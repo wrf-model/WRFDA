@@ -52,11 +52,11 @@ SUBROUTINE DA_Test_Transforms (diff, xb, xbx, xp,  &
    enddo
    enddo
 
-   CALL DA_PsiChi_To_UV (diff%psi, diff%chi, xb%map_factor, xb%ds, &
-                         diff%u, diff%v,   &
-                            ids,ide, jds,jde, kds,kde,  &
-                            ims,ime, jms,jme, kms,kme,  &
-                            its,ite, jts,jte, kts,kte )
+   CALL DA_PsiChi_To_UV(diff % psi, diff % chi, xb % coefx, &
+                        xb % coefy , diff % u, diff % v, &
+                        ids,ide, jds,jde, kds,kde, &
+                        ims,ime, jms,jme, kms,kme, &
+                        its,ite, jts,jte, kts,kte )
 
 #ifndef DEREF_KLUDGE
    CALL DA_UV_To_Vorticity( xb, diff % u, diff % v, vor, &
@@ -104,12 +104,12 @@ SUBROUTINE DA_Test_Transforms (diff, xb, xbx, xp,  &
                                     ims,ime, jms,jme, kms,kme,      &
                                     its,ite, jts,jte, kts,kte )
 
+   CALL DA_PsiChi_To_UV(psi, chi, xb % coefx, &
+                        xb % coefy , u, v, &
+                        ids,ide, jds,jde, kds,kde, &
+                        ims,ime, jms,jme, kms,kme, &
+                        its,ite, jts,jte, kts,kte )
 
-   CALL DA_PsiChi_To_UV (psi, chi, xb%map_factor, xb%ds, &
-                         u, v,   &
-                            ids,ide, jds,jde, kds,kde,  &
-                            ims,ime, jms,jme, kms,kme,  &
-                            its,ite, jts,jte, kts,kte )
 !   do k=1,1 !kde
 !   write(301,'(10e13.5)') ((u(i,j,k),i=1,ide),j=1,jde)
 !   write(302,'(10e13.5)') ((v(i,j,k),i=1,ide),j=1,jde)
