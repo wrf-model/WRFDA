@@ -33,6 +33,7 @@ SUBROUTINE DA_Allocate_Y( iv, y )
    y % num_metar = iv % num_metar
    y % num_sound = iv % num_sound
    y % num_pilot = iv % num_pilot
+   y % num_bogus = iv % num_bogus
    y % num_Radar = iv % num_Radar
    y % num_airep = iv % num_airep
    y % num_satem = iv % num_satem
@@ -197,6 +198,25 @@ SUBROUTINE DA_Allocate_Y( iv, y )
          y % airep(n) % t(1:nlevels) = 0.0
 
       end do
+   END IF
+
+!  Initialize Bogus:
+
+   IF ( y % num_bogus > 0 ) THEN
+      ALLOCATE (y % bogus(1:y % num_bogus))
+      do n = 1, y % num_bogus
+
+         nlevels = iv % bogus(n) % info % levels
+         ALLOCATE (y % bogus(n)%u(1:nlevels))
+         ALLOCATE (y % bogus(n)%v(1:nlevels))
+
+         y % bogus(n) % u(1:nlevels) = 0.0
+         y % bogus(n) % v(1:nlevels) = 0.0
+
+      end do
+
+      y % bogus(1:y % num_bogus) % slp = 0.0
+
    END IF
 
 !  Initialize satem:

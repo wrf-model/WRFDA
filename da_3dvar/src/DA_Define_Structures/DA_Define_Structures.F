@@ -17,6 +17,7 @@ MODULE DA_Define_Structures
 !  HISTORY: 01/06/2000 - Creation of F90 version.           Dale Barker
 !           10/19/2001 - Mods for parallel implementation.  Al Bourgeois
 !           05/25/2004 - "gpsref" added.             W. Huang, Y.-R. Guo
+!           10/08/2004 - Updated be_type             Syed  RH Rizvi         
 !------------------------------------------------------------------------------
 
    USE DA_Constants
@@ -165,6 +166,28 @@ MODULE DA_Define_Structures
       REAL, POINTER    :: fft_coeffs(:,:)    ! FFT Coefficients
 
       REAL             :: fft_adjoint_factor ! FFT Adjoint factor
+!  spectral transform related variables
+      INTEGER          :: inc                ! Vector array increment 
+      INTEGER          :: ni                 
+      INTEGER          :: nj                 
+      INTEGER          :: nk                 
+      INTEGER          :: max_wavenumber     
+      INTEGER          :: c_cv_size           
+      INTEGER          :: lenr               
+      INTEGER          :: lensav             
+      INTEGER          :: lenwrk             
+      INTEGER          :: alp_size           
+   real, pointer       :: wsave(:)          ! Primes for FFT.
+   real, pointer       :: lon(:)            ! Longitude (radians).
+   real, pointer       :: sinlon(:)         ! sine(longitude).
+   real, pointer       :: coslon(:)         ! cosine(longitude).
+   real, pointer       :: lat(:)            ! Latitude (radians, from south).
+   real, pointer       :: sinlat(:)         ! sine(latitude).
+   real, pointer       :: coslat(:)         ! cosine(latitude).
+   real, pointer       :: int_wgts(:)       ! Legendre integration weights.
+   real, pointer       :: alp(:)            ! Associated Legendre Polynomial.
+
+
    END TYPE xbx_type
 
 !-----------------------------------------------------------------------------
@@ -314,6 +337,18 @@ MODULE DA_Define_Structures
       TYPE (field_type)     , pointer :: u        (:) ! u-wind.
       TYPE (field_type)     , pointer :: v        (:) ! v-wind.
    END TYPE pilot_type
+
+   TYPE bogus_type
+      TYPE (info_type)        :: info
+      TYPE (model_loc_type)   :: loc
+
+      REAL                  , pointer :: p        (:) ! Height in m
+      REAL                  , pointer :: zk       (:) ! k-coordinates
+
+      TYPE (field_type)     , pointer :: u        (:) ! u-wind.
+      TYPE (field_type)     , pointer :: v        (:) ! v-wind.
+      TYPE (field_type)               :: slp          ! sea level pressure.
+   END TYPE bogus_type
 
    TYPE satem_type
       TYPE (info_type)        :: info
@@ -487,6 +522,7 @@ MODULE DA_Define_Structures
                  sound, &
                  satob, &
                  pilot, &
+                 bogus, &
                  satem, &
                  airep, &
                  metar, &
@@ -517,7 +553,7 @@ MODULE DA_Define_Structures
                  num_ssmi_tb, num_ssmi_retrieval, &
                  num_ssmt1, num_ssmt2, num_pseudo, &
                  num_qscat, num_profiler, num_buoy, &
-                 num_Radar, num_gpsref
+                 num_Radar, num_gpsref, num_bogus
 
       INTEGER :: num_synop_glo, &
                  num_sound_glo, num_satob_glo, &
@@ -527,7 +563,7 @@ MODULE DA_Define_Structures
                  num_ssmi_tb_glo, num_ssmi_retrieval_glo, &
                  num_ssmt1_glo, num_ssmt2_glo, num_pseudo_glo, &
                  num_qscat_glo, num_profiler_glo, num_buoy_glo, &
-                 num_Radar_glo, num_gpsref_glo
+                 num_Radar_glo, num_gpsref_glo, num_bogus_glo
 
       real    :: synop_ef_u, synop_ef_v, synop_ef_t, synop_ef_p, synop_ef_q
       real    :: metar_ef_u, metar_ef_v, metar_ef_t, metar_ef_p, metar_ef_q
@@ -544,6 +580,7 @@ MODULE DA_Define_Structures
       real    :: profiler_ef_u, profiler_ef_v
       real    :: buoy_ef_u, buoy_ef_v, buoy_ef_t, buoy_ef_p, buoy_ef_q
       real    :: Radar_ef_rv, Radar_ef_rf
+      real    :: bogus_ef_u, bogus_ef_v, bogus_ef_slp
 
       TYPE (sound_type)         , pointer :: sound(:)
       TYPE (synop_type)         , pointer :: sonde_sfc(:)
@@ -564,6 +601,7 @@ MODULE DA_Define_Structures
       TYPE (qscat_type)         , pointer :: qscat(:)
       TYPE (synop_type)         , pointer :: buoy(:)
       TYPE (pilot_type)         , pointer :: profiler(:)
+      TYPE (bogus_type)         , pointer :: bogus(:)
       TYPE (Radar_type)         , pointer :: Radar(:)
 
       REAL :: missing
@@ -598,6 +636,7 @@ MODULE DA_Define_Structures
       type (bad_info)       :: rh
       type (bad_info)       :: rv
       type (bad_info)       :: rf
+      type (bad_info)       :: slp
    END TYPE bad_data_type
 
    TYPE count_obs_number_type
@@ -621,7 +660,7 @@ MODULE DA_Define_Structures
                                          num_qscat, &
                                          num_profiler, &
                                          num_buoy, &
-                                         num_Radar, &
+                                         num_Radar, num_bogus, &
                                          num_other  
 
    END TYPE count_obs_type
@@ -664,6 +703,12 @@ MODULE DA_Define_Structures
       REAL, POINTER :: u(:)                     ! u-wind.
       REAL, POINTER :: v(:)                     ! v-wind.
    END TYPE residual_pilot_type
+
+   TYPE residual_bogus_type
+      REAL, POINTER :: u(:)                     ! u-wind.
+      REAL, POINTER :: v(:)                     ! v-wind.
+      REAL          :: slp                      ! sea-level pressure.
+   END TYPE residual_bogus_type
 
    TYPE residual_satem_type
       REAL, POINTER :: thickness(:)             ! Thickness.
@@ -739,7 +784,7 @@ MODULE DA_Define_Structures
                    num_ssmi_tb, num_ssmi_retrieval, &
                    num_ssmt1, num_ssmt2, num_pseudo, &
                    num_qscat, num_profiler, num_buoy, &
-                   num_Radar, num_gpsref
+                   num_Radar, num_gpsref, num_bogus
 
         TYPE (residual_synop_type), POINTER :: synop(:)
         TYPE (residual_synop_type), POINTER :: metar(:) ! Same as synop type
@@ -748,6 +793,7 @@ MODULE DA_Define_Structures
         TYPE (residual_gpspw_type ), POINTER :: gpspw (:)
         TYPE (residual_gpsref_type), POINTER :: gpsref(:)
         TYPE (residual_sound_type), POINTER :: sound(:)
+        TYPE (residual_bogus_type), POINTER :: bogus(:)
         TYPE (residual_synop_type), POINTER :: sonde_sfc(:) ! Same as synop type
         TYPE (residual_airep_type), POINTER :: airep(:)
         TYPE (residual_pilot_type), POINTER :: pilot(:)
@@ -782,6 +828,7 @@ MODULE DA_Define_Structures
         TYPE (maxmin_type)         :: q        ! Mixing ration kg/kg
         TYPE (maxmin_type)         :: rh       ! Relative humidity %.
         TYPE (maxmin_type)         :: tpw      ! Toatl precipitable water cm
+        TYPE (maxmin_type)         :: slp      ! Sea Level pressure (hPa)
 !       TYPE (maxmin_type)         :: Speed    ! Wind speed (m/s)
    END TYPE maxmin_stats_type
 
@@ -829,6 +876,7 @@ MODULE DA_Define_Structures
       REAL          :: q                        ! specific humidity.
       REAL          :: Speed                    ! Wind speed in m/s
       REAL          :: tpw                      ! Toatl precipitable water cm
+      REAL          :: slp                      ! sea level pressure (hPa)
    END TYPE residual_type
 
    TYPE stats_type
@@ -895,6 +943,7 @@ MODULE DA_Define_Structures
       real                :: profiler_u, profiler_v
       real                :: buoy_u, buoy_v, buoy_t, buoy_p, buoy_q
       real                :: Radar_rv, Radar_rf
+      real                :: bogus_u, bogus_v, bogus_slp
    end type jo_type
 
    type j_type
@@ -913,15 +962,19 @@ MODULE DA_Define_Structures
       INTEGER          :: size3              ! Size of CV array of 3rd variable error.
       INTEGER          :: size4              ! Size of CV array of 4th variable error.
       INTEGER          :: size5              ! Size of CV array of 5th variable error.
-      REAL, POINTER    :: array(:)           ! Control variables v.
+      real, POINTER    :: array(:)           ! Control variables v.
+
    END TYPE cv_type
 
    TYPE be_subtype
       INTEGER           :: mz                ! Vertical truncation of errors.
       CHARACTER*5       :: name              ! Variable name.
-      REAL, POINTER     :: val(:,:)          ! Standard dev./sqrt(eigenvalue).
       REAL, POINTER     :: rf_alpha(:)       ! RF scale length.
-      REAL, POINTER     :: evec(:,:,:)       ! Vertical eigenvectors.
+      REAL, POINTER     :: val(:,:)          ! LOcal Standard dev./sqrt(eigenvalue).
+      REAL, POINTER     :: evec(:,:,:)       ! LOcal Vertical eigenvectors.
+      REAL, POINTER     :: val_g(:)          ! Global Standard dev./sqrt(eigenvalue).
+      REAL, POINTER     :: evec_g(:,:)       ! Global Vertical eigenvectors.
+      real, pointer     :: power(:,:)        ! Power spectrum
    END TYPE be_subtype
 
    TYPE be_type
@@ -934,7 +987,7 @@ MODULE DA_Define_Structures
       TYPE (be_subtype) :: v4
       TYPE (be_subtype) :: v5
       REAL, POINTER     :: pb_vert_reg(:,:,:)
-
+!
 !     Control variable space errors:
       TYPE (cv_type)    :: cv
 
@@ -954,6 +1007,11 @@ MODULE DA_Define_Structures
       REAL, POINTER    :: vz(:,:,:,:)
       REAL, POINTER    :: corz(:,:,:,:)
       REAL, POINTER    :: corp(:,:)
+!-----For cv option 4:
+      REAL, POINTER     :: reg_chi(:,:)
+      REAL, POINTER     :: reg_t  (:,:,:)
+      REAL, POINTER     :: reg_ps (:,:)
+
    END TYPE be_type
 
 !  Analysis_Stats maximum-minumum structure.

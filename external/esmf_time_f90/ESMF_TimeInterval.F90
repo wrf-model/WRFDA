@@ -441,7 +441,7 @@
 ! !IROUTINE: ESMF_TimeIntervalSet - Initialize via user-specified unit set
 
 ! !INTERFACE:
-      subroutine ESMF_TimeIntervalSet(timeinterval, YY, YYl, MO, MOl, D, Dl, &
+      subroutine ESMF_TimeIntervalSet(timeinterval, YY, YYl, MM, MOl, D, Dl, &
                                       H, M, S, Sl, MS, US, NS, &
                                       d_, h_, m_, s_, ms_, us_, ns_, &
                                       Sn, Sd, rc)
@@ -450,7 +450,7 @@
       type(ESMF_TimeInterval), intent(out) :: timeinterval
       integer, intent(in), optional :: YY
       integer(ESMF_IKIND_I8), intent(in), optional :: YYl
-      integer, intent(in), optional :: MO
+      integer, intent(in), optional :: MM
       integer(ESMF_IKIND_I8), intent(in), optional :: MOl
       integer, intent(in), optional :: D
       integer(ESMF_IKIND_I8), intent(in), optional :: Dl
@@ -491,7 +491,7 @@
 !          Integer number of interval years (>= 32-bit)
 !     \item[{[YYl]}]
 !          Integer number of interval years (large, >= 64-bit)
-!     \item[{[MO]}]
+!     \item[{[MM]}]
 !          Integer number of interval months (>= 32-bit)
 !     \item[{[MOl]}]
 !          Integer number of interval months (large, >= 64-bit)
@@ -540,7 +540,7 @@
 !EOP
 
       ! use optional args for any subset
-      call c_ESMC_TimeIntervalSet(timeinterval, YY, YYl, MO, MOl, D, Dl, &
+      call c_ESMC_TimeIntervalSet(timeinterval, YY, YYl, MM, MOl, D, Dl, &
                                   H, M, S, Sl, MS, US, NS, &
                                   d_, h_, m_, s_, ms_, us_, ns_, &
                                   Sn, Sd, rc)
@@ -552,12 +552,8 @@
         timeinterval%YR = YY
       ENDIF
       timeinterval%MM = 0
-      IF ( PRESENT( MO ) ) THEN
-        timeinterval%MM = MO
-      ENDIF
-      timeinterval%DD = 0
-      IF ( PRESENT( D ) ) THEN
-        timeinterval%DD = D
+      IF ( PRESENT( MM ) ) THEN
+        timeinterval%MM = MM
       ENDIF
 !
 !      timeinterval%basetime%S = 0
@@ -578,7 +574,11 @@
 !        timeinterval%basetime%MS = NINT( Sn*1.0D0 / Sd*1.0D0 * 1000 )
 !      ENDIF
 
+      timeinterval%DD = 0
       timeinterval%basetime%S = 0
+      IF ( PRESENT( D ) ) THEN
+        timeinterval%basetime%S = timeinterval%basetime%S + D * 24 * 3600
+      ENDIF
       IF ( PRESENT( H ) ) THEN
         timeinterval%basetime%S = timeinterval%basetime%S + H * 3600
       ENDIF
@@ -646,11 +646,13 @@
 !EOP
 
 #ifdef F90_STANDALONE
-      write(TimeString,'(I4.4"-"I2.2"-"I2.2"_"I2.2":"I2.2":"I2.2)') &
-             timeinterval%YR,timeinterval%MM,timeinterval%DD, &
-             timeinterval%basetime%S / 3600 , &
+      write(TimeString,'(I5.5"_"I2.2":"I2.2":"I2.2)') &
+             timeinterval%basetime%S / (3600 * 24) , &
+             mod( timeinterval%basetime%S / 3600 , 24 ) , &
              mod( timeinterval%basetime%S / 60 , 60 ), &
              mod( timeinterval%basetime%S  , 60 )
+
+!write(0,*)'TimeIntervalGetString Sn ',timeinterval%basetime%Sn,' Sd ',timeinterval%basetime%Sd
 
 
       rc = ESMF_SUCCESS
@@ -818,7 +820,7 @@
 ! !ARGUMENTS:
       type(ESMF_TimeInterval), intent(in) :: timeinterval
       integer, intent(in) :: divisor
-      integer  d, n, remainder
+      integer  d, n
 !
       type(ESMF_TimeInterval) :: retval
 ! !LOCAL:
@@ -840,28 +842,23 @@
 !     TMG1.5.6, TMG5.3, TMG7.2
 !EOP
 
+      retval = timeinterval
 
       CALL ESMF_TimeIntervalSet( ESMF_TimeIntervalQuotI, rc=rc )
       call c_ESMC_TimeIntervalQuotI(timeinterval, divisor, &
                                     ESMF_TimeIntervalQuotI)
 
-      retval = timeinterval
-! divide the whole seconds 
-      retval%basetime%S = timeinterval%basetime%S / divisor
-      remainder =         mod( timeinterval%basetime%S , divisor )
-
-! divide the fractional part (don't worry about simplification here)
-      n = retval%basetime%Sn
-      d = retval%basetime%Sd * divisor
-
-! add the remainder from above to the fractional part
-      n = n + remainder * divisor
+! convert timeinterval to a fraction and divide by multipling the denonminator by the divisor
+      n = timeinterval%basetime%S * timeinterval%basetime%Sd + timeinterval%basetime%Sn
+      d = timeinterval%basetime%Sd * divisor
 
       CALL simplify(n,d,retval%basetime%Sn,retval%basetime%Sd) 
+
       IF ( retval%basetime%Sn > retval%basetime%Sd ) THEN
-        retval%basetime%S = retval%basetime%S + retval%basetime%Sn / retval%basetime%Sd
+        retval%basetime%S = retval%basetime%Sn / retval%basetime%Sd
         retval%basetime%Sn = mod( retval%basetime%Sn, retval%basetime%Sd )
       ENDIF
+
       ESMF_TimeIntervalQuotI = retval
 
       end function ESMF_TimeIntervalQuotI

@@ -75,6 +75,17 @@ SUBROUTINE DA_Deallocate_Observations ( ob )
       DEALLOCATE (ob % pilot)
    endif
 
+   IF ( ob % num_bogus > 0 ) then
+      do n = 1, ob % num_bogus
+         deallocate (ob % bogus ( n ) % p )
+         deallocate (ob % bogus ( n ) % zk)
+         deallocate (ob % bogus ( n ) % u )
+         deallocate (ob % bogus ( n ) % v )
+      enddo
+
+      DEALLOCATE (ob % bogus)
+   endif
+
    IF ( ob % num_Radar > 0 ) then
       do n = 1, ob % num_Radar
          deallocate (ob % Radar ( n ) % height   )

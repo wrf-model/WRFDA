@@ -28,7 +28,7 @@ SUBROUTINE DA_AO_Stats_Sound( stats_unit, oi, re )
    Sound%minimum%t = maxmin_type(-missing_r, 0, 0)
    Sound%minimum%p = maxmin_type(-missing_r, 0, 0)
    Sound%minimum%q = maxmin_type(-missing_r, 0, 0)
-   Sound%average = residual_type(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+   Sound%average = residual_type(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
    Sound%rms_err = Sound%average
 
    IF ( oi%num_Sound > 0 ) THEN

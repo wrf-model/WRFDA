@@ -24,7 +24,7 @@ SUBROUTINE DA_AO_Stats_Airep( stats_unit, oi, re )
    Airep%minimum%u = maxmin_type(-missing_r, 0, 0)
    Airep%minimum%v = maxmin_type(-missing_r, 0, 0)
    Airep%minimum%t = maxmin_type(-missing_r, 0, 0)
-   Airep%average = residual_type(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+   Airep%average = residual_type(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
    Airep%rms_err = Airep%average
 
    IF ( oi%num_Airep > 0 ) THEN

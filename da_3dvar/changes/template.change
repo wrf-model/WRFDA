@@ -42,3 +42,15 @@ Files modified:
 
 cvs commit ?
 
+tag info:
+---------------
+
+wrfvar_version_2_0_a_b_c
+
+2_0	following WRF release
+2_0_a	Major wrfvar develope
+2_0_a_b	Bug fix on 2_0_a
+2_0_a_b_c Bug fix on 2_0_a_b
+
+(a, b, and c are integeres stat from 0)
+              

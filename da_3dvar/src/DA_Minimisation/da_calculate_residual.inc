@@ -79,6 +79,11 @@
       call da_calculate_residual_Pilot( iv, y, re, np_missing, np_bad_data, &
                                         np_obs_used, np_available )
 
+!     for TC bogus
+
+      call da_calculate_residual_bogus( iv, y, re, np_missing, np_bad_data, &
+                                        np_obs_used, np_available )
+
 !     for Satem
 
       call da_calculate_residual_Satem( iv, y, re, np_missing, np_bad_data, &

@@ -20,7 +20,7 @@ SUBROUTINE DA_AO_Stats_Satob ( stats_unit, oi, re )
    satob%maximum%v = maxmin_type( missing_r, 0, 0)
    satob%minimum%u = maxmin_type(-missing_r, 0, 0)
    satob%minimum%v = maxmin_type(-missing_r, 0, 0)
-   satob%average = residual_type(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+   satob%average = residual_type(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
    satob%rms_err = satob%average
 
    IF ( oi%num_satob > 0 ) THEN

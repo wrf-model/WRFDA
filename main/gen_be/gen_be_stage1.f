@@ -115,6 +115,7 @@ program gen_be_stage1
          read(iunit)t_prime
          read(iunit)rh_prime
          read(iunit)ps_prime
+
          read(iunit)height
 
          read(iunit)latitude
@@ -306,10 +307,11 @@ program gen_be_stage1
 !        Write ps:
          variable = 'ps' ! 2D field
          filename = trim(variable)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce
+         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce//'.01'
          open (ounit, file = filename, form='unformatted')
          write(ounit)ni, nj, 1
-         write(ounit)ps_prime
+        write(ounit).true., .false.
+        write(ounit)ps_prime
          close(ounit)
 
       end do  ! End loop over ensemble members.

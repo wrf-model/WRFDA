@@ -29,7 +29,7 @@ SUBROUTINE DA_AO_Stats_Synop( stats_unit, oi, re )
    synop%minimum%t = maxmin_type(-missing_r, 0, 0)
    synop%minimum%p = maxmin_type(-missing_r, 0, 0)
    synop%minimum%q = maxmin_type(-missing_r, 0, 0)
-   synop%average = residual_type(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+   synop%average = residual_type(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
    synop%rms_err = synop%average
 
    IF ( oi%num_synop > 0 ) THEN

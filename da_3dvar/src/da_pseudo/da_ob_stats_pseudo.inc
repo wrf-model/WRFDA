@@ -27,7 +27,7 @@ SUBROUTINE da_ob_stats_pseudo ( stats_unit, oi )
    pseudo%minimum%t = maxmin_type( -missing_r, 0, 0)
    pseudo%minimum%p = maxmin_type( -missing_r, 0, 0)
    pseudo%minimum%q = maxmin_type( -missing_r, 0, 0)
-   pseudo%average = residual_type(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+   pseudo%average = residual_type(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
    pseudo%rms_err = pseudo%average
    
    IF ( oi%num_pseudo > 0 ) THEN

@@ -200,7 +200,13 @@ SUBROUTINE DA_Transfer_MM5ToXb( ix, jy, kz, xp, xb_mm5, xb, xbx )
 
 !  Sea level pressure and total precipitable water
 
-   call DA_WRF_TPQ_2_SLP ( xb )
+!  call DA_WRF_TPQ_2_SLP ( xb )
+   do j = js,je
+   do i = is,ie
+      call DA_TPQ_To_SLP( xb%t(i,j,:), xb%q(i,j,:), xb%p(i,j,:), xb%terr(i,j), &
+                         xb%psfc(i,j), xb%slp(i,j), xp )
+   end do
+   enddo
    CALL INTEGRAT_dZ ( xb )
 
 !  Roughness
@@ -271,7 +277,6 @@ SUBROUTINE DA_Transfer_MM5ToXb( ix, jy, kz, xp, xb_mm5, xb, xbx )
      enddo
 
    ENDIF
-
 
 END SUBROUTINE DA_Transfer_MM5ToXb
 
