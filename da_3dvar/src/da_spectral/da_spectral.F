@@ -24,8 +24,5 @@ module da_spectral
 #include "da_test_spectral.inc"
 #include "da_v_to_vv_spectral.inc"
 #include "da_vv_to_v_spectral.inc"
-#include "da_v_to_vv_spectral_adj.inc"
-#include "da_legtra_inv_adj.inc"
-#include "da_apply_power.inc"
 
 end module da_spectral

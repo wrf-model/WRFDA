@@ -22,7 +22,6 @@ subroutine da_setlegpol_test ( nj, max_wavenumber, alp_size, int_wgts, alp )
       eq_coeff = 1.0 ! Odd latitudes
    else
       eq_coeff = 0.0 ! Even latitudes
-      eq_term  = 0.0
    end if
 
 !  Test 0.5 * integral_-1^1 alp(j,l1,m) * alp(j,l2,m) = 1 if l1=l2, 0 otherwise:
@@ -49,8 +48,7 @@ subroutine da_setlegpol_test ( nj, max_wavenumber, alp_size, int_wgts, alp )
                alp_norm_test = alp_norm_test + int_wgts(j1) * &
                                sign_switch1 * alp(index1) * sign_switch2 * alp(index2)
             end do
-        if( eq_coeff > 0.0 ) then   
-!           Skip this step for even lats       R! Syed RH Rizvi! S
+
 !           Add equator term (wrong if even nj, but then eq_coeff = 0.0 so OK):
             j = nj/2 + 1
             index_j = ( j - 1 ) * ( max_wavenumber + 1 ) * ( max_wavenumber + 2 ) / 2
@@ -58,7 +56,7 @@ subroutine da_setlegpol_test ( nj, max_wavenumber, alp_size, int_wgts, alp )
             index2 = index_j + index_m + l2
 
             eq_term = int_wgts(j) * alp(index1) * alp(index2)
-        end if
+
             alp_norm_test = 0.5 * ( alp_norm_test + eq_coeff * eq_term )
 
 !            if ( l1 /= l2 .and. abs(alp_norm_test) >= tolerance ) then

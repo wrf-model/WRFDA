@@ -50,4 +50,5 @@ subroutine da_leg_tra_inv ( nj, max_wavenumber, alp_size, m, alp, v, r_leg )
       end do
       r_leg(j) = sum_legtra1
    end if
+
 end subroutine da_leg_tra_inv

@@ -181,7 +181,7 @@ program gen_be_stage4
 !---------------------------------------------------------------------------------------------
 
          call da_vv_to_v_spectral( ni, nj, max_wavenumber, inc, lenr, lensav, lenwrk, &
-                                   alp_size, v_size, alp, wsave, int_wgts, cv, field)
+                                   alp_size, v_size, alp, wsave, int_wgts, field, cv)
 
 !---------------------------------------------------------------------------------------------
 !         write(6,(a)) Calculate power spectra.

@@ -24,7 +24,6 @@ subroutine da_leg_tra ( nj, max_wavenumber, alp_size, m, int_wgts, alp, r_leg, v
       eq_coeff = 1.0 ! Odd latitudes
    else
       eq_coeff = 0.0 ! Even latitudes
-      eq_term  = 0.0
    end if
 
    do l = m, max_wavenumber
@@ -43,16 +42,13 @@ subroutine da_leg_tra ( nj, max_wavenumber, alp_size, m, int_wgts, alp, r_leg, v
          j1 = nj + 1 - j
          sum_legtra = sum_legtra + sign_switch * int_wgts(j1) * r_leg(j1) * alp(index)
       end do
-     
-     if( eq_coeff > 0.0) then
-!     Skip this step for Even lats    ! Syed RH Rizvi
+
 !     Add equator term (wrong if even nj, but then eq_coeff = 0.0 so OK):
       j = nj/2 + 1
       index_j = ( j - 1 ) * ( max_wavenumber + 1 ) * ( max_wavenumber + 2 ) / 2
       index = index_j + index_m + l
-      eq_term = int_wgts(j) * r_leg(j) * alp(index)
-      end if
 
+      eq_term = int_wgts(j) * r_leg(j) * alp(index)
       v(l) = 0.5 * ( sum_legtra + eq_coeff * eq_term )
    end do
 
