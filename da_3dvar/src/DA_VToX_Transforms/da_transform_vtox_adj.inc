@@ -279,7 +279,7 @@ subroutine da_transform_vtox_adj( xb, xbx, be, xa, xp, vp, vv, cv, &
                                 ids,ide, jds,jde, kds,kde,  &
                                 ims,ime, jms,jme, kms,kme,  &
                                 its,ite, jts,jte, kts,kte )
-   if( print_detail > 100) then
+   if( print_detail >= 100) then
       write(unit=0, fmt='(2a,2x,a,i6)') 'file:', __FILE__, 'line:', __LINE__
       call get_3d_sum(vp%v1, 'vp%v1', &
                       ids, ide, jds, jde, kds, kde, &
@@ -327,7 +327,7 @@ subroutine da_transform_vtox_adj( xb, xbx, be, xa, xp, vp, vv, cv, &
       vv % v5(its:ite,jts:jte,kts:kte) = vp % v5(its:ite,jts:jte,kts:kte)
    end if
 
-   if( print_detail > 100) then 
+   if( print_detail >= 100) then 
       write(unit=0, fmt='(2a,2x,a,i6)') 'file:', __FILE__, 'line:', __LINE__
       call get_3d_sum(vv%v1, 'vv%v1', &
                       ids, ide, jds, jde, kds, kde, &
@@ -383,7 +383,7 @@ subroutine da_transform_vtox_adj( xb, xbx, be, xa, xp, vp, vv, cv, &
                               ids,ide, jds,jde, kds,kde,  &
                               ims,ime, jms,jme, kms,kme,  &
                               its,ite, jts,jte, kts,kte )
- if( print_detail > 100 ) &
+ if( print_detail >= 100 ) &
  print*,' in vtox_adj after vtovv_adj  cv.cv = ',sum(cv * cv)
 
 end subroutine da_transform_vtox_adj

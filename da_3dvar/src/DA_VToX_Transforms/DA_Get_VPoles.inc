@@ -24,12 +24,13 @@ SUBROUTINE DA_GET_VPoles(u,v,lon,        &
    real                   :: conv,tmpvar                                         
    real                   :: tmpu,tmp_u,tmpv,tmp_v,tmpp,tmp_p,tmpps,tmp_ps
    integer                :: ierror, k
-   real                   :: xlon(its:ite)    
+   real, dimension(ims:ime) :: xls, xln
 !---------------------------------------------------------------------------
       conv = pi/180. 
 !---------------------------------------------------------------------------
    tmpvar      = 1.0/real(ide-ids+1)
-   xlon(its:ite) = conv*lon(its:ite,jts)
+   xls(its:ite) = conv*lon(its:ite,jts)
+   xln(its:ite) = conv*lon(its:ite,jte)
 !---------------------------------------------------------------------------------
  do k = kts,kte
    tmp_u =0.0
@@ -38,10 +39,10 @@ SUBROUTINE DA_GET_VPoles(u,v,lon,        &
    tmpv = 0.
 
    if( jts == jds) then 
-      tmp_u = tmpvar*sum(-u(its:ite,jts+1,k)*cos(xlon(its:ite))& 
-                         +v(its:ite,jts+1,k)*sin(xlon(its:ite)))
-      tmp_v = tmpvar*sum(-u(its:ite,jts+1,k)*sin(xlon(its:ite))& 
-                         -v(its:ite,jts+1,k)*cos(xlon(its:ite)))
+      tmp_u = tmpvar*sum(-u(its:ite,jts+1,k)*cos(xls(its:ite))& 
+                         +v(its:ite,jts+1,k)*sin(xls(its:ite)))
+      tmp_v = tmpvar*sum(-u(its:ite,jts+1,k)*sin(xls(its:ite))& 
+                         -v(its:ite,jts+1,k)*cos(xls(its:ite)))
      
    end if
 
@@ -53,9 +54,8 @@ SUBROUTINE DA_GET_VPoles(u,v,lon,        &
    tmpv = tmp_v                    
 #endif
    if( jts == jds) then 
-    
-     u(its:ite,jts,k) = -tmpu*cos(xlon(its:ite)) -tmpv*sin(xlon(its:ite))
-     v(its:ite,jts,k) =  tmpu*sin(xlon(its:ite)) -tmpv*cos(xlon(its:ite))
+     u(its:ite,jts,k) = -tmpu*cos(xls(its:ite)) -tmpv*sin(xls(its:ite))
+     v(its:ite,jts,k) =  tmpu*sin(xls(its:ite)) -tmpv*cos(xls(its:ite))
    end if
 !
    tmp_u =0.0
@@ -64,10 +64,10 @@ SUBROUTINE DA_GET_VPoles(u,v,lon,        &
    tmpv = 0.
 
    if( jte == jde) then 
-      tmp_u = tmpvar*sum(-u(its:ite,jte-1,k)*cos(xlon(its:ite))& 
-                         -v(its:ite,jte-1,k)*sin(xlon(its:ite)))
-      tmp_v = tmpvar*sum( u(its:ite,jte-1,k)*sin(xlon(its:ite))& 
-                         -v(its:ite,jte-1,k)*cos(xlon(its:ite)))
+      tmp_u = tmpvar*sum(-u(its:ite,jte-1,k)*cos(xln(its:ite))& 
+                         -v(its:ite,jte-1,k)*sin(xln(its:ite)))
+      tmp_v = tmpvar*sum( u(its:ite,jte-1,k)*sin(xln(its:ite))& 
+                         -v(its:ite,jte-1,k)*cos(xln(its:ite)))
    end if
 #ifdef DM_PARALLEL
    call MPI_ALLREDUCE(tmp_u,tmpu,1, MPI_REAL8, MPI_SUM, MPI_COMM_WORLD, IERROR )
@@ -79,8 +79,10 @@ SUBROUTINE DA_GET_VPoles(u,v,lon,        &
    tmpv = tmp_v                    
 #endif
    if( jte == jde) then 
-     u(its:ite,jte,k) = -tmpu*cos(xlon(its:ite)) +tmpv*sin(xlon(its:ite))
-     v(its:ite,jte,k) = -tmpu*sin(xlon(its:ite)) -tmpv*cos(xlon(its:ite))
+     u(its:ite,jte,k) = -tmpu*cos(xln(its:ite)) +tmpv*sin(xln(its:ite))
+     v(its:ite,jte,k) = -tmpu*sin(xln(its:ite)) -tmpv*cos(xln(its:ite))
    end if
  end do
 END SUBROUTINE DA_GET_VPoles
+
+

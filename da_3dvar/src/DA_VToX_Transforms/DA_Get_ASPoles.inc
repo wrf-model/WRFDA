@@ -28,14 +28,17 @@ SUBROUTINE DA_GET_ASPoles(x,              &
 !
  do k = kts, kte
    tmps =0.0  ; tmp_s =0.0
-   if( jts == jds)  tmp_s = tmpvar*sum(x(its:ite,jts,k))
+   if( jts == jds) tmp_s = tmpvar*sum(x(its:ite,jts,k))
 
 #ifdef DM_PARALLEL
    call MPI_ALLREDUCE(tmp_s,tmps,1, MPI_REAL8, MPI_SUM, MPI_COMM_WORLD, IERROR )
 #else
    tmps = tmp_s                    
 #endif
-   if( jts == jds) x(its:ite,jts+1,k) = x(its:ite,jts+1,k) + tmps
+   if( jts == jds) then
+      x(its:ite,jts+1,k) = x(its:ite,jts+1,k) + tmps
+      x(its:ite,jts,k) = 0.0
+   endif
 !
    tmps =0.0  ; tmp_s =0.0
    if( jte == jde) tmp_s = tmpvar*sum(x(its:ite,jte,k))
@@ -45,9 +48,11 @@ SUBROUTINE DA_GET_ASPoles(x,              &
 #else
    tmps = tmp_s                    
 #endif
-   if( jte == jde) x(its:ite,jte-1,k) = x(its:ite,jte-1,k) + tmps
- x(its:ite,jts,k) = 0.0
- x(its:ite,jte,k) = 0.0
+   if( jte == jde) then
+      x(its:ite,jte-1,k) = x(its:ite,jte-1,k) + tmps
+      x(its:ite,jte,k) = 0.0
+   endif
  end do
 
 END SUBROUTINE DA_GET_ASPoles
+

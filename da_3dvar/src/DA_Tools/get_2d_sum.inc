@@ -11,6 +11,11 @@ subroutine get_2d_sum(var, name, &
    character(len=*), intent(in) :: name
 
    real :: partial, total
+   integer :: ierror
+
+#ifdef DM_PARALLEL
+   include 'mpif.h'
+#endif
 
 #if ( DWORDSIZE != RWORDSIZE )
 #define TRUE_MPI_REAL     MPI_REAL

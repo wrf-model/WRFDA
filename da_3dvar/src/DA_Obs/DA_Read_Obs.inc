@@ -152,7 +152,7 @@ SUBROUTINE DA_Read_Obs (iunit, ob, xp, filename)
       RETURN
    ENDIF
 
-   if(print_detail > 100) then
+   if(print_detail > 500) then
       write(unit=*, fmt='(2a)') &
            'fmt_info=', fmt_info, &
            'fmt_loc =', fmt_loc,  &
@@ -190,7 +190,7 @@ SUBROUTINE DA_Read_Obs (iunit, ob, xp, filename)
          EXIT reports
       ENDIF
 
-      if(print_detail > 100) then
+      if(print_detail > 500) then
          write(unit=*, fmt=fmt_info) &
                platform%info%platform,    &
                platform%info%date_char,   &
@@ -255,7 +255,7 @@ loop_level: DO i = 1, platform%info%levels
               platform%each (i)%td,           &
               platform%each (i)%rh
 
-      if(print_detail > 100) then
+      if(print_detail > 500) then
          write(unit=*, FMT = '( a, i6)') 'i=', i
          write(unit=*, FMT = TRIM (fmt_each)) &
               platform%each (i)%p,            &

@@ -69,6 +69,8 @@ SUBROUTINE DA_GET_AVPoles(u,v,lon,       &
                          -v(its:ite,jte,k)*sin(xlon(its:ite)))
       tmp_v = tmpvar*sum( u(its:ite,jte,k)*sin(xlon(its:ite))& 
                          -v(its:ite,jte,k)*cos(xlon(its:ite)))
+      u(its:ite,jts,k) = 0.0
+      v(its:ite,jts,k) = 0.0
    end if
 #ifdef DM_PARALLEL
    call MPI_ALLREDUCE(tmp_u,tmpu,1, MPI_REAL8, MPI_SUM, MPI_COMM_WORLD, IERROR )
@@ -82,10 +84,9 @@ SUBROUTINE DA_GET_AVPoles(u,v,lon,       &
    if( jte == jde) then 
      u(its:ite,jte-1,k) = u(its:ite,jte-1,k) -tmpu*cos(xlon(its:ite)) +tmpv*sin(xlon(its:ite))
      v(its:ite,jte-1,k) = v(its:ite,jte-1,k) -tmpu*sin(xlon(its:ite)) -tmpv*cos(xlon(its:ite))
+     u(its:ite,jte,k) = 0.0
+     v(its:ite,jte,k) = 0.0
    end if
-   u(its:ite,jts,k) = 0.0
-   u(its:ite,jte,k) = 0.0
-   v(its:ite,jts,k) = 0.0
-   v(its:ite,jte,k) = 0.0
  end do
 END SUBROUTINE DA_GET_AVPoles
+
