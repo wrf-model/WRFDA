@@ -44,19 +44,13 @@ SUBROUTINE DA_Test_Transforms (diff, xb, xbx, xp,  &
    do i=its,ite
       x=pi/real(nx) * (i-1)
       y=pi/real(ny) * (j-1)
-   diff%psi(i,j,k)=sin(2*x)*sin(3*y)
-   diff%chi(i,j,k)=0.0
-   diff%u(i,j,k)=0.0
-   diff%v(i,j,k)=0.0
+      diff%psi(i,j,k)=sin(2*x)*sin(3*y)
+      diff%chi(i,j,k)=0.0
+      diff%u(i,j,k)=0.0
+      diff%v(i,j,k)=0.0
    enddo
    enddo
    enddo
-
-!   diff%psi(its,jts:jte,kts:kte)=0.0
-!   diff%psi(ite,jts:jte,kts:kte)=0.0
-!   diff%psi(its:ite,jts,kts:kte)=0.0
-!   diff%psi(its:ite,jte,kts:kte)=0.0
-
 
    CALL DA_PsiChi_To_UV (diff%psi, diff%chi, xb%map_factor, xb%ds, &
                          diff%u, diff%v,   &
@@ -64,18 +58,13 @@ SUBROUTINE DA_Test_Transforms (diff, xb, xbx, xp,  &
                             ims,ime, jms,jme, kms,kme,  &
                             its,ite, jts,jte, kts,kte )
 
-!   do k=1,1 !kde
-!   write(201,'(10e13.5)') ((diff%u(i,j,k),i=1,ide),j=1,jde)
-!   write(202,'(10e13.5)') ((diff%v(i,j,k),i=1,ide),j=1,jde)
-!   write(203,'(10e13.5)') ((diff%psi(i,j,k),i=1,ide),j=1,jde)
-!   write(204,'(10e13.5)') ((diff%chi(i,j,k),i=1,ide),j=1,jde)
-!   enddo
-
-   CALL DA_UV_To_Vorticity( xb % ds, &
-                            xb % map_factor, &
-                            diff%u, &
-                            diff%v, &
-                            vor, &
+#ifndef DEREF_KLUDGE
+   CALL DA_UV_To_Vorticity( xb, diff % u, diff % v, vor, &
+#else
+   CALL DA_UV_To_Vorticity( xb, diff % u(ims,jms,kms), &
+                            diff % v(ims,jms,kms), &
+                            vor(ims,jms,kms), &
+#endif
                             ids,ide, jds,jde, kds,kde,  &
                             ims,ime, jms,jme, kms,kme,  &
                             its,ite, jts,jte, kts,kte )
@@ -86,11 +75,15 @@ SUBROUTINE DA_Test_Transforms (diff, xb, xbx, xp,  &
    END DO
 
 
-  CALL DA_UV_To_Divergence(xb % ds, &
-                            xb % map_factor, &
-                            diff%u, &
-                            diff%v, &
-                            div, &
+#ifndef DEREF_KLUDGE
+   CALL DA_UV_To_Divergence( diff % u, diff % v, xb%coefx, xb%coefy, div, &
+#else
+   CALL DA_UV_To_Divergence(diff % u(ims,jms,kms), &
+                            diff % v(ims,jms,kms), &
+                            xb % coefx(ims,jms), &
+                            xb % coefy(ims,jms), &
+                            div(ims,jms,kms), &
+#endif
                             ids,ide, jds,jde, kds,kde,  &
                             ims,ime, jms,jme, kms,kme,  &
                             its,ite, jts,jte, kts,kte )

@@ -54,7 +54,7 @@ SUBROUTINE stats_be ( grid , config_flags , &
 !  [1.0] Initialise STATS parameters:
 !------------------------------------------------------------------------------
 
-      call da_init_be  ( grid, xp, xb, &
+      call da_init_3dvar ( grid, xp, xb, &
                        ids, ide, jds, jde, kds, kde, &
                        ims, ime, jms, jme, kms, kme, &
                        its, ite, jts, jte, kts, kte )
@@ -77,7 +77,7 @@ SUBROUTINE stats_be ( grid , config_flags , &
 !-------------------------------------------------------------------------------
 CONTAINS
 
-#include "da_init_be.inc"
+#include "../da_solve_v3d/da_init_3dvar.inc"
 
 END SUBROUTINE stats_be
 

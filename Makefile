@@ -98,12 +98,12 @@ n2k :
 	  $(MAKE) MODULE_DIRS="$(DA_CONVERTOR_MODULES)" SOLVER=netcdf2kma )
 
 gen_be :
-	/bin/rm -f main/libwrflib.a
-	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" ext
-	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" toolsdir
-	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" REGISTRY="Registry" framework
-	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" shared
-	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" da_3dvar_io
+#	/bin/rm -f main/libwrflib.a
+#	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" ext
+#	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" toolsdir
+#	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" REGISTRY="Registry" framework
+#	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" shared
+#	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" da_3dvar_io
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES_2)" gen_be_src
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" gen_be_interface
 	( cd da_be ; \

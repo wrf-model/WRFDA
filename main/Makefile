@@ -33,32 +33,6 @@ $(SOLVER)_real : module_initialize real_$(SOLVER).o ndown_$(SOLVER).o
 	$(LD) -o real.exe $(LDFLAGS) real_$(SOLVER).o ../dyn_$(SOLVER)/module_initialize_$(IDEAL_CASE).o libwrflib.a $(LIB)
 	$(LD) -o ndown.exe $(LDFLAGS) ndown_$(SOLVER).o  ../dyn_$(SOLVER)/module_initialize_$(IDEAL_CASE).o libwrflib.a $(LIB)
 
-$(SOLVER) :     $(SOLVER)_stage0 \
-                $(SOLVER)_stage1 \
-                $(SOLVER)_stage2 \
-                $(SOLVER)_stage3 \
-                $(SOLVER)_stage4 \
-                $(SOLVER)_stage4_scale \
-                $(SOLVER)_cov2d \
-                $(SOLVER)_cov3d \
-                $(SOLVER)_diags \
-                $(SOLVER)_diags_read
-
-$(SOLVER)_stage0 : $(SOLVER)_stage0.o
-        $(RANLIB) ../lib_3dvar.a
-        $(FC) -o $(SOLVER)_stage0.exe $(LDFLAGS) $(SOLVER)_stage0.o \
-        ../lib_3dvar.a -L../../external/io_netcdf -lwrfio_nf -L$(NETCDFPATH)/lib -lnetcdf \
-        -L../../external/io_int -lwrfio_int \
-        ../../frame/internal_header_util.o ../../frame/pack_utils.o
-
-$(SOLVER)_stage4_scale : $(SOLVER)_stage4_scale.o
-        $(RANLIB) ../lib_3dvar.a
-        $(FC) -o $(SOLVER)_stage4_scale.exe $(LDFLAGS) $(SOLVER)_stage4_scale.o ../lib_3dvar.a
-
-$(SOLVER)_diags_read : $(SOLVER)_diags_read.o
-        $(RANLIB) ../lib_3dvar.a
-        $(FC) -o $(SOLVER)_diags_read.exe $(LDFLAGS) $(SOLVER)_diags_read.o ../lib_3dvar.a
-
 convert_bioemiss : convert_bioemiss.o
 	$(RANLIB) libwrflib.a
 	$(FC) -o convert_bioemiss.exe $(LDFLAGS) convert_bioemiss.o libwrflib.a $(LIB)

@@ -32,17 +32,16 @@ SUBROUTINE DA_New_Statistics_Variable( diff, xb, xbx, xp, &
 
 !  [2.1] Transform u, v to streamfunction via vorticity:
 #ifndef DEREF_KLUDGE
-   CALL DA_UV_To_Vorticity( xb % ds, xb % map_factor, diff % u, diff % v, diff%vor, &
+   CALL DA_UV_To_Vorticity( xb, diff % u, diff % v, diff % vor, &
 #else
-   CALL DA_UV_To_Vorticity( xb % ds, &
-                            xb % map_factor(ims,jms), &
-                            diff % u(ims,jms,kms), &
+   CALL DA_UV_To_Vorticity( xb, diff % u(ims,jms,kms), &
                             diff % v(ims,jms,kms), &
                             diff % vor(ims,jms,kms), &
 #endif
                             ids,ide, jds,jde, kds,kde,  &
                             ims,ime, jms,jme, kms,kme,  &
                             its,ite, jts,jte, kts,kte )
+
 !  Convert vorticity to Del**2 psi:
 
    DO k = kts, kte
@@ -51,23 +50,27 @@ SUBROUTINE DA_New_Statistics_Variable( diff, xb, xbx, xp, &
    END DO
 
 !--------------------------------------------------------------------
-!   CALL DA_Solve_PoissonEqn_FCT(xb, xbx, diff%vor, diff%psi, xp)
    CALL DA_Solve_PoissonEqn_FST(xb, xbx, xp, diff%vor, diff%psi,    &
                                     ids,ide, jds,jde, kds,kde,      &
                                     ims,ime, jms,jme, kms,kme,      &
                                     its,ite, jts,jte, kts,kte )
-    diff%psi(ids:ide,jds,kds:kde)= diff%psi(ids:ide,jds+1,kds:kde)
-    diff%psi(ids,jds:jde,kds:kde)= diff%psi(ids+1,jds:jde,kds:kde)
+   if(jts == jds) then
+    diff%psi(its:ite,jds,kts:kte)= diff%psi(its:ite,jds+1,kts:kte)
+   endif
+
+   if(its == ids) then
+    diff%psi(ids,jts:jte,kts:kte)= diff%psi(ids+1,jts:jte,kts:kte)
+   endif
 
 !  [2.2] Transform u, v to velocity potential via divergence:
 #ifndef DEREF_KLUDGE
-   CALL DA_UV_To_Divergence( xb % ds, xb % map_factor, diff % u, diff % v, diff%div, &
+   CALL DA_UV_To_Divergence( diff % u, diff % v, xb%coefx, xb%coefy, diff % div, &
 #else
-   CALL DA_UV_To_Divergence(xb % ds, &
-                            xb % map_factor(ims,jms), &
-                            diff % u(ims,jms,kms), &
+   CALL DA_UV_To_Divergence(diff % u(ims,jms,kms), &
                             diff % v(ims,jms,kms), &
-                            diff%div(ims,jms,kms), &
+                            xb % coefx(ims,jms), &
+                            xb % coefy(ims,jms), &
+                            diff % div(ims,jms,kms), &
 #endif
                             ids,ide, jds,jde, kds,kde,  &
                             ims,ime, jms,jme, kms,kme,  &
@@ -82,13 +85,18 @@ SUBROUTINE DA_New_Statistics_Variable( diff, xb, xbx, xp, &
 
 !  Calculate chi:
 
-!   CALL DA_Solve_PoissonEqn_FCT(xb, xbx, diff%div, diff%chi, xp)
    CALL DA_Solve_PoissonEqn_FST(xb, xbx, xp, diff%div, diff%chi,    &
                                     ids,ide, jds,jde, kds,kde,      &
                                     ims,ime, jms,jme, kms,kme,      &
                                     its,ite, jts,jte, kts,kte )
 
-    diff%chi(ids:ide,jds,kds:kde)= diff%chi(ids:ide,jds+1,kds:kde)
-    diff%chi(ids,jds:jde,kds:kde)= diff%chi(ids+1,jds:jde,kds:kde)
+   if(jts == jds) then
+    diff%chi(its:ite,jds,kts:kte)= diff%chi(its:ite,jds+1,kts:kte)
+   endif
+
+   if(its == ids) then
+    diff%chi(ids,jts:jte,kts:kte)= diff%chi(ids+1,jts:jte,kts:kte)
+   endif
 
 END SUBROUTINE DA_New_Statistics_Variable
+

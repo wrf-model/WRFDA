@@ -49,13 +49,46 @@ OBJS_FOR_ALL =		da_solve_v3d.o		\
 			BLAS.o
 
 OBJS_FOR_GEN_BE =	DA_Constants.o		\
-			da_gen_be.o		\
+			par_util.o              \
+			DA_Setup_Structures.o	\
+			DA_VToX_Transforms.o	\
+			DA_Obs.o		\
+			DA_Metar.o		\
+			DA_Satob.o		\
+			DA_Ships.o		\
+			DA_Synop.o		\
+			DA_Sound.o		\
+			DA_Bogus.o		\
+			DA_Airep.o		\
+			DA_Pilot.o		\
+			DA_Radar.o		\
 			DA_Gen_Be_Stats.o	\
-			da_fftpack5.o		\
-			da_stats_be.o		\
+			DA_Gpspw.o		\
+			DA_Gpsref.o		\
+			DA_SSMI.o		\
+			DA_Satem.o		\
+			da_qscat.o		\
+			da_pseudo.o		\
+			DA_Profiler.o		\
+			DA_Buoy.o   		\
+			DA_ReadWrite_MM5.o	\
+			DA_Dynamics.o		\
+			DA_Physics.o		\
+			DA_FFTs.o		\
+			DA_Test.o		\
+			DA_Tools.o		\
+			DA_Grid_Definitions.o	\
+			DA_Define_Structures.o	\
+			da_h_ops.o		\
+			da_c_mat.o		\
+			da_rf.o			\
+			da_mat.o      		\
+			da_rfz.o      		\
 			LAPACK.o		\
-			BLAS.o			\
-			da_spectral.o
+			da_spectral.o           \
+			da_fftpack5.o           \
+			da_gen_be.o             \
+			BLAS.o
 
 include ../../configure.wrf
 
@@ -1169,7 +1202,7 @@ da_stats_be.o:		DA_Constants.o		\
 			DA_Tools.o		\
 			DA_Gen_Be_Stats.o	\
 			par_util.o		\
-			da_stats_be/da_init_be.inc      \
+			da_solve_v3d/da_init_3dvar.inc	\
 			da_stats_be/da_stats_be.F
 			$(RM) $@
 			$(CPP) -I./da_stats_be $(CPPFLAGS_3DVAR) da_stats_be/da_stats_be.F > da_stats_be.f
@@ -1178,6 +1211,7 @@ da_stats_be.o:		DA_Constants.o		\
 DA_Gen_Be_Stats.o:	../module_wrf_3dvar_io.o		\
 			LAPACK.o				\
 	                DA_FFTs.o				\
+			DA_Test.o				\
 	                DA_Tools.o				\
 	                DA_Dynamics.o				\
 	                DA_Constants.o				\
