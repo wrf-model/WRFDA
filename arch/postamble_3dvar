@@ -11,7 +11,7 @@ INCLUDE_MODULES =       -I../da_3dvar -I../da_3dvar/src \
 
 REGISTRY        =       Registry
 CPPFLAGS        =       -I$(LIBINCLUDE) -C -P $(ARCHFLAGS) $(ENVCOMPDEFS) \
-			$(TRADFLAG) $(DM_1_CPP_FLAGS) $(OMPCPP) $(COREDEFS) $(POUND_DEF)
+			$(DM_1_CPP_FLAGS) $(OMPCPP) $(COREDEFS) $(POUND_DEF)
 
 INC_MOD_3DVAR   =       -I../../$(NETCDF_IO_PATH) \
 			-I../../da_3dvar -I../../da_3dvar/src \
@@ -22,13 +22,13 @@ FCFLAGS_3DVAR   =       $(FCOPTIM) $(FCBASEOPTS)
 FCFLAGS_FFT_RF  =       $(FCOPTIM) $(FC_FFT_RF_OPTS)
 F77FLAGS_BUFR   =       $(FCTYPE) $(FCBUFR) $(FCHOST) $(FCDEBUG) -I.
 F77FLAGS_3DVAR  =       $(FCTYPE) $(FCBASE) $(FCHOST) $(FCDEBUG) -I.
-CPPFLAGS_3DVAR  =       $(TRADFLAG) $(DM_2_CPP_FLAGS) \
+CPPFLAGS_3DVAR  =       $(DM_2_CPP_FLAGS) \
                         -I$(LIBINCLUDE) -I../../inc -C -P $(ARCHFLAGS) $(POUND_DEF)
 FUFLAGS         =       $(FCOPTIM) $(FCBASE) $(FCFORM) $(FCDEBUG)
 
 wrfio_nf : 
 	( cd ../external/io_netcdf ; \
-        make NETCDFPATH=$(NETCDFPATH) CPP="$(CPP) $(TRADFLAG)" \
+        make NETCDFPATH=$(NETCDFPATH) CPP="$(CPP)" \
 	RANLIB="$(RANLIB)" \
 	FC="$(FC)" FCFLAGS="$(FCDEBUG) $(FCFORM) $(FCBASE) -w" TRADFLAG="$(TRADFLAG)" ; \
 	if [ $(RWORDSIZE) -eq 8 ] ; then \
@@ -39,13 +39,13 @@ wrfio_nf :
 
 wrfio_int : 
 	( cd ../external/io_int ; \
-        make CC="$(CC)" CPP="$(CPP) $(TRADFLAG)" \
+        make CC="$(CC)" CPP="$(CPP)" \
 	RANLIB="$(RANLIB)" \
 	FC="$(FC)" FCFLAGS="$(FCDEBUG) $(FCFORM) $(FCBASE)" all )
 
 wrfio_grib1 :
 	( cd ../external/io_grib1 ; \
-        make CPP="$(CPP) $(TRADFLAG)" \
+        make CPP="$(CPP)" \
 	RANLIB="$(RANLIB)" \
 	CC="$(CC)" CFLAGS="$(CFLAGS)" \
 	FC="$(FC)" FCFLAGS="$(FCDEBUG) -I. $(FCFORM) $(FCBASE)" )
@@ -54,7 +54,7 @@ esmf_time :
 	( cd ../external/esmf_time_f90 ; \
 	make FC="$(FC) $(FCFLAGS)" \
 	RANLIB="$(RANLIB)" \
-	CPP="$(CPP) -I../../inc -I. $(POUND_DEF) $(TRADFLAG)" )
+	CPP="$(CPP) -I../../inc -I. $(POUND_DEF)" )
 
 # compile these without high optimization to speed compile
 module_io_mm5.o : module_io_mm5.F

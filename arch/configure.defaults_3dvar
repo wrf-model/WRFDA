@@ -243,7 +243,7 @@ LOCAL_LIBRARIES =       -g -L/usr/local/ncarg/lib -L/usr/X12R6/lib -L/usr/local/
 
 CPP             =       /lib/cpp $(TRADFLAG)
 DM_1_CPP_FLAGS  =       -I../external/RSL/RSL -C -P `cat ../inc/dm_comm_cpp_flags` \
-			-DNO_RRTM_PHYSICS  -DPGF90 $(TRADFLAG)
+			-DNO_RRTM_PHYSICS  -DPGF90
 DM_2_CPP_FLAGS  =       -I../../external/RSL/RSL -C -P `cat ../../inc/dm_comm_cpp_flags`
 POUND_DEF       =       -DLINUX -DNO_RRTM_PHYSICS  \
 			-DNONSTANDARD_SYSTEM -DF90_STANDALONE \
@@ -294,7 +294,7 @@ NETCDF_LIB	=       CONFIGURE_NETCDF_LIB_PATH
 LOCAL_LIBRARIES =       -g -L/usr/local/ncarg/lib -L/usr/X11R6/lib -L/usr/local/lib \
 			-lncarg -lncarg_gks -lncarg_c -lX11
 
-CPP             =       /lib/cpp -traditional
+CPP             =       /lib/cpp $(TRADFLAG)
 DM_1_CPP_FLAGS  =
 DM_2_CPP_FLAGS  =
 POUND_DEF       =       -DNO_RRTM_PHYSICS -DNONSTANDARD_SYSTEM -DF90_STANDALONE \

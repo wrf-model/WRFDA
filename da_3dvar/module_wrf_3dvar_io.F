@@ -8,8 +8,7 @@ MODULE module_wrf_3dvar_io
 !--Model layer
 
    USE module_configure
-
-   USE WRF_ESMF_MOD
+   USE module_timing
 
 CONTAINS
 
