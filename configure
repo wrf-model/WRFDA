@@ -10,13 +10,13 @@ elif [ "$option" = "3dvar" ] ; then
     echo "configure for 3dvar"
 elif [ "$option" = "4dvar" ] ; then
     echo "configure for 4dvar"
-elif [ "$option" = "gen_be" ] ; then
-    echo "configure for gen_be"
+elif [ "$option" = "be" ] ; then
+    echo "configure for be"
 else
    echo "Please type : <configure wrf> to compile wrf,"
    echo "    or type : <configure 3dvar> to compile 3dvar."
    echo "    or type : <configure 4dvar> to compile 4dvar."
-   echo "    or type : <configure gen_be> to compile gen_be."
+   echo "    or type : <configure be> to compile be."
    exit
 fi
 
@@ -318,7 +318,7 @@ fi
 if test -n "$PERL" ; then
   echo option = $option
 
-  if [ "$option" = "3dvar" | "$option" = "gen_be" ] ; then
+  if [ "$option" = "3dvar" -o "$option" = "be" ] ; then
      echo "configure for 3dvar"
      $PERL arch/Config_3dvar.pl -perl=$PERL -netcdf=$NETCDF -phdf5=$PHDF5 -os=$os -mach=$mach -ldflags=$ldflags \
        -compileflags=$compileflags

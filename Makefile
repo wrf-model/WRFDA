@@ -97,19 +97,33 @@ n2k :
           /bin/rm -f netcdf2kma.exe ; \
 	  $(MAKE) MODULE_DIRS="$(DA_CONVERTOR_MODULES)" SOLVER=netcdf2kma )
 
-gen_be :
-#	/bin/rm -f main/libwrflib.a
+be :
+	/bin/rm -f main/libwrflib.a
 #	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" ext
 #	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" toolsdir
 #	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" REGISTRY="Registry" framework
 #	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" shared
 #	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" da_3dvar_io
-	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES_2)" gen_be_src
-	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" gen_be_interface
-	( cd da_be ; \
+	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES_2)" gen_be_short
+#	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" gen_be_interface
+	( cd gen_be ; \
 	/bin/rm -f *.exe ; \
 	$(MAKE) MODULE_DIRS="$(DA_GEN_BE_MODULES)" SOLVER=gen_be )
 
+be_wrf :
+#	/bin/rm -f main/libwrflib.a
+#	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" ext
+#	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" toolsdir
+#	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" REGISTRY="Registry" framework
+#	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" shared
+	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" da_3dvar_io
+	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES_2)" gen_be_long
+	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" gen_be_interface
+#	$(MAKE) MODULE_DIRS="$(DA_GEN_BE_MODULES)" SOLVER=gen_be ; \
+#
+	( cd gen_be ; \
+	/bin/rm -f *.exe ; \
+	$(MAKE) MODULE_DIRS="$(DA_GEN_BE_MODULES)" gen_be_stage0 )
 
 ### 3.a.  rules to build the framework and then the experimental core
 
@@ -299,9 +313,13 @@ convertor_drivers :
 	@ echo '--------------------------------------'
 	( cd convertor ; $(MAKE) )
 
-gen_be_src :
+gen_be_short :
 	@ echo '--------------------------------------'
-	( cd da_3dvar/src; $(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES_2)" gen_be )
+	( cd da_3dvar/src; $(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES_2)" gen_be_short )
+
+gen_be_long :
+	@ echo '--------------------------------------'
+	( cd da_3dvar/src; $(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES_2)" gen_be_long )
 
 # rule used by configure to test if this will compile with MPI 2 calls MPI_Comm_f2c and _c2f
 mpi2_test :

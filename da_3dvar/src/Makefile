@@ -48,7 +48,14 @@ OBJS_FOR_ALL =		da_solve_v3d.o		\
 			da_gen_be.o             \
 			BLAS.o
 
-OBJS_FOR_GEN_BE =	DA_Constants.o		\
+OBJS_4_GEN_BE_SHORT =	DA_Constants.o		\
+			da_gen_be.o		\
+			da_fftpack5.o		\
+			da_spectral.o           \
+			LAPACK.o		\
+			BLAS.o
+
+OBJS_4_GEN_BE_LONG =	DA_Constants.o		\
 			par_util.o              \
 			DA_Setup_Structures.o	\
 			DA_VToX_Transforms.o	\
@@ -88,6 +95,7 @@ OBJS_FOR_GEN_BE =	DA_Constants.o		\
 			da_spectral.o           \
 			da_fftpack5.o           \
 			da_gen_be.o             \
+			da_stats_be.o           \
 			BLAS.o
 
 include ../../configure.wrf
@@ -96,8 +104,11 @@ TARGETDIR    =  ../..
 3dvar :		$(OBJS_FOR_ALL)
 		$(AR) ../../main/libwrflib.a $(OBJS_FOR_ALL)
 
-gen_be :	$(OBJS_FOR_GEN_BE)
-		$(AR) ../../main/libwrflib.a $(OBJS_FOR_GEN_BE)
+gen_be_short :	$(OBJS_4_GEN_BE_SHORT)
+		$(AR) ../../main/libwrflib.a $(OBJS_4_GEN_BE_SHORT)
+
+gen_be_long :	$(OBJS_4_GEN_BE_LONG)
+		$(AR) ../../main/libwrflib.a $(OBJS_4_GEN_BE_LONG)
 
 ##########################################################################
 
