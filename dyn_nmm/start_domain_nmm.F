@@ -124,11 +124,6 @@
      &                                  ,XLAND,XLAT,XLONG
 
       REAL,ALLOCATABLE,DIMENSION(:,:) :: Z0_DUM
-!
-!!!   REAL,ALLOCATABLE,DIMENSION(:,:,:) :: W0AVG,ZINT,ZMID
-#if 0
-      REAL,ALLOCATABLE,DIMENSION(:,:,:) :: W0AVG
-#endif
       LOGICAL :: E_BDY,N_BDY,S_BDY,W_BDY,WARM_RAIN
       integer :: jam,retval
       character(20) :: seeout="hi08.t00z.nhbmeso"
@@ -139,10 +134,20 @@
       integer :: i_t=096,j_t=195,n_t=11
       integer :: i_u=49,j_u=475,n_u=07
       integer :: i_v=49,j_v=475,n_v=07
+! Used if -DDEREF_KLUDGE is compiled
+!  see http://www.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm
+      INTEGER     :: sm31 , em31 , sm32 , em32 , sm33 , em33
+      INTEGER     :: sm31x, em31x, sm32x, em32x, sm33x, em33x
+      INTEGER     :: sm31y, em31y, sm32y, em32y, sm33y, em33y
+
+!----------------------
+! Executable statements
+!----------------------
 !
 !----------------------------------------------------------------------
 #define COPY_IN
 #include <nmm_scalar_derefs.inc>
+#include "deref_kludge.h"
 #ifdef DM_PARALLEL
 #    include <nmm_data_calls.inc>
 #endif
@@ -1640,9 +1645,6 @@
       ALLOCATE(TSLB(IMS:IME,KMS:KME,JMS:JME),STAT=I)
 !state    real   ZS              l        dyn_em      -         Z     ir 
 
-#if 0
-      ALLOCATE(W0AVG(IMS:IME,KMS:KME,JMS:JME),STAT=I)
-#endif
 !-----------------------------------------------------------------------
 !jm added set of g_inv
       G_INV=1./G
