@@ -1,3 +1,18 @@
+MODULE module_wrf_3dvar_io
+
+!--Driver layer
+
+   USE module_domain
+   USE module_io_domain
+
+!--Model layer
+
+   USE module_configure
+
+CONTAINS
+
+!------------------------------------------------------------------------------
+
 SUBROUTINE med_initialdata_input_3dvar ( grid , config_flags, in_filename )
 
    IMPLICIT NONE
@@ -98,11 +113,11 @@ SUBROUTINE med_initialdata_input_3dvar ( grid , config_flags, in_filename )
 !  write(unit=0, fmt='(a, 2i8, f12.3)') &
 !       '2: julyr, julday, gmt=', julyr, julday, gmt
 
-   CALL wrf_debug ( 100 , 'med_initialdata_input_3dvar: calling open_r_dataset for wrf 3dvar input' )
+   CALL wrf_debug ( 100 , 'da_3dvar/module_wrf_3dvar_io: calling open_r_dataset for wrf 3dvar input' )
    CALL open_r_dataset ( fid, TRIM(file_name), grid , config_flags , "DATASET=INPUT", ierr )
 
    IF ( ierr .NE. 0 ) THEN
-     WRITE( wrf_err_message , * ) 'med_initialdata_input_3dvar: error opening ', &
+     WRITE( wrf_err_message , * ) 'da_3dvar/module_wrf_3dvar_io: error opening ', &
                                   TRIM(file_name),' for reading ierr=',ierr
      CALL WRF_ERROR_FATAL ( wrf_err_message )
    ENDIF
@@ -118,4 +133,71 @@ SUBROUTINE med_initialdata_input_3dvar ( grid , config_flags, in_filename )
         'file_name =', trim(file_name)
 
 END SUBROUTINE med_initialdata_input_3dvar
+
+!----------------------------------------------------------
+
+SUBROUTINE med_initialdata_output_3dvar ( grid , config_flags, out_filename )
+
+   IMPLICIT NONE
+
+!--Arguments
+
+   TYPE(domain)                                :: grid
+   TYPE (grid_config_rec_type) , INTENT(INOUT) :: config_flags       
+   CHARACTER(*),  INTENT (in),  OPTIONAL       :: out_filename
+
+!--Local
+
+   INTEGER                :: time_step_begin_restart
+   INTEGER                :: fid , ierr
+   CHARACTER (LEN=80)     :: message
+   CHARACTER (LEN=80)     :: file_name
+
+   INTEGER                :: current_day,current_hour,current_month,current_year
+   CHARACTER (LEN=1)      :: single_char 
+   INTEGER :: julyr, julday
+   REAL    :: gmt
+
+   if(present(out_filename)) then
+      write(unit=*, fmt='(2a,2x,a,i6)') &
+           'file:', __FILE__, 'line:', __LINE__
+      file_name = trim(out_filename)
+   else
+      write(unit=*, fmt='(2a,2x,a,i6)') &
+           'file:', __FILE__, 'line:', __LINE__
+      file_name = 'wrf_3dvar_output'
+   endif
+
+!  write(unit=*, fmt='(2a,2x,a,i6,2(2x,a))') &
+!       'file:', __FILE__, 'line:', __LINE__, &
+!       'file_name =', trim(file_name)
+
+   CALL wrf_debug ( 100 , 'da_3dvar/module_wrf_3dvar_io: calling open_w_dataset 3dvar output' )
+   CALL open_w_dataset ( fid, TRIM(file_name), grid , config_flags , &
+                         output_model_input , "DATASET=INPUT", ierr )
+
+   IF ( ierr .NE. 0 ) THEN
+      WRITE( wrf_err_message , * ) 'da_3dvar/module_wrf_3dvar_io: error opening ', &
+                                    TRIM(file_name),' for writing ierr=',ierr
+      CALL wrf_error_fatal( wrf_err_message )
+   ENDIF
+
+   start_date=current_date
+
+   call geth_julgmt(julyr, julday, gmt)
+   config_flags%gmt = gmt
+   config_flags%julyr = julyr
+   config_flags%julday = julday
+
+!--------------------------------------------------------------------- 
+
+   CALL output_model_input ( fid, grid , config_flags , ierr )
+
+   CALL close_dataset ( fid , config_flags, "DATASET=INPUT" )
+   WRITE ( message , FMT = '("Writing 3dvar output for domain ",I8)' ) grid%id
+!  CALL end_timing ( TRIM(message) )
+
+END SUBROUTINE med_initialdata_output_3dvar
+
+END MODULE module_wrf_3dvar_io
 

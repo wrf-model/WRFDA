@@ -31,7 +31,7 @@
       USE DA_Setup_Structures
       use da_qscat
 
-      USE da_var_io
+      USE module_wrf_3dvar_io
 
       implicit none
 

@@ -14,7 +14,7 @@ PROGRAM kma2netcdf
    USE module_dm
 #endif
 
-   USE DA_Var_IO
+   USE module_wrf_3dvar_io
    USE module_kma2netcdf_interface
    USE module_kma_wave2grid
 
