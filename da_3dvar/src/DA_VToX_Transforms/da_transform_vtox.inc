@@ -77,7 +77,8 @@ subroutine da_transform_vtox( xb, xbx, be, cv, vv, vp, xp, xa,        &
                             ims,ime, jms,jme, kms,kme,  &
                             its,ite, jts,jte, kts,kte )
 
- else if(cv_options==3) then
+
+ if(cv_options==3) then
    call da_apply_be( be, cv, vp, xb, xp, &
                      ids,ide, jds,jde, kds,kde,  &
                      ims,ime, jms,jme, kms,kme,  &
@@ -248,6 +249,7 @@ subroutine da_transform_vtox( xb, xbx, be, cv, vv, vp, xp, xa,        &
                     ims, ime, jms, jme,   1,   1,  &
                     its, ite, jts, jte,   1,   1   )
 #endif
+    call DA_Set_Boundary_Xa(xa, xb)
    end if   
-
 end subroutine da_transform_vtox
+

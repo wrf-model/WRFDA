@@ -87,39 +87,28 @@ SUBROUTINE DA_Setup_FirstGuess( xbx, grid, &
 
 #endif
 
-   CALL wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id0)
-   periodic_x = grid%periodic_x
-
-   if( global ) then     
-     if( fg_format == 3) then
-!    Set East-West boundary for Xb-array 
-     call da_set_boundary_xb(xb)
+   if( fg_format == 1 .or. fg_format == 2) then
+!---- Calculate multiplicative constants for PsiChi_TO_UV 
+      xb%coefx(is:ie,js:je) = 0.5 * xb%map_factor(is:ie,js:je)/xb%ds
+      xb%coefy(is:ie,js:je) = xb%coefx(is:ie,js:je)
+      xb%coefz(is:ie,js:je) = 0.5 / (xb%map_factor(is:ie,js:je)*xb%ds)
+   else if( fg_format == 3) then
 !--- Calculate multiplicative constants for PsiChi_TO_UV 
      ddx =  earth_radius*1000 * 2.0 * pi / (xb%ide-xb%ids+1)
      ddy =  earth_radius*1000       * pi / (xb%jde-xb%jds  )
      xb% coefx(is:ie,js:je) = 0.5 / (ddx * cos(xlat(is:ie,js:je)*pi/180.))
      xb% coefy(is:ie,js:je) = 0.5 /  ddy
-     else
-     print*,' For global option wrong choice for fg_format = ',fg_format
-     stop
-     end if
-
    else
-     if( fg_format == 1 .or. fg_format == 2) then
-!---- Calculate multiplicative constants for PsiChi_TO_UV 
+     print*,' Wrong choice for fg_format = ',fg_format
+     stop 'wrong fg_format.'
+   end if
 
-      if ( xb%its == xb%ids ) is = xb%ids+1
-      if ( xb%ite == xb%ide ) ie = xb%ide-1
-      if ( xb%jts == xb%jds ) js = xb%jds+1
-      if ( xb%jte == xb%jde ) je = xb%jde-1
-      xb%coefx(is-1:ie+1,js-1:je+1) = 0.5 * &
-                        xb%map_factor(is-1:ie+1,js-1:je+1)/xb%ds
-      xb%coefy(is-1:ie+1,js-1:je+1) = xb%coefx(is-1:ie+1,js-1:je+1)
-      xb%coefz(is-1:ie+1,js-1:je+1) = 0.5 / &
-                        (xb%map_factor(is-1:ie+1,js-1:je+1)*xb%ds)
-     else
-     print*,' For regional option wrong choice for fg_format = ',fg_format
-     end if
+   CALL wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id0)
+   periodic_x = grid%periodic_x
+
+   if( global ) then     
+!    Set East-West boundary for Xb-array 
+     call da_set_boundary_xb(xb)
    end if
 !------------------------------------------------------------------------------
    write(unit=*, fmt='(4x,a,i4)') &
@@ -137,3 +126,4 @@ SUBROUTINE DA_Setup_FirstGuess( xbx, grid, &
    CALL DA_Setup_RunConstants( xp, xb, xbx)
 
 END SUBROUTINE DA_Setup_FirstGuess
+

@@ -6,6 +6,9 @@ SUBROUTINE DA_Scan_Obs (iunit, ob, xp, filename)
 ! Modifications:      10/26/2004            Syed RH Rizvi
 !
 !              Fix Obs-Long as -180 if it is +180
+!                     03/30/2005           Syed RH Rizvi
+!              For global option duplicate obs at East/West boundary
+!
 !-----------------------------------------------------------------------------!
 
    implicit none
@@ -50,6 +53,8 @@ SUBROUTINE DA_Scan_Obs (iunit, ob, xp, filename)
                                    num_ssmt2, &
                                    num_pseudo, num_qscat, &
                                    num_profiler, num_buoy
+
+   INTEGER                        :: ndup, n
 
 !----------------------------------------------------------------------------!
 !--default value.
@@ -292,6 +297,13 @@ loop_level: DO i = 1, platform%info%levels
          endif
       endif
 
+!    Loop over duplicating obs for global
+     ndup = 1
+     if(global .and. &
+     (platform%loc%i < xp%ids .or. platform%loc%i >= xp%ide)) ndup= 2
+
+     DO n = 1, ndup
+
       SELECT CASE(fm)
 
 !        if(index(platform%info%source, 'SYNOP') > 0) then
@@ -415,6 +427,7 @@ loop_level: DO i = 1, platform%info%levels
                  'platform%info%levels=', platform%info%levels
 
       END SELECT
+    ENDDO        !  loop over duplicate
 
    ENDDO reports
 

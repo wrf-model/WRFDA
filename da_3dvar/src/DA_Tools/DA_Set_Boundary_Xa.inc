@@ -18,17 +18,21 @@ SUBROUTINE DA_Set_Boundary_Xa( xa, xb )
 
 !--2d
 
-   do j=xb%jts, xb%jte
+   k = xb%kte + 1
+   do j=xb%jms, xb%jme
    do n=1,bdyzone
       xa%psfc(xb%ids-n,j) = xa%psfc(xb%ide+1-n,j)
+      xa%w(xb%ids-n,j,k) = xa%w(xb%ide+1-n,j,k)
+
       xa%psfc(xb%ide+n,j) = xa%psfc(xb%ids-1+n,j)
+      xa%w(xb%ide+n,j,k) = xa%w(xb%ids-1+n,j,k)
    enddo
    enddo
 
 !--3d
 
    do k=xb%kts, xb%kte
-   do j=xb%jts, xb%jte
+   do j=xb%jms, xb%jme
    do n=1,bdyzone
       xa%u(xb%ids-n,j,k) = xa%u(xb%ide+1-n,j,k)
       xa%v(xb%ids-n,j,k) = xa%v(xb%ide+1-n,j,k)
@@ -47,5 +51,5 @@ SUBROUTINE DA_Set_Boundary_Xa( xa, xb )
    enddo
    enddo
 
-
 END SUBROUTINE DA_Set_Boundary_Xa
+

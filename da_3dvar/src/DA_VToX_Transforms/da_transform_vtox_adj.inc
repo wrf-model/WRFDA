@@ -41,6 +41,7 @@ subroutine da_transform_vtox_adj( xb, xbx, be, xa, xp, vp, vv, cv, &
    end if
 
    if( global ) then     
+    call DA_Set_Boundary_Xa(xa, xb)
 !  Poles treatment for global 3DVAR
 #ifndef DEREF_KLUDGE
     call DA_Get_AVPoles(xa%u,xa%v,xb%lon,&
@@ -276,3 +277,4 @@ subroutine da_transform_vtox_adj( xb, xbx, be, xa, xp, vp, vv, cv, &
                               its,ite, jts,jte, kts,kte )
 
 end subroutine da_transform_vtox_adj
+

@@ -36,8 +36,6 @@ SUBROUTINE DA_Setup_FirstGuess_KMA( xbx, grid, &
    integer(kind=4)   :: flag
    integer           :: len, index, seconds
 
-   LOGICAL, EXTERNAL :: wrf_dm_on_monitor
-
    is = xp % its
    ie = xp % ite
    js = xp % jts

@@ -867,7 +867,6 @@ DA_Tools.o:		\
 			DA_Tools/da_dot.inc \
 			DA_Tools/DA_Set_Boundary_Xa.inc \
 			DA_Tools/DA_Set_Boundary_Xb.inc \
-			DA_Tools/DA_Set_Boundary_2d.inc \
 			DA_Tools/DA_Set_Boundary_3d.inc \
 			DA_Tools/xyll.inc    
 			$(RM) $@

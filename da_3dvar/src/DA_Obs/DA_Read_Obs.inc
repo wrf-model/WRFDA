@@ -8,6 +8,8 @@ SUBROUTINE DA_Read_Obs (iunit, ob, xp, filename)
 ! Modifications:      10/26/2004            Syed RH Rizvi
 !
 !              Fix Obs-Long as -180 if it is +180
+!                     03/30/2005           Syed RH Rizvi
+!              For global option duplicate obs at East/West boundary
 !                        
 !-----------------------------------------------------------------------------!
 
@@ -55,6 +57,8 @@ SUBROUTINE DA_Read_Obs (iunit, ob, xp, filename)
                                    num_ssmt2, &
                                    num_pseudo, num_qscat, &
                                    num_profiler, num_buoy
+
+   INTEGER                        :: ndup, n
 
 !--------------------------------------------------------------------
 
@@ -341,6 +345,34 @@ loop_level: DO i = 1, platform%info%levels
       CALL DA_Obs_Proc_Station(platform)
 
       nlevels = platform%info%levels
+
+!    Loop over duplicating obs for global
+     ndup = 1
+     if(global .and. &
+     (platform%loc%i < xp%ids .or. platform%loc%i >= xp%ide)) ndup= 2
+
+     if( print_detail >= 10 .and. ndup > 1) then
+         write(unit=*, FMT = fmt_info) &
+               platform%info%platform,    &
+               platform%info%date_char,   &
+               platform%info%name,        &
+               platform%info%levels,      &
+               platform%info%lat,         &
+               platform%info%lon,         &
+               platform%info%elv,         &
+               platform%info%id
+
+         write(unit=*, FMT = '(a,2i5,4e20.10)') &
+          ' duplicating obs since loc% i,j,dx,dxm,dy & dym ', &
+          platform%loc%i,  platform%loc%j,   &
+          platform%loc%dx, platform%loc%dxm, &
+          platform%loc%dy, platform%loc%dym
+
+    end if
+
+   DO n = 1, ndup
+
+
 
       SELECT CASE(fm)
 
@@ -744,6 +776,19 @@ loop_level: DO i = 1, platform%info%levels
                  'platform%info%levels=', platform%info%levels
 
       END SELECT
+
+     if( global .and. n < 2 ) then
+      if( platform%loc % i >= xp % ide) then
+         platform%loc%i = platform%loc % i - xp % ide
+      else if( platform%loc % i < xp % ids) then
+         platform%loc%i = platform%loc % i + xp % ide
+      end if
+
+      platform%loc%proc_domain = .not. platform%loc%proc_domain
+     end if
+
+    ENDDO        !  loop over duplicate
+
 
    ENDDO reports
 
