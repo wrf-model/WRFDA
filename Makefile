@@ -58,7 +58,7 @@ wrf : configcheck
 	( cd main ; $(MAKE) MODULE_DIRS="$(ALL_MODULES)" SOLVER=em em_wrf )
 #	( cd run ; /bin/rm -f wrf.exe ; ln -s ../main/wrf.exe . )
 
-wrfvar : 
+3dvar : 
 	/bin/rm -f main/libwrflib.a
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" ext
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" toolsdir
@@ -66,7 +66,7 @@ wrfvar :
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" shared
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" wrfvar_drivers
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" wrfvar_src
-	( cd main ; $(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" wrfvar )
+	( cd main ; $(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" da_3dvar )
 
 k2n : 
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" ext
