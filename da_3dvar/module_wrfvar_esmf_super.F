@@ -63,15 +63,10 @@ MODULE module_wrfvar_esmf_super
 
 CONTAINS
 
-
-#ifdef WRF_ESMF_MOD
    SUBROUTINE wrfvar_init( gcomp, importState, exportState, clock, rc )
      TYPE(ESMF_GridComp), INTENT(INOUT) :: gcomp
      TYPE(ESMF_State), INTENT(INOUT) :: importState, exportState
      TYPE(ESMF_Clock), INTENT(INOUT) :: clock
-#else
-   SUBROUTINE wrfvar_init( rc )
-#endif
      INTEGER, INTENT(OUT) :: rc
 !<DESCRIPTION>
 !     WRFVAR init routine.
@@ -267,14 +262,10 @@ CONTAINS
 
 
 
-#ifdef WRF_ESMF_MOD
    SUBROUTINE wrfvar_run( gcomp, importState, exportState, clock, rc )
      TYPE(ESMF_GridComp), INTENT(INOUT) :: gcomp
      TYPE(ESMF_State), INTENT(INOUT) :: importState, exportState
      TYPE(ESMF_Clock), INTENT(INOUT) :: clock
-#else
-   SUBROUTINE wrfvar_run( rc )
-#endif
      INTEGER, INTENT(OUT) :: rc
 !<DESCRIPTION>
 !     WRFVAR run routine.
@@ -301,14 +292,10 @@ CONTAINS
    END SUBROUTINE wrfvar_run
 
 
-#ifdef WRF_ESMF_MOD
    SUBROUTINE wrfvar_finalize( gcomp, importState, exportState, clock, rc )
      TYPE(ESMF_GridComp), INTENT(INOUT) :: gcomp
      TYPE(ESMF_State), INTENT(INOUT) :: importState, exportState
      TYPE(ESMF_Clock), INTENT(INOUT) :: clock
-#else
-   SUBROUTINE wrfvar_finalize( rc )
-#endif
      INTEGER, INTENT(OUT) :: rc
 !<DESCRIPTION>
 !     WRFVAR finalize routine.

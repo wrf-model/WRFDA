@@ -12,6 +12,14 @@ LIBPATHS =
 
 include ../configure.wrf
 
+da_3dvar : da_3dvar.o
+	$(RANLIB) libwrflib.a
+	$(LD) -o da_3dvar.exe $(LDFLAGS) da_3dvar.o libwrflib.a $(LIB)
+
+$(SOLVER) : $(SOLVER).o
+	$(RANLIB) libwrflib.a
+	$(LD) -o $(SOLVER).exe $(LDFLAGS) $(SOLVER).o libwrflib.a $(LIB)
+
 $(SOLVER)_wrf : wrf.o
 	$(RANLIB) libwrflib.a
 	$(LD) -o wrf.exe $(LDFLAGS) wrf.o libwrflib.a $(LIB)
@@ -125,6 +133,10 @@ wrf.o: \
 	../frame/module_timing.o \
 	../frame/module_wrf_error.o \
 	../frame/module_dm.o \
+	../share/module_wrf_esmf_super.o \
+	$(ESMF_MOD_DEPENDENCE) $(EXTRAMODULES)
+
+da_3dvar.o: \
 	../share/module_wrf_esmf_super.o \
 	$(ESMF_MOD_DEPENDENCE) $(EXTRAMODULES)
 
