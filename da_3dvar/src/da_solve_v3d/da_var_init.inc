@@ -15,6 +15,10 @@
 !                       otherwise ESMF_FAILURE.
 !</DESCRIPTION>
 
+#ifdef DM_PARALLEL
+   LOGICAL , EXTERNAL      :: wrf_dm_on_monitor
+#endif
+
 !<DESCRIPTION>
 ! Program_name, a global variable defined in frame/module_domain.F, is
 ! set, then a routine <a href=init_modules.html>init_modules</a> is
@@ -28,7 +32,7 @@
 !
 !</DESCRIPTION>
 
-   program_name = "WRFVAR 1.0.0.0 (COMPATIBLE TO WRF V2.0.3.1) MODEL"
+   program_name = "DA_VAR 2.0.2.0 (COMPATIBLE TO WRF V2.0.3.1) MODEL"
 
    !  Get the NAMELIST data for input.
 
@@ -162,7 +166,7 @@
 ! 
 !</DESCRIPTION>
 
-   if(config_flags%real_data_init_type == 1) then
+   if((config_flags%real_data_init_type == 1) .or. (config_flags%real_data_init_type == 3)) then
      CALL med_initialdata_input_3dvar( head_grid , config_flags )
    endif
 

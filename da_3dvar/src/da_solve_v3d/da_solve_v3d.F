@@ -53,9 +53,6 @@ MODULE da_var_esmf_super
    INTEGER                 :: nbytes
    INTEGER, PARAMETER      :: configbuflen = 4* CONFIG_BUF_LEN
    INTEGER                 :: configbuf( configbuflen )
-#ifndef AIX
-   LOGICAL , EXTERNAL      :: wrf_dm_on_monitor
-#endif
 #endif
 
    CHARACTER (LEN=80)      :: rstname
