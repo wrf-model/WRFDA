@@ -2,7 +2,7 @@ Change Log for update to WRFVAR code
 ---------------------------------------
 
 Author: 	Wei
-Reviewer: 	Hans
+Reviewer: 	Hans, Dale
 Date: 		02/03/05
 
 Reason for changes (explain before making changes)
@@ -292,6 +292,105 @@ Files modified:
  share/wrf_restartin.F
  share/wrf_restartout.F
  tools/regtest.csh
+
+New add for synchronize with WRFV2
+ external/esmf_time_f90/ESMF_Stubs.F90
+ external/esmf_wrapper/ESMF_Indirection.F90
+ external/esmf_wrapper/ESMF_Mod_Wrapper.F90
+ external/esmf_wrapper/Makefile
+ share/module_wrf_esmf_super.F
+ share/module_wrf_setservices.F
+ tools/mpi2_test.c
+
+New modification for synchronize with WRFV2
+ Makefile
+ Registry/Registry.EM
+ Registry/Registry.EM_CHEM
+ Registry/Registry.NMM
+ arch/Config.pl
+ arch/configure.defaults
+ chem/aerosol_driver.F
+ chem/chem_driver.F
+ chem/chemics_init.F
+ chem/dry_dep_driver.F
+ chem/module_aerosols_sorgam.F
+ chem/module_bioemi_beis311.F
+ chem/module_ctrans_grell.F
+ chem/module_dep_simple.F
+ chem/module_input_chem_bioemiss.F
+ chem/module_input_chem_data.F
+ chem/module_phot_mad.F
+ dyn_em/Makefile
+ dyn_em/couple_or_uncouple_em.F
+ dyn_em/module_initialize_b_wave.F
+ dyn_em/module_initialize_grav2d_x.F
+ dyn_em/module_initialize_hill2d_x.F
+ dyn_em/module_initialize_quarter_ss.F
+ dyn_em/module_initialize_real.F
+ dyn_em/module_initialize_squall2d_x.F
+ dyn_em/module_initialize_squall2d_y.F
+ dyn_em/module_small_step_em.F
+ dyn_em/solve_em.F
+ dyn_em/start_em.F
+ dyn_exp/module_initialize_exp.F
+ dyn_exp/solve_exp.F
+ dyn_nmm/TURBL.F
+ dyn_nmm/module_IGWAVE_ADJUST.F
+ dyn_nmm/read_nmm.F
+ dyn_nmm/solve_nmm.F
+ dyn_nmm/start_domain_nmm.F
+ external/RSL/module_dm.F
+ external/RSL/RSL/rsl.h
+ external/RSL/RSL/rsl_initial.c
+ external/RSL/RSL/rsl_io.c
+ external/RSL_LITE/c_code.c
+ external/RSL_LITE/gen_comms.c
+ external/RSL_LITE/makefile
+ external/RSL_LITE/module_dm.F
+ external/RSL_LITE/rsl_bcast.c
+ external/RSL_LITE/rsl_lite.h
+ external/RSL_LITE/task_for_point.c
+ external/esmf_time_f90/ESMF_Alarm.F90
+ external/esmf_time_f90/ESMF_Base.F90
+ external/esmf_time_f90/ESMF_BaseTime.F90
+ external/esmf_time_f90/ESMF_Calendar.F90
+ external/esmf_time_f90/ESMF_Clock.F90
+ external/esmf_time_f90/ESMF_Fraction.F90
+ external/esmf_time_f90/ESMF_Macros.inc
+ external/esmf_time_f90/ESMF_Mod.F90
+ external/esmf_time_f90/ESMF_Time.F90
+ external/esmf_time_f90/ESMF_TimeInterval.F90
+ external/esmf_time_f90/ESMF_TimeMgr.inc
+ external/esmf_time_f90/Makefile
+ external/io_grib1/README.io_grib1
+ external/io_grib1/makefile
+ external/io_int/makefile
+ frame/Makefile
+ frame/collect_on_comm.c
+ frame/libmassv.F
+ frame/module_domain.F
+ frame/module_integrate.F
+ frame/module_io.F
+ inc/deref_kludge.h
+ main/Makefile
+ main/convert_nmm.F
+ main/ideal.F
+ main/ndown_em.F
+ main/real_em.F
+ main/wrf.F
+ phys/module_physics_init.F
+ run/RRTM_DATA
+ share/Makefile
+ share/mediation_feedback_domain.F
+ share/mediation_force_domain.F
+ share/mediation_integrate.F
+ share/mediation_interp_domain.F
+ share/module_date_time.F
+ share/set_timekeeping.F
+ share/solve_interface.F
+ share/start_domain.F
+ tools/regtest.csh
+
 
 Minor-tag:
 
