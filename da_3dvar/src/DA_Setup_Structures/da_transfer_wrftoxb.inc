@@ -654,7 +654,7 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
 !--Calculate means for later use in setting up background errors.
 !------------------------------------------------------------------------------
 
-   if(.not. assocaited(xbx % latc_mean)) then
+   if(.not. associated(xbx % latc_mean)) then
    allocate ( xbx % latc_mean(xp%jds:xp%jde) )
 
    size2d = (xp%ide-xp%ids+1)*(xp%jde-xp%jds+1)
