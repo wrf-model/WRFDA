@@ -15,42 +15,42 @@ gen_be_stage0 : $(SOLVER)_stage0.o
 
 $(SOLVER)_stage1 : $(SOLVER)_stage1.o
 	$(RANLIB) ../main/libwrflib.a
-	$(LD) -o $(SOLVER)_stage1.exe $(LDFLAGS) $(SOLVER)_stage1.o ../main/libwrflib.a $(LIB)
+	$(LD) -o $(SOLVER)_stage1.exe $(LDFLAGS) $(SOLVER)_stage1.o ../main/libwrflib.a
 
 $(SOLVER)_stage2 : $(SOLVER)_stage2.o
 	$(RANLIB) ../main/libwrflib.a
-	$(LD) -o $(SOLVER)_stage2.exe $(LDFLAGS) $(SOLVER)_stage2.o ../main/libwrflib.a $(LIB)
+	$(LD) -o $(SOLVER)_stage2.exe $(LDFLAGS) $(SOLVER)_stage2.o ../main/libwrflib.a
 
 $(SOLVER)_stage3 : $(SOLVER)_stage3.o
 	$(RANLIB) ../main/libwrflib.a
-	$(LD) -o $(SOLVER)_stage3.exe $(LDFLAGS) $(SOLVER)_stage3.o ../main/libwrflib.a $(LIB)
+	$(LD) -o $(SOLVER)_stage3.exe $(LDFLAGS) $(SOLVER)_stage3.o ../main/libwrflib.a
 
 $(SOLVER)_stage4 : $(SOLVER)_stage4.o
 	$(RANLIB) ../main/libwrflib.a
-	$(LD) -o $(SOLVER)_stage4.exe $(LDFLAGS) $(SOLVER)_stage4.o ../main/libwrflib.a $(LIB)
+	$(LD) -o $(SOLVER)_stage4.exe $(LDFLAGS) $(SOLVER)_stage4.o ../main/libwrflib.a
 
 $(SOLVER)_stage4_scale : $(SOLVER)_stage4_scale.o
 	$(RANLIB) ../main/libwrflib.a
-	$(LD) -o $(SOLVER)_stage4_scale.exe $(LDFLAGS) $(SOLVER)_stage4_scale.o ../main/libwrflib.a $(LIB)
+	$(LD) -o $(SOLVER)_stage4_scale.exe $(LDFLAGS) $(SOLVER)_stage4_scale.o ../main/libwrflib.a
 
 $(SOLVER)_cov2d : $(SOLVER)_cov2d.o
 	$(RANLIB) ../main/libwrflib.a
-	$(LD) -o $(SOLVER)_cov2d.exe $(LDFLAGS) $(SOLVER)_cov2d.o ../main/libwrflib.a $(LIB)
+	$(LD) -o $(SOLVER)_cov2d.exe $(LDFLAGS) $(SOLVER)_cov2d.o ../main/libwrflib.a
 
 $(SOLVER)_cov3d : $(SOLVER)_cov3d.o
 	$(RANLIB) ../main/libwrflib.a
-	$(LD) -o $(SOLVER)_cov3d.exe $(LDFLAGS) $(SOLVER)_cov3d.o ../main/libwrflib.a $(LIB)
+	$(LD) -o $(SOLVER)_cov3d.exe $(LDFLAGS) $(SOLVER)_cov3d.o ../main/libwrflib.a
 
 $(SOLVER)_diags : $(SOLVER)_diags.o
 	$(RANLIB) ../main/libwrflib.a
-	$(LD) -o $(SOLVER)_diags.exe $(LDFLAGS) $(SOLVER)_diags.o ../main/libwrflib.a $(LIB)
+	$(LD) -o $(SOLVER)_diags.exe $(LDFLAGS) $(SOLVER)_diags.o ../main/libwrflib.a
 
 $(SOLVER)_diags_read : $(SOLVER)_diags_read.o
 	$(RANLIB) ../main/libwrflib.a
-	$(LD) -o $(SOLVER)_diags_read.exe $(LDFLAGS) $(SOLVER)_diags_read.o ../main/libwrflib.a $(LIB)
+	$(LD) -o $(SOLVER)_diags_read.exe $(LDFLAGS) $(SOLVER)_diags_read.o ../main/libwrflib.a
 
-#	$(CPP) -I. $(CPPFLAGS_3DVAR) gen_be_stage0.f > gen_be_stage0.f
-#	../../da_3dvar/src/DA_Constants.o
+#
+
 gen_be_stage0.o:
 	$(RM) $@
 	$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) gen_be_stage0.f

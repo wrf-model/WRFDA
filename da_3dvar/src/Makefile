@@ -86,6 +86,10 @@ OBJS_4_GEN_BE_LONG =	DA_Constants.o		\
 			DA_Tools.o		\
 			DA_Grid_Definitions.o	\
 			DA_Define_Structures.o	\
+			DA_Recursive_Filter.o	\
+			DA_Interpolation.o	\
+			DA_Statistics.o		\
+	                da_bufrlib.o 		\
 			da_h_ops.o		\
 			da_c_mat.o		\
 			da_rf.o			\
