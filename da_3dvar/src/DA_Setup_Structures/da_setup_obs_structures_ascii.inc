@@ -44,6 +44,7 @@ SUBROUTINE da_setup_obs_structures_ascii( xp, ob, iv )
    iv%num_profiler  = 0
    iv%num_buoy  = 0
    iv%num_radar  = 0
+   iv%num_bogus  = 0
 
    do n=0, max_fgat_time
       iv%ob_numb(n)%total = 0
@@ -66,6 +67,7 @@ SUBROUTINE da_setup_obs_structures_ascii( xp, ob, iv )
       iv%ob_numb(n)%profiler  = 0
       iv%ob_numb(n)%buoy  = 0
       iv%ob_numb(n)%radar  = 0
+      iv%ob_numb(n)%bogus  = 0
    enddo
 
 !-----------------------------------------------------------------------------
@@ -150,6 +152,8 @@ SUBROUTINE da_setup_obs_structures_ascii( xp, ob, iv )
       iv%num_buoy = max_buoy_input
    if(iv%num_radar > max_radar_input ) &
       iv%num_radar = max_radar_input
+   if(iv%num_bogus > max_bogus_input ) &
+      iv%num_bogus = max_bogus_input
 !  if(iv%num_pseudo > max_pseudo_input ) &
 !     iv%num_pseudo = max_pseudo_input
 
@@ -181,6 +185,7 @@ SUBROUTINE da_setup_obs_structures_ascii( xp, ob, iv )
    iv%num_profiler  = 0
    iv%num_buoy  = 0
    iv%num_radar  = 0
+   iv%num_bogus  = 0
 
 !-----------------------------------------------------------------------------
 

@@ -22,6 +22,13 @@ SUBROUTINE XYLL(XX,YY,XLAT,XLON)
    
    conv = 180.0 / pi
 
+! seperate treatment for global fields
+   if(fg_format == 3) then
+      xlat = yy * 180.0 /(coarse_jy-1)  -  90.0    
+      xlon = xx * 360.0 /(coarse_ix-1)  - 180.0    
+      return
+   endif
+
    CNTRI = real(coarse_ix+1)/2.
    CNTRJ = real(coarse_jy+1)/2. 
 
@@ -75,6 +82,6 @@ SUBROUTINE XYLL(XX,YY,XLAT,XLON)
       CELL = EXP(Y/C2)  
       XLAT = 2.*(CONV*ATAN(CELL))-90.0 
    ENDIF  
- 
+
 END SUBROUTINE XYLL
 

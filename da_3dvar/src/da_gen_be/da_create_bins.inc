@@ -1,7 +1,25 @@
 subroutine da_create_bins( ni, nj, nk, bin_type, num_bins, num_bins2d, &
                            bin, bin2d, &
                            binwidth_lat, binwidth_hgt, num_bins_hgt, latitude, height )
-
+!----------------------------------------------------------------------------------------
+!
+! Purpose: To create the bins for calculation of the means.
+!
+! Input  : ni, nj, nk   ----- Dimensions
+!          bin_type     ----- 0: No binning; 
+!                             1: bins for X-direction mean; 
+!                             2: bins for each of binwidth_lat/binwidth_hgt.  
+!          Optional for bin_type = 2:
+!          binwidth_lat ----- interval between bins for latitude in degree for bin_type = 2
+!          binwidth_hgt ----- interval between bins for height in meter for bin_type = 2
+!          num_bins_hgt ----- the number of height bins for bin_type = 2
+!          latitude     ----- 3d field latitude in degree for bin_type = 2
+!          height       ----- 3d field height in meter for bin_type = 2
+!
+! Output:  num_bins,num_bins2d ---- the number of bins for 3d and 2d fields
+!          bin     ,     bin2d ---- Assigned bin to a gridpoints for 3d and 2d fields
+!
+!-----------------------------------------------------------------------------------------       
    implicit none
 
    integer, intent(in)      :: ni, nj, nk                 ! Dimensions read in.
@@ -79,7 +97,7 @@ subroutine da_create_bins( ni, nj, nk, bin_type, num_bins, num_bins2d, &
       num_bins2d = num_bins_lat
 
       write(6,'(i3)')num_bins_lat, num_bins_hgt, num_bins
-stop
+!stop
 
 !     Select height bins:
       do k = 1, nk

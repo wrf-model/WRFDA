@@ -108,6 +108,9 @@ subroutine DA_Vertical_Transform( string, be, vertical_wgt, vv, vp, &
       END IF
 
       IF ( be % v5 % mz > 0 ) THEN
+        if (be % v5 % mz == 1) then
+         vp % v5(its:ite,jts:jte,1) = vv % v5(its:ite,jts:jte,1)
+        else
          CALL DA_Transform_VvToVp( &
 #ifndef DEREF_KLUDGE
                                    be % v5 % evec, &
@@ -124,6 +127,8 @@ subroutine DA_Vertical_Transform( string, be, vertical_wgt, vv, vp, &
                                    ids,ide, jds,jde, kds,kde,  &
                                    ims,ime, jms,jme, kms,kme,  &
                                    its,ite, jts,jte, kts,kte )
+      endif
+
       ELSE
          vp % v5(its:ite,jts:jte,kts:kte) = 0.0
       END IF
@@ -211,6 +216,9 @@ subroutine DA_Vertical_Transform( string, be, vertical_wgt, vv, vp, &
       END IF
 
       IF ( be % v5 % mz > 0 ) THEN
+        if (be % v5 % mz == 1) then
+         vv % v5(its:ite,jts:jte,1) = vp % v5(its:ite,jts:jte,1)
+        else
          CALL DA_Transform_VpToVv( &
 #ifndef DEREF_KLUDGE
                                    be % v5 % evec, &
@@ -227,6 +235,7 @@ subroutine DA_Vertical_Transform( string, be, vertical_wgt, vv, vp, &
                                    ids,ide, jds,jde, kds,kde,  &
                                    ims,ime, jms,jme, kms,kme,  &
                                    its,ite, jts,jte, kts,kte )
+        endif
       END IF
 
    case ('u_adj');
@@ -316,6 +325,10 @@ subroutine DA_Vertical_Transform( string, be, vertical_wgt, vv, vp, &
       END IF
 
       IF ( be % v5 % mz > 0 ) THEN
+       if( be % v5 % mz == 1) then
+         vv % v5(its:ite,jts:jte,1) = vp % v5(its:ite,jts:jte,1)
+       else
+
          CALL DA_Transform_VvToVp_Adj( &
 #ifndef DEREF_KLUDGE
                                        be % v5 % evec, &
@@ -333,6 +346,7 @@ subroutine DA_Vertical_Transform( string, be, vertical_wgt, vv, vp, &
                                        ids,ide, jds,jde, kds,kde,  &
                                        ims,ime, jms,jme, kms,kme,  &
                                        its,ite, jts,jte, kts,kte )
+      endif 
       END IF
 
    case default;
