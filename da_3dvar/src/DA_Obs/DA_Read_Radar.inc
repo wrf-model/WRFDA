@@ -155,9 +155,6 @@ SUBROUTINE DA_Read_Radar (iunit, ob, xp, filename)
    WRITE (0,'(A)')  &
    '--------------------------------------------------------------------------'
 
-
-   max_Radar_input = platform % stn % numObs
-
 !----------------------------------------------------------------------------!
 !  3.4 SKIP TWO LINES
 !      --------------
@@ -169,7 +166,7 @@ SUBROUTINE DA_Read_Radar (iunit, ob, xp, filename)
 !  3.5 LOOP OVER RECORDS
 !  --------------------
 
-   reports: DO j = 1, max_Radar_input
+   reports: DO j = 1, platform % stn % numObs
 
 !    3.5.1 READ STATION GENERAL INFO
 !           -------------------------

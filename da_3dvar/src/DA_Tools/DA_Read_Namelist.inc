@@ -373,7 +373,7 @@ SUBROUTINE DA_Read_Namelist
    READ  ( UNIT = namelist_unit, NML = RECORD8 , ERR = 8000, IOSTAT = IOST)
    
    if ( print_detail >= 1 ) then
-      WRITE(6,'(A)') ' def_sub_domain = ', def_sub_domain
+      WRITE(6,'(A, L10)') ' def_sub_domain = ', def_sub_domain
    end if
    
    READ  ( UNIT = namelist_unit, NML = RECORD10, ERR = 8000, IOSTAT = IOST)
