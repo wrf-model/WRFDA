@@ -8,7 +8,9 @@ Date: 		02/03/05
 Reason for changes (explain before making changes)
 --------------------------------------------------
 
-Merge to current WRF frame.
+1. Merge to current WRF frame.
+
+2. Bug fix for radar.
 
 Expected Differences
 --------------------
@@ -18,6 +20,12 @@ None.
 Test results (run on what machines?)
 ------------------------------------------------------
 
+Have been tested on Mac G4, G5, IBM.
+
+Known problem:
+------------------------------------------------------
+
+It compiles EXTREMELY slow on DEC-alpha OSF1 (cape, zebra).
 
 Files removed:
 --------------
@@ -95,6 +103,11 @@ Files modified:
  da_3dvar/src/Makefile
  da_3dvar/src/DA_Setup_Structures/da_setup_runconstants.inc
  da_3dvar/src/DA_Setup_Structures/da_transfer_xatowrf.inc
+
+ (bug fix for radar)
+ da_3dvar/src/DA_Obs/DA_Scan_Radar.inc
+ da_3dvar/src/DA_Obs/DA_Read_Radar.inc
+
  dyn_em/couple_or_uncouple_em.F
  dyn_em/module_big_step_utilities_em.F
  dyn_em/module_initialize_b_wave.F
