@@ -10,8 +10,7 @@ MODULES_INTERFACE	=	module_wrf_3dvar_interface.o	\
 	   			module_wrfvar_esmf_super.o
 
 MODULES_BE_INTERFACE	=	module_wrf_3dvar_interface.o	\
-				module_da_gen_be_stats_interface.o \
-	   			module_wrfvar_esmf_super.o
+				module_da_gen_be_stats_interface.o
 OBJS    = 
 
 gen_be_interface :	$(MODULES_BE_INTERFACE) $(OBJS)

@@ -16,6 +16,9 @@ DA_3DVAR_MODULES_2 = $(INC_MOD_3DVAR)
 DA_CONVERTOR_MOD_DIR = -I../convertor
 DA_CONVERTOR_MODULES = $(DA_CONVERTOR_MOD_DIR) $(INCLUDE_MODULES)
 
+DA_GEN_BE_MOD_DIR = -I../da_3dvar/src
+DA_GEN_BE_MODULES = $(DA_GEN_BE_MOD_DIR) $(INCLUDE_MODULES)
+
 #### 3.d.   add macros to specify the modules for this core
 
 #EXP_MODULE_DIR = -I../dyn_exp
@@ -95,8 +98,15 @@ n2k :
 	  $(MAKE) MODULE_DIRS="$(DA_CONVERTOR_MODULES)" SOLVER=netcdf2kma )
 
 gen_be :
+	/bin/rm -f main/libwrflib.a
+	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" ext
+	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" toolsdir
+	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" REGISTRY="Registry" framework
+	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" shared
+	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" da_3dvar_io
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES_2)" gen_be_src
-	( cd main/gen_be ; \
+	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" gen_be_interface
+	( cd da_be ; \
 	/bin/rm -f *.exe ; \
 	$(MAKE) MODULE_DIRS="$(DA_GEN_BE_MODULES)" SOLVER=gen_be )
 
@@ -248,7 +258,6 @@ ext :
 
 framework :
 	@ echo '--------------------------------------'
-#	( cd frame ; $(MAKE) framework )
 	( cd frame ; $(MAKE) framework; \
 	cd ../external/io_netcdf ; make NETCDFPATH="$(NETCDFPATH)" FC="$(FC) $(FCBASEOPTS)" RANLIB="$(RANLIB)" CPP="$(CPP)" diffwrf; \
 	cd ../io_grib1 ; make FC="$(FC) -I. $(FCBASEOPTS)" CC="$(CC)" CFLAGS="$(CFLAGS)" RANLIB="$(RANLIB)" CPP="$(CPP)"; \
@@ -282,9 +291,17 @@ da_3dvar_interface :
 	@ echo '--------------------------------------'
 	( cd da_3dvar; $(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" da_3dvar_interface )
 
+gen_be_interface :
+	@ echo '--------------------------------------'
+	( cd da_3dvar; $(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" gen_be_interface )
+
 convertor_drivers :
 	@ echo '--------------------------------------'
 	( cd convertor ; $(MAKE) )
+
+gen_be_src :
+	@ echo '--------------------------------------'
+	( cd da_3dvar/src; $(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES_2)" gen_be )
 
 # rule used by configure to test if this will compile with MPI 2 calls MPI_Comm_f2c and _c2f
 mpi2_test :

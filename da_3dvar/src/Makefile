@@ -50,7 +50,9 @@ OBJS_FOR_ALL =		da_solve_v3d.o		\
 
 OBJS_FOR_GEN_BE =	DA_Constants.o		\
 			da_gen_be.o		\
+			DA_Gen_Be_Stats.o	\
 			da_fftpack5.o		\
+			da_stats_be.o		\
 			LAPACK.o		\
 			BLAS.o			\
 			da_spectral.o
@@ -1155,10 +1157,55 @@ da_spectral.o:		\
 			da_spectral/da_vv_to_v_spectral.inc	\
 			da_spectral/da_v_to_vv_spectral_adj.inc	\
 			da_spectral/da_legtra_inv_adj.inc	\
-			da_spectral/da_apply_power.inc    \
+			da_spectral/da_apply_power.inc		\
 			da_spectral/da_spectral.F
 			$(CPP) -I./da_spectral $(CPPFLAGS_3DVAR) da_spectral/da_spectral.F > da_spectral.f
 			$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) da_spectral.f
+
+da_stats_be.o:		DA_Constants.o		\
+			DA_Define_Structures.o	\
+			DA_Setup_Structures.o	\
+			DA_Test.o		\
+			DA_Tools.o		\
+			DA_Gen_Be_Stats.o	\
+			par_util.o		\
+			da_stats_be/da_init_be.inc      \
+			da_stats_be/da_stats_be.F
+			$(RM) $@
+			$(CPP) -I./da_stats_be $(CPPFLAGS_3DVAR) da_stats_be/da_stats_be.F > da_stats_be.f
+			$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) da_stats_be.f
+
+DA_Gen_Be_Stats.o:	../module_wrf_3dvar_io.o		\
+			LAPACK.o				\
+	                DA_FFTs.o				\
+	                DA_Tools.o				\
+	                DA_Dynamics.o				\
+	                DA_Constants.o				\
+	                DA_VToX_Transforms.o			\
+	                DA_Setup_Structures.o			\
+	                DA_Define_Structures.o			\
+	                DA_Gen_Be_Stats/DA_Stats_Namelist.inc	\
+	                DA_Gen_Be_Stats/DA_Statistics_Step0.inc	\
+	                DA_Gen_Be_Stats/DA_advance_cymdh0.inc	\
+	                DA_Gen_Be_Stats/DA_set_current_date.inc	\
+	                DA_Gen_Be_Stats/DA_get_ymdh.inc		\
+	                DA_Gen_Be_Stats/DA_Assign_Value.inc	\
+	                DA_Gen_Be_Stats/DA_Difference.inc	\
+	                DA_Gen_Be_Stats/DA_New_Statistics_Variable.inc \
+	                DA_Gen_Be_Stats/DA_Write_Diff.inc	\
+	                DA_Gen_Be_Stats/DA_Make_Ensemble_Mean.inc \
+	                DA_Gen_Be_Stats/DA_Ens_Sum.inc		\
+	                DA_Gen_Be_Stats/DA_Zero_Ens.inc		\
+	                DA_Gen_Be_Stats/DA_Ens_Magnify.inc	\
+	                DA_Gen_Be_Stats/DA_Test_Transforms.inc	\
+	                DA_Gen_Be_Stats/DA_Mss_Read.inc		\
+	                DA_Gen_Be_Stats/DA_Data_Delete.inc	\
+	                DA_Gen_Be_Stats/DA_Gen_Date.inc		\
+	                DA_Gen_Be_Stats/DA_Make_Filename.inc	\
+			DA_Gen_Be_Stats/DA_Gen_Be_Stats.F
+			$(RM) $@
+			$(CPP) -I./DA_Gen_Be_Stats $(CPPFLAGS_3DVAR) DA_Gen_Be_Stats/DA_Gen_Be_Stats.F > DA_Gen_Be_Stats.f
+			$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) DA_Gen_Be_Stats.f
 
 ##############################################################################
 

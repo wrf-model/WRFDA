@@ -47,7 +47,7 @@ PROGRAM da_gen_be_stats
    CALL initial_config
 
 
-   CALL get_debug_level ( debug_level )
+   CALL nl_get_debug_level ( 1, debug_level )
    CALL set_wrf_debug_level ( debug_level )
 
 !--allocated and configure the mother domain
@@ -56,7 +56,6 @@ PROGRAM da_gen_be_stats
 
    CALL       wrf_debug ( 100 , 'wrf: calling alloc_and_configure_domain ' )
    CALL alloc_and_configure_domain ( domain_id  = 1 ,                  &
-                                     local_time = 0 ,                  &
                                      grid       = head_grid ,          &
                                      parent     = null_domain ,        &
                                      kid        = -1                   )
