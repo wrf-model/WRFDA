@@ -33,15 +33,34 @@ subroutine da_transform_vtox_adj( xb, xbx, be, xa, xp, vp, vv, cv, &
 !-------------------------------------------------------------------------
 !   Polar treatment for Global
 !-------------------------------------------------------------------------
-   if( print_detail > 100) then
-   print*,' invtox_adj initial xa U = ',sum(xa%u * xa%u)
-   print*,' invtox_adj initial xa V = ',sum(xa%v * xa%v)
-   print*,' invtox_adj initial xa T = ',sum(xa%t * xa%t)
-   print*,' invtox_adj initial xa psfc = ',sum(xa%psfc * xa%psfc)
-   end if
-
    if( global ) then     
-    call DA_Set_Boundary_Xa(xa, xb)
+    if(print_detail >= 100) then
+       write(unit=0, fmt='(2a,2x,a,i6)') 'file:', __FILE__, 'line:', __LINE__
+       call get_3d_sum(xa%u, 'xa%u', &
+                      ids, ide, jds, jde, kds, kde, &
+                      ims, ime, jms, jme, kms, kme, &
+                      its, ite, jts, jte, kts, kte)
+       call get_3d_sum(xa%v, 'xa%v', &
+                      ids, ide, jds, jde, kds, kde, &
+                      ims, ime, jms, jme, kms, kme, &
+                      its, ite, jts, jte, kts, kte)
+       call get_3d_sum(xa%t, 'xa%t', &
+                      ids, ide, jds, jde, kds, kde, &
+                      ims, ime, jms, jme, kms, kme, &
+                      its, ite, jts, jte, kts, kte)
+       call get_3d_sum(xa%p, 'xa%p', &
+                      ids, ide, jds, jde, kds, kde, &
+                      ims, ime, jms, jme, kms, kme, &
+                      its, ite, jts, jte, kts, kte)
+       call get_3d_sum(xa%q, 'xa%q', &
+                      ids, ide, jds, jde, kds, kde, &
+                      ims, ime, jms, jme, kms, kme, &
+                      its, ite, jts, jte, kts, kte)
+       call get_2d_sum(xa%psfc, 'xa%psfc', &
+                      ids, ide, jds, jde, &
+                      ims, ime, jms, jme, &
+                      its, ite, jts, jte )
+    endif
 !  Poles treatment for global 3DVAR
 #ifndef DEREF_KLUDGE
     call DA_Get_AVPoles(xa%u,xa%v,xb%lon,&
@@ -88,6 +107,33 @@ subroutine da_transform_vtox_adj( xb, xbx, be, xa, xp, vp, vv, cv, &
                     ims, ime, jms, jme,   1,   1,  &
                     its, ite, jts, jte,   1,   1   )
 #endif
+    if(print_detail >= 100) then
+       write(unit=0, fmt='(2a,2x,a,i6)') 'file:', __FILE__, 'line:', __LINE__
+       call get_3d_sum(xa%u, 'xa%u', &
+                      ids, ide, jds, jde, kds, kde, &
+                      ims, ime, jms, jme, kms, kme, &
+                      its, ite, jts, jte, kts, kte)
+       call get_3d_sum(xa%v, 'xa%v', &
+                      ids, ide, jds, jde, kds, kde, &
+                      ims, ime, jms, jme, kms, kme, &
+                      its, ite, jts, jte, kts, kte)
+       call get_3d_sum(xa%t, 'xa%t', &
+                      ids, ide, jds, jde, kds, kde, &
+                      ims, ime, jms, jme, kms, kme, &
+                      its, ite, jts, jte, kts, kte)
+       call get_3d_sum(xa%p, 'xa%p', &
+                      ids, ide, jds, jde, kds, kde, &
+                      ims, ime, jms, jme, kms, kme, &
+                      its, ite, jts, jte, kts, kte)
+       call get_3d_sum(xa%q, 'xa%q', &
+                      ids, ide, jds, jde, kds, kde, &
+                      ims, ime, jms, jme, kms, kme, &
+                      its, ite, jts, jte, kts, kte)
+       call get_2d_sum(xa%psfc, 'xa%psfc', &
+                      ids, ide, jds, jde, &
+                      ims, ime, jms, jme, &
+                      its, ite, jts, jte )
+    endif
    end if     
 
 !--Compute w increments using Richardson's eqn.
@@ -191,6 +237,37 @@ subroutine da_transform_vtox_adj( xb, xbx, be, xa, xp, vp, vv, cv, &
    enddo
  endif
 
+ if( global ) then     
+   call DA_Set_Boundary_Xa(xa, xb)
+    if(print_detail >= 100) then
+       write(unit=0, fmt='(2a,2x,a,i6)') 'file:', __FILE__, 'line:', __LINE__
+       call get_3d_sum(xa%u, 'xa%u', &
+                      ids, ide, jds, jde, kds, kde, &
+                      ims, ime, jms, jme, kms, kme, &
+                      its, ite, jts, jte, kts, kte)
+       call get_3d_sum(xa%v, 'xa%v', &
+                      ids, ide, jds, jde, kds, kde, &
+                      ims, ime, jms, jme, kms, kme, &
+                      its, ite, jts, jte, kts, kte)
+       call get_3d_sum(xa%t, 'xa%t', &
+                      ids, ide, jds, jde, kds, kde, &
+                      ims, ime, jms, jme, kms, kme, &
+                      its, ite, jts, jte, kts, kte)
+       call get_3d_sum(xa%p, 'xa%p', &
+                      ids, ide, jds, jde, kds, kde, &
+                      ims, ime, jms, jme, kms, kme, &
+                      its, ite, jts, jte, kts, kte)
+       call get_3d_sum(xa%q, 'xa%q', &
+                      ids, ide, jds, jde, kds, kde, &
+                      ims, ime, jms, jme, kms, kme, &
+                      its, ite, jts, jte, kts, kte)
+       call get_2d_sum(xa%psfc, 'xa%psfc', &
+                      ids, ide, jds, jde, &
+                      ims, ime, jms, jme, &
+                      its, ite, jts, jte )
+    endif
+ endif
+
 !-------------------------------------------------------------------------
  if(cv_options == 2 .or. cv_options == 4)then
 
@@ -203,13 +280,28 @@ subroutine da_transform_vtox_adj( xb, xbx, be, xa, xp, vp, vv, cv, &
                                 ims,ime, jms,jme, kms,kme,  &
                                 its,ite, jts,jte, kts,kte )
    if( print_detail > 100) then
-    print*,' in vtox_adj after vptox_adj Vp V1 ',sum(vp%v1 * vp%v1)
-    print*,' in vtox_adj after vptox_adj Vp V2 ',sum(vp%v2 * vp%v2)
-    print*,' in vtox_adj after vptox_adj Vp V3 ',sum(vp%v3 * vp%v3)
-    print*,' in vtox_adj after vptox_adj Vp V4 ',sum(vp%v4 * vp%v4)
-    print*,' in vtox_adj after vptox_adj Vp V5 ',sum(vp%v5 * vp%v5)
+      write(unit=0, fmt='(2a,2x,a,i6)') 'file:', __FILE__, 'line:', __LINE__
+      call get_3d_sum(vp%v1, 'vp%v1', &
+                      ids, ide, jds, jde, kds, kde, &
+                      ims, ime, jms, jme, kms, kme, &
+                      its, ite, jts, jte, kts, kte)
+      call get_3d_sum(vp%v2, 'vp%v2', &
+                      ids, ide, jds, jde, kds, kde, &
+                      ims, ime, jms, jme, kms, kme, &
+                      its, ite, jts, jte, kts, kte)
+      call get_3d_sum(vp%v3, 'vp%v3', &
+                      ids, ide, jds, jde, kds, kde, &
+                      ims, ime, jms, jme, kms, kme, &
+                      its, ite, jts, jte, kts, kte)
+      call get_3d_sum(vp%v4, 'vp%v4', &
+                      ids, ide, jds, jde, kds, kde, &
+                      ims, ime, jms, jme, kms, kme, &
+                      its, ite, jts, jte, kts, kte)
+      call get_3d_sum(vp%v5, 'vp%v5', &
+                      ids, ide, jds, jde, kds, kde, &
+                      ims, ime, jms, jme, kms, kme, &
+                      its, ite, jts, jte, kts, kte)
    end if
-
 
 !-------------------------------------------------------------------------
 !  [2.0]: Perform vp = u_v vv transform:
@@ -234,13 +326,31 @@ subroutine da_transform_vtox_adj( xb, xbx, be, xa, xp, vp, vv, cv, &
       vv % v4(its:ite,jts:jte,kts:kte) = vp % v4(its:ite,jts:jte,kts:kte)
       vv % v5(its:ite,jts:jte,kts:kte) = vp % v5(its:ite,jts:jte,kts:kte)
    end if
-   if( print_detail > 100) then
-    print*,' in vtox_adj after vvtvp_adj Vv V1 ',sum(vv%v1 * vv%v1)
-    print*,' in vtox_adj after vvtvp_adj Vv V2 ',sum(vv%v2 * vv%v2)
-    print*,' in vtox_adj after vvtvp_adj Vv V3 ',sum(vv%v3 * vv%v3)
-    print*,' in vtox_adj after vvtvp_adj Vv V4 ',sum(vv%v4 * vv%v4)
-    print*,' in vtox_adj after vvtvp_adj Vv V5 ',sum(vv%v5 * vv%v5)
+
+   if( print_detail > 100) then 
+      write(unit=0, fmt='(2a,2x,a,i6)') 'file:', __FILE__, 'line:', __LINE__
+      call get_3d_sum(vv%v1, 'vv%v1', &
+                      ids, ide, jds, jde, kds, kde, &
+                      ims, ime, jms, jme, kms, kme, &
+                      its, ite, jts, jte, kts, kte) 
+      call get_3d_sum(vv%v2, 'vv%v2', &
+                      ids, ide, jds, jde, kds, kde, &
+                      ims, ime, jms, jme, kms, kme, &
+                      its, ite, jts, jte, kts, kte) 
+      call get_3d_sum(vv%v3, 'vv%v3', &
+                      ids, ide, jds, jde, kds, kde, &
+                      ims, ime, jms, jme, kms, kme, &
+                      its, ite, jts, jte, kts, kte)
+      call get_3d_sum(vv%v4, 'vv%v4', &
+                      ids, ide, jds, jde, kds, kde, &
+                      ims, ime, jms, jme, kms, kme, &
+                      its, ite, jts, jte, kts, kte)
+      call get_3d_sum(vv%v5, 'vv%v5', &
+                      ids, ide, jds, jde, kds, kde, &
+                      ims, ime, jms, jme, kms, kme, &
+                      its, ite, jts, jte, kts, kte)
    end if
+
 !-------------------------------------------------------------------------
 !  [1.0]: perform vv = u_h cv transform:
 !-------------------------------------------------------------------------
@@ -267,14 +377,14 @@ subroutine da_transform_vtox_adj( xb, xbx, be, xa, xp, vp, vv, cv, &
                                 ids,ide, jds,jde, kds,kde,  &
                                 ims,ime, jms,jme, kms,kme,  &
                                 its,ite, jts,jte, kts,kte )
- if( print_detail > 100 ) &
- print*,' in vtox_adj after vtovv_adj  cv.cv = ',sum(cv * cv)
 
  if(cv_options == 4 ) &
   call DA_Transform_VToVv_Global_Adj(xb, xbx, be, cv, vv, &
                               ids,ide, jds,jde, kds,kde,  &
                               ims,ime, jms,jme, kms,kme,  &
                               its,ite, jts,jte, kts,kte )
+ if( print_detail > 100 ) &
+ print*,' in vtox_adj after vtovv_adj  cv.cv = ',sum(cv * cv)
 
 end subroutine da_transform_vtox_adj
 

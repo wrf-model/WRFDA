@@ -978,6 +978,9 @@ CONTAINS
 #include "DA_Set_Boundary_Xa.inc"
 #include "DA_Set_Boundary_Xb.inc"
 #include "DA_Set_Boundary_3d.inc"
+
+#include "get_2d_sum.inc"
+#include "get_3d_sum.inc"
    
 END MODULE DA_Tools
 

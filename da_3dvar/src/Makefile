@@ -869,6 +869,8 @@ DA_Tools.o:		\
 			DA_Tools/DA_Set_Boundary_Xa.inc \
 			DA_Tools/DA_Set_Boundary_Xb.inc \
 			DA_Tools/DA_Set_Boundary_3d.inc \
+			DA_Tools/get_2d_sum.inc \
+			DA_Tools/get_3d_sum.inc \
 			DA_Tools/xyll.inc    
 			$(RM) $@
 			$(CPP) -I./DA_Tools $(CPPFLAGS_3DVAR) DA_Tools/DA_Tools.F > DA_Tools.f
