@@ -55,8 +55,6 @@ program gen_be_stage4
    real, allocatable   :: total_power(:)             ! Total Power spectrum (averaged over time/members).
 
    complex, allocatable:: cv(:)                      ! Control variable vector.
-   real,    allocatable:: rcv(:)                     ! Real Control variable vector.
-
 
    namelist / gen_be_stage4_nl / start_date, end_date, interval, variable, gaussian_lats, &
                                  be_method, ne, k, testing_spectral, expt, dat_dir
@@ -169,13 +167,11 @@ program gen_be_stage4
 
             v_size = ( max_wavenumber + 1 ) * ( max_wavenumber + 2 ) / 2
             allocate( cv( 1:v_size) )
-            allocate( rcv( 1:2*v_size) )
-
 
 !           Test horizontal transforms:
             if ( testing_spectral ) then
                call da_test_spectral( ni, nj, max_wavenumber, inc, lenr, lensav, lenwrk, &
-                                      alp_size, 2*v_size, alp, wsave, int_wgts, field )
+                                      alp_size, v_size, alp, wsave, int_wgts, field )
             end if
             first_time = .false.
          end if
@@ -183,16 +179,13 @@ program gen_be_stage4
 !---------------------------------------------------------------------------------------------
 !         write(6,(a)) Perform gridpoint to spectral decomposition.
 !---------------------------------------------------------------------------------------------
+
          call da_vv_to_v_spectral( ni, nj, max_wavenumber, inc, lenr, lensav, lenwrk, &
-                                   alp_size, 2*v_size, alp, wsave, int_wgts, rcv, field)
+                                   alp_size, v_size, alp, wsave, int_wgts, field, cv )
 
 !---------------------------------------------------------------------------------------------
 !         write(6,(a)) Calculate power spectra.
 !---------------------------------------------------------------------------------------------
-
-         do i = 1, v_size
-         cv(i) = cmplx ( rcv(2*i-1), rcv(2*i) )
-         end do
 
          call da_calc_power( max_wavenumber, v_size, cv, power )
 

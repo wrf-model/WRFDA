@@ -22,6 +22,7 @@ subroutine DA_Vertical_Transform( string, be, vertical_wgt, vv, vp, &
 !-------------------------------------------------------------------
 !     [1.0] Perform vp(i,j,k) = E L^{1/2} vv(i,j,m) transform:
 !------------------------------------------------------------------- 
+
       IF ( be % v1 % mz > 0 ) THEN
          CALL DA_Transform_VvToVp( &
 #ifndef DEREF_KLUDGE
@@ -107,9 +108,9 @@ subroutine DA_Vertical_Transform( string, be, vertical_wgt, vv, vp, &
       END IF
 
       IF ( be % v5 % mz > 0 ) THEN
-       if( cv_options == 4) then
-         vp % v5(its:ite,jts:jte,1) = vv % v5(its:ite,jts:jte,1) 
-       else
+        if (be % v5 % mz == 1) then
+         vp % v5(its:ite,jts:jte,1) = vv % v5(its:ite,jts:jte,1)
+        else
          CALL DA_Transform_VvToVp( &
 #ifndef DEREF_KLUDGE
                                    be % v5 % evec, &
@@ -126,7 +127,8 @@ subroutine DA_Vertical_Transform( string, be, vertical_wgt, vv, vp, &
                                    ids,ide, jds,jde, kds,kde,  &
                                    ims,ime, jms,jme, kms,kme,  &
                                    its,ite, jts,jte, kts,kte )
-       end if
+      endif
+
       ELSE
          vp % v5(its:ite,jts:jte,kts:kte) = 0.0
       END IF
@@ -214,9 +216,9 @@ subroutine DA_Vertical_Transform( string, be, vertical_wgt, vv, vp, &
       END IF
 
       IF ( be % v5 % mz > 0 ) THEN
-       if( cv_options == 4) then
-         vv % v5(its:ite,jts:jte,1) = vp % v5(its:ite,jts:jte,1) 
-       else
+        if (be % v5 % mz == 1) then
+         vv % v5(its:ite,jts:jte,1) = vp % v5(its:ite,jts:jte,1)
+        else
          CALL DA_Transform_VpToVv( &
 #ifndef DEREF_KLUDGE
                                    be % v5 % evec, &
@@ -233,7 +235,7 @@ subroutine DA_Vertical_Transform( string, be, vertical_wgt, vv, vp, &
                                    ids,ide, jds,jde, kds,kde,  &
                                    ims,ime, jms,jme, kms,kme,  &
                                    its,ite, jts,jte, kts,kte )
-       end if
+        endif
       END IF
 
    case ('u_adj');
@@ -323,9 +325,10 @@ subroutine DA_Vertical_Transform( string, be, vertical_wgt, vv, vp, &
       END IF
 
       IF ( be % v5 % mz > 0 ) THEN
-       if( cv_options == 4) then
-         vv % v5(its:ite,jts:jte,1) = vp % v5(its:ite,jts:jte,1) 
+       if( be % v5 % mz == 1) then
+         vv % v5(its:ite,jts:jte,1) = vp % v5(its:ite,jts:jte,1)
        else
+
          CALL DA_Transform_VvToVp_Adj( &
 #ifndef DEREF_KLUDGE
                                        be % v5 % evec, &
@@ -343,7 +346,7 @@ subroutine DA_Vertical_Transform( string, be, vertical_wgt, vv, vp, &
                                        ids,ide, jds,jde, kds,kde,  &
                                        ims,ime, jms,jme, kms,kme,  &
                                        its,ite, jts,jte, kts,kte )
-       end if
+      endif 
       END IF
 
    case default;
@@ -357,3 +360,4 @@ subroutine DA_Vertical_Transform( string, be, vertical_wgt, vv, vp, &
    end select
 
 END subroutine DA_Vertical_Transform
+

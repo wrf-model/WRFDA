@@ -19,6 +19,9 @@ subroutine da_readwrite_be_stage3( outunit, nk, variable, be_method )
    real, allocatable        :: e_val_loc(:,:)             ! Latitudinally varying eigenvalues.
  
    filename = 'gen_be_stage3.'//trim(variable)//'.'//trim(be_method)//'.dat'
+!yrg mods:
+   print '(5X,"Readwrite BE Stage4: nk=",i3,3X,"var=",a8," be_method=",a3,"  filemane=",a32)', &
+                                 nk, variable, be_method, filename
    open (iunit, file = filename, form='unformatted')
    read(iunit)vardum
    if ( trim(vardum) /= trim(variable) ) then

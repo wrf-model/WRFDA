@@ -36,7 +36,7 @@ subroutine da_transform_vtox( xb, xbx, be, cv, vv, vp, xp, xa,        &
 !-------------------------------------------------------------------------
 !  [1.0]: Perform vv = u_h cv transform:
 !-------------------------------------------------------------------------
- if(cv_options == 2 ) &    
+ if(cv_options == 2 .or. cv_options == 4 .or. cv_options == 5) &    
    call da_transform_vtovv( xb, be, cv, vv, xp,         &
                             ids,ide, jds,jde, kds,kde,  &
                             ims,ime, jms,jme, kms,kme,  &
@@ -49,7 +49,7 @@ subroutine da_transform_vtox( xb, xbx, be, cv, vv, vp, xp, xa,        &
 !-------------------------------------------------------------------------
 !  [2.0]: Perform vp = u_v vv transform:
 !-------------------------------------------------------------------------
- if( cv_options == 2 .or. cv_options == 4)then 
+ if( cv_options == 2 .or. cv_options == 4 .or. cv_options == 5)then 
    if ( vert_corr == 2 ) then      
       call da_vertical_transform( 'u', be, &
 #ifndef DEREF_KLUDGE
@@ -77,7 +77,7 @@ subroutine da_transform_vtox( xb, xbx, be, cv, vv, vp, xp, xa,        &
                             ims,ime, jms,jme, kms,kme,  &
                             its,ite, jts,jte, kts,kte )
 
- else if(cv_options==3) then
+ else if(cv_options == 3) then
    call da_apply_be( be, cv, vp, xb, xp, &
                      ids,ide, jds,jde, kds,kde,  &
                      ims,ime, jms,jme, kms,kme,  &
@@ -95,10 +95,10 @@ subroutine da_transform_vtox( xb, xbx, be, cv, vv, vp, xp, xa,        &
     CALL wrf_shutdown
     STOP 'Stopped, as cv_options not valid.'
  endif
- if(cv_options == 3 .or. cv_options == 4) then
+ if(cv_options == 3 .or. cv_options == 4 .or. cv_options == 5) then
    do j=xb%jts,xb%jte
    do i=xb%its,xb%ite
-     if(fg_format==1) then
+     if (fg_format == 1) then
       sdmd=0.0
       s1md=0.0
       do k=xb%kts,xb%kte

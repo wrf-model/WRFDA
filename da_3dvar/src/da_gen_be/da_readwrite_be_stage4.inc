@@ -1,10 +1,12 @@
-subroutine da_readwrite_be_stage4( outunit, nk, be_method, variable )
+subroutine da_readwrite_be_stage4( outunit, nk, be_method, uh_method, variable )
 
    implicit none
 
    integer, intent(in)      :: outunit                    ! Output unit number.
    integer, intent(in)      :: nk                         ! Number of vertical levels/modes.
    character*3, intent(in)  :: be_method                  ! Be method ('NMC', or 'ENS').
+   character*5, intent(in)  :: uh_method
+
    character*10, intent(in) :: variable                   ! Variable name.
 
    character*80             :: filename                   ! Input filename.
@@ -17,8 +19,11 @@ subroutine da_readwrite_be_stage4( outunit, nk, be_method, variable )
    logical                  :: use_global_eofs            ! True if projected data uses global EOFs.
    logical                  :: data_on_levels             ! True if field in on model levels.
    real, allocatable        :: total_power(:)             ! Total Power spectrum.
+   real, allocatable        :: scale_length(:)
 
    first_time = .true.
+
+if (uh_method .eq. 'spectrum') then
 
    do k = 1, nk
       write(ck,'(i2)')k
@@ -65,5 +70,28 @@ subroutine da_readwrite_be_stage4( outunit, nk, be_method, variable )
    end do
 
    deallocate( total_power )
+
+   elseif (uh_method == 'scale   ') then
+      if ( first_time ) allocate( scale_length(1:nk) )
+
+      filename = trim(variable)//'/'//'sl_print.'//trim(variable)
+      open (iunit, file = filename)
+      read(iunit,'(/)')
+
+      do k=1,nk
+      read(iunit,'(24x,e20.8)') scale_length(k)
+!      print*,'scale_length ',variable,k,scale_length(k)
+      enddo
+
+      write(outunit) variable
+      write(outunit) scale_length
+! yrg mods:
+      print '(5X,"ReadWrite scale length for ",a10," nk=",i3," from ",a40)', &
+               variable, nk, filename
+
+   deallocate (scale_length)
+
+   endif
+
 
 end subroutine da_readwrite_be_stage4

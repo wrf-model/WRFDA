@@ -13,7 +13,7 @@ CONTAINS
 
 !------------------------------------------------------------------------------
 
-SUBROUTINE med_initialdata_input_3dvar ( grid , config_flags, in_filename )
+SUBROUTINE med_initialdata_input_3dvar ( grid , config_flags, in_date, in_filename )
 
    IMPLICIT NONE
 
@@ -21,6 +21,8 @@ SUBROUTINE med_initialdata_input_3dvar ( grid , config_flags, in_filename )
 
    TYPE(domain)                               :: grid
    TYPE (grid_config_rec_type), INTENT(INOUT) :: config_flags
+
+   CHARACTER(*),  INTENT (in),  OPTIONAL      :: in_date
    CHARACTER(*),  INTENT (in),  OPTIONAL      :: in_filename
 
 !--Local
@@ -63,17 +65,26 @@ SUBROUTINE med_initialdata_input_3dvar ( grid , config_flags, in_filename )
      STOP "Stopped with NetCDF error."
    endif
 
-!  print *, 'ready to call get_next_time'
-   CALL ext_ncd_get_next_time( fid, current_date, Status )
-!  print *, 'current_date=', trim(current_date)
+   if (present(in_date)) then
+!-----Set start_date to current_date.
+      read(in_date(1:19), fmt='(i4, 5(a1, i2))') &
+           grid%start_year,  char, &
+           grid%start_month, char, &
+           grid%start_day,   char, &
+           grid%start_hour,  char, &
+           grid%start_second 
+           current_date(1:19) = in_date(1:19)
+   else
+      CALL ext_ncd_get_next_time( fid, current_date, Status )
   
-!--Set start_date to current_date.
-   read(current_date(1:19), fmt='(i4, 5(a1, i2))') &
-        grid%start_year,  char, &
-        grid%start_month, char, &
-        grid%start_day,   char, &
-        grid%start_hour,  char, &
-        grid%start_second
+!-----Set start_date to current_date.
+      read(current_date(1:19), fmt='(i4, 5(a1, i2))') &
+           grid%start_year,  char, &
+           grid%start_month, char, &
+           grid%start_day,   char, &
+           grid%start_hour,  char, &
+           grid%start_second
+   endif
 
    call geth_julgmt(julyr, julday, gmt)
    CALL nl_set_gmt (grid%id, gmt)
@@ -89,17 +100,7 @@ SUBROUTINE med_initialdata_input_3dvar ( grid , config_flags, in_filename )
    CALL nl_set_stand_lon ( grid%id , grid%stand_lon )
    CALL nl_set_map_proj ( grid%id , grid%map_proj )
 
-!  write(unit=*, fmt='(a, 2i8, f12.3)') &
-!       '1: julyr, julday, gmt=', julyr, julday, gmt
-!  write(unit=0, fmt='(a, 2i8, f12.3)') &
-!       '1: julyr, julday, gmt=', julyr, julday, gmt
-
    start_date=current_date
-
-!  write(unit=*, fmt='(2a)') &
-!       'current_date = ', trim(current_date)
-!  write(unit=0, fmt='(2a)') &
-!       'current_date = ', trim(current_date)
 
    call geth_julgmt(julyr, julday, gmt)
    config_flags%gmt = gmt
@@ -107,11 +108,6 @@ SUBROUTINE med_initialdata_input_3dvar ( grid , config_flags, in_filename )
    config_flags%julday = julday
 
    call ext_ncd_ioclose(fid, ierr)
-
-!  write(unit=*, fmt='(a, 2i8, f12.3)') &
-!       '2: julyr, julday, gmt=', julyr, julday, gmt
-!  write(unit=0, fmt='(a, 2i8, f12.3)') &
-!       '2: julyr, julday, gmt=', julyr, julday, gmt
 
    CALL wrf_debug ( 100 , 'da_3dvar/module_wrf_3dvar_io: calling open_r_dataset for wrf 3dvar input' )
    CALL open_r_dataset ( fid, TRIM(file_name), grid , config_flags , "DATASET=INPUT", ierr )
@@ -127,10 +123,6 @@ SUBROUTINE med_initialdata_input_3dvar ( grid , config_flags, in_filename )
    CALL       wrf_debug ( 100 , 'wrf_da_3dvar: back from input_model_input' )
 
    CALL close_dataset ( fid , config_flags , "DATASET=INPUT" )
-
-   write(unit=0, fmt='(2a,2x,a,i6,2(2x,a))') &
-        'end med_initialdata_input_3dvar file:', __FILE__, 'line:', __LINE__, &
-        'file_name =', trim(file_name)
 
 END SUBROUTINE med_initialdata_input_3dvar
 

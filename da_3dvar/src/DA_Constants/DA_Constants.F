@@ -144,7 +144,8 @@ MODULE DA_Constants
 
    INTEGER, PARAMETER :: be_cv_2_unit = 32    ! Unit number for be input.
    INTEGER, PARAMETER :: be_cv_3_unit = 33    ! Unit number for be input.
-   INTEGER, PARAMETER :: be_cv_4_unit = 34    ! Unit number for be input.
+   INTEGER, PARAMETER :: be_cv_4_unit = 34    ! Unit number for be input. 
+   INTEGER, PARAMETER :: be_cv_5_unit = 35    ! Unit number for be input.
 
    INTEGER, PARAMETER :: terrain_unit = 40    ! Unit number for terrain input.
    INTEGER, PARAMETER :: jpin = 41            ! Unit number for xb input.

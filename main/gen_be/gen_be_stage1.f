@@ -1,22 +1,34 @@
 program gen_be_stage1
-
+!
+!---------------------------------------------------------------------- 
+! Purpose : to remove the binned mean from the difference fields.
+!
+! Input   : binary files: wrf.diff_ccyy-mm-dd_hh:00:00.ce for ENS or
+!                         ...............................
+!                         wrf.diff_ccyy-mm-dd_hh:00:00    for NMC.
+!                         ...............................
+!
+! Output : binary files for use of the gen_be_stage2:
+!
+!----------------------------------------------------------------------
+!
    use da_constants
    use da_gen_be
 
    implicit none
 
-   character*10        :: start_date, end_date       ! Starting and ending dates.
+   character*10        :: start_date, end_date       ! Starting and ending dates (ccyymmddhh).
    character*10        :: date, new_date             ! Current date (ccyymmddhh).
    character*10        :: variable                   ! Variable name.
    character*3         :: be_method                  ! Be method (NMC, or ENS)
-   character*3         :: ce                         ! Ensemble member.
+   character*3         :: ce                         ! Ensemble member index.
    character*80        :: dat_dir                    ! Input data directory.
    character*80        :: expt                       ! Experiment ID.
    character*80        :: filename                   ! Input filename.
    integer             :: ni, nj, nk                 ! Dimensions read in.
    integer             :: member, b, i, j, k         ! Loop counters.
    integer             :: sdate, cdate, edate        ! Starting, current ending dates.
-   integer             :: interval                   ! Period between dates (hours).
+   integer             :: interval                   ! Interval between file times (hours).
    integer             :: ne                         ! Number of ensemble members.
    integer             :: bin_type                   ! Type of bin to average over.
    integer             :: num_bins                   ! Number of bins (3D fields).
@@ -93,9 +105,18 @@ program gen_be_stage1
 
          write(6,'(a,a)')'    Processing data for date ', date
 
-         filename = 'kma.diff.'//date(1:4)//'-'//date(5:6)//'-'//date(7:8)//'_'//date(9:10)//':00:00'
+!         filename = 'kma.diff_'//date(1:4)//'-'//date(5:6)//'-'//date(7:8)//'_'//date(9:10)//':00:00'
+         filename = 'wrf.diff_'//date(1:4)//'-'//date(5:6)//'-'//date(7:8)//'_'//date(9:10)//':00:00'
+         if (be_method.eq.'ENS') then
+           if (member.lt.10) write(ce,'(I1)') member
+           if (member.ge.10.and.member.lt.100) write(ce,'(I2)') member
+           filename = trim(filename)//'.'//trim(ce)
+           print*,filename
+         endif
+
          open (iunit, file = trim(dat_dir)//'/'//filename, form='unformatted')
-         read(iunit)date, ni, nj, nk, dphi
+!         read(iunit)date, ni, nj, nk, dphi
+         read(iunit)date, ni, nj, nk
 
          if ( first_time ) then
             write(6,'(a,3i8)')'    i, j, k dimensions are ', ni, nj, nk
@@ -115,7 +136,6 @@ program gen_be_stage1
          read(iunit)t_prime
          read(iunit)rh_prime
          read(iunit)ps_prime
-
          read(iunit)height
 
          read(iunit)latitude
@@ -210,9 +230,19 @@ program gen_be_stage1
 
          write(6,'(a,a)')'    Removing mean for date ', date
 
-         filename = 'kma.diff.'//date(1:4)//'-'//date(5:6)//'-'//date(7:8)//'_'//date(9:10)//':00:00'
+!         filename = 'kma.diff_'//date(1:4)//'-'//date(5:6)//'-'//date(7:8)//'_'//date(9:10)//':00:00'
+         filename = 'wrf.diff_'//date(1:4)//'-'//date(5:6)//'-'//date(7:8)//'_'//date(9:10)//':00:00'
+
+         if (be_method.eq.'ENS') then
+         if (member.lt.10) write(ce,'(I1)') member
+         if (member.ge.10.and.member.lt.100) write(ce,'(I2)') member
+         filename = trim(filename)//'.'//trim(ce)
+         print*,filename
+         endif
+
          open (iunit, file = trim(dat_dir)//'/'//filename, form='unformatted')
-         read(iunit)date, ni, nj, nk, dphi
+!         read(iunit)date, ni, nj, nk, dphi
+         read(iunit)date, ni, nj, nk
 
          read(iunit)psi_prime
          read(iunit)chi_prime
@@ -311,7 +341,7 @@ program gen_be_stage1
          open (ounit, file = filename, form='unformatted')
          write(ounit)ni, nj, 1
         write(ounit).true., .false.
-        write(ounit)ps_prime
+         write(ounit)ps_prime
          close(ounit)
 
       end do  ! End loop over ensemble members.

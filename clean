@@ -9,6 +9,7 @@ foreach dir ( frame chem share dyn_em dyn_exp dyn_nmm phys main tools )
                       wrfdata whatiread rsl.* show_domain* )
 end
 
+( cd main/gen_be; /bin/rm -f *.exe *.o *.stb )
 ( cd da_3dvar ; /bin/rm -f *.f *.o *.mod mpif.h *.stb )
 ( cd da_3dvar/src ; /bin/rm -f *.f *.o *.mod *.stb )
 ( cd da_3dvar/utl ; /bin/rm -f *.f *.o *.mod *.exe *.stb )

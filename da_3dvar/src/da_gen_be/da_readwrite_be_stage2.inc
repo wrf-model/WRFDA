@@ -25,7 +25,9 @@ subroutine da_readwrite_be_stage2( outunit, be_method, nk )
    read(iunit)ni, nj, nk
    read(iunit)bin_type, num_bins_hgt, binwidth_hgt, binwidth_lat !!!DALE ADD
    read(iunit)num_bins, num_bins2d
-
+! yrg mods:
+   print '(5X,"Read stage2: num_bins=",i6," num_bins2d=",i5)', &
+                            num_bins,       num_bins2d
    allocate( regcoeff1(1:num_bins) )
    allocate( regcoeff2(1:nk,1:num_bins2d) )
    allocate( regcoeff3(1:nk,1:nk,1:num_bins2d) )
@@ -37,6 +39,9 @@ subroutine da_readwrite_be_stage2( outunit, be_method, nk )
 
    write(outunit)ni, nj, nk
    write(outunit)bin_type, num_bins_hgt, binwidth_hgt, binwidth_lat !!!DALE ADD
+! yrg mods:
+   print '(5X,"bin_type, num_bins_ght, binwidth_hgt, binwidth_lat:",2I4,2f10.2)',  &
+            bin_type, num_bins_hgt, binwidth_hgt, binwidth_lat
    write(outunit)num_bins, num_bins2d
    write(outunit)regcoeff1
    write(outunit)regcoeff2

@@ -35,9 +35,6 @@ MODULE DA_VToX_Transforms
    USE da_fftpack5
 
    IMPLICIT NONE
-#ifdef DM_PARALLEL
-   INCLUDE 'mpif.h'
-#endif
 
    CONTAINS
 

@@ -141,10 +141,9 @@ program gen_be_stage3
          open (iunit, file = filename, form='unformatted')
          read(iunit)ni, nj, nk
          read(iunit)field
-!   rizvi
-         call remove_horizontal_mean(field, ni, nj, nk)
-!   rizvi
          close(iunit)
+
+         call remove_horizontal_mean(field, ni, nj, nk)
 
          do j = 1, nj
             do i = 1, ni
@@ -318,6 +317,7 @@ program gen_be_stage3
    end do
 
 end program gen_be_stage3
+
   subroutine remove_horizontal_mean(field,n1,n2,n3)
   implicit none
   integer, intent(in)   :: n1, n2, n3

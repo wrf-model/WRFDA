@@ -122,8 +122,7 @@ subroutine DA_Transform_VpToX_Adj( xb, xbx, xa, vp, be, xp, &
                                ids,ide, jds,jde, kds,kde,    &
                                ims,ime, jms,jme, kms,kme,    &
                                its,ite, jts,jte, kts,kte )
- end if
- if( cv_options == 4) then    ! psi, chi_u, t_u, pseudo_rh , psfc_u
+ else if( cv_options == 4) then    ! psi, chi_u, t_u, pseudo_rh , psfc_u
   vp%v4(its:ite,jts:jte,kts:kte)  = vp%v4(its:ite,jts:jte,kts:kte) + &
                                     xa%q (its:ite,jts:jte,kts:kte) * &
                                     xb%qs(its:ite,jts:jte,kts:kte)
@@ -168,6 +167,63 @@ subroutine DA_Transform_VpToX_Adj( xb, xbx, xa, vp, be, xp, &
 
    vp%v3(its:ite,jts:jte,kts:kte) = xa%t(its:ite,jts:jte,kts:kte)
 
+elseif( cv_options == 5) then    ! psi, chi_u, t_u, pseudo_rh , psfc_u
+
+!  [3.4]  adj of Transform psi and chi to u and v:
+
+   CALL wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id3)
+
+   vp%v1(:,:,:)=0.
+   vp%v2(:,:,:)=0.
+
+   CALL DA_PsiChi_To_UV_Adj( xa % u, xa % v, xb % map_factor, &
+                             xb % ds, vp % v1, vp % v2, &
+                             ids,ide, jds,jde, kds,kde, &
+                             ims,ime, jms,jme, kms,kme, &
+                             its,ite, jts,jte, kts,kte )
+
+!  [3.3]  adj Calculate Psfc_b from psi
+
+    DO k = kts,kte
+    DO j = jts,jte
+    DO i= its,ite
+       vp % v1(i,j,k)= vp % v1(i,j,k)+ &
+                        be % reg_ps(j,k) * xa % psfc(i,j)
+    END DO
+    END DO
+    END DO
+
+   vp % v5(its:ite,jts:jte,1)=xa % psfc(its:ite,jts:jte)
+
+!  [3.2] adj Calculate chi_b from psi
+
+    DO k = kts,kte
+     DO j = jts,jte
+      DO i= its,ite
+         vp % v1(i,j,k)= vp % v1(i,j,k)+ &
+                         be % reg_chi(j,k) * vp % v2(i,j,k)
+      END DO
+     END DO
+    END DO
+
+!  [3.1] Calculate t_b from psi
+
+   DO kk = kts,kte
+    DO k = kts,kte
+     DO j = jts,jte
+      DO i= its,ite
+         vp % v1(i,j,kk)= vp % v1(i,j,kk)+ &
+                          be % reg_t(j,k,kk) * xa % t(i,j,k)
+      END DO
+     END DO
+    END DO
+   END DO
+
+   vp % v3(its:ite,jts:jte,kts:kte)= xa % t(its:ite,jts:jte,kts:kte)
+
+!  [3.5] treat humidity
+      vp % v4(its:ite,jts:jte,kts:kte) = xa % q(its:ite,jts:jte,kts:kte) &
+                                       * xb % qs(its:ite,jts:jte,kts:kte)
  end if
 
 END subroutine DA_Transform_VpToX_Adj

@@ -859,7 +859,7 @@ MODULE DA_Define_Structures
       REAL, POINTER     :: evec(:,:,:)       ! LOcal Vertical eigenvectors.
       REAL, POINTER     :: val_g(:)          ! Global Standard dev./sqrt(eigenvalue).
       REAL, POINTER     :: evec_g(:,:)       ! Global Vertical eigenvectors.
-      real, pointer     :: power(:,:)        ! Power spectrum
+      REAL, POINTER     :: power(:,:)        ! Power spectrum
    END TYPE be_subtype
 
    TYPE be_type
@@ -892,11 +892,10 @@ MODULE DA_Define_Structures
       REAL, POINTER    :: vz(:,:,:,:)
       REAL, POINTER    :: corz(:,:,:,:)
       REAL, POINTER    :: corp(:,:)
-!-----For cv option 4:
+!-----For cv option 4 and 5:
       REAL, POINTER     :: reg_chi(:,:)
       REAL, POINTER     :: reg_t  (:,:,:)
       REAL, POINTER     :: reg_ps (:,:)
-
    END TYPE be_type
 
 !  Analysis_Stats maximum-minumum structure.

@@ -25,10 +25,6 @@ MODULE DA_Setup_Structures
 
    IMPLICIT NONE
 
-#ifdef DM_PARALLEL
-!  INCLUDE 'mpif.h'
-#endif
-
 #if ( DWORDSIZE != RWORDSIZE )
 #define TRUE_MPI_REAL     MPI_REAL
 #else
@@ -47,6 +43,7 @@ MODULE DA_Setup_Structures
 #include <da_setup_background_errors2.inc>
 #include <da_setup_background_errors3.inc>
 #include <da_setup_background_errors4.inc>
+#include <da_setup_background_errors5.inc>
 #include <da_chgvres.inc>
 #include <da_setup_firstguess.inc>
 #include <da_setup_firstguess_mm5.inc>

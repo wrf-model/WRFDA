@@ -138,12 +138,12 @@ subroutine da_transform_vtox_adj( xb, xbx, be, xa, xp, vp, vv, cv, &
       endif
    endif
 !-------------------------------------------------------------------------
- if(cv_options==3 .or. cv_options == 4  ) then
+ if(cv_options == 3 .or. cv_options == 4 .or. cv_options == 5) then
  
   call DA_PT_To_Rho_Adj( xb, xa )
    do j=xb%jts,xb%jte
    do i=xb%its,xb%ite
-     if(fg_format == 1) then
+     if (fg_format == 1) then
       mu=0.0
       s1md=0.0
 
@@ -191,7 +191,7 @@ subroutine da_transform_vtox_adj( xb, xbx, be, xa, xp, vp, vv, cv, &
  endif
 
 !-------------------------------------------------------------------------
- if(cv_options == 2 .or. cv_options == 4)then
+ if(cv_options == 2 .or. cv_options == 4 .or. cv_options == 5)then
 
 !-------------------------------------------------------------------------
 !  [3.0]: Perform x = u_p vp transform::
@@ -261,7 +261,7 @@ subroutine da_transform_vtox_adj( xb, xbx, be, xa, xp, vp, vv, cv, &
     STOP 'Stopped, as cv_options not valid.'
  endif
 
- if(cv_options == 2 ) &
+ if(cv_options == 2 .or. cp_options == 5) &
    call da_transform_vtovv_adj( xb, be, vv, cv, xp, &
                                 ids,ide, jds,jde, kds,kde,  &
                                 ims,ime, jms,jme, kms,kme,  &

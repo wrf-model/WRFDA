@@ -124,8 +124,7 @@ subroutine DA_Transform_VpToX( xb, xbx, vp, xp, xa, be,    &
       xa%psfc(its:ite,jts:jte)=xa%p(its:ite,jts:jte,kts)
    endif
 
- end if        
- if( cv_options == 4) then    ! psi, chi_u, t_u, pseudo_rh , psfc_u
+ else if( cv_options == 4) then    ! psi, chi_u, t_u, pseudo_rh , psfc_u
 
 ! Get Full fields:        
 ! Temperature
@@ -180,6 +179,68 @@ subroutine DA_Transform_VpToX( xb, xbx, vp, xp, xa, be,    &
 !  Check the units for Pseudo humidity 
   xa % q(its:ite,jts:jte,kts:kte)  = vp%v4(its:ite,jts:jte,kts:kte) * &
                                      xb%qs(its:ite,jts:jte,kts:kte) 
+elseif (cv_options == 5) then    ! psi, chi_u, t_u, pseudo_rh , psfc_u      
+
+!  [3.1] Calculate t_b from psi
+
+   xa % t(its:ite,jts:jte,kts:kte)=vp % v3(its:ite,jts:jte,kts:kte)
+
+   DO kk = kts,kte
+   DO k = kts,kte
+   DO j = jts,jte
+   DO i= its,ite
+         xa % t(i,j,k) = xa % t(i,j,k) + &
+                         be % reg_t(j,k,kk) * vp % v1(i,j,kk)
+   END DO
+   END DO
+   END DO
+   END DO
+
+!  [3.2] Calculate chi_b from psi
+
+      DO k = kts,kte
+      DO j = jts,jte
+      DO i= its,ite
+         vp % v2(i,j,k) = vp % v2(i,j,k) + &
+                          be % reg_chi(j,k) * vp % v1(i,j,k)
+      END DO
+      END DO
+      END DO
+
+! Surface Pressure
+   xa%psfc(its:ite,jts:jte) = vp%v5(its:ite,jts:jte,kts)
+
+!--convert from delt.ln(ps) to delt.ps
+!   xa%psfc(its:ite,jts:jte) = xa%psfc(its:ite,jts:jte) &
+!                            * xb%psfc(its:ite,jts:jte)
+   do k=kts,kte
+   do j=jts,jte
+   DO i= its,ite
+   xa%psfc(i,j) = xa%psfc(i,j) + &
+                              be%reg_ps(j,k)*vp%v1(i,j,k)
+   enddo
+   enddo
+   enddo
+
+!--convert from delt.ln(ps) to delt.ps
+!   xa%psfc(its:ite,jts:jte) = xa%psfc(its:ite,jts:jte) &
+!                            * xb%psfc(its:ite,jts:jte)
+
+!  [3.4] Transform psi and chi to u and v:
+
+!  Communicate halo region.
+   CALL wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id1)
+
+   CALL DA_PsiChi_To_UV( vp % v1, vp % v2, xb % map_factor, &
+                         xb % ds, xa % u, xa % v, &
+                         ids,ide, jds,jde, kds,kde, &
+                         ims,ime, jms,jme, kms,kme, &
+                         its,ite, jts,jte, kts,kte )
+
+!  [3.5] treat humidity
+
+      xa % q(its:ite,jts:jte,kts:kte) = vp % v4(its:ite,jts:jte,kts:kte) * &
+                                        xb % qs(its:ite,jts:jte,kts:kte)
  end if
 
 END subroutine DA_Transform_VpToX

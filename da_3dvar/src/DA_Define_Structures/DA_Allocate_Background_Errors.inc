@@ -100,6 +100,11 @@ SUBROUTINE DA_Allocate_Background_Errors ( jy, kz, l, e, be_eval_loc, &
                                  'Eigenvectors for j=jy' )
          END IF
 
+         allocate (be_sub%val_g(1:mz))
+         allocate (be_sub%evec_g(1:kz,1:mz))
+  
+         be_sub % val_g(1:mz) = l(1:mz)
+         be_sub % evec_g(1:kz,1:mz) = e(1:kz,1:mz)
       ELSE IF ( vert_corr == 1 ) THEN
 
          print *, 'Change be std dev to variance in NMC code'
