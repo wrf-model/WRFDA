@@ -57,6 +57,7 @@ SUBROUTINE proc_sum_count_obs ( count_obs )
    call pack_count_obs( count_obs % num_ssmt2, offset, procval )
    call pack_count_obs( count_obs % num_qscat, offset, procval )
    call pack_count_obs( count_obs % num_profiler, offset, procval )
+   call pack_count_obs( count_obs % num_bogus, offset, procval )
    call pack_count_obs( count_obs % num_buoy, offset, procval )
 
    call MPI_REDUCE(procval, sumval, numvals, MPI_INTEGER, MPI_SUM, root, MPI_COMM_WORLD, IERR )
@@ -79,6 +80,7 @@ SUBROUTINE proc_sum_count_obs ( count_obs )
      call unpack_count_obs( count_obs % num_ssmt2, offset, sumval )
      call unpack_count_obs( count_obs % num_qscat, offset, sumval )
      call unpack_count_obs( count_obs % num_profiler, offset, sumval )
+     call unpack_count_obs( count_obs % num_bogus, offset, sumval )
      call unpack_count_obs( count_obs % num_buoy, offset, sumval )
    END IF
    RETURN

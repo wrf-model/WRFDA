@@ -4,7 +4,7 @@ SUBROUTINE DA_Print_Stats_Metar( stats_unit, nu, nv, nt, np, nq, metar )
 
    INTEGER,           INTENT(IN)    :: stats_unit
    INTEGER,           INTENT(INOUT) :: nu, nv, nt, np, nq
-   TYPE (stats_type), INTENT(IN)    :: metar
+   TYPE (stats_metar_type), INTENT(IN)    :: metar
 
    write(unit=stats_unit, fmt='(6a/)') &
         '   var             ', &

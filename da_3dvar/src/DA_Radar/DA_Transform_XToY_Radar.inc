@@ -56,7 +56,6 @@ SUBROUTINE da_transform_xtoy_Radar ( xa, xb, iv, xp, y )
 
          do k = 1, num_levs
             model_qrnb(k) = iv%Radar(n)%model_qrn(k)
-            model_rhob(k) = iv%Radar(n)%model_rho(k)
 
             model_p(k) = iv%Radar(n)%model_p(k)
          end do
@@ -70,10 +69,6 @@ SUBROUTINE da_transform_xtoy_Radar ( xa, xb, iv, xp, y )
                             num_levs)
          call Interp_lin_3D(xa % v, xp, i, j, dx, dy, dxm, dym, &
                             model_v, num_levs, iv%Radar(n)%zk, &
-                            num_levs)
-         call Interp_lin_3D(xa % rho, xp, &
-                            i, j, dx, dy, dxm, dym, &
-                            model_rho, num_levs, iv%Radar(n)%zk, &
                             num_levs)
          call Interp_lin_3D(xa % qrn, xp, &
                             i, j, dx, dy, dxm, dym, &
@@ -91,10 +86,6 @@ SUBROUTINE da_transform_xtoy_Radar ( xa, xb, iv, xp, y )
          call Interp_lin_3D(xa % v(xp%ims,xp%jms,xp%kms), xp, &
                             i, j, dx, dy, dxm, dym, &
                             model_v(1), num_levs, iv%Radar(n)%zk(1), &
-                            num_levs)
-         call Interp_lin_3D(xa % rho(xp%ims,xp%jms,xp%kms), xp, &
-                            i, j, dx, dy, dxm, dym, &
-                            model_rho(1), num_levs, iv%Radar(n)%zk(1), &
                             num_levs)
          call Interp_lin_3D(xa % qrn(xp%ims,xp%jms,xp%kms), xp, &
                             i, j, dx, dy, dxm, dym, &
@@ -138,7 +129,6 @@ SUBROUTINE da_transform_xtoy_Radar ( xa, xb, iv, xp, y )
 
                call da_reflectivity_Lin( y%Radar(n)%rf(k), &
                     model_rho(k), model_qrn(k), model_rhob(k), model_qrnb(k) )
-
              ENDIF
             ENDIF
 

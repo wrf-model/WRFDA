@@ -12,9 +12,10 @@ SUBROUTINE da_reflectivity_Adj( rf, rho, qrn, rho9, qrn9 )
    REAL   :: temp
 
 
-   temp = leh2 / ( rho9*qrn9*alog(10.) )
+!X   temp = leh2 / ( rho9*qrn9*alog(10.) )
 
-   rho = rho + temp * qrn9 * rf
-   qrn = qrn + temp * rho9 * rf
+!X   rho = rho + temp * qrn9 * rf
+!X   qrn = qrn + temp * rho9 * rf
+   qrn = qrn + leh2/(qrn9*alog(10.)) * rf
 
 END SUBROUTINE da_reflectivity_Adj

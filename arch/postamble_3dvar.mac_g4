@@ -9,7 +9,7 @@ INCLUDE_MODULES =       -I../da_3dvar -I../da_3dvar/src \
                         -I../frame -I../share -I../phys -I../inc
 
 REGISTRY        =       Registry
-CPPFLAGS        =       -I$(LIBINCLUDE) -C -P $(ARCHFLAGS) \
+CPPFLAGS        =       -I$(LIBINCLUDE) -C -P $(ARCHFLAGS) $(ENVCOMPDEFS) \
 			$(TRADFLAG) $(DM_1_CPP_FLAGS) $(OMPCPP) $(COREDEFS) $(POUND_DEF)
 
 INC_MOD_3DVAR   =       -I../../$(NETCDF_IO_PATH) \
@@ -30,9 +30,7 @@ wrfio_nf :
         make NETCDFPATH=$(NETCDFPATH) CPP="$(CPP) $(TRADFLAG)" \
 	RANLIB="$(RANLIB)" \
 	FC="$(FC)" FCFLAGS="$(FCDEBUG) $(FCFORM) $(FCBASE) -w" TRADFLAG="$(TRADFLAG)" ; \
-	/bin/cp wrf_io_flags.h wrf_status_codes.h ../../inc ; \
-	/bin/cp wrf_io_flags.h wrf_status_codes.h ../io_phdf5 ; \
-	/bin/cp wrf_io_flags.h ../io_quilt )
+	/bin/cp wrf_io_flags.h wrf_status_codes.h ../../inc )
 
 wrfio_int : 
 	( cd ../external/io_int ; \

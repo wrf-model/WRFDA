@@ -4,7 +4,7 @@ SUBROUTINE DA_Print_Stats_Satob( stats_unit, nu, nv, satob )
 
    INTEGER,           intent(in)    :: stats_unit
    INTEGER,           intent(inout) :: nu, nv
-   TYPE (stats_type), intent(in)    :: satob
+   TYPE (stats_satob_type), intent(in)    :: satob
 
    write(unit=stats_unit, fmt='(a/)') &
         '   var             u (m/s)     n    k    v (m/s)     n    k'
