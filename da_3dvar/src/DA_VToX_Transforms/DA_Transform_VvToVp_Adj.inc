@@ -57,7 +57,7 @@ SUBROUTINE DA_Transform_VvToVp_Adj( evec, eval, vertical_wgt, &
       END DO
    END DO
 
-   if( print_detail >= 100) then
+   if( print_detail >= 200) then
       write(unit=0, fmt='(2a,2x,a,i6)') 'file:', __FILE__, 'line:', __LINE__
       write(unit=0, fmt='(2(2x,a,i6))') 'its:', its, 'ite:', ite
       write(unit=0, fmt='(2(2x,a,i6))') 'jts:', jts, 'jte:', jte
@@ -88,14 +88,14 @@ SUBROUTINE DA_Transform_VvToVp_Adj( evec, eval, vertical_wgt, &
       write(unit=0, fmt='(a,e24.14)') 'sqare sum of evec=', SUM(evec(jds:jde,kts:kte,1:mz)*evec(jds:jde,kts:kte,1:mz))
       write(unit=0, fmt='(a,e24.14)') 'sqare sum of eval=', SUM(eval(jds:jde,1:mz)*eval(jds:jde,1:mz))
 
-      write(unit=*, fmt='(/a)') 'eval'
-      call DA_Array_Print(2, eval(jds:jde,1:mz), "eval")
+!     write(unit=*, fmt='(/a)') 'eval'
+!     call DA_Array_Print(2, eval(jds:jde,1:mz), "eval")
 
-      write(unit=*, fmt='(/a,i6)') 'evec at jts=', jts
-      call DA_Array_Print(2, evec(jts,kds:kde,1:mz), "evec at jts")
+!     write(unit=*, fmt='(/a,i6)') 'evec at jts=', jts
+!     call DA_Array_Print(2, evec(jts,kds:kde,1:mz), "evec at jts")
 
-      write(unit=*, fmt='(/a,i6)') 'evec at jte=', jte
-      call DA_Array_Print(2, evec(jte,kds:kde,1:mz), "evec at jte")
+!     write(unit=*, fmt='(/a,i6)') 'evec at jte=', jte
+!     call DA_Array_Print(2, evec(jte,kds:kde,1:mz), "evec at jte")
    endif
 
 END SUBROUTINE DA_Transform_VvToVp_Adj

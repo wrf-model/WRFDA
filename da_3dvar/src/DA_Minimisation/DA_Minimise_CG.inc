@@ -25,7 +25,7 @@
       type (xbx_type),intent(in)        :: xbx   ! Header & non-gridded vars.
       type (be_type), intent(in)        :: be    ! background error structure.
       type (ob_type), intent(in)        :: iv    ! ob. increment vector.
-      real,intent(inout),dimension(cv_size)::xhat! Increament control variable
+      real,intent(out),dimension(cv_size)::xhat  ! Increament control variable
       type (cv_type), intent(inout)     :: cv    ! control variable (local).
       type (x_type), intent(out)        :: xa    ! analysis increments (local).
       type (vp_type), intent(inout)     :: vv    ! Grdipt/EOF CV.
@@ -65,10 +65,10 @@
       write (6,'(A)') &
         ' ----------------------------------------------------------'
       write(6,*)
-!
-      xhat = 0 
+
+      xhat   = 0.0
       j_grad = 0.0
-!
+
       call da_allocate_y(iv, jo_grad_y)
       call da_calculate_j(it, 0, xb, xbx, be, iv, xhat, cv % array, &
                            vv, vp, xp, re, y, xa, j, j_grad,     &
@@ -78,7 +78,12 @@
       ghat  = j_grad
       phat  = - ghat
    
-      rrmold = da_dot(ghat, ghat, cv_size)
+      if(global) then
+         rrmold = dot_product(ghat, ghat)
+      else
+         rrmold = da_dot(ghat, ghat, cv_size)
+      endif
+
       if( j%total == 0.0) go to 1004
       if(it == 1) cv % j_grad_norm_target =  sqrt (rrmold)
 
@@ -127,7 +132,11 @@
                                ims, ime, jms, jme, kms, kme,         &
                                its, ite, jts, jte, kts, kte )
          fhat = - fhat + phat
-         apdotp = da_dot(fhat, phat, cv_size)
+         if(global) then
+           apdotp = dot_product(fhat, phat)
+         else
+           apdotp = da_dot(fhat, phat, cv_size)
+         endif
          step = 0.0
          if(apdotp .gt. 0.0   ) step = rrmold/apdotp
          ghat = ghat + step * fhat
@@ -139,10 +148,19 @@
                             ids, ide, jds, jde, kds, kde,        &
                             ims, ime, jms, jme, kms, kme,        &
                             its, ite, jts, jte, kts, kte         )
-          ob_grad = sqrt(da_dot(j_grad,j_grad,cv_size))  
+           if(global) then
+              ob_grad = sqrt(dot_product(j_grad,j_grad))  
+           else
+              ob_grad = sqrt(da_dot(j_grad,j_grad,cv_size))  
+           endif
          end if
 
-         rrmnew = da_dot (ghat, ghat, cv_size)
+         if(global) then
+            rrmnew = dot_product (ghat, ghat)
+         else
+            rrmnew = da_dot (ghat, ghat, cv_size)
+         endif
+
          rrmnew_norm = sqrt(rrmnew)
 
          if (rrmnew_norm  < eps(it)*cv % j_grad_norm_target) go to 1002
@@ -184,7 +202,11 @@
                               ids, ide, jds, jde, kds, kde,        &
                               ims, ime, jms, jme, kms, kme,        &
                               its, ite, jts, jte, kts, kte         )
-         rrmnew_norm = sqrt( da_dot(j_grad,j_grad,cv_size) )
+         if(global) then
+            rrmnew_norm = sqrt( dot_product(j_grad,j_grad) )
+         else
+            rrmnew_norm = sqrt( da_dot(j_grad,j_grad,cv_size) )
+         endif
        endif
         
        write(6,15)j%total , rrmnew_norm
@@ -195,11 +217,7 @@
 !
       cv % array = cv % array + xhat
 
-      print*,' Norm of cv (sqrt(cv.cv)) = ', &
-               sqrt(da_dot(cv%array,cv%array,cv_size))
-      print*,' Norm of xhat (sqrt(xhat.xhat)) = ', &
-               sqrt(da_dot(xhat, xhat,cv_size))
-
       call da_deallocate_y( jo_grad_y)
-!
+
       end subroutine DA_Minimise_CG
+

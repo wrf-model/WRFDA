@@ -1,4 +1,4 @@
-subroutine da_leg_tra_inv( jds, jde, jts, jte, max_wavenumber, alp_size, m, alp, v, r_leg )
+subroutine da_legtra_inv( jds, jde, jts, jte, max_wavenumber, alp_size, m, alp, v, r_leg )
 
    implicit none
 
@@ -54,5 +54,5 @@ subroutine da_leg_tra_inv( jds, jde, jts, jte, max_wavenumber, alp_size, m, alp,
       r_leg(j) = sum_legtra
    end do
 
-end subroutine da_leg_tra_inv
+end subroutine da_legtra_inv
 

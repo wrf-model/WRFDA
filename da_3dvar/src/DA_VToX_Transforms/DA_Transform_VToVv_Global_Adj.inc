@@ -19,10 +19,9 @@ subroutine DA_Transform_VToVv_Global_Adj (xb, xbx, be, cv,vv, &
    integer, intent(in)              :: ims,ime, jms,jme, kms,kme ! memory dims.
    integer, intent(in)              :: its,ite, jts,jte, kts,kte ! tile   dims
 
-   integer :: i, j, k, cv_s, cv_e, r_cvsize 
+   integer :: k, cv_s, cv_e
 
 !-------------------------------------------------------------------------
-!  write(unit=*, fmt='(2a,2x,a,i6)') 'file:', __FILE__, 'line:', __LINE__
 
    cv_s = 1        
    do k = 1, be%v1%mz
@@ -31,6 +30,12 @@ subroutine DA_Transform_VToVv_Global_Adj (xb, xbx, be, cv,vv, &
                                    ids, ide, jds, jde, &
                                    ims, ime, jms, jme, &
                                    its, ite, jts, jte )
+
+      if( print_detail >= 100 )  then
+         write(unit=0, fmt='(2a,2(2x,a,i6))') 'file:', __FILE__, 'line:', __LINE__, 'vv%v1, k=', k
+         write(unit=0, fmt='(a, e24.14)') 'Square sum of cv:', sum(cv(cv_s:cv_e) * cv(cv_s:cv_e))
+      endif
+
       cv_s = cv_e + 1
    end do
 
@@ -40,6 +45,12 @@ subroutine DA_Transform_VToVv_Global_Adj (xb, xbx, be, cv,vv, &
                                    ids, ide, jds, jde, &
                                    ims, ime, jms, jme, &
                                    its, ite, jts, jte )
+
+      if( print_detail >= 100 )  then
+         write(unit=0, fmt='(2a,2(2x,a,i6))') 'file:', __FILE__, 'line:', __LINE__, 'vv%v2, k=', k
+         write(unit=0, fmt='(a, e24.14)') 'Square sum of cv:', sum(cv(cv_s:cv_e) * cv(cv_s:cv_e))
+      endif
+
       cv_s = cv_e + 1
    end do
 
@@ -69,6 +80,11 @@ subroutine DA_Transform_VToVv_Global_Adj (xb, xbx, be, cv,vv, &
                                    its, ite, jts, jte )
       cv_s = cv_e + 1
    end do
+
+   if( print_detail >= 100) then
+      write(unit=0, fmt='(2a,2(2x,a,i6))') 'file:', __FILE__, 'line:', __LINE__, 'vv%v1, k=', k
+      write(unit=0, fmt='(a, e24.14)') ' in VToVv_Global_Adj  whole: cv.cv = ',sum(cv(1:cv_e) * cv(1:cv_e))
+   endif
 
 end subroutine DA_Transform_VToVv_Global_Adj
 

@@ -91,12 +91,12 @@ subroutine da_test_spectral(xbx, field, &
    cv(mm) = cmplx (rcv_out(2*mm-1), rcv_out(2*mm))                    
    end do
    r_leg = 0.0
-   call da_leg_tra_inv( jds, jde, jts, jte, xbx%max_wavenumber, xbx%alp_size, m, xbx%alp, &
-                        cv(index_start:index_end), r_leg )
+   call da_legtra_inv( jds, jde, jts, jte, xbx%max_wavenumber, xbx%alp_size, m, xbx%alp, &
+                       cv(index_start:index_end), r_leg )
 
    cv1(index_start:index_end) = 0.
-   call da_leg_tra ( xbx%nj, xbx%max_wavenumber, xbx%alp_size, m, xbx%int_wgts, xbx%alp, r_leg, &
-                   cv1(index_start:index_end) )
+   call da_legtra ( xbx%nj, xbx%max_wavenumber, xbx%alp_size, m, xbx%int_wgts, xbx%alp, r_leg, &
+                    cv1(index_start:index_end) )
    cv1(index_start:index_end) = cv1(index_start:index_end) - &
                                  cv(index_start:index_end) 
     num =  sum ( real(cv1(index_start:index_end))*real(cv1(index_start:index_end))+&
@@ -112,8 +112,8 @@ subroutine da_test_spectral(xbx, field, &
 10  format(a,i5,a,e30.20)
 
    cv1(index_start:index_end) = 0.
-   call da_leg_tra_inv_adj( jds, jde, jts, jte, xbx%max_wavenumber, xbx%alp_size, m, xbx%alp, &
-                            cv1(index_start:index_end), r_leg )
+   call da_legtra_inv_adj( jds, jde, jts, jte, xbx%max_wavenumber, xbx%alp_size, m, xbx%alp, &
+                           cv1(index_start:index_end), r_leg )
    xx = sum( real(cv(index_start:index_end))*     &
              real(cv1(index_start:index_end))     +&
             aimag(cv(index_start:index_end))* &

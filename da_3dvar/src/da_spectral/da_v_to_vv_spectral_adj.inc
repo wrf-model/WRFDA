@@ -27,11 +27,16 @@ subroutine da_v_to_vv_spectral_adj(xbx, power, rcv, field, &
    integer             :: ier                        ! Error return.
 
    complex, dimension(xbx%c_cv_size) :: cv           ! Spectral modes.
+   complex, dimension(xbx%c_cv_size) :: cv_local     ! Spectral modes.
 
    complex             :: v_fou(its:ite,0:xbx%max_wavenumber)! Intermediate Fourier state.
 
    real                :: r_fou(1:xbx%lenr)             ! FFT array.
    real                :: work(1:xbx%lenwrk)            ! FFT work array. 
+
+#ifdef DM_PARALLEL
+   include 'mpif.h'
+#endif
 
 !-------------------------------------------------------------------------
 !  logical             :: odd_longitudes             ! True if odd longitudes.
@@ -74,8 +79,17 @@ subroutine da_v_to_vv_spectral_adj(xbx, power, rcv, field, &
       index_start = m * ( xbx%max_wavenumber + 1 - m ) + m * ( m + 1 ) / 2 + 1
       index_end   = index_start + xbx%max_wavenumber - m
 
-      call da_leg_tra_inv_adj( jds, jde, jts, jte, xbx%max_wavenumber, xbx%alp_size, m, xbx%alp, &
+#ifdef DM_PARALLEL
+      cv_local(index_start:index_end) = 0.0
+      call da_legtra_inv_adj( jds, jde, jts, jte, xbx%max_wavenumber, xbx%alp_size, m, xbx%alp, &
+                              cv_local(index_start:index_end), v_fou(jts:jte,m) )
+
+      n = index_end - index_start + 1
+      call MPI_ALLREDUCE( cv_local(index_start:index_end), cv(index_start:index_end), n, TRUE_MPI_COMPLEX, MPI_SUM, MPI_COMM_WORLD, IER )
+#else
+      call da_legtra_inv_adj( jds, jde, jts, jte, xbx%max_wavenumber, xbx%alp_size, m, xbx%alp, &
                                cv(index_start:index_end), v_fou(jts:jte,m) )
+#endif
    end do
 !-------------------------------------------------------------------------
 !

@@ -11,6 +11,12 @@ module da_spectral
 
    implicit none
 
+#if ( DWORDSIZE != RWORDSIZE )
+#define TRUE_MPI_COMPLEX   MPI_COMPLEX
+#else
+#define TRUE_MPI_COMPLEX   MPI_DOUBLE_COMPLEX
+#endif
+
    CONTAINS
 
 #include "da_asslegpol.inc"

@@ -51,7 +51,7 @@ subroutine da_v_to_vv_spectral(xbx, power, rcv, field, &
    do m = 0, xbx%max_wavenumber
       index_start = m * ( xbx%max_wavenumber + 1 - m ) + m * ( m + 1 ) / 2 + 1
       index_end   = index_start + xbx%max_wavenumber - m
-      call da_leg_tra_inv(jds, jde, jts, jte, xbx%max_wavenumber, xbx%alp_size, m, xbx%alp, cv(index_start:index_end),  v_fou(jts:jte,m) )
+      call da_legtra_inv(jds, jde, jts, jte, xbx%max_wavenumber, xbx%alp_size, m, xbx%alp, cv(index_start:index_end),  v_fou(jts:jte,m) )
    end do
 
 !---------------------------------------------------------------------------------
