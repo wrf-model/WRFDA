@@ -52,11 +52,12 @@ wrf : configcheck
 	$(MAKE) MODULE_DIRS="$(ALL_MODULES)" framework
 	$(MAKE) MODULE_DIRS="$(ALL_MODULES)" shared
 	$(MAKE) MODULE_DIRS="$(ALL_MODULES)" physics
+	if [ $(WRF_CHEM) -eq 1 ]    ; then $(MAKE) MODULE_DIRS="$(ALL_MODULES)" chemics ; fi
 	if [ $(WRF_EM_CORE) -eq 1 ]    ; then $(MAKE) MODULE_DIRS="$(ALL_MODULES)" em_core ; fi
 	if [ $(WRF_NMM_CORE) -eq 1 ]   ; then $(MAKE) MODULE_DIRS="$(ALL_MODULES)" nmm_core ; fi
 	if [ $(WRF_EXP_CORE) -eq 1 ]   ; then $(MAKE) MODULE_DIRS="$(ALL_MODULES)" exp_core ; fi
 	( cd main ; $(MAKE) MODULE_DIRS="$(ALL_MODULES)" SOLVER=em em_wrf )
-#	( cd run ; /bin/rm -f wrf.exe ; ln -s ../main/wrf.exe . )
+	( cd run ; /bin/rm -f wrf.exe ; ln -s ../main/wrf.exe . )
 
 3dvar : 
 	/bin/rm -f main/libwrflib.a
@@ -97,6 +98,7 @@ gen_be :
 	( cd main/gen_be ; \
 	/bin/rm -f *.exe ; \
 	$(MAKE) MODULE_DIRS="$(DA_GEN_BE_MODULES)" SOLVER=gen_be )
+
 
 ### 3.a.  rules to build the framework and then the experimental core
 
@@ -183,6 +185,7 @@ em_real : wrf
 	( cd run ; /bin/rm -f ndown.exe ; ln -s ../main/ndown.exe . )
 	( cd run ; /bin/rm -f namelist.input ; ln -s ../test/em_real/namelist.input . )
 
+
 em_hill2d_x : wrf
 	@ echo '--------------------------------------'
 	( cd main ; $(MAKE) MODULE_DIRS="$(ALL_MODULES)" SOLVER=em IDEAL_CASE=hill2d_x em_ideal )
@@ -205,6 +208,24 @@ em_grav2d_x : wrf
 	( cd run ; /bin/rm -f namelist.input ; ln -s ../test/em_grav2d_x/namelist.input . )
 	( cd run ; /bin/rm -f input_sounding ; ln -s ../test/em_grav2d_x/input_sounding . )
 
+#### anthropogenic emissions converter
+
+emi_conv : wrf
+	@ echo '--------------------------------------'
+	( cd main ; $(MAKE) MODULE_DIRS="$(ALL_MODULES)" SOLVER=em IDEAL_CASE=real convert_emiss )
+	( cd test/em_real ; /bin/rm -f convert_emiss.exe ; ln -s ../../main/convert_emiss.exe . )
+	( cd test/em_real ; /bin/rm -f README.namelist ; ln -s ../../run/README.namelist . )
+	( cd run ; /bin/rm -f namelist.input ; ln -s ../test/em_real/namelist.input . )
+
+#### biogenic emissions converter
+
+bio_conv : wrf
+	@ echo '--------------------------------------'
+	( cd main ; $(MAKE) MODULE_DIRS="$(ALL_MODULES)" SOLVER=em IDEAL_CASE=real convert_bioemiss )
+	( cd test/em_real ; /bin/rm -f convert_bioemiss.exe ; ln -s ../../main/convert_bioemiss.exe . )
+	( cd test/em_real ; /bin/rm -f README.namelist ; ln -s ../../run/README.namelist . )
+	( cd run ; /bin/rm -f namelist.input ; ln -s ../test/em_real/namelist.input . )
+
 #### nmm converter
 
 nmm_real : nmm_wrf
@@ -226,18 +247,19 @@ ext :
 
 framework :
 	@ echo '--------------------------------------'
+#	( cd frame ; $(MAKE) framework )
 	( cd frame ; $(MAKE) framework; \
-	cd ../external/io_netcdf ; \
-	make NETCDFPATH="$(NETCDFPATH)" FC="$(FC) $(FCBASEOPTS)" RANLIB=$(RANLIB) CPP="$(CPP) $(TRADFLAG)" diffwrf; \
-	cd ../io_grib1 ; \
-	make FC="$(FC) -I. $(FCBASEOPTS)" CC="$(CC)" CFLAGS="$(CFLAGS)" RANLIB="$(RANLIB)" CPP="$(CPP)"; \
-	cd ../io_int ; \
-	$(MAKE) FC="$(FC) $(FCBASEOPTS)" RANLIB=$(RANLIB) CPP="$(CPP) $(TRADFLAG)" diffwrf ; \
-	cd ../../frame )
+	cd ../external/io_netcdf ; make NETCDFPATH="$(NETCDFPATH)" FC="$(FC) $(FCBASEOPTS)" RANLIB="$(RANLIB)" CPP="$(CPP)" diffwrf; \
+	cd ../io_grib1 ; make FC="$(FC) -I. $(FCBASEOPTS)" CC="$(CC)" CFLAGS="$(CFLAGS)" RANLIB="$(RANLIB)" CPP="$(CPP)"; \
+	cd ../io_int ; $(MAKE) FC="$(FC) $(FCBASEOPTS)" RANLIB="$(RANLIB)" CPP="$(CPP)" diffwrf ; cd ../../frame )
 
 shared :
 	@ echo '--------------------------------------'
 	( cd share ; $(MAKE) )
+
+chemics :
+	@ echo '--------------------------------------'
+	( cd chem ; $(MAKE) )
 
 physics :
 	@ echo '--------------------------------------'
@@ -259,6 +281,11 @@ wrfvar_src :
 convertor_drivers :
 	@ echo '--------------------------------------'
 	( cd convertor ; $(MAKE) )
+
+# rule used by configure to test if this will compile with MPI 2 calls MPI_Comm_f2c and _c2f
+mpi2_test :
+	@ cd tools ; /bin/rm -f mpi2_test ; $(CC) -o mpi2_test mpi2_test.c ; cd ..
+
 
 ### 3.b.  sub-rule to build the expimental core
 
