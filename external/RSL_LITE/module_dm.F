@@ -510,7 +510,7 @@ write(0,*)'2  nest_grid%intermediate_grid%id ', nest_grid%intermediate_grid%id
       IF ( .NOT. mpi_inited ) THEN
 	! If MPI has not been initialized then initialize it and 
 	! make comm_world the communicator
-	! Otherwise, something else (e.g. quilt-io) has already 
+	! Otherwise, something else (e.g. int-io) has already 
 	! initialized MPI, so just grab the communicator that
 	! should already be stored and use that.
 	CALL mpi_init ( ierr )
@@ -961,7 +961,7 @@ END
                                    MS1, ME1, MS2, ME2, MS3, ME3   )
        ENDIF
 
-! defined in external/io_quilt
+! defined in external/io_int
        CALL collect_on_comm0 (  local_communicator , IWORDSIZE ,  &
                                 Patch , 6 ,                       &
                                 GPatch , 6*ntasks                 )
@@ -1341,7 +1341,7 @@ END
        Patch(2,1) = ps2 ; Patch(2,2) = pe2
        Patch(3,1) = ps3 ; Patch(3,2) = pe3
 
-! defined in external/io_quilt
+! defined in external/io_int
        CALL collect_on_comm0 (  local_communicator , IWORDSIZE ,  &
                                 Patch , 6 ,                       &
                                 GPatch , 6*ntasks                 )

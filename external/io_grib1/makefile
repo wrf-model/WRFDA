@@ -21,7 +21,7 @@ libio_grib1.a:		$(OBJS)
 			$(AR) cr libio_grib1.a $(OBJSL)
 			$(RANLIB) libio_grib1.a
 
-io_grib1.o:     io_grib1.F 
+io_grib1.o:
 	mv $*.F $*.F90
 	$(CPP) $(CPPFLAGS) -I../../main io_grib1.F90 | $(M4) - > io_grib1.f
 	$(FC) $(FCFLAGS) -I../../main -I../../inc -c io_grib1.f

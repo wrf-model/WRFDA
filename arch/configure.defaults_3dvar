@@ -571,7 +571,7 @@ lib_rsl :
 	make MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) LEARN_BCAST=-DLEARN_BCAST sp2 )
 
 ###########################################################
-#ARCH   crayx1 UNICOS/mp  CRAY X1         (single-threaded)
+#ARCH   crayx1 UNICOS/mp  CRAY X1
 #
 ## Use these for X1 cross compiler to build Registry
 ##X1_CROSS_COMP = "gcc"
@@ -581,12 +581,15 @@ X1_CROSS_COMP = "cc"
 X1_CROSS_CFLG = "-hcommand"
 CC_TOOLS        =       $(X1_CROSS_COMP) $(X1_CROSS_CFLG)
 
+SED_FTN		=	sed -f ../arch/cray_csd.sed
+
 OMP             =
 OMPCPP          =
 DMPARALLEL      =       1
 SFC             =       ftn
 SCC             =       cc
 FC              =       ftn
+LD              =       ftn
 F77             =       $(FC)
 CC              =       cc
 
@@ -595,48 +598,47 @@ ARCHFLAGS       =       -DWRF_RSL_IO -DRSL \
                         $(WORDSIZE_DEF) \
                         CONFIGURE_NETCDF_FLAG \
                         -DTRIEDNTRUE -DONLY_WRFMODEL_IO -DINTIO \
-                        -DNORESHAPE
-CFLAGS          =       -DCRAY \
+                        -DNORESHAPE -Dcrayx1
+CFLAGS          =       -UCRAY -Dcrayx1 \
                         -DWRF_RSL_IO \
                         -I../external/RSL/RSL \
                         -DDM_PARALLEL  \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) \
-                        -DMAXPROC_MAKE=$(MAX_PROC)
+                        -DMAXPROC_MAKE=$(MAX_PROC) \
+			-h gen_private_callee
 TRADFLAG        =
-FCOPTIM         =     	#-Ofp3 -O3
+#FCOPTIM         =     	-Ofp3 -O3
+FCOPTIM         =     	-Ofp2 -O1 -Ogen_private_callee
 FCDEBUG         =       #-g
-#FCTYPE          =       integer32 real64 -e m
 FCTYPE          =       integer32 -e m -sreal64 -dp
-FCFORM          =       -f free
+FCFORM          =       -f free -N 255
 FCHOST          =   
-FCBASE          =       #-Oscalar1 -Ovector0 -Ostream0
+FCBASE          =       #-Ovector0 -Ostream0 -Oscalar1
 FCBUFR          =       $(FCBASE)
 FC_FFT_RF       =       $(FCBASE)
 
 EXTRAMODULES    =       
 PERL            =       perl
 
-LDFLAGS         =       -p../da_3dvar -p../da_3dvar/src -p../frame -p../share \
-			-L../da_3dvar -L../da_3dvar/src -L../frame -L../share
+LDFLAGS         =
 ENVCOMPDEFS     =       CONFIGURE_COMPILEFLAGS
-
 NETCDFPATH      =       CONFIGURE_NETCDF_PATH
 NETCDF_IO_PATH  =       external/io_netcdf
 NETCDF_LIB	=       CONFIGURE_NETCDF_LIB_PATH
 MPI_LIB		=	-L../external/RSL/RSL -lrsl
-LOCAL_LIB	=	../frame/wrf_num_bytes_between.o
-LOCAL_LIBRARIES =     
+LOCAL_LIB	=	-L../frame -L../share -L../da_3dvar -L../da_3dvar/src
+LOCAL_LIBRARIES =       #-L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c -lX11
 
-CPP             =       cpp
-DM_1_CPP_FLAGS	=
-DM_2_CPP_FLAGS	=
+CPP             =       cpp -C -P
+DM_1_CPP_FLAGS	=	-I../external/RSL/RSL -C -P `cat ../inc/dm_comm_cpp_flags`
+DM_2_CPP_FLAGS	=	-I../../external/RSL/RSL -C -P `cat ../../inc/dm_comm_cpp_flags`
 POUND_DEF       =       -DCRAYX1 \
 			-DNONSTANDARD_SYSTEM -DF90_STANDALONE \
 			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 
 RANLIB          =       echo
 
-externals : wrfio_nf wrfio_int wrfio_grib1 lib_rsl
+externals : wrfio_nf wrfio_int wrfio_grib1 esmf_time lib_rsl
 	( /bin/cp ../tools/gen_comms_warning ../tools/gen_comms.c ; \
           cat ../external/RSL/gen_comms.c >> ../tools/gen_comms.c ; \
           /bin/cp module_dm_warning module_dm.F ; \

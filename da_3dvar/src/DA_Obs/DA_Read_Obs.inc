@@ -97,7 +97,7 @@ SUBROUTINE DA_Read_Obs (iunit, ob, xp, filename)
          RETURN
       ENDIF
    else
-#ifndef CRAYX1
+#ifndef crayx1
       OPEN(UNIT   = iunit,     &
            FORM   = 'FORMATTED',  &
            ACCESS = 'SEQUENTIAL', &
@@ -181,8 +181,8 @@ SUBROUTINE DA_Read_Obs (iunit, ob, xp, filename)
                    platform%info%id
 
       IF (iost /= 0) THEN
-          WRITE (0,'(/,A,I3,/)') ' END OF OBS UNIT: ',iunit
-          WRITE (0,'(A,I3)')     ' IOSTAT == ',iost
+         WRITE (0,'(/A,I9)') ' END OF OBS UNIT: ',iunit
+         WRITE (0,'(/A,I9)') ' IOSTAT:          ',iost
          EXIT reports
       ENDIF
 

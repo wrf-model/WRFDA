@@ -197,7 +197,7 @@ if($sw_os =~ m/darwin/i)
       or die "cannot open arch/postamble_3dvar" ;
    }
 }
-elsif($sw_os =~ m/crayx1/i)
+elsif(($sw_os =~ m/crayx1/i) || ($sw_os =~ m/UNICOS/i))
 {
    open ARCH_POSTAMBLE, "< arch/postamble_3dvar.crayx1"
    or die "cannot open arch/postamble_3dvar.crayx1" ;
@@ -207,12 +207,11 @@ else
    open ARCH_POSTAMBLE, "< arch/postamble_3dvar" or die "cannot open arch/postamble_3dvar" ;
 }
 
-open ARCH_POSTAMBLE, "< arch/postamble_3dvar" or die "cannot open arch/postamble_3dvar" ;
 while ( <ARCH_POSTAMBLE> ) { print CONFIGURE_WRF } ;
 close ARCH_POSTAMBLE ;
 close CONFIGURE_WRF ;
 
-printf "Configuration successful. To build the model type compile . \n" ;
+printf "Configuration successful for $sw_os. To build the model type compile . \n" ;
 printf "------------------------------------------------------------------------\n" ;
 
 

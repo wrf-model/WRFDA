@@ -62,10 +62,10 @@ integer myproc
   INTEGER inttypesize, realtypesize, istat, code
 
   IF ( .NOT. int_valid_handle( DataHandle ) ) THEN
-    CALL wrf_error_fatal("external/io_quilt/io_int.F90: ext_mcel_read_field: invalid data handle" )
+    CALL wrf_error_fatal("external/io_mcel/io_int.F90: ext_mcel_read_field: invalid data handle" )
   ENDIF
   IF ( .NOT. int_handle_in_use( DataHandle ) ) THEN
-    CALL wrf_error_fatal("external/io_quilt/io_int.F90: ext_mcel_read_field: DataHandle not opened" )
+    CALL wrf_error_fatal("external/io_mcel/io_int.F90: ext_mcel_read_field: DataHandle not opened" )
   ENDIF
 
 

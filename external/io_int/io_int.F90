@@ -6,7 +6,7 @@
 ! information on adding a package to WRF, see the latest version of the
 ! WRF Design and Implementation Document 1.1 (Draft). June 21, 2001
 !
-! Uses header manipulation routines in module_io_quilt.F
+! Uses header manipulation routines in module_io_int.F
 !
 
 MODULE module_ext_internal
@@ -60,7 +60,7 @@ MODULE module_ext_internal
       ENDDO
 33    CONTINUE
       IF ( retval < 0 )  THEN
-        CALL wrf_error_fatal("external/io_quilt/io_int.F90: int_get_fresh_handle() can not")
+        CALL wrf_error_fatal("external/io_int/io_int.F90: int_get_fresh_handle() can not")
       ENDIF
       int_handle_in_use(i) = .TRUE.
       first_operation(i) = .TRUE.
@@ -395,10 +395,10 @@ SUBROUTINE ext_int_get_next_time ( DataHandle, DateStr, Status )
   REAL, DIMENSION(1)    :: Field  ! dummy
 
   IF ( .NOT. int_valid_handle( DataHandle ) ) THEN
-    CALL wrf_error_fatal("external/io_quilt/io_int.F90: ext_int_get_next_time: invalid data handle" )
+    CALL wrf_error_fatal("external/io_int/io_int.F90: ext_int_get_next_time: invalid data handle" )
   ENDIF
   IF ( .NOT. int_handle_in_use( DataHandle ) ) THEN
-    CALL wrf_error_fatal("external/io_quilt/io_int.F90: ext_int_get_next_time: DataHandle not opened" )
+    CALL wrf_error_fatal("external/io_int/io_int.F90: ext_int_get_next_time: DataHandle not opened" )
   ENDIF
   inttypesize = itypesize
   realtypesize = rtypesize
@@ -497,10 +497,10 @@ SUBROUTINE ext_int_get_var_info ( DataHandle , VarName , NDim , MemoryOrder , St
   REAL, DIMENSION(1)    :: Field   ! dummy
 
   IF ( .NOT. int_valid_handle( DataHandle ) ) THEN
-    CALL wrf_error_fatal("external/io_quilt/io_int.F90: ext_int_get_var_info: invalid data handle" )
+    CALL wrf_error_fatal("external/io_int/io_int.F90: ext_int_get_var_info: invalid data handle" )
   ENDIF
   IF ( .NOT. int_handle_in_use( DataHandle ) ) THEN
-    CALL wrf_error_fatal("external/io_quilt/io_int.F90: ext_int_get_var_info: DataHandle not opened" )
+    CALL wrf_error_fatal("external/io_int/io_int.F90: ext_int_get_var_info: DataHandle not opened" )
   ENDIF
   inttypesize = itypesize
   realtypesize = rtypesize
@@ -579,10 +579,10 @@ real    rdata(128)
   REAL, DIMENSION(1)    :: Field  ! dummy
 
   IF ( .NOT. int_valid_handle( DataHandle ) ) THEN
-    CALL wrf_error_fatal("external/io_quilt/io_int.F90: ext_int_get_next_var: invalid data handle" )
+    CALL wrf_error_fatal("external/io_int/io_int.F90: ext_int_get_next_var: invalid data handle" )
   ENDIF
   IF ( .NOT. int_handle_in_use( DataHandle ) ) THEN
-    CALL wrf_error_fatal("external/io_quilt/io_int.F90: ext_int_get_next_var: DataHandle not opened" )
+    CALL wrf_error_fatal("external/io_int/io_int.F90: ext_int_get_next_var: DataHandle not opened" )
   ENDIF
   inttypesize = itypesize
   realtypesize = rtypesize
@@ -1437,10 +1437,10 @@ SUBROUTINE ext_int_read_field ( DataHandle , DateStr , VarName , Field , FieldTy
   INTEGER inttypesize, realtypesize, istat, code
 
   IF ( .NOT. int_valid_handle( DataHandle ) ) THEN
-    CALL wrf_error_fatal("external/io_quilt/io_int.F90: ext_int_read_field: invalid data handle" )
+    CALL wrf_error_fatal("external/io_int/io_int.F90: ext_int_read_field: invalid data handle" )
   ENDIF
   IF ( .NOT. int_handle_in_use( DataHandle ) ) THEN
-    CALL wrf_error_fatal("external/io_quilt/io_int.F90: ext_int_read_field: DataHandle not opened" )
+    CALL wrf_error_fatal("external/io_int/io_int.F90: ext_int_read_field: DataHandle not opened" )
   ENDIF
 
   inttypesize = itypesize
@@ -1523,10 +1523,10 @@ SUBROUTINE ext_int_write_field ( DataHandle , DateStr , VarName , Field , FieldT
   INTEGER inttypesize, realtypesize
 
   IF ( .NOT. int_valid_handle( DataHandle ) ) THEN
-    CALL wrf_error_fatal("external/io_quilt/io_int.F90: ext_int_write_field: invalid data handle" )
+    CALL wrf_error_fatal("external/io_int/io_int.F90: ext_int_write_field: invalid data handle" )
   ENDIF
   IF ( .NOT. int_handle_in_use( DataHandle ) ) THEN
-    CALL wrf_error_fatal("external/io_quilt/io_int.F90: ext_int_write_field: DataHandle not opened" )
+    CALL wrf_error_fatal("external/io_int/io_int.F90: ext_int_write_field: DataHandle not opened" )
   ENDIF
 
   inttypesize = itypesize
