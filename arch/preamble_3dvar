@@ -62,7 +62,7 @@ SED_FTN = sed -f ../arch/standard.sed
 ESMF_MOD_DEPENDENCE = ../external/esmf_time_f90/ESMF_Mod.o
 
 WRF_LIB		=	-L../external/io_int -lwrfio_int \
-			-L../external/io_grib1 -lwrfio_grib1 \
+			-L../external/io_grib1 -lio_grib1 \
 			-L../external/esmf_time_f90 -lesmf_time \
 			../frame/module_internal_header_util.o \
 			../frame/pack_utils.o
