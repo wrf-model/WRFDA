@@ -4,7 +4,9 @@ LN      =       ln -sf
 MAKE    =       make -i -r
 RM      =       rm -f
 
-$(SOLVER) : $(SOLVER)_stage1 $(SOLVER)_stage2 $(SOLVER)_stage3 $(SOLVER)_stage4 $(SOLVER)_cov2d $(SOLVER)_cov3d $(SOLVER)_diags
+$(SOLVER) : $(SOLVER)_stage1 $(SOLVER)_stage2 $(SOLVER)_stage3 $(SOLVER)_stage4 $(SOLVER)_cov2d $(SOLVER)_cov3d \
+         $(SOLVER)_diags $(SOLVER)_diags_read
+
 $(SOLVER)_stage1 : $(SOLVER)_stage1.o
 	$(RANLIB) ../lib_3dvar.a
 	$(FC) -o $(SOLVER)_stage1.exe $(LDFLAGS) $(SOLVER)_stage1.o ../lib_3dvar.a
@@ -32,6 +34,10 @@ $(SOLVER)_cov3d : $(SOLVER)_cov3d.o
 $(SOLVER)_diags : $(SOLVER)_diags.o
 	$(RANLIB) ../lib_3dvar.a
 	$(FC) -o $(SOLVER)_diags.exe $(LDFLAGS) $(SOLVER)_diags.o ../lib_3dvar.a
+
+$(SOLVER)_diags_read : $(SOLVER)_diags_read.o
+	$(RANLIB) ../lib_3dvar.a
+	$(FC) -o $(SOLVER)_diags_read.exe $(LDFLAGS) $(SOLVER)_diags_read.o ../lib_3dvar.a
 
 include ../../configure.3dvar
 

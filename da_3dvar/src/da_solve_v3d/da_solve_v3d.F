@@ -1,23 +1,31 @@
-!MEDIATION_LAYER:SOLVE_V3D
+!DA_VAR:DRIVER_LAYER:ESMF
 !
 
-SUBROUTINE solve_v3d ( grid , config_flags , &
-#include <em_dummy_args.inc>
-                 )
+MODULE da_var_esmf_super
+!<DESCRIPTION>
+! This module defines da_var_init(), da_var_run(), and da_var_finalize() routines for 
+! use by ESMF superstructure.  
+! WRFVAR can be built with either ESMF_Mod (from an installed ESMF library) 
+! or with built-in wrf_esmf_mod.  The choice is made at configure time 
+! via cpp token WRF_ESMF_MOD.  
+! Note that WRF_ESMF_MOD is USEd by module_domain.  
+!</DESCRIPTION>
 
-
-! Driver layer modules
-   USE module_domain
-   USE module_configure
-   USE module_driver_constants
    USE module_machine
+   USE module_domain
+   USE module_integrate
+   USE module_driver_constants
+   USE module_configure
    USE module_tiles
+   USE module_timing
+   USE module_wrf_error
+
+#ifdef DM_PARALLEL
    USE module_dm
-! Mediation layer modules
-! Model layer modules
-   USE module_model_constants
+#endif
 
    USE DA_Constants
+   USE DA_Var_IO
    USE DA_Define_Structures
    USE DA_Setup_Structures
    USE DA_Test
@@ -25,173 +33,46 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
    USE DA_Minimisation
    USE par_util
 
-! Registry generated module
-   USE module_state_description
-
    IMPLICIT NONE
 
-   TYPE(domain),                intent(inout) :: grid
-   TYPE (grid_config_rec_type), intent(inout) :: config_flags
+   REAL    :: time
 
-   !  Definitions of dummy arguments to solve
-#include <em_dummy_decl.inc>
+   INTEGER :: loop , &
+              levels_to_process
 
-   TYPE (xbx_type)              :: xbx         ! For header & non-grid arrays.
-   TYPE (be_type)               :: be          ! Background error structure.
-   TYPE (y_type)                :: ob          ! Observation structure.
-   TYPE (ob_type)               :: iv          ! Obs. increment structure.
-   TYPE (y_type)                :: re          ! Residual (o-a) structure.
-   TYPE (y_type)                :: y           ! y = H(x_inc) structure.
-   TYPE (cv_type)               :: cv1d        ! Control variable structure (local processor grid).
-   INTEGER                      :: it          ! External loop counter.
-   type (j_type)                :: j           ! Cost function.
+   TYPE (domain) , POINTER :: keep_grid, grid_ptr, null_domain
+   TYPE (grid_config_rec_type), SAVE :: config_flags
+   INTEGER                 :: number_at_same_level
+   INTEGER                 :: time_step_begin_restart
 
-   INTEGER                      :: ids , ide , jds , jde , kds , kde , &
-                                   ims , ime , jms , jme , kms , kme , &
-                                   its , ite , jts , jte , kts , kte
+   INTEGER :: max_dom , domain_id , fid , oid , idum1 , idum2 , ierr
+   INTEGER :: debug_level
+   LOGICAL :: input_from_file
 
-   TYPE (cv_type)               :: xhat  ! Increament control variable
-
-!------------------------------------------------------------------------------
-
-   write (6, '(/,A,/)') ' *** 3-DIMENSIONAL VARIATIONAL ANALYSIS ***'
-
-!------------------------------------------------------------------------------
-!  [1.0] Read 3DVAR namelist:
-!------------------------------------------------------------------------------
-
-   CALL DA_Read_Namelist
-
-!------------------------------------------------------------------------------
-!  [2.0] Initialise 3D-Var parameters:
-!------------------------------------------------------------------------------
-
-   call da_init_3dvar( grid, xp, xb, &
-                       ids, ide, jds, jde, kds, kde, &
-                       ims, ime, jms, jme, kms, kme, &
-                       its, ite, jts, jte, kts, kte )
-
-!------------------------------------------------------------------------------
-!  [3.0] Set up first guess field (xb):
-!------------------------------------------------------------------------------
-
-   CALL DA_Setup_FirstGuess( xbx, grid, &
-#include <em_dummy_args.inc>
-                           )
-
-!------------------------------------------------------------------------------
-!  [4.0] Set up observations (ob):
-!------------------------------------------------------------------------------
-
-   call DA_Setup_Obs_Structures( xp, ob, iv )
-
-!------------------------------------------------------------------------------
-!  [5.0] Set up background errors (be):
-!------------------------------------------------------------------------------
-
-   call DA_Setup_Background_Errors( xb, xbx, be, xp )
-
-!------------------------------------------------------------------------------
-!  [6.0] Allocate cv:
-!------------------------------------------------------------------------------
-
-   call calculate_cv_local_size( xp, be, cv1d, cv_size )
-   call da_allocate_cv( cv_size, cv1d )
-   call da_allocate_cv( cv_size, xhat )
-      
-!------------------------------------------------------------------------------
-!  [7.0] Test:
-!------------------------------------------------------------------------------
-
-   if ( test_transforms .or. Testing_3DVAR ) then
-      CALL da_get_innov_vector( it, ob, iv, &
-                                grid , config_flags , &
-#include <em_dummy_args.inc>
-                 )
-
-      call da_allocate_y( iv, re )
-      call da_allocate_y( iv, y )
-
-      call da_check( xb, xbx, be, iv, cv1d, &
-                     xa, vv, vp, xp, ob, y, &
-                     ids, ide, jds, jde, kds, kde, &
-                     ims, ime, jms, jme, kms, kme, &
-                     its, ite, jts, jte, kts, kte )
-   endif
-
-!------------------------------------------------------------------------------
-!  [8.0] Loop over O-B calculation and minimization:
-!------------------------------------------------------------------------------
-
-   DO it = 1, max_ext_its
-
-!     [8.1] Calculate innovation vector (O-B):
-      CALL da_get_innov_vector( it, ob, iv, &
-                                grid , config_flags , &
-#include <em_dummy_args.inc>
-                 )
-
-      call da_allocate_y( iv, re )
-      call da_allocate_y( iv, y )
-
-!     [8.2] Minimize cost function:
-
-      CALL DA_Minimise( it, ob, xb, xbx, be, iv, xhat%array, &
-                        cv1d, xa, vv, vp, xp, re, y, j, &
-                        ids, ide, jds, jde, kds, kde, &
-                        ims, ime, jms, jme, kms, kme, &
-                        its, ite, jts, jte, kts, kte )
-
-!     [8.3] Update latest analysis solution:
-
-      call da_transform_vtox( xb, xbx, be, xhat%array, vv, vp, xp, xa,  &
-                              ids, ide, jds, jde, kds, kde,             &
-                              ims, ime, jms, jme, kms, kme,             &
-                              its, ite, jts, jte, kts, kte )
-
-!     [8.4] Only when use_RadarObs = .false. and W_INCREMENTS =.true.,
-!           the W_increment need to be diagnosed:
-
-     if (W_INCREMENTS .and. .not.use_RadarObs) then
-
-         CALL DA_UVPRho_To_W_Lin( xb, xa, xp,                 &
-                                  ids,ide, jds,jde, kds,kde,  &
-                                  ims,ime, jms,jme, kms,kme,  &
-                                  its,ite, jts,jte, kts, kte )
 #ifdef DM_PARALLEL
-         call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id13)
+   INTEGER                 :: nbytes
+   INTEGER, PARAMETER      :: configbuflen = 4* CONFIG_BUF_LEN
+   INTEGER                 :: configbuf( configbuflen )
 #endif
-      endif
 
+   CHARACTER (LEN=80)      :: rstname
+   CHARACTER (LEN=80)      :: message
 
-      CALL DA_Write_Diagnostics( ob, iv, re, y, xp, xa, j )
-
-!------------------------------------------------------------------------------
-!  [8.0] Output 3DVAR analysis and analysis increments:
-!------------------------------------------------------------------------------
-
-      call DA_Transfer_XatoAnalysis( it, xbx, grid, &
-#include <em_dummy_args.inc>
-                           )
-   END DO
-
-!------------------------------------------------------------------------------
-!  [9.0] Tidy up:
-!------------------------------------------------------------------------------
-
-   call da_deallocate_cv( cv1d )
-   call da_deallocate_cv( xhat )
-   call da_deallocate_y( re )
-   call da_deallocate_y( y )
-   
-   write(6,'(a)') ' *** 3DVAR completed successfully ***'
-   write(6,*)
-
-   CALL wrf_debug ( 200 , ' call end of solve_v3d' )
+   INTERFACE 
+     SUBROUTINE Setup_Timekeeping( grid )
+      USE module_domain
+      TYPE(domain), POINTER :: grid
+     END SUBROUTINE Setup_Timekeeping
+   END INTERFACE
 
 CONTAINS
 
 #include "da_init_3dvar.inc"
+#include "da_var_init.inc"
+#include "da_var_run.inc"
+#include "da_var_finalize.inc"
+#include "solve_v3d.inc"
+#include "da_var_solve_interface.inc"
 
-END SUBROUTINE solve_v3d
+END MODULE da_var_esmf_super
 

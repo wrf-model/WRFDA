@@ -1,7 +1,9 @@
-SUBROUTINE da_init_3dvar( grid, xp, xb, &
+SUBROUTINE da_init_3dvar( grid, &
                           ids, ide, jds, jde, kds, kde, &
                           ims, ime, jms, jme, kms, kme, &
-                          ips, ipe, jps, jpe, kps, kpe )
+                          ips, ipe, jps, jpe, kps, kpe, &
+#include <em_dummy_args.inc>
+                        )
 
    IMPLICIT NONE
 
@@ -9,16 +11,20 @@ SUBROUTINE da_init_3dvar( grid, xp, xb, &
 
    TYPE(domain) , TARGET            :: grid
 
-   TYPE (xpose_type),INTENT(INOUT)  :: xp      ! Transpose variables.
-   TYPE (xb_type), INTENT(INOUT)    :: xb      ! Background state
+!  Definitions of dummy arguments to solve
+#include <em_dummy_decl.inc>
 
    INTEGER,      INTENT(OUT)        :: ids,ide, jds,jde, kds,kde   ! domain dims.
    INTEGER,      INTENT(OUT)        :: ims,ime, jms,jme, kms,kme   ! memory dims.
    INTEGER,      INTENT(OUT)        :: ips,ipe, jps,jpe, kps,kpe   ! patch  dims.
 
-   INTEGER :: ii
+   INTEGER :: ii, ierr
 
-   INTEGER :: sm31,sm32,sm33,sm31x,sm32x,sm33x,sm31y,sm32y,sm33y
+   INTEGER     :: sm31 , em31 , sm32 , em32 , sm33 , em33
+   INTEGER     :: sm31x, em31x, sm32x, em32x, sm33x, em33x
+   INTEGER     :: sm31y, em31y, sm32y, em32y, sm33y, em33y
+
+   INTEGER     :: its,ite, jts,jte, kts,kte   ! tile dims.
 
 !if ( DWORDSIZE != RWORDSIZE )
 #define TRUE_MSG_XPOSE add_msg_xpose_real
@@ -41,17 +47,17 @@ SUBROUTINE da_init_3dvar( grid, xp, xb, &
 
 !**********************************************************************
 
-   sm31             = grid%sm31
-   sm32             = grid%sm32
-   sm33             = grid%sm33
-   sm31x            = grid%sm31x
-   sm32x            = grid%sm32x
-   sm33x            = grid%sm33x
-   sm31y            = grid%sm31y
-   sm32y            = grid%sm32y
-   sm33y            = grid%sm33y
+#include "deref_kludge.h"
 
 !**********************************************************************
+
+#ifdef DM_PARALLEL
+   call MPI_COMM_SIZE( MPI_COMM_WORLD, numb_procs, ierr )
+   call MPI_COMM_RANK( MPI_COMM_WORLD, my_proc_id, ierr )
+#else
+   numb_procs = 1
+   my_proc_id = 1
+#endif
 
 !--Register xpose arrays and build messages for processor communication.
 

@@ -14,9 +14,9 @@ PROGRAM netcdf2kma
    USE module_dm
 #endif
 
-   USE module_wrf_3dvar_io
-   USE module_wrf_3dvar_interface
+   USE DA_Var_IO
    USE module_netcdf2kma_interface
+   USE module_wave2grid_kma
 
    IMPLICIT NONE
 
@@ -30,7 +30,7 @@ PROGRAM netcdf2kma
 
 #ifdef DM_PARALLEL
    INTEGER                 :: nbytes
-   INTEGER, PARAMETER      :: configbuflen = 8*1024
+   INTEGER, PARAMETER      :: configbuflen = 4*8192
    INTEGER                 :: configbuf( configbuflen )
    LOGICAL , EXTERNAL      :: wrf_dm_on_monitor
 #endif
@@ -80,7 +80,8 @@ PROGRAM netcdf2kma
    CALL set_scalar_indices_from_config ( head_grid%id , idum1, idum2 )
    CALL       wrf_debug ( 100 , 'wrf: calling init_wrfio' )
 
-   if(config_flags%real_data_init_type == 1) then
+   if(config_flags%real_data_init_type == 1 .or. &
+      config_flags%real_data_init_type == 3) then
      CALL init_wrfio
 
 #ifdef DM_PARALLEL
@@ -94,7 +95,6 @@ PROGRAM netcdf2kma
 
 
 !-- read input in netcdf format
-
      CALL med_initialdata_input_3dvar( head_grid , config_flags )  
 
 !--write in grid-array in kma-ascii format

@@ -14,9 +14,9 @@ PROGRAM kma2netcdf
    USE module_dm
 #endif
 
-   USE module_wrf_3dvar_io
-   USE module_wrf_3dvar_interface
+   USE DA_Var_IO
    USE module_kma2netcdf_interface
+   USE module_kma_wave2grid
 
    IMPLICIT NONE
 
@@ -30,12 +30,14 @@ PROGRAM kma2netcdf
 
 #ifdef DM_PARALLEL
    INTEGER                 :: nbytes
-   INTEGER, PARAMETER      :: configbuflen = 8*1024
+   INTEGER, PARAMETER      :: configbuflen = 4*8192
    INTEGER                 :: configbuf( configbuflen )
    LOGICAL , EXTERNAL      :: wrf_dm_on_monitor
 #endif
 
    CHARACTER (LEN=80)      :: message
+
+!  Definitions of dummy arguments to solve
 
 !--Define the name of this program (program_name defined in module_domain)
 
@@ -80,7 +82,8 @@ PROGRAM kma2netcdf
    CALL set_scalar_indices_from_config ( head_grid%id , idum1, idum2 )
    CALL       wrf_debug ( 100 , 'wrf: calling init_wrfio' )
 
-   if(config_flags%real_data_init_type == 1) then
+!  if(config_flags%real_data_init_type == 1 .or. & 
+!     config_flags%real_data_init_type == 3) then
      CALL init_wrfio
 
 #ifdef DM_PARALLEL
@@ -88,18 +91,20 @@ PROGRAM kma2netcdf
      CALL wrf_dm_bcast_bytes( configbuf, nbytes )
      CALL set_config_as_buffer( configbuf, configbuflen )
 #endif
-   endif
+!  endif
    call med_add_config_info_to_grid ( head_grid )
 
 !--read  kma-ascii grid data and pack in grid-array
 
    CALL wrf_debug ( 100 , 'kma2netcdf: calling kma2netcdf_interface ' )
    CALL kma2netcdf_interface ( head_grid, config_flags )
+
    CALL wrf_debug ( 100 , 'kma2netcdf: back from kma2netcdf_interface ' )
 
 !--output 3dvar analysis
-
    CALL med_initialdata_output_3dvar( head_grid , config_flags )  
+
+   CALL wrf_debug ( 100 , 'kma2netcdf: back from med_initialdata_output' )
 
    CALL med_shutdown_io ( head_grid , config_flags )
 
