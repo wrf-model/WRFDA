@@ -352,6 +352,8 @@ CONTAINS
           proj%truelat2=proj%truelat1
         ENDIF
         CALL set_lc(proj)
+
+        write(unit=*, fmt='(a)') "back from set_lc"
    
       CASE (PROJ_MERC)
         PRINT '(A)', 'Setting up MERCATOR map...'

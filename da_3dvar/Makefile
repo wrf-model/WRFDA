@@ -9,7 +9,7 @@ MODULES_IO		=	module_wrf_3dvar_io.o
 MODULES_INTERFACE	=	module_wrf_3dvar_interface.o	\
 	   			module_wrfvar_esmf_super.o
 
-MODULES_BE_INTERFACE	=	module_wrf_3dvar_interface.o	\
+MODULES_BE_INTERFACE	=	module_gen_be_esmf_super.o	\
 				module_da_gen_be_stats_interface.o
 OBJS    = 
 
@@ -24,9 +24,14 @@ da_3dvar_io :	$(MODULES_IO)
 
 include ../configure.wrf
 
-module_wrfvar_esmf_super.o:	\
-		module_wrf_3dvar_io.o		\
-		module_wrf_3dvar_interface.o
+#module_wrfvar_esmf_super.o:	\
+#		module_wrf_3dvar_io.o		\
+#		module_wrf_3dvar_interface.o
+#
+#module_gen_be_esmf_super.o:	\
+#		module_wrf_3dvar_io.o		\
+#		module_da_gen_be_stats_interface.o
+
 clean:
 	$(RM) *.f *.o *.mod
 #	@ echo 'use the clean script'

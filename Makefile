@@ -16,9 +16,6 @@ DA_3DVAR_MODULES_2 = $(INC_MOD_3DVAR)
 DA_CONVERTOR_MOD_DIR = -I../convertor
 DA_CONVERTOR_MODULES = $(DA_CONVERTOR_MOD_DIR) $(INCLUDE_MODULES)
 
-DA_GEN_BE_MOD_DIR = -I../da_3dvar/src
-DA_GEN_BE_MODULES = $(DA_GEN_BE_MOD_DIR) $(INCLUDE_MODULES)
-
 #### 3.d.   add macros to specify the modules for this core
 
 #EXP_MODULE_DIR = -I../dyn_exp
@@ -115,8 +112,8 @@ be_wrf :
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" gen_be_interface
 	( cd gen_be ; \
 	/bin/rm -f *.exe ; \
-	$(MAKE) MODULE_DIRS="$(DA_GEN_BE_MODULES)" SOLVER=gen_be ; \
-	$(MAKE) MODULE_DIRS="$(DA_GEN_BE_MODULES)" gen_be_stage0 )
+	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" SOLVER=gen_be ; \
+	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" gen_be_stage0 )
 
 ### 3.a.  rules to build the framework and then the experimental core
 

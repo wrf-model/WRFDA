@@ -1,14 +1,13 @@
 MODULE module_gen_be_stats_interface
 
-CONTAINS
-
-
-SUBROUTINE da_gen_be_stats_interface ( grid, config_flags ) 
-
    USE module_domain
    USE module_timing
    USE module_driver_constants
    USE module_configure
+
+CONTAINS
+
+SUBROUTINE da_gen_be_stats_interface ( grid, config_flags ) 
 
    IMPLICIT NONE
 
@@ -66,5 +65,5 @@ SUBROUTINE da_gen_be_stats_interface ( grid, config_flags )
 
 END SUBROUTINE da_gen_be_stats_interface
 
-
 END MODULE module_gen_be_stats_interface
+
