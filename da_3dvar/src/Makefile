@@ -12,6 +12,7 @@ OBJS_FOR_ALL =		da_solve_v3d.o		\
 			DA_Ships.o		\
 			DA_Synop.o		\
 			DA_Sound.o		\
+			DA_Bogus.o		\
 			DA_Airep.o		\
 			DA_Pilot.o		\
 			DA_Radar.o		\
@@ -63,9 +64,6 @@ TARGETDIR    =  ../..
 gen_be :	$(OBJS_FOR_GEN_BE)
 		$(AR) ../../main/libwrflib.a $(OBJS_FOR_GEN_BE)
 
-da_var_io :	$(OBJS_FOR_DA_VAR_IO)
-		$(AR) ../../main/libwrflib.a $(OBJS_FOR_DA_VAR_IO)
-
 ##########################################################################
 
 clean:
@@ -112,7 +110,7 @@ da_solve_v3d.o:		DA_Constants.o			\
 			$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) da_solve_v3d.f
 
 DA_Minimisation.o:	\
-			../module_wrf_3dvar_io.o	\
+			../module_wrf_3dvar_io.o \
 			DA_Constants.o \
 			DA_Tools.o     \
 			DA_Define_Structures.o \
@@ -123,6 +121,7 @@ DA_Minimisation.o:	\
 			DA_Ships.o \
 			DA_Synop.o \
 			DA_Sound.o \
+			DA_Bogus.o \
 			DA_Airep.o \
 			DA_Pilot.o \
 			DA_Radar.o \
@@ -263,6 +262,7 @@ DA_Obs.o:		\
 			DA_Ships.o \
 			DA_Synop.o \
 			DA_Sound.o \
+			DA_Bogus.o \
 			da_pseudo.o \
 			da_qscat.o \
 			DA_Profiler.o \
@@ -491,6 +491,28 @@ DA_Pilot.o:		\
 			$(RM) $@
 			$(CPP) -I./DA_Pilot $(CPPFLAGS_3DVAR) DA_Pilot/DA_Pilot.F > DA_Pilot.f
 			$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) DA_Pilot.f
+
+DA_Bogus.o:		\
+			DA_Constants.o \
+			par_util.o \
+			DA_Define_Structures.o \
+			DA_Interpolation.o \
+			DA_Statistics.o \
+			DA_Tools.o \
+			DA_Physics.o \
+			DA_Bogus/DA_Bogus.F \
+			DA_Bogus/DA_AO_Stats_Bogus.inc \
+			DA_Bogus/DA_Calculate_Jo_and_GradY_Bogus.inc \
+			DA_Bogus/DA_Calculate_Residual_Bogus.inc \
+			DA_Bogus/DA_OI_Stats_Bogus.inc \
+			DA_Bogus/DA_Print_Stats_Bogus.inc \
+			DA_Bogus/DA_Transform_XToY_Bogus.inc \
+			DA_Bogus/DA_Transform_XToY_Bogus_Adj.inc \
+			DA_Bogus/da_check_max_iv_bogus.inc \
+			DA_Bogus/da_get_innov_vector_bogus.inc
+			$(RM) $@
+			$(CPP) -I./DA_Bogus $(CPPFLAGS_3DVAR) DA_Bogus/DA_Bogus.F > DA_Bogus.f
+			$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) DA_Bogus.f
 
 DA_Radar.o:		\
 			DA_Constants.o \
@@ -787,6 +809,8 @@ DA_Physics.o:		\
 			DA_Physics/DA_TPQ_To_RH.inc \
 			DA_Physics/DA_TPQ_To_RH_Lin.inc \
 			DA_Physics/DA_TPQ_To_SLP.inc \
+			DA_Physics/DA_TPQ_To_SLP_Lin.inc \
+			DA_Physics/DA_TPQ_To_SLP_Adj.inc \
 			DA_Physics/DA_TPQ_To_Thickness.inc \
 			DA_Physics/DA_TPRH_To_Q_Adj.inc \
 			DA_Physics/DA_TPRH_To_Q_Lin.inc \
@@ -857,7 +881,6 @@ DA_Tools.o:		\
 			DA_Tools/da_max_error_qc.inc \
 			DA_Tools/da_random_omb.inc \
 			DA_Tools/da_random_seed.inc \
-			DA_Tools/da_set_randomcv.inc \
 			DA_Tools/gaus_noise.inc \
 			DA_Tools/llxy.inc \
 			DA_Tools/open_afile.inc \
@@ -963,17 +986,17 @@ DA_Constants.o:		DA_Constants/DA_Constants.F \
 
 da_mat.o:		DA_VToX_Transforms/da_mat.f
 			$(RM) $@
-			$(CPP) $(TRADFLAG) DA_VToX_Transforms/da_mat.f > da_mat.f
+			$(CPP) DA_VToX_Transforms/da_mat.f > da_mat.f
 			$(FC) -c $(FCFLAGS_3DVAR) da_mat.f
 
 da_rfz.o:		DA_VToX_Transforms/da_rfz.f
 			$(RM) $@
-			$(CPP) $(TRADFLAG) DA_VToX_Transforms/da_rfz.f > da_rfz.f
+			$(CPP) DA_VToX_Transforms/da_rfz.f > da_rfz.f
 			$(FC) -c $(FCFLAGS_FFT_RF) da_rfz.f
 
 da_rf.o:		DA_VToX_Transforms/da_rf.f
 			$(RM) $@
-			$(CPP) $(TRADFLAG) DA_VToX_Transforms/da_rf.f > da_rf.f
+			$(CPP) DA_VToX_Transforms/da_rf.f > da_rf.f
 			$(FC) -c $(FCFLAGS_FFT_RF) da_rf.f
 
 LAPACK.o:		\
@@ -1029,6 +1052,7 @@ DA_Test.o:	\
 			DA_Satob.o \
 			DA_Ships.o \
 			DA_Sound.o \
+			DA_Bogus.o \
 			DA_Synop.o \
 			da_pseudo.o \
 			DA_Profiler.o \
@@ -1058,6 +1082,7 @@ DA_Test.o:	\
 			DA_Test/DA_Check_XToY_Adjoint_Ships.inc \
 			DA_Test/DA_Check_XToY_Adjoint_Sound.inc \
 			DA_Test/DA_Check_XToY_Adjoint_Sonde_sfc.inc \
+			DA_Test/DA_Check_XToY_Adjoint_Bogus.inc \
 			DA_Test/DA_Check_XToY_Adjoint_Synop.inc \
 			DA_Test/DA_Check_XToY_Adjoint_Radar.inc \
 			DA_Test/DA_Check_XToY_Adjoint_Profiler.inc \

@@ -13,7 +13,7 @@
                                       jo_metar, jo_ships, jo_gpspw, &
                                       jo_ssmi , jo_ssmt1, jo_ssmt2, &
                                       jo_pseudo, jo_qscat, jo_buoy, &
-                                      jo_profiler, jo_Radar, jo_gpsref
+                                      jo_profiler, jo_Radar, jo_gpsref, jo_bogus
                                       
 !-------------------------------------------------------------------------
 !     [1.0] Compute components of Grad_y(Jo):
@@ -140,6 +140,11 @@
 
       call da_calculate_jo_and_grady_Profiler (iv, re, jo, jo_grad_y)
       jo_profiler = jo % profiler_u + jo % profiler_v
+
+!     TC bogus:
+
+      call da_calculate_jo_and_grady_bogus ( iv, re, jo, jo_grad_y)
+      jo_bogus = jo % bogus_u + jo % bogus_v + jo % bogus_slp
       
 !     Buoy: 
 
@@ -155,7 +160,7 @@
                    jo_pilot + jo_airep + jo_metar + jo_ships + &
                    jo_gpspw + jo_ssmi + jo_ssmt1 + jo_ssmt2 + &
                    jo_pseudo + jo_qscat + jo_profiler + jo_buoy + &
-                   jo_Radar + jo_gpsref
+                   jo_Radar + jo_gpsref + jo_bogus
                    
       jot = jo % total
 
@@ -181,7 +186,8 @@
               'jo_profil=', jo_profiler, &
               'jo_buoy  =', jo_buoy, &
               'jo_Radar =', jo_Radar, &
-              'jo_gpsref =', jo_gpsref
+              'jo_gpsref =', jo_gpsref, &
+              'jo_bogus =', jo_bogus
       endif
                    
       end subroutine da_calculate_jo_and_grady

@@ -11,7 +11,7 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
 !
 !  HISTORY: 09/27/2002		Wei Huang
 !
-!  HISTORY: 06/28/2004 with respect to the cloud water and rain water   Jianfeng Gu
+!  HISTORY: 06/28/2004 with respect to the cloud water and rain water        Jianfeng Gu
 !
 !  PARENT_MODULE: DA_Setup_Structures
 !------------------------------------------------------------------------------
@@ -411,7 +411,6 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
      print *, 'xb%q(is,js,ke)=', xb%q(is,js,ke)
      print *, 'xb%h(is,js,ke)=', xb%h(is,js,ke)
      print *, 'xb%hf(is,js,ke)=', xb%hf(is,js,ke)
-
      print *, 'xb%map_factor(is,js)=', xb%map_factor(is,js)
      print *, 'xb%cori(is,js)=', xb%cori(is,js)
      print *, 'xb%tgrn(is,js)=', xb%tgrn(is,js)
@@ -553,7 +552,13 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
           'Sea level pressure and total precipitable water'
    endif
 
-   call DA_WRF_TPQ_2_SLP ( xb )
+!  call DA_WRF_TPQ_2_SLP ( xb )
+   do j = js,je
+   do i = is,ie
+      call DA_TPQ_To_SLP( xb%t(i,j,:), xb%q(i,j,:), xb%p(i,j,:), xb%terr(i,j), &
+                         xb%psfc(i,j), xb%slp(i,j), xp )
+   end do
+   end do
    call INTEGRAT_dZ( xb )
 
 !------------------------------------------------------------------------------
@@ -666,7 +671,6 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
      enddo
 
    ENDIF
-
 
 END SUBROUTINE DA_Transfer_WRFToXb
 

@@ -185,6 +185,10 @@ SUBROUTINE DA_Check_XToY_Adjoint( xb, xa, iv, xp, y, &
 
    if( Use_BuoyObs ) &
    call da_check_xtoy_adjoint_Buoy( iv, y, partial_lhs, pertile_lhs )
+
+   if( Use_BogusObs ) &
+   call da_check_xtoy_adjoint_Bogus( iv, y, partial_lhs, pertile_lhs )
+
 !-------------------------------------------------------------------------
 !     [5.0] Perform adjoint operation:
 !-------------------------------------------------------------------------

@@ -27,7 +27,7 @@ SUBROUTINE DA_OI_Stats_Buoy ( stats_unit, oi )
    buoy%minimum%t = maxmin_type(-missing_r, 0, 0)
    buoy%minimum%p = maxmin_type(-missing_r, 0, 0)
    buoy%minimum%q = maxmin_type(-missing_r, 0, 0)
-   buoy%average = residual_type(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+   buoy%average = residual_type(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
    buoy%rms_err = buoy%average
 
    IF ( oi%num_buoy > 0 ) THEN

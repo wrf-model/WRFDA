@@ -28,7 +28,7 @@ SUBROUTINE DA_AO_Stats_Sonde_sfc( stats_unit, oi, re )
    sonde_sfc%minimum%t = maxmin_type(-missing_r, 0, 0)
    sonde_sfc%minimum%p = maxmin_type(-missing_r, 0, 0)
    sonde_sfc%minimum%q = maxmin_type(-missing_r, 0, 0)
-   sonde_sfc%average = residual_type(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+   sonde_sfc%average = residual_type(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
    sonde_sfc%rms_err = sonde_sfc%average
 
    IF ( oi%num_sound > 0 ) THEN

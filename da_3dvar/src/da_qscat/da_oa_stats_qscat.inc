@@ -20,7 +20,7 @@ subroutine da_oa_stats_qscat( stats_unit, oi, re )
    qscat%maximum%v = maxmin_type(-1.0E+20, 0, 0)
    qscat%minimum%u = maxmin_type( 1.0E+20, 0, 0)
    qscat%minimum%v = maxmin_type( 1.0E+20, 0, 0)
-   qscat%average = residual_type(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+   qscat%average = residual_type(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
    qscat%rms_err = qscat%average
 
    IF ( oi%num_qscat > 0 ) THEN

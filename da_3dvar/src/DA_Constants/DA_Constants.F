@@ -271,7 +271,7 @@ MODULE DA_Constants
                            num_satem_tot, num_satob_tot, num_ships_tot, &
                            num_sound_tot, num_airep_tot, num_qscat_tot, &
                            num_profiler_tot, num_buoy_tot, num_gpsref_tot, &
-                           num_Radar_tot
+                           num_Radar_tot, num_bogus_tot
 
  integer       :: num_pseudo
  real          :: pseudo_x, pseudo_y, pseudo_z
@@ -336,6 +336,7 @@ MODULE DA_Constants
                    use_metarObs, &  
                    use_pilotObs, &  
                    use_soundObs, &  
+                   use_bogusObs, &  
                    use_satemObs, &  
                    use_satobObs, &  
                    use_airepObs, & 
@@ -396,7 +397,9 @@ MODULE DA_Constants
                     max_error_tb             = 5, &
                     max_error_thickness      = 5, &
                     max_error_rv             = 5, &
-                    max_error_rf             = 5
+                    max_error_rf             = 5, &
+                    max_error_buv            = 500, &
+                    max_error_slp            = 500
 
 !  Define various ways for bad data to be flagged.  
 
@@ -466,7 +469,8 @@ MODULE DA_Constants
                            max_profiler = 30000, & ! Maximum Number of profiler obs.
                            max_buoy = 30000, &     ! Maximum Number of buoy obs.
                            max_Radar = 10000, &   ! Maximum Number of Radar obs.
-                           max_qscat  = 50000      ! Maximum Number of Quik SCAT obs.
+                           max_qscat  = 50000, &   ! Maximum Number of Quik SCAT obs.
+                           max_bogus  = 5000       ! Maximum Number of bogus obs.
 
  integer                :: max_sound_input, &
                            max_synop_input, &
@@ -485,6 +489,7 @@ MODULE DA_Constants
                            max_profiler_input, &
                            max_buoy_input,  &
                            max_Radar_input, &
+                           max_Bogus_input, &
                            max_qscat_input
 
  integer                :: numb_procs, &         ! Number of total processors.

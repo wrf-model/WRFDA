@@ -6,19 +6,20 @@
 # @ job_name   = wrf3dvar
 # @ output     = wrf3dvar.out
 # @ error      = wrf3dvar.err
-# @ node       = 1
+# @ node       = 4
 ## @ network.MPI    = css0,shared,us
 # @ network.MPI    = css0,shared,ip
-# @ tasks_per_node = 16
-# @ node_usage = not_shared
+# @ tasks_per_node = 4
+# @ node_usage = shared
 # @ checkpoint = no
-# @ wall_clock_limit = 01:30:00
+# @ wall_clock_limit = 00:30:00
 # NCEP IBM=dev
 # NCAR IBM(bluesky)=com_rg8:
 # NCAR IBM(blackforest)=com_reg:
 # NCAR IBM(blackforest_nighthawk)=com_nh:
-# @ class      =  com_nh
 ## @ class      =  com_reg
+## @ class      =  com_nh
+# @ class      =  com_pr8
 # @ queue
 #
 #FSL JET (Alpha/Linux):
@@ -54,16 +55,17 @@
 
 #Specify job details here:
 
+ set DA_FG_FORMAT  = 2          # First guess format: 1=WRF, 2=MM5, 3=KMA
  set DA_OB_FORMAT  = 2		# Observation format: 1=BUFR, 2=ASCII "little_r"
- set DA_CV_OPTIONS = 4		# 2 -> MM5, 3 -> WRF 4 -> Global
- set DA_GLOBAL     = .TRUE.     # true for global option
+ set DA_CV_OPTIONS = 2		# 2 -> MM5, 3 -> WRF 4 -> Global
+ set DA_GLOBAL     = .FALSE.     # true for global option
  setenv TRUNC  T63              # Triangular truncation number 
 
- setenv DA_ANALYSIS_DATE	2004-10-27_06:00:00.0000  # Specify date in this format.
- setenv WEST_EAST_GRID_NUMBER	193                       # Number of gridpoints in x(i) dim.
- setenv SOUTH_NORTH_GRID_NUMBER	 98                       # Number of gridpoints in y(j) dim.
- setenv VERTICAL_GRID_NUMBER	 31                       # Number of vertical levels.
- setenv GRID_DISTANCE		190000                     # Grid resolution (m).
+ setenv DA_ANALYSIS_DATE	2002-08-29_00:00:00.0000  # Specify date in this format.
+ setenv WEST_EAST_GRID_NUMBER	191                       # Number of gridpoints in x(i) dim.
+ setenv SOUTH_NORTH_GRID_NUMBER	171                       # Number of gridpoints in y(j) dim.
+ setenv VERTICAL_GRID_NUMBER	 34                       # Number of vertical levels.
+ setenv GRID_DISTANCE		30000                     # Grid resolution (m).
 
 #Specify directories/files here:
 
@@ -73,18 +75,18 @@
  setenv TMP1    /datatmp1/rizvi
  
 # setenv WRF_DIR ${TMP1}/wrf3dvar
- setenv WRF_DIR ${TMP}/wrf3dvar
+ setenv WRF_DIR /ptmp/hsiao/KMA30/wrfvar
 
- setenv DAT_DIR  ${TMP1}/kma_data_input
+ setenv DAT_DIR  /ptmp/hsiao/KMA30/INPUT
  setenv IN_DIR  ${TMP1}/kma_data_input/${TRUNC}                   
  setenv OUT_DIR ${TMP1}/kma_data_output/${TRUNC}
 
- setenv RUN_DIR /${TMP1}/kma_test_results/global/adj_test/${TRUNC}
+ setenv RUN_DIR /ptmp/hsiao/KMA30/wrfvar/run/TEST_16pc
 
- setenv DA_FIRST_GUESS  ${IN_DIR}/KMA2NETCDF_DATA
- setenv DA_BACK_ERRORS  ${IN_DIR}/gen_be.NMC.dat      # global BE
- setenv DA_SSMI		${DAT_DIR}/ssmi.dat                 # SSM/I radiances (ignore if not using).
- setenv DA_RADAR	${DAT_DIR}/radar.dat                # Radar data (ignore if not using).
+ setenv DA_FIRST_GUESS  ${DAT_DIR}/r3dv_lc30_fcst.2002082812
+ setenv DA_BACK_ERRORS  ${DAT_DIR}/DA_BACK_ERRORS_3DVAR.DOMAIN_1
+ setenv DA_SSMI		${DAT_DIR}/ssmi.dat
+ setenv DA_RADAR	${DAT_DIR}/radar.dat
 
  set os = `uname`
  set endian_form   = big_endian
@@ -97,7 +99,7 @@
  else if(${DA_OB_FORMAT} == 2) then
 #    set DA_OBSERVATIONS	= ${IN_DIR}/obs_gts.3dvar          # Input "little_r" format obs (recommended for now).
 #    set DA_OBSERVATIONS	=  ${HOME}/radar_case_062002/obs-gts-2002061012 
-    set DA_OBSERVATIONS	=  ${DAT_DIR}/obs_gts-2004102712-full 
+    set DA_OBSERVATIONS	=  ${DAT_DIR}/r3dv_lc30_dcod_data_ncar.2002082900_GTS_BGS
  else
     echo "DA_OB_FORMAT error: Do not know how to handle DA_OB_FORMAT = ${DA_OB_FORMAT}"
     exit 1
@@ -137,7 +139,14 @@
     exit 1
  endif
 
- ln -sf $DA_FIRST_GUESS		wrf_3dvar_input
+ if(${DA_FG_FORMAT} == 1) then
+    ln -sf $DA_FIRST_GUESS              wrf_3dvar_input
+ else if(${DA_FG_FORMAT} == 2) then
+    ln -sf $DA_FIRST_GUESS              fort.41
+ else
+    echo "DA_FG_FORMAT error: Do not know how to handle DA_FG_FORMAT = ${DA_FG_FORMAT}"
+    exit 1
+ endif
  ln -sf $DA_BACK_ERRORS		fort.3${DA_CV_OPTIONS}
  ln -sf $DA_OBSERVATIONS	fort.9${DA_OB_FORMAT}
 
@@ -155,35 +164,36 @@
 #-----------------------------------------------------------------------
 
  if ( ! $?DA_MODEL_TYPE )   set DA_MODEL_TYPE = WRF
- if ( ! $?DA_WRITE_INCREMENTS ) set DA_WRITE_INCREMENTS = .TRUE.
+ if ( ! $?DA_WRITE_INCREMENTS ) set DA_WRITE_INCREMENTS = .FALSE.
  if ( ! $?DA_ANALYSIS_TYPE ) set DA_ANALYSIS_TYPE = 3D-VAR
- if ( ! $?DA_ANALYSIS_DATE ) set DA_ANALYSIS_DATE = 2002-08-03_00:00:00.0000
+ if ( ! $?DA_ANALYSIS_DATE ) set DA_ANALYSIS_DATE = 2002-08-29_00:00:00.0000
  if ( ! $?DA_ANALYSIS_ACCU ) set DA_ANALYSIS_ACCU = 900
- if ( ! $?DA_FG_FORMAT )     set DA_FG_FORMAT = 3
- if ( ! $?DA_OB_FORMAT )     set DA_OB_FORMAT = 1
+ if ( ! $?DA_FG_FORMAT )     set DA_FG_FORMAT = 2
+ if ( ! $?DA_OB_FORMAT )     set DA_OB_FORMAT = 2
  if ( ! $?DA_NUM_FGAT_TIME ) set DA_NUM_FGAT_TIME = 1
  if ( ! $?DA_PROCESS_OBS )   set DA_PROCESS_OBS = YES
  if ( ! $?DA_QC_POINTER )    set DA_QC_POINTER = 0
- if ( ! $?DA_USE_SYNOPOBS )  set DA_USE_SYNOPOBS = .TRUE. 
- if ( ! $?DA_USE_SHIPSOBS )  set DA_USE_SHIPSOBS = .TRUE. 
- if ( ! $?DA_USE_METAROBS )  set DA_USE_METAROBS = .TRUE. 
- if ( ! $?DA_USE_PILOTOBS )  set DA_USE_PILOTOBS = .TRUE. 
- if ( ! $?DA_USE_SOUNDOBS )  set DA_USE_SOUNDOBS = .TRUE. 
- if ( ! $?DA_USE_SATEMOBS )  set DA_USE_SATEMOBS = .TRUE. 
- if ( ! $?DA_USE_SATOBOBS )  set DA_USE_SATOBOBS = .TRUE.
- if ( ! $?DA_USE_AIREPOBS )  set DA_USE_AIREPOBS = .TRUE.
- if ( ! $?DA_USE_GPSPWOBS )  set DA_USE_GPSPWOBS = .TRUE. 
+ if ( ! $?DA_USE_SYNOPOBS )  set DA_USE_SYNOPOBS = .FALSE. 
+ if ( ! $?DA_USE_SHIPSOBS )  set DA_USE_SHIPSOBS = .FALSE. 
+ if ( ! $?DA_USE_METAROBS )  set DA_USE_METAROBS = .FALSE. 
+ if ( ! $?DA_USE_PILOTOBS )  set DA_USE_PILOTOBS = .FALSE. 
+ if ( ! $?DA_USE_SOUNDOBS )  set DA_USE_SOUNDOBS = .FALSE. 
+ if ( ! $?DA_USE_SATEMOBS )  set DA_USE_SATEMOBS = .FALSE. 
+ if ( ! $?DA_USE_SATOBOBS )  set DA_USE_SATOBOBS = .FALSE.
+ if ( ! $?DA_USE_AIREPOBS )  set DA_USE_AIREPOBS = .FALSE.
+ if ( ! $?DA_USE_GPSPWOBS )  set DA_USE_GPSPWOBS = .FALSE. 
  if ( ! $?DA_USE_RADAROBS )  set DA_USE_RADAROBS = .FALSE.
  if ( ! $?DA_Use_Radar_rv )  set DA_Use_Radar_rv = .FALSE.
  if ( ! $?DA_Use_Radar_rf )  set DA_Use_Radar_rf = .FALSE.
- if ( ! $?DA_USE_GPSREFOBS )  set DA_USE_GPSREFOBS = .TRUE. 
- if ( ! $?DA_USE_PROFILEROBS )  set DA_USE_PROFILEROBS = .TRUE. 
- if ( ! $?DA_USE_BUOYOBS     )  set DA_USE_BUOYOBS     = .TRUE. 
+ if ( ! $?DA_USE_BOGUSOBS )  set DA_USE_BOGUSOBS = .TRUE.
+ if ( ! $?DA_USE_GPSREFOBS )  set DA_USE_GPSREFOBS = .FALSE. 
+ if ( ! $?DA_USE_PROFILEROBS )  set DA_USE_PROFILEROBS = .FALSE. 
+ if ( ! $?DA_USE_BUOYOBS     )  set DA_USE_BUOYOBS     = .FALSE. 
  if ( ! $?DA_USE_SSMIRETRIEVALOBS  )  set DA_USE_SSMIRETRIEVALOBS = .FALSE.
  if ( ! $?DA_USE_SSMITBOBS ) set DA_USE_SSMITBOBS = .FALSE.
  if ( ! $?DA_USE_SSMT1OBS ) set DA_USE_SSMT1OBS = .FALSE.  
  if ( ! $?DA_USE_SSMT2OBS ) set DA_USE_SSMT2OBS = .FALSE.
- if ( ! $?DA_USE_QSCATOBS ) set DA_USE_QSCATOBS = .TRUE.
+ if ( ! $?DA_USE_QSCATOBS ) set DA_USE_QSCATOBS = .FALSE.
  if ( ! $?DA_Check_Max_IV )  set DA_Check_Max_IV        = .TRUE.
  if ( ! $?DA_USE_OBS_ERRFAC ) set DA_USE_OBS_ERRFAC = .FALSE.
  if ( ! $?DA_PUT_RAND_SEED ) set DA_PUT_RAND_SEED = .FALSE.
@@ -192,37 +202,44 @@
  if ( ! $?DA_TIME_WINDOW )   set DA_TIME_WINDOW = 3.
  if ( ! $?DA_PRINT_DETAIL )  set DA_PRINT_DETAIL = 0
  if ( ! $?DA_MAX_EXT_ITS )   set DA_MAX_EXT_ITS = 1
+ if ( ! $?DA_W_INCREMENTS ) set DA_W_INCREMENTS = .TRUE.
+ if ( ! $?DA_DT_CLOUD_MODEL ) set DA_DT_CLOUD_MODEL = .FALSE.
  if ( ! $?DA_EPS )           set DA_EPS = "1.E-02, 1.E-02, 1.E-02, 1.E-02, 1.E-02, 1.E-02, 1.E-02,"
  if ( ! $?DA_NTMAX )         set DA_NTMAX = 100
  if ( ! $?DA_WRITE_SWITCH )  set DA_WRITE_SWITCH   = .FALSE.
  if ( ! $?DA_WRITE_INTERVAL )set DA_WRITE_INTERVAL = 5
- if ( ! $?DA_RF_PASSES )     set DA_RF_PASSES = 6
- if ( ! $?DA_VAR_SCALING1 )  set DA_VAR_SCALING1 = 1.0
- if ( ! $?DA_VAR_SCALING2 )  set DA_VAR_SCALING2 = 1.0
- if ( ! $?DA_VAR_SCALING3 )  set DA_VAR_SCALING3 = 1.0
- if ( ! $?DA_VAR_SCALING4 )  set DA_VAR_SCALING4 = 1.0
- if ( ! $?DA_VAR_SCALING5 )  set DA_VAR_SCALING5 = 1.0
- if ( ! $?DA_LEN_SCALING1 )  set DA_LEN_SCALING1 = 1.0
- if ( ! $?DA_LEN_SCALING2 )  set DA_LEN_SCALING2 = 1.0
- if ( ! $?DA_LEN_SCALING3 )  set DA_LEN_SCALING3 = 1.0
- if ( ! $?DA_LEN_SCALING4 )  set DA_LEN_SCALING4 = 1.0
- if ( ! $?DA_LEN_SCALING5 )  set DA_LEN_SCALING5 = 1.0
+ if ( ! $?DA_WRITE_QCW )     set DA_WRITE_QCW = .FALSE.
+ if ( ! $?DA_WRITE_QRN )     set DA_WRITE_QRN = .FALSE.
+ if ( ! $?DA_WRITE_QCI )     set DA_WRITE_QCI = .FALSE.
+ if ( ! $?DA_WRITE_QSN )     set DA_WRITE_QSN = .FALSE.
+ if ( ! $?DA_WRITE_QGR )     set DA_WRITE_QGR = .FALSE.
+ if ( ! $?DA_RF_PASSES )     set DA_RF_PASSES = 4
+ if ( ! $?DA_VAR_SCALING1 )  set DA_VAR_SCALING1 = 1.5
+ if ( ! $?DA_VAR_SCALING2 )  set DA_VAR_SCALING2 = 1.5
+ if ( ! $?DA_VAR_SCALING3 )  set DA_VAR_SCALING3 = 1.5
+ if ( ! $?DA_VAR_SCALING4 )  set DA_VAR_SCALING4 = 1.5
+ if ( ! $?DA_VAR_SCALING5 )  set DA_VAR_SCALING5 = 1.5
+ if ( ! $?DA_LEN_SCALING1 )  set DA_LEN_SCALING1 = 0.5
+ if ( ! $?DA_LEN_SCALING2 )  set DA_LEN_SCALING2 = 0.5
+ if ( ! $?DA_LEN_SCALING3 )  set DA_LEN_SCALING3 = 0.5
+ if ( ! $?DA_LEN_SCALING4 )  set DA_LEN_SCALING4 = 0.5
+ if ( ! $?DA_LEN_SCALING5 )  set DA_LEN_SCALING5 = 0.5
  if ( ! $?DA_DEF_SUB_DOMAIN )set DA_DEF_SUB_DOMAIN = .FALSE.
  if ( ! $?DA_X_START_SUB_DOMAIN )set DA_X_START_SUB_DOMAIN = 55.0
  if ( ! $?DA_Y_START_SUB_DOMAIN )set DA_Y_START_SUB_DOMAIN = 35.0
  if ( ! $?DA_X_END_SUB_DOMAIN )set DA_X_END_SUB_DOMAIN = 80.0
  if ( ! $?DA_Y_END_SUB_DOMAIN )set DA_Y_END_SUB_DOMAIN = 60.0
- if ( ! $?DA_TESTING_3DVAR ) set DA_TESTING_3DVAR = .TRUE. 
- if ( ! $?DA_TEST_TRANSFORMS )  set DA_TEST_TRANSFORMS = .TRUE. 
+ if ( ! $?DA_TESTING_3DVAR ) set DA_TESTING_3DVAR = .FALSE. 
+ if ( ! $?DA_TEST_TRANSFORMS )  set DA_TEST_TRANSFORMS = .FALSE. 
  if ( ! $?DA_TEST_STATISTICS )  set DA_TEST_STATISTICS = .FALSE.
  if ( ! $?DA_INTERPOLATE_STATS )  set DA_INTERPOLATE_STATS = .TRUE.
  if ( ! $?DA_MINIMISATION_OPTION) set DA_MINIMISATION_OPTION = 2
  if ( ! $?DA_WRITE_OUTER_LOOP) set DA_WRITE_OUTER_LOOP = .FALSE.
  if ( ! $?DA_LAT_STATS_OPTION) set DA_LAT_STATS_OPTION = .FALSE.
- if ( ! $?DA_CALCULATE_CG_COST_FUNCTION) set DA_CALCULATE_CG_COST_FUNCTION = .TRUE.
- if ( ! $?DA_CV_OPTIONS )    set DA_CV_OPTIONS = 3
- if ( ! $?DA_CV_OPTIONS_HUM ) set DA_CV_OPTIONS_HUM = 3
- if ( ! $?DA_CHECK_RH )      set DA_CHECK_RH = 1
+ if ( ! $?DA_CALCULATE_CG_COST_FUNCTION) set DA_CALCULATE_CG_COST_FUNCTION = .FALSE.
+ if ( ! $?DA_CV_OPTIONS )    set DA_CV_OPTIONS = 2
+ if ( ! $?DA_CV_OPTIONS_HUM ) set DA_CV_OPTIONS_HUM = 1
+ if ( ! $?DA_CHECK_RH )      set DA_CHECK_RH = 2
  if ( ! $?DA_as1        )    set DA_as1 = "0.25, 0.75, 1.5"
  if ( ! $?DA_as2        )    set DA_as2 = "0.25, 0.75, 1.5"
  if ( ! $?DA_as3        )    set DA_as3 = "0.25, 0.75, 1.5"
@@ -258,7 +275,14 @@ cat >! namelist.3dvar << EOF
 &record2
  ANALYSIS_TYPE = '$DA_ANALYSIS_TYPE',
  ANALYSIS_DATE = '$DA_ANALYSIS_DATE',
- ANALYSIS_ACCU =  $DA_ANALYSIS_ACCU /
+ ANALYSIS_ACCU =  $DA_ANALYSIS_ACCU,
+ W_INCREMENTS  = $DA_W_INCREMENTS,
+ DT_CLOUD_MODEL = $DA_DT_CLOUD_MODEL,
+ WRITE_QCW      = $DA_WRITE_QCW,
+ WRITE_QRN      = $DA_WRITE_QRN,
+ WRITE_QCI      = $DA_WRITE_QCI,
+ WRITE_QSN      = $DA_WRITE_QSN,
+ WRITE_QGR      = $DA_WRITE_QGR /
 
 &record3
  fg_format = $DA_FG_FORMAT,
@@ -280,6 +304,7 @@ cat >! namelist.3dvar << EOF
  Use_GpsrefObs   = $DA_USE_GPSREFOBS,
  Use_ProfilerObs = $DA_USE_PROFILEROBS, 
  Use_BuoyObs     = $DA_USE_BUOYOBS,
+ Use_BogusObs   = $DA_USE_BOGUSOBS,
  Use_SsmiRetrievalObs = $DA_USE_SSMIRETRIEVALOBS,
  Use_SsmiTbObs  = $DA_USE_SSMITBOBS,
  use_ssmt1obs   = $DA_USE_SSMT1OBS,
@@ -544,7 +569,7 @@ EOF
  echo "Running  3DVAR  ------"
 #-----------------------------------------------------------------------
 #DEC, SGI, Linux/PC multiPE:
-   ./da_3dvar.exe >&! da_3dvar.out
+#   ./da_3dvar.exe >&! da_3dvar.out
  cp wrf_3dvar_output ANL_NETCDF_DATA
  cp fort.71          ANL_INCREMENTS
  cp fort.710         FORMATTED_ANL_INCREMENTS
@@ -554,7 +579,7 @@ EOF
 #BIG : mpirun -np 4 ./da_3dvar.exe
 #    mpirun -np 8 ./da_3dvar.exe
 #IBM (llsubmit):
-#  poe ./da_3dvar.exe
+  poe ./da_3dvar.exe
 #AFWA: setenv LOADL_INTERACTIVE_CLASS 1
 #AFWA: poe ./da_3dvar.exe -euilib us -hostfile host.afwa -procs 15
  echo "3DVAR    completed"

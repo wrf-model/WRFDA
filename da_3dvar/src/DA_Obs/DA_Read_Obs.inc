@@ -54,7 +54,7 @@ SUBROUTINE DA_Read_Obs (iunit, ob, xp, filename)
                                    num_ssmt1, &
                                    num_ssmt2, &
                                    num_pseudo, num_qscat, &
-                                   num_profiler, num_buoy
+                                   num_profiler, num_buoy, num_bogus
 
 !--------------------------------------------------------------------
 
@@ -76,6 +76,7 @@ SUBROUTINE DA_Read_Obs (iunit, ob, xp, filename)
    num_qscat = ob%num_qscat
    num_profiler = ob%num_profiler
    num_buoy = ob%num_buoy
+   num_bogus= ob%num_bogus
    num_pseudo = 0
 !----------------------------------------------------------------------------!
 !  OPEN FILE
@@ -714,6 +715,49 @@ loop_level: DO i = 1, platform%info%levels
            ob%profiler(num_profiler)%v(i) = platform%each(i)%v
          enddo
 
+!     else if(index(platform%info%source, 'TCBGS') > 0) then
+
+         CASE (135) ;
+
+         if(.not.use_BogusObs) cycle reports
+
+         num_bogus = num_bogus + 1
+
+         if( num_bogus > max_bogus_input) then
+                  write(0,'(A,I6,A,I6)') 'Bogus #=', num_bogus, &
+                         ' > max_bogus_input=', max_bogus_input
+                  STOP
+         endif
+
+         ob%bogus(num_bogus)%info = platform%info
+         ob%bogus(num_bogus)%loc  = platform%loc
+
+         allocate (ob%bogus(num_bogus)%p (1:nlevels))
+         allocate (ob%bogus(num_bogus)%zk(1:nlevels))
+         allocate (ob%bogus(num_bogus)%u (1:nlevels))
+         allocate (ob%bogus(num_bogus)%v (1:nlevels))
+
+         do i = 1, nlevels
+           ob%bogus(num_bogus)%p(i) = platform%each(i)%p%inv
+           ob%bogus(num_bogus)%u(i) = platform%each(i)%u
+           ob%bogus(num_bogus)%v(i) = platform%each(i)%v
+         enddo
+
+         ob%bogus(num_bogus)%slp    = platform%loc%slp
+
+         if ( print_detail > 0) then
+            print*,'nlevels=', nlevels
+            print*,'ob % num_bogus,slp', num_bogus,  &
+                    ob % bogus ( num_bogus ) % slp
+  	    do i=1,nlevels
+               print*,'ob % num_bogus, i ', num_bogus,i
+               print*,'ob%bogus(ob%num_bogus)%u,v=',  &
+                       ob%bogus(num_bogus)%u(i),ob%bogus(num_bogus)%v(i)
+            enddo
+            write(*,fmt='(2(a,i4))') 'ob%num_bogus=',num_bogus, &
+                                     'nlevels=',nlevels
+         end if
+
          CASE (18,19) ;             ! bouy
 
          if(.not.use_BuoyObs) cycle reports
@@ -761,6 +805,7 @@ loop_level: DO i = 1, platform%info%levels
    ob%num_qscat = num_qscat
    ob%num_buoy  = num_buoy
    ob%num_profiler = num_profiler
+   ob%num_bogus = num_bogus
 
 !  ob%num_ssmt1 = num_ssmt1
 !  ob%num_ssmt2 = num_ssmt2
@@ -794,6 +839,7 @@ loop_level: DO i = 1, platform%info%levels
            'Read:  ', num_qscat, ' QSCAT       reports,', &
            'Read:  ', num_profiler, ' Profiler reports,', &
            'Read:  ', num_buoy, ' Buoy         reports,', &
+           'Read:  ', num_bogus, ' Bogus       reports,', &
            'Read:  ', total_obs, ' Total Observations.', &
            'There are ', total_obs - num_sound - num_synop &
                                    - num_pilot - num_satem &
@@ -803,6 +849,7 @@ loop_level: DO i = 1, platform%info%levels
                                    - num_ssmi_tb - num_ssmt1 - num_ssmt2 &
                                    - num_gpspw - num_gpsref - num_qscat  &
                                    - num_profiler - num_buoy, &
+                                   - num_bogus - num_bogus, &
                                    '  Observations unsaved.'
 
    end if
@@ -819,6 +866,7 @@ loop_level: DO i = 1, platform%info%levels
       (ob%ob_numb(ob%current_ob_time)%ships /= ob%num_ships) .or. &
       (ob%ob_numb(ob%current_ob_time)%qscat /= ob%num_qscat) .or. &
       (ob%ob_numb(ob%current_ob_time)%buoy  /= ob%num_buoy) .or. &
+      (ob%ob_numb(ob%current_ob_time)%bogus /= ob%num_bogus) .or. &
       (ob%ob_numb(ob%current_ob_time)%ssmt2 /= ob%num_ssmt1) .or. &
       (ob%ob_numb(ob%current_ob_time)%ssmt2 /= ob%num_ssmt2) .or. &
       (ob%ob_numb(ob%current_ob_time)%profiler /= ob%num_profiler)) then
@@ -848,6 +896,8 @@ loop_level: DO i = 1, platform%info%levels
            'ob%num_qscat=', ob%num_qscat, &
            'ob%ob_numb(ob%current_ob_time)%buoy =', ob%ob_numb(ob%current_ob_time)%buoy , &
            'ob%num_buoy =', ob%num_buoy , &
+           'ob%ob_numb(ob%current_ob_time)%bogus=', ob%ob_numb(ob%current_ob_time)%bogus, &
+           'ob%num_bogus=', ob%num_bogus, &
            'ob%ob_numb(ob%current_ob_time)%ssmt1=', ob%ob_numb(ob%current_ob_time)%ssmt1, &
            'ob%num_ssmt1=', ob%num_ssmt1, &
            'ob%ob_numb(ob%current_ob_time)%ssmt2=', ob%ob_numb(ob%current_ob_time)%ssmt2, &

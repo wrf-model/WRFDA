@@ -15,7 +15,7 @@ SUBROUTINE DA_OI_Stats_Gpspw ( stats_unit, oi )
    
    Gpspw%maximum%tpw = maxmin_type( missing_r, 0, 0)
    Gpspw%minimum%tpw = maxmin_type(-missing_r, 0, 0)
-   Gpspw%average = residual_type(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+   Gpspw%average = residual_type(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
    Gpspw%rms_err = Gpspw%average
 
    IF ( oi%num_Gpspw > 0 ) THEN

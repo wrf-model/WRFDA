@@ -18,7 +18,7 @@ SUBROUTINE DA_OI_Stats_Profiler ( stats_unit, oi )
    Profiler%maximum%v = maxmin_type( missing_r, 0, 0)
    Profiler%minimum%u = maxmin_type(-missing_r, 0, 0)
    Profiler%minimum%v = maxmin_type(-missing_r, 0, 0)
-   Profiler%average = residual_type(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+   Profiler%average = residual_type(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
    Profiler%rms_err = Profiler%average
 
    IF ( oi%num_Profiler > 0 ) THEN

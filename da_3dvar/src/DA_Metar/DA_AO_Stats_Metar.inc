@@ -29,7 +29,7 @@ SUBROUTINE DA_AO_Stats_Metar( stats_unit, oi, re )
    metar%minimum%t = maxmin_type(-missing_r, 0, 0)
    metar%minimum%p = maxmin_type(-missing_r, 0, 0)
    metar%minimum%q = maxmin_type(-missing_r, 0, 0)
-   metar%average = residual_type(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+   metar%average = residual_type(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
    metar%rms_err = metar%average
 
    IF ( oi%num_metar > 0 ) THEN

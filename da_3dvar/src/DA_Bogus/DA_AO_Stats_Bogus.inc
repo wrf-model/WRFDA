@@ -1,0 +1,86 @@
+SUBROUTINE DA_AO_Stats_Bogus( stats_unit, oi, re )
+
+   IMPLICIT NONE
+
+   INTEGER,        INTENT (in)      :: stats_unit    ! Output unit for stats.
+   TYPE (ob_type), INTENT (in)      :: oi            ! OI
+   TYPE ( y_type), INTENT (in)      :: re            ! A - O
+
+   TYPE (stats_type)                :: Bogus
+   INTEGER                          :: nu, nv, nslp
+   INTEGER                          :: n, k
+
+   LOGICAL, EXTERNAL :: wrf_dm_on_monitor
+
+   nu = 0
+   nv = 0
+   nslp = 0
+   num_bogus_tot = 0
+
+   Bogus%maximum%u   = maxmin_type( missing_r, 0, 0 )
+   Bogus%maximum%v   = maxmin_type( missing_r, 0, 0 )
+   Bogus%maximum%slp = maxmin_type( missing_r, 0, 0 )
+   Bogus%minimum%u   = maxmin_type(-missing_r, 0, 0 )
+   Bogus%minimum%v   = maxmin_type(-missing_r, 0, 0 )
+   Bogus%minimum%slp = maxmin_type(-missing_r, 0, 0 )
+   Bogus%average = residual_type(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+   Bogus%rms_err = Bogus%average
+ 
+   IF ( oi%num_Bogus > 0 ) THEN
+
+      DO n=1, oi%num_Bogus
+
+       if( oi%bogus(n)%loc%proc_domain ) then
+
+         CALL Stats_Calculate( n, 0, oi%Bogus(n)%slp%qc,  &
+                               re%Bogus(n)%slp, nslp,     &
+                               Bogus%minimum%slp, Bogus%maximum%slp,  &
+                               Bogus%average%slp, Bogus%rms_err%slp )
+
+         do k=1, oi%bogus(n)%info%levels
+            CALL Stats_Calculate( n, k, oi%Bogus(n)%u(k)%qc, & 
+                                  re%Bogus(n)%u(k), nu, &
+                                  Bogus%minimum%u, Bogus%maximum%u, &
+                                  Bogus%average%u, Bogus%rms_err%u )
+            CALL Stats_Calculate( n, k, oi%Bogus(n)%v(k)%qc, & 
+                                  re%Bogus(n)%v(k), nv, &
+                                  Bogus%minimum%v, Bogus%maximum%v, &
+                                  Bogus%average%v, Bogus%rms_err%v )
+         end do
+       endif
+      END DO
+
+   ENDIF
+
+! Do inter-processor communication to gather statistics.
+   call proc_sum_int( nu )
+   call proc_sum_int( nv )
+   call proc_sum_int( nslp )
+   num_bogus_tot = nu + nv + nslp 
+
+   call proc_stats_combine(Bogus%average%u, Bogus%rms_err%u, &
+                           Bogus%minimum%u%value, Bogus%maximum%u%value, &
+                           Bogus%minimum%u%n, Bogus%maximum%u%n, &
+                           Bogus%minimum%u%l, Bogus%maximum%u%l )
+   call proc_stats_combine(Bogus%average%v, Bogus%rms_err%v, &
+                           Bogus%minimum%v%value, Bogus%maximum%v%value, &
+                           Bogus%minimum%v%n, Bogus%maximum%v%n, &
+                           Bogus%minimum%v%l, Bogus%maximum%v%l )
+   call proc_stats_combine(Bogus%average%slp, Bogus%rms_err%slp, &
+                           Bogus%minimum%slp%value, Bogus%maximum%slp%value, &
+                           Bogus%minimum%slp%n, Bogus%maximum%slp%n, &
+                           Bogus%minimum%slp%l, Bogus%maximum%slp%l )
+
+   IF ( wrf_dm_on_monitor() ) THEN
+
+      IF ( nu /= 0 .or. nv /= 0 .or.  nslp /= 0 ) THEN
+  
+         write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for Bogus'
+
+         call DA_Print_Stats_Bogus(stats_unit, nu, nv, nslp, Bogus)
+
+      END IF
+
+   END IF
+
+END SUBROUTINE DA_AO_Stats_Bogus

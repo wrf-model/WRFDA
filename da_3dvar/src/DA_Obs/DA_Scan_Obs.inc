@@ -49,7 +49,7 @@ SUBROUTINE DA_Scan_Obs (iunit, ob, xp, filename)
                                    num_ssmt1, &
                                    num_ssmt2, &
                                    num_pseudo, num_qscat, &
-                                   num_profiler, num_buoy
+                                   num_profiler, num_buoy, num_bogus
 
 !----------------------------------------------------------------------------!
 !--default value.
@@ -66,6 +66,7 @@ SUBROUTINE DA_Scan_Obs (iunit, ob, xp, filename)
    ob%ob_numb(ob%current_ob_time)%qscat = ob%num_qscat
    ob%ob_numb(ob%current_ob_time)%buoy  = ob%num_buoy
    ob%ob_numb(ob%current_ob_time)%profiler = ob%num_profiler
+   ob%ob_numb(ob%current_ob_time)%bogus = ob%num_bogus
 
    ob%ob_numb(ob%current_ob_time)%ssmt1 = ob%num_ssmt1
    ob%ob_numb(ob%current_ob_time)%ssmt2 = ob%num_ssmt2
@@ -129,6 +130,7 @@ SUBROUTINE DA_Scan_Obs (iunit, ob, xp, filename)
    num_qscat = 0
    num_profiler = 0
    num_buoy = 0
+   num_bogus = 0
 
 !----------------------------------------------------------------------------!
 
@@ -396,6 +398,11 @@ loop_level: DO i = 1, platform%info%levels
             if(.not.use_ProfilerObs) cycle reports
             num_profiler = num_profiler + 1
 
+         CASE (135) ;
+
+            if(.not.use_BogusObs) cycle reports
+            num_bogus = num_bogus + 1
+
          CASE (18,19) ;             ! bouy
 
             if(.not.use_BuoyObs) cycle reports
@@ -437,6 +444,7 @@ loop_level: DO i = 1, platform%info%levels
    ob%num_qscat = ob%num_qscat + num_qscat
    ob%num_buoy  = ob%num_buoy  + num_buoy
    ob%num_profiler = ob%num_profiler + num_profiler
+   ob%num_bogus = ob%num_bogus + num_bogus
 
    ob%num_ssmt1 = ob%num_ssmt1 + num_ssmt1
    ob%num_ssmt2 = ob%num_ssmt2 + num_ssmt2
@@ -457,6 +465,7 @@ loop_level: DO i = 1, platform%info%levels
    ob%ob_numb(ob%current_ob_time)%qscat = ob%num_qscat
    ob%ob_numb(ob%current_ob_time)%buoy  = ob%num_buoy
    ob%ob_numb(ob%current_ob_time)%profiler = ob%num_profiler
+   ob%ob_numb(ob%current_ob_time)%bogus = ob%num_bogus
 
    ob%ob_numb(ob%current_ob_time)%ssmt1 = ob%num_ssmt1
    ob%ob_numb(ob%current_ob_time)%ssmt2 = ob%num_ssmt2
@@ -487,6 +496,7 @@ loop_level: DO i = 1, platform%info%levels
            'Scan:  ', num_qscat, ' QSCAT reports,', &
            'Scan:  ', num_profiler, ' Profiler reports,', &
            'Scan:  ', num_buoy, ' Buoy reports,', &
+           'Scan:  ', num_bogus, ' TCBGS reports,', &
            'Scan:  ', num_ssmt1, ' SSMT1 reports,', &
            'Scan:  ', num_ssmt2, ' SSMT2 reports.'
 

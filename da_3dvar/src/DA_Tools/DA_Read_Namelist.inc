@@ -51,6 +51,7 @@ SUBROUTINE DA_Read_Namelist
                        use_qscatobs, &
                        use_ProfilerObs, &
                        use_BuoyObs, &
+                       use_BogusObs, &
                        check_max_iv, &
                        use_obs_errfac, &
                        put_rand_seed, &
@@ -63,6 +64,7 @@ SUBROUTINE DA_Read_Namelist
                        max_airep_input, &
                        max_satem_input, &
                        max_pilot_input, &
+                       max_bogus_input, &
                        max_metar_input, &
                        max_gpspw_input, &
                        max_ships_input, &
@@ -138,6 +140,7 @@ SUBROUTINE DA_Read_Namelist
    Use_PilotObs   = .TRUE.
    Use_AirepObs   = .TRUE.
    Use_SatobObs   = .TRUE.
+   Use_BogusObs   = .FALSE.
    Use_BuoyObs    = .FALSE.
    Use_ProfilerObs= .FALSE.
    Use_SatemObs   = .FALSE.
@@ -165,6 +168,7 @@ SUBROUTINE DA_Read_Namelist
    max_gpspw_input = max_gpspw
    max_ships_input = max_ships
    max_profiler_input = max_profiler
+   max_bogus_input = max_bogus
    max_buoy_input = max_buoy
    max_ssmi_retrieval_input = max_ssmi_retrieval
    max_ssmi_tb_input = max_ssmi_tb
@@ -319,6 +323,7 @@ SUBROUTINE DA_Read_Namelist
                                ' Use_ProfilerObs  =', Use_ProfilerObs, &
                                ' Use_BuoyObs  =', Use_BuoyObs, &
                                ' Use_SoundObs  =', Use_SoundObs, &
+                               ' Use_BogusObs  =', Use_BogusObs, &
                                ' Use_RadarObs  =', Use_RadarObs, &
                                ' Use_Radar_rv  =', Use_Radar_rv, &
                                ' Use_Radar_rf  =', Use_Radar_rf, &
@@ -450,6 +455,7 @@ SUBROUTINE DA_Read_Namelist
      Use_ShipsObs         = .FALSE.
      Use_MetarObs         = .FALSE.
      Use_SoundObs         = .FALSE.
+     Use_BogusObs         = .FALSE.
      Use_PilotObs         = .FALSE.
      Use_AirepObs         = .FALSE.
      Use_SatobObs         = .FALSE.
@@ -575,6 +581,7 @@ SUBROUTINE DA_Read_Namelist
                             ' Use_RadarObs  =', Use_RadarObs, &
                             ' Use_Radar_rv  =', Use_Radar_rv, &
                             ' Use_Radar_rf  =', Use_Radar_rf, &
+                            ' Use_BogusObs  =', Use_BogusObs, &
                             ' Use_SatemObs  =', Use_SatemObs, &
                             ' Use_SatobObs  =', Use_SatobObs, &
                             ' Use_AirepObs  =', Use_AirepObs, &
