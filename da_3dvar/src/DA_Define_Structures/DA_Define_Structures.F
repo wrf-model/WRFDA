@@ -752,26 +752,10 @@ MODULE DA_Define_Structures
       REAL :: q                                   ! specific humidity.
    END TYPE residual_pseudo_type
 
-   TYPE residual_satem1_type
-      REAL :: thickness                           ! Thickness.
-   END TYPE residual_satem1_type
-
-   TYPE residual_gpsref1_type
-      REAL :: ref                   ! GPS Refractivity
-      REAL ::   p                   ! Retrieved from GPS Refractivity
-      REAL ::   t                   ! Retrieved from GPS Refractivity
-      REAL ::   q                   ! Used in GPS Refra. retrieval.
-   END TYPE residual_gpsref1_type
-
    TYPE residual_Radar_type
       REAL, POINTER :: rv(:)                    ! rv
       REAL, POINTER :: rf(:)                    ! rf
    END TYPE residual_Radar_type
-
-   TYPE residual_Radar1_type
-        REAL                    :: rv
-        REAL                    :: rf
-   END TYPE residual_Radar1_type
 
    TYPE y_type
         TYPE(ob_numb_type) :: ob_numb
@@ -819,105 +803,6 @@ MODULE DA_Define_Structures
         REAL                       :: value
         INTEGER                    :: n, l
    END TYPE maxmin_type
-
-   TYPE maxmin_stats_type
-        TYPE (maxmin_type)         :: u        ! Wind x-component in m/s
-        TYPE (maxmin_type)         :: v        ! Wind y-component in m/s
-        TYPE (maxmin_type)         :: p        ! Pressure in Pa
-        TYPE (maxmin_type)         :: t        ! Temperature in K
-        TYPE (maxmin_type)         :: q        ! Mixing ration kg/kg
-        TYPE (maxmin_type)         :: rh       ! Relative humidity %.
-        TYPE (maxmin_type)         :: tpw      ! Toatl precipitable water cm
-        TYPE (maxmin_type)         :: slp      ! Sea Level pressure (hPa)
-!       TYPE (maxmin_type)         :: Speed    ! Wind speed (m/s)
-   END TYPE maxmin_stats_type
-
-   TYPE maxmin_gpsref_stats_type
-        TYPE (maxmin_type)         :: ref          ! GPS Refractivity
-   END TYPE maxmin_gpsref_stats_type
-
-   TYPE maxmin_ssmi_rv_stats_type
-        TYPE (maxmin_type)         :: tpw      ! Toatl precipitable water cm
-        TYPE (maxmin_type)         :: Speed    ! Wind speed (m/s)
-   END TYPE maxmin_ssmi_rv_stats_type
-
-   TYPE maxmin_ssmi_tb_stats_type
-        TYPE (maxmin_type)         :: tb19v    ! brightness temperature (K)
-        TYPE (maxmin_type)         :: tb19h    ! brightness temperature (K)
-        TYPE (maxmin_type)         :: tb22v    ! brightness temperature (K)
-        TYPE (maxmin_type)         :: tb37v    ! brightness temperature (K)
-        TYPE (maxmin_type)         :: tb37h    ! brightness temperature (K)
-        TYPE (maxmin_type)         :: tb85v    ! brightness temperature (K)
-        TYPE (maxmin_type)         :: tb85h    ! brightness temperature (K)
-   END TYPE maxmin_ssmi_tb_stats_type
-
-   TYPE maxmin_satem_stats_type
-        TYPE (maxmin_type)         :: thickness    ! Satem thickness
-   END TYPE maxmin_satem_stats_type
-
-   TYPE maxmin_ssmt1_stats_type
-        TYPE (maxmin_type)         :: t            ! Temperature.
-   END TYPE maxmin_ssmt1_stats_type
-
-   TYPE maxmin_ssmt2_stats_type
-        TYPE (maxmin_type)         :: rh           ! Relative humidity.
-   END TYPE maxmin_ssmt2_stats_type
-
-   TYPE maxmin_Radar_stats_type
-        TYPE (maxmin_type)         :: rv       ! Radial velocity
-        TYPE (maxmin_type)         :: rf       ! Reflectivity
-   END TYPE maxmin_Radar_stats_type
-
-   TYPE residual_type
-      REAL          :: u                        ! u-wind.
-      REAL          :: v                        ! v-wind.
-      REAL          :: t                        ! temperature.
-      REAL          :: p                        ! pressure.
-      REAL          :: q                        ! specific humidity.
-      REAL          :: Speed                    ! Wind speed in m/s
-      REAL          :: tpw                      ! Toatl precipitable water cm
-      REAL          :: slp                      ! sea level pressure (hPa)
-   END TYPE residual_type
-
-   TYPE stats_type
-        TYPE (maxmin_stats_type)  :: maximum, minimum
-        TYPE (residual_type)      :: average, rms_err
-   END TYPE stats_type
-
-   TYPE stats_ssmi_retrieval_type
-        TYPE (maxmin_ssmi_rv_stats_type)      :: maximum, minimum
-        TYPE (residual_ssmi_retrieval_type) :: average, rms_err
-   END TYPE stats_ssmi_retrieval_type
-
-   TYPE stats_ssmi_tb_type
-        TYPE (maxmin_ssmi_tb_stats_type)  :: maximum, minimum
-        TYPE (residual_ssmi_tb_type)      :: average, rms_err
-   END TYPE stats_ssmi_tb_type
-
-   TYPE stats_satem_type
-        TYPE (maxmin_satem_stats_type)    :: maximum, minimum
-        TYPE (residual_satem1_type)       :: average, rms_err
-   END TYPE stats_satem_type
-
-   TYPE stats_gpsref_type
-        TYPE (maxmin_gpsref_stats_type)   :: maximum, minimum
-        TYPE (residual_gpsref1_type)      :: average, rms_err
-   END TYPE stats_gpsref_type
-
-   TYPE stats_ssmt1_type
-        TYPE (maxmin_ssmt1_stats_type)    :: maximum, minimum
-        TYPE (residual_ssmt1_type)       :: average, rms_err
-   END TYPE stats_ssmt1_type
-
-   TYPE stats_ssmt2_type
-        TYPE (maxmin_ssmt2_stats_type)    :: maximum, minimum
-        TYPE (residual_ssmt2_type)       :: average, rms_err
-   END TYPE stats_ssmt2_type
-
-   TYPE stats_Radar_type
-        TYPE (maxmin_Radar_stats_type)  :: maximum, minimum
-        TYPE (residual_Radar1_type)     :: average, rms_err
-   END TYPE stats_Radar_type
 
 !-----------------------------------------------------------------------------
 !  [5.0] Control variable structure:

@@ -5,7 +5,7 @@ SUBROUTINE DA_OI_Stats_Sound ( stats_unit, oi )
    INTEGER,        INTENT (in)      :: stats_unit    ! Output unit for stats.
    TYPE (ob_type), INTENT (in)      :: oi            ! OI
 
-   TYPE (stats_type)                :: Sound
+   TYPE (stats_sound_type)          :: Sound
    INTEGER                          :: nu, nv, nt, nq
    INTEGER                          :: n, k
 
@@ -19,14 +19,12 @@ SUBROUTINE DA_OI_Stats_Sound ( stats_unit, oi )
    Sound%maximum%u = maxmin_type( missing_r, 0, 0)
    Sound%maximum%v = maxmin_type( missing_r, 0, 0)
    Sound%maximum%t = maxmin_type( missing_r, 0, 0)
-   Sound%maximum%p = maxmin_type( missing_r, 0, 0)
    Sound%maximum%q = maxmin_type( missing_r, 0, 0)
    Sound%minimum%u = maxmin_type(-missing_r, 0, 0)
    Sound%minimum%v = maxmin_type(-missing_r, 0, 0)
    Sound%minimum%t = maxmin_type(-missing_r, 0, 0)
-   Sound%minimum%p = maxmin_type(-missing_r, 0, 0)
    Sound%minimum%q = maxmin_type(-missing_r, 0, 0)
-   Sound%average = residual_type(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+   Sound%average = residual_sound1_type(0.0, 0.0, 0.0, 0.0)
    Sound%rms_err = Sound%average
 
    IF ( oi%num_Sound > 0 ) THEN

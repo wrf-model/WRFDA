@@ -6,7 +6,7 @@ SUBROUTINE DA_AO_Stats_Ships( stats_unit, oi, re )
    TYPE (ob_type), INTENT (in)      :: oi            ! OI
    TYPE ( y_type), INTENT (in)      :: re            ! A - O
 
-   TYPE (stats_type)                :: ships
+   TYPE (stats_ships_type)          :: ships
    INTEGER                          :: nu, nv, nt, np, nq
    INTEGER                          :: n
 
@@ -29,7 +29,7 @@ SUBROUTINE DA_AO_Stats_Ships( stats_unit, oi, re )
    ships%minimum%t = maxmin_type(-missing_r, 0, 0)
    ships%minimum%p = maxmin_type(-missing_r, 0, 0)
    ships%minimum%q = maxmin_type(-missing_r, 0, 0)
-   ships%average = residual_type(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+   ships%average = residual_ships1_type(0.0, 0.0, 0.0, 0.0, 0.0)
    ships%rms_err = ships%average
 
    IF ( oi%num_ships > 0 ) THEN

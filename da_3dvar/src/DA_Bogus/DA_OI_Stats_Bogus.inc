@@ -5,10 +5,9 @@ SUBROUTINE DA_OI_Stats_Bogus ( stats_unit, oi )
    INTEGER,        INTENT (in)      :: stats_unit    ! Output unit for stats.
    TYPE (ob_type), INTENT (in)      :: oi            ! OI
 
-   TYPE (stats_type)                :: Bogus
+   TYPE (stats_bogus_type)          :: Bogus
    INTEGER                          :: nu, nv, nslp
    INTEGER                          :: n, k
-
    LOGICAL, EXTERNAL :: wrf_dm_on_monitor
 
    nslp = 0
@@ -21,7 +20,7 @@ SUBROUTINE DA_OI_Stats_Bogus ( stats_unit, oi )
    Bogus%minimum%u = maxmin_type(-missing_r, 0, 0)
    Bogus%minimum%v = maxmin_type(-missing_r, 0, 0)
    Bogus%minimum%slp = maxmin_type(-missing_r, 0, 0)
-   Bogus%average = residual_type(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+   Bogus%average = residual_bogus1_type(0.0, 0.0, 0.0)
    Bogus%rms_err = Bogus%average
 
    IF ( oi%num_Bogus > 0 ) THEN

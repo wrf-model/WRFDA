@@ -5,7 +5,7 @@ SUBROUTINE DA_OI_Stats_Profiler ( stats_unit, oi )
    INTEGER,        INTENT (in)      :: stats_unit    ! Output unit for stats.
    TYPE (ob_type), INTENT (in)      :: oi            ! OI
 
-   TYPE (stats_type)                :: Profiler
+   TYPE (stats_profiler_type)       :: Profiler
    INTEGER                          :: nu, nv
    INTEGER                          :: n, k
 
@@ -18,7 +18,7 @@ SUBROUTINE DA_OI_Stats_Profiler ( stats_unit, oi )
    Profiler%maximum%v = maxmin_type( missing_r, 0, 0)
    Profiler%minimum%u = maxmin_type(-missing_r, 0, 0)
    Profiler%minimum%v = maxmin_type(-missing_r, 0, 0)
-   Profiler%average = residual_type(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+   Profiler%average = residual_profiler1_type(0.0, 0.0)
    Profiler%rms_err = Profiler%average
 
    IF ( oi%num_Profiler > 0 ) THEN

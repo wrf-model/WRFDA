@@ -6,7 +6,7 @@ SUBROUTINE DA_AO_Stats_Bogus( stats_unit, oi, re )
    TYPE (ob_type), INTENT (in)      :: oi            ! OI
    TYPE ( y_type), INTENT (in)      :: re            ! A - O
 
-   TYPE (stats_type)                :: Bogus
+   TYPE (stats_bogus_type)          :: Bogus
    INTEGER                          :: nu, nv, nslp
    INTEGER                          :: n, k
 
@@ -23,7 +23,7 @@ SUBROUTINE DA_AO_Stats_Bogus( stats_unit, oi, re )
    Bogus%minimum%u   = maxmin_type(-missing_r, 0, 0 )
    Bogus%minimum%v   = maxmin_type(-missing_r, 0, 0 )
    Bogus%minimum%slp = maxmin_type(-missing_r, 0, 0 )
-   Bogus%average = residual_type(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+   Bogus%average = residual_bogus1_type(0.0, 0.0, 0.0)
    Bogus%rms_err = Bogus%average
  
    IF ( oi%num_Bogus > 0 ) THEN

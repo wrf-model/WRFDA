@@ -5,7 +5,7 @@ SUBROUTINE DA_OI_Stats_Satob ( stats_unit, oi )
    INTEGER,        INTENT (in)      :: stats_unit    ! Output unit for stats.
    TYPE (ob_type), INTENT (in)      :: oi            ! OI
 
-   TYPE (stats_type)                :: satob
+   TYPE (stats_satob_type)                :: satob
    INTEGER                          :: nu, nv, nt
    INTEGER                          :: n
 
@@ -18,7 +18,7 @@ SUBROUTINE DA_OI_Stats_Satob ( stats_unit, oi )
    satob%maximum%v = maxmin_type( missing_r, 0, 0)
    satob%minimum%u = maxmin_type(-missing_r, 0, 0)
    satob%minimum%v = maxmin_type(-missing_r, 0, 0)
-   satob%average = residual_type(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+   satob%average = residual_satob1_type(0.0, 0.0)
    satob%rms_err = satob%average
 
    IF ( oi%num_satob > 0 ) THEN

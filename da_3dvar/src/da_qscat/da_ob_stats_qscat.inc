@@ -5,7 +5,7 @@ subroutine da_ob_stats_qscat ( stats_unit, oi )
    INTEGER,        INTENT (in)      :: stats_unit    ! Output unit for stats.
    TYPE (ob_type), INTENT (in)      :: oi            ! OI
 
-   TYPE (stats_type)                :: qscat
+   TYPE (stats_qscat_type)          :: qscat
    INTEGER                          :: nu, nv
    INTEGER                          :: n
 
@@ -18,7 +18,7 @@ subroutine da_ob_stats_qscat ( stats_unit, oi )
    qscat%maximum%v = maxmin_type(-1.0E+20, 0, 0)
    qscat%minimum%u = maxmin_type( 1.0E+20, 0, 0)
    qscat%minimum%v = maxmin_type( 1.0E+20, 0, 0)
-   qscat%average = residual_type(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+   qscat%average = residual_qscat1_type(0.0, 0.0)
    qscat%rms_err = qscat%average
 
    IF ( oi%num_qscat > 0 ) THEN

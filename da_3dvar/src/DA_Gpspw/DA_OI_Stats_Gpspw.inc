@@ -5,7 +5,7 @@ SUBROUTINE DA_OI_Stats_Gpspw ( stats_unit, oi )
    INTEGER,        INTENT (in)      :: stats_unit    ! Output unit for stats.
    TYPE (ob_type), INTENT (in)      :: oi            ! OI
 
-   TYPE (stats_type)                :: Gpspw
+   TYPE (stats_gpspw_type)                :: Gpspw
    INTEGER                          :: ntpw
    INTEGER                          :: n
 
@@ -15,7 +15,7 @@ SUBROUTINE DA_OI_Stats_Gpspw ( stats_unit, oi )
    
    Gpspw%maximum%tpw = maxmin_type( missing_r, 0, 0)
    Gpspw%minimum%tpw = maxmin_type(-missing_r, 0, 0)
-   Gpspw%average = residual_type(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+   Gpspw%average = residual_gpspw1_type(0.0)
    Gpspw%rms_err = Gpspw%average
 
    IF ( oi%num_Gpspw > 0 ) THEN

@@ -5,7 +5,7 @@ SUBROUTINE DA_OI_Stats_Sonde_sfc ( stats_unit, oi )
    INTEGER,        INTENT (in)      :: stats_unit    ! Output unit for stats.
    TYPE (ob_type), INTENT (in)      :: oi            ! OI
 
-   TYPE (stats_type)                :: sonde_sfc
+   TYPE (stats_sonde_sfc_type)      :: sonde_sfc
    INTEGER                          :: nu, nv, nt, np, nq
    INTEGER                          :: n
 
@@ -27,9 +27,8 @@ SUBROUTINE DA_OI_Stats_Sonde_sfc ( stats_unit, oi )
    sonde_sfc%minimum%t = maxmin_type(-missing_r, 0, 0)
    sonde_sfc%minimum%p = maxmin_type(-missing_r, 0, 0)
    sonde_sfc%minimum%q = maxmin_type(-missing_r, 0, 0)
-   sonde_sfc%average = residual_type(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
-   sonde_sfc%rms_err = residual_type(1.0e-20, 1.0e-20, 1.0e-20, 1.0e-20, &
-                                 1.0e-20, 1.0e-20, 1.0e-20, 1.0e-20)
+   sonde_sfc%average = residual_sonde_sfc1_type(0.0, 0.0, 0.0, 0.0, 0.0)
+   sonde_sfc%rms_err = sonde_sfc%average
 
 !  IF ( oi%num_sound < 1 ) return
 
