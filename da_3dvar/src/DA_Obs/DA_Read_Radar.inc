@@ -9,10 +9,6 @@ SUBROUTINE DA_Read_Radar (iunit, ob, xp, filename)
 !              the WRF space, July 2004, Jianfeng Gu
 !   History of multi Radar Obs., 29 September 2004, Jianfeng Gu
 !              Finalized on February 03, 2005, Qingnong Xiao
-!
-!             03/30/2005           Syed RH Rizvi
-!             For global option duplicate obs at East/West boundary
-!
 !----------------------------------------------------------------------------------------!
 
    implicit none
@@ -34,8 +30,6 @@ SUBROUTINE DA_Read_Radar (iunit, ob, xp, filename)
    LOGICAL                       :: outside
 
    INTEGER                       :: total_obs, num_Radar, total_Radar
-
-   INTEGER                        ::n_dup, ndup
 
 ! -------------------------------------------------------------------
 
@@ -257,12 +251,6 @@ SUBROUTINE DA_Read_Radar (iunit, ob, xp, filename)
     endif
 
 
-!    Loop over duplicating obs for global
-   n_dup = 1
-   if(global .and. &
-     (platform%loc%i == xp%ids .or. platform%loc%i == xp%ide))n_dup= 2
-   DO ndup = 1, n_dup
-
        SELECT CASE ( fm )
  
           CASE (128)
@@ -309,16 +297,6 @@ SUBROUTINE DA_Read_Radar (iunit, ob, xp, filename)
                'platform % info % levels=', platform % info % levels
 
        END SELECT
-
-      if( global .and. ndup == 1 ) then
-      if( platform%loc % i >= xp % ide) then
-      platform%loc%i = xp % ids
-      platform%loc%proc_domain = .FALSE.
-      else if( platform%loc % i <= xp % ids) then
-      platform%loc%i = xp % ide
-      platform%loc%proc_domain = .FALSE.
-      end if
-     end if
 
    ENDDO reports
 
