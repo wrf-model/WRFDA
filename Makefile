@@ -99,7 +99,7 @@ be :
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES_2)" gen_be_short
 	( cd gen_be ; \
 	/bin/rm -f *.exe ; \
-	$(MAKE) MODULE_DIRS="$(DA_GEN_BE_MODULES)" SOLVER=gen_be )
+	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" SOLVER=gen_be )
 
 be_wrf :
 	/bin/rm -f main/libwrflib.a
