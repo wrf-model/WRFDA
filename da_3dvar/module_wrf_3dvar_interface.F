@@ -37,13 +37,13 @@ SUBROUTINE da_3dvar_interface ( grid, config_flags )
 ! Model layer modules
    USE module_model_constants
 
-!  USE DA_Constants
-!  USE DA_Define_Structures
-!  USE DA_Setup_Structures
-!  USE DA_Test
-!  USE DA_Tools
-!  USE DA_Minimisation
-!  USE par_util
+   USE DA_Constants
+   USE DA_Define_Structures
+   USE DA_Setup_Structures
+   USE DA_Test
+   USE DA_Tools
+   USE DA_Minimisation
+   USE par_util
 
 ! Registry generated module
 !  USE module_state_description

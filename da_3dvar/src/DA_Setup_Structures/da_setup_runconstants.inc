@@ -5,7 +5,7 @@ SUBROUTINE DA_Setup_RunConstants( xp, xbx, ds )
 !
 !  HISTORY: 01/06/2000 - Creation of F90 version.           Dale Barker
 !           10/19/2001 - Mods for parallel implementation.  Al Bourgeois
-!           09/26/2006 - Mods for parallel implementation to WRF.  Wei Huang
+!           09/26/2004 - Mods for parallel implementation to WRF.  Wei Huang
 !
 !  PARENT_MODULE: DA_Setup_Structures
 !------------------------------------------------------------------------------

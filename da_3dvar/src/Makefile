@@ -57,8 +57,6 @@ TARGETDIR    =  ../..
 3dvar :		$(OBJS_FOR_ALL)
 		$(AR) ../../main/libwrflib.a $(OBJS_FOR_ALL)
 
-include ../../configure.wrf
-
 gen_be :	$(OBJS_FOR_GEN_BE)
 		$(AR) ../../main/libwrflib.a $(OBJS_FOR_GEN_BE)
 
@@ -743,6 +741,7 @@ DA_Dynamics.o:		\
 			DA_Dynamics/DA_UV_To_Divergence_Adj.inc \
 			DA_Dynamics/DA_W_Adjustment_Lin.inc \
 			DA_Dynamics/DA_W_Adjustment_Adj.inc \
+			DA_Dynamics/DA_WZ_BASE.inc \
 			DA_Dynamics/DA_UV_To_Vorticity.inc
 			$(RM) $@
 			$(CPP) -I./DA_Dynamics $(CPPFLAGS_3DVAR) DA_Dynamics/DA_Dynamics.F > DA_Dynamics.f
@@ -795,6 +794,7 @@ DA_Physics.o:		\
 			DA_Physics/da_sfc_pre_Adj.inc \
 			DA_Physics/da_filter.inc \
 			DA_Physics/da_filter_adj.inc \
+			DA_Physics/da_wdt.inc \
 			DA_Physics/DA_Moist_Phys_Adj.inc \
 			DA_Physics/DA_Moist_Phys_Lin.inc
 			$(RM) $@
@@ -935,17 +935,17 @@ DA_Constants.o:		DA_Constants/DA_Constants.F \
 
 da_mat.o:		DA_VToX_Transforms/da_mat.f
 			$(RM) $@
-			$(CPP) DA_VToX_Transforms/da_mat.f > da_mat.f
+			$(CPP) $(TRADFLAG) DA_VToX_Transforms/da_mat.f > da_mat.f
 			$(FC) -c $(FCFLAGS_3DVAR) da_mat.f
 
 da_rfz.o:		DA_VToX_Transforms/da_rfz.f
 			$(RM) $@
-			$(CPP) DA_VToX_Transforms/da_rfz.f > da_rfz.f
+			$(CPP) $(TRADFLAG) DA_VToX_Transforms/da_rfz.f > da_rfz.f
 			$(FC) -c $(FCFLAGS_FFT_RF) da_rfz.f
 
 da_rf.o:		DA_VToX_Transforms/da_rf.f
 			$(RM) $@
-			$(CPP) DA_VToX_Transforms/da_rf.f > da_rf.f
+			$(CPP) $(TRADFLAG) DA_VToX_Transforms/da_rf.f > da_rf.f
 			$(FC) -c $(FCFLAGS_FFT_RF) da_rf.f
 
 LAPACK.o:		\
