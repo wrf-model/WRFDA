@@ -68,6 +68,32 @@ as shown below.
 >     Final cost function J  =  3935.45092556085228
 >     Final 3DVAR value of Jo =      3807.54304
 >     Final 3DVAR value of Jb =       127.90789
+------------------------------------------------------
+Test results (run on Cray )
+------------------------------------------------------
+ tarting outer iteration :   1
+  Original gradient is  1.53172280E+04
+  For this outer iteration Gradient target is  1.53172280E+02
+  Starting Cost function:  1.96672808E+05 Gradient=  1.53172280E+04
+
+  After 10 iterations:
+  Inner iteration stopped after   10 iterations
+   Final cost function :  1.31352755E+05 and Gradient:  3.19523699E+03
+ ----------------------------------------------------------       
+
+Test results (on Mac (Mahua)   
+------------------------------------------------------
+  
+  Starting outer iteration :   1
+  Original gradient is  1.53172280D+04
+  For this outer iteration Gradient target is  1.53172280D+02
+  Starting Cost function:  1.96672808D+05 Gradient=  1.53172280D+04
+ ----------------------------------------------------------
+
+  After 10 iterations:
+ Inner iteration stopped after   10 iterations
+  Final cost function :  1.31352755D+05 and Gradient:  3.19523699D+03
+ ----------------------------------------------------------
 --------------------------------------------------------------------------------------
 Files removed:
 --------------
