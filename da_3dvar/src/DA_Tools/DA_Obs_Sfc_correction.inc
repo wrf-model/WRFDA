@@ -47,12 +47,14 @@ SUBROUTINE DA_Obs_Sfc_correction(sfc_obs, xb )
          dy = sfc_obs%loc%dy
          dxm = sfc_obs%loc%dxm
          dym = sfc_obs%loc%dym
+
 !-----Model roughness at the obs site
 
       roughness = dym*(dxm*xb%rough(i,j)   + dx*xb%rough(i+1,j)) &
                 + dy *(dxm*xb%rough(i,j+1) + dx*xb%rough(i+1,j+1))
 
       model_profile: do k = xb%kts, xb%kte
+
          pressure(k) = dym*(dxm*xb%p(i,j  ,k) + dx*xb%p(i+1,j  ,k)) &
                      + dy *(dxm*xb%p(i,j+1,k) + dx*xb%p(i+1,j+1,k))
 
@@ -72,6 +74,7 @@ SUBROUTINE DA_Obs_Sfc_correction(sfc_obs, xb )
                      + dy *(dxm*xb%v(i,j+1,k) + dx*xb% v(i+1,j+1,k))
 
      enddo model_profile
+
 ! 3. OBS data and recover the surface pressure from the
 !    mean sea level pressure (mslp)
 
@@ -81,13 +84,12 @@ SUBROUTINE DA_Obs_Sfc_correction(sfc_obs, xb )
       qo   = sfc_obs % q % inv
       uo   = sfc_obs % u % inv
       vo   = sfc_obs % v % inv
+
 ! 3.1 Compute the surface OBS pressure from mean sea level pressure
-
+ 
       mslp = sfc_obs % loc % slp % inv
-      psfc = sfc_obs % p % inv
-
-      if (abs(sfc_obs % p % inv - missing_r) < 1.) then
       if (abs(mslp - missing_r) > 1.) then
+         psfc = missing_r
          if (abs(ho - missing_r) > 1.) then
             if (abs(to - missing_r) > 1.) then
                CALL sfcprs (xb%kts, xb%kte, pressure, t_mdl, q_mdl, &
@@ -98,21 +100,6 @@ SUBROUTINE DA_Obs_Sfc_correction(sfc_obs, xb )
             endif
          endif
          sfc_obs % p % inv = psfc
-      else
-         sfc_obs % u % inv = missing_r
-         sfc_obs % v % inv = missing_r
-         sfc_obs % t % inv = missing_r
-         sfc_obs % p % inv = missing_r
-         sfc_obs % q % inv = missing_r
-
-         sfc_obs % u % qc  = missing
-         sfc_obs % v % qc  = missing
-         sfc_obs % t % qc  = missing
-         sfc_obs % p % qc  = missing
-         sfc_obs % q % qc  = missing
-
-         return
-      endif
       endif
 
       if(sfc_obs % p % inv < 1.0) then
@@ -154,6 +141,7 @@ SUBROUTINE DA_Obs_Sfc_correction(sfc_obs, xb )
         pm = pressure (xb%kts)
         qm = q_mdl(xb%kts)
         hm = height(xb%kts)
+
 ! 3.2 Correction wind based on similarity laws
 !     -------------------------------------------
 
@@ -192,7 +180,7 @@ SUBROUTINE DA_Obs_Sfc_correction(sfc_obs, xb )
 ! 3.4 Correct pressure
 !     ----------------
 
-
+     
            IF (sfc_obs % p % qc >= 0) THEN
 
              !  Correct data
@@ -213,13 +201,13 @@ SUBROUTINE DA_Obs_Sfc_correction(sfc_obs, xb )
 
            ENDIF
 
-
 ! 3.5 Correct temperature
 !     -------------------
 
            IF (abs(sfc_obs % t % inv - missing_r) > 1.) THEN
 
                !  Correct data
+
                CALL intpsfc_tem (val, ho, po, to, height, pressure, t_mdl, xb%kts, xb%kte)
 
                sfc_obs % t % inv = val
@@ -338,7 +326,9 @@ SUBROUTINE INTPSFC_TEM (val, ho, po, to, height, pressure, temp, kts, kte)
 
 ! 1.1 Convert model pressure profile from Pa to hPa  
 !     ---------------------------------------------
+
        prs_mb = pressure / 100.
+
 ! 1.2  Find levels surface + 100hPA
 !      ----------------------------
 
@@ -353,6 +343,7 @@ SUBROUTINE INTPSFC_TEM (val, ho, po, to, height, pressure, temp, kts, kte)
               EXIT
           ENDIF
        ENDDO
+
 ! 1.2  Find levels surface + 200hPA
 !      ----------------------------
 
