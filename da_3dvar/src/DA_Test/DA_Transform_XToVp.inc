@@ -21,14 +21,13 @@ SUBROUTINE DA_Transform_XToVp( xb, xbx, xa, xp, vp, be, &
    integer, intent(in)  :: ims,ime, jms,jme, kms,kme  ! memory dims.
    integer, intent(in)  :: its,ite, jts,jte, kts,kte  ! tile   dims.
 
-   real, dimension(ims:ime,jms:jme)         :: grid_coeff  ! Gridpoint coeffs.
    real, dimension(ims:ime,jms:jme,kms:kme) :: vor, & ! Vorticity.
                                                div, & ! Divergence.
                                                phi_b  ! Balanced mass increment.
 
    real, dimension(kms:kme,ims:ime,jms:jme) :: phi_b_copy
    real, dimension(kms:kme,jms:jme,kms:kme) :: reg_copy
-   real, dimension(ims:ime,jms:jme)         :: coeff  ! Multiplicative coeff.
+   real, dimension(ims:ime,jms:jme)         :: one_over_m2    !   Multiplicative coeff.
 
    integer :: i, j, k, kk                             ! Loop counters.
    real :: sum_vphi                                   ! Summing variable.
@@ -45,8 +44,7 @@ SUBROUTINE DA_Transform_XToVp( xb, xbx, xa, xp, vp, be, &
       stop 'Wrong cv_options.'
    ENDIF
 
-   grid_coeff(its:ite,jts:jte) = 1.0 / ( xb % map_factor(its:ite,jts:jte) * &
-                                       xb % map_factor(its:ite,jts:jte) )
+
 
    call DA_Zero_vp_type ( vp )
 
@@ -69,20 +67,16 @@ SUBROUTINE DA_Transform_XToVp( xb, xbx, xa, xp, vp, be, &
 !  Convert vorticity to Del**2 psi:
    if(.not. global ) then               
      if (fg_format == 1 .or. fg_format == 2) then
-    coeff(its:ite,jts:jte) = 1.0 / ( xb % map_factor(its:ite,jts:jte) * &
+    one_over_m2(its:ite,jts:jte) = 1.0 / ( xb % map_factor(its:ite,jts:jte) * &
                                         xb % map_factor(its:ite,jts:jte) )
     DO k = kts, kte
-       vor(its:ite,jts:jte,k) = coeff(its:ite,jts:jte)*vor(its:ite,jts:jte,k)
+       vor(its:ite,jts:jte,k) = one_over_m2(its:ite,jts:jte)*vor(its:ite,jts:jte,k)
     END DO
     else
     print*,' Wrong choice of fg_format= ',fg_format,' with global = ',global
     stop
     end if
    end if
-
-   DO k = kts, kte
-      vor(its:ite,jts:jte,k) = grid_coeff(its:ite,jts:jte)*vor(its:ite,jts:jte,k)
-   END DO
 
 !  Calculate psi:
   print*,' calling Solve_PoissonEquation for Psi'
@@ -108,17 +102,13 @@ SUBROUTINE DA_Transform_XToVp( xb, xbx, xa, xp, vp, be, &
    if(.not. global )  then              
      if (fg_format == 1 .or. fg_format == 2) then
     DO k = kts, kte
-      div(its:ite,jts:jte,k) = coeff(its:ite,jts:jte) * div(its:ite,jts:jte,k)
+      div(its:ite,jts:jte,k) = one_over_m2(its:ite,jts:jte) * div(its:ite,jts:jte,k)
     END DO
     else
     print*,' Wrong choice of fg_format= ',fg_format,' with global = ',global
     stop
     end if
    end if
-
-   DO k = kts, kte
-      div(its:ite,jts:jte,k) = grid_coeff(its:ite,jts:jte) * div(its:ite,jts:jte,k)
-   END DO
 
 !  Calculate chi:
 
