@@ -253,11 +253,7 @@ externals : CONFIGURE_WRFIO_NF wrfio_int wrfio_grib1 esmf_time lib_rsl
           /bin/cp module_dm_warning module_dm.F ; cat ../external/RSL/module_dm.F >> module_dm.F )
 
 lib_rsl :
-	( cd ../external/RSL/RSL ; \
-          make CC=$(CC) FC='mpif90 -byteswapio' \
-               MAX_DOMAINS=$(MAX_DOMAINS) \
-               MAX_PROC=$(MAX_PROC) \
-               LEARN_BCAST=-DLEARN_BCAST linux )
+	( cd ../external/RSL/RSL ; make CC="$(CC)" FC="$(FC) -byteswapio" MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) LEARN_BCAST=-DLEARN_BCAST linux )
 
 ###########################################################
 #ARCH Intel xeon i686 ia32 Xeon Linux, ifort compiler (single-threaded, no nesting)
