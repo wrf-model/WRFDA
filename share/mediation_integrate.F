@@ -158,7 +158,7 @@ SUBROUTINE med_nest_initial ( parent , nest , config_flags )
    TYPE (grid_config_rec_type) , INTENT(IN)   :: config_flags
    TYPE (grid_config_rec_type)                :: nest_config_flags
 
-#if (EM_CORE == 1)
+#if (EM_CORE == 1 && DA_CORE != 1)
   ! Local
    INTEGER                                    :: idum1 , idum2 , fid, ierr
    INTEGER                                    :: i , j
@@ -398,7 +398,7 @@ SUBROUTINE init_domain_constants ( parent , nest )
    USE module_domain
    IMPLICIT NONE
    TYPE(domain) :: parent , nest
-#if (EM_CORE == 1)
+#if (EM_CORE == 1 && DA_CORE != 1)
    INTERFACE 
      SUBROUTINE med_init_domain_constants ( parent , nest )
         USE module_domain
