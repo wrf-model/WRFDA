@@ -1,6 +1,7 @@
-subroutine da_v_to_vv_spectral(ni, nj,max_wavenumber, inc,lenr, &
-                lensav,lenwrk, alp_size, r_cvsize, alp, wsave,  &
-                power, rcv,field)
+subroutine da_v_to_vv_spectral(xbx, power, rcv, field, &
+                               ids, ide, jds, jde, &
+                               ims, ime, jms, jme, &
+                               its, ite, jts, jte )
 
 !-------------------------------------------------------------------------
 !  Performs spectral to gridpoint transformation on a sphere.
@@ -10,68 +11,61 @@ subroutine da_v_to_vv_spectral(ni, nj,max_wavenumber, inc,lenr, &
 
    implicit none
 
-   integer, intent(in) :: ni                         ! Number of longitudes.
-   integer, intent(in) :: nj                         ! Number of latitudes.
-   integer, intent(in) :: max_wavenumber             ! Smallest scale required (ni/2 - 1).
-   integer, intent(in) :: inc                        ! Jump between elements of vector in array.
-   integer, intent(in) :: lenr                       ! FFT array dimension (at least inc*(n-1)+1).
-   integer, intent(in) :: lensav                     ! wsave dimension (n+int(log(real(ni)))+4).
-   integer, intent(in) :: lenwrk                     ! Dimension of work array.
-   integer, intent(in) :: alp_size                   ! Size of ALP vector.
-   integer, intent(in) :: r_cvsize                   ! Size of real cv-array      
-   real, intent(in)    :: alp(1:alp_size)            ! Associated Legendre Polynomials.
-   real, intent(in)    :: wsave(1:lensav)            ! Primes for FFT.
-   real, intent(in)    :: rcv(1:r_cvsize)            ! Spectral modes.
-   real, intent(in)    :: power(0:max_wavenumber)    ! Power spectrum 
-   real, intent(out)   :: field(1:ni,1:nj)           ! Gridpoint field.
-   integer             ::  i, j, k , m , n, mm       ! Loop counters.
+   type (xbx_type),intent(in) :: xbx  ! For header & non-grid arrays.
+   integer,        intent(in) :: ids, ide, jds, jde, &
+                                 ims, ime, jms, jme, &
+                                 its, ite, jts, jte
+
+   real, intent(out)   :: field(ims:ime,jms:jme)     ! Gridpoint field.
+
+   real, intent(in)    :: rcv(1:2*xbx%c_cv_size)            ! Spectral modes.
+   real, intent(in)    :: power(0:xbx%max_wavenumber)    ! Power spectrum 
+
+   integer             ::  i, j, k , m , n           ! Loop counters.
    integer             :: index_start, index_end     ! Position markers in cv.
    integer             :: index                      ! Position markers in rcv.
    integer             :: index_r, index_c           ! Array index for complex v_fou.
    integer             :: ier                        ! Error return.
 
-   complex, allocatable:: cv(:)                      ! Spectral modes.
-   integer             :: c_cvsize                   ! Size of complex cv-array
-   complex             :: v_fou(1:nj,0:max_wavenumber)! Intermediate Fourier state.
-   complex             :: r_leg(1:nj)                ! Leg Tra. array.
-   real                :: r_fou(1:lenr)              ! FFT array.
-   real                :: work(1:lenwrk)             ! FFT work array. 
-!---------------------------------------------------------------------------------
-   real                :: xx
+   real                :: r_fou(1:xbx%lenr)              ! FFT array.
+   real                :: work(1:xbx%lenwrk)             ! FFT work array. 
 
-   c_cvsize = 0.5 * r_cvsize     
-   allocate (cv(1:c_cvsize))
+   complex             :: v_fou(its:ite,0:xbx%max_wavenumber)! Intermediate Fourier state.
+   complex             :: r_leg(jts:jte)                ! Leg Tra. array.
+
+   complex, dimension(xbx%c_cv_size) :: cv              ! Spectral modes.
+   real                :: xx
 !---------------------------------------------------------------------------------
-      v_fou = 0.0
-      do n = 1, c_cvsize
-      mm =  2*n - 1    
-      cv(n)  = CMPLX( rcv(mm), rcv(mm+1) )
-      end do
+
+   v_fou = 0.0
+   do n = 1, xbx%c_cv_size
+      cv(n)  = CMPLX( rcv(2*n-1), rcv(2*n) )
+   end do
 !---------------------------------------------------------------------------------
 ! [1]  Adjust Power spectrum
-     if( .not. test_transforms ) &
-     call da_apply_power(power, max_wavenumber, cv, c_cvsize)
+   if( .not. test_transforms ) &
+     call da_apply_power(power, xbx%max_wavenumber, cv, xbx%c_cv_size)
 !---------------------------------------------------------------------------------
 !  [2] Perform inverse Legendre decomposition in N-S direction:
 
-   do m = 0, max_wavenumber
-      index_start = m * ( max_wavenumber + 1 - m ) + m * ( m + 1 ) / 2 + 1
-      index_end   = index_start + max_wavenumber - m
-      call da_leg_tra_inv ( nj, max_wavenumber, alp_size, m, alp, cv(index_start:index_end), r_leg )
-
-      v_fou(1:nj,m) = r_leg(1:nj)
+   do m = 0, xbx%max_wavenumber
+      index_start = m * ( xbx%max_wavenumber + 1 - m ) + m * ( m + 1 ) / 2 + 1
+      index_end   = index_start + xbx%max_wavenumber - m
+      call da_leg_tra_inv(jds, jde, jts, jte, xbx%max_wavenumber, xbx%alp_size, m, xbx%alp, cv(index_start:index_end),  v_fou(jts:jte,m) )
    end do
+
 !---------------------------------------------------------------------------------
 
 !  [3] Perform inverse Fourier decomposition in E-W direction:
 
-   do j = 1, nj
-      r_fou(1)  =  real(v_fou(j,0 ))  ! R(m=0) is real.
-      r_fou(ni) = aimag(v_fou(j,0))   ! R(m=NI/2) is real, but packed in imag m = 0)
-!rizvi make r_fou(ni) zero as there is no power computed corresponding to this wavenumber
-      r_fou(ni) = 0.      
+   do j = jts, jte
+      r_fou(its) =  real(v_fou(j,0 ))  ! R(m=0) is real.
+!     r_fou(ite) = aimag(v_fou(j,0))   ! R(m=NI/2) is real, but packed in imag m = 0)
+!-----make r_fou(ni) zero as there is no power computed corresponding to this wavenumber
 
-      do m = 1, max_wavenumber
+      r_fou(ite) = 0.      
+
+      do m = 1, xbx%max_wavenumber
          index_r = 2 * m
          index_c = 2 * m + 1
          r_fou(index_r) = real(v_fou(j,m))
@@ -79,10 +73,9 @@ subroutine da_v_to_vv_spectral(ni, nj,max_wavenumber, inc,lenr, &
       end do
 
 !---------------------------------------------------------------------------------
-      call rfft1b( ni, inc, r_fou, lenr, wsave, lensav, work, lenwrk, ier )
-      field(1:ni,j) = r_fou(1:ni)
-
+      call rfft1b( xbx%ni, xbx%inc, r_fou, xbx%lenr, xbx%wsave, xbx%lensav, work, xbx%lenwrk, ier )
+      field(its:ite,j) = r_fou(its:ite)
    end do
    
-   deallocate (cv)
 end subroutine da_v_to_vv_spectral
+

@@ -1,6 +1,7 @@
 module da_spectral
 
    use da_constants
+   use DA_Define_Structures
    use da_fftpack5
 
 !-----------------------------------------------------------------------

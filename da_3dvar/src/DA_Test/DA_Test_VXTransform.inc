@@ -34,9 +34,9 @@ SUBROUTINE DA_Test_VXTransform( xb, xbx, xp, be, &
    TYPE (vp_type), intent(out)       :: vv          ! Test CV structure.
 
    real, dimension(1:cv_size)        :: cv          ! Test control variable.
-   real , allocatable  :: field(:,:)
    integer            :: i   
    TYPE (vp_type)                    :: vp1, vv1    ! Test CV structure.
+   real, dimension(ims:ime, jms:jme) :: field
 !-------------------------------------------------------------------------
 
    real, dimension(ims:ime, jms:jme, kms:kme) :: xa2_u, xa2_v, xa2_t, &
@@ -246,13 +246,12 @@ SUBROUTINE DA_Test_VXTransform( xb, xbx, xp, be, &
 !  [8.0]: Perform Spectral transform tests for Global                    
 !-------------------------------------------------------------------------
     if (global) then   
-    allocate ( field(1:xbx%ni,1:xbx%nj) )
     call random_number(field(:,:) )
     field(:,:) = field(:,:) - 0.5
-    call da_test_spectral(xbx%ni, xbx%nj, xbx%max_wavenumber, xbx%inc, &
-       xbx%lenr, xbx%lensav, xbx%lenwrk, xbx%alp_size, 2*xbx%c_cv_size,&
-       xbx%alp, xbx%wsave, xbx%int_wgts, field )
-    deallocate ( field )
+    call da_test_spectral(xbx, field, &
+                          ids, ide, jds, jde, &
+                          ims, ime, jms, jme, &
+                          its, ite, jts, jte )
    endif
 !-------------------------------------------------------------------------
  DEALLOCATE (vp1 % v1)

@@ -1117,6 +1117,7 @@ da_fftpack5.o:	         \
 
 da_spectral.o:		\
 			DA_Constants.o				\
+			DA_Define_Structures.o			\
 			da_fftpack5.o			        \
 			da_spectral/da_asslegpol.inc		\
 			da_spectral/da_calc_power.inc		\

@@ -18,98 +18,55 @@ subroutine DA_Transform_VToVv_Global (xb, xbx, be, cv, vv, &
    integer, intent(in)              :: ims,ime, jms,jme, kms,kme ! memory dims.
    integer, intent(in)              :: its,ite, jts,jte, kts,kte ! tile   dims
 
+   integer :: i, j, k, cv_s, cv_e
 
-
-   integer :: i, j, k, cv_s, cv_e, r_cvsize 
-
-   real, allocatable     :: rcv(:)      ! real local  control variable.
-   real, allocatable     :: power(:)    ! local power spectrum
-   real, allocatable     :: field(:,:)  ! local 2D-field      
 !-------------------------------------------------------------------------
-
-    integer  :: ncall
-
-   allocate (rcv(1:2*xbx%c_cv_size) )
-   allocate (power(0:xbx%max_wavenumber))
-   allocate (field(1:xbx%ni , 1:xbx%nj) )
-
-    ncall = 0
-
-   r_cvsize = 2*xbx%c_cv_size
+  
    cv_s = 1        
-   if( be%v1%mz > 0)then 
-    do k = 1, be%v1%mz
-    cv_e = cv_s + r_cvsize - 1 
-    rcv (1:r_cvsize) = cv(cv_s:cv_e) 
-    power(0:xbx%max_wavenumber) = be%v1%power(0:xbx%max_wavenumber,k)
-    ncall = ncall + 1
-    call da_v_to_vv_spectral(xbx%ni,xbx%nj,xbx%max_wavenumber, &
-                      xbx%inc,xbx%lenr,xbx%lensav, xbx%lenwrk, &
-                      xbx%alp_size,r_cvsize,xbx%alp, xbx%wsave,&
-                      power, rcv, field)
-    vv%v1(1:xbx%ni,1:xbx%nj,k) = field(1:xbx%ni,1:xbx%nj)
-    cv_s = cv_e + 1
-    end do
-   end if
-!
-   if( be%v2%mz > 0)then 
-    do k = 1, be%v2%mz
-    cv_e = cv_s + r_cvsize - 1 
-    rcv (1:r_cvsize) = cv(cv_s:cv_e) 
-    power(0:xbx%max_wavenumber) = be%v2%power(0:xbx%max_wavenumber,k)
-    ncall = ncall + 1
-    call da_v_to_vv_spectral(xbx%ni,xbx%nj,xbx%max_wavenumber, &
-                      xbx%inc,xbx%lenr,xbx%lensav, xbx%lenwrk, &
-                      xbx%alp_size,r_cvsize,xbx%alp, xbx%wsave,&
-                      power, rcv, field)
-    vv%v2(1:xbx%ni,1:xbx%nj,k) = field(1:xbx%ni,1:xbx%nj)
-    cv_s = cv_e + 1
-    end do
-   end if
-!
-   if( be%v3%mz > 0)then 
-    do k = 1, be%v3%mz
-    cv_e = cv_s + r_cvsize - 1 
-    rcv (1:r_cvsize) = cv(cv_s:cv_e) 
-    power(0:xbx%max_wavenumber) = be%v3%power(0:xbx%max_wavenumber,k)
-    ncall = ncall + 1
-    call da_v_to_vv_spectral(xbx%ni,xbx%nj,xbx%max_wavenumber, &
-                      xbx%inc,xbx%lenr,xbx%lensav, xbx%lenwrk, &
-                      xbx%alp_size,r_cvsize,xbx%alp, xbx%wsave,&
-                      power, rcv, field)
-    vv%v3(1:xbx%ni,1:xbx%nj,k) = field(1:xbx%ni,1:xbx%nj)
-    cv_s = cv_e + 1
-    end do
-   end if
-!
-   if( be%v4%mz > 0)then 
-    do k = 1, be%v4%mz
-    cv_e = cv_s + r_cvsize - 1 
-    rcv (1:r_cvsize) = cv(cv_s:cv_e) 
-    power(0:xbx%max_wavenumber) = be%v4%power(0:xbx%max_wavenumber,k)
-    ncall = ncall + 1
-    call da_v_to_vv_spectral(xbx%ni,xbx%nj,xbx%max_wavenumber, &
-                      xbx%inc,xbx%lenr,xbx%lensav, xbx%lenwrk, &
-                      xbx%alp_size,r_cvsize,xbx%alp, xbx%wsave,&
-                      power, rcv, field)
-    vv%v4(1:xbx%ni,1:xbx%nj,k) = field(1:xbx%ni,1:xbx%nj)
-    cv_s = cv_e + 1
-    end do
-   end if
-!
-   if( be%v5%mz > 0)then 
-    do k = 1, be%v5%mz
-    cv_e = cv_s + r_cvsize - 1 
-    rcv (1:r_cvsize) = cv(cv_s:cv_e) 
-    power(0:xbx%max_wavenumber) = be%v5%power(0:xbx%max_wavenumber,k)
-    ncall = ncall + 1
-    call da_v_to_vv_spectral(xbx%ni,xbx%nj,xbx%max_wavenumber, &
-                      xbx%inc,xbx%lenr,xbx%lensav, xbx%lenwrk, &
-                      xbx%alp_size,r_cvsize,xbx%alp, xbx%wsave,&
-                      power, rcv, field)
-    vv%v5(1:xbx%ni,1:xbx%nj,k) = field(1:xbx%ni,1:xbx%nj)
-    cv_s = cv_e + 1
-    end do
-   end if
-!
+   do k = 1, be%v1%mz
+      cv_e = cv_s + 2*xbx%c_cv_size - 1 
+      call da_v_to_vv_spectral(xbx, be%v1%power(0:xbx%max_wavenumber,k), cv(cv_s:cv_e), vv%v1(ims:ime,jms:jme,k), &
+                               ids, ide, jds, jde, &
+                               ims, ime, jms, jme, &
+                               its, ite, jts, jte )
+      cv_s = cv_e + 1
+   end do
+
+   do k = 1, be%v2%mz
+      cv_e = cv_s + 2*xbx%c_cv_size - 1
+      call da_v_to_vv_spectral(xbx, be%v2%power(0:xbx%max_wavenumber,k), cv(cv_s:cv_e), vv%v2(ims:ime,jms:jme,k), &
+                               ids, ide, jds, jde, &
+                               ims, ime, jms, jme, &
+                               its, ite, jts, jte )
+      cv_s = cv_e + 1
+   end do
+
+   do k = 1, be%v3%mz
+      cv_e = cv_s + 2*xbx%c_cv_size - 1
+      call da_v_to_vv_spectral(xbx, be%v3%power(0:xbx%max_wavenumber,k), cv(cv_s:cv_e), vv%v3(ims:ime,jms:jme,k), &
+                               ids, ide, jds, jde, &
+                               ims, ime, jms, jme, &
+                               its, ite, jts, jte )
+      cv_s = cv_e + 1
+   end do
+
+   do k = 1, be%v4%mz
+      cv_e = cv_s + 2*xbx%c_cv_size - 1
+      call da_v_to_vv_spectral(xbx, be%v4%power(0:xbx%max_wavenumber,k), cv(cv_s:cv_e), vv%v4(ims:ime,jms:jme,k), &
+                               ids, ide, jds, jde, &
+                               ims, ime, jms, jme, &
+                               its, ite, jts, jte )
+      cv_s = cv_e + 1
+   end do
+
+   do k = 1, be%v5%mz
+      cv_e = cv_s + 2*xbx%c_cv_size - 1
+      call da_v_to_vv_spectral(xbx, be%v5%power(0:xbx%max_wavenumber,k), cv(cv_s:cv_e), vv%v5(ims:ime,jms:jme,k), &
+                               ids, ide, jds, jde, &
+                               ims, ime, jms, jme, &
+                               its, ite, jts, jte )
+      cv_s = cv_e + 1
+   end do
+
 end subroutine DA_Transform_VToVv_Global
+

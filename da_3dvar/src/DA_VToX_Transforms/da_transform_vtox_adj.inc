@@ -372,19 +372,23 @@ subroutine da_transform_vtox_adj( xb, xbx, be, xa, xp, vp, vv, cv, &
     STOP 'Stopped, as cv_options not valid.'
  endif
 
- if(cv_options == 2 ) &
+ if(cv_options == 2 ) then
    call da_transform_vtovv_adj( xb, be, vv, cv, xp, &
                                 ids,ide, jds,jde, kds,kde,  &
                                 ims,ime, jms,jme, kms,kme,  &
                                 its,ite, jts,jte, kts,kte )
-
- if(cv_options == 4 ) &
+ else if(cv_options == 4 ) then
   call DA_Transform_VToVv_Global_Adj(xb, xbx, be, cv, vv, &
                               ids,ide, jds,jde, kds,kde,  &
                               ims,ime, jms,jme, kms,kme,  &
                               its,ite, jts,jte, kts,kte )
- if( print_detail >= 100 ) &
- print*,' in vtox_adj after vtovv_adj  cv.cv = ',sum(cv * cv)
+ endif
+
+ if( print_detail >= 100 )  then
+    write(unit=*, fmt='(2a,2x,a,i6)') 'file:', __FILE__, 'line:', __LINE__
+    write(unit=0, fmt='(a, e24.14)') ' in vtox_adj after vtovv_adj  cv.cv = ',sum(cv * cv)
+    write(unit=*, fmt='(a, e24.14)') ' in vtox_adj after vtovv_adj  cv.cv = ',sum(cv * cv)
+ endif
 
 end subroutine da_transform_vtox_adj
 

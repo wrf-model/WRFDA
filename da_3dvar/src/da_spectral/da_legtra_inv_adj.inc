@@ -1,38 +1,51 @@
-subroutine da_leg_tra_inv_adj( nj, max_wavenumber, alp_size, m, alp, v, r_leg )
+subroutine da_leg_tra_inv_adj( jds, jde, jts, jte, max_wavenumber, alp_size, m, alp, v, r_leg )
 
    implicit none
 
-   integer, intent(in)  :: nj                         ! Number of latitudes.
+   integer, intent(in)  :: jds, jde                   ! Number of latitudes.
+   integer, intent(in)  :: jts, jte                   ! Number of latitudes.
    integer, intent(in)  :: max_wavenumber             ! Maximum wavenumber.
    integer, intent(in)  :: alp_size                   ! Dimension of ALPs.
    integer, intent(in)  :: m                          ! Zonal wavenumber.
    real, intent(in)     :: alp(1:alp_size)            ! Associated Legendre Polynomials.
 
    complex, intent(out) :: v(m:max_wavenumber)        ! Output spectral coefficient.
-   complex, intent(in)  :: r_leg(1:nj)                ! Field to transform.
+   complex, intent(in) :: r_leg(jts:jte)              ! Field to transform.
 
-   integer              :: l, j                       ! Loop counters.
-   integer              :: index_m, index_j, index    ! Markers.
-   integer              :: sign_switch                ! Make use of symmetry of ALPs.
-   complex              :: sum_legtra1, sum_legtra2   ! Summation scalars.
+   integer              :: l, j, js, je               ! Loop counters.
+   integer              :: index_m, index_j           ! Markers.
+   complex              :: sum_legtra                 ! Summation scalars.
+
+   integer              :: jc, iequator
 
    index_m = m * ( max_wavenumber + 1 - m ) + m * ( m + 1 ) / 2 + 1 - m
 
-  do l = m, max_wavenumber
-   sum_legtra1 = 0.
-   do j = 1, nj / 2
-      index_j = ( j - 1 ) * ( max_wavenumber + 1 ) * ( max_wavenumber + 2 ) / 2
-         index = index_j + index_m + l
-         sign_switch = (-1)**( l + m )
-         sum_legtra1 = sum_legtra1 + r_leg(j) * alp(index) 
-         sum_legtra1 = sum_legtra1 + r_leg(nj+1-j) * sign_switch * alp(index)
+   jc = (jde-jds+1)/2
+
+   iequator = mod(jde-jds+1, 2)
+
+   js = max(jts, jc+iequator+1)
+   je = min(jc+iequator, jte)
+
+   do l = m, max_wavenumber
+      sum_legtra = ( 0.0, 0.0 )
+
+      do j = js, jte
+         index_j = ( jds+jde - j - 1 ) * ( max_wavenumber + 1 ) * ( max_wavenumber + 2 ) / 2
+         if(mod(l+m,2) == 1) then
+            sum_legtra = sum_legtra - r_leg(j) * alp(index_j + index_m + l)
+         else
+            sum_legtra = sum_legtra + r_leg(j) * alp(index_j + index_m + l)
+         endif
+      enddo
+
+      do j = jts, je
+         index_j = ( j - 1 ) * ( max_wavenumber + 1 ) * ( max_wavenumber + 2 ) / 2
+         sum_legtra = sum_legtra + r_leg(j) * alp(index_j + index_m + l) 
+      end do
+
+      v(l) = sum_legtra
    end do
-    if ( (nj+1) / 2 == nj/2 + 1 ) then
-      j = nj/2 + 1
-      index_j = ( j - 1 ) * ( max_wavenumber + 1 ) * ( max_wavenumber + 2 ) / 2
-      index = index_j + index_m + l
-      sum_legtra1 = sum_legtra1 + r_leg(j) * alp(index)
-    end if
-   v(l) = sum_legtra1
-  end do
+
 end subroutine da_leg_tra_inv_adj
+
