@@ -42,7 +42,7 @@ wrfio_int :
 
 wrfio_grib1 :
 	( cd ../external/io_grib1 ; \
-        make CC="$(CC)" CPP="$(CPP)" \
+        make CPP="$(CPP)" \
 	RANLIB="$(RANLIB)" \
 	CC="$(CC)" CFLAGS="$(CFLAGS)" \
 	FC="$(FC)" FCFLAGS="$(FCDEBUG) $(FCFORM) $(FCBASE)" )

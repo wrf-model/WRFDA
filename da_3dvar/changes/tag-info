@@ -3,6 +3,7 @@ This file is intended to track the tags created by CVS.
 
 Version History
 ---------------
+cvs -r tag adapt_wrf_frame	(January 26, 2005)	tag before merge to WRF
 cvs -r tag port_to_crayx1	(November 2, 2004)	tag for port code to Cray-x1
 cvs -r tag radar_in_wrf3dvar	(October 19, 2004)	tag after radar code commited in.
 cvs -r tag mm5_as_fg	 	(September 27, 2004)	tag for using MM5 as FG
