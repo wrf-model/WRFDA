@@ -16,7 +16,7 @@ SUBROUTINE da_init_3dvar( grid, xp, xb, &
    INTEGER,      INTENT(OUT)        :: ims,ime, jms,jme, kms,kme   ! memory dims.
    INTEGER,      INTENT(OUT)        :: ips,ipe, jps,jpe, kps,kpe   ! patch  dims.
 
-   INTEGER :: ii
+   INTEGER :: ii, ierr
 
    INTEGER :: sm31,sm32,sm33,sm31x,sm32x,sm33x,sm31y,sm32y,sm33y
 
@@ -52,6 +52,14 @@ SUBROUTINE da_init_3dvar( grid, xp, xb, &
    sm33y            = grid%sm33y
 
 !**********************************************************************
+
+#ifdef DM_PARALLEL
+   call MPI_COMM_SIZE( MPI_COMM_WORLD, numb_procs, ierr )
+   call MPI_COMM_RANK( MPI_COMM_WORLD, my_proc_id, ierr )
+#else
+   numb_procs = 1
+   my_proc_id = 1
+#endif
 
 !--Register xpose arrays and build messages for processor communication.
 

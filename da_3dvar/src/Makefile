@@ -42,6 +42,9 @@ OBJS_FOR_ALL =		da_solve_v3d.o		\
 			da_mat.o      		\
 			da_rfz.o      		\
 			LAPACK.o		\
+			da_spectral.o           \
+			da_fftpack5.o           \
+			da_gen_be.o             \
 			BLAS.o
 
 OBJS_FOR_GEN_BE =	DA_Constants.o		\
@@ -108,6 +111,7 @@ da_solve_v3d.o:		DA_Constants.o			\
 DA_Minimisation.o:	\
 			../module_wrf_3dvar_io.o \
 			DA_Constants.o \
+			DA_Tools.o     \
 			DA_Define_Structures.o \
 			DA_VToX_Transforms.o \
 			DA_Obs.o \
@@ -160,6 +164,8 @@ DA_Setup_Structures.o:	\
 			da_h_ops.o \
 	                da_bufrlib.o \
 	                DA_ReadWrite_MM5.o \
+	                da_spectral.o \
+	                da_gen_be.o  \
 			DA_Setup_Structures/DA_Setup_Structures.F \
 			DA_Setup_Structures/da_add_increments.inc \
 			DA_Setup_Structures/DA_Add_PBL_And_SFC_Info.inc \
@@ -172,9 +178,12 @@ DA_Setup_Structures.o:	\
 			DA_Setup_Structures/da_setup_background_errors.inc \
 			DA_Setup_Structures/da_setup_background_errors2.inc \
 			DA_Setup_Structures/da_setup_background_errors3.inc \
+			DA_Setup_Structures/da_setup_background_errors4.inc \
+			DA_Setup_Structures/DA_Get_Bins_Info.inc            \
 			DA_Setup_Structures/da_setup_firstguess.inc \
 			DA_Setup_Structures/da_setup_firstguess_mm5.inc \
 			DA_Setup_Structures/da_setup_firstguess_wrf.inc \
+			DA_Setup_Structures/da_setup_firstguess_kma.inc \
 			DA_Setup_Structures/da_setup_obs_structures.inc \
 			DA_Setup_Structures/da_setup_obs_structures_ascii.inc \
 			DA_Setup_Structures/da_setup_obs_structures_bufr.inc \
@@ -182,7 +191,10 @@ DA_Setup_Structures.o:	\
 			DA_Setup_Structures/da_setup_runconstants.inc \
 			DA_Setup_Structures/da_transfer_mm5toxb.inc \
 			DA_Setup_Structures/da_transfer_wrftoxb.inc \
+			DA_Setup_Structures/da_transfer_kmatoxb.inc \
 			DA_Setup_Structures/da_transfer_xatowrf.inc \
+			DA_Setup_Structures/da_transfer_xatokma.inc \
+			DA_Setup_Structures/DA_Write_KMA_Increments.inc   \
 			DA_Setup_Structures/DA_Transfer_XatoAnalysis.inc \
 			DA_Setup_Structures/da_write_increments.inc
 			$(RM) $@
@@ -202,10 +214,14 @@ DA_VToX_Transforms.o:	\
 			DA_Constants.o \
 			DA_Dynamics.o \
 			DA_Physics.o \
+			da_fftpack5.o \
+			da_spectral.o \
 			DA_SSMI.o \
 			DA_VToX_Transforms/DA_VToX_Transforms.F \
 			DA_VToX_Transforms/DA_Transform_VToVv.inc \
 			DA_VToX_Transforms/DA_Transform_VToVv_Adj.inc \
+			DA_VToX_Transforms/DA_Transform_VToVv_Global.inc \
+			DA_VToX_Transforms/DA_Transform_VToVv_Global_Adj.inc \
 			DA_VToX_Transforms/da_transform_vtox.inc \
 			DA_VToX_Transforms/da_transform_vtox_adj.inc \
 			DA_VToX_Transforms/DA_Transform_VpToVv.inc \
@@ -219,6 +235,10 @@ DA_VToX_Transforms.o:	\
 			DA_VToX_Transforms/da_apply_rf_adj.inc    \
 			DA_VToX_Transforms/da_transform_bal.inc   \
 			DA_VToX_Transforms/da_transform_bal_adj.inc   \
+			DA_VToX_Transforms/DA_Get_VPoles.inc   \
+			DA_VToX_Transforms/DA_Get_SPoles.inc   \
+			DA_VToX_Transforms/DA_Get_AVPoles.inc   \
+			DA_VToX_Transforms/DA_Get_ASPoles.inc   \
 			DA_VToX_Transforms/DA_Vertical_Transform.inc
 			$(RM) $@
 			$(CPP) -I./DA_VToX_Transforms $(CPPFLAGS_3DVAR) DA_VToX_Transforms/DA_VToX_Transforms.F > DA_VToX_Transforms.f
@@ -741,7 +761,7 @@ DA_Dynamics.o:		\
 			DA_Dynamics/DA_UV_To_Divergence_Adj.inc \
 			DA_Dynamics/DA_W_Adjustment_Lin.inc \
 			DA_Dynamics/DA_W_Adjustment_Adj.inc \
-			DA_Dynamics/DA_WZ_BASE.inc \
+			DA_Dynamics/DA_WZ_BASE.inc          \
 			DA_Dynamics/DA_UV_To_Vorticity.inc
 			$(RM) $@
 			$(CPP) -I./DA_Dynamics $(CPPFLAGS_3DVAR) DA_Dynamics/DA_Dynamics.F > DA_Dynamics.f
@@ -794,7 +814,7 @@ DA_Physics.o:		\
 			DA_Physics/da_sfc_pre_Adj.inc \
 			DA_Physics/da_filter.inc \
 			DA_Physics/da_filter_adj.inc \
-			DA_Physics/da_wdt.inc \
+			DA_Physics/da_wdt.inc        \
 			DA_Physics/DA_Moist_Phys_Adj.inc \
 			DA_Physics/DA_Moist_Phys_Lin.inc
 			$(RM) $@
@@ -841,7 +861,11 @@ DA_Tools.o:		\
 			DA_Tools/toGrid.inc \
 			DA_Tools/unifva.inc \
 			DA_Tools/da_dot.inc \
-			DA_Tools/xyll.inc
+			DA_Tools/DA_Set_Boundary_Xa.inc \
+			DA_Tools/DA_Set_Boundary_Xb.inc \
+			DA_Tools/DA_Set_Boundary_2d.inc \
+			DA_Tools/DA_Set_Boundary_3d.inc \
+			DA_Tools/xyll.inc    
 			$(RM) $@
 			$(CPP) -I./DA_Tools $(CPPFLAGS_3DVAR) DA_Tools/DA_Tools.F > DA_Tools.f
 			$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) DA_Tools.f
@@ -1083,7 +1107,7 @@ da_fftpack5.o:	         \
 			da_fftpack5/xerfft.f	\
 			da_fftpack5/da_fftpack5.F
 			$(CPP) -I./da_fftpack5 $(CPPFLAGS_3DVAR) da_fftpack5/da_fftpack5.F > da_fftpack5.f
-			$(FC) -c $(F77FLAGS_3DVAR) $(MODULE_DIRS) da_fftpack5.f
+			$(F77) -c $(F77FLAGS_3DVAR) $(MODULE_DIRS) da_fftpack5.f
 
 da_spectral.o:		\
 			DA_Constants.o				\
@@ -1100,6 +1124,9 @@ da_spectral.o:		\
 			da_spectral/da_test_spectral.inc	\
 			da_spectral/da_v_to_vv_spectral.inc	\
 			da_spectral/da_vv_to_v_spectral.inc	\
+			da_spectral/da_v_to_vv_spectral_adj.inc	\
+			da_spectral/da_legtra_inv_adj.inc	\
+			da_spectral/da_apply_power.inc    \
 			da_spectral/da_spectral.F
 			$(CPP) -I./da_spectral $(CPPFLAGS_3DVAR) da_spectral/da_spectral.F > da_spectral.f
 			$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) da_spectral.f

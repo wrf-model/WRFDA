@@ -128,6 +128,8 @@ state    real   T2               ij     misc        1         -     irh       "T
 state    real   TH2              ij     misc        1         -     irh       "TH2"                  "POT TEMP at 2 M" ""
 state    real   U10              ij     misc        1         X     irh       "U10"                  "U at 10 M"         " "
 state    real   V10              ij     misc        1         Y     irh       "V10"                  "V at 10 M"         " "
+state    real   PSFC             ij     misc        1         -     irh       "PSFC"                 "SURFACE PRESSURE"  "
+Passcal"
 
 # lsm State Variables
 
@@ -224,6 +226,9 @@ state   real    zetatop        -        eh+em      -         -     irh       "ze
 state   real    cf1            -        eh+em      -         -     ir        "cf1"                   "2nd order extrapolation constant"         ""      
 state   real    cf2            -        eh+em      -         -     ir        "cf2"                   "2nd order extrapolation constant"         ""      
 state   real    cf3            -        eh+em      -         -     ir        "cf3"                   "2nd order extrapolation constant"         ""      
+
+state   real    kma_a          k       dyn_em      1         Z     irh       "A"  "KMA Constants A to convert surface presure to full level pressure" "dimensionless"
+state   real    kma_b          k       dyn_em      1         Z     irh       "B"  "KMA Constants B to convert surface presure to full level pressure" "dimensionless"
 #-----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 #-------------------------------------------------------------------------------------------------------------------------------------------
@@ -348,6 +353,10 @@ rconfig   integer spec_zone               namelist,namelist_01      1           
 rconfig   integer relax_zone              namelist,namelist_01      1             4       irh    "relax_zone"                    ""      ""
 rconfig   integer tile_sz_x               namelist,namelist_01      1             0       -      "tile_sz_x"             ""      ""
 rconfig   integer tile_sz_y               namelist,namelist_01      1             0       -      "tile_sz_y"             ""      ""
+rconfig   integer nproc_x                 namelist,namelist_01      1
+  0       -      "nproc_x"             ""      ""
+rconfig   integer nproc_y                 namelist,namelist_01      1
+  0       -      "nproc_y"             ""      ""
 rconfig   integer numtiles                namelist,namelist_01      1             1       -      "numtiles"              ""      ""
 rconfig   integer debug_level             namelist,namelist_01      1             0       -      "debug_level"           ""      ""
 rconfig   integer irand                   namelist,namelist_01      1             0       -      "irand"           ""      ""
@@ -648,6 +657,9 @@ typedef xb_type real    dnw                    k        -         1        -    
 
 typedef xb_type real    sigmah                 k        -         1        -       -
 typedef xb_type real    sigmaf                 k        -         1        -       -
+
+typedef xb_type real    kma_a                  k        -         1        -       -
+typedef xb_type real    kma_b                  k        -         1        -       -
 # END XB_TYPE DEFINITION
 
 # BEGIN X_TYPE DEFINITION

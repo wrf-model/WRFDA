@@ -9,7 +9,8 @@ SUBROUTINE DA_Read_Namelist
 !  99/11/30: Creation (D. Barker)
 !
 !  Additions:
-!             07/08/2003      Profiler and Buoy Obs            S. R. H. Rizvi
+!             07/08/2003      Profiler and Buoy Obs            Syed RH Rizvi
+!             01/31/2005      Added global option              Syed RH Rizvi
 !----------------------------------------------------------------------------
    IMPLICIT NONE
 
@@ -24,7 +25,7 @@ SUBROUTINE DA_Read_Namelist
 
 !  Namelist contents :
 
-   NAMELIST /RECORD1/  MODEL_TYPE, write_increments
+   NAMELIST /RECORD1/  MODEL_TYPE, write_increments, global
    NAMELIST /RECORD2/  ANALYSIS_TYPE, ANALYSIS_DATE, ANALYSIS_ACCU, W_INCREMENTS, &
                        DT_cloud_model, &
                        write_qcw, write_qrn, write_qci, write_qsn, write_qgr
@@ -70,7 +71,8 @@ SUBROUTINE DA_Read_Namelist
                        max_ssmi_retrieval_input, &
                        max_ssmi_tb_input, &
                        max_ssmt1_input, &
-                       max_ssmt2_input
+                       max_ssmt2_input, &
+                       max_qscat_input 
    NAMELIST /RECORD5/  TIME_WINDOW, print_detail, print_obs_info
    NAMELIST /RECORD6/  max_ext_its, EPS, NTMAX, NSAVE, &
                        write_switch, write_interval
@@ -124,6 +126,7 @@ SUBROUTINE DA_Read_Namelist
    fg_format = 1
    ob_format = 2
    num_fgat_time = 1
+   global = .FALSE. 
 
 !--record4
    PROCESS_OBS    = 'YES'
@@ -279,13 +282,13 @@ SUBROUTINE DA_Read_Namelist
 !----------------------------------------------------------------------------
 !  [2.0] Read namelist and close:
 !----------------------------------------------------------------------------
-
    IOST = 0
    READ  ( UNIT = namelist_unit, NML = RECORD1 , ERR = 8000, IOSTAT = IOST)
 
    if ( print_detail >= 1 ) then
       WRITE(6,'(A,3X,A     )') ' MODEL_TYPE    = ', trim(MODEL_TYPE)
       WRITE(6,'(A,3X,L10   )') ' write_increments = ', write_increments
+      WRITE(6,'(A,3X,L5    )') ' Global analysis option=', global         
    endif
 
    READ  ( UNIT = namelist_unit, NML = RECORD2 , ERR = 8000, IOSTAT = IOST)
@@ -476,7 +479,7 @@ SUBROUTINE DA_Read_Namelist
 !  [3.0] Error traps:
 !------------------------------------------------------------------------------
 
-   IF ( cv_options < 1 .OR. cv_options > 3 ) THEN
+   IF ( cv_options < 1 .OR. cv_options > 4 ) THEN
       WRITE(0,'(A,I3)')' DA_Read_Namelist: Invalid cv_options = ', cv_options
       STOP
    END IF

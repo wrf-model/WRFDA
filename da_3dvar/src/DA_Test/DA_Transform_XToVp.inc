@@ -2,6 +2,12 @@ SUBROUTINE DA_Transform_XToVp( xb, xbx, xa, xp, vp, be, &
                                ids,ide, jds,jde, kds,kde,  &
                                ims,ime, jms,jme, kms,kme,  &
                                its,ite, jts,jte, kts,kte )
+!------------------------------------------------------------------------------
+!  PURPOSE: Transforms analysis to control variables (Vp-type)
+!
+!  HISTORY:   02/02/2005 - Updated for global              Syed RH Rizvi 
+!
+!------------------------------------------------------------------------------
 
    IMPLICIT NONE
 
@@ -22,6 +28,7 @@ SUBROUTINE DA_Transform_XToVp( xb, xbx, xa, xp, vp, be, &
 
    real, dimension(kms:kme,ims:ime,jms:jme) :: phi_b_copy
    real, dimension(kms:kme,jms:jme,kms:kme) :: reg_copy
+   real, dimension(ims:ime,jms:jme)         :: coeff  ! Multiplicative coeff.
 
    integer :: i, j, k, kk                             ! Loop counters.
    real :: sum_vphi                                   ! Summing variable.
@@ -29,16 +36,14 @@ SUBROUTINE DA_Transform_XToVp( xb, xbx, xa, xp, vp, be, &
 !-------------------------------------------------------------------
 !  [1.0] Perform transform v = U^{-1} x
 !-------------------------------------------------------------------      
-
-   IF ( cv_options /= 2) THEN
+   print*,' in XToVp'     
+   IF ( cv_options /= 2 .and. cv_options /=4) THEN
       write(unit=*, fmt='(a,i6)') &
            'Cannot perform Transform_XToVp for cv_options:', cv_options
 
       CALL wrf_shutdown
       stop 'Wrong cv_options.'
    ENDIF
-
-   print *, 'cv_options=', cv_options
 
    grid_coeff(its:ite,jts:jte) = 1.0 / ( xb % map_factor(its:ite,jts:jte) * &
                                        xb % map_factor(its:ite,jts:jte) )
@@ -49,13 +54,11 @@ SUBROUTINE DA_Transform_XToVp( xb, xbx, xa, xp, vp, be, &
 
 !  Communicate halo region.
    CALL wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id3)
-
+  print*,' calling UV_To_Vorticity'
 #ifndef DEREF_KLUDGE
-   CALL DA_UV_To_Vorticity( xb % ds, xb % map_factor, xa % u, xa % v, vor, &
+   CALL DA_UV_To_Vorticity( xb, xa % u, xa % v, vor, &
 #else
-   CALL DA_UV_To_Vorticity( xb % ds, &
-                            xb % map_factor(ims,jms), &
-                            xa % u(ims,jms,kms), &
+   CALL DA_UV_To_Vorticity( xb, xa % u(ims,jms,kms), &
                             xa % v(ims,jms,kms), &
                             vor(ims,jms,kms), &
 #endif
@@ -64,17 +67,30 @@ SUBROUTINE DA_Transform_XToVp( xb, xbx, xa, xp, vp, be, &
                             its,ite, jts,jte, kts,kte )
 
 !  Convert vorticity to Del**2 psi:
+   if(.not. global ) then               
+     if (fg_format == 1 .or. fg_format == 2) then
+    coeff(its:ite,jts:jte) = 1.0 / ( xb % map_factor(its:ite,jts:jte) * &
+                                        xb % map_factor(its:ite,jts:jte) )
+    DO k = kts, kte
+       vor(its:ite,jts:jte,k) = coeff(its:ite,jts:jte)*vor(its:ite,jts:jte,k)
+    END DO
+    else
+    print*,' Wrong choice of fg_format= ',fg_format,' with global = ',global
+    stop
+    end if
+   end if
 
    DO k = kts, kte
       vor(its:ite,jts:jte,k) = grid_coeff(its:ite,jts:jte)*vor(its:ite,jts:jte,k)
    END DO
 
 !  Calculate psi:
-
+  print*,' calling Solve_PoissonEquation for Psi'
    CALL DA_Solve_PoissonEqn_FCT(xb, xbx, vor, vp%v1, xp)
 
 !  [2.3] Transform u, v to velocity potential via divergence:
 
+  print*,' calling UV_To_Divergence'
 #ifndef DEREF_KLUDGE
    CALL DA_UV_To_Divergence( xa % u, xa % v, xb%coefx, xb%coefy, div, &
 #else
@@ -89,6 +105,16 @@ SUBROUTINE DA_Transform_XToVp( xb, xbx, xa, xp, vp, be, &
                             its,ite, jts,jte, kts,kte )
 
 !  Convert divergence to Del**2 chi:
+   if(.not. global )  then              
+     if (fg_format == 1 .or. fg_format == 2) then
+    DO k = kts, kte
+      div(its:ite,jts:jte,k) = coeff(its:ite,jts:jte) * div(its:ite,jts:jte,k)
+    END DO
+    else
+    print*,' Wrong choice of fg_format= ',fg_format,' with global = ',global
+    stop
+    end if
+   end if
 
    DO k = kts, kte
       div(its:ite,jts:jte,k) = grid_coeff(its:ite,jts:jte) * div(its:ite,jts:jte,k)
@@ -96,10 +122,20 @@ SUBROUTINE DA_Transform_XToVp( xb, xbx, xa, xp, vp, be, &
 
 !  Calculate chi:
 
+  print*,' calling Solve_PoissonEquation for Chi'
    CALL DA_Solve_PoissonEqn_FCT(xb, xbx, div, vp%v2, xp)
 
+   if( cv_options == 4) then
 !  [2.4] Transform chi to chi_u:
+  print*,' calculating chi_u'                         
+    do k=kts,kte
+    do j=jts,jte
+      vp%v2(its:ite,j,k) = vp%v2(its:ite,j,k) - be%reg_chi(j,k)*vp%v1(its:ite,j,k)
+    enddo
+    enddo
+   end if
 
+   if( cv_options == 2) then
 !  Communicate halo region.
    CALL wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id1)
 
@@ -115,18 +151,18 @@ SUBROUTINE DA_Transform_XToVp( xb, xbx, xa, xp, vp, be, &
                                  xa % v(ims,jms,kms), &
                                  phi_b(ims,jms,kms), &
 #endif
-
                                  ids,ide, jds,jde, kds,kde,  &
                                  ims,ime, jms,jme, kms,kme,  &
                                  its,ite, jts,jte, kts,kte )
-
 !  [2.4] Compute phi:
-
    IF ( PRESENT(be) ) THEN
 
+
       DO k = kts, kte ! Need copies for all model levels for sum:
+
          reg_copy(k,jts:jte,kts:kte) = be % pb_vert_reg(jts:jte,kts:kte,k)
          phi_b_copy(k,its:ite,jts:jte) = phi_b(its:ite,jts:jte,k)
+    
       END DO
 
       DO k = kts, kte
@@ -145,8 +181,20 @@ SUBROUTINE DA_Transform_XToVp( xb, xbx, xa, xp, vp, be, &
    ELSE
       xa % p(its:ite,jts:jte,kts:kte) = phi_b(its:ite,jts:jte,kts:kte)
    ENDIF
-
    vp % v3(its:ite,jts:jte,kts:kte) = xa % p(its:ite,jts:jte,kts:kte)
+   end if
+
+   if( cv_options == 4) then
+  print*,' calculating t_u'                         
+!  [2.4] Compute t_u:
+    do k=kts,kte
+    do j=jts,jte
+    do i=its,ite
+      vp%v3(i,j,k) = xa%t(i,j,k) - sum(be%reg_t(j,k,kts:kte)*vp%v1(i,j,kts:kte))
+    enddo
+    enddo
+    enddo
+   end if
 
 !  [2.6] Choice of moisture control variable: 
   
@@ -158,10 +206,17 @@ SUBROUTINE DA_Transform_XToVp( xb, xbx, xa, xp, vp, be, &
 
 !!!-------------------------------------------------------------------
    else IF ( cv_options_hum == 3 ) THEN
+     if( cv_options == 2) then 
      xa % qt(its:ite,jts:jte,kts:kte) = xa % q  (its:ite,jts:jte,kts:kte) +   &
                                         xa % qcw(its:ite,jts:jte,kts:kte) +   &
                                         xa % qrn(its:ite,jts:jte,kts:kte)
      vp % v4(its:ite,jts:jte,kts:kte) = xa % qt (its:ite,jts:jte,kts:kte)
+     end if
+     if( cv_options == 4) then       ! Pseudo RH
+  print*,' calculating psudo rh'                    
+     vp % v4(its:ite,jts:jte,kts:kte) = xa % q  (its:ite,jts:jte,kts:kte) /   &
+                                        xb % qs (its:ite,jts:jte,kts:kte) 
+     end if
 !!!-------------------------------------------------------------------
 
       ELSE IF ( cv_options_hum == 1 ) THEN
@@ -170,9 +225,19 @@ SUBROUTINE DA_Transform_XToVp( xb, xbx, xa, xp, vp, be, &
       
    END IF
                
+   if ( cv_options == 2) then
 !  [2.7] v5 set to zero (ground temperature in future):
+    vp % v5(its:ite,jts:jte,kts:kte) = 0.0
+   end if
 
-   vp % v5(its:ite,jts:jte,kts:kte) = 0.0
+   if ( cv_options == 4) then
+!  [2.7] compute psfc_u:
+  print*,' calculating psfc_u '                     
+    do j=jts,jte
+    do i=its,ite
+    vp % v5(i,j,1) = xa%psfc(i,j) - sum(be%reg_ps(j,kts:kte)*vp%v1(i,j,kts:kte))
+    end do
+    end do
+   end if
 
 END SUBROUTINE DA_Transform_XToVp
-
