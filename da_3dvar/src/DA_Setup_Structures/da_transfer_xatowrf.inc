@@ -72,7 +72,11 @@ SUBROUTINE DA_Transfer_XatoWRF( xbx, grid, &
    do k=ks,ke
    do j=js,je
    do i=is,ie
-      q_cgrid(i,j,k) = xa%q(i,j,k)/(1.0 - xb%q(i,j,k))**2
+      if((xb%q(i,j,k)+xa%q(i,j,k)) < 0.0) then
+         q_cgrid(i,j,k) =-xb%q(i,j,k)/(1.0 - xb%q(i,j,k))**2
+      else
+         q_cgrid(i,j,k) = xa%q(i,j,k)/(1.0 - xb%q(i,j,k))**2
+      endif
    enddo
    enddo
    enddo
@@ -140,6 +144,25 @@ SUBROUTINE DA_Transfer_XatoWRF( xbx, grid, &
       call DA_Write_Increment ( xp, xb, xa, q_cgrid, mu_cgrid )
 
    endif
+! ----------------------------------------------------------------------------
+
+!--Adjust xa%q to make xb%q + xa%q > 0.0
+
+   if ( check_rh == 2 ) THEN
+!     Shu-Hua~s TPW conservation:
+      CALL da_check_rh( xb, xa, xp )
+   else
+!     Simple resetting to max/min values:
+      call da_check_rh_simple( xb, xa, xp )
+   end if
+
+   do k=ks,ke
+   do j=js,je
+   do i=is,ie
+      q_cgrid(i,j,k) = xa%q(i,j,k)/(1.0 - xb%q(i,j,k))**2
+   enddo
+   enddo
+   enddo
 ! ----------------------------------------------------------------------------
 
 !==> CONVERT FROM A-GRID TO C-GRID
@@ -311,19 +334,26 @@ SUBROUTINE DA_Transfer_XatoWRF( xbx, grid, &
          v_2(i,j,k) = v_2(i,j,k) + v_cgrid(i,j,k)
          w_2(i,j,k) = w_2(i,j,k) +    xa%w(i,j,k)
          moist_2(i,j,k,P_QV) = moist_2(i,j,k,P_QV) + q_cgrid(i,j,k)
+!--------make sure qv is positive.
+         if(moist_2(i,j,k,P_QV) < 1.0e-6) moist_2(i,j,k,P_QV) = 1.0e-6
 
         if ( size(moist_2,dim=4) >= 4 ) then
          moist_2(i,j,k,p_qcw) = moist_2(i,j,k,p_qcw) + xa%qcw(i,j,k)
          moist_2(i,j,k,p_qrn) = moist_2(i,j,k,p_qrn) + xa%qrn(i,j,k)
+         if(moist_2(i,j,k,p_qcw) < 0.0) moist_2(i,j,k,p_qcw) = 0.0
+         if(moist_2(i,j,k,p_qrn) < 0.0) moist_2(i,j,k,p_qrn) = 0.0
         endif
 
         if ( size(moist_2,dim=4) >= 6 ) then
          moist_2(i,j,k,p_qci) = moist_2(i,j,k,p_qci) + xa%qci(i,j,k)
          moist_2(i,j,k,p_qsn) = moist_2(i,j,k,p_qsn) + xa%qsn(i,j,k)
+         if(moist_2(i,j,k,p_qci) < 0.0) moist_2(i,j,k,p_qci) = 0.0
+         if(moist_2(i,j,k,p_qsn) < 0.0) moist_2(i,j,k,p_qsn) = 0.0
         endif
 
         if ( size(moist_2,dim=4) >= 7 ) then
          moist_2(i,j,k,p_qgr) = moist_2(i,j,k,p_qgr) + xa%qgr(i,j,k)
+         if(moist_2(i,j,k,p_qgr) < 0.0) moist_2(i,j,k,p_qgr) = 0.0
         endif
 
       enddo

@@ -16,6 +16,16 @@ MODULE module_ext_internal
   INTEGER, PARAMETER :: int_num_handles = 99
   LOGICAL, DIMENSION(int_num_handles) :: okay_for_io, int_handle_in_use, okay_to_commit
   INTEGER, DIMENSION(int_num_handles) :: int_num_bytes_to_write
+! first_operation is set to .TRUE. when a new handle is allocated 
+! or when open-for-write or open-for-read are committed.  It is set 
+! to .FALSE. when the first field is read or written.  
+  LOGICAL, DIMENSION(int_num_handles) :: first_operation
+! TBH:  file_status is checked by routines that call the WRF IOAPI.  It is not 
+! TBH:  yet cleanly integrated with okay_for_io, int_handle_in_use, 
+! TBH:  okay_to_commit.  Fix this later...  
+  INTEGER, DIMENSION(int_num_handles) :: file_status
+! TBH:  This flag goes along with file_status and is set as early as possible.  
+  LOGICAL, DIMENSION(int_num_handles) :: file_read_only
   CHARACTER*128, DIMENSION(int_num_handles) :: CurrentDateInFile
   REAL, POINTER    :: int_local_output_buffer(:)
   INTEGER          :: int_local_output_cursor
@@ -27,7 +37,7 @@ MODULE module_ext_internal
   INTEGER, DIMENSION(int_num_handles)       :: handle
   INTEGER, DIMENSION(512, int_num_handles)  :: open_file_descriptors
 
-  CHARACTER*132 last_next_var 
+  CHARACTER*132 last_next_var( int_num_handles )
 
   CONTAINS
 
@@ -38,6 +48,7 @@ MODULE module_ext_internal
     END FUNCTION int_valid_handle
 
     SUBROUTINE int_get_fresh_handle( retval )
+      include 'wrf_io_flags.h'
       INTEGER i, retval
       retval = -1
 ! dont use first 8 handles
@@ -52,15 +63,84 @@ MODULE module_ext_internal
         CALL wrf_error_fatal("external/io_quilt/io_int.F90: int_get_fresh_handle() can not")
       ENDIF
       int_handle_in_use(i) = .TRUE.
+      first_operation(i) = .TRUE.
+      file_status(i) = WRF_FILE_NOT_OPENED
       NULLIFY ( int_local_output_buffer )
     END SUBROUTINE int_get_fresh_handle
 
     !--- ioinit
     SUBROUTINE init_module_ext_internal
       IMPLICIT NONE
+      INTEGER i
       CALL wrf_sizeof_integer( itypesize )
       CALL wrf_sizeof_real   ( rtypesize )
+      DO i = 1, int_num_handles
+         last_next_var( i ) = ' '
+      ENDDO
     END SUBROUTINE init_module_ext_internal
+
+! Returns .TRUE. iff it is OK to write time-independent domain metadata to the 
+! file referenced by DataHandle.  If DataHandle is invalid, .FALSE. is 
+! returned.  
+LOGICAL FUNCTION int_ok_to_put_dom_ti( DataHandle )
+    include 'wrf_io_flags.h'
+    INTEGER, INTENT(IN) :: DataHandle 
+    CHARACTER*256 :: fname
+    INTEGER :: filestate
+    INTEGER :: Status
+    LOGICAL :: dryrun, first_output, retval
+    call ext_int_inquire_filename( DataHandle, fname, filestate, Status )
+    IF ( Status /= 0 ) THEN
+      retval = .FALSE.
+    ELSE
+      dryrun       = ( filestate .EQ. WRF_FILE_OPENED_NOT_COMMITTED )
+      first_output = int_is_first_operation( DataHandle )
+      ! Note that we want to REPLICATE time-independent domain metadata in the 
+      ! output files so the metadata is available during reads.  Fortran 
+      ! unformatted I/O must be sequential because we don't have fixed record 
+      ! lengths.  
+      ! retval = .NOT. dryrun .AND. first_output
+      retval = .NOT. dryrun
+    ENDIF
+    int_ok_to_put_dom_ti = retval
+    RETURN
+END FUNCTION int_ok_to_put_dom_ti
+
+! Returns .TRUE. iff it is OK to read time-independent domain metadata from the 
+! file referenced by DataHandle.  If DataHandle is invalid, .FALSE. is 
+! returned.  
+LOGICAL FUNCTION int_ok_to_get_dom_ti( DataHandle )
+    include 'wrf_io_flags.h'
+    INTEGER, INTENT(IN) :: DataHandle 
+    CHARACTER*256 :: fname
+    INTEGER :: filestate
+    INTEGER :: Status
+    LOGICAL :: dryrun, retval
+    call ext_int_inquire_filename( DataHandle, fname, filestate, Status )
+    IF ( Status /= 0 ) THEN
+      retval = .FALSE.
+    ELSE
+      dryrun       = ( filestate .EQ. WRF_FILE_OPENED_NOT_COMMITTED )
+      retval = .NOT. dryrun
+    ENDIF
+    int_ok_to_get_dom_ti = retval
+    RETURN
+END FUNCTION int_ok_to_get_dom_ti
+
+! Returns .TRUE. iff nothing has been read from or written to the file 
+! referenced by DataHandle.  If DataHandle is invalid, .FALSE. is returned.  
+LOGICAL FUNCTION int_is_first_operation( DataHandle )
+    INTEGER, INTENT(IN) :: DataHandle 
+    LOGICAL :: retval
+    retval = .FALSE.
+    IF ( int_valid_handle ( DataHandle ) ) THEN
+      IF ( int_handle_in_use( DataHandle ) ) THEN
+        retval = first_operation( DataHandle )
+      ENDIF
+    ENDIF
+    int_is_first_operation = retval
+    RETURN
+END FUNCTION int_is_first_operation
 
 END MODULE module_ext_internal
 
@@ -97,6 +177,7 @@ SUBROUTINE ext_int_open_for_write_begin( FileName , Comm_compute, Comm_io, SysDe
   USE module_ext_internal
   IMPLICIT NONE
   INCLUDE 'intio_tags.h'
+  INCLUDE 'wrf_io_flags.h'
   CHARACTER*(*) :: FileName
   INTEGER ,       INTENT(IN)  :: Comm_compute , Comm_io
   CHARACTER*(*) :: SysDepInfo
@@ -106,16 +187,21 @@ SUBROUTINE ext_int_open_for_write_begin( FileName , Comm_compute, Comm_io, SysDe
   LOGICAL, EXTERNAL :: wrf_dm_on_monitor
   REAL dummy
   INTEGER io_form
+  CHARACTER*256 :: fname
 
   CALL int_get_fresh_handle(i)
   okay_for_io(i) = .false.
   DataHandle = i
 
   io_form = 100 ! dummy value
+  fname = TRIM(FileName)
   CALL int_gen_ofwb_header( open_file_descriptors(1,i), hdrbufsize, itypesize, &
-                            FileName,SysDepInfo,io_form,DataHandle )
+                            fname,SysDepInfo,io_form,DataHandle )
 
   OPEN ( unit=DataHandle, file=TRIM(FileName), form='unformatted', iostat=Status )
+
+  file_status(DataHandle) = WRF_FILE_OPENED_NOT_COMMITTED
+  file_read_only(DataHandle) = .FALSE.
 
   Status = 0
   RETURN  
@@ -126,6 +212,7 @@ SUBROUTINE ext_int_open_for_write_commit( DataHandle , Status )
   USE module_ext_internal
   IMPLICIT NONE
   INCLUDE 'intio_tags.h'
+  INCLUDE 'wrf_io_flags.h'
   INTEGER ,       INTENT(IN ) :: DataHandle
   INTEGER ,       INTENT(OUT) :: Status
   REAL dummy
@@ -135,6 +222,9 @@ SUBROUTINE ext_int_open_for_write_commit( DataHandle , Status )
       okay_for_io( DataHandle ) = .true.
     ENDIF
   ENDIF
+
+  first_operation( DataHandle ) = .TRUE.
+  file_status(DataHandle) = WRF_FILE_OPENED_FOR_WRITE
 
   Status = 0
 
@@ -146,22 +236,27 @@ SUBROUTINE ext_int_open_for_read ( FileName , Comm_compute, Comm_io, SysDepInfo,
                                DataHandle , Status )
   USE module_ext_internal
   IMPLICIT NONE
+  INCLUDE 'wrf_io_flags.h'
   CHARACTER*(*) :: FileName
   INTEGER ,       INTENT(IN)  :: Comm_compute , Comm_io
   CHARACTER*(*) :: SysDepInfo
   INTEGER ,       INTENT(OUT) :: DataHandle
   INTEGER ,       INTENT(OUT) :: Status
   INTEGER i
+  CHARACTER*256 :: fname
 
   CALL int_get_fresh_handle(i)
   DataHandle = i
   CurrentDateInFile(i) = ""
+  fname = TRIM(FileName)
 
   CALL int_gen_ofr_header( open_file_descriptors(1,i), hdrbufsize, itypesize, &
-                            FileName,SysDepInfo,DataHandle )
+                            fname,SysDepInfo,DataHandle )
 
   OPEN ( unit=DataHandle, status="old", file=TRIM(FileName), form='unformatted', iostat=Status )
-  okay_for_io(i) = .true.
+  okay_for_io(DataHandle) = .true.
+  file_status(DataHandle) = WRF_FILE_OPENED_FOR_READ
+  file_read_only(DataHandle) = .TRUE.
 
   RETURN  
 END SUBROUTINE ext_int_open_for_read
@@ -175,17 +270,15 @@ SUBROUTINE ext_int_inquire_opened ( DataHandle, FileName , FileStatus, Status )
   CHARACTER*(*) :: FileName
   INTEGER ,       INTENT(OUT) :: FileStatus
   INTEGER ,       INTENT(OUT) :: Status
+  CHARACTER*256 :: fname
 
   Status = 0
 
-  FileStatus = WRF_FILE_NOT_OPENED
-  IF ( DataHandle .GE. 1 .AND. DataHandle .LE. int_num_handles ) THEN
-    IF      ( int_handle_in_use( DataHandle ) .AND. okay_for_io( DataHandle ) ) THEN
-      FileStatus = WRF_FILE_OPENED_FOR_WRITE
-    ELSE IF ( int_handle_in_use( DataHandle ) .AND. .NOT. okay_for_io( DataHandle ) ) THEN
-      FileStatus = WRF_FILE_OPENED_FOR_WRITE
-    ENDIF
+  CALL ext_int_inquire_filename ( DataHandle, fname, FileStatus, Status )
+  IF ( fname /= TRIM(FileName) ) THEN
+    FileStatus = WRF_FILE_NOT_OPENED
   ENDIF
+
   Status = 0
   
   RETURN
@@ -202,18 +295,24 @@ SUBROUTINE ext_int_inquire_filename ( DataHandle, FileName , FileStatus, Status 
   INTEGER ,       INTENT(OUT) :: Status
   CHARACTER *4096   SysDepInfo
   INTEGER locDataHandle
+  CHARACTER*256 :: fname
+  INTEGER io_form
   Status = 0
   SysDepInfo = ""
   FileStatus = WRF_FILE_NOT_OPENED
+  FileName = ""
   IF ( int_valid_handle( DataHandle ) ) THEN
     IF ( int_handle_in_use( DataHandle ) ) THEN
-      CALL int_get_ofr_header( open_file_descriptors(1,DataHandle), hdrbufsize, itypesize, &
-                               FileName,SysDepInfo,locDataHandle )
-      IF ( okay_for_io( DataHandle ) ) THEN
-        FileStatus = WRF_FILE_OPENED_FOR_WRITE
+      ! Note that the formats for these headers differ.  
+      IF ( file_read_only(DataHandle) ) THEN
+        CALL int_get_ofr_header( open_file_descriptors(1,DataHandle), hdrbufsize, itypesize, &
+                                 fname,SysDepInfo,locDataHandle )
       ELSE
-        FileStatus = WRF_FILE_OPENED_NOT_COMMITTED
+        CALL int_get_ofwb_header( open_file_descriptors(1,DataHandle), hdrbufsize, itypesize, &
+                                  fname,SysDepInfo,io_form,locDataHandle )
       ENDIF
+      FileName = TRIM(fname)
+      FileStatus = file_status(DataHandle)
     ENDIF
   ENDIF
   Status = 0
@@ -444,7 +543,7 @@ SUBROUTINE ext_int_get_var_info ( DataHandle , VarName , NDim , MemoryOrder , St
 RETURN
 END SUBROUTINE ext_int_get_var_info
 
-!--- get_next_var  (not defined for IntIO)
+!--- get_next_var
 SUBROUTINE ext_int_get_next_var ( DataHandle, VarName, Status )
   USE module_ext_internal
   IMPLICIT NONE
@@ -517,13 +616,13 @@ real    rdata(128)
         IF (TRIM(locDateStr) .NE. TRIM(CurrentDateInFile(DataHandle))) THEN
           Status = WRF_WARN_VAR_EOF !-6 ! signal past last var in time frame
           BACKSPACE ( unit=DataHandle )
-          last_next_var = ""
+          last_next_var( DataHandle )  = ""
           GOTO 7717
         ELSE
           VarName = TRIM(locVarName)
-          IF ( last_next_var .NE. VarName ) THEN
+          IF ( last_next_var( DataHandle )  .NE. VarName ) THEN
             BACKSPACE ( unit=DataHandle )
-            last_next_var = VarName
+            last_next_var( DataHandle )  = VarName
           ELSE
             READ( unit=DataHandle, iostat=istat )
             GOTO 7727
@@ -558,8 +657,11 @@ SUBROUTINE ext_int_get_dom_ti_real ( DataHandle,Element,   Data, Count, Outcount
   CHARACTER*132                :: locElement, mess
   LOGICAL keepgoing
 
+  Status = 0
   IF ( int_valid_handle( DataHandle ) ) THEN
     IF ( int_handle_in_use( DataHandle ) ) THEN
+     ! Do nothing unless it is time to read time-independent domain metadata.
+     IF ( int_ok_to_get_dom_ti( DataHandle ) ) THEN
       keepgoing = .true.
       DO WHILE ( keepgoing ) 
         READ( unit=DataHandle , iostat = istat ) hdrbuf
@@ -575,7 +677,10 @@ SUBROUTINE ext_int_get_dom_ti_real ( DataHandle,Element,   Data, Count, Outcount
               keepgoing = .false. ;  Status = 0
             ENDIF
           ELSE IF ( .NOT. ( code .EQ. int_dom_ti_integer .OR. code .EQ. int_dom_ti_logical .OR. &
-                            code .EQ. int_dom_ti_char    .OR. code .EQ. int_dom_ti_real8         ) ) THEN
+                            code .EQ. int_dom_ti_char    .OR. code .EQ. int_dom_ti_double  .OR. &
+                            code .EQ. int_dom_td_integer .OR. code .EQ. int_dom_td_logical .OR. &
+                            code .EQ. int_dom_td_char    .OR. code .EQ. int_dom_td_double  .OR. &
+                            code .EQ. int_dom_td_real                                  ) ) THEN
             BACKSPACE ( unit=DataHandle )
             keepgoing = .false. ; Status = 2
           ENDIF
@@ -583,6 +688,7 @@ SUBROUTINE ext_int_get_dom_ti_real ( DataHandle,Element,   Data, Count, Outcount
           keepgoing = .false. ; Status = 1
         ENDIF
       ENDDO
+     ENDIF
     ENDIF
   ENDIF
 RETURN
@@ -603,39 +709,50 @@ SUBROUTINE ext_int_put_dom_ti_real ( DataHandle,Element,   Data, Count,  Status 
 
   IF ( int_valid_handle( DataHandle ) ) THEN
     IF ( int_handle_in_use( DataHandle ) ) THEN
-      CALL int_gen_ti_header( hdrbuf, hdrbufsize, itypesize, rtypesize, &
-                              DataHandle, Element, Data, Count, int_dom_ti_real )
-      WRITE( unit=DataHandle ) hdrbuf
+      ! Do nothing unless it is time to write time-independent domain metadata.
+      IF ( int_ok_to_put_dom_ti( DataHandle ) ) THEN
+        CALL int_gen_ti_header( hdrbuf, hdrbufsize, itypesize, rtypesize, &
+                                DataHandle, Element, Data, Count, int_dom_ti_real )
+        WRITE( unit=DataHandle ) hdrbuf
+      ENDIF
     ENDIF
   ENDIF
   Status = 0
 RETURN
 END SUBROUTINE ext_int_put_dom_ti_real 
 
-!--- get_dom_ti_real8
-SUBROUTINE ext_int_get_dom_ti_real8 ( DataHandle,Element,   Data, Count, Outcount, Status )
+!--- get_dom_ti_double
+SUBROUTINE ext_int_get_dom_ti_double ( DataHandle,Element,   Data, Count, Outcount, Status )
+  USE module_ext_internal
   IMPLICIT NONE
   INTEGER ,       INTENT(IN)  :: DataHandle
   CHARACTER*(*) :: Element
-  real(kind=8) ,  INTENT(OUT) :: Data(*)
+  real*8 ,            INTENT(OUT) :: Data(*)
   INTEGER ,       INTENT(IN)  :: Count
   INTEGER ,       INTENT(OUT)  :: OutCount
   INTEGER ,       INTENT(OUT) :: Status
-  CALL wrf_message('ext_int_get_dom_ti_real8 not supported yet')
+  ! Do nothing unless it is time to read time-independent domain metadata.
+  IF ( int_ok_to_get_dom_ti( DataHandle ) ) THEN
+    CALL wrf_message('ext_int_get_dom_ti_double not supported yet')
+  ENDIF
 RETURN
-END SUBROUTINE ext_int_get_dom_ti_real8 
+END SUBROUTINE ext_int_get_dom_ti_double 
 
-!--- put_dom_ti_real8
-SUBROUTINE ext_int_put_dom_ti_real8 ( DataHandle,Element,   Data, Count,  Status )
+!--- put_dom_ti_double
+SUBROUTINE ext_int_put_dom_ti_double ( DataHandle,Element,   Data, Count,  Status )
+  USE module_ext_internal
   IMPLICIT NONE
   INTEGER ,       INTENT(IN)  :: DataHandle
   CHARACTER*(*) :: Element
-  real(kind=8) ,  INTENT(IN) :: Data(*)
+  real*8 ,            INTENT(IN) :: Data(*)
   INTEGER ,       INTENT(IN)  :: Count
   INTEGER ,       INTENT(OUT) :: Status
-  CALL wrf_message('ext_int_put_dom_ti_real8 not supported yet')
+  ! Do nothing unless it is time to write time-independent domain metadata.
+  IF ( int_ok_to_put_dom_ti( DataHandle ) ) THEN
+    CALL wrf_message('ext_int_put_dom_ti_double not supported yet')
+  ENDIF
 RETURN
-END SUBROUTINE ext_int_put_dom_ti_real8 
+END SUBROUTINE ext_int_put_dom_ti_double 
 
 !--- get_dom_ti_integer
 SUBROUTINE ext_int_get_dom_ti_integer ( DataHandle,Element,   Data, Count, Outcount, Status )
@@ -652,8 +769,11 @@ SUBROUTINE ext_int_get_dom_ti_integer ( DataHandle,Element,   Data, Count, Outco
   CHARACTER*132   locElement, mess
   LOGICAL keepgoing
 
+  Status = 0
   IF ( int_valid_handle( DataHandle ) ) THEN
     IF ( int_handle_in_use( DataHandle ) ) THEN
+     ! Do nothing unless it is time to read time-independent domain metadata.
+     IF ( int_ok_to_get_dom_ti( DataHandle ) ) THEN
       keepgoing = .true.
       DO WHILE ( keepgoing )
         READ( unit=DataHandle , iostat = istat ) hdrbuf
@@ -668,8 +788,12 @@ SUBROUTINE ext_int_get_dom_ti_integer ( DataHandle,Element,   Data, Count, Outco
               ENDIF
               keepgoing = .false. ;  Status = 0
             ENDIF
-          ELSE IF ( .NOT. ( code .EQ. int_dom_ti_real .OR. code .EQ. int_dom_ti_logical .OR. &
-                            code .EQ. int_dom_ti_char .OR. code .EQ. int_dom_ti_real8         ) ) THEN
+
+          ELSE IF ( .NOT. ( code .EQ. int_dom_ti_real    .OR.   code .EQ. int_dom_ti_logical .OR. &
+                            code .EQ. int_dom_ti_char    .OR.   code .EQ. int_dom_ti_double  .OR. &
+                            code .EQ. int_dom_td_real    .OR.   code .EQ. int_dom_td_logical .OR. &
+                            code .EQ. int_dom_td_char    .OR.   code .EQ. int_dom_td_double  .OR. &
+                            code .EQ. int_dom_td_integer )                                           ) THEN
             BACKSPACE ( unit=DataHandle )
             keepgoing = .false. ; Status = 1
           ENDIF
@@ -677,6 +801,7 @@ SUBROUTINE ext_int_get_dom_ti_integer ( DataHandle,Element,   Data, Count, Outco
           keepgoing = .false. ; Status = 1
         ENDIF
       ENDDO
+     ENDIF
     ENDIF
   ENDIF
 RETURN
@@ -696,9 +821,12 @@ SUBROUTINE ext_int_put_dom_ti_integer ( DataHandle,Element,   Data, Count,  Stat
 !
   IF ( int_valid_handle ( Datahandle ) ) THEN
     IF ( int_handle_in_use( DataHandle ) ) THEN
-      CALL int_gen_ti_header( hdrbuf, hdrbufsize, itypesize, itypesize, &
-                              DataHandle, Element, Data, Count, int_dom_ti_integer )
-      WRITE( unit=DataHandle ) hdrbuf 
+      ! Do nothing unless it is time to write time-independent domain metadata.
+      IF ( int_ok_to_put_dom_ti( DataHandle ) ) THEN
+        CALL int_gen_ti_header( hdrbuf, hdrbufsize, itypesize, itypesize, &
+                                DataHandle, Element, Data, Count, int_dom_ti_integer )
+        WRITE( unit=DataHandle ) hdrbuf 
+      ENDIF
     ENDIF
   ENDIF
   Status = 0
@@ -707,6 +835,7 @@ END SUBROUTINE ext_int_put_dom_ti_integer
 
 !--- get_dom_ti_logical
 SUBROUTINE ext_int_get_dom_ti_logical ( DataHandle,Element,   Data, Count, Outcount, Status )
+  USE module_ext_internal
   IMPLICIT NONE
   INTEGER ,       INTENT(IN)  :: DataHandle
   CHARACTER*(*) :: Element
@@ -714,19 +843,26 @@ SUBROUTINE ext_int_get_dom_ti_logical ( DataHandle,Element,   Data, Count, Outco
   INTEGER ,       INTENT(IN)  :: Count
   INTEGER ,       INTENT(OUT)  :: OutCount
   INTEGER ,       INTENT(OUT) :: Status
-  CALL wrf_message('ext_int_get_dom_ti_logical not supported yet')
+  ! Do nothing unless it is time to read time-independent domain metadata.
+  IF ( int_ok_to_get_dom_ti( DataHandle ) ) THEN
+    CALL wrf_message('ext_int_get_dom_ti_logical not supported yet')
+  ENDIF
 RETURN
 END SUBROUTINE ext_int_get_dom_ti_logical 
 
 !--- put_dom_ti_logical
 SUBROUTINE ext_int_put_dom_ti_logical ( DataHandle,Element,   Data, Count,  Status )
+  USE module_ext_internal
   IMPLICIT NONE
   INTEGER ,       INTENT(IN)  :: DataHandle
   CHARACTER*(*) :: Element
   logical ,            INTENT(IN) :: Data(*)
   INTEGER ,       INTENT(IN)  :: Count
   INTEGER ,       INTENT(OUT) :: Status
-  CALL wrf_message('ext_int_put_dom_ti_logical not supported yet')
+  ! Do nothing unless it is time to write time-independent domain metadata.
+  IF ( int_ok_to_put_dom_ti( DataHandle ) ) THEN
+    CALL wrf_message('ext_int_put_dom_ti_logical not supported yet')
+  ENDIF
 RETURN
 END SUBROUTINE ext_int_put_dom_ti_logical 
 
@@ -744,8 +880,11 @@ SUBROUTINE ext_int_get_dom_ti_char ( DataHandle,Element,   Data,  Status )
   INTEGER locDataHandle
   LOGICAL keepgoing
 
+  Status = 0
   IF ( int_valid_handle( DataHandle ) ) THEN
     IF ( int_handle_in_use( DataHandle ) ) THEN
+     ! Do nothing unless it is time to read time-independent domain metadata.
+     IF ( int_ok_to_get_dom_ti( DataHandle ) ) THEN
       keepgoing = .true.
       DO WHILE ( keepgoing )
         READ( unit=DataHandle , iostat = istat ) hdrbuf
@@ -759,7 +898,10 @@ SUBROUTINE ext_int_get_dom_ti_char ( DataHandle,Element,   Data,  Status )
               keepgoing = .false. ;  Status = 0
             ENDIF
           ELSE IF ( .NOT. ( code .EQ. int_dom_ti_real    .OR. code .EQ. int_dom_ti_logical .OR. &
-                            code .EQ. int_dom_ti_integer .OR. code .EQ. int_dom_ti_real8         ) ) THEN
+                            code .EQ. int_dom_ti_integer .OR. code .EQ. int_dom_ti_double  .OR. &
+                            code .EQ. int_dom_td_real    .OR. code .EQ. int_dom_td_logical .OR. &
+                            code .EQ. int_dom_td_integer .OR. code .EQ. int_dom_td_double  .OR. &
+                            code .EQ. int_dom_td_char                                             ) ) THEN
             BACKSPACE ( unit=DataHandle )
             keepgoing = .false. ; Status = 1
           ENDIF
@@ -767,6 +909,7 @@ SUBROUTINE ext_int_get_dom_ti_char ( DataHandle,Element,   Data,  Status )
           keepgoing = .false. ; Status = 1
         ENDIF
       ENDDO
+     ENDIF
     ENDIF
   ENDIF
 RETURN
@@ -787,9 +930,12 @@ SUBROUTINE ext_int_put_dom_ti_char ( DataHandle, Element,  Data,  Status )
 
   IF ( int_valid_handle ( Datahandle ) ) THEN
     IF ( int_handle_in_use( DataHandle ) ) THEN
-      CALL int_gen_ti_header_char( hdrbuf, hdrbufsize, itypesize,  &
-                                   DataHandle, Element, "", Data, int_dom_ti_char )
-      WRITE( unit=DataHandle ) hdrbuf 
+      ! Do nothing unless it is time to write time-independent domain metadata.
+      IF ( int_ok_to_put_dom_ti( DataHandle ) ) THEN
+        CALL int_gen_ti_header_char( hdrbuf, hdrbufsize, itypesize,  &
+                                     DataHandle, Element, "", Data, int_dom_ti_char )
+        WRITE( unit=DataHandle ) hdrbuf 
+      ENDIF
     ENDIF
   ENDIF
   Status = 0
@@ -821,30 +967,30 @@ SUBROUTINE ext_int_put_dom_td_real ( DataHandle,Element, DateStr,  Data, Count, 
 RETURN
 END SUBROUTINE ext_int_put_dom_td_real 
 
-!--- get_dom_td_real8
-SUBROUTINE ext_int_get_dom_td_real8 ( DataHandle,Element, DateStr,  Data, Count, Outcount, Status )
+!--- get_dom_td_double
+SUBROUTINE ext_int_get_dom_td_double ( DataHandle,Element, DateStr,  Data, Count, Outcount, Status )
   IMPLICIT NONE
   INTEGER ,       INTENT(IN)  :: DataHandle
   CHARACTER*(*) :: Element
   CHARACTER*(*) :: DateStr
-  real(kind=8) ,  INTENT(OUT) :: Data(*)
+  real*8 ,            INTENT(OUT) :: Data(*)
   INTEGER ,       INTENT(IN)  :: Count
   INTEGER ,       INTENT(OUT)  :: OutCount
   INTEGER ,       INTENT(OUT) :: Status
 RETURN
-END SUBROUTINE ext_int_get_dom_td_real8 
+END SUBROUTINE ext_int_get_dom_td_double 
 
-!--- put_dom_td_real8
-SUBROUTINE ext_int_put_dom_td_real8 ( DataHandle,Element, DateStr,  Data, Count,  Status )
+!--- put_dom_td_double
+SUBROUTINE ext_int_put_dom_td_double ( DataHandle,Element, DateStr,  Data, Count,  Status )
   IMPLICIT NONE
   INTEGER ,       INTENT(IN)  :: DataHandle
   CHARACTER*(*) :: Element
   CHARACTER*(*) :: DateStr
-  real(kind=8) ,  INTENT(IN) :: Data(*)
+  real*8 ,            INTENT(IN) :: Data(*)
   INTEGER ,       INTENT(IN)  :: Count
   INTEGER ,       INTENT(OUT) :: Status
 RETURN
-END SUBROUTINE ext_int_put_dom_td_real8 
+END SUBROUTINE ext_int_put_dom_td_double 
 
 !--- get_dom_td_integer
 SUBROUTINE ext_int_get_dom_td_integer ( DataHandle,Element, DateStr,  Data, Count, Outcount, Status )
@@ -979,36 +1125,36 @@ SUBROUTINE ext_int_put_var_ti_real ( DataHandle,Element,  Varname, Data, Count, 
   INTEGER ,       INTENT(IN)  :: DataHandle
   CHARACTER*(*) :: Element
   CHARACTER*(*) :: VarName 
-  real ,          INTENT(IN) :: Data(*)
+  real ,            INTENT(IN) :: Data(*)
   INTEGER ,       INTENT(IN)  :: Count
   INTEGER ,       INTENT(OUT) :: Status
 RETURN
 END SUBROUTINE ext_int_put_var_ti_real 
 
-!--- get_var_ti_real8
-SUBROUTINE ext_int_get_var_ti_real8 ( DataHandle,Element,  Varname, Data, Count, Outcount, Status )
+!--- get_var_ti_double
+SUBROUTINE ext_int_get_var_ti_double ( DataHandle,Element,  Varname, Data, Count, Outcount, Status )
   IMPLICIT NONE
   INTEGER ,       INTENT(IN)  :: DataHandle
   CHARACTER*(*) :: Element
   CHARACTER*(*) :: VarName 
-  real(kind=8) ,  INTENT(OUT) :: Data(*)
+  real*8 ,            INTENT(OUT) :: Data(*)
   INTEGER ,       INTENT(IN)  :: Count
   INTEGER ,       INTENT(OUT)  :: OutCount
   INTEGER ,       INTENT(OUT) :: Status
 RETURN
-END SUBROUTINE ext_int_get_var_ti_real8 
+END SUBROUTINE ext_int_get_var_ti_double 
 
-!--- put_var_ti_real8
-SUBROUTINE ext_int_put_var_ti_real8 ( DataHandle,Element,  Varname, Data, Count,  Status )
+!--- put_var_ti_double
+SUBROUTINE ext_int_put_var_ti_double ( DataHandle,Element,  Varname, Data, Count,  Status )
   IMPLICIT NONE
   INTEGER ,       INTENT(IN)  :: DataHandle
   CHARACTER*(*) :: Element
   CHARACTER*(*) :: VarName 
-  real(kind=8) ,  INTENT(IN) :: Data(*)
+  real*8 ,            INTENT(IN) :: Data(*)
   INTEGER ,       INTENT(IN)  :: Count
   INTEGER ,       INTENT(OUT) :: Status
 RETURN
-END SUBROUTINE ext_int_put_var_ti_real8 
+END SUBROUTINE ext_int_put_var_ti_double 
 
 !--- get_var_ti_integer
 SUBROUTINE ext_int_get_var_ti_integer ( DataHandle,Element,  Varname, Data, Count, Outcount, Status )
@@ -1135,32 +1281,32 @@ SUBROUTINE ext_int_put_var_td_real ( DataHandle,Element,  DateStr,Varname, Data,
 RETURN
 END SUBROUTINE ext_int_put_var_td_real 
 
-!--- get_var_td_real8
-SUBROUTINE ext_int_get_var_td_real8 ( DataHandle,Element,  DateStr,Varname, Data, Count, Outcount, Status )
+!--- get_var_td_double
+SUBROUTINE ext_int_get_var_td_double ( DataHandle,Element,  DateStr,Varname, Data, Count, Outcount, Status )
   IMPLICIT NONE
   INTEGER ,       INTENT(IN)  :: DataHandle
   CHARACTER*(*) :: Element
   CHARACTER*(*) :: DateStr
   CHARACTER*(*) :: VarName 
-  real(kind=8) ,  INTENT(OUT) :: Data(*)
+  real*8 ,            INTENT(OUT) :: Data(*)
   INTEGER ,       INTENT(IN)  :: Count
   INTEGER ,       INTENT(OUT)  :: OutCount
   INTEGER ,       INTENT(OUT) :: Status
 RETURN
-END SUBROUTINE ext_int_get_var_td_real8 
+END SUBROUTINE ext_int_get_var_td_double 
 
-!--- put_var_td_real8
-SUBROUTINE ext_int_put_var_td_real8 ( DataHandle,Element,  DateStr,Varname, Data, Count,  Status )
+!--- put_var_td_double
+SUBROUTINE ext_int_put_var_td_double ( DataHandle,Element,  DateStr,Varname, Data, Count,  Status )
   IMPLICIT NONE
   INTEGER ,       INTENT(IN)  :: DataHandle
   CHARACTER*(*) :: Element
   CHARACTER*(*) :: DateStr
   CHARACTER*(*) :: VarName 
-  real(kind=8) ,  INTENT(IN) :: Data(*)
+  real*8 ,            INTENT(IN) :: Data(*)
   INTEGER ,       INTENT(IN)  :: Count
   INTEGER ,       INTENT(OUT) :: Status
 RETURN
-END SUBROUTINE ext_int_put_var_td_real8 
+END SUBROUTINE ext_int_put_var_td_double 
 
 !--- get_var_td_integer
 SUBROUTINE ext_int_get_var_td_integer ( DataHandle,Element,  DateStr,Varname, Data, Count, Outcount, Status )
@@ -1312,12 +1458,12 @@ SUBROUTINE ext_int_read_field ( DataHandle , DateStr , VarName , Field , FieldTy
                                  locMemoryStart , locMemoryEnd ,                                    &
                                  locPatchStart , locPatchEnd )
         IF ( TRIM(locVarName) .EQ. TRIM(VarName) ) THEN
-          IF     ((FieldType .EQ. WRF_REAL4) .OR. (FieldType .EQ. WRF_REAL8)) THEN
+          IF      ( FieldType .EQ. WRF_REAL ) THEN
             CALL rfieldread( DataHandle, Field, MemoryStart, MemoryEnd, PatchStart, PatchEnd )
           ELSE IF ( FieldType .EQ. WRF_INTEGER ) THEN
             CALL ifieldread( DataHandle, Field, MemoryStart, MemoryEnd, PatchStart, PatchEnd )
           ELSE
-            CALL wrf_message('io_int.F90: ext_int_read_field: types other than REAL or INTEGER not supported yet')
+            CALL wrf_message('io_int.F90: ext_int_read_field: types other than WRF_REAL not supported yet')
             READ( unit=DataHandle )
           ENDIF
         ELSE
@@ -1336,6 +1482,7 @@ SUBROUTINE ext_int_read_field ( DataHandle , DateStr , VarName , Field , FieldTy
 
 7717 CONTINUE
 
+  first_operation( DataHandle ) = .FALSE.
   RETURN
 
 END SUBROUTINE ext_int_read_field
@@ -1384,8 +1531,10 @@ SUBROUTINE ext_int_write_field ( DataHandle , DateStr , VarName , Field , FieldT
 
   inttypesize = itypesize
   realtypesize = rtypesize
-  IF      ( FieldType .EQ. WRF_REAL4 .OR. FieldType .EQ. WRF_REAL8) THEN
+  IF      ( FieldType .EQ. WRF_REAL .OR. FieldType .EQ. WRF_DOUBLE) THEN
     typesize = rtypesize
+ ! ELSE IF ( FieldType .EQ. WRF_DOUBLE ) THEN
+ !   CALL wrf_error_fatal( 'io_int.F90: ext_int_write_field, WRF_DOUBLE not yet supported')
   ELSE IF ( FieldType .EQ. WRF_INTEGER ) THEN
     typesize = itypesize
   ELSE IF ( FieldType .EQ. WRF_LOGICAL ) THEN
@@ -1401,12 +1550,13 @@ SUBROUTINE ext_int_write_field ( DataHandle , DateStr , VarName , Field , FieldT
                              MemoryStart , MemoryEnd ,                                    &
                              PatchStart , PatchEnd )
     WRITE( unit=DataHandle ) hdrbuf
-    IF     ((FieldType .EQ. WRF_REAL4) .OR. (FieldType .EQ. WRF_REAL8)) THEN
+    IF      ( FieldType .EQ. WRF_REAL ) THEN
       CALL rfieldwrite( DataHandle, Field, MemoryStart, MemoryEnd, PatchStart, PatchEnd )
     ELSE IF ( FieldType .EQ. WRF_INTEGER ) THEN
       CALL ifieldwrite( DataHandle, Field, MemoryStart, MemoryEnd, PatchStart, PatchEnd )
     ENDIF
   ENDIF
+  first_operation( DataHandle ) = .FALSE.
   Status = 0
   RETURN
 END SUBROUTINE ext_int_write_field

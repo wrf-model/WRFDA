@@ -9,7 +9,10 @@ SUBROUTINE med_force_domain ( parent_grid , nested_grid )
    INTEGER nlev, msize
    TYPE (grid_config_rec_type)            :: config_flags
 #ifdef DEREF_KLUDGE
+!  see http://www.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm
    INTEGER     :: sm31 , em31 , sm32 , em32 , sm33 , em33
+   INTEGER     :: sm31x, em31x, sm32x, em32x, sm33x, em33x
+   INTEGER     :: sm31y, em31y, sm32y, em32y, sm33y, em33y
 #endif
 
    INTERFACE
@@ -81,6 +84,7 @@ SUBROUTINE med_force_domain ( parent_grid , nested_grid )
 ! vvvvvvvvvv EM PART 1 BFB (bug) vvvvvvvvvv
      grid => parent_grid
 #  include "deref_kludge.h"
+     CALL model_to_grid_config_rec ( grid%id , model_config_rec , config_flags )
      CALL interp_domain_em_part1 ( grid , nested_grid%intermediate_grid, config_flags ,  &
 !
 #  include "em_actual_args.inc"
@@ -89,6 +93,7 @@ SUBROUTINE med_force_domain ( parent_grid , nested_grid )
 
      grid => nested_grid%intermediate_grid
 #  include "deref_kludge.h"
+     CALL model_to_grid_config_rec ( grid%id , model_config_rec , config_flags )
      CALL couple_or_uncouple_em ( grid , config_flags ,  .true., &
 !
 #  include "em_actual_args.inc"
@@ -96,6 +101,7 @@ SUBROUTINE med_force_domain ( parent_grid , nested_grid )
                  )
      grid => nested_grid
 #  include "deref_kludge.h"
+     CALL model_to_grid_config_rec ( grid%id , model_config_rec , config_flags )
      CALL couple_or_uncouple_em ( nested_grid , config_flags ,  .true., &
 !
 #  include "em_actual_args.inc"
@@ -180,7 +186,7 @@ SUBROUTINE med_force_domain ( parent_grid , nested_grid )
         ! uncouple the nest
         grid => nested_grid
 #  include "deref_kludge.h"
-        CALL model_to_grid_config_rec ( nested_grid%id , model_config_rec , config_flags )
+        CALL model_to_grid_config_rec ( grid%id , model_config_rec , config_flags )
         CALL couple_or_uncouple_em( nested_grid , config_flags ,  .false. , &
 !
 #  include "em_actual_args.inc"
