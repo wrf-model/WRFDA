@@ -30,7 +30,7 @@ SUBROUTINE da_get_innov_vector_gpsref ( it, xb, xp, ob, iv )
 
 ! Deallocate:
         if (iv%num_gpsref > 0) then
-          print '(a,i)','iv%num_gpsref=', iv%num_gpsref
+!          print '(a,i6)','iv%num_gpsref=', iv%num_gpsref
           do n = 1, iv%num_gpsref
           deallocate (iv % gpsref(n) %  h )
           deallocate (iv % gpsref(n) %  zk)
