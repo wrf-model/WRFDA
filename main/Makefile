@@ -25,18 +25,6 @@ $(SOLVER)_real : module_initialize real_$(SOLVER).o ndown_$(SOLVER).o
 	$(LD) -o real.exe $(LDFLAGS) real_$(SOLVER).o ../dyn_$(SOLVER)/module_initialize_$(IDEAL_CASE).o libwrflib.a $(LIB)
 	$(LD) -o ndown.exe $(LDFLAGS) ndown_$(SOLVER).o  ../dyn_$(SOLVER)/module_initialize_$(IDEAL_CASE).o libwrflib.a $(LIB)
 
-da_3dvar : da_3dvar.o
-	$(RANLIB) libwrflib.a
-	$(FC) -o da_3dvar.exe $(LDFLAGS) da_3dvar.o libwrflib.a $(LIB)
-
-tl_wrf : tl_wrf.o
-	$(RANLIB) libwrflib.a
-	$(LD) -o tl_wrf.exe $(LDFLAGS) tl_wrf.o libwrflib.a $(LIB)
-
-ad_wrf : ad_wrf.o
-	$(RANLIB) libwrflib.a
-	$(LD) -o ad_wrf.exe $(LDFLAGS) ad_wrf.o libwrflib.a $(LIB)
-
 convert_bioemiss : convert_bioemiss.o
 	$(RANLIB) libwrflib.a
 	$(FC) -o convert_bioemiss.exe $(LDFLAGS) convert_bioemiss.o libwrflib.a $(LIB)
@@ -74,7 +62,7 @@ convert_nmm.o: \
 	../frame/module_configure.o \
 	../frame/module_timing.o \
 	../frame/module_dm.o \
-	../frame/module_wrf_esmf_super.o \
+	../share/module_wrf_esmf_super.o \
 	../share/module_bc.o \
 	../share/module_io_domain.o \
 	$(ESMF_MOD_DEPENDENCE) $(EXTRAMODULES)
@@ -86,7 +74,7 @@ ideal.o: \
 	../frame/module_configure.o \
 	../frame/module_timing.o \
 	../frame/module_dm.o \
-	../frame/module_wrf_esmf_super.o \
+	../share/module_wrf_esmf_super.o \
 	../share/module_io_domain.o \
 	../dyn_$(SOLVER)/$(CASE_MODULE) \
 	$(ESMF_MOD_DEPENDENCE) $(EXTRAMODULES)
@@ -98,7 +86,7 @@ ndown_em.o: \
 	../frame/module_configure.o \
 	../frame/module_timing.o \
 	../frame/module_dm.o \
-	../frame/module_wrf_esmf_super.o \
+	../share/module_wrf_esmf_super.o \
 	../frame/module_wrf_error.o \
 	../frame/module_integrate.o \
 	../share/module_bc.o \
@@ -117,7 +105,7 @@ real_em.o: \
 	../frame/module_configure.o \
 	../frame/module_timing.o \
 	../frame/module_dm.o \
-	../frame/module_wrf_esmf_super.o \
+	../share/module_wrf_esmf_super.o \
 	../dyn_em/module_si_io_em.o \
 	../dyn_em/module_big_step_utilities_em.o \
 	../share/module_io_domain.o \
@@ -137,31 +125,7 @@ wrf.o: \
 	../frame/module_timing.o \
 	../frame/module_wrf_error.o \
 	../frame/module_dm.o \
-	../frame/module_wrf_esmf_super.o \
-	$(ESMF_MOD_DEPENDENCE) $(EXTRAMODULES)
-
-tl_wrf.o: \
-	../frame/module_machine.o \
-	../frame/module_domain.o \
-	../frame/module_integrate_tl.o \
-	../frame/module_driver_constants.o \
-	../frame/module_configure.o \
-	../frame/module_timing.o \
-	../frame/module_wrf_error.o \
-	../frame/module_dm.o \
-	../frame/module_wrf_esmf_super.o \
-	$(ESMF_MOD_DEPENDENCE) $(EXTRAMODULES)
-
-ad_wrf.o: \
-	../frame/module_machine.o \
-	../frame/module_domain.o \
-	../frame/module_integrate.o \
-	../frame/module_driver_constants.o \
-	../frame/module_configure.o \
-	../frame/module_timing.o \
-	../frame/module_wrf_error.o \
-	../frame/module_dm.o \
-	../frame/module_wrf_esmf_super.o \
+	../share/module_wrf_esmf_super.o \
 	$(ESMF_MOD_DEPENDENCE) $(EXTRAMODULES)
 
 # DO NOT DELETE

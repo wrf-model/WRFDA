@@ -227,6 +227,8 @@ framework :
 	( cd frame ; $(MAKE) framework; \
 	cd ../external/io_netcdf ; \
 	make NETCDFPATH="$(NETCDFPATH)" FC="$(FC) $(FCBASEOPTS)" RANLIB=$(RANLIB) CPP="$(CPP) $(TRADFLAG)" diffwrf; \
+	cd ../io_grib1 ; \
+	make FC="$(FC) -I. $(FCBASEOPTS)" CC="$(CC)" CFLAGS="$(CFLAGS)" RANLIB="$(RANLIB)" CPP="$(CPP)"; \
 	cd ../io_int ; \
 	$(MAKE) FC="$(FC) $(FCBASEOPTS)" RANLIB=$(RANLIB) CPP="$(CPP) $(TRADFLAG)" diffwrf ; \
 	cd ../../frame )
