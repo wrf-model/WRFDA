@@ -75,17 +75,6 @@ SUBROUTINE DA_Setup_FirstGuess( xbx, grid, &
 !------------------------------------------------------------------------------
 !--Exchange halo region for XB arrays.
 !------------------------------------------------------------------------------
-#ifdef DM_PARALLEL
-
-   write(unit=*, fmt='(a, 3i3)') &
-        'xb%ids, xb%jds, xb%kds=', xb%ids, xb%jds, xb%kds, &
-        'xb%ims, xb%jms, xb%kms=', xb%ims, xb%jms, xb%kms, &
-        'xb%its, xb%jts, xb%kts=', xb%its, xb%jts, xb%kts, &
-        'xb%ide, xb%jde, xb%kde=', xb%ide, xb%jde, xb%kde, &
-        'xb%ime, xb%jme, xb%kme=', xb%ime, xb%jme, xb%kme, &
-        'xb%ite, xb%jte, xb%kte=', xb%ite, xb%jte, xb%kte
-
-#endif
 
    CALL wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id0)
    periodic_x = grid%periodic_x
@@ -122,11 +111,11 @@ SUBROUTINE DA_Setup_FirstGuess( xbx, grid, &
      end if
    end if
 !------------------------------------------------------------------------------
-   write(unit=*, fmt='(4x,a,i4)') &
-        'I Dimension grid points: ', xb % mix, &
-        'J Dimension grid points: ', xb % mjy, &
-        'K Dimension grid points: ', xb % mkz
-   write(unit=*, fmt='(/)')
+!  write(unit=*, fmt='(4x,a,i4)') &
+!       'I Dimension grid points: ', xb % mix, &
+!       'J Dimension grid points: ', xb % mjy, &
+!       'K Dimension grid points: ', xb % mkz
+!  write(unit=*, fmt='(/)')
 
 !------------------------------------------------------------------------------      
 !  [2.0] Setup grid-dependent constants used:
