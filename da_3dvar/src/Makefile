@@ -55,6 +55,8 @@ OBJS_FOR_GEN_BE =	DA_Constants.o		\
 			BLAS.o			\
 			da_spectral.o
 
+OBJS_FOR_DA_VAR_IO =	DA_Var_IO.o
+
 include ../../configure.wrf
 
 TARGETDIR    =  ../..
@@ -63,6 +65,9 @@ TARGETDIR    =  ../..
 
 gen_be :	$(OBJS_FOR_GEN_BE)
 		$(AR) ../../main/libwrflib.a $(OBJS_FOR_GEN_BE)
+
+da_var_io :	$(OBJS_FOR_DA_VAR_IO)
+		$(AR) ../../main/libwrflib.a $(OBJS_FOR_DA_VAR_IO)
 
 ##########################################################################
 

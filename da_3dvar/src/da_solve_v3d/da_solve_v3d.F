@@ -26,11 +26,11 @@ MODULE da_var_esmf_super
 
    USE DA_Constants
    USE DA_Var_IO
-!  USE DA_Define_Structures
-!  USE DA_Setup_Structures
-!  USE DA_Test
-!  USE DA_Tools
-!  USE DA_Minimisation
+   USE DA_Define_Structures
+   USE DA_Setup_Structures
+   USE DA_Test
+   USE DA_Tools
+   USE DA_Minimisation
    USE par_util
 
    IMPLICIT NONE
@@ -53,7 +53,9 @@ MODULE da_var_esmf_super
    INTEGER                 :: nbytes
    INTEGER, PARAMETER      :: configbuflen = 4* CONFIG_BUF_LEN
    INTEGER                 :: configbuf( configbuflen )
+#ifndef AIX
    LOGICAL , EXTERNAL      :: wrf_dm_on_monitor
+#endif
 #endif
 
    CHARACTER (LEN=80)      :: rstname

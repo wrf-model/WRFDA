@@ -503,3 +503,45 @@ cvs commit ?
 CHANGES
 
 changes/change_20050207.srh
+
+Wei Huang's new change to break makefile circular dependency
+February 23, 2005
+
+Files added:
+-------------------------------------
+
+ da_3dvar/src/da_solve_v3d/solve_v3d.inc
+ da_3dvar/src/da_solve_v3d/da_var_solve_interface.inc
+ da_3dvar/src/da_solve_v3d/da_var_run.inc
+ da_3dvar/src/da_solve_v3d/da_var_finalize.inc
+ da_3dvar/src/da_solve_v3d/da_var_init.inc
+ da_3dvar/src/DA_Var_IO/DA_Var_IO.F
+ med_initialdata_input_3dvar.inc         
+ med_initialdata_output_3dvar.inc
+
+Files Removed:
+-------------------------------------
+
+ da_3dvar/module_wrf_3dvar_interface.F
+ da_3dvar/module_wrf_3dvar_io.F
+ da_3dvar/module_wrfvar_esmf_super.F
+
+Files Modified:
+-------------------------------------
+
+ Makefile
+ Registry/Registry.3DVAR
+ da_3dvar/module_wrf_3dvar_interface.F
+ da_3dvar/module_wrf_3dvar_io.F
+ da_3dvar/module_wrfvar_esmf_super.F
+ da_3dvar/src/Makefile
+ da_3dvar/src/DA_Minimisation/DA_Minimisation.F
+ da_3dvar/src/da_solve_v3d/da_init_3dvar.inc
+ da_3dvar/src/da_solve_v3d/da_solve_v3d.F
+ frame/libmassv.F
+ main/da_3dvar.F
+
+Tag:
+
+version_2_0_2_0
+

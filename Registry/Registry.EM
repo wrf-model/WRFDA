@@ -1148,12 +1148,17 @@ rconfig   integer map_proj                derived                  max_domains  
 
 #
 #---------------------------------------------------------------------------------------------------------------------------------------
+# Single dummy declaration to define a nodyn dyn option
+state integer nodyn_dummy - dyn_nodyn -  -  -  "" "" ""
+
+#
+#------------------------------------------------------------------------------------
 # Package Declarations
-#                                               
+#
 
 #key      package       associated                package          associated 4d scalars
 #         name          namelist choice           state vars
-
+package   dyn_nodyn    dyn_opt==0                   -             -
 package   dyn_em       dyn_opt==2                   -             -
 
 #package   passivec1     chem_opt==0                  -             

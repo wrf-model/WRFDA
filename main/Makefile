@@ -48,15 +48,7 @@ convert_nmm : convert_nmm.o
 module_initialize :
 	( cd ../dyn_$(SOLVER) ;  $(MAKE) module_initialize_$(IDEAL_CASE).o )
 
-## prevent real being compiled for OMP -- only for regtesting
-#$(SOLVER)_real : module_initialize real_$(SOLVER).o
-#	$(RANLIB) libwrflib.a
-#	if [ -z "$(OMP)" ] ; then $(FC) -o real.exe $(LDFLAGS) real_$(SOLVER).o ../dyn_$(SOLVER)/module_initialize_$(IDEAL_CASE).o libwrflib.a $(LIB) ; fi
-#
-## prevent module_initialize being compiled for OMP --remove after IBM debugging
-#module_initialize :
-#	if [ -z "$(OMP)" ] ; then ( cd ../dyn_$(SOLVER) ;  $(MAKE) module_initialize_$(IDEAL_CASE).o ) ; fi
-# end of regtest changes
+#############################################################################################################################
 
 clean:
 	@ echo 'use the clean script'

@@ -1,7 +1,9 @@
-SUBROUTINE da_init_3dvar( grid, xp, xb, &
+SUBROUTINE da_init_3dvar( grid, &
                           ids, ide, jds, jde, kds, kde, &
                           ims, ime, jms, jme, kms, kme, &
-                          ips, ipe, jps, jpe, kps, kpe )
+                          ips, ipe, jps, jpe, kps, kpe, &
+#include <em_dummy_args.inc>
+                        )
 
    IMPLICIT NONE
 
@@ -9,8 +11,8 @@ SUBROUTINE da_init_3dvar( grid, xp, xb, &
 
    TYPE(domain) , TARGET            :: grid
 
-   TYPE (xpose_type),INTENT(INOUT)  :: xp      ! Transpose variables.
-   TYPE (xb_type), INTENT(INOUT)    :: xb      ! Background state
+!  Definitions of dummy arguments to solve
+#include <em_dummy_decl.inc>
 
    INTEGER,      INTENT(OUT)        :: ids,ide, jds,jde, kds,kde   ! domain dims.
    INTEGER,      INTENT(OUT)        :: ims,ime, jms,jme, kms,kme   ! memory dims.

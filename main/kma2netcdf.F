@@ -14,8 +14,7 @@ PROGRAM kma2netcdf
    USE module_dm
 #endif
 
-   USE module_wrf_3dvar_io
-   USE module_wrf_3dvar_interface
+   USE DA_Var_IO
    USE module_kma2netcdf_interface
    USE module_kma_wave2grid
 
@@ -31,7 +30,7 @@ PROGRAM kma2netcdf
 
 #ifdef DM_PARALLEL
    INTEGER                 :: nbytes
-   INTEGER, PARAMETER      :: configbuflen = 8*1024
+   INTEGER, PARAMETER      :: configbuflen = 4*8192
    INTEGER                 :: configbuf( configbuflen )
    LOGICAL , EXTERNAL      :: wrf_dm_on_monitor
 #endif

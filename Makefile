@@ -75,7 +75,7 @@ k2n :
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" toolsdir
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" REGISTRY="Registry" framework
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" shared
-	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" wrfvar_drivers
+	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" wrfvar_io
 	$(MAKE) MODULE_DIRS="$(DA_CONVERTOR_MODULES)" convertor_drivers
 	( cd main ; \
           /bin/rm -f kma2netcdf.exe ; \
@@ -86,7 +86,7 @@ n2k :
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" toolsdir
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" REGISTRY="Registry" framework
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" shared
-	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" wrfvar_drivers
+	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" wrfvar_io
 	$(MAKE) MODULE_DIRS="$(DA_CONVERTOR_MODULES)" convertor_drivers
 	( cd main ; \
           /bin/rm -f netcdf2kma.exe ; \
@@ -268,9 +268,9 @@ em_core :
 	@ echo '--------------------------------------'
 	( cd dyn_em ; $(MAKE) )
 
-wrfvar_drivers :
+wrfvar_io :
 	@ echo '--------------------------------------'
-	( cd da_3dvar ; $(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" da_3dvar_io )
+	( cd da_3dvar/src ; $(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" da_var_io )
 
 wrfvar_src :
 	@ echo '--------------------------------------'

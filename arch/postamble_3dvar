@@ -23,7 +23,7 @@ FCFLAGS_FFT_RF  =       $(FCOPTIM) $(FC_FFT_RF_OPTS)
 F77FLAGS_BUFR   =       $(FCTYPE) $(FCBUFR) $(FCHOST) $(FCDEBUG) -I.
 F77FLAGS_3DVAR  =       $(FCTYPE) $(FCBASE) $(FCHOST) $(FCDEBUG) -I.
 CPPFLAGS_3DVAR  =       $(TRADFLAG) $(DM_2_CPP_FLAGS) \
-                        -I$(LIBINCLUDE) -I../../inc -C -P $(ARCHFLAGS)
+                        -I$(LIBINCLUDE) -I../../inc -C -P $(ARCHFLAGS) $(POUND_DEF)
 FUFLAGS         =       $(FCOPTIM) $(FCBASE) $(FCFORM) $(FCDEBUG)
 
 wrfio_nf : 

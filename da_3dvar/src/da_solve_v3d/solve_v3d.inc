@@ -66,10 +66,12 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
 !  [2.0] Initialise 3D-Var parameters:
 !------------------------------------------------------------------------------
 
-   call da_init_3dvar( grid, xp, xb, &
+   call da_init_3dvar( grid, &
                        ids, ide, jds, jde, kds, kde, &
                        ims, ime, jms, jme, kms, kme, &
-                       its, ite, jts, jte, kts, kte )
+                       its, ite, jts, jte, kts, kte, &
+#include <em_dummy_args.inc>
+                     )
 
 !------------------------------------------------------------------------------
 !  [3.0] Set up first guess field (xb):

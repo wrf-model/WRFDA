@@ -26,7 +26,7 @@ MODULE DA_Setup_Structures
    IMPLICIT NONE
 
 #ifdef DM_PARALLEL
-   INCLUDE 'mpif.h'
+!  INCLUDE 'mpif.h'
 #endif
 
 #if ( DWORDSIZE != RWORDSIZE )
