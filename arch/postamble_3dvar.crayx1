@@ -3,7 +3,7 @@ LIB	     =       $(NETCDF_LIB) $(MPI_LIB) $(LOCAL_LIB) $(WRF_LIB)
 EXTRAMODULES    =
 FCBASEOPTS      =       $(FCTYPE) $(FCBASE) $(FCFORM) $(FCHOST) $(FCDEBUG) -I.
 FC_FFT_RF_OPTS  =       $(FCTYPE) $(FC_FFT_RF) $(FCFORM) $(FCHOST) $(FCDEBUG) -I.
-FCFLAGS	 =       $(FCOPTIM) $(FCBASEOPTS) $(OMP)
+FCFLAGS	 =       $(FCOPTIM) $(FCBASEOPTS)
 INCLUDE_MODULES =       -I../da_3dvar -I../da_3dvar/src \
 			-I../external/io_netcdf -I../external/io_int \
 	                -I../external/esmf_time_f90 \
@@ -41,7 +41,7 @@ F77FLAGS_BUFR   =       $(FCTYPE) $(FCBUFR) $(FCHOST) $(FCDEBUG) -I.
 F77FLAGS_3DVAR  =       $(FCTYPE) $(FCBASE) $(FCHOST) $(FCDEBUG) -I.
 CPPFLAGS_3DVAR  =       $(TRADFLAG) $(DM_2_CPP_FLAGS) \
 	                -I$(LIBINCLUDE) -I../../inc -C -P $(ARCHFLAGS)
-FUFLAGS	 =       $(FCOPTIM) $(FCBASE) $(FCFORM) $(FCDEBUG)
+FUFLAGS	 =       $(FCOPTIM) $(FCBASE) $(FCFORM) $(FCDEBUG) $(FCTYPE)
 
 wrfio_nf : 
 	( cd ../external/io_netcdf ; \

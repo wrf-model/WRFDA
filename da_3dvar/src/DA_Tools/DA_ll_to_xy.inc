@@ -23,26 +23,30 @@ SUBROUTINE DA_ll_to_xy (info, loc, xp, &
 
    if(fg_format == 1) then
       CALL latlon_to_ij(map_info, info%lat, info%lon, loc%x, loc%y)
-   else if(fg_format == 2) then
+!  else if(fg_format == 2) then
+!     CALL llxy (info%lat, info%lon, loc%x, loc%y)
+!  else if(fg_format == 3) then
+!     CALL llxy (info%lat, info%lon, loc%x, loc%y)
+   else
       CALL llxy (info%lat, info%lon, loc%x, loc%y)
-   else if(fg_format == 3) then
-      CALL llxy (info%lat, info%lon, loc%x, loc%y)
-      if(int(loc%x) == xp%ide) then
-        if( xp%ite < xp%ide) loc%x = loc%x - real(xp%ide)
-      elseif(int(loc%x) == xp%ids) then
-        if(xp%its > xp%ids)  loc%x = loc%x + real(xp%ide)
-      endif
    endif
 
    call toGrid (loc%x, xp%its-2, xp%ite+2, loc%i, loc%dx, loc%dxm)
    call toGrid (loc%y, xp%jts-2, xp%jte+2, loc%j, loc%dy, loc%dym)
 
    if(fg_format == 3)then
+      if((loc%j < xp%jts-1) .or. (loc%j > xp%jte)) then
+         outside = .true. 
+         inside_halo = .false.
+         return
+      endif
+
       if(loc%j == xp%jde) then
          loc%j = loc%j - 1
          loc%dy  = 1.0
          loc%dym = 0.0
       end if
+
       return
    endif
 
