@@ -207,7 +207,8 @@ DA_Setup_Structures.o:	\
 da_bufrlib.o:		\
 			da_bufrlib/da_bufrlib.f
 			$(RM) $@
-			$(F77) -c -I./da_bufrlib $(F77FLAGS_BUFR) $(MODULE_DIRS) da_bufrlib/da_bufrlib.f
+			$(CPP) -I./da_bufrlib $(CPPFLAGS_3DVAR)  da_bufrlib/da_bufrlib.f > da_bufrlib.f
+			$(F77) -c -I./da_bufrlib $(F77FLAGS_BUFR) $(MODULE_DIRS) da_bufrlib.f
 
 DA_VToX_Transforms.o:	\
 			par_util.o \
