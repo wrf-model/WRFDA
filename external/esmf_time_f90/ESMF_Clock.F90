@@ -99,6 +99,7 @@
       public ESMF_ClockSyncToWallClock
       public ESMF_ClockAdvance
       public ESMF_ClockIsStopTime
+      public ESMF_ClockStopTimeDisable
 
 ! Required inherited and overridden ESMF_Base class methods
 
@@ -887,7 +888,7 @@ use esmf_timemod
             IF ( alarm%RingIntervalSet ) THEN
 	       PRED3 = ( alarm%PrevRingTime + alarm%RingInterval <= clock%CurrTime )
 	    ENDIF
-           
+
             IF (                                                                           &
                  ( .NOT.  ( pred1                                                   ))     &
                    .AND.                                                                   &
@@ -898,7 +899,7 @@ use esmf_timemod
                  )                                                                         &
                ) THEN
                alarm%Ringing = .TRUE.
-               alarm%PrevRingTime = alarm%PrevRingTime + alarm%RingInterval
+               IF ( PRED3) alarm%PrevRingTime = alarm%PrevRingTime + alarm%RingInterval
                IF ( PRESENT( RingingAlarmList ) .AND. PRESENT ( NumRingingAlarms ) ) THEN
                  NumRingingAlarms = NumRingingAlarms + 1
                  RingingAlarmList( NumRingingAlarms ) = alarm
@@ -920,6 +921,21 @@ use esmf_timemod
       ENDDO
     
       end subroutine ESMF_ClockAdvance
+
+!------------------------------------------------------------------------------
+!BOP
+! !IROUTINE: ESMF_ClockStopTimeDisable - NOOP for compatibility with ESMF 2.1.0+
+
+! !INTERFACE:
+      subroutine ESMF_ClockStopTimeDisable(clock, rc)
+!
+! !ARGUMENTS:
+      type(ESMF_Clock), intent(in) :: clock
+      integer, intent(out) :: rc
+
+      rc = ESMF_SUCCESS
+
+      end subroutine ESMF_ClockStopTimeDisable
 
 !------------------------------------------------------------------------------
 !BOP
