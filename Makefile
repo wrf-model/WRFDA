@@ -64,6 +64,8 @@ wrf : configcheck
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" toolsdir
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" REGISTRY="Registry" framework
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" shared
+	$(MAKE) MODULE_DIRS="$(ALL_MODULES)" physics
+	$(MAKE) MODULE_DIRS="$(ALL_MODULES)" em_core
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" wrfvar_drivers
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" wrfvar_src
 	( cd main ; $(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" da_3dvar )
