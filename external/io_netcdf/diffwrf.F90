@@ -169,7 +169,7 @@ if ( Justplot ) then
       start_index = 1
       end_index = 1
       call ext_ncd_get_var_info (dh1,VarName,ndim,ordering,staggering,start_index,end_index, WrfType, ierr )
-      if(WrfType /= WRF_REAL4 .AND. WrfType /= WRF_REAL8) then 
+      if(WrfType /= WRF_REAL .AND. WrfType /= WRF_DOUBLE) then 
         call ext_ncd_get_next_var (dh1, VarName, Status_next_var) 
         cycle 
       endif 
@@ -192,7 +192,7 @@ if ( Justplot ) then
           ord = '0'
         endif
 
-        call ext_ncd_read_field(dh1,DateStr,TRIM(name),data,WRF_REAL4,0,0,0,ord, &
+        call ext_ncd_read_field(dh1,DateStr,TRIM(name),data,WRF_REAL,0,0,0,ord, &
                             staggering, dimnames ,                      &
                             start_index,end_index,                      & !dom
                             start_index,end_index,                      & !mem
@@ -261,7 +261,7 @@ else
         write(*,*)'Big difference: The types do not match'
         GOTO 1234
       ENDIF
-      if( WrfType == WRF_REAL4) then
+      if( WrfType == WRF_REAL) then
         DO i = 1, ndim
           IF ( end_index(i) /= end_index2(i) ) THEN
             write(*,*)'Big difference: dim ',i,' lengths differ for ',Varname,' differ in ',flnm2
@@ -292,7 +292,7 @@ else
           ord = '0'
         endif
 
-        call ext_ncd_read_field(dh1,DateStr,TRIM(VarName),data,WRF_REAL4,0,0,0,ord,&
+        call ext_ncd_read_field(dh1,DateStr,TRIM(VarName),data,WRF_REAL,0,0,0,ord,&
                             staggering, dimnames ,                      &
                             start_index,end_index,                      & !dom 
                             start_index,end_index,                      & !mem
@@ -306,7 +306,7 @@ else
           write(*,*)'  end_index(2) ',end_index(2)
           write(*,*)'  end_index(3) ',end_index(3)
         ENDIF
-        call ext_ncd_read_field(dh2,DateStr,TRIM(VarName),data2,WRF_REAL4,0,0,0,ord,&
+        call ext_ncd_read_field(dh2,DateStr,TRIM(VarName),data2,WRF_REAL,0,0,0,ord,&
                             staggering, dimnames ,                      &
                             start_index,end_index,                      & !dom 
                             start_index,end_index,                      & !mem

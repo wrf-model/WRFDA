@@ -15,7 +15,7 @@ SUBROUTINE DA_Transform_XToVp( xb, xbx, xa, xp, vp, be, &
    integer, intent(in)  :: ims,ime, jms,jme, kms,kme  ! memory dims.
    integer, intent(in)  :: its,ite, jts,jte, kts,kte  ! tile   dims.
 
-   real, dimension(ims:ime,jms:jme)         :: coeff  ! Gridpoint coeffs.
+   real, dimension(ims:ime,jms:jme)         :: grid_coeff  ! Gridpoint coeffs.
    real, dimension(ims:ime,jms:jme,kms:kme) :: vor, & ! Vorticity.
                                                div, & ! Divergence.
                                                phi_b  ! Balanced mass increment.
@@ -40,7 +40,7 @@ SUBROUTINE DA_Transform_XToVp( xb, xbx, xa, xp, vp, be, &
 
    print *, 'cv_options=', cv_options
 
-   coeff(its:ite,jts:jte) = 1.0 / ( xb % map_factor(its:ite,jts:jte) * &
+   grid_coeff(its:ite,jts:jte) = 1.0 / ( xb % map_factor(its:ite,jts:jte) * &
                                        xb % map_factor(its:ite,jts:jte) )
 
    call DA_Zero_vp_type ( vp )
@@ -66,7 +66,7 @@ SUBROUTINE DA_Transform_XToVp( xb, xbx, xa, xp, vp, be, &
 !  Convert vorticity to Del**2 psi:
 
    DO k = kts, kte
-      vor(its:ite,jts:jte,k) = coeff(its:ite,jts:jte)*vor(its:ite,jts:jte,k)
+      vor(its:ite,jts:jte,k) = grid_coeff(its:ite,jts:jte)*vor(its:ite,jts:jte,k)
    END DO
 
 !  Calculate psi:
@@ -76,12 +76,12 @@ SUBROUTINE DA_Transform_XToVp( xb, xbx, xa, xp, vp, be, &
 !  [2.3] Transform u, v to velocity potential via divergence:
 
 #ifndef DEREF_KLUDGE
-   CALL DA_UV_To_Divergence( xb % ds, xb % map_factor, xa % u, xa % v, div, &
+   CALL DA_UV_To_Divergence( xa % u, xa % v, xb%coefx, xb%coefy, div, &
 #else
-   CALL DA_UV_To_Divergence(xb % ds, &
-                            xb % map_factor(ims,jms), &
-                            xa % u(ims,jms,kms), &
+   CALL DA_UV_To_Divergence(xa % u(ims,jms,kms), &
                             xa % v(ims,jms,kms), &
+                            xb % coefx(ims,jms), &
+                            xb % coefy(ims,jms), &
                             div(ims,jms,kms), &
 #endif
                             ids,ide, jds,jde, kds,kde,  &
@@ -91,7 +91,7 @@ SUBROUTINE DA_Transform_XToVp( xb, xbx, xa, xp, vp, be, &
 !  Convert divergence to Del**2 chi:
 
    DO k = kts, kte
-      div(its:ite,jts:jte,k) = coeff(its:ite,jts:jte) * div(its:ite,jts:jte,k)
+      div(its:ite,jts:jte,k) = grid_coeff(its:ite,jts:jte) * div(its:ite,jts:jte,k)
    END DO
 
 !  Calculate chi:

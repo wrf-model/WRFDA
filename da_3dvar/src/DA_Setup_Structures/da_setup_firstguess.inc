@@ -23,6 +23,7 @@ SUBROUTINE DA_Setup_FirstGuess( xbx, grid, &
 
 !  Definitions of dummy arguments to solve
 #include <em_dummy_decl.inc>
+   integer :: is, ie, js, je
 
    write(unit=*, fmt='(/a)') &
         '-----------------------------------'
@@ -66,6 +67,22 @@ SUBROUTINE DA_Setup_FirstGuess( xbx, grid, &
    CALL wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id0)
 
 !------------------------------------------------------------------------------
+
+   if( fg_format == 1 .or. fg_format == 2) then
+!---- Calculate multiplicative constants for PsiChi_TO_UV
+
+    if ( xb%its == xb%ids ) is = xb%ids+1
+    if ( xb%ite == xb%ide ) ie = xb%ide-1
+    if ( xb%jts == xb%jds ) js = xb%jds+1
+    if ( xb%jte == xb%jde ) je = xb%jde-1
+    xb%coefx(is-1:ie+1,js-1:je+1) = 0.5 * &
+                      xb%map_factor(is-1:ie+1,js-1:je+1)/xb%ds
+    xb%coefy(is-1:ie+1,js-1:je+1) = xb%coefx(is-1:ie+1,js-1:je+1)
+    xb%coefz(is-1:ie+1,js-1:je+1) = 0.5 / &
+                      (xb%map_factor(is-1:ie+1,js-1:je+1)*xb%ds)
+   else
+   print*,' For regional option wrong choice for fg_format = ',fg_format
+   end if
 
    write(unit=*, fmt='(4x,a,i4)') &
         'I Dimension grid points: ', xb % mix, &
