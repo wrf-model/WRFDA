@@ -8,6 +8,8 @@ MODULE DA_Tools
 !     HISTORY: 09/28/1999 - Creation of F90 version.           Dale Barker
 !------------------------------------------------------------------------------
    
+   USE module_bc
+
    USE DA_Constants
    USE DA_Define_Structures
    USE LAPACK
@@ -972,6 +974,10 @@ CONTAINS
 #include "da_eof_decomposition.inc"
 #include "da_lubksb.inc"
 #include "da_ludcmp.inc"
+#include "DA_Set_Boundary_Xa.inc"
+#include "DA_Set_Boundary_Xb.inc"
+#include "DA_Set_Boundary_2d.inc"
+#include "DA_Set_Boundary_3d.inc"
    
 END MODULE DA_Tools
 

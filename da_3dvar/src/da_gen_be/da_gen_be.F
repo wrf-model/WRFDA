@@ -17,6 +17,9 @@ module da_gen_be
 contains
 
 #include "da_create_bins.inc"
+#include "da_print_be_stats_h.inc"
+#include "da_print_be_stats_p.inc"
+#include "da_print_be_stats_v.inc"
 #include "da_readwrite_be_stage2.inc"
 #include "da_readwrite_be_stage3.inc"
 #include "da_readwrite_be_stage4.inc"

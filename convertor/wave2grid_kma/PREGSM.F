@@ -5,7 +5,7 @@ C***********************************************************************
       PARAMETER ( IMAXE=640, JMAXE=321 )                                 
       PARAMETER ( ISST=360, JSST=181 )                                          
       PARAMETER ( ISNW=360, JSNW=180 )                                          
-      PARAMETER ( IDIM=640, JDIM=320 ) ! MAX(MAX,SST,SNW)                       
+      PARAMETER ( IDIM=428, JDIM=214 ) ! MAX(MAX,SST,SNW)                       
       PARAMETER ( MAXJZ=16 )                                                    
       PARAMETER (MEND1 =214,NEND1=214,JEND1=214)
       PARAMETER (JMAXHF= JMAX/2)

@@ -39,14 +39,38 @@ MODULE module_dm
    INTEGER, PRIVATE :: mpi_comm_local
    INTEGER, PRIVATE :: nproc_lt, nproc_ln
 
-#if ( RWORDSIZE == DWORDSIZE )
-#define TRUE_RSL_REAL     RSL_DOUBLE
-#define TRUE_RSL_REAL_F90 RSL_DOUBLE_F90
-#else
+#if ( RWORDSIZE != DWORDSIZE )
+   INTERFACE add_msg_xpose
+     MODULE PROCEDURE add_msg_xpose_real, add_msg_xpose_integer, add_msg_xpose_doubleprecision
+   END INTERFACE
+   INTERFACE add_msg_4pt
+     MODULE PROCEDURE add_msg_4pt_real, add_msg_4pt_integer, add_msg_4pt_doubleprecision
+   END INTERFACE
+   INTERFACE add_msg_8pt
+     MODULE PROCEDURE add_msg_8pt_real, add_msg_8pt_integer, add_msg_8pt_doubleprecision
+   END INTERFACE
+   INTERFACE add_msg_12pt
+     MODULE PROCEDURE add_msg_12pt_real, add_msg_12pt_integer, add_msg_12pt_doubleprecision
+   END INTERFACE
+   INTERFACE add_msg_24pt
+     MODULE PROCEDURE add_msg_24pt_real, add_msg_24pt_integer, add_msg_24pt_doubleprecision
+   END INTERFACE
+   INTERFACE add_msg_48pt
+     MODULE PROCEDURE add_msg_48pt_real, add_msg_48pt_integer, add_msg_48pt_doubleprecision
+   END INTERFACE
+   INTERFACE add_msg_80pt
+     MODULE PROCEDURE add_msg_80pt_real, add_msg_80pt_integer, add_msg_80pt_doubleprecision
+   END INTERFACE
+   INTERFACE add_msg_120pt
+     MODULE PROCEDURE add_msg_120pt_real, add_msg_120pt_integer, add_msg_120pt_doubleprecision
+   END INTERFACE
+   INTERFACE wrf_dm_maxval
+     MODULE PROCEDURE wrf_dm_maxval_real , wrf_dm_maxval_integer, wrf_dm_maxval_doubleprecision
+   END INTERFACE
+
 #define TRUE_RSL_REAL     RSL_REAL
 #define TRUE_RSL_REAL_F90 RSL_REAL_F90
-#endif
-
+#else
    INTERFACE add_msg_xpose
      MODULE PROCEDURE add_msg_xpose_real, add_msg_xpose_integer
    END INTERFACE
@@ -74,6 +98,10 @@ MODULE module_dm
    INTERFACE wrf_dm_maxval
      MODULE PROCEDURE wrf_dm_maxval_real , wrf_dm_maxval_integer
    END INTERFACE
+
+#define TRUE_RSL_REAL     RSL_DOUBLE
+#define TRUE_RSL_REAL_F90 RSL_DOUBLE_F90
+#endif
 
 CONTAINS
 
@@ -214,21 +242,45 @@ CONTAINS
       integer dim
       if (      dim == 3 ) then
         CALL rsl_build_message(msg_z,TRUE_RSL_REAL_F90,fld_z,dim,decomp(1),glen(1),llen(1))
+#ifdef D3VAR_IRY_KLUDGE
+!
+! The transpose utility was developed in rsl originally with MM5 3DVAR in mind, and the way
+! the implementers worked around the I->Y issue was by calling I->X in the Registry but then
+! calling the other (Z2Y) transpose throughout the code to effect the correct orientation.
+! The result is that although it's basically wrong here for codes that actually are I->X,
+! we cannot fix it without breaking 3DVAR. Hence the KLUDGE to keep it the old wrong way
+! for 3DVAR and fix it for everyone else. There was already a D3VAR_KLUDGE needed in the
+! registry anyway, to make sure the WRF I/O API gets called properly -- again, to manage
+! this MM5 assumption that was hidden in the 3DVAR code -- so we can make use of that here.
+! This needs to be revisited once the I->Y assumption is purged from 3DVAR. JM 20020910
+!
+        CALL rsl_build_message(msg_x,TRUE_RSL_REAL_F90,fld_x,dim,decomp(1),glen(1),llen_tx(1))
+        CALL rsl_build_message(msg_y,TRUE_RSL_REAL_F90,fld_y,dim,decomp(1),glen(1),llen_ty(1))
+#else
         CALL rsl_build_message(msg_y,TRUE_RSL_REAL_F90,fld_x,dim,decomp(1),glen(1),llen_tx(1))  ! msg_y->msg_x 20020908
         CALL rsl_build_message(msg_x,TRUE_RSL_REAL_F90,fld_y,dim,decomp(1),glen(1),llen_ty(1))  ! msg_x->msg_y 20020908
+#endif
       endif
    END SUBROUTINE add_msg_xpose_real
 
+#if ( RWORDSIZE != DWORDSIZE )
    SUBROUTINE add_msg_xpose_doubleprecision( fld_z, fld_x, fld_y, dim )
       IMPLICIT NONE
-      real(kind=8) fld_z(*), fld_x(*), fld_y(*)
+      doubleprecision fld_z(*), fld_x(*), fld_y(*)
       integer dim
       if (      dim == 3 ) then
         CALL rsl_build_message(msg_z,RSL_DOUBLE_F90,fld_z,dim,decomp(1),glen(1),llen(1))
+#ifdef D3VAR_IRY_KLUDGE
+        CALL rsl_build_message(msg_x,RSL_DOUBLE_F90,fld_x,dim,decomp(1),glen(1),llen_tx(1))
+        CALL rsl_build_message(msg_y,RSL_DOUBLE_F90,fld_y,dim,decomp(1),glen(1),llen_ty(1))
+#else
         CALL rsl_build_message(msg_y,RSL_DOUBLE_F90,fld_x,dim,decomp(1),glen(1),llen_tx(1))  ! msg_y->msg_x 20020908
         CALL rsl_build_message(msg_x,RSL_DOUBLE_F90,fld_y,dim,decomp(1),glen(1),llen_ty(1))  ! msg_x->msg_y 20020908
+#endif
       endif
    END SUBROUTINE add_msg_xpose_doubleprecision
+#endif
+
 
    SUBROUTINE add_msg_xpose_integer ( fld_z, fld_x, fld_y, dim )
       IMPLICIT NONE
@@ -236,8 +288,13 @@ CONTAINS
       integer dim
       if (      dim == 3 ) then
         CALL rsl_build_message(msg_z,TRUE_RSL_REAL_F90,fld_z,dim,decomp(1),glen(1),llen(1))
+#ifdef D3VAR_IRY_KLUDGE
+        CALL rsl_build_message(msg_x,RSL_INTEGER_F90,fld_x,dim,decomp(1),glen(1),llen_tx(1))
+        CALL rsl_build_message(msg_y,RSL_INTEGER_F90,fld_y,dim,decomp(1),glen(1),llen_ty(1))
+#else
         CALL rsl_build_message(msg_y,RSL_INTEGER_F90,fld_x,dim,decomp(1),glen(1),llen_tx(1))  ! msg_y->msg_x 20020908
         CALL rsl_build_message(msg_x,RSL_INTEGER_F90,fld_y,dim,decomp(1),glen(1),llen_ty(1))  ! msg_x->msg_y 20020908
+#endif
       endif
    END SUBROUTINE add_msg_xpose_integer
 
@@ -617,7 +674,7 @@ CONTAINS
    SUBROUTINE add_msg_x_shift_doubleprecision ( fld, kdim )
       IMPLICIT NONE
       integer kdim, gl(3), ll(3)
-      real(kind=8) fld(*)
+      doubleprecision fld(*)
       SELECT CASE ( model_data_order )
          ! need to finish other cases
          CASE ( DATA_ORDER_XZY )
@@ -658,7 +715,7 @@ CONTAINS
    SUBROUTINE add_msg_y_shift_doubleprecision ( fld, kdim )
       IMPLICIT NONE
       integer kdim, gl(3), ll(3)
-      real(kind=8) fld(*)
+      doubleprecision fld(*)
       SELECT CASE ( model_data_order )
          ! need to finish other cases
          CASE ( DATA_ORDER_XZY )
@@ -727,11 +784,11 @@ CONTAINS
       RETURN
    END SUBROUTINE add_msg_4pt_real
 
-#if (  RWORDSIZE == DWORDSIZE )
+#if (  RWORDSIZE != DWORDSIZE )
    SUBROUTINE add_msg_4pt_doubleprecision ( fld , kdim )
       IMPLICIT NONE
       integer kdim, gl(3), ll(3)
-      real(kind=8) fld(*)
+      doubleprecision fld(*)
       SELECT CASE ( model_data_order )
          ! need to finish other cases
          CASE ( DATA_ORDER_XZY )
@@ -821,11 +878,11 @@ CONTAINS
       RETURN
    END SUBROUTINE add_msg_8pt_real
 
-#if ( RWORDSIZE == DWORDSIZE )
+#if ( RWORDSIZE != DWORDSIZE )
    SUBROUTINE add_msg_8pt_doubleprecision ( fld , kdim )
       IMPLICIT NONE
       integer kdim, gl(3), ll(3)
-      real(kind=8) fld(*)
+      doubleprecision fld(*)
       SELECT CASE ( model_data_order )
          ! need to finish other cases
          CASE ( DATA_ORDER_XZY )
@@ -917,11 +974,11 @@ CONTAINS
       RETURN
    END SUBROUTINE add_msg_12pt_real
 
-#if ( RWORDSIZE == DWORDSIZE )
+#if ( RWORDSIZE != DWORDSIZE )
    SUBROUTINE add_msg_12pt_doubleprecision ( fld , kdim )
       IMPLICIT NONE
       integer kdim, gl(3), ll(3)
-      real(kind=8) fld(*)
+      doubleprecision fld(*)
       SELECT CASE ( model_data_order )
          ! need to finish other cases
          CASE ( DATA_ORDER_XZY )
@@ -1029,11 +1086,11 @@ CONTAINS
       RETURN
    END SUBROUTINE add_msg_24pt_real
 
-#if ( RWORDSIZE == DWORDSIZE )
+#if ( RWORDSIZE != DWORDSIZE )
    SUBROUTINE add_msg_24pt_doubleprecision ( fld , kdim )
       IMPLICIT NONE
       integer kdim, gl(3), ll(3)
-      real(kind=8) fld(*)
+      doubleprecision fld(*)
       SELECT CASE ( model_data_order )
          ! need to finish other cases
          CASE ( DATA_ORDER_XZY )
@@ -1197,11 +1254,11 @@ CONTAINS
       RETURN
    END SUBROUTINE add_msg_48pt_real
 
-#if ( RWORDSIZE == DWORDSIZE )
+#if ( RWORDSIZE != DWORDSIZE )
    SUBROUTINE add_msg_48pt_doubleprecision ( fld , kdim )
       IMPLICIT NONE
       integer kdim, gl(3), ll(3)
-      real(kind=8) fld(*)
+      doubleprecision fld(*)
       SELECT CASE ( model_data_order )
          ! need to finish other cases
          CASE ( DATA_ORDER_XZY )
@@ -1366,11 +1423,11 @@ CONTAINS
       RETURN
    END SUBROUTINE add_msg_80pt_real
 
-#if ( RWORDSIZE == DWORDSIZE )
+#if ( RWORDSIZE != DWORDSIZE )
    SUBROUTINE add_msg_80pt_doubleprecision ( fld , kdim )
       IMPLICIT NONE
       integer kdim, gl(3), ll(3)
-      real(kind=8) fld(*)
+      doubleprecision fld(*)
       SELECT CASE ( model_data_order )
          ! need to finish other cases
          CASE ( DATA_ORDER_XZY )
@@ -1424,11 +1481,11 @@ CONTAINS
       RETURN
    END SUBROUTINE add_msg_120pt_real
 
-#if ( RWORDSIZE == DWORDSIZE )
+#if ( RWORDSIZE != DWORDSIZE )
    SUBROUTINE add_msg_120pt_doubleprecision ( fld , kdim )
       IMPLICIT NONE
       integer kdim, gl(3), ll(3)
-      real(kind=8) fld(*)
+      doubleprecision fld(*)
       CALL add_msg_80pt ( fld , kdim )
       RETURN
    END SUBROUTINE add_msg_120pt_doubleprecision
@@ -2289,8 +2346,14 @@ messages(120)=  s5e5
 #endif
                                   idim   ,  jdim   ,  kdim   ,     &
                                   mloc   ,  nloc   ,  zloc   ,     &
+#ifdef D3VAR_IRY_KLUDGE
+! see comment above, 20020910 JM
+                                  mloc_x ,  nloc_x ,  zloc_x ,     &
+                                  mloc_y ,  nloc_y ,  zloc_y       )
+#else
                                   mloc_y ,  nloc_y ,  zloc_y ,     &   ! x->y 20020908
                                   mloc_x ,  nloc_x ,  zloc_x       )   ! y->x 20020908
+#endif
          CALL show_domain_decomp(domdesc)
          ! this computes the dimension information for the
          ! nest and passes these back
@@ -2335,8 +2398,14 @@ messages(120)=  s5e5
 #endif
                                   idim   ,  jdim   ,  kdim   ,     &
                                   mloc   ,  nloc   ,  zloc   ,     &
+#  ifdef D3VAR_IRY_KLUDGE
+! see comment above, 20020910 JM
+                                  mloc_x ,  nloc_x ,  zloc_x ,     &
+                                  mloc_y ,  nloc_y ,  zloc_y       )
+#  else
                                   mloc_y ,  nloc_y ,  zloc_y ,     &     ! x->y 20020910
                                   mloc_x ,  nloc_x ,  zloc_x       )     ! y->x 20020910
+#  endif
          CALL show_domain_decomp(domdesc)
          ! this computes the dimension information for the
          ! nest and passes these back
@@ -2630,7 +2699,11 @@ messages(120)=  s5e5
            sm1 = sp1
            em1 = sm1 + zloc - 1
 
+#ifdef D3VAR_IRY_KLUDGE
+           CALL rsl_reg_patchinfo_mz ( domdesc ,                       &
+#else
            CALL rsl_reg_patchinfo_nz ( domdesc ,                       &                    ! switched m->n 20020910
+#endif
                        sp2x , ep2x , sp3x , ep3x ,  sp1x , ep1x  )
            sp1x = sp1x - ( 1 - sd1 ) ; ep1x = ep1x - ( 1 - sd1 )   ! adjust if domain start not 1
            sp2x = sp2x - ( 1 - sd2 ) ; ep2x = ep2x - ( 1 - sd2 )
@@ -2642,7 +2715,11 @@ messages(120)=  s5e5
            sm1x = sp1x
            em1x = sm1x + zloc_x - 1
 
+#ifdef D3VAR_IRY_KLUDGE
+           CALL rsl_reg_patchinfo_nz ( domdesc ,                       &
+#else
            CALL rsl_reg_patchinfo_mz ( domdesc ,                       &                    ! switched n->m 20020910
+#endif
                        sp2y , ep2y , sp3y , ep3y ,  sp1y , ep1y  )
            sp1y = sp1y - ( 1 - sd1 ) ; ep1y = ep1y - ( 1 - sd1 )   ! adjust if domain start not 1
            sp2y = sp2y - ( 1 - sd2 ) ; ep2y = ep2y - ( 1 - sd2 )
@@ -2670,7 +2747,11 @@ messages(120)=  s5e5
            sm2 = sp2
            em2 = sm2 + zloc - 1
 
+#ifdef D3VAR_IRY_KLUDGE
+           CALL rsl_reg_patchinfo_mz ( domdesc ,                       &
+#else
            CALL rsl_reg_patchinfo_nz ( domdesc ,                       &   ! switched m->n 20020908
+#endif
                        sp1x , ep1x , sp3x , ep3x ,  sp2x , ep2x  )
            sp1x = sp1x - ( 1 - sd1 ) ; ep1x = ep1x - ( 1 - sd1 )   ! adjust if domain start not 1
            sp2x = sp2x - ( 1 - sd2 ) ; ep2x = ep2x - ( 1 - sd2 )
@@ -2682,7 +2763,11 @@ messages(120)=  s5e5
            sm2x = sp2x
            em2x = sm2x + zloc_x - 1
 
+#ifdef D3VAR_IRY_KLUDGE
+           CALL rsl_reg_patchinfo_nz ( domdesc ,                       &
+#else
            CALL rsl_reg_patchinfo_mz ( domdesc ,                       &   ! switched n->m 20020908
+#endif
                        sp1y , ep1y , sp3y , ep3y ,  sp2y , ep2y  )
            sp1y = sp1y - ( 1 - sd1 ) ; ep1y = ep1y - ( 1 - sd1 )   ! adjust if domain start not 1
            sp2y = sp2y - ( 1 - sd2 ) ; ep2y = ep2y - ( 1 - sd2 )
@@ -2708,7 +2793,11 @@ messages(120)=  s5e5
            sm3 = sp3
            em3 = sm3 + zloc - 1
 
+#ifdef D3VAR_IRY_KLUDGE
+           CALL rsl_reg_patchinfo_mz ( domdesc ,                       &
+#else
            CALL rsl_reg_patchinfo_nz ( domdesc ,                       &     ! switched m->n 20020910
+#endif
                        sp1x , ep1x , sp2x , ep2x ,  sp3x , ep3x  )
            sp1x = sp1x - ( 1 - sd1 ) ; ep1x = ep1x - ( 1 - sd1 )   ! adjust if domain start not 1
            sp2x = sp2x - ( 1 - sd2 ) ; ep2x = ep2x - ( 1 - sd2 )
@@ -2720,7 +2809,11 @@ messages(120)=  s5e5
            sm3x = sp3x
            em3x = sm3x + zloc_x - 1
 
+#ifdef D3VAR_IRY_KLUDGE
+           CALL rsl_reg_patchinfo_nz ( domdesc ,                       &
+#else
            CALL rsl_reg_patchinfo_mz ( domdesc ,                       &     ! switched n->m 20020910
+#endif
                        sp1y , ep1y , sp2y , ep2y ,  sp3y , ep3y  )
            sp1y = sp1y - ( 1 - sd1 ) ; ep1y = ep1y - ( 1 - sd1 )   ! adjust if domain start not 1
            sp2y = sp2y - ( 1 - sd2 ) ; ep2y = ep2y - ( 1 - sd2 )
@@ -2747,7 +2840,11 @@ messages(120)=  s5e5
            sm3 = sp3
            em3 = sm3 + zloc - 1
 
+#ifdef D3VAR_IRY_KLUDGE
+           CALL rsl_reg_patchinfo_mz ( domdesc ,                       &
+#else
            CALL rsl_reg_patchinfo_nz ( domdesc ,                       &     ! switched n->m 20020910
+#endif
                        sp2x , ep2x , sp1x , ep1x ,  sp3x , ep3x  )
            sp1x = sp1x - ( 1 - sd1 ) ; ep1x = ep1x - ( 1 - sd1 )   ! adjust if domain start not 1
            sp2x = sp2x - ( 1 - sd2 ) ; ep2x = ep2x - ( 1 - sd2 )
@@ -2759,7 +2856,11 @@ messages(120)=  s5e5
            sm3x = sp3x
            em3x = sm3x + zloc_x - 1
 
+#ifdef D3VAR_IRY_KLUDGE
+           CALL rsl_reg_patchinfo_nz ( domdesc ,                       &
+#else
            CALL rsl_reg_patchinfo_mz ( domdesc ,                       &     ! switched m->n 20020910
+#endif
                        sp2y , ep2y , sp1y , ep1y ,  sp3y , ep3y  )
            sp1y = sp1y - ( 1 - sd1 ) ; ep1y = ep1y - ( 1 - sd1 )   ! adjust if domain start not 1
            sp2y = sp2y - ( 1 - sd2 ) ; ep2y = ep2y - ( 1 - sd2 )
@@ -3141,13 +3242,15 @@ SUBROUTINE wrf_dm_bcast_string( BUF, N1 )
    INTEGER ibuf(256),i,n
    CHARACTER*256 tstr
    n = n1
+   ! Root task is required to have the correct value of N1, other tasks
+   ! might not have the correct value.
+   CALL wrf_dm_bcast_integer( n , 1 )
    IF (n .GT. 256) n = 256
    IF (n .GT. 0 ) then
-     CALL rsl_mon_bcast( n , IWORDSIZE )
      DO i = 1, n
        ibuf(I) = ichar(buf(I:I))
      ENDDO
-     CALL rsl_mon_bcast( ibuf, n*IWORDSIZE )
+     CALL wrf_dm_bcast_integer( ibuf, n )
      buf = ''
      DO i = 1, n
        buf(i:i) = char(ibuf(i))
@@ -3216,7 +3319,11 @@ SUBROUTINE wrf_dm_xpose_z2y ( domdesc , comms , xpose_id )
    USE module_dm
    IMPLICIT NONE
    INTEGER domdesc , comms(*) , xpose_id
+#ifdef D3VAR_IRY_KLUDGE
+   CALL rsl_xpose_mn_nz ( domdesc , comms( xpose_id ) )
+#else
    CALL rsl_xpose_mn_mz ( domdesc , comms( xpose_id ) )      ! switched nz->mz 20020910
+#endif
    RETURN
 END SUBROUTINE wrf_dm_xpose_z2y
 
@@ -3224,7 +3331,11 @@ SUBROUTINE wrf_dm_xpose_y2z ( domdesc , comms , xpose_id )
    USE module_dm
    IMPLICIT NONE
    INTEGER domdesc , comms(*) , xpose_id
+#ifdef D3VAR_IRY_KLUDGE
+   CALL rsl_xpose_nz_mn ( domdesc , comms( xpose_id ) )
+#else
    CALL rsl_xpose_mz_mn ( domdesc , comms( xpose_id ) )      ! switched nz->mz 20020910
+#endif
    RETURN
 END SUBROUTINE wrf_dm_xpose_y2z
 
@@ -3232,7 +3343,11 @@ SUBROUTINE wrf_dm_xpose_y2x ( domdesc , comms , xpose_id )
    USE module_dm
    IMPLICIT NONE
    INTEGER domdesc , comms(*) , xpose_id
+#ifdef D3VAR_IRY_KLUDGE
+   CALL rsl_xpose_nz_mz ( domdesc , comms( xpose_id ) )
+#else
    CALL rsl_xpose_mz_nz ( domdesc , comms( xpose_id ) )      ! switched nz<->mz 20020910
+#endif
    RETURN
 END SUBROUTINE wrf_dm_xpose_y2x
 
@@ -3240,7 +3355,11 @@ SUBROUTINE wrf_dm_xpose_x2y ( domdesc , comms , xpose_id )
    USE module_dm
    IMPLICIT NONE
    INTEGER domdesc , comms(*) , xpose_id
+#ifdef D3VAR_IRY_KLUDGE
+   CALL rsl_xpose_mz_nz ( domdesc , comms( xpose_id ) )
+#else
    CALL rsl_xpose_nz_mz ( domdesc , comms( xpose_id ) )      ! switched nz<->mz 20020910
+#endif
    RETURN
 END SUBROUTINE wrf_dm_xpose_x2y
 
@@ -3248,7 +3367,11 @@ SUBROUTINE wrf_dm_xpose_x2z ( domdesc , comms , xpose_id )
    USE module_dm
    IMPLICIT NONE
    INTEGER domdesc , comms(*) , xpose_id
+#ifdef D3VAR_IRY_KLUDGE
+   CALL rsl_xpose_mz_mn ( domdesc , comms( xpose_id ) )
+#else
    CALL rsl_xpose_nz_mn ( domdesc , comms( xpose_id ) )      ! switched mz->nz 20020910
+#endif
    RETURN
 END SUBROUTINE wrf_dm_xpose_x2z
 
@@ -3256,7 +3379,11 @@ SUBROUTINE wrf_dm_xpose_z2x ( domdesc , comms , xpose_id )
    USE module_dm
    IMPLICIT NONE
    INTEGER domdesc , comms(*) , xpose_id
+#ifdef D3VAR_IRY_KLUDGE
+   CALL rsl_xpose_mn_mz ( domdesc , comms( xpose_id ) )
+#else
    CALL rsl_xpose_mn_nz ( domdesc , comms( xpose_id ) )      ! switched mz->nz 20020910
+#endif
    RETURN
 END SUBROUTINE wrf_dm_xpose_z2x
 
@@ -3288,7 +3415,10 @@ SUBROUTINE wrf_dm_define_comms ( grid )
    INTEGER idum1, idum2, icomm
 
 #ifdef DEREF_KLUDGE
+!  see http://www.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm
    INTEGER     :: sm31 , em31 , sm32 , em32 , sm33 , em33
+   INTEGER     :: sm31x, em31x, sm32x, em32x, sm33x, em33x
+   INTEGER     :: sm31y, em31y, sm32y, em32y, sm33y, em33y
 #endif
 
 #include "deref_kludge.h"
@@ -3479,7 +3609,8 @@ END
                                        PS1,PE1,PS2,PE2,PS3,PE3
        CHARACTER *(*) stagger,ordering
        INTEGER fid,domdesc
-       REAL, DIMENSION(*) :: buf, globbuf
+       DOUBLEPRECISION globbuf(*)
+       DOUBLEPRECISION buf(*)
 ! <DESCRIPTION>
 ! Collective operation. Given a buffer of type double corresponding to a 2- or 3-dimensional patch on a local processor,
 ! return on task zero the global array assembled from the pieces stored on each processor.
@@ -3570,7 +3701,8 @@ END
                                        PS1,PE1,PS2,PE2,PS3,PE3
        CHARACTER *(*) stagger,ordering
        INTEGER fid,domdesc,type
-       REAL, DIMENSION(*) :: globbuf, buf
+       REAL globbuf(*)
+       REAL buf(*)
 
        LOGICAL, EXTERNAL :: has_char
        INTEGER glen(3),llen(3),glen2d(3),llen2d(3)
@@ -3595,10 +3727,17 @@ END
            IF ( .NOT. has_char( stagger, 'y' ) ) DE2 = DE2+1
            IF ( .NOT. has_char( stagger, 'z' ) ) DE3 = DE3+1
          CASE ( 'yxz','yx' )
+#ifndef D3VAR_IRY_KLUDGE
+           ord = io3d_jik_internal ; ord2d = io2d_ji_internal
+           IF ( .NOT. has_char( stagger, 'x' ) ) DE2 = DE2+1
+           IF ( .NOT. has_char( stagger, 'y' ) ) DE1 = DE1+1
+           IF ( .NOT. has_char( stagger, 'z' ) ) DE3 = DE3+1
+#else
            ord = io3d_ijk_internal ; ord2d = io2d_ij_internal
            IF ( .NOT. has_char( stagger, 'x' ) ) DE2 = DE2+1
            IF ( .NOT. has_char( stagger, 'y' ) ) DE1 = DE1+1
            IF ( .NOT. has_char( stagger, 'z' ) ) DE3 = DE3+1
+#endif
          CASE ( 'zxy' )
            IF ( .NOT. has_char( stagger, 'x' ) ) DE2 = DE2+1
            IF ( .NOT. has_char( stagger, 'y' ) ) DE3 = DE3+1
@@ -3637,7 +3776,6 @@ END
        IF ( wrf_at_debug_level(500) ) THEN
          CALL end_timing('wrf_patch_to_global_generic')
        ENDIF
-
        RETURN
     END SUBROUTINE wrf_patch_to_global_generic
 
@@ -3679,17 +3817,14 @@ END
                                        MS1,ME1,MS2,ME2,MS3,ME3,&
                                        PS1,PE1,PS2,PE2,PS3,PE3
        CHARACTER *(*) stagger,ordering
-       INTEGER fs,domdesc
-       REAL, DIMENSION(*) :: globbuf, buf
-
+       INTEGER fid,domdesc
+       DOUBLEPRECISION globbuf(*)
+       DOUBLEPRECISION buf(*)
 ! <DESCRIPTION>
 ! Collective operation. Given a global 2- or 3-dimensional array of type double on task zero,
 ! return the appropriate decomposed section (patch) on each processor.
 ! 
 ! </DESCRIPTION>
-
-!      fs = (de1-ds1+1)*(de2-ds2+1)*(de3-ds3+1)
-!      CALL wrf_dm_bcast_bytes( globbuf , DWORDSIZE*fs )
 
        CALL wrf_global_to_patch_generic (globbuf,buf,domdesc,stagger,ordering,RSL_DOUBLE,&
                                        DS1,DE1,DS2,DE2,DS3,DE3,&
@@ -3793,10 +3928,17 @@ END
            IF ( .NOT. has_char( stagger, 'y' ) ) DE2 = DE2+1
            IF ( .NOT. has_char( stagger, 'z' ) ) DE3 = DE3+1
          CASE ( 'yxz','yx' )
+#ifndef D3VAR_IRY_KLUDGE
+           ord = io3d_jik_internal ; ord2d = io2d_ji_internal
+           IF ( .NOT. has_char( stagger, 'x' ) ) DE2 = DE2+1
+           IF ( .NOT. has_char( stagger, 'y' ) ) DE1 = DE1+1
+           IF ( .NOT. has_char( stagger, 'z' ) ) DE3 = DE3+1
+#else
            ord = io3d_ijk_internal ; ord2d = io2d_ij_internal
            IF ( .NOT. has_char( stagger, 'x' ) ) DE2 = DE2+1
            IF ( .NOT. has_char( stagger, 'y' ) ) DE1 = DE1+1
            IF ( .NOT. has_char( stagger, 'z' ) ) DE3 = DE3+1
+#endif
          CASE ( 'zxy' )
            ord = io3d_kij_internal ; ord2d = io2d_ij_internal
            IF ( .NOT. has_char( stagger, 'x' ) ) DE2 = DE2+1
@@ -3827,7 +3969,6 @@ END
        ELSE
          CALL rsl_read(globbuf,ord2d,buf,domdesc,type,glen2d,llen2d)
        ENDIF
-
        RETURN
     END SUBROUTINE wrf_global_to_patch_generic
 
@@ -3864,6 +4005,15 @@ END
 ! <DESCRIPTION>
 ! Description is to do...
 ! </DESCRIPTION>
+
+#ifdef DEREF_KLUDGE
+!  see http://www.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm
+   INTEGER     :: sm31 , em31 , sm32 , em32 , sm33 , em33
+   INTEGER     :: sm31x, em31x, sm32x, em32x, sm33x, em33x
+   INTEGER     :: sm31y, em31y, sm32y, em32y, sm33y, em33y
+#endif
+#include "deref_kludge.h"
+
 #define COPY_IN
 #include <em_scalar_derefs.inc>
 #ifdef DM_PARALLEL
@@ -3967,6 +4117,15 @@ END
       INTEGER       ::          nids, nide, njds, njde, nkds, nkde,    &
                                 nims, nime, njms, njme, nkms, nkme,    &
                                 nips, nipe, njps, njpe, nkps, nkpe
+
+#ifdef DEREF_KLUDGE
+!  see http://www.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm
+   INTEGER     :: sm31 , em31 , sm32 , em32 , sm33 , em33
+   INTEGER     :: sm31x, em31x, sm32x, em32x, sm33x, em33x
+   INTEGER     :: sm31y, em31y, sm32y, em32y, sm33y, em33y
+#endif
+#include "deref_kludge.h"
+
 #define COPY_IN
 #include <em_scalar_derefs.inc>
 #ifdef DM_PARALLEL
@@ -4020,6 +4179,14 @@ END
                                                   ! soil temp, moisture, etc., has vertical dim
                                                   ! of soil categories
 #include <em_dummy_decl.inc>
+
+#ifdef DEREF_KLUDGE
+!  see http://www.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm
+   INTEGER     :: sm31 , em31 , sm32 , em32 , sm33 , em33
+   INTEGER     :: sm31x, em31x, sm32x, em32x, sm33x, em33x
+   INTEGER     :: sm31y, em31y, sm32y, em32y, sm33y, em33y
+#endif
+#include "deref_kludge.h"
 
 #define COPY_IN
 #include <em_scalar_derefs.inc>
@@ -4079,7 +4246,10 @@ END
       END INTERFACE
 
 #ifdef DEREF_KLUDGE
+!  see http://www.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm
    INTEGER     :: sm31 , em31 , sm32 , em32 , sm33 , em33
+   INTEGER     :: sm31x, em31x, sm32x, em32x, sm33x, em33x
+   INTEGER     :: sm31y, em31y, sm32y, em32y, sm33y, em33y
 #endif
 
 #include "deref_kludge.h"
@@ -4152,8 +4322,16 @@ END
       INTEGER       ::          nids, nide, njds, njde, nkds, nkde,    &
                                 nims, nime, njms, njme, nkms, nkme,    &
                                 nips, nipe, njps, njpe, nkps, nkpe
-#if (DA_CORE != 1)
       LOGICAL, EXTERNAL  :: em_cd_feedback_mask
+
+#ifdef DEREF_KLUDGE
+!  see http://www.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm
+   INTEGER     :: sm31 , em31 , sm32 , em32 , sm33 , em33
+   INTEGER     :: sm31x, em31x, sm32x, em32x, sm33x, em33x
+   INTEGER     :: sm31y, em31y, sm32y, em32y, sm33y, em33y
+#endif
+#include "deref_kludge.h"
+
 #define COPY_IN
 #include <em_scalar_derefs.inc>
 #ifdef DM_PARALLEL
@@ -4190,7 +4368,6 @@ END
 
 #define COPY_OUT
 #include <em_scalar_derefs.inc>
-#endif
       RETURN
    END SUBROUTINE feedback_domain_em_part2
 

@@ -2,6 +2,11 @@ SUBROUTINE DA_Scan_Obs (iunit, ob, xp, filename)
 !-----------------------------------------------------------------------------!
 !  Purpose: Scan 3D-VAR GTS observation file
 !-----------------------------------------------------------------------------!
+!
+! Modifications:      10/26/2004            Syed RH Rizvi
+!
+!              Fix Obs-Long as -180 if it is +180
+!-----------------------------------------------------------------------------!
 
    implicit none
 
@@ -87,7 +92,7 @@ SUBROUTINE DA_Scan_Obs (iunit, ob, xp, filename)
          RETURN
       ENDIF
    else
-#ifndef CRAYX1
+#ifndef crayx1
       OPEN(UNIT   = iunit,     &
            FORM   = 'FORMATTED',  &
            ACCESS = 'SEQUENTIAL', &
@@ -194,8 +199,8 @@ SUBROUTINE DA_Scan_Obs (iunit, ob, xp, filename)
                    platform%info%id
 
       IF (iost /= 0) THEN
-          WRITE (0,'(/,A,I3,/)') ' END OF OBS UNIT: ',iunit
-          WRITE (0,'(A,I3)')     ' IOSTAT == ',iost
+          WRITE (0,'(/A,I9)') ' END OF OBS UNIT: ',iunit
+          WRITE (0,'(/A,I9)') ' IOSTAT:          ',iost
          EXIT reports
       ENDIF
 
@@ -211,10 +216,11 @@ SUBROUTINE DA_Scan_Obs (iunit, ob, xp, filename)
                platform%info%id
       endif
 
-!-----Fix funny wind direction at South Pole
-      if(platform%info%lat < -89.9999) then
-         platform%info%lon = 0.0
-      endif
+      if(platform%info%lon == 180.0   ) platform%info%lon =-180.000
+!-----Fix funny wind direction at South Poles
+!      if(platform%info%lat < -89.9999 .or. platform%info%lat > 89.9999 ) then
+!         platform%info%lon = 0.0
+!      endif
 
       read(platform%info%platform(4:6), '(I3)') fm
 
@@ -320,7 +326,6 @@ loop_level: DO i = 1, platform%info%levels
 !        else if(index(platform%info%source, 'FM-35 TEMP') > 0) then
 
          CASE (35:38) ;
-
             if(.not.use_SoundObs) cycle reports
 
             num_sound = num_sound + 1
