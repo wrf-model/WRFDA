@@ -227,7 +227,7 @@ CONTAINS
 ! 
 !</DESCRIPTION>
 
-   if((config_flags%real_data_init_type == 1) .or. (config_flags%real_data_init_type == 1)) then
+   if((config_flags%real_data_init_type == 1) .or. (config_flags%real_data_init_type == 3)) then
      CALL med_initialdata_input_3dvar( head_grid , config_flags )
    endif
 
@@ -311,7 +311,7 @@ CONTAINS
 
 !--output 3dvar analysis
 
-   if((config_flags%real_data_init_type == 1) .or. (config_flags%real_data_init_type == 1)) then
+   if((config_flags%real_data_init_type == 1) .or. (config_flags%real_data_init_type == 3)) then
      CALL med_initialdata_output_3dvar( head_grid , config_flags )
 
      CALL med_shutdown_io ( head_grid , config_flags )
