@@ -1,0 +1,309 @@
+Change Log for update to WRF 3DVAR code
+---------------------------------------
+
+Author: 	YR
+Reviewer: 	HC LIN, WEI
+Date: 		08/11/04
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+1. Develop the GPS Refractivity (Local Observation Operator)
+   assimilation code. (YR, Wei)
+
+   The refractivity N is
+
+                 p                        pq
+       N = 77.6 --- + 3.73 x 10^5 ---------------------
+                 T                 T^2 (0.622+0.378q)
+
+   where p (hPa) is pressure, T(K) is temperature, and
+   q (kg/kg) is the specific humidity.
+
+   Reference
+
+     Zou, X., Y.-H. Kuo, and Y.-R. Guo, 1995: Assimilation 
+       of Atmospheric Radio Refractivity Using a Nonhydrostatic
+       Adjoint Model. Mon. Wea. Rev., 123,2229-2249.
+ 
+2. Develop the GPS PW assimilation code in considering the
+   site elevation. (YR, Kusaka, Rizvi)
+
+   Basic idea is to add (ob_elv > mdl_terr) a correction to or 
+   subtract (ob_elv < mdl_terr) a correction from the original
+   innovation (O-B). Currently, this correction is function of
+   the model q, rho, and the difference (ob_elv-mdl_terr).
+   
+   Currently, in wrf3dvar code, we did not consider the 
+   perturbation of 'hf' (xa%hf=0.0), 'h' (xa%h=0.0),..., during 
+   the minimization, just diagnose it in "xatowrf".
+ 
+3. Add the SINGLE OBS test code for 'ref' (GPS Refractivity)
+   and 'tpw' (GPS PW). (YR)
+ 
+4. Write out 'ANALYSIS_INCREMENT' file (binary) with 
+   WRITE_INCREMENTS = .TRUE. (YR)
+
+   The binary 'ANALYSIS_INCREMENT' file includes the 8 increment
+   fields: 3d fields--> u, v, p, t, q(mixing ratio), and
+           2d fields--> mu(psfcdry-ptop), and psfc
+   and the necessary information and 2d constant fields.
+        
+5. Develop a convertor program da_3dvar/utl/convert_to_mm5v3.f90
+   to convert 'ANALYSIS_INCREMENT' to be a MM5V3 format file
+   'MMINPUT_ANALYSIS_INCREMENT' for plotting with GRAPH. (YR)
+
+   * To compile
+
+      cd da_3dvar/utl
+      make convert_to_mm5v3
+
+   * To get the 'MMINPUT_ANALYSIS_INCREMENT'
+
+      cp da_3dvar/utl/convert_to_mm5v3.csh   .
+ 
+      then edit convert_to_mm5v3.csh and run convert_to_mm5v3.csh.
+      
+      The file 'MMINPUT_ANALYSIS_INCREMENT' can be used by
+      MM5V3/GRAPH as usual for plotting.
+
+6. Bug fix in llxy.inc for Mecator Proj., domain across date 
+   line) (found by YR)
+
+   Bug fix in da_transfer_wrftoxb.inc including qcw, qrn in
+   xb for Radar radial velocity assimilation.
+    
+Expected Differences
+--------------------
+
+Accuracy: 	More capabilities 1, and 2 added to wrf3dvar. 
+                See the testing results below.
+
+                The point 3, 4, 5 will not change the results.
+
+                The point 6 only affect the results in case of
+                the domain across the dateline with Mecator map
+                projection, otherwise, not change the results.
+
+CPU/memory:	CPU time increase is very minor, and the memory 
+                will be increased with more capability of wrf3dvar 
+                code, but not significant. 
+
+Test results (run on what machines?)
+------------------------------------------------------
+
+      Tests with IHOP case at 20020618Z in DEC machine
+                
+
+      *********** GPS Refractivity assimilation:
+                  
+                > Adjoint check with 25 OSSE GPS Ref. Soundings:
+                  
+                 ==> Single processor:
+
+                  Whole  Domain: < x, x >     =   8.44001795631683E+08 
+                  Whole  Domain: < v_adj, v > =   8.44001795632432E+08
+
+                  Tile < y, y     > =   6.54083680381281E+00
+                  Tile < x, x_adj > =   6.54083680381281E+00
+
+                 ==> 4-processors:
+
+                  Tile < y, y     > =   2.67146596521702E+00 
+                  Tile < x, x_adj > =   2.67146596521702E+00
+                     Whole Domain < y, y     > =   6.54083680381281E+00 
+                     Whole Domain < x, x_adj > =   6.54083680381282E+00
+
+
+                > Single OBS test (cv_options = 3):
+
+                    Diagnostics of OI for GPSRef
+
+                       var                 ref(m)  n    k
+
+                      Number:                1
+                     Minimum(n,k):       1.0000    1    1
+                     Maximum(n,k):       1.0000    1    1
+                     Average     :       1.0000
+                        RMSE     :       1.0000
+
+                    Diagnostics of AO for GPSRef
+
+                       var                 ref(m)  n    k
+
+                      Number:                1
+                     Minimum(n,k):       0.1312    1    1
+                     Maximum(n,k):       0.1312    1    1
+                     Average     :       0.1312
+                        RMSE     :       0.1312
+
+                  > Assimilation runs with 25 OSSE GPS Ref. Soundings:
+                  
+                   ==> Single processor:
+
+        8      3.81936392D-01      1.70570068D-01
+     ----------------------------------------------------------
+      Inner iteration stopped after    8 iterations
+       Final cost function :  5.93755796D+01 and Gradient:  3.81936392D-01
+
+                   ==> 4-processors:
+
+        8      3.81936392D-01      1.70570068D-01 
+     ---------------------------------------------------------- 
+      Inner iteration stopped after    8 iterations 
+       Final cost function :  5.93755796D+01 and Gradient:  3.81936392D-01 
+
+
+      *********** GPS PW assimilation:
+
+                > Adjoint check with 60 real GPS PW OBS:
+
+                 ==> Single processor:
+
+                  Whole  Domain: < x, x >     =   8.44001795631683E+08 
+                  Whole  Domain: < v_adj, v > =   8.44001795632432E+08
+
+                  Tile < y, y     > =   3.36833805641922E-02 
+                  Tile < x, x_adj > =   3.36833805641922E-02
+
+                 ==> 4-processors:
+
+                  Tile < y, y     > =   3.81431776553138E-03 
+                  Tile < x, x_adj > =   3.81431776553138E-03 
+                     Whole Domain < y, y     > =   3.36833805641922E-02 
+                     Whole Domain < x, x_adj > =   3.36833805641921E-02 
+
+                > Single OBS test (cv_options = 3):
+
+                    Diagnostics of OI for Gpspw
+
+                       var           tpw(cm)     n
+
+                      Number:              1
+                     Minimum(n):       1.0000    1
+                     Maximum(n):       1.0000    1
+                     Average   :       1.0000
+                        RMSE   :       1.0000
+
+                    Diagnostics of AO for Gpspw
+
+                       var           tpw(cm)     n
+
+                      Number:              1
+                     Minimum(n):       0.1848    1
+                     Maximum(n):       0.1848    1
+                     Average   :       0.1848
+                        RMSE   :       0.1848
+
+                  > Assimilation runs with 60 GPS PW Obs:
+                  
+                   ==> Single processor:
+
+        7      1.88123568D-01      3.14641738D-01 
+     ---------------------------------------------------------- 
+      Inner iteration stopped after    7 iterations 
+       Final cost function :  2.70337520D+01 and Gradient:  1.88123568D-01 
+
+                   ==> 4-processors:
+
+       7      1.88123568D-01      3.14641738D-01 
+     ---------------------------------------------------------- 
+      Inner iteration stopped after    7 iterations 
+       Final cost function :  2.70337520D+01 and Gradient:  1.88123568D-01
+
+Files removed:
+--------------
+
+Files added:
+------------
+
+wrf3dvar/da_3dvar/changes/change_20040811.yrg
+wrf3dvar/da_3dvar/utl/convert_to_mm5v3.csh
+wrf3dvar/da_3dvar/utl/convert_to_mm5v3.f90
+wrf3dvar/da_3dvar/src/DA_Setup_Structures/da_write_increments.inc
+
+Files modified:
+---------------
+
+wrf3dvar/Registry/Registry_3dvar 
+wrf3dvar/run/DA_Run_3DVAR.csh
+wrf3dvar/da_3dvar/src/Makefile 
+wrf3dvar/da_3dvar/src/DA_Constants/DA_Constants.F 
+
+wrf3dvar/da_3dvar/src/DA_Define_Structures/DA_Allocate_Observations.inc 
+wrf3dvar/da_3dvar/src/DA_Define_Structures/DA_Allocate_Y.inc 
+wrf3dvar/da_3dvar/src/DA_Define_Structures/DA_Deallocate_Observations.inc 
+wrf3dvar/da_3dvar/src/DA_Define_Structures/DA_Deallocate_Y.inc 
+wrf3dvar/da_3dvar/src/DA_Define_Structures/DA_Define_Structures.F 
+wrf3dvar/da_3dvar/src/DA_Define_Structures/DA_Zero_X.inc 
+wrf3dvar/da_3dvar/src/DA_Define_Structures/DA_Zero_Y.inc
+ 
+wrf3dvar/da_3dvar/src/DA_Gpspw/DA_Transform_XToY_Gpspw.inc 
+wrf3dvar/da_3dvar/src/DA_Gpspw/DA_Transform_XToY_Gpspw_Adj.inc 
+wrf3dvar/da_3dvar/src/DA_Gpspw/da_get_innov_vector_gpspw.inc
+ 
+wrf3dvar/da_3dvar/src/DA_Gpsref/DA_AO_Stats_Gpsref.inc 
+wrf3dvar/da_3dvar/src/DA_Gpsref/DA_Calculate_GradY_Gpsref.inc 
+wrf3dvar/da_3dvar/src/DA_Gpsref/DA_Calculate_Jo_and_GradY_Gpsref.inc 
+wrf3dvar/da_3dvar/src/DA_Gpsref/DA_Calculate_Residual_Gpsref.inc 
+wrf3dvar/da_3dvar/src/DA_Gpsref/DA_OI_Stats_Gpsref.inc 
+wrf3dvar/da_3dvar/src/DA_Gpsref/DA_Print_Stats_Gpsref.inc 
+wrf3dvar/da_3dvar/src/DA_Gpsref/DA_Transform_XToY_Gpsref.inc 
+wrf3dvar/da_3dvar/src/DA_Gpsref/DA_Transform_XToY_Gpsref_Adj.inc 
+wrf3dvar/da_3dvar/src/DA_Gpsref/da_check_max_iv_Gpsref.inc 
+wrf3dvar/da_3dvar/src/DA_Gpsref/da_get_innov_vector_Gpsref.inc
+ 
+wrf3dvar/da_3dvar/src/DA_Minimisation/DA_CG_Minimise.inc 
+wrf3dvar/da_3dvar/src/DA_Minimisation/DA_Calculate_GradY.inc 
+wrf3dvar/da_3dvar/src/DA_Minimisation/da_calculate_jo_and_grady.inc 
+wrf3dvar/da_3dvar/src/DA_Minimisation/da_calculate_residual.inc 
+wrf3dvar/da_3dvar/src/DA_Minimisation/da_get_innov_vector.inc 
+wrf3dvar/da_3dvar/src/DA_Minimisation/da_get_var_diagnostics.inc 
+wrf3dvar/da_3dvar/src/DA_Minimisation/da_write_diagnostics.inc 
+
+wrf3dvar/da_3dvar/src/DA_Obs/DA_Obs_Count.inc 
+wrf3dvar/da_3dvar/src/DA_Obs/DA_Read_Obs.inc 
+wrf3dvar/da_3dvar/src/DA_Obs/DA_Scan_Obs.inc 
+wrf3dvar/da_3dvar/src/DA_Obs/DA_Transform_XToY.inc 
+wrf3dvar/da_3dvar/src/DA_Obs/DA_Transform_XToY_Adj.inc 
+wrf3dvar/da_3dvar/src/DA_Obs/da_fill_obs_structures.inc 
+wrf3dvar/da_3dvar/src/DA_Obs/da_fm_decoder.inc 
+wrf3dvar/da_3dvar/src/DA_Obs/da_setup_pseudo_obs.inc 
+
+wrf3dvar/da_3dvar/src/DA_Physics/DA_Physics.F 
+wrf3dvar/da_3dvar/src/DA_Physics/DA_Transform_XToGPSRef.inc 
+wrf3dvar/da_3dvar/src/DA_Physics/DA_Transform_XToGPSRef_Adj.inc 
+wrf3dvar/da_3dvar/src/DA_Physics/DA_Transform_XToGPSRef_Lin.inc
+ 
+wrf3dvar/da_3dvar/src/DA_Setup_Structures/DA_Setup_Structures.F 
+wrf3dvar/da_3dvar/src/DA_Setup_Structures/da_setup_firstguess_wrf.inc 
+wrf3dvar/da_3dvar/src/DA_Setup_Structures/da_setup_obs_interp_wts.inc 
+wrf3dvar/da_3dvar/src/DA_Setup_Structures/da_setup_obs_structures.inc 
+wrf3dvar/da_3dvar/src/DA_Setup_Structures/da_transfer_wrftoxb.inc 
+wrf3dvar/da_3dvar/src/DA_Setup_Structures/da_transfer_xatowrf.inc 
+
+wrf3dvar/da_3dvar/src/DA_Test/DA_Check_VToX_Adjoint.inc 
+wrf3dvar/da_3dvar/src/DA_Test/DA_Check_XToY_Adjoint.inc 
+wrf3dvar/da_3dvar/src/DA_Test/DA_Test.F 
+wrf3dvar/da_3dvar/src/DA_Test/da_setup_testfield.inc 
+
+wrf3dvar/da_3dvar/src/DA_Tools/DA_Read_Namelist.inc 
+wrf3dvar/da_3dvar/src/DA_Tools/llxy.inc
+
+wrf3dvar/da_3dvar/src/DA_VToX_Transforms/da_calc_covariance.inc 
+wrf3dvar/da_3dvar/src/DA_VToX_Transforms/da_transform_vtox.inc 
+wrf3dvar/da_3dvar/src/DA_VToX_Transforms/da_transform_vtox_adj.inc 
+
+wrf3dvar/da_3dvar/src/da_pseudo/da_get_innov_vector_pseudo.inc 
+
+wrf3dvar/da_3dvar/src/da_solve_v3d/da_solve_v3d.F 
+
+wrf3dvar/da_3dvar/utl/Makefile
+
+M run/DA_Run_3DVAR.csh
+
+Minor-tag:
+---------
+
+version_2_1_1
+

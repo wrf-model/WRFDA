@@ -1,0 +1,92 @@
+Change Log for update to WRF 3DVAR code
+---------------------------------------
+
+Author:         Qingnong Xiao
+Reviewer:       Wei Huang
+Date:           04/20/04
+
+Reason for changes 
+--------------------------------------------------
+
+Update of vertical velocity increments and Doppler radial velocity 
+assimilation in wrf3dvar
+
+
+Expected Differences
+--------------------
+
+Accuracy:       Impact on vertical velocity increments and Radar in wrf3dvar.
+CPU/memory:     There is slight increase in CPU and memory
+
+Test results
+------------------------------------------------------
+
+Machine: NCAR DEC machine zebra with 4 CPUs
+Case: KMA Typhoon Rusa case at 00 UTC 31 August 2002
+Check results:
+
+rsl.out.0000_cv2_4cpu
+
+ Tile < y, y     > =   4.55140718455660E+02
+ Tile < x, x_adj > =   4.55140718455660E+02
+ Whole Domain < y, y     > =   3.80267179809102E+03
+ Whole Domain < x, x_adj > =   3.80267179809102E+03
+
+rsl.out.0000_cv3_4cpu
+
+ Whole  Domain: < x, x >     =   9.44617461450262E+08
+ Whole  Domain: < v_adj, v > =   9.44617461450331E+08
+
+ Tile < y, y     > =   4.55140718455660E+02
+ Tile < x, x_adj > =   4.55140718455660E+02
+ Whole Domain < y, y     > =   3.80267179809102E+03
+ Whole Domain < x, x_adj > =   3.80267179809102E+03
+
+
+Files removed:
+--------------
+
+None
+
+Files added:
+------------
+
+da_3dvar/src/DA_Obs/h_to_zk.inc
+
+Files modified:
+---------------
+
+Registry/Registry_3dvar
+da_3dvar/src/DA_Define_Structures/DA_Allocate_Observations.inc
+da_3dvar/src/DA_Dynamics/DA_W_Adjustment_Adj.inc
+da_3dvar/src/DA_Dynamics/DA_W_Adjustment_Lin.inc
+da_3dvar/src/DA_Obs/DA_Obs.F
+da_3dvar/src/DA_Obs/DA_Read_Radar.inc
+da_3dvar/src/DA_Obs/DA_Read_Radar_Info.inc
+da_3dvar/src/DA_Physics/DA_UVPRho_To_W_Adj.inc
+da_3dvar/src/DA_Physics/DA_UVPRho_To_W_Lin.inc
+da_3dvar/src/DA_Radar/DA_AO_Stats_Radar.inc
+da_3dvar/src/DA_Radar/DA_Calculate_GradY_Radar.inc
+da_3dvar/src/DA_Radar/DA_Calculate_Jo_and_GradY_Radar.inc
+da_3dvar/src/DA_Radar/DA_Calculate_Residual_Radar.inc
+da_3dvar/src/DA_Radar/DA_OI_Stats_Radar.inc
+da_3dvar/src/DA_Radar/DA_Print_Stats_Radar.inc
+da_3dvar/src/DA_Radar/DA_Transform_XToY_Radar.inc
+da_3dvar/src/DA_Radar/DA_Transform_XToY_Radar_Adj.inc
+da_3dvar/src/DA_Radar/da_check_max_iv_Radar.inc
+
+da_3dvar/src/DA_Radar/da_get_innov_vector_Radar.inc
+da_3dvar/src/DA_Radar/da_radial_velocity_Adj.inc
+da_3dvar/src/DA_Setup_Structures/da_setup_obs_structures.inc
+da_3dvar/src/DA_Setup_Structures/da_setup_obs_structures_mm5.inc
+da_3dvar/src/DA_Test/DA_Check_XToY_Adjoint.inc
+da_3dvar/src/DA_Test/DA_Check_XToY_Adjoint_Radar.inc
+da_3dvar/src/DA_VToX_Transforms/da_transform_vtox.inc
+da_3dvar/src/DA_VToX_Transforms/da_transform_vtox_adj.inc
+da_3dvar/src/da_solve_v3d/da_solve_v3d.F
+
+
+Minor tag:
+
+tag beta_version_4
+

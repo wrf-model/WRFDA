@@ -1,0 +1,19 @@
+This file is intended to track the tags created by CVS.
+
+
+Version History
+---------------
+cvs -r tag port_to_crayx1	(November 2, 2004)	tag for port code to Cray-x1
+cvs -r tag radar_in_wrf3dvar	(October 19, 2004)	tag after radar code commited in.
+cvs -r tag mm5_as_fg	 	(September 27, 2004)	tag for using MM5 as FG
+cvs -r tag version_2_1_0 	(July 16, 2004)		tag for release 2.1.0 (F_GAT)
+cvs -r tag version_2_0_2 	(June 21, 2004)		tag for release 2.0.2
+cvs -r tag version_2_0_1 	(May 27, 2004)		tag for release 2.0.1
+cvs -r tag version_2_0_0 	(May 17, 2004)		tag for release
+cvs -r tag beta_version_4	(April 20, 2004)	tag for Radar
+cvs -r tag beta_version_3	(April 16, 2004)	tag for VtoX changes, wrftoxb, xatowrf.
+cvs -r tag beta_version_2	(April 14, 2004)	tag for SSMI update.
+cvs -r tag beta_version_1	(April 13, 2004)	tag for SATEM bug fix.
+cvs -r tag beta_version		(March 30, 2004)	Beta-version
+cvs -r tag version_0_0_0	(October, 2002)  - New Repository wrf3dvar
+

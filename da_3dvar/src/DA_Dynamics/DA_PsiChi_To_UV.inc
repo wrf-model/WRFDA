@@ -1,0 +1,157 @@
+SUBROUTINE DA_PsiChi_To_UV( psi, chi, map_factor, ds, u, v, &
+                            ids,ide, jds,jde, kds,kde,  &
+                            ims,ime, jms,jme, kms,kme,  &
+                            its,ite, jts,jte, kts,kte )
+ 
+!------------------------------------------------------------------------------
+!  PURPOSE: Calculate wind components u and v from psi and chi.
+!
+!  METHOD:  u = m * ( -dpsi/dy + dchi/dx )
+!           v = m * (  dpsi/dx + dchi/dy )
+!
+!  ASSUMPTIONS: Unstaggered grid.
+!               Lateral boundary conditions - dpsi/dn, dchi/dn = 0 (FCT)
+!               dx = dy = ds on grid.
+!
+!  HISTORY: 02/03/2000 - Creation of F90 version.           Dale Barker
+!           10/30/2001 - Parallel version.                  Dale Barker
+!------------------------------------------------------------------------------
+
+   implicit none
+
+   integer, intent(in):: ids,ide, jds,jde, kds,kde    ! domain dims.
+   integer, intent(in):: ims,ime, jms,jme, kms,kme    ! memory dims.
+   integer, intent(in):: its,ite, jts,jte, kts,kte    ! tile   dims.
+   
+   real, intent(in)   :: psi(ims:ime,jms:jme,kms:kme) ! Stream function
+   real, intent(in)   :: chi(ims:ime,jms:jme,kms:kme) ! Velocity potential
+   real, intent(in)   :: map_factor(ims:ime,jms:jme)  ! Map fact.
+   real, intent(in)   :: ds                           ! Resolution.
+   real, intent(out)  :: u(ims:ime,jms:jme,kms:kme)   ! u wind comp.
+   real, intent(out)  :: v(ims:ime,jms:jme,kms:kme)   ! v wind comp.
+
+   integer            :: i, j, k                      ! Loop counters.
+   integer            :: is, ie                       ! 1st dim. end points.
+   integer            :: js, je                       ! 2nd dim. end points.
+   integer            :: ks, ke                       ! 3rd dim. end points.
+   real               :: coeff(ims:ime,jms:jme)       ! Multiplicative coeff.
+
+!------------------------------------------------------------------------------
+!  [1.0] Initialise:
+!------------------------------------------------------------------------------
+
+!  Computation to check for edge of domain:
+   is = its; ie = ite; js = jts; je = jte
+   if ( its == ids ) is = ids+1; if ( ite == ide ) ie = ide-1
+   if ( jts == jds ) js = jds+1; if ( jte == jde ) je = jde-1
+
+   coeff(its:ite,jts:jte) = 0.5 * map_factor(its:ite,jts:jte) / ds
+
+   do k = kts, kte
+
+!------------------------------------------------------------------------------
+!  [2.0] Compute u, v at interior points (2nd order central finite diffs):
+!------------------------------------------------------------------------------
+
+      do j = js, je
+         do i = is, ie
+            u(i,j,k) = (-( psi(i  ,j+1,k) - psi(i  ,j-1,k) ) + &
+                         ( chi(i+1,j  ,k) - chi(i-1,j  ,k) ) ) * coeff(i,j)
+                           
+            v(i,j,k) = ( psi(i+1,j  ,k) - psi(i-1,j  ,k) + &
+                         chi(i  ,j+1,k) - chi(i  ,j-1,k) ) * coeff(i,j) 
+         end do
+      end do
+
+!------------------------------------------------------------------------------
+!  [3.0] Compute u, v at domain boundaries:
+!------------------------------------------------------------------------------
+
+!     [3.1] Western boundaries:
+
+      if ( its == ids ) then
+         i = its
+         do j = js, je
+            u(i,j,k) = (-( psi(i  ,j+1,k) - psi(i,j-1,k) ) + &
+                         ( chi(i+2,j  ,k) - chi(i,j  ,k) ) ) * coeff(i,j)
+
+            v(i,j,k) = ( psi(i+2,j  ,k) - psi(i,j  ,k) + &
+                         chi(i  ,j+1,k) - chi(i,j-1,k) ) * coeff(i,j)
+         end do
+      end if
+
+!     [3.2] Eastern boundaries:
+
+      if ( ite == ide ) then
+         i = ite
+         do j = js, je
+            u(i,j,k) = (-( psi(i,j+1,k) - psi(i  ,j-1,k) ) + &
+                         ( chi(i,j  ,k) - chi(i-2,j  ,k) ) ) * coeff(i,j)
+
+            v(i,j,k) = ( psi(i,j  ,k) - psi(i-2,j  ,k) + &
+                         chi(i,j+1,k) - chi(i  ,j-1,k) ) * coeff(i,j)
+         end do
+      end if
+
+!     [3.3] Southern boundaries:
+
+      if ( jts == jds ) then
+         j = jts
+         do i = is, ie
+            u(i,j,k) = (-( psi(i  ,j+2,k) - psi(i  ,j,k) ) + &
+                         ( chi(i+1,j  ,k) - chi(i-1,j,k) ) ) * coeff(i,j)
+
+            v(i,j,k) = ( psi(i+1,j  ,k) - psi(i-1,j,k) + &
+                         chi(i  ,j+2,k) - chi(i  ,j,k) ) * coeff(i,j)
+         end do
+      end if
+
+!     [3.4] Northern boundaries:
+
+      if ( jte == jde ) then
+         j = jte
+         do i = is, ie
+            u(i,j,k) = (-( psi(i  ,j,k) - psi(i  ,j-2,k) ) + &
+                         ( chi(i+1,j,k) - chi(i-1,j  ,k) ) ) * coeff(i,j)
+                           
+            v(i,j,k) = ( psi(i+1,j,k) - psi(i-1,j  ,k) + &
+                         chi(i  ,j,k) - chi(i  ,j-2,k) ) * coeff(i,j)
+         end do
+      end if
+   
+!------------------------------------------------------------------------------
+!     [4.0] Corner points (assume average of surrounding points - poor?):
+!------------------------------------------------------------------------------
+
+!     [4.1] Bottom-left point:
+
+      if ( its == ids .AND. jts == jds ) then
+         u(its,jts,k) = 0.5 * ( u(its+1,jts,k) + u(its,jts+1,k) )
+         v(its,jts,k) = 0.5 * ( v(its+1,jts,k) + v(its,jts+1,k) )
+      end if
+   
+!     [4.2] Top-left point:
+
+      if ( ite == ide .AND. jts == jds ) then
+         u(ite,jts,k) = 0.5 * ( u(ite-1,jts,k) + u(ite,jts+1,k) )
+         v(ite,jts,k) = 0.5 * ( v(ite-1,jts,k) + v(ite,jts+1,k) )
+      end if
+   
+!     [4.3] Bottom-right point:
+
+      if ( its == ids .AND. jte == jde ) then
+         u(its,jte,k) = 0.5 * ( u(its+1,jte,k) + u(its,jte-1,k) )
+         v(its,jte,k) = 0.5 * ( v(its+1,jte,k) + v(its,jte-1,k) )
+      end if
+   
+!     [4.4] Top-right point:
+
+      if ( ite == ide .AND. jte == jde ) then
+         u(ite,jte,k) = 0.5 * ( u(ite-1,jte,k) + u(ite,jte-1,k) )
+         v(ite,jte,k) = 0.5 * ( v(ite-1,jte,k) + v(ite,jte-1,k) )
+      end if
+   
+   end do
+
+END SUBROUTINE DA_PsiChi_To_UV
+

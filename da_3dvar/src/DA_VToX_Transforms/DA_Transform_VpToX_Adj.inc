@@ -1,0 +1,123 @@
+subroutine DA_Transform_VpToX_Adj( xb, xbx, xa, vp, be, xp, &
+                                   ids,ide, jds,jde, kds,kde,  &
+                                   ims,ime, jms,jme, kms,kme,  &
+                                   its,ite, jts,jte, kts,kte )
+   implicit none
+
+   type (xb_type), intent(in)           :: xb  ! First guess structure.
+   type (xbx_type),intent(in)           :: xbx ! Header & non-gridded vars.
+   type (x_type), intent(inout)         :: xa  ! Grad_x(Jo)
+   type (vp_type), intent(inout)        :: vp  ! CV on grid structure.
+   type (be_type), intent(in), optional :: be  ! Background errors.
+   type (xpose_type), intent(inout)     :: xp  ! Transpose variables.
+   integer, intent(in)             :: ids,ide, jds,jde, kds,kde ! domain dims.
+   integer, intent(in)             :: ims,ime, jms,jme, kms,kme ! memory dims.
+   integer, intent(in)             :: its,ite, jts,jte, kts,kte ! tile   dims.
+
+   integer         :: i, j, k, kk             ! Loop counters.
+   real            :: sum_v_p                 ! Summing variable.
+   real, dimension(ims:ime,jms:jme,kms:kme) :: phi_b ! Balanced mass increment.
+
+   real, dimension(kms:kme,ims:ime,jms:jme) :: p_copy
+   real, dimension(kms:kme,jms:jme,kms:kme) :: reg_copy
+
+!--surface pressure increments
+
+   if (sfc_assi_options == 2) then
+      call DA_Transform_XToWTQ_adj( xp, xb, xa )
+   else
+      xa%p(its:ite,jts:jte,kts) = xa%p(its:ite,jts:jte,kts) &
+                                + xa%psfc(its:ite,jts:jte)
+      xa%psfc(its:ite,jts:jte) = 0.0
+   endif
+
+!    [2.8] Ground temperature control variable:
+
+!     vp % v5(its:ite,jts:jte) = vp % v5(its:ite,jts:jte) + &
+!                                xa % tgrn(its:ite,jts:jte)
+    
+!     [2.7] Choice of moisture control variable:
+      
+      IF ( cv_options_hum == 1 ) THEN
+
+         vp % v4(its:ite,jts:jte,kts:kte) = vp % v4(its:ite,jts:jte,kts:kte)+&
+                                            xa % q(its:ite,jts:jte,kts:kte)
+  
+      ELSE IF ( cv_options_hum == 2 ) THEN
+      
+         CALL DA_TPRH_To_Q_Adj( xb, xp, xa )
+
+         vp % v4(its:ite,jts:jte,kts:kte) = vp % v4(its:ite,jts:jte,kts:kte)+&
+                                            xa % rh(its:ite,jts:jte,kts:kte)
+
+      ELSE IF ( cv_options_hum == 3 ) THEN
+
+!    [2.10] Partition of hydrometeor increments via warm rain process
+
+         CALL DA_Moist_Phys_Adj( xb, xa, xp,                 &
+                                 ids,ide, jds,jde, kds,kde,  &
+                                 ims,ime, jms,jme, kms,kme,  &
+                                 its,ite, jts,jte, kts,kte)
+
+         vp % v4(its:ite,jts:jte,kts:kte) = vp % v4(its:ite,jts:jte,kts:kte) + &
+                                            xa % qt(its:ite,jts:jte,kts:kte)
+
+
+      END IF
+
+!     [2.6] Compute temperature increments from p/rho increments:
+               
+      CALL DA_PRho_To_T_Adj( xb, xp, xa )
+
+!     [2.5] Compute density increments using hydrostatic eqn:
+
+      CALL DA_HydrostaticP_To_Rho_Adj( xb, xp, xa % rho, xa % p )
+
+!     [2.4] Compute phi:
+
+      IF ( PRESENT(be) ) THEN
+
+         DO k = kts, kte ! Need copies for all model levels for sum:
+            reg_copy(k,jts:jte,kts:kte) = be % pb_vert_reg(jts:jte,k,kts:kte)
+            p_copy(k,its:ite,jts:jte) = xa % p(its:ite,jts:jte,k)
+         END DO
+
+         DO k = kts, kte
+            DO j = jts, jte
+               DO i= its, ite
+!                 SUM OVER ALL LEVELS (kts:kte):
+                  sum_v_p = reg_copy(kts,j,k) * p_copy(kts,i,j)
+                  DO kk = kts+1, kte ! SUM OVER ALL LEVELS
+                     sum_v_p= sum_v_p + reg_copy(kk,j,k) * p_copy(kk,i,j)
+                  END DO
+                  phi_b(i,j,k) = sum_v_p
+               END DO
+            END DO
+         END DO
+
+      ELSE
+         phi_b(its:ite,jts:jte,kts:kte) = xa % p(its:ite,jts:jte,kts:kte)
+      END IF
+
+      vp % v3(its:ite,jts:jte,kts:kte) = vp % v3(its:ite,jts:jte,kts:kte) + &
+                                         xa % p(its:ite,jts:jte,kts:kte)
+
+!     [2.3] Calculate phi_b from u and v:
+
+      CALL DA_Balance_Equation_Adj( xb, xbx, xp, phi_b, xa % u, xa % v, &
+                                    ids,ide, jds,jde, kds,kde,  &
+                                    ims,ime, jms,jme, kms,kme,  &
+                                    its,ite, jts,jte, kts,kte )
+
+      CALL wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id3)
+
+!     [2.2] Transform psi and chi to u and v:
+
+      CALL DA_PsiChi_To_UV_Adj( xa % u, xa % v, xb % map_factor, &
+                            xb % ds, vp % v1, vp % v2, &
+                            ids,ide, jds,jde, kds,kde, &
+                            ims,ime, jms,jme, kms,kme, &
+                            its,ite, jts,jte, kts,kte )
+
+END subroutine DA_Transform_VpToX_Adj
+
