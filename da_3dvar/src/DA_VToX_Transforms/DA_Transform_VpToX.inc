@@ -231,11 +231,12 @@ elseif (cv_options == 5) then    ! psi, chi_u, t_u, pseudo_rh , psfc_u
 !  Communicate halo region.
    CALL wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id1)
 
-   CALL DA_PsiChi_To_UV( vp % v1, vp % v2, xb % map_factor, &
-                         xb % ds, xa % u, xa % v, &
-                         ids,ide, jds,jde, kds,kde, &
-                         ims,ime, jms,jme, kms,kme, &
-                         its,ite, jts,jte, kts,kte )
+
+   CALL DA_PsiChi_To_UV(vp % v1, vp % v2, xb % coefx, &
+                        xb % coefy , xa % u, xa % v, &
+                        ids,ide, jds,jde, kds,kde, &
+                        ims,ime, jms,jme, kms,kme, &
+                        its,ite, jts,jte, kts,kte )
 
 !  [3.5] treat humidity
 
