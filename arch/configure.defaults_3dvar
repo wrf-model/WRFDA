@@ -99,7 +99,7 @@ externals : wrfio_nf wrfio_int wrfio_grib1 esmf_time lib_rsl
 
 lib_rsl :
 	( cd ../external/RSL/RSL ; \
-          make CC=$(CC) FC=$(FC) MAX_DOMAINS=$(MAX_DOMAINS) \
+          make CC="$(CC)" FC="$(FC)" MAX_DOMAINS=$(MAX_DOMAINS) \
                                  MAX_PROC=$(MAX_PROC) \
                                  LEARN_BCAST=-DLEARN_BCAST alpha )
 
