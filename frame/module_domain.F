@@ -2,7 +2,7 @@
 !
 !  Following are the routines contained within this MODULE:
 
-!  alloc_space_domain                1. Allocate the space for a single domain (constants
+!  alloc_and_configure_domain        1. Allocate the space for a single domain (constants
 !                                       and null terminate pointers).
 !                                    2. Connect the domains as a linked list.
 !                                    3. Store all of the domain constants.
@@ -30,7 +30,7 @@ MODULE module_domain
    USE module_state_description
    USE module_configure
    USE module_wrf_error
-   USE esmf_mod
+   USE WRF_ESMF_MOD
 
    CHARACTER (LEN=80) program_name
 
@@ -49,9 +49,11 @@ MODULE module_domain
                          AUXINPUT1_ALARM=7, AUXINPUT2_ALARM=8, AUXINPUT3_ALARM=9, &
                          AUXINPUT4_ALARM=10, AUXINPUT5_ALARM=11,                  &
                          RESTART_ALARM=12, BOUNDARY_ALARM=13, INPUTOUT_ALARM=14,  &  ! for outputing input (e.g. for 3dvar)
-                         ALARM_SUBTIME=15
+                         ALARM_SUBTIME=15,                                        &
+                         MAX_WRF_ALARMS=20  ! ESMF 2.0.1+ requires user to dimension alarm 
+                                            ! lists.  MAX_WRF_ALARMS must be big enough 
+                                            ! to include all of the above alarms.  
 
-!  added for 3dvar code, WCS, 5 June 2002, Wei Huang, 3 November 2004
 #include <state_subtypes.inc>
 
    TYPE domain
@@ -621,6 +623,7 @@ CONTAINS
       INTEGER                     :: i
       INTEGER                     :: parent_id , parent_domdesc , new_domdesc
       INTEGER                     :: bdyzone_x , bdyzone_y
+      INTEGER                     :: nx, ny
 
 
 ! This next step uses information that is listed in the registry as namelist_derived
@@ -637,6 +640,8 @@ CONTAINS
           CALL nl_get_e_sn( domain_id , ed2 )
           CALL nl_get_s_vert( domain_id , sd3 )
           CALL nl_get_e_vert( domain_id , ed3 )
+          nx = ed1-sd1+1
+          ny = ed2-sd2+1
 
         CASE  ( DATA_ORDER_YXZ )
 
@@ -646,6 +651,8 @@ CONTAINS
           CALL nl_get_e_we( domain_id , ed2 )
           CALL nl_get_s_vert( domain_id , sd3 )
           CALL nl_get_e_vert( domain_id , ed3 )
+          nx = ed2-sd2+1
+          ny = ed1-sd1+1
 
         CASE  ( DATA_ORDER_ZXY )
 
@@ -655,6 +662,8 @@ CONTAINS
           CALL nl_get_e_we( domain_id , ed2 )
           CALL nl_get_s_sn( domain_id , sd3 )
           CALL nl_get_e_sn( domain_id , ed3 )
+          nx = ed2-sd2+1
+          ny = ed3-sd3+1
 
         CASE  ( DATA_ORDER_ZYX )
 
@@ -664,6 +673,8 @@ CONTAINS
           CALL nl_get_e_sn( domain_id , ed2 )
           CALL nl_get_s_we( domain_id , sd3 )
           CALL nl_get_e_we( domain_id , ed3 )
+          nx = ed3-sd3+1
+          ny = ed2-sd2+1
 
         CASE  ( DATA_ORDER_XZY )
 
@@ -673,6 +684,8 @@ CONTAINS
           CALL nl_get_e_vert( domain_id , ed2 )
           CALL nl_get_s_sn( domain_id , sd3 )
           CALL nl_get_e_sn( domain_id , ed3 )
+          nx = ed1-sd1+1
+          ny = ed3-sd3+1
 
         CASE  ( DATA_ORDER_YZX )
 
@@ -682,15 +695,25 @@ CONTAINS
           CALL nl_get_e_vert( domain_id , ed2 )
           CALL nl_get_s_we( domain_id , sd3 )
           CALL nl_get_e_we( domain_id , ed3 )
+          nx = ed3-sd3+1
+          ny = ed1-sd1+1
 
       END SELECT data_ordering
 
+#ifdef RSL
+! Check domain size to be sure it is within RSLs limit
+      IF ( nx .GE. 1024 .OR. ny .GE. 1024 ) THEN
+        WRITE ( wrf_err_message , * ) 'domain too large for RSL. Use RSL_LITE or other comm package.'
+        CALL wrf_error_fatal ( TRIM ( wrf_err_message ) )
+      ENDIF
 
-      if ( num_time_levels > 3 ) then
-        WRITE ( wrf_err_message , * ) 'module_domain: alloc_and_configure_domain: Incorrect value for num_time_levels ', &
+#endif
+
+      IF ( num_time_levels > 3 ) THEN
+        WRITE ( wrf_err_message , * ) 'alloc_and_configure_domain: Incorrect value for num_time_levels ', &
                                        num_time_levels
         CALL wrf_error_fatal ( TRIM ( wrf_err_message ) )
-      endif
+      ENDIF
 
       IF (ASSOCIATED(parent)) THEN
         parent_id = parent%id
@@ -717,7 +740,7 @@ CONTAINS
       NULLIFY  (new_grid%j_start)
       NULLIFY  (new_grid%i_end)
       NULLIFY  (new_grid%j_end)
-      NULLIFY  (new_grid%alarms)    ! set with call to ESMF_ClockGetAlarmList
+      ALLOCATE( new_grid%alarms( MAX_WRF_ALARMS ) )    ! initialize in setup_timekeeping
 
       ! set up the pointers that represent the nest hierarchy
       ! set this up *prior* to calling the patching or allocation

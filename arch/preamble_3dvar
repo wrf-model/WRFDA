@@ -22,7 +22,7 @@ RM      =       /bin/rm -f
 MV      =       /bin/mv -f
 CP      =       /bin/cp -f
 AR      =       ar ru
-M4      =       m4 -B8000
+M4      =       m4 -B 12000
 
 .SUFFIXES: .F .i .o .f .c
 
@@ -35,11 +35,21 @@ COREDEFS = -DEM_CORE=$(WRF_EM_CORE) \
            -DEXP_CORE=$(WRF_EXP_CORE) \
            -DDA_CORE=$(WRF_DA_CORE)
 
+#### For wrfvar, always use RWORDSIZE 8
+
+RWORDSIZE	=	8
+WORDSIZE_DEF	=	-DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4
+
 #### Single location for defining total number of domains.  You need
 #### at least 1 + 2*(number of total nests).  For example, 1 coarse
 #### grid + three fine grids = 1 + 2(3) = 7, so MAX_DOMAINS=7.
 
 MAX_DOMAINS	=	21
+MAX_PROC	=	1024
+RANLIB		=	ranlib
+
+MPI_LIB		=
+LOCAL_LIB	=
 
 #### DM buffer length for the configuration flags.
 
@@ -47,6 +57,15 @@ CONFIG_BUF_LEN	=	8192
 
 #### Default sed command and script for Fortran source files ####
 SED_FTN = sed -f ../arch/standard.sed
+
+#### Default ESMF dependence for embedded ESMF time manager ####
+ESMF_MOD_DEPENDENCE = ../external/esmf_time_f90/ESMF_Mod.o
+
+WRF_LIB		=	-L../external/io_int -lwrfio_int \
+			-L../external/io_grib1 -lio_grib1 \
+			-L../external/esmf_time_f90 -lesmf_time \
+			../frame/module_internal_header_util.o \
+			../frame/pack_utils.o
 
 #### Architecture specific settings ####
 

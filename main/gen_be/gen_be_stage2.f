@@ -35,6 +35,7 @@ program gen_be_stage2
    real                :: summ                       ! Summation dummy.
    logical             :: first_time                 ! True if first file.
    logical             :: testing_eofs               ! True if testing EOF decomposition.
+   logical             :: ldum1, ldum2               ! Dummy logicals.
 
    real, allocatable   :: latitude(:,:)              ! Latitude (degrees, from south).
    real, allocatable   :: height(:,:,:)              ! Height field.
@@ -189,9 +190,10 @@ program gen_be_stage2
 !        Read ps:
          variable = 'ps'
          filename = trim(variable)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce
+         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce//'.01'
          open (iunit, file = filename, form='unformatted')
          read(iunit)ni, nj, nkdum
+         read(iunit)ldum1, ldum2 ! Dummy logicals.
          read(iunit)ps
          close(iunit)
 
@@ -265,7 +267,7 @@ program gen_be_stage2
    allocate( evec(1:nk,1:nk) )
    allocate( eval(1:nk) )
    allocate( LamInvET(1:nk,1:nk) )
-   allocate( var2_inv(1:nk,1:nk,1:num_bins) )
+   allocate( var2_inv(1:nk,1:nk,1:num_bins2d) )
 
    do b = 1, num_bins2d   
       LamInvET(:,:) = 0.0
@@ -327,8 +329,8 @@ program gen_be_stage2
 !---------------------------------------------------------------------------------------------
 
    allocate( regcoeff1(1:num_bins) )
-   allocate( regcoeff2(1:nk,1:num_bins) )
-   allocate( regcoeff3(1:nk,1:nk,1:num_bins) )
+   allocate( regcoeff2(1:nk,1:num_bins2d) )
+   allocate( regcoeff3(1:nk,1:nk,1:num_bins2d) )
 
 !  psi/chi:
    do b = 1, num_bins
@@ -363,7 +365,8 @@ program gen_be_stage2
    filename = 'gen_be_stage2.'//trim(be_method)//'.dat'
    open (ounit, file = filename, form='unformatted')
    write(ounit)ni, nj, nk
-   write(ounit)num_bins
+   write(ounit)bin_type, num_bins_hgt, binwidth_hgt, binwidth_lat
+   write(ounit)num_bins, num_bins2d
    write(ounit)regcoeff1
    write(ounit)regcoeff2
    write(ounit)regcoeff3
@@ -371,14 +374,10 @@ program gen_be_stage2
 
    do k = 1, nk
       do j = 1, nj
-         b = bin(1,j,k)
-         write(60,'(1pe13.5)')regcoeff1(b)
          b = bin2d(1,j)
-         write(61,'(1pe13.5)')covar2(k,b)
-         write(62,'(1pe13.5)')var2(k,k,b)
-         write(63,'(1pe13.5)')var2_inv(k,k,b)
-         write(64,'(1pe13.5)')regcoeff2(k,b)
-         write(65,'(1pe13.5)')regcoeff3(k,k,b)
+         write(61,'(3i6,1pe13.5)')k, j, b, covar2(k,b)
+         write(62,'(3i6,1pe13.5)')k, j, b, var2(k,k,b)
+         write(63,'(3i6,1pe13.5)')k, j, b, var2_inv(k,k,b)
       end do
    end do
 
@@ -443,9 +442,10 @@ program gen_be_stage2
 !        Read ps:
          variable = 'ps'
          filename = trim(variable)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce
+         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce//'.01'
          open (iunit, file = filename, form='unformatted')
          read(iunit)ni, nj, nkdum
+         read(iunit)ldum1, ldum2 ! Dummy logicals.
          read(iunit)ps
          close(iunit)
 
@@ -458,9 +458,10 @@ program gen_be_stage2
 
          variable = 'ps_u'
          filename = trim(variable)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce
+         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce//'.01'
          open (ounit, file = filename, form='unformatted')
          write(ounit)ni, nj, 1
+         write(ounit)ldum1, ldum2 ! Dummy logicals.
          write(ounit)ps
          close(ounit)
 

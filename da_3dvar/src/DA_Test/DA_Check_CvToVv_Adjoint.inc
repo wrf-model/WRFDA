@@ -9,6 +9,7 @@ SUBROUTINE DA_Check_CvToVv_Adjoint( xb, xbx, xp, be, cv, vv, &
 !  METHOD:  Standard adjoint test: < Vp, Vp > = < Vv_adj, Vv >.
 !
 !  HISTORY: 02/23/2000 - Creation of F90 version.           Dale Barker
+!           02/04/2005 - Updated for cv_option =4           Syed RH Rizvi
 !------------------------------------------------------------------------------
 
    IMPLICIT NONE
@@ -54,11 +55,16 @@ SUBROUTINE DA_Check_CvToVv_Adjoint( xb, xbx, xp, be, cv, vv, &
 !-------------------------------------------------------------------------
 
    cv_2(1:cv_size) = cv(1:cv_size)
-
+   if( cv_options == 2) &
    call da_transform_vtovv( xb, be, cv, vv, xp,         &
                             ids,ide, jds,jde, kds,kde,  &
                             ims,ime, jms,jme, kms,kme,  &
                             its,ite, jts,jte, kts,kte )
+   if( cv_options == 4) &
+       call DA_Transform_VToVv_Global(xb, xbx, be, cv,vv, &
+                                ids, ide, jds, jde, kds, kde, &
+                                ims, ime, jms, jme, kms, kme, &
+                                its, ite, jts, jte, kts, kte )
 
 !-------------------------------------------------------------------------
 !  [3.0] Calculate LHS of adjoint test equation:
@@ -74,10 +80,17 @@ SUBROUTINE DA_Check_CvToVv_Adjoint( xb, xbx, xp, be, cv, vv, &
 !  [4.0] Calculate LHS of adjoint test equation:
 !-------------------------------------------------------------------------
 
+   if( cv_options == 2) &
    call DA_Transform_VToVv_Adj( xb, be, vv, cv, xp, &
                                ids,ide, jds,jde, kds,kde,  &
                                ims,ime, jms,jme, kms,kme,  &
                                its,ite, jts,jte, kts,kte )
+   if( cv_options == 4) &
+       call DA_Transform_VToVv_Global_Adj(xb, xbx, be, cv,vv, &
+                                ids, ide, jds, jde, kds, kde, &
+                                ims, ime, jms, jme, kms, kme, &
+                                its, ite, jts, jte, kts, kte )
+
 
    adj_par_rhs = SUM( cv(1:cv_size) * cv_2(1:cv_size) )
 
