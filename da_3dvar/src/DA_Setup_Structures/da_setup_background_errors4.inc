@@ -249,7 +249,7 @@ SUBROUTINE DA_Setup_Background_Errors4(xb, be, xbx, xp)
    cv_size = be % cv % size
    close(be_cv_4_unit)
    return
-99  write(5,'(a, i5)')' Unexpected end on BE-unit = ',be_cv_4_unit
-100 write(5,'(a, i5)')' Read error on BE-unit = ',be_cv_4_unit
+99  write(6,'(a, i5)')' Unexpected end on BE-unit = ',be_cv_4_unit
+100 write(6,'(a, i5)')' Read error on BE-unit = ',be_cv_4_unit
    stop     
 END SUBROUTINE DA_Setup_Background_Errors4
