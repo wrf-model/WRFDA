@@ -25,7 +25,7 @@ wrf_io_flags.h:
 
 wrf_io.o:               wrf_io.F90 $(CODE)
 			$(CPP1) wrf_io.F90 | $(M4) - > wrf_io.f
-			$(FC) $(FFLAGS) -c wrf_io.f
+			$(FC) $(FFLAGS) -I. -c wrf_io.f
 
 diffwrf:                diffwrf.F90
 			$(CPP1) diffwrf.F90 > diffwrf.f

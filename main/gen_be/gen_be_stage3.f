@@ -12,7 +12,6 @@ program gen_be_stage3
    character*80        :: dat_dir                    ! Input data directory.
    character*80        :: expt                       ! Experiment ID.
    character*80        :: filename                   ! Input filename.
-   character*1         :: k_label                    ! = k if model level, m if mode output.
    character*2         :: ck                         ! Level index -> character.
    character*3         :: ce                         ! Member index -> character.
    integer             :: ni, nj, nk                 ! Dimensions read in.
@@ -142,6 +141,9 @@ program gen_be_stage3
          open (iunit, file = filename, form='unformatted')
          read(iunit)ni, nj, nk
          read(iunit)field
+!   rizvi
+         call remove_horizontal_mean(field, ni, nj, nk)
+!   rizvi
          close(iunit)
 
          do j = 1, nj
@@ -169,7 +171,7 @@ program gen_be_stage3
 
    do b = 1, num_bins2d
       do k1 = 1, nk
-         do k2 = k+1, nk ! Symmetry.
+         do k2 = k1+1, nk ! Symmetry.
             bv(k1,k2,b) = bv(k2,k1,b)
          end do
       end do
@@ -279,11 +281,9 @@ program gen_be_stage3
 
          if ( data_on_levels ) then
 !           Keep data on vertical levels:
-            k_label = 'k'
             field_out(:,:,:) = field(:,:,:)
          else
 !           Project fields onto vertical modes:
-            k_label = 'm'
             call da_transform_vptovv( evec, eval, vertical_wgt, &
                                       field, field_out, nk, &
                                       1, ni, 1, nj, 1, nk, & ! WRF ids, ide etc.
@@ -302,9 +302,10 @@ program gen_be_stage3
             if ( k < 10 ) ck = '0'//ck(2:2)
 !           Assumes variable directory has been created by script:
             filename = trim(variable)//'/'//date(1:10)//'.'//trim(variable)
-            filename = trim(filename)//'.'//trim(be_method)//'.e'//ce//'.'//k_label//ck
+            filename = trim(filename)//'.'//trim(be_method)//'.e'//ce//'.'//ck
             open (ounit, file = filename, form='unformatted')
             write(ounit)ni, nj, k
+            write(ounit)data_on_levels, use_global_eofs
             write(ounit)field_out(1:ni,1:nj,k)
             close(ounit)
          end do
@@ -317,3 +318,23 @@ program gen_be_stage3
    end do
 
 end program gen_be_stage3
+  subroutine remove_horizontal_mean(field,n1,n2,n3)
+  implicit none
+  integer, intent(in)   :: n1, n2, n3
+  real, intent(inout)   :: field(1:n1,1:n2,1:n3)
+
+  integer    ::  i, j, k        ! loop counters
+  real       :: avg, inv_n1n2
+
+  inv_n1n2 = 1.0/real(n1*n2)
+  do k = 1, n3
+  avg = 0
+    do j=1,n2
+    do i=1,n1
+    avg = avg + field(i,j,k)
+    end do
+    end do
+  field(1:n1,1:n2,k) = field(1:n1,1:n2,k) - avg*inv_n1n2
+  end do
+ end subroutine remove_horizontal_mean
+
