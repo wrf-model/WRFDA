@@ -78,7 +78,7 @@ subroutine da_transform_vtox( xb, xbx, be, cv, vv, vp, xp, xa,        &
                             its,ite, jts,jte, kts,kte )
 
 
- if(cv_options==3) then
+ else if(cv_options==3) then
    call da_apply_be( be, cv, vp, xb, xp, &
                      ids,ide, jds,jde, kds,kde,  &
                      ims,ime, jms,jme, kms,kme,  &

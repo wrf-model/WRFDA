@@ -71,11 +71,11 @@ SUBROUTINE DA_Setup_FirstGuess_KMA( xbx, grid, &
     end do
 
 !--Avoid assigning -90,90 value                                           
-    if(jts == jds) then
+    if(xb%jts == xb%jds) then
        xlat(is:ie,j) = -89.9                               
     end if
 
-    if(jte == jde) then
+    if(xb%jte == xb%jde) then
        xlat(is:ie,j) = 89.9                               
     end if
 
