@@ -87,8 +87,19 @@
 !     [1.0] calculate jb:
 !-------------------------------------------------------------------------
 
-     if(minimisation_option == 1)j%jb = 0.5*da_dot(cv     ,cv     ,cv_size)
-     if(minimisation_option == 2)j%jb = 0.5*da_dot(cv+xhat,cv+xhat,cv_size)
+     if(minimisation_option == 1) then
+        if(global) then
+           j%jb = 0.5*dot_product(cv, cv)
+        else
+           j%jb = 0.5*da_dot(cv+xhat,cv+xhat,cv_size)
+        endif
+     else if(minimisation_option == 2) then
+        if(global) then
+           j%jb = 0.5*dot_product(cv+xhat, cv+xhat)
+        else
+           j%jb = 0.5*da_dot(cv+xhat,cv+xhat,cv_size)
+        endif
+     endif
 
 !-------------------------------------------------------------------------
 !     [3.0] calculate total cost function j = jo + jb:
