@@ -39,7 +39,7 @@ SUBROUTINE DA_Setup_RunConstants( xp, xb, xbx)
 !  [1.0] Calculate padded grid-size required for efficient FFTs and factors:
 !------------------------------------------------------------------------------
 
-!rizvi   IF ( cv_options == 2 ) THEN
+      if (associated(xbx % fft_factors_x)) return
 
 !     [1.1] In x direction:
 
@@ -177,7 +177,6 @@ SUBROUTINE DA_Setup_RunConstants( xp, xb, xbx)
          enddo
       endif
 
-!rizvi   END IF
 !------------------------------------------------------------------------------
    IF ( cv_options == 4 ) THEN
 ! Set up Spectral transform constants:

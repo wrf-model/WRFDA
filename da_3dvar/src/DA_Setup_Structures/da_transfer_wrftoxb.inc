@@ -53,7 +53,7 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
 
    REAL   :: qvf1, qvf2
 
-!  REAL   :: cvpm, cpovcv, ppb, ttb, alb, al
+   REAL   :: cvpm, cpovcv, ppb, ttb, ralb, ral
 
 !---------------------------------------------------------------------------
 !--Set xb array range indices for processor subdomain.
@@ -382,7 +382,7 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
      enddo
    enddo
 
-#if 0
+#if 1
 ! Adapted the code from WRF module_big_step_utilities_em.F ----
 !         subroutine calc_p_rho_phi      Y.-R. Guo (10/20/2004)
 
@@ -406,16 +406,16 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
 !--------The base specific volume (from real.init.code):...........
          ppb  = znu(k) * mub(i,j) + ptop
          ttb  = (tis0 + tlp*log(ppb/ps0)) * (ps0/ppb)**kappa
-         alb  = (gas_constant/ps0) * ttb * (ppb/ps0)**cvpm
+         ralb = (gas_constant/ps0) * ttb * (ppb/ps0)**cvpm
 ! .............................................................
          qvf1 = 1. + moist_2(i,j,k,P_QV) / rd_over_rv
-         al   = -1. / (mub(i,j)+mu_2(i,j)) * ( alb*mu_2(i,j) &
+         ral  = -1. / (mub(i,j)+mu_2(i,j)) * ( ralb*mu_2(i,j) &
                 + rdnw(k) *(ph_2(i,j,k+1) - ph_2(i,j,k)) )
 !--------total pressure:
          xb%p(i,j,k) = ps0 * ( (gas_constant*(ts0+t_2(i,j,k))*qvf1) / &
-                      (ps0*(al+alb)) )**cpovcv
+                      (ps0*(ral+ralb)) )**cpovcv
 !--------total density
-         xb%rho(i,j,k)= 1.0 / (alb+al)
+         xb%rho(i,j,k)= 1.0 / (ralb+ral)
 !--------pressure purtubation:
          p(i,j,k) = xb%p(i,j,k) - ppb
        enddo
@@ -654,6 +654,7 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
 !--Calculate means for later use in setting up background errors.
 !------------------------------------------------------------------------------
 
+   if(.not. assocaited(xbx % latc_mean)) then
    allocate ( xbx % latc_mean(xp%jds:xp%jde) )
 
    size2d = (xp%ide-xp%ids+1)*(xp%jde-xp%jds+1)
@@ -687,7 +688,7 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
 !     print *, 'loc_latc_mean  =', loc_latc_mean(js)
       print *, 'xbx % latc_mean=', xbx % latc_mean(js)
    endif
-
+   endif
 
 !---Calculate time step from one dimensional cloud model parameterization-------------
 
