@@ -38,7 +38,7 @@ MODULE DA_Constants
    REAL, PARAMETER    :: gravity = 9.81        ! m/s - value used in MM5.
 !  REAL, PARAMETER    :: earth_radius = 6378.15
    REAL, PARAMETER    :: earth_radius = 6370.0		! Be consistant with WRF
-   REAL, PARAMETER    :: earth_omega  = 0.000072921  ! Omega 7.2921*10**-5 
+   REAL, PARAMETER    :: earth_omega  = 2.0*pi/86400.0  ! Omega
 
 !  Saturation Vapour Pressure Constants(Rogers & Yau, 1989) 
    REAL, PARAMETER    :: es_alpha = 611.2
@@ -185,6 +185,10 @@ MODULE DA_Constants
    REAL               :: coarse_ds            ! Coarse domain gridlength (km)
    REAL               :: start_x              ! i posn. of (1,1) in coarse domain.
    REAL               :: start_y              ! j posn. of (1,1) in coarse domain.
+   REAL               :: start_lat            ! Latitude coresponds to start_(x,y)
+   REAL               :: start_lon            ! Longitude coresponds to start_(x,y)
+   REAL               :: delt_lat             ! Latitude increments for global grids
+   REAL               :: delt_lon             ! Longitude increments for global grids
 
    REAL               :: phic                 ! COARSE DOMAIN CENTRAL LAT(DEGREE)
    REAL               :: xlonc                ! COARSE DOMAIN CENTRAL LON(DEGREE)

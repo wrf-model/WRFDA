@@ -25,8 +25,8 @@ SUBROUTINE DA_ll_to_xy (info, loc, xp, &
       CALL latlon_to_ij(map_info, info%lat, info%lon, loc%x, loc%y)
 !  else if(fg_format == 2) then
 !     CALL llxy (info%lat, info%lon, loc%x, loc%y)
-!  else if(fg_format == 3) then
-!     CALL llxy (info%lat, info%lon, loc%x, loc%y)
+   else if(fg_format == 3) then
+      CALL da_global_ll_to_xy (info%lat, info%lon, loc%x, loc%y)
    else
       CALL llxy (info%lat, info%lon, loc%x, loc%y)
    endif
@@ -36,7 +36,7 @@ SUBROUTINE DA_ll_to_xy (info, loc, xp, &
 
    if(fg_format == 3)then
       if((loc%j < xp%jts-1) .or. (loc%j > xp%jte)) then
-         outside = .true. 
+         outside = .true.
          inside_halo = .false.
          return
       endif
