@@ -38,7 +38,8 @@ MODULE DA_Constants
    REAL, PARAMETER    :: gravity = 9.81        ! m/s - value used in MM5.
 !  REAL, PARAMETER    :: earth_radius = 6378.15
    REAL, PARAMETER    :: earth_radius = 6370.0		! Be consistant with WRF
-   REAL, PARAMETER    :: earth_omega  = 2.0*pi/86400.0  ! Omega
+!  REAL, PARAMETER    :: earth_omega  = 2.0*pi/86400.0  ! Omega
+   REAL, PARAMETER    :: earth_omega  = 0.000072921     ! Omega 7.2921*10**-5
 
 !  Saturation Vapour Pressure Constants(Rogers & Yau, 1989) 
    REAL, PARAMETER    :: es_alpha = 611.2
