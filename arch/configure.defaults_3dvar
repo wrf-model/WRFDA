@@ -8,7 +8,7 @@ F77             =       $(FC)
 CC              =       cc
 CC_TOOLS        =       cc
 ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DNETCDF -DINTIO \
-                        -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=8 -DLWORDSIZE=4 \
+                        $(WORDSIZE_DEF) \
                         -DTRIEDNTRUE -DONLY_WRFMODEL_IO \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC)
 CFLAGS          =       $(ARCHFLAGS)
@@ -30,11 +30,8 @@ LDFLAGS         =       $(FCOPTIM) $(FCBASE)
 
 NETCDFPATH      =       CONFIGURE_NETCDF_PATH
 NETCDF_IO_PATH  =       external/io_netcdf
+NETCDF_LIB	=       CONFIGURE_NETCDF_LIB_PATH
 
-LIB             =       CONFIGURE_NETCDF_LIB_PATH \
-                        -L../external/io_int -lwrfio_int \
-			-L../external/esmf_time_f90 -lesmf_time \
-                        ../frame/module_internal_header_util.o ../frame/pack_utils.o
 LOCAL_LIBRARIES =       -L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c -lX11
 
 CPP             =       /usr/bin/cpp
@@ -42,10 +39,6 @@ DM_1_CPP_FLAGS	=
 DM_2_CPP_FLAGS	=
 POUND_DEF       =       -DDEC_ALPHA -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
 			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
-
-MAX_DOMAINS     =       21
-MAX_PROC        =       1024
-RANLIB          =       ranlib
 
 externals : CONFIGURE_WRFIO_NF wrfio_int wrfio_grib1 esmf_time
 	( /bin/cp module_dm_warning module_dm.F ; \
@@ -63,7 +56,7 @@ CC              =       mpicc
 CC_TOOLS        =       cc
 ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DNETCDF -DINTIO \
                         -DWRF_RSL_IO -DDM_PARALLEL -DRSL \
-                        -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=8 -DLWORDSIZE=4 \
+                        $(WORDSIZE_DEF) \
                         -DTRIEDNTRUE -DONLY_WRFMODEL_IO \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC)
 CFLAGS          =       $(ARCHFLAGS) -I../external/RSL/RSL
@@ -85,12 +78,9 @@ LDFLAGS         =       $(FCOPTIM) $(FCBASE)
 
 NETCDFPATH      =       CONFIGURE_NETCDF_PATH
 NETCDF_IO_PATH  =       external/io_netcdf
+NETCDF_LIB	=       CONFIGURE_NETCDF_LIB_PATH
+MPI_LIB		=	-L../external/RSL/RSL -lrsl
 
-LIB             =       CONFIGURE_NETCDF_LIB_PATH \
-                        -L../external/io_int -lwrfio_int \
-                        -L../external/RSL/RSL -lrsl -lfmpich \
-			-L../external/esmf_time_f90 -lesmf_time \
-                        ../frame/module_internal_header_util.o ../frame/pack_utils.o
 LOCAL_LIBRARIES =       -L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c -lX11
 
 CPP             =       /usr/bin/cpp
@@ -98,10 +88,6 @@ DM_1_CPP_FLAGS	=	-I../external/RSL/RSL -C -P `cat ../inc/dm_comm_cpp_flags`
 DM_2_CPP_FLAGS	=	-I../../external/RSL/RSL -C -P `cat ../../inc/dm_comm_cpp_flags`
 POUND_DEF       =       -DDEC_ALPHA -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
                         -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
-
-MAX_DOMAINS     =       21
-MAX_PROC        =       1024
-RANLIB          =       ranlib
 
 externals : wrfio_nf wrfio_int wrfio_grib1 esmf_time lib_rsl
 	( /bin/cp ../tools/gen_comms_warning ../tools/gen_comms.c ; \
@@ -125,7 +111,7 @@ F77             =       $(FC)
 CC              =       cc
 CC_TOOLS        =       cc
 ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DNETCDF -DINTIO \
-                        -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=8 -DLWORDSIZE=4 \
+                        $(WORDSIZE_DEF) \
                         -DTRIEDNTRUE -DONLY_WRFMODEL_IO \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC)
 CFLAGS          =       $(ARCHFLAGS)
@@ -147,11 +133,8 @@ LDFLAGS         =       $(FCOPTIM) $(FCBASE)
 
 NETCDFPATH      =       CONFIGURE_NETCDF_PATH
 NETCDF_IO_PATH  =       external/io_netcdf
+NETCDF_LIB	=       CONFIGURE_NETCDF_LIB_PATH
 
-LIB             =       CONFIGURE_NETCDF_LIB_PATH \
-                        -L../external/io_int -lwrfio_int \
-			-L../external/esmf_time_f90 -lesmf_time \
-                        ../frame/module_internal_header_util.o ../frame/pack_utils.o
 LOCAL_LIBRARIES =       -L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c -lX11
 
 CPP             =       /usr/bin/cpp
@@ -159,10 +142,6 @@ DM_1_CPP_FLAGS  =
 DM_2_CPP_FLAGS  =
 POUND_DEF       =       -DDEC_ALPHA -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
                         -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
-
-MAX_DOMAINS     =       21
-MAX_PROC        =       1024
-RANLIB          =       ranlib
 
 externals : CONFIGURE_WRFIO_NF wrfio_int wrfio_grib1 esmf_time
 	( /bin/cp module_dm_warning module_dm.F ; \
@@ -187,7 +166,7 @@ FCBUFR          =       -Ktrap=fp -tp p6
 FCBASE          =       $(FCBUFR) -byteswapio
 FC_FFT_RF       =       $(FCBUFR) -byteswapio
 ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE \
-                        -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=8 -DLWORDSIZE=4 \
+                        $(WORDSIZE_DEF) \
                         CONFIGURE_NETCDF_FLAG \
                         -DTRIEDNTRUE -DONLY_WRFMODEL_IO
 EXTRAMODULES    =       
@@ -197,10 +176,8 @@ LDFLAGS         =
 
 NETCDFPATH      =       CONFIGURE_NETCDF_PATH
 NETCDF_IO_PATH  =       external/io_netcdf
+NETCDF_LIB	=       CONFIGURE_NETCDF_LIB_PATH
 
-LIB             =       CONFIGURE_NETCDF_LIB_PATH \
-			-L../external/esmf_time_f90 -lesmf_time \
-			../frame/module_internal_header_util.o ../frame/pack_utils.o
 LOCAL_LIBRARIES =       -g -L/usr/local/ncarg/lib -L/usr/X11R6/lib -L/usr/local/lib \
 			-lncarg -lncarg_gks -lncarg_c -lX11
 
@@ -210,8 +187,6 @@ DM_2_CPP_FLAGS  =
 POUND_DEF       =       -DLINUX -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
 			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 
-RANLIB          =       ranlib
-
 externals : CONFIGURE_WRFIO_NF wrfio_int wrfio_grib1 esmf_time
 	( /bin/cp module_dm_warning module_dm.F ; cat module_dm_stubs.F >> module_dm.F )
 
@@ -219,8 +194,6 @@ externals : CONFIGURE_WRFIO_NF wrfio_int wrfio_grib1 esmf_time
 #ARCH Settings for PC Linux i486 i586 i686, PGI compiler  (RSL, MPICH, RSL IO)
 #
 DMPARALLEL      =       1
-MAX_DOMAINS     =       21
-MAX_PROC        =       1024
 FC              =       mpif90
 F77             =       $(FC)
 CC              =       mpicc
@@ -228,7 +201,7 @@ CC_TOOLS        =       gcc
 SFC             =       pgf90
 ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE \
                         -DINTIO -DWRF_RSL_IO -DRSL -DDM_PARALLEL \
-                        -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=8 -DLWORDSIZE=4 \
+                        $(WORDSIZE_DEF) \
                         CONFIGURE_NETCDF_FLAG \
                         -DTRIEDNTRUE -DONLY_WRFMODEL_IO
 CFLAGS          =       -DDM_PARALLEL -DWRF_RSL_IO \
@@ -252,15 +225,12 @@ LDFLAGS         =       -byteswapio
 
 NETCDFPATH      =       CONFIGURE_NETCDF_PATH
 NETCDF_IO_PATH  =       external/io_netcdf
+NETCDF_LIB	=       CONFIGURE_NETCDF_LIB_PATH
+MPI_LIB		=	-L../external/RSL/RSL -lrsl
 
-LIB             =       CONFIGURE_NETCDF_LIB_PATH -L../external/RSL/RSL -lrsl \
-			-L../external/io_int -lwrfio_int \
-			-L../external/esmf_time_f90 -lesmf_time \
-			../frame/module_internal_header_util.o ../frame/pack_utils.o
 LOCAL_LIBRARIES =       -g -L/usr/local/ncarg/lib -L/usr/X12R6/lib -L/usr/local/lib \
                         -lncarg -lncarg_gks -lncarg_c -lX11
 
-RANLIB          =       ranlib
 CPP             =       /lib/cpp
 DM_1_CPP_FLAGS  =       -I../external/RSL/RSL -C -P `cat ../inc/dm_comm_cpp_flags` \
 			-DNO_RRTM_PHYSICS  -DPGF90 $(TRADFLAG)
@@ -301,7 +271,7 @@ FCBUFR          =
 FCBASE          =       $(FCBUFR) -convert big_endian
 FC_FFT_RF       =       $(FCBUFR) -convert big_endian
 ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE \
-                        -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=8 -DLWORDSIZE=4 \
+                        $(WORDSIZE_DEF) \
                         CONFIGURE_NETCDF_FLAG \
                         -DTRIEDNTRUE -DONLY_WRFMODEL_IO
 EXTRAMODULES    =       
@@ -311,10 +281,8 @@ LDFLAGS         =
 
 NETCDFPATH      =       CONFIGURE_NETCDF_PATH
 NETCDF_IO_PATH  =       external/io_netcdf
+NETCDF_LIB	=       CONFIGURE_NETCDF_LIB_PATH
 
-LIB             =       CONFIGURE_NETCDF_LIB_PATH \
-			-L../external/esmf_time_f90 -lesmf_time \
-			../frame/module_internal_header_util.o ../frame/pack_utils.o
 LOCAL_LIBRARIES =       -g -L/usr/local/ncarg/lib -L/usr/X11R6/lib -L/usr/local/lib \
 			-lncarg -lncarg_gks -lncarg_c -lX11
 
@@ -323,8 +291,6 @@ DM_1_CPP_FLAGS  =
 DM_2_CPP_FLAGS  =
 POUND_DEF       =       -DNO_RRTM_PHYSICS -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
 			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
-
-RANLIB          =       ranlib
 
 externals : CONFIGURE_WRFIO_NF wrfio_int wrfio_grib1 esmf_time
 	( /bin/cp ../tools/gen_comms_warning ../tools/gen_comms.c ; \
@@ -341,7 +307,7 @@ F77             =       $(FC)
 CC              =       cc
 CC_TOOLS        =       cc
 ARCHFLAGS       =       -DINTIO \
-                        -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=8 -DLWORDSIZE=4 \
+                        $(WORDSIZE_DEF) \
                         CONFIGURE_NETCDF_FLAG \
                         -DTRIEDNTRUE -DONLY_WRFMODEL_IO \
                         -DNORESHAPE
@@ -364,11 +330,8 @@ LDFLAGS         =       -64 -mips4
 
 NETCDFPATH      =       CONFIGURE_NETCDF_PATH
 NETCDF_IO_PATH  =       external/io_netcdf
+NETCDF_LIB	=       CONFIGURE_NETCDF_LIB_PATH
 
-LIB             =       CONFIGURE_NETCDF_LIB_PATH \
-                        -L../external/io_int -lwrfio_int \
-			-L../external/esmf_time_f90 -lesmf_time \
-                        ../frame/module_internal_header_util.o ../frame/pack_utils.o
 LOCAL_LIBRARIES =       -L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c -lX11
 
 CPP             =       /lib/cpp
@@ -378,8 +341,6 @@ POUND_DEF       =       -DIRIX \
 			-DNONSTANDARD_SYSTEM -DF90_STANDALONE \
 			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 
-MAX_DOMAINS     =       21
-MAX_PROC        =       1024
 RANLIB          =       echo
 
 externals : CONFIGURE_WRFIO_NF wrfio_int wrfio_grib1 esmf_time
@@ -399,7 +360,7 @@ CC              =       mpicc
 CC_TOOLS        =       cc
 ARCHFLAGS       =       -DINTIO \
                         -DWRF_RSL_IO -DDM_PARALLEL -DRSL \
-                        -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=8 -DLWORDSIZE=4 \
+                        $(WORDSIZE_DEF) \
                         -DTRIEDNTRUE -DONLY_WRFMODEL_IO
 CFLAGS          =       -w -64 -mips4 \
                         -DWRF_RSL_IO -DDM_PARALLEL \
@@ -424,12 +385,9 @@ LDFLAGS         =       $(FCOPTIM) $(FCBASE)
 
 NETCDFPATH      =       CONFIGURE_NETCDF_PATH
 NETCDF_IO_PATH  =       external/io_netcdf
+NETCDF_LIB	=       CONFIGURE_NETCDF_LIB_PATH
+MPI_LIB		=	-L../external/RSL/RSL -lrsl -lmpi
 
-LIB             =       CONFIGURE_NETCDF_LIB_PATH \
-                        -L../external/io_int -lwrfio_int \
-                        -L../external/RSL/RSL -lrsl -lfmpich \
-			-L../external/esmf_time_f90 -lesmf_time \
-                        ../frame/module_internal_header_util.o ../frame/pack_utils.o
 LOCAL_LIBRARIES =       -L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c -lX11
 
 CPP             =       /lib/cpp
@@ -439,8 +397,6 @@ POUND_DEF       =       -DIRIX \
 			-DNONSTANDARD_SYSTEM -DF90_STANDALONE \
 			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 
-MAX_DOMAINS     =       21
-MAX_PROC        =       1024
 RANLIB          =       echo
 
 externals : wrfio_nf wrfio_int wrfio_grib1 esmf_time lib_rsl
@@ -465,7 +421,7 @@ F77             =       $(FC)
 CC              =       cc
 CC_TOOLS        =       cc
 ARCHFLAGS       =       -DINTIO \
-                        -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=8 -DLWORDSIZE=4 \
+                        $(WORDSIZE_DEF) \
                         -DTRIEDNTRUE -DONLY_WRFMODEL_IO \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) \
 			-DNEC_SX -DWRF3DVAR -DMPI -I$(MPIINCDIR)
@@ -486,13 +442,12 @@ EXTRAMODULES    =
 PERL            =       perl
 
 NETCDF_IO_PATH  =       main
+NETCDF_LIB	=
+MPI_LIB		=
+
+LOCAL_LIBRARIES =       
 
 LDFLAGS         =  	#-Wl"-Z 3000000"
-
-LIB             =       -L../external/io_int -lwrfio_int \
-			-L../external/esmf_time_f90 -lesmf_time \
-                        ../frame/module_internal_header_util.o ../frame/pack_utils.o
-LOCAL_LIBRARIES =       
 
 CPP             =       /usr/lib0/cpp
 DM_1_CPP_FLAGS	=
@@ -501,7 +456,6 @@ POUND_DEF       =       -DNEC \
 			-DNONSTANDARD_SYSTEM -DF90_STANDALONE \
 			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 
-MAX_DOMAINS     =       21
 MAX_PROC        =       256
 RANLIB          =       echo
 
@@ -529,16 +483,13 @@ FCBUFR          =       $(FCBASE)
 FC_FFT_RF       =       $(FCBASE)
 EXTRAMODULES    =
 ARCHFLAGS       =       -DYYY -DINTIO \
-			-DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=8 -DLWORDSIZE=4 \
+			$(WORDSIZE_DEF) \
                         CONFIGURE_NETCDF_FLAG -DTRIEDNTRUE   \
 			-DLIMIT_ARGS -DNO_NAMELIST_PRINT -DNATIVE_MASSV
 PERL            =       CONFIGURE_PERL_PATH
 REGISTRY        =       Registry
-LIB             =       CONFIGURE_NETCDF_LIB_PATH -lmass -lmassv \
-                        -L../external/io_int -lwrfio_int \
-                        -L../external/io_grib1 -lio_grib1 \
-			-L../external/esmf_time_f90 -lesmf_time \
-			../frame/module_internal_header_util.o ../frame/pack_utils.o
+NETCDF_LIB	=       CONFIGURE_NETCDF_LIB_PATH
+LOCAL_LIB	=	-lmass -lmassv
 
 LDFLAGS         =	-bmaxstack:256000000 -bmaxdata:2048000000
 CPP             =       /lib/cpp
@@ -547,7 +498,6 @@ DM_2_CPP_FLAGS	=
 POUND_DEF       =       -DAIX \
 			-DNONSTANDARD_SYSTEM -DF90_STANDALONE \
 			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
-RANLIB          =       ranlib
 NETCDFPATH	=	CONFIGURE_NETCDF_PATH
 
 externals : CONFIGURE_WRFIO_NF wrfio_int wrfio_grib1 esmf_time
@@ -581,20 +531,16 @@ FCBUFR          =       $(FCBASE)
 FC_FFT_RF       =       $(FCBASE)
 EXTRAMODULES    =
 ARCHFLAGS       =       -DWRF_RSL_IO -DRSL -DDM_PARALLEL \
-			-DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=8 -DLWORDSIZE=4 \
+			$(WORDSIZE_DEF) \
 			CONFIGURE_NETCDF_FLAG \
 			-DTRIEDNTRUE -DYYY -DINTIO \
 			-DLIMIT_ARGS -DNO_NAMELIST_PRINT -DNATIVE_MASSV \
 			-DNORESHAPE
 PERL            =       perl
 REGISTRY        =       Registry
-LIB             =       CONFIGURE_NETCDF_LIB_PATH \
-			-L../external/RSL/RSL -lrsl -lmass -lmassv \
-                        -L../external/io_int -lwrfio_int  \
-                        -L../external/io_grib1 -lio_grib1 \
-			-L../external/esmf_time_f90 -lesmf_time \
-			../frame/module_internal_header_util.o \
-			../frame/pack_utils.o
+NETCDF_LIB	=       CONFIGURE_NETCDF_LIB_PATH
+MPI_LIB		=	-L../external/RSL/RSL -lrsl
+LOCAL_LIB	=	-lmass -lmassv
 LDFLAGS         =	-bmaxstack:256000000 -bmaxdata:2048000000
 CPP		=	/lib/cpp
 DM_1_CPP_FLAGS	=	-I../external/RSL/RSL -C -P `cat ../inc/dm_comm_cpp_flags`
@@ -602,8 +548,6 @@ DM_2_CPP_FLAGS	=	-I../../external/RSL/RSL -C -P `cat ../../inc/dm_comm_cpp_flags
 POUND_DEF       =       -DAIX \
 			-DNONSTANDARD_SYSTEM -DF90_STANDALONE \
 			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
-MAX_PROC        =       1024
-RANLIB          =       ranlib
 NETCDFPATH	=	CONFIGURE_NETCDF_PATH
 
 externals :	CONFIGURE_WRFIO_NF wrfio_int wrfio_grib1 esmf_time lib_rsl
@@ -638,7 +582,7 @@ CC              =       cc
 
 ARCHFLAGS       =       -DWRF_RSL_IO -DRSL \
                         -DDM_PARALLEL \
-                        -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=8 -DLWORDSIZE=4 \
+                        $(WORDSIZE_DEF) \
                         CONFIGURE_NETCDF_FLAG \
                         -DTRIEDNTRUE -DONLY_WRFMODEL_IO -DINTIO \
                         -DNORESHAPE
@@ -667,14 +611,9 @@ LDFLAGS         =       -p../da_3dvar -p../da_3dvar/src -p../frame -p../share \
 
 NETCDFPATH      =       CONFIGURE_NETCDF_PATH
 NETCDF_IO_PATH  =       external/io_netcdf
-
-LIB             =       CONFIGURE_NETCDF_LIB_PATH \
-                        -L../external/RSL/RSL -lrsl \
-                        -L../external/io_int -lwrfio_int  \
-			-L../external/esmf_time_f90 -lesmf_time \
-                        ../frame/module_internal_header_util.o \
-                        ../frame/wrf_num_bytes_between.o \
-			../frame/pack_utils.o
+NETCDF_LIB	=       CONFIGURE_NETCDF_LIB_PATH
+MPI_LIB		=	-L../external/RSL/RSL -lrsl
+LOCAL_LIB	=	../frame/wrf_num_bytes_between.o
 LOCAL_LIBRARIES =     
 
 CPP             =       cpp
@@ -684,8 +623,6 @@ POUND_DEF       =       -DCRAYX1 \
 			-DNONSTANDARD_SYSTEM -DF90_STANDALONE \
 			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 
-MAX_DOMAINS     =       21
-MAX_PROC        =       1024
 RANLIB          =       echo
 
 externals : wrfio_nf wrfio_int wrfio_grib1 lib_rsl
@@ -722,17 +659,12 @@ FC_FFT_RF       =       $(FCBASE)
 EXTRAMODULES    =
 EXTRAMODULES    =       
 ARCHFLAGS       =       -DINTIO \
-			-DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=8 -DLWORDSIZE=4 \
+			$(WORDSIZE_DEF) \
                         CONFIGURE_NETCDF_FLAG -DTRIEDNTRUE   \
 			-DLIMIT_ARGS -DNO_NAMELIST_PRINT
 PERL            =       CONFIGURE_PERL_PATH
 REGISTRY        =       Registry
-LIB             =       CONFIGURE_NETCDF_LIB_PATH \
-                        -L../external/io_int -lwrfio_int \
-                        -L../external/io_grib1 -lio_grib1 \
-			-L../external/esmf_time_f90 -lesmf_time \
-			../frame/module_internal_header_util.o \
-			../frame/pack_utils.o
+NETCDF_LIB	=       CONFIGURE_NETCDF_LIB_PATH
 LDFLAGS         =	 -Wl,-stack_size,10000000,-stack_addr,0xc0000000
 CPP             =       /usr/bin/cpp  -C -P -xassembler-with-cpp
 DM_1_CPP_FLAGS	=
@@ -740,7 +672,6 @@ DM_2_CPP_FLAGS	=
 POUND_DEF       =       -DDARWIN -DMAC_OS \
 			-DNONSTANDARD_SYSTEM -DF90_STANDALONE \
 			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
-RANLIB          =       ranlib
 NETCDFPATH	=	CONFIGURE_NETCDF_PATH
 
 externals : CONFIGURE_WRFIO_NF wrfio_int wrfio_grib1 esmf_time
@@ -768,17 +699,12 @@ FC_FFT_RF       =       $(FCBASE)
 EXTRAMODULES    =
 EXTRAMODULES    =       
 ARCHFLAGS       =       -DINTIO \
-			-DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=8 -DLWORDSIZE=4 \
+			$(WORDSIZE_DEF) \
                         CONFIGURE_NETCDF_FLAG -DTRIEDNTRUE   \
 			-DLIMIT_ARGS -DNO_NAMELIST_PRINT
 PERL            =       CONFIGURE_PERL_PATH
 REGISTRY        =       Registry
-LIB             =       CONFIGURE_NETCDF_LIB_PATH \
-                        -L../external/io_int -lwrfio_int \
-                        -L../external/io_grib1 -lio_grib1 \
-			-L../external/esmf_time_f90 -lesmf_time \
-			../frame/module_internal_header_util.o \
-			../frame/pack_utils.o
+NETCDF_LIB	=       CONFIGURE_NETCDF_LIB_PATH
 LDFLAGS         =	 -Wl,-stack_size,10000000,-stack_addr,0xc0000000
 CPP             =       /usr/bin/cpp  -C -P -xassembler-with-cpp
 DM_1_CPP_FLAGS	=
@@ -786,7 +712,6 @@ DM_2_CPP_FLAGS	=
 POUND_DEF       =       -DDARWIN -DMAC_OS \
 			-DNONSTANDARD_SYSTEM -DF90_STANDALONE \
 			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
-RANLIB          =       ranlib
 NETCDFPATH	=	CONFIGURE_NETCDF_PATH
 
 externals : CONFIGURE_WRFIO_NF wrfio_int wrfio_grib1 esmf_time

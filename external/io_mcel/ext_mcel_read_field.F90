@@ -78,11 +78,10 @@ write(0,*)'ext_mcel_read_field ',DataHandle, TRIM(DateStr), TRIM(VarName)
 
   inttypesize = itypesize
   realtypesize = rtypesize
-  IF      ( FieldType .EQ. WRF_REAL4 ) THEN
+  IF      ( FieldType .EQ. WRF_REAL ) THEN
     typesize = rtypesize
     mcel_type = MCEL_DATATYPE_REAL
-  ELSE IF ( FieldType .EQ. WRF_REAL8 ) THEN
-    typesize = rtypesize
+  ELSE IF ( FieldType .EQ. WRF_DOUBLE ) THEN
     mcel_type = MCEL_DATATYPE_DOUBLE
   ELSE IF ( FieldType .EQ. WRF_INTEGER ) THEN
     typesize = itypesize
@@ -132,9 +131,9 @@ write(0,*)'ext_mcel_read_field tr setglobalstart ', TRIM(VarName), mcel_mystart
           DEALLOCATE(xlat)
         ENDIF
         ALLOCATE(xlat(ips:ipe,jps:jpe))
-        IF      ( FieldType .EQ. WRF_REAL4) ) THEN
+        IF      ( FieldType .EQ. WRF_REAL ) THEN
           CALL copy_field_to_cache_r2d ( Field, xlat, ips, ipe, jps, jpe, ims, ime, jms, jme )
-        ELSE IF ( FieldType .EQ. WRF_REAL8) THEN
+        ELSE IF ( FieldType .EQ. WRF_DOUBLE ) THEN
           CALL copy_field_to_cache_d2d ( Field, xlat, ips, ipe, jps, jpe, ims, ime, jms, jme )
         ENDIF
 
@@ -143,9 +142,9 @@ write(0,*)'ext_mcel_read_field tr setglobalstart ', TRIM(VarName), mcel_mystart
           DEALLOCATE(xlong)
         ENDIF
         ALLOCATE(xlong(ips:ipe,jps:jpe))
-        IF      ( FieldType .EQ. WRF_REAL4 ) THEN
+        IF      ( FieldType .EQ. WRF_REAL ) THEN
           CALL copy_field_to_cache_r2d ( Field, xlong, ips, ipe, jps, jpe, ims, ime, jms, jme )
-        ELSE IF ( FieldType .EQ. WRF_REAL8 ) THEN
+        ELSE IF ( FieldType .EQ. WRF_DOUBLE ) THEN
           CALL copy_field_to_cache_d2d ( Field, xlong, ips, ipe, jps, jpe, ims, ime, jms, jme )
         ENDIF
       ELSE IF ( TRIM(VarName) .EQ. TRIM(LANDMASK_I(DataHandle)) ) THEN
@@ -155,12 +154,12 @@ write(0,*)'ext_mcel_read_field tr setglobalstart ', TRIM(VarName), mcel_mystart
         ALLOCATE(mask(ips:ipe,jps:jpe))
         IF ( FieldType .EQ. WRF_INTEGER ) THEN
           CALL copy_field_to_cache_int ( Field, mask, ips, ipe, jps, jpe, ims, ime, jms, jme )
-        ELSE IF((FieldType .EQ. WRF_REAL4) .OR. (FieldType .EQ. WRF_REAL8)) THEN
+        ELSE IF ( FieldType .EQ. WRF_REAL ) THEN
           ALLOCATE(rmask(ips:ipe,jps:jpe))
           CALL copy_field_to_cache_r2r ( Field, rmask, ips, ipe, jps, jpe, ims, ime, jms, jme )
           mask = NINT( rmask )
           DEALLOCATE(rmask)
-        ELSE IF (FieldType .EQ. WRF_REAL8 ) THEN
+        ELSE IF (FieldType .EQ. WRF_DOUBLE ) THEN
           ALLOCATE(dmask(ips:ipe,jps:jpe))
           CALL copy_field_to_cache_d2d ( Field, dmask, ips, ipe, jps, jpe, ims, ime, jms, jme )
           mask = NINT( dmask )
@@ -309,7 +308,7 @@ write(0,*)'ext_mcel_read_field ok getData returns ',ierr, Trim(VarName)
         ENDIF
         CALL copy_cache_to_field_r2r ( temp, Field, ips, ipe, jps, jpe, ims, ime, jms, jme )
         DEALLOCATE(temp)
-      ELSE IF ( FieldType .EQ. WRF_REAL8 ) THEN
+      ELSE IF ( FieldType .EQ. WRF_DOUBLE ) THEN
 
         ALLOCATE(dtemp(ips:ipe,jps:jpe))
 write(0,*)'ext_mcel_read_field opened_for_update(DataHandle) ',opened_for_update(DataHandle)

@@ -79,6 +79,11 @@ integer , dimension(grid%sm31:grid%em31,grid%sm33:grid%em31) :: xxxxx , yyyyy , 
    LOGICAL :: leapfrog
    INTEGER :: l,kte,kk
 
+#ifdef DEREF_KLUDGE
+   INTEGER     :: sm31 , em31 , sm32 , em32 , sm33 , em33
+#endif
+#include "deref_kludge.h"
+
 #include <bench_solve_em_def.h>
 
 #define COPY_IN
@@ -145,6 +150,7 @@ integer , dimension(grid%sm31:grid%em31,grid%sm33:grid%em31) :: xxxxx , yyyyy , 
 
   num_3d_m        = num_moist
   num_3d_c        = num_chem
+
 
    !  Compute these starting and stopping locations for each tile and number of tiles.
 
@@ -1096,7 +1102,7 @@ BENCH_START(small_step_prep_tim)
       CALL calc_coef_w( a,alpha,gamma,                    &
                         mut, cqw,                         &
                         rdn, rdnw, c2a,                   &
-                        dts, g, epssm,                    &
+                        dts_rk, g, epssm,                 &
                         ids, ide, jds, jde, kds, kde,     &
                         ims, ime, jms, jme, kms, kme,     &
                         grid%i_start(ij), grid%i_end(ij), &
@@ -1250,7 +1256,7 @@ BENCH_START(advance_uv_tim)
                            p, pb,                            &
                            ph_2, php, alt, al, mu_2,         &
                            muu, cqu, muv, cqv, mudf,         &
-                           rdx, rdy, dts,                    &
+                           rdx, rdy, dts_rk,                 &
                            cf1, cf2, cf3, fnm, fnp,          &
                            emdiv,                            &
                            rdnw, config_flags,spec_zone,     &
@@ -1317,7 +1323,7 @@ BENCH_START(advance_mu_t_tim)
                            mudf, ru_m, rv_m, ww_m,            &
                            t_2, t_save, t_2save, t_tend,      &
                            mu_tend,                           &
-                           rdx, rdy, dts, epssm,              &
+                           rdx, rdy, dts_rk, epssm,           &
                            dnw, fnm, fnp, rdnw,               &
                            msfu, msfv, msft,                  &
                            iteration, config_flags,           &
@@ -1394,7 +1400,7 @@ BENCH_START(advance_w_tim)
                           ph_2, ph_save, phb, ph_tend,      &
                           ht, c2a, cqw, alt, alb,           &
                           a, alpha, gamma,                  &
-                          rdx, rdy, dts, t0, epssm,         &
+                          rdx, rdy, dts_rk, t0, epssm,      &
                           dnw, fnm, fnp, rdnw, rdn,         &
                           cf1, cf2, cf3, msft,              &
                           config_flags,                     &
@@ -1569,6 +1575,8 @@ BENCH_START(small_step_finish_tim)
                               u_save, v_save, w_save,           &
                               t_save, ph_save, mu_save,         &
                               msfu, msfv, msft,                 &
+                              h_diabatic,                       &
+                              number_of_small_timesteps,dts_rk, &
                               ids, ide, jds, jde, kds, kde,     &
                               ims, ime, jms, jme, kms, kme,     &
                               grid%i_start(ij), grid%i_end(ij), &

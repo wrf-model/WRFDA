@@ -11,6 +11,7 @@ PROGRAM ideal
 
    USE module_timing
    USE module_wrf_error
+   USE WRF_ESMF_MOD
 #ifdef DM_PARALLEL
    USE module_dm
 #endif
@@ -28,7 +29,7 @@ PROGRAM ideal
    TYPE (grid_config_rec_type)              :: config_flags
 
    INTEGER :: max_dom , domain_id , fid , oid , idum1 , idum2 , ierr
-   INTEGER :: debug_level
+   INTEGER :: debug_level, rc
    LOGICAL :: input_from_file
 
    INTERFACE
@@ -56,7 +57,26 @@ PROGRAM ideal
 
    !  Get the NAMELIST data for input.
 
-   CALL init_modules
+   CALL init_modules(1)   ! Phase 1 returns after MPI_INIT() (if it is called)
+#ifdef WRF_ESMF_MOD
+   CALL ESMF_Initialize( defaultCalendar=ESMF_CAL_GREGORIAN, rc=rc )
+   ! TBH:  Note that IDEAL does not set up ESMF clocks.  We need 
+   ! TBH:  explicit replacements for old default initializations...  
+   CALL ESMF_TimeSet(grid%start_time, YY=1, MM=1, DD=1, H=0, M=0, S=0, rc=rc)
+   grid%stop_time    = grid%start_time
+   grid%current_time = grid%start_time
+   ! TBH:  Bogus default value...  
+   CALL ESMF_TimeIntervalSet(grid%step_time, S=180, rc=rc)
+   grid%domain_clock = ESMF_ClockCreate( TimeStep= grid%step_time,  &
+                                         StartTime=grid%start_time, &
+                                         StopTime= grid%stop_time,  &
+                                         rc=rc)
+   CALL wrf_check_error( ESMF_SUCCESS, rc, &
+                         'grid%domain_clock = ESMF_ClockCreate() FAILED', &
+                         __FILE__ , &
+                         __LINE__  )
+#endif
+   CALL init_modules(2)   ! Phase 2 resumes after MPI_INIT() (if it is called)
 
 #ifdef DM_PARALLEL
    IF ( wrf_dm_on_monitor() ) THEN
@@ -100,8 +120,12 @@ PROGRAM ideal
    CALL med_initialdata_output( head_grid , config_flags )
 
    CALL       wrf_debug (   0 , 'wrf: SUCCESS COMPLETE IDEAL INIT' )
-
+   CALL med_shutdown_io ( head_grid , config_flags )
    CALL wrf_shutdown
+
+#ifdef WRF_ESMF_MOD
+   CALL ESMF_Finalize( rc=rc )
+#endif
 
 END PROGRAM ideal
 
@@ -140,14 +164,20 @@ SUBROUTINE med_initialdata_output ( grid , config_flags )
    CALL output_model_input ( id, grid , config_flags , ierr )
    CALL close_dataset ( id , config_flags, "DATASET=INPUT" )
 
-   CALL construct_filename1 ( bdyname , 'wrfbdy' , grid%id , 2 )
-   CALL open_w_dataset ( id, TRIM(bdyname) , grid , config_flags , output_boundary , "DATASET=BOUNDARY", ierr )
-   IF ( ierr .NE. 0 ) THEN
-     WRITE (wrf_err_message,*)'ideal: error opening wrfbdy for writing ',ierr
-     CALL wrf_error_fatal( wrf_err_message )
+
+   IF ( config_flags%specified ) THEN
+ 
+     CALL construct_filename1 ( bdyname , 'wrfbdy' , grid%id , 2 )
+     CALL open_w_dataset ( id, TRIM(bdyname) , grid , config_flags , output_boundary , "DATASET=BOUNDARY", ierr )
+     IF ( ierr .NE. 0 ) THEN
+       WRITE (wrf_err_message,*)'ideal: error opening wrfbdy for writing ',ierr
+       CALL wrf_error_fatal( wrf_err_message )
+     ENDIF
+     CALL output_boundary ( id, grid , config_flags , ierr )
+     CALL close_dataset ( id , config_flags , "DATASET=BOUNDARY" )
+ 
    ENDIF
-   CALL output_boundary ( id, grid , config_flags , ierr )
-   CALL close_dataset ( id , config_flags , "DATASET=BOUNDARY" )
 
    RETURN
 END SUBROUTINE med_initialdata_output
+

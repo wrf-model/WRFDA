@@ -58,22 +58,22 @@ wrf : configcheck
 	( cd main ; $(MAKE) MODULE_DIRS="$(ALL_MODULES)" SOLVER=em em_wrf )
 #	( cd run ; /bin/rm -f wrf.exe ; ln -s ../main/wrf.exe . )
 
-3dvar : 
+wrfvar : 
 	/bin/rm -f main/libwrflib.a
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" ext
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" toolsdir
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" REGISTRY="Registry" framework
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" shared
-	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" 3dvar_drivers
-	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" 3dvar_src
-	( cd main ; $(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" da_3dvar )
+	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" wrfvar_drivers
+	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" wrfvar_src
+	( cd main ; $(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" wrfvar )
 
 k2n : 
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" ext
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" toolsdir
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" REGISTRY="Registry" framework
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" shared
-	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" 3dvar_drivers
+	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" wrfvar_drivers
 	$(MAKE) MODULE_DIRS="$(DA_CONVERTOR_MODULES)" convertor_drivers
 	( cd main ; \
           /bin/rm -f kma2netcdf.exe ; \
@@ -84,7 +84,7 @@ n2k :
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" toolsdir
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" REGISTRY="Registry" framework
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" shared
-	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" 3dvar_drivers
+	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" wrfvar_drivers
 	$(MAKE) MODULE_DIRS="$(DA_CONVERTOR_MODULES)" convertor_drivers
 	( cd main ; \
           /bin/rm -f netcdf2kma.exe ; \
@@ -162,10 +162,15 @@ em_real : wrf
 	( cd test/em_real ; /bin/rm -f real.exe ; ln -s ../../main/real.exe . )
 	( cd test/em_real ; /bin/rm -f ndown.exe ; ln -s ../../main/ndown.exe . )
 	( cd test/em_real ; /bin/rm -f README.namelist ; ln -s ../../run/README.namelist . )
-	( cd test/em_real ; /bin/rm -f ETAMPNEW_DATA ; ln -s ../../run/ETAMPNEW_DATA . )
+	( cd test/em_real ; /bin/rm -f ETAMPNEW_DATA RRTM_DATA ;    \
+             ln -sf ../../run/ETAMPNEW_DATA . ;                     \
+             ln -sf ../../run/RRTM_DATA . ;                         \
+             if [ $(RWORDSIZE) -eq 8 ] ; then                       \
+                ln -sf ../../run/ETAMPNEW_DATA_DBL ETAMPNEW_DATA ;  \
+                ln -sf ../../run/RRTM_DATA_DBL RRTM_DATA ;          \
+             fi )
 	( cd test/em_real ; /bin/rm -f GENPARM.TBL ; ln -s ../../run/GENPARM.TBL . )
 	( cd test/em_real ; /bin/rm -f LANDUSE.TBL ; ln -s ../../run/LANDUSE.TBL . )
-	( cd test/em_real ; /bin/rm -f RRTM_DATA ; ln -s ../../run/RRTM_DATA . )
 	( cd test/em_real ; /bin/rm -f SOILPARM.TBL ; ln -s ../../run/SOILPARM.TBL . )
 	( cd test/em_real ; /bin/rm -f VEGPARM.TBL ; ln -s ../../run/VEGPARM.TBL . )
 	( cd test/em_real ; /bin/rm -f tr49t67 ; ln -s ../../run/tr49t67 . )
@@ -220,8 +225,11 @@ ext :
 framework :
 	@ echo '--------------------------------------'
 	( cd frame ; $(MAKE) framework; \
-	cd ../external/io_netcdf ; make NETCDFPATH="$(NETCDFPATH)" FC="$(FC) $(FCBASEOPTS)" CPP="$(CPP)" diffwrf; \
-	cd ../io_int ; $(MAKE) FC="$(FC) $(FCBASEOPTS)" RANLIB=$(RANLIB) CPP="$(CPP)" diffwrf ; cd ../../frame )
+	cd ../external/io_netcdf ; \
+	make NETCDFPATH="$(NETCDFPATH)" FC="$(FC) $(FCBASEOPTS)" RANLIB=$(RANLIB) CPP="$(CPP) $(TRADFLAG)" diffwrf; \
+	cd ../io_int ; \
+	$(MAKE) FC="$(FC) $(FCBASEOPTS)" RANLIB=$(RANLIB) CPP="$(CPP) $(TRADFLAG)" diffwrf ; \
+	cd ../../frame )
 
 shared :
 	@ echo '--------------------------------------'
@@ -235,11 +243,11 @@ em_core :
 	@ echo '--------------------------------------'
 	( cd dyn_em ; $(MAKE) )
 
-3dvar_drivers :
+wrfvar_drivers :
 	@ echo '--------------------------------------'
 	( cd da_3dvar ; $(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" da_3dvar_io )
 
-3dvar_src :
+wrfvar_src :
 	@ echo '--------------------------------------'
 	( cd da_3dvar/src; $(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES_2)" 3dvar )
 	( cd da_3dvar ; $(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" da_3dvar_io )

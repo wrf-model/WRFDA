@@ -1,0 +1,215 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: 	Wei
+Reviewer: 	Hans
+Date: 		02/03/05
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Merge to current WRF frame.
+
+Expected Differences
+--------------------
+
+None.
+
+Test results (run on what machines?)
+------------------------------------------------------
+
+
+Files removed:
+--------------
+
+ None.
+
+Files added: 
+------------
+ (From WRFV2.0.3.1.1)
+ external/RSL_LITE/rsl_bcast.c
+ external/RSL_LITE/task_for_point.c
+ frame/module_wrf_esmf_super.F
+ frame/module_wrf_esmf_super_tl.F
+ frame/module_wrf_setservices.F
+ main/ad_wrf.F
+ main/tl_wrf.F
+ tools/four2eight.c
+ run/ETAMPNEW_DATA_DBL
+ run/RRTM_DATA_DBL
+
+ chem (WRF)
+ aerosol_driver.F
+ chem_driver.F
+ chemics_init.F
+ dry_dep_driver.F
+ emissions_driver.F
+ Makefile
+ mechanism_driver.F
+ module_aerosols_sorgam.F
+ module_bioemi_beis311.F
+ module_bioemi_simple.F
+ module_chem_utilities.F
+ module_ctrans_grell.F
+ module_data_racm.F
+ module_data_radm2.F
+ module_data_sorgam.F
+ module_dep_simple.F
+ module_emissions_anthropogenics.F
+ module_input_chem_bioemiss.F
+ module_input_chem_data.F
+ module_phot_mad.F
+ module_racm.F
+ module_radm.F
+ module_vertmx_wrf.F
+ photolysis_driver.F
+
+ (Use WRF feature)
+ da_3dvar/module_wrfvar_esmf_super.F
+
+ (User later in 4dvar)
+ dyn_em/solve_em_tl.F
+ frame/module_integrate_tl.F
+ frame/module_wrf_esmf_super_tl.F
+ share/solve_em_tl.int
+ share/solve_interface_tl.F
+
+Files modified:
+---------------
+ Makefile
+ README
+ clean
+ Registry/Registry.EM
+ Registry/Registry.EM_CHEM
+ Registry/Registry.NMM
+ arch/configure.defaults
+ arch/configure.defaults_3dvar
+ arch/postamble
+ arch/postamble_3dvar
+ arch/preamble
+ arch/preamble_3dvar
+ da_3dvar/Makefile
+ da_3dvar/module_wrf_3dvar_interface.F
+ da_3dvar/module_wrf_3dvar_io.F
+ da_3dvar/changes/tag-info
+ da_3dvar/src/Makefile
+ da_3dvar/src/DA_Setup_Structures/da_setup_runconstants.inc
+ da_3dvar/src/DA_Setup_Structures/da_transfer_xatowrf.inc
+ dyn_em/couple_or_uncouple_em.F
+ dyn_em/module_big_step_utilities_em.F
+ dyn_em/module_initialize_b_wave.F
+ dyn_em/module_initialize_quarter_ss.F
+ dyn_em/module_initialize_real.F
+ dyn_em/module_small_step_em.F
+ dyn_em/solve_em.F
+ dyn_em/start_em.F
+ dyn_exp/solve_exp.F
+ dyn_nmm/CUCNVC.F
+ dyn_nmm/TURBL.F
+ dyn_nmm/module_IGWAVE_ADJUST.F
+ dyn_nmm/read_nmm.F
+ dyn_nmm/solve_nmm.F
+ dyn_nmm/start_domain_nmm.F
+ external/RSL/gen_comms.c
+ external/RSL/module_dm.F
+ external/RSL/RSL/compat.h
+ external/RSL/RSL/message_def.c
+ external/RSL/RSL/process_refs.c
+ external/RSL/RSL/rsl.h
+ external/RSL/RSL/rsl_order.c
+ external/RSL_LITE/module_dm.F
+ external/esmf_time_f90/ESMF_Alarm.F90
+ external/esmf_time_f90/ESMF_Clock.F90
+ external/esmf_time_f90/ESMF_Mod.F90
+ external/esmf_time_f90/ESMF_Time.F90
+ external/esmf_time_f90/ESMF_TimeInterval.F90
+ external/esmf_time_f90/Makefile
+ external/esmf_time_f90/Meat.F90
+ external/esmf_time_f90/Test1.F90
+ external/io_grib1/makefile
+ external/io_grib1/wrf_io_flags.h
+ external/io_grib1/write_grib.c
+ external/io_int/diffwrf.F
+ external/io_int/io_int.F90
+ external/io_int/makefile
+ external/io_int/module_internal_header_util.F
+ external/io_mcel/ext_mcel_read_field.F90
+ external/io_mcel/ext_mcel_write_field.F90
+ external/io_netcdf/diffwrf.F90
+ external/io_netcdf/field_routines.F90
+ external/io_netcdf/wrf_io.F90
+ external/io_quilt/wrf_io_flags.h
+ frame/Makefile
+ frame/md_calls.m4
+ frame/module_domain.F
+ frame/module_integrate.F
+ frame/module_internal_header_util.F
+ frame/module_io.F
+ frame/module_io_quilt.F
+ frame/module_nesting.F
+ frame/module_quilt_outbuf_ops.F
+ frame/module_timing.F
+ frame/module_wrf_error.F
+ inc/intio_tags.h
+ main/Makefile
+ main/convert_nmm.F
+ main/da_3dvar.F
+ main/ideal.F
+ main/ndown_em.F
+ main/real_em.F
+ main/wrf.F
+ phys/module_mp_wsm3.F
+ phys/module_mp_wsm5.F
+ phys/module_physics_init.F
+ phys/module_ra_gfdleta.F
+ run/README.namelist
+ run/RRTM_DATA
+ run/namelist.input
+ share/Makefile
+ share/init_modules.F
+ share/input_wrf.F
+ share/mediation_force_domain.F
+ share/mediation_integrate.F
+ share/mediation_wrfmain.F
+ share/module_bc_time_utilities.F
+ share/module_date_time.F
+ share/module_get_file_names.F
+ share/module_io_wrf.F
+ share/module_soil_pre.F
+ share/output_wrf.F
+ share/set_timekeeping.F
+ share/solve_interface.F
+ share/wrf_auxhist1in.F
+ share/wrf_auxhist1out.F
+ share/wrf_auxhist2in.F
+ share/wrf_auxhist2out.F
+ share/wrf_auxhist3in.F
+ share/wrf_auxhist3out.F
+ share/wrf_auxhist4in.F
+ share/wrf_auxhist4out.F
+ share/wrf_auxhist5in.F
+ share/wrf_auxhist5out.F
+ share/wrf_auxinput1in.F
+ share/wrf_auxinput1out.F
+ share/wrf_auxinput2in.F
+ share/wrf_auxinput2out.F
+ share/wrf_auxinput3in.F
+ share/wrf_auxinput3out.F
+ share/wrf_auxinput4in.F
+ share/wrf_auxinput4out.F
+ share/wrf_auxinput5in.F
+ share/wrf_auxinput5out.F
+ share/wrf_bdyin.F
+ share/wrf_bdyout.F
+ share/wrf_histin.F
+ share/wrf_histout.F
+ share/wrf_inputin.F
+ share/wrf_inputout.F
+ share/wrf_restartin.F
+ share/wrf_restartout.F
+ tools/regtest.csh
+
+Minor-tag:
+
+wrfvar_version_1_0_0
+

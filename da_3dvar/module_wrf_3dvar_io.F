@@ -43,18 +43,18 @@ SUBROUTINE med_initialdata_input_3dvar ( grid , config_flags, in_filename )
 
    if(present(in_filename)) then
       write(unit=*, fmt='(2a,2x,a,i6)') &
-           'file:', __FILE__, 'line:', __LINE__
+           'file:', "module_wrf_3dvar_io.b", 'line:', 46
       file_name = trim(in_filename)
    else
       write(unit=*, fmt='(2a,2x,a,i6)') &
-           'file:', __FILE__, 'line:', __LINE__
+           'file:', "module_wrf_3dvar_io.b", 'line:', 50
       file_name = 'wrf_3dvar_input'
    endif
 
    call ext_ncd_open_for_read( trim(file_name), 0, 0, "", fid, ierr)
 
    if(ierr /= 0) then
-     write(message,*) 'NetCDF error in ',__FILE__,', line', __LINE__
+     write(message,*) 'NetCDF error in ',"module_wrf_3dvar_io.b",', line', 57
      call wrf_debug ( 0 , message)
 
      write(unit=0, fmt='(2a)') 'Erro to open file:', trim(file_name)
@@ -63,9 +63,9 @@ SUBROUTINE med_initialdata_input_3dvar ( grid , config_flags, in_filename )
      STOP "Stopped with NetCDF error."
    endif
 
-!  print *, 'ready to call get_next_time'
+!  print *, ready to call get_next_time
    CALL ext_ncd_get_next_time( fid, current_date, Status )
-!  print *, 'current_date=', trim(current_date)
+!  print *, current_date=, trim(current_date)
   
 !--Set start_date to current_date.
    read(current_date(1:19), fmt='(i4, 5(a1, i2))') &
@@ -89,17 +89,17 @@ SUBROUTINE med_initialdata_input_3dvar ( grid , config_flags, in_filename )
    CALL nl_set_stand_lon ( grid%id , grid%stand_lon )
    CALL nl_set_map_proj ( grid%id , grid%map_proj )
 
-!  write(unit=*, fmt='(a, 2i8, f12.3)') &
-!       '1: julyr, julday, gmt=', julyr, julday, gmt
-!  write(unit=0, fmt='(a, 2i8, f12.3)') &
-!       '1: julyr, julday, gmt=', julyr, julday, gmt
+!  write(unit=*, fmt=(a, 2i8, f12.3)) &
+!       1: julyr, julday, gmt=, julyr, julday, gmt
+!  write(unit=0, fmt=(a, 2i8, f12.3)) &
+!       1: julyr, julday, gmt=, julyr, julday, gmt
 
    start_date=current_date
 
-!  write(unit=*, fmt='(2a)') &
-!       'current_date = ', trim(current_date)
-!  write(unit=0, fmt='(2a)') &
-!       'current_date = ', trim(current_date)
+!  write(unit=*, fmt=(2a)) &
+!       current_date = , trim(current_date)
+!  write(unit=0, fmt=(2a)) &
+!       current_date = , trim(current_date)
 
    call geth_julgmt(julyr, julday, gmt)
    config_flags%gmt = gmt
@@ -108,10 +108,10 @@ SUBROUTINE med_initialdata_input_3dvar ( grid , config_flags, in_filename )
 
    call ext_ncd_ioclose(fid, ierr)
 
-!  write(unit=*, fmt='(a, 2i8, f12.3)') &
-!       '2: julyr, julday, gmt=', julyr, julday, gmt
-!  write(unit=0, fmt='(a, 2i8, f12.3)') &
-!       '2: julyr, julday, gmt=', julyr, julday, gmt
+!  write(unit=*, fmt=(a, 2i8, f12.3)) &
+!       2: julyr, julday, gmt=, julyr, julday, gmt
+!  write(unit=0, fmt=(a, 2i8, f12.3)) &
+!       2: julyr, julday, gmt=, julyr, julday, gmt
 
    CALL wrf_debug ( 100 , 'da_3dvar/module_wrf_3dvar_io: calling open_r_dataset for wrf 3dvar input' )
    CALL open_r_dataset ( fid, TRIM(file_name), grid , config_flags , "DATASET=INPUT", ierr )
@@ -119,7 +119,7 @@ SUBROUTINE med_initialdata_input_3dvar ( grid , config_flags, in_filename )
    IF ( ierr .NE. 0 ) THEN
      WRITE( wrf_err_message , * ) 'da_3dvar/module_wrf_3dvar_io: error opening ', &
                                   TRIM(file_name),' for reading ierr=',ierr
-     CALL WRF_ERROR_FATAL ( wrf_err_message )
+     CALL wrf_error_fatal3 ( "module_wrf_3dvar_io.b" , 122 ,  wrf_err_message )
    ENDIF
 
    CALL       wrf_debug ( 100 , 'wrf_da_3dvar: calling input_model_input' )
@@ -129,7 +129,7 @@ SUBROUTINE med_initialdata_input_3dvar ( grid , config_flags, in_filename )
    CALL close_dataset ( fid , config_flags , "DATASET=INPUT" )
 
    write(unit=0, fmt='(2a,2x,a,i6,2(2x,a))') &
-        'end med_initialdata_input_3dvar file:', __FILE__, 'line:', __LINE__, &
+        'end med_initialdata_input_3dvar file:', "module_wrf_3dvar_io.b", 'line:', 132, &
         'file_name =', trim(file_name)
 
 END SUBROUTINE med_initialdata_input_3dvar
@@ -160,17 +160,17 @@ SUBROUTINE med_initialdata_output_3dvar ( grid , config_flags, out_filename )
 
    if(present(out_filename)) then
       write(unit=*, fmt='(2a,2x,a,i6)') &
-           'file:', __FILE__, 'line:', __LINE__
+           'file:', "module_wrf_3dvar_io.b", 'line:', 163
       file_name = trim(out_filename)
    else
       write(unit=*, fmt='(2a,2x,a,i6)') &
-           'file:', __FILE__, 'line:', __LINE__
+           'file:', "module_wrf_3dvar_io.b", 'line:', 167
       file_name = 'wrf_3dvar_output'
    endif
 
-!  write(unit=*, fmt='(2a,2x,a,i6,2(2x,a))') &
-!       'file:', __FILE__, 'line:', __LINE__, &
-!       'file_name =', trim(file_name)
+!  write(unit=*, fmt=(2a,2x,a,i6,2(2x,a))) &
+!       file:, "module_wrf_3dvar_io.b", line:, 172, &
+!       file_name =, trim(file_name)
 
    CALL wrf_debug ( 100 , 'da_3dvar/module_wrf_3dvar_io: calling open_w_dataset 3dvar output' )
    CALL open_w_dataset ( fid, TRIM(file_name), grid , config_flags , &
@@ -179,7 +179,7 @@ SUBROUTINE med_initialdata_output_3dvar ( grid , config_flags, out_filename )
    IF ( ierr .NE. 0 ) THEN
       WRITE( wrf_err_message , * ) 'da_3dvar/module_wrf_3dvar_io: error opening ', &
                                     TRIM(file_name),' for writing ierr=',ierr
-      CALL wrf_error_fatal( wrf_err_message )
+      CALL wrf_error_fatal3 ( "module_wrf_3dvar_io.b" , 182 ,  wrf_err_message )
    ENDIF
 
    start_date=current_date

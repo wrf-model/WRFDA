@@ -1,7 +1,6 @@
 # these settings for compiling standalone on Compaq. Type "make -r"
 #CPP = /lib/cpp 
 #FC  = f90 -free
-#FCFLAGS =
 
 .SUFFIXES: .F90 .o
 
@@ -16,12 +15,12 @@ libesmf_time.a : $(OBJS)
 	$(RANLIB) libesmf_time.a
 
 Test1 : Test1.F90 libesmf_time.a
-	$(FC) $(FCFLAGS) -c -g Test1.F90
-	$(FC) $(FCFLAGS) -o Test1 Test1.o libesmf_time.a
+	$(FC) -c Test1.F90
+	$(FC) -o Test1 Test1.o libesmf_time.a
 
 .F90.o :
 	$(CPP) -C -P -I. -DF90_STANDALONE $*.F90 > $*.f
-	$(FC) $(FCFLAGS) -c -g $*.f
+	$(FC) -c $*.f
 
 superclean: 
 	/bin/rm -f *.f *.o libesmf_time.a *.mod Test1

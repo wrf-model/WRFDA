@@ -1,134 +1,53 @@
-!3DVAR:DRIVER_LAYER:MAIN
+!WRFVAR:DRIVER_LAYER:MAIN
 !
 
-PROGRAM da_3dvar
+PROGRAM wrfvar
 
-   USE module_machine
-   USE module_domain
-   USE module_driver_constants
-   USE module_configure
+   USE module_wrfvar_esmf_super
 
-   USE module_timing
-   USE module_wrf_error
-   USE esmf_mod
-#ifdef DM_PARALLEL
-   USE module_dm
-#endif
-
-   USE module_wrf_3dvar_io
-   USE module_wrf_3dvar_interface
+!<DESCRIPTION>
+! Main program of WRF model.  Responsible for starting up the model, reading in (and
+! broadcasting for distributed memory) configuration data, defining and initializing
+! the top-level domain, either from initial or restart data, setting up time-keeping, and
+! then calling the <a href=integrate.html>integrate</a> routine to advance the domain
+! to the ending time of the simulation. After the integration is completed, the model
+! is properly shut down.
+!
+!</DESCRIPTION>
 
    IMPLICIT NONE
 
-   REAL    :: time
-
-   INTEGER :: loop , &
-              levels_to_process
-
-   TYPE (domain) , POINTER :: keep_grid, grid_ptr, null_domain
-   TYPE (grid_config_rec_type)              :: config_flags
-
-   INTEGER :: max_dom , domain_id , fid , oid , idum1 , idum2 , ierr
-   INTEGER :: debug_level
-
+#ifdef WRF_ESMF_MOD
+   TYPE(ESMF_GridComp) :: gcomp
+   TYPE(ESMF_State)    :: importState, exportState
+   TYPE(ESMF_Clock)    :: clock
+   TYPE(ESMF_VM)       :: vm   
+#endif
    INTEGER :: rc
-   LOGICAL :: input_from_file
 
-#ifdef DM_PARALLEL
-   INTEGER                 :: nbytes
-   INTEGER, PARAMETER      :: configbuflen = 4*8192
-   INTEGER                 :: configbuf( configbuflen )
-   LOGICAL , EXTERNAL      :: wrf_dm_on_monitor
-#endif
+   ! This call includes everything that must be done before ESMF_Initialize() 
+   ! is called.  
+   CALL init_modules(1)   ! Phase 1 returns after MPI_INIT() (if it is called)
 
-   CHARACTER (LEN=80)      :: message
-
-   INTERFACE
-     SUBROUTINE Setup_Timekeeping( grid )
-      USE module_domain
-      TYPE(domain), POINTER :: grid
-     END SUBROUTINE Setup_Timekeeping
-   END INTERFACE
-
-!--Define the name of this program (program_name defined in module_domain)
-
-   program_name = "WRF_3DVAR"
-
-!--Get the NAMELIST data for input.
-
-   CALL init_modules
-
-#ifdef DM_PARALLEL
-   IF ( wrf_dm_on_monitor() ) THEN
-     CALL initial_config
-   ENDIF
-   CALL get_config_as_buffer( configbuf, configbuflen, nbytes )
-   CALL wrf_dm_bcast_bytes( configbuf, nbytes )
-   CALL set_config_as_buffer( configbuf, configbuflen )
-   CALL wrf_dm_initialize
+#ifdef WRF_ESMF_MOD
+   CALL ESMF_Initialize( vm=vm, defaultCalendar=ESMF_CAL_GREGORIAN, rc=rc )
+   CALL wrfvar_init( gcomp, importState, exportState, clock, rc )
 #else
-   CALL initial_config
+   CALL wrfvar_init( rc )
 #endif
 
-   CALL nl_get_debug_level ( 1, debug_level )
-   CALL set_wrf_debug_level ( debug_level )
-
-!--allocated and configure the mother domain
-
-   NULLIFY( null_domain )
-
-   CALL       wrf_message ( program_name )
-   CALL       wrf_debug ( 100 , 'wrf: calling alloc_and_configure_domain ' )
-   CALL alloc_and_configure_domain ( domain_id  = 1 ,                  &
-                                     grid       = head_grid ,          &
-                                     parent     = null_domain ,        &
-                                     kid        = -1                   )
-
-   CALL       wrf_debug ( 100 , 'wrf: calling model_to_grid_config_rec ' )
-   CALL model_to_grid_config_rec ( head_grid%id , model_config_rec , config_flags )
-   CALL       wrf_debug ( 100 , 'wrf: calling set_scalar_indices_from_config ' )
-   CALL set_scalar_indices_from_config ( head_grid%id , idum1, idum2 )
-   CALL       wrf_debug ( 100 , 'wrf: calling init_wrfio' )
-
-   if(config_flags%real_data_init_type == 1) then
-     CALL init_wrfio
-
-#ifdef DM_PARALLEL
-     CALL get_config_as_buffer( configbuf, configbuflen, nbytes )
-     CALL wrf_dm_bcast_bytes( configbuf, nbytes )
-     CALL set_config_as_buffer( configbuf, configbuflen )
+#ifdef WRF_ESMF_MOD
+   CALL wrfvar_run( gcomp, importState, exportState, clock, rc )
+#else
+   CALL wrfvar_run( rc )
 #endif
 
-     CALL Setup_Timekeeping (head_grid)
+#ifdef WRF_ESMF_MOD
+   CALL wrfvar_finalize( gcomp, importState, exportState, clock, rc )
+   CALL ESMF_Finalize( rc=rc )
+#else
+   CALL wrfvar_finalize( rc )
+#endif
 
-!--input background from wrf model. 
-
-     CALL med_initialdata_input_3dvar( head_grid , config_flags )  
-   endif
-
-   call med_add_config_info_to_grid ( head_grid )
-
-   head_grid%start_subtime = head_grid%start_time
-   head_grid%stop_subtime = head_grid%stop_time
-
-!--do 3dvar
-
-   CALL wrf_debug ( 100 , 'da_3dvar: calling 3dvar ' )
-   CALL da_3dvar_interface ( head_grid, config_flags )
-   CALL wrf_debug ( 100 , 'da_3dvar: back from 3dvar ' )
-
-!--output 3dvar analysis
-
-   if(config_flags%real_data_init_type == 1) then
-     CALL med_initialdata_output_3dvar( head_grid , config_flags )  
-
-     CALL med_shutdown_io ( head_grid , config_flags )
-   endif
-
-   CALL wrf_debug ( 0 , 'da_3dvar: SUCCESS COMPLETE WRF3DVAR' )
-   CALL wrf_shutdown
-
-   STOP "Stopped normally."
-
-END PROGRAM da_3dvar
+END PROGRAM wrfvar
 

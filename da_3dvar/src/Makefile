@@ -933,17 +933,17 @@ DA_Constants.o:		DA_Constants/DA_Constants.F \
 
 da_mat.o:		DA_VToX_Transforms/da_mat.f
 			$(RM) $@
-			$(CPP) DA_VToX_Transforms/da_mat.f > da_mat.f
+			$(CPP) $(TRADFLAG) DA_VToX_Transforms/da_mat.f > da_mat.f
 			$(FC) -c $(FCFLAGS_3DVAR) da_mat.f
 
 da_rfz.o:		DA_VToX_Transforms/da_rfz.f
 			$(RM) $@
-			$(CPP) DA_VToX_Transforms/da_rfz.f > da_rfz.f
+			$(CPP) $(TRADFLAG) DA_VToX_Transforms/da_rfz.f > da_rfz.f
 			$(FC) -c $(FCFLAGS_FFT_RF) da_rfz.f
 
 da_rf.o:		DA_VToX_Transforms/da_rf.f
 			$(RM) $@
-			$(CPP) DA_VToX_Transforms/da_rf.f > da_rf.f
+			$(CPP) $(TRADFLAG) DA_VToX_Transforms/da_rf.f > da_rf.f
 			$(FC) -c $(FCFLAGS_FFT_RF) da_rf.f
 
 LAPACK.o:		\

@@ -12,7 +12,7 @@ SUBROUTINE solve_interface ( grid )
    IMPLICIT NONE
 
    INTERFACE
-#if (EM_CORE == 1)
+#if (EM_CORE == 1 && DA_CORE != 1)
 # include  <solve_em.int>
 #endif
 #if (NMM_CORE == 1)
@@ -42,13 +42,30 @@ SUBROUTINE solve_interface ( grid )
 
    IF ( .FALSE.                         ) THEN
 
-#if (EM_CORE == 1)
+#if (EM_CORE == 1 && DA_CORE != 1)
    ELSE IF ( config_flags%dyn_opt == DYN_EM  ) THEN
      CALL solve_em  ( grid , config_flags , &
 !
 # include <em_actual_args.inc>
 !
                )
+
+# ifdef WRF_CHEM
+   IF ( config_flags%chem_opt == RADM2  ) THEN
+     CALL chem_driver  ( grid , config_flags , &
+!
+# include <em_actual_args.inc>
+!
+               )
+   ENDIF
+   IF ( config_flags%chem_opt == RADM2SORG ) THEN
+     CALL chem_driver  ( grid , config_flags , &
+!
+# include <em_actual_args.inc>
+!
+               )
+   ENDIF
+# endif
 #endif
 #if (NMM_CORE == 1)
    ELSE IF ( config_flags%dyn_opt == DYN_NMM  ) THEN

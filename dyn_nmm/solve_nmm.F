@@ -71,6 +71,9 @@ SUBROUTINE SOLVE_NMM(GRID,CONFIG_FLAGS,                                 &
      &,            pfdht_tim,ddamp_tim,bocov_tim,sum_tim
       real :: btim,btimx
       integer ij
+#ifdef DEREF_KLUDGE
+      INTEGER     :: sm31 , em31 , sm32 , em32 , sm33 , em33
+#endif
 #ifdef RSL
       integer rsl_internal_microclock
       external rsl_internal_microclock 
@@ -86,6 +89,7 @@ SUBROUTINE SOLVE_NMM(GRID,CONFIG_FLAGS,                                 &
 
 #define COPY_IN
 #include <nmm_scalar_derefs.inc>
+#include "deref_kludge.h"
 #ifdef DM_PARALLEL
 #    define REGISTER_I1
 #    include <nmm_data_calls.inc>
@@ -227,10 +231,10 @@ SUBROUTINE SOLVE_NMM(GRID,CONFIG_FLAGS,                                 &
 !***  FIRST TIME THROUGH TOTAL_TIME_STEPS IS ZERO.
 !***  IT IS INCREMENTED IN SOLVE_INTERFACE.
 !***
-      CALL ESMF_ClockGetAdvanceCount(grid%domain_clock,NTSD,rc)
+      CALL ESMF_ClockGet(grid%domain_clock,advanceCount=NTSD,rc=rc)
       LAST_TIME=grid%stop_time.EQ.grid%current_time+grid%step_time
 
-!      CALL ESMF_TimeGetString( grid%current_time, message, rc=rc )
+!      CALL wrf_timetoa ( grid%current_time, message )
 !      WRITE(0,*)' SOLVE_NMM CALLED: TIMESTEP IS ',NTSD
 !      WRITE(message,*)' SOLVE_NMM CALLED: TIMESTEP IS ',NTSD           &
 !               ,' FCST TIME IS',TRIM(message)

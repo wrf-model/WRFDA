@@ -281,7 +281,7 @@ SUBROUTINE wrf_open_for_write_begin( FileName , Comm_compute, Comm_io, SysDepInf
           ELSE
             LocFilename = FileName
           ENDIF
-          CALL ext_int_open_for_write_begin ( FileName , Comm_compute, Comm_io, SysDepInfo, &
+          CALL ext_int_open_for_write_begin ( LocFileName , Comm_compute, Comm_io, SysDepInfo, &
                                               Hndl , Status )
         ENDIF
         IF ( .NOT. multi_files(io_form) ) THEN
@@ -2090,7 +2090,7 @@ SUBROUTINE collect_fld_and_call_pkg (    fcn, donotcollect_arg,                 
                PatchStart , PatchEnd ,                                        &
                Status )
 
-  ELSE IF ( FieldType .EQ. WRF_REAL8  ) THEN
+  ELSE IF ( FieldType .EQ. WRF_DOUBLE  ) THEN
 
      CALL collect_double_and_call_pkg ( fcn,                                        &
                Hndl , DateStr , VarName , Field , FieldType , Comm , IOComm , &
@@ -2100,7 +2100,7 @@ SUBROUTINE collect_fld_and_call_pkg (    fcn, donotcollect_arg,                 
                PatchStart , PatchEnd ,                                      &
                Status )
 
-  ELSE IF ( FieldType .EQ. WRF_REAL4 ) THEN
+  ELSE IF ( FieldType .EQ. WRF_REAL ) THEN
 
      CALL collect_real_and_call_pkg ( fcn,                                        &
                Hndl , DateStr , VarName , Field , FieldType , Comm , IOComm , &
@@ -2170,15 +2170,29 @@ SUBROUTINE collect_real_and_call_pkg (   fcn,                                   
   INTEGER ,dimension(*)         ,INTENT(IN)    :: MemoryStart, MemoryEnd
   INTEGER ,dimension(*)         ,INTENT(IN)    :: PatchStart,  PatchEnd
   INTEGER                       ,INTENT(INOUT)   :: Status
-  REAL globbuf ( (DomainEnd(1)-DomainStart(1)+3)*(DomainEnd(2)-DomainStart(2)+3)*(DomainEnd(3)-DomainStart(3)+3) )
+  REAL, ALLOCATABLE :: globbuf (:)
+  LOGICAL, EXTERNAL           :: wrf_dm_on_monitor
+
+  IF ( wrf_dm_on_monitor() ) THEN
+    ALLOCATE( globbuf( (DomainEnd(1)-DomainStart(1)+3)*(DomainEnd(2)-DomainStart(2)+3)*(DomainEnd(3)-DomainStart(3)+3) ) )
+  ELSE
+    ALLOCATE( globbuf( 1 ) )
+  ENDIF
+
+#ifdef DEREF_KLUDGE
+# define FRSTELEM (1)
+#else
+# define FRSTELEM
+#endif
   
-  CALL collect_generic_and_call_pkg (   fcn, globbuf,                                             &
+  CALL collect_generic_and_call_pkg (   fcn, globbuf FRSTELEM,                                    &
                                      Hndl , DateStr , VarName , Field , FieldType , Comm , IOComm , &
                                      DomainDesc , bdy_mask, MemoryOrder , Stagger , DimNames ,    &
                                      DomainStart , DomainEnd ,                                    &
                                      MemoryStart , MemoryEnd ,                                    &
                                      PatchStart , PatchEnd ,                                      &
                                      Status )
+  DEALLOCATE ( globbuf )
   RETURN
 
 END SUBROUTINE collect_real_and_call_pkg
@@ -2219,15 +2233,23 @@ SUBROUTINE collect_int_and_call_pkg (   fcn,                                    
   INTEGER ,dimension(*)         ,INTENT(IN)    :: MemoryStart, MemoryEnd
   INTEGER ,dimension(*)         ,INTENT(IN)    :: PatchStart,  PatchEnd
   INTEGER                       ,INTENT(INOUT)   :: Status
-  INTEGER globbuf ( (DomainEnd(1)-DomainStart(1)+3)*(DomainEnd(2)-DomainStart(2)+3)*(DomainEnd(3)-DomainStart(3)+3) )
+  INTEGER, ALLOCATABLE :: globbuf (:)
+  LOGICAL, EXTERNAL           :: wrf_dm_on_monitor
 
-  CALL collect_generic_and_call_pkg (   fcn, globbuf,                                             &
+  IF ( wrf_dm_on_monitor() ) THEN
+    ALLOCATE( globbuf( (DomainEnd(1)-DomainStart(1)+3)*(DomainEnd(2)-DomainStart(2)+3)*(DomainEnd(3)-DomainStart(3)+3) ) )
+  ELSE
+    ALLOCATE( globbuf( 1 ) )
+  ENDIF
+
+  CALL collect_generic_and_call_pkg (   fcn, globbuf FRSTELEM ,                                   &
                                      Hndl , DateStr , VarName , Field , FieldType , Comm , IOComm , &
                                      DomainDesc , bdy_mask, MemoryOrder , Stagger , DimNames ,    &
                                      DomainStart , DomainEnd ,                                    &
                                      MemoryStart , MemoryEnd ,                                    &
                                      PatchStart , PatchEnd ,                                      &
                                      Status )
+  DEALLOCATE ( globbuf )
   RETURN
 
 END SUBROUTINE collect_int_and_call_pkg
@@ -2269,15 +2291,23 @@ SUBROUTINE collect_double_and_call_pkg (   fcn,                                 
   INTEGER ,dimension(*)         ,INTENT(IN)    :: MemoryStart, MemoryEnd
   INTEGER ,dimension(*)         ,INTENT(IN)    :: PatchStart,  PatchEnd
   INTEGER                       ,INTENT(INOUT)   :: Status
-  DOUBLE PRECISION globbuf ( (DomainEnd(1)-DomainStart(1)+3)*(DomainEnd(2)-DomainStart(2)+3)*(DomainEnd(3)-DomainStart(3)+3) )
+  DOUBLE PRECISION, ALLOCATABLE :: globbuf (:)
+  LOGICAL, EXTERNAL           :: wrf_dm_on_monitor
 
-  CALL collect_generic_and_call_pkg (   fcn, globbuf,                                             &
+  IF ( wrf_dm_on_monitor() ) THEN
+    ALLOCATE( globbuf( (DomainEnd(1)-DomainStart(1)+3)*(DomainEnd(2)-DomainStart(2)+3)*(DomainEnd(3)-DomainStart(3)+3) ) )
+  ELSE
+    ALLOCATE( globbuf( 1 ) )
+  ENDIF
+
+  CALL collect_generic_and_call_pkg (   fcn, globbuf FRSTELEM ,                                   &
                                      Hndl , DateStr , VarName , Field , FieldType , Comm , IOComm , &
                                      DomainDesc , bdy_mask, MemoryOrder , Stagger , DimNames ,    &
                                      DomainStart , DomainEnd ,                                    &
                                      MemoryStart , MemoryEnd ,                                    &
                                      PatchStart , PatchEnd ,                                      &
                                      Status )
+  DEALLOCATE ( globbuf )
   RETURN
 
 END SUBROUTINE collect_double_and_call_pkg
@@ -2318,15 +2348,23 @@ SUBROUTINE collect_logical_and_call_pkg (   fcn,                                
   INTEGER ,dimension(*)         ,INTENT(IN)    :: MemoryStart, MemoryEnd
   INTEGER ,dimension(*)         ,INTENT(IN)    :: PatchStart,  PatchEnd
   INTEGER                       ,INTENT(INOUT)   :: Status
-  LOGICAL globbuf ( (DomainEnd(1)-DomainStart(1)+3)*(DomainEnd(2)-DomainStart(2)+3)*(DomainEnd(3)-DomainStart(3)+3) )
+  LOGICAL, ALLOCATABLE :: globbuf (:)
+  LOGICAL, EXTERNAL           :: wrf_dm_on_monitor
 
-  CALL collect_generic_and_call_pkg (   fcn, globbuf,                                             &
+  IF ( wrf_dm_on_monitor() ) THEN
+    ALLOCATE( globbuf( (DomainEnd(1)-DomainStart(1)+3)*(DomainEnd(2)-DomainStart(2)+3)*(DomainEnd(3)-DomainStart(3)+3) ) )
+  ELSE
+    ALLOCATE( globbuf( 1 ) )
+  ENDIF
+
+  CALL collect_generic_and_call_pkg (   fcn, globbuf FRSTELEM ,                                   &
                                      Hndl , DateStr , VarName , Field , FieldType , Comm , IOComm , &
                                      DomainDesc , bdy_mask, MemoryOrder , Stagger , DimNames ,    &
                                      DomainStart , DomainEnd ,                                    &
                                      MemoryStart , MemoryEnd ,                                    &
                                      PatchStart , PatchEnd ,                                      &
                                      Status )
+  DEALLOCATE ( globbuf )
   RETURN
 
 END SUBROUTINE collect_logical_and_call_pkg
@@ -2425,12 +2463,12 @@ include "mpif.h"
     CASE (  'xzy','zxy','xyz','yxz','xy','yx' )
 
       distributed_field = .TRUE.
-      IF ( FieldType .EQ. WRF_REAL8 ) THEN
+      IF ( FieldType .EQ. WRF_DOUBLE ) THEN
         CALL wrf_patch_to_global_double ( Field  , globbuf , DomainDesc, Stagger, MemOrd ,             &
            DomainStart(1), DomainEnd(1), DomainStart(2), DomainEnd(2), DomainStart(3), DomainEnd(3), &
            MemoryStart(1), MemoryEnd(1), MemoryStart(2), MemoryEnd(2), MemoryStart(3), MemoryEnd(3), &
            PatchStart(1) , PatchEnd(1) , PatchStart(2) , PatchEnd(2) , PatchStart(3) , PatchEnd(3) )
-      ELSE IF ( FieldType .EQ. WRF_REAL4 ) THEN
+      ELSE IF ( FieldType .EQ. WRF_REAL ) THEN
         CALL wrf_patch_to_global_real ( Field  , globbuf , DomainDesc, Stagger, MemOrd ,             &
            DomainStart(1), DomainEnd(1), DomainStart(2), DomainEnd(2), DomainStart(3), DomainEnd(3), &
            MemoryStart(1), MemoryEnd(1), MemoryStart(2), MemoryEnd(2), MemoryStart(3), MemoryEnd(3), &
@@ -2480,7 +2518,7 @@ include "mpif.h"
            lx2  = dom_end_rev(1)-DomainStart(1)+1
            idx  = lx*((k-1)+(i-1)*(MemoryEnd(2)-MemoryStart(2)+1))
            idx2 = lx2*((k-1)+(i-1)*(MemoryEnd(2)-MemoryStart(2)+1))
-           IF ( FieldType .EQ. WRF_REAL8  ) THEN
+           IF ( FieldType .EQ. WRF_DOUBLE  ) THEN
 
              CALL wrf_gatherv_double ( Field, PatchStart(1)+idx , &
                              my_count ,                       &    ! sendcount
@@ -2491,7 +2529,7 @@ include "mpif.h"
                              communicator                   , &    ! communicator
                              ierr )
 
-           ELSE IF ( FieldType .EQ. WRF_REAL4 ) THEN
+           ELSE IF ( FieldType .EQ. WRF_REAL ) THEN
 
              CALL wrf_gatherv_real ( Field, PatchStart(1)+idx , &
                              my_count ,                       &    ! sendcount
@@ -2545,7 +2583,7 @@ include "mpif.h"
            idx  = lx*(i-1)
            lx2  = dom_end_rev(1)-DomainStart(1)+1
            idx2 = lx2*(i-1)
-           IF ( FieldType .EQ. WRF_REAL8 ) THEN
+           IF ( FieldType .EQ. WRF_DOUBLE ) THEN
 
              CALL wrf_gatherv_double ( Field, PatchStart(1)+idx , &
                              my_count ,                       &    ! sendcount
@@ -2556,7 +2594,7 @@ include "mpif.h"
                              communicator                   , &    ! communicator
                              ierr )
 
-           ELSE IF ( FieldType .EQ. WRF_REAL4 ) THEN
+           ELSE IF ( FieldType .EQ. WRF_REAL ) THEN
 
              CALL wrf_gatherv_real ( Field, PatchStart(1)+idx , &
                              my_count ,                       &    ! sendcount
@@ -2613,7 +2651,7 @@ include "mpif.h"
            idx  = lx*((k-1)+(j-1)*(MemoryEnd(2)-MemoryStart(2)+1))
            idx2 = lx2*((k-1)+(j-1)*(MemoryEnd(2)-MemoryStart(2)+1))
 
-           IF ( FieldType .EQ. WRF_REAL8 ) THEN 
+           IF ( FieldType .EQ. WRF_DOUBLE ) THEN 
 
              CALL wrf_gatherv_double ( Field, PatchStart(1)+idx ,      &    ! sendbuf
                              my_count                       , &    ! sendcount
@@ -2624,7 +2662,7 @@ include "mpif.h"
                              communicator                   , &    ! communicator
                              ierr )
 
-           ELSE IF ( FieldType .EQ. WRF_REAL4 ) THEN
+           ELSE IF ( FieldType .EQ. WRF_REAL ) THEN
 
              CALL wrf_gatherv_real( Field, PatchStart(1)+idx ,      &    ! sendbuf
                              my_count                       , &    ! sendcount
@@ -2680,7 +2718,7 @@ include "mpif.h"
            lx2  = dom_end_rev(1)-DomainStart(1)+1
            idx2 = lx2*(j-1)
 
-           IF ( FieldType .EQ. WRF_REAL8 ) THEN 
+           IF ( FieldType .EQ. WRF_DOUBLE ) THEN 
 
              CALL wrf_gatherv_double( Field, PatchStart(1)+idx ,      &    ! sendbuf
                              my_count                       , &    ! sendcount
@@ -2691,7 +2729,7 @@ include "mpif.h"
                              communicator                   , &    ! communicator
                              ierr )
 
-           ELSE IF ( FieldType .EQ. WRF_REAL4 ) THEN
+           ELSE IF ( FieldType .EQ. WRF_REAL ) THEN
 
              CALL wrf_gatherv_real( Field, PatchStart(1)+idx ,      &    ! sendbuf
                              my_count                       , &    ! sendcount
@@ -2793,7 +2831,7 @@ SUBROUTINE call_pkg_and_dist (       fcn, donotdist_arg, update_arg,            
                PatchStart , PatchEnd ,                                        &
                Status )
 
-  ELSE IF (FieldType .EQ. WRF_REAL8) THEN
+  ELSE IF (FieldType .EQ. WRF_DOUBLE) THEN
 
      CALL call_pkg_and_dist_double ( fcn, update_arg,                            &
                Hndl , DateStr , VarName , Field , FieldType , Comm , IOComm , &
@@ -2803,7 +2841,7 @@ SUBROUTINE call_pkg_and_dist (       fcn, donotdist_arg, update_arg,            
                PatchStart , PatchEnd ,                                      &
                Status )
 
-  ELSE IF (FieldType .EQ. WRF_REAL4) THEN
+  ELSE IF (FieldType .EQ. WRF_REAL) THEN
 
      CALL call_pkg_and_dist_real ( fcn, update_arg,                            &
                Hndl , DateStr , VarName , Field , FieldType , Comm , IOComm , &
@@ -2870,16 +2908,24 @@ SUBROUTINE call_pkg_and_dist_real (  fcn, update_arg,                           
   INTEGER ,dimension(*)         ,INTENT(IN)    :: MemoryStart, MemoryEnd
   INTEGER ,dimension(*)         ,INTENT(IN)    :: PatchStart,  PatchEnd
   INTEGER                       ,INTENT(INOUT)   :: Status
-  REAL globbuf ( (DomainEnd(1)-DomainStart(1)+2)*(DomainEnd(2)-DomainStart(2)+2)*(DomainEnd(3)-DomainStart(3)+2) )
+  REAL, ALLOCATABLE :: globbuf (:)
+  LOGICAL, EXTERNAL :: wrf_dm_on_monitor
+
+  IF ( wrf_dm_on_monitor() ) THEN
+    ALLOCATE( globbuf( (DomainEnd(1)-DomainStart(1)+3)*(DomainEnd(2)-DomainStart(2)+3)*(DomainEnd(3)-DomainStart(3)+3) ) )
+  ELSE
+    ALLOCATE( globbuf( 1 ) )
+  ENDIF
 
   globbuf = 0.
-  CALL call_pkg_and_dist_generic (   fcn, globbuf , update_arg,                                    &
+  CALL call_pkg_and_dist_generic (   fcn, globbuf FRSTELEM , update_arg,                          &
                                      Hndl , DateStr , VarName , Field , FieldType , Comm , IOComm , &
                                      DomainDesc , MemoryOrder , Stagger , DimNames ,              &
                                      DomainStart , DomainEnd ,                                    &
                                      MemoryStart , MemoryEnd ,                                    &
                                      PatchStart , PatchEnd ,                                      &
                                      Status )
+  DEALLOCATE ( globbuf )
   RETURN
 END SUBROUTINE call_pkg_and_dist_real
 
@@ -2917,17 +2963,25 @@ SUBROUTINE call_pkg_and_dist_double  (  fcn, update_arg ,                       
   INTEGER ,dimension(*)         ,INTENT(IN)    :: MemoryStart, MemoryEnd
   INTEGER ,dimension(*)         ,INTENT(IN)    :: PatchStart,  PatchEnd
   INTEGER                       ,INTENT(INOUT)   :: Status
-  DOUBLE PRECISION globbuf ( (DomainEnd(1)-DomainStart(1)+2)*(DomainEnd(2)-DomainStart(2)+2)*(DomainEnd(3)-DomainStart(3)+2) )
+  DOUBLE PRECISION , ALLOCATABLE :: globbuf (:)
+  LOGICAL, EXTERNAL :: wrf_dm_on_monitor
+
+  IF ( wrf_dm_on_monitor() ) THEN
+    ALLOCATE( globbuf( (DomainEnd(1)-DomainStart(1)+3)*(DomainEnd(2)-DomainStart(2)+3)*(DomainEnd(3)-DomainStart(3)+3) ) )
+  ELSE
+    ALLOCATE( globbuf( 1 ) )
+  ENDIF
 
   globbuf = 0
 
-  CALL call_pkg_and_dist_generic (   fcn, globbuf , update_arg ,                                  &
+  CALL call_pkg_and_dist_generic (   fcn, globbuf FRSTELEM , update_arg ,                         &
                                      Hndl , DateStr , VarName , Field , FieldType , Comm , IOComm , &
                                      DomainDesc , MemoryOrder , Stagger , DimNames ,              &
                                      DomainStart , DomainEnd ,                                    &
                                      MemoryStart , MemoryEnd ,                                    &
                                      PatchStart , PatchEnd ,                                      &
                                      Status )
+  DEALLOCATE ( globbuf )
   RETURN
 END SUBROUTINE call_pkg_and_dist_double
 
@@ -2965,17 +3019,25 @@ SUBROUTINE call_pkg_and_dist_int  (  fcn, update_arg ,                          
   INTEGER ,dimension(*)         ,INTENT(IN)    :: MemoryStart, MemoryEnd
   INTEGER ,dimension(*)         ,INTENT(IN)    :: PatchStart,  PatchEnd
   INTEGER                       ,INTENT(INOUT)   :: Status
-  INTEGER globbuf ( (DomainEnd(1)-DomainStart(1)+2)*(DomainEnd(2)-DomainStart(2)+2)*(DomainEnd(3)-DomainStart(3)+2) )
+  INTEGER , ALLOCATABLE :: globbuf (:)
+  LOGICAL, EXTERNAL :: wrf_dm_on_monitor
+
+  IF ( wrf_dm_on_monitor() ) THEN
+    ALLOCATE( globbuf( (DomainEnd(1)-DomainStart(1)+3)*(DomainEnd(2)-DomainStart(2)+3)*(DomainEnd(3)-DomainStart(3)+3) ) )
+  ELSE
+    ALLOCATE( globbuf( 1 ) )
+  ENDIF
 
   globbuf = 0
 
-  CALL call_pkg_and_dist_generic (   fcn, globbuf , update_arg ,                                  &
+  CALL call_pkg_and_dist_generic (   fcn, globbuf FRSTELEM , update_arg ,                                  &
                                      Hndl , DateStr , VarName , Field , FieldType , Comm , IOComm , &
                                      DomainDesc , MemoryOrder , Stagger , DimNames ,              &
                                      DomainStart , DomainEnd ,                                    &
                                      MemoryStart , MemoryEnd ,                                    &
                                      PatchStart , PatchEnd ,                                      &
                                      Status )
+  DEALLOCATE ( globbuf )
   RETURN
 END SUBROUTINE call_pkg_and_dist_int
 
@@ -3013,17 +3075,25 @@ SUBROUTINE call_pkg_and_dist_logical  (  fcn, update_arg ,                      
   INTEGER ,dimension(*)         ,INTENT(IN)    :: MemoryStart, MemoryEnd
   INTEGER ,dimension(*)         ,INTENT(IN)    :: PatchStart,  PatchEnd
   INTEGER                       ,INTENT(INOUT)   :: Status
-  logical globbuf ( (DomainEnd(1)-DomainStart(1)+2)*(DomainEnd(2)-DomainStart(2)+2)*(DomainEnd(3)-DomainStart(3)+2) )
+  LOGICAL , ALLOCATABLE :: globbuf (:)
+  LOGICAL, EXTERNAL :: wrf_dm_on_monitor
+
+  IF ( wrf_dm_on_monitor() ) THEN
+    ALLOCATE( globbuf( (DomainEnd(1)-DomainStart(1)+3)*(DomainEnd(2)-DomainStart(2)+3)*(DomainEnd(3)-DomainStart(3)+3) ) )
+  ELSE
+    ALLOCATE( globbuf( 1 ) )
+  ENDIF
 
   globbuf = .false.
 
-  CALL call_pkg_and_dist_generic (   fcn, globbuf , update_arg ,                                  &
+  CALL call_pkg_and_dist_generic (   fcn, globbuf FRSTELEM , update_arg ,                         &
                                      Hndl , DateStr , VarName , Field , FieldType , Comm , IOComm , &
                                      DomainDesc , MemoryOrder , Stagger , DimNames ,              &
                                      DomainStart , DomainEnd ,                                    &
                                      MemoryStart , MemoryEnd ,                                    &
                                      PatchStart , PatchEnd ,                                      &
                                      Status )
+  DEALLOCATE ( globbuf )
   RETURN
 END SUBROUTINE call_pkg_and_dist_logical
 
@@ -3132,12 +3202,12 @@ SUBROUTINE call_pkg_and_dist_generic (   fcn, globbuf , update_arg ,            
     IF ( update_arg ) THEN
       SELECT CASE (TRIM(MemOrd))
         CASE (  'xzy','zxy','xyz','yxz','xy','yx' )
-          IF ( FieldType .EQ. WRF_REAL8 ) THEN
+          IF ( FieldType .EQ. WRF_DOUBLE ) THEN
             CALL wrf_patch_to_global_double ( Field  , globbuf , DomainDesc, Stagger, MemOrd ,             &
                DomainStart(1), DomainEnd(1), DomainStart(2), DomainEnd(2), DomainStart(3), DomainEnd(3), &
                MemoryStart(1), MemoryEnd(1), MemoryStart(2), MemoryEnd(2), MemoryStart(3), MemoryEnd(3), &
                PatchStart(1) , PatchEnd(1) , PatchStart(2) , PatchEnd(2) , PatchStart(3) , PatchEnd(3) )
-          ELSE IF (  FieldType .EQ. WRF_REAL4 ) THEN
+          ELSE IF (  FieldType .EQ. WRF_REAL ) THEN
             CALL wrf_patch_to_global_real ( Field  , globbuf , DomainDesc, Stagger, MemOrd ,             &
                DomainStart(1), DomainEnd(1), DomainStart(2), DomainEnd(2), DomainStart(3), DomainEnd(3), &
                MemoryStart(1), MemoryEnd(1), MemoryStart(2), MemoryEnd(2), MemoryStart(3), MemoryEnd(3), &
@@ -3170,7 +3240,7 @@ SUBROUTINE call_pkg_and_dist_generic (   fcn, globbuf , update_arg ,            
     CALL wrf_dm_bcast_bytes( Status, IWORDSIZE )
   
     CALL lower_case( MemoryOrder, MemOrd )
-    IF ( FieldType .EQ. WRF_REAL8 ) THEN
+    IF ( FieldType .EQ. WRF_DOUBLE ) THEN
 
       SELECT CASE (MemOrd)
       CASE ( 'xzy','xyz','yxz','zxy' )
@@ -3185,7 +3255,7 @@ SUBROUTINE call_pkg_and_dist_generic (   fcn, globbuf , update_arg ,            
            PatchStart(1) , PatchEnd(1) , PatchStart(2) , PatchEnd(2) , 1            , 1   )
       END SELECT
 
-    ELSE IF ( FieldType .EQ. WRF_REAL4 ) THEN
+    ELSE IF ( FieldType .EQ. WRF_REAL ) THEN
 
       SELECT CASE (MemOrd)
       CASE ( 'xzy','xyz','yxz','zxy' )
@@ -3242,9 +3312,9 @@ SUBROUTINE call_pkg_and_dist_generic (   fcn, globbuf , update_arg ,            
     ENDIF
     CALL wrf_dm_bcast_bytes( Status, IWORDSIZE )
     memsize = (MemoryEnd(1)-MemoryStart(1)+1)*(MemoryEnd(2)-MemoryStart(2)+1)*(MemoryEnd(3)-MemoryStart(3)+1)
-    IF ( FieldType .EQ. WRF_REAL8 ) THEN 
+    IF ( FieldType .EQ. WRF_DOUBLE ) THEN 
       CALL wrf_dm_bcast_bytes( Field , DWORDSIZE*memsize )
-    ELSE IF ( FieldType .EQ. WRF_REAL4) THEN
+    ELSE IF ( FieldType .EQ. WRF_REAL) THEN
       CALL wrf_dm_bcast_bytes( Field , RWORDSIZE*memsize )
     ELSE IF ( FieldType .EQ. WRF_INTEGER ) THEN
       CALL wrf_dm_bcast_bytes( Field , IWORDSIZE*memsize )
