@@ -114,7 +114,6 @@ da_solve_v3d.o:		DA_Constants.o			\
 DA_Minimisation.o:	\
 			../module_wrf_3dvar_io.o	\
 			DA_Constants.o \
-			DA_Tools.o     \
 			DA_Define_Structures.o \
 			DA_VToX_Transforms.o \
 			DA_Obs.o \
@@ -141,6 +140,7 @@ DA_Minimisation.o:	\
 			DA_Minimisation/da_calculate_residual.inc \
 			DA_Minimisation/da_get_var_diagnostics.inc \
 			DA_Minimisation/da_get_innov_vector.inc \
+			DA_Minimisation/da_dot.inc \
 			DA_Minimisation/da_lmdir.inc \
 			DA_Minimisation/da_minimisation_warning.inc \
 			DA_Minimisation/da_minimise.inc \
@@ -865,7 +865,6 @@ DA_Tools.o:		\
 			DA_Tools/smooth_anl.inc \
 			DA_Tools/toGrid.inc \
 			DA_Tools/unifva.inc \
-			DA_Tools/da_dot.inc \
 			DA_Tools/DA_Set_Boundary_Xa.inc \
 			DA_Tools/DA_Set_Boundary_Xb.inc \
 			DA_Tools/DA_Set_Boundary_3d.inc \
