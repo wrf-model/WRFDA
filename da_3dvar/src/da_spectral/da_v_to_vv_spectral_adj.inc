@@ -39,7 +39,7 @@ subroutine da_v_to_vv_spectral_adj( ni, nj, max_wavenumber,inc, lenr,   &
    logical             :: odd_longitudes             ! True if odd longitudes.
 !
 !-------------------------------------------------------------------------
-    c_cvsize = 0.5 * r_cvsize   
+   c_cvsize = 0.5 * r_cvsize   
    allocate (cv(1:c_cvsize))
 !-------------------------------------------------------------------------
    if ( (ni+1) / 2 == ni/2 + 1 ) then  ! Odd number of longitudes:
@@ -61,8 +61,9 @@ subroutine da_v_to_vv_spectral_adj( ni, nj, max_wavenumber,inc, lenr,   &
        r_fou    =  real(ni/2.) * r_fou
        r_fou(1) =  r_fou(1)    * 2.0       
        if(.not. odd_longitudes)r_fou(ni) = 2.0*r_fou(ni)   
+!rizvi make r_fou(ni) zero as there is no power computed corresponding to this wavenumber
+       r_fou(ni) = 0.
 !
-
        if ( odd_longitudes ) then
           v_fou(j,0) = CMPLX( r_fou(1), 0.0 ) ! m = 0 is real.
        else
@@ -87,16 +88,13 @@ subroutine da_v_to_vv_spectral_adj( ni, nj, max_wavenumber,inc, lenr,   &
       call da_leg_tra_inv_adj( nj, max_wavenumber, alp_size, m, alp, &
       cv(index_start:index_end), r_leg )
    end do
-
-! Adjust Power spectrum
-   do n =0, max_wavenumber
-      cv(n+1) = cv(n+1) * sqrt(power(n)/(2.0*n+1))
-    do m=1, n
-     index = m*(max_wavenumber+1- m) + m*(m+1)/2+n-m + 1
-     cv(index) =  cv(index) * sqrt (power(n)/(2*n+1) )
-    end do
-   end do
-
+!-------------------------------------------------------------------------
+!
+! [3] Adjust Power spectrum
+!-------------------------------------------------------------------------
+   if( .not. test_transforms ) &
+   call da_apply_power(power, max_wavenumber, cv, c_cvsize)
+!
     do i=1,c_cvsize
      mm = 2*i - 1
      rcv(mm  ) = real ( cv(i) )

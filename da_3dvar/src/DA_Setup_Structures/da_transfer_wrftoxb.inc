@@ -48,19 +48,13 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
 
    integer :: ierror, size2d
 
-   LOGICAL, EXTERNAL :: wrf_dm_on_monitor
-
-   integer, parameter :: P_QV  = 2
-   integer, parameter :: p_qcw = 3
-   integer, parameter :: p_qrn = 4
-   integer, parameter :: p_qci = 5
-   integer, parameter :: p_qsn = 6
-   integer, parameter :: p_qgr = 7
-
    real, dimension(xp%kms:xp%kme) :: DDT
 !------------------------------------------------------------------------------
 
    REAL   :: qvf1, qvf2
+
+!  REAL   :: cvpm, cpovcv, ppb, ttb, alb, al
+
 !---------------------------------------------------------------------------
 !--Set xb array range indices for processor subdomain.
 !---------------------------------------------------------------------------
@@ -362,18 +356,18 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
 
          if( size(moist_2,dim=4) >= 4 ) then
 !          write(6,*)'P_QV, P_QCW, P_QRN:',P_QV, P_QCW, P_QRN
-           xb%qcw(i,j,k) = moist_2(i,j,k,p_qcw)
-           xb%qrn(i,j,k) = moist_2(i,j,k,p_qrn)
+           xb%qcw(i,j,k) = moist_2(i,j,k,p_qc)
+           xb%qrn(i,j,k) = moist_2(i,j,k,p_qr)
            xb%qt (i,j,k) = xb%q(i,j,k) + xb%qcw(i,j,k) + xb%qrn(i,j,k)
          endif
 
          if( size(moist_2,dim=4) >= 6 ) then
-           xb%qci(i,j,k) = moist_2(i,j,k,p_qci)
-           xb%qsn(i,j,k) = moist_2(i,j,k,p_qsn)
+           xb%qci(i,j,k) = moist_2(i,j,k,p_qi)
+           xb%qsn(i,j,k) = moist_2(i,j,k,p_qs)
          endif
 
          if( size(moist_2,dim=4) >= 7 ) then
-           xb%qgr(i,j,k) = moist_2(i,j,k,p_qgr)
+           xb%qgr(i,j,k) = moist_2(i,j,k,p_qg)
          endif
 
        enddo
@@ -387,6 +381,47 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
           xb%tgrn(i,j) = xb%t(i,j,ks)+0.0065*(xb%h(i,j,ks+1)-xb%hf(i,j,ks))
      enddo
    enddo
+
+#if 0
+! Adapted the code from WRF module_big_step_utilities_em.F ----
+!         subroutine calc_p_rho_phi      Y.-R. Guo (10/20/2004)
+
+   ptop = grid%p_top
+   ts0  = 300.0     ! Base potential temperature for all levels.
+   ps0  = 100000.0  ! Base sea level pressure
+   tis0 = 290.0     ! Base sea level temperature
+   tlp  = 50.0      ! temperature difference from 1000mb to 300mb
+
+   xb % ptop = ptop
+   xb % ps0  = ps0
+   xb % ts0  = ts0
+   xb % tlp  = tlp
+
+   cvpm =  - (1. - gas_constant/cp)
+   cpovcv = cp / (cp - gas_constant)
+
+   do j=js,je
+     do k=ks,ke
+       do i=is,ie
+!--------The base specific volume (from real.init.code):...........
+         ppb  = znu(k) * mub(i,j) + ptop
+         ttb  = (tis0 + tlp*log(ppb/ps0)) * (ps0/ppb)**kappa
+         alb  = (gas_constant/ps0) * ttb * (ppb/ps0)**cvpm
+! .............................................................
+         qvf1 = 1. + moist_2(i,j,k,P_QV) / rd_over_rv
+         al   = -1. / (mub(i,j)+mu_2(i,j)) * ( alb*mu_2(i,j) &
+                + rdnw(k) *(ph_2(i,j,k+1) - ph_2(i,j,k)) )
+!--------total pressure:
+         xb%p(i,j,k) = ps0 * ( (gas_constant*(ts0+t_2(i,j,k))*qvf1) / &
+                      (ps0*(al+alb)) )**cpovcv
+!--------total density
+         xb%rho(i,j,k)= 1.0 / (alb+al)
+!--------pressure purtubation:
+         p(i,j,k) = xb%p(i,j,k) - ppb
+       enddo
+     enddo
+   enddo
+#endif
 
    xb%ztop = xb%hf(is,js,ke+1)
 
@@ -552,13 +587,15 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
           'Sea level pressure and total precipitable water'
    endif
 
-!  call DA_WRF_TPQ_2_SLP ( xb )
-   do j = js,je
-   do i = is,ie
-      call DA_TPQ_To_SLP( xb%t(i,j,:), xb%q(i,j,:), xb%p(i,j,:), xb%terr(i,j), &
-                         xb%psfc(i,j), xb%slp(i,j), xp )
-   end do
-   end do
+   call DA_WRF_TPQ_2_SLP ( xb )
+
+!  do j = js,je
+!  do i = is,ie
+!     call DA_TPQ_To_SLP( xb%t(i,j,:), xb%q(i,j,:), xb%p(i,j,:), xb%terr(i,j), &
+!                        xb%psfc(i,j), xb%slp(i,j), xp )
+!  end do
+!  end do
+
    call INTEGRAT_dZ( xb )
 
 !------------------------------------------------------------------------------

@@ -4,14 +4,21 @@ LN      =       ln -sf
 MAKE    =       make -i -r
 RM      =       rm -f
 
-$(SOLVER) : $(SOLVER)_stage1 $(SOLVER)_stage2 $(SOLVER)_stage3 $(SOLVER)_stage4 \
-	$(SOLVER)_stage4_scale $(SOLVER)_cov2d $(SOLVER)_cov3d $(SOLVER)_diags $(SOLVER)_diags_read
+$(SOLVER) :	$(SOLVER)_stage1	\
+		$(SOLVER)_stage2	\
+		$(SOLVER)_stage3	\
+		$(SOLVER)_stage4	\
+		$(SOLVER)_stage4_scale	\
+		$(SOLVER)_cov2d		\
+		$(SOLVER)_cov3d		\
+		$(SOLVER)_diags		\
+		$(SOLVER)_diags_read
 
 include ../configure.wrf
 
-gen_be_stage0 : $(SOLVER)_stage0.o
+gen_be_stage0 : gen_be_stage0.o
 	$(RANLIB) ../main/libwrflib.a
-	$(LD) -o $(SOLVER)_stage0.exe $(LDFLAGS) $(SOLVER)_stage0.o ../main/libwrflib.a $(LIB)
+	$(LD) -o gen_be_stage0.exe $(LDFLAGS) gen_be_stage0.o ../main/libwrflib.a $(LIB)
 
 $(SOLVER)_stage1 : $(SOLVER)_stage1.o
 	$(RANLIB) ../main/libwrflib.a
@@ -95,5 +102,4 @@ clean:
 	@ echo 'use the clean script'
 
 # DEPENDENCIES : only dependencies after this line (don't remove the word DEPENDENCIES)
-
 

@@ -25,10 +25,6 @@ SUBROUTINE DA_Transfer_XatoKMA( xbx, grid, &
    integer :: i, j, k, n
    integer :: is, ie, js, je, ks, ke
    real    :: sdmd, s1md
-!---------------------------------------------------------------------------
-   LOGICAL, EXTERNAL :: wrf_dm_on_monitor
-
-   integer, parameter :: P_QV=2
    real    :: PU, PD, coeff
 !---------------------------------------------------------------------------
 !--SET ARRAY RANGE INDICES FOR PROCESSOR SUBDOMAIN.

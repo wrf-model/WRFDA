@@ -168,15 +168,15 @@ MODULE DA_Define_Structures
       REAL             :: fft_adjoint_factor ! FFT Adjoint factor
 !  spectral transform related variables
       INTEGER          :: inc                ! Vector array increment 
-      INTEGER          :: ni                 
-      INTEGER          :: nj                 
-      INTEGER          :: nk                 
-      INTEGER          :: max_wavenumber     
-      INTEGER          :: c_cv_size           
-      INTEGER          :: lenr               
-      INTEGER          :: lensav             
-      INTEGER          :: lenwrk             
-      INTEGER          :: alp_size           
+      INTEGER          :: ni
+      INTEGER          :: nj
+      INTEGER          :: nk
+      INTEGER          :: max_wavenumber
+      INTEGER          :: c_cv_size
+      INTEGER          :: lenr
+      INTEGER          :: lensav
+      INTEGER          :: lenwrk
+      INTEGER          :: alp_size
    real, pointer       :: wsave(:)          ! Primes for FFT.
    real, pointer       :: lon(:)            ! Longitude (radians).
    real, pointer       :: sinlon(:)         ! sine(longitude).

@@ -18,8 +18,8 @@ SUBROUTINE DA_TPQ_To_SLP_Adj ( T, Q, P, TERR, PSFC, &
 
   TYPE (xpose_type), INTENT(IN)                 :: xp
   REAL,                intent(in)               :: TERR, PSFC
-  REAL, dimension(xp%kts:xp%kte), intent(in)    :: T, Q, P
-  REAL, dimension(xp%kts:xp%kte)                :: T9, Q9, P9
+  REAL, dimension(xp%kms:xp%kme), intent(in)    :: T, Q, P
+  REAL, dimension(xp%kms:xp%kme)                :: T9, Q9, P9
   REAL                                          :: SLP, SLP9, PSFC9
 
   INTEGER              :: I, J, K, KLO, KHI

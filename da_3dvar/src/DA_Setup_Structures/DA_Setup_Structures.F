@@ -10,6 +10,8 @@ MODULE DA_Setup_Structures
 !
 !------------------------------------------------------------------------------
 
+   use module_state_description
+
    USE DA_Define_Structures
    USE DA_Constants
    USE DA_Grid_Definitions

@@ -9,6 +9,8 @@ MODULE module_wrf_3dvar_io
 
    USE module_configure
 
+   USE WRF_ESMF_MOD
+
 CONTAINS
 
 !------------------------------------------------------------------------------
@@ -39,17 +41,13 @@ SUBROUTINE med_initialdata_input_3dvar ( grid , config_flags, in_date, in_filena
 
 !  Initialize the mother domain.
 
-!  CALL start_timing
+   CALL start_timing
 
    grid%input_from_file = .true.
 
    if(present(in_filename)) then
-      write(unit=*, fmt='(2a,2x,a,i6)') &
-           'file:', __FILE__, 'line:', __LINE__
       file_name = trim(in_filename)
    else
-      write(unit=*, fmt='(2a,2x,a,i6)') &
-           'file:', __FILE__, 'line:', __LINE__
       file_name = 'wrf_3dvar_input'
    endif
 
@@ -124,6 +122,9 @@ SUBROUTINE med_initialdata_input_3dvar ( grid , config_flags, in_date, in_filena
 
    CALL close_dataset ( fid , config_flags , "DATASET=INPUT" )
 
+   WRITE ( message , FMT = '("Reading 3dvar input for domain ",I8)' ) grid%id
+   CALL end_timing ( TRIM(message) )
+
 END SUBROUTINE med_initialdata_input_3dvar
 
 !----------------------------------------------------------
@@ -150,19 +151,13 @@ SUBROUTINE med_initialdata_output_3dvar ( grid , config_flags, out_filename )
    INTEGER :: julyr, julday
    REAL    :: gmt
 
+   CALL start_timing
+
    if(present(out_filename)) then
-      write(unit=*, fmt='(2a,2x,a,i6)') &
-           'file:', __FILE__, 'line:', __LINE__
       file_name = trim(out_filename)
    else
-      write(unit=*, fmt='(2a,2x,a,i6)') &
-           'file:', __FILE__, 'line:', __LINE__
       file_name = 'wrf_3dvar_output'
    endif
-
-!  write(unit=*, fmt='(2a,2x,a,i6,2(2x,a))') &
-!       'file:', __FILE__, 'line:', __LINE__, &
-!       'file_name =', trim(file_name)
 
    CALL wrf_debug ( 100 , 'da_3dvar/module_wrf_3dvar_io: calling open_w_dataset 3dvar output' )
    CALL open_w_dataset ( fid, TRIM(file_name), grid , config_flags , &
@@ -186,8 +181,9 @@ SUBROUTINE med_initialdata_output_3dvar ( grid , config_flags, out_filename )
    CALL output_model_input ( fid, grid , config_flags , ierr )
 
    CALL close_dataset ( fid , config_flags, "DATASET=INPUT" )
+
    WRITE ( message , FMT = '("Writing 3dvar output for domain ",I8)' ) grid%id
-!  CALL end_timing ( TRIM(message) )
+   CALL end_timing ( TRIM(message) )
 
 END SUBROUTINE med_initialdata_output_3dvar
 
