@@ -1,9 +1,9 @@
 !WRF:DRIVER_LAYER:MAIN
 !
 
-PROGRAM wrfvar
+PROGRAM da_var
 
-   USE module_wrfvar_esmf_super
+   USE da_var_esmf_super
 
 !<DESCRIPTION>
 ! Main program of WRF model.  Responsible for starting up the model, reading in (and
@@ -29,14 +29,13 @@ PROGRAM wrfvar
 
    CALL ESMF_Initialize( vm=vm, defaultCalendar=ESMF_CAL_GREGORIAN, rc=rc )
 
-   CALL wrfvar_init( gcomp, importState, exportState, clock, rc )
+   CALL da_var_init( gcomp, importState, exportState, clock, rc )
 
-   CALL wrfvar_run( gcomp, importState, exportState, clock, rc )
+   CALL da_var_run( gcomp, importState, exportState, clock, rc )
 
-   CALL wrfvar_finalize( gcomp, importState, exportState, clock, rc )
+   CALL da_var_finalize( gcomp, importState, exportState, clock, rc )
 
    CALL ESMF_Finalize( rc=rc )
 
-END PROGRAM wrfvar
-
+END PROGRAM da_var
 

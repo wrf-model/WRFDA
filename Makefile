@@ -67,7 +67,6 @@ wrf : configcheck
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" shared
 	$(MAKE) MODULE_DIRS="$(ALL_MODULES)" physics
 	$(MAKE) MODULE_DIRS="$(ALL_MODULES)" em_core
-	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" wrfvar_drivers
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" wrfvar_src
 	( cd main ; $(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" da_3dvar )
 
@@ -276,7 +275,6 @@ wrfvar_drivers :
 wrfvar_src :
 	@ echo '--------------------------------------'
 	( cd da_3dvar/src; $(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES_2)" 3dvar )
-	( cd da_3dvar ; $(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" da_3dvar_io )
 
 convertor_drivers :
 	@ echo '--------------------------------------'

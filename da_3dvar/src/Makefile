@@ -2,6 +2,7 @@
 # Lower level Makefile
 
 OBJS_FOR_ALL =		da_solve_v3d.o		\
+			DA_Var_IO.o             \
 			par_util.o              \
 			DA_Setup_Structures.o	\
 			DA_Minimisation.o	\
@@ -102,14 +103,26 @@ da_solve_v3d.o:		DA_Constants.o			\
 			DA_Tools.o			\
 			DA_Minimisation.o		\
 			par_util.o			\
-			da_solve_v3d/da_init_3dvar.inc	\
+			da_solve_v3d/da_init_3dvar.inc		\
+			da_solve_v3d/da_var_finalize.inc	\
+			da_solve_v3d/da_var_init.inc		\
+			da_solve_v3d/da_var_run.inc		\
+			da_solve_v3d/da_var_solve_interface.inc	\
+			da_solve_v3d/solve_v3d.inc		\
 			da_solve_v3d/da_solve_v3d.F
 			$(RM) $@
 			$(CPP) -I./da_solve_v3d $(CPPFLAGS_3DVAR) da_solve_v3d/da_solve_v3d.F > da_solve_v3d.f
 			$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) da_solve_v3d.f
 
+DA_Var_IO.o:		DA_Var_IO/med_initialdata_input_3dvar.inc	\
+			DA_Var_IO/med_initialdata_output_3dvar.inc	\
+			DA_Var_IO/DA_Var_IO.F
+			$(RM) $@
+			$(CPP) -I./DA_Var_IO $(CPPFLAGS_3DVAR) DA_Var_IO/DA_Var_IO.F > DA_Var_IO.f
+			$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) DA_Var_IO.f
+
 DA_Minimisation.o:	\
-			../module_wrf_3dvar_io.o \
+			DA_Var_IO.o	\
 			DA_Constants.o \
 			DA_Tools.o     \
 			DA_Define_Structures.o \
