@@ -6936,7 +6936,7 @@ wrfio_int :
 
 wrfio_grib1 :
 	( cd ../external/io_grib1 ; \
-          make CC="$(CC)" RANLIB="$(RANLIB)" CPP="$(CPP)" FC="$(FC) $(FCDEBUG) -qarch=auto -qzerosize" )
+          make CC="$(CC)" CFLAGS="$(CFLAGS)" RANLIB="$(RANLIB)" CPP="$(CPP)" FC="$(FC) $(FCDEBUG) -qarch=auto -qzerosize" )
 
 esmf_time : 
 	( cd ../external/esmf_time_f90 ; \
@@ -7044,7 +7044,7 @@ wrfio_int :
 
 wrfio_grib1 :
 	( cd ../external/io_grib1 ; \
-          make CC="$(CC)" RANLIB="$(RANLIB)" CPP="$(CPP)" FC="$(FC) $(FCDEBUG) -qarch=auto -qzerosize" )
+          make CC="$(CC)" CFLAGS="$(CFLAGS)" RANLIB="$(RANLIB)" CPP="$(CPP)" FC="$(FC) $(FCDEBUG) -qarch=auto -qzerosize" )
 
 esmf_time : 
 	( cd ../external/esmf_time_f90 ; \

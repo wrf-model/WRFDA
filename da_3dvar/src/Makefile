@@ -57,8 +57,6 @@ TARGETDIR    =  ../..
 3dvar :		$(OBJS_FOR_ALL)
 		$(AR) ../../main/libwrflib.a $(OBJS_FOR_ALL)
 
-include ../../configure.wrf
-
 gen_be :	$(OBJS_FOR_GEN_BE)
 		$(AR) ../../main/libwrflib.a $(OBJS_FOR_GEN_BE)
 

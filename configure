@@ -2,6 +2,18 @@
 
 option=$1
 
+echo option = $option
+
+if [ "$option" = "3dvar" ] ; then
+    echo "configure for 3dvar"
+elif [ "$option" = "wrf" ] ; then
+    echo "configure for wrf"
+else
+   echo "Please	type	: <configure wrf> to compile wrf,"
+   echo "	or type	: <configure 3dvar> to compile 3dvar."
+   exit
+fi
+
 # lifted from the configure file for mpich; 00/03/10 jm
 #
 # Check for perl and perl version
