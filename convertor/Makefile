@@ -13,9 +13,9 @@ MODULES =	module_kma_wave2grid.o \
 LIBTARGET    =  convertor
 TARGETDIR    =  ./
 $(LIBTARGET) :  $(MODULES) $(OBJS)
-		$(AR) ../main/lib_3dvar.a $(OBJS) $(MODULES)
+		$(AR) ../main/libwrflib.a $(OBJS) $(MODULES)
 
-include ../configure.3dvar
+include ../configure.wrf
 
 module_kma_wave2grid.o: \
 		kma_wave2grid/BSSLZ1.inc \
