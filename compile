@@ -39,7 +39,7 @@ foreach a ( $argv )
       set compare_wrf = 1
     else if ( "$a" == "em_real" ) then
       set compare_wrf = 1
-    else if ( "$a" == "3dvar" ) then
+    else if ( "$a" == "3dvar" || "$a" == "k2n" || "$a" == "n2k" ) then
       set compare_wrf = 1
       set compare_3dvar = 1
     endif
