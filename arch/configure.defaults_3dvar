@@ -27,6 +27,7 @@ EXTRAMODULES    =
 PERL            =       perl
 
 LDFLAGS         =       $(FCOPTIM) $(FCBASE)
+ENVCOMPDEFS     =       CONFIGURE_COMPILEFLAGS
 
 NETCDFPATH      =       CONFIGURE_NETCDF_PATH
 NETCDF_IO_PATH  =       external/io_netcdf
@@ -75,6 +76,7 @@ EXTRAMODULES    =
 PERL            =       perl
 
 LDFLAGS         =       $(FCOPTIM) $(FCBASE)
+ENVCOMPDEFS     =       CONFIGURE_COMPILEFLAGS
 
 NETCDFPATH      =       CONFIGURE_NETCDF_PATH
 NETCDF_IO_PATH  =       external/io_netcdf
@@ -130,6 +132,7 @@ EXTRAMODULES    =
 PERL            =       perl
 
 LDFLAGS         =       $(FCOPTIM) $(FCBASE)
+ENVCOMPDEFS     =       CONFIGURE_COMPILEFLAGS
 
 NETCDFPATH      =       CONFIGURE_NETCDF_PATH
 NETCDF_IO_PATH  =       external/io_netcdf
@@ -174,6 +177,7 @@ EXTRAMODULES    =
 PERL            =       perl
 
 LDFLAGS         =
+ENVCOMPDEFS     =       CONFIGURE_COMPILEFLAGS
 
 NETCDFPATH      =       CONFIGURE_NETCDF_PATH
 NETCDF_IO_PATH  =       external/io_netcdf
@@ -224,6 +228,7 @@ EXTRAMODULES    =
 PERL            =       perl
 
 LDFLAGS         =       -byteswapio
+ENVCOMPDEFS     =       CONFIGURE_COMPILEFLAGS
 
 NETCDFPATH      =       CONFIGURE_NETCDF_PATH
 NETCDF_IO_PATH  =       external/io_netcdf
@@ -281,6 +286,7 @@ EXTRAMODULES    =
 PERL            =       perl
 
 LDFLAGS         =
+ENVCOMPDEFS     =       CONFIGURE_COMPILEFLAGS
 
 NETCDFPATH      =       CONFIGURE_NETCDF_PATH
 NETCDF_IO_PATH  =       external/io_netcdf
@@ -330,6 +336,7 @@ EXTRAMODULES    =
 PERL            =       perl
 
 LDFLAGS         =       -64 -mips4
+ENVCOMPDEFS     =       CONFIGURE_COMPILEFLAGS
 
 NETCDFPATH      =       CONFIGURE_NETCDF_PATH
 NETCDF_IO_PATH  =       external/io_netcdf
@@ -385,6 +392,7 @@ EXTRAMODULES    =
 PERL            =       perl
 
 LDFLAGS         =       $(FCOPTIM) $(FCBASE)
+ENVCOMPDEFS     =       CONFIGURE_COMPILEFLAGS
 
 NETCDFPATH      =       CONFIGURE_NETCDF_PATH
 NETCDF_IO_PATH  =       external/io_netcdf
@@ -451,6 +459,7 @@ MPI_LIB		=
 LOCAL_LIBRARIES =       
 
 LDFLAGS         =  	#-Wl"-Z 3000000"
+ENVCOMPDEFS     =       CONFIGURE_COMPILEFLAGS
 
 CPP             =       /usr/lib0/cpp
 DM_1_CPP_FLAGS	=
@@ -495,6 +504,7 @@ NETCDF_LIB	=       CONFIGURE_NETCDF_LIB_PATH
 LOCAL_LIB	=	-lmass -lmassv
 
 LDFLAGS         =	-bmaxstack:256000000 -bmaxdata:2048000000
+ENVCOMPDEFS     =       CONFIGURE_COMPILEFLAGS
 CPP             =       /lib/cpp
 DM_1_CPP_FLAGS	=
 DM_2_CPP_FLAGS	=
@@ -545,6 +555,7 @@ NETCDF_LIB	=       CONFIGURE_NETCDF_LIB_PATH
 MPI_LIB		=	-L../external/RSL/RSL -lrsl
 LOCAL_LIB	=	-lmass -lmassv
 LDFLAGS         =	-bmaxstack:256000000 -bmaxdata:2048000000
+ENVCOMPDEFS     =       CONFIGURE_COMPILEFLAGS
 CPP		=	/lib/cpp
 DM_1_CPP_FLAGS	=	-I../external/RSL/RSL -C -P `cat ../inc/dm_comm_cpp_flags`
 DM_2_CPP_FLAGS	=	-I../../external/RSL/RSL -C -P `cat ../../inc/dm_comm_cpp_flags`
@@ -611,6 +622,7 @@ PERL            =       perl
 
 LDFLAGS         =       -p../da_3dvar -p../da_3dvar/src -p../frame -p../share \
 			-L../da_3dvar -L../da_3dvar/src -L../frame -L../share
+ENVCOMPDEFS     =       CONFIGURE_COMPILEFLAGS
 
 NETCDFPATH      =       CONFIGURE_NETCDF_PATH
 NETCDF_IO_PATH  =       external/io_netcdf
@@ -669,6 +681,7 @@ PERL            =       CONFIGURE_PERL_PATH
 REGISTRY        =       Registry
 NETCDF_LIB	=       CONFIGURE_NETCDF_LIB_PATH
 LDFLAGS         =	 -Wl,-stack_size,10000000,-stack_addr,0xc0000000
+ENVCOMPDEFS     =       CONFIGURE_COMPILEFLAGS
 CPP             =       /usr/bin/cpp  -C -P -xassembler-with-cpp
 DM_1_CPP_FLAGS	=
 DM_2_CPP_FLAGS	=
@@ -709,6 +722,7 @@ PERL            =       CONFIGURE_PERL_PATH
 REGISTRY        =       Registry
 NETCDF_LIB	=       CONFIGURE_NETCDF_LIB_PATH
 LDFLAGS         =	 -Wl,-stack_size,10000000,-stack_addr,0xc0000000
+ENVCOMPDEFS     =       CONFIGURE_COMPILEFLAGS
 CPP             =       /usr/bin/cpp  -C -P -xassembler-with-cpp
 DM_1_CPP_FLAGS	=
 DM_2_CPP_FLAGS	=
