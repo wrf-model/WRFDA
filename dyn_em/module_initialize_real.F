@@ -39,7 +39,10 @@ CONTAINS
       INTEGER :: idum1, idum2
 
 #ifdef DEREF_KLUDGE
-      INTEGER     :: sm31 , em31 , sm32 , em32 , sm33 , em33
+!  see http://www.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm
+   INTEGER     :: sm31 , em31 , sm32 , em32 , sm33 , em33
+   INTEGER     :: sm31x, em31x, sm32x, em32x, sm33x, em33x
+   INTEGER     :: sm31y, em31y, sm32y, em32y, sm33y, em33y
 #endif
 
 #include "deref_kludge.h"
@@ -114,6 +117,15 @@ CONTAINS
 
 
 integer::oops1,oops2
+
+#ifdef DEREF_KLUDGE
+!  see http://www.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm
+      INTEGER     :: sm31 , em31 , sm32 , em32 , sm33 , em33
+      INTEGER     :: sm31x, em31x, sm32x, em32x, sm33x, em33x
+      INTEGER     :: sm31y, em31y, sm32y, em32y, sm33y, em33y
+#endif
+
+#include "deref_kludge.h"
 
 #define COPY_IN
 #include <em_scalar_derefs.inc>
@@ -779,7 +791,10 @@ endif
       TYPE (domain)          :: grid 
 
 #ifdef DEREF_KLUDGE
+!  see http://www.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm
       INTEGER     :: sm31 , em31 , sm32 , em32 , sm33 , em33
+      INTEGER     :: sm31x, em31x, sm32x, em32x, sm33x, em33x
+      INTEGER     :: sm31y, em31y, sm32y, em32y, sm33y, em33y
 #endif
 
 #include "deref_kludge.h"
@@ -822,6 +837,15 @@ endif
                                      its, ite, jts, jte, kts, kte, &
                                      ips, ipe, jps, jpe, kps, kpe, &
                                      i, j, k
+
+#ifdef DEREF_KLUDGE
+!  see http://www.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm
+      INTEGER     :: sm31 , em31 , sm32 , em32 , sm33 , em33
+      INTEGER     :: sm31x, em31x, sm32x, em32x, sm33x, em33x
+      INTEGER     :: sm31y, em31y, sm32y, em32y, sm33y, em33y
+#endif
+
+#include "deref_kludge.h"
 
 #define COPY_IN
 #include <em_scalar_derefs.inc>

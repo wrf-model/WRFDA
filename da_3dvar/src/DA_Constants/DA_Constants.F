@@ -267,7 +267,8 @@ MODULE DA_Constants
                            num_ssmi_tot,  num_ssmt1_tot, num_ssmt2_tot, &
                            num_satem_tot, num_satob_tot, num_ships_tot, &
                            num_sound_tot, num_airep_tot, num_qscat_tot, &
-                           num_profiler_tot, num_buoy_tot, num_gpsref_tot
+                           num_profiler_tot, num_buoy_tot, num_gpsref_tot, &
+                           num_Radar_tot
 
  integer       :: num_pseudo
  real          :: pseudo_x, pseudo_y, pseudo_z

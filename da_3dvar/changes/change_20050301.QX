@@ -1,0 +1,203 @@
+Change Log for update to wrfvar code
+---------------------------------------
+
+Author:         Ying Zhang, Xiaoyan Zhang
+Reviewer:       Qingnong Xiao
+Date:           03/01/05
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Add typoon bogussing in the 3DVAR data assimilation 
+procedure. Currently, the bogus observations are SLP
+and wind profiles. The SLP operator, its linear and
+adjoint are developed in the 3DVAR system.
+
+Expected Differences
+---------------------------------------------------
+
+No impact on 3D-Var assimilation of other regular observations.
+
+CPU/memory
+
+The CPU time and memory will be slightly increased 
+with the bogus data assimilation capability. 
+
+
+Test results (run on what machines?)
+---------------------------------------------------
+
+1. Adjoint check on Mac, serial code
+
+ DA_Check_XToY_Adjoint: Adjoint Test Results:
+ Tile < y, y     > =   6.04877058455550E+03
+ Tile < x, x_adj > =   6.04877058455550E+03
+ Whole Domain < y, y     > =   6.04877058455550E+03
+ Whole Domain < x, x_adj > =   6.04877058455550E+03
+
+
+2. Minimization run with 1 process on IBM
+
+  Starting outer iteration :   1
+  Original gradient is  1.39506800D+03
+  For this outer iteration Gradient target is  1.39506800D+01
+  Starting Cost function:  2.39537049D+04 Gradient=  1.39506800D+03
+ ----------------------------------------------------------
+
+   Iter      Gradient             Step
+
+    1      5.68821640D+02      1.06267466D-02
+    2      3.19158955D+02      3.68581823D-02
+    3      1.48009344D+02      2.47689902D-02
+    4      1.57985455D+02      5.75860787D-02
+    5      1.21219484D+02      1.87015797D-02
+    6      1.14918381D+02      3.96804906D-02
+    7      7.35290347D+01      3.88614448D-02
+    8      5.42910260D+01      3.58242120D-02
+    9      5.36012386D+01      2.75523895D-02
+   10      3.63591000D+01      2.43594884D-02
+   11      3.93401350D+01      4.59686208D-02
+   12      1.91745789D+01      4.70415379D-02
+   13      1.39947668D+01      4.69145337D-02
+   14      1.19029830D+01      8.12690598D-02
+ ----------------------------------------------------------
+  Inner iteration stopped after   14 iterations
+   Final cost function :  4.72023799D+03 and Gradient:  1.19029830D+01
+ ----------------------------------------------------------
+  Norm of cv (sqrt(cv.cv)) =  56.0865985842806154
+  Norm of xhat (sqrt(xhat.xhat)) =  56.0865985842806154
+
+    Final cost function J  =  4720.23798824462756
+
+
+3. Minimization with 16 process on IBM (2 nodes)
+
+  Starting outer iteration :   1
+  Original gradient is  1.39506800D+03
+  For this outer iteration Gradient target is  1.39506800D+01
+  Starting Cost function:  2.39537049D+04 Gradient=  1.39506800D+03
+ ----------------------------------------------------------
+
+   Iter      Gradient             Step
+
+    1      5.68821640D+02      1.06267466D-02
+    2      3.19158955D+02      3.68581823D-02
+    3      1.48009344D+02      2.47689902D-02
+    4      1.57985455D+02      5.75860787D-02
+    5      1.21219484D+02      1.87015797D-02
+    6      1.14918381D+02      3.96804906D-02
+    7      7.35290347D+01      3.88614448D-02
+    8      5.42910260D+01      3.58242120D-02
+    9      5.36012386D+01      2.75523895D-02
+   10      3.63591000D+01      2.43594884D-02
+   11      3.93401350D+01      4.59686208D-02
+   12      1.91745789D+01      4.70415379D-02
+   13      1.39947668D+01      4.69145337D-02
+   14      1.19029830D+01      8.12690598D-02
+ ----------------------------------------------------------
+  Inner iteration stopped after   14 iterations
+   Final cost function :  4.72023799D+03 and Gradient:  1.19029830D+01
+ ----------------------------------------------------------
+  Norm of cv (sqrt(cv.cv)) =  56.0865985841861132
+  Norm of xhat (sqrt(xhat.xhat)) =  56.0865985841861132
+
+    Final cost function J  =  4720.23798824490677
+
+
+----------------------------------------------------------
+Files removed
+
+   None
+
+Files added:
+
+   wrfvar/da_3dvar/changes/change_20050301.QX
+   wrfvar/da_3dvar/src/DA_Physics/DA_TPQ_To_SLP_Adj.inc
+   wrfvar/da_3dvar/src/DA_Physics/DA_TPQ_To_SLP_Lin.inc
+   wrfvar/da_3dvar/src/DA_Test/DA_Check_XToY_Adjoint_Bogus.inc
+   wrfvar/da_3dvar/src/DA_Bogus/DA_AO_Stats_Bogus.inc
+   wrfvar/da_3dvar/src/DA_Bogus/DA_Bogus.F
+   wrfvar/da_3dvar/src/DA_Bogus/DA_Calculate_GradY_Bogus.inc
+   wrfvar/da_3dvar/src/DA_Bogus/DA_Calculate_Jo_and_GradY_Bogus.inc
+   wrfvar/da_3dvar/src/DA_Bogus/DA_Calculate_Residual_Bogus.inc
+   wrfvar/da_3dvar/src/DA_Bogus/DA_OI_Stats_Bogus.inc
+   wrfvar/da_3dvar/src/DA_Bogus/DA_Print_Stats_Bogus.inc
+   wrfvar/da_3dvar/src/DA_Bogus/DA_Transform_XToY_Bogus.inc
+   wrfvar/da_3dvar/src/DA_Bogus/DA_Transform_XToY_Bogus_Adj.inc
+   wrfvar/da_3dvar/src/DA_Bogus/da_check_max_iv_bogus.inc
+   wrfvar/da_3dvar/src/DA_Bogus/da_get_innov_vector_bogus.inc
+
+Files modified:
+
+   wrfvar/Registry/Registry.3DVAR
+   wrfvar/da_3dvar/src/Makefile
+   wrfvar/da_3dvar/src/DA_Airep/DA_AO_Stats_Airep.inc
+   wrfvar/da_3dvar/src/DA_Airep/DA_OI_Stats_Airep.inc
+   wrfvar/da_3dvar/src/DA_Buoy/DA_AO_Stats_Buoy.inc
+   wrfvar/da_3dvar/src/DA_Buoy/DA_OI_Stats_Buoy.inc
+   wrfvar/da_3dvar/src/DA_Constants/DA_Constants.F
+   wrfvar/da_3dvar/src/DA_Define_Structures/DA_Allocate_Observations.inc
+   wrfvar/da_3dvar/src/DA_Define_Structures/DA_Allocate_Y.inc
+   wrfvar/da_3dvar/src/DA_Define_Structures/DA_Deallocate_Observations.inc
+   wrfvar/da_3dvar/src/DA_Define_Structures/DA_Deallocate_Y.inc
+   wrfvar/da_3dvar/src/DA_Define_Structures/DA_Define_Structures.F
+   wrfvar/da_3dvar/src/DA_Define_Structures/DA_Zero_Y.inc
+   wrfvar/da_3dvar/src/DA_Gpspw/DA_AO_Stats_Gpspw.inc
+   wrfvar/da_3dvar/src/DA_Gpspw/DA_OI_Stats_Gpspw.inc
+   wrfvar/da_3dvar/src/DA_Metar/DA_AO_Stats_Metar.inc
+   wrfvar/da_3dvar/src/DA_Metar/DA_OI_Stats_Metar.inc
+   wrfvar/da_3dvar/src/DA_Minimisation/DA_Calculate_GradY.inc
+   wrfvar/da_3dvar/src/DA_Minimisation/DA_Minimisation.F
+   wrfvar/da_3dvar/src/DA_Minimisation/da_calculate_jo_and_grady.inc
+   wrfvar/da_3dvar/src/DA_Minimisation/da_calculate_residual.inc
+   wrfvar/da_3dvar/src/DA_Minimisation/da_get_innov_vector.inc
+   wrfvar/da_3dvar/src/DA_Minimisation/da_get_var_diagnostics.inc
+   wrfvar/da_3dvar/src/DA_Minimisation/da_write_diagnostics.inc
+   wrfvar/da_3dvar/src/DA_Obs/DA_Obs.F
+   wrfvar/da_3dvar/src/DA_Obs/DA_Read_Obs.inc
+   wrfvar/da_3dvar/src/DA_Obs/DA_Scan_Obs.inc
+   wrfvar/da_3dvar/src/DA_Obs/DA_Transform_XToY.inc
+   wrfvar/da_3dvar/src/DA_Obs/DA_Transform_XToY_Adj.inc
+   wrfvar/da_3dvar/src/DA_Obs/da_add_noise_to_ob.inc
+   wrfvar/da_3dvar/src/DA_Obs/da_fill_obs_structures.inc
+   wrfvar/da_3dvar/src/DA_Obs/da_random_omb_all.inc
+   wrfvar/da_3dvar/src/DA_Obs/da_use_obs_errfac.inc
+   wrfvar/da_3dvar/src/DA_Obs/da_write_obs.inc
+   wrfvar/da_3dvar/src/DA_Obs/da_write_y.inc
+   wrfvar/da_3dvar/src/DA_Physics/DA_Physics.F
+   wrfvar/da_3dvar/src/DA_Physics/DA_TPQ_To_SLP.inc
+   wrfvar/da_3dvar/src/DA_Pilot/DA_AO_Stats_Pilot.inc
+   wrfvar/da_3dvar/src/DA_Pilot/DA_OI_Stats_Pilot.inc
+   wrfvar/da_3dvar/src/DA_Profiler/DA_AO_Stats_Profiler.inc
+   wrfvar/da_3dvar/src/DA_Profiler/DA_OI_Stats_Profiler.inc
+   wrfvar/da_3dvar/src/DA_Satob/DA_AO_Stats_Satob.inc
+   wrfvar/da_3dvar/src/DA_Satob/DA_OI_Stats_Satob.inc
+   wrfvar/da_3dvar/src/DA_Setup_Structures/DA_Add_PBL_And_SFC_Info.inc
+   wrfvar/da_3dvar/src/DA_Setup_Structures/da_setup_obs_interp_wts.inc
+   wrfvar/da_3dvar/src/DA_Setup_Structures/da_setup_obs_structures.inc
+   wrfvar/da_3dvar/src/DA_Setup_Structures/da_setup_obs_structures_ascii.inc
+   wrfvar/da_3dvar/src/DA_Setup_Structures/da_transfer_mm5toxb.inc
+   wrfvar/da_3dvar/src/DA_Setup_Structures/da_transfer_wrftoxb.inc
+   wrfvar/da_3dvar/src/DA_Ships/DA_AO_Stats_Ships.inc
+   wrfvar/da_3dvar/src/DA_Ships/DA_OI_Stats_Ships.inc
+   wrfvar/da_3dvar/src/DA_Sound/DA_AO_Stats_Sound.inc
+   wrfvar/da_3dvar/src/DA_Sound/DA_OI_Stats_Sound.inc
+   wrfvar/da_3dvar/src/DA_Sound/DA_Sonde_sfc/DA_AO_Stats_Sonde_sfc.inc
+   wrfvar/da_3dvar/src/DA_Sound/DA_Sonde_sfc/DA_OI_Stats_Sonde_sfc.inc
+   wrfvar/da_3dvar/src/DA_Synop/DA_AO_Stats_Synop.inc
+   wrfvar/da_3dvar/src/DA_Synop/DA_OI_Stats_Synop.inc
+   wrfvar/da_3dvar/src/DA_Test/DA_Check_XToY_Adjoint.inc
+   wrfvar/da_3dvar/src/DA_Test/DA_Test.F
+   wrfvar/da_3dvar/src/DA_Tools/DA_Read_Namelist.inc
+   wrfvar/da_3dvar/src/da_pseudo/da_oa_stats_pseudo.inc
+   wrfvar/da_3dvar/src/da_pseudo/da_ob_stats_pseudo.inc
+   wrfvar/da_3dvar/src/da_qscat/da_oa_stats_qscat.inc
+   wrfvar/da_3dvar/src/da_qscat/da_ob_stats_qscat.inc
+   wrfvar/da_3dvar/src/par_util/proc_sum_count_obs.inc
+   wrfvar/external/io_netcdf/makefile
+   wrfvar/run/DA_Run_3DVAR.csh
+
+New Tag:
+
+version_2_0_3_0
+

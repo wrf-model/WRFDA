@@ -30,7 +30,7 @@ SUBROUTINE med_before_solve_io ( grid , config_flags )
    USE module_domain
   ! Model layer
    USE module_configure
-   USE esmf_mod
+   USE WRF_ESMF_MOD
 
    IMPLICIT NONE
 
@@ -42,52 +42,52 @@ SUBROUTINE med_before_solve_io ( grid , config_flags )
 
    IF( ESMF_AlarmIsRinging( grid%alarms( HISTORY_ALARM ), rc=rc ) ) THEN
      CALL med_history_out ( grid , config_flags )
-     CALL ESMF_AlarmTurnOff( grid%alarms( HISTORY_ALARM ), rc=rc )
+     CALL ESMF_AlarmRingerOff( grid%alarms( HISTORY_ALARM ), rc=rc )
    ENDIF
 
    IF( ESMF_AlarmIsRinging( grid%alarms( INPUTOUT_ALARM ), rc=rc ) ) THEN
      CALL med_filter_out  ( grid , config_flags )
-     CALL ESMF_AlarmTurnOff( grid%alarms( INPUTOUT_ALARM ), rc=rc )
+     CALL ESMF_AlarmRingerOff( grid%alarms( INPUTOUT_ALARM ), rc=rc )
    ENDIF
 
 ! - AUX HISTORY OUTPUT 
    IF( ESMF_AlarmIsRinging( grid%alarms( AUXHIST1_ALARM ), rc=rc ) ) THEN
      CALL med_auxhist1_out ( grid , config_flags )
-     CALL ESMF_AlarmTurnOff( grid%alarms( AUXHIST1_ALARM ), rc=rc )
+     CALL ESMF_AlarmRingerOff( grid%alarms( AUXHIST1_ALARM ), rc=rc )
    ENDIF
    IF( ESMF_AlarmIsRinging( grid%alarms( AUXHIST2_ALARM ), rc=rc ) ) THEN
      CALL med_auxhist2_out ( grid , config_flags )
-     CALL ESMF_AlarmTurnOff( grid%alarms( AUXHIST2_ALARM ), rc=rc )
+     CALL ESMF_AlarmRingerOff( grid%alarms( AUXHIST2_ALARM ), rc=rc )
    ENDIF
    IF( ESMF_AlarmIsRinging( grid%alarms( AUXHIST3_ALARM ), rc=rc ) ) THEN
      CALL med_auxhist3_out ( grid , config_flags )
-     CALL ESMF_AlarmTurnOff( grid%alarms( AUXHIST3_ALARM ), rc=rc )
+     CALL ESMF_AlarmRingerOff( grid%alarms( AUXHIST3_ALARM ), rc=rc )
    ENDIF
    IF( ESMF_AlarmIsRinging( grid%alarms( AUXHIST4_ALARM ), rc=rc ) ) THEN
      CALL med_auxhist4_out ( grid , config_flags )
-     CALL ESMF_AlarmTurnOff( grid%alarms( AUXHIST4_ALARM ), rc=rc )
+     CALL ESMF_AlarmRingerOff( grid%alarms( AUXHIST4_ALARM ), rc=rc )
    ENDIF
    IF( ESMF_AlarmIsRinging( grid%alarms( AUXHIST5_ALARM ), rc=rc ) ) THEN
      CALL med_auxhist5_out ( grid , config_flags )
-     CALL ESMF_AlarmTurnOff( grid%alarms( AUXHIST5_ALARM ), rc=rc )
+     CALL ESMF_AlarmRingerOff( grid%alarms( AUXHIST5_ALARM ), rc=rc )
    ENDIF
 
 ! - AUX INPUT INPUT
    IF( ESMF_AlarmIsRinging( grid%alarms( AUXINPUT1_ALARM ), rc=rc ) ) THEN
      CALL med_auxinput1_in ( grid , config_flags )
-     CALL ESMF_AlarmTurnOff( grid%alarms( AUXINPUT1_ALARM ), rc=rc )
+     CALL ESMF_AlarmRingerOff( grid%alarms( AUXINPUT1_ALARM ), rc=rc )
    ENDIF
    IF( ESMF_AlarmIsRinging( grid%alarms( AUXINPUT2_ALARM ), rc=rc ) ) THEN
      CALL med_auxinput2_in ( grid , config_flags )
-     CALL ESMF_AlarmTurnOff( grid%alarms( AUXINPUT2_ALARM ), rc=rc )
+     CALL ESMF_AlarmRingerOff( grid%alarms( AUXINPUT2_ALARM ), rc=rc )
    ENDIF
    IF( ESMF_AlarmIsRinging( grid%alarms( AUXINPUT3_ALARM ), rc=rc ) ) THEN
      CALL med_auxinput3_in ( grid , config_flags )
-     CALL ESMF_AlarmTurnOff( grid%alarms( AUXINPUT3_ALARM ), rc=rc )
+     CALL ESMF_AlarmRingerOff( grid%alarms( AUXINPUT3_ALARM ), rc=rc )
    ENDIF
    IF( ESMF_AlarmIsRinging( grid%alarms( AUXINPUT4_ALARM ), rc=rc ) ) THEN
      CALL med_auxinput4_in ( grid , config_flags )
-     CALL ESMF_AlarmTurnOff( grid%alarms( AUXINPUT4_ALARM ), rc=rc )
+     CALL ESMF_AlarmRingerOff( grid%alarms( AUXINPUT4_ALARM ), rc=rc )
    ENDIF
 
 ! this needs to be looked at again so we can get rid of the special
@@ -101,7 +101,7 @@ SUBROUTINE med_before_solve_io ( grid , config_flags )
    IF( ESMF_AlarmIsRinging( grid%alarms( AUXINPUT5_ALARM ), rc=rc ) ) THEN
     print *,' CALL med_read_wrf_chem_emiss '
      CALL med_read_wrf_chem_emiss ( grid , config_flags )
-     CALL ESMF_AlarmTurnOff( grid%alarms( AUXINPUT5_ALARM ), rc=rc )
+     CALL ESMF_AlarmRingerOff( grid%alarms( AUXINPUT5_ALARM ), rc=rc )
     print *,' back from CALL med_read_wrf_chem_emiss '
 
    ENDIF
@@ -110,7 +110,7 @@ SUBROUTINE med_before_solve_io ( grid , config_flags )
   ELSE
    IF( ESMF_AlarmIsRinging( grid%alarms( AUXINPUT5_ALARM ), rc=rc ) ) THEN
      CALL med_auxinput5_in ( grid , config_flags )
-     CALL ESMF_AlarmTurnOff( grid%alarms( AUXINPUT5_ALARM ), rc=rc )
+     CALL ESMF_AlarmRingerOff( grid%alarms( AUXINPUT5_ALARM ), rc=rc )
    ENDIF
   ENDIF
 #endif
@@ -118,7 +118,7 @@ SUBROUTINE med_before_solve_io ( grid , config_flags )
 ! - RESTART OUTPUT
    IF( ESMF_AlarmIsRinging( grid%alarms( RESTART_ALARM ), rc=rc ) ) THEN
      CALL med_restart_out ( grid , config_flags )
-     CALL ESMF_AlarmTurnOff( grid%alarms( RESTART_ALARM ), rc=rc )
+     CALL ESMF_AlarmRingerOff( grid%alarms( RESTART_ALARM ), rc=rc )
    ENDIF
 
 ! - Look for boundary data after writing out history and restart files
@@ -367,8 +367,8 @@ integer myproc
 
   ELSE
 
-    CALL ESMF_ClockGetCurrTime( nest%domain_clock, CurrTime=CurrTime, rc=ierr )
-    CALL ESMF_TimeGetString( CurrTime, timestr, rc=ierr )
+    CALL ESMF_ClockGet( nest%domain_clock, CurrTime=CurrTime, rc=ierr )
+    CALL wrf_timetoa ( CurrTime, timestr )
     CALL construct_filename2a ( rstname , config_flags%rst_inname , nest%id , 2 , timestr )
 
     WRITE(message,*)'opening ',TRIM(rstname),' for reading'
@@ -452,14 +452,14 @@ SUBROUTINE med_nest_move ( parent, nest )
      END SUBROUTINE shift_domain_em
      LOGICAL FUNCTION TIME_FOR_MOVE ( grid , dx , dy )
         USE module_domain
-        USE esmf_mod
+        USE WRF_ESMF_MOD
         TYPE(domain) , POINTER    :: grid
         INTEGER, INTENT(OUT)      :: dx , dy
      END FUNCTION TIME_FOR_MOVE
    END INTERFACE
 
 #ifdef DEREF_KLUDGE
-   ! see <a href="www.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm">here</a>
+! see <a href="www.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm">here</a>
    INTEGER     :: sm31 , em31 , sm32 , em32 , sm33 , em33
    INTEGER     :: sm31x, em31x, sm32x, em32x, sm33x, em33x
    INTEGER     :: sm31y, em31y, sm32y, em32y, sm33y, em33y
@@ -551,7 +551,7 @@ LOGICAL FUNCTION time_for_move ( grid , move_cd_x, move_cd_y )
   ! Driver layer
    USE module_domain
    USE module_configure
-   USE esmf_mod
+   USE WRF_ESMF_MOD
    IMPLICIT NONE
 ! arguments
    TYPE(domain) , POINTER    :: grid
@@ -564,8 +564,7 @@ LOGICAL FUNCTION time_for_move ( grid , move_cd_x, move_cd_y )
    CHARACTER*256 mess
 
    TIME_FOR_MOVE = .FALSE.
-   CALL ESMF_ClockGetCurrTime( grid%domain_clock, CurrTime=ct, rc=rc )
-   CALL ESMF_ClockGetStartTime( grid%domain_clock, StartTime=st, rc=rc )
+   CALL ESMF_ClockGet( grid%domain_clock, CurrTime=ct, StartTime=st, rc=rc )
    CALL nl_get_num_moves( 1, num_moves )
    IF ( num_moves .GT. max_moves ) THEN
      WRITE(mess,*)'mediation_integrate: time_for_move: num_moves (',num_moves,') .GT. max_moves (',max_moves,')'
@@ -616,13 +615,19 @@ SUBROUTINE shift_domain_em ( grid , disp_x, disp_y, &
                                       ims , ime , jms , jme , kms , kme , &
                                       ips , ipe , jps , jpe , kps , kpe
    TYPE (grid_config_rec_type)  :: config_flags
-
+#ifdef DEREF_KLUDGE
+! see <a href="www.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm">here</a>
+   INTEGER     :: sm31 , em31 , sm32 , em32 , sm33 , em33
+   INTEGER     :: sm31x, em31x, sm32x, em32x, sm33x, em33x
+   INTEGER     :: sm31y, em31y, sm32y, em32y, sm33y, em33y
+#endif
 
    !  Definitions of dummy arguments to solve
 #include <em_dummy_decl.inc>
 
 #define COPY_IN
 #include <em_scalar_derefs.inc>
+#include "deref_kludge.h"
 #ifdef DM_PARALLEL
 #      include <em_data_calls.inc>
 #endif
@@ -674,7 +679,7 @@ SUBROUTINE med_nest_force ( parent , nest )
   ! Model layer
    USE module_configure
   ! External
-   USE esmf_mod
+   USE WRF_ESMF_MOD
 
    IMPLICIT NONE
 
@@ -715,7 +720,7 @@ SUBROUTINE med_nest_feedback ( parent , nest , config_flags )
    USE module_configure
   ! Model layer
   ! External
-   USE esmf_mod
+   USE WRF_ESMF_MOD
    IMPLICIT NONE
 
 
@@ -818,7 +823,7 @@ SUBROUTINE med_restart_out ( grid , config_flags )
   ! Model layer
    USE module_configure
    USE module_bc_time_utilities
-   USE ESMF_Mod
+   USE WRF_ESMF_MOD
 
    IMPLICIT NONE
 
@@ -840,8 +845,8 @@ SUBROUTINE med_restart_out ( grid , config_flags )
      CALL start_timing
    END IF
 
-   CALL ESMF_ClockGetCurrTime( grid%domain_clock, CurrTime=CurrTime, rc=ierr )
-   CALL ESMF_TimeGetString( CurrTime, timestr, rc=ierr )
+   CALL ESMF_ClockGet( grid%domain_clock, CurrTime=CurrTime, rc=ierr )
+   CALL wrf_timetoa ( CurrTime, timestr )
    CALL construct_filename2a ( rstname , config_flags%rst_outname , grid%id , 2 , timestr )
 
    WRITE( message , '("med_restart_out: opening ",A," for writing")' ) TRIM ( rstname )
@@ -869,7 +874,7 @@ SUBROUTINE med_history_out ( grid , config_flags )
   ! Model layer
    USE module_configure
    USE module_bc_time_utilities
-   USE ESMF_Mod
+   USE WRF_ESMF_MOD
 
    IMPLICIT NONE
 
@@ -893,8 +898,8 @@ SUBROUTINE med_history_out ( grid , config_flags )
 
    IF ( grid%oid .eq. 0 ) THEN
 
-     CALL ESMF_ClockGetCurrTime( grid%domain_clock, CurrTime=CurrTime, rc=ierr )
-     CALL ESMF_TimeGetString( CurrTime, timestr, rc=ierr )
+     CALL ESMF_ClockGet( grid%domain_clock, CurrTime=CurrTime, rc=ierr )
+     CALL wrf_timetoa ( CurrTime, timestr )
      CALL construct_filename2a ( outname , config_flags%history_outname , grid%id , 2 , timestr )
 
      WRITE ( message , '("med_history_out 1: opening ",A," for writing. ",I3)') TRIM ( outname ), ierr
@@ -984,8 +989,7 @@ SUBROUTINE med_auxhist_out ( grid , stream, config_flags )
    USE module_io_domain
    USE module_configure
    USE module_bc_time_utilities
-
-   USE ESMF_Mod
+   USE WRF_ESMF_MOD
 
    IMPLICIT NONE
   ! Arguments
@@ -1012,8 +1016,8 @@ SUBROUTINE med_auxhist_out ( grid , stream, config_flags )
         .or. ( stream .eq. 4 .and. grid%auxhist4_oid .eq. 0 )    &
         .or. ( stream .eq. 5 .and. grid%auxhist5_oid .eq. 0 )    &
       ) THEN
-     CALL ESMF_ClockGetCurrTime( grid%domain_clock, CurrTime=CurrTime, rc=ierr )
-     CALL ESMF_TimeGetString( CurrTime, timestr, rc=ierr )
+     CALL ESMF_ClockGet( grid%domain_clock, CurrTime=CurrTime, rc=ierr )
+     CALL wrf_timetoa ( CurrTime, timestr )
      SELECT CASE( stream )
        CASE ( 1 )
          CALL construct_filename2a ( auxname , config_flags%auxhist1_outname , grid%id , 2 , timestr )
@@ -1056,11 +1060,11 @@ SUBROUTINE med_auxhist_out ( grid , stream, config_flags )
      CASE ( 2 )
        CALL output_aux_hist2 ( grid%auxhist2_oid, grid , config_flags , ierr )
      CASE ( 3 )
-       CALL output_aux_hist2 ( grid%auxhist3_oid, grid , config_flags , ierr )
+       CALL output_aux_hist3 ( grid%auxhist3_oid, grid , config_flags , ierr )
      CASE ( 4 )
-       CALL output_aux_hist2 ( grid%auxhist4_oid, grid , config_flags , ierr )
+       CALL output_aux_hist4 ( grid%auxhist4_oid, grid , config_flags , ierr )
      CASE ( 5 )
-       CALL output_aux_hist2 ( grid%auxhist5_oid, grid , config_flags , ierr )
+       CALL output_aux_hist5 ( grid%auxhist5_oid, grid , config_flags , ierr )
    END SELECT
    RETURN
 END SUBROUTINE med_auxhist_out
@@ -1122,7 +1126,7 @@ SUBROUTINE med_auxinput_in ( grid , stream, config_flags )
   ! Model layer
    USE module_configure
    USE module_bc_time_utilities
-   USE ESMF_Mod
+   USE WRF_ESMF_MOD
 
    IMPLICIT NONE
   ! Arguments
@@ -1149,8 +1153,8 @@ SUBROUTINE med_auxinput_in ( grid , stream, config_flags )
         .or. ( stream .eq. 4 .and. grid%auxinput4_oid .eq. 0 )    &
         .or. ( stream .eq. 5 .and. grid%auxinput5_oid .eq. 0 )    &
       ) THEN
-     CALL ESMF_ClockGetCurrTime( grid%domain_clock, CurrTime=CurrTime, rc=ierr )
-     CALL ESMF_TimeGetString( CurrTime, timestr, rc=ierr )
+     CALL ESMF_ClockGet( grid%domain_clock, CurrTime=CurrTime, rc=ierr )
+     CALL wrf_timetoa ( CurrTime, timestr )
      SELECT CASE( stream )
        CASE ( 1 )
          CALL construct_filename2a ( auxname , config_flags%auxinput1_inname, grid%id , 2 , timestr )
@@ -1242,8 +1246,8 @@ SUBROUTINE med_filter_out ( grid , config_flags )
      CALL start_timing
    END IF
 
-     CALL ESMF_ClockGetCurrTime( grid%domain_clock, CurrTime=CurrTime, rc=ierr )
-     CALL ESMF_TimeGetString( CurrTime, timestr, rc=ierr )
+     CALL ESMF_ClockGet( grid%domain_clock, CurrTime=CurrTime, rc=ierr )
+     CALL wrf_timetoa ( CurrTime, timestr )
      CALL construct_filename2a ( outname , config_flags%input_outname , grid%id , 2 , timestr )
 
      WRITE ( message , '("med_filter_out 1: opening ",A," for writing. ",I3)') TRIM ( outname ), ierr
@@ -1279,7 +1283,7 @@ SUBROUTINE med_latbound_in ( grid , config_flags )
   ! Model layer
    USE module_configure
    USE module_bc_time_utilities
-   USE esmf_mod
+   USE WRF_ESMF_MOD
 
    IMPLICIT NONE
 
@@ -1299,7 +1303,7 @@ SUBROUTINE med_latbound_in ( grid , config_flags )
    Type (ESMF_Time )                      :: time, btime
    Type (ESMF_Time )                      :: current_time
 
-!include <wrf_io_flags.h>
+#include <wrf_io_flags.h>
 
    CALL wrf_debug ( 1 , 'in med_latbound_in' )
 
@@ -1312,7 +1316,7 @@ SUBROUTINE med_latbound_in ( grid , config_flags )
 
      ELSE IF ( ESMF_AlarmIsRinging( grid%alarms( BOUNDARY_ALARM ), rc=rc ) ) THEN
        CALL wrf_debug ( 1 , 'in med_latbound_in preparing to read' )
-       CALL ESMF_AlarmTurnOff( grid%alarms( BOUNDARY_ALARM ), rc=rc )
+       CALL ESMF_AlarmRingerOff( grid%alarms( BOUNDARY_ALARM ), rc=rc )
        IF ( wrf_dm_on_monitor() ) CALL start_timing
 
 ! typically a <date> wouldn't be part of the bdy_inname, so just pass a dummy
@@ -1338,7 +1342,7 @@ SUBROUTINE med_latbound_in ( grid , config_flags )
        CALL wrf_debug( 100 , 'med_latbound_in: calling input_boundary ' )
        CALL input_boundary ( grid%lbc_fid, grid , config_flags , ierr )
 
-       CALL ESMF_ClockGetCurrTime( grid%domain_clock, current_time, rc=rc)
+       CALL ESMF_ClockGet( grid%domain_clock, CurrTime=current_time, rc=rc)
        DO WHILE (current_time .GE. grid%next_bdy_time )         ! next_bdy_time is set by input_boundary from bdy file
          CALL wrf_debug( 100 , 'med_latbound_in: calling input_boundary ' )
          CALL input_boundary ( grid%lbc_fid, grid , config_flags , ierr )
@@ -1393,3 +1397,191 @@ SUBROUTINE med_setup_step ( grid , config_flags )
 
 END SUBROUTINE med_setup_step
  
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+SUBROUTINE med_read_wrf_chem_emiss ( grid , config_flags )
+  ! Driver layer
+   USE module_domain
+   USE module_io_domain
+   USE module_timing
+  ! Model layer
+   USE module_configure
+   USE module_bc_time_utilities
+#ifdef DM_PARALLEL
+   USE module_dm
+#endif
+   USE module_date_time
+   USE WRF_ESMF_Mod
+
+   IMPLICIT NONE
+
+  ! Arguments
+   TYPE(domain)                               :: grid
+
+!  TYPE (grid_config_rec_type) , INTENT(IN)   :: config_flags
+   TYPE (grid_config_rec_type)                :: config_flags
+   Type (ESMF_Time )                          :: start_time, stop_time, current_time
+   TYPE(ESMF_TimeInterval)                    :: time_interval
+
+  ! Local data
+   LOGICAL, EXTERNAL                      :: wrf_dm_on_monitor
+
+   INTEGER                                :: ierr, efid
+   REAL                                   :: time, tupdate
+   real, allocatable :: dumc0(:,:,:)
+   CHARACTER (LEN=256)                    :: message, current_date_char, date_string
+   CHARACTER (LEN=80)                     :: inpname
+
+#include <wrf_io_flags.h>
+
+     CALL model_to_grid_config_rec ( grid%id , model_config_rec , config_flags )
+
+    IF ( grid%id .EQ. 1 ) THEN
+
+      CALL ESMF_ClockGet( grid%domain_clock, grid%current_time, rc=ierr )
+      CALL ESMF_TimeGetString( grid%current_time, current_date_char, rc=ierr )
+
+      time = float(grid%itimestep) * grid%dt
+      tupdate = mod( time, (12. * 3600.) )
+      IF( grid%current_time + grid%step_time .GE. grid%stop_time .AND.                  &
+          grid%auxinput5_oid .NE. 0 ) THEN
+        CALL close_dataset ( grid%auxinput5_oid , config_flags , "DATASET=AUXINPUT5" )
+        tupdate = 1.
+      ENDIF
+
+       print *,' EMISSIONS UPDATE TIME ',time,TRIM(current_date_char(12:13))
+       print *,tupdate
+
+
+      IF ( tupdate .EQ. 0. .AND.  current_date_char(12:13) .EQ. '00' ) THEN
+         CALL construct_filename1 ( inpname , 'wrfchemi_00z' , grid%id , 2 )
+         WRITE(message,*)'mediation_integrate: med_read_wrf_chem_emissions: Open file ',TRIM(inpname)
+         CALL wrf_message( TRIM(message) )
+
+        if( grid%auxinput5_oid .NE. 0 ) then
+          CALL close_dataset ( grid%auxinput5_oid , config_flags , "DATASET=AUXINPUT5" )
+        endif
+
+        CALL open_r_dataset ( grid%auxinput5_oid, TRIM(inpname) , grid , config_flags, &
+                              "DATASET=AUXINPUT5", ierr )
+        IF ( ierr .NE. 0 ) THEN
+           WRITE( message , * ) 'med_read_wrf_chem_emissions: error opening ', TRIM( inpname )
+           CALL wrf_error_fatal( TRIM( message ) )
+        ENDIF
+      ELSE IF ( tupdate .EQ. 0. .AND. current_date_char(12:13) .EQ. '12' ) THEN
+         CALL construct_filename1 ( inpname , 'wrfchemi_12z' , grid%id , 2 )
+         WRITE(message,*)'mediation_integrate: med_read_wrf_chem_emissions: Open file ',TRIM(inpname)
+         CALL wrf_message( TRIM(message) )
+
+        if( grid%auxinput5_oid .NE. 0 ) then
+          CALL close_dataset ( grid%auxinput5_oid , config_flags , "DATASET=AUXINPUT5" )
+        endif
+
+        CALL open_r_dataset ( grid%auxinput5_oid, TRIM(inpname) , grid , config_flags, &
+                              "DATASET=AUXINPUT5", ierr )
+        IF ( ierr .NE. 0 ) THEN
+           WRITE( message , * ) 'med_read_wrf_chem_emissions: error opening ', TRIM( inpname )
+           CALL wrf_error_fatal( TRIM( message ) )
+        ENDIF
+      ENDIF
+
+       print *,' HOURLY EMISSIONS UPDATE TIME ',time,mod(time,3600.)
+!      print *, grid%current_time + grid%step_time, grid%stop_time
+! hourly updates to emissions
+      IF ( ( mod( time, 3600. ) .EQ. 0   ) .AND. &
+           ( grid%current_time + grid%step_time .LT. grid%stop_time ) ) THEN
+!        IF ( wrf_dm_on_monitor() ) CALL start_timing
+
+         WRITE(message,*)'mediation_integrate: med_read_wrf_chem_emissions: Read emissions for time ',TRIM(current_date_char)
+         CALL wrf_message( TRIM(message) )
+
+         CALL wrf_debug (100 , 'mediation_integrate: calling input_aux_model_input5' )
+         CALL input_aux_model_input5 ( grid%auxinput5_oid, grid , config_flags , ierr )
+      ELSE
+         CALL wrf_debug (100 , 'mediation_integrate: med_read_wrf_chem_emissions: Do not read emissions' )
+      ENDIF
+
+!     ! Close the data file at 11z and 23z
+!     IF ( ( time - 11. * 3600. ) .GE. 0.   ) THEN
+!        CALL close_dataset ( grid%auxinput5_oid , config_flags , "DATASET=AUXINPUT5" )
+!     ENDIF
+
+   ENDIF
+   CALL wrf_debug (100 , 'mediation_integrate: med_read_wrf_chem_emissions: exit' )
+
+END SUBROUTINE med_read_wrf_chem_emiss
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+SUBROUTINE med_read_wrf_chem_bioemiss ( grid , config_flags )
+  ! Driver layer
+   USE module_domain
+   USE module_io_domain
+   USE module_timing
+  ! Model layer
+   USE module_configure
+   USE module_bc_time_utilities
+#ifdef DM_PARALLEL
+   USE module_dm
+#endif
+   USE module_date_time
+   USE WRF_ESMF_Mod
+
+   IMPLICIT NONE
+
+  ! Arguments
+   TYPE(domain)                               :: grid
+
+   TYPE (grid_config_rec_type) , INTENT(IN)   :: config_flags
+   Type (ESMF_Time )                          :: start_time, stop_time, current_time
+   TYPE(ESMF_TimeInterval)                    :: time_interval
+
+  ! Local data
+   LOGICAL, EXTERNAL                      :: wrf_dm_on_monitor
+
+   INTEGER                                :: ierr, efid
+   REAL                                   :: time, tupdate
+   real, allocatable :: dumc0(:,:,:)
+   CHARACTER (LEN=256)                    :: message, current_date_char, date_string
+   CHARACTER (LEN=80)                     :: inpname
+
+#include <wrf_io_flags.h>
+    IF ( grid%id .EQ. 1 ) THEN
+
+      CALL ESMF_ClockGet( grid%domain_clock, grid%current_time, rc=ierr )
+      CALL ESMF_TimeGetString( grid%current_time, current_date_char, rc=ierr )
+
+!     IF( grid%current_time + grid%step_time .GE. grid%stop_time ) then
+!       return
+!     ENDIF
+
+      CALL construct_filename1 ( inpname , 'wrfbiochemi' , grid%id , 2 )
+      WRITE(message,*)'mediation_integrate: med_read_wrf_chem_bioemissions: Open file ',TRIM(inpname)
+      CALL wrf_message( TRIM(message) )
+
+     if( grid%auxinput4_oid .NE. 0 ) then
+       CALL close_dataset ( grid%auxinput4_oid , config_flags , "DATASET=AUXINPUT4" )
+     endif
+
+      CALL open_r_dataset ( grid%auxinput4_oid, TRIM(inpname) , grid , config_flags, &
+                              "DATASET=AUXINPUT4", ierr )
+        IF ( ierr .NE. 0 ) THEN
+           WRITE( message , * ) 'med_read_wrf_chem_bioemissions: error opening ', TRIM( inpname )
+           CALL wrf_error_fatal( TRIM( message ) )
+        ENDIF
+
+         WRITE(message,*)'mediation_integrate: med_read_wrf_chem_bioemissions: Read biogenic emissions at time ',TRIM(current_date_char)
+         CALL wrf_message( TRIM(message) )
+
+         CALL wrf_debug (100 , 'mediation_integrate: calling input_aux_model_input4' )
+         CALL input_aux_model_input4 ( grid%auxinput4_oid, grid , config_flags , ierr )
+
+         CALL close_dataset ( grid%auxinput4_oid , config_flags , "DATASET=AUXINPUT4" )
+
+   ENDIF
+   CALL wrf_debug (100 , 'mediation_integrate: med_read_wrf_chem_bioemissions: exit' )
+
+END SUBROUTINE med_read_wrf_chem_bioemiss
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

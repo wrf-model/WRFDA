@@ -1,4 +1,4 @@
-SUBROUTINE DA_UV_To_Divergence_adj( xp, ds, map_factor, u, v, div, &
+SUBROUTINE DA_UV_To_Divergence_adj( xp, u, v, coefx, coefy, div, &
                                ids,ide, jds,jde, kds,kde,  &
                                ims,ime, jms,jme, kms,kme,  &
                                its,ite, jts,jte, kts,kte )
@@ -6,9 +6,9 @@ SUBROUTINE DA_UV_To_Divergence_adj( xp, ds, map_factor, u, v, div, &
 !------------------------------------------------------------------------------
 !  PURPOSE: Adjoint of the subroutine DA_UV_To_Divergence
 !
-!  ASSUMPTIONS: dx = dy = ds
-!
 !  HISTORY: 09/28/2002 - Qingnong Xiao
+!           02/02/2005 - Global update       Syed RH Rizvi 
+!
 !------------------------------------------------------------------------------
 
    implicit none
@@ -19,8 +19,8 @@ SUBROUTINE DA_UV_To_Divergence_adj( xp, ds, map_factor, u, v, div, &
    integer, intent(in):: ims,ime, jms,jme, kms,kme    ! memory dims.
    integer, intent(in):: its,ite, jts,jte, kts,kte    ! tile   dims.
 
-   real, intent(in)   :: ds                           ! Resolution.
-   real, intent(in)   :: map_factor(ims:ime,jms:jme)  ! Map fact.
+   real, intent(in)   :: coefx(ims:ime,jms:jme)       ! Multiplicative const.
+   real, intent(in)   :: coefy(ims:ime,jms:jme)       ! Multiplicative const.
    real, intent(out)  :: u(ims:ime,jms:jme,kms:kme)   ! u wind comp.
    real, intent(out)  :: v(ims:ime,jms:jme,kms:kme)   ! v wind comp.
    real, intent(inout):: div(ims:ime,jms:jme,kms:kme) ! Divergence.
@@ -28,20 +28,12 @@ SUBROUTINE DA_UV_To_Divergence_adj( xp, ds, map_factor, u, v, div, &
    integer            :: i, j, k                      ! Loop counters.
    integer            :: is, ie                       ! 1st dim. end points.
    integer            :: js, je                       ! 2nd dim. end points.
-   real               :: inv_2ds                      ! 1/2ds.
    real               :: one_third                    ! 1/3.
-   real               :: coeff
-   real               :: um(ims:ime,jms:jme)          ! Temp. storage of u/m.
-   real               :: vm(ims:ime,jms:jme)          ! Temp. storage of v/m.
 
 !------------------------------------------------------------------------------
 !  [1.0] Initialise:
 !------------------------------------------------------------------------------
 
-   um(ims:ime,jms:jme) = 0.
-   vm(ims:ime,jms:jme) = 0.
-
-   inv_2ds = 0.5 / ds
    one_third = 1.0 / 3.0
 
    if(Testing_3DVAR) then
@@ -121,26 +113,15 @@ SUBROUTINE DA_UV_To_Divergence_adj( xp, ds, map_factor, u, v, div, &
       endif
 !-------------------------------------------------------------------------
 
-      DO j = js, je
-         DO i = is, ie
-           coeff = map_factor(i,j) * map_factor(i,j) * inv_2ds
-           um(i+1,j)=um(i+1,j)+div(i,j,k)*coeff
-           um(i-1,j)=um(i-1,j)-div(i,j,k)*coeff
-           vm(i,j+1)=vm(i,j+1)+div(i,j,k)*coeff
-           vm(i,j-1)=vm(i,j-1)-div(i,j,k)*coeff
-        END DO
-      END DO
-   
-      u(is-1:ie+1,js-1:je+1,k) = u(is-1:ie+1,js-1:je+1,k) &
-                               +um(is-1:ie+1,js-1:je+1) / map_factor(is-1:ie+1,js-1:je+1)
-      v(is-1:ie+1,js-1:je+1,k) = v(is-1:ie+1,js-1:je+1,k) &
-                               +vm(is-1:ie+1,js-1:je+1) / map_factor(is-1:ie+1,js-1:je+1)
-
-      um(:,:)=0.
-      vm(:,:)=0.
-
+    do j = je, js, -1
+     do i = ie, is, -1  
+          u(i+1,j,k) = u(i+1,j,k) + coefx(i,j) * div(i,j,k) 
+          u(i-1,j,k) = u(i-1,j,k) - coefx(i,j) * div(i,j,k) 
+          v(i,j+1,k) = v(i,j+1,k) + coefy(i,j) * div(i,j,k) 
+          v(i,j-1,k) = v(i,j-1,k) - coefy(i,j) * div(i,j,k) 
+     end do
+    enddo
    END DO
 
    div = 0.0
-
 END SUBROUTINE DA_UV_To_Divergence_adj
