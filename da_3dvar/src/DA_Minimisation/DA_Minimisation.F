@@ -26,6 +26,7 @@
       USE DA_SSMI
       USE DA_Satem
       USE da_pseudo
+      USE DA_Bogus
       USE DA_Profiler
       USE DA_Buoy 
       USE DA_Setup_Structures

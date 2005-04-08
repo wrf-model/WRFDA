@@ -5,7 +5,7 @@ SUBROUTINE DA_OI_Stats_Metar ( stats_unit, oi )
    INTEGER,        INTENT (in)      :: stats_unit    ! Output unit for stats.
    TYPE (ob_type), INTENT (in)      :: oi            ! OI
 
-   TYPE (stats_type)                :: metar
+   TYPE (stats_metar_type)                :: metar
    INTEGER                          :: nu, nv, nt, np, nq
    INTEGER                          :: n
 
@@ -27,7 +27,7 @@ SUBROUTINE DA_OI_Stats_Metar ( stats_unit, oi )
    metar%minimum%t = maxmin_type(-missing_r, 0, 0)
    metar%minimum%p = maxmin_type(-missing_r, 0, 0)
    metar%minimum%q = maxmin_type(-missing_r, 0, 0)
-   metar%average = residual_type(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+   metar%average = residual_metar1_type(0.0, 0.0, 0.0, 0.0, 0.0)
    metar%rms_err = metar%average
 
    IF ( oi%num_metar > 0 ) THEN

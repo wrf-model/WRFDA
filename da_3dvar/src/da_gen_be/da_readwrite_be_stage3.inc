@@ -19,6 +19,9 @@ subroutine da_readwrite_be_stage3( outunit, nk, variable, be_method )
    real, allocatable        :: e_val_loc(:,:)             ! Latitudinally varying eigenvalues.
  
    filename = 'gen_be_stage3.'//trim(variable)//'.'//trim(be_method)//'.dat'
+!yrg mods:
+   print '(5X,"Readwrite BE Stage4: nk=",i3,3X,"var=",a8," be_method=",a3,"  filemane=",a32)', &
+                                 nk, variable, be_method, filename
    open (iunit, file = filename, form='unformatted')
    read(iunit)vardum
    if ( trim(vardum) /= trim(variable) ) then
@@ -31,7 +34,7 @@ subroutine da_readwrite_be_stage3( outunit, nk, variable, be_method )
       write(6,'(a)')' Inconsistent nk between regression coefficients and vertical modes. Stop'
       stop
    end if
-print *, vardum, nkdum, num_bins2d
+
    allocate( e_vec_loc(1:nk,1:nk,1:num_bins2d) )
    allocate( e_val_loc(1:nk,1:num_bins2d) )
 
@@ -47,27 +50,6 @@ print *, vardum, nkdum, num_bins2d
    write(outunit)e_val
    write(outunit)e_vec_loc
    write(outunit)e_val_loc
-   close(ounit)
-
-!  Print diagnostics:
-
-   write(6,'(2a)')' First 5 Global eigenvectors for variable ', trim(variable)
-   do k = 1, nk
-      write(6,'(i4,5f15.8)')k, ( e_vec(k,m), m = 1, 5 )
-   end do
-   write(6,*)
-
-   write(6,'(2a)')' Global eigenvalues for variable ', trim(variable)
-   do k = 1, nk
-      write(6,'(i4,1pe18.5)')k, e_val(k)
-   end do
-   write(6,*)
-
-   write(6,'(2a)')' First 5 local eigenvalues for variable ', trim(variable)
-   do b = 1, num_bins2d
-      write(6,'(i4,5f20.3)')b, ( e_val_loc(m,b), m = 1, 5 )
-   end do
-   write(6,*)
 
    deallocate( e_vec_loc )
    deallocate( e_val_loc )

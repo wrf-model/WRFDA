@@ -1,11 +1,13 @@
-SUBROUTINE DA_Setup_RunConstants( xp, xbx, ds )
+SUBROUTINE DA_Setup_RunConstants( xp, xb, xbx)
 
 !------------------------------------------------------------------------------
 !  PURPOSE: Define constants used.
 !
 !  HISTORY: 01/06/2000 - Creation of F90 version.           Dale Barker
 !           10/19/2001 - Mods for parallel implementation.  Al Bourgeois
-!           09/26/2006 - Mods for parallel implementation to WRF.  Wei Huang
+!           09/26/2004 - Mods for parallel implementation to WRF.  Wei Huang
+!
+!           11/26/2004 - Updated for Spectral constants       Syed RH Rizvi              
 !
 !  PARENT_MODULE: DA_Setup_Structures
 !------------------------------------------------------------------------------
@@ -13,8 +15,8 @@ SUBROUTINE DA_Setup_RunConstants( xp, xbx, ds )
    IMPLICIT NONE
 
    type (xpose_type), intent(in)    :: xp       ! Dimensions and xpose buffers.
+   type (xb_type),    intent(inout) :: xb       ! xb-array                     
    type (xbx_type),   intent(inout) :: xbx      ! Header & non-gridded vars.
-   real,              intent(in)    :: ds       ! Model grid distance
 
    INTEGER, PARAMETER            :: nrange = 50 ! Range to search for efficient FFT.
    INTEGER                       :: n           ! Loop counter.
@@ -37,7 +39,7 @@ SUBROUTINE DA_Setup_RunConstants( xp, xbx, ds )
 !  [1.0] Calculate padded grid-size required for efficient FFTs and factors:
 !------------------------------------------------------------------------------
 
-   IF ( cv_options == 2 ) THEN
+      if (associated(xbx % fft_factors_x)) return
 
 !     [1.1] In x direction:
 
@@ -95,7 +97,7 @@ SUBROUTINE DA_Setup_RunConstants( xp, xbx, ds )
 
 !-----Multiplicative coefficent for solution of spectral Poission eqn:
 
-      const = -0.5 * ds * ds
+      const = -0.5 * xb%ds * xb%ds
 
       nx = xp%ide - xp%ids + xbx%fft_pad_i
       ny = xp%jde - xp%jds + xbx%fft_pad_j
@@ -176,8 +178,47 @@ SUBROUTINE DA_Setup_RunConstants( xp, xbx, ds )
       endif
 
 !------------------------------------------------------------------------------
+   IF ( cv_options == 4 ) THEN
+! Set up Spectral transform constants:
+    xbx%inc    = 1
+    xbx%ni     = xp%ide-xp%ids+1
+    xbx%nj     = xp%jde-xp%jds+1
+    xbx%lenr   = xbx%inc * (xbx%ni - 1 ) + 1
+    xbx%lensav = xbx%ni + int(log(real(xbx%ni))) + 4
+    xbx%lenwrk = xbx%ni
+    xbx%max_wavenumber = xbx%ni/2 -1
+    xbx%alp_size = (xbx%nj+ 1)*(xbx%max_wavenumber+1)*( xbx%max_wavenumber + 2)/ 4
+    xbx%c_cv_size= (xbx%max_wavenumber+1)*(xbx%max_wavenumber+2)/2
+
+  if(print_detail > 0) then
+   write(unit=*, fmt='(a, i6)') &
+        'inc   =', xbx%inc   , &
+        'ni    =', xbx%ni    , &
+        'nj    =', xbx%nj    , &
+        'lenr  =', xbx%lenr  , &
+        'lensav=', xbx%lensav, &
+        'lenwrk=', xbx%lenwrk, &
+        'max_wavenumber=', xbx%max_wavenumber, &
+        'alp_size      =', xbx%alp_size
+   end if
+
+! -----------------------------------------------------------------------------
+  allocate( xbx%coslat(1:xbx%nj) )
+  allocate( xbx%sinlat(1:xbx%nj) )
+  allocate( xbx%coslon(1:xbx%ni) )
+  allocate( xbx%sinlon(1:xbx%ni) )
+  allocate( xbx%int_wgts(1:xbx%nj) )      ! Interpolation weights
+  allocate( xbx%alp( 1:xbx%alp_size) )
+  allocate( xbx%wsave( 1:xbx%lensav) )
+! -----------------------------------------------------------------------------
+
+   call da_initialize_h( xbx%ni, xbx%nj, xbx%max_wavenumber, &
+                         xbx%lensav, xbx%alp_size,           &
+                         xbx%wsave, xb%lon, xbx%sinlon,      &
+                         xbx%coslon, xb%lat, xbx%sinlat,     &
+                         xbx%coslat, xbx%int_wgts, xbx%alp )
+
 
    END IF
    
 END SUBROUTINE DA_Setup_RunConstants
-

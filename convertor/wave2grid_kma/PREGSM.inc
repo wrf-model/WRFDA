@@ -1,4 +1,4 @@
-      SUBROUTINE PREGSM(PSE, GTE, GUE, GVE, GQE)
+      SUBROUTINE PREGSM(PSE,GTE,GUE,GVE,GQE,PSB,GTB,GUB,GVB,GQB)   !shc
       INTEGER IDATE(5), IDGES(5), IDSST(5)                                      
       CHARACTER*8 FILE, MODEL, RESL                                             
       CHARACTER*80 CINF(10)                                                     
@@ -24,13 +24,18 @@ C
      1       GZE (IMAXE,JMAXE,KMAX), GTE  (IMAXE,JMAXE,KMAX),                        
      2       GUE (IMAXE,JMAXE,KMAX), GVE  (IMAXE,JMAXE,KMAX),                        
      3       GQE (IMAXE,JMAXE,KMAX)
-      DIMENSION  PS  (IMAX,JMAX),                                                   
+      DIMENSION  PS  (IMAX,JMAX),  GRH (IMAX,JMAX,KMAX),  !shc 
      1       GZ  (IMAX,JMAX,KMAX), GT  (IMAX,JMAX,KMAX),                        
      2       GU  (IMAX,JMAX,KMAX), GV  (IMAX,JMAX,KMAX),                        
      3       GQ  (IMAX,JMAX,KMAX), AGT (IMAX,JMAX,KMAX),
      4       GCWC(IMAX,JMAX,KMAX), GCVR(IMAX,JMAX,KMAX),                        
      5       GUMB(IMAX,JMAX,KMAX),                                              
      6       GSST(IMAX,JMAX)     , GSNW(IMAX,JMAX)
+      DIMENSION  PSB (IMAX,JMAX),  GRHB(IMAX,JMAX,KMAX),  !shc start 
+     1       GQB (IMAX,JMAX,KMAX), GTB (IMAX,JMAX,KMAX),                        
+     2       GUB (IMAX,JMAX,KMAX), GVB (IMAX,JMAX,KMAX)   !shc end
+      real   rdum (imax,jmax,kmax)      !shcimsi
+
       DIMENSION VLG(IMAX,JMAX,KMAX)                                             
 C     DIMENSION WRK1(IMAX,JMAX,KMAX), WRK2(IMAX,JMAX,KMAX),                     
       REAL * 8  WRK1(IMAX,JMAX,KMAX), WRK2(IMAX,JMAX,KMAX)                      
@@ -108,13 +113,15 @@ C   =================================================================
 C   =================================================================
 C   >>>   Select Input Source                                     <<<
 C   =================================================================
-      CALL GETENV('FROMUNPACK',FROMUNPACK)
-      IF (LEN_TRIM(FROMUNPACK).EQ.0) THEN
-        IUNPACK=0
-      ELSE
-        READ(FROMUNPACK,'(I1)') IUNPACK
-      END IF
-      WRITE(6,*)'IUNPACK=',IUNPACK
+!shc-wei start
+C     CALL GETENV('FROMUNPACK',FROMUNPACK)    !shc-wei
+c     IF (LEN_TRIM(FROMUNPACK).EQ.0) THEN
+c       IUNPACK=0
+c     ELSE
+c       READ(FROMUNPACK,'(I1)') IUNPACK
+c     END IF
+c     WRITE(6,*)'IUNPACK=',IUNPACK
+!shc-wei end
 C   =================================================================           
 C   >>>   GENERATE GAUSSIAN LATITUDES                             <<<           
 C   =================================================================           
@@ -142,6 +149,7 @@ C   =================================================================
 C   >>>  READ TOPO FILE
 C   =================================================================           
           NTPFL = 3
+          go to 33333
  	  IF (NTPFL.GT.0) THEN
  	  	READ(NTPFL)NWV,DUM,IGRD,JGRD
  	  	IF ((IGRD.NE.IMAX).OR.(JGRD.NE.JMAX)) THEN
@@ -158,6 +166,8 @@ C   =================================================================
 C---------------------------------------------------------------------
 C +++ CONVERT LAT/LON to GAUSS
 C---------------------------------------------------------------------
+33333        continue
+  	READ(NTPFL,'(10f10.3)')GPHIS
         CALL LT2GAU (PSE,IMAXE,JMAXE,IMAX,JMAX,
      1                  COLRAD,PS,DY,LY)
        DO K = 1, KMAX
@@ -170,6 +180,70 @@ C---------------------------------------------------------------------
         CALL LT2GAU (GQE(:,:,K),IMAXE,JMAXE,IMAX,JMAX,
      1                  COLRAD,GQ(:,:,K),DY,LY)
        ENDDO
+9001   format(10e15.7)     !shcimsi start
+       rdum = 0.0       
+       write(902,9001) ((rdum(i,j,1),i=1,imax),j=1,jmax)
+       write(902,9001) ((PS(i,j),i=1,imax),j=1,jmax)
+       write(902,9001) ((rdum(i,j,1),i=1,imax),j=1,jmax)
+       do k=1,kmax
+       write(902,9001) ((GT(i,j,k),i=1,imax),j=1,jmax)
+       enddo
+       do k=1,kmax
+       write(902,9001) ((GU(i,j,k),i=1,imax),j=1,jmax)
+       enddo
+       do k=1,kmax
+       write(902,9001) ((GV(i,j,k),i=1,imax),j=1,jmax)
+       enddo
+       do k=1,kmax
+       write(902,9001) ((GQ(i,j,k),i=1,imax),j=1,jmax)
+       enddo
+       do k=1,kmax
+       write(902,9001) ((rdum(i,j,k),i=1,imax),j=1,jmax)
+       enddo
+       do k=1,kmax
+       write(902,9001) ((rdum(i,j,k),i=1,imax),j=1,jmax)   
+       enddo                                              !shcimsi end
+C                                                !shc start
+C   =================================================================           
+C   >>>   PS, TEMP, Q -> RH
+C   =================================================================           
+      CALL RELHUM                                 
+     I  (GT ,GQ ,PS ,IMAX,JMAX,KMAX,A,B, 
+     O   GRH)                                    
+      CALL RELHUM                                 
+     I  (GTB ,GQB ,PSB ,IMAX,JMAX,KMAX,A,B, 
+     O   GRHB)                                   !shc end
+      PIHF = 3.141593*0.5                              !shc start
+      DO 3739 K = 1,KMAX
+      DO 3738 J = 1,JMAX
+      DO 3737 I = 1,IMAX
+        AANAL = GRH(I,J,K)-GRHB(I,J,K)                 !shc end
+        AGES  = GRHB(I,J,K)                            !shc start
+        IF    ( AGES.LE.0.0 .AND. AANAL.LE.0.0 ) THEN
+           AANAL = 1.0E-6  ! \214\270\202\351\227]\222n\202\252\202\310\202\242
+        ELSEIF( AGES.GE.1.0 .AND. AANAL.GE.0.0 ) THEN
+           AANAL = 1.0     ! \221\235\202\246\202\351\227]\222n\202\252\202\310\202\242
+        ELSE
+          IF( AANAL.GT.0.0 ) THEN
+            RES = 1.0-AGES  ! \213\226\227e\227\312
+          ELSE                                         !shc end
+            RES =    -AGES                             !shc start
+          ENDIF
+          IF( ABS(AANAL).LE.ABS(RES*0.5) ) THEN ! \224\274\225\252\210\310\211\272
+            AANAL = AGES+AANAL    ! \202\273\202\314\202\334\202\334
+          ELSE                                   
+            AA = RES/PIHF*0.5                          !shc end
+            XN = AANAL-RES*0.5                         !shc start
+            AANAL        = AGES + 0.5*RES + AA*ATAN(XN/AA)
+          ENDIF
+        ENDIF
+        AANAL        = DMAX1( AANAL, 1.0D-6 )  ! \215\305\217I\222\262\220\256
+        AANAL        = DMIN1( AANAL, 1.0D0  )
+        GRH(I,J,K) = AANAL
+ 3737 CONTINUE
+ 3738 CONTINUE
+ 3739 CONTINUE                                         !shc end
+
 C   =================================================================           
 C   >>>   PS, TEMP, Q -> Z
 C   =================================================================           
@@ -207,6 +281,12 @@ Crizvi        READ(NRSFL)GQ
 Crizvi        READ(NRSFL)AGT
 Crizvi
 Crizvi      END IF ! READ ANAL FINISH
+       print*,' Gaussian lats data size ',IMAX, JMAX, KMAX
+        write(661,'(10f10.3)')PS
+        write(661,'(10f10.3)')GU
+        write(661,'(10f10.3)')GV
+        write(661,'(10f10.3)')GT
+        write(661,'(10f10.3)')GQ
 
 CLSW      write(99,*) ' Gauss GT'
 CLSW   do k=1,2
@@ -265,17 +345,47 @@ C   =================================================================
 C   >>>   RH, TV -> Q, T                                          <<<           
 C   =================================================================           
       IDX=1
+      LARHM=20                 !shc start
+      DO K=1,LARHM-1
+      DO I=1,IMAX
+      DO J=1,JMAX
+       GQ(I,J,K)=GRH(I,J,K) 
+      ENDDO
+      ENDDO
+      ENDDO                    !shc end
       CALL CRH2SHA
      I(IMAX*JMAX, KMAX, PS, A, B, GRAV,GASR,TLAPS,QCONS,QMIN,KST,ITERMX,
      I IDX, LARHM,
      O GQ, GT)
-          write(99,*) ' after  RH, TV -> Q, T'
-       do k=1,2
-        do j=1,jmax
-          write(99,FMT='(10F12.5,1x)') (GT(I,J,K),I=1,IMAX)
-        enddo
-       enddo
+C          write(99,*) ' after  RH, TV -> Q, T'
+C       do k=1,2
+C        do j=1,jmax
+C          write(99,FMT='(10F12.5,1x)') (GT(I,J,K),I=1,IMAX)
+C        enddo
+C       enddo
 
+       rdum = 0.0       !shcimsi start
+       write(903,9001) ((rdum(i,j,1),i=1,imax),j=1,jmax)
+       write(903,9001) ((PS(i,j),i=1,imax),j=1,jmax)
+       write(903,9001) ((rdum(i,j,1),i=1,imax),j=1,jmax)
+       do k=1,kmax
+       write(903,9001) ((GT(i,j,k),i=1,imax),j=1,jmax)
+       enddo
+       do k=1,kmax
+       write(903,9001) ((GU(i,j,k),i=1,imax),j=1,jmax)
+       enddo
+       do k=1,kmax
+       write(903,9001) ((GV(i,j,k),i=1,imax),j=1,jmax)
+       enddo
+       do k=1,kmax
+       write(903,9001) ((GQ(i,j,k),i=1,imax),j=1,jmax)
+       enddo
+       do k=1,kmax
+       write(903,9001) ((rdum(i,j,k),i=1,imax),j=1,jmax)
+       enddo
+       do k=1,kmax
+       write(903,9001) ((rdum(i,j,k),i=1,imax),j=1,jmax)   
+       enddo                                              !shcimsi end
 C   *****************************************************************           
 C   >>>   OUTPUT INITIAL VALUE                                    <<<           
 C   *****************************************************************           

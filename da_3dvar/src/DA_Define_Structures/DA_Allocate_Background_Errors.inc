@@ -22,7 +22,7 @@ SUBROUTINE DA_Allocate_Background_Errors ( jy, kz, l, e, be_eval_loc, &
    TYPE (be_subtype), INTENT(inout) :: be_sub             ! Backgrd error struct.
     
    INTEGER                          :: mz                 ! Vertical truncation.
-   INTEGER                          :: j, m               ! Loop counter.
+   INTEGER                          :: j, m, k            ! Loop counter.
 
 !-----------------------------------------------------------------------------
 !  [1.0] Initialise:
@@ -33,7 +33,6 @@ SUBROUTINE DA_Allocate_Background_Errors ( jy, kz, l, e, be_eval_loc, &
 !-----------------------------------------------------------------------------
 !  [2.0] Allocate components of be_sub structure:
 !-----------------------------------------------------------------------------
-
    IF ( mz > 0 ) THEN
 
       ALLOCATE ( be_sub % val(1:jy,1:mz) )
@@ -54,6 +53,14 @@ SUBROUTINE DA_Allocate_Background_Errors ( jy, kz, l, e, be_eval_loc, &
          ELSE
 
 !           Use eigenvalues varying with j-direction.
+         do j = 1, jy
+         do k = 1, mz
+         if(be_eval_loc(j,k) <=0) then
+         print*,'At lat= ',j,' For mode = ',k,' local eigen value= ',be_eval_loc(j,k)
+         stop
+         end if
+         end do
+         end do
             be_sub % val(1:jy,1:mz) = SQRT( be_eval_loc(1:jy,1:mz) )            
 
          END IF
@@ -93,6 +100,11 @@ SUBROUTINE DA_Allocate_Background_Errors ( jy, kz, l, e, be_eval_loc, &
                                  'Eigenvectors for j=jy' )
          END IF
 
+         allocate (be_sub%val_g(1:mz))
+         allocate (be_sub%evec_g(1:kz,1:mz))
+  
+         be_sub % val_g(1:mz) = l(1:mz)
+         be_sub % evec_g(1:kz,1:mz) = e(1:kz,1:mz)
       ELSE IF ( vert_corr == 1 ) THEN
 
          print *, 'Change be std dev to variance in NMC code'
