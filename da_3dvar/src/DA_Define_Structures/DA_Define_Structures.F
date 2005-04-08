@@ -17,6 +17,7 @@ MODULE DA_Define_Structures
 !  HISTORY: 01/06/2000 - Creation of F90 version.           Dale Barker
 !           10/19/2001 - Mods for parallel implementation.  Al Bourgeois
 !           05/25/2004 - "gpsref" added.             W. Huang, Y.-R. Guo
+!           10/08/2004 - Updated be_type             Syed  RH Rizvi         
 !------------------------------------------------------------------------------
 
    USE DA_Constants
@@ -165,6 +166,28 @@ MODULE DA_Define_Structures
       REAL, POINTER    :: fft_coeffs(:,:)    ! FFT Coefficients
 
       REAL             :: fft_adjoint_factor ! FFT Adjoint factor
+!  spectral transform related variables
+      INTEGER          :: inc                ! Vector array increment 
+      INTEGER          :: ni                 
+      INTEGER          :: nj                 
+      INTEGER          :: nk                 
+      INTEGER          :: max_wavenumber     
+      INTEGER          :: c_cv_size           
+      INTEGER          :: lenr               
+      INTEGER          :: lensav             
+      INTEGER          :: lenwrk             
+      INTEGER          :: alp_size           
+   real, pointer       :: wsave(:)          ! Primes for FFT.
+   real, pointer       :: lon(:)            ! Longitude (radians).
+   real, pointer       :: sinlon(:)         ! sine(longitude).
+   real, pointer       :: coslon(:)         ! cosine(longitude).
+   real, pointer       :: lat(:)            ! Latitude (radians, from south).
+   real, pointer       :: sinlat(:)         ! sine(latitude).
+   real, pointer       :: coslat(:)         ! cosine(latitude).
+   real, pointer       :: int_wgts(:)       ! Legendre integration weights.
+   real, pointer       :: alp(:)            ! Associated Legendre Polynomial.
+
+
    END TYPE xbx_type
 
 !-----------------------------------------------------------------------------
@@ -913,15 +936,19 @@ MODULE DA_Define_Structures
       INTEGER          :: size3              ! Size of CV array of 3rd variable error.
       INTEGER          :: size4              ! Size of CV array of 4th variable error.
       INTEGER          :: size5              ! Size of CV array of 5th variable error.
-      REAL, POINTER    :: array(:)           ! Control variables v.
+      real, POINTER    :: array(:)           ! Control variables v.
+
    END TYPE cv_type
 
    TYPE be_subtype
       INTEGER           :: mz                ! Vertical truncation of errors.
       CHARACTER*5       :: name              ! Variable name.
-      REAL, POINTER     :: val(:,:)          ! Standard dev./sqrt(eigenvalue).
       REAL, POINTER     :: rf_alpha(:)       ! RF scale length.
-      REAL, POINTER     :: evec(:,:,:)       ! Vertical eigenvectors.
+      REAL, POINTER     :: val(:,:)          ! LOcal Standard dev./sqrt(eigenvalue).
+      REAL, POINTER     :: evec(:,:,:)       ! LOcal Vertical eigenvectors.
+      REAL, POINTER     :: val_g(:)          ! Global Standard dev./sqrt(eigenvalue).
+      REAL, POINTER     :: evec_g(:,:)       ! Global Vertical eigenvectors.
+      real, pointer     :: power(:,:)        ! Power spectrum
    END TYPE be_subtype
 
    TYPE be_type
@@ -934,7 +961,7 @@ MODULE DA_Define_Structures
       TYPE (be_subtype) :: v4
       TYPE (be_subtype) :: v5
       REAL, POINTER     :: pb_vert_reg(:,:,:)
-
+!
 !     Control variable space errors:
       TYPE (cv_type)    :: cv
 
@@ -954,6 +981,11 @@ MODULE DA_Define_Structures
       REAL, POINTER    :: vz(:,:,:,:)
       REAL, POINTER    :: corz(:,:,:,:)
       REAL, POINTER    :: corp(:,:)
+!-----For cv option 4:
+      REAL, POINTER     :: reg_chi(:,:)
+      REAL, POINTER     :: reg_t  (:,:,:)
+      REAL, POINTER     :: reg_ps (:,:)
+
    END TYPE be_type
 
 !  Analysis_Stats maximum-minumum structure.

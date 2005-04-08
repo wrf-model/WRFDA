@@ -34,6 +34,10 @@ SUBROUTINE DA_Setup_Background_Errors( xb, xbx, be, xp )
 
       CALL DA_Setup_Background_Errors3( xb,be,xp )
 
+   else if(cv_options == 4)then
+
+      CALL DA_Setup_Background_Errors4( xb,be, xbx, xp )
+
    else
 
       write(unit=*, fmt='(a,i8/a)') &
@@ -45,6 +49,5 @@ SUBROUTINE DA_Setup_Background_Errors( xb, xbx, be, xp )
            'Invalid cv_options =', cv_options
       CALL WRF_ERROR_FATAL ( message )
    endif
-
 END SUBROUTINE DA_Setup_Background_Errors
 

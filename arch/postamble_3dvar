@@ -1,6 +1,7 @@
 #
+LIB		=	$(NETCDF_LIB) $(MPI_LIB) $(LOCAL_LIB) $(WRF_LIB)
 EXTRAMODULES    =
-FCBASEOPTS      =       -w $(FCTYPE) $(FCBASE) $(FCFORM) $(FCHOST) $(FCDEBUG) -I.
+FCBASEOPTS      =       $(FCTYPE) $(FCBASE) $(FCFORM) $(FCHOST) $(FCDEBUG) -I.
 FC_FFT_RF_OPTS  =       $(FCTYPE) $(FC_FFT_RF) $(FCFORM) $(FCHOST) $(FCDEBUG) -I.
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS) $(OMP)
 INCLUDE_MODULES =       -I../da_3dvar -I../da_3dvar/src \
@@ -9,7 +10,7 @@ INCLUDE_MODULES =       -I../da_3dvar -I../da_3dvar/src \
                         -I../frame -I../share -I../phys -I../inc
 
 REGISTRY        =       Registry
-CPPFLAGS        =       -I$(LIBINCLUDE) -C -P $(ARCHFLAGS) \
+CPPFLAGS        =       -I$(LIBINCLUDE) -C -P $(ARCHFLAGS) $(ENVCOMPDEFS) \
 			$(TRADFLAG) $(DM_1_CPP_FLAGS) $(OMPCPP) $(COREDEFS) $(POUND_DEF)
 
 INC_MOD_3DVAR   =       -I../../$(NETCDF_IO_PATH) \
@@ -22,7 +23,7 @@ FCFLAGS_FFT_RF  =       $(FCOPTIM) $(FC_FFT_RF_OPTS)
 F77FLAGS_BUFR   =       $(FCTYPE) $(FCBUFR) $(FCHOST) $(FCDEBUG) -I.
 F77FLAGS_3DVAR  =       $(FCTYPE) $(FCBASE) $(FCHOST) $(FCDEBUG) -I.
 CPPFLAGS_3DVAR  =       $(TRADFLAG) $(DM_2_CPP_FLAGS) \
-                        -I$(LIBINCLUDE) -I../../inc -C -P $(ARCHFLAGS)
+                        -I$(LIBINCLUDE) -I../../inc -C -P $(ARCHFLAGS) $(POUND_DEF)
 FUFLAGS         =       $(FCOPTIM) $(FCBASE) $(FCFORM) $(FCDEBUG)
 
 wrfio_nf : 
@@ -30,26 +31,28 @@ wrfio_nf :
         make NETCDFPATH=$(NETCDFPATH) CPP="$(CPP) $(TRADFLAG)" \
 	RANLIB="$(RANLIB)" \
 	FC="$(FC)" FCFLAGS="$(FCDEBUG) $(FCFORM) $(FCBASE) -w" TRADFLAG="$(TRADFLAG)" ; \
-	/bin/cp wrf_io_flags.h wrf_status_codes.h ../../inc ; \
-	/bin/cp wrf_io_flags.h wrf_status_codes.h ../io_phdf5 ; \
-	/bin/cp wrf_io_flags.h ../io_quilt )
+	if [ $(RWORDSIZE) -eq 8 ] ; then \
+	/bin/rm -f foo_io_flags.h; \
+	sed -e 's/104/105/' wrf_io_flags.h > foo_io_flags.h ;\
+	/bin/mv foo_io_flags.h wrf_io_flags.h ; fi ; \
+	/bin/cp wrf_io_flags.h wrf_status_codes.h ../../inc )
 
 wrfio_int : 
 	( cd ../external/io_int ; \
-        make CC="$(CC)" CPP="$(CPP)" \
+        make CC="$(CC)" CPP="$(CPP) $(TRADFLAG)" \
 	RANLIB="$(RANLIB)" \
 	FC="$(FC)" FCFLAGS="$(FCDEBUG) $(FCFORM) $(FCBASE)" all )
 
 wrfio_grib1 :
 	( cd ../external/io_grib1 ; \
-        make CC="$(CC)" CPP="$(CPP)" \
+        make CPP="$(CPP) $(TRADFLAG)" \
 	RANLIB="$(RANLIB)" \
 	CC="$(CC)" CFLAGS="$(CFLAGS)" \
-	FC="$(FC)" FCFLAGS="$(FCDEBUG) $(FCFORM) $(FCBASE)" )
+	FC="$(FC)" FCFLAGS="$(FCDEBUG) -I. $(FCFORM) $(FCBASE)" )
 
 esmf_time : 
 	( cd ../external/esmf_time_f90 ; \
-	make FC="$(FC)" FCFLAGS="$(FCDEBUG) $(FCFLAGS)" \
+	make FC="$(FC) $(FCFLAGS)" \
 	RANLIB="$(RANLIB)" \
 	CPP="$(CPP) -I../../inc -I. $(POUND_DEF) $(TRADFLAG)" )
 
