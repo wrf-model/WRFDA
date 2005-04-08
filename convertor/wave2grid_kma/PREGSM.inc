@@ -1,40 +1,40 @@
-      SUBROUTINE PREGSM(PSE,GTE,GUE,GVE,GQE,PSB,GTB,GUB,GVB,GQB)   !shc
-      INTEGER IDATE(5), IDGES(5), IDSST(5)                                      
-      CHARACTER*8 FILE, MODEL, RESL                                             
-      CHARACTER*80 CINF(10)                                                     
-      CHARACTER*4 TYPE, EXPR, KTUNIT, NPROD, NPROM, VCODD, VCODM                
-      CHARACTER*4 LEVEL, ELEM                                                   
-      CHARACTER*32 TITLE                                                        
-      CHARACTER*16 UNIT                                                         
-      CHARACTER*8 MDLINF(4)                                                     
-      REAL        DTHPRO(7)                                                     
-      INTEGER ITYP(2)                                                           
-      CHARACTER*48 LABEL                                                        
-      INTEGER JTINF(2)                                                          
+      SUBROUTINE PREGSM(PSE,GTE,GUE,GVE,GQE,PSB,GTB,GUB,GVB,GQB)
+      INTEGER IDATE(5), IDGES(5), IDSST(5)
+      CHARACTER*8 FILE, MODEL0, RESL0
+      CHARACTER*80 CINF0(10)
+      CHARACTER*4 TYPE, EXPR0, KTUNIT, NPROD, NPROM, VCODD, VCODM
+      CHARACTER*4 LEVEL, ELEM
+      CHARACTER*32 TITLE
+      CHARACTER*16 UNIT
+      CHARACTER*8 MDLINF(4)
+      REAL        DTHPRO(7)
+      INTEGER ITYP(2)
+      CHARACTER*48 LABEL
+      INTEGER JTINF(2)
 	  CHARACTER*10	FROMUNPACK
 	  INTEGER		IUNPACK
-C                                                                               
-      DIMENSION A(KMAX+1), B(KMAX+1), AAM(KMAX+1), BBM(KMAX+1)                  
-      DIMENSION AGD(KMAX+1), BGD(KMAX+1), AGM(KMAX+1), BGM(KMAX+1)              
-      DIMENSION GPHIS(IMAX*JMAX)                                                
+C
+      DIMENSION A(KMAX+1), B(KMAX+1), AAM(KMAX+1), BBM(KMAX+1)
+      DIMENSION AGD(KMAX+1), BGD(KMAX+1), AGM(KMAX+1), BGM(KMAX+1)
+      DIMENSION GPHIS(IMAX*JMAX)
       REAL, DIMENSION(IMAX,JMAX)    :: GAU
       REAL, DIMENSION(JMAX)         :: SINCLT,COSCLT,GW,DGW,DCOSCL,COLRAD,DY
 
-      DIMENSION PSE (IMAXE,JMAXE),                                                   
-     1       GZE (IMAXE,JMAXE,KMAX), GTE  (IMAXE,JMAXE,KMAX),                        
-     2       GUE (IMAXE,JMAXE,KMAX), GVE  (IMAXE,JMAXE,KMAX),                        
+      DIMENSION PSE (IMAXE,JMAXE),
+     1       GZE (IMAXE,JMAXE,KMAX), GTE  (IMAXE,JMAXE,KMAX),
+     2       GUE (IMAXE,JMAXE,KMAX), GVE  (IMAXE,JMAXE,KMAX),
      3       GQE (IMAXE,JMAXE,KMAX)
-      DIMENSION  PS  (IMAX,JMAX),  GRH (IMAX,JMAX,KMAX),  !shc 
-     1       GZ  (IMAX,JMAX,KMAX), GT  (IMAX,JMAX,KMAX),                        
-     2       GU  (IMAX,JMAX,KMAX), GV  (IMAX,JMAX,KMAX),                        
+      DIMENSION  PS  (IMAX,JMAX),  GRH (IMAX,JMAX,KMAX),
+     1       GZ  (IMAX,JMAX,KMAX), GT  (IMAX,JMAX,KMAX),
+     2       GU  (IMAX,JMAX,KMAX), GV  (IMAX,JMAX,KMAX),
      3       GQ  (IMAX,JMAX,KMAX), AGT (IMAX,JMAX,KMAX),
-     4       GCWC(IMAX,JMAX,KMAX), GCVR(IMAX,JMAX,KMAX),                        
-     5       GUMB(IMAX,JMAX,KMAX),                                              
+     4       GCWC(IMAX,JMAX,KMAX), GCVR(IMAX,JMAX,KMAX),
+     5       GUMB(IMAX,JMAX,KMAX),
      6       GSST(IMAX,JMAX)     , GSNW(IMAX,JMAX)
-      DIMENSION  PSB (IMAX,JMAX),  GRHB(IMAX,JMAX,KMAX),  !shc start 
-     1       GQB (IMAX,JMAX,KMAX), GTB (IMAX,JMAX,KMAX),                        
-     2       GUB (IMAX,JMAX,KMAX), GVB (IMAX,JMAX,KMAX)   !shc end
-      real   rdum (imax,jmax,kmax)      !shcimsi
+      DIMENSION  PSB (IMAX,JMAX),  GRHB(IMAX,JMAX,KMAX),
+     1       GQB (IMAX,JMAX,KMAX), GTB (IMAX,JMAX,KMAX),
+     2       GUB (IMAX,JMAX,KMAX), GVB (IMAX,JMAX,KMAX)
+      real   rdum (imax,jmax,kmax)
 
       DIMENSION VLG(IMAX,JMAX,KMAX)                                             
 C     DIMENSION WRK1(IMAX,JMAX,KMAX), WRK2(IMAX,JMAX,KMAX),                     
@@ -54,10 +54,10 @@ C     DIMENSION WRK1(IMAX,JMAX,KMAX), WRK2(IMAX,JMAX,KMAX),
       REAL*8 TABLE,DTABLE,RGSA,G                                                       
       DIMENSION RLAT(MAXJZ), ZDAT(MAXJZ,KMAX)                                   
 C                                                                               
-      NAMELIST /NAMFIL/ NALFL,NVPFL,NGSFL,NSSTFL,NSNWFL,NINFL,
-     1				    KTLAG,IDCHCK,NDIGFL,NTPFL,NALOT,NRSFL
-      NAMELIST /HEADIN/ TYPE,FILE,KTUNIT,IDTYPE,
-     1                  IBACK,NNSP
+      NAMELIST /NAMFIL0/NALFL0,NVPFL0,NGSFL0,NSSTFL0,NSNWFL0,NINFL0,
+     1		    KTLAG0,IDCHCK0,NDIGFL0,NTPFL0,NALOT0,NRSFL0
+C     NAMELIST /HEADIN/ TYPE,FILE,KTUNIT,IDTYPE,
+C    1                  IBACK,NNSP
 C------------------------------------------------------------------------
 C  NALFL : 3DOI INPUT FILE
 C  NVPFL : VERTIAL LEVEL DEF. FILE
@@ -65,16 +65,16 @@ C  NTPFL : TOPO FILE
 C  NALOT : 3DOI INPUT SAVE FILE
 C  NRSFL : UNPACK INPUT FILE
 C------------------------------------------------------------------------
-      NAMELIST /NAMVER/ MODEL, RESL, EXPR, CINF                                 
-C                                                                               
+      NAMELIST /NAMVER0/ MODEL0, RESL0, EXPR0, CINF0                                 
+                                                                                
       DATA RHMIN/1.0E-3/                             
       DATA GRAV,ER,GASR,GAMMA/9.80665,6371.E3,287.04,0.0050/                    
       DATA TLAPS,QCONS,QMIN,KST,ITERMX/2.0E-3,2.5E-6,1.0E-10,10,3/              
 C                                                                               
-      DATA NALFL ,NGSFL ,NSSTFL,NSNWFL,NINFL ,NVPFL ,NALOT,NRSFL
+      DATA NALFL0,NGSFL0,NSSTFL0,NSNWFL0,NINFL0,NVPFL0,NALOT0,NRSFL0
      1    /     1,     2,    -1,    -1,    11,    21,   12,   -1/                           
-      DATA KTLAG / 6/                                                           
-      DATA IDCHCK/ 1/                                                           
+      DATA KTLAG0 / 6/                                                           
+      DATA IDCHCK0/ 1/                                                           
       DATA A/0.00000000000D+00,0.00000000000D+00,0.00000000000D+00,
      &       0.00000000000D+00,1.546082500000000,5.614406590000000,
      &       12.42546270000000,21.63197330000000,32.59785460000000,
@@ -106,15 +106,15 @@ C   =================================================================
 C   =================================================================           
 C   >>>   NAMELIST (NAMFIL)                                       <<<           
 C   =================================================================           
-      READ(95,NAMFIL)                                                            
-      READ(95,HEADIN)                                                            
-      WRITE(6,NAMFIL)                                                           
-      WRITE(6,HEADIN)                                                           
+      READ(96,NAMFIL0)                                                            
+C     READ(96,HEADIN)                                                            
+      WRITE(6,NAMFIL0)                                                           
+C     WRITE(6,HEADIN)                                                           
 C   =================================================================
 C   >>>   Select Input Source                                     <<<
 C   =================================================================
 !shc-wei start
-C     CALL GETENV('FROMUNPACK',FROMUNPACK)    !shc-wei
+c     CALL GETENV('FROMUNPACK',FROMUNPACK)
 c     IF (LEN_TRIM(FROMUNPACK).EQ.0) THEN
 c       IUNPACK=0
 c     ELSE
@@ -148,26 +148,26 @@ C   =================================================================
 C   =================================================================           
 C   >>>  READ TOPO FILE
 C   =================================================================           
-          NTPFL = 3
-          go to 33333
- 	  IF (NTPFL.GT.0) THEN
- 	  	READ(NTPFL)NWV,DUM,IGRD,JGRD
+          NTPFL0 = 3
+c         go to 33333     !shc For T63 only
+ 	  IF (NTPFL0.GT.0) THEN
+ 	  	READ(NTPFL0)NWV,DUM,IGRD,JGRD
  	  	IF ((IGRD.NE.IMAX).OR.(JGRD.NE.JMAX)) THEN
  			WRITE(*,*)' TOPO DIM DOES NOT MATCH'
  			WRITE(*,*)'IMAX=',IMAX,' IGRD=',IGRD
  			WRITE(*,*)'JMAX=',JMAX,' JGRD=',JGRD
  			STOP 9988
  	  	END IF
- 	  	READ(NTPFL)
- 	  	READ(NTPFL)
- 	  	READ(NTPFL)GPHIS
+ 	  	READ(NTPFL0)
+ 	  	READ(NTPFL0)
+ 	  	READ(NTPFL0)GPHIS
  	  	WRITE(*,*)'GRID DISTANCE=',DUM
  	  END IF
 C---------------------------------------------------------------------
 C +++ CONVERT LAT/LON to GAUSS
 C---------------------------------------------------------------------
 33333        continue
-  	READ(NTPFL,'(10f10.3)')GPHIS
+c 	READ(NTPFL0,'(10f10.3)')GPHIS    !shc For T63 only
         CALL LT2GAU (PSE,IMAXE,JMAXE,IMAX,JMAX,
      1                  COLRAD,PS,DY,LY)
        DO K = 1, KMAX
@@ -180,7 +180,7 @@ C---------------------------------------------------------------------
         CALL LT2GAU (GQE(:,:,K),IMAXE,JMAXE,IMAX,JMAX,
      1                  COLRAD,GQ(:,:,K),DY,LY)
        ENDDO
-9001   format(10e15.7)     !shcimsi start
+9001   format(10e15.7)     
        rdum = 0.0       
        write(902,9001) ((rdum(i,j,1),i=1,imax),j=1,jmax)
        write(902,9001) ((PS(i,j),i=1,imax),j=1,jmax)
@@ -202,8 +202,8 @@ C---------------------------------------------------------------------
        enddo
        do k=1,kmax
        write(902,9001) ((rdum(i,j,k),i=1,imax),j=1,jmax)   
-       enddo                                              !shcimsi end
-C                                                !shc start
+       enddo                                              
+C                                                
 C   =================================================================           
 C   >>>   PS, TEMP, Q -> RH
 C   =================================================================           
@@ -212,37 +212,37 @@ C   =================================================================
      O   GRH)                                    
       CALL RELHUM                                 
      I  (GTB ,GQB ,PSB ,IMAX,JMAX,KMAX,A,B, 
-     O   GRHB)                                   !shc end
-      PIHF = 3.141593*0.5                              !shc start
+     O   GRHB)                                   
+      PIHF = 3.141593*0.5                              
       DO 3739 K = 1,KMAX
       DO 3738 J = 1,JMAX
       DO 3737 I = 1,IMAX
-        AANAL = GRH(I,J,K)-GRHB(I,J,K)                 !shc end
-        AGES  = GRHB(I,J,K)                            !shc start
+        AANAL = GRH(I,J,K)-GRHB(I,J,K)                 
+        AGES  = GRHB(I,J,K)                            
         IF    ( AGES.LE.0.0 .AND. AANAL.LE.0.0 ) THEN
-           AANAL = 1.0E-6  ! \214\270\202\351\227]\222n\202\252\202\310\202\242
+           AANAL = 1.0E-6  
         ELSEIF( AGES.GE.1.0 .AND. AANAL.GE.0.0 ) THEN
-           AANAL = 1.0     ! \221\235\202\246\202\351\227]\222n\202\252\202\310\202\242
+           AANAL = 1.0    
         ELSE
           IF( AANAL.GT.0.0 ) THEN
-            RES = 1.0-AGES  ! \213\226\227e\227\312
-          ELSE                                         !shc end
-            RES =    -AGES                             !shc start
+            RES = 1.0-AGES  
+          ELSE                                         
+            RES =    -AGES                             
           ENDIF
-          IF( ABS(AANAL).LE.ABS(RES*0.5) ) THEN ! \224\274\225\252\210\310\211\272
-            AANAL = AGES+AANAL    ! \202\273\202\314\202\334\202\334
+          IF( ABS(AANAL).LE.ABS(RES*0.5) ) THEN 
+            AANAL = AGES+AANAL   
           ELSE                                   
-            AA = RES/PIHF*0.5                          !shc end
-            XN = AANAL-RES*0.5                         !shc start
+            AA = RES/PIHF*0.5                          
+            XN = AANAL-RES*0.5                         
             AANAL        = AGES + 0.5*RES + AA*ATAN(XN/AA)
           ENDIF
         ENDIF
-        AANAL        = DMAX1( AANAL, 1.0D-6 )  ! \215\305\217I\222\262\220\256
+        AANAL        = DMAX1( AANAL, 1.0D-6 ) 
         AANAL        = DMIN1( AANAL, 1.0D0  )
         GRH(I,J,K) = AANAL
  3737 CONTINUE
  3738 CONTINUE
- 3739 CONTINUE                                         !shc end
+ 3739 CONTINUE                                         
 
 C   =================================================================           
 C   >>>   PS, TEMP, Q -> Z
@@ -262,23 +262,23 @@ CLSW   enddo
 C  ==================================================================
 C  >>> SAVE INPUT DATA
 C  ==================================================================
-        IF (NALOT.GT.0) THEN
-            WRITE(NALOT)PS
-            WRITE(NALOT)GZ
-            WRITE(NALOT)GU
-            WRITE(NALOT)GV
-            WRITE(NALOT)GQ
-            WRITE(NALOT)GT
+        IF (NALOT0.GT.0) THEN
+            WRITE(NALOT0)PS
+            WRITE(NALOT0)GZ
+            WRITE(NALOT0)GU
+            WRITE(NALOT0)GV
+            WRITE(NALOT0)GQ
+            WRITE(NALOT0)GT
         END IF
 Crizvi      ELSE          ! START WITH UNPACK FILE
 Crizvi        LARHM=20
-Crizvi        READ(NRSFL)IDATE
-Crizvi        READ(NRSFL)PS
-Crizvi        READ(NRSFL)GZ
-Crizvi        READ(NRSFL)GU
-Crizvi        READ(NRSFL)GV
-Crizvi        READ(NRSFL)GQ
-Crizvi        READ(NRSFL)AGT
+Crizvi        READ(NRSFL0)IDATE
+Crizvi        READ(NRSFL0)PS
+Crizvi        READ(NRSFL0)GZ
+Crizvi        READ(NRSFL0)GU
+Crizvi        READ(NRSFL0)GV
+Crizvi        READ(NRSFL0)GQ
+Crizvi        READ(NRSFL0)AGT
 Crizvi
 Crizvi      END IF ! READ ANAL FINISH
        print*,' Gaussian lats data size ',IMAX, JMAX, KMAX
@@ -304,14 +304,14 @@ C      ENDDO
 C   =================================================================           
 C   >>>   NAMELIST (NAMVER)                                       <<<           
 C   =================================================================           
-      CINF(1)=' ';CINF(2)=' ';CINF(3)=' ';CINF(4)=' ';CINF(5)=' '               
-      CINF(6)=' ';CINF(7)=' ';CINF(8)=' ';CINF(9)=' ';CINF(10)=' '              
-      READ(95,NAMVER)                                                            
-      WRITE(6,NAMVER)                                                           
+      CINF0(1)=' ';CINF0(2)=' ';CINF0(3)=' ';CINF0(4)=' ';CINF0(5)=' '               
+      CINF0(6)=' ';CINF0(7)=' ';CINF0(8)=' ';CINF0(9)=' ';CINF0(10)=' '              
+      READ(96,NAMVER0)                                                            
+      WRITE(6,NAMVER0)                                                           
 C   =================================================================
-      IF(NGSFL.GE.0) THEN
+      IF(NGSFL0.GE.0) THEN
       CALL REDGES
-     I(NGSFL ,IMAX  ,JMAX  ,KMAX  ,KTLAG ,IDATE ,IDCHCK,
+     I(NGSFL0 ,IMAX  ,JMAX  ,KMAX  ,KTLAG0 ,IDATE ,IDCHCK0,
      O IDGES ,AGD   ,BGD   ,AGM   ,BGM   ,GCWC  ,GCVR  ,GUMB  ,
      W I2    ,IDSST )
       ENDIF
@@ -320,7 +320,7 @@ C   >>>   Z -> TV                                                 <<<
 C   =================================================================           
 C     CALL CTIME( 4, 'ZE2TVE              ' )
 C   >>> GT IS TV (OUTPUT)
-      IF (NTPFL.LT.0) THEN
+      IF (NTPFL0.LT.0) THEN
         CALL GH2TV(GZ, GT, PS, GPHIS, A, B,
      1          IMAX  , JMAX  , KMAX  ,WRK1  , WRK2  , WRK3  , WRK4)
       ELSE
@@ -345,14 +345,14 @@ C   =================================================================
 C   >>>   RH, TV -> Q, T                                          <<<           
 C   =================================================================           
       IDX=1
-      LARHM=20                 !shc start
+      LARHM=20                 
       DO K=1,LARHM-1
       DO I=1,IMAX
       DO J=1,JMAX
        GQ(I,J,K)=GRH(I,J,K) 
       ENDDO
       ENDDO
-      ENDDO                    !shc end
+      ENDDO                    
       CALL CRH2SHA
      I(IMAX*JMAX, KMAX, PS, A, B, GRAV,GASR,TLAPS,QCONS,QMIN,KST,ITERMX,
      I IDX, LARHM,
@@ -364,7 +364,7 @@ C          write(99,FMT='(10F12.5,1x)') (GT(I,J,K),I=1,IMAX)
 C        enddo
 C       enddo
 
-       rdum = 0.0       !shcimsi start
+       rdum = 0.0       
        write(903,9001) ((rdum(i,j,1),i=1,imax),j=1,jmax)
        write(903,9001) ((PS(i,j),i=1,imax),j=1,jmax)
        write(903,9001) ((rdum(i,j,1),i=1,imax),j=1,jmax)
@@ -385,7 +385,7 @@ C       enddo
        enddo
        do k=1,kmax
        write(903,9001) ((rdum(i,j,k),i=1,imax),j=1,jmax)   
-       enddo                                              !shcimsi end
+       enddo                                            
 C   *****************************************************************           
 C   >>>   OUTPUT INITIAL VALUE                                    <<<           
 C   *****************************************************************           
@@ -393,23 +393,23 @@ C   =================================================================
 C   >>>   HEADER                                                  <<<           
 C   =================================================================           
       CALL WRTHED                                                               
-     I(NINFL ,                                                                  
-     I 'GVS1',IDATE ,'INITETA ',MODEL, RESL,                                    
-     I EXPR  ,'HOUR',1     ,0     ,0     ,                                      
+     I(NINFL0 ,                                                                  
+     I 'GVS1',IDATE ,'INITETA ',MODEL0, RESL0,                                    
+     I EXPR0 ,'HOUR',1     ,0     ,0     ,                                      
      I IMAX  ,JMAX  ,'GAUS',360.0/IMAX, REAL(JMAX),                             
      I 1.0   ,(JMAX+1)/2.0, 0.0   ,0.0   ,                                      
      I 'ETA ',KMAX  ,A     ,B     ,                                             
      I IMAX  ,JMAX  ,'GAUS',360.0/IMAX, REAL(JMAX),                             
      I 1.0   ,(JMAX+1)/2.0, 0.0   ,0.0   ,                                      
      I 'ETA ',KMAX  ,A     ,B     ,                                             
-     I CINF  )                                                                  
+     I CINF0 )                                                                  
 C                                                                               
 C   =================================================================           
 C   >>>   PS                                                      <<<           
 C   =================================================================           
       CALL MOVERD(PS, WRK, IMAX*JMAX)
       CALL WRTDAT
-     1(NINFL , IDATE , -1    , 'SURF', 'P   ',
+     1(NINFL0 , IDATE , -1    , 'SURF', 'P   ',
      2 'P                               ', 'HPA             ',
      3 0     , 0     , WRK   , IMAX  , JMAX  , I2    )
 C                                                                               
@@ -420,7 +420,7 @@ C   =================================================================
         CALL MOVERD(GU(1,1,K), WRK, IMAX*JMAX)
         WRITE(ALVL(1:4), '(I4)') K
         CALL WRTDAT
-     1  (NINFL , IDATE , -1    , ALVL  , 'U   ',
+     1  (NINFL0 , IDATE , -1    , ALVL  , 'U   ',
      2   'U                               ', 'M/S             ',
      3   0     , 0     , WRK   , IMAX  , JMAX  , I2    )
  9030   CONTINUE
@@ -428,7 +428,7 @@ C   =================================================================
         CALL MOVERD(GV(1,1,K), WRK, IMAX*JMAX)
         WRITE(ALVL(1:4), '(I4)') K
         CALL WRTDAT
-     1  (NINFL , IDATE , -1    , ALVL  , 'V   ',
+     1  (NINFL0 , IDATE , -1    , ALVL  , 'V   ',
      2   'V                               ', 'M/S             ',
      3   0     , 0     , WRK   , IMAX  , JMAX  , I2    )
  9040   CONTINUE
@@ -439,7 +439,7 @@ C   =================================================================
         CALL MOVERD(GT(1,1,K), WRK, IMAX*JMAX)
         WRITE(ALVL(1:4), '(I4)') K
         CALL WRTDAT
-     1  (NINFL , IDATE , -1    , ALVL  , 'T   ',
+     1  (NINFL0 , IDATE , -1    , ALVL  , 'T   ',
      2   'T                               ', 'K               ',
      3   0     , 0     , WRK   , IMAX  , JMAX  , I2    )
  9010   CONTINUE
@@ -447,27 +447,27 @@ C   =================================================================
         CALL MOVERD(GQ(1,1,K), WRK, IMAX*JMAX)
         WRITE(ALVL(1:4), '(I4)') K
         CALL WRTDAT
-     1  (NINFL , IDATE , -1    , ALVL  , 'Q   ',
+     1  (NINFL0 , IDATE , -1    , ALVL  , 'Q   ',
      2   'Q                               ', 'KG/KG           ',
      3   0     , 0     , WRK   , IMAX  , JMAX  , I2    )
  9020   CONTINUE
 C   =================================================================           
 C   >>>  SAVE INPUT FIELD FOR DIAG.
 C   =================================================================           
-      IF (NDIGFL.GT.0) THEN
-        WRITE(NDIGFL)GT
-        WRITE(NDIGFL)GQ
+      IF (NDIGFL0.GT.0) THEN
+        WRITE(NDIGFL0)GT
+        WRITE(NDIGFL0)GQ
       END IF
 C                                                                               
 C   =================================================================           
 C   >>>   CWC, CVR                                                <<<           
 C   =================================================================           
-      IF(NGSFL.GT.0) THEN
+      IF(NGSFL0.GT.0) THEN
         DO 9050 K=1,KMAX
         CALL MOVERD(GCWC(1,1,K), WRK, IMAX*JMAX)
         WRITE(ALVL(1:4), '(I4)') K
         CALL WRTDAT
-     1  (NINFL , IDATE , -1    , ALVL  , 'CWC ',
+     1  (NINFL0 , IDATE , -1    , ALVL  , 'CWC ',
      2   'CLOUD WATER CONTENT             ', 'KG/KG           ',
      3   0     , 0     , WRK   , IMAX  , JMAX  , I2    )
  9050   CONTINUE
@@ -475,7 +475,7 @@ C   =================================================================
         CALL MOVERD(GCVR(1,1,K), WRK, IMAX*JMAX)
         WRITE(ALVL(1:4), '(I4)') K
         CALL WRTDAT
-     1  (NINFL , IDATE , -1    , ALVL  , 'CVR ',
+     1  (NINFL0 , IDATE , -1    , ALVL  , 'CVR ',
      2   'CLOUD COVER                     ', '-               ',
      3   0     , 0     , WRK   , IMAX  , JMAX  , I2    )
  9060   CONTINUE
@@ -487,7 +487,7 @@ C   =================================================================
         CALL MOVERD(GUMB(1,1,K), WRK, IMAX*JMAX)
         WRITE(ALVL(1:4), '(I4)') K
         CALL WRTDAT
-     1  (NINFL , IDATE , -1    , ALVL  , 'UMB ',
+     1  (NINFL0 , IDATE , -1    , ALVL  , 'UMB ',
      2   'UPWARD MASS FLUX AT CLOUD BASE  ', 'KG/S/M**2       ',
      3   0     , 0     , WRK   , IMAX  , JMAX  , I2    )
  9070   CONTINUE
@@ -496,14 +496,14 @@ C
 C   *****************************************************************           
 C   >>>   SST ANOMALY                                             <<<           
 C   *****************************************************************           
-      IF( NSSTFL.NE.-1 ) THEN
-      CALL GETTYP(NSSTFL,IOTYP)
+      IF( NSSTFL0.NE.-1 ) THEN
+      CALL GETTYP(NSSTFL0,IOTYP)
 C
       IF(IOTYP.EQ.1) THEN
-C     CALL GVDFIR(NSSTFL,
-C    1            IDSST,IBACK,IM,JM,MDLINF,DTHPRO,CINF,ITYP,IRTN)
+C     CALL GVDFIR(NSSTFL0,
+C    1            IDSST,IBACK,IM,JM,MDLINF,DTHPRO,CINF0,ITYP,IRTN)
 C     WRITE(6,*) 'GVDFIR:IRTN=',IRTN
-C     CALL GVDFNR(NSSTFL,IDSST,0,'SURF','SSTA',
+C     CALL GVDFNR(NSSTFL0,IDSST,0,'SURF','SSTA',
 C    1            LABEL,JTINF,SSTA,IRTN)
 C     WRITE(6,*) 'GVDFNR:IRTN=',IRTN
       WRITE(*,*)' UNKNOWN IOTYP:1'
@@ -513,8 +513,8 @@ C   =================================================================
 C   >>>   HEADER                                                  <<<           
 C   =================================================================           
       CALL REDHED
-     I(NSSTFL,
-     O TYPE  ,IDSST ,FILE  ,MODEL ,RESL  ,EXPR  ,KTUNIT,IDTYPE,
+     I(NSSTFL0,
+     O TYPE  ,IDSST ,FILE  ,MODEL0,RESL0 ,EXPR0 ,KTUNIT,IDTYPE,
      O IBACK ,NNSP  ,
      O IMD   ,JMD   ,NPROD ,FLONID, FLATID,
      O XID   ,XJD   ,XLATD ,XLOND ,
@@ -522,15 +522,15 @@ C   =================================================================
      O IMM   ,JMM   ,NPROM ,FLONIM, FLATIM,
      O XIM   ,XJM   ,XLATM ,XLONM ,
      O VCODM ,KMM   ,AAM   ,BBM   ,
-     O CINF  )
+     O CINF0 )
 C   =================================================================           
 C   >>>   SST ANOMALLY                                            <<<           
 C   =================================================================           
       DO 1 I=1,NNSP
-        READ(NSSTFL)
+        READ(NSSTFL0)
     1 CONTINUE
  3001 CALL REDDAT
-     I(NSSTFL,
+     I(NSSTFL0,
      O IDSST , KT    ,
      O LEVEL , ELEM  , TITLE , UNIT  , KTSD  , KTSA  ,
      O SSTA  , IRTN  ,
@@ -541,7 +541,7 @@ C   =================================================================
       ENDIF
 C
       WRITE(6,*) '## ', IDSST, KT
-      IF( IDCHCK.EQ.1 ) THEN
+      IF( IDCHCK0.EQ.1 ) THEN
         CALL CVDATE( IDGES, IDSST, 24 )
         IF( IDATE(1).NE.IDGES(1).OR.IDATE(2).NE.IDGES(2).OR.
      1      IDATE(3).NE.IDGES(3) ) THEN
@@ -553,7 +553,7 @@ C
       CALL LT2GAU(SSTA,ISST,JSST,IMAX,JMAX,COLRAD,GSST,DY,LY)
       CALL MOVERD(GSST, WRK, IMAX*JMAX)
       CALL WRTDAT
-     1(NINFL , IDATE , -1    , 'SURF', 'SSTA',
+     1(NINFL0 , IDATE , -1    , 'SURF', 'SSTA',
      2 'SST ANOMALLY                    ', 'K               ',
      3 0     , 0     , WRK   , IMAX  , JMAX  , I2    )
       WRITE(6,*) '## SST ANOMALLY WAS WRITTEN'
@@ -563,13 +563,13 @@ C
 C   *****************************************************************           
 C   >>>   SNOW ANALYSIS                                           <<<           
 C   *****************************************************************           
-      IF( NSNWFL.NE.-1 ) THEN
+      IF( NSNWFL0.NE.-1 ) THEN
 C   =================================================================           
 C   >>>   HEADER                                                  <<<           
 C   =================================================================           
       CALL REDHED
-     I(NSNWFL,
-     O TYPE  ,IDSST ,FILE  ,MODEL ,RESL  ,EXPR  ,KTUNIT,IDTYPE,
+     I(NSNWFL0,
+     O TYPE  ,IDSST ,FILE  ,MODEL0,RESL0 ,EXPR0 ,KTUNIT,IDTYPE,
      O IBACK ,NNSP  ,
      O IMD   ,JMD   ,NPROD ,FLONID, FLATID,
      O XID   ,XJD   ,XLATD ,XLOND ,
@@ -577,15 +577,15 @@ C   =================================================================
      O IMM   ,JMM   ,NPROM ,FLONIM, FLATIM,
      O XIM   ,XJM   ,XLATM ,XLONM ,
      O VCODM ,KMM   ,AAM   ,BBM   ,
-     O CINF  )
+     O CINF0 )
       DO 2 I=1,NNSP
-        READ(NSNWFL)
+        READ(NSNWFL0)
     2 CONTINUE
 C   =================================================================           
 C   >>>   SNOW ANALYSIS                                           <<<           
 C   =================================================================           
       CALL REDDAT
-     I(NSNWFL,
+     I(NSNWFL0,
      O IDSST , KT    ,
      O LEVEL , ELEM  , TITLE , UNIT  , KTSD  , KTSA  ,
      O SEWA  , IRTN  ,
@@ -593,7 +593,7 @@ C   =================================================================
      W BASE  , AMP   ,I2    )
       WRITE(6,*) '## ', TITLE, '(',UNIT,')'
       WRITE(6,*) '## ', IDSST, KT
-      IF( IDCHCK.EQ.1 ) THEN
+      IF( IDCHCK0.EQ.1 ) THEN
         CALL CVDATE( IDGES, IDSST, 24 )
         IF( IDATE(1).NE.IDGES(1).OR.IDATE(2).NE.IDGES(2).OR.
      1      IDATE(3).NE.IDGES(3) ) THEN
@@ -625,7 +625,7 @@ C
 C   -----
       CALL MOVERD(GSNW, WRK, IMAX*JMAX)
       CALL WRTDAT
-     1(NINFL , IDATE , -1    , 'SURF', 'SEW ',
+     1(NINFL0 , IDATE , -1    , 'SURF', 'SEW ',
      2 'SNOW EQUIVALENT WATER           ', 'M               ',
      3 0     , 0     , WRK   , IMAX  , JMAX  , I2    )
       WRITE(6,*) '## SNOW ANALYSIS WAS WRITTEN'
