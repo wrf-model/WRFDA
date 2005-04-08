@@ -11,6 +11,9 @@ subroutine DA_Balance_CycloTerm( xb, k, term_x, term_y, &
 !  ASSUMPTIONS: Various (see documentation).
 !
 !  HISTORY: 03/02/2000 - Creation of F90 version.           Dale Barker
+!  
+!           09/27/2004 -  Additional option for FG at equal lat x long  
+!                         Author:     Syed RH Rizvi ,    Org: NCAR/MMM 
 !------------------------------------------------------------------------------
 
    implicit none
@@ -24,7 +27,6 @@ subroutine DA_Balance_CycloTerm( xb, k, term_x, term_y, &
    integer, intent(in)  :: ims,ime, jms,jme, kms,kme    ! memory dims.
    integer, intent(in)  :: its,ite, jts,jte, kts,kte    ! tile   dims.
 
-   real                 :: inv_2ds                      ! 1/2ds.
    integer              :: i, j                         ! Loop counters.
    integer              :: is, ie                       ! 1st dim. end points.
    integer              :: js, je                       ! 2nd dim. end points.
@@ -37,12 +39,11 @@ subroutine DA_Balance_CycloTerm( xb, k, term_x, term_y, &
 !------------------------------------------------------------------------------
 !  [1.0] Initialise:
 !------------------------------------------------------------------------------
-
-   inv_2ds = 0.5 / xb%ds
    
 !  Computation to check for edge of domain:
    is = its; ie = ite; js = jts; je = jte
-   if ( its == ids ) is = ids+1; if ( ite == ide ) ie = ide-1
+   if (.not. global .and. its == ids ) is = ids+1
+   if (.not. global .and. ite == ide ) ie = ide-1
    if ( jts == jds ) js = jds+1; if ( jte == jde ) je = jde-1
    
 !------------------------------------------------------------------------------
@@ -53,11 +54,13 @@ subroutine DA_Balance_CycloTerm( xb, k, term_x, term_y, &
 
    do j = js, je
       do i = is, ie
-         data(i,j) = xb%u(i,j,k) * ( xb%u(i+1,j,k) - xb%u(i-1,j,k) ) + &
-                     xb%v(i,j,k) * ( xb%u(i,j+1,k) - xb%u(i,j-1,k) )
+       data(i,j) = xb%u(i,j,k) * xb%coefx(i,j)*( xb%u(i+1,j,k) - xb%u(i-1,j,k) ) + &
+                   xb%v(i,j,k) * xb%coefy(i,j)*( xb%u(i,j+1,k) - xb%u(i,j-1,k) )
       end do
    end do
    
+   if( global) go to 101      ! For global only interior points
+
 !  [2.2] Bottom boundaries:
 
    if ( its == ids ) then
@@ -66,8 +69,8 @@ subroutine DA_Balance_CycloTerm( xb, k, term_x, term_y, &
       do j = js, je 
          varb = -3.0*xb%u(i,j,k)+4.0*xb%u(i+1,j,k)-xb%u(i+2,j,k)
 
-         data(i,j) = xb%u(i,j,k) * varb + &
-                     xb%v(i,j,k) * ( xb%u(i,j+1,k) - xb%u(i,j-1,k) )
+         data(i,j) = xb%u(i,j,k) * xb%coefx(i,j) * varb + &
+                     xb%v(i,j,k) * xb%coefy(i,j) * ( xb%u(i,j+1,k) - xb%u(i,j-1,k) )
       end do
    end if
 
@@ -79,8 +82,8 @@ subroutine DA_Balance_CycloTerm( xb, k, term_x, term_y, &
       do j = js, je
          varb = 3.0*xb%u(i,j,k)-4.0*xb%u(i-1,j,k)+xb%u(i-2,j,k)
 
-         data(i,j) = xb%u(i,j,k) * varb + &
-                     xb%v(i,j,k) * ( xb%u(i,j+1,k) - xb%u(i,j-1,k) )
+         data(i,j) = xb%u(i,j,k) * xb%coefx(i,j) * varb + &
+                     xb%v(i,j,k) * xb%coefy(i,j) * ( xb%u(i,j+1,k) - xb%u(i,j-1,k) )
       end do
    end if
 
@@ -92,8 +95,8 @@ subroutine DA_Balance_CycloTerm( xb, k, term_x, term_y, &
       do i = is, ie
          varb = -3.0*xb%u(i,j,k)+4.0*xb%u(i,j+1,k)-xb%u(i,j+2,k)
 
-         data(i,j) = xb%u(i,j,k) * ( xb%u(i+1,j,k) - xb%u(i-1,j,k) ) + &
-                     xb%v(i,j,k) * varb
+         data(i,j) = xb%u(i,j,k) * xb%coefx(i,j) * ( xb%u(i+1,j,k) - xb%u(i-1,j,k) ) + &
+                     xb%v(i,j,k) * xb%coefy(i,j) * varb
       end do
    end if
 
@@ -105,8 +108,8 @@ subroutine DA_Balance_CycloTerm( xb, k, term_x, term_y, &
       do i = is, ie
          varb = 3.0*xb%u(i,j,k)-4.0*xb%u(i,j-1,k)+xb%u(i,j-2,k)
 
-         data(i,j) = xb%u(i,j,k) * ( xb%u(i+1,j,k) - xb%u(i-1,j,k) ) + &
-                     xb%v(i,j,k) * varb
+         data(i,j) = xb%u(i,j,k) * xb%coefx(i,j) * ( xb%u(i+1,j,k) - xb%u(i-1,j,k) ) + &
+                     xb%v(i,j,k) * xb%coefy(i,j) * varb
       end do
    end if
 
@@ -128,10 +131,10 @@ subroutine DA_Balance_CycloTerm( xb, k, term_x, term_y, &
       data(ite,jte) = 0.5 * ( data(ite-1,jte) + data(ite,jte-1) )
    end if
       
-!  [2.7] Multiply by 0.5 * rho * M / ds and add to term_x:
+!  [2.7] Multiply by rho  and add to term_x:
 
-   term_x(its:ite,jts:jte) = inv_2ds * xb%rho(its:ite,jts:jte,k) * &
-                             xb%map_factor(its:ite,jts:jte) * data(its:ite,jts:jte) + &
+101  continue
+   term_x(its:ite,jts:jte) = xb%rho(its:ite,jts:jte,k)*data(its:ite,jts:jte) + &
                              term_x(its:ite,jts:jte)
 
 !------------------------------------------------------------------------------
@@ -142,11 +145,15 @@ subroutine DA_Balance_CycloTerm( xb, k, term_x, term_y, &
 
    do j = js, je
       do i = is, ie
-         data(i,j) = xb%u(i,j,k) * ( xb%v(i+1,j,k) - xb%v(i-1,j,k) ) + &
-                     xb%v(i,j,k) * ( xb%v(i,j+1,k) - xb%v(i,j-1,k) )
+         data(i,j) = xb%u(i,j,k) * xb%coefx(i,j)*( xb%v(i+1,j,k) - xb%v(i-1,j,k) ) + &
+                     xb%v(i,j,k) * xb%coefy(i,j)*( xb%v(i,j+1,k) - xb%v(i,j-1,k) )
       end do
    end do
    
+   
+   if( global) go to 102      ! For global only interior points
+
+
 !  [3.2] Bottom boundaries:
 
    if ( its == ids ) then
@@ -155,8 +162,8 @@ subroutine DA_Balance_CycloTerm( xb, k, term_x, term_y, &
       do j = js, je
          varb = -3.0*xb%v(i,j,k)+4.0*xb%v(i+1,j,k)-xb%v(i+2,j,k)
 
-         data(i,j) = xb%u(i,j,k) * varb + &
-                     xb%v(i,j,k) * ( xb%v(i,j+1,k) - xb%v(i,j-1,k) )
+         data(i,j) = xb%u(i,j,k) * xb%coefx(i,j)* varb + &
+                     xb%v(i,j,k) * xb%coefy(i,j)* ( xb%v(i,j+1,k) - xb%v(i,j-1,k) )
       end do
    end if
 
@@ -168,8 +175,8 @@ subroutine DA_Balance_CycloTerm( xb, k, term_x, term_y, &
       do j = js, je
          varb = 3.0*xb%v(i,j,k)-4.0*xb%v(i-1,j,k)+xb%v(i-2,j,k)
 
-         data(i,j) = xb%u(i,j,k) * varb + &
-                     xb%v(i,j,k) * ( xb%v(i,j+1,k) - xb%v(i,j-1,k) )
+         data(i,j) = xb%u(i,j,k) * xb%coefx(i,j)* varb + &
+                     xb%v(i,j,k) * xb%coefy(i,j)* ( xb%v(i,j+1,k) - xb%v(i,j-1,k) )
       end do
    end if
 
@@ -181,8 +188,8 @@ subroutine DA_Balance_CycloTerm( xb, k, term_x, term_y, &
       do i = is, ie
          varb = -3.0*xb%v(i,j,k)+4.0*xb%v(i,j+1,k)-xb%v(i,j+2,k)
 
-         data(i,j) = xb%u(i,j,k) * ( xb%v(i+1,j,k) - xb%v(i-1,j,k) ) + &
-                     xb%v(i,j,k) * varb
+         data(i,j) = xb%u(i,j,k) * xb%coefx(i,j)* ( xb%v(i+1,j,k) - xb%v(i-1,j,k) ) + &
+                     xb%v(i,j,k) * xb%coefy(i,j)* varb
       end do
    end if
 
@@ -194,8 +201,8 @@ subroutine DA_Balance_CycloTerm( xb, k, term_x, term_y, &
       do i = is, ie
          varb = 3.0*xb%v(i,j,k)-4.0*xb%v(i,j+1,k)+xb%v(i,j+2,k)
 
-         data(i,j) = xb%u(i,j,k) * ( xb%v(i+1,j,k) - xb%v(i-1,j,k) ) + &
-                     xb%v(i,j,k) * varb
+         data(i,j) = xb%u(i,j,k) * xb%coefx(i,j)* ( xb%v(i+1,j,k) - xb%v(i-1,j,k) ) + &
+                     xb%v(i,j,k) * xb%coefy(i,j)* varb
       end do
    end if
 
@@ -217,11 +224,10 @@ subroutine DA_Balance_CycloTerm( xb, k, term_x, term_y, &
       data(ite,jte) = 0.5 * ( data(ite-1,jte) + data(ite,jte-1) )
    end if
 
-!  [3.7] Multiply by 0.5 * rho * M / ds and add to term_y
+102  continue
+!  [3.7] Multiply by rho and add to term_y
 
-   term_y(its:ite,jts:jte) = inv_2ds * xb%rho(its:ite,jts:jte,k) * &
-                             xb%map_factor(its:ite,jts:jte) * data(its:ite,jts:jte) + &
+   term_y(its:ite,jts:jte)=xb%rho(its:ite,jts:jte,k)* data(its:ite,jts:jte) + &
                              term_y(its:ite,jts:jte)
 
 end subroutine DA_Balance_CycloTerm
-

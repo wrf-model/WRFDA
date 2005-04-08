@@ -12,7 +12,6 @@ program gen_be_stage4
    character*80        :: dat_dir                    ! Input data directory.
    character*80        :: expt                       ! Experiment ID.
    character*80        :: filename                   ! Input filename.
-   character*1         :: k_label                    ! = k if model level, m if mode output.
    character*2         :: ck                         ! Loop index -> character.
    character*3         :: ce                         ! Member index -> character.
    integer             :: ni, nj, nk                 ! Dimensions read in.
@@ -34,10 +33,11 @@ program gen_be_stage4
    logical             :: first_time                 ! True if first time through loop.
    logical             :: testing_spectral           ! Test spectral transform.
    logical             :: data_on_levels             ! False if data is projected onto EOFs.
+   logical             :: use_global_eofs            ! True if projected data uses global EOFs.
    real                :: pi_over_180                ! pi / 180
    real                :: diff_rms                   ! RMS error measure.
    real                :: coeffa, coeffb             ! Accumulating mean coefficients.
-   real                :: accum_power, variance      ! Accumulated power, variance.
+   real                :: variance                   ! Variance (sum of power spectra) .
 
    real, allocatable   :: field(:,:)                 ! Gridpoint field to be decomposed.
    real, allocatable   :: field_out(:,:)             ! Output test field.
@@ -55,9 +55,11 @@ program gen_be_stage4
    real, allocatable   :: total_power(:)             ! Total Power spectrum (averaged over time/members).
 
    complex, allocatable:: cv(:)                      ! Control variable vector.
+   real,    allocatable:: rcv(:)                     ! Real Control variable vector.
+
 
    namelist / gen_be_stage4_nl / start_date, end_date, interval, variable, gaussian_lats, &
-                                 be_method, ne, k, testing_spectral, data_on_levels, expt, dat_dir
+                                 be_method, ne, k, testing_spectral, expt, dat_dir
 
    pi_over_180 = pi / 180.0
 
@@ -74,7 +76,6 @@ program gen_be_stage4
    ne = 1
    k = 1
    testing_spectral = .true.
-   data_on_levels = .false.
    expt = 'gen_be_stage4'
    dat_dir = '/mmmtmp1/dmbarker'
 
@@ -85,16 +86,6 @@ program gen_be_stage4
 
    write(ck,'(i2)')k
    if ( k < 10 ) ck = '0'//ck(2:2)
-   if ( data_on_levels ) then
-!      Data on vertical levels:
-       k_label = 'k'
-!       write(6,(a)) Input Data is on model levels.
-   else
-!      Project fields onto vertical modes:
-       k_label = 'm'
-!       write(6,(a)) Input Data is projected on vertical modes.
-   end if
-!   if ( trim(variable) == ps .or. trim(variable) == ps_u ) k_label = k
 
    read(start_date(1:10), fmt='(i10)')sdate
    read(end_date(1:10), fmt='(i10)')edate
@@ -122,9 +113,11 @@ program gen_be_stage4
 !---------------------------------------------------------------------------------------------
 
          filename = trim(variable)//'/'//date(1:10)//'.'//trim(variable)
-         filename = trim(filename)//'.'//trim(be_method)//'.e'//ce//'.'//k_label//ck
+         filename = trim(filename)//'.'//trim(be_method)//'.e'//ce//'.'//ck
          open (iunit, file = filename, form='unformatted')
          read(iunit)ni, nj, nk ! nk not used.
+         read(iunit)data_on_levels, use_global_eofs
+
          if ( first_time ) then
             write(6,'(a,3i8)')'    i, j, k dimensions are ', ni, nj, nk
             allocate( field(1:ni,1:nj) )
@@ -133,6 +126,16 @@ program gen_be_stage4
          close(iunit)
 
          if ( first_time ) then
+            if ( data_on_levels ) then
+               write(6,'(a)')' Input Data is on model levels.'
+            else
+               write(6,'(a)')' Input Data is projected on vertical modes.'
+               if ( use_global_eofs ) then
+                  write(6,'(a)')' Input 2D field is projected using global EOFs.'
+               else
+                  write(6,'(a)')' Input 2D field is projected using local EOFs.'
+               end if
+            end if
 
 !---------------------------------------------------------------------------------------------
 !           write(6,(a)) Initialize spectral transforms.
@@ -166,11 +169,13 @@ program gen_be_stage4
 
             v_size = ( max_wavenumber + 1 ) * ( max_wavenumber + 2 ) / 2
             allocate( cv( 1:v_size) )
+            allocate( rcv( 1:2*v_size) )
+
 
 !           Test horizontal transforms:
             if ( testing_spectral ) then
                call da_test_spectral( ni, nj, max_wavenumber, inc, lenr, lensav, lenwrk, &
-                                      alp_size, v_size, alp, wsave, int_wgts, field )
+                                      alp_size, 2*v_size, alp, wsave, int_wgts, field )
             end if
             first_time = .false.
          end if
@@ -178,13 +183,16 @@ program gen_be_stage4
 !---------------------------------------------------------------------------------------------
 !         write(6,(a)) Perform gridpoint to spectral decomposition.
 !---------------------------------------------------------------------------------------------
-
          call da_vv_to_v_spectral( ni, nj, max_wavenumber, inc, lenr, lensav, lenwrk, &
-                                   alp_size, v_size, alp, wsave, int_wgts, field, cv )
+                                   alp_size, 2*v_size, alp, wsave, int_wgts, rcv, field)
 
 !---------------------------------------------------------------------------------------------
 !         write(6,(a)) Calculate power spectra.
 !---------------------------------------------------------------------------------------------
+
+         do i = 1, v_size
+         cv(i) = cmplx ( rcv(2*i-1), rcv(2*i) )
+         end do
 
          call da_calc_power( max_wavenumber, v_size, cv, power )
 
@@ -206,22 +214,16 @@ program gen_be_stage4
 
    end do     ! End loop over times.
 
-   accum_power = 0.0
    variance = sum( total_power(0:max_wavenumber) )   
-   do n = 0, max_wavenumber
-      accum_power = accum_power + total_power(n)
-      write(6,'(a,2i4,2f18.5,f8.3)')trim(variable), k, n, total_power(n), accum_power, &
-                                    accum_power / variance
-   end do
-
    write(6,'(3a,i2,a,1pe15.5)')' Variable = ', trim(variable), ', Vertical Index = ', &
                                 k, ', Variance = ', variance
 
    filename = trim(variable)//'/'//trim(variable)
-   filename = trim(filename)//'.'//trim(be_method)//'.'//k_label//ck//'.spectrum'
+   filename = trim(filename)//'.'//trim(be_method)//'.'//ck//'.spectrum'
    open (ounit, file = filename, form='unformatted')
    write(ounit)variable
    write(ounit)max_wavenumber, k
+   write(ounit)data_on_levels, use_global_eofs
    write(ounit)total_power
 
 end program gen_be_stage4
