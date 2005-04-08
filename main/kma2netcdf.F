@@ -45,7 +45,10 @@ PROGRAM kma2netcdf
 
 !--Get the NAMELIST data for input.
 
-   CALL init_modules
+!shc-wei start
+!  CALL init_modules
+   CALL init_modules(1)
+!shc-wei end
 
 
 #ifdef DM_PARALLEL
@@ -62,7 +65,10 @@ PROGRAM kma2netcdf
    CALL initial_config
 #endif
 
-   CALL get_debug_level ( debug_level )
+!shc-wei start
+!  CALL get_debug_level ( debug_level )
+   CALL nl_get_debug_level ( 1,debug_level )
+!shc-wei end
    CALL set_wrf_debug_level ( debug_level )
 
 !--allocated and configure the mother domain
@@ -71,7 +77,7 @@ PROGRAM kma2netcdf
 
    CALL       wrf_debug ( 100 , 'wrf: calling alloc_and_configure_domain ' )
    CALL alloc_and_configure_domain ( domain_id  = 1 ,                  &
-                                     local_time = 0 ,                  &
+!                                    local_time = 0 ,                  &   !shc-wei
                                      grid       = head_grid ,          &
                                      parent     = null_domain ,        &
                                      kid        = -1                   )

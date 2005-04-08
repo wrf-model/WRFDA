@@ -8,7 +8,7 @@ OBJS	=	module_kma2netcdf_interface.o \
 		module_netcdf2kma_interface.o
 
 MODULES =	module_kma_wave2grid.o \
-		module_wave2grid_kma.o \
+		module_wave2grid_kma.o
 
 LIBTARGET    =  convertor
 TARGETDIR    =  ./

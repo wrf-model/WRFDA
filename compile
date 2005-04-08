@@ -26,8 +26,10 @@ if ( ! $?dontask && $?prompt ) then
 endif
 
 set arglist=""
-set compare_wrf = 0
+set compare_wrf = 1
 set compare_3dvar = 0
+setenv WRF_EM_CORE 1
+setenv WRF_DA_CORE 0
 
 foreach a ( $argv )
   if ( "$a" == "-h" ) then

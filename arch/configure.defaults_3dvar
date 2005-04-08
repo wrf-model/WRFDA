@@ -614,10 +614,11 @@ CFLAGS          =       -UCRAY -Dcrayx1 \
 			-h gen_private_callee
 TRADFLAG        =
 #FCOPTIM         =     	-Ofp3 -O3
-#FCOPTIM         =     	-Ofp2 -O1 -Ogen_private_callee
-FCOPTIM         =     	-Ofp2 -O0
+FCOPTIM         =     	-Ofp2 -O1 -Ogen_private_callee
+#FCOPTIM         =     	-Ofp2 -O0
 FCDEBUG         =       #-g
-FCTYPE          =       -sinteger32 -e m -sreal64 -dp
+#FCTYPE          =       -sinteger32 -e m -sreal64 -dp
+FCTYPE          =       integer32 -e m -sreal64 -dp
 FCFORM          =       -f free -N 255
 FCHOST          =   
 FCBASE          =       #-Ovector0 -Ostream0 -Oscalar1
@@ -638,6 +639,7 @@ CONVERTOR_LIB	=	-L../convertor
 LOCAL_LIBRARIES =       #-L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c -lX11
 
 CPP             =       cpp -C -P -Dcrayx1
+#CPP             =       cpp -C -P
 DM_1_CPP_FLAGS	=	-I../external/RSL/RSL -C -P `cat ../inc/dm_comm_cpp_flags`
 DM_2_CPP_FLAGS	=	-I../../external/RSL/RSL -C -P `cat ../../inc/dm_comm_cpp_flags`
 POUND_DEF       =       -DCRAYX1 \

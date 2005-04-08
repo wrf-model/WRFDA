@@ -108,13 +108,15 @@ C   =================================================================
 C   =================================================================
 C   >>>   Select Input Source                                     <<<
 C   =================================================================
-      CALL GETENV('FROMUNPACK',FROMUNPACK)
-      IF (LEN_TRIM(FROMUNPACK).EQ.0) THEN
-        IUNPACK=0
-      ELSE
-        READ(FROMUNPACK,'(I1)') IUNPACK
-      END IF
-      WRITE(6,*)'IUNPACK=',IUNPACK
+!shc-wei start
+C     CALL GETENV('FROMUNPACK',FROMUNPACK)  
+c     IF (LEN_TRIM(FROMUNPACK).EQ.0) THEN
+c       IUNPACK=0
+c     ELSE
+c       READ(FROMUNPACK,'(I1)') IUNPACK
+c     END IF
+c     WRITE(6,*)'IUNPACK=',IUNPACK
+!shc-wei end
 C   =================================================================           
 C   >>>   GENERATE GAUSSIAN LATITUDES                             <<<           
 C   =================================================================           

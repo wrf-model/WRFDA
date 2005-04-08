@@ -16,6 +16,14 @@ da_3dvar : da_3dvar.o
 	$(RANLIB) libwrflib.a
 	$(LD) -o da_3dvar.exe $(LDFLAGS) da_3dvar.o libwrflib.a $(LIB)
 
+kma2netcdf : kma2netcdf.o
+	$(RANLIB) libwrflib.a
+	$(LD) -o kma2netcdf.exe $(LDFLAGS) kma2netcdf.o libwrflib.a $(LIB) -L../convertor
+
+netcdf2kma : netcdf2kma.o
+	$(RANLIB) libwrflib.a
+	$(LD) -o netcdf2kma.exe $(LDFLAGS) netcdf2kma.o libwrflib.a $(LIB) -L../convertor 
+
 $(SOLVER) : $(SOLVER).o
 	$(RANLIB) libwrflib.a
 	$(LD) -o $(SOLVER).exe $(LDFLAGS) $(SOLVER).o libwrflib.a $(LIB)

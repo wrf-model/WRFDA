@@ -1,4 +1,4 @@
-#! /bin/csh -f
+#!/bin/csh -f
 #IBM:
 # @ job_type   = parallel
 ## @ environment = COPY_ALL
@@ -6,19 +6,15 @@
 # @ job_name   = wrf3dvar
 # @ output     = wrf3dvar.out
 # @ error      = wrf3dvar.err
-# @ node       = 1
-## @ network.MPI    = css0,shared,us
+# @ node       = 4
 # @ network.MPI    = css0,shared,ip
-# @ tasks_per_node = 16
+# @ tasks_per_node = 8
 # @ node_usage = not_shared
 # @ checkpoint = no
 # @ wall_clock_limit = 01:30:00
 # NCEP IBM=dev
 # NCAR IBM(bluesky)=com_rg8:
-# NCAR IBM(blackforest)=com_reg:
-# NCAR IBM(blackforest_nighthawk)=com_nh:
-# @ class      =  com_nh
-## @ class      =  com_reg
+# @ class      =  com_rg8
 # @ queue
 #
 #FSL JET (Alpha/Linux):
@@ -39,7 +35,7 @@
 #
 #-----------------------------------------------------------------------
 
- unlimit
+#unlimit
 
  setenv MP_SHARED_MEMORY yes
 
@@ -54,60 +50,32 @@
 
 #Specify job details here:
 
- set DA_OB_FORMAT  = 2		# Observation format: 1=BUFR, 2=ASCII "little_r"
- set DA_CV_OPTIONS = 4		# 2 -> MM5, 3 -> WRF 4 -> Global
- set DA_GLOBAL     = .TRUE.     # true for global option
- setenv TRUNC  T63              # Triangular truncation number 
+ set DA_OB_FORMAT	= 2		# Observation format: 1=BUFR, 2=ASCII "little_r"
+ set DA_CV_OPTIONS	= 4		# 2 -> MM5, 3 -> WRF 4 -> Global
+ set DA_GLOBAL		= .TRUE.	# true for global option
+ set TRUNC		= T63           # Triangular truncation number 
 
  setenv DA_ANALYSIS_DATE	2004-10-27_06:00:00.0000  # Specify date in this format.
  setenv WEST_EAST_GRID_NUMBER	193                       # Number of gridpoints in x(i) dim.
- setenv SOUTH_NORTH_GRID_NUMBER	 98                       # Number of gridpoints in y(j) dim.
- setenv VERTICAL_GRID_NUMBER	 31                       # Number of vertical levels.
- setenv GRID_DISTANCE		190000                     # Grid resolution (m).
+ setenv SOUTH_NORTH_GRID_NUMBER	98                        # Number of gridpoints in y(j) dim.
+ setenv VERTICAL_GRID_NUMBER	31                        # Number of vertical levels.
+ setenv GRID_DISTANCE		190000                    # Grid resolution (m).
 
 #Specify directories/files here:
 
-# setenv HOME    /Volumes/mahua/rizvi
- setenv HOME    /mmmtmp/rizvi
- setenv TMP     /mmmtmp/rizvi
- setenv TMP1    /datatmp1/rizvi
- 
-# setenv WRF_DIR ${TMP1}/wrf3dvar
- setenv WRF_DIR ${TMP}/wrf3dvar
+ setenv WRF_DIR	/ptmp/n10450/wrfvar
+ setenv DAT_DIR	/ptmp/n10450/kma_data
+ setenv RUN_DIR /ptmp/n10450/test_kma_global
 
- setenv DAT_DIR  ${TMP1}/kma_data_input
- setenv IN_DIR  ${TMP1}/kma_data_input/${TRUNC}                   
- setenv OUT_DIR ${TMP1}/kma_data_output/${TRUNC}
+ setenv DA_FIRST_GUESS  ${DAT_DIR}/wrf_3dvar_input
+ setenv DA_BACK_ERRORS  ${DAT_DIR}/be
+ setenv DA_OBSERVATIONS	${DAT_DIR}/obs_gts-2004102712-full 
 
- setenv RUN_DIR /${TMP1}/kma_test_results/global/adj_test/${TRUNC}
-
- setenv DA_FIRST_GUESS  ${IN_DIR}/KMA2NETCDF_DATA
- setenv DA_BACK_ERRORS  ${IN_DIR}/gen_be.NMC.dat      # global BE
  setenv DA_SSMI		${DAT_DIR}/ssmi.dat                 # SSM/I radiances (ignore if not using).
  setenv DA_RADAR	${DAT_DIR}/radar.dat                # Radar data (ignore if not using).
 
- set os = `uname`
- set endian_form   = big_endian
- if((${os} == 'OSF1') || (${os} == 'Linux')) then
-    set endian_form   = little_endian                       # Needed for BUFR obs files only.
- endif
-
- if(${DA_OB_FORMAT} == 1) then
-    set DA_OBSERVATIONS = ${IN_DIR}/ob.bufr.${endian_form} # Input BUFR observation file.
- else if(${DA_OB_FORMAT} == 2) then
-#    set DA_OBSERVATIONS	= ${IN_DIR}/obs_gts.3dvar          # Input "little_r" format obs (recommended for now).
-#    set DA_OBSERVATIONS	=  ${HOME}/radar_case_062002/obs-gts-2002061012 
-    set DA_OBSERVATIONS	=  ${DAT_DIR}/obs_gts-2004102712-full 
- else
-    echo "DA_OB_FORMAT error: Do not know how to handle DA_OB_FORMAT = ${DA_OB_FORMAT}"
-    exit 1
- endif
-
 ############################################################################
 
- if ( ! -d $OUT_DIR ) then
-  mkdir -p $OUT_DIR
- endif
  if ( ! -d $RUN_DIR ) then
   mkdir -p $RUN_DIR
  endif
@@ -117,8 +85,8 @@
 #rm -rf $RUN_DIR/*
  cp $WRF_DIR/run/LANDUSE.TBL .
  cp $WRF_DIR/main/da_3dvar.exe  da_3dvar.exe
-# cp $WRF_DIR/main/kma2netcdf.exe .                 
-# cp $WRF_DIR/main/netcdf2kma.exe .                 
+#cp $WRF_DIR/main/kma2netcdf.exe .                 
+#cp $WRF_DIR/main/netcdf2kma.exe .                 
 
 #Check settings:
 
@@ -167,23 +135,23 @@
  if ( ! $?DA_USE_SYNOPOBS )  set DA_USE_SYNOPOBS = .TRUE. 
  if ( ! $?DA_USE_SHIPSOBS )  set DA_USE_SHIPSOBS = .TRUE. 
  if ( ! $?DA_USE_METAROBS )  set DA_USE_METAROBS = .TRUE. 
- if ( ! $?DA_USE_PILOTOBS )  set DA_USE_PILOTOBS = .TRUE. 
- if ( ! $?DA_USE_SOUNDOBS )  set DA_USE_SOUNDOBS = .TRUE. 
- if ( ! $?DA_USE_SATEMOBS )  set DA_USE_SATEMOBS = .TRUE. 
- if ( ! $?DA_USE_SATOBOBS )  set DA_USE_SATOBOBS = .TRUE.
+ if ( ! $?DA_USE_PILOTOBS )  set DA_USE_PILOTOBS = .TRUE.
+ if ( ! $?DA_USE_SOUNDOBS )  set DA_USE_SOUNDOBS = .TRUE.
+ if ( ! $?DA_USE_SATEMOBS )  set DA_USE_SATEMOBS = .TRUE.
+ if ( ! $?DA_USE_SATOBOBS )  set DA_USE_SATOBOBS = .TRUE. 
  if ( ! $?DA_USE_AIREPOBS )  set DA_USE_AIREPOBS = .TRUE.
- if ( ! $?DA_USE_GPSPWOBS )  set DA_USE_GPSPWOBS = .TRUE. 
+ if ( ! $?DA_USE_GPSPWOBS )  set DA_USE_GPSPWOBS = .TRUE.
  if ( ! $?DA_USE_RADAROBS )  set DA_USE_RADAROBS = .FALSE.
  if ( ! $?DA_Use_Radar_rv )  set DA_Use_Radar_rv = .FALSE.
  if ( ! $?DA_Use_Radar_rf )  set DA_Use_Radar_rf = .FALSE.
- if ( ! $?DA_USE_GPSREFOBS )  set DA_USE_GPSREFOBS = .TRUE. 
- if ( ! $?DA_USE_PROFILEROBS )  set DA_USE_PROFILEROBS = .TRUE. 
- if ( ! $?DA_USE_BUOYOBS     )  set DA_USE_BUOYOBS     = .TRUE. 
+ if ( ! $?DA_USE_GPSREFOBS )  set DA_USE_GPSREFOBS = .FALSE.
+ if ( ! $?DA_USE_PROFILEROBS )  set DA_USE_PROFILEROBS = .TRUE.
+ if ( ! $?DA_USE_BUOYOBS     )  set DA_USE_BUOYOBS     = .TRUE.
  if ( ! $?DA_USE_SSMIRETRIEVALOBS  )  set DA_USE_SSMIRETRIEVALOBS = .FALSE.
  if ( ! $?DA_USE_SSMITBOBS ) set DA_USE_SSMITBOBS = .FALSE.
  if ( ! $?DA_USE_SSMT1OBS ) set DA_USE_SSMT1OBS = .FALSE.  
  if ( ! $?DA_USE_SSMT2OBS ) set DA_USE_SSMT2OBS = .FALSE.
- if ( ! $?DA_USE_QSCATOBS ) set DA_USE_QSCATOBS = .TRUE.
+ if ( ! $?DA_USE_QSCATOBS ) set DA_USE_QSCATOBS = .FALSE.
  if ( ! $?DA_Check_Max_IV )  set DA_Check_Max_IV        = .TRUE.
  if ( ! $?DA_USE_OBS_ERRFAC ) set DA_USE_OBS_ERRFAC = .FALSE.
  if ( ! $?DA_PUT_RAND_SEED ) set DA_PUT_RAND_SEED = .FALSE.
@@ -212,9 +180,9 @@
  if ( ! $?DA_Y_START_SUB_DOMAIN )set DA_Y_START_SUB_DOMAIN = 35.0
  if ( ! $?DA_X_END_SUB_DOMAIN )set DA_X_END_SUB_DOMAIN = 80.0
  if ( ! $?DA_Y_END_SUB_DOMAIN )set DA_Y_END_SUB_DOMAIN = 60.0
- if ( ! $?DA_TESTING_3DVAR ) set DA_TESTING_3DVAR = .TRUE. 
- if ( ! $?DA_TEST_TRANSFORMS )  set DA_TEST_TRANSFORMS = .TRUE. 
- if ( ! $?DA_TEST_STATISTICS )  set DA_TEST_STATISTICS = .FALSE.
+ if ( ! $?DA_TESTING_3DVAR ) set DA_TESTING_3DVAR = .FALSE.
+ if ( ! $?DA_TEST_TRANSFORMS )  set DA_TEST_TRANSFORMS = .FALSE.
+ if ( ! $?DA_TEST_STATISTICS )  set DA_TEST_STATISTICS = .FALSE. 
  if ( ! $?DA_INTERPOLATE_STATS )  set DA_INTERPOLATE_STATS = .TRUE.
  if ( ! $?DA_MINIMISATION_OPTION) set DA_MINIMISATION_OPTION = 2
  if ( ! $?DA_WRITE_OUTER_LOOP) set DA_WRITE_OUTER_LOOP = .FALSE.
@@ -432,7 +400,8 @@ cat >! namelist.input << EOF
  parent_grid_ratio                   = 1,     3,     3,
  parent_time_step_ratio              = 1,     3,     3,
  feedback                            = 1,
- smooth_option                       = 0
+ smooth_option                       = 0,
+ nproc_y                             = 1
  /
 
  &physics
@@ -507,16 +476,7 @@ cat >! namelist.input << EOF
  /
 
 EOF
-#  Over write the namelist.input file
-# cp ${IN_DIR}/namelist.input .
 
-#Uncomment for particular machine:
-cat >! hosts << EOF
-zebra
-zebra
-zebra
-zebra
-EOF
 #-----------------------------------------------------------------------
 # [1.0] Run KMA2NETCDF   Procedure
  echo "Running KMA2NETCDF ------"
@@ -544,43 +504,90 @@ EOF
  echo "Running  3DVAR  ------"
 #-----------------------------------------------------------------------
 #DEC, SGI, Linux/PC multiPE:
-   ./da_3dvar.exe >&! da_3dvar.out
- cp wrf_3dvar_output ANL_NETCDF_DATA
- cp fort.71          ANL_INCREMENTS
- cp fort.710         FORMATTED_ANL_INCREMENTS
- cp fort.12          DAProg_3DVAR.statistics
- cp fort.81          DAProg_3DVAR.cost_fn
- cp fort.82          DAProg_3DVAR.grad_fn
+#  ./da_3dvar.exe >&! da_3dvar.out
+#cp wrf_3dvar_output ANL_NETCDF_DATA
+#cp fort.71          ANL_INCREMENTS
+#cp fort.710         FORMATTED_ANL_INCREMENTS
+#cp fort.12          DAProg_3DVAR.statistics
+#cp fort.81          DAProg_3DVAR.cost_fn
+#cp fort.82          DAProg_3DVAR.grad_fn
 #BIG : mpirun -np 4 ./da_3dvar.exe
 #    mpirun -np 8 ./da_3dvar.exe
 #IBM (llsubmit):
 #  poe ./da_3dvar.exe
 #AFWA: setenv LOADL_INTERACTIVE_CLASS 1
 #AFWA: poe ./da_3dvar.exe -euilib us -hostfile host.afwa -procs 15
- echo "3DVAR    completed"
+#echo "3DVAR    completed"
+#-----------------------------------------------------------------------
+#Create job script for cray x1.
+cat >! run_3dvar.sh << EOF
+#!/bin/sh
+# PBSPRO SETUP
+#PBS -lmppe=4,walltime=1:00:00,mem=10Gb
+####PBS -lmppssp=416,walltime=2:00:00,mem=400Gb
+####PBS -lmppe=4
+#PBS -V
+#PBS -j oe
+                                                                                
+ cd \$PBS_O_WORKDIR
+
+NPROC=4
+
+set -x
+
+. /opt/modules/modules/init/sh
+
+module purge
+module load modules
+module use /opt/modulefiles
+module load PrgEnv.53.newest apptools
+
+FILENV=.assign
+export FILENV
+assign -R
+assign -Y on f:namelist.input
+assign -Y on f:namelist.3dvar
+
+rm -f rsl.* show* wrf_3dvar_output
+
+export X1_STACK_SIZE=1200000000
+export X1_HEAP_SIZE=12000000000
+
+date
+
+aprun -p16m:16m -c core=0 -n \$NPROC da_3dvar.exe
+
+date
+
+ mv rsl.out.0000 p\${NPROC}_rsl.out.0000
+ mv rsl.error.0000 p\${NPROC}_rsl.error.0000
+EOF
+
+qsub run_3dvar.sh
+
 exit
 #-----------------------------------------------------------------------
 # [3.0] Run NETCDF2KMA   Procedure
- echo "Running  NETCDF2KMA  ------"
+#echo "Running  NETCDF2KMA  ------"
 #-----------------------------------------------------------------------
- ln -sf ${IN_DIR}/analysis_date         fort.94
- ln -sf ${IN_DIR}/gau2gwv213_namelist   fort.95
+#ln -sf ${IN_DIR}/analysis_date         fort.94
+#ln -sf ${IN_DIR}/gau2gwv213_namelist   fort.95
 # This file is for T213 which holds gaussian topography
 #   ln -sf ${IN_DIR}/ghm_modl_mtn.dat           fort.3
 # This file is for T63 which holds gaussian topography
-   ln -sf ${IN_DIR}/T63_TOPO_gaus.2004051906    fort.3
- ln -sf ${OUT_DIR}/ANL_NETCDF_DATA wrf_3dvar_input
- ln -sf ${OUT_DIR}/ANL_INCREMENTS             fort.101  # INC at equal lat/lon
- ln -sf ${IN_DIR}/wg6_modl_gleln.2004051906   fort.102  # FG at gaussian lat/lon
- ln -sf ${OUT_DIR}/n2k.out         fort.901    #shc1
- ln -sf ${OUT_DIR}/lt2.out         fort.902    #shc1
- ln -sf ${OUT_DIR}/gwv.out         fort.903    #shc1
- ln -sf ${OUT_DIR}/n2F.out         fort.904    #shc1
- ln -sf ${OUT_DIR}/n2k1.ASC        fort.881    #shc1
- ln -sf ${OUT_DIR}/n2k2.ASC        fort.882    #shc1
+#ln -sf ${IN_DIR}/T63_TOPO_gaus.2004051906    fort.3
+#ln -sf ${OUT_DIR}/ANL_NETCDF_DATA wrf_3dvar_input
+#ln -sf ${OUT_DIR}/ANL_INCREMENTS             fort.101  # INC at equal lat/lon
+#ln -sf ${IN_DIR}/wg6_modl_gleln.2004051906   fort.102  # FG at gaussian lat/lon
+#ln -sf ${OUT_DIR}/n2k.out         fort.901    #shc1
+#ln -sf ${OUT_DIR}/lt2.out         fort.902    #shc1
+#ln -sf ${OUT_DIR}/gwv.out         fort.903    #shc1
+#ln -sf ${OUT_DIR}/n2F.out         fort.904    #shc1
+#ln -sf ${OUT_DIR}/n2k1.ASC        fort.881    #shc1
+#ln -sf ${OUT_DIR}/n2k2.ASC        fort.882    #shc1
 #  ./netcdf2kma.exe >&! netcdf2kma.out
- cp fort.11 ${OUT_DIR}/KMA_HIST_DATA
- cp fort.12 ${OUT_DIR}/W2GG_DATA
- cp rsl.out.0000     rsl.out.netcdf2kma
- echo "NETCDF2KMA    completed"
+#cp fort.11 ${OUT_DIR}/KMA_HIST_DATA
+#cp fort.12 ${OUT_DIR}/W2GG_DATA
+#cp rsl.out.0000     rsl.out.netcdf2kma
+#echo "NETCDF2KMA    completed"
 # exit (0)
