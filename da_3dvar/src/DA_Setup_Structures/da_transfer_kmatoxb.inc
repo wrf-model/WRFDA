@@ -40,12 +40,7 @@ SUBROUTINE DA_Transfer_KMAToXb( xbx, grid, &
 
    integer :: ierror
 
-   LOGICAL, EXTERNAL :: wrf_dm_on_monitor
-
-   integer, parameter :: P_QV = 2
-
 !---------------------------------------------------------------------------
-!
 
       conv = pi/180. 
       earth_radius_sq = earth_radius*1000. * earth_radius*1000. * &
@@ -547,3 +542,4 @@ SUBROUTINE DA_Transfer_KMAToXb( xbx, grid, &
 #endif
 
 END SUBROUTINE DA_Transfer_KMAToXb
+

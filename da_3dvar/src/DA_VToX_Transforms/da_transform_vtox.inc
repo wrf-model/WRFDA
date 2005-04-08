@@ -36,16 +36,17 @@ subroutine da_transform_vtox( xb, xbx, be, cv, vv, vp, xp, xa,        &
 !-------------------------------------------------------------------------
 !  [1.0]: Perform vv = u_h cv transform:
 !-------------------------------------------------------------------------
- if(cv_options == 2 .or. cv_options == 4 .or. cv_options == 5) &    
+ if(cv_options == 2 .or. cv_options == 5) &    
    call da_transform_vtovv( xb, be, cv, vv, xp,         &
                             ids,ide, jds,jde, kds,kde,  &
                             ims,ime, jms,jme, kms,kme,  &
                             its,ite, jts,jte, kts,kte )
- if(cv_options == 4 ) &    
+ else if(cv_options == 4) then
    call DA_Transform_VToVv_Global(xb, xbx, be, cv, vv, &
                            ids,ide, jds,jde, kds,kde,  &
                            ims,ime, jms,jme, kms,kme,  &
                            its,ite, jts,jte, kts,kte )
+ endif
 !-------------------------------------------------------------------------
 !  [2.0]: Perform vp = u_v vv transform:
 !-------------------------------------------------------------------------
@@ -248,6 +249,8 @@ subroutine da_transform_vtox( xb, xbx, be, cv, vv, vp, xp, xa,        &
                     ims, ime, jms, jme,   1,   1,  &
                     its, ite, jts, jte,   1,   1   )
 #endif
+    call DA_Set_Boundary_Xa(xa, xb)
    end if   
 
 end subroutine da_transform_vtox
+

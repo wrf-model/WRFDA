@@ -41,44 +41,35 @@ subroutine DA_PsiChi_To_UV_Adj( u, v, coefx, coefy, psi, chi, &
    integer            :: ips, ipe                     ! 1st dim. end points.
    integer            :: is, ie                       ! 1st dim. end points.
    integer            :: js, je                       ! 2nd dim. end points.
-   real               :: coeff_u, coeff_v             ! Multiplicative coefficient.
-!   real, intent(in)   :: map_factor(ims:ime,jms:jme)  ! Map fact.
-!   real, intent(in)   :: ds                           ! Resolution.
-   real               :: coeff(ims:ime,jms:jme)       ! Multiplicative coefficient.
 
 !------------------------------------------------------------------------------
-!  [1.0] For Global application, set West-Eest Periodic boundary
+!  [5.0] For Global application, set Wast-Eest Periodic boundary
 !------------------------------------------------------------------------------
-
-   if( global) then 
-   call da_set_boundary_3d(u, &
-                               ids,ide, jds,jde, kds,kde,  &
-                               ims,ime, jms,jme, kms,kme,  &
-                               its,ite, jts,jte, kts,kte )
-   call da_set_boundary_3d(v, &
-                               ids,ide, jds,jde, kds,kde,  &
-                               ims,ime, jms,jme, kms,kme,  &
-                               its,ite, jts,jte, kts,kte )
-   end if   
+   if( global ) then
+    call da_set_boundary_3d(u, &
+                            ids,ide, jds,jde, kds,kde,  & 
+                            ims,ime, jms,jme, kms,kme,  & 
+                            its,ite, jts,jte, kts,kte ) 
+    call da_set_boundary_3d(v, &
+                            ids,ide, jds,jde, kds,kde,  & 
+                            ims,ime, jms,jme, kms,kme,  & 
+                            its,ite, jts,jte, kts,kte ) 
+   end if
 
 !------------------------------------------------------------------------------
 !  Computation to check for edge of domain:
-   is = its; ie = ite; js = jts; je = jte
-   if( its == ids) is = ids+1
-   if( ite == ide) ie = ide-1
-   if( jts == jds ) js = jds+1; if ( jte == jde ) je = jde-1
+!------------------------------------------------------------------------------
 
+   is = its-1; ie = ite+1
+   js = jts-1; je = jte+1
+   if ( jts == jds ) js = jds+1; if ( jte == jde ) je = jde-1
 
-!!------------------------------------------------------------------------------
-!!  Computation to check for edge of domain:
-!   is = its; ie = ite; js = jts; je = jte
-!   if ( its == ids ) is = ids+1; if ( ite == ide ) ie = ide-1
-!   if ( jts == jds ) js = jds+1; if ( jte == jde ) je = jde-1
-!
-!!------------------------------------------------------------------------------
+   if ( .not. global ) then
+      if ( its == ids ) is = ids+1
+      if ( ite == ide ) ie = ide-1
+!------------------------------------------------------------------------------
    do k = kts, kte
    
-!------------------------------------------------------------------------------
 !------------------------------------------------------------------------------
 !     [4.0] Corner points (assume average of surrounding points - poor?):
 !------------------------------------------------------------------------------
@@ -120,18 +111,14 @@ subroutine DA_PsiChi_To_UV_Adj( u, v, coefx, coefy, psi, chi, &
       end if
       
    enddo
+   endif
 !------------------------------------------------------------------------------
-!102    continue
 !  [3.0] Compute u, v at domain boundaries:
-!------------------------------------------------------------------------------
-   is = its-1; ie = ite+1; js = jts-1; je = jte+1
-   if ( its == ids ) is = ids+1
-   if ( ite == ide ) ie = ide-1
-   if ( jts == jds ) js = jds+1; if ( jte == jde ) je = jde-1
 
 
    do k = kts, kte
 
+     if( .not. global ) then
 !     [3.4] Northern boundaries:
 
       if ( jte == jde ) then
@@ -214,6 +201,7 @@ subroutine DA_PsiChi_To_UV_Adj( u, v, coefx, coefy, psi, chi, &
          end do
       end if
 
+   endif
 !------------------------------------------------------------------------------
 !  [2.0] Compute u, v at interior points (2nd order central finite diffs):
 !------------------------------------------------------------------------------
@@ -232,18 +220,23 @@ subroutine DA_PsiChi_To_UV_Adj( u, v, coefx, coefy, psi, chi, &
             chi(i-1,j,k) = chi(i-1,j,k) - coefx(i,j) * u(i,j,k)
          end do
       end do
-   end do
+
 !------------------------------------------------------------------------------
-!  [1.0] For Global application, set West-Eest Periodic boundary
+   end do    !  loop over levels
+
 !------------------------------------------------------------------------------
-   if( global) then 
-   call da_set_boundary_3d(psi, &
-                               ids,ide, jds,jde, kds,kde,  &
-                               ims,ime, jms,jme, kms,kme,  &
-                               its,ite, jts,jte, kts,kte )
-   call da_set_boundary_3d(chi, &
-                               ids,ide, jds,jde, kds,kde,  &
-                               ims,ime, jms,jme, kms,kme,  &
-                               its,ite, jts,jte, kts,kte )
-   end if   
+!  [5.0] For Global application, set Wast-Eest Periodic boundary
+!------------------------------------------------------------------------------
+   if( global ) then
+    call da_set_boundary_3d(psi, &
+                            ids,ide, jds,jde, kds,kde,  &
+                            ims,ime, jms,jme, kms,kme,  &
+                            its,ite, jts,jte, kts,kte )
+    call da_set_boundary_3d(chi, &
+                            ids,ide, jds,jde, kds,kde,  &
+                            ims,ime, jms,jme, kms,kme,  &
+                            its,ite, jts,jte, kts,kte )
+   end if
+
 end subroutine DA_PsiChi_To_UV_Adj
+

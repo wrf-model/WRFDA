@@ -50,6 +50,7 @@ RANLIB		=	ranlib
 
 MPI_LIB		=
 LOCAL_LIB	=
+CONVERTOR_LIB	=
 
 #### DM buffer length for the configuration flags.
 

@@ -36,7 +36,10 @@ SUBROUTINE netcdf2kma_interface ( grid, config_flags )
 !
 !   First the Equal lat/lon data
 ! set Field as per KMA order (North top South and 0 to 360 east)
-   back = 102                    !shc start
+!shc-wei start
+!  back = 102                    !shc start
+   back = 48                     !shc start
+!shc-wei end
    read(back) ID,KT,IM,JM,KM
    read(back)       !topo
    read(back) PSB
@@ -49,7 +52,10 @@ SUBROUTINE netcdf2kma_interface ( grid, config_flags )
    read(back)       !z           !shc end
    USE_INCREMENT=1     !shc start
    if (USE_INCREMENT.eq.1) then
-   incre = 101                   
+!shc-wei start
+!  incre = 101                   
+   incre = 47                   
+!shc-wei end
    read(incre) DPSE
    read(incre) DUE
    read(incre) DVE

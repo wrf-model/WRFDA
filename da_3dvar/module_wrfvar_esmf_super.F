@@ -93,7 +93,7 @@ CONTAINS
 !
 !</DESCRIPTION>
 
-   program_name = "WRFVAR 2.0.2.0 (COMPATIBLE TO WRF V2.0.3.1) MODEL"
+   program_name = "WRFVAR 2.0.3.2 (COMPATIBLE TO WRF V2.0.3.1) MODEL"
 
    !  Get the NAMELIST data for input.
 

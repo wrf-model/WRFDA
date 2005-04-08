@@ -1,4 +1,4 @@
-subroutine da_leg_tra ( nj, max_wavenumber, alp_size, m, int_wgts, alp, r_leg, v )
+subroutine da_legtra ( nj, max_wavenumber, alp_size, m, int_wgts, alp, r_leg, v )
 
    implicit none
 
@@ -56,4 +56,5 @@ subroutine da_leg_tra ( nj, max_wavenumber, alp_size, m, int_wgts, alp, r_leg, v
       v(l) = 0.5 * ( sum_legtra + eq_coeff * eq_term )
    end do
 
-end subroutine da_leg_tra
+end subroutine da_legtra
+

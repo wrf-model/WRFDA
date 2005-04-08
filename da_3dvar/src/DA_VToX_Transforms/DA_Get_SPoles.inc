@@ -48,3 +48,4 @@ SUBROUTINE DA_GET_SPoles(x,              &
    if( jte == jde) x(its:ite,jte,k) = tmps
  end do
 END SUBROUTINE DA_GET_SPoles
+
