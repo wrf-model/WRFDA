@@ -76,4 +76,7 @@ SUBROUTINE DA_Allocate_Observations ( ob )
    if(ob%num_Radar     > 0) &
       ALLOCATE(ob%Radar(1:ob%num_Radar))
 
+   if(ob%num_Bogus     > 0) &
+      ALLOCATE(ob%Bogus(1:ob%num_Bogus))
+
 END SUBROUTINE DA_Allocate_Observations

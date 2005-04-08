@@ -4,7 +4,7 @@ SUBROUTINE DA_Print_Stats_Airep( stats_unit, nu, nv, nt, Airep )
 
    INTEGER,           INTENT(IN)    :: stats_unit
    INTEGER,           INTENT(INOUT) :: nu, nv, nt
-   TYPE (stats_type), INTENT(IN)    :: Airep
+   TYPE (stats_airep_type), INTENT(IN):: Airep
    
    write(unit=stats_unit, fmt='(4a/)') &
         '   var             ', &

@@ -9,7 +9,12 @@ subroutine da_readwrite_be_stage2( outunit, be_method, nk )
    character*80             :: filename                   ! Input filename.
 
    integer                  :: ni, nj                     ! Number of points in x/y direction.
+   integer                  :: bin_type                   ! Type of bin to average over. !!!DALE ADD.
+   integer                  :: num_bins_hgt               ! Used if bin_type = 2. !!!DALE ADD..
    integer                  :: num_bins                   ! Number of 3D bins.
+   integer                  :: num_bins2d                 ! Number of 2D bins.
+   real                     :: binwidth_lat               ! Used if bin_type = 2 (degrees). !!!DALE ADD..
+   real                     :: binwidth_hgt               ! Used if bin_type = 2 (m). !!!DALE ADD..
 
    real, allocatable   :: regcoeff1(:)                    ! psi/chi regression cooefficient.
    real, allocatable   :: regcoeff2(:,:)                  ! psi/ps regression cooefficient.
@@ -18,11 +23,14 @@ subroutine da_readwrite_be_stage2( outunit, be_method, nk )
    filename = 'gen_be_stage2.'//trim(be_method)//'.dat'
    open (iunit, file = filename, form='unformatted')
    read(iunit)ni, nj, nk
-   read(iunit)num_bins
-
+   read(iunit)bin_type, num_bins_hgt, binwidth_hgt, binwidth_lat !!!DALE ADD
+   read(iunit)num_bins, num_bins2d
+! yrg mods:
+   print '(5X,"Read stage2: num_bins=",i6," num_bins2d=",i5)', &
+                            num_bins,       num_bins2d
    allocate( regcoeff1(1:num_bins) )
-   allocate( regcoeff2(1:nk,1:num_bins) )
-   allocate( regcoeff3(1:nk,1:nk,1:num_bins) )
+   allocate( regcoeff2(1:nk,1:num_bins2d) )
+   allocate( regcoeff3(1:nk,1:nk,1:num_bins2d) )
 
    read(iunit)regcoeff1 ! psi/chi regression coefficient.
    read(iunit)regcoeff2 ! psi/ps  regression coefficient.
@@ -30,7 +38,11 @@ subroutine da_readwrite_be_stage2( outunit, be_method, nk )
    close(iunit)
 
    write(outunit)ni, nj, nk
-   write(outunit)num_bins
+   write(outunit)bin_type, num_bins_hgt, binwidth_hgt, binwidth_lat !!!DALE ADD
+! yrg mods:
+   print '(5X,"bin_type, num_bins_ght, binwidth_hgt, binwidth_lat:",2I4,2f10.2)',  &
+            bin_type, num_bins_hgt, binwidth_hgt, binwidth_lat
+   write(outunit)num_bins, num_bins2d
    write(outunit)regcoeff1
    write(outunit)regcoeff2
    write(outunit)regcoeff3

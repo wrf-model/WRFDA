@@ -171,6 +171,8 @@ CONTAINS
    INTEGER :: i, j, itf, jtf
    LOGICAL :: restart
    INTEGER :: hr, min, sec, ms, rc
+! TBH:  Get rid of "dayhack" when Earl fixes ESMF bug 1111746
+   integer :: dayhack
 integer myproc
 
 !-----------------------------------------------------------------
@@ -184,10 +186,19 @@ integer myproc
 
    IF ( .NOT. grid%restart ) THEN
      restart = .false.
-     CALL ESMF_ClockGetCurrTime( grid%domain_clock, grid%current_time, rc=rc )
-     CALL ESMF_TimeGetDayOfYear( grid%current_time, julday, rc=rc)
-     CALL ESMF_TimeGet( grid%current_time, YR=julyr, H=hr, M=min, S=sec, MS=ms, rc=rc)
+     CALL wrf_clockprint(150, grid%domain_clock, &
+                         'DEBUG phy_init():  get currTime from grid%domain_clock,')
+     CALL ESMF_ClockGet( grid%domain_clock, currTime=grid%current_time, rc=rc )
+     CALL ESMF_TimeGet( grid%current_time, YY=julyr, dayOfYear=julday, DD=dayhack, H=hr, M=min, S=sec, MS=ms, rc=rc)
+     CALL wrf_timetoa ( grid%current_time, message )
+     WRITE( wrf_err_message , * ) 'DEBUG phy_init():  currTime = [',TRIM( message ),']'
+     CALL wrf_debug( 150, TRIM(wrf_err_message) )
      gmt=hr+real(min)/60.+real(sec)/3600.+real(ms)/(1000*3600)
+     WRITE( wrf_err_message , * ) 'DEBUG phy_init():  julyr,hr,min,sec,ms,julday = ', &
+                                  julyr,hr,min,sec,ms,julday
+     CALL wrf_debug( 150, TRIM(wrf_err_message) )
+     WRITE( wrf_err_message , * ) 'DEBUG phy_init():  gmt = ',gmt
+     CALL wrf_debug( 150, TRIM(wrf_err_message) )
    ELSE
      restart = .true.
      CALL nl_get_julyr (id, julyr)

@@ -92,5 +92,9 @@ SUBROUTINE DA_Setup_Obs_Interp_Wts ( xp, iv )
      CALL DA_Store_Obs_Grid_Info( xp, iv%buoy(n)%loc )
    enddo
 
+   do n=1, iv % num_bogus
+     CALL DA_Store_Obs_Grid_Info( xp, iv%bogus(n)%loc )
+   enddo
+
 END SUBROUTINE DA_Setup_Obs_Interp_Wts
 

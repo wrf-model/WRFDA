@@ -49,6 +49,14 @@ SUBROUTINE DA_Deallocate_Y( y )
      DEALLOCATE (y % pilot)
    endif
 
+   IF ( y % num_bogus > 0 ) then
+      do n = 1, y % num_bogus
+         DEALLOCATE (y % bogus(n)%u)
+         DEALLOCATE (y % bogus(n)%v)
+      enddo
+     DEALLOCATE (y % bogus)
+   endif
+
     IF ( y % num_Radar > 0 ) then
        do n = 1, y % num_Radar
           DEALLOCATE (y % Radar(n)%rv)

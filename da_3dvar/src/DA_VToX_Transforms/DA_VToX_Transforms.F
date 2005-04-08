@@ -7,6 +7,9 @@ MODULE DA_VToX_Transforms
 !  METHOD:  See individual routines.
 !
 !  HISTORY: 01/07/2000 - Creation of F90 version.           Dale Barker
+!
+! Additions: 
+!           10/26/2004 - Poles Treatment for Global 3DVAR   Syed RH Rizvi
 !------------------------------------------------------------------------------
 
 ! Driver layer modules
@@ -25,12 +28,17 @@ MODULE DA_VToX_Transforms
    USE DA_Recursive_Filter
    USE DA_Dynamics
    USE DA_Physics
-!  USE DA_ReadWrite_MM5
    USE DA_Constants
    USE PAR_UTIL
    USE DA_SSMI
+   USE da_spectral
+   USE da_fftpack5
 
    IMPLICIT NONE
+
+#ifdef DM_PARALLEL
+   include 'mpif.h'
+#endif
 
    CONTAINS
 
@@ -57,6 +65,11 @@ MODULE DA_VToX_Transforms
 
 #include "DA_Transform_VpToVv.inc"
 #include "DA_Vertical_Transform.inc"
+#include "DA_Get_VPoles.inc"
+#include "DA_Get_SPoles.inc"
+#include "DA_Get_AVPoles.inc"
+#include "DA_Get_ASPoles.inc"
+#include "DA_Transform_VToVv_Global.inc"
+#include "DA_Transform_VToVv_Global_Adj.inc"
 
 END MODULE DA_VToX_Transforms
-

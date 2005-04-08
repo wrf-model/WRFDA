@@ -102,6 +102,10 @@
 
       call DA_OI_Stats_Radar ( stats_unit, iv )
 
+!  [1.19] TC bogus:
+
+      call DA_OI_Stats_bogus ( stats_unit, iv )
+
 
 !---- -------------------------------------------------------------------------
 !  [2.0] Calculate residual vector (O-A) statistics:
@@ -180,6 +184,10 @@
 
       call DA_AO_Stats_Radar ( stats_unit, iv, re )
 
+!  [2.19] TC bogus:
+
+      call DA_AO_Stats_Bogus ( stats_unit, iv, re )
+
 !---- -------------------------------------------------------------------------
 !  [3.0] Calculate analysis increment (A-B) statistics:
 !------------------------------------------------------------------------------
@@ -194,9 +202,10 @@
 !---- -------------------------------------------------------------------------
 !  [5.0] Write observation data (O, O-B, O-A, y=hx'):
 !------------------------------------------------------------------------------
-
-   if ( wrf_dm_on_monitor()  ) then
+!rizvi   if ( wrf_dm_on_monitor()  ) then
       call da_write_obs( ob, iv, re )
+!rizvi   end if
+   if ( wrf_dm_on_monitor()  ) then
       call da_write_y( iv, y )
    end if
  

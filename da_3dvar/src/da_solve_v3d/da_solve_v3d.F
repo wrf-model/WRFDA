@@ -95,7 +95,7 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
 !  [6.0] Allocate cv:
 !------------------------------------------------------------------------------
 
-   call calculate_cv_local_size( xp, be, cv1d, cv_size )
+   call calculate_cv_local_size( xbx, xp, be, cv1d, cv_size )
    call da_allocate_cv( cv_size, cv1d )
    call da_allocate_cv( cv_size, xhat )
       
@@ -170,9 +170,40 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
 !  [8.0] Output 3DVAR analysis and analysis increments:
 !------------------------------------------------------------------------------
 
-      call DA_Transfer_XatoAnalysis( it, xbx, grid, &
+!------------------------------------------------------------------------------
+! Following lines are added by  Syed RH Rizvi due to following reasons:
+! (1) To accomodate KMA FG(fg_format =  3)
+! (2) Seperate treatment for WRF and KMA updating of Xa and Xb array
+! (3) Treatment for MM5 format FG(fg_format = 2) remains same as original
+!------------------------------------------------------------------------------
+!
+      if(fg_format == 1) then
+      call DA_Transfer_XatoWRF( xbx, grid, &
 #include <em_dummy_args.inc>
                            )
+      else if(fg_format == 3) then
+      call DA_Transfer_XatoKMA( xbx, grid, &
+#include <em_dummy_args.inc>
+                           )
+      end if
+
+      if(it < max_ext_its) then
+
+         if(fg_format == 1) then
+         CALL DA_Transfer_WRFToXb( xbx, grid, &
+#include <em_dummy_args.inc>
+                           )
+         else if(fg_format == 3) then
+         CALL DA_Transfer_KMAToXb( xbx, grid, &
+#include <em_dummy_args.inc>
+                           )
+         end if
+      endif
+!
+    if( fg_format == 2)  call DA_Transfer_XatoAnalysis( it, xbx, grid, &
+#include <em_dummy_args.inc>
+                           )
+!------------------------------------------------------------------------------
    END DO
 
 !------------------------------------------------------------------------------
