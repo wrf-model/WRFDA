@@ -244,7 +244,7 @@ subroutine da_transform_vtox_adj( xb, xbx, be, xa, xp, vp, vv, cv, &
     STOP 'Stopped, as cv_options not valid.'
  endif
 
- if(cv_options == 2 .or. cv_options == 5) &
+ if(cv_options == 2 .or. cv_options == 5) then
    call da_transform_vtovv_adj( xb, be, vv, cv, xp, &
                                 ids,ide, jds,jde, kds,kde,  &
                                 ims,ime, jms,jme, kms,kme,  &

@@ -36,7 +36,7 @@ subroutine da_transform_vtox( xb, xbx, be, cv, vv, vp, xp, xa,        &
 !-------------------------------------------------------------------------
 !  [1.0]: Perform vv = u_h cv transform:
 !-------------------------------------------------------------------------
- if(cv_options == 2 .or. cv_options == 5) &    
+ if(cv_options == 2 .or. cv_options == 5) then
    call da_transform_vtovv( xb, be, cv, vv, xp,         &
                             ids,ide, jds,jde, kds,kde,  &
                             ims,ime, jms,jme, kms,kme,  &
