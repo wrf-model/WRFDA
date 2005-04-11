@@ -1,7 +1,7 @@
 MODULE module_netcdf2kma_interface
 
    use module_wave2grid_kma
-   implicit none
+!  implicit none
 
 CONTAINS
 
@@ -12,7 +12,7 @@ SUBROUTINE netcdf2kma_interface ( grid, config_flags )
    USE module_driver_constants
    USE module_configure
 
-   IMPLICIT NONE
+!  IMPLICIT NONE
    real    :: DPSE(imaxe,jmaxe)
    real    :: DUE(imaxe,jmaxe,kmax),DVE(imaxe,jmaxe,kmax)
    real    :: DTE(imaxe,jmaxe,kmax),DQE(imaxe,jmaxe,kmax)
@@ -145,7 +145,7 @@ END SUBROUTINE netcdf2kma_interface
 
 SUBROUTINE reorder_for_kma(wrf,n1,n2,n3)
 
- IMPLICIT none                
+!IMPLICIT none                
  integer, intent(in) :: n1,n2,n3
  real, intent(inout) :: wrf(n1,n2,n3)
 

@@ -1,4 +1,4 @@
-u!/bin/csh -f
+#!/bin/csh -f
 #IBM:
 # @ job_type   = parallel
 ## @ environment = COPY_ALL
@@ -11,7 +11,7 @@ u!/bin/csh -f
 # @ tasks_per_node = 8
 # @ node_usage = not_shared
 # @ checkpoint = no
-# @ wall_clock_limit = 00:30:00
+# @ wall_clock_limit = 01:30:00
 # NCEP IBM=dev
 # NCAR IBM(bluesky)=com_rg8:
 # @ class      =  com_rg8
@@ -105,14 +105,7 @@ u!/bin/csh -f
     exit 1
  endif
 
- if(${DA_FG_FORMAT} == 1) then
-    ln -sf $DA_FIRST_GUESS              wrf_3dvar_input
- else if(${DA_FG_FORMAT} == 2) then
-    ln -sf $DA_FIRST_GUESS              fort.41
- else
-    echo "DA_FG_FORMAT error: Do not know how to handle DA_FG_FORMAT = ${DA_FG_FORMAT}"
-    exit 1
- endif
+ ln -sf $DA_FIRST_GUESS		wrf_3dvar_input
  ln -sf $DA_BACK_ERRORS		fort.3${DA_CV_OPTIONS}
  ln -sf $DA_OBSERVATIONS	fort.9${DA_OB_FORMAT}
 
@@ -130,12 +123,12 @@ u!/bin/csh -f
 #-----------------------------------------------------------------------
 
  if ( ! $?DA_MODEL_TYPE )   set DA_MODEL_TYPE = WRF
- if ( ! $?DA_WRITE_INCREMENTS ) set DA_WRITE_INCREMENTS = .FALSE.
+ if ( ! $?DA_WRITE_INCREMENTS ) set DA_WRITE_INCREMENTS = .TRUE.
  if ( ! $?DA_ANALYSIS_TYPE ) set DA_ANALYSIS_TYPE = 3D-VAR
- if ( ! $?DA_ANALYSIS_DATE ) set DA_ANALYSIS_DATE = 2002-08-29_00:00:00.0000
+ if ( ! $?DA_ANALYSIS_DATE ) set DA_ANALYSIS_DATE = 2002-08-03_00:00:00.0000
  if ( ! $?DA_ANALYSIS_ACCU ) set DA_ANALYSIS_ACCU = 900
- if ( ! $?DA_FG_FORMAT )     set DA_FG_FORMAT = 2
- if ( ! $?DA_OB_FORMAT )     set DA_OB_FORMAT = 2
+ if ( ! $?DA_FG_FORMAT )     set DA_FG_FORMAT = 3
+ if ( ! $?DA_OB_FORMAT )     set DA_OB_FORMAT = 1
  if ( ! $?DA_NUM_FGAT_TIME ) set DA_NUM_FGAT_TIME = 1
  if ( ! $?DA_PROCESS_OBS )   set DA_PROCESS_OBS = YES
  if ( ! $?DA_QC_POINTER )    set DA_QC_POINTER = 0
@@ -167,28 +160,21 @@ u!/bin/csh -f
  if ( ! $?DA_TIME_WINDOW )   set DA_TIME_WINDOW = 3.
  if ( ! $?DA_PRINT_DETAIL )  set DA_PRINT_DETAIL = 0
  if ( ! $?DA_MAX_EXT_ITS )   set DA_MAX_EXT_ITS = 1
- if ( ! $?DA_W_INCREMENTS ) set DA_W_INCREMENTS = .TRUE.
- if ( ! $?DA_DT_CLOUD_MODEL ) set DA_DT_CLOUD_MODEL = .FALSE.
  if ( ! $?DA_EPS )           set DA_EPS = "1.E-02, 1.E-02, 1.E-02, 1.E-02, 1.E-02, 1.E-02, 1.E-02,"
  if ( ! $?DA_NTMAX )         set DA_NTMAX = 100
  if ( ! $?DA_WRITE_SWITCH )  set DA_WRITE_SWITCH   = .FALSE.
  if ( ! $?DA_WRITE_INTERVAL )set DA_WRITE_INTERVAL = 5
- if ( ! $?DA_WRITE_QCW )     set DA_WRITE_QCW = .FALSE.
- if ( ! $?DA_WRITE_QRN )     set DA_WRITE_QRN = .FALSE.
- if ( ! $?DA_WRITE_QCI )     set DA_WRITE_QCI = .FALSE.
- if ( ! $?DA_WRITE_QSN )     set DA_WRITE_QSN = .FALSE.
- if ( ! $?DA_WRITE_QGR )     set DA_WRITE_QGR = .FALSE.
- if ( ! $?DA_RF_PASSES )     set DA_RF_PASSES = 4
- if ( ! $?DA_VAR_SCALING1 )  set DA_VAR_SCALING1 = 1.5
- if ( ! $?DA_VAR_SCALING2 )  set DA_VAR_SCALING2 = 1.5
- if ( ! $?DA_VAR_SCALING3 )  set DA_VAR_SCALING3 = 1.5
- if ( ! $?DA_VAR_SCALING4 )  set DA_VAR_SCALING4 = 1.5
- if ( ! $?DA_VAR_SCALING5 )  set DA_VAR_SCALING5 = 1.5
- if ( ! $?DA_LEN_SCALING1 )  set DA_LEN_SCALING1 = 0.5
- if ( ! $?DA_LEN_SCALING2 )  set DA_LEN_SCALING2 = 0.5
- if ( ! $?DA_LEN_SCALING3 )  set DA_LEN_SCALING3 = 0.5
- if ( ! $?DA_LEN_SCALING4 )  set DA_LEN_SCALING4 = 0.5
- if ( ! $?DA_LEN_SCALING5 )  set DA_LEN_SCALING5 = 0.5
+ if ( ! $?DA_RF_PASSES )     set DA_RF_PASSES = 6
+ if ( ! $?DA_VAR_SCALING1 )  set DA_VAR_SCALING1 = 1.0
+ if ( ! $?DA_VAR_SCALING2 )  set DA_VAR_SCALING2 = 1.0
+ if ( ! $?DA_VAR_SCALING3 )  set DA_VAR_SCALING3 = 1.0
+ if ( ! $?DA_VAR_SCALING4 )  set DA_VAR_SCALING4 = 1.0
+ if ( ! $?DA_VAR_SCALING5 )  set DA_VAR_SCALING5 = 1.0
+ if ( ! $?DA_LEN_SCALING1 )  set DA_LEN_SCALING1 = 1.0
+ if ( ! $?DA_LEN_SCALING2 )  set DA_LEN_SCALING2 = 1.0
+ if ( ! $?DA_LEN_SCALING3 )  set DA_LEN_SCALING3 = 1.0
+ if ( ! $?DA_LEN_SCALING4 )  set DA_LEN_SCALING4 = 1.0
+ if ( ! $?DA_LEN_SCALING5 )  set DA_LEN_SCALING5 = 1.0
  if ( ! $?DA_DEF_SUB_DOMAIN )set DA_DEF_SUB_DOMAIN = .FALSE.
  if ( ! $?DA_X_START_SUB_DOMAIN )set DA_X_START_SUB_DOMAIN = 55.0
  if ( ! $?DA_Y_START_SUB_DOMAIN )set DA_Y_START_SUB_DOMAIN = 35.0
@@ -201,10 +187,10 @@ u!/bin/csh -f
  if ( ! $?DA_MINIMISATION_OPTION) set DA_MINIMISATION_OPTION = 2
  if ( ! $?DA_WRITE_OUTER_LOOP) set DA_WRITE_OUTER_LOOP = .FALSE.
  if ( ! $?DA_LAT_STATS_OPTION) set DA_LAT_STATS_OPTION = .FALSE.
- if ( ! $?DA_CALCULATE_CG_COST_FUNCTION) set DA_CALCULATE_CG_COST_FUNCTION = .FALSE.
- if ( ! $?DA_CV_OPTIONS )    set DA_CV_OPTIONS = 2
- if ( ! $?DA_CV_OPTIONS_HUM ) set DA_CV_OPTIONS_HUM = 1
- if ( ! $?DA_CHECK_RH )      set DA_CHECK_RH = 2
+ if ( ! $?DA_CALCULATE_CG_COST_FUNCTION) set DA_CALCULATE_CG_COST_FUNCTION = .TRUE.
+ if ( ! $?DA_CV_OPTIONS )    set DA_CV_OPTIONS = 3
+ if ( ! $?DA_CV_OPTIONS_HUM ) set DA_CV_OPTIONS_HUM = 3
+ if ( ! $?DA_CHECK_RH )      set DA_CHECK_RH = 1
  if ( ! $?DA_as1        )    set DA_as1 = "0.25, 0.75, 1.5"
  if ( ! $?DA_as2        )    set DA_as2 = "0.25, 0.75, 1.5"
  if ( ! $?DA_as3        )    set DA_as3 = "0.25, 0.75, 1.5"
@@ -240,14 +226,7 @@ cat >! namelist.3dvar << EOF
 &record2
  ANALYSIS_TYPE = '$DA_ANALYSIS_TYPE',
  ANALYSIS_DATE = '$DA_ANALYSIS_DATE',
- ANALYSIS_ACCU =  $DA_ANALYSIS_ACCU,
- W_INCREMENTS  = $DA_W_INCREMENTS,
- DT_CLOUD_MODEL = $DA_DT_CLOUD_MODEL,
- WRITE_QCW      = $DA_WRITE_QCW,
- WRITE_QRN      = $DA_WRITE_QRN,
- WRITE_QCI      = $DA_WRITE_QCI,
- WRITE_QSN      = $DA_WRITE_QSN,
- WRITE_QGR      = $DA_WRITE_QGR /
+ ANALYSIS_ACCU =  $DA_ANALYSIS_ACCU /
 
 &record3
  fg_format = $DA_FG_FORMAT,
@@ -269,7 +248,6 @@ cat >! namelist.3dvar << EOF
  Use_GpsrefObs   = $DA_USE_GPSREFOBS,
  Use_ProfilerObs = $DA_USE_PROFILEROBS, 
  Use_BuoyObs     = $DA_USE_BUOYOBS,
- Use_BogusObs   = $DA_USE_BOGUSOBS,
  Use_SsmiRetrievalObs = $DA_USE_SSMIRETRIEVALOBS,
  Use_SsmiTbObs  = $DA_USE_SSMITBOBS,
  use_ssmt1obs   = $DA_USE_SSMT1OBS,
@@ -536,7 +514,7 @@ EOF
 #BIG : mpirun -np 4 ./da_3dvar.exe
 #    mpirun -np 8 ./da_3dvar.exe
 #IBM (llsubmit):
-  poe ./da_3dvar.exe
+#  poe ./da_3dvar.exe
 #AFWA: setenv LOADL_INTERACTIVE_CLASS 1
 #AFWA: poe ./da_3dvar.exe -euilib us -hostfile host.afwa -procs 15
 #echo "3DVAR    completed"
