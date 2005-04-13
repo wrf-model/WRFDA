@@ -18,8 +18,10 @@ program gen_be_diags_read
    integer             :: k                          ! Loop counter.
    integer             :: kdum                       ! Dummy vertical index.
    integer             :: max_wavenumber             ! Smallest scale required (ni/2 - 1).
+   real                :: lat_min, lat_max           ! Used if bin_type = 2 (degrees).
    real                :: binwidth_lat               ! Used if bin_type = 2 (degrees). !!!DALE ADD..
    real                :: binwidth_hgt               ! Used if bin_type = 2 (m). !!!DALE ADD..
+   real                :: hgt_min, hgt_max           ! Used if bin_type = 2 (m).
    logical             :: data_on_levels             ! False if data is projected onto EOFs.
    logical             :: use_global_eofs            ! True if projected data uses global EOFs.
 
@@ -52,14 +54,10 @@ program gen_be_diags_read
 !----------------------------------------------------------------------------
 
    read(iunit)ni, nj, nk
-   read(iunit)bin_type, num_bins_hgt, binwidth_hgt, binwidth_lat
    read(iunit)num_bins, num_bins2d
 
    allocate( bin(1:ni,1:nj,1:nk) )
    allocate( bin2d(1:ni,1:nj) )
-
-   call da_create_bins( ni, nj, nk, bin_type, num_bins, num_bins2d, bin, bin2d )
-
    allocate( regcoeff1(1:num_bins) )
    allocate( regcoeff2(1:nk,1:num_bins2d) )
    allocate( regcoeff3(1:nk,1:nk,1:num_bins2d) )
@@ -67,6 +65,17 @@ program gen_be_diags_read
    read(iunit)regcoeff1
    read(iunit)regcoeff2
    read(iunit)regcoeff3
+
+!  Read bin info:
+   filename = 'bin.data'
+   open (iunit+1, file = filename, form='unformatted')
+   read(iunit+1)bin_type
+   read(iunit+1)lat_min, lat_max, binwidth_lat
+   read(iunit+1)hgt_min, hgt_max, binwidth_hgt
+   read(iunit+1)num_bins, num_bins2d
+   read(iunit+1)bin(1:ni,1:nj,1:nk)
+   read(iunit+1)bin2d(1:ni,1:nj)
+   close(iunit+1)
 
    outunit = ounit + 100
    call da_print_be_stats_p( outunit, ni, nj, nk, num_bins, num_bins2d, &
@@ -118,7 +127,7 @@ program gen_be_diags_read
                              e_vec, e_val, e_vec_loc, e_val_loc )
 
 !----------------------------------------------------------------------------
-   if (uh_method == 'spectrum') then
+   if (uh_method == 'power') then
      write(6,'(/a)') '[3] Gather horizontal error power spectra.'
 !----------------------------------------------------------------------------
 

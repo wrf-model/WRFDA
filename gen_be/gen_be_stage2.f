@@ -2,7 +2,6 @@ program gen_be_stage2
 
    use da_constants
    use da_gen_be
-!   use da_tools
 
    implicit none
 
@@ -26,8 +25,9 @@ program gen_be_stage2
    integer             :: bin_type                   ! Type of bin to average over.
    integer             :: num_bins                   ! Number of bins (3D fields).
    integer             :: num_bins2d                 ! Number of bins (2D fields).
-   integer             :: num_bins_hgt               ! Used if bin_type = 2.
+   real                :: lat_min, lat_max           ! Used if bin_type = 2 (degrees).
    real                :: binwidth_lat               ! Used if bin_type = 2 (degrees).
+   real                :: hgt_min, hgt_max           ! Used if bin_type = 2 (m).
    real                :: binwidth_hgt               ! Used if bin_type = 2 (m).
    real                :: coeffa, coeffb             ! Accumulating mean coefficients.
    real                :: total_variance             ! Total variance of <psi psi> matrix.
@@ -63,9 +63,7 @@ program gen_be_stage2
    real, allocatable   :: regcoeff3(:,:,:)           ! psi/T regression cooefficient.
 
    namelist / gen_be_stage2_nl / start_date, end_date, interval, &
-                                 be_method, ne, bin_type, num_bins_hgt, &
-                                 binwidth_hgt, binwidth_lat, &
-                                 testing_eofs, expt, dat_dir
+                                 be_method, ne, testing_eofs, expt, dat_dir
 
 !---------------------------------------------------------------------------------------------
    write(6,'(a)')' [1] Initialize namelist variables and other scalars.'
@@ -76,10 +74,6 @@ program gen_be_stage2
    interval = 24
    be_method = 'NMC'
    ne = 1
-   bin_type = 1
-   num_bins_hgt = 30
-   binwidth_hgt = 1000.0
-   binwidth_lat = 10.0
    testing_eofs = .true.
    expt = 'gen_be_stage2'
    dat_dir = '/mmmtmp1/dmbarker'
@@ -138,9 +132,17 @@ program gen_be_stage2
          close(iunit)
 
          if ( first_time ) then
-!           Create and sort into bins:
-            call da_create_bins( ni, nj, nk, bin_type, num_bins, num_bins2d, bin, bin2d, &
-                                 binwidth_lat, binwidth_hgt, num_bins_hgt, latitude, height )
+
+!           Read bin info:
+            filename = 'bin.data'
+            open (iunit, file = filename, form='unformatted')
+            read(iunit)bin_type
+            read(iunit)lat_min, lat_max, binwidth_lat
+            read(iunit)hgt_min, hgt_max, binwidth_hgt
+            read(iunit)num_bins, num_bins2d
+            read(iunit)bin(1:ni,1:nj,1:nk)
+            read(iunit)bin2d(1:ni,1:nj)
+            close(iunit)
 
             allocate( bin_pts(1:num_bins) )
             allocate( bin_pts2d(1:num_bins2d) )
@@ -365,7 +367,6 @@ program gen_be_stage2
    filename = 'gen_be_stage2.'//trim(be_method)//'.dat'
    open (ounit, file = filename, form='unformatted')
    write(ounit)ni, nj, nk
-   write(ounit)bin_type, num_bins_hgt, binwidth_hgt, binwidth_lat
    write(ounit)num_bins, num_bins2d
    write(ounit)regcoeff1
    write(ounit)regcoeff2
@@ -380,127 +381,5 @@ program gen_be_stage2
          write(63,'(3i6,1pe13.5)')k, j, b, var2_inv(k,k,b)
       end do
    end do
-
-!---------------------------------------------------------------------------------------------
-   write(6,'(a)')' [5] Read fields again, and save "unbalanced" components'
-!---------------------------------------------------------------------------------------------
-
-   date = start_date
-   cdate = sdate
-
-   do while ( cdate <= edate )
-      write(6,'(a,a)')'    Calculating unbalanced fields for date ', date
-
-      do member = 1, ne
-
-         write(ce,'(i3)')member
-         if ( member < 10 ) ce = '00'//ce(3:3)
-         if ( member >= 10 .and. member < 100 ) ce = '0'//ce(2:3)
-
-!        Read psi:
-         variable = 'psi'
-         filename = trim(variable)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce
-         open (iunit, file = filename, form='unformatted')
-         read(iunit)ni, nj, nk
-         read(iunit)psi
-         close(iunit)
-
-!--------------------------------------------------------------------------------------
-!        Re-read chi. Calculate, and output unbalanced chi:
-!--------------------------------------------------------------------------------------
-
-         variable = 'chi'
-         filename = trim(variable)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce
-         open (iunit, file = filename, form='unformatted')
-         read(iunit)ni, nj, nk
-         read(iunit)chi
-         close(iunit)
-
-         do k = 1, nk
-            do j = 1, nj
-               do i = 1, ni
-                  b = bin(i,j,k)
-                  chi(i,j,k) = chi(i,j,k) - regcoeff1(b) * psi(i,j,k)
-               end do
-            end do
-         end do
-
-         variable = 'chi_u'
-         filename = trim(variable)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce
-         open (ounit, file = filename, form='unformatted')
-         write(ounit)ni, nj, nk
-         write(ounit)chi
-         close(ounit)
-
-!--------------------------------------------------------------------------------------
-!        Re-read surface pressure (ps). Calculate, and output unbalanced ps:
-!--------------------------------------------------------------------------------------
-
-!        Read ps:
-         variable = 'ps'
-         filename = trim(variable)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce//'.01'
-         open (iunit, file = filename, form='unformatted')
-         read(iunit)ni, nj, nkdum
-         read(iunit)ldum1, ldum2 ! Dummy logicals.
-         read(iunit)ps
-         close(iunit)
-
-         do j = 1, nj
-            do i = 1, ni
-               b = bin2d(i,j)
-               ps(i,j) = ps(i,j) - SUM(regcoeff2(1:nk,b) * psi(i,j,1:nk))
-            end do
-         end do
-
-         variable = 'ps_u'
-         filename = trim(variable)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce//'.01'
-         open (ounit, file = filename, form='unformatted')
-         write(ounit)ni, nj, 1
-         write(ounit)ldum1, ldum2 ! Dummy logicals.
-         write(ounit)ps
-         close(ounit)
-
-!--------------------------------------------------------------------------------------
-!        Re-read temperature. Calculate, and output unbalanced temperature:
-!--------------------------------------------------------------------------------------
-
-!        Read T:
-         variable = 't'
-         filename = trim(variable)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce
-         open (iunit, file = filename, form='unformatted')
-         read(iunit)ni, nj, nk
-         read(iunit)temp
-         close(iunit)
-
-         do j = 1, nj
-            do i = 1, ni
-               b = bin2d(i,j)
-               do k = 1, nk
-                  temp(i,j,k) = temp(i,j,k) - SUM(regcoeff3(k,1:nk,b) * psi(i,j,1:nk))
-               end do
-            end do
-         end do
-
-         variable = 't_u'
-         filename = trim(variable)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce
-         open (ounit, file = filename, form='unformatted')
-         write(ounit)ni, nj, nk
-         write(ounit)temp
-         close(ounit)
-
-      end do  ! End loop over ensemble members.
-
-!     Calculate next date:
-      call da_advance_cymdh( date, interval, new_date )
-      date = new_date
-      read(date(1:10), fmt='(i10)')cdate
-   end do     ! End loop over times.
 
 end program gen_be_stage2

@@ -24,9 +24,6 @@ SUBROUTINE DA_Setup_Background_Errors4(xb, be, xbx, xp)
    integer             :: bin_type           ! Type of bin to average over.
    integer             :: num_bins           ! Number of bins (3D fields).
    integer             :: num_bins2d         ! Number of bins (3D fields).
-   integer             :: num_bins_hgt       ! Used if bin_type = 2. 
-   real                :: binwidth_lat       ! If bin_type = 2 (degrees). 
-   real                :: binwidth_hgt       ! Used if bin_type = 2 (m). 
    logical  :: use_global_eofs               ! True if projected data uses global EOFs
 !------------------------------------------------------------------------------
 !
@@ -57,9 +54,8 @@ SUBROUTINE DA_Setup_Background_Errors4(xb, be, xbx, xp)
    rewind (be_cv_4_unit)
 !---------------------------------------------------------
    read(be_cv_4_unit, end= 99, err = 100) ni, nj, nk 
-   read(be_cv_4_unit, end= 99,err = 100)&
-          bin_type, num_bins_hgt, binwidth_hgt, binwidth_lat
    read(be_cv_4_unit, err = 100) num_bins, num_bins2d
+
 !---------------------------------------------------------
    if( ni /= xbx%ni .or. nj /= xbx%nj .or. nk /= xbx%nk ) &
    stop ' Cannot generate BE at this resolution'
@@ -79,8 +75,8 @@ SUBROUTINE DA_Setup_Background_Errors4(xb, be, xbx, xp)
    allocate( bin(1:ni,1:nj,1:nk) )
    allocate( bin2d(1:ni,1:nj) )
    call da_create_bins( ni, nj, nk, bin_type, num_bins, &
-                                num_bins2d, bin, bin2d, &
-                binwidth_lat, binwidth_hgt, num_bins_hgt)
+                        num_bins2d, bin, bin2d )
+
 !--------------------------------------------------------------
 ! Following "latitude, height" variables are optional arguments 
 ! The same may be added, if required

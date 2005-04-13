@@ -22,8 +22,9 @@ program gen_be_stage3
    integer             :: bin_type                   ! Type of bin to average over.
    integer             :: num_bins                   ! Number of bins (3D fields).
    integer             :: num_bins2d                 ! Number of bins (2D fields).
-   integer             :: num_bins_hgt               ! Used if bin_type = 2.
+   real                :: lat_min, lat_max           ! Used if bin_type = 2 (degrees).
    real                :: binwidth_lat               ! Used if bin_type = 2 (degrees).
+   real                :: hgt_min, hgt_max           ! Used if bin_type = 2 (m).
    real                :: binwidth_hgt               ! Used if bin_type = 2 (m).
    real                :: coeffa, coeffb             ! Accumulating mean coefficients.
    logical             :: first_time                 ! True if first file.
@@ -49,8 +50,9 @@ program gen_be_stage3
    real, allocatable   :: eval(:,:)                  ! Gridpoint sqrt(eigenvalues).
 
    namelist / gen_be_stage3_nl / start_date, end_date, interval, variable, &
-                                 be_method, ne, bin_type, num_bins_hgt, &
-                                 binwidth_hgt, binwidth_lat, &
+                                 be_method, ne, bin_type, &
+                                 lat_min, lat_max, binwidth_lat, &
+                                 hgt_min, hgt_max, binwidth_hgt, &
                                  testing_eofs, use_global_eofs, data_on_levels, &
                                  expt, dat_dir
 
@@ -67,9 +69,12 @@ program gen_be_stage3
    be_method = 'NMC'
    ne = 1
    bin_type = 1
-   num_bins_hgt = 30
-   binwidth_hgt = 1000.0
+   lat_min = -90.0
+   lat_max = 90.0
    binwidth_lat = 10.0
+   hgt_min = 0.0
+   hgt_max = 20000.0
+   binwidth_hgt = 1000.0
    testing_eofs = .true.
    use_global_eofs = .true.
    data_on_levels = .false.
@@ -126,7 +131,8 @@ program gen_be_stage3
          if ( first_time ) then
 !           Create and sort into bins:
             call da_create_bins( ni, nj, nk, bin_type, num_bins, num_bins2d, bin, bin2d, &
-                                 binwidth_lat, binwidth_hgt, num_bins_hgt, latitude, height )
+                                 lat_min, lat_max, binwidth_lat, &
+                                 hgt_min, hgt_max, binwidth_hgt, latitude, height )
 
             allocate( bin_pts2d(1:num_bins2d) )
             allocate( field(1:ni,1:nj,1:nk) )
@@ -141,6 +147,9 @@ program gen_be_stage3
          open (iunit, file = filename, form='unformatted')
          read(iunit)ni, nj, nk
          read(iunit)field
+!   rizvi
+         call remove_horizontal_mean(field, ni, nj, nk)
+!   rizvi
          close(iunit)
 
          call remove_horizontal_mean(field, ni, nj, nk)

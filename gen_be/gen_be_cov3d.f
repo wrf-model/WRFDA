@@ -7,8 +7,8 @@ program gen_be_cov3d
 
    character*10        :: start_date, end_date       ! Starting and ending dates.
    character*10        :: date, new_date             ! Current date (ccyymmddhh).
-   character*10        :: variable1					 ! Variable name
-   character*10        :: variable2					 ! Variable name
+   character*10        :: variable1                  ! Variable name
+   character*10        :: variable2                  ! Variable name
    character*3         :: be_method                  ! Be method (NMC, or ENS)
    character*80        :: dat_dir                    ! Input data directory.
    character*80        :: expt                       ! Experiment ID.
@@ -23,16 +23,15 @@ program gen_be_cov3d
    integer             :: bin_type                   ! Type of bin to average over.
    integer             :: num_bins                   ! Number of bins (3D fields).
    integer             :: num_bins2d                 ! Number of bins (3D fields).
-   integer             :: num_bins_hgt               ! Used if bin_type = 2.
+   real                :: lat_min, lat_max           ! Used if bin_type = 2 (degrees).
    real                :: binwidth_lat               ! Used if bin_type = 2 (degrees).
+   real                :: hgt_min, hgt_max           ! Used if bin_type = 2 (m).
    real                :: binwidth_hgt               ! Used if bin_type = 2 (m).
    real                :: coeffa, coeffb             ! Accumulating mean coefficients.
    logical             :: first_time                 ! True if first file.
 
-   real, allocatable   :: latitude(:,:)              ! Latitude (degrees, from south).
-   real, allocatable   :: height(:,:,:)              ! Height field.
-   real, allocatable   :: field1(:,:,:)		         ! Field 1.
-   real, allocatable   :: field2(:,:,:)				 ! Field 2.
+   real, allocatable   :: field1(:,:,:)              ! Field 1.
+   real, allocatable   :: field2(:,:,:)              ! Field 2.
    integer, allocatable:: bin(:,:,:)                 ! Bin assigned to each 3D point.
    integer, allocatable:: bin2d(:,:)                 ! Bin assigned to each 2D point.
    integer, allocatable:: bin_pts(:)                 ! Number of points in bin (3D fields).
@@ -40,9 +39,8 @@ program gen_be_cov3d
    real, allocatable   :: var(:)                     ! Autocovariance of field.
 
    namelist / gen_be_cov3d_nl / start_date, end_date, interval, &
-								be_method, ne, bin_type, num_bins_hgt, &
-								binwidth_hgt, binwidth_lat, &
-								variable1, variable2, expt, dat_dir
+                                be_method, ne, &
+                                variable1, variable2, expt, dat_dir
 
 !---------------------------------------------------------------------------------------------
    write(6,'(a)')' [1] Initialize namelist variables and other scalars.'
@@ -53,10 +51,6 @@ program gen_be_cov3d
    interval = 24
    be_method = 'NMC'
    ne = 1
-   bin_type = 1
-   num_bins_hgt = 30
-   binwidth_hgt = 1000.0
-   binwidth_lat = 10.0
    variable1 = 'psi'
    variable2 = 'chi'
    expt = 'gen_be_cov3d'
@@ -92,31 +86,30 @@ program gen_be_cov3d
          if ( member < 10 ) ce = '00'//ce(3:3)
          if ( member >= 10 .and. member < 100 ) ce = '0'//ce(2:3)
 
-!        Read Full-fields:
-         filename = 'fullflds/'//date(1:10)
-         filename = trim(filename)//'.fullflds.'//trim(be_method)//'.e'//ce
+!        Read first field:
+         filename = trim(variable1)//'/'//date(1:10)
+         filename = trim(filename)//'.'//trim(variable1)//'.'//trim(be_method)//'.e'//ce
          open (iunit, file = filename, form='unformatted')
-
          read(iunit)ni, nj, nk
-         if ( first_time ) then
+
+        if ( first_time ) then
             write(6,'(a,3i8)')'    i, j, k dimensions are ', ni, nj, nk
-            allocate( latitude(1:ni,1:nj) )
-            allocate( height(1:ni,1:nj,1:nk) )
             allocate( bin(1:ni,1:nj,1:nk) )
             allocate( bin2d(1:ni,1:nj) )
             allocate( field1(1:ni,1:nj,1:nk) )
             allocate( field2(1:ni,1:nj,1:nk) )
-         end if
-         read(iunit)latitude
-         read(iunit)height
 
-!        Create and sort into bins:
-         call da_create_bins( ni, nj, nk, bin_type, num_bins, num_bins2d, bin, bin2d, &
-                              binwidth_lat, binwidth_hgt, num_bins_hgt, latitude, height )
+!           Read bin info:
+            filename = 'bin.data'
+            open (iunit+1, file = filename, form='unformatted')
+            read(iunit+1)bin_type
+            read(iunit+1)lat_min, lat_max, binwidth_lat
+            read(iunit+1)hgt_min, hgt_max, binwidth_hgt
+            read(iunit+1)num_bins, num_bins2d
+            read(iunit+1)bin(1:ni,1:nj,1:nk)
+            read(iunit+1)bin2d(1:ni,1:nj)
+            close(iunit+1)
 
-         close(iunit)
-
-         if ( first_time ) then
             allocate( bin_pts(1:num_bins) )
             allocate( covar(1:num_bins) )
             allocate( var(1:num_bins) )
@@ -126,11 +119,6 @@ program gen_be_cov3d
             first_time = .false.
          end if
 
-!        Read first field:
-         filename = trim(variable1)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable1)//'.'//trim(be_method)//'.e'//ce
-         open (iunit, file = filename, form='unformatted')
-         read(iunit)ni, nj, nk
          read(iunit)field1
          close(iunit)
 
@@ -169,8 +157,9 @@ program gen_be_cov3d
    
    do k = 1, nk
       do j = 1, nj
-	     b = bin(1,j,k)
-	     write(ounit,'(f22.5)')covar(b) / var(b)
+	     b = bin(ni/2,j,k)
+             print *, k, j
+ 	     write(ounit,'(f22.5)')covar(b) / var(b)
 	  end do
    end do
 

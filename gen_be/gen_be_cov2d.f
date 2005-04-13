@@ -23,11 +23,13 @@ program gen_be_cov2d
    integer             :: bin_type                   ! Type of bin to average over.
    integer             :: num_bins                   ! Number of bins (3D fields).
    integer             :: num_bins2d                 ! Number of bins (3D fields).
-   integer             :: num_bins_hgt               ! Used if bin_type = 2.
+   real                :: lat_min, lat_max           ! Used if bin_type = 2 (degrees).
    real                :: binwidth_lat               ! Used if bin_type = 2 (degrees).
+   real                :: hgt_min, hgt_max           ! Used if bin_type = 2 (m).
    real                :: binwidth_hgt               ! Used if bin_type = 2 (m).
    real                :: coeffa, coeffb             ! Accumulating mean coefficients.
    logical             :: first_time                 ! True if first file.
+   logical             :: ldum1, ldum2               ! Dummy logicals.
 
    real, allocatable   :: latitude(:,:)              ! Latitude (degrees, from south).
    real, allocatable   :: height(:,:,:)              ! Height field.
@@ -40,9 +42,10 @@ program gen_be_cov2d
    real, allocatable   :: var(:)                     ! Autocovariance of field.
 
    namelist / gen_be_cov2d_nl / start_date, end_date, interval, &
-				be_method, ne, bin_type, num_bins_hgt, &
-				binwidth_hgt, binwidth_lat, &
-				variable1, variable2, expt, dat_dir
+                                be_method, ne, bin_type, &
+                                lat_min, lat_max, binwidth_lat, &
+                                hgt_min, hgt_max, binwidth_hgt, &
+                                variable1, variable2, expt, dat_dir
 
 !---------------------------------------------------------------------------------------------
    write(6,'(a)')' [1] Initialize namelist variables and other scalars.'
@@ -54,9 +57,12 @@ program gen_be_cov2d
    be_method = 'NMC'
    ne = 1
    bin_type = 1
-   num_bins_hgt = 30
-   binwidth_hgt = 1000.0
+   lat_min = -90.0
+   lat_max = 90.0
    binwidth_lat = 10.0
+   hgt_min = 0.0
+   hgt_max = 20000.0
+   binwidth_hgt = 1000.0
    variable1 = 'ps_u'
    variable2 = 'ps'
    expt = 'gen_be_cov2d'
@@ -112,7 +118,8 @@ program gen_be_cov2d
 
 !        Create and sort into bins:
          call da_create_bins( ni, nj, nk, bin_type, num_bins, num_bins2d, bin, bin2d, &
-                              binwidth_lat, binwidth_hgt, num_bins_hgt, latitude, height )
+                              lat_min, lat_max, binwidth_lat, &
+                              hgt_min, hgt_max, binwidth_hgt, latitude, height )
 
          close(iunit)
 
@@ -126,19 +133,21 @@ program gen_be_cov2d
             first_time = .false.
          end if
 
-!        Read first field:
+!        Read 2D first field:
          filename = trim(variable1)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable1)//'.'//trim(be_method)//'.e'//ce
+         filename = trim(filename)//'.'//trim(variable1)//'.'//trim(be_method)//'.e'//ce//'.01'
          open (iunit, file = filename, form='unformatted')
          read(iunit)ni, nj, nkdum
+         read(iunit)ldum1, ldum2
          read(iunit)field1
          close(iunit)
 
-!        Read second field:
+!        Read 2D second field:
          filename = trim(variable2)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable2)//'.'//trim(be_method)//'.e'//ce
+         filename = trim(filename)//'.'//trim(variable2)//'.'//trim(be_method)//'.e'//ce//'.01'
          open (iunit, file = filename, form='unformatted')
          read(iunit)ni, nj, nkdum
+         read(iunit)ldum1, ldum2
          read(iunit)field2
          close(iunit)
 

@@ -34,44 +34,53 @@ subroutine da_print_be_stats_v( outunit, variable, nk, num_bins2d, &
 ! 1, Global vectors:
    write(6,'(3a,i5)')' First 5 Global eigenvectors for variable ', trim(variable), &
                      ' in unit ', outunit
-   write(outunit,'(3a,i5)')' First 5 Global eigenvectors for variable ', trim(variable), &
-                     ' in unit ', outunit
+
+   open(outunit)
    do k = 1, nk
       write(outunit,'(i4,5f15.8)') k, ( e_vec(k,m), m = 1, 5 )
    end do
+   close(outunit)
 
 ! 2, Global values:
    outunit = outunit + 1
+
    write(6,'(3a,i5)')' Global eigenvalues for variable ', trim(variable), &
                      ' in unit ', outunit
-   write(outunit,'(3a,i5)')' Global eigenvalues for variable ', trim(variable), &
-                     ' in unit ', outunit
+
+   open(outunit)
    do k = 1, nk
       write(outunit,'(i4,1pe18.5)') k, e_val(k)
    end do
+   close(outunit)
 
 ! 3, Local vectors:
+
    outunit = outunit + 1
+
    write(6,'(3a,i5)')' First 5 local eigenvectors for variable ', trim(variable), &
                      ' in unit ', outunit
-   write(outunit,'(3a,i5)')' First 5 local eigenvectors for variable ', trim(variable), &
-                     ' in unit ', outunit
+
+   open(outunit)
    do b = 1, num_bins2d
      write(outunit,'(/"bin =",i6)') b
      do k = 1, nk
        write(outunit,'(i4,5f15.8)') k, ( e_vec_loc(k,m,b), m = 1, 5 )
      end do
    end do
+   close(outunit)
 
 ! 4. Local values:
+
    outunit = outunit + 1
+
    write(6,'(3a,i5)')' First 5 local eigenvalues for variable ', trim(variable), &
                      ' in unit ', outunit
-   write(outunit,'(3a,i5)')' First 5 local eigenvalues for variable ', trim(variable), &
-                     ' in unit ', outunit
+
+   open(outunit)
    do b = 1, num_bins2d
       write(outunit,'(i4,5(1pe18.5))') b, ( e_val_loc(m,b), m = 1, 5 )
    end do
+   close(outunit)
 
    outunit = outunit + 1 
    write(6,*)

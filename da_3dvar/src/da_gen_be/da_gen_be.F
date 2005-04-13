@@ -17,6 +17,7 @@ module da_gen_be
 contains
 
 #include "da_create_bins.inc"
+#include "da_filter_regcoeffs.inc"
 #include "da_print_be_stats_h.inc"
 #include "da_print_be_stats_p.inc"
 #include "da_print_be_stats_v.inc"
@@ -28,5 +29,7 @@ contains
 #include "../DA_VToX_Transforms/DA_Transform_VpToVv.inc"
 #include "../DA_Tools/da_eof_decomposition.inc"
 #include "../DA_Tools/da_eof_decomposition_test.inc"
+#include "../DA_Recursive_Filter/da_perform_2drf.inc"
+#include "../DA_Recursive_Filter/DA_Recursive_Filter_1d.inc"
 
 end module da_gen_be
