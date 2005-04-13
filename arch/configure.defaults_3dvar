@@ -14,13 +14,13 @@ ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DNETCDF -DINTIO \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC)
 CFLAGS          =       $(ARCHFLAGS)
 TRADFLAG        =
-#FCOPTIM         =       -fast -O2 -Olimit 2000
-FCOPTIM         =       -O0
+FCOPTIM         =       -fast -O2 -Olimit 2000
+#FCOPTIM         =       -O0
 FCDEBUG         =       -g
 FCTYPE          =       -r8
 FCFORM          =       -free
 FCHOST          =       -arch host
-FCBUFR          =       -automatic -cpp -fpe2 -align dcommons -align records
+FCBUFR          =       -automatic -cpp -fpe0 -align dcommons -align records
 FCBASE          =       $(FCBUFR) -convert big_endian
 FC_FFT_RF       =       -automatic -cpp -fpe2 -align dcommons -align records -convert big_endian
 
@@ -64,13 +64,13 @@ ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DNETCDF -DINTIO \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC)
 CFLAGS          =       $(ARCHFLAGS) -I../external/RSL/RSL
 TRADFLAG        =
-#FCOPTIM         =       -fast -O2 -Olimit 2000
-FCOPTIM         =       -O0
+FCOPTIM         =       -fast -O2 -Olimit 2000
+#FCOPTIM         =       -O0
 FCDEBUG         =       -g
 FCTYPE          =       -r8
 FCFORM          =       -free
 FCHOST          =       -arch host
-FCBUFR          =       -automatic -cpp -fpe2 -align dcommons -align records
+FCBUFR          =       -automatic -cpp -fpe0 -align dcommons -align records
 FCBASE          =       $(FCBUFR) -convert big_endian
 FC_FFT_RF       =       -automatic -cpp -fpe2 -align dcommons -align records -convert big_endian
 
@@ -121,13 +121,13 @@ ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DNETCDF -DINTIO \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC)
 CFLAGS          =       $(ARCHFLAGS)
 TRADFLAG        =
-#FCOPTIM         =       -fast -O2 -Olimit 2000
-FCOPTIM         =       -O0
+FCOPTIM         =       -fast -O2 -Olimit 2000
+#FCOPTIM         =       -O0
 FCDEBUG         =       -g
 FCTYPE          =       -r8
 FCFORM          =       -free
 FCHOST          =       -arch host
-FCBUFR          =       -automatic -cpp -fpe2 -align dcommons -align records
+FCBUFR          =       -automatic -cpp -fpe0 -align dcommons -align records
 FCBASE          =       $(FCBUFR) -convert big_endian
 FC_FFT_RF       =       -automatic -cpp -fpe2 -align dcommons -align records -convert big_endian
 
@@ -667,7 +667,7 @@ lib_rsl :
 ##X1_CROSS_COMP = "gcc"
 ##X1_CROSS_CFLG = ""
 ## Use these for X1 native (trigger) compiler
-X1_CROSS_COMP = "gcc"
+X1_CROSS_COMP = "cc"
 X1_CROSS_CFLG = "-hcommand"
 CC_TOOLS        =       $(X1_CROSS_COMP) $(X1_CROSS_CFLG)
 

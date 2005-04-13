@@ -69,13 +69,14 @@ SUBROUTINE DA_Add_PBL_And_SFC_Info( xp, xb, xbx )
 ! [4.0] Calculate  Sea level pressure and total precipitable water
 !------------------------------------------------------------------------------
 
-!  call DA_WRF_TPQ_2_SLP ( xb )
-   do j = js,je
-   do i = is,ie
-      call DA_TPQ_To_SLP( xb%t(i,j,:), xb%q(i,j,:), xb%p(i,j,:), xb%terr(i,j), &
-                         xb%psfc(i,j), xb%slp(i,j), xp )
-   end do
-   end do
+   call DA_WRF_TPQ_2_SLP ( xb )
+
+!  do j = js,je
+!  do i = is,ie
+!     call DA_TPQ_To_SLP( xb%t(i,j,:), xb%q(i,j,:), xb%p(i,j,:), xb%terr(i,j), &
+!                        xb%psfc(i,j), xb%slp(i,j), xp )
+!  end do
+!  end do
 
    CALL INTEGRAT_dZ(xb)
 

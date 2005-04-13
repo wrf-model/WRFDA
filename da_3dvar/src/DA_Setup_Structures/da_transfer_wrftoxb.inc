@@ -382,7 +382,7 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
      enddo
    enddo
 
-#if 1
+#if 0
 ! Adapted the code from WRF module_big_step_utilities_em.F ----
 !         subroutine calc_p_rho_phi      Y.-R. Guo (10/20/2004)
 
