@@ -34,12 +34,12 @@ SUBROUTINE DA_Setup_RunConstants( xp, xb, xbx)
    REAL                     :: coeff_ny      ! Multiplicative coefficients.
    REAL                     :: cos_coeff_nx  ! Multiplicative coefficients.
    REAL                     :: cos_coeff_ny  ! Multiplicative coefficients.
-   
+   real                     :: delta_phi 
 !------------------------------------------------------------------------------
 !  [1.0] Calculate padded grid-size required for efficient FFTs and factors:
 !------------------------------------------------------------------------------
 
-      if (associated(xbx % fft_factors_x)) return
+!mslee   IF ( cv_options == 2 ) THEN
 
 !     [1.1] In x direction:
 
@@ -97,7 +97,8 @@ SUBROUTINE DA_Setup_RunConstants( xp, xb, xbx)
 
 !-----Multiplicative coefficent for solution of spectral Poission eqn:
 
-      const = -0.5 * xb%ds * xb%ds
+!mslee.Bgrid      const = -0.5 * xb%ds * xb%ds
+      const = -2.0 * xb%ds * xb%ds
 
       nx = xp%ide - xp%ids + xbx%fft_pad_i
       ny = xp%jde - xp%jds + xbx%fft_pad_j
@@ -114,16 +115,23 @@ SUBROUTINE DA_Setup_RunConstants( xp, xb, xbx)
          cos_coeff_ny = COS(coeff_ny * REAL(j-1))
          DO i = 2, nx
             cos_coeff_nx = COS(coeff_nx * REAL(i-1))
-            xbx%fft_coeffs(i,j) = const / ( 1.0 - cos_coeff_nx * cos_coeff_ny)
+!mslee.Bgrid            xbx%fft_coeffs(i,j) = const / ( 1.0 - cos_coeff_nx * cos_coeff_ny)
+            if (cos_coeff_nx.eq.1.and.cos_coeff_ny.eq.1) then
+            xbx%fft_coeffs(i,j) = 0.0
+            else
+            xbx%fft_coeffs(i,j) = const / ( 2.0 - cos_coeff_nx - cos_coeff_ny)
+            endif
+
          END DO
       END DO
 
 !  Set to zero all coefficients which are multiplied by sin(0.0) in FST:
 
-      xbx%fft_coeffs(1,1:xbx%fft_jy)  = 0.0
-      xbx%fft_coeffs(xbx%fft_ix,1:xbx%fft_jy) = 0.0
-      xbx%fft_coeffs(1:xbx%fft_ix,1)  = 0.0
-      xbx%fft_coeffs(1:xbx%fft_ix,xbx%fft_jy) = 0.0
+!mslee      xbx%fft_coeffs(1,1:xbx%fft_jy)  = 0.0
+!mslee      xbx%fft_coeffs(xbx%fft_ix,1:xbx%fft_jy) = 0.0
+!mslee      xbx%fft_coeffs(1:xbx%fft_ix,1)  = 0.0
+!mslee      xbx%fft_coeffs(1:xbx%fft_ix,xbx%fft_jy) = 0.0
+!mslee. we need to check the following
    
       xbx%fft_adjoint_factor = 4.0 / REAL( nx * ny )
 
@@ -177,6 +185,7 @@ SUBROUTINE DA_Setup_RunConstants( xp, xb, xbx)
          enddo
       endif
 
+!mslee   END IF
 !------------------------------------------------------------------------------
    IF ( cv_options == 4 ) THEN
 ! Set up Spectral transform constants:
@@ -188,7 +197,7 @@ SUBROUTINE DA_Setup_RunConstants( xp, xb, xbx)
     xbx%lenwrk = xbx%ni
     xbx%max_wavenumber = xbx%ni/2 -1
     xbx%alp_size = (xbx%nj+ 1)*(xbx%max_wavenumber+1)*( xbx%max_wavenumber + 2)/ 4
-    xbx%c_cv_size= (xbx%max_wavenumber+1)*(xbx%max_wavenumber+2)/2
+    xbx% c_cv_size =(xbx%max_wavenumber+1)*(xbx%max_wavenumber+2)/2
 
   if(print_detail > 0) then
    write(unit=*, fmt='(a, i6)') &
