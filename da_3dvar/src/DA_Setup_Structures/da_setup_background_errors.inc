@@ -37,6 +37,7 @@ SUBROUTINE DA_Setup_Background_Errors( xb, xbx, be, xp )
 
    else if(cv_options == 4)then
 
+      CALL DA_Setup_Background_Errors4( xb,be, xbx, xp )
 
    else if(cv_options == 5)then
 
