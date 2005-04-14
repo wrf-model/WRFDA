@@ -51,8 +51,8 @@ C     DIMENSION WRK1(IMAX,JMAX,KMAX), WRK2(IMAX,JMAX,KMAX),
 C                                                                               
       NAMELIST /NAMFIL/ NALFL,NVPFL,NGSFL,NSSTFL,NSNWFL,NINFL,
      1				    KTLAG,IDCHCK,NDIGFL,NTPFL,NALOT,NRSFL
-      NAMELIST /HEADIN/ TYPE,FILE,KTUNIT,IDTYPE,
-     1                  IBACK,NNSP
+C     NAMELIST /HEADIN/ TYPE,FILE,KTUNIT,IDTYPE,
+C    1                  IBACK,NNSP
 C------------------------------------------------------------------------
 C  NALFL : 3DOI INPUT FILE
 C  NVPFL : VERTIAL LEVEL DEF. FILE
@@ -102,19 +102,21 @@ C   =================================================================
 C   >>>   NAMELIST (NAMFIL)                                       <<<           
 C   =================================================================           
       READ(95,NAMFIL) 
-      READ(95,HEADIN)
+C     READ(95,HEADIN)
       WRITE(6,NAMFIL)                                                           
-      WRITE(6,HEADIN)                                                           
+C     WRITE(6,HEADIN)                                                           
 C   =================================================================
 C   >>>   Select Input Source                                     <<<
 C   =================================================================
-      CALL GETENV('FROMUNPACK',FROMUNPACK)
-      IF (LEN_TRIM(FROMUNPACK).EQ.0) THEN
-        IUNPACK=0
-      ELSE
-        READ(FROMUNPACK,'(I1)') IUNPACK
-      END IF
-      WRITE(6,*)'IUNPACK=',IUNPACK
+!shc-wei start
+c     CALL GETENV('FROMUNPACK',FROMUNPACK)
+c     IF (LEN_TRIM(FROMUNPACK).EQ.0) THEN
+c       IUNPACK=0
+c     ELSE
+c       READ(FROMUNPACK,'(I1)') IUNPACK
+c     END IF
+c     WRITE(6,*)'IUNPACK=',IUNPACK
+!shc-wei end
 C   =================================================================           
 C   >>>   GENERATE GAUSSIAN LATITUDES                             <<<           
 C   =================================================================           
@@ -142,7 +144,7 @@ C   =================================================================
 C   >>>  READ TOPO FILE
 C   =================================================================           
           NTPFL = 3
-          go to 33333
+c         go to 33333   ! shc For T63 only
  	  IF (NTPFL.GT.0) THEN
  	  	READ(NTPFL)NWV,DUM,IGRD,JGRD
  	  	IF ((IGRD.NE.IMAX).OR.(JGRD.NE.JMAX)) THEN
@@ -160,7 +162,7 @@ C---------------------------------------------------------------------
 C +++ CONVERT LAT/LON to GAUSS
 C---------------------------------------------------------------------
 33333        continue
-  	READ(NTPFL,'(10f10.3)')GPHIS
+c 	READ(NTPFL,'(10f10.3)')GPHIS      !shc For T63 only
 C                                                !shc start
 C   =================================================================           
 C   >>>   PS, TEMP, Q -> RH

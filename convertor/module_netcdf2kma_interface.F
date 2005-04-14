@@ -1,7 +1,7 @@
 MODULE module_netcdf2kma_interface
 
    use module_wave2grid_kma
-   implicit none
+!  implicit none
 
 CONTAINS
 
@@ -12,7 +12,7 @@ SUBROUTINE netcdf2kma_interface ( grid, config_flags )
    USE module_driver_constants
    USE module_configure
 
-   IMPLICIT NONE
+!  IMPLICIT NONE
    real    :: DPSE(imaxe,jmaxe)
    real    :: DUE(imaxe,jmaxe,kmax),DVE(imaxe,jmaxe,kmax)
    real    :: DTE(imaxe,jmaxe,kmax),DQE(imaxe,jmaxe,kmax)
@@ -36,7 +36,10 @@ SUBROUTINE netcdf2kma_interface ( grid, config_flags )
 !
 !   First the Equal lat/lon data
 ! set Field as per KMA order (North top South and 0 to 360 east)
-   back = 102                    !shc start
+!shc-wei start
+!  back = 102                    !shc start
+   back = 48                     !shc start
+!shc-wei end
    read(back) ID,KT,IM,JM,KM
    read(back)       !topo
    read(back) PSB
@@ -49,7 +52,10 @@ SUBROUTINE netcdf2kma_interface ( grid, config_flags )
    read(back)       !z           !shc end
    USE_INCREMENT=1     !shc start
    if (USE_INCREMENT.eq.1) then
-   incre = 101                   
+!shc-wei start
+!  incre = 101                   
+   incre = 47                   
+!shc-wei end
    read(incre) DPSE
    read(incre) DUE
    read(incre) DVE
@@ -139,7 +145,7 @@ END SUBROUTINE netcdf2kma_interface
 
 SUBROUTINE reorder_for_kma(wrf,n1,n2,n3)
 
- IMPLICIT none                
+!IMPLICIT none                
  integer, intent(in) :: n1,n2,n3
  real, intent(inout) :: wrf(n1,n2,n3)
 

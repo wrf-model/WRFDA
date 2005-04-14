@@ -1,19 +1,30 @@
       MODULE module_wave2grid_kma
      
-      PARAMETER ( KMAX=30 )
-      PARAMETER ( IMAXE=640, JMAXE=321 )                                 
-      PARAMETER ( IMAX=640, JMAX=320 )                                 
-      PARAMETER (MEND1 =214,NEND1=214,JEND1=214)
-C for T63      PARAMETER ( IMAXE=192, JMAXE=97 )                                 
-C for T63      PARAMETER ( IMAX=192, JMAX=96  )                                 
-C for T63      PARAMETER (MEND1 =64,NEND1=64,JEND1=64)
-      PARAMETER ( ISST=360, JSST=181 )                                          
-      PARAMETER ( ISNW=360, JSNW=180 )                                          
-      PARAMETER ( IDIM=428, JDIM=214 ) ! MAX(MAX,SST,SNW)                       
-      PARAMETER ( MAXJZ=16 )                                                    
-      PARAMETER (JMAXHF= JMAX/2)
-      PARAMETER (MNWAV =MEND1*(MEND1+1)/2)
-      PARAMETER (IVAR=6,IMX=IMAX+2)
+      PARAMETER (KMAX=30)
+C==== T213 (640*321)
+C     PARAMETER(IMAXE=640,JMAXE=321)
+C     PARAMETER(IMAX=640,JMAX=320)
+C     PARAMETER(IDIM=640,JDIM=320)
+C     PARAMETER(MEND1 =214,NEND1=214,JEND1=214)
+
+C==== T213 (428*215)
+      PARAMETER(IMAXE=428,JMAXE=215)
+      PARAMETER(IMAX=428,JMAX=214)
+      PARAMETER(IDIM=428,JDIM=214)
+      PARAMETER(MEND1 =214,NEND1=214,JEND1=214)
+
+C==== T63 (192*97)
+C     PARAMETER(IMAXE=192,JMAXE=97)
+C     PARAMETER(IMAX=192,JMAX=96)
+C     PARAMETER(IDIM=192,JDIM=96)
+C     PARAMETER(MEND1=64,NEND1=64,JEND1=64)
+
+      PARAMETER(ISST=360,JSST=181)
+      PARAMETER(ISNW=360,JSNW=180)
+      PARAMETER(MAXJZ=16)
+      PARAMETER(JMAXHF=JMAX/2)
+      PARAMETER(MNWAV=MEND1*(MEND1+1)/2)
+      PARAMETER(IVAR=6,IMX=IMAX+2)
 
       CONTAINS
 
@@ -45,9 +56,9 @@ C for T63      PARAMETER (MEND1 =64,NEND1=64,JEND1=64)
 #include  "ZE2TVE.inc"
 #include  "ZMNLAT.inc"
 #include  "ZMNT.inc"
-#include  "RELHUM.inc"            !shc
+#include  "RELHUM.inc"
 #include  "PREGSM.inc"
-#include  "PREGSM1.inc"           !shc
-#include  "Einc_to_Ganl.inc"      !shc
+#include  "PREGSM1.inc"
+#include  "Einc_to_Ganl.inc"
 
       END MODULE  module_wave2grid_kma

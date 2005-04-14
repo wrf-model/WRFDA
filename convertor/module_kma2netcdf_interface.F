@@ -8,13 +8,13 @@ MODULE module_kma2netcdf_interface
    USE module_configure
    use module_kma_wave2grid
    USE module_tiles
-   implicit none
+!  implicit none    !shc-wei
 
 CONTAINS
 
 SUBROUTINE kma2netcdf_interface ( grid, config_flags )
 
-   IMPLICIT NONE
+!  IMPLICIT NONE    !shc-wei
 
 !--Input data.
    TYPE (grid_config_rec_type)   :: config_flags
@@ -44,7 +44,7 @@ SUBROUTINE kma2netcdf_solver( grid, config_flags, &
 #include <em_dummy_args.inc>
                  )
 
-   IMPLICIT NONE
+!  IMPLICIT NONE   !shc-wei
 
 !--Input data.
    TYPE (grid_config_rec_type)   :: config_flags
