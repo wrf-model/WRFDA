@@ -67,6 +67,10 @@ SUBROUTINE da_get_innov_vector( it, ob, iv, &
 
       call da_get_innov_vector_pilot( it, xb, xp, ob, iv )
 
+!-----TC bogus
+
+      call da_get_innov_vector_bogus( it, xb, xp, ob, iv )
+
 !-----Metar:
 
       call da_get_innov_vector_metar( it, xb, xp, ob, iv )

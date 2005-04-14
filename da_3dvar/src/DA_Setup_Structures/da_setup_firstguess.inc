@@ -11,6 +11,10 @@ SUBROUTINE DA_Setup_FirstGuess( xbx, grid, &
 !
 !  HISTORY: 01/06/2000 - Creation of F90 version.           Dale Barker
 !           10/19/2001 - Mods for parallel implementation.  Al Bourgeois
+!           26/29/2004 - Updated for KMF First Guess field  Syed RH Rizvi
+!           01/31/2005 - Updated Xb with multiplicative 
+!                        coefficients for PsiChi_TO_UV      Syed RH Rizvi
+!
 !
 !  PARENT_MODULE: DA_Setup_Structures
 !------------------------------------------------------------------------------
@@ -23,6 +27,8 @@ SUBROUTINE DA_Setup_FirstGuess( xbx, grid, &
 
 !  Definitions of dummy arguments to solve
 #include <em_dummy_decl.inc>
+   integer :: is, ie, js, je
+   real    :: ddx , ddy     
 
    write(unit=*, fmt='(/a)') &
         '-----------------------------------'
@@ -30,6 +36,11 @@ SUBROUTINE DA_Setup_FirstGuess( xbx, grid, &
         '[2.0] Set up first guess field (xb)'
    write(unit=*, fmt='(a/a)') &
         '-----------------------------------'
+
+   is = xp % its
+   ie = xp % ite
+   js = xp % jts
+   je = xp % jte
 
 !------------------------------------------------------------------------------      
 !  [1.0] Setup and read in fields from first guess:
@@ -52,11 +63,13 @@ SUBROUTINE DA_Setup_FirstGuess( xbx, grid, &
 
    else if ( fg_format == 3 ) then
 
-!-----First guess is an KMA (netcdf format) file:
-!     call da_setup_firstguess_kma(xb, xbx, xp)
-   
-      write(unit=*, fmt='(/a)') 'Input KMA FG.'
+!  First guess is an KMA format file:
 
+     call da_setup_firstguess_kma( xbx, grid, &
+!
+#include <em_dummy_args.inc>
+!
+                                 )
    end if
 
 !------------------------------------------------------------------------------
@@ -64,22 +77,52 @@ SUBROUTINE DA_Setup_FirstGuess( xbx, grid, &
 !------------------------------------------------------------------------------
 
    CALL wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id0)
+   periodic_x = grid%periodic_x
 
+   if( global ) then     
+     if( fg_format == 3) then
+!    Set East-West boundary for Xb-array 
+     call da_set_boundary_xb(xb)
+!--- Calculate multiplicative constants for PsiChi_TO_UV 
+     ddx =  earth_radius*1000 * 2.0 * pi / (xb%ide-xb%ids+1)
+     ddy =  earth_radius*1000       * pi / (xb%jde-xb%jds  )
+     xb% coefx(is:ie,js:je) = 0.5 / (ddx * cos(xlat(is:ie,js:je)*pi/180.))
+     xb% coefy(is:ie,js:je) = 0.5 /  ddy
+     else
+     print*,' For global option wrong choice for fg_format = ',fg_format
+     stop
+     end if
+
+   else
+     if( fg_format == 1 .or. fg_format == 2) then
+!---- Calculate multiplicative constants for PsiChi_TO_UV 
+
+      if ( xb%its == xb%ids ) is = xb%ids+1
+      if ( xb%ite == xb%ide ) ie = xb%ide-1
+      if ( xb%jts == xb%jds ) js = xb%jds+1
+      if ( xb%jte == xb%jde ) je = xb%jde-1
+      xb%coefx(is-1:ie+1,js-1:je+1) = 0.5 * &
+                        xb%map_factor(is-1:ie+1,js-1:je+1)/xb%ds
+      xb%coefy(is-1:ie+1,js-1:je+1) = xb%coefx(is-1:ie+1,js-1:je+1)
+      xb%coefz(is-1:ie+1,js-1:je+1) = 0.5 / &
+                        (xb%map_factor(is-1:ie+1,js-1:je+1)*xb%ds)
+     else
+     print*,' For regional option wrong choice for fg_format = ',fg_format
+     end if
+   end if
 !------------------------------------------------------------------------------
-
-   write(unit=*, fmt='(4x,a,i4)') &
-        'I Dimension grid points: ', xb % mix, &
-        'J Dimension grid points: ', xb % mjy, &
-        'K Dimension grid points: ', xb % mkz
-   write(unit=*, fmt='(/)')
+!  write(unit=*, fmt='(4x,a,i4)') &
+!       'I Dimension grid points: ', xb % mix, &
+!       'J Dimension grid points: ', xb % mjy, &
+!       'K Dimension grid points: ', xb % mkz
+!  write(unit=*, fmt='(/)')
 
 !------------------------------------------------------------------------------      
 !  [2.0] Setup grid-dependent constants used:
 !------------------------------------------------------------------------------
 
-!  [2.1] Set up fast Fourier transform constants:
+!  [2.1] Set up fast Fourier & Legendre transform constants:
 
-   CALL DA_Setup_RunConstants( xp, xbx, xb%ds)
+   CALL DA_Setup_RunConstants( xp, xb, xbx)
 
 END SUBROUTINE DA_Setup_FirstGuess
-
