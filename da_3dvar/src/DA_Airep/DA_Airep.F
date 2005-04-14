@@ -7,6 +7,23 @@ MODULE DA_Airep
    USE DA_Tools
    USE PAR_UTIL
 
+! The "stats_airep_type" is ONLY used locally in DA_Airep:
+
+   TYPE residual_airep1_type
+      REAL          :: u                        ! u-wind.
+      REAL          :: v                        ! v-wind.
+      REAL          :: t                        ! temperature
+   END TYPE residual_airep1_type
+
+   TYPE maxmin_airep_stats_type
+        TYPE (maxmin_type)         :: u, v, t 
+   END TYPE maxmin_airep_stats_type
+
+   TYPE stats_airep_type
+        TYPE (maxmin_airep_stats_type)  :: maximum, minimum
+        TYPE (residual_airep1_type)     :: average, rms_err
+   END TYPE stats_airep_type
+
 CONTAINS
 
 #include "DA_AO_Stats_Airep.inc"

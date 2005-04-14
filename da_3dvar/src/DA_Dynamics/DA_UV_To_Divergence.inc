@@ -1,4 +1,4 @@
-SUBROUTINE DA_UV_To_Divergence( ds, map_factor, u, v, div, &
+SUBROUTINE DA_UV_To_Divergence( u, v, coefx, coefy,   div, &
                                ids,ide, jds,jde, kds,kde,  &
                                ims,ime, jms,jme, kms,kme,  &
                                its,ite, jts,jte, kts,kte )
@@ -7,11 +7,10 @@ SUBROUTINE DA_UV_To_Divergence( ds, map_factor, u, v, div, &
 !  PURPOSE: Calculate divergence on a co-ordinate surface, given an input
 !           wind field.
 !
-!  METHOD:  div = m**2 ( d(u/m)/dx + d(v/m)/dy )
-!
-!  ASSUMPTIONS: dx = dy = ds
 !
 !  HISTORY: 09/28/1999 - Creation of F90 version.           Dale Barker
+!           02/02/2005 - Global update       Syed RH Rizvi
+!
 !------------------------------------------------------------------------------
 
    implicit none
@@ -19,9 +18,8 @@ SUBROUTINE DA_UV_To_Divergence( ds, map_factor, u, v, div, &
    integer, intent(in):: ids,ide, jds,jde, kds,kde    ! domain dims.
    integer, intent(in):: ims,ime, jms,jme, kms,kme    ! memory dims.
    integer, intent(in):: its,ite, jts,jte, kts,kte    ! tile   dims.
-
-   real, intent(in)   :: ds                           ! Resolution.
-   real, intent(in)   :: map_factor(ims:ime,jms:jme)  ! Map fact.
+   real, intent(in)   :: coefx(ims:ime,jms:jme)       ! Multiplicative const.
+   real, intent(in)   :: coefy(ims:ime,jms:jme)       ! Multiplicative const.
    real, intent(in)   :: u(ims:ime,jms:jme,kms:kme)   ! u wind comp.
    real, intent(in)   :: v(ims:ime,jms:jme,kms:kme)   ! v wind comp.
    real, intent(inout):: div(ims:ime,jms:jme,kms:kme) ! Divergence.
@@ -30,19 +28,11 @@ SUBROUTINE DA_UV_To_Divergence( ds, map_factor, u, v, div, &
    integer            :: is, ie                       ! 1st dim. end points.
    integer            :: js, je                       ! 2nd dim. end points.
    integer            :: ks, ke                       ! 3rd dim. end points.
-   real               :: inv_2ds                      ! 1/2ds.
    real               :: one_third                    ! 1/3.
-   real               :: coeff
-   real               :: um(ims:ime,jms:jme)          ! Temp. storage of u/m.
-   real               :: vm(ims:ime,jms:jme)          ! Temp. storage of v/m.
-
 !------------------------------------------------------------------------------
 !  [1.0] Initialise:
 !------------------------------------------------------------------------------
-
-   inv_2ds = 0.5 / ds
    one_third = 1.0 / 3.0
-
    div = 0.0
 
 !  Computation to check for edge of domain:
@@ -56,18 +46,15 @@ SUBROUTINE DA_UV_To_Divergence( ds, map_factor, u, v, div, &
 
    DO k = kts, kte
    
-      um(is-1:ie+1,js-1:je+1) = u(is-1:ie+1,js-1:je+1,k) / map_factor(is-1:ie+1,js-1:je+1)
-      vm(is-1:ie+1,js-1:je+1) = v(is-1:ie+1,js-1:je+1,k) / map_factor(is-1:ie+1,js-1:je+1)
-
 !     [2.1] Compute fd divergence at interior points:
 
       DO j = js, je
       DO i = is, ie
-         coeff = map_factor(i,j) * map_factor(i,j) * inv_2ds
-         div(i,j,k) = ( um(i+1,j) - um(i-1,j) + vm(i,j+1) - vm(i,j-1) ) * coeff
+         div(i,j,k) = coefx(i,j) * (u(i+1,j,k) - u(i-1,j,k) ) + &
+                      coefy(i,j) * (v(i,j+1,k) - v(i,j-1,k) )
       END DO
       END DO
-      
+
 !     [2.2] Impose zero divergence gradient condition at boundaries:
 
 !     [2.2.1] Bottom boundaries:

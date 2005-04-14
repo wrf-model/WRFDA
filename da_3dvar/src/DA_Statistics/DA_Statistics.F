@@ -19,7 +19,6 @@ MODULE DA_Statistics
 #include "DA_Correlation_Coeff1d.inc"
 #include "DA_Correlation_Coeff2d.inc"
 #include "DA_Data_Distribution.inc"
-#include "DA_Print_Stats.inc"
 #include "Stats_Calculate.inc"
 
 END MODULE DA_Statistics

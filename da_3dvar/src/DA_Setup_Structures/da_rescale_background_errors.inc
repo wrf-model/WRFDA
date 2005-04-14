@@ -53,27 +53,43 @@ SUBROUTINE DA_Rescale_Background_Errors ( ix, jy, var_scaling, len_scaling, &
       s(1:mz) = s(1:mz) / ds
 
 !     [2.3] Empirical rescaling of variances:
+      if (mz > 1) &
       be_sub % val(:,:) = var_scaling * be_sub % val(:,:)
 
 !     Calculate recursive filter rescaling:
 
       ALLOCATE( rf_scale_factor(1:mz) )
+!      print*,'RF_Factors name ',TRIM(be_sub % name)
+!      print*,'RF_Factors s ',s(1:mz)
+!      print*,'RF_Factors rf_alpha',be_sub % rf_alpha(1:mz)
+!      print*,'RF_Factors rf_scale_factor',rf_scale_factor(1:mz)
 
       CALL DA_Calculate_RF_Factors( s(:), be_sub % rf_alpha(:), &
                                     rf_scale_factor(:) )
 
+!      print*,'RF_Factors after ',TRIM(be_sub % name), inv_ij_sqrt
+!      print*,'RF_Factors s ',s(1:mz)
+!      print*,'RF_Factors rf_alpha',be_sub % rf_alpha(1:mz)
+!      print*,'RF_Factors rf_scale_factor',rf_scale_factor(1:mz)
+
 !     Include differential factor for psi/chi:
 
-      IF ( TRIM(be_sub % name) == 'psi' .OR. &
-           TRIM(be_sub % name) == 'chi_u'  ) THEN
-         rf_scale_factor(:) = rf_scale_factor(:) * rf_scale_factor(:) * &
-                              inv_ij_sqrt
-      END IF
+!mslee      IF ( TRIM(be_sub % name) == 'psi' .OR. &
+!mslee          TRIM(be_sub % name) == 'chi_u'  ) THEN
+!mslee     IF ( TRIM(be_sub % name) == 'psi') THEN 
+!mslee         rf_scale_factor(:) = rf_scale_factor(:) * rf_scale_factor(:) * &
+!mslee                              inv_ij_sqrt
+!mslee      END IF
 
+!      print*,'rf_scale_factor',rf_scale_factor(1:mz)
+
+      if (mz > 1) then
       DO m = 1, mz
          be_sub % val(:,m) = rf_scale_factor(m) * be_sub % val(:,m)
+!      write(*,'(a,10e13.5)') 'be_sub%val',be_sub%val(1:10,m)
       END DO
-                                       
+      endif
+                 
       DEALLOCATE ( rf_scale_factor )   
 
    END IF

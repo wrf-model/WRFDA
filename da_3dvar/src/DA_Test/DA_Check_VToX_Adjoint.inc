@@ -60,7 +60,6 @@ SUBROUTINE DA_Check_VToX_Adjoint( xb, xbx, be, cv1, vv, vp, xp, xa, &
 !-------------------------------------------------------------------------
 
    call da_zero_x ( xa )
-
    call da_transform_vtox( xb, xbx, be, cv1, vv, vp, xp, xa, &
                           ids, ide, jds, jde, kds, kde,      &
                           ims, ime, jms, jme, kms, kme,      &
@@ -131,7 +130,6 @@ SUBROUTINE DA_Check_VToX_Adjoint( xb, xbx, be, cv1, vv, vp, xp, xa, &
 !-------------------------------------------------------------------------
 !  [5.0] Perform adjoint operation:
 !-------------------------------------------------------------------------
-
    call da_transform_vtox_adj( xb, xbx, be, xa, xp, vp, vv, cv2, &
                               ids, ide, jds, jde, kds, kde,      &
                               ims, ime, jms, jme, kms, kme,      &
@@ -141,7 +139,7 @@ SUBROUTINE DA_Check_VToX_Adjoint( xb, xbx, be, cv1, vv, vp, xp, xa, &
 !  [6.0] Calculate RHS of adjoint test equation:
 !-------------------------------------------------------------------------
 
-   adj_par_rhs = SUM( cv1(:) * cv2(:) )
+   adj_par_rhs = SUM( cv1(1:cv_size) * cv2(1:cv_size) )
 
 !-------------------------------------------------------------------------
 !  [7.0] Print output:

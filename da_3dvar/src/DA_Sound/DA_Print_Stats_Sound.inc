@@ -4,7 +4,7 @@ SUBROUTINE DA_Print_Stats_Sound( stats_unit, nu, nv, nt, nq, Sound )
 
    INTEGER,           INTENT(IN)    :: stats_unit
    INTEGER,           INTENT(INOUT) :: nu, nv, nt, nq
-   TYPE (stats_type), INTENT(IN)    :: Sound
+   TYPE (stats_sound_type), INTENT(IN)    :: Sound
    
       write(unit=stats_unit, fmt='(5a/)') &
         '   var             ', &
