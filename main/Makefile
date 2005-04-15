@@ -14,7 +14,19 @@ include ../configure.wrf
 
 da_3dvar : da_3dvar.o
 	$(RANLIB) libwrflib.a
-	$(FC) -o da_3dvar.exe $(LDFLAGS) da_3dvar.o libwrflib.a $(LIB)
+	$(LD) -o da_3dvar.exe $(LDFLAGS) da_3dvar.o libwrflib.a $(LIB)
+
+kma2netcdf : kma2netcdf.o
+	$(RANLIB) libwrflib.a
+	$(LD) -o kma2netcdf.exe $(LDFLAGS) kma2netcdf.o libwrflib.a $(LIB) -L../convertor
+
+netcdf2kma : netcdf2kma.o
+	$(RANLIB) libwrflib.a
+	$(LD) -o netcdf2kma.exe $(LDFLAGS) netcdf2kma.o libwrflib.a $(LIB) -L../convertor 
+
+$(SOLVER) : $(SOLVER).o
+	$(RANLIB) libwrflib.a
+	$(LD) -o $(SOLVER).exe $(LDFLAGS) $(SOLVER).o libwrflib.a $(LIB)
 
 $(SOLVER)_wrf : wrf.o
 	$(RANLIB) libwrflib.a
@@ -29,12 +41,22 @@ $(SOLVER)_real : module_initialize real_$(SOLVER).o ndown_$(SOLVER).o
 	$(LD) -o real.exe $(LDFLAGS) real_$(SOLVER).o ../dyn_$(SOLVER)/module_initialize_$(IDEAL_CASE).o libwrflib.a $(LIB)
 	$(LD) -o ndown.exe $(LDFLAGS) ndown_$(SOLVER).o  ../dyn_$(SOLVER)/module_initialize_$(IDEAL_CASE).o libwrflib.a $(LIB)
 
+convert_bioemiss : convert_bioemiss.o
+	$(RANLIB) libwrflib.a
+	$(FC) -o convert_bioemiss.exe $(LDFLAGS) convert_bioemiss.o libwrflib.a $(LIB)
+
+convert_emiss : convert_emiss.o
+	$(RANLIB) libwrflib.a
+	$(FC) -o convert_emiss.exe $(LDFLAGS) convert_emiss.o libwrflib.a $(LIB)
+
 convert_nmm : convert_nmm.o
 	$(RANLIB) libwrflib.a
 	$(FC) -o convert_nmm.exe $(LDFLAGS) convert_nmm.o libwrflib.a $(LIB)
 
 module_initialize :
 	( cd ../dyn_$(SOLVER) ;  $(MAKE) module_initialize_$(IDEAL_CASE).o )
+
+#############################################################################################################################
 
 clean:
 	@ echo 'use the clean script'
@@ -48,9 +70,10 @@ convert_nmm.o: \
 	../frame/module_configure.o \
 	../frame/module_timing.o \
 	../frame/module_dm.o \
+	../share/module_wrf_esmf_super.o \
 	../share/module_bc.o \
 	../share/module_io_domain.o \
-	../external/esmf_time_f90/ESMF_Mod.o 
+	$(ESMF_MOD_DEPENDENCE) $(EXTRAMODULES)
 
 ideal.o: \
 	../frame/module_machine.o \
@@ -59,8 +82,10 @@ ideal.o: \
 	../frame/module_configure.o \
 	../frame/module_timing.o \
 	../frame/module_dm.o \
+	../share/module_wrf_esmf_super.o \
 	../share/module_io_domain.o \
-	../dyn_$(SOLVER)/$(CASE_MODULE)
+	../dyn_$(SOLVER)/$(CASE_MODULE) \
+	$(ESMF_MOD_DEPENDENCE) $(EXTRAMODULES)
 
 ndown_em.o: \
 	../frame/module_machine.o \
@@ -69,6 +94,7 @@ ndown_em.o: \
 	../frame/module_configure.o \
 	../frame/module_timing.o \
 	../frame/module_dm.o \
+	../share/module_wrf_esmf_super.o \
 	../frame/module_wrf_error.o \
 	../frame/module_integrate.o \
 	../share/module_bc.o \
@@ -77,7 +103,7 @@ ndown_em.o: \
 	../share/module_soil_pre.o \
 	../dyn_em/module_initialize_real.o \
 	../dyn_em/module_big_step_utilities_em.o \
-	../external/esmf_time_f90/ESMF_Mod.o 
+	$(ESMF_MOD_DEPENDENCE) $(EXTRAMODULES)
 
 # this already built above :../dyn_em/module_initialize.real.o \
 real_em.o: \
@@ -87,13 +113,17 @@ real_em.o: \
 	../frame/module_configure.o \
 	../frame/module_timing.o \
 	../frame/module_dm.o \
+	../share/module_wrf_esmf_super.o \
 	../dyn_em/module_si_io_em.o \
 	../dyn_em/module_big_step_utilities_em.o \
 	../share/module_io_domain.o \
 	../share/module_date_time.o \
 	../share/module_optional_si_input.o \
 	../share/module_bc_time_utilities.o \
-	../external/esmf_time_f90/ESMF_Mod.o 
+	$(ESMF_MOD_DEPENDENCE) $(EXTRAMODULES)
+#	../chem/module_input_chem_data.o \
+#	../chem/module_input_chem_bioemiss.o \
+
 wrf.o: \
 	../frame/module_machine.o \
 	../frame/module_domain.o \
@@ -103,8 +133,11 @@ wrf.o: \
 	../frame/module_timing.o \
 	../frame/module_wrf_error.o \
 	../frame/module_dm.o \
-	../external/esmf_time_f90/ESMF_Mod.o 
+	../share/module_wrf_esmf_super.o \
+	$(ESMF_MOD_DEPENDENCE) $(EXTRAMODULES)
 
-da_3dvar.o:
+da_3dvar.o: \
+	../share/module_wrf_esmf_super.o \
+	$(ESMF_MOD_DEPENDENCE) $(EXTRAMODULES)
 
 # DO NOT DELETE

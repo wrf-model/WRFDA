@@ -476,5 +476,26 @@ SUBROUTINE da_fill_obs_structures( iv, ob )
 
    ENDIF
 
+!  [2.19] Transfer TC bogus:
+
+   IF ( iv % num_bogus > 0 ) THEN
+
+      DO n = 1, iv % num_bogus
+         DO k = 1, iv % bogus(n) % info % levels
+
+!           Copy observations variables:
+
+            ob % bogus(n) % u(k) = iv % bogus(n) % u(k) % inv
+            ob % bogus(n) % v(k) = iv % bogus(n) % v(k) % inv
+         END DO
+         ob % bogus(n) % slp = iv % bogus(n) % slp % inv
+      END DO
+
+!     Initialise obs error factors (optionally overwritten in use_obs_errfac)
+      iv % bogus_ef_u = 1.0
+      iv % bogus_ef_v = 1.0
+      iv % bogus_ef_slp = 1.0
+
+   ENDIF
 
 END SUBROUTINE da_fill_obs_structures

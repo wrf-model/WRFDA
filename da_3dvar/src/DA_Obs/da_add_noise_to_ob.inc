@@ -396,4 +396,32 @@ SUBROUTINE da_add_noise_to_ob( iv, ob )
       END DO
    ENDIF
 
+!  [2.16] Transfer TC bogus obs:
+
+   IF ( iv % num_bogus > 0 ) THEN
+
+      write(rand_unit,'(a,i8)')'bogus', iv % num_bogus
+
+      DO n = 1, iv % num_bogus
+         write(rand_unit,'(i8)')iv % bogus(n) % info % levels
+
+         DO k = 1, iv % bogus(n) % info % levels
+
+!           Add random perturbation:
+            call da_add_noise( iv % bogus(n) % u(k), ob % bogus(n) % u(k), z1)
+            call da_add_noise( iv % bogus(n) % v(k), ob % bogus(n) % v(k), z2)
+
+!           Write out data:
+            write(rand_unit,'(2i8,10e15.7)')n, k, &
+                               iv % bogus(n) % u(k) % error, z1, &
+                               iv % bogus(n) % v(k) % error, z2
+         END DO
+
+         call da_add_noise( iv % bogus(n) % slp, ob % bogus(n) % slp, z3 )
+         write(rand_unit,'(2i8,10e15.7)')n, 1, &
+                                  iv % bogus(n) % slp % error, z3
+
+      END DO
+   ENDIF
+
 END SUBROUTINE da_add_noise_to_ob

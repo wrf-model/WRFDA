@@ -16,6 +16,7 @@ MODULE DA_Recursive_Filter
 
    CONTAINS
 
+#include "da_perform_2drf.inc"
 #include "DA_Calculate_RF_Factors.inc"
 #include "DA_RF_Turning_Conditions.inc"
 #include "DA_Recursive_Filter_1d.inc"

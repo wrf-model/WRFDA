@@ -83,6 +83,10 @@
 !     Pseudo obs:
 
       call DA_Calculate_GradY_Pseudo( iv, re,  jo_grad_y )    
+
+!     TC bogus obs:
+
+      call DA_Calculate_GradY_bogus( iv, re,  jo_grad_y )    
                   
 !     Quikscat scatterometer:
 

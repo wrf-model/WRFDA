@@ -43,7 +43,7 @@ SUBROUTINE da_cloud_model ( TB, PB, QB, QCWB, QRNB, ZB, ZFB, DT, kts, kte )
 
    P0 = PP(kts)
    Z0 = ZB(kts)
-   T0 = AMAX1(TB(kts),303.)
+   T0 = MAX(TB(kts),303.)
 
    CALL QFRMRH ( P0, T0, 95., Q0 )
 
