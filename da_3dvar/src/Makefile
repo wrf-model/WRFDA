@@ -97,6 +97,7 @@ OBJS_4_GEN_BE_LONG =	DA_Constants.o		\
 			da_rfz.o      		\
 			LAPACK.o		\
 			da_spectral.o           \
+			be_spectral.o           \
 			da_fftpack5.o           \
 			da_gen_be.o             \
 			da_stats_be.o           \
