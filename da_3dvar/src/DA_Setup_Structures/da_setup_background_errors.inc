@@ -19,18 +19,16 @@ SUBROUTINE DA_Setup_Background_Errors( xb, xbx, be, xp )
    CHARACTER (LEN=120)         :: message
 
    if(cv_options == 2)then
-!mslee      CALL DA_Setup_Background_Errors2( xb, xbx, be_g )
-     CALL DA_Setup_Background_Errors2( xb, xbx, be )
+      CALL DA_Setup_Background_Errors2( xb, xbx, be_g )
 
 !-----Create local be arrays and deallocate global copies.
 
-!mslee      jts = xp%jts
-!mslee      jte = xp%jte
-!mslee      kts = xp%kts
-!mslee      kte = xp%kte
+      jts = xp%jts
+      jte = xp%jte
+      kts = xp%kts
+      kte = xp%kte
 
-!mslee      call be_local_copy( be_g, be, jts, jte, kts, kte )
-   print*,'end sub-errors2'
+      call be_local_copy( be_g, be, jts, jte, kts, kte )
    else if(cv_options == 3)then
 
       CALL DA_Setup_Background_Errors3( xb,be,xp )
