@@ -14,8 +14,8 @@ ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DNETCDF -DINTIO \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC)
 CFLAGS          =       $(ARCHFLAGS)
 TRADFLAG        =
-FCOPTIM         =       -fast -O2 -Olimit 2000
-#FCOPTIM         =       -O0
+#FCOPTIM         =       -fast -O2 -Olimit 2000
+FCOPTIM         =       -O0
 FCDEBUG         =       -g
 FCTYPE          =       -r8
 FCFORM          =       -free
@@ -64,8 +64,8 @@ ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DNETCDF -DINTIO \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC)
 CFLAGS          =       $(ARCHFLAGS) -I../external/RSL/RSL
 TRADFLAG        =
-FCOPTIM         =       -fast -O2 -Olimit 2000
-#FCOPTIM         =       -O0
+#FCOPTIM         =       -fast -O2 -Olimit 2000
+FCOPTIM         =       -O0
 FCDEBUG         =       -g
 FCTYPE          =       -r8
 FCFORM          =       -free
@@ -121,8 +121,8 @@ ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DNETCDF -DINTIO \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC)
 CFLAGS          =       $(ARCHFLAGS)
 TRADFLAG        =
-FCOPTIM         =       -fast -O2 -Olimit 2000
-#FCOPTIM         =       -O0
+#FCOPTIM         =       -fast -O2 -Olimit 2000
+FCOPTIM         =       -O0
 FCDEBUG         =       -g
 FCTYPE          =       -r8
 FCFORM          =       -free
