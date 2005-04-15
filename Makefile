@@ -81,7 +81,7 @@ k2n :
 	$(MAKE) MODULE_DIRS="$(DA_CONVERTOR_MODULES)" convertor_drivers
 	( cd main ; \
           /bin/rm -f kma2netcdf.exe ; \
-	  $(MAKE) MODULE_DIRS="$(DA_CONVERTOR_MODULES)" SOLVER=kma2netcdf )
+	  $(MAKE) MODULE_DIRS="$(DA_CONVERTOR_MODULES)" kma2netcdf )
 
 n2k : 
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" ext
@@ -92,7 +92,7 @@ n2k :
 	$(MAKE) MODULE_DIRS="$(DA_CONVERTOR_MODULES)" convertor_drivers
 	( cd main ; \
           /bin/rm -f netcdf2kma.exe ; \
-	  $(MAKE) MODULE_DIRS="$(DA_CONVERTOR_MODULES)" SOLVER=netcdf2kma )
+	  $(MAKE) MODULE_DIRS="$(DA_CONVERTOR_MODULES)" netcdf2kma )
 
 be :
 	/bin/rm -f main/libwrflib.a

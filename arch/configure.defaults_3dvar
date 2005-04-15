@@ -20,7 +20,7 @@ FCDEBUG         =       -g
 FCTYPE          =       -r8
 FCFORM          =       -free
 FCHOST          =       -arch host
-FCBUFR          =       -automatic -cpp -fpe2 -align dcommons -align records
+FCBUFR          =       -automatic -cpp -fpe0 -align dcommons -align records
 FCBASE          =       $(FCBUFR) -convert big_endian
 FC_FFT_RF       =       -automatic -cpp -fpe2 -align dcommons -align records -convert big_endian
 
@@ -70,7 +70,7 @@ FCDEBUG         =       -g
 FCTYPE          =       -r8
 FCFORM          =       -free
 FCHOST          =       -arch host
-FCBUFR          =       -automatic -cpp -fpe2 -align dcommons -align records
+FCBUFR          =       -automatic -cpp -fpe0 -align dcommons -align records
 FCBASE          =       $(FCBUFR) -convert big_endian
 FC_FFT_RF       =       -automatic -cpp -fpe2 -align dcommons -align records -convert big_endian
 
@@ -127,7 +127,7 @@ FCDEBUG         =       -g
 FCTYPE          =       -r8
 FCFORM          =       -free
 FCHOST          =       -arch host
-FCBUFR          =       -automatic -cpp -fpe2 -align dcommons -align records
+FCBUFR          =       -automatic -cpp -fpe0 -align dcommons -align records
 FCBASE          =       $(FCBUFR) -convert big_endian
 FC_FFT_RF       =       -automatic -cpp -fpe2 -align dcommons -align records -convert big_endian
 
