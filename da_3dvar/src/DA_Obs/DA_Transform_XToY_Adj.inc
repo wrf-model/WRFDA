@@ -88,7 +88,6 @@ SUBROUTINE DA_Transform_XToY_Adj( xb, iv, xp, jo_grad_y, jo_grad_x )
 !------------------------------------------------------------------------------
 
    call da_transform_xtoy_ssmt2_adj ( iv, xp, jo_grad_y, jo_grad_x )
-   
 !------------------------------------------------------------------------------
 !  [14.0] Scatterometer observation operator y = H(x):
 !------------------------------------------------------------------------------
@@ -118,6 +117,12 @@ SUBROUTINE DA_Transform_XToY_Adj( xb, iv, xp, jo_grad_y, jo_grad_x )
 !------------------------------------------------------------------------------
 
    call da_transform_xtoy_Radar_adj ( xb, iv, xp, jo_grad_y, jo_grad_x )
+
+!------------------------------------------------------------------------------
+!  [19.0] TC bogus observation operator y = H(x):
+!------------------------------------------------------------------------------
+
+   call da_transform_xtoy_Bogus_adj ( xb, iv, xp, jo_grad_y, jo_grad_x )
 
 !------------------------------------------------------------------------------
 END SUBROUTINE DA_Transform_XToY_Adj

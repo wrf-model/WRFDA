@@ -38,6 +38,8 @@ MODULE DA_Constants
    REAL, PARAMETER    :: gravity = 9.81        ! m/s - value used in MM5.
 !  REAL, PARAMETER    :: earth_radius = 6378.15
    REAL, PARAMETER    :: earth_radius = 6370.0		! Be consistant with WRF
+!  REAL, PARAMETER    :: earth_omega  = 2.0*pi/86400.0  ! Omega
+   REAL, PARAMETER    :: earth_omega  = 0.000072921     ! Omega 7.2921*10**-5
 
 !  Saturation Vapour Pressure Constants(Rogers & Yau, 1989) 
    REAL, PARAMETER    :: es_alpha = 611.2
@@ -143,6 +145,8 @@ MODULE DA_Constants
 
    INTEGER, PARAMETER :: be_cv_2_unit = 32    ! Unit number for be input.
    INTEGER, PARAMETER :: be_cv_3_unit = 33    ! Unit number for be input.
+   INTEGER, PARAMETER :: be_cv_4_unit = 34    ! Unit number for be input. 
+   INTEGER, PARAMETER :: be_cv_5_unit = 35    ! Unit number for be input.
 
    INTEGER, PARAMETER :: terrain_unit = 40    ! Unit number for terrain input.
    INTEGER, PARAMETER :: jpin = 41            ! Unit number for xb input.
@@ -151,6 +155,7 @@ MODULE DA_Constants
    integer, parameter :: yp_unit = 46         ! Output of H(x'(yo+noise)).
    integer, parameter :: y_unit = 47          ! Output of H(x'(yo)).
    integer, parameter :: jo_unit = 48         ! Output of components of Jo, ErrFac.
+   INTEGER, PARAMETER :: anl_inc_unit = 141   ! Analysis increment unit     
    integer, parameter :: fac_unit = 49        ! Input components of ErrFac.
    integer, parameter :: omb_unit = 50        ! Output for O-B values.
 
@@ -182,6 +187,10 @@ MODULE DA_Constants
    REAL               :: coarse_ds            ! Coarse domain gridlength (km)
    REAL               :: start_x              ! i posn. of (1,1) in coarse domain.
    REAL               :: start_y              ! j posn. of (1,1) in coarse domain.
+   REAL               :: start_lat            ! Latitude coresponds to start_(x,y)
+   REAL               :: start_lon            ! Longitude coresponds to start_(x,y)
+   REAL               :: delt_lat             ! Latitude increments for global grids
+   REAL               :: delt_lon             ! Longitude increments for global grids
 
    REAL               :: phic                 ! COARSE DOMAIN CENTRAL LAT(DEGREE)
    REAL               :: xlonc                ! COARSE DOMAIN CENTRAL LON(DEGREE)
@@ -267,7 +276,8 @@ MODULE DA_Constants
                            num_ssmi_tot,  num_ssmt1_tot, num_ssmt2_tot, &
                            num_satem_tot, num_satob_tot, num_ships_tot, &
                            num_sound_tot, num_airep_tot, num_qscat_tot, &
-                           num_profiler_tot, num_buoy_tot, num_gpsref_tot
+                           num_profiler_tot, num_buoy_tot, num_gpsref_tot, &
+                           num_Radar_tot, num_bogus_tot
 
  integer       :: num_pseudo
  real          :: pseudo_x, pseudo_y, pseudo_z
@@ -281,8 +291,6 @@ MODULE DA_Constants
  CHARACTER*(8) :: MODEL_TYPE    ! Model type.
  CHARACTER*(8) :: ANALYSIS_TYPE ! Either '3D-PSAS' OR '3D-VAR'
  LOGICAL       :: write_increments ! Write out analysis increments if true.
-
- logical       :: gaussian_lats ! True if Gaussian latitudes used (global).
 
  CHARACTER(LEN=24) :: ANALYSIS_DATE ! Analysis time, "CCYY-MM-DD_HH:MM:SS.ssss"
  INTEGER           :: ANALYSIS_ACCU ! Analysis time accuracy in seconds.
@@ -320,6 +328,7 @@ MODULE DA_Constants
  LOGICAL       :: check_max_iv
  INTEGER       :: check_rh
  logical       :: interpolate_stats
+ logical       :: gaussian_lats      
 
 !Namelist variables in future?:
  REAL, PARAMETER :: maximum_rh = 100.0
@@ -333,6 +342,7 @@ MODULE DA_Constants
                    use_metarObs, &  
                    use_pilotObs, &  
                    use_soundObs, &  
+                   use_bogusObs, &  
                    use_satemObs, &  
                    use_satobObs, &  
                    use_airepObs, & 
@@ -393,7 +403,9 @@ MODULE DA_Constants
                     max_error_tb             = 5, &
                     max_error_thickness      = 5, &
                     max_error_rv             = 5, &
-                    max_error_rf             = 5
+                    max_error_rf             = 5, &
+                    max_error_buv            = 500, &
+                    max_error_slp            = 500
 
 !  Define various ways for bad data to be flagged.  
 
@@ -463,7 +475,8 @@ MODULE DA_Constants
                            max_profiler = 30000, & ! Maximum Number of profiler obs.
                            max_buoy = 30000, &     ! Maximum Number of buoy obs.
                            max_Radar = 10000, &   ! Maximum Number of Radar obs.
-                           max_qscat  = 50000      ! Maximum Number of Quik SCAT obs.
+                           max_qscat  = 50000, &   ! Maximum Number of Quik SCAT obs.
+                           max_bogus  = 5000       ! Maximum Number of bogus obs.
 
  integer                :: max_sound_input, &
                            max_synop_input, &
@@ -482,8 +495,12 @@ MODULE DA_Constants
                            max_profiler_input, &
                            max_buoy_input,  &
                            max_Radar_input, &
+                           max_Bogus_input, &
                            max_qscat_input
 
+ integer                :: numb_procs, &         ! Number of total processors.
+                           my_proc_id            ! My processor ID.
+ LOGICAL                :: global 
  CONTAINS
 
 #include "da_advance_cymdh.inc"
