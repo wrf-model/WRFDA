@@ -51,7 +51,7 @@ OBJS_FOR_ALL =		da_solve_v3d.o		\
 OBJS_4_GEN_BE_SHORT =	DA_Constants.o		\
 			da_gen_be.o		\
 			da_fftpack5.o		\
-			da_spectral.o           \
+			be_spectral.o           \
 			LAPACK.o		\
 			BLAS.o
 
@@ -1218,6 +1218,25 @@ da_spectral.o:		\
 			da_spectral/da_spectral.F
 			$(CPP) -I./da_spectral $(CPPFLAGS_3DVAR) da_spectral/da_spectral.F > da_spectral.f
 			$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) da_spectral.f
+
+be_spectral.o:		\
+			DA_Constants.o				\
+			da_fftpack5.o			        \
+			da_spectral/da_asslegpol.inc		\
+			da_spectral/da_calc_power.inc		\
+			da_spectral/da_get_gausslats.inc	\
+			da_spectral/da_get_reglats.inc		\
+			da_spectral/da_initialize_h.inc		\
+			da_spectral/da_legtra.inc		\
+			da_spectral/da_legtra_inv.inc		\
+			da_spectral/da_setlegpol.inc		\
+			da_spectral/da_setlegpol_test.inc	\
+			da_spectral/da_vv_to_v_spectral.inc	\
+			da_spectral/da_legtra_inv_adj.inc	\
+			da_spectral/da_apply_power.inc		\
+			da_spectral/be_spectral.F
+			$(CPP) -I./da_spectral $(CPPFLAGS_3DVAR) da_spectral/be_spectral.F > be_spectral.f
+			$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) be_spectral.f
 
 da_stats_be.o:		DA_Constants.o		\
 			DA_Define_Structures.o	\

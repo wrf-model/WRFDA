@@ -1,7 +1,7 @@
 program gen_be_stage4
 
    use da_constants
-   use da_spectral
+   use be_spectral
 
    implicit none
 
@@ -169,10 +169,10 @@ program gen_be_stage4
             allocate( rcv( 1:r_cvsize) )
 
 !           Test horizontal transforms:
-            if ( testing_spectral ) then
-               call da_test_spectral( ni, nj, max_wavenumber, inc, lenr, lensav, lenwrk, &
-                                      alp_size, r_cvsize, alp, wsave, int_wgts, field )
-            end if
+!           if ( testing_spectral ) then
+!              call da_test_spectral( ni, nj, max_wavenumber, inc, lenr, lensav, lenwrk, &
+!                                     alp_size, r_cvsize, alp, wsave, int_wgts, field )
+!           end if
             first_time = .false.
          end if
 

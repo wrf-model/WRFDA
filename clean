@@ -13,6 +13,7 @@ end
 ( cd da_3dvar/src ; /bin/rm -f *.f *.o *.mod *.stb .*.m *.lst )
 ( cd external/RSL/RSL ; /bin/rm -f *.lst )
 ( cd convertor ; /bin/rm -f *.f *.o *.mod *.exe *.stb .*.m *.lst )
+( cd gen_be ; /bin/rm -f *.o *.mod *.exe *.stb .*.m *.lst )
 
 ( cd tools/CodeBase ; make clean )
 
