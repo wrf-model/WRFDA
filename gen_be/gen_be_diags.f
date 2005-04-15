@@ -49,7 +49,7 @@ program gen_be_diags
 
 !----------------------------------------------------------------------------
 ! yrg mods:
-   if (uh_method == 'spectrum') then
+   if (uh_method == 'power') then
      write(6,'(/a)')' [3] Gather horizontal error power spectra.'
    else if (uh_method == 'scale') then
      write(6,'(/a)')' [3] Gather horizontal scale length.'

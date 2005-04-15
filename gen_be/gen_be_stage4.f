@@ -28,7 +28,7 @@ program gen_be_stage4
    integer             :: ier                        ! FFT error flag.
    integer             :: count                      ! Counter
    integer             :: alp_size                   ! Ass. Leg. Pol. array size.
-   integer             :: v_size                     ! Complex control variable array size.
+   integer             :: r_cvsize                   ! Real control variable array size.
 
    logical             :: first_time                 ! True if first time through loop.
    logical             :: testing_spectral           ! Test spectral transform.
@@ -54,7 +54,7 @@ program gen_be_stage4
    real, allocatable   :: power(:)                   ! Power spectrum (n).
    real, allocatable   :: total_power(:)             ! Total Power spectrum (averaged over time/members).
 
-   complex, allocatable:: cv(:)                      ! Control variable vector.
+   real, allocatable   :: rcv(:)                     ! Control variable vector.
 
    namelist / gen_be_stage4_nl / start_date, end_date, interval, variable, gaussian_lats, &
                                  be_method, ne, k, testing_spectral, expt, dat_dir
@@ -165,13 +165,13 @@ program gen_be_stage4
                                   wsave, lon, sinlon, coslon, lat, sinlat, coslat, &
                                   int_wgts, alp )
 
-            v_size = ( max_wavenumber + 1 ) * ( max_wavenumber + 2 ) / 2
-            allocate( cv( 1:v_size) )
+            r_cvsize = ( max_wavenumber + 1 ) * ( max_wavenumber + 2 )
+            allocate( rcv( 1:r_cvsize) )
 
 !           Test horizontal transforms:
             if ( testing_spectral ) then
                call da_test_spectral( ni, nj, max_wavenumber, inc, lenr, lensav, lenwrk, &
-                                      alp_size, v_size, alp, wsave, int_wgts, field )
+                                      alp_size, r_cvsize, alp, wsave, int_wgts, field )
             end if
             first_time = .false.
          end if
@@ -181,13 +181,13 @@ program gen_be_stage4
 !---------------------------------------------------------------------------------------------
 
          call da_vv_to_v_spectral( ni, nj, max_wavenumber, inc, lenr, lensav, lenwrk, &
-                                   alp_size, v_size, alp, wsave, int_wgts, field, cv)
+                                   alp_size, r_cvsize, alp, wsave, int_wgts, rcv, field )
 
 !---------------------------------------------------------------------------------------------
 !         write(6,(a)) Calculate power spectra.
 !---------------------------------------------------------------------------------------------
 
-         call da_calc_power( max_wavenumber, v_size, cv, power )
+         call da_calc_power( max_wavenumber, r_cvsize, rcv, power )
 
          coeffa = 1.0 / real(num_states)
          coeffb = real(num_states-1) * coeffa

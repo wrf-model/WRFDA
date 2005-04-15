@@ -23,12 +23,14 @@ SUBROUTINE DA_Rescale_Background_Errors ( ix, jy, var_scaling, len_scaling, &
     
    INTEGER                          :: mz                ! Vertical truncation.
    INTEGER                          :: m
+   REAL                             :: inv_ij_sqrt       ! 1/SQRT(ix*jy)
    REAL, ALLOCATABLE                :: rf_scale_factor(:)! RF rescaling.
    
 !-----------------------------------------------------------------------------
 !  [1.0] Initialise:
 !-----------------------------------------------------------------------------
 
+   inv_ij_sqrt = 1.0 / SQRT( REAL( ix * jy ) ) 
    mz = be_sub % mz
 
 !-----------------------------------------------------------------------------
@@ -63,16 +65,10 @@ SUBROUTINE DA_Rescale_Background_Errors ( ix, jy, var_scaling, len_scaling, &
 
 !     Include differential factor for psi/chi:
 
-!mslee      IF ( TRIM(be_sub % name) == 'psi' .OR. &
-!mslee          TRIM(be_sub % name) == 'chi_u'  ) THEN
-!mslee     IF ( TRIM(be_sub % name) == 'psi') THEN 
-!mslee         rf_scale_factor(:) = rf_scale_factor(:) * rf_scale_factor(:) * &
-!mslee                              inv_ij_sqrt
-!mslee      END IF
-
       if (mz > 1) then
       DO m = 1, mz
          be_sub % val(:,m) = rf_scale_factor(m) * be_sub % val(:,m)
+!      write(*,'(a,10e13.5)') 'be_sub%val',be_sub%val(1:10,m)
       END DO
       endif
                  

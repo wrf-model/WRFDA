@@ -6,6 +6,7 @@ RM      =       rm -f
 
 $(SOLVER) :	$(SOLVER)_stage1	\
 		$(SOLVER)_stage2	\
+		$(SOLVER)_stage2a	\
 		$(SOLVER)_stage3	\
 		$(SOLVER)_stage4	\
 		$(SOLVER)_stage4_scale	\
@@ -27,6 +28,10 @@ $(SOLVER)_stage1 : $(SOLVER)_stage1.o
 $(SOLVER)_stage2 : $(SOLVER)_stage2.o
 	$(RANLIB) ../main/libwrflib.a
 	$(LD) -o $(SOLVER)_stage2.exe $(LDFLAGS) $(SOLVER)_stage2.o ../main/libwrflib.a
+
+$(SOLVER)_stage2a : $(SOLVER)_stage2a.o
+	$(RANLIB) ../main/libwrflib.a
+	$(LD) -o $(SOLVER)_stage2a.exe $(LDFLAGS) $(SOLVER)_stage2a.o ../main/libwrflib.a
 
 $(SOLVER)_stage3 : $(SOLVER)_stage3.o
 	$(RANLIB) ../main/libwrflib.a
@@ -69,6 +74,10 @@ gen_be_stage1.o:
 gen_be_stage2.o:
 	$(RM) $@
 	$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) gen_be_stage2.f
+
+gen_be_stage2a.o:
+	$(RM) $@
+	$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) gen_be_stage2a.f
 
 gen_be_stage3.o:
 	$(RM) $@
