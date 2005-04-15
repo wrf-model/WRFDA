@@ -382,7 +382,7 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
      enddo
    enddo
 
-#if 1
+#if 0
 ! Adapted the code from WRF module_big_step_utilities_em.F ----
 !         subroutine calc_p_rho_phi      Y.-R. Guo (10/20/2004)
 
@@ -654,8 +654,9 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
 !--Calculate means for later use in setting up background errors.
 !------------------------------------------------------------------------------
 
-   if(.not. associated(xbx % latc_mean)) then
-   allocate ( xbx % latc_mean(xp%jds:xp%jde) )
+!  if(.not. associated(xbx % latc_mean)) then
+      allocate ( xbx % latc_mean(xp%jds:xp%jde) )
+!  endif
 
    size2d = (xp%ide-xp%ids+1)*(xp%jde-xp%jds+1)
 
@@ -687,7 +688,6 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
 
 !     print *, 'loc_latc_mean  =', loc_latc_mean(js)
       print *, 'xbx % latc_mean=', xbx % latc_mean(js)
-   endif
    endif
 
 !---Calculate time step from one dimensional cloud model parameterization-------------
