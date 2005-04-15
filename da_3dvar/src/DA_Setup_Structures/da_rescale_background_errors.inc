@@ -60,9 +60,21 @@ SUBROUTINE DA_Rescale_Background_Errors ( ix, jy, var_scaling, len_scaling, &
 
       CALL DA_Calculate_RF_Factors( s(:), be_sub % rf_alpha(:), &
                                     rf_scale_factor(:) )
+
+!     Include differential factor for psi/chi:
+
+!mslee      IF ( TRIM(be_sub % name) == 'psi' .OR. &
+!mslee          TRIM(be_sub % name) == 'chi_u'  ) THEN
+!mslee     IF ( TRIM(be_sub % name) == 'psi') THEN 
+!mslee         rf_scale_factor(:) = rf_scale_factor(:) * rf_scale_factor(:) * &
+!mslee                              inv_ij_sqrt
+!mslee      END IF
+
+      if (mz > 1) then
       DO m = 1, mz
          be_sub % val(:,m) = rf_scale_factor(m) * be_sub % val(:,m)
       END DO
+      endif
                  
       DEALLOCATE ( rf_scale_factor )   
 

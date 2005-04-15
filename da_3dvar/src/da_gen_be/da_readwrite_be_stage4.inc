@@ -6,7 +6,6 @@ subroutine da_readwrite_be_stage4( outunit, nk, be_method, uh_method, variable )
    integer, intent(in)      :: nk                         ! Number of vertical levels/modes.
    character*3, intent(in)  :: be_method                  ! Be method ('NMC', or 'ENS').
    character*5, intent(in)  :: uh_method
-
    character*10, intent(in) :: variable                   ! Variable name.
 
    character*80             :: filename                   ! Input filename.
@@ -23,7 +22,7 @@ subroutine da_readwrite_be_stage4( outunit, nk, be_method, uh_method, variable )
 
    first_time = .true.
 
-if (uh_method .eq. 'spectrum') then
+if (uh_method .eq. 'power') then
 
    do k = 1, nk
       write(ck,'(i2)')k

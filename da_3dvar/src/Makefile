@@ -951,6 +951,7 @@ DA_Tools.o:		\
 DA_Recursive_Filter.o:	\
 			DA_Constants.o \
 			DA_Recursive_Filter/DA_Recursive_Filter.F \
+                        DA_Recursive_Filter/da_perform_2drf.inc \
 			DA_Recursive_Filter/DA_Calculate_RF_Factors.inc \
 			DA_Recursive_Filter/DA_RF_Turning_Conditions.inc \
 			DA_Recursive_Filter/DA_Recursive_Filter_1d.inc \
@@ -1158,7 +1159,13 @@ da_gen_be.o:	         \
 			DA_VToX_Transforms/DA_Transform_VpToVv.inc	\
 			DA_Tools/da_eof_decomposition.inc	\
 			DA_Tools/da_eof_decomposition_test.inc	\
+                        DA_Recursive_Filter/da_perform_2drf.inc \
+                        DA_Recursive_Filter/DA_Recursive_Filter_1d.inc  \
 			da_gen_be/da_create_bins.inc	\
+                        da_gen_be/da_filter_regcoeffs.inc       \
+                        da_gen_be/da_print_be_stats_h.inc       \
+                        da_gen_be/da_print_be_stats_p.inc       \
+                        da_gen_be/da_print_be_stats_v.inc       \
 			da_gen_be/da_readwrite_be_stage2.inc	\
 			da_gen_be/da_readwrite_be_stage3.inc	\
 			da_gen_be/da_readwrite_be_stage4.inc	\

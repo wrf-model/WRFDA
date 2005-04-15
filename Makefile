@@ -103,7 +103,7 @@ be :
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES_2)" gen_be_short
 	( cd gen_be ; \
 	/bin/rm -f *.exe ; \
-	$(MAKE) MODULE_DIRS="$(DA_GEN_BE_MODULES)" SOLVER=gen_be )
+	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" SOLVER=gen_be )
 
 be_wrf :
 	/bin/rm -f main/libwrflib.a
@@ -111,6 +111,7 @@ be_wrf :
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" toolsdir
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" REGISTRY="Registry" framework
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" shared
+	$(MAKE) MODULE_DIRS="$(ALL_MODULES)" em_core
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" da_3dvar_io
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES_2)" gen_be_long
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" gen_be_interface

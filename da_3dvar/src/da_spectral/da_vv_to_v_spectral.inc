@@ -1,5 +1,5 @@
 subroutine da_vv_to_v_spectral( ni, nj, max_wavenumber, inc, lenr, lensav, lenwrk, &
-                                alp_size, r_cvsize,alp, wsave,int_wgts,rcv, field)
+                                alp_size, r_cvsize, alp, wsave, int_wgts, rcv, field)
 !-------------------------------------------------------------------------
 !  Performs gridpoint to spectral transformation on a sphere.
 !  Note: Routine works for both regular and Gaussian latitude (latitude integration
