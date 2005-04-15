@@ -3,7 +3,6 @@
 
 MODULE module_io_wrf
 
-  USE wrf_data
   USE module_wrf_error
   USE module_date_time
 
@@ -22,17 +21,8 @@ MODULE module_io_wrf
   INTEGER, PARAMETER :: aux_hist5_only=12
   INTEGER, PARAMETER :: boundary_only=13, restart_only=14
 
-  INTEGER            :: WRF_REAL
-
 CONTAINS
   SUBROUTINE init_module_io_wrf
-
-#if ( RWORDSIZE == DWORDSIZE )
-     WRF_REAL = WRF_REAL8
-#else
-     WRF_REAL = WRF_REAL4
-#endif
-
   END SUBROUTINE init_module_io_wrf
 
 END MODULE module_io_wrf

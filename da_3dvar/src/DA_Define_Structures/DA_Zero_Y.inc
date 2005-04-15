@@ -42,6 +42,7 @@ SUBROUTINE DA_Zero_Y( iv, y )
    y % num_profiler = iv % num_profiler
    y % num_buoy     = iv % num_buoy    
    y % num_radar    = iv % num_radar   
+   y % num_bogus    = iv % num_bogus   
 
 !------------------------------------------------------------------------------
 !  [2.0] Allocate:
@@ -121,6 +122,17 @@ SUBROUTINE DA_Zero_Y( iv, y )
          y % sonde_sfc(n) % t = 0.0
          y % sonde_sfc(n) % p = 0.0
          y % sonde_sfc(n) % q = 0.0
+      end do
+   END IF
+
+   IF ( y % num_bogus > 0 ) THEN
+      do n = 1, y % num_bogus
+
+         nlevels = iv % bogus(n) % info % levels
+
+         y % bogus(n) % u(1:nlevels) = 0.0
+         y % bogus(n) % v(1:nlevels) = 0.0
+         y % bogus(n) % slp          = 0.0
       end do
    END IF
 

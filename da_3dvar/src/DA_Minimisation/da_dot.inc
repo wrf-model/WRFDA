@@ -6,7 +6,7 @@
 !     jack dongarra, linpack, 3/11/78.
 !
       implicit none
-!
+
       INCLUDE 'mpif.h'
 
       integer, intent(in)               :: n
@@ -15,6 +15,12 @@
       real dtemp1,dtemp1x
       integer i,m,mp1
       integer ierror     ! MPI error code.
+
+#if ( DWORDSIZE != RWORDSIZE )
+#define TRUE_MPI_REAL     MPI_REAL
+#else
+#define TRUE_MPI_REAL     MPI_REAL8
+#endif
 !
       da_dot = 0.0
       if(n <= 0)return
