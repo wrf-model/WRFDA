@@ -98,17 +98,22 @@ SUBROUTINE DA_Check_CvToVv_Adjoint( xb, xbx, xp, be, cv, vv, &
 !  [5.0] Print output:
 !-------------------------------------------------------------------------
 
+   if( .not. global) then
    write(unit=*, fmt='(a,1pe22.14)') &
-        'Single domain < vp,     vp > = ', adj_par_lhs, &
-        'Single domain < Vv_adj, Vv > = ', adj_par_rhs
+        'Single Domain: < Vv, Vv >     = ', adj_par_lhs, &
+        'Single Domain: < cv_adj, cv > = ', adj_par_rhs
+   endif
+
 
 #ifdef DM_PARALLEL
    call MPI_ALLREDUCE( adj_par_lhs, adj_sum_lhs, 1, TRUE_MPI_REAL, MPI_SUM, &
                        MPI_COMM_WORLD, IERROR )
-
+   if( global) then
+   adj_sum_rhs = adj_par_rhs
+   else
    call MPI_ALLREDUCE( adj_par_rhs, adj_sum_rhs, 1, TRUE_MPI_REAL, MPI_SUM, &
                        MPI_COMM_WORLD, IERROR )
-
+   endif  
    IF ( wrf_dm_on_monitor() ) THEN
       write(unit=*, fmt='(/)')
       write(unit=*, fmt='(a,1pe22.14)') &
@@ -129,4 +134,3 @@ SUBROUTINE DA_Check_CvToVv_Adjoint( xb, xbx, xp, be, cv, vv, &
         'DA_Check_CvToVv_Adjoint: Test Finished.'
 
 END SUBROUTINE DA_Check_CvToVv_Adjoint
-

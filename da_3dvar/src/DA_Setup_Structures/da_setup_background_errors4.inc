@@ -14,7 +14,6 @@ SUBROUTINE DA_Setup_Background_Errors4(xb, be, xbx, xp)
    TYPE (xbx_type),INTENT(IN)  :: xbx                   ! Header non-grid info 
    type (xpose_type), intent(in) :: xp   ! Dimensions and xpose buffers.
 
-   INTEGER                     :: its,ite,jts,jte
    INTEGER                     :: nrec, max_wavenumber  ! Scalar.
    INTEGER                     :: i, j, k, ic, jc       ! Loop counters.
    INTEGER                     :: ier                   ! error index
@@ -107,9 +106,7 @@ SUBROUTINE DA_Setup_Background_Errors4(xb, be, xbx, xp)
    end do
 !
 !-------------------------------------------------------------------
-   nrec = 0
-10 continue
-   nrec  = nrec + 1
+   do nrec = 1, 4
    read(be_cv_4_unit,end= 99,  err = 100) variable   
    read(be_cv_4_unit,end= 99,  err = 100) nk, num_bins2d 
 !
@@ -149,10 +146,12 @@ SUBROUTINE DA_Setup_Background_Errors4(xb, be, xbx, xp)
    deallocate ( eval_g )     
    deallocate ( evec_loc )     
    deallocate ( eval_loc )     
-!
-   if( nrec < 4) go to 10
+
+   enddo ! loop nrec
+
    deallocate( bin )
    deallocate( bin2d )
+
 !  Read Power spectrum
   
   do k = 1, nk

@@ -162,7 +162,6 @@ da_solve_v3d.o:		DA_Constants.o			\
 DA_Minimisation.o:	\
 			../module_wrf_3dvar_io.o \
 			DA_Constants.o \
-			DA_Tools.o     \
 			DA_Define_Structures.o \
 			DA_VToX_Transforms.o \
 			DA_Obs.o \
@@ -190,6 +189,7 @@ DA_Minimisation.o:	\
 			DA_Minimisation/da_calculate_residual.inc \
 			DA_Minimisation/da_get_var_diagnostics.inc \
 			DA_Minimisation/da_get_innov_vector.inc \
+			DA_Minimisation/da_dot.inc \
 			DA_Minimisation/da_lmdir.inc \
 			DA_Minimisation/da_minimisation_warning.inc \
 			DA_Minimisation/da_minimise.inc \
@@ -923,6 +923,7 @@ DA_Tools.o:		\
 			DA_Tools/DA_Diff_Seconds.inc \
 			DA_Tools/DA_Read_Namelist.inc \
 			DA_Tools/DA_Obs_Sfc_correction.inc \
+			DA_Tools/da_global_ll_to_xy.inc \
 			DA_Tools/DA_ll_to_xy.inc \
 			DA_Tools/Residual.inc \
 			DA_Tools/da_add_noise.inc \
@@ -937,11 +938,11 @@ DA_Tools.o:		\
 			DA_Tools/smooth_anl.inc \
 			DA_Tools/toGrid.inc \
 			DA_Tools/unifva.inc \
-			DA_Tools/da_dot.inc \
 			DA_Tools/DA_Set_Boundary_Xa.inc \
 			DA_Tools/DA_Set_Boundary_Xb.inc \
-			DA_Tools/DA_Set_Boundary_2d.inc \
 			DA_Tools/DA_Set_Boundary_3d.inc \
+			DA_Tools/get_2d_sum.inc \
+			DA_Tools/get_3d_sum.inc \
 			DA_Tools/xyll.inc    
 			$(RM) $@
 			$(CPP) -I./DA_Tools $(CPPFLAGS_3DVAR) DA_Tools/DA_Tools.F > DA_Tools.f
@@ -1197,6 +1198,7 @@ da_fftpack5.o:	         \
 
 da_spectral.o:		\
 			DA_Constants.o				\
+			DA_Define_Structures.o			\
 			da_fftpack5.o			        \
 			da_spectral/da_asslegpol.inc		\
 			da_spectral/da_calc_power.inc		\

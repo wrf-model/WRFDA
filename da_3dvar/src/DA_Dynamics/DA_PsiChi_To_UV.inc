@@ -45,24 +45,23 @@ SUBROUTINE DA_PsiChi_To_UV( psi, chi, coefx,coefy, u, v,&
 !------------------------------------------------------------------------------
 !  [1.0] For Global application, set Wast-Eest Periodic boundary
 !------------------------------------------------------------------------------
-   if( global ) then  
-   call da_set_boundary_3d(psi, &
-                            ids,ide, jds,jde, kds,kde,  &
-                            ims,ime, jms,jme, kms,kme,  &
-                            its,ite, jts,jte, kts,kte )
-   call da_set_boundary_3d(chi, &
-                            ids,ide, jds,jde, kds,kde,  &
-                            ims,ime, jms,jme, kms,kme,  &
-                            its,ite, jts,jte, kts,kte )
-   end if
-!------------------------------------------------------------------------------
-!  [1.1] Initialise:
-!------------------------------------------------------------------------------
 !  Computation to check for edge of domain:
    is = its; ie = ite; js = jts; je = jte
-   if( its == ids) is = ids+1
-   if( ite == ide) ie = ide-1
    if( jts == jds ) js = jds+1; if ( jte == jde ) je = jde-1
+
+   if( global ) then  
+      call da_set_boundary_3d(psi, &
+                            ids,ide, jds,jde, kds,kde,  &
+                            ims,ime, jms,jme, kms,kme,  &
+                            its,ite, jts,jte, kts,kte )
+      call da_set_boundary_3d(chi, &
+                            ids,ide, jds,jde, kds,kde,  &
+                            ims,ime, jms,jme, kms,kme,  &
+                            its,ite, jts,jte, kts,kte )
+   else
+      if(its == ids) is = ids+1
+      if(ite == ide) ie = ide-1
+   end if
 
    do k = kts, kte
 !------------------------------------------------------------------------------
@@ -80,6 +79,7 @@ SUBROUTINE DA_PsiChi_To_UV( psi, chi, coefx,coefy, u, v,&
          end do
       end do
 
+      if ( global ) cycle
 !------------------------------------------------------------------------------
 !  [3.0] Compute u, v at domain boundaries:
 !------------------------------------------------------------------------------
@@ -111,7 +111,6 @@ SUBROUTINE DA_PsiChi_To_UV( psi, chi, coefx,coefy, u, v,&
          end do
       end if
 
-
 !     [3.3] Southern boundaries:
 
       if ( jts == jds ) then
@@ -139,7 +138,6 @@ SUBROUTINE DA_PsiChi_To_UV( psi, chi, coefx,coefy, u, v,&
                        coefy(i,j)*( chi(i  ,j,k) - chi(i  ,j-2,k) ) 
          end do
       end if
-
 !------------------------------------------------------------------------------
 !     [4.0] Corner points (assume average of surrounding points - poor?):
 !------------------------------------------------------------------------------
@@ -170,21 +168,21 @@ SUBROUTINE DA_PsiChi_To_UV( psi, chi, coefx,coefy, u, v,&
          u(ite,jte,k) = 0.5 * ( u(ite-1,jte,k) + u(ite,jte-1,k) )
          v(ite,jte,k) = 0.5 * ( v(ite-1,jte,k) + v(ite,jte-1,k) )
       end if
-
-!101   continue
    end do
 
 !------------------------------------------------------------------------------
 !  [5.0] For Global application, set Wast-Eest Periodic boundary
 !------------------------------------------------------------------------------
-   if( global ) then  
-   call da_set_boundary_3d(u, &
+   if( global ) then
+    call da_set_boundary_3d(u, &
                             ids,ide, jds,jde, kds,kde,  &
                             ims,ime, jms,jme, kms,kme,  &
                             its,ite, jts,jte, kts,kte )
-   call da_set_boundary_3d(v, &
+    call da_set_boundary_3d(v, &
                             ids,ide, jds,jde, kds,kde,  &
                             ims,ime, jms,jme, kms,kme,  &
                             its,ite, jts,jte, kts,kte )
    end if
+
 END SUBROUTINE DA_PsiChi_To_UV
+

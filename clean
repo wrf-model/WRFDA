@@ -4,15 +4,15 @@ set nonomatch
 
 
 foreach dir ( frame chem share dyn_em dyn_exp dyn_nmm phys main tools )
-( cd $dir ; echo $dir ; /bin/rm -f core wrf *.f *.exe *.kmo *.mod *.o *.inc *.F90 *.a \
+( cd $dir ; echo $dir ; /bin/rm -f core wrf *.f *.exe *.kmo *.mod *.o *.inc *.F90 *.a .*.m *.lst \
                       db_* Warnings module_state_description.F module_dm.F gmeta \
                       wrfdata whatiread rsl.* show_domain* )
 end
 
-( cd gen_be; /bin/rm -f *.exe *.o *.stb )
-( cd da_3dvar ; /bin/rm -f *.f *.o *.mod mpif.h *.stb )
-( cd da_3dvar/src ; /bin/rm -f *.f *.o *.mod *.stb )
-( cd da_3dvar/utl ; /bin/rm -f *.f *.o *.mod *.exe *.stb )
+( cd da_3dvar ; /bin/rm -f *.f *.o *.mod mpif.h *.stb .*.m *.lst )
+( cd da_3dvar/src ; /bin/rm -f *.f *.o *.mod *.stb .*.m *.lst )
+( cd external/RSL/RSL ; /bin/rm -f *.lst )
+( cd convertor ; /bin/rm -f *.f *.o *.mod *.exe *.stb .*.m *.lst )
 
 ( cd tools/CodeBase ; make clean )
 
@@ -47,6 +47,6 @@ if ( "$1" == '-a' ) then
   ( /bin/rm -f da_3dvar/src/mpif.h )
   ( /bin/rm -f external/io_netcdf/mpif.h )
   ( /bin/rm -fr ./netcdf_links )
-  ( /bin/rm -f core *.out )
+  ( /bin/rm -f core *.out 1 )
 endif
 

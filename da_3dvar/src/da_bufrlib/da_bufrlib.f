@@ -5859,7 +5859,11 @@ C----------------------------------------------------------------------
 
       DIMENSION JCON(JCONS)
 
-      EQUIVALENCE (JCON1(1), NNOD)
+      EQUIVALENCE (NNOD, JCON(1))
+      EQUIVALENCE (NCON, JCON(2))
+      EQUIVALENCE (NODS(1), JCON(3))
+      EQUIVALENCE (IVLS(1), JCON(33))
+      EQUIVALENCE (KONS(1), JCON(43))
 #else
       COMMON /USRSTR/ JCON(JCONS)
 #endif

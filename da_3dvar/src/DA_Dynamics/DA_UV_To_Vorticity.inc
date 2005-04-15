@@ -41,15 +41,16 @@ SUBROUTINE DA_UV_To_Vorticity(xb , u, v, vor, &
 
    vor = 0.0
 
+!------------------------------------------------------------------------------
 !  Computation to check for edge of domain:
+!------------------------------------------------------------------------------
    is = its; ie = ite; js = jts; je = jte
-   if ( its == ids ) is = ids+1; if ( ite == ide ) ie = ide-1
+   if ( .not. global .and. its == ids ) is = ids+1 
+   if ( .not. global .and. ite == ide ) ie = ide-1
    if ( jts == jds ) js = jds+1; if ( jte == jde ) je = jde-1
-
 !------------------------------------------------------------------------------
 !  [2.0] Calculate vorticity:
 !------------------------------------------------------------------------------
-
    DO k = kts, kte
 
 !     [2.1] Compute finite difference vorticity at interior points:
@@ -60,6 +61,8 @@ SUBROUTINE DA_UV_To_Vorticity(xb , u, v, vor, &
                       xb%coefx(i,j) * (  v(i+1,j,k) - v(i-1,j,k) )
       END DO
       END DO
+
+      if( global ) cycle
 
 !    [2.2] Impose zero vorticity gradient condition at boundaries:
 
@@ -98,7 +101,14 @@ SUBROUTINE DA_UV_To_Vorticity(xb , u, v, vor, &
             vor(i,j,k) = one_third * ( 4.0 * vor(i,j-1,k) - vor(i,j-2,k) )
          end do
       end if
-
    END DO
 
+   if( global ) then
+      call da_set_boundary_3d(vor, &
+                              ids,ide, jds,jde, kds,kde,  &
+                              ims,ime, jms,jme, kms,kme,  &
+                              its,ite, jts,jte, kts,kte )
+   endif
+
 END SUBROUTINE DA_UV_To_Vorticity
+

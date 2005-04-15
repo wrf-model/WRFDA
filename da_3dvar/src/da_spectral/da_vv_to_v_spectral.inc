@@ -84,8 +84,8 @@ subroutine da_vv_to_v_spectral( ni, nj, max_wavenumber, inc, lenr, lensav, lenwr
        index_start = m * ( max_wavenumber + 1 - m ) + m * ( m + 1 ) / 2 + 1
        index_end   = index_start + max_wavenumber - m
        r_leg(1:nj) = v_fou(1:nj,m)
-       call da_leg_tra ( nj, max_wavenumber, alp_size, m, int_wgts, alp, r_leg, &
-                         cv(index_start:index_end) )
+       call da_legtra ( nj, max_wavenumber, alp_size, m, int_wgts, alp, r_leg, &
+                        cv(index_start:index_end) )
     end do
 
     do i=1,c_cvsize

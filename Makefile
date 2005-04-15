@@ -13,7 +13,7 @@ EM_MODULES =  $(EM_MODULE_DIR)
 DA_3DVAR_MODULES = $(INCLUDE_MODULES)
 DA_3DVAR_MODULES_2 = $(INC_MOD_3DVAR)
 
-DA_CONVERTOR_MOD_DIR = -I../convertor
+DA_CONVERTOR_MOD_DIR = -I../convertor -p../convertor
 DA_CONVERTOR_MODULES = $(DA_CONVERTOR_MOD_DIR) $(INCLUDE_MODULES)
 
 #### 3.d.   add macros to specify the modules for this core
@@ -90,6 +90,8 @@ n2k :
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" toolsdir
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" REGISTRY="Registry" framework
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" shared
+	$(MAKE) MODULE_DIRS="$(ALL_MODULES)" physics
+	$(MAKE) MODULE_DIRS="$(ALL_MODULES)" em_core
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" da_3dvar_io
 	$(MAKE) MODULE_DIRS="$(DA_CONVERTOR_MODULES)" convertor_drivers
 	( cd main ; \

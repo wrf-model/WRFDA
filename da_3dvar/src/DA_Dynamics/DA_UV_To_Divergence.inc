@@ -35,15 +35,16 @@ SUBROUTINE DA_UV_To_Divergence( u, v, coefx, coefy,   div, &
    one_third = 1.0 / 3.0
    div = 0.0
 
+!------------------------------------------------------------------------------
 !  Computation to check for edge of domain:
+!------------------------------------------------------------------------------
    is = its; ie = ite; js = jts; je = jte
-   if ( its == ids ) is = ids+1; if ( ite == ide ) ie = ide-1
+   if ( .not. global .and. its == ids ) is = ids+1  
+   if ( .not. global .and. ite == ide ) ie = ide-1
    if ( jts == jds ) js = jds+1; if ( jte == jde ) je = jde-1
-
 !------------------------------------------------------------------------------
 !  [2.0] Calculate divergence:
 !------------------------------------------------------------------------------
-
    DO k = kts, kte
    
 !     [2.1] Compute fd divergence at interior points:
@@ -54,6 +55,8 @@ SUBROUTINE DA_UV_To_Divergence( u, v, coefx, coefy,   div, &
                       coefy(i,j) * (v(i,j+1,k) - v(i,j-1,k) )
       END DO
       END DO
+
+      if( global ) cycle
 
 !     [2.2] Impose zero divergence gradient condition at boundaries:
 
@@ -92,8 +95,14 @@ SUBROUTINE DA_UV_To_Divergence( u, v, coefx, coefy,   div, &
             div(i,j,k) = one_third * ( 4.0 * div(i,j-1,k) - div(i,j-2,k) )
          end do
       end if
-
    END DO
+
+   if( global ) then
+      call da_set_boundary_3d(div, &
+                              ids,ide, jds,jde, kds,kde,  &
+                              ims,ime, jms,jme, kms,kme,  &
+                              its,ite, jts,jte, kts,kte )
+   endif
 
 END SUBROUTINE DA_UV_To_Divergence
 

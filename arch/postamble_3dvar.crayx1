@@ -3,7 +3,7 @@ LIB	     =       $(NETCDF_LIB) $(MPI_LIB) $(LOCAL_LIB) $(WRF_LIB)
 EXTRAMODULES    =
 FCBASEOPTS      =       $(FCTYPE) $(FCBASE) $(FCFORM) $(FCHOST) $(FCDEBUG) -I.
 FC_FFT_RF_OPTS  =       $(FCTYPE) $(FC_FFT_RF) $(FCFORM) $(FCHOST) $(FCDEBUG) -I.
-FCFLAGS	 =       $(FCOPTIM) $(FCBASEOPTS) $(OMP)
+FCFLAGS	 =       $(FCOPTIM) $(FCBASEOPTS)
 INCLUDE_MODULES =       -I../da_3dvar -I../da_3dvar/src \
 			-I../external/io_netcdf -I../external/io_int \
 	                -I../external/esmf_time_f90 \
@@ -41,13 +41,13 @@ F77FLAGS_BUFR   =       $(FCTYPE) $(FCBUFR) $(FCHOST) $(FCDEBUG) -I.
 F77FLAGS_3DVAR  =       $(FCTYPE) $(FCBASE) $(FCHOST) $(FCDEBUG) -I.
 CPPFLAGS_3DVAR  =       $(TRADFLAG) $(DM_2_CPP_FLAGS) \
 	                -I$(LIBINCLUDE) -I../../inc -C -P $(ARCHFLAGS)
-FUFLAGS	 =       $(FCOPTIM) $(FCBASE) $(FCFORM) $(FCDEBUG)
+FUFLAGS	 =       $(FCOPTIM) $(FCBASE) $(FCFORM) $(FCDEBUG) $(FCTYPE)
 
 wrfio_nf : 
 	( cd ../external/io_netcdf ; \
 	make NETCDFPATH=$(NETCDFPATH) CPP="cpp -C -P -Dcrayx1" \
 	RANLIB="$(RANLIB)" \
-	FC="$(FC)" FCFLAGS="$(FCDEBUG) $(FCFORM) $(FCBASE)" TRADFLAG="$(TRADFLAG)" ; \
+	FC="$(FC)" FCFLAGS="$(FCDEBUG) $(FCFORM) $(FCBASE) $(FCTYPE) -O0" TRADFLAG="$(TRADFLAG)" ; \
 	if [ $(RWORDSIZE) -eq 8 ] ; then \
 	/bin/rm -f foo_io_flags.h; \
 	sed -e 's/104/105/' wrf_io_flags.h > foo_io_flags.h ;\
@@ -59,18 +59,18 @@ wrfio_int :
 	( cd ../external/io_int ; \
 	make CC="$(CC)" CPP="$(CPP)" \
 	RANLIB="$(RANLIB)" \
-	FC="$(FC)" FCFLAGS="$(FCDEBUG) $(FCFORM) $(FCBASE)" all )
+	FC="$(FC)" FCFLAGS="$(FCDEBUG) $(FCFORM) $(FCBASE) $(FCTYPE) -O0" all )
 
 wrfio_grib1 :
 	( cd ../external/io_grib1 ; \
 	make CC="$(CC)" CPP="$(CPP)" \
 	RANLIB="$(RANLIB)" \
 	CC="$(CC)" CFLAGS="$(CFLAGS)" \
-	FC="$(FC)" FCFLAGS="$(FCDEBUG) $(FCFORM) $(FCBASE)" )
+	FC="$(FC)" FCFLAGS="$(FCDEBUG) $(FCFORM) $(FCBASE) $(FCTYPE) -O0" )
 
 esmf_time : 
 	( cd ../external/esmf_time_f90 ; \
-	make FC="$(FC)" FCFLAGS="$(FCDEBUG) $(FCFLAGS)" \
+	make FC="$(FC) $(FCDEBUG) $(FCFORM) $(FCBASE) $(FCTYPE) -O0" \
 	RANLIB="$(RANLIB)" \
 	CPP="$(CPP) -I../../inc -I. $(POUND_DEF) $(TRADFLAG)" )
 

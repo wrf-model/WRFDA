@@ -428,7 +428,8 @@ cat >! namelist.input << EOF
  parent_grid_ratio                   = 1,     3,     3,
  parent_time_step_ratio              = 1,     3,     3,
  feedback                            = 1,
- smooth_option                       = 0
+ smooth_option                       = 0,
+ nproc_y                             = 1,
  /
 
  &physics
@@ -447,7 +448,6 @@ cat >! namelist.input << EOF
  icloud                              = 1,
  num_soil_layers                     = ${DA_NUM_SOIL_LAYERS},
  surface_input_source                = 1,
- num_soil_layers                     = 5,
  mp_zero_out                         = 0,
  maxiens                             = 1,
  maxens                              = 3,
@@ -455,6 +455,8 @@ cat >! namelist.input << EOF
  maxens3                             = 16,
  ensdim                              = 144,
  /
+
+ num_soil_layers                     = 5,
 
  &dynamics
  dyn_opt                             = 2,
@@ -520,16 +522,65 @@ EOF
 #mpirun -np 4 -machinefile hosts ./da_3dvar.exe
 # ./da_3dvar.exe >&! da_3dvar.out
 #BIG : mpirun -np 4 ./da_3dvar.exe
-    mpirun -np ${NUM_PROCS} ./da_3dvar.exe
+#   mpirun -np ${NUM_PROCS} ./da_3dvar.exe
 #IBM (llsubmit): 
 #  poe ./da_3dvar.exe
 #AFWA: setenv LOADL_INTERACTIVE_CLASS 1
 #AFWA: poe ./da_3dvar.exe -euilib us -hostfile host.afwa -procs 15
+#-----------------------------------------------------------------------
+#Create job script for cray x1.
+cat >! run_3dvar.sh << EOF
+#!/bin/sh
+# PBSPRO SETUP
+#PBS -lmppe=4,walltime=1:00:00,mem=10Gb
+####PBS -lmppssp=416,walltime=2:00:00,mem=400Gb
+####PBS -lmppe=4
+#PBS -V 
+#PBS -j oe
+                   
+ cd \$PBS_O_WORKDIR
+
+NPROC=4
+
+set -x
+
+. /opt/modules/modules/init/sh
+
+module purge
+module load modules
+module use /opt/modulefiles
+module load PrgEnv.53.newest apptools
+
+FILENV=.assign
+export FILENV
+assign -R 
+assign -Y on f:namelist.input
+assign -Y on f:namelist.3dvar
+
+rm -f rsl.* show* wrf_3dvar_output
+
+export X1_STACK_SIZE=1200000000
+export X1_HEAP_SIZE=12000000000
+
+date
+
+aprun -p16m:16m -c core=0 -n \$NPROC da_3dvar.exe
+
+date
+ 
+ mv rsl.out.0000 p\${NPROC}_rsl.out.0000
+ mv rsl.error.0000 p\${NPROC}_rsl.error.0000
+EOF
+
+qsub run_3dvar.sh
+
+exit
+#-----------------------------------------------------------------------
 # cp wrf_3dvar_output ANL_NETCDF_DATA
- cp fort.71          ANL_INCREMENTS
- cp fort.710         FORMATTED_ANL_INCREMENTS
- cp fort.12          DAProg_3DVAR.statistics
- cp fort.81          DAProg_3DVAR.cost_fn
- cp fort.82          DAProg_3DVAR.grad_fn
+#cp fort.71          ANL_INCREMENTS
+#cp fort.710         FORMATTED_ANL_INCREMENTS
+#cp fort.12          DAProg_3DVAR.statistics
+#cp fort.81          DAProg_3DVAR.cost_fn
+#cp fort.82          DAProg_3DVAR.grad_fn
  echo "3DVAR    completed"
 # exit (0)

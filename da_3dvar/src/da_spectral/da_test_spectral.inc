@@ -1,79 +1,79 @@
-subroutine da_test_spectral( ni, nj, max_wavenumber, inc, lenr, lensav, lenwrk, &
-                             alp_size, r_cvsize, alp, wsave, int_wgts, field )
+subroutine da_test_spectral(xbx, field, &
+                            ids, ide, jds, jde, &
+                            ims, ime, jms, jme, &
+                            its, ite, jts, jte )
+
    implicit none
-   integer, intent(in) :: ni                      ! Number of longitudes.
-   integer, intent(in) :: nj                      ! Number of latitudes.
-   integer, intent(in) :: max_wavenumber          ! Smallest scale required (ni/2 - 1).
-   integer, intent(in) :: r_cvsize                ! Size of control variable array.
-   integer, intent(in) :: inc                     ! Jump between elements of vector in array.
-   integer, intent(in) :: lenr                    ! FFT array dimension (at least inc*(n-1)+1).
-   integer, intent(in) :: lensav                  ! wsave dimension (n+int(log(real(ni)))+4).
-   integer, intent(in) :: lenwrk                  ! Dimension of work array.
-   integer, intent(in) :: alp_size                ! Size of ALP vector.
-   real, intent(in)    :: alp(1:alp_size)         ! Associated Legendre Polynomials.
-   real, intent(in)    :: wsave(1:lensav)         ! Primes for FFT.
-   real, intent(in)    :: int_wgts(1:nj)          ! Legendre integration weights.
-   real, intent(in)    :: field(1:ni,1:nj)        ! Test input field.
-   real                :: field_out(1:ni,1:nj)    ! Test field.
-   real                :: rcv(1:r_cvsize)         ! Test real control variable vector.
-   real                :: rcv_out(1:r_cvsize)     ! Test real control variable vector.
-   real                :: power(0:max_wavenumber)
+
+   type (xbx_type),intent(in) :: xbx  ! For header & non-grid arrays.
+   integer,        intent(in) :: ids, ide, jds, jde, &
+                                 ims, ime, jms, jme, &
+                                 its, ite, jts, jte
+
+   real, dimension(ims:ime,jms:jme), intent(in) :: field    ! Gridpoint field.
+
+   real, dimension(ims:ime,jms:jme)      :: field_out
+   real, dimension(0:xbx%max_wavenumber) :: power   ! Power spectrum
+   real, dimension(1:2*xbx%c_cv_size)    :: rcv     ! Spectral modes.
+   real, dimension(1:2*xbx%c_cv_size)    :: rcv_out ! Spectral modes.
+
    integer             :: m,mm, i, j, k,c_cvsize, index_start, index_end
-   complex             :: r_leg(1:nj)     
-   complex, allocatable:: cv(:)                      ! Spectral modes.
-   complex, allocatable:: cv1(:)                     ! Spectral modes.
+
+   complex             :: r_leg(1:xbx%nj)     
+   complex, dimension(1:xbx%c_cv_size) :: cv, cv1    ! Spectral modes.
    real                :: den, num, xx
 !------------------------------------------------------------------------------------------------------
    print*,' Test orthogonality of Associated Legendre Polynomials:'
 !------------------------------------------------------------------------------------------------------
 !  Initialise Power spectrum
    power  = 1.0
-   call da_setlegpol_test( nj, max_wavenumber, alp_size, int_wgts, alp )
+   call da_setlegpol_test( xbx%nj, xbx%max_wavenumber, xbx%alp_size, xbx%int_wgts, xbx%alp )
 
 !------------------------------------------------------------------------------------------------------
    print*,' Test invertibility of spectral (Fourier, Legendre) transforms:'
 !------------------------------------------------------------------------------------------------------
 
-   c_cvsize  = 0.5*r_cvsize
-   allocate (cv(1:c_cvsize))
-   allocate (cv1(1:c_cvsize))
 !  Gridpoint to spectral:
    rcv = 0. 
-   call da_vv_to_v_spectral( ni, nj, max_wavenumber, inc, lenr, lensav, lenwrk, &
-                             alp_size, r_cvsize, alp, wsave, int_wgts, rcv, field)
+   call da_vv_to_v_spectral( xbx%ni, xbx%nj, xbx%max_wavenumber, xbx%inc, xbx%lenr, xbx%lensav, xbx%lenwrk, &
+                             xbx%alp_size, 2*xbx%c_cv_size, xbx%alp, xbx%wsave, xbx%int_wgts, rcv, field)
+
    field_out = 0.
 !  Spectral to gridpoint:
-  
-   call da_v_to_vv_spectral( ni, nj, max_wavenumber, inc, lenr, lensav, lenwrk, &
-                       alp_size, r_cvsize, alp, wsave, power, rcv, field_out )
-   
+   call da_v_to_vv_spectral(xbx, power, rcv, field_out, &
+                            ids, ide, jds, jde, &
+                            ims, ime, jms, jme, &
+                            its, ite, jts, jte )
+
    print 100,'Domain-Averaged (Grid->Spectral->Grid) Error = ', &
-              sqrt( sum( ( field_out(1:ni,1:nj) - field(1:ni,1:nj) )**2 ) / &
-                    sum( field(1:ni,1:nj)**2 ) )
+              sqrt( sum( ( field_out(1:xbx%ni,1:xbx%nj) - field(1:xbx%ni,1:xbx%nj) )**2 ) / &
+                    sum( field(1:xbx%ni,1:xbx%nj)**2 ) )
 100  format(1x,a,e30.10)
    rcv_out = 0.
    
 !  Gridpoint to spectral (again):
-   call da_vv_to_v_spectral( ni, nj, max_wavenumber, inc, lenr, lensav, lenwrk, &
-                      alp_size, r_cvsize, alp, wsave, int_wgts, rcv_out, field_out)
+   call da_vv_to_v_spectral( xbx%ni, xbx%nj, xbx%max_wavenumber, xbx%inc, xbx%lenr, xbx%lensav, xbx%lenwrk, &
+                      xbx%alp_size, 2*xbx%c_cv_size, xbx%alp, xbx%wsave, xbx%int_wgts, rcv_out, field_out)
 
-   rcv_out(1:r_cvsize) = &
-   rcv_out(1:r_cvsize) - rcv(1:r_cvsize) ! Create difference for test diags.
+   rcv_out(1:2*xbx%c_cv_size) = &
+   rcv_out(1:2*xbx%c_cv_size) - rcv(1:2*xbx%c_cv_size) ! Create difference for test diags.
     
    print 100 ,' Domain-Averaged (Spectral->Grid->Spectral) Error = ', &
-                       sqrt( sum( rcv_out(1:r_cvsize)**2 ) ) / &
-                       sqrt( sum( rcv    (1:r_cvsize)**2 ) )
+                       sqrt( sum( rcv_out(1:2*xbx%c_cv_size)**2 ) ) / &
+                       sqrt( sum( rcv    (1:2*xbx%c_cv_size)**2 ) )
 
 !Adjoint test for Spectral Transform
-   rcv_out = 0
-   call da_v_to_vv_spectral_adj( ni, nj, max_wavenumber, inc, lenr, lensav, lenwrk, &
-                       alp_size, r_cvsize, alp, wsave, power, rcv_out, field_out)
+   rcv_out = 0.0
+   call da_v_to_vv_spectral_adj(xbx, power, rcv_out, field_out, &
+                                ids, ide, jds, jde, &
+                                ims, ime, jms, jme, &
+                                its, ite, jts, jte )
 
    print*,' Adjoint test result for  Spectral -> Grid : '
    print 100, ' LHS  ( LX.LX)       = ',&
-                    sum( field_out(1:ni,1:nj)*field_out(1:ni,1:nj) ) 
+                    sum( field_out(1:xbx%ni,1:xbx%nj)*field_out(1:xbx%ni,1:xbx%nj) ) 
    print 100, ' RHS  (  X.L^TLX )   = ',&
-                        sum( rcv(1:r_cvsize)*rcv_out(1:r_cvsize) ) 
+                        sum( rcv(1:2*xbx%c_cv_size)*rcv_out(1:2*xbx%c_cv_size) ) 
 
 ! Inverse test for Legendre Transform
 
@@ -82,21 +82,21 @@ subroutine da_test_spectral( ni, nj, max_wavenumber, inc, lenr, lensav, lenwrk, 
    print*,'  Inverse and Adjoint Legendre test result:'
 !------------------------------------------------------------------------------------------------------
 
-  do m = 0, max_wavenumber
-      index_start = m * ( max_wavenumber + 1 - m ) + m * ( m + 1 ) / 2 + 1
-      index_end   = index_start + max_wavenumber - m
+  do m = 0, xbx%max_wavenumber
+      index_start = m * ( xbx%max_wavenumber + 1 - m ) + m * ( m + 1 ) / 2 + 1
+      index_end   = index_start + xbx%max_wavenumber - m
 
    do mm = index_start, index_end
-   if( 2*mm > r_cvsize) stop 'rcv_out index bounce'
+   if( 2*mm > 2*xbx%c_cv_size) stop 'rcv_out index bounce'
    cv(mm) = cmplx (rcv_out(2*mm-1), rcv_out(2*mm))                    
    end do
    r_leg = 0.0
-   call da_leg_tra_inv ( nj, max_wavenumber, alp_size, m, alp, &
-           cv(index_start:index_end), r_leg )
+   call da_legtra_inv( jds, jde, jts, jte, xbx%max_wavenumber, xbx%alp_size, m, xbx%alp, &
+                       cv(index_start:index_end), r_leg )
 
    cv1(index_start:index_end) = 0.
-   call da_leg_tra ( nj, max_wavenumber, alp_size, m, int_wgts, alp, r_leg, &
-                   cv1(index_start:index_end) )
+   call da_legtra ( xbx%nj, xbx%max_wavenumber, xbx%alp_size, m, xbx%int_wgts, xbx%alp, r_leg, &
+                    cv1(index_start:index_end) )
    cv1(index_start:index_end) = cv1(index_start:index_end) - &
                                  cv(index_start:index_end) 
     num =  sum ( real(cv1(index_start:index_end))*real(cv1(index_start:index_end))+&
@@ -106,14 +106,14 @@ subroutine da_test_spectral( ni, nj, max_wavenumber, inc, lenr, lensav, lenwrk, 
    print 12 ,m, sqrt(num)/sqrt(den)
 12 format(1x,'For zonal wave number',i4,' difference ',e30.20)
 
-   xx = sum( real(r_leg(1:nj))* real(r_leg(1:nj))+ &
-            aimag(r_leg(1:nj))*aimag(r_leg(1:nj)) )
+   xx = sum( real(r_leg(1:xbx%nj))* real(r_leg(1:xbx%nj))+ &
+            aimag(r_leg(1:xbx%nj))*aimag(r_leg(1:xbx%nj)) )
    print 10,'For Wave = ',m,' LX.LX    = ',xx
 10  format(a,i5,a,e30.20)
 
    cv1(index_start:index_end) = 0.
-   call da_leg_tra_inv_adj( nj, max_wavenumber, alp_size, m, alp, &
-           cv1(index_start:index_end), r_leg )
+   call da_legtra_inv_adj( jds, jde, jts, jte, xbx%max_wavenumber, xbx%alp_size, m, xbx%alp, &
+                           cv1(index_start:index_end), r_leg )
    xx = sum( real(cv(index_start:index_end))*     &
              real(cv1(index_start:index_end))     +&
             aimag(cv(index_start:index_end))* &
@@ -124,3 +124,4 @@ subroutine da_test_spectral( ni, nj, max_wavenumber, inc, lenr, lensav, lenwrk, 
    end do
 
 end subroutine da_test_spectral
+

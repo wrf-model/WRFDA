@@ -149,14 +149,18 @@ SUBROUTINE DA_Check_VToX_Adjoint( xb, xbx, be, cv1, vv, vp, xp, xa, &
    call MPI_ALLREDUCE( adj_par_lhs, adj_sum_lhs, 1, TRUE_MPI_REAL, MPI_SUM, &
                        MPI_COMM_WORLD, IERROR )
 
+   if( global ) then
+   adj_sum_rhs = adj_par_rhs
+   else
    call MPI_ALLREDUCE( adj_par_rhs, adj_sum_rhs, 1, TRUE_MPI_REAL, MPI_SUM, &
                        MPI_COMM_WORLD, IERROR )
+   end if
 
    IF ( wrf_dm_on_monitor() ) THEN
-      write(unit=*, fmt='(/)')
-      write(unit=*, fmt='(a,1pe22.14)') &
-           'Whole  Domain: < x, x >     = ', adj_sum_lhs, &
-           'Whole  Domain: < v_adj, v > = ', adj_sum_rhs
+   write(unit=*, fmt='(/)')
+   write(unit=*, fmt='(a,1pe22.14)') &
+        'Whole  Domain: < x, x >     = ', adj_sum_lhs, &
+        'Whole  Domain: < v_adj, v > = ', adj_sum_rhs
    ENDIF
 #else
    adj_sum_lhs = adj_par_lhs
