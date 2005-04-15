@@ -13,6 +13,7 @@ MODULE DA_Dynamics
    USE DA_FFTs
    USE DA_Statistics
    USE DA_Interpolation
+   USE DA_Tools        
 
    IMPLICIT NONE
 
@@ -35,6 +36,7 @@ MODULE DA_Dynamics
 #include "DA_W_Adjustment_Lin.inc"
 #include "DA_W_Adjustment_Adj.inc"
 #include "DA_UV_To_Vorticity.inc"
+#include "DA_WZ_BASE.inc"           
 
 END MODULE DA_Dynamics
 

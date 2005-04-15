@@ -4,7 +4,7 @@ SUBROUTINE DA_Print_Stats_Buoy( stats_unit, nu, nv, nt, np, nq, buoy )
 
    INTEGER,           INTENT(IN)    :: stats_unit
    INTEGER,           INTENT(INOUT) :: nu, nv, nt, np, nq
-   TYPE (stats_type), INTENT(IN)    :: buoy
+   TYPE (stats_buoy_type), INTENT(IN):: buoy
    
    write(unit=stats_unit, fmt='(6a/)') &
         '   var             ', &

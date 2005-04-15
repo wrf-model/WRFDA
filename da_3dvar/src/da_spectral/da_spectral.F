@@ -1,6 +1,7 @@
 module da_spectral
 
    use da_constants
+   use DA_Define_Structures
    use da_fftpack5
 
 !-----------------------------------------------------------------------
@@ -9,6 +10,12 @@ module da_spectral
 !-----------------------------------------------------------------------
 
    implicit none
+
+#if ( DWORDSIZE != RWORDSIZE )
+#define TRUE_MPI_COMPLEX   MPI_COMPLEX
+#else
+#define TRUE_MPI_COMPLEX   MPI_DOUBLE_COMPLEX
+#endif
 
    CONTAINS
 
@@ -24,5 +31,8 @@ module da_spectral
 #include "da_test_spectral.inc"
 #include "da_v_to_vv_spectral.inc"
 #include "da_vv_to_v_spectral.inc"
+#include "da_v_to_vv_spectral_adj.inc"
+#include "da_legtra_inv_adj.inc"
+#include "da_apply_power.inc"
 
 end module da_spectral

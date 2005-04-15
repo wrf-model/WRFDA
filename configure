@@ -2,6 +2,24 @@
 
 option=$1
 
+echo option = $option
+
+if [ "$option" = "wrf" ] ; then
+    echo "configure for wrf"
+elif [ "$option" = "3dvar" ] ; then
+    echo "configure for 3dvar"
+elif [ "$option" = "4dvar" ] ; then
+    echo "configure for 4dvar"
+elif [ "$option" = "be" ] ; then
+    echo "configure for be"
+else
+   echo "Please type : <configure wrf> to compile wrf,"
+   echo "    or type : <configure 3dvar> to compile 3dvar."
+   echo "    or type : <configure 4dvar> to compile 4dvar."
+   echo "    or type : <configure be> to compile be."
+   exit
+fi
+
 # lifted from the configure file for mpich; 00/03/10 jm
 #
 # Check for perl and perl version
@@ -122,7 +140,7 @@ if  test -z "$NETCDF"  ; then
          export OBJECT_MODE
       fi
       if [ $OBJECT_MODE -ne 64 -a \( `hostname | cut -c 1-2` = "bb" -o `hostname | cut -c 1-2` = "bf" -o `hostname | cut -c 1-2` = "bs" \) ] ; then
-        ( cd ./netcdf_links ; ln -s /usr/local/lib64/r4i4 ./lib ; \
+        ( cd ./netcdf_links ; ln -s /usr/local/lib32/r4i4 ./lib ; \
                               ln -s /usr/local/include ./include )
       else
         ( cd ./netcdf_links ; ln -s /usr/local/lib64/r4i4 ./lib ; \
@@ -283,18 +301,51 @@ if [ "$os" = "AIX" ] ; then
       fi
 fi
 
-# Found perl, so proceed with configuration
-
-if test -n "$PERL" ; then
-!  echo option = $option
-
-   if [ "$option" = "3dvar" ] ; then
-      echo "configure for 3dvar"
-      $PERL arch/Config_3dvar.pl -perl=$PERL -netcdf=$NETCDF -phdf5=$PHDF5 -os=$os -mach=$mach -ldflags=$ldflags
-   else
-      echo "configure for wrf"
-      $PERL arch/Config.pl -perl=$PERL -netcdf=$NETCDF -phdf5=$PHDF5 -os=$os -mach=$mach -ldflags=$ldflags
-   fi
+# compile options that come from the environment, such as chemistry
+# the "!" is removed by Config.pl
+if [ -n "$WRF_CHEM" ] ; then
+  if [ $WRF_CHEM = 1 ] ; then
+    echo building WRF with chemistry option
+    compileflags="${compileflags}!-DWRF_CHEM"
+  else
+    compileflags=" "
+  fi
+else
+  compileflags=" "
 fi
 
+# Found perl, so proceed with configuration
+if test -n "$PERL" ; then
+  echo option = $option
+
+  if [ "$option" = "3dvar" -o "$option" = "be" ] ; then
+     echo "configure for 3dvar"
+     $PERL arch/Config_3dvar.pl -perl=$PERL -netcdf=$NETCDF -phdf5=$PHDF5 -os=$os -mach=$mach -ldflags=$ldflags \
+       -compileflags=$compileflags
+     echo "configure for 3dvar/be"
+  else
+     echo "configure for wrf or 4dvar"
+     $PERL arch/Config.pl -perl=$PERL -netcdf=$NETCDF -phdf5=$PHDF5 -os=$os -mach=$mach -ldflags=$ldflags \
+       -compileflags=$compileflags
+     echo "configure for wrf/4dvar"
+  fi
+fi
+
+if [ "$option" != "be" ] ; then
+# new feb 2005.  test whether MPI-2
+if test -e configure.wrf ; then
+  grep 'DMPARALLEL .*=.*1' configure.wrf >1 /dev/null
+  if  $status  ; then
+    echo testing for MPI_Comm_f2c and MPI_Comm_c2f 
+    /bin/rm -f tools/mpi2_test
+    make mpi2_test
+    if test -x tools/mpi2_test ; then
+      echo "  " MPI_Comm_f2c and MPI_Comm_c2f are supported
+      sed '/^CC .*=/s/$/ -DMPI2_SUPPORT/' configure.wrf > xx$$ ; /bin/mv xx$$ configure.wrf
+    else
+      echo "  " MPI_Comm_f2c and MPI_Comm_c2f are not supported
+    fi
+  fi
+fi
+fi
 

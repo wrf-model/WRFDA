@@ -67,7 +67,7 @@ SUBROUTINE DA_Rescale_Background_Errors ( ix, jy, var_scaling, len_scaling, &
       IF ( TRIM(be_sub % name) == 'psi' .OR. &
            TRIM(be_sub % name) == 'chi_u'  ) THEN
          rf_scale_factor(:) = rf_scale_factor(:) * rf_scale_factor(:) * &
-                              inv_ij_sqrt
+                              inv_ij_sqrt 
       END IF
 
       DO m = 1, mz
