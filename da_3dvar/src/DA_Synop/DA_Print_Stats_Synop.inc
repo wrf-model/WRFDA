@@ -4,7 +4,7 @@ SUBROUTINE DA_Print_Stats_Synop( stats_unit, nu, nv, nt, np, nq, synop )
 
    INTEGER,           INTENT(IN)    :: stats_unit
    INTEGER,           INTENT(INOUT) :: nu, nv, nt, np, nq
-   TYPE (stats_type), INTENT(IN)    :: synop
+   TYPE (stats_synop_type), INTENT(IN):: synop
    
    write(unit=stats_unit, fmt='(6a/)') &
         '   var             ', &

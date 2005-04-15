@@ -9,7 +9,8 @@ SUBROUTINE DA_Read_Namelist
 !  99/11/30: Creation (D. Barker)
 !
 !  Additions:
-!             07/08/2003      Profiler and Buoy Obs            S. R. H. Rizvi
+!             07/08/2003      Profiler and Buoy Obs            Syed RH Rizvi
+!             01/31/2005      Added global option              Syed RH Rizvi
 !----------------------------------------------------------------------------
    IMPLICIT NONE
 
@@ -24,7 +25,7 @@ SUBROUTINE DA_Read_Namelist
 
 !  Namelist contents :
 
-   NAMELIST /RECORD1/  MODEL_TYPE, write_increments
+   NAMELIST /RECORD1/  MODEL_TYPE, write_increments, global
    NAMELIST /RECORD2/  ANALYSIS_TYPE, ANALYSIS_DATE, ANALYSIS_ACCU, W_INCREMENTS, &
                        DT_cloud_model, &
                        write_qcw, write_qrn, write_qci, write_qsn, write_qgr
@@ -50,6 +51,7 @@ SUBROUTINE DA_Read_Namelist
                        use_qscatobs, &
                        use_ProfilerObs, &
                        use_BuoyObs, &
+                       use_BogusObs, &
                        check_max_iv, &
                        use_obs_errfac, &
                        put_rand_seed, &
@@ -62,6 +64,7 @@ SUBROUTINE DA_Read_Namelist
                        max_airep_input, &
                        max_satem_input, &
                        max_pilot_input, &
+                       max_bogus_input, &
                        max_metar_input, &
                        max_gpspw_input, &
                        max_ships_input, &
@@ -70,7 +73,8 @@ SUBROUTINE DA_Read_Namelist
                        max_ssmi_retrieval_input, &
                        max_ssmi_tb_input, &
                        max_ssmt1_input, &
-                       max_ssmt2_input
+                       max_ssmt2_input, &
+                       max_qscat_input 
    NAMELIST /RECORD5/  TIME_WINDOW, print_detail, print_obs_info
    NAMELIST /RECORD6/  max_ext_its, EPS, NTMAX, NSAVE, &
                        write_switch, write_interval
@@ -124,6 +128,7 @@ SUBROUTINE DA_Read_Namelist
    fg_format = 1
    ob_format = 2
    num_fgat_time = 1
+   global = .FALSE. 
 
 !--record4
    PROCESS_OBS    = 'YES'
@@ -135,6 +140,7 @@ SUBROUTINE DA_Read_Namelist
    Use_PilotObs   = .TRUE.
    Use_AirepObs   = .TRUE.
    Use_SatobObs   = .TRUE.
+   Use_BogusObs   = .FALSE.
    Use_BuoyObs    = .FALSE.
    Use_ProfilerObs= .FALSE.
    Use_SatemObs   = .FALSE.
@@ -162,6 +168,7 @@ SUBROUTINE DA_Read_Namelist
    max_gpspw_input = max_gpspw
    max_ships_input = max_ships
    max_profiler_input = max_profiler
+   max_bogus_input = max_bogus
    max_buoy_input = max_buoy
    max_ssmi_retrieval_input = max_ssmi_retrieval
    max_ssmi_tb_input = max_ssmi_tb
@@ -279,13 +286,13 @@ SUBROUTINE DA_Read_Namelist
 !----------------------------------------------------------------------------
 !  [2.0] Read namelist and close:
 !----------------------------------------------------------------------------
-
    IOST = 0
    READ  ( UNIT = namelist_unit, NML = RECORD1 , ERR = 8000, IOSTAT = IOST)
 
    if ( print_detail >= 1 ) then
       WRITE(6,'(A,3X,A     )') ' MODEL_TYPE    = ', trim(MODEL_TYPE)
       WRITE(6,'(A,3X,L10   )') ' write_increments = ', write_increments
+      WRITE(6,'(A,3X,L5    )') ' Global analysis option=', global         
    endif
 
    READ  ( UNIT = namelist_unit, NML = RECORD2 , ERR = 8000, IOSTAT = IOST)
@@ -316,6 +323,7 @@ SUBROUTINE DA_Read_Namelist
                                ' Use_ProfilerObs  =', Use_ProfilerObs, &
                                ' Use_BuoyObs  =', Use_BuoyObs, &
                                ' Use_SoundObs  =', Use_SoundObs, &
+                               ' Use_BogusObs  =', Use_BogusObs, &
                                ' Use_RadarObs  =', Use_RadarObs, &
                                ' Use_Radar_rv  =', Use_Radar_rv, &
                                ' Use_Radar_rf  =', Use_Radar_rf, &
@@ -373,7 +381,7 @@ SUBROUTINE DA_Read_Namelist
    READ  ( UNIT = namelist_unit, NML = RECORD8 , ERR = 8000, IOSTAT = IOST)
    
    if ( print_detail >= 1 ) then
-      WRITE(6,'(A)') ' def_sub_domain = ', def_sub_domain
+      WRITE(6,'(A, L10)') ' def_sub_domain = ', def_sub_domain
    end if
    
    READ  ( UNIT = namelist_unit, NML = RECORD10, ERR = 8000, IOSTAT = IOST)
@@ -447,6 +455,7 @@ SUBROUTINE DA_Read_Namelist
      Use_ShipsObs         = .FALSE.
      Use_MetarObs         = .FALSE.
      Use_SoundObs         = .FALSE.
+     Use_BogusObs         = .FALSE.
      Use_PilotObs         = .FALSE.
      Use_AirepObs         = .FALSE.
      Use_SatobObs         = .FALSE.
@@ -476,7 +485,7 @@ SUBROUTINE DA_Read_Namelist
 !  [3.0] Error traps:
 !------------------------------------------------------------------------------
 
-   IF ( cv_options < 1 .OR. cv_options > 3 ) THEN
+   IF ( cv_options < 1 .OR. cv_options > 4 ) THEN
       WRITE(0,'(A,I3)')' DA_Read_Namelist: Invalid cv_options = ', cv_options
       STOP
    END IF
@@ -572,6 +581,7 @@ SUBROUTINE DA_Read_Namelist
                             ' Use_RadarObs  =', Use_RadarObs, &
                             ' Use_Radar_rv  =', Use_Radar_rv, &
                             ' Use_Radar_rf  =', Use_Radar_rf, &
+                            ' Use_BogusObs  =', Use_BogusObs, &
                             ' Use_SatemObs  =', Use_SatemObs, &
                             ' Use_SatobObs  =', Use_SatobObs, &
                             ' Use_AirepObs  =', Use_AirepObs, &

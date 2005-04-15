@@ -8,6 +8,8 @@ MODULE DA_Tools
 !     HISTORY: 09/28/1999 - Creation of F90 version.           Dale Barker
 !------------------------------------------------------------------------------
    
+   USE module_bc
+
    USE DA_Constants
    USE DA_Define_Structures
    USE LAPACK
@@ -953,6 +955,7 @@ CONTAINS
 #include "DA_Obs_Sfc_correction.inc"
 #include "DA_Diff_Seconds.inc"
 #include "DA_Read_Namelist.inc"
+#include "da_global_ll_to_xy.inc"
 #include "DA_ll_to_xy.inc"
 #include "Residual.inc"
 #include "da_add_noise.inc"
@@ -972,6 +975,12 @@ CONTAINS
 #include "da_eof_decomposition.inc"
 #include "da_lubksb.inc"
 #include "da_ludcmp.inc"
+#include "DA_Set_Boundary_Xa.inc"
+#include "DA_Set_Boundary_Xb.inc"
+#include "DA_Set_Boundary_3d.inc"
+
+#include "get_2d_sum.inc"
+#include "get_3d_sum.inc"
    
 END MODULE DA_Tools
 

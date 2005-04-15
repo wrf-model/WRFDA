@@ -5848,13 +5848,25 @@ C----------------------------------------------------------------------
  
       COMMON /MSGCWD/ NMSG(32),NSUB(32),MSUB(32),INODE(32),IDATE(32)
       COMMON /STCACH/ MSTR,NSTR,LSTR,LUX(MXS,2),USR(MXS),ICON(52,MXS)
-      COMMON /USRSTR/ JCON(JCONS)
       COMMON /STORDS/ IORD(MXS),IORX(MXS)
  
       CHARACTER*(*) STR
       CHARACTER*80  USR,UST
  
 C----------------------------------------------------------------------
+#ifdef crayx1
+      COMMON /USRSTR/ NNOD,NCON,NODS(20),NODC(10),IVLS(10),KONS(10)     
+
+      DIMENSION JCON(JCONS)
+
+      EQUIVALENCE (NNOD, JCON(1))
+      EQUIVALENCE (NCON, JCON(2))
+      EQUIVALENCE (NODS(1), JCON(3))
+      EQUIVALENCE (IVLS(1), JCON(33))
+      EQUIVALENCE (KONS(1), JCON(43))
+#else
+      COMMON /USRSTR/ JCON(JCONS)
+#endif
 C----------------------------------------------------------------------
 
       NXT = 0
