@@ -80,6 +80,3 @@ SUBROUTINE DA_Rescale_Background_Errors ( ix, jy, var_scaling, len_scaling, &
 
 END SUBROUTINE DA_Rescale_Background_Errors
 
-
---0-1980338226-1113549979=:48943--
-
