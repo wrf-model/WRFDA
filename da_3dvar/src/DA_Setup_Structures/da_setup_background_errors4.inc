@@ -17,7 +17,7 @@ SUBROUTINE DA_Setup_Background_Errors4(xb, be, xbx, xp)
    INTEGER                     :: nrec, max_wavenumber  ! Scalar.
    INTEGER                     :: i, j, k, ic, jc       ! Loop counters.
    INTEGER                     :: ier                   ! error index
-   real, allocatable   :: height(:,:,:)      ! Height field.
+!  real, allocatable   :: height(:,:,:)      ! Height field.
    integer, allocatable:: bin(:,:,:)         ! Bin assigned to each 3D point
    integer, allocatable:: bin2d(:,:)         ! Bin assigned to each 2D point
    integer             :: bin_type           ! Type of bin to average over.
@@ -73,6 +73,7 @@ SUBROUTINE DA_Setup_Background_Errors4(xb, be, xbx, xp)
 !-------------------------------------------------------------
    allocate( bin(1:ni,1:nj,1:nk) )
    allocate( bin2d(1:ni,1:nj) )
+   bin_type = 1
    call da_create_bins( ni, nj, nk, bin_type, num_bins, &
                         num_bins2d, bin, bin2d )
 
