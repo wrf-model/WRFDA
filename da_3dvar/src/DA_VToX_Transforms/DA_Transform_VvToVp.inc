@@ -23,7 +23,7 @@ subroutine DA_Transform_VvToVp( evec, eval, vertical_wgt, &
    real, intent(in)      :: evec(jts:jte,kts:kte,1:mz) ! Eigenvectors.
    real, intent(in)      :: eval(jts:jte,1:mz)         ! Eigenvalues.
    real, intent(in)      :: vertical_wgt(ims:ime,jms:jme,kms:kme) ! Weighting.
-   real, intent(in)      :: vv(ims:ime,jms:jme,1:mz)   ! CV in EOF space.
+   real, intent(in)      :: vv(ims:ime,jms:jme,kms:kme)   ! CV in EOF space.
    real, intent(out)     :: vp(ims:ime,jms:jme,kms:kme)! CV in level space.
    
    integer               :: i, j, k, m                 ! Loop counters.

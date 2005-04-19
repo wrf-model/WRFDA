@@ -29,11 +29,18 @@ SUBROUTINE DA_Setup_Background_Errors( xb, xbx, be, xp )
       kte = xp%kte
 
       call be_local_copy( be_g, be, jts, jte, kts, kte )
-
    else if(cv_options == 3)then
 
       CALL DA_Setup_Background_Errors3( xb,be,xp )
 
+   else if(cv_options == 4)then
+
+      CALL DA_Setup_Background_Errors4( xb,be, xbx, xp )
+
+   else if(cv_options == 5)then
+
+     CALL DA_Setup_Background_Errors5(xb,be,xbx, xp)
+     
    else
 
       write(unit=*, fmt='(a,i8/a)') &

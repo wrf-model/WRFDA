@@ -4,7 +4,7 @@ SUBROUTINE DA_Print_Stats_Gpspw( stats_unit, ntpw, Gpspw )
 
    INTEGER,           INTENT(IN)    :: stats_unit
    INTEGER,           INTENT(INOUT) :: ntpw
-   TYPE (stats_type), INTENT(IN)    :: Gpspw
+   TYPE (stats_gpspw_type), INTENT(IN)    :: Gpspw
 
     if (ntpw > 0) then
 

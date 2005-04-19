@@ -279,4 +279,20 @@ SUBROUTINE da_random_omb_all( iv, ob )
       END DO
    ENDIF
 
+!  [2.16] Transfer TC bogus obs:
+
+   IF ( iv % num_bogus > 0 ) THEN
+      DO n = 1, iv % num_bogus
+         DO k = 1, iv % bogus(n) % info % levels
+            call da_random_omb( iv % bogus(n) % u(k) % error, ob % bogus(n) % u(k), &
+                              iv % bogus(n) % u(k) % qc, iv % bogus(n) % u(k) % inv )
+            call da_random_omb( iv % bogus(n) % v(k) % error, ob % bogus(n) % v(k), &
+                              iv % bogus(n) % v(k) % qc, iv % bogus(n) % v(k) % inv )
+         END DO
+
+         call da_random_omb( iv % bogus(n) % slp % error, ob % bogus(n) % slp, &
+                             iv % bogus(n) % slp % qc, iv % bogus(n) % slp % inv )
+      END DO
+   ENDIF
+
 END SUBROUTINE da_random_omb_all

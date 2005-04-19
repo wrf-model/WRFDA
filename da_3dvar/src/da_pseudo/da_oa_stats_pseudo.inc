@@ -6,7 +6,7 @@ SUBROUTINE da_oa_stats_pseudo ( stats_unit, oi, re )
    TYPE (ob_type), INTENT (in)      :: oi            ! O-B
    TYPE ( y_type), INTENT (in)      :: re            ! O-A
 
-   TYPE (stats_type)                :: pseudo
+   TYPE (stats_pseudo_type)         :: pseudo
    INTEGER                          :: nu, nv, nt, np, nq
    INTEGER                          :: n
    real                             :: o_minus_b, o_minus_a, sigma_o, sigma_b
@@ -29,7 +29,7 @@ SUBROUTINE da_oa_stats_pseudo ( stats_unit, oi, re )
    pseudo%minimum%t = maxmin_type(-missing_r, 0, 0)
    pseudo%minimum%p = maxmin_type(-missing_r, 0, 0)
    pseudo%minimum%q = maxmin_type(-missing_r, 0, 0)
-   pseudo%average = residual_type(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+   pseudo%average = residual_pseudo1_type(0.0, 0.0, 0.0, 0.0, 0.0)
    pseudo%rms_err = pseudo%average
 
    IF ( oi%num_pseudo > 0 ) THEN

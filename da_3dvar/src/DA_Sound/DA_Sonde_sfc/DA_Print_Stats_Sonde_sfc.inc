@@ -4,7 +4,7 @@ SUBROUTINE DA_Print_Stats_Sonde_sfc( stats_unit, nu, nv, nt, np, nq, sonde_sfc )
 
    INTEGER,           INTENT(IN)    :: stats_unit
    INTEGER,           INTENT(INOUT) :: nu, nv, nt, np, nq
-   TYPE (stats_type), INTENT(IN)    :: sonde_sfc
+   TYPE (stats_sonde_sfc_type), INTENT(IN):: sonde_sfc
    
    write(unit=stats_unit, fmt='(6a/)') &
         '   var             ', &
