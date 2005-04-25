@@ -91,7 +91,7 @@
         if(global) then
            j%jb = 0.5*dot_product(cv, cv)
         else
-           j%jb = 0.5*da_dot(cv+xhat,cv+xhat,cv_size)
+           j%jb = 0.5*da_dot(cv,cv,cv_size)
         endif
      else if(minimisation_option == 2) then
         if(global) then
