@@ -463,6 +463,11 @@ CONTAINS
     REAL                              :: scale_top
 
     ! Executable code
+
+! To define the cone factor for polar stereographic projection 
+! (Y.-R. Guo 04/25/2005):
+    proj%cone = 1.0
+
     reflon = proj%stdlon + 90.
 
     ! Compute numerator term of map scale factor
