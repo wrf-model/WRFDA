@@ -30,7 +30,14 @@
       integer  :: i
       real gnorm
 
-      gnorm= da_dot(g,g,n)
+!     gnorm= da_dot(g,g,n)
+
+      if(global) then
+         gnorm=dot_product(g,g)
+      else
+         gnorm= da_dot(g,g,n)
+      endif
+
       gnorm= sqrt(gnorm)
 !
 !     convergence check
