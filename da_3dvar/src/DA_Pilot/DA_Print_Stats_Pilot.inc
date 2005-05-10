@@ -4,7 +4,7 @@ SUBROUTINE DA_Print_Stats_Pilot( stats_unit, nu, nv, Pilot )
 
    INTEGER,           INTENT(IN)    :: stats_unit
    INTEGER,           INTENT(INOUT) :: nu, nv
-   TYPE (stats_type), INTENT(IN)    :: Pilot
+   TYPE (stats_pilot_type), INTENT(IN):: Pilot
    
    write(unit=stats_unit, fmt='(a/)') &
         '   var             u (m/s)     n    k    v (m/s)     n    k  '

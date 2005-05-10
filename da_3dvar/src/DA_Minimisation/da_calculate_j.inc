@@ -87,8 +87,11 @@
 !     [1.0] calculate jb:
 !-------------------------------------------------------------------------
 
-     if(minimisation_option == 1)j%jb = 0.5*da_dot(cv     ,cv     ,cv_size)
-     if(minimisation_option == 2)j%jb = 0.5*da_dot(cv+xhat,cv+xhat,cv_size)
+     if(minimisation_option == 1) then
+        j%jb = 0.5*da_dot(cv,cv,cv_size)
+     else if(minimisation_option == 2) then
+        j%jb = 0.5*da_dot(cv+xhat,cv+xhat,cv_size)
+     endif
 
 !-------------------------------------------------------------------------
 !     [3.0] calculate total cost function j = jo + jb:
@@ -129,6 +132,13 @@
 
       call da_deallocate_y( jo_grad_y )
 
+      if( print_detail >= 100) then
+         write(unit=0, fmt='(2a,2(2x,a,i6))') 'file:', __FILE__, 'line:', __LINE__, 'iter=', iter
+         write(unit=0, fmt='(a, e24.14)') ' in da_calculate_j: cv.cv = ',sum(cv(1:cv_size) * cv(1:cv_size))
+         write(unit=0, fmt='(a, e24.14)') ' in da_calculate_j: xhat.xhat = ',sum(xhat(1:cv_size) * xhat(1:cv_size))
+         write(unit=0, fmt='(a, e24.14)') ' in da_calculate_j: j_grad.j_grad = ',sum(j_grad(1:cv_size) * j_grad(1:cv_size))
+      endif
+
 !-------------------------------------------------------------------------
 !     [3.0] calculate grad_v (j) = grad_v (jb) + grad_v (jo):
 !-------------------------------------------------------------------------
@@ -141,18 +151,30 @@
 
       if(minimisation_option == 1) then
          j_grad =  cv        + j_grad
-         gnorm_cv= da_dot(cv       , cv       , cv_size)
+
+         gnorm_cv=da_dot(cv, cv, cv_size)
       else if(minimisation_option == 2) then
          j_grad =  cv + xhat + j_grad
-         gnorm_cv= da_dot(cv + xhat, cv + xhat, cv_size)
+
+         gnorm_cv=da_dot(cv + xhat, cv + xhat, cv_size)
       else
          write(unit=*, fmt='(a)') 'Wrong minimisation_option.'
       endif
 
+      if( print_detail >= 100) then
+         write(unit=0, fmt='(2a,2(2x,a,i6))') 'file:', __FILE__, 'line:', __LINE__, 'iter=', iter
+         write(unit=0, fmt='(a, e24.14)') ' in da_calculate_j: cv.cv = ',sum(cv(1:cv_size) * cv(1:cv_size))
+         write(unit=0, fmt='(a, e24.14)') ' in da_calculate_j: xhat.xhat = ',sum(xhat(1:cv_size) * xhat(1:cv_size))
+         write(unit=0, fmt='(a, e24.14)') ' in da_calculate_j: j_grad.j_grad = ',sum(j_grad(1:cv_size) * j_grad(1:cv_size))
+      endif
+
       gnorm_cv= sqrt(gnorm_cv)
+
       gnorm_j = da_dot(j_grad, j_grad,cv_size)
+
       gnorm_j = sqrt(gnorm_j )
 
       write(82,81) it, EPS(it), iter, gnorm_j, gnorm_cv, gnorm_jo
 
   end subroutine da_calculate_j
+

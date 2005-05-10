@@ -35,7 +35,8 @@ Crizvi      INTEGER*4 IDATA(*)
             IDATA(I)=0                                                          
    20    CONTINUE                                                               
          IF ((LM/2)*2.NE.LM) THEN                    ! LM ODD                   
-            CALL MOVEC(IDATA(LM/2+1),1,HZERO,1,2)                               
+Crizvi            CALL MOVEC(IDATA(LM/2+1),1,HZERO,1,2)                               
+         IDATA(LM/2+1) = HZERO * 65536
          END IF                                                                 
       ELSE                             ! NORMAL DATA                            
          EXPV=DVAL/DIST                                                         
@@ -50,7 +51,8 @@ Crizvi      INTEGER*4 IDATA(*)
    30    CONTINUE                                                               
          IF ((LM/2)*2.NE.LM) THEN                    ! LM ODD                   
             HWORK=NINT((RDATA(LM)-DBASE)*EXPV)                                  
-            CALL MOVEC(IDATA(LM/2+1),1,HWORK,1,2)                               
+Crizvi            CALL MOVEC(IDATA(LM/2+1),1,HWORK,1,2)                               
+         IDATA(LM/2+1) = HWORK * 65536
          END IF                                                                 
       END IF                                                                    
 *                                                                               

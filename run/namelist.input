@@ -1,6 +1,6 @@
  &time_control
  run_days                            = 0,
- run_hours                           = 12,
+ run_hours                           = 3,
  run_minutes                         = 0,
  run_seconds                         = 0,
  start_year                          = 2000, 2000, 2000,
@@ -15,17 +15,32 @@
  end_hour                            = 12,   12,   12,
  end_minute                          = 00,   00,   00,
  end_second                          = 00,   00,   00,
- interval_seconds                    = 10800
+ interval_seconds                    = 10800,
  input_from_file                     = .true.,.false.,.false.,
- history_interval                    = 180,  60,   60,
+ history_interval                    = 60,  60,   60,
  frames_per_outfile                  = 1000, 1000, 1000,
  restart                             = .false.,
  restart_interval                    = 5000,
- io_form_history                     = 2
- io_form_restart                     = 2
- io_form_input                       = 2
- io_form_boundary                    = 2
- debug_level                         = 10
+ io_form_history                     = 2,
+ io_form_restart                     = 2,
+ io_form_input                       = 2,
+ io_form_boundary                    = 2,
+ debug_level                         = 10,
+ write_input                         = .true.,
+ inputout_interval                   = 60,
+ inputout_begin_y                    = 0, 0, 0,
+ inputout_begin_mo                   = 0, 0, 0,
+ inputout_begin_d                    = 0, 0, 0,
+ inputout_begin_h                    = 3, 0, 0,
+ inputout_begin_m                    = 0, 0, 0,
+ inputout_begin_s                    = 0, 0, 0,
+ inputout_end_y                      = 0, 0, 0,
+ inputout_end_mo                     = 0, 0, 0,
+ inputout_end_d                      = 0, 0, 0,
+ inputout_end_h                      = 12, 0, 0,
+ inputout_end_m                      = 0, 0, 0,
+ inputout_end_s                      = 0, 0, 0,
+ input_outname                       = 'wrf_3dvar_input_d<domain>_<date>',
  /
 
  &domains

@@ -25,7 +25,7 @@
       type (xbx_type),intent(in)        :: xbx   ! Header & non-gridded vars.
       type (be_type), intent(in)        :: be    ! background error structure.
       type (ob_type), intent(in)        :: iv    ! ob. increment vector.
-      real,intent(inout),dimension(cv_size)::xhat! Increament control variable
+      real,intent(out),dimension(cv_size)::xhat  ! Increament control variable
       type (cv_type), intent(inout)     :: cv    ! control variable (local).
       type (x_type), intent(out)        :: xa    ! analysis increments (local).
       type (vp_type), intent(inout)     :: vv    ! Grdipt/EOF CV.
@@ -65,12 +65,11 @@
       write (6,'(A)') &
         ' ----------------------------------------------------------'
       write(6,*)
-!
-      xhat = 0 
-      j_grad = 0.0
-!
-      call da_allocate_y(iv, jo_grad_y)
 
+      xhat   = 0.0
+      j_grad = 0.0
+
+      call da_allocate_y(iv, jo_grad_y)
       call da_calculate_j(it, 0, xb, xbx, be, iv, xhat, cv % array, &
                            vv, vp, xp, re, y, xa, j, j_grad,     &
                            ids, ide, jds, jde, kds, kde,         &
@@ -80,6 +79,7 @@
       phat  = - ghat
    
       rrmold = da_dot(ghat, ghat, cv_size)
+
       if( j%total == 0.0) go to 1004
       if(it == 1) cv % j_grad_norm_target =  sqrt (rrmold)
 
@@ -97,7 +97,7 @@
       write(6,'(2x,/,2x,A)') &
         ' Iter    Cost Function         Gradient             Step'
       else
-      write(6,'(2x,/,2x,A)')' Iter     CG_Gradient           Step'
+      write(6,'(2x,/,2x,A)')' Iter      Gradient             Step'
       endif
       write(6,*)
 !-------------------------------------------------------------------------
@@ -105,13 +105,13 @@
 !-------------------------------------------------------------------------
 !
       do 1000  iter = 1  ,  ntmax
+      if( rrmold == 0.) go to 1002
 !-------------------------------------------------------------------------
       fhat = phat
       call da_transform_vtox( xb, xbx, be, fhat , vv, vp, xp, xa,  &
                               ids, ide, jds, jde, kds, kde,        &
                               ims, ime, jms, jme, kms, kme,        &
                               its, ite, jts, jte, kts, kte )
-
       call da_transform_xtoy( xb, iv, xa, xp, y )
 
       call da_calculate_grady( iv, y , jo_grad_y)
@@ -132,7 +132,6 @@
          step = 0.0
          if(apdotp .gt. 0.0   ) step = rrmold/apdotp
          ghat = ghat + step * fhat
-!         cv % array = cv % array + step * phat
          xhat = xhat + step * phat
          if( calculate_cg_cost_function ) then
            j_grad = 0.
@@ -141,16 +140,14 @@
                             ids, ide, jds, jde, kds, kde,        &
                             ims, ime, jms, jme, kms, kme,        &
                             its, ite, jts, jte, kts, kte         )
-          ob_grad = sqrt(da_dot(j_grad,j_grad,cv_size))  
-!         if (ob_grad < eps(it)*cv % j_grad_norm_target) go to 1002
+           ob_grad = sqrt(da_dot(j_grad,j_grad,cv_size))  
          end if
 
          rrmnew = da_dot (ghat, ghat, cv_size)
+
          rrmnew_norm = sqrt(rrmnew)
 
          if (rrmnew_norm  < eps(it)*cv % j_grad_norm_target) go to 1002
-!        if( .not. calculate_cg_cost_function .and.          &
-!            rrmnew_norm < eps0(it)*cv % j_grad_norm_target) go to 1002
          ratio = 0.0
          if(rrmold .gt. 0.0 ) ratio = rrmnew/rrmold
 
@@ -200,12 +197,7 @@
 !
       cv % array = cv % array + xhat
 
-      print*,' After outer loop: ',it
-      print*,' Norm of cv (sqrt(cv.cv)) = ', &
-               sqrt(da_dot(cv%array,cv%array,cv_size))
-      print*,' Norm of xhat (sqrt(xhat.xhat)) = ', &
-               sqrt(da_dot(xhat, xhat,cv_size))
-
       call da_deallocate_y( jo_grad_y)
-!
+
       end subroutine DA_Minimise_CG
+

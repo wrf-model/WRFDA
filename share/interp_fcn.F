@@ -74,8 +74,10 @@
      ENDIF
 
      nfx = nri * nrj
+#ifndef crayx1
    !$OMP PARALLEL DO   &
    !$OMP PRIVATE ( i,j,k,ni,nj,ci,cj,ip,jp,nk,ck,nf,icmask,psca )
+#endif
      DO k = ckts, ckte
         icmask = .FALSE.
         DO nf = 1,nfx
@@ -120,7 +122,9 @@
            ENDDO
         ENDDO
      ENDDO
+#ifndef crayx1
    !$OMP END PARALLEL DO
+#endif
 #endif
 
 #ifdef DUMBCOPY
@@ -787,8 +791,10 @@
 
      nfx = nri * nrj
 
+#ifndef crayx1
    !$OMP PARALLEL DO   &
    !$OMP PRIVATE ( i,j,k,ni,nj,ni1,nj1,ci,cj,ip,jp,nk,ck,nf,icmask,psca,psca1 )
+#endif
      DO k = ckts, ckte
 
         DO nf = 1,nfx
@@ -901,7 +907,9 @@
            ENDDO
         ENDDO
      ENDDO
+#ifndef crayx1
    !$OMP END PARALLEL DO
+#endif
 #endif
 
 #ifdef DUMBCOPY

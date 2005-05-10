@@ -4,7 +4,7 @@ SUBROUTINE DA_Print_Stats_Ships( stats_unit, nu, nv, nt, np, nq, ships )
 
    INTEGER,           INTENT(IN)    :: stats_unit
    INTEGER,           INTENT(INOUT) :: nu, nv, nt, np, nq
-   TYPE (stats_type), INTENT(IN)    :: ships
+   TYPE (stats_ships_type), INTENT(IN):: ships
    
    write(unit=stats_unit, fmt='(6a/)') &
         '   var             ', &

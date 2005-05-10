@@ -103,9 +103,10 @@ subroutine DA_Minimise_QN( it, ob, xb, xbx, be, iv, xhat,    &
 
       if( j %total == 0.0) go to 1004
 
-
       llfin = .false.
+
       j_grad_norm = sqrt( da_dot( j_grad, j_grad, cv_size ) )
+
       if (j_grad_norm > 1.0e-20) step = 1.0 / j_grad_norm
       j_grad_old = j_grad
       zs(1:cv_size) = -j_grad(1:cv_size)
@@ -188,16 +189,6 @@ subroutine DA_Minimise_QN( it, ob, xb, xbx, be, iv, xhat,    &
 
       if (iter > ntmax) iter = iter-1
 1004  continue
-
-      print*,' After outer loop: ',it
-      print*,' Norm of cv (sqrt(cv.cv)) = ', &
-               sqrt(da_dot(cv%array,cv%array,cv_size))
-      print*,' Norm of xhat (sqrt(xhat.xhat)) = ', &
-               sqrt(da_dot(xhat, xhat,cv_size))
-
-!      IF ( wrf_dm_on_monitor() ) THEN
-!        write(stats_unit,'(/''final'',i4.4)') iter
-!      ENDIF
 
 end subroutine DA_Minimise_QN
 
