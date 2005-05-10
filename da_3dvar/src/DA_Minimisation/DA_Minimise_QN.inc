@@ -105,11 +105,7 @@ subroutine DA_Minimise_QN( it, ob, xb, xbx, be, iv, xhat,    &
 
       llfin = .false.
 
-      if(global) then
-         j_grad_norm = sqrt( dot_product( j_grad, j_grad ) )
-      else
-         j_grad_norm = sqrt( da_dot( j_grad, j_grad, cv_size ) )
-      endif
+      j_grad_norm = sqrt( da_dot( j_grad, j_grad, cv_size ) )
 
       if (j_grad_norm > 1.0e-20) step = 1.0 / j_grad_norm
       j_grad_old = j_grad

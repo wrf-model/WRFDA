@@ -1,4 +1,3 @@
-#ifdef DM_PARALLEL
       real function da_dot(x,y,n)
 !
 !     forms the dot product of two vectors.
@@ -15,12 +14,6 @@
       real dtemp1,dtemp1x
       integer i,m,mp1
       integer ierror     ! MPI error code.
-
-#if ( DWORDSIZE != RWORDSIZE )
-#define TRUE_MPI_REAL     MPI_REAL
-#else
-#define TRUE_MPI_REAL     MPI_REAL8
-#endif
 !
       da_dot = 0.0
       if(n <= 0)return
@@ -44,35 +37,16 @@
           end do
         end if
       end if
-!
-      call mpi_allreduce(dtemp1,dtemp1x,1,TRUE_MPI_REAL,mpi_sum,mpi_comm_world,ierror)
-!
-      da_dot = dtemp1x
-      return
-      end function da_dot
-
+#ifdef DM_PARALLEL
+      if(global) then
+         da_dot = dtemp1
+      else
+         call mpi_allreduce(dtemp1,dtemp1x,1,TRUE_MPI_REAL,mpi_sum,mpi_comm_world,ierror)
+         da_dot = dtemp1x
+      endif
 #else
-
-      real function da_dot(x,y,n)
-
-!
-!------------------------------------------------------------------------------
-!  PURPOSE: Prepare for dot product calculation - separate out for MPI coding
-!
-!  METHOD:
-!
-!  HISTORY: 06/14/2001 - Creation of F90 version.           John Derber
-!
-!  PARENT_MODULE: DA_Minimisation
-!------------------------------------------------------------------------------
-
-      implicit none
-      
-      integer, intent(in)               :: n
-      real, dimension(n), intent(in)    :: x,y
-
-      da_dot=dot_product(x,y)
-
-      end function da_dot
+      da_dot = dtemp1
 #endif
+      end function da_dot
+
 

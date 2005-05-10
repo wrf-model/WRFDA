@@ -43,8 +43,6 @@
               stmin,stmax,width,width1,xtrapf,zero
 
 #ifdef DM_PARALLEL
-!     INCLUDE 'mpif.h'
-
       LOGICAL, EXTERNAL :: wrf_dm_on_monitor
 
 #if ( DWORDSIZE != RWORDSIZE )
@@ -53,6 +51,12 @@
 #define TRUE_MPI_REAL     MPI_REAL8
 #endif
 #endif
+
+      private :: da_dot
+      private :: infoc, brackt, stage1
+      private :: dg,dgm,dginit,dgtest,dgx,dgxm,dgy,dgym, &
+                 finit,ftest1,fm,fx,fxm,fy,fym,p5,p66,stx,sty, &
+                 stmin,stmax,width,width1,xtrapf,zero
 
       contains
       

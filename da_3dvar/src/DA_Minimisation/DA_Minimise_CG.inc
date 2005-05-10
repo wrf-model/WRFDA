@@ -78,11 +78,7 @@
       ghat  = j_grad
       phat  = - ghat
    
-      if(global) then
-         rrmold = dot_product(ghat, ghat)
-      else
-         rrmold = da_dot(ghat, ghat, cv_size)
-      endif
+      rrmold = da_dot(ghat, ghat, cv_size)
 
       if( j%total == 0.0) go to 1004
       if(it == 1) cv % j_grad_norm_target =  sqrt (rrmold)
@@ -132,11 +128,7 @@
                                ims, ime, jms, jme, kms, kme,         &
                                its, ite, jts, jte, kts, kte )
          fhat = - fhat + phat
-         if(global) then
-           apdotp = dot_product(fhat, phat)
-         else
-           apdotp = da_dot(fhat, phat, cv_size)
-         endif
+         apdotp = da_dot(fhat, phat, cv_size)
          step = 0.0
          if(apdotp .gt. 0.0   ) step = rrmold/apdotp
          ghat = ghat + step * fhat
@@ -148,18 +140,10 @@
                             ids, ide, jds, jde, kds, kde,        &
                             ims, ime, jms, jme, kms, kme,        &
                             its, ite, jts, jte, kts, kte         )
-           if(global) then
-              ob_grad = sqrt(dot_product(j_grad,j_grad))  
-           else
-              ob_grad = sqrt(da_dot(j_grad,j_grad,cv_size))  
-           endif
+           ob_grad = sqrt(da_dot(j_grad,j_grad,cv_size))  
          end if
 
-         if(global) then
-            rrmnew = dot_product (ghat, ghat)
-         else
-            rrmnew = da_dot (ghat, ghat, cv_size)
-         endif
+         rrmnew = da_dot (ghat, ghat, cv_size)
 
          rrmnew_norm = sqrt(rrmnew)
 
@@ -202,11 +186,7 @@
                               ids, ide, jds, jde, kds, kde,        &
                               ims, ime, jms, jme, kms, kme,        &
                               its, ite, jts, jte, kts, kte         )
-         if(global) then
-            rrmnew_norm = sqrt( dot_product(j_grad,j_grad) )
-         else
-            rrmnew_norm = sqrt( da_dot(j_grad,j_grad,cv_size) )
-         endif
+         rrmnew_norm = sqrt( da_dot(j_grad,j_grad,cv_size) )
        endif
         
        write(6,15)j%total , rrmnew_norm

@@ -88,17 +88,9 @@
 !-------------------------------------------------------------------------
 
      if(minimisation_option == 1) then
-        if(global) then
-           j%jb = 0.5*dot_product(cv, cv)
-        else
-           j%jb = 0.5*da_dot(cv+xhat,cv+xhat,cv_size)
-        endif
+        j%jb = 0.5*da_dot(cv,cv,cv_size)
      else if(minimisation_option == 2) then
-        if(global) then
-           j%jb = 0.5*dot_product(cv+xhat, cv+xhat)
-        else
-           j%jb = 0.5*da_dot(cv+xhat,cv+xhat,cv_size)
-        endif
+        j%jb = 0.5*da_dot(cv+xhat,cv+xhat,cv_size)
      endif
 
 !-------------------------------------------------------------------------
@@ -151,11 +143,7 @@
 !     [3.0] calculate grad_v (j) = grad_v (jb) + grad_v (jo):
 !-------------------------------------------------------------------------
 
-      if(global) then
-         gnorm_jo=dot_product(j_grad,j_grad)
-      else
-         gnorm_jo= da_dot(j_grad,j_grad,cv_size)
-      endif
+      gnorm_jo= da_dot(j_grad,j_grad,cv_size)
 
       gnorm_jo= sqrt(gnorm_jo)
 
@@ -164,19 +152,11 @@
       if(minimisation_option == 1) then
          j_grad =  cv        + j_grad
 
-         if(global) then
-            gnorm_cv=dot_product(cv,cv)
-         else
-            gnorm_cv=da_dot(cv, cv, cv_size)
-         endif
+         gnorm_cv=da_dot(cv, cv, cv_size)
       else if(minimisation_option == 2) then
          j_grad =  cv + xhat + j_grad
 
-         if(global) then
-            gnorm_cv=dot_product(cv + xhat, cv + xhat)
-         else
-            gnorm_cv=da_dot(cv + xhat, cv + xhat, cv_size)
-         endif
+         gnorm_cv=da_dot(cv + xhat, cv + xhat, cv_size)
       else
          write(unit=*, fmt='(a)') 'Wrong minimisation_option.'
       endif
@@ -190,11 +170,7 @@
 
       gnorm_cv= sqrt(gnorm_cv)
 
-      if(global) then
-         gnorm_j = dot_product(j_grad,j_grad)
-      else
-         gnorm_j = da_dot(j_grad, j_grad,cv_size)
-      endif
+      gnorm_j = da_dot(j_grad, j_grad,cv_size)
 
       gnorm_j = sqrt(gnorm_j )
 

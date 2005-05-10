@@ -246,12 +246,16 @@ SUBROUTINE DA_Test_VXTransform( xb, xbx, xp, be, &
 !  [8.0]: Perform Spectral transform tests for Global                    
 !-------------------------------------------------------------------------
     if (global) then   
+#ifdef DM_PARALLEL
+  print*,' Inverse tests for spectral transforms will not be done as it is MPP run'
+#else
     call random_number(field(:,:) )
     field(:,:) = field(:,:) - 0.5
     call da_test_spectral(xbx, field, &
                           ids, ide, jds, jde, &
                           ims, ime, jms, jme, &
                           its, ite, jts, jte )
+#endif
    endif
 !-------------------------------------------------------------------------
  DEALLOCATE (vp1 % v1)
