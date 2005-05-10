@@ -23,14 +23,14 @@ SUBROUTINE DA_Rescale_Background_Errors ( ix, jy, var_scaling, len_scaling, &
     
    INTEGER                          :: mz                ! Vertical truncation.
    INTEGER                          :: m
-   REAL                             :: inv_ij_sqrt       ! 1/SQRT(ix*jy)
-   REAL, ALLOCATABLE                :: rf_scale_factor(:)! RF rescaling.
+!  REAL                             :: inv_ij_sqrt       ! 1/SQRT(ix*jy)
+!  REAL, ALLOCATABLE                :: rf_scale_factor(:)! RF rescaling.
    
 !-----------------------------------------------------------------------------
 !  [1.0] Initialise:
 !-----------------------------------------------------------------------------
 
-   inv_ij_sqrt = 1.0 / SQRT( REAL( ix * jy ) ) 
+!  inv_ij_sqrt = 1.0 / SQRT( REAL( ix * jy ) ) 
    mz = be_sub % mz
 
 !-----------------------------------------------------------------------------
@@ -57,24 +57,24 @@ SUBROUTINE DA_Rescale_Background_Errors ( ix, jy, var_scaling, len_scaling, &
 
 !     Calculate recursive filter rescaling:
 
-      ALLOCATE( rf_scale_factor(1:mz) )
+!     ALLOCATE( rf_scale_factor(1:mz) )
 
-      CALL DA_Calculate_RF_Factors( s(:), be_sub % rf_alpha(:), &
-                                    rf_scale_factor(:) )
+!     CALL DA_Calculate_RF_Factors( s(:), be_sub % rf_alpha(:), &
+!                                   rf_scale_factor(:) )
 
 !     Include differential factor for psi/chi:
 
-      IF ( TRIM(be_sub % name) == 'psi' .OR. &
-           TRIM(be_sub % name) == 'chi_u'  ) THEN
-         rf_scale_factor(:) = rf_scale_factor(:) * rf_scale_factor(:) * &
-                              inv_ij_sqrt 
-      END IF
+!     IF ( TRIM(be_sub % name) == 'psi' .OR. &
+!          TRIM(be_sub % name) == 'chi_u'  ) THEN
+!        rf_scale_factor(:) = rf_scale_factor(:) * rf_scale_factor(:) * &
+!                             inv_ij_sqrt 
+!     END IF
 
-      DO m = 1, mz
-         be_sub % val(:,m) = rf_scale_factor(m) * be_sub % val(:,m)
-      END DO
-                                       
-      DEALLOCATE ( rf_scale_factor )   
+!     DO m = 1, mz
+!        be_sub % val(:,m) = rf_scale_factor(m) * be_sub % val(:,m)
+!     END DO
+!                                      
+!     DEALLOCATE ( rf_scale_factor )   
 
    END IF
 
