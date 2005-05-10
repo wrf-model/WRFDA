@@ -6,7 +6,9 @@
 !
       implicit none
 
+#ifdef DM_PARALLEL
       INCLUDE 'mpif.h'
+#endif
 
       integer, intent(in)               :: n
       real, dimension(n), intent(in)    :: x,y
