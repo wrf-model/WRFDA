@@ -981,7 +981,7 @@ MODULE module_wrf_quilt
                     WRITE(*,*)'>>> ',TRIM(DateStr), ' ', TRIM(VarName), ' ', TRIM(MemoryOrder), ' ', &
                          (PatchEnd(1)-PatchStart(1)+1)*(PatchEnd(2)-PatchStart(2)+1)*(PatchEnd(3)-PatchStart(3)+1)
 
-                    IF ( FieldType .EQ. WRF_REAL4 .OR. FieldType .EQ. WRF_REAL8)  THEN
+                    IF ( FieldType .EQ. WRF_REAL .OR. FieldType .EQ. WRF_DOUBLE)  THEN
                       CALL mpi_type_size( MPI_REAL, ftypesize, ierr )
                       stored_write_record = .true.
                       CALL store_patch_in_outbuf ( bigbuf(icurs/inttypesize), dummybuf, TRIM(DateStr), TRIM(VarName) , &
@@ -1887,7 +1887,7 @@ SUBROUTINE wrf_quilt_put_dom_ti_real ( DataHandle,Element,   Data, Count,  Statu
 RETURN
 END SUBROUTINE wrf_quilt_put_dom_ti_real 
 
-SUBROUTINE wrf_quilt_get_dom_ti_real8 ( DataHandle,Element,   Data, Count, Outcount, Status )
+SUBROUTINE wrf_quilt_get_dom_ti_double ( DataHandle,Element,   Data, Count, Outcount, Status )
 !<DESCRIPTION>
 !<PRE>
 ! Instruct the I/O quilt servers to attempt to read Count words of time
@@ -1909,12 +1909,12 @@ SUBROUTINE wrf_quilt_get_dom_ti_real8 ( DataHandle,Element,   Data, Count, Outco
   INTEGER ,       INTENT(IN)  :: Count
   INTEGER                     :: OutCount
   INTEGER                     :: Status
-  CALL wrf_message('wrf_quilt_get_dom_ti_real8 not supported yet')
+  CALL wrf_message('wrf_quilt_get_dom_ti_double not supported yet')
 #endif
 RETURN
-END SUBROUTINE wrf_quilt_get_dom_ti_real8 
+END SUBROUTINE wrf_quilt_get_dom_ti_double 
 
-SUBROUTINE wrf_quilt_put_dom_ti_real8 ( DataHandle,Element,   Data, Count,  Status )
+SUBROUTINE wrf_quilt_put_dom_ti_double ( DataHandle,Element,   Data, Count,  Status )
 !<DESCRIPTION>
 !<PRE>
 ! Instruct the I/O quilt servers to write Count words of time independent
@@ -1934,10 +1934,10 @@ SUBROUTINE wrf_quilt_put_dom_ti_real8 ( DataHandle,Element,   Data, Count,  Stat
   real*8 ,            INTENT(IN) :: Data(*)
   INTEGER ,       INTENT(IN)  :: Count
   INTEGER                     :: Status
-  CALL wrf_message('wrf_quilt_put_dom_ti_real8 not supported yet')
+  CALL wrf_message('wrf_quilt_put_dom_ti_double not supported yet')
 #endif
 RETURN
-END SUBROUTINE wrf_quilt_put_dom_ti_real8 
+END SUBROUTINE wrf_quilt_put_dom_ti_double 
 
 SUBROUTINE wrf_quilt_get_dom_ti_integer ( DataHandle,Element,   Data, Count, Outcount, Status )
 !<DESCRIPTION>
@@ -2210,7 +2210,7 @@ SUBROUTINE wrf_quilt_put_dom_td_real ( DataHandle,Element, DateStr,  Data, Count
 RETURN
 END SUBROUTINE wrf_quilt_put_dom_td_real 
 
-SUBROUTINE wrf_quilt_get_dom_td_real8 ( DataHandle,Element, DateStr,  Data, Count, Outcount, Status )
+SUBROUTINE wrf_quilt_get_dom_td_double ( DataHandle,Element, DateStr,  Data, Count, Outcount, Status )
 !<DESCRIPTION>
 !<PRE>
 ! Instruct the I/O quilt servers to attempt to read Count words of time
@@ -2235,9 +2235,9 @@ SUBROUTINE wrf_quilt_get_dom_td_real8 ( DataHandle,Element, DateStr,  Data, Coun
   INTEGER                     :: Status
 #endif
 RETURN
-END SUBROUTINE wrf_quilt_get_dom_td_real8 
+END SUBROUTINE wrf_quilt_get_dom_td_double 
 
-SUBROUTINE wrf_quilt_put_dom_td_real8 ( DataHandle,Element, DateStr,  Data, Count,  Status )
+SUBROUTINE wrf_quilt_put_dom_td_double ( DataHandle,Element, DateStr,  Data, Count,  Status )
 !<DESCRIPTION>
 !<PRE>
 ! Instruct the I/O quilt servers to write Count words of time dependent
@@ -2260,7 +2260,7 @@ SUBROUTINE wrf_quilt_put_dom_td_real8 ( DataHandle,Element, DateStr,  Data, Coun
   INTEGER                     :: Status
 #endif
 RETURN
-END SUBROUTINE wrf_quilt_put_dom_td_real8 
+END SUBROUTINE wrf_quilt_put_dom_td_double 
 
 SUBROUTINE wrf_quilt_get_dom_td_integer ( DataHandle,Element, DateStr,  Data, Count, Outcount, Status )
 !<DESCRIPTION>
@@ -2466,7 +2466,7 @@ SUBROUTINE wrf_quilt_put_var_ti_real ( DataHandle,Element,  Varname, Data, Count
 RETURN
 END SUBROUTINE wrf_quilt_put_var_ti_real 
 
-SUBROUTINE wrf_quilt_get_var_ti_real8 ( DataHandle,Element,  Varname, Data, Count, Outcount, Status )
+SUBROUTINE wrf_quilt_get_var_ti_double ( DataHandle,Element,  Varname, Data, Count, Outcount, Status )
 !<DESCRIPTION>
 !<PRE>
 ! Instruct the I/O quilt servers to attempt to read Count words of time
@@ -2491,9 +2491,9 @@ SUBROUTINE wrf_quilt_get_var_ti_real8 ( DataHandle,Element,  Varname, Data, Coun
   INTEGER                     :: Status
 #endif
 RETURN
-END SUBROUTINE wrf_quilt_get_var_ti_real8 
+END SUBROUTINE wrf_quilt_get_var_ti_double 
 
-SUBROUTINE wrf_quilt_put_var_ti_real8 ( DataHandle,Element,  Varname, Data, Count,  Status )
+SUBROUTINE wrf_quilt_put_var_ti_double ( DataHandle,Element,  Varname, Data, Count,  Status )
 !<DESCRIPTION>
 !<PRE>
 ! Instruct the I/O quilt servers to write Count words of time independent
@@ -2516,7 +2516,7 @@ SUBROUTINE wrf_quilt_put_var_ti_real8 ( DataHandle,Element,  Varname, Data, Coun
   INTEGER                     :: Status
 #endif
 RETURN
-END SUBROUTINE wrf_quilt_put_var_ti_real8 
+END SUBROUTINE wrf_quilt_put_var_ti_double 
 
 SUBROUTINE wrf_quilt_get_var_ti_integer ( DataHandle,Element,  Varname, Data, Count, Outcount, Status )
 !<DESCRIPTION>
@@ -2757,7 +2757,7 @@ SUBROUTINE wrf_quilt_put_var_td_real ( DataHandle,Element,  DateStr,Varname, Dat
 RETURN
 END SUBROUTINE wrf_quilt_put_var_td_real 
 
-SUBROUTINE wrf_quilt_get_var_td_real8 ( DataHandle,Element,  DateStr,Varname, Data, Count, Outcount, Status )
+SUBROUTINE wrf_quilt_get_var_td_double ( DataHandle,Element,  DateStr,Varname, Data, Count, Outcount, Status )
 !<DESCRIPTION>
 !<PRE>
 ! Instruct the I/O quilt servers to attempt to read Count words of time
@@ -2783,9 +2783,9 @@ SUBROUTINE wrf_quilt_get_var_td_real8 ( DataHandle,Element,  DateStr,Varname, Da
   INTEGER                     :: Status
 #endif
 RETURN
-END SUBROUTINE wrf_quilt_get_var_td_real8 
+END SUBROUTINE wrf_quilt_get_var_td_double 
 
-SUBROUTINE wrf_quilt_put_var_td_real8 ( DataHandle,Element,  DateStr,Varname, Data, Count,  Status )
+SUBROUTINE wrf_quilt_put_var_td_double ( DataHandle,Element,  DateStr,Varname, Data, Count,  Status )
 !<DESCRIPTION>
 !<PRE>
 ! Instruct the I/O quilt servers to write Count words of time dependent
@@ -2809,7 +2809,7 @@ SUBROUTINE wrf_quilt_put_var_td_real8 ( DataHandle,Element,  DateStr,Varname, Da
   INTEGER                     :: Status
 #endif
 RETURN
-END SUBROUTINE wrf_quilt_put_var_td_real8 
+END SUBROUTINE wrf_quilt_put_var_td_double 
 
 SUBROUTINE wrf_quilt_get_var_td_integer ( DataHandle,Element,  DateStr,Varname, Data, Count, Outcount,Status)
 !<DESCRIPTION>
@@ -3079,9 +3079,9 @@ SUBROUTINE wrf_quilt_write_field ( DataHandle , DateStr , VarName , Field , Fiel
 
   CALL mpi_type_size( MPI_INTEGER, inttypesize, ierr )
   CALL mpi_type_size( MPI_REAL, realtypesize, ierr )
-  IF      ( FieldType .EQ. WRF_REAL4 ) THEN
+  IF      ( FieldType .EQ. WRF_REAL ) THEN
     CALL mpi_type_size( MPI_REAL, typesize, ierr )
-  ELSE IF ( FieldType .EQ. WRF_REAL8 ) THEN
+  ELSE IF ( FieldType .EQ. WRF_DOUBLE ) THEN
     CALL mpi_type_size( MPI_DOUBLE_PRECISION, typesize, ierr )
   ELSE IF ( FieldType .EQ. WRF_INTEGER ) THEN
     CALL mpi_type_size( MPI_INTEGER, typesize, ierr )

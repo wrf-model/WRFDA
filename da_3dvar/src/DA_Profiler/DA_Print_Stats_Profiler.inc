@@ -4,7 +4,7 @@ SUBROUTINE DA_Print_Stats_Profiler( stats_unit, nu, nv, Profiler )
 
    INTEGER,           INTENT(IN)    :: stats_unit
    INTEGER,           INTENT(INOUT) :: nu, nv
-   TYPE (stats_type), INTENT(IN)    :: Profiler
+   TYPE (stats_profiler_type), INTENT(IN):: Profiler
    
    write(unit=stats_unit, fmt='(a/)') &
         '   var             u (m/s)     n    k    v (m/s)     n    k  '

@@ -29,10 +29,10 @@ SUBROUTINE da_transform_bal_adj( xb, vp, xa, be ,xp,&
    vp%v1(:,:,:)=0.
    vp%v2(:,:,:)=0.
 
-   CALL DA_PsiChi_To_UV_Adj( xa % u, xa % v, xb % map_factor, &
-                            xb % ds, vp % v1, vp % v2, &
-                            ids,ide, jds,jde, kds,kde, &
-                            ims,ime, jms,jme, kms,kme, &
+   CALL DA_PsiChi_To_UV_Adj( xa % u, xa % v, xb % coefx,   &
+                            xb % coefy,  vp % v1, vp % v2, &
+                            ids,ide, jds,jde, kds,kde,     &
+                            ims,ime, jms,jme, kms,kme,     &
                             its,ite, jts,jte, kts,kte )
 
 !  [3.3]  adj Calculate Psfc_b from psi

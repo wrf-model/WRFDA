@@ -1,0 +1,573 @@
+Change Log for update to WRF 3DVAR code
+---------------------------------------
+
+Author: Syed RH Rizvi
+Reviewer: 
+Date: 02/07/05
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Update with global option
+
+Expected Differences
+--------------------
+No changes are expected when run with regional option 
+Accuracy: 
+ 
+With regional option slight differences are expected with the 
+new procedure. This is mainly due to the fact that the  
+horizontal derivatives are computed slightly different way.
+(For example see DA_Dynamics/DA_PsiChi_To_UV.inc)
+The new procedure works when FG is either at equal distance or
+at equal lat/lon.  
+
+CPU:
+
+Since multiplicative constants needed for horizontal derivative
+computation is computed once, the new code is expected to reduce 
+the CPU requirements. 
+
+memory:
+
+There is minor increase.
+
+Test results (run on mac machines?)
+------------------------------------------------------
+
+Comparison of regional test run for 01/24/2000 12 UTC case.
+
+The output starts deviating slightly after 13th iterations 
+as shown below.
+
+
+ wrf3dvar (new code) output after 13th and 14th 
+------------------------------------------------------
+<    13      4.80820397D+00      6.37437445D-02
+<    14      2.71299841D+00      5.81128679D-02
+---
+ wrfvar (old code) output after 13th and 14th 
+------------------------------------------------------
+>    13      4.80820392D+00      6.37437446D-02
+>    14      2.71298559D+00      5.81128826D-02
+
+ wrf3dvar (new code) :
+------------------------------------------------------
+<    Final cost function :  3.93545093D+03 and Gradient:  2.71299841D+00
+<   Norm of cv (sqrt(cv.cv)) =  15.9942414641248138
+<   Norm of xhat (sqrt(xhat.xhat)) =  15.9942414641248138
+<     Final cost function J  =  3935.45092571833447
+<     Final 3DVAR value of Jo =      3807.54305
+<     Final 3DVAR value of Jb =       127.90788
+---
+ wrfvar (old code) :
+------------------------------------------------------
+>    Final cost function :  3.93545093D+03 and Gradient:  2.71298559D+00
+>   Norm of cv (sqrt(cv.cv)) =  15.9942420545922204
+>   Norm of xhat (sqrt(xhat.xhat)) =  15.9942420545922204
+>     Final cost function J  =  3935.45092556085228
+>     Final 3DVAR value of Jo =      3807.54304
+>     Final 3DVAR value of Jb =       127.90789
+------------------------------------------------------
+Test results (run on Cray )
+------------------------------------------------------
+ tarting outer iteration :   1
+  Original gradient is  1.53172280E+04
+  For this outer iteration Gradient target is  1.53172280E+02
+  Starting Cost function:  1.96672808E+05 Gradient=  1.53172280E+04
+
+  After 10 iterations:
+  Inner iteration stopped after   10 iterations
+   Final cost function :  1.31352755E+05 and Gradient:  3.19523699E+03
+ ----------------------------------------------------------       
+
+Test results (on Mac (Mahua)   
+------------------------------------------------------
+  
+  Starting outer iteration :   1
+  Original gradient is  1.53172280D+04
+  For this outer iteration Gradient target is  1.53172280D+02
+  Starting Cost function:  1.96672808D+05 Gradient=  1.53172280D+04
+ ----------------------------------------------------------
+
+  After 10 iterations:
+ Inner iteration stopped after   10 iterations
+  Final cost function :  1.31352755D+05 and Gradient:  3.19523699D+03
+ ----------------------------------------------------------
+--------------------------------------------------------------------------------------
+Files removed:
+--------------
+share/module_bdyzone.F
+
+Files added:
+------------
+Registry/Registry.3DVAR
+Registry/Registry.EM
+Registry/Registry.EM.PET
+Registry/Registry.EM_CHEM
+Registry/Registry.NMM
+Registry/Registry.backup
+arch/Config.pl
+arch/configure.defaults
+arch/cray_csd.sed
+arch/no_file_line.sed
+arch/postamble
+arch/postamble_3dvar.crayx1
+arch/postamble_3dvar.mac_g4
+arch/preamble
+arch/standard.sed
+convertor/wave2grid_kma/Einc_to_Ganl.inc
+convertor/wave2grid_kma/PREGSM1.inc
+convertor/wave2grid_kma/RELHUM.inc
+convertor/wave2grid_kma/pvchkdv.f
+da_3dvar/changes/changes_20050207.srh
+da_3dvar/src/DA_Dynamics/DA_WZ_BASE.inc
+da_3dvar/src/DA_Setup_Structures/DA_Get_Bins_Info.inc
+da_3dvar/src/DA_Setup_Structures/DA_Write_KMA_Increments.inc
+da_3dvar/src/DA_Setup_Structures/da_asslegpol.inc
+da_3dvar/src/DA_Setup_Structures/da_get_gausslats.inc
+da_3dvar/src/DA_Setup_Structures/da_get_reglats.inc
+da_3dvar/src/DA_Setup_Structures/da_initialize_h.inc
+da_3dvar/src/DA_Setup_Structures/da_setlegpol.inc
+da_3dvar/src/DA_Setup_Structures/da_setup_background_errors4.inc
+da_3dvar/src/DA_Setup_Structures/da_setup_firstguess_kma.inc
+da_3dvar/src/DA_Setup_Structures/da_transfer_kmatoxb.inc
+da_3dvar/src/DA_Setup_Structures/da_transfer_xatokma.inc
+da_3dvar/src/DA_Tools/DA_Set_Boundary_2d.inc
+da_3dvar/src/DA_Tools/DA_Set_Boundary_3d.inc
+da_3dvar/src/DA_Tools/DA_Set_Boundary_Xa.inc
+da_3dvar/src/DA_Tools/DA_Set_Boundary_Xb.inc
+da_3dvar/src/DA_Tools/da_set_boundary.inc
+da_3dvar/src/DA_VToX_Transforms/DA_Get_ASPoles.inc
+da_3dvar/src/DA_VToX_Transforms/DA_Get_AVPoles.inc
+da_3dvar/src/DA_VToX_Transforms/DA_Get_SPoles.inc
+da_3dvar/src/DA_VToX_Transforms/DA_Get_VPoles.inc
+da_3dvar/src/DA_VToX_Transforms/DA_Transform_VToVv_Global.inc
+da_3dvar/src/DA_VToX_Transforms/DA_Transform_VToVv_Global_Adj.inc
+da_3dvar/src/da_gen_be/da_print_be_stats_h.inc
+da_3dvar/src/da_gen_be/da_print_be_stats_p.inc
+da_3dvar/src/da_gen_be/da_print_be_stats_v.inc
+da_3dvar/src/da_spectral/da_apply_power.inc
+da_3dvar/src/da_spectral/da_leg_tra_inv_adj.inc
+da_3dvar/src/da_spectral/da_legtra_inv_adj.inc
+da_3dvar/src/da_spectral/da_v_to_vv_spectral_adj.inc
+da_3dvar/utl/be4_scale_length.f90
+da_3dvar/utl/plot_be4_eigen.f90
+external/RSL/RSL/makefile.altix
+external/RSL/RSL/makefile.x1
+external/RSL_LITE
+external/esmf_time_f90
+external/io_grib1
+external/io_int/diffwrf.F
+external/io_int/module_internal_header_util.F
+external/io_mcel
+external/io_netcdf/diffwrf.F90
+external/io_phdf5
+frame/libmassv.F
+frame/module_integrate.F
+frame/module_internal_header_util.F
+frame/module_nesting.F
+frame/protomain.F
+inc/bench_solve_em_def.h
+inc/bench_solve_em_end.h
+inc/bench_solve_em_init.h
+inc/deref_kludge.h
+main/convert_nmm.F
+main/gen_be/gen_be_diags_read.f
+main/ideal.F
+main/ndown_em.F
+main/real_em.F
+main/wrf.F
+run/ETAMPNEW_DATA
+run/GENPARM.TBL
+run/README.namelist
+run/RRTM_DATA
+run/SOILPARM.TBL
+run/VEGPARM.TBL
+run/gribmap.txt
+run/tr49t67
+run/tr49t85
+run/tr67t85
+share/init_modules.F
+share/input_wrf.F
+share/interp_fcn.F
+share/mediation_feedback_domain.F
+share/mediation_force_domain.F
+share/mediation_integrate.F
+share/mediation_interp_domain.F
+share/mediation_wrfmain.F
+share/module_MPP.F
+share/module_bc.F
+share/module_bc_time_utilities.F
+share/module_get_file_names.F
+share/module_interp_fcn.F
+share/module_optional_si_input.F
+share/module_soil_pre.F
+share/output_wrf.F
+share/set_timekeeping.F
+share/sint.F
+share/solve_em.int
+share/solve_interface.F
+share/solve_nmm.int
+share/start_domain_em.int
+share/wrf_auxhist1in.F
+share/wrf_auxhist1out.F
+share/wrf_auxhist2in.F
+share/wrf_auxhist2out.F
+share/wrf_auxhist3in.F
+share/wrf_auxhist3out.F
+share/wrf_auxhist4in.F
+share/wrf_auxhist4out.F
+share/wrf_auxhist5in.F
+share/wrf_auxhist5out.F
+share/wrf_auxinput1in.F
+share/wrf_auxinput1out.F
+share/wrf_auxinput2in.F
+share/wrf_auxinput2out.F
+share/wrf_auxinput3in.F
+share/wrf_auxinput3out.F
+share/wrf_auxinput4in.F
+share/wrf_auxinput4out.F
+share/wrf_auxinput5in.F
+share/wrf_auxinput5out.F
+share/wrf_bdyin.F
+share/wrf_bdyout.F
+share/wrf_ext_read_field.F
+share/wrf_ext_write_field.F
+share/wrf_histin.F
+share/wrf_histout.F
+share/wrf_inputin.F
+share/wrf_inputout.F
+share/wrf_restartin.F
+share/wrf_restartout.F
+tools/build_codebase
+tools/build_test.csh
+tools/callgraph.page1
+tools/callgraph.page2
+tools/collapsd.gif
+tools/danger
+tools/daughter.gif
+tools/exploded.gif
+tools/index.page
+tools/link_codebase_to_wrfbrowser
+tools/regtest.csh
+tools/safe
+tools/subinfo
+tools/testomatic
+
+Files modified:
+---------------
+Makefile
+README
+Registry/Registry_3dvar
+arch/Config_3dvar.pl
+arch/configure.defaults_3dvar
+arch/postamble_3dvar
+arch/preamble_3dvar
+clean
+compile
+configure
+convertor/Makefile
+convertor/kma_wave2grid/PACK.inc
+convertor/kma_wave2grid/W2GCONV.inc
+convertor/kma_wave2grid/module_kma_wave2grid.F
+convertor/wave2grid_kma/CR8I2V.inc
+convertor/wave2grid_kma/PACK.inc
+convertor/wave2grid_kma/PREGSM.F
+convertor/wave2grid_kma/PREGSM.inc
+convertor/wave2grid_kma/module_wave2grid_kma.F
+da_3dvar/Makefile
+da_3dvar/changes/tag-info
+da_3dvar/module_wrf_3dvar_interface.F
+da_3dvar/module_wrf_3dvar_io.F
+da_3dvar/src/DA_Constants/DA_Constants.F
+da_3dvar/src/DA_Define_Structures/DA_Allocate_Background_Errors.inc
+da_3dvar/src/DA_Define_Structures/DA_Define_Structures.F
+da_3dvar/src/DA_Define_Structures/da_allocate_cv.inc
+da_3dvar/src/DA_Dynamics/DA_Balance_CycloTerm.inc
+da_3dvar/src/DA_Dynamics/DA_Balance_CycloTerm_Adj.inc
+da_3dvar/src/DA_Dynamics/DA_Balance_CycloTerm_Lin.inc
+da_3dvar/src/DA_Dynamics/DA_Balance_Equation_Adj.inc
+da_3dvar/src/DA_Dynamics/DA_Balance_Equation_Lin.inc
+da_3dvar/src/DA_Dynamics/DA_Dynamics.F
+da_3dvar/src/DA_Dynamics/DA_PsiChi_To_UV.inc
+da_3dvar/src/DA_Dynamics/DA_PsiChi_To_UV_Adj.inc
+da_3dvar/src/DA_Dynamics/DA_UV_To_Divergence.inc
+da_3dvar/src/DA_Dynamics/DA_UV_To_Divergence_Adj.inc
+da_3dvar/src/DA_Dynamics/DA_UV_To_Vorticity.inc
+da_3dvar/src/DA_Dynamics/DA_W_Adjustment_Adj.inc
+da_3dvar/src/DA_Dynamics/DA_W_Adjustment_Lin.inc
+da_3dvar/src/DA_FFTs/DA_FFTs.F
+da_3dvar/src/DA_FFTs/DA_Solve_PoissonEqn_FCT.inc
+da_3dvar/src/DA_FFTs/DA_Solve_PoissonEqn_FCT_Adj.inc
+da_3dvar/src/DA_Gpspw/DA_AO_Stats_Gpspw.inc
+da_3dvar/src/DA_Gpspw/DA_Gpspw.F
+da_3dvar/src/DA_Gpsref/DA_AO_Stats_Gpsref.inc
+da_3dvar/src/DA_Gpsref/DA_Gpsref.F
+da_3dvar/src/DA_Interpolation/DA_Interpolation.F
+da_3dvar/src/DA_Interpolation/Interp_Obs_lin_2D.inc
+da_3dvar/src/DA_Interpolation/Interp_Obs_lin_2D_adj.inc
+da_3dvar/src/DA_Interpolation/Interp_lin_2D.inc
+da_3dvar/src/DA_Interpolation/Interp_lin_2D_adj.inc
+da_3dvar/src/DA_Interpolation/Interp_lin_3D.inc
+da_3dvar/src/DA_Interpolation/Interp_lin_3D_adj.inc
+da_3dvar/src/DA_Minimisation/DA_Minimisation.F
+da_3dvar/src/DA_Minimisation/DA_Minimise_CG.inc
+da_3dvar/src/DA_Minimisation/da_calculate_j.inc
+da_3dvar/src/DA_Minimisation/da_dot.inc
+da_3dvar/src/DA_Minimisation/da_write_diagnostics.inc
+da_3dvar/src/DA_Obs/DA_Read_Obs.inc
+da_3dvar/src/DA_Obs/DA_Scan_Obs.inc
+da_3dvar/src/DA_Obs/DA_Transform_XToY_Adj.inc
+da_3dvar/src/DA_Obs/da_add_noise_to_ob.inc
+da_3dvar/src/DA_Obs/da_write_obs.inc
+da_3dvar/src/DA_Physics/DA_Transform_XToGPSRef.inc
+da_3dvar/src/DA_Physics/DA_Transform_XToGPSRef_Adj.inc
+da_3dvar/src/DA_Physics/DA_Transform_XToGPSRef_Lin.inc
+da_3dvar/src/DA_Physics/DA_UVPRho_To_W_Adj.inc
+da_3dvar/src/DA_Physics/DA_UVPRho_To_W_Lin.inc
+da_3dvar/src/DA_Recursive_Filter/DA_Transform_Through_RF_Adj.inc
+da_3dvar/src/DA_Setup_Structures/DA_Setup_Structures.F
+da_3dvar/src/DA_Setup_Structures/da_chgvres.inc
+da_3dvar/src/DA_Setup_Structures/da_get_vertical_truncation.inc
+da_3dvar/src/DA_Setup_Structures/da_interpolate_stats.inc
+da_3dvar/src/DA_Setup_Structures/da_setup_background_errors.inc
+da_3dvar/src/DA_Setup_Structures/da_setup_firstguess.inc
+da_3dvar/src/DA_Setup_Structures/da_setup_firstguess_mm5.inc
+da_3dvar/src/DA_Setup_Structures/da_setup_firstguess_wrf.inc
+da_3dvar/src/DA_Setup_Structures/da_setup_obs_structures.inc
+da_3dvar/src/DA_Setup_Structures/da_setup_runconstants.inc
+da_3dvar/src/DA_Setup_Structures/da_transfer_mm5toxb.inc
+da_3dvar/src/DA_Setup_Structures/da_transfer_wrftoxb.inc
+da_3dvar/src/DA_Setup_Structures/da_write_increments.inc
+da_3dvar/src/DA_Sound/da_get_innov_vector_sound.inc
+da_3dvar/src/DA_Synop/DA_Calculate_GradY_Synop.inc
+da_3dvar/src/DA_Synop/DA_Transform_XToY_Synop_Adj.inc
+da_3dvar/src/DA_Synop/da_get_innov_vector_synop.inc
+da_3dvar/src/DA_Test/DA_Check_CvToVv_Adjoint.inc
+da_3dvar/src/DA_Test/DA_Check_VToX_Adjoint.inc
+da_3dvar/src/DA_Test/DA_Check_VpToX_Adjoint.inc
+da_3dvar/src/DA_Test/DA_Check_Vp_Errors.inc
+da_3dvar/src/DA_Test/DA_Check_VvToVp_Adjoint.inc
+da_3dvar/src/DA_Test/DA_Check_XToY_Adjoint.inc
+da_3dvar/src/DA_Test/DA_Test.F
+da_3dvar/src/DA_Test/DA_Test_VXTransform.inc
+da_3dvar/src/DA_Test/DA_Transform_XToVp.inc
+da_3dvar/src/DA_Test/check_sfc_assi.inc
+da_3dvar/src/DA_Test/da_check.inc
+da_3dvar/src/DA_Tools/DA_Obs_Sfc_correction.inc
+da_3dvar/src/DA_Tools/DA_Read_Namelist.inc
+da_3dvar/src/DA_Tools/DA_Tools.F
+da_3dvar/src/DA_Tools/DA_ll_to_xy.inc
+da_3dvar/src/DA_Tools/da_dot.inc
+da_3dvar/src/DA_Tools/llxy.inc
+da_3dvar/src/DA_Tools/toGrid.inc
+da_3dvar/src/DA_Tools/xyll.inc
+da_3dvar/src/DA_VToX_Transforms/DA_Transform_VpToX.inc
+da_3dvar/src/DA_VToX_Transforms/DA_Transform_VpToX_Adj.inc
+da_3dvar/src/DA_VToX_Transforms/DA_Transform_VvToVp.inc
+da_3dvar/src/DA_VToX_Transforms/DA_Transform_VvToVp_Adj.inc
+da_3dvar/src/DA_VToX_Transforms/DA_VToX_Transforms.F
+da_3dvar/src/DA_VToX_Transforms/DA_Vertical_Transform.inc
+da_3dvar/src/DA_VToX_Transforms/da_mat.f
+da_3dvar/src/DA_VToX_Transforms/da_transform_bal.inc
+da_3dvar/src/DA_VToX_Transforms/da_transform_bal_adj.inc
+da_3dvar/src/DA_VToX_Transforms/da_transform_vtox.inc
+da_3dvar/src/DA_VToX_Transforms/da_transform_vtox_adj.inc
+da_3dvar/src/Makefile
+da_3dvar/src/da_fftpack5/README
+da_3dvar/src/da_fftpack5/r1f2kb.f
+da_3dvar/src/da_fftpack5/r1f2kf.f
+da_3dvar/src/da_fftpack5/r1f3kb.f
+da_3dvar/src/da_fftpack5/r1f3kf.f
+da_3dvar/src/da_fftpack5/r1f4kb.f
+da_3dvar/src/da_fftpack5/r1f4kf.f
+da_3dvar/src/da_fftpack5/r1f5kb.f
+da_3dvar/src/da_fftpack5/r1f5kf.f
+da_3dvar/src/da_fftpack5/r1fgkb.f
+da_3dvar/src/da_fftpack5/r1fgkf.f
+da_3dvar/src/da_fftpack5/rfft1b.f
+da_3dvar/src/da_fftpack5/rfft1f.f
+da_3dvar/src/da_fftpack5/rfft1i.f
+da_3dvar/src/da_fftpack5/rfftb1.f
+da_3dvar/src/da_fftpack5/rfftf1.f
+da_3dvar/src/da_fftpack5/rffti1.f
+da_3dvar/src/da_fftpack5/xerfft.f
+da_3dvar/src/da_gen_be/da_gen_be.F
+da_3dvar/src/da_gen_be/da_readwrite_be_stage2.inc
+da_3dvar/src/da_gen_be/da_readwrite_be_stage3.inc
+da_3dvar/src/da_gen_be/da_readwrite_be_stage4.inc
+da_3dvar/src/da_pseudo/DA_Calculate_GradY_Pseudo.inc
+da_3dvar/src/da_pseudo/da_cal_jo_and_grady_pseudo.inc
+da_3dvar/src/da_pseudo/da_calculate_residual_pseudo.inc
+da_3dvar/src/da_pseudo/da_transform_xtoy_pseudo.inc
+da_3dvar/src/da_solve_v3d/da_init_3dvar.inc
+da_3dvar/src/da_solve_v3d/da_solve_v3d.F
+da_3dvar/src/da_spectral/da_legtra.inc
+da_3dvar/src/da_spectral/da_legtra_inv.inc
+da_3dvar/src/da_spectral/da_setlegpol_test.inc
+da_3dvar/src/da_spectral/da_spectral.F
+da_3dvar/src/da_spectral/da_test_spectral.inc
+da_3dvar/src/da_spectral/da_v_to_vv_spectral.inc
+da_3dvar/src/da_spectral/da_vv_to_v_spectral.inc
+da_3dvar/src/par_util/calculate_cv_local_size.inc
+da_3dvar/src/par_util/par_util.F
+da_3dvar/src/par_util/proc_stats_combine.inc
+da_3dvar/src/par_util/proc_sum_real.inc
+external/IOAPI
+external/Makefile
+external/RSL/RSL/compat.h
+external/RSL/RSL/debug.c
+external/RSL/RSL/decomp.c
+external/RSL/RSL/domain_def.c
+external/RSL/RSL/exch_period.c
+external/RSL/RSL/exch_sten.c
+external/RSL/RSL/makefile
+external/RSL/RSL/makefile.alpha
+external/RSL/RSL/makefile.hp
+external/RSL/RSL/makefile.linux
+external/RSL/RSL/makefile.o2k
+external/RSL/RSL/makefile.sp2
+external/RSL/RSL/makefile.sp2.1
+external/RSL/RSL/makefile.sp2ch
+external/RSL/RSL/makefile.stub
+external/RSL/RSL/period_refs.c
+external/RSL/RSL/process_refs.c
+external/RSL/RSL/pt.c
+external/RSL/RSL/rsl.h
+external/RSL/RSL/rsl_bcast.c
+external/RSL/RSL/rsl_hemiforce.c
+external/RSL/RSL/rsl_initial.c
+external/RSL/RSL/rsl_io.c
+external/RSL/RSL/rsl_io.h
+external/RSL/RSL/rsl_ioserve.c
+external/RSL/RSL/rsl_malloc.c
+external/RSL/RSL/rsl_merge.c
+external/RSL/RSL/rsl_new_decom.c
+external/RSL/RSL/rsl_order.c
+external/RSL/RSL/rsl_remap_state.c
+external/RSL/RSL/show_decomp.c
+external/RSL/RSL/stencil_def.c
+external/RSL/RSL/stencil_def.h
+external/RSL/gen_comms.c
+external/RSL/module_dm.F
+external/io_int/io_int.F90
+external/io_int/makefile
+external/io_netcdf/ext_ncd_get_dom_ti.code
+external/io_netcdf/ext_ncd_get_var_td.code
+external/io_netcdf/ext_ncd_get_var_ti.code
+external/io_netcdf/ext_ncd_put_dom_ti.code
+external/io_netcdf/ext_ncd_put_var_td.code
+external/io_netcdf/ext_ncd_put_var_ti.code
+external/io_netcdf/field_routines.F90
+external/io_netcdf/makefile
+external/io_netcdf/transpose.code
+external/io_netcdf/wrf_io.F90
+external/io_netcdf/wrf_status_codes.h
+external/io_quilt/wrf_io_flags.h
+frame/Makefile
+frame/collect_on_comm.c
+frame/md_calls.m4
+frame/module_configure.F
+frame/module_dm_stubs.F
+frame/module_domain.F
+frame/module_driver_constants.F
+frame/module_io.F
+frame/module_io_quilt.F
+frame/module_machine.F
+frame/module_quilt_outbuf_ops.F
+frame/module_sm.F
+frame/module_tiles.F
+frame/module_timing.F
+frame/module_wrf_error.F
+frame/pack_utils.c
+frame/wrf_num_bytes_between.c
+frame/wrf_shutdown.F
+frame/xxx_template_ioapi.F
+inc/intio_tags.h
+main/Makefile
+main/da_3dvar.F
+main/gen_be/Makefile
+main/gen_be/gen_be_diags.f
+main/gen_be/gen_be_stage1.f
+main/gen_be/gen_be_stage2.f
+main/gen_be/gen_be_stage3.f
+main/gen_be/gen_be_stage4.f
+main/kma2netcdf.F
+main/netcdf2kma.F
+run/DA_Run_3DVAR.csh
+run/LANDUSE.TBL
+run/gen_be/gen_be.csh
+run/namelist.3dvar
+run/namelist.input
+share/Makefile
+share/module_date_time.F
+share/module_io_domain.F
+share/module_io_wrf.F
+share/module_model_constants.F
+share/start_domain.F
+tools/data.h
+tools/gen_allocs.c
+tools/gen_args.c
+tools/gen_config.c
+tools/gen_interp.c
+tools/gen_scalar_derefs.c
+tools/gen_scalar_indices.c
+tools/gen_wrf_io.c
+tools/misc.c
+tools/my_strtok.c
+tools/protos.h
+tools/reg_parse.c
+tools/registry.c
+tools/registry.h
+tools/sym.h
+tools/symtab_gen.c
+tools/type.c
+
+cvs commit ?
+
+CHANGES
+
+changes/change_20050207.srh
+
+Wei Huang's new change to break makefile circular dependency
+February 23, 2005
+
+Files added:
+-------------------------------------
+
+ da_3dvar/src/da_solve_v3d/solve_v3d.inc
+ da_3dvar/src/da_solve_v3d/da_var_solve_interface.inc
+ da_3dvar/src/da_solve_v3d/da_var_run.inc
+ da_3dvar/src/da_solve_v3d/da_var_finalize.inc
+ da_3dvar/src/da_solve_v3d/da_var_init.inc
+ da_3dvar/src/DA_Var_IO/DA_Var_IO.F
+ med_initialdata_input_3dvar.inc         
+ med_initialdata_output_3dvar.inc
+
+Files Removed:
+-------------------------------------
+
+ da_3dvar/module_wrf_3dvar_interface.F
+ da_3dvar/module_wrf_3dvar_io.F
+ da_3dvar/module_wrfvar_esmf_super.F
+
+Files Modified:
+-------------------------------------
+
+ Makefile
+ Registry/Registry.3DVAR
+ da_3dvar/module_wrf_3dvar_interface.F
+ da_3dvar/module_wrf_3dvar_io.F
+ da_3dvar/module_wrfvar_esmf_super.F
+ da_3dvar/src/Makefile
+ da_3dvar/src/DA_Minimisation/DA_Minimisation.F
+ da_3dvar/src/da_solve_v3d/da_init_3dvar.inc
+ da_3dvar/src/da_solve_v3d/da_solve_v3d.F
+ frame/libmassv.F
+ main/da_3dvar.F
+
+Tag:
+
+version_2_0_2_0
+

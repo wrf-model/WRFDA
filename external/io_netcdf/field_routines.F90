@@ -48,44 +48,16 @@ subroutine ext_ncd_RealFieldIO(IO,NCID,VarID,VStart,VCount,Data,Status)
   integer                     ,intent(out)   :: Status
   integer                                    :: stat
 
-  real(kind=4), dimension(:), allocatable    :: loc_data
-  integer                                    :: n, nd
-
   if(IO == 'write') then
-#if (DWORDSIZE == RWORDSIZE)
-    nd = 1
-    do n=1,NVarDims
-       if(VCount(n) > VStart(n)) nd = nd*(VCount(n) - VStart(n) + 1)
-    enddo
-    allocate(loc_data(1:nd))
-    loc_data(1:nd) = data(1:nd)
-    stat = NF_PUT_VARA_REAL(NCID,VarID,VStart,VCount,loc_data)
-    deallocate(loc_data)
-#else
     stat = NF_PUT_VARA_REAL(NCID,VarID,VStart,VCount,Data)
-#endif
   else
-#if (DWORDSIZE == RWORDSIZE)
-    nd = 1
-    do n=1,NVarDims
-       if(VCount(n) > VStart(n)) nd = nd*(VCount(n) - VStart(n) + 1)
-    enddo
-    allocate(loc_data(1:nd))
-    stat = NF_GET_VARA_REAL(NCID,VarID,VStart,VCount,loc_data)
-    data(1:nd) = loc_data(1:nd)
-    deallocate(loc_data)
-#else
     stat = NF_GET_VARA_REAL(NCID,VarID,VStart,VCount,Data)
-#endif
   endif
   call netcdf_err(stat,Status)
   if(Status /= WRF_NO_ERR) then
     write(msg,*) 'NetCDF error in ',__FILE__,', line', __LINE__
     call wrf_debug ( WARN , msg)
   endif
-
-  write(unit=0, fmt='(a,e24.14)') 'in ext_ncd_RealFieldIO, data(1)=', data(1)
-
   return
 end subroutine ext_ncd_RealFieldIO
 
@@ -100,7 +72,7 @@ subroutine ext_ncd_DoubleFieldIO(IO,NCID,VarID,VStart,VCount,Data,Status)
   integer                     ,intent(in)    :: VarID
   integer ,dimension(NVarDims),intent(in)    :: VStart
   integer ,dimension(NVarDims),intent(in)    :: VCount
-  real(kind=8)                ,intent(inout) :: Data
+  real*8                      ,intent(inout) :: Data
   integer                     ,intent(out)   :: Status
   integer                                    :: stat
 
