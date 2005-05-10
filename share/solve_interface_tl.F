@@ -12,7 +12,7 @@ SUBROUTINE solve_interface_tl ( grid )
    IMPLICIT NONE
 
    INTERFACE
-#if (EM_CORE == 1)
+#if (EM_CORE == 1 && DA_CORE != 1)
 # include  <solve_em_tl.int>
 #endif
 #if (NMM_CORE == 1)
@@ -33,6 +33,8 @@ SUBROUTINE solve_interface_tl ( grid )
 
 #ifdef DEREF_KLUDGE
    INTEGER     :: sm31 , em31 , sm32 , em32 , sm33 , em33
+   INTEGER     :: sm31x, em31x, sm32x, em32x, sm33x, em33x
+   INTEGER     :: sm31y, em31y, sm32y, em32y, sm33y, em33y
 #endif
 
    CALL model_to_grid_config_rec ( grid%id , model_config_rec , config_flags )
@@ -42,13 +44,30 @@ SUBROUTINE solve_interface_tl ( grid )
 
    IF ( .FALSE.                         ) THEN
 
-#if (EM_CORE == 1)
-   ELSE IF ( config_flags%dyn_opt == DYN_EM  ) THEN
-     CALL solve_em_tl  ( grid , config_flags , &
+#if (EM_CORE == 1 && DA_CORE != 1)
+   ELSE IF ( config_flags%dyn_opt == DYN_EM_TL ) THEN
+     CALL solve_em_tl ( grid , config_flags , &
 !
 # include <em_actual_args.inc>
 !
                )
+
+# ifdef WRF_CHEM
+   IF ( config_flags%chem_opt == RADM2  ) THEN
+     CALL chem_driver  ( grid , config_flags , &
+!
+# include <em_actual_args.inc>
+!
+               )
+   ENDIF
+   IF ( config_flags%chem_opt == RADM2SORG ) THEN
+     CALL chem_driver  ( grid , config_flags , &
+!
+# include <em_actual_args.inc>
+!
+               )
+   ENDIF
+# endif
 #endif
 #if (NMM_CORE == 1)
    ELSE IF ( config_flags%dyn_opt == DYN_NMM  ) THEN
@@ -67,7 +86,7 @@ SUBROUTINE solve_interface_tl ( grid )
                )
 #endif
 
-! ###### 4. Edit share/solve_interface_tl.F to add call to experimental core
+! ###### 4. Edit share/solve_interface.F to add call to experimental core
 
 #if (EXP_CORE == 1)
    ELSE IF ( config_flags%dyn_opt == DYN_EXP  ) THEN

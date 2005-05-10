@@ -85,6 +85,9 @@ MODULE module_domain
       INTEGER      , DIMENSION( max_parents )             :: child_of_parent
       INTEGER      , DIMENSION( max_nests )               :: active
 
+      INTEGER      , DIMENSION(0:5)                       :: nframes          ! frames per outfile for history 
+                                                                              ! streams (0 is main history)                  
+
       TYPE(domain) , POINTER                              :: next
       TYPE(domain) , POINTER                              :: same_level
 
@@ -215,7 +218,7 @@ CONTAINS
 
     CALL dealloc_space_field ( grid )
 
-    CALL alloc_space_field ( grid, grid%id , .FALSE. ,          &
+    CALL alloc_space_field ( grid, grid%id , 1 ,          &
                              grid%sd31, grid%ed31, grid%sd32, grid%ed32, grid%sd33, grid%ed33, &
                              grid%sm31,  grid%em31,  grid%sm32,  grid%em32,  grid%sm33,  grid%em33, &
                              grid%sm31x, grid%em31x, grid%sm32x, grid%em32x, grid%sm33x, grid%em33x, &   ! x-xpose
@@ -781,10 +784,11 @@ CONTAINS
       new_grid%num_parents = 0
       new_grid%max_tiles   = 0
       new_grid%num_tiles_spec   = 0
+      new_grid%nframes   = 0         ! initialize the number of frames per file (array assignment)
 
-      CALL alloc_space_field ( new_grid, domain_id , .TRUE. ,          &
-                               sd1, ed1, sd2, ed2, sd3, ed3, &
-                               sm1,  em1,  sm2,  em2,  sm3,  em3, &
+      CALL alloc_space_field ( new_grid, domain_id , 3 ,           &
+                               sd1, ed1, sd2, ed2, sd3, ed3,       &
+                               sm1,  em1,  sm2,  em2,  sm3,  em3,  &
                                sm1x, em1x, sm2x, em2x, sm3x, em3x, &   ! x-xpose
                                sm1y, em1y, sm2y, em2y, sm3y, em3y  &   ! y-xpose
       )
@@ -958,7 +962,7 @@ CONTAINS
 
       TYPE(domain)               , POINTER          :: grid
       INTEGER , INTENT(IN)            :: id
-      LOGICAL , INTENT(IN)            :: setinitval
+      INTEGER , INTENT(IN)            :: setinitval   ! 3 = everything, 1 = arrays only, 0 = none
       INTEGER , INTENT(IN)            :: sd31, ed31, sd32, ed32, sd33, ed33
       INTEGER , INTENT(IN)            :: sm31, em31, sm32, em32, sm33, em33
       INTEGER , INTENT(IN)            :: sm31x, em31x, sm32x, em32x, sm33x, em33x
@@ -989,10 +993,13 @@ CONTAINS
       num_bytes_allocated = 0 
 
 
-      IF      ( .FALSE. )           THEN
+      IF ( dyn_opt == DYN_NODYN ) THEN
+
+        CALL wrf_message ( 'DYNAMICS OPTION: dynamics disabled ' )
+# include <nodyn_allocs.inc>
 
 #if (EM_CORE == 1)
-      ELSE IF ( dyn_opt == DYN_EM ) THEN
+      ELSE IF ( mod(dyn_opt, 100) == DYN_EM ) THEN
         CALL wrf_message ( 'DYNAMICS OPTION: Eulerian Mass Coordinate ')
 # include <em_allocs.inc>
 #endif
@@ -1006,18 +1013,14 @@ CONTAINS
         CALL wrf_message ( 'DYNAMICS OPTION: coamps dyncore' )
 # include <coamps_allocs.inc>
 #endif
-
-!### 13. Edit frame/module_domain.F to add case for DYN_EXP to
-!### alloc_space_field.  (This is a bug;
-!### one should never have to edit the framework code; will fix this in
-!### coming versions).  Same goes for share/start_domain.F, although this
-!### is not a framework routine.
 #if (EXP_CORE==1)
       ELSE IF ( dyn_opt == DYN_EXP ) THEN
         CALL wrf_message ( 'DYNAMICS OPTION: experimental dyncore' )
 # include <exp_allocs.inc>
 #endif
+
       ELSE
+
         WRITE( wrf_err_message , * )'Invalid specification of dynamics: dyn_opt = ',dyn_opt
         CALL wrf_error_fatal ( TRIM ( wrf_err_message ) )
       ENDIF
@@ -1100,7 +1103,7 @@ CONTAINS
       IF      ( .FALSE. )           THEN
 
 #if (EM_CORE == 1)
-      ELSE IF ( dyn_opt == DYN_EM ) THEN
+      ELSE IF ( mod(dyn_opt, 100) == DYN_EM ) THEN
 # include <em_deallocs.inc>
 #endif
 #if (NMM_CORE == 1)

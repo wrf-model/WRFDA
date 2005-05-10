@@ -49,9 +49,14 @@
    INTEGER     :: sm31x , em31x , sm32x , em32x , sm33x , em33x
    INTEGER     :: sm31y , em31y , sm32y , em32y , sm33y , em33y
 
+   INTEGER     :: hr, mn, sec, ms, rc
+
+   CHARACTER*80 :: message
+
    REAL :: qvf1, qvf2, qvf
    REAL :: MPDT
    LOGICAL :: first_trip_for_this_domain
+   REAL    :: wgt1, wgt2, zw, z1, z2
 
 ! Trick problematic compilers into not performing copy-in/copy-out by adding
 ! indices to array arguments in the CALL statements in this routine.
@@ -220,13 +225,36 @@
 ! MPDT is the call frequency for microphysics in minutes (0 means every step)
    MPDT = 0.
 
+! set GMT outside of phy_init because phy_init may not be called on this
+! process if, for example, it is a moving nest and if this part of the domain is not
+! being initialized (not the leading edge).
+   IF ( .NOT. grid%restart ) THEN
+     CALL wrf_clockprint(150, grid%domain_clock, &
+                         'DEBUG phy_init():  get currTime from grid%domain_clock,')
+     CALL ESMF_ClockGet( grid%domain_clock, currTime=grid%current_time, rc=rc )
+     CALL ESMF_TimeGet( grid%current_time, YY=julyr, dayOfYear=julday, H=hr, M=mn, S=sec, MS=ms, rc=rc)
+     CALL wrf_timetoa ( grid%current_time, message )
+     WRITE( wrf_err_message , * ) 'DEBUG start_em():  currTime = [',TRIM( message ),']'
+     CALL wrf_debug( 150, TRIM(wrf_err_message) )
+     gmt=hr+real(mn)/60.+real(sec)/3600.+real(ms)/(1000*3600)
+     WRITE( wrf_err_message , * ) 'DEBUG start_em():  julyr,hr,mn,sec,ms,julday = ', &
+                                  julyr,hr,mn,sec,ms,julday
+     CALL wrf_debug( 150, TRIM(wrf_err_message) )
+     WRITE( wrf_err_message , * ) 'DEBUG start_em():  gmt = ',gmt
+     CALL wrf_debug( 150, TRIM(wrf_err_message) )
+   ELSE
+     CALL nl_get_julyr (grid%id, julyr)
+     CALL nl_get_julday (grid%id, julday)
+     CALL nl_get_gmt (grid%id, gmt)
+   END IF
+
    CALL set_tiles ( grid , imask_nostag, ims, ime, jms, jme, ips, ipe, jps, jpe )
 
 ! Phy_init is not necessarily thread-safe; do not multi-thread this loop.
 ! The tiling is to handle the fact that we may be masking off part of the computation.
    DO ij = 1, grid%num_tiles
 
-   CALL phy_init   (  grid,                                   &  
+     CALL phy_init (  grid,                                   &  
                       grid%id , config_flags, DT, znw, znu,   &
                       p_top, TSK, RADT,BLDT,CUDT, MPDT,       &
                       RTHCUTEN, RQVCUTEN, RQRCUTEN,           &
@@ -376,6 +404,7 @@
                            its , ite , jts , jte , &
                            its , ite , jts , jte   )
 
+   IF ( .not. restart ) THEN 
    CALL set_w_surface(  config_flags,                                      &
                         w_1, ht, u_1, v_1, cf1, cf2, cf3, rdx, rdy, msft,  &
                         ids, ide, jds, jde, kds, kde,                      &
@@ -388,6 +417,7 @@
                         ips, ipe, jps, jpe, kps, kpe,                      &
                         its, ite, jts, jte, kts, kte,                      &
                         ims, ime, jms, jme, kms, kme                      )
+   END IF
 
 ! finished setting kinematic condition for w at the surface
 
@@ -597,6 +627,21 @@
                          ims , ime , jms , jme , &
                          its , ite , jts , jte , &
                          its , ite , jts , jte   ) 
+
+! initial surface pressure (xyh)
+
+    do j = jts,min( jte,jde-1 )
+    do i = its,min( ite,ide-1 )
+      zw = (phb(i,1,j)+ph_1(i,1,j))/g
+      z1 = 0.5*(ph_1(i,1,j)+phb(i,1,j)+ph_1(i,2,j)+phb(i,2,j))/g
+      z2 = 0.5*(ph_1(i,2,j)+phb(i,2,j)+ph_1(i,3,j)+phb(i,3,j))/g
+      wgt1 = (zw - z2)/(z1 - z2)
+      wgt2 = 1. - wgt1
+      psfc (i,j) = wgt1*(p(i,1,j) + pb(i,1,j)) &
+                  +wgt2*(p(i,2,j) + pb(i,2,j))
+      psfcm(i,j) = psfc(i,j)
+    enddo
+    enddo
 
 #ifdef DM_PARALLEL
 #   include "HALO_EM_INIT_1.inc"

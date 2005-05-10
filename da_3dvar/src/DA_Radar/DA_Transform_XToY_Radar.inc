@@ -39,7 +39,7 @@ SUBROUTINE da_transform_xtoy_Radar ( xa, xb, iv, xp, y )
 
    IF ( iv%num_Radar > 0 ) THEN
 
-      do n=1, iv % num_Radar
+      do n=iv%ob_numb(iv%current_ob_time-1)%radar + 1, iv%ob_numb(iv%current_ob_time)%radar
 
        if(iv%Radar(n)%loc%proc_domain_with_halo) then
 
@@ -104,8 +104,8 @@ SUBROUTINE da_transform_xtoy_Radar ( xa, xb, iv, xp, y )
 
          do k = 1, num_levs
 
-           y%Radar(n)%rv(k) = 0.0
-           y%Radar(n)%rf(k) = 0.0
+!xyh           y%Radar(n)%rv(k) = 0.0
+!xyh           y%Radar(n)%rf(k) = 0.0
 
            IF ( iv % Radar(n) % height_qc(k) /= below_model_surface .and.  &
                 iv % Radar(n) % height_qc(k) /= above_model_lid ) THEN

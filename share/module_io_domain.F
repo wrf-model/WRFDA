@@ -73,18 +73,39 @@ CONTAINS
    LOGICAL                   :: anyway
    CALL wrf_debug ( 100 , 'calling wrf_open_for_read_begin in open_u_dataset' )
    CALL wrf_debug ( 0 , 'calling wrf_open_for_read_begin in open_u_dataset' )
-   CALL wrf_open_for_read_begin ( fname ,     &
-                                   grid%communicator ,         &
-                                   grid%iocommunicator ,       &
-                                   sysdepinfo ,                &
-                                   id ,                        &
-                                   ierr )
+
+   write(unit=*, fmt='(2a,2x,a,i6)') 'file:', __FILE__, 'line:', __LINE__
+   write(unit=*, fmt='(2a)') 'fname=', trim(fname)
+
+   CALL wrf_open_for_read ( fname ,                     &
+                            grid%communicator ,         &
+                            grid%iocommunicator ,       &
+                            sysdepinfo ,                &
+                            id ,                        &
+                            ierr )
+
+!  CALL wrf_open_for_read_begin ( fname ,     &
+!                                 grid%communicator ,         &
+!                                 grid%iocommunicator ,       &
+!                                 sysdepinfo ,                &
+!                                 id ,                        &
+!                                 ierr )
+
+   write(unit=*, fmt='(2a,2x,a,i6)') 'file:', __FILE__, 'line:', __LINE__
+   write(unit=*, fmt='(2a)') 'sysdepinfo=', trim(sysdepinfo)
+   write(unit=*, fmt='(a,i6)') 'file id:', id
+   write(unit=*, fmt='(a,i6)') 'ierr:', ierr
+
    IF ( ierr .LE. 0 ) THEN
      CALL wrf_debug ( 100 , 'calling insub in open_u_dataset' )
      CALL wrf_debug ( 0 , 'calling insub in open_u_dataset' )
      CALL insub( id , grid , config_flags , ierr )
      CALL wrf_debug ( 0 , 'back from insub in open_u_dataset' )
    ENDIF
+
+   write(unit=*, fmt='(2a,2x,a,i6)') 'file:', __FILE__, 'line:', __LINE__
+   write(unit=*, fmt='(a,i6)') 'ierr:', ierr
+
    IF ( ierr .LE. 0 ) THEN
      CALL wrf_debug ( 100 , 'calling wrf_open_for_read_commit in open_u_dataset' )
      CALL wrf_debug ( 0 , 'calling wrf_open_for_read_commit in open_u_dataset' )
@@ -92,6 +113,10 @@ CONTAINS
                                        ierr )
      CALL wrf_debug ( 0 , 'back from wrf_open_for_read_commit in open_u_dataset' )
    ENDIF
+
+   write(unit=*, fmt='(2a,2x,a,i6)') 'file:', __FILE__, 'line:', __LINE__
+   write(unit=*, fmt='(a,i6)') 'ierr:', ierr
+
   END SUBROUTINE open_u_dataset
 
   SUBROUTINE close_dataset( id , config_flags, sysdepinfo ) 

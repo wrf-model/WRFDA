@@ -43,10 +43,10 @@ SUBROUTINE solve_interface ( grid )
 
 #include "deref_kludge.h"
 
-   IF ( .FALSE.                         ) THEN
+   IF ( config_flags%dyn_opt == DYN_NODYN  ) THEN
 
 #if (EM_CORE == 1 && DA_CORE != 1)
-   ELSE IF ( config_flags%dyn_opt == DYN_EM  ) THEN
+   ELSE IF ((config_flags%dyn_opt == DYN_EM) .or. (config_flags%dyn_opt == DYN_EM_SN)) THEN
      CALL solve_em  ( grid , config_flags , &
 !
 # include <em_actual_args.inc>

@@ -24,9 +24,13 @@ OBJS    = 		\
 	mediation_feedback_domain.o	\
 	mediation_wrfmain.o		\
 	solve_interface.o               \
+	solve_interface_ad.o            \
+	solve_interface_tl.o            \
+	solve_interface_tst.o           \
         start_domain.o                  \
         init_modules.o                  \
         set_timekeeping.o               \
+        Setup_ad_date_string.o          \
         interp_fcn.o sint.o             \
         input_wrf.o                     \
         output_wrf.o                    \
@@ -59,7 +63,8 @@ OBJS    = 		\
         wrf_auxinput5in.o               \
         wrf_bdyin.o             	\
         wrf_histin.o            	\
-        wrf_restartin.o
+        wrf_restartin.o			\
+	landread.o
 
 
 NMM_MODULES = 
@@ -86,6 +91,18 @@ clean:
 # DEPENDENCIES : only dependencies after this line (don't remove the word DEPENDENCIES)
 
 solve_interface.o: solve_em.int ../frame/module_domain.o ../frame/module_configure.o \
+		../frame/module_timing.o ../frame/module_driver_constants.o \
+		../frame/module_wrf_error.o
+
+solve_interface_tl.o: solve_em_tl.int ../frame/module_domain.o ../frame/module_configure.o \
+		../frame/module_timing.o ../frame/module_driver_constants.o \
+		../frame/module_wrf_error.o
+
+solve_interface_ad.o: solve_em_ad.int ../frame/module_domain.o ../frame/module_configure.o \
+		../frame/module_timing.o ../frame/module_driver_constants.o \
+		../frame/module_wrf_error.o
+
+solve_interface_tst.o: solve_em_tst.int ../frame/module_domain.o ../frame/module_configure.o \
 		../frame/module_timing.o ../frame/module_driver_constants.o \
 		../frame/module_wrf_error.o
 
@@ -164,6 +181,9 @@ mediation_interp_domain.o: ../frame/module_domain.o ../frame/module_configure.o 
 #			module_date_time.o module_bc_time_utilities.o \
 #			module_io_domain.o
 
+Setup_ad_date_string.o: ../frame/module_domain.o ../frame/module_configure.o \
+			$(ESMF_MOD_DEPENDENCE)
+
 set_timekeeping.o: ../frame/module_domain.o ../frame/module_configure.o \
 			$(ESMF_MOD_DEPENDENCE)
 
@@ -172,6 +192,9 @@ module_wrf_setservices.o: module_wrf_esmf_super.o
 module_wrf_esmf_super.o: ../frame/module_machine.o \
 			../frame/module_domain.o \
 			../frame/module_integrate.o \
+			../frame/module_integrate_ad.o \
+			../frame/module_integrate_tl.o \
+			../frame/module_integrate_tst.o \
 			../frame/module_driver_constants.o \
 			../frame/module_configure.o \
 			../frame/module_timing.o \

@@ -5,7 +5,7 @@ MODULE module_integrate_tl
 
 CONTAINS
 
-RECURSIVE SUBROUTINE tl_integrate ( grid )
+RECURSIVE SUBROUTINE integrate_tl ( grid )
 
 
 
@@ -43,11 +43,12 @@ RECURSIVE SUBROUTINE tl_integrate ( grid )
 ! (<a href="setup_timekeeping.html">setup_timekeeping</a>) at the time
 ! that the domain is initialized.
 ! The lower-level time library and the type declarations for the times
-! and time intervals used are defined in external/esmf_time_f90, or, if 
-! WRF_ESMF_MOD is defined during build, a site-specific installation of the 
-! ESMF library is used.  Note that arithmetic and comparison is performed 
-! on these data types using F90 operator overloading, also defined in that 
-! library.
+! and time intervals used are defined in external/esmf_time_f90 which, 
+! depending on build-time options, either incorporates the embedded ESMF 
+! subset implementation contained in that directory or incorporates a 
+! site-specific installation of the ESMF library.  Note that arithmetic and 
+! comparison is performed on these data types using F90 operator overloading, 
+! also defined in that library.
 ! 
 ! This routine is the lowest level of the WRF Driver Layer and for the most
 ! part the WRF routines that are called from here are in the topmost level
@@ -106,7 +107,7 @@ RECURSIVE SUBROUTINE tl_integrate ( grid )
 ! calling <a href=med_before_solve_io.html>med_before_solve_io</a>. In WRF this is the point at which history and
 ! restart data is output.
 ! 
-! 4.f  Call <a href=tl_solve_interface.html>tl_solve_interface</a> which calls the solver that advance the domain 
+! 4.f  Call <a href=solve_interface_tl.html>solve_interface_tl</a> which calls the solver that advance the domain 
 ! one time step, then advance the domain's clock by calling ESMF_ClockAdvance.  Upon advancing the clock,
 ! the current time for the grid is updated by calling ESMF_ClockGet. The enclosing WHILE loop around
 ! this section is for handling other domains with which this domain may overlap.  It is not active in WRF 2.0 and
@@ -157,10 +158,10 @@ RECURSIVE SUBROUTINE tl_integrate ( grid )
    ! interface
    INTERFACE
        ! mediation-supplied solver
-     SUBROUTINE tl_solve_interface ( grid )
+     SUBROUTINE solve_interface_tl ( grid )
        USE module_domain
        TYPE (domain) grid
-     END SUBROUTINE tl_solve_interface
+     END SUBROUTINE solve_interface_tl
        ! mediation-supplied routine to allow driver to pass time information
        ! down to mediation/model layer
      SUBROUTINE med_calc_model_time ( grid , config_flags )
@@ -250,7 +251,7 @@ RECURSIVE SUBROUTINE tl_integrate ( grid )
       CALL model_to_grid_config_rec ( grid%id , model_config_rec , config_flags )
       CALL ESMF_ClockGet( grid%domain_clock, currTime=grid%current_time, rc=rc )
       CALL wrf_clockprint ( 150, grid%domain_clock, &
-                            'DEBUG:  top of integrate(),' )
+                            'DEBUG:  top of integrate_tl(),' )
       DO WHILE ( grid%current_time .LT. grid%stop_subtime )
          IF ( wrf_dm_on_monitor() ) THEN
            CALL start_timing
@@ -275,19 +276,19 @@ RECURSIVE SUBROUTINE tl_integrate ( grid )
          CALL med_before_solve_io ( grid , config_flags )
          grid_ptr => grid
          DO WHILE ( ASSOCIATED( grid_ptr ) )
-            CALL wrf_debug( 100 , 'module_integrate: calling solve interface ' )
-            CALL tl_solve_interface ( grid_ptr ) 
+            CALL wrf_debug( 100 , 'module_integrate_tl: calling solve interface _tl' )
+            CALL solve_interface_tl ( grid_ptr ) 
             CALL wrf_clockprint ( 150, grid_ptr%domain_clock, &
-                                  'DEBUG integrate():  before ESMF_ClockAdvance,' )
+                                  'DEBUG integrate_tl():  before ESMF_ClockAdvance,' )
             CALL ESMF_ClockAdvance( grid_ptr%domain_clock, rc=rc )
             CALL wrf_check_error( ESMF_SUCCESS, rc, &
                                   'ESMF_ClockAdvance() FAILED', &
                                   __FILE__ , &
                                   __LINE__  )
             CALL wrf_clockprint ( 150, grid_ptr%domain_clock, &
-                                  'DEBUG integrate():  after ESMF_ClockAdvance,' )
+                                  'DEBUG integrate_tl():  after ESMF_ClockAdvance,' )
             CALL ESMF_ClockGet( grid_ptr%domain_clock, currTime=grid_ptr%current_time, rc=rc )
-            CALL wrf_debug( 100 , 'module_integrate: back from solve interface ' )
+            CALL wrf_debug( 100 , 'module_integrate_tl: back from solve interface _tl' )
             grid_ptr => grid_ptr%sibling
          END DO
          CALL med_calc_model_time ( grid , config_flags )
@@ -297,16 +298,16 @@ RECURSIVE SUBROUTINE tl_integrate ( grid )
             DO kid = 1, max_nests
               IF ( ASSOCIATED( grid_ptr%nests(kid)%ptr ) ) THEN
                 ! Recursive -- advance nests from previous time level to this time level.
-                CALL wrf_debug( 100 , 'module_integrate: calling med_nest_force ' )
+                CALL wrf_debug( 100 , 'module_integrate_tl: calling med_nest_force ' )
                 CALL med_nest_force ( grid_ptr , grid_ptr%nests(kid)%ptr , config_flags )
-                CALL wrf_debug( 100 , 'module_integrate: back from med_nest_force ' )
+                CALL wrf_debug( 100 , 'module_integrate_tl: back from med_nest_force ' )
                 grid_ptr%nests(kid)%ptr%start_subtime = grid%current_time - grid%step_time
                 grid_ptr%nests(kid)%ptr%stop_subtime = grid%current_time
-                CALL tl_integrate ( grid_ptr%nests(kid)%ptr ) 
-                CALL wrf_debug( 100 , 'module_integrate: back from recursive call to integrate ' )
-                CALL wrf_debug( 100 , 'module_integrate: calling med_nest_feedback ' )
+                CALL integrate_tl ( grid_ptr%nests(kid)%ptr ) 
+                CALL wrf_debug( 100 , 'module_integrate_tl: back from recursive call to integrate_tl ' )
+                CALL wrf_debug( 100 , 'module_integrate_tl: calling med_nest_feedback ' )
                 CALL med_nest_feedback ( grid_ptr , grid_ptr%nests(kid)%ptr , config_flags )
-                CALL wrf_debug( 100 , 'module_integrate: back from med_nest_feedback ' )
+                CALL wrf_debug( 100 , 'module_integrate_tl: back from med_nest_feedback ' )
 #ifdef MOVE_NESTS
                 CALL med_nest_move ( grid_ptr , grid_ptr%nests(kid)%ptr )
 #endif
@@ -333,6 +334,7 @@ RECURSIVE SUBROUTINE tl_integrate ( grid )
       ENDIF
    END IF
 
-END SUBROUTINE tl_integrate
+END SUBROUTINE integrate_tl
 
 END MODULE module_integrate_tl
+

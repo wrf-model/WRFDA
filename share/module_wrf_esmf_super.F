@@ -11,6 +11,9 @@ MODULE module_wrf_esmf_super
    USE module_machine
    USE module_domain
    USE module_integrate
+   USE module_integrate_ad
+   USE module_integrate_tl
+   USE module_integrate_tst
    USE module_driver_constants
    USE module_configure
 
@@ -264,13 +267,15 @@ CONTAINS
 
    END SUBROUTINE wrf_init
 
-
-
    SUBROUTINE wrf_run( gcomp, importState, exportState, clock, rc )
      TYPE(ESMF_GridComp), INTENT(INOUT) :: gcomp
      TYPE(ESMF_State), INTENT(INOUT) :: importState, exportState
      TYPE(ESMF_Clock), INTENT(INOUT) :: clock
      INTEGER, INTENT(OUT) :: rc
+
+     character(len=19), dimension(25) :: ad_date_string
+     integer                          :: ad_date_index
+
 !<DESCRIPTION>
 !     WRF run routine.
 !
@@ -284,7 +289,30 @@ CONTAINS
 !</DESCRIPTION>
 
    CALL       wrf_debug ( 100 , 'wrf: calling integrate' )
-   CALL integrate ( head_grid )
+
+   IF ( config_flags%dyn_opt == DYN_EM ) THEN
+      CALL integrate ( head_grid )
+   ELSE IF ( config_flags%dyn_opt == DYN_EM_SN ) THEN
+      CALL integrate ( head_grid )
+   ELSE IF ( config_flags%dyn_opt == DYN_EM_TL ) THEN
+      CALL integrate_tl ( head_grid )
+   ELSE IF ( config_flags%dyn_opt == DYN_EM_AD ) THEN
+
+! - Look for boundary data after writing out history and restart files
+      CALL med_latbound_in ( head_grid , config_flags )
+
+      CALL Setup_ad_date_string (head_grid, ad_date_string )
+      ad_date_index = 1
+
+      head_grid%current_time = head_grid%stop_time
+      CALL ESMF_ClockSetCurrTime( head_grid%domain_clock, currTime=head_grid%current_time, rc=rc )
+      CALL ESMF_ClockGetCurrTime( head_grid%domain_clock, currTime=head_grid%current_time, rc=rc )
+
+      CALL integrate_ad ( head_grid, ad_date_string, ad_date_index )
+   ELSE IF ( config_flags%dyn_opt == DYN_EM_TST ) THEN
+      CALL integrate_tst ( head_grid )
+   ENDIF
+
    CALL       wrf_debug ( 100 , 'wrf: back from integrate' )
 
    ! return success status

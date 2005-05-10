@@ -20,8 +20,8 @@ SUBROUTINE DA_Transform_VvToVp_Adj( evec, eval, vertical_wgt, &
    integer, intent(in)   :: ims,ime, jms,jme, kms,kme  ! memory dims.
    integer, intent(in)   :: its,ite, jts,jte, kts,kte  ! tile   dims
 
-   real, intent(in)      :: evec(jts:jte,kts:kte,1:mz) ! Eigenvectors.
-   real, intent(in)      :: eval(jts:jte,1:mz)         ! Eigenvalues.
+   real, intent(in)      :: evec(jds:jde,kds:kde,1:mz) ! Eigenvectors.
+   real, intent(in)      :: eval(jds:jde,1:mz)         ! Eigenvalues.
    real, intent(in)      :: vertical_wgt(ims:ime,jms:jme,kms:kme) ! Weighting.
    real, intent(inout)   :: vp(ims:ime,jms:jme,kms:kme)! CV in level space.
    real, intent(out)     :: vv(ims:ime,jms:jme,kms:kme)! CV in EOF space.

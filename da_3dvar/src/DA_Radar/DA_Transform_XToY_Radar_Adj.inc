@@ -39,7 +39,7 @@ SUBROUTINE da_transform_xtoy_Radar_Adj( xb, iv, xp, jo_grad_y, jo_grad_x )
 
    IF ( iv%num_Radar > 0 ) THEN
 
-      DO n=1, iv % num_Radar
+      do n=iv%ob_numb(iv%current_ob_time-1)%radar + 1, iv%ob_numb(iv%current_ob_time)%radar
 
        if(iv%Radar(n)%loc%proc_domain_with_halo) then
 

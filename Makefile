@@ -59,14 +59,20 @@ wrf : configcheck
 	( cd main ; $(MAKE) MODULE_DIRS="$(ALL_MODULES)" SOLVER=em em_wrf )
 	( cd run ; /bin/rm -f wrf.exe ; ln -s ../main/wrf.exe . )
 
-3dvar : 
+var : 
 	/bin/rm -f main/libwrflib.a
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" ext
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" toolsdir
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" REGISTRY="Registry" framework
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" shared
-	$(MAKE) MODULE_DIRS="$(ALL_MODULES)" physics
-	$(MAKE) MODULE_DIRS="$(ALL_MODULES)" em_core
+	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" da_3dvar_io
+	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" wrfvar_src
+	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" da_3dvar_interface
+	( cd main ; $(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" da_3dvar )
+
+pure_var : 
+	@ echo 'This option assumes that you have already compiled the WRF frame part correctly.'
+	@ echo 'If you have not done so, please use compile 3dvar'
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" da_3dvar_io
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" wrfvar_src
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" da_3dvar_interface
@@ -111,8 +117,17 @@ be_wrf :
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" toolsdir
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" REGISTRY="Registry" framework
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" shared
-	$(MAKE) MODULE_DIRS="$(ALL_MODULES)" physics
-	$(MAKE) MODULE_DIRS="$(ALL_MODULES)" em_core
+	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" da_3dvar_io
+	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES_2)" gen_be_long
+	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" gen_be_interface
+	( cd gen_be ; \
+	/bin/rm -f *.exe ; \
+	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" SOLVER=gen_be ; \
+	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" gen_be_stage0 )
+
+pure_be_wrf :
+	@ echo 'This option assumes that you have already compiled the WRF frame part correctly.'
+	@ echo 'If you have not done so, please use compile be_wrf'
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" da_3dvar_io
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES_2)" gen_be_long
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" gen_be_interface

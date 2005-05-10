@@ -1,8 +1,9 @@
-subroutine DA_Minimise_QN( it, ob, xb, xbx, be, iv, xhat,    &
+subroutine DA_Minimise_QN( grid, config_flags,               &
+                           it, ob, xb, xbx, be, iv, xhat,    &
                            cv, xa, vv, vp, xp, re, y, j,     &
                            ids, ide, jds, jde, kds, kde,     &
                            ims, ime, jms, jme, kms, kme,     &
-                           its, ite, jts, jte, kts, kte )
+                           its, ite, jts, jte, kts, kte      )
 
 !-------------------------------------------------------------------------
 !  Purpose: Main subroutine for Quasi Newton minimisation
@@ -10,27 +11,30 @@ subroutine DA_Minimise_QN( it, ob, xb, xbx, be, iv, xhat,    &
 
       implicit none
 
-      integer, intent(in)               :: it    ! external iteration.
-      type (y_type), intent(in)         :: ob    ! Observation structure.
-      type (xb_type), intent(in)        :: xb    ! first guess (local).
-      type (xbx_type),intent(in)        :: xbx   ! Header & non-gridded vars.
-      type (be_type), intent(in)        :: be    ! background error structure.
-      type (ob_type), intent(in)        :: iv    ! ob. increment vector.
-      real,intent(out),dimension(cv_size)::xhat! Increament control variable
-      type (cv_type), intent(inout)     :: cv    ! control variable (local).
-      type (x_type), intent(out)        :: xa    ! analysis increments (local).
-      type (vp_type), intent(inout)     :: vv    ! Grdipt/EOF CV.
-      type (vp_type), intent(inout)     :: vp    ! Grdipt/level CV.
-      type (xpose_type), intent(inout)  :: xp    ! Dimensions and xpose buffers. 
-      type (y_type), intent(inout)      :: re    ! residual (o-a) structure.
-      type (y_type), intent(inout)      :: y     ! y = H(x_inc) structure.
+      integer, intent(in)                 :: it    ! external iteration.
+      type (y_type), intent(in)           :: ob    ! Observation structure.
+      type (xb_type), intent(in)          :: xb    ! first guess (local).
+      type (xbx_type),intent(in)          :: xbx   ! Header & non-gridded vars.
+      type (be_type), intent(in)          :: be    ! background error structure.
+      type (ob_type), intent(inout)       :: iv    ! ob. increment vector.
+      real,intent(out),dimension(cv_size) :: xhat  ! Increament control variable
+      type (cv_type), intent(inout)       :: cv    ! control variable (local).
+      type (x_type), intent(out)          :: xa    ! analysis increments (local).
+      type (vp_type), intent(inout)       :: vv    ! Grdipt/EOF CV.
+      type (vp_type), intent(inout)       :: vp    ! Grdipt/level CV.
+      type (xpose_type), intent(inout)    :: xp    ! Dimensions and xpose buffers.
+      type (y_type), intent(inout)        :: re    ! residual (o-a) structure.
+      type (y_type), intent(inout)        :: y     ! y = H(x_inc) structure.
 
-      LOGICAL, EXTERNAL :: wrf_dm_on_monitor     ! For statistics output.
+!     LOGICAL, EXTERNAL :: wrf_dm_on_monitor       ! For statistics output.
 
-      type (j_type), intent(out)        :: j     ! cost function
-      integer, intent(in)           :: ids,ide, jds,jde, kds,kde ! domain dims.
-      integer, intent(in)           :: ims,ime, jms,jme, kms,kme ! memory dims.
-      integer, intent(in)           :: its,ite, jts,jte, kts,kte ! tile   dims.
+      type (j_type), intent(out) :: j                         ! cost function
+      integer, intent(in)        :: ids,ide, jds,jde, kds,kde ! domain dims.
+      integer, intent(in)        :: ims,ime, jms,jme, kms,kme ! memory dims.
+      integer, intent(in)        :: its,ite, jts,jte, kts,kte ! tile   dims.
+
+      type(domain) ,   TARGET                   :: grid
+      type(grid_config_rec_type), intent(inout) :: config_flags
       
       integer                           :: iflag, info
       integer                           :: ipoint, ifev
@@ -39,15 +43,14 @@ subroutine DA_Minimise_QN( it, ob, xb, xbx, be, iv, xhat,    &
       integer                           :: iter_start
       integer                           :: iter_inner
       integer                           :: ip
-      real                              :: step   ! minimization step size.
+      real                              :: step        ! minimization step size.
       real                              :: j_grad_norm ! target gradient norm.
-      real, dimension(cv_size)          :: j_grad ! grad_v j (local-grid)
-      real, dimension(cv_size)          :: j_grad_old ! grad_v j from previous iter
-      real, dimension(cv_size)          :: work   ! work array
-      real, dimension(nsave*cv_size)    :: zs, zy ! work arrays for minimization
-      real, dimension(2*nsave+cv_size)  :: zw     ! work arrays for minimization
+      real, dimension(cv_size)          :: j_grad      ! grad_v j (local-grid)
+      real, dimension(cv_size)          :: j_grad_old  ! grad_v j from previous iter
+      real, dimension(cv_size)          :: work        ! work array
+      real, dimension(nsave*cv_size)    :: zs, zy      ! work arrays for minimization
+      real, dimension(2*nsave+cv_size)  :: zw          ! work arrays for minimization
       integer, dimension(2)             :: iprint
-
       logical                           :: llfin
 
       write (6,'(A)') &
@@ -96,20 +99,17 @@ subroutine DA_Minimise_QN( it, ob, xb, xbx, be, iv, xhat,    &
       xhat = 0.0
 
       call da_calculate_j(it,  0, xb, xbx, be, iv, xhat, cv % array, &
-                           vv, vp, xp, re, y, xa, j, j_grad,   &
-                           ids, ide, jds, jde, kds, kde,       &
-                           ims, ime, jms, jme, kms, kme,       &
-                           its, ite, jts, jte, kts, kte )
+                           vv, vp, xp, re, y, xa, j, j_grad,         &
+                           ids, ide, jds, jde, kds, kde,             &
+                           ims, ime, jms, jme, kms, kme,             &
+                           its, ite, jts, jte, kts, kte,             &
+                           grid, config_flags                        )
 
       if( j %total == 0.0) go to 1004
 
       llfin = .false.
 
-      if(global) then
-         j_grad_norm = sqrt( dot_product( j_grad, j_grad ) )
-      else
-         j_grad_norm = sqrt( da_dot( j_grad, j_grad, cv_size ) )
-      endif
+      j_grad_norm = sqrt( da_dot( j_grad, j_grad, cv_size ) )
 
       if (j_grad_norm > 1.0e-20) step = 1.0 / j_grad_norm
       j_grad_old = j_grad
@@ -163,12 +163,13 @@ subroutine DA_Minimise_QN( it, ob, xb, xbx, be, iv, xhat,    &
                if ( info == -1 ) then
                   iflag = 1
 
-                  call da_calculate_j(it,  iter, xb, xbx, be, iv,xhat, & 
+                  call da_calculate_j( it, iter, xb, xbx, be, iv,xhat, &
                                        cv % array, vv, vp, xp,         &
                                        re, y, xa, j, j_grad,           &
                                        ids, ide, jds, jde, kds, kde,   &
                                        ims, ime, jms, jme, kms, kme,   &
-                                       its, ite, jts, jte, kts, kte )
+                                       its, ite, jts, jte, kts, kte,   &
+                                       grid, config_flags              )
                   infun = infun + 1
                end if
             end if

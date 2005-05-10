@@ -64,21 +64,24 @@ Additional ones when running 3DVAR:
 
  write_input                         = t,       ; write input-formatted data as output
  inputout_interval                   = 180,     ; interval in minutes when writing input-formatted data 
- input_outname                       = wrf_3dvar_input_d<domain>_<date> ; you may change the output file name
+ input_outname                       = 'wrf_3dvar_input_d<domain>_<date>' ; you may change the output file name
  inputout_begin_y                    = 0
  inputout_begin_mo                   = 0
  inputout_begin_d                    = 0
  inputout_begin_h                    = 3
+ inputout_begin_m                    = 0
  inputout_begin_s                    = 0
  inputout_end_y                      = 0
  inputout_end_mo                     = 0
  inputout_end_d                      = 0
  inputout_end_h                      = 12
+ inputout_end_m                      = 0
  inputout_end_s                      = 0        ; the above shows that the input-formatted data are output
                                                   starting from hour 3 to hour 12 in 180 min interval.
 
  &domains
  time_step                           = 60,	; time step for integration in integer seconds
+                                                  recommend 6*dx (in km) for typical real-data cases
  time_step_fract_num                 = 0,	; numerator for fractional time step 
  time_step_fract_den                 = 1,	; denominator for fractional time step 
                                                   Example, if you want to use 60.3 sec as your time step,
@@ -86,12 +89,14 @@ Additional ones when running 3DVAR:
                                                   time_step_fract_den = 10
  max_dom                             = 1,	; number of domains - set it to > 1 if it is a nested run
  s_we (max_dom)                      = 1,	; start index in x (west-east) direction (leave as is)
- e_we (max_dom)                      = 91,	; end index in x (west-east) direction
+ e_we (max_dom)                      = 91,	; end index in x (west-east) direction (staggered dimension)
  s_sn (max_dom)                      = 1,	; start index in y (south-north) direction (leave as is)
- e_sn (max_dom)                      = 82,	; end index in y (south-north) direction
+ e_sn (max_dom)                      = 82,	; end index in y (south-north) direction (staggered dimension)
  s_vert (max_dom)                    = 1,	; start index in z (vertical) direction (leave as is)
- e_vert (max_dom)                    = 28,	; end index in z (vertical) direction
+ e_vert (max_dom)                    = 28,	; end index in z (vertical) direction (staggered dimension)
+                                                  Note: this refers to full levels including surface and top
                                                   vertical dimensions need to be the same for all nests
+                                                  Note: most variables are unstaggered (= staggered dim - 1)
  dx (max_dom)                        = 10000,	; grid length in x direction, unit in meters
  dy (max_dom)                        = 10000,	; grid length in y direction, unit in meters
  ztop (max_dom)                      = 19000.	; used in mass model for idealized cases
@@ -110,7 +115,7 @@ Additional ones when running 3DVAR:
                                                   option on. 0: no smoothing; 1: 1-2-1 smoothing; 2: smoothing-desmoothing
                                      
 Namelist variables for controling the prototype moving nest: 
-                   Note moving nest needs to be activated at the compile time by adding -DMOVE_NEST 
+                   Note moving nest needs to be activated at the compile time by adding -DMOVE_NESTS
                    to the ARCHFLAGS. The maximum number of moves, max_moves, is set to 50 
                    but can be modified in source code file frame/module_driver_constants.F.
  num_moves                           = 4        ; total number of moves
@@ -163,7 +168,7 @@ Namelist variables for controling the prototype moving nest:
                                      = 99, GFDL (Eta) longwave (semi-supported)
 
  radt (max_dom)                      = 30,	; minutes between radiation physics calls
-                                                  reduce it if grid distance is finer
+                                           recommend 1 min per km of dx (e.g. 10 for 10 km)
 
  sf_sfclay_physics (max_dom)         surface-layer option (old bl_sfclay_physics option)
                                      = 0, no surface-layer
@@ -275,9 +280,10 @@ Namelist variables for controling the prototype moving nest:
  v_mom_adv_order (max_dom)           = 3,       ; vertical momentum advection order
  h_sca_adv_order (max_dom)           = 5,       ; horizontal scalar advection order
  v_sca_adv_order (max_dom)           = 3,       ; vertical scalar advection order
- time_step_sound (max_dom)           = 4 /	; number of sound steps per time-step
+ time_step_sound (max_dom)           = 4 /	; number of sound steps per time-step (0=set automatically)
                                                   (if using a time_step much larger than 6*dx (in km),
-                                                  increase number of sound steps)
+                                                  proportionally increase number of sound steps - also
+                                                  best to use even numbers)
 
 
  &bc_control

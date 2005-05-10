@@ -165,7 +165,7 @@ SFC             =       $(FC)
 CFLAGS          =       
 TRADFLAG        =       -traditional
 FCOPTIM         =       -fast
-FCDEBUG         =       -g
+FCDEBUG         =       #-g
 FCTYPE          =       -r8
 FCFORM          =       -Mfree
 FCHOST          =       
@@ -186,7 +186,7 @@ NETCDFPATH      =       CONFIGURE_NETCDF_PATH
 NETCDF_IO_PATH  =       external/io_netcdf
 NETCDF_LIB	=       CONFIGURE_NETCDF_LIB_PATH
 
-LOCAL_LIBRARIES =       -g -L/usr/local/ncarg/lib -L/usr/X11R6/lib -L/usr/local/lib \
+LOCAL_LIBRARIES =       -L/usr/local/ncarg/lib -L/usr/X11R6/lib -L/usr/local/lib \
 			-lncarg -lncarg_gks -lncarg_c -lX11
 
 CPP             =       /lib/cpp $(TRADFLAG)
@@ -219,7 +219,7 @@ CFLAGS          =       -DDM_PARALLEL -DWRF_RSL_IO \
                         -I../external/RSL/RSL
 TRADFLAG        =       -traditional
 FCOPTIM         =       #-fast
-FCDEBUG         =       -g
+FCDEBUG         =       #-g
 FCTYPE          =       -r8
 FCFORM          =       -Mfree
 FCHOST          =
@@ -238,7 +238,7 @@ NETCDF_IO_PATH  =       external/io_netcdf
 NETCDF_LIB	=       CONFIGURE_NETCDF_LIB_PATH
 MPI_LIB		=	-L../external/RSL/RSL -lrsl
 
-LOCAL_LIBRARIES =       -g -L/usr/local/ncarg/lib -L/usr/X12R6/lib -L/usr/local/lib \
+LOCAL_LIBRARIES =       -L/usr/local/ncarg/lib -L/usr/X12R6/lib -L/usr/local/lib \
                         -lncarg -lncarg_gks -lncarg_c -lX11
 
 CPP             =       /lib/cpp $(TRADFLAG)
@@ -270,7 +270,7 @@ LD              =       $(FC)
 CFLAGS          =       
 TRADFLAG        =       -traditional
 FCOPTIM         =       -O3 -xW
-FCDEBUG         =       -g
+FCDEBUG         =       #-g
 FCTYPE          =       -r8
 FCFORM          =       -FR -cm -w
 FCHOST          =       
@@ -291,7 +291,7 @@ NETCDFPATH      =       CONFIGURE_NETCDF_PATH
 NETCDF_IO_PATH  =       external/io_netcdf
 NETCDF_LIB	=       CONFIGURE_NETCDF_LIB_PATH
 
-LOCAL_LIBRARIES =       -g -L/usr/local/ncarg/lib -L/usr/X11R6/lib -L/usr/local/lib \
+LOCAL_LIBRARIES =       -L/usr/local/ncarg/lib -L/usr/X11R6/lib -L/usr/local/lib \
 			-lncarg -lncarg_gks -lncarg_c -lX11
 
 CPP             =       /lib/cpp $(TRADFLAG)
@@ -750,7 +750,7 @@ F77             =       xlf_r
 LD              =       xlf90_r
 CC              =       cc
 CC_TOOLS        =       cc
-CFLAGS          =       -DNOUNDERSCORE
+CFLAGS          =       -DNOUNDERSCORE -DLANDREAD_STUB
 TRADFLAG        =
 FCOPTIM         =       -O0 -qarch=auto
 FCDEBUG         =       #-g
@@ -791,7 +791,7 @@ F77             =       xlf_r
 LD              =       xlf90_r
 CC              =       cc
 CC_TOOLS        =       cc
-CFLAGS          =       -DNOUNDERSCORE
+CFLAGS          =       -DNOUNDERSCORE -DLANDREAD_STUB
 TRADFLAG        =
 FCOPTIM         =       -O0 -qarch=auto
 FCDEBUG         =       #-g

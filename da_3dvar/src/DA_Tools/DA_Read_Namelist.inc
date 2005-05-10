@@ -25,7 +25,7 @@ SUBROUTINE DA_Read_Namelist
 
 !  Namelist contents :
 
-   NAMELIST /RECORD1/  MODEL_TYPE, write_increments, global
+   NAMELIST /RECORD1/  MODEL_TYPE, write_increments, global, print_detail, lvar4d
    NAMELIST /RECORD2/  ANALYSIS_TYPE, ANALYSIS_DATE, ANALYSIS_ACCU, W_INCREMENTS, &
                        DT_cloud_model, &
                        write_qcw, write_qrn, write_qci, write_qsn, write_qgr
@@ -75,7 +75,7 @@ SUBROUTINE DA_Read_Namelist
                        max_ssmt1_input, &
                        max_ssmt2_input, &
                        max_qscat_input 
-   NAMELIST /RECORD5/  TIME_WINDOW, print_detail, print_obs_info
+   NAMELIST /RECORD5/  TIME_WINDOW, print_obs_info
    NAMELIST /RECORD6/  max_ext_its, EPS, NTMAX, NSAVE, &
                        write_switch, write_interval
    NAMELIST /RECORD7/  rf_passes, &
@@ -111,6 +111,10 @@ SUBROUTINE DA_Read_Namelist
 !--record1
    MODEL_TYPE       = 'WRF'
    WRITE_INCREMENTS = .FALSE.
+   lvar4d           = .false.
+   PRINT_DETAIL     = 0
+   global           = .FALSE. 
+
 
 !--record2
    ANALYSIS_TYPE = '3D-VAR'
@@ -128,7 +132,6 @@ SUBROUTINE DA_Read_Namelist
    fg_format = 1
    ob_format = 2
    num_fgat_time = 1
-   global = .FALSE. 
 
 !--record4
    PROCESS_OBS    = 'YES'
@@ -179,7 +182,6 @@ SUBROUTINE DA_Read_Namelist
 
 !--record5
    TIME_WINDOW    = 3.
-   PRINT_DETAIL   = 0
    print_obs_info = .false.
 
 !--record6
@@ -287,12 +289,16 @@ SUBROUTINE DA_Read_Namelist
 !  [2.0] Read namelist and close:
 !----------------------------------------------------------------------------
    IOST = 0
+
+
    READ  ( UNIT = namelist_unit, NML = RECORD1 , ERR = 8000, IOSTAT = IOST)
 
    if ( print_detail >= 1 ) then
       WRITE(6,'(A,3X,A     )') ' MODEL_TYPE    = ', trim(MODEL_TYPE)
+      WRITE(6,'(A,I4       )') ' print_detail  = ',print_detail
       WRITE(6,'(A,3X,L10   )') ' write_increments = ', write_increments
       WRITE(6,'(A,3X,L5    )') ' Global analysis option=', global         
+      WRITE(6,'(A,3X,L5    )') ' VAR4d =', lvar4d
    endif
 
    READ  ( UNIT = namelist_unit, NML = RECORD2 , ERR = 8000, IOSTAT = IOST)
@@ -348,7 +354,6 @@ SUBROUTINE DA_Read_Namelist
    
    if ( print_detail >= 1 ) then
       WRITE(6,'(A,1X,F6.2,A)') ' TIME_WINDOW   = ',TIME_WINDOW, ' hour(s)'
-      WRITE(6,'(A,I4       )') ' print_detail  = ',print_detail
    end if
    
    READ  ( UNIT = namelist_unit, NML = RECORD6 , ERR = 8000, IOSTAT = IOST)
@@ -658,7 +663,7 @@ SUBROUTINE DA_Read_Namelist
    
    end if
    
-   WRITE(6,'(/)')
+   WRITE(6,'(A)')''
 
    RETURN
 

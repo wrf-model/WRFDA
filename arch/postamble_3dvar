@@ -11,7 +11,7 @@ INCLUDE_MODULES =       -I../da_3dvar -I../da_3dvar/src \
 
 REGISTRY        =       Registry
 CPPFLAGS        =       -I$(LIBINCLUDE) -C -P $(ARCHFLAGS) $(ENVCOMPDEFS) \
-			$(DM_1_CPP_FLAGS) $(OMPCPP) $(COREDEFS) $(POUND_DEF)
+			$(DM_1_CPP_FLAGS) $(COREDEFS) $(POUND_DEF)
 
 INC_MOD_3DVAR   =       -I../../$(NETCDF_IO_PATH) \
 			-I../../da_3dvar -I../../da_3dvar/src \
@@ -23,7 +23,7 @@ FCFLAGS_FFT_RF  =       $(FCOPTIM) $(FC_FFT_RF_OPTS)
 F77FLAGS_BUFR   =       $(FCTYPE) $(FCBUFR) $(FCHOST) $(FCDEBUG) -I.
 F77FLAGS_3DVAR  =       $(FCTYPE) $(FCBASE) $(FCHOST) $(FCDEBUG) -I.
 CPPFLAGS_3DVAR  =       $(DM_2_CPP_FLAGS) \
-                        -I$(LIBINCLUDE) -I../../inc -C -P $(ARCHFLAGS) $(POUND_DEF)
+                        -I$(LIBINCLUDE) -I../../inc -C -P $(ARCHFLAGS) $(POUND_DEF) $(WRFVAR)
 FUFLAGS         =       $(FCOPTIM) $(FCBASE) $(FCFORM) $(FCDEBUG)
 
 wrfio_nf : 
@@ -57,10 +57,16 @@ esmf_time :
 	CPP="$(CPP) -I../../inc -I. $(POUND_DEF)" )
 
 # compile these without high optimization to speed compile
+module_domain.o : module_domain.F
+	$(RM) $@
+	$(SED_FTN) $*.F > $*.b 
+	$(CPP) -I../inc $(CPPFLAGS) $*.b  > $*.f
+	$(RM) $*.b
+	$(FC) -c $(FCBASEOPTS)  -I../external/esmf_time_f90 $*.f
+
 module_io_mm5.o : module_io_mm5.F
 module_si_io.o : module_si_io.F
 module_io_wrf.o : module_io_wrf.F
-module_domain.o : module_domain.F
 module_start.o : module_start.F
 module_initialize.o : module_initialize.F
 module_initialize_b_wave.o : module_initialize_b_wave.F
@@ -76,7 +82,7 @@ mediation_interp_domain.o : mediation_interp_domain.F
 mediation_force_domain.o : mediation_force_domain.F
 mediation_feedback_domain.o : mediation_feedback_domain.F
 
-module_io_mm5.o module_si_io.o module_io_wrf.o module_domain.o \
+module_io_mm5.o module_si_io.o module_io_wrf.o		       \
 module_start.o module_initialize.o module_initialize_b_wave.o  \
 module_initialize_hill2d_x.o module_initialize_quarter_ss.o    \
 module_initialize_squall2d_x.o module_initialize_squall2d_y.o  \

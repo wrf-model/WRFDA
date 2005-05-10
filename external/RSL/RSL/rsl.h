@@ -828,12 +828,10 @@ rsl_index_t id_domain(), id_jdex(), id_idex() ;
 
 /* defines for MPI2 compat */
 
-#ifndef crayx1
 #ifndef MPI2_SUPPORT
 typedef int MPI_Fint;
 #  define MPI_Comm_c2f(comm) (MPI_Fint)(comm)
 #  define MPI_Comm_f2c(comm) (MPI_Comm)(comm)
-#endif
 #endif
 
 /* other includes */

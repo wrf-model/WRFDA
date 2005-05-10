@@ -257,6 +257,15 @@ SUBROUTINE solve_em ( grid , config_flags , &
 
  rk_order = config_flags%rk_ord
  leapfrog = .false.
+
+ IF (time_step_sound == 0) THEN
+! auto-set option
+! This function will give 4 for 6*dx and 6 for 10*dx and returns even numbers only
+   time_step_sound = max ( 2 * ( INT (300.*dt/dx-0.01) + 1 ), 4 )
+   WRITE(wrf_err_message,*)'dx, dt, time_step_sound=',dx,dt,time_step_sound
+   CALL wrf_debug ( 50 , wrf_err_message )
+ ENDIF
+
  dts = dt/float(time_step_sound)
 
  IF(rk_ord == 1) leapfrog = .true.
@@ -392,6 +401,7 @@ BENCH_END(step_prep_tim)
 !   CALL set_tiles ( grid , ids , ide , jds , jde , ips-1 , ipe+1 , jps-1 , jpe+1 )
 
 BENCH_START(set_phys_bc_tim)
+   if(dyn_opt == DYN_EM) then
    !$OMP PARALLEL DO   &
    !$OMP PRIVATE ( ij )
 
@@ -418,6 +428,7 @@ BENCH_START(set_phys_bc_tim)
 
    END DO
    !$OMP END PARALLEL DO
+   endif
 BENCH_END(set_phys_bc_tim)
 
     rk_step_is_one : IF (rk_step == 1) THEN ! only need to initialize diffusion tendencies
@@ -504,6 +515,7 @@ BENCH_END(phy_prep_tim)
 
          CALL wrf_debug ( 200 , ' call radiation_driver' )
 BENCH_START(rad_driver_tim)
+         if(dyn_opt == DYN_EM) then
          CALL radiation_driver(itimestep,dt,AER_DRY,AER_WATER,       &
                     RTHRATENLW,RTHRATENSW,RTHRATEN,GLW,GSW,          &
                     SWDOWN,                                          &
@@ -513,7 +525,6 @@ BENCH_START(rad_driver_tim)
                     GMT,JULDAY,config_flags,RADT,STEPRA,ICLOUD,      &
                     taucldi,taucldc,warm_rain,                       &
                     XLAND,TSK,HTOP,HBOT,CUPPT,VEGFRA,SNOW,           &
-                    F_ICE_PHY,F_RAIN_PHY,                            & ! for new ETARA
                     julyr,                                           &
                     1   ,                                            &
                     TOTSWDN,TOTLWDN,RSWTOA,RLWTOA,CZMEAN,            &
@@ -524,6 +535,7 @@ BENCH_START(rad_driver_tim)
                     grid%i_start, min(grid%i_end, ide-1),            &
                     grid%j_start, min(grid%j_end, jde-1),            &
                     k_start    , min(k_end,kde-1) , grid%num_tiles   )
+         endif
 BENCH_END(rad_driver_tim)
 
 
@@ -532,7 +544,7 @@ BENCH_END(rad_driver_tim)
 ! surface
 
 BENCH_START(surf_driver_tim)
-
+      if(dyn_opt == DYN_EM) then
       CALL wrf_debug ( 200 , ' call surface_driver' )
       CALL surface_driver(                                          &
      &           ACSNOM,ACSNOW,AKHS,AKMS,ALBEDO,BR,CANWAT,CAPG        &
@@ -556,13 +568,15 @@ BENCH_START(surf_driver_tim)
      &          ,grid%i_start, min(grid%i_end, ide-1)                 &
      &          ,grid%j_start, min(grid%j_end, jde-1)                 &
      &          ,k_start    , min(k_end,kde-1) , grid%num_tiles       )
+      endif
 BENCH_END(surf_driver_tim)
 
 !*********
 ! pbl
 
-      CALL wrf_debug ( 200 , ' call pbl_driver' )
 BENCH_START(pbl_driver_tim)
+      if(dyn_opt == DYN_EM) then
+      CALL wrf_debug ( 200 , ' call pbl_driver' )
       CALL pbl_driver(itimestep,dt,u_frame,v_frame                    &
      &           ,RUBLTEN,RVBLTEN,RTHBLTEN                            &
      &           ,RQVBLTEN,RQCBLTEN,RQIBLTEN                          &
@@ -582,37 +596,63 @@ BENCH_START(pbl_driver_tim)
      &           ,grid%i_start, min(grid%i_end,ide-1)                 &
      &           ,grid%j_start, min(grid%j_end,jde-1)                 &
      &           ,k_start    , min(k_end,kde-1) , grid%num_tiles  )
+      endif
 BENCH_END(pbl_driver_tim)
 
 ! cumulus para.
 
-          CALL wrf_debug ( 200 , ' call cumulus_driver' )
-
 BENCH_START(cu_driver_tim)
-         CALL cumulus_driver(itimestep,dt,DX,num_3d_m,                 &
-                     RTHCUTEN,RQVCUTEN,RQCCUTEN,RQRCUTEN,              &
-                     RQICUTEN,RQSCUTEN,RAINC,RAINCV,NCA,               &
-                     RTHRATEN,RTHBLTEN,RQVBLTEN,                       &
-                     RTHFTEN,RQVFTEN,                                  &
-                     u_phy,v_phy,th_phy,t_phy,w_2,moist_2,             &
-                     dz8w,p8w,p_phy,pi_phy,config_flags,               &
-                     W0AVG,rho,STEPCU,                                 &
-                     CLDEFI,LOWLYR,XLAND,CU_ACT_FLAG,warm_rain,        &
-                     apr_gr,apr_w,apr_mc,apr_st,apr_as,apr_capma,      &
-                     apr_capme,apr_capmi,                              &
-                     HTOP,HBOT,KPBL,                                   &
-                     MASS_FLUX,XF_ENS,PR_ENS,ht,                       & ! for Grell-Devenyi
-                     ensdim,maxiens,maxens,maxens2,maxens3,            &
-                     ids,ide, jds,jde, kds,kde,                        &
-                     ims,ime, jms,jme, kms,kme,                        &
-                     grid%i_start, min(grid%i_end, ide-1),             &
-                     grid%j_start, min(grid%j_end, jde-1),             &
-                     k_start    , min(k_end,kde-1) , grid%num_tiles    )
+         if(dyn_opt == DYN_EM) then
+         CALL wrf_debug ( 200 , ' call cumulus_driver' )
+         CALL cumulus_driver(                                          &
+                 ! Order dependent args: domain, mem, tile dims
+                     ids,ide, jds,jde, kds,kde                         &
+                   , ims,ime, jms,jme, kms,kme                         &
+                   , grid%i_start, min(grid%i_end, ide-1)              &
+                   , grid%j_start, min(grid%j_end, jde-1)              &
+                   , k_start  , min(k_end,kde-1) , grid%num_tiles      &
+                 ! Prognostic variables
+                   , U=u_phy   ,V=v_phy   ,TH=th_phy  ,T=t_phy         &
+                   , W=w_2     ,P=p_phy   ,PI=pi_phy  ,RHO=rho         &
+                 ! Other arguments
+                   , ITIMESTEP=itimestep ,DT=dt      ,DX=dx            &
+                   , RAINC=rainc   ,RAINCV=raincv   ,NCA=nca           &
+                   , HTOP=htop     ,HBOT=hbot       ,KPBL=kpbl         &
+                   , DZ8W=dz8w     ,P8W=p8w                            &
+                   , W0AVG=w0avg   ,STEPCU=stepcu                      &
+                   , CLDEFI=cldefi ,LOWLYR=lowlyr ,XLAND=xland         &
+                   , APR_GR=apr_gr ,APR_W=apr_w   ,APR_MC=apr_mc       &
+                   , APR_ST=apr_st ,APR_AS=apr_as ,APR_CAPMA=apr_capma &
+                   , APR_CAPME=apr_capme          ,APR_CAPMI=apr_capmi &
+                   , MASS_FLUX=mass_flux          ,XF_ENS=xf_ens       &
+                   , PR_ENS=pr_ens ,HT=ht                              &
+                   , ENSDIM=ensdim ,MAXIENS=maxiens ,MAXENS=maxens     &
+                   , MAXENS2=maxens2                ,MAXENS3=maxens3   &
+                   , CU_ACT_FLAG=cu_act_flag   ,WARM_RAIN=warm_rain    &
+                 ! Selection flag
+                   , CU_PHYSICS=config_flags%cu_physics                &
+                 ! Moisture tendency arguments
+                   , RQVCUTEN=rqvcuten , RQCCUTEN=rqccuten             &
+                   , RQRCUTEN=rqrcuten , RQVBLTEN=rqvblten             &
+                   , RQVFTEN=rqvften                                   &
+                 ! Other tendency arguments
+                   , RTHRATEN=rthraten , RTHBLTEN=rthblten             &
+                   , RTHCUTEN=rthcuten , RTHFTEN=rthften               &
+                 ! Moisture tracer arguments
+                   , QV_CURR=moist_2(ims,kms,jms,P_QV), F_QV=F_QV      &
+                   , QC_CURR=moist_2(ims,kms,jms,P_QC), F_QC=F_QC      &
+                   , QR_CURR=moist_2(ims,kms,jms,P_QR), F_QR=F_QR      &
+                   , QI_CURR=moist_2(ims,kms,jms,P_QI), F_QI=F_QI      &
+                   , QS_CURR=moist_2(ims,kms,jms,P_QS), F_QS=F_QS      &
+                   , QG_CURR=moist_2(ims,kms,jms,P_QG), F_QG=F_QG      &
+                                                                       )
+         endif
 BENCH_END(cu_driver_tim)
 
 ! calculate_phy_tend
 
 BENCH_START(cal_phy_tend)
+      if(dyn_opt == DYN_EM) then
       !$OMP PARALLEL DO   &
       !$OMP PRIVATE ( ij )
 
@@ -633,6 +673,7 @@ BENCH_START(cal_phy_tend)
 
       ENDDO
       !$OMP END PARALLEL DO
+      endif
 BENCH_END(cal_phy_tend)
 
 ! tke diffusion
@@ -640,6 +681,7 @@ BENCH_END(cal_phy_tend)
      IF(diff_opt .eq. 2 .OR. diff_opt .eq. 1) THEN
 
 BENCH_START(comp_diff_metrics_tim)
+       if(dyn_opt == DYN_EM) then
        !$OMP PARALLEL DO   &
        !$OMP PRIVATE ( ij )
 
@@ -655,6 +697,7 @@ BENCH_START(comp_diff_metrics_tim)
                                       k_start    , k_end                    )
        ENDDO
        !$OMP END PARALLEL DO
+       endif
 BENCH_END(comp_diff_metrics_tim)
 
 #ifdef DM_PARALLEL
@@ -662,6 +705,7 @@ BENCH_END(comp_diff_metrics_tim)
 #endif
 
 BENCH_START(tke_diff_bc_tim)
+       if(dyn_opt == DYN_EM) then
        DO ij = 1 , grid%num_tiles
 
           CALL wrf_debug ( 200 , ' call bc for diffusion_metrics ' )
@@ -702,6 +746,7 @@ BENCH_START(tke_diff_bc_tim)
                                   k_start    , k_end                 )
 
        ENDDO
+       endif
 BENCH_END(tke_diff_bc_tim)
 
 #ifdef DM_PARALLEL
@@ -709,7 +754,7 @@ BENCH_END(tke_diff_bc_tim)
 #endif
 
 BENCH_START(deform_div_tim)
-
+       if(dyn_opt == DYN_EM) then
        !$OMP PARALLEL DO   &
        !$OMP PRIVATE ( ij )
 
@@ -729,6 +774,7 @@ BENCH_START(deform_div_tim)
                                     k_start    , k_end                  )
        ENDDO
        !$OMP END PARALLEL DO
+       endif
 BENCH_END(deform_div_tim)
 
 
@@ -777,6 +823,7 @@ BENCH_END(calc_tke_tim)
 #endif
 
 BENCH_START(phy_bc_tim)
+     if(dyn_opt == DYN_EM) then
      !$OMP PARALLEL DO   &
      !$OMP PRIVATE ( ij )
 
@@ -796,6 +843,7 @@ BENCH_START(phy_bc_tim)
                             k_start    , k_end                           )
      ENDDO
      !$OMP END PARALLEL DO
+     endif
 BENCH_END(phy_bc_tim)
 
 #ifdef DM_PARALLEL
@@ -844,6 +892,7 @@ BENCH_END(phy_bc_tim)
 #endif
 
 BENCH_START(update_phy_ten_tim)
+      if(dyn_opt == DYN_EM) then
       !$OMP PARALLEL DO   &
       !$OMP PRIVATE ( ij )
 
@@ -863,11 +912,13 @@ BENCH_START(update_phy_ten_tim)
 
       END DO
       !$OMP END PARALLEL DO
+      endif
 BENCH_END(update_phy_ten_tim)
 
      IF( diff_opt .eq. 2 .and. km_opt .eq. 2 ) THEN
 
 BENCH_START(tke_rhs_tim)
+       if(dyn_opt == DYN_EM) then
        !$OMP PARALLEL DO   &
        !$OMP PRIVATE ( ij )
 
@@ -888,6 +939,7 @@ BENCH_START(tke_rhs_tim)
 
        ENDDO
        !$OMP END PARALLEL DO
+       endif
 BENCH_END(tke_rhs_tim)
 
      ENDIF
@@ -900,6 +952,7 @@ BENCH_END(tke_rhs_tim)
        IF (bl_pbl_physics .eq. 0) THEN
 
 BENCH_START(vert_diff_tim)
+         if(dyn_opt == DYN_EM) then
          !$OMP PARALLEL DO   &
          !$OMP PRIVATE ( ij )
          DO ij = 1 , grid%num_tiles
@@ -923,11 +976,13 @@ BENCH_START(vert_diff_tim)
 
          ENDDO
          !$OMP END PARALLEL DO
+         endif
 BENCH_END(vert_diff_tim)
 
        ENDIF
 !
 BENCH_START(hor_diff_tim)
+       if(dyn_opt == DYN_EM) then
        !$OMP PARALLEL DO   &
        !$OMP PRIVATE ( ij )
        DO ij = 1 , grid%num_tiles
@@ -953,6 +1008,7 @@ BENCH_START(hor_diff_tim)
                                       k_start    , k_end                    )
        ENDDO
        !$OMP END PARALLEL DO
+       endif
 BENCH_END(hor_diff_tim)
 
      ENDIF
@@ -1172,6 +1228,7 @@ BENCH_END(small_step_prep_tim)
 #endif
 
 BENCH_START(set_phys_bc2_tim)
+   if(dyn_opt == DYN_EM) then
    !$OMP PARALLEL DO   &
    !$OMP PRIVATE ( ij )
 
@@ -1256,6 +1313,7 @@ BENCH_START(set_phys_bc2_tim)
 
     END DO
     !$OMP END PARALLEL DO
+    endif
 BENCH_END(set_phys_bc2_tim)
 
    small_steps : DO iteration = 1 , number_of_small_timesteps
@@ -1447,6 +1505,7 @@ BENCH_START(spec_bdynhyd_tim)
                                      grid%j_start(ij), grid%j_end(ij),         &
                                      k_start    , k_end             )
              IF( config_flags%specified ) THEN
+               if(dyn_opt == DYN_EM) then
                CALL zero_grad_bdy ( w_2,                        &
                                     'w'         , config_flags, &
                                     spec_zone,                  &
@@ -1456,6 +1515,7 @@ BENCH_START(spec_bdynhyd_tim)
                                     grid%i_start(ij), grid%i_end(ij),         &
                                     grid%j_start(ij), grid%j_end(ij),         &
                                     k_start    , k_end             )
+               endif
              ELSE
                CALL spec_bdyupdate   ( w_2, rw_tend, dts_rk,       &
                                        'h'         , config_flags, &
@@ -1510,6 +1570,7 @@ BENCH_END(cald_p_rho_tim)
 #endif
 
 BENCH_START(phys_bc_tim)
+      if(dyn_opt == DYN_EM) then
       !$OMP PARALLEL DO   &
       !$OMP PRIVATE ( ij )
 
@@ -1564,6 +1625,7 @@ BENCH_START(phys_bc_tim)
 
       END DO
       !$OMP END PARALLEL DO
+      endif
 BENCH_END(phys_bc_tim)
 
    END DO small_steps
@@ -1864,6 +1926,7 @@ BENCH_START(update_scal_tim)
 BENCH_END(update_scal_tim)
 
 BENCH_START(flow_depbdy_tim)
+       if(dyn_opt == DYN_EM) then
        IF( config_flags%specified ) THEN
          IF(im .ne. P_QV)THEN
            CALL flow_dep_bdy  (  moist_2(ims,kms,jms,im),                     &
@@ -1877,6 +1940,7 @@ BENCH_START(flow_depbdy_tim)
                                k_start, k_end                               )
          ENDIF
        ENDIF
+       endif
 BENCH_END(flow_depbdy_tim)
 
    ENDDO moist_tile_loop_2
@@ -1887,6 +1951,7 @@ BENCH_END(flow_depbdy_tim)
  ENDIF moist_scalar_advance
 
 BENCH_START(tke_adv_tim)
+ if(dyn_opt == DYN_EM) then
  TKE_advance: IF (km_opt .eq. 2) then
 
 #ifdef DM_PARALLEL
@@ -1972,6 +2037,7 @@ BENCH_START(tke_adv_tim)
    !$OMP END PARALLEL DO
 
    END IF TKE_advance
+   endif
 BENCH_END(tke_adv_tim)
 
 !  next the chemical species
@@ -2148,6 +2214,7 @@ BENCH_END(diag_w_tim)
 #endif
 
 BENCH_START(bc_end_tim)
+   if(dyn_opt == DYN_EM) then
    !$OMP PARALLEL DO   &
    !$OMP PRIVATE ( ij )
 
@@ -2209,6 +2276,7 @@ BENCH_START(bc_end_tim)
 
     END DO tile_bc_loop_1
    !$OMP END PARALLEL DO
+   endif
 BENCH_END(bc_end_tim)
 
 
@@ -2322,6 +2390,7 @@ BENCH_END(advance_ppt_tim)
      sz = 0
    ENDIF
 
+   if(dyn_opt == DYN_EM) then
    !$OMP PARALLEL DO   &
    !$OMP PRIVATE ( ij, its, ite, jts, jte )
 
@@ -2366,6 +2435,7 @@ BENCH_START(micro_driver_tim)
                                 grid%j_start, min(grid%j_end, jde-1),       &
                                 k_start    , min(k_end,kde-1) , grid%num_tiles )
 BENCH_END(micro_driver_tim)
+   endif
 
        CALL wrf_debug ( 200 , ' call moist_physics_finish' )
 BENCH_START(moist_phys_end_tim)
@@ -2427,6 +2497,7 @@ BENCH_END(moist_phys_end_tim)
    END DO scalar_tile_loop_2
 
 
+   if(dyn_opt == DYN_EM) then
    IF (leapfrog ) THEN
 
     ! do time filter and switch for the dry variables
@@ -2455,6 +2526,7 @@ BENCH_END(time_filt_tim)
    !$OMP END PARALLEL DO
 
     END IF
+    endif
 
    !  We're finished except for boundary condition (and patch) update
 
@@ -2523,6 +2595,7 @@ BENCH_END(time_filt_tim)
 !  now set physical b.c on a patch
 
 BENCH_START(bc_2d_tim)
+   if(dyn_opt == DYN_EM) then
    !$OMP PARALLEL DO   &
    !$OMP PRIVATE ( ij )
 
@@ -2597,6 +2670,7 @@ BENCH_START(bc_2d_tim)
 
    END DO tile_bc_loop_2
    !$OMP END PARALLEL DO
+   endif
 BENCH_END(bc_2d_tim)
 
    IF( config_flags%specified .or. config_flags%nested ) THEN 
@@ -2648,6 +2722,42 @@ BENCH_END(bc_2d_tim)
      ENDIF
    endif
 #endif
+
+! add diagnoses. hans_xyh huang.
+
+   DO ij = 1 , grid%num_tiles
+
+     call calc_dpsdt ( itimestep, dt, psfc, psfcm, 'ps', &
+                       avg_abs_dpsdt, dpsdt,             &
+                       ids, ide, jds, jde,               &
+                       ims, ime, jms, jme,               &
+                       grid%i_start(ij), grid%i_end(ij), &
+                       grid%j_start(ij), grid%j_end(ij)  )
+     call calc_dpsdt ( itimestep, dt, mu_2, mu_1, 'mu',  &
+                       avg_abs_dmudt, dmudt,             &
+                       ids, ide, jds, jde,               &
+                       ims, ime, jms, jme,               &
+                       grid%i_start(ij), grid%i_end(ij), &
+                       grid%j_start(ij), grid%j_end(ij)  )
+
+     call calc_q_conv_3d ( moist_1, moist_2, dt,             &
+                           q_conve_3d,                       &
+                           num_3d_m,                         &
+                           ids, ide, jds, jde, kds, kde,     &
+                           ims, ime, jms, jme, kms, kme,     &
+                           grid%i_start(ij), grid%i_end(ij), &
+                           grid%j_start(ij), grid%j_end(ij), &
+                           k_start, k_end                    )
+     call calc_q_conv_2d ( moist_2, u_2, v_2,                &
+                           dt, DX, q_conve_2d,               &
+                           num_3d_m,                         &
+                           ids, ide, jds, jde, kds, kde,     &
+                           ims, ime, jms, jme, kms, kme,     &
+                           grid%i_start(ij), grid%i_end(ij), &
+                           grid%j_start(ij), grid%j_end(ij), &
+                           k_start, k_end                    )
+
+   ENDDO
 
    CALL wrf_debug ( 200 , ' call end of solve_em' )
 

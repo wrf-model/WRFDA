@@ -191,6 +191,15 @@ integer::oops1,oops2
 
       real_data_init_type = model_config_rec%real_data_init_type
 
+      !  Save the TSK field for later use in the sea ice surface temperature
+      !  for the Noah LSM scheme.
+
+       DO j = jts, MIN(jte,jde-1)
+         DO i = its, MIN(ite,ide-1)
+            tsk_save(i,j) = tsk(i,j)
+         END DO
+      END DO
+
       !  Take the data from the input file and store it in the variables that
       !  use the WRF naming and ordering conventions.
 
@@ -474,9 +483,9 @@ integer::oops1,oops2
       CALL nl_get_seaice_threshold ( grid%id , seaice_threshold ) 
       CALL nl_get_isice ( grid%id , isice )
       CALL nl_get_iswater ( grid%id , iswater )
-      CALL adjust_for_seaice_post ( xice , landmask , tsk , ivgtyp , vegcat , lu_index , &
+      CALL adjust_for_seaice_post ( xice , landmask , tsk , tsk_save , ivgtyp , vegcat , lu_index , &
                                     xland , landusef , isltyp , soilcat , soilctop , &
-                                    soilcbot , tmn , &
+                                    soilcbot , tmn , vegfra , &
                                     tslb , smois , sh2o , &
                                     seaice_threshold , &
                                     num_veg_cat , num_soil_top_cat , num_soil_bot_cat , &
@@ -752,6 +761,28 @@ endif
                ph0(i,k,j) = ph_2(i,k,j) + phb(i,k,j)
             END DO
        
+         END DO
+      END DO
+
+      DO j = jts, min(jde-1,jte)
+         DO i = its, min(ide,ite)
+            u10(i,j)=u_2(i,1,j)
+         END DO
+      END DO
+
+      DO j = jts, min(jde,jte)
+         DO i = its, min(ide-1,ite)
+            v10(i,j)=v_2(i,1,j)
+         END DO
+      END DO
+
+      DO j = jts, min(jde-1,jte)
+         DO i = its, min(ide-1,ite)
+            p_surf = p00 * EXP ( -t00/a + ( (t00/a)**2 - 2.*g*ht(i,j)/a/r_d ) **0.5 ) 
+            psfc(i,j)=p_surf + p(i,1,j)
+            q2(i,j)=moist_2(i,1,j,P_QV)
+            th2(i,j)=t_2(i,1,j)+300.
+            t2(i,j)=th2(i,j)*(((p(i,1,j)+pb(i,1,j))/p00)**(r_d/cp))
          END DO
       END DO
 

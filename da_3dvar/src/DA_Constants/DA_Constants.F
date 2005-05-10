@@ -288,6 +288,8 @@ MODULE DA_Constants
 ! 2.0 Namelist parameters:
 !------------------------------------------------------------------------------
 
+ logical :: lvar4d ! select 4dvar
+
  CHARACTER*(8) :: MODEL_TYPE    ! Model type.
  CHARACTER*(8) :: ANALYSIS_TYPE ! Either '3D-PSAS' OR '3D-VAR'
  LOGICAL       :: write_increments ! Write out analysis increments if true.
