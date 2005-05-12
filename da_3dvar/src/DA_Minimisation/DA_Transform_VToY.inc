@@ -45,6 +45,7 @@ subroutine DA_Transform_VToY(be, cv, iv, vp, vv, xa, xb, xbx, xp, y, &
 
       if ( lvar4d ) then
 
+#ifdef WRFVAR
          filnam = 'tl00'
          call DA_Transfer_XatoWRFTL( grid, config_flags, filnam, &
 #include <em_actual_args.inc>
@@ -60,6 +61,9 @@ subroutine DA_Transform_VToY(be, cv, iv, vp, vv, xa, xb, xbx, xp, y, &
                                  )
             call da_transform_xtoy( xb, iv, xa, xp, y )
          enddo
+#else
+         call da_transform_xtoy( xb, iv, xa, xp, y )
+#endif
 
 
       else  ! lvar4d

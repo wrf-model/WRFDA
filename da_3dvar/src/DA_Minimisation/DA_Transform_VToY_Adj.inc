@@ -40,6 +40,7 @@ subroutine DA_Transform_VToY_Adj(be, cv, iv, vp, vv, xa, xb, xbx, xp, y, &
 
       if ( lvar4d ) then
 
+#ifdef WRFVAR
          do nobwin=num_fgat_time,1,-1
             iv%current_ob_time = nobwin
             call DA_zero_x(xa)
@@ -56,7 +57,10 @@ subroutine DA_Transform_VToY_Adj(be, cv, iv, vp, vv, xa, xb, xbx, xp, y, &
          call DA_Transfer_XatoWRFTL_Adj( grid, config_flags, filnam, &
 #include <em_actual_args.inc>
                                  )
-
+#else
+         call DA_zero_x(xa)
+         call da_transform_xtoy( xb, iv, xa, xp, y )
+#endif
       else  ! lvar4d
 
          call DA_zero_x(xa)
