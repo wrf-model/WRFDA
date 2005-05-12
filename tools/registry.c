@@ -28,6 +28,8 @@ main( int argc, char *argv[], char *env[] )
   sw_ifort_kludge          = 0 ;
   sw_dm_serial_in_only      = 0 ; /* input and bdy data set is distributed by node 0, 
                                      other data streams are written to file per process */
+/*Wei's change for 4dvar*/
+  sw_wrfvar = 0 ;
 
   strcpy( fname_in , "" ) ;
 
@@ -70,6 +72,10 @@ main( int argc, char *argv[], char *env[] )
       }
       if (!strcmp(*argv,"-DDM_SERIAL_IN_ONLY")) {
         sw_dm_serial_in_only = 1 ;
+      }
+/*Wei's change for 4dvar*/
+      if (!strcmp(*argv,"-DWRFVAR")) {
+        sw_wrfvar = 1 ;
       }
       if (!strncmp(*argv,"-h",2)) {
         fprintf(stderr,"Usage: %s [-DDEREF_KLUDGE] [-DDM_PARALLEL] [-DDISTRIB_IO_LAYER] [-DDM_SERIAL_IN_ONLY] [-DD3VAR_IRY_KLUDGE] registryfile\n",thisprog) ;

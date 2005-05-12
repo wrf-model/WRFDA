@@ -1,0 +1,179 @@
+Change Log for update to wrfvar code
+---------------------------------------
+
+Author: 	Qingnong Xiao, S. Rizvi
+Reviewer: 	Yong-run Guo
+Date: 		02/15/05
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+1. Add multiple radar data assimilation capabilities.
+   The multiple radar data are sequentially put together
+   in the input file. Each radar has the same data format
+   as before.
+2. Add map factors to the subroutines that calculate the
+   vertical velocity increments.
+
+Expected Differences
+---------------------------------------------------
+
+Accuracy
+
+1. The first addition expands the code to multiple radar
+   data assimilation. But if only one radar data set is
+   assimilated, the results are the same.
+
+2. The map factors affect the results slightly when radar
+   data are assimilated (see the results below).
+
+CPU/memory
+
+   The CPU time is increased with multiple radar data 
+   assimilation. The memory requirements are also 
+   increased depending on how many radar data set are
+   assimilated.
+
+Test results (run on what machines?)
+------------------------------------------------------
+
+1. Adjoint check on IBM with 64 processes
+
+   DA_Check_XToY_Adjoint: Adjoint Test Results:
+   Tile < y, y     > =   1.66024283229772E+02
+   Tile < x, x_adj > =   1.66024283229772E+02
+   Whole Domain < y, y     > =   5.57013438036406E+03
+   Whole Domain < x, x_adj > =   5.57013438036406E+03
+
+2. Tests on DEC machine to compare the minimizations 
+   with and without map factors
+
+   Without map factor:
+
+   Original gradient is  2.74104989D+03
+   For this outer iteration Gradient target is  2.74104989D+01
+   Starting Cost function:  5.43952937D+04 Gradient=  2.74104989D+03
+   ----------------------------------------------------------
+
+   Iter      Gradient             Step
+
+    1      1.09216992D+03      1.70503755D-04
+    2      8.49217661D+02      1.43577820D-03
+    3      6.58639460D+02      1.49748009D-03
+    4      5.58367274D+02      2.54516085D-03
+    5      5.25160299D+02      1.70781512D-03
+    6      4.12065844D+02      1.79278204D-03
+    7      3.37646241D+02      5.11923826D-03
+    8      7.49490698D+02      1.04866722D-03
+    9      2.30523241D+02      7.08022844D-04
+   10      2.61441950D+02      1.24606482D-02
+   11      2.68302419D+02      7.78869841D-03
+   12      2.92788721D+02      7.76251702D-03
+   13      2.14213151D+02      2.59275836D-04
+   14      1.21685107D+02      5.24607783D-04
+   15      2.65398876D+02      1.42626184D-02
+   16      8.55676617D+01      8.50068522D-04
+   17      9.03624252D+01      2.75634259D-02
+   18      2.07979149D+02      1.74211701D-03
+   19      1.16301502D+02      3.24642395D-04
+   20      9.31345398D+01      7.49223769D-03
+   21      5.86676826D+01      1.21545598D-02
+   22      1.34981026D+02      3.97570764D-03
+   23      2.41620593D+02      4.98736054D-03
+   24      8.62203970D+01      1.79922157D-04
+   25      6.18890448D+01      2.28417575D-03
+   26      8.13858639D+01      2.00139080D-03
+   27      6.18613055D+01      7.42892332D-03
+   28      7.20965715D+01      3.73200321D-03
+   29      4.89593721D+01      2.20331035D-04
+   30      3.60330441D+01      2.16885222D-02
+   31      4.52458605D+01      5.34689146D-03
+   32      6.57650913D+01      4.62069908D-03
+   33      2.03737662D+02      2.10094563D-03
+   34      7.81481573D+01      5.33007392D-04
+   35      2.39149033D+01      7.02327656D-04
+   ----------------------------------------------------------
+   Inner iteration stopped after   35 iterations
+   Final cost function :  4.91918278D+04 and Gradient:  2.39147380D+01
+   ----------------------------------------------------------
+
+   With map factor:
+
+   Original gradient is  2.73696571D+03
+   For this outer iteration Gradient target is  2.73696571D+01
+   Starting Cost function:  5.43952937D+04 Gradient=  2.73696571D+03
+   ----------------------------------------------------------
+
+   Iter    Cost Function         Gradient             Step
+
+    1      5.37580279D+04      1.08346103D+03      1.70142057D-04
+    2      5.29079448D+04      8.48220376D+02      1.44832039D-03
+    3      5.23768807D+04      6.52694195D+02      1.47624663D-03
+    4      5.18057073D+04      5.54453201D+02      2.68150572D-03
+    5      5.15512882D+04      5.05516036D+02      1.65520025D-03
+    6      5.12941661D+04      4.12113100D+02      2.01232345D-03
+    7      5.08582058D+04      3.45771536D+02      5.13384092D-03
+    8      5.08048553D+04      7.10207165D+02      8.92465732D-04
+    9      5.05983885D+04      2.26194423D+02      8.18675696D-04
+   10      5.02828443D+04      2.74389708D+02      1.23346448D-02
+   11      5.00061966D+04      2.51764716D+02      7.34885414D-03
+   12      4.97327758D+04      3.02130324D+02      8.62717637D-03
+   13      4.97169941D+04      2.64045557D+02      3.45774095D-04
+   14      4.97045669D+04      1.14583092D+02      3.56489655D-04
+   15      4.95987309D+04      2.64651145D+02      1.61221900D-02
+   16      4.95678333D+04      8.27042109D+01      8.82276746D-04
+   17      4.94710211D+04      8.54051677D+01      2.83080985D-02
+   18      4.94602493D+04      1.69721306D+02      2.95361029D-03
+   19      4.94563539D+04      1.31114930D+02      2.70458452D-04
+   20      4.94087633D+04      9.39053662D+01      5.53660658D-03
+   21      4.93532927D+04      5.81960645D+01      1.25810963D-02
+   22      4.93477006D+04      1.19833161D+02      3.30234069D-03
+   23      4.92997736D+04      9.58682882D+01      6.67540127D-03
+   24      4.92940615D+04      1.93629215D+02      1.24305251D-03
+   25      4.92879645D+04      5.36460387D+01      3.25250241D-04
+   26      4.92817005D+04      1.09394787D+02      4.35346662D-03
+   27      4.92645333D+04      6.96560432D+01      2.86907430D-03
+   28      4.92555711D+04      3.69208350D+01      3.69438208D-03
+   29      4.92273071D+04      3.27189115D+01      4.14686359D-02
+   30      4.92268387D+04      6.93865424D+01      8.75141718D-04
+   31      4.92234086D+04      5.35880888D+01      1.42489087D-03
+   32      4.92164199D+04      6.71638320D+01      4.86718869D-03
+   33      4.92039270D+04      4.52961377D+01      5.53906871D-03
+   34      4.92029980D+04      2.55590579D+01      9.05568806D-04
+   ----------------------------------------------------------
+   Inner iteration stopped after   34 iterations
+   Final cost function :  4.92029980D+04 and Gradient:  2.55590579D+01
+   ----------------------------------------------------------
+ 
+---------------
+Files removed:
+
+   None
+
+Files added:
+
+wrfvar/da_3dvar/changes/change_20050215.QX   
+wrfvar/da_3dvar/src/DA_Dynamics/DA_WZ_BASE.inc
+
+Files modified:
+
+wrfvar/Registry/Registry.3DVAR
+wrfvar/da_3dvar/src/Makefile
+wrfvar/da_3dvar/src/DA_Constants/DA_Constants.F
+wrfvar/da_3dvar/src/DA_Dynamics/DA_Dynamics.F
+wrfvar/da_3dvar/src/DA_Dynamics/DA_UV_To_Divergence.inc
+wrfvar/da_3dvar/src/DA_Dynamics/DA_UV_To_Divergence_Adj.inc
+wrfvar/da_3dvar/src/DA_Dynamics/DA_W_Adjustment_Adj.inc
+wrfvar/da_3dvar/src/DA_Dynamics/DA_W_Adjustment_Lin.inc
+wrfvar/da_3dvar/src/DA_Obs/DA_Read_Radar.inc
+wrfvar/da_3dvar/src/DA_Obs/DA_Scan_Radar.inc
+wrfvar/da_3dvar/src/DA_Physics/DA_UVPRho_To_W_Adj.inc
+wrfvar/da_3dvar/src/DA_Physics/DA_UVPRho_To_W_Lin.inc
+wrfvar/da_3dvar/src/DA_Radar/DA_AO_Stats_Radar.inc
+wrfvar/da_3dvar/src/DA_Setup_Structures/da_setup_firstguess.inc
+wrfvar/da_3dvar/src/DA_Test/DA_Transform_XToVp.inc
+
+New Tag:
+
+version_2_0_1
+

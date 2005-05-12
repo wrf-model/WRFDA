@@ -1,5 +1,5 @@
-subroutine DA_Balance_CycloTerm_Adj( ds, rho, ub, vb, term_x, term_y, &
-                                     map_factor, u, v, &
+subroutine DA_Balance_CycloTerm_Adj( rho, ub, vb, u, v, coefx,   &
+                                     coefy, term_x, term_y,      &
                                      ids,ide, jds,jde, kds,kde,  &
                                      ims,ime, jms,jme, kms,kme,  &
                                      its,ite, jts,jte, kts,kte )
@@ -11,7 +11,10 @@ subroutine DA_Balance_CycloTerm_Adj( ds, rho, ub, vb, term_x, term_y, &
 !
 !  ASSUMPTIONS: Various (see documentation).
 !
-!  HISTORY: 03/20/2000 - Creation of F90 version.           Dale Barker
+!  HISTORY: 03/20/2000 - Creation of F90 version.        Dale Barker
+!
+!           01/31/2005 - Updated for global option        Syed RH Rizvi 
+!
 !------------------------------------------------------------------------------
 
    implicit none
@@ -20,14 +23,12 @@ subroutine DA_Balance_CycloTerm_Adj( ds, rho, ub, vb, term_x, term_y, &
    integer, intent(in)  :: ims,ime, jms,jme, kms,kme    ! memory dims.
    integer, intent(in)  :: its,ite, jts,jte, kts,kte    ! tile   dims.
 
-   real, intent(in)     :: ds                           ! Resolution.
-
    real, dimension(ims:ime,jms:jme), intent(in) :: rho, &           ! Density.
                                                    ub, &            ! Background u wind
                                                    vb, &            ! Background u wind
                                                    term_x, &        ! x component of term
                                                    term_y, &        ! y component of term
-                                                   map_factor       ! Map factors.
+                                                   coefx, coefy     ! Mulplicative coeff. 
 
    real, dimension(ims:ime,jms:jme), intent(inout) :: u, &     ! u wind increment
                                                       v        ! v wind increment
@@ -36,31 +37,29 @@ subroutine DA_Balance_CycloTerm_Adj( ds, rho, ub, vb, term_x, term_y, &
    integer              :: is, ie                       ! 1st dim. end points.
    integer              :: js, je                       ! 2nd dim. end points.
    integer              :: ks, ke                       ! 3rd dim. end points.
-   real                 :: inv_2ds                      ! 1/2ds.
    real                 :: data(ims:ime,jms:jme)        ! Work array.
 
-   real                 :: var, varb
+   real                 :: var, varb, uar
    
 !------------------------------------------------------------------------------
 !  [1.0] Initialise:
 !------------------------------------------------------------------------------
 
-   inv_2ds = 0.5 / ds
-
 !  Computation to check for edge of domain:
    is = its; ie = ite; js = jts; je = jte
-   if ( its == ids ) is = ids+1; if ( ite == ide ) ie = ide-1
+   if (.not. global .and. its == ids ) is = ids+1
+   if (.not. global .and. ite == ide ) ie = ide-1
    if ( jts == jds ) js = jds+1; if ( jte == jde ) je = jde-1
 
 !------------------------------------------------------------------------------
 !  [3.0] Calculate term_y = rho M ( u'dv/dx + v'dv/dy + udv'/dx + vdv'/dy ):
 !------------------------------------------------------------------------------
 
-!  [3.7] Multiply by 0.5 * rho * M / ds and add to term_y
+!  [3.7] Multiply by rho and add to term_y
 
-   data(its:ite,jts:jte) = inv_2ds * rho(its:ite,jts:jte) * &
-                           map_factor(its:ite,jts:jte) * &
-                           term_y(its:ite,jts:jte)
+   data(its:ite,jts:jte) = rho(its:ite,jts:jte) * term_y(its:ite,jts:jte)
+   if( global ) go to 102      
+
 !  [3.6] Corner points:
    
    if ( its == ids .AND. jts == jds ) then
@@ -89,14 +88,15 @@ subroutine DA_Balance_CycloTerm_Adj( ds, rho, ub, vb, term_x, term_y, &
       j = jte
 
       do i = is, ie
-         varb = 3.0*vb(i,j)-4.0*vb(i,j+1)+vb(i,j+2)
+         varb = 3.0*vb(i,j)-4.0*vb(i,j-1)+vb(i,j-2)
 
-         var = vb(i,j) * data(i,j)
+         var = coefy(i,j)* vb(i,j) * data(i,j)
+         uar = coefx(i,j)* data(i,j) * ub(i,j)
 
-         u(i,j) = u(i,j) + data(i,j) * ( vb(i+1,j) - vb(i-1,j) )
-         v(i,j) = v(i,j) + data(i,j) * varb
-         v(i+1,j) = v(i+1,j) + ub(i,j) * data(i,j)
-         v(i-1,j) = v(i-1,j) - ub(i,j) * data(i,j)
+         u(i,j)   = u(i,j) + coefx(i,j)*data(i,j) * ( vb(i+1,j) - vb(i-1,j) )
+         v(i,j)   = v(i,j) + coefy(i,j)*data(i,j) * varb
+         v(i+1,j) = v(i+1,j) + uar                             
+         v(i-1,j) = v(i-1,j) - uar                             
 
          v(i,j) = v(i,j) + 3.0*var
          v(i,j-1) = v(i,j-1) -4.0*var
@@ -112,12 +112,12 @@ subroutine DA_Balance_CycloTerm_Adj( ds, rho, ub, vb, term_x, term_y, &
       do i = is, ie
          varb = -3.0*vb(i,j)+4.0*vb(i,j+1)-vb(i,j+2)
 
-         var = vb(i,j) * data(i,j)
+         var = coefy(i,j)*vb(i,j) * data(i,j)
+         uar = coefx(i,j)*ub(i,j) * data(i,j)
 
-         u(i,j) = u(i,j) + data(i,j) * ( vb(i+1,j) - vb(i-1,j) )
-         v(i,j) = v(i,j) + data(i,j) * varb
-         v(i+1,j) = v(i+1,j) + ub(i,j) * data(i,j)
-         v(i-1,j) = v(i-1,j) - ub(i,j) * data(i,j)
+         v(i,j)   = v(i,j) + coefy(i,j)*data(i,j) * varb
+         v(i+1,j) = v(i+1,j) + uar                           
+         v(i-1,j) = v(i-1,j) - uar                           
 
          v(i,j) = v(i,j) - 3.0*var
          v(i,j+1) = v(i,j+1) +4.0*var
@@ -133,11 +133,13 @@ subroutine DA_Balance_CycloTerm_Adj( ds, rho, ub, vb, term_x, term_y, &
       do j = js, je
          varb = 3.0*vb(i,j)-4.0*vb(i-1,j)+vb(i-2,j)
 
-         var = ub(i,j) * data(i,j)
-         u(i,j) = u(i,j) + data(i,j) * varb
-         v(i,j) = v(i,j) + data(i,j) * ( vb(i,j+1) - vb(i,j-1) )
-         v(i,j+1) = v(i,j+1) + vb(i,j) * data(i,j)
-         v(i,j-1) = v(i,j-1) - vb(i,j) * data(i,j)
+         var = coefx(i,j)* ub(i,j) * data(i,j)
+         uar = coefy(i,j)* vb(i,j) * data(i,j)
+
+         u(i,j) = u(i,j) + coefx(i,j)*data(i,j) * varb
+         v(i,j) = v(i,j) + coefy(i,j)*data(i,j) * ( vb(i,j+1) - vb(i,j-1) )
+         v(i,j+1) = v(i,j+1) + uar                           
+         v(i,j-1) = v(i,j-1) - uar                           
 
          v(i,j) = v(i,j) + 3.0*var
          v(i-1,j) = v(i-1,j) -4.0**var
@@ -151,13 +153,15 @@ subroutine DA_Balance_CycloTerm_Adj( ds, rho, ub, vb, term_x, term_y, &
       i = its
 
       do j = js, je
-         varb = -3.0*vb(i,j)+4.0*vb(i-1,j)-vb(i-2,j)
+         varb = -3.0*vb(i,j)+4.0*vb(i+1,j)-vb(i+2,j)
 
-         var = ub(i,j) * data(i,j)
-         u(i,j) = u(i,j) + data(i,j) * varb
-         v(i,j) = v(i,j) + data(i,j) * ( vb(i,j+1) - vb(i,j-1) )
-         v(i,j+1) = v(i,j+1) + vb(i,j) * data(i,j)
-         v(i,j-1) = v(i,j-1) - vb(i,j) * data(i,j)
+         var = coefx(i,j)* ub(i,j) * data(i,j)
+         uar = coefy(i,j)* vb(i,j) * data(i,j)
+ 
+         u(i,j) = u(i,j) + coefx(i,j)*data(i,j) * varb
+         v(i,j) = v(i,j) + coefy(i,j)*data(i,j) * ( vb(i,j+1) - vb(i,j-1) )
+         v(i,j+1) = v(i,j+1) + uar                             
+         v(i,j-1) = v(i,j-1) - uar                             
 
          v(i,j) = v(i,j) - 3.0*var
          v(i+1,j) = v(i+1,j) +4.0**var
@@ -165,16 +169,20 @@ subroutine DA_Balance_CycloTerm_Adj( ds, rho, ub, vb, term_x, term_y, &
       end do
    end if
    
+102   continue
 !  [3.1] Interior points:
 
    do j = je, js, -1
       do i = ie, is, -1
-         u(i,j) = u(i,j) + ( vb(i+1,j) - vb(i-1,j) ) * data(i,j)
-         v(i,j) = v(i,j) + ( vb(i,j+1) - vb(i,j-1) ) * data(i,j)
-         v(i+1,j) = v(i+1,j) + ub(i,j) * data(i,j)
-         v(i-1,j) = v(i-1,j) - ub(i,j) * data(i,j)
-         v(i,j+1) = v(i,j+1) + vb(i,j) * data(i,j)
-         v(i,j-1) = v(i,j-1) - vb(i,j) * data(i,j)
+         uar = coefx(i,j) * ub(i,j) * data(i,j)  
+         var = coefy(i,j) * vb(i,j) * data(i,j)  
+
+         u(i,j) = u(i,j) + coefx(i,j)*data(i,j)*( vb(i+1,j) - vb(i-1,j) ) 
+         v(i,j) = v(i,j) + coefy(i,j)*data(i,j)*( vb(i,j+1) - vb(i,j-1) ) 
+         v(i+1,j) = v(i+1,j) + uar                 
+         v(i-1,j) = v(i-1,j) - uar                 
+         v(i,j+1) = v(i,j+1) + var                  
+         v(i,j-1) = v(i,j-1) - var                  
       end do
    end do
    
@@ -182,11 +190,11 @@ subroutine DA_Balance_CycloTerm_Adj( ds, rho, ub, vb, term_x, term_y, &
 !  [2.0] Calculate term_x = rho M ( u'du/dx + v'du/dy + udu'/dx + vdu'/dy ):
 !------------------------------------------------------------------------------
 
-!  [2.7] Multiply by 0.5 * rho * M / ds and add to term_x:
+!  [2.7] Multiply by rho and add to term_x:
 
-   data(its:ite,jts:jte) = inv_2ds * rho(its:ite,jts:jte) * &
-                           map_factor(its:ite,jts:jte) * term_x(its:ite,jts:jte)
+   data(its:ite,jts:jte) = rho(its:ite,jts:jte) * term_x(its:ite,jts:jte)
 
+   if( global) go to 101 
 !  [2.6] Corner points:
 
    if ( its == ids .AND. jts == jds ) then
@@ -216,12 +224,14 @@ subroutine DA_Balance_CycloTerm_Adj( ds, rho, ub, vb, term_x, term_y, &
 
       do i = is, ie
          varb = 3.0*ub(i,j)-4.0*ub(i,j-1)+ub(i,j-2)
+         var  = coefy(i,j) * vb(i,j) * data(i,j)
+         uar  = coefx(i,j) * ub(i,j) * data(i,j)
 
-         var = vb(i,j) * data(i,j)
-         u(i+1,j) = u(i+1,j) + ub(i,j) *data(i,j)
-         u(i-1,j) = u(i-1,j) - ub(i,j) *data(i,j)
-         v(i,j) = v(i,j) + data(i,j) * varb
-         u(i,j) = u(i,j) + data(i,j) * ( ub(i+1,j) - ub(i-1,j) )
+         u(i+1,j) = u(i+1,j) + uar                   
+         u(i-1,j) = u(i-1,j) - uar                   
+         v(i,j) = v(i,j) + coefy(i,j)*data(i,j) * varb
+         u(i,j) = u(i,j) + coefx(i,j)*data(i,j) * ( ub(i+1,j) - ub(i-1,j) )
+
          u(i,j) = u(i,j) + 3.0*var
          u(i,j-1) = u(i,j-1) -4.0*var
          u(i,j-2) = u(i,j-2) + var
@@ -235,12 +245,14 @@ subroutine DA_Balance_CycloTerm_Adj( ds, rho, ub, vb, term_x, term_y, &
 
       do i = is, ie
          varb = -3.0*ub(i,j)+4.0*ub(i,j+1)-ub(i,j+2)
+         var = coefy(i,j)*vb(i,j) * data(i,j)
+         uar = coefx(i,j)*ub(i,j) * data(i,j)
 
-         var = vb(i,j) * data(i,j)
-         u(i+1,j) = u(i+1,j) + ub(i,j) *data(i,j)
-         u(i-1,j) = u(i-1,j) - ub(i,j) *data(i,j)
-         v(i,j) = v(i,j) + data(i,j) * varb
-         u(i,j) = u(i,j) + data(i,j) * ( ub(i+1,j) - ub(i-1,j) )
+         u(i+1,j) = u(i+1,j) + uar                 
+         u(i-1,j) = u(i-1,j) - uar                 
+         v(i,j) = v(i,j) + coefy(i,j)*data(i,j) * varb
+         u(i,j) = u(i,j) + coefx(i,j)*data(i,j) * ( ub(i+1,j) - ub(i-1,j) )
+
          u(i,j) = u(i,j) - 3.0*var
          u(i,j+1) = u(i,j+1) +4.0*var
          u(i,j+2) = u(i,j+2) - var
@@ -254,13 +266,15 @@ subroutine DA_Balance_CycloTerm_Adj( ds, rho, ub, vb, term_x, term_y, &
 
       do j = js, je
          varb = 3.0*ub(i,j)-4.0*ub(i-1,j)+ub(i-2,j)
+         var = coefx(i,j)*ub(i,j) * data(i,j)
+         uar = coefy(i,j)*vb(i,j) * data(i,j)
 
-         var = ub(i,j) * data(i,j)
-         u(i,j+1) = u(i,j+1) + vb(i,j) * data(i,j)
-         u(i,j-1) = u(i,j-1) - vb(i,j) * data(i,j)
-         v(i,j) = v(i,j) + data(i,j) * ( ub(i,j+1) - ub(i,j-1) )
-         u(i,j) = u(i,j) + data(i,j) * varb
-         u(i,j) = u(i,j) + 3.0*var
+         u(i,j+1) = u(i,j+1) + uar                  
+         u(i,j-1) = u(i,j-1) - uar                  
+         v(i,j) = v(i,j) + coefy(i,j)*data(i,j) * ( ub(i,j+1) - ub(i,j-1) )
+         u(i,j) = u(i,j) + coefx(i,j)*data(i,j) * varb
+
+         u(i,j)   = u(i,j) + 3.0*var
          u(i-1,j) =  u(i-1,j) - 4.0*var
          u(i-2,j) =  u(i-2,j) + var
       end do
@@ -273,30 +287,36 @@ subroutine DA_Balance_CycloTerm_Adj( ds, rho, ub, vb, term_x, term_y, &
 
       do j = js, je
          varb = -3.0*ub(i,j)+4.0*ub(i+1,j)-ub(i+2,j)
+         var = coefy(i,j)*ub(i,j) * data(i,j)
+         uar = coefy(i,j)*vb(i,j) * data(i,j)
 
-         var = ub(i,j) * data(i,j)
-         u(i,j+1) = u(i,j+1) + vb(i,j) * data(i,j)
-         u(i,j-1) = u(i,j-1) - vb(i,j) * data(i,j)
-         v(i,j) = v(i,j) + data(i,j) * ( ub(i,j+1) - ub(i,j-1) )
-         u(i,j) = u(i,j) + data(i,j) * varb
+         u(i,j+1) = u(i,j+1) + uar                  
+         u(i,j-1) = u(i,j-1) - uar                  
+         v(i,j) = v(i,j) + coefy(i,j)*data(i,j) * ( ub(i,j+1) - ub(i,j-1) )
+         u(i,j) = u(i,j) + coefx(i,j)*data(i,j) * varb
+
          u(i,j) = u(i,j) - 3.0*var
          u(i+1,j) =  u(i+1,j) + 4.0*var
          u(i+2,j) =  u(i+2,j) - var
       end do
    end if
 
+101   continue
 !  [2.1] Interior points:
 
    do j = je, js, -1
       do i = ie, is, -1
-         u(i,j) = u(i,j) + ( ub(i+1,j) - ub(i-1,j) ) * data(i,j)
-         v(i,j) = v(i,j) + ( ub(i,j+1) - ub(i,j-1) ) * data(i,j)
-         u(i+1,j) = u(i+1,j) + ub(i,j) * data(i,j)
-         u(i-1,j) = u(i-1,j) - ub(i,j) * data(i,j)
-         u(i,j+1) = u(i,j+1) + vb(i,j) * data(i,j)
-         u(i,j-1) = u(i,j-1) - vb(i,j) * data(i,j)
+
+         uar = coefx(i,j) * ub(i,j) * data(i,j)
+         var = coefy(i,j) * vb(i,j) * data(i,j)
+
+         u(i,j) = u(i,j) + coefx(i,j)*( ub(i+1,j) - ub(i-1,j) ) * data(i,j)
+         v(i,j) = v(i,j) + coefy(i,j)*( ub(i,j+1) - ub(i,j-1) ) * data(i,j)
+         u(i+1,j) = u(i+1,j) + uar                 
+         u(i-1,j) = u(i-1,j) - uar                 
+         u(i,j+1) = u(i,j+1) + var                   
+         u(i,j-1) = u(i,j-1) - var  
       end do
    end do
-
 end subroutine DA_Balance_CycloTerm_Adj
 
