@@ -14,6 +14,7 @@ MODULE DA_Obs
    USE DA_Ships
    USE DA_Synop
    USE DA_Sound
+   USE DA_Bogus
    USE da_pseudo
    USE da_qscat
    USE DA_Profiler

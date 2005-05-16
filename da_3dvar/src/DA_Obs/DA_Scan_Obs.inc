@@ -2,6 +2,14 @@ SUBROUTINE DA_Scan_Obs (iunit, ob, xp, filename)
 !-----------------------------------------------------------------------------!
 !  Purpose: Scan 3D-VAR GTS observation file
 !-----------------------------------------------------------------------------!
+!
+! Modifications:      10/26/2004            Syed RH Rizvi
+!
+!              Fix Obs-Long as -180 if it is +180
+!                     03/30/2005           Syed RH Rizvi
+!              For global option duplicate obs at East/West boundary
+!
+!-----------------------------------------------------------------------------!
 
    implicit none
 
@@ -44,7 +52,9 @@ SUBROUTINE DA_Scan_Obs (iunit, ob, xp, filename)
                                    num_ssmt1, &
                                    num_ssmt2, &
                                    num_pseudo, num_qscat, &
-                                   num_profiler, num_buoy
+                                   num_profiler, num_buoy, num_bogus
+
+   INTEGER                        :: ndup, n
 
 !----------------------------------------------------------------------------!
 !--default value.
@@ -61,6 +71,7 @@ SUBROUTINE DA_Scan_Obs (iunit, ob, xp, filename)
    ob%ob_numb(ob%current_ob_time)%qscat = ob%num_qscat
    ob%ob_numb(ob%current_ob_time)%buoy  = ob%num_buoy
    ob%ob_numb(ob%current_ob_time)%profiler = ob%num_profiler
+   ob%ob_numb(ob%current_ob_time)%bogus = ob%num_bogus
 
    ob%ob_numb(ob%current_ob_time)%ssmt1 = ob%num_ssmt1
    ob%ob_numb(ob%current_ob_time)%ssmt2 = ob%num_ssmt2
@@ -87,7 +98,7 @@ SUBROUTINE DA_Scan_Obs (iunit, ob, xp, filename)
          RETURN
       ENDIF
    else
-#ifndef CRAYX1
+#ifndef crayx1
       OPEN(UNIT   = iunit,     &
            FORM   = 'FORMATTED',  &
            ACCESS = 'SEQUENTIAL', &
@@ -124,6 +135,7 @@ SUBROUTINE DA_Scan_Obs (iunit, ob, xp, filename)
    num_qscat = 0
    num_profiler = 0
    num_buoy = 0
+   num_bogus = 0
 
 !----------------------------------------------------------------------------!
 
@@ -194,8 +206,8 @@ SUBROUTINE DA_Scan_Obs (iunit, ob, xp, filename)
                    platform%info%id
 
       IF (iost /= 0) THEN
-          WRITE (0,'(/,A,I3,/)') ' END OF OBS UNIT: ',iunit
-          WRITE (0,'(A,I3)')     ' IOSTAT == ',iost
+          WRITE (0,'(/A,I9)') ' END OF OBS UNIT: ',iunit
+          WRITE (0,'(/A,I9)') ' IOSTAT:          ',iost
          EXIT reports
       ENDIF
 
@@ -211,10 +223,11 @@ SUBROUTINE DA_Scan_Obs (iunit, ob, xp, filename)
                platform%info%id
       endif
 
-!-----Fix funny wind direction at South Pole
-      if(platform%info%lat < -89.9999) then
-         platform%info%lon = 0.0
-      endif
+      if(platform%info%lon == 180.0   ) platform%info%lon =-180.000
+!-----Fix funny wind direction at South Poles
+!      if(platform%info%lat < -89.9999 .or. platform%info%lat > 89.9999 ) then
+!         platform%info%lon = 0.0
+!      endif
 
       read(platform%info%platform(4:6), '(I3)') fm
 
@@ -286,6 +299,13 @@ loop_level: DO i = 1, platform%info%levels
          endif
       endif
 
+!    Loop over duplicating obs for global
+     ndup = 1
+     if(global .and. &
+     (platform%loc%i < xp%ids .or. platform%loc%i >= xp%ide)) ndup= 2
+
+     DO n = 1, ndup
+
       SELECT CASE(fm)
 
 !        if(index(platform%info%source, 'SYNOP') > 0) then
@@ -320,7 +340,6 @@ loop_level: DO i = 1, platform%info%levels
 !        else if(index(platform%info%source, 'FM-35 TEMP') > 0) then
 
          CASE (35:38) ;
-
             if(.not.use_SoundObs) cycle reports
 
             num_sound = num_sound + 1
@@ -391,6 +410,11 @@ loop_level: DO i = 1, platform%info%levels
             if(.not.use_ProfilerObs) cycle reports
             num_profiler = num_profiler + 1
 
+         CASE (135) ;
+
+            if(.not.use_BogusObs) cycle reports
+            num_bogus = num_bogus + 1
+
          CASE (18,19) ;             ! bouy
 
             if(.not.use_BuoyObs) cycle reports
@@ -410,6 +434,7 @@ loop_level: DO i = 1, platform%info%levels
                  'platform%info%levels=', platform%info%levels
 
       END SELECT
+    ENDDO        !  loop over duplicate
 
    ENDDO reports
 
@@ -432,6 +457,7 @@ loop_level: DO i = 1, platform%info%levels
    ob%num_qscat = ob%num_qscat + num_qscat
    ob%num_buoy  = ob%num_buoy  + num_buoy
    ob%num_profiler = ob%num_profiler + num_profiler
+   ob%num_bogus = ob%num_bogus + num_bogus
 
    ob%num_ssmt1 = ob%num_ssmt1 + num_ssmt1
    ob%num_ssmt2 = ob%num_ssmt2 + num_ssmt2
@@ -452,6 +478,7 @@ loop_level: DO i = 1, platform%info%levels
    ob%ob_numb(ob%current_ob_time)%qscat = ob%num_qscat
    ob%ob_numb(ob%current_ob_time)%buoy  = ob%num_buoy
    ob%ob_numb(ob%current_ob_time)%profiler = ob%num_profiler
+   ob%ob_numb(ob%current_ob_time)%bogus = ob%num_bogus
 
    ob%ob_numb(ob%current_ob_time)%ssmt1 = ob%num_ssmt1
    ob%ob_numb(ob%current_ob_time)%ssmt2 = ob%num_ssmt2
@@ -482,6 +509,7 @@ loop_level: DO i = 1, platform%info%levels
            'Scan:  ', num_qscat, ' QSCAT reports,', &
            'Scan:  ', num_profiler, ' Profiler reports,', &
            'Scan:  ', num_buoy, ' Buoy reports,', &
+           'Scan:  ', num_bogus, ' TCBGS reports,', &
            'Scan:  ', num_ssmt1, ' SSMT1 reports,', &
            'Scan:  ', num_ssmt2, ' SSMT2 reports.'
 

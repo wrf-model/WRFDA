@@ -35,10 +35,11 @@ SUBROUTINE da_transform_xtoy_Radar_Adj( xb, iv, xp, jo_grad_y, jo_grad_x )
 
    REAL                          :: xr,yr,zr
 
+!  W_HALF is vertical velocity at half-sigma levels.
 
    IF ( iv%num_Radar > 0 ) THEN
 
-      DO n=1, iv % num_Radar
+      do n=iv%ob_numb(iv%current_ob_time-1)%radar + 1, iv%ob_numb(iv%current_ob_time)%radar
 
        if(iv%Radar(n)%loc%proc_domain_with_halo) then
 
@@ -46,7 +47,6 @@ SUBROUTINE da_transform_xtoy_Radar_Adj( xb, iv, xp, jo_grad_y, jo_grad_x )
             model_u(k) = 0.
             model_v(k) = 0.
             model_w(k) = 0.
-            model_rho(k) = 0.
             model_qrn(k) = 0.
          end do
          
@@ -68,7 +68,6 @@ SUBROUTINE da_transform_xtoy_Radar_Adj( xb, iv, xp, jo_grad_y, jo_grad_x )
 
          do k = 1, num_levs
 
-            model_rhob(k) = iv%Radar(n)%model_rho(k)
             model_qrnb(k) = iv%Radar(n)%model_qrn(k)
             model_p(k)    = iv%Radar(n)%model_p(k)
 
@@ -117,10 +116,6 @@ SUBROUTINE da_transform_xtoy_Radar_Adj( xb, iv, xp, jo_grad_y, jo_grad_x )
                             i, j, dx, dy, dxm, dym, &
                             model_qrn, num_levs, iv%Radar(n)%zk, &
                             num_levs)
-         call Interp_lin_3D_Adj(jo_grad_x % rho, xp, &
-                            i, j, dx, dy, dxm, dym, &
-                            model_rho, num_levs, iv%Radar(n)%zk, &
-                            num_levs)
          call Interp_Lin_3D_Adj(jo_grad_x % v, xp, i, j, dx, dy, dxm, dym, &
                              model_v, num_levs, iv%Radar(n)%zk, num_levs)
          call Interp_Lin_3D_Adj(jo_grad_x % u, xp, i, j, dx, dy, dxm, dym, &
@@ -131,9 +126,6 @@ SUBROUTINE da_transform_xtoy_Radar_Adj( xb, iv, xp, jo_grad_y, jo_grad_x )
                                 num_levs, iv%Radar(n)%zk(1), num_levs )
          call Interp_Lin_3D_Adj(jo_grad_x%qrn(xp%ims,xp%jms,xp%kms), & 
                                 xp, i, j, dx, dy, dxm, dym, model_qrn(1), &
-                                num_levs, iv%Radar(n)%zk(1), num_levs )
-         call Interp_Lin_3D_Adj(jo_grad_x%rho(xp%ims,xp%jms,xp%kms), & 
-                                xp, i, j, dx, dy, dxm, dym, model_rho(1), &
                                 num_levs, iv%Radar(n)%zk(1), num_levs )
          call Interp_Lin_3D_Adj(jo_grad_x % v(xp%ims,xp%jms,xp%kms), xp, &
                              i, j, dx, dy, dxm, dym, &
