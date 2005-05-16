@@ -162,6 +162,13 @@
 #ifdef DM_PARALLEL
       INTEGER :: IPS,IPE,JPS,JPE,KPS,KPE
 #endif
+#ifdef DEREF_KLUDGE
+!  see http://www.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm
+   INTEGER     :: sm31 , em31 , sm32 , em32 , sm33 , em33
+   INTEGER     :: sm31x, em31x, sm32x, em32x, sm33x, em33x
+   INTEGER     :: sm31y, em31y, sm32y, em32y, sm33y, em33y
+#endif
+#define  DATA_CALLS_INCLUDED
       INTEGER :: I,IDUMMY,IEND,ISFFLX,ISTR,J,K,KOUNT_ALL,LENGTH_ROW     &
      &          ,LLIJ,LLMH,LLYR,N
 !
@@ -208,6 +215,7 @@
       CHARACTER*256 :: errmess
 !
 !-----------------------------------------------------------------------
+#include "deref_kludge.h"
 !-----------------------------------------------------------------------
       WARM_RAIN = .FALSE.
 

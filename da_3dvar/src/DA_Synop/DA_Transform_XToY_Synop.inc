@@ -15,14 +15,14 @@ SUBROUTINE DA_Transform_XToY_Synop ( xa, xb, iv, xp, y )
    
    IF ( iv%num_synop > 0 ) THEN
 
-      y%synop(:)%u = 0.0
-      y%synop(:)%v = 0.0
-      y%synop(:)%t = 0.0
-      y%synop(:)%p = 0.0
-      y%synop(:)%q = 0.0
+!xyh      y%synop(:)%u = 0.0
+!xyh      y%synop(:)%v = 0.0
+!xyh      y%synop(:)%t = 0.0
+!xyh      y%synop(:)%p = 0.0
+!xyh      y%synop(:)%q = 0.0
 
       if (sfc_assi_options == 1) then
-      do n=1, iv % num_synop
+      do n=iv%ob_numb(iv%current_ob_time-1)%synop + 1, iv%ob_numb(iv%current_ob_time)%synop
 
        if(iv%synop(n)%loc%proc_domain_with_halo) then
 
@@ -67,7 +67,7 @@ SUBROUTINE DA_Transform_XToY_Synop ( xa, xb, iv, xp, y )
 
       end do
       else if (sfc_assi_options == 2) then
-         do n=1, iv % num_synop
+         do n=iv%ob_numb(iv%current_ob_time-1)%synop + 1, iv%ob_numb(iv%current_ob_time)%synop
             if(iv%synop(n)%loc%proc_domain_with_halo) then
                CALL DA_Transform_XToPsfc( xb, xa, xp, iv%synop(n), y%synop(n) )
             endif

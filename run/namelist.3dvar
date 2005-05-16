@@ -1,122 +1,124 @@
 &record1
  MODEL_TYPE = 'WRF',
- WRITE_INCREMENTS = .TRUE.,
- /
+ PRINT_DETAIL   = 0,
+ WRITE_INCREMENTS = .FALSE. /
+
 &record2
  ANALYSIS_TYPE = '3D-VAR',
- ANALYSIS_DATE = '2000-01-24_12:00:00.0000',
- ANALYSIS_ACCU = 900,
- W_INCREMENTS = .FALSE.,
- /
+ ANALYSIS_DATE = '2000-01-25_00:00:00.0000',
+ ANALYSIS_ACCU = 900 /
+
 &record3
- FG_FORMAT = 1,
- OB_FORMAT = 2,
- NUM_FGAT_TIME = 1,
- /
+ num_fgat_time = 4,
+ fg_format = 1, 
+ ob_format = 2 /
+
 &record4
- PROCESS_OBS = 'YES',
- OBS_QC_POINTER = 0,
- USE_SYNOPOBS = .TRUE.,
- USE_SHIPSOBS = .TRUE.,
- USE_METAROBS = .TRUE.,
- USE_PILOTOBS = .TRUE.,
- USE_SOUNDOBS = .TRUE.,
- USE_SATEMOBS = .TRUE.,
- USE_SATOBOBS = .TRUE.,
- USE_AIREPOBS = .TRUE.,
- USE_QSCATOBS = .FALSE.,
- USE_BUOYOBS = .TRUE.,
- USE_PROFILEROBS = .TRUE.,
- USE_GPSPWOBS = .FALSE.,
- USE_GPSREFOBS = .FALSE.,
- USE_SSMIRETRIEVALOBS = .FALSE.,
- USE_SSMITBOBS = .FALSE.,
- USE_SSMT1OBS = .FALSE.,
- USE_SSMT2OBS = .FALSE.,
- USE_RADAROBS = .FALSE.,
- USE_RADAR_RV = .FALSE.,
- USE_RADAR_RF = .FALSE.,
- CHECK_MAX_IV = .TRUE.,
- USE_OBS_ERRFAC = .FALSE.,
- PUT_RAND_SEED = .FALSE.,
- OMB_SET_RAND = .FALSE.,
- OMB_ADD_NOISE = .FALSE.,
- /
+ PROCESS_OBS    = 'YES',
+ obs_qc_pointer = 0,
+ Use_SynopObs   = .TRUE.,
+ Use_ShipsObs   = .TRUE.,
+ Use_MetarObs   = .TRUE.,
+ Use_PilotObs   = .TRUE.,
+ Use_SoundObs   = .TRUE.,
+ Use_SatemObs   = .TRUE.,
+ Use_SatobObs   = .TRUE.,
+ Use_AirepObs   = .TRUE.,
+ Use_GpspwObs   = .TRUE.,
+ Use_SsmiRetrievalObs = .FALSE.,
+ Use_SsmiTbObs  = .FALSE.,
+ use_ssmt1obs   = .FALSE.,
+ use_ssmt2obs   = .FALSE.,
+ use_qscatobs   = .TRUE.,
+ check_max_iv   = .TRUE.,
+ use_obs_errfac = .FALSE.,
+ put_rand_seed  = .FALSE.,
+ omb_set_rand   = .FALSE.,
+ omb_add_noise  = .FALSE. /
+
 &record5
- TIME_WINDOW = 3.,
- PRINT_DETAIL = 0,
- /
+ TIME_WINDOW    = 3./
+
 &record6
- MAX_EXT_ITS = 1,
- EPS = 1.E-02, 1.E-02, 1.E-02, 1.E-02, 1.E-02, 1.E-02, 1.E-02,
- NTMAX = 100,
- NSAVE = 4,
- WRITE_SWITCH = .FALSE.,
- WRITE_INTERVAL = 5,
- /
+ max_ext_its    = 2,
+ EPS            = 1.E-02, 1.E-02, 1.E-02, 1.E-02, 1.E-02, 1.E-02, 1.E-02,,
+ NTMAX          = 3,
+ NSAVE          = 4,
+ WRITE_SWITCH   = .FALSE.,
+ WRITE_INTERVAL = 5 /
+
 &record7
- RF_PASSES = 6,
- VAR_SCALING1 = 1.0,
- VAR_SCALING2 = 1.0,
- VAR_SCALING3 = 1.0,
- VAR_SCALING4 = 1.0,
- VAR_SCALING5 = 1.0,
- LEN_SCALING1 = 1.0,
- LEN_SCALING2 = 1.0,
- LEN_SCALING3 = 1.0,
- LEN_SCALING4 = 1.0,
- LEN_SCALING5 = 1.0,
- /
+ RF_PASSES      = 6,
+ VAR_SCALING1   = 1.0,
+ VAR_SCALING2   = 1.0,
+ VAR_SCALING3   = 1.0,
+ VAR_SCALING4   = 1.0,
+ VAR_SCALING5   = 1.0,
+ LEN_SCALING1   = 1.0,
+ LEN_SCALING2   = 1.0,
+ LEN_SCALING3   = 1.0,
+ LEN_SCALING4   = 1.0,
+ LEN_SCALING5   = 1.0 /
+
 &record8
- DEF_SUB_DOMAIN = .FALSE.,
- X_START_SUB_DOMAIN = 55.0,
- Y_START_SUB_DOMAIN = 35.0,
- X_END_SUB_DOMAIN = 80.0,
- Y_END_SUB_DOMAIN = 60.0,
- /
+ def_sub_domain = .FALSE.,
+ x_start_sub_domain = 55.0,
+ y_start_sub_domain = 35.0,
+ x_end_sub_domain   = 80.0,
+ y_end_sub_domain   = 60.0 /
+
 &record10
- TESTING_3DVAR = .FALSE.,
- TEST_TRANSFORMS = .FALSE.,
- TEST_STATISTICS = .FALSE.,
- INTERPOLATE_STATS = .TRUE.,
- /
+ Testing_3DVAR  = .FALSE.,
+ Test_Transforms = .FALSE.,
+ Test_Statistics = .FALSE.,
+ Interpolate_Stats = .TRUE. /
+ 
 &record11
- MINIMISATION_OPTION = 2,
- WRITE_OUTER_LOOP = .FALSE.,
- LAT_STATS_OPTION = .TRUE.,
- CALCULATE_CG_COST_FUNCTION = .FALSE.,
- CV_OPTIONS = 2,
- CV_OPTIONS_HUM = 1,
- CHECK_RH = 1,
- AS1 = 0.25, 0.75, 1.5,
- AS2 = 0.25, 0.75, 1.5,
- AS3 = 0.25, 0.75, 1.5,
- AS4 = 0.25, 0.75, 1.5,
- AS5 = 0.25, 0.75, 1.5,
- SFC_ASSI_OPTIONS = 1,
- SET_OMB_RAND_FAC = 1.0,
- SEED_ARRAY1 = 0,
- SEED_ARRAY2 = 0,
- /
+ cv_options     = 2,
+ cv_options_hum = 1,
+ minimisation_option = 1,
+ check_rh       = 1,
+ as1            = 0.25, 0.75, 1.5,
+ as2            = 0.25, 0.75, 1.5,
+ as3            = 0.25, 0.75, 1.5,
+ as4            = 0.25, 0.75, 1.5,
+ as5            = 0.25, 0.75, 1.5,
+ set_omb_rand_fac = 1.0,
+ seed_array1    = 0,
+ seed_array2    = 0 /
+ 
 &record12
- BALANCE_TYPE = 1,
- /
+ balance_type   = 1 /
+ 
 &record13
- VERT_CORR = 2,
- VERTICAL_IP = 0,
- VERT_EVALUE = 1,
- MAX_VERT_VAR1 = 99.0,
- MAX_VERT_VAR2 = 99.0,
- MAX_VERT_VAR3 = 99.0,
- MAX_VERT_VAR4 = 99.0,
- MAX_VERT_VAR5 = 0.0,
- /
+ vert_corr      = 2,
+ vertical_ip    = 0,
+ vert_evalue    = 1,
+ max_vert_var1  = 99.0,
+ max_vert_var2  = 99.0,
+ max_vert_var3  = 99.0,
+ max_vert_var4  = 99.0,
+ max_vert_var5  = 0.0 /
+ 
 &pseudo_ob_nl
- NUM_PSEUDO = 0,
- PSEUDO_X = 41.0,
- PSEUDO_Y = 34.0,
- PSEUDO_Z = 1.0,
- PSEUDO_VAL = 1.0,
- PSEUDO_ERR = 1.0,
- PSEUDO_VAR = 'p',
- /
+ num_pseudo     = 0, 
+ pseudo_x       = 1.0,
+ pseudo_y       = 1.0,
+ pseudo_z       = 1.0,
+ pseudo_val     = 1.0,
+ pseudo_err     = 1.0,
+ pseudo_var     = 't' /
+
+&var4dnl
+ lvar4d      = .true.,
+ nnlhist     = 3600,
+ nobhist     = 3600,
+ linc4d      = .true.,
+ llowres     = .true.,
+ ndtime_nl   = 60,
+ nstop_nl    = 180,
+ ndtime_tlad = 600,
+ nstop_tlad  = 18,
+ ntlfil1     = 76,
+ nadfil9     = 75 /
+

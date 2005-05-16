@@ -14,12 +14,12 @@ SUBROUTINE da_transform_xtoy_pilot ( xa, iv, xp, y )
    
    IF ( iv%num_pilot > 0 ) THEN
 
-      do n=1, iv % num_pilot
+      do n=iv%ob_numb(iv%current_ob_time-1)%pilot + 1, iv%ob_numb(iv%current_ob_time)%pilot
 
        if(iv%pilot(n)%loc%proc_domain_with_halo) then
 
-         y%pilot(n)%u(:) = 0.0
-         y%pilot(n)%v(:) = 0.0
+!xyh         y%pilot(n)%u(:) = 0.0
+!xyh         y%pilot(n)%v(:) = 0.0
 
          k = iv % pilot(n) % info % levels
  
