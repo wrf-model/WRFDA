@@ -189,6 +189,20 @@ float tsGetValueInt(const int aix, const int aiy)
   int iy = aiy;
   int ix = aix;
 
+  int tx;
+  int ty;
+  int tn;
+  int txg;
+  int tyg;
+  int gn;
+
+  long long ll_gn;
+  long long ll_numHeaderBytes;
+  long long ll_tileNx;
+  long long ll_tileNy;
+
+  off_t loc;
+
   /* Perform bounds checking. */
   if (iy < 0)
     {
@@ -237,19 +251,19 @@ float tsGetValueInt(const int aix, const int aiy)
 	}
     }
 
-  int tx  = ix / tileNx;
-  int ty  = iy / tileNy;
-  int tn  = tx + ty*numTilesX;
-  int txg = ix - tx*tileNx;
-  int tyg = iy - ty*tileNy;
-  int gn  = txg + tyg*tileNx;
+  tx  = ix / tileNx;
+  ty  = iy / tileNy;
+  tn  = tx + ty*numTilesX;
+  txg = ix - tx*tileNx;
+  tyg = iy - ty*tileNy;
+  gn  = txg + tyg*tileNx;
 
-  long long ll_gn = gn;
-  long long ll_numHeaderBytes  = numHeaderBytes;
-  long long ll_tileNx = tileNx;
-  long long ll_tileNy = tileNy;
+  ll_gn = gn;
+  ll_numHeaderBytes  = numHeaderBytes;
+  ll_tileNx = tileNx;
+  ll_tileNy = tileNy;
 
-  off_t loc = ll_numHeaderBytes + ll_tileNx*ll_tileNy*sizeof(float)*tn +
+  loc = ll_numHeaderBytes + ll_tileNx*ll_tileNy*sizeof(float)*tn +
     ll_gn*sizeof(float);
 
   /* Seek to the proper location in the file and get the data value. */
@@ -272,19 +286,27 @@ float tsGetValue(const double ix, const double iy)
   float v1 = tsGetValueInt(i0,j1);
   float v2 = tsGetValueInt(i1,j0);
   float v3 = tsGetValueInt(i1,j1);
+
+  double w0;
+  double w1;
+
+  float v4;
+  float v5;
+  float v6;
+  float val;
   
   if (isMissing(v0)) return(vmiss);
   if (isMissing(v1)) return(vmiss);
   if (isMissing(v2)) return(vmiss);
   if (isMissing(v3)) return(vmiss);
 
-  double w0 = ix - i0;
-  double w1 = iy - j0;
+  w0 = ix - i0;
+  w1 = iy - j0;
 
-  float v4 = v2*w0 + v0*(1.0-w0);
-  float v5 = v3*w0 + v1*(1.0-w0);
-  float v6 = w1*v5 + (1.0-w1)*v4;
-  float val = v6;
+  v4 = v2*w0 + v0*(1.0-w0);
+  v5 = v3*w0 + v1*(1.0-w0);
+  v6 = w1*v5 + (1.0-w1)*v4;
+  val = v6;
 
   return(val);
 }
@@ -395,10 +417,10 @@ int GET_TERRAIN (        float *adx,
 	char type[MAXLEN];
 	char res[MAXLEN];
 	char fn[MAXLEN];
+	float dx;
 
 	if (fscanf(fp, "%s %s %s", type, res, fn) == EOF) break;
 
-	float dx;
 	sscanf(res, "%f", &dx);
 
 	if (strcmp(type, "landuse") == 0)
@@ -452,13 +474,14 @@ fprintf(stderr,"%d %d file %f adx %f max %f\n",i,first,tsfTopo.dx[i],*adx , maxd
       {
 	for ( i = 0; i < *iyyn; i++)
 	  {
+	    double fix;
+	    double fiy;
+	    float tv;
 	    float lat = xlat[*mix*j + i];
 	    float lon = xlon[*mix*j + i];
 	    
-	    double fix;
-	    double fiy;
 	    tsLatLonToGridpoint(lat,lon,&fix,&fiy);
-	    float tv = tsGetValue(fix, fiy);
+	    tv = tsGetValue(fix, fiy);
 	    terrain[*mix*j + i] = tv;
 	  }
       }
