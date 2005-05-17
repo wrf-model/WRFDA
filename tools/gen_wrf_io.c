@@ -774,7 +774,7 @@ if ( pass == 0 )
             if(!var)
             {
 	        if ( !strncmp( p->use, "dyn_", 4 ) ) 
-	          fprintf(fp,"IF (mod(grid%%dyn_opt, 100) .EQ. %s ) THEN\n",p->use) ;
+	          fprintf(fp,"IF ((mod(grid%%dyn_opt, 100) .EQ. %s_tl) .or. (mod(grid%%dyn_opt, 100) .EQ. %s_ad)) THEN\n",p->use,p->use) ;
 
                 if ( p->scalar_array_member )
                   fprintf(fp,"IF (P_%s .GE. PARAM_FIRST_SCALAR) THEN\n",p->name) ;
