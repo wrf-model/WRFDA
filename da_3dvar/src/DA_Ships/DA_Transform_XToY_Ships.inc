@@ -15,14 +15,14 @@ SUBROUTINE DA_Transform_XToY_Ships ( xa, xb, iv, xp, y )
    
    IF ( iv%num_ships > 0 ) THEN
 
-      y%ships(:)%u = 0.0
-      y%ships(:)%v = 0.0
-      y%ships(:)%t = 0.0
-      y%ships(:)%p = 0.0
-      y%ships(:)%q = 0.0
+!xyh      y%ships(:)%u = 0.0
+!xyh      y%ships(:)%v = 0.0
+!xyh      y%ships(:)%t = 0.0
+!xyh      y%ships(:)%p = 0.0
+!xyh      y%ships(:)%q = 0.0
 
       if (sfc_assi_options == 1) then
-      do n=1, iv % num_ships
+         do n=iv%ob_numb(iv%current_ob_time-1)%ships + 1, iv%ob_numb(iv%current_ob_time)%ships
 
        if(iv%ships(n)%loc%proc_domain_with_halo) then
 
@@ -68,7 +68,7 @@ SUBROUTINE DA_Transform_XToY_Ships ( xa, xb, iv, xp, y )
 ! [2.0] Surface assimilation approach 2
 
       else if (sfc_assi_options == 2) then
-         do n=1, iv % num_ships
+         do n=iv%ob_numb(iv%current_ob_time-1)%ships + 1, iv%ob_numb(iv%current_ob_time)%ships
             if(iv%ships(n)%loc%proc_domain_with_halo) then
                CALL DA_Transform_XToPsfc(xb,xa,xp,iv%ships(n),y%ships(n))
             endif

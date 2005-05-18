@@ -10,7 +10,7 @@ PROGRAM convert_nmm
    USE module_bc
    USE module_configure
    USE module_timing
-   USE esmf_mod
+   USE WRF_ESMF_MOD
 #ifdef DM_PARALLEL
    USE module_dm
 #endif
@@ -74,7 +74,10 @@ PROGRAM convert_nmm
 ! permit pass by reference through the registry generated
 ! interface to med_read_nmm, below
 #ifdef DEREF_KLUDGE
+!  see http://www.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm
    INTEGER     :: sm31 , em31 , sm32 , em32 , sm33 , em33
+   INTEGER     :: sm31x, em31x, sm32x, em32x, sm33x, em33x
+   INTEGER     :: sm31y, em31y, sm32y, em32y, sm33y, em33y
 #endif
 
    !  Get the NAMELIST data for input.
@@ -87,7 +90,9 @@ PROGRAM convert_nmm
    CALL disable_quilting
 #endif
 
-   CALL init_modules
+   CALL init_modules(1)   ! Phase 1 returns after MPI_INIT() (if it is called)
+   CALL ESMF_Initialize( defaultCalendar=ESMF_CAL_GREGORIAN, rc=rc )
+   CALL init_modules(2)   ! Phase 2 resumes after MPI_INIT() (if it is called)
 
 #ifdef DM_PARALLEL
    IF ( wrf_dm_on_monitor() ) THEN
@@ -119,9 +124,9 @@ PROGRAM convert_nmm
 
    CALL Setup_Timekeeping ( grid )
    CALL ESMF_TimeIntervalSet ( time_interval , S=model_config_rec%interval_seconds, rc=rc )
-   CALL ESMF_ClockSetTimeStep ( grid%domain_clock , time_interval , rc=rc )
-   CALL ESMF_ClockGetCurrTime ( grid%domain_clock, grid%current_time , rc=rc )
-   CALL ESMF_TimeGetString( grid%current_time, message, rc=rc)
+   CALL ESMF_ClockSet ( grid%domain_clock , timeStep=time_interval , rc=rc )
+   CALL ESMF_ClockGet ( grid%domain_clock, currTime=grid%current_time , rc=rc )
+   CALL wrf_timetoa ( grid%current_time, message )
    write(0,*)Trim(message)
 
    CALL model_to_grid_config_rec ( grid%id , model_config_rec , config_flags )
@@ -157,6 +162,14 @@ print *,'init_typ  =',model_config_rec%real_data_init_type
            start_year,start_month,start_day,start_hour,start_minute,start_second
    WRITE (   end_date_char , FMT = '(I4.4,"-",I2.2,"-",I2.2,"_",I2.2,":",I2.2,":",I2.2)' ) &
              end_year,  end_month,  end_day,  end_hour,  end_minute,  end_second
+
+   !  Override stop time with value computed above.
+   CALL wrf_atotime( end_date_char, grid%stop_time )
+   CALL ESMF_ClockSet ( grid%domain_clock , StopTime=grid%stop_time, rc=rc )
+   CALL wrf_check_error( ESMF_SUCCESS, rc, &
+                         'ESMF_ClockSet(grid%domain_clock) FAILED', &
+                         __FILE__ , &
+                         __LINE__  )
 
    !  Figure out our loop count for the processing times.
 
@@ -233,7 +246,7 @@ print *,'init_typ  =',model_config_rec%real_data_init_type
 
      write(0,*)'BDY FRAME ', BDY_FRAME
      write(*,*)'BDY FRAME ', BDY_FRAME
-     CALL ESMF_TimeGetString( grid%current_time, message, rc=rc)
+     CALL wrf_timetoa ( grid%current_time, message )
      write(0,*)Trim(message)
      bdyfrq = interval_seconds
      CALL nl_set_bdyfrq ( grid%id , bdyfrq )
@@ -242,14 +255,16 @@ print *,'init_typ  =',model_config_rec%real_data_init_type
        CALL wrf_error_fatal( 'real: error opening wrfbdy for writing' )
      ENDIF
 
-     CALL ESMF_ClockGetCurrTime ( grid%domain_clock, grid%current_time , rc=rc )
+     CALL ESMF_ClockGet ( grid%domain_clock, currTime=grid%current_time , rc=rc )
 
      current_date_char = current_date(1:19)
      CALL geth_newdate ( next_date_char, current_date_char, 3600 )
      current_date = next_date_char // '.0000'
 
      CALL output_boundary ( id, grid , config_flags , ierr )
-     CALL ESMF_ClockAdvance( grid%domain_clock, rc=rc )
+     IF ( .NOT. ESMF_ClockIsStopTime(grid%domain_clock ,rc=rc) ) THEN
+        CALL ESMF_ClockAdvance( grid%domain_clock, rc=rc )
+     ENDIF
 
      ntsd = (bdy_frame-1)*(3600./dt_from_file)
      CALL med_read_nmm_bdy ( grid, config_flags, ntsd, dt_from_file, tstart_from_file, tend_from_file, &
@@ -264,5 +279,7 @@ print *,'init_typ  =',model_config_rec%real_data_init_type
 
 
    CALL wrf_shutdown
+
+   CALL ESMF_Finalize( rc=rc )
 
 END PROGRAM convert_nmm

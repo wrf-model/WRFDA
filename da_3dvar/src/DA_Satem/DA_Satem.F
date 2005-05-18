@@ -8,6 +8,22 @@ MODULE DA_Satem
    USE DA_Tools
    USE PAR_UTIL
 
+! The "stats_satem_type" is ONLY used locally in DA_Satem:
+
+   TYPE residual_satem1_type
+      REAL          :: thickness                ! Satem thickness
+   END TYPE residual_satem1_type
+
+   TYPE maxmin_satem_stats_type
+        TYPE (maxmin_type)         :: thickness
+   END TYPE maxmin_satem_stats_type
+
+   TYPE stats_satem_type
+        TYPE (maxmin_satem_stats_type)  :: maximum, minimum
+        TYPE (residual_satem1_type)     :: average, rms_err
+   END TYPE stats_satem_type
+
+
 CONTAINS
 
 #include "DA_AO_Stats_Satem.inc"
