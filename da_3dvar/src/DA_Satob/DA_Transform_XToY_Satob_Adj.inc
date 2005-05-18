@@ -14,7 +14,7 @@ SUBROUTINE DA_Transform_XToY_Satob_Adj ( iv, xp, jo_grad_y, jo_grad_x )
 
    IF ( iv%num_satob > 0 ) THEN
 
-      do n=1, iv % num_satob
+      do n=iv%ob_numb(iv%current_ob_time-1)%satob + 1, iv%ob_numb(iv%current_ob_time)%satob
 
        if(iv%satob(n)%loc%proc_domain_with_halo) then
 

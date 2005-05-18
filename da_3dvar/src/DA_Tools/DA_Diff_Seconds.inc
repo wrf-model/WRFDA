@@ -80,7 +80,11 @@ real function DA_Diff_Seconds(date_char_1, date_char_2)
       endif
    endif
 
-   jd_2 = dd_2 + diff_days
+   if(ccyy_2 >= ccyy_1) then
+      jd_2 = dd_2 + diff_days
+   else
+      jd_2 = dd_2 - diff_days
+   endif
 
    do i=1,mo_2-1
       jd_2=jd_2+mmday(i)

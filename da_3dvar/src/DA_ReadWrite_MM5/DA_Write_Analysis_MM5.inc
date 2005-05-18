@@ -473,14 +473,29 @@ subroutine da_write_analysis_mm5( ix, jy, kz, xp, xb, xa, it )
          call add_3d(data, t_global, ix+1, jy+1, kz)
       elseif (xb_mm5%sub_header(nv)%name == 'CLW      ') then
          call add_3d(data, qcw_global, ix+1, jy+1, kz)
+         where (data < 0.0)
+            data = 0.0
+         end where
       elseif (xb_mm5%sub_header(nv)%name == 'RNW      ') then
          call add_3d(data, qrn_global, ix+1, jy+1, kz)
+         where (data < 0.0)
+            data = 0.0
+         end where
       elseif (xb_mm5%sub_header(nv)%name == 'ICE      ') then
          call add_3d(data, qci_global, ix+1, jy+1, kz)
+         where (data < 0.0)
+            data = 0.0
+         end where
       elseif (xb_mm5%sub_header(nv)%name == 'SNOW     ') then
          call add_3d(data, qsn_global, ix+1, jy+1, kz)
+         where (data < 0.0)
+            data = 0.0
+         end where
       elseif (xb_mm5%sub_header(nv)%name == 'GRAUPEL  ') then
          call add_3d(data, qgr_global, ix+1, jy+1, kz)
+         where (data < 0.0)
+            data = 0.0
+         end where
       elseif (xb_mm5%sub_header(nv)%name == 'Q        ') then
          call add_3d(data, q_global, ix+1, jy+1, kz)
 

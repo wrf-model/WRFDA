@@ -1,27 +1,33 @@
 #makefile to build io_int that does binary i/o
 
-OBJS = io_grib1.o pdstool.o std_ncep_gds.o wrt_grib_rec.o wrt_grib_msg.o \
+OBJSL   = io_grib1.o pdstool.o std_ncep_gds.o wrt_grib_rec.o wrt_grib_msg.o \
   append_24section.o cpGRIBsec.o mk_bds_bms.o \
   gribw_aux.o gribw_private.o intpower.o ibm2flt.o \
   flt2ibm.o flist2bit.o gdstool.o rd_grib_msg.o rd_grib_rec.o \
   seekgrib.o readgrib.o get_nxny.o BDSunpk.o  unpk_bds.o gribw_time.o \
   inv_scan.o open_file.o write_grib.o gridnav.o gribmap.o
+OBJS    = $(OBJSL)
+LIBS    = 
 M4      = m4 -Uinclude -Uindex -Ulen
 AR      = ar
 CPPFLAGS = -C -P
 
 .SUFFIXES:      .F90 .F .f .c .o
 
-all : libio_grib1.a
+all : libio_grib1.a wgrib_exe
+
+wgrib_exe :
+	( cd WGRIB ; make "CC=$(CC)" )
+	ln -sf WGRIB/wgrib .
 
 libio_grib1.a:		$(OBJS)
 			/bin/rm -f libio_grib1.a
-			$(AR) cr libio_grib1.a $(OBJS)
+			$(AR) cr libio_grib1.a $(OBJSL)
 			$(RANLIB) libio_grib1.a
 
-io_grib1.o:     io_grib1.F 
-	$(CPP) $(CPPFLAGS) -I../../main io_grib1.F | $(M4) - > io_grib1.f
-	$(FC) $(FCFLAGS) -I. -I../../main -I../../inc -c io_grib1.f
+io_grib1.o: io_grib1.F90
+	$(CPP) $(CPPFLAGS) -I../../main io_grib1.F90 | $(M4) - > io_grib1.f
+	$(FC) $(FCFLAGS) -I../../main -I../../inc -c io_grib1.f
 
 pdstool.o: pdstool.c pdstool.h
 
@@ -86,6 +92,8 @@ superclean: clean
 
 clean:  
 			/bin/rm -f  *.f *.o *.mod
+			( cd WGRIB ; make clean )
+			/bin/rm wgrib
 
 .c.o:
 	$(CC) -c $(CFLAGS) $*.c

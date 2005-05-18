@@ -19,7 +19,7 @@ subroutine da_get_var_diagnostics ( iv, j )
                     num_ssmt2_tot + num_satem_tot + num_airep_tot + &
                     num_satob_tot + num_ships_tot + num_sound_tot + &
                     num_qscat_tot + num_profiler_tot + num_buoy_tot &
-                  + num_gpsref_tot
+                  + num_gpsref_tot + num_bogus_tot
 
       call da_sum_reals( 5, j % jo % synop_u, j % jo % synop_v, &
                          j % jo % synop_t, j % jo % synop_p, j % jo % synop_q,&
@@ -46,6 +46,8 @@ subroutine da_get_var_diagnostics ( iv, j )
                          j % jo % airep_t, dum1, dum2, dum3, dum4 )
       call da_sum_reals( 2, j % jo % pilot_u, j % jo % pilot_v, dum1, dum2,   &
                                                              dum3, dum4, dum5 )
+      call da_sum_reals( 3, j % jo % bogus_u, j % jo % bogus_v, &
+                            j % jo % bogus_slp, dum1, dum2, dum3, dum4 )
       call da_sum_reals( 2, j % jo % ssmir_speed, j % jo % ssmir_tpw, &
                          dum1, dum2, dum3, dum4, dum5 )
       call da_sum_reals( 7, j % jo % ssmi_tb19v, j % jo % ssmi_tb19h, &
@@ -100,6 +102,8 @@ subroutine da_get_var_diagnostics ( iv, j )
                           MPI_SUM, MPI_COMM_WORLD, IERROR )
       call MPI_ALLREDUCE( iv%num_profiler, iv%num_profiler_glo, 1, MPI_INTEGER, &
                           MPI_SUM, MPI_COMM_WORLD, IERROR )
+      call MPI_ALLREDUCE( iv%num_bogus, iv%num_bogus_glo, 1, MPI_INTEGER, &
+                          MPI_SUM, MPI_COMM_WORLD, IERROR )
 #else
       iv%num_profiler_glo = iv%num_profiler
       iv%num_buoy_glo = iv%num_buoy
@@ -113,6 +117,7 @@ subroutine da_get_var_diagnostics ( iv, j )
       iv%num_ssmt1_glo = iv%num_ssmt1
       iv%num_ssmt2_glo = iv%num_ssmt2
       iv%num_pilot_glo = iv%num_pilot
+      iv%num_bogus_glo = iv%num_bogus
       iv%num_ships_glo = iv%num_ships
       iv%num_metar_glo = iv%num_metar
       iv%num_synop_glo = iv%num_synop
@@ -215,6 +220,15 @@ subroutine da_get_var_diagnostics ( iv, j )
                                   j % jo % airep_u, iv % airep_ef_u, &
                                   j % jo % airep_v, iv % airep_ef_v, &
                                   j % jo % airep_t, iv % airep_ef_t, &
+                                  0.0, 1.0, 0.0, 1.0
+         end if
+
+         if ( iv % num_bogus_glo > 0 ) then
+            write(jo_unit,'(a30,2i8,10f15.5)')'    bogus obs, Jo (actual)  = ', &
+                                  iv % num_bogus_glo, num_bogus_tot, &
+                                  j % jo % bogus_u, iv % bogus_ef_u, &
+                                  j % jo % bogus_v, iv % bogus_ef_v, &
+                                  j % jo % bogus_slp, iv % bogus_ef_slp, &
                                   0.0, 1.0, 0.0, 1.0
          end if
 

@@ -33,6 +33,8 @@ MODULE DA_Physics
 #include "DA_TP_To_Qs_Lin.inc"
 #include "DA_TRH_To_TD.inc"
 #include "DA_TPQ_To_SLP.inc"
+#include "DA_TPQ_To_SLP_Lin.inc"
+#include "DA_TPQ_To_SLP_Adj.inc"
 #include "DA_TPQ_To_Thickness.inc"
 #include "DA_Transform_XToTPW.inc"
 #include "DA_Transform_XToTPW_Adj.inc"

@@ -1,4 +1,4 @@
-subroutine da_calc_power( max_wavenumber, cv_size, cv, power )
+subroutine da_calc_power( max_wavenumber, r_cvsize, rcv, power )
 
 !-------------------------------------------------------------------------
 !  Performs spectral to gridpoint transformation on a sphere.
@@ -10,13 +10,23 @@ subroutine da_calc_power( max_wavenumber, cv_size, cv, power )
    implicit none
 
    integer, intent(in) :: max_wavenumber             ! Smallest scale required (ni/2 - 1).
-   integer, intent(in) :: cv_size                    ! Size of cv vector.
-   complex, intent(in) :: cv(1:cv_size)              ! Spectral modes.
+   integer, intent(in) :: r_cvsize                   ! Size of rcv vector.
+   real, intent(in)    :: rcv(1:r_cvsize)            ! Spectral modes.
    real, intent(out)   :: power(0:max_wavenumber)    ! Power spectrum.
 
    integer             :: n, m                       ! Loop counters.
-   integer             :: index                      ! Position markers in cv.
+   integer             :: index, indexx              ! Position markers in cv.
+   integer             :: cv_size                    ! Complex cv size.
    real                :: accum_power                ! Power for given total wavenumber n.
+   complex, allocatable:: cv(:)                      ! Complex control variable.
+
+!  Create complex array:
+   cv_size = r_cvsize / 2
+   allocate( cv(1:cv_size) )
+   do index = 1, cv_size
+      indexx = 2 * index - 1
+      cv(index) = cmplx( rcv(indexx), rcv(indexx+1) )
+   end do
 
    power(:) = 0.0
 
@@ -36,5 +46,7 @@ subroutine da_calc_power( max_wavenumber, cv_size, cv, power )
       end do
 
    end do
+
+   deallocate( cv )
       
 end subroutine da_calc_power
