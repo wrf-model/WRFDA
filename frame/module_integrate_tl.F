@@ -298,17 +298,12 @@ RECURSIVE SUBROUTINE integrate_tl ( grid, nl_date_string, nl_date_index )
                     'nl_date_string(nl_date_index)(1:19)=', nl_date_string(nl_date_index)(1:19)
 
 ! -------      do input
-               write(unit=10, fmt='(a,i2,2a,2(2x,a,f12.4))') &
-                    '1. xyh nl_date_string(', nl_date_index, ')=', nl_date_string(nl_date_index)(1:19), &
-                    'grid%t_2(1,1,1)=', grid%em_t_2(1,1,1), &
-                    'grid%g_t_2(1,1,1)=', grid%em_g_t_2(1,1,1)
 
                CALL med_auxinput2_in ( grid , config_flags , nl_date_string(nl_date_index) )
 
-               write(unit=10, fmt='(a,i2,2a,2(2x,a,f12.4))') &
-                    '2. xyh nl_date_string(', nl_date_index, ')=', nl_date_string(nl_date_index)(1:19), &
-                    'grid%t_2(1,1,1)=', grid%em_t_2(1,1,1), &
-                    'grid%g_t_2(1,1,1)=', grid%em_g_t_2(1,1,1)
+               write(unit=10, fmt='(a,i2,2a,2x,a,f12.4)') &
+                    'xyh nl_date_string(', nl_date_index, ')=', nl_date_string(nl_date_index-1)(1:19), &
+                    'grid%t_2(1,1,1)=', grid%em_t_2(1,1,1)
 
                nl_date_index = nl_date_index + 1
             else
