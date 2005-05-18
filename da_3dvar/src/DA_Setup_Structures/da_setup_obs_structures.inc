@@ -48,6 +48,7 @@ SUBROUTINE da_setup_obs_structures( xp, ob, iv )
    iv%num_buoy=0
    iv%num_profiler=0
    iv%num_radar=0
+   iv%num_bogus=0
 
    iv%num_pseudo=num_pseudo
 
@@ -79,6 +80,5 @@ SUBROUTINE da_setup_obs_structures( xp, ob, iv )
 
 !     Get horizontal interpolation weights.
       call da_setup_obs_interp_wts( xp, iv )     
-
 END SUBROUTINE da_setup_obs_structures
 

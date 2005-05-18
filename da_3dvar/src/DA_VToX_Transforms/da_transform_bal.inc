@@ -20,7 +20,6 @@ SUBROUTINE da_transform_bal( xb, vp, xa, be ,xp,&
 !-------------------------------------------------------------------
 !  [1.0] Initialise:
 !------------------------------------------------------------------- 
-  
 !  linear balance btw psi and t-b, Psfc_b and chi_b 
 !  [3.1] Calculate t_b from psi
 
@@ -70,10 +69,10 @@ SUBROUTINE da_transform_bal( xb, vp, xa, be ,xp,&
 !  Communicate halo region.
    CALL wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id1)
 
-   CALL DA_PsiChi_To_UV( vp % v1, vp % v2, xb % map_factor, &
-                         xb % ds, xa % u, xa % v, &
-                         ids,ide, jds,jde, kds,kde, &
-                         ims,ime, jms,jme, kms,kme, &
+   CALL DA_PsiChi_To_UV( vp % v1, vp % v2, xb % coefx, &
+                         xb % coefy, xa % u, xa % v,   &
+                         ids,ide, jds,jde, kds,kde,    &
+                         ims,ime, jms,jme, kms,kme,    &
                          its,ite, jts,jte, kts,kte )
 
 !  [3.5] treat humidity                         

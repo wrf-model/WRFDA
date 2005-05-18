@@ -9,6 +9,36 @@ MODULE DA_SSMI
    USE DA_Tools
    USE PAR_UTIL
 
+! The "stats_ssmi_rv_type" is ONLY used locally in DA_Ssmi_Rv:
+
+   TYPE maxmin_ssmi_rv_stats_type
+        TYPE (maxmin_type)         :: tpw      ! Toatl precipitable water cm
+        TYPE (maxmin_type)         :: Speed    ! Wind speed (m/s)
+   END TYPE maxmin_ssmi_rv_stats_type
+
+   TYPE stats_ssmi_retrieval_type
+        TYPE (maxmin_ssmi_rv_stats_type)      :: maximum, minimum
+        TYPE (residual_ssmi_retrieval_type)   :: average, rms_err
+   END TYPE stats_ssmi_retrieval_type
+
+! The "stats_ssmi_tb_type" is ONLY used locally in DA_Ssmi_tb:
+
+   TYPE maxmin_ssmi_tb_stats_type
+        TYPE (maxmin_type)         :: tb19v    ! brightness temperature (K)
+        TYPE (maxmin_type)         :: tb19h    ! brightness temperature (K)
+        TYPE (maxmin_type)         :: tb22v    ! brightness temperature (K)
+        TYPE (maxmin_type)         :: tb37v    ! brightness temperature (K)
+        TYPE (maxmin_type)         :: tb37h    ! brightness temperature (K)
+        TYPE (maxmin_type)         :: tb85v    ! brightness temperature (K)
+        TYPE (maxmin_type)         :: tb85h    ! brightness temperature (K)
+   END TYPE maxmin_ssmi_tb_stats_type
+
+   TYPE stats_ssmi_tb_type
+        TYPE (maxmin_ssmi_tb_stats_type)  :: maximum, minimum
+        TYPE (residual_ssmi_tb_type)      :: average, rms_err
+   END TYPE stats_ssmi_tb_type
+
+
 CONTAINS
 
 #include "DA_AO_Stats_SSMI.inc"

@@ -285,5 +285,25 @@ SUBROUTINE da_use_obs_errfac( iv )
       END DO
    ENDIF
 
+!  [2.16] Transfer TC bogus obs:
+
+   IF ( iv % num_bogus > 0 ) THEN
+
+      call da_read_errfac( 'bogus', iv % bogus_ef_u, iv % bogus_ef_v, &
+                           iv % bogus_ef_slp, d1, d2 )
+
+      DO n = 1, iv % num_bogus
+         DO k = 1, iv % bogus(n) % info % levels
+            iv % bogus(n) % u(k) % error = iv % bogus(n) % u(k) % error * &
+                                           iv % bogus_ef_u
+            iv % bogus(n) % v(k) % error = iv % bogus(n) % v(k) % error * &
+                                           iv % bogus_ef_v
+
+         END DO
+
+         iv % bogus(n) % slp % error = iv % bogus(n) % slp % error * iv % bogus_ef_slp
+      END DO
+   END IF
+
 END SUBROUTINE da_use_obs_errfac
 
