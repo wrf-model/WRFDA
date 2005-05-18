@@ -78,7 +78,9 @@ Crizvi      INTEGER*2 HZERO/0/,HWORK
             IDATA(I)=0                                                          
    20    CONTINUE                                                               
          IF ((LM/2)*2.NE.LM) THEN                    ! LM ODD                   
-            CALL MOVEC(IDATA(LM/2+1),1,HZERO,1,2)                               
+Crizvi            CALL MOVEC(IDATA(LM/2+1),1,HZERO,1,2)                               
+         IDATA(LM/2+1) = HZERO * 65536
+
          END IF                                                                 
       ELSE                             ! NORMAL DATA                            
          EXPV=DVAL/DIST                                                         
@@ -93,7 +95,8 @@ Crizvi      INTEGER*2 HZERO/0/,HWORK
    30    CONTINUE                                                               
          IF ((LM/2)*2.NE.LM) THEN                    ! LM ODD                   
             HWORK=NINT((RDATA(LM)-DBASE)*EXPV)                                  
-            CALL MOVEC(IDATA(LM/2+1),1,HWORK,1,2)                               
+Crizvi            CALL MOVEC(IDATA(LM/2+1),1,HWORK,1,2)                               
+         IDATA(LM/2+1) = HWORK * 65536
          END IF                                                                 
       END IF                                                                    
 *                                                                               
@@ -123,10 +126,12 @@ C*********************************************************************
 *                                                                               
 Crizvi      REAL*4    RDATA(LM)                                                       
       REAL    RDATA(LM)                                                       
-C     INTEGER*4 IDATA(*)                                                        
+cshc-rizvi start
+c     INTEGER*4 IDATA(*)                                                        
       INTEGER*2 IDATA(*)                                                        
-Crizvi      INTEGER*2 HWORK                                                           
-      INTEGER HWORK                                                           
+cshc-rizvi end
+      INTEGER*2 HWORK                                                           
+C      INTEGER HWORK                                                           
 *                                                                               
       DO 10 I=2,LM,2                                                            
          IWRK=IDATA(I/2)/65536                                                  
@@ -151,7 +156,8 @@ Crizvi      INTEGER*2 HWORK
          END IF                                                                 
    10 CONTINUE                                                                  
       IF ((LM/2)*2.NE.LM) THEN                    ! LM ODD                      
-         CALL MOVEC(HWORK,1,IDATA(LM/2+1),1,2)                                  
+Crizvi         CALL MOVEC(HWORK,1,IDATA(LM/2+1),1,2)  
+         HWORK=IDATA(LM/2+1)/65536
          RDATA(LM)=BASE+AMP*HWORK                                               
       END IF                                                                    
 *                                                                               
@@ -181,8 +187,8 @@ C*********************************************************************
 *                                                                               
       REAL*8    RDATA(LM)                                                       
       INTEGER*4 IDATA(*)                                                        
-Crizvi      INTEGER*2 HWORK                                                           
-      INTEGER HWORK                                                           
+      INTEGER*2 HWORK                                                           
+c     INTEGER HWORK                                                           
 *                                                                               
       DO 10 I=2,LM,2                                                            
          IWRK=IDATA(I/2)/65536                                                  
@@ -207,7 +213,8 @@ Crizvi      INTEGER*2 HWORK
          END IF                                                                 
    10 CONTINUE                                                                  
       IF ((LM/2)*2.NE.LM) THEN                    ! LM ODD                      
-         CALL MOVEC(HWORK,1,IDATA(LM/2+1),1,2)                                  
+Crizvi         CALL MOVEC(HWORK,1,IDATA(LM/2+1),1,2)  
+         HWORK=IDATA(LM/2+1)/65536
          RDATA(LM)=BASE+AMP*HWORK                                               
       END IF                                                                    
 *                                                                               

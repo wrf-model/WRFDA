@@ -234,7 +234,6 @@ state   integer auxinput2_oid  -        -          -         -     -         "au
 state   integer auxinput3_oid  -        -          -         -     -         "auxinput3_oid"         ""         ""
 state   integer auxinput4_oid  -        -          -         -     -         "auxinput4_oid"         ""         ""
 state   integer auxinput5_oid  -        -          -         -     -         "auxinput5_oid"         ""         ""
-state   integer nframes        -        -          -         -     -         "nframes"               ""         ""      
 # input file descriptor for lbcs on parent domain                                               
 state   integer lbc_fid        -        -          -         -     -         "lbc_fid"               ""         ""      
 # indicates if tiling has been computed                                         
@@ -624,6 +623,11 @@ rconfig   integer interval_seconds        namelist,time_control		1             4
 rconfig   logical input_from_file         namelist,time_control		max_domains    .false. irh    "input_from_file"      "T/F INPUT FOR THIS DOMAIN FROM A SEPARATE INPUT FILE"  ""
 rconfig   integer history_interval        namelist,time_control		max_domains    0       h     "history_interval"       ""      "MINUTES"
 rconfig   integer frames_per_outfile      namelist,time_control		max_domains    10      h     "frames_per_outfile"            ""      ""
+rconfig   integer frames_per_auxhist1     namelist,time_control		max_domains    10      h     "frames_per_auxhist1"            ""      ""
+rconfig   integer frames_per_auxhist2     namelist,time_control		max_domains    10      h     "frames_per_auxhist2"            ""      ""
+rconfig   integer frames_per_auxhist3     namelist,time_control		max_domains    10      h     "frames_per_auxhist3"            ""      ""
+rconfig   integer frames_per_auxhist4     namelist,time_control		max_domains    10      h     "frames_per_auxhist4"            ""      ""
+rconfig   integer frames_per_auxhist5     namelist,time_control		max_domains    10      h     "frames_per_auxhist5"            ""      ""
 rconfig   logical restart                 namelist,time_control		1             .false. h    "restart"              ""      ""
 rconfig   integer restart_interval        namelist,time_control		1              0       h     "restart_interval"       ""      "MINUTES"
 rconfig   integer     io_form_input       namelist,time_control		1              2       h        "io_form_input"                 ""      ""
@@ -1074,6 +1078,9 @@ rconfig   integer isoilwater              derived                  max_domains  
 rconfig   integer map_proj                derived                  max_domains    0       -        "map_proj"             "domain map projection"      "0=none, 1=Lambert, 2=polar, 3=Mercator"
 
 #
+#
+# Single dummy declaration to define a nodyn dyn option
+state integer nodyn_dummy - dyn_nodyn -  -  -  "" "" ""      
 
 #
 #---------------------------------------------------------------------------------------------------------------------------------------
@@ -1083,6 +1090,7 @@ rconfig   integer map_proj                derived                  max_domains  
 #key      package       associated                package          associated 4d scalars
 #         name          namelist choice           state vars
 
+package   dyn_nodyn    dyn_opt==0                   -             -
 package   dyn_em       dyn_opt==2                   -             -
 
 #package   passivec1     chem_opt==0                  -             
@@ -1091,7 +1099,7 @@ package   kesslerscheme mp_physics==1                -             moist:qv,qc,q
 package   linscheme     mp_physics==2                -             moist:qv,qc,qr,qi,qs,qg
 package   wsm3scheme    mp_physics==3                -             moist:qv,qc,qr
 package   wsm5scheme    mp_physics==4                -             moist:qv,qc,qr,qi,qs
-package   etampnew      mp_physics==5                -             moist:qv,qc
+package   etampnew      mp_physics==5                -             moist:qv,qc,,qr,qi
 package   wsm6scheme    mp_physics==6                -             moist:qv,qc,qr,qi,qs,qg
 package   ncepcloud3    mp_physics==98               -             moist:qv,qc,qr
 package   ncepcloud5    mp_physics==99               -             moist:qv,qc,qr,qi,qs
@@ -1111,11 +1119,13 @@ package   lsmscheme      sf_surface_physics==2       -             -
 package   ruclsmscheme   sf_surface_physics==3       -             -
 package   ysuscheme      bl_pbl_physics==1           -             -
 package   myjpblscheme   bl_pbl_physics==2           -             -
+package   gfsscheme      bl_pbl_physics==3           -             -
 package   mrfscheme      bl_pbl_physics==99          -             -
 
 package   kfetascheme    cu_physics==1               -             -
 package   bmjscheme      cu_physics==2               -             -
 package   gdscheme       cu_physics==3               -             -
+package   sasscheme      cu_physics==4               -             -
 package   kfscheme       cu_physics==99              -             -
                                                 
 # only need to specify these once; not for every io_form* variable
