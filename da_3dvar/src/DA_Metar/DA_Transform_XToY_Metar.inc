@@ -15,14 +15,14 @@ SUBROUTINE da_transform_xtoy_metar ( xa, xb, iv, xp, y )
    
    IF ( iv%num_metar > 0 ) THEN
 
-      y%metar(:)%u = 0.0
-      y%metar(:)%v = 0.0
-      y%metar(:)%t = 0.0
-      y%metar(:)%p = 0.0
-      y%metar(:)%q = 0.0
+!xyh      y%metar(:)%u = 0.0
+!xyh      y%metar(:)%v = 0.0
+!xyh      y%metar(:)%t = 0.0
+!xyh      y%metar(:)%p = 0.0
+!xyh      y%metar(:)%q = 0.0
 
       if (sfc_assi_options == 1) then
-      do n=1, iv % num_metar
+      do n=iv%ob_numb(iv%current_ob_time-1)%metar + 1, iv%ob_numb(iv%current_ob_time)%metar
 
        if(iv%metar(n)%loc%proc_domain_with_halo) then
 
@@ -66,7 +66,7 @@ SUBROUTINE da_transform_xtoy_metar ( xa, xb, iv, xp, y )
 ! [2.0] Surface assimilation approach 2
 
       else if (sfc_assi_options == 2) then
-         do n=1, iv % num_metar
+         do n=iv%ob_numb(iv%current_ob_time-1)%metar + 1, iv%ob_numb(iv%current_ob_time)%metar
             if(iv%metar(n)%loc%proc_domain_with_halo) then
                CALL DA_Transform_XToPsfc(xb,xa,xp,iv%metar(n),y%metar(n))
             endif

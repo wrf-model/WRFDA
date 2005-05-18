@@ -119,4 +119,10 @@ SUBROUTINE da_transform_xtoy( xb, iv, xa, xp, y )
 
    call da_transform_xtoy_Radar ( xa, xb, iv, xp, y )
 
+!------------------------------------------------------------------------------
+!  [19.0] TC bogus observation operator y = H(x):
+!------------------------------------------------------------------------------
+
+   call da_transform_xtoy_Bogus ( xa, xb, iv, xp, y )
+
 END SUBROUTINE da_transform_xtoy

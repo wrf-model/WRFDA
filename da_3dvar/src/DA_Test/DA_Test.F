@@ -28,6 +28,7 @@ module DA_Test
    USE da_pseudo
    USE DA_Profiler
    USE DA_Buoy 
+   USE DA_Bogus 
    USE DA_Setup_Structures
    USE DA_Tools
    use da_qscat
@@ -66,6 +67,7 @@ contains
 #include "DA_Check_XToY_Adjoint_Satob.inc"
 #include "DA_Check_XToY_Adjoint_Ships.inc"
 #include "DA_Check_XToY_Adjoint_Radar.inc"
+#include "DA_Check_XToY_Adjoint_Bogus.inc"
 #include "DA_Check_XToY_Adjoint_Sound.inc"
 #include "DA_Check_XToY_Adjoint_Sonde_sfc.inc"
 #include "DA_Check_XToY_Adjoint_Synop.inc"

@@ -32,7 +32,7 @@ SUBROUTINE DA_TRANSFORM_XTOY_SATEM_ADJ( iv, xp, jo_grad_y, jo_grad_x, xb)
     
    IF ( iv%num_satem > 0 ) THEN
 
-      DO n=1, iv % num_satem
+      do n=iv%ob_numb(iv%current_ob_time-1)%satem + 1, iv%ob_numb(iv%current_ob_time)%satem
 
        if(iv%satem(n)%loc%proc_domain_with_halo) then
 

@@ -14,12 +14,12 @@ SUBROUTINE da_transform_xtoy_profiler ( xa, iv, xp, y )
    
    IF ( iv%num_profiler > 0 ) THEN
 
-      do n=1, iv % num_profiler
+      do n=iv%ob_numb(iv%current_ob_time-1)%profiler + 1, iv%ob_numb(iv%current_ob_time)%profiler
 
        if(iv%profiler(n)%loc%proc_domain_with_halo) then
 
-         y%profiler(n)%u(:) = 0.0
-         y%profiler(n)%v(:) = 0.0
+!xyh         y%profiler(n)%u(:) = 0.0
+!xyh         y%profiler(n)%v(:) = 0.0
 
          k = iv % profiler(n) % info % levels
  

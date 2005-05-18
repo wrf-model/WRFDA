@@ -13,7 +13,7 @@ PROGRAM real_data
    USE module_input_chem_data
    USE module_input_chem_bioemiss
 #endif
-   USE esmf_mod
+   USE WRF_ESMF_MOD
 #ifdef DM_PARALLEL
    USE module_dm
 #endif
@@ -77,7 +77,9 @@ real::t1,t2
    !  chemistry indices, etc.
 
    CALL       wrf_debug ( 100 , 'real_em: calling init_modules ' )
-   CALL init_modules
+   CALL init_modules(1)   ! Phase 1 returns after MPI_INIT() (if it is called)
+   CALL ESMF_Initialize( defaultCalendar=ESMF_CAL_GREGORIAN, rc=rc )
+   CALL init_modules(2)   ! Phase 2 resumes after MPI_INIT() (if it is called)
 
    !  The configuration switches mostly come from the NAMELIST input.
 
@@ -110,8 +112,17 @@ real::t1,t2
    grid => head_grid
 
    CALL Setup_Timekeeping ( grid )
+   CALL wrf_clockprint ( 150, grid%domain_clock, &
+                         'DEBUG real:  grid%domain_clock after Setup_Timekeeping,' )
    CALL ESMF_TimeIntervalSet ( time_interval , S=model_config_rec%interval_seconds, rc=rc )
-   CALL ESMF_ClockSetTimeStep ( grid%domain_clock , time_interval , rc=rc )
+   CALL ESMF_ClockSet ( grid%domain_clock , timeStep=time_interval , rc=rc )
+   CALL wrf_check_error( ESMF_SUCCESS, rc, &
+                         'ESMF_ClockSet(grid%domain_clock) FAILED', &
+                         __FILE__ , &
+                         __LINE__  )
+   CALL wrf_clockprint ( 150, grid%domain_clock, &
+                         'DEBUG real:  grid%domain_clock after timeStep set,' )
+
 
    CALL       wrf_debug ( 100 , 'real_em: calling set_scalar_indices_from_config ' )
    CALL set_scalar_indices_from_config ( grid%id , idum1, idum2 )
@@ -146,6 +157,8 @@ real::t1,t2
 
    CALL wrf_shutdown
 
+   CALL ESMF_Finalize( rc=rc )
+
 END PROGRAM real_data
 
 SUBROUTINE med_sidata_input ( grid , config_flags )
@@ -163,6 +176,7 @@ SUBROUTINE med_sidata_input ( grid , config_flags )
 #endif
 
    USE module_date_time
+   USE WRF_ESMF_MOD
 
    IMPLICIT NONE
 
@@ -210,6 +224,22 @@ real::t1,t2
                                    model_config_rec%interval_seconds      , &
                                    model_config_rec%real_data_init_type   , &
                                    start_date_char , end_date_char , time_loop_max )
+
+   !  Override stop time with value computed above.  
+   CALL wrf_atotime( end_date_char, grid%stop_time )
+   CALL ESMF_ClockSet ( grid%domain_clock , StopTime=grid%stop_time, rc=rc )
+   CALL wrf_check_error( ESMF_SUCCESS, rc, &
+                         'ESMF_ClockSet(grid%domain_clock) FAILED', &
+                         __FILE__ , &
+                         __LINE__  )
+   ! TBH:  for now, turn off stop time and let it run data-driven
+   CALL ESMF_ClockStopTimeDisable( grid%domain_clock, rc=rc ) 
+   CALL wrf_check_error( ESMF_SUCCESS, rc, &
+                         'ESMF_ClockStopTimeDisable(grid%domain_clock) FAILED', &
+                         __FILE__ , &
+                         __LINE__  )
+   CALL wrf_clockprint ( 150, grid%domain_clock, &
+                         'DEBUG med_sidata_input:  grid%domain_clock after stopTime set,' )
 
    !  Here we define the initial time to process, for later use by the code.
    
@@ -278,21 +308,23 @@ real::t1,t2
 
 #ifdef WRF_CHEM
       IF ( loop == 1 ) THEN
-         IF( grid%chem_opt .NE. 0 ) then
+         IF ( ( grid%chem_opt .EQ. RADM2     ) .OR. &
+              ( grid%chem_opt .EQ. RADM2SORG ) .OR. &
+              ( grid%chem_opt .EQ. RACM      ) .OR. &
+              ( grid%chem_opt .EQ. RACMSORG  ) ) THEN
            ! Read the chemistry data from a previous wrf forecast (wrfout file)
-            IF(grid%chem_in_opt == 1 ) THEN
+           IF(grid%chem_in_opt == 1 ) THEN
               message = 'INITIALIZING CHEMISTRY WITH OLD SIMULATION'
               CALL  wrf_message ( message )
 
               CALL input_ext_chem_file( grid )
 
-
-              message = 'READING BEIS3.11 EMISSIONS DATA'
-              CALL  wrf_message ( message )
+              IF(grid%bio_emiss_opt == BEIS311 ) THEN
+                 message = 'READING BEIS3.11 EMISSIONS DATA'
+                 CALL  wrf_message ( message )
+                 CALL med_read_wrf_chem_bioemiss ( grid , config_flags)
+              END IF
  
-              CALL med_read_wrf_chem_bioemiss ( grid , config_flags)
-!             CALL input_ext_chem_beis3_file ( grid )
-!
            ELSEIF(grid%chem_in_opt == 0)then
               ! Generate chemistry data from a idealized vertical profile
               message = 'STARTING WITH BACKGROUND CHEMISTRY '
@@ -300,12 +332,11 @@ real::t1,t2
 
               CALL input_chem_profile ( grid )
 
-
-              message = 'READING BEIS3.11 EMISSIONS DATA'
-              CALL  wrf_message ( message )
-
-              CALL med_read_wrf_chem_bioemiss ( grid , config_flags)
-!             CALL input_ext_chem_beis3_file ( grid )
+              IF(grid%bio_emiss_opt == BEIS311 ) THEN
+                 message = 'READING BEIS3.11 EMISSIONS DATA'
+                 CALL  wrf_message ( message )
+                 CALL med_read_wrf_chem_bioemiss ( grid , config_flags)
+              END IF
 
            ELSE
              message = 'RUNNING WITHOUT CHEMISTRY INITIALIZATION'
@@ -321,8 +352,19 @@ real::t1,t2
 
       CALL geth_newdate ( current_date_char , start_date_char , loop * model_config_rec%interval_seconds )
       current_date =  current_date_char // '.0000'
-      CALL atotime( current_date(1:19), grid%current_time )
-      CALL ESMF_ClockSetCurrTime(grid%domain_clock, grid%current_time, rc)
+      CALL wrf_atotime( current_date(1:19), grid%current_time )
+      CALL wrf_clockprint ( 150, grid%domain_clock, &
+                            'DEBUG med_sidata_input:  grid%domain_clock before currTime set,' )
+      WRITE (wrf_err_message,*) &
+        'DEBUG med_sidata_input:  before currTime set, current_date = ',TRIM(current_date)
+      CALL wrf_debug ( 150 , wrf_err_message )
+      CALL ESMF_ClockSet(grid%domain_clock, currTime=grid%current_time, rc=rc)
+      CALL wrf_check_error( ESMF_SUCCESS, rc, &
+                            'ESMF_ClockSet(grid%domain_clock) FAILED', &
+                            __FILE__ , &
+                            __LINE__  )
+      CALL wrf_clockprint ( 150, grid%domain_clock, &
+                            'DEBUG med_sidata_input:  grid%domain_clock after currTime set,' )
 if (loop.ne.time_loop_max )then
 print *,'set esmf clock to ',current_date(1:19)
 endif
@@ -539,7 +581,11 @@ print *,'spec_bdy_width, interval_seconds, loop=',spec_bdy_width , interval_seco
                CALL wrf_error_fatal( 'real: error opening wrfbdy for writing' )
          ENDIF
       ELSE
-         CALL ESMF_ClockAdvance( grid%domain_clock, rc=rc )
+         IF ( .NOT. ESMF_ClockIsStopTime(grid%domain_clock ,rc=rc) ) THEN
+            CALL ESMF_ClockAdvance( grid%domain_clock, rc=rc )
+            CALL wrf_clockprint ( 150, grid%domain_clock, &
+                                  'DEBUG assemble_output:  grid%domain_clock after ClockAdvance,' )
+         ENDIF
       END IF
 
 
@@ -604,22 +650,55 @@ print *,'spec_bdy_width, interval_seconds, loop=',spec_bdy_width , interval_seco
       !  that the starting time in the attributes is the second time period.  Why you may ask.  I
       !  agree, why indeed.
 
-      CALL atotime( current_date(1:19), grid%current_time )
-      CALL ESMF_ClockSetCurrTime(grid%domain_clock, grid%current_time, rc)
+      CALL wrf_atotime( current_date(1:19), grid%current_time )
+      CALL wrf_clockprint ( 150, grid%domain_clock, &
+                            'DEBUG assemble_output:  grid%domain_clock before 1st currTime set,' )
+      WRITE (wrf_err_message,*) &
+        'DEBUG assemble_output:  before 1st currTime set, current_date = ',TRIM(current_date)
+      CALL wrf_debug ( 150 , wrf_err_message )
+      CALL ESMF_ClockSet(grid%domain_clock, currTime=grid%current_time, rc=rc)
+      CALL wrf_check_error( ESMF_SUCCESS, rc, &
+                            'ESMF_ClockSet(grid%domain_clock) FAILED', &
+                            __FILE__ , &
+                            __LINE__  )
+      CALL wrf_clockprint ( 150, grid%domain_clock, &
+                            'DEBUG assemble_output:  grid%domain_clock after 1st currTime set,' )
 
       temp24= current_date
       temp24b=start_date
       start_date = current_date
       CALL geth_newdate ( temp19 , temp24b(1:19) , (loop-2) * model_config_rec%interval_seconds )
       current_date = temp19 //  '.0000'
-      CALL atotime( current_date(1:19), grid%current_time )
-      CALL ESMF_ClockSetCurrTime(grid%domain_clock, grid%current_time, rc)
+      CALL wrf_atotime( current_date(1:19), grid%current_time )
+      CALL wrf_clockprint ( 150, grid%domain_clock, &
+                            'DEBUG assemble_output:  grid%domain_clock before 2nd currTime set,' )
+      WRITE (wrf_err_message,*) &
+        'DEBUG assemble_output:  before 2nd currTime set, current_date = ',TRIM(current_date)
+      CALL wrf_debug ( 150 , wrf_err_message )
+      CALL ESMF_ClockSet(grid%domain_clock, currTime=grid%current_time, rc=rc)
+      CALL wrf_check_error( ESMF_SUCCESS, rc, &
+                            'ESMF_ClockSet(grid%domain_clock) FAILED', &
+                            __FILE__ , &
+                            __LINE__  )
+      CALL wrf_clockprint ( 150, grid%domain_clock, &
+                            'DEBUG assemble_output:  grid%domain_clock after 2nd currTime set,' )
 print *,'LBC valid between these times ',current_date, ' ',start_date
       CALL output_boundary ( id, grid , config_flags , ierr )
       current_date = temp24
       start_date = temp24b
-      CALL atotime( current_date(1:19), grid%current_time )
-      CALL ESMF_ClockSetCurrTime(grid%domain_clock, grid%current_time, rc)
+      CALL wrf_atotime( current_date(1:19), grid%current_time )
+      CALL wrf_clockprint ( 150, grid%domain_clock, &
+                            'DEBUG assemble_output:  grid%domain_clock before 3rd currTime set,' )
+      WRITE (wrf_err_message,*) &
+        'DEBUG assemble_output:  before 3rd currTime set, current_date = ',TRIM(current_date)
+      CALL wrf_debug ( 150 , wrf_err_message )
+      CALL ESMF_ClockSet(grid%domain_clock, currTime=grid%current_time, rc=rc)
+      CALL wrf_check_error( ESMF_SUCCESS, rc, &
+                            'ESMF_ClockSet(grid%domain_clock) FAILED', &
+                            __FILE__ , &
+                            __LINE__  )
+      CALL wrf_clockprint ( 150, grid%domain_clock, &
+                            'DEBUG assemble_output:  grid%domain_clock after 3rd currTime set,' )
 
       !  OK, for all of the loops, we output the initialzation data, which would allow us to
       !  start the model at any of the available analysis time periods.

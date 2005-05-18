@@ -1,7 +1,7 @@
-subroutine DA_Balance_CycloTerm_Lin( ds, rho, ub, vb, u, v, &
-                                     map_factor, term_x, term_y, &
-                                     ids,ide, jds,jde, kds,kde,  &
-                                     ims,ime, jms,jme, kms,kme,  &
+subroutine DA_Balance_CycloTerm_Lin( rho, ub, vb, u, v, coefx,  &
+                                     coefy, term_x, term_y,     &
+                                     ids,ide, jds,jde, kds,kde, &
+                                     ims,ime, jms,jme, kms,kme, &
                                      its,ite, jts,jte, kts,kte )
                                      
 !------------------------------------------------------------------------------
@@ -12,6 +12,8 @@ subroutine DA_Balance_CycloTerm_Lin( ds, rho, ub, vb, u, v, &
 !  ASSUMPTIONS: Various (see documentation).
 !
 !  HISTORY: 03/02/2000 - Creation of F90 version.           Dale Barker
+!
+!           01/31/2005 - Updated for Global                 Syed RH Rizvi 
 !------------------------------------------------------------------------------
 
    implicit none
@@ -20,19 +22,16 @@ subroutine DA_Balance_CycloTerm_Lin( ds, rho, ub, vb, u, v, &
    integer, intent(in)  :: ims,ime, jms,jme, kms,kme    ! memory dims.
    integer, intent(in)  :: its,ite, jts,jte, kts,kte    ! tile   dims.
 
-   real, intent(in)     :: ds                           ! Resolution.
-
    real, dimension(ims:ime,jms:jme), intent(in) :: rho, &           ! Density.
                                                    ub, &            ! Background u wind
                                                    vb, &            ! Background u wind
                                                    u, &             ! u wind increment
                                                    v, &             ! v wind increment
-                                                   map_factor       ! Map factors.
+                                                   coefx, coefy     ! Multiplicative const.
 
    real, dimension(ims:ime,jms:jme), intent(inout) :: term_x, &     ! x component of term.
                                                       term_y        ! y component of term.
 
-   real                 :: inv_2ds                      ! 1/2ds.
    integer              :: i, j                         ! Loop counters.
    integer              :: is, ie                       ! 1st dim. end points.
    integer              :: js, je                       ! 2nd dim. end points.
@@ -46,13 +45,12 @@ subroutine DA_Balance_CycloTerm_Lin( ds, rho, ub, vb, u, v, &
 !  [1.0] Initialise:
 !------------------------------------------------------------------------------
 
-   inv_2ds = 0.5 / ds
-   
 !  Computation to check for edge of domain:
    is = its; ie = ite; js = jts; je = jte
-   if ( its == ids ) is = ids+1; if ( ite == ide ) ie = ide-1
+   if (.not. global .and. its == ids ) is = ids+1
+   if (.not. global .and. ite == ide ) ie = ide-1
    if ( jts == jds ) js = jds+1; if ( jte == jde ) je = jde-1
-   
+
 !------------------------------------------------------------------------------
 !  [2.0] Calculate term_x = rho M ( u'du/dx + v'du/dy + udu'/dx + vdu'/dy ):
 !------------------------------------------------------------------------------
@@ -61,13 +59,15 @@ subroutine DA_Balance_CycloTerm_Lin( ds, rho, ub, vb, u, v, &
 
    do j = js, je
       do i = is, ie
-         data(i,j) = u(i,j) * ( ub(i+1,j) - ub(i-1,j) ) + &
-                     v(i,j) * ( ub(i,j+1) - ub(i,j-1) ) + &
-                     ub(i,j) * ( u(i+1,j) - u(i-1,j) ) + &
-                     vb(i,j) * ( u(i,j+1) - u(i,j-1) )
+         data(i,j) = coefx(i,j)*u(i,j) * ( ub(i+1,j) - ub(i-1,j) ) + &
+                     coefy(i,j)*v(i,j) * ( ub(i,j+1) - ub(i,j-1) ) + &
+                     coefx(i,j)*ub(i,j) * ( u(i+1,j) - u(i-1,j) ) + &
+                     coefy(i,j)*vb(i,j) * ( u(i,j+1) - u(i,j-1) )
       end do
    end do
-   
+
+ if (global) go to 101      ! For global only interior points needed  
+
 !  [2.2] Bottom boundaries:
 
    if ( its == ids ) then
@@ -77,10 +77,10 @@ subroutine DA_Balance_CycloTerm_Lin( ds, rho, ub, vb, u, v, &
          var  = -3.0*u (i,j)+4.0*u(i+1,j)-u(i+2,j)
          varb = -3.0*ub(i,j)+4.0*ub(i+1,j)-ub(i+2,j)
 
-         data(i,j) = u(i,j) * varb + &
-                     v(i,j) * ( ub(i,j+1) - ub(i,j-1) ) + &
-                     ub(i,j) * var + &
-                     vb(i,j) * ( u(i,j+1) - u(i,j-1) )
+         data(i,j) = coefx(i,j)* u(i,j) * varb + &
+                     coefy(i,j)* v(i,j) * ( ub(i,j+1) - ub(i,j-1) ) + &
+                     coefx(i,j)*ub(i,j) * var + &
+                     coefy(i,j)*vb(i,j) * ( u(i,j+1) - u(i,j-1) )
       end do
    end if
 
@@ -93,10 +93,10 @@ subroutine DA_Balance_CycloTerm_Lin( ds, rho, ub, vb, u, v, &
          var  = 3.0*u (i,j)-4.0*u (i-1,j)+u (i-2,j)
          varb = 3.0*ub(i,j)-4.0*ub(i-1,j)+ub(i-2,j)
 
-         data(i,j) = u(i,j) * varb + &
-                     v(i,j) * ( ub(i,j+1) - ub(i,j-1) ) + &
-                     ub(i,j) * var + &
-                     vb(i,j) * ( u(i,j+1) - u(i,j-1) )
+         data(i,j) = coefx(i,j)*u(i,j) * varb + &
+                     coefy(i,j)*v(i,j) * ( ub(i,j+1) - ub(i,j-1) ) + &
+                     coefx(i,j)*ub(i,j) * var + &
+                     coefy(i,j)*vb(i,j) * ( u(i,j+1) - u(i,j-1) )
       end do
    end if
 
@@ -109,10 +109,10 @@ subroutine DA_Balance_CycloTerm_Lin( ds, rho, ub, vb, u, v, &
          var  = -3.0*u (i,j)+4.0*u (i,j+1)-u (i,j+2)
          varb = -3.0*ub(i,j)+4.0*ub(i,j+1)-ub(i,j+2)
 
-         data(i,j) = u(i,j) * ( ub(i+1,j) - ub(i-1,j) ) + &
-                     v(i,j) * varb + &
-                     ub(i,j) * ( u(i+1,j) - u(i-1,j) ) + &
-                     vb(i,j) * var
+         data(i,j) = coefx(i,j)*u(i,j) * ( ub(i+1,j) - ub(i-1,j) ) + &
+                     coefy(i,j)*v(i,j) * varb + &
+                     coefx(i,j)*ub(i,j) * ( u(i+1,j) - u(i-1,j) ) + &
+                     coefy(i,j)*vb(i,j) * var
       end do
    end if
 
@@ -125,10 +125,10 @@ subroutine DA_Balance_CycloTerm_Lin( ds, rho, ub, vb, u, v, &
          var  = 3.0*u (i,j)-4.0*u (i,j-1)+u (i,j-2)
          varb = 3.0*ub(i,j)-4.0*ub(i,j-1)+ub(i,j-2)
 
-         data(i,j) = u(i,j) * ( ub(i+1,j) - ub(i-1,j) ) + &
-                     v(i,j) * varb + &
-                     ub(i,j) * ( u(i+1,j) - u(i-1,j) ) + &
-                     vb(i,j) * var
+         data(i,j) = coefx(i,j)*u(i,j) * ( ub(i+1,j) - ub(i-1,j) ) + &
+                     coefy(i,j)*v(i,j) * varb + &
+                     coefx(i,j)*ub(i,j) * ( u(i+1,j) - u(i-1,j) ) + &
+                     coefy(i,j)*vb(i,j) * var
       end do
    end if
 
@@ -150,12 +150,12 @@ subroutine DA_Balance_CycloTerm_Lin( ds, rho, ub, vb, u, v, &
       data(ite,jte) = 0.5 * ( data(ite-1,jte) + data(ite,jte-1) )
    end if
       
-!  [2.7] Multiply by 0.5 * rho * M / ds and add to term_x:
+101  continue
 
-   term_x(its:ite,jts:jte) = inv_2ds * rho(its:ite,jts:jte) * &
-                             map_factor(its:ite,jts:jte) * data(its:ite,jts:jte) + &
+!  [2.7] Multiply by rho and add to term_x:
+
+   term_x(its:ite,jts:jte) = rho(its:ite,jts:jte) * data(its:ite,jts:jte) + &
                              term_x(its:ite,jts:jte)
-
 !------------------------------------------------------------------------------
 !  [3.0] Calculate term_y = rho M ( u'dv/dx + v'dv/dy + udv'/dx + vdv'/dy ):
 !------------------------------------------------------------------------------
@@ -164,13 +164,14 @@ subroutine DA_Balance_CycloTerm_Lin( ds, rho, ub, vb, u, v, &
 
    do j = js, je
       do i = is, ie
-         data(i,j) = u(i,j) * ( vb(i+1,j) - vb(i-1,j) ) + &
-                     v(i,j) * ( vb(i,j+1) - vb(i,j-1) ) + &
-                     ub(i,j) * ( v(i+1,j) - v(i-1,j) ) + &
-                     vb(i,j) * ( v(i,j+1) - v(i,j-1) )
+         data(i,j) = coefx(i,j)*u(i,j) * ( vb(i+1,j) - vb(i-1,j) ) + &
+                     coefy(i,j)*v(i,j) * ( vb(i,j+1) - vb(i,j-1) ) + &
+                     coefx(i,j)*ub(i,j) * ( v(i+1,j) - v(i-1,j) ) + &
+                     coefy(i,j)*vb(i,j) * ( v(i,j+1) - v(i,j-1) )
       end do
    end do
    
+ if (global) go to 102      ! For global only interior points needed  
 !  [3.2] Bottom boundaries:
 
    if ( its == ids ) then
@@ -180,10 +181,10 @@ subroutine DA_Balance_CycloTerm_Lin( ds, rho, ub, vb, u, v, &
          var  = -3.0*v (i,j)+4.0*v (i+1,j)-v (i+2,j)
          varb = -3.0*vb(i,j)+4.0*vb(i+1,j)-vb(i+2,j)
 
-         data(i,j) = u(i,j) * varb + &
-                     v(i,j) * ( vb(i,j+1) - vb(i,j-1) ) + &
-                     ub(i,j) * var + &
-                     vb(i,j) * ( v(i,j+1) - v(i,j-1) )
+         data(i,j) = coefx(i,j)*u(i,j) * varb + &
+                     coefy(i,j)*v(i,j) * ( vb(i,j+1) - vb(i,j-1) ) + &
+                     coefx(i,j)*ub(i,j) * var + &
+                     coefy(i,j)*vb(i,j) * ( v(i,j+1) - v(i,j-1) )
       end do
    end if
 
@@ -196,10 +197,10 @@ subroutine DA_Balance_CycloTerm_Lin( ds, rho, ub, vb, u, v, &
          var  = 3.0*v (i,j)-4.0*v (i-1,j)+v (i-2,j)
          varb = 3.0*vb(i,j)-4.0*vb(i-1,j)+vb(i-2,j)
 
-         data(i,j) = u(i,j) * varb + &
-                     v(i,j) * ( vb(i,j+1) - vb(i,j-1) ) + &
-                     ub(i,j) * var + &
-                     vb(i,j) * ( v(i,j+1) - v(i,j-1) )
+         data(i,j) = coefx(i,j)*u(i,j) * varb + &
+                     coefy(i,j)*v(i,j) * ( vb(i,j+1) - vb(i,j-1) ) + &
+                     coefx(i,j)*ub(i,j) * var + &
+                     coefy(i,j)*vb(i,j) * ( v(i,j+1) - v(i,j-1) )
       end do
    end if
 
@@ -212,10 +213,10 @@ subroutine DA_Balance_CycloTerm_Lin( ds, rho, ub, vb, u, v, &
          varb = -3.0*vb(i,j)+4.0*vb(i,j+1)-vb(i,j+2)
          var  = -3.0*v (i,j)+4.0*v (i,j+1)-v (i,j+2)
 
-         data(i,j) = u(i,j) * ( vb(i+1,j) - vb(i-1,j) ) + &
-                     v(i,j) * varb + &
-                     ub(i,j) * ( v(i+1,j) - v(i-1,j) ) + &
-                     vb(i,j) * var
+         data(i,j) = coefx(i,j)*u(i,j) * ( vb(i+1,j) - vb(i-1,j) ) + &
+                     coefy(i,j)*v(i,j) * varb + &
+                     coefx(i,j)*ub(i,j) * ( v(i+1,j) - v(i-1,j) ) + &
+                     coefy(i,j)*vb(i,j) * var
       end do
    end if
 
@@ -228,10 +229,10 @@ subroutine DA_Balance_CycloTerm_Lin( ds, rho, ub, vb, u, v, &
          varb = 3.0*vb(i,j)-4.0*vb(i,j-1)+vb(i,j-2)
          var  = 3.0*v (i,j)-4.0*v (i,j-1)+v (i,j-2)
 
-         data(i,j) = u(i,j) * ( vb(i+1,j) - vb(i-1,j) ) + &
-                     v(i,j) * varb + &
-                     ub(i,j) * ( v(i+1,j) - v(i-1,j) ) + &
-                     vb(i,j) * var
+         data(i,j) = coefx(i,j)*u(i,j) * ( vb(i+1,j) - vb(i-1,j) ) + &
+                     coefy(i,j)*v(i,j) * varb + &
+                     coefx(i,j)*ub(i,j) * ( v(i+1,j) - v(i-1,j) ) + &
+                     coefy(i,j)*vb(i,j) * var
       end do
    end if
 
@@ -253,11 +254,10 @@ subroutine DA_Balance_CycloTerm_Lin( ds, rho, ub, vb, u, v, &
       data(ite,jte) = 0.5 * ( data(ite-1,jte) + data(ite,jte-1) )
    end if
 
-!  [3.7] Multiply by 0.5 * rho * M / ds and add to term_y
+102  continue
 
-   term_y(its:ite,jts:jte) = inv_2ds * rho(its:ite,jts:jte) * &
-                             map_factor(its:ite,jts:jte) * data(its:ite,jts:jte) + &
+!  [3.7] Multiply by  rho and add to term_y
+
+   term_y(its:ite,jts:jte) = rho(its:ite,jts:jte) * data(its:ite,jts:jte) + &
                              term_y(its:ite,jts:jte)
-
 end subroutine DA_Balance_CycloTerm_Lin
-
