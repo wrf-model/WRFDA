@@ -273,8 +273,10 @@ CONTAINS
      TYPE(ESMF_Clock), INTENT(INOUT) :: clock
      INTEGER, INTENT(OUT) :: rc
 
-     character(len=19), dimension(25) :: ad_date_string
-     integer                          :: ad_date_index
+     character(len=19), dimension(100) :: nl_date_string
+     integer                           :: nl_date_index
+     character(len=19), dimension(100) :: ad_date_string
+     integer                           :: ad_date_index
 
 !<DESCRIPTION>
 !     WRF run routine.
@@ -295,20 +297,34 @@ CONTAINS
    ELSE IF ( config_flags%dyn_opt == DYN_EM_SN ) THEN
       CALL integrate ( head_grid )
    ELSE IF ( config_flags%dyn_opt == DYN_EM_TL ) THEN
-      CALL integrate_tl ( head_grid )
+
+! - Look for boundary data after writing out history and restart files
+      CALL med_latbound_in ( head_grid , config_flags )
+
+      CALL Setup_date_string (head_grid, nl_date_string, 'tn' )
+      nl_date_index = 1
+
+      head_grid%current_time = head_grid%start_time
+      CALL ESMF_ClockSetCurrTime( head_grid%domain_clock, currTime=head_grid%current_time, rc=rc )
+      CALL ESMF_ClockGetCurrTime( head_grid%domain_clock, currTime=head_grid%current_time, rc=rc )
+
+      CALL integrate_tl ( head_grid, nl_date_string, nl_date_index )
+
    ELSE IF ( config_flags%dyn_opt == DYN_EM_AD ) THEN
 
 ! - Look for boundary data after writing out history and restart files
       CALL med_latbound_in ( head_grid , config_flags )
 
-      CALL Setup_ad_date_string (head_grid, ad_date_string )
+      CALL Setup_date_string (head_grid, ad_date_string, 'ad' )
+      CALL Setup_date_string (head_grid, nl_date_string, 'an' )
+      nl_date_index = 1
       ad_date_index = 1
 
       head_grid%current_time = head_grid%stop_time
       CALL ESMF_ClockSetCurrTime( head_grid%domain_clock, currTime=head_grid%current_time, rc=rc )
       CALL ESMF_ClockGetCurrTime( head_grid%domain_clock, currTime=head_grid%current_time, rc=rc )
 
-      CALL integrate_ad ( head_grid, ad_date_string, ad_date_index )
+      CALL integrate_ad ( head_grid, nl_date_string, nl_date_index, ad_date_string, ad_date_index )
    ELSE IF ( config_flags%dyn_opt == DYN_EM_TST ) THEN
       CALL integrate_tst ( head_grid )
    ENDIF

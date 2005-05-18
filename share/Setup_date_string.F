@@ -1,10 +1,11 @@
-SUBROUTINE Setup_ad_date_string ( grid, ad_date_string )
+SUBROUTINE Setup_date_string ( grid, date_string, adantn )
    USE module_domain
    USE module_configure
    USE WRF_ESMF_MOD
    IMPLICIT NONE
    TYPE(domain), POINTER :: grid
-   character(len=19), dimension(25), intent(out) :: ad_date_string
+   character(len=19), dimension(100), intent(out) :: date_string
+   character(len=2),                 intent(in ) :: adantn
 
    character(len=19)                             :: tmp_string, begin_date_string, end_date_string
 
@@ -12,28 +13,28 @@ SUBROUTINE Setup_ad_date_string ( grid, ad_date_string )
    INTEGER :: start_year,start_month,start_day,start_hour,start_minute,start_second
    INTEGER :: end_year,end_month,end_day,end_hour,end_minute,end_second
 
-   INTEGER :: auxinput3_interval  ,  &
-              auxinput3_interval_mo, &
-              auxinput3_interval_d,  &
-              auxinput3_interval_h,  &
-              auxinput3_interval_m,  &
-              auxinput3_interval_s
+   INTEGER :: local_interval  ,  &
+              local_interval_mo, &
+              local_interval_d,  &
+              local_interval_h,  &
+              local_interval_m,  &
+              local_interval_s
 
-   INTEGER :: auxinput3_begin  ,  &
-              auxinput3_begin_y,  &
-              auxinput3_begin_mo, &
-              auxinput3_begin_d,  &
-              auxinput3_begin_h,  &
-              auxinput3_begin_m,  &
-              auxinput3_begin_s
+   INTEGER :: local_begin  ,  &
+              local_begin_y,  &
+              local_begin_mo, &
+              local_begin_d,  &
+              local_begin_h,  &
+              local_begin_m,  &
+              local_begin_s
 
-   INTEGER :: auxinput3_end  , &
-              auxinput3_end_y, &
-              auxinput3_end_mo,&
-              auxinput3_end_d, &
-              auxinput3_end_h, &
-              auxinput3_end_m, &
-              auxinput3_end_s
+   INTEGER :: local_end  , &
+              local_end_y, &
+              local_end_mo,&
+              local_end_d, &
+              local_end_h, &
+              local_end_m, &
+              local_end_s
 
    INTEGER :: current_y, &
               current_mo,&
@@ -70,37 +71,68 @@ SUBROUTINE Setup_ad_date_string ( grid, ad_date_string )
 ! auxinput3_interval is left there (and means minutes) for consistency, but
 ! auxinput3_interval_m will take precedence if specified
 
-   CALL nl_get_auxinput3_interval( 1, auxinput3_interval )   ! same as minutes
+   if( adantn == 'ad') then
 
-   CALL nl_get_auxinput3_interval_mo( 1, auxinput3_interval_mo )
-   CALL nl_get_auxinput3_interval_d( 1, auxinput3_interval_d )
-   CALL nl_get_auxinput3_interval_h( 1, auxinput3_interval_h )
-   CALL nl_get_auxinput3_interval_m( 1, auxinput3_interval_m )
-   CALL nl_get_auxinput3_interval_s( 1, auxinput3_interval_s )
+      CALL nl_get_auxinput3_begin_y( 1, local_begin_y )
+      CALL nl_get_auxinput3_begin_mo( 1, local_begin_mo )
+      CALL nl_get_auxinput3_begin_d( 1, local_begin_d )
+      CALL nl_get_auxinput3_begin_h( 1, local_begin_h )
+      CALL nl_get_auxinput3_begin_m( 1, local_begin_m )
+      CALL nl_get_auxinput3_begin_s( 1, local_begin_s )
 
-   if(auxinput3_interval_mo < 1 .and. &
-      auxinput3_interval_d < 1 .and. &
-      auxinput3_interval_h < 1 .and. &
-      auxinput3_interval_m < 1 .and. &
-      auxinput3_interval_s < 1) then
-      auxinput3_interval_m = auxinput3_interval
+      CALL nl_get_auxinput3_end_y( 1, local_end_y )
+      CALL nl_get_auxinput3_end_mo( 1, local_end_mo )
+      CALL nl_get_auxinput3_end_d( 1, local_end_d )
+      CALL nl_get_auxinput3_end_h( 1, local_end_h )
+      CALL nl_get_auxinput3_end_m( 1, local_end_m )
+      CALL nl_get_auxinput3_end_s( 1, local_end_s )
+
+      CALL nl_get_auxinput3_interval( 1, local_interval )   ! same as minutes
+
+      CALL nl_get_auxinput3_interval_mo( 1, local_interval_mo )
+      CALL nl_get_auxinput3_interval_d( 1, local_interval_d )
+      CALL nl_get_auxinput3_interval_h( 1, local_interval_h )
+      CALL nl_get_auxinput3_interval_m( 1, local_interval_m )
+      CALL nl_get_auxinput3_interval_s( 1, local_interval_s )
+
+   else 
+
+      CALL nl_get_auxinput2_begin_y( 1, local_begin_y )
+      CALL nl_get_auxinput2_begin_mo( 1, local_begin_mo )
+      CALL nl_get_auxinput2_begin_d( 1, local_begin_d )
+      CALL nl_get_auxinput2_begin_h( 1, local_begin_h )
+      CALL nl_get_auxinput2_begin_m( 1, local_begin_m )
+      CALL nl_get_auxinput2_begin_s( 1, local_begin_s )
+
+      CALL nl_get_auxinput2_end_y( 1, local_end_y )
+      CALL nl_get_auxinput2_end_mo( 1, local_end_mo )
+      CALL nl_get_auxinput2_end_d( 1, local_end_d )
+      CALL nl_get_auxinput2_end_h( 1, local_end_h )
+      CALL nl_get_auxinput2_end_m( 1, local_end_m )
+      CALL nl_get_auxinput2_end_s( 1, local_end_s )
+
+      CALL nl_get_auxinput2_interval( 1, local_interval )   ! same as minutes
+
+      CALL nl_get_auxinput2_interval_mo( 1, local_interval_mo )
+      CALL nl_get_auxinput2_interval_d( 1, local_interval_d )
+      CALL nl_get_auxinput2_interval_h( 1, local_interval_h )
+      CALL nl_get_auxinput2_interval_m( 1, local_interval_m )
+      CALL nl_get_auxinput2_interval_s( 1, local_interval_s )
+
    endif
 
-   CALL nl_get_auxinput3_begin_y( 1, auxinput3_begin_y )
-   CALL nl_get_auxinput3_begin_mo( 1, auxinput3_begin_mo )
-   CALL nl_get_auxinput3_begin_d( 1, auxinput3_begin_d )
-   CALL nl_get_auxinput3_begin_h( 1, auxinput3_begin_h )
-   CALL nl_get_auxinput3_begin_m( 1, auxinput3_begin_m )
-   CALL nl_get_auxinput3_begin_s( 1, auxinput3_begin_s )
+   if(local_interval_mo < 1 .and. &
+      local_interval_d < 1 .and. &
+      local_interval_h < 1 .and. &
+      local_interval_m < 1 .and. &
+      local_interval_s < 1) then
+      local_interval_m = local_interval
+   endif
 
-   CALL nl_get_auxinput3_end_y( 1, auxinput3_end_y )
-   CALL nl_get_auxinput3_end_mo( 1, auxinput3_end_mo )
-   CALL nl_get_auxinput3_end_d( 1, auxinput3_end_d )
-   CALL nl_get_auxinput3_end_h( 1, auxinput3_end_h )
-   CALL nl_get_auxinput3_end_m( 1, auxinput3_end_m )
-   CALL nl_get_auxinput3_end_s( 1, auxinput3_end_s )
+      write(6,*) 'xyh intervals =', local_interval_mo, local_interval_d, local_interval_h, local_interval_m, local_interval_s
 
-!--ad_date_string(0) = 2000-01-24_12:00:00
+
+!--date_string(0) = 2000-01-24_12:00:00
 
    write(end_date_string(1:19), fmt='(i4.4,5(a1,i2.2))') &
          end_year, &
@@ -136,7 +168,7 @@ SUBROUTINE Setup_ad_date_string ( grid, ad_date_string )
 
       index = index + 1
 
-      write(ad_date_string(index)(1:19), fmt='(i4.4,5(a1,i2.2))') &
+      write(date_string(index)(1:19), fmt='(i4.4,5(a1,i2.2))') &
          current_y, &
          '-', current_mo, &
          '-', current_d, &
@@ -145,11 +177,16 @@ SUBROUTINE Setup_ad_date_string ( grid, ad_date_string )
          ':', current_s
 
       write(unit=*, fmt='(a,i2,2a)') &
-        'ad_date_string(', index, ')=', ad_date_string(index)
+        'date_string(', index, ')=', date_string(index)
+
+      write(6,*) 'xyh intervals =', local_interval_mo, local_interval_d, local_interval_h, local_interval_m, local_interval_s
+
+      write(6,*) 'xyh intervals b4 =', current_y, current_mo, current_d, current_h, current_m, current_s
 
       call advance_ccyymmddhhmmss(current_y, current_mo, current_d, current_h, current_m, current_s, &
-                                   0, auxinput3_interval_mo, auxinput3_interval_d, auxinput3_interval_h, auxinput3_interval_m, auxinput3_interval_s )
+                                   0, local_interval_mo, local_interval_d, local_interval_h, local_interval_m, local_interval_s )
 
+      write(6,*) 'xyh intervals =', current_y, current_mo, current_d, current_h, current_m, current_s
 
       write(begin_date_string(1:19), fmt='(i4.4,5(a1,i2.2))') &
          current_y, &
@@ -159,21 +196,29 @@ SUBROUTINE Setup_ad_date_string ( grid, ad_date_string )
          ':', current_m, &
          ':', current_s
 
-      if(index > 20) exit
+      if(index > 99) exit
    end do
 
-   n = index
+   if( adantn /= 'tn' ) then ! reverse order
 
-   do i=1, index/2
-      tmp_string = ad_date_string(i)
-      ad_date_string(i) = ad_date_string(n)
-      ad_date_string(n) = tmp_string
-      n = n - 1
+      n = index
+      do i=1, index/2
+         tmp_string = date_string(i)
+         date_string(i) = date_string(n)
+         date_string(n) = tmp_string
+         n = n - 1
+      enddo
+
+   endif
+
+!xyh
+   do i=1,index
+      write(6,*)'xyh:',adantn,i,date_string(i)
    enddo
 
-   CALL wrf_debug ( 100 , 'Setup_ad_date_string:  returning...' )
+   CALL wrf_debug ( 100 , 'Setup_date_string:  returning...' )
 
-END SUBROUTINE Setup_ad_date_string
+END SUBROUTINE Setup_date_string
 
 subroutine advance_ccyymmddhhmmss(current_y, current_mo, current_d, current_h, current_m, current_s, &
                                   interval_y, interval_mo, interval_d, interval_h, interval_m, interval_s )
@@ -286,9 +331,9 @@ function string_a_less_than_b(begin_date_string, end_date_string)
    INTEGER :: begin_year,begin_month,begin_day,begin_hour,begin_minute,begin_second
    INTEGER :: end_year,end_month,end_day,end_hour,end_minute,end_second
 
-   logical :: string_a_less_than_b
+   integer(kind=8) :: begin_date, end_date
 
-   string_a_less_than_b = .true.
+   logical :: string_a_less_than_b
 
    read(begin_date_string(1:19), fmt='(i4.4,5(a1,i2.2))') &
          begin_year, &
@@ -306,33 +351,15 @@ function string_a_less_than_b(begin_date_string, end_date_string)
          char, end_minute, &
          char, end_second
 
-   if(end_year   < begin_year  ) then
-      string_a_less_than_b = .false.
-      return
-   endif
+   begin_date = begin_second + 100*(begin_minute + 100*(begin_hour &
+                             +  100*(begin_day + 100*(begin_month + 100*begin_year))))
+   end_date = end_second + 100*(end_minute + 100*(end_hour &
+                             +  100*(end_day + 100*(end_month + 100*end_year))))
 
-   if(end_month  < begin_month ) then
+   if(end_date < begin_date  ) then
       string_a_less_than_b = .false.
-      return
-   endif
-
-   if(end_day    < begin_day   ) then
-      string_a_less_than_b = .false.
-      return
-   endif
-
-   if(end_hour   < begin_hour  ) then
-      string_a_less_than_b = .false.
-      return
-   endif
-
-   if(end_minute < begin_minute) then
-      string_a_less_than_b = .false.
-      return
-   endif
-
-   if(end_second < begin_second) then
-      string_a_less_than_b = .false.
+   else
+      string_a_less_than_b = .true.
    endif
 
 end function string_a_less_than_b

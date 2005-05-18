@@ -5,7 +5,7 @@ MODULE module_integrate_tl
 
 CONTAINS
 
-RECURSIVE SUBROUTINE integrate_tl ( grid )
+RECURSIVE SUBROUTINE integrate_tl ( grid, nl_date_string, nl_date_index )
 
 
 
@@ -21,6 +21,9 @@ RECURSIVE SUBROUTINE integrate_tl ( grid )
    !  Input data.
 
    TYPE(domain) , POINTER :: grid
+
+   character(len=19), dimension(100), intent(in)    :: nl_date_string
+   integer,                           intent(inout) :: nl_date_index
 
 ! module_integrate:integrate
 ! <DESCRIPTION> 
@@ -155,6 +158,8 @@ RECURSIVE SUBROUTINE integrate_tl ( grid )
    INTEGER                                :: idum1 , idum2 , ierr , open_status
    INTEGER                                :: rc
 
+   CHARACTER (LEN=25)                     :: currTime_str, tmpTime_str
+
    ! interface
    INTERFACE
        ! mediation-supplied solver
@@ -252,6 +257,10 @@ RECURSIVE SUBROUTINE integrate_tl ( grid )
       CALL ESMF_ClockGet( grid%domain_clock, currTime=grid%current_time, rc=rc )
       CALL wrf_clockprint ( 150, grid%domain_clock, &
                             'DEBUG:  top of integrate_tl(),' )
+
+      CALL ESMF_TimeIntervalPrint(grid%domain_clock%TimeStep, 'DEBUG:  integrate_tl.', rc)
+      CALL print_a_timeinterval(grid%domain_clock%TimeStep)
+
       DO WHILE ( grid%current_time .LT. grid%stop_subtime )
          IF ( wrf_dm_on_monitor() ) THEN
            CALL start_timing
@@ -277,6 +286,46 @@ RECURSIVE SUBROUTINE integrate_tl ( grid )
          grid_ptr => grid
          DO WHILE ( ASSOCIATED( grid_ptr ) )
             CALL wrf_debug( 100 , 'module_integrate_tl: calling solve interface _tl' )
+!-----------start check non-linear input
+            CALL wrf_clockprint ( 150, grid%domain_clock, 'DEBUG:  integrate_tl(),' )
+
+            CALL wrf_timetoa( grid%current_time, currTime_str )
+
+            if(currTime_str(1:19) .eq. nl_date_string(nl_date_index)(1:19)) then
+               write(unit=*, fmt='(a,i5,4(x,a))') &
+                    'xyh nl_date_index =', nl_date_index, &
+                    'read NL at currTime_str(1:19)=', currTime_str(1:19), &
+                    'nl_date_string(nl_date_index)(1:19)=', nl_date_string(nl_date_index)(1:19)
+
+! -------      do input
+               write(unit=10, fmt='(a,i2,2a,2(2x,a,f12.4))') &
+                    '1. xyh nl_date_string(', nl_date_index, ')=', nl_date_string(nl_date_index)(1:19), &
+                    'grid%t_2(1,1,1)=', grid%em_t_2(1,1,1), &
+                    'grid%g_t_2(1,1,1)=', grid%em_g_t_2(1,1,1)
+
+               CALL med_auxinput2_in ( grid , config_flags , nl_date_string(nl_date_index) )
+
+               write(unit=10, fmt='(a,i2,2a,2(2x,a,f12.4))') &
+                    '2. xyh nl_date_string(', nl_date_index, ')=', nl_date_string(nl_date_index)(1:19), &
+                    'grid%t_2(1,1,1)=', grid%em_t_2(1,1,1), &
+                    'grid%g_t_2(1,1,1)=', grid%em_g_t_2(1,1,1)
+
+               nl_date_index = nl_date_index + 1
+            else
+               write(unit=*, fmt='(2a)') &
+                    'xyh no NL state at ', currTime_str(1:19)
+
+               write(unit=*, fmt='(2a)') &
+                    'xyh use NL state from ', nl_date_string(nl_date_index-1)
+
+               CALL med_auxinput2_in ( grid , config_flags , nl_date_string(nl_date_index-1) )
+               write(unit=10, fmt='(a,i2,2a,2x,a,f12.4)') &
+                    'xyh nl_date_string(', nl_date_index, ')=', nl_date_string(nl_date_index-1)(1:19), &
+                    'grid%t_2(1,1,1)=', grid%em_t_2(1,1,1)
+
+            endif
+!-----------end check non-linear input
+
             CALL solve_interface_tl ( grid_ptr ) 
             CALL wrf_clockprint ( 150, grid_ptr%domain_clock, &
                                   'DEBUG integrate_tl():  before ESMF_ClockAdvance,' )
@@ -303,7 +352,7 @@ RECURSIVE SUBROUTINE integrate_tl ( grid )
                 CALL wrf_debug( 100 , 'module_integrate_tl: back from med_nest_force ' )
                 grid_ptr%nests(kid)%ptr%start_subtime = grid%current_time - grid%step_time
                 grid_ptr%nests(kid)%ptr%stop_subtime = grid%current_time
-                CALL integrate_tl ( grid_ptr%nests(kid)%ptr ) 
+                CALL integrate_tl ( grid_ptr%nests(kid)%ptr, nl_date_string, nl_date_index ) 
                 CALL wrf_debug( 100 , 'module_integrate_tl: back from recursive call to integrate_tl ' )
                 CALL wrf_debug( 100 , 'module_integrate_tl: calling med_nest_feedback ' )
                 CALL med_nest_feedback ( grid_ptr , grid_ptr%nests(kid)%ptr , config_flags )
@@ -324,6 +373,7 @@ RECURSIVE SUBROUTINE integrate_tl ( grid )
       END DO
       ! Avoid double writes on nests if this is not really the last time;
       ! Do check for write if the parent domain is ending.
+!-----Need to check how to output tl variables.
       IF ( grid%id .EQ. 1 ) THEN               ! head_grid
         CALL med_last_solve_io ( grid , config_flags )
       ELSE

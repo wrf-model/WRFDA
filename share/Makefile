@@ -30,7 +30,7 @@ OBJS    = 		\
         start_domain.o                  \
         init_modules.o                  \
         set_timekeeping.o               \
-        Setup_ad_date_string.o          \
+        Setup_date_string.o          \
         interp_fcn.o sint.o             \
         input_wrf.o                     \
         output_wrf.o                    \
@@ -181,7 +181,7 @@ mediation_interp_domain.o: ../frame/module_domain.o ../frame/module_configure.o 
 #			module_date_time.o module_bc_time_utilities.o \
 #			module_io_domain.o
 
-Setup_ad_date_string.o: ../frame/module_domain.o ../frame/module_configure.o \
+Setup_date_string.o: ../frame/module_domain.o ../frame/module_configure.o \
 			$(ESMF_MOD_DEPENDENCE)
 
 set_timekeeping.o: ../frame/module_domain.o ../frame/module_configure.o \

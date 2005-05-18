@@ -77,10 +77,10 @@ SUBROUTINE med_before_solve_io ( grid , config_flags )
      CALL med_auxinput1_in ( grid , config_flags )
      CALL ESMF_AlarmRingerOff( grid%alarms( AUXINPUT1_ALARM ), rc=rc )
    ENDIF
-   IF( ESMF_AlarmIsRinging( grid%alarms( AUXINPUT2_ALARM ), rc=rc ) ) THEN
-     CALL med_auxinput2_in ( grid , config_flags )
-     CALL ESMF_AlarmRingerOff( grid%alarms( AUXINPUT2_ALARM ), rc=rc )
-   ENDIF
+!  IF( ESMF_AlarmIsRinging( grid%alarms( AUXINPUT2_ALARM ), rc=rc ) ) THEN
+!    CALL med_auxinput2_in ( grid , config_flags )
+!    CALL ESMF_AlarmRingerOff( grid%alarms( AUXINPUT2_ALARM ), rc=rc )
+!  ENDIF
    IF( ESMF_AlarmIsRinging( grid%alarms( AUXINPUT3_ALARM ), rc=rc ) ) THEN
      CALL med_auxinput3_in ( grid , config_flags )
      CALL ESMF_AlarmRingerOff( grid%alarms( AUXINPUT3_ALARM ), rc=rc )
@@ -1125,13 +1125,18 @@ SUBROUTINE med_auxinput1_in ( grid , config_flags )
    RETURN
 END SUBROUTINE med_auxinput1_in
 
-SUBROUTINE med_auxinput2_in ( grid , config_flags )
+SUBROUTINE med_auxinput2_in ( grid , config_flags , nl_timestr )
    USE module_domain
    USE module_configure
    IMPLICIT NONE
    TYPE(domain)                               :: grid
    TYPE (grid_config_rec_type) , INTENT(IN)   :: config_flags
-   CALL med_auxinput_in( grid , 2 , config_flags )
+   character(len=*), intent(in), optional     :: nl_timestr
+   if( present(nl_timestr) ) then
+      CALL med_auxinput_in( grid , 2 , config_flags , nl_timestr )
+   else
+      CALL med_auxinput_in( grid , 2 , config_flags )
+   endif
    RETURN
 END SUBROUTINE med_auxinput2_in
 
@@ -1165,7 +1170,7 @@ SUBROUTINE med_auxinput5_in ( grid , config_flags )
    RETURN
 END SUBROUTINE med_auxinput5_in
 
-SUBROUTINE med_auxinput_in ( grid , stream, config_flags )
+SUBROUTINE med_auxinput_in ( grid , stream, config_flags, nl_timestr )
   ! Driver layer
    USE module_domain
    USE module_io_domain
@@ -1179,6 +1184,7 @@ SUBROUTINE med_auxinput_in ( grid , stream, config_flags )
    TYPE(domain)                               :: grid
    TYPE (grid_config_rec_type) , INTENT(IN)   :: config_flags
    INTEGER , INTENT(IN)                       :: stream
+   character(len=*), intent(in), optional     :: nl_timestr
   ! Local
    LOGICAL, EXTERNAL :: wrf_dm_on_monitor
    CHARACTER*80                           :: rstname , outname, auxname, n1, n2
@@ -1194,6 +1200,30 @@ SUBROUTINE med_auxinput_in ( grid , stream, config_flags )
      CALL wrf_error_fatal( message )
    ENDIF
 
+   IF(stream == 2) THEN
+     if( present(nl_timestr) ) then
+        timestr = trim( nl_timestr )
+     else
+        CALL ESMF_ClockGet( grid%domain_clock, CurrTime=CurrTime, rc=ierr )
+        CALL wrf_timetoa ( CurrTime, timestr )
+     endif
+     CALL construct_filename2a ( auxname , config_flags%auxinput2_inname , grid%id , 2 , timestr )
+     WRITE(n2,'("DATASET=AUXINPUT",I1)')stream
+     WRITE ( message , '("med_auxinput_in : opening ",A," for reading. ",I3)') TRIM ( auxname ), ierr
+     CALL wrf_debug( 1, message )
+
+     CALL open_r_dataset ( grid%auxinput2_oid, TRIM(auxname), grid , config_flags , n2, ierr )
+
+     IF ( ierr .NE. 0 ) THEN
+       CALL wrf_message( message )
+     ENDIF
+
+     CALL input_aux_model_input2 ( grid%auxinput2_oid, grid , config_flags , ierr )
+
+     CALL close_dataset ( grid%auxinput2_oid , config_flags , n2)
+
+     return
+   ENDIF
 
    IF(stream == 3) THEN
      CALL ESMF_ClockGet( grid%domain_clock, CurrTime=CurrTime, rc=ierr )
@@ -1254,8 +1284,9 @@ SUBROUTINE med_auxinput_in ( grid , stream, config_flags )
          CALL open_u_dataset ( grid%auxinput1_oid, TRIM(auxname), grid ,  &
                                config_flags , input_aux_model_input1 , n2, ierr )
        CASE ( 2 )
-         CALL open_u_dataset ( grid%auxinput2_oid, TRIM(auxname), grid ,  &
-                               config_flags , input_aux_model_input2 , n2, ierr )
+         CALL open_r_dataset ( grid%auxinput2_oid, TRIM(auxname), grid , config_flags , n2, ierr )
+!        CALL open_u_dataset ( grid%auxinput2_oid, TRIM(auxname), grid ,  &
+!                              config_flags , input_aux_model_input2 , n2, ierr )
        CASE ( 3 )
          CALL open_r_dataset ( grid%auxinput3_oid, TRIM(auxname), grid , config_flags , n2, ierr )
 !        CALL open_u_dataset ( grid%auxinput3_oid, TRIM(auxname), grid ,  &

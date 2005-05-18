@@ -5,7 +5,7 @@ MODULE module_integrate_ad
 
 CONTAINS
 
-RECURSIVE SUBROUTINE integrate_ad ( grid, ad_date_string, ad_date_index )
+RECURSIVE SUBROUTINE integrate_ad ( grid, nl_date_string, nl_date_index, ad_date_string, ad_date_index )
 
 
 
@@ -22,7 +22,9 @@ RECURSIVE SUBROUTINE integrate_ad ( grid, ad_date_string, ad_date_index )
 
    TYPE(domain) , POINTER :: grid
 
-   character(len=19), dimension(25), intent(in)    :: ad_date_string
+   character(len=19), dimension(100), intent(in)    :: nl_date_string
+   integer,                          intent(inout) :: nl_date_index
+   character(len=19), dimension(100), intent(in)    :: ad_date_string
    integer,                          intent(inout) :: ad_date_index
 
 ! module_integrate:integrate
@@ -252,17 +254,42 @@ RECURSIVE SUBROUTINE integrate_ad ( grid, ad_date_string, ad_date_index )
       CALL model_to_grid_config_rec ( grid%id , model_config_rec , config_flags )
       CALL ESMF_ClockGet( grid%domain_clock, currTime=grid%current_time, rc=rc )
 
-!-----start check adjoint input
+!-----start check nonlinear and adjoint input
       CALL wrf_clockprint ( 150, grid%domain_clock, 'DEBUG:  integrate_ad(),' )
 
       CALL wrf_timetoa( grid%current_time, currTime_str )
 
+!-----start check non-linear input
+      if(currTime_str(1:19) .eq. nl_date_string(nl_date_index)(1:19)) then
+         write(unit=*, fmt='(a,i5,4(x,a))') &
+              'xyh nl_date_index =', nl_date_index, &
+              'read NL at currTime_str(1:19)=', currTime_str(1:19), &
+              'nl_date_string(nl_date_index)(1:19)=', nl_date_string(nl_date_index)(1:19)
+! ----do input
+         CALL med_auxinput2_in ( grid , config_flags , nl_date_string(nl_date_index) )
+         write(unit=10, fmt='(a,i2,2a,2x,a,f12.4)') &
+              'xyh nl_date_string(', nl_date_index, ')=',nl_date_string(nl_date_index)(1:19), &
+              'grid%t_2(1,1,1)=', grid%em_t_2(1,1,1)
+               nl_date_index = nl_date_index + 1
+      else
+         write(unit=*, fmt='(2a)') &
+              'xyh no NL state at ', currTime_str(1:19)
+         write(unit=*, fmt='(2a)') &
+              'xyh use NL state from ', nl_date_string(nl_date_index)
+         CALL med_auxinput2_in ( grid , config_flags , nl_date_string(nl_date_index) )
+         write(unit=10, fmt='(a,i2,2a,2x,a,f12.4)') &
+              'xyh nl_date_string(', nl_date_index, ')=',nl_date_string(nl_date_index)(1:19), &
+              'grid%t_2(1,1,1)=', grid%em_t_2(1,1,1)
+      endif
+!-----end check non-linear input
+
+
+!-----start check adjoint input
       if(currTime_str(1:19) .eq. ad_date_string(ad_date_index)(1:19)) then
          print *, 'ad_date_index =', ad_date_index
          write(unit=*, fmt='(2a)') &
               'currTime_str(1:19)=', currTime_str(1:19), &
               'ad_date_string(ad_date_index)(1:19)=', ad_date_string(ad_date_index)(1:19)
-
 !-       do input
          CALL med_auxinput3_in ( grid , config_flags )
          CALL add_forcing_to_ad(grid)
@@ -281,11 +308,38 @@ RECURSIVE SUBROUTINE integrate_ad ( grid, ad_date_string, ad_date_index )
            CALL start_timing
          END IF
 
-!--------start check adjoint input
+!--------start check nonlinear and adjoint input
+
          CALL ESMF_ClockGet( grid%domain_clock, currTime=grid%current_time, rc=rc )
          CALL wrf_clockprint ( 150, grid%domain_clock, 'DEBUG:  integrate_ad(),' )
 
          CALL wrf_timetoa( grid%current_time, currTime_str )
+
+!-----start check non-linear input
+         if(currTime_str(1:19) .eq. nl_date_string(nl_date_index)(1:19)) then
+            write(unit=*, fmt='(a,i5,4(x,a))') &
+                 'xyh nl_date_index =', nl_date_index, &
+                 'read NL at currTime_str(1:19)=', currTime_str(1:19), &
+                 'nl_date_string(nl_date_index)(1:19)=', nl_date_string(nl_date_index)(1:19)
+! ----do input
+            CALL med_auxinput2_in ( grid , config_flags , nl_date_string(nl_date_index) )
+            write(unit=10, fmt='(a,i2,2a,2x,a,f12.4)') &
+                 'xyh nl_date_string(', nl_date_index, ')=',nl_date_string(nl_date_index)(1:19), &
+                 'grid%t_2(1,1,1)=', grid%em_t_2(1,1,1)
+                  nl_date_index = nl_date_index + 1
+         else
+            write(unit=*, fmt='(2a)') &
+                 'xyh no NL state at ', currTime_str(1:19)
+            write(unit=*, fmt='(2a)') &
+                 'xyh use NL state from ', nl_date_string(nl_date_index)
+            CALL med_auxinput2_in ( grid , config_flags , nl_date_string(nl_date_index) )
+            write(unit=10, fmt='(a,i2,2a,2x,a,f12.4)') &
+                 'xyh nl_date_string(', nl_date_index, ')=',nl_date_string(nl_date_index)(1:19), &
+                 'grid%t_2(1,1,1)=', grid%em_t_2(1,1,1)
+         endif
+!-----end check non-linear input
+
+!--------start check adjoint input
 
          if(currTime_str(1:19) .eq. ad_date_string(ad_date_index)(1:19)) then
             print *, 'ad_date_index =', ad_date_index
@@ -352,7 +406,7 @@ RECURSIVE SUBROUTINE integrate_ad ( grid, ad_date_string, ad_date_index )
                 CALL wrf_debug( 100 , 'module_integrate_ad: back from med_nest_force ' )
                 grid_ptr%nests(kid)%ptr%start_subtime = grid%current_time - grid%step_time
                 grid_ptr%nests(kid)%ptr%stop_subtime = grid%current_time
-                CALL integrate_ad ( grid_ptr%nests(kid)%ptr, ad_date_string, ad_date_index ) 
+                CALL integrate_ad ( grid_ptr%nests(kid)%ptr, nl_date_string, nl_date_index, ad_date_string, ad_date_index ) 
                 CALL wrf_debug( 100 , 'module_integrate_ad: back from recursive call to integrate_ad ' )
                 CALL wrf_debug( 100 , 'module_integrate_ad: calling med_nest_feedback ' )
                 CALL med_nest_feedback ( grid_ptr , grid_ptr%nests(kid)%ptr , config_flags )
@@ -375,12 +429,39 @@ RECURSIVE SUBROUTINE integrate_ad ( grid, ad_date_string, ad_date_index )
       ! Do check for write if the parent domain is ending.
       IF ( grid%id .EQ. 1 ) THEN               ! head_grid
 !       CALL med_last_solve_ad_io ( grid , config_flags )
-!--------start check adjoint input
+
+!--------start check nonlinear and adjoint input
+
          CALL ESMF_ClockGet( grid%domain_clock, currTime=grid%current_time, rc=rc )
          CALL wrf_clockprint ( 1, grid%domain_clock, 'Check last time:  integrate_ad(),' )
 
          CALL wrf_timetoa( grid%current_time, currTime_str )
 
+!--------start check non-linear input
+         if(currTime_str(1:19) .eq. nl_date_string(nl_date_index)(1:19)) then
+            write(unit=*, fmt='(a,i5,4(x,a))') &
+                 'xyh nl_date_index =', nl_date_index, &
+                 'read NL at currTime_str(1:19)=', currTime_str(1:19), &
+                 'nl_date_string(nl_date_index)(1:19)=', nl_date_string(nl_date_index)(1:19)
+! ----------do input
+            CALL med_auxinput2_in ( grid , config_flags , nl_date_string(nl_date_index) )
+            write(unit=10, fmt='(a,i2,2a,2x,a,f12.4)') &
+                 'xyh nl_date_string(', nl_date_index, ')=',nl_date_string(nl_date_index)(1:19), &
+                'grid%t_2(1,1,1)=', grid%em_t_2(1,1,1)
+                  nl_date_index = nl_date_index + 1
+         else
+            write(unit=*, fmt='(2a)') &
+                 'xyh no NL state at ', currTime_str(1:19)
+            write(unit=*, fmt='(2a)') &
+                 'xyh use NL state from ', nl_date_string(nl_date_index)
+            CALL med_auxinput2_in ( grid , config_flags , nl_date_string(nl_date_index) )
+            write(unit=10, fmt='(a,i2,2a,2x,a,f12.4)') &
+                 'xyh nl_date_string(', nl_date_index, ')=',nl_date_string(nl_date_index)(1:19), &
+                'grid%t_2(1,1,1)=', grid%em_t_2(1,1,1)
+         endif
+!--------end check non-linear input
+
+!--------start check adjoint input
          if(currTime_str(1:19) .eq. ad_date_string(ad_date_index)(1:19)) then
             print *, 'ad_date_index =', ad_date_index
             write(unit=*, fmt='(2a)') &
