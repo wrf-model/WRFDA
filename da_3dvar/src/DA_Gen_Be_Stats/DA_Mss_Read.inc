@@ -13,6 +13,7 @@ Subroutine DA_Mss_Read(file_date)
 
 !--------------------------------------------------------------
 
+#ifndef crayx1
        tar_date=file_date(6:7)//file_date(9:10)//file_date(12:13)
        cmd_line = 'msrcp mss:'//trim(mss_directory)//'/' &
                    //file_head(1:6)//'_'//tar_date//'.tar '// &
@@ -34,4 +35,6 @@ Subroutine DA_Mss_Read(file_date)
        write(*,'(a90)') trim(cmd_line)
 
        call system(cmd_line)
+#endif
+
 End Subroutine DA_Mss_Read

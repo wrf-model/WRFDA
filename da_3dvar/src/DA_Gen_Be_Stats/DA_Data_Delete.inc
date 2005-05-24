@@ -12,6 +12,7 @@ Subroutine DA_Data_Delete(file_date)
 
 !--------------------------------------------------------------
 
+#ifndef crayx1
        cmd_line = 'rm -rf '//trim(directory_name)//'/' &
                    //trim(file_head)//'_'//trim(file_date)//'*'
 
@@ -25,5 +26,6 @@ Subroutine DA_Data_Delete(file_date)
        write(*,'(a90)') trim(cmd_line)
 
        call system(cmd_line)
+#endif
 
 End Subroutine DA_Data_Delete

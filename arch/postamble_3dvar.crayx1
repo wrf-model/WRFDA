@@ -18,6 +18,15 @@ INCLUDE_MODULES =       -I../da_3dvar -I../da_3dvar/src \
 	                -p../external/esmf_time_f90 \
 	                -p../external/RSL/RSL
 
+LDFLAGS         =       -L../da_3dvar \
+			-L../da_3dvar/src \
+			-L../external/io_netcdf \
+			-L../external/io_int \
+			-L../external/esmf_time_f90 \
+			-L../external/RSL/RSL \
+			-L../frame \
+			-L../share
+
 REGISTRY	=       Registry
 CPPFLAGS	=       -I$(LIBINCLUDE) -C -P $(ARCHFLAGS) $(ENVCOMPDEFS) \
 			$(TRADFLAG) $(DM_1_CPP_FLAGS) $(OMPCPP) $(COREDEFS) $(POUND_DEF)
