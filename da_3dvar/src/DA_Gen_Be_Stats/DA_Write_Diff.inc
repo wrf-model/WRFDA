@@ -26,7 +26,7 @@ SUBROUTINE DA_Write_Diff (unit, file_date, number, diff, xp,   &
   integer                         :: k
   real                            :: dphi !Latitude interval (not used)
 !--------------------------------------------------------------------
-  head = 'wrf.diff_'
+  head = 'diff.'
 !
   IF (BACKGROUND_OPTION == 1) then
   filename = trim(head)//file_date(1:19)

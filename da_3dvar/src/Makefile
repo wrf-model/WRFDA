@@ -1168,7 +1168,8 @@ da_gen_be.o:	         \
                         DA_Recursive_Filter/DA_Recursive_Filter_1d.inc  \
 			da_gen_be/da_create_bins.inc	\
                         da_gen_be/da_filter_regcoeffs.inc       \
-                        da_gen_be/da_print_be_stats_h.inc       \
+                        da_gen_be/da_print_be_stats_h_global.inc       \
+                        da_gen_be/da_print_be_stats_h_regional.inc       \
                         da_gen_be/da_print_be_stats_p.inc       \
                         da_gen_be/da_print_be_stats_v.inc       \
 			da_gen_be/da_readwrite_be_stage2.inc	\

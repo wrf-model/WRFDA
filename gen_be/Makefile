@@ -8,8 +8,8 @@ $(SOLVER) :	$(SOLVER)_stage1	\
 		$(SOLVER)_stage2	\
 		$(SOLVER)_stage2a	\
 		$(SOLVER)_stage3	\
-		$(SOLVER)_stage4	\
-		$(SOLVER)_stage4_scale	\
+		$(SOLVER)_stage4_global	\
+		$(SOLVER)_stage4_regional	\
 		$(SOLVER)_cov2d		\
 		$(SOLVER)_cov3d		\
 		$(SOLVER)_diags		\
@@ -37,13 +37,13 @@ $(SOLVER)_stage3 : $(SOLVER)_stage3.o
 	$(RANLIB) ../main/libwrflib.a
 	$(LD) -o $(SOLVER)_stage3.exe $(LDFLAGS) $(SOLVER)_stage3.o ../main/libwrflib.a
 
-$(SOLVER)_stage4 : $(SOLVER)_stage4.o
+$(SOLVER)_stage4_global : $(SOLVER)_stage4_global.o
 	$(RANLIB) ../main/libwrflib.a
-	$(LD) -o $(SOLVER)_stage4.exe $(LDFLAGS) $(SOLVER)_stage4.o ../main/libwrflib.a
+	$(LD) -o $(SOLVER)_stage4_global.exe $(LDFLAGS) $(SOLVER)_stage4_global.o ../main/libwrflib.a
 
-$(SOLVER)_stage4_scale : $(SOLVER)_stage4_scale.o
+$(SOLVER)_stage4_regional : $(SOLVER)_stage4_regional.o
 	$(RANLIB) ../main/libwrflib.a
-	$(LD) -o $(SOLVER)_stage4_scale.exe $(LDFLAGS) $(SOLVER)_stage4_scale.o ../main/libwrflib.a
+	$(LD) -o $(SOLVER)_stage4_regional.exe $(LDFLAGS) $(SOLVER)_stage4_regional.o ../main/libwrflib.a
 
 $(SOLVER)_cov2d : $(SOLVER)_cov2d.o
 	$(RANLIB) ../main/libwrflib.a
@@ -83,13 +83,13 @@ gen_be_stage3.o:
 	$(RM) $@
 	$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) gen_be_stage3.f
 
-gen_be_stage4.o:
+gen_be_stage4_global.o:
 	$(RM) $@
-	$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) gen_be_stage4.f
+	$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) gen_be_stage4_global.f
 
-gen_be_stage4_scale.o:
+gen_be_stage4_regional.o:
 	$(RM) $@
-	$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) gen_be_stage4_scale.f
+	$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) gen_be_stage4_regional.f
 
 gen_be_cov2d.o:
 	$(RM) $@

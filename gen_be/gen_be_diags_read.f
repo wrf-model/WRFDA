@@ -22,6 +22,7 @@ program gen_be_diags_read
    real                :: binwidth_lat               ! Used if bin_type = 2 (degrees). !!!DALE ADD..
    real                :: binwidth_hgt               ! Used if bin_type = 2 (m). !!!DALE ADD..
    real                :: hgt_min, hgt_max           ! Used if bin_type = 2 (m).
+   real                :: scale_length_ps_u          ! Scale length for scalar ps_u.
    logical             :: data_on_levels             ! False if data is projected onto EOFs.
    logical             :: use_global_eofs            ! True if projected data uses global EOFs.
 
@@ -128,7 +129,7 @@ program gen_be_diags_read
 
 !----------------------------------------------------------------------------
    if (uh_method == 'power') then
-     write(6,'(/a)') '[3] Gather horizontal error power spectra.'
+!     write(6,'(/a)') '[3] Gather horizontal error power spectra.'
 !----------------------------------------------------------------------------
 
    do k = 1, nk
@@ -137,7 +138,7 @@ program gen_be_diags_read
       read(iunit)use_global_eofs
       if ( k == 1 ) allocate( total_power(0:max_wavenumber) )
       read(iunit)total_power(:)
-      call da_print_be_stats_h( outunit, variable, k, max_wavenumber, total_power )
+      call da_print_be_stats_h_global( outunit, variable, k, max_wavenumber, total_power )
    end do
 
    do k = 1, nk
@@ -145,7 +146,7 @@ program gen_be_diags_read
       read(iunit)max_wavenumber, kdum
       read(iunit)use_global_eofs
       read(iunit)total_power(:)
-      call da_print_be_stats_h( outunit, variable, k, max_wavenumber, total_power )
+      call da_print_be_stats_h_global( outunit, variable, k, max_wavenumber, total_power )
    end do
 
    do k = 1, nk
@@ -153,7 +154,7 @@ program gen_be_diags_read
       read(iunit)max_wavenumber, kdum
       read(iunit)use_global_eofs
       read(iunit)total_power(:)
-      call da_print_be_stats_h( outunit, variable, k, max_wavenumber, total_power )
+      call da_print_be_stats_h_global( outunit, variable, k, max_wavenumber, total_power )
    end do
 
    do k = 1, nk
@@ -161,52 +162,48 @@ program gen_be_diags_read
       read(iunit)max_wavenumber, kdum
       read(iunit)use_global_eofs
       read(iunit)total_power(:)
-      call da_print_be_stats_h( outunit, variable, k, max_wavenumber, total_power )
+      call da_print_be_stats_h_global( outunit, variable, k, max_wavenumber, total_power )
    end do
 
    read(iunit)variable
    read(iunit)max_wavenumber, kdum
    read(iunit)use_global_eofs
    read(iunit)total_power(:)
-   call da_print_be_stats_h( outunit, variable, k, max_wavenumber, total_power )
+   call da_print_be_stats_h_global( outunit, variable, k, max_wavenumber, total_power )
 
    else if (uh_method == 'scale   ') then
 
-      write(6,'(/a)') '[3] Gather horizontal scale length:'
       allocate (scale_length(1:nk))
-! psi:
+
+!     psi:
       read(iunit) variable
       read(iunit) scale_length
-      print '("Scale_length for variable:",a)', variable
-      write(outunit,'(/a,a)') 'Scale_length for variable:', variable
-      write(outunit,'((2X,6(2X,"k=",i2,1x,e14.8)))') (k,scale_length(k),k=1,nk)
-! chi_u:
+      call da_print_be_stats_h_regional( outunit, variable, nk, scale_length )
+
+!     chi_u:
       read(iunit) variable
       read(iunit) scale_length
-      print '("Scale_length for variable:",a)', variable
-      write(outunit,'(/a,a)') 'Scale_length for variable:', variable
-      write(outunit,'((2X,6(2X,"k=",i2,1x,e14.8)))') (k,scale_length(k),k=1,nk)
-! t_u:
+      call da_print_be_stats_h_regional( outunit, variable, nk, scale_length )
+
+!     t_u:
       read(iunit) variable
       read(iunit) scale_length
-      print '("Scale_length for variable:",a)', variable
-      write(outunit,'(/a,a)') 'Scale_length for variable:', variable
-      write(outunit,'((2X,6(2X,"k=",i2,1x,e14.8)))') (k,scale_length(k),k=1,nk)
-! rh:
+      call da_print_be_stats_h_regional( outunit, variable, nk, scale_length )
+
+!     rh:
       read(iunit) variable
       read(iunit) scale_length
-      print '("Scale_length for variable:",a)', variable
-      write(outunit,'(/a,a)') 'Scale_length for variable:', variable
-      write(outunit,'((2X,6(2X,"k=",i2,1x,e14.8)))') (k,scale_length(k),k=1,nk)
+      call da_print_be_stats_h_regional( outunit, variable, nk, scale_length )
+
+!     ps_u:
+      read(iunit) variable
+      read(iunit) scale_length_ps_u
+      write(6,'(3a,i5)')' Scale length for variable ', trim(variable), ' in unit ', outunit
+      write(outunit,'(a,i4,1pe15.5)')trim(variable), 1, scale_length_ps_u
+      outunit = outunit + 1
+      write(6,*)
 
       deallocate (scale_length)
-      allocate (scale_length(1:1))
-! ps_u:
-      read(iunit) variable
-      read(iunit) scale_length
-      print '("Scale_length for variable:",a)', variable
-      write(outunit,'(/a,a)') 'Scale_length for variable:', variable
-      write(outunit,'((4X,"k=",i2,1x,e14.8))') (k,scale_length(k),k=1,1)
 
    endif
 

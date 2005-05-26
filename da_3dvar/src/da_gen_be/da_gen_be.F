@@ -18,7 +18,8 @@ contains
 
 #include "da_create_bins.inc"
 #include "da_filter_regcoeffs.inc"
-#include "da_print_be_stats_h.inc"
+#include "da_print_be_stats_h_global.inc"
+#include "da_print_be_stats_h_regional.inc"
 #include "da_print_be_stats_p.inc"
 #include "da_print_be_stats_v.inc"
 #include "da_readwrite_be_stage2.inc"

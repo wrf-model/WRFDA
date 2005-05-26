@@ -57,7 +57,6 @@ program gen_be_diags
 !----------------------------------------------------------------------------
 
    variable = 'psi'
-!mslee   call da_readwrite_be_stage4( ounit, nk, be_method, variable )
    call da_readwrite_be_stage4( ounit, nk, be_method, uh_method, variable )
 
    variable = 'chi_u'

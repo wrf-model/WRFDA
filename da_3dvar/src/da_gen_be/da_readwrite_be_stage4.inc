@@ -14,6 +14,7 @@ subroutine da_readwrite_be_stage4( outunit, nk, be_method, uh_method, variable )
    integer                  :: k                          ! Loop counter.
    integer                  :: kdum                       ! Dummy vertical index.
    integer                  :: max_wavenumber             ! Smallest scale required (ni/2 - 1).
+   real                     :: ml                         ! Gradient (read from file but not used).
    logical                  :: first_time                 ! True if first time through loop.
    logical                  :: use_global_eofs            ! True if projected data uses global EOFs.
    logical                  :: data_on_levels             ! True if field in on model levels.
@@ -70,25 +71,21 @@ if (uh_method .eq. 'power') then
 
    deallocate( total_power )
 
-   elseif (uh_method == 'scale   ') then
+   else if (uh_method == 'scale   ') then
+
       if ( first_time ) allocate( scale_length(1:nk) )
 
       filename = trim(variable)//'/'//'sl_print.'//trim(variable)
       open (iunit, file = filename)
-      read(iunit,'(/)')
 
       do k=1,nk
-      read(iunit,'(24x,e20.8)') scale_length(k)
-!      print*,'scale_length ',variable,k,scale_length(k)
+         read(iunit,'(a,2e20.8)') ck, ml, scale_length(k)
       enddo
 
       write(outunit) variable
       write(outunit) scale_length
-! yrg mods:
-      print '(5X,"ReadWrite scale length for ",a10," nk=",i3," from ",a40)', &
-               variable, nk, filename
 
-   deallocate (scale_length)
+      deallocate (scale_length)
 
    endif
 

@@ -35,11 +35,13 @@ Additional changes required for complete testing as stage0 not working.
 Files removed:
 --------------
 
-cvs remove gen_be/gen_be_stage4.f \
+cvs remove da_3dvar/src/da_gen_be/da_print_be_stats_h.inc \
+gen_be/gen_be_stage4.f \
 gen_be/gen_be_stage4_scale.f \
 run/gen_be/da_wrf_stage0.csh \
 run/gen_be/da_wrf_stage0_nmc.csh \
 run/gen_be/diag.csh \
+run/gen_be/gen_be_ens_sample.csh \
 run/gen_be/gen_be_nmc_global.csh \
 run/gen_be/gen_be_nmc_regional.csh \
 run/gen_be/gen_be_sample.csh \
@@ -50,17 +52,26 @@ run/gen_be/stage4.csh
 Files added:
 ------------
 
-changes/change_20050426.db
+cvs add da_3dvar/changes/changes_20050426.db \
+da_3dvar/src/da_gen_be/da_print_be_stats_h_global.inc \
+da_3dvar/src/da_gen_be/da_print_be_stats_h_regional.inc \
+gen_be/gen_be_stage4_regional.f \
+gen_be/gen_be_stage4_global.f \
+run/gen_be/gen_be_stage4_regional.csh \
+run/gen_be/gen_be_stage4_global.csh \
+run/gen_be/gen_be_stage0_wrf_nmc.csh
 
 Files modified:
 ---------------
 
+da_3dvar/src/Makefile (rename print_be_stats_h)
 da_3dvar/src/DA_Gen_Be_Stats/DA_Write_Diff.inc (change filename).
+da_3dvar/src/da_gen_be/da_gen_be.F (rename print_be_stats_h)
 da_3dvar/src/da_gen_be/da_readwrite_be_stage4.inc (change format)
 gen_be/Makefile (rename files for consistency between global/regional)
 gen_be/gen_be_diags.f (tidy)
+gen_be/gen_be_diags_read.f (change print format)
 run/gen_be/gen_be.csh (redo)
-
 
 Tag:
 
