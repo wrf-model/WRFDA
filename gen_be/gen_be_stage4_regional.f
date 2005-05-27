@@ -269,6 +269,7 @@ subroutine make_scale_length( variable, ck, ounit, nn, nr, cov )
 
    write(6,'(5a)')'  n  ', ' nr(n) ', ' d(n) ', ' cov(n) ', ' yr(n)  '
    n = 0
+   nrr(n) = real(nr(n))
    write(6,'(i6,4e13.5)') n, nrr(n), d(0), cov(n), yr(n)
 
    do d2 = 1, nn
