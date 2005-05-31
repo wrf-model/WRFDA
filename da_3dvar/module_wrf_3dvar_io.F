@@ -28,8 +28,8 @@ SUBROUTINE med_initialdata_input_3dvar ( grid , config_flags, in_date, in_filena
 
 !--Local
 
-   INTEGER                 :: fid , ierr , status
-   CHARACTER (LEN=80)      :: file_name
+   INTEGER                 :: fid , ierr , status, n, nsave, previous_status
+   CHARACTER (LEN=80)      :: file_name, previous_time_string
    CHARACTER (LEN=80)      :: message
    CHARACTER (LEN= 1)      :: char
 
@@ -62,6 +62,8 @@ SUBROUTINE med_initialdata_input_3dvar ( grid , config_flags, in_date, in_filena
      STOP "Stopped with NetCDF error."
    endif
 
+   CALL ext_ncd_get_next_time( fid, current_date, Status )
+
    if (present(in_date)) then
 !-----Set start_date to current_date.
       read(in_date(1:19), fmt='(i4, 5(a1, i2))') &
@@ -70,10 +72,23 @@ SUBROUTINE med_initialdata_input_3dvar ( grid , config_flags, in_date, in_filena
            grid%start_day,   char, &
            grid%start_hour,  char, &
            grid%start_second 
-           current_date(1:19) = in_date(1:19)
+
+      nsave = -1
+      do n=1, 1000
+         message = 'current_date='//trim(current_date)//', in_date='//trim(in_date)
+         CALL wrf_debug ( 100 , trim(message) )
+         if(current_date(1:19) == in_date(1:19)) then
+            nsave = n - 1
+            exit
+         endif
+         CALL ext_ncd_get_next_time( fid, current_date, Status )
+      enddo
+
+      if(nsave < 0) then
+         print *, 'Can not find the needed time'
+         STOP "Stopped with input error."
+      endif
    else
-      CALL ext_ncd_get_next_time( fid, current_date, Status )
-  
 !-----Set start_date to current_date.
       read(current_date(1:19), fmt='(i4, 5(a1, i2))') &
            grid%start_year,  char, &
@@ -114,6 +129,14 @@ SUBROUTINE med_initialdata_input_3dvar ( grid , config_flags, in_date, in_filena
                                   TRIM(file_name),' for reading ierr=',ierr
      CALL WRF_ERROR_FATAL ( wrf_err_message )
    ENDIF
+
+   if (present(in_date)) then
+      do n=1, nsave
+         message = 'current_date='//trim(current_date)//', in_date='//trim(in_date)
+         CALL wrf_debug ( 100 , trim(message) )
+         CALL ext_ncd_get_next_time( fid, current_date, Status )
+      enddo
+   endif
 
    CALL       wrf_debug ( 100 , 'wrf_da_3dvar: calling input_model_input' )
    CALL input_model_input ( fid ,   grid , config_flags , ierr )
