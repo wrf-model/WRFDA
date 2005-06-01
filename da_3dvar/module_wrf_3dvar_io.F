@@ -71,6 +71,7 @@ SUBROUTINE med_initialdata_input_3dvar ( grid , config_flags, in_date, in_filena
            grid%start_month, char, &
            grid%start_day,   char, &
            grid%start_hour,  char, &
+           grid%start_minute,char, &
            grid%start_second 
 
       nsave = -1
@@ -95,6 +96,7 @@ SUBROUTINE med_initialdata_input_3dvar ( grid , config_flags, in_date, in_filena
            grid%start_month, char, &
            grid%start_day,   char, &
            grid%start_hour,  char, &
+           grid%start_minute,char, &
            grid%start_second
    endif
 
