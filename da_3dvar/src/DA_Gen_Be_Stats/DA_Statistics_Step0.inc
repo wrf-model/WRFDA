@@ -65,8 +65,10 @@ loop_date:       do while (file_date(1:19) <= end_date(1:19))
 #include <em_dummy_args.inc>
                            )
        call DA_Assign_Value (xb, xb24) 
-       write(*,'(a,F10.4,a,f10.4)')   &
-          'xb24: xb%u(10,10,10)=',xb%u(10,10,10),'  xb%t(10,10,10)=',xb%t(10,10,10)
+       write(*,'(3(a,e20.12))')   &
+          'xb24: xb%u(10,10,10)=',xb%u(10,10,10), &
+              '  xb%t(10,10,10)=',xb%t(10,10,10), &
+           '  xb%Psfc(10,10)   =',xb%psfc(10,10)
 
 !------T12 READ
 
@@ -88,11 +90,17 @@ loop_date:       do while (file_date(1:19) <= end_date(1:19))
        endif
       
        call DA_Difference (diff, xb24, xb12,its,ite, jts,jte, kts,kte)
+!       write(*,'(3(a,E20.12))')   &
+!          'diff: diff%u(10,10,10)=',diff%u(10,10,10), &
+!              '  diff%t(10,10,10)=',diff%t(10,10,10), &
+!           '  diff%Psfc(10,10)   =',diff%psfc(10,10)
        call DA_New_Statistics_Variable (diff, xb, xbx, xp, &
                                ids,ide, jds,jde, kds,kde,  &
                                ims,ime, jms,jme, kms,kme,  &
                                its,ite, jts,jte, kts,kte )
-
+!       write(*,'(2(a,e20.12))')   &
+!          'diff: diff%psi(10,10,10)=',diff%psi(10,10,10), &
+!              '  diff%chi(10,10,10)=',diff%chi(10,10,10)
        unit=51
        call DA_Write_Diff (unit, file_date, number, diff, xp, &
                            ids,ide, jds,jde, kds,kde,  &

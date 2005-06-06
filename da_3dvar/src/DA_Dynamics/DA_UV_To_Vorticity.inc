@@ -32,6 +32,10 @@ SUBROUTINE DA_UV_To_Vorticity(xb , u, v, vor, &
    integer            :: js, je                       ! 2nd dim. end points.
    integer            :: ks, ke                       ! 3rd dim. end points.
    real               :: one_third                    ! 1/3.
+   real               :: inv_2ds                      ! 1/2ds.
+   real               :: coeff(ims:ime,jms:jme)       ! Mult. coefficient.
+   real               :: um(ims:ime,jms:jme)          ! Temp. storage of u/m.
+   real               :: vm(ims:ime,jms:jme)          ! Temp. storage of v/m.
 
 !------------------------------------------------------------------------------
 !  [1.0] Initialise:
@@ -48,12 +52,21 @@ SUBROUTINE DA_UV_To_Vorticity(xb , u, v, vor, &
    if ( .not. global .and. its == ids ) is = ids+1 
    if ( .not. global .and. ite == ide ) ie = ide-1
    if ( jts == jds ) js = jds+1; if ( jte == jde ) je = jde-1
+
+   if ( .not.global ) then
+       inv_2ds = 0.5 / xb%ds
+       coeff(its:ite,jts:jte) = xb%map_factor(its:ite,jts:jte) * &
+                                xb%map_factor(its:ite,jts:jte) * inv_2ds
+   endif
+     
 !------------------------------------------------------------------------------
 !  [2.0] Calculate vorticity:
 !------------------------------------------------------------------------------
    DO k = kts, kte
 
 !     [2.1] Compute finite difference vorticity at interior points:
+
+   if( global ) then
    
       DO j = js, je
       DO i = is, ie
@@ -62,7 +75,19 @@ SUBROUTINE DA_UV_To_Vorticity(xb , u, v, vor, &
       END DO
       END DO
 
-      if( global ) cycle
+!      if( global ) cycle
+   else
+
+      um(is-1:ie+1,js-1:je+1) = u(is-1:ie+1,js-1:je+1,k) / xb%map_factor(is-1:ie+1,js-1:je+1)
+      vm(is-1:ie+1,js-1:je+1) = v(is-1:ie+1,js-1:je+1,k) / xb%map_factor(is-1:ie+1,js-1:je+1)
+
+!     [2.1] Compute finite difference vorticity at interior points:
+   
+      DO j = js, je
+      DO i = is, ie
+         vor(i,j,k) = ( -um(i,j+1) + um(i,j-1) + vm(i+1,j) - vm(i-1,j) ) * coeff(i,j)
+      END DO
+      END DO
 
 !    [2.2] Impose zero vorticity gradient condition at boundaries:
 
@@ -101,6 +126,9 @@ SUBROUTINE DA_UV_To_Vorticity(xb , u, v, vor, &
             vor(i,j,k) = one_third * ( 4.0 * vor(i,j-1,k) - vor(i,j-2,k) )
          end do
       end if
+
+   endif
+
    END DO
 
    if( global ) then

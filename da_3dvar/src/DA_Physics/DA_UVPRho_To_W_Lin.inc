@@ -12,6 +12,7 @@ SUBROUTINE DA_UVPRho_To_W_Lin( xb, xa, xp,                 &
 !  HISTORY: 07/21/2002 - Creation of F90 version. Qingnong Xiao
 !  HISTORY: 04/15/2004 - Modified of F90 version. Jianfeng Gu
 !           02/02/2005 - Map factor fix and global update      Syed RH Rizvi 
+!           06/02/2005 - fixed the bug and update the DIV.  Yong-Run Guo
 !
 !------------------------------------------------------------------------------
 
@@ -105,7 +106,7 @@ SUBROUTINE DA_UVPRho_To_W_Lin( xb, xa, xp,                 &
 
 ! Term 2.1: Divergence term from perturbed wind
 
-   CALL DA_UV_To_Divergence(xa%u,xa%v, xb%coefx, xb%coefy, DIV, &
+   CALL DA_UV_To_Divergence(xb, xa%u, xa%v, DIV, &
                             ids,ide, jds,jde, kds,kde,         &
                             ims,ime, jms,jme, kms,kme,         &
                             its,ite, jts,jte, kts,kte )
@@ -120,7 +121,7 @@ SUBROUTINE DA_UVPRho_To_W_Lin( xb, xa, xp,                 &
 
 ! Term 2.2: Divergence term from basic wind
 
-   CALL DA_UV_To_Divergence(xa%u,xa%v, xb%coefx, xb%coefy, DIV, &
+   CALL DA_UV_To_Divergence(xb, xb%u, xb%v, DIV, &
                             ids,ide, jds,jde, kds,kde,         &
                             ims,ime, jms,jme, kms,kme,         &
                             its,ite, jts,jte, kts,kte )
@@ -149,7 +150,7 @@ SUBROUTINE DA_UVPRho_To_W_Lin( xb, xa, xp,                 &
       ENDDO
    ENDDO
 
-   CALL DA_UV_To_Divergence(URHO, VRHO, xb%coefx, xb%coefy, DIV, &
+   CALL DA_UV_To_Divergence(xb, URHO, VRHO, DIV, &
                             ids,ide, jds,jde, kds,kde,         &
                             ims,ime, jms,jme, kms,kme,         &
                             its,ite, jts,jte, kts,kte )
@@ -178,7 +179,7 @@ SUBROUTINE DA_UVPRho_To_W_Lin( xb, xa, xp,                 &
       ENDDO
    ENDDO
 
-   CALL DA_UV_To_Divergence(URHO, VRHO, xb%coefx, xb%coefy, DIV, &
+   CALL DA_UV_To_Divergence(xb, URHO, VRHO, DIV, &
                             ids,ide, jds,jde, kds,kde,         &
                             ims,ime, jms,jme, kms,kme,         &
                             its,ite, jts,jte, kts,kte )

@@ -42,12 +42,15 @@ SUBROUTINE DA_New_Statistics_Variable( diff, xb, xbx, xp, &
                             ims,ime, jms,jme, kms,kme,  &
                             its,ite, jts,jte, kts,kte )
 
+!   write (*,'(a,e20.12)') '1, Vor: diff%vor(10,10,10)=', diff%vor(10,10,10)
+
 !  Convert vorticity to Del**2 psi:
 
    DO k = kts, kte
      diff%vor(its:ite,jts:jte,k) = coeff(its:ite,jts:jte) * & 
                                    diff%vor(its:ite,jts:jte,k)
    END DO
+!   write (*,'(a,e20.12)') '2, Vor: diff%vor(10,10,10)=', diff%vor(10,10,10)
 
 !--------------------------------------------------------------------
    CALL DA_Solve_PoissonEqn_FST(xb, xbx, xp, diff%vor, diff%psi,    &
@@ -64,13 +67,11 @@ SUBROUTINE DA_New_Statistics_Variable( diff, xb, xbx, xp, &
 
 !  [2.2] Transform u, v to velocity potential via divergence:
 #ifndef DEREF_KLUDGE
-   CALL DA_UV_To_Divergence( diff % u, diff % v, xb%coefx, xb%coefy, diff % div, &
+   CALL DA_UV_To_Divergence( xb, diff % u, diff % v, diff % div, &
 #else
-   CALL DA_UV_To_Divergence(diff % u(ims,jms,kms), &
-                            diff % v(ims,jms,kms), &
-                            xb % coefx(ims,jms), &
-                            xb % coefy(ims,jms), &
-                            diff % div(ims,jms,kms), &
+   CALL DA_UV_To_Divergence( xb, diff % u(ims,jms,kms), &
+                                 diff % v(ims,jms,kms), &
+                                 diff % div(ims,jms,kms), &
 #endif
                             ids,ide, jds,jde, kds,kde,  &
                             ims,ime, jms,jme, kms,kme,  &

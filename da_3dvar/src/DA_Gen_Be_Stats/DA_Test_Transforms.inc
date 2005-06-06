@@ -76,12 +76,10 @@ SUBROUTINE DA_Test_Transforms (diff, xb, xbx, xp,  &
 
 
 #ifndef DEREF_KLUDGE
-   CALL DA_UV_To_Divergence( diff % u, diff % v, xb%coefx, xb%coefy, div, &
+   CALL DA_UV_To_Divergence(xb, diff % u, diff % v, div, &
 #else
-   CALL DA_UV_To_Divergence(diff % u(ims,jms,kms), &
-                            diff % v(ims,jms,kms), &
-                            xb % coefx(ims,jms), &
-                            xb % coefy(ims,jms), &
+   CALL DA_UV_To_Divergence(xb, diff % u(ims,jms,kms), &
+                                diff % v(ims,jms,kms), &
                             div(ims,jms,kms), &
 #endif
                             ids,ide, jds,jde, kds,kde,  &

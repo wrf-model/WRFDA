@@ -83,7 +83,7 @@ SUBROUTINE WZ_BASE(xb,WZ_b,                       &
    end if
 
 
-   CALL DA_UV_To_Divergence(xb%u,xb%v, xb%coefx, xb%coefy,DIV, &
+   CALL DA_UV_To_Divergence(xb, xb%u,xb%v, DIV, &
                             ids,ide, jds,jde, kds,kde,         &
                             ims,ime, jms,jme, kms,kme,         &
                             its,ite, jts,jte, kts,kte)
@@ -111,7 +111,7 @@ SUBROUTINE WZ_BASE(xb,WZ_b,                       &
       ENDDO
    ENDDO
 
-   CALL DA_UV_To_Divergence(URHO, VRHO, xb%coefx, xb%coefy,DIV, &
+   CALL DA_UV_To_Divergence(xb, URHO, VRHO, DIV, &
                             ids,ide, jds,jde, kds,kde,         &
                             ims,ime, jms,jme, kms,kme,         &
                             its,ite, jts,jte, kts,kte)

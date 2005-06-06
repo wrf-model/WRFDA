@@ -86,12 +86,10 @@ SUBROUTINE DA_Transform_XToVp( xb, xbx, xa, xp, vp, be, &
 
   print*,' calling UV_To_Divergence'
 #ifndef DEREF_KLUDGE
-   CALL DA_UV_To_Divergence( xa % u, xa % v, xb%coefx, xb%coefy, div, &
+   CALL DA_UV_To_Divergence(xb, xa % u, xa % v, div, &
 #else
-   CALL DA_UV_To_Divergence(xa % u(ims,jms,kms), &
-                            xa % v(ims,jms,kms), &
-                            xb % coefx(ims,jms), &
-                            xb % coefy(ims,jms), &
+   CALL DA_UV_To_Divergence(xb, xa % u(ims,jms,kms), &
+                                xa % v(ims,jms,kms), &
                             div(ims,jms,kms), &
 #endif
                             ids,ide, jds,jde, kds,kde,  &
