@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
+#ifdef crayx1
+#include <math.h>
+#endif
 #include "pdstool.h"
 #include "gdstool.h"
 #include "gridnav.h"
@@ -140,7 +143,7 @@ int WRITE_GRIB(char *varname, float *level1, float *level2, int *vert_unit,
       fprintf(stdout,\
 	      "Skipping %s, Could not find parameter for %s in gribmap.txt\n",\
 	      varname2,varname2);
-      return 0;
+      return ;
     }
   center = grib_table_info->center;
   subcenter = grib_table_info->subcenter;

@@ -23,7 +23,7 @@ CONTAINS
      &          ,ids,ide,jds,jde,kds,kde                              &
      &          ,ims,ime,jms,jme,kms,kme                              &
      &          ,i_start,i_end,j_start,j_end,kts,kte,num_tiles        &
-     &          ,POTEVP,SNOPCX,SOILTB                                 ) ! optional args
+     &          ,POTEVP,SNOPCX,SOILTB,SR                              ) ! optional args
 
    USE module_configure
    USE module_state_description
@@ -253,6 +253,7 @@ CONTAINS
    REAL, DIMENSION( ims:ime, jms:jme ) , OPTIONAL, INTENT(INOUT)::   POTEVP ! NMM LSM
    REAL, DIMENSION( ims:ime, jms:jme ) , OPTIONAL, INTENT(INOUT)::   SNOPCX ! NMM LSM
    REAL, DIMENSION( ims:ime, jms:jme ) , OPTIONAL, INTENT(INOUT)::   SOILTB ! NMM LSM
+   REAL, DIMENSION( ims:ime, jms:jme ) , OPTIONAL, INTENT(IN)::   SR ! NMM LSM
    REAL, DIMENSION( ims:ime, jms:jme ), INTENT(OUT)::   BR
    REAL, DIMENSION( ims:ime, jms:jme ), INTENT(OUT)::   CHKLOWQ
    REAL, DIMENSION( ims:ime, jms:jme ), INTENT(OUT)::   GZ1OZ0
@@ -352,6 +353,7 @@ CONTAINS
     DO j=j_start(ij),j_end(ij)
     DO i=i_start(ij),i_end(ij)
        RAINBL(i,j) = RAINBL(i,j) + RAINCV(i,j) + RAINNCV(i,j) 
+       RAINBL(i,j) = MAX (RAINBL(i,j), 0.0) 
     ENDDO
     ENDDO
   ENDDO
@@ -399,6 +401,10 @@ CONTAINS
      sfclay_select: SELECT CASE(config_flags%sf_sfclay_physics)
 
      CASE (SFCLAYSCHEME)
+#if (NMM_CORE != 1)
+! DX varies spatially in NMM, therefore, SFCLAY cannot be called
+! because it takes a scalar DX. NMM passes in a dummy value for this
+! scalar.  NEEDS FURTHER ATTENTION. JM 20050215
        CALL wrf_debug( 100, 'in SFCLAY' )
          CALL SFCLAY(u_phytmp,v_phytmp,t_phy,moist(ims,kms,jms,P_QV),&
                p_phy,dz8w,CP,G,RCP,R_d,XLV,PSFC,CHS,CHS2,CQS2,CPM, &
@@ -410,6 +416,9 @@ CONTAINS
                ids,ide, jds,jde, kds,kde,                          &
                ims,ime, jms,jme, kms,kme,                          &
                i_start(ij),i_end(ij), j_start(ij),j_end(ij), kts,kte    )
+#else
+        CALL wrf_error_fatal('SFCLAY cannot be used with NMM')
+#endif
       CASE (MYJSFCSCHEME)
 
           CALL wrf_debug(100,'in MYJSFC')
@@ -485,7 +494,7 @@ CONTAINS
                 ALBBCK,TMN,XLAND,XICE,QZ0,                      &
                 th2,q2,SNOWC,CQS2,QSFC,SOILTB,CHKLOWQ,RAINBL,   &
                 num_soil_layers,DTBL,DZS,itimestep,             &
-                SMOIS,TSLB,SNOW,CANWAT,CPM,RCP,                 &    !TSLB
+                SMOIS,TSLB,SNOW,CANWAT,CPM,RCP,SR,              &    !TSLB
                 ALBEDO,SNOALB,SH2O,SNOWH,                       &
                 ids,ide, jds,jde, kds,kde,                      &
                 ims,ime, jms,jme, kms,kme,                      &
@@ -520,7 +529,6 @@ CONTAINS
            ENDDO
            ENDDO
          
-
           CALL SFCDIAGS(HFX,QFX,TSK,QSFC,CQS2,CQS2,T2,TH2,Q2,      &
                      PSFC,CP,R_d,RCP,                              &
                      ids,ide, jds,jde, kds,kde,                    &

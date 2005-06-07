@@ -14,10 +14,10 @@ SUBROUTINE DA_Transform_XToY_Satob ( xa, iv, xp, y )
    
    IF ( iv%num_satob > 0 ) THEN
 
-      y%satob(:)%u = 0.0
-      y%satob(:)%v = 0.0
+!xyh      y%satob(:)%u = 0.0
+!xyh      y%satob(:)%v = 0.0
 
-      do n=1, iv % num_satob
+      do n=iv%ob_numb(iv%current_ob_time-1)%satob + 1, iv%ob_numb(iv%current_ob_time)%satob
 
        if(iv%satob(n)%loc%proc_domain_with_halo) then
 

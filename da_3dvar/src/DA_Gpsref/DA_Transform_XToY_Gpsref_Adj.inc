@@ -16,7 +16,7 @@ SUBROUTINE DA_TRANSFORM_XTOY_GPSRef_ADJ( iv, xp, jo_grad_y, jo_grad_x, xb)
 
    IF ( iv%num_gpsref < 1 ) return
 
-   DO n=1, iv % num_gpsref
+   do n=iv%ob_numb(iv%current_ob_time-1)%gpsref + 1, iv%ob_numb(iv%current_ob_time)%gpsref
 
       if(iv%gpsref(n)%loc%proc_domain_with_halo) then
 

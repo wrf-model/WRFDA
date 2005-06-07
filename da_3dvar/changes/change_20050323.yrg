@@ -1,0 +1,134 @@
+Change Log for update to WRF 3DVAR code
+---------------------------------------
+
+Author: 	Mi-Seon Lee
+Reviewer: 	Yong-Run Guo
+Date: 		03/23/05
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+1, Added the cv_options = 5.
+
+   The control variables are psi, chi_u, t_u, pseudo_rh, and Psfc,
+   same as cv_options = 3.
+
+   U_p transform: statistical balance with the regression coefficients;
+   U_v transform: EOF with eigenvector/eigenvalue;
+   U_h transform: Multiple passes recursive filter with scale-length
+
+2. Added the BES (Background Error Statistics) computation for 
+   cv_options = 5 (use for Regional WRF model): Stage0, Stage4, and 
+   the BES plotting program
+
+   Here the Stage0 codes special for regional WRF model output are embeded 
+   in the 3dvar code. 
+
+   The input data files are either 
+
+   a) from a series of the forecasts starting at the consecutive 
+      initial times (NMC approach), or
+   b) from a set of the ensemble forecasts (ENS approach). 
+
+3, A program and shell script for plotting the eigenvector/eigenvalue 
+   and scale-lengths: plot_eigen_in_be.f90 and plot_eigen_in_be.csh
+   are added under da_3dvar/utl
+
+Expected Differences
+--------------------
+
+Accuracy:       not affect 3dvar results 	
+
+CPU/memory:	not affect the 3dvar jobs
+
+Test results (run on what machines?)
+------------------------------------------------------
+
+The binary BES file: gen_be.NMC.dat or gen_be.ENS.dat
+will be generated for use of cv_options = 5
+
+************* Note Note *********************
+
+There may be a bug in the code for transformation between (u,v) and (psi,chi).
+The accuracy for inverse tests is about 5~8% with an ideal psi field. 
+ 
+Files added:
+------------
+
+? da_3dvar/module_da_gen_be_stats_interface.F
+? da_3dvar/src/DA_Gen_Be_Stats
+? da_3dvar/src/da_stats_be
+? da_3dvar/src/DA_Setup_Structures/DA_Get_Bins_Info.inc
+? da_3dvar/src/DA_Setup_Structures/da_setup_background_errors5.inc
+? da_3dvar/src/DA_VToX_Transforms/DA_Transform_VToVv_Spectral.inc
+? da_3dvar/src/DA_VToX_Transforms/DA_Transform_VToVv_Spectral_Adj.inc
+? da_3dvar/src/da_gen_be/da_print_be_stats_h.inc
+? da_3dvar/src/da_gen_be/da_print_be_stats_p.inc
+? da_3dvar/src/da_gen_be/da_print_be_stats_v.inc
+? da_3dvar/src/da_spectral/da_legtra_inv_adj.inc
+? da_3dvar/src/da_spectral/da_v_to_vv_spectral_adj.inc
+? da_3dvar/src/da_gen_be/da_print_be_stats_h.inc
+? da_3dvar/src/da_gen_be/da_print_be_stats_p.inc
+? da_3dvar/src/da_gen_be/da_print_be_stats_v.inc
+? da_3dvar/src/da_spectral/da_legtra_inv_adj.inc
+? da_3dvar/src/da_spectral/da_v_to_vv_spectral_adj.inc
+? da_3dvar/utl/plot_eigen_in_be.csh
+? da_3dvar/utl/plot_eigen_in_be.f90
+? main/gen_be/gen_be_diags_read.f
+? main/gen_be/gen_be_stage0.F
+? main/gen_be/gen_be_stage0.f
+? main/gen_be/gen_be_stage4_scale.f
+? run/gen_be/da_wrf_stage0.csh
+? run/gen_be/gen_be_ens_sample.csh
+? run/gen_be/gen_be_sample.csh
+
+
+Files modified:
+---------------
+
+M clean
+M Registry/Registry_3dvar
+M arch/configure.defaults_3dvar
+M da_3dvar/Makefile
+M da_3dvar/module_wrf_3dvar_io.F
+M da_3dvar/src/Makefile
+M da_3dvar/src/DA_Constants/DA_Constants.F
+M da_3dvar/src/DA_Define_Structures/DA_Allocate_Background_Errors.inc
+M da_3dvar/src/DA_Define_Structures/DA_Define_Structures.F
+M da_3dvar/src/DA_Define_Structures/da_allocate_cv.inc
+M da_3dvar/src/DA_FFTs/DA_QPASSM.inc
+M da_3dvar/src/DA_Obs/da_add_noise_to_ob.inc
+M da_3dvar/src/DA_Setup_Structures/DA_Setup_Structures.F
+M da_3dvar/src/DA_Setup_Structures/da_rescale_background_errors.inc
+M da_3dvar/src/DA_Setup_Structures/da_setup_background_errors.inc
+M da_3dvar/src/DA_Setup_Structures/da_setup_firstguess.inc
+M da_3dvar/src/DA_Setup_Structures/da_setup_runconstants.inc
+M da_3dvar/src/DA_Setup_Structures/da_transfer_wrftoxb.inc
+M da_3dvar/src/DA_Tools/DA_Read_Namelist.inc
+M da_3dvar/src/DA_VToX_Transforms/DA_Transform_VpToX.inc
+M da_3dvar/src/DA_VToX_Transforms/DA_Transform_VpToX_Adj.inc
+M da_3dvar/src/DA_VToX_Transforms/DA_VToX_Transforms.F
+M da_3dvar/src/DA_VToX_Transforms/DA_Vertical_Transform.inc
+M da_3dvar/src/DA_VToX_Transforms/da_transform_vtox.inc
+M da_3dvar/src/DA_VToX_Transforms/da_transform_vtox_adj.inc
+M da_3dvar/src/da_gen_be/da_create_bins.inc
+M da_3dvar/src/da_gen_be/da_gen_be.F
+M da_3dvar/src/da_gen_be/da_readwrite_be_stage2.inc
+M da_3dvar/src/da_gen_be/da_readwrite_be_stage3.inc
+M da_3dvar/src/da_gen_be/da_readwrite_be_stage4.inc
+M da_3dvar/src/da_solve_v3d/da_solve_v3d.F
+M da_3dvar/utl/Makefile
+M main/gen_be/Makefile
+M main/gen_be/gen_be_diags.f
+M main/gen_be/gen_be_stage1.f
+M main/gen_be/gen_be_stage2.f
+M main/gen_be/gen_be_stage3.f
+M main/gen_be/gen_be_stage4.f
+M run/DA_Run_3DVAR.csh
+M run/gen_be/gen_be.csh
+
+Minor-tag:
+---------
+
+version_2_0_3_2
+

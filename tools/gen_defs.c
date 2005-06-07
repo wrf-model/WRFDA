@@ -114,7 +114,7 @@ int
 gen_decls ( FILE * fp , char * corename , node_t * node , int sw_ranges, int sw_point , int mask , int layer )
 {
   node_t * p ; 
-  int tag, ipass ;
+  int var, tag, ipass ;
   char fname[NAMELEN], post[NAMELEN] ;
   char * dimspec ;
 
@@ -136,7 +136,15 @@ gen_decls ( FILE * fp , char * corename , node_t * node , int sw_ranges, int sw_
 
       if ( p->node_kind & FOURD ) { sprintf(post,",num_%s)",field_name(t4,p,0)) ; }
       else                        { sprintf(post,")") ; }
-
+/*Wei's change for 4dvar*/
+      for ( var = 0 ; var < p->var_numb ; var++ )
+      { 
+      /*
+        if(p->var_numb > 1)
+        {  
+          printf("Processing var: <%s> for <%c> in file: <%s>, line: <%d>\n", p->name, p->var_name[var], __FILE__, __LINE__);
+        }
+       */
       for ( tag = 1 ; tag <= p->ntl ; tag++ ) 
       {
 
@@ -146,10 +154,35 @@ gen_decls ( FILE * fp , char * corename , node_t * node , int sw_ranges, int sw_
 
         /* if this is a core-specific variable, prepend the name of the core to                    */
         /* the variable at the driver level                                                        */
-        if (!strncmp( p->use, "dyn_", 4 ) && layer == DRIVER_LAYER )
-          sprintf(fname,"%s_%s",p->use+4,field_name(t4,p,(p->ntl>1)?tag:0)) ;
-        else
-          strcpy(fname,field_name(t4,p,(p->ntl>1)?tag:0)) ;
+      /*This is the Original
+       *if (!strncmp( p->use, "dyn_", 4 ) && layer == DRIVER_LAYER )
+       *  sprintf(fname,"%s_%s",p->use+4,field_name(t4,p,(p->ntl>1)?tag:0)) ;
+       *else
+       *  strcpy(fname,field_name(t4,p,(p->ntl>1)?tag:0)) ;
+       *End of Orginal
+       */
+
+          if (!strncmp( p->use, "dyn_", 4 ) && layer == DRIVER_LAYER )
+          {
+            if(var)
+              sprintf(fname,"%s_%c_%s",p->use+4,p->var_name[var],field_name(t4,p,(p->ntl>1)?tag:0)) ;
+            else
+              sprintf(fname,"%s_%s",p->use+4,field_name(t4,p,(p->ntl>1)?tag:0)) ;
+          }
+          else
+          {
+            if(var)
+              sprintf(fname,"%c_%s",p->var_name[var],field_name(t4,p,(p->ntl>1)?tag:0)) ;
+            else
+              strcpy(fname,field_name(t4,p,(p->ntl>1)?tag:0)) ;
+          }
+
+        /*
+          if(p->var_numb > 1)
+          {
+            printf("fname: <%s> in file: <%s>, line: <%d>\n", fname, __FILE__, __LINE__);
+          }
+         */
 
         switch ( sw_ranges )
         {
@@ -171,6 +204,7 @@ gen_decls ( FILE * fp , char * corename , node_t * node , int sw_ranges, int sw_
                     (sw_point==POINTERDECL)?declare_array_as_pointer(t3,p):"" ,
                     fname ) ;
       }
+      } /* End Wei's change */
     }
   }
   }
