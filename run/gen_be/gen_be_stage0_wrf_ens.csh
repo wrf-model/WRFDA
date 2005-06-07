@@ -4,21 +4,22 @@
 #
 # History : 10/01/2004 Creation.                       Mi-Seon Lee
 #           05/21/2005 Modify for inclusion in wrfvar  Dale Barker
-#           06/06/2005 Modified by                     Y.-R. Guo
+#           06/06/2005 Modified.                       Y.-R. Guo            
 #---------------------------------------------------------------
 
 #Define job by overriding default environment variables:
 
 #set echo
-setenv START_BE_DATE           2005-05-03_00:00:00
-setenv END_BE_DATE             2005-05-04_00:00:00
-setenv WEST_EAST_GRID_NUMBER   222
-setenv SOUTH_NORTH_GRID_NUMBER 128
-setenv GRID_DISTANCE           45000
-setenv FILE_HEAD               'nfsout_d01'
-setenv EXPT                    cwb.test
-setenv DAT_DIR                 /palm1/guo/${EXPT}
-setenv WRFVAR_DIR              /palm/users/guo/wrfvar
+setenv START_BE_DATE           2002-01-01_00:00:00
+setenv END_BE_DATE             2002-01-10_00:00:00
+setenv WEST_EAST_GRID_NUMBER    90
+setenv SOUTH_NORTH_GRID_NUMBER  90
+setenv VERTICAL_GRID_NUMBER     28
+setenv GRID_DISTANCE           100000
+setenv FILE_HEAD               'wrfout_d01'
+setenv EXPT                    ENS
+setenv DAT_DIR                 /mmm/mmmtmp/guo/GEN_BE_data/${EXPT}
+setenv WRFVAR_DIR              /home/bluesky/guo/wrfvar
 
 #-----------------------------------------------------------------------------------
 # Don't change anything below this line.
@@ -28,20 +29,19 @@ setenv WRFVAR_DIR              /palm/users/guo/wrfvar
  echo "Run WRF Stage 0: Calculate standard difference fields from WRF input forecasts."
  echo "-------------------------------------------------------------------------------"
 
- setenv BEGIN_CPU `date`
+ set BEGIN_CPU  = `date`
  echo "Beginning CPU time: ${BEGIN_CPU}"
 
  if ( ! $?START_BE_DATE )           setenv START_BE_DATE 2004-05-01_00:00:00
  if ( ! $?END_BE_DATE )             setenv END_BE_DATE   2004-05-28_00:00:00
- if ( ! $?BE_TYPE )                 setenv BE_TYPE 1 # 1: NMC(Default),  2: ENS
- if ( $BE_TYPE == 1 )               setenv MEMBER 1  # Only 1 member for NMC method.
- if ( ! $?MEMBER )                  setenv MEMBER 10 # Needed if BE_TYPE /= 1. 
+ if ( ! $?BE_TYPE )                 setenv BE_TYPE  2  # 1: NMC(Default),  2: ENS
+ if ( $BE_TYPE == 1 )               setenv MEMBER   1  # Only 1 member for NMC method.
+ if ( ! $?MEMBER )                  setenv MEMBER  50  # Needed if BE_TYPE /= 1. 
  if ( ! $?WEST_EAST_GRID_NUMBER )   setenv WEST_EAST_GRID_NUMBER   165
  if ( ! $?SOUTH_NORTH_GRID_NUMBER ) setenv SOUTH_NORTH_GRID_NUMBER 217
  if ( ! $?VERTICAL_GRID_NUMBER )    setenv VERTICAL_GRID_NUMBER    31
  if ( ! $?GRID_DISTANCE )           setenv GRID_DISTANCE           60000
- if ( ! $?DA_NUM_SOIL_LAYERS )      setenv DA_NUM_SOIL_LAYERS      4
-
+ if ( ! $?DA_NUM_SOIL_LAYERS )      setenv DA_NUM_SOIL_LAYERS      5
  if ( ! $?FILE_HEAD )               setenv FILE_HEAD 'wrfout_d01',
  if ( ! $?EXPT )                    setenv EXPT amps1.60km.may04.NMC
  if ( ! $?WRFVAR_DIR )              setenv WRFVAR_DIR /tara/dmbarker/code_development/wrfvar
@@ -51,7 +51,7 @@ setenv WRFVAR_DIR              /palm/users/guo/wrfvar
     echo "Directory $DAT_DIR doesn't exist. Exiting."
     exit
  endif
- if ( ! $?RUN_DIR )                 setenv RUN_DIR ${DAT_DIR}
+ if ( ! $?RUN_DIR )                 setenv RUN_DIR /ptmp/guo/TEST_ENS
  if ( ! -d ${RUN_DIR} )             mkdir ${RUN_DIR}
  
  set START_CY = `echo $START_BE_DATE | cut -c1-4`
@@ -222,7 +222,7 @@ EOF
 
 #cp namelist.input.00 namelist.input
 
- ln -sf $DAT_DIR/${FILE_HEAD}_${START_BE_DATE}  wrf_3dvar_input
+ ln -sf $DAT_DIR/${FILE_HEAD}_${START_BE_DATE}.1  wrf_3dvar_input
 
  ln -sf $WRFVAR_DIR/run/LANDUSE.TBL LANDUSE.TBL
  ln -sf $WRFVAR_DIR/gen_be/gen_be_stage0.exe gen_be_stage0.exe

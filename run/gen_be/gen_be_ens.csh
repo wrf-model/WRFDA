@@ -10,22 +10,22 @@
 #
 # History : 10/01/2004 Creation.                       Dale Barker
 #           05/21/2005 Modify for inclusion in wrfvar  Dale Barker
-#           Modified by                                Y.-R. Guo
+#           06/06/2005 Modified by                     Y.-R. Guo
 #-----------------------------------------------------------------------
 
 #Define job via environment variables:
 
 #set echo
-setenv ID cwb_wrf
+setenv ID ens_wrf
 #setenv NUM_JOBS 2
 #setenv BIN_TYPE 5
-setenv START_DATE      2003081512
-setenv END_DATE        2003091500
-setenv NUM_LEVELS      31
-setenv RESOLUTION_KM   45000
-setenv EXPT            wrfvar_cwb_be
-setenv DAT_DIR         /mmmtmp/guo/${EXPT}
-setenv WRFVAR_DIR      /palm/users/guo/wrfvar
+setenv START_DATE      2002010100
+setenv END_DATE        2002011000
+setenv NUM_LEVELS      28
+setenv RESOLUTION_KM   100000
+setenv EXPT            TEST_ENS
+setenv DAT_DIR         /ptmp/guo/${EXPT}
+setenv WRFVAR_DIR      /home/bluesky/guo/wrfvar
 
 #Uncomment the stages you wish to run:
 setenv RUN_GEN_BE_STAGE1 # Set to run stage 1 (Remove mean, split variables).
@@ -46,8 +46,8 @@ echo "Beginning CPU time: ${BEGIN_CPU}"
 if ( ! $?START_DATE )    setenv START_DATE    2004050112 # Starting time of period.
 if ( ! $?END_DATE )      setenv END_DATE      2004052800 # Ending time of period.
 if ( ! $?INTERVAL )      setenv INTERVAL      12         # Period between files (hours).
-if ( ! $?BE_METHOD )     setenv BE_METHOD     NMC        # NMC (NMC-method), ENS (Ensemble-Method).
-if ( ! $?NE )            setenv NE 1                     # Number of ensemble members (for ENS).
+if ( ! $?BE_METHOD )     setenv BE_METHOD     ENS        # NMC (NMC-method), ENS (Ensemble-Method).
+if ( ! $?NE )            setenv NE            50         # Number of ensemble members (for ENS).
 if ( ! $?BIN_TYPE )      setenv BIN_TYPE      1          # 0=None, 1=1:ni, 2=latitude, ....
 if ( ! $?LAT_MIN )       setenv LAT_MIN       -90.0      # Used if BIN_TYPE = 2.
 if ( ! $?LAT_MAX )       setenv LAT_MAX       90.0       # Used if BIN_TYPE = 2.

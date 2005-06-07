@@ -5,7 +5,7 @@
 # Purpose: To calculate correlation lengthscales for 2D control variable fields. 
 #
 # History:
-#     06/06/2005    Modified by                          Y.-R. Guo
+#         06/06/2005  Modified by                     Y.-R. Guo
 #-----------------------------------------------------------------------
 
 #Define job by overriding default environment variables:
@@ -24,19 +24,19 @@
  echo "Beginning CPU time: ${BEGIN_CPU}"
 
 #Define environment variables:
- if ( ! $?START_DATE )    setenv START_DATE    2003081512 # Starting time of period.
- if ( ! $?END_DATE )      setenv END_DATE      2003091500 # Ending time of period.
+ if ( ! $?START_DATE )    setenv START_DATE    2002010100 # Starting time of period.
+ if ( ! $?END_DATE )      setenv END_DATE      2002011000 # Ending time of period.
  if ( ! $?INTERVAL )      setenv INTERVAL      12         # Period between files (hours).
- if ( ! $?BE_METHOD )     setenv BE_METHOD     NMC        # NMC (NMC-method), ENS (Ensemble-Method).
- if ( ! $?NE )            setenv NE 1                     # Number of ensemble members (for ENS).
+ if ( ! $?BE_METHOD )     setenv BE_METHOD     ENS        # NMC (NMC-method), ENS (Ensemble-Method).
+ if ( ! $?NE )            setenv NE            50         # Number of ensemble members (for ENS).
  if ( ! $?STRIDE )        setenv STRIDE 1                 # Calculate correlation evert STRIDE point.
- if ( ! $?NUM_LEVELS )    setenv NUM_LEVELS    30         # Hard-wired for now....
+ if ( ! $?NUM_LEVELS )    setenv NUM_LEVELS    27         # Hard-wired for now....
 
- if ( ! $?EXPT )          setenv EXPT         wrfvar_cwb_be
- if ( ! $?ID )            setenv ID           cwb_wrf
- if ( ! $?WRFVAR_DIR )    setenv WRFVAR_DIR   /palm/users/guo/wrfvar
+ if ( ! $?EXPT )          setenv EXPT         ENS_TEST
+ if ( ! $?ID )            setenv ID           ens_wrf
+ if ( ! $?WRFVAR_DIR )    setenv WRFVAR_DIR   /home/bluesky/guo/wrfvar
  if ( ! $?SRC_DIR )       setenv SRC_DIR      ${WRFVAR_DIR}/gen_be
- if ( ! $?DAT_DIR )       setenv DAT_DIR      /mmmtmp/guo/${EXPT}
+ if ( ! $?DAT_DIR )       setenv DAT_DIR      /ptmp/guo/${EXPT}
  if ( ! $?RUN_DIR )       setenv RUN_DIR      ${DAT_DIR}/${ID}
  if ( ! -d ${RUN_DIR} )   mkdir ${RUN_DIR}
 
