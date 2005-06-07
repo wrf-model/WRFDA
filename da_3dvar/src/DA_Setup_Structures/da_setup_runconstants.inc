@@ -39,8 +39,6 @@ SUBROUTINE DA_Setup_RunConstants( xp, xb, xbx)
 !  [1.0] Calculate padded grid-size required for efficient FFTs and factors:
 !------------------------------------------------------------------------------
 
-      if (associated(xbx % fft_factors_x)) return
-
 !     [1.1] In x direction:
 
       nx = xp%ide - xp%ids
