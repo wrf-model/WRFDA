@@ -23,11 +23,15 @@ SUBROUTINE DA_Transform_XToY_Adj( xb, iv, xp, jo_grad_y, jo_grad_x )
 
    call da_transform_xtoy_Synop_Adj ( xb, iv, xp, jo_grad_y, jo_grad_x )
 
+
 !------------------------------------------------------------------------------
 !  [3.0] Cloud track wind observation operator y = H(x):
 !------------------------------------------------------------------------------
 
-   call da_transform_xtoy_Satob_Adj ( iv, xp, jo_grad_y, jo_grad_x )
+!  Geostationary Satellite
+   call da_transform_xtoy_GeoAMV_Adj ( iv, xp, jo_grad_y, jo_grad_x )
+!  Polar orbitting Satellite
+   call da_transform_xtoy_PolarAMV_Adj ( iv, xp, jo_grad_y, jo_grad_x )
 
 !------------------------------------------------------------------------------
 !  [4.0] Aircraft observation operator y = H(x):

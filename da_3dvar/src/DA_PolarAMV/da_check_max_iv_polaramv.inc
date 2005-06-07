@@ -1,24 +1,20 @@
-SUBROUTINE da_check_max_iv_satob(it, satob, &
+SUBROUTINE da_check_max_iv_polaramv(it, polaramv, &
                            itu,ituf,itvv,itvvf)
 !-------------------------------------------------------------------------
+!  HISTORY: 
 !
-!  History:
+!      Created: 03/05/2005                   Syed RH Rizvi   
 !
-!     Additions:        02/26/2003                    S. R. H. Rizvi
-!
-!            outer iteration and extra counters are added in the  argument
-!            list for generating detailed information about rejected obs in
-!            various outer iterations
-!
+!      Purpose: Innovation vector check for Polar AMVs 
+!               
 !-------------------------------------------------------------------------
    IMPLICIT NONE
 
    INTEGER,           INTENT (IN)         :: it      ! Outer iteration
-   TYPE (satob_type), INTENT(INOUT)       :: satob
+   TYPE (polaramv_type), INTENT(INOUT)      :: polaramv
    INTEGER, INTENT(INOUT) :: itu,ituf,itvv,itvvf
-
+   INTEGER                                :: i, k
    LOGICAL                                :: failed
-!-----------------------------------------------------------------------------!
 !-----------------------------------------------------------------------------!
 !  [1.0] Open diagnostic file:
 !-----------------------------------------------------------------------------!
@@ -27,13 +23,9 @@ SUBROUTINE da_check_max_iv_satob(it, satob, &
       WRITE (check_max_iv_unit,'(A)')  &
       '----------------------------------------------------------------'
       WRITE (UNIT = check_max_iv_unit, FMT = '(A,/)') 'MAX ERROR TEST QC:'
-
       WRITE (UNIT = check_max_iv_unit, FMT = '(/,9(A,F3.0,/))')  &
-     'Error max test ratio for Satob_U   = ',max_error_uv, &
-     'Error max test ratio for Satob_V   = ',max_error_uv, &
-     'Error max test ratio for Satob_P   = ',max_error_p,  &
-     'Error max test ratio for Satob_T   = ',max_error_t,  &
-     'Error max test ratio for Satob_QV  = ',max_error_q
+     'Error max test ratio for Polar AMV_U   = ',max_error_uv, &
+     'Error max test ratio for Polar AMV_V   = ',max_error_uv
 
    end if
 
@@ -43,15 +35,19 @@ SUBROUTINE da_check_max_iv_satob(it, satob, &
 
    failed = .FALSE.
 
+   DO k = 1, polaramv % info % levels
+
 !     U-wind
 
-      CALL da_max_error_qc(it, satob % info, satob % u, &
+      CALL da_max_error_qc(it, polaramv % info, polaramv % u(k), &
               max_error_uv, itu, ituf, check_max_iv_unit, 'U    ', &
                             failed, check_max_iv_print)
 !     V-wind
 
-      CALL da_max_error_qc (it, satob % info, satob % v,&
+      CALL da_max_error_qc (it, polaramv % info, polaramv % v(k),&
               max_error_uv, itvv, itvvf, check_max_iv_unit, 'V    ', &
                              failed, check_max_iv_print)                           
-END SUBROUTINE da_check_max_iv_satob
+    
+   END DO
+END SUBROUTINE da_check_max_iv_polaramv      
 

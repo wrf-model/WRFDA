@@ -36,11 +36,13 @@ SUBROUTINE DA_Scan_Obs (iunit, ob, xp, filename)
 
    REAL                         :: height_error
 
+
    INTEGER                      :: total_obs, &
                                    num_sound, &
                                    num_synop, &
                                    num_pilot, &
-                                   num_satob, &
+                                   num_geoamv, &
+                                   num_polaramv, &
                                    num_satem, &
                                    num_airep, &
                                    num_metar, &
@@ -62,7 +64,8 @@ SUBROUTINE DA_Scan_Obs (iunit, ob, xp, filename)
    ob%ob_numb(ob%current_ob_time)%synop = ob%num_synop
    ob%ob_numb(ob%current_ob_time)%pilot = ob%num_pilot
    ob%ob_numb(ob%current_ob_time)%satem = ob%num_satem
-   ob%ob_numb(ob%current_ob_time)%satob = ob%num_satob
+   ob%ob_numb(ob%current_ob_time)%geoamv = ob%num_geoamv
+   ob%ob_numb(ob%current_ob_time)%polaramv = ob%num_polaramv
    ob%ob_numb(ob%current_ob_time)%airep = ob%num_airep
    ob%ob_numb(ob%current_ob_time)%gpspw = ob%num_gpspw
    ob%ob_numb(ob%current_ob_time)%gpsref = ob%num_gpsref
@@ -71,11 +74,9 @@ SUBROUTINE DA_Scan_Obs (iunit, ob, xp, filename)
    ob%ob_numb(ob%current_ob_time)%qscat = ob%num_qscat
    ob%ob_numb(ob%current_ob_time)%buoy  = ob%num_buoy
    ob%ob_numb(ob%current_ob_time)%profiler = ob%num_profiler
-   ob%ob_numb(ob%current_ob_time)%bogus = ob%num_bogus
 
    ob%ob_numb(ob%current_ob_time)%ssmt1 = ob%num_ssmt1
    ob%ob_numb(ob%current_ob_time)%ssmt2 = ob%num_ssmt2
-
 !  ob%ob_numb(ob%current_ob_time)%ssmi_tb        = ob%num_ssmi_tb
 !  ob%ob_numb(ob%current_ob_time)%ssmi_retrieval = ob%num_ssmi_retrieval
 !----------------------------------------------------------------------------!
@@ -120,7 +121,8 @@ SUBROUTINE DA_Scan_Obs (iunit, ob, xp, filename)
    num_sound = 0
    num_synop = 0
    num_pilot = 0
-   num_satob = 0
+   num_geoamv = 0
+   num_polaramv = 0
    num_satem = 0
    num_airep = 0
    num_metar = 0
@@ -358,12 +360,19 @@ loop_level: DO i = 1, platform%info%levels
 
             num_satem = num_satem + 1
 
-!        else if(index(platform%info%source, 'SATOB') > 0) then
+
+!--------Geostationary or Polar orbitting Satellite AMVs:
 
          CASE (88)    ;
 
-            if(.not.use_SatobObs) cycle reports
-            num_satob = num_satob + 1
+      if(index(platform%info%name, 'MODIS') > 0 .or. &
+         index(platform%info%name, 'modis') > 0 )  then
+         if(.not.use_PolarAMVObs) cycle reports
+         num_polaramv = num_polaramv + 1
+      else
+         if(.not.use_GeoAMVObs) cycle reports 
+         num_geoamv = num_geoamv + 1
+      end if
 
 !        else if(index(platform%info%source, 'AIREP') > 0) then
 
@@ -436,6 +445,7 @@ loop_level: DO i = 1, platform%info%levels
       END SELECT
     ENDDO        !  loop over duplicate
 
+
    ENDDO reports
 
    CLOSE(iunit)
@@ -448,7 +458,8 @@ loop_level: DO i = 1, platform%info%levels
    ob%num_synop = ob%num_synop + num_synop
    ob%num_pilot = ob%num_pilot + num_pilot
    ob%num_satem = ob%num_satem + num_satem
-   ob%num_satob = ob%num_satob + num_satob
+   ob%num_geoamv = ob%num_geoamv + num_geoamv
+   ob%num_polaramv = ob%num_polaramv + num_polaramv
    ob%num_airep = ob%num_airep + num_airep
    ob%num_gpspw = ob%num_gpspw + num_gpspw
    ob%num_gpsref = ob%num_gpsref + num_gpsref
@@ -469,7 +480,8 @@ loop_level: DO i = 1, platform%info%levels
    ob%ob_numb(ob%current_ob_time)%synop = ob%num_synop
    ob%ob_numb(ob%current_ob_time)%pilot = ob%num_pilot
    ob%ob_numb(ob%current_ob_time)%satem = ob%num_satem
-   ob%ob_numb(ob%current_ob_time)%satob = ob%num_satob
+   ob%ob_numb(ob%current_ob_time)%geoamv = ob%num_geoamv
+   ob%ob_numb(ob%current_ob_time)%polaramv = ob%num_polaramv
    ob%ob_numb(ob%current_ob_time)%airep = ob%num_airep
    ob%ob_numb(ob%current_ob_time)%gpspw = ob%num_gpspw
    ob%ob_numb(ob%current_ob_time)%gpsref = ob%num_gpsref
@@ -500,7 +512,8 @@ loop_level: DO i = 1, platform%info%levels
            'Scan:  ', num_synop, ' SYNOP reports,', &
            'Scan:  ', num_pilot, ' PILOT reports,', &
            'Scan:  ', num_satem, ' SATEM reports,', &
-           'Scan:  ', num_satob, ' SATOB reports,', & 
+           'Scan:  ', num_geoamv,' Geo. AMVs rports,', &
+           'Scan:  ', num_polaramv,' Polar AMVs rports,', &
            'Scan:  ', num_airep, ' AIREP reports,', &
            'Scan:  ', num_gpspw, ' GPSPW reports,', &
            'Scan:  ', num_gpsref,' GPSRF reports,', &

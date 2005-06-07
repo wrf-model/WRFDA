@@ -6,20 +6,19 @@
 # @ job_name   = wrf3dvar
 # @ output     = wrf3dvar.out
 # @ error      = wrf3dvar.err
-# @ node       = 4
+# @ node       = 1
 ## @ network.MPI    = css0,shared,us
 # @ network.MPI    = css0,shared,ip
-# @ tasks_per_node = 4
-# @ node_usage = shared
+# @ tasks_per_node = 16
+# @ node_usage = not_shared
 # @ checkpoint = no
-# @ wall_clock_limit = 00:30:00
+# @ wall_clock_limit = 01:30:00
 # NCEP IBM=dev
 # NCAR IBM(bluesky)=com_rg8:
 # NCAR IBM(blackforest)=com_reg:
 # NCAR IBM(blackforest_nighthawk)=com_nh:
+# @ class      =  com_nh
 ## @ class      =  com_reg
-## @ class      =  com_nh
-# @ class      =  com_pr8
 # @ queue
 #
 #FSL JET (Alpha/Linux):
@@ -37,6 +36,7 @@
 # History: 11/16/99  Original version. Dale Barker
 #          12/01/99  Modifications to defaults and names. Dale Barker
 #          10/14/03  Modifications to defaults for WRF 3DVAR. Wei Huang
+#          06/06/05  Modifications for Polar & Geo AMV's      Syed RH Rizvi
 #
 #-----------------------------------------------------------------------
 
@@ -59,6 +59,17 @@
  if ( ! $?DA_OB_FORMAT )  setenv DA_OB_FORMAT 2    # Observation format: 1=BUFR, 2=ASCII "little_r"
  if ( ! $?DA_CV_OPTIONS ) setenv DA_CV_OPTIONS 2   # Background error statistics: 2=NCAR, 3=NCEP.
 
+ set DA_OB_FORMAT  = 2		# Observation format: 1=BUFR, 2=ASCII "little_r"
+ set DA_CV_OPTIONS = 4		# 2 -> MM5, 3 -> WRF 4 -> Global
+ set DA_GLOBAL     = .TRUE.     # true for global option
+ setenv TRUNC  T63              # Triangular truncation number 
+
+ setenv DA_ANALYSIS_DATE	2004-10-27_06:00:00.0000  # Specify date in this format.
+ setenv WEST_EAST_GRID_NUMBER	193                       # Number of gridpoints in x(i) dim.
+ setenv SOUTH_NORTH_GRID_NUMBER	 98                       # Number of gridpoints in y(j) dim.
+ setenv VERTICAL_GRID_NUMBER	 31                       # Number of vertical levels.
+ setenv GRID_DISTANCE		190000                     # Grid resolution (m).
+
 #Specify directories/files here:
  if ( ! $?SRC_DIR )    setenn SRC_DIR    ${HOME}/code_management
  if ( ! $?WRFVAR_DIR ) setenv WRFVAR_DIR ${SRC_DIR}/wrfvar
@@ -78,10 +89,21 @@
     set endian_form   = little_endian                       # Needed for BUFR obs files only.
  endif
 
-############################################################################
+ if(${DA_OB_FORMAT} == 1) then
+    set DA_OBSERVATIONS = ${IN_DIR}/ob.bufr.${endian_form} # Input BUFR observation file.
+ else if(${DA_OB_FORMAT} == 2) then
+    set DA_OBSERVATIONS	=  ${DAT_DIR}/obs_gts-2004102712-full 
+#    set DA_OBSERVATIONS	=  ${TMP}/airep                    
+ else
+    echo "DA_OB_FORMAT error: Do not know how to handle DA_OB_FORMAT = ${DA_OB_FORMAT}"
+    exit 1
+ endif
 
  if ( ! -d $RUN_DIR/var ) then
   mkdir -p $RUN_DIR/var
+ endif
+ if ( ! -d $RUN_DIR ) then
+  mkdir -p $RUN_DIR
  endif
 
  cd $RUN_DIR/var
@@ -106,14 +128,7 @@
     exit 1
  endif
 
- if(${DA_FG_FORMAT} == 1) then
-    ln -sf $DA_FIRST_GUESS              wrf_3dvar_input
- else if(${DA_FG_FORMAT} == 2) then
-    ln -sf $DA_FIRST_GUESS              fort.41
- else
-    echo "DA_FG_FORMAT error: Do not know how to handle DA_FG_FORMAT = ${DA_FG_FORMAT}"
-    exit 1
- endif
+ ln -sf $DA_FIRST_GUESS		wrf_3dvar_input
  ln -sf $DA_BACK_ERRORS		fort.3${DA_CV_OPTIONS}
  ln -sf $DA_OBSERVATIONS	fort.9${DA_OB_FORMAT}
 
@@ -135,12 +150,12 @@
  if ( ! $?VERTICAL_GRID_NUMBER ) setenv VERTICAL_GRID_NUMBER 28 # Number of vertical levels.
  if ( ! $?GRID_DISTANCE ) setenv GRID_DISTANCE 30000 # Grid resolution (m).
  if ( ! $?DA_MODEL_TYPE )   set DA_MODEL_TYPE = WRF
- if ( ! $?DA_WRITE_INCREMENTS ) set DA_WRITE_INCREMENTS = .FALSE.
+ if ( ! $?DA_WRITE_INCREMENTS ) set DA_WRITE_INCREMENTS = .TRUE.
  if ( ! $?DA_ANALYSIS_TYPE ) set DA_ANALYSIS_TYPE = 3D-VAR
- if ( ! $?DA_ANALYSIS_DATE ) set DA_ANALYSIS_DATE = 2002-08-29_00:00:00.0000
+ if ( ! $?DA_ANALYSIS_DATE ) set DA_ANALYSIS_DATE = 2002-08-03_00:00:00.0000
  if ( ! $?DA_ANALYSIS_ACCU ) set DA_ANALYSIS_ACCU = 900
- if ( ! $?DA_FG_FORMAT )     set DA_FG_FORMAT = 2
- if ( ! $?DA_OB_FORMAT )     set DA_OB_FORMAT = 2
+ if ( ! $?DA_FG_FORMAT )     set DA_FG_FORMAT = 3
+ if ( ! $?DA_OB_FORMAT )     set DA_OB_FORMAT = 1
  if ( ! $?DA_NUM_FGAT_TIME ) set DA_NUM_FGAT_TIME = 1
  if ( ! $?DA_PROCESS_OBS )   set DA_PROCESS_OBS = YES
  if ( ! $?DA_QC_POINTER )    set DA_QC_POINTER = 0
@@ -150,7 +165,8 @@
  if ( ! $?DA_USE_PILOTOBS )  set DA_USE_PILOTOBS = .TRUE. 
  if ( ! $?DA_USE_SOUNDOBS )  set DA_USE_SOUNDOBS = .TRUE. 
  if ( ! $?DA_USE_SATEMOBS )  set DA_USE_SATEMOBS = .TRUE. 
- if ( ! $?DA_USE_SATOBOBS )  set DA_USE_SATOBOBS = .TRUE.
+ if ( ! $?DA_USE_GEO_AMV  )  set DA_USE_GEO_AMV = .FALSE.  
+ if ( ! $?DA_USE_POLAR_AMV  )  set DA_USE_POLAR_AMV = .FALSE.  
  if ( ! $?DA_USE_AIREPOBS )  set DA_USE_AIREPOBS = .TRUE.
  if ( ! $?DA_USE_GPSPWOBS )  set DA_USE_GPSPWOBS = .TRUE. 
  if ( ! $?DA_USE_RADAROBS )  set DA_USE_RADAROBS = .FALSE.
@@ -173,8 +189,6 @@
  if ( ! $?DA_TIME_WINDOW )   set DA_TIME_WINDOW = 3.
  if ( ! $?DA_PRINT_DETAIL )  set DA_PRINT_DETAIL = 0
  if ( ! $?DA_MAX_EXT_ITS )   set DA_MAX_EXT_ITS = 1
- if ( ! $?DA_W_INCREMENTS ) set DA_W_INCREMENTS = .TRUE.
- if ( ! $?DA_DT_CLOUD_MODEL ) set DA_DT_CLOUD_MODEL = .FALSE.
  if ( ! $?DA_EPS )           set DA_EPS = "1.E-02, 1.E-02, 1.E-02, 1.E-02, 1.E-02, 1.E-02, 1.E-02,"
  if ( ! $?DA_NTMAX )         set DA_NTMAX = 100
  if ( ! $?DA_WRITE_SWITCH )  set DA_WRITE_SWITCH   = .FALSE.
@@ -200,8 +214,8 @@
  if ( ! $?DA_Y_START_SUB_DOMAIN )set DA_Y_START_SUB_DOMAIN = 35.0
  if ( ! $?DA_X_END_SUB_DOMAIN )set DA_X_END_SUB_DOMAIN = 80.0
  if ( ! $?DA_Y_END_SUB_DOMAIN )set DA_Y_END_SUB_DOMAIN = 60.0
- if ( ! $?DA_TESTING_3DVAR ) set DA_TESTING_3DVAR = .TRUE. 
- if ( ! $?DA_TEST_TRANSFORMS )  set DA_TEST_TRANSFORMS = .TRUE. 
+ if ( ! $?DA_TESTING_3DVAR ) set DA_TESTING_3DVAR = .FALSE.
+ if ( ! $?DA_TEST_TRANSFORMS )  set DA_TEST_TRANSFORMS = .FALSE.
  if ( ! $?DA_TEST_STATISTICS )  set DA_TEST_STATISTICS = .FALSE.
  if ( ! $?DA_INTERPOLATE_STATS )  set DA_INTERPOLATE_STATS = .TRUE.
  if ( ! $?DA_MINIMISATION_OPTION) set DA_MINIMISATION_OPTION = 2
@@ -246,14 +260,7 @@ cat >! namelist.3dvar << EOF
 &record2
  ANALYSIS_TYPE = '$DA_ANALYSIS_TYPE',
  ANALYSIS_DATE = '$DA_ANALYSIS_DATE',
- ANALYSIS_ACCU =  $DA_ANALYSIS_ACCU,
- W_INCREMENTS  = $DA_W_INCREMENTS,
- DT_CLOUD_MODEL = $DA_DT_CLOUD_MODEL,
- WRITE_QCW      = $DA_WRITE_QCW,
- WRITE_QRN      = $DA_WRITE_QRN,
- WRITE_QCI      = $DA_WRITE_QCI,
- WRITE_QSN      = $DA_WRITE_QSN,
- WRITE_QGR      = $DA_WRITE_QGR /
+ ANALYSIS_ACCU =  $DA_ANALYSIS_ACCU /
 
 &record3
  fg_format = $DA_FG_FORMAT,
@@ -269,13 +276,13 @@ cat >! namelist.3dvar << EOF
  Use_PilotObs   = $DA_USE_PILOTOBS,
  Use_SoundObs   = $DA_USE_SOUNDOBS,
  Use_SatemObs   = $DA_USE_SATEMOBS,
- Use_SatobObs   = $DA_USE_SATOBOBS,
+ Use_GeoAMVObs  = $DA_USE_GEO_AMV,
+ Use_PolarAMVObs = $DA_USE_POLAR_AMV,
  Use_AirepObs   = $DA_USE_AIREPOBS,
  Use_GpspwObs   = $DA_USE_GPSPWOBS,
  Use_GpsrefObs   = $DA_USE_GPSREFOBS,
  Use_ProfilerObs = $DA_USE_PROFILEROBS, 
  Use_BuoyObs     = $DA_USE_BUOYOBS,
- Use_BogusObs   = $DA_USE_BOGUSOBS,
  Use_SsmiRetrievalObs = $DA_USE_SSMIRETRIEVALOBS,
  Use_SsmiTbObs  = $DA_USE_SSMITBOBS,
  use_ssmt1obs   = $DA_USE_SSMT1OBS,
@@ -522,6 +529,9 @@ EOF
 #mpirun -np 4 -machinefile hosts ./da_3dvar.exe
 # ./da_3dvar.exe >&! da_3dvar.out
 #BIG : mpirun -np 4 ./da_3dvar.exe
+#    mpirun -np 8 ./da_3dvar.exe
+#IBM (llsubmit):
+#  poe ./da_3dvar.exe
 #   mpirun -np ${NUM_PROCS} ./da_3dvar.exe
 #IBM (llsubmit): 
 #  poe ./da_3dvar.exe

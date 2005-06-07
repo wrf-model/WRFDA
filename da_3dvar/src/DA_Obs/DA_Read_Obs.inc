@@ -1,13 +1,21 @@
 SUBROUTINE DA_Read_Obs (iunit, ob, xp, filename)
 !-----------------------------------------------------------------------------!
+!  Purpose: Read the header of a MM5 3D-VAR 2.0 GTS observation file
+!
 !  History:
 !
-!  Purpose: Read the header of a MM5 3D-VAR 2.0 GTS observation file
-!-----------------------------------------------------------------------------!
-! History:
 ! Modifications:      10/26/2004            Syed RH Rizvi
 !
 !              Fix Obs-Long as -180 if it is +180
+!
+!      Date:  03/04/2005 -       Syed  RH  Rizvi
+!
+!      (a)  AMVs from Geostationary and Polar orbiting satellite are
+!           seperated & used as profile. Currently there is a provision
+!           to use MODIS winds only.
+!      (b)  MODIS obs error are currently assigned through namelist
+!           parameter (modis_cmv_error)
+!
 !                     03/30/2005           Syed RH Rizvi
 !              For global option duplicate obs at East/West boundary
 !                        
@@ -44,7 +52,8 @@ SUBROUTINE DA_Read_Obs (iunit, ob, xp, filename)
                                    num_sound, &
                                    num_synop, &
                                    num_pilot, &
-                                   num_satob, &
+                                   num_geoamv, &
+                                   num_polaramv, &
                                    num_satem, &
                                    num_airep, &
                                    num_metar, &
@@ -66,7 +75,8 @@ SUBROUTINE DA_Read_Obs (iunit, ob, xp, filename)
    num_sound = ob%num_sound
    num_synop = ob%num_synop
    num_pilot = ob%num_pilot
-   num_satob = ob%num_satob
+   num_geoamv = ob%num_geoamv
+   num_polaramv = ob%num_polaramv
    num_satem = ob%num_satem
    num_airep = ob%num_airep
    num_metar = ob%num_metar
@@ -373,8 +383,6 @@ loop_level: DO i = 1, platform%info%levels
 
    DO n = 1, ndup
 
-
-
       SELECT CASE(fm)
 
 !     if(index(platform%info%source, 'SYNOP') > 0) then
@@ -585,21 +593,52 @@ loop_level: DO i = 1, platform%info%levels
                         sqrt( ob%satem(num_satem)%thickness(1)%error ** 2 + &
                         platform%loc%pw%error ** 2) / gravity
 
-!     else if(index(platform%info%source, 'SATOB') > 0) then
+
+!--------Geostatinary ot Polar orbitting Satellite AMVs:
 
          CASE (88)    ;
 
-         if(.not.use_SatobObs) cycle reports
+      if(index(platform%info%name, 'MODIS') > 0 .or. &
+         index(platform%info%name, 'modis') > 0 )  then
+         if(.not.use_polaramvObs) cycle reports
+   
+         num_polaramv = num_polaramv + 1
+        
+         ob%polaramv(num_polaramv)%info = platform%info
+         ob%polaramv(num_polaramv)%loc  = platform%loc
 
-         num_satob = num_satob + 1
+         allocate (ob%polaramv(num_polaramv)%p (1:nlevels))
+         allocate (ob%polaramv(num_polaramv)%zk(1:nlevels))
+         allocate (ob%polaramv(num_polaramv)%u (1:nlevels))
+         allocate (ob%polaramv(num_polaramv)%v (1:nlevels))
 
-         ob%satob(num_satob)%info = platform%info
-         ob%satob(num_satob)%loc  = platform%loc
-         ob%satob(num_satob)%h = platform%each(1)%height
-         ob%satob(num_satob)%p = platform%each(1)%p%inv
-         ob%satob(num_satob)%u = platform%each(1)%u
-         ob%satob(num_satob)%v = platform%each(1)%v
+         do i = 1, nlevels
+           ob%polaramv(num_polaramv)%p(i) = platform%each(i)%p%inv
+           ob%polaramv(num_polaramv)%u(i) = platform%each(i)%u
+           ob%polaramv(num_polaramv)%v(i) = platform%each(i)%v
+         end do
 
+      else
+         if(.not.use_geoamvObs) cycle reports
+
+         num_geoamv = num_geoamv + 1
+
+         ob%geoamv(num_geoamv)%info = platform%info
+         ob%geoamv(num_geoamv)%loc  = platform%loc
+
+         allocate (ob%geoamv(num_geoamv)%p (1:nlevels))
+         allocate (ob%geoamv(num_geoamv)%zk(1:nlevels))
+         allocate (ob%geoamv(num_geoamv)%u (1:nlevels))
+         allocate (ob%geoamv(num_geoamv)%v (1:nlevels))
+
+         do i = 1, nlevels
+           ob%geoamv(num_geoamv)%p(i) = platform%each(i)%p%inv
+           ob%geoamv(num_geoamv)%u(i) = platform%each(i)%u
+           ob%geoamv(num_geoamv)%v(i) = platform%each(i)%v
+         enddo
+!
+      end if
+!
 !     else if(index(platform%info%source, 'AIREP') > 0) then
 
          CASE (42,96:97) ;
@@ -833,7 +872,6 @@ loop_level: DO i = 1, platform%info%levels
 
     ENDDO        !  loop over duplicate
 
-
    ENDDO reports
 
 !------------------------------------------------------------------------
@@ -841,7 +879,8 @@ loop_level: DO i = 1, platform%info%levels
    ob%num_synop = num_synop
    ob%num_pilot = num_pilot
    ob%num_satem = num_satem
-   ob%num_satob = num_satob
+   ob%num_geoamv = num_geoamv
+   ob%num_polaramv = num_polaramv
    ob%num_airep = num_airep
    ob%num_gpspw = num_gpspw
    ob%num_gpsref = num_gpsref
@@ -871,7 +910,8 @@ loop_level: DO i = 1, platform%info%levels
            'Read:  ', num_synop, ' SYNOP       reports,', &
            'Read:  ', num_pilot, ' PILOT       reports,', &
            'Read:  ', num_satem, ' SATEM       reports,', &
-           'Read:  ', num_satob, ' SATOB       reports,', & 
+           'Read:  ', num_geoamv, ' Geo AMV     reports,', & 
+           'Read:  ', num_polaramv,' Polar AMV     reports,', & 
            'Read:  ', num_airep, ' AIREP       reports,', &
            'Read:  ', num_gpspw , ' GPSPW/GPSZD reports,', &
            'Read:  ', num_gpsref, ' GPSRF       reports,', &
@@ -888,7 +928,7 @@ loop_level: DO i = 1, platform%info%levels
            'Read:  ', total_obs, ' Total Observations.', &
            'There are ', total_obs - num_sound - num_synop &
                                    - num_pilot - num_satem &
-                                   - num_satob - num_airep &
+                                   - num_geoamv - num_polaramv - num_airep &
                                    - num_metar - num_ships &
                                    - num_ssmi_retrieval  &
                                    - num_ssmi_tb - num_ssmt1 - num_ssmt2 &
@@ -903,7 +943,8 @@ loop_level: DO i = 1, platform%info%levels
       (ob%ob_numb(ob%current_ob_time)%synop /= ob%num_synop) .or. &
       (ob%ob_numb(ob%current_ob_time)%pilot /= ob%num_pilot) .or. &
       (ob%ob_numb(ob%current_ob_time)%satem /= ob%num_satem) .or. &
-      (ob%ob_numb(ob%current_ob_time)%satob /= ob%num_satob) .or. &
+      (ob%ob_numb(ob%current_ob_time)%geoamv /= ob%num_geoamv) .or. &
+      (ob%ob_numb(ob%current_ob_time)%polaramv /= ob%num_polaramv) .or. &
       (ob%ob_numb(ob%current_ob_time)%airep /= ob%num_airep) .or. &
       (ob%ob_numb(ob%current_ob_time)%gpspw /= ob%num_gpspw) .or. &
       (ob%ob_numb(ob%current_ob_time)%gpsref /= ob%num_gpsref) .or. &
@@ -925,8 +966,10 @@ loop_level: DO i = 1, platform%info%levels
            'ob%num_pilot=', ob%num_pilot, &
            'ob%ob_numb(ob%current_ob_time)%satem=', ob%ob_numb(ob%current_ob_time)%satem, &
            'ob%num_satem=', ob%num_satem, &
-           'ob%ob_numb(ob%current_ob_time)%satob=', ob%ob_numb(ob%current_ob_time)%satob, &
-           'ob%num_satob=', ob%num_satob, &
+           'ob%ob_numb(ob%current_ob_time)%geoamv=', ob%ob_numb(ob%current_ob_time)%geoamv, &
+           'ob%num_geoamv=', ob%num_geoamv, &
+           'ob%ob_numb(ob%current_ob_time)%polaramv=', ob%ob_numb(ob%current_ob_time)%polaramv, &
+           'ob%num_polaramv=', ob%num_polaramv, &
            'ob%ob_numb(ob%current_ob_time)%airep=', ob%ob_numb(ob%current_ob_time)%airep, &
            'ob%num_airep=', ob%num_airep, &
            'ob%ob_numb(ob%current_ob_time)%gpspw=', ob%ob_numb(ob%current_ob_time)%gpspw, &
@@ -941,8 +984,6 @@ loop_level: DO i = 1, platform%info%levels
            'ob%num_qscat=', ob%num_qscat, &
            'ob%ob_numb(ob%current_ob_time)%buoy =', ob%ob_numb(ob%current_ob_time)%buoy , &
            'ob%num_buoy =', ob%num_buoy , &
-           'ob%ob_numb(ob%current_ob_time)%bogus=', ob%ob_numb(ob%current_ob_time)%bogus, &
-           'ob%num_bogus=', ob%num_bogus, &
            'ob%ob_numb(ob%current_ob_time)%ssmt1=', ob%ob_numb(ob%current_ob_time)%ssmt1, &
            'ob%num_ssmt1=', ob%num_ssmt1, &
            'ob%ob_numb(ob%current_ob_time)%ssmt2=', ob%ob_numb(ob%current_ob_time)%ssmt2, &
@@ -964,4 +1005,3 @@ loop_level: DO i = 1, platform%info%levels
 !  endif
 
 END SUBROUTINE DA_Read_Obs
-

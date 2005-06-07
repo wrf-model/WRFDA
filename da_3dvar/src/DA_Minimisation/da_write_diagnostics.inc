@@ -1,11 +1,14 @@
       subroutine DA_Write_Diagnostics( ob, iv, re, y, xp, xa, j )
-
 !---- -------------------------------------------------------------------------
 !  PURPOSE: Output data assimilation diagnostics.
 !
 !  METHOD:  See individual routines.
 !
 !  HISTORY: 04/07/2000 - Creation of F90 version.           Dale Barker
+!           03/04/2005 - CMV's from Geostationary and       Syed  RH  Rizvi
+!                        Polar orbiting satellite are
+!                        seperated & used as profile
+!
 !
 !  PARENT_MODULE: DA_Diagnostics
 !------------------------------------------------------------------------------
@@ -37,11 +40,17 @@
 !  [1.2] Surface:
 
       call DA_OI_Stats_Synop ( stats_unit, iv )
-
-!  [1.3] Cloud track winds:
-
-      call DA_OI_Stats_Satob ( stats_unit, iv )
  
+!  [1.3.1] Geostationary Satellite Cloud track winds:
+
+      call DA_OI_Stats_GeoAMV ( stats_unit, iv )
+
+
+!  [1.3.2] Polar Satellite Cloud track winds:
+
+      call DA_OI_Stats_PolarAMV ( stats_unit, iv )
+
+
 !  [1.4] Aireps:
 
       call DA_OI_Stats_Airep ( stats_unit, iv )
@@ -120,9 +129,16 @@
 
       call DA_AO_Stats_Synop ( stats_unit, iv, re )
 
-!  [2.3] Cloud track winds:
+!  [2.3.1] Geostationary Satellite Cloud track winds:
 
-      call DA_AO_Stats_Satob ( stats_unit, iv, re )
+      call DA_AO_Stats_GeoAMV ( stats_unit, iv, re )
+
+
+!  [2.3.2] Polar Satellite Cloud track winds:
+
+      call DA_AO_Stats_PolarAMV ( stats_unit, iv, re )
+
+
 
 !  [2.4] Aireps:
 

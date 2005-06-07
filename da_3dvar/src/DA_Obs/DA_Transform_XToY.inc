@@ -26,8 +26,11 @@ SUBROUTINE da_transform_xtoy( xb, iv, xa, xp, y )
 !------------------------------------------------------------------------------
 !  [3.0] Cloud track wind observation operator y = H(x):
 !------------------------------------------------------------------------------
+!  Geostationary Satellite
+   call da_transform_xtoy_GeoAMV( xa, iv, xp, y )
+!  Polar orbitting Satellite
+   call da_transform_xtoy_PolarAMV( xa, iv, xp, y )
 
-   call da_transform_xtoy_Satob ( xa, iv, xp, y )
 
 !------------------------------------------------------------------------------
 !  [4.0] Aircraft observation operator y = H(x):

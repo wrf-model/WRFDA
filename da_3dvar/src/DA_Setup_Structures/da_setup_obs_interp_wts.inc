@@ -2,9 +2,12 @@ SUBROUTINE DA_Setup_Obs_Interp_Wts ( xp, iv )
 !-------------------------------------------------------------------------
 !  HISTORY:
 !
-!       Modified:         07/08/2003                   S. R. H. Rizvi
-!
+!       Modified:         07/08/2003                        Syed RH Rizvi
 !       Included the Profiler and Buoy obs
+!
+!           03/04/2005 - AMV's from Geostationary and       Syed RH Rizvi
+!                        Polar orbiting satellite are
+!                        seperated & used as profile
 !-------------------------------------------------------------------------
 
    IMPLICIT NONE
@@ -24,8 +27,13 @@ SUBROUTINE DA_Setup_Obs_Interp_Wts ( xp, iv )
      CALL DA_Store_Obs_Grid_Info( xp, iv%synop(n)%loc )
    enddo
 
-   do n=1, iv % num_satob
-     CALL DA_Store_Obs_Grid_Info( xp, iv%satob(n)%loc )
+
+   do n=1, iv % num_geoamv
+     CALL DA_Store_Obs_Grid_Info( xp, iv%geoamv(n)%loc )
+   enddo
+
+   do n=1, iv % num_polaramv
+     CALL DA_Store_Obs_Grid_Info( xp, iv%polaramv(n)%loc )
    enddo
 
    do n=1, iv % num_airep

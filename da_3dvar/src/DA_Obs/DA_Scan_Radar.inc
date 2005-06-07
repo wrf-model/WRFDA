@@ -5,6 +5,7 @@ SUBROUTINE DA_Scan_Radar (iunit, ob, xp, filename)
 !  History: 13 Sept. 2004, Update,   Jianfeng Gu
 !  History: Multi Radar Obs., 29 Sept. 2004,  Jianfeng Gu
 !           Finalized on February 03, 2005, Qingnong Xiao
+!
 !-----------------------------------------------------------------------------!
 
    implicit none
@@ -24,6 +25,8 @@ SUBROUTINE DA_Scan_Radar (iunit, ob, xp, filename)
    CHARACTER (LEN = 120)         :: char_ned
 
    LOGICAL                       :: outside, inside_halo
+   INTEGER                        ::n_dup, ndup
+
 
 ! -------------------------------------------------------------------
 !--default value.
@@ -187,6 +190,13 @@ SUBROUTINE DA_Scan_Radar (iunit, ob, xp, filename)
 
       endif
 
+!    Loop over duplicating obs for global
+   n_dup = 1
+   if(global .and. &
+     (platform%loc%i == xp%ids .or. platform%loc%i == xp%ide))n_dup= 2
+!
+   DO ndup = 1, n_dup
+
 
       SELECT CASE ( fm )
  
@@ -211,6 +221,7 @@ SUBROUTINE DA_Scan_Radar (iunit, ob, xp, filename)
                'platform % info % levels=', platform % info % levels
 
       END SELECT
+    ENDDO        !  loop over duplicate
 
     ENDDO reports
 

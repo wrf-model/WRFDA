@@ -28,7 +28,8 @@ SUBROUTINE da_setup_obs_structures_ascii( xp, ob, iv )
    iv%num_sound = 0
    iv%num_synop = 0
    iv%num_pilot = 0
-   iv%num_satob = 0
+   iv%num_geoamv = 0
+   iv%num_polaramv = 0
    iv%num_satem = 0
    iv%num_airep = 0
    iv%num_metar = 0
@@ -51,7 +52,8 @@ SUBROUTINE da_setup_obs_structures_ascii( xp, ob, iv )
       iv%ob_numb(n)%sound = 0
       iv%ob_numb(n)%synop = 0
       iv%ob_numb(n)%pilot = 0
-      iv%ob_numb(n)%satob = 0
+      iv%ob_numb(n)%geoamv = 0
+      iv%ob_numb(n)%polaramv = 0
       iv%ob_numb(n)%satem = 0
       iv%ob_numb(n)%airep = 0
       iv%ob_numb(n)%metar = 0
@@ -124,8 +126,10 @@ SUBROUTINE da_setup_obs_structures_ascii( xp, ob, iv )
       iv%num_synop = max_synop_input
    if(iv%num_pilot > max_pilot_input ) &
       iv%num_pilot = max_pilot_input
-   if(iv%num_satob > max_satob_input ) &
-      iv%num_satob = max_satob_input
+   if(iv%num_geoamv > max_geoamv_input ) &
+      iv%num_geoamv = max_geoamv_input
+   if(iv%num_polaramv > max_polaramv_input ) &
+      iv%num_polaramv = max_polaramv_input
    if(iv%num_satem > max_satem_input ) &
       iv%num_satem = max_satem_input
    if(iv%num_airep > max_airep_input ) &
@@ -169,7 +173,8 @@ SUBROUTINE da_setup_obs_structures_ascii( xp, ob, iv )
    iv%num_sound = 0
    iv%num_synop = 0
    iv%num_pilot = 0
-   iv%num_satob = 0
+   iv%num_geoamv = 0
+   iv%num_polaramv = 0
    iv%num_satem = 0
    iv%num_airep = 0
    iv%num_metar = 0

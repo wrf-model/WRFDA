@@ -68,16 +68,35 @@ SUBROUTINE da_write_y( iv, y )
       END DO
    ENDIF
 
-!  [4] Transfer satob obs:
 
-   IF ( iv % num_satob > 0 ) THEN
-      write(unit,'(a,i8)')'satob', iv % num_satob
-      DO n = 1, iv % num_satob
-         call da_check_missing(iv%satob(n)%u%qc, y%satob(n)%u, f1)
-         call da_check_missing(iv%satob(n)%v%qc, y%satob(n)%v, f2)
+!  [4.1] Transfer Geo. AMVs Obs:
 
-         write(unit,'(2i8,10e15.7)')n, 1, f1, f2
+   IF ( iv % num_geoamv > 0 ) THEN 
+      write(unit,'(a,i8)')'geoamv', iv % num_geoamv
+      DO n = 1, iv % num_geoamv
+         write(unit,'(i8)')iv % geoamv(n) % info % levels
+         DO k = 1, iv % geoamv(n) % info % levels
+         call da_check_missing(iv%geoamv(n)%u(k)%qc, y%geoamv(n)%u(k), f1)
+         call da_check_missing(iv%geoamv(n)%v(k)%qc, y%geoamv(n)%v(k), f2)
+
+         write(unit,'(2i8,10e15.7)')n, k, f1, f2
       END DO
+    END DO
+   ENDIF
+
+!  [4.2] Transfer Polar AMVs Obs:
+
+   IF ( iv % num_polaramv > 0 ) THEN
+      write(unit,'(a,i8)')'polaramv', iv % num_polaramv
+      DO n = 1, iv % num_polaramv
+         write(unit,'(i8)')iv % polaramv(n) % info % levels
+         DO k = 1, iv % polaramv(n) % info % levels
+         call da_check_missing(iv%polaramv(n)%u(k)%qc, y%polaramv(n)%u(k), f1)
+         call da_check_missing(iv%polaramv(n)%v(k)%qc, y%polaramv(n)%v(k), f2)
+
+         write(unit,'(2i8,10e15.7)')n, k, f1, f2
+      END DO
+    END DO
    ENDIF
 
 !  [5] Transfer gpspw obs:

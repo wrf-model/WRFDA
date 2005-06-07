@@ -109,6 +109,7 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
 #include <em_dummy_args.inc>
                  )
 
+
       call da_allocate_y( iv, re )
       call da_allocate_y( iv, y )
 
@@ -147,12 +148,17 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
       call da_allocate_y( iv, re )
       call da_allocate_y( iv, y )
 
+!------------------------------------------------------------------------------
       CALL DA_Minimise( grid, config_flags,                  &
                         it, ob, xb, xbx, be, iv, xhat%array, &
                         cv1d, xa, vv, vp, xp, re, y, j,      &
                         ids, ide, jds, jde, kds, kde,        &
                         ims, ime, jms, jme, kms, kme,        &
                         its, ite, jts, jte, kts, kte         )
+!------------------------------------------------------------------------------
+!   For first outer loop write filtered obs when ntmax = 0
+   if(it == 1 .and. ntmax == 0) &
+    CALL da_write_filtered_obs(gts_iunit, filtered_obs_iunit, ob, iv)
 
 !     [8.5] Update latest analysis solution:
 
@@ -189,11 +195,9 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
 ! (2) Seperate treatment for WRF and KMA updating of Xa and Xb array
 ! (3) Treatment for MM5 format FG(fg_format = 2) remains same as original
 !------------------------------------------------------------------------------
-
       call DA_Transfer_XatoAnalysis( it, xbx, grid, config_flags ,&
 #include <em_dummy_args.inc>
                            )
-
    END DO
 
 !------------------------------------------------------------------------------

@@ -3,9 +3,14 @@ SUBROUTINE da_get_innov_vector( it, ob, iv, &
 #include <em_dummy_args.inc>
                  )
 
-!----------------------------------------------------------------------------   
+
+!----------------------------------------------------------------------------
 !--Purpose: Compute O-B for different observation types:
-!----------------------------------------------------------------------------   
+!           03/04/2005 - AMV's from Geostationary and       Syed  RH  Rizvi
+!                        Polar orbiting satellite are
+!                        seperated & used as profile
+!
+!----------------------------------------------------------------------------
 
    IMPLICIT NONE
 
@@ -55,9 +60,14 @@ SUBROUTINE da_get_innov_vector( it, ob, iv, &
 
       call da_get_innov_vector_synop( it, xb, xp, ob, iv )
 
-!-----Cloud track winds:
+!-----Geostationary Satellite AMVs:
 
-      call da_get_innov_vector_satob( it, xb, xp, ob, iv )
+      call da_get_innov_vector_geoamv( it, xb, xp, ob, iv )
+
+
+!-----Polar orbitting Satellite AMVs:
+
+      call da_get_innov_vector_polaramv( it, xb, xp, ob, iv )
 
 !-----Aireps:
 

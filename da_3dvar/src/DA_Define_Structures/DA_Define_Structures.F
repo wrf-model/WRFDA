@@ -18,6 +18,9 @@ MODULE DA_Define_Structures
 !           10/19/2001 - Mods for parallel implementation.  Al Bourgeois
 !           05/25/2004 - "gpsref" added.             W. Huang, Y.-R. Guo
 !           10/08/2004 - Updated be_type             Syed  RH Rizvi         
+!           03/04/2005 - CMV's from Geostationary and       Syed  RH  Rizvi
+!                        Polar orbiting satellite are
+!                        seperated & used as profile
 !------------------------------------------------------------------------------
 
    USE DA_Constants
@@ -360,17 +363,27 @@ MODULE DA_Define_Structures
       TYPE (field_type)     , pointer :: thickness(:) ! Thickness.
    END TYPE satem_type
 
-   TYPE satob_type
+   TYPE geoamv_type
       TYPE (info_type)        :: info
       TYPE (model_loc_type)   :: loc
 
-      REAL                    :: h              ! Height in m
-      REAL                    :: p              ! Pressure
-      REAL                    :: zk             ! k-coordinates
+      REAL                  , pointer :: p        (:) ! Height in Pa
+      REAL                  , pointer :: zk       (:) ! k-coordinates
 
-      TYPE (field_type)       :: u              ! u-wind.
-      TYPE (field_type)       :: v              ! v-wind.
-   END TYPE satob_type
+      TYPE (field_type)     , pointer :: u        (:) ! u-wind.
+      TYPE (field_type)     , pointer :: v        (:) ! v-wind.
+   END TYPE geoamv_type
+
+   TYPE polaramv_type
+      TYPE (info_type)        :: info
+      TYPE (model_loc_type)   :: loc
+
+      REAL                  , pointer :: p        (:) ! Height in Pa
+      REAL                  , pointer :: zk       (:) ! k-coordinates
+
+      TYPE (field_type)     , pointer :: u        (:) ! u-wind.
+      TYPE (field_type)     , pointer :: v        (:) ! v-wind.
+   END TYPE polaramv_type
 
    TYPE gpsref_type
       TYPE (info_type)        :: info
@@ -520,7 +533,8 @@ MODULE DA_Define_Structures
       INTEGER :: total, &
                  synop, & 
                  sound, &
-                 satob, &
+                 geoamv,&
+                 polaramv,&
                  pilot, &
                  bogus, &
                  satem, &
@@ -546,7 +560,7 @@ MODULE DA_Define_Structures
       INTEGER :: current_ob_time
 
       INTEGER :: total_obs, num_synop, &
-                 num_sound, num_satob, &
+                 num_sound, num_geoamv, num_polaramv, &
                  num_pilot, num_satem, &
                  num_airep, num_metar, &
                  num_ships, num_gpspw, &
@@ -556,7 +570,7 @@ MODULE DA_Define_Structures
                  num_Radar, num_gpsref, num_bogus
 
       INTEGER :: num_synop_glo, &
-                 num_sound_glo, num_satob_glo, &
+                 num_sound_glo, num_geoamv_glo, num_polaramv_glo, &
                  num_pilot_glo, num_satem_glo, &
                  num_airep_glo, num_metar_glo, &
                  num_ships_glo, num_gpspw_glo, &
@@ -568,7 +582,8 @@ MODULE DA_Define_Structures
       real    :: synop_ef_u, synop_ef_v, synop_ef_t, synop_ef_p, synop_ef_q
       real    :: metar_ef_u, metar_ef_v, metar_ef_t, metar_ef_p, metar_ef_q
       real    :: ships_ef_u, ships_ef_v, ships_ef_t, ships_ef_p, ships_ef_q
-      real    :: satob_ef_u, satob_ef_v
+      real    :: geoamv_ef_u, geoamv_ef_v
+      real    :: polaramv_ef_u, polaramv_ef_v
       real    :: gpspw_ef_tpw
       real    :: sound_ef_u, sound_ef_v, sound_ef_t, sound_ef_p, sound_ef_q
       real    :: airep_ef_u, airep_ef_v, airep_ef_t
@@ -587,7 +602,8 @@ MODULE DA_Define_Structures
       TYPE (airep_type)         , pointer :: airep(:)
       TYPE (pilot_type)         , pointer :: pilot(:)
       TYPE (satem_type)         , pointer :: satem(:)
-      TYPE (satob_type)         , pointer :: satob(:)
+      TYPE (geoamv_type)        , pointer :: geoamv(:)
+      TYPE (polaramv_type)        , pointer :: polaramv(:)
       TYPE (synop_type)         , pointer :: synop(:)
       TYPE (synop_type)         , pointer :: metar(:)
       TYPE (synop_type)         , pointer :: ships(:)
@@ -649,7 +665,7 @@ MODULE DA_Define_Structures
    TYPE count_obs_type
 
         TYPE (count_obs_number_type)  :: total_obs, num_synop, &
-                                         num_sound, num_satob, &
+                                         num_sound, num_geoamv, num_polaramv,&
                                          num_pilot, num_satem, &
                                          num_airep, num_metar, &
                                          num_ships, num_gpspw, &
@@ -677,10 +693,20 @@ MODULE DA_Define_Structures
       REAL :: q                                 ! q.
    END TYPE residual_synop_type
 
-   TYPE residual_satob_type
+   TYPE residual_qscat_type
       REAL :: u                                 ! u-wind.
       REAL :: v                                 ! v-wind.
-   END TYPE residual_satob_type
+   END TYPE residual_qscat_type
+
+   TYPE residual_geoamv_type
+      REAL, POINTER :: u(:)                     ! u-wind.
+      REAL, POINTER :: v(:)                     ! v-wind.
+   END TYPE residual_geoamv_type
+
+   TYPE residual_polaramv_type
+      REAL, POINTER :: u(:)                     ! u-wind.
+      REAL, POINTER :: v(:)                     ! v-wind.
+   END TYPE residual_polaramv_type
 
    TYPE residual_gpspw_type
       REAL :: tpw                               ! Total precipitable water.
@@ -761,7 +787,7 @@ MODULE DA_Define_Structures
         TYPE(ob_numb_type) :: ob_numb
 
         INTEGER :: total_obs, num_synop, &
-                   num_sound, num_satob, &
+                   num_sound, num_geoamv, num_polaramv, &
                    num_pilot, num_satem, &
                    num_airep, num_metar, &
                    num_ships, num_gpspw, &
@@ -773,7 +799,8 @@ MODULE DA_Define_Structures
         TYPE (residual_synop_type), POINTER :: synop(:)
         TYPE (residual_synop_type), POINTER :: metar(:) ! Same as synop type
         TYPE (residual_synop_type), POINTER :: ships(:) ! Same as synop type
-        TYPE (residual_satob_type), POINTER :: satob(:)
+        TYPE (residual_geoamv_type), POINTER :: geoamv(:)
+        TYPE (residual_polaramv_type), POINTER :: polaramv(:)
         TYPE (residual_gpspw_type ), POINTER :: gpspw (:)
         TYPE (residual_gpsref_type), POINTER :: gpsref(:)
         TYPE (residual_sound_type), POINTER :: sound(:)
@@ -787,7 +814,7 @@ MODULE DA_Define_Structures
         TYPE (residual_ssmt1_type), POINTER :: ssmt1(:)
         TYPE (residual_ssmt2_type), POINTER :: ssmt2(:)
         TYPE (residual_pseudo_type), POINTER:: pseudo(:)
-        TYPE (residual_satob_type), POINTER :: qscat(:) ! Same as satob type!
+        TYPE (residual_qscat_type), POINTER :: qscat(:)
         TYPE (residual_synop_type),  POINTER :: buoy(:) ! Same as synop type
         TYPE (residual_pilot_type), POINTER :: profiler(:) ! Same as pilot type
         TYPE (residual_Radar_type), POINTER :: Radar(:)
@@ -813,7 +840,8 @@ MODULE DA_Define_Structures
       real                :: synop_u, synop_v, synop_t, synop_p, synop_q
       real                :: metar_u, metar_v, metar_t, metar_p, metar_q
       real                :: ships_u, ships_v, ships_t, ships_p, ships_q
-      real                :: satob_u, satob_v
+      real                :: geoamv_u, geoamv_v
+      real                :: polaramv_u, polaramv_v
       real                :: gpspw_tpw, satem_thickness, gpsref_ref
       real                :: sound_u, sound_v, sound_t, sound_q
       real                :: sonde_sfc_u, sonde_sfc_v, sonde_sfc_t, sonde_sfc_p, sonde_sfc_q

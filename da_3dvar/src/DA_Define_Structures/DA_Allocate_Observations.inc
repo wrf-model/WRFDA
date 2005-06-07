@@ -31,8 +31,11 @@ SUBROUTINE DA_Allocate_Observations ( ob )
    if(ob%num_airep > 0) &
       ALLOCATE(ob%airep(1:ob%num_airep))
 
-   if(ob%num_satob > 0) &
-      ALLOCATE(ob%satob(1:ob%num_satob))
+   if(ob%num_geoamv> 0) &
+      ALLOCATE(ob%geoamv(1:ob%num_geoamv))
+
+   if(ob%num_polaramv> 0) &
+      ALLOCATE(ob%polaramv(1:ob%num_polaramv))
 
    if(ob%num_satem > 0) &
       ALLOCATE(ob%satem(1:ob%num_satem))

@@ -1,5 +1,12 @@
 subroutine da_get_var_diagnostics ( iv, j )
 
+
+!------------------------------------------------------------------------------
+!  History:
+!           03/04/2005 - AMV's from Geostationary and       Syed  RH  Rizvi
+!                        Polar orbiting satellite are
+!                        seperated & used as profile
+!------------------------------------------------------------------------------
       type (ob_type), intent(inout):: iv      ! innovation vector.
       type (j_type), intent(inout) :: j       ! Cost function.
 
@@ -17,9 +24,9 @@ subroutine da_get_var_diagnostics ( iv, j )
       num_obs_tot = num_gpspw_tot + num_synop_tot + num_metar_tot + &
                     num_pilot_tot + num_ssmi_tot  + num_ssmt1_tot + &
                     num_ssmt2_tot + num_satem_tot + num_airep_tot + &
-                    num_satob_tot + num_ships_tot + num_sound_tot + &
-                    num_qscat_tot + num_profiler_tot + num_buoy_tot &
-                  + num_gpsref_tot + num_bogus_tot
+                    num_geoamv_tot+ num_polaramv_tot+ num_ships_tot + &
+                    num_sound_tot + num_qscat_tot + num_profiler_tot+ &
+                    num_buoy_tot + num_gpsref_tot + num_bogus_tot
 
       call da_sum_reals( 5, j % jo % synop_u, j % jo % synop_v, &
                          j % jo % synop_t, j % jo % synop_p, j % jo % synop_q,&
@@ -30,7 +37,9 @@ subroutine da_get_var_diagnostics ( iv, j )
       call da_sum_reals( 5, j % jo % ships_u, j % jo % ships_v, &
                          j % jo % ships_t, j % jo % ships_p, j % jo % ships_q,&
                                                                    dum1, dum2 )
-      call da_sum_reals( 2, j % jo % satob_u, j % jo % satob_v, dum1, dum2,   &
+     call da_sum_reals( 2, j % jo % geoamv_u, j % jo % geoamv_v, dum1, dum2,   &
+                                                             dum3, dum4, dum5 )
+      call da_sum_reals( 2, j % jo % polaramv_u, j % jo % polaramv_v, dum1, dum2,   &
                                                              dum3, dum4, dum5 )
       call da_sum_reals( 1, j % jo % gpspw_tpw, dum1, dum2, dum3, dum4, dum5, &
                                                                          dum6 )
@@ -92,7 +101,9 @@ subroutine da_get_var_diagnostics ( iv, j )
                           MPI_SUM, MPI_COMM_WORLD, IERROR )
       call MPI_ALLREDUCE( iv%num_airep, iv%num_airep_glo, 1, MPI_INTEGER, &
                           MPI_SUM, MPI_COMM_WORLD, IERROR )
-      call MPI_ALLREDUCE( iv%num_satob, iv%num_satob_glo, 1, MPI_INTEGER, &
+      call MPI_ALLREDUCE( iv%num_geoamv, iv%num_geoamv_glo, 1, MPI_INTEGER, &
+                          MPI_SUM, MPI_COMM_WORLD, IERROR )
+      call MPI_ALLREDUCE( iv%num_polaramv, iv%num_polaramv_glo, 1, MPI_INTEGER, &
                           MPI_SUM, MPI_COMM_WORLD, IERROR )
       call MPI_ALLREDUCE( iv%num_sound, iv%num_sound_glo, 1, MPI_INTEGER, &
                           MPI_SUM, MPI_COMM_WORLD, IERROR )
@@ -109,8 +120,9 @@ subroutine da_get_var_diagnostics ( iv, j )
       iv%num_buoy_glo = iv%num_buoy
       iv%num_qscat_glo = iv%num_qscat
       iv%num_sound_glo = iv%num_sound
-      iv%num_satob_glo = iv%num_satob
       iv%num_airep_glo = iv%num_airep
+      iv%num_geoamv_glo = iv%num_geoamv
+      iv%num_polaramv_glo = iv%num_polaramv
       iv%num_gpspw_glo = iv%num_gpspw
       iv%num_satem_glo = iv%num_satem
       iv%num_ssmi_retrieval_glo = iv%num_ssmi_retrieval
@@ -176,13 +188,23 @@ subroutine da_get_var_diagnostics ( iv, j )
                                   j % jo % ships_q, iv % ships_ef_q                                
          end if
       
-         if ( iv % num_satob_glo > 0 ) then
-            write(jo_unit,'(a30,2i8,10f15.5)')'    satob obs, Jo (actual)  = ', &
-                                  iv % num_satob_glo, num_satob_tot, &
-                                  j % jo % satob_u, iv % satob_ef_u, &
-                                  j % jo % satob_v, iv % satob_ef_v, &
+
+         if ( iv % num_geoamv_glo > 0 ) then
+            write(jo_unit,'(a30,2i8,10f15.5)')'    geo. cmv obs, Jo (actual)  = ', &
+                                  iv % num_geoamv_glo, num_geoamv_tot, &
+                                  j % jo % geoamv_u, iv % geoamv_ef_u, &
+                                  j % jo % geoamv_v, iv % geoamv_ef_v, &
                                   0.0, 1.0, 0.0, 1.0, 0.0, 1.0
          end if
+
+         if ( iv % num_polaramv_glo > 0 ) then
+            write(jo_unit,'(a30,2i8,10f15.5)')'   Polar cmv obs, Jo (actual)  = ', &
+                                  iv % num_polaramv_glo, num_polaramv_tot, &
+                                  j % jo % polaramv_u, iv % polaramv_ef_u, &
+                                  j % jo % polaramv_v, iv % polaramv_ef_v, &
+                                  0.0, 1.0, 0.0, 1.0, 0.0, 1.0
+         end if
+
       
          if ( iv % num_gpspw_glo > 0 ) then
             write(jo_unit,'(a30,2i8,10f15.5)')'    gpspw obs, Jo (actual)  = ', &
@@ -297,4 +319,3 @@ subroutine da_get_var_diagnostics ( iv, j )
       end if
       
 end subroutine da_get_var_diagnostics
-

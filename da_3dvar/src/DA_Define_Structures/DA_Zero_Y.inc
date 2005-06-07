@@ -7,6 +7,9 @@ SUBROUTINE DA_Zero_Y( iv, y )
 !
 !           07/28/2003 - Creation                           S. R. H. Rizvi
 !           05/27/2004 - GPS Refractivity added.            Y.-R. Guo
+!           03/04/2005 - AMV's from Geostationary and       Syed  RH  Rizvi
+!                        Polar orbiting satellite are
+!                        seperated & used as profile
 !
 ! PARENT_MODULE: DA_Setup_Structures
 !------------------------------------------------------------------------------
@@ -30,7 +33,8 @@ SUBROUTINE DA_Zero_Y( iv, y )
    y % num_pilot = iv % num_pilot
    y % num_airep = iv % num_airep
    y % num_satem = iv % num_satem
-   y % num_satob = iv % num_satob
+   y % num_geoamv = iv % num_geoamv
+   y % num_polaramv = iv % num_polaramv
    y % num_gpspw  = iv % num_gpspw
    y % num_gpsref = iv % num_gpsref
    y % num_ssmi_tb = iv % num_ssmi_tb
@@ -77,12 +81,24 @@ SUBROUTINE DA_Zero_Y( iv, y )
       y % metar(1:y % num_metar) % p = 0.0
       y % metar(1:y % num_metar) % q = 0.0
    END IF
+!  Initialize Geo. AMV's:
 
-!  Initialize SATOBS:
+   IF ( y % num_geoamv > 0 ) THEN
+      do n = 1, y % num_geoamv
+       nlevels = iv % geoamv(n) % info % levels
+       y % geoamv(n) % u(1:nlevels) = 0.0
+       y % geoamv(n) % v(1:nlevels) = 0.0
+      end do
+   END IF
 
-   IF ( y % num_satob > 0 ) THEN
-      y % satob(1:y % num_satob) % u = 0.0
-      y % satob(1:y % num_satob) % v = 0.0
+!  Initialize Polat AMVs:
+
+   IF ( y % num_polaramv > 0 ) THEN
+      do n = 1, y % num_polaramv
+       nlevels = iv % polaramv(n) % info % levels
+       y % polaramv(n) % u(1:nlevels) = 0.0
+       y % polaramv(n) % v(1:nlevels) = 0.0
+      end do
    END IF
 
 !  Initialize GPS TPW:

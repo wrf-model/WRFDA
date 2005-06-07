@@ -8,7 +8,8 @@ OBJS_FOR_ALL =		da_solve_v3d.o		\
 			DA_VToX_Transforms.o	\
 			DA_Obs.o		\
 			DA_Metar.o		\
-			DA_Satob.o		\
+			DA_GeoAMV.o	       \
+			DA_PolarAMV.o	       \
 			DA_Ships.o		\
 			DA_Synop.o		\
 			DA_Sound.o		\
@@ -167,7 +168,8 @@ DA_Minimisation.o:	\
 			DA_VToX_Transforms.o \
 			DA_Obs.o \
 			DA_Metar.o \
-			DA_Satob.o \
+			DA_GeoAMV.o \
+			DA_PolarAMV.o \
 			DA_Ships.o \
 			DA_Synop.o \
 			DA_Sound.o \
@@ -312,7 +314,8 @@ DA_Obs.o:		\
 			DA_Pilot.o \
 			DA_Radar.o \
 			DA_SSMI.o \
-			DA_Satob.o \
+			DA_GeoAMV.o \
+			DA_PolarAMV.o \
 			DA_Satem.o \
 			DA_Ships.o \
 			DA_Synop.o \
@@ -387,26 +390,47 @@ DA_Metar.o:		\
 			$(CPP) -I./DA_Metar $(CPPFLAGS_3DVAR) DA_Metar/DA_Metar.F > DA_Metar.f
 			$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) DA_Metar.f
 
-DA_Satob.o:		\
+DA_GeoAMV.o:		\
 			DA_Constants.o \
 			par_util.o \
 			DA_Define_Structures.o \
 			DA_Interpolation.o \
 			DA_Statistics.o \
 			DA_Tools.o \
-			DA_Satob/DA_Satob.F \
-			DA_Satob/DA_AO_Stats_Satob.inc \
-			DA_Satob/DA_Calculate_Jo_and_GradY_Satob.inc \
-			DA_Satob/DA_Calculate_Residual_Satob.inc \
-			DA_Satob/DA_OI_Stats_Satob.inc \
-			DA_Satob/DA_Print_Stats_Satob.inc \
-			DA_Satob/DA_Transform_XToY_Satob.inc \
-			DA_Satob/DA_Transform_XToY_Satob_Adj.inc \
-			DA_Satob/da_check_max_iv_satob.inc \
-			DA_Satob/da_get_innov_vector_satob.inc
+			DA_GeoAMV/DA_GeoAMV.F \
+			DA_GeoAMV/DA_AO_Stats_GeoAMV.inc \
+			DA_GeoAMV/DA_Calculate_Jo_and_GradY_GeoAMV.inc \
+			DA_GeoAMV/DA_Calculate_Residual_GeoAMV.inc \
+			DA_GeoAMV/DA_OI_Stats_GeoAMV.inc \
+			DA_GeoAMV/DA_Print_Stats_GeoAMV.inc \
+			DA_GeoAMV/DA_Transform_XToY_GeoAMV.inc \
+			DA_GeoAMV/DA_Transform_XToY_GeoAMV.inc \
+			DA_GeoAMV/da_check_max_iv_geoamv.inc \
+			DA_GeoAMV/da_get_innov_vector_geoamv.inc
 			$(RM) $@
-			$(CPP) -I./DA_Satob $(CPPFLAGS_3DVAR) DA_Satob/DA_Satob.F > DA_Satob.f
-			$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) DA_Satob.f
+			$(CPP) -I./DA_GeoAMV $(CPPFLAGS_3DVAR) DA_GeoAMV/DA_GeoAMV.F > DA_GeoAMV.f
+			$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) DA_GeoAMV.f
+
+DA_PolarAMV.o:		\
+			DA_Constants.o \
+			par_util.o \
+			DA_Define_Structures.o \
+			DA_Interpolation.o \
+			DA_Statistics.o \
+			DA_Tools.o \
+			DA_PolarAMV/DA_PolarAMV.F \
+			DA_PolarAMV/DA_AO_Stats_PolarAMV.inc \
+			DA_PolarAMV/DA_Calculate_Jo_and_GradY_PolarAMV.inc \
+			DA_PolarAMV/DA_Calculate_Residual_PolarAMV.inc \
+			DA_PolarAMV/DA_OI_Stats_PolarAMV.inc \
+			DA_PolarAMV/DA_Print_Stats_PolarAMV.inc \
+			DA_PolarAMV/DA_Transform_XToY_PolarAMV.inc \
+			DA_PolarAMV/DA_Transform_XToY_PolarAMV.inc \
+			DA_PolarAMV/da_check_max_iv_polaramv.inc \
+			DA_PolarAMV/da_get_innov_vector_polaramv.inc
+			$(RM) $@
+			$(CPP) -I./DA_PolarAMV $(CPPFLAGS_3DVAR) DA_PolarAMV/DA_PolarAMV.F > DA_PolarAMV.f
+			$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) DA_PolarAMV.f
 
 DA_Satem.o:		\
 			DA_Constants.o \
@@ -945,7 +969,6 @@ DA_Tools.o:		\
 			DA_Tools/unifva.inc \
 			DA_Tools/DA_Set_Boundary_Xa.inc \
 			DA_Tools/DA_Set_Boundary_Xb.inc \
-			DA_Tools/DA_Set_Boundary_3d.inc \
 			DA_Tools/get_2d_sum.inc \
 			DA_Tools/get_3d_sum.inc \
 			DA_Tools/xyll.inc    
@@ -1106,7 +1129,8 @@ DA_Test.o:	\
 			DA_Radar.o \
 			DA_SSMI.o \
 			DA_Satem.o \
-			DA_Satob.o \
+			DA_GeoAMV.o \
+			DA_PolarAMV.o \
 			DA_Ships.o \
 			DA_Sound.o \
 			DA_Bogus.o \
@@ -1134,8 +1158,8 @@ DA_Test.o:	\
 			DA_Test/DA_Check_XToY_Adjoint_SSMI.inc \
 			DA_Test/DA_Check_XToY_Adjoint_SSMI_Rv.inc \
 			DA_Test/DA_Check_XToY_Adjoint_SSMI_Tb.inc \
-			DA_Test/DA_Check_XToY_Adjoint_Satem.inc \
-			DA_Test/DA_Check_XToY_Adjoint_Satob.inc \
+			DA_Test/DA_Check_XToY_Adjoint_GeoAMV.inc \
+			DA_Test/DA_Check_XToY_Adjoint_PolarAMV.inc \
 			DA_Test/DA_Check_XToY_Adjoint_Ships.inc \
 			DA_Test/DA_Check_XToY_Adjoint_Sound.inc \
 			DA_Test/DA_Check_XToY_Adjoint_Sonde_sfc.inc \

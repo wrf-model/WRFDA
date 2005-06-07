@@ -40,7 +40,8 @@ SUBROUTINE DA_Read_Namelist
                        use_PilotObs, &
                        use_SoundObs, &
                        use_SatemObs, &
-                       use_SatobObs, &
+                       use_GeoAMVObs, &
+                       use_PolarAMVObs, &
                        use_AirepObs, &
                        use_GpspwObs, &
                        use_GpsrefObs, &
@@ -59,7 +60,8 @@ SUBROUTINE DA_Read_Namelist
                        omb_add_noise, &
                        max_sound_input, &
                        max_synop_input, &
-                       max_satob_input, &
+                       max_geoamv_input, &
+                       max_polaramv_input, &
                        max_Radar_input, &
                        max_airep_input, &
                        max_satem_input, &
@@ -142,7 +144,8 @@ SUBROUTINE DA_Read_Namelist
    Use_SoundObs   = .TRUE.
    Use_PilotObs   = .TRUE.
    Use_AirepObs   = .TRUE.
-   Use_SatobObs   = .TRUE.
+   Use_GeoAMVObs   = .TRUE.
+   Use_PolarAMVObs   = .TRUE.
    Use_BogusObs   = .FALSE.
    Use_BuoyObs    = .FALSE.
    Use_ProfilerObs= .FALSE.
@@ -162,7 +165,8 @@ SUBROUTINE DA_Read_Namelist
 
    max_sound_input = max_sound
    max_synop_input = max_synop
-   max_satob_input = max_satob
+   max_geoamv_input = max_geoamv
+   max_polaramv_input = max_polaramv
    max_airep_input = max_airep
    max_satem_input = max_satem
    max_pilot_input = max_pilot
@@ -334,7 +338,8 @@ SUBROUTINE DA_Read_Namelist
                                ' Use_Radar_rv  =', Use_Radar_rv, &
                                ' Use_Radar_rf  =', Use_Radar_rf, &
                                ' Use_SatemObs  =', Use_SatemObs, &
-                               ' Use_SatobObs  =', Use_SatobObs, &
+                               ' Use_GeoAMVObs  =', Use_GeoAMVObs, &
+                               ' Use_PolarAMVObs  =', Use_PolarAMVObs, &
                                ' Use_AirepObs  =', Use_AirepObs, &
                                ' Use_GpspwObs  =', Use_GpspwObs, &
                                ' Use_GpsrefObs  =', Use_GpsrefObs, &
@@ -463,7 +468,8 @@ SUBROUTINE DA_Read_Namelist
      Use_BogusObs         = .FALSE.
      Use_PilotObs         = .FALSE.
      Use_AirepObs         = .FALSE.
-     Use_SatobObs         = .FALSE.
+     Use_GeoAMVObs        = .FALSE.
+     Use_PolarAMVObs      = .FALSE.
      Use_BuoyObs          = .FALSE.
      Use_ProfilerObs      = .FALSE.
      Use_SatemObs         = .FALSE.
@@ -586,9 +592,10 @@ SUBROUTINE DA_Read_Namelist
                             ' Use_RadarObs  =', Use_RadarObs, &
                             ' Use_Radar_rv  =', Use_Radar_rv, &
                             ' Use_Radar_rf  =', Use_Radar_rf, &
-                            ' Use_BogusObs  =', Use_BogusObs, &
                             ' Use_SatemObs  =', Use_SatemObs, &
-                            ' Use_SatobObs  =', Use_SatobObs, &
+                            ' Use_GeoAMVObs =', Use_GeoAMVObs, &
+                            ' Use_PolarAMVObs =', Use_PolarAMVObs, &
+                            ' Use_BogusObs  =', Use_BogusObs, &
                             ' Use_AirepObs  =', Use_AirepObs, &
                             ' Use_GpspwObs  =', Use_GpspwObs, &
                             ' Use_GpsrefObs  =', Use_GpsrefObs, &

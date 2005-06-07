@@ -168,7 +168,7 @@ MODULE DA_Constants
    INTEGER, PARAMETER :: gts_iunit  = 92      ! Unit number for GTS obs input.
    INTEGER, PARAMETER :: ssmi_iunit = 93      ! Unit number for SSMI obs input.
    INTEGER, PARAMETER :: Radar_iunit = 94     ! Unit number for Radar input.
-
+   INTEGER, PARAMETER :: filtered_obs_iunit  = 192  ! Unit number for writing filtered obs
    integer, parameter  :: iunit = 70
    integer, parameter  :: ounit = iunit + 1
    integer, parameter  :: namelist_unit = 72
@@ -274,7 +274,7 @@ MODULE DA_Constants
  integer                :: num_gpspw_tot, num_synop_tot, num_metar_tot, &
                            num_pilot_tot, num_ssmi_rv_tot, num_ssmi_tb_tot, &
                            num_ssmi_tot,  num_ssmt1_tot, num_ssmt2_tot, &
-                           num_satem_tot, num_satob_tot, num_ships_tot, &
+                           num_satem_tot, num_geoamv_tot,num_polaramv_tot, num_ships_tot, &
                            num_sound_tot, num_airep_tot, num_qscat_tot, &
                            num_profiler_tot, num_buoy_tot, num_gpsref_tot, &
                            num_Radar_tot, num_bogus_tot
@@ -345,8 +345,9 @@ MODULE DA_Constants
                    use_pilotObs, &  
                    use_soundObs, &  
                    use_bogusObs, &  
-                   use_satemObs, &  
-                   use_satobObs, &  
+                   use_satemObs, &
+                   use_GeoAMVObs, &
+                   use_polaramvObs, &
                    use_airepObs, & 
                    use_gpspwObs , &
                    use_gpsrefObs, &
@@ -462,7 +463,8 @@ MODULE DA_Constants
 !Observations:
  INTEGER, PARAMETER     :: max_sound = 5000,   &   ! Maximum Number of radiosonde obs.
                            max_synop = 50000,  &   ! Maximum Number of surface obs.
-                           max_satob = 300000, &   ! Maximum Number of satellite wind obs.
+                           max_geoamv= 300000, &   ! Maximum Number of Geo. AMV  wind obs.
+                           max_polaramv= 300000, &   ! Maximum Number of Polar AMV wind obs.
                            max_airep = 200000, &   ! Maximum Number of AIREP obs.
                            max_satem = 50000,  &   ! Maximum Number of SATEM obs.
                            max_pilot = 30000,  &   ! Maximum Number of PILOT obs.
@@ -482,7 +484,8 @@ MODULE DA_Constants
 
  integer                :: max_sound_input, &
                            max_synop_input, &
-                           max_satob_input, &
+                           max_geoamv_input, &
+                           max_polaramv_input, &
                            max_airep_input, &
                            max_satem_input, &
                            max_pilot_input, &

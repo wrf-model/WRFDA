@@ -3,7 +3,12 @@ SUBROUTINE da_write_obs( ob, iv, re )
 !  History:
 !  Purpose: Writes out components of iv=O-B structure.
 !  Additions:
-!             07/08/2003      Profiler and Buoy Obs            S. R. H. Rizvi
+!           07/08/2003 - Profiler and Buoy Obs             Syed  RH  Rizvi
+!           03/04/2005 - AMV's from Geostationary and      Syed  RH  Rizvi
+!                        Polar orbiting satellite are
+!                        seperated & used as profile
+!
+
 !----------------------------------------------------------------------------   
    IMPLICIT NONE
 
@@ -69,21 +74,38 @@ SUBROUTINE da_write_obs( ob, iv, re )
                          ob%ships(n)%q, iv%ships(n)%q, re%ships(n)%q   ! O, O-B, O-A q
       END DO
    ENDIF
-
-!  [4] Transfer satob obs:
-
-   IF ( iv % num_satob > 0 ) THEN
-      write(omb_unit,'(a,i8)')'satob', iv % num_satob
-      DO n = 1, iv % num_satob  
-         write(omb_unit,'(2i8,a5,2f9.3,f17.7,5(2f17.7,i8,2f17.7))')&
-                         n, 1, iv % satob(n) % info % id, &  ! Station
-                         iv % satob(n) % info % lat, &       ! Latitude
-                         iv % satob(n) % info % lon, &       ! Longitude
-                         iv % satob(n) % p, &                ! Obs Pressure
-                         ob%satob(n)%u, iv%satob(n)%u, re%satob(n)%u, &! O, O-B, O-A u
-                         ob%satob(n)%v, iv%satob(n)%v, re%satob(n)%v
+!  [4.2] Transfer Polar AMVs Obs:
+!
+   IF ( iv % num_polaramv > 0 ) THEN
+      write(omb_unit,'(a,i8)')'polaramv', iv % num_polaramv
+      DO n = 1, iv % num_polaramv
+        write(omb_unit,'(i8)')iv % polaramv(n) % info % levels
+        DO k = 1, iv % polaramv(n) % info % levels
+          write(omb_unit,'(2i8,a5,2f9.3,f17.7,5(2f17.7,i8,2f17.7))')&
+                 n, 1, iv % polaramv(n) % info % id, &  ! Station
+                 iv % polaramv(n) % info % lat, &       ! Latitude
+                 iv % polaramv(n) % info % lon, &       ! Longitude
+                 iv % polaramv(n) % p(k), &                ! Obs Pressure
+                 ob%polaramv(n)%u(k), iv%polaramv(n)%u(k), re%polaramv(n)%u(k), &! O, O-B, O-A u
+                 ob%polaramv(n)%v(k), iv%polaramv(n)%v(k), re%polaramv(n)%v(k)
+        END DO
       END DO
    ENDIF
+
+!  [5] Transfer gpspw obs:
+
+   IF ( iv % num_gpspw > 0 ) THEN
+      write(omb_unit,'(a,i8)')'gpspw', iv % num_gpspw
+      DO n = 1, iv % num_gpspw
+         write(omb_unit,'(2i8,a5,2f9.3,f17.7,5(2f17.7,i8,2f17.7))')&
+                         n, 1, iv % gpspw(n) % info % id, &  ! Station
+                         iv % gpspw(n) % info % lat, &       ! Latitude
+                         iv % gpspw(n) % info % lon, &       ! Longitude
+                         missing_r, &
+                         ob%gpspw(n)%tpw, iv%gpspw(n)%tpw, re%gpspw(n)%tpw ! O, O-B, O-A u
+      END DO
+   ENDIF
+
 
 !  [5] Transfer gpspw obs:
 

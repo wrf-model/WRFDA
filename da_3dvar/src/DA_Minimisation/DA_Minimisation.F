@@ -15,7 +15,8 @@
       USE DA_VToX_Transforms
       USE DA_Obs
       USE DA_Metar
-      USE DA_Satob
+      USE DA_GeoAMV
+      USE DA_PolarAMV
       USE DA_Ships
       USE DA_Synop
       USE DA_Sound

@@ -9,6 +9,9 @@ SUBROUTINE DA_Check_XToY_Adjoint( xb, xa, iv, xp, y, &
 !  METHOD:  Standard adjoint test: < y, y > = < x, x_adj >.
 !
 !  HISTORY: 02/23/2000 - Creation of F90 version.           Dale Barker
+!           03/04/2005 - Added AMV's from Geostationary     Syed RH Rizvi
+!                        and Polar orbiting satellite
+!                        as profile data
 !------------------------------------------------------------------------------
    
    implicit none
@@ -141,8 +144,11 @@ SUBROUTINE DA_Check_XToY_Adjoint( xb, xa, iv, xp, y, &
    if( Use_SynopObs ) &
    call da_check_xtoy_adjoint_Synop( iv, y, partial_lhs, pertile_lhs )
 
-   if( Use_SatobObs ) &
-   call da_check_xtoy_adjoint_Satob( iv, y, partial_lhs, pertile_lhs )
+   if( Use_GeoAMVObs ) &
+   call da_check_xtoy_adjoint_GeoAMV( iv, y, partial_lhs, pertile_lhs )
+
+   if( Use_PolarAMVObs ) &
+   call da_check_xtoy_adjoint_PolarAMV( iv, y, partial_lhs, pertile_lhs )
 
    if( Use_AirepObs ) &
    call da_check_xtoy_adjoint_Airep( iv, y, partial_lhs, pertile_lhs )

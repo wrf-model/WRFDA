@@ -11,6 +11,9 @@ SUBROUTINE DA_Allocate_Y( iv, y )
 !           07/08/2003 - Updated for Profiler Data          S. R. H. Rizvi
 !           07/08/2003 - Updated for Buoy     Data          S. R. H. Rizvi
 !           05/27/2004 - GPS Refractivity Data              Y.-R. Guo
+!           03/04/2005 - CMV's from Geostationary and       Syed  RH  Rizvi
+!                        Polar orbiting satellite are
+!                        seperated & used as profile
 !
 !
 ! PARENT_MODULE: DA_Setup_Structures
@@ -37,7 +40,8 @@ SUBROUTINE DA_Allocate_Y( iv, y )
    y % num_Radar = iv % num_Radar
    y % num_airep = iv % num_airep
    y % num_satem = iv % num_satem
-   y % num_satob = iv % num_satob
+   y % num_geoamv = iv % num_geoamv
+   y % num_polaramv = iv % num_polaramv
    y % num_gpspw  = iv % num_gpspw
    y % num_gpsref = iv % num_gpsref
    y % num_ssmi_tb        = iv % num_ssmi_tb
@@ -86,14 +90,36 @@ SUBROUTINE DA_Allocate_Y( iv, y )
       y % metar(1:y % num_metar) % q = 0.0
    END IF
 
-!  Initialize SATOBS:
+!  Initialize Geo. CMVs Obs:
 
-   IF ( y % num_satob > 0 ) THEN
-      ALLOCATE (y % satob(1:y % num_satob))
-      y % satob(1:y % num_satob) % u = 0.0
-      y % satob(1:y % num_satob) % v = 0.0
+   IF ( y % num_geoamv > 0 ) THEN
+      ALLOCATE (y % geoamv(1:y % num_geoamv))
+      do n = 1, y % num_geoamv
+
+         nlevels = iv % geoamv(n) % info % levels
+         ALLOCATE (y % geoamv(n)%u(1:nlevels))
+         ALLOCATE (y % geoamv(n)%v(1:nlevels))
+         y % geoamv(n) % u(1:nlevels) = 0.0
+         y % geoamv(n) % v(1:nlevels) = 0.0
+
+     end do
    END IF
 
+!  Initialize Polar CMVS;
+
+   IF ( y % num_polaramv > 0 ) THEN
+      ALLOCATE (y % polaramv(1:y % num_polaramv))
+
+      do n = 1, y % num_polaramv
+
+         nlevels = iv % polaramv(n) % info % levels
+         ALLOCATE (y % polaramv(n)%u(1:nlevels))
+         ALLOCATE (y % polaramv(n)%v(1:nlevels))
+         y % polaramv(n) % u(1:nlevels) = 0.0
+         y % polaramv(n) % v(1:nlevels) = 0.0
+
+     end do
+   END IF
 !  Initialize GPS TPW:
 
    IF ( y % num_gpspw > 0 ) THEN

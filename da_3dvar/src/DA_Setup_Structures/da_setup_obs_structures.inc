@@ -32,7 +32,8 @@ SUBROUTINE da_setup_obs_structures( xp, ob, iv )
 
    iv%num_sound=0
    iv%num_synop=0
-   iv%num_satob=0
+   iv%num_geoamv=0
+   iv%num_polaramv=0
    iv%num_airep=0
    iv%num_metar=0
    iv%num_ships=0
