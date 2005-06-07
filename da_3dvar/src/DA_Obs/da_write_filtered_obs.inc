@@ -113,13 +113,12 @@ SUBROUTINE da_write_filtered_obs(iunit, ounit, ob, iv )
    IF ( iv % num_synop > 0 ) THEN
     if(print_detail > 1) print*,' writing filtered Obs for synop ',iv%num_synop
 !
-     
 !----------------------------------------------------------------------------!
     DO i = 1, iv % num_synop               
-    if(iv%synop(i)%info%levels > 1) then
+   if(iv%synop(i)%info%levels > 1) then
     print*,' for SYNOP station ',iv%synop(i)%info%name,' got levels ',&
     iv%synop(i)%info%levels ,' but wrote only one level'
-    iv%synop(i)%info%levels = 1
+    iv%synop(i)%info%levels = 1 
     end if
      write(ounit, FMT = fmt_info, IOSTAT = iost) &
                    iv%synop(i)%info%platform,    &
@@ -197,6 +196,7 @@ SUBROUTINE da_write_filtered_obs(iunit, ounit, ob, iv )
     iv%metar(i)%info%levels ,' but wrote only one level'
     iv%metar(i)%info%levels = 1
     end if
+
      write(ounit, FMT = fmt_info, IOSTAT = iost) &
                    iv%metar(i)%info%platform,    &
                    iv%metar(i)%info%date_char,   &
@@ -271,6 +271,7 @@ SUBROUTINE da_write_filtered_obs(iunit, ounit, ob, iv )
     iv%ships(i)%info%levels ,' but wrote only one level'
     iv%ships(i)%info%levels = 1
     end if
+
      write(ounit, FMT = fmt_info, IOSTAT = iost) &
                    iv%ships(i)%info%platform,    &
                    iv%ships(i)%info%date_char,   &
@@ -341,11 +342,12 @@ SUBROUTINE da_write_filtered_obs(iunit, ounit, ob, iv )
 !
 !----------------------------------------------------------------------------!
    DO i = 1, iv % num_buoy               
-    if(iv%buoy(i)%info%levels > 1) then
+   if(iv%buoy(i)%info%levels > 1) then
     print*,' for buoy station ',iv%buoy(i)%info%name,' got levels ',&
     iv%buoy(i)%info%levels ,' but wrote only one level'
     iv%buoy(i)%info%levels = 1
     end if
+
      write(ounit, FMT = fmt_info, IOSTAT = iost) &
                    iv%buoy (i)%info%platform,    &
                    iv%buoy (i)%info%date_char,   &
@@ -410,55 +412,101 @@ SUBROUTINE da_write_filtered_obs(iunit, ounit, ob, iv )
 !
    ENDIF
 !----------------------------------------------------------------------------!
-!  Write Satob Obs:
-   IF ( iv % num_satob    > 0 ) THEN
-    if(print_detail > 1) print*,' writing filtered Obs for SATOB    ',iv%num_satob    
+!  Write Geo. AMVs Obs:
+   IF ( iv % num_geoamv > 0 ) THEN
+    if(print_detail > 1) print*,' writing filtered Obs for geoamv ',iv%num_geoamv
 !
 !----------------------------------------------------------------------------!
-    DO i = 1, iv % num_satob                  
-
-    if(iv%satob(i)%info%levels > 1) then
-    print*,' in satob got levels ',iv%satob(i)%info%levels,' but writing only one ' 
-    iv%satob(i)%info%levels = 1
-    end if
+    DO i = 1, iv % num_geoamv               
      write(ounit, FMT = fmt_info, IOSTAT = iost) &
-                   iv%satob(i)%info%platform,    &
-                   iv%satob(i)%info%date_char,   &
-                   iv%satob(i)%info%name,        &
-                   iv%satob(i)%info%levels,      &
-                   iv%satob(i)%info%lat,         &
-                   iv%satob(i)%info%lon,         &
-                   iv%satob(i)%info%elv,         &
-                   iv%satob(i)%info%id
-     write(ounit, FMT = fmt_loc) iv%satob(i)%loc%slp, iv%satob(i)%loc%pw
+                   iv%geoamv(i)%info%platform,    &
+                   iv%geoamv(i)%info%date_char,   &
+                   iv%geoamv(i)%info%name,        &
+                   iv%geoamv(i)%info%levels,      &
+                   iv%geoamv(i)%info%lat,         &
+                   iv%geoamv(i)%info%lon,         &
+                   iv%geoamv(i)%info%elv,         &
+                   iv%geoamv(i)%info%id
+     write(ounit, FMT = fmt_loc) iv%geoamv(i)%loc%slp, iv%geoamv(i)%loc%pw
 !
 !----------------------------------------------------------------------------!
+     DO n = 1, iv%geoamv(i)%info%levels
 !----------------------------------------------------------------------------!
 ! get speed and direction
-      if( iv%satob(i)%u%qc >= obs_qc_pointer .and. &
-          iv%satob(i)%v%qc >= obs_qc_pointer) then  
-         uu = ob%satob(i)%u
-         vv = ob%satob(i)%v
-         call FFDDUV( speed, dir, uu, vv, iv%satob(i)%info%lon, -1)                        
-       speed_error = iv%satob(i)%u%error
+      if( iv%geoamv(i)%u(n)%qc >= obs_qc_pointer .and. &
+          iv%geoamv(i)%v(n)%qc >= obs_qc_pointer) then  
+         uu = ob%geoamv(i)%u(n)
+         vv = ob%geoamv(i)%v(n)
+         call FFDDUV( speed, dir, uu, vv, iv%geoamv(i)%info%lon, -1)                        
+       speed_error = iv%geoamv(i)%u(n)%error
        if( speed_error == missing_r) speed_error = xmiss        
       else
          speed = missing_r
          dir   = missing_r
          speed_error = xmiss
-       iv%satob(i)%u%qc = missing_data
-       iv%satob(i)%v%qc = missing_data
+       iv%geoamv(i)%u(n)%qc = missing_data
+       iv%geoamv(i)%v(n)%qc = missing_data
       end if
 !----------------------------------------------------------------------------!
       write(ounit, FMT = TRIM (fmt_each))                   &
-         iv%satob(i)%p,iv%satob(i)%u%qc,slp_error,  &
-         speed,iv%satob(i)%u%qc,speed_error,            &
-         dir  ,iv%satob(i)%u%qc,dir_error,              &
+         iv%geoamv(i)%p(n),iv%geoamv(i)%u(n)%qc,slp_error,  &
+         speed,iv%geoamv(i)%u(n)%qc,speed_error,            &
+         dir  ,iv%geoamv(i)%u(n)%qc,dir_error,              &
+         missing_r, standard_atmosphere, xmiss,             &
+         missing_r, zero_t_td, xmiss,                       & 
+         missing_r, zero_t_td, xmiss,                       & 
+         missing_r, zero_t_td, xmiss   
+     ENDDO   
+!
+    ENDDO   
+   ENDIF
+!----------------------------------------------------------------------------!
+!  Write Polar AMVs Obs:
+   IF ( iv % num_polaramv > 0 ) THEN
+    if(print_detail > 1) print*,' writing filtered Obs for polaramv ',iv%num_polaramv
+!
+!----------------------------------------------------------------------------!
+    DO i = 1, iv % num_polaramv               
+     write(ounit, FMT = fmt_info, IOSTAT = iost) &
+                   iv%polaramv(i)%info%platform,    &
+                   iv%polaramv(i)%info%date_char,   &
+                   iv%polaramv(i)%info%name,        &
+                   iv%polaramv(i)%info%levels,      &
+                   iv%polaramv(i)%info%lat,         &
+                   iv%polaramv(i)%info%lon,         &
+                   iv%polaramv(i)%info%elv,         &
+                   iv%polaramv(i)%info%id
+     write(ounit, FMT = fmt_loc) iv%polaramv(i)%loc%slp, iv%polaramv(i)%loc%pw
+!
+!----------------------------------------------------------------------------!
+     DO n = 1, iv%polaramv(i)%info%levels
+!----------------------------------------------------------------------------!
+! get speed and direction
+      if( iv%polaramv(i)%u(n)%qc >= obs_qc_pointer .and. &
+          iv%polaramv(i)%v(n)%qc >= obs_qc_pointer) then  
+         uu = ob%polaramv(i)%u(n)
+         vv = ob%polaramv(i)%v(n)
+         call FFDDUV( speed, dir, uu, vv, iv%polaramv(i)%info%lon, -1)                        
+       speed_error = iv%polaramv(i)%u(n)%error
+       if( speed_error == missing_r) speed_error = xmiss        
+      else
+         speed = missing_r
+         dir   = missing_r
+         speed_error = xmiss
+       iv%polaramv(i)%u(n)%qc = missing_data
+       iv%polaramv(i)%v(n)%qc = missing_data
+      end if
+!----------------------------------------------------------------------------!
+      write(ounit, FMT = TRIM (fmt_each))                   &
+         iv%polaramv(i)%p(n),iv%polaramv(i)%u(n)%qc,slp_error,  &
+         speed,iv%polaramv(i)%u(n)%qc,speed_error,            &
+         dir  ,iv%polaramv(i)%u(n)%qc,dir_error,              &
          missing_r, standard_atmosphere, xmiss,             &
          missing_r, zero_t_td, xmiss,                       & 
          missing_r, zero_t_td, xmiss,                       & 
          missing_r, zero_t_td, xmiss   
 !
+      ENDDO   
     ENDDO   
    ENDIF
 !----------------------------------------------------------------------------!
