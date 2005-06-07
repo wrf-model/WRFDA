@@ -15,8 +15,7 @@ SUBROUTINE da_write_obs( ob, iv, re )
    real                          :: f1, f2, f3, f4, f5
    logical, external             :: wrf_dm_on_monitor
 
-   if ( wrf_dm_on_monitor() ) then
-   
+  if ( wrf_dm_on_monitor() ) then
 !  [1] Transfer surface obs:
 
    IF ( iv % num_synop > 0 ) THEN
@@ -318,6 +317,30 @@ SUBROUTINE da_write_obs( ob, iv, re )
       END DO
    ENDIF
 
+!   Transfer TC bogus obs:
+
+   IF ( iv % num_bogus > 0 ) THEN
+      write(omb_unit,'(a,i8)')'bogus', iv % num_bogus
+      DO n = 1, iv % num_bogus
+         write(omb_unit,'(2i8,a5,2f9.3,f17.7,5(2f17.7,i8,2f17.7))')&
+                         n, 1, iv % bogus(n) % info % id, &  ! Station
+                         iv % bogus(n) % info % lat, &       ! Latitude
+                         iv % bogus(n) % info % lon, &       ! Longitude
+                         missing_r,                  &
+                         ob%bogus(n)%slp, iv%bogus(n)%slp, re%bogus(n)%slp    ! O, O-B, O-A p
+         write(omb_unit,'(i8)')iv % bogus(n) % info % levels
+         DO k = 1, iv % bogus(n) % info % levels
+            write(omb_unit,'(2i8,a5,2f9.3,f17.7,5(2f17.7,i8,2f17.7))')&
+                         n, k, iv % bogus(n) % info % id, &  ! Station
+                         iv % bogus(n) % info % lat, &       ! Latitude
+                         iv % bogus(n) % info % lon, &       ! Longitude
+                         iv % bogus(n) % p(k), &             ! Obs Pressure
+                         ob%bogus(n)%u(k), iv%bogus(n)%u(k), re%bogus(n)%u(k), &! O,O-B,O-A u
+                         ob%bogus(n)%v(k), iv%bogus(n)%v(k), re%bogus(n)%v(k) ! O,O-B,O-A v 
+
+         END DO
+      END DO
+   ENDIF
 
    write(omb_unit,'(a5,i8)')'*****', 0
 

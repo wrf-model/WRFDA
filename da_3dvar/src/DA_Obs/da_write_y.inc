@@ -268,5 +268,21 @@ SUBROUTINE da_write_y( iv, y )
       END DO
    ENDIF
 
+!  [16] Transfer TC bogus obs:
+
+   IF ( iv % num_bogus > 0 ) THEN
+      write(unit,'(a,i8)')'bogus', iv % num_bogus
+      DO n = 1, iv % num_bogus
+         call da_check_missing(iv%bogus(n)%slp%qc, y%bogus(n)%slp, f1)
+         write(unit,'(2i8,10e15.7)')n, 1, f1
+         write(unit,'(i8)')iv % bogus(n) % info % levels
+         DO k = 1, iv % bogus(n) % info % levels
+            call da_check_missing(iv%bogus(n)%u(k)%qc, y%bogus(n)%u(k), f2)
+            call da_check_missing(iv%bogus(n)%v(k)%qc, y%bogus(n)%v(k), f3)
+
+            write(unit,'(2i8,10e15.7)')n, k, f2, f3
+         END DO
+      END DO
+   ENDIF
 
 END SUBROUTINE da_write_y

@@ -1,7 +1,7 @@
-SUBROUTINE LADJUST(INV_2DS,xb,W_a,WZ_a,                 &
-                      ids,ide, jds,jde, kds,kde,        &
-                      ims,ime, jms,jme, kms,kme,        &
-                      its,ite, jts,jte, kts,kte )
+SUBROUTINE LADJUST(xb,W_a,WZ_a,                 &
+                   ids,ide, jds,jde, kds,kde,   &
+                   ims,ime, jms,jme, kms,kme,   &
+                   its,ite, jts,jte, kts,kte )
 !------------------------------------------------------------------------------
 !  PURPOSE: Adjust vertical velocity increments
 !
@@ -9,6 +9,7 @@ SUBROUTINE LADJUST(INV_2DS,xb,W_a,WZ_a,                 &
 !
 !  HISTORY: 09/21/2002 - Creation of F90 version. Qingnong Xiao
 !  HISTORY: 04/15/2004 - Modified of F90 version. Jianfeng Gu
+!  HISTORY: 02/02/2005 - Map factor fix and global update      Syed RH Rizvi
 !------------------------------------------------------------------------------
 
    IMPLICIT NONE
@@ -24,16 +25,14 @@ SUBROUTINE LADJUST(INV_2DS,xb,W_a,WZ_a,                 &
    real, dimension(ims:ime,jms:jme,kms:kme) :: W_a
    real, dimension(ims:ime,jms:jme,kms:kme)   :: WZ_a
 
-   real :: INV_2DS,TERM3
-
    real, dimension(ims:ime,jms:jme,kms:kme)   :: URHO, VRHO, WZ_b
 
    real :: EBXL1,EBXL2
    real :: EBXL19,EBXL29
 
-   CALL WZ_BASE(xb,WZ_b,INV_2DS,                     &
-                ids,ide, jds,jde, kds,kde,           &
-                ims,ime, jms,jme, kms,kme,           &
+   CALL WZ_BASE(xb,WZ_b,                    &
+                ids,ide, jds,jde, kds,kde,  &
+                ims,ime, jms,jme, kms,kme,  &
                 its,ite, jts,jte, kts,kte )
 
    DO J=jts,jte
