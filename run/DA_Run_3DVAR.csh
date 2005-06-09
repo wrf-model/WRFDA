@@ -165,8 +165,8 @@
  if ( ! $?DA_USE_PILOTOBS )  set DA_USE_PILOTOBS = .TRUE. 
  if ( ! $?DA_USE_SOUNDOBS )  set DA_USE_SOUNDOBS = .TRUE. 
  if ( ! $?DA_USE_SATEMOBS )  set DA_USE_SATEMOBS = .TRUE. 
- if ( ! $?DA_USE_GEO_AMV  )  set DA_USE_GEO_AMV = .FALSE.  
- if ( ! $?DA_USE_POLAR_AMV  )  set DA_USE_POLAR_AMV = .FALSE.  
+ if ( ! $?DA_USE_GEO_AMV  )  set DA_USE_GEO_AMV = .TRUE.  
+ if ( ! $?DA_USE_POLAR_AMV  )  set DA_USE_POLAR_AMV = .TRUE.  
  if ( ! $?DA_USE_AIREPOBS )  set DA_USE_AIREPOBS = .TRUE.
  if ( ! $?DA_USE_GPSPWOBS )  set DA_USE_GPSPWOBS = .TRUE. 
  if ( ! $?DA_USE_RADAROBS )  set DA_USE_RADAROBS = .FALSE.
@@ -255,7 +255,8 @@ cat >! namelist.3dvar << EOF
 &record1
  MODEL_TYPE = '$DA_MODEL_TYPE',
  WRITE_INCREMENTS = $DA_WRITE_INCREMENTS ,
- GLOBAL           = $DA_GLOBAL           /
+ GLOBAL           = $DA_GLOBAL,
+ PRINT_DETAIL   = $DA_PRINT_DETAIL /
 
 &record2
  ANALYSIS_TYPE = '$DA_ANALYSIS_TYPE',
@@ -299,7 +300,7 @@ cat >! namelist.3dvar << EOF
 
 &record5
  TIME_WINDOW    = $DA_TIME_WINDOW,
- PRINT_DETAIL   = $DA_PRINT_DETAIL /
+ /
 
 &record6
  max_ext_its    = $DA_MAX_EXT_ITS,
