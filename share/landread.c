@@ -28,6 +28,7 @@ int GET_TERRAIN (        float *adx,
 #else
 
 #include <stdio.h>
+#include <rpc/types.h>
 #include <rpc/xdr.h>
 #include <math.h>
 #include <malloc.h>

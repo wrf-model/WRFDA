@@ -23,9 +23,9 @@ SUBROUTINE da_write_filtered_obs(iunit, ounit, ob, iv )
 !----------------------------------------------------------------------------   
    IMPLICIT NONE
 
-   INTEGER,        INTENT (in)   :: iunit, ounit
-   type (y_type), intent(in)     :: ob      ! Observation structure.
-   TYPE (ob_type), INTENT(IN)    :: iv      ! O-B structure.
+   INTEGER,        INTENT(in)    :: iunit, ounit
+   type (y_type),  intent(inout) :: ob      ! Observation structure.
+   TYPE (ob_type), INTENT(INOUT) :: iv      ! O-B structure.
 !
    CHARACTER (LEN =  10)        :: fmt_name
    CHARACTER (LEN = 160)        :: info_string
