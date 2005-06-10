@@ -129,9 +129,9 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
 !     [8.1] Calculate nonlinear model trajectory 
 
       if (lvar4d) then
-
+#ifdef WRFVAR
          call system("runvar4dnl.csh")
-
+#endif
       endif
 
 !     [8.2] Calculate innovation vector (O-B):
