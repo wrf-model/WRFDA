@@ -77,7 +77,7 @@ program plot_reg_coeff
    integer :: i, j, k, n, m, b, member, n_times, ier
    integer :: sdate, cdate, edate        ! Starting, current ending dates.
    character(len= 10)        :: variable             ! Variable name
-   character(len= 80)        :: filename  
+   character(len=100)        :: filename  
    character(len= 10)        :: date, new_date       ! Current date (ccyymmddhh).
    character(len=  3)        :: ce                   ! Member index -> characte
    character(len=  5)        :: cvv                  ! control variable name
@@ -152,7 +152,7 @@ program plot_reg_coeff
 ! ----------------------------------------------------
 
    filename = trim(gen_be_dir)//'/gen_be.'//trim(be_method)//'.dat'
-   print '("*** Unit=",i3,3X,"filename=",a60)',input_unit, filename
+   print '("*** Unit=",i3,3X,"filename=",a70)',input_unit, filename
    open (input_unit, file = filename, form='unformatted')
 
 ! 3.1 Read the domain size and numbers of bins
@@ -1561,7 +1561,7 @@ contains
       xb        = 0.0
       xe        = real(mmx*10)
 
-      x_title =  ' Y-LATITUDE (GRID)'
+      x_title =  ' PSB   Y-LATITUDE (GRID)'
 
          do k=1, nj
            x(k) = real(k)
@@ -1594,7 +1594,7 @@ contains
       xb        = 0.0
       xe        = real(10)
 
-      x_title =  '<XB X> / <X X>'
+      x_title =  'CHIB AND TEMPB   <XB X> / <X X>'
 
          do k=1, nk
            y(k) = real(k)
