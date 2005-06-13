@@ -513,9 +513,9 @@ program plot_reg_coeff
         write(Title,'("CHI_B LOCALLY EXPLAINED BY PSI")')  
         print '(a)', Title 
         call set(0.1,0.97,0.1,0.97, 0.0,100.,0.0,100.,1)  
-        CALL PWRITX(50.0, 95.0,Title,23,20,0,0) 
-        CALL PWRITX(40.0, 2.0,"GRID IN Y-DIRECTION",19,20,0,0) 
-        CALL PWRITX(1.5,30.0,"<CHI_B*CHI> / <CHI*CHI>",23,20,90,-1) 
+        CALL PWRITX(50.0, 95.0,Title,30,20,0,0) 
+        CALL PWRITX(60.0, 2.0,"GRID IN Y-DIRECTION",19,20,0,0) 
+        CALL PWRITX(1.5,30.0,"MODEL LEVEL",11,20,90,-1) 
         CALL FRAME 
 
 ! 6.2.1 Balanced temperature
@@ -529,12 +529,12 @@ program plot_reg_coeff
         CALL CONREC(temp_loc,nj,nk,nk,flo,hi, cint,-1, 0, NDOT) 
         CALL PERIML( nj/10, 5, nk/5, 5) 
       
-        write(Title,'("TEMP_B LOCALLY EXPLAINED BY PSI")')  
+        write(Title,'("TEMPB LOCALLY EXPLAINED BY PSI")')  
         print '(a)', Title 
         call set(0.1,0.97,0.1,0.97, 0.0,100.,0.0,100.,1)  
-        CALL PWRITX(50.0, 95.0,Title,24,20,0,0) 
-        CALL PWRITX(40.0, 2.0,"GRID IN Y-DIRECTION",19,20,0,0) 
-        CALL PWRITX(1.5,30.0,"<TEMP_B*TEMP> / <TEMP*TEMP>",26,20,90,-1) 
+        CALL PWRITX(50.0, 95.0,Title,30,20,0,0) 
+        CALL PWRITX(60.0, 2.0,"GRID IN Y-DIRECTION",19,20,0,0) 
+        CALL PWRITX(1.5,30.0,"MODEL LEVEL",11,20,90,-1) 
         CALL FRAME 
 
 ! --------------------------------------------------------------------------
@@ -1531,6 +1531,7 @@ contains
       real (kind=4),       intent(in) :: chi(nk), temp(nk)
 
       character(len=80)               :: x_title, y_title
+      character(len=80)               :: title
       real, dimension(501)            :: x, y
 
       integer                         :: iopt
@@ -1594,7 +1595,7 @@ contains
       xb        = 0.0
       xe        = real(10)
 
-      x_title =  'CHIB AND TEMPB   <XB X> / <X X>'
+       x_title =  'CHIB AND TEMPB   <XB X> / <X X>'
 
          do k=1, nk
            y(k) = real(k)
