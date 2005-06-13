@@ -1,4 +1,3 @@
-
 SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
 !
 #include <em_dummy_args.inc>
@@ -52,9 +51,7 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
    real, dimension(xp%kms:xp%kme) :: DDT
 !------------------------------------------------------------------------------
 
-   REAL   :: qvf1, qvf2
-
-   REAL   :: cvpm, cpovcv, ppb, ttb, ralb, ral
+   REAL   :: qvf1, cvpm, cpovcv, ppb, ttb, albn, aln
 
 !---------------------------------------------------------------------------
 !--Set xb array range indices for processor subdomain.
@@ -85,10 +82,10 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
 !---------------------------------------------------------------------------
 
    ptop = grid%p_top
-   ps0  = 100000.0
-   ts0  = 300.0
-   tis0 = 0.0
-   tlp  = 0.0
+   ps0  = 100000.0    ! Base sea level pressure
+   ts0  = 300.0       ! Base potential temperature for all levels.
+   tis0 = 290.0       ! Base sea level temperature
+   tlp  = 50.0        ! temperature difference from 1000mb to 300mb
 
    xb%sigmaf(ke+1) = znw(ke+1)
 
@@ -298,51 +295,6 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
        xb%landmask(i,j) = xland(i,j)
      enddo
 
-     do k=ks,ke+1
-       do i=is,ie
-         xb%hf(i,j,k) = (phb(i,j,k)+ph_2(i,j,k))/gravity
-         xa%w (i,j,k) = w_2(i,j,k)
-         xb%w (i,j,k) = w_2(i,j,k)
-       enddo
-     enddo
-
-! Adapted the code from WRF module_big_step_utilities_em.F ----
-!         subroutine calc_p_rho_phi      Y.-R. Guo (10/20/2004)
-
-   ptop = grid%p_top
-   ts0  = 300.0     ! Base potential temperature for all levels.
-   ps0  = 100000.0  ! Base sea level pressure
-   tis0 = 290.0     ! Base sea level temperature
-   tlp  = 50.0      ! temperature difference from 1000mb to 300mb
-
-   xb % ptop = ptop
-   xb % ps0  = ps0
-   xb % ts0  = ts0
-   xb % tlp  = tlp
-
-   cvpm =  - (1. - gas_constant/cp)
-   cpovcv = cp / (cp - gas_constant)
-
-     do k=ks,ke
-       do i=is,ie
-!--------The base specific volume (from real.init.code):...........
-         ppb  = znu(k) * mub(i,j) + ptop
-         ttb  = (tis0 + tlp*log(ppb/ps0)) * (ps0/ppb)**kappa
-         ralb = (gas_constant/ps0) * ttb * (ppb/ps0)**cvpm
-! .............................................................
-         qvf1 = 1. + moist_2(i,j,k,P_QV) / rd_over_rv
-         ral  = -1. / (mub(i,j)+mu_2(i,j)) * ( ralb*mu_2(i,j) &
-                + rdnw(k) *(ph_2(i,j,k+1) - ph_2(i,j,k)) )
-!--------total pressure:
-         xb%p(i,j,k) = ps0 * ( (gas_constant*(ts0+t_2(i,j,k))*qvf1) / &
-                      (ps0*(ral+ralb)) )**cpovcv
-!--------total density
-         xb%rho(i,j,k)= 1.0 / (ralb+ral)
-!--------pressure purtubation:
-         p(i,j,k) = xb%p(i,j,k) - ppb
-       enddo
-     enddo
-
 #if 0
 ! Adapted the code from "real.init.code" by Y.-R. Guo 05/13/2004:
 
@@ -362,6 +314,40 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
      enddo
 #endif
 
+! Adapted the code from WRF module_big_step_utilities_em.F ----
+!         subroutine calc_p_rho_phi      Y.-R. Guo (10/20/2004)
+
+     cvpm =  - (1. - gas_constant/cp)
+     cpovcv = cp / (cp - gas_constant)
+
+     do k=ks,ke
+       do i=is,ie
+! .. The base specific volume (from real.init.code):...........
+         ppb  = znu(k) * mub(i,j) + ptop
+         ttb  = (tis0 + tlp*log(ppb/ps0)) * (ps0/ppb)**kappa
+         albn = (gas_constant/ps0) * ttb * (ppb/ps0)**cvpm
+! .............................................................
+         qvf1 = 1. + moist_2(i,j,k,P_QV) / rd_over_rv
+         aln  = -1. / (mub(i,j)+mu_2(i,j)) * ( albn*mu_2(i,j) &
+                + rdnw(k) *(ph_2(i,j,k+1) - ph_2(i,j,k)) )
+! .. total pressure:
+         xb%p(i,j,k) = ps0 * ( (gas_constant*(ts0+t_2(i,j,k))*qvf1) / &
+                            (ps0*(aln+albn)) )**cpovcv
+! .. total density
+         xb%rho(i,j,k)= 1.0 / (albn+aln)
+! .. pressure purtubation:
+         p(i,j,k) = xb%p(i,j,k) - ppb
+       enddo
+     enddo
+
+     do k=ks,ke+1
+       do i=is,ie
+         xb%hf(i,j,k) = (phb(i,j,k)+ph_2(i,j,k))/gravity
+         xa%w (i,j,k) = w_2(i,j,k)
+         xb%w (i,j,k) = w_2(i,j,k)
+       enddo
+     enddo
+
      do k=ks,ke
        do i=is,ie
 
@@ -370,21 +356,10 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
          xb%wh(i,j,k)= 0.5*(xb%w(i,j,k)+xb%w(i,j,k+1))
          xb%h(i,j,k) = 0.5*(xb%hf(i,j,k)+xb%hf(i,j,k+1))
 
-!         xb%p(i,j,k) = grid%p_top+xb%znu(k)*mub(i,j)+p(i,j,k)
-
          xb%q(i,j,k) = moist_2(i,j,k,P_QV)
 
          theta = ts0 + t_2(i,j,k)
          xb%t(i,j,k) = theta*(xb%p(i,j,k)/ps0)**kappa
-
-! YRG: This the dry air density used to compute the geopotential height: 
-!      (see WRF document Klemp, et al 2000:"Conservative split-explicit
-!       time integration methods for the compressible nonhydrostatic 
-!       equations", Page 12):
-
-!         xb%rho(i,j,k)=xb%p(i,j,k) &
-!                /(gas_constant*xb%t(i,j,k)*(1.0+xb%q(i,j,k)/rd_over_rv))
-! .....................................................................
 
 !  Convert to specific humidity from mixing ratio of water vapor:
          xb%q(i,j,k)=xb%q(i,j,k)/(1.0+xb%q(i,j,k))
@@ -454,6 +429,9 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
      print *, 'xb%snow(is,js)=', xb%snow(is,js)
      print *, 'xb%lanu(is,js)=', xb%lanu(is,js)
      print *, 'xb%landmask(is,js)=', xb%landmask(is,js)
+     print *, '(ie,je)=', ie,je                   !hcl
+     print *, 'xb%lat(ie,je)=', xb%lat(ie,je)     !hcl
+     print *, 'xb%lon(ie,je)=', xb%lon(ie,je)     !hcl
      print *, ' '
    endif
 
@@ -650,10 +628,18 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
    call da_transform_XTogpsref(xb, xp)
 
 !------------------------------------------------------------------------------
+!--Ground-based GPS ZTD must follow the GPS Refractivity calculation. YRG 04/05/05
+!------------------------------------------------------------------------------
+
+!  if (Use_GpsztdObs) call DA_Transform_XToZTD( xb )
+
+!------------------------------------------------------------------------------
 !--Calculate means for later use in setting up background errors.
 !------------------------------------------------------------------------------
 
+!  if(.not. associated(xbx % latc_mean)) then
       allocate ( xbx % latc_mean(xp%jds:xp%jde) )
+!  endif
 
    size2d = (xp%ide-xp%ids+1)*(xp%jde-xp%jds+1)
 

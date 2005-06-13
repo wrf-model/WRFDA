@@ -400,6 +400,8 @@ CONTAINS
       
       CASE(PROJ_LC)
         CALL llij_lc(lat,lon,proj,i,j)
+        i = i + proj%knowni - 1.0
+        j = j + proj%knownj - 1.0
 
       CASE DEFAULT
         PRINT '(A,I2)', 'Unrecognized map projection code: ', proj%code
@@ -409,21 +411,26 @@ CONTAINS
     RETURN
   END SUBROUTINE latlon_to_ij
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  SUBROUTINE ij_to_latlon(proj, i, j, lat, lon)
+  SUBROUTINE ij_to_latlon(proj, ii, jj, lat, lon)
     ! Computes geographical latitude and longitude for a given (i,j) point
     ! in a grid with a projection of proj
 
     IMPLICIT NONE
     TYPE(proj_info),INTENT(IN)          :: proj
-    REAL, INTENT(IN)                    :: i
-    REAL, INTENT(IN)                    :: j
+    REAL, INTENT(IN)                    :: ii
+    REAL, INTENT(IN)                    :: jj
     REAL, INTENT(OUT)                   :: lat
     REAL, INTENT(OUT)                   :: lon
+    REAL                                :: i, j
 
     IF (.NOT.proj%init) THEN
       PRINT '(A)', 'You have not called map_set for this projection!'
       STOP 'IJ_TO_LATLON'
     ENDIF
+
+    i = ii
+    j = jj
+
     SELECT CASE (proj%code)
 
       CASE (PROJ_LATLON)
@@ -436,6 +443,9 @@ CONTAINS
         CALL ijll_ps(i, j, proj, lat, lon)
 
       CASE (PROJ_LC)
+
+        i = ii - proj%knowni + 1.0
+        j = jj - proj%knownj + 1.0
         CALL ijll_lc(i, j, proj, lat, lon)
 
       CASE DEFAULT

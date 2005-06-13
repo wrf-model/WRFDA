@@ -40,7 +40,7 @@ SUBROUTINE DA_Transfer_XatoWRF( xbx, grid, &
 !=>ARRAYS TO HOLD WRF INCREMENTS ON THE C-grid 
 
    REAL, dimension(xp%ims:xp%ime,xp%jms:xp%jme,xp%kms:xp%kme) :: u_cgrid,  v_cgrid, &
-                                                                 q_cgrid
+                                                                 q_cgrid, ph_cgrid
 
    REAL, dimension(xp%ims:xp%ime,xp%jms:xp%jme)               :: mu_cgrid
 
@@ -57,6 +57,16 @@ SUBROUTINE DA_Transfer_XatoWRF( xbx, grid, &
    je = xp % jte
    ks = xp % kts
    ke = xp % kte
+
+! .. To keep the background PH perturbation:
+
+   do j=js,je
+   do i=is,ie
+     do k=ks, ke+1
+       ph_cgrid(i,j,k) = ph_2(i,j,k)
+     enddo
+   enddo
+   enddo
 
 !------------------------------------------------------------------------------
 !  [1.0] Get the mixing ratio of moisture first, as it is easy.
@@ -126,17 +136,6 @@ SUBROUTINE DA_Transfer_XatoWRF( xbx, grid, &
    enddo
    enddo
 
-! ========================
-! Write out the increment:
-! ========================
-
-   if (write_increments) then
-
-      print '(/"WRITE OUT INCREMENT FOR PLOTTING......")'
-
-      call DA_Write_Increment ( xp, xb, xa, q_cgrid, mu_cgrid )
-
-   endif
 ! ----------------------------------------------------------------------------
 
 !--Adjust xa%q to make xb%q + xa%q > 0.0
@@ -156,6 +155,91 @@ SUBROUTINE DA_Transfer_XatoWRF( xbx, grid, &
    enddo
    enddo
    enddo
+
+!------------------------------------------------------------------------------
+!  [4.0] CONVERT TEMPERATURE INCREMENTS INTO THETA INCREMENTS 
+!        EVALUATE ALSO THE INCREMENTS OF (1/rho) AND GEOPOTENTIAL
+!------------------------------------------------------------------------------
+
+   if(print_detail > 10) then
+      write(unit=*, fmt='(a, e24.12)') &
+        'sum(abs(xa%t(is:ie,js:je,ks:ke)))=', sum(abs(xa%t(is:ie,js:je,ks:ke))), &
+        'sum(abs(xa%p(is:ie,js:je,ks:ke)))=', sum(abs(xa%p(is:ie,js:je,ks:ke))), &
+        'sum(abs(xb%t(is:ie,js:je,ks:ke)))=', sum(abs(xb%t(is:ie,js:je,ks:ke))), &
+        'sum(abs(xb%p(is:ie,js:je,ks:ke)))=', sum(abs(xb%p(is:ie,js:je,ks:ke))), &
+        'sum(abs(t_2 (is:ie,js:je,ks:ke)))=', sum(abs(t_2 (is:ie,js:je,ks:ke)))
+
+      write(unit=*, fmt='(2(2x, a, e20.12))') &
+        'maxval(xa%u(is:ie,js:je,ks:ke))=', maxval(xa%u(is:ie,js:je,ks:ke)), &
+        'minval(xa%u(is:ie,js:je,ks:ke))=', minval(xa%u(is:ie,js:je,ks:ke)), &
+        'maxval(xa%v(is:ie,js:je,ks:ke))=', maxval(xa%v(is:ie,js:je,ks:ke)), &
+        'minval(xa%v(is:ie,js:je,ks:ke))=', minval(xa%v(is:ie,js:je,ks:ke)), &
+        'maxval(xa%t(is:ie,js:je,ks:ke))=', maxval(xa%t(is:ie,js:je,ks:ke)), &
+        'minval(xa%t(is:ie,js:je,ks:ke))=', minval(xa%t(is:ie,js:je,ks:ke)), &
+        'maxval(xa%q(is:ie,js:je,ks:ke))=', maxval(xa%q(is:ie,js:je,ks:ke)), &
+        'minval(xa%q(is:ie,js:je,ks:ke))=', minval(xa%q(is:ie,js:je,ks:ke)), &
+        'maxval(xa%p(is:ie,js:je,ks:ke))=', maxval(xa%p(is:ie,js:je,ks:ke)), &
+        'minval(xa%p(is:ie,js:je,ks:ke))=', minval(xa%p(is:ie,js:je,ks:ke)), &
+        'maxval(xa%psfc(is:ie,js:je))   =', maxval(xa%psfc(is:ie,js:je)), &
+        'minval(xa%psfc(is:ie,js:je))   =', minval(xa%psfc(is:ie,js:je))
+   endif
+
+   do j=js,je
+   do i=is,ie
+
+     ph_full  = ht(i,j) * gravity
+     ph_xb_hd = ht(i,j) * gravity
+     do k = ks, ke
+! To obtain all of the full fields: t, p, q(mixing ratio), rho
+
+      t_full   = xa%t(i,j,k) + xb%t(i,j,k)
+      p_full   = xa%p(i,j,k) + xb%p(i,j,k)
+      q_full   = moist_2(i,j,k,P_QV) + q_cgrid(i,j,k)
+
+! Note: According to WRF, this is the dry air density used to
+!       compute the geopotential height: 
+      rho_full = p_full / (gas_constant*t_full*(1.0+q_full/rd_over_rv))
+
+! To compute the theta increment with the full fields:
+      t_2(i,j,k) = t_full*(ps0/p_full)**kappa - ts0
+
+! The full field of analysis ph:
+         ph_full  = ph_full  &
+                  - xb%dnw(k) * (xb%psac(i,j)+mu_cgrid(i,j)) / rho_full
+!
+! background hydrostatic phi:
+         ph_xb_hd  = ph_xb_hd  &
+                  - xb%dnw(k) * xb%psac(i,j) / xb%rho(i,j,k)
+    
+! The analysis perturbation = Hydro_ph - base_ph + nonhydro_xb_ph:
+         ph_2(i,j,k+1) = ph_full - phb(i,j,k+1) &
+                        + (xb%hf(i,j,k+1)*gravity - ph_xb_hd)
+     enddo
+
+   enddo
+   enddo
+
+! .. To compute the geopotential height increment:
+
+   do k=ks, ke+1
+     do j=js,je
+     do i=is,ie
+       ph_cgrid(i,j,k) = ph_2(i,j,k) - ph_cgrid(i,j,k)
+     enddo
+     enddo
+   enddo
+
+! ========================
+! Write out the increment:
+! ========================
+
+   if (write_increments) then
+
+      print '(/"WRITE OUT INCREMENT FOR PLOTTING......")'
+
+      call DA_Write_Increment ( xp, xb, xa, q_cgrid, mu_cgrid, ph_cgrid )
+
+   endif
 ! ----------------------------------------------------------------------------
 
 !==> CONVERT FROM A-GRID TO C-GRID
@@ -246,69 +330,6 @@ SUBROUTINE DA_Transfer_XatoWRF( xbx, grid, &
    v_cgrid(is:ie,js,ks:ke)=2.0*xa%v(is:ie,js  ,ks:ke) &
                           - v_cgrid(is:ie,js+1,ks:ke)
 #endif
-
-!------------------------------------------------------------------------------
-!  [4.0] CONVERT TEMPERATURE INCREMENTS INTO THETA INCREMENTS 
-!        EVALUATE ALSO THE INCREMENTS OF (1/rho) AND GEOPOTENTIAL
-!------------------------------------------------------------------------------
-
-   if(print_detail > 10) then
-      write(unit=*, fmt='(a, e24.12)') &
-        'sum(abs(xa%t(is:ie,js:je,ks:ke)))=', sum(abs(xa%t(is:ie,js:je,ks:ke))), &
-        'sum(abs(xa%p(is:ie,js:je,ks:ke)))=', sum(abs(xa%p(is:ie,js:je,ks:ke))), &
-        'sum(abs(xb%t(is:ie,js:je,ks:ke)))=', sum(abs(xb%t(is:ie,js:je,ks:ke))), &
-        'sum(abs(xb%p(is:ie,js:je,ks:ke)))=', sum(abs(xb%p(is:ie,js:je,ks:ke))), &
-        'sum(abs(t_2 (is:ie,js:je,ks:ke)))=', sum(abs(t_2 (is:ie,js:je,ks:ke)))
-
-      write(unit=*, fmt='(2(2x, a, e20.12))') &
-        'maxval(xa%u(is:ie,js:je,ks:ke))=', maxval(xa%u(is:ie,js:je,ks:ke)), &
-        'minval(xa%u(is:ie,js:je,ks:ke))=', minval(xa%u(is:ie,js:je,ks:ke)), &
-        'maxval(xa%v(is:ie,js:je,ks:ke))=', maxval(xa%v(is:ie,js:je,ks:ke)), &
-        'minval(xa%v(is:ie,js:je,ks:ke))=', minval(xa%v(is:ie,js:je,ks:ke)), &
-        'maxval(xa%t(is:ie,js:je,ks:ke))=', maxval(xa%t(is:ie,js:je,ks:ke)), &
-        'minval(xa%t(is:ie,js:je,ks:ke))=', minval(xa%t(is:ie,js:je,ks:ke)), &
-        'maxval(xa%q(is:ie,js:je,ks:ke))=', maxval(xa%q(is:ie,js:je,ks:ke)), &
-        'minval(xa%q(is:ie,js:je,ks:ke))=', minval(xa%q(is:ie,js:je,ks:ke)), &
-        'maxval(xa%p(is:ie,js:je,ks:ke))=', maxval(xa%p(is:ie,js:je,ks:ke)), &
-        'minval(xa%p(is:ie,js:je,ks:ke))=', minval(xa%p(is:ie,js:je,ks:ke)), &
-        'maxval(xa%psfc(is:ie,js:je))   =', maxval(xa%psfc(is:ie,js:je)), &
-        'minval(xa%psfc(is:ie,js:je))   =', minval(xa%psfc(is:ie,js:je))
-   endif
-
-   do j=js,je
-   do i=is,ie
-
-     ph_full  = ht(i,j) * gravity
-     ph_xb_hd = ht(i,j) * gravity
-     do k = ks, ke
-! To obtain all of the full fields: t, p, q(mixing ratio), rho
-
-      t_full   = xa%t(i,j,k) + xb%t(i,j,k)
-      p_full   = xa%p(i,j,k) + xb%p(i,j,k)
-      q_full   = moist_2(i,j,k,P_QV) + q_cgrid(i,j,k)
-
-! Note: According to WRF, this is the dry air density used to
-!       compute the geopotential height: 
-      rho_full = p_full / (gas_constant*t_full*(1.0+q_full/rd_over_rv))
-
-! To compute the theta increment with the full fields:
-      t_2(i,j,k) = t_full*(ps0/p_full)**kappa - ts0
-
-! The full field of analysis ph:
-         ph_full  = ph_full  &
-                  - xb%dnw(k) * (xb%psac(i,j)+mu_cgrid(i,j)) / rho_full
-!
-! background hydrostatic phi:
-         ph_xb_hd  = ph_xb_hd  &
-                  - xb%dnw(k) * xb%psac(i,j) / xb%rho(i,j,k)
-    
-! The analysis perturbation = Hydro_ph - base_ph + nonhydro_xb_ph:
-         ph_2(i,j,k+1) = ph_full - phb(i,j,k+1) &
-                        + (xb%hf(i,j,k+1)*gravity - ph_xb_hd)
-     enddo
-
-   enddo
-   enddo
 
 !------------------------------------------------------------------------------
 !  [5.0] ADD INCREMENT TO THE ORIGINAL GUESS AND UPDATE "grid"
