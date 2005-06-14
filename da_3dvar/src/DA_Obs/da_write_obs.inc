@@ -74,6 +74,24 @@ SUBROUTINE da_write_obs( ob, iv, re )
                          ob%ships(n)%q, iv%ships(n)%q, re%ships(n)%q   ! O, O-B, O-A q
       END DO
    ENDIF
+!  [4.1] Transfer Geo   AMVs Obs:
+!
+   IF ( iv % num_geoamv > 0 ) THEN
+      write(omb_unit,'(a,i8)')'geoamv', iv % num_geoamv
+      DO n = 1, iv % num_geoamv
+        write(omb_unit,'(i8)')iv % geoamv(n) % info % levels
+        DO k = 1, iv % geoamv(n) % info % levels
+          write(omb_unit,'(2i8,a5,2f9.3,f17.7,5(2f17.7,i8,2f17.7))')&
+                 n, 1, iv % geoamv(n) % info % id, &  ! Station
+                 iv % geoamv(n) % info % lat, &       ! Latitude
+                 iv % geoamv(n) % info % lon, &       ! Longitude
+                 iv % geoamv(n) % p(k), &                ! Obs Pressure
+                 ob%geoamv(n)%u(k), iv%geoamv(n)%u(k), re%geoamv(n)%u(k), &! O, O-B, O-A u
+                 ob%geoamv(n)%v(k), iv%geoamv(n)%v(k), re%geoamv(n)%v(k)
+        END DO
+      END DO
+   ENDIF
+
 !  [4.2] Transfer Polar AMVs Obs:
 !
    IF ( iv % num_polaramv > 0 ) THEN
