@@ -30,13 +30,9 @@ subroutine DA_Transform_VpToX_Adj( xb, xbx, xa, vp, be, xp, &
  if( cv_options == 2 ) then
 !--surface pressure increments
 
-   if (sfc_assi_options == 2) then
-      call DA_Transform_XToWTQ_adj( xp, xb, xa )
-   else
       xa%p(its:ite,jts:jte,kts) = xa%p(its:ite,jts:jte,kts) &
                                 + xa%psfc(its:ite,jts:jte)
       xa%psfc(its:ite,jts:jte) = 0.0
-   endif
 
 !    [2.8] Ground temperature control variable:
 

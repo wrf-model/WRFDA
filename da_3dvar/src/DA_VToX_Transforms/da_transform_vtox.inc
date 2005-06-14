@@ -146,6 +146,7 @@ subroutine da_transform_vtox( xb, xbx, be, cv, vv, vp, xp, xa,        &
 !
    if (.not.Testing_3DVAR) then
 !--Exchange XA halo region.
+   call DA_Transform_XToWTQ ( xp, xb, xa )
    CALL wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id4)
 
    if (sfc_assi_options == 2) then

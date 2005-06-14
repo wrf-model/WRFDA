@@ -118,11 +118,7 @@ subroutine DA_Transform_VpToX( xb, xbx, vp, xp, xa, be,    &
 
 !--surface pressure increments
  
-   if (sfc_assi_options == 2) then
-      call DA_Transform_XToWTQ ( xp, xb, xa )
-   else
       xa%psfc(its:ite,jts:jte)=xa%p(its:ite,jts:jte,kts)
-   endif
 
  else if( cv_options == 4) then    ! psi, chi_u, t_u, pseudo_rh , psfc_u
 
