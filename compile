@@ -1,41 +1,24 @@
 #!/bin/csh -f
 
-cont1:
-
-if ( !  -e configure.wrf  ) then
-   ./configure
-   set dontask
-endif
-
-if ( ! $?dontask && $?prompt ) then
-  echo "This script assumes you have configured the code already."
-  echo "You only need to configure once."
-  echo "If you wish to reconfigure, type c at the prompt below"
-  echo " "
-  echo "Ready to compile? [ync]"
-  set resp=$<
-
-  if ( "$resp" == "c" ) then
-    ./configure
-    goto cont1
-  endif
-
-  if ( "$resp" == "n" ) then
-    exit 2
-  endif
-endif
-
 set arglist=""
-set compare_wrf = 1
+set compare_wrf = 0
 set compare_var = 0
 set compare_be = 0
 setenv WRF_EM_CORE 1
 setenv WRF_DA_CORE 0
 
+if ( !  -e configure.wrf  ) then
+  echo "You need to configure the code first."
+  echo "Please do configure and then compile."
+  exit 1
+endif
+
 foreach a ( $argv )
   if ( "$a" == "-h" ) then
     goto hlp
   else
+#we probably needs to add consistent check here.
+
     set arglist = ( $arglist $a )
 
     if ( "$a" == "wrf" ) then
@@ -52,6 +35,21 @@ foreach a ( $argv )
     endif
   endif
 end
+
+if( $compare_wrf != 1 ) then
+  echo "You need to compile corresponding to your configure option."
+  echo "Type <compile wrf> to compile WRF model only"
+  echo "Type <compile em_real> to compile WRF model and real"
+  echo "Type <compile var> to compile 3dvar (and WRF frame)"
+  echo "Type <compile pure_var> to compile 3dvar only (assume WRF frame has compiled)"
+  echo "Type <compile be> to compile gen_be stage 1 - 4"
+  echo "Type <compile be_wrf> to compile gen_be stage 0 - 4"
+  echo "Type <compile pure_be_wrf> to compile gen_be stage 0 - 4 only (assume WRF frame has compiled)"
+  echo "Type <compile k2n> to compile convetor for converting KMA data to NetCDF data format"
+  echo "Type <compile n2k> to compile convetor for converting NetCDF data to KMA data format"
+
+  exit 2
+endif
 
 setenv WRF_EM_CORE 1
 setenv WRF_DA_CORE 0
