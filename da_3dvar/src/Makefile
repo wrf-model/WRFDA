@@ -62,7 +62,8 @@ OBJS_4_GEN_BE_LONG =	DA_Constants.o		\
 			DA_VToX_Transforms.o	\
 			DA_Obs.o		\
 			DA_Metar.o		\
-			DA_Satob.o		\
+			DA_GeoAMV.o		\
+			DA_PolarAMV.o		\
 			DA_Ships.o		\
 			DA_Synop.o		\
 			DA_Sound.o		\
