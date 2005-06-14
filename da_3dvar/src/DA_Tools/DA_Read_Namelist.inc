@@ -301,8 +301,8 @@ SUBROUTINE DA_Read_Namelist
       WRITE(6,'(A,3X,A     )') ' MODEL_TYPE    = ', trim(MODEL_TYPE)
       WRITE(6,'(A,I4       )') ' print_detail  = ',print_detail
       WRITE(6,'(A,3X,L10   )') ' write_increments = ', write_increments
-      WRITE(6,'(A,3X,L5    )') ' Global analysis option=', global         
-      WRITE(6,'(A,3X,L5    )') ' VAR4d =', lvar4d
+      WRITE(6,'(A,3X,L10   )') ' Global analysis option=', global         
+      WRITE(6,'(A,3X,L10   )') ' VAR4d =', lvar4d
    endif
 
    READ  ( UNIT = namelist_unit, NML = RECORD2 , ERR = 8000, IOSTAT = IOST)
@@ -628,7 +628,7 @@ SUBROUTINE DA_Read_Namelist
    WRITE(6,'(A,1PE8.2   )') ' RF_LEN_SCALING3 = ',len_scaling3
    WRITE(6,'(A,1PE8.2   )') ' RF_LEN_SCALING4 = ',len_scaling4
    WRITE(6,'(A,1PE8.2   )') ' RF_LEN_SCALING5 = ',len_scaling5
-   WRITE(6,'(A,3X,L10   )') ' Minimise _Option = ',Minimisation_Option 
+   WRITE(6,'(A,3X,I4    )') ' Minimise _Option = ',Minimisation_Option 
    WRITE(6,'(A,3X,L10   )') ' In_CG_COST_FUNCTION_NEEDED = ',calculate_cg_cost_function
    WRITE(6,'(A,3X,L10   )') ' Outer_Loop_Write   = ',write_outer_loop
    WRITE(6,'(A,3X,L10   )') ' Lat_Stats_Option   = ',lat_stats_option
