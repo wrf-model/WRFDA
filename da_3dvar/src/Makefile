@@ -516,7 +516,7 @@ DA_Sound.o:		\
 			DA_Sound/da_get_innov_vector_sound.inc \
 			DA_Sound/da_obs_diagnostics.inc	\
 			DA_Sound/DA_Sonde_sfc/DA_AO_Stats_Sonde_sfc.inc \
-			DA_Sound/DA_Sonde_sfc/DA_Calculate_Jo_and_GradY_Sonde_sfc.inc \
+			DA_Sound/DA_Sonde_sfc/DA_Get_Jo_and_GradY_Sonde_sfc.inc \
 			DA_Sound/DA_Sonde_sfc/DA_Calculate_Residual_Sonde_sfc.inc \
 			DA_Sound/DA_Sonde_sfc/DA_OI_Stats_Sonde_sfc.inc \
 			DA_Sound/DA_Sonde_sfc/DA_Print_Stats_Sonde_sfc.inc \
@@ -766,7 +766,7 @@ DA_Profiler.o:		\
 			DA_Tools.o \
 			DA_Profiler/DA_Profiler.F \
 			DA_Profiler/DA_AO_Stats_Profiler.inc \
-			DA_Profiler/DA_Calculate_Jo_and_GradY_Profiler.inc \
+			DA_Profiler/DA_Get_Jo_and_GradY_Profiler.inc \
 			DA_Profiler/DA_Calculate_Residual_Profiler.inc \
 			DA_Profiler/DA_OI_Stats_Profiler.inc \
 			DA_Profiler/DA_Print_Stats_Profiler.inc \

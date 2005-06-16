@@ -1,4 +1,4 @@
-SUBROUTINE DA_Calculate_Jo_and_GradY_profiler( iv, re, jo, jo_grad_y )
+SUBROUTINE DA_Get_Jo_and_GradY_profiler( iv, re, jo, jo_grad_y )
 
    IMPLICIT NONE
 
@@ -50,5 +50,5 @@ SUBROUTINE DA_Calculate_Jo_and_GradY_profiler( iv, re, jo, jo_grad_y )
       
    END IF
 
-END SUBROUTINE DA_Calculate_Jo_and_GradY_profiler
+END SUBROUTINE DA_Get_Jo_and_GradY_profiler
 

@@ -60,7 +60,7 @@ CONTAINS
 #include "DA_Calculate_GradY_Sound.inc"
 
 #include "DA_Sonde_sfc/DA_AO_Stats_Sonde_sfc.inc"
-#include "DA_Sonde_sfc/DA_Calculate_Jo_and_GradY_Sonde_sfc.inc"
+#include "DA_Sonde_sfc/DA_Get_Jo_and_GradY_Sonde_sfc.inc"
 #include "DA_Sonde_sfc/DA_Calculate_Residual_Sonde_sfc.inc"
 #include "DA_Sonde_sfc/DA_OI_Stats_Sonde_sfc.inc"
 #include "DA_Sonde_sfc/DA_Print_Stats_Sonde_sfc.inc"

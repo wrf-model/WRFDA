@@ -39,7 +39,7 @@
               'jo%sound_q =', jo%sound_q
       endif
 
-      call da_calculate_jo_and_grady_Sonde_sfc( iv, re, jo, jo_grad_y)
+      call da_get_jo_and_grady_Sonde_sfc( iv, re, jo, jo_grad_y)
       jo_sound = jo_sound         + jo % sonde_sfc_u + jo % sonde_sfc_v + &
                  jo % sonde_sfc_t + jo % sonde_sfc_q + jo % sonde_sfc_p
 
@@ -161,7 +161,7 @@
 
 !     Profiler:
 
-      call da_calculate_jo_and_grady_Profiler (iv, re, jo, jo_grad_y)
+      call da_get_jo_and_grady_Profiler (iv, re, jo, jo_grad_y)
       jo_profiler = jo % profiler_u + jo % profiler_v
 
 !     TC bogus:

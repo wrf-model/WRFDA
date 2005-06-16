@@ -1,4 +1,4 @@
-SUBROUTINE DA_Calculate_Jo_and_GradY_Sonde_sfc( iv, re, jo, jo_grad_y )
+SUBROUTINE DA_Get_Jo_and_GradY_Sonde_sfc( iv, re, jo, jo_grad_y )
 
    IMPLICIT NONE
 
@@ -51,5 +51,5 @@ SUBROUTINE DA_Calculate_Jo_and_GradY_Sonde_sfc( iv, re, jo, jo_grad_y )
       jo % sonde_sfc_p = 0.5 * jo % sonde_sfc_p
       jo % sonde_sfc_q = 0.5 * jo % sonde_sfc_q
      
-END SUBROUTINE DA_Calculate_Jo_and_GradY_Sonde_sfc
+END SUBROUTINE DA_Get_Jo_and_GradY_Sonde_sfc
 
