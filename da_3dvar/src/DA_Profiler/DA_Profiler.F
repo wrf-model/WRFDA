@@ -26,7 +26,7 @@ MODULE DA_Profiler
 CONTAINS
 
 #include "DA_AO_Stats_Profiler.inc"
-#include "DA_Get_Jo_and_GradY_profiler.inc"
+#include "DA_Get_Jo_and_GradY_Profiler.inc"
 #include "DA_Calculate_Residual_Profiler.inc"
 #include "DA_OI_Stats_Profiler.inc"
 #include "DA_Print_Stats_Profiler.inc"
