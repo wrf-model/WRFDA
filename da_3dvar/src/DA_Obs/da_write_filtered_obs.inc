@@ -35,12 +35,12 @@ SUBROUTINE da_write_filtered_obs(iunit, ounit, ob, iv )
    INTEGER                      :: i, j, iost, nlevels, fm
    TYPE (multi_level_type)      :: platform
 
-   integer                       :: n, k, zero 
+   integer                       :: n, k, zero , ships_elv_qual
    integer                       :: thick_qc, dir_qc, td_qc, rh_qc, height_qc
    real                          :: es, qs, speed, dir, rh, rh_error, uu, vv
    real                          :: xmiss, height, height_error, pr_error, slp_error
    real                          :: thick1, thick, thick_error,dir_error,speed_error
-   real                          :: td, td_error , elv_err     
+   real                          :: td, td_error , elv_err,ships_elv
    logical, external             :: wrf_dm_on_monitor
 
 !----------------------------------------------------------------------------!
@@ -61,6 +61,9 @@ SUBROUTINE da_write_filtered_obs(iunit, ounit, ob, iv )
    slp_error = 200.
    elv_err = 6.0
    dir_error = 5.0
+   ships_elv = 0.0
+   ships_elv_qual = -5
+
 !----------------------------------------------------------------------------!
 !
    if ( wrf_dm_on_monitor() ) then
@@ -327,7 +330,7 @@ SUBROUTINE da_write_filtered_obs(iunit, ounit, ob, iv )
          ob%ships(i)%p,iv%ships(i)%p%qc,pr_error,           &
          speed,iv%ships(i)%u%qc,speed_error,                &
          dir  ,iv%ships(i)%v%qc,dir_error,                  &
-         iv%ships(i)%info%elv, zero, elv_err,               &
+         ships_elv, ships_elv_qual, elv_err,                &
          ob%ships(i)%t,iv%ships(i)%t%qc,iv%ships(i)%t%error,&
          td, td_qc, td_error,                               &
          rh, rh_qc,  rh_error                
