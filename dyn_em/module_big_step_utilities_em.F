@@ -4373,7 +4373,6 @@ END SUBROUTINE phy_prep
      DO k = k_start, k_end
      DO i = i_start, i_end
 
-       t_new(i,k,j) = t_new(i,k,j)-h_diabatic(i,k,j)*dt
        h_diabatic(i,k,j) = t_new(i,k,j)
        t_new(i,k,j) = t_new(i,k,j) + t0
        t_old(i,k,j) = t_old(i,k,j) + t0
@@ -4502,7 +4501,7 @@ END SUBROUTINE phy_prep
    SUBROUTINE init_module_big_step
    END SUBROUTINE init_module_big_step
 
-SUBROUTINE set_tend ( field, field_adv_tend,            &
+SUBROUTINE set_tend ( field, field_adv_tend, msf,       &
                       ids, ide, jds, jde, kds, kde,     &
                       ims, ime, jms, jme, kms, kme,     &
                       its, ite, jts, jte, kts, kte       )
@@ -4518,6 +4517,8 @@ SUBROUTINE set_tend ( field, field_adv_tend,            &
    REAL , DIMENSION( ims:ime , kms:kme , jms:jme ) , INTENT(OUT) :: field
 
    REAL , DIMENSION( ims:ime , kms:kme , jms:jme ) , INTENT(IN)  :: field_adv_tend
+
+   REAL , DIMENSION( ims:ime , jms:jme ) , INTENT(IN)  :: msf
 
    ! Local data
 
@@ -4535,7 +4536,7 @@ SUBROUTINE set_tend ( field, field_adv_tend,            &
       DO j = jts, jtf
       DO k = kts, ktf
       DO i = its, itf
-         field(i,k,j) = field_adv_tend(i,k,j)
+         field(i,k,j) = field_adv_tend(i,k,j)*msf(i,j)
       ENDDO
       ENDDO
       ENDDO

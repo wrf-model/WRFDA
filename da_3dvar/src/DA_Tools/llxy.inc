@@ -8,6 +8,10 @@ subroutine llxy (xlati,xloni,x,y)
 ! PURPOSE:  CALCULATES THE (X,Y) LOCATION (DOT) IN THE MESOSCALE GRIDS
 ! -------   FROM LATITUDES AND LONGITUDES
 !
+!  Additions:      10/26/2004    Syed RH Rizvi
+!                  Global domain co-ordinates
+!
+!           For global domain co-ordinates
 !
 !  INPUT:
 !  -----
@@ -36,7 +40,7 @@ subroutine llxy (xlati,xloni,x,y)
    real, parameter   :: conv = 180.0 / pi
    
 !------------------------------------------------------------------------------!
-   
+
    xlon = xloni
    xlat = xlati
 
@@ -107,6 +111,5 @@ subroutine llxy (xlati,xloni,x,y)
 
    x = (x - start_x)*ratio + 0.5
    y = (y - start_y)*ratio + 0.5
-
 end subroutine llxy
-   
+

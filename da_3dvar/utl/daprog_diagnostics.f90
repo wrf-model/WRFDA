@@ -40,12 +40,28 @@ program da_diagnostics
       type (field_type)          :: q
    end type surfc_type
    
-   type satob_type
+   type qscat_type
       type (info_type)           :: info
       real                       :: height
       type (field_type)          :: u
       type (field_type)          :: v
-   end type satob_type
+   end type qscat_type
+
+   type geamv_type
+      type (info_type)           :: info
+      real                       :: height
+      type (field_type)          :: u
+      type (field_type)          :: v
+   end type geamv_type
+
+   type poamv_type
+      type (info_type)           :: info
+      character*2                :: channel 
+      character*1                :: landmask
+      real                       :: pressure
+      type (field_type)          :: u
+      type (field_type)          :: v
+   end type poamv_type
    
    type gpspw_type
       type (info_type)           :: info
@@ -109,14 +125,16 @@ program da_diagnostics
 
    type ob_type
       integer                    :: num_synop, num_metar, num_ships, &
-                                    num_satob, num_gpspw, num_sound, &
+                                    num_poamv, num_qscat, num_geamv, num_gpspw, num_sound, &
                                     num_airep, num_pilot, num_ssmir, &
                                     num_satem, num_ssmt1, num_ssmt2
 
       type (surfc_type), pointer :: synop(:)
       type (surfc_type), pointer :: metar(:)
       type (surfc_type), pointer :: ships(:)
-      type (satob_type), pointer :: satob(:)
+      type (poamv_type), pointer :: poamv(:)
+      type (geamv_type), pointer :: geamv(:)
+      type (qscat_type), pointer :: qscat(:)
       type (gpspw_type), pointer :: gpspw(:)
       type (sound_type), pointer :: sound(:)
       type (airep_type), pointer :: airep(:)
@@ -175,9 +193,21 @@ program da_diagnostics
       write(6,*)
    end if
    
-   if ( ob % num_satob > 0 ) then
-      call da_calc_stats( 'satob u  ', ob % num_satob, ob % satob % u )
-      call da_calc_stats( 'satob v  ', ob % num_satob, ob % satob % v )
+   if ( ob % num_poamv > 0 ) then
+      call da_calc_stats( 'poamv u  ', ob % num_poamv, ob % poamv % u )
+      call da_calc_stats( 'poamv v  ', ob % num_poamv, ob % poamv % v )
+      write(6,*)
+   end if
+
+   if ( ob % num_geamv > 0 ) then
+      call da_calc_stats( 'geamv u  ', ob % num_geamv, ob % geamv % u )
+      call da_calc_stats( 'geamv v  ', ob % num_geamv, ob % geamv % v )
+      write(6,*)
+   end if
+
+   if ( ob % num_qscat > 0 ) then
+      call da_calc_stats( 'qscat u  ', ob % num_qscat, ob % qscat % u )
+      call da_calc_stats( 'qscat v  ', ob % num_qscat, ob % qscat % v )
       write(6,*)
    end if
 
@@ -234,11 +264,11 @@ program da_diagnostics
       current_time = ob % sound(n) % info % time
    end do
 
-   write(unit1,'(a5,2f9.3,3f17.7,i8)')'*end*', 0, 0, 0, 0, 0, 0
-   write(unit2,'(a5,2f9.3,3f17.7,i8)')'*end*', 0, 0, 0, 0, 0, 0
-   write(unit3,'(a5,2f9.3,3f17.7,i8)')'*end*', 0, 0, 0, 0, 0, 0
-   write(unit4,'(a5,2f9.3,3f17.7,i8)')'*end*', 0, 0, 0, 0, 0, 0
-   write(unit5,'(a5,2f9.3,3f17.7,i8)')'*end*', 0, 0, 0, 0, 0, 0
+   write(unit1,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
+   write(unit2,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
+   write(unit3,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
+   write(unit4,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
+   write(unit5,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
 
    close( unit1 ); close( unit2 ); close( unit3 ); close( unit4 ); close( unit5 )
 
@@ -270,11 +300,11 @@ program da_diagnostics
       current_time = ob % synop(n) % info % time
    end do
 
-   write(unit1,'(a5,2f9.3,3f17.7,i8)')'*end*', 0, 0, 0, 0, 0, 0
-   write(unit2,'(a5,2f9.3,3f17.7,i8)')'*end*', 0, 0, 0, 0, 0, 0
-   write(unit3,'(a5,2f9.3,3f17.7,i8)')'*end*', 0, 0, 0, 0, 0, 0
-   write(unit4,'(a5,2f9.3,3f17.7,i8)')'*end*', 0, 0, 0, 0, 0, 0
-   write(unit5,'(a5,2f9.3,3f17.7,i8)')'*end*', 0, 0, 0, 0, 0, 0
+   write(unit1,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
+   write(unit2,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
+   write(unit3,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
+   write(unit4,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
+   write(unit5,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
 
    close( unit1 ); close( unit2 ); close( unit3 ); close( unit4 ); close( unit5 )
 
@@ -310,13 +340,34 @@ program da_diagnostics
       current_time = ob % metar(n) % info % time
    end do
 
-   write(unit1,'(a5,2f9.3,3f17.7,i8)')'*end*', 0, 0, 0, 0, 0, 0
-   write(unit2,'(a5,2f9.3,3f17.7,i8)')'*end*', 0, 0, 0, 0, 0, 0
-   write(unit3,'(a5,2f9.3,3f17.7,i8)')'*end*', 0, 0, 0, 0, 0, 0
-   write(unit4,'(a5,2f9.3,3f17.7,i8)')'*end*', 0, 0, 0, 0, 0, 0
-   write(unit5,'(a5,2f9.3,3f17.7,i8)')'*end*', 0, 0, 0, 0, 0, 0
+   write(unit1,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
+   write(unit2,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
+   write(unit3,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
+   write(unit4,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
+   write(unit5,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
 
    close( unit1 ); close( unit2 ); close( unit3 ); close( unit4 ); close( unit5 )
+
+!  [4.4] Polar AMV O-B:
+
+   open( unit1, file = 'poamvu_omb.dat', status = 'unknown' )
+   open( unit2, file = 'poamvv_omb.dat', status = 'unknown' )
+
+   current_time = 1
+   do n = 1, ob % num_poamv
+      call da_write_data( 1, current_time, ob % num_poamv, unit1, &
+                          ob % poamv(n) % info, &
+                          ob % poamv(n) % pressure, ob % poamv(n) % u )
+      call da_write_data( 1, current_time, ob % num_poamv, unit2, &
+                          ob % poamv(n) % info, &
+                          ob % poamv(n) % pressure, ob % poamv(n) % v )
+      current_time = ob % poamv(n) % info % time
+   end do
+
+   write(unit1,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
+   write(unit2,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
+
+   close( unit1 ); close( unit2 )
 
 contains
 
@@ -336,7 +387,7 @@ subroutine da_write_data( lev, current_time, num_obs, ounit, info, p, field )
       write(ounit,'(a5,2f9.3,3f17.7,i8)') info % id, info % lat, info % lon, &
                                           p, field % omb, field % err, field % qc
    else
-      if ( lev == 1)write(ounit,'(a5,2f9.3,3f17.7,i8)')'*****', 0, 0, 0, 0, 0, 0
+      if ( lev == 1)write(ounit,'(a5,2f9.3,3f17.7,i8)')'*****', 0., 0., 0., 0., 0., 0
       write(ounit,'(a5,2f9.3,3f17.7,i8)') info % id, info % lat, info % lon, &
                                           p, field % omb, field % err, field % qc
    end if
@@ -360,7 +411,9 @@ subroutine da_count_obs( y_unit, ob )
    ob % num_synop = 0
    ob % num_metar = 0
    ob % num_ships = 0
-   ob % num_satob = 0
+   ob % num_poamv = 0
+   ob % num_geamv = 0
+   ob % num_qscat = 0
    ob % num_gpspw = 0
    ob % num_sound = 0
    ob % num_airep = 0
@@ -377,7 +430,7 @@ subroutine da_count_obs( y_unit, ob )
       do    ! loop over particular time (ends in *****)
 
          read(y_unit,'(a5,i8)')ob_name, num_obs
-         
+ 
          if ( trim(ob_name) == '*****' .or. trim(ob_name) == '*end*' ) exit
 
          if ( trim(ob_name) == 'synop' ) then
@@ -386,8 +439,12 @@ subroutine da_count_obs( y_unit, ob )
             ob % num_metar = ob % num_metar + num_obs
          else if ( trim(ob_name) == 'ships' ) then
             ob % num_ships = ob % num_ships + num_obs
-         else if ( trim(ob_name) == 'satob' ) then
-            ob % num_satob = ob % num_satob + num_obs
+         else if ( trim(ob_name) == 'poamv' ) then
+            ob % num_poamv = ob % num_poamv + num_obs
+         else if ( trim(ob_name) == 'geamv' ) then
+            ob % num_geamv = ob % num_geamv + num_obs
+         else if ( trim(ob_name) == 'qscat' ) then
+            ob % num_qscat = ob % num_qscat + num_obs
          else if ( trim(ob_name) == 'gpspw' ) then
             ob % num_gpspw = ob % num_gpspw + num_obs
          else if ( trim(ob_name) == 'sound' ) then
@@ -433,11 +490,21 @@ subroutine da_count_obs( y_unit, ob )
       write(6,'(a,i8)')' Number of ships obs = ', ob % num_ships
    end if
    
-   if ( ob % num_satob > 0 ) then
-      allocate( ob % satob(1:ob % num_satob) )
-      write(6,'(a,i8)')' Number of satob obs = ', ob % num_satob
+   if ( ob % num_poamv > 0 ) then
+      allocate( ob % poamv(1:ob % num_poamv) )
+      write(6,'(a,i8)')' Number of poamv obs = ', ob % num_poamv
    end if
    
+   if ( ob % num_geamv > 0 ) then
+      allocate( ob % geamv(1:ob % num_geamv) )
+      write(6,'(a,i8)')' Number of geamv obs = ', ob % num_geamv
+   end if
+
+   if ( ob % num_qscat > 0 ) then
+      allocate( ob % qscat(1:ob % num_qscat) )
+      write(6,'(a,i8)')' Number of qscat obs = ', ob % num_qscat
+   end if
+
    if ( ob % num_gpspw > 0 ) then
       allocate( ob % gpspw(1:ob % num_gpspw) )
       write(6,'(a,i8)')' Number of gpspw obs = ', ob % num_gpspw
@@ -493,18 +560,20 @@ subroutine da_read_y( y_unit, ob )
 
    character*5          :: ob_name
    integer              :: n, ndum, k, kdum, num_obs, num_levs
-   integer              :: num_obs_synop, num_obs_metar, num_obs_ships, num_obs_satob
+   integer              :: num_obs_synop, num_obs_metar, num_obs_ships
+   integer              :: num_obs_qscat,  num_obs_poamv, num_obs_geamv
    integer              :: num_obs_gpspw, num_obs_sound, num_obs_airep, num_obs_pilot
    integer              :: num_obs_ssmir, num_obs_satem, num_obs_ssmt1, num_obs_ssmt2
-   integer              :: synopt, metart, shipst, satobt,gpspwt, soundt
+   integer              :: synopt, metart, shipst, poamvt, geamvt, qscatt, gpspwt, soundt
    integer              :: airept, pilott, ssmirt, satemt, ssmt1t, ssmt2t
    real                 :: rdum
 
    rewind (y_unit)
-   num_obs_synop = 0; num_obs_metar = 0; num_obs_ships = 0; num_obs_satob = 0
+   num_obs_synop = 0; num_obs_metar = 0; num_obs_ships = 0
+   num_obs_poamv = 0; num_obs_geamv = 0; num_obs_qscat = 0
    num_obs_gpspw = 0; num_obs_sound = 0; num_obs_airep = 0; num_obs_pilot = 0
    num_obs_ssmir = 0; num_obs_satem = 0; num_obs_ssmt1 = 0; num_obs_ssmt2 = 0
-   synopt = 0; metart = 0; shipst = 0; satobt = 0
+   synopt = 0; metart = 0; shipst = 0; poamvt = 0; geamvt = 0; qscatt = 0
    gpspwt = 0; soundt = 0; airept = 0; pilott = 0
    ssmirt = 0; satemt = 0; ssmt1t = 0; ssmt2t = 0
 
@@ -563,19 +632,49 @@ subroutine da_read_y( y_unit, ob )
          end do
          num_obs_ships = num_obs_ships + num_obs
          
-      else if ( trim(ob_name) == 'satob' ) then
-         satobt = satobt + 1
-         do n = num_obs_satob + 1, num_obs_satob + num_obs
+      else if ( trim(ob_name) == 'poamv' ) then
+         poamvt = poamvt + 1
+         do n = num_obs_poamv + 1, num_obs_poamv + num_obs
             read(y_unit,'(2i8,a5,2f9.3,f17.7,5(2f17.7,i8,2f17.7))') &
-            ndum, kdum, ob % satob(n) % info % id, &        ! Station
-                        ob % satob(n) % info % lat, &       ! Latitude
-                        ob % satob(n) % info % lon, &       ! Longitude
-                        ob % satob(n) % height, &           ! Obs height
-                        ob % satob(n) % u, &                ! O, O-B, O-A
-                        ob % satob(n) % v
-            ob % satob(n) % info % time = satobt
+            ndum, kdum, ob % poamv(n) % info % id, &        ! Station
+                        ob % poamv(n) % info % lat, &       ! Latitude
+                        ob % poamv(n) % info % lon, &       ! Longitude
+                        ob % poamv(n) % pressure, &         ! Obs pressure
+                        ob % poamv(n) % u, &                ! O, O-B, O-A
+                        ob % poamv(n) % v
+            ob % poamv(n) % info % time = poamvt
+            ob % poamv(n) % channel = ob % poamv(n) % info % id(3:4)
+            ob % poamv(n) % landmask = ob % poamv(n) % info % id(5:5)
          end do
-         num_obs_satob = num_obs_satob + num_obs
+         num_obs_poamv = num_obs_poamv + num_obs
+
+      else if ( trim(ob_name) == 'geamv' ) then
+         geamvt = geamvt + 1
+         do n = num_obs_geamv + 1, num_obs_geamv + num_obs
+            read(y_unit,'(2i8,a5,2f9.3,f17.7,5(2f17.7,i8,2f17.7))') &
+            ndum, kdum, ob % geamv(n) % info % id, &        ! Station
+                        ob % geamv(n) % info % lat, &       ! Latitude
+                        ob % geamv(n) % info % lon, &       ! Longitude
+                        ob % geamv(n) % height, &           ! Obs height
+                        ob % geamv(n) % u, &                ! O, O-B, O-A
+                        ob % geamv(n) % v
+            ob % geamv(n) % info % time = geamvt
+         end do
+         num_obs_geamv = num_obs_geamv + num_obs
+
+      else if ( trim(ob_name) == 'qscat' ) then
+         qscatt = qscatt + 1
+         do n = num_obs_qscat + 1, num_obs_qscat + num_obs
+            read(y_unit,'(2i8,a5,2f9.3,f17.7,5(2f17.7,i8,2f17.7))') &
+            ndum, kdum, ob % qscat(n) % info % id, &        ! Station
+                        ob % qscat(n) % info % lat, &       ! Latitude
+                        ob % qscat(n) % info % lon, &       ! Longitude
+                        ob % qscat(n) % height, &           ! Obs height
+                        ob % qscat(n) % u, &                ! O, O-B, O-A
+                        ob % qscat(n) % v
+            ob % qscat(n) % info % time = qscatt
+         end do
+         num_obs_qscat = num_obs_qscat + num_obs
          
       else if ( trim(ob_name) == 'gpspw' ) then
          gpspwt = gpspwt + 1
@@ -771,7 +870,7 @@ subroutine da_calc_stats( ob_name, num_obs, field )
                                   mean_omb, mean_oma, stdv_omb, stdv_oma )
       end do
 
-      write(6,'(1x,a9,i5,a,i5,a,4f10.4)')ob_name, count, '/', num_obs, &
+      write(6,'(1x,a9,i8,a,i8,a,4f10.4)')ob_name, count, '/', num_obs, &
                                         '. O-B(m,s), O-A(m,s) =', &
                                         mean_omb, stdv_omb, mean_oma, stdv_oma
 
@@ -804,7 +903,7 @@ subroutine da_calc_stats_sound( num_obs, sound )
                                      mean_omb, mean_oma, stdv_omb, stdv_oma  )
          end do
       end do
-      write(6,'(1x,a9,i5,a,i5,a,4f10.4)')'sound u  ', count, '/', count1, &
+      write(6,'(1x,a9,i8,a,i8,a,4f10.4)')'sound u  ', count, '/', count1, &
                                         '. O-B(m,s), O-A(m,s) =', &
                                         mean_omb, stdv_omb, mean_oma, stdv_oma
 
@@ -818,7 +917,7 @@ subroutine da_calc_stats_sound( num_obs, sound )
                                      mean_omb, mean_oma, stdv_omb, stdv_oma  )
          end do
       end do
-      write(6,'(1x,a9,i5,a,i5,a,4f10.4)')'sound v  ', count, '/', count1, &
+      write(6,'(1x,a9,i8,a,i8,a,4f10.4)')'sound v  ', count, '/', count1, &
                                         '. O-B(m,s), O-A(m,s) =', &
                                         mean_omb, stdv_omb, mean_oma, stdv_oma
 
@@ -832,7 +931,7 @@ subroutine da_calc_stats_sound( num_obs, sound )
                                      mean_omb, mean_oma, stdv_omb, stdv_oma  )
          end do
       end do
-      write(6,'(1x,a9,i5,a,i5,a,4f10.4)')'sound t  ', count, '/', count1, &
+      write(6,'(1x,a9,i8,a,i8,a,4f10.4)')'sound t  ', count, '/', count1, &
                                         '. O-B(m,s), O-A(m,s) =', &
                                         mean_omb, stdv_omb, mean_oma, stdv_oma
 
@@ -846,7 +945,7 @@ subroutine da_calc_stats_sound( num_obs, sound )
                                      mean_omb, mean_oma, stdv_omb, stdv_oma  )
          end do
       end do
-      write(6,'(1x,a9,i5,a,i5,a,4f10.4)')'sound p  ', count, '/', count1, &
+      write(6,'(1x,a9,i8,a,i8,a,4f10.4)')'sound p  ', count, '/', count1, &
                                         '. O-B(m,s), O-A(m,s) =', &
                                         mean_omb, stdv_omb, mean_oma, stdv_oma
 
@@ -860,7 +959,7 @@ subroutine da_calc_stats_sound( num_obs, sound )
                                      mean_omb, mean_oma, stdv_omb, stdv_oma  )
          end do
       end do
-      write(6,'(1x,a9,i5,a,i5,a,4f10.4)')'sound q  ', count, '/', count1, &
+      write(6,'(1x,a9,i8,a,i8,a,4f10.4)')'sound q  ', count, '/', count1, &
                                         '. O-B(m,s), O-A(m,s) =', &
                                         mean_omb, stdv_omb, mean_oma, stdv_oma
       write(6,*)
@@ -906,7 +1005,7 @@ subroutine da_calc_stats_airep( num_obs, airep )
                                     mean_omb, mean_oma, stdv_omb, stdv_oma  )
          end do
       end do
-      write(6,'(1x,a9,i5,a,i5,a,4f10.4)')'airep v  ', count, '/', count1, &
+      write(6,'(1x,a9,i8,a,i8,a,4f10.4)')'airep v  ', count, '/', count1, &
                                         '. O-B(m,s), O-A(m,s) =', &
                                         mean_omb, stdv_omb, mean_oma, stdv_oma
       count = 0; count1 = 0
@@ -919,7 +1018,7 @@ subroutine da_calc_stats_airep( num_obs, airep )
                                     mean_omb, mean_oma, stdv_omb, stdv_oma  )
          end do
       end do
-      write(6,'(1x,a9,i5,a,i5,a,4f10.4)')'airep t  ', count, '/', count1, &
+      write(6,'(1x,a9,i8,a,i8,a,4f10.4)')'airep t  ', count, '/', count1, &
                                         '. O-B(m,s), O-A(m,s) =', &
                                         mean_omb, stdv_omb, mean_oma, stdv_oma
       write(6,*)
@@ -951,7 +1050,7 @@ subroutine da_calc_stats_pilot( num_obs, pilot )
                                      mean_omb, mean_oma, stdv_omb, stdv_oma  )
          end do
       end do
-      write(6,'(1x,a9,i5,a,i5,a,4f10.4)')'pilot u  ', count, '/', count1, &
+      write(6,'(1x,a9,i8,a,i8,a,4f10.4)')'pilot u  ', count, '/', count1, &
                                         '. O-B(m,s), O-A(m,s) =', &
                                         mean_omb, stdv_omb, mean_oma, stdv_oma
 
@@ -965,7 +1064,7 @@ subroutine da_calc_stats_pilot( num_obs, pilot )
                                      mean_omb, mean_oma, stdv_omb, stdv_oma  )
          end do
       end do
-      write(6,'(1x,a9,i5,a,i5,a,4f10.4)')'pilot v  ', count, '/', count1, &
+      write(6,'(1x,a9,i8,a,i8,a,4f10.4)')'pilot v  ', count, '/', count1, &
                                         '. O-B(m,s), O-A(m,s) =', &
                                         mean_omb, stdv_omb, mean_oma, stdv_oma
       write(6,*)
@@ -996,7 +1095,7 @@ subroutine da_calc_stats_satem( num_obs, satem )
                                      mean_omb, mean_oma, stdv_omb, stdv_oma  )
          end do
       end do
-      write(6,'(1x,a9,i5,a,i5,a,4f10.4)')'satem thk', count, '/', count1, &
+      write(6,'(1x,a9,i8,a,i8,a,4f10.4)')'satem thk', count, '/', count1, &
                                         '. O-B(m,s), O-A(m,s) =', &
                                         mean_omb, stdv_omb, mean_oma, stdv_oma
       write(6,*)
@@ -1028,7 +1127,7 @@ subroutine da_calc_stats_ssmt1( num_obs, ssmt1 )
                                      mean_omb, mean_oma, stdv_omb, stdv_oma  )
          end do
       end do
-      write(6,'(1x,a9,i5,a,i5,a,4f10.4)')'ssmt1 t  ', count, '/', count1, &
+      write(6,'(1x,a9,i8,a,i8,a,4f10.4)')'ssmt1 t  ', count, '/', count1, &
                                         '. O-B(m,s), O-A(m,s) =', &
                                         mean_omb, stdv_omb, mean_oma, stdv_oma
       write(6,*)
@@ -1060,7 +1159,7 @@ subroutine da_calc_stats_ssmt2( num_obs, ssmt2 )
                                      mean_omb, mean_oma, stdv_omb, stdv_oma  )
          end do
       end do
-      write(6,'(1x,a9,i5,a,i5,a,4f10.4)')'ssmt2 rh ', count, '/', count1, &
+      write(6,'(1x,a9,i8,a,i8,a,4f10.4)')'ssmt2 rh ', count, '/', count1, &
                                         '. O-B(m,s), O-A(m,s) =', &
                                         mean_omb, stdv_omb, mean_oma, stdv_oma
       write(6,*)
