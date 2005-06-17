@@ -29,7 +29,7 @@ Subroutine DA_Transform_XToWTQ ( xp, xb, xa )
                        xa%psfc(i,j), xa%tgrn(i,j), &
                        xa%p(i,j,kz), xa%t(i,j,kz), xa%q(i,j,kz), &
                        xa%u(i,j,kz), xa%v(i,j,kz), &
-                       xb%h(i,j,kz), xb%rough(i,j), xb%landmask(i,j), &
+                       xb%h(i,j,kz), xb%rough(i,j), xb%xland(i,j), &
                        xa%u10(i,j), xa%v10(i,j), &
                        xa%t2(i,j),  xa%q2(i,j))
    enddo
