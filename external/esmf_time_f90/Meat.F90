@@ -483,8 +483,17 @@ IMPLICIT NONE
       iSn = timeinterval%basetime%Sn
       tSd = time1%basetime%Sd
       tSn = time1%basetime%Sn
+
+!     write(unit=*, fmt='(2a,2x,a,i6)') 'file:', __FILE__, 'line:', __LINE__
+
+!     print *, 'diy, daysapart, iSd, iSn, tSd, tSn=', diy, daysapart, iSd, iSn, tSd, tSn
+!     print *, 'time1%instant=', time1%instant
+
       IF ( iSd .NE. 0 ) THEN
         CALL compute_lcd( tSd , iSd , lcd )
+
+!       print *, 'tSd, iSd, lcd=', tSd , iSd , lcd
+
 	if ( tSd .EQ. 0 ) tSd = 1
         time2%basetime%Sd = lcd
         time2%basetime%Sn = (tSn * lcd / tSd) - (iSn * lcd / iSd)
@@ -510,32 +519,37 @@ IMPLICIT NONE
 
         time2%basetime%S = time1%basetime%S - timeinterval%basetime%S
         diy = diy - timeinterval%DD
-        IF ( time2%basetime%S .LT. 0 ) THEN
+        IF ( time2%basetime%S < 0 ) THEN
           diy = diy - 1
           time2%basetime%S = time2%basetime%S + 3600*24
         ENDIF
-        IF ( nfeb(time1%YR) .NE. 29 ) THEN
-          time2%YR = time1%YR
-          IF ( diy .lt. 1 ) THEN
-            diy = diy + 365
-            time2%YR = time2%YR - 1
+
+        time2%YR = time1%YR
+
+        IF ( diy .lt. 1 ) THEN
+          diy = diy + 365
+          time2%YR = time2%YR - 1
+          IF ( nfeb(time2%YR) == 29 ) THEN
+             diy = diy + 1
           ENDIF
-          time2%MM = daym( diy )
-          time2%DD = diy - mdaycum(time2%MM-1)
-        ELSE
-          time2%YR = time1%YR
-          IF ( diy .lt. 1 ) THEN
-            diy = diy + 366
-            time2%YR = time2%YR - 1
-          ENDIF
-          time2%MM = diy
-          time2%DD = diy - mdayleapcum(time2%MM-1)
         ENDIF
+
+        time2%MM = daym( diy )
+
+        IF ( nfeb(time2%YR) == 29 ) THEN
+          time2%DD = diy - mdayleapcum(time2%MM-1)
+        ELSE
+          time2%DD = diy - mdaycum(time2%MM-1)
+        ENDIF
+
         time2%basetime%S = mod( time2%basetime%S, 3600*24 )
       ELSE
         time2%DD = time1%DD - timeinterval%DD
         time2%MM = time1%MM - timeinterval%MM
       ENDIF
+
+!     print *, 'final: time1%YR, time1%MM, time1%DD, time1%basetime%S=', time1%YR, time1%MM, time1%DD, time1%basetime%S
+!     print *, 'final: time2%YR, time2%MM, time2%DD, time2%basetime%S=', time2%YR, time2%MM, time2%DD, time2%basetime%S
 
 END SUBROUTINE c_esmc_basetimediff
 
@@ -555,10 +569,14 @@ SUBROUTINE c_esmc_clockaddalarm
 END SUBROUTINE c_esmc_clockaddalarm
 SUBROUTINE c_esmc_clockadvance
 END SUBROUTINE c_esmc_clockadvance
+SUBROUTINE c_esmc_clockback
+END SUBROUTINE c_esmc_clockback
 SUBROUTINE c_esmc_clockgetadvancecount
 END SUBROUTINE c_esmc_clockgetadvancecount
 SUBROUTINE c_esmc_clockgetalarmlist
 END SUBROUTINE c_esmc_clockgetalarmlist
+SUBROUTINE c_esmc_clockgetbackcount
+END SUBROUTINE c_esmc_clockgetbackcount
 SUBROUTINE c_esmc_clockgetcurrsimtime
 END SUBROUTINE c_esmc_clockgetcurrsimtime
 SUBROUTINE c_esmc_clockgetcurrtime
@@ -579,6 +597,8 @@ SUBROUTINE c_esmc_clockgettimestep
 END SUBROUTINE c_esmc_clockgettimestep
 SUBROUTINE c_esmc_clockisstoptime
 END SUBROUTINE c_esmc_clockisstoptime
+SUBROUTINE c_esmc_clockisstarttime
+END SUBROUTINE c_esmc_clockisstarttime
 SUBROUTINE c_esmc_clockprint
 END SUBROUTINE c_esmc_clockprint
 SUBROUTINE c_esmc_clockread
@@ -695,28 +715,4 @@ SUBROUTINE print_a_timeinterval( time )
    write(0,*)'Print a time interval|',TRIM(s),'|'
    return
 END SUBROUTINE print_a_timeinterval
-
-SUBROUTINE atotime ( str, time )
-   use ESMF_basemod
-   use ESMF_Timemod
-   type(ESMF_Time) time
-   character*(*) str
-   integer yr, mm, dd, h, m, s, ms
-   integer rc
-   if ( len( str ) .ge. 20 ) then
-     if ( str(20:20) .eq. '.' ) then
-       read(str,34) yr,mm,dd,h,m,s,ms
-     else
-       read(str,33) yr,mm,dd,h,m,s
-       ms = 0
-     endif
-   else
-     read(str,33) yr,mm,dd,h,m,s
-     ms = 0
-   endif
-   CALL ESMF_TimeSet( time, YR=yr, MM=mm, DD=dd, H=h, M=m, S=s, MS=ms, rc=rc )
-33 format (I4.4,1x,I2.2,1x,I2.2,1x,I2.2,1x,I2.2,1x,I2.2)
-34 format (I4.4,1x,I2.2,1x,I2.2,1x,I2.2,1x,I2.2,1x,I2.2,1x,I4.4)
-   return
-END SUBROUTINE atotime
 

@@ -28,7 +28,8 @@ SUBROUTINE da_setup_obs_structures_ascii( xp, ob, iv )
    iv%num_sound = 0
    iv%num_synop = 0
    iv%num_pilot = 0
-   iv%num_satob = 0
+   iv%num_geoamv = 0
+   iv%num_polaramv = 0
    iv%num_satem = 0
    iv%num_airep = 0
    iv%num_metar = 0
@@ -44,13 +45,15 @@ SUBROUTINE da_setup_obs_structures_ascii( xp, ob, iv )
    iv%num_profiler  = 0
    iv%num_buoy  = 0
    iv%num_radar  = 0
+   iv%num_bogus  = 0
 
    do n=0, max_fgat_time
       iv%ob_numb(n)%total = 0
       iv%ob_numb(n)%sound = 0
       iv%ob_numb(n)%synop = 0
       iv%ob_numb(n)%pilot = 0
-      iv%ob_numb(n)%satob = 0
+      iv%ob_numb(n)%geoamv = 0
+      iv%ob_numb(n)%polaramv = 0
       iv%ob_numb(n)%satem = 0
       iv%ob_numb(n)%airep = 0
       iv%ob_numb(n)%metar = 0
@@ -66,6 +69,7 @@ SUBROUTINE da_setup_obs_structures_ascii( xp, ob, iv )
       iv%ob_numb(n)%profiler  = 0
       iv%ob_numb(n)%buoy  = 0
       iv%ob_numb(n)%radar  = 0
+      iv%ob_numb(n)%bogus  = 0
    enddo
 
 !-----------------------------------------------------------------------------
@@ -122,8 +126,10 @@ SUBROUTINE da_setup_obs_structures_ascii( xp, ob, iv )
       iv%num_synop = max_synop_input
    if(iv%num_pilot > max_pilot_input ) &
       iv%num_pilot = max_pilot_input
-   if(iv%num_satob > max_satob_input ) &
-      iv%num_satob = max_satob_input
+   if(iv%num_geoamv > max_geoamv_input ) &
+      iv%num_geoamv = max_geoamv_input
+   if(iv%num_polaramv > max_polaramv_input ) &
+      iv%num_polaramv = max_polaramv_input
    if(iv%num_satem > max_satem_input ) &
       iv%num_satem = max_satem_input
    if(iv%num_airep > max_airep_input ) &
@@ -150,6 +156,8 @@ SUBROUTINE da_setup_obs_structures_ascii( xp, ob, iv )
       iv%num_buoy = max_buoy_input
    if(iv%num_radar > max_radar_input ) &
       iv%num_radar = max_radar_input
+   if(iv%num_bogus > max_bogus_input ) &
+      iv%num_bogus = max_bogus_input
 !  if(iv%num_pseudo > max_pseudo_input ) &
 !     iv%num_pseudo = max_pseudo_input
 
@@ -165,7 +173,8 @@ SUBROUTINE da_setup_obs_structures_ascii( xp, ob, iv )
    iv%num_sound = 0
    iv%num_synop = 0
    iv%num_pilot = 0
-   iv%num_satob = 0
+   iv%num_geoamv = 0
+   iv%num_polaramv = 0
    iv%num_satem = 0
    iv%num_airep = 0
    iv%num_metar = 0
@@ -181,6 +190,7 @@ SUBROUTINE da_setup_obs_structures_ascii( xp, ob, iv )
    iv%num_profiler  = 0
    iv%num_buoy  = 0
    iv%num_radar  = 0
+   iv%num_bogus  = 0
 
 !-----------------------------------------------------------------------------
 

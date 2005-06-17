@@ -12,7 +12,7 @@ Subroutine DA_Transform_XToWTQ ( xp, xb, xa )
 !  [1.0] Calculate surface variable(1-m wind, 2-m moisture and temperature)
 ! --------------------------------------------------------------------------
 
-   kz = xp%kte
+   kz = xp%kts
 
 ! --------------------------------------------------------------------------
 !  [2.0] Calculate sfc variable perturbations at the cross point
