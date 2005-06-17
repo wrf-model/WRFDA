@@ -190,7 +190,8 @@ SUBROUTINE DA_Transfer_KMAToXb( xbx, grid, &
       xb%tgrn(i,j) = sst(i,j)
       if(xb%tgrn(i,j) < 100.0) xb%tgrn(i,j) = tmn(i,j)
       xb%lanu(i,j)     = lu_index(i,j)
-      xb%landmask(i,j) = xland(i,j)
+      xb%landmask(i,j) = landmask(i,j)
+      xb%xland(i,j) = xland(i,j)
       xb%snow(i,j)     = snowc(i,j)
 !------------------------------------------------------------------------------
 !

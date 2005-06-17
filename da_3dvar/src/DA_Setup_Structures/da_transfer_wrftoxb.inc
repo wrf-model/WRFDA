@@ -292,7 +292,8 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
        xb%terr(i,j) = ht(i,j)
        xb%snow(i,j) = snowc(i,j)
        xb%lanu(i,j) = lu_index(i,j)
-       xb%landmask(i,j) = xland(i,j)
+       xb%landmask(i,j) = landmask(i,j)
+       xb%xland(i,j) = xland(i,j)
      enddo
 
 #if 0
