@@ -479,6 +479,8 @@ RECURSIVE SUBROUTINE integrate_ad ( grid, nl_date_string, nl_date_index, ad_date
 !--------end check adjoint input
 !          CALL med_last_solve_ad_io ( grid , config_flags )
          call med_filter_out ( grid , config_flags )
+!--------Force output last gradient.
+         call med_hist_out ( grid , 0 , config_flags )
       ELSE
         IF ( ESMF_ClockIsStartTime(grid%domain_clock , rc=rc) .OR. &
              ESMF_ClockIsStartTime(grid%parents(1)%ptr%domain_clock , rc=rc ) ) THEN
