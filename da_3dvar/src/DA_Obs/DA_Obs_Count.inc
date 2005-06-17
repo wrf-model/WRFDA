@@ -30,7 +30,8 @@ SUBROUTINE DA_Obs_Count(count_obs, fm, cycle_report, &
                         count_obs %num_pilot % num_outside_iyjx, &
                         count_obs %num_sound % num_outside_iyjx, &
                         count_obs %num_satem % num_outside_iyjx, &
-                        count_obs %num_satob % num_outside_iyjx, &
+                        count_obs %num_geoamv % num_outside_iyjx, &
+                        count_obs %num_polaramv % num_outside_iyjx, &
                         count_obs %num_airep % num_outside_iyjx, &
                         count_obs %num_gpspw  % num_outside_iyjx, &
                         count_obs %num_gpsref % num_outside_iyjx, &
@@ -53,7 +54,8 @@ SUBROUTINE DA_Obs_Count(count_obs, fm, cycle_report, &
                         count_obs %num_pilot % num_used, &
                         count_obs %num_sound % num_used, &
                         count_obs %num_satem % num_used, &
-                        count_obs %num_satob % num_used, &
+                        count_obs %num_geoamv % num_used, &
+                        count_obs %num_polaramv % num_used, &
                         count_obs %num_airep % num_used, &
                         count_obs %num_gpspw  % num_used, &
                         count_obs %num_gpsref % num_used, &

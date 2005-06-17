@@ -11,6 +11,9 @@ SUBROUTINE DA_UVPRho_To_W_Lin( xb, xa, xp,                 &
 !
 !  HISTORY: 07/21/2002 - Creation of F90 version. Qingnong Xiao
 !  HISTORY: 04/15/2004 - Modified of F90 version. Jianfeng Gu
+!           02/02/2005 - Map factor fix and global update      Syed RH Rizvi 
+!           06/02/2005 - fixed the bug and update the DIV.  Yong-Run Guo
+!
 !------------------------------------------------------------------------------
 
    IMPLICIT NONE
@@ -28,15 +31,13 @@ SUBROUTINE DA_UVPRho_To_W_Lin( xb, xa, xp,                 &
    integer                       :: its,ite, jts,jte, kts,kte
 
    integer                       :: I,J,K
-   real                          :: INV_2DS
 
    real, dimension(ims:ime,jms:jme,kms:kme) :: URHO, VRHO
    real, dimension(ims:ime,jms:jme,kms:kme) :: DIV, WZ
    real                                     :: TERM3
+
    
 !------------------------------------------------------------------------------
-
-   INV_2DS=0.5/xb%ds  ! Refer to DA_UV_To_Divergence, in /DA_Dynamics
 
 !  Computation to check for edge of domain:
    is = its; ie = ite; js = jts; je = jte
@@ -45,23 +46,21 @@ SUBROUTINE DA_UVPRho_To_W_Lin( xb, xa, xp,                 &
 
     WZ(:,:,:) = 0.0
 ! Term 1.1: perturbed pressure advection along the basic wind
-
    DO K=kts,kte
       DO J=js,je
       DO I=is,ie
-         WZ(I,J,K)=WZ(I,J,K)-xb%u(I,J,K)*(xa%p(I+1,J,K)-xa%p(I-1,J,K))*INV_2DS
-         WZ(I,J,K)=WZ(I,J,K)-xb%v(I,J,K)*(xa%p(I,J+1,K)-xa%p(I,J-1,K))*INV_2DS
+         WZ(I,J,K)=WZ(I,J,K)-xb%u(I,J,K)*(xa%p(I+1,J,K)-xa%p(I-1,J,K))*xb%coefx(I,J)
+         WZ(I,J,K)=WZ(I,J,K)-xb%v(I,J,K)*(xa%p(I,J+1,K)-xa%p(I,J-1,K))*xb%coefy(I,J)
       ENDDO
       ENDDO
    ENDDO
-
 ! Term 1.2: Basic pressure advection along the perturbed wind
 
    DO K=kts,kte
       DO J=js,je
       DO I=is,ie
-         WZ(I,J,K)=WZ(I,J,K)-xa%u(I,J,K)*(xb%p(I+1,J,K)-xb%p(I-1,J,K))*INV_2DS
-         WZ(I,J,K)=WZ(I,J,K)-xa%v(I,J,K)*(xb%p(I,J+1,K)-xb%p(I,J-1,K))*INV_2DS
+         WZ(I,J,K)=WZ(I,J,K)-xa%u(I,J,K)*(xb%p(I+1,J,K)-xb%p(I-1,J,K))*xb%coefx(I,J)
+         WZ(I,J,K)=WZ(I,J,K)-xa%v(I,J,K)*(xb%p(I,J+1,K)-xb%p(I,J-1,K))*xb%coefy(I,J)
       ENDDO
       ENDDO
    ENDDO
@@ -107,7 +106,7 @@ SUBROUTINE DA_UVPRho_To_W_Lin( xb, xa, xp,                 &
 
 ! Term 2.1: Divergence term from perturbed wind
 
-   CALL DA_UV_To_Divergence(xb%ds,xb%map_factor,xa%u,xa%v,DIV, &
+   CALL DA_UV_To_Divergence(xb, xa%u, xa%v, DIV, &
                             ids,ide, jds,jde, kds,kde,         &
                             ims,ime, jms,jme, kms,kme,         &
                             its,ite, jts,jte, kts,kte )
@@ -122,7 +121,7 @@ SUBROUTINE DA_UVPRho_To_W_Lin( xb, xa, xp,                 &
 
 ! Term 2.2: Divergence term from basic wind
 
-   CALL DA_UV_To_Divergence(xb%ds,xb%map_factor,xb%u,xb%v,DIV, &
+   CALL DA_UV_To_Divergence(xb, xb%u, xb%v, DIV, &
                             ids,ide, jds,jde, kds,kde,         &
                             ims,ime, jms,jme, kms,kme,         &
                             its,ite, jts,jte, kts,kte )
@@ -151,7 +150,7 @@ SUBROUTINE DA_UVPRho_To_W_Lin( xb, xa, xp,                 &
       ENDDO
    ENDDO
 
-   CALL DA_UV_To_Divergence(xb%ds,xb%map_factor,URHO,VRHO,DIV, &
+   CALL DA_UV_To_Divergence(xb, URHO, VRHO, DIV, &
                             ids,ide, jds,jde, kds,kde,         &
                             ims,ime, jms,jme, kms,kme,         &
                             its,ite, jts,jte, kts,kte )
@@ -180,7 +179,7 @@ SUBROUTINE DA_UVPRho_To_W_Lin( xb, xa, xp,                 &
       ENDDO
    ENDDO
 
-   CALL DA_UV_To_Divergence(xb%ds,xb%map_factor,URHO,VRHO,DIV, &
+   CALL DA_UV_To_Divergence(xb, URHO, VRHO, DIV, &
                             ids,ide, jds,jde, kds,kde,         &
                             ims,ime, jms,jme, kms,kme,         &
                             its,ite, jts,jte, kts,kte )
@@ -223,9 +222,9 @@ SUBROUTINE DA_UVPRho_To_W_Lin( xb, xa, xp,                 &
 
 ! Integration to calculate the vertical velocity 
 
-   CALL LADJUST(INV_2DS,xb,xa%w,WZ,                     &
-                ids,ide, jds,jde, kds,kde,              &
-                ims,ime, jms,jme, kms,kme,              &
+   CALL LADJUST(xb,xa%w,WZ,                  &
+                ids,ide, jds,jde, kds,kde,   &
+                ims,ime, jms,jme, kms,kme,   &
                 its,ite, jts,jte, kts,kte )
 
    DO J=jts,jte

@@ -9,11 +9,13 @@ MODULE DA_Obs
    USE DA_Pilot
    USE DA_Radar
    USE DA_ssmi
-   USE DA_Satob
    USE DA_Satem
+   USE DA_GeoAMV
+   USE DA_PolarAMV
    USE DA_Ships
    USE DA_Synop
    USE DA_Sound
+   USE DA_Bogus
    USE da_pseudo
    USE da_qscat
    USE DA_Profiler
@@ -41,7 +43,7 @@ CONTAINS
 #include "da_store_obs_grid_info.inc"
 #include "da_use_obs_errfac.inc"
 #include "da_write_obs.inc"
+#include "da_write_filtered_obs.inc"
 #include "da_write_y.inc"
 
 END MODULE DA_Obs
-
