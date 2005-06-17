@@ -1120,89 +1120,43 @@ SUBROUTINE med_auxinput1_in ( grid , config_flags )
    USE module_configure
    IMPLICIT NONE
 
-   INTERFACE
-      SUBROUTINE med_auxinput_in ( grid , stream, config_flags, nl_timestr )
-        ! Driver layer
-         USE module_domain
-         USE module_io_domain
-        ! Model layer
-         USE module_configure
-         USE module_bc_time_utilities
-         USE WRF_ESMF_MOD
-
-         IMPLICIT NONE
-        ! Arguments
-         TYPE(domain)                               :: grid
-         TYPE (grid_config_rec_type) , INTENT(IN)   :: config_flags
-         INTEGER , INTENT(IN)                       :: stream
-         character(len=*), intent(in), optional     :: nl_timestr
-      END SUBROUTINE med_auxinput_in
-   END INTERFACE
-
    TYPE(domain)                               :: grid
    TYPE (grid_config_rec_type) , INTENT(IN)   :: config_flags
    CALL med_auxinput_in( grid , 1 , config_flags )
    RETURN
 END SUBROUTINE med_auxinput1_in
 
-SUBROUTINE med_auxinput2_in ( grid , config_flags , nl_timestr )
+SUBROUTINE med_auxinput2_in ( grid , config_flags )
    USE module_domain
    USE module_configure
    IMPLICIT NONE
 
-   INTERFACE
-      SUBROUTINE med_auxinput_in ( grid , stream, config_flags, nl_timestr )
-        ! Driver layer
-         USE module_domain
-         USE module_io_domain
-        ! Model layer
-         USE module_configure
-         USE module_bc_time_utilities
-         USE WRF_ESMF_MOD
+   TYPE(domain)                               :: grid
+   TYPE (grid_config_rec_type) , INTENT(IN)   :: config_flags
 
-         IMPLICIT NONE
-        ! Arguments
-         TYPE(domain)                               :: grid
-         TYPE (grid_config_rec_type) , INTENT(IN)   :: config_flags
-         INTEGER , INTENT(IN)                       :: stream
-         character(len=*), intent(in), optional     :: nl_timestr
-      END SUBROUTINE med_auxinput_in
-   END INTERFACE
+   CALL med_auxinput_in( grid , 2 , config_flags )
+   RETURN
+END SUBROUTINE med_auxinput2_in
+
+SUBROUTINE med_auxinput2_in4ad ( grid , config_flags , nl_timestr )
+   USE module_domain
+   USE module_configure
+   IMPLICIT NONE
 
    TYPE(domain)                               :: grid
    TYPE (grid_config_rec_type) , INTENT(IN)   :: config_flags
-   character(len=*), intent(in), optional     :: nl_timestr
-   if( present(nl_timestr) ) then
-      CALL med_auxinput_in( grid , 2 , config_flags , nl_timestr )
-   else
-      CALL med_auxinput_in( grid , 2 , config_flags )
-   endif
+   character(len=*), intent(in), INTENT(IN)   :: nl_timestr
+
+   write(unit=*, fmt='(3a,i6)') 'file:', __FILE__, ', line:', __LINE__
+   print *, 'nl_timestr=', nl_timestr
+   CALL med_auxinput4ad( grid , 2 , config_flags , nl_timestr )
    RETURN
-END SUBROUTINE med_auxinput2_in
+END SUBROUTINE med_auxinput2_in4ad
 
 SUBROUTINE med_auxinput3_in ( grid , config_flags )
    USE module_domain
    USE module_configure
    IMPLICIT NONE
-
-   INTERFACE
-      SUBROUTINE med_auxinput_in ( grid , stream, config_flags, nl_timestr )
-        ! Driver layer
-         USE module_domain
-         USE module_io_domain
-        ! Model layer
-         USE module_configure
-         USE module_bc_time_utilities
-         USE WRF_ESMF_MOD
-
-         IMPLICIT NONE
-        ! Arguments
-         TYPE(domain)                               :: grid
-         TYPE (grid_config_rec_type) , INTENT(IN)   :: config_flags
-         INTEGER , INTENT(IN)                       :: stream
-         character(len=*), intent(in), optional     :: nl_timestr
-      END SUBROUTINE med_auxinput_in
-   END INTERFACE
 
    TYPE(domain)                               :: grid
    TYPE (grid_config_rec_type) , INTENT(IN)   :: config_flags
@@ -1215,25 +1169,6 @@ SUBROUTINE med_auxinput4_in ( grid , config_flags )
    USE module_configure
    IMPLICIT NONE
 
-   INTERFACE
-      SUBROUTINE med_auxinput_in ( grid , stream, config_flags, nl_timestr )
-        ! Driver layer
-         USE module_domain
-         USE module_io_domain
-        ! Model layer
-         USE module_configure
-         USE module_bc_time_utilities
-         USE WRF_ESMF_MOD
-
-         IMPLICIT NONE
-        ! Arguments
-         TYPE(domain)                               :: grid
-         TYPE (grid_config_rec_type) , INTENT(IN)   :: config_flags
-         INTEGER , INTENT(IN)                       :: stream
-         character(len=*), intent(in), optional     :: nl_timestr
-      END SUBROUTINE med_auxinput_in
-   END INTERFACE
-
    TYPE(domain)                               :: grid
    TYPE (grid_config_rec_type) , INTENT(IN)   :: config_flags
    CALL med_auxinput_in( grid , 4 , config_flags )
@@ -1245,32 +1180,13 @@ SUBROUTINE med_auxinput5_in ( grid , config_flags )
    USE module_configure
    IMPLICIT NONE
 
-   INTERFACE
-      SUBROUTINE med_auxinput_in ( grid , stream, config_flags, nl_timestr )
-        ! Driver layer
-         USE module_domain
-         USE module_io_domain
-        ! Model layer
-         USE module_configure
-         USE module_bc_time_utilities
-         USE WRF_ESMF_MOD
-
-         IMPLICIT NONE
-        ! Arguments
-         TYPE(domain)                               :: grid
-         TYPE (grid_config_rec_type) , INTENT(IN)   :: config_flags
-         INTEGER , INTENT(IN)                       :: stream
-         character(len=*), intent(in), optional     :: nl_timestr
-      END SUBROUTINE med_auxinput_in
-   END INTERFACE
-
    TYPE(domain)                               :: grid
    TYPE (grid_config_rec_type) , INTENT(IN)   :: config_flags
    CALL med_auxinput_in( grid , 5 , config_flags )
    RETURN
 END SUBROUTINE med_auxinput5_in
 
-SUBROUTINE med_auxinput_in ( grid , stream, config_flags, nl_timestr )
+SUBROUTINE med_auxinput_in ( grid , stream, config_flags )
   ! Driver layer
    USE module_domain
    USE module_io_domain
@@ -1284,7 +1200,6 @@ SUBROUTINE med_auxinput_in ( grid , stream, config_flags, nl_timestr )
    TYPE(domain)                               :: grid
    TYPE (grid_config_rec_type) , INTENT(IN)   :: config_flags
    INTEGER , INTENT(IN)                       :: stream
-   character(len=*), intent(in), optional     :: nl_timestr
   ! Local
    LOGICAL, EXTERNAL :: wrf_dm_on_monitor
    CHARACTER*80                           :: rstname , outname, auxname, n1, n2
@@ -1301,13 +1216,11 @@ SUBROUTINE med_auxinput_in ( grid , stream, config_flags, nl_timestr )
    ENDIF
 
    IF(stream == 2) THEN
-     if( present(nl_timestr) ) then
-        timestr = trim( nl_timestr )
-     else
-        CALL ESMF_ClockGet( grid%domain_clock, CurrTime=CurrTime, rc=ierr )
-        CALL wrf_timetoa ( CurrTime, timestr )
-     endif
+     CALL ESMF_ClockGet( grid%domain_clock, CurrTime=CurrTime, rc=ierr )
+     CALL wrf_timetoa ( CurrTime, timestr )
      CALL construct_filename2a ( auxname , config_flags%auxinput2_inname , grid%id , 2 , timestr )
+     WRITE ( message , '("build auxname <",A,"> for stream:",I3,", timestr <",A,">")') TRIM ( auxname ), stream, trim(timestr)
+     CALL wrf_debug( 1, message )
      WRITE(n2,'("DATASET=AUXINPUT",I1)')stream
      WRITE ( message , '("med_auxinput_in : opening ",A," for reading. ",I3)') TRIM ( auxname ), ierr
      CALL wrf_debug( 1, message )
@@ -1329,6 +1242,8 @@ SUBROUTINE med_auxinput_in ( grid , stream, config_flags, nl_timestr )
      CALL ESMF_ClockGet( grid%domain_clock, CurrTime=CurrTime, rc=ierr )
      CALL wrf_timetoa ( CurrTime, timestr )
      CALL construct_filename2a ( auxname , config_flags%auxinput3_inname , grid%id , 2 , timestr )
+     WRITE ( message , '("build auxname <",A,"> for stream:",I3,", timestr <",A,">")') TRIM ( auxname ), stream, trim(timestr)
+     CALL wrf_debug( 1, message )
      WRITE(n2,'("DATASET=AUXINPUT",I1)')stream
      WRITE ( message , '("med_auxinput_in : opening ",A," for reading. ",I3)') TRIM ( auxname ), ierr
      CALL wrf_debug( 1, message )
@@ -1419,6 +1334,70 @@ SUBROUTINE med_auxinput_in ( grid , stream, config_flags, nl_timestr )
 
    RETURN
 END SUBROUTINE med_auxinput_in
+
+SUBROUTINE med_auxinput4ad ( grid , stream, config_flags, nl_timestr )
+  ! Driver layer
+   USE module_domain
+   USE module_io_domain
+  ! Model layer
+   USE module_configure
+   USE module_bc_time_utilities
+   USE WRF_ESMF_MOD
+
+   IMPLICIT NONE
+  ! Arguments
+   TYPE(domain)                               :: grid
+   TYPE (grid_config_rec_type) , INTENT(IN)   :: config_flags
+   INTEGER , INTENT(IN)                       :: stream
+   character(len=*), intent(in)               :: nl_timestr
+  ! Local
+   LOGICAL, EXTERNAL :: wrf_dm_on_monitor
+   CHARACTER*80                           :: rstname , outname, auxname, n1, n2
+   INTEGER                                :: fid , rid
+   CHARACTER (LEN=256)                    :: message
+   INTEGER                                :: ierr
+   INTEGER                                :: myproc
+   TYPE(ESMF_Time)                        :: CurrTime
+   CHARACTER*80                           :: timestr
+
+   IF ( stream /= 2 ) THEN
+     WRITE(message,*)'med_auxinput4ad: invalid inputory stream ',stream
+     CALL wrf_error_fatal( message )
+   ENDIF
+
+     timestr = trim( nl_timestr )
+     ierr = 0
+
+     write(unit=*, fmt='(3a,i6)') 'file:', __FILE__, ', line:', __LINE__
+     print *, 'nl_timestr=', nl_timestr
+
+     CALL construct_filename2a ( auxname , config_flags%auxinput2_inname , grid%id , 2 , timestr )
+     WRITE(n2,'("DATASET=AUXINPUT",I1)')stream
+
+     print *, 'auxname=', auxname
+
+     WRITE ( message , '("med_auxinput_in : opening ",A," for reading. ",I3)') TRIM ( auxname ), ierr
+     CALL wrf_debug( 1, message )
+
+     CALL open_r_dataset ( grid%auxinput2_oid, TRIM(auxname), grid , config_flags , n2, ierr )
+
+     IF ( ierr .NE. 0 ) THEN
+       CALL wrf_message( message )
+     ENDIF
+
+     CALL input_aux_model_input2 ( grid%auxinput2_oid, grid , config_flags , ierr )
+
+     write(unit=20, fmt='(2a)') &
+              '    message:', trim(message)
+
+     write(unit=20, fmt='(2a,2x,a,f12.4)') &
+              'xyh timestr:',trim(timestr), &
+              'grid%t_2(1,1,1)=', grid%em_t_2(1,1,1)
+
+     CALL close_dataset ( grid%auxinput2_oid , config_flags , n2)
+
+   RETURN
+END SUBROUTINE med_auxinput4ad
 
 SUBROUTINE med_filter_out ( grid , config_flags )
   ! Driver layer

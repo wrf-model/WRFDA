@@ -22,8 +22,8 @@ RECURSIVE SUBROUTINE integrate_tl ( grid, nl_date_string, nl_date_index )
 
    TYPE(domain) , POINTER :: grid
 
-   character(len=19), dimension(100), intent(in)    :: nl_date_string
-   integer,                           intent(inout) :: nl_date_index
+   character(len=19), dimension(1000), intent(in)    :: nl_date_string
+   integer,                            intent(inout) :: nl_date_index
 
 ! module_integrate:integrate
 ! <DESCRIPTION> 

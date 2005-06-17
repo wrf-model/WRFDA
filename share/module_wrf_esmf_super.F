@@ -273,10 +273,10 @@ CONTAINS
      TYPE(ESMF_Clock), INTENT(INOUT) :: clock
      INTEGER, INTENT(OUT) :: rc
 
-     character(len=19), dimension(100) :: nl_date_string
-     integer                           :: nl_date_index
-     character(len=19), dimension(100) :: ad_date_string
-     integer                           :: ad_date_index
+     character(len=19), dimension(1000) :: nl_date_string
+     integer                            :: nl_date_index
+     character(len=19), dimension(1000) :: ad_date_string
+     integer                            :: ad_date_index
 
 !<DESCRIPTION>
 !     WRF run routine.

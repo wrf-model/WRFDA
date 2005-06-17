@@ -4,8 +4,8 @@ SUBROUTINE Setup_date_string ( grid, date_string, adantn )
    USE WRF_ESMF_MOD
    IMPLICIT NONE
    TYPE(domain), POINTER :: grid
-   character(len=19), dimension(100), intent(out) :: date_string
-   character(len=2),                 intent(in ) :: adantn
+   character(len=19), dimension(1000), intent(out) :: date_string
+   character(len=2),                   intent(in ) :: adantn
 
    character(len=19)                             :: tmp_string, begin_date_string, end_date_string
 
@@ -176,7 +176,7 @@ SUBROUTINE Setup_date_string ( grid, date_string, adantn )
          ':', current_m, &
          ':', current_s
 
-      write(unit=*, fmt='(a,i2,2a)') &
+      write(unit=*, fmt='(a,i4,2a)') &
         'date_string(', index, ')=', date_string(index)
 
       write(6,*) 'xyh intervals =', local_interval_mo, local_interval_d, local_interval_h, local_interval_m, local_interval_s
@@ -196,7 +196,7 @@ SUBROUTINE Setup_date_string ( grid, date_string, adantn )
          ':', current_m, &
          ':', current_s
 
-      if(index > 99) exit
+      if(index > 1000) exit
    end do
 
    if( adantn /= 'tn' ) then ! reverse order

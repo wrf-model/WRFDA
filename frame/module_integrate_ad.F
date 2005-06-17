@@ -22,10 +22,10 @@ RECURSIVE SUBROUTINE integrate_ad ( grid, nl_date_string, nl_date_index, ad_date
 
    TYPE(domain) , POINTER :: grid
 
-   character(len=19), dimension(100), intent(in)    :: nl_date_string
-   integer,                          intent(inout) :: nl_date_index
-   character(len=19), dimension(100), intent(in)    :: ad_date_string
-   integer,                          intent(inout) :: ad_date_index
+   character(len=19), dimension(1000), intent(in)    :: nl_date_string
+   integer,                            intent(inout) :: nl_date_index
+   character(len=19), dimension(1000), intent(in)    :: ad_date_string
+   integer,                            intent(inout) :: ad_date_index
 
 ! module_integrate:integrate
 ! <DESCRIPTION> 
@@ -266,8 +266,8 @@ RECURSIVE SUBROUTINE integrate_ad ( grid, nl_date_string, nl_date_index, ad_date
               'read NL at currTime_str(1:19)=', currTime_str(1:19), &
               'nl_date_string(nl_date_index)(1:19)=', nl_date_string(nl_date_index)(1:19)
 ! ----do input
-         CALL med_auxinput2_in ( grid , config_flags , nl_date_string(nl_date_index) )
-         write(unit=10, fmt='(a,i2,2a,2x,a,f12.4)') &
+         CALL med_auxinput2_in4ad ( grid , config_flags , nl_date_string(nl_date_index) )
+         write(unit=10, fmt='(a,i4,2a,2x,a,f12.4)') &
               'xyh nl_date_string(', nl_date_index, ')=',nl_date_string(nl_date_index)(1:19), &
               'grid%t_2(1,1,1)=', grid%em_t_2(1,1,1)
                nl_date_index = nl_date_index + 1
@@ -276,8 +276,8 @@ RECURSIVE SUBROUTINE integrate_ad ( grid, nl_date_string, nl_date_index, ad_date
               'xyh no NL state at ', currTime_str(1:19)
          write(unit=*, fmt='(2a)') &
               'xyh use NL state from ', nl_date_string(nl_date_index)
-         CALL med_auxinput2_in ( grid , config_flags , nl_date_string(nl_date_index) )
-         write(unit=10, fmt='(a,i2,2a,2x,a,f12.4)') &
+         CALL med_auxinput2_in4ad ( grid , config_flags , nl_date_string(nl_date_index) )
+         write(unit=10, fmt='(a,i4,2a,2x,a,f12.4)') &
               'xyh nl_date_string(', nl_date_index, ')=',nl_date_string(nl_date_index)(1:19), &
               'grid%t_2(1,1,1)=', grid%em_t_2(1,1,1)
       endif
@@ -322,8 +322,8 @@ RECURSIVE SUBROUTINE integrate_ad ( grid, nl_date_string, nl_date_index, ad_date
                  'read NL at currTime_str(1:19)=', currTime_str(1:19), &
                  'nl_date_string(nl_date_index)(1:19)=', nl_date_string(nl_date_index)(1:19)
 ! ----do input
-            CALL med_auxinput2_in ( grid , config_flags , nl_date_string(nl_date_index) )
-            write(unit=10, fmt='(a,i2,2a,2x,a,f12.4)') &
+            CALL med_auxinput2_in4ad ( grid , config_flags , nl_date_string(nl_date_index) )
+            write(unit=10, fmt='(a,i4,2a,2x,a,f12.4)') &
                  'xyh nl_date_string(', nl_date_index, ')=',nl_date_string(nl_date_index)(1:19), &
                  'grid%t_2(1,1,1)=', grid%em_t_2(1,1,1)
                   nl_date_index = nl_date_index + 1
@@ -332,8 +332,8 @@ RECURSIVE SUBROUTINE integrate_ad ( grid, nl_date_string, nl_date_index, ad_date
                  'xyh no NL state at ', currTime_str(1:19)
             write(unit=*, fmt='(2a)') &
                  'xyh use NL state from ', nl_date_string(nl_date_index)
-            CALL med_auxinput2_in ( grid , config_flags , nl_date_string(nl_date_index) )
-            write(unit=10, fmt='(a,i2,2a,2x,a,f12.4)') &
+            CALL med_auxinput2_in4ad ( grid , config_flags , nl_date_string(nl_date_index) )
+            write(unit=10, fmt='(a,i4,2a,2x,a,f12.4)') &
                  'xyh nl_date_string(', nl_date_index, ')=',nl_date_string(nl_date_index)(1:19), &
                  'grid%t_2(1,1,1)=', grid%em_t_2(1,1,1)
          endif
@@ -444,8 +444,8 @@ RECURSIVE SUBROUTINE integrate_ad ( grid, nl_date_string, nl_date_index, ad_date
                  'read NL at currTime_str(1:19)=', currTime_str(1:19), &
                  'nl_date_string(nl_date_index)(1:19)=', nl_date_string(nl_date_index)(1:19)
 ! ----------do input
-            CALL med_auxinput2_in ( grid , config_flags , nl_date_string(nl_date_index) )
-            write(unit=10, fmt='(a,i2,2a,2x,a,f12.4)') &
+            CALL med_auxinput2_in4ad ( grid , config_flags , nl_date_string(nl_date_index) )
+            write(unit=10, fmt='(a,i4,2a,2x,a,f12.4)') &
                  'xyh nl_date_string(', nl_date_index, ')=',nl_date_string(nl_date_index)(1:19), &
                 'grid%t_2(1,1,1)=', grid%em_t_2(1,1,1)
                   nl_date_index = nl_date_index + 1
@@ -454,8 +454,8 @@ RECURSIVE SUBROUTINE integrate_ad ( grid, nl_date_string, nl_date_index, ad_date
                  'xyh no NL state at ', currTime_str(1:19)
             write(unit=*, fmt='(2a)') &
                  'xyh use NL state from ', nl_date_string(nl_date_index)
-            CALL med_auxinput2_in ( grid , config_flags , nl_date_string(nl_date_index) )
-            write(unit=10, fmt='(a,i2,2a,2x,a,f12.4)') &
+            CALL med_auxinput2_in4ad ( grid , config_flags , nl_date_string(nl_date_index) )
+            write(unit=10, fmt='(a,i4,2a,2x,a,f12.4)') &
                  'xyh nl_date_string(', nl_date_index, ')=',nl_date_string(nl_date_index)(1:19), &
                 'grid%t_2(1,1,1)=', grid%em_t_2(1,1,1)
          endif
