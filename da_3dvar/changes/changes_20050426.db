@@ -1,0 +1,79 @@
+Change Log for update to WRF 3DVAR code
+---------------------------------------
+
+Author: Dale Barker
+Reviewer: Yong-Run Guo
+Date: 04/26/05
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Rewrite gen_be_stage4_regional to make it more 
+efficient, with slight improvements in accuracy:
+
+1. Stores on 1 2d field (hard-wired 1000 fields before!).
+2. Improved calculation of distance between pts. (integer distance**2).
+3. Intrduction on "stride" to potentially reduce cost by skipping pts.
+4. Rewritten to improve readiblity, etc.
+
+Expected Differences
+--------------------
+
+Memory should a very small fraction of previous code (1.).
+CPU should be better, due to reduced calculation, and removal of if blocks.
+Small improvement in accuracy due to binning as integer distance.
+
+Test results (run on which machines?)
+------------------------------------------------------
+
+Tested stages 1-4 using CWB input data on Mac G5.
+Compared wrf3dvar, wrfvar results. Differences generally 2nd d.p.
+
+Additional changes required for complete testing as stage0 not working.
+
+--------------------------------------------------------------------------------------
+Files removed:
+--------------
+
+cvs remove da_3dvar/src/da_gen_be/da_print_be_stats_h.inc \
+gen_be/gen_be_stage4.f \
+gen_be/gen_be_stage4_scale.f \
+run/gen_be/da_wrf_stage0.csh \
+run/gen_be/da_wrf_stage0_nmc.csh \
+run/gen_be/diag.csh \
+run/gen_be/gen_be_ens_sample.csh \
+run/gen_be/gen_be_nmc_global.csh \
+run/gen_be/gen_be_nmc_regional.csh \
+run/gen_be/gen_be_sample.csh \
+run/gen_be/stage2.csh \
+run/gen_be/stage3.csh \
+run/gen_be/stage4.csh
+
+Files added:
+------------
+
+cvs add da_3dvar/changes/changes_20050426.db \
+da_3dvar/src/da_gen_be/da_print_be_stats_h_global.inc \
+da_3dvar/src/da_gen_be/da_print_be_stats_h_regional.inc \
+gen_be/gen_be_stage4_regional.f \
+gen_be/gen_be_stage4_global.f \
+run/gen_be/gen_be_stage4_regional.csh \
+run/gen_be/gen_be_stage4_global.csh \
+run/gen_be/gen_be_stage0_wrf_nmc.csh
+
+Files modified:
+---------------
+
+da_3dvar/src/Makefile (rename print_be_stats_h)
+da_3dvar/src/DA_Gen_Be_Stats/DA_Write_Diff.inc (change filename).
+da_3dvar/src/da_gen_be/da_gen_be.F (rename print_be_stats_h)
+da_3dvar/src/da_gen_be/da_readwrite_be_stage4.inc (change format)
+gen_be/Makefile (rename files for consistency between global/regional)
+gen_be/gen_be_diags.f (tidy)
+gen_be/gen_be_diags_read.f (change print format)
+run/gen_be/gen_be.csh (redo)
+
+Tag:
+
+version_2_?
+

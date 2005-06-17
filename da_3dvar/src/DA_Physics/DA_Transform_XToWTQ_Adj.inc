@@ -11,7 +11,7 @@ Subroutine DA_Transform_XToWTQ_adj ( xp, xb, jo_grad_x )
    integer :: i, j, kz, is, js, ie, je
 ! ---------------------------------------------------------------------------
 
-   kz = xp%kte
+   kz = xp%kts
 
    is = xb%its
    js = xb%jts

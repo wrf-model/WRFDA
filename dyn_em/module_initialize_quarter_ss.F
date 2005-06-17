@@ -51,7 +51,10 @@ CONTAINS
    INTEGER :: idum1, idum2
 
 #ifdef DEREF_KLUDGE
+!  see http://www.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm
    INTEGER     :: sm31 , em31 , sm32 , em32 , sm33 , em33
+   INTEGER     :: sm31x, em31x, sm32x, em32x, sm33x, em33x
+   INTEGER     :: sm31y, em31y, sm32y, em32y, sm33y, em33y
 #endif
 
 #include "deref_kludge.h"
@@ -122,6 +125,17 @@ CONTAINS
 
    LOGICAL :: moisture_init
    LOGICAL :: stretch_grid, dry_sounding
+
+#ifdef DEREF_KLUDGE
+!  see http://www.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm
+   INTEGER     :: sm31 , em31 , sm32 , em32 , sm33 , em33
+   INTEGER     :: sm31x, em31x, sm32x, em32x, sm33x, em33x
+   INTEGER     :: sm31y, em31y, sm32y, em32y, sm33y, em33y
+#endif
+
+   LOGICAL, EXTERNAL :: wrf_dm_on_monitor
+
+#include "deref_kludge.h"
 
 #define COPY_IN
 #include <em_scalar_derefs.inc>
@@ -271,9 +285,21 @@ CONTAINS
 !  get the sounding from the ascii sounding file, first get dry sounding and 
 !  calculate base state
 
-  write(6,*) ' getting dry sounding for base state '
   dry_sounding = .true.
+  IF ( wrf_dm_on_monitor() ) THEN
+  write(6,*) ' getting dry sounding for base state '
+
   CALL get_sounding( zk, p_in, pd_in, theta, rho, u, v, qv, dry_sounding, nl_max, nl_in )
+  ENDIF
+  CALL wrf_dm_bcast_real( zk , nl_max )
+  CALL wrf_dm_bcast_real( p_in , nl_max )
+  CALL wrf_dm_bcast_real( pd_in , nl_max )
+  CALL wrf_dm_bcast_real( theta , nl_max )
+  CALL wrf_dm_bcast_real( rho , nl_max )
+  CALL wrf_dm_bcast_real( u , nl_max )
+  CALL wrf_dm_bcast_real( v , nl_max )
+  CALL wrf_dm_bcast_real( qv , nl_max )
+  CALL wrf_dm_bcast_integer ( nl_in , 1 ) 
 
   write(6,*) ' returned from reading sounding, nl_in is ',nl_in
 
@@ -318,8 +344,10 @@ CONTAINS
   ENDDO
   ENDDO
 
-  write(6,*) ' ptop is ',p_top
-  write(6,*) ' base state mub(1,1), p_surf is ',mub(1,1),mub(1,1)+p_top
+  IF ( wrf_dm_on_monitor() ) THEN
+    write(6,*) ' ptop is ',p_top
+    write(6,*) ' base state mub(1,1), p_surf is ',mub(1,1),mub(1,1)+p_top
+  ENDIF
 
 !  calculate full state for each column - this includes moisture.
 
@@ -401,10 +429,12 @@ CONTAINS
       ph0(i,k,j) = ph_1(i,k,j) + phb(i,k,j)
     ENDDO
 
+    IF ( wrf_dm_on_monitor() ) THEN
     if((i==2) .and. (j==2)) then
      write(6,*) ' ph_1 calc ',ph_1(2,1,2),ph_1(2,2,2),mu_1(2,2)+mub(2,2),mu_1(2,2), &
                               alb(2,1,2),al(1,2,1),rdnw(1)
     endif
+    ENDIF
 
   ENDDO
   ENDDO
@@ -458,6 +488,7 @@ CONTAINS
 
 !#endif
 
+   IF ( wrf_dm_on_monitor() ) THEN
    write(6,*) ' mu_1 from comp ', mu_1(1,1)
    write(6,*) ' full state sounding from comp, ph, p, al, t_1, qv '
    do k=1,kde-1
@@ -472,6 +503,7 @@ CONTAINS
                                       p(1,k,1), al(1,k,1), &
                                       t_1(1,k,1), moist_1(1,k,1,P_QV)
    enddo
+   ENDIF
 
 ! interp v
 
@@ -541,6 +573,7 @@ CONTAINS
   ENDDO
   ENDDO
 
+  IF ( wrf_dm_on_monitor() ) THEN
   DO k=1,kte-1
     t_base(k) = t_1(1,k,1)
     qv_base(k) = moist_1(1,k,1,P_QV)
@@ -548,6 +581,12 @@ CONTAINS
     v_base(k) = v_1(1,k,1)
     z_base(k) = 0.5*(phb(1,k,1)+phb(1,k+1,1)+ph_1(1,k,1)+ph_1(1,k+1,1))/g
   ENDDO
+  ENDIF
+  CALL wrf_dm_bcast_real( t_base , kte )
+  CALL wrf_dm_bcast_real( qv_base , kte )
+  CALL wrf_dm_bcast_real( u_base , kte )
+  CALL wrf_dm_bcast_real( v_base , kte )
+  CALL wrf_dm_bcast_real( z_base , kte )
 
   DO J = jts, min(jde-1,jte)
   DO I = its, min(ide-1,ite)

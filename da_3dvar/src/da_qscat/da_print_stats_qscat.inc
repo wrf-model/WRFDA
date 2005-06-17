@@ -4,7 +4,7 @@ subroutine da_print_stats_qscat( stats_unit, nu, nv, qscat )
 
    INTEGER,           INTENT(IN)    :: stats_unit
    INTEGER,           INTENT(INOUT) :: nu, nv
-   TYPE (stats_type), INTENT(IN)    :: qscat
+   TYPE (stats_qscat_type), INTENT(IN):: qscat
    
    write(unit=stats_unit, fmt='(3a/)') &
         '   var             ', &
