@@ -22,10 +22,10 @@ RECURSIVE SUBROUTINE integrate_ad ( grid, nl_date_string, nl_date_index, ad_date
 
    TYPE(domain) , POINTER :: grid
 
-   character(len=19), dimension(100), intent(in)    :: nl_date_string
-   integer,                          intent(inout) :: nl_date_index
-   character(len=19), dimension(100), intent(in)    :: ad_date_string
-   integer,                          intent(inout) :: ad_date_index
+   character(len=19), dimension(1000), intent(in)    :: nl_date_string
+   integer,                            intent(inout) :: nl_date_index
+   character(len=19), dimension(1000), intent(in)    :: ad_date_string
+   integer,                            intent(inout) :: ad_date_index
 
 ! module_integrate:integrate
 ! <DESCRIPTION> 
@@ -291,8 +291,8 @@ RECURSIVE SUBROUTINE integrate_ad ( grid, nl_date_string, nl_date_index, ad_date
               'currTime_str(1:19)=', currTime_str(1:19), &
               'ad_date_string(ad_date_index)(1:19)=', ad_date_string(ad_date_index)(1:19)
 !-       do input
-         CALL med_auxinput3_in ( grid , config_flags )
-         CALL add_forcing_to_ad(grid)
+!XX         CALL med_auxinput3_in ( grid , config_flags )
+!XX         CALL add_forcing_to_ad(grid)
          ad_date_index = ad_date_index + 1
 !     else
 !        write(unit=*, fmt='(2a)') &
@@ -347,8 +347,8 @@ RECURSIVE SUBROUTINE integrate_ad ( grid, nl_date_string, nl_date_index, ad_date
                  'currTime_str(1:19)=', currTime_str(1:19), &
                  'ad_date_string(ad_date_index)(1:19)=', ad_date_string(ad_date_index)(1:19)
 !-          do input
-            CALL med_auxinput3_in ( grid , config_flags )
-            CALL add_forcing_to_ad(grid)
+!XX            CALL med_auxinput3_in ( grid , config_flags )
+!XX            CALL add_forcing_to_ad(grid)
             ad_date_index = ad_date_index + 1
 !        else
 !           write(unit=*, fmt='(2a)') &
@@ -468,8 +468,8 @@ RECURSIVE SUBROUTINE integrate_ad ( grid, nl_date_string, nl_date_index, ad_date
                  'currTime_str(1:19)=', currTime_str(1:19), &
                  'ad_date_string(ad_date_index)(1:19)=', ad_date_string(ad_date_index)(1:19)
 !-          do input
-            CALL med_auxinput3_in ( grid , config_flags )
-            CALL add_forcing_to_ad(grid)
+!XX            CALL med_auxinput3_in ( grid , config_flags )
+!XX            CALL add_forcing_to_ad(grid)
             ad_date_index = ad_date_index + 1
 !        else
 !           write(unit=*, fmt='(2a)') &

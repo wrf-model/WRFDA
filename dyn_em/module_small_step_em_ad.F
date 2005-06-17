@@ -763,6 +763,11 @@ real rhs(its:ite,kts:kte)
 real t_2aveh(ims:ime,kms:kme,jms:jme)
 real wdwn(its:ite,kts:kte)
 real wh(ims:ime,kms:kme,jms:jme)
+!mzz
+real keep1_w(ims:ime,kms:kme,jms:jme)
+real keep2_w(ims:ime,kms:kme,jms:jme)
+real keep3_w(ims:ime,kms:kme,jms:jme)
+!mzz
 
 !----------------------------------------------
 ! SAVE REQUIRED INPUT VARIABLES
@@ -871,12 +876,19 @@ do j = j_start, j_end
 ! recompute : w
   do k = 2, k_end+1
     do i = i_start, i_end
+!mzz
+    keep1_w(i,k-1,j) =w(i,k-1,j)
+    keep2_w(i,k,j) =w(i,k,j)
+!mzz
       w(i,k,j) = (w(i,k,j)-a(i,k,j)*w(i,k-1,j))*alpha(i,k,j)
     end do
   end do
 ! recompute : w
   do k = k_end, 2, -1
     do i = i_start, i_end
+!mzz
+    keep3_w(i,k+1,j) =w(i,k+1,j)  
+!mzz
       w(i,k,j) = w(i,k,j)-gamma(i,k,j)*w(i,k+1,j)
     end do
   end do
@@ -892,6 +904,7 @@ do j = j_start, j_end
 ! recdepend vars : cf1,cf2,cf3,ht,i_end,i_start,j,rdx,rdy,u,v
 ! recompute pos : DOLOOP_STMT module_small_step_em.f90:1361
 ! recompute vars : w
+
   do i = i_start, i_end
     w(i,1,j) = 0.5*rdy*((ht(i,j+1)-ht(i,j))*(cf1*v(i,1,j+1)+cf2*v(i,2,j+1)+cf3*v(i,3,j+1))+(ht(i,j)-ht(i,j-1))*(cf1*v(i,1,j)+cf2*&
 &v(i,2,j)+cf3*v(i,3,j)))+0.5*rdx*((ht(i+1,j)-ht(i,j))*(cf1*u(i+1,1,j)+cf2*u(i+1,2,j)+cf3*u(i+1,3,j))+(ht(i,j)-ht(i-1,j))*(cf1*&
@@ -942,6 +955,9 @@ do j = j_start, j_end
   end do
   do k = 2, k_end
     do i = i_start, i_end
+!mzz
+    w(i,k+1,j) =keep3_w(i,k+1,j)  
+!mzz
       a_gamma(i,k,j) = a_gamma(i,k,j)-a_w(i,k,j)*w(i,k+1,j)
       a_w(i,k+1,j) = a_w(i,k+1,j)-a_w(i,k,j)*gamma(i,k,j)
     end do
@@ -990,12 +1006,17 @@ do j = j_start, j_end
   end do
   do k = k_end+1, 2, -1
     do i = i_start, i_end
+!mzz
+     w(i,k-1,j)=keep1_w(i,k-1,j) 
+     w(i,k,j)=keep2_w(i,k,j) 
+!mzz
       a_a(i,k,j) = a_a(i,k,j)-a_w(i,k,j)*w(i,k-1,j)*alpha(i,k,j)
       a_alpha(i,k,j) = a_alpha(i,k,j)+a_w(i,k,j)*(w(i,k,j)-a(i,k,j)*w(i,k-1,j))
       a_w(i,k-1,j) = a_w(i,k-1,j)-a_w(i,k,j)*a(i,k,j)*alpha(i,k,j)
       a_w(i,k,j) = a_w(i,k,j)*alpha(i,k,j)
     end do
   end do
+
 ! recdepend vars : k_end
 ! recompute pos : ASSIGN_STMT module_small_step_em.f90:1404
 ! recompute vars : k

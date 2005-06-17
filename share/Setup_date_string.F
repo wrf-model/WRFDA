@@ -4,8 +4,8 @@ SUBROUTINE Setup_date_string ( grid, date_string, adantn )
    USE WRF_ESMF_MOD
    IMPLICIT NONE
    TYPE(domain), POINTER :: grid
-   character(len=19), dimension(100), intent(out) :: date_string
-   character(len=2),                 intent(in ) :: adantn
+   character(len=19), dimension(1000), intent(out) :: date_string
+   character(len=2),                   intent(in ) :: adantn
 
    character(len=19)                             :: tmp_string, begin_date_string, end_date_string
 
@@ -126,11 +126,17 @@ SUBROUTINE Setup_date_string ( grid, date_string, adantn )
       local_interval_h < 1 .and. &
       local_interval_m < 1 .and. &
       local_interval_s < 1) then
-      local_interval_m = local_interval
+      if(local_interval < 1) then
+         index = 1
+         date_string(index)(1:19) = '9999-01-01_00:00:00'
+         write(unit=*, fmt='(a)') 'No need to set date_string.'
+         return
+      else
+         local_interval_m = local_interval
+      endif
    endif
 
       write(6,*) 'xyh intervals =', local_interval_mo, local_interval_d, local_interval_h, local_interval_m, local_interval_s
-
 
 !--date_string(0) = 2000-01-24_12:00:00
 
@@ -176,7 +182,7 @@ SUBROUTINE Setup_date_string ( grid, date_string, adantn )
          ':', current_m, &
          ':', current_s
 
-      write(unit=*, fmt='(a,i2,2a)') &
+      write(unit=*, fmt='(a,i3,2a)') &
         'date_string(', index, ')=', date_string(index)
 
       write(6,*) 'xyh intervals =', local_interval_mo, local_interval_d, local_interval_h, local_interval_m, local_interval_s
@@ -196,7 +202,7 @@ SUBROUTINE Setup_date_string ( grid, date_string, adantn )
          ':', current_m, &
          ':', current_s
 
-      if(index > 99) exit
+      if(index > 999) exit
    end do
 
    if( adantn /= 'tn' ) then ! reverse order

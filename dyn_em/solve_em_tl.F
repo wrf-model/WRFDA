@@ -71,7 +71,6 @@ SUBROUTINE solve_em_tl ( grid , config_flags , &
 ! storage for tendencies and decoupled state (generated from Registry)
 #include <em_i1_decl.inc>
 
-#ifdef WRFVAR
    INTEGER :: rc 
    INTEGER :: number_of_small_timesteps, rk_step
    INTEGER :: klevel,ijm,ijp,i,j,k,size1,size2    ! for prints/plots only
@@ -171,11 +170,6 @@ SUBROUTINE solve_em_tl ( grid , config_flags , &
 
 ! Initialize timers if compiled with -DBENCH
 #include <bench_solve_em_init.h>
-
-#ifdef WRFVAR
-
-! xyh identity operation return here
-   return
 
 !  set leapfrog or runge-kutta solver (2nd or 3rd order)
 
@@ -1631,7 +1625,7 @@ BENCH_START(spec_bdynhyd_tim)
 &spec_zone,ids,ide,jds,jde,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),&
 &k_start,k_end )
              IF( config_flags%specified ) THEN
-               if(dyn_opt == DYN_EM) then
+#if 0
                CALL zero_grad_bdy ( w_2,                        &
                                     'w'         , config_flags, &
                                     spec_zone,                  &
@@ -1641,7 +1635,10 @@ BENCH_START(spec_bdynhyd_tim)
                                     grid%i_start(ij), grid%i_end(ij),         &
                                     grid%j_start(ij), grid%j_end(ij),         &
                                     k_start    , k_end             )
-               endif
+#endif
+              call g_zero_grad_bdy( w_2,g_w_2,'w',spec_zone,ids,ide,jds,jde,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%&
+&i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start )
+
              ELSE
 #if 0
                CALL spec_bdyupdate   ( w_2, rw_tend, dts_rk,       &
@@ -2964,11 +2961,8 @@ BENCH_END(bc_2d_tim)
 ! See comment before earlier #include of this file.
 #define COPY_OUT
 #include <em_scalar_derefs.inc>
-#endif
 
    RETURN
-
-#endif
 
 END SUBROUTINE solve_em_tl
 
