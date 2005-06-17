@@ -36,8 +36,6 @@ SUBROUTINE DA_Setup_FirstGuess_WRF( xbx, grid, &
    integer(kind=4)   :: flag
    integer           :: len, index, seconds
 
-   real              :: start_lat, start_lon
-
 !---------------------------------------------------------------------------
 !  [1.0] Read original WRF format first guess:
 !---------------------------------------------------------------------------
@@ -90,6 +88,8 @@ SUBROUTINE DA_Setup_FirstGuess_WRF( xbx, grid, &
            'cen_lon  =', grid%cen_lon,  &
            'truelat1 =', grid%truelat1, &
            'truelat2 =', grid%truelat2, &
+           'start_lat =', start_lat, &
+           'start_lon =', start_lon, &
            'dsm      =', dsm
    endif
 

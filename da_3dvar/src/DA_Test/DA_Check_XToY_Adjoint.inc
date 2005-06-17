@@ -106,6 +106,11 @@ SUBROUTINE DA_Check_XToY_Adjoint( xb, xa, iv, xp, y, &
 
       if ( use_ssmt1obs .or. use_ssmt2obs .or. &
            Use_SsmiTbObs .or. Use_SsmiRetrievalObs ) then
+         if( cv_options == 4) then
+         print*,' This will not work as xb%speed is not available' 
+         print*,' Please see the comments in da_transfer_kmatoxb.inc'
+         stop
+         end if
          call DA_Transform_XToSeaSfcWind_Lin( xa, xb )
       endif
 
@@ -133,7 +138,6 @@ SUBROUTINE DA_Check_XToY_Adjoint( xb, xa, iv, xp, y, &
        call da_check_xtoy_adjoint_Sound( iv, y, partial_lhs, pertile_lhs )
        call da_check_xtoy_adjoint_Sonde_sfc( iv, y, partial_lhs, pertile_lhs )
    endif
-
    if( Use_SynopObs ) &
    call da_check_xtoy_adjoint_Synop( iv, y, partial_lhs, pertile_lhs )
 
@@ -181,6 +185,10 @@ SUBROUTINE DA_Check_XToY_Adjoint( xb, xa, iv, xp, y, &
 
    if( Use_BuoyObs ) &
    call da_check_xtoy_adjoint_Buoy( iv, y, partial_lhs, pertile_lhs )
+
+   if( Use_BogusObs ) &
+   call da_check_xtoy_adjoint_Bogus( iv, y, partial_lhs, pertile_lhs )
+
 !-------------------------------------------------------------------------
 !     [5.0] Perform adjoint operation:
 !-------------------------------------------------------------------------
@@ -205,6 +213,11 @@ SUBROUTINE DA_Check_XToY_Adjoint( xb, xa, iv, xp, y, &
 
       if ( use_ssmt1obs .or. use_ssmt2obs .or. &
            Use_SsmiTbObs .or. Use_SsmiRetrievalObs ) then
+         if( cv_options == 4) then
+         print*,' This will not work as xb%speed is not available' 
+         print*,' Please see the comments in da_transfer_kmatoxb.inc'
+         stop
+         end if
          call DA_Transform_XToSeaSfcWind_Adj( xa, xb )
       endif
    endif
@@ -227,8 +240,7 @@ SUBROUTINE DA_Check_XToY_Adjoint( xb, xa, iv, xp, y, &
                + sum( xa%p(ims:ime, jms:jme, kms:kme) * xa2_p(ims:ime, jms:jme, kms:kme) ) &
                + sum( xa%q(ims:ime, jms:jme, kms:kme) * xa2_q(ims:ime, jms:jme, kms:kme) ) &
                + sum( xa%rh(ims:ime, jms:jme, kms:kme)* xa2_rh(ims:ime, jms:jme, kms:kme) ) &
-               + sum( xa%psfc(ims:ime, jms:jme) * xa2_psfc(ims:ime, jms:jme) ) 
-
+               + sum( xa%psfc(ims:ime, jms:jme) * xa2_psfc(ims:ime, jms:jme) )
    pertile_rhs = pertile_rhs &
                + sum( xa%qcw(ims:ime, jms:jme, kms:kme) * xa2_qcw(ims:ime, jms:jme, kms:kme) ) &
                + sum( xa%qrn(ims:ime, jms:jme, kms:kme) * xa2_qrn(ims:ime, jms:jme, kms:kme) )
@@ -277,4 +289,3 @@ SUBROUTINE DA_Check_XToY_Adjoint( xb, xa, iv, xp, y, &
 #endif
    
 END SUBROUTINE DA_Check_XToY_Adjoint
-

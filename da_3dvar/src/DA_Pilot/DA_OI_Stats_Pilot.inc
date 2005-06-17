@@ -5,7 +5,7 @@ SUBROUTINE DA_OI_Stats_Pilot ( stats_unit, oi )
    INTEGER,        INTENT (in)      :: stats_unit    ! Output unit for stats.
    TYPE (ob_type), INTENT (in)      :: oi            ! OI
 
-   TYPE (stats_type)                :: Pilot
+   TYPE (stats_pilot_type)          :: Pilot
    INTEGER                          :: nu, nv
    INTEGER                          :: n, k
 
@@ -18,7 +18,7 @@ SUBROUTINE DA_OI_Stats_Pilot ( stats_unit, oi )
    Pilot%maximum%v = maxmin_type( missing_r, 0, 0)
    Pilot%minimum%u = maxmin_type(-missing_r, 0, 0)
    Pilot%minimum%v = maxmin_type(-missing_r, 0, 0)
-   Pilot%average = residual_type(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+   Pilot%average = residual_pilot1_type(0.0, 0.0)
    Pilot%rms_err = Pilot%average
 
    IF ( oi%num_Pilot > 0 ) THEN

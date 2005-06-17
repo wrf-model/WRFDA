@@ -16,6 +16,7 @@ SUBROUTINE couple_or_uncouple_em ( grid , config_flags , couple, &
    USE module_machine
    USE module_tiles
    USE module_dm
+   USE module_bc
 ! Mediation layer modules
 ! Registry generated module
    USE module_state_description
@@ -46,6 +47,15 @@ SUBROUTINE couple_or_uncouple_em ( grid , config_flags , couple, &
    REAL                            :: mu_factor
 
    REAL, DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33) :: mut_2, muut_2, muvt_2, muwt_2
+
+#ifdef DEREF_KLUDGE
+!  see http://www.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm
+   INTEGER     :: sm31 , em31 , sm32 , em32 , sm33 , em33
+   INTEGER     :: sm31x, em31x, sm32x, em32x, sm33x, em33x
+   INTEGER     :: sm31y, em31y, sm32y, em32y, sm33y, em33y
+#endif
+
+#include "deref_kludge.h"
 
 !  De-reference dimension information stored in the grid data structure.
 
@@ -78,8 +88,31 @@ SUBROUTINE couple_or_uncouple_em ( grid , config_flags , couple, &
 #      include <em_data_calls.inc>
 #endif
 
+   IF ( config_flags%periodic_x .OR. config_flags%periodic_y ) THEN
+     CALL set_physical_bc2d( mub, 't',  &
+                             config_flags,           &
+                             ids,ide, jds,jde,   & ! domain dims
+                             ims,ime, jms,jme,   & ! memory dims
+                             ips,ipe, jps,jpe,   & ! patch  dims
+                             ips,ipe, jps,jpe   )
+     CALL set_physical_bc2d( mu_1, 't',  &
+                             config_flags,           &
+                             ids,ide, jds,jde,   & ! domain dims
+                             ims,ime, jms,jme,   & ! memory dims
+                             ips,ipe, jps,jpe,   & ! patch  dims
+                             ips,ipe, jps,jpe   )
+     CALL set_physical_bc2d( mu_2, 't',  &
+                             config_flags,           &
+                             ids,ide, jds,jde,   & ! domain dims
+                             ims,ime, jms,jme,   & ! memory dims
+                             ips,ipe, jps,jpe,   & ! patch  dims
+                             ips,ipe, jps,jpe   )
+   ENDIF
+
+
 #ifdef DM_PARALLEL
 # include "HALO_EM_COUPLE_A.inc"
+# include "PERIOD_EM_COUPLE_A.inc"
 #endif
 
    !  computations go out one row and column to avoid having to communicate before solver
@@ -258,29 +291,111 @@ SUBROUTINE couple_or_uncouple_em ( grid , config_flags , couple, &
    ENDDO
    !$OMP END PARALLEL DO
 
+   IF ( config_flags%periodic_x .OR. config_flags%periodic_y ) THEN
+     CALL set_physical_bc3d( ph_1, 'w',        &
+                             config_flags,                   &
+                             ids,ide, jds,jde, kds,kde,  & ! domain dims
+                             ims,ime, jms,jme, kms,kme,  & ! memory dims
+                             ips,ipe, jps,jpe, kps,kpe,  & ! patch  dims
+                             ips,ipe, jps,jpe, kps,kpe )
+     CALL set_physical_bc3d( ph_2, 'w',        &
+                             config_flags,                   &
+                             ids,ide, jds,jde, kds,kde,  & ! domain dims
+                             ims,ime, jms,jme, kms,kme,  & ! memory dims
+                             ips,ipe, jps,jpe, kps,kpe,  & ! patch  dims
+                             ips,ipe, jps,jpe, kps,kpe )
+     CALL set_physical_bc3d( w_1, 'w',        &
+                             config_flags,                   &
+                             ids,ide, jds,jde, kds,kde,  & ! domain dims
+                             ims,ime, jms,jme, kms,kme,  & ! memory dims
+                             ips,ipe, jps,jpe, kps,kpe,  & ! patch  dims
+                             ips,ipe, jps,jpe, kps,kpe )
+     CALL set_physical_bc3d( w_2, 'w',        &
+                             config_flags,                   &
+                             ids,ide, jds,jde, kds,kde,  & ! domain dims
+                             ims,ime, jms,jme, kms,kme,  & ! memory dims
+                             ips,ipe, jps,jpe, kps,kpe,  & ! patch  dims
+                             ips,ipe, jps,jpe, kps,kpe )
+     CALL set_physical_bc3d( t_1, 't',        &
+                             config_flags,                   &
+                             ids,ide, jds,jde, kds,kde,  & ! domain dims
+                             ims,ime, jms,jme, kms,kme,  & ! memory dims
+                             ips,ipe, jps,jpe, kps,kpe,  & ! patch  dims
+                             ips,ipe, jps,jpe, kps,kpe )
+     CALL set_physical_bc3d( t_2, 't',        &
+                             config_flags,                   &
+                             ids,ide, jds,jde, kds,kde,  & ! domain dims
+                             ims,ime, jms,jme, kms,kme,  & ! memory dims
+                             ips,ipe, jps,jpe, kps,kpe,  & ! patch  dims
+                             ips,ipe, jps,jpe, kps,kpe )
+     CALL set_physical_bc3d( u_1, 'u',        &
+                             config_flags,                   &
+                             ids,ide, jds,jde, kds,kde,  & ! domain dims
+                             ims,ime, jms,jme, kms,kme,  & ! memory dims
+                             ips,ipe, jps,jpe, kps,kpe,  & ! patch  dims
+                             ips,ipe, jps,jpe, kps,kpe )
+     CALL set_physical_bc3d( u_2, 'u',        &
+                             config_flags,                   &
+                             ids,ide, jds,jde, kds,kde,  & ! domain dims
+                             ims,ime, jms,jme, kms,kme,  & ! memory dims
+                             ips,ipe, jps,jpe, kps,kpe,  & ! patch  dims
+                             ips,ipe, jps,jpe, kps,kpe )
+     CALL set_physical_bc3d( v_1, 'v',        &
+                             config_flags,                   &
+                             ids,ide, jds,jde, kds,kde,  & ! domain dims
+                             ims,ime, jms,jme, kms,kme,  & ! memory dims
+                             ips,ipe, jps,jpe, kps,kpe,  & ! patch  dims
+                             ips,ipe, jps,jpe, kps,kpe )
+     CALL set_physical_bc3d( v_2, 'v',        &
+                             config_flags,                   &
+                             ids,ide, jds,jde, kds,kde,  & ! domain dims
+                             ims,ime, jms,jme, kms,kme,  & ! memory dims
+                             ips,ipe, jps,jpe, kps,kpe,  & ! patch  dims
+                             ips,ipe, jps,jpe, kps,kpe )
+
+     IF (num_3d_m >= PARAM_FIRST_SCALAR) THEN
+       DO im = PARAM_FIRST_SCALAR , num_3d_m
+
+     CALL set_physical_bc3d( moist_1(ims,kms,jms,im), 'p',        &
+                             config_flags,                   &
+                             ids,ide, jds,jde, kds,kde,  & ! domain dims
+                             ims,ime, jms,jme, kms,kme,  & ! memory dims
+                             ips,ipe, jps,jpe, kps,kpe,  & ! patch  dims
+                             ips,ipe, jps,jpe, kps,kpe )
+     CALL set_physical_bc3d( moist_2(ims,kms,jms,im), 'p',        &
+                             config_flags,                   &
+                             ids,ide, jds,jde, kds,kde,  & ! domain dims
+                             ims,ime, jms,jme, kms,kme,  & ! memory dims
+                             ips,ipe, jps,jpe, kps,kpe,  & ! patch  dims
+                             ips,ipe, jps,jpe, kps,kpe )
+       ENDDO
+     ENDIF
+
+
+     IF (num_3d_c >= PARAM_FIRST_SCALAR) THEN
+       DO im = PARAM_FIRST_SCALAR , num_3d_c
+
+     CALL set_physical_bc3d( chem_1(ims,kms,jms,im), 'p',        &
+                             config_flags,                   &
+                             ids,ide, jds,jde, kds,kde,  & ! domain dims
+                             ims,ime, jms,jme, kms,kme,  & ! memory dims
+                             ips,ipe, jps,jpe, kps,kpe,  & ! patch  dims
+                             ips,ipe, jps,jpe, kps,kpe )
+     CALL set_physical_bc3d( chem_2(ims,kms,jms,im), 'p',        &
+                             config_flags,                   &
+                             ids,ide, jds,jde, kds,kde,  & ! domain dims
+                             ims,ime, jms,jme, kms,kme,  & ! memory dims
+                             ips,ipe, jps,jpe, kps,kpe,  & ! patch  dims
+                             ips,ipe, jps,jpe, kps,kpe )
+     ENDDO
+     ENDIF
+
+   ENDIF
+
 #ifdef DM_PARALLEL
 # include "HALO_EM_COUPLE_B.inc"
+# include "PERIOD_EM_COUPLE_B.inc"
 #endif
 
-!     write(6,*) ' coupling: finished '
-
 END SUBROUTINE couple_or_uncouple_em
-
-LOGICAL FUNCTION em_cd_feedback_mask( pig, ips_save, ipe_save , pjg, jps_save, jpe_save, xstag, ystag )
-   INTEGER, INTENT(IN) :: pig, ips_save, ipe_save , pjg, jps_save, jpe_save
-   LOGICAL, INTENT(IN) :: xstag, ystag
-
-   INTEGER ioff, joff
-
-   ioff = 0 ; joff = 0 
-   IF ( xstag  ) ioff = 1
-   IF ( ystag  ) joff = 1
-
-   em_cd_feedback_mask = ( pig .ge. ips_save+1        .and.      &
-                           pjg .ge. jps_save+1        .and.      &
-                           pig .le. ipe_save-1  +ioff .and.      &
-                           pjg .le. jpe_save-1  +joff           )
-
-
-END FUNCTION em_cd_feedback_mask
 
