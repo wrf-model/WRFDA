@@ -535,12 +535,21 @@ IMPLICIT NONE
         ENDIF
 
         time2%MM = daym( diy )
-        time2%DD = diy - mdaycum(time2%MM-1)
+
+        IF ( nfeb(time2%YR) == 29 ) THEN
+          time2%DD = diy - mdayleapcum(time2%MM-1)
+        ELSE
+          time2%DD = diy - mdaycum(time2%MM-1)
+        ENDIF
+
         time2%basetime%S = mod( time2%basetime%S, 3600*24 )
       ELSE
         time2%DD = time1%DD - timeinterval%DD
         time2%MM = time1%MM - timeinterval%MM
       ENDIF
+
+!     print *, 'final: time1%YR, time1%MM, time1%DD, time1%basetime%S=', time1%YR, time1%MM, time1%DD, time1%basetime%S
+!     print *, 'final: time2%YR, time2%MM, time2%DD, time2%basetime%S=', time2%YR, time2%MM, time2%DD, time2%basetime%S
 
 END SUBROUTINE c_esmc_basetimediff
 
