@@ -1,4 +1,4 @@
-# Registry file, EM
+# Order refers to which of the three sets of just-mentioned internal
 #                                               
 # At the present time this file is managed manually and edited by hand.                                         
 #                                               
@@ -67,7 +67,7 @@ dimspec    e      3     namelist=ensdim           z          ensemble dimension
 # interpolated with a mask, as lu_index supplies that mask.
 # this next 1 is for the HFSoLE/PET demo; writing these to auxhist1 output over MCEL for coupling
 # with wave model, only if compiled with -DMCELIO, JM 2003/05/29
-state    real  LU_INDEX         ij      misc        1         -     irh01d=(interp_fcnm)u=(copy_fcnm)   "LU_INDEX"              "LAND USE CATEGORY"         ""
+state    real  LU_INDEX         ij      misc        1         -     i02rh0201d=(interp_fcnm)u=(copy_fcnm)   "LU_INDEX"              "LAND USE CATEGORY"         ""
 state    real  LU_MASK          ij      misc        1         -     i3h1     "LU_MASK"              "0 land 1 water"         ""
 
 
@@ -158,10 +158,10 @@ state    real   tke            ikj     dyn_em      2         -       r        "t
 i1       real   tke_tend       ikj     dyn_em      1         -      
 
 # Pressure and Density
-state    real   p              ikj     dyn_em      1ag       -      rh        "p"           "perturbation pressure"         "Pa"
-state    real   al             ikj     dyn_em      1ag       -      r         "al"          "inverse perturbation density"  "m3 kg-1"
-state    real   alt            ikj     dyn_em      1ag       -      r         "alt"         "inverse density"               "m3 kg-1"
-state    real   alb            ikj     dyn_em      1         -      rdu       "alb"         "inverse base density"          "m3 kg-1"
+state    real   p              ikj     dyn_em      1ag       -      rh02         "p"           "perturbation pressure"         "Pa"
+state    real   al             ikj     dyn_em      1ag       -      rh02         "al"          "inverse perturbation density"  "m3 kg-1"
+state    real   alt            ikj     dyn_em      1ag       -      rh02         "alt"         "inverse density"               "m3 kg-1"
+state    real   alb            ikj     dyn_em      1         -      rh02du       "alb"         "inverse base density"          "m3 kg-1"
 state    real   zx             ikj     dyn_em      1         X      -         " "  " "  " "    
 state    real   zy             ikj     dyn_em      1         Y      -         " "  " "  " "   
 state    real   rdz            ikj     dyn_em      1         Z      -         " "  " "  " "   
@@ -172,56 +172,56 @@ state    real   pb             ikj     dyn_em      1         -      rhdu      "p
 # Other dyn                                             
 #                                               
 i1       real   advect_tend    ikj     dyn_em      1ag       -                                          
-i1       real   alpha          ikj     dyn_em      1ag       -                                                  
-i1       real   a              ikj     dyn_em      1ag       -                                                  
-i1       real   gamma          ikj     dyn_em      1ag       -                                                  
-i1       real   c2a            ikj     dyn_em      1ag       -     -
-i1       real   rho            ikj     dyn_em      1ag       -     -
-i1       real   phm            ikj     dyn_em      1ag       -     -
-i1       real   cqu            ikj     dyn_em      1ag       -     -
-i1       real   cqv            ikj     dyn_em      1ag       -     -
-i1       real   cqw            ikj     dyn_em      1ag       -     -
-i1       real   pm1            ikj     dyn_em      1ag       -     -
+state       real   alpha          ikj     dyn_em      1ag       -    h02
+state       real   a              ikj     dyn_em      1ag       -    h02
+state       real   gamma          ikj     dyn_em      1ag       -    h02
+state       real   c2a            ikj     dyn_em      1ag       -    h02
+state       real   rho            ikj     dyn_em      1ag       -    h02
+state       real   phm            ikj     dyn_em      1ag       -    h02
+state       real   cqu            ikj     dyn_em      1ag       -    h02
+state       real   cqv            ikj     dyn_em      1ag       -    h02
+state       real   cqw            ikj     dyn_em      1ag       -    h02
+state       real   pm1            ikj     dyn_em      1ag       -    h02
 i1       real   sr             ij      dyn_em      1         -     -   # dummy array for microphysics driver
 
-state    real    fnm            k       dyn_em      1         -     irh       "fnm"  "upper weight for vertical stretching"  ""
-state    real    fnp            k       dyn_em      1         -     irh       "fnp"  "lower weight for vertical stretching"  ""
-state    real    rdnw           k       dyn_em      1         -     irh       "rdnw"  "inverse d(eta) values between full (w) levels"   ""
-state    real    rdn            k       dyn_em      1         -     irh       "rdn"  "inverse d(eta) values between half (mass) levels"   ""
-state    real    dnw            k       dyn_em      1         -     irh       "dnw" "d(eta) values between full (w) levels"   ""
-state    real    dn             k       dyn_em      1         -     irh       "dn " "d(eta) values between half (mass) levels"   ""
+state    real    fnm            k       dyn_em      1         -     irh02       "fnm"  "upper weight for vertical stretching"  ""
+state    real    fnp            k       dyn_em      1         -     irh02       "fnp"  "lower weight for vertical stretching"  ""
+state    real    rdnw           k       dyn_em      1         -     irh02       "rdnw"  "inverse d(eta) values between full (w) levels"   ""
+state    real    rdn            k       dyn_em      1         -     irh02       "rdn"  "inverse d(eta) values between half (mass) levels"   ""
+state    real    dnw            k       dyn_em      1         -     irh02       "dnw" "d(eta) values between full (w) levels"   ""
+state    real    dn             k       dyn_em      1         -     irh02       "dn " "d(eta) values between half (mass) levels"   ""
 state    real    znu            k       dyn_em      1         -     irh023     "znu"  "eta values on half (mass) levels"  ""
 state    real    znw            k       dyn_em      1         Z     i0123rh023  "znw"  "eta values on full (w) levels"  ""
 state    real    t_base         k       dyn_em      1         -     ir        "t_base"               "BASE STATET T IN IDEALIZED CASES"         "K"      
 state    real    z              ikj     dyn_em      1ag       Z     -         " " " " " "
 i1       real    mu_3d          ikj     dyn_em      1         -                                          
 i1       real    z_at_w         ikj     dyn_em      1ag       Z 
-state    real    cfn            -       misc      -         -     irh       "cfn"    "extrapolation constant"  ""
-state    real    cfn1           -       misc      -         -     irh       "cfn1"   "extrapolation constant"  ""
-state    real    epsts          -       misc      -         -     irh       "epsts"  "leapfrog time filter constant"  ""
+state    real    cfn            -       misc      -         -     irh02       "cfn"    "extrapolation constant"  ""
+state    real    cfn1           -       misc      -         -     irh02       "cfn1"   "extrapolation constant"  ""
+state    real    epsts          -       misc      -         -     irh02       "epsts"  "leapfrog time filter constant"  ""
 state    integer step_number    -       misc      -         -     ir        "step_number"  ""
 
 # 2m and 10m output diagnostics
-state    real   Q2               ij     misc        1         -     irh       "Q2"                   "QV at 2 M"         "kg kg-1"
-state    real   T2               ij     misc        1         -     irh       "T2"                   "TEMP at 2 M"       "K"
-state    real   TH2              ij     misc        1         -     irh       "TH2"                  "POT TEMP at 2 M"   "K"
+state    real   Q2               ij     misc        1         -     irh02       "Q2"                   "QV at 2 M"         "kg kg-1"
+state    real   T2               ij     misc        1         -     irh02       "T2"                   "TEMP at 2 M"       "K"
+state    real   TH2              ij     misc        1         -     irh02       "TH2"                  "POT TEMP at 2 M"   "K"
 state    real   PSFC             ij     misc        1         -      rh       "PSFC"                 "SFC PRESSURE"      "Pa"
 
 # these next 2 are for the HFSoLE/PET demo; writing these to auxhist1 output over MCEL for coupling
 # with wave model, only if compiled with -DMCELIO, JM 2003/05/29
-state    real   U10              ij     misc        1         -     irh01       "U10"                "U at 10 M"         "m s-1"
-state    real   V10              ij     misc        1         -     irh01       "V10"                "V at 10 M"         "m s-1"
+state    real   U10              ij     misc        1         -     irh012       "U10"                "U at 10 M"         "m s-1"
+state    real   V10              ij     misc        1         -     irh012       "V10"                "V at 10 M"         "m s-1"
 
 # Other
-state   real    rdx            -        misc      -         -     irh       "rdx"                   "INVERSE X GRID LENGTH"         ""      
-state   real    rdy            -        misc      -         -     irh       "rdy"                   "INVERSE Y GRID LENGTH"         ""      
-state   real    dts            -        misc      -         -     ir        "dts"                   "SMALL TIMESTEP"         ""      
-state   real    dtseps         -        misc      -         -     ir        "dtseps"                "TIME WEIGHT CONSTANT FOR SMALL STEPS"         ""      
-state   real    resm           -        misc      -         -     irh       "resm"                  "TIME WEIGHT CONSTANT FOR SMALL STEPS"         ""      
-state   real    zetatop        -        misc      -         -     irh       "zetatop"               "ZETA AT MODEL TOP"         ""      
-state   real    cf1            -        misc      -         -     irh       "cf1"                   "2nd order extrapolation constant"         ""      
-state   real    cf2            -        misc      -         -     irh       "cf2"                   "2nd order extrapolation constant"         ""      
-state   real    cf3            -        misc      -         -     irh       "cf3"                   "2nd order extrapolation constant"         ""      
+state   real    rdx            -        misc      -         -     irh02       "rdx"                   "INVERSE X GRID LENGTH"         ""      
+state   real    rdy            -        misc      -         -     irh02       "rdy"                   "INVERSE Y GRID LENGTH"         ""      
+state   real    dts            -        misc      -         -     irh02       "dts"                   "SMALL TIMESTEP"         ""      
+state   real    dtseps         -        misc      -         -     irh02       "dtseps"                "TIME WEIGHT CONSTANT FOR SMALL STEPS"         ""      
+state   real    resm           -        misc      -         -     irh02       "resm"                  "TIME WEIGHT CONSTANT FOR SMALL STEPS"         ""      
+state   real    zetatop        -        misc      -         -     irh02       "zetatop"               "ZETA AT MODEL TOP"         ""      
+state   real    cf1            -        misc      -         -     irh02       "cf1"                   "2nd order extrapolation constant"         ""      
+state   real    cf2            -        misc      -         -     irh02       "cf2"                   "2nd order extrapolation constant"         ""      
+state   real    cf3            -        misc      -         -     irh02       "cf3"                   "2nd order extrapolation constant"         ""      
 state   integer number_at_same_level \
                                -        -         -         -     -         "number_at_same_level"  ""         ""      
 state   integer itimestep      -        -         -         -     rh        "itimestep"             ""         ""      
@@ -328,9 +328,9 @@ state    real   rqg_b          ikjb      misc        -ag        -     b         
 state    real   rqg_bt         ikjb      misc        -ag        -     b         "rqg_bt"                "MU COUPLED WATER GRAUPEL MIXING RATIO TENDENCY AT BOUNDARIES"         ""
 
 
-state    real   fcx            w         misc     -ag       -      ir       "fcx"                  "RELAXATION TERM FOR BOUNDARY ZONE"         ""
-state    real   gcx            w         misc     -ag       -      ir       "gcx"                  "2ND RELAXATION TERM FOR BOUNDARY ZONE"         ""
-state    real   dtbc            -        misc     -ag       -      ir       "dtbc"                 "TIME SINCE BOUNDARY READ"         ""
+state    real   fcx            w         misc     -ag       -      irh02      "fcx"                  "RELAXATION TERM FOR BOUNDARY ZONE"         ""
+state    real   gcx            w         misc     -ag       -      irh02      "gcx"                  "2ND RELAXATION TERM FOR BOUNDARY ZONE"         ""
+state    real   dtbc            -        misc     -ag       -      irh02      "dtbc"                 "TIME SINCE BOUNDARY READ"         ""
 
 #-------------------------------------------------------------------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------------------------------------------------------------------
@@ -374,19 +374,19 @@ state   real   soilt040            ij    misc          1     -     i1      "SOIL
 state   real   soilt160            ij    misc          1     -     i1      "SOILT160"      "LAYER SOIL TEMPERATURE" "K"
 state   real   soilt300            ij    misc          1     -     i1      "SOILT300"      "LAYER SOIL TEMPERATURE" "K"
 state   real   landmask            ij    misc          1     -     i0123rh023d=(interp_fcnm)u=(copy_fcnm)   "LANDMASK"      "LAND MASK (1 FOR LAND, 0 FOR WATER)"  ""
-state   real   topostdv            ij    misc          1     -     i12     "TOPOSTDV"      "ELEVATION STD DEV"  "m"
-state   real   toposlpx            ij    misc          1     -     i12     "TOPOSLPX"      "ELEVATION X SLOPE"  ""
-state   real   toposlpy            ij    misc          1     -     i12     "TOPOSLPY"      "ELEVATION Y SLOPE"  ""
-state   real   shdmax              ij    misc          1     -     i012r   "SHDMAX"        "ANNUAL MAX VEG FRACTION" ""
-state   real   shdmin              ij    misc          1     -     i012r   "SHDMIN"        "ANNUAL MIN VEG FRACTION" ""
-state   real   snoalb              ij    misc          1     -     i012r   "SNOALB"        "ANNUAL MAX SNOW ALBEDO IN FRACTION" "
-state   real   slopecat            ij    misc          1     -     i12     "SLOPECAT"      "SLOPE CATEGORY"  ""
-state   real   toposoil            ij    misc          1     -     i12     "SOILHGT"       "ELEVATION OF LSM DATA"  "m"
-state   real   landusef            iuj   misc          1     Z     i12     "LANDUSEF"      "LANDUSE FRACTION BY CATEGORY"  ""
-state   real   soilctop            isj   misc          1     Z     i12     "SOILCTOP"      "SOIL CAT FRACTION (TOP)"  ""
+state   real   topostdv            ij    misc          1     -     i1      "TOPOSTDV"      "ELEVATION STD DEV"  "m"
+state   real   toposlpx            ij    misc          1     -     i1      "TOPOSLPX"      "ELEVATION X SLOPE"  ""
+state   real   toposlpy            ij    misc          1     -     i1      "TOPOSLPY"      "ELEVATION Y SLOPE"  ""
+state   real   shdmax              ij    misc          1     -     i01r    "SHDMAX"        "ANNUAL MAX VEG FRACTION" ""
+state   real   shdmin              ij    misc          1     -     i01r    "SHDMIN"        "ANNUAL MIN VEG FRACTION" ""
+state   real   snoalb              ij    misc          1     -     i01r    "SNOALB"        "ANNUAL MAX SNOW ALBEDO IN FRACTION" "
+state   real   slopecat            ij    misc          1     -     i1      "SLOPECAT"      "SLOPE CATEGORY"  ""
+state   real   toposoil            ij    misc          1     -     i1      "SOILHGT"       "ELEVATION OF LSM DATA"  "m"
+state   real   landusef            iuj   misc          1     Z     i1      "LANDUSEF"      "LANDUSE FRACTION BY CATEGORY"  ""
+state   real   soilctop            isj   misc          1     Z     i1      "SOILCTOP"      "SOIL CAT FRACTION (TOP)"  ""
 state   real   soilcbot            isj   misc          1     Z     i1      "SOILCBOT"      "SOIL CAT FRACTION (BOTTOM)"  ""
-state   real   soilcat             ij    misc          1     -     i12     "SOILCAT"       "SOIL CAT DOMINANT TYPE" ""
-state   real   vegcat              ij    misc          1     -     i12     "VEGCAT"        "VEGETATION CAT DOMINANT TYPE" ""
+state   real   soilcat             ij    misc          1     -     i1      "SOILCAT"       "SOIL CAT DOMINANT TYPE" ""
+state   real   vegcat              ij    misc          1     -     i1      "VEGCAT"        "VEGETATION CAT DOMINANT TYPE" ""
 
 #---------------------------------------------------------------------------------------------------------------------------------------
 # SI - end variables from netCDF format from Standard Initialization
@@ -394,33 +394,33 @@ state   real   vegcat              ij    misc          1     -     i12     "VEGC
 
 # soil model variables  (Note that they are marked as staggered in the vertical dimension
 # because they are "fully dimensioned" -- they use every element in that dim
-state    real   TSLB           ilj       misc      1         Z     i02rhd=(interp_mask_land_field:lu_index)u=(copy_fcnm)           "TSLB"     "SOIL TEMPERATURE"   "K"
-state    real   ZS              l        misc      -         Z     irh       "ZS"                    "DEPTHS OF CENTERS OF SOIL LAYERS"         "m"
-state    real   DZS             l        misc      -         Z     irh       "DZS"                   "THICKNESSES OF SOIL LAYERS"               "m"
+state    real   TSLB           ilj       misc      1         Z     irh02d=(interp_mask_land_field:lu_index)u=(copy_fcnm)           "TSLB"     "SOIL TEMPERATURE"   "K"
+state    real   ZS              l        misc      -         Z     irh02       "ZS"                    "DEPTHS OF CENTERS OF SOIL LAYERS"         "m"
+state    real   DZS             l        misc      -         Z     irh02       "DZS"                   "THICKNESSES OF SOIL LAYERS"               "m"
 
 # lsm State Variables
 
-state    real   SMOIS            ilj     -          1         Z     i02rhd=(interp_mask_land_field:lu_index)u=(copy_fcnm)    "SMOIS"            "SOIL MOISTURE"     "m3 m-3"
-state    real   SH2O             ilj     -          1         Z     i02rhd=(interp_mask_land_field:lu_index)u=(copy_fcnm)    "SH2O"             "SOIL LIQUID WATER" "m3 m-3"
-state    real   XICE             ij     misc        1         -     i012rhd=(interp_mask_water_field:lu_index)u=(copy_fcnm)  "XICE"             "SEA ICE FLAG"  ""
+state    real   SMOIS            ilj     -          1         Z     irh02d=(interp_mask_land_field:lu_index)u=(copy_fcnm)    "SMOIS"            "SOIL MOISTURE"     "m3 m-3"
+state    real   SH2O             ilj     -          1         Z     irh02d=(interp_mask_land_field:lu_index)u=(copy_fcnm)    "SH2O"             "SOIL LIQUID WATER" "m3 m-3"
+state    real   XICE             ij     misc        1         -     i01rh02d=(interp_mask_water_field:lu_index)u=(copy_fcnm)  "XICE"             "SEA ICE FLAG"  ""
 state    real   SMSTAV           ij     misc        1         -      rd=(interp_mask_land_field:lu_index)       "SMSTAV"           "MOISTURE AVAILABILITY" ""
 state    real   SMSTOT           ij     misc        1         -      r                                          "SMSTOT"           "TOTAL SOIL MOISTURE" "m3 m-3"
 
 state    real   SFCRUNOFF        ij     misc        1         -      rhd=(interp_mask_land_field:lu_index)      "SFROFF"           "SURFACE RUNOFF"     "mm"
 state    real   UDRUNOFF         ij     misc        1         -      rhd=(interp_mask_land_field:lu_index)      "UDROFF"           "UNDERGROUND RUNOFF" "mm"
-state  integer  IVGTYP           ij     misc        1         -     i02rhd=(interp_fcni)u=(copy_fcni)            "IVGTYP"           "DOMINANT VEGETATION CATEGORY" ""
-state  integer  ISLTYP           ij     misc        1         -     i02rhd=(interp_fcni)u=(copy_fcni)            "ISLTYP"           "DOMINANT SOIL CATEGORY"       ""
-state    real   VEGFRA           ij     misc        1         -     i012rhd=(interp_mask_land_field:lu_index)u=(copy_fcnm)   "VEGFRA"           "VEGETATION FRACTION" ""
+state  integer  IVGTYP           ij     misc        1         -     irh02d=(interp_fcni)u=(copy_fcni)            "IVGTYP"           "DOMINANT VEGETATION CATEGORY" ""
+state  integer  ISLTYP           ij     misc        1         -     irh02d=(interp_fcni)u=(copy_fcni)            "ISLTYP"           "DOMINANT SOIL CATEGORY"       ""
+state    real   VEGFRA           ij     misc        1         -     i01rh02d=(interp_mask_land_field:lu_index)u=(copy_fcnm)   "VEGFRA"           "VEGETATION FRACTION" ""
 state    real   SFCEVP           ij     misc        1         -      r                                          "SFCEVP"           "SURFACE EVAPORATION" "kg m-2"
 state    real   GRDFLX           ij     misc        1         -      rh                                         "GRDFLX"           "GROUND HEAT FLUX" "W m-2"
 state    real   SFCEXC           ij     misc        1         -      r                                          "SFCEXC "          "SURFACE EXCHANGE COEFFICIENT"   "m s-1"
 
 state    real   ACSNOW           ij     misc        1         -      rd=(interp_mask_land_field:lu_index)u=(copy_fcnm)       "ACSNOW"           "ACCUMULATED SNOW"         "kg m-2"
 state    real   ACSNOM           ij     misc        1         -      rd=(interp_mask_land_field:lu_index)u=(copy_fcnm)       "ACSNOM"           "ACCUMULATED MELTED SNOW"  "kg m-2"
-state    real   SNOW             ij     misc        1         -     i01rhd=(interp_mask_land_field:lu_index)u=(copy_fcnm)    "SNOW"             "SNOW WATER EQUIVALENT"    "kg m-2"
-state    real   SNOWH            ij     misc        1         -     i01rhd=(interp_mask_land_field:lu_index)u=(copy_fcnm)    "SNOWH"            "PHYSICAL SNOW DEPTH"      "m"
-state    real   CANWAT           ij     misc        1         -     i01rhd=(interp_mask_land_field:lu_index)u=(copy_fcnm)    "CANWAT"           "CANOPY WATER"             "kg m-2"
-state    real   SST              ij     misc        1         -     i012rhd=(interp_mask_water_field:lu_index)   "SST"              "SEA SURFACE TEMPERATURE" "K"
+state    real   SNOW             ij     misc        1         -     i01rh2d=(interp_mask_land_field:lu_index)u=(copy_fcnm)    "SNOW"             "SNOW WATER EQUIVALENT"    "kg m-2"
+state    real   SNOWH            ij     misc        1         -     i01rh2d=(interp_mask_land_field:lu_index)u=(copy_fcnm)    "SNOWH"            "PHYSICAL SNOW DEPTH"      "m"
+state    real   CANWAT           ij     misc        1         -     i01rh2d=(interp_mask_land_field:lu_index)u=(copy_fcnm)    "CANWAT"           "CANOPY WATER"             "kg m-2"
+state    real   SST              ij     misc        1         -     i01rh2d=(interp_mask_water_field:lu_index)   "SST"              "SEA SURFACE TEMPERATURE" "K"
 state  integer  IFNDSNOWH        -      misc        1         -     i         "FNDSNOWH" "SNOWH_LOGICAL"
 state  integer  IFNDSOILW        -      misc        1         -     i         "FNDSOILW" "SOILW_LOGICAL"
 
@@ -483,19 +483,19 @@ state    real    F_RIMEF_PHY     ikj    misc        1         -      rdu      "F
 
 # Other Misc State Variables                                            
 state   real    h_diabatic     ikj     misc         1         -      r        "h_diabatic"            "PREVIOUS TIMESTEP CONDENSATIONAL HEATING"         ""      
-state   real    msft           ij      misc         1         -     i012rhdu=(copy_fcnm)    "MAPFAC_M"         "Map scale factor on mass grid" ""
-state   real    msfu           ij      misc         1         X     i012rhdu=(copy_fcnm)    "MAPFAC_U"         "Map scale factor on u-grid" ""
-state   real    msfv           ij      misc         1         Y     i012rhdu=(copy_fcnm)    "MAPFAC_V"         "Map scale factor on v-grid" ""
-state   real    f              ij      misc         1         -     i012rhdu=(copy_fcnm)    "f"                "Coriolis sine latitude term"  "s-1"
-state   real    e              ij      misc         1         -     i012rhdu=(copy_fcnm)    "e"                "Coriolis cosine latitude term"  "s-1"
-state   real    sina           ij      misc         1         -     i012rhdu=(copy_fcnm)    "SINALPHA"         "Local sine of map rotation"   ""
-state   real    cosa           ij      misc         1         -     i012rhdu=(copy_fcnm)    "COSALPHA"         "Local cosine of map rotation"  ""
-state   real    ht             ij      misc         1         -     i012rhdus  "HGT"              "Terrain Height"   "m"
+state   real    msft           ij      misc         1         -     i012rh02du=(copy_fcnm)    "MAPFAC_M"         "Map scale factor on mass grid" ""
+state   real    msfu           ij      misc         1         X     i012rh02du=(copy_fcnm)    "MAPFAC_U"         "Map scale factor on u-grid" ""
+state   real    msfv           ij      misc         1         Y     i012rh02du=(copy_fcnm)    "MAPFAC_V"         "Map scale factor on v-grid" ""
+state   real    f              ij      misc         1         -     i012rh02du=(copy_fcnm)    "f"                "Coriolis sine latitude term"  "s-1"
+state   real    e              ij      misc         1         -     i012rh02du=(copy_fcnm)    "e"                "Coriolis cosine latitude term"  "s-1"
+state   real    sina           ij      misc         1         -     i012rh02du=(copy_fcnm)    "SINALPHA"         "Local sine of map rotation"   ""
+state   real    cosa           ij      misc         1         -     i012rh02du=(copy_fcnm)    "COSALPHA"         "Local cosine of map rotation"  ""
+state   real    ht             ij      misc         1         -     i012rh02dus  "HGT"              "Terrain Height"   "m"
 state   real    ht_fine        ij      misc         1         -     -          "HGT_FINE"         "Fine Terrain Height"   "m"
 state   real    ht_int         ij      misc         1         -     -          "HGT_INT"          "Terrain Height Horizontally Interpolated"   "m"
 state   real    ht_input       ij      misc         1         -     -          "HGT_INPUT"        "Terrain Height from FG Input File"   "m"
 
-state   real    TSK            ij      misc         1         -     i012rhdu=(copy_fcnm)    "TSK"                   "SURFACE SKIN TEMPERATURE"                  "K"
+state   real    TSK            ij      misc         1         -     i012rh02du=(copy_fcnm)    "TSK"                   "SURFACE SKIN TEMPERATURE"                  "K"
 state   real    TSK_SAVE       ij      misc         1         -     -         "TSK_SAVE" "SURFACE SKIN TEMPERATURE, EXTRA COPY FOR SEA ICE TESTS in REAL"       "K"
 state   real    u_base         k       misc         1         -     ir        "u_base"                "BASE STATE X WIND IN IDEALIZED CASES"         ""      
 state   real    v_base         k       misc         1         -     ir        "v_base"                "BASE STATE Y WIND IN IDEALIZED CASES"         ""      
@@ -591,10 +591,10 @@ state    real  GLW              ij      misc        1         -      rh       "G
 
 # these next 2 are for the HFSoLE/PET demo; writing these to auxhist1 output over MCEL for coupling
 # with wave model, only if compiled with -DMCELIO, JM 2003/05/29
-state    real  XLAT             ij      misc        1         -     i0123rh01du=(copy_fcnm)      "XLAT"                "LATITUDE, SOUTH IS NEGATIVE"                                          "degree_north"
-state    real  XLONG            ij      misc        1         -     i0123rh01du=(copy_fcnm)      "XLONG"               "LONGITUDE, WEST IS NEGATIVE"                                          "degree_east"
+state    real  XLAT             ij      misc        1         -     i012rh012du=(copy_fcnm)      "XLAT"                "LATITUDE, SOUTH IS NEGATIVE"                                          "degree_north"
+state    real  XLONG            ij      misc        1         -     i012rh012du=(copy_fcnm)      "XLONG"               "LONGITUDE, WEST IS NEGATIVE"                                          "degree_east"
 state    real  ALBEDO           ij      misc        1         -       r          "ALBEDO"                   "ALBEDO"
-state    real  ALBBCK           ij      misc        1         -     i012r        "ALBBCK"                   "BACKGROUND ALBEDO"        ""
+state    real  ALBBCK           ij      misc        1         -     i012rh02        "ALBBCK"                   "BACKGROUND ALBEDO"        ""
 state    real  EMISS            ij      misc        1         -      r        "EMISS"                 "SURFACE EMISSIVITY"         "" 
 
 state    real  CLDEFI           ij      misc        1         -      r        "CLDEFI"                "precipitation efficiency in BMJ SCHEME"    ""      
@@ -619,9 +619,9 @@ i1       real  rho_phy         ikj      misc        1ag       -
 i1    logical  CU_ACT_FLAG     ij       misc        1         -
 
                                                 
-state    real  TMN              ij      misc        1         -     i012rhd=(interp_mask_land_field:lu_index)u=(copy_fcnm)     "TMN"                   "SOIL TEMPERATURE AT LOWER BOUNDARY"           "K"
-state    real  XLAND            ij      misc        1         -     i02rhd=(interp_fcnm)u=(copy_fcnm)       "XLAND"                 "LAND MASK (1 FOR LAND, 2 FOR WATER)"          ""      
-state    real  ZNT              ij      misc        1         -      i3r      "ZNT"                   "TIME-VARYING ROUGHNESS LENGTH"                "m"      
+state    real  TMN              ij      misc        1         -     i012rh02d=(interp_mask_land_field:lu_index)u=(copy_fcnm)     "TMN"                   "SOIL TEMPERATURE AT LOWER BOUNDARY"           "K"
+state    real  XLAND            ij      misc        1         -     i02rh02d=(interp_fcnm)u=(copy_fcnm)       "XLAND"                 "LAND MASK (1 FOR LAND, 2 FOR WATER)"          ""      
+state    real  ZNT              ij      misc        1         -     i023rh02     "ZNT"                   "TIME-VARYING ROUGHNESS LENGTH"                "m"      
 state    real  UST              ij      misc        1         -      r        "UST"                   "U* IN SIMILARITY THEORY"                      "m s-1"      
 i1       real  HOL              ij      misc        1         -      -        "HOL"                   "PBL HEIGHT OVER MONIN-OBUKHOV LENGTH"         ""
 state    real  RMOL             ij      misc        1         -     rh       "RMOL"                   "1./Monin Ob. Length"                      ""
@@ -1069,6 +1069,33 @@ rconfig   integer   move_interval   namelist,domains    max_moves        9999999
 rconfig   integer   move_cd_x       namelist,domains    max_moves        0
 rconfig   integer   move_cd_y       namelist,domains    max_moves        0
 
+# VAR_TEST_control, append to domains
+rconfig   logical TEST_rk_step_prep       namelist,domains          1      .false. -     "TEST_rk_step_prep"           ""      ""
+rconfig   logical TEST_init_zero_tendency namelist,domains          1      .false. -     "TEST_init_zero_tendency"     ""      ""
+rconfig   logical TEST_phy_prep           namelist,domains          1      .false. -     "TEST_phy_prep"               ""      ""
+rconfig   logical TEST_calculate_km_kh    namelist,domains          1      .false. -     "TEST_calculate_km_kh"        ""      ""
+rconfig   logical TEST_rk_tendency        namelist,domains          1      .false. -     "TEST_rk_tendency"            ""      ""
+rconfig   logical TEST_advect_scalar      namelist,domains          1      .false. -     "TEST_advect_scalar"          ""      ""
+rconfig   logical TEST_relax_bdy_dry      namelist,domains          1      .false. -     "TEST_relax_bdy_dry"          ""      ""
+rconfig   logical TEST_rk_addtend_dry     namelist,domains          1      .false. -     "TEST_rk_addtend_dry"         ""      ""
+rconfig   logical TEST_spec_bdy_dry       namelist,domains          1      .false. -     "TEST_spec_bdy_dry"           ""      ""
+rconfig   logical TEST_small_step_prep    namelist,domains          1      .false. -     "TEST_small_step_prep"        ""      ""
+rconfig   logical TEST_calc_p_rho         namelist,domains          1      .false. -     "TEST_calc_p_rho"             ""      ""
+rconfig   logical TEST_calc_coef_w        namelist,domains          1      .false. -     "TEST_calc_coef_w"            ""      ""
+rconfig   logical TEST_advance_uv         namelist,domains          1      .false. -     "TEST_advance_uv"             ""      ""
+rconfig   logical TEST_spec_bdyupdate     namelist,domains          1      .false. -     "TEST_spec_bdyupdate"         ""      ""
+rconfig   logical TEST_advance_mu_t       namelist,domains          1      .false. -     "TEST_advance_mu_t"           ""      ""
+rconfig   logical TEST_sumflux            namelist,domains          1      .false. -     "TEST_sumflux"                ""      ""
+rconfig   logical TEST_advance_w          namelist,domains          1      .false. -     "TEST_advance_w"              ""      ""
+rconfig   logical TEST_spec_bdyupdate_ph  namelist,domains          1      .false. -     "TEST_spec_bdyupdate_ph"      ""      ""
+rconfig   logical TEST_calc_mu_uv_1       namelist,domains          1      .false. -     "TEST_calc_mu_uv_1"           ""      ""
+rconfig   logical TEST_small_step_finish  namelist,domains          1      .false. -     "TEST_small_step_finish"      ""      ""
+rconfig   logical TEST_rk_scalar_tend     namelist,domains          1      .false. -     "TEST_rk_scalar_tend"         ""      ""
+rconfig   logical TEST_spec_bdy_scalar    namelist,domains          1      .false. -     "TEST_spec_bdy_scalar"        ""      ""
+rconfig   logical TEST_rk_update_scalar   namelist,domains          1      .false. -     "TEST_rk_update_scalar"       ""      ""
+rconfig   logical TEST_calc_p_rho_phi     namelist,domains          1      .false. -     "TEST_calc_p_rho_phi"         ""      ""
+rconfig   logical TEST_diagnose_w         namelist,domains          1      .false. -     "TEST_diagnose_w"             ""      ""
+
 # Physics
 rconfig   integer     mp_physics          namelist,physics	max_domains    0       rh       "mp_physics"            ""      ""
 rconfig   integer     ra_lw_physics       namelist,physics	max_domains    0       rh       "ra_lw_physics"         ""      ""
@@ -1153,33 +1180,6 @@ rconfig   logical open_ys                 namelist,bdy_control	max_domains    .f
 rconfig   logical open_ye                 namelist,bdy_control	max_domains    .false. rh    "open_ye"               ""      ""
 rconfig   logical nested                  namelist,bdy_control	max_domains    .false. rh    "nested"                ""      ""
 rconfig   integer real_data_init_type     namelist,bdy_control		1                 1    irh   "real_data_init_type"   "REAL DATA INITIALIZATION OPTIONS: 1=SI, 2=MM5, 3=GENERIC" "PRE-PROCESSOR TYPES"
-
-# VAR_TEST_control
-rconfig   logical TEST_rk_step_prep       namelist,var_test_control          1      .false. -     "TEST_rk_step_prep"           ""      ""
-rconfig   logical TEST_init_zero_tendency namelist,var_test_control          1      .false. -     "TEST_init_zero_tendency"     ""      ""
-rconfig   logical TEST_phy_prep           namelist,var_test_control          1      .false. -     "TEST_phy_prep"               ""      ""
-rconfig   logical TEST_calculate_km_kh    namelist,var_test_control          1      .false. -     "TEST_calculate_km_kh"        ""      ""
-rconfig   logical TEST_rk_tendency        namelist,var_test_control          1      .false. -     "TEST_rk_tendency"            ""      ""
-rconfig   logical TEST_advect_scalar      namelist,var_test_control          1      .false. -     "TEST_advect_scalar"          ""      ""
-rconfig   logical TEST_relax_bdy_dry      namelist,var_test_control          1      .false. -     "TEST_relax_bdy_dry"          ""      ""
-rconfig   logical TEST_rk_addtend_dry     namelist,var_test_control          1      .false. -     "TEST_rk_addtend_dry"         ""      ""
-rconfig   logical TEST_spec_bdy_dry       namelist,var_test_control          1      .false. -     "TEST_spec_bdy_dry"           ""      ""
-rconfig   logical TEST_small_step_prep    namelist,var_test_control          1      .false. -     "TEST_small_step_prep"        ""      ""
-rconfig   logical TEST_calc_p_rho         namelist,var_test_control          1      .false. -     "TEST_calc_p_rho"             ""      ""
-rconfig   logical TEST_calc_coef_w        namelist,var_test_control          1      .false. -     "TEST_calc_coef_w"            ""      ""
-rconfig   logical TEST_advance_uv         namelist,var_test_control          1      .false. -     "TEST_advance_uv"             ""      ""
-rconfig   logical TEST_spec_bdyupdate     namelist,var_test_control          1      .false. -     "TEST_spec_bdyupdate"         ""      ""
-rconfig   logical TEST_advance_mu_t       namelist,var_test_control          1      .false. -     "TEST_advance_mu_t"           ""      ""
-rconfig   logical TEST_sumflux            namelist,var_test_control          1      .false. -     "TEST_sumflux"                ""      ""
-rconfig   logical TEST_advance_w          namelist,var_test_control          1      .false. -     "TEST_advance_w"              ""      ""
-rconfig   logical TEST_spec_bdyupdate_ph  namelist,var_test_control          1      .false. -     "TEST_spec_bdyupdate_ph"      ""      ""
-rconfig   logical TEST_calc_mu_uv_1       namelist,var_test_control          1      .false. -     "TEST_calc_mu_uv_1"           ""      ""
-rconfig   logical TEST_small_step_finish  namelist,var_test_control          1      .false. -     "TEST_small_step_finish"      ""      ""
-rconfig   logical TEST_rk_scalar_tend     namelist,var_test_control          1      .false. -     "TEST_rk_scalar_tend"         ""      ""
-rconfig   logical TEST_spec_bdy_scalar    namelist,var_test_control          1      .false. -     "TEST_spec_bdy_scalar"        ""      ""
-rconfig   logical TEST_rk_update_scalar   namelist,var_test_control          1      .false. -     "TEST_rk_update_scalar"       ""      ""
-rconfig   logical TEST_calc_p_rho_phi     namelist,var_test_control          1      .false. -     "TEST_calc_p_rho_phi"         ""      ""
-rconfig   logical TEST_diagnose_w         namelist,var_test_control          1      .false. -     "TEST_diagnose_w"             ""      ""
 
 # NAMELIST DERIVED
 rconfig   real    cen_lat                 derived                  max_domains    0       -        "cen_lat"              "center latitude"      "degrees, negative is south"
