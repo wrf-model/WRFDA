@@ -30,9 +30,14 @@
       call da_calculate_residual_Synop( iv, y, re, np_missing, np_bad_data, &
                                         np_obs_used, np_available )
 
-!     for satellite wind track.
+!     for Geo. Satellite AMVs :
 
-      call da_calculate_residual_Satob( iv, y, re, np_missing, np_bad_data, &
+      call da_calculate_residual_GeoAMV( iv, y, re, np_missing, np_bad_data, &
+                                        np_obs_used, np_available )
+
+!     for Polar Satellite AMVs :
+
+      call da_calculate_residual_PolarAMV( iv, y, re, np_missing, np_bad_data, &
                                         np_obs_used, np_available )
 
 !     for airep:
@@ -77,6 +82,11 @@
 !     for pilot
 
       call da_calculate_residual_Pilot( iv, y, re, np_missing, np_bad_data, &
+                                        np_obs_used, np_available )
+
+!     for TC bogus
+
+      call da_calculate_residual_bogus( iv, y, re, np_missing, np_bad_data, &
                                         np_obs_used, np_available )
 
 !     for Satem

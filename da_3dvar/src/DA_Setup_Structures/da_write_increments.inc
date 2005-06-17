@@ -1,12 +1,12 @@
-SUBROUTINE DA_Write_Increment ( xp, xb, xa, q_cgrid, mu_cgrid )
+SUBROUTINE DA_Write_Increment ( xp, xb, xa, q_cgrid, mu_cgrid, ph_cgrid )
 
    IMPLICIT NONE
 
    TYPE(xb_type)                               :: xb
    TYPE(x_type)                                :: xa
    TYPE(xpose_type)                            :: xp
-   REAL, dimension(xp%ims:xp%ime,xp%jms:xp%jme,xp%kms:xp%kme) :: q_cgrid
-   REAL, dimension(xp%ims:xp%ime,xp%jms:xp%jme)               :: mu_cgrid
+   REAL, dimension(xp%ims:xp%ime,xp%jms:xp%jme,xp%kms:xp%kme)   :: q_cgrid, ph_cgrid
+   REAL, dimension(xp%ims:xp%ime,xp%jms:xp%jme)                 :: mu_cgrid
 
 ! .. Arrays for write out increments:
    integer                                          :: ix, jy, kz
@@ -16,7 +16,8 @@ SUBROUTINE DA_Write_Increment ( xp, xb, xa, q_cgrid, mu_cgrid )
    real, dimension(1:xb%mix,1:xb%mjy,1:xb%mkz+1)    ::    wgbuf
 
    real, dimension(:,:,:), allocatable :: u_global, v_global, w_global, &
-                                          p_global, t_global, q_global
+                                          p_global, t_global, q_global, &
+                                         ph_global
    real, dimension(:,:)  , allocatable :: mu_global, psfc_global, &
                        psac_global, tgrn_global, terr_global, snow_global,&
                         lat_global,  lon_global, lanu_global,             &
@@ -53,6 +54,7 @@ SUBROUTINE DA_Write_Increment ( xp, xb, xa, q_cgrid, mu_cgrid )
       ALLOCATE (    u_global (1:ix+1,1:jy+1,1:kz+1) )
       ALLOCATE (    v_global (1:ix+1,1:jy+1,1:kz+1) )
       ALLOCATE (    w_global (1:ix+1,1:jy+1,1:kz+1) )
+      ALLOCATE (   ph_global (1:ix+1,1:jy+1,1:kz+1) )
       ALLOCATE ( psfc_global (1:ix+1,1:jy+1) )
       ALLOCATE (   mu_global (1:ix+1,1:jy+1) )
 
@@ -75,12 +77,20 @@ SUBROUTINE DA_Write_Increment ( xp, xb, xa, q_cgrid, mu_cgrid )
       call local_to_global( xp, xa % v, gbuf, 3 ) 
       IF ( wrf_dm_on_monitor() ) THEN 
         v_global(1:ix,1:jy,1:kz) = gbuf(1:ix,1:jy,1:kz) 
-      END IF 
+      END IF
+
+! One more level for w and ph:
+      xp%kde = xp%kde+1
       call local_to_global( xp, xa % w, wgbuf, 3 ) 
       IF ( wrf_dm_on_monitor() ) THEN 
         w_global(1:ix,1:jy,1:kz+1) = wgbuf(1:ix,1:jy,1:kz+1) 
       END IF 
- 
+      call local_to_global( xp, ph_cgrid, wgbuf, 3 ) 
+      IF ( wrf_dm_on_monitor() ) THEN 
+        ph_global(1:ix,1:jy,1:kz+1) = wgbuf(1:ix,1:jy,1:kz+1) 
+      END IF 
+      xp%kde = xp%kde-1
+! 
       call local_to_global( xp, xa % psfc, gbuf_2d, 2 ) 
       IF ( wrf_dm_on_monitor() ) THEN 
         psfc_global(1:ix,1:jy) = gbuf_2d(1:ix,1:jy) 
@@ -168,21 +178,55 @@ SUBROUTINE DA_Write_Increment ( xp, xb, xa, q_cgrid, mu_cgrid )
 
 !    .. 3d- and 2d-increments:
          write (141) u_global, v_global, w_global, p_global, t_global, &
-                   q_global, mu_global, psfc_global
+                   q_global, ph_global, mu_global, psfc_global
 
 !    .. 2d-constant fields:
          write (141) psac_global, tgrn_global, terr_global, snow_global,  &
                   lat_global, lon_global, lanu_global, map_factor_global, &
                   cori_global, landmask_global
 
+     print '(/"MAXVAL:: u, v, w, p, t, qv, ph, mu, psfc:",9e13.5)',  &
+      maxval(u_global),maxval(v_global),maxval(w_global ),maxval(p_global ), &
+      maxval(t_global),maxval(q_global),maxval(ph_global),maxval(mu_global), & 
+      maxval(psfc_global)
+     print '(/"MINVAL:: u, v, w, p, t, qv, ph, mu, psfc:",9e13.5)',  &
+      minval(u_global),minval(v_global),minval(w_global ),minval(p_global ), &
+      minval(t_global),minval(q_global),minval(ph_global),minval(mu_global), &
+      minval(psfc_global)
+
 #else
 
 !    .. 3d- and 2d-increments:
-        write (141) xa%u, xa%v, xa%w, xa%p, xa%t, q_cgrid, mu_cgrid, xa%psfc
+        write (141) xa%u(1:ix+1,1:jy+1,1:kz+1), &
+                    xa%v(1:ix+1,1:jy+1,1:kz+1), &
+                    xa%w(1:ix+1,1:jy+1,1:kz+1), &
+                    xa%p(1:ix+1,1:jy+1,1:kz+1), &
+                    xa%t(1:ix+1,1:jy+1,1:kz+1), &
+                    q_cgrid(1:ix+1,1:jy+1,1:kz+1), &
+                    ph_cgrid(1:ix+1,1:jy+1,1:kz+1), &
+                    mu_cgrid(1:ix+1,1:jy+1), &
+                    xa%psfc(1:ix+1,1:jy+1)
 
 !    .. 2d-constant fields:
-        write (141) xb%psac, xb%tgrn, xb%terr, xb%snow, xb%lat, xb%lon, &
-                  xb%lanu, xb%map_factor, xb%cori, xb%landmask
+        write (141) xb%psac(1:ix+1,1:jy+1), &
+                    xb%tgrn(1:ix+1,1:jy+1), &
+                    xb%terr(1:ix+1,1:jy+1), &
+                    xb%snow(1:ix+1,1:jy+1), &
+                    xb%lat(1:ix+1,1:jy+1), &
+                    xb%lon(1:ix+1,1:jy+1), &
+                    xb%lanu(1:ix+1,1:jy+1), &
+                    xb%map_factor(1:ix+1,1:jy+1), &
+                    xb%cori(1:ix+1,1:jy+1), &
+                    xb%landmask(1:ix+1,1:jy+1)
+
+      print '(/"MAXVAL:: u, v, w, p, t, qv, ph, mu, psfc:",9e13.5)',  &
+         maxval(xa%u),maxval(xa%v),   maxval(xa%w ),   maxval(xa%p ), &
+         maxval(xa%t),maxval(q_cgrid),maxval(ph_cgrid),maxval(mu_cgrid),&
+         maxval(xa%psfc)
+      print '(/"MINVAL:: u, v, w, p, t, qv, ph, mu, psfc:",9e13.5)',  &
+         minval(xa%u),minval(xa%v),   minval(xa%w ),   minval(xa%p ), &
+         minval(xa%t),minval(q_cgrid),minval(ph_cgrid),minval(mu_cgrid),&
+         minval(xa%psfc)
 
 #endif
 
