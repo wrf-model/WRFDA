@@ -61,7 +61,7 @@ SUBROUTINE solve_em_tl ( grid , config_flags , &
    INTEGER                         :: ids , ide , jds , jde , kds , kde , &
                                       ims , ime , jms , jme , kms , kme , &
                                       ips , ipe , jps , jpe , kps , kpe
-   INTEGER                         :: ij , iteration
+   INTEGER                         :: ij , iteration,iteration1
    INTEGER                         :: im , num_3d_m , ic , num_3d_c
    INTEGER                         :: loop
    INTEGER                         :: ijds, ijde
@@ -71,7 +71,6 @@ SUBROUTINE solve_em_tl ( grid , config_flags , &
 ! storage for tendencies and decoupled state (generated from Registry)
 #include <em_i1_decl.inc>
 
-#ifdef WRFVAR
    INTEGER :: rc 
    INTEGER :: number_of_small_timesteps, rk_step
    INTEGER :: klevel,ijm,ijp,i,j,k,size1,size2    ! for prints/plots only
@@ -172,12 +171,10 @@ SUBROUTINE solve_em_tl ( grid , config_flags , &
 ! Initialize timers if compiled with -DBENCH
 #include <bench_solve_em_init.h>
 
-#ifdef WRFVAR
-
-! xyh identity operation return here
-   return
-
 !  set leapfrog or runge-kutta solver (2nd or 3rd order)
+
+!xyh return to be identity operation
+!   return
 
    dynamics_option = config_flags%rk_ord
 
@@ -371,6 +368,7 @@ BENCH_START(step_prep_tim)
                            grid%j_start(ij), grid%j_end(ij), &
                            k_start, k_end                   )
 #endif
+
       call g_rk_step_prep( config_flags,                     &
                            u_2,g_u_2,v_2,g_v_2,w_2,g_w_2,    &
                            ph_2,g_ph_2,mu_2,g_mu_2,          &
@@ -388,6 +386,7 @@ BENCH_START(step_prep_tim)
                            k_start,k_end )
 
    END DO
+
    !$OMP END PARALLEL DO
 BENCH_END(step_prep_tim)
 
@@ -1067,7 +1066,7 @@ BENCH_END(hor_diff_tim)
 
      END IF rk_step_is_one
 
-BENCH_START(rk_tend_tim)
+
    !$OMP PARALLEL DO   &
    !$OMP PRIVATE ( ij )
    DO ij = 1 , grid%num_tiles
@@ -1186,6 +1185,7 @@ BENCH_START(relax_bdy_dry_tim)
    !$OMP END PARALLEL DO
 BENCH_END(relax_bdy_dry_tim)
 
+
 !<DESCRIPTION>
 !<pre>
 ! (3) Small (acoustic,sound) steps.
@@ -1271,12 +1271,20 @@ BENCH_START(small_step_prep_tim)
                         grid%j_start(ij), grid%j_end(ij), &
                         k_start    , k_end               )
 #endif
+
+
       call g_calc_coef_w( a,g_a,alpha,g_alpha,gamma,g_gamma,mut,g_mut,cqw,g_cqw,rdn,rdnw,c2a,g_c2a,dts,g,epssm,ide,jde,kde,ims,ime,&
 &jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij) )
       ENDIF
    ENDDO
+
    !$OMP END PARALLEL DO
 BENCH_END(small_step_prep_tim)
+
+!----------------
+!----------------
+!  goto 6788 !zzma
+!----------------
 
 
 #ifdef DM_PARALLEL
@@ -1402,6 +1410,7 @@ BENCH_START(set_phys_bc2_tim)
     !$OMP END PARALLEL DO
     endif
 BENCH_END(set_phys_bc2_tim)
+
 
    small_steps : DO iteration = 1 , number_of_small_timesteps
 
@@ -1631,7 +1640,7 @@ BENCH_START(spec_bdynhyd_tim)
 &spec_zone,ids,ide,jds,jde,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),&
 &k_start,k_end )
              IF( config_flags%specified ) THEN
-               if(dyn_opt == DYN_EM) then
+#if 0
                CALL zero_grad_bdy ( w_2,                        &
                                     'w'         , config_flags, &
                                     spec_zone,                  &
@@ -1641,7 +1650,9 @@ BENCH_START(spec_bdynhyd_tim)
                                     grid%i_start(ij), grid%i_end(ij),         &
                                     grid%j_start(ij), grid%j_end(ij),         &
                                     k_start    , k_end             )
-               endif
+#endif
+               call g_zero_grad_bdy( w_2,g_w_2,'w',spec_zone,ids,ide,jds,jde,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%&
+&i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start )
              ELSE
 #if 0
                CALL spec_bdyupdate   ( w_2, rw_tend, dts_rk,       &
@@ -1765,6 +1776,7 @@ BENCH_END(phys_bc_tim)
 
    END DO small_steps
 
+
    !$OMP PARALLEL DO   &
    !$OMP PRIVATE ( ij )
 
@@ -1809,10 +1821,14 @@ BENCH_START(small_step_finish_tim)
     call g_small_step_finish( u_2,g_u_2,v_2,g_v_2,w_2,g_w_2,t_2,g_t_2,ph_2,g_ph_2,ww,mu_2,g_mu_2,mut,g_mut,muts,g_muts,muu,g_muu,&
 &muus,g_muus,muv,g_muv,muvs,g_muvs,u_save,g_u_save,v_save,g_v_save,w_save,g_w_save,t_save,g_t_save,ph_save,g_ph_save,mu_save,&
 &g_mu_save,msfu,msfv,msft,ide,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij) )
+
+
 BENCH_END(small_step_finish_tim)
 
    END DO
    !$OMP END PARALLEL DO
+
+
 
 #ifdef DM_PARALLEL
 !
@@ -1839,7 +1855,6 @@ BENCH_END(small_step_finish_tim)
 !    of the scalar (calling rk_scalar_update).
 !</pre>
 !</DESCRIPTION>
-
 
   moist_scalar_advance: IF (num_3d_m >= PARAM_FIRST_SCALAR )  THEN
 
@@ -2532,6 +2547,11 @@ BENCH_END(bc_end_tim)
 
    ENDIF rk_step_1_check
 
+!----------------
+!----------------
+!6788 continue !zzma
+!----------------
+
 
 !**********************************************************
 !
@@ -2540,6 +2560,11 @@ BENCH_END(bc_end_tim)
 !**********************************************************
 
  END DO Runge_Kutta_loop
+
+!----------------
+!----------------
+!  goto 6789 !zzma
+!----------------
 
 #if 0
    !$OMP PARALLEL DO   &
@@ -2964,11 +2989,14 @@ BENCH_END(bc_2d_tim)
 ! See comment before earlier #include of this file.
 #define COPY_OUT
 #include <em_scalar_derefs.inc>
-#endif
+
+!----------------
+!----------------
+!6789 continue !zzma
+!----------------
+
 
    RETURN
-
-#endif
 
 END SUBROUTINE solve_em_tl
 

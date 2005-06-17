@@ -315,8 +315,19 @@ CONTAINS
 ! - Look for boundary data after writing out history and restart files
       CALL med_latbound_in ( head_grid , config_flags )
 
+!XX
+!     print*,'ad_date_string = ',ad_date_string
+!XX
       CALL Setup_date_string (head_grid, ad_date_string, 'ad' )
+!XX
+!     print*,'after ad_date_string',ad_date_string
+!     print*,'nl_date_string = ',nl_date_string
+!XX
       CALL Setup_date_string (head_grid, nl_date_string, 'an' )
+!XX
+!     print*,'after nl_date_string', nl_date_string
+!XX
+
       nl_date_index = 1
       ad_date_index = 1
 

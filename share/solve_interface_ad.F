@@ -46,10 +46,11 @@ SUBROUTINE solve_interface_ad ( grid )
 
 #if (EM_CORE == 1 && DA_CORE != 1)
    ELSE IF ( config_flags%dyn_opt == DYN_EM_AD ) THEN
+     print *, 'call solve_em_ad:'
      CALL solve_em_ad ( grid , config_flags , &
-!
-# include <em_actual_args.inc>
-!
+ 
+ # include <em_actual_args.inc>
+ 
                )
 
 # ifdef WRF_CHEM
