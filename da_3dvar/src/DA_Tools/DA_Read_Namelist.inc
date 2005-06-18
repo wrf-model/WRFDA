@@ -496,7 +496,7 @@ SUBROUTINE DA_Read_Namelist
 !  [3.0] Error traps:
 !------------------------------------------------------------------------------
 
-   IF ( cv_options < 1 .OR. cv_options > 4 ) THEN
+   IF ( cv_options < 1 .OR. cv_options > 5 ) THEN
       WRITE(0,'(A,I3)')' DA_Read_Namelist: Invalid cv_options = ', cv_options
       STOP
    END IF
