@@ -14,7 +14,7 @@ SUBROUTINE calculate_cv_local_size( xbx, xp, be, cv, cv_size )
     integer             :: iy, jx          ! Local horizontal domain dimensions.
     integer             :: ij              ! Product of horizontal dims.
 
-    if ( cv_options <= 3) then
+    if ( cv_options <= 5) then
     iy = xp % ite - xp % its + 1
     jx = xp % jte - xp % jts + 1
     ij = iy * jx
