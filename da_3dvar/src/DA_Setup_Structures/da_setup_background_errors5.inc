@@ -1,3 +1,4 @@
+
 SUBROUTINE DA_Setup_Background_Errors5(xb, be, xbx, xp)
 
 !------------------------------------------------------------------------------
@@ -78,6 +79,12 @@ SUBROUTINE DA_Setup_Background_Errors5(xb, be, xbx, xp)
    ENDIF
 
    be % cv % option = cv_options
+!!!!!!!!! cv_options=3
+      be % v1 % name = 'psi  '           ! Streamfunction
+      be % v2 % name = 'chi_u'           ! Uncorrelated velocity potential.
+      be % v3 % name = 't_u'             ! Unbalanced temperature.
+      be % v4 % name = 'q/qsg'
+      be % v5 % name = 'psfc'            ! surface pressure
 
    write(6,'(3x,A)')' DA_Setup_Background_Errors: 3DVAR dry control variables are:'
    write(6,'(4x,7A)')TRIM(be % v1 % name), ', ', TRIM(be % v2 % name), ', ', &
@@ -99,6 +106,11 @@ rewind (be_cv_5_unit)
    read(be_cv_5_unit) num_bins, num_bins2d
 !---------------------------------------------------------
 
+! 1.0 Load the regression coefficients
+! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+! 1.1 Read in regression coefficients
+
    allocate (regcoeff1(1:num_bins))
    allocate (regcoeff2(1:nk,1:num_bins2d))
    allocate (regcoeff3(1:nk,1:nk,1:num_bins2d))
@@ -107,20 +119,30 @@ rewind (be_cv_5_unit)
    read(be_cv_5_unit) regcoeff2 
    read(be_cv_5_unit) regcoeff3  
 
-   allocate (be%reg_chi(1:nj,1:nk))
-   allocate (be%reg_ps (1:nj,1:nk))
-   allocate (be%reg_t  (1:nj,1:nk,1:nk))
+! 1.2 Re-assign the regression coefficients
 
-!-------------------------------------------------------------
+! 1.2.1 Create the bins
+
    allocate( bin(1:ni,1:nj,1:nk) )
    allocate( bin2d(1:ni,1:nj) )
+
+   bin_type = 1
+   print '(/a,i4)', "bin_type=",bin_type
    call da_create_bins( ni, nj, nk, bin_type, num_bins, &
                                 num_bins2d, bin, bin2d )
+
+   print '("ni, nj, nk, num_bins, num_bins2d:",5i8)', ni, nj, nk, num_bins, num_bins2d
 !--------------------------------------------------------------
 ! Following "latitude, height" variables are optional arguments 
 ! The same may be added, if required
 !--------------------------------------------------------------
-! Fill regression coeff. array
+
+! 1.2.2 Fill regression coeff. array
+
+   allocate (be%reg_chi(1:nj,1:nk))
+   allocate (be%reg_ps (1:nj,1:nk))
+   allocate (be%reg_t  (1:nj,1:nk,1:nk))
+
    do k=1,nk
     do j =1, nj
       b = bin(1,j,k)
@@ -148,6 +170,8 @@ rewind (be_cv_5_unit)
 !   write(901,'(10e13.5)') ((be%reg_chi (j,k),j=1,num_bins2d),k=1,nk)
 !   write(902,'(10e13.5)') ((be%reg_ps (j,k),j=1,num_bins2d),k=1,nk)
 !   write(903,'(10e13.5)') ((be%reg_t (j,k,k),j=1,num_bins2d),k=1,nk)
+
+! 1.3 Domain_averaged regression coefficients
 
     if (.not.lat_stats_option) then
      write(unit=*, fmt='(/5x, a/)') &
@@ -187,16 +211,20 @@ rewind (be_cv_5_unit)
     write(unit=*, fmt='(/5x, a/)') &
     '*** Using the latitude-dependent regression coefficients for unbalanced part ***'
     endif
+    
+    print '(2x,a,i8,a,i4)',"a) &
+        Finished regression coefficients processing! jy=",jy," kz=",kz
 
-!------------------------------------------------------------------------------
-!  [4.0] Allocate temporary arrays:
-!------------------------------------------------------------------------------
+! 2.0 Load the eigenvector and eigenvalue
+! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-   ALLOCATE ( be1_eval_loc (1:jy,1:kz) )
-   ALLOCATE ( be2_eval_loc (1:jy,1:kz) )
-   ALLOCATE ( be3_eval_loc (1:jy,1:kz) )
-   ALLOCATE ( be4_eval_loc (1:jy,1:kz) )
-   ALLOCATE ( be5_eval_loc (1:jy,1:kz) )
+! 2.1 Allocate the arrays
+
+   ALLOCATE ( be1_eval_loc (1:kz,1:jy) )
+   ALLOCATE ( be2_eval_loc (1:kz,1:jy) )
+   ALLOCATE ( be3_eval_loc (1:kz,1:jy) )
+   ALLOCATE ( be4_eval_loc (1:kz,1:jy) )
+   ALLOCATE ( be5_eval_loc (1:kz,1:jy) )
 
    IF ( vert_corr == 2 ) THEN
 
@@ -206,11 +234,11 @@ rewind (be_cv_5_unit)
       ALLOCATE ( be4_eval_glo(1:kz) )
       ALLOCATE ( be5_eval_glo(1:kz) )
 
-      ALLOCATE ( be1_evec_loc(1:jy,1:kz,1:kz) )
-      ALLOCATE ( be2_evec_loc(1:jy,1:kz,1:kz) )
-      ALLOCATE ( be3_evec_loc(1:jy,1:kz,1:kz) )
-      ALLOCATE ( be4_evec_loc(1:jy,1:kz,1:kz) )
-      ALLOCATE ( be5_evec_loc(1:jy,1:kz,1:kz) )
+      ALLOCATE ( be1_evec_loc(1:kz,1:kz,1:jy) )
+      ALLOCATE ( be2_evec_loc(1:kz,1:kz,1:jy) )
+      ALLOCATE ( be3_evec_loc(1:kz,1:kz,1:jy) )
+      ALLOCATE ( be4_evec_loc(1:kz,1:kz,1:jy) )
+      ALLOCATE ( be5_evec_loc(1:kz,1:kz,1:jy) )
 
       ALLOCATE ( be1_evec_glo(1:kz,1:kz) )
       ALLOCATE ( be2_evec_glo(1:kz,1:kz) )
@@ -218,56 +246,63 @@ rewind (be_cv_5_unit)
       ALLOCATE ( be4_evec_glo(1:kz,1:kz) )
       ALLOCATE ( be5_evec_glo(1:kz,1:kz) )
    END IF
-!CV1
+
+! 2.2 Read in the eigenvector and eigenvalue 
+
+! 2.2.1 Control variable 1 (psi)
+
    read(be_cv_5_unit) variable   
    read(be_cv_5_unit) nk, num_bins2d 
-   print*,'variable ',variable,nk,num_bins2d
-!
-   be % v1 % name = variable
-
    read(be_cv_5_unit)  be1_evec_glo   
    read(be_cv_5_unit)  be1_eval_glo    
    read(be_cv_5_unit)  be1_evec_loc     
    read(be_cv_5_unit)  be1_eval_loc    
-!CV2
+
+   be % v1 % name = variable
+!   print*,'variable ',be % v1 % name,nk,num_bins2d
+!
+! 2.2.2 Control variable 2 (chi_u)
+
    read(be_cv_5_unit) variable
    read(be_cv_5_unit) nk, num_bins2d
-   print*,'variable ',variable,nk,num_bins2d
-!
-   be % v2 % name = variable
-
    read(be_cv_5_unit)  be2_evec_glo
    read(be_cv_5_unit)  be2_eval_glo
    read(be_cv_5_unit)  be2_evec_loc
    read(be_cv_5_unit)  be2_eval_loc
 
-!CV3
+   be % v2 % name = variable
+!   print*,'variable ',be % v2 % name,nk,num_bins2d
+
+! 2.2.3 Control variable 3 (t_u)
+
    read(be_cv_5_unit) variable
    read(be_cv_5_unit) nk, num_bins2d
-   print*,'variable ',variable,nk,num_bins2d
-!
-   be % v3 % name = variable
-
    read(be_cv_5_unit)  be3_evec_glo
    read(be_cv_5_unit)  be3_eval_glo
    read(be_cv_5_unit)  be3_evec_loc
    read(be_cv_5_unit)  be3_eval_loc
 
-!CV4
+   be % v3 % name = variable
+!   print*,'variable ',be % v3 % name,nk,num_bins2d
+
+! 2.2.4 Control variable 4 (q/qsg)
+
    read(be_cv_5_unit) variable
    read(be_cv_5_unit) nk, num_bins2d
-   print*,'variable ',variable,nk,num_bins2d
-!
-   be % v4 % name = variable
-
    read(be_cv_5_unit)  be4_evec_glo
    read(be_cv_5_unit)  be4_eval_glo
    read(be_cv_5_unit)  be4_evec_loc
    read(be_cv_5_unit)  be4_eval_loc
 !
+   be % v4 % name = variable
+!   print*,'variable ',be % v4 % name,nk,num_bins2d
+
+! 3.0 Check and get the truncated number of the vertical modes
+! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
    IF ( vert_corr == 2 ) THEN
 
-!     [11.1] Perform checks on eigenvectors:
+! 3.1 Perform checks on eigenvectors:
 
       IF ( test_statistics ) THEN
          CALL DA_Check_EOF_Decomposition( be1_eval_glo(:), be1_evec_glo(:,:), be % v1 % name)
@@ -276,7 +311,8 @@ rewind (be_cv_5_unit)
          CALL DA_Check_EOF_Decomposition( be4_eval_glo(:), be4_evec_glo(:,:), be % v4 % name)
       END IF
 
-!     [11.2] Truncate in vertical:
+! 3.2 Truncate in vertical:
+
       CALL DA_Get_Vertical_Truncation( max_vert_var1, be1_eval_glo(:), be % v1 )
       CALL DA_Get_Vertical_Truncation( max_vert_var2, be2_eval_glo(:), be % v2 )
       CALL DA_Get_Vertical_Truncation( max_vert_var3, be3_eval_glo(:), be % v3 )
@@ -287,6 +323,9 @@ rewind (be_cv_5_unit)
       write(6,*)
 
    ELSE
+
+! 3.3 no truncated
+
       be % v1 % mz = xb % mkz
       be % v2 % mz = xb % mkz
       be % v3 % mz = xb % mkz
@@ -294,10 +333,12 @@ rewind (be_cv_5_unit)
       be % v5 % mz = xb % mkz
 
    END IF
-!------------------------------------------------------------------------------
-!  [12.0] Initialise control variable space components of header:
-!------------------------------------------------------------------------------
+
+! 4.0 Initialise control variable space components of header:
+! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 !This is for DA_Test
+
    kz_vv(1) = be % v1 % mz
    kz_vv(2) = be % v2 % mz
    kz_vv(3) = be % v3 % mz
@@ -305,6 +346,9 @@ rewind (be_cv_5_unit)
    kz_vv(5) = be % v5 % mz
    kz_vp    = xb % mkz
 !------
+
+! 4.1 Compute the size of the control variables
+
    be % mix = ix
    be % mjy = jy
 
@@ -316,14 +360,12 @@ rewind (be_cv_5_unit)
    be % cv % size4  = ij * be % v4 % mz    ! Fix size, read from file later.
    be % cv % size5  = ij * be % v5 % mz    ! Fix size, read from file later.
 
-   print*,'mz size', be % v1 % mz, be % v2 % mz, be % v3 % mz, be % v4 % mz, be % v5 % mz
    be % cv % size = be % cv % size1 + be % cv % size2 + be % cv % size3 + &
                     be % cv % size4 + be % cv % size5
 
    cv_size = be % cv % size
-!------------------------------------------------------------------------------
-!  [13.0] Transfer errors to error structure:
-!------------------------------------------------------------------------------
+
+ ! 4.2 Transfer errors to error structure:
 
    CALL DA_Allocate_Background_Errors( jy, kz, be1_eval_glo, be1_evec_glo, be1_eval_loc, &
                                        be1_evec_loc, be % v1 )
@@ -334,12 +376,20 @@ rewind (be_cv_5_unit)
    CALL DA_Allocate_Background_Errors( jy, kz, be4_eval_glo, be4_evec_glo, be4_eval_loc, &
                                        be4_evec_loc, be % v4 )
 
-!--------------------------------------------------------------------------------------
+   print '(2x,a,i10)',"b) Finished eigenvector processing! ij=", ij
+   
+! 5.0 Load the scale lengths
+! ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+! 5.1 Allocate the array for scale lengths
+
      allocate ( be1_rf_lengthscale(1:nk) )
      allocate ( be2_rf_lengthscale(1:nk) )
      allocate ( be3_rf_lengthscale(1:nk) )
      allocate ( be4_rf_lengthscale(1:nk) )
      allocate ( be5_rf_lengthscale(1:nk) )
+
+! 5.2 read in the scale lengths
 
      read(be_cv_5_unit) variable
      read(be_cv_5_unit) be1_rf_lengthscale
@@ -356,11 +406,9 @@ rewind (be_cv_5_unit)
      read(be_cv_5_unit) variable
      read(be_cv_5_unit) be5_rf_lengthscale(1:1)
      be%v5%name = variable
-     print*,'xb%ds ',xb%ds
-     do k=1,nk
-     write(*,'(I4,5F10.3 )' ) k, be1_rf_lengthscale(k), be2_rf_lengthscale(k), &
- be3_rf_lengthscale(k), be4_rf_lengthscale(k),be5_rf_lengthscale(1)
-     enddo
+
+! 5.3 Convert the scale lengths in the real distance (meter)
+
      be1_rf_lengthscale(1:nk) = be1_rf_lengthscale(1:nk) * xb%ds
      be2_rf_lengthscale(1:nk) = be2_rf_lengthscale(1:nk) * xb%ds
      be3_rf_lengthscale(1:nk) = be3_rf_lengthscale(1:nk) * xb%ds
@@ -369,19 +417,22 @@ rewind (be_cv_5_unit)
 
 !--------------------------------------------------------------
 
-! Perform checks on eigenvectors:
+! 6.0 Perform checks on eigenvectors with be data structure:
+! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
- IF ( test_statistics ) THEN
+    IF ( test_statistics ) THEN
 
-    CALL DA_Check_EOF_Decomposition( be%v1%val_g(:), be%v1%evec_g(:,:),&
+      CALL DA_Check_EOF_Decomposition( be%v1%val_g(:), be%v1%evec_g(:,:),&
                                      be%v1%name)
-    CALL DA_Check_EOF_Decomposition( be%v2%val_g(:), be%v2%evec_g(:,:),&
+      CALL DA_Check_EOF_Decomposition( be%v2%val_g(:), be%v2%evec_g(:,:),&
                                      be%v2%name)
-    CALL DA_Check_EOF_Decomposition( be%v3%val_g(:), be%v3%evec_g(:,:),&
+      CALL DA_Check_EOF_Decomposition( be%v3%val_g(:), be%v3%evec_g(:,:),&
                                      be%v3%name)
-    CALL DA_Check_EOF_Decomposition( be%v4%val_g(:), be%v4%evec_g(:,:),&
+      CALL DA_Check_EOF_Decomposition( be%v4%val_g(:), be%v4%evec_g(:,:),&
                                      be%v4%name)
- END IF
+    END IF
+
+! 6.1 Re-assign the control variable size
 
    be % cv % size1  = ij * be % v1 % mz
    be % cv % size2  = ij * be % v2 % mz
@@ -394,11 +445,13 @@ rewind (be_cv_5_unit)
 
    cv_size = be % cv % size
 
+! 6.2 Close the be unit
+
    close(be_cv_5_unit)
-!------------------------------------------------------------------------------
-!  [16.0] Apply empirical and recursive filter rescaling factor:
-!------------------------------------------------------------------------------
-   print*,'mz',be%v1%mz,be%v2%mz,be%v3%mz,be%v4%mz,be%v5%mz
+
+! 7.0 Apply empirical and recursive filter rescaling factor:
+! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
    CALL DA_Rescale_Background_Errors( ix, jy, var_scaling1, len_scaling1, &
                                       xb % ds, be1_rf_lengthscale, be % v1 )
    CALL DA_Rescale_Background_Errors( ix, jy, var_scaling2, len_scaling2, &
@@ -414,9 +467,27 @@ rewind (be_cv_5_unit)
       be%v5 % val(1:jy,1:be%v5%mz) = 0.0
     CALL DA_Rescale_Background_Errors( ix, jy, var_scaling5, len_scaling5, &
                                       xb % ds, be5_rf_lengthscale, be % v5 )
-!------------------------------------------------------------------------------
-!  [9.0] Deallocate input model state:
-!------------------------------------------------------------------------------
+
+!       k = be%v5%mz
+!       print '(a,i4)', "CV5 (ps_u): k=", k
+!       print '(10e12.5)', be%v5 % val(1:jy,k)
+
+!     print '(/a,f10.2)','xb%ds=',xb%ds
+!     do k=1,nk
+!       write(*,'(I4,5F10.3 )' ) k, be1_rf_lengthscale(k), be2_rf_lengthscale(k), &
+!             be3_rf_lengthscale(k), be4_rf_lengthscale(k),be5_rf_lengthscale(1)
+!     enddo
+
+    print '(2x,a)',"c) Finished the scale length processing!"
+
+    print '(a,i10/5(a,i10))',   &
+      "Size of control variable =",  cv_size, &
+      " and the size for each of control vaiables: cv1=", be % cv % size1, &
+                        " cv2=",be % cv % size2, " cv3=", be % cv % size3, &
+                        " cv4=",be % cv % size4, " cv5=", be % cv % size5
+
+! 8.0 Deallocate input model state:
+! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
    DEALLOCATE ( be1_eval_loc )
    DEALLOCATE ( be2_eval_loc )
