@@ -291,8 +291,8 @@ RECURSIVE SUBROUTINE integrate_ad ( grid, nl_date_string, nl_date_index, ad_date
               'currTime_str(1:19)=', currTime_str(1:19), &
               'ad_date_string(ad_date_index)(1:19)=', ad_date_string(ad_date_index)(1:19)
 !-       do input
-!XX         CALL med_auxinput3_in ( grid , config_flags )
-!XX         CALL add_forcing_to_ad(grid)
+         CALL med_auxinput3_in ( grid , config_flags )
+         CALL add_forcing_to_ad(grid)
          ad_date_index = ad_date_index + 1
 !     else
 !        write(unit=*, fmt='(2a)') &
@@ -347,8 +347,8 @@ RECURSIVE SUBROUTINE integrate_ad ( grid, nl_date_string, nl_date_index, ad_date
                  'currTime_str(1:19)=', currTime_str(1:19), &
                  'ad_date_string(ad_date_index)(1:19)=', ad_date_string(ad_date_index)(1:19)
 !-          do input
-!XX            CALL med_auxinput3_in ( grid , config_flags )
-!XX            CALL add_forcing_to_ad(grid)
+            CALL med_auxinput3_in ( grid , config_flags )
+            CALL add_forcing_to_ad(grid)
             ad_date_index = ad_date_index + 1
 !        else
 !           write(unit=*, fmt='(2a)') &
@@ -468,8 +468,8 @@ RECURSIVE SUBROUTINE integrate_ad ( grid, nl_date_string, nl_date_index, ad_date
                  'currTime_str(1:19)=', currTime_str(1:19), &
                  'ad_date_string(ad_date_index)(1:19)=', ad_date_string(ad_date_index)(1:19)
 !-          do input
-!XX            CALL med_auxinput3_in ( grid , config_flags )
-!XX            CALL add_forcing_to_ad(grid)
+            CALL med_auxinput3_in ( grid , config_flags )
+            CALL add_forcing_to_ad(grid)
             ad_date_index = ad_date_index + 1
 !        else
 !           write(unit=*, fmt='(2a)') &
