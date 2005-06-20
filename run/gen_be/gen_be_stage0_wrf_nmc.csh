@@ -10,15 +10,16 @@
 #Define job by overriding default environment variables:
 
 #set echo
-setenv START_BE_DATE           2005-05-03_00:00:00
-setenv END_BE_DATE             2005-05-04_00:00:00
-setenv WEST_EAST_GRID_NUMBER   222
-setenv SOUTH_NORTH_GRID_NUMBER 128
-setenv GRID_DISTANCE           45000
-setenv FILE_HEAD               'nfsout_d01'
-setenv EXPT                    cwb.test
-setenv DAT_DIR                 /palm1/guo/${EXPT}
-setenv WRFVAR_DIR              /palm/users/guo/wrfvar
+setenv START_BE_DATE           2002-01-01_00:00:00
+setenv END_BE_DATE             2002-01-10_00:00:00
+setenv WEST_EAST_GRID_NUMBER    90
+setenv SOUTH_NORTH_GRID_NUMBER  90
+setenv VERTICAL_GRID_NUMBER     28
+setenv GRID_DISTANCE           100000
+setenv FILE_HEAD               'wrfout_d01'
+setenv EXPT                    WRF
+setenv DAT_DIR                 /mmm/mmmtmp/guo/GEN_BE_data/WRF
+setenv WRFVAR_DIR              /home/bluesky/guo/wrfvar
 
 #-----------------------------------------------------------------------------------
 # Don't change anything below this line.
@@ -28,7 +29,7 @@ setenv WRFVAR_DIR              /palm/users/guo/wrfvar
  echo "Run WRF Stage 0: Calculate standard difference fields from WRF input forecasts."
  echo "-------------------------------------------------------------------------------"
 
- setenv BEGIN_CPU `date`
+ set BEGIN_CPU = `date`
  echo "Beginning CPU time: ${BEGIN_CPU}"
 
  if ( ! $?START_BE_DATE )           setenv START_BE_DATE 2004-05-01_00:00:00
@@ -51,7 +52,7 @@ setenv WRFVAR_DIR              /palm/users/guo/wrfvar
     echo "Directory $DAT_DIR doesn't exist. Exiting."
     exit
  endif
- if ( ! $?RUN_DIR )                 setenv RUN_DIR ${DAT_DIR}
+ if ( ! $?RUN_DIR )                 setenv RUN_DIR /ptmp/guo/TEST_NMC
  if ( ! -d ${RUN_DIR} )             mkdir ${RUN_DIR}
  
  set START_CY = `echo $START_BE_DATE | cut -c1-4`

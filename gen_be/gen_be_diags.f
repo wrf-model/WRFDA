@@ -9,7 +9,7 @@ program gen_be_diags
    character*3         :: be_method                  ! Be method (NMC, or ENS)   
    character*8         :: uh_method                  ! Uh_method (power, scale)
    character*80        :: filename                   ! Input filename.
-   integer             :: nk                         ! Dimensions read in.
+   integer             :: nk,nk_3d                   ! Dimensions read in.
    integer             :: num_bins                   ! Number of bins (3D).
    logical             :: data_on_levels             ! False if data is projected onto EOFs.
 
@@ -24,7 +24,6 @@ program gen_be_diags
 
    filename = 'gen_be.'//trim(be_method)//'.dat'
    open (ounit, file = filename, form='unformatted')
-
 !----------------------------------------------------------------------------
    write(6,'(/a)')' [1] Gather regression coefficients.'
 !----------------------------------------------------------------------------
@@ -47,6 +46,14 @@ program gen_be_diags
    variable = 'rh'
    call da_readwrite_be_stage3( ounit, nk, variable, be_method )
 
+! To keep the dimension nk for 3d fields:
+   nk_3d = nk
+
+   if (uh_method /= 'power') then
+     variable = 'ps_u'
+     call da_readwrite_be_stage3( ounit,  1, variable, be_method )
+   endif
+
 !----------------------------------------------------------------------------
 ! yrg mods:
    if (uh_method == 'power') then
@@ -55,6 +62,9 @@ program gen_be_diags
      write(6,'(/a)')' [3] Gather horizontal scale length.'
    endif
 !----------------------------------------------------------------------------
+
+! To assign the dimension nk for 3d fields:
+   nk = nk_3d
 
    variable = 'psi'
    call da_readwrite_be_stage4( ounit, nk, be_method, uh_method, variable )

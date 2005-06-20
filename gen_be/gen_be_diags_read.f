@@ -10,7 +10,7 @@ program gen_be_diags_read
    character*8         :: uh_method                  ! Uh_method (power, scale)
    character*80        :: filename                   ! Input filename.
    integer             :: outunit                    ! Output unit for diagnostics.
-   integer             :: ni, nj, nk                 ! Dimensions read in.
+   integer             :: ni, nj, nk, nk_3d          ! Dimensions read in.
    integer             :: bin_type                   ! Type of bin to average over. !!!DALE ADD.
    integer             :: num_bins_hgt               ! Used if bin_type = 2. !!!DALE ADD..
    integer             :: num_bins                   ! Number of 3D bins.
@@ -54,11 +54,23 @@ program gen_be_diags_read
 !   [1] Gather regression coefficients.
 !----------------------------------------------------------------------------
 
+!  Read the dimensions:
    read(iunit)ni, nj, nk
-   read(iunit)num_bins, num_bins2d
+   nk_3d = nk
 
    allocate( bin(1:ni,1:nj,1:nk) )
    allocate( bin2d(1:ni,1:nj) )
+
+!  Read bin info:
+
+   read(iunit)bin_type
+   read(iunit)lat_min, lat_max, binwidth_lat
+   read(iunit)hgt_min, hgt_max, binwidth_hgt
+   read(iunit)num_bins, num_bins2d
+   read(iunit)bin(1:ni,1:nj,1:nk)
+   read(iunit)bin2d(1:ni,1:nj)
+
+!  Read the regression coefficients:
    allocate( regcoeff1(1:num_bins) )
    allocate( regcoeff2(1:nk,1:num_bins2d) )
    allocate( regcoeff3(1:nk,1:nk,1:num_bins2d) )
@@ -66,17 +78,6 @@ program gen_be_diags_read
    read(iunit)regcoeff1
    read(iunit)regcoeff2
    read(iunit)regcoeff3
-
-!  Read bin info:
-   filename = 'bin.data'
-   open (iunit+1, file = filename, form='unformatted')
-   read(iunit+1)bin_type
-   read(iunit+1)lat_min, lat_max, binwidth_lat
-   read(iunit+1)hgt_min, hgt_max, binwidth_hgt
-   read(iunit+1)num_bins, num_bins2d
-   read(iunit+1)bin(1:ni,1:nj,1:nk)
-   read(iunit+1)bin2d(1:ni,1:nj)
-   close(iunit+1)
 
    outunit = ounit + 100
    call da_print_be_stats_p( outunit, ni, nj, nk, num_bins, num_bins2d, &
@@ -126,6 +127,32 @@ program gen_be_diags_read
    read(iunit)e_val_loc
    call da_print_be_stats_v( outunit, variable, nk, num_bins2d, &
                              e_vec, e_val, e_vec_loc, e_val_loc )
+
+
+   deallocate( e_vec )
+   deallocate( e_val )
+   deallocate( e_vec_loc )
+   deallocate( e_val_loc )
+
+! 2d fields: ps_u, ps:
+
+   read(iunit)variable
+   read(iunit)nk, num_bins2d
+
+   allocate( e_vec(1:nk,1:nk) )
+   allocate( e_val(1:nk) )
+   allocate( e_vec_loc(1:nk,1:nk,1:num_bins2d) )
+   allocate( e_val_loc(1:nk,1:num_bins2d) )
+
+   read(iunit)e_vec
+   read(iunit)e_val
+   read(iunit)e_vec_loc
+   read(iunit)e_val_loc
+   call da_print_be_stats_v( outunit, variable, nk, num_bins2d, &
+                             e_vec, e_val, e_vec_loc, e_val_loc )
+
+! To assign the dimension nk for 3d fields:
+   nk = nk_3d
 
 !----------------------------------------------------------------------------
    if (uh_method == 'power') then

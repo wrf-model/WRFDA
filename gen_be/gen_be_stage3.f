@@ -31,6 +31,7 @@ program gen_be_stage3
    logical             :: testing_eofs               ! True if testing EOF decomposition.
    logical             :: use_global_eofs            ! True if projected data uses global EOFs.
    logical             :: data_on_levels             ! True if output level data (diagnostic).
+   logical             :: ldum1, ldum2
 
    integer, allocatable:: bin(:,:,:)                 ! Bin assigned to each 3D point.
    integer, allocatable:: bin2d(:,:)                 ! Bin assigned to each 2D point.
@@ -135,19 +136,32 @@ program gen_be_stage3
                                  hgt_min, hgt_max, binwidth_hgt, latitude, height )
 
             allocate( bin_pts2d(1:num_bins2d) )
-            allocate( field(1:ni,1:nj,1:nk) )
-            allocate( bv(1:nk,1:nk,1:num_bins2d) )
             bin_pts2d(:) = 0
-            bv(:,:,:) = 0.0
-            first_time = .false.
          end if
 
          filename = trim(variable)//'/'//date(1:10)
          filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce
+! For 2d fields (YRG 06/17/2005):
+         if (trim(variable) == 'ps_u' .or. trim(variable) == 'ps') then
+              filename = trim(filename)//'.01'
+!              print '(4a)',"variable=",trim(variable),"  filename =",filename
+         endif
+! ...............................
          open (iunit, file = filename, form='unformatted')
          read(iunit)ni, nj, nk
+!         print '(a,3i5)', "ni, nj, nk:", ni, nj, nk
+         if ( first_time ) then
+! Allocate the arrays:
+            allocate( field(1:ni,1:nj,1:nk) )
+            allocate( bv(1:nk,1:nk,1:num_bins2d) )
+            bv(:,:,:) = 0.0
+            first_time = .false.
+         endif
+! For 2d field:
+         if (nk == 1) read(iunit) ldum1, ldum2
+
          read(iunit)field
-!   rizvi
+
          call remove_horizontal_mean(field, ni, nj, nk)
 !   rizvi
          close(iunit)
@@ -201,8 +215,9 @@ program gen_be_stage3
 	                 ' of ', num_bins2d
 	  
       work(1:nk,1:nk) = bv(1:nk,1:nk,b)
-
+!      print '(a,i6,2x,e15.8)', "bin=",b, sqrt(bv(1,1,b))
       call da_eof_decomposition( nk, work, e_vec, e_val )
+!      print '(i6,a,e15.8,a,e15.8)', b,"  e_val=",e_val(1), "  e_vec=",e_vec(1,1)
       e_vec_loc(1:nk,1:nk,b) = e_vec(1:nk,1:nk)
       e_val_loc(1:nk,b) = e_val(1:nk)
    end do
@@ -213,9 +228,9 @@ program gen_be_stage3
       work(1:nk,1:nk) = work(1:nk,1:nk) + bv(1:nk,1:nk,b)
    end do
    work(1:nk,1:nk) = work(1:nk,1:nk) / real( num_bins2d )
-
+!   print '(a,e15.8)', "Global bv=", sqrt(work(1,1))
    call da_eof_decomposition( nk, work, e_vec, e_val )
-
+!   print '(a,e15.8,a,e15.8)', "e_val=",e_val(1), "  e_vec=",e_vec(1,1)
    if ( testing_eofs ) then
       call da_eof_decomposition_test( nk, work, e_vec, e_val )
    end if
@@ -272,17 +287,26 @@ program gen_be_stage3
 
          filename = trim(variable)//'/'//date(1:10)
          filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce
+! For 2d fields (YRG 06/17/2005):
+         if (trim(variable) == 'ps_u' .or. trim(variable) == 'ps') then
+              filename = trim(filename)//'.01'
+!              print '(4a)',"variable=",trim(variable),"  filename =",filename
+         endif
+! ...............................
          open (iunit, file = filename, form='unformatted')
          read(iunit)ni, nj, nk
-
+!         print '(a,3i5)', "ni, nj, nk:", ni, nj, nk
          if ( first_time ) then
+! Allocate the arrays:
             if ( data_on_levels) allocate( latitude(1:ni,1:nj) )   ! Not allocated earlier.
             if ( data_on_levels) allocate( field(1:ni,1:nj,1:nk) ) ! Not allocated earlier.
             allocate( field_out(1:ni,1:nj,1:nk) )
             allocate( vertical_wgt(1:ni,1:nj,1:nk) )
             vertical_wgt(1:ni,1:nj,1:nk) = 1.0 ! vertical_ip = 0 hardwired.
             first_time = .false.
-         end if
+         endif
+! For 2d field:
+         if (nk == 1) read(iunit) ldum1, ldum2
 
          read(iunit)field
          close(iunit)
@@ -299,9 +323,12 @@ program gen_be_stage3
                                       1, ni, 1, nj, 1, nk )  ! WRF its, ite etc.
          end if
 
-!         write(6,(i12,2f18.4))cdate, &
+!         write(6,'(i12,2f18.4)')cdate, &
 !                                sqrt( sum(field(1:ni,1:nj,1:nk)**2)     / real(ni*nj*nk) ), &
 !                                sqrt( sum(field_out(1:ni,1:nj,1:nk)**2) / real(ni*nj*nk) )
+
+! For 2D physical fields, no 2D fields in eigenvector space are needed: 
+         if (nk == 1) cycle
 
 !        Output fields (split into 2D files to allow parallel horizontal treatment):
 
