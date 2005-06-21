@@ -39,7 +39,7 @@ Uh_method     = 'scale',
 NE            = 1,
 stride        = 1,
 domain_averaged = .false., 
-gen_be_dir    = '/ptmp/guo/wrfvar_cwb.be/cwb_wrf', 
+gen_be_dir    = '/ptmp/guo/wrfvar_cwb.be/cwb_wrf1', 
 code_version  = 'wrfvar', /
 
 gen_be_dir    = '/ptmp/guo/wrf3dvar_cwb.be/NMC', 
@@ -62,10 +62,9 @@ if ( $First_word == 'OSF1' ) then
 
 else if ( $First_word == 'Linu' ) then
 # PC Linux:
-  pgf90    -o plot_gen_be.exe -byteswapio -Mfreeform          \
-           -L/usr/local/ncarg/lib -L/usr/X11R6/lib -lncarg    \
-           -lncarg_gks -lncarg_c -lX11 -L/usr/pgi/linux86/lib \
-           -L/usr/lib -lf2c                                   \
+  pgf90    -o plot_gen_be.exe -byteswapio -Mfreeform \
+           -L/usr/local/ncarg/lib -L/usr/X11R6/lib -lncarg -lncarg_gks -lncarg_c \
+           -lX11 -L/usr/pgi/linux86/lib -L/usr/lib -lf2c \
            plot_gen_be.f
 
 else if ( $First_word == 'AIX' ) then
@@ -74,15 +73,6 @@ else if ( $First_word == 'AIX' ) then
       -L/usr/local/lib32/r4i4 -lncarg -lncarg_gks -lncarg_c -lX11 -lm \
       -qfree -qarch=auto -qmaxmem=-1 -qnosave \
       plot_gen_be.f
-
-else if ( $First_word == 'Darw' ) then
-# Mac:
-   xlf -o plot_gen_be.exe   plot_gen_be.f    \
-       -w -qfree -qarch=auto -qspill=20000 -qmaxmem=32767 -qextname \
-       -L/usr/local/ncarg/lib -lncarg -lcgm -lncarg_gks -lncarg_c   \
-       -L/usr/X11R6/lib -lX11 -lm -L/usr/local/lib                  \
-       -L/opt/ibmcmp/xlf/8.1/lib/ -lxlf90 -lg2c 
- 
 endif
 # -----------------------------------------------------------------------
 
