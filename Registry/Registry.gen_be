@@ -1434,6 +1434,7 @@ typedef xb_type real    terr                   ij       -         1        -    
 typedef xb_type real    psac                   ij       -         1        -       -
 typedef xb_type real    lanu                   ij       -         1        -       -
 typedef xb_type real    snow                   ij       -         1        -       -
+typedef xb_type real    xland                  ij       -         1        -       -
 typedef xb_type real    landmask               ij       -         1        -       -
 
 typedef xb_type real    u10                    ij       -         1        -       -
