@@ -511,7 +511,7 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
                    xb%p(i,j,ks), xb%t(i,j,ks), xb%q(i,j,ks), &
                    xb%u(i,j,ks), xb%v(i,j,ks), &
                    xb%p(i,j,ks+1), xb%t(i,j,ks+1), xb%q(i,j,ks+1), &
-                   xb%h(i,j,ks), xb%rough(i,j),xb%landmask(i,j), &
+                   xb%h(i,j,ks), xb%rough(i,j),xb%xland(i,j), &
                    xb%u10(i,j), xb%v10(i,j), xb%t2(i,j), xb%q2(i,j), &
                    xb%regime(i,j))
    enddo
