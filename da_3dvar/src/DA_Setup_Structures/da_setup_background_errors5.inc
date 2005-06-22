@@ -227,8 +227,7 @@ rewind (be_cv_5_unit)
     '*** Using the latitude-dependent regression coefficients for unbalanced part ***'
     endif
     
-    print '(2x,a,i8,a,i4)',"a) &
-        Finished regression coefficients processing! jy=",jy," kz=",kz
+    print '(2x,a,i8,a,i4)',"a) Finished regression coefficients processing! jy=",jy," kz=",kz
 
 ! 2.0 Load the eigenvector and eigenvalue
 ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
