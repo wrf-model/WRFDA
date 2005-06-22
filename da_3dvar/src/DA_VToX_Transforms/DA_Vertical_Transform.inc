@@ -108,7 +108,7 @@ subroutine DA_Vertical_Transform( string, be, vertical_wgt, vv, vp, &
       END IF
 
       IF ( be % v5 % mz > 0 ) THEN
-        if( cv_options == 4 .or. be % v5 % mz == 1 ) then
+        if( cv_options == 4 ) then
          vp % v5(its:ite,jts:jte,1) = vv % v5(its:ite,jts:jte,1)
         else
          CALL DA_Transform_VvToVp( &
@@ -216,7 +216,7 @@ subroutine DA_Vertical_Transform( string, be, vertical_wgt, vv, vp, &
       END IF
 
       IF ( be % v5 % mz > 0 ) THEN
-        if( cv_options == 4 .or. be % v5 % mz == 1 ) then
+        if( cv_options == 4 ) then
          vv % v5(its:ite,jts:jte,1) = vp % v5(its:ite,jts:jte,1)
         else
          CALL DA_Transform_VpToVv( &
@@ -325,7 +325,7 @@ subroutine DA_Vertical_Transform( string, be, vertical_wgt, vv, vp, &
       END IF
 
       IF ( be % v5 % mz > 0 ) THEN
-        if( cv_options == 4 .or. be % v5 % mz == 1 ) then
+        if( cv_options == 4 ) then
          vv % v5(its:ite,jts:jte,1) = vp % v5(its:ite,jts:jte,1)
         else
 

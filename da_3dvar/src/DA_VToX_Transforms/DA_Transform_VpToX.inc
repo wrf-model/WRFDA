@@ -204,7 +204,7 @@ elseif (cv_options == 5) then    ! psi, chi_u, t_u, pseudo_rh , psfc_u
       END DO
 
 ! Surface Pressure
-   xa%psfc(its:ite,jts:jte) = vp%v5(its:ite,jts:jte,kts)
+   xa%psfc(its:ite,jts:jte) = vp%v5(its:ite,jts:jte, 1)
 
 !--convert from delt.ln(ps) to delt.ps
 !   xa%psfc(its:ite,jts:jte) = xa%psfc(its:ite,jts:jte) &
@@ -217,6 +217,13 @@ elseif (cv_options == 5) then    ! psi, chi_u, t_u, pseudo_rh , psfc_u
    enddo
    enddo
    enddo
+
+!   print '(a,e20.12)', &
+!         "ps_u part  =",&
+!      sqrt( sum(vp%v5(its:ite,jts:jte,1)**2)/real((ite-its+1)*(jte-jts+1)) )
+!   print '(a,e20.12)',  &
+!         "psfc total =",&
+!      sqrt( sum(xa%psfc(its:ite,jts:jte)**2)/real((ite-its+1)*(jte-jts+1)) )
 
 !--convert from delt.ln(ps) to delt.ps
 !   xa%psfc(its:ite,jts:jte) = xa%psfc(its:ite,jts:jte) &

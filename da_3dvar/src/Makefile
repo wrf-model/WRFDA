@@ -235,6 +235,7 @@ DA_Setup_Structures.o:	\
 			DA_Setup_Structures/da_setup_background_errors2.inc \
 			DA_Setup_Structures/da_setup_background_errors3.inc \
 			DA_Setup_Structures/da_setup_background_errors4.inc \
+			DA_Setup_Structures/da_setup_background_errors5.inc \
 			DA_Setup_Structures/DA_Get_Bins_Info.inc            \
 			DA_Setup_Structures/da_setup_firstguess.inc \
 			DA_Setup_Structures/da_setup_firstguess_mm5.inc \

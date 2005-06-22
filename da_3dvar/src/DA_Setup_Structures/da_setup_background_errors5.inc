@@ -23,6 +23,10 @@ SUBROUTINE DA_Setup_Background_Errors5(xb, be, xbx, xp)
    integer             :: bin_type           ! Type of bin to average over.
    integer             :: num_bins           ! Number of bins (3D fields).
    integer             :: num_bins2d         ! Number of bins (3D fields).
+   real    :: lat_min, lat_max, binwidth_lat ! Used if bin_type = 2 (degrees)..
+   real    :: hgt_min, hgt_max, binwidth_hgt ! Used if bin_type = 2 (m). .
+   integer :: num_bins_lat, num_bins_hgt     ! Used if bin_type = 2.
+
    logical  :: use_global_eofs               ! True if projected data uses global EOFs
    REAL, ALLOCATABLE           :: be1_eval_loc(:,:)     ! Temp arrays.
    REAL, ALLOCATABLE           :: be2_eval_loc(:,:)     ! Temp arrays.
@@ -57,7 +61,7 @@ SUBROUTINE DA_Setup_Background_Errors5(xb, be, xbx, xp)
 !------------------------------------------------------------------------------
 !
    character*10                :: variable
-   integer                     :: ni, nj, nk, b, nlev           
+   integer                     :: ni, nj, nk, nk_2d, b, nlev           
    integer                     :: ix, jy, kz
    real, allocatable           :: regcoeff1(:)
    real, allocatable           :: regcoeff2(:,:)
@@ -102,8 +106,19 @@ SUBROUTINE DA_Setup_Background_Errors5(xb, be, xbx, xp)
 !-------------------------
 rewind (be_cv_5_unit)
 !---------------------------------------------------------
-   read(be_cv_5_unit) ni, nj, nk 
-   read(be_cv_5_unit) num_bins, num_bins2d
+   read(be_cv_5_unit) ni, nj, nk
+
+     allocate( bin(1:ni,1:nj,1:nk) )
+     allocate( bin2d(1:ni,1:nj) )
+
+     read(be_cv_5_unit)bin_type
+     read(be_cv_5_unit)lat_min, lat_max, binwidth_lat
+     read(be_cv_5_unit)hgt_min, hgt_max, binwidth_hgt
+     read(be_cv_5_unit)num_bins, num_bins2d
+     read(be_cv_5_unit)bin(1:ni,1:nj,1:nk)
+     read(be_cv_5_unit)bin2d(1:ni,1:nj)
+
+!   read(be_cv_5_unit) num_bins, num_bins2d
 !---------------------------------------------------------
 
 ! 1.0 Load the regression coefficients
@@ -123,13 +138,13 @@ rewind (be_cv_5_unit)
 
 ! 1.2.1 Create the bins
 
-   allocate( bin(1:ni,1:nj,1:nk) )
-   allocate( bin2d(1:ni,1:nj) )
+ !  allocate( bin(1:ni,1:nj,1:nk) )
+ !  allocate( bin2d(1:ni,1:nj) )
 
-   bin_type = 1
-   print '(/a,i4)', "bin_type=",bin_type
-   call da_create_bins( ni, nj, nk, bin_type, num_bins, &
-                                num_bins2d, bin, bin2d )
+ !  bin_type = 1
+ !  print '(/a,i4)', "bin_type=",bin_type
+ !  call da_create_bins( ni, nj, nk, bin_type, num_bins, &
+ !                               num_bins2d, bin, bin2d )
 
    print '("ni, nj, nk, num_bins, num_bins2d:",5i8)', ni, nj, nk, num_bins, num_bins2d
 !--------------------------------------------------------------
@@ -224,7 +239,7 @@ rewind (be_cv_5_unit)
    ALLOCATE ( be2_eval_loc (1:kz,1:jy) )
    ALLOCATE ( be3_eval_loc (1:kz,1:jy) )
    ALLOCATE ( be4_eval_loc (1:kz,1:jy) )
-   ALLOCATE ( be5_eval_loc (1:kz,1:jy) )
+   ALLOCATE ( be5_eval_loc (1:1,1:jy) )
 
    IF ( vert_corr == 2 ) THEN
 
@@ -232,19 +247,19 @@ rewind (be_cv_5_unit)
       ALLOCATE ( be2_eval_glo(1:kz) )
       ALLOCATE ( be3_eval_glo(1:kz) )
       ALLOCATE ( be4_eval_glo(1:kz) )
-      ALLOCATE ( be5_eval_glo(1:kz) )
+      ALLOCATE ( be5_eval_glo(1:1) )
 
       ALLOCATE ( be1_evec_loc(1:kz,1:kz,1:jy) )
       ALLOCATE ( be2_evec_loc(1:kz,1:kz,1:jy) )
       ALLOCATE ( be3_evec_loc(1:kz,1:kz,1:jy) )
       ALLOCATE ( be4_evec_loc(1:kz,1:kz,1:jy) )
-      ALLOCATE ( be5_evec_loc(1:kz,1:kz,1:jy) )
+      ALLOCATE ( be5_evec_loc(1:1,1:1,1:jy) )
 
       ALLOCATE ( be1_evec_glo(1:kz,1:kz) )
       ALLOCATE ( be2_evec_glo(1:kz,1:kz) )
       ALLOCATE ( be3_evec_glo(1:kz,1:kz) )
       ALLOCATE ( be4_evec_glo(1:kz,1:kz) )
-      ALLOCATE ( be5_evec_glo(1:kz,1:kz) )
+      ALLOCATE ( be5_evec_glo(1:1,1:1) )
    END IF
 
 ! 2.2 Read in the eigenvector and eigenvalue 
@@ -296,6 +311,16 @@ rewind (be_cv_5_unit)
 !
    be % v4 % name = variable
 !   print*,'variable ',be % v4 % name,nk,num_bins2d
+
+   read(be_cv_5_unit) variable
+   read(be_cv_5_unit) nk_2d, num_bins2d
+   read(be_cv_5_unit)  be5_evec_glo
+   read(be_cv_5_unit)  be5_eval_glo
+   read(be_cv_5_unit)  be5_evec_loc
+   read(be_cv_5_unit)  be5_eval_loc
+
+   be % v5 % name = variable
+!   print*,'variable ',be % v5 % name,nk_2d,num_bins2d
 
 ! 3.0 Check and get the truncated number of the vertical modes
 ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -365,7 +390,7 @@ rewind (be_cv_5_unit)
 
    cv_size = be % cv % size
 
- ! 4.2 Transfer errors to error structure:
+! 4.2 Transfer errors to error structure:
 
    CALL DA_Allocate_Background_Errors( jy, kz, be1_eval_glo, be1_evec_glo, be1_eval_loc, &
                                        be1_evec_loc, be % v1 )
@@ -375,6 +400,11 @@ rewind (be_cv_5_unit)
                                        be3_evec_loc, be % v3 )
    CALL DA_Allocate_Background_Errors( jy, kz, be4_eval_glo, be4_evec_glo, be4_eval_loc, &
                                        be4_evec_loc, be % v4 )
+
+! 4.2.1 Transfer the ps_u variance to be % v5:
+
+   CALL DA_Allocate_Background_Errors( jy,  1, be5_eval_glo, be5_evec_glo, be5_eval_loc, &
+                                       be5_evec_loc, be % v5 )
 
    print '(2x,a,i10)',"b) Finished eigenvector processing! ij=", ij
    
@@ -461,16 +491,10 @@ rewind (be_cv_5_unit)
    CALL DA_Rescale_Background_Errors( ix, jy, var_scaling4, len_scaling4, &
                                       xb % ds, be4_rf_lengthscale, be % v4 )
 
-      ALLOCATE( be%v5 % rf_alpha(1:be%v5%mz) )
-      be%v5 % rf_alpha(1:be%v5%mz) = 1.0
-      ALLOCATE( be%v5 % val(1:jy,1:be%v5%mz) )
-      be%v5 % val(1:jy,1:be%v5%mz) = 0.0
+    
+
     CALL DA_Rescale_Background_Errors( ix, jy, var_scaling5, len_scaling5, &
                                       xb % ds, be5_rf_lengthscale, be % v5 )
-
-!       k = be%v5%mz
-!       print '(a,i4)', "CV5 (ps_u): k=", k
-!       print '(10e12.5)', be%v5 % val(1:jy,k)
 
 !     print '(/a,f10.2)','xb%ds=',xb%ds
 !     do k=1,nk

@@ -39,7 +39,7 @@ Uh_method     = 'scale',
 NE            = 1,
 stride        = 1,
 domain_averaged = .false., 
-gen_be_dir    = '/ptmp/guo/wrfvar_cwb.be/cwb_wrf1', 
+gen_be_dir    = '/mmmtmp/guo/wrfvar_cwb.be/cwb_wrf1', 
 code_version  = 'wrfvar', /
 
 gen_be_dir    = '/ptmp/guo/wrf3dvar_cwb.be/NMC', 
@@ -52,13 +52,21 @@ EOF
 
 set OS = `uname -a`
 set First_word = `echo $OS | cut -c 1-4`
-echo $First_word
+set palm = `echo $OS | cut -c 7-10`
+echo "${First_word} in ${palm}"
 
 if ( -e plot_gen_be.exe ) rm plot_gen_be.exe
 
 if ( $First_word == 'OSF1' ) then
 # DEC_alpha
   ncargf90 -o plot_gen_be.exe -convert big_endian -free plot_gen_be.f
+
+else if ( $First_word == 'Linu' && $palm == 'palm' ) then
+# PC Linux:
+  pgf90    -o plot_gen_be.exe -byteswapio -Mfreeform \
+           -L/usr/local/ncarg/lib -L/usr/X11R6/lib64 -lncarg -lncarg_gks -lncarg_c \
+           -lX11 -L/usr/pgi/linux86/lib -L/usr/lib64 \
+           plot_gen_be.f
 
 else if ( $First_word == 'Linu' ) then
 # PC Linux:
@@ -73,6 +81,13 @@ else if ( $First_word == 'AIX' ) then
       -L/usr/local/lib32/r4i4 -lncarg -lncarg_gks -lncarg_c -lX11 -lm \
       -qfree -qarch=auto -qmaxmem=-1 -qnosave \
       plot_gen_be.f
+else if ( $First_word == 'Darw' ) then
+# Mac:
+   xlf -o plot_gen_be.exe   plot_gen_be.f    \
+       -w -qfree -qarch=auto -qspill=20000 -qmaxmem=32767 -qextname \
+       -L/usr/local/ncarg/lib -lncarg -lcgm -lncarg_gks -lncarg_c   \
+       -L/usr/X11R6/lib -lX11 -lm -L/usr/local/lib                  \
+       -L/opt/ibmcmp/xlf/8.1/lib/ -lxlf90 -lg2c 
 endif
 # -----------------------------------------------------------------------
 

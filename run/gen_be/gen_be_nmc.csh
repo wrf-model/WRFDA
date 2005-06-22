@@ -24,15 +24,15 @@ setenv END_DATE        2003091500
 setenv NUM_LEVELS      30
 setenv RESOLUTION_KM   45000
 setenv EXPT            wrfvar_cwb.be
-setenv DAT_DIR         /ptmp/guo/${EXPT}
-setenv WRFVAR_DIR      /home/bluesky/guo/wrfvar
+setenv DAT_DIR         /mmmtmp/guo/${EXPT}
+setenv WRFVAR_DIR      /palm/users/guo/wrfvar
 
 #Uncomment the stages you wish to run:
-#setenv RUN_GEN_BE_STAGE1 # Set to run stage 1 (Remove mean, split variables).
-#setenv RUN_GEN_BE_STAGE2 # Set to run stage 2 (Regression Coefficients).
-#setenv RUN_GEN_BE_STAGE2A # Set to run stage 2 (Regression Coefficients).
-#setenv RUN_GEN_BE_STAGE3 # Set to run stage 3 (Vertical Covariances).
-#setenv RUN_GEN_BE_STAGE4 # Set to run stage 4 (Horizontal Covariances).
+setenv RUN_GEN_BE_STAGE1 # Set to run stage 1 (Remove mean, split variables).
+setenv RUN_GEN_BE_STAGE2 # Set to run stage 2 (Regression Coefficients).
+setenv RUN_GEN_BE_STAGE2A # Set to run stage 2 (Regression Coefficients).
+setenv RUN_GEN_BE_STAGE3 # Set to run stage 3 (Vertical Covariances).
+setenv RUN_GEN_BE_STAGE4 # Set to run stage 4 (Horizontal Covariances).
 setenv RUN_GEN_BE_DIAGS  # Set to run gen_be diagnostics.
 setenv RUN_GEN_BE_DIAGS_READ  # Set to run gen_be diagnostics_read.
 
