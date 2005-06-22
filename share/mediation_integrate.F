@@ -1145,7 +1145,7 @@ SUBROUTINE med_auxinput2_in4ad ( grid , config_flags , nl_timestr )
 
    TYPE(domain)                               :: grid
    TYPE (grid_config_rec_type) , INTENT(IN)   :: config_flags
-   character(len=*), intent(in), INTENT(IN)   :: nl_timestr
+   character(len=*),             INTENT(IN)   :: nl_timestr
 
    write(unit=*, fmt='(3a,i6)') 'file:', __FILE__, ', line:', __LINE__
    print *, 'nl_timestr=', nl_timestr
