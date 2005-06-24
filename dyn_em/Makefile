@@ -47,6 +47,7 @@ OBJS    = 		        \
 	solve_em_ad.o           \
 	solve_em_tl.o           \
 	solve_em_tst.o          \
+	test_solve_em.o          \
         start_em.o              \
         couple_or_uncouple_em.o \
         nest_init_utils.o	\
@@ -357,6 +358,32 @@ solve_em_ad.o:  module_small_step_em.o \
 		../phys/module_physics_addtendc.o
 
 solve_em_tst.o: solve_em_ad.o \
+		solve_em_tl.o \
+		module_small_step_em.o \
+		module_em.o            \
+		module_em_ad.o         \
+		module_em_tl.o         \
+		module_solvedebug_em.o \
+                module_bc_em.o         \
+		module_diffusion_em.o  \
+		module_big_step_utilities_em.o \
+		../frame/module_domain.o \
+		../frame/module_configure.o  \
+		../frame/module_driver_constants.o \
+		../frame/module_state_description.o \
+		../frame/module_machine.o \
+		../frame/module_tiles.o \
+		../frame/module_dm.o \
+		../share/module_model_constants.o \
+		../share/module_bc.o \
+		../phys/module_radiation_driver.o \
+		../phys/module_surface_driver.o \
+		../phys/module_cumulus_driver.o \
+		../phys/module_microphysics_driver.o \
+		../phys/module_pbl_driver.o \
+		../phys/module_physics_addtendc.o
+
+test_solve_em.o: solve_em_ad.o \
 		solve_em_tl.o \
 		module_small_step_em.o \
 		module_em.o            \
