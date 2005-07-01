@@ -282,12 +282,11 @@ subroutine make_scale_length( variable, ck, ounit, nn, nr, cov )
          nrr(n) = real(nr(d2))
          d(n) = sqrt(real(d2))                  ! Distance
          write(6,'(i6,4e13.5)') n, nrr(n), d(n), cov(d2), yr(n)
-      end if
-
+       end if
    end do
    nmax = n
 
-!  Now perform curve-fitting:
+!  Now perform curve-fitting when more than 2 points available:
 
 !-----Steps of fitting Gaussian Distribution:
 
@@ -309,13 +308,25 @@ subroutine make_scale_length( variable, ck, ounit, nn, nr, cov )
    coeff2 = 0.0
 
    do n = 1, nmax
+      print '("n, nrr, d, yr:",i3,3e15.6)', n, nrr(n), d(n), yr(n)
       coeff1 = coeff1 + nrr(n) * d(n) * yr(n)
       coeff2 = coeff2 + nrr(n) * d(n) * d(n)
    end do
 
-   ml = coeff1 / coeff2
+   if (coeff2 > 0.0) then
 
-   sl = 1.0 / ml
+     ml = coeff1 / coeff2
+
+     sl = 1.0 / ml
+
+   else
+
+! When no fitting could be completed, set the missing value = 0.0 (YRG 06/30/2005):
+
+     ml = 0.0
+     sl = 0.0
+
+   endif
 
    write(6,'(/3a,3e30.8/)') trim(variable), ' scale-length at mode:', ck, ml, sl
 
