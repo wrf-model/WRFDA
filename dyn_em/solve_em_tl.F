@@ -2943,44 +2943,6 @@ BENCH_END(bc_2d_tim)
    endif
 #endif
 
-#if 0
-! add diagnoses. hans_xyh huang.
-
-   DO ij = 1 , grid%num_tiles
-
-     call calc_dpsdt ( itimestep, dt, psfc, psfcm, 'ps', &
-                       avg_abs_dpsdt, dpsdt,             &
-                       ids, ide, jds, jde,               &
-                       ims, ime, jms, jme,               &
-                       grid%i_start(ij), grid%i_end(ij), &
-                       grid%j_start(ij), grid%j_end(ij)  )
-     call calc_dpsdt ( itimestep, dt, mu_2, mu_1, 'mu',  &
-                       avg_abs_dmudt, dmudt,             &
-                       ids, ide, jds, jde,               &
-                       ims, ime, jms, jme,               &
-                       grid%i_start(ij), grid%i_end(ij), &
-                       grid%j_start(ij), grid%j_end(ij)  )
-
-     call calc_q_conv_3d ( moist_1, moist_2, dt,             &
-                           q_conve_3d,                       &
-                           num_3d_m,                         &
-                           ids, ide, jds, jde, kds, kde,     &
-                           ims, ime, jms, jme, kms, kme,     &
-                           grid%i_start(ij), grid%i_end(ij), &
-                           grid%j_start(ij), grid%j_end(ij), &
-                           k_start, k_end                    )
-     call calc_q_conv_2d ( moist_2, u_2, v_2,                &
-                           dt, DX, q_conve_2d,               &
-                           num_3d_m,                         &
-                           ids, ide, jds, jde, kds, kde,     &
-                           ims, ime, jms, jme, kms, kme,     &
-                           grid%i_start(ij), grid%i_end(ij), &
-                           grid%j_start(ij), grid%j_end(ij), &
-                           k_start, k_end                    )
-
-   ENDDO
-#endif
-
    CALL wrf_debug ( 200 , ' call end of solve_em_tl' )
 
 ! Finish timers if compiled with -DBENCH.

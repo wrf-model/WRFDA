@@ -1387,13 +1387,6 @@ SUBROUTINE med_auxinput4ad ( grid , stream, config_flags, nl_timestr )
 
      CALL input_aux_model_input2 ( grid%auxinput2_oid, grid , config_flags , ierr )
 
-     write(unit=20, fmt='(2a)') &
-              '    message:', trim(message)
-
-     write(unit=20, fmt='(2a,2x,a,f12.4)') &
-              'xyh timestr:',trim(timestr), &
-              'grid%t_2(1,1,1)=', grid%em_t_2(1,1,1)
-
      CALL close_dataset ( grid%auxinput2_oid , config_flags , n2)
 
    RETURN

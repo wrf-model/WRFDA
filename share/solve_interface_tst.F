@@ -50,15 +50,15 @@ SUBROUTINE solve_interface_tst ( grid )
 
 ! zz: test solve_em ------------------------------------------------------
 
-!      CALL test_solve_em ( grid , config_flags , &
-! # include <em_actual_args.inc>
-!                )
+     CALL test_solve_em ( grid , config_flags , &
+# include <em_actual_args.inc>
+               )
 
 ! zz: test individual subroutines below solve_em -------------------------
 
-    CALL solve_em_tst ( grid , config_flags , &
-# include <em_actual_args.inc>
-               )
+!    CALL solve_em_tst ( grid , config_flags , &
+!# include <em_actual_args.inc>
+!               )
 
 ! zz ----------------------------------------------------------------------
 

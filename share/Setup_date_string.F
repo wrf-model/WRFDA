@@ -136,8 +136,6 @@ SUBROUTINE Setup_date_string ( grid, date_string, adantn )
       endif
    endif
 
-      write(6,*) 'xyh intervals =', local_interval_mo, local_interval_d, local_interval_h, local_interval_m, local_interval_s
-
 !--date_string(0) = 2000-01-24_12:00:00
 
    write(end_date_string(1:19), fmt='(i4.4,5(a1,i2.2))') &
@@ -185,14 +183,8 @@ SUBROUTINE Setup_date_string ( grid, date_string, adantn )
       write(unit=*, fmt='(a,i4,2a)') &
         'date_string(', index, ')=', date_string(index)
 
-      write(6,*) 'xyh intervals =', local_interval_mo, local_interval_d, local_interval_h, local_interval_m, local_interval_s
-
-      write(6,*) 'xyh intervals b4 =', current_y, current_mo, current_d, current_h, current_m, current_s
-
       call advance_ccyymmddhhmmss(current_y, current_mo, current_d, current_h, current_m, current_s, &
                                    0, local_interval_mo, local_interval_d, local_interval_h, local_interval_m, local_interval_s )
-
-      write(6,*) 'xyh intervals =', current_y, current_mo, current_d, current_h, current_m, current_s
 
       write(begin_date_string(1:19), fmt='(i4.4,5(a1,i2.2))') &
          current_y, &
@@ -217,9 +209,8 @@ SUBROUTINE Setup_date_string ( grid, date_string, adantn )
 
    endif
 
-!xyh
    do i=1,index
-      write(6,*)'xyh:',adantn,i,date_string(i)
+      write(6,*)'check date_string:',adantn,i,date_string(i)
    enddo
 
    CALL wrf_debug ( 100 , 'Setup_date_string:  returning...' )

@@ -285,41 +285,30 @@ RECURSIVE SUBROUTINE integrate_tl ( grid, nl_date_string, nl_date_index )
          CALL med_before_solve_io ( grid , config_flags )
          grid_ptr => grid
          DO WHILE ( ASSOCIATED( grid_ptr ) )
+
             CALL wrf_debug( 100 , 'module_integrate_tl: calling solve interface _tl' )
-!-----------start check non-linear input
+
             CALL wrf_clockprint ( 150, grid%domain_clock, 'DEBUG:  integrate_tl(),' )
 
             CALL wrf_timetoa( grid%current_time, currTime_str )
 
-            if(currTime_str(1:19) .eq. nl_date_string(nl_date_index)(1:19)) then
-               write(unit=*, fmt='(a,i5,4(x,a))') &
-                    'xyh nl_date_index =', nl_date_index, &
-                    'read NL at currTime_str(1:19)=', currTime_str(1:19), &
-                    'nl_date_string(nl_date_index)(1:19)=', nl_date_string(nl_date_index)(1:19)
+            write(unit=*, fmt='(2a)') 'xyh TL state at ', currTime_str(1:19)
 
-! -------      do input
+            if(currTime_str(1:19) .eq. nl_date_string(nl_date_index)(1:19)) then
+
+               write(unit=*, fmt='(2a)') 'xyh NL state from ', nl_date_string(nl_date_index)
 
                CALL med_auxinput2_in ( grid , config_flags , nl_date_string(nl_date_index) )
 
-               write(unit=10, fmt='(a,i2,2a,2x,a,f12.4)') &
-                    'xyh nl_date_string(', nl_date_index, ')=', nl_date_string(nl_date_index-1)(1:19), &
-                    'grid%t_2(1,1,1)=', grid%em_t_2(1,1,1)
-
                nl_date_index = nl_date_index + 1
-            else
-               write(unit=*, fmt='(2a)') &
-                    'xyh no NL state at ', currTime_str(1:19)
 
-               write(unit=*, fmt='(2a)') &
-                    'xyh use NL state from ', nl_date_string(nl_date_index-1)
+            else
+
+               write(unit=*, fmt='(2a)') 'xyh NL state from ', nl_date_string(nl_date_index-1)
 
                CALL med_auxinput2_in ( grid , config_flags , nl_date_string(nl_date_index-1) )
-               write(unit=10, fmt='(a,i2,2a,2x,a,f12.4)') &
-                    'xyh nl_date_string(', nl_date_index, ')=', nl_date_string(nl_date_index-1)(1:19), &
-                    'grid%t_2(1,1,1)=', grid%em_t_2(1,1,1)
 
             endif
-!-----------end check non-linear input
 
             CALL solve_interface_tl ( grid_ptr ) 
             CALL wrf_clockprint ( 150, grid_ptr%domain_clock, &

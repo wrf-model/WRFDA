@@ -903,7 +903,6 @@ jtf = min(jte,jde-1)
 ktf = min(kte,kde-1)
 ! recompute : ktf
 if (non_hydrostatic) then
-  write(6,*) 'xyh p0,r_d,t0,rvovrd,p_qv,cpovcv=', p0,r_d,t0,rvovrd,p_qv,cpovcv
   if (n_moist .ge. param_first_scalar) then
     do j = jts, jtf
       do k = kts, ktf
