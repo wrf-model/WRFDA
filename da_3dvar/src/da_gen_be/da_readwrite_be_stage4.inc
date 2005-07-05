@@ -1,4 +1,4 @@
-subroutine da_readwrite_be_stage4( outunit, nk, be_method, uh_method, variable )
+subroutine da_readwrite_be_stage4( outunit, nk, be_method, uh_method, n_smth_sl, variable )
 
    implicit none
 
@@ -6,6 +6,7 @@ subroutine da_readwrite_be_stage4( outunit, nk, be_method, uh_method, variable )
 
    integer, intent(in)      :: outunit                    ! Output unit number.
    integer, intent(in)      :: nk                         ! Number of vertical levels/modes.
+   integer    , intent(in)  :: n_smth_sl                  ! Number of smoothing. 0: no smoothig
    character*3, intent(in)  :: be_method                  ! Be method ('NMC', or 'ENS').
    character*5, intent(in)  :: uh_method
    character*10, intent(in) :: variable                   ! Variable name.
@@ -103,16 +104,15 @@ if (uh_method .eq. 'power') then
       enddo
 
 ! Smoothing the scale_length (YRG 07/01/2005):
-
-      sl_smth =  scale_length
-      do kdum = 1, 2
-         do k = 2, nk-1
-           sl_smth(k) = scale_length(k) &
-                + 0.25*(scale_length(k-1)+scale_length(k+1)-2.0*scale_length(k))
-         enddo
-         scale_length = sl_smth 
-      enddo
-           
+        sl_smth =  scale_length
+        do kdum = 1, n_smth_sl
+           do k = 2, nk-1
+             sl_smth(k) = scale_length(k) &
+                  + 0.25*(scale_length(k-1)+scale_length(k+1)-2.0*scale_length(k))
+           enddo
+           scale_length = sl_smth 
+        enddo
+     
       write(outunit) variable
       write(outunit) scale_length
 

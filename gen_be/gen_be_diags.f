@@ -8,12 +8,13 @@ program gen_be_diags
    character*10        :: variable                   ! Variable name
    character*3         :: be_method                  ! Be method (NMC, or ENS)   
    character*8         :: uh_method                  ! Uh_method (power, scale)
+   integer             :: n_smth_sl                  ! Number of smoothing for scale-length
    character*80        :: filename                   ! Input filename.
    integer             :: nk,nk_3d                   ! Dimensions read in.
    integer             :: num_bins                   ! Number of bins (3D).
    logical             :: data_on_levels             ! False if data is projected onto EOFs.
 
-   namelist / gen_be_diags_nl / be_method, uh_method
+   namelist / gen_be_diags_nl / be_method, uh_method, n_smth_sl
 
    be_method = 'NMC'
 
@@ -67,19 +68,19 @@ program gen_be_diags
    nk = nk_3d
 
    variable = 'psi'
-   call da_readwrite_be_stage4( ounit, nk, be_method, uh_method, variable )
+   call da_readwrite_be_stage4( ounit, nk, be_method, uh_method, n_smth_sl, variable )
 
    variable = 'chi_u'
-   call da_readwrite_be_stage4( ounit, nk, be_method, uh_method, variable )
+   call da_readwrite_be_stage4( ounit, nk, be_method, uh_method, n_smth_sl, variable )
 
    variable = 't_u'
-   call da_readwrite_be_stage4( ounit, nk, be_method, uh_method, variable )
+   call da_readwrite_be_stage4( ounit, nk, be_method, uh_method, n_smth_sl, variable )
 
    variable = 'rh'
-   call da_readwrite_be_stage4( ounit, nk, be_method, uh_method, variable )
+   call da_readwrite_be_stage4( ounit, nk, be_method, uh_method, n_smth_sl, variable )
 
    variable = 'ps_u'
-   call da_readwrite_be_stage4( ounit, 1, be_method, uh_method, variable )
+   call da_readwrite_be_stage4( ounit, 1, be_method, uh_method, n_smth_sl, variable )
 
    close(ounit)
 
