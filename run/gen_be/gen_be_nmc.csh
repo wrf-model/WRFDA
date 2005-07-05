@@ -274,7 +274,8 @@ if ( $?RUN_GEN_BE_DIAGS_READ ) then
 cat >! gen_be_diags_nl.nl << EOF
   &gen_be_diags_nl
     be_method = '${BE_METHOD}',
-    uh_method = '${UH_METHOD}' /
+    uh_method = '${UH_METHOD}',
+    n_smth_sl = 0, /
 EOF
 
    ln -sf ${SRC_DIR}/gen_be_diags_read.exe .

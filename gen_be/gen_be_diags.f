@@ -17,6 +17,7 @@ program gen_be_diags
    namelist / gen_be_diags_nl / be_method, uh_method, n_smth_sl
 
    be_method = 'NMC'
+   n_smth_sl = 0
 
    open(unit=namelist_unit, file='gen_be_diags_nl.nl', &
         form='formatted', status='old', action='read')
