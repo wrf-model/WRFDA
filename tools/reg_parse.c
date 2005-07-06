@@ -199,8 +199,66 @@ reg_parse( FILE * infile )
       if ( set_state_dims( tokens[FIELD_DIMS], field_struct ) )
        { fprintf(stderr,"Registry warning: some problem with dimstring %s\n", tokens[FIELD_DIMS] ) ; }
 
-      if ( strcmp( tokens[FIELD_NTL], "-" ) ) /* that is, if not equal "-" */
-       { field_struct->ntl = atoi(tokens[FIELD_NTL]) ; }
+/*Wei's change for 4DVAR*/
+      if(sw_wrfvar)
+      {
+        field_struct->var_numb = 0;
+        strcpy(field_struct->var_name, " ");
+
+        if ( strcmp( tokens[FIELD_NTL], "-" ) ) /* that is, if not equal "-" */
+        {
+          char *cpa ;
+          char *cpg ;
+          int   noc ;
+
+          cpa = index(tokens[FIELD_NTL], 'a') ;
+          cpg = index(tokens[FIELD_NTL], 'g') ;
+
+          if(cpg != NULL)
+          {
+	    field_struct->var_numb ++;
+            strcat(field_struct->var_name, "g");
+          }
+
+          if(cpa != NULL)
+          {
+	    field_struct->var_numb ++;
+            strcat(field_struct->var_name, "a");
+          }
+
+          if(field_struct->var_numb)
+          {
+          /*
+           *printf("Check NumTLev: <%s>\n", tokens[FIELD_NTL]);
+           */
+
+            for(noc = 0; noc < strlen(tokens[FIELD_NTL]); noc ++)
+            {
+              if(! isdigit(tokens[FIELD_NTL][noc]))
+              {
+                tokens[FIELD_NTL][noc] = '\0';
+                break;
+              }
+            }
+          }
+
+          if(strlen(tokens[FIELD_NTL]))
+            field_struct->ntl = atoi(tokens[FIELD_NTL]);
+          else
+            field_struct->ntl = 1 ;
+        }
+        
+        field_struct->var_numb ++;
+      }
+      else
+      {
+        field_struct->var_numb = 1;
+
+        if ( strcmp( tokens[FIELD_NTL], "-" ) ) /* that is, if not equal "-" */
+         { field_struct->ntl = atoi(tokens[FIELD_NTL]) ; }
+      }
+/*end Wei's change for 4DVAR*/
+
       field_struct->ntl = ( field_struct->ntl > 0 )?field_struct->ntl:1 ;
       /* calculate the maximum number of time levels and store in global variable */
       if ( field_struct->ntl > max_time_level && field_struct->ntl <= 3 ) max_time_level = field_struct->ntl ;

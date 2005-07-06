@@ -6,7 +6,7 @@
 #.SUFFIXES: .F .i .o .f .c .f90
 .SUFFIXES: .f90 .o
 
-include ../../configure.3dvar
+include ../../configure.wrf
 
 ##########################################################################################
 

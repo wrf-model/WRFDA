@@ -78,8 +78,7 @@ CONTAINS
 #ifdef NETCDF
         CASE ( IO_NETCDF   )
 
-          IF((outbuf_table(ii)%FieldType .EQ. WRF_REAL4) .or. &
-             (outbuf_table(ii)%FieldType .EQ. WRF_REAL8)) THEN
+          IF ( outbuf_table(ii)%FieldType .EQ. WRF_REAL ) THEN
 
           CALL ext_ncd_write_field ( DataHandle ,                                     &
                                  TRIM(outbuf_table(ii)%DateStr),                      &
@@ -120,8 +119,7 @@ CONTAINS
 #ifdef YYY
       CASE ( IO_YYY   )
 
-          IF((outbuf_table(ii)%FieldType .EQ. WRF_REAL4) .or. &
-             (outbuf_table(ii)%FieldType .EQ. WRF_REAL8)) THEN
+          IF ( outbuf_table(ii)%FieldType .EQ. WRF_REAL ) THEN
 
           CALL ext_yyy_write_field ( DataHandle ,                                     &
                                  TRIM(outbuf_table(ii)%DateStr),                      &
@@ -161,8 +159,7 @@ CONTAINS
 #endif
 #ifdef INTIO
         CASE ( IO_INTIO  )
-          IF((outbuf_table(ii)%FieldType .EQ. WRF_REAL4) .or. &
-             (outbuf_table(ii)%FieldType .EQ. WRF_REAL8)) THEN
+          IF ( outbuf_table(ii)%FieldType .EQ. WRF_REAL ) THEN
 
           CALL ext_int_write_field ( DataHandle ,                                     &
                                  TRIM(outbuf_table(ii)%DateStr),                      &
@@ -270,8 +267,7 @@ END MODULE module_quilt_outbuf_ops
     ENDDO
     IF ( .NOT. found ) THEN
       num_entries = num_entries + 1
-      IF    ( ( FieldType .EQ. WRF_REAL4 ) .or. &
-              ( FieldType .EQ. WRF_REAL8 ) ) THEN
+      IF      ( FieldType .EQ. WRF_REAL ) THEN
         ALLOCATE( outbuf_table(num_entries)%rptr(DomainStart(1):DomainEnd(1), &
                                                  DomainStart(2):DomainEnd(2),DomainStart(3):DomainEnd(3)) )
       ELSE IF ( FieldType .EQ. WRF_INTEGER ) THEN
@@ -294,8 +290,7 @@ END MODULE module_quilt_outbuf_ops
       ii = num_entries
     ENDIF
     jj = 1
-    IF ( ( FieldType .EQ. WRF_REAL4 ) .or. &
-         ( FieldType .EQ. WRF_REAL8 ) ) THEN
+    IF (  FieldType .EQ. WRF_REAL ) THEN
       DO n = PatchStart(3),PatchEnd(3)
         DO m = PatchStart(2),PatchEnd(2)
           DO l = PatchStart(1),PatchEnd(1)

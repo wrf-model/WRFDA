@@ -11,7 +11,7 @@ Subroutine DA_Transform_XToWTQ_adj ( xp, xb, jo_grad_x )
    integer :: i, j, kz, is, js, ie, je
 ! ---------------------------------------------------------------------------
 
-   kz = xp%kte
+   kz = xp%kts
 
    is = xb%its
    js = xb%jts
@@ -48,7 +48,7 @@ Subroutine DA_Transform_XToWTQ_adj ( xp, xb, jo_grad_x )
                        jo_grad_x%psfc(i,j), jo_grad_x%tgrn(i,j), &
                        jo_grad_x%p(i,j,kz), jo_grad_x%t(i,j,kz), jo_grad_x%q(i,j,kz), &
                        jo_grad_x%u(i,j,kz), jo_grad_x%v(i,j,kz), &
-                       xb%h(i,j,kz), xb%rough(i,j), xb%landmask(i,j), &
+                       xb%h(i,j,kz), xb%rough(i,j), xb%xland(i,j), &
                        jo_grad_x%u10(i,j),jo_grad_x%v10(i,j), &
                        jo_grad_x%t2 (i,j),jo_grad_x%q2 (i,j))
     

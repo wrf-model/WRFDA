@@ -1,8 +1,20 @@
-This file is intended to track the tags created by CVS.
-
+This file is intended to track the tags created by CVS. 
 
 Version History
 ---------------
+cvs tag version_2_0_5_0		(May 10, 2005)		tag for merging 4dvar.
+cvs tag version_2_0_4_2		(May 10, 2005)		tag for KMA code bug fix.
+cvs tag version_2_0_4_1		(April 15, 2005)	tag for code delivered to KMA.
+cvs tag version_2_0_4_0		(April 15, 2005)	tag for KMA project.
+cvs tag version_2_0_3_1		(March 22, 2005)	tag for TC Bogus (With change or residual type for obs.)
+cvs tag version_2_0_3_0		(March 17, 2005)	tag for TC Bogus
+cvs tag version_2_0_2_0		(March 15, 2005)	tag for global-3dvar
+cvs tag cray_pre_v_2_0_2_0	(March 9, 2005)		intermediate tag: after Cray test before formal tag
+cvs tag version_2_0_1_1		(March 29, 2005)	bug fix for SNU/KMA.
+cvs tag pre_version_2_0_1_1	(March 29, 2005)	before bug fix for SNU/KMA.
+cvs tag version_2_0_1_0		(February 22, 2005)	tag multiple radar
+cvs rtag -F version_2_0_0_0	(February 18, 2005)	rtag after merge all WRFV2 frame in.
+cvs -r tag version_2_0_0_0	(February 8, 2005)	tag for adapt wrf frame.
 cvs -r tag port_to_crayx1	(November 2, 2004)	tag for port code to Cray-x1
 cvs -r tag radar_in_wrf3dvar	(October 19, 2004)	tag after radar code commited in.
 cvs -r tag mm5_as_fg	 	(September 27, 2004)	tag for using MM5 as FG

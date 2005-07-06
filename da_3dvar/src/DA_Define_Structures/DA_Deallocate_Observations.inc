@@ -50,16 +50,8 @@ SUBROUTINE DA_Deallocate_Observations ( ob )
 
       DEALLOCATE (ob % airep)
    endif
-
-   if (ob % num_satob > 0) DEALLOCATE (ob % satob)
-
-   IF ( ob % num_satem > 0 ) then
-      do n = 1, ob % num_satem
-         deallocate (ob % satem ( n ) % p        )
-         deallocate (ob % satem ( n ) % thickness)
-       enddo
-      DEALLOCATE (ob % satem)
-   endif
+   if (ob % num_geoamv > 0) DEALLOCATE (ob % geoamv)
+   if (ob % num_polaramv > 0) DEALLOCATE (ob % polaramv)
 
    if (ob % num_metar > 0) DEALLOCATE (ob % metar)
    if (ob % num_ships > 0) DEALLOCATE (ob % ships)
@@ -73,6 +65,17 @@ SUBROUTINE DA_Deallocate_Observations ( ob )
       enddo
 
       DEALLOCATE (ob % pilot)
+   endif
+
+   IF ( ob % num_bogus > 0 ) then
+      do n = 1, ob % num_bogus
+         deallocate (ob % bogus ( n ) % p )
+         deallocate (ob % bogus ( n ) % zk)
+         deallocate (ob % bogus ( n ) % u )
+         deallocate (ob % bogus ( n ) % v )
+      enddo
+
+      DEALLOCATE (ob % bogus)
    endif
 
    IF ( ob % num_Radar > 0 ) then

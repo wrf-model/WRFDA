@@ -21,13 +21,15 @@ module DA_Test
    USE DA_Radar
    USE DA_SSMI
    USE DA_Satem
-   USE DA_Satob
+   USE DA_GeoAMV
+   USE DA_PolarAMV
    USE DA_Ships
    USE DA_Sound
    USE DA_Synop
    USE da_pseudo
    USE DA_Profiler
    USE DA_Buoy 
+   USE DA_Bogus 
    USE DA_Setup_Structures
    USE DA_Tools
    use da_qscat
@@ -63,9 +65,11 @@ contains
 #include "DA_Check_XToY_Adjoint_SSMI_Rv.inc"
 #include "DA_Check_XToY_Adjoint_SSMI_Tb.inc"
 #include "DA_Check_XToY_Adjoint_Satem.inc"
-#include "DA_Check_XToY_Adjoint_Satob.inc"
+#include "DA_Check_XToY_Adjoint_GeoAMV.inc"
+#include "DA_Check_XToY_Adjoint_PolarAMV.inc"
 #include "DA_Check_XToY_Adjoint_Ships.inc"
 #include "DA_Check_XToY_Adjoint_Radar.inc"
+#include "DA_Check_XToY_Adjoint_Bogus.inc"
 #include "DA_Check_XToY_Adjoint_Sound.inc"
 #include "DA_Check_XToY_Adjoint_Sonde_sfc.inc"
 #include "DA_Check_XToY_Adjoint_Synop.inc"
@@ -83,4 +87,3 @@ contains
 #include "set_tst_trnsf_fld.inc"
 
 end module DA_Test
-
