@@ -54,7 +54,7 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
 
 !------------------------------------------------------------------------------
 
-   write (6, '(/,A,/)') ' *** 3-DIMENSIONAL VARIATIONAL ANALYSIS ***'
+   write (6, '(/,A,/)') ' ***  VARIATIONAL ANALYSIS ***'
 
 !------------------------------------------------------------------------------
 !  [1.0] Read 3DVAR namelist:
@@ -95,7 +95,7 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
 !  [6.0] Allocate cv:
 !------------------------------------------------------------------------------
 
-   call calculate_cv_local_size( xp, be, cv1d, cv_size )
+   call calculate_cv_local_size( xbx, xp, be, cv1d, cv_size )
    call da_allocate_cv( cv_size, cv1d )
    call da_allocate_cv( cv_size, xhat )
       
@@ -109,6 +109,7 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
 #include <em_dummy_args.inc>
                  )
 
+
       call da_allocate_y( iv, re )
       call da_allocate_y( iv, y )
 
@@ -120,36 +121,53 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
    endif
 
 !------------------------------------------------------------------------------
-!  [8.0] Loop over O-B calculation and minimization:
+!  [8] Outerloop
 !------------------------------------------------------------------------------
 
    DO it = 1, max_ext_its
 
-!     [8.1] Calculate innovation vector (O-B):
+!     [8.1] Calculate nonlinear model trajectory 
+
+      if (lvar4d) then
+#ifdef WRFVAR
+         call system("runvar4dnl.csh")
+#endif
+      endif
+
+!     [8.2] Calculate innovation vector (O-B):
+
       CALL da_get_innov_vector( it, ob, iv, &
                                 grid , config_flags , &
 #include <em_dummy_args.inc>
                  )
 
+!     [8.3] Interpolate x_g to low resolution grid
+
+!     [8.4] Minimize cost function:
+
       call da_allocate_y( iv, re )
       call da_allocate_y( iv, y )
 
-!     [8.2] Minimize cost function:
+!------------------------------------------------------------------------------
+      CALL DA_Minimise( grid, config_flags,                  &
+                        it, ob, xb, xbx, be, iv, xhat%array, &
+                        cv1d, xa, vv, vp, xp, re, y, j,      &
+                        ids, ide, jds, jde, kds, kde,        &
+                        ims, ime, jms, jme, kms, kme,        &
+                        its, ite, jts, jte, kts, kte         )
+!------------------------------------------------------------------------------
+!   For first outer loop write filtered obs when ntmax = 0
+   if(it == 1 .and. ntmax == 0) &
+    CALL da_write_filtered_obs(gts_iunit, filtered_obs_iunit, ob, iv)
 
-      CALL DA_Minimise( it, ob, xb, xbx, be, iv, xhat%array, &
-                        cv1d, xa, vv, vp, xp, re, y, j, &
-                        ids, ide, jds, jde, kds, kde, &
-                        ims, ime, jms, jme, kms, kme, &
-                        its, ite, jts, jte, kts, kte )
-
-!     [8.3] Update latest analysis solution:
+!     [8.5] Update latest analysis solution:
 
       call da_transform_vtox( xb, xbx, be, xhat%array, vv, vp, xp, xa,  &
                               ids, ide, jds, jde, kds, kde,             &
                               ims, ime, jms, jme, kms, kme,             &
                               its, ite, jts, jte, kts, kte )
 
-!     [8.4] Only when use_RadarObs = .false. and W_INCREMENTS =.true.,
+!     [8.6] Only when use_RadarObs = .false. and W_INCREMENTS =.true.,
 !           the W_increment need to be diagnosed:
 
      if (W_INCREMENTS .and. .not.use_RadarObs) then
@@ -158,11 +176,12 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
                                   ids,ide, jds,jde, kds,kde,  &
                                   ims,ime, jms,jme, kms,kme,  &
                                   its,ite, jts,jte, kts, kte )
-#ifdef DM_PARALLEL
+
          call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id13)
-#endif
+
       endif
 
+!     [8.7] Write out diagnostics
 
       CALL DA_Write_Diagnostics( ob, iv, re, y, xp, xa, j )
 
@@ -170,7 +189,13 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
 !  [8.0] Output 3DVAR analysis and analysis increments:
 !------------------------------------------------------------------------------
 
-      call DA_Transfer_XatoAnalysis( it, xbx, grid, &
+!------------------------------------------------------------------------------
+! Following lines are added by  Syed RH Rizvi due to following reasons:
+! (1) To accomodate KMA FG(fg_format =  3)
+! (2) Seperate treatment for WRF and KMA updating of Xa and Xb array
+! (3) Treatment for MM5 format FG(fg_format = 2) remains same as original
+!------------------------------------------------------------------------------
+      call DA_Transfer_XatoAnalysis( it, xbx, grid, config_flags ,&
 #include <em_dummy_args.inc>
                            )
    END DO

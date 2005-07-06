@@ -14,7 +14,8 @@ SUBROUTINE da_transform_xtoy_profiler_adj( iv, xp, jo_grad_y, jo_grad_x )
 
    IF ( iv%num_profiler > 0 ) THEN
 
-      DO n=1, iv % num_profiler
+      do n=iv%ob_numb(iv%current_ob_time-1)%profiler + 1, iv%ob_numb(iv%current_ob_time)%profiler
+
 
        if(iv%profiler(n)%loc%proc_domain_with_halo) then
 

@@ -30,7 +30,7 @@ SUBROUTINE med_before_solve_io ( grid , config_flags )
    USE module_domain
   ! Model layer
    USE module_configure
-   USE esmf_mod
+   USE WRF_ESMF_MOD
 
    IMPLICIT NONE
 
@@ -41,53 +41,53 @@ SUBROUTINE med_before_solve_io ( grid , config_flags )
    INTEGER                                    :: rc
 
    IF( ESMF_AlarmIsRinging( grid%alarms( HISTORY_ALARM ), rc=rc ) ) THEN
-     CALL med_history_out ( grid , config_flags )
-     CALL ESMF_AlarmTurnOff( grid%alarms( HISTORY_ALARM ), rc=rc )
+     CALL med_hist_out ( grid , 0, config_flags )
+     CALL ESMF_AlarmRingerOff( grid%alarms( HISTORY_ALARM ), rc=rc )
    ENDIF
 
    IF( ESMF_AlarmIsRinging( grid%alarms( INPUTOUT_ALARM ), rc=rc ) ) THEN
      CALL med_filter_out  ( grid , config_flags )
-     CALL ESMF_AlarmTurnOff( grid%alarms( INPUTOUT_ALARM ), rc=rc )
+     CALL ESMF_AlarmRingerOff( grid%alarms( INPUTOUT_ALARM ), rc=rc )
    ENDIF
 
 ! - AUX HISTORY OUTPUT 
    IF( ESMF_AlarmIsRinging( grid%alarms( AUXHIST1_ALARM ), rc=rc ) ) THEN
-     CALL med_auxhist1_out ( grid , config_flags )
-     CALL ESMF_AlarmTurnOff( grid%alarms( AUXHIST1_ALARM ), rc=rc )
+     CALL med_hist_out ( grid , 1, config_flags )
+     CALL ESMF_AlarmRingerOff( grid%alarms( AUXHIST1_ALARM ), rc=rc )
    ENDIF
    IF( ESMF_AlarmIsRinging( grid%alarms( AUXHIST2_ALARM ), rc=rc ) ) THEN
-     CALL med_auxhist2_out ( grid , config_flags )
-     CALL ESMF_AlarmTurnOff( grid%alarms( AUXHIST2_ALARM ), rc=rc )
+     CALL med_hist_out ( grid , 2, config_flags )
+     CALL ESMF_AlarmRingerOff( grid%alarms( AUXHIST2_ALARM ), rc=rc )
    ENDIF
    IF( ESMF_AlarmIsRinging( grid%alarms( AUXHIST3_ALARM ), rc=rc ) ) THEN
-     CALL med_auxhist3_out ( grid , config_flags )
-     CALL ESMF_AlarmTurnOff( grid%alarms( AUXHIST3_ALARM ), rc=rc )
+     CALL med_hist_out ( grid , 3,  config_flags )
+     CALL ESMF_AlarmRingerOff( grid%alarms( AUXHIST3_ALARM ), rc=rc )
    ENDIF
    IF( ESMF_AlarmIsRinging( grid%alarms( AUXHIST4_ALARM ), rc=rc ) ) THEN
-     CALL med_auxhist4_out ( grid , config_flags )
-     CALL ESMF_AlarmTurnOff( grid%alarms( AUXHIST4_ALARM ), rc=rc )
+     CALL med_hist_out ( grid , 4, config_flags )
+     CALL ESMF_AlarmRingerOff( grid%alarms( AUXHIST4_ALARM ), rc=rc )
    ENDIF
    IF( ESMF_AlarmIsRinging( grid%alarms( AUXHIST5_ALARM ), rc=rc ) ) THEN
-     CALL med_auxhist5_out ( grid , config_flags )
-     CALL ESMF_AlarmTurnOff( grid%alarms( AUXHIST5_ALARM ), rc=rc )
+     CALL med_hist_out ( grid , 5, config_flags )
+     CALL ESMF_AlarmRingerOff( grid%alarms( AUXHIST5_ALARM ), rc=rc )
    ENDIF
 
 ! - AUX INPUT INPUT
    IF( ESMF_AlarmIsRinging( grid%alarms( AUXINPUT1_ALARM ), rc=rc ) ) THEN
      CALL med_auxinput1_in ( grid , config_flags )
-     CALL ESMF_AlarmTurnOff( grid%alarms( AUXINPUT1_ALARM ), rc=rc )
+     CALL ESMF_AlarmRingerOff( grid%alarms( AUXINPUT1_ALARM ), rc=rc )
    ENDIF
-   IF( ESMF_AlarmIsRinging( grid%alarms( AUXINPUT2_ALARM ), rc=rc ) ) THEN
-     CALL med_auxinput2_in ( grid , config_flags )
-     CALL ESMF_AlarmTurnOff( grid%alarms( AUXINPUT2_ALARM ), rc=rc )
-   ENDIF
+!  IF( ESMF_AlarmIsRinging( grid%alarms( AUXINPUT2_ALARM ), rc=rc ) ) THEN
+!    CALL med_auxinput2_in ( grid , config_flags )
+!    CALL ESMF_AlarmRingerOff( grid%alarms( AUXINPUT2_ALARM ), rc=rc )
+!  ENDIF
    IF( ESMF_AlarmIsRinging( grid%alarms( AUXINPUT3_ALARM ), rc=rc ) ) THEN
      CALL med_auxinput3_in ( grid , config_flags )
-     CALL ESMF_AlarmTurnOff( grid%alarms( AUXINPUT3_ALARM ), rc=rc )
+     CALL ESMF_AlarmRingerOff( grid%alarms( AUXINPUT3_ALARM ), rc=rc )
    ENDIF
    IF( ESMF_AlarmIsRinging( grid%alarms( AUXINPUT4_ALARM ), rc=rc ) ) THEN
      CALL med_auxinput4_in ( grid , config_flags )
-     CALL ESMF_AlarmTurnOff( grid%alarms( AUXINPUT4_ALARM ), rc=rc )
+     CALL ESMF_AlarmRingerOff( grid%alarms( AUXINPUT4_ALARM ), rc=rc )
    ENDIF
 
 ! this needs to be looked at again so we can get rid of the special
@@ -101,7 +101,7 @@ SUBROUTINE med_before_solve_io ( grid , config_flags )
    IF( ESMF_AlarmIsRinging( grid%alarms( AUXINPUT5_ALARM ), rc=rc ) ) THEN
     print *,' CALL med_read_wrf_chem_emiss '
      CALL med_read_wrf_chem_emiss ( grid , config_flags )
-     CALL ESMF_AlarmTurnOff( grid%alarms( AUXINPUT5_ALARM ), rc=rc )
+     CALL ESMF_AlarmRingerOff( grid%alarms( AUXINPUT5_ALARM ), rc=rc )
     print *,' back from CALL med_read_wrf_chem_emiss '
 
    ENDIF
@@ -110,7 +110,7 @@ SUBROUTINE med_before_solve_io ( grid , config_flags )
   ELSE
    IF( ESMF_AlarmIsRinging( grid%alarms( AUXINPUT5_ALARM ), rc=rc ) ) THEN
      CALL med_auxinput5_in ( grid , config_flags )
-     CALL ESMF_AlarmTurnOff( grid%alarms( AUXINPUT5_ALARM ), rc=rc )
+     CALL ESMF_AlarmRingerOff( grid%alarms( AUXINPUT5_ALARM ), rc=rc )
    ENDIF
   ENDIF
 #endif
@@ -118,7 +118,7 @@ SUBROUTINE med_before_solve_io ( grid , config_flags )
 ! - RESTART OUTPUT
    IF( ESMF_AlarmIsRinging( grid%alarms( RESTART_ALARM ), rc=rc ) ) THEN
      CALL med_restart_out ( grid , config_flags )
-     CALL ESMF_AlarmTurnOff( grid%alarms( RESTART_ALARM ), rc=rc )
+     CALL ESMF_AlarmRingerOff( grid%alarms( RESTART_ALARM ), rc=rc )
    ENDIF
 
 ! - Look for boundary data after writing out history and restart files
@@ -158,7 +158,7 @@ SUBROUTINE med_nest_initial ( parent , nest , config_flags )
    TYPE (grid_config_rec_type) , INTENT(IN)   :: config_flags
    TYPE (grid_config_rec_type)                :: nest_config_flags
 
-#if (EM_CORE == 1)
+#if (EM_CORE == 1 && DA_CORE != 1)
   ! Local
    INTEGER                                    :: idum1 , idum2 , fid, ierr
    INTEGER                                    :: i , j
@@ -180,8 +180,6 @@ SUBROUTINE med_nest_initial ( parent , nest , config_flags )
                                          ,save_sfcevp             &
                                          ,save_sfcrunoff          &
                                          ,save_udrunoff
-
-integer myproc
 
    INTERFACE
      SUBROUTINE med_interp_domain ( parent , nest )
@@ -235,6 +233,19 @@ integer myproc
        REAL , DIMENSION(ims:ime,jms:jme) :: ter_interpolated
        REAL , DIMENSION(ims:ime,jms:jme) :: ter_input
      END SUBROUTINE store_terrain
+
+     SUBROUTINE  input_terrain_rsmas ( ter_input , xlat, xlon, dx,  &
+                           ids , ide , jds , jde , kds , kde , &
+                           ims , ime , jms , jme , kms , kme , &
+                           ips , ipe , jps , jpe , kps , kpe )
+       INTEGER                           :: ids , ide , jds , jde , kds , kde , &
+                                            ims , ime , jms , jme , kms , kme , &
+                                            ips , ipe , jps , jpe , kps , kpe
+       REAL , DIMENSION(ims:ime,jms:jme), INTENT(INOUT) :: ter_input
+       REAL , DIMENSION(ims:ime,jms:jme), INTENT(IN)    :: xlat, xlon
+       REAL , INTENT(IN)                                :: dx
+     END SUBROUTINE input_terrain_rsmas
+
    END INTERFACE
 
    nest%first_force = .true.
@@ -266,7 +277,8 @@ integer myproc
 ! get the nest config flags
      CALL model_to_grid_config_rec ( nest%id , model_config_rec , nest_config_flags )
 
-     IF ( nest_config_flags%input_from_file ) THEN
+     IF ( nest_config_flags%input_from_file .OR. nest_config_flags%input_from_hires ) THEN
+
         WRITE(message,FMT='(A,I2,A)') '*** Initializing nest domain #',nest%id,&
                                       ' from an input file. ***'
         CALL wrf_debug ( 0 , message )
@@ -284,8 +296,16 @@ integer myproc
                              ims , ime , jms , jme , kms , kme , &
                              ips , ipe , jps , jpe , kps , kpe )
 
+       IF ( nest_config_flags%input_from_file ) THEN
 ! read input from dataset
-       CALL med_initialdata_input_ptr( nest , nest_config_flags )
+          CALL med_initialdata_input_ptr( nest , nest_config_flags )
+       ELSE IF ( nest_config_flags%input_from_hires ) THEN
+! read in high res topography
+          CALL  input_terrain_rsmas ( nest%ht , nest%xlat, nest%xlong, nest%dx, &
+                                      ids , ide , jds , jde , 1   , 1   , &
+                                      ims , ime , jms , jme , 1   , 1   , &
+                                      ips , ipe , jps , jpe , 1   , 1   )
+       ENDIF
 
 ! blend parent and nest fields: terrain, mub, and phb.  THe mub and phb are used in start_domain.
        CALL  blend_terrain ( nest%ht_fine , nest%ht , &
@@ -300,92 +320,91 @@ integer myproc
                              ids , ide , jds , jde , kds , kde , &
                              ims , ime , jms , jme , kms , kme , &
                              ips , ipe , jps , jpe , kps , kpe )
-    ELSE
-        WRITE(message,FMT='(A,I2,A,I2,A)') '*** Initializing nest domain #',nest%id,&
-                                      ' by horizontally interpolating parent domain #' ,parent%id, &
-                                      '. ***'
-        CALL wrf_debug ( 0 , message )
-    END IF
+     ELSE
+       WRITE(message,FMT='(A,I2,A,I2,A)') '*** Initializing nest domain #',nest%id,&
+                                     ' by horizontally interpolating parent domain #' ,parent%id, &
+                                     '. ***'
+       CALL wrf_debug ( 0 , message )
+     END IF
 
 ! feedback, mostly for this new terrain, but it is the safe thing to do
-    CALL med_nest_feedback ( parent , nest , config_flags )
+     CALL med_nest_feedback ( parent , nest , config_flags )
 
 ! set some other initial fields, fill out halos, base fields; re-do parent due
 ! to new terrain elevation from feedback
-    nest%imask_nostag = 1
-    nest%imask_xstag = 1
-    nest%imask_ystag = 1
-    nest%imask_xystag = 1
-    CALL start_domain ( nest , .TRUE. )
+     nest%imask_nostag = 1
+     nest%imask_xstag = 1
+     nest%imask_ystag = 1
+     nest%imask_xystag = 1
+     CALL start_domain ( nest , .TRUE. )
 ! kludge: 20040604
-    CALL get_ijk_from_grid (  parent ,                   &
-                              ids, ide, jds, jde, kds, kde,    &
-                              ims, ime, jms, jme, kms, kme,    &
-                              ips, ipe, jps, jpe, kps, kpe    )
+     CALL get_ijk_from_grid (  parent ,                   &
+                               ids, ide, jds, jde, kds, kde,    &
+                               ims, ime, jms, jme, kms, kme,    &
+                               ips, ipe, jps, jpe, kps, kpe    )
   
-    ALLOCATE( save_acsnow(ims:ime,jms:jme) )
-    ALLOCATE( save_acsnom(ims:ime,jms:jme) )
-    ALLOCATE( save_cuppt(ims:ime,jms:jme) )
-    ALLOCATE( save_rainc(ims:ime,jms:jme) )
-    ALLOCATE( save_rainnc(ims:ime,jms:jme) )
-    ALLOCATE( save_sfcevp(ims:ime,jms:jme) )
-    ALLOCATE( save_sfcrunoff(ims:ime,jms:jme) )
-    ALLOCATE( save_udrunoff(ims:ime,jms:jme) )
-    save_acsnow       = parent%acsnow
-    save_acsnom       = parent%acsnom
-    save_cuppt        = parent%cuppt
-    save_rainc        = parent%rainc
-    save_rainnc       = parent%rainnc
-    save_sfcevp       = parent%sfcevp
-    save_sfcrunoff    = parent%sfcrunoff
-    save_udrunoff     = parent%udrunoff
-    save_itimestep    = parent%itimestep
-    parent%imask_nostag = 1
-    parent%imask_xstag = 1
-    parent%imask_ystag = 1
-    parent%imask_xystag = 1
-    CALL start_domain ( parent , .TRUE. )
-    parent%acsnow     = save_acsnow
-    parent%acsnom     = save_acsnom
-    parent%cuppt      = save_cuppt
-    parent%rainc      = save_rainc
-    parent%rainnc     = save_rainnc
-    parent%sfcevp     = save_sfcevp
-    parent%sfcrunoff  = save_sfcrunoff
-    parent%udrunoff   = save_udrunoff
-    parent%itimestep  = save_itimestep
-    DEALLOCATE( save_acsnow )
-    DEALLOCATE( save_acsnom )
-    DEALLOCATE( save_cuppt )
-    DEALLOCATE( save_rainc )
-    DEALLOCATE( save_rainnc )
-    DEALLOCATE( save_sfcevp )
-    DEALLOCATE( save_sfcrunoff )
-    DEALLOCATE( save_udrunoff )
+     ALLOCATE( save_acsnow(ims:ime,jms:jme) )
+     ALLOCATE( save_acsnom(ims:ime,jms:jme) )
+     ALLOCATE( save_cuppt(ims:ime,jms:jme) )
+     ALLOCATE( save_rainc(ims:ime,jms:jme) )
+     ALLOCATE( save_rainnc(ims:ime,jms:jme) )
+     ALLOCATE( save_sfcevp(ims:ime,jms:jme) )
+     ALLOCATE( save_sfcrunoff(ims:ime,jms:jme) )
+     ALLOCATE( save_udrunoff(ims:ime,jms:jme) )
+     save_acsnow       = parent%acsnow
+     save_acsnom       = parent%acsnom
+     save_cuppt        = parent%cuppt
+     save_rainc        = parent%rainc
+     save_rainnc       = parent%rainnc
+     save_sfcevp       = parent%sfcevp
+     save_sfcrunoff    = parent%sfcrunoff
+     save_udrunoff     = parent%udrunoff
+     save_itimestep    = parent%itimestep
+     parent%imask_nostag = 1
+     parent%imask_xstag = 1
+     parent%imask_ystag = 1
+     parent%imask_xystag = 1
+     CALL start_domain ( parent , .TRUE. )
+     parent%acsnow     = save_acsnow
+     parent%acsnom     = save_acsnom
+     parent%cuppt      = save_cuppt
+     parent%rainc      = save_rainc
+     parent%rainnc     = save_rainnc
+     parent%sfcevp     = save_sfcevp
+     parent%sfcrunoff  = save_sfcrunoff
+     parent%udrunoff   = save_udrunoff
+     parent%itimestep  = save_itimestep
+     DEALLOCATE( save_acsnow )
+     DEALLOCATE( save_acsnom )
+     DEALLOCATE( save_cuppt )
+     DEALLOCATE( save_rainc )
+     DEALLOCATE( save_rainnc )
+     DEALLOCATE( save_sfcevp )
+     DEALLOCATE( save_sfcrunoff )
+     DEALLOCATE( save_udrunoff )
 ! end of kludge: 20040604
 
 
   ELSE
+     CALL ESMF_ClockGet( nest%domain_clock, CurrTime=CurrTime, rc=ierr )
+     CALL wrf_timetoa ( CurrTime, timestr )
+     CALL construct_filename2a ( rstname , config_flags%rst_inname , nest%id , 2 , timestr )
 
-    CALL ESMF_ClockGetCurrTime( nest%domain_clock, CurrTime=CurrTime, rc=ierr )
-    CALL ESMF_TimeGetString( CurrTime, timestr, rc=ierr )
-    CALL construct_filename2a ( rstname , config_flags%rst_inname , nest%id , 2 , timestr )
+     WRITE(message,*)'RESTART: nest, opening ',TRIM(rstname),' for reading'
+     CALL wrf_message ( message )
+     CALL open_r_dataset ( fid , TRIM(rstname) , nest , config_flags , "DATASET=RESTART", ierr )
+     IF ( ierr .NE. 0 ) THEN
+       WRITE( message , '("program wrf: error opening ",A32," for reading")') TRIM(rstname)
+       CALL WRF_ERROR_FATAL ( message )
+     ENDIF
+     CALL input_restart ( fid,   nest , config_flags , ierr )
+     CALL close_dataset ( fid , config_flags , "DATASET=RESTART" )
 
-    WRITE(message,*)'opening ',TRIM(rstname),' for reading'
-    CALL wrf_debug ( 1 , message )
-    CALL open_r_dataset ( fid , TRIM(rstname) , nest , config_flags , "DATASET=RESTART", ierr )
-    IF ( ierr .NE. 0 ) THEN
-      WRITE( message , '("program wrf: error opening ",A32," for reading")') TRIM(rstname)
-      CALL WRF_ERROR_FATAL ( message )
-    ENDIF
-    CALL input_restart ( fid,   nest , config_flags , ierr )
-    CALL close_dataset ( fid , config_flags , "DATASET=RESTART" )
-
-    nest%imask_nostag = 1
-    nest%imask_xstag = 1
-    nest%imask_ystag = 1
-    nest%imask_xystag = 1
-    CALL start_domain ( nest , .TRUE. )
+     nest%imask_nostag = 1
+     nest%imask_xstag = 1
+     nest%imask_ystag = 1
+     nest%imask_xystag = 1
+     CALL start_domain ( nest , .TRUE. )
 
   ENDIF
 
@@ -398,7 +417,7 @@ SUBROUTINE init_domain_constants ( parent , nest )
    USE module_domain
    IMPLICIT NONE
    TYPE(domain) :: parent , nest
-#if (EM_CORE == 1)
+#if (EM_CORE == 1 && DA_CORE != 1)
    INTERFACE 
      SUBROUTINE med_init_domain_constants ( parent , nest )
         USE module_domain
@@ -450,16 +469,16 @@ SUBROUTINE med_nest_move ( parent, nest )
         TYPE(domain) , POINTER                 :: grid
 #include <em_dummy_decl.inc>
      END SUBROUTINE shift_domain_em
-     LOGICAL FUNCTION TIME_FOR_MOVE ( grid , dx , dy )
+     LOGICAL FUNCTION time_for_move ( parent , nest , dx , dy )
         USE module_domain
-        USE esmf_mod
-        TYPE(domain) , POINTER    :: grid
+        USE WRF_ESMF_MOD
+        TYPE(domain) , POINTER    :: parent , nest
         INTEGER, INTENT(OUT)      :: dx , dy
-     END FUNCTION TIME_FOR_MOVE
+     END FUNCTION time_for_move
    END INTERFACE
 
 #ifdef DEREF_KLUDGE
-   ! see <a href="www.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm">here</a>
+! see <a href="www.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm">here</a>
    INTEGER     :: sm31 , em31 , sm32 , em32 , sm33 , em33
    INTEGER     :: sm31x, em31x, sm32x, em32x, sm33x, em33x
    INTEGER     :: sm31y, em31y, sm32y, em32y, sm33y, em33y
@@ -471,11 +490,12 @@ SUBROUTINE med_nest_move ( parent, nest )
 
 ! mask should be defined in nest domain
 
-   check_for_move: IF ( time_for_move ( nest , dx, dy ) ) THEN
+   check_for_move: IF ( time_for_move ( parent , nest , dx, dy ) ) THEN
 
      IF ( dx .gt. 1 .or. dy .gt. 1 ) THEN
        CALL wrf_error_fatal( 'med_nest_move' )
      ENDIF
+write(0,*)' moving ',grid%id,dx,dy
 
 
      CALL get_ijk_from_grid (  grid ,                   &
@@ -547,14 +567,14 @@ SUBROUTINE med_nest_move ( parent, nest )
 
 END SUBROUTINE med_nest_move
 
-LOGICAL FUNCTION time_for_move ( grid , move_cd_x, move_cd_y )
+LOGICAL FUNCTION time_for_move2 ( parent , grid , move_cd_x, move_cd_y )
   ! Driver layer
    USE module_domain
    USE module_configure
-   USE esmf_mod
+   USE WRF_ESMF_MOD
    IMPLICIT NONE
 ! arguments
-   TYPE(domain) , POINTER    :: grid
+   TYPE(domain) , POINTER    :: parent, grid
    INTEGER, INTENT(OUT)      :: move_cd_x , move_cd_y
 ! local
    INTEGER  i, num_moves, rc
@@ -563,12 +583,11 @@ LOGICAL FUNCTION time_for_move ( grid , move_cd_x, move_cd_y )
    TYPE(ESMF_TimeInterval) :: ti
    CHARACTER*256 mess
 
-   TIME_FOR_MOVE = .FALSE.
-   CALL ESMF_ClockGetCurrTime( grid%domain_clock, CurrTime=ct, rc=rc )
-   CALL ESMF_ClockGetStartTime( grid%domain_clock, StartTime=st, rc=rc )
+   time_for_move2 = .FALSE.
+   CALL ESMF_ClockGet( grid%domain_clock, CurrTime=ct, StartTime=st, rc=rc )
    CALL nl_get_num_moves( 1, num_moves )
    IF ( num_moves .GT. max_moves ) THEN
-     WRITE(mess,*)'mediation_integrate: time_for_move: num_moves (',num_moves,') .GT. max_moves (',max_moves,')'
+     WRITE(mess,*)'time_for_moves2: num_moves (',num_moves,') .GT. max_moves (',max_moves,')'
      CALL wrf_error_fatal( TRIM(mess) )
    ENDIF
    DO I = 1, num_moves
@@ -581,12 +600,97 @@ LOGICAL FUNCTION time_for_move ( grid , move_cd_x, move_cd_y )
            CALL nl_get_move_cd_x ( i, move_cd_x )
            CALL nl_get_move_cd_y ( i, move_cd_y )
            CALL nl_set_move_interval ( i, 999999999 )
-           TIME_FOR_MOVE = .TRUE.
+           time_for_move2 = .TRUE.
            EXIT
          ENDIF
        ENDIF
      ENDIF
    ENDDO
+   RETURN
+END FUNCTION time_for_move2
+
+LOGICAL FUNCTION time_for_move ( parent , grid , move_cd_x, move_cd_y )
+   USE module_domain
+   USE module_configure
+   USE WRF_ESMF_MOD
+   IMPLICIT NONE
+! arguments
+   TYPE(domain) , POINTER    :: parent, grid
+   INTEGER, INTENT(OUT)      :: move_cd_x , move_cd_y
+! local
+   INTEGER     :: coral_dist, kid
+   INTEGER     :: dw, de, ds, dn, pgr
+   INTEGER     :: cids, cide, cjds, cjde, ckds, ckde, &
+                  cims, cime, cjms, cjme, ckms, ckme, &
+                  cips, cipe, cjps, cjpe, ckps, ckpe, &
+                  nids, nide, njds, njde, nkds, nkde, &
+                  nims, nime, njms, njme, nkms, nkme, &
+                  nips, nipe, njps, njpe, nkps, nkpe
+! interface
+   INTERFACE
+     LOGICAL FUNCTION time_for_move2 ( parent , nest , dx , dy )
+        USE module_domain
+        USE WRF_ESMF_MOD
+        TYPE(domain) , POINTER    :: parent , nest
+        INTEGER, INTENT(OUT)      :: dx , dy
+     END FUNCTION time_for_move2
+   END INTERFACE
+! executable
+! 
+! Simplifying assumption: domains in moving nest simulations have only 
+! one parent and only one child.
+   IF   ( grid%num_nests .GT. 1 ) THEN
+     CALL wrf_error_fatal ( 'domains in moving nest simulations can have only 1 nest' )
+   ENDIF
+   kid = 1
+!
+! find out if this is the innermost nest (will not have kids)
+   IF   ( grid%num_nests .EQ. 0 ) THEN
+     ! code that executes on innermost nest
+     time_for_move = time_for_move2 ( parent , grid , move_cd_x, move_cd_y )
+   ELSE
+     ! code that executes on parent to see if parent needs to move
+     ! get closest number of cells we'll allow nest edge to approach parent bdy
+     CALL nl_get_coral_dist ( grid%id , coral_dist )
+     ! get dims
+     CALL get_ijk_from_grid (  grid%nests(kid)%ptr ,               &
+                               nids, nide, njds, njde, nkds, nkde, &
+                               nims, nime, njms, njme, nkms, nkme, &
+                               nips, nipe, njps, njpe, nkps, nkpe  )
+     CALL get_ijk_from_grid (  grid ,                              &
+                               cids, cide, cjds, cjde, ckds, ckde, &
+                               cims, cime, cjms, cjme, ckms, ckme, &
+                               cips, cipe, cjps, cjpe, ckps, ckpe  )
+     CALL nl_get_parent_grid_ratio ( grid%nests(kid)%ptr%id , pgr )
+     ! perform measurements...
+     !  from western boundary
+     dw = grid%nests(kid)%ptr%i_parent_start - 1
+     !  from southern boundary
+     ds = grid%nests(kid)%ptr%j_parent_start - 1
+     !  from eastern boundary
+     de = cide - ( grid%nests(kid)%ptr%i_parent_start + (nide-nids+1)/pgr )
+     !  from northern boundary
+     dn = cjde - ( grid%nests(kid)%ptr%j_parent_start + (njde-njds+1)/pgr )
+
+     ! move this domain (the parent containing the moving nest)
+     ! in a direction that reestablishes the distance from 
+     ! the boundary.
+     move_cd_x = 0
+     move_cd_y = 0
+     if ( dw .LT. coral_dist ) move_cd_x = move_cd_x - 1
+     if ( de .LT. coral_dist ) move_cd_x = move_cd_x + 1
+     if ( ds .LT. coral_dist ) move_cd_y = move_cd_y - 1
+     if ( dn .LT. coral_dist ) move_cd_y = move_cd_y + 1
+
+     time_for_move = ( move_cd_x .NE. 0 ) .OR. ( move_cd_y .NE. 0 )
+
+     IF ( time_for_move .AND. grid%id .EQ. 1 ) THEN
+       CALL wrf_message( 'DANGER: Nest has moved too close to boundary of outermost domain.' )
+       time_for_move = .FALSE.
+     ENDIF 
+
+   ENDIF
+
    RETURN
 
 END FUNCTION time_for_move
@@ -616,13 +720,19 @@ SUBROUTINE shift_domain_em ( grid , disp_x, disp_y, &
                                       ims , ime , jms , jme , kms , kme , &
                                       ips , ipe , jps , jpe , kps , kpe
    TYPE (grid_config_rec_type)  :: config_flags
-
+#ifdef DEREF_KLUDGE
+! see <a href="www.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm">here</a>
+   INTEGER     :: sm31 , em31 , sm32 , em32 , sm33 , em33
+   INTEGER     :: sm31x, em31x, sm32x, em32x, sm33x, em33x
+   INTEGER     :: sm31y, em31y, sm32y, em32y, sm33y, em33y
+#endif
 
    !  Definitions of dummy arguments to solve
 #include <em_dummy_decl.inc>
 
 #define COPY_IN
 #include <em_scalar_derefs.inc>
+#include "deref_kludge.h"
 #ifdef DM_PARALLEL
 #      include <em_data_calls.inc>
 #endif
@@ -674,7 +784,7 @@ SUBROUTINE med_nest_force ( parent , nest )
   ! Model layer
    USE module_configure
   ! External
-   USE esmf_mod
+   USE WRF_ESMF_MOD
 
    IMPLICIT NONE
 
@@ -715,7 +825,7 @@ SUBROUTINE med_nest_feedback ( parent , nest , config_flags )
    USE module_configure
   ! Model layer
   ! External
-   USE esmf_mod
+   USE WRF_ESMF_MOD
    IMPLICIT NONE
 
 
@@ -777,7 +887,7 @@ SUBROUTINE med_last_solve_io ( grid , config_flags )
    INTEGER                                    :: rc
 
    IF( ESMF_AlarmIsRinging( grid%alarms( HISTORY_ALARM ), rc=rc ) ) THEN
-     CALL med_history_out ( grid , config_flags )
+     CALL med_hist_out ( grid , 0 , config_flags )
    ENDIF
 
    IF( ESMF_AlarmIsRinging( grid%alarms( INPUTOUT_ALARM ), rc=rc ) ) THEN
@@ -785,19 +895,19 @@ SUBROUTINE med_last_solve_io ( grid , config_flags )
    ENDIF
 
    IF( ESMF_AlarmIsRinging( grid%alarms( AUXHIST1_ALARM ), rc=rc ) ) THEN
-     CALL med_auxhist1_out ( grid , config_flags )
+     CALL med_hist_out ( grid , 1 , config_flags )
    ENDIF
    IF( ESMF_AlarmIsRinging( grid%alarms( AUXHIST2_ALARM ), rc=rc ) ) THEN
-     CALL med_auxhist2_out ( grid , config_flags )
+     CALL med_hist_out ( grid , 2 , config_flags )
    ENDIF
    IF( ESMF_AlarmIsRinging( grid%alarms( AUXHIST3_ALARM ), rc=rc ) ) THEN
-     CALL med_auxhist3_out ( grid , config_flags )
+     CALL med_hist_out ( grid , 3 , config_flags )
    ENDIF
    IF( ESMF_AlarmIsRinging( grid%alarms( AUXHIST4_ALARM ), rc=rc ) ) THEN
-     CALL med_auxhist4_out ( grid , config_flags )
+     CALL med_hist_out ( grid , 4 , config_flags )
    ENDIF
    IF( ESMF_AlarmIsRinging( grid%alarms( AUXHIST5_ALARM ), rc=rc ) ) THEN
-     CALL med_auxhist5_out ( grid , config_flags )
+     CALL med_hist_out ( grid , 5 , config_flags )
    ENDIF
 
 ! - RESTART OUTPUT
@@ -818,7 +928,7 @@ SUBROUTINE med_restart_out ( grid , config_flags )
   ! Model layer
    USE module_configure
    USE module_bc_time_utilities
-   USE ESMF_Mod
+   USE WRF_ESMF_MOD
 
    IMPLICIT NONE
 
@@ -840,8 +950,8 @@ SUBROUTINE med_restart_out ( grid , config_flags )
      CALL start_timing
    END IF
 
-   CALL ESMF_ClockGetCurrTime( grid%domain_clock, CurrTime=CurrTime, rc=ierr )
-   CALL ESMF_TimeGetString( CurrTime, timestr, rc=ierr )
+   CALL ESMF_ClockGet( grid%domain_clock, CurrTime=CurrTime, rc=ierr )
+   CALL wrf_timetoa ( CurrTime, timestr )
    CALL construct_filename2a ( rstname , config_flags%rst_outname , grid%id , 2 , timestr )
 
    WRITE( message , '("med_restart_out: opening ",A," for writing")' ) TRIM ( rstname )
@@ -861,131 +971,16 @@ SUBROUTINE med_restart_out ( grid , config_flags )
    RETURN
 END SUBROUTINE med_restart_out
 
-SUBROUTINE med_history_out ( grid , config_flags )
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+SUBROUTINE med_hist_out ( grid , stream, config_flags )
   ! Driver layer
    USE module_domain
-   USE module_io_domain
    USE module_timing
-  ! Model layer
-   USE module_configure
-   USE module_bc_time_utilities
-   USE ESMF_Mod
-
-   IMPLICIT NONE
-
-  ! Arguments
-   TYPE(domain)                               :: grid
-   TYPE (grid_config_rec_type) , INTENT(IN)   :: config_flags
-
-  ! Local
-   LOGICAL, EXTERNAL :: wrf_dm_on_monitor
-   CHARACTER*80                           :: rstname , outname
-   INTEGER                                :: fid , rid
-   CHARACTER (LEN=256)                    :: message
-   INTEGER                                :: ierr
-   INTEGER                                :: myproc
-   TYPE(ESMF_Time)                        :: CurrTime
-   CHARACTER*80                           :: timestr
-
-   IF ( wrf_dm_on_monitor() ) THEN
-     CALL start_timing
-   END IF
-
-   IF ( grid%oid .eq. 0 ) THEN
-
-     CALL ESMF_ClockGetCurrTime( grid%domain_clock, CurrTime=CurrTime, rc=ierr )
-     CALL ESMF_TimeGetString( CurrTime, timestr, rc=ierr )
-     CALL construct_filename2a ( outname , config_flags%history_outname , grid%id , 2 , timestr )
-
-     WRITE ( message , '("med_history_out 1: opening ",A," for writing. ",I3)') TRIM ( outname ), ierr
-     CALL wrf_debug( 1, message )
-
-     CALL open_w_dataset ( grid%oid, TRIM(outname), grid ,  &
-                           config_flags , output_history , "DATASET=HISTORY", ierr )
-     WRITE ( message , '("med_history_out 1: back from opening ",A," for writing. ",I3)') TRIM ( outname ), ierr
-     CALL wrf_debug( 1, message )
-     IF ( ierr .NE. 0 ) THEN
-       CALL wrf_message( message )
-     ENDIF
-   END IF
-
-   CALL output_history ( grid%oid, grid , config_flags , ierr )
-
-   grid%nframes = grid%nframes + 1
-   IF ( grid%nframes >= config_flags%frames_per_outfile ) THEN
-     CALL close_dataset ( grid%oid , config_flags , "DATASET=HISTORY" )
-     grid%nframes = 0
-     grid%oid = 0
-   ENDIF
-   IF ( wrf_dm_on_monitor() ) THEN
-     WRITE ( message , FMT = '("Writing output for domain ",I8)' ) grid%id
-     CALL end_timing ( TRIM(message) )
-   END IF
-   RETURN
-END SUBROUTINE med_history_out
-
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-SUBROUTINE med_auxhist1_out ( grid , config_flags )
-   USE module_domain
-   USE module_configure
-   IMPLICIT NONE
-   TYPE(domain)                               :: grid
-   TYPE (grid_config_rec_type) , INTENT(IN)   :: config_flags
-   CALL med_auxhist_out( grid , 1 , config_flags )
-   RETURN
-END SUBROUTINE med_auxhist1_out
-
-SUBROUTINE med_auxhist2_out ( grid , config_flags )
-   USE module_domain
-   USE module_configure
-   IMPLICIT NONE
-   TYPE(domain)                               :: grid
-   TYPE (grid_config_rec_type) , INTENT(IN)   :: config_flags
-   CALL med_auxhist_out( grid , 2 , config_flags )
-   RETURN
-END SUBROUTINE med_auxhist2_out
-
-SUBROUTINE med_auxhist3_out ( grid , config_flags )
-   USE module_domain
-   USE module_configure
-   IMPLICIT NONE
-   TYPE(domain)                               :: grid
-   TYPE (grid_config_rec_type) , INTENT(IN)   :: config_flags
-   CALL med_auxhist_out( grid , 3 , config_flags )
-   RETURN
-END SUBROUTINE med_auxhist3_out
-
-SUBROUTINE med_auxhist4_out ( grid , config_flags )
-   USE module_domain
-   USE module_configure
-   IMPLICIT NONE
-   TYPE(domain)                               :: grid
-   TYPE (grid_config_rec_type) , INTENT(IN)   :: config_flags
-   CALL med_auxhist_out( grid , 4 , config_flags )
-   RETURN
-END SUBROUTINE med_auxhist4_out
-
-SUBROUTINE med_auxhist5_out ( grid , config_flags )
-   USE module_domain
-   USE module_configure
-   IMPLICIT NONE
-   TYPE(domain)                               :: grid
-   TYPE (grid_config_rec_type) , INTENT(IN)   :: config_flags
-   CALL med_auxhist_out( grid , 5 , config_flags )
-   RETURN
-END SUBROUTINE med_auxhist5_out
-
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-SUBROUTINE med_auxhist_out ( grid , stream, config_flags )
-  ! Driver layer
-   USE module_domain
    USE module_io_domain
    USE module_configure
    USE module_bc_time_utilities
-
-   USE ESMF_Mod
+   USE WRF_ESMF_MOD
 
    IMPLICIT NONE
   ! Arguments
@@ -994,7 +989,7 @@ SUBROUTINE med_auxhist_out ( grid , stream, config_flags )
    INTEGER , INTENT(IN)                       :: stream
   ! Local
    LOGICAL, EXTERNAL :: wrf_dm_on_monitor
-   CHARACTER*80                           :: rstname , outname, auxname, n1, n2
+   CHARACTER*80                           :: fname, n1, n2
    INTEGER                                :: fid , rid
    CHARACTER (LEN=256)                    :: message
    INTEGER                                :: ierr
@@ -1002,48 +997,54 @@ SUBROUTINE med_auxhist_out ( grid , stream, config_flags )
    TYPE(ESMF_Time)                        :: CurrTime
    CHARACTER*80                           :: timestr
 
-   IF ( stream .LT. 1 .OR. stream .GT. 5 ) THEN
-     WRITE(message,*)'med_auxhist_out: invalid history stream ',stream
+   IF ( stream .LT. 0 .OR. stream .GT. 5 ) THEN
+     WRITE(message,*)'med_hist_out: invalid history stream ',stream
      CALL wrf_error_fatal( message )
    ENDIF
-   IF (      ( stream .eq. 1 .and. grid%auxhist1_oid .eq. 0 )    &
+   IF (      ( stream .eq. 0 .and. grid%oid          .eq. 0 )    &
+        .or. ( stream .eq. 1 .and. grid%auxhist1_oid .eq. 0 )    &
         .or. ( stream .eq. 2 .and. grid%auxhist2_oid .eq. 0 )    &
         .or. ( stream .eq. 3 .and. grid%auxhist3_oid .eq. 0 )    &
         .or. ( stream .eq. 4 .and. grid%auxhist4_oid .eq. 0 )    &
         .or. ( stream .eq. 5 .and. grid%auxhist5_oid .eq. 0 )    &
       ) THEN
-     CALL ESMF_ClockGetCurrTime( grid%domain_clock, CurrTime=CurrTime, rc=ierr )
-     CALL ESMF_TimeGetString( CurrTime, timestr, rc=ierr )
+     CALL ESMF_ClockGet( grid%domain_clock, CurrTime=CurrTime, rc=ierr )
+     CALL wrf_timetoa ( CurrTime, timestr )
      SELECT CASE( stream )
+       CASE ( 0 )
+         CALL construct_filename2a ( fname , config_flags%history_outname , grid%id , 2 , timestr )
        CASE ( 1 )
-         CALL construct_filename2a ( auxname , config_flags%auxhist1_outname , grid%id , 2 , timestr )
+         CALL construct_filename2a ( fname , config_flags%auxhist1_outname , grid%id , 2 , timestr )
        CASE ( 2 )
-         CALL construct_filename2a ( auxname , config_flags%auxhist2_outname , grid%id , 2 , timestr )
+         CALL construct_filename2a ( fname , config_flags%auxhist2_outname , grid%id , 2 , timestr )
        CASE ( 3 )
-         CALL construct_filename2a ( auxname , config_flags%auxhist3_outname , grid%id , 2 , timestr )
+         CALL construct_filename2a ( fname , config_flags%auxhist3_outname , grid%id , 2 , timestr )
        CASE ( 4 )
-         CALL construct_filename2a ( auxname , config_flags%auxhist4_outname , grid%id , 2 , timestr )
+         CALL construct_filename2a ( fname , config_flags%auxhist4_outname , grid%id , 2 , timestr )
        CASE ( 5 )
-         CALL construct_filename2a ( auxname , config_flags%auxhist5_outname , grid%id , 2 , timestr )
+         CALL construct_filename2a ( fname , config_flags%auxhist5_outname , grid%id , 2 , timestr )
      END SELECT
-     WRITE(n2,'("DATASET=AUXHIST",I1)')stream
-     WRITE ( message , '("med_auxhist_out : opening ",A," for writing. ",I3)') TRIM ( auxname ), ierr
+     WRITE(n2,'("DATASET=AUXHIST",I1)')stream  ! may be overwritten, below, if stream is 0
+     WRITE ( message , '("med_hist_out : opening ",A," for writing. ",I3)') TRIM ( fname ), ierr
      CALL wrf_debug( 1, message )
      SELECT CASE( stream )
+       CASE ( 0 )
+         CALL open_w_dataset ( grid%oid, TRIM(fname), grid ,  &
+                               config_flags , output_history , 'DATASET=HISTORY' , ierr )
        CASE ( 1 )
-         CALL open_w_dataset ( grid%auxhist1_oid, TRIM(auxname), grid ,  &
+         CALL open_w_dataset ( grid%auxhist1_oid, TRIM(fname), grid ,  &
                                config_flags , output_aux_hist1 , n2, ierr )
        CASE ( 2 )
-         CALL open_w_dataset ( grid%auxhist2_oid, TRIM(auxname), grid ,  &
+         CALL open_w_dataset ( grid%auxhist2_oid, TRIM(fname), grid ,  &
                                config_flags , output_aux_hist2 , n2, ierr )
        CASE ( 3 )
-         CALL open_w_dataset ( grid%auxhist3_oid, TRIM(auxname), grid ,  &
+         CALL open_w_dataset ( grid%auxhist3_oid, TRIM(fname), grid ,  &
                                config_flags , output_aux_hist3 , n2, ierr )
        CASE ( 4 )
-         CALL open_w_dataset ( grid%auxhist4_oid, TRIM(auxname), grid ,  &
+         CALL open_w_dataset ( grid%auxhist4_oid, TRIM(fname), grid ,  &
                                config_flags , output_aux_hist4 , n2, ierr )
        CASE ( 5 )
-         CALL open_w_dataset ( grid%auxhist5_oid, TRIM(auxname), grid ,  &
+         CALL open_w_dataset ( grid%auxhist5_oid, TRIM(fname), grid ,  &
                                config_flags , output_aux_hist5 , n2, ierr )
      END SELECT
      IF ( ierr .NE. 0 ) THEN
@@ -1051,24 +1052,74 @@ SUBROUTINE med_auxhist_out ( grid , stream, config_flags )
      ENDIF
    END IF
    SELECT CASE( stream )
+     CASE ( 0 )
+       CALL output_history ( grid%oid, grid , config_flags , ierr )
      CASE ( 1 )
        CALL output_aux_hist1 ( grid%auxhist1_oid, grid , config_flags , ierr )
      CASE ( 2 )
        CALL output_aux_hist2 ( grid%auxhist2_oid, grid , config_flags , ierr )
      CASE ( 3 )
-       CALL output_aux_hist2 ( grid%auxhist3_oid, grid , config_flags , ierr )
+       CALL output_aux_hist3 ( grid%auxhist3_oid, grid , config_flags , ierr )
      CASE ( 4 )
-       CALL output_aux_hist2 ( grid%auxhist4_oid, grid , config_flags , ierr )
+       CALL output_aux_hist4 ( grid%auxhist4_oid, grid , config_flags , ierr )
      CASE ( 5 )
-       CALL output_aux_hist2 ( grid%auxhist5_oid, grid , config_flags , ierr )
+       CALL output_aux_hist5 ( grid%auxhist5_oid, grid , config_flags , ierr )
    END SELECT
+
+   grid%nframes(stream) = grid%nframes(stream) + 1
+
+   SELECT CASE( stream )
+     CASE ( 0 )
+       IF ( grid%nframes(stream) >= config_flags%frames_per_outfile ) THEN
+         CALL close_dataset ( grid%oid , config_flags , "DATASET=HISTORY" ) 
+         grid%oid = 0
+         grid%nframes(stream) = 0
+       ENDIF
+     CASE ( 1 )
+       IF ( grid%nframes(stream) >= config_flags%frames_per_auxhist1 ) THEN
+         CALL close_dataset ( grid%auxhist1_oid , config_flags , n2 ) 
+         grid%auxhist1_oid = 0
+         grid%nframes(stream) = 0
+       ENDIF
+     CASE ( 2 )
+       IF ( grid%nframes(stream) >= config_flags%frames_per_auxhist2 ) THEN
+         CALL close_dataset ( grid%auxhist2_oid , config_flags , n2 ) 
+         grid%auxhist2_oid = 0
+         grid%nframes(stream) = 0
+       ENDIF
+     CASE ( 3 )
+       IF ( grid%nframes(stream) >= config_flags%frames_per_auxhist3 ) THEN
+         CALL close_dataset ( grid%auxhist3_oid , config_flags , n2 ) 
+         grid%auxhist3_oid = 0
+         grid%nframes(stream) = 0
+       ENDIF
+     CASE ( 4 )
+       IF ( grid%nframes(stream) >= config_flags%frames_per_auxhist4 ) THEN
+         CALL close_dataset ( grid%auxhist4_oid , config_flags , n2 ) 
+         grid%auxhist4_oid = 0
+         grid%nframes(stream) = 0
+       ENDIF
+     CASE ( 5 )
+       IF ( grid%nframes(stream) >= config_flags%frames_per_auxhist5 ) THEN
+         CALL close_dataset ( grid%auxhist5_oid , config_flags , n2 ) 
+         grid%auxhist5_oid = 0
+         grid%nframes(stream) = 0
+       ENDIF
+   END SELECT
+   IF ( wrf_dm_on_monitor() ) THEN
+     WRITE ( message , FMT = '("Writing ",A30," for domain ",I8)' )TRIM(fname),grid%id
+     CALL end_timing ( TRIM(message) )
+   END IF
    RETURN
-END SUBROUTINE med_auxhist_out
+
+   RETURN
+END SUBROUTINE med_hist_out
 
 SUBROUTINE med_auxinput1_in ( grid , config_flags )
    USE module_domain
    USE module_configure
    IMPLICIT NONE
+
    TYPE(domain)                               :: grid
    TYPE (grid_config_rec_type) , INTENT(IN)   :: config_flags
    CALL med_auxinput_in( grid , 1 , config_flags )
@@ -1079,16 +1130,34 @@ SUBROUTINE med_auxinput2_in ( grid , config_flags )
    USE module_domain
    USE module_configure
    IMPLICIT NONE
+
    TYPE(domain)                               :: grid
    TYPE (grid_config_rec_type) , INTENT(IN)   :: config_flags
+
    CALL med_auxinput_in( grid , 2 , config_flags )
    RETURN
 END SUBROUTINE med_auxinput2_in
+
+SUBROUTINE med_auxinput2_in4ad ( grid , config_flags , nl_timestr )
+   USE module_domain
+   USE module_configure
+   IMPLICIT NONE
+
+   TYPE(domain)                               :: grid
+   TYPE (grid_config_rec_type) , INTENT(IN)   :: config_flags
+   character(len=*),             INTENT(IN)   :: nl_timestr
+
+   write(unit=*, fmt='(3a,i6)') 'file:', __FILE__, ', line:', __LINE__
+   print *, 'nl_timestr=', nl_timestr
+   CALL med_auxinput4ad( grid , 2 , config_flags , nl_timestr )
+   RETURN
+END SUBROUTINE med_auxinput2_in4ad
 
 SUBROUTINE med_auxinput3_in ( grid , config_flags )
    USE module_domain
    USE module_configure
    IMPLICIT NONE
+
    TYPE(domain)                               :: grid
    TYPE (grid_config_rec_type) , INTENT(IN)   :: config_flags
    CALL med_auxinput_in( grid , 3 , config_flags )
@@ -1099,6 +1168,7 @@ SUBROUTINE med_auxinput4_in ( grid , config_flags )
    USE module_domain
    USE module_configure
    IMPLICIT NONE
+
    TYPE(domain)                               :: grid
    TYPE (grid_config_rec_type) , INTENT(IN)   :: config_flags
    CALL med_auxinput_in( grid , 4 , config_flags )
@@ -1109,6 +1179,7 @@ SUBROUTINE med_auxinput5_in ( grid , config_flags )
    USE module_domain
    USE module_configure
    IMPLICIT NONE
+
    TYPE(domain)                               :: grid
    TYPE (grid_config_rec_type) , INTENT(IN)   :: config_flags
    CALL med_auxinput_in( grid , 5 , config_flags )
@@ -1122,7 +1193,7 @@ SUBROUTINE med_auxinput_in ( grid , stream, config_flags )
   ! Model layer
    USE module_configure
    USE module_bc_time_utilities
-   USE ESMF_Mod
+   USE WRF_ESMF_MOD
 
    IMPLICIT NONE
   ! Arguments
@@ -1143,14 +1214,61 @@ SUBROUTINE med_auxinput_in ( grid , stream, config_flags )
      WRITE(message,*)'med_auxinput_in: invalid inputory stream ',stream
      CALL wrf_error_fatal( message )
    ENDIF
+
+   IF(stream == 2) THEN
+     CALL ESMF_ClockGet( grid%domain_clock, CurrTime=CurrTime, rc=ierr )
+     CALL wrf_timetoa ( CurrTime, timestr )
+     CALL construct_filename2a ( auxname , config_flags%auxinput2_inname , grid%id , 2 , timestr )
+     WRITE ( message , '("build auxname <",A,"> for stream:",I3,", timestr <",A,">")') TRIM ( auxname ), stream, trim(timestr)
+     CALL wrf_debug( 1, message )
+     WRITE(n2,'("DATASET=AUXINPUT",I1)')stream
+     WRITE ( message , '("med_auxinput_in : opening ",A," for reading. ",I3)') TRIM ( auxname ), ierr
+     CALL wrf_debug( 1, message )
+
+     CALL open_r_dataset ( grid%auxinput2_oid, TRIM(auxname), grid , config_flags , n2, ierr )
+
+     IF ( ierr .NE. 0 ) THEN
+       CALL wrf_message( message )
+     ENDIF
+
+     CALL input_aux_model_input2 ( grid%auxinput2_oid, grid , config_flags , ierr )
+
+     CALL close_dataset ( grid%auxinput2_oid , config_flags , n2)
+
+     return
+   ENDIF
+
+   IF(stream == 3) THEN
+     CALL ESMF_ClockGet( grid%domain_clock, CurrTime=CurrTime, rc=ierr )
+     CALL wrf_timetoa ( CurrTime, timestr )
+     CALL construct_filename2a ( auxname , config_flags%auxinput3_inname , grid%id , 2 , timestr )
+     WRITE ( message , '("build auxname <",A,"> for stream:",I3,", timestr <",A,">")') TRIM ( auxname ), stream, trim(timestr)
+     CALL wrf_debug( 1, message )
+     WRITE(n2,'("DATASET=AUXINPUT",I1)')stream
+     WRITE ( message , '("med_auxinput_in : opening ",A," for reading. ",I3)') TRIM ( auxname ), ierr
+     CALL wrf_debug( 1, message )
+
+     CALL open_r_dataset ( grid%auxinput3_oid, TRIM(auxname), grid , config_flags , n2, ierr )
+
+     IF ( ierr .NE. 0 ) THEN
+       CALL wrf_message( message )
+     ENDIF
+
+     CALL input_aux_model_input3 ( grid%auxinput3_oid, grid , config_flags , ierr )
+
+     CALL close_dataset ( grid%auxinput3_oid , config_flags , n2)
+
+     return
+   ENDIF
+
    IF (      ( stream .eq. 1 .and. grid%auxinput1_oid .eq. 0 )    &
         .or. ( stream .eq. 2 .and. grid%auxinput2_oid .eq. 0 )    &
         .or. ( stream .eq. 3 .and. grid%auxinput3_oid .eq. 0 )    &
         .or. ( stream .eq. 4 .and. grid%auxinput4_oid .eq. 0 )    &
         .or. ( stream .eq. 5 .and. grid%auxinput5_oid .eq. 0 )    &
       ) THEN
-     CALL ESMF_ClockGetCurrTime( grid%domain_clock, CurrTime=CurrTime, rc=ierr )
-     CALL ESMF_TimeGetString( CurrTime, timestr, rc=ierr )
+     CALL ESMF_ClockGet( grid%domain_clock, CurrTime=CurrTime, rc=ierr )
+     CALL wrf_timetoa ( CurrTime, timestr )
      SELECT CASE( stream )
        CASE ( 1 )
          CALL construct_filename2a ( auxname , config_flags%auxinput1_inname, grid%id , 2 , timestr )
@@ -1181,11 +1299,13 @@ SUBROUTINE med_auxinput_in ( grid , stream, config_flags )
          CALL open_u_dataset ( grid%auxinput1_oid, TRIM(auxname), grid ,  &
                                config_flags , input_aux_model_input1 , n2, ierr )
        CASE ( 2 )
-         CALL open_u_dataset ( grid%auxinput2_oid, TRIM(auxname), grid ,  &
-                               config_flags , input_aux_model_input2 , n2, ierr )
+         CALL open_r_dataset ( grid%auxinput2_oid, TRIM(auxname), grid , config_flags , n2, ierr )
+!        CALL open_u_dataset ( grid%auxinput2_oid, TRIM(auxname), grid ,  &
+!                              config_flags , input_aux_model_input2 , n2, ierr )
        CASE ( 3 )
-         CALL open_u_dataset ( grid%auxinput3_oid, TRIM(auxname), grid ,  &
-                               config_flags , input_aux_model_input3 , n2, ierr )
+         CALL open_r_dataset ( grid%auxinput3_oid, TRIM(auxname), grid , config_flags , n2, ierr )
+!        CALL open_u_dataset ( grid%auxinput3_oid, TRIM(auxname), grid ,  &
+!                              config_flags , input_aux_model_input3 , n2, ierr )
        CASE ( 4 )
          CALL open_u_dataset ( grid%auxinput4_oid, TRIM(auxname), grid ,  &
                                config_flags , input_aux_model_input4 , n2, ierr )
@@ -1197,6 +1317,8 @@ SUBROUTINE med_auxinput_in ( grid , stream, config_flags )
        CALL wrf_message( message )
      ENDIF
    END IF
+
+
    SELECT CASE( stream )
      CASE ( 1 )
        CALL input_aux_model_input1 ( grid%auxinput1_oid, grid , config_flags , ierr )
@@ -1209,8 +1331,73 @@ SUBROUTINE med_auxinput_in ( grid , stream, config_flags )
      CASE ( 5 )
        CALL input_aux_model_input5 ( grid%auxinput5_oid, grid , config_flags , ierr )
    END SELECT
+
    RETURN
 END SUBROUTINE med_auxinput_in
+
+SUBROUTINE med_auxinput4ad ( grid , stream, config_flags, nl_timestr )
+  ! Driver layer
+   USE module_domain
+   USE module_io_domain
+  ! Model layer
+   USE module_configure
+   USE module_bc_time_utilities
+   USE WRF_ESMF_MOD
+
+   IMPLICIT NONE
+  ! Arguments
+   TYPE(domain)                               :: grid
+   TYPE (grid_config_rec_type) , INTENT(IN)   :: config_flags
+   INTEGER , INTENT(IN)                       :: stream
+   character(len=*), intent(in)               :: nl_timestr
+  ! Local
+   LOGICAL, EXTERNAL :: wrf_dm_on_monitor
+   CHARACTER*80                           :: rstname , outname, auxname, n1, n2
+   INTEGER                                :: fid , rid
+   CHARACTER (LEN=256)                    :: message
+   INTEGER                                :: ierr
+   INTEGER                                :: myproc
+   TYPE(ESMF_Time)                        :: CurrTime
+   CHARACTER*80                           :: timestr
+
+   IF ( stream /= 2 ) THEN
+     WRITE(message,*)'med_auxinput4ad: invalid inputory stream ',stream
+     CALL wrf_error_fatal( message )
+   ENDIF
+
+     timestr = trim( nl_timestr )
+     ierr = 0
+
+     write(unit=*, fmt='(3a,i6)') 'file:', __FILE__, ', line:', __LINE__
+     print *, 'nl_timestr=', nl_timestr
+
+     CALL construct_filename2a ( auxname , config_flags%auxinput2_inname , grid%id , 2 , timestr )
+     WRITE(n2,'("DATASET=AUXINPUT",I1)')stream
+
+     print *, 'auxname=', auxname
+
+     WRITE ( message , '("med_auxinput_in : opening ",A," for reading. ",I3)') TRIM ( auxname ), ierr
+     CALL wrf_debug( 1, message )
+
+     CALL open_r_dataset ( grid%auxinput2_oid, TRIM(auxname), grid , config_flags , n2, ierr )
+
+     IF ( ierr .NE. 0 ) THEN
+       CALL wrf_message( message )
+     ENDIF
+
+     CALL input_aux_model_input2 ( grid%auxinput2_oid, grid , config_flags , ierr )
+
+     write(unit=20, fmt='(2a)') &
+              '    message:', trim(message)
+
+     write(unit=20, fmt='(2a,2x,a,f12.4)') &
+              'xyh timestr:',trim(timestr), &
+              'grid%t_2(1,1,1)=', grid%em_t_2(1,1,1)
+
+     CALL close_dataset ( grid%auxinput2_oid , config_flags , n2)
+
+   RETURN
+END SUBROUTINE med_auxinput4ad
 
 SUBROUTINE med_filter_out ( grid , config_flags )
   ! Driver layer
@@ -1242,8 +1429,8 @@ SUBROUTINE med_filter_out ( grid , config_flags )
      CALL start_timing
    END IF
 
-     CALL ESMF_ClockGetCurrTime( grid%domain_clock, CurrTime=CurrTime, rc=ierr )
-     CALL ESMF_TimeGetString( CurrTime, timestr, rc=ierr )
+     CALL ESMF_ClockGet( grid%domain_clock, CurrTime=CurrTime, rc=ierr )
+     CALL wrf_timetoa ( CurrTime, timestr )
      CALL construct_filename2a ( outname , config_flags%input_outname , grid%id , 2 , timestr )
 
      WRITE ( message , '("med_filter_out 1: opening ",A," for writing. ",I3)') TRIM ( outname ), ierr
@@ -1279,7 +1466,7 @@ SUBROUTINE med_latbound_in ( grid , config_flags )
   ! Model layer
    USE module_configure
    USE module_bc_time_utilities
-   USE esmf_mod
+   USE WRF_ESMF_MOD
 
    IMPLICIT NONE
 
@@ -1299,11 +1486,11 @@ SUBROUTINE med_latbound_in ( grid , config_flags )
    Type (ESMF_Time )                      :: time, btime
    Type (ESMF_Time )                      :: current_time
 
-!include <wrf_io_flags.h>
+#include <wrf_io_flags.h>
 
    CALL wrf_debug ( 1 , 'in med_latbound_in' )
 
-   IF ( grid%id .EQ. 1 .AND. config_flags%specified ) THEN
+   IF ( grid%id .EQ. 1 .AND. config_flags%specified .AND. config_flags%io_form_boundary .GT. 0 ) THEN
 
      IF ( ( lbc_read_time( grid%current_time ) ) .AND. &
           ( grid%current_time + grid%step_time .GE. grid%stop_time ) .AND. &
@@ -1312,7 +1499,7 @@ SUBROUTINE med_latbound_in ( grid , config_flags )
 
      ELSE IF ( ESMF_AlarmIsRinging( grid%alarms( BOUNDARY_ALARM ), rc=rc ) ) THEN
        CALL wrf_debug ( 1 , 'in med_latbound_in preparing to read' )
-       CALL ESMF_AlarmTurnOff( grid%alarms( BOUNDARY_ALARM ), rc=rc )
+       CALL ESMF_AlarmRingerOff( grid%alarms( BOUNDARY_ALARM ), rc=rc )
        IF ( wrf_dm_on_monitor() ) CALL start_timing
 
 ! typically a <date> wouldn't be part of the bdy_inname, so just pass a dummy
@@ -1338,7 +1525,7 @@ SUBROUTINE med_latbound_in ( grid , config_flags )
        CALL wrf_debug( 100 , 'med_latbound_in: calling input_boundary ' )
        CALL input_boundary ( grid%lbc_fid, grid , config_flags , ierr )
 
-       CALL ESMF_ClockGetCurrTime( grid%domain_clock, current_time, rc=rc)
+       CALL ESMF_ClockGet( grid%domain_clock, CurrTime=current_time, rc=rc)
        DO WHILE (current_time .GE. grid%next_bdy_time )         ! next_bdy_time is set by input_boundary from bdy file
          CALL wrf_debug( 100 , 'med_latbound_in: calling input_boundary ' )
          CALL input_boundary ( grid%lbc_fid, grid , config_flags , ierr )
@@ -1393,3 +1580,192 @@ SUBROUTINE med_setup_step ( grid , config_flags )
 
 END SUBROUTINE med_setup_step
  
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+SUBROUTINE med_read_wrf_chem_emiss ( grid , config_flags )
+  ! Driver layer
+   USE module_domain
+   USE module_io_domain
+   USE module_timing
+  ! Model layer
+   USE module_configure
+   USE module_bc_time_utilities
+#ifdef DM_PARALLEL
+   USE module_dm
+#endif
+   USE module_date_time
+   USE WRF_ESMF_Mod
+
+   IMPLICIT NONE
+
+  ! Arguments
+   TYPE(domain)                               :: grid
+
+!  TYPE (grid_config_rec_type) , INTENT(IN)   :: config_flags
+   TYPE (grid_config_rec_type)                :: config_flags
+   Type (ESMF_Time )                          :: start_time, stop_time, current_time
+   TYPE(ESMF_TimeInterval)                    :: time_interval
+
+  ! Local data
+   LOGICAL, EXTERNAL                      :: wrf_dm_on_monitor
+
+   INTEGER                                :: ierr, efid
+   REAL                                   :: time, tupdate
+   real, allocatable :: dumc0(:,:,:)
+   CHARACTER (LEN=256)                    :: message, current_date_char, date_string
+   CHARACTER (LEN=80)                     :: inpname
+
+#include <wrf_io_flags.h>
+
+     CALL model_to_grid_config_rec ( grid%id , model_config_rec , config_flags )
+
+    IF ( grid%id .EQ. 1 ) THEN
+
+      CALL ESMF_ClockGet( grid%domain_clock, CurrTime=grid%current_time, rc=ierr )
+      CALL wrf_timetoa ( grid%current_time, current_date_char )
+
+      time = float(grid%itimestep) * grid%dt
+      tupdate = mod( time, (12. * 3600.) )
+      IF( grid%current_time + grid%step_time .GE. grid%stop_time .AND.                  &
+          grid%auxinput5_oid .NE. 0 ) THEN
+        CALL close_dataset ( grid%auxinput5_oid , config_flags , "DATASET=AUXINPUT5" )
+        tupdate = 1.
+      ENDIF
+
+       print *,' EMISSIONS UPDATE TIME ',time,TRIM(current_date_char(12:13))
+       print *,tupdate
+
+
+      IF ( tupdate .EQ. 0. .AND.  current_date_char(12:13) .EQ. '00' ) THEN
+         CALL construct_filename1 ( inpname , 'wrfchemi_00z' , grid%id , 2 )
+         WRITE(message,*)'mediation_integrate: med_read_wrf_chem_emissions: Open file ',TRIM(inpname)
+         CALL wrf_message( TRIM(message) )
+
+        if( grid%auxinput5_oid .NE. 0 ) then
+          CALL close_dataset ( grid%auxinput5_oid , config_flags , "DATASET=AUXINPUT5" )
+        endif
+
+        CALL open_r_dataset ( grid%auxinput5_oid, TRIM(inpname) , grid , config_flags, &
+                              "DATASET=AUXINPUT5", ierr )
+        IF ( ierr .NE. 0 ) THEN
+           WRITE( message , * ) 'med_read_wrf_chem_emissions: error opening ', TRIM( inpname )
+           CALL wrf_error_fatal( TRIM( message ) )
+        ENDIF
+      ELSE IF ( tupdate .EQ. 0. .AND. current_date_char(12:13) .EQ. '12' ) THEN
+         CALL construct_filename1 ( inpname , 'wrfchemi_12z' , grid%id , 2 )
+         WRITE(message,*)'mediation_integrate: med_read_wrf_chem_emissions: Open file ',TRIM(inpname)
+         CALL wrf_message( TRIM(message) )
+
+        if( grid%auxinput5_oid .NE. 0 ) then
+          CALL close_dataset ( grid%auxinput5_oid , config_flags , "DATASET=AUXINPUT5" )
+        endif
+
+        CALL open_r_dataset ( grid%auxinput5_oid, TRIM(inpname) , grid , config_flags, &
+                              "DATASET=AUXINPUT5", ierr )
+        IF ( ierr .NE. 0 ) THEN
+           WRITE( message , * ) 'med_read_wrf_chem_emissions: error opening ', TRIM( inpname )
+           CALL wrf_error_fatal( TRIM( message ) )
+        ENDIF
+      ENDIF
+
+       print *,' HOURLY EMISSIONS UPDATE TIME ',time,mod(time,3600.)
+!      print *, grid%current_time + grid%step_time, grid%stop_time
+! hourly updates to emissions
+      IF ( ( mod( time, 3600. ) .EQ. 0   ) .AND. &
+           ( grid%current_time + grid%step_time .LT. grid%stop_time ) ) THEN
+!        IF ( wrf_dm_on_monitor() ) CALL start_timing
+
+         WRITE(message,*)'mediation_integrate: med_read_wrf_chem_emissions: Read emissions for time ',TRIM(current_date_char)
+         CALL wrf_message( TRIM(message) )
+
+         CALL wrf_debug (100 , 'mediation_integrate: calling input_aux_model_input5' )
+         CALL input_aux_model_input5 ( grid%auxinput5_oid, grid , config_flags , ierr )
+      ELSE
+         CALL wrf_debug (100 , 'mediation_integrate: med_read_wrf_chem_emissions: Do not read emissions' )
+      ENDIF
+
+!     ! Close the data file at 11z and 23z
+!     IF ( ( time - 11. * 3600. ) .GE. 0.   ) THEN
+!        CALL close_dataset ( grid%auxinput5_oid , config_flags , "DATASET=AUXINPUT5" )
+!     ENDIF
+
+   ENDIF
+   CALL wrf_debug (100 , 'mediation_integrate: med_read_wrf_chem_emissions: exit' )
+
+END SUBROUTINE med_read_wrf_chem_emiss
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+SUBROUTINE med_read_wrf_chem_bioemiss ( grid , config_flags )
+  ! Driver layer
+   USE module_domain
+   USE module_io_domain
+   USE module_timing
+  ! Model layer
+   USE module_configure
+   USE module_bc_time_utilities
+#ifdef DM_PARALLEL
+   USE module_dm
+#endif
+   USE module_date_time
+   USE WRF_ESMF_Mod
+
+   IMPLICIT NONE
+
+  ! Arguments
+   TYPE(domain)                               :: grid
+
+   TYPE (grid_config_rec_type) , INTENT(IN)   :: config_flags
+   Type (ESMF_Time )                          :: start_time, stop_time, current_time
+   TYPE(ESMF_TimeInterval)                    :: time_interval
+
+  ! Local data
+   LOGICAL, EXTERNAL                      :: wrf_dm_on_monitor
+
+   INTEGER                                :: ierr, efid
+   REAL                                   :: time, tupdate
+   real, allocatable :: dumc0(:,:,:)
+   CHARACTER (LEN=256)                    :: message, current_date_char, date_string
+   CHARACTER (LEN=80)                     :: inpname
+
+#include <wrf_io_flags.h>
+    IF ( grid%id .EQ. 1 ) THEN
+
+      CALL ESMF_ClockGet( grid%domain_clock, CurrTime=grid%current_time, rc=ierr )
+      CALL wrf_timetoa ( grid%current_time, current_date_char )
+
+!     IF( grid%current_time + grid%step_time .GE. grid%stop_time ) then
+!       return
+!     ENDIF
+
+      CALL construct_filename1 ( inpname , 'wrfbiochemi' , grid%id , 2 )
+      WRITE(message,*)'mediation_integrate: med_read_wrf_chem_bioemissions: Open file ',TRIM(inpname)
+      CALL wrf_message( TRIM(message) )
+
+     if( grid%auxinput4_oid .NE. 0 ) then
+       CALL close_dataset ( grid%auxinput4_oid , config_flags , "DATASET=AUXINPUT4" )
+     endif
+
+      CALL open_r_dataset ( grid%auxinput4_oid, TRIM(inpname) , grid , config_flags, &
+                              "DATASET=AUXINPUT4", ierr )
+        IF ( ierr .NE. 0 ) THEN
+           WRITE( message , * ) 'med_read_wrf_chem_bioemissions: error opening ', TRIM( inpname )
+           CALL wrf_error_fatal( TRIM( message ) )
+        ENDIF
+
+         WRITE(message,*)'mediation_integrate: med_read_wrf_chem_bioemissions: Read biogenic emissions at time ',&
+         TRIM(current_date_char)
+         CALL wrf_message( TRIM(message) )
+
+         CALL wrf_debug (100 , 'mediation_integrate: calling input_aux_model_input4' )
+         CALL input_aux_model_input4 ( grid%auxinput4_oid, grid , config_flags , ierr )
+
+         CALL close_dataset ( grid%auxinput4_oid , config_flags , "DATASET=AUXINPUT4" )
+
+   ENDIF
+   CALL wrf_debug (100 , 'mediation_integrate: med_read_wrf_chem_bioemissions: exit' )
+
+END SUBROUTINE med_read_wrf_chem_bioemiss
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
