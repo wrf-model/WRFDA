@@ -55,7 +55,7 @@ SUBROUTINE DA_Check_CvToVv_Adjoint( xb, xbx, xp, be, cv, vv, &
 !-------------------------------------------------------------------------
 
    cv_2(1:cv_size) = cv(1:cv_size)
-   if( cv_options == 2) &
+   if( cv_options == 2 .or. cv_options == 5 ) &
    call da_transform_vtovv( xb, be, cv, vv, xp,         &
                             ids,ide, jds,jde, kds,kde,  &
                             ims,ime, jms,jme, kms,kme,  &
@@ -80,7 +80,7 @@ SUBROUTINE DA_Check_CvToVv_Adjoint( xb, xbx, xp, be, cv, vv, &
 !  [4.0] Calculate LHS of adjoint test equation:
 !-------------------------------------------------------------------------
 
-   if( cv_options == 2) &
+   if( cv_options == 2 .or. cv_options == 5 ) &
    call DA_Transform_VToVv_Adj( xb, be, vv, cv, xp, &
                                ids,ide, jds,jde, kds,kde,  &
                                ims,ime, jms,jme, kms,kme,  &
