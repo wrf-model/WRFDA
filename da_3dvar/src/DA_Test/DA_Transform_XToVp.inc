@@ -6,7 +6,7 @@ SUBROUTINE DA_Transform_XToVp( xb, xbx, xa, xp, vp, be, &
 !  PURPOSE: Transforms analysis to control variables (Vp-type)
 !
 !  HISTORY:   02/02/2005 - Updated for global              Syed RH Rizvi 
-!
+!             07/07/2005 - Include cv_options = 5.         Y.-R. Guo
 !------------------------------------------------------------------------------
 
    IMPLICIT NONE
@@ -36,7 +36,7 @@ SUBROUTINE DA_Transform_XToVp( xb, xbx, xa, xp, vp, be, &
 !  [1.0] Perform transform v = U^{-1} x
 !-------------------------------------------------------------------      
    print*,' in XToVp'     
-   IF ( cv_options /= 2 .and. cv_options /=4) THEN
+   IF ( cv_options /= 2 .and. cv_options /=4 .and. cv_options /= 5) THEN
       write(unit=*, fmt='(a,i6)') &
            'Cannot perform Transform_XToVp for cv_options:', cv_options
 
@@ -113,7 +113,7 @@ SUBROUTINE DA_Transform_XToVp( xb, xbx, xa, xp, vp, be, &
   print*,' calling Solve_PoissonEquation for Chi'
    CALL DA_Solve_PoissonEqn_FCT(xb, xbx, div, vp%v2, xp)
 
-   if( cv_options == 4) then
+   if( cv_options == 4 .or.cv_options == 5 ) then
 !  [2.4] Transform chi to chi_u:
   print*,' calculating chi_u'                         
     do k=kts,kte
@@ -125,16 +125,16 @@ SUBROUTINE DA_Transform_XToVp( xb, xbx, xa, xp, vp, be, &
 
    if( cv_options == 2) then
 !  Communicate halo region.
-   CALL wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id1)
+     CALL wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id1)
 
 !  [2.5] Calculate phi_b from u and v and use it with p
 !   to calculate unbalanced phi:
 
 #ifndef DEREF_KLUDGE
-   CALL DA_Balance_Equation_Lin( xb, xbx, xp,                &
+     CALL DA_Balance_Equation_Lin( xb, xbx, xp,                &
                                  xa % u, xa % v, phi_b,      &
 #else
-   CALL DA_Balance_Equation_Lin( xb, xbx, xp,                &
+     CALL DA_Balance_Equation_Lin( xb, xbx, xp,                &
                                  xa % u(ims,jms,kms), &
                                  xa % v(ims,jms,kms), &
                                  phi_b(ims,jms,kms), &
@@ -143,89 +143,86 @@ SUBROUTINE DA_Transform_XToVp( xb, xbx, xa, xp, vp, be, &
                                  ims,ime, jms,jme, kms,kme,  &
                                  its,ite, jts,jte, kts,kte )
 !  [2.4] Compute phi:
-   IF ( PRESENT(be) ) THEN
+     IF ( PRESENT(be) ) THEN
 
 
-      DO k = kts, kte ! Need copies for all model levels for sum:
+        DO k = kts, kte ! Need copies for all model levels for sum:
 
-         reg_copy(k,jts:jte,kts:kte) = be % pb_vert_reg(jts:jte,kts:kte,k)
-         phi_b_copy(k,its:ite,jts:jte) = phi_b(its:ite,jts:jte,k)
+           reg_copy(k,jts:jte,kts:kte) = be % pb_vert_reg(jts:jte,kts:kte,k)
+           phi_b_copy(k,its:ite,jts:jte) = phi_b(its:ite,jts:jte,k)
     
-      END DO
+        END DO
 
-      DO k = kts, kte
-      DO j = jts, jte
-      DO i = its, ite
+        DO k = kts, kte
+        DO j = jts, jte
+        DO i = its, ite
 !--------SUM OVER ALL LEVELS (kts:kte):
-         sum_vphi = 0.0
+           sum_vphi = 0.0
 
-         DO kk = kts, kte
-            sum_vphi = sum_vphi + reg_copy(kk,j,k) * phi_b_copy(kk,i,j)
-         END DO
-         xa % p(i,j,k) = sum_vphi
-      END DO
-      END DO
-      END DO
-   ELSE
-      xa % p(its:ite,jts:jte,kts:kte) = phi_b(its:ite,jts:jte,kts:kte)
-   ENDIF
-   vp % v3(its:ite,jts:jte,kts:kte) = xa % p(its:ite,jts:jte,kts:kte)
-   end if
+           DO kk = kts, kte
+              sum_vphi = sum_vphi + reg_copy(kk,j,k) * phi_b_copy(kk,i,j)
+           END DO
+           xa % p(i,j,k) = sum_vphi
+        END DO
+        END DO
+        END DO
+     ELSE
+        xa % p(its:ite,jts:jte,kts:kte) = phi_b(its:ite,jts:jte,kts:kte)
+     ENDIF
+     vp % v3(its:ite,jts:jte,kts:kte) = xa % p(its:ite,jts:jte,kts:kte)
 
-   if( cv_options == 4) then
-  print*,' calculating t_u'                         
+   else if( cv_options == 4 .or. cv_options == 5 ) then
+     print*,' calculating t_u'                         
 !  [2.4] Compute t_u:
-    do k=kts,kte
-    do j=jts,jte
-    do i=its,ite
-      vp%v3(i,j,k) = xa%t(i,j,k) - sum(be%reg_t(j,k,kts:kte)*vp%v1(i,j,kts:kte))
-    enddo
-    enddo
-    enddo
+     do k=kts,kte
+     do j=jts,jte
+     do i=its,ite
+        vp%v3(i,j,k) = xa%t(i,j,k) - sum(be%reg_t(j,k,kts:kte)*vp%v1(i,j,kts:kte))
+     enddo
+     enddo
+     enddo
    end if
 
 !  [2.6] Choice of moisture control variable: 
-  
-   IF ( cv_options_hum == 2 ) THEN
+   
+   if (cv_options == 2 ) then
 
-      CALL DA_TPQ_To_RH_Lin( xb, xp, xa )
+     IF ( cv_options_hum == 2 ) THEN
 
-      vp % v4(its:ite,jts:jte,kts:kte) = xa % rh(its:ite,jts:jte,kts:kte)
+       CALL DA_TPQ_To_RH_Lin( xb, xp, xa )
 
-!!!-------------------------------------------------------------------
-   else IF ( cv_options_hum == 3 ) THEN
-     if( cv_options == 2) then 
-     xa % qt(its:ite,jts:jte,kts:kte) = xa % q  (its:ite,jts:jte,kts:kte) +   &
-                                        xa % qcw(its:ite,jts:jte,kts:kte) +   &
-                                        xa % qrn(its:ite,jts:jte,kts:kte)
-     vp % v4(its:ite,jts:jte,kts:kte) = xa % qt (its:ite,jts:jte,kts:kte)
-     end if
-     if( cv_options == 4) then       ! Pseudo RH
-  print*,' calculating psudo rh'                    
-     vp % v4(its:ite,jts:jte,kts:kte) = xa % q  (its:ite,jts:jte,kts:kte) /   &
-                                        xb % qs (its:ite,jts:jte,kts:kte) 
-     end if
-!!!-------------------------------------------------------------------
+       vp % v4(its:ite,jts:jte,kts:kte) = xa % rh(its:ite,jts:jte,kts:kte)
 
-      ELSE IF ( cv_options_hum == 1 ) THEN
+     else IF ( cv_options_hum == 3 ) THEN
+       xa % qt(its:ite,jts:jte,kts:kte) = xa % q  (its:ite,jts:jte,kts:kte) +   &
+                                          xa % qcw(its:ite,jts:jte,kts:kte) +   &
+                                          xa % qrn(its:ite,jts:jte,kts:kte)
+       vp % v4(its:ite,jts:jte,kts:kte) = xa % qt (its:ite,jts:jte,kts:kte)
+     ELSE IF ( cv_options_hum == 1 ) THEN
 
       vp % v4(its:ite,jts:jte,kts:kte) = xa % q(its:ite,jts:jte,kts:kte)
-      
-   END IF
-               
-   if ( cv_options == 2) then
-!  [2.7] v5 set to zero (ground temperature in future):
-    vp % v5(its:ite,jts:jte,kts:kte) = 0.0
+     end if
+   else if( cv_options == 4 .or. cv_options == 5 ) then       ! Pseudo RH
+
+     print*,' calculating psudo rh'                    
+     vp % v4(its:ite,jts:jte,kts:kte) = xa % q  (its:ite,jts:jte,kts:kte) /   &
+                                        xb % qs (its:ite,jts:jte,kts:kte) 
    end if
 
-   if ( cv_options == 4) then
+!  [2.7] Choice of surface pressure control variable: 
+      
+   if ( cv_options == 2) then
+!  [2.7] v5 set to zero (ground temperature in future):
+     vp % v5(its:ite,jts:jte,kts:kte) = 0.0
+
+   else if ( cv_options == 4 .or.cv_options == 5 ) then
 !  [2.7] compute psfc_u:
-  print*,' calculating psfc_u '                     
-    do j=jts,jte
-    do i=its,ite
-    vp % v5(i,j,1) = xa%psfc(i,j) - sum(be%reg_ps(j,kts:kte)*vp%v1(i,j,kts:kte))
-    end do
-    end do
+     print*,' calculating psfc_u '                     
+     do j=jts,jte
+     do i=its,ite
+       vp % v5(i,j,1) = xa%psfc(i,j) - sum(be%reg_ps(j,kts:kte)*vp%v1(i,j,kts:kte))
+     end do
+     end do
    end if
 
 END SUBROUTINE DA_Transform_XToVp

@@ -187,38 +187,38 @@ SUBROUTINE DA_Test_VXTransform( xb, xbx, xp, be, &
 !  [4.0] Test inverse physical variable transform:
 !  Note: Currently these test are developed for cp_options = 2 only
 !-------------------------------------------------------------------------
-   if(  cv_options == 2 ) then
-   call da_zero_x(xa)
-   call da_transform_vptox( xb, xbx, vp, xp, xa, be,    &
-                            ids,ide, jds,jde, kds,kde,  &
-                            ims,ime, jms,jme, kms,kme,  &
-                            its,ite, jts,jte, kts,kte )
+   if(  cv_options == 2 .or. cv_options == 5 ) then
+     call da_zero_x(xa)
+     call da_transform_vptox( xb, xbx, vp, xp, xa, be,    &
+                              ids,ide, jds,jde, kds,kde,  &
+                              ims,ime, jms,jme, kms,kme,  &
+                              its,ite, jts,jte, kts,kte )
 
 !  [4.1] Test XToVpToX differences:
 
-   write(unit=*, fmt='(/a/)') &
-        'DA_Check_XToVpToX_Errors'
+     write(unit=*, fmt='(/a/)') &
+          'DA_Check_XToVpToX_Errors'
    
-   CALL DA_Check_XToVpToX_Errors( xa, xa2_u, xa2_v, xa2_w, xa2_t, &
-                               xa2_p, xa2_q, xa2_rh, xa2_rho, &
-                               xa2_qt, xa2_qcw, xa2_qrn, &
-                              ids,ide, jds,jde, kds,kde, &
-                              ims,ime, jms,jme, kms,kme, &
-                              its,ite, jts,jte, kts,kte )
+     CALL DA_Check_XToVpToX_Errors( xa, xa2_u, xa2_v, xa2_w, xa2_t, &
+                                 xa2_p, xa2_q, xa2_rh, xa2_rho, &
+                                 xa2_qt, xa2_qcw, xa2_qrn, &
+                                 ids,ide, jds,jde, kds,kde, &
+                                 ims,ime, jms,jme, kms,kme, &
+                                 its,ite, jts,jte, kts,kte )
 
 !  [4.2] Perform v_{p} = U_{p}^{-1} x transform (again):
 
-   call DA_Transform_XToVp( xb, xbx, xa, xp, vv, be, &
+     call DA_Transform_XToVp( xb, xbx, xa, xp, vv, be, &
                             ids,ide, jds,jde, kds,kde, &
                             ims,ime, jms,jme, kms,kme, &
                             its,ite, jts,jte, kts,kte )
       
 !  [2.4] Check inverse errors:
 
-   write(unit=*, fmt='(/a/)') &
-        'DA_Check_VpToXToVp_Errors'
+     write(unit=*, fmt='(/a/)') &
+          'DA_Check_VpToXToVp_Errors'
 
-   call DA_Check_Vp_Errors( vp, vv, kz_vp, its,ite, jts,jte, kts,kte )
+     call DA_Check_Vp_Errors( vp, vv, kz_vp, its,ite, jts,jte, kts,kte )
    end if
 !-------------------------------------------------------------------------
 !  [5.0] Perform Vv -> Vp adjoint test: 
@@ -241,7 +241,6 @@ SUBROUTINE DA_Test_VXTransform( xb, xbx, xp, be, &
                                ids, ide, jds, jde, kds, kde,      &
                                ims, ime, jms, jme, kms, kme,      &
                                its, ite, jts, jte, kts, kte )
-    
 !-------------------------------------------------------------------------
 !  [8.0]: Perform Spectral transform tests for Global                    
 !-------------------------------------------------------------------------

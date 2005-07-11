@@ -20,9 +20,9 @@ SUBROUTINE da_transform_xtoy_bogus_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
    REAL                           :: dx, dxm  ! 
    REAL                           :: dy, dym  !
 
-   REAL, DIMENSION(xp%kts:xp%kte) :: model_t,tt
-   REAL, DIMENSION(xp%kts:xp%kte) :: model_q,qq
-   REAL, DIMENSION(xp%kts:xp%kte) :: model_p_c,pp
+   REAL, DIMENSION(xp%kms:xp%kme) :: model_t,tt
+   REAL, DIMENSION(xp%kms:xp%kme) :: model_q,qq
+   REAL, DIMENSION(xp%kms:xp%kme) :: model_p_c,pp
    REAL                           :: psfc_loc,terr_loc,ppsfc                     
 
    IF ( iv%num_bogus > 0 ) THEN

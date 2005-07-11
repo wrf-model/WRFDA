@@ -98,6 +98,7 @@ SUBROUTINE DA_Check_XToY_Adjoint( xb, xa, iv, xp, y, &
    endif
 
    if ( use_ssmt1obs .or. use_ssmt2obs .or. Use_GpspwObs .or. &
+        use_GpsrefObs .or.                                    &
         Use_SsmiTbObs .or. Use_SsmiRetrievalObs ) then
 
 !-----Now do something for PW
@@ -206,6 +207,7 @@ SUBROUTINE DA_Check_XToY_Adjoint( xb, xa, iv, xp, y, &
 !-------------------------------------------------------------------------
 
    if ( use_ssmt1obs .or. use_ssmt2obs .or. Use_GpspwObs .or. &
+        use_GpsrefObs .or.                                    &
         Use_SsmiTbObs .or. Use_SsmiRetrievalObs ) then
 
       if ( Use_SsmiTbObs) call DA_Transform_XToTb_Adj (xa, xb)
