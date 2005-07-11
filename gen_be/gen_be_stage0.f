@@ -1,41 +1,29 @@
-!WRF:DRIVER_LAYER:MAIN
+!WRF GEN_BE_STAGE0:DRIVER_LAYER:MAIN
 !
 
 PROGRAM gen_be_stage0
 
-   USE module_gen_be_esmf_super
+   USE module_gen_be_top
 
 !<DESCRIPTION>
-! Main program of WRF model.  Responsible for starting up the model, reading in (and
+! Main program of gen_be.  Responsible for starting up, reading in (and
 ! broadcasting for distributed memory) configuration data, defining and initializing
 ! the top-level domain, either from initial or restart data, setting up time-keeping, and
-! then calling the <a href=integrate.html>integrate</a> routine to advance the domain
-! to the ending time of the simulation. After the integration is completed, the model
-! is properly shut down.
+! then calling the <a href=da_v3d_solve.html>da_v3d_solve</a> routine assimilation.
+! After the assimilation is completed, the model is properly shut down.
 !
 !</DESCRIPTION>
 
    IMPLICIT NONE
 
-   TYPE(ESMF_GridComp) :: gcomp
-   TYPE(ESMF_State)    :: importState, exportState
-   TYPE(ESMF_Clock)    :: clock
-   TYPE(ESMF_VM)       :: vm   
-   INTEGER :: rc
+!--Initialize gen_be
+   CALL gen_be_init
 
-   ! This call includes everything that must be done before ESMF_Initialize() 
-   ! is called.  
-   CALL init_modules(1)   ! Phase 1 returns after MPI_INIT() (if it is called)
+!--gen_be Calls integrate().  
+   CALL gen_be_run
 
-   CALL ESMF_Initialize( vm=vm, defaultCalendar=ESMF_CAL_GREGORIAN, rc=rc )
-
-   CALL gen_be_init( gcomp, importState, exportState, clock, rc )
-
-   CALL gen_be_run( gcomp, importState, exportState, clock, rc )
-
-   CALL gen_be_finalize( gcomp, importState, exportState, clock, rc )
-
-   CALL ESMF_Finalize( rc=rc )
+!--gen_be clean-up.  This calls MPI_FINALIZE() for DM parallel runs.  
+   CALL gen_be_finalize
 
 END PROGRAM gen_be_stage0
 
