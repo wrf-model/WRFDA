@@ -4677,3 +4677,22 @@ END
    END SUBROUTINE wrf_gatherv_double
 
 #endif
+
+LOGICAL FUNCTION em_cd_feedback_mask( pig, ips_save, ipe_save , pjg, jps_save, jpe_save, xstag, ystag )
+   INTEGER, INTENT(IN) :: pig, ips_save, ipe_save , pjg, jps_save, jpe_save
+   LOGICAL, INTENT(IN) :: xstag, ystag
+
+   INTEGER ioff, joff
+
+   ioff = 0 ; joff = 0
+   IF ( xstag  ) ioff = 1
+   IF ( ystag  ) joff = 1
+
+   em_cd_feedback_mask = ( pig .ge. ips_save+1        .and.      &
+                           pjg .ge. jps_save+1        .and.      &
+                           pig .le. ipe_save-1  +ioff .and.      &
+                           pjg .le. jpe_save-1  +joff           )
+
+
+END FUNCTION em_cd_feedback_mask
+
