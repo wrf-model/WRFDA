@@ -1,6 +1,7 @@
 !WRF:MODEL_RA:RADIATION
 !
 MODULE MODULE_RA_GFDLETA
+      USE MODULE_CONFIGURE,ONLY : GRID_CONFIG_REC_TYPE
       USE MODULE_MODEL_CONSTANTS
       USE MODULE_MP_ETANEW, ONLY : RHGRD,FPVS
       INTEGER,PARAMETER :: NL=81
@@ -45,11 +46,12 @@ CONTAINS
 
 !-----------------------------------------------------------------------
       SUBROUTINE GFDLETAINIT(SFULL,SHALF,PPTOP,JULYR,MONTH,IDAY,GMT,    &
-     &                       ALLOWED_TO_READ,                           &
+     &                       CONFIG_FLAGS,ALLOWED_TO_READ,              &
      &                       KDS,KDE,KMS,KME,KTS,KTE)
 !-----------------------------------------------------------------------
       IMPLICIT NONE
 !-----------------------------------------------------------------------
+      TYPE (GRID_CONFIG_REC_TYPE) :: CONFIG_FLAGS
       INTEGER,INTENT(IN) :: KDS,KDE,KMS,KME,KTS,KTE
       REAL,DIMENSION(KMS:KME),INTENT(IN) :: SFULL, SHALF
       INTEGER,INTENT(IN) :: JULYR,MONTH,IDAY
@@ -81,12 +83,11 @@ CONTAINS
 !***  OTHERWISE CALL CO2O3.
 !
       IF(ALLOWED_TO_READ)THEN
-#if (EM_CORE==1)
-        CALL CO2O3(SFULL,SHALF,PPTOP,KME-KMS,KME-KMS+1,KME-KMS+2)
-#endif
-#if (NMM_CORE==1)
-        CALL CONRAD(KDS,KDE,KMS,KME,KTS,KTE)
-#endif
+        IF(CONFIG_FLAGS%CO2TF==1)THEN
+          CALL CO2O3(SFULL,SHALF,PPTOP,KME-KMS,KME-KMS+1,KME-KMS+2)
+        ELSE
+          CALL CONRAD(KDS,KDE,KMS,KME,KTS,KTE)
+        ENDIF
 !
         CALL O3CLIM
         CALL TABLE
@@ -151,6 +152,8 @@ CONTAINS
      &                                                         QW,T
 !     REAL, INTENT(IN), DIMENSION(37*kte) :: RAD1,RAD2,RAD3,RAD4
       LOGICAL, INTENT(IN) :: gfdl_lw,gfdl_sw
+
+!
 
       REAL, DIMENSION(its:ite, kms:kme, jts:jte):: PFLIP,QIFLIP,QFLIP,  &
      &                                             QWFLIP,TFLIP
@@ -1285,8 +1288,8 @@ CONTAINS
       IF(CNCLD)THEN
         IF(HBOT(I,J)-HTOP(I,J).GT.1.)THEN
 !--- Count locations with convective cloudiness
-          ACFRST(I,J)=ACFRST(I,J)+CFRAVG
-          NCFRST(I,J)=NCFRST(I,J)+1
+          ACFRCV(I,J)=ACFRCV(I,J)+CFRAVG
+          NCFRCV(I,J)=NCFRCV(I,J)+1
         ENDIF
         BITS=.FALSE.
         DO LL=1,LM
@@ -1300,8 +1303,8 @@ CONTAINS
         ENDIF
       ELSE
 !--- Count only locations with grid-scale cloudiness
-        ACFRCV(I,J)=ACFRCV(I,J)+CFRAVG
-        NCFRCV(I,J)=NCFRCV(I,J)+1
+        ACFRST(I,J)=ACFRST(I,J)+CFRAVG
+        NCFRST(I,J)=NCFRST(I,J)+1
       ENDIF
   650 CONTINUE
 !***

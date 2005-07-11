@@ -62,7 +62,7 @@ SUBROUTINE DA_Transfer_WRFTLtoXa( grid, config_flags, filnam, &
    do k=ks,ke
    do j=js,je
    do i=is,ie
-      xa%q(i,j,k)=g_moist_2(i,j,k,P_QV)*(1.0-xb%q(i,j,k))**2
+      xa%q(i,j,k)=g_moist(i,j,k,P_QV)*(1.0-xb%q(i,j,k))**2
    enddo
    enddo
    enddo
@@ -76,8 +76,8 @@ SUBROUTINE DA_Transfer_WRFTLtoXa( grid, config_flags, filnam, &
       sdmd=0.0
       s1md=0.0
       do k=ks,ke
-         sdmd=sdmd+g_moist_2(i,j,k,P_QV)*dnw(k)
-         s1md=s1md+(1.0+moist_2(i,j,k,P_QV))*dnw(k)
+         sdmd=sdmd+g_moist(i,j,k,P_QV)*dnw(k)
+         s1md=s1md+(1.0+moist(i,j,k,P_QV))*dnw(k)
       enddo
       xa%psfc(i,j)=-xb%psac(i,j)*sdmd-g_mu_2(i,j)*s1md
    enddo
@@ -92,8 +92,8 @@ SUBROUTINE DA_Transfer_WRFTLtoXa( grid, config_flags, filnam, &
 
      k=ke
 
-     qvf1  =g_moist_2(i,j,k,P_QV)
-     qvf1_b=moist_2(i,j,k,P_QV)
+     qvf1  =g_moist(i,j,k,P_QV)
+     qvf1_b=moist(i,j,k,P_QV)
      qvf2  =-qvf1/ ((1.+qvf1_b)*(1.+qvf1_b))
      qvf2_b=1./(1.+qvf1)
      qvf1  =qvf1*qvf2_b + qvf1_b*qvf2
@@ -105,8 +105,8 @@ SUBROUTINE DA_Transfer_WRFTLtoXa( grid, config_flags, filnam, &
 
      do k = ke-1,1,-1
 
-       qvf1  =0.5*(g_moist_2(i,j,k,P_QV)+g_moist_2(i,j,k+1,P_QV))
-       qvf1_b=0.5*(  moist_2(i,j,k,P_QV)+  moist_2(i,j,k+1,P_QV))
+       qvf1  =0.5*(g_moist(i,j,k,P_QV)+g_moist(i,j,k+1,P_QV))
+       qvf1_b=0.5*(  moist(i,j,k,P_QV)+  moist(i,j,k+1,P_QV))
        qvf2  =-qvf1/((1.+qvf1_b)*(1.+qvf1_b))
        qvf2_b=1./(1.+qvf1_b)
        qvf1  =qvf1*qvf2_b + qvf1_b*qvf2
@@ -164,33 +164,33 @@ SUBROUTINE DA_Transfer_WRFTLtoXa( grid, config_flags, filnam, &
    enddo
 
 #if 0
-   if ( size(moist_2,dim=4) >= 4 ) then
+   if ( size(moist,dim=4) >= 4 ) then
       do k=ks,ke
       do j=js,je
       do i=is,ie
-         xa%qcw(i,j,k)=g_moist_2(i,j,k,p_qcw)
-         xa%qrn(i,j,k)=g_moist_2(i,j,k,p_qrn)
+         xa%qcw(i,j,k)=g_moist(i,j,k,p_qcw)
+         xa%qrn(i,j,k)=g_moist(i,j,k,p_qrn)
       enddo
       enddo
       enddo
    endif
 
-   if ( size(moist_2,dim=4) >= 6 ) then
+   if ( size(moist,dim=4) >= 6 ) then
       do k=ks,ke
       do j=js,je
       do i=is,ie
-         xa%qci(i,j,k)=g_moist_2(i,j,k,p_qci)
-         xa%qsn(i,j,k)=g_moist_2(i,j,k,p_qsn)
+         xa%qci(i,j,k)=g_moist(i,j,k,p_qci)
+         xa%qsn(i,j,k)=g_moist(i,j,k,p_qsn)
       enddo
       enddo
       enddo
    endif
 
-   if ( size(moist_2,dim=4) >= 7 ) then
+   if ( size(moist,dim=4) >= 7 ) then
       do k=ks,ke
       do j=js,je
       do i=is,ie
-         xa%qgr(i,j,k)=g_moist_2(i,j,k,p_qgr) 
+         xa%qgr(i,j,k)=g_moist(i,j,k,p_qgr) 
       enddo
       enddo
       enddo

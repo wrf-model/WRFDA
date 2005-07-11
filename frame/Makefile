@@ -9,9 +9,6 @@ RM      =       rm -f
 MODULES =       module_driver_constants.o  \
                 module_domain.o            \
                 module_integrate.o         \
-                module_integrate_ad.o      \
-                module_integrate_tl.o      \
-                module_integrate_tst.o     \
                 module_timing.o            \
                 module_configure.o         \
                 module_tiles.o             \
@@ -28,19 +25,18 @@ MODULES =       module_driver_constants.o  \
 OBJS    =       wrf_num_bytes_between.o    \
                 wrf_shutdown.o             \
                 libmassv.o                 \
-                collect_on_comm.o          \
-		add_forcing_to_ad.o
+                collect_on_comm.o
 
 #compile as a .o but do not link into the main library
 SPECIAL =       module_internal_header_util.o pack_utils.o
-WRFVAR	=
+   
 
 include ../configure.wrf
 
 LIBTARGET    =  framework
 TARGETDIR    =  ./
-$(LIBTARGET) :  $(MODULES) $(EXTRAMODULES) $(OBJS) $(SPECIAL)
-		$(AR) ../main/libwrflib.a $(MODULES) $(EXTRAMODULES) $(OBJS)
+$(LIBTARGET) :  $(MODULES) $(OBJS) $(SPECIAL)
+		$(AR) ../main/libwrflib.a $(MODULES) $(OBJS)
 		$(RANLIB) ../main/libwrflib.a
 
 
@@ -51,7 +47,7 @@ clean:
 	@ echo 'use the clean script'
 
 module_state_description.F : ../Registry/$(REGISTRY)
-		( cd .. ; tools/registry $(ARCHFLAGS) $(WRFVAR) Registry/$(REGISTRY) )
+		( cd .. ; tools/registry $(ARCHFLAGS) Registry/$(REGISTRY) )
 
 md_calls.inc : md_calls.m4
 	$(M4) md_calls.m4 > md_calls.inc
@@ -85,30 +81,6 @@ module_driver_constants.o: \
                 module_wrf_error.o
 
 module_integrate.o: module_domain.o \
-		module_timing.o \
-		module_driver_constants.o \
-		module_state_description.o \
-		module_nesting.o \
-		module_configure.o \
-		$(ESMF_MOD_DEPENDENCE)
-
-module_integrate_ad.o: module_domain.o \
-		module_timing.o \
-		module_driver_constants.o \
-		module_state_description.o \
-		module_nesting.o \
-		module_configure.o \
-		$(ESMF_MOD_DEPENDENCE)
-
-module_integrate_tl.o: module_domain.o \
-		module_timing.o \
-		module_driver_constants.o \
-		module_state_description.o \
-		module_nesting.o \
-		module_configure.o \
-		$(ESMF_MOD_DEPENDENCE)
-
-module_integrate_tst.o: module_domain.o \
 		module_timing.o \
 		module_driver_constants.o \
 		module_state_description.o \

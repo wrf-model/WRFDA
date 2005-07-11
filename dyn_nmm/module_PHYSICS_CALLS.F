@@ -25,6 +25,7 @@
       USE MODULE_CUMULUS_DRIVER
       USE MODULE_MP_ETANEW
       USE MODULE_MICROPHYSICS_DRIVER
+      USE MODULE_MICROPHYSICS_ZERO_OUT
 !-----------------------------------------------------------------------
 !
       CONTAINS
@@ -289,30 +290,40 @@
 !
       CALL SET_TILES(GRID,IDS+1,IDE-1,JDS+2,JDE-2,ITS,ITE,JTS,JTE)
 !
-      CALL RADIATION_DRIVER(NTSD,DT                                     &
-     &                     ,AER_DRY,AER_WATER                           &
-     &                     ,THRATENLW,THRATENSW,THRATEN                 &
-     &                     ,GLW,SWNETDN,SWDOWN                          &
-     &                     ,XLAT,XLON,ALBEDO,ZERO_3D,EPSR               &
-     &                     ,RR,WATER,N_MOIST                            &
-     &                     ,P8W,P_PHY,ZERO_3D,PI_PHY,DZ,T_PHY,T8W       &
-     &                     ,GMT,JULDAY,CONFIG_FLAGS,RADT                &
-     &                     ,NRAD                                        & 
-     &                     ,ICLOUD,ZERO_3D,ZERO_3D,WARM_RAIN            & 
-     &                     ,XLAND,TSFC,HTOP,HBOT,CUPPT,VEGFRC,SNOW      & 
-     &                     ,JULYR                                       & 
-     &                     ,NPHS                                        &
-     &                     ,TOTSWDN ,TOTLWDN                            &
-     &                     ,RSWTOA ,RLWTOA                              &
-     &                     ,CZMEAN ,CFRACL                              &
-     &                     ,CFRACM ,CFRACH                              &
-     &                     ,ACFRST ,NCFRST                              &
-     &                     ,ACFRCV ,NCFRCV                              &
-     &                     ,IDS,IDE,JDS,JDE,KDS,KDE                     &
-     &                     ,IMS,IME,JMS,JME,KMS,KME                     &
-     &                     ,GRID%I_START,GRID%I_END                     &
-     &                     ,GRID%J_START,GRID%J_END                     &
-     &                     ,KTS,KTE,GRID%NUM_TILES)
+      CALL RADIATION_DRIVER(                                            &
+     &                  IDS=IDS,IDE=IDE,JDS=JDS,JDE=JDE,KDS=KDS,KDE=KDE &
+     &                 ,IMS=IMS,IME=IME,JMS=JMS,JME=JME,KMS=KMS,KME=KME &
+     &                 ,I_START=GRID%I_START,I_END=GRID%I_END           &
+     &                 ,J_START=GRID%J_START,J_END=GRID%J_END           &
+     &                 ,KTS=KTS,KTE=KTE,NUM_TILES=GRID%NUM_TILES        &
+     &                 ,ITIMESTEP=NTSD,DT=DT                            &
+     &                 ,AER_DRY=AER_DRY,AER_WATER=AER_WATER             &
+     &                 ,RTHRATENLW=THRATENLW,RTHRATENSW=THRATENSW       &
+     &                 ,RTHRATEN=THRATEN                                &
+     &                 ,GLW=GLW,GSW=SWNETDN,SWDOWN=SWDOWN               &
+     &                 ,XLAT=XLAT,XLONG=XLON,ALBEDO=ALBEDO,EMISS=EPSR   &
+     &                 ,XLAND=XLAND,TSK=TSFC                            &
+     &                 ,HTOP=HTOP,HBOT=HBOT,CUPPT=CUPPT                 &
+     &                 ,VEGFRA=VEGFRC,SNOW=SNOW                         &
+     &                 ,RHO=RR,P8W=P8W,P=P_PHY,PI=PI_PHY                &
+     &                 ,DZ8W=DZ,T=T_PHY,T8W=T8W,GMT=GMT                 &
+     &                 ,JULDAY=JULDAY,JULYR=JULYR,NPHS=NPHS             &
+     &                 ,LW_PHYSICS=CONFIG_FLAGS%RA_LW_PHYSICS           &
+     &                 ,SW_PHYSICS=CONFIG_FLAGS%RA_SW_PHYSICS           &
+     &                 ,RADT=RADT,STEPRA=NRAD,ICLOUD=ICLOUD             &
+     &                 ,WARM_RAIN=WARM_RAIN                             & 
+     &                 ,TOTSWDN=TOTSWDN,TOTLWDN=TOTLWDN                 &
+     &                 ,RSWTOA=RSWTOA,RLWTOA=RLWTOA                     &
+     &                 ,CZMEAN=CZMEAN,CFRACL=CFRACL                     &
+     &                 ,CFRACM=CFRACM,CFRACH=CFRACH                     &
+     &                 ,ACFRST=ACFRST,NCFRST=NCFRST                     &
+     &                 ,ACFRCV=ACFRCV,NCFRCV=NCFRCV                     &
+     &                 ,QV=WATER(IMS,KMS,JMS,P_QV),F_QV=F_QV            &
+     &                 ,QC=WATER(IMS,KMS,JMS,P_QC),F_QC=F_QC            &
+     &                 ,QR=WATER(IMS,KMS,JMS,P_QR),F_QR=F_QR            &
+     &                 ,QI=WATER(IMS,KMS,JMS,P_QI),F_QI=F_QI            &
+     &                 ,QS=WATER(IMS,KMS,JMS,P_QS),F_QS=F_QS            &
+     &                 ,QG=WATER(IMS,KMS,JMS,P_QG),F_QG=F_QG          )
 !
 !-----------------------------------------------------------------------
 !
@@ -347,7 +358,10 @@
           DO II=0,NRADS,NPHS
             TIMES=NTSD*DT+II*DT
             CALL ZENITH(TIMES,DAYI,HOUR,IDAT,IHRST,GLON,GLAT,CZEN       &
-     &                 ,MYIS,MYIE,MYJS,MYJE                             &
+     &                 ,MYIS &
+     &                 ,MYIE &
+     &                 ,MYJS &
+     &                 ,MYJE &
      &                 ,IDS,IDE,JDS,JDE,KDS,KDE                         &
      &                 ,IMS,IME,JMS,JME,KMS,KME                         &
      &                 ,ITS,ITE,JTS,JTE,KTS,KTE)
@@ -473,8 +487,8 @@
      &                ,CZEN,CZMEAN,SIGT4,RLWIN,RSWIN,RADOT              &
      &                ,PD,RES,PINT,T,Q,CWM,F_ICE,F_RAIN,SR              &
      &                ,Q2,U,V,THS,SST,PREC,SNO,ZERO_3D                  &
-     &                ,FIS,Z0,Z0BASE,USTAR,PBLH,LPBL                    &
-     &                ,EXCH_H,AKHS,AKMS                                 &
+     &                ,FIS,Z0,Z0BASE,USTAR,PBLH,LPBL,EL_MYJ             &
+     &                ,EXCH_H,AKHS,AKMS,AKHS_OUT,AKMS_OUT               &
      &                ,THZ0,QZ0,UZ0,VZ0,QS                              &
      &                ,STC,SMC,CMC,SMSTAV,SMSTOT,SSROFF,BGROFF          &
      &                ,IVGTYP,ISLTYP,VEGFRC,SHDMIN,SHDMAX,GRNFLX        &
@@ -580,7 +594,8 @@
      &                                                ,VZ0,VZ0H         &
      &                                                ,Z0,Z0BASE
 !
-      REAL,DIMENSION(IMS:IME,JMS:JME),INTENT(OUT) :: ALWIN,ALWOUT       &
+      REAL,DIMENSION(IMS:IME,JMS:JME),INTENT(OUT) :: AKHS_OUT,AKMS_OUT  &
+     &                                              ,ALWIN,ALWOUT       &
      &                                              ,ALWTOA,ASWIN       &
      &                                              ,ASWOUT,ASWTOA      &
      &                                              ,PSHLTR,Q10,QSHLTR  &
@@ -601,6 +616,8 @@
 !
       REAL,DIMENSION(IMS:IME,KMS:KME,JMS:JME),INTENT(INOUT) :: ZERO_3D
 !
+      REAL,DIMENSION(IMS:IME,KMS:KME,JMS:JME),INTENT(OUT) :: EL_MYJ
+!
       REAL,DIMENSION(NSOIL),INTENT(IN) :: DZSOIL,SLDPTH
 !
       REAL,DIMENSION(IMS:IME,NSOIL,JMS:JME),INTENT(INOUT) :: SMC,STC
@@ -617,15 +634,15 @@
 !***
 !-----------------------------------------------------------------------
       INTEGER :: I,IDUMMY,IEND,ISFFLX,ISTR,J,K,KOUNT_ALL,LENGTH_ROW     &
-     &          ,LLIJ,LLMH,LLYR,N
+     &          ,LLIJ,LLMH,LLYR,N,SST_UPDATE
 !
       INTEGER,DIMENSION(IMS:IME,JMS:JME) :: KPBL,LOWLYR
 !
       REAL :: TRESH=0.95
 !
-      REAL :: ALTITUDE,CWML,DQDT,DTDT,DTPHS,DX,FACTR,FACTRL,G_INV       &
-     &       ,PDSL,PLYR,PSFC,QI,QL,QOLD,QR,QW,RATIOMX,RDTPHS,ROG        &
-     &       ,RWMSK,SDEPTH,TL,TLMH,TLMH4,TNEW,TSFC2,U_FRAME,V_FRAME     &
+      REAL :: ALTITUDE,CWML,DQDT,DTDT,DTPHS,DX,DZHALF,FACTR,FACTRL      &
+     &       ,G_INV,PDSL,PLYR,PSFC,QI,QL,QOLD,QR,QW,RATIOMX,RDTPHS      &
+     &       ,ROG,RWMSK,SDEPTH,TL,TLMH,TLMH4,TNEW,TSFC2,U_FRAME,V_FRAME &
      &       ,WMSK,XLVRW
 !
       REAL :: APES,CKLQ,FACTOR,FFS,PQ0X,Q2SAT,QFC1,QLOWX,RLIVWV         &
@@ -669,6 +686,7 @@
       IDUMMY=0
       ISFFLX=1
       DX=0.
+      SST_UPDATE=0
 !
       DO J=JMS,JME
       DO I=IMS,IME
@@ -920,29 +938,47 @@
       CALL SET_TILES(GRID,IDS,IDE-1,JDS+1,JDE-1,ITS,ITE,JTS,JTE)
 !
       CALL SURFACE_DRIVER(                                              &
-     &           ACSNOM,ACSNOW,AKHS,AKMS,ALBEDO,BR,CMC,ZERO_2D          &
-     &          ,CHKLOWQ,CONFIG_FLAGS,DT,DX,DZ,SLDPTH,ZERO_2D           &
-     &          ,RLW_DN_SFC,GRNFLX,RSW_NET_SFC,GZ1OZ0,TWBS,ZERO_2D      &
-     &          ,SFCZ,IDUMMY,ISFFLX,ISLTYP,NTSD,IVGTYP,LOWLYR           &
-     &          ,ONE,WATER,ZERO_2D,RMOL,NSOIL,N_MOIST,P8W,PBLH          &
-     &          ,PI_PHY,PSHLTR,PSIH,PSIM,P_PHY,Q10,Q2X,QWBS,QS,QSHLTR   &
-     &          ,QZ0,RAINBL,RAIN,ZERO_2D,ZERO_2D,RR,SFCEVPX             &
-     &          ,SFCEXC,SSROFF,SMC,SMSTAV,SMSTOT,MXSNAL,SNOW,SNOWC      &
-     &          ,SNOWH,NPHS,ZERO_2D,TH10,TH2X,ZERO_2D,THZ0,TH_PHY       &
-     &          ,TG,TSHLTR,TSFC,STC,T_PHY,U10,BGROFF,USTAR,UZ0H         &
-     &          ,U_FRAME,U_PHY,V10,VGFRCK,VZ0H,V_FRAME,V_PHY            &
-     &          ,WARM_RAIN,WSPD,SICE,XLAND,Z,Z0,DZSOIL                  &
-     &          ,CT,TKE                                                 &
-     &          ,ALBASE,ELFLX,SH2O,SHDMAX,SHDMIN,Z0BASE                 &
-     &          ,FLQC,FLHC,ZERO_2D,ZERO_2D,ZERO_2D,ZERO_2D,ZERO_2D      & ! RUC LSM
-     &          ,ZERO_SOIL,ZERO_SOIL                                    &
-     &          ,PSFC_OUT                                               &
-     &          ,IDS,IDE,JDS,JDE,KDS,KDE                                &
-     &          ,IMS,IME,JMS,JME,KMS,KME                                &
-     &          ,GRID%I_START,GRID%I_END                                &
-     &          ,GRID%J_START,GRID%J_END                                &
-     &          ,KTS,KTE,GRID%NUM_TILES                                 &
-     &          ,POTEVP,SNOPCX,SOILTB,SR)                                 ! NMM LSM only
+     &           ACSNOM=ACSNOM,ACSNOW=ACSNOW,AKHS=AKHS,AKMS=AKMS        &
+     &          ,ALBEDO=ALBEDO,BR=BR,CANWAT=CMC,CHKLOWQ=CHKLOWQ         &
+     &          ,DT=DT,DX=DX,DZ8W=DZ,DZS=SLDPTH,GLW=RLW_DN_SFC          &
+     &          ,GRDFLX=GRNFLX,GSW=RSW_NET_SFC,GZ1OZ0=GZ1OZ0,HFX=TWBS   &
+     &          ,HT=SFCZ,IFSNOW=IDUMMY,ISFFLX=ISFFLX,ISLTYP=ISLTYP      &
+     &          ,ITIMESTEP=NTSD,IVGTYP=IVGTYP,LOWLYR=LOWLYR             &
+     &          ,MAVAIL=ONE,RMOL=RMOL,NUM_SOIL_LAYERS=NSOIL,P8W=P8W     &
+     &          ,PBLH=PBLH,PI_PHY=PI_PHY,PSHLTR=PSHLTR,PSIH=PSIH        &
+     &          ,PSIM=PSIM,P_PHY=P_PHY,Q10=Q10,Q2=Q2X,QFX=QWBS,QSFC=QS  &
+     &          ,QSHLTR=QSHLTR,QZ0=QZ0,RAINCV=RAIN                      &
+     &          ,RHO=RR,SFCEVP=SFCEVPX,SFCEXC=SFCEXC,SFCRUNOFF=SSROFF   &
+     &          ,SMOIS=SMC,SMSTAV=SMSTAV,SMSTOT=SMSTOT,SNOALB=MXSNAL    &
+     &          ,SNOW=SNOW,SNOWC=SNOWC,SNOWH=SNOWH,STEPBL=NPHS          &
+     &          ,SST=sst            ,SST_UPDATE=sst_update              &
+     &          ,TH10=TH10,TH2=TH2X,THZ0=THZ0,TH_PHY=TH_PHY             &
+     &          ,TMN=TG,TSHLTR=TSHLTR,TSK=TSFC,TSLB=STC,T_PHY=T_PHY     &
+     &          ,U10=U10,UDRUNOFF=BGROFF,UST=USTAR,UZ0=UZ0H             &
+     &          ,U_FRAME=U_FRAME,U_PHY=U_PHY,V10=V10,VEGFRA=VGFRCK      &
+     &          ,VZ0=VZ0H,V_FRAME=V_FRAME,V_PHY=V_PHY                   &
+     &          ,WARM_RAIN=WARM_RAIN,WSPD=WSPD,XICE=SICE                &
+     &          ,XLAND=XLAND,Z=Z,ZNT=Z0,ZS=DZSOIL,CT=CT,TKE_MYJ=TKE     &
+     &          ,ALBBCK=ALBASE,LH=ELFLX,SH2O=SH2O,SHDMAX=SHDMAX         &
+     &          ,SHDMIN=SHDMIN,Z0=Z0BASE,FLQC=FLQC,FLHC=FLHC            &
+     &          ,PSFC=PSFC_OUT                                          &
+     &          ,SF_SFCLAY_PHYSICS=CONFIG_FLAGS%SF_SFCLAY_PHYSICS       &
+     &          ,SF_SURFACE_PHYSICS=CONFIG_FLAGS%SF_SURFACE_PHYSICS     &
+     &          ,RA_LW_PHYSICS=CONFIG_FLAGS%RA_LW_PHYSICS               &
+     &          ,IDS=IDS,IDE=IDE,JDS=JDS,JDE=JDE,KDS=KDS,KDE=KDE        &
+     &          ,IMS=IMS,IME=IME,JMS=JMS,JME=JME,KMS=KMS,KME=KME        &
+     &          ,I_START=GRID%I_START,I_END=GRID%I_END                  &
+     &          ,J_START=GRID%J_START,J_END=GRID%J_END                  &
+     &          ,KTS=KTS,KTE=KTE,NUM_TILES=GRID%NUM_TILES               &
+           ! Optional args
+     &          ,QV_CURR=WATER(IMS,KMS,JMS,P_QV),F_QV=F_QV              &
+     &          ,QC_CURR=WATER(IMS,KMS,JMS,P_QC),F_QC=F_QC              &
+     &          ,QR_CURR=WATER(IMS,KMS,JMS,P_QR),F_QR=F_QR              &
+     &          ,QI_CURR=WATER(IMS,KMS,JMS,P_QI),F_QI=F_QI              &
+     &          ,QS_CURR=WATER(IMS,KMS,JMS,P_QS),F_QS=F_QS              &
+     &          ,QG_CURR=WATER(IMS,KMS,JMS,P_QG),F_QG=F_QG              &
+     &          ,RAINBL=RAINBL                                          &
+     &          ,POTEVP=POTEVP,SNOPCX=SNOPCX,SOILTB=SOILTB,SR=SR      )
 !
 !-----------------------------------------------------------------------
 !
@@ -961,25 +997,58 @@
       ENDDO
       ENDDO
 !
-      CALL PBL_DRIVER(NTSD,DT,U_FRAME,V_FRAME                           &
-     &               ,DUDT,DVDT,RTHBLTEN                                &
-     &               ,RQVBLTEN,RQCBLTEN,RQIBLTEN                        &
-     &               ,TSFC,XLAND,Z0,SFCZ                                &
-     &               ,USTAR,ZERO_2D,ZERO_2D,PBLH                        &
-     &               ,TWBS,QWBS,ZERO_2D,GRNFLX                          &
-     &               ,U_PHY,V_PHY,TH_PHY,RR,WATER                       &
-     &               ,P_PHY,PI_PHY,P8W,T_PHY,DZ,Z                       &
-     &               ,TKE,EXCH_H,AKHS,AKMS                              &
-     &               ,THZ0,QZ0,UZ0H,VZ0H,QS,LOWLYR                      &
-     &               ,PSIM,PSIH,GZ1OZ0,WSPD,BR,CHKLOWQ                  &
-     &               ,CONFIG_FLAGS,DX,N_MOIST                           &
-     &               ,NPHS,WARM_RAIN                                    &
-     &               ,KPBL,CT,ELFLX,SNOW,SICE                           &
-     &               ,IDS,IDE,JDS,JDE,KDS,KDE                           &
-     &               ,IMS,IME,JMS,JME,KMS,KME                           &
-     &               ,GRID%I_START,GRID%I_END                           &
-     &               ,GRID%J_START,GRID%J_END                           &
-     &               ,KTS,KTE,GRID%NUM_TILES)
+!***  THE SURFACE EXCHANGE COEFFICIENTS AKHS AND AKMS ARE ACTUALLY
+!***  MULTIPLIED BY HALF THE DEPTH OF THE LOWEST LAYER.  WE MUST RETAIN
+!***  THOSE VALUES FOR THE NEXT TIMESTEP SO USE AUXILLIARY ARRAYS FOR
+!***  THE OUTPUT.
+!
+!$omp parallel do                                                       &
+!$omp& private(dzhalf,i,j)
+      DO J=JTS,JTE
+      DO I=ITS,ITE
+        DZHALF=0.5*DZ(I,KTS,J)
+        AKHS_OUT(I,J)=AKHS(I,J)*DZHALF
+        AKMS_OUT(I,J)=AKMS(I,J)*DZHALF
+      ENDDO
+      ENDDO
+!
+      CALL PBL_DRIVER(                                                &
+     &                ITIMESTEP=NTSD,DT=DT                            &
+     &               ,U_FRAME=U_FRAME,V_FRAME=V_FRAME                 &
+     &               ,RUBLTEN=DUDT,RVBLTEN=DVDT,RTHBLTEN=RTHBLTEN     &
+     &               ,RQVBLTEN=RQVBLTEN,RQCBLTEN=RQCBLTEN             &
+     &               ,RQIBLTEN=RQIBLTEN                               &
+     &               ,TSK=TSFC,XLAND=XLAND,ZNT=Z0,HT=SFCZ             &
+     &               ,UST=USTAR, PBLH=PBLH                            &
+     &               ,HFX=TWBS,QFX=QWBS,  GRDFLX=GRNFLX               &
+     &               ,U_PHY=U_PHY,V_PHY=V_PHY,TH_PHY=TH_PHY,RHO=RR    &
+     &               ,P_PHY=P_PHY,PI_PHY=PI_PHY,P8W=P8W,T_PHY=T_PHY   &
+     &               ,DZ8W=DZ,Z=Z,TKE_MYJ=TKE,EL_MYJ=EL_MYJ           &
+     &               ,EXCH_H=EXCH_H,AKHS=AKHS,AKMS=AKMS               &
+     &               ,THZ0=THZ0,QZ0=QZ0,UZ0=UZ0H,VZ0=VZ0H             &
+     &               ,QSFC=QS,LOWLYR=LOWLYR                           &
+     &               ,PSIM=PSIM,PSIH=PSIH,GZ1OZ0=GZ1OZ0               &
+     &               ,WSPD=WSPD,BR=BR,CHKLOWQ=CHKLOWQ                 &
+     &               ,DX=DX,STEPBL=NPHS,WARM_RAIN=WARM_RAIN           &
+     &               ,KPBL=KPBL,CT=CT,LH=ELFLX,SNOW=SNOW,XICE=SICE    &
+     &               ,BL_PBL_PHYSICS=config_flags%bl_pbl_physics      &
+     &               ,RA_LW_PHYSICS=config_flags%ra_lw_physics        &
+     &               ,IDS=IDS,IDE=IDE,JDS=JDS,JDE=JDE,KDS=KDS,KDE=KDE &
+     &               ,IMS=IMS,IME=IME,JMS=JMS,JME=JME,KMS=KMS,KME=KME &
+     &               ,I_START=GRID%I_START,I_END=GRID%I_END           &
+     &               ,J_START=GRID%J_START,J_END=GRID%J_END           &
+     &               ,KTS=KTS,KTE=KTE,NUM_TILES=GRID%NUM_TILES        &
+                ! Optional args
+     &               ,QV_CURR=WATER(IMS,KMS,JMS,P_QV) , F_QV=F_QV     &
+     &               ,QC_CURR=WATER(IMS,KMS,JMS,P_QC) , F_QC=F_QC     &
+     &               ,QR_CURR=WATER(IMS,KMS,JMS,P_QR) , F_QR=F_QR     &
+     &               ,QI_CURR=WATER(IMS,KMS,JMS,P_QI) , F_QI=F_QI     &
+     &               ,QS_CURR=WATER(IMS,KMS,JMS,P_QS) , F_QS=F_QS     &
+     &               ,QG_CURR=WATER(IMS,KMS,JMS,P_QG) , F_QG=F_QG   )
+!
+!***  NOTE THAT THE EXCHANGE COEFFICIENTS FOR HEAT EXCH_H COMING OUT OF
+!***  PBL_DRIVER ARE DEFINED AT THE TOPS OF THE LAYERS KTS TO KTE-1
+!***  IF MODULE_BL_MYJPBL WAS INVOKED.
 !
 !-----------------------------------------------------------------------
 ! UNCOMPUTED LOCATIONS MUST BE FILLED IN FOR THE POST-PROCESSOR
@@ -1451,6 +1520,8 @@
 !-----------------------------------------------------------------------
       IF(MOD(NTSD,NCNVC)/=0.AND.                                      &
      &   CONFIG_FLAGS%CU_PHYSICS==BMJSCHEME)RETURN
+      IF(MOD(NTSD,NCNVC)/=0.AND.                                      &
+     &   CONFIG_FLAGS%CU_PHYSICS==SASSCHEME)RETURN
 !-----------------------------------------------------------------------
       NSTEP_CNV=NCNVC
 !
@@ -1670,10 +1741,10 @@
      &                 ,I_START=GRID%I_START,I_END=GRID%I_END           &
      &                 ,J_START=GRID%J_START,J_END=GRID%J_END           &
      &                 ,KTS=KTS,KTE=KTE,NUM_TILES=GRID%NUM_TILES        &
-                     ! prognostic
+                  ! Prognostic
      &                 ,U=U_PHY,V=V_PHY,TH=TH_PHY,T=T_PHY,W=WINT        &
      &                 ,P=P_PHY,PI=PI_PHY,RHO=RR,W0AVG=W0AVG            &
-                     ! others
+                  ! Others
      &                 ,ITIMESTEP=NTSD,DT=DT,DX=GPS                     &
      &                 ,RAINC=RAINC,RAINCV=RAINCV,NCA=NCA               &
      &                 ,DZ8W=DZ,P8W=P8W                                 &
@@ -1685,16 +1756,15 @@
      &                 ,maxens2=1,maxens3=1                             &
      &                 ,RTHCUTEN=RTHCUTEN ,RQVCUTEN=RQVCUTEN            &
      &                 ,RQCCUTEN=RQCCUTEN ,RQRCUTEN=RQRCUTEN            &
-                     ! selection argument
+                  ! Selection argument
      &                 ,CU_PHYSICS=CONFIG_FLAGS%CU_PHYSICS              &
-                     ! moisture tracer arguments
-     &                 ,QV_CURR=water(ims,kms,jms,P_QV) , F_QV=F_QV     &
-     &                 ,QC_CURR=water(ims,kms,jms,P_QC) , F_QC=F_QC     &
-     &                 ,QR_CURR=water(ims,kms,jms,P_QR) , F_QR=F_QR     &
-     &                 ,QI_CURR=water(ims,kms,jms,P_QI) , F_QI=F_QI     &
-     &                 ,QS_CURR=water(ims,kms,jms,P_QS) , F_QS=F_QS     &
-     &                 ,QG_CURR=water(ims,kms,jms,P_QG) , F_QG=F_QG     &
-                                                                        )
+                  ! Moisture tracer arguments
+     &                 ,QV_CURR=WATER(IMS,KMS,JMS,P_QV),F_QV=F_QV       &
+     &                 ,QC_CURR=WATER(IMS,KMS,JMS,P_QC),F_QC=F_QC       &
+     &                 ,QR_CURR=WATER(IMS,KMS,JMS,P_QR),F_QR=F_QR       &
+     &                 ,QI_CURR=WATER(IMS,KMS,JMS,P_QI),F_QI=F_QI       &
+     &                 ,QS_CURR=WATER(IMS,KMS,JMS,P_QS),F_QS=F_QS       &
+     &                 ,QG_CURR=WATER(IMS,KMS,JMS,P_QG),F_QG=F_QG      )
 !
 !-----------------------------------------------------------------------
 !
@@ -1811,6 +1881,9 @@
      &                   ,PDTOP,PT,PD,RES,PINT,T,Q,CWM,TRAIN            &
      &                   ,F_ICE,F_RAIN,F_RIMEF,SR                       &
      &                   ,PREC,ACPREC,AVRAIN,ZERO_3D                    &
+     &                   ,MP_RESTART_STATE                              &
+     &                   ,TBPVS_STATE                                   &
+     &                   ,TBPVS0_STATE                                  &
      &                   ,GRID,CONFIG_FLAGS                             &
      &                   ,IDS,IDE,JDS,JDE,KDS,KDE                       &
      &                   ,IMS,IME,JMS,JME,KMS,KME                       &
@@ -1867,6 +1940,11 @@
       REAL,DIMENSION(IMS:IME,KMS:KME,JMS:JME),INTENT(INOUT) :: F_ICE    &
      &                                                        ,F_RAIN   &
      &                                                        ,F_RIMEF
+!  state var for etampnew microphysics (JM, 2005 05 02)
+      REAL,DIMENSION(:),INTENT(INOUT) ::                MP_RESTART_STATE &
+     &                                                     ,TBPVS_STATE &
+     &                                                    ,TBPVS0_STATE
+
 !
       REAL,DIMENSION(IMS:IME,JMS:JME),INTENT(OUT) :: SR
 !
@@ -1879,7 +1957,7 @@
 !***  LOCAL VARIABLES
 !***
 !-----------------------------------------------------------------------
-      INTEGER :: I,IENDX,J,K
+      INTEGER :: I,IENDX,J,K,IJ
 !
       INTEGER,DIMENSION(IMS:IME,JMS:JME) :: LOWLYR
 !
@@ -1954,20 +2032,52 @@
 !
       CALL SET_TILES(GRID,IDS+1,IDE-1,JDS+2,JDE-2,ITS,ITE,JTS,JTE)
 !
-      CALL MICROPHYSICS_DRIVER(TH_PHY,WATER,ZERO_3D,ZERO_3D             &
-     &                        ,RR,PI_PHY,P_PHY,ZERO_2D,RAINNCV          &
-     &                        ,ZERO_3D,ZERO_2D,DZ,P8W,DTPHS,DX,DY       &
-     &                        ,CONFIG_FLAGS,0,N_MOIST,WARM_RAIN         &
-     &                        ,XLAND,NTSD-1                             &
-     &                        ,F_ICE,F_RAIN,F_RIMEF                     &
-     &                        ,LOWLYR,SR                                &
-     &                        ,IDS,IDE,JDS,JDE,KDS,KDE                  &
-     &                        ,IMS,IME,JMS,JME,KMS,KME                  &
-     &                        ,GRID%I_START,GRID%I_END                  &
-     &                        ,GRID%J_START,GRID%J_END                  &
-     &                        ,KTS,KTE,GRID%NUM_TILES)
+      CALL MICROPHYSICS_DRIVER(                                         &
+     &                  TH=TH_PHY                                       &
+     &                 ,RHO=RR,PI_PHY=PI_PHY,P=P_PHY                    &
+     &                 ,RAINNCV=RAINNCV                                 &
+     &                 ,DZ8W=DZ,P8W=P8W,DT=DTPHS,DX=DX,DY=DY            &
+     &                 ,MP_PHYSICS=CONFIG_FLAGS%MP_PHYSICS              &
+     &                 ,SPECIFIED=CONFIG_FLAGS%SPECIFIED                &
+     &                        .OR.CONFIG_FLAGS%NESTED                   &
+     &                 ,SPEC_ZONE=0,WARM_RAIN=WARM_RAIN                 &
+     &                 ,XLAND=XLAND,ITIMESTEP=NTSD-1                    &
+     &                 ,F_ICE_PHY=F_ICE,F_RAIN_PHY=F_RAIN               &
+     &                 ,F_RIMEF_PHY=F_RIMEF                             &
+     &                 ,LOWLYR=LOWLYR,SR=SR                             &
+     &                 ,QV_CURR=WATER(IMS,KMS,JMS,P_QV),F_QV=F_QV       &
+     &                 ,QC_CURR=WATER(IMS,KMS,JMS,P_QC),F_QC=F_QC       &
+     &                 ,QR_CURR=WATER(IMS,KMS,JMS,P_QR),F_QR=F_QR       &
+     &                 ,QI_CURR=WATER(IMS,KMS,JMS,P_QI),F_QI=F_QI       &
+     &                 ,QS_CURR=WATER(IMS,KMS,JMS,P_QS),F_QS=F_QS       &
+     &                 ,QG_CURR=WATER(IMS,KMS,JMS,P_QG),F_QG=F_QG       &
+     &                 ,MP_RESTART_STATE=MP_RESTART_STATE               &
+     &                 ,TBPVS_STATE=TBPVS_STATE                         &
+     &                 ,TBPVS0_STATE=TBPVS0_STATE                       &
+     &                 ,IDS=IDS,IDE=IDE,JDS=JDS,JDE=JDE,KDS=KDS,KDE=KDE &
+     &                 ,IMS=IMS,IME=IME,JMS=JMS,JME=JME,KMS=KMS,KME=KME &
+     &                 ,I_START=GRID%I_START,I_END=GRID%I_END           &
+     &                 ,J_START=GRID%J_START,J_END=GRID%J_END           &
+     &                 ,KTS=KTS,KTE=KTE,NUM_TILES=GRID%NUM_TILES        &
+                                                                        )
+
+!$omp parallel do                                                       &
+!$omp& private(ij)
+      DO IJ=1,GRID%NUM_TILES
+        CALL MICROPHYSICS_ZERO_OUT(                                     &
+                     WATER,N_MOIST,CONFIG_FLAGS                         &
+                    ,IDS,IDE,JDS,JDE,KDS,KDE                            &
+                    ,IMS,IME,JMS,JME,KMS,KME                            &
+                    ,GRID%I_START(IJ),GRID%I_END(IJ)                    &
+                    ,GRID%J_START(IJ),GRID%J_END(IJ)                    &
+                    ,KTS,KTE                                       )
+      ENDDO
+
+
+
 !
 !-----------------------------------------------------------------------
+!
       E_BDY=(ITE>=IDE)
 !
 !$omp parallel do                                                       &

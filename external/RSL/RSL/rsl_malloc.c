@@ -54,7 +54,7 @@
 
 ***************************************************************************/
 
-/*#define PADIT		*/	/* add page at beginning and end of allocation */
+/*#define PADIT		/* add page at beginning and end of allocation */
 #if 0
 # define BASE_MALLOC   fence_malloc
 # define BASE_FREE     fence_free
@@ -124,7 +124,7 @@ EF_PROTECT_FREE = 1 ;
 "rsl_malloc failed allocating %d bytes, called %s, line %d, try %d\n",
        s,f,l,tries) ;
        perror(mess) ;
-#if !(defined(vpp) || defined(vpp2) || defined(SUN) || defined(crayx1))
+#if !(defined(vpp) || defined(vpp2) || defined(SUN))
        minf = mallinfo() ;
        fprintf(stderr,"mallinfo: arena %d\n",minf.arena)  ;
        fprintf(stderr,"mallinfo: ordblks %d\n",minf.ordblks)  ;

@@ -6,7 +6,7 @@
 ! information on adding a package to WRF, see the latest version of the
 ! WRF Design and Implementation Document 1.1 (Draft). June 21, 2001
 !
-! Uses header manipulation routines in module_io_int.F
+! Uses header manipulation routines in module_io_quilt.F
 !
 
 MODULE module_ext_internal
@@ -60,13 +60,24 @@ MODULE module_ext_internal
       ENDDO
 33    CONTINUE
       IF ( retval < 0 )  THEN
-        CALL wrf_error_fatal("external/io_int/io_int.F90: int_get_fresh_handle() can not")
+        CALL wrf_error_fatal("io_int.F90: int_get_fresh_handle() can not get new handle")
       ENDIF
       int_handle_in_use(i) = .TRUE.
       first_operation(i) = .TRUE.
       file_status(i) = WRF_FILE_NOT_OPENED
       NULLIFY ( int_local_output_buffer )
     END SUBROUTINE int_get_fresh_handle
+
+    SUBROUTINE release_handle( i )
+      include 'wrf_io_flags.h'
+      INTEGER, INTENT(IN) :: i
+      IF ( i .LT. 8 .OR. i .GT. int_num_handles ) RETURN
+      IF ( .NOT. int_handle_in_use(i) ) RETURN
+      int_handle_in_use(i) = .FALSE.
+      RETURN
+    END SUBROUTINE release_handle
+
+      
 
     !--- ioinit
     SUBROUTINE init_module_ext_internal
@@ -339,6 +350,7 @@ SUBROUTINE ext_int_ioclose ( DataHandle, Status )
     IF ( int_handle_in_use( DataHandle ) ) THEN
       CLOSE ( DataHandle ) 
     ENDIF
+    CALL release_handle(DataHandle)
   ENDIF
 
   Status = 0
@@ -395,10 +407,10 @@ SUBROUTINE ext_int_get_next_time ( DataHandle, DateStr, Status )
   REAL, DIMENSION(1)    :: Field  ! dummy
 
   IF ( .NOT. int_valid_handle( DataHandle ) ) THEN
-    CALL wrf_error_fatal("external/io_int/io_int.F90: ext_int_get_next_time: invalid data handle" )
+    CALL wrf_error_fatal("io_int.F90: ext_int_get_next_time: invalid data handle" )
   ENDIF
   IF ( .NOT. int_handle_in_use( DataHandle ) ) THEN
-    CALL wrf_error_fatal("external/io_int/io_int.F90: ext_int_get_next_time: DataHandle not opened" )
+    CALL wrf_error_fatal("io_int.F90: ext_int_get_next_time: DataHandle not opened" )
   ENDIF
   inttypesize = itypesize
   realtypesize = rtypesize
@@ -497,10 +509,10 @@ SUBROUTINE ext_int_get_var_info ( DataHandle , VarName , NDim , MemoryOrder , St
   REAL, DIMENSION(1)    :: Field   ! dummy
 
   IF ( .NOT. int_valid_handle( DataHandle ) ) THEN
-    CALL wrf_error_fatal("external/io_int/io_int.F90: ext_int_get_var_info: invalid data handle" )
+    CALL wrf_error_fatal("io_int.F90: ext_int_get_var_info: invalid data handle" )
   ENDIF
   IF ( .NOT. int_handle_in_use( DataHandle ) ) THEN
-    CALL wrf_error_fatal("external/io_int/io_int.F90: ext_int_get_var_info: DataHandle not opened" )
+    CALL wrf_error_fatal("io_int.F90: ext_int_get_var_info: DataHandle not opened" )
   ENDIF
   inttypesize = itypesize
   realtypesize = rtypesize
@@ -579,10 +591,10 @@ real    rdata(128)
   REAL, DIMENSION(1)    :: Field  ! dummy
 
   IF ( .NOT. int_valid_handle( DataHandle ) ) THEN
-    CALL wrf_error_fatal("external/io_int/io_int.F90: ext_int_get_next_var: invalid data handle" )
+    CALL wrf_error_fatal("io_int.F90: ext_int_get_next_var: invalid data handle" )
   ENDIF
   IF ( .NOT. int_handle_in_use( DataHandle ) ) THEN
-    CALL wrf_error_fatal("external/io_int/io_int.F90: ext_int_get_next_var: DataHandle not opened" )
+    CALL wrf_error_fatal("io_int.F90: ext_int_get_next_var: DataHandle not opened" )
   ENDIF
   inttypesize = itypesize
   realtypesize = rtypesize
@@ -733,7 +745,7 @@ SUBROUTINE ext_int_get_dom_ti_double ( DataHandle,Element,   Data, Count, Outcou
   INTEGER ,       INTENT(OUT) :: Status
   ! Do nothing unless it is time to read time-independent domain metadata.
   IF ( int_ok_to_get_dom_ti( DataHandle ) ) THEN
-    CALL wrf_message('ext_int_get_dom_ti_double not supported yet')
+    CALL wrf_error_fatal('ext_int_get_dom_ti_double not supported yet')
   ENDIF
 RETURN
 END SUBROUTINE ext_int_get_dom_ti_double 
@@ -749,7 +761,7 @@ SUBROUTINE ext_int_put_dom_ti_double ( DataHandle,Element,   Data, Count,  Statu
   INTEGER ,       INTENT(OUT) :: Status
   ! Do nothing unless it is time to write time-independent domain metadata.
   IF ( int_ok_to_put_dom_ti( DataHandle ) ) THEN
-    CALL wrf_message('ext_int_put_dom_ti_double not supported yet')
+    CALL wrf_error_fatal('ext_int_put_dom_ti_double not supported yet')
   ENDIF
 RETURN
 END SUBROUTINE ext_int_put_dom_ti_double 
@@ -977,6 +989,7 @@ SUBROUTINE ext_int_get_dom_td_double ( DataHandle,Element, DateStr,  Data, Count
   INTEGER ,       INTENT(IN)  :: Count
   INTEGER ,       INTENT(OUT)  :: OutCount
   INTEGER ,       INTENT(OUT) :: Status
+    CALL wrf_error_fatal('ext_int_get_dom_td_double not supported yet')
 RETURN
 END SUBROUTINE ext_int_get_dom_td_double 
 
@@ -989,6 +1002,7 @@ SUBROUTINE ext_int_put_dom_td_double ( DataHandle,Element, DateStr,  Data, Count
   real*8 ,            INTENT(IN) :: Data(*)
   INTEGER ,       INTENT(IN)  :: Count
   INTEGER ,       INTENT(OUT) :: Status
+    CALL wrf_error_fatal('ext_int_get_dom_td_double not supported yet')
 RETURN
 END SUBROUTINE ext_int_put_dom_td_double 
 
@@ -1141,6 +1155,7 @@ SUBROUTINE ext_int_get_var_ti_double ( DataHandle,Element,  Varname, Data, Count
   INTEGER ,       INTENT(IN)  :: Count
   INTEGER ,       INTENT(OUT)  :: OutCount
   INTEGER ,       INTENT(OUT) :: Status
+    CALL wrf_error_fatal('ext_int_get_var_ti_double not supported yet')
 RETURN
 END SUBROUTINE ext_int_get_var_ti_double 
 
@@ -1153,6 +1168,7 @@ SUBROUTINE ext_int_put_var_ti_double ( DataHandle,Element,  Varname, Data, Count
   real*8 ,            INTENT(IN) :: Data(*)
   INTEGER ,       INTENT(IN)  :: Count
   INTEGER ,       INTENT(OUT) :: Status
+    CALL wrf_error_fatal('ext_int_put_var_ti_double not supported yet')
 RETURN
 END SUBROUTINE ext_int_put_var_ti_double 
 
@@ -1292,6 +1308,7 @@ SUBROUTINE ext_int_get_var_td_double ( DataHandle,Element,  DateStr,Varname, Dat
   INTEGER ,       INTENT(IN)  :: Count
   INTEGER ,       INTENT(OUT)  :: OutCount
   INTEGER ,       INTENT(OUT) :: Status
+    CALL wrf_error_fatal('ext_int_get_var_td_double not supported yet')
 RETURN
 END SUBROUTINE ext_int_get_var_td_double 
 
@@ -1305,6 +1322,7 @@ SUBROUTINE ext_int_put_var_td_double ( DataHandle,Element,  DateStr,Varname, Dat
   real*8 ,            INTENT(IN) :: Data(*)
   INTEGER ,       INTENT(IN)  :: Count
   INTEGER ,       INTENT(OUT) :: Status
+    CALL wrf_error_fatal('ext_int_put_var_td_double not supported yet')
 RETURN
 END SUBROUTINE ext_int_put_var_td_double 
 
@@ -1437,10 +1455,10 @@ SUBROUTINE ext_int_read_field ( DataHandle , DateStr , VarName , Field , FieldTy
   INTEGER inttypesize, realtypesize, istat, code
 
   IF ( .NOT. int_valid_handle( DataHandle ) ) THEN
-    CALL wrf_error_fatal("external/io_int/io_int.F90: ext_int_read_field: invalid data handle" )
+    CALL wrf_error_fatal("io_int.F90: ext_int_read_field: invalid data handle" )
   ENDIF
   IF ( .NOT. int_handle_in_use( DataHandle ) ) THEN
-    CALL wrf_error_fatal("external/io_int/io_int.F90: ext_int_read_field: DataHandle not opened" )
+    CALL wrf_error_fatal("io_int.F90: ext_int_read_field: DataHandle not opened" )
   ENDIF
 
   inttypesize = itypesize
@@ -1523,18 +1541,18 @@ SUBROUTINE ext_int_write_field ( DataHandle , DateStr , VarName , Field , FieldT
   INTEGER inttypesize, realtypesize
 
   IF ( .NOT. int_valid_handle( DataHandle ) ) THEN
-    CALL wrf_error_fatal("external/io_int/io_int.F90: ext_int_write_field: invalid data handle" )
+    CALL wrf_error_fatal("io_int.F90: ext_int_write_field: invalid data handle" )
   ENDIF
   IF ( .NOT. int_handle_in_use( DataHandle ) ) THEN
-    CALL wrf_error_fatal("external/io_int/io_int.F90: ext_int_write_field: DataHandle not opened" )
+    CALL wrf_error_fatal("io_int.F90: ext_int_write_field: DataHandle not opened" )
   ENDIF
 
   inttypesize = itypesize
   realtypesize = rtypesize
   IF      ( FieldType .EQ. WRF_REAL .OR. FieldType .EQ. WRF_DOUBLE) THEN
     typesize = rtypesize
- ! ELSE IF ( FieldType .EQ. WRF_DOUBLE ) THEN
- !   CALL wrf_error_fatal( 'io_int.F90: ext_int_write_field, WRF_DOUBLE not yet supported')
+  ELSE IF ( FieldType .EQ. WRF_DOUBLE ) THEN
+    CALL wrf_error_fatal( 'io_int.F90: ext_int_write_field, WRF_DOUBLE not yet supported')
   ELSE IF ( FieldType .EQ. WRF_INTEGER ) THEN
     typesize = itypesize
   ELSE IF ( FieldType .EQ. WRF_LOGICAL ) THEN

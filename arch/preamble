@@ -17,13 +17,10 @@ LIBINCLUDE      =       .
 #### Get core settings from environment (set in compile script)
 #### Note to add a core, this has to be added to.
 
-WRFVAR		=	-DWRFVAR
-
 COREDEFS = -DEM_CORE=$(WRF_EM_CORE) \
-           -DNMM_CORE=$(WRF_NMM_CORE) -DNMM_MAX_DIM=1250 \
+           -DNMM_CORE=$(WRF_NMM_CORE) -DNMM_MAX_DIM=2600 \
 	   -DCOAMPS_CORE=$(WRF_COAMPS_CORE) \
-           -DEXP_CORE=$(WRF_EXP_CORE) \
-	   $(WRFVAR)
+           -DEXP_CORE=$(WRF_EXP_CORE)
 
 #### Single location for defining total number of domains.  You need
 #### at least 1 + 2*(number of total nests).  For example, 1 coarse
@@ -35,11 +32,33 @@ MAX_DOMAINS	=	21
 
 CONFIG_BUF_LEN	=	8192
 
+
+##############################################################################
+#### The settings in this section are defaults that may be overridden by the 
+#### architecture-specific settings in the next section.  
+##############################################################################
+
+##############################################################################
+#### NOTE:  Do not modify these default values here.  To override these 
+####        values, make changes after "Architecture specific settings".  
+##############################################################################
+
+#### Native size (in bytes) of Fortran REAL data type on this architecture ####
+#### Note:  to change real wordsize (for example, to promote REALs from 
+####        4-byte to 8-byte), modify the definition of RWORDSIZE in the 
+####        section following "Architecture specific settings".  Do not 
+####        change NATIVE_RWORDSIZE as is it architecture-specific.  
+NATIVE_RWORDSIZE = 4
+
 #### Default sed command and script for Fortran source files ####
 SED_FTN = sed -f ../arch/standard.sed
 
-#### Default ESMF dependence for embedded ESMF time manager ####
-ESMF_MOD_DEPENDENCE = ../external/esmf_time_f90/ESMF_Mod.o
+#### Default ESMF switch and dependences for embedded ESMF time manager ####
+ESMFCOUPLING        = 0
+ESMF_MOD_DEPENDENCE = ../external/esmf_time_f90/module_utility.o
+
+##############################################################################
+
 
 #### Architecture specific settings ####
 

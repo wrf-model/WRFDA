@@ -1,11 +1,22 @@
 !WRF:MODEL_LAYER:DYNAMICS
 !
+
+#if (RWORDSIZE == 4)
+#   define VPOWX vspowx
+#   define VPOW  vspow
+#else
+#   define VPOWX vpowx
+#   define VPOW  vpow
+#endif
+
+
 MODULE module_big_step_utilities_em
 
    USE module_domain
    USE module_model_constants
    USE module_state_description
    USE module_configure
+   USE module_wrf_error
 
 CONTAINS
 
@@ -846,6 +857,7 @@ SUBROUTINE calc_cq ( moist, cqu, cqv, cqw, n_moist, &
         DO k=kts,ktf
         DO i=its,itf
           qtot = 0.
+!DEC$ loop count(3)
           DO ispe=PARAM_FIRST_SCALAR,n_moist
             qtot = qtot + moist(i,k,j,ispe) + moist(i-1,k,j,ispe)
           ENDDO
@@ -864,6 +876,7 @@ SUBROUTINE calc_cq ( moist, cqu, cqv, cqw, n_moist, &
         DO k=kts,ktf
         DO i=its,itf
           qtot = 0.
+!DEC$ loop count(3)
           DO ispe=PARAM_FIRST_SCALAR,n_moist
             qtot = qtot + moist(i,k,j,ispe) + moist(i,k,j-1,ispe)
           ENDDO
@@ -881,6 +894,7 @@ SUBROUTINE calc_cq ( moist, cqu, cqv, cqw, n_moist, &
         DO k=kts+1,ktf
         DO i=its,itf
           qtot = 0.
+!DEC$ loop count(3)
           DO ispe=PARAM_FIRST_SCALAR,n_moist
             qtot = qtot + moist(i,k,j,ispe) + moist(i,k-1,j,ispe)
           ENDDO
@@ -1012,6 +1026,8 @@ SUBROUTINE calc_p_rho_phi ( moist, n_moist,                &
 
   INTEGER :: i, j, k, itf, jtf, ktf, ispe
   REAL    :: qvf, qtot, qf1, qf2
+  REAL, DIMENSION( its:ite) :: temp,cpovcv_v
+
 
 !<DESCRIPTION>
 !
@@ -1030,6 +1046,10 @@ SUBROUTINE calc_p_rho_phi ( moist, n_moist,                &
   jtf=MIN(jte,jde-1)
   ktf=MIN(kte,kde-1)
 
+#ifndef INTELMKL
+  cpovcv_v = cpovcv
+#endif
+
   IF (non_hydrostatic) THEN
 
       IF (n_moist >= PARAM_FIRST_SCALAR ) THEN  
@@ -1040,10 +1060,17 @@ SUBROUTINE calc_p_rho_phi ( moist, n_moist,                &
           qvf = 1.+rvovrd*moist(i,k,j,P_QV)
           al(i,k,j)=-1./muts(i,j)*(alb(i,k,j)*mu(i,j)  &
                      +rdnw(k)*(ph(i,k+1,j)-ph(i,k,j)))
-          p(i,k,j)= ( (r_d*(t0+t(i,k,j))*qvf)/                 &
-                        (p0*(al(i,k,j)+alb(i,k,j))) )**cpovcv  &
-                        *p0 -pb(i,k,j)
-
+          temp(i)=(r_d*(t0+t(i,k,j))*qvf)/                 &
+                        (p0*(al(i,k,j)+alb(i,k,j)))
+        ENDDO
+#ifdef INTELMKL
+        CALL VPOWX ( itf-its+1, temp(its), cpovcv, p(its,k,j) )
+#else
+! use vector version from libmassv or from compat lib in frame/libmassv.F
+        CALL VPOW  ( p(its,k,j), temp(its), cpovcv_v(its), itf-its+1 )
+#endif
+        DO i=its,itf
+           p(i,k,j)= p(i,k,j)*p0-pb(i,k,j)
         ENDDO
         ENDDO
         ENDDO
@@ -2119,6 +2146,7 @@ END SUBROUTINE pg_buoy_w
 !-------------------------------------------------------------------------------
 
 SUBROUTINE w_damp( rw_tend, ww, w, mut, rdnw, dt,     &
+                      w_damping,                      &
                       ids, ide, jds, jde, kds, kde,   &
                       ims, ime, jms, jme, kms, kme,   &
                       its, ite, jts, jte, kts, kte   )
@@ -2126,6 +2154,8 @@ SUBROUTINE w_damp( rw_tend, ww, w, mut, rdnw, dt,     &
    IMPLICIT NONE
 
    ! Input data
+
+   INTEGER ,          INTENT(IN   ) :: w_damping
 
    INTEGER ,          INTENT(IN   ) :: ids, ide, jds, jde, kds, kde, &
                                        ims, ime, jms, jme, kms, kme, &
@@ -2140,9 +2170,11 @@ SUBROUTINE w_damp( rw_tend, ww, w, mut, rdnw, dt,     &
    REAL, DIMENSION( kms:kme ), INTENT(IN   ) :: rdnw
 
    REAL, INTENT(IN)    :: dt
-   REAL                :: cfl, cf_n, cf_d
+   REAL                :: cfl, cf_n, cf_d, maxcfl, maxdub, maxdeta
 
-   INTEGER :: itf, jtf, i, j, k
+   INTEGER :: itf, jtf, i, j, k, maxi, maxj, maxk
+   INTEGER :: some
+   CHARACTER*512 :: temp
 
 !<DESCRIPTION>
 !
@@ -2158,7 +2190,11 @@ SUBROUTINE w_damp( rw_tend, ww, w, mut, rdnw, dt,     &
    itf=MIN(ite,ide-1)
    jtf=MIN(jte,jde-1)
 
-   DO j = jts,jtf
+   some = 0
+   maxcfl = 0.
+
+   IF ( w_damping == 1 ) THEN
+     DO j = jts,jtf
 
      DO k = 2, kde-1
      DO i = its,itf
@@ -2167,18 +2203,55 @@ SUBROUTINE w_damp( rw_tend, ww, w, mut, rdnw, dt,     &
         if(cfl .gt. w_beta)then
 #else
 ! restructure to get rid of divide
-        cf_n = abs(ww(i,k,j))
-        cf_d = abs(mut(i,j)*rdnw(k)*dt)
+        cf_n = abs(ww(i,k,j)*rdnw(k)*dt)
+        cf_d = abs(mut(i,j))
         if(cf_n .gt. cf_d*w_beta )then
 #endif
-
-           print *,i,j,k,'cfl,w,d(eta)=',cfl,w(i,k,j),-1./rdnw(k)
+           cfl = abs(ww(i,k,j)/mut(i,j)*rdnw(k)*dt)
+           IF ( cfl > maxcfl ) THEN
+             maxcfl = cfl ; maxi = i ; maxj = j ; maxk = k 
+             maxdub = w(i,k,j) ; maxdeta = -1./rdnw(k)
+           ENDIF
+           WRITE(temp,*)i,j,k,' cfl,w,d(eta)=',cfl,w(i,k,j),-1./rdnw(k), &
+                              ' in w_damp'
+           CALL wrf_debug ( 100 , TRIM(temp) )
+           some = some + 1
            rw_tend(i,k,j) = rw_tend(i,k,j)-sign(1.,w(i,k,j))*w_alpha*(cfl-w_beta)*mut(i,j)
         endif
      END DO
      ENDDO
+     ENDDO
+   ELSE
+! just print
+     DO j = jts,jtf
 
-   ENDDO
+     DO k = 2, kde-1
+     DO i = its,itf
+        cf_n = abs(ww(i,k,j)*rdnw(k)*dt)
+        cf_d = abs(mut(i,j))
+        if(cf_n .gt. cf_d*w_beta )then
+           cfl = abs(ww(i,k,j)/mut(i,j)*rdnw(k)*dt)
+           IF ( cfl > maxcfl ) THEN
+             maxcfl = cfl ; maxi = i ; maxj = j ; maxk = k 
+             maxdub = w(i,k,j) ; maxdeta = -1./rdnw(k)
+           ENDIF
+           WRITE(temp,*)i,j,k,' cfl,w,d(eta)=',cfl,w(i,k,j),-1./rdnw(k), &
+                              ' in w_damp'
+           CALL wrf_debug ( 100 , TRIM(temp) )
+           some = some + 1
+        endif
+     END DO
+     ENDDO
+     ENDDO
+   ENDIF
+   IF ( some .GT. 0 ) THEN
+     WRITE(wrf_err_message,*)some,                                            &
+            ' points exceeded cfl in w_damp (module_big_step_utilities_em.F) '
+     CALL wrf_debug ( 0 , TRIM(wrf_err_message) )
+     WRITE(wrf_err_message,*)'MAX AT i,j,k: ',maxi,maxj,maxk,' cfl,w,d(eta)=',maxcfl, &
+                             maxdub,maxdeta
+     CALL wrf_debug ( 0 , TRIM(wrf_err_message) )
+   ENDIF
 
 END SUBROUTINE w_damp
 
@@ -2224,8 +2297,7 @@ SUBROUTINE horizontal_diffusion ( name, field, tendency, mu,           &
    INTEGER :: i_start, i_end, j_start, j_end
 
    REAL :: mrdx, mkrdxm, mkrdxp, &
-           mrdy, mkrdym, mkrdyp, &
-           rcoup
+           mrdy, mkrdym, mkrdyp
    REAL :: pr = 3.
 
    LOGICAL :: specified
@@ -2258,17 +2330,18 @@ SUBROUTINE horizontal_diffusion ( name, field, tendency, mu,           &
       DO k=kts,ktf
       DO i = i_start, i_end
 
-         mkrdxm=msft(i-1,j)*xkmhd(i-1,k,j)*rdx
-         mkrdxp=msft(i,j)*xkmhd(i,k,j)*rdx
+         mkrdxm=msft(i-1,j)*mu(i-1,j)*xkmhd(i-1,k,j)*rdx
+         mkrdxp=msft(i,j)*mu(i,j)*xkmhd(i,k,j)*rdx
          mrdx=msfu(i,j)*rdx
          mkrdym=0.5*(msfu(i,j)+msfu(i,j-1))*    &
+                0.25*(mu(i,j)+mu(i,j-1)+mu(i-1,j-1)+mu(i-1,j))* &
                 0.25*(xkmhd(i,k,j)+xkmhd(i,k,j-1)+xkmhd(i-1,k,j-1)+xkmhd(i-1,k,j))*rdy
          mkrdyp=0.5*(msfu(i,j)+msfu(i,j+1))*    &
+                0.25*(mu(i,j)+mu(i,j+1)+mu(i-1,j+1)+mu(i-1,j))* &
                 0.25*(xkmhd(i,k,j)+xkmhd(i,k,j+1)+xkmhd(i-1,k,j+1)+xkmhd(i-1,k,j))*rdy
          mrdy=msfu(i,j)*rdy
 
-            rcoup=0.5*(mu(i,j)+mu(i-1,j))
-            tendency(i,k,j)=tendency(i,k,j)+rcoup*( &
+            tendency(i,k,j)=tendency(i,k,j)+( &
                             mrdx*(mkrdxp*(field(i+1,k,j)-field(i  ,k,j))  &
                                  -mkrdxm*(field(i  ,k,j)-field(i-1,k,j))) &
                            +mrdy*(mkrdyp*(field(i,k,j+1)-field(i,k,j  ))  &
@@ -2294,16 +2367,17 @@ SUBROUTINE horizontal_diffusion ( name, field, tendency, mu,           &
       DO i = i_start, i_end
 
          mkrdxm=0.5*(msfv(i,j)+msfv(i-1,j))*    &
+                0.25*(mu(i,j)+mu(i,j-1)+mu(i-1,j-1)+mu(i-1,j))* &
                 0.25*(xkmhd(i,k,j)+xkmhd(i,k,j-1)+xkmhd(i-1,k,j-1)+xkmhd(i-1,k,j))*rdx
          mkrdxp=0.5*(msfv(i,j)+msfv(i+1,j))*    &
+                0.25*(mu(i,j)+mu(i,j-1)+mu(i+1,j-1)+mu(i+1,j))* &
                 0.25*(xkmhd(i,k,j)+xkmhd(i,k,j-1)+xkmhd(i+1,k,j-1)+xkmhd(i+1,k,j))*rdx
          mrdx=msfv(i,j)*rdx
          mkrdym=msft(i,j-1)*xkmhd(i,k,j-1)*rdy
          mkrdyp=msft(i,j)*xkmhd(i,k,j)*rdy
          mrdy=msfv(i,j)*rdy
 
-            rcoup=0.5*(mu(i,j)+mu(i,j-1))
-            tendency(i,k,j)=tendency(i,k,j)+rcoup*( &
+            tendency(i,k,j)=tendency(i,k,j)+( &
                             mrdx*(mkrdxp*(field(i+1,k,j)-field(i  ,k,j))  &
                                  -mkrdxm*(field(i  ,k,j)-field(i-1,k,j))) &
                            +mrdy*(mkrdyp*(field(i,k,j+1)-field(i,k,j  ))  &
@@ -2328,15 +2402,22 @@ SUBROUTINE horizontal_diffusion ( name, field, tendency, mu,           &
       DO k=kts+1,ktf
       DO i = i_start, i_end
 
-         mkrdxm=msfu(i,j)*0.25*(xkmhd(i,k,j)+xkmhd(i-1,k,j)+xkmhd(i,k-1,j)+xkmhd(i-1,k-1,j))*rdx
-         mkrdxp=msfu(i+1,j)*0.25*(xkmhd(i+1,k,j)+xkmhd(i,k,j)+xkmhd(i+1,k-1,j)+xkmhd(i,k-1,j))*rdx
+         mkrdxm=msfu(i,j)*   &
+                0.25*(mu(i,j)+mu(i-1,j)+mu(i,j)+mu(i-1,j))* &
+                0.25*(xkmhd(i,k,j)+xkmhd(i-1,k,j)+xkmhd(i,k-1,j)+xkmhd(i-1,k-1,j))*rdx
+         mkrdxp=msfu(i+1,j)*   &
+                0.25*(mu(i+1,j)+mu(i,j)+mu(i+1,j)+mu(i,j))* &
+                0.25*(xkmhd(i+1,k,j)+xkmhd(i,k,j)+xkmhd(i+1,k-1,j)+xkmhd(i,k-1,j))*rdx
          mrdx=msft(i,j)*rdx
-         mkrdym=msfv(i,j)*0.25*(xkmhd(i,k,j)+xkmhd(i,k,j-1)+xkmhd(i,k-1,j)+xkmhd(i,k-1,j-1))*rdy
-         mkrdyp=msfv(i,j+1)*0.25*(xkmhd(i,k,j+1)+xkmhd(i,k,j)+xkmhd(i,k-1,j+1)+xkmhd(i,k-1,j))*rdy
+         mkrdym=msfv(i,j)*   &
+                0.25*(mu(i,j)+mu(i,j-1)+mu(i,j)+mu(i,j-1))* &
+                0.25*(xkmhd(i,k,j)+xkmhd(i,k,j-1)+xkmhd(i,k-1,j)+xkmhd(i,k-1,j-1))*rdy
+         mkrdyp=msfv(i,j+1)*   &
+                0.25*(mu(i,j+1)+mu(i,j)+mu(i,j+1)+mu(i,j))* &
+                0.25*(xkmhd(i,k,j+1)+xkmhd(i,k,j)+xkmhd(i,k-1,j+1)+xkmhd(i,k-1,j))*rdy
          mrdy=msft(i,j)*rdy
 
-            rcoup=0.5*(mu(i,j)+mu(i,j))
-            tendency(i,k,j)=tendency(i,k,j)+rcoup*( &
+            tendency(i,k,j)=tendency(i,k,j)+( &
                             mrdx*(mkrdxp*(field(i+1,k,j)-field(i  ,k,j)) &
                                  -mkrdxm*(field(i  ,k,j)-field(i-1,k,j))) &
                            +mrdy*(mkrdyp*(field(i,k,j+1)-field(i,k,j  )) &
@@ -2362,15 +2443,14 @@ SUBROUTINE horizontal_diffusion ( name, field, tendency, mu,           &
       DO k=kts,ktf
       DO i = i_start, i_end
 
-         mkrdxm=msfu(i,j)*0.5*(xkmhd(i,k,j)+xkmhd(i-1,k,j))*rdx*pr
-         mkrdxp=msfu(i+1,j)*0.5*(xkmhd(i+1,k,j)+xkmhd(i,k,j))*rdx*pr
+         mkrdxm=msfu(i,j)*0.5*(xkmhd(i,k,j)+xkmhd(i-1,k,j))*0.5*(mu(i,j)+mu(i-1,j))*rdx*pr
+         mkrdxp=msfu(i+1,j)*0.5*(xkmhd(i+1,k,j)+xkmhd(i,k,j))*0.5*(mu(i+1,j)+mu(i,j))*rdx*pr
          mrdx=msft(i,j)*rdx
-         mkrdym=msfv(i,j)*0.5*(xkmhd(i,k,j)+xkmhd(i,k,j-1))*rdy*pr
-         mkrdyp=msfv(i,j+1)*0.5*(xkmhd(i,k,j+1)+xkmhd(i,k,j))*rdy*pr
+         mkrdym=msfv(i,j)*0.5*(xkmhd(i,k,j)+xkmhd(i,k,j-1))*0.5*(mu(i,j)+mu(i,j-1))*rdy*pr
+         mkrdyp=msfv(i,j+1)*0.5*(xkmhd(i,k,j+1)+xkmhd(i,k,j))**0.5*(mu(i,j+1)+mu(i,j))*rdy*pr
          mrdy=msft(i,j)*rdy
 
-            rcoup=mu(i,j)
-            tendency(i,k,j)=tendency(i,k,j)+rcoup*( &
+            tendency(i,k,j)=tendency(i,k,j)+( &
                             mrdx*(mkrdxp*(field(i+1,k,j)-field(i  ,k,j))  &
                                  -mkrdxm*(field(i  ,k,j)-field(i-1,k,j))) &
                            +mrdy*(mkrdyp*(field(i,k,j+1)-field(i,k,j  ))  &
@@ -2427,8 +2507,7 @@ SUBROUTINE horizontal_diffusion_3dmp ( name, field, tendency, mu,           &
    INTEGER :: i_start, i_end, j_start, j_end
 
    REAL :: mrdx, mkrdxm, mkrdxp, &
-           mrdy, mkrdym, mkrdyp, &
-           rcoup
+           mrdy, mkrdym, mkrdyp
    REAL :: pr = 3.
 
    LOGICAL :: specified
@@ -2460,15 +2539,14 @@ SUBROUTINE horizontal_diffusion_3dmp ( name, field, tendency, mu,           &
       DO k=kts,ktf
       DO i = i_start, i_end
 
-         mkrdxm=msfu(i,j)*0.5*(xkmhd(i,k,j)+xkmhd(i-1,k,j))*rdx*pr
-         mkrdxp=msfu(i+1,j)*0.5*(xkmhd(i+1,k,j)+xkmhd(i,k,j))*rdx*pr
+         mkrdxm=msfu(i,j)*0.5*(xkmhd(i,k,j)+xkmhd(i-1,k,j))*0.5*(mu(i,j)+mu(i-1,j))*rdx*pr
+         mkrdxp=msfu(i+1,j)*0.5*(xkmhd(i+1,k,j)+xkmhd(i,k,j))*0.5*(mu(i+1,j)+mu(i,j))*rdx*pr
          mrdx=msft(i,j)*rdx
-         mkrdym=msfv(i,j)*0.5*(xkmhd(i,k,j)+xkmhd(i,k,j-1))*rdy*pr
-         mkrdyp=msfv(i,j+1)*0.5*(xkmhd(i,k,j+1)+xkmhd(i,k,j))*rdy*pr
+         mkrdym=msfv(i,j)*0.5*(xkmhd(i,k,j)+xkmhd(i,k,j-1))*0.5*(mu(i,j)+mu(i,j-1))*rdy*pr
+         mkrdyp=msfv(i,j+1)*0.5*(xkmhd(i,k,j+1)+xkmhd(i,k,j))**0.5*(mu(i,j+1)+mu(i,j))*rdy*pr
          mrdy=msft(i,j)*rdy
 
-            rcoup=mu(i,j)
-            tendency(i,k,j)=tendency(i,k,j)+rcoup*(                        &
+            tendency(i,k,j)=tendency(i,k,j)+(                        &
                     mrdx*( mkrdxp*(   field(i+1,k,j)  -field(i  ,k,j)      &
                                    -base_3d(i+1,k,j)+base_3d(i  ,k,j) )    &
                           -mkrdxm*(   field(i  ,k,j)  -field(i-1,k,j)      &
@@ -2526,7 +2604,7 @@ SUBROUTINE vertical_diffusion ( name, field, tendency,        &
    REAL , DIMENSION(its:ite, jts:jte) :: vfluxm, vfluxp, zz
    REAL , DIMENSION(its:ite, 0:kte+1) :: vflux
 
-   REAL :: rdz, rcoup
+   REAL :: rdz
 
    LOGICAL :: specified
 
@@ -2651,7 +2729,7 @@ SUBROUTINE vertical_diffusion_mp ( field, tendency, config_flags, &
 
    REAL , DIMENSION(its:ite, 0:kte+1) :: vflux
 
-   REAL :: rdz, rcoup
+   REAL :: rdz
 
    LOGICAL :: specified
 
@@ -2743,7 +2821,7 @@ SUBROUTINE vertical_diffusion_3dmp ( field, tendency, config_flags, &
 
    REAL , DIMENSION(its:ite, 0:kte+1) :: vflux
 
-   REAL :: rdz, rcoup
+   REAL :: rdz
 
    LOGICAL :: specified
 
@@ -2835,7 +2913,7 @@ SUBROUTINE vertical_diffusion_u ( field, tendency,              &
 
    REAL , DIMENSION(its:ite, 0:kte+1) :: vflux
 
-   REAL :: rdz, rcoup, zz
+   REAL :: rdz, zz
 
    LOGICAL :: specified
 
@@ -2933,7 +3011,7 @@ SUBROUTINE vertical_diffusion_v ( field, tendency,              &
 
    REAL , DIMENSION(its:ite, 0:kte+1) :: vflux
 
-   REAL :: rdz, rcoup, zz
+   REAL :: rdz, zz
 
    LOGICAL :: specified
 
@@ -3824,52 +3902,6 @@ END SUBROUTINE decouple
 
 !-------------------------------------------------------------------------------
 
-SUBROUTINE mix_qv ( qv_tend, qv_mix, rho,         &
-                    ids, ide, jds, jde, kds, kde, &
-                    ims, ime, jms, jme, kms, kme, &
-                    its, ite, jts, jte, kts, kte )
-
-   IMPLICIT NONE
-
-   ! Input data
-
-   INTEGER ,               INTENT(IN   ) :: ids, ide, jds, jde, kds, kde, &
-                                            ims, ime, jms, jme, kms, kme, &
-                                            its, ite, jts, jte, kts, kte
-
-   REAL , DIMENSION( ims:ime, kms:kme , jms:jme ) , INTENT(IN   ) :: qv_mix,  &
-                                                                     rho
-
-   REAL , DIMENSION( ims:ime, kms:kme , jms:jme ) , INTENT(INOUT) :: qv_tend
-
-   ! Local data
-   
-   INTEGER :: i, j, k, itf, jtf, ktf
-
-!<DESCRIPTION>
-!
-!  mix_qv adds the qv_mixing tendency to the qv tendency.
-!
-!</DESCRIPTION>
-
-   ktf=MIN(kte,kde-1)
-   itf=MIN(ite,ide-1)
-   jtf=MIN(jte,jde-1)
-
-     DO j=jts,jtf
-     DO k=kts,ktf
-     DO i=its,itf
-
-       qv_tend(i,k,j) = qv_tend(i,k,j)  + qv_mix(i,k,j)
-
-     ENDDO
-     ENDDO
-     ENDDO
-
-END SUBROUTINE mix_qv
-
-!-------------------------------------------------------------------------------
-
 
 SUBROUTINE zero_tend ( tendency,                     &
                        ids, ide, jds, jde, kds, kde, &
@@ -4265,7 +4297,8 @@ END SUBROUTINE phy_prep
 !------------------------------------------------------------
 
    SUBROUTINE moist_physics_prep_em( t_new, t_old, t0, rho, al, alb, &
-                                     p, p8w, p0, pb, ph, phb, pii, pf,    &
+                                     p, p8w, p0, pb, ph, phb,        &
+                                     th_phy, pii, pf,                &
                                      z, z_at_w, dz8w,                &
                                      dt,h_diabatic,                  &
                                      config_flags,fzm, fzp,          &
@@ -4300,6 +4333,7 @@ END SUBROUTINE phy_prep
 
    REAL, DIMENSION( ims:ime , kms:kme, jms:jme ),       &
          INTENT(  OUT) ::                         rho,  &
+                                               th_phy,  &
                                                   pii,  &
                                                   pf,   &
                                                     z,  &
@@ -4367,15 +4401,18 @@ END SUBROUTINE phy_prep
 
            !  compute full pii, rho, and z at the new time-level
            !  (needed for physics).
-           !  convert perturbation theta to full theta
+           !  convert perturbation theta to full theta (th_phy)
+           !  use h_diabatic to temporarily save pre-microphysics full theta
 
      DO j = j_start, j_end
      DO k = k_start, k_end
      DO i = i_start, i_end
 
-       h_diabatic(i,k,j) = t_new(i,k,j)
-       t_new(i,k,j) = t_new(i,k,j) + t0
-       t_old(i,k,j) = t_old(i,k,j) + t0
+#ifdef REVERT
+       t_new(i,k,j) = t_new(i,k,j)-h_diabatic(i,k,j)*dt
+#endif
+       th_phy(i,k,j) = t_new(i,k,j) + t0
+       h_diabatic(i,k,j) = th_phy(i,k,j)
        rho(i,k,j)  = 1./(al(i,k,j)+alb(i,k,j))
        pii(i,k,j) = ((p(i,k,j)+pb(i,k,j))/p0)**rcp
        z(i,k,j) = 0.5*(z_at_w(i,k,j) +z_at_w(i,k+1,j) )
@@ -4428,7 +4465,7 @@ END SUBROUTINE phy_prep
 !------------------------------------------------------------------------------
 
    SUBROUTINE moist_physics_finish_em( t_new, t_old, t0, mut,     &
-                                       h_diabatic, dt,            &
+                                       th_phy, h_diabatic, dt,    &
                                        config_flags,              &
                                        ids,ide, jds,jde, kds,kde, &
                                        ims,ime, jms,jme, kms,kme, &
@@ -4448,6 +4485,7 @@ END SUBROUTINE phy_prep
    REAL, DIMENSION( ims:ime , kms:kme, jms:jme ),        &
          INTENT(INOUT) ::                         t_new, &
                                                   t_old, &
+                                                 th_phy, &
                                                   h_diabatic
 
    REAL, DIMENSION( ims:ime , jms:jme ),  INTENT(INOUT) ::  mut
@@ -4478,15 +4516,14 @@ END SUBROUTINE phy_prep
     k_start = kts
     k_end = min( kte, kde-1 )
 
-!  return theta to perturbation theta, calc new p, rho
+!  add microphysics theta diff to perturbation theta, set h_diabatic
 
      DO j = j_start, j_end
      DO k = k_start, k_end
      DO i = i_start, i_end
 
-       t_new(i,k,j) = t_new(i,k,j) - t0
-       t_old(i,k,j) = t_old(i,k,j) - t0
-       h_diabatic(i,k,j) = (t_new(i,k,j)-h_diabatic(i,k,j))/dt
+       t_new(i,k,j) = t_new(i,k,j) + (th_phy(i,k,j)-h_diabatic(i,k,j))
+       h_diabatic(i,k,j) = (th_phy(i,k,j)-h_diabatic(i,k,j))/dt
 !       h_diabatic(i,k,j) = 0.
 
      ENDDO
@@ -4542,5 +4579,273 @@ SUBROUTINE set_tend ( field, field_adv_tend, msf,       &
       ENDDO
 
 END SUBROUTINE set_tend
+
+!------------------------------------------------------------------------------
+
+    SUBROUTINE rk_rayleigh_damp( ru_tendf, rv_tendf,              &
+                                 rw_tendf, t_tendf,               &
+                                 u, v, w, t, t_init,              &
+                                 mut, muu, muv, ph, phb,          &
+                                 u_base, v_base, t_base, z_base,  &
+                                 dampcoef, zdamp,                 &
+                                 ids, ide, jds, jde, kds, kde,    &
+                                 ims, ime, jms, jme, kms, kme,    &
+                                 its, ite, jts, jte, kts, kte   )
+
+! History:     Apr 2005  Modifications by George Bryan, NCAR:
+!                  - Generalized the code in a way that allows for
+!                    simulations with steep terrain.
+!
+!              Jul 2004  Modifications by George Bryan, NCAR:
+!                  - Modified the code to use u_base, v_base, and t_base
+!                    arrays for the background state.  Removed the hard-wired
+!                    base-state values.
+!                  - Modified the code to use dampcoef, zdamp, and damp_opt,
+!                    i.e., the upper-level damper variables in namelist.input.
+!                    Removed the hard-wired variables in the older version.
+!                    This damper is used when damp_opt = 2.
+!                  - Modified the code to account for the movement of the
+!                    model surfaces with time.  The code now obtains a base-
+!                    state value by interpolation using the "_base" arrays.
+
+!              Nov 2003  Bug fix by Jason Knievel, NCAR
+
+!              Aug 2003  Meridional dimension, some comments, and
+!                        changes in layout of the code added by
+!                        Jason Knievel, NCAR
+
+!              Jul 2003  Original code by Bill Skamarock, NCAR
+
+! Purpose:     This routine applies Rayleigh damping to a layer at top
+!              of the model domain.
+
+!-----------------------------------------------------------------------
+! Begin declarations.
+
+    IMPLICIT NONE
+
+    INTEGER, INTENT( IN )  &
+    :: ids, ide, jds, jde, kds, kde,  &
+       ims, ime, jms, jme, kms, kme,  &
+       its, ite, jts, jte, kts, kte
+
+    REAL, DIMENSION( ims:ime, kms:kme, jms:jme ), INTENT( INOUT )  &
+    :: ru_tendf, rv_tendf, rw_tendf, t_tendf
+
+    REAL, DIMENSION( ims:ime, kms:kme, jms:jme ), INTENT( IN )  &
+    :: u, v, w, t, t_init, ph, phb
+
+    REAL, DIMENSION( ims:ime, jms:jme ),  INTENT( IN )  &
+    :: mut, muu, muv
+
+    REAL, DIMENSION( kms:kme ) ,  INTENT(IN   )  &
+    :: u_base, v_base, t_base, z_base
+
+    REAL, INTENT(IN   )   &
+    :: dampcoef, zdamp
+
+! Local variables.
+
+    INTEGER  &
+    :: i_start, i_end, j_start, j_end, k_start, k_end, i, j, k, ktf, k1, k2
+
+    REAL  &
+    :: pii, dcoef, z, ztop
+
+    REAL :: wkp1, wk, wkm1
+
+    REAL, DIMENSION( kms:kme ) :: z00, u00, v00, t00
+
+! End declarations.
+!-----------------------------------------------------------------------
+
+    pii = 2.0 * asin(1.0)
+
+    ktf = MIN( kte,   kde-1 )
+
+!-----------------------------------------------------------------------
+! Adjust u to base state.
+
+    DO j = jts, MIN( jte, jde-1 )
+    DO i = its, MIN( ite, ide   )
+
+      ! Get height at top of model
+      ztop = 0.5*( phb(i  ,kde,j)+phb(i-1,kde,j)   &
+                  +ph(i  ,kde,j)+ph(i-1,kde,j) )/g
+
+      ! Find bottom of damping layer
+      k1 = ktf
+      z = ztop
+      DO WHILE( z >= (ztop-zdamp) )
+        z = 0.25*( phb(i  ,k1,j)+phb(i  ,k1+1,j)  &
+                  +phb(i-1,k1,j)+phb(i-1,k1+1,j)  &
+                  +ph(i  ,k1,j)+ph(i  ,k1+1,j)    &
+                  +ph(i-1,k1,j)+ph(i-1,k1+1,j))/g
+        z00(k1) = z
+        k1 = k1 - 1
+      ENDDO
+      k1 = k1 + 2
+
+      ! Get reference state at model levels
+      DO k = k1, ktf
+        k2 = ktf
+        DO WHILE( z_base(k2) .gt. z00(k) )
+          k2 = k2 - 1
+        ENDDO
+        if(k2+1.gt.ktf)then
+          u00(k) = u_base(k2) + ( u_base(k2) - u_base(k2-1) )   &
+                              * (     z00(k) - z_base(k2)   )   &
+                              / ( z_base(k2) - z_base(k2-1) )
+        else
+          u00(k) = u_base(k2) + ( u_base(k2+1) - u_base(k2) )   &
+                              * (       z00(k) - z_base(k2) )   &
+                              / ( z_base(k2+1) - z_base(k2) )
+        endif
+      ENDDO
+
+      ! Apply the Rayleigh damper
+      DO k = k1, ktf
+        dcoef = 1.0 - MIN( 1.0, ( ztop - z00(k) ) / zdamp )
+        dcoef = (SIN( 0.5 * pii * dcoef ) )**2
+        ru_tendf(i,k,j) = ru_tendf(i,k,j) -                    &
+                          muu(i,j) * ( dcoef * dampcoef ) *    &
+                          ( u(i,k,j) - u00(k) )
+      END DO
+
+    END DO
+    END DO
+
+! End adjustment of u.
+!-----------------------------------------------------------------------
+
+!-----------------------------------------------------------------------
+! Adjust v to base state.
+
+    DO j = jts, MIN( jte, jde   )
+    DO i = its, MIN( ite, ide-1 )
+
+      ! Get height at top of model
+      ztop = 0.5*( phb(i,kde,j  )+phb(i,kde,j-1)   &
+                  +ph(i,kde,j  )+ph(i,kde,j-1) )/g
+
+      ! Find bottom of damping layer
+      k1 = ktf
+      z = ztop
+      DO WHILE( z >= (ztop-zdamp) )
+        z = 0.25*( phb(i,k1,j  )+phb(i,k1+1,j  )  &
+                  +phb(i,k1,j-1)+phb(i,k1+1,j-1)  &
+                  +ph(i,k1,j  )+ph(i,k1+1,j  )    &
+                  +ph(i,k1,j-1)+ph(i,k1+1,j-1))/g
+        z00(k1) = z
+        k1 = k1 - 1
+      ENDDO
+      k1 = k1 + 2
+
+      ! Get reference state at model levels
+      DO k = k1, ktf
+        k2 = ktf
+        DO WHILE( z_base(k2) .gt. z00(k) )
+          k2 = k2 - 1
+        ENDDO
+        if(k2+1.gt.ktf)then
+          v00(k) = v_base(k2) + ( v_base(k2) - v_base(k2-1) )   &
+                              * (     z00(k) - z_base(k2)   )   &
+                              / ( z_base(k2) - z_base(k2-1) )
+        else
+          v00(k) = v_base(k2) + ( v_base(k2+1) - v_base(k2) )   &
+                              * (       z00(k) - z_base(k2) )   &
+                              / ( z_base(k2+1) - z_base(k2) )
+        endif
+      ENDDO
+
+      ! Apply the Rayleigh damper
+      DO k = k1, ktf
+        dcoef = 1.0 - MIN( 1.0, ( ztop - z00(k) ) / zdamp )
+        dcoef = (SIN( 0.5 * pii * dcoef ) )**2
+        rv_tendf(i,k,j) = rv_tendf(i,k,j) -                    &
+                          muv(i,j) * ( dcoef * dampcoef ) *    &
+                          ( v(i,k,j) - v00(k) )
+      END DO
+
+    END DO
+    END DO
+
+! End adjustment of v.
+!-----------------------------------------------------------------------
+
+!-----------------------------------------------------------------------
+! Adjust w to base state.
+
+    DO j = jts, MIN( jte,   jde-1 )
+    DO i = its, MIN( ite,   ide-1 )
+      ztop = ( phb(i,kde,j) + ph(i,kde,j) ) / g
+      DO k = kts, MIN( kte,   kde   )
+        z = ( phb(i,k,j) + ph(i,k,j) ) / g
+        IF ( z >= (ztop-zdamp) ) THEN
+          dcoef = 1.0 - MIN( 1.0, ( ztop - z ) / zdamp )
+          dcoef = ( SIN( 0.5 * pii * dcoef ) )**2
+          rw_tendf(i,k,j) = rw_tendf(i,k,j) -  &
+                            mut(i,j) * ( dcoef * dampcoef ) * w(i,k,j)
+        END IF
+      END DO
+    END DO
+    END DO
+
+! End adjustment of w.
+!-----------------------------------------------------------------------
+
+!-----------------------------------------------------------------------
+! Adjust potential temperature to base state.
+
+    DO j = jts, MIN( jte,   jde-1 )
+    DO i = its, MIN( ite,   ide-1 )
+
+      ! Get height at top of model
+      ztop = ( phb(i,kde,j) + ph(i,kde,j) ) / g
+
+      ! Find bottom of damping layer
+      k1 = ktf
+      z = ztop
+      DO WHILE( z >= (ztop-zdamp) )
+        z = 0.5 * ( phb(i,k1,j) + phb(i,k1+1,j) +  &
+                     ph(i,k1,j) +  ph(i,k1+1,j) ) / g
+        z00(k1) = z
+        k1 = k1 - 1
+      ENDDO
+      k1 = k1 + 2
+
+      ! Get reference state at model levels
+      DO k = k1, ktf
+        k2 = ktf
+        DO WHILE( z_base(k2) .gt. z00(k) )
+          k2 = k2 - 1
+        ENDDO
+        if(k2+1.gt.ktf)then
+          t00(k) = t_base(k2) + ( t_base(k2) - t_base(k2-1) )   &
+                              * (     z00(k) - z_base(k2)   )   &
+                              / ( z_base(k2) - z_base(k2-1) )
+        else
+          t00(k) = t_base(k2) + ( t_base(k2+1) - t_base(k2) )   &
+                              * (       z00(k) - z_base(k2) )   &
+                              / ( z_base(k2+1) - z_base(k2) )
+        endif
+      ENDDO
+
+      ! Apply the Rayleigh damper
+      DO k = k1, ktf
+        dcoef = 1.0 - MIN( 1.0, ( ztop - z00(k) ) / zdamp )
+        dcoef = (SIN( 0.5 * pii * dcoef ) )**2
+        t_tendf(i,k,j) = t_tendf(i,k,j) -                      &
+                         mut(i,j) * ( dcoef * dampcoef )  *    &
+                         ( t(i,k,j) - t00(k) )
+      END DO
+
+    END DO
+    END DO
+
+! End adjustment of potential temperature.
+!-----------------------------------------------------------------------
+
+    END SUBROUTINE rk_rayleigh_damp
 
 END MODULE module_big_step_utilities_em

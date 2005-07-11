@@ -1,9 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
-#ifdef crayx1
-#include <math.h>
-#endif
 #include "pdstool.h"
 #include "gdstool.h"
 #include "gridnav.h"

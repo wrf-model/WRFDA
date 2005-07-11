@@ -68,7 +68,7 @@ var :
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" da_3dvar_io
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" wrfvar_src
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" da_3dvar_interface
-	( cd main ; $(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" da_3dvar )
+	( cd main ; $(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" wrfvar )
 
 pure_var : 
 	@ echo 'This option assumes that you have already compiled the WRF frame part correctly.'
@@ -76,7 +76,7 @@ pure_var :
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" da_3dvar_io
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" wrfvar_src
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" da_3dvar_interface
-	( cd main ; $(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" da_3dvar )
+	( cd main ; $(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" wrfvar )
 
 k2n : 
 	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" ext

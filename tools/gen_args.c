@@ -66,7 +66,7 @@ gen_args1 ( FILE * fp , char * outstr , char * structname , char * corename ,
             node_t * node , int *linelen , int sw , int deep )
 {
   node_t * p ;
-  int var, tag ;
+  int tag ;
   char post[NAMELEN] ;
   char fname[NAMELEN] ;
   char x[NAMELEN], y[NAMELEN] ;
@@ -94,53 +94,24 @@ gen_args1 ( FILE * fp , char * outstr , char * structname , char * corename ,
       if      ( p->node_kind & FOURD ) { sprintf(post,",1)") ; }
       else if ( p->boundary_array )     { sprintf(post,")") ; }
       else                              { sprintf(post,")") ; }
-/*Wei's change for 4dvar*/
-      for ( var = 0 ; var < p->var_numb ; var++ )
+      for ( tag = 1 ; tag <= p->ntl ; tag++ )
       {
-      /*
-       *if(p->var_numb > 1)
-       *{
-       *  printf("Processing var: <%s> for <%c>\n", p->name, p->var_name[var]);
-       *}
-       */
-
-        for ( tag = 1 ; tag <= p->ntl ; tag++ )
-        {
-          /* if this is a core-specific variable, prepend the name of the core to */
-          /* the variable at the driver level */
-          if (!strcmp( corename , p->use+4 ) && sw==ACTUAL)
-          {
-            if(var)
-              sprintf(fname,"%s_%c_%s",corename,p->var_name[var],field_name(t4,p,(p->ntl>1)?tag:0)) ;
-            else
-              sprintf(fname,"%s_%s",corename,field_name(t4,p,(p->ntl>1)?tag:0)) ;
-          }
-          else
-          {
-            if(var)
-              sprintf(fname,"%c_%s",p->var_name[var],field_name(t4,p,(p->ntl>1)?tag:0)) ;
-            else
-              strcpy(fname,field_name(t4,p,(p->ntl>1)?tag:0)) ;
-          }
-
-        /*
-         *if(p->var_numb > 1)
-         *{
-         *  printf("fname: <%s>\n", fname);
-         *}
-         */
-
-	  strcpy(indices,"") ;
-          if ( sw_deref_kludge && sw==ACTUAL ) 
-	    sprintf(indices, "%s",index_with_firstelem("(","",t2,p,post)) ;
-          /* generate argument */
-	  strcpy(y,structname) ; strcat(y,fname) ; strcat(y,indices) ; strcat(y,",") ;
-	  lenarg = strlen(y) ;
-	  if ( lenarg+*linelen > MAX_ARGLINE ) { strcat(outstr," &\n") ; *linelen = 0 ; }
-	  strcat(outstr,y) ;
-	  *linelen += lenarg ;
-        }
-      } /* End Wei's change */
+        /* if this is a core-specific variable, prepend the name of the core to */
+        /* the variable at the driver level */
+        if (!strcmp( corename , p->use+4 ) && sw==ACTUAL)
+          sprintf(fname,"%s_%s",corename,field_name(t4,p,(p->ntl>1)?tag:0)) ;
+        else
+          strcpy(fname,field_name(t4,p,(p->ntl>1)?tag:0)) ;
+	strcpy(indices,"") ;
+        if ( sw_deref_kludge && sw==ACTUAL ) 
+	  sprintf(indices, "%s",index_with_firstelem("(","",t2,p,post)) ;
+        /* generate argument */
+	strcpy(y,structname) ; strcat(y,fname) ; strcat(y,indices) ; strcat(y,",") ;
+	lenarg = strlen(y) ;
+	if ( lenarg+*linelen > MAX_ARGLINE ) { strcat(outstr," &\n") ; *linelen = 0 ; }
+	strcat(outstr,y) ;
+	*linelen += lenarg ;
+      }
     }
     if ( p->type != NULL )
     {

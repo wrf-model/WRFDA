@@ -11,10 +11,11 @@ PROGRAM ideal
 
    USE module_timing
    USE module_wrf_error
-   USE WRF_ESMF_MOD
+   USE module_utility
 #ifdef DM_PARALLEL
    USE module_dm
 #endif
+   USE module_date_time
 
    IMPLICIT NONE
 
@@ -58,7 +59,7 @@ PROGRAM ideal
    !  Get the NAMELIST data for input.
 
    CALL init_modules(1)   ! Phase 1 returns after MPI_INIT() (if it is called)
-   CALL ESMF_Initialize( defaultCalendar=ESMF_CAL_GREGORIAN, rc=rc )
+   CALL WRF_UTIL_Initialize( defaultCalendar=WRF_UTIL_CAL_GREGORIAN, rc=rc )
    CALL init_modules(2)   ! Phase 2 resumes after MPI_INIT() (if it is called)
 
 #ifdef DM_PARALLEL
@@ -87,28 +88,50 @@ PROGRAM ideal
                                      parent     = null_domain ,        &
                                      kid        = -1                   )
 
-#ifdef WRF_ESMF_MOD
-   ! TBH:  Note that historically, IDEAL did not set up ESMF clocks.  These 
-   ! TBH:  are explicit replacements for old default initializations...  
-   CALL ESMF_TimeSet(grid%start_time, YY=1, MM=1, DD=1, H=0, M=0, S=0, rc=rc)
+   grid => head_grid
+   ! TBH:  Note that historically, IDEAL did not set up clocks.  These 
+   ! TBH:  are explicit replacements for old default initializations...  They 
+   ! TBH:  are needed to ensure that time manager calls do not fail due to 
+   ! TBH:  uninitialized clock.  Clean this up later...  
+   CALL WRF_UTIL_TimeSet(grid%start_time, YY=1, MM=1, DD=1, H=0, M=0, S=0, rc=rc)
    grid%stop_time    = grid%start_time
    grid%current_time = grid%start_time
    ! TBH:  Bogus time step value -- clock is never advanced...  
-   CALL ESMF_TimeIntervalSet(grid%step_time, S=180, rc=rc)
-   grid%domain_clock = ESMF_ClockCreate( TimeStep= grid%step_time,  &
-                                         StartTime=grid%start_time, &
-                                         StopTime= grid%stop_time,  &
-                                         rc=rc)
-   CALL wrf_check_error( ESMF_SUCCESS, rc, &
-                         'grid%domain_clock = ESMF_ClockCreate() FAILED', &
+   CALL WRF_UTIL_TimeIntervalSet(grid%step_time, S=180, rc=rc)
+   grid%domain_clock = WRF_UTIL_ClockCreate( TimeStep= grid%step_time,  &
+                                             StartTime=grid%start_time, &
+                                             StopTime= grid%stop_time,  &
+                                             rc=rc )
+   CALL wrf_check_error( WRF_UTIL_SUCCESS, rc, &
+                         'grid%domain_clock = WRF_UTIL_ClockCreate() FAILED', &
                          __FILE__ , &
                          __LINE__  )
-#endif
-
    CALL       wrf_debug ( 100 , 'wrf: calling model_to_grid_config_rec ' )
    CALL model_to_grid_config_rec ( head_grid%id , model_config_rec , config_flags )
    CALL       wrf_debug ( 100 , 'wrf: calling set_scalar_indices_from_config ' )
    CALL set_scalar_indices_from_config ( head_grid%id , idum1, idum2 )
+
+   WRITE ( current_date , FMT = '(I4.4,"-",I2.2,"-",I2.2,"_",I2.2,":",I2.2,":",I2.2,".0000")' ) &
+           config_flags%start_year, &
+           config_flags%start_month, &
+           config_flags%start_day, &
+           config_flags%start_hour, &
+           config_flags%start_minute, &
+           config_flags%start_second 
+   CALL wrf_atotime( current_date(1:19), grid%current_time )
+   CALL wrf_clockprint ( 150, grid%domain_clock, &
+                            'DEBUG assemble_output:  grid%domain_clock before 1st currTime set,' )
+   WRITE (wrf_err_message,*) &
+        'DEBUG assemble_output:  before 1st currTime set, current_date = ',TRIM(current_date)
+   CALL wrf_debug ( 150 , wrf_err_message )
+   CALL WRF_UTIL_ClockSet(grid%domain_clock, currTime=grid%current_time, rc=rc)
+   CALL wrf_check_error( WRF_UTIL_SUCCESS, rc, &
+                            'WRF_UTIL_ClockSet(grid%domain_clock) FAILED', &
+                            __FILE__ , &
+                            __LINE__  )
+   CALL wrf_clockprint ( 150, grid%domain_clock, &
+                            'DEBUG assemble_output:  grid%domain_clock after 1st currTime set,' )
+
    CALL       wrf_debug ( 100 , 'wrf: calling init_wrfio' )
    CALL init_wrfio
 
@@ -124,7 +147,7 @@ PROGRAM ideal
    CALL med_shutdown_io ( head_grid , config_flags )
    CALL wrf_shutdown
 
-   CALL ESMF_Finalize( rc=rc )
+   CALL WRF_UTIL_Finalize( rc=rc )
 
 END PROGRAM ideal
 

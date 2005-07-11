@@ -94,7 +94,7 @@ SUBROUTINE DA_Transfer_XatoWRF( xbx, grid, &
       s1md=0.0
       do k=ks,ke
          sdmd=sdmd+q_cgrid(i,j,k)*dnw(k)
-         s1md=s1md+(1.0+moist_2(i,j,k,P_QV))*dnw(k)
+         s1md=s1md+(1.0+moist(i,j,k,P_QV))*dnw(k)
       enddo
 
       mu_cgrid(i,j)=-(xa%psfc(i,j)+xb%psac(i,j)*sdmd)/s1md
@@ -112,7 +112,7 @@ SUBROUTINE DA_Transfer_XatoWRF( xbx, grid, &
    do i=is,ie
      k = ke
      qvf1   = 0.5*(q_cgrid(i,j,k)+q_cgrid(i,j,k))
-     qvf1_b = 0.5*(moist_2(i,j,k,P_QV)+moist_2(i,j,k,P_QV))
+     qvf1_b = 0.5*(moist(i,j,k,P_QV)+moist(i,j,k,P_QV))
      qvf2   = - qvf1 / ((1.+qvf1_b)*(1.+qvf1_b))
      qvf2_b = 1./(1.+qvf1)
      qvf1   = qvf1*qvf2_b + qvf1_b*qvf2
@@ -123,7 +123,7 @@ SUBROUTINE DA_Transfer_XatoWRF( xbx, grid, &
 
      do k = ke-1,1,-1
        qvf1   = 0.5*(q_cgrid(i,j,k)+q_cgrid(i,j,k+1))
-       qvf1_b = 0.5*(moist_2(i,j,k,P_QV)+moist_2(i,j,k+1,P_QV))
+       qvf1_b = 0.5*(moist(i,j,k,P_QV)+moist(i,j,k+1,P_QV))
        qvf2   = - qvf1 / ((1.+qvf1_b)*(1.+qvf1_b))
        qvf2_b = 1./(1.+qvf1_b)
        qvf1   = qvf1*qvf2_b + qvf1_b*qvf2
@@ -194,7 +194,7 @@ SUBROUTINE DA_Transfer_XatoWRF( xbx, grid, &
 
       t_full   = xa%t(i,j,k) + xb%t(i,j,k)
       p_full   = xa%p(i,j,k) + xb%p(i,j,k)
-      q_full   = moist_2(i,j,k,P_QV) + q_cgrid(i,j,k)
+      q_full   = moist(i,j,k,P_QV) + q_cgrid(i,j,k)
 
 ! Note: According to WRF, this is the dry air density used to
 !       compute the geopotential height: 
@@ -347,27 +347,27 @@ SUBROUTINE DA_Transfer_XatoWRF( xbx, grid, &
          u_2(i,j,k) = u_2(i,j,k) + u_cgrid(i,j,k)
          v_2(i,j,k) = v_2(i,j,k) + v_cgrid(i,j,k)
          w_2(i,j,k) = w_2(i,j,k) +    xa%w(i,j,k)
-         moist_2(i,j,k,P_QV) = moist_2(i,j,k,P_QV) + q_cgrid(i,j,k)
+         moist(i,j,k,P_QV) = moist(i,j,k,P_QV) + q_cgrid(i,j,k)
 !--------make sure qv is positive.
-         if(moist_2(i,j,k,P_QV) < 1.0e-6) moist_2(i,j,k,P_QV) = 1.0e-6
+         if(moist(i,j,k,P_QV) < 1.0e-6) moist(i,j,k,P_QV) = 1.0e-6
 
-        if ( size(moist_2,dim=4) >= 4 ) then
-         moist_2(i,j,k,p_qc) = moist_2(i,j,k,p_qc) + xa%qcw(i,j,k)
-         moist_2(i,j,k,p_qr) = moist_2(i,j,k,p_qr) + xa%qrn(i,j,k)
-         if(moist_2(i,j,k,p_qc) < 0.0) moist_2(i,j,k,p_qc) = 0.0
-         if(moist_2(i,j,k,p_qr) < 0.0) moist_2(i,j,k,p_qr) = 0.0
+        if ( size(moist,dim=4) >= 4 ) then
+         moist(i,j,k,p_qc) = moist(i,j,k,p_qc) + xa%qcw(i,j,k)
+         moist(i,j,k,p_qr) = moist(i,j,k,p_qr) + xa%qrn(i,j,k)
+         if(moist(i,j,k,p_qc) < 0.0) moist(i,j,k,p_qc) = 0.0
+         if(moist(i,j,k,p_qr) < 0.0) moist(i,j,k,p_qr) = 0.0
         endif
 
-        if ( size(moist_2,dim=4) >= 6 ) then
-         moist_2(i,j,k,p_qi) = moist_2(i,j,k,p_qi) + xa%qci(i,j,k)
-         moist_2(i,j,k,p_qs) = moist_2(i,j,k,p_qs) + xa%qsn(i,j,k)
-         if(moist_2(i,j,k,p_qi) < 0.0) moist_2(i,j,k,p_qi) = 0.0
-         if(moist_2(i,j,k,p_qs) < 0.0) moist_2(i,j,k,p_qs) = 0.0
+        if ( size(moist,dim=4) >= 6 ) then
+         moist(i,j,k,p_qi) = moist(i,j,k,p_qi) + xa%qci(i,j,k)
+         moist(i,j,k,p_qs) = moist(i,j,k,p_qs) + xa%qsn(i,j,k)
+         if(moist(i,j,k,p_qi) < 0.0) moist(i,j,k,p_qi) = 0.0
+         if(moist(i,j,k,p_qs) < 0.0) moist(i,j,k,p_qs) = 0.0
         endif
 
-        if ( size(moist_2,dim=4) >= 7 ) then
-         moist_2(i,j,k,p_qg) = moist_2(i,j,k,p_qg) + xa%qgr(i,j,k)
-         if(moist_2(i,j,k,p_qg) < 0.0) moist_2(i,j,k,p_qg) = 0.0
+        if ( size(moist,dim=4) >= 7 ) then
+         moist(i,j,k,p_qg) = moist(i,j,k,p_qg) + xa%qgr(i,j,k)
+         if(moist(i,j,k,p_qg) < 0.0) moist(i,j,k,p_qg) = 0.0
         endif
 
       enddo

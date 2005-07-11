@@ -202,7 +202,7 @@ CONTAINS
                W0AVG1D(K) =W0AVG(I,K,J)
                DZ1D(k)=dz8w(I,K,J)
             ENDDO
-          CALL wrf_debug(500,'in kf_eta_para')
+          CALL wrf_debug(500,'calling kf_eta_para')
             CALL KF_eta_PARA(I, J,                  &
                  U1D,V1D,T1D,QV1D,P1D,DZ1D,         &
                  W0AVG1D,DT,DX,DXSQ,RHO1D,          &
@@ -404,6 +404,7 @@ CONTAINS
                  NM,LMAX,NCOUNT,NOITR,                     &
                  NSTEP,NTC,NCHM,ISHALL,NSHALL
       LOGICAL :: IPRNT
+      CHARACTER*1024 message
 !
       DATA P00,T00/1.E5,273.16/
       DATA RLF/3.339E5/
@@ -476,7 +477,8 @@ CONTAINS
 !         TKE(K) = Q2(I,J,NK)
          TKE(K) = 0.
          CLDHGT(K) = 0.
-         IF(P0(K).GE.500E2)L5=K
+!        IF(P0(K).GE.500E2)L5=K
+         IF(P0(K).GE.0.5*P0(1))L5=K
          IF(P0(K).GE.P300)LLFC=K
          IF(T0(K).GT.T00)ML=K
       ENDDO
@@ -544,14 +546,24 @@ usl:   DO
            NLAYRS=0
            DPTHMX=0.
            NK=LC-1
-           DO 
-             NK=NK+1   
-             DPTHMX=DPTHMX+DP(NK)
-             NLAYRS=NLAYRS+1
-             IF(DPTHMX.GT.DPMIN)THEN
-               EXIT 
-             ENDIF
-           END DO    
+           IF ( NK+1 .LT. KTS ) THEN
+             WRITE(message,*)'WOULD GO OFF BOTTOM: KF_ETA_PARA I,J,NK',I,J,NK
+             CALL wrf_message (TRIM(message)) 
+           ELSE
+             DO 
+               NK=NK+1   
+               IF ( NK .GT. KTE ) THEN
+                 WRITE(message,*)'WOULD GO OFF TOP: KF_ETA_PARA I,J,DPTHMX,DPMIN',I,J,DPTHMX,DPMIN
+                 CALL wrf_message (TRIM(message))
+                 EXIT
+               ENDIF
+               DPTHMX=DPTHMX+DP(NK)
+               NLAYRS=NLAYRS+1
+               IF(DPTHMX.GT.DPMIN)THEN
+                 EXIT 
+               ENDIF
+             END DO    
+           ENDIF
            IF(DPTHMX.LT.DPMIN)THEN 
              RETURN
            ENDIF
@@ -1261,6 +1273,7 @@ updraft:    DO NK=K,KL-1
 !        KSTART=MAX0(KPBL,KLCL)
 !        KSTART=KPBL                                  ! Changed 7/23/99
          KSTART=KPBL+1                                ! Changed 7/23/99
+         KLFS = LET-1
          DO NK = KSTART+1,KL
            DPPP = P0(KSTART)-P0(NK)
 !          IF(DPPP.GT.200.E2)THEN
@@ -1282,7 +1295,7 @@ updraft:    DO NK=K,KL-1
 !
 !...call tpmix2dd to find wet-bulb temp, qv...
 !
-          call tpmix2dd(p0(lfs),theted(lfs),tz(lfs),qss)
+          call tpmix2dd(p0(lfs),theted(lfs),tz(lfs),qss,i,j)
           THTAD(LFS)=TZ(LFS)*(P00/P0(LFS))**(0.2854*(1.-0.28*QSS))
 !     
 !...TAKE A FIRST GUESS AT THE INITIAL DOWNDRAFT MASS FLUX...
@@ -1325,7 +1338,7 @@ updraft:    DO NK=K,KL-1
           endif
           LDT = MIN0(LFS-1,KSTART-1)
 !
-          call tpmix2dd(p0(kstart),theted(kstart),tz(kstart),qss)
+          call tpmix2dd(p0(kstart),theted(kstart),tz(kstart),qss,i,j)
 !
           tz(kstart) = tz(kstart)-dtmelt
           ES=ALIQ*EXP((BLIQ*TZ(KSTART)-CLIQ)/(TZ(KSTART)-DLIQ))
@@ -1341,7 +1354,7 @@ updraft:    DO NK=K,KL-1
 !
 !...call tpmix2dd to find wet bulb temp, saturation mixing ratio...
 !
-            call tpmix2dd(p0(nd),theted(nd),tz(nd),qss)
+            call tpmix2dd(p0(nd),theted(nd),tz(nd),qss,i,j)
             qsd(nd) = qss
 !
 !...specify RH decrease of 20%/km in downdraft...
@@ -1759,7 +1772,7 @@ iter:     DO NCOUNT=1,10
             NK1=NK+1
             THETEU(NK1) = THETEU(NK)
 !
-            call tpmix2dd(p0(nk1),theteu(nk1),tgu(nk1),qgu(nk1))
+            call tpmix2dd(p0(nk1),theteu(nk1),tgu(nk1),qgu(nk1),i,j)
 !
             TVQU(NK1)=TGU(NK1)*(1.+0.608*QGU(NK1)-QLIQ(NK1)-QICE(NK1))
             IF(NK.EQ.K)THEN
@@ -2518,7 +2531,7 @@ iter:     DO NCOUNT=1,10
    END SUBROUTINE PROF5
 
 ! ------------------------------------------------------------------------
-   SUBROUTINE TPMIX2DD(p,thes,ts,qs)
+   SUBROUTINE TPMIX2DD(p,thes,ts,qs,i,j)
 !
 ! Lookup table variables:
 !     INTEGER, PARAMETER :: (KFNT=250,KFNP=220)
@@ -2532,8 +2545,10 @@ iter:     DO NCOUNT=1,10
 !-----------------------------------------------------------------------
    REAL,         INTENT(IN   )   :: P,THES
    REAL,         INTENT(INOUT)   :: TS,QS
+   INTEGER,      INTENT(IN   )   :: i,j     ! avail for debugging
    REAL    ::    TP,QQ,BTH,TTH,PP,T00,T10,T01,T11,Q00,Q10,Q01,Q11
    INTEGER ::    IPTB,ITHTB
+   CHARACTER*256 :: MESS
 !-----------------------------------------------------------------------
 
 !

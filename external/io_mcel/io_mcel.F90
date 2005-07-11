@@ -64,7 +64,7 @@ MODULE module_ext_mcel
       ENDDO
 33    CONTINUE
       IF ( retval < 0 )  THEN
-        CALL wrf_error_fatal("external/io_mcel/io_int.F90: int_get_fresh_handle() can not")
+        CALL wrf_error_fatal("external/io_quilt/io_int.F90: int_get_fresh_handle() can not")
       ENDIF
       int_handle_in_use(retval) = .TRUE.
       NULLIFY ( int_local_output_buffer )
@@ -420,10 +420,10 @@ SUBROUTINE ext_mcel_get_next_time ( DataHandle, DateStr, Status )
   REAL, DIMENSION( 1 ) :: Field
 
   IF ( .NOT. int_valid_handle( DataHandle ) ) THEN
-    CALL wrf_error_fatal("external/io_mcel/io_int.F90: ext_mcel_get_next_time: invalid data handle" )
+    CALL wrf_error_fatal("external/io_quilt/io_int.F90: ext_mcel_get_next_time: invalid data handle" )
   ENDIF
   IF ( .NOT. int_handle_in_use( DataHandle ) ) THEN
-    CALL wrf_error_fatal("external/io_mcel/io_int.F90: ext_mcel_get_next_time: DataHandle not opened" )
+    CALL wrf_error_fatal("external/io_quilt/io_int.F90: ext_mcel_get_next_time: DataHandle not opened" )
   ENDIF
   inttypesize = itypesize
   realtypesize = rtypesize
@@ -480,10 +480,10 @@ SUBROUTINE ext_mcel_get_var_info ( DataHandle , VarName , NDim , MemoryOrder , S
   REAL, DIMENSION( 1 ) :: Field
 
   IF ( .NOT. int_valid_handle( DataHandle ) ) THEN
-    CALL wrf_error_fatal("external/io_mcel/io_int.F90: ext_mcel_get_var_info: invalid data handle" )
+    CALL wrf_error_fatal("external/io_quilt/io_int.F90: ext_mcel_get_var_info: invalid data handle" )
   ENDIF
   IF ( .NOT. int_handle_in_use( DataHandle ) ) THEN
-    CALL wrf_error_fatal("external/io_mcel/io_int.F90: ext_mcel_get_var_info: DataHandle not opened" )
+    CALL wrf_error_fatal("external/io_quilt/io_int.F90: ext_mcel_get_var_info: DataHandle not opened" )
   ENDIF
   inttypesize = itypesize
   realtypesize = rtypesize
@@ -526,10 +526,10 @@ real    rdata(128)
   REAL, DIMENSION( 1 ) :: Field
 
   IF ( .NOT. int_valid_handle( DataHandle ) ) THEN
-    CALL wrf_error_fatal("external/io_mcel/io_int.F90: ext_mcel_get_next_var: invalid data handle" )
+    CALL wrf_error_fatal("external/io_quilt/io_int.F90: ext_mcel_get_next_var: invalid data handle" )
   ENDIF
   IF ( .NOT. int_handle_in_use( DataHandle ) ) THEN
-    CALL wrf_error_fatal("external/io_mcel/io_int.F90: ext_mcel_get_next_var: DataHandle not opened" )
+    CALL wrf_error_fatal("external/io_quilt/io_int.F90: ext_mcel_get_next_var: DataHandle not opened" )
   ENDIF
   inttypesize = itypesize
   realtypesize = rtypesize

@@ -175,11 +175,6 @@
       JTE=MIN(JPE,JDF)
       KTS=KPS
       KTE=MIN(KPE,KDF)
-      if(ntsd==0)then
-        write(0,*)' its=',its,' ite=',ite
-        write(0,*)' jts=',jts,' jte=',jte
-        write(0,*)' kts=',kts,' kte=',kte
-      endif
 !-----------------------------------------------------------------------
 !***  SET TIMING VARIABLES TO ZERO AT START OF FORECAST.
 !-----------------------------------------------------------------------
@@ -254,17 +249,8 @@
 !***  FIRST TIME THROUGH TOTAL_TIME_STEPS IS ZERO.
 !***  IT IS INCREMENTED IN SOLVE_INTERFACE.
 !***
-      CALL ESMF_ClockGet(GRID%DOMAIN_CLOCK,ADVANCEcOUNT=NTSD,RC=RC)
+      CALL WRF_UTIL_ClockGet(GRID%DOMAIN_CLOCK,ADVANCEcOUNT=NTSD,RC=RC)
       LAST_TIME=GRID%STOP_TIME.EQ.GRID%CURRENT_TIME+GRID%STEP_TIME
-!
-!     if(ntsd>=400)then
-!       write(0,*)' last_time=',last_time
-!       CALL print_a_time( grid%stop_time )
-!       CALL print_a_time( grid%current_time )
-!       CALL print_a_timeinterval( grid%step_time )
-!     endif
-!
-!      CALL ESMF_TimeGetString(GRID%CURRENT_TIME,MESSAGE,RC=RC)
 !
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
@@ -311,11 +297,11 @@
 !-----------------------------------------------------------------------
 !***  USE THE FOLLOWING VARIABLES TO KEEP TRACK OF EXCHANGE TIMES.
 !-----------------------------------------------------------------------
-        exch_tim=exch_tim+timef()-btimx
-        this_tim=timef()-btimx
-        call mpi_allreduce(this_tim,et_max,1,mpi_real,mpi_max           &
-     &                    ,mpi_comm_comp,irtn)
-        exch_tim_max=exch_tim_max+et_max
+!       exch_tim=exch_tim+timef()-btimx
+!       this_tim=timef()-btimx
+!       call mpi_allreduce(this_tim,et_max,1,mpi_real,mpi_max           &
+!    &                    ,mpi_comm_comp,irtn)
+!       exch_tim_max=exch_tim_max+et_max
 !-----------------------------------------------------------------------
 !
         GO TO 2003
@@ -337,11 +323,11 @@
 #    include "HALO_NMM_D.inc"
 #endif
 !-----------------
-      exch_tim=exch_tim+timef()-btimx
-      this_tim=timef()-btimx
-      call mpi_allreduce(this_tim,et_max,1,mpi_real,mpi_max             &
-     &                  ,mpi_comm_comp,irtn)
-      exch_tim_max=exch_tim_max+et_max
+!     exch_tim=exch_tim+timef()-btimx
+!     this_tim=timef()-btimx
+!     call mpi_allreduce(this_tim,et_max,1,mpi_real,mpi_max             &
+!    &                  ,mpi_comm_comp,irtn)
+!     exch_tim_max=exch_tim_max+et_max
 !
       btimx=timef()
 !
@@ -371,11 +357,11 @@
 #    include "HALO_NMM_F1.inc"
 #endif
 !-----------------
-      exch_tim=exch_tim+timef()-btimx
-      this_tim=timef()-btimx
-      call mpi_allreduce(this_tim,et_max,1,mpi_real,mpi_max             &
-     &                  ,mpi_comm_comp,irtn)
-      exch_tim_max=exch_tim_max+et_max
+!     exch_tim=exch_tim+timef()-btimx
+!     this_tim=timef()-btimx
+!     call mpi_allreduce(this_tim,et_max,1,mpi_real,mpi_max             &
+!    &                  ,mpi_comm_comp,irtn)
+!     exch_tim_max=exch_tim_max+et_max
 !
       btimx=timef()
 !
@@ -395,12 +381,6 @@
      &         ,ITS,ITE,JTS,JTE,KTS,KTE)
 !
       adve_tim=adve_tim+timef()-btimx
-!     if(ntsd<=21)then
-!       call twr(t,0,'t1',ntsd,mype,npes,mpi_comm_comp                  &
-!    &                ,ids,ide,jds,jde,kds,kde                         &
-!    &                ,ims,ime,jms,jme,kms,kme                         &
-!    &                ,its,ite,jts,jte,kts,kte)
-!     endif
 !
 !-----------------------------------------------------------------------
 !***  PRESSURE TENDENCY, ETA/SIGMADOT, VERTICAL PART OF OMEGA-ALPHA TERM
@@ -450,11 +430,11 @@
 #    include "HALO_NMM_G.inc"
 #endif
 !-----------------
-      exch_tim=exch_tim+timef()-btimx
-      this_tim=timef()-btimx
-      call mpi_allreduce(this_tim,et_max,1,mpi_real,mpi_max             &
-     &                  ,mpi_comm_comp,irtn)
-      exch_tim_max=exch_tim_max+et_max
+!     exch_tim=exch_tim+timef()-btimx
+!     this_tim=timef()-btimx
+!     call mpi_allreduce(this_tim,et_max,1,mpi_real,mpi_max             &
+!    &                  ,mpi_comm_comp,irtn)
+!     exch_tim_max=exch_tim_max+et_max
 !
       btimx=timef()
 !
@@ -479,11 +459,11 @@
 #    include "HALO_NMM_H.inc"
 #endif
 !-----------------
-      exch_tim=exch_tim+timef()-btimx
-      this_tim=timef()-btimx
-      call mpi_allreduce(this_tim,et_max,1,mpi_real,mpi_max             &
-     &                  ,mpi_comm_comp,irtn)
-      exch_tim_max=exch_tim_max+et_max
+!     exch_tim=exch_tim+timef()-btimx
+!     this_tim=timef()-btimx
+!     call mpi_allreduce(this_tim,et_max,1,mpi_real,mpi_max             &
+!    &                  ,mpi_comm_comp,irtn)
+!     exch_tim_max=exch_tim_max+et_max
 !
       btimx=timef()
 !
@@ -532,11 +512,11 @@
 #    include "HALO_NMM_I.inc"
 #endif
 !-----------------
-        exch_tim=exch_tim+timef()-btimx
-        this_tim=timef()-btimx
-        call mpi_allreduce(this_tim,et_max,1,mpi_real,mpi_max           &
-     &                    ,mpi_comm_comp,irtn)
-        exch_tim_max=exch_tim_max+et_max
+!       exch_tim=exch_tim+timef()-btimx
+!       this_tim=timef()-btimx
+!       call mpi_allreduce(this_tim,et_max,1,mpi_real,mpi_max           &
+!    &                    ,mpi_comm_comp,irtn)
+!       exch_tim_max=exch_tim_max+et_max
 !
         btimx=timef()
 !
@@ -616,8 +596,8 @@
      &            ,CZEN,CZMEAN,SIGT4,TOTLWDN,TOTSWDN,RADOT             &
      &            ,PD,RES,PINT,T,Q,CWM,F_ICE,F_RAIN,SR                 &
      &            ,Q2,U,V,THS,SST,PREC,SNO,ZERO_3D                     &
-     &            ,FIS,Z0,Z0BASE,USTAR,PBLH,LPBL                       &
-     &            ,EXCH_H,AKHS,AKMS                                    &
+     &            ,FIS,Z0,Z0BASE,USTAR,PBLH,LPBL,EL_MYJ                &
+     &            ,EXCH_H,AKHS,AKMS,AKHS_OUT,AKMS_OUT                  &
      &            ,THZ0,QZ0,UZ0,VZ0,QS                                 &
      &            ,STC,SMC,CMC,SMSTAV,SMSTOT,SSROFF,BGROFF             &
      &            ,IVGTYP,ISLTYP,VEGFRC,SHDMIN,SHDMAX,GRNFLX           &
@@ -648,11 +628,11 @@
 # include "HALO_NMM_TURBL_B.inc"
 #endif
 !-----------------
-        exch_tim=exch_tim+timef()-btimx
-        this_tim=timef()-btimx
-        call mpi_allreduce(this_tim,et_max,1,mpi_real,mpi_max           &
-     &                    ,mpi_comm_comp,irtn)
-        exch_tim_max=exch_tim_max+et_max
+!       exch_tim=exch_tim+timef()-btimx
+!       this_tim=timef()-btimx
+!       call mpi_allreduce(this_tim,et_max,1,mpi_real,mpi_max           &
+!    &                    ,mpi_comm_comp,irtn)
+!       exch_tim_max=exch_tim_max+et_max
 !
 !***  INTERPOLATE WINDS FROM H POINTS BACK TO V POINTS.
 !
@@ -674,11 +654,11 @@
 #    include "HALO_NMM_J.inc"
 #endif
 !-----------------
-        exch_tim=exch_tim+timef()-btimx
-        this_tim=timef()-btimx
-        call mpi_allreduce(this_tim,et_max,1,mpi_real,mpi_max           &
-     &                    ,mpi_comm_comp,irtn)
-        exch_tim_max=exch_tim_max+et_max
+!       exch_tim=exch_tim+timef()-btimx
+!       this_tim=timef()-btimx
+!       call mpi_allreduce(this_tim,et_max,1,mpi_real,mpi_max           &
+!    &                    ,mpi_comm_comp,irtn)
+!       exch_tim_max=exch_tim_max+et_max
 !
         ICLTEND=-1
         btimx=timef()
@@ -703,11 +683,11 @@
 #    include "HALO_NMM_C.inc"
 #endif
 !-----------------
-        exch_tim=exch_tim+timef()-btimx
-        this_tim=timef()-btimx
-        call mpi_allreduce(this_tim,et_max,1,mpi_real,mpi_max          &
-     &                    ,mpi_comm_comp,irtn)
-        exch_tim_max=exch_tim_max+et_max
+!       exch_tim=exch_tim+timef()-btimx
+!       this_tim=timef()-btimx
+!       call mpi_allreduce(this_tim,et_max,1,mpi_real,mpi_max          &
+!    &                    ,mpi_comm_comp,irtn)
+!       exch_tim_max=exch_tim_max+et_max
       ENDIF
 !
       btimx=timef()
@@ -744,6 +724,9 @@
      &               ,PDTOP,PT,PD,RES,PINT,T,Q,CWM,TRAIN               &
      &               ,F_ICE,F_RAIN,F_RIMEF,SR                          &
      &               ,PREC,ACPREC,AVRAIN,ZERO_3D                       &
+     &               ,MP_RESTART_STATE                                 &
+     &               ,TBPVS_STATE                                      &
+     &               ,TBPVS0_STATE                                     &
      &               ,GRID,CONFIG_FLAGS                                &
      &               ,IDS,IDF,JDS,JDF,KDS,KDE                          &
      &               ,IMS,IME,JMS,JME,KMS,KME                          &
@@ -789,11 +772,11 @@
 #    include "HALO_NMM_K.inc"
 #endif
 !-----------------
-      exch_tim=exch_tim+timef()-btimx
-      this_tim=timef()-btimx
-      call mpi_allreduce(this_tim,et_max,1,mpi_real,mpi_max             &
-     &                  ,mpi_comm_comp,irtn)
-      exch_tim_max=exch_tim_max+et_max
+!     exch_tim=exch_tim+timef()-btimx
+!     this_tim=timef()-btimx
+!     call mpi_allreduce(this_tim,et_max,1,mpi_real,mpi_max             &
+!    &                  ,mpi_comm_comp,irtn)
+!     exch_tim_max=exch_tim_max+et_max
 !
       btimx=timef()
 !
@@ -817,11 +800,11 @@
 #    include "HALO_NMM_L.inc"
 #endif
 !-----------------
-      exch_tim=exch_tim+timef()-btimx
-      this_tim=timef()-btimx
-      call mpi_allreduce(this_tim,et_max,1,mpi_real,mpi_max             &
-     &                  ,mpi_comm_comp,irtn)
-      exch_tim_max=exch_tim_max+et_max
+!     exch_tim=exch_tim+timef()-btimx
+!     this_tim=timef()-btimx
+!     call mpi_allreduce(this_tim,et_max,1,mpi_real,mpi_max             &
+!    &                  ,mpi_comm_comp,irtn)
+!     exch_tim_max=exch_tim_max+et_max
 !
       btimx=timef()
 !
@@ -854,11 +837,11 @@
 #    include "HALO_NMM_A.inc"
 #endif
 !-----------------
-      exch_tim=exch_tim+timef()-btimx
-      this_tim=timef()-btimx
-      call mpi_allreduce(this_tim,et_max,1,mpi_real,mpi_max             &
-     &                  ,mpi_comm_comp,irtn)
-      exch_tim_max=exch_tim_max+et_max
+!     exch_tim=exch_tim+timef()-btimx
+!     this_tim=timef()-btimx
+!     call mpi_allreduce(this_tim,et_max,1,mpi_real,mpi_max             &
+!    &                  ,mpi_comm_comp,irtn)
+!     exch_tim_max=exch_tim_max+et_max
 !
       btimx=timef()
 !
@@ -885,11 +868,11 @@
 #    include "HALO_NMM_B.inc"
 #endif
 !-----------------
-      exch_tim=exch_tim+timef()-btimx
-      this_tim=timef()-btimx
-      call mpi_allreduce(this_tim,et_max,1,mpi_real,mpi_max            &
-     &                  ,mpi_comm_comp,irtn)
-      exch_tim_max=exch_tim_max+et_max
+!     exch_tim=exch_tim+timef()-btimx
+!     this_tim=timef()-btimx
+!     call mpi_allreduce(this_tim,et_max,1,mpi_real,mpi_max            &
+!    &                  ,mpi_comm_comp,irtn)
+!     exch_tim_max=exch_tim_max+et_max
 !
       btimx=timef()
 !
@@ -912,11 +895,12 @@
 #    include "HALO_NMM_A.inc"
 #endif
 !-----------------
-        exch_tim=exch_tim+timef()-btimx
-        this_tim=timef()-btimx
-        call mpi_allreduce(this_tim,et_max,1,mpi_real,mpi_max          &
-     &                    ,mpi_comm_comp,irtn)
-        exch_tim_max=exch_tim_max+et_max
+!       exch_tim=exch_tim+timef()-btimx
+!       this_tim=timef()-btimx
+!       call mpi_allreduce(this_tim,et_max,1,mpi_real,mpi_max          &
+!    &                    ,mpi_comm_comp,irtn)
+!       exch_tim_max=exch_tim_max+et_max
+!
         GO TO 2000
       ENDIF
 !
@@ -930,11 +914,11 @@
 #    include "HALO_NMM_C.inc"
 #endif
 !-----------------
-      exch_tim=exch_tim+timef()-btimx
-      this_tim=timef()-btimx
-      call mpi_allreduce(this_tim,et_max,1,mpi_real,mpi_max            &
-     &                  ,mpi_comm_comp,irtn)
-      exch_tim_max=exch_tim_max+et_max
+!     exch_tim=exch_tim+timef()-btimx
+!     this_tim=timef()-btimx
+!     call mpi_allreduce(this_tim,et_max,1,mpi_real,mpi_max            &
+!    &                  ,mpi_comm_comp,irtn)
+!     exch_tim_max=exch_tim_max+et_max
 !
       btimx=timef()
 !
@@ -968,40 +952,40 @@
 !***  PRINT TIMING VARIABLES WHEN DESIRED.
 !----------------------------------------------------------------------
 !
-      sum_tim=pdte_tim+adve_tim+vtoa_tim+vadz_tim+hadz_tim+eps_tim     &
-     &       +vad2_tim+had2_tim+radiation_tim+rdtemp_tim+turbl_tim     &
-     &       +cltend_tim+cucnvc_tim+gsmdrive_tim+hdiff_tim             &
-     &       +bocoh_tim+pfdht_tim+ddamp_tim+bocov_tim+uv_htov_tim      &
-     &       +exch_tim
+!     sum_tim=pdte_tim+adve_tim+vtoa_tim+vadz_tim+hadz_tim+eps_tim     &
+!    &       +vad2_tim+had2_tim+radiation_tim+rdtemp_tim+turbl_tim     &
+!    &       +cltend_tim+cucnvc_tim+gsmdrive_tim+hdiff_tim             &
+!    &       +bocoh_tim+pfdht_tim+ddamp_tim+bocov_tim+uv_htov_tim      &
+!    &       +exch_tim
 !
-      n_print_time=nint(3600./dt)   ! Print timings once per hour
+      n_print_time=nint(3600./dt)   ! Print stats once per hour
 !
       if(mod(ntsd,n_print_time)==0)then
-        write(0,*)' ntsd=',ntsd,' solve_tim=',solve_tim*1.e-3          &
-     &           ,' sum_tim=',sum_tim*1.e-3
-        write(0,*)' pdte_tim=',pdte_tim*1.e-3,' pct=',pdte_tim/sum_tim*100.
-        write(0,*)' adve_tim=',adve_tim*1.e-3,' pct=',adve_tim/sum_tim*100.
-        write(0,*)' vtoa_tim=',vtoa_tim*1.e-3,' pct=',vtoa_tim/sum_tim*100.
-        write(0,*)' vadz_tim=',vadz_tim*1.e-3,' pct=',vadz_tim/sum_tim*100.
-        write(0,*)' hadz_tim=',hadz_tim*1.e-3,' pct=',hadz_tim/sum_tim*100.
-        write(0,*)' eps_tim=',eps_tim*1.e-3,' pct=',eps_tim/sum_tim*100.
-        write(0,*)' vad2_tim=',vad2_tim*1.e-3,' pct=',vad2_tim/sum_tim*100.
-        write(0,*)' had2_tim=',had2_tim*1.e-3,' pct=',had2_tim/sum_tim*100.
-        write(0,*)' radiation_tim=',radiation_tim*1.e-3,' pct=',radiation_tim/sum_tim*100.
-        write(0,*)' rdtemp_tim=',rdtemp_tim*1.e-3,' pct=',rdtemp_tim/sum_tim*100.
-        write(0,*)' turbl_tim=',turbl_tim*1.e-3,' pct=',turbl_tim/sum_tim*100.
-        write(0,*)' cltend_tim=',cltend_tim*1.e-3,' pct=',cltend_tim/sum_tim*100.
-        write(0,*)' cucnvc_tim=',cucnvc_tim*1.e-3,' pct=',cucnvc_tim/sum_tim*100.
-        write(0,*)' gsmdrive_tim=',gsmdrive_tim*1.e-3,' pct=',gsmdrive_tim/sum_tim*100.
-        write(0,*)' hdiff_tim=',hdiff_tim*1.e-3,' pct=',hdiff_tim/sum_tim*100.
-        write(0,*)' bocoh_tim=',bocoh_tim*1.e-3,' pct=',bocoh_tim/sum_tim*100.
-        write(0,*)' pfdht_tim=',pfdht_tim*1.e-3,' pct=',pfdht_tim/sum_tim*100.
-        write(0,*)' ddamp_tim=',ddamp_tim*1.e-3,' pct=',ddamp_tim/sum_tim*100.
-        write(0,*)' bocov_tim=',bocov_tim*1.e-3,' pct=',bocov_tim/sum_tim*100.
-        write(0,*)' uv_h_to_v_tim=',uv_htov_tim*1.e-3,' pct=',uv_htov_tim/sum_tim*100.
-        write(0,*)' exch_tim=',exch_tim*1.e-3,' pct=',exch_tim/sum_tim*100.
-        call time_stats(exch_tim,'exchange',ntsd,mype,npes,mpi_comm_comp)
-        write(0,*)' exch_tim_max=',exch_tim_max*1.e-3
+!       write(0,*)' ntsd=',ntsd,' solve_tim=',solve_tim*1.e-3          &
+!    &           ,' sum_tim=',sum_tim*1.e-3
+!       write(0,*)' pdte_tim=',pdte_tim*1.e-3,' pct=',pdte_tim/sum_tim*100.
+!       write(0,*)' adve_tim=',adve_tim*1.e-3,' pct=',adve_tim/sum_tim*100.
+!       write(0,*)' vtoa_tim=',vtoa_tim*1.e-3,' pct=',vtoa_tim/sum_tim*100.
+!       write(0,*)' vadz_tim=',vadz_tim*1.e-3,' pct=',vadz_tim/sum_tim*100.
+!       write(0,*)' hadz_tim=',hadz_tim*1.e-3,' pct=',hadz_tim/sum_tim*100.
+!       write(0,*)' eps_tim=',eps_tim*1.e-3,' pct=',eps_tim/sum_tim*100.
+!       write(0,*)' vad2_tim=',vad2_tim*1.e-3,' pct=',vad2_tim/sum_tim*100.
+!       write(0,*)' had2_tim=',had2_tim*1.e-3,' pct=',had2_tim/sum_tim*100.
+!       write(0,*)' radiation_tim=',radiation_tim*1.e-3,' pct=',radiation_tim/sum_tim*100.
+!       write(0,*)' rdtemp_tim=',rdtemp_tim*1.e-3,' pct=',rdtemp_tim/sum_tim*100.
+!       write(0,*)' turbl_tim=',turbl_tim*1.e-3,' pct=',turbl_tim/sum_tim*100.
+!       write(0,*)' cltend_tim=',cltend_tim*1.e-3,' pct=',cltend_tim/sum_tim*100.
+!       write(0,*)' cucnvc_tim=',cucnvc_tim*1.e-3,' pct=',cucnvc_tim/sum_tim*100.
+!       write(0,*)' gsmdrive_tim=',gsmdrive_tim*1.e-3,' pct=',gsmdrive_tim/sum_tim*100.
+!       write(0,*)' hdiff_tim=',hdiff_tim*1.e-3,' pct=',hdiff_tim/sum_tim*100.
+!       write(0,*)' bocoh_tim=',bocoh_tim*1.e-3,' pct=',bocoh_tim/sum_tim*100.
+!       write(0,*)' pfdht_tim=',pfdht_tim*1.e-3,' pct=',pfdht_tim/sum_tim*100.
+!       write(0,*)' ddamp_tim=',ddamp_tim*1.e-3,' pct=',ddamp_tim/sum_tim*100.
+!       write(0,*)' bocov_tim=',bocov_tim*1.e-3,' pct=',bocov_tim/sum_tim*100.
+!       write(0,*)' uv_h_to_v_tim=',uv_htov_tim*1.e-3,' pct=',uv_htov_tim/sum_tim*100.
+!       write(0,*)' exch_tim=',exch_tim*1.e-3,' pct=',exch_tim/sum_tim*100.
+!       call time_stats(exch_tim,'exchange',ntsd,mype,npes,mpi_comm_comp)
+!       write(0,*)' exch_tim_max=',exch_tim_max*1.e-3
 !
         call field_stats(t,mype,mpi_comm_comp                          &
      &                  ,ids,ide,jds,jde,kds,kde                       &
@@ -1009,9 +993,6 @@
      &                  ,its,ite,jts,jte,kts,kte)
       endif
 !
-!     if(ntsd==1200)then
-!       call hpm_print()
-!     endif
 !     if(last_time)then
 #define COPY_OUT
 #include <nmm_scalar_derefs.inc>
@@ -1216,11 +1197,12 @@
   100 FORMAT(' EXIT ',A,' AT NTSD=',I5)
       IEND=ITE
       S_BDY=(JTS==JDS)
-      E_BDY=(ITE==JDE)
+      E_BDY=(ITE==IDE-1)
 !
       DO J=JTS,JTE
+      IEND=ITE
       DO K=KTS,KTE
-      IF(E_BDY)IEND=ITE-1
+      IF(E_BDY.AND.MOD(J,2)==0)IEND=ITE-1
 !
       DO I=ITS,IEND
         IF(T(I,K,J)>330..OR.T(I,K,J)<180..OR.T(I,K,J)/=T(I,K,J))THEN
@@ -1248,7 +1230,17 @@
      &,          ' AT (',I3,',',I2,',',I3,')',' MYPE=',I3)
 !         CALL WRF_ERROR_FATAL(ERRMESS)
 !         CALL MPI_ABORT(MPI_COMM_WORLD,1,IERR)
-        ELSEIF(ABS(U(I,K,J))>125..OR.ABS(V(I,K,J))>125.                &
+        ENDIF
+      ENDDO
+      ENDDO
+      ENDDO
+!
+      DO J=JTS,JTE
+      IEND=ITE
+      DO K=KTS,KTE
+      IF(E_BDY.AND.MOD(J,2)==1)IEND=ITE-1
+      DO I=ITS,IEND
+        IF(ABS(U(I,K,J))>125..OR.ABS(V(I,K,J))>125.                    &
      &         .OR.U(I,K,J)/=U(I,K,J).OR.V(I,K,J)/=V(I,K,J))THEN
           WRITE(0,100)NAME,NTSD
           WRITE(0,400)I,J,K,U(I,K,J),V(I,K,J),MYPE,NTSD
@@ -1567,7 +1559,7 @@
 !----------------------------------------------------------------------
 !
       I_BY_J=(IDE-IDS)*(JDE-JDS)-(JDE-JDS-1)/2  ! This assumes that
-                                                ! IDE AND JDE are each
+                                                ! IDE and JDE are each
                                                 ! one greater than the
                                                 ! true grid size.
 !
@@ -1618,7 +1610,7 @@
      &                (POINTS*(POINTS-1)))
           RMS=SQRT(SUMF2_0(K)/POINTS)
           KFLIP=KTE-K+1
-          WRITE(0,101)KFLIP,FMAX_0(KFLIP),FMIN_0(KFLIP)
+          WRITE(0,101)KFLIP,FMAX_0(K),FMIN_0(K)
           WRITE(0,102)F_MEAN,ST_DEV,RMS
   101     FORMAT(' LAYER=',I2,' MAX=',E13.6,' MIN=',E13.6)
   102     FORMAT(9X,' MEAN=',E13.6,' STDEV=',E13.6,' RMS=',E13.6)

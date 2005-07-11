@@ -45,8 +45,10 @@ SUBROUTINE solve_interface ( grid )
 
    IF ( config_flags%dyn_opt == DYN_NODYN  ) THEN
 
+     CALL wrf_debug( 1 , "solve_interface: dynamics disabled\n" )
+
 #if (EM_CORE == 1 && DA_CORE != 1)
-   ELSE IF ((config_flags%dyn_opt == DYN_EM) .or. (config_flags%dyn_opt == DYN_EM_SN)) THEN
+   ELSE IF ( config_flags%dyn_opt == DYN_EM  ) THEN
      CALL solve_em  ( grid , config_flags , &
 !
 # include <em_actual_args.inc>

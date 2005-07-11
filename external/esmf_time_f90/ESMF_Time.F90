@@ -91,22 +91,22 @@
 ! !PUBLIC MEMBER FUNCTIONS:
       public ESMF_TimeGet
       public ESMF_TimeSet
-      public ESMF_TimeGetCalendar
-      public ESMF_TimeSetCalendar
-      public ESMF_TimeIsSameCal
-      public ESMF_TimeGetTimezone
-      public ESMF_TimeSetTimezone
-      public ESMF_TimeGetString
-      public ESMF_TimeGetDayOfYear
-      public ESMF_TimeGetDayOfWeek
-      public ESMF_TimeGetDayOfMonth
-      public ESMF_TimeGetMidMonth
-      public ESMF_TimeGetRealTime
+!      public ESMF_TimeGetCalendar
+!      public ESMF_TimeSetCalendar
+!      public ESMF_TimeIsSameCal
+!      public ESMF_TimeGetTimezone
+!      public ESMF_TimeSetTimezone
+      public ESMFold_TimeGetString
+!      public ESMF_TimeGetDayOfYear
+!      public ESMF_TimeGetDayOfWeek
+!      public ESMF_TimeGetDayOfMonth
+!      public ESMF_TimeGetMidMonth
+!      public ESMF_TimeGetRealTime
 
 ! Required inherited and overridden ESMF_Base class methods
 
-      public ESMF_TimeRead
-      public ESMF_TimeWrite
+!      public ESMF_TimeRead
+!      public ESMF_TimeWrite
       public ESMF_TimeValidate
       public ESMF_TimePrint
 
@@ -469,6 +469,13 @@
       IF ( PRESENT( S ) ) THEN
         S = mod( time%basetime%S , 3600 )
       ENDIF
+      ! TBH:  HACK to allow DD and S to behave as in ESMF 2.1.0+ when 
+      ! TBH:  both are present and H and M are not.  
+      IF ( PRESENT( S ) .AND. PRESENT( DD ) ) THEN
+        IF ( ( .NOT. PRESENT( H ) ) .AND. ( .NOT. PRESENT( M ) ) ) THEN
+          S = time%basetime%S
+        ENDIF
+      ENDIF
       IF ( PRESENT( MS ) ) THEN
         MS = time%basetime%MS
       ENDIF
@@ -480,7 +487,7 @@
         CALL ESMF_TimeGetDayOfYear( time, dayOfYear, rc=ierr )
       ENDIF
       IF ( PRESENT( timeString ) ) THEN
-        CALL ESMF_TimeGetString( time, timeString, rc=ierr )
+        CALL ESMFold_TimeGetString( time, timeString, rc=ierr )
       ENDIF
 
       IF ( PRESENT( rc ) ) THEN
@@ -892,10 +899,10 @@
 
 !------------------------------------------------------------------------------
 !BOP
-! !IROUTINE:  ESMF_TimeGetString - Get time instant value in string format
+! !IROUTINE:  ESMFold_TimeGetString - Get time instant value in string format
 
 ! !INTERFACE:
-      subroutine ESMF_TimeGetString(time, TimeString, rc)
+      subroutine ESMFold_TimeGetString(time, TimeString, rc)
 
 ! !ARGUMENTS:
       type(ESMF_Time), intent(in) :: time
@@ -927,14 +934,12 @@
              mod( time%basetime%S / 60 , 60 ), &
              mod( time%basetime%S  , 60 )
 
-!write(0,*)' ESMF_TimeGetString time%basetime%Sn ',time%basetime%Sn,' time%basetime%Sd ',time%basetime%Sd
-
       rc = ESMF_SUCCESS
 #else
       call c_ESMC_TimeGetString(time, TimeString, rc)
 #endif
 
-      end subroutine ESMF_TimeGetString
+      end subroutine ESMFold_TimeGetString
 
 !------------------------------------------------------------------------------
 !BOP
@@ -1265,7 +1270,7 @@
       ESMF_TimeDec = time
 
       ! call ESMC_BaseTime base class function
-       call c_ESMC_BaseTimeDiff(time, timeinterval, ESMF_TimeDec)
+       call c_ESMC_BaseTimeDec(time, timeinterval, ESMF_TimeDec)
 
       end function ESMF_TimeDec
 

@@ -1572,79 +1572,59 @@
 !-----------------------------------------------------------------------
 !
 
-      ALLOCATE(SFULL(KMS:KME),STAT=I)
-      ALLOCATE(SMID(KMS:KME),STAT=I)
-      ALLOCATE(EMISS(IMS:IME,JMS:JME),STAT=I)
-      ALLOCATE(GLW(IMS:IME,JMS:JME),STAT=I)
-      ALLOCATE(GSW(IMS:IME,JMS:JME),STAT=I)
-      ALLOCATE(HFX(IMS:IME,JMS:JME),STAT=I)
-      ALLOCATE(LOWLYR(IMS:IME,JMS:JME),STAT=I)
-      ALLOCATE(MAVAIL(IMS:IME,JMS:JME),STAT=I)
-      ALLOCATE(NCA(IMS:IME,JMS:JME),STAT=I)
-      ALLOCATE(QFX(IMS:IME,JMS:JME),STAT=I)
-      ALLOCATE(RAINBL(IMS:IME,JMS:JME),STAT=I)
-      ALLOCATE(RAINC(IMS:IME,JMS:JME),STAT=I)
-      ALLOCATE(RAINCV(IMS:IME,JMS:JME),STAT=I)
-      ALLOCATE(RAINNC(IMS:IME,JMS:JME),STAT=I)
-      ALLOCATE(RAINNCV(IMS:IME,JMS:JME),STAT=I)
+      ALLOCATE(SFULL(KMS:KME),STAT=I)           ; SFULL    = 0.
+      ALLOCATE(SMID(KMS:KME),STAT=I)            ; SMID     = 0.
+      ALLOCATE(EMISS(IMS:IME,JMS:JME),STAT=I)   ; EMISS    = 0.
+      ALLOCATE(GLW(IMS:IME,JMS:JME),STAT=I)     ; GLW      = 0.
+      ALLOCATE(GSW(IMS:IME,JMS:JME),STAT=I)     ; GSW      = 0.
+      ALLOCATE(HFX(IMS:IME,JMS:JME),STAT=I)     ; HFX      = 0.
+      ALLOCATE(LOWLYR(IMS:IME,JMS:JME),STAT=I)  ; LOWLYR   = 0.
+      ALLOCATE(MAVAIL(IMS:IME,JMS:JME),STAT=I)  ; MAVAIL   = 0.
+      ALLOCATE(NCA(IMS:IME,JMS:JME),STAT=I)     ; NCA      = 0.
+      ALLOCATE(QFX(IMS:IME,JMS:JME),STAT=I)     ; QFX      = 0.
+      ALLOCATE(RAINBL(IMS:IME,JMS:JME),STAT=I)  ; RAINBL   = 0.
+      ALLOCATE(RAINC(IMS:IME,JMS:JME),STAT=I)   ; RAINC    = 0.
+      ALLOCATE(RAINCV(IMS:IME,JMS:JME),STAT=I)  ; RAINCV   = 0.
+      ALLOCATE(RAINNC(IMS:IME,JMS:JME),STAT=I)  ; RAINNC   = 0.
+      ALLOCATE(RAINNCV(IMS:IME,JMS:JME),STAT=I) ; RAINNCV  = 0.
 
-      ALLOCATE(ZS(KMS:KME),STAT=I)
-      ALLOCATE(SNOWC(IMS:IME,JMS:JME),STAT=I)
-      ALLOCATE(THC(IMS:IME,JMS:JME),STAT=I)
-      ALLOCATE(TMN(IMS:IME,JMS:JME),STAT=I)
-      ALLOCATE(TSFC(IMS:IME,JMS:JME),STAT=I)
-      ALLOCATE(XLAND(IMS:IME,JMS:JME),STAT=I)
-      ALLOCATE(XLAT(IMS:IME,JMS:JME),STAT=I)
-      ALLOCATE(XLONG(IMS:IME,JMS:JME),STAT=I)
-      ALLOCATE(Z0_DUM(IMS:IME,JMS:JME),STAT=I)
+      ALLOCATE(ZS(KMS:KME),STAT=I)              ; ZS       = 0.
+      ALLOCATE(SNOWC(IMS:IME,JMS:JME),STAT=I)   ; SNOWC    = 0.
+      ALLOCATE(THC(IMS:IME,JMS:JME),STAT=I)     ; THC      = 0.
+      ALLOCATE(TMN(IMS:IME,JMS:JME),STAT=I)     ; TMN      = 0.
+      ALLOCATE(TSFC(IMS:IME,JMS:JME),STAT=I)    ; TSFC     = 0.
+      ALLOCATE(XLAND(IMS:IME,JMS:JME),STAT=I)   ; XLAND    = 0.
+      ALLOCATE(XLAT(IMS:IME,JMS:JME),STAT=I)    ; XLAT     = 0.
+      ALLOCATE(XLONG(IMS:IME,JMS:JME),STAT=I)   ; XLONG    = 0.
+      ALLOCATE(Z0_DUM(IMS:IME,JMS:JME),STAT=I)  ; Z0_DUM   = 0.
 
-!state    real   DZS             l        dyn_em      -         Z     ir 
-      ALLOCATE(DZS(KMS:KME),STAT=I)
-!state    real  CLDFRA          ikj      dyn_em        1         -      r
-      ALLOCATE(CLDFRA(IMS:IME,KMS:KME, JMS:JME),STAT=I)
-!state    real  RQCBLTEN        ikj      dyn_em        1         -      r
-      ALLOCATE(RQCBLTEN(IMS:IME,KMS:KME,JMS:JME),STAT=I)
-!state    real  RQIBLTEN        ikj      dyn_em        1         -      r
-      ALLOCATE(RQIBLTEN(IMS:IME,KMS:KME,JMS:JME),STAT=I)
-!state    real  RQVBLTEN        ikj      dyn_em        1         -      r
-      ALLOCATE(RQVBLTEN(IMS:IME,KMS:KME,JMS:JME),STAT=I)
-!state    real  RTHBLTEN        ikj      dyn_em        1         -      r
-      ALLOCATE(RTHBLTEN(IMS:IME,KMS:KME,JMS:JME),STAT=I)
-!state    real  RUBLTEN         ikj      dyn_em        1         -      r
-      ALLOCATE(RUBLTEN(IMS:IME,KMS:KME,JMS:JME),STAT=I)
-!state    real  RVBLTEN         ikj      dyn_em        1         -      r
-      ALLOCATE(RVBLTEN(IMS:IME,KMS:KME,JMS:JME),STAT=I)
-!state    real  RQCCUTEN        ikj      dyn_em        1         -      r
-      ALLOCATE(RQCCUTEN(IMS:IME,KMS:KME,JMS:JME),STAT=I)
-!state    real  RQICUTEN        ikj      dyn_em        1         -      r
-      ALLOCATE(RQICUTEN(IMS:IME,KMS:KME,JMS:JME),STAT=I)
-!state    real  RQRCUTEN        ikj      dyn_em        1         -      r
-      ALLOCATE(RQRCUTEN(IMS:IME,KMS:KME,JMS:JME),STAT=I)
-!state    real  RQSCUTEN        ikj      dyn_em        1         -      r
-      ALLOCATE(RQSCUTEN(IMS:IME,KMS:KME,JMS:JME),STAT=I)
-!state    real  RQVCUTEN        ikj      dyn_em        1         -      r
-      ALLOCATE(RQVCUTEN(IMS:IME,KMS:KME,JMS:JME),STAT=I)
-!state    real  RTHCUTEN        ikj      dyn_em        1         -      r
-      ALLOCATE(RTHCUTEN(IMS:IME,KMS:KME,JMS:JME),STAT=I)
-!state    real  RTHRATEN        ikj      dyn_em        1         -      r
-      ALLOCATE(RTHRATEN(IMS:IME,KMS:KME,JMS:JME),STAT=I)
-!state    real  RTHRATENLW      ikj      dyn_em        1         -      r
-      ALLOCATE(RTHRATENLW(IMS:IME,KMS:KME,JMS:JME),STAT=I)
-!state    real  RTHRATENSW      ikj      dyn_em        1         -      r
-      ALLOCATE(RTHRATENSW(IMS:IME,KMS:KME,JMS:JME),STAT=I)
-!state    real   TSLB           ilj       dyn_em      1         Z     irh
-      ALLOCATE(TSLB(IMS:IME,KMS:KME,JMS:JME),STAT=I)
-!state    real   ZS              l        dyn_em      -         Z     ir 
-
+      ALLOCATE(DZS(KMS:KME),STAT=I)                         ; DZS = 0.
+      ALLOCATE(CLDFRA(IMS:IME,KMS:KME, JMS:JME),STAT=I)     ; CLDFRA = 0.
+      ALLOCATE(RQCBLTEN(IMS:IME,KMS:KME,JMS:JME),STAT=I)    ; RQCBLTEN = 0.
+      ALLOCATE(RQIBLTEN(IMS:IME,KMS:KME,JMS:JME),STAT=I)    ; RQIBLTEN = 0.
+      ALLOCATE(RQVBLTEN(IMS:IME,KMS:KME,JMS:JME),STAT=I)    ; RQVBLTEN =  0.
+      ALLOCATE(RTHBLTEN(IMS:IME,KMS:KME,JMS:JME),STAT=I)    ; RTHBLTEN =  0.
+      ALLOCATE(RUBLTEN(IMS:IME,KMS:KME,JMS:JME),STAT=I)     ; RUBLTEN = 0.
+      ALLOCATE(RVBLTEN(IMS:IME,KMS:KME,JMS:JME),STAT=I)     ; RVBLTEN = 0.
+      ALLOCATE(RQCCUTEN(IMS:IME,KMS:KME,JMS:JME),STAT=I)    ; RQCCUTEN = 0.
+      ALLOCATE(RQICUTEN(IMS:IME,KMS:KME,JMS:JME),STAT=I)    ; RQICUTEN  = 0.
+      ALLOCATE(RQRCUTEN(IMS:IME,KMS:KME,JMS:JME),STAT=I)    ; RQRCUTEN = 0.
+      ALLOCATE(RQSCUTEN(IMS:IME,KMS:KME,JMS:JME),STAT=I)    ; RQSCUTEN = 0.
+      ALLOCATE(RQVCUTEN(IMS:IME,KMS:KME,JMS:JME),STAT=I)    ; RQVCUTEN = 0.
+      ALLOCATE(RTHCUTEN(IMS:IME,KMS:KME,JMS:JME),STAT=I)    ; RTHCUTEN = 0.
+      ALLOCATE(RTHRATEN(IMS:IME,KMS:KME,JMS:JME),STAT=I)    ; RTHRATEN  = 0.
+      ALLOCATE(RTHRATENLW(IMS:IME,KMS:KME,JMS:JME),STAT=I)  ; RTHRATENLW = 0.
+      ALLOCATE(RTHRATENSW(IMS:IME,KMS:KME,JMS:JME),STAT=I)  ; RTHRATENSW = 0.
+      ALLOCATE(TSLB(IMS:IME,KMS:KME,JMS:JME),STAT=I)        ; TSLB = 0.
 #if 0
-      ALLOCATE(W0AVG(IMS:IME,KMS:KME,JMS:JME),STAT=I)
+      ALLOCATE(W0AVG(IMS:IME,KMS:KME,JMS:JME),STAT=I)       ; W0AVG = 0.
 #endif
 !-----------------------------------------------------------------------
 !jm added set of g_inv
       write(0,*)' start nrads=',nrads,' nradl=',nradl,' nphs=',nphs,' ncnvc=',ncnvc
       G_INV=1./G
       ROG=R_D*G_INV
-      RADT=NRADS/60.
+      RADT=NRADS*DT/60.
       BLDT=NPHS*DT/60.
       CUDT=NCNVC*DT/60.
       GSMDT=NPHS*DT/60.
@@ -1688,6 +1668,7 @@
       PDBOT=PDTOT-PDTOP
       SFULL(KTS)=1.
       SFULL(KTE)=0.
+      dsigsum = 0.
       DO K=KTS+1,KTE
         DSIG=(DETA1(K-1)*PDTOP+DETA2(K-1)*PDBOT)*RPDTOT
         dsigsum=dsigsum+dsig
@@ -1733,6 +1714,7 @@
      &             ,ACSNOM,IVGTYP,ISLTYP,SFCEVP,SMOIS                   &
      &             ,SH2O, SNOWH, SMFR3D                                 &  ! temporary
      &             ,DX,DY,F_ICE_PHY,F_RAIN_PHY,F_RIMEF_PHY              &
+     &             ,MP_RESTART_STATE,TBPVS_STATE,TBPVS0_STATE           &
      &             ,.TRUE.,.FALSE.                                      &
      &             ,ids, ide, jds, jde, kds, kde                        &
      &             ,ims, ime, jms, jme, kms, kme                        &

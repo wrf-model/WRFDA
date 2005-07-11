@@ -14,20 +14,22 @@ CPPFLAGS = -C -P
 
 .SUFFIXES:      .F90 .F .f .c .o
 
-all : libio_grib1.a wgrib_exe
+all : libio_grib1.a wgrib
 
-wgrib_exe :
+wgrib : 
 	( cd WGRIB ; make "CC=$(CC)" )
-	( cd .. ; ln -sf WGRIB/wgrib . )
+	ln -sf WGRIB/wgrib .
 
 libio_grib1.a:		$(OBJS)
 			/bin/rm -f libio_grib1.a
 			$(AR) cr libio_grib1.a $(OBJSL)
 			$(RANLIB) libio_grib1.a
 
-io_grib1.o: io_grib1.F90
-	$(CPP) $(CPPFLAGS) -I../../main io_grib1.F90 | $(M4) - > io_grib1.f
-	$(FC) $(FCFLAGS) -I../../main -I../../inc -c io_grib1.f
+io_grib1.o:     io_grib1.F 
+	mv $*.F $*.F90
+	$(CPP) $(CPPFLAGS) -I. -I../ioapi_share io_grib1.F90 | $(M4) - > io_grib1.f
+	$(FC) $(FCFLAGS) -c io_grib1.f
+	mv $*.F90 $*.F
 
 pdstool.o: pdstool.c pdstool.h
 
@@ -93,7 +95,7 @@ superclean: clean
 clean:  
 			/bin/rm -f  *.f *.o *.mod
 			( cd WGRIB ; make clean )
-			/bin/rm wgrib
+			/bin/rm -f wgrib
 
 .c.o:
 	$(CC) -c $(CFLAGS) $*.c

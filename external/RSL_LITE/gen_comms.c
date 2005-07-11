@@ -11,7 +11,7 @@
 static int parent_type;
 
 int
-gen_halos ( char * dirname )
+gen_halos ( char * dirname , char * incname , node_t * halos )
 {
   node_t * p, * q ;
   node_t * dimd ;
@@ -35,10 +35,15 @@ gen_halos ( char * dirname )
 
   if ( dirname == NULL ) return(1) ;
 
-  for ( p = Halos ; p != NULL ; p = p->next )
+  for ( p = halos ; p != NULL ; p = p->next )
   {
-    strcpy( commname, p->name ) ;
-    make_upper_case(commname) ;
+    if ( incname == NULL ) {
+      strcpy( commname, p->name ) ;
+      make_upper_case(commname) ;
+    } 
+    else {
+      strcpy( commname, incname ) ;
+    }
     if ( strlen(dirname) > 0 ) { sprintf(fname,"%s/%s.inc",dirname,commname) ; }
     else                       { sprintf(fname,"%s.inc",commname) ; }
     if ((fp = fopen( fname , "w" )) == NULL ) 
@@ -135,14 +140,14 @@ fprintf(fp,"CALL wrf_debug(2,'calling %s')\n",fname) ;
             else
             {
               if        ( ! strcmp( q->type->name, "real") ) {
-                if         ( q->ndims == 3 )      n3dR++ ;
-	        else    if ( q->ndims == 2 )      n2dR++ ;
+                if         ( q->ndims == 3 )      { n3dR++ ; }
+	        else    if ( q->ndims == 2 )      { n2dR++ ; }
 	      } else if ( ! strcmp( q->type->name, "integer") ) {
-                if         ( q->ndims == 3 )      n3dI++ ;
-	        else    if ( q->ndims == 2 )      n2dI++ ;
+                if         ( q->ndims == 3 )      { n3dI++ ; }
+	        else    if ( q->ndims == 2 )      { n2dI++ ; }
 	      } else if ( ! strcmp( q->type->name, "doubleprecision") ) {
-                if         ( q->ndims == 3 )      n3dD++ ;
-	        else    if ( q->ndims == 2 )      n2dD++ ;
+                if         ( q->ndims == 3 )      { n3dD++ ; }
+	        else    if ( q->ndims == 2 )      { n2dD++ ; }
 	      }
 	    }
 	  }
@@ -508,6 +513,8 @@ gen_shift (  char * dirname )
   char fname[NAMELEN], vname[NAMELEN] ;
   char indices[NAMELEN], post[NAMELEN], tmp3[NAMELEN] ;
   int zdex ;
+  node_t Shift ;
+int said_it = 0 ;
 
   for ( direction = directions ; *direction != NULL ; direction++ )
   {
@@ -515,12 +522,106 @@ gen_shift (  char * dirname )
   {
     corename = get_corename_i(ncore) ;
     if ( dirname == NULL || corename == NULL ) return(1) ;
-    if ( strlen(dirname) > 0 )
-     { sprintf(fname,"%s/%s_shift_halo_%s.inc",dirname,corename,*direction) ; }
-    else
-     { sprintf(fname,"%s_shift_halo_%s.inc",corename,*direction) ; }
-    if ((fp = fopen( fname , "w" )) == NULL ) return(1) ;
-    print_warning(fp,fname) ;
+    sprintf(fname,"%s_shift_halo_%s",corename,*direction) ;
+
+    Shift.next = NULL ;
+    sprintf( Shift.use, "dyn_%s", corename ) ;
+    strcpy( Shift.comm_define, "48:" ) ;
+    for ( p = Domain.fields ; p != NULL ; p = p->next ) {
+      if (( p->node_kind & (FIELD | FOURD) ) && p->ndims >= 2 && ! p->boundary_array &&
+          ((!strncmp(p->use,"dyn_",4) && !strcmp(corename,p->use+4)) || strncmp(p->use,"dyn_",4)))
+      {
+if ( !strcmp( p->name , "xf_ens" ) || !strcmp( p->name,"pr_ens" ) )  {
+  if ( sw_move && ! said_it ) { fprintf(stderr,"Info only - not an error: Moving nests not implemented for Grell Ens. Cumulus\n") ;
+  said_it = 1 ; }
+  continue ;
+}
+        if ( p->type->type_type == SIMPLE )
+        {
+          for ( i = 1 ; i <= p->ntl ; i++ )
+          {
+            if ( p->ntl > 1 ) sprintf(vname,"%s_%d",p->name,i ) ;
+            else              sprintf(vname,"%s",p->name ) ;
+
+            strcat( Shift.comm_define, vname ) ;
+            strcat( Shift.comm_define, "," ) ;
+          }
+        }
+      }
+    }
+    if ( strlen(Shift.comm_define) > 0 )Shift.comm_define[strlen(Shift.comm_define)-1] = '\0' ;
+
+    gen_halos( dirname , fname, &Shift ) ;
+
+    if ( strlen(dirname) > 0 ) { sprintf(fname,"%s/%s_shift_halo_%s.inc",dirname,corename,*direction) ; }
+    else                       { sprintf(fname,"%s_shift_halo_%s.inc",corename,*direction) ; }
+    if ((fp = fopen( fname , "a" )) == NULL ) return(1) ;
+
+/* now generate the shifts themselves */
+    for ( p = Domain.fields ; p != NULL ; p = p->next )
+    {
+
+if ( !strcmp( p->name , "xf_ens" ) || !strcmp( p->name,"pr_ens" ) )  {
+  continue ;
+}
+      if (( p->node_kind & (FIELD | FOURD) ) && p->ndims >= 2 && ! p->boundary_array &&
+	  ((!strncmp(p->use,"dyn_",4) && !strcmp(corename,p->use+4)) || strncmp(p->use,"dyn_",4)))
+      {
+	if ( p->type->type_type == SIMPLE )
+	{
+	  for ( i = 1 ; i <= p->ntl ; i++ )
+	  {
+            if ( p->ntl > 1 ) sprintf(vname,"%s_%d",p->name,i ) ;
+            else              sprintf(vname,"%s",p->name ) ;
+	    if ( p->node_kind & FOURD )
+            {
+              node_t *member ;
+              zdex = get_index_for_coord( p , COORD_Z ) ;
+              if ( zdex >=1 && zdex <= 3 )
+              {
+                for ( member = p->members ; member != NULL ; member = member->next )
+                {
+                  if ( strcmp( member->name, "-" ) )
+                  {
+                    if ( !strcmp( *direction, "x" ) )
+                    {
+                      fprintf(fp,
+   "  if ( P_%s .GT. 1 ) %s ( ips:min(ide%s,ipe),:,jms:jme,P_%s) = %s (ips+px:min(ide%s,ipe)+px,:,jms:jme,P_%s)\n",
+                       member->name, vname, member->stag_x?"":"-1", member->name, vname, member->stag_x?"":"-1", member->name ) ;
+                    }
+                    else
+                    {
+                      fprintf(fp,
+   "  if ( P_%s .GT. 1 ) %s ( ims:ime,:,jps:min(jde%s,jpe),P_%s) = %s (ims:ime,:,jps+py:min(jde%s,jpe)+py,P_%s)\n",
+                       member->name, vname, member->stag_y?"":"-1", member->name, vname, member->stag_y?"":"-1", member->name ) ;
+                    }
+                  }
+                }
+              }
+              else
+              {
+                fprintf(stderr,"WARNING: %d some dimension info missing for 4d array %s\n",zdex,t2) ;
+              }
+            }
+            else
+	    {
+	      char * vdim ;
+	      vdim = "" ;
+	      if ( p->ndims == 3 ) vdim = ":," ;
+              if ( !strcmp( *direction, "x" ) )
+              {
+                fprintf(fp,"%s (ips:min(ide%s,ipe),%sjms:jme) = %s (ips+px:min(ide%s,ipe)+px,%sjms:jme)\n", vname,  p->stag_x?"":"-1", vdim, vname, p->stag_x?"":"-1", vdim ) ;
+              }
+              else
+	      {
+                fprintf(fp,"%s (ims:ime,%sjps:min(jde%s,jpe)) = %s (ims:ime,%sjps+py:min(jde%s,jpe)+py)\n", vname, vdim,  p->stag_y?"":"-1", vname, vdim, p->stag_y?"":"-1" ) ;
+              }
+            }
+	  }
+	}
+      }
+    }
+
     close_the_file(fp) ;
   }
   }
@@ -636,6 +737,7 @@ gen_nest_pack ( char * dirname )
   char pdim[3][2][NAMELEN] ;
   char vname[NAMELEN] ; char tag[NAMELEN] ; char core[NAMELEN] ;
   int d2, d3 ;
+  char *info_name ;
 
   for ( fnp = fnlst , ipath = 0 ; *fnp ; fnp++ , ipath++ )
   {
@@ -667,53 +769,41 @@ gen_nest_pack ( char * dirname )
       if ( d2 + d3 > 0 ) {
         if ( down_path[ipath] == INTERP_UP )
         {
-
-          fprintf(fp,"msize = %d * nlev + %d\n", d3, d2 ) ;
-          fprintf(fp,"CALL rsl_lite_to_parent_info( msize*RWORDSIZE                              &\n") ;
-          fprintf(fp,"                        ,cips,cipe,cjps,cjpe                               &\n") ;
-          fprintf(fp,"                        ,nids,nide,njds,njde                               &\n") ;
-          fprintf(fp,"                        ,ntasks_x,ntasks_y                                 &\n") ;
-          fprintf(fp,"                        ,nig,njg,cm,cn,pig,pjg,retval )\n") ;
-          fprintf(fp,"DO while ( retval .eq. 1 )\n") ;
- 
-          gen_nest_packunpack ( fp , Domain.fields, corename, PACKIT, down_path[ipath] ) ;
-
-          fprintf(fp,"CALL rsl_lite_to_parent_info( grid%%domdesc, intermediate_grid%%domdesc ,  &\n") ;
-          fprintf(fp,"                         msize*RWORDSIZE,                             &\n") ;
-          fprintf(fp,"                         i,j,nig,njg,cm,cn,pig,pjg,retval )\n") ;
-          fprintf(fp,"ENDDO\n") ;
-
+          info_name = "rsl_lite_to_parent_info" ;
         }
         else
         {
-
-          fprintf(fp,"msize = %d * nlev + %d\n", d3, d2 ) ;
-
-          fprintf(fp,"CALL rsl_lite_to_child_info( msize*RWORDSIZE                               &\n") ;
-          fprintf(fp,"                        ,cips,cipe,cjps,cjpe                               &\n") ;
-          fprintf(fp,"                        ,nids,nide,njds,njde                               &\n") ;
-          fprintf(fp,"                        ,ntasks_x,ntasks_y                                 &\n") ; 
-          fprintf(fp,"                        ,icoord,jcoord                                     &\n") ;
-          fprintf(fp,"                        ,idim_cd,jdim_cd                                   &\n") ;
-          fprintf(fp,"                        ,pig,pjg,retval )\n") ;
-
-          fprintf(fp,"DO while ( retval .eq. 1 )\n") ;
-  
-          gen_nest_packunpack ( fp , Domain.fields, corename, PACKIT, down_path[ipath] ) ;
-
-          fprintf(fp,"CALL rsl_lite_to_child_info( msize*RWORDSIZE                               &\n") ;
-          fprintf(fp,"                        ,cips,cipe,cjps,cjpe                               &\n") ;
-          fprintf(fp,"                        ,nids,nide,njds,njde                               &\n") ;
-          fprintf(fp,"                        ,ntasks_x,ntasks_y                                 &\n") ; 
-          fprintf(fp,"                        ,icoord,jcoord                                     &\n") ;
-          fprintf(fp,"                        ,idim_cd,jdim_cd                                   &\n") ;
-          fprintf(fp,"                        ,pig,pjg,retval )\n") ;
-
-          fprintf(fp,"ENDDO\n") ;
-
+          info_name = "rsl_lite_to_child_info" ;
         }
-      }
 
+        fprintf(fp,"msize = %d * nlev + %d\n", d3, d2 ) ;
+
+        fprintf(fp,"CALL %s( msize*RWORDSIZE                               &\n",info_name ) ;
+        fprintf(fp,"                        ,cips,cipe,cjps,cjpe                               &\n") ;
+/* nids has shw already added so subtract it out so the nested decomposition will be 
+   correctly computed in the TASK_FOR_POINT routine that this guy calls */
+        fprintf(fp,"                        ,nids+shw,nide-shw,njds+shw,njde-shw               &\n") ;
+        fprintf(fp,"                        ,ntasks_x,ntasks_y                                 &\n") ; 
+        fprintf(fp,"                        ,icoord,jcoord                                     &\n") ;
+        fprintf(fp,"                        ,idim_cd,jdim_cd                                   &\n") ;
+        fprintf(fp,"                        ,pig,pjg,retval )\n") ;
+
+        fprintf(fp,"DO while ( retval .eq. 1 )\n") ;
+  
+        gen_nest_packunpack ( fp , Domain.fields, corename, PACKIT, down_path[ipath] ) ;
+
+        fprintf(fp,"CALL %s( msize*RWORDSIZE                               &\n",info_name ) ;
+        fprintf(fp,"                        ,cips,cipe,cjps,cjpe                               &\n") ;
+/* nids has shw already added so subtract it out so the nested decomposition will be 
+   correctly computed in the TASK_FOR_POINT routine that this guy calls */
+        fprintf(fp,"                        ,nids+shw,nide-shw,njds+shw,njde-shw               &\n") ;
+        fprintf(fp,"                        ,ntasks_x,ntasks_y                                 &\n") ; 
+        fprintf(fp,"                        ,icoord,jcoord                                     &\n") ;
+        fprintf(fp,"                        ,idim_cd,jdim_cd                                   &\n") ;
+        fprintf(fp,"                        ,pig,pjg,retval )\n") ;
+
+        fprintf(fp,"ENDDO\n") ;
+      }
       close_the_file(fp) ;
     }
   }
@@ -736,6 +826,7 @@ gen_nest_unpack ( char * dirname )
   char ddim[3][2][NAMELEN] ;
   char mdim[3][2][NAMELEN] ;
   char pdim[3][2][NAMELEN] ;
+  char *info_name ;
   char vname[NAMELEN] ; char tag[NAMELEN] ; char core[NAMELEN] ;
   int d2, d3 ;
 
@@ -762,37 +853,19 @@ gen_nest_unpack ( char * dirname )
       if ( d2 + d3 > 0 ) {
         if ( down_path[ipath] == INTERP_UP )
         {
-
-          fprintf(fp,"CALL rsl_from_child_info(i,j,pig,pjg,cm,cn,nig,njg,retval)\n") ;
-          fprintf(fp,"DO while ( retval .eq. 1 )\n") ;
-
-#if 0
-          fprintf(fp," if ( pig .ge. ips_save+1 .and. pjg .ge. jps_save+1 .and. &\n") ;
-          fprintf(fp,"      pig .le. ipe_save-1 .and. pjg .le. jpe_save-1    ) then\n") ;
-#endif
-
-          gen_nest_packunpack ( fp , Domain.fields, corename, UNPACKIT, down_path[ipath] ) ;
-
-#if 0
-          fprintf(fp,"endif\n") ;
-#endif
-
-          fprintf(fp,"CALL rsl_from_child_info(i,j,pig,pjg,cm,cn,nig,njg,retval)\n") ;
-          fprintf(fp,"ENDDO\n") ;
-
+          info_name = "rsl_lite_from_child_info" ;
         }
         else
         {
-
-          fprintf(fp,"CALL rsl_lite_from_parent_info(pig,pjg,retval)\n") ;
-          fprintf(fp,"DO while ( retval .eq. 1 )\n") ;
-          gen_nest_packunpack ( fp , Domain.fields, corename, UNPACKIT, down_path[ipath] ) ;
-          fprintf(fp,"CALL rsl_lite_from_parent_info(pig,pjg,retval)\n") ;
-          fprintf(fp,"ENDDO\n") ;
-
+          info_name = "rsl_lite_from_parent_info" ;
         }
-      }
 
+        fprintf(fp,"CALL %s(pig,pjg,retval)\n", info_name ) ;
+        fprintf(fp,"DO while ( retval .eq. 1 )\n") ;
+        gen_nest_packunpack ( fp , Domain.fields, corename, UNPACKIT, down_path[ipath] ) ;
+        fprintf(fp,"CALL %s(pig,pjg,retval)\n", info_name ) ;
+        fprintf(fp,"ENDDO\n") ;
+      }
       close_the_file(fp) ;
     }
   }
@@ -848,7 +921,6 @@ gen_nest_packunpack ( FILE *fp , node_t * node , char * corename, int dir, int d
           c = ( dir == UNPACKIT )?'n':'p' ;
           d = ( dir == UNPACKIT )?'2':'1' ;
         }
-#if 1
 
         if ( zdex >= 0 ) {
           if      ( xdex == 0 && zdex == 1 && ydex == 2 )  sprintf(dexes,"pig,k,pjg") ;
@@ -858,53 +930,6 @@ gen_nest_packunpack ( FILE *fp , node_t * node , char * corename, int dir, int d
           if ( xdex == 0 && ydex == 1 )  sprintf(dexes,"pig,pjg") ;
           if ( ydex == 0 && xdex == 1 )  sprintf(dexes,"pjg,pig") ;
         }
-
-#else
-        if      ( dir == PACKIT   && ( down_path == INTERP_DOWN || down_path == FORCE_DOWN ))
-        {
-          if ( zdex >= 0 ) {
-            if      ( xdex == 0 && zdex == 1 && ydex == 2 )  sprintf(dexes,"%cig+%c*shw,k,%cjg+%c*shw",c,d,c,d) ;
-            else if ( zdex == 0 && xdex == 1 && ydex == 2 )  sprintf(dexes,"k,%cig+%c*shw,%cjg+%c*shw",c,d,c,d) ;
-            else if ( xdex == 0 && ydex == 1 && zdex == 2 )  sprintf(dexes,"%cig+%c*shw,%cjg+%c*shw,k",c,d,c,d) ;
-          } else {
-            if ( xdex == 0 && ydex == 1 )  sprintf(dexes,"%cig+%c*shw,%cjg+%c*shw",c,d,c,d) ;
-            if ( ydex == 0 && xdex == 1 )  sprintf(dexes,"%cjg+%c*shw,%cig+%c*shw",c,d,c,d) ;
-          }
-        }
-        else  if ( dir == UNPACKIT && ( down_path == INTERP_DOWN || down_path == FORCE_DOWN ))
-        {
-          if ( zdex >= 0 ) {
-            if      ( xdex == 0 && zdex == 1 && ydex == 2 )  sprintf(dexes,"%cig+i_parent_start-1-shw,k,%cjg+j_parent_start-1-shw",c,c) ;
-            else if ( zdex == 0 && xdex == 1 && ydex == 2 )  sprintf(dexes,"k,%cig+i_parent_start-1-shw,%cjg+j_parent_start-1-shw",c,c) ;
-            else if ( xdex == 0 && ydex == 1 && zdex == 2 )  sprintf(dexes,"%cig+i_parent_start-1-shw,%cjg+j_parent_start-1,shw,k",c,c) ;
-          } else {
-            if ( xdex == 0 && ydex == 1 )  sprintf(dexes,"%cig+i_parent_start-1-shw,%cjg+j_parent_start-1-shw",c,c) ;
-            if ( ydex == 0 && xdex == 1 )  sprintf(dexes,"%cjg+j_parent_start-1-shw,%cig+i_parent_start-1-shw",c,c) ;
-          }
-        }
-        else  if ( dir == PACKIT   && down_path == INTERP_UP )
-        {
-          if ( zdex >= 0 ) {
-            if      ( xdex == 0 && zdex == 1 && ydex == 2 )  sprintf(dexes,"%cig+i_parent_start-1-shw,k,%cjg+j_parent_start-1-shw",c,c) ;
-            else if ( zdex == 0 && xdex == 1 && ydex == 2 )  sprintf(dexes,"k,%cig+i_parent_start-1-shw,%cjg+j_parent_start-1-shw",c,c) ;
-            else if ( xdex == 0 && ydex == 1 && zdex == 2 )  sprintf(dexes,"%cig+i_parent_start-1-shw,%cjg+j_parent_start-1,shw,k",c,c) ;
-          } else {
-            if ( xdex == 0 && ydex == 1 )  sprintf(dexes,"%cig+i_parent_start-1-shw,%cjg+j_parent_start-1-shw",c,c) ;
-            if ( ydex == 0 && xdex == 1 )  sprintf(dexes,"%cjg+j_parent_start-1-shw,%cig+i_parent_start-1-shw",c,c) ;
-          }
-        }
-        else  if ( dir == UNPACKIT && down_path == INTERP_UP )
-        {
-          if ( zdex >= 0 ) {
-            if      ( xdex == 0 && zdex == 1 && ydex == 2 )  sprintf(dexes,"%cig+%c*shw,k,%cjg+%c*shw",c,d,c,d) ;
-            else if ( zdex == 0 && xdex == 1 && ydex == 2 )  sprintf(dexes,"k,%cig+%c*shw,%cjg+%c*shw",c,d,c,d) ;
-            else if ( xdex == 0 && ydex == 1 && zdex == 2 )  sprintf(dexes,"%cig+%c*shw,%cjg+%c*shw,k",c,d,c,d) ;
-          } else {
-            if ( xdex == 0 && ydex == 1 )  sprintf(dexes,"%cig+%c*shw,%cjg+%c*shw",c,d,c,d) ;
-            if ( ydex == 0 && xdex == 1 )  sprintf(dexes,"%cjg+%c*shw,%cig+%c*shw",c,d,c,d) ;
-          }
-        }
-#endif
 
         /* construct variable name */
         if ( p->scalar_array_member )
@@ -934,13 +959,9 @@ fprintf(fp,"IF ( P_%s .GE. PARAM_FIRST_SCALAR ) THEN\n",p->name) ;
           if ( down_path == INTERP_UP )
 	  {
             if ( zdex >= 0 ) {
-fprintf(fp,"CALL rsl_from_child_msg(((%s)-(%s)+1)*RWORDSIZE,xv) ;\n",ddim[zdex][1], ddim[zdex][0] ) ;
+fprintf(fp,"CALL rsl_lite_from_child_msg(((%s)-(%s)+1)*RWORDSIZE,xv) ;\n",ddim[zdex][1], ddim[zdex][0] ) ;
             } else {
-#if 0
-fprintf(fp,"CALL rsl_from_child_msg(RWORDSIZE,xv)\n%s = xv(1)\n", vname) ;
-#else
-fprintf(fp,"CALL rsl_from_child_msg(RWORDSIZE,xv)\n" ) ;
-#endif
+fprintf(fp,"CALL rsl_lite_from_child_msg(RWORDSIZE,xv)\n" ) ;
             }
 fprintf(fp,"IF ( %s_cd_feedback_mask( pig, ips_save, ipe_save , pjg, jps_save, jpe_save, %s, %s ) ) THEN\n",
                  corename, p->stag_x?".TRUE.":".FALSE." ,p->stag_y?".TRUE.":".FALSE." ) ;
@@ -1036,9 +1057,9 @@ int
 gen_comms ( char * dirname )
 {
   if ( sw_dm_parallel )
-    fprintf(stderr,"ADVISORY: RSL version of gen_comms is linked in with registry program.\n") ;
+    fprintf(stderr,"ADVISORY: RSL_LITE version of gen_comms is linked in with registry program.\n") ;
 
-  gen_halos( "inc" ) ;
+  gen_halos( "inc" , NULL, Halos ) ;
   gen_shift( "inc" ) ;
   gen_periods( "inc" ) ;
   gen_xposes( "inc" ) ;

@@ -199,77 +199,153 @@ SUBROUTINE store_terrain ( ter_interpolated , ter_input , &
 END SUBROUTINE store_terrain
 
 
-SUBROUTINE input_terrain_rsmas ( ter , xlat, xlon, dx , &
+SUBROUTINE input_terrain_rsmas ( grid ,                        &
                            ids , ide , jds , jde , kds , kde , &
                            ims , ime , jms , jme , kms , kme , &
                            ips , ipe , jps , jpe , kps , kpe )
 
+   USE module_domain
    IMPLICIT NONE
+   TYPE ( domain ) :: grid
 
    INTEGER , INTENT(IN)                       :: ids , ide , jds , jde , kds , kde , &
                                                  ims , ime , jms , jme , kms , kme , &
                                                  ips , ipe , jps , jpe , kps , kpe
-   REAL , DIMENSION(ims:ime,jms:jme) , INTENT(INOUT)  :: ter
-   REAL , DIMENSION(ims:ime,jms:jme) , INTENT(IN)     :: xlat, xlon
-   REAL , INTENT(IN)                                  :: DX
+
    LOGICAL, EXTERNAL ::  wrf_dm_on_monitor
 
    INTEGER :: i , j , k , myproc
+   INTEGER, DIMENSION(256) :: ipath  ! array for integer coded ascii for passing path down to get_terrain
+   CHARACTER*256 :: message, message2
+   CHARACTER*256 :: rsmas_data_path
 
 #if DM_PARALLEL
 ! Local globally sized arrays
-   REAL , DIMENSION(ids:ide,jds:jde) :: ter_g, xlat_g, xlon_g
+   REAL , DIMENSION(ids:ide,jds:jde) :: ht_g, xlat_g, xlon_g
 #endif
 
    CALL wrf_get_myproc ( myproc ) 
 
 #if 0
-write(30+myproc,*)ipe-ips+1,jpe-jps+1,' HT before '
+CALL wrf_timetoa ( grid%current_time, message2 )
+WRITE ( message , FMT = '(A," HT before ",I3)' ) TRIM(message2), grid%id
+write(30+myproc,*)ipe-ips+1,jpe-jps+1,trim(message)
 do j = jps,jpe
 do i = ips,ipe
-write(30+myproc,*)ter(i,j)
+write(30+myproc,*)grid%ht(i,j)
 enddo
 enddo
 #endif
 
+   CALL nl_get_rsmas_data_path(1,rsmas_data_path)
+   do i = 1, LEN(TRIM(rsmas_data_path))
+      ipath(i) = ICHAR(rsmas_data_path(i:i))
+   enddo
+
 #if ( defined( DM_PARALLEL ) && ( ! defined( STUBMPI ) ) )
 
-   CALL wrf_patch_to_global_real ( xlat , xlat_g , 'z' , 'xy' ,       &
+   CALL wrf_patch_to_global_real ( grid%xlat , xlat_g , grid%domdesc, ' ' , 'xy' ,       &
                                    ids, ide-1 , jds , jde-1 , 1 , 1 , &
                                    ims, ime   , jms , jme   , 1 , 1 , &
                                    ips, ipe   , jps , jpe   , 1 , 1   ) 
-   CALL wrf_patch_to_global_real ( xlon , xlon_g , 'z' , 'xy' ,       &
+   CALL wrf_patch_to_global_real ( grid%xlong , xlon_g , grid%domdesc, ' ' , 'xy' ,       &
                                    ids, ide-1 , jds , jde-1 , 1 , 1 , &
                                    ims, ime   , jms , jme   , 1 , 1 , &
                                    ips, ipe   , jps , jpe   , 1 , 1   ) 
 
    IF ( wrf_dm_on_monitor() ) THEN
-     CALL get_terrain ( dx/1000., xlat_g(ids:ide,jds:jde), xlon_g(ids:ide,jds:jde), ter_g(ids:ide,jds:jde), &
-                        ide-ids+1,jde-jds+1,ide-ids+1,jde-jds+1 )
-     WHERE ( ter(ids:ide,jds:jde) < -1000. ) ter(ids:ide,jds:jde) = 0.
+     CALL get_terrain ( grid%dx/1000., xlat_g(ids:ide,jds:jde), xlon_g(ids:ide,jds:jde), ht_g(ids:ide,jds:jde), &
+                        ide-ids+1,jde-jds+1,ide-ids+1,jde-jds+1, ipath, LEN(TRIM(rsmas_data_path)) )
+     WHERE ( ht_g(ids:ide,jds:jde) < -1000. ) ht_g(ids:ide,jds:jde) = 0.
    ENDIF
 
-   CALL wrf_global_to_patch_real ( ter_g , ter , 'z' , 'xy' ,         &
+   CALL wrf_global_to_patch_real ( ht_g , grid%ht , grid%domdesc, ' ' , 'xy' ,         &
                                    ids, ide-1 , jds , jde-1 , 1 , 1 , &
                                    ims, ime   , jms , jme   , 1 , 1 , &
                                    ips, ipe   , jps , jpe   , 1 , 1   ) 
-
 #else
 
-   CALL get_terrain ( dx/1000., xlat(ids:ide,jds:jde), xlon(ids:ide,jds:jde), ter(ids:ide,jds:jde), &
-                       ide-ids+1,jde-jds+1,ide-ids+1,jde-jds+1 )
-   WHERE ( ter(ids:ide,jds:jde) < -1000. ) ter(ids:ide,jds:jde) = 0.
+   CALL get_terrain ( grid%dx/1000., grid%xlat(ids:ide,jds:jde), grid%xlong(ids:ide,jds:jde), grid%ht(ids:ide,jds:jde), &
+                       ide-ids+1,jde-jds+1,ide-ids+1,jde-jds+1, ipath, LEN(TRIM(rsmas_data_path)) )
+   WHERE ( grid%ht(ids:ide,jds:jde) < -1000. ) grid%ht(ids:ide,jds:jde) = 0.
 
 #endif
 
 #if 0
-write(30+myproc,*)ipe-ips+1,jpe-jps+1,' HT after '
+CALL wrf_timetoa ( grid%current_time, message2 )
+WRITE ( message , FMT = '(A," HT after ",I3)' ) TRIM(message2), grid%id
+write(30+myproc,*)ipe-ips+1,jpe-jps+1,trim(message)
 do j = jps,jpe
 do i = ips,ipe
-write(30+myproc,*)ter(i,j)
+write(30+myproc,*)grid%ht(i,j)
 enddo
 enddo
 #endif
                        
 END SUBROUTINE input_terrain_rsmas
+
+SUBROUTINE update_after_feedback_em ( grid , &
+!
+#include "em_dummy_args.inc"
+!
+                 )
+!
+! perform core specific updates, exchanges after
+! model feedback  (called from med_feedback_domain) -John
+!
+
+! Driver layer modules
+   USE module_domain
+   USE module_configure
+   USE module_driver_constants
+   USE module_machine
+   USE module_tiles
+   USE module_dm
+   USE module_bc
+! Mediation layer modules
+! Registry generated module
+   USE module_state_description
+
+   IMPLICIT NONE
+
+   !  Subroutine interface block.
+
+   TYPE(domain) , TARGET         :: grid
+
+   !  Definitions of dummy arguments
+#include <em_dummy_decl.inc>
+
+   INTEGER                         :: ids , ide , jds , jde , kds , kde , &
+                                      ims , ime , jms , jme , kms , kme , &
+                                      ips , ipe , jps , jpe , kps , kpe
+
+! These are used if -DDEREF_KLUDGE is compiled
+!  see http://www.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm
+   INTEGER     :: sm31  , em31  , sm32  , em32  , sm33  , em33
+   INTEGER     :: sm31x , em31x , sm32x , em32x , sm33x , em33x
+   INTEGER     :: sm31y , em31y , sm32y , em32y , sm33y , em33y
+
+! Trick problematic compilers into not performing copy-in/copy-out by adding
+! indices to array arguments in the CALL statements in this routine.
+! It has the effect of passing only the first element of the array, rather
+! than the entire array.  See:
+! http://www.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm
+#include "deref_kludge.h"
+
+#ifdef DM_PARALLEL
+#    define REGISTER_I1
+#      include <em_data_calls.inc>
+#endif
+
+!  Obtain dimension information stored in the grid data structure.
+  CALL get_ijk_from_grid (  grid ,                   &
+                            ids, ide, jds, jde, kds, kde,    &
+                            ims, ime, jms, jme, kms, kme,    &
+                            ips, ipe, jps, jpe, kps, kpe    )
+
+#ifdef DM_PARALLEL
+#include "HALO_EM_FEEDBACK.inc"
+#endif
+
+END SUBROUTINE update_after_feedback_em
 

@@ -4,6 +4,7 @@
 OMP             =
 OMPCPP          =
 FC              =       f90
+SFC             =       $(FC)
 F77             =       $(FC)
 LD              =       $(FC)
 CC              =       cc

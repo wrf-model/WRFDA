@@ -50,31 +50,33 @@ END SUBROUTINE wrf_debug
 
 SUBROUTINE wrf_message( str )
   USE module_wrf_error
-#ifdef WRF_ESMF_LOGERR
-  USE ESMF_Mod
-#endif
+  USE module_utility
   IMPLICIT NONE
   CHARACTER*(*) str
 #if defined( DM_PARALLEL ) && ! defined( STUBMPI) 
   write(0,*) str
 #endif
   print*, str
-#ifdef WRF_ESMF_LOGERR
-  CALL ESMF_LogWrite( str, ESMF_LOG_INFO )
+!TBH:  work around deficiencies in build-automation
+#ifdef USE_LOGERR
+  IF ( WRF_UTIL_IsInitialized() ) THEN
+    CALL WRF_UTIL_LogWrite( str, WRF_UTIL_LOG_INFO )
+  ENDIF
 #endif
 END SUBROUTINE wrf_message
 
 ! intentionally write to stderr only
 SUBROUTINE wrf_message2( str )
   USE module_wrf_error
-#ifdef WRF_ESMF_LOGERR
-  USE ESMF_Mod
-#endif
+  USE module_utility
   IMPLICIT NONE
   CHARACTER*(*) str
   write(0,*) str
-#ifdef WRF_ESMF_LOGERR
-  CALL ESMF_LogWrite( str, ESMF_LOG_INFO )
+!TBH:  work around deficiencies in build-automation
+#ifdef USE_LOGERR
+  IF ( WRF_UTIL_IsInitialized() ) THEN
+    CALL WRF_UTIL_LogWrite( str, WRF_UTIL_LOG_INFO )
+  ENDIF
 #endif
 END SUBROUTINE wrf_message2
 

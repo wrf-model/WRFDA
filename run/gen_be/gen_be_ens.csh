@@ -195,6 +195,12 @@ if ( $?RUN_GEN_BE_STAGE3 ) then
    foreach CV ( $CONTROL_VARIABLES )
       setenv VARIABLE $CV
 
+      if ( $CV == "ps" ) then
+         echo "Bypassing vertical transform for " $CV
+      else if ( $CV == "ps_u" ) then
+         echo "Bypassing vertical transform for " $CV
+      else
+
 cat >! gen_be_stage3_nl.nl << EOF
   &gen_be_stage3_nl
     start_date = '${START_DATE}',
@@ -218,6 +224,7 @@ cat >! gen_be_stage3_nl.nl << EOF
 EOF
 
          ./gen_be_stage3.exe >& gen_be_stage3.${VARIABLE}.log
+      endif
    end
 endif
 
@@ -274,8 +281,7 @@ if ( $?RUN_GEN_BE_DIAGS_READ ) then
 cat >! gen_be_diags_nl.nl << EOF
   &gen_be_diags_nl
     be_method = '${BE_METHOD}',
-    uh_method = '${UH_METHOD}',
-    n_smth_sl = 0, /
+    uh_method = '${UH_METHOD}' /
 EOF
 
    ln -sf ${SRC_DIR}/gen_be_diags_read.exe .

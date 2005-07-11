@@ -13,7 +13,7 @@ PROGRAM real_data
    USE module_input_chem_data
    USE module_input_chem_bioemiss
 #endif
-   USE WRF_ESMF_MOD
+   USE module_utility
 #ifdef DM_PARALLEL
    USE module_dm
 #endif
@@ -51,7 +51,7 @@ PROGRAM real_data
    INTEGER ::   end_year ,   end_month ,   end_day ,   end_hour ,   end_minute ,   end_second
    INTEGER :: interval_seconds , real_data_init_type
    INTEGER :: time_loop_max , time_loop
-   TYPE(ESMF_TimeInterval) :: time_interval
+   TYPE(WRF_UTIL_TimeInterval) :: time_interval
 real::t1,t2
    INTERFACE
      SUBROUTINE Setup_Timekeeping( grid )
@@ -78,7 +78,7 @@ real::t1,t2
 
    CALL       wrf_debug ( 100 , 'real_em: calling init_modules ' )
    CALL init_modules(1)   ! Phase 1 returns after MPI_INIT() (if it is called)
-   CALL ESMF_Initialize( defaultCalendar=ESMF_CAL_GREGORIAN, rc=rc )
+   CALL WRF_UTIL_Initialize( defaultCalendar=WRF_UTIL_CAL_GREGORIAN, rc=rc )
    CALL init_modules(2)   ! Phase 2 resumes after MPI_INIT() (if it is called)
 
    !  The configuration switches mostly come from the NAMELIST input.
@@ -114,10 +114,10 @@ real::t1,t2
    CALL Setup_Timekeeping ( grid )
    CALL wrf_clockprint ( 150, grid%domain_clock, &
                          'DEBUG real:  grid%domain_clock after Setup_Timekeeping,' )
-   CALL ESMF_TimeIntervalSet ( time_interval , S=model_config_rec%interval_seconds, rc=rc )
-   CALL ESMF_ClockSet ( grid%domain_clock , timeStep=time_interval , rc=rc )
-   CALL wrf_check_error( ESMF_SUCCESS, rc, &
-                         'ESMF_ClockSet(grid%domain_clock) FAILED', &
+   CALL WRF_UTIL_TimeIntervalSet ( time_interval , S=model_config_rec%interval_seconds, rc=rc )
+   CALL WRF_UTIL_ClockSet ( grid%domain_clock , timeStep=time_interval , rc=rc )
+   CALL wrf_check_error( WRF_UTIL_SUCCESS, rc, &
+                         'WRF_UTIL_ClockSet(grid%domain_clock) FAILED', &
                          __FILE__ , &
                          __LINE__  )
    CALL wrf_clockprint ( 150, grid%domain_clock, &
@@ -157,7 +157,7 @@ real::t1,t2
 
    CALL wrf_shutdown
 
-   CALL ESMF_Finalize( rc=rc )
+   CALL WRF_UTIL_Finalize( rc=rc )
 
 END PROGRAM real_data
 
@@ -176,7 +176,7 @@ SUBROUTINE med_sidata_input ( grid , config_flags )
 #endif
 
    USE module_date_time
-   USE WRF_ESMF_MOD
+   USE module_utility
 
    IMPLICIT NONE
 
@@ -227,15 +227,15 @@ real::t1,t2
 
    !  Override stop time with value computed above.  
    CALL wrf_atotime( end_date_char, grid%stop_time )
-   CALL ESMF_ClockSet ( grid%domain_clock , StopTime=grid%stop_time, rc=rc )
-   CALL wrf_check_error( ESMF_SUCCESS, rc, &
-                         'ESMF_ClockSet(grid%domain_clock) FAILED', &
+   CALL WRF_UTIL_ClockSet ( grid%domain_clock , StopTime=grid%stop_time, rc=rc )
+   CALL wrf_check_error( WRF_UTIL_SUCCESS, rc, &
+                         'WRF_UTIL_ClockSet(grid%domain_clock) FAILED', &
                          __FILE__ , &
                          __LINE__  )
    ! TBH:  for now, turn off stop time and let it run data-driven
-   CALL ESMF_ClockStopTimeDisable( grid%domain_clock, rc=rc ) 
-   CALL wrf_check_error( ESMF_SUCCESS, rc, &
-                         'ESMF_ClockStopTimeDisable(grid%domain_clock) FAILED', &
+   CALL WRF_UTIL_ClockStopTimeDisable( grid%domain_clock, rc=rc ) 
+   CALL wrf_check_error( WRF_UTIL_SUCCESS, rc, &
+                         'WRF_UTIL_ClockStopTimeDisable(grid%domain_clock) FAILED', &
                          __FILE__ , &
                          __LINE__  )
    CALL wrf_clockprint ( 150, grid%domain_clock, &
@@ -358,15 +358,15 @@ real::t1,t2
       WRITE (wrf_err_message,*) &
         'DEBUG med_sidata_input:  before currTime set, current_date = ',TRIM(current_date)
       CALL wrf_debug ( 150 , wrf_err_message )
-      CALL ESMF_ClockSet(grid%domain_clock, currTime=grid%current_time, rc=rc)
-      CALL wrf_check_error( ESMF_SUCCESS, rc, &
-                            'ESMF_ClockSet(grid%domain_clock) FAILED', &
+      CALL WRF_UTIL_ClockSet(grid%domain_clock, currTime=grid%current_time, rc=rc)
+      CALL wrf_check_error( WRF_UTIL_SUCCESS, rc, &
+                            'WRF_UTIL_ClockSet(grid%domain_clock) FAILED', &
                             __FILE__ , &
                             __LINE__  )
       CALL wrf_clockprint ( 150, grid%domain_clock, &
                             'DEBUG med_sidata_input:  grid%domain_clock after currTime set,' )
 if (loop.ne.time_loop_max )then
-print *,'set esmf clock to ',current_date(1:19)
+print *,'set clock to ',current_date(1:19)
 endif
    END DO
 
@@ -445,8 +445,8 @@ SUBROUTINE assemble_output ( grid , config_flags , loop , time_loop_max )
    INTEGER :: ijds , ijde , spec_bdy_width
    INTEGER :: i , j , k , idts
 
-   INTEGER :: id1 , interval_seconds , ierr, rc
-   INTEGER , SAVE :: id 
+   INTEGER :: id1 , interval_seconds , ierr, rc, sst_update
+   INTEGER , SAVE :: id, id5 
    CHARACTER (LEN=80) :: inpname , bdyname
    CHARACTER(LEN= 4) :: loop_char
 character *19 :: temp19
@@ -488,6 +488,7 @@ real::t1,t2
 
    spec_bdy_width = model_config_rec%spec_bdy_width
    interval_seconds = model_config_rec%interval_seconds
+   sst_update = model_config_rec%sst_update
 
 print *,'spec_bdy_width, interval_seconds, loop=',spec_bdy_width , interval_seconds,loop
 
@@ -516,9 +517,19 @@ print *,'spec_bdy_width, interval_seconds, loop=',spec_bdy_width , interval_seco
       IF ( ierr .NE. 0 ) THEN
          CALL wrf_error_fatal( 'real: error opening wrfinput for writing' )
       ENDIF
+      IF(sst_update .EQ. 1)THEN
+        CALL construct_filename1( inpname , 'wrflowinp' , grid%id , 2 )
+        CALL open_w_dataset ( id5, TRIM(inpname) , grid , config_flags , output_aux_model_input5 , "DATASET=AUXINPUT5", ierr )
+        IF ( ierr .NE. 0 ) THEN
+           CALL wrf_error_fatal( 'real: error opening wrflowinp for writing' )
+        ENDIF
+      ENDIF
 !     CALL calc_current_date ( grid%id , 0. )
       CALL output_model_input ( id1, grid , config_flags , ierr )
       CALL close_dataset ( id1 , config_flags , "DATASET=INPUT" )
+      IF(sst_update .EQ. 1)THEN
+        CALL output_aux_model_input5 ( id5, grid , config_flags , ierr )
+      ENDIF
 
       !  We need to save the 3d data to compute a difference during the next loop.  Couple the
       !  3d fields with total mu (mub + mu_2) and the stagger-specific map scale factor.
@@ -531,7 +542,7 @@ print *,'spec_bdy_width, interval_seconds, loop=',spec_bdy_width , interval_seco
                     ids, ide, jds, jde, kds, kde, ims, ime, jms, jme, kms, kme, ips, ipe, jps, jpe, kps, kpe )
       CALL couple ( grid%em_mu_2 , grid%em_mub , pbdy3dtemp1 , grid%em_ph_2                , 'h' , grid%msft , &
                     ids, ide, jds, jde, kds, kde, ims, ime, jms, jme, kms, kme, ips, ipe, jps, jpe, kps, kpe )
-      CALL couple ( grid%em_mu_2 , grid%em_mub , qbdy3dtemp1 , grid%moist_2(:,:,:,P_QV) , 't' , grid%msft , &
+      CALL couple ( grid%em_mu_2 , grid%em_mub , qbdy3dtemp1 , grid%moist(:,:,:,P_QV) , 't' , grid%msft , &
                     ids, ide, jds, jde, kds, kde, ims, ime, jms, jme, kms, kme, ips, ipe, jps, jpe, kps, kpe )
 
       DO j = jps , MIN(jde-1,jpe)
@@ -559,7 +570,7 @@ print *,'spec_bdy_width, interval_seconds, loop=',spec_bdy_width , interval_seco
                                                                  ids , ide , jds , jde , kds , kde , &
                                                                  ims , ime , jms , jme , kms , kme , &
                                                                  ips , ipe , jps , jpe , kps , kpe )
-      CALL stuff_bdy     ( qbdy3dtemp1 , grid%em_rqv_b   , 'T' , ijds , ijde , spec_bdy_width      , &
+      CALL stuff_bdy     ( qbdy3dtemp1 , grid%moist_b(:,:,:,:,P_QV)   , 'T' , ijds , ijde , spec_bdy_width      , &
                                                                  ids , ide , jds , jde , kds , kde , &
                                                                  ims , ime , jms , jme , kms , kme , &
                                                                  ips , ipe , jps , jpe , kps , kpe )
@@ -571,6 +582,10 @@ print *,'spec_bdy_width, interval_seconds, loop=',spec_bdy_width , interval_seco
 
    ELSE IF ( loop .GT. 1 ) THEN
 
+      IF(sst_update .EQ. 1)THEN
+        CALL output_aux_model_input5 ( id5, grid , config_flags , ierr )
+      ENDIF
+
       !  Open the boundary file.
 
 
@@ -581,8 +596,8 @@ print *,'spec_bdy_width, interval_seconds, loop=',spec_bdy_width , interval_seco
                CALL wrf_error_fatal( 'real: error opening wrfbdy for writing' )
          ENDIF
       ELSE
-         IF ( .NOT. ESMF_ClockIsStopTime(grid%domain_clock ,rc=rc) ) THEN
-            CALL ESMF_ClockAdvance( grid%domain_clock, rc=rc )
+         IF ( .NOT. WRF_UTIL_ClockIsStopTime(grid%domain_clock ,rc=rc) ) THEN
+            CALL WRF_UTIL_ClockAdvance( grid%domain_clock, rc=rc )
             CALL wrf_clockprint ( 150, grid%domain_clock, &
                                   'DEBUG assemble_output:  grid%domain_clock after ClockAdvance,' )
          ENDIF
@@ -599,7 +614,7 @@ print *,'spec_bdy_width, interval_seconds, loop=',spec_bdy_width , interval_seco
                     ids, ide, jds, jde, kds, kde, ims, ime, jms, jme, kms, kme, ips, ipe, jps, jpe, kps, kpe )
       CALL couple ( grid%em_mu_2 , grid%em_mub , pbdy3dtemp2 , grid%em_ph_2                , 'h' , grid%msft , &
                     ids, ide, jds, jde, kds, kde, ims, ime, jms, jme, kms, kme, ips, ipe, jps, jpe, kps, kpe )
-      CALL couple ( grid%em_mu_2 , grid%em_mub , qbdy3dtemp2 , grid%moist_2(:,:,:,P_QV) , 't' , grid%msft , &
+      CALL couple ( grid%em_mu_2 , grid%em_mub , qbdy3dtemp2 , grid%moist(:,:,:,P_QV) , 't' , grid%msft , &
                     ids, ide, jds, jde, kds, kde, ims, ime, jms, jme, kms, kme, ips, ipe, jps, jpe, kps, kpe )
 
       DO j = jps , jpe
@@ -632,7 +647,7 @@ print *,'spec_bdy_width, interval_seconds, loop=',spec_bdy_width , interval_seco
                                                             ids , ide , jds , jde , kds , kde , &
                                                             ims , ime , jms , jme , kms , kme , &
                                                             ips , ipe , jps , jpe , kps , kpe )
-      CALL stuff_bdytend ( qbdy3dtemp2 , qbdy3dtemp1 , REAL(interval_seconds) , grid%em_rqv_bt , 'T' , &
+      CALL stuff_bdytend ( qbdy3dtemp2 , qbdy3dtemp1 , REAL(interval_seconds) , grid%moist_bt(:,:,:,:,P_QV) , 'T' , &
                                                             ijds , ijde , spec_bdy_width      , &
                                                             ids , ide , jds , jde , kds , kde , &
                                                             ims , ime , jms , jme , kms , kme , &
@@ -656,9 +671,9 @@ print *,'spec_bdy_width, interval_seconds, loop=',spec_bdy_width , interval_seco
       WRITE (wrf_err_message,*) &
         'DEBUG assemble_output:  before 1st currTime set, current_date = ',TRIM(current_date)
       CALL wrf_debug ( 150 , wrf_err_message )
-      CALL ESMF_ClockSet(grid%domain_clock, currTime=grid%current_time, rc=rc)
-      CALL wrf_check_error( ESMF_SUCCESS, rc, &
-                            'ESMF_ClockSet(grid%domain_clock) FAILED', &
+      CALL WRF_UTIL_ClockSet(grid%domain_clock, currTime=grid%current_time, rc=rc)
+      CALL wrf_check_error( WRF_UTIL_SUCCESS, rc, &
+                            'WRF_UTIL_ClockSet(grid%domain_clock) FAILED', &
                             __FILE__ , &
                             __LINE__  )
       CALL wrf_clockprint ( 150, grid%domain_clock, &
@@ -675,9 +690,9 @@ print *,'spec_bdy_width, interval_seconds, loop=',spec_bdy_width , interval_seco
       WRITE (wrf_err_message,*) &
         'DEBUG assemble_output:  before 2nd currTime set, current_date = ',TRIM(current_date)
       CALL wrf_debug ( 150 , wrf_err_message )
-      CALL ESMF_ClockSet(grid%domain_clock, currTime=grid%current_time, rc=rc)
-      CALL wrf_check_error( ESMF_SUCCESS, rc, &
-                            'ESMF_ClockSet(grid%domain_clock) FAILED', &
+      CALL WRF_UTIL_ClockSet(grid%domain_clock, currTime=grid%current_time, rc=rc)
+      CALL wrf_check_error( WRF_UTIL_SUCCESS, rc, &
+                            'WRF_UTIL_ClockSet(grid%domain_clock) FAILED', &
                             __FILE__ , &
                             __LINE__  )
       CALL wrf_clockprint ( 150, grid%domain_clock, &
@@ -692,9 +707,9 @@ print *,'LBC valid between these times ',current_date, ' ',start_date
       WRITE (wrf_err_message,*) &
         'DEBUG assemble_output:  before 3rd currTime set, current_date = ',TRIM(current_date)
       CALL wrf_debug ( 150 , wrf_err_message )
-      CALL ESMF_ClockSet(grid%domain_clock, currTime=grid%current_time, rc=rc)
-      CALL wrf_check_error( ESMF_SUCCESS, rc, &
-                            'ESMF_ClockSet(grid%domain_clock) FAILED', &
+      CALL WRF_UTIL_ClockSet(grid%domain_clock, currTime=grid%current_time, rc=rc)
+      CALL wrf_check_error( WRF_UTIL_SUCCESS, rc, &
+                            'WRF_UTIL_ClockSet(grid%domain_clock) FAILED', &
                             __FILE__ , &
                             __LINE__  )
       CALL wrf_clockprint ( 150, grid%domain_clock, &
@@ -757,7 +772,7 @@ print *,'LBC valid between these times ',current_date, ' ',start_date
                                                                     ids , ide , jds , jde , kds , kde , &
                                                                     ims , ime , jms , jme , kms , kme , &
                                                                     ips , ipe , jps , jpe , kps , kpe )
-         CALL stuff_bdy     ( qbdy3dtemp1 , grid%em_rqv_b   , 'T' , ijds , ijde , spec_bdy_width      , &
+         CALL stuff_bdy     ( qbdy3dtemp1 , grid%moist_b(:,:,:,:,P_QV)   , 'T' , ijds , ijde , spec_bdy_width      , &
                                                                     ids , ide , jds , jde , kds , kde , &
                                                                     ims , ime , jms , jme , kms , kme , &
                                                                     ips , ipe , jps , jpe , kps , kpe )
@@ -771,6 +786,9 @@ print *,'LBC valid between these times ',current_date, ' ',start_date
          !  If this is the last time through here, we need to close the files.
 
          CALL close_dataset ( id , config_flags , "DATASET=BOUNDARY" )
+        IF(sst_update .EQ. 1)THEN
+         CALL close_dataset ( id5 , config_flags , "DATASET=AUXINPUT5" )
+        ENDIF
 
       END IF
 

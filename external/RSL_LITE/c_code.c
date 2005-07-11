@@ -19,13 +19,13 @@ RSL_LITE_ERROR_DUP1 ( int *me )
     if ((newfd = open( filename, O_CREAT | O_WRONLY, 0666 )) < 0 )
     {
         perror("error_dup: cannot open rsl.out.nnnn") ;
-        fprintf(stderr,"...sending error to standard error and continuing.\n") ;
+        fprintf(stderr,"...sending output to standard output and continuing.\n") ;
         return ;
     }
     if( dup2( newfd, STANDARD_OUTPUT ) < 0 )
     {
         perror("error_dup: dup2 fails to change output descriptor") ;
-        fprintf(stderr,"...sending error to standard error and continuing.\n") ;
+        fprintf(stderr,"...sending output to standard output and continuing.\n") ;
         close(newfd) ;
         return ;
     }
@@ -185,7 +185,7 @@ RSL_LITE_PACK ( char * buf , int * shw0 , int * typesize0 , int * xy0 , int * pu
 	if ( typesize == sizeof(int) ) {
 #ifdef crayx1
 /* PETER -- CHECK THIS AND UPDATE TO USE IMAX AND IMIN MACROS */
-        i4 = ips-shw ;
+        i4 = IMAX(ips-shw) ;
           i_offset = ipe+shw+1-i4;
           i3=0;
           for ( j = jpe-shw+1 ; j <= jpe ; j++ ) {
@@ -208,7 +208,7 @@ RSL_LITE_PACK ( char * buf , int * shw0 , int * typesize0 , int * xy0 , int * pu
           for ( j = jpe-shw+1 ; j <= jpe ; j++ ) {
             for ( k = kps ; k <= kpe ; k++ ) {
               pi = (int *)(p+yp_curs) ;
-              i = ips-shw ;
+              i = IMAX(ips-shw) ;
               qi = (int *)((buf + typesize*( (i-ims) + (ime-ims+1)*(
                                              (k-kms) + (j-jms)*(kme-kms+1))))) ;
               for ( i = IMAX(ips-shw) ; i <= IMIN(ipe+shw) ; i++ ) {
@@ -238,7 +238,7 @@ RSL_LITE_PACK ( char * buf , int * shw0 , int * typesize0 , int * xy0 , int * pu
 	if ( typesize == sizeof(int) ) {
 #ifdef crayx1
 /* PETER -- CHECK THIS AND UPDATE TO USE IMAX AND IMIN MACROS */
-        i4 = ips-shw ;
+        i4 = IMAX(ips-shw) ;
           i_offset = ipe+shw+1-i4;
           for ( j = jpe+1 ; j <= jpe+shw ; j++ ) {
           pi = (int *)(p+yp_curs) ;
@@ -260,7 +260,7 @@ RSL_LITE_PACK ( char * buf , int * shw0 , int * typesize0 , int * xy0 , int * pu
           for ( j = jpe+1 ; j <= jpe+shw ; j++ ) {
             for ( k = kps ; k <= kpe ; k++ ) {
               pi = (int *)(p+yp_curs) ;
-              i = ips-shw ;
+              i = IMAX(ips-shw) ;
               qi = (int *)((buf + typesize*( (i-ims) + (ime-ims+1)*(
                                              (k-kms) + (j-jms)*(kme-kms+1))))) ;
               for ( i = IMAX(ips-shw) ; i <= IMIN(ipe+shw) ; i++ ) {
@@ -300,7 +300,7 @@ RSL_LITE_PACK ( char * buf , int * shw0 , int * typesize0 , int * xy0 , int * pu
 	if ( typesize == sizeof(int) ) {
 #ifdef crayx1
 /* PETER -- CHECK THIS AND UPDATE TO USE IMAX AND IMIN MACROS */
-        i4 = ips-shw ;
+        i4 = IMAX(ips-shw) ;
           i_offset = ipe+shw+1-i4;
           for ( j = jps ; j <= jps+shw-1 ; j++ ) {
           pi = (int *)(p+ym_curs) ;
@@ -322,7 +322,7 @@ RSL_LITE_PACK ( char * buf , int * shw0 , int * typesize0 , int * xy0 , int * pu
           for ( j = jps ; j <= jps+shw-1 ; j++ ) {
             for ( k = kps ; k <= kpe ; k++ ) {
               pi = (int *)(p+ym_curs) ;
-              i = ips-shw ;
+              i = IMAX(ips-shw) ;
               qi = (int *)((buf + typesize*( (i-ims) + (ime-ims+1)*(
                                              (k-kms) + (j-jms)*(kme-kms+1))))) ;
               for ( i = IMAX(ips-shw) ; i <= IMIN(ipe+shw) ; i++ ) {
@@ -352,7 +352,7 @@ RSL_LITE_PACK ( char * buf , int * shw0 , int * typesize0 , int * xy0 , int * pu
 	if ( typesize == sizeof(int) ) {
 #ifdef crayx1
 /* PETER -- CHECK THIS AND UPDATE TO USE IMAX AND IMIN MACROS */
-        i4 = ips-shw ;
+        i4 = IMAX(ips-shw) ;
           i_offset = ipe+shw+1-i4;
           for ( j = jps-shw ; j <= jps-1 ; j++ ) {
           pi = (int *)(p+ym_curs) ;
@@ -375,7 +375,7 @@ RSL_LITE_PACK ( char * buf , int * shw0 , int * typesize0 , int * xy0 , int * pu
          for ( j = jps-shw ; j <= jps-1 ; j++ ) {
             for ( k = kps ; k <= kpe ; k++ ) {
               pi = (int *)(p+ym_curs) ;
-              i = ips-shw ;
+              i = IMAX(ips-shw) ;
               qi = (int *)((buf + typesize*( (i-ims) + (ime-ims+1)*(
                                              (k-kms) + (j-jms)*(kme-kms+1))))) ;
               for ( i = IMAX(ips-shw) ; i <= IMIN(ipe+shw) ; i++ ) {

@@ -1,4 +1,4 @@
-subroutine da_readwrite_be_stage4( outunit, nk, be_method, uh_method, n_smth_sl, variable )
+subroutine da_readwrite_be_stage4( outunit, nk, be_method, uh_method, variable )
 
    implicit none
 
@@ -6,7 +6,6 @@ subroutine da_readwrite_be_stage4( outunit, nk, be_method, uh_method, n_smth_sl,
 
    integer, intent(in)      :: outunit                    ! Output unit number.
    integer, intent(in)      :: nk                         ! Number of vertical levels/modes.
-   integer    , intent(in)  :: n_smth_sl                  ! Number of smoothing. 0: no smoothig
    character*3, intent(in)  :: be_method                  ! Be method ('NMC', or 'ENS').
    character*5, intent(in)  :: uh_method
    character*10, intent(in) :: variable                   ! Variable name.
@@ -24,8 +23,6 @@ subroutine da_readwrite_be_stage4( outunit, nk, be_method, uh_method, n_smth_sl,
    logical                  :: data_on_levels             ! True if field in on model levels.
    real, allocatable        :: total_power(:)             ! Total Power spectrum.
    real, allocatable        :: scale_length(:)
-   real, allocatable        :: sl_smth(:)
-   
 
    first_time = .true.
 
@@ -79,20 +76,13 @@ if (uh_method .eq. 'power') then
 
    else if (uh_method == 'scale   ') then
 
-      if ( first_time ) then
-           allocate( scale_length(1:nk) )
-           allocate( sl_smth(1:nk) )
-      endif
+      if ( first_time ) allocate( scale_length(1:nk) )
 
       filename = trim(variable)//'/'//'sl_print.'//trim(variable)
       open (iunit, file = filename)
 
       do k=1, nk
          read(iunit,'(a,2e20.8)') ck, ml, scale_length(k)
-! If missing value is encountered, use the value from the last
-! mode or level (YRG, 06/30/2005):
-         if (ml == 0.0 .and. scale_length(k) == 0.0) &
-             scale_length(k) = scale_length(k-1)
       end do
 
 !     Remove spikes in lengthscales (average if spike detected):
@@ -103,16 +93,6 @@ if (uh_method .eq. 'power') then
          end if
       enddo
 
-! Smoothing the scale_length (YRG 07/01/2005):
-        sl_smth =  scale_length
-        do kdum = 1, n_smth_sl
-           do k = 2, nk-1
-             sl_smth(k) = scale_length(k) &
-                  + 0.25*(scale_length(k-1)+scale_length(k+1)-2.0*scale_length(k))
-           enddo
-           scale_length = sl_smth 
-        enddo
-     
       write(outunit) variable
       write(outunit) scale_length
 

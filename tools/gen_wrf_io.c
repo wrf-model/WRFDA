@@ -31,123 +31,123 @@ gen_wrf_io ( char * dirname )
 #if 1
 
   OP_F(fp,"wrf_metaput_input.inc") ;
-  gen_wrf_io2 ( fp , fname, "grid%" , Domain.fields ,
+  gen_wrf_io2 ( fp , fname, "grid%" , NULL, Domain.fields ,
       METADATA | INPUT , GEN_OUTPUT ) ;
 
   OP_F(fp,"wrf_metaput_restart.inc") ;
-  gen_wrf_io2 ( fp , fname, "grid%" , Domain.fields ,
+  gen_wrf_io2 ( fp , fname, "grid%" , NULL, Domain.fields ,
       METADATA | RESTART , GEN_OUTPUT ) ;
 
   OP_F(fp,"wrf_metaput_history.inc") ;
-  gen_wrf_io2 ( fp , fname, "grid%" , Domain.fields ,
+  gen_wrf_io2 ( fp , fname, "grid%" , NULL, Domain.fields ,
       METADATA | HISTORY , GEN_OUTPUT ) ;
 
   OP_F(fp,"wrf_metaput_boundary.inc") ;
-  gen_wrf_io2 ( fp , fname, "grid%" , Domain.fields ,
+  gen_wrf_io2 ( fp , fname, "grid%" , NULL, Domain.fields ,
       METADATA | BOUNDARY , GEN_OUTPUT ) ;
 
   OP_F(fp,"wrf_histout.inc") ;
-  gen_wrf_io2 ( fp , fname, "grid%" , Domain.fields , HISTORY , GEN_OUTPUT ) ;
+  gen_wrf_io2 ( fp , fname, "grid%" , NULL, Domain.fields , HISTORY , GEN_OUTPUT ) ;
   close_the_file(fp) ;
   OP_F(fp,"wrf_auxhist1out.inc") ;
-  gen_wrf_io2 ( fp , fname, "grid%" , Domain.fields , AUXHIST1 , GEN_OUTPUT ) ;
+  gen_wrf_io2 ( fp , fname, "grid%" , NULL, Domain.fields , AUXHIST1 , GEN_OUTPUT ) ;
   close_the_file(fp) ;
   OP_F(fp,"wrf_auxhist2out.inc") ;
-  gen_wrf_io2 ( fp , fname, "grid%" , Domain.fields , AUXHIST2 , GEN_OUTPUT ) ;
+  gen_wrf_io2 ( fp , fname, "grid%" , NULL, Domain.fields , AUXHIST2 , GEN_OUTPUT ) ;
   close_the_file(fp) ;
   OP_F(fp,"wrf_auxhist3out.inc") ;
-  gen_wrf_io2 ( fp , fname, "grid%" , Domain.fields , AUXHIST3 , GEN_OUTPUT ) ;
+  gen_wrf_io2 ( fp , fname, "grid%" , NULL, Domain.fields , AUXHIST3 , GEN_OUTPUT ) ;
   close_the_file(fp) ;
   OP_F(fp,"wrf_auxhist4out.inc") ;
-  gen_wrf_io2 ( fp , fname, "grid%" , Domain.fields , AUXHIST4 , GEN_OUTPUT ) ;
+  gen_wrf_io2 ( fp , fname, "grid%" , NULL, Domain.fields , AUXHIST4 , GEN_OUTPUT ) ;
   close_the_file(fp) ;
   OP_F(fp,"wrf_auxhist5out.inc") ;
-  gen_wrf_io2 ( fp , fname, "grid%" , Domain.fields , AUXHIST5 , GEN_OUTPUT ) ;
+  gen_wrf_io2 ( fp , fname, "grid%" , NULL, Domain.fields , AUXHIST5 , GEN_OUTPUT ) ;
   close_the_file(fp) ;
   OP_F(fp,"wrf_inputout.inc") ;
-  gen_wrf_io2 ( fp , fname, "grid%" , Domain.fields , INPUT   , GEN_OUTPUT ) ;
+  gen_wrf_io2 ( fp , fname, "grid%" , NULL, Domain.fields , INPUT   , GEN_OUTPUT ) ;
   close_the_file(fp) ;
   OP_F(fp,"wrf_auxinput1out.inc") ;
-  gen_wrf_io2 ( fp , fname, "grid%" , Domain.fields , AUXINPUT1   , GEN_OUTPUT ) ;
+  gen_wrf_io2 ( fp , fname, "grid%" , NULL, Domain.fields , AUXINPUT1   , GEN_OUTPUT ) ;
   close_the_file(fp) ;
   OP_F(fp,"wrf_auxinput2out.inc") ;
-  gen_wrf_io2 ( fp , fname, "grid%" , Domain.fields , AUXINPUT2   , GEN_OUTPUT ) ;
+  gen_wrf_io2 ( fp , fname, "grid%" , NULL, Domain.fields , AUXINPUT2   , GEN_OUTPUT ) ;
   close_the_file(fp) ;
   OP_F(fp,"wrf_auxinput3out.inc") ;
-  gen_wrf_io2 ( fp , fname, "grid%" , Domain.fields , AUXINPUT3   , GEN_OUTPUT ) ;
+  gen_wrf_io2 ( fp , fname, "grid%" , NULL, Domain.fields , AUXINPUT3   , GEN_OUTPUT ) ;
   close_the_file(fp) ;
   OP_F(fp,"wrf_auxinput4out.inc") ;
-  gen_wrf_io2 ( fp , fname, "grid%" , Domain.fields , AUXINPUT4   , GEN_OUTPUT ) ;
+  gen_wrf_io2 ( fp , fname, "grid%" , NULL, Domain.fields , AUXINPUT4   , GEN_OUTPUT ) ;
   close_the_file(fp) ;
   OP_F(fp,"wrf_auxinput5out.inc") ;
-  gen_wrf_io2 ( fp , fname, "grid%" , Domain.fields , AUXINPUT5   , GEN_OUTPUT ) ;
+  gen_wrf_io2 ( fp , fname, "grid%" , NULL, Domain.fields , AUXINPUT5   , GEN_OUTPUT ) ;
   close_the_file(fp) ;
   OP_F(fp,"wrf_restartout.inc") ;
-  gen_wrf_io2 ( fp , fname, "grid%" , Domain.fields , RESTART , GEN_OUTPUT ) ;
+  gen_wrf_io2 ( fp , fname, "grid%" , NULL, Domain.fields , RESTART , GEN_OUTPUT ) ;
   close_the_file(fp) ;
   OP_F(fp,"wrf_bdyout.inc") ;
-  gen_wrf_io2 ( fp , fname, "grid%" , Domain.fields , BOUNDARY , GEN_OUTPUT ) ;
+  gen_wrf_io2 ( fp , fname, "grid%" , NULL, Domain.fields , BOUNDARY , GEN_OUTPUT ) ;
   close_the_file(fp) ;
 #endif
 
 #if 1
   OP_F(fp,"wrf_metaget_input.inc") ;
-  gen_wrf_io2 ( fp , fname, "grid%" , Domain.fields , 
+  gen_wrf_io2 ( fp , fname, "grid%" , NULL, Domain.fields , 
       METADATA | INPUT , GEN_INPUT ) ;
 
   OP_F(fp,"wrf_metaget_restart.inc") ;
-  gen_wrf_io2 ( fp , fname, "grid%" , Domain.fields , 
+  gen_wrf_io2 ( fp , fname, "grid%" , NULL, Domain.fields , 
       METADATA | RESTART , GEN_INPUT ) ;
 
   OP_F(fp,"wrf_metaget_history.inc") ;
-  gen_wrf_io2 ( fp , fname, "grid%" , Domain.fields , 
+  gen_wrf_io2 ( fp , fname, "grid%" , NULL, Domain.fields , 
       METADATA | HISTORY , GEN_INPUT ) ;
 
   OP_F(fp,"wrf_metaget_boundary.inc") ;
-  gen_wrf_io2 ( fp , fname, "grid%" , Domain.fields , 
+  gen_wrf_io2 ( fp , fname, "grid%" , NULL, Domain.fields , 
       METADATA | BOUNDARY , GEN_INPUT ) ;
 
   OP_F(fp,"wrf_histin.inc") ;
-  gen_wrf_io2 ( fp , fname, "grid%" , Domain.fields , HISTORY , GEN_INPUT ) ;
+  gen_wrf_io2 ( fp , fname, "grid%" , NULL, Domain.fields , HISTORY , GEN_INPUT ) ;
   close_the_file(fp) ;
   OP_F(fp,"wrf_auxhist1in.inc") ;
-  gen_wrf_io2 ( fp , fname, "grid%" , Domain.fields , AUXHIST1 , GEN_INPUT ) ;
+  gen_wrf_io2 ( fp , fname, "grid%" , NULL, Domain.fields , AUXHIST1 , GEN_INPUT ) ;
   close_the_file(fp) ;
   OP_F(fp,"wrf_auxhist2in.inc") ;
-  gen_wrf_io2 ( fp , fname, "grid%" , Domain.fields , AUXHIST2 , GEN_INPUT ) ;
+  gen_wrf_io2 ( fp , fname, "grid%" , NULL, Domain.fields , AUXHIST2 , GEN_INPUT ) ;
   close_the_file(fp) ;
   OP_F(fp,"wrf_auxhist3in.inc") ;
-  gen_wrf_io2 ( fp , fname, "grid%" , Domain.fields , AUXHIST3 , GEN_INPUT ) ;
+  gen_wrf_io2 ( fp , fname, "grid%" , NULL, Domain.fields , AUXHIST3 , GEN_INPUT ) ;
   close_the_file(fp) ;
   OP_F(fp,"wrf_auxhist4in.inc") ;
-  gen_wrf_io2 ( fp , fname, "grid%" , Domain.fields , AUXHIST4 , GEN_INPUT ) ;
+  gen_wrf_io2 ( fp , fname, "grid%" , NULL, Domain.fields , AUXHIST4 , GEN_INPUT ) ;
   close_the_file(fp) ;
   OP_F(fp,"wrf_auxhist5in.inc") ;
-  gen_wrf_io2 ( fp , fname, "grid%" , Domain.fields , AUXHIST5 , GEN_INPUT ) ;
+  gen_wrf_io2 ( fp , fname, "grid%" , NULL, Domain.fields , AUXHIST5 , GEN_INPUT ) ;
   close_the_file(fp) ;
   OP_F(fp,"wrf_inputin.inc") ;
-  gen_wrf_io2 ( fp , fname, "grid%" , Domain.fields , INPUT   , GEN_INPUT ) ;
+  gen_wrf_io2 ( fp , fname, "grid%" , NULL, Domain.fields , INPUT   , GEN_INPUT ) ;
   close_the_file(fp) ;
   OP_F(fp,"wrf_auxinput1in.inc") ;
-  gen_wrf_io2 ( fp , fname, "grid%" , Domain.fields , AUXINPUT1   , GEN_INPUT ) ;
+  gen_wrf_io2 ( fp , fname, "grid%" , NULL, Domain.fields , AUXINPUT1   , GEN_INPUT ) ;
   close_the_file(fp) ;
   OP_F(fp,"wrf_auxinput2in.inc") ;
-  gen_wrf_io2 ( fp , fname, "grid%" , Domain.fields , AUXINPUT2   , GEN_INPUT ) ;
+  gen_wrf_io2 ( fp , fname, "grid%" , NULL, Domain.fields , AUXINPUT2   , GEN_INPUT ) ;
   close_the_file(fp) ;
   OP_F(fp,"wrf_auxinput3in.inc") ;
-  gen_wrf_io2 ( fp , fname, "grid%" , Domain.fields , AUXINPUT3   , GEN_INPUT ) ;
+  gen_wrf_io2 ( fp , fname, "grid%" , NULL, Domain.fields , AUXINPUT3   , GEN_INPUT ) ;
   close_the_file(fp) ;
   OP_F(fp,"wrf_auxinput4in.inc") ;
-  gen_wrf_io2 ( fp , fname, "grid%" , Domain.fields , AUXINPUT4   , GEN_INPUT ) ;
+  gen_wrf_io2 ( fp , fname, "grid%" , NULL, Domain.fields , AUXINPUT4   , GEN_INPUT ) ;
   close_the_file(fp) ;
   OP_F(fp,"wrf_auxinput5in.inc") ;
-  gen_wrf_io2 ( fp , fname, "grid%" , Domain.fields , AUXINPUT5   , GEN_INPUT ) ;
+  gen_wrf_io2 ( fp , fname, "grid%" , NULL, Domain.fields , AUXINPUT5   , GEN_INPUT ) ;
   close_the_file(fp) ;
   OP_F(fp,"wrf_restartin.inc") ;
-  gen_wrf_io2 ( fp , fname, "grid%" , Domain.fields , RESTART , GEN_INPUT ) ;
+  gen_wrf_io2 ( fp , fname, "grid%" , NULL, Domain.fields , RESTART , GEN_INPUT ) ;
   close_the_file(fp) ;
   OP_F(fp,"wrf_bdyin.inc") ;
-  gen_wrf_io2 ( fp , fname, "grid%" , Domain.fields , BOUNDARY , GEN_INPUT ) ;
+  gen_wrf_io2 ( fp , fname, "grid%" , NULL, Domain.fields , BOUNDARY , GEN_INPUT ) ;
   close_the_file(fp) ;
 #endif
 
@@ -237,7 +237,7 @@ set_dim_strs ( node_t *node , char ddim[3][2][NAMELEN], char mdim[3][2][NAMELEN]
 }
 
 int
-gen_wrf_io2 ( FILE * fp , char * fname, char * structname , node_t * node , int io_mask , int sw_io )
+gen_wrf_io2 ( FILE * fp , char * fname, char * structname , char * fourdname, node_t * node , int io_mask , int sw_io )
 {
   node_t * p ;
   int i , ii  ;
@@ -253,11 +253,12 @@ gen_wrf_io2 ( FILE * fp , char * fname, char * structname , node_t * node , int 
   char dimname[3][NAMELEN] ;
   char core[NAMELEN] ;
   char stagstr[NAMELEN] ;
+  char * tend_tag ;
 
   char post[NAMELEN] ;
   char indices[NAMELEN] ;
 
-  int var, pass, passes ;
+  int pass, passes ;
   int xi, yi, zi ;
   node_t * dimnode ;
   int ok_to_collect_distribute ;
@@ -298,7 +299,16 @@ gen_wrf_io2 ( FILE * fp , char * fname, char * structname , node_t * node , int 
 
     if ( p->node_kind & FOURD )
     {
-      gen_wrf_io2 ( fp , fname, structname , p->members, io_mask, sw_io ) ; 
+      node_t * nd ;
+      char p1[NAMELEN] ;
+      int itdoesnt ;
+
+      /* find out if the four-d array has an associated boundary array? */
+      itdoesnt = 0 ;
+      sprintf(p1,"%s_b",p->name ) ;
+      if (( nd = get_entry ( p1 , Domain.fields )) == NULL ) itdoesnt = 1 ;
+      if ( ! ( io_mask & BOUNDARY && itdoesnt ) )
+         gen_wrf_io2 ( fp , fname, structname , p->name, p->members, io_mask, sw_io ) ; 
     }
     else if ( p->type != NULL )
     {
@@ -308,7 +318,8 @@ gen_wrf_io2 ( FILE * fp , char * fname, char * structname , node_t * node , int 
 
 /* ////////  BOUNDARY ///////////////////// */
 
-      if ( p->io_mask & BOUNDARY && (io_mask & BOUNDARY) && !( io_mask & METADATA ) )
+      if (  p->io_mask & BOUNDARY && (io_mask & BOUNDARY) && !( io_mask & METADATA ) 
+         && strcmp( p->use, "_4d_bdy_array_" ) || ( io_mask & BOUNDARY && fourdname ) )
       {
         int ibdy ;
         int idx ;
@@ -325,7 +336,6 @@ gen_wrf_io2 ( FILE * fp , char * fname, char * structname , node_t * node , int 
         ds3 = "1" ; de3 = "config_flags%spec_bdy_width" ;
         ms3 = "1" ; me3 = "config_flags%spec_bdy_width" ;
         ps3 = "1" ; pe3 = "config_flags%spec_bdy_width" ;
-
 
         if (( dimnode = get_dimnode_for_coord( p , COORD_Z )) != NULL )
          { if ( p->stag_z ) { sprintf( dimname[1] ,"%s_stag", dimnode->dim_data_name) ; } 
@@ -346,6 +356,7 @@ gen_wrf_io2 ( FILE * fp , char * fname, char * structname , node_t * node , int 
            ms3 = "1" ; me3 = "1" ;
            ps3 = "1" ; pe3 = "1" ;
          }
+
         if ( strlen(p->dname) < 1 ) {
           fprintf(stderr,"gen_wrf_io.c: Registry WARNING: no data name for %s \n",p->name) ;
         }
@@ -397,46 +408,29 @@ gen_wrf_io2 ( FILE * fp , char * fname, char * structname , node_t * node , int 
           if      ( p->ndims == 3 ) sprintf(memord,"%sZ",bdytag ) ;
           else if ( p->ndims == 2 ) sprintf(memord,"%s",bdytag ) ;
           else                      sprintf(memord,"0") ;
+
+        passes = 1 ;
+        if ( fourdname != NULL ) passes = 2 ;
+        for ( pass = 0 ; pass < passes ; pass++ ) {
+          tend_tag = ( pass == 0 ) ? "_B" : "_BT" ;
 	  if ( sw_io == GEN_INPUT )
 	  {
-/*Wei's change for 4dvar*/
-          for ( var = 0 ; var < p->var_numb ; var++ )
-          {
-          /*
-           */
-            if(p->var_numb > 1)
-            {
-              printf("Processing var: <%s> for <%c> in file: <%s>, line: <%d>\n", p->name, p->var_name[var], __FILE__, __LINE__);
-            }
-
-            if(var)
-            {
-              if ( !strncmp( p->use, "dyn_", 4 ) )
-              {
-                if ( p->var_name[var] == 'a' )
-                  fprintf(fp,"IF ( grid%%dyn_opt .EQ. %s_AD ) THEN\n",p->use) ;
-                else if ( p->var_name[var] == 'g' )
-	          fprintf(fp,"IF ((grid%%dyn_opt .EQ. %s_TL) .or. (grid%%dyn_opt .EQ. %s_AD)) THEN\n",p->use,p->use) ;
-              }
-            } 
-            else
-            {
-              if ( !strncmp( p->use, "dyn_", 4 ) )
-                fprintf(fp,"IF ( mod(grid%%dyn_opt,100) .EQ. %s ) THEN\n",p->use) ;
-            }
-
+	    if ( !strncmp( p->use, "dyn_", 4 ) ) 
+	      fprintf(fp,"IF ( grid%%dyn_opt .EQ. %s ) THEN\n",p->use) ;
             if ( ok_to_collect_distribute )
 	      fprintf(fp,"IF ( wrf_dm_on_monitor() ) THEN\n") ;
             fprintf(fp,"CALL wrf_ext_read_field (  &\n") ;
             fprintf(fp,"                       fid                , &  ! DataHandle \n" ) ;
             fprintf(fp,"                       current_date(1:19) , &  ! DateStr \n" ) ;
-
-            if(var)
-              fprintf(fp,"                       '%c_%s'             , &  ! Data Name \n", toupper(p->var_name[var]), dname ) ;
-            else
+            if ( fourdname == NULL ) {
               fprintf(fp,"                       '%s'               , &  ! Data Name \n", dname ) ;
-
-            fprintf(fp,"                       %s%s%s(1,kds,1,%d)     , &  ! Field \n" , structname , core , p->name, ibdy ) ;
+              fprintf(fp,"                       %s%s%s(1,kds,1,%d)     , &  ! Field \n" , structname , core , p->name, ibdy ) ;
+            } else {
+              if ( strlen(p->dname)==0 || !strcmp(p->dname,"-") ) { sprintf(dname,"%s%s%s",p->name,tend_tag,bdytag)  ; }
+              else                                                { sprintf(dname,"%s%s%s",p->dname,tend_tag,bdytag) ; }
+              fprintf(fp,"                       '%s'               , &  ! Data Name \n", dname ) ;
+              fprintf(fp,"                       %s%s%s%s(1,kds,1,%d,P_%s)     , &  ! Field \n" , structname , core , fourdname, tend_tag, ibdy, p->name ) ;
+            }
             fprintf(fp,"                       WRF_%s             , &  ! FieldType \n" , p->type->name ) ;
             fprintf(fp,"                       grid%%communicator , &  ! Comm\n") ;
             fprintf(fp,"                       grid%%iocommunicator , &  ! Comm\n") ;
@@ -458,50 +452,25 @@ gen_wrf_io2 ( FILE * fp , char * fname, char * structname , node_t * node , int 
             }
 	    if ( !strncmp( p->use, "dyn_", 4 ) ) 
 	      fprintf(fp,"END IF\n" ) ;
-          }
-/*End Wei's change for 4dvar*/
 	  }
           else if ( sw_io == GEN_OUTPUT )
 	  {
-/*Wei's change for 4dvar*/
-          for ( var = 0 ; var < p->var_numb ; var++ )
-          {
-          /*
-           */
-            if(p->var_numb > 1)
-            {
-              printf("Processing var: <%s> for <%c> in file: <%s>, line: <%d>\n", p->name, p->var_name[var], __FILE__, __LINE__);
-            }
-
             if ( ok_to_collect_distribute )
               fprintf(fp,"IF ( wrf_dm_on_monitor() ) THEN\n") ;
-
-            if(var)
-            {
-              if ( !strncmp( p->use, "dyn_", 4 ) )
-              {
-                if ( p->var_name[var] == 'a' )
-                  fprintf(fp,"IF ( grid%%dyn_opt .EQ. %s_AD ) THEN\n",p->use) ;
-                else if ( p->var_name[var] == 'g' )
-	          fprintf(fp,"IF ((grid%%dyn_opt .EQ. %s_TL) .or. (grid%%dyn_opt .EQ. %s_AD)) THEN\n",p->use,p->use) ;
-              }
-            } 
-            else
-            {
-              if ( !strncmp( p->use, "dyn_", 4 ) )
-                fprintf(fp,"IF ( mod(grid%%dyn_opt,100) .EQ. %s ) THEN\n",p->use) ;
-            }
-
+            if ( !strncmp( p->use, "dyn_", 4 ) )
+              fprintf(fp,"IF ( grid%%dyn_opt .EQ. %s ) THEN\n",p->use) ;
             fprintf(fp,"CALL wrf_ext_write_field (  &\n") ;
             fprintf(fp,"                       fid                , &  ! DataHandle \n" ) ;
             fprintf(fp,"                       current_date(1:19) , &  ! DateStr \n" ) ;
-
-            if(var)
-              fprintf(fp,"                       '%c_%s'             , &  ! Data Name \n", toupper(p->var_name[var]), dname ) ;
-            else
+            if ( fourdname == NULL ) {
               fprintf(fp,"                       '%s'               , &  ! Data Name \n", dname ) ;
-
-            fprintf(fp,"                       %s%s%s(1,kds,1,%d)     , &  ! Field \n" , structname , core , p->name, ibdy ) ;
+              fprintf(fp,"                       %s%s%s(1,kds,1,%d)     , &  ! Field \n" , structname , core , p->name, ibdy ) ;
+            } else {
+              if ( strlen(p->dname)==0 || !strcmp(p->dname,"-") ) { sprintf(dname,"%s%s%s",p->name,tend_tag,bdytag)  ; }
+              else                                                { sprintf(dname,"%s%s%s",p->dname,tend_tag,bdytag) ; }
+              fprintf(fp,"                       '%s'               , &  ! Data Name \n", dname ) ;
+              fprintf(fp,"                       %s%s%s%s(1,kds,1,%d,P_%s)     , &  ! Field \n" , structname , core , fourdname, tend_tag, ibdy, p->name ) ;
+            }
             fprintf(fp,"                       WRF_%s             , &  ! FieldType \n" , p->type->name ) ;
             fprintf(fp,"                       grid%%communicator , &  ! Comm\n") ;
             fprintf(fp,"                       grid%%iocommunicator , &  ! Comm\n") ;
@@ -513,17 +482,7 @@ gen_wrf_io2 ( FILE * fp , char * fname, char * structname , node_t * node , int 
             fprintf(fp,"                       '%s'               , &  ! Dimname 1 \n",dimname[0] ) ;
             fprintf(fp,"                       '%s'               , &  ! Dimname 2 \n",dimname[1] ) ;
             fprintf(fp,"                       '%s'               , &  ! Dimname 3 \n",dimname[2] ) ;
-
-            if(var)
-            {
-              if(p->var_name[var] == 'a')
-                 fprintf(fp,"                       'GRADIENT %s'               , &  ! Desc  \n",p->descrip ) ;
-              else
-                 fprintf(fp,"                       'PETURBATION %s'               , &  ! Desc  \n",p->descrip ) ;
-            }
-            else
-              fprintf(fp,"                       '%s'               , &  ! Desc  \n",p->descrip ) ;
-
+            fprintf(fp,"                       '%s'               , &  ! Desc  \n",p->descrip ) ;
             fprintf(fp,"                       '%s'               , &  ! Units \n",p->units ) ;
             fprintf(fp,"'%s ext_write_field %s memorder %s' , & ! Debug message\n",fname,dname,memord ) ;
             /* global dimensions */
@@ -537,7 +496,6 @@ gen_wrf_io2 ( FILE * fp , char * fname, char * structname , node_t * node , int 
               fprintf(fp,"ENDIF\n") ;
 	  }
         }
-/*End Wei's change for 4dvar*/
         }
       }
 
@@ -611,40 +569,13 @@ in the program does not change as a result of inputting the dataset.
       {
         if ( io_mask & RESTART && p->ntl > 1 ) passes = p->ntl ;
         else                                   passes = 1 ;
-/*Wei's change for 4dvar*/
-        for ( var = 0 ; var < p->var_numb ; var++ )
-        {
-        /*
-         *if(p->var_numb > 1)
-         *{
-         *  printf("Processing var: <%s> for <%c> in file: <%s>, line: <%d>\n", p->name, p->var_name[var], __FILE__, __LINE__);
-         *}
-         */
 
         for ( pass = 0 ; pass < passes ; pass++ )   /* for multi timelevel vars */
         {
-          if(var)
-          {
-            if (!strncmp( p->use, "dyn_", 4))
-	      sprintf(core,"%s_%c_",p->use+4,p->var_name[var]) ;
-	    else
-	      sprintf(core,"%c_",p->var_name[var]);
-          }
-          else
-          {
-            if (!strncmp( p->use, "dyn_", 4))
-	      sprintf(core,"%s_",p->use+4) ;
-	    else
-	      strcpy(core,"") ;
-          }
-
-        /*
-         *if(p->var_numb > 1)
-         *{
-         *  printf("core: <%s> in file: <%s>, line: <%d>\n", core, __FILE__, __LINE__);
-         *}
-         */
-/*end Wei's change for 4dvar*/
+          if (!strncmp( p->use, "dyn_", 4))
+	    sprintf(core,"%s_",p->use+4) ;
+	  else
+	    strcpy(core,"") ;
 
 		  /* for multi time level variables gen read for both levels
 		     for restart, only _2 for others */
@@ -707,35 +638,15 @@ if ( pass == 0 )
           char dname_symbol[128] ;
           sym_nodeptr sym_node ;
 
-/*Wei's change for 4dvar*/
-          if(var)
-          {
-            sprintf(dname_symbol, "DNAME_%c_%s", p->var_name[var], dname_tmp ) ;
-          }
-          else
-          {
-            sprintf(dname_symbol, "DNAME_%s", dname_tmp ) ;
-          }
-
-        /*
-         *if(p->var_numb > 1)
-         *{
-         *  printf("var No. %d, dname_symbol: <%s>, dname_tmp: <%s>, file: <%s>, line: <%d>\n", var, dname_symbol, dname_tmp, __FILE__, __LINE__);
-         *}
-         */
-/*End Wei's change for 4dvar*/
-
+          sprintf(dname_symbol, "DNAME_%s", dname_tmp ) ;
           /* check and see if it is in the symbol table already */
 
           if ((sym_node = sym_get( dname_symbol )) == NULL ) {
             /* add it */
- /* fprintf(stderr,"adding %s %s  %s\n",dname_symbol,core,p->name ) ; */
             sym_node = sym_add ( dname_symbol ) ;
             strcpy( sym_node->internal_name , p->name ) ;
             strcpy( sym_node->core_name , core ) ;
           } else {
- /* fprintf(stderr,"got %s (core %s) (sym_core %s) %s  %s\n",
-   dname_symbol,core,sym_node->core_name,p->name,sym_node->internal_name ) ; */
             /* it's there already, check and make sure we don't have an error condition */
             if ( (strlen(core) > 0 && strlen( sym_node->core_name ) > 0 && !strcmp( core, sym_node->core_name ))
               || strlen(core) == 0
@@ -765,331 +676,12 @@ if ( pass == 0 )
           if ( strlen(dname) < 1 ) {
             fprintf(stderr,"gen_wrf_io.c: Registry WARNING:: no data name for %s \n",p->name) ;
           }
-
           if ( p->io_mask & io_mask && sw_io == GEN_INPUT )
           {
-          if ( io_mask == AUXINPUT2 )
-          {
-/*Wei's change for 4dvar*/
-            if(!var)
-            {
-	        if ( !strncmp( p->use, "dyn_", 4 ) ) 
-	          fprintf(fp,"IF (mod(grid%%dyn_opt, 100) .EQ. %s) THEN\n",p->use) ;
-
-                if ( p->scalar_array_member )
-                  fprintf(fp,"IF (P_%s .GE. PARAM_FIRST_SCALAR) THEN\n",p->name) ;
-
-                if ( ok_to_collect_distribute )
-                  fprintf(fp,"IF ( wrf_dm_on_monitor() ) THEN\n") ;
-
-                strcpy(indices,"") ;
-                sprintf(post,")") ;
-                if ( sw_io_deref_kludge && !(p->scalar_array_member) )   /* these aready have */
-                {
-                  sprintf(indices, "%s",index_with_firstelem("(","grid%",t2,p,post)) ;
-                }
-
-	        fprintf(fp,"CALL wrf_ext_read_field (  &\n") ;
-	        fprintf(fp,"                       fid                , &  ! DataHandle \n" ) ;
-	        fprintf(fp,"                       current_date(1:19) , &  ! DateStr \n" ) ;
-
-	        fprintf(fp,"                       '%s'               , &  ! Data Name \n", dname ) ;
-
-                if ( p->ndims >= 2 && ok_to_collect_distribute )
-	          fprintf(fp,"                       globbuf_%s               , &  ! Field \n" , p->type->name ) ;
-                else
-	          fprintf(fp,"                       %s%s%s               , &  ! Field \n" , structname , vname , indices) ;
-
-	        fprintf(fp,"                       WRF_%s             , &  ! FieldType \n" , p->type->name ) ;
-	        fprintf(fp,"                       grid%%communicator  , &  ! Comm\n") ;
-	        fprintf(fp,"                       grid%%iocommunicator  , &  ! Comm\n") ;
-	        fprintf(fp,"                       grid%%domdesc       , &  ! Comm\n") ;
-                fprintf(fp,"                       grid%%bdy_mask     , &  ! bdy_mask\n") ;
-	        fprintf(fp,"                       '%s'               , &  ! MemoryOrder\n",memord ) ;
-	        fprintf(fp,"                       '%s'               , &  ! Stagger\n",stagstr ) ;
-	        fprintf(fp,"'%s ext_read_field %s memorder %s' , & ! Debug message\n",fname,dname,memord ) ;
-	        /* global dimensions */
-	        for ( i = 0 ; i < 3 ; i++ ) { fprintf(fp,"%s , %s , ",ddim[i][0], ddim[i][1]) ; }
-	        fprintf(fp," & \n") ;
-
-                if      ( p->ndims == 3 && ok_to_collect_distribute )
-	        {
-	          /* mem    dimensions are actually domain dimensions */
-	          for ( i = 0 ; i < 3 ; i++ ) { fprintf(fp,"%s , %s , ",ddim_no[i][0], ddim_no[i][1]) ; }
-	          fprintf(fp," & \n") ;
-	          /* patch  dimensions are actually domain dimensions */
-	          for ( i = 0 ; i < 3 ; i++ ) { fprintf(fp,"%s , %s , ",ddim   [i][0], ddim   [i][1]) ; }
-	          fprintf(fp," & \n") ;
-	        }
-	        else if ( p->ndims == 2 && ok_to_collect_distribute )
-	        {
-	          if ((xi=get_index_for_coord(p,COORD_X))>=0&&(yi=get_index_for_coord(p,COORD_Y))>=0)
-	          {
-	            /* mem    dimensions are actually domain dimensions */
-                    fprintf(fp, "%s, %s, %s, %s, 1 , 1 , &\n",ddim_no[xi][0],ddim_no[xi][1],
-							      ddim_no[yi][0],ddim_no[yi][1] ) ;
-	          /* patch  dimensions are actually domain dimensions */
-                    fprintf(fp, "%s, %s, %s, %s, 1 , 1 , &\n",ddim   [xi][0],ddim   [xi][1],
-							      ddim   [yi][0],ddim   [yi][1] ) ;
-	          }
-	        }
-	        else
-	        {
-	          /* mem    dimensions */
-	          for ( i = 0 ; i < 3 ; i++ ) { fprintf(fp,"%s , %s , ",mdim[i][0], mdim[i][1]) ; }
-	          fprintf(fp," & \n") ;
-	          /* patch  dimensions */
-	          for ( i = 0 ; i < 3 ; i++ ) { fprintf(fp,"%s , %s , ",pdim[i][0], pdim[i][1]) ; }
-	          fprintf(fp," & \n") ;
-	        }
-	        fprintf(fp,"                       ierr )\n") ;
-  
-                if ( ok_to_collect_distribute )
-	          fprintf(fp,"END IF\n" ) ;
-  
-  /* In case we have read into a global buffer, generate code to distribute the data just read in */
-              if      ( p->ndims == 3 && ok_to_collect_distribute )
-	      {
-	        if ((xi=get_index_for_coord(p,COORD_X))>=0&&(yi=get_index_for_coord(p,COORD_Y))>=0&&(zi=get_index_for_coord(p,COORD_Z))>=0)
-	        {
-	          fprintf(fp,"call wrf_global_to_patch_%s ( globbuf_%s , %s%s , &\n",p->type->name,p->type->name,structname , vname ) ;
-	          fprintf(fp,"       grid%%domdesc, %d, &\n",p->ndims) ;
-                  fprintf(fp, "%s, %s, %s, %s, %s, %s, &\n",ddim_no[xi][0],ddim_no[xi][1],
-							    ddim_no[yi][0],ddim_no[yi][1],
-							    ddim_no[zi][0],ddim_no[zi][1]) ;
-                  fprintf(fp, "%s, %s, %s, %s, %s, %s, &\n",mdim_no[xi][0],mdim_no[xi][1],
-							    mdim_no[yi][0],mdim_no[yi][1],
-							    mdim_no[zi][0],mdim_no[zi][1]) ;
-                  fprintf(fp, "%s, %s, %s, %s, %s, %s  )\n",pdim_no[xi][0],pdim_no[xi][1],
-							    pdim_no[yi][0],pdim_no[yi][1],
-							    pdim_no[zi][0],pdim_no[zi][1]) ;
-	        }
-	      }
-	      else if ( p->ndims == 2 && ok_to_collect_distribute )
-	      {
-	        if ((xi=get_index_for_coord(p,COORD_X))>=0&&(yi=get_index_for_coord(p,COORD_Y))>=0)
-	        {
-	          fprintf(fp,"call wrf_global_to_patch_%s ( globbuf_%s , %s%s , &\n",p->type->name,p->type->name,structname , vname ) ;
-	          fprintf(fp,"       grid%%domdesc, %d, &\n",p->ndims) ;
-                  fprintf(fp, "%s, %s, %s, %s, 1 , 1 , &\n",ddim_no[xi][0],ddim_no[xi][1],
-							    ddim_no[yi][0],ddim_no[yi][1] ) ;
-                  fprintf(fp, "%s, %s, %s, %s, 1 , 1 , &\n",mdim_no[xi][0],mdim_no[xi][1],
-							    mdim_no[yi][0],mdim_no[yi][1] ) ;
-                  fprintf(fp, "%s, %s, %s, %s, 1 , 1   )\n",pdim_no[xi][0],pdim_no[xi][1],
-							    pdim_no[yi][0],pdim_no[yi][1] ) ;
-	        }
-	        else
-	        {
-	          fprintf(stderr,"gen_wrf_io.c: Registry WARNING (and possibly internal error) %s \n",p->name) ;
-	        }
-	      }
-	      else if ( !strcmp(memord,"Z") && ok_to_collect_distribute )
-	      {
-	        fprintf(fp," call wrf_dm_bcast_%s ( %s%s , (%s)-(%s)+1 )\n",p->type->name,structname,vname,ddim[0][1],ddim[0][0] ) ;
-	      }
-	      else if ( !strcmp(memord,"0") && ok_to_collect_distribute )
-	      {
-	        fprintf(fp," call wrf_dm_bcast_%s ( %s%s , 1 )\n",p->type->name,structname,vname ) ;
-  
-	      }
-	      else if ( ok_to_collect_distribute )
-	      {
-	        fprintf(stderr,"gen_wrf_io.c: Registry WARNING: can't figure out entry for %s (Memord %s)\n",p->name,memord) ;
-	      }
-  
-	      if ( io_mask & INPUT && p->ntl > 1 ) {
-	        /* copy time level two into time level one */
-	        if ( p->ntl == 3 ) fprintf(fp, "grid%%%s = grid%%%s\n", vname_2 , vname_x ) ;
-	        if ( p->ntl == 2 ) fprintf(fp, "grid%%%s = grid%%%s\n", vname_1 , vname_x ) ;
-	      }
-  
-	      if ( p->scalar_array_member )
-	      {
-	        fprintf(fp,"END IF\n" ) ;
-	      }
-  
-	      if ( !strncmp( p->use, "dyn_", 4 ) ) 
-	        fprintf(fp,"END IF\n" ) ;
-              }
-          }
-          else if ( io_mask == AUXINPUT3 )
-          {
-/*Wei's change for 4dvar*/
-            if(var)
-            {
-	      if ( p->var_name[var] == 'g' )
-              {
-	        if ( !strncmp( p->use, "dyn_", 4 ) ) 
-	          fprintf(fp,"IF ( grid%%dyn_opt .EQ. %s_AD ) THEN\n",p->use) ;
-                if ( p->scalar_array_member )
-                  fprintf(fp,"IF ((grid%%dyn_opt .EQ. DYN_EM_AD) .and. (P_%s .GE. PARAM_FIRST_SCALAR)) THEN\n",p->name) ;
-
-                if ( ok_to_collect_distribute )
-                  fprintf(fp,"IF ( wrf_dm_on_monitor() ) THEN\n") ;
-
-                strcpy(indices,"") ;
-                sprintf(post,")") ;
-                if ( sw_io_deref_kludge && !(p->scalar_array_member) )   /* these aready have */
-                {
-                  sprintf(indices, "%s",index_with_firstelem("(","grid%",t2,p,post)) ;
-                }
-
-	        fprintf(fp,"CALL wrf_ext_read_field (  &\n") ;
-	        fprintf(fp,"                       fid                , &  ! DataHandle \n" ) ;
-	        fprintf(fp,"                       current_date(1:19) , &  ! DateStr \n" ) ;
-
-	        fprintf(fp,"                       'G_%s'             , &  ! Data Name \n", dname ) ;
-
-                if ( p->ndims >= 2 && ok_to_collect_distribute )
-	          fprintf(fp,"                       globbuf_%s               , &  ! Field \n" , p->type->name ) ;
-                else
-	          fprintf(fp,"                       %s%s%s               , &  ! Field \n" , structname , vname , indices) ;
-
-	        fprintf(fp,"                       WRF_%s             , &  ! FieldType \n" , p->type->name ) ;
-	        fprintf(fp,"                       grid%%communicator  , &  ! Comm\n") ;
-	        fprintf(fp,"                       grid%%iocommunicator  , &  ! Comm\n") ;
-	        fprintf(fp,"                       grid%%domdesc       , &  ! Comm\n") ;
-                fprintf(fp,"                       grid%%bdy_mask     , &  ! bdy_mask\n") ;
-	        fprintf(fp,"                       '%s'               , &  ! MemoryOrder\n",memord ) ;
-	        fprintf(fp,"                       '%s'               , &  ! Stagger\n",stagstr ) ;
-	        fprintf(fp,"'%s ext_read_field %s memorder %s' , & ! Debug message\n",fname,dname,memord ) ;
-	        /* global dimensions */
-	        for ( i = 0 ; i < 3 ; i++ ) { fprintf(fp,"%s , %s , ",ddim[i][0], ddim[i][1]) ; }
-	        fprintf(fp," & \n") ;
-
-                if      ( p->ndims == 3 && ok_to_collect_distribute )
-	        {
-	          /* mem    dimensions are actually domain dimensions */
-	          for ( i = 0 ; i < 3 ; i++ ) { fprintf(fp,"%s , %s , ",ddim_no[i][0], ddim_no[i][1]) ; }
-	          fprintf(fp," & \n") ;
-	          /* patch  dimensions are actually domain dimensions */
-	          for ( i = 0 ; i < 3 ; i++ ) { fprintf(fp,"%s , %s , ",ddim   [i][0], ddim   [i][1]) ; }
-	          fprintf(fp," & \n") ;
-	        }
-	        else if ( p->ndims == 2 && ok_to_collect_distribute )
-	        {
-	          if ((xi=get_index_for_coord(p,COORD_X))>=0&&(yi=get_index_for_coord(p,COORD_Y))>=0)
-	          {
-	            /* mem    dimensions are actually domain dimensions */
-                    fprintf(fp, "%s, %s, %s, %s, 1 , 1 , &\n",ddim_no[xi][0],ddim_no[xi][1],
-							      ddim_no[yi][0],ddim_no[yi][1] ) ;
-	          /* patch  dimensions are actually domain dimensions */
-                    fprintf(fp, "%s, %s, %s, %s, 1 , 1 , &\n",ddim   [xi][0],ddim   [xi][1],
-							      ddim   [yi][0],ddim   [yi][1] ) ;
-	          }
-	        }
-	        else
-	        {
-	          /* mem    dimensions */
-	          for ( i = 0 ; i < 3 ; i++ ) { fprintf(fp,"%s , %s , ",mdim[i][0], mdim[i][1]) ; }
-	          fprintf(fp," & \n") ;
-	          /* patch  dimensions */
-	          for ( i = 0 ; i < 3 ; i++ ) { fprintf(fp,"%s , %s , ",pdim[i][0], pdim[i][1]) ; }
-	          fprintf(fp," & \n") ;
-	        }
-	        fprintf(fp,"                       ierr )\n") ;
-  
-                if ( ok_to_collect_distribute )
-	          fprintf(fp,"END IF\n" ) ;
-  
-  /* In case we have read into a global buffer, generate code to distribute the data just read in */
-              if      ( p->ndims == 3 && ok_to_collect_distribute )
-	      {
-	        if ((xi=get_index_for_coord(p,COORD_X))>=0&&(yi=get_index_for_coord(p,COORD_Y))>=0&&(zi=get_index_for_coord(p,COORD_Z))>=0)
-	        {
-	          fprintf(fp,"call wrf_global_to_patch_%s ( globbuf_%s , %s%s , &\n",p->type->name,p->type->name,structname , vname ) ;
-	          fprintf(fp,"       grid%%domdesc, %d, &\n",p->ndims) ;
-                  fprintf(fp, "%s, %s, %s, %s, %s, %s, &\n",ddim_no[xi][0],ddim_no[xi][1],
-							    ddim_no[yi][0],ddim_no[yi][1],
-							    ddim_no[zi][0],ddim_no[zi][1]) ;
-                  fprintf(fp, "%s, %s, %s, %s, %s, %s, &\n",mdim_no[xi][0],mdim_no[xi][1],
-							    mdim_no[yi][0],mdim_no[yi][1],
-							    mdim_no[zi][0],mdim_no[zi][1]) ;
-                  fprintf(fp, "%s, %s, %s, %s, %s, %s  )\n",pdim_no[xi][0],pdim_no[xi][1],
-							    pdim_no[yi][0],pdim_no[yi][1],
-							    pdim_no[zi][0],pdim_no[zi][1]) ;
-	        }
-	      }
-	      else if ( p->ndims == 2 && ok_to_collect_distribute )
-	      {
-	        if ((xi=get_index_for_coord(p,COORD_X))>=0&&(yi=get_index_for_coord(p,COORD_Y))>=0)
-	        {
-	          fprintf(fp,"call wrf_global_to_patch_%s ( globbuf_%s , %s%s , &\n",p->type->name,p->type->name,structname , vname ) ;
-	          fprintf(fp,"       grid%%domdesc, %d, &\n",p->ndims) ;
-                  fprintf(fp, "%s, %s, %s, %s, 1 , 1 , &\n",ddim_no[xi][0],ddim_no[xi][1],
-							    ddim_no[yi][0],ddim_no[yi][1] ) ;
-                  fprintf(fp, "%s, %s, %s, %s, 1 , 1 , &\n",mdim_no[xi][0],mdim_no[xi][1],
-							    mdim_no[yi][0],mdim_no[yi][1] ) ;
-                  fprintf(fp, "%s, %s, %s, %s, 1 , 1   )\n",pdim_no[xi][0],pdim_no[xi][1],
-							    pdim_no[yi][0],pdim_no[yi][1] ) ;
-	        }
-	        else
-	        {
-	          fprintf(stderr,"gen_wrf_io.c: Registry WARNING (and possibly internal error) %s \n",p->name) ;
-	        }
-	      }
-	      else if ( !strcmp(memord,"Z") && ok_to_collect_distribute )
-	      {
-	        fprintf(fp," call wrf_dm_bcast_%s ( %s%s , (%s)-(%s)+1 )\n",p->type->name,structname,vname,ddim[0][1],ddim[0][0] ) ;
-	      }
-	      else if ( !strcmp(memord,"0") && ok_to_collect_distribute )
-	      {
-	        fprintf(fp," call wrf_dm_bcast_%s ( %s%s , 1 )\n",p->type->name,structname,vname ) ;
-  
-	      }
-	      else if ( ok_to_collect_distribute )
-	      {
-	        fprintf(stderr,"gen_wrf_io.c: Registry WARNING: can't figure out entry for %s (Memord %s)\n",p->name,memord) ;
-	      }
-  
-	      if ( io_mask & INPUT && p->ntl > 1 ) {
-	        /* copy time level two into time level one */
-	        if ( p->ntl == 3 ) fprintf(fp, "grid%%%s = grid%%%s\n", vname_2 , vname_x ) ;
-	        if ( p->ntl == 2 ) fprintf(fp, "grid%%%s = grid%%%s\n", vname_1 , vname_x ) ;
-	      }
-  
-	      if ( p->scalar_array_member )
-	      {
-	        fprintf(fp,"END IF\n" ) ;
-	      }
-  
-	      if ( !strncmp( p->use, "dyn_", 4 ) ) 
-	        fprintf(fp,"END IF\n" ) ;
-              }
-            }
-          }
-          else
-          {
-/*Wei's change for 4dvar*/
-            if(var)
-            {
-	      if ( !strncmp( p->use, "dyn_", 4 ) ) 
-              {
-	        if ( p->var_name[var] == 'a' )
-	          fprintf(fp,"IF ( grid%%dyn_opt .EQ. %s_AD ) THEN\n",p->use) ;
-	        else if ( p->var_name[var] == 'g' )
-	          fprintf(fp,"IF ((grid%%dyn_opt .EQ. %s_TL) .or. (grid%%dyn_opt .EQ. %s_AD)) THEN\n",p->use,p->use) ;
-              }
-
-              if ( p->scalar_array_member )
-              {
-                if ( p->var_name[var] == 'a' )
-                  fprintf(fp,"IF ((grid%%dyn_opt .EQ. DYN_EM_AD) .and. (P_%s .GE. PARAM_FIRST_SCALAR)) THEN\n",p->name) ;
-                else if ( p->var_name[var] == 'g' )
-                  fprintf(fp,"IF(((grid%%dyn_opt .EQ. DYN_EM_TL) .or. (grid%%dyn_opt .EQ. DYN_EM_AD)) .and. (P_%s .GE. PARAM_FIRST_SCALAR)) THEN\n",p->name) ;
-              }
-            }
-            else
-            {
-	      if ( !strncmp( p->use, "dyn_", 4 ) ) 
-	        fprintf(fp,"IF ( mod(grid%%dyn_opt,100) .EQ. %s ) THEN\n",p->use) ;
-
-	      if ( p->scalar_array_member )
-	        fprintf(fp,"IF ( P_%s .GE. PARAM_FIRST_SCALAR ) THEN\n",p->name) ;
-            }
-
-/*End Wei's change for 4dvar*/
-
+	    if ( !strncmp( p->use, "dyn_", 4 ) ) 
+	      fprintf(fp,"IF ( grid%%dyn_opt .EQ. %s ) THEN\n",p->use) ;
+	    if ( p->scalar_array_member )
+	      fprintf(fp,"IF ( P_%s .GE. PARAM_FIRST_SCALAR ) THEN\n",p->name) ;
             if ( ok_to_collect_distribute )
               fprintf(fp,"IF ( wrf_dm_on_monitor() ) THEN\n") ;
 
@@ -1103,14 +695,7 @@ if ( pass == 0 )
 	    fprintf(fp,"CALL wrf_ext_read_field (  &\n") ;
 	    fprintf(fp,"                       fid                , &  ! DataHandle \n" ) ;
 	    fprintf(fp,"                       current_date(1:19) , &  ! DateStr \n" ) ;
-
-/*Wei's change for 4dvar*/
-            if(var)
-	      fprintf(fp,"                       '%c_%s'             , &  ! Data Name \n", toupper(p->var_name[var]), dname ) ;
-            else
-	      fprintf(fp,"                       '%s'               , &  ! Data Name \n", dname ) ;
-/*End Wei's change for 4dvar*/
-
+	    fprintf(fp,"                       '%s'               , &  ! Data Name \n", dname ) ;
             if ( p->ndims >= 2 && ok_to_collect_distribute )
 	      fprintf(fp,"                       globbuf_%s               , &  ! Field \n" , p->type->name ) ;
             else
@@ -1228,381 +813,20 @@ if ( pass == 0 )
 	      if ( p->ntl == 2 ) fprintf(fp, "grid%%%s = grid%%%s\n", vname_1 , vname_x ) ;
 	    }
 
-            if(var)
-            {
-              if ( !strncmp( p->use, "dyn_", 4 ) )
-              {
-                if ( p->var_name[var] == 'a' )
-	          fprintf(fp,"END IF\n" ) ;
-                else if ( p->var_name[var] == 'g' )
-	          fprintf(fp,"END IF\n" ) ;
-              }
+	    if ( p->scalar_array_member )
+	    {
+	      fprintf(fp,"END IF\n" ) ;
+	    }
 
-              if ( p->scalar_array_member )
-              {
-                if ( p->var_name[var] == 'a' )
-	          fprintf(fp,"END IF\n" ) ;
-                else if ( p->var_name[var] == 'g' )
-	          fprintf(fp,"END IF\n" ) ;
-              }
-            }
-            else
-            {
-              if ( !strncmp( p->use, "dyn_", 4 ) )
-	        fprintf(fp,"END IF\n" ) ;
-
-              if ( p->scalar_array_member )
-		fprintf(fp,"END IF\n" ) ;
-            }
-          }
+	    if ( !strncmp( p->use, "dyn_", 4 ) ) 
+	      fprintf(fp,"END IF\n" ) ;
           }
           else if ( sw_io == GEN_OUTPUT )
 	  {
-/*Wei's change for 4dvar*/
-            if ( io_mask == AUXHIST2 )
-            {
-            if(!var)
-            {
-              if ( !strncmp( p->use, "dyn_", 4 ) )
-                fprintf(fp,"IF ( mod(grid%%dyn_opt,100) .EQ. %s ) THEN\n",p->use) ;
-
-	      if ( p->scalar_array_member )
-	        fprintf(fp,"IF ( P_%s .GE. PARAM_FIRST_SCALAR ) THEN\n",p->name) ;
-
-/* Genereate code to write into a global buffer if it's DM-parallel and I/O API cannot handle distributed data  */
-
-            if      ( p->ndims == 3 && ok_to_collect_distribute )
-	    {
-	      if ((xi=get_index_for_coord(p,COORD_X))>=0&&(yi=get_index_for_coord(p,COORD_Y))>=0&&(zi=get_index_for_coord(p,COORD_Z))>=0)
-	      {
-	        fprintf(fp,"IF ( .NOT. dryrun ) call wrf_patch_to_global_%s ( %s%s , globbuf_%s , &\n",p->type->name,structname,vname,p->type->name ) ;
-	        fprintf(fp,"       grid%%domdesc, %d, &\n",p->ndims) ;
-                fprintf(fp, "%s, %s, %s, %s, %s, %s, &\n",ddim_no[xi][0],ddim_no[xi][1],
-							  ddim_no[yi][0],ddim_no[yi][1],
-							  ddim_no[zi][0],ddim_no[zi][1]) ;
-                fprintf(fp, "%s, %s, %s, %s, %s, %s, &\n",mdim_no[xi][0],mdim_no[xi][1],
-							  mdim_no[yi][0],mdim_no[yi][1],
-							  mdim_no[zi][0],mdim_no[zi][1]) ;
-                fprintf(fp, "%s, %s, %s, %s, %s, %s  )\n",pdim_no[xi][0],pdim_no[xi][1],
-							  pdim_no[yi][0],pdim_no[yi][1],
-							  pdim_no[zi][0],pdim_no[zi][1]) ;
-	      }
-	    }
-	    else if ( p->ndims == 2 && ok_to_collect_distribute )
-	    {
-	      if ((xi=get_index_for_coord(p,COORD_X))>=0&&(yi=get_index_for_coord(p,COORD_Y))>=0)
-	      {
-	        fprintf(fp,"IF ( .NOT. dryrun ) call wrf_patch_to_global_%s ( %s%s , globbuf_%s , &\n",p->type->name,structname,vname,p->type->name ) ;
-	        fprintf(fp,"       grid%%domdesc, %d, &\n",p->ndims) ;
-                fprintf(fp, "%s, %s, %s, %s, 1 , 1 , &\n",ddim_no[xi][0],ddim_no[xi][1],
-							  ddim_no[yi][0],ddim_no[yi][1] ) ;
-                fprintf(fp, "%s, %s, %s, %s, 1 , 1 , &\n",mdim_no[xi][0],mdim_no[xi][1],
-							  mdim_no[yi][0],mdim_no[yi][1] ) ;
-                fprintf(fp, "%s, %s, %s, %s, 1 , 1   )\n",pdim_no[xi][0],pdim_no[xi][1],
-							  pdim_no[yi][0],pdim_no[yi][1] ) ;
-	      }
-	      else
-	      {
-	        fprintf(stderr,"gen_wrf_io.c: Registry WARNING (and possibly internal error) %s \n",p->name) ;
-	      }
-	    }
-         
-            for ( i = 0 ; i < 3 ; i++ ) strcpy(dimname[i],"") ;
-	    for ( i = 0 ; i < 3 ; i++ ) 
-	    {
-              if (( dimnode = p->dims[i]) != NULL )
-	      {
-	        switch ( dimnode->coord_axis )
-	        {
-	        case (COORD_X) : 
-		  if ( ( ! sw_3dvar_iry_kludge && p->stag_x ) || ( sw_3dvar_iry_kludge && p->stag_y ) )
-		   { sprintf( dimname[i] ,"%s_stag", dimnode->dim_data_name) ; } 
-		  else 
-		   { strcpy( dimname[i], dimnode->dim_data_name) ; }
-		  break ;
-	        case (COORD_Y) : 
-		  if ( ( ! sw_3dvar_iry_kludge && p->stag_y ) || ( sw_3dvar_iry_kludge && p->stag_x ) )
-		   { sprintf( dimname[i] ,"%s_stag", dimnode->dim_data_name) ; } 
-		  else 
-		   { strcpy( dimname[i], dimnode->dim_data_name) ; }
-		  break ;
-	        case (COORD_Z) : 
-		  if ( p->stag_z ) 
-		   { sprintf( dimname[i] ,"%s_stag", dimnode->dim_data_name) ; } 
-		  else 
-		   { strcpy( dimname[i], dimnode->dim_data_name) ; }
-		  break ;
-	        }
-	      }
-	    }
-
-            if ( ok_to_collect_distribute )
-              fprintf(fp,"IF ( wrf_dm_on_monitor() ) THEN\n") ;
-
-            strcpy(indices,"") ;
-            sprintf(post,")") ;
-            if ( sw_io_deref_kludge && !(p->scalar_array_member) )   /* these aready have */
-            {
-              sprintf(indices, "%s",index_with_firstelem("(","grid%",t2,p,post)) ;
-            }
-
-	    fprintf(fp,"CALL wrf_ext_write_field (  &\n") ;
-	    fprintf(fp,"                       fid                , &  ! DataHandle \n" ) ;
-	    fprintf(fp,"                       current_date(1:19) , &  ! DateStr \n" ) ;
-            fprintf(fp,"                       '%s'               , &  ! Data Name \n", dname ) ;
-            if ( p->ndims >= 2 && ok_to_collect_distribute )
-	      fprintf(fp,"                       globbuf_%s               , &  ! Field \n" , p->type->name ) ;
-            else
-	      fprintf(fp,"                       %s%s%s               , &  ! Field \n" , structname , vname , indices ) ;
-	    fprintf(fp,"                       WRF_%s             , &  ! FieldType \n" , p->type->name ) ;
-	    fprintf(fp,"                       grid%%communicator  , &  ! Comm\n") ;
-	    fprintf(fp,"                       grid%%iocommunicator  , &  ! Comm\n") ;
-	    fprintf(fp,"                       grid%%domdesc       , &  ! Comm\n") ;
-	    fprintf(fp,"                       grid%%bdy_mask       , &  ! bdy_mask\n") ;
-            fprintf(fp,"                       dryrun             , &  ! flag\n" ) ;
-	    fprintf(fp,"                       '%s'               , &  ! MemoryOrder\n",memord ) ;
-	    fprintf(fp,"                       '%s'               , &  ! Stagger\n",stagstr ) ;
-            fprintf(fp,"                       '%s'               , &  ! Dimname 1 \n",dimname[0] ) ;
-            fprintf(fp,"                       '%s'               , &  ! Dimname 2 \n",dimname[1] ) ;
-            fprintf(fp,"                       '%s'               , &  ! Dimname 3 \n",dimname[2] ) ;
-            fprintf(fp,"                       '%s'               , &  ! Desc  \n",p->descrip ) ;
-            fprintf(fp,"                       '%s'               , &  ! Units \n",p->units ) ;
-	    fprintf(fp,"'%s ext_write_field %s memorder %s' , & ! Debug message\n",fname,dname,memord ) ;
-	    /* global dimensions */
-	    for ( i = 0 ; i < 3 ; i++ ) { fprintf(fp,"%s , %s , ",ddim[i][0], ddim[i][1]) ; }
-	    fprintf(fp," & \n") ;
-
-            if      ( p->ndims == 3 && ok_to_collect_distribute )
-	    {
-	      /* mem    dimensions are actually domain dimensions */
-	      for ( i = 0 ; i < 3 ; i++ ) { fprintf(fp,"%s , %s , ",ddim_no[i][0], ddim_no[i][1]) ; }
-	      fprintf(fp," & \n") ;
-	      /* patch  dimensions are actually domain dimensions */
-/*	      for ( i = 0 ; i < 3 ; i++ ) { fprintf(fp,"%s , %s , ",ddim_no[i][0], ddim_no[i][1]) ; } */
-	      for ( i = 0 ; i < 3 ; i++ ) { fprintf(fp,"%s , %s , ",ddim[i][0], ddim[i][1]) ; }
-	      fprintf(fp," & \n") ;
-	    }
-	    else if ( p->ndims == 2 && ok_to_collect_distribute )
-	    {
-	      if ((xi=get_index_for_coord(p,COORD_X))>=0&&(yi=get_index_for_coord(p,COORD_Y))>=0)
-	      {
-	        /* mem    dimensions are actually domain dimensions */
-                fprintf(fp, "%s, %s, %s, %s, 1 , 1 , &\n",ddim_no[xi][0],ddim_no[xi][1],
-							  ddim_no[yi][0],ddim_no[yi][1] ) ;
-	      /* patch  dimensions are actually domain dimensions */
-/*              fprintf(fp, "%s, %s, %s, %s, 1 , 1 , &\n",ddim_no[xi][0],ddim_no[xi][1],
-							  ddim_no[yi][0],ddim_no[yi][1] ) ; */
-                fprintf(fp, "%s, %s, %s, %s, 1 , 1 , &\n",ddim[xi][0],ddim[xi][1],
-							  ddim[yi][0],ddim[yi][1] ) ;
-	      }
-	    }
-	    else
-	    {
-	      /* mem    dimensions */
-	      for ( i = 0 ; i < 3 ; i++ ) { fprintf(fp,"%s , %s , ",mdim[i][0], mdim[i][1]) ; }
-	      fprintf(fp," & \n") ;
-	      /* patch  dimensions */
-	      for ( i = 0 ; i < 3 ; i++ ) { fprintf(fp,"%s , %s , ",pdim[i][0], pdim[i][1]) ; }
-	      fprintf(fp," & \n") ;
-	    }
-	    fprintf(fp,"                       ierr )\n") ;
-
-            if ( ok_to_collect_distribute )
-	      fprintf(fp,"END IF\n" ) ;
-
-	    if ( p->scalar_array_member )
-	      fprintf(fp,"END IF\n" ) ;
 	    if ( !strncmp( p->use, "dyn_", 4 ) ) 
-	      fprintf(fp,"END IF\n" ) ;
-            }
-            }					/* end auxhist2 */
-            else if ( io_mask == AUXHIST3 )
-            {
-            if(var && (p->var_name[var] == 'g'))
-            {
-              if ( !strncmp( p->use, "dyn_", 4 ) )
-                fprintf(fp,"IF ( grid%%dyn_opt .EQ. %s_TL ) THEN\n",p->use) ;
-
-	      if ( p->scalar_array_member )
-                fprintf(fp,"IF (P_%s .GE. PARAM_FIRST_SCALAR) THEN\n",p->name) ;
-
-/* Genereate code to write into a global buffer if it's DM-parallel and I/O API cannot handle distributed data  */
-
-            if      ( p->ndims == 3 && ok_to_collect_distribute )
-	    {
-	      if ((xi=get_index_for_coord(p,COORD_X))>=0&&(yi=get_index_for_coord(p,COORD_Y))>=0&&(zi=get_index_for_coord(p,COORD_Z))>=0)
-	      {
-	        fprintf(fp,"IF ( .NOT. dryrun ) call wrf_patch_to_global_%s ( %s%s , globbuf_%s , &\n",p->type->name,structname,vname,p->type->name ) ;
-	        fprintf(fp,"       grid%%domdesc, %d, &\n",p->ndims) ;
-                fprintf(fp, "%s, %s, %s, %s, %s, %s, &\n",ddim_no[xi][0],ddim_no[xi][1],
-							  ddim_no[yi][0],ddim_no[yi][1],
-							  ddim_no[zi][0],ddim_no[zi][1]) ;
-                fprintf(fp, "%s, %s, %s, %s, %s, %s, &\n",mdim_no[xi][0],mdim_no[xi][1],
-							  mdim_no[yi][0],mdim_no[yi][1],
-							  mdim_no[zi][0],mdim_no[zi][1]) ;
-                fprintf(fp, "%s, %s, %s, %s, %s, %s  )\n",pdim_no[xi][0],pdim_no[xi][1],
-							  pdim_no[yi][0],pdim_no[yi][1],
-							  pdim_no[zi][0],pdim_no[zi][1]) ;
-	      }
-	    }
-	    else if ( p->ndims == 2 && ok_to_collect_distribute )
-	    {
-	      if ((xi=get_index_for_coord(p,COORD_X))>=0&&(yi=get_index_for_coord(p,COORD_Y))>=0)
-	      {
-	        fprintf(fp,"IF ( .NOT. dryrun ) call wrf_patch_to_global_%s ( %s%s , globbuf_%s , &\n",p->type->name,structname,vname,p->type->name ) ;
-	        fprintf(fp,"       grid%%domdesc, %d, &\n",p->ndims) ;
-                fprintf(fp, "%s, %s, %s, %s, 1 , 1 , &\n",ddim_no[xi][0],ddim_no[xi][1],
-							  ddim_no[yi][0],ddim_no[yi][1] ) ;
-                fprintf(fp, "%s, %s, %s, %s, 1 , 1 , &\n",mdim_no[xi][0],mdim_no[xi][1],
-							  mdim_no[yi][0],mdim_no[yi][1] ) ;
-                fprintf(fp, "%s, %s, %s, %s, 1 , 1   )\n",pdim_no[xi][0],pdim_no[xi][1],
-							  pdim_no[yi][0],pdim_no[yi][1] ) ;
-	      }
-	      else
-	      {
-	        fprintf(stderr,"gen_wrf_io.c: Registry WARNING (and possibly internal error) %s \n",p->name) ;
-	      }
-	    }
-         
-            for ( i = 0 ; i < 3 ; i++ ) strcpy(dimname[i],"") ;
-	    for ( i = 0 ; i < 3 ; i++ ) 
-	    {
-              if (( dimnode = p->dims[i]) != NULL )
-	      {
-	        switch ( dimnode->coord_axis )
-	        {
-	        case (COORD_X) : 
-		  if ( ( ! sw_3dvar_iry_kludge && p->stag_x ) || ( sw_3dvar_iry_kludge && p->stag_y ) )
-		   { sprintf( dimname[i] ,"%s_stag", dimnode->dim_data_name) ; } 
-		  else 
-		   { strcpy( dimname[i], dimnode->dim_data_name) ; }
-		  break ;
-	        case (COORD_Y) : 
-		  if ( ( ! sw_3dvar_iry_kludge && p->stag_y ) || ( sw_3dvar_iry_kludge && p->stag_x ) )
-		   { sprintf( dimname[i] ,"%s_stag", dimnode->dim_data_name) ; } 
-		  else 
-		   { strcpy( dimname[i], dimnode->dim_data_name) ; }
-		  break ;
-	        case (COORD_Z) : 
-		  if ( p->stag_z ) 
-		   { sprintf( dimname[i] ,"%s_stag", dimnode->dim_data_name) ; } 
-		  else 
-		   { strcpy( dimname[i], dimnode->dim_data_name) ; }
-		  break ;
-	        }
-	      }
-	    }
-
-            if ( ok_to_collect_distribute )
-              fprintf(fp,"IF ( wrf_dm_on_monitor() ) THEN\n") ;
-
-            strcpy(indices,"") ;
-            sprintf(post,")") ;
-            if ( sw_io_deref_kludge && !(p->scalar_array_member) )   /* these aready have */
-            {
-              sprintf(indices, "%s",index_with_firstelem("(","grid%",t2,p,post)) ;
-            }
-
-	    fprintf(fp,"CALL wrf_ext_write_field (  &\n") ;
-	    fprintf(fp,"                       fid                , &  ! DataHandle \n" ) ;
-	    fprintf(fp,"                       current_date(1:19) , &  ! DateStr \n" ) ;
-            fprintf(fp,"                       '%c_%s'             , &  ! Data Name \n", toupper(p->var_name[var]), dname ) ;
-            if ( p->ndims >= 2 && ok_to_collect_distribute )
-	      fprintf(fp,"                       globbuf_%s               , &  ! Field \n" , p->type->name ) ;
-            else
-	      fprintf(fp,"                       %s%s%s               , &  ! Field \n" , structname , vname , indices ) ;
-	    fprintf(fp,"                       WRF_%s             , &  ! FieldType \n" , p->type->name ) ;
-	    fprintf(fp,"                       grid%%communicator  , &  ! Comm\n") ;
-	    fprintf(fp,"                       grid%%iocommunicator  , &  ! Comm\n") ;
-	    fprintf(fp,"                       grid%%domdesc       , &  ! Comm\n") ;
-	    fprintf(fp,"                       grid%%bdy_mask       , &  ! bdy_mask\n") ;
-            fprintf(fp,"                       dryrun             , &  ! flag\n" ) ;
-	    fprintf(fp,"                       '%s'               , &  ! MemoryOrder\n",memord ) ;
-	    fprintf(fp,"                       '%s'               , &  ! Stagger\n",stagstr ) ;
-            fprintf(fp,"                       '%s'               , &  ! Dimname 1 \n",dimname[0] ) ;
-            fprintf(fp,"                       '%s'               , &  ! Dimname 2 \n",dimname[1] ) ;
-            fprintf(fp,"                       '%s'               , &  ! Dimname 3 \n",dimname[2] ) ;
-            fprintf(fp,"                       'PETURBATION OF %s', &  ! Desc  \n",p->descrip ) ;
-            fprintf(fp,"                       '%s'               , &  ! Units \n",p->units ) ;
-	    fprintf(fp,"'%s ext_write_field %s memorder %s' , & ! Debug message\n",fname,dname,memord ) ;
-	    /* global dimensions */
-	    for ( i = 0 ; i < 3 ; i++ ) { fprintf(fp,"%s , %s , ",ddim[i][0], ddim[i][1]) ; }
-	    fprintf(fp," & \n") ;
-
-            if      ( p->ndims == 3 && ok_to_collect_distribute )
-	    {
-	      /* mem    dimensions are actually domain dimensions */
-	      for ( i = 0 ; i < 3 ; i++ ) { fprintf(fp,"%s , %s , ",ddim_no[i][0], ddim_no[i][1]) ; }
-	      fprintf(fp," & \n") ;
-	      /* patch  dimensions are actually domain dimensions */
-/*	      for ( i = 0 ; i < 3 ; i++ ) { fprintf(fp,"%s , %s , ",ddim_no[i][0], ddim_no[i][1]) ; } */
-	      for ( i = 0 ; i < 3 ; i++ ) { fprintf(fp,"%s , %s , ",ddim[i][0], ddim[i][1]) ; }
-	      fprintf(fp," & \n") ;
-	    }
-	    else if ( p->ndims == 2 && ok_to_collect_distribute )
-	    {
-	      if ((xi=get_index_for_coord(p,COORD_X))>=0&&(yi=get_index_for_coord(p,COORD_Y))>=0)
-	      {
-	        /* mem    dimensions are actually domain dimensions */
-                fprintf(fp, "%s, %s, %s, %s, 1 , 1 , &\n",ddim_no[xi][0],ddim_no[xi][1],
-							  ddim_no[yi][0],ddim_no[yi][1] ) ;
-	      /* patch  dimensions are actually domain dimensions */
-/*              fprintf(fp, "%s, %s, %s, %s, 1 , 1 , &\n",ddim_no[xi][0],ddim_no[xi][1],
-							  ddim_no[yi][0],ddim_no[yi][1] ) ; */
-                fprintf(fp, "%s, %s, %s, %s, 1 , 1 , &\n",ddim[xi][0],ddim[xi][1],
-							  ddim[yi][0],ddim[yi][1] ) ;
-	      }
-	    }
-	    else
-	    {
-	      /* mem    dimensions */
-	      for ( i = 0 ; i < 3 ; i++ ) { fprintf(fp,"%s , %s , ",mdim[i][0], mdim[i][1]) ; }
-	      fprintf(fp," & \n") ;
-	      /* patch  dimensions */
-	      for ( i = 0 ; i < 3 ; i++ ) { fprintf(fp,"%s , %s , ",pdim[i][0], pdim[i][1]) ; }
-	      fprintf(fp," & \n") ;
-	    }
-	    fprintf(fp,"                       ierr )\n") ;
-
-            if ( ok_to_collect_distribute )
-	      fprintf(fp,"END IF\n" ) ;
-
+	      fprintf(fp,"IF ( grid%%dyn_opt .EQ. %s ) THEN\n",p->use) ;
 	    if ( p->scalar_array_member )
-	      fprintf(fp,"END IF\n" ) ;
-	    if ( !strncmp( p->use, "dyn_", 4 ) ) 
-	      fprintf(fp,"END IF\n" ) ;
-            }
-            }					/* end auxhist3 */
-            else
-            {
-/*Wei's change for 4dvar*/
-            if(var)
-            {
-              if ( !strncmp( p->use, "dyn_", 4 ) )
-              {
-                if ( p->var_name[var] == 'a' )
-                  fprintf(fp,"IF ( grid%%dyn_opt .EQ. %s_AD ) THEN\n",p->use) ;
-                else if ( p->var_name[var] == 'g' )
-	          fprintf(fp,"IF ((grid%%dyn_opt .EQ. %s_TL) .or. (grid%%dyn_opt .EQ. %s_AD)) THEN\n",p->use,p->use) ;
-              }
-
-	      if ( p->scalar_array_member )
-              {
-                if ( p->var_name[var] == 'a' )
-                  fprintf(fp,"IF ((P_%s .GE. PARAM_FIRST_SCALAR) .and. (grid%%dyn_opt .EQ. DYN_EM_AD)) THEN\n",p->name) ;
-                else if ( p->var_name[var] == 'g' )
-	          fprintf(fp,"IF ((P_%s .GE. PARAM_FIRST_SCALAR) .and. ((grid%%dyn_opt .EQ. DYN_EM_TL) .or. (grid%%dyn_opt .EQ. DYN_EM_AD))) THEN\n",p->name) ;
-              }
-            }
-            else
-            {
-              if ( !strncmp( p->use, "dyn_", 4 ) )
-                fprintf(fp,"IF ( mod(grid%%dyn_opt,100) .EQ. %s ) THEN\n",p->use) ;
-
-	      if ( p->scalar_array_member )
-	        fprintf(fp,"IF ( P_%s .GE. PARAM_FIRST_SCALAR ) THEN\n",p->name) ;
-            }
-/*End Wei's change for 4dvar*/
+	      fprintf(fp,"IF ( P_%s .GE. PARAM_FIRST_SCALAR ) THEN\n",p->name) ;
 
 /* Genereate code to write into a global buffer if it's DM-parallel and I/O API cannot handle distributed data  */
 
@@ -1686,12 +910,7 @@ if ( pass == 0 )
 	    fprintf(fp,"CALL wrf_ext_write_field (  &\n") ;
 	    fprintf(fp,"                       fid                , &  ! DataHandle \n" ) ;
 	    fprintf(fp,"                       current_date(1:19) , &  ! DateStr \n" ) ;
-/*Wei's change for 4dvar*/
-            if(var)
-              fprintf(fp,"                       '%c_%s'             , &  ! Data Name \n", toupper(p->var_name[var]), dname ) ;
-            else
-              fprintf(fp,"                       '%s'               , &  ! Data Name \n", dname ) ;
-/*End Wei's change for 4dvar*/
+	    fprintf(fp,"                       '%s'               , &  ! Data Name \n", dname ) ;
             if ( p->ndims >= 2 && ok_to_collect_distribute )
 	      fprintf(fp,"                       globbuf_%s               , &  ! Field \n" , p->type->name ) ;
             else
@@ -1707,17 +926,7 @@ if ( pass == 0 )
             fprintf(fp,"                       '%s'               , &  ! Dimname 1 \n",dimname[0] ) ;
             fprintf(fp,"                       '%s'               , &  ! Dimname 2 \n",dimname[1] ) ;
             fprintf(fp,"                       '%s'               , &  ! Dimname 3 \n",dimname[2] ) ;
-/*Wei's change for 4dvar*/
-            if(var)
-            {
-              if(p->var_name[var] == 'a')
-                 fprintf(fp,"                       'GRADIENT %s'               , &  ! Desc  \n",p->descrip ) ;
-              else
-                 fprintf(fp,"                       'PETURBATION %s'               , &  ! Desc  \n",p->descrip ) ;
-            }
-            else
-              fprintf(fp,"                       '%s'               , &  ! Desc  \n",p->descrip ) ;
-/*End Wei's change for 4dvar*/
+            fprintf(fp,"                       '%s'               , &  ! Desc  \n",p->descrip ) ;
             fprintf(fp,"                       '%s'               , &  ! Units \n",p->units ) ;
 	    fprintf(fp,"'%s ext_write_field %s memorder %s' , & ! Debug message\n",fname,dname,memord ) ;
 	    /* global dimensions */
@@ -1778,18 +987,14 @@ if ( pass == 0 )
 	      fprintf(fp,"END IF\n" ) ;
 
           }
-          }
         }
       }
     }
     }
-/*Wei's change for 4dvar*/
-    }
-/*End Wei's change for 4dvar*/
     if ( p->type->type_type == DERIVED )
     {
       sprintf(x,"%s%s%%",structname,p->name ) ;
-      gen_wrf_io2(fp, fname, x, p->type, io_mask, sw_io ) ;
+      gen_wrf_io2(fp, fname, x, NULL, p->type, io_mask, sw_io ) ;
     }
 
     }

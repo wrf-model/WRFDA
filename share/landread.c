@@ -20,7 +20,9 @@ int GET_TERRAIN (        float *adx,
                          int   *mix,
                          int   *mjx,
                          int   *iyyn,
-                         int   *jxxn)
+                         int   *jxxn,
+                         int   *ipath , int * ipathlen)  /* integer coded ASCII string from Funtran and len */
+
 {
  return(0) ;
 }
@@ -28,7 +30,6 @@ int GET_TERRAIN (        float *adx,
 #else
 
 #include <stdio.h>
-#include <rpc/types.h>
 #include <rpc/xdr.h>
 #include <math.h>
 #include <malloc.h>
@@ -190,20 +191,6 @@ float tsGetValueInt(const int aix, const int aiy)
   int iy = aiy;
   int ix = aix;
 
-  int tx;
-  int ty;
-  int tn;
-  int txg;
-  int tyg;
-  int gn;
-
-  long long ll_gn;
-  long long ll_numHeaderBytes;
-  long long ll_tileNx;
-  long long ll_tileNy;
-
-  off_t loc;
-
   /* Perform bounds checking. */
   if (iy < 0)
     {
@@ -252,19 +239,19 @@ float tsGetValueInt(const int aix, const int aiy)
 	}
     }
 
-  tx  = ix / tileNx;
-  ty  = iy / tileNy;
-  tn  = tx + ty*numTilesX;
-  txg = ix - tx*tileNx;
-  tyg = iy - ty*tileNy;
-  gn  = txg + tyg*tileNx;
+  int tx  = ix / tileNx;
+  int ty  = iy / tileNy;
+  int tn  = tx + ty*numTilesX;
+  int txg = ix - tx*tileNx;
+  int tyg = iy - ty*tileNy;
+  int gn  = txg + tyg*tileNx;
 
-  ll_gn = gn;
-  ll_numHeaderBytes  = numHeaderBytes;
-  ll_tileNx = tileNx;
-  ll_tileNy = tileNy;
+  long long ll_gn = gn;
+  long long ll_numHeaderBytes  = numHeaderBytes;
+  long long ll_tileNx = tileNx;
+  long long ll_tileNy = tileNy;
 
-  loc = ll_numHeaderBytes + ll_tileNx*ll_tileNy*sizeof(float)*tn +
+  off_t loc = ll_numHeaderBytes + ll_tileNx*ll_tileNy*sizeof(float)*tn +
     ll_gn*sizeof(float);
 
   /* Seek to the proper location in the file and get the data value. */
@@ -287,27 +274,19 @@ float tsGetValue(const double ix, const double iy)
   float v1 = tsGetValueInt(i0,j1);
   float v2 = tsGetValueInt(i1,j0);
   float v3 = tsGetValueInt(i1,j1);
-
-  double w0;
-  double w1;
-
-  float v4;
-  float v5;
-  float v6;
-  float val;
   
   if (isMissing(v0)) return(vmiss);
   if (isMissing(v1)) return(vmiss);
   if (isMissing(v2)) return(vmiss);
   if (isMissing(v3)) return(vmiss);
 
-  w0 = ix - i0;
-  w1 = iy - j0;
+  double w0 = ix - i0;
+  double w1 = iy - j0;
 
-  v4 = v2*w0 + v0*(1.0-w0);
-  v5 = v3*w0 + v1*(1.0-w0);
-  v6 = w1*v5 + (1.0-w1)*v4;
-  val = v6;
+  float v4 = v2*w0 + v0*(1.0-w0);
+  float v5 = v3*w0 + v1*(1.0-w0);
+  float v6 = w1*v5 + (1.0-w1)*v4;
+  float val = v6;
 
   return(val);
 }
@@ -397,18 +376,21 @@ int GET_TERRAIN (        float *adx,
                          int   *mix,
                          int   *mjx,
                          int   *iyyn,
-                         int   *jxxn)
+                         int   *jxxn, 
+                         int   *ipath , int * ipathlen)  /* integer coded ASCII string from Funtran and len */
 #endif
 {
   TsFileInfo tsfTopo;
   TsFileInfo tsfOcean;
   TsFileInfo tsfLU;
   int i, j ;
+  char path[1024] ;
 
   tsfTopo.num  = 0;
   tsfOcean.num = 0;
   tsfLU.num    = 0;
 
+#if 0
   /* Read in the list of topography/land use filenames. */
   {
     FILE *fp = fopen("landFilenames", "r");
@@ -418,10 +400,10 @@ int GET_TERRAIN (        float *adx,
 	char type[MAXLEN];
 	char res[MAXLEN];
 	char fn[MAXLEN];
-	float dx;
 
 	if (fscanf(fp, "%s %s %s", type, res, fn) == EOF) break;
 
+	float dx;
 	sscanf(res, "%f", &dx);
 
 	if (strcmp(type, "landuse") == 0)
@@ -443,9 +425,39 @@ int GET_TERRAIN (        float *adx,
 	    tsfOcean.num++;
 	  }
       }
-
     fclose(fp);
   }
+#else
+  for (i = 0 ; i < *ipathlen ; i++ ) {
+    path[i] = ipath[i] ;
+  }
+  path[*ipathlen] = '\0' ;
+
+# if 0
+  fprintf(stderr,"path: %s\n",path) ;
+# endif
+tsfTopo.num  = 0;
+tsfTopo.dx[tsfTopo.num] =  1; sprintf(tsfTopo.fn[tsfTopo.num], "%s/topo.%02dkm.ts", path,  1); tsfTopo.num++ ;
+tsfTopo.dx[tsfTopo.num] =  2; sprintf(tsfTopo.fn[tsfTopo.num], "%s/topo.%02dkm.ts", path,  2); tsfTopo.num++ ;
+tsfTopo.dx[tsfTopo.num] =  3; sprintf(tsfTopo.fn[tsfTopo.num], "%s/topo.%02dkm.ts", path,  3); tsfTopo.num++ ;
+tsfTopo.dx[tsfTopo.num] =  4; sprintf(tsfTopo.fn[tsfTopo.num], "%s/topo.%02dkm.ts", path,  4); tsfTopo.num++ ;
+tsfTopo.dx[tsfTopo.num] =  5; sprintf(tsfTopo.fn[tsfTopo.num], "%s/topo.%02dkm.ts", path,  5); tsfTopo.num++ ;
+tsfTopo.dx[tsfTopo.num] =  6; sprintf(tsfTopo.fn[tsfTopo.num], "%s/topo.%02dkm.ts", path,  6); tsfTopo.num++ ;
+tsfTopo.dx[tsfTopo.num] =  7; sprintf(tsfTopo.fn[tsfTopo.num], "%s/topo.%02dkm.ts", path,  7); tsfTopo.num++ ;
+tsfTopo.dx[tsfTopo.num] =  8; sprintf(tsfTopo.fn[tsfTopo.num], "%s/topo.%02dkm.ts", path,  8); tsfTopo.num++ ;
+tsfTopo.dx[tsfTopo.num] =  9; sprintf(tsfTopo.fn[tsfTopo.num], "%s/topo.%02dkm.ts", path,  9); tsfTopo.num++ ;
+tsfTopo.dx[tsfTopo.num] = 10; sprintf(tsfTopo.fn[tsfTopo.num], "%s/topo.%02dkm.ts", path, 10); tsfTopo.num++ ;
+tsfTopo.dx[tsfTopo.num] = 20; sprintf(tsfTopo.fn[tsfTopo.num], "%s/topo.%02dkm.ts", path, 20); tsfTopo.num++ ;
+tsfTopo.dx[tsfTopo.num] = 30; sprintf(tsfTopo.fn[tsfTopo.num], "%s/topo.%02dkm.ts", path, 30); tsfTopo.num++ ;
+tsfTopo.dx[tsfTopo.num] = 40; sprintf(tsfTopo.fn[tsfTopo.num], "%s/topo.%02dkm.ts", path, 40); tsfTopo.num++ ;
+
+# if 0
+  for ( i = 0 ; i < tsfTopo.num ; i++ ) {
+    fprintf(stderr,"%02d. %s\n",i, tsfTopo.fn[i] ) ;
+  }
+# endif
+#endif
+
 
   /* First get the terrain from GTOPO30. */
   {
@@ -456,7 +468,9 @@ int GET_TERRAIN (        float *adx,
     int first = 1;
     for (i = 0; i < tsfTopo.num; i++)
       {
+# if 0
 fprintf(stderr,"%d %d file %f adx %f max %f\n",i,first,tsfTopo.dx[i],*adx , maxdx ) ;
+# endif
 	if (tsfTopo.dx[i] < maxdx) continue;
 	if (first || tsfTopo.dx[i] < *adx)
 	  {
@@ -475,14 +489,13 @@ fprintf(stderr,"%d %d file %f adx %f max %f\n",i,first,tsfTopo.dx[i],*adx , maxd
       {
 	for ( i = 0; i < *iyyn; i++)
 	  {
-	    double fix;
-	    double fiy;
-	    float tv;
 	    float lat = xlat[*mix*j + i];
 	    float lon = xlon[*mix*j + i];
 	    
+	    double fix;
+	    double fiy;
 	    tsLatLonToGridpoint(lat,lon,&fix,&fiy);
-	    tv = tsGetValue(fix, fiy);
+	    float tv = tsGetValue(fix, fiy);
 	    terrain[*mix*j + i] = tv;
 	  }
       }

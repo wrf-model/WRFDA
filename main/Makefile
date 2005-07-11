@@ -12,9 +12,9 @@ LIBPATHS =
 
 include ../configure.wrf
 
-da_3dvar : da_3dvar.o
+wrfvar : wrfvar.o
 	$(RANLIB) libwrflib.a
-	$(LD) -o da_3dvar.exe $(LDFLAGS) da_3dvar.o libwrflib.a $(LIB)
+	$(LD) -o wrfvar.exe $(LDFLAGS) wrfvar.o libwrflib.a $(LIB)
 
 kma2netcdf : kma2netcdf.o
 	$(RANLIB) libwrflib.a
@@ -141,8 +141,6 @@ wrf.o: \
 	../share/module_wrf_esmf_super.o \
 	$(ESMF_MOD_DEPENDENCE) $(EXTRAMODULES)
 
-da_3dvar.o: \
-	../share/module_wrf_esmf_super.o \
-	$(ESMF_MOD_DEPENDENCE) $(EXTRAMODULES)
+wrfvar.o: ../da_3dvar/module_wrfvar_top.o
 
 # DO NOT DELETE

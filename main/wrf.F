@@ -3,7 +3,7 @@
 
 PROGRAM wrf
 
-   USE module_wrf_esmf_super
+   USE module_wrf_top
 
 !<DESCRIPTION>
 ! Main program of WRF model.  Responsible for starting up the model, reading in (and
@@ -17,25 +17,14 @@ PROGRAM wrf
 
    IMPLICIT NONE
 
-   TYPE(ESMF_GridComp) :: gcomp
-   TYPE(ESMF_State)    :: importState, exportState
-   TYPE(ESMF_Clock)    :: clock
-   TYPE(ESMF_VM)       :: vm   
-   INTEGER :: rc
+   ! Initialize WRF model.  
+   CALL wrf_init
 
-   ! This call includes everything that must be done before ESMF_Initialize() 
-   ! is called.  
-   CALL init_modules(1)   ! Phase 1 returns after MPI_INIT() (if it is called)
+   ! WRF model time-stepping.  Calls integrate().  
+   CALL wrf_run
 
-   CALL ESMF_Initialize( vm=vm, defaultCalendar=ESMF_CAL_GREGORIAN, rc=rc )
-
-   CALL wrf_init( gcomp, importState, exportState, clock, rc )
-
-   CALL wrf_run( gcomp, importState, exportState, clock, rc )
-
-   CALL wrf_finalize( gcomp, importState, exportState, clock, rc )
-
-   CALL ESMF_Finalize( rc=rc )
+   ! WRF model clean-up.  This calls MPI_FINALIZE() for DM parallel runs.  
+   CALL wrf_finalize
 
 END PROGRAM wrf
 

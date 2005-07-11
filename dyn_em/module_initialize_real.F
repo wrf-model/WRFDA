@@ -222,6 +222,27 @@ integer::oops1,oops2
          ifndsoilw = 0
       END IF
 
+      !  We require input data for the various LSM schemes.
+
+      enough_data : SELECT CASE ( model_config_rec%sf_surface_physics(grid%id) )
+
+         CASE (SLABSCHEME)
+            IF ( num_st_levels_input .LT. 2 ) THEN
+               CALL wrf_error_fatal ( 'Not enough soil temperature data for 5-layer soil scheme.')
+            END IF
+
+         CASE (LSMSCHEME)
+            IF ( num_st_levels_input .LT. 2 ) THEN
+               CALL wrf_error_fatal ( 'Not enough soil temperature data for Noah LSM scheme.')
+            END IF
+
+         CASE (RUCLSMSCHEME)
+            IF ( num_st_levels_input .LT. 2 ) THEN
+               CALL wrf_error_fatal ( 'Not enough soil temperature data for RUC LSM scheme.')
+            END IF
+
+      END SELECT enough_data
+
       !  For sf_surface_physics = 1, we want to use close to a 10 cm value
       !  for the bottom level of the soil temps.
 
@@ -536,6 +557,14 @@ endif
 if(oops2.gt.0) then
 print *,'points artificially set to water: ',oops2
 endif
+! fill sst array with tsk if missing in real input (needed for time-varying sst in wrf)
+      DO j = jts, MIN(jde-1,jte)
+         DO i = its, MIN(ide-1,ite)
+           IF ( flag_sst .NE. 1 ) THEN
+             sst(i,j) = tsk(i,j)
+           ENDIF
+         END DO
+      END DO
 
       !  From the full level data, we can get the half levels, reciprocals, and layer
       !  thicknesses.  These are all defined at half level locations, so one less level.
@@ -729,12 +758,12 @@ endif
       
             k = kte-1
       
-            qvf1 = 0.5*(moist_2(i,k,j,P_QV)+moist_2(i,k,j,P_QV))
+            qvf1 = 0.5*(moist(i,k,j,P_QV)+moist(i,k,j,P_QV))
             qvf2 = 1./(1.+qvf1)
             qvf1 = qvf1*qvf2
       
             p(i,k,j) = - 0.5*(mu_2(i,j)+qvf1*mub(i,j))/rdnw(k)/qvf2
-            qvf = 1. + rvovrd*moist_2(i,k,j,P_QV)
+            qvf = 1. + rvovrd*moist(i,k,j,P_QV)
             alt(i,k,j) = (r_d/p1000mb)*(t_2(i,k,j)+t0)*qvf*(((p(i,k,j)+pb(i,k,j))/p1000mb)**cvpm)
             al(i,k,j) = alt(i,k,j) - alb(i,k,j)
       
@@ -742,11 +771,11 @@ endif
             !  inverse density fields (total and perturbation).
       
             DO k=kte-2,1,-1
-               qvf1 = 0.5*(moist_2(i,k,j,P_QV)+moist_2(i,k+1,j,P_QV))
+               qvf1 = 0.5*(moist(i,k,j,P_QV)+moist(i,k+1,j,P_QV))
                qvf2 = 1./(1.+qvf1)
                qvf1 = qvf1*qvf2
                p(i,k,j) = p(i,k+1,j) - (mu_2(i,j) + qvf1*mub(i,j))/qvf2/rdn(k+1)
-               qvf = 1. + rvovrd*moist_2(i,k,j,P_QV)
+               qvf = 1. + rvovrd*moist(i,k,j,P_QV)
                alt(i,k,j) = (r_d/p1000mb)*(t_2(i,k,j)+t0)*qvf* &
                            (((p(i,k,j)+pb(i,k,j))/p1000mb)**cvpm)
                al(i,k,j) = alt(i,k,j) - alb(i,k,j)
@@ -780,7 +809,7 @@ endif
          DO i = its, min(ide-1,ite)
             p_surf = p00 * EXP ( -t00/a + ( (t00/a)**2 - 2.*g*ht(i,j)/a/r_d ) **0.5 ) 
             psfc(i,j)=p_surf + p(i,1,j)
-            q2(i,j)=moist_2(i,1,j,P_QV)
+            q2(i,j)=moist(i,1,j,P_QV)
             th2(i,j)=t_2(i,1,j)+300.
             t2(i,j)=th2(i,j)*(((p(i,1,j)+pb(i,1,j))/p00)**(r_d/cp))
          END DO
@@ -1013,12 +1042,12 @@ endif
       
             k = kte-1
       
-            qvf1 = 0.5*(moist_2(i,k,j,P_QV)+moist_2(i,k,j,P_QV))
+            qvf1 = 0.5*(moist(i,k,j,P_QV)+moist(i,k,j,P_QV))
             qvf2 = 1./(1.+qvf1)
             qvf1 = qvf1*qvf2
       
             p(i,k,j) = - 0.5*(mu_2(i,j)+qvf1*mub(i,j))/rdnw(k)/qvf2
-            qvf = 1. + rvovrd*moist_2(i,k,j,P_QV)
+            qvf = 1. + rvovrd*moist(i,k,j,P_QV)
             alt(i,k,j) = (r_d/p1000mb)*(t_2(i,k,j)+t0)*qvf*(((p(i,k,j)+pb(i,k,j))/p1000mb)**cvpm)
             al(i,k,j) = alt(i,k,j) - alb(i,k,j)
       
@@ -1026,11 +1055,11 @@ endif
             !  inverse density fields (total and perturbation).
       
             DO k=kte-2,1,-1
-               qvf1 = 0.5*(moist_2(i,k,j,P_QV)+moist_2(i,k+1,j,P_QV))
+               qvf1 = 0.5*(moist(i,k,j,P_QV)+moist(i,k+1,j,P_QV))
                qvf2 = 1./(1.+qvf1)
                qvf1 = qvf1*qvf2
                p(i,k,j) = p(i,k+1,j) - (mu_2(i,j) + qvf1*mub(i,j))/qvf2/rdn(k+1)
-               qvf = 1. + rvovrd*moist_2(i,k,j,P_QV)
+               qvf = 1. + rvovrd*moist(i,k,j,P_QV)
                alt(i,k,j) = (r_d/p1000mb)*(t_2(i,k,j)+t0)*qvf* &
                            (((p(i,k,j)+pb(i,k,j))/p1000mb)**cvpm)
                al(i,k,j) = alt(i,k,j) - alb(i,k,j)

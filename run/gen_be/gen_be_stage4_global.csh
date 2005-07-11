@@ -15,7 +15,7 @@
 #-----------------------------------------------------------------------------------
 
  echo "---------------------------------------------------------------"
- echo "Run Stage 4: Calculate horizontal covariances (global power spectra)."
+ echo "Run Stage 4: Calculate horizontal covariances (global power spectra).
  echo "---------------------------------------------------------------"
 
  if ( ! $?START_DATE )    setenv START_DATE    2004050112 # Starting time of period.
@@ -33,8 +33,7 @@
  if ( ! $?DAT_DIR )       setenv DAT_DIR /tara/dmbarker/be/amps_stats/${EXPT}
  if ( ! $?RUN_DIR )       setenv RUN_DIR ${DAT_DIR}/${ID}
  if ( ! -d ${RUN_DIR} )   mkdir ${RUN_DIR}
-# if ( ! $?{CONTROL_VARIABLES} ) setenv CONTROL_VARIABLES ( psi chi_u t_u rh ps_u ) # Fields to process.
-  set CONTROL_VARIABLES = ( psi chi_u t_u rh ps_u ) # Fields to process.
+ if ( ! $?CONTROL_VARIABLES) setenv CONTROL_VARIABLES ( psi chi_u t_u rh ps_u ) # Fields to process.
 
  foreach CV ( $CONTROL_VARIABLES )
     if ( ! -d ${RUN_DIR}/$CV ) then
@@ -45,7 +44,7 @@
 
  cd ${RUN_DIR}
    
- ln -sf ${SRC_DIR}/gen_be_stage4_global.exe .
+ ln -sf ${SRC_DIR}/gen_be_stage4.exe .
 
  foreach CV ( $CONTROL_VARIABLES )
     setenv VARIABLE $CV
@@ -61,8 +60,8 @@
     set VINDEX = 1
     while ( $VINDEX <= $MAX_VINDEX )
 
-cat >! gen_be_stage4_global_nl.nl << EOF
-  &gen_be_stage4_global_nl
+cat >! gen_be_stage4_nl.nl << EOF
+  &gen_be_stage4_nl
     start_date = '${START_DATE}',
     end_date = '${END_DATE}', 
     interval = ${INTERVAL},
@@ -70,10 +69,12 @@ cat >! gen_be_stage4_global_nl.nl << EOF
     be_method = '${BE_METHOD}',
     ne = ${NE},
     k = ${VINDEX},
-    testing_spectral = ${TESTING_SPECTRAL}/
+    testing_spectral = ${TESTING_SPECTRAL},
+    expt = '${EXPT}',
+    dat_dir = '${DAT_DIR}' /
 EOF
 
-         ./gen_be_stage4_global.exe >& gen_be_stage4_global-$CV.log
+         ./gen_be_stage4.exe >& gen_be_stage4.log
 
          set VINDEX = `expr $VINDEX + 1`
     end # Loop over levels

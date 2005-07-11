@@ -30,7 +30,7 @@ MODULE module_domain
    USE module_state_description
    USE module_configure
    USE module_wrf_error
-   USE WRF_ESMF_MOD
+   USE module_utility
 
    CHARACTER (LEN=80) program_name
 
@@ -50,9 +50,12 @@ MODULE module_domain
                          AUXINPUT4_ALARM=10, AUXINPUT5_ALARM=11,                  &
                          RESTART_ALARM=12, BOUNDARY_ALARM=13, INPUTOUT_ALARM=14,  &  ! for outputing input (e.g. for 3dvar)
                          ALARM_SUBTIME=15,                                        &
-                         MAX_WRF_ALARMS=20  ! ESMF 2.0.1+ requires user to dimension alarm 
-                                            ! lists.  MAX_WRF_ALARMS must be big enough 
-                                            ! to include all of the above alarms.  
+#ifdef MOVE_NESTS
+                         COMPUTE_VORTEX_CENTER_ALARM=16,                          &
+#endif
+                         MAX_WRF_ALARMS=20  ! WARNING:  MAX_WRF_ALARMS must be 
+                                            ! large enough to include all of 
+                                            ! the alarms declared above.  
 
 #include <state_subtypes.inc>
 
@@ -95,6 +98,10 @@ MODULE module_domain
 
       LOGICAL                                             :: first_force
 
+#ifdef MOVE_NESTS
+      REAL         :: xi , xj
+      REAL         :: vc_i, vc_j    ! vortex center i and j
+#endif
 
       ! domain dimensions
 
@@ -116,13 +123,18 @@ MODULE module_domain
                     sp21y,  ep21y,  sp22y,  ep22y,                        &
                     sm31y,  em31y,  sm32y,  em32y,  sm33y,  em33y,        &
                     sm21y,  em21y,  sm22y,  em22y
-      Type(ESMF_Clock)                                    :: domain_clock
-      Type(ESMF_Time)                                     :: start_time, stop_time, current_time
-      Type(ESMF_Time)                                     :: start_subtime, stop_subtime
-      Type(ESMF_Time)                                     :: this_bdy_time, next_bdy_time
-      Type(ESMF_Time)                                     :: this_emi_time, next_emi_time
-      Type(ESMF_TimeInterval) :: step_time
-      Type(ESMF_Alarm), pointer :: alarms(:)
+      Type(WRF_UTIL_Clock), POINTER                           :: domain_clock
+      Type(WRF_UTIL_Time)                                     :: start_time, stop_time, current_time
+      Type(WRF_UTIL_Time)                                     :: start_subtime, stop_subtime
+      Type(WRF_UTIL_Time)                                     :: this_bdy_time, next_bdy_time
+      Type(WRF_UTIL_Time)                                     :: this_emi_time, next_emi_time
+      Type(WRF_UTIL_TimeInterval) :: step_time
+      Type(WRF_UTIL_Alarm), pointer :: alarms(:)
+! This awful hackery accounts for the fact that ESMF2.1.0+ alarms cannot tell 
+! us if they have ever been created or not.  So, we have to keep track of this 
+! ourselves to avoid destroying an alarm that has never been created!  Rip this 
+! out once ESMF has useful introspection here...  
+      LOGICAL, pointer :: alarms_created(:)
 
    END TYPE domain
 
@@ -163,6 +175,10 @@ CONTAINS
             grid%ep31  =             grid%ep31 + dx
             grid%sp32  =             grid%sp32 + dy
             grid%ep32  =             grid%ep32 + dy
+            grid%sd31  =             grid%sd31 + dx
+            grid%ed31  =             grid%ed31 + dx
+            grid%sd32  =             grid%sd32 + dy
+            grid%ed32  =             grid%ed32 + dy
 
        CASE  ( DATA_ORDER_YXZ )
             grid%sm31  =             grid%sm31 + dy
@@ -173,6 +189,10 @@ CONTAINS
             grid%ep31  =             grid%ep31 + dy
             grid%sp32  =             grid%sp32 + dx
             grid%ep32  =             grid%ep32 + dx
+            grid%sd31  =             grid%sd31 + dy
+            grid%ed31  =             grid%ed31 + dy
+            grid%sd32  =             grid%sd32 + dx
+            grid%ed32  =             grid%ed32 + dx
 
        CASE  ( DATA_ORDER_ZXY )
             grid%sm32  =             grid%sm32 + dx
@@ -183,6 +203,10 @@ CONTAINS
             grid%ep32  =             grid%ep32 + dx
             grid%sp33  =             grid%sp33 + dy
             grid%ep33  =             grid%ep33 + dy
+            grid%sd32  =             grid%sd32 + dx
+            grid%ed32  =             grid%ed32 + dx
+            grid%sd33  =             grid%sd33 + dy
+            grid%ed33  =             grid%ed33 + dy
 
        CASE  ( DATA_ORDER_ZYX )
             grid%sm32  =             grid%sm32 + dy
@@ -193,6 +217,10 @@ CONTAINS
             grid%ep32  =             grid%ep32 + dy
             grid%sp33  =             grid%sp33 + dx
             grid%ep33  =             grid%ep33 + dx
+            grid%sd32  =             grid%sd32 + dy
+            grid%ed32  =             grid%ed32 + dy
+            grid%sd33  =             grid%sd33 + dx
+            grid%ed33  =             grid%ed33 + dx
 
        CASE  ( DATA_ORDER_XZY )
             grid%sm31  =             grid%sm31 + dx
@@ -203,6 +231,10 @@ CONTAINS
             grid%ep31  =             grid%ep31 + dx
             grid%sp33  =             grid%sp33 + dy
             grid%ep33  =             grid%ep33 + dy
+            grid%sd31  =             grid%sd31 + dx
+            grid%ed31  =             grid%ed31 + dx
+            grid%sd33  =             grid%sd33 + dy
+            grid%ed33  =             grid%ed33 + dy
 
        CASE  ( DATA_ORDER_YZX )
             grid%sm31  =             grid%sm31 + dy
@@ -213,17 +245,23 @@ CONTAINS
             grid%ep31  =             grid%ep31 + dy
             grid%sp33  =             grid%sp33 + dx
             grid%ep33  =             grid%ep33 + dx
+            grid%sd31  =             grid%sd31 + dy
+            grid%ed31  =             grid%ed31 + dy
+            grid%sd33  =             grid%sd33 + dx
+            grid%ed33  =             grid%ed33 + dx
 
     END SELECT data_ordering
 
+#if 0
     CALL dealloc_space_field ( grid )
 
-    CALL alloc_space_field ( grid, grid%id , 1 ,          &
+    CALL alloc_space_field ( grid, grid%id , 1 , 2 , .FALSE. ,     &
                              grid%sd31, grid%ed31, grid%sd32, grid%ed32, grid%sd33, grid%ed33, &
                              grid%sm31,  grid%em31,  grid%sm32,  grid%em32,  grid%sm33,  grid%em33, &
                              grid%sm31x, grid%em31x, grid%sm32x, grid%em32x, grid%sm33x, grid%em33x, &   ! x-xpose
                              grid%sm31y, grid%em31y, grid%sm32y, grid%em32y, grid%sm33y, grid%em33y  &   ! y-xpose
       )
+#endif
 
     RETURN
 
@@ -703,6 +741,7 @@ CONTAINS
 
       END SELECT data_ordering
 
+
 #ifdef RSL
 ! Check domain size to be sure it is within RSLs limit
       IF ( nx .GE. 1024 .OR. ny .GE. 1024 ) THEN
@@ -743,7 +782,19 @@ CONTAINS
       NULLIFY  (new_grid%j_start)
       NULLIFY  (new_grid%i_end)
       NULLIFY  (new_grid%j_end)
+      ALLOCATE( new_grid%domain_clock )
       ALLOCATE( new_grid%alarms( MAX_WRF_ALARMS ) )    ! initialize in setup_timekeeping
+      ALLOCATE( new_grid%alarms_created( MAX_WRF_ALARMS ) )
+      DO i = 1, MAX_WRF_ALARMS
+        new_grid%alarms_created( i ) = .FALSE.
+      ENDDO
+
+#ifdef MOVE_NESTS
+      new_grid%xi = -1.0
+      new_grid%xj = -1.0
+      new_grid%vc_i = -1.0
+      new_grid%vc_j = -1.0
+#endif
 
       ! set up the pointers that represent the nest hierarchy
       ! set this up *prior* to calling the patching or allocation
@@ -778,6 +829,7 @@ CONTAINS
                          bdyzone_x  , bdyzone_y , new_grid%bdy_mask &
       ) 
 
+
       new_grid%domdesc = new_domdesc
       new_grid%num_nests = 0
       new_grid%num_siblings = 0
@@ -786,7 +838,7 @@ CONTAINS
       new_grid%num_tiles_spec   = 0
       new_grid%nframes   = 0         ! initialize the number of frames per file (array assignment)
 
-      CALL alloc_space_field ( new_grid, domain_id , 3 ,           &
+      CALL alloc_space_field ( new_grid, domain_id , 3 , 3 , .FALSE. ,      &
                                sd1, ed1, sd2, ed2, sd3, ed3,       &
                                sm1,  em1,  sm2,  em2,  sm3,  em3,  &
                                sm1x, em1x, sm2x, em2x, sm3x, em3x, &   ! x-xpose
@@ -947,7 +999,7 @@ CONTAINS
 !  below this top-level of data allocation and management (in the solve routine
 !  and below).
 
-   SUBROUTINE alloc_space_field ( grid,   id, setinitval ,            &
+   SUBROUTINE alloc_space_field ( grid,   id, setinitval ,  tl_in , inter_domain_in ,   &
                                   sd31, ed31, sd32, ed32, sd33, ed33, &
                                   sm31 , em31 , sm32 , em32 , sm33 , em33 , &
                                   sm31x, em31x, sm32x, em32x, sm33x, em33x, &
@@ -968,16 +1020,36 @@ CONTAINS
       INTEGER , INTENT(IN)            :: sm31x, em31x, sm32x, em32x, sm33x, em33x
       INTEGER , INTENT(IN)            :: sm31y, em31y, sm32y, em32y, sm33y, em33y
 
+      ! this argument is a bitmask. First bit is time level 1, second is time level 2, and so on.
+      ! e.g. to set both 1st and second time level, use 3
+      !      to set only 1st                        use 1
+      !      to set only 2st                        use 2
+      INTEGER , INTENT(IN)            :: tl_in
+  
+      ! true if the allocation is for an intermediate domain (for nesting); only certain fields allocated
+      ! false otherwise (all allocated, modulo tl above)
+      LOGICAL , INTENT(IN)            :: inter_domain_in
+
       !  Local data.
       INTEGER dyn_opt, idum1, idum2, spec_bdy_width
       INTEGER num_bytes_allocated
       REAL    initial_data_value
       CHARACTER (LEN=256) message
+      INTEGER tl
+      LOGICAL inter_domain
 
       !declare ierr variable for error checking ALLOCATE calls
       INTEGER ierr
 
       INTEGER                              :: loop
+
+#if 1
+      tl = tl_in
+      inter_domain = inter_domain_in
+#else
+      tl = 3
+      inter_domain = .FALSE.
+#endif
 
 #if ( RWORDSIZE == 8 )
       initial_data_value = 0.
@@ -995,32 +1067,32 @@ CONTAINS
 
       IF ( dyn_opt == DYN_NODYN ) THEN
 
-        CALL wrf_message ( 'DYNAMICS OPTION: dynamics disabled ' )
+        IF ( grid%id .EQ. 1 ) CALL wrf_message ( 'DYNAMICS OPTION: dynamics disabled ' )
 # include <nodyn_allocs.inc>
 
 #if (EM_CORE == 1)
-      ELSE IF ( mod(dyn_opt, 100) == DYN_EM ) THEN
-        CALL wrf_message ( 'DYNAMICS OPTION: Eulerian Mass Coordinate ')
+      ELSE IF ( dyn_opt == DYN_EM ) THEN
+        IF ( grid%id .EQ. 1 ) CALL wrf_message ( 'DYNAMICS OPTION: Eulerian Mass Coordinate ')
 # include <em_allocs.inc>
 #endif
 #if (NMM_CORE == 1)
       ELSE IF ( dyn_opt == DYN_NMM ) THEN
-        CALL wrf_message ( 'DYNAMICS OPTION: nmm dyncore' )
+        IF ( grid%id .EQ. 1 ) CALL wrf_message ( 'DYNAMICS OPTION: nmm dyncore' )
 # include <nmm_allocs.inc>
 #endif
 #if (COAMPS_CORE == 1)
       ELSE IF ( dyn_opt == DYN_COAMPS ) THEN
-        CALL wrf_message ( 'DYNAMICS OPTION: coamps dyncore' )
+        IF ( grid%id .EQ. 1 ) CALL wrf_message ( 'DYNAMICS OPTION: coamps dyncore' )
 # include <coamps_allocs.inc>
 #endif
 #if (EXP_CORE==1)
       ELSE IF ( dyn_opt == DYN_EXP ) THEN
-        CALL wrf_message ( 'DYNAMICS OPTION: experimental dyncore' )
+        IF ( grid%id .EQ. 1 ) CALL wrf_message ( 'DYNAMICS OPTION: experimental dyncore' )
 # include <exp_allocs.inc>
 #endif
 
       ELSE
-
+      
         WRITE( wrf_err_message , * )'Invalid specification of dynamics: dyn_opt = ',dyn_opt
         CALL wrf_error_fatal ( TRIM ( wrf_err_message ) )
       ENDIF
@@ -1050,6 +1122,7 @@ CONTAINS
 
       TYPE(domain) , POINTER          :: grid
       LOGICAL                         :: found
+      INTEGER                         :: alarmid
 
       !  Initializations required to start the routine.
 
@@ -1066,6 +1139,19 @@ CONTAINS
             found = .TRUE.
             old_grid%next => grid%next
             CALL dealloc_space_field ( grid )
+            DEALLOCATE( grid%parents )
+            DEALLOCATE( grid%nests )
+            ! clean up time manager bits
+            CALL WRF_UTIL_ClockDestroy( grid%domain_clock )
+            DO alarmid = 1, MAX_WRF_ALARMS
+              IF ( grid%alarms_created( alarmid ) ) THEN
+                CALL WRF_UTIL_AlarmDestroy( grid%alarms( alarmid ) )
+                grid%alarms_created( alarmid ) = .FALSE.
+              ENDIF
+            ENDDO
+            DEALLOCATE( grid%alarms )
+            DEALLOCATE( grid%alarms_created )
+            DEALLOCATE( grid%domain_clock )
             DEALLOCATE(grid)
             EXIT find_grid
          END IF
@@ -1103,7 +1189,7 @@ CONTAINS
       IF      ( .FALSE. )           THEN
 
 #if (EM_CORE == 1)
-      ELSE IF ( mod(dyn_opt, 100) == DYN_EM ) THEN
+      ELSE IF ( dyn_opt == DYN_EM ) THEN
 # include <em_deallocs.inc>
 #endif
 #if (NMM_CORE == 1)

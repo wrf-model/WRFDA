@@ -40,6 +40,9 @@ MODULE module_dm
    INTEGER, PRIVATE :: nproc_lt, nproc_ln
 
 #if ( RWORDSIZE != DWORDSIZE )
+   INTERFACE add_msg_period
+     MODULE PROCEDURE add_msg_period_real, add_msg_period_integer, add_msg_period_doubleprecision
+   END INTERFACE
    INTERFACE add_msg_xpose
      MODULE PROCEDURE add_msg_xpose_real, add_msg_xpose_integer, add_msg_xpose_doubleprecision
    END INTERFACE
@@ -67,10 +70,16 @@ MODULE module_dm
    INTERFACE wrf_dm_maxval
      MODULE PROCEDURE wrf_dm_maxval_real , wrf_dm_maxval_integer, wrf_dm_maxval_doubleprecision
    END INTERFACE
+   INTERFACE wrf_dm_minval
+     MODULE PROCEDURE wrf_dm_minval_real , wrf_dm_minval_integer, wrf_dm_minval_doubleprecision
+   END INTERFACE
 
 #define TRUE_RSL_REAL     RSL_REAL
 #define TRUE_RSL_REAL_F90 RSL_REAL_F90
 #else
+   INTERFACE add_msg_period
+     MODULE PROCEDURE add_msg_period_real, add_msg_period_integer
+   END INTERFACE
    INTERFACE add_msg_xpose
      MODULE PROCEDURE add_msg_xpose_real, add_msg_xpose_integer
    END INTERFACE
@@ -97,6 +106,9 @@ MODULE module_dm
    END INTERFACE
    INTERFACE wrf_dm_maxval
      MODULE PROCEDURE wrf_dm_maxval_real , wrf_dm_maxval_integer
+   END INTERFACE
+   INTERFACE wrf_dm_minval
+     MODULE PROCEDURE wrf_dm_minval_real , wrf_dm_minval_integer
    END INTERFACE
 
 #define TRUE_RSL_REAL     RSL_DOUBLE
@@ -198,14 +210,12 @@ CONTAINS
       IF ( nproc_ln .GT. 0 .OR. nproc_lt .GT. 0 ) THEN
         ! if only nproc_ln is specified then make it 1-d decomp in i
         IF      ( nproc_ln .GT. 0 .AND. nproc_lt .EQ. -1 ) THEN
-          nproc_ln = rsl_nproc
-          nproc_lt = 1
+          nproc_lt = rsl_nproc / nproc_ln
         ! if only nproc_lt is specified then make it 1-d decomp in j
         ELSE IF ( nproc_ln .EQ. -1 .AND. nproc_lt .GT. 0 ) THEN
-          nproc_ln = 1
-          nproc_lt = rsl_nproc
+          nproc_ln = rsl_nproc / nproc_lt
         ENDIF
-        ! make sure user knows what they're doing (when both specified)
+        ! make sure user knows what they're doing
         IF ( nproc_ln * nproc_lt .NE. rsl_nproc ) THEN
           WRITE( wrf_err_message , * )'WRF_DM_INITIALIZE (RSL): nproc_x * nproc_y in namelist ne ',rsl_nproc
           CALL wrf_error_fatal ( wrf_err_message )
@@ -221,11 +231,91 @@ CONTAINS
 #ifdef NMM_CORE
       CALL rsl_set_padarea ( 6 )
 #endif
+      CALL nl_set_nproc_x ( 1, nproc_ln )
+      CALL nl_set_nproc_y ( 1, nproc_lt )
       invalid_message_value = RSL_INVALID
       x_period_flag         = RSL_M
       y_period_flag         = RSL_N
       RETURN
    END SUBROUTINE wrf_dm_initialize
+
+! period additions, 200505
+
+   SUBROUTINE reset_period
+      IMPLICIT NONE
+      CALL rsl_create_message ( msg )
+   END SUBROUTINE reset_period
+
+   SUBROUTINE add_msg_period_real( fld, kdim )
+      IMPLICIT NONE
+      integer kdim, gl(3), ll(3)
+      real fld(*)
+      SELECT CASE ( model_data_order )
+         ! need to finish other cases
+         CASE ( DATA_ORDER_XZY )
+           gl(1) = glen(1) ; ll(1) = llen(1)
+           gl(2) = kdim    ; ll(2) = kdim
+           gl(3) = glen(3) ; ll(3) = llen(3)
+         CASE ( DATA_ORDER_XYZ )
+           gl(1) = glen(1) ; ll(1) = llen(1)
+           gl(2) = glen(2) ; ll(2) = llen(2)
+           gl(3) = kdim    ; ll(3) = kdim
+         CASE DEFAULT
+      END SELECT
+      if (      kdim >  1 ) then
+        CALL rsl_build_message(msg,TRUE_RSL_REAL_F90,fld,3,decomp(1),gl(1),ll(1))
+      else if ( kdim == 1 ) then
+        CALL rsl_build_message(msg,TRUE_RSL_REAL_F90,fld,2,decomp2d(1),glen2d(1),llen2d(1))
+      endif
+   END SUBROUTINE add_msg_period_real
+
+   SUBROUTINE add_msg_period_integer( fld, kdim )
+      IMPLICIT NONE
+      integer kdim, gl(3), ll(3)
+      integer fld(*)
+      SELECT CASE ( model_data_order )
+         ! need to finish other cases
+         CASE ( DATA_ORDER_XZY )
+           gl(1) = glen(1) ; ll(1) = llen(1)
+           gl(2) = kdim    ; ll(2) = kdim
+           gl(3) = glen(3) ; ll(3) = llen(3)
+         CASE ( DATA_ORDER_XYZ )
+           gl(1) = glen(1) ; ll(1) = llen(1)
+           gl(2) = glen(2) ; ll(2) = llen(2)
+           gl(3) = kdim    ; ll(3) = kdim
+         CASE DEFAULT
+      END SELECT
+      if (      kdim >  1 ) then
+        CALL rsl_build_message(msg,RSL_INTEGER_F90,fld,3,decomp(1),gl(1),ll(1))
+      else if ( kdim == 1 ) then
+        CALL rsl_build_message(msg,RSL_INTEGER_F90,fld,2,decomp2d(1),glen2d(1),llen2d(1))
+      endif
+   END SUBROUTINE add_msg_period_integer
+
+#if (  RWORDSIZE != DWORDSIZE )
+   SUBROUTINE add_msg_period_doubleprecision( fld, kdim )
+      IMPLICIT NONE
+      integer kdim, gl(3), ll(3)
+      doubleprecision fld(*)
+      SELECT CASE ( model_data_order )
+         ! need to finish other cases
+         CASE ( DATA_ORDER_XZY )
+           gl(1) = glen(1) ; ll(1) = llen(1)
+           gl(2) = kdim    ; ll(2) = kdim
+           gl(3) = glen(3) ; ll(3) = llen(3)
+         CASE ( DATA_ORDER_XYZ )
+           gl(1) = glen(1) ; ll(1) = llen(1)
+           gl(2) = glen(2) ; ll(2) = llen(2)
+           gl(3) = kdim    ; ll(3) = kdim
+         CASE DEFAULT
+      END SELECT
+      if (      kdim >  1 ) then
+        CALL rsl_build_message(msg,RSL_DOUBLE_F90,fld,3,decomp(1),gl(1),ll(1))
+      else if ( kdim == 1 ) then
+        CALL rsl_build_message(msg,RSL_DOUBLE_F90,fld,2,decomp2d(1),glen2d(1),llen2d(1))
+      endif
+   END SUBROUTINE add_msg_period_doubleprecision
+#endif
 
 ! xpose additions, 20000302
 
@@ -287,7 +377,7 @@ CONTAINS
       integer fld_z(*), fld_x(*), fld_y(*)
       integer dim
       if (      dim == 3 ) then
-        CALL rsl_build_message(msg_z,TRUE_RSL_REAL_F90,fld_z,dim,decomp(1),glen(1),llen(1))
+        CALL rsl_build_message(msg_z,RSL_INTEGER_F90,fld_z,dim,decomp(1),glen(1),llen(1))
 #ifdef D3VAR_IRY_KLUDGE
         CALL rsl_build_message(msg_x,RSL_INTEGER_F90,fld_x,dim,decomp(1),glen(1),llen_tx(1))
         CALL rsl_build_message(msg_y,RSL_INTEGER_F90,fld_y,dim,decomp(1),glen(1),llen_ty(1))
@@ -1887,6 +1977,14 @@ messages(120)=  s5e5
       RETURN
    END SUBROUTINE stencil_120pt
 
+   SUBROUTINE period_def ( did, perid, w )
+      IMPLICIT NONE
+      INTEGER did, perid, w
+      CALL rsl_create_period( perid )
+      CALL rsl_describe_period ( did, perid, w, msg )
+      RETURN
+   END SUBROUTINE period_def
+
    SUBROUTINE setup_halo_rsl( grid )
        USE module_domain
        IMPLICIT NONE
@@ -2086,7 +2184,7 @@ messages(120)=  s5e5
 ! domain and the intermediate domain.  See <a
 ! href=interp_domain_em_part1.html>interp_domain_em_part1</a>, <a
 ! href=interp_domain_em_part2.html>interp_domain_em_part2</a>, <a
-! href=force_domain_em_part1.html>force_domain_em_part1</a>, <a
+! href=force_domain_em_part2.html>force_domain_em_part2</a>, <a
 ! href=feedback_domain_em_part1.html>feedback_domain_em_part1</a>, and <a
 ! href=feedback_domain_em_part2.html>feedback_domain_em_part2</a>.)
 ! 
@@ -2243,7 +2341,7 @@ messages(120)=  s5e5
 ! external/RSL/module_dm.F. See See <a
 ! href=interp_domain_em_part1.html>interp_domain_em_part1</a>, <a
 ! href=interp_domain_em_part2.html>interp_domain_em_part2</a>, <a
-! href=force_domain_em_part1.html>force_domain_em_part1</a>, <a
+! href=force_domain_em_part2.html>force_domain_em_part2</a>, <a
 ! href=feedback_domain_em_part1.html>feedback_domain_em_part1</a>, and <a
 ! href=feedback_domain_em_part2.html>feedback_domain_em_part2</a>.)
 !
@@ -2595,12 +2693,28 @@ messages(120)=  s5e5
          c_sm1x = 1 ; c_em1x = 1 ; c_sm2x = 1 ; c_em2x = 1 ; c_sm3x = 1 ; c_em3x = 1
          c_sm1y = 1 ; c_em1y = 1 ; c_sm2y = 1 ; c_em2y = 1 ; c_sm3y = 1 ; c_em3y = 1
 
+         intermediate_grid%sm31x                           = c_sm1x
+         intermediate_grid%em31x                           = c_em1x
+         intermediate_grid%sm32x                           = c_sm2x
+         intermediate_grid%em32x                           = c_em2x
+         intermediate_grid%sm33x                           = c_sm3x
+         intermediate_grid%em33x                           = c_em3x
+         intermediate_grid%sm31y                           = c_sm1y
+         intermediate_grid%em31y                           = c_em1y
+         intermediate_grid%sm32y                           = c_sm2y
+         intermediate_grid%em32y                           = c_em2y
+         intermediate_grid%sm33y                           = c_sm3y
+         intermediate_grid%em33y                           = c_em3y
+
+
+#if 0
          ! allocate space for the intermediate domain
-         CALL alloc_space_field ( intermediate_grid, id , 3 ,  &   ! use same id as nest
+         CALL alloc_space_field ( intermediate_grid, id , 3 , .TRUE. , &   ! use same id as nest
                                c_sd1, c_ed1, c_sd2, c_ed2, c_sd3, c_ed3,       &
                                c_sm1,  c_em1,  c_sm2,  c_em2,  c_sm3,  c_em3,  &
                                c_sm1x, c_em1x, c_sm2x, c_em2x, c_sm3x, c_em3x, &   ! x-xpose
                                c_sm1y, c_em1y, c_sm2y, c_em2y, c_sm3y, c_em3y  )   ! y-xpose
+#endif
 
          intermediate_grid%sd31                            =   c_sd1
          intermediate_grid%ed31                            =   c_ed1
@@ -3025,6 +3139,37 @@ messages(120)=  s5e5
 #endif
    END SUBROUTINE wrf_dm_maxval_real
 
+   SUBROUTINE wrf_dm_minval_real ( val, idex, jdex )
+      IMPLICIT NONE
+      REAL val, val_all( rsl_nproc )
+      INTEGER idex, jdex, ierr
+      INTEGER dex(2)
+      INTEGER dex_all (2,rsl_nproc)
+! <DESCRIPTION>
+! Collective operation. Each processor calls passing a local value and its index; on return
+! all processors are passed back the minimum of all values passed and its index.
+!
+! </DESCRIPTION>
+      INTEGER i, comm
+#ifndef STUBMPI
+      INCLUDE 'mpif.h'
+
+      CALL wrf_get_dm_communicator ( comm )
+      dex(1) = idex ; dex(2) = jdex
+      CALL mpi_allgather ( dex, 2, MPI_INTEGER, dex_all , 2, MPI_INTEGER, comm, ierr )
+      CALL mpi_allgather ( val, 1, MPI_REAL, val_all , 1, MPI_REAL, comm, ierr )
+      val = val_all(1)
+      idex = dex_all(1,1) ; jdex = dex_all(2,1)
+      DO i = 2, rsl_nproc
+        IF ( val_all(i) .LT. val ) THEN
+           val = val_all(i)
+           idex = dex_all(1,i)
+           jdex = dex_all(2,i)
+        ENDIF
+      ENDDO
+#endif
+   END SUBROUTINE wrf_dm_minval_real
+
    SUBROUTINE wrf_dm_maxval_doubleprecision ( val, idex, jdex )
       IMPLICIT NONE
       DOUBLE PRECISION val, val_all( rsl_nproc )
@@ -3056,6 +3201,38 @@ messages(120)=  s5e5
 #endif
    END SUBROUTINE wrf_dm_maxval_doubleprecision
 
+   SUBROUTINE wrf_dm_minval_doubleprecision ( val, idex, jdex )
+      IMPLICIT NONE
+      DOUBLE PRECISION val, val_all( rsl_nproc )
+      INTEGER idex, jdex, ierr
+      INTEGER dex(2)
+      INTEGER dex_all (2,rsl_nproc)
+! <DESCRIPTION>
+! Collective operation. Each processor calls passing a local value and its index; on return
+! all processors are passed back the minimum of all values passed and its index.
+!
+! </DESCRIPTION>
+      INTEGER i, comm
+#ifndef STUBMPI
+      INCLUDE 'mpif.h'
+
+      CALL wrf_get_dm_communicator ( comm )
+      dex(1) = idex ; dex(2) = jdex
+      CALL mpi_allgather ( dex, 2, MPI_INTEGER, dex_all , 2, MPI_INTEGER, comm, ierr )
+      CALL mpi_allgather ( val, 1, MPI_DOUBLE_PRECISION, val_all , 1, MPI_DOUBLE_PRECISION, comm, ierr )
+      val = val_all(1)
+      idex = dex_all(1,1) ; jdex = dex_all(2,1)
+      DO i = 2, rsl_nproc
+        IF ( val_all(i) .LT. val ) THEN
+           val = val_all(i)
+           idex = dex_all(1,i)
+           jdex = dex_all(2,i)
+        ENDIF
+      ENDDO
+#endif
+   END SUBROUTINE wrf_dm_minval_doubleprecision
+
+
    SUBROUTINE wrf_dm_maxval_integer ( val, idex, jdex )
       IMPLICIT NONE
       INTEGER val, val_all( rsl_nproc )
@@ -3086,6 +3263,44 @@ messages(120)=  s5e5
       ENDDO
 #endif
    END SUBROUTINE wrf_dm_maxval_integer
+
+   SUBROUTINE wrf_dm_minval_integer ( val, idex, jdex )
+      IMPLICIT NONE
+      INTEGER val, val_all( rsl_nproc )
+      INTEGER idex, jdex, ierr
+      INTEGER dex(2)
+      INTEGER dex_all (2,rsl_nproc)
+! <DESCRIPTION>
+! Collective operation. Each processor calls passing a local value and its index; on return
+! all processors are passed back the minimum of all values passed and its index.
+!
+! </DESCRIPTION>
+      INTEGER i, comm
+#ifndef STUBMPI
+      INCLUDE 'mpif.h'
+
+      CALL wrf_get_dm_communicator ( comm )
+      dex(1) = idex ; dex(2) = jdex
+      CALL mpi_allgather ( dex, 2, MPI_INTEGER, dex_all , 2, MPI_INTEGER, comm, ierr )
+      CALL mpi_allgather ( val, 1, MPI_INTEGER, val_all , 1, MPI_INTEGER, comm, ierr )
+      val = val_all(1)
+      idex = dex_all(1,1) ; jdex = dex_all(2,1)
+      DO i = 2, rsl_nproc
+        IF ( val_all(i) .LT. val ) THEN
+           val = val_all(i)
+           idex = dex_all(1,i)
+           jdex = dex_all(2,i)
+        ENDIF
+      ENDDO
+#endif
+   END SUBROUTINE wrf_dm_minval_integer
+
+   SUBROUTINE wrf_dm_move_nest ( parent, nest, dx, dy )
+      USE module_domain
+      TYPE (domain),INTENT(INOUT) :: parent, nest
+      INTEGER, INTENT(IN)         :: dx, dy
+      CALL rsl_move_nest ( parent%domdesc, nest%domdesc, dx, dy )
+   END SUBROUTINE wrf_dm_move_nest
 
 END MODULE module_dm
 
@@ -4462,21 +4677,3 @@ END
    END SUBROUTINE wrf_gatherv_double
 
 #endif
-
-LOGICAL FUNCTION em_cd_feedback_mask( pig, ips_save, ipe_save , pjg, jps_save, jpe_save, xstag, ystag )
-   INTEGER, INTENT(IN) :: pig, ips_save, ipe_save , pjg, jps_save, jpe_save
-   LOGICAL, INTENT(IN) :: xstag, ystag
-
-   INTEGER ioff, joff
-
-   ioff = 0 ; joff = 0
-   IF ( xstag  ) ioff = 1
-   IF ( ystag  ) joff = 1
-
-   em_cd_feedback_mask = ( pig .ge. ips_save+1        .and.      &
-                           pjg .ge. jps_save+1        .and.      &
-                           pig .le. ipe_save-1  +ioff .and.      &
-                           pjg .le. jpe_save-1  +joff           )
-
-END FUNCTION em_cd_feedback_mask
-

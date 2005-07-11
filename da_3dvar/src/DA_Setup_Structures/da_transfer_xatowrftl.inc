@@ -62,7 +62,7 @@ SUBROUTINE DA_Transfer_XatoWRFTL( grid, config_flags, filnam, &
    do k=ks,ke
    do j=js,je
    do i=is,ie
-      g_moist_2(i,j,k,P_QV) = xa%q(i,j,k)/(1.0 - xb%q(i,j,k))**2
+      g_moist(i,j,k,P_QV) = xa%q(i,j,k)/(1.0 - xb%q(i,j,k))**2
    enddo
    enddo
    enddo
@@ -84,8 +84,8 @@ SUBROUTINE DA_Transfer_XatoWRFTL( grid, config_flags, filnam, &
       sdmd=0.0
       s1md=0.0
       do k=ks,ke
-         sdmd=sdmd+g_moist_2(i,j,k,P_QV)*dnw(k)
-         s1md=s1md+(1.0+moist_2(i,j,k,P_QV))*dnw(k)
+         sdmd=sdmd+g_moist(i,j,k,P_QV)*dnw(k)
+         s1md=s1md+(1.0+moist(i,j,k,P_QV))*dnw(k)
       enddo
 
       mu_cgrid(i,j)=-(xa%psfc(i,j)+xb%psac(i,j)*sdmd)/s1md
@@ -102,8 +102,8 @@ SUBROUTINE DA_Transfer_XatoWRFTL( grid, config_flags, filnam, &
    do j=js,je
    do i=is,ie
      k = ke
-     qvf1   = g_moist_2(i,j,k,P_QV)
-     qvf1_b = moist_2(i,j,k,P_QV)
+     qvf1   = g_moist(i,j,k,P_QV)
+     qvf1_b = moist(i,j,k,P_QV)
      qvf2   = - qvf1 / ((1.+qvf1_b)*(1.+qvf1_b))
      qvf2_b = 1./(1.+qvf1)
      qvf1   = qvf1*qvf2_b + qvf1_b*qvf2
@@ -113,8 +113,8 @@ SUBROUTINE DA_Transfer_XatoWRFTL( grid, config_flags, filnam, &
                  -(mu_2(i,j)+qvf1_b*mub(i,j))*qvf2/(qvf2_b*qvf2_b) )
 
      do k = ke-1,1,-1
-       qvf1   = 0.5*(g_moist_2(i,j,k,P_QV)+g_moist_2(i,j,k,P_QV))
-       qvf1_b = 0.5*(moist_2(i,j,k,P_QV)+moist_2(i,j,k+1,P_QV))
+       qvf1   = 0.5*(g_moist(i,j,k,P_QV)+g_moist(i,j,k,P_QV))
+       qvf1_b = 0.5*(moist(i,j,k,P_QV)+moist(i,j,k+1,P_QV))
        qvf2   = - qvf1 / ((1.+qvf1_b)*(1.+qvf1_b))
        qvf2_b = 1./(1.+qvf1_b)
        qvf1   = qvf1*qvf2_b + qvf1_b*qvf2
@@ -222,7 +222,7 @@ SUBROUTINE DA_Transfer_XatoWRFTL( grid, config_flags, filnam, &
 
       t_full   = xa%t(i,j,k) + xb%t(i,j,k)
       p_full   = p_cgrid(i,j,k) + xb%p(i,j,k)
-      q_full   = moist_2(i,j,k,P_QV) + g_moist_2(i,j,k,P_QV)
+      q_full   = moist(i,j,k,P_QV) + g_moist(i,j,k,P_QV)
 
 ! Note: According to WRF, this is the dry air density used to
 !       compute the geopotential height: 
@@ -272,33 +272,33 @@ SUBROUTINE DA_Transfer_XatoWRFTL( grid, config_flags, filnam, &
       enddo
 
 #if 0
-      if ( size(moist_2,dim=4) >= 4 ) then
+      if ( size(moist,dim=4) >= 4 ) then
       do k=ks,ke
       do j=js,je
       do i=is,ie
-         g_moist_2(i,j,k,p_qcw) =  xa%qcw(i,j,k)
-         g_moist_2(i,j,k,p_qrn) =  xa%qrn(i,j,k)
+         g_moist(i,j,k,p_qcw) =  xa%qcw(i,j,k)
+         g_moist(i,j,k,p_qrn) =  xa%qrn(i,j,k)
       enddo
       enddo
       enddo
       endif
 
-      if ( size(moist_2,dim=4) >= 6 ) then
+      if ( size(moist,dim=4) >= 6 ) then
       do k=ks,ke
       do j=js,je
       do i=is,ie
-         g_moist_2(i,j,k,p_qci) =  xa%qci(i,j,k)
-         g_moist_2(i,j,k,p_qsn) =  xa%qsn(i,j,k)
+         g_moist(i,j,k,p_qci) =  xa%qci(i,j,k)
+         g_moist(i,j,k,p_qsn) =  xa%qsn(i,j,k)
       enddo
       enddo
       enddo
       endif
 
-      if ( size(moist_2,dim=4) >= 7 ) then
+      if ( size(moist,dim=4) >= 7 ) then
       do k=ks,ke
       do j=js,je
       do i=is,ie
-         g_moist_2(i,j,k,p_qgr) =  xa%qgr(i,j,k)
+         g_moist(i,j,k,p_qgr) =  xa%qgr(i,j,k)
       enddo
       enddo
       enddo

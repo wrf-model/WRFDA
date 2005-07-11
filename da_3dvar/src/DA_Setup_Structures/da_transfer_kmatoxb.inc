@@ -110,7 +110,7 @@ SUBROUTINE DA_Transfer_KMAToXb( xbx, grid, &
          xb%u(i,j,k) = u_2(i,j,k)
          xb%v(i,j,k) = v_2(i,j,k)
          xb%t(i,j,k) = t_2(i,j,k)
-         xb%q(i,j,k) = moist_2(i,j,k,P_QV)
+         xb%q(i,j,k) = moist(i,j,k,P_QV)
      end do
    end do
   end do

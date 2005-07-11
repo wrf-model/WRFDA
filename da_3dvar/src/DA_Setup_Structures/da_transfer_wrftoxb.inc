@@ -207,7 +207,7 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
      print *, 'num_moist=', num_moist
      print *, 'P_QV=', P_QV
 
-     print *, 'moist_2(is,js,ks,2)=', moist_2(is,js,ks,2)
+     print *, 'moist(is,js,ks,2)=', moist(is,js,ks,2)
      print *, ' '
    endif
 
@@ -301,13 +301,13 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
 
      do i=is,ie
      k = ke
-     qvf1 = 0.5*(moist_2(i,j,k,P_QV)+moist_2(i,j,k,P_QV))
+     qvf1 = 0.5*(moist(i,j,k,P_QV)+moist(i,j,k,P_QV))
      qvf2 = 1./(1.+qvf1)
      qvf1 = qvf1*qvf2
      p(i,j,k) = -0.5*(mu_2(i,j)+qvf1*mub(i,j))/rdnw(k)/qvf2
 
      do k = ke-1,1,-1
-       qvf1 = 0.5*(moist_2(i,j,k,P_QV)+moist_2(i,j,k+1,P_QV))
+       qvf1 = 0.5*(moist(i,j,k,P_QV)+moist(i,j,k+1,P_QV))
        qvf2 = 1./(1.+qvf1)
        qvf1 = qvf1*qvf2
        p(i,j,k) = p(i,j,k+1) - (mu_2(i,j)+qvf1*mub(i,j))/qvf2/rdn(k+1)
@@ -328,7 +328,7 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
          ttb  = (tis0 + tlp*log(ppb/ps0)) * (ps0/ppb)**kappa
          albn = (gas_constant/ps0) * ttb * (ppb/ps0)**cvpm
 ! .............................................................
-         qvf1 = 1. + moist_2(i,j,k,P_QV) / rd_over_rv
+         qvf1 = 1. + moist(i,j,k,P_QV) / rd_over_rv
          aln  = -1. / (mub(i,j)+mu_2(i,j)) * ( albn*mu_2(i,j) &
                 + rdnw(k) *(ph_2(i,j,k+1) - ph_2(i,j,k)) )
 ! .. total pressure:
@@ -357,7 +357,7 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
          xb%wh(i,j,k)= 0.5*(xb%w(i,j,k)+xb%w(i,j,k+1))
          xb%h(i,j,k) = 0.5*(xb%hf(i,j,k)+xb%hf(i,j,k+1))
 
-         xb%q(i,j,k) = moist_2(i,j,k,P_QV)
+         xb%q(i,j,k) = moist(i,j,k,P_QV)
 
          theta = ts0 + t_2(i,j,k)
          xb%t(i,j,k) = theta*(xb%p(i,j,k)/ps0)**kappa
@@ -370,20 +370,20 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
 !
 ! Background qrn needed for Radar Radial velocity assimilation:
 
-         if( size(moist_2,dim=4) >= 4 ) then
+         if( size(moist,dim=4) >= 4 ) then
 !          write(6,*)'P_QV, P_QCW, P_QRN:',P_QV, P_QCW, P_QRN
-           xb%qcw(i,j,k) = moist_2(i,j,k,p_qc)
-           xb%qrn(i,j,k) = moist_2(i,j,k,p_qr)
+           xb%qcw(i,j,k) = moist(i,j,k,p_qc)
+           xb%qrn(i,j,k) = moist(i,j,k,p_qr)
            xb%qt (i,j,k) = xb%q(i,j,k) + xb%qcw(i,j,k) + xb%qrn(i,j,k)
          endif
 
-         if( size(moist_2,dim=4) >= 6 ) then
-           xb%qci(i,j,k) = moist_2(i,j,k,p_qi)
-           xb%qsn(i,j,k) = moist_2(i,j,k,p_qs)
+         if( size(moist,dim=4) >= 6 ) then
+           xb%qci(i,j,k) = moist(i,j,k,p_qi)
+           xb%qsn(i,j,k) = moist(i,j,k,p_qs)
          endif
 
-         if( size(moist_2,dim=4) >= 7 ) then
-           xb%qgr(i,j,k) = moist_2(i,j,k,p_qg)
+         if( size(moist,dim=4) >= 7 ) then
+           xb%qgr(i,j,k) = moist(i,j,k,p_qg)
          endif
 
        enddo

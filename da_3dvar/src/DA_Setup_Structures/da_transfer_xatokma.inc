@@ -82,7 +82,7 @@ SUBROUTINE DA_Transfer_XatoKMA( xbx, grid, &
          u_2(i,j,k) = u_2(i,j,k) + xa%u(i,j,k)
          v_2(i,j,k) = v_2(i,j,k) + xa%v(i,j,k)
          w_2(i,j,k) = w_2(i,j,k) + xa%w(i,j,k)
-         moist_2(i,j,k,P_QV) = moist_2(i,j,k,P_QV) + xa%q(i,j,k)
+         moist(i,j,k,P_QV) = moist(i,j,k,P_QV) + xa%q(i,j,k)
       enddo
       enddo
    enddo

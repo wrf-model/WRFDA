@@ -17,14 +17,11 @@ typedef struct node_struct {
   int           stag_z ;
   int           subject_to_communication ;
   int           boundary_array ;
+  int           boundary_array_4d ;
   char    use[NAMELEN] ;
   char    dname[NAMELEN] ;
   char    descrip[NAMELEN] ;
   char    units[NAMELEN] ;
-
-/*Wei's adding for 4dvar*/
-  char    var_name[NAMELEN] ;
-  int     var_numb ;
 
 /* Fields for 4D scalar arrays */
   int           scalar_array_member ;
@@ -86,7 +83,7 @@ typedef struct node_struct {
   char pkg_4dscalars[NAMELEN] ;
 
 /* fields used by Comm (halo, period, xpose)  nodes */
-  char comm_define[4096] ;
+  char comm_define[2*8192] ;
 
 /* marker */
   int mark ;
@@ -111,9 +108,6 @@ EXTERN int sw_all_y_staggered ;
 EXTERN int sw_dm_serial_in_only ;
 EXTERN int sw_ifort_kludge ;
 EXTERN char sw_commpath[NAMELEN] ;
-
-/*Wei's change for 4dvar*/
-EXTERN int sw_wrfvar ;
 
 EXTERN node_t * Type ;
 EXTERN node_t * Dim ;

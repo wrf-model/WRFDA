@@ -23,6 +23,9 @@
    USE module_dm
 #endif
 
+!!debug
+!USE module_compute_geop
+
    USE module_model_constants
    IMPLICIT NONE
    !  Input data.
@@ -53,10 +56,12 @@
 
    CHARACTER*80 :: message
 
+   REAL        :: p00, t00, a, p_surf, pd_surf
+
    REAL :: qvf1, qvf2, qvf
    REAL :: MPDT
    LOGICAL :: first_trip_for_this_domain
-   REAL    :: wgt1, wgt2, zw, z1, z2
+!integer myproc
 
 ! Trick problematic compilers into not performing copy-in/copy-out by adding
 ! indices to array arguments in the CALL statements in this routine.
@@ -140,6 +145,52 @@
 
    ENDIF
 
+
+!call wrf_get_myproc(myproc)
+
+
+   IF ( ( config_flags%input_from_hires ) .OR. ( config_flags%input_from_file ) ) THEN
+
+      CALL nl_get_base_pres  ( 1 , p00 )
+      CALL nl_get_base_temp  ( 1 , t00 )
+      CALL nl_get_base_lapse ( 1 , a   )
+
+      !  Base state potential temperature and inverse density (alpha = 1/rho) from
+      !  the half eta levels and the base-profile surface pressure.  Compute 1/rho
+      !  from equation of state.  The potential temperature is a perturbation from t0.
+
+      DO j = jts, MIN(jte,jde-1)
+         DO i = its, MIN(ite,ide-1)
+
+            !  Base state pressure is a function of eta level and terrain, only, plus
+            !  the hand full of constants: p00 (sea level pressure, Pa), t00 (sea level
+            !  temperature, K), and A (temperature difference, from 1000 mb to 300 mb, K).
+
+            p_surf = p00 * EXP ( -t00/a + ( (t00/a)**2 - 2.*g*ht(i,j)/a/r_d ) **0.5 )
+
+            DO k = 1, kte-1
+               pb(i,k,j) = znu(k)*(p_surf - p_top) + p_top
+               t_init(i,k,j) = (t00 + A*LOG(pb(i,k,j)/p00))*(p00/pb(i,k,j))**(r_d/cp) - t0
+               alb(i,k,j) = (r_d/p1000mb)*(t_init(i,k,j)+t0)*(pb(i,k,j)/p1000mb)**cvpm
+            END DO
+
+            !  Base state mu is defined as base state surface pressure minus p_top
+
+            mub(i,j) = p_surf - p_top
+
+            !  Integrate base geopotential, starting at terrain elevation.  This assures that
+            !  the base state is in exact hydrostatic balance with respect to the model equations.
+            !  This field is on full levels.
+
+            phb(i,1,j) = ht(i,j) * g
+            DO k  = 2,kte
+               phb(i,k,j) = phb(i,k-1,j) - dnw(k-1)*mub(i,j)*alb(i,k-1,j)
+            END DO
+         END DO
+      END DO
+
+   ENDIF
+
    IF(.not.config_flags%restart)THEN
 
 !  if this is for a nested domain, the defined/interpolated fields are the _2
@@ -153,7 +204,6 @@
        DO k = kts,kte-1
        DO i = its, min(ite,ide-1)
            IF ( imask_nostag(i,j) .EQ. 1 ) THEN
-             moist_1(i,k,j,P_QV)=moist_2(i,k,j,P_QV)
              t_1(i,k,j)=t_2(i,k,j)
            ENDIF
        ENDDO
@@ -188,11 +238,11 @@
        k = kte-1
        DO i = its, min(ite,ide-1)
          IF ( imask_nostag(i,j) .EQ. 1 ) THEN
-           qvf1 = 0.5*(moist_1(i,k,j,P_QV)+moist_1(i,k,j,P_QV))
+           qvf1 = 0.5*(moist(i,k,j,P_QV)+moist(i,k,j,P_QV))
            qvf2 = 1./(1.+qvf1)
            qvf1 = qvf1*qvf2
            p(i,k,j) = - 0.5*(mu_1(i,j)+qvf1*mub(i,j))/rdnw(k)/qvf2
-           qvf = 1. + rvovrd*moist_1(i,k,j,P_QV)
+           qvf = 1. + rvovrd*moist(i,k,j,P_QV)
            alt(i,k,j) = (r_d/p1000mb)*(t_1(i,k,j)+t0)*qvf*(((p(i,k,j)+pb(i,k,j))/p1000mb)**cvpm)
            al(i,k,j) = alt(i,k,j) - alb(i,k,j)
          ENDIF
@@ -201,11 +251,11 @@
        DO k = kte-2, 1, -1
        DO i = its, min(ite,ide-1)
          IF ( imask_nostag(i,j) .EQ. 1 ) THEN
-           qvf1 = 0.5*(moist_1(i,k,j,P_QV)+moist_1(i,k+1,j,P_QV))
+           qvf1 = 0.5*(moist(i,k,j,P_QV)+moist(i,k+1,j,P_QV))
            qvf2 = 1./(1.+qvf1)
            qvf1 = qvf1*qvf2
            p(i,k,j) = p(i,k+1,j) - (mu_1(i,j) + qvf1*mub(i,j))/qvf2/rdn(k+1)
-           qvf = 1. + rvovrd*moist_1(i,k,j,P_QV)
+           qvf = 1. + rvovrd*moist(i,k,j,P_QV)
            alt(i,k,j) = (r_d/p1000mb)*(t_1(i,k,j)+t0)*qvf* &
                         (((p(i,k,j)+pb(i,k,j))/p1000mb)**cvpm)
            al(i,k,j) = alt(i,k,j) - alb(i,k,j)
@@ -216,6 +266,22 @@
      ENDDO
 
    ENDIF
+
+   IF ( ( grid%id .NE. 1 ) .AND. &
+       ( ( config_flags%input_from_hires ) .OR. ( config_flags%input_from_file ) ) ) THEN
+      DO j = jts, MIN(jte,jde-1)
+         DO i = its, MIN(ite,ide-1)
+            mu_2(i,j) = mu_2(i,j) + al(i,1,j) / ( alt(i,1,j) * alb(i,1,j) ) * &
+                                    g * ( ht(i,j) - ht_fine(i,j) )
+         END DO
+       END DO
+       DO j = jts,min(jte,jde-1)
+       DO i = its, min(ite,ide-1)
+          mu_1(i,j)=mu_2(i,j)
+       ENDDO
+       ENDDO
+
+   END IF
 
    IF ( first_trip_for_this_domain ) THEN
 
@@ -231,8 +297,8 @@
    IF ( .NOT. grid%restart ) THEN
      CALL wrf_clockprint(150, grid%domain_clock, &
                          'DEBUG phy_init():  get currTime from grid%domain_clock,')
-     CALL ESMF_ClockGet( grid%domain_clock, currTime=grid%current_time, rc=rc )
-     CALL ESMF_TimeGet( grid%current_time, YY=julyr, dayOfYear=julday, H=hr, M=mn, S=sec, MS=ms, rc=rc)
+     CALL WRF_UTIL_ClockGet( grid%domain_clock, currTime=grid%current_time, rc=rc )
+     CALL WRF_UTIL_TimeGet( grid%current_time, YY=julyr, dayOfYear=julday, H=hr, M=mn, S=sec, MS=ms, rc=rc)
      CALL wrf_timetoa ( grid%current_time, message )
      WRITE( wrf_err_message , * ) 'DEBUG start_em():  currTime = [',TRIM( message ),']'
      CALL wrf_debug( 150, TRIM(wrf_err_message) )
@@ -280,6 +346,7 @@
                       ACSNOM,IVGTYP,ISLTYP, SFCEVP,SMOIS,     &
                       SH2O, SNOWH, SMFR3D,                    &
                       DX,DY,F_ICE_PHY,F_RAIN_PHY,F_RIMEF_PHY, &
+                      mp_restart_state,tbpvs_state,tbpvs0_state,&
                       allowed_to_read, moved ,                &
                       ids, ide, jds, jde, kds, kde,           &
                       ims, ime, jms, jme, kms, kme,           &
@@ -355,10 +422,9 @@
 !
 !  4D variables
 !
-! moist_1                        x
-! moist_2                        x
-!  chem_1                        x
-!  chem_2                        x
+! moist                        x
+!  chem                        x
+!scalar                        x
 
 !--------------------------------------------------------------
 
@@ -525,12 +591,7 @@
 ! use of (:,:,:,loop) not efficient on DEC, but (ims,kms,jms,loop) not portable to SGI/Cray
 
       loop_3d_m   : DO loop = 1 , num_moist
-         CALL set_physical_bc3d( moist_1(:,:,:,loop) , 'r' , config_flags ,                 &
-                                 ids , ide , jds , jde , kds , kde ,        &
-                                 ims , ime , jms , jme , kms , kme ,        &
-                                 its , ite , jts , jte , kts , kte ,        &
-                                 its , ite , jts , jte , kts , kte )
-         CALL set_physical_bc3d( moist_2(:,:,:,loop) , 'r' , config_flags ,                 &
+         CALL set_physical_bc3d( moist(:,:,:,loop) , 'r' , config_flags ,                 &
                                  ids , ide , jds , jde , kds , kde ,        &
                                  ims , ime , jms , jme , kms , kme ,        &
                                  its , ite , jts , jte , kts , kte ,        &
@@ -541,7 +602,7 @@
 
    IF (num_chem >= PARAM_FIRST_SCALAR ) THEN
 #ifdef WRF_CHEM
-         CALL chem_init (grid%id,chem_2,dt,bioemdt,photdt,chemdt,           &
+         CALL chem_init (grid%id,chem,dt,bioemdt,photdt,chemdt,           &
                          stepbioe,stepphot,stepchem,                        &
                          ph_2,phb,g,aerwrf,config_flags,                    &
                          alt,t_1,pb,p,t0,p1000mb,rcp,                       &
@@ -550,7 +611,6 @@
                                  ids , ide , jds , jde , kds , kde ,        &
                                  ims , ime , jms , jme , kms , kme ,        &
                                  its , ite , jts , jte , kts , kte          )
-        chem_1=chem_2
 !
 ! calculate initial pm
 !
@@ -564,12 +624,12 @@
 
           pm2_5(i,k,j)=0.
           do l=p_so4aj,p_p25i
-             pm2_5(i,k,j)=pm2_5(i,k,j)+chem_2(ii,kk,jj,l)
+             pm2_5(i,k,j)=pm2_5(i,k,j)+chem(ii,kk,jj,l)
           enddo
           pm10(i,k,j)= pm2_5(i,k,j)                      &
-                      +chem_2(ii,kk,jj,p_antha)             &
-                      +chem_2(ii,kk,jj,p_soila)             &
-                      +chem_2(ii,kk,jj,p_seas)
+                      +chem(ii,kk,jj,p_antha)             &
+                      +chem(ii,kk,jj,p_soila)             &
+                      +chem(ii,kk,jj,p_seas)
         enddo
         enddo
         enddo
@@ -578,12 +638,7 @@
 ! use of (:,:,:,loop) not efficient on DEC, but (ims,kms,jms,loop) not portable to SGI/Cray
 
       loop_3d_c   : DO loop = PARAM_FIRST_SCALAR , num_chem
-         CALL set_physical_bc3d( chem_1(:,:,:,loop) , 'r' , config_flags ,                 &
-                                 ids , ide , jds , jde , kds , kde ,        &
-                                 ims , ime , jms , jme , kms , kme ,        &
-                                 its , ite , jts , jte , kts , kte ,        &
-                                 its , ite , jts , jte , kts , kte )
-         CALL set_physical_bc3d( chem_2(:,:,:,loop) , 'r' , config_flags ,                 &
+         CALL set_physical_bc3d( chem(:,:,:,loop) , 'r' , config_flags ,                 &
                                  ids , ide , jds , jde , kds , kde ,        &
                                  ims , ime , jms , jme , kms , kme ,        &
                                  its , ite , jts , jte , kts , kte ,        &
@@ -627,21 +682,6 @@
                          ims , ime , jms , jme , &
                          its , ite , jts , jte , &
                          its , ite , jts , jte   ) 
-
-! initial surface pressure (xyh)
-
-    do j = jts,min( jte,jde-1 )
-    do i = its,min( ite,ide-1 )
-      zw = (phb(i,1,j)+ph_1(i,1,j))/g
-      z1 = 0.5*(ph_1(i,1,j)+phb(i,1,j)+ph_1(i,2,j)+phb(i,2,j))/g
-      z2 = 0.5*(ph_1(i,2,j)+phb(i,2,j)+ph_1(i,3,j)+phb(i,3,j))/g
-      wgt1 = (zw - z2)/(z1 - z2)
-      wgt2 = 1. - wgt1
-      psfc (i,j) = wgt1*(p(i,1,j) + pb(i,1,j)) &
-                  +wgt2*(p(i,2,j) + pb(i,2,j))
-      psfcm(i,j) = psfc(i,j)
-    enddo
-    enddo
 
 #ifdef DM_PARALLEL
 #   include "HALO_EM_INIT_1.inc"

@@ -5,19 +5,21 @@ MODULE module_bl_gfs
 CONTAINS
 
 !-------------------------------------------------------------------          
-   SUBROUTINE BL_GFS(U3D,V3D,TH3D,T3D,QV3D,QC3D,QI3D,P3D,PI3D,     &
+   SUBROUTINE BL_GFS(U3D,V3D,TH3D,T3D,QV3D,QC3D,     P3D,PI3D,     &
                   RUBLTEN,RVBLTEN,RTHBLTEN,                        &
-                  RQVBLTEN,RQCBLTEN,RQIBLTEN,          	       & 
-                  CP,G,ROVCP,R,ROVG,P_QI,P_FIRST_SCALAR,           &
+                  RQVBLTEN,RQCBLTEN,                   	           &
+                  CP,G,ROVCP,R,ROVG,FLAG_QI,                       &
                   dz8w,z,PSFC,                                     &
                   UST,PBL,PSIM,PSIH,                               &
                   HFX,QFX,TSK,GZ1OZ0,WSPD,BR,                      &
                   DT,KPBL2D,EP1,KARMAN,                            &
                   ids,ide, jds,jde, kds,kde,                       &
                   ims,ime, jms,jme, kms,kme,                       &
-                  its,ite, jts,jte, kts,kte                        )
+                  its,ite, jts,jte, kts,kte,                       &
+               ! optional
+                  qi3d,rqiblten                                    )
 !--------------------------------------------------------------------
-      USE MODULE_GFS_CONSTANTS,    ONLY : kind_phys
+      USE MODULE_GFS_MACHINE,    ONLY : kind_phys
 !-------------------------------------------------------------------
       IMPLICIT NONE
 !-------------------------------------------------------------------
@@ -88,8 +90,9 @@ CONTAINS
 
       INTEGER, INTENT(IN) ::            ids,ide, jds,jde, kds,kde,      &
                                         ims,ime, jms,jme, kms,kme,      &
-                                        its,ite, jts,jte, kts,kte,      &
-                                        P_QI,P_FIRST_SCALAR
+                                        its,ite, jts,jte, kts,kte
+
+      LOGICAL, INTENT(IN) ::            flag_qi 
 
       REAL,    INTENT(IN) ::                                            &
                                         CP,                             &
@@ -106,7 +109,6 @@ CONTAINS
                                         P3D,                            &
                                         PI3D,                           &
                                         QC3D,                           &
-                                        QI3D,                           &
                                         QV3D,                           &
                                         T3D,                            &
                                         TH3D,                           &
@@ -118,7 +120,6 @@ CONTAINS
       REAL,    DIMENSION(ims:ime, kms:kme, jms:jme), INTENT(INOUT) ::   &
                                         RTHBLTEN,                       &
                                         RQCBLTEN,                       &
-                                        RQIBLTEN,                       &
                                         RQVBLTEN,                       &
                                         RUBLTEN,                        &
                                         RVBLTEN                        
@@ -141,6 +142,14 @@ CONTAINS
       INTEGER, DIMENSION(ims:ime, jms:jme), INTENT(OUT) ::              &
                                         KPBL2D 
 
+!--------------------------- OPTIONAL VARS ------------------------------
+      REAL, DIMENSION(ims:ime, kms:kme, jms:jme),                       &
+            OPTIONAL, INTENT(IN) ::                                     & 
+                                        QI3D
+
+      REAL, DIMENSION(ims:ime, kms:kme, jms:jme),                       &
+            OPTIONAL, INTENT(INOUT) ::                                  & 
+                                        RQIBLTEN
 
 !--------------------------- LOCAL VARS ------------------------------
 
@@ -212,7 +221,7 @@ CONTAINS
    KTEP=KTE+1
    NTRAC=2
    DELTIM=DT
-   IF (P_QI.ge.P_FIRST_SCALAR) NTRAC=3
+   IF (flag_qi) NTRAC=3
 
 
    DO J=jts,jte
@@ -244,8 +253,8 @@ CONTAINS
           U1(I,K) = U3D(i,k,j)
           V1(I,K) = V3D(i,k,j)
           T1(I,K) = T3D(i,k,j)
-          Q1(I,K,1) = QV3D(i,k,j)
-          Q1(I,K,2) = QC3D(i,k,j)
+          Q1(I,K,1) = QV3D(i,k,j)/(1.+QV3D(i,k,j))
+          Q1(I,K,2) = QC3D(i,k,j)/(1.+QC3D(i,k,j))
           PRSL(I,K)=P3D(i,k,j)*.001
         ENDDO
       ENDDO
@@ -273,10 +282,10 @@ CONTAINS
         PHIL(I,KTE)=PHII(I,KTE)-PHIL(I,KTEM)+PHII(I,KTE)
       ENDDO
 
-      IF (P_QI.ge.P_FIRST_SCALAR) THEN
+      IF (flag_QI .AND. PRESENT( QI3D ) ) THEN
         DO k=kts,kte
           DO i=its,ite 
-            Q1(I,K,3) = QI3D(i,k,j)
+            Q1(I,K,3) = QI3D(i,k,j)/(1.+QI3D(i,k,j))
           ENDDO
         ENDDO
       ENDIF
@@ -300,15 +309,15 @@ CONTAINS
           RVBLTEN(I,K,J)=DV(I,K)
           RUBLTEN(I,K,J)=DU(I,K)
           RTHBLTEN(I,K,J)=TAU(I,K)/PI3D(I,K,J)
-          RQVBLTEN(I,K,J)=RTG(I,K,1)
-          RQCBLTEN(I,K,J)=RTG(I,K,2)
+          RQVBLTEN(I,K,J)=RTG(I,K,1)/(1.-Q1(I,K,1))**2
+          RQCBLTEN(I,K,J)=RTG(I,K,2)/(1.-Q1(I,K,2))**2
         ENDDO
       ENDDO
 
-      IF (P_QI.ge.P_FIRST_SCALAR) THEN
+      IF (flag_QI .AND. PRESENT( RQIBLTEN ))  THEN
         DO k=kts,kte
           DO i=its,ite
-            RQIBLTEN(I,K,J)=RTG(I,K,3)
+            RQIBLTEN(I,K,J)=RTG(I,K,3)/(1.-Q1(I,K,3))**2
           ENDDO
         ENDDO
       ENDIF
@@ -328,7 +337,7 @@ CONTAINS
 
 !===================================================================
    SUBROUTINE gfsinit(RUBLTEN,RVBLTEN,RTHBLTEN,RQVBLTEN,           &
-                      RQCBLTEN,RQIBLTEN,P_QI,P_FIRST_SCALAR,       &
+                      RQCBLTEN,RQIBLTEN,P_QI,P_FIRST_SCALAR,   &
                       restart,                                     &
                       allowed_to_read,                             &
                       ids, ide, jds, jde, kds, kde,                &
@@ -341,7 +350,7 @@ CONTAINS
    INTEGER , INTENT(IN)          ::  ids, ide, jds, jde, kds, kde, &
                                      ims, ime, jms, jme, kms, kme, &
                                      its, ite, jts, jte, kts, kte
-   INTEGER , INTENT(IN)          ::  P_QI,P_FIRST_SCALAR
+   INTEGER , INTENT(IN)          ::  P_QI, P_FIRST_SCALAR
 
    REAL , DIMENSION( ims:ime , kms:kme , jms:jme ) , INTENT(OUT) ::         &
                                                          RUBLTEN, &
@@ -391,9 +400,10 @@ CONTAINS
      &     PRSI,DEL,PRSL,PRSLK,PHII,PHIL,RCL,DELTIM,                    &
      &     DUSFC,DVSFC,DTSFC,DQSFC,HPBL,HGAMT,HGAMQ)
 !
-      USE MODULE_GFS_CONSTANTS, only: kind_phys, grav => con_g,         &
-     &                                RD => con_RD, CP => con_CP        &
+      USE MODULE_GFS_MACHINE, ONLY : kind_phys
+      USE MODULE_GFS_PHYSCONS, grav => con_g, RD => con_RD, CP => con_CP &
      &,             HVAP => con_HVAP, ROG => con_ROG, FV => con_FVirt
+
       implicit none
 !
 !     include 'constant.h'
@@ -946,7 +956,7 @@ CONTAINS
       SUBROUTINE TRIDI2(L,N,CL,CM,CU,R1,R2,AU,A1,A2)
 !sela %INCLUDE DBTRIDI2;
 !
-      USE MODULE_GFS_CONSTANTS     , ONLY : kind_phys
+      USE MODULE_GFS_MACHINE     , ONLY : kind_phys
       implicit none
       integer             k,n,l,i
       real(kind=kind_phys) fk
@@ -987,7 +997,7 @@ CONTAINS
       SUBROUTINE TRIDIN(L,N,nt,CL,CM,CU,R1,R2,AU,A1,A2)
 !sela %INCLUDE DBTRIDI2;
 !
-      USE MODULE_GFS_CONSTANTS     , ONLY : kind_phys
+      USE MODULE_GFS_MACHINE     , ONLY : kind_phys
       implicit none
       integer             is,k,kk,n,nt,l,i
       real(kind=kind_phys) fk(L)
@@ -1052,7 +1062,7 @@ CONTAINS
       SUBROUTINE TRIDIT(L,N,nt,CL,CM,CU,RT,AU,AT)
 !sela %INCLUDE DBTRIDI2;
 !
-      USE MODULE_GFS_CONSTANTS     , ONLY : kind_phys
+      USE MODULE_GFS_MACHINE     , ONLY : kind_phys
       implicit none
       integer             is,k,kk,n,nt,l,i
       real(kind=kind_phys) fk(L)

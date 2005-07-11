@@ -51,6 +51,7 @@ CONTAINS
                          ACSNOM,IVGTYP,ISLTYP, SFCEVP, SMOIS,    &
                          SH2O, SNOWH, SMFR3D,                    &  ! temporary
                          DX,DY,F_ICE_PHY,F_RAIN_PHY,F_RIMEF_PHY, &
+                         mp_restart_state,tbpvs_state,tbpvs0_state,&
                          allowed_to_read, moved,                 &
                          ids, ide, jds, jde, kds, kde,           &
                          ims, ime, jms, jme, kms, kme,           &
@@ -157,6 +158,7 @@ CONTAINS
 !mp
    REAL,     DIMENSION( ims:ime , kms:kme , jms:jme ) , INTENT(OUT) ::   &
              F_ICE_PHY,F_RAIN_PHY,F_RIMEF_PHY
+   REAL, DIMENSION(:), INTENT(INOUT)   :: mp_restart_state,tbpvs_state,tbpvs0_state
    LOGICAL,  INTENT(IN)  :: allowed_to_read, moved
 
 ! Local data
@@ -189,8 +191,8 @@ integer myproc
      restart = .false.
      CALL wrf_clockprint(150, grid%domain_clock, &
                          'DEBUG phy_init():  get currTime from grid%domain_clock,')
-     CALL ESMF_ClockGet( grid%domain_clock, currTime=grid%current_time, rc=rc )
-     CALL ESMF_TimeGet( grid%current_time, YY=julyr, dayOfYear=julday, H=hr, M=min, S=sec, MS=ms, rc=rc)
+     CALL WRF_UTIL_ClockGet( grid%domain_clock, currTime=grid%current_time, rc=rc )
+     CALL WRF_UTIL_TimeGet( grid%current_time, YY=julyr, dayOfYear=julday, H=hr, M=min, S=sec, MS=ms, rc=rc)
      CALL wrf_timetoa ( grid%current_time, message )
      WRITE( wrf_err_message , * ) 'DEBUG phy_init():  currTime = [',TRIM( message ),']'
      CALL wrf_debug( 150, TRIM(wrf_err_message) )
@@ -343,7 +345,8 @@ integer myproc
    CALL mp_init(RAINNC,config_flags,restart,warm_rain,          &
                 MPDT, DT, DX, DY, LOWLYR,                       & 
                 F_ICE_PHY,F_RAIN_PHY,F_RIMEF_PHY,               &
-                allowed_to_read ,                                   &
+                mp_restart_state,tbpvs_state,tbpvs0_state,       &
+                allowed_to_read ,                               &
                 ids, ide, jds, jde, kds, kde,                   &
                 ims, ime, jms, jme, kms, kme,                   &
                 its, ite, jts, jte, kts, kte                    )
@@ -505,6 +508,7 @@ integer myproc
           ENDIF                                                        
           ALBBCK(I,J)=ALBD(IS,ISN)/100.                                  
           ALBEDO(I,J)=ALBBCK(I,J)
+          IF(SNOWC(I,J) .GT. 0.5)ALBEDO(I,J)=ALBBCK(I,J)*(1.+SCFX(IS))
           THC(I,J)=THERIN(IS,ISN)/100.                               
           Z0(I,J)=SFZ0(IS,ISN)/100.                                
           ZNT(I,J)=Z0(I,J)
@@ -601,7 +605,7 @@ integer myproc
              CALL nl_get_start_month(grid%id,month)
              CALL nl_get_start_day(grid%id,iday)
              CALL gfdletainit(sfull,shalf,pptop,JULYR,MONTH,IDAY,GMT,&
-                           allowed_to_read ,                         &
+                           config_flags,allowed_to_read ,            &
                            kds, kde, kms, kme, kts, kte     )
              etalw = .true.
         CASE DEFAULT
@@ -627,7 +631,7 @@ integer myproc
              CALL nl_get_start_month(grid%id,month)
              CALL nl_get_start_day(grid%id,iday)
              CALL gfdletainit(sfull,shalf,pptop,JULYR,MONTH,IDAY,GMT,&
-                           allowed_to_read,                          &
+                           config_flags,allowed_to_read,             &
                            kds, kde, kms, kme, kts, kte     )
              ENDIF
 
@@ -750,6 +754,21 @@ integer myproc
            CALL sfclayinit( allowed_to_read )
            isfc = 1
       CASE (MYJSFCSCHEME)
+           CALL myjsfcinit(LOWLYR,UST,                         &
+#if ( NMM_CORE == 1 )
+                                      Z0,                      &
+#else
+                                      ZNT,                     &
+#endif
+                                          XLAND,XICE,          &
+                         IVGTYP,restart,                       &
+                         allowed_to_read ,                     &
+                         ids, ide, jds, jde, kds, kde,         &
+                         ims, ime, jms, jme, kms, kme,         &
+                         its, ite, jts, jte, kts, kte          )
+           isfc = 2
+
+      CASE (GFSSFCSCHEME)
 #if ( NMM_CORE == 1 )
            CALL myjsfcinit(LOWLYR,UST,Z0,XLAND,XICE,           &
 #else
@@ -760,7 +779,8 @@ integer myproc
                          ids, ide, jds, jde, kds, kde,         &
                          ims, ime, jms, jme, kms, kme,         &
                          its, ite, jts, jte, kts, kte          )
-           isfc = 2
+           isfc = 1
+
       CASE DEFAULT
 
    END SELECT sfclay_select
@@ -1004,6 +1024,7 @@ integer myproc
    SUBROUTINE mp_init(RAINNC,config_flags,restart,warm_rain,      &
                       MPDT, DT, DX, DY, LOWLYR,                   & ! for eta mp
                       F_ICE_PHY,F_RAIN_PHY,F_RIMEF_PHY,           & ! for eta mp
+                      mp_restart_state,tbpvs_state,tbpvs0_state,   & ! eta mp
                       allowed_to_read ,                           &
                       ids, ide, jds, jde, kds, kde,               &
                       ims, ime, jms, jme, kms, kme,               &
@@ -1015,6 +1036,7 @@ integer myproc
    USE module_mp_wsm5
    USE module_mp_wsm6
    USE module_mp_etanew
+   USE module_mp_thompson
 !------------------------------------------------------------------
    IMPLICIT NONE
 !------------------------------------------------------------------
@@ -1032,6 +1054,7 @@ integer myproc
    REAL,     DIMENSION( ims:ime , jms:jme ) , INTENT(INOUT) :: RAINNC
    REAL,     DIMENSION( ims:ime , kms:kme, jms:jme ) , INTENT(INOUT) :: &
                                   F_ICE_PHY,F_RAIN_PHY,F_RIMEF_PHY
+   REAL , DIMENSION(:) ,INTENT(INOUT)  :: mp_restart_state,tbpvs_state,tbpvs0_state
    LOGICAL , INTENT(IN)  :: allowed_to_read
 
 ! Local
@@ -1062,10 +1085,13 @@ integer myproc
      CASE (ETAMPNEW)
          CALL etanewinit (MPDT,DT,DX,DY,LOWLYR,restart,           &
                           F_ICE_PHY,F_RAIN_PHY,F_RIMEF_PHY,       &
+                          mp_restart_state,tbpvs_state,tbpvs0_state,&
                           allowed_to_read,                        &
                           ids, ide, jds, jde, kds, kde,           &
                           ims, ime, jms, jme, kms, kme,           &
                           its, ite, jts, jte, kts, kte            )
+     CASE (THOMPSON)
+         CALL thomp_init
      CASE (NCEPCLOUD3)
           CALL ncloud3init(rhoair0,rhowater,rhosnow,cliq,cv, allowed_to_read )
      CASE (NCEPCLOUD5)

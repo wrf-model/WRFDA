@@ -75,7 +75,7 @@ SUBROUTINE DA_Transfer_XatoWRFTL_Adj( grid, config_flags, filnam, &
    do k=ks,ke
    do i=is,ie
       xa%t(i,j,k)=a_t_2(i,j,k)
-      xa%q(i,j,k)=a_moist_2(i,j,k,P_QV)
+      xa%q(i,j,k)=a_moist(i,j,k,P_QV)
       xa%w(i,j,k)=a_w_2(i,j,k)
    enddo
    enddo
@@ -83,33 +83,33 @@ SUBROUTINE DA_Transfer_XatoWRFTL_Adj( grid, config_flags, filnam, &
    enddo
 
 #if 0
-   if ( size(moist_2,dim=4) >= 4 ) then
+   if ( size(moist,dim=4) >= 4 ) then
       do k=ks,ke
       do j=js,je
       do i=is,ie
-         xa%qcw(i,j,k)=a_moist_2(i,j,k,p_qcw)
-         xa%qrn(i,j,k)=a_moist_2(i,j,k,p_qrn)
+         xa%qcw(i,j,k)=a_moist(i,j,k,p_qcw)
+         xa%qrn(i,j,k)=a_moist(i,j,k,p_qrn)
       enddo
       enddo
       enddo
    endif
 
-   if ( size(moist_2,dim=4) >= 6 ) then
+   if ( size(moist,dim=4) >= 6 ) then
       do k=ks,ke
       do j=js,je
       do i=is,ie
-         xa%qci(i,j,k)=a_moist_2(i,j,k,p_qci)
-         xa%qsn(i,j,k)=a_moist_2(i,j,k,p_qsn)
+         xa%qci(i,j,k)=a_moist(i,j,k,p_qci)
+         xa%qsn(i,j,k)=a_moist(i,j,k,p_qsn)
       enddo
       enddo
       enddo
    endif
 
-   if ( size(moist_2,dim=4) >= 7 ) then
+   if ( size(moist,dim=4) >= 7 ) then
       do k=ks,ke
       do j=js,je
       do i=is,ie
-         xa%qgr(i,j,k)=a_moist_2(i,j,k,p_qgr) 
+         xa%qgr(i,j,k)=a_moist(i,j,k,p_qgr) 
       enddo
       enddo
       enddo

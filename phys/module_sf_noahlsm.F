@@ -32,6 +32,8 @@ MODULE module_sf_noahlsm
                  REFKDT_DATA,FRZK_DATA,ZBOT_DATA,  SMLOW_DATA,SMHIGH_DATA,        &
                         CZIL_DATA
 
+        CHARACTER*256  :: err_message
+
 !
 CONTAINS
 !
@@ -43,7 +45,8 @@ CONTAINS
                   ALBEDO,ALBBCK,ZNT,Z0,TMN,XLAND,XICE, EMISS,   & 
                   SNOWC,QSFC,RAINBL,                            &
                   num_soil_layers,DT,DZS,ITIMESTEP,             &
-                  SMOIS,TSLB,SNOW,CANWAT,CHS,CPM,ROVCP,         & !H   
+                  SMOIS,TSLB,SNOW,CANWAT,                       &
+                  CHS,CHS2,CQS2,CPM,ROVCP,                      & !H   
                   SH2O,SNOWH,                                   & !H 
                   SNOALB,SHDMIN,SHDMAX,                         & !I
                   ACSNOM,ACSNOW,                                & !O  
@@ -79,6 +82,8 @@ CONTAINS
 !-- ALBEDO      time-varying surface albedo including snow effect (unitless fraction)
 !-- ALBBCK      background surface albedo (unitless fraction)
 !-- CHS          surface exchange coefficient for heat and moisture (m s-1);
+!-- CHS2        2m surface exchange coefficient for heat  (m s-1);
+!-- CQS2        2m surface exchange coefficient for moisture (m s-1);
 ! --- soil variables
 !-- num_soil_layers   the number of soil layers
 !-- ZS          depths of centers of soil layers   (m)
@@ -227,6 +232,8 @@ CONTAINS
                                                             LH, &
                                                         GRDFLX, &
                                                           QSFC,&     
+                                                          CQS2,&     
+                                                          CHS2,&     
                                                           SNOW, & 
                                                          SNOWC, & 
                                                          SNOWH, & !new
@@ -517,6 +524,13 @@ CONTAINS
           LH(I,J)=ETA
           GRDFLX(I,J)=SSOIL
           SNOWC(I,J)=SNCOVR
+          CHS2(I,J)=CQS2(I,J)
+!      prevent diagnostic ground q (q1) from being greater than qsat(tsk)
+!      as happens over snow cover where the cqs2 value also becomes irrelevant
+!      by setting cqs2=chs in this situation the 2m q should become just qv(k=1)
+          IF (Q1 .GT. QSFC(I,J)) THEN
+            CQS2(I,J) = CHS(I,J)
+          ENDIF
           QSFC(I,J)=Q1
 !                                                                       
           DO 80 NS=1,NSOIL                                              
@@ -598,6 +612,7 @@ CONTAINS
    REAL                      :: BX, SMCMAX, PSISAT, FREE
    REAL, PARAMETER           :: BLIM = 5.5, HLICE = 3.335E5,    &
                                 GRAV = 9.81, T0 = 273.15
+   INTEGER                   :: errflag
 
 !
 
@@ -613,7 +628,17 @@ CONTAINS
    itf=min0(ite,ide-1)
    jtf=min0(jte,jde-1)
 
-   IF ( MINVAL ( ISLTYP( its:itf, jts:jtf ) ) .LT. 1 ) THEN
+   errflag = 0
+   DO j = jts,jtf
+     DO i = its,itf
+       IF ( ISLTYP( i,j ) .LT. 1 ) THEN
+         errflag = 1
+         WRITE(err_message,*)"module_sf_noahlsm.F: lsminit: out of range ISLTYP ",i,j,ISLTYP( i,j )
+         CALL wrf_message(err_message)
+       ENDIF
+     ENDDO
+   ENDDO
+   IF ( errflag .EQ. 1 ) THEN
       CALL wrf_error_fatal( "module_sf_noahlsm.F: lsminit: out of range value of ISLTYP. Is this field in the input?" )
    ENDIF
 
@@ -1089,7 +1114,7 @@ CONTAINS
 ! NECESSARY.  OTHER APPLICATIONS MAY REQUIRE DIFFERENT OUTPUT VARIABLES.         
 !   ETA        ACTUAL LATENT HEAT FLUX (W m-2: NEGATIVE, IF UP FROM              
 !              SURFACE)                                                          
-!  ETA_KINEMATIC atctual latent heat flux in Kg m s-1                            
+!  ETA_KINEMATIC atctual latent heat flux in Kg m-2 s-1                            
 !   SHEAT      SENSIBLE HEAT FLUX (W M-2: NEGATIVE, IF UPWARD FROM               
 !              SURFACE)                                                          
 !   FDOWN      Radiation forcing at the surface (W m-2) = SOLDN*(1-alb)+LWDN     
@@ -1279,7 +1304,6 @@ CONTAINS
          ELSE                                                                    
             SNDENS = SNEQV / SNOWH                                               
             IF(SNDENS > 1.0) THEN                                               
-             write(*,*)'Physical snow depth is less than snow water equiv.'           
              CALL wrf_error_fatal ( 'Physical snow depth is less than snow water equiv.' )
             ENDIF                                                                
             CALL CSNOW (SNCOND,SNDENS)                                           
@@ -2916,15 +2940,12 @@ CONTAINS
 ! ----------------------------------------------------------------------         
 !                                                                                
                IF (SOILTYP .gt. SLCATS) THEN                                     
-                        WRITE (*,*) 'Warning: too many input soil types'         
                         CALL wrf_error_fatal ( 'Warning: too many input soil types' )
                END IF                                                            
                IF (VEGTYP .gt. LUCATS) THEN                                      
-                     WRITE (*,*) 'Warning: too many input landuse types'         
                      CALL wrf_error_fatal ( 'Warning: too many input landuse types' )
                END IF                                                            
                IF (SLOPETYP .gt. SLPCATS) THEN                                   
-                     WRITE (*,*) 'Warning: too many input slope types'           
                      CALL wrf_error_fatal ( 'Warning: too many input slope types' )
                END IF                                                            
                                                                                  
@@ -2985,8 +3006,9 @@ CONTAINS
                                                                                  
                IF (VEGTYP .eq. BARE) SHDFAC = 0.0                                
                IF (NROOT .gt. NSOIL) THEN                                        
-                  WRITE (*,*) 'Warning: too many root layers'                    
-                  CALL wrf_error_fatal ( 'Warning: too many root layers' )
+                  WRITE (err_message,*) 'Error: too many root layers ',  &
+                                                 NSOIL,NROOT
+                  CALL wrf_error_fatal ( err_message )
 ! ----------------------------------------------------------------------         
 ! CALCULATE ROOT DISTRIBUTION.  PRESENT VERSION ASSUMES UNIFORM                  
 ! DISTRIBUTION BASED ON SOIL LAYER DEPTHS.                                       

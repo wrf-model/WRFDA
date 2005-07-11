@@ -43,7 +43,7 @@ SUBROUTINE couple_or_uncouple_em ( grid , config_flags , couple, &
                                       ips , ipe , jps , jpe , kps , kpe
 
    INTEGER                         :: i,j,k, im
-   INTEGER                         :: num_3d_c, num_3d_m
+   INTEGER                         :: num_3d_c, num_3d_m, num_3d_s
    REAL                            :: mu_factor
 
    REAL, DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33) :: mut_2, muut_2, muvt_2, muwt_2
@@ -66,6 +66,7 @@ SUBROUTINE couple_or_uncouple_em ( grid , config_flags , couple, &
 
    num_3d_m        = num_moist
    num_3d_c        = num_chem
+   num_3d_s        = num_scalar
 
    !  couple or uncouple mass-point variables
    !  first, compute mu or its reciprical as necessary
@@ -253,7 +254,7 @@ SUBROUTINE couple_or_uncouple_em ( grid , config_flags , couple, &
        DO im = PARAM_FIRST_SCALAR, num_3d_m
          DO k = kps,kpe-1
          DO i = max(ids,ips),min(ide-1,ipe)
-           moist_2(i,k,j,im)  =  moist_2(i,k,j,im)*mut_2(i,j)
+           moist(i,k,j,im)  =  moist(i,k,j,im)*mut_2(i,j)
          ENDDO
          ENDDO
        ENDDO
@@ -263,7 +264,17 @@ SUBROUTINE couple_or_uncouple_em ( grid , config_flags , couple, &
        DO im = PARAM_FIRST_SCALAR, num_3d_c
          DO k = kps,kpe-1
          DO i = max(ids,ips),min(ide-1,ipe)
-           chem_2(i,k,j,im)  =  chem_2(i,k,j,im)*mut_2(i,j)
+           chem(i,k,j,im)  =  chem(i,k,j,im)*mut_2(i,j)
+         ENDDO
+         ENDDO
+       ENDDO
+     END IF
+
+     IF (num_3d_s >= PARAM_FIRST_SCALAR )  THEN
+       DO im = PARAM_FIRST_SCALAR, num_3d_s
+         DO k = kps,kpe-1
+         DO i = max(ids,ips),min(ide-1,ipe)
+           scalar(i,k,j,im)  =  scalar(i,k,j,im)*mut_2(i,j)
          ENDDO
          ENDDO
        ENDDO
@@ -356,13 +367,7 @@ SUBROUTINE couple_or_uncouple_em ( grid , config_flags , couple, &
      IF (num_3d_m >= PARAM_FIRST_SCALAR) THEN
        DO im = PARAM_FIRST_SCALAR , num_3d_m
 
-     CALL set_physical_bc3d( moist_1(ims,kms,jms,im), 'p',        &
-                             config_flags,                   &
-                             ids,ide, jds,jde, kds,kde,  & ! domain dims
-                             ims,ime, jms,jme, kms,kme,  & ! memory dims
-                             ips,ipe, jps,jpe, kps,kpe,  & ! patch  dims
-                             ips,ipe, jps,jpe, kps,kpe )
-     CALL set_physical_bc3d( moist_2(ims,kms,jms,im), 'p',        &
+     CALL set_physical_bc3d( moist(ims,kms,jms,im), 'p',        &
                              config_flags,                   &
                              ids,ide, jds,jde, kds,kde,  & ! domain dims
                              ims,ime, jms,jme, kms,kme,  & ! memory dims
@@ -375,13 +380,19 @@ SUBROUTINE couple_or_uncouple_em ( grid , config_flags , couple, &
      IF (num_3d_c >= PARAM_FIRST_SCALAR) THEN
        DO im = PARAM_FIRST_SCALAR , num_3d_c
 
-     CALL set_physical_bc3d( chem_1(ims,kms,jms,im), 'p',        &
+     CALL set_physical_bc3d( chem(ims,kms,jms,im), 'p',        &
                              config_flags,                   &
                              ids,ide, jds,jde, kds,kde,  & ! domain dims
                              ims,ime, jms,jme, kms,kme,  & ! memory dims
                              ips,ipe, jps,jpe, kps,kpe,  & ! patch  dims
                              ips,ipe, jps,jpe, kps,kpe )
-     CALL set_physical_bc3d( chem_2(ims,kms,jms,im), 'p',        &
+     ENDDO
+     ENDIF
+
+     IF (num_3d_s >= PARAM_FIRST_SCALAR) THEN
+       DO im = PARAM_FIRST_SCALAR , num_3d_s
+
+     CALL set_physical_bc3d( scalar(ims,kms,jms,im), 'p',        &
                              config_flags,                   &
                              ids,ide, jds,jde, kds,kde,  & ! domain dims
                              ims,ime, jms,jme, kms,kme,  & ! memory dims
@@ -398,4 +409,22 @@ SUBROUTINE couple_or_uncouple_em ( grid , config_flags , couple, &
 #endif
 
 END SUBROUTINE couple_or_uncouple_em
+
+LOGICAL FUNCTION em_cd_feedback_mask( pig, ips_save, ipe_save , pjg, jps_save, jpe_save, xstag, ystag )
+   INTEGER, INTENT(IN) :: pig, ips_save, ipe_save , pjg, jps_save, jpe_save
+   LOGICAL, INTENT(IN) :: xstag, ystag
+
+   INTEGER ioff, joff
+
+   ioff = 0 ; joff = 0 
+   IF ( xstag  ) ioff = 1
+   IF ( ystag  ) joff = 1
+
+   em_cd_feedback_mask = ( pig .ge. ips_save+1        .and.      &
+                           pjg .ge. jps_save+1        .and.      &
+                           pig .le. ipe_save-1  +ioff .and.      &
+                           pjg .le. jpe_save-1  +joff           )
+
+
+END FUNCTION em_cd_feedback_mask
 
