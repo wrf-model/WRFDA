@@ -128,12 +128,12 @@ program gen_be_diags_read
    call da_print_be_stats_v( outunit, variable, nk, num_bins2d, &
                              e_vec, e_val, e_vec_loc, e_val_loc )
 
-
    deallocate( e_vec )
    deallocate( e_val )
    deallocate( e_vec_loc )
    deallocate( e_val_loc )
 
+   if (uh_method /= 'power') then
 ! 2d fields: ps_u, ps:
 
    read(iunit)variable
@@ -150,7 +150,11 @@ program gen_be_diags_read
    read(iunit)e_val_loc
    call da_print_be_stats_v( outunit, variable, nk, num_bins2d, &
                              e_vec, e_val, e_vec_loc, e_val_loc )
-
+   deallocate( e_vec )
+   deallocate( e_val )
+   deallocate( e_vec_loc )
+   deallocate( e_val_loc )
+   end if
 ! To assign the dimension nk for 3d fields:
    nk = nk_3d
 
