@@ -333,8 +333,10 @@ SUBROUTINE med_nest_initial ( parent , nest , config_flags )
                                ims, ime, jms, jme, kms, kme,    &
                                ips, ipe, jps, jpe, kps, kpe    )
   
+#if (EM_CORE == 1 && DA_CORE == 0)
 ! initialize some other constants (and 1d arrays in z)
      CALL init_domain_constants ( parent, nest )
+#endif
 
 ! get the nest config flags
      CALL model_to_grid_config_rec ( nest%id , model_config_rec , nest_config_flags )
@@ -486,7 +488,7 @@ SUBROUTINE init_domain_constants ( parent , nest )
    USE module_domain
    IMPLICIT NONE
    TYPE(domain) :: parent , nest
-#if (EM_CORE == 1)
+#if (EM_CORE == 1 && DA_CORE == 0)
    INTERFACE 
      SUBROUTINE med_init_domain_constants ( parent , nest )
         USE module_domain
