@@ -108,11 +108,13 @@ SUBROUTINE med_force_domain ( parent_grid , nested_grid )
      ! swich config_flags to point to parent rconfig info
      CALL model_to_grid_config_rec ( grid%id , model_config_rec , config_flags )
 #    include "deref_kludge.h"
+#if (DA_CORE == 0)
      CALL couple_or_uncouple_em ( grid , config_flags ,  .true., &
 !
 #      include "em_actual_args.inc"
 !
                                 )
+#endif
      ! on restart do not force the nest the first time since it has already been forced
      ! prior to the writing of the restart file
      IF ( .NOT. ( config_flags%restart .AND. nested_grid%first_force ) ) THEN
@@ -120,11 +122,13 @@ SUBROUTINE med_force_domain ( parent_grid , nested_grid )
         grid => nested_grid
         CALL model_to_grid_config_rec ( grid%id , model_config_rec , config_flags )
 #       include "deref_kludge.h"
+#if (DA_CORE == 0)
         CALL couple_or_uncouple_em ( nested_grid , config_flags ,  .true., &
 !
 #         include "em_actual_args.inc"
 !
                                    )
+#endif
         ! perform first part: transfer data from parent to intermediate domain
         ! at the same resolution but on the same decomposition as the nest
         ! note that this will involve communication on multiple DM procs
@@ -153,21 +157,25 @@ SUBROUTINE med_force_domain ( parent_grid , nested_grid )
         grid => nested_grid
         CALL model_to_grid_config_rec ( grid%id , model_config_rec , config_flags )
 #       include "deref_kludge.h"
+#if (DA_CORE == 0)
         CALL couple_or_uncouple_em ( nested_grid , config_flags ,  .false. , &
 !
 #         include "em_actual_args.inc"
 !
                                    )
+#endif
      ENDIF ! not restart and first_force
      ! uncouple the parent
      grid => parent_grid
      CALL model_to_grid_config_rec ( grid%id , model_config_rec , config_flags )
 #    include "deref_kludge.h"
+#if (DA_CORE == 0)
      CALL couple_or_uncouple_em ( grid , config_flags ,  .false. , &
 !
 #      include "em_actual_args.inc"
 !
                                 )
+#endif
      IF ( nested_grid%first_force ) THEN
         nested_grid%first_force = .FALSE.
      ENDIF

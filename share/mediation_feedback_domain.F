@@ -84,6 +84,7 @@ SUBROUTINE med_feedback_domain ( parent_grid , nested_grid )
 !    Feedback calls for EM CORE.
 ! ----------------------------------------------------------
 #if (EM_CORE == 1 && defined( DM_PARALLEL ))
+#if (DA_CORE == 0)
    CALL model_to_grid_config_rec ( nested_grid%id , model_config_rec , config_flags )
    IF ( config_flags%dyn_opt == DYN_EM ) THEN
      grid => nested_grid%intermediate_grid
@@ -118,6 +119,7 @@ SUBROUTINE med_feedback_domain ( parent_grid , nested_grid )
      grid => nested_grid%intermediate_grid
      CALL dealloc_space_field ( grid )
    ENDIF
+#endif
 #endif
 ! ------------------------------------------------------
 !    End of Feedback calls for EM CORE.
