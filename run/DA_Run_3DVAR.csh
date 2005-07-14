@@ -54,12 +54,9 @@
 #-----------------------------------------------------------------------
 
 #Specify job details here:
- if ( ! $?NUM_PROCS )     setenv NUM_PROCS 8       # Number of processors to run on.
- if ( ! $?DA_FG_FORMAT )  setenv DA_FG_FORMAT 1    # First guess format: 1=WRF, 2=MM5, 3=KMA
- if ( ! $?DA_OB_FORMAT )  setenv DA_OB_FORMAT 2    # Observation format: 1=BUFR, 2=ASCII "little_r"
- if ( ! $?DA_CV_OPTIONS ) setenv DA_CV_OPTIONS 2   # Background error statistics: 2=NCAR, 3=NCEP.
 
  set DA_OB_FORMAT  = 2		# Observation format: 1=BUFR, 2=ASCII "little_r"
+ set DA_FG_FORMAT  = 3          # First guess format: 1=WRF, 2=MM5, 3=KMA
  set DA_CV_OPTIONS = 4		# 2 -> MM5, 3 -> WRF 4 -> Global
  set DA_GLOBAL     = .TRUE.     # true for global option
  setenv TRUNC  T63              # Triangular truncation number 
@@ -70,20 +67,30 @@
  setenv VERTICAL_GRID_NUMBER	 31                       # Number of vertical levels.
  setenv GRID_DISTANCE		190000                     # Grid resolution (m).
 
+ setenv SRC_DIR /data1/huangwei
+ setenv WRFVAR_DIR ${SRC_DIR}/wrfvar
+ setenv DAT_DIR	/data4/huangwei/wrfvar_regtest/global_2004102712/data
+ setenv RUN_DIR /mmmtmp2/huangwei/global_kma
+
+ if ( ! $?NUM_PROCS )     setenv NUM_PROCS 8       # Number of processors to run on.
+ if ( ! $?DA_FG_FORMAT )  setenv DA_FG_FORMAT 1    # First guess format: 1=WRF, 2=MM5, 3=KMA
+ if ( ! $?DA_OB_FORMAT )  setenv DA_OB_FORMAT 2    # Observation format: 1=BUFR, 2=ASCII "little_r"
+ if ( ! $?DA_CV_OPTIONS ) setenv DA_CV_OPTIONS 2   # Background error statistics: 2=NCAR, 3=NCEP.
+
 #Specify directories/files here:
- if ( ! $?SRC_DIR )    setenn SRC_DIR    ${HOME}/code_management
+ if ( ! $?SRC_DIR )    setenv SRC_DIR    ${HOME}/code_management
  if ( ! $?WRFVAR_DIR ) setenv WRFVAR_DIR ${SRC_DIR}/wrfvar
  if ( ! $?DAT_DIR )    setenv DAT_DIR    /data3/mp/mm53dvar/case_2000012412/data
  if ( ! $?RUN_DIR )    setenv RUN_DIR    /data3/dmbarker/run/case_2000012412
 
-#if ( ! $?DA_FIRST_GUESS ) setenv DA_FIRST_GUESS ${DAT_DIR}/MMINPUT_DOMAIN1 # first guess input.
- if ( ! $?DA_FIRST_GUESS ) setenv DA_FIRST_GUESS ${DAT_DIR}/wrfinput_d01 # wrf3dvar "first guess" input.
+ if ( ! $?DA_FIRST_GUESS ) setenv DA_FIRST_GUESS ${DAT_DIR}/wrfinput_d01 # wrfvar "first guess" input.
  if ( ! $?DA_OBSERVATIONS ) setenv DA_OBSERVATIONS ${DAT_DIR}/obs_gts.3dvar
- if ( ! $?DA_BACK_ERRORS ) setenv DA_BACK_ERRORS ${DAT_DIR}/be.cv_${DA_CV_OPTIONS} # wrf3dvar background errors.
+ if ( ! $?DA_BACK_ERRORS ) setenv DA_BACK_ERRORS ${DAT_DIR}/be.cv_${DA_CV_OPTIONS} # wrfvar background errors.
  if ( ! $?DA_SSMI ) setenv DA_SSMI ${DAT_DIR}/ssmi.dat  # SSM/I radiances (ignore if not using).
  if ( ! $?DA_RADAR) setenv DA_RADAR ${DAT_DIR}/radar.dat # Radar data (ignore if not using).
 
  set os = `uname`
+
  set endian_form   = big_endian
  if((${os} == 'OSF1') || (${os} == 'Linux')) then
     set endian_form   = little_endian                       # Needed for BUFR obs files only.
@@ -109,7 +116,7 @@
  cd $RUN_DIR/var
 
  cp $WRFVAR_DIR/run/LANDUSE.TBL .
- cp $WRFVAR_DIR/main/da_3dvar.exe  da_3dvar.exe
+ cp $WRFVAR_DIR/main/wrfvar.exe  wrfvar.exe
 
 #Check settings:
 
@@ -145,6 +152,7 @@
 # [2.0] Set up details of analysis algorithm:
 #-----------------------------------------------------------------------
 
+ if ( ! $?DA_NUM_SOIL_LAYERS ) set DA_NUM_SOIL_LAYERS = 5
  if ( ! $?WEST_EAST_GRID_NUMBER ) set WEST_EAST_GRID_NUMBER = 74 # Number of gridpoints in x(i) dim.
  if ( ! $?SOUTH_NORTH_GRID_NUMBER ) set SOUTH_NORTH_GRID_NUMBER = 61 # Number of gridpoints in y(j) dim.
  if ( ! $?VERTICAL_GRID_NUMBER ) setenv VERTICAL_GRID_NUMBER 28 # Number of vertical levels.
@@ -429,7 +437,6 @@ cat >! namelist.input << EOF
  dx                                  = $GRID_DISTANCE, $GRID_DISTANCE, $GRID_DISTANCE,
  dy                                  = $GRID_DISTANCE, $GRID_DISTANCE, $GRID_DISTANCE,
  grid_id                             = 1,     2,     3,
- level                               = 1,     1,     2,
  parent_id                           = 0,     1,     2,
  i_parent_start                      = 0,     30,    30,
  j_parent_start                      = 0,     20,    30,
@@ -437,7 +444,7 @@ cat >! namelist.input << EOF
  parent_time_step_ratio              = 1,     3,     3,
  feedback                            = 1,
  smooth_option                       = 0,
- nproc_y                             = 1,
+ nproc_x                             = 1,
  /
 
  &physics
@@ -463,8 +470,6 @@ cat >! namelist.input << EOF
  maxens3                             = 16,
  ensdim                              = 144,
  /
-
- num_soil_layers                     = 5,
 
  &dynamics
  dyn_opt                             = 2,
@@ -518,7 +523,7 @@ EOF
 
 #Uncomment for particular machine:
 #DEC, SGI, Linux/PC multiPE: 
- if( ${os} == 'OSF1') then
+ if((${os} == 'OSF1') || (${os} == 'Linux') || (${os} == 'IRIX'))then
     set machine_name = `uname -n`
 cat > hosts << EOF
 $machine_name
@@ -526,18 +531,21 @@ $machine_name
 $machine_name
 $machine_name
 EOF
+#mpirun -np 4 -machinefile hosts ./wrfvar.exe
+   ./wrfvar.exe >&! wrfvar.out
  endif
-#mpirun -np 4 -machinefile hosts ./da_3dvar.exe
-# ./da_3dvar.exe >&! da_3dvar.out
-#BIG : mpirun -np 4 ./da_3dvar.exe
-#    mpirun -np 8 ./da_3dvar.exe
+#BIG : mpirun -np 4 ./wrfvar.exe
+#    mpirun -np 8 ./wrfvar.exe
 #IBM (llsubmit):
-#  poe ./da_3dvar.exe
-#   mpirun -np ${NUM_PROCS} ./da_3dvar.exe
+#  poe ./wrfvar.exe
+#   mpirun -np ${NUM_PROCS} ./wrfvar.exe
 #IBM (llsubmit): 
-#  poe ./da_3dvar.exe
+#  poe ./wrfvar.exe
 #AFWA: setenv LOADL_INTERACTIVE_CLASS 1
-#AFWA: poe ./da_3dvar.exe -euilib us -hostfile host.afwa -procs 15
+#AFWA: poe ./wrfvar.exe -euilib us -hostfile host.afwa -procs 15
+
+ exit ( 0 )
+
 #-----------------------------------------------------------------------
 #Create job script for cray x1.
 cat >! run_3dvar.sh << EOF
@@ -575,7 +583,7 @@ export X1_HEAP_SIZE=12000000000
 
 date
 
-aprun -p16m:16m -c core=0 -n \$NPROC da_3dvar.exe
+aprun -p16m:16m -c core=0 -n \$NPROC wrfvar.exe
 
 date
  
