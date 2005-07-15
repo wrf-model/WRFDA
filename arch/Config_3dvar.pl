@@ -197,10 +197,10 @@ if($sw_os =~ m/darwin/i)
       or die "cannot open arch/postamble_3dvar" ;
    }
 }
-elsif(($sw_os =~ m/crayx1/i) || ($sw_os =~ m/UNICOS/i))
+elsif(($sw_os =~ m/crayx1/i) || ($sw_os =~ m/cray1e/i) || ($sw_os =~ m/UNICOS/i))
 {
-   open ARCH_POSTAMBLE, "< arch/postamble_3dvar.crayx1"
-   or die "cannot open arch/postamble_3dvar.crayx1" ;
+   open ARCH_POSTAMBLE, "< arch/postamble_3dvar.cray1e"
+   or die "cannot open arch/postamble_3dvar.cray1e" ;
 }
 else
 {

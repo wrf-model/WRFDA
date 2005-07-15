@@ -663,13 +663,13 @@ lib_rsl :
                LEARN_BCAST=-DLEARN_BCAST crayx1 )
 
 ###########################################################
-#ARCH   crayx1 UNICOS/mp  CRAY X1 (KMA)
+#ARCH   cray1e UNICOS/mp  CRAY1E (KMA)
 #
 ## Use these for X1 cross compiler to build Registry
 ##X1_CROSS_COMP = "gcc"
 ##X1_CROSS_CFLG = ""
 ## Use these for X1 native (trigger) compiler
-X1_CROSS_COMP = "cc"
+X1_CROSS_COMP = "gcc"
 X1_CROSS_CFLG = "-hcommand"
 CC_TOOLS        =       $(X1_CROSS_COMP) $(X1_CROSS_CFLG)
 
@@ -679,11 +679,11 @@ OMP             =
 OMPCPP          =
 DMPARALLEL      =       1
 SFC             =       ftn
-SCC             =       cc
+SCC             =       gcc
 FC              =       ftn
 LD              =       ftn
 F77             =       $(FC)
-CC              =       cc
+CC              =       gcc
 
 ARCHFLAGS       =       -DWRF_RSL_IO -DRSL \
                         -DDM_PARALLEL \
