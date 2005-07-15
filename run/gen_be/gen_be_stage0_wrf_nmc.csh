@@ -10,16 +10,20 @@
 #Define job by overriding default environment variables:
 
 #set echo
-setenv START_BE_DATE           2002-01-01_00:00:00
-setenv END_BE_DATE             2002-01-10_00:00:00
-setenv WEST_EAST_GRID_NUMBER    90
-setenv SOUTH_NORTH_GRID_NUMBER  90
-setenv VERTICAL_GRID_NUMBER     28
-setenv GRID_DISTANCE           100000
-setenv FILE_HEAD               'wrfout_d01'
-setenv EXPT                    WRF
-setenv DAT_DIR                 /mmm/mmmtmp/guo/GEN_BE_data/WRF
-setenv WRFVAR_DIR              /home/bluesky/guo/wrfvar
+#AMPS:
+setenv END_BE_DATE             2004-05-09_12:00:00
+setenv DAT_DIR                 /data3/dmbarker/data/amps1/noobs
+setenv WRFVAR_DIR              /snowdrift/users/dmbarker/code_development/wrfvar
+
+#CONUS:
+setenv START_BE_DATE 2003-01-01_00:00:00
+setenv END_BE_DATE 2003-01-10_00:00:00
+setenv WEST_EAST_GRID_NUMBER   45
+setenv SOUTH_NORTH_GRID_NUMBER 45
+setenv VERTICAL_GRID_NUMBER    28
+setenv GRID_DISTANCE           200000
+setenv DA_NUM_SOIL_LAYERS      5
+setenv DAT_DIR                 /data4/dmbarker/data/conus2/noobs
 
 #-----------------------------------------------------------------------------------
 # Don't change anything below this line.
@@ -41,19 +45,19 @@ setenv WRFVAR_DIR              /home/bluesky/guo/wrfvar
  if ( ! $?SOUTH_NORTH_GRID_NUMBER ) setenv SOUTH_NORTH_GRID_NUMBER 217
  if ( ! $?VERTICAL_GRID_NUMBER )    setenv VERTICAL_GRID_NUMBER    31
  if ( ! $?GRID_DISTANCE )           setenv GRID_DISTANCE           60000
- if ( ! $?DA_NUM_SOIL_LAYERS )      setenv DA_NUM_SOIL_LAYERS      4
+ if ( ! $?DA_NUM_SOIL_LAYERS )      setenv DA_NUM_SOIL_LAYERS      5
 
- if ( ! $?FILE_HEAD )               setenv FILE_HEAD 'wrfout_d01',
- if ( ! $?EXPT )                    setenv EXPT amps1.60km.may04.NMC
+ if ( ! $?FILE_HEAD )               setenv FILE_HEAD 'wrfout_d01'
  if ( ! $?WRFVAR_DIR )              setenv WRFVAR_DIR /tara/dmbarker/code_development/wrfvar
  if ( ! $?SRC_DIR )                 setenv SRC_DIR ${WRFVAR_DIR}/gen_be
- if ( ! $?DAT_DIR )                 setenv DAT_DIR /tara/dmbarker/be/amps_stats/${EXPT}
+ if ( ! $?DAT_DIR )                 setenv DAT_DIR /tara/dmbarker/be/amps_stats
  if ( ! -d $DAT_DIR ) then
     echo "Directory $DAT_DIR doesn't exist. Exiting."
     exit
  endif
- if ( ! $?RUN_DIR )                 setenv RUN_DIR /ptmp/guo/TEST_NMC
+ if ( ! $?RUN_DIR )                 setenv RUN_DIR ${DAT_DIR}/gen_be
  if ( ! -d ${RUN_DIR} )             mkdir ${RUN_DIR}
+ echo $RUN_DIR
  
  set START_CY = `echo $START_BE_DATE | cut -c1-4`
  set START_MM = `echo $START_BE_DATE | cut -c6-7`
@@ -133,7 +137,6 @@ cat >! namelist.input << EOF
  dx                                  = $GRID_DISTANCE, $GRID_DISTANCE, $GRID_DISTANCE,
  dy                                  = $GRID_DISTANCE, $GRID_DISTANCE, $GRID_DISTANCE,
  grid_id                             = 1,     2,     3,
- level                               = 1,     1,     2,
  parent_id                           = 0,     1,     2,
  i_parent_start                      = 0,     30,    30,
  j_parent_start                      = 0,     20,    30,
@@ -223,7 +226,7 @@ EOF
 
 #cp namelist.input.00 namelist.input
 
- ln -sf $DAT_DIR/${FILE_HEAD}_${START_BE_DATE}  wrf_3dvar_input
+ ln -sf $DAT_DIR/${START_CY}${START_MM}${START_DD}${START_HH}/${FILE_HEAD}_${START_BE_DATE}  wrf_3dvar_input
 
  ln -sf $WRFVAR_DIR/run/LANDUSE.TBL LANDUSE.TBL
  ln -sf $WRFVAR_DIR/gen_be/gen_be_stage0.exe gen_be_stage0.exe

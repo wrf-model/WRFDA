@@ -11,7 +11,6 @@ program gen_be_cov3d
    character*10        :: variable2                  ! Variable name
    character*3         :: be_method                  ! Be method (NMC, or ENS)
    character*80        :: dat_dir                    ! Input data directory.
-   character*80        :: expt                       ! Experiment ID.
    character*80        :: filename                   ! Input filename.
    character*3         :: ce                         ! Member index -> character.
    integer             :: ni, nj, nk, nkdum          ! Grid dimensions.
@@ -40,7 +39,7 @@ program gen_be_cov3d
 
    namelist / gen_be_cov3d_nl / start_date, end_date, interval, &
                                 be_method, ne, &
-                                variable1, variable2, expt, dat_dir
+                                variable1, variable2, dat_dir
 
 !---------------------------------------------------------------------------------------------
    write(6,'(a)')' [1] Initialize namelist variables and other scalars.'
@@ -53,7 +52,6 @@ program gen_be_cov3d
    ne = 1
    variable1 = 'psi'
    variable2 = 'chi'
-   expt = 'gen_be_cov3d'
    dat_dir = '/mmmtmp1/dmbarker'
 
    open(unit=namelist_unit, file='gen_be_cov3d_nl.nl', &

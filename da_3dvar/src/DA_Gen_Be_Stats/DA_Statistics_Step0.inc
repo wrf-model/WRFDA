@@ -32,13 +32,18 @@ SUBROUTINE DA_Statistics_Step0 (grid, config_flags,    &
    INTEGER                         :: unit, number
    character (len=2)               :: mem
    INTEGER                         :: ccyy, mm, dd, hh
+   integer                         :: t_forecast
 !-------------------------------------------------------------------------
 
        numfiles = 0
        file_date(1:19) = bgn_date(1:19)
-       fcst_date(1:19) = bgn_date(1:19)
 
 loop_date:       do while (file_date(1:19) <= end_date(1:19))
+
+       t_forecast = t_forecast2
+       if ( background_option == 2 ) t_forecast = t_forecast1
+
+       call DA_Gen_Date(file_date, fcst_date, t_forecast)
 
        IF ( BACKGROUND_OPTION == 1 .and. &
            file_date(1:19) == end_date(1:19) ) EXIT loop_date
@@ -58,7 +63,8 @@ loop_date:       do while (file_date(1:19) <= end_date(1:19))
 
        write(*,'(/a,i4," *********")') 'PROCESS for T24, member=', number
 
-       call DA_Make_Filename (file_date, fcst_date, number, filename,0)
+print *, file_date, fcst_date
+       call DA_Make_Filename (file_date, fcst_date, number, filename)
        call med_initialdata_input_3dvar ( grid , config_flags, &
                                         fcst_date, filename )
        call DA_Setup_FirstGuess( xbx, grid, &
@@ -76,8 +82,9 @@ loop_date:       do while (file_date(1:19) <= end_date(1:19))
 
        write(*,'(/a)') 'PROCESS for T12'
 
-       call DA_Make_Filename(file_date, fcst_date, number, filename, 99)
        call DA_Gen_Date(file_date, fcst_date, t_forecast1)
+       call DA_Make_Filename(file_date, fcst_date, number, filename)
+print *, file_date, fcst_date, filename
 
        call med_initialdata_input_3dvar ( grid , config_flags, &
                                         fcst_date, filename )
@@ -122,11 +129,9 @@ loop_date:       do while (file_date(1:19) <= end_date(1:19))
 
        if (from_mss) call DA_Data_Delete(file_date)
 
-       if (BACKGROUND_OPTION == 2) then
-       call DA_Make_Filename(file_date, fcst_date, number, filename, 99)
 
-       write(*,'(/a,a19)') 'NEXT file_date for ENS ',file_date
-       endif
+       call DA_Gen_Date(file_date, fcst_date, file_interval)
+       file_date(1:19) = fcst_date(1:19)
 
 !time-loop end
        enddo loop_date

@@ -39,7 +39,7 @@ SUBROUTINE DA_Make_Ensemble_Mean (grid, config_flags, file_date, &
        do number = 1, members 
        numfiles= numfiles+1
 
-       call DA_Make_Filename (file_date, fcst_date, number, filename, 0)
+       call DA_Make_Filename (file_date, fcst_date, number, filename)
        call med_initialdata_input_3dvar ( grid , config_flags, &
                                         fcst_date, filename )
        call DA_Setup_FirstGuess( xbx, grid, &

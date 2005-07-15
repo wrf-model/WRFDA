@@ -10,31 +10,48 @@
 #
 # History : 10/01/2004 Creation.                       Dale Barker
 #           05/21/2005 Modify for inclusion in wrfvar  Dale Barker
-#           Modified by                                Y.-R. Guo
+#           06/06/2005 Modified by                     Y.-R. Guo
 #-----------------------------------------------------------------------
 
 #Define job via environment variables:
 
 #set echo
-setenv ID cwb_wrf
-#setenv NUM_JOBS 2
-#setenv BIN_TYPE 5
-setenv START_DATE      2003081512
-setenv END_DATE        2003091500
-setenv NUM_LEVELS      31
-setenv RESOLUTION_KM   45000
-setenv EXPT            wrfvar_cwb_be
-setenv DAT_DIR         /mmmtmp/guo/${EXPT}
-setenv WRFVAR_DIR      /palm/users/guo/wrfvar
+#AMPS:
+setenv START_DATE 2004050112
+setenv END_DATE 2004050912
+setenv NUM_LEVELS 30
+setenv RESOLUTION_KM 60
+setenv EXPT 2004-05.AMPS1
+setenv DAT_DIR /data3/dmbarker/data/amps1/noobs/gen_be
+
+#CWB:
+setenv START_DATE 2003081512
+setenv END_DATE 2003083012
+setenv NUM_LEVELS 30
+setenv RESOLUTION_KM 45 
+setenv EXPT 2003-08.CWB
+setenv DAT_DIR /data3/dmbarker/data/cwb
+
+#CONUS:
+setenv START_DATE 2003010100
+setenv END_DATE 2003010912
+setenv NUM_LEVELS 28
+setenv RESOLUTION_KM 200 
+setenv EXPT 2003-01.CONUS
+setenv DAT_DIR /data4/dmbarker/data/conus2/noobs/gen_be
+
+setenv BIN_TYPE 1
+setenv UH_METHOD 'scale'
+setenv WRFVAR_DIR /snowdrift/users/dmbarker/code_development/wrfvar
 
 #Uncomment the stages you wish to run:
 setenv RUN_GEN_BE_STAGE1 # Set to run stage 1 (Remove mean, split variables).
 setenv RUN_GEN_BE_STAGE2 # Set to run stage 2 (Regression Coefficients).
 setenv RUN_GEN_BE_STAGE2A # Set to run stage 2 (Regression Coefficients).
-setenv RUN_GEN_BE_STAGE3 # Set to run stage 3 (Vertical Covariances).
-setenv RUN_GEN_BE_STAGE4 # Set to run stage 4 (Horizontal Covariances).
-setenv RUN_GEN_BE_DIAGS  # Set to run gen_be diagnostics.
-setenv RUN_GEN_BE_DIAGS_READ  # Set to run gen_be diagnostics_read.
+#setenv RUN_GEN_BE_STAGE3 # Set to run stage 3 (Vertical Covariances).
+#setenv RUN_GEN_BE_STAGE4 # Set to run stage 4 (Horizontal Covariances).
+#setenv RUN_GEN_BE_DIAGS  # Set to run gen_be diagnostics.
+#setenv RUN_GEN_BE_DIAGS_READ  # Set to run gen_be diagnostics_read.
 
 #-----------------------------------------------------------------------------------
 # Don't change anything below this line.
@@ -43,11 +60,11 @@ setenv RUN_GEN_BE_DIAGS_READ  # Set to run gen_be diagnostics_read.
 set BEGIN_CPU = `date`
 echo "Beginning CPU time: ${BEGIN_CPU}"
 
-if ( ! $?START_DATE )    setenv START_DATE    2004050112 # Starting time of period.
-if ( ! $?END_DATE )      setenv END_DATE      2004052800 # Ending time of period.
+if ( ! $?START_DATE )    setenv START_DATE    2004120200 # Starting time of period.
+if ( ! $?END_DATE )      setenv END_DATE      2004122012 # Ending time of period.
 if ( ! $?INTERVAL )      setenv INTERVAL      12         # Period between files (hours).
 if ( ! $?BE_METHOD )     setenv BE_METHOD     NMC        # NMC (NMC-method), ENS (Ensemble-Method).
-if ( ! $?NE )            setenv NE 1                     # Number of ensemble members (for ENS).
+if ( ! $?NE )            setenv NE            1          # Number of ensemble members (for ENS).
 if ( ! $?BIN_TYPE )      setenv BIN_TYPE      1          # 0=None, 1=1:ni, 2=latitude, ....
 if ( ! $?LAT_MIN )       setenv LAT_MIN       -90.0      # Used if BIN_TYPE = 2.
 if ( ! $?LAT_MAX )       setenv LAT_MAX       90.0       # Used if BIN_TYPE = 2.
@@ -57,23 +74,23 @@ if ( ! $?HGT_MAX )       setenv HGT_MAX       20000.0    # Used if BIN_TYPE = 2.
 if ( ! $?BINWIDTH_HGT )  setenv BINWIDTH_HGT  1000.0     # Used if BIN_TYPE = 2.
 if ( ! $?REMOVE_MEAN )   setenv REMOVE_MEAN   .true.     # Remove time/ensemble/area mean.
 if ( ! $?GAUSSIAN_LATS ) setenv GAUSSIAN_LATS .false.    # Set if Gaussian latitudes used (global only).
-if ( ! $?TESTING_EOFS )  setenv TESTING_EOFS .false.     # True if performing EOF tests.
+if ( ! $?TESTING_EOFS )  setenv TESTING_EOFS  .true.     # True if performing EOF tests.
 if ( ! $?NUM_PASSES )    setenv NUM_PASSES    0          # Number of passes of recursive filter.
 if ( ! $?RF_SCALE )      setenv RF_SCALE      1.0        # Recursive filter scale.
 if ( ! $?USE_GLOBAL_EOFS ) setenv USE_GLOBAL_EOFS .true. # True if using global EOFs.
 if ( ! $?DATA_ON_LEVELS )  setenv DATA_ON_LEVELS .false. # False if fields projected onto modes.
-if ( ! $?UH_METHOD )     setenv UH_METHOD 'scale'        # 'scale for regional. 'power' for global.
+if ( ! $?UH_METHOD )     setenv UH_METHOD 'power'        # 'scale for regional. 'power' for global.
 if ( ! $?NUM_LEVELS )    setenv NUM_LEVELS    30         # Hard-wired for now....
 if ( ! $?STRIDE )        setenv STRIDE 1                 # Calculate correlation evert STRIDE point (stage4 regional).
 if ( ! $?NUM_JOBS )      setenv NUM_JOBS 1               # Number of jobs to run (stage4 regional)).
 if ( ! $?RESOLUTION_KM ) setenv RESOLUTION_KM 60         # Hard-wired for now (only used for regional)
-if ( ! $?TESTING_SPECTRAL ) setenv TESTING_SPECTRAL .false. # True if performing spectral tests.
+if ( ! $?TESTING_SPECTRAL ) setenv TESTING_SPECTRAL .true.  # True if performing spectral tests.
 
-if ( ! $?EXPT )          setenv EXPT amps1.60km.may04.NMC
-if ( ! $?ID )            setenv ID ${EXPT}.bin_type${BIN_TYPE}
+if ( ! $?EXPT )          setenv EXPT 2004-12.T213.elat
+if ( ! $?ID )            setenv ID ${BE_METHOD}.bin_type${BIN_TYPE}
 if ( ! $?WRFVAR_DIR )    setenv WRFVAR_DIR /tara/dmbarker/code_development/wrfvar
 if ( ! $?SRC_DIR )       setenv SRC_DIR ${WRFVAR_DIR}/gen_be
-if ( ! $?DAT_DIR )       setenv DAT_DIR /tara/dmbarker/be/amps_stats/${EXPT}
+if ( ! $?DAT_DIR )       setenv DAT_DIR /tara/dmbarker/be/kma_stats/${EXPT}
 if ( ! $?RUN_DIR )       setenv RUN_DIR ${DAT_DIR}/${ID}
 if ( ! -d ${RUN_DIR} )   mkdir ${RUN_DIR}
 
@@ -281,7 +298,8 @@ if ( $?RUN_GEN_BE_DIAGS_READ ) then
 cat >! gen_be_diags_nl.nl << EOF
   &gen_be_diags_nl
     be_method = '${BE_METHOD}',
-    uh_method = '${UH_METHOD}' /
+    uh_method = '${UH_METHOD}',
+    n_smth_sl = 0, /
 EOF
 
    ln -sf ${SRC_DIR}/gen_be_diags_read.exe .
