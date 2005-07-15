@@ -24,6 +24,14 @@ SUBROUTINE DA_Setup_Background_Errors4(xb, be, xbx, xp)
    integer             :: num_bins           ! Number of bins (3D fields).
    integer             :: num_bins2d         ! Number of bins (3D fields).
    logical  :: use_global_eofs               ! True if projected data uses global EOFs
+!
+! Addeded for new gen_be  Syed Rizvi
+   integer             :: bin_type                   ! Type of bin to average over. 
+   integer             :: num_bins_hgt               ! Used if bin_type = 2. 
+   real                :: binwidth_lat               ! Used if bin_type = 2 (degrees). 
+   real                :: binwidth_hgt               ! Used if bin_type = 2 (m). 
+   real                :: hgt_min, hgt_max           ! Used if bin_type = 2 (m).
+   real                :: lat_min, lat_max           ! Used if bin_type = 2 (degrees).
 !------------------------------------------------------------------------------
 !
    character*10                :: variable
@@ -36,8 +44,6 @@ SUBROUTINE DA_Setup_Background_Errors4(xb, be, xbx, xp)
    real, allocatable           :: regcoeff2(:,:)
    real, allocatable           :: regcoeff3(:,:,:)
 
-!---------------------------------------------------------------------
-!---------------------------------------------------------------------
    write (6,'(A)') ' ----------------------------------------------------------'
    IF(cv_options /= 4) THEN
       write(unit=*, fmt='(a, i2)') &
@@ -53,7 +59,17 @@ SUBROUTINE DA_Setup_Background_Errors4(xb, be, xbx, xp)
    rewind (be_cv_4_unit)
 !---------------------------------------------------------
    read(be_cv_4_unit, end= 99, err = 100) ni, nj, nk 
+   read(be_cv_4_unit, err = 100)bin_type
+   read(be_cv_4_unit, err = 100)lat_min, lat_max, binwidth_lat
+   read(be_cv_4_unit, err = 100)hgt_min, hgt_max, binwidth_hgt
+!---------------------------------------------------------------
+
    read(be_cv_4_unit, err = 100) num_bins, num_bins2d
+
+   allocate( bin(1:ni,1:nj,1:nk) )
+   allocate( bin2d(1:ni,1:nj) )
+   read(be_cv_4_unit, err = 100)bin(1:ni,1:nj,1:nk)
+   read(be_cv_4_unit, err = 100)bin2d(1:ni,1:nj)
 
 !---------------------------------------------------------
    if( ni /= xbx%ni .or. nj /= xbx%nj .or. nk /= xbx%nk ) &
@@ -70,13 +86,12 @@ SUBROUTINE DA_Setup_Background_Errors4(xb, be, xbx, xp)
    allocate (be%reg_chi(1:nj,1:nk))
    allocate (be%reg_ps (1:nj,1:nk))
    allocate (be%reg_t  (1:nj,1:nk,1:nk))
-!-------------------------------------------------------------
-   allocate( bin(1:ni,1:nj,1:nk) )
-   allocate( bin2d(1:ni,1:nj) )
-   bin_type = 1
-   call da_create_bins( ni, nj, nk, bin_type, num_bins, &
-                        num_bins2d, bin, bin2d )
-
+!--------------- not needed with new gen_be ------------------
+!   allocate( bin(1:ni,1:nj,1:nk) )
+!   allocate( bin2d(1:ni,1:nj) )
+!   bin_type = 1
+!   call da_create_bins( ni, nj, nk, bin_type, num_bins, &
+!                        num_bins2d, bin, bin2d )
 !--------------------------------------------------------------
 ! Following "latitude, height" variables are optional arguments 
 ! The same may be added, if required
