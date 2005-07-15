@@ -381,7 +381,7 @@ loop_level: DO i = 1, platform%info%levels
 
     end if
 
-   DO n = 1, ndup
+   dup_loop: DO n = 1, ndup
 
       SELECT CASE(fm)
 
@@ -861,6 +861,7 @@ loop_level: DO i = 1, platform%info%levels
       END SELECT
 
      if( global .and. n < 2 ) then
+      if( Testing_3DVAR ) exit dup_loop
       if( platform%loc % i >= xp % ide) then
          platform%loc%i = platform%loc % i - xp % ide
       else if( platform%loc % i < xp % ids) then
@@ -870,7 +871,7 @@ loop_level: DO i = 1, platform%info%levels
       platform%loc%proc_domain = .not. platform%loc%proc_domain
      end if
 
-    ENDDO        !  loop over duplicate
+    ENDDO dup_loop
 
    ENDDO reports
 
