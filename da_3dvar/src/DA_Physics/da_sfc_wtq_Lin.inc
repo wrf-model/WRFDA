@@ -483,7 +483,7 @@ SUBROUTINE sfc_wtq_Lin(psfc, tg, ps, ts, qs, us, vs, regime,           &
 
        CASE DEFAULT;
 
-       write(unit=*, fmt='(/a,i2,a/)') "Regime=",regime," is invalid."
+       write(unit=*, fmt='(/a,i2,a/)') "Regime=",iregime," is invalid."
        stop "sfc_wtq_Lin"
 
       END SELECT

@@ -1,0 +1,126 @@
+Change Log for update to wrfvar code
+---------------------------------------
+
+Author:         Yong-Run Guo
+Reviewer:       Qingnong Xiao
+Date:           03/18/05
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+To place the "stats_(obs)_type" in each of obs directories
+because this is ONLY used locally in DA_(Obs). This will
+avoid to touch the all (Obs) directories when a new type of
+Obs is introcuded.
+
+The COMMON "stats_type" and some other structures are removed 
+from DA_Define_Structures/DA_Define_Structures.F.
+
+Minor bugs fixed (not affect the results) in
+      DA_Bogus/DA_Print_Stats_Bogus.inc
+      DA_Gpsref/da_get_innov_vector_Gpsref.inc
+
+Expected Differences
+---------------------------------------------------
+
+No
+
+CPU/memory
+---------------------------------------------------
+
+
+Other
+---------------------------------------------------
+The size of the executable is smaller than original one:
+The size of the new executable da_3dvar.exe: 10349608
+The size of the old executable da_3dvar.exe: 10357896  
+
+Test results (run on what machines?)
+---------------------------------------------------
+
+I diff_ed the two codes before and after Yong-run's change, and checked
+all the changes in each observation type. The new code is right.
+
+I also run the typhoon Rusa (2002) case with typhoon bogus, and got exact
+the same results.
+
+Qingnong
+
+----------------------------------------------------------
+Files removed
+
+   None
+
+Files added:
+
+   None
+
+Files modified:
+
+ da_3dvar/src/DA_Airep/DA_AO_Stats_Airep.inc
+ da_3dvar/src/DA_Airep/DA_Airep.F
+ da_3dvar/src/DA_Airep/DA_OI_Stats_Airep.inc
+ da_3dvar/src/DA_Airep/DA_Print_Stats_Airep.inc
+ da_3dvar/src/DA_Bogus/DA_AO_Stats_Bogus.inc
+ da_3dvar/src/DA_Bogus/DA_Bogus.F
+ da_3dvar/src/DA_Bogus/DA_OI_Stats_Bogus.inc
+ da_3dvar/src/DA_Bogus/DA_Print_Stats_Bogus.inc
+ da_3dvar/src/DA_Buoy/DA_AO_Stats_Buoy.inc
+ da_3dvar/src/DA_Buoy/DA_Buoy.F
+ da_3dvar/src/DA_Buoy/DA_OI_Stats_Buoy.inc
+ da_3dvar/src/DA_Buoy/DA_Print_Stats_Buoy.inc
+ da_3dvar/src/DA_Define_Structures/DA_Define_Structures.F
+ da_3dvar/src/DA_Gpspw/DA_AO_Stats_Gpspw.inc
+ da_3dvar/src/DA_Gpspw/DA_Gpspw.F
+ da_3dvar/src/DA_Gpspw/DA_OI_Stats_Gpspw.inc
+ da_3dvar/src/DA_Gpspw/DA_Print_Stats_Gpspw.inc
+ da_3dvar/src/DA_Gpsref/DA_Gpsref.F
+ da_3dvar/src/DA_Gpsref/da_get_innov_vector_Gpsref.inc
+ da_3dvar/src/DA_Metar/DA_AO_Stats_Metar.inc
+ da_3dvar/src/DA_Metar/DA_Metar.F
+ da_3dvar/src/DA_Metar/DA_OI_Stats_Metar.inc
+ da_3dvar/src/DA_Metar/DA_Print_Stats_Metar.inc
+ da_3dvar/src/DA_Pilot/DA_AO_Stats_Pilot.inc
+ da_3dvar/src/DA_Pilot/DA_OI_Stats_Pilot.inc
+ da_3dvar/src/DA_Pilot/DA_Pilot.F
+ da_3dvar/src/DA_Pilot/DA_Print_Stats_Pilot.inc
+ da_3dvar/src/DA_Profiler/DA_AO_Stats_Profiler.inc
+ da_3dvar/src/DA_Profiler/DA_OI_Stats_Profiler.inc
+ da_3dvar/src/DA_Profiler/DA_Print_Stats_Profiler.inc
+ da_3dvar/src/DA_Profiler/DA_Profiler.F
+ da_3dvar/src/DA_Radar/DA_Radar.F
+ da_3dvar/src/DA_SSMI/DA_SSMI.F
+ da_3dvar/src/DA_Satem/DA_Satem.F
+ da_3dvar/src/DA_Satob/DA_AO_Stats_Satob.inc
+ da_3dvar/src/DA_Satob/DA_OI_Stats_Satob.inc
+ da_3dvar/src/DA_Satob/DA_Print_Stats_Satob.inc
+ da_3dvar/src/DA_Satob/DA_Satob.F
+ da_3dvar/src/DA_Ships/DA_AO_Stats_Ships.inc
+ da_3dvar/src/DA_Ships/DA_OI_Stats_Ships.inc
+ da_3dvar/src/DA_Ships/DA_Print_Stats_Ships.inc
+ da_3dvar/src/DA_Ships/DA_Ships.F
+ da_3dvar/src/DA_Sound/DA_AO_Stats_Sound.inc
+ da_3dvar/src/DA_Sound/DA_OI_Stats_Sound.inc
+ da_3dvar/src/DA_Sound/DA_Print_Stats_Sound.inc
+ da_3dvar/src/DA_Sound/DA_Sound.F
+ da_3dvar/src/DA_Sound/DA_Sonde_sfc/DA_AO_Stats_Sonde_sfc.inc
+ da_3dvar/src/DA_Sound/DA_Sonde_sfc/DA_OI_Stats_Sonde_sfc.inc
+ da_3dvar/src/DA_Sound/DA_Sonde_sfc/DA_Print_Stats_Sonde_sfc.inc
+ da_3dvar/src/DA_Statistics/DA_Statistics.F
+ da_3dvar/src/DA_Synop/DA_AO_Stats_Synop.inc
+ da_3dvar/src/DA_Synop/DA_OI_Stats_Synop.inc
+ da_3dvar/src/DA_Synop/DA_Print_Stats_Synop.inc
+ da_3dvar/src/DA_Synop/DA_Synop.F
+ da_3dvar/src/da_pseudo/da_oa_stats_pseudo.inc
+ da_3dvar/src/da_pseudo/da_ob_stats_pseudo.inc
+ da_3dvar/src/da_pseudo/da_print_stats_pseudo.inc
+ da_3dvar/src/da_pseudo/da_pseudo.F
+ da_3dvar/src/da_qscat/da_oa_stats_qscat.inc
+ da_3dvar/src/da_qscat/da_ob_stats_qscat.inc
+ da_3dvar/src/da_qscat/da_print_stats_qscat.inc
+ da_3dvar/src/da_qscat/da_qscat.F
+
+New Tag:
+
+version_2_0_3_1
+

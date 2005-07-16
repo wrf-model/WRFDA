@@ -22,7 +22,7 @@ CONTAINS
      &               ALBSF,TMN,XLAND,XICE,QZ0,                          &
      &               TH2,Q2,SNOWC,CHS2,QSFC,TBOT,CHKLOWQ,RAINBL,        &
      &               NUM_SOIL_LAYERS,DT,DZS,ITIMESTEP,                  &
-     &               SMOIS,TSLB,SNOW,CANWAT,CPM,ROVCP,                  &  !STEMP
+     &               SMOIS,TSLB,SNOW,CANWAT,CPM,ROVCP,SR,               & 
      &               ALB,SNOALB,SMLIQ,SNOWH,                            &
      &               IDS,IDE, JDS,JDE, KDS,KDE,                         &
      &               IMS,IME, JMS,JME, KMS,KME,                         &
@@ -56,6 +56,7 @@ CONTAINS
 !-- EMISS       surface emissivity (between 0 and 1)
 !-- DELTSM      time step (second)
 !-- ROVCP       R/CP
+!-- SR          fraction of frozen precip (0.0 to 1.0)
 !-- XLV         latent heat of melting (J/kg)
 !-- DTMIN       time step (minute)
 !-- IFSNOW      ifsnow=1 for snow-cover effects
@@ -145,7 +146,8 @@ CONTAINS
                                                                 VEGFRA, &
                                                                    GSW, &
                                                                    GLW, &     
-                                                                   QZ0
+                                                                   QZ0, &
+                                                                    SR    
 
       REAL,DIMENSION(IMS:IME,KMS:KME,JMS:JME),INTENT(IN) ::       QV3D, &
                                                                  P8W3D, &
@@ -211,7 +213,7 @@ CONTAINS
                     ALBSF,TMN,XLAND,XICE,QZ0,                           &
                     TH2,Q2,SNOWC,CHS2(IMS,J),QSFC,TBOT,CHKLOWQ,         &
                     NUM_SOIL_LAYERS,DT,DZS,ITIMESTEP,                   &
-                    SMOIS,TSLB,SNOW,CANWAT,CPM(IMS,J),ROVCP,            &  !STEMP
+                    SMOIS,TSLB,SNOW,CANWAT,CPM(IMS,J),ROVCP,SR,         & 
                     ALB,SNOALB,SMLIQ,SNOWH,                             &
                     IMS,IME,JMS,JME,KMS,KME,                            &
                     ITS,ITE,JTS,JTE,KTS,KTE                            ) 
@@ -229,7 +231,7 @@ CONTAINS
                      ALBSF,TMN,XLAND,XICE,QZ0,                         &
                      TH2,Q2,SNOWC,CHS2,QSFC,TBOT,CHKLOWQ,              &
                      NUM_SOIL_LAYERS,DT,DZS,ITIMESTEP,                 &
-                     SMOIS,TSLB,SNOW,CANWAT,CPM,ROVCP,                 &  !STEMP
+                     SMOIS,TSLB,SNOW,CANWAT,CPM,ROVCP,SR,              & 
                      ALB,SNOALB,SMLIQ,SNOWH,                           &
                      IMS,IME,JMS,JME,KMS,KME,                          &
                      ITS,ITE,JTS,JTE,KTS,KTE                           ) 
@@ -319,7 +321,8 @@ CONTAINS
                                                               VEGFRA, &
                                                                  GSW, &
                                                                  GLW, &
-                                                                 QZ0
+                                                                 QZ0, &
+                                                                  SR
 
    REAL,    DIMENSION( ims:ime, jms:jme )                           , &
             INTENT(INOUT)    ::                                   Q2, &
@@ -363,7 +366,7 @@ CONTAINS
             SFCPRS,PRCP,Q2K,DQSDTK,SATFLG,TBOTK,CHK,VGFRCK,T1K,LWDN,  &
             CMCK,Q2M,SNODPK,PLFLX,HFLX,GFLX,RNOF1K,                   &
             RNOF2K,Q1K,SMELTK,SOILQW,SOILQM,T2K,PRESK,CHFF,STIMESTEP, &
-            ALB1D,SNOALB1D,SNOWH1D,ALBSF1D,                           &
+            ALB1D,SNOALB1D,SNOWH1D,ALBSF1D,SOLNET,FFROZP,             &
             DUM1,DUM2,DUM3,DUM4,DUM5,DUM6,DUM7
 
     INTEGER :: I,K,NS,ICE,IVGTPK,ISLTPK,ISPTPK,NOOUT,NSOIL,LZ
@@ -425,25 +428,25 @@ CONTAINS
 !
 !***  CHECK FOR SATURATION AT THE LOWEST MODEL LEVEL                    
 !
-        q2k=qv(i)
-!       IF((Q2K.GE.Q2SAT*TRESH))THEN                                  
-          IF((Q2K.GE.Q2SAT*TRESH).AND.Q2K.LT.QZ0(I,J))THEN                                  
-            SATFLG=0.                                                   
-            CHKLOWQ(I,J)=0.
-          ELSE                                                          
-            SATFLG=1.0                                                  
-            CHKLOWQ(I,J)=1.
-          ENDIF                                                         
+        Q2K=QV(I)
+        APES=(1.E5/PSFC(I))**CAPA
 !
-          TBOT(I,J)=273.16
+        IF((Q2K.GE.Q2SAT*TRESH).AND.Q2K.LT.QZ0(I,J))THEN                                  
+          SATFLG=0.                                                   
+          CHKLOWQ(I,J)=0.
+        ELSE                                                          
+          SATFLG=1.0                                                  
+          CHKLOWQ(I,J)=1.
+        ENDIF                                                         
+!
+        TBOT(I,J)=273.16
 !***                                                                    
 !***  LOADING AND UNLOADING MM5/LSM LAND SOIL VARIABLES                 
 !***                                                                    
         IF((XLAND(I,J)-1.5).GE.0.)THEN                                  
 !*** Water                                                              
-!CC     Q2SAT=PQ0/SFCPRS*EXP(A2*(TGDSA(I)-A3)/(TGDSA(I)-A4))            
-          HFX(I,J)=CHFF*(TGDSA(I)-TH(I))                         
-          QFX(I,J)=RHO(I)*CHS(I)*(Q2SAT-QV(I))                      
+          HFX(I,J)=HFX(I,J)/APES
+          QFX(I,J)=QFX(I,J)*SATFLG
           SFCEVP(I,J)=SFCEVP(I,J)+QFX(I,J)*DT                       
         ELSE                                                            
 !*** LAND OR SEA-ICE                                                    
@@ -458,21 +461,21 @@ CONTAINS
           Z=ZA(I)                                                    
 !          FK=GSW(I,J)+GLW(I,J)                                          
           LWDN=GLW(I,J)
-
-
-!tst
-	if (I .ge. 198 .and. I .le. 202 .and. J .ge. 486 .and. J .le. 494) then
-	endif
-!tst
-
-!         SOLDN=GSW(I,J)
-          SOLDN=GSW(I,J)/(1.-ALB(I,J))                                  
+!
+!***  GSW is net downward shortwave
+!
+          SOLNET=GSW(I,J)
+!
+!***  Simple use of albedo to determine total incoming solar shortwave SOLDN
+!***  (no solar zenith angle correction)
+!
+          SOLDN=SOLNET/(1.-ALB(I,J))                                  
+!
           ALBSF1D=ALBSF(I,J)
           SNOALB1D=SNOALB(I,J)
           SFCTMP=T(I)                                               
 !!!       SFCTH2=SFCTMP+(0.0097545*Z)                                   
           APELM=(1.E5/SFCPRS)**CAPA
-          APES=(1.E5/PSFC(I))**CAPA
           SFCTH2=SFCTMP*APELM
           SFCTH2=SFCTH2/APES
           PRCP=PREC(I)                                                  
@@ -505,8 +508,10 @@ CONTAINS
           SNODPK=SNOW(I,J)*0.001                                        
           SNOWH1D=SNOWH(I,J)*0.001                                        
 !                                                                       
-
-
+!*** fraction of frozen precip
+!                                                                       
+          FFROZP=SR(I,J)
+!
           DO 70 NS=1,NSOIL                                              
             SMOIS1D(NS)=SMOIS(I,NS,J)                                       
             SMLIQ1D(NS)=SMLIQ(I,NS,J)                                       
@@ -536,13 +541,13 @@ CONTAINS
 !     O    SOILQW,SOILQM,DUM1,DUM2,DUM3,DUM4)
 !-----------------------------------------------------------------------
         CALL SFLX                                                       &
-          (ICE,DT,Z,NSOIL,DZS,                                          &
-          LWDN,SOLDN,SFCPRS,PRCP,SFCTMP,SFCTH2,Q2K,DUM5,Q2SAT,DQSDTK,   &
-          IVGTPK,ISLTPK,ISPTPK,                                         &
+          (FFROZP,ICE,DT,Z,NSOIL,DZS,                                   &
+          LWDN,SOLDN,SOLNET,SFCPRS,PRCP,SFCTMP,SFCTH2,Q2K,DUM5,Q2SAT,   &
+          DQSDTK,IVGTPK,ISLTPK,ISPTPK,                                  &
           VGFRCK,DUM6,TBOTK,ALBSF1D,SNOALB1D,                           &
           CMCK,T1K,STEMP1D,SMOIS1D,SMLIQ1D,SNOWH1D,SNODPK,ALB1D,CHK,DUM7, &
           PLFLX,ELFLX(I,J),HFLX,GFLX,RNOF1K,RNOF2K,Q1K,SMELTK,          &
-          SOILQW,SOILQM,DUM1,DUM2,DUM3,DUM4)
+          SOILQW,SOILQM,DUM1,DUM2,DUM3,DUM4,I,J)
 !-----------------------------------------------------------------------
 !***  DIAGNOSTICS                                                       
 !        Convert the water unit into mm                                 
@@ -563,7 +568,7 @@ CONTAINS
 !       IF(SNOB(I,J).GT.0..OR.SICE(I,J).GT.0.)THEN                      
 !         QFC1(I,J)=QFC1(I,J)*RLIVWV                                    
 !       ENDIF                                                           
-          IF(T(I).LE.T0)THEN                                        
+          IF(FFROZP.GT.0.5)THEN
             ACSNOW(I,J)=ACSNOW(I,J)+PREC(I)*DT                     
           ENDIF                                                         
           IF(SNOW(I,J).GT.0.)THEN                                       
@@ -662,13 +667,13 @@ CONTAINS
 !-----------------------------------------------------------------------
 
       SUBROUTINE SFLX (                                                 &
-       ICE,DT,Z,NSOIL,SLDPTH,                                           &
-       LWDN,SOLDN,SFCPRS,PRCP,SFCTMP,TH2,Q2,SFCSPD,Q2SAT,DQSDT2,        &
-       VEGTYP,SOILTYP,SLOPETYP,                                         &
+       FFROZP,ICE,DT,Z,NSOIL,SLDPTH,                                    &
+       LWDN,SOLDN,SOLNET,SFCPRS,PRCP,SFCTMP,TH2,Q2,SFCSPD,Q2SAT,        &
+       DQSDT2,VEGTYP,SOILTYP,SLOPETYP,                                  &
        SHDFAC,PTU,TBOT,ALB,SNOALB,                                      &
        CMC,T1,STC,SMC,SH2O,SNOWH,SNEQV,ALBEDO,CH,CM,                    &
        ETP,ETA,H,S,RUNOFF1,RUNOFF2,Q1,SNMAX,                            &
-       SOILW,SOILM, SMCWLT,SMCDRY,SMCREF,SMCMAX)
+       SOILW,SOILM, SMCWLT,SMCDRY,SMCREF,SMCMAX,I,J)
 !
       IMPLICIT NONE
 !!
@@ -818,6 +823,8 @@ CONTAINS
       LOGICAL FRZGRA
       LOGICAL SATURATED
 !
+      INTEGER I
+      INTEGER J
       INTEGER K
       INTEGER KZ
       INTEGER ICE
@@ -890,7 +897,6 @@ CONTAINS
       REAL RUNOFF2
       REAL RGL
       REAL RUNOF
-      REAL RIB
       REAL RUNOFF3
       REAL RSMAX
       REAL RC
@@ -921,6 +927,7 @@ CONTAINS
       REAL SNOALB
       REAL STC(NSOIL)
       REAL SOLDN
+      REAL SOLNET
       REAL SNMAX
       REAL SOILM
       REAL SOILW
@@ -940,6 +947,7 @@ CONTAINS
       REAL ZBOT
       REAL Z0
       REAL ZSOIL(NSOLD)
+      REAL FFROZP
 
       CHARACTER(LEN=4) :: veg_def
 
@@ -949,13 +957,6 @@ CONTAINS
       PARAMETER ( R      = 287.04      )
       PARAMETER ( CP     = 1004.5      )
       
-!
-! COMMON BLK "RITE" CARRIES DIAGNOSTIC QUANTITIES FOR PRINTOUT,
-! BUT IS NOT INVOLVED IN MODEL PHYSICS AND IS NOT PRESENT IN
-! PARENT MODEL THAT CALLS SFLX
-!
-      COMMON/RITE/ BETA,DRIP,EC,EDIR,ETT,FLX1,FLX2,FLX3,RUNOF,  &
-                   DEW,RIB,RUNOFF3
 
 !   INITIALIZATION
 
@@ -1107,7 +1108,9 @@ CONTAINS
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
       IF ( PRCP .GT. 0.0 ) THEN
-        IF ( SFCTMP .LE. TFREEZ ) THEN
+!***  Snow defined when fraction of frozen precip (FFROZP) > 0.5, passed
+!***  in from model microphysics.
+        IF (FFROZP .GT. 0.5) THEN
           SNOWNG = .TRUE.
         ELSE
           IF ( T1 .LE. TFREEZ ) FRZGRA = .TRUE.
@@ -1210,7 +1213,7 @@ CONTAINS
 ! (1998,JAS, VOL 55, 1209-1224), WHICH REQUIRES THE SPECIFYING
 ! THE QUARTZ CONTENT OF THE GIVEN SOIL CLASS (SEE ROUTINE REDPRM)
 !
-        CALL TDFCND ( DF1, SMC(1),QUARTZ,SMCMAX,SH2O(1))
+        CALL TDFCND ( DF1, SMC(1),QUARTZ,SMCMAX,SH2O(1),I,J)
 ! ----------------------------------------------------------------------
 ! NEXT ADD SUBSURFACE HEAT FLUX REDUCTION EFFECT FROM THE 
 ! OVERLYING GREEN CANOPY, ADAPTED FROM SECTION 2.1.2 OF 
@@ -1254,17 +1257,16 @@ CONTAINS
 !  CALCULATE TOTAL DOWNWARD RADIATION (SOLAR PLUS LONGWAVE)
 !  NEEDED IN PENMAN EP SUBROUTINE THAT FOLLOWS
           
-          F = SOLDN*(1.0-ALBEDO) + LWDN
+          F = SOLNET + LWDN
 
 ! ----------------------------------------------------------------------
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 !     CALL PENMAN SUBROUTINE TO CALCULATE POTENTIAL EVAPORATION (ETP)
-!     (AND OTHER PARTIAL PRODUCTS AND SUMS SAVE IN COMMON/RITE FOR 
-!       LATER CALCULATIONS)
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
        CALL PENMAN ( SFCTMP,SFCPRS,CH,T2V,TH2,PRCP,F,T24,S,Q2,     &
-                    Q2SAT,ETP,RCH,EPSCA,RR,SNOWNG,FRZGRA,DQSDT2)
+                    Q2SAT,ETP,RCH,EPSCA,RR,SNOWNG,FRZGRA,DQSDT2,   &
+                    FLX2,I,J)
 !
 ! following old constraint is disabled
 !.....IF(SATURATED) ETP = 0.0
@@ -1296,6 +1298,10 @@ CONTAINS
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
         IF ( SNEQV .EQ. 0.0 ) THEN
+	if (SH2O(1) .lt. 0) then
+	write(errmess,*) 'calling NOPAC with negative SH2O: ', SH2O(1)
+        CALL wrf_message(errmess)
+	endif
 
           CALL NOPAC ( ETP, ETA, PRCP, SMC, SMCMAX, SMCWLT,           &
                        SMCREF,SMCDRY, CMC, CMCMAX, NSOIL, DT, SHDFAC, &
@@ -1304,7 +1310,9 @@ CONTAINS
                        SH2O, SLOPE, KDT, FRZX, PSISAT, ZSOIL,         &
                        DKSAT, DWSAT, TBOT, ZBOT, RUNOFF1,RUNOFF2,     &
                        RUNOFF3, EDIR1, EC1, ETT1,NROOT,ICE,RTDIS,     &
-                       QUARTZ, FXEXP,CSOIL)
+                       QUARTZ, FXEXP,CSOIL,                           &
+                       BETA,DRIP,EC,EDIR,ETT,FLX1,FLX2,FLX3,          &
+                       RUNOF,DEW,I,J)
 
         ELSE
 
@@ -1322,7 +1330,9 @@ CONTAINS
                       SNOWH, SH2O, SLOPE, KDT, FRZX, PSISAT, SNUP,    &
                       ZSOIL, DWSAT, DKSAT, TBOT, ZBOT, SHDFAC,RUNOFF1,&
                       RUNOFF2,RUNOFF3,EDIR1,EC1,ETT1,NROOT,SNMAX,ICE, &
-                      RTDIS,QUARTZ, FXEXP,CSOIL)
+                      RTDIS,QUARTZ, FXEXP,CSOIL,                      &
+                      BETA,DRIP,EC,EDIR,ETT,FLX1,FLX2,FLX3,           &
+                      RUNOF,DEW,I,J)
         
         ENDIF
 
@@ -1529,7 +1539,7 @@ CONTAINS
 
       SUBROUTINE HRT ( RHSTS,STC,SMC,SMCMAX,NSOIL,ZSOIL,YY,ZZ1,   &
                        TBOT, ZBOT, PSISAT, SH2O, DT, B,           &
-                       F1, DF1, QUARTZ, CSOIL)
+                       F1, DF1, QUARTZ, CSOIL,AI,BI,CI,II,J)
 
       IMPLICIT NONE
 
@@ -1545,6 +1555,8 @@ CONTAINS
 !tst      PARAMETER ( NSOLD = 4 )
 
       INTEGER I
+      INTEGER II
+      INTEGER J
       INTEGER K
       INTEGER NSOIL
 
@@ -1589,7 +1601,6 @@ CONTAINS
 
       REAL T0, TSURF, PSISAT, DT, B, SICE, TBK, TSNSR, TBK1
 
-      COMMON /ABCI/ AI, BI, CI
 !
       PARAMETER ( T0   = 273.15  )
 
@@ -1718,7 +1729,7 @@ CONTAINS
 
 ! CALCULATE THERMAL DIFFUSIVITY FOR THIS LAYER
 
-           CALL TDFCND ( DF1N, SMC(K),QUARTZ,SMCMAX,SH2O(K))
+           CALL TDFCND ( DF1N, SMC(K),QUARTZ,SMCMAX,SH2O(K),II,J)
 
 ! CALC THE VERTICAL SOIL TEMP GRADIENT THRU THIS LAYER
 
@@ -1739,7 +1750,7 @@ CONTAINS
 
 ! CALCULATE THERMAL DIFFUSIVITY FOR THIS LAYER
 
-           CALL TDFCND ( DF1N, SMC(K),QUARTZ,SMCMAX,SH2O(K))
+           CALL TDFCND ( DF1N, SMC(K),QUARTZ,SMCMAX,SH2O(K),II,J)
 
 ! CALC THE VERTICAL SOIL TEMP GRADIENT THRU THIS LAYER
 
@@ -1797,7 +1808,7 @@ CONTAINS
 
       END SUBROUTINE HRT
 
-      SUBROUTINE HRTICE (RHSTS,STC,NSOIL,ZSOIL,YY,ZZ1,DF1)
+      SUBROUTINE HRTICE (RHSTS,STC,NSOIL,ZSOIL,YY,ZZ1,DF1,AI,BI,CI)
 
       IMPLICIT NONE
 
@@ -1836,7 +1847,6 @@ CONTAINS
       REAL ZSOIL ( NSOIL )
       REAL ZZ1
 !
-      COMMON /ABCI/ AI, BI, CI
 
 ! THE INPUT ARGUMENT DF1 A UNIVERSALLY CONSTANT VALUE OF
 ! SEA-ICE THERMAL DIFFUSIVITY, SET IN ROUTINE SNOPAC AS
@@ -1941,7 +1951,7 @@ CONTAINS
 
       END SUBROUTINE HRTICE
 
-      SUBROUTINE HSTEP ( STCOUT, STCIN, RHSTS, DT, NSOIL)
+      SUBROUTINE HSTEP ( STCOUT, STCIN, RHSTS, DT, NSOIL,AI,BI,CI,I,J)
 
       IMPLICIT NONE
 
@@ -1953,6 +1963,8 @@ CONTAINS
       PARAMETER ( NSOLD = 20 )
 !tst      PARAMETER ( NSOLD = 4  )
 
+      INTEGER I
+      INTEGER J
       INTEGER K
       INTEGER NSOIL
 
@@ -1967,8 +1979,6 @@ CONTAINS
       REAL STCIN   ( NSOIL )
      
 !
-      COMMON /ABCI/ AI, BI, CI
-
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 !     CREATE FINITE DIFFERENCE VALUES FOR USE IN ROSR12 ROUTINE
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
@@ -1993,7 +2003,7 @@ CONTAINS
 !     SOLVE THE TRI-DIAGONAL MATRIX EQUATION
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
-      CALL ROSR12 ( CI,AI,BI,CIin,RHSTSin,RHSTS,NSOIL)
+      CALL ROSR12 ( CI,AI,BI,CIin,RHSTSin,RHSTS,NSOIL,I,J)
 
 	if (RHSTS(1) .lt. -100) then
 	write(0,*) 'RHSTSin was: ', RHSTSin
@@ -2024,7 +2034,9 @@ CONTAINS
                          SH2O, SLOPE, KDT, FRZFACT, PSISAT, ZSOIL,    &
                          DKSAT, DWSAT, TBOT, ZBOT, RUNOFF1, RUNOFF2,  &
                          RUNOFF3, EDIR1, EC1, ETT1, NROOT, ICE,RTDIS, &
-                         QUARTZ, FXEXP,CSOIL)
+                         QUARTZ, FXEXP,CSOIL,                         &
+                         BETA,DRIP,EC,EDIR,ETT,FLX1,FLX2,FLX3,        &
+                         RUNOF,DEW,I,J)
 
 
       IMPLICIT NONE
@@ -2035,6 +2047,8 @@ CONTAINS
 !C              THE CASE WHEN NO SNOW PACK IS PRESENT.
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
+      INTEGER I
+      INTEGER J
       INTEGER ICE
       INTEGER NROOT
       INTEGER NSOIL
@@ -2072,10 +2086,9 @@ CONTAINS
       REAL PRCP1
       REAL Q2
       REAL RCH
-      REAL RIB
       REAL RR
       REAL RTDIS (NSOIL)
-      REAL RUNOFF,RUNOXX3
+      REAL RUNOFF,RUNOF
       REAL S
       REAL SBETA
       REAL SFCTMP
@@ -2101,9 +2114,6 @@ CONTAINS
       REAL Q1, SLOPE, FRZFACT, PSISAT, RUNOFF1, RUNOFF2, RUNOFF3
       REAL EDIR1, EC1, ETT1, QUARTZ
 
-      COMMON/RITE/ BETA,DRIP,EC,EDIR,ETT,FLX1,FLX2,FLX3,RUNOFF,    &
-                   DEW,RIB,RUNOXX3
-
       PARAMETER(CP=1004.5, SIGMA=5.67E-8)
 
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
@@ -2120,12 +2130,12 @@ CONTAINS
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 !       CONVERT PRCP FROM  KG M-2 S-1  TO  M S-1
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-
            CALL SMFLX ( ETA1,SMC,NSOIL,CMC,ETP1,DT,PRCP1,ZSOIL,     &
                 SH2O, SLOPE, KDT, FRZFACT,                          &
                 SMCMAX,B,PC,SMCWLT,DKSAT,DWSAT,SMCREF,SHDFAC,       &
                 CMCMAX,SMCDRY,CFACTR, RUNOFF1,RUNOFF2, RUNOFF3,     &
-                EDIR1,EC1,ETT1,SFCTMP,Q2,NROOT,RTDIS,FXEXP)
+                EDIR1,EC1,ETT1,SFCTMP,Q2,NROOT,RTDIS,FXEXP,DRIP,    &
+                EC,EDIR,ETT,RUNOF,I,J)
 
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 !       CONVERT MODELED EVAPOTRANSPIRATION FM  M S-1  TO  KG M-2 S-1
@@ -2153,7 +2163,8 @@ CONTAINS
                 SH2O, SLOPE, KDT, FRZFACT,                          &
                 SMCMAX,B,PC,SMCWLT,DKSAT,DWSAT,SMCREF,SHDFAC,       &
                 CMCMAX,SMCDRY,CFACTR, RUNOFF1,RUNOFF2, RUNOFF3,     &
-                EDIR1,EC1,ETT1,SFCTMP,Q2,NROOT,RTDIS,FXEXP)
+                EDIR1,EC1,ETT1,SFCTMP,Q2,NROOT,RTDIS,FXEXP,DRIP,    &
+                EC,EDIR,ETT,RUNOF,I,J)
 
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 !       CONVERT MODELED EVAPOTRANSPIRATION FM  M S-1  TO  KG M-2 S-1
@@ -2183,7 +2194,7 @@ CONTAINS
 !    CALL SHFLX TO COMPUTE/UPDATE SOIL HEAT FLUX AND SOIL TEMPS.
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
-      CALL TDFCND ( DF1, SMC(1),QUARTZ,SMCMAX,SH2O(1))
+      CALL TDFCND ( DF1, SMC(1),QUARTZ,SMCMAX,SH2O(1),I,J)
 
 ! VEGETATION GREENNESS FRACTION REDUCTION IN SUBSURFACE HEAT FLUX 
 ! VIA REDUCTION FACTOR, WHICH IS CONVENIENT TO APPLY HERE TO THERMAL 
@@ -2203,7 +2214,7 @@ CONTAINS
       CALL SHFLX ( S,STC,SMC,SMCMAX,NSOIL,T1,DT,YY,ZZ1,ZSOIL,TBOT,  &
                    ZBOT, SMCWLT, PSISAT, SH2O,                      &
                    B,F1,DF1, ICE,                                   &
-                   QUARTZ,CSOIL)
+                   QUARTZ,CSOIL,I,J)
 
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 !     SET FLX1, AND FLX3 TO ZERO SINCE THEY ARE NOT USED.  FLX2
@@ -2216,7 +2227,8 @@ CONTAINS
       END SUBROUTINE NOPAC
 
       SUBROUTINE PENMAN(SFCTMP,SFCPRS,CH,T2V,TH2,PRCP,F,T24,S,Q2,    &
-                        Q2SAT,ETP,RCH,EPSCA,RR,SNOWNG,FRZGRA,DQSDT2)
+                        Q2SAT,ETP,RCH,EPSCA,RR,SNOWNG,FRZGRA,DQSDT2, &
+                        FLX2,I,J)
 
       IMPLICIT NONE
 
@@ -2229,8 +2241,10 @@ CONTAINS
       LOGICAL SNOWNG
       LOGICAL FRZGRA
 
+      INTEGER I
+      INTEGER J
+
       REAL A
-      REAL BETA
       REAL CH
       REAL CP
       REAL CPH2O
@@ -2245,9 +2259,7 @@ CONTAINS
       REAL ETP
       REAL ETT
       REAL F
-      REAL FLX1
       REAL FLX2
-      REAL FLX3
       REAL FNET
       REAL LSUBC
       REAL LSUBF
@@ -2258,9 +2270,7 @@ CONTAINS
       REAL RAD
       REAL RCH
       REAL RHO
-      REAL RIB
       REAL RR
-      REAL RUNOFF,RUNOXX3
       REAL S
       REAL SFCPRS
       REAL SFCTMP
@@ -2269,9 +2279,6 @@ CONTAINS
       REAL T2V
       REAL TH2
       REAL DQSDT2
-
-      COMMON/RITE/ BETA,DRIP,EC,EDIR,ETT,FLX1,FLX2,FLX3,RUNOFF,      &
-                   DEW,RIB,RUNOXX3
 
       PARAMETER(CP=1004.6,CPH2O=4.218E+3,CPICE=2.106E+3,R=287.04,    &
          ELCP=2.4888E+3,LSUBF=3.335E+5,LSUBC=2.501000E+6,SIGMA=5.67E-8)
@@ -3235,16 +3242,17 @@ CONTAINS
          END IF
 
          DO I = 1, DEFINED_SOIL
-            SATDW(I)  = BB(I)*SATDK(I)*(SATPSI(I)/MAXSMC(I))
-            F11(I)    = ALOG10(SATPSI(I)) + BB(I)*ALOG10(MAXSMC(I)) + 2.0
-            REFSMC1   = MAXSMC(I)*(5.79E-9/SATDK(I))  &
-                                          **(1.0/(2.0*BB(I)+3.0))
-            REFSMC(I) = REFSMC1 + (MAXSMC(I)-REFSMC1) / 3.0
-            WLTSMC1   = MAXSMC(I) * (200.0/SATPSI(I))**(-1.0/BB(I))
-            WLTSMC(I) = WLTSMC1 - 0.5 * WLTSMC1
+!           if(abs(satdk(i))<=1.e-7.or.abs(satpsi(i))<=1.e-7)cycle
+!           SATDW(I)  = BB(I)*SATDK(I)*(SATPSI(I)/MAXSMC(I))
+!           F11(I)    = ALOG10(SATPSI(I)) + BB(I)*ALOG10(MAXSMC(I)) + 2.0
+!           REFSMC1   = MAXSMC(I)*(5.79E-9/SATDK(I))  &
+!                                         **(1.0/(2.0*BB(I)+3.0))
+!           REFSMC(I) = REFSMC1 + (MAXSMC(I)-REFSMC1) / 3.0
+!           WLTSMC1   = MAXSMC(I) * (200.0/SATPSI(I))**(-1.0/BB(I))
+!           WLTSMC(I) = WLTSMC1 - 0.5 * WLTSMC1
 ! Current version DRYSMC values that equate to WLTSMC
 ! Future version could let DRYSMC be independently set via namelist
-            DRYSMC(I) = WLTSMC(I)
+!           DRYSMC(I) = WLTSMC(I)
          END DO
 
 !     END IF
@@ -3322,7 +3330,7 @@ CONTAINS
 !--------------------------------------------------------------------!
 
 
-      SUBROUTINE ROSR12 ( P, A, B, C, D, DELTA, NSOIL)
+      SUBROUTINE ROSR12 ( P, A, B, C, D, DELTA, NSOIL,I,J)
 
       IMPLICIT NONE
 
@@ -3331,6 +3339,8 @@ CONTAINS
 !C    =======   BELOW:
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
+      INTEGER I
+      INTEGER J
       INTEGER K
       INTEGER KK
       INTEGER NSOIL
@@ -3382,7 +3392,7 @@ CONTAINS
       END SUBROUTINE ROSR12
 
       SUBROUTINE SHFLX(S,STC,SMC,SMCMAX,NSOIL,T1,DT,YY,ZZ1,ZSOIL,TBOT, &
-           ZBOT, SMCWLT, PSISAT, SH2O, B,F1,DF1,ICE,QUARTZ,CSOIL)
+           ZBOT, SMCWLT, PSISAT, SH2O, B,F1,DF1,ICE,QUARTZ,CSOIL,II,J)
       
       IMPLICIT NONE
       
@@ -3398,11 +3408,16 @@ CONTAINS
 !tst      PARAMETER ( NSOLD = 4 )
 
       INTEGER I
+      INTEGER II
+      INTEGER J
       INTEGER ICE
       INTEGER IFRZ
       INTEGER NSOIL
 
+      REAL AI(NSOLD)
       REAL B
+      REAL BI(NSOLD)
+      REAL CI(NSOLD)
       REAL DF1
       REAL CSOIL
       REAL DT
@@ -3444,13 +3459,13 @@ CONTAINS
 
 !..SEA-ICE CASE
 
-         CALL HRTICE(RHSTS,STC,NSOIL,ZSOIL,YY,ZZ1,DF1)
+         CALL HRTICE(RHSTS,STC,NSOIL,ZSOIL,YY,ZZ1,DF1,AI,BI,CI)
 
 	if (minval(RHSTS) .lt. -100.) then
 	write(0,*) 'small RHSTS in seaice branch: ', RHSTS(1)
 	endif
 
-         CALL HSTEP (STCF,STC,RHSTS,DT,NSOIL)
+         CALL HSTEP (STCF,STC,RHSTS,DT,NSOIL,AI,BI,CI,II,J)
          
       ELSE
 
@@ -3458,14 +3473,14 @@ CONTAINS
 
          CALL HRT(RHSTS,STC,SMC,SMCMAX,NSOIL,ZSOIL,YY,ZZ1,TBOT, &
               ZBOT, PSISAT, SH2O, DT,                           &
-              B,F1,DF1,QUARTZ,CSOIL)
+              B,F1,DF1,QUARTZ,CSOIL,AI,BI,CI,II,J)
 
 	if (DT*RHSTS(1) .lt. -100.) then
 	write(0,*) 'crazy RHSTS returned from HRT: ', RHSTS
 	endif
 
          
-         CALL HSTEP(STCF,STC,RHSTS,DT,NSOIL)
+         CALL HSTEP(STCF,STC,RHSTS,DT,NSOIL,AI,BI,CI,II,J)
 
 	if (RHSTS(1) .lt. -100.) then
 !	write(0,*) 'crazy RHSTS returned from HSTEP: ', RHSTS
@@ -3505,7 +3520,8 @@ CONTAINS
            SH2O, SLOPE, KDT, FRZFACT,                             &
            SMCMAX,B,PC,SMCWLT,DKSAT,DWSAT,SMCREF,SHDFAC,CMCMAX,   &
            SMCDRY,CFACTR, RUNOFF1,RUNOFF2, RUNOFF3, EDIR1, EC1,   &
-           ETT1, SFCTMP,Q2,NROOT,RTDIS, FXEXP)
+           ETT1, SFCTMP,Q2,NROOT,RTDIS, FXEXP,DRIP,EC,EDIR,ETT,   &
+           RUNOF,II,J)
 
 
       IMPLICIT NONE
@@ -3525,10 +3541,11 @@ CONTAINS
       INTEGER NSOLD
       PARAMETER ( NSOLD = 20 )
 !tst      PARAMETER ( NSOLD = 4 )
+      INTEGER II
+      INTEGER J
       INTEGER K
       INTEGER NSOIL
       REAL B
-      REAL BETA
       REAL CFACTR
       REAL CMC
       REAL CMCMAX
@@ -3554,7 +3571,6 @@ CONTAINS
       REAL PRCP1
       REAL RHSCT
       REAL RHSTT  ( NSOLD )
-      REAL RIB
       REAL RTDIS (NSOIL)
       REAL RUNOF
       REAL RUNOFF,RUNOXX3
@@ -3589,11 +3605,9 @@ CONTAINS
       REAL ETT1, SFCTMP, Q2, DUMMY, CMC2MS
 
       INTEGER NROOT, I
-      real ai,bi,ci
-
-      COMMON/RITE/ BETA,DRIP,EC,EDIR,ETT,FLX1,FLX2,FLX3,RUNOF,  &
-           DEW,RIB,RUNOXX3
-      COMMON /ABCI/ AI(NSOLD), BI(NSOLD), CI(NSOLD)
+      real ai(nsold)
+      real bi(nsold)
+      real ci(nsold)
 
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 !     EXECUTABLE CODE BEGINS HERE....IF THE POTENTIAL EVAPOTRANS-
@@ -3621,7 +3635,7 @@ CONTAINS
 !
         IF (SHDFAC .LT. 1.) THEN
           EDIR = DEVAP ( ETP1, SH2O(1), ZSOIL(1), SHDFAC, SMCMAX,  &
-            B, DKSAT, DWSAT, SMCDRY,SMCREF, SMCWLT, FXEXP)
+            B, DKSAT, DWSAT, SMCDRY,SMCREF, SMCWLT, FXEXP,II,J)
         ENDIF
 ! ----------------------------------------------------------------------
 !       INITIALIZE PLANT TOTAL TRANSPIRATION, RETRIEVE PLANT
@@ -3750,10 +3764,10 @@ CONTAINS
 !
          CALL SRT ( RHSTT,RUNOFF,EDIR,ET,SH2O,SH2O,NSOIL,PCPDRP,ZSOIL, &
               DWSAT,DKSAT,SMCMAX, B, RUNOFF1,                          &
-              RUNOFF2,DT,SMCWLT,SLOPE,KDT,FRZFACT, SICE)
+              RUNOFF2,DT,SMCWLT,SLOPE,KDT,FRZFACT, SICE,AI,BI,CI,II,J)
          
          CALL SSTEP ( SH2OFG,SH2O,DUMMY,RHSTT,RHSCT,DT,NSOIL,SMCMAX, &
-              CMCMAX, RUNOFF3, ZSOIL, SMC, SICE)
+              CMCMAX, RUNOFF3, ZSOIL, SMC, SICE,AI,BI,CI,II,J)
          
          DO K = 1, NSOIL
             SH2OA(K) = ( SH2O(K) + SH2OFG(K) ) * 0.5
@@ -3761,10 +3775,10 @@ CONTAINS
         
          CALL SRT ( RHSTT,RUNOFF,EDIR,ET,SH2O,SH2OA,NSOIL,PCPDRP,ZSOIL, &
               DWSAT,DKSAT,SMCMAX, B, RUNOFF1,                           &
-              RUNOFF2,DT,SMCWLT,SLOPE,KDT,FRZFACT, SICE)
+              RUNOFF2,DT,SMCWLT,SLOPE,KDT,FRZFACT, SICE,AI,BI,CI,II,J)
          
          CALL SSTEP ( SH2O,SH2O,CMC,RHSTT,RHSCT,DT,NSOIL,SMCMAX,        &
-              CMCMAX, RUNOFF3, ZSOIL,SMC,SICE)
+              CMCMAX, RUNOFF3, ZSOIL,SMC,SICE,AI,BI,CI,II,J)
          
       ELSE
 
@@ -3774,7 +3788,7 @@ CONTAINS
          
          CALL SRT ( RHSTT,RUNOFF,EDIR,ET,SH2O,SH2O,NSOIL,PCPDRP,ZSOIL, &
               DWSAT,DKSAT,SMCMAX, B, RUNOFF1,                          &
-              RUNOFF2,DT,SMCWLT,SLOPE,KDT,FRZFACT, SICE)
+              RUNOFF2,DT,SMCWLT,SLOPE,KDT,FRZFACT, SICE,AI,BI,CI,II,J)
          
          
 	if (SICE(1) + SH2O(1) .gt. 1.0) then
@@ -3783,7 +3797,7 @@ CONTAINS
 	write(0,*) 'SH2O(1), SICE(1): ', SH2O(1), SICE(1)
 	endif
          CALL SSTEP ( SH2O,SH2O,CMC,RHSTT,RHSCT,DT,NSOIL,SMCMAX,       &
-              CMCMAX, RUNOFF3, ZSOIL,SMC,SICE)
+              CMCMAX, RUNOFF3, ZSOIL,SMC,SICE,AI,BI,CI,II,J)
 
 	if (SH2O(1) .lt. 0) then
 	write(0,*) 'neg SH2O AFTER SRT, SSTEP calls: ', SH2O(1)
@@ -3804,7 +3818,8 @@ CONTAINS
         SNOWH, SH2O, SLOPE, KDT, FRZFACT, PSISAT,SNUP,                &
         ZSOIL, DWSAT, DKSAT, TBOT, ZBOT, SHDFAC, RUNOFF1,             &
         RUNOFF2,RUNOFF3,EDIR1,EC1,ETT1,NROOT,SNMAX,ICE,               &
-        RTDIS,QUARTZ, FXEXP,CSOIL)
+        RTDIS,QUARTZ, FXEXP,CSOIL,                                    &
+        BETA,DRIP,EC,EDIR,ETT,FLX1,FLX2,FLX3,RUNOF,DEW,I,J)
 
       IMPLICIT NONE
 
@@ -3814,6 +3829,8 @@ CONTAINS
 !C              THE CASE WHEN A SNOW PACK IS PRESENT.
 ! ----------------------------------------------------------------------
 
+      INTEGER I
+      INTEGER J
       INTEGER ICE
       INTEGER NROOT
       INTEGER NSOIL
@@ -3868,10 +3885,9 @@ CONTAINS
       REAL Q1
       REAL Q2
       REAL RCH
-      REAL RIB
       REAL RR
       REAL RTDIS   ( NSOIL )
-      REAL RUNOFF
+      REAL RUNOFF,RUNOF
       REAL S
       REAL SBETA
       REAL S1
@@ -3910,9 +3926,6 @@ CONTAINS
       REAL EDIR1, EC1, ETT1, QUARTZ
       REAL SNDENS, SNCOND, RSNOW, SNCOVER, QSAT, ETP3, SEH, T14
 
-      COMMON/RITE/ BETA,DRIP,EC,EDIR,ETT,FLX1,FLX2,FLX3,RUNOFF,  &
-        DEW,RIB,RUNOXX3
-     
       PARAMETER(CP=1004.5,CPH2O=4.218E+3,CPICE=2.106E+3,         &
         LSUBF=3.335E+5,LSUBC=2.501000E+6,LSUBS=2.83E+6,SIGMA=5.67E-8)
 
@@ -4117,7 +4130,7 @@ CONTAINS
           SMCMAX,B,PC,SMCWLT,DKSAT,DWSAT,                               &
           SMCREF,SHDFAC,CMCMAX,SMCDRY,CFACTR,RUNOFF1,RUNOFF2,           &
           RUNOFF3, EDIR1, EC1, ETT1,SFCTMP,Q2,NROOT,RTDIS,              &
-          FXEXP)
+          FXEXP,DRIP,EC,EDIR,ETT,RUNOF,I,J)
 	if (SH2O(1) .lt. 0) then
 	write(0,*) 'return SMFLX with neg SH2O:: ', SH2O(1)
 	endif
@@ -4157,7 +4170,7 @@ CONTAINS
       CALL SHFLX(S1,STC,SMC,SMCMAX,NSOIL,T11,DT,YY,ZZ1,ZSOIL,TBOT,      &
         ZBOT, SMCWLT, PSISAT, SH2O,                                     &
         B,F1,DF1,ICE,                                                   &
-        QUARTZ,CSOIL)
+        QUARTZ,CSOIL,I,J)
 
 !	write(0,*) 'SNOWH, STC(1), STCWAS: ', SNOWH, STC(1), STCWAS
 	
@@ -4363,7 +4376,8 @@ CONTAINS
 
       SUBROUTINE SRT (RHSTT,RUNOFF,EDIR,ET,SH2O,SH2OA,NSOIL,PCPDRP,     &
                        ZSOIL,DWSAT,DKSAT,SMCMAX,B, RUNOFF1,             &
-                       RUNOFF2,DT,SMCWLT,SLOPE,KDT,FRZX,SICE)
+                       RUNOFF2,DT,SMCWLT,SLOPE,KDT,FRZX,SICE,AI,BI,CI,  &
+                       I,JJJ)
 
 
       IMPLICIT NONE
@@ -4380,10 +4394,12 @@ CONTAINS
 !tst      PARAMETER ( NSOLD = 4 )
 
       INTEGER CVFRZ      
+      INTEGER I
       INTEGER IALP1
       INTEGER IOHINF
       INTEGER J
       INTEGER JJ      
+      INTEGER JJJ      
       INTEGER K
       INTEGER KS
       INTEGER NSOIL
@@ -4430,8 +4446,6 @@ CONTAINS
       REAL SSTT, SLOPX
 
 !
-      COMMON /ABCI/ AI, BI, CI
-
 ! -----------     FROZEN GROUND VERSION    -------------------------
 !   REFERENCE FROZEN GROUND PARAMETER, CVFRZ, IS A SHAPE PARAMETER OF
 !   AREAL DISTRIBUTION FUNCTION OF SOIL ICE CONTENT WHICH EQUALS 1/CV.
@@ -4717,7 +4731,7 @@ CONTAINS
       END SUBROUTINE SRT
 
       SUBROUTINE SSTEP ( SH2OOUT, SH2OIN, CMC, RHSTT, RHSCT, DT,    &
-           NSOIL, SMCMAX, CMCMAX, RUNOFF3, ZSOIL,SMC,SICE)
+           NSOIL, SMCMAX, CMCMAX, RUNOFF3, ZSOIL,SMC,SICE,AI,BI,CI,II,J)
 
       IMPLICIT NONE
 
@@ -4731,6 +4745,8 @@ CONTAINS
 !tst      PARAMETER ( NSOLD = 4 )
 !
       INTEGER I
+      INTEGER II
+      INTEGER J
       INTEGER K 
       INTEGER KK11
       INTEGER NSOIL
@@ -4754,13 +4770,10 @@ CONTAINS
 
       REAL RUNOFF3, RUNOFS, WPLUS, DDZ, STOT, WFREE, DPLUS
 !
-      COMMON /ABCI/ AI, BI, CI
-
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 !     CREATE 'AMOUNT' VALUES OF VARIABLES TO BE INPUT TO THE
 !     TRI-DIAGONAL MATRIX ROUTINE.
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-
       DO K = 1 , NSOIL
         RHSTT(K) = RHSTT(K) * DT
         AI(K) = AI(K) * DT
@@ -4781,7 +4794,7 @@ CONTAINS
 !     CALL ROSR12 TO SOLVE THE TRI-DIAGONAL MATRIX
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
-      CALL ROSR12 ( CI, AI, BI, CIin, RHSTTin, RHSTT, NSOIL)
+      CALL ROSR12 ( CI, AI, BI, CIin, RHSTTin, RHSTT, NSOIL,II,J)
 
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 !     SUM THE PREVIOUS SMC VALUE AND THE MATRIX SOLUTION TO GET A
@@ -4801,7 +4814,7 @@ CONTAINS
 
 	if (SH2OOUT(K) .lt. 0) then
 	write(0,*) 'prelim val SH2OIN(K), SH2OOUT(K), CI(K), WPLUS: ', SH2OIN(K), &
-                       SH2OOUT(K), CI(K), WPLUS
+                       SH2OOUT(K), CI(K), WPLUS,' i=',ii,' j=',j
 	endif
         
 !      PRINT*,'IN sstep'
@@ -4919,7 +4932,7 @@ CONTAINS
       
       END SUBROUTINE TBND
 
-      SUBROUTINE TDFCND ( DF, SMC, Q,  SMCMAX, SH2O)
+      SUBROUTINE TDFCND ( DF, SMC, Q,  SMCMAX, SH2O,I,J)
 
       IMPLICIT NONE
 
@@ -4931,6 +4944,8 @@ CONTAINS
 !C    =======
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
+       INTEGER I
+       INTEGER J
        REAL DF
        REAL GAMMD
        REAL THKDRY
@@ -4949,7 +4964,7 @@ CONTAINS
        REAL XU
        REAL XUNFROZ
 
-       SAVE
+!!!!!!!SAVE
 
 ! WE NOW GET QUARTZ AS AN INPUT ARGUMENT (SET IN ROUTINE REDPRM):
 !        DATA QUARTZ /0.82, 0.10, 0.25, 0.60, 0.52, 
@@ -5334,8 +5349,9 @@ CONTAINS
       
       END FUNCTION CSNOW
 
-      FUNCTION DEVAP ( ETP1, SMC, ZSOIL, SHDFAC, SMCMAX, B,        &
-                       DKSAT, DWSAT, SMCDRY, SMCREF, SMCWLT, FXEXP)
+      FUNCTION DEVAP ( ETP1, SMC, ZSOIL, SHDFAC, SMCMAX, B,         &
+                       DKSAT, DWSAT, SMCDRY, SMCREF, SMCWLT, FXEXP, &
+                       I,J)
 
       IMPLICIT NONE
 
@@ -5343,6 +5359,8 @@ CONTAINS
 !C    NAME:  DIRECT EVAPORATION (DEVAP) FUNCTION  VERSION: N/A
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
+      INTEGER I
+      INTEGER J
       REAL B
       REAL DEVAP
       REAL DKSAT

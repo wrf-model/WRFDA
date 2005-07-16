@@ -64,16 +64,31 @@ gen_alloc2 ( FILE * fp , char * structname , char * corename , node_t * node )
       {
         /* if this is a core-specific variable, prepend the name of the core to   */
         /* the variable at the driver level                                       */
-        if (!strcmp( corename , p->use+4 ))
+        if (      !strcmp( corename , p->use+4 )) {
           sprintf(fname,"%s_%s",corename,field_name(t4,p,(p->ntl>1)?tag:0)) ;
-        else
+        } else if ( !strcmp ( p->use , "_4d_bdy_array_") ) {
+          strcpy(fname,p->name) ;
+        } else {
           strcpy(fname,field_name(t4,p,(p->ntl>1)?tag:0)) ;
+        }
 
 /* check for errors in memory allocation */
 
-       fprintf(fp, "ALLOCATE(%s%s%s,STAT=ierr)\n if (ierr.ne.0) then\n CALL wrf_error_fatal ( &\n'frame/module_domain.f: Failed to allocate %s%s%s. ')\n endif\n", structname, fname,dimension_with_ranges( "", "(", t2, p, post, "model_config_rec%"), structname, fname,dimension_with_ranges( "", "(", t2, p, post, "model_config_rec%")); 
+       if ( ! ( p->node_kind & FOURD ) && 
+            ! ( p->io_mask & INTERP_DOWN || p->io_mask & FORCE_DOWN || p->io_mask & INTERP_UP || p->io_mask & SMOOTH_UP ) )
+       {
+	 fprintf(fp,"IF(.NOT.inter_domain)THEN\n",tag) ;
+       }
+       if ( p->ntl > 1 ) {
+	 fprintf(fp,"IF(IAND(%d,tl).NE.0)THEN\n",tag) ;
+       }
+       fprintf(fp, "ALLOCATE(%s%s%s,STAT=ierr)\n if (ierr.ne.0) then\n CALL wrf_error_fatal ( &\n'frame/module_domain.f: Failed to allocate %s%s%s. ')\n endif\n",
+                structname, fname,
+                dimension_with_ranges( "", "(", t2, p, post, "model_config_rec%"), 
+                structname, fname,
+                dimension_with_ranges( "", "(", t2, p, post, "model_config_rec%")); 
 
-       fprintf(fp, "  IF ( setinitval ) %s%s=", structname , fname);
+       fprintf(fp, "  IF ( setinitval .EQ. 1 .OR. setinitval .EQ. 3 ) %s%s=", structname , fname);
        if( p->type != NULL  &&   (!strcmp( p->type->name , "real" ) 
                                || !strcmp( p->type->name , "doubleprecision") ) )   {
        /* if a real */
@@ -82,6 +97,26 @@ gen_alloc2 ( FILE * fp , char * structname , char * corename , node_t * node )
          fprintf(fp, ".FALSE.\n");
        } else if ( !strcmp( p->type->name , "integer" ) ) {
          fprintf(fp, "0\n");
+       }
+       if ( p->ntl > 1 ) {
+	 fprintf(fp,"ELSE\n") ;
+
+       fprintf(fp, "ALLOCATE(%s%s%s,STAT=ierr)\n if (ierr.ne.0) then\n CALL wrf_error_fatal ( &\n'frame/module_domain.f: Failed to allocate %s%s%s.  ')\n endif\n",
+                structname, fname, dimension_with_ones( "(",t2,p,")" ), 
+                structname, fname, dimension_with_ones( "(",t2,p,")" ) ) ;
+
+
+
+	 fprintf(fp,"ENDIF\n") ;
+       }
+       if ( ! ( p->node_kind & FOURD ) && 
+            ! ( p->io_mask & INTERP_DOWN || p->io_mask & FORCE_DOWN || p->io_mask & INTERP_UP || p->io_mask & SMOOTH_UP ) )
+       {
+	 fprintf(fp,"ELSE\n") ;
+       fprintf(fp, "ALLOCATE(%s%s%s,STAT=ierr)\n if (ierr.ne.0) then\n CALL wrf_error_fatal ( &\n'frame/module_domain.f: Failed to allocate %s%s%s.  ')\n endif\n",
+                structname, fname, dimension_with_ones( "(",t2,p,")" ), 
+                structname, fname, dimension_with_ones( "(",t2,p,")" ) ) ;
+	 fprintf(fp,"ENDIF\n") ;
        }
 
       }
@@ -107,15 +142,15 @@ gen_alloc2 ( FILE * fp , char * structname , char * corename , node_t * node )
           }
           if( !strcmp( p->type->name , "real" ) || 
               !strcmp( p->type->name , "doubleprecision" )  ) { /* if a real */
-            fprintf(fp, "IF ( setinitval ) %s%s=initial_data_value\n",
+            fprintf(fp, "IF ( setinitval .EQ. 3 ) %s%s=initial_data_value\n",
                         structname ,
                         fname ) ;
 	  } else if ( !strcmp( p->type->name , "integer" ) ) {
-            fprintf(fp, "IF ( setinitval ) %s%s=0\n",
+            fprintf(fp, "IF ( setinitval .EQ. 3 ) %s%s=0\n",
                         structname ,
                         fname ) ;
           } else if ( !strcmp( p->type->name , "logical" ) ) {
-            fprintf(fp, "IF ( setinitval ) %s%s=.FALSE.\n",
+            fprintf(fp, "IF ( setinitval .EQ. 3 ) %s%s=.FALSE.\n",
                         structname ,
                         fname ) ;
           }
@@ -270,7 +305,16 @@ gen_dealloc2 ( FILE * fp , char * structname , char * corename , node_t * node )
         else
           strcpy(fname,field_name(t4,p,(p->ntl>1)?tag:0)) ;
 
-        fprintf(fp, "DEALLOCATE(%s%s,STAT=ierr)\n if (ierr.ne.0) then\n CALL wrf_error_fatal ( &\n'frame/module_domain.f: Failed to dallocate %s%s. ')\n endif\n", structname, fname, structname, fname ) ;
+        fprintf(fp,
+"IF ( ASSOCIATED( %s%s ) ) THEN \n", structname, fname ) ;
+        fprintf(fp, 
+"  DEALLOCATE(%s%s,STAT=ierr)\n if (ierr.ne.0) then\n CALL wrf_error_fatal ( &\n'frame/module_domain.f: Failed to dallocate %s%s. ')\n endif\n",
+structname, fname, structname, fname ) ;
+        fprintf(fp,
+"  NULLIFY(%s%s)\n",structname, fname ) ;
+        fprintf(fp,
+"ENDIF\n" ) ;
+
 
       }
     }

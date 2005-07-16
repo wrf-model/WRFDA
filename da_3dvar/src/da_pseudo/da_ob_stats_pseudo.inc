@@ -5,7 +5,7 @@ SUBROUTINE da_ob_stats_pseudo ( stats_unit, oi )
    INTEGER,        INTENT (in)      :: stats_unit    ! Output unit for stats.
    TYPE (ob_type), INTENT (in)      :: oi            ! O-B
 
-   TYPE (stats_type)                :: pseudo
+   TYPE (stats_pseudo_type)         :: pseudo
    INTEGER                          :: nu, nv, nt, np, nq
    INTEGER                          :: n
 
@@ -27,7 +27,7 @@ SUBROUTINE da_ob_stats_pseudo ( stats_unit, oi )
    pseudo%minimum%t = maxmin_type( -missing_r, 0, 0)
    pseudo%minimum%p = maxmin_type( -missing_r, 0, 0)
    pseudo%minimum%q = maxmin_type( -missing_r, 0, 0)
-   pseudo%average = residual_type(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+   pseudo%average = residual_pseudo1_type(0.0, 0.0, 0.0, 0.0, 0.0)
    pseudo%rms_err = pseudo%average
    
    IF ( oi%num_pseudo > 0 ) THEN

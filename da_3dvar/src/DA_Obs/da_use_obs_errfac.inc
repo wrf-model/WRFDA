@@ -1,12 +1,16 @@
 SUBROUTINE da_use_obs_errfac( iv )
-!----------------------------------------------------------------------------   
+!----------------------------------------------------------------------------
 !  History:
 !
 !  Additions:
-!             07/08/2003      Profiler and Buoy Obs            S. R. H. Rizvi
+!           07/08/2003 - Profiler and Buoy Obs            Syed  RH  Rizvi
+!           03/04/2005 - AMV's from Geostationary and     Syed  RH  Rizvi
+!                        Polar orbiting satellite are
+!                        seperated & used as profile
+!
 !
 !  Purpose: Allocates observation structure and fills it fro iv.
-!----------------------------------------------------------------------------   
+!----------------------------------------------------------------------------
    IMPLICIT NONE
 
    TYPE (ob_type), INTENT(INOUT) :: iv              ! Obs and header structure.
@@ -69,17 +73,34 @@ SUBROUTINE da_use_obs_errfac( iv )
       END DO
    ENDIF
 
-!  [2.4] Transfer satob obs:
-
-   IF ( iv % num_satob > 0 ) THEN
+!  [2.4.1] Transfer Geo. AMVs Obs:
    
-      call da_read_errfac( 'satob', iv % satob_ef_u, iv % satob_ef_v, d1, d2, d3 )
+   IF ( iv % num_geoamv > 0 ) THEN
+   
+      call da_read_errfac( 'geoamv', iv % geoamv_ef_u, iv % geoamv_ef_v, d1, d2, d3 )
 
-      DO n = 1, iv % num_satob
-         iv % satob(n) % u % error = iv % satob(n) % u % error * iv % satob_ef_u
-         iv % satob(n) % v % error = iv % satob(n) % v % error * iv % satob_ef_v
+      DO n = 1, iv % num_geoamv
+        DO k = 1, iv % geoamv(n) % info % levels
+         iv % geoamv(n) % u(k) % error = iv % geoamv(n) % u(k) % error * iv % geoamv_ef_u
+         iv % geoamv(n) % v(k) % error = iv % geoamv(n) % v(k) % error * iv % geoamv_ef_v
+        END DO
+      END DO 
+   ENDIF
+
+!  [2.4.2] Transfer Polar AMVs Obs:
+
+   IF ( iv % num_polaramv > 0 ) THEN 
+
+      call da_read_errfac( 'polaramv', iv % polaramv_ef_u, iv % polaramv_ef_v, d1, d2, d3 )
+
+      DO n = 1, iv % num_polaramv
+        DO k = 1, iv % polaramv(n) % info % levels
+         iv % polaramv(n) % u(k) % error = iv % polaramv(n) % u(k) % error * iv % polaramv_ef_u
+         iv % polaramv(n) % v(k) % error = iv % polaramv(n) % v(k) % error * iv % polaramv_ef_v
+        END DO
       END DO
    ENDIF
+
 
 !  [2.5] Transfer gpspw obs:
 
@@ -284,6 +305,30 @@ SUBROUTINE da_use_obs_errfac( iv )
          iv % buoy(n) % q % error = iv % buoy(n) % q % error * iv % buoy_ef_q
       END DO
    ENDIF
+
+!  [2.16] Transfer TC bogus obs:
+
+   IF ( iv % num_bogus > 0 ) THEN
+
+      call da_read_errfac( 'bogus', iv % bogus_ef_u, iv % bogus_ef_v, &
+                           iv % bogus_ef_t, iv % bogus_ef_q, iv % bogus_ef_slp )
+
+      DO n = 1, iv % num_bogus
+         DO k = 1, iv % bogus(n) % info % levels
+            iv % bogus(n) % u(k) % error = iv % bogus(n) % u(k) % error * &
+                                           iv % bogus_ef_u
+            iv % bogus(n) % v(k) % error = iv % bogus(n) % v(k) % error * &
+                                           iv % bogus_ef_v
+            iv % bogus(n) % t(k) % error = iv % bogus(n) % t(k) % error * &
+                                           iv % bogus_ef_t
+            iv % bogus(n) % q(k) % error = iv % bogus(n) % q(k) % error * &
+                                           iv % bogus_ef_q
+
+         END DO
+
+         iv % bogus(n) % slp % error = iv % bogus(n) % slp % error * iv % bogus_ef_slp
+      END DO
+   END IF
 
 END SUBROUTINE da_use_obs_errfac
 

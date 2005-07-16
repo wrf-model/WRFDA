@@ -48,6 +48,7 @@ dimspec    w      -     namelist=spec_bdy_width   c          spec_bdy_width
 dimspec    u      2     namelist=num_land_cat     z          land_cat
 dimspec    s      2     namelist=num_soil_cat     z          soil_cat
 dimspec    e      3     namelist=ensdim           z          gd ensemble dimension
+dimspec    p      -     constant=7501             c          microphysics_rstrt_state
 
 #### 7. Edit the Registry file and create the state data assocaited with this
 ####    solver.  Single entry:
@@ -62,29 +63,22 @@ state real x ikj dyn_exp 2 - ih "TOYVAR"
 # used by the script use_registry to generate module_state_descript.F                                           
 # and other files.  Also see documentation in use_registry.                                             
 #
+# It is reauired that LU_INDEX appears before any variable that is
+# interpolated with a mask, as lu_index supplies that mask.
+#
+state    real  LU_INDEX         ij      misc        1         -     irh01d=(interp_fcnm)u=(copy_fcnm)   "LU_INDEX"              "LAND USE CATEGORY"         ""
+state    real  LU_MASK          ij      misc        1         -     i3h1     "LU_MASK"              "0 land 1 water"         ""
+################################################################################
+################################################################################
+
 # Variables for nmm dynamics                                            
 #
 # module_BC
 #
 # pdb is only 2d but registry doesn't support 2d bdy arrays right now...
 #definitions for NMM slab arrays
-dimspec    q      -     constant=1250             c  # a little crude right now
+dimspec    q      -     constant=2600             c  # a little crude right now
 dimspec    v      -     constant=1             c  # a little crude right now
-
-state  real    pd_b     ijb    dyn_nmm     1      -      b    "PDB"
-state  real    pd_bt    ijb    dyn_nmm     1      -      b    "PDBT"
-state  real    t_b      ikjb    dyn_nmm     1      -      b    "TB"
-state  real    t_bt     ikjb    dyn_nmm     1      -      b    "TBT"
-state  real    q_b      ikjb    dyn_nmm     1      -      b    "QB"
-state  real    q_bt     ikjb    dyn_nmm     1      -      b    "QBT"
-state  real    u_b      ikjb    dyn_nmm     1      -      b    "UB"
-state  real    u_bt     ikjb    dyn_nmm     1      -      b    "UBT"
-state  real    v_b      ikjb    dyn_nmm     1      -      b    "VB"
-state  real    v_bt     ikjb    dyn_nmm     1      -      b    "VBT"
-state  real    q2_b     ikjb    dyn_nmm     1      -      b    "Q2"
-state  real    q2_bt    ikjb    dyn_nmm     1      -      b    "Q2T"
-state  real   cwm_b     ikjb    dyn_nmm     1      -      b    "CWM"
-state  real   cwm_bt    ikjb    dyn_nmm     1      -      b    "CWMT"
 
 #
 # module_LOOPS
@@ -100,18 +94,18 @@ state  real   vbm2      ij     dyn_nmm     1      -      irh
 state  real   vbm3      ij     dyn_nmm     1      -      irh
 state  real   sm        ij     dyn_nmm     1      -      i01rh
 state  real   sice      ij     dyn_nmm     1      -      irh
-state  real   htm       ikj    dyn_nmm     1      -      i01rh
-state  real   vtm       ikj    dyn_nmm     1      -      i01rh
+state  real   htm       ikj    dyn_nmm     1      -      rh
+state  real   vtm       ikj    dyn_nmm     1      -      rh
 #
 # module_VRBLS
 #
-state  real   pd        ij     dyn_nmm     1      -      i01rh
+state  real   pd        ijb     dyn_nmm     1      -      i01rh
 state  real   fis       ij     dyn_nmm     1      -      i01rh
 state  real   res       ij     dyn_nmm     1      -      irh
-state  real   t         ikj    dyn_nmm     1      -      i01rh   "T"
-state  real   q         ikj    dyn_nmm     1      -      i01rh   "Q"
-state  real   u         ikj    dyn_nmm     1      -      i01rh   "U"
-state  real   v         ikj    dyn_nmm     1      -      i01rh   "V"
+state  real   t         ikjb    dyn_nmm     1      -      i01rh   "T"
+state  real   q         ikjb    dyn_nmm     1      -      i01rh   "Q"
+state  real   u         ikjb    dyn_nmm     1      -      i01rh   "U"
+state  real   v         ikjb    dyn_nmm     1      -      i01rh   "V"
 state  real   told      ikj    dyn_nmm     1      -      r
 state  real   uold      ikj    dyn_nmm     1      -      r
 state  real   vold      ikj    dyn_nmm     1      -      r
@@ -136,10 +130,10 @@ state  real   etax      k      dyn_nmm     1      -      i01r
 state  real   dfl       k      dyn_nmm     1      Z      i01r
 state  real   deta1     k      dyn_nmm     1      -      i01r
 state  real   aeta1     k      dyn_nmm     1      -      i01r
-state  real   eta1      k      dyn_nmm     1      Z      i01r
+state  real   eta1      k      dyn_nmm     1      -      i01r
 state  real   deta2     k      dyn_nmm     1      -      i01r
 state  real   aeta2     k      dyn_nmm     1      -      i01r
-state  real   eta2      k      dyn_nmm     1      Z      i01r
+state  real   eta2      k      dyn_nmm     1      -      i01r
 state  real   em        q      dyn_nmm     1      -      ir
 state  real   emt       q      dyn_nmm     1      -      ir
 state  real   adt       ikj    dyn_nmm     1      -      -
@@ -176,65 +170,68 @@ state  real   rtop      ikj    dyn_nmm     1      -      -
 #
 # module_PVRBLS
 #
+state real  pblh        ij    dyn_nmm   1    -     rh       "PBLH"                  "PBL HEIGHT"         "m"
 state integer lpbl      ij    dyn_nmm   1    -     ir
-state  real   ustar     ij    dyn_nmm   1    -     ir
-state  real   z0        ij    dyn_nmm   1    -     irh
+state  real   ustar     ij    dyn_nmm   1    -     irh
+state  real   z0        ij    dyn_nmm   1    -     i01rh
 state  real   z0base    ij    dyn_nmm   1    -     ir
 state  real   ths       ij    dyn_nmm   1    -     irh
-state  real   qs        ij    dyn_nmm   1    -     ir
-state  real   twbs      ij    dyn_nmm   1    -     ir
-state  real   qwbs      ij    dyn_nmm   1    -     ir
+state  real   qs        ij    dyn_nmm   1    -     irh
+state  real   twbs      ij    dyn_nmm   1    -     irh
+state  real   qwbs      ij    dyn_nmm   1    -     irh
 state  real   prec      ij    dyn_nmm   1    -     rh
 state  real   aprec     ij    dyn_nmm   1    -     rh
 state  real   acprec    ij    dyn_nmm   1    -     rh
 state  real   cuprec    ij    dyn_nmm   1    -     rh
 state  real   accliq    ij    dyn_nmm   1    -     r
-state  real   sno       ij    dyn_nmm   1    -     ir
-state  real   si        ij    dyn_nmm   1    -     ir
-state  real   cldefi    ij    dyn_nmm   1    -     r
+state  real   sno       ij    dyn_nmm   1    -     irh
+state  real   si        ij    dyn_nmm   1    -     irh
+state  real   cldefi    ij    dyn_nmm   1    -     rh
 state  real   deep      ij    dyn_nmm   1    -     r
 state  real   rf        ij    dyn_nmm   1    -     r
-state  real   th10      ij    dyn_nmm   1    -     ir
-state  real   q10       ij    dyn_nmm   1    -     ir
+state  real   th10      ij    dyn_nmm   1    -     irh
+state  real   q10       ij    dyn_nmm   1    -     irh
 state  real   pshltr    ij    dyn_nmm   1    -     irh
 state  real   tshltr    ij    dyn_nmm   1    -     irh
 state  real   qshltr    ij    dyn_nmm   1    -     irh
-state  real   q2        ikj    dyn_nmm   1    -     ir
+state  real   q2        ikjb   dyn_nmm   1    -     irh   "Q2"
 state  real   t_adj     ikj   dyn_nmm   1    -     r
 state  real   t_old     ikj   dyn_nmm   1    -     r
 state  real   zero_3d   ikj   dyn_nmm   1    -     r
 state  real   W0AVG     ikj   dyn_nmm   1    -     r        "W0AVG" "AVERAGE VERTICAL VELOCITY FOR KF CUMULUS SCHEME"         "m s-1"
+state  real   AKHS_OUT  ij    dyn_nmm   1    -     h        "AKHS_OUT"  "OUTPUT SFC EXCH COEFF FOR HEAT"                      "m^2 s-1"
+state  real   AKMS_OUT  ij    dyn_nmm   1    -     -        "AKMS_OUT"  "OUTPUT SFC EXCH COEFF FOR MOMENTUM"                  "m^2 s-1"    
 #
 # module_PHYS
 #
 state  real   albase    ij    dyn_nmm   1    -     i01rh
-state  real   albedo    ij    dyn_nmm   1    -     ir
+state  real   albedo    ij    dyn_nmm   1    -     irh
 state  real   cnvbot    ij    dyn_nmm   1    -     irh
 state  real   cnvtop    ij    dyn_nmm   1    -     irh
-state  real   czen      ij    dyn_nmm   1    -     ir
-state  real   czmean    ij    dyn_nmm   1    -     ir
+state  real   czen      ij    dyn_nmm   1    -     irh
+state  real   czmean    ij    dyn_nmm   1    -     irh
 state  real   epsr      ij    dyn_nmm   1    -     ir
 state  real   gffc      ij    dyn_nmm   1    -     ir
 state  real   glat      ij    dyn_nmm   1    -     i01rh
 state  real   glon      ij    dyn_nmm   1    -     i01rh
 state  real   NMM_TSK   ij    dyn_nmm   1    -    i01r     "TSK"
-#jw state  real   hbot      ij    dyn_nmm   1    -     i
 state  real   hdac      ij    dyn_nmm   1    -     ir
 state  real   hdacv     ij    dyn_nmm   1    -     ir
 state  real   mxsnal    ij    dyn_nmm   1    -     i01r
 state  real   radin     ij    dyn_nmm   1    -     -
-state  real   radot     ij    dyn_nmm   1    -     -
-state  real   sigt4     ij    dyn_nmm   1    -     -
+state  real   radot     ij    dyn_nmm   1    -     h
+state  real   sigt4     ij    dyn_nmm   1    -     h
 state  real   tg        ij    dyn_nmm   1    -     i01rh "TGROUND"  # changed data name from SOILTB to avoid conflict
+state  real   dfrlg     k     dyn_nmm   1    Z     i01r
 state integer lvl       ij    dyn_nmm   1    -     ir
 #
 # module_CLDWTR.F
 #
-state  real   cwm       ikj   dyn_nmm   1    -     rh
+state  real   cwm       ikjb   dyn_nmm   1    -     rh
 state  real   f_ice     ikj   dyn_nmm   1    -     rh
-state  real   f_rain    ikj   dyn_nmm   1    -     r
-state  real   f_rimef   ikj   dyn_nmm   1    -     -
-state  real   sr        ij    dyn_nmm   1    -     ir
+state  real   f_rain    ikj   dyn_nmm   1    -     rh
+state  real   f_rimef   ikj   dyn_nmm   1    -     rh
+state  real   sr        ij    dyn_nmm   1    -     irh
 state  real   u00       ij    dyn_nmm   1    -     ir
 state  real   cfrach    ij    dyn_nmm   1    -     h
 state  real   cfracl    ij    dyn_nmm   1    -     h
@@ -248,11 +245,12 @@ state logical micro_start        -     dyn_nmm   -    -     -
 state integer islope    ij    dyn_nmm   1    -     i01rh
 state  real   dzsoil    k     dyn_nmm   1    -     ir
 state  real   rtdpth    k     dyn_nmm   1    -     i01r
-state  real   sldpth    k     dyn_nmm   1    -     i01r
-state  real   cmc       ij    dyn_nmm   1    -     i01r
-state  real   grnflx    ij    dyn_nmm   1    -     ir
-state  real   pctsno    ij    dyn_nmm   1    -     ir
-state  real   soiltb    ij    dyn_nmm   1    -     i01r
+state  real   sldpth    k     dyn_nmm   1    -     i01rh
+state  real   cmc       ij    dyn_nmm   1    -     i01rh
+state  real   grnflx    ij    dyn_nmm   1    -     irh
+state  real   pctsno    ij    dyn_nmm   1    -     irh
+state  real   soiltb    ij    dyn_nmm   1    -     i01rh
+state  real   vegfrc    ij    dyn_nmm   1    -     i01rh
 state  real   shdmin    ij    dyn_nmm   1    -     -
 state  real   shdmax    ij    dyn_nmm   1    -     -
 state  real   sh2o      ilj   dyn_nmm   1    Z     irh
@@ -267,57 +265,58 @@ state  real   dwdtmx    ij    dyn_nmm   1    -     -
 state  real   dwdt      ikj   dyn_nmm   1    -     r
 state  real   pdwdt     ikj   dyn_nmm   1    -     r
 state  real   pint      ikj   dyn_nmm   1    Z     rh
-# are not these z staggered (z and w?)
 state  real   w         ikj   dyn_nmm   1    Z     rh
 state  real   z         ikj   dyn_nmm   1    Z     -
 #
 # module_ACCUM.F
 #
-state  real   acfrcv    ij    dyn_nmm     1    -    -
-state  real   acfrst    ij    dyn_nmm     1    -    -
-state  real   ssroff    ij    dyn_nmm     1    -    -
-state  real   bgroff    ij    dyn_nmm     1    -    -
+state  real   acfrcv    ij    dyn_nmm     1    -    h
+state  real   acfrst    ij    dyn_nmm     1    -    h
+state  real   ssroff    ij    dyn_nmm     1    -    h
+state  real   bgroff    ij    dyn_nmm     1    -    h
 state  real   rlwin     ij    dyn_nmm     1    -    h
 state  real   rlwout    ij    dyn_nmm     1    -    -
 state  real   rlwtoa    ij    dyn_nmm     1    -    -
 state  real   alwin     ij    dyn_nmm     1    -    h
-state  real   alwout    ij    dyn_nmm     1    -    -
-state  real   alwtoa    ij    dyn_nmm     1    -    -
+state  real   alwout    ij    dyn_nmm     1    -    h
+state  real   alwtoa    ij    dyn_nmm     1    -    h
 state  real   totswdn   ij    dyn_nmm     1    -    -
 state  real   totlwdn   ij    dyn_nmm     1    -    -
-state  real   rswin     ij    dyn_nmm     1    -    -
-state  real   rswout    ij    dyn_nmm     1    -    -
+state  real   rswin     ij    dyn_nmm     1    -    h
+state  real   rswout    ij    dyn_nmm     1    -    h
 state  real   rswtoa    ij    dyn_nmm     1    -    -
-state  real   aswin     ij    dyn_nmm     1    -    -
-state  real   aswout    ij    dyn_nmm     1    -    -
-state  real   aswtoa    ij    dyn_nmm     1    -    -
-state  real   sfcshx    ij    dyn_nmm     1    -    -
-state  real   sfclhx    ij    dyn_nmm     1    -    -
-state  real   subshx    ij    dyn_nmm     1    -    -
-state  real   snopcx    ij    dyn_nmm     1    -    -
-state  real   sfcuvx    ij    dyn_nmm     1    -    -
-state  real   potevp    ij    dyn_nmm     1    -    -
+state  real   aswin     ij    dyn_nmm     1    -    h
+state  real   aswout    ij    dyn_nmm     1    -    h
+state  real   aswtoa    ij    dyn_nmm     1    -    h
+state  real   sfcshx    ij    dyn_nmm     1    -    h
+state  real   sfclhx    ij    dyn_nmm     1    -    h
+state  real   subshx    ij    dyn_nmm     1    -    h
+state  real   snopcx    ij    dyn_nmm     1    -    h
+state  real   sfcuvx    ij    dyn_nmm     1    -    h
+state  real   potevp    ij    dyn_nmm     1    -    h
 state  real   potflx    ij    dyn_nmm     1    -    -
 state  real   tlmin     ij    dyn_nmm     1    -    -
 state  real   tlmax     ij    dyn_nmm     1    -    -
-state  real   rlwtt     ikj   dyn_nmm     1    -    r
-state  real   rswtt     ikj   dyn_nmm     1    -    r
-state  real   tcucn     ikj   dyn_nmm     1    -    -
-state  real   train     ikj   dyn_nmm     1    -    -
-state integer ncfrcv    ij    dyn_nmm     1    -    ir
-state integer ncfrst    ij    dyn_nmm     1    -    ir
-state integer nclod     -     dyn_nmm     -    -    ir
-state integer nheat     -     dyn_nmm     -    -    ir
-state integer nrdlw     -     dyn_nmm     -    -    ir
-state integer nrdsw     -     dyn_nmm     -    -    ir
-state integer nsrfc     -     dyn_nmm     -    -    ir
-state  real   avrain    -     dyn_nmm     -    -    ir
-state  real   avcnvc    -     dyn_nmm     -    -    ir
+state  real   rlwtt     ikj   dyn_nmm     1    -    h
+state  real   rswtt     ikj   dyn_nmm     1    -    h
+state  real   tcucn     ikj   dyn_nmm     1    -    h
+state  real   train     ikj   dyn_nmm     1    -    h
+state integer ncfrcv    ij    dyn_nmm     1    -    irh
+state integer ncfrst    ij    dyn_nmm     1    -    irh
+state integer nphs0     -     dyn_nmm     -    -    rh
+state integer nprec     -     dyn_nmm     -    -    irh
+state integer nclod     -     dyn_nmm     -    -    irh
+state integer nheat     -     dyn_nmm     -    -    irh
+state integer nrdlw     -     dyn_nmm     -    -    irh
+state integer nrdsw     -     dyn_nmm     -    -    irh
+state integer nsrfc     -     dyn_nmm     -    -    irh
+state  real   avrain    -     dyn_nmm     -    -    irh
+state  real   avcnvc    -     dyn_nmm     -    -    irh
 state  real   aratim    -     dyn_nmm     -    -    ir
 state  real   acutim    -     dyn_nmm     -    -    ir
 state  real   ardlw     -     dyn_nmm     -    -    irh
-state  real   ardsw     -     dyn_nmm     -    -    ir
-state  real   asrfc     -     dyn_nmm     -    -    ir
+state  real   ardsw     -     dyn_nmm     -    -    irh
+state  real   asrfc     -     dyn_nmm     -    -    irh
 state  real   aphtim    -     dyn_nmm     -    -    ir
 #
 # module_INDX.F
@@ -327,7 +326,7 @@ state integer ihw       j    dyn_nmm     1    -    -
 state integer ive       j    dyn_nmm     1    -    -
 state integer ivw       j    dyn_nmm     1    -    -
 state integer irad      i    dyn_nmm     1    -    -
-#definitions for NMM slab arrays
+#definitions for NMM east-west orientation on E grid
 state integer iheg      q    dyn_nmm     1    -    -
 state integer ihwg      q    dyn_nmm     1    -    -
 state integer iveg      q    dyn_nmm     1    -    -
@@ -345,61 +344,18 @@ state integer iup_h     ij   dyn_nmm     1    -    -
 state integer iup_v     ij   dyn_nmm     1    -    -
 state integer iup_adh   ij   dyn_nmm     1    -    -
 state integer iup_adv   ij   dyn_nmm     1    -    -
+state integer imicrogram -   misc        -    -    r   "imicrogram"  "flag 0/1 0=mixratio, 1=mcrograms/m3"  ""
 
 #                                               
 # table entries are of the form                                         
 #<Table> <Type> <Sym>         <Dims>   <Use>   <NumTLev> <Stagger> <IO>     <DNAME>             <DESCRIP>     <UNITS>   
 #
-# Variables for slt dynamics                                            
-#
-
-#                                               
-# Variables for Eulerian height coordinate model                                           
-#                                               
-
-#                                               
-#                                               
 # Mask for moving nest interpolations
 state    integer imask_nostag         ij      misc     -
 state    integer imask_xstag          ij      misc     X
 state    integer imask_ystag          ij      misc     Y
 state    integer imask_xystag         ij      misc     XY
 #                                               
-#                                               
-#                                               
-#                                               
-#                                               
-#                                               
-
-#                                               
-#                                               
-# Vertical Vel                                          
-#                                               
-# Other dyn                                             
-#                                               
-#                                               
-#                                               
-#                                               
-#                                               
-#                                               
-                                                
-                                                
-#-----------------------------------------------------------------------------------------------------------------------------------------------------------------
-#                                               
-# Variables for Eulerian mass coordinate dynamics                                            
-#                                               
-#                                               
-#                                               
-# Vertical Vel                                          
-#                                               
-# Other dyn                                             
-#                                               
-#
-#                                               
-
-
-
-
 #---------------------------------------------------------------------------------------------------------------------------------
 # SI - start variables from netCDF format from Standard Initialization, most eventually for use in LSM schemes
 #---------------------------------------------------------------------------------------------------------------------------------
@@ -471,6 +427,10 @@ state   real    qi             ikjft   moist       1         -     r       "QICE
 state   real    qs             ikjft   moist       1         -     rh      "QSNOW"            "Snow mixing ratio"             "kg kg-1"
 state   real    qg             ikjft   moist       1         -     rh      "QGRAUP"           "Graupel mixing ratio"          "kg kg-1"
 #                                               
+# Other Scalars
+state   real    -              ikjftb  scalar      2         -     -    -
+state   real    qni            ikjftb  scalar      2         -     \
+   i01rhusdf=(bdy_interp:dt)    "QNICE"         "Ice Number concentration" "# kg(-1)"
 
 #-----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -498,7 +458,7 @@ state   real    -              ikjft   chem        2         -     -    -
 
 # lsm State Variables
 
-state    real   SMOIS            ilj     -          1         Z     irh       "SMOIS"                "SOIL MOISTURE" ""
+state    real   SMOIS            ilj     -          1         Z     rh       "SMOIS"                "SOIL MOISTURE" ""
 
 # MYJ PBL variables
 
@@ -543,16 +503,16 @@ state    real   U10              ij     misc        1         -     irh       "U
 state    real   V10              ij     misc        1         -     irh       "V10"                  "V at 10 M"         " "
 state    real   XICE             ij     misc        1         -     i01r      "XICE"                 "SEA ICE"         ""
 state    real   SMSTAV           ij     misc        1         -     irh       "SMSTAV"               "MOISTURE VARIBILITY" ""
-state    real   SMSTOT           ij     misc        1         -     i       "SMSTOT"               "TOTAL SOIL MOISTURE" ""
-state    real   SFCRUNOFF        ij     misc        1         -     irh       "SFROFF"               "SURFACE RUNOFF" ""
-state    real   UDRUNOFF         ij     misc        1         -     irh       "UDROFF"               "UNDERGROUND RUNOFF" ""
+state    real   SMSTOT           ij     misc        1         -     irh     "SMSTOT"               "TOTAL SOIL MOISTURE" ""
+state    real   SFCRUNOFF        ij     misc        1         -     rh       "SFROFF"               "SURFACE RUNOFF" ""
+state    real   UDRUNOFF         ij     misc        1         -     rh       "UDROFF"               "UNDERGROUND RUNOFF" ""
 state  integer  IVGTYP           ij     misc        1         -     irh       "IVGTYP"               "VEGETATION TYPE" ""
 state  integer  ISLTYP           ij     misc        1         -     irh       "ISLTYP"               "SOIL TYPE"         " "
 state    real   VEGFRA           ij     misc        1         -     i01rh       "VEGFRA"               "VEGETATION FRACTION" ""
-state    real   SFCEVP           ij     misc        1         -     i       "SFCEVP"               "SURFACE EVAPORATION" ""
-state    real   GRDFLX           ij     misc        1         -     i       "GRDFLX"               "GROUND HEAT FLUX" ""
+state    real   SFCEVP           ij     misc        1         -     irh     "SFCEVP"               "SURFACE EVAPORATION" ""
+state    real   GRDFLX           ij     misc        1         -     irh     "GRDFLX"               "GROUND HEAT FLUX" ""
 state    real   ALBBCK           ij     misc        1         -     i012r   "ALBBCK"          "BACKGROUND ALBEDO"        "NA"
-state    real   SFCEXC           ij     misc        1         -     i       "SFCEXC "              "SURFACE EXCHANGE COEFFICIENT"         ""
+state    real   SFCEXC           ij     misc        1         -     ir      "SFCEXC "              "SURFACE EXCHANGE COEFFICIENT"         ""
 state    real   ACSNOW           ij     misc        1         -     irh       "ACSNOW"               "ACCUMULATED SNOW" ""
 state    real   ACSNOM           ij     misc        1         -     irh       "ACSNOM"               "ACCUMULATED MELTED SNOW"         ""
 state    real   SNOW             ij     misc        1         -     irh       "SNOW"                 "SNOW WATER EQUIVALENT"         ""
@@ -562,9 +522,9 @@ state    real   WEASD            ij     misc        1         -     i01rh       
 state    real  ZNT              ij      misc        1         -     ir        "ZNT"                   "TIME-VARYING ROUGHNESS LENGTH"
 state    real  MOL              ij      misc        1         -     ir        "MOL"                   "T* IN SIMILARITY THEORY"                      "K"
 
-
-state    real   tke_myj        ikj     misc        1         -     irh       "tke_myj"               "TKE FROM MELLOR-YAMADA-JANJIC      "m2 s-2"
-state    real   EXCH_H          ikj     misc        1         -     r          "EXCH_H"               "EXCHANGE COEFFICIENTS "
+state    real   tke_myj         ikj     misc        1         -     rh        "tke_myj"               "TKE FROM MELLOR-YAMADA-JANJIC"     "m2 s-2"
+state    real   EL_MYJ          ikj     misc        1         -      h        "el_myj"                "MIXING LENGTH FROM MELLOR-YAMADA-JANJIC"     "m"
+state    real   EXCH_H         ikj     misc        1         -     rh         "EXCH_H"               "EXCHANGE COEFFICIENTS FOR HEAT"               "m2 s-1"
 state   real   THZ0             ij     misc        1         -     irh       "THZ0"                  "POTENTIAL TEMPERATURE AT ZNT"                 "K"
 state   real   QZ0              ij     misc        1         -     irh       "QZ0"                   "SPECIFIC HUMIDITY AT ZNT"                     "kg kg-1"
 state   real   UZ0              ij     misc        1         -     irh       "UZ0"                   "U WIND COMPONENT AT ZNT"                      "m s-1"
@@ -577,15 +537,19 @@ state   real   dudt              ikj     misc        1         -     -
 state   real   dvdt              ikj     misc        1         -     -      
 
 state   real   QSFC             ij     misc        1         -     irh       "QSFC"                  "SPECIFIC HUMIDITY AT LOWER BOUNDARY"          "kg kg-1"
-state   real   AKHS             ij     misc        1         -     irh       "AKHS"                  "SFC EXCH COEFF FOR HEAT"                      "m s-1"    
-state   real   AKMS             ij     misc        1         -     irh       "AKMS"                  "SFC EXCH COEFF FOR MOMENTUM"                  "m s-1"    
+state   real   AKHS             ij     misc        1         -     ir        "AKHS"                  "SFC EXCH COEFF FOR HEAT"                      "m s-1"    
+state   real   AKMS             ij     misc        1         -     ir        "AKMS"                  "SFC EXCH COEFF FOR MOMENTUM"                  "m s-1"    
 i1      real   TSHLTR           ij     misc        1         -     -         "TSHLTR"                "SHELTER THETA FROM MYJ"                       "K"         
 i1      real   QSHLTR           ij     misc        1         -     -         "QSHLTR"                "SHELTER SPECIFIC HUMIDITY FROM MYJ"           "kg kg-1"
 i1      real   TH10             ij     misc        1         -     -         "TH10"                  "10-M THETA FROM MYJ"                          "K"        
 i1      real   Q10              ij     misc        1         -     -         "Q10"                   "10-M SPECIFIC HUMIDITY FROM MYJ"              "kg kg-1"
-state    real    HTOP            ij     misc        1         -     ir        "HTOP"                 "TOP OF CONVECTION LELVEL"         ""
-state    real    HBOT            ij     misc        1         -     ir        "HBOT"                 "BOT OF CONVECTION LELVEL"         ""
-state    REAL      CUPPT         ij     misc        1         -     ir        "CUPPT"                "ACCUMULATED CONVECTIVE RAIN SINC LAST CALL TO THE RADIATION"         ""
+state    real    HTOP            ij     misc        1         -     irh       "HTOP"                 "TOP OF CONVECTION LEVEL"         ""
+state    real    HBOT            ij     misc        1         -     irh       "HBOT"                 "BOT OF CONVECTION LEVEL"         ""
+state    real    HTOPD           ij     misc        1         -     rh        "HTOPD"                "TOP DEEP CONVECTION LEVEL"         ""
+state    real    HBOTD           ij     misc        1         -     rh        "HBOTD"                "BOT DEEP CONVECTION LEVEL"         ""
+state    real    HTOPS           ij     misc        1         -     rh        "HTOPS"                "TOP SHALLOW CONVECTION LEVEL"         ""
+state    real    HBOTS           ij     misc        1         -     rh        "HBOTS"                "BOT SHALLOW CONVECTION LEVEL"         ""
+state    REAL      CUPPT         ij     misc        1         -     rh        "CUPPT"                "ACCUMULATED CONVECTIVE RAIN SINCE LAST CALL TO THE RADIATION"         ""
 state    real    F_ICE_PHY       ikj    misc        1         -      r        "F_ICE_PHY"            "FRACTION OF ICE"         ""
 state    real    F_RAIN_PHY      ikj    misc        1         -      r        "F_RAIN_PHY"           "FRACTION OF RAIN "         ""
 state    real    F_RIMEF_PHY     ikj    misc        1         -      r        "F_RIMEF_PHY"          "MASS RATIO OF RIMED ICE "         ""
@@ -605,7 +569,10 @@ state    real  RQVFTEN          ikj     misc        1         -      r       "RQ
 state    real   SNOWH            ij     misc        1         -     i01rhd=(interp_mask_land_field:lu_index)      "SNOWH"                 "PHYSICAL SNOW DEPTH"  ""
 state    real   SMFR3D           ilj    misc        1         Z      rh       "SMFR3D"               "SOIL ICE" ""
 
-
+# added state for etampnew microphysics (needed for restarts)
+state    real  mp_restart_state   p      misc        1         -      r       "MP_RESTART_STATE"       "STATE VECTOR FOR MICROPHYSICS RESTARTS"
+state    real  tbpvs_state       p      misc        1         -      r        "TBPVS_STATE"           "STATE FOR ETAMPNEW MICROPHYSICS"
+state    real  tbpvs0_state      p      misc        1         -      r        "TBPVS0_STATE"          "STATE FOR ETAMPNEW MICROPHYSICS"
 
 #################################################################
 #                                               
@@ -625,7 +592,6 @@ state   integer auxinput2_oid  -        -          -         -     -         "au
 state   integer auxinput3_oid  -        -          -         -     -         "auxinput3_oid"         ""         ""
 state   integer auxinput4_oid  -        -          -         -     -         "auxinput4_oid"         ""         ""
 state   integer auxinput5_oid  -        -          -         -     -         "auxinput5_oid"         ""         ""
-state   integer nframes        -        -          -         -     -         "nframes"               ""         ""      
 # input file descriptor for lbcs on parent domain                                               
 state   integer lbc_fid        -        -          -         -     -         "lbc_fid"               ""         ""      
                                                 
@@ -662,8 +628,14 @@ rconfig   integer end_minute              namelist,time_control		max_domains    
 rconfig   integer end_second              namelist,time_control		max_domains      00    irh   "end_second"            "2 DIGIT SECOND OF THE MINUTE OF END OF MODEL, 0-59" "SECONDS"
 rconfig   integer interval_seconds        namelist,time_control		1             43200    irh   "interval_seconds"      "SECONDS BETWEEN ANALYSIS AND BOUNDARY PERIODS" "SECONDS"
 rconfig   logical input_from_file         namelist,time_control		max_domains    .false. irh    "input_from_file"      "T/F INPUT FOR THIS DOMAIN FROM A SEPARATE INPUT FILE"  ""
+rconfig   integer fine_input_stream       namelist,time_control         max_domains    0       irh    "fine_input_stream"      "0 THROUGH 5, WHAT INPUT STREAM IS FINE GRID IC FROM"  ""
 rconfig   integer history_interval        namelist,time_control		max_domains    0       h     "history_interval"       ""      "MINUTES"
 rconfig   integer frames_per_outfile      namelist,time_control		max_domains    10      h     "frames_per_outfile"            ""      ""
+rconfig   integer frames_per_auxhist1     namelist,time_control		max_domains    10      h     "frames_per_auxhist1"            ""      ""
+rconfig   integer frames_per_auxhist2     namelist,time_control		max_domains    10      h     "frames_per_auxhist2"            ""      ""
+rconfig   integer frames_per_auxhist3     namelist,time_control		max_domains    10      h     "frames_per_auxhist3"            ""      ""
+rconfig   integer frames_per_auxhist4     namelist,time_control		max_domains    10      h     "frames_per_auxhist4"            ""      ""
+rconfig   integer frames_per_auxhist5     namelist,time_control		max_domains    10      h     "frames_per_auxhist5"            ""      ""
 rconfig   logical restart                 namelist,time_control		1             .false. h    "restart"              ""      ""
 rconfig   integer restart_interval        namelist,time_control		1              0       h     "restart_interval"       ""      "MINUTES"
 rconfig   integer     io_form_input       namelist,time_control		1              2       h        "io_form_input"                 ""      ""
@@ -788,180 +760,180 @@ rconfig   integer restart_interval_m      namelist,time_control		1              
 rconfig   integer restart_interval_s      namelist,time_control		1              0       h     "restart_interval_s"       ""      "SECONDS"
 
 
-rconfig  integer history_begin_y  namelist,time_control		max_domains    0     h   "history_begin_y"    ""   "YEARS"
-rconfig  integer history_begin_mo  namelist,time_control	max_domains    0     h   "history_begin_mo"    ""   "MONTHS"
-rconfig  integer history_begin_d   namelist,time_control	max_domains    0     h   "history_begin_d"    ""   "DAYS"
-rconfig  integer history_begin_h   namelist,time_control	max_domains    0     h   "history_begin_h"    ""   "HOURS"
-rconfig  integer history_begin_m   namelist,time_control	max_domains    0     h   "history_begin_m"    ""   "MINUTES"
-rconfig  integer history_begin_s   namelist,time_control	max_domains    0     h   "history_begin_s"    ""   "SECONDS"
+rconfig  integer history_begin_y  namelist,time_control		max_domains    0     h   "history_begin_y"    ""   "YEARS from start of run"
+rconfig  integer history_begin_mo  namelist,time_control	max_domains    0     h   "history_begin_mo"    ""   "MONTHS from start of run"
+rconfig  integer history_begin_d   namelist,time_control	max_domains    0     h   "history_begin_d"    ""   "DAYS from start of run"
+rconfig  integer history_begin_h   namelist,time_control	max_domains    0     h   "history_begin_h"    ""   "HOURS from start of run"
+rconfig  integer history_begin_m   namelist,time_control	max_domains    0     h   "history_begin_m"    ""   "MINUTES from start of run"
+rconfig  integer history_begin_s   namelist,time_control	max_domains    0     h   "history_begin_s"    ""   "SECONDS from start of run"
 
-rconfig  integer inputout_begin_y   namelist,time_control	max_domains    0     h   "inputout_begin_y"    ""   "YEARS"
-rconfig  integer inputout_begin_mo   namelist,time_control	max_domains    0     h   "inputout_begin_mo"    ""   "MONTHS"
-rconfig  integer inputout_begin_d   namelist,time_control	max_domains    0     h   "inputout_begin_d"    ""   "DAYS"
-rconfig  integer inputout_begin_h   namelist,time_control	max_domains    0     h   "inputout_begin_h"    ""   "HOURS"
-rconfig  integer inputout_begin_m   namelist,time_control	max_domains    0     h   "inputout_begin_m"    ""   "MINUTES"
-rconfig  integer inputout_begin_s   namelist,time_control	max_domains    0     h   "inputout_begin_s"    ""   "SECONDS"
+rconfig  integer inputout_begin_y   namelist,time_control	max_domains    0     h   "inputout_begin_y"    ""   "YEARS from start of run"
+rconfig  integer inputout_begin_mo   namelist,time_control	max_domains    0     h   "inputout_begin_mo"    ""   "MONTHS from start of run"
+rconfig  integer inputout_begin_d   namelist,time_control	max_domains    0     h   "inputout_begin_d"    ""   "DAYS from start of run"
+rconfig  integer inputout_begin_h   namelist,time_control	max_domains    0     h   "inputout_begin_h"    ""   "HOURS from start of run"
+rconfig  integer inputout_begin_m   namelist,time_control	max_domains    0     h   "inputout_begin_m"    ""   "MINUTES from start of run"
+rconfig  integer inputout_begin_s   namelist,time_control	max_domains    0     h   "inputout_begin_s"    ""   "SECONDS from start of run"
 
-rconfig  integer auxhist1_begin_y   namelist,time_control	max_domains    0     h   "auxhist1_begin_y"    ""   "YEARS"
-rconfig  integer auxhist1_begin_mo   namelist,time_control	max_domains    0     h   "auxhist1_begin_mo"    ""   "MONTHS"
-rconfig  integer auxhist1_begin_d   namelist,time_control	max_domains    0     h   "auxhist1_begin_d"    ""   "DAYS"
-rconfig  integer auxhist1_begin_h   namelist,time_control	max_domains    0     h   "auxhist1_begin_h"    ""   "HOURS"
-rconfig  integer auxhist1_begin_m   namelist,time_control	max_domains    0     h   "auxhist1_begin_m"    ""   "MINUTES"
-rconfig  integer auxhist1_begin_s   namelist,time_control	max_domains    0     h   "auxhist1_begin_s"    ""   "SECONDS"
+rconfig  integer auxhist1_begin_y   namelist,time_control	max_domains    0     h   "auxhist1_begin_y"    ""   "YEARS from start of run"
+rconfig  integer auxhist1_begin_mo   namelist,time_control	max_domains    0     h   "auxhist1_begin_mo"    ""   "MONTHS from start of run"
+rconfig  integer auxhist1_begin_d   namelist,time_control	max_domains    0     h   "auxhist1_begin_d"    ""   "DAYS from start of run"
+rconfig  integer auxhist1_begin_h   namelist,time_control	max_domains    0     h   "auxhist1_begin_h"    ""   "HOURS from start of run"
+rconfig  integer auxhist1_begin_m   namelist,time_control	max_domains    0     h   "auxhist1_begin_m"    ""   "MINUTES from start of run"
+rconfig  integer auxhist1_begin_s   namelist,time_control	max_domains    0     h   "auxhist1_begin_s"    ""   "SECONDS from start of run"
 
-rconfig  integer auxhist2_begin_y   namelist,time_control	max_domains    0     h   "auxhist2_begin_y"    ""   "YEARS"
-rconfig  integer auxhist2_begin_mo   namelist,time_control	max_domains    0     h   "auxhist2_begin_mo"    ""   "MONTHS"
-rconfig  integer auxhist2_begin_d   namelist,time_control	max_domains    0     h   "auxhist2_begin_d"    ""   "DAYS"
-rconfig  integer auxhist2_begin_h   namelist,time_control	max_domains    0     h   "auxhist2_begin_h"    ""   "HOURS"
-rconfig  integer auxhist2_begin_m   namelist,time_control	max_domains    0     h   "auxhist2_begin_m"    ""   "MINUTES"
-rconfig  integer auxhist2_begin_s   namelist,time_control	max_domains    0     h   "auxhist2_begin_s"    ""   "SECONDS"
+rconfig  integer auxhist2_begin_y   namelist,time_control	max_domains    0     h   "auxhist2_begin_y"    ""   "YEARS from start of run"
+rconfig  integer auxhist2_begin_mo   namelist,time_control	max_domains    0     h   "auxhist2_begin_mo"    ""   "MONTHS from start of run"
+rconfig  integer auxhist2_begin_d   namelist,time_control	max_domains    0     h   "auxhist2_begin_d"    ""   "DAYS from start of run"
+rconfig  integer auxhist2_begin_h   namelist,time_control	max_domains    0     h   "auxhist2_begin_h"    ""   "HOURS from start of run"
+rconfig  integer auxhist2_begin_m   namelist,time_control	max_domains    0     h   "auxhist2_begin_m"    ""   "MINUTES from start of run"
+rconfig  integer auxhist2_begin_s   namelist,time_control	max_domains    0     h   "auxhist2_begin_s"    ""   "SECONDS from start of run"
 
-rconfig  integer auxhist3_begin_y   namelist,time_control	max_domains    0     h   "auxhist3_begin_y"    ""   "YEARS"
-rconfig  integer auxhist3_begin_mo   namelist,time_control	max_domains    0     h   "auxhist3_begin_mo"    ""   "MONTHS"
-rconfig  integer auxhist3_begin_d   namelist,time_control	max_domains    0     h   "auxhist3_begin_d"    ""   "DAYS"
-rconfig  integer auxhist3_begin_h   namelist,time_control	max_domains    0     h   "auxhist3_begin_h"    ""   "HOURS"
-rconfig  integer auxhist3_begin_m   namelist,time_control	max_domains    0     h   "auxhist3_begin_m"    ""   "MINUTES"
-rconfig  integer auxhist3_begin_s   namelist,time_control	max_domains    0     h   "auxhist3_begin_s"    ""   "SECONDS"
+rconfig  integer auxhist3_begin_y   namelist,time_control	max_domains    0     h   "auxhist3_begin_y"    ""   "YEARS from start of run"
+rconfig  integer auxhist3_begin_mo   namelist,time_control	max_domains    0     h   "auxhist3_begin_mo"    ""   "MONTHS from start of run"
+rconfig  integer auxhist3_begin_d   namelist,time_control	max_domains    0     h   "auxhist3_begin_d"    ""   "DAYS from start of run"
+rconfig  integer auxhist3_begin_h   namelist,time_control	max_domains    0     h   "auxhist3_begin_h"    ""   "HOURS from start of run"
+rconfig  integer auxhist3_begin_m   namelist,time_control	max_domains    0     h   "auxhist3_begin_m"    ""   "MINUTES from start of run"
+rconfig  integer auxhist3_begin_s   namelist,time_control	max_domains    0     h   "auxhist3_begin_s"    ""   "SECONDS from start of run"
 
-rconfig  integer auxhist4_begin_y  namelist,time_control	max_domains    0     h   "auxhist4_begin_y"    ""   "YEARS"
-rconfig  integer auxhist4_begin_mo  namelist,time_control	max_domains    0     h   "auxhist4_begin_mo"    ""   "MONTHS"
-rconfig  integer auxhist4_begin_d   namelist,time_control	max_domains    0     h   "auxhist4_begin_d"    ""   "DAYS"
-rconfig  integer auxhist4_begin_h   namelist,time_control	max_domains    0     h   "auxhist4_begin_h"    ""   "HOURS"
-rconfig  integer auxhist4_begin_m   namelist,time_control	max_domains    0     h   "auxhist4_begin_m"    ""   "MINUTES"
-rconfig  integer auxhist4_begin_s   namelist,time_control	max_domains    0     h   "auxhist4_begin_s"    ""   "SECONDS"
+rconfig  integer auxhist4_begin_y  namelist,time_control	max_domains    0     h   "auxhist4_begin_y"    ""   "YEARS from start of run"
+rconfig  integer auxhist4_begin_mo  namelist,time_control	max_domains    0     h   "auxhist4_begin_mo"    ""   "MONTHS from start of run"
+rconfig  integer auxhist4_begin_d   namelist,time_control	max_domains    0     h   "auxhist4_begin_d"    ""   "DAYS from start of run"
+rconfig  integer auxhist4_begin_h   namelist,time_control	max_domains    0     h   "auxhist4_begin_h"    ""   "HOURS from start of run"
+rconfig  integer auxhist4_begin_m   namelist,time_control	max_domains    0     h   "auxhist4_begin_m"    ""   "MINUTES from start of run"
+rconfig  integer auxhist4_begin_s   namelist,time_control	max_domains    0     h   "auxhist4_begin_s"    ""   "SECONDS from start of run"
 
-rconfig  integer auxhist5_begin_y  namelist,time_control	max_domains    0     h   "auxhist5_begin_y"    ""   "YEARS"
-rconfig  integer auxhist5_begin_mo  namelist,time_control	max_domains    0     h   "auxhist5_begin_mo"    ""   "MONTHS"
-rconfig  integer auxhist5_begin_d   namelist,time_control	max_domains    0     h   "auxhist5_begin_d"    ""   "DAYS"
-rconfig  integer auxhist5_begin_h   namelist,time_control	max_domains    0     h   "auxhist5_begin_h"    ""   "HOURS"
-rconfig  integer auxhist5_begin_m   namelist,time_control	max_domains    0     h   "auxhist5_begin_m"    ""   "MINUTES"
-rconfig  integer auxhist5_begin_s   namelist,time_control	max_domains    0     h   "auxhist5_begin_s"    ""   "SECONDS"
+rconfig  integer auxhist5_begin_y  namelist,time_control	max_domains    0     h   "auxhist5_begin_y"    ""   "YEARS from start of run"
+rconfig  integer auxhist5_begin_mo  namelist,time_control	max_domains    0     h   "auxhist5_begin_mo"    ""   "MONTHS from start of run"
+rconfig  integer auxhist5_begin_d   namelist,time_control	max_domains    0     h   "auxhist5_begin_d"    ""   "DAYS from start of run"
+rconfig  integer auxhist5_begin_h   namelist,time_control	max_domains    0     h   "auxhist5_begin_h"    ""   "HOURS from start of run"
+rconfig  integer auxhist5_begin_m   namelist,time_control	max_domains    0     h   "auxhist5_begin_m"    ""   "MINUTES from start of run"
+rconfig  integer auxhist5_begin_s   namelist,time_control	max_domains    0     h   "auxhist5_begin_s"    ""   "SECONDS from start of run"
 
-rconfig  integer auxinput1_begin_y  namelist,time_control	max_domains    0     h   "auxinput1_begin_y"    ""   "YEARS"
-rconfig  integer auxinput1_begin_mo  namelist,time_control	max_domains    0     h   "auxinput1_begin_mo"    ""   "MONTHS"
-rconfig  integer auxinput1_begin_d   namelist,time_control	max_domains    0     h   "auxinput1_begin_d"    ""   "DAYS"
-rconfig  integer auxinput1_begin_h   namelist,time_control	max_domains    0     h   "auxinput1_begin_h"    ""   "HOURS"
-rconfig  integer auxinput1_begin_m   namelist,time_control	max_domains    0     h   "auxinput1_begin_m"    ""   "MINUTES"
-rconfig  integer auxinput1_begin_s   namelist,time_control	max_domains    0     h   "auxinput1_begin_s"    ""   "SECONDS"
+rconfig  integer auxinput1_begin_y  namelist,time_control	max_domains    0     h   "auxinput1_begin_y"    ""   "YEARS from start of run"
+rconfig  integer auxinput1_begin_mo  namelist,time_control	max_domains    0     h   "auxinput1_begin_mo"    ""   "MONTHS from start of run"
+rconfig  integer auxinput1_begin_d   namelist,time_control	max_domains    0     h   "auxinput1_begin_d"    ""   "DAYS from start of run"
+rconfig  integer auxinput1_begin_h   namelist,time_control	max_domains    0     h   "auxinput1_begin_h"    ""   "HOURS from start of run"
+rconfig  integer auxinput1_begin_m   namelist,time_control	max_domains    0     h   "auxinput1_begin_m"    ""   "MINUTES from start of run"
+rconfig  integer auxinput1_begin_s   namelist,time_control	max_domains    0     h   "auxinput1_begin_s"    ""   "SECONDS from start of run"
 
-rconfig  integer auxinput2_begin_y  namelist,time_control	max_domains    0     h   "auxinput2_begin_y"    ""   "YEARS"
-rconfig  integer auxinput2_begin_mo  namelist,time_control	max_domains    0     h   "auxinput2_begin_mo"    ""   "MONTHS"
-rconfig  integer auxinput2_begin_d   namelist,time_control	max_domains    0     h   "auxinput2_begin_d"    ""   "DAYS"
-rconfig  integer auxinput2_begin_h   namelist,time_control	max_domains    0     h   "auxinput2_begin_h"    ""   "HOURS"
-rconfig  integer auxinput2_begin_m   namelist,time_control	max_domains    0     h   "auxinput2_begin_m"    ""   "MINUTES"
-rconfig  integer auxinput2_begin_s   namelist,time_control	max_domains    0     h   "auxinput2_begin_s"    ""   "SECONDS"
+rconfig  integer auxinput2_begin_y  namelist,time_control	max_domains    0     h   "auxinput2_begin_y"    ""   "YEARS from start of run"
+rconfig  integer auxinput2_begin_mo  namelist,time_control	max_domains    0     h   "auxinput2_begin_mo"    ""   "MONTHS from start of run"
+rconfig  integer auxinput2_begin_d   namelist,time_control	max_domains    0     h   "auxinput2_begin_d"    ""   "DAYS from start of run"
+rconfig  integer auxinput2_begin_h   namelist,time_control	max_domains    0     h   "auxinput2_begin_h"    ""   "HOURS from start of run"
+rconfig  integer auxinput2_begin_m   namelist,time_control	max_domains    0     h   "auxinput2_begin_m"    ""   "MINUTES from start of run"
+rconfig  integer auxinput2_begin_s   namelist,time_control	max_domains    0     h   "auxinput2_begin_s"    ""   "SECONDS from start of run"
 
-rconfig  integer auxinput3_begin_y  namelist,time_control	max_domains    0     h   "auxinput3_begin_y"    ""   "YEARS"
-rconfig  integer auxinput3_begin_mo  namelist,time_control	max_domains    0     h   "auxinput3_begin_mo"    ""   "MONTHS"
-rconfig  integer auxinput3_begin_d   namelist,time_control	max_domains    0     h   "auxinput3_begin_d"    ""   "DAYS"
-rconfig  integer auxinput3_begin_h   namelist,time_control	max_domains    0     h   "auxinput3_begin_h"    ""   "HOURS"
-rconfig  integer auxinput3_begin_m   namelist,time_control	max_domains    0     h   "auxinput3_begin_m"    ""   "MINUTES"
-rconfig  integer auxinput3_begin_s   namelist,time_control	max_domains    0     h   "auxinput3_begin_s"    ""   "SECONDS"
+rconfig  integer auxinput3_begin_y  namelist,time_control	max_domains    0     h   "auxinput3_begin_y"    ""   "YEARS from start of run"
+rconfig  integer auxinput3_begin_mo  namelist,time_control	max_domains    0     h   "auxinput3_begin_mo"    ""   "MONTHS from start of run"
+rconfig  integer auxinput3_begin_d   namelist,time_control	max_domains    0     h   "auxinput3_begin_d"    ""   "DAYS from start of run"
+rconfig  integer auxinput3_begin_h   namelist,time_control	max_domains    0     h   "auxinput3_begin_h"    ""   "HOURS from start of run"
+rconfig  integer auxinput3_begin_m   namelist,time_control	max_domains    0     h   "auxinput3_begin_m"    ""   "MINUTES from start of run"
+rconfig  integer auxinput3_begin_s   namelist,time_control	max_domains    0     h   "auxinput3_begin_s"    ""   "SECONDS from start of run"
 
-rconfig  integer auxinput4_begin_y  namelist,time_control	max_domains    0     h   "auxinput4_begin_y"    ""   "YEARS"
-rconfig  integer auxinput4_begin_mo  namelist,time_control	max_domains    0     h   "auxinput4_begin_mo"    ""   "MONTHS"
-rconfig  integer auxinput4_begin_d   namelist,time_control	max_domains    0     h   "auxinput4_begin_d"    ""   "DAYS"
-rconfig  integer auxinput4_begin_h   namelist,time_control	max_domains    0     h   "auxinput4_begin_h"    ""   "HOURS"
-rconfig  integer auxinput4_begin_m   namelist,time_control	max_domains    0     h   "auxinput4_begin_m"    ""   "MINUTES"
-rconfig  integer auxinput4_begin_s   namelist,time_control	max_domains    0     h   "auxinput4_begin_s"    ""   "SECONDS"
+rconfig  integer auxinput4_begin_y  namelist,time_control	max_domains    0     h   "auxinput4_begin_y"    ""   "YEARS from start of run"
+rconfig  integer auxinput4_begin_mo  namelist,time_control	max_domains    0     h   "auxinput4_begin_mo"    ""   "MONTHS from start of run"
+rconfig  integer auxinput4_begin_d   namelist,time_control	max_domains    0     h   "auxinput4_begin_d"    ""   "DAYS from start of run"
+rconfig  integer auxinput4_begin_h   namelist,time_control	max_domains    0     h   "auxinput4_begin_h"    ""   "HOURS from start of run"
+rconfig  integer auxinput4_begin_m   namelist,time_control	max_domains    0     h   "auxinput4_begin_m"    ""   "MINUTES from start of run"
+rconfig  integer auxinput4_begin_s   namelist,time_control	max_domains    0     h   "auxinput4_begin_s"    ""   "SECONDS from start of run"
 
-rconfig  integer auxinput5_begin_y  namelist,time_control	max_domains    0     h   "auxinput5_begin_y"    ""   "YEARS"
-rconfig  integer auxinput5_begin_mo  namelist,time_control	max_domains    0     h   "auxinput5_begin_mo"    ""   "MONTHS"
-rconfig  integer auxinput5_begin_d   namelist,time_control	max_domains    0     h   "auxinput5_begin_d"    ""   "DAYS"
-rconfig  integer auxinput5_begin_h   namelist,time_control	max_domains    0     h   "auxinput5_begin_h"    ""   "HOURS"
-rconfig  integer auxinput5_begin_m   namelist,time_control	max_domains    0     h   "auxinput5_begin_m"    ""   "MINUTES"
-rconfig  integer auxinput5_begin_s   namelist,time_control	max_domains    0     h   "auxinput5_begin_s"    ""   "SECONDS"
+rconfig  integer auxinput5_begin_y  namelist,time_control	max_domains    0     h   "auxinput5_begin_y"    ""   "YEARS from start of run"
+rconfig  integer auxinput5_begin_mo  namelist,time_control	max_domains    0     h   "auxinput5_begin_mo"    ""   "MONTHS from start of run"
+rconfig  integer auxinput5_begin_d   namelist,time_control	max_domains    0     h   "auxinput5_begin_d"    ""   "DAYS from start of run"
+rconfig  integer auxinput5_begin_h   namelist,time_control	max_domains    0     h   "auxinput5_begin_h"    ""   "HOURS from start of run"
+rconfig  integer auxinput5_begin_m   namelist,time_control	max_domains    0     h   "auxinput5_begin_m"    ""   "MINUTES from start of run"
+rconfig  integer auxinput5_begin_s   namelist,time_control	max_domains    0     h   "auxinput5_begin_s"    ""   "SECONDS from start of run"
 
-rconfig  integer restart_begin_y  namelist,time_control		1              0     h   "restart_begin_y"    ""   "YEARS"
-rconfig  integer restart_begin_mo  namelist,time_control	1              0     h   "restart_begin_mo"    ""   "MONTHS"
-rconfig  integer restart_begin_d   namelist,time_control	1              0     h   "restart_begin_d"    ""   "DAYS"
-rconfig  integer restart_begin_h   namelist,time_control	1              0     h   "restart_begin_h"    ""   "HOURS"
-rconfig  integer restart_begin_m   namelist,time_control	1              0     h   "restart_begin_m"    ""   "MINUTES"
-rconfig  integer restart_begin_s   namelist,time_control	1              0     h   "restart_begin_s"    ""   "SECONDS"
+rconfig  integer restart_begin_y  namelist,time_control		1              0     h   "restart_begin_y"    ""   "YEARS from start of run"
+rconfig  integer restart_begin_mo  namelist,time_control	1              0     h   "restart_begin_mo"    ""   "MONTHS from start of run"
+rconfig  integer restart_begin_d   namelist,time_control	1              0     h   "restart_begin_d"    ""   "DAYS from start of run"
+rconfig  integer restart_begin_h   namelist,time_control	1              0     h   "restart_begin_h"    ""   "HOURS from start of run"
+rconfig  integer restart_begin_m   namelist,time_control	1              0     h   "restart_begin_m"    ""   "MINUTES from start of run"
+rconfig  integer restart_begin_s   namelist,time_control	1              0     h   "restart_begin_s"    ""   "SECONDS from start of run"
 
-rconfig integer history_end_y      namelist,time_control	max_domains    0    h  "history_end_y"       ""      "YEARS"
-rconfig integer history_end_mo     namelist,time_control	max_domains    0    h  "history_end_mo"       ""      "MONTHS"
-rconfig integer history_end_d      namelist,time_control	max_domains    0    h  "history_end_d"       ""      "DAYS"
-rconfig integer history_end_h      namelist,time_control	max_domains    0    h  "history_end_h"       ""      "HOURS"
-rconfig integer history_end_m      namelist,time_control	max_domains    0    h  "history_end_m"       ""      "MINUTES"
-rconfig integer history_end_s      namelist,time_control	max_domains    0    h  "history_end_s"       ""      "SECONDS"
+rconfig integer history_end_y      namelist,time_control	max_domains    0    h  "history_end_y"       ""      "YEARS from start of run"
+rconfig integer history_end_mo     namelist,time_control	max_domains    0    h  "history_end_mo"       ""      "MONTHS from start of run"
+rconfig integer history_end_d      namelist,time_control	max_domains    0    h  "history_end_d"       ""      "DAYS from start of run"
+rconfig integer history_end_h      namelist,time_control	max_domains    0    h  "history_end_h"       ""      "HOURS from start of run"
+rconfig integer history_end_m      namelist,time_control	max_domains    0    h  "history_end_m"       ""      "MINUTES from start of run"
+rconfig integer history_end_s      namelist,time_control	max_domains    0    h  "history_end_s"       ""      "SECONDS from start of run"
 
-rconfig integer inputout_end_y      namelist,time_control     max_domains    0    h  "inputout_end_y"       ""      "YEARS"
-rconfig integer inputout_end_mo      namelist,time_control     max_domains    0    h  "inputout_end_mo"       ""      "MONTHS"
-rconfig integer inputout_end_d      namelist,time_control     max_domains    0    h  "inputout_end_d"       ""      "DAYS"
-rconfig integer inputout_end_h      namelist,time_control     max_domains    0    h  "inputout_end_h"       ""      "HOURS"
-rconfig integer inputout_end_m      namelist,time_control     max_domains    0    h  "inputout_end_m"       ""      "MINUTES"
-rconfig integer inputout_end_s      namelist,time_control     max_domains    0    h  "inputout_end_s"       ""      "SECONDS"
+rconfig integer inputout_end_y      namelist,time_control     max_domains    0    h  "inputout_end_y"       ""      "YEARS from start of run"
+rconfig integer inputout_end_mo      namelist,time_control     max_domains    0    h  "inputout_end_mo"       ""      "MONTHS from start of run"
+rconfig integer inputout_end_d      namelist,time_control     max_domains    0    h  "inputout_end_d"       ""      "DAYS from start of run"
+rconfig integer inputout_end_h      namelist,time_control     max_domains    0    h  "inputout_end_h"       ""      "HOURS from start of run"
+rconfig integer inputout_end_m      namelist,time_control     max_domains    0    h  "inputout_end_m"       ""      "MINUTES from start of run"
+rconfig integer inputout_end_s      namelist,time_control     max_domains    0    h  "inputout_end_s"       ""      "SECONDS from start of run"
 
-rconfig integer auxhist1_end_y      namelist,time_control     max_domains    0    h  "auxhist1_end_y"       ""      "YEARS"
-rconfig integer auxhist1_end_mo      namelist,time_control     max_domains    0    h  "auxhist1_end_mo"       ""      "MONTHS"
-rconfig integer auxhist1_end_d      namelist,time_control     max_domains    0    h  "auxhist1_end_d"       ""      "DAYS"
-rconfig integer auxhist1_end_h      namelist,time_control     max_domains    0    h  "auxhist1_end_h"       ""      "HOURS"
-rconfig integer auxhist1_end_m      namelist,time_control     max_domains    0    h  "auxhist1_end_m"       ""      "MINUTES"
-rconfig integer auxhist1_end_s      namelist,time_control     max_domains    0    h  "auxhist1_end_s"       ""      "SECONDS"
+rconfig integer auxhist1_end_y      namelist,time_control     max_domains    0    h  "auxhist1_end_y"       ""      "YEARS from start of run"
+rconfig integer auxhist1_end_mo      namelist,time_control     max_domains    0    h  "auxhist1_end_mo"       ""      "MONTHS from start of run"
+rconfig integer auxhist1_end_d      namelist,time_control     max_domains    0    h  "auxhist1_end_d"       ""      "DAYS from start of run"
+rconfig integer auxhist1_end_h      namelist,time_control     max_domains    0    h  "auxhist1_end_h"       ""      "HOURS from start of run"
+rconfig integer auxhist1_end_m      namelist,time_control     max_domains    0    h  "auxhist1_end_m"       ""      "MINUTES from start of run"
+rconfig integer auxhist1_end_s      namelist,time_control     max_domains    0    h  "auxhist1_end_s"       ""      "SECONDS from start of run"
 
-rconfig integer auxhist2_end_y      namelist,time_control     max_domains    0    h  "auxhist2_end_y"       ""      "YEARS"
-rconfig integer auxhist2_end_mo      namelist,time_control     max_domains    0    h  "auxhist2_end_mo"       ""      "MONTHS"
-rconfig integer auxhist2_end_d      namelist,time_control     max_domains    0    h  "auxhist2_end_d"       ""      "DAYS"
-rconfig integer auxhist2_end_h      namelist,time_control     max_domains    0    h  "auxhist2_end_h"       ""      "HOURS"
-rconfig integer auxhist2_end_m      namelist,time_control     max_domains    0    h  "auxhist2_end_m"       ""      "MINUTES"
-rconfig integer auxhist2_end_s      namelist,time_control     max_domains    0    h  "auxhist2_end_s"       ""      "SECONDS"
+rconfig integer auxhist2_end_y      namelist,time_control     max_domains    0    h  "auxhist2_end_y"       ""      "YEARS from start of run"
+rconfig integer auxhist2_end_mo      namelist,time_control     max_domains    0    h  "auxhist2_end_mo"       ""      "MONTHS from start of run"
+rconfig integer auxhist2_end_d      namelist,time_control     max_domains    0    h  "auxhist2_end_d"       ""      "DAYS from start of run"
+rconfig integer auxhist2_end_h      namelist,time_control     max_domains    0    h  "auxhist2_end_h"       ""      "HOURS from start of run"
+rconfig integer auxhist2_end_m      namelist,time_control     max_domains    0    h  "auxhist2_end_m"       ""      "MINUTES from start of run"
+rconfig integer auxhist2_end_s      namelist,time_control     max_domains    0    h  "auxhist2_end_s"       ""      "SECONDS from start of run"
 
-rconfig integer auxhist3_end_y      namelist,time_control     max_domains    0    h  "auxhist3_end_y"       ""      "YEARS"
-rconfig integer auxhist3_end_mo      namelist,time_control     max_domains    0    h  "auxhist3_end_mo"       ""      "MONTHS"
-rconfig integer auxhist3_end_d      namelist,time_control     max_domains    0    h  "auxhist3_end_d"       ""      "DAYS"
-rconfig integer auxhist3_end_h      namelist,time_control     max_domains    0    h  "auxhist3_end_h"       ""      "HOURS"
-rconfig integer auxhist3_end_m      namelist,time_control     max_domains    0    h  "auxhist3_end_m"       ""      "MINUTES"
-rconfig integer auxhist3_end_s      namelist,time_control     max_domains    0    h  "auxhist3_end_s"       ""      "SECONDS"
+rconfig integer auxhist3_end_y      namelist,time_control     max_domains    0    h  "auxhist3_end_y"       ""      "YEARS from start of run"
+rconfig integer auxhist3_end_mo      namelist,time_control     max_domains    0    h  "auxhist3_end_mo"       ""      "MONTHS from start of run"
+rconfig integer auxhist3_end_d      namelist,time_control     max_domains    0    h  "auxhist3_end_d"       ""      "DAYS from start of run"
+rconfig integer auxhist3_end_h      namelist,time_control     max_domains    0    h  "auxhist3_end_h"       ""      "HOURS from start of run"
+rconfig integer auxhist3_end_m      namelist,time_control     max_domains    0    h  "auxhist3_end_m"       ""      "MINUTES from start of run"
+rconfig integer auxhist3_end_s      namelist,time_control     max_domains    0    h  "auxhist3_end_s"       ""      "SECONDS from start of run"
 
-rconfig integer auxhist4_end_y     namelist,time_control     max_domains    0    h  "auxhist4_end_y"       ""      "YEARS"
-rconfig integer auxhist4_end_mo     namelist,time_control     max_domains    0    h  "auxhist4_end_mo"       ""      "MONTHS"
-rconfig integer auxhist4_end_d      namelist,time_control     max_domains    0    h  "auxhist4_end_d"       ""      "DAYS"
-rconfig integer auxhist4_end_h      namelist,time_control     max_domains    0    h  "auxhist4_end_h"       ""      "HOURS"
-rconfig integer auxhist4_end_m      namelist,time_control     max_domains    0    h  "auxhist4_end_m"       ""      "MINUTES"
-rconfig integer auxhist4_end_s      namelist,time_control     max_domains    0    h  "auxhist4_end_s"       ""      "SECONDS"
+rconfig integer auxhist4_end_y     namelist,time_control     max_domains    0    h  "auxhist4_end_y"       ""      "YEARS from start of run"
+rconfig integer auxhist4_end_mo     namelist,time_control     max_domains    0    h  "auxhist4_end_mo"       ""      "MONTHS from start of run"
+rconfig integer auxhist4_end_d      namelist,time_control     max_domains    0    h  "auxhist4_end_d"       ""      "DAYS from start of run"
+rconfig integer auxhist4_end_h      namelist,time_control     max_domains    0    h  "auxhist4_end_h"       ""      "HOURS from start of run"
+rconfig integer auxhist4_end_m      namelist,time_control     max_domains    0    h  "auxhist4_end_m"       ""      "MINUTES from start of run"
+rconfig integer auxhist4_end_s      namelist,time_control     max_domains    0    h  "auxhist4_end_s"       ""      "SECONDS from start of run"
 
-rconfig integer auxhist5_end_y     namelist,time_control     max_domains    0    h  "auxhist5_end_y"       ""      "YEARS"
-rconfig integer auxhist5_end_mo     namelist,time_control     max_domains    0    h  "auxhist5_end_mo"       ""      "MONTHS"
-rconfig integer auxhist5_end_d      namelist,time_control     max_domains    0    h  "auxhist5_end_d"       ""      "DAYS"
-rconfig integer auxhist5_end_h      namelist,time_control     max_domains    0    h  "auxhist5_end_h"       ""      "HOURS"
-rconfig integer auxhist5_end_m      namelist,time_control     max_domains    0    h  "auxhist5_end_m"       ""      "MINUTES"
-rconfig integer auxhist5_end_s      namelist,time_control     max_domains    0    h  "auxhist5_end_s"       ""      "SECONDS"
+rconfig integer auxhist5_end_y     namelist,time_control     max_domains    0    h  "auxhist5_end_y"       ""      "YEARS from start of run"
+rconfig integer auxhist5_end_mo     namelist,time_control     max_domains    0    h  "auxhist5_end_mo"       ""      "MONTHS from start of run"
+rconfig integer auxhist5_end_d      namelist,time_control     max_domains    0    h  "auxhist5_end_d"       ""      "DAYS from start of run"
+rconfig integer auxhist5_end_h      namelist,time_control     max_domains    0    h  "auxhist5_end_h"       ""      "HOURS from start of run"
+rconfig integer auxhist5_end_m      namelist,time_control     max_domains    0    h  "auxhist5_end_m"       ""      "MINUTES from start of run"
+rconfig integer auxhist5_end_s      namelist,time_control     max_domains    0    h  "auxhist5_end_s"       ""      "SECONDS from start of run"
 
-rconfig integer auxinput1_end_y     namelist,time_control     max_domains    0    h  "auxinput1_end_y"       ""      "YEARS"
-rconfig integer auxinput1_end_mo     namelist,time_control     max_domains    0    h  "auxinput1_end_mo"       ""      "MONTHS"
-rconfig integer auxinput1_end_d      namelist,time_control     max_domains    0    h  "auxinput1_end_d"       ""      "DAYS"
-rconfig integer auxinput1_end_h      namelist,time_control     max_domains    0    h  "auxinput1_end_h"       ""      "HOURS"
-rconfig integer auxinput1_end_m      namelist,time_control     max_domains    0    h  "auxinput1_end_m"       ""      "MINUTES"
-rconfig integer auxinput1_end_s      namelist,time_control     max_domains    0    h  "auxinput1_end_s"       ""      "SECONDS"
+rconfig integer auxinput1_end_y     namelist,time_control     max_domains    0    h  "auxinput1_end_y"       ""      "YEARS from start of run"
+rconfig integer auxinput1_end_mo     namelist,time_control     max_domains    0    h  "auxinput1_end_mo"       ""      "MONTHS from start of run"
+rconfig integer auxinput1_end_d      namelist,time_control     max_domains    0    h  "auxinput1_end_d"       ""      "DAYS from start of run"
+rconfig integer auxinput1_end_h      namelist,time_control     max_domains    0    h  "auxinput1_end_h"       ""      "HOURS from start of run"
+rconfig integer auxinput1_end_m      namelist,time_control     max_domains    0    h  "auxinput1_end_m"       ""      "MINUTES from start of run"
+rconfig integer auxinput1_end_s      namelist,time_control     max_domains    0    h  "auxinput1_end_s"       ""      "SECONDS from start of run"
 
-rconfig integer auxinput2_end_y     namelist,time_control     max_domains    0    h  "auxinput2_end_y"       ""      "YEARS"
-rconfig integer auxinput2_end_mo     namelist,time_control     max_domains    0    h  "auxinput2_end_mo"       ""      "MONTHS"
-rconfig integer auxinput2_end_d      namelist,time_control     max_domains    0    h  "auxinput2_end_d"       ""      "DAYS"
-rconfig integer auxinput2_end_h      namelist,time_control     max_domains    0    h  "auxinput2_end_h"       ""      "HOURS"
-rconfig integer auxinput2_end_m      namelist,time_control     max_domains    0    h  "auxinput2_end_m"       ""      "MINUTES"
-rconfig integer auxinput2_end_s      namelist,time_control     max_domains    0    h  "auxinput2_end_s"       ""      "SECONDS"
+rconfig integer auxinput2_end_y     namelist,time_control     max_domains    0    h  "auxinput2_end_y"       ""      "YEARS from start of run"
+rconfig integer auxinput2_end_mo     namelist,time_control     max_domains    0    h  "auxinput2_end_mo"       ""      "MONTHS from start of run"
+rconfig integer auxinput2_end_d      namelist,time_control     max_domains    0    h  "auxinput2_end_d"       ""      "DAYS from start of run"
+rconfig integer auxinput2_end_h      namelist,time_control     max_domains    0    h  "auxinput2_end_h"       ""      "HOURS from start of run"
+rconfig integer auxinput2_end_m      namelist,time_control     max_domains    0    h  "auxinput2_end_m"       ""      "MINUTES from start of run"
+rconfig integer auxinput2_end_s      namelist,time_control     max_domains    0    h  "auxinput2_end_s"       ""      "SECONDS from start of run"
 
-rconfig integer auxinput3_end_y     namelist,time_control     max_domains    0    h  "auxinput3_end_y"       ""      "YEARS"
-rconfig integer auxinput3_end_mo     namelist,time_control     max_domains    0    h  "auxinput3_end_mo"       ""      "MONTHS"
-rconfig integer auxinput3_end_d      namelist,time_control     max_domains    0    h  "auxinput3_end_d"       ""      "DAYS"
-rconfig integer auxinput3_end_h      namelist,time_control     max_domains    0    h  "auxinput3_end_h"       ""      "HOURS"
-rconfig integer auxinput3_end_m      namelist,time_control     max_domains    0    h  "auxinput3_end_m"       ""      "MINUTES"
-rconfig integer auxinput3_end_s      namelist,time_control     max_domains    0    h  "auxinput3_end_s"       ""      "SECONDS"
+rconfig integer auxinput3_end_y     namelist,time_control     max_domains    0    h  "auxinput3_end_y"       ""      "YEARS from start of run"
+rconfig integer auxinput3_end_mo     namelist,time_control     max_domains    0    h  "auxinput3_end_mo"       ""      "MONTHS from start of run"
+rconfig integer auxinput3_end_d      namelist,time_control     max_domains    0    h  "auxinput3_end_d"       ""      "DAYS from start of run"
+rconfig integer auxinput3_end_h      namelist,time_control     max_domains    0    h  "auxinput3_end_h"       ""      "HOURS from start of run"
+rconfig integer auxinput3_end_m      namelist,time_control     max_domains    0    h  "auxinput3_end_m"       ""      "MINUTES from start of run"
+rconfig integer auxinput3_end_s      namelist,time_control     max_domains    0    h  "auxinput3_end_s"       ""      "SECONDS from start of run"
 
-rconfig integer auxinput4_end_y     namelist,time_control     max_domains    0    h  "auxinput4_end_y"       ""      "YEARS"
-rconfig integer auxinput4_end_mo     namelist,time_control     max_domains    0    h  "auxinput4_end_mo"       ""      "MONTHS"
-rconfig integer auxinput4_end_d      namelist,time_control     max_domains    0    h  "auxinput4_end_d"       ""      "DAYS"
-rconfig integer auxinput4_end_h      namelist,time_control     max_domains    0    h  "auxinput4_end_h"       ""      "HOURS"
-rconfig integer auxinput4_end_m      namelist,time_control     max_domains    0    h  "auxinput4_end_m"       ""      "MINUTES"
-rconfig integer auxinput4_end_s      namelist,time_control     max_domains    0    h  "auxinput4_end_s"       ""      "SECONDS"
+rconfig integer auxinput4_end_y     namelist,time_control     max_domains    0    h  "auxinput4_end_y"       ""      "YEARS from start of run"
+rconfig integer auxinput4_end_mo     namelist,time_control     max_domains    0    h  "auxinput4_end_mo"       ""      "MONTHS from start of run"
+rconfig integer auxinput4_end_d      namelist,time_control     max_domains    0    h  "auxinput4_end_d"       ""      "DAYS from start of run"
+rconfig integer auxinput4_end_h      namelist,time_control     max_domains    0    h  "auxinput4_end_h"       ""      "HOURS from start of run"
+rconfig integer auxinput4_end_m      namelist,time_control     max_domains    0    h  "auxinput4_end_m"       ""      "MINUTES from start of run"
+rconfig integer auxinput4_end_s      namelist,time_control     max_domains    0    h  "auxinput4_end_s"       ""      "SECONDS from start of run"
 
-rconfig integer auxinput5_end_y     namelist,time_control     max_domains    0    h  "auxinput5_end_y"       ""      "YEARS"
-rconfig integer auxinput5_end_mo     namelist,time_control     max_domains    0    h  "auxinput5_end_mo"       ""      "MONTHS"
-rconfig integer auxinput5_end_d      namelist,time_control     max_domains    0    h  "auxinput5_end_d"       ""      "DAYS"
-rconfig integer auxinput5_end_h      namelist,time_control     max_domains    0    h  "auxinput5_end_h"       ""      "HOURS"
-rconfig integer auxinput5_end_m      namelist,time_control     max_domains    0    h  "auxinput5_end_m"       ""      "MINUTES"
-rconfig integer auxinput5_end_s      namelist,time_control     max_domains    0    h  "auxinput5_end_s"       ""      "SECONDS"
+rconfig integer auxinput5_end_y     namelist,time_control     max_domains    0    h  "auxinput5_end_y"       ""      "YEARS from start of run"
+rconfig integer auxinput5_end_mo     namelist,time_control     max_domains    0    h  "auxinput5_end_mo"       ""      "MONTHS from start of run"
+rconfig integer auxinput5_end_d      namelist,time_control     max_domains    0    h  "auxinput5_end_d"       ""      "DAYS from start of run"
+rconfig integer auxinput5_end_h      namelist,time_control     max_domains    0    h  "auxinput5_end_h"       ""      "HOURS from start of run"
+rconfig integer auxinput5_end_m      namelist,time_control     max_domains    0    h  "auxinput5_end_m"       ""      "MINUTES from start of run"
+rconfig integer auxinput5_end_s      namelist,time_control     max_domains    0    h  "auxinput5_end_s"       ""      "SECONDS from start of run"
 
 rconfig   integer     io_form_auxinput1   namelist,time_control		1              2       h        "io_form_auxinput1"                 ""      ""
 rconfig   integer     io_form_auxinput2   namelist,time_control		1              2       h        "io_form_auxinput2"                 ""      ""
@@ -1002,7 +974,6 @@ rconfig   real    dx                      namelist,domains     max_domains    20
 rconfig   real    dy                      namelist,domains   	max_domains    200     h     "dy"        "Y HORIZONTAL RESOLUTION"   "METERS"
 rconfig   integer grid_id                 namelist,domains	max_domains    1       irh    "id"            ""      ""
 rconfig   integer parent_id               namelist,domains	max_domains    0       h     "parent_id"             ""      ""
-rconfig   integer level                   namelist,domains	max_domains    1       irh    "level"         ""      ""
 rconfig   integer i_parent_start          namelist,domains	max_domains    1       h     "i_parent_start"                ""      ""
 rconfig   integer j_parent_start          namelist,domains	max_domains    1       h     "j_parent_start"                ""      ""
 rconfig   integer parent_grid_ratio       namelist,domains	max_domains    1       h     "parent_grid_ratio"             ""      ""
@@ -1020,6 +991,11 @@ rconfig   integer nproc_x                 namelist,domains	1             -1     
 rconfig   integer nproc_y		  namelist,domains	1             -1       -      "nproc_y"              "-1 means not set"      ""
 rconfig   integer irand                   namelist,domains	1             0       -      "irand"           ""      ""
 rconfig   real    dt                      derived              max_domains    2.      h     "dt"        "TEMPORAL RESOLUTION"      "SECONDS"
+rconfig   integer   num_moves       namelist,domains    1                0
+rconfig   integer   move_id         namelist,domains    max_moves        0
+rconfig   integer   move_interval   namelist,domains    max_moves        999999999
+rconfig   integer   move_cd_x       namelist,domains    max_moves        0
+rconfig   integer   move_cd_y       namelist,domains    max_moves        0
 
 # Physics
 rconfig   integer     mp_physics          namelist,physics	max_domains    0       rh       "mp_physics"            ""      ""
@@ -1048,15 +1024,19 @@ rconfig   integer num_land_cat            namelist,physics	1            24      
 rconfig   integer num_soil_cat            namelist,physics	1            16       -      "num_soil_cat"                  ""      ""
 rconfig   integer mp_zero_out             namelist,physics	1             0       -      "mp_zero_out"  "microphysics fields set to zero  0=no action taken, 1=all fields but Qv, 2=all fields including Qv"      "flag"
 rconfig   real mp_zero_out_thresh         namelist,physics	1          1.e-8      -      "mp_zero_out_thresh"  "minimum threshold for non-Qv moist fields, below are set to zero"  "kg/kg"
+rconfig   real    seaice_threshold        namelist,physics      1            271       h    "seaice_threshold"  "tsk below which which water points are set to sea ice for slab scheme"   "K"
+rconfig   integer sst_update              namelist,physics      1            0         h    "sst_update"  "update sst from wrflowinp file  0=no, 1=yes"   ""
+
 
 # nmm variables
 rconfig   integer idtad                   namelist,physics     max_domains    2       irh    "nmm input 1"
 rconfig   integer nsoil                   namelist,physics     max_domains    4       irh    "nmm input 2"
-rconfig   integer nphs                    namelist,physics     max_domains   12       irh    "nmm input 3"
-rconfig   integer ncnvc                   namelist,physics     max_domains    4       irh    "nmm input 4"
-rconfig   integer nrads                   namelist,physics     max_domains  180       irh    "nmm input 5"
-rconfig   integer nradl                   namelist,physics     max_domains  180       irh    "nmm input 6"
+rconfig   integer nphs                    namelist,physics     max_domains   10       irh    "nmm input 3"
+rconfig   integer ncnvc                   namelist,physics     max_domains   10       irh    "nmm input 4"
+rconfig   integer nrads                   namelist,physics     max_domains  200       irh    "nmm input 5"
+rconfig   integer nradl                   namelist,physics     max_domains  200       irh    "nmm input 6"
 rconfig   integer sigma                   namelist,physics     max_domains    1       irh    "nmm input 7"
+rconfig   integer co2tf                   namelist,physics     1              0       -      "GFDL radiation co2 flag"
 
 # Dynamics
 # dynamics option (see package definitions, below)
@@ -1069,6 +1049,10 @@ rconfig   integer diff_opt                namelist,dynamics	1             1     
 rconfig   integer km_opt                  namelist,dynamics	1             1       irh    "km_opt"                ""      ""
 rconfig   integer damp_opt                namelist,dynamics	1             1       irh    "damp_opt"              ""      ""
 rconfig   real    zdamp                   namelist,dynamics	max_domains    5000.   h    "zdamp"         ""      ""
+rconfig   real    base_pres               namelist,dynamics     1          100000.     h    "base_pres"  "Base state pressure - do not change (10^5 Pa), real only"      "Pa"
+rconfig   real    base_temp               namelist,dynamics     1             290.     h    "base_temp"  "Base state sea level temperature, real
+only"      "K"
+rconfig   real    base_lapse              namelist,dynamics     1              50.     h    "base_lapse" "Base state temperature difference between base pres and 1/e of atm depth - do not change, real only"      "K"
 rconfig   real    dampcoef                namelist,dynamics     max_domains    0.2     h    "dampcoef"              ""      ""
 rconfig   real    khdif                   namelist,dynamics	max_domains    0       h    "khdif"         ""      ""
 rconfig   real    kvdif                   namelist,dynamics	max_domains    0       h    "kvdif"         ""      ""
@@ -1122,11 +1106,21 @@ rconfig   integer isice                   derived                  max_domains  
 rconfig   integer isurban                 derived                  max_domains    0       -        "isurban"              "land use index for 'urban and built-up"     "index category"
 rconfig   integer isoilwater              derived                  max_domains    0       -        "isoilwater"           "land use index of water for soil"        "index category"
 rconfig   integer map_proj                derived                  max_domains    0       -        "map_proj"             "domain map projection"      "0=none, 1=Lambert, 2=polar, 3=Mercator"
+rconfig   integer simulation_start_year   derived                  1              0       -        "simulation_start_year" "start of simulation through restarts" "4-digit year"
+rconfig   integer simulation_start_month  derived                  1              0       -        "simulation_start_month" "start of simulation through restarts" "2-digit month"
+rconfig   integer simulation_start_day    derived                  1              0       -        "simulation_start_day" "start of simulation through restarts" "2-digit day"
+rconfig   integer simulation_start_hour   derived                  1              0       -        "simulation_start_hour" "start of simulation through restarts" "2-digit hour"
+rconfig   integer simulation_start_minute derived                  1              0       -        "simulation_start_minute" "start of simulation through restarts" "2-digit minute"
+rconfig   integer simulation_start_second derived                  1              0       -        "simulation_start_second" "start of simulation through restarts" "2-digit second"
 
+#
+# Single dummy declaration to define a nodyn dyn option
+state integer nodyn_dummy - dyn_nodyn -  -  -  "" "" ""
 
 #key      package       associated                package          associated 4d scalars
 #         name          namelist choice           state vars
 
+package   dyn_nodyn     dyn_opt==0                   -             -
 package   dyn_nmm       dyn_opt==4                   -             -
 
 
@@ -1144,10 +1138,10 @@ package   etampnew      mp_physics==5                -             moist:qv,qc
 package   wsm6scheme    mp_physics==6                -             moist:qv,qc,qr,qi,qs,qg
 package   ncepcloud3    mp_physics==98               -             moist:qv,qc,qr
 package   ncepcloud5    mp_physics==99               -             moist:qv,qc,qr,qi,qs
-#package   reisner2      mp_physics==8                -             moist:qv,qc,qr,qi,qs,qg;chem:qn
+package   thompson       mp_physics==8               -             moist:qv,qc,qr,qi,qs,qg;scalar:qni
 
 package   rrtmscheme    ra_lw_physics==1             -             -
-package   gfdllwscheme  ra_lw_physics==99            -             -
+package   gfdllwscheme  ra_lw_physics==99            -             moist:qv,qc,qr,qi
 
 package   swradscheme   ra_sw_physics==1             -             -
 package   gsfcswscheme  ra_sw_physics==2             -             -
@@ -1155,30 +1149,35 @@ package   gfdlswscheme  ra_sw_physics==99            -             -
 
 package   sfclayscheme   sf_sfclay_physics==1        -             -
 package   myjsfcscheme   sf_sfclay_physics==2        -             -
+package   gfssfcscheme   sf_sfclay_physics==3        -             -
 package   slabscheme     sf_surface_physics==1       -             -
 package   lsmscheme      sf_surface_physics==2       -             -
 package   ruclsmscheme   sf_surface_physics==3       -             -
 package   nmmlsmscheme   sf_surface_physics==99      -             -
 package   ysuscheme      bl_pbl_physics==1           -             -
 package   myjpblscheme   bl_pbl_physics==2           -             -
+package   gfsscheme      bl_pbl_physics==3           -             -
 package   mrfscheme      bl_pbl_physics==99          -             -
 
 package   kfetascheme    cu_physics==1               -             -
 package   bmjscheme      cu_physics==2               -             -
 package   gdscheme       cu_physics==3               -             -
+package   sasscheme      cu_physics==4               -             -
 package   kfscheme       cu_physics==99              -             -
                                                 
 # only need to specify these once; not for every io_form* variable
 package   io_intio    io_form_restart==1                     -             -
 package   io_netcdf   io_form_restart==2                     -             -
-
-# Four placeholders for additional packages (we can go beyond zzz 
+# Placeholders for additional packages (we can go beyond zzz 
 # but that will entail modifying frame/module_io.F and frame/md_calls.m4)
 # Please note these are placeholders; HDF has not been implemented yet.
 package   io_hdf      io_form_restart==3                     -             -
 package   io_phdf5    io_form_restart==4                     -             -
+# yyy = grib output from WSI
 package   io_yyy      io_form_restart==5                     -             -
-package   io_zzz      io_form_restart==6                     -             -
+package   io_mcel     io_form_restart==6                     -             -
+package   io_esmf     io_form_restart==7                     -             -
+package   io_zzz      io_form_restart==8                     -             -
                                                 
 ## communications                                               
 
@@ -1198,8 +1197,8 @@ halo HALO_NMM_INIT_8	dyn_nmm 120:GLON,EPSR,TG
 halo HALO_NMM_INIT_9	dyn_nmm 120:GFFC,SST,ALBASE
 #halo HALO_NMM_INIT_10	dyn_nmm 120:HDAC,HDACV,IVGTYP
 halo HALO_NMM_INIT_10	dyn_nmm 120:HDAC,HDACV
-#halo HALO_NMM_INIT_11	dyn_nmm 120:ISLTYP,ISLOPE,VEGFRA
-halo HALO_NMM_INIT_11	dyn_nmm 120:VEGFRA
+#halo HALO_NMM_INIT_11	dyn_nmm 120:ISLTYP,ISLOPE,VEGFRC
+halo HALO_NMM_INIT_11	dyn_nmm 120:VEGFRC
 halo HALO_NMM_INIT_12	dyn_nmm 120:OMGALF,PD,RES
 halo HALO_NMM_INIT_13	dyn_nmm 120:FIS,T,U
 halo HALO_NMM_INIT_14	dyn_nmm 120:V,Q,Q2

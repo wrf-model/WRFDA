@@ -3,9 +3,14 @@ SUBROUTINE da_get_innov_vector( it, ob, iv, &
 #include <em_dummy_args.inc>
                  )
 
-!----------------------------------------------------------------------------   
+
+!----------------------------------------------------------------------------
 !--Purpose: Compute O-B for different observation types:
-!----------------------------------------------------------------------------   
+!           03/04/2005 - AMV's from Geostationary and       Syed  RH  Rizvi
+!                        Polar orbiting satellite are
+!                        seperated & used as profile
+!
+!----------------------------------------------------------------------------
 
    IMPLICIT NONE
 
@@ -40,7 +45,7 @@ SUBROUTINE da_get_innov_vector( it, ob, iv, &
 
       if(num_fgat_time > 1) then
          write(filename(1:10), fmt='(a, i2.2)') 'fgat_fg.', n
-         call med_initialdata_input_3dvar ( grid , config_flags, filename )
+         call med_initialdata_input_3dvar ( grid , config_flags, in_filename=filename )
          call DA_Setup_FirstGuess( xbx, grid, &
 #include <em_dummy_args.inc>
                            )
@@ -55,9 +60,14 @@ SUBROUTINE da_get_innov_vector( it, ob, iv, &
 
       call da_get_innov_vector_synop( it, xb, xp, ob, iv )
 
-!-----Cloud track winds:
+!-----Geostationary Satellite AMVs:
 
-      call da_get_innov_vector_satob( it, xb, xp, ob, iv )
+      call da_get_innov_vector_geoamv( it, xb, xp, ob, iv )
+
+
+!-----Polar orbitting Satellite AMVs:
+
+      call da_get_innov_vector_polaramv( it, xb, xp, ob, iv )
 
 !-----Aireps:
 
@@ -66,6 +76,10 @@ SUBROUTINE da_get_innov_vector( it, ob, iv, &
 !-----Pilot:
 
       call da_get_innov_vector_pilot( it, xb, xp, ob, iv )
+
+!-----TC bogus
+
+      call da_get_innov_vector_bogus( it, xb, xp, ob, iv )
 
 !-----Metar:
 

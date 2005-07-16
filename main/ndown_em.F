@@ -10,11 +10,10 @@ PROGRAM ndown_em
    USE module_driver_constants
    USE module_configure
    USE module_io_domain
-   USE esmf_mod
+   USE module_utility
 
    USE module_timing
    USE module_wrf_error
-
 #ifdef DM_PARALLEL
    USE module_dm
 #endif
@@ -95,7 +94,7 @@ character(len=24) :: start_date_hold
 
    CHARACTER (LEN=80)      :: message
 integer :: ii
-   TYPE(ESMF_TimeInterval) :: time_interval
+   TYPE(WRF_UTIL_TimeInterval) :: time_interval
 
    !  Interface block for routine that passes pointers and needs to know that they
    !  are receiving pointers.
@@ -128,7 +127,9 @@ integer :: ii
    !  REAL, setting the file handles to a pre-use value, defining moisture and 
    !  chemistry indices, etc.
 
-   CALL init_modules
+   CALL init_modules(1)   ! Phase 1 returns after MPI_INIT() (if it is called)
+   CALL WRF_UTIL_Initialize( defaultCalendar=WRF_UTIL_CAL_GREGORIAN, rc=rc )
+   CALL init_modules(2)   ! Phase 2 resumes after MPI_INIT() (if it is called)
 
    !  Get the NAMELIST data.  This is handled in the initial_config routine.  All of the
    !  NAMELIST input variables are assigned to the model_config_rec structure.  Below,
@@ -169,8 +170,8 @@ integer :: ii
    !  Set up time initializations.
 
    CALL Setup_Timekeeping ( parent_grid )
-   CALL ESMF_TimeIntervalSet ( time_interval , S=model_config_rec%interval_seconds, rc=rc )
-   CALL ESMF_ClockSetTimeStep ( head_grid%domain_clock , time_interval , rc=rc )
+   CALL WRF_UTIL_TimeIntervalSet ( time_interval , S=model_config_rec%interval_seconds, rc=rc )
+   CALL WRF_UTIL_ClockSet ( head_grid%domain_clock , timeStep=time_interval , rc=rc )
 
    CALL       wrf_debug ( 100 , 'ndown_em: calling model_to_grid_config_rec ' )
    CALL model_to_grid_config_rec ( parent_grid%id , model_config_rec , config_flags )
@@ -210,6 +211,14 @@ integer :: ii
            model_config_rec%  end_minute(parent_grid%id) , &
            model_config_rec%  end_second(parent_grid%id) 
 
+   !  Override stop time with value computed above.
+   CALL wrf_atotime( end_date_char, parent_grid%stop_time )
+   CALL WRF_UTIL_ClockSet ( parent_grid%domain_clock , StopTime=parent_grid%stop_time, rc=rc )
+   CALL wrf_check_error( WRF_UTIL_SUCCESS, rc, &
+                         'WRF_UTIL_ClockSet(parent_grid%domain_clock) FAILED', &
+                         __FILE__ , &
+                         __LINE__  )
+
    CALL geth_idts ( end_date_char , start_date_char , total_time_sec ) 
 
    new_bdy_frq = model_config_rec%interval_seconds
@@ -226,7 +235,6 @@ integer :: ii
 
    file_counter = 1
    need_new_file = .FALSE.
-   CALL init_module_get_file_names
    CALL unix_ls ( 'wrfout' , parent_grid%id )
 
    !  Open the input data (wrfout_d01_xxxxxx) for reading.
@@ -251,8 +259,8 @@ print *,'-------->>>  Processing data: loop=',time_loop,'  date/time = ',date_st
       current_date      = date_string // '.0000'
       start_date        = date_string // '.0000'
 print *,'loopmax = ', time_loop_max, '   ending date = ',end_date_char
-      CALL atotime( current_date(1:19), parent_grid%current_time )
-      CALL ESMF_ClockSetCurrTime(parent_grid%domain_clock, parent_grid%current_time, rc)
+      CALL wrf_atotime( current_date(1:19), parent_grid%current_time )
+      CALL WRF_UTIL_ClockSet(parent_grid%domain_clock, currTime=parent_grid%current_time, rc=rc)
 
       !  Which times are in this file, and more importantly, are any of them the
       !  ones that we want?  We need to loop over times in each files, loop
@@ -331,10 +339,17 @@ print *,'file date/time = ',date_string,'     desired date = ',current_date_char
          !  Set up time initializations for the fine grid.
 
          CALL Setup_Timekeeping ( nested_grid )
-         CALL ESMF_TimeIntervalSet ( time_interval , S=model_config_rec%interval_seconds, rc=rc )
-         CALL ESMF_ClockSetTimeStep ( nested_grid%domain_clock , time_interval , rc=rc )
-         CALL atotime( current_date(1:19), nested_grid%current_time )
-         CALL ESMF_ClockSetCurrTime(nested_grid%domain_clock, nested_grid%current_time, rc)
+         CALL WRF_UTIL_TimeIntervalSet ( time_interval , S=model_config_rec%interval_seconds, rc=rc )
+         CALL wrf_atotime( current_date(1:19), nested_grid%current_time )
+         ! Strictly speaking, nest stop time should come from model_config_rec...  
+         CALL WRF_UTIL_ClockSet( nested_grid%domain_clock, timeStep=time_interval,            &
+                                                       currTime=nested_grid%current_time, &
+                                                       StopTime=parent_grid%stop_time, &
+                                                       rc=rc )
+         CALL wrf_check_error( WRF_UTIL_SUCCESS, rc, &
+                               'WRF_UTIL_ClockSet(nested_grid%domain_clock) FAILED', &
+                               __FILE__ , &
+                               __LINE__  )
 
          !  Generate an output file from this program, which will be an input file to WRF.
 
@@ -461,9 +476,10 @@ nested_grid%chem_in_opt = parent_grid%chem_in_opt
 
       END IF
 
-      CALL ESMF_ClockSetTimeStep ( nested_grid%domain_clock , time_interval , rc=rc )
-      CALL atotime( current_date(1:19), nested_grid%current_time )
-      CALL ESMF_ClockSetCurrTime(nested_grid%domain_clock, nested_grid%current_time, rc)
+      CALL wrf_atotime( current_date(1:19), nested_grid%current_time )
+      CALL WRF_UTIL_ClockSet( nested_grid%domain_clock, timeStep=time_interval,            &
+                                                    currTime=nested_grid%current_time, &
+                                                    rc=rc )
 
       !  Do the horizontal interpolation.
 
@@ -582,8 +598,8 @@ nested_grid%chem_in_opt = parent_grid%chem_in_opt
          !  Set the time info.
 
          print *,'current_date = ',current_date
-         CALL atotime( current_date(1:19), nested_grid%current_time )
-         CALL ESMF_ClockSetCurrTime(nested_grid%domain_clock, nested_grid%current_time, rc)
+         CALL wrf_atotime( current_date(1:19), nested_grid%current_time )
+         CALL WRF_UTIL_ClockSet(nested_grid%domain_clock, currTime=nested_grid%current_time, rc=rc)
 !
 ! SEP     Put in chemistry data
 !
@@ -661,7 +677,7 @@ print *,'gmt=',gmt
          CALL couple ( nested_grid%em_mu_2 , nested_grid%em_mub , pbdy3dtemp1 , nested_grid%em_ph_2                , &
                        'h' , nested_grid%msft , &
                        ids, ide, jds, jde, kds, kde, ims, ime, jms, jme, kms, kme, ips, ipe, jps, jpe, kps, kpe )
-         CALL couple ( nested_grid%em_mu_2 , nested_grid%em_mub , qbdy3dtemp1 , nested_grid%moist_2(:,:,:,P_QV)    , &
+         CALL couple ( nested_grid%em_mu_2 , nested_grid%em_mub , qbdy3dtemp1 , nested_grid%moist(:,:,:,P_QV)    , &
                        't' , nested_grid%msft , &
                        ids, ide, jds, jde, kds, kde, ims, ime, jms, jme, kms, kme, ips, ipe, jps, jpe, kps, kpe )
 
@@ -690,7 +706,8 @@ print *,'gmt=',gmt
                                                                            ids , ide , jds , jde , kds , kde , &
                                                                            ims , ime , jms , jme , kms , kme , &
                                                                            ips , ipe , jps , jpe , kps , kpe )
-         CALL stuff_bdy     ( qbdy3dtemp1 , nested_grid%em_rqv_b   , 'T' , ijds , ijde , spec_bdy_width      , &
+         CALL stuff_bdy     ( qbdy3dtemp1 , nested_grid%moist_b(:,:,:,:,P_QV)                                  &
+                                                                   , 'T' , ijds , ijde , spec_bdy_width      , &
                                                                            ids , ide , jds , jde , kds , kde , &
                                                                            ims , ime , jms , jme , kms , kme , &
                                                                            ips , ipe , jps , jpe , kps , kpe )
@@ -713,7 +730,7 @@ print *,'gmt=',gmt
          CALL couple ( nested_grid%em_mu_2 , nested_grid%em_mub , pbdy3dtemp2 , nested_grid%em_ph_2                , &
                        'h' , nested_grid%msft , &
                        ids, ide, jds, jde, kds, kde, ims, ime, jms, jme, kms, kme, ips, ipe, jps, jpe, kps, kpe )
-         CALL couple ( nested_grid%em_mu_2 , nested_grid%em_mub , qbdy3dtemp2 , nested_grid%moist_2(:,:,:,P_QV)    , &
+         CALL couple ( nested_grid%em_mu_2 , nested_grid%em_mub , qbdy3dtemp2 , nested_grid%moist(:,:,:,P_QV)    , &
                        't' , nested_grid%msft , &
                        ids, ide, jds, jde, kds, kde, ims, ime, jms, jme, kms, kme, ips, ipe, jps, jpe, kps, kpe )
 
@@ -747,7 +764,7 @@ print *,'gmt=',gmt
                                                                   ids , ide , jds , jde , kds , kde , &
                                                                   ims , ime , jms , jme , kms , kme , &
                                                                   ips , ipe , jps , jpe , kps , kpe )
-         CALL stuff_bdytend ( qbdy3dtemp2 , qbdy3dtemp1 , new_bdy_frq , nested_grid%em_rqv_bt , 'T' , &
+         CALL stuff_bdytend ( qbdy3dtemp2 , qbdy3dtemp1 , new_bdy_frq , nested_grid%moist_bt(:,:,:,:,P_QV), 'T' , &
                                                                   ijds , ijde , spec_bdy_width      , &
                                                                   ids , ide , jds , jde , kds , kde , &
                                                                   ims , ime , jms , jme , kms , kme , &
@@ -774,8 +791,8 @@ print *,'gmt=',gmt
 
          !  Both pieces of the boundary data are now available to be written.
          
-      CALL atotime( current_date(1:19), nested_grid%current_time )
-      CALL ESMF_ClockSetCurrTime(nested_grid%domain_clock, nested_grid%current_time, rc)
+      CALL wrf_atotime( current_date(1:19), nested_grid%current_time )
+      CALL WRF_UTIL_ClockSet(nested_grid%domain_clock, currTime=nested_grid%current_time, rc=rc)
       temp24= current_date
       temp24b=start_date_hold
       start_date = start_date_hold
@@ -788,14 +805,14 @@ print *,'gmt=',gmt
       CALL wrf_put_dom_ti_real    ( fidb , 'GMT' , gmt , 1 , ierr ) 
       CALL wrf_put_dom_ti_integer ( fidb , 'JULYR' , julyr , 1 , ierr ) 
       CALL wrf_put_dom_ti_integer ( fidb , 'JULDAY' , julday , 1 , ierr ) 
-      CALL atotime( current_date(1:19), nested_grid%current_time )
-      CALL ESMF_ClockSetCurrTime(nested_grid%domain_clock, nested_grid%current_time, rc)
+      CALL wrf_atotime( current_date(1:19), nested_grid%current_time )
+      CALL WRF_UTIL_ClockSet(nested_grid%domain_clock, currTime=nested_grid%current_time, rc=rc)
 print *,'bdy time = ',time_loop-1,'  bdy date = ',current_date,' ',start_date
       CALL output_boundary ( fidb , nested_grid , config_flags , ierr )
       current_date = temp24
       start_date = temp24b
-      CALL atotime( current_date(1:19), nested_grid%current_time )
-      CALL ESMF_ClockSetCurrTime(nested_grid%domain_clock, nested_grid%current_time, rc)
+      CALL wrf_atotime( current_date(1:19), nested_grid%current_time )
+      CALL WRF_UTIL_ClockSet(nested_grid%domain_clock, currTime=nested_grid%current_time, rc=rc)
 
          IF ( time_loop .EQ. 2 ) THEN
             CALL wrf_put_dom_ti_real    ( fidb , 'BDYFRQ' , new_bdy_frq , 1 , ierr ) 
@@ -842,7 +859,7 @@ print *,'bdy time = ',time_loop-1,'  bdy date = ',current_date,' ',start_date
                                                                            ids , ide , jds , jde , kds , kde , &
                                                                            ims , ime , jms , jme , kms , kme , &
                                                                            ips , ipe , jps , jpe , kps , kpe )
-         CALL stuff_bdy     ( qbdy3dtemp1 , nested_grid%em_rqv_b   , 'T' , ijds , ijde , spec_bdy_width      , &
+         CALL stuff_bdy     ( qbdy3dtemp1 , nested_grid%moist_b(:,:,:,:,P_QV)   , 'T' , ijds , ijde , spec_bdy_width      , &
                                                                            ids , ide , jds , jde , kds , kde , &
                                                                            ims , ime , jms , jme , kms , kme , &
                                                                            ips , ipe , jps , jpe , kps , kpe )
@@ -865,7 +882,7 @@ print *,'bdy time = ',time_loop-1,'  bdy date = ',current_date,' ',start_date
          CALL couple ( nested_grid%em_mu_2 , nested_grid%em_mub , pbdy3dtemp2 , nested_grid%em_ph_2                , &
                        'h' , nested_grid%msft , &
                        ids, ide, jds, jde, kds, kde, ims, ime, jms, jme, kms, kme, ips, ipe, jps, jpe, kps, kpe )
-         CALL couple ( nested_grid%em_mu_2 , nested_grid%em_mub , qbdy3dtemp2 , nested_grid%moist_2(:,:,:,P_QV)    , &
+         CALL couple ( nested_grid%em_mu_2 , nested_grid%em_mub , qbdy3dtemp2 , nested_grid%moist(:,:,:,P_QV)    , &
                        't' , nested_grid%msft , &
                        ids, ide, jds, jde, kds, kde, ims, ime, jms, jme, kms, kme, ips, ipe, jps, jpe, kps, kpe )
          mbdy2dtemp2(:,1,:) = nested_grid%em_mu_2(:,:)
@@ -894,7 +911,7 @@ print *,'bdy time = ',time_loop-1,'  bdy date = ',current_date,' ',start_date
                                                                   ids , ide , jds , jde , kds , kde , &
                                                                   ims , ime , jms , jme , kms , kme , &
                                                                   ips , ipe , jps , jpe , kps , kpe )
-         CALL stuff_bdytend ( qbdy3dtemp2 , qbdy3dtemp1 , new_bdy_frq , nested_grid%em_rqv_bt , 'T' , &
+         CALL stuff_bdytend ( qbdy3dtemp2 , qbdy3dtemp1 , new_bdy_frq , nested_grid%moist_bt(:,:,:,:,P_QV) , 'T' , &
                                                                   ijds , ijde , spec_bdy_width      , &
                                                                   ids , ide , jds , jde , kds , kde , &
                                                                   ims , ime , jms , jme , kms , kme , &
@@ -922,8 +939,8 @@ print *,'bdy time = ',time_loop-1,'  bdy date = ',current_date,' ',start_date
 
          !  Both pieces of the boundary data are now available to be written.
 
-      CALL atotime( current_date(1:19), nested_grid%current_time )
-      CALL ESMF_ClockSetCurrTime(nested_grid%domain_clock, nested_grid%current_time, rc)
+      CALL wrf_atotime( current_date(1:19), nested_grid%current_time )
+      CALL WRF_UTIL_ClockSet(nested_grid%domain_clock, currTime=nested_grid%current_time, rc=rc)
       temp24= current_date
       temp24b=start_date_hold
       start_date = start_date_hold
@@ -936,13 +953,13 @@ print *,'bdy time = ',time_loop-1,'  bdy date = ',current_date,' ',start_date
       CALL wrf_put_dom_ti_real    ( fidb , 'GMT' , gmt , 1 , ierr ) 
       CALL wrf_put_dom_ti_integer ( fidb , 'JULYR' , julyr , 1 , ierr ) 
       CALL wrf_put_dom_ti_integer ( fidb , 'JULDAY' , julday , 1 , ierr ) 
-      CALL atotime( current_date(1:19), nested_grid%current_time )
-      CALL ESMF_ClockSetCurrTime(nested_grid%domain_clock, nested_grid%current_time, rc)
+      CALL wrf_atotime( current_date(1:19), nested_grid%current_time )
+      CALL WRF_UTIL_ClockSet(nested_grid%domain_clock, currTime=nested_grid%current_time, rc=rc)
       CALL output_boundary ( fidb , nested_grid , config_flags , ierr )
       current_date = temp24
       start_date = temp24b
-      CALL atotime( current_date(1:19), nested_grid%current_time )
-      CALL ESMF_ClockSetCurrTime(nested_grid%domain_clock, nested_grid%current_time, rc)
+      CALL wrf_atotime( current_date(1:19), nested_grid%current_time )
+      CALL WRF_UTIL_ClockSet(nested_grid%domain_clock, currTime=nested_grid%current_time, rc=rc)
 
          IF ( time_loop .EQ. 2 ) THEN
             CALL wrf_put_dom_ti_real    ( fidb , 'BDYFRQ' , new_bdy_frq , 1 , ierr ) 
@@ -969,6 +986,8 @@ print *,'bdy time = ',time_loop-1,'  bdy date = ',current_date,' ',start_date
    CALL wrf_debug ( 0 , 'ndown_em: SUCCESS COMPLETE NDOWN_EM INIT' )
 
    CALL wrf_shutdown
+
+   CALL WRF_UTIL_Finalize( rc=rc )
 
 END PROGRAM ndown_em
 

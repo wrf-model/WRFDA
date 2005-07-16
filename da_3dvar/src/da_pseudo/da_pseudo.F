@@ -7,6 +7,25 @@ MODULE da_pseudo
    USE DA_Tools
    USE PAR_UTIL
 
+! The "stats_pseudo_type" is ONLY used locally in DA_Pseudo:
+
+   TYPE residual_pseudo1_type
+      REAL          :: u                        ! u-wind.
+      REAL          :: v                        ! v-wind.
+      REAL          :: t                        ! temperature
+      REAL          :: p                        ! pressure
+      REAL          :: q                        ! specific humidity
+   END TYPE residual_pseudo1_type
+
+   TYPE maxmin_pseudo_stats_type
+        TYPE (maxmin_type)         :: u, v, t, p, q
+   END TYPE maxmin_pseudo_stats_type
+
+   TYPE stats_pseudo_type
+        TYPE (maxmin_pseudo_stats_type)  :: maximum, minimum
+        TYPE (residual_pseudo1_type)     :: average, rms_err
+   END TYPE stats_pseudo_type
+
 CONTAINS
 
 #include <da_cal_jo_and_grady_pseudo.inc>

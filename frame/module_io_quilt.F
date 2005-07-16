@@ -981,8 +981,15 @@ MODULE module_wrf_quilt
                     WRITE(*,*)'>>> ',TRIM(DateStr), ' ', TRIM(VarName), ' ', TRIM(MemoryOrder), ' ', &
                          (PatchEnd(1)-PatchStart(1)+1)*(PatchEnd(2)-PatchStart(2)+1)*(PatchEnd(3)-PatchStart(3)+1)
 
-                    IF ( FieldType .EQ. WRF_REAL4 .OR. FieldType .EQ. WRF_REAL8)  THEN
-                      CALL mpi_type_size( MPI_REAL, ftypesize, ierr )
+                    IF ( FieldType .EQ. WRF_REAL .OR. FieldType .EQ. WRF_DOUBLE)  THEN
+                      ! Note that the WRF_DOUBLE branch of this IF statement must come first since 
+                      ! WRF_REAL is set equal to WRF_DOUBLE during autopromotion builds.  
+                      IF ( FieldType .EQ. WRF_DOUBLE)  THEN
+! this branch has not been tested TBH: 20050406
+                        CALL mpi_type_size( MPI_DOUBLE_PRECISION, ftypesize, ierr )
+                      ELSE
+                        CALL mpi_type_size( MPI_REAL, ftypesize, ierr )
+                      ENDIF
                       stored_write_record = .true.
                       CALL store_patch_in_outbuf ( bigbuf(icurs/inttypesize), dummybuf, TRIM(DateStr), TRIM(VarName) , &
                                                    FieldType, TRIM(MemoryOrder), TRIM(Stagger), DimNames, &
@@ -1312,7 +1319,7 @@ SUBROUTINE wrf_quilt_open_for_write_begin( FileName , Comm_compute, Comm_io, Sys
   INTEGER ,       INTENT(OUT) :: Status
 ! Local
   CHARACTER*132   :: locFileName, locSysDepInfo
-  INTEGER i, typesize, itypesize, tasks_in_group, ierr, comm_io_group
+  INTEGER i, itypesize, tasks_in_group, ierr, comm_io_group
   LOGICAL, EXTERNAL :: wrf_dm_on_monitor
   REAL dummy
 
@@ -1334,7 +1341,6 @@ SUBROUTINE wrf_quilt_open_for_write_begin( FileName , Comm_compute, Comm_io, Sys
 
   iserver = 1 ! only one server group for now
   CALL get_mpi_comm_io_groups( comm_io_group , iserver )
-  CALL MPI_TYPE_SIZE( MPI_REAL, typesize, ierr )
 
   CALL mpi_x_comm_size( comm_io_group , tasks_in_group , ierr )
 
@@ -1373,7 +1379,7 @@ SUBROUTINE wrf_quilt_open_for_write_commit( DataHandle , Status )
   INCLUDE 'intio_tags.h'
   INTEGER ,       INTENT(IN ) :: DataHandle
   INTEGER ,       INTENT(OUT) :: Status
-  INTEGER i, typesize, itypesize, tasks_in_group, ierr, comm_io_group
+  INTEGER i, itypesize, tasks_in_group, ierr, comm_io_group
   REAL dummy
 
   CALL wrf_debug ( DEBUG_LVL, 'in wrf_quilt_open_for_write_commit' ) 
@@ -1389,7 +1395,6 @@ SUBROUTINE wrf_quilt_open_for_write_commit( DataHandle , Status )
 
   iserver = 1 ! only one server group for now
   CALL get_mpi_comm_io_groups( comm_io_group , iserver )
-  CALL MPI_TYPE_SIZE( MPI_REAL, typesize, ierr )
 
   CALL mpi_x_comm_size( comm_io_group , tasks_in_group , ierr )
 
@@ -1539,7 +1544,7 @@ SUBROUTINE wrf_quilt_iosync ( DataHandle, Status )
   INTEGER ,       INTENT(IN)  :: DataHandle
   INTEGER ,       INTENT(OUT) :: Status
 
-  INTEGER locsize , typesize, inttypesize
+  INTEGER locsize , inttypesize
   INTEGER ierr, tasks_in_group, comm_io_group, dummy, i
 
   CALL wrf_debug ( DEBUG_LVL, 'in wrf_quilt_iosync' ) 
@@ -1548,10 +1553,6 @@ SUBROUTINE wrf_quilt_iosync ( DataHandle, Status )
 
     iserver = 1 ! only one server group for now
     CALL get_mpi_comm_io_groups( comm_io_group , iserver )
-    CALL MPI_TYPE_SIZE( MPI_REAL, typesize, ierr )
-    IF ( typesize <= 0 ) THEN
-      CALL wrf_error_fatal("frame/module_io_quilt.F: wrf_quilt_iosync : type size <= 0 invalid")
-    ENDIF
 
     CALL mpi_x_comm_size( comm_io_group , tasks_in_group , ierr )
 
@@ -1606,7 +1607,7 @@ SUBROUTINE wrf_quilt_ioclose ( DataHandle, Status )
   INCLUDE 'intio_tags.h'
   INTEGER ,       INTENT(IN)  :: DataHandle
   INTEGER ,       INTENT(OUT) :: Status
-  INTEGER i, typesize, itypesize, tasks_in_group, comm_io_group, ierr
+  INTEGER i, itypesize, tasks_in_group, comm_io_group, ierr
   LOGICAL, EXTERNAL :: wrf_dm_on_monitor
   REAL dummy
 
@@ -1622,7 +1623,6 @@ SUBROUTINE wrf_quilt_ioclose ( DataHandle, Status )
 
   iserver = 1 ! only one server group for now
   CALL get_mpi_comm_io_groups( comm_io_group , iserver )
-  CALL MPI_TYPE_SIZE( MPI_REAL, typesize, ierr )
 
   CALL mpi_x_comm_size( comm_io_group , tasks_in_group , ierr )
 
@@ -1668,7 +1668,7 @@ SUBROUTINE wrf_quilt_ioexit( Status )
   INCLUDE 'intio_tags.h'
   INTEGER ,       INTENT(OUT) :: Status
   INTEGER                     :: DataHandle
-  INTEGER i, typesize, itypesize, tasks_in_group, comm_io_group, ierr
+  INTEGER i, itypesize, tasks_in_group, comm_io_group, ierr
   LOGICAL, EXTERNAL :: wrf_dm_on_monitor
   REAL dummy
 
@@ -1684,7 +1684,6 @@ SUBROUTINE wrf_quilt_ioexit( Status )
 
   iserver = 1 ! only one server group for now
   CALL get_mpi_comm_io_groups( comm_io_group , iserver )
-  CALL MPI_TYPE_SIZE( MPI_REAL, typesize, ierr )
 
   CALL mpi_x_comm_size( comm_io_group , tasks_in_group , ierr )
 
@@ -1750,7 +1749,7 @@ SUBROUTINE wrf_quilt_set_time ( DataHandle, Data,  Status )
   INTEGER ,       INTENT(IN)  :: DataHandle
   CHARACTER*(*) , INTENT(IN)  :: Data
   INTEGER                     :: Status
-  INTEGER i, typesize, itypesize, tasks_in_group, ierr, comm_io_group
+  INTEGER i, itypesize, tasks_in_group, ierr, comm_io_group
   REAL dummy
   INTEGER                 :: Count
 !
@@ -1887,7 +1886,7 @@ SUBROUTINE wrf_quilt_put_dom_ti_real ( DataHandle,Element,   Data, Count,  Statu
 RETURN
 END SUBROUTINE wrf_quilt_put_dom_ti_real 
 
-SUBROUTINE wrf_quilt_get_dom_ti_real8 ( DataHandle,Element,   Data, Count, Outcount, Status )
+SUBROUTINE wrf_quilt_get_dom_ti_double ( DataHandle,Element,   Data, Count, Outcount, Status )
 !<DESCRIPTION>
 !<PRE>
 ! Instruct the I/O quilt servers to attempt to read Count words of time
@@ -1909,12 +1908,12 @@ SUBROUTINE wrf_quilt_get_dom_ti_real8 ( DataHandle,Element,   Data, Count, Outco
   INTEGER ,       INTENT(IN)  :: Count
   INTEGER                     :: OutCount
   INTEGER                     :: Status
-  CALL wrf_message('wrf_quilt_get_dom_ti_real8 not supported yet')
+  CALL wrf_error_fatal('wrf_quilt_get_dom_ti_double not supported yet')
 #endif
 RETURN
-END SUBROUTINE wrf_quilt_get_dom_ti_real8 
+END SUBROUTINE wrf_quilt_get_dom_ti_double 
 
-SUBROUTINE wrf_quilt_put_dom_ti_real8 ( DataHandle,Element,   Data, Count,  Status )
+SUBROUTINE wrf_quilt_put_dom_ti_double ( DataHandle,Element,   Data, Count,  Status )
 !<DESCRIPTION>
 !<PRE>
 ! Instruct the I/O quilt servers to write Count words of time independent
@@ -1934,10 +1933,10 @@ SUBROUTINE wrf_quilt_put_dom_ti_real8 ( DataHandle,Element,   Data, Count,  Stat
   real*8 ,            INTENT(IN) :: Data(*)
   INTEGER ,       INTENT(IN)  :: Count
   INTEGER                     :: Status
-  CALL wrf_message('wrf_quilt_put_dom_ti_real8 not supported yet')
+  CALL wrf_error_fatal('wrf_quilt_put_dom_ti_double not supported yet')
 #endif
 RETURN
-END SUBROUTINE wrf_quilt_put_dom_ti_real8 
+END SUBROUTINE wrf_quilt_put_dom_ti_double 
 
 SUBROUTINE wrf_quilt_get_dom_ti_integer ( DataHandle,Element,   Data, Count, Outcount, Status )
 !<DESCRIPTION>
@@ -2124,7 +2123,7 @@ SUBROUTINE wrf_quilt_put_dom_ti_char ( DataHandle, Element,  Data,  Status )
   CHARACTER*(*) , INTENT(IN)  :: Element
   CHARACTER*(*) , INTENT(IN)  :: Data
   INTEGER                     :: Status
-  INTEGER i, typesize, itypesize, tasks_in_group, ierr, comm_io_group
+  INTEGER i, itypesize, tasks_in_group, ierr, comm_io_group
   REAL dummy
   LOGICAL, EXTERNAL :: wrf_dm_on_monitor
 !
@@ -2210,7 +2209,7 @@ SUBROUTINE wrf_quilt_put_dom_td_real ( DataHandle,Element, DateStr,  Data, Count
 RETURN
 END SUBROUTINE wrf_quilt_put_dom_td_real 
 
-SUBROUTINE wrf_quilt_get_dom_td_real8 ( DataHandle,Element, DateStr,  Data, Count, Outcount, Status )
+SUBROUTINE wrf_quilt_get_dom_td_double ( DataHandle,Element, DateStr,  Data, Count, Outcount, Status )
 !<DESCRIPTION>
 !<PRE>
 ! Instruct the I/O quilt servers to attempt to read Count words of time
@@ -2234,10 +2233,11 @@ SUBROUTINE wrf_quilt_get_dom_td_real8 ( DataHandle,Element, DateStr,  Data, Coun
   INTEGER                      :: OutCount
   INTEGER                     :: Status
 #endif
+  CALL wrf_error_fatal('wrf_quilt_get_dom_td_double not supported yet')
 RETURN
-END SUBROUTINE wrf_quilt_get_dom_td_real8 
+END SUBROUTINE wrf_quilt_get_dom_td_double 
 
-SUBROUTINE wrf_quilt_put_dom_td_real8 ( DataHandle,Element, DateStr,  Data, Count,  Status )
+SUBROUTINE wrf_quilt_put_dom_td_double ( DataHandle,Element, DateStr,  Data, Count,  Status )
 !<DESCRIPTION>
 !<PRE>
 ! Instruct the I/O quilt servers to write Count words of time dependent
@@ -2259,8 +2259,9 @@ SUBROUTINE wrf_quilt_put_dom_td_real8 ( DataHandle,Element, DateStr,  Data, Coun
   INTEGER ,       INTENT(IN)  :: Count
   INTEGER                     :: Status
 #endif
+  CALL wrf_error_fatal('wrf_quilt_put_dom_td_double not supported yet')
 RETURN
-END SUBROUTINE wrf_quilt_put_dom_td_real8 
+END SUBROUTINE wrf_quilt_put_dom_td_double 
 
 SUBROUTINE wrf_quilt_get_dom_td_integer ( DataHandle,Element, DateStr,  Data, Count, Outcount, Status )
 !<DESCRIPTION>
@@ -2466,7 +2467,7 @@ SUBROUTINE wrf_quilt_put_var_ti_real ( DataHandle,Element,  Varname, Data, Count
 RETURN
 END SUBROUTINE wrf_quilt_put_var_ti_real 
 
-SUBROUTINE wrf_quilt_get_var_ti_real8 ( DataHandle,Element,  Varname, Data, Count, Outcount, Status )
+SUBROUTINE wrf_quilt_get_var_ti_double ( DataHandle,Element,  Varname, Data, Count, Outcount, Status )
 !<DESCRIPTION>
 !<PRE>
 ! Instruct the I/O quilt servers to attempt to read Count words of time
@@ -2490,10 +2491,11 @@ SUBROUTINE wrf_quilt_get_var_ti_real8 ( DataHandle,Element,  Varname, Data, Coun
   INTEGER                     :: OutCount
   INTEGER                     :: Status
 #endif
+  CALL wrf_error_fatal('wrf_quilt_get_var_ti_double not supported yet')
 RETURN
-END SUBROUTINE wrf_quilt_get_var_ti_real8 
+END SUBROUTINE wrf_quilt_get_var_ti_double 
 
-SUBROUTINE wrf_quilt_put_var_ti_real8 ( DataHandle,Element,  Varname, Data, Count,  Status )
+SUBROUTINE wrf_quilt_put_var_ti_double ( DataHandle,Element,  Varname, Data, Count,  Status )
 !<DESCRIPTION>
 !<PRE>
 ! Instruct the I/O quilt servers to write Count words of time independent
@@ -2515,8 +2517,9 @@ SUBROUTINE wrf_quilt_put_var_ti_real8 ( DataHandle,Element,  Varname, Data, Coun
   INTEGER ,       INTENT(IN)  :: Count
   INTEGER                     :: Status
 #endif
+  CALL wrf_error_fatal('wrf_quilt_put_var_ti_double not supported yet')
 RETURN
-END SUBROUTINE wrf_quilt_put_var_ti_real8 
+END SUBROUTINE wrf_quilt_put_var_ti_double 
 
 SUBROUTINE wrf_quilt_get_var_ti_integer ( DataHandle,Element,  Varname, Data, Count, Outcount, Status )
 !<DESCRIPTION>
@@ -2668,7 +2671,7 @@ SUBROUTINE wrf_quilt_put_var_ti_char ( DataHandle,Element,  Varname, Data,  Stat
   CHARACTER*(*) , INTENT(IN)  :: VarName 
   CHARACTER*(*) , INTENT(IN)  :: Data
   INTEGER                     :: Status
-  INTEGER i, typesize, itypesize, tasks_in_group, ierr, comm_io_group
+  INTEGER i, itypesize, tasks_in_group, ierr, comm_io_group
   REAL dummy
   LOGICAL, EXTERNAL :: wrf_dm_on_monitor
 !
@@ -2757,7 +2760,7 @@ SUBROUTINE wrf_quilt_put_var_td_real ( DataHandle,Element,  DateStr,Varname, Dat
 RETURN
 END SUBROUTINE wrf_quilt_put_var_td_real 
 
-SUBROUTINE wrf_quilt_get_var_td_real8 ( DataHandle,Element,  DateStr,Varname, Data, Count, Outcount, Status )
+SUBROUTINE wrf_quilt_get_var_td_double ( DataHandle,Element,  DateStr,Varname, Data, Count, Outcount, Status )
 !<DESCRIPTION>
 !<PRE>
 ! Instruct the I/O quilt servers to attempt to read Count words of time
@@ -2782,10 +2785,11 @@ SUBROUTINE wrf_quilt_get_var_td_real8 ( DataHandle,Element,  DateStr,Varname, Da
   INTEGER                     :: OutCount
   INTEGER                     :: Status
 #endif
+  CALL wrf_error_fatal('wrf_quilt_get_var_td_double not supported yet')
 RETURN
-END SUBROUTINE wrf_quilt_get_var_td_real8 
+END SUBROUTINE wrf_quilt_get_var_td_double 
 
-SUBROUTINE wrf_quilt_put_var_td_real8 ( DataHandle,Element,  DateStr,Varname, Data, Count,  Status )
+SUBROUTINE wrf_quilt_put_var_td_double ( DataHandle,Element,  DateStr,Varname, Data, Count,  Status )
 !<DESCRIPTION>
 !<PRE>
 ! Instruct the I/O quilt servers to write Count words of time dependent
@@ -2808,8 +2812,9 @@ SUBROUTINE wrf_quilt_put_var_td_real8 ( DataHandle,Element,  DateStr,Varname, Da
   INTEGER ,       INTENT(IN)  :: Count
   INTEGER                     :: Status
 #endif
+  CALL wrf_error_fatal('wrf_quilt_put_var_td_double not supported yet')
 RETURN
-END SUBROUTINE wrf_quilt_put_var_td_real8 
+END SUBROUTINE wrf_quilt_put_var_td_double 
 
 SUBROUTINE wrf_quilt_get_var_td_integer ( DataHandle,Element,  DateStr,Varname, Data, Count, Outcount,Status)
 !<DESCRIPTION>
@@ -3059,7 +3064,7 @@ SUBROUTINE wrf_quilt_write_field ( DataHandle , DateStr , VarName , Field , Fiel
   REAL, DIMENSION( MemoryStart(1):MemoryEnd(1), &
                    MemoryStart(2):MemoryEnd(2), &
                    MemoryStart(3):MemoryEnd(3) ) :: Field
-  INTEGER locsize , typesize, inttypesize, realtypesize
+  INTEGER locsize , typesize, inttypesize
   INTEGER ierr, tasks_in_group, comm_io_group, dummy, i
   LOGICAL, EXTERNAL :: wrf_dm_on_monitor
   INTEGER, EXTERNAL :: use_package
@@ -3078,11 +3083,12 @@ SUBROUTINE wrf_quilt_write_field ( DataHandle , DateStr , VarName , Field , Fiel
             (PatchEnd(3)-PatchStart(3)+1)
 
   CALL mpi_type_size( MPI_INTEGER, inttypesize, ierr )
-  CALL mpi_type_size( MPI_REAL, realtypesize, ierr )
-  IF      ( FieldType .EQ. WRF_REAL4 ) THEN
-    CALL mpi_type_size( MPI_REAL, typesize, ierr )
-  ELSE IF ( FieldType .EQ. WRF_REAL8 ) THEN
+  ! Note that the WRF_DOUBLE branch of this IF statement must come first since 
+  ! WRF_REAL is set equal to WRF_DOUBLE during autopromotion builds.  
+  IF ( FieldType .EQ. WRF_DOUBLE ) THEN
     CALL mpi_type_size( MPI_DOUBLE_PRECISION, typesize, ierr )
+  ELSE IF ( FieldType .EQ. WRF_REAL ) THEN
+    CALL mpi_type_size( MPI_REAL, typesize, ierr )
   ELSE IF ( FieldType .EQ. WRF_INTEGER ) THEN
     CALL mpi_type_size( MPI_INTEGER, typesize, ierr )
   ELSE IF ( FieldType .EQ. WRF_LOGICAL ) THEN

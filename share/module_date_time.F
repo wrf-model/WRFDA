@@ -66,13 +66,13 @@ CONTAINS
     CALL nl_get_julday (id, julday)
     idt        = 86400*(julday-1)+nint(3600*gmt)
     write (mess,*) 'calc_current_date called: time = ',time,' idt = ',idt
-    CALL wrf_debug(300,mess)
+    CALL wrf_debug(300,TRIM(mess))
     write (mess,*) 'calc_current_date called: gmt  = ',gmt
-    CALL wrf_debug(300,mess)
+    CALL wrf_debug(300,TRIM(mess))
     write (mess,*) 'calc_current_date called: julyr  = ',julyr
-    CALL wrf_debug(300,mess)
+    CALL wrf_debug(300,TRIM(mess))
     write (mess,*) 'calc_current_date called: julday = ',julday
-    CALL wrf_debug(300,mess)
+    CALL wrf_debug(300,TRIM(mess))
     base_date  = '0000-01-01_00:00:00.0000'
     write(base_date(1:4),'(I4.4)')julyr
     CALL geth_newdate (start_date(1:19), base_date(1:19), idt)
@@ -80,7 +80,7 @@ CONTAINS
     write (current_date(1:24),fmt=340)new_date
     340 format(a19, '.0000')
     write (mess,*) current_date,gmt,julday,julyr,'=current_date,gmt,julday,julyr: calc_current_date'
-    CALL wrf_debug(300,mess)
+    CALL wrf_debug(300,TRIM(mess))
    END SUBROUTINE calc_current_date
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -711,5 +711,106 @@ CONTAINS
 
    SUBROUTINE init_module_date_time
    END SUBROUTINE init_module_date_time
-   
+
 END MODULE module_date_time
+
+
+   ! TBH:  NOTE:  
+   ! TBH:  Linkers whine if these routines are placed inside the module.  Not 
+   ! TBH:  sure if these should live here or inside an external package.  They 
+   ! TBH:  have dependencies both on WRF (for the format of the WRF date-time 
+   ! TBH:  strings) and on the time manager.  Currently, the format of the WRF 
+   ! TBH:  date-time strings is a slight variant on ISO 8601 (ISO is 
+   ! TBH:  "YYYY-MM-DDThh:mm:ss" while WRF is "YYYY-MM-DD_hh:mm:ss").  If we 
+   ! TBH:  change the WRF format to match the standard, then we remove the 
+   ! TBH:  WRF dependence...  
+
+   ! Converts WRF date-time string into an WRF_UTIL_Time object.  
+   ! The format of the WRF date-time strings is a slight variant on ISO 8601: 
+   ! ISO is "YYYY-MM-DDThh:mm:ss" while WRF is "YYYY-MM-DD_hh:mm:ss".  
+   SUBROUTINE wrf_atotime ( str, time )
+      USE module_utility
+      CHARACTER (LEN=*), INTENT( IN) :: str
+      TYPE(WRF_UTIL_Time),   INTENT(OUT) :: time
+      INTEGER yr, mm, dd, h, m, s, ms
+      INTEGER rc
+      IF ( LEN( str ) .GE. 20 ) THEN
+        IF ( str(20:20) .EQ. '.' ) THEN
+          READ(str,34) yr,mm,dd,h,m,s,ms
+          !  last four digits are ten-thousandths of a sec, convert to ms
+          ms=nint(real(ms)/10)
+        ELSE
+          READ(str,33) yr,mm,dd,h,m,s
+          ms = 0
+        ENDIF
+      ELSE
+        READ(str,33) yr,mm,dd,h,m,s
+        ms = 0
+      ENDIF
+      CALL WRF_UTIL_TimeSet( time, YY=yr, MM=mm, DD=dd, H=h, M=m, S=s, MS=ms, rc=rc )
+      CALL wrf_check_error( WRF_UTIL_SUCCESS, rc, &
+                            'WRF_UTIL_TimeSet() in wrf_atotime() FAILED', &
+                            __FILE__ , &
+                            __LINE__  )
+33 FORMAT (I4.4,1x,I2.2,1x,I2.2,1x,I2.2,1x,I2.2,1x,I2.2)
+34 FORMAT (I4.4,1x,I2.2,1x,I2.2,1x,I2.2,1x,I2.2,1x,I2.2,1x,I4.4)
+      RETURN
+   END SUBROUTINE wrf_atotime
+
+
+
+   ! Converts an WRF_UTIL_Time object into a WRF date-time string.  
+   ! The format of the WRF date-time strings is a slight variant on ISO 8601: 
+   ! ISO is "YYYY-MM-DDThh:mm:ss" while WRF is "YYYY-MM-DD_hh:mm:ss".  
+   SUBROUTINE wrf_timetoa ( time, str )
+      USE module_utility
+      TYPE(WRF_UTIL_Time),   INTENT( IN) :: time
+      CHARACTER (LEN=*), INTENT(OUT) :: str
+      INTEGER rc
+      CHARACTER (LEN=256) :: mess
+      CALL WRF_UTIL_TimeGet( time, timeString=str, rc=rc )
+      CALL wrf_check_error( WRF_UTIL_SUCCESS, rc, &
+                            'WRF_UTIL_TimeGet() in wrf_timetoa() FAILED', &
+                            __FILE__ , &
+                            __LINE__  )
+      ! change ISO 8601 'T' to WRF '_'
+      str(11:11) = '_'
+      WRITE (mess,*) 'DEBUG wrf_timetoa():  returning with str = [',TRIM(str),']'
+      CALL wrf_debug ( 150 , mess )
+      RETURN
+   END SUBROUTINE wrf_timetoa
+
+
+
+   ! Debug routine to print key clock information.  
+   ! Every printed line begins with pre_str.  
+   ! If clock is invalid, also print its state using WRF_UTIL_ClockPrint().  
+   ! Lines printed by WRF_UTIL_ClockPrint() currently do not begin with 
+   ! pre_str.  
+   SUBROUTINE wrf_clockprint ( level, clock, pre_str )
+      USE module_utility
+      INTEGER,           INTENT( IN) :: level
+      TYPE(WRF_UTIL_Clock),  INTENT( IN) :: clock
+      CHARACTER (LEN=*), INTENT( IN) :: pre_str
+      INTEGER rc
+      INTEGER :: debug_level
+      TYPE(WRF_UTIL_Time) :: currTime, startTime, stopTime
+      CHARACTER (LEN=25) :: currTime_str, startTime_str, stopTime_str
+      CHARACTER (LEN=256) :: mess
+      CALL get_wrf_debug_level( debug_level )
+      IF ( level .LE. debug_level ) THEN
+        CALL WRF_UTIL_ClockGet( clock, CurrTime=currTime, StartTime=startTime, &
+                                StopTime=stopTime, rc=rc )
+        CALL wrf_timetoa( currTime, currTime_str )
+        CALL wrf_timetoa( startTime, startTime_str )
+        CALL wrf_timetoa( stopTime, stopTime_str )
+        WRITE (mess,*) TRIM(pre_str),'  clock start time = ',TRIM(startTime_str)
+        CALL wrf_message(TRIM(mess))
+        WRITE (mess,*) TRIM(pre_str),'  clock current time = ',TRIM(currTime_str)
+        CALL wrf_message(TRIM(mess))
+        WRITE (mess,*) TRIM(pre_str),'  clock stop time = ',TRIM(stopTime_str)
+        CALL wrf_message(TRIM(mess))
+      ENDIF
+      RETURN
+   END SUBROUTINE wrf_clockprint
+

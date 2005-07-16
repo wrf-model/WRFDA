@@ -36,8 +36,12 @@
 # History: 11/16/99  Original version. Dale Barker
 #          12/01/99  Modifications to defaults and names. Dale Barker
 #          10/14/03  Modifications to defaults for WRF 3DVAR. Wei Huang
+#          06/06/05  Modifications for Polar & Geo AMV's      Syed RH Rizvi
+#          07/15/05  Tidy up prior to WRF V2.1 release. Dale Barker
 #
 #-----------------------------------------------------------------------
+
+#set echo
 
  unlimit
 
@@ -49,165 +53,116 @@
  echo ""
 
 #-----------------------------------------------------------------------
-# [1.0] Set up input/output file environment variables:
+# USER: Define non-default job via environment variables: 
 #-----------------------------------------------------------------------
 
-#Specify job details here:
+#e.g.: setenv START_DATE 2004050200 overrides the default.
 
- set DA_FG_FORMAT  = 1		# First guess format: 1=WRF, 2=MM5, 3=KMA
- set DA_OB_FORMAT  = 2		# Observation format: 1=BUFR, 2=ASCII "little_r"
- set DA_CV_OPTIONS = 2		# Background error statistics: 2=NCAR, 3=NCEP.
-
- setenv DA_ANALYSIS_DATE        2000-01-24_12:00:00.0000  # Specify date in this format.
- setenv WEST_EAST_GRID_NUMBER   74                        # Number of gridpoints in x(i) dim.
- setenv SOUTH_NORTH_GRID_NUMBER 61                        # Number of gridpoints in y(j) dim.
- setenv VERTICAL_GRID_NUMBER    28                        # Number of vertical levels.
- setenv GRID_DISTANCE           30000                     # Grid resolution (m).
-
-
-#Specify directories/files here:
-
- setenv WRF_DIR /datatmp2/huangwei/mac/my_wrf3dvar
- setenv DAT_DIR /data3/mp/mm53dvar/case_2000012412/data
- setenv RUN_DIR /datatmp/huangwei/test_my_wrf3dvar
-
-#setenv DA_FIRST_GUESS  ${DAT_DIR}/MMINPUT_DOMAIN1          # first guess input.
- setenv DA_FIRST_GUESS  ${DAT_DIR}/wrfinput_d01             # wrf3dvar "first guess" input.
- setenv DA_BACK_ERRORS  ${DAT_DIR}/be.cv_${DA_CV_OPTIONS}   # wrf3dvar background errors.
- setenv DA_SSMI	        ${DAT_DIR}/ssmi.dat                 # SSM/I radiances (ignore if not using).
- setenv DA_RADAR	${DAT_DIR}/radar.dat                # Radar data (ignore if not using).
-
- set os = `uname`
- set endian_form   = big_endian
- if((${os} == 'OSF1') || (${os} == 'Linux')) then
-    set endian_form   = little_endian                       # Needed for BUFR obs files only.
- endif
-
- if(${DA_OB_FORMAT} == 1) then
-    set DA_OBSERVATIONS = ${DAT_DIR}/ob.bufr.${endian_form} # Input BUFR observation file.
- else if(${DA_OB_FORMAT} == 2) then
-#   set DA_OBSERVATIONS	= ${DAT_DIR}/obs_gts.3dvar          # Input "little_r" format obs (recommended for now).
-    set DA_OBSERVATIONS	= ${DAT_DIR}/ob.ascii
- else
-    echo "DA_OB_FORMAT error: Do not know how to handle DA_OB_FORMAT = ${DA_OB_FORMAT}"
-    exit 1
- endif
-
-############################################################################
-
- if ( ! -d $RUN_DIR ) then
-  mkdir -p $RUN_DIR
- endif
-
- cd $RUN_DIR
-
- cp $WRF_DIR/run/LANDUSE.TBL .
- cp $WRF_DIR/main/da_3dvar.exe  da_3dvar.exe
-
-#Check settings:
-
-  if ( ! $?DA_FIRST_GUESS ) then
-    echo "DA_Run_3DVAR error: DA_FIRST_GUESS must be specified"
-    exit 1
- endif
-
- if (( ! $?DA_OBSERVATIONS ) && (! $?DA_SSMI) ) then
-    echo "DA_Run_3DVAR error: DA_OBSERVATIONS or DA_SSMI must be specified"
-    exit 1
- endif
-
-  if ( ! $?DA_BACK_ERRORS ) then
-    echo "DA_Run_3DVAR error: DA_BACK_ERRORS must be specified"
-    exit 1
- endif
-
- if(${DA_FG_FORMAT} == 1) then
-    ln -sf $DA_FIRST_GUESS		wrf_3dvar_input
- else if(${DA_FG_FORMAT} == 2) then
-    ln -sf $DA_FIRST_GUESS		fort.41
- else
-    echo "DA_FG_FORMAT error: Do not know how to handle DA_FG_FORMAT = ${DA_FG_FORMAT}"
-    exit 1
- endif
-
- ln -sf $DA_BACK_ERRORS		fort.3${DA_CV_OPTIONS}
- ln -sf $DA_OBSERVATIONS	fort.9${DA_OB_FORMAT}
-
- if ( -e $DA_SSMI) then
-    ln -sf $DA_SSMI	fort.93
-    set DA_USE_SSMIRETRIEVALOBS = .TRUE.
- endif
-
- if ( -e $DA_RADAR) then
-    ln -sf $DA_RADAR	fort.94
-    set DA_USE_RadarOBS = .TRUE.
-    echo "Radar Obs Input File:        $DA_RadarObs"
- endif
-
- echo "First Guess Input File:      $DA_FIRST_GUESS"
- echo "Background Error Input File: $DA_BACK_ERRORS"
- echo "Observation Input File:      $DA_OBSERVATIONS"
+##########################################################################
+#USER: DO NOT MAKE CHANGES BELOW (if you do, you're on your own!) 
+##########################################################################
 
 #-----------------------------------------------------------------------
-# [2.0] Set up details of analysis algorithm:
+# [1.0] Specify default environment variables:
 #-----------------------------------------------------------------------
 
- if ( ! $?DA_MODEL_TYPE )   set DA_MODEL_TYPE = WRF
- if ( ! $?DA_WRITE_INCREMENTS ) set DA_WRITE_INCREMENTS = .FALSE.
+ if ( ! $?START_DATE )              setenv START_DATE 2004050100       # Analysis date.
+
+#Default directories/files:
+ if ( ! $?SRC_DIR )    setenv SRC_DIR    ${HOME}/code_development
+ if ( ! $?WRFVAR_DIR ) setenv WRFVAR_DIR ${SRC_DIR}/wrfvar
+ if ( ! $?DAT_DIR )    setenv DAT_DIR    /data4/dmbarker/data/amps1
+ if ( ! $?RUN_DIR )    setenv RUN_DIR    ${DAT_DIR}
+ if ( ! -d $RUN_DIR )  mkdir $RUN_DIR
+
+ if ( ! $?DA_FIRST_GUESS ) setenv DA_FIRST_GUESS ${DAT_DIR}/wrfinput_d01.${START_DATE} # wrfvar "first guess" input.
+ if ( ! $?DA_OBSERVATIONS ) setenv DA_OBSERVATIONS ${DAT_DIR}/obs_gts.3dvar.${START_DATE} # wrfvar observation input.
+ if ( ! $?DA_BACK_ERRORS ) setenv DA_BACK_ERRORS ${DAT_DIR}/be    # wrfvar background errors.
+ if ( ! $?DA_SSMI ) setenv DA_SSMI ${DAT_DIR}/ob/ssmi.dat         # SSM/I radiances (ignore if not using).
+ if ( ! $?DA_RADAR) setenv DA_RADAR ${DAT_DIR}/ob/radar.dat       # Radar data (ignore if not using).
+
+#Default WRF namelist variables:
+ if ( ! $?NUM_PROCS ) setenv NUM_PROCS 1                          # Number of processors to run on.
+ if ( ! $?WEST_EAST_GRID_NUMBER )   setenv WEST_EAST_GRID_NUMBER 165   # X grid dimension.
+ if ( ! $?SOUTH_NORTH_GRID_NUMBER ) setenv SOUTH_NORTH_GRID_NUMBER 217 # Y grid dimension.
+ if ( ! $?VERTICAL_GRID_NUMBER ) setenv VERTICAL_GRID_NUMBER 31   # Z grid dimension.
+ if ( ! $?GRID_DISTANCE ) setenv GRID_DISTANCE 60000              # Grid resolution (m).
+ if ( ! $?DA_SF_SURFACE_PHYSICS ) setenv DA_SF_SURFACE_PHYSICS 1  #(1=Thermal diffusion, 2=Noah LSM).
+ if ( $DA_SF_SURFACE_PHYSICS == 1 ) setenv DA_NUM_SOIL_LAYERS 5   # (Thermal diffusion surface physics).
+ if ( $DA_SF_SURFACE_PHYSICS == 2 ) setenv DA_NUM_SOIL_LAYERS 4   # (Noah LSM surface physics).
+
+#Supported default WRF-Var namelist variables:
+ if ( ! $?DA_FG_FORMAT )  setenv DA_FG_FORMAT 1                   # First guess format: 1=WRF, 2=MM5, 3=KMA
+ if ( ! $?DA_OB_FORMAT )  setenv DA_OB_FORMAT 2                   # Observation format: 1=BUFR, 2=ASCII "little_r"
+ if ( ! $?DA_CV_OPTIONS ) setenv DA_CV_OPTIONS 2                  # Background error statistics: 2=NCAR, 3=NCEP.
+ if ( ! $?DA_GLOBAL )     setenv DA_GLOBAL .FALSE.                # Regional/global domain.
+ if ( ! $?DA_MODEL_TYPE ) setenv DA_MODEL_TYPE WRF                # WRF, MM5 or KMA.
+ if ( ! $?DA_WRITE_INCREMENTS ) setenv DA_WRITE_INCREMENTS .FALSE.# Optionally write increments.
+ if ( ! $?DA_NUM_FGAT_TIME ) setenv DA_NUM_FGAT_TIME 1            # Number of FGAT ob windows.
+ if ( ! $?DA_USE_SYNOPOBS )  set DA_USE_SYNOPOBS = .TRUE.         # Assimilate this observation type.
+ if ( ! $?DA_USE_SHIPSOBS )  set DA_USE_SHIPSOBS = .TRUE.         # Assimilate this observation type.
+ if ( ! $?DA_USE_METAROBS )  set DA_USE_METAROBS = .TRUE.         # Assimilate this observation type.
+ if ( ! $?DA_USE_PILOTOBS )  set DA_USE_PILOTOBS = .TRUE.         # Assimilate this observation type.
+ if ( ! $?DA_USE_SOUNDOBS )  set DA_USE_SOUNDOBS = .TRUE.         # Assimilate this observation type.
+ if ( ! $?DA_USE_SATEMOBS )  set DA_USE_SATEMOBS = .TRUE.         # Assimilate this observation type.
+ if ( ! $?DA_USE_GEO_AMV  )  set DA_USE_GEO_AMV =  .TRUE.         # Assimilate this observation type.
+ if ( ! $?DA_USE_POLAR_AMV ) set DA_USE_POLAR_AMV = .TRUE.        # Assimilate this observation type.
+ if ( ! $?DA_USE_AIREPOBS )  set DA_USE_AIREPOBS = .TRUE.         # Assimilate this observation type.
+ if ( ! $?DA_USE_GPSPWOBS )  set DA_USE_GPSPWOBS = .TRUE.         # Assimilate this observation type.
+ if ( ! $?DA_USE_RADAROBS )  set DA_USE_RADAROBS = .FALSE.        # Assimilate this observation type.
+ if ( ! $?DA_Use_Radar_rv )  set DA_Use_Radar_rv = .FALSE.        # Assimilate this observation type.
+ if ( ! $?DA_Use_Radar_rf )  set DA_Use_Radar_rf = .FALSE.        # Assimilate this observation type.
+ if ( ! $?DA_USE_BOGUSOBS )  set DA_USE_BOGUSOBS = .FALSE.        # Assimilate this observation type.
+ if ( ! $?DA_USE_GPSREFOBS ) set DA_USE_GPSREFOBS = .TRUE.        # Assimilate this observation type.
+ if ( ! $?DA_USE_PROFILEROBS )set DA_USE_PROFILEROBS = .TRUE.     # Assimilate this observation type.
+ if ( ! $?DA_USE_BUOYOBS )   set DA_USE_BUOYOBS = .TRUE.          # Assimilate this observation type.
+ if ( ! $?DA_USE_SSMIRETRIEVALOBS )set DA_USE_SSMIRETRIEVALOBS = .FALSE. # Assimilate this observation type.
+ if ( ! $?DA_USE_SSMITBOBS ) set DA_USE_SSMITBOBS = .FALSE.       # Assimilate this observation type.
+ if ( ! $?DA_USE_SSMT1OBS )  set DA_USE_SSMT1OBS = .FALSE.        # Assimilate this observation type.
+ if ( ! $?DA_USE_SSMT2OBS )  set DA_USE_SSMT2OBS = .FALSE.        # Assimilate this observation type.
+ if ( ! $?DA_USE_QSCATOBS )  set DA_USE_QSCATOBS = .TRUE.         # Assimilate this observation type.
+ if ( ! $?DA_Check_Max_IV )  set DA_Check_Max_IV = .TRUE.         # Perform O-B > 5sigma_o QC if true.
+ if ( ! $?DA_MAX_EXT_ITS )   set DA_MAX_EXT_ITS = 1               # Maximum number of "WRF-Var outer loops".
+ if ( ! $?DA_EPS )           set DA_EPS = "1.E-02, 1.E-02, 1.E-02, 1.E-02, 1.E-02, 1.E-02, 1.E-02," # Convergence criteria.
+ if ( ! $?DA_NTMAX )         set DA_NTMAX = 100                   # Maximum number of inner loop iterations.
+ if ( ! $?DA_RF_PASSES )     set DA_RF_PASSES = 6                 # Number of recursive filter passes.
+ if ( ! $?DA_TESTING_3DVAR ) set DA_TESTING_3DVAR = .FALSE.       # Test WRF-Var code.
+ if ( ! $?DA_TEST_TRANSFORMS )  set DA_TEST_TRANSFORMS = .FALSE.  # Test WRF-Var transforms.
+ if ( ! $?DA_TEST_STATISTICS )  set DA_TEST_STATISTICS = .FALSE.  # Test WRF-Var statistics.
+ if ( ! $?DA_INTERPOLATE_STATS )set DA_INTERPOLATE_STATS = .TRUE. # True if statistics computed on different domain.
+ if ( ! $?DA_MINIMISATION_OPTION) set DA_MINIMISATION_OPTION = 2  # 1=Quasi-Newton, 2=Conjugate gradient.
+ if ( ! $?DA_CALCULATE_CG_COST_FUNCTION) set DA_CALCULATE_CG_COST_FUNCTION = .FALSE. # True if want CG diagnostic output. 
+ if ( ! $?DA_CV_OPTIONS_HUM ) set DA_CV_OPTIONS_HUM = 3           # Moist control variable (1-3).
+ if ( ! $?DA_CHECK_RH )      set DA_CHECK_RH = 2                  # Physical check on humidity (0-2).
+ if ( ! $?DA_MAX_VERT_VAR1 ) set DA_MAX_VERT_VAR1 = 99.0          # CV1 variance truncation.
+ if ( ! $?DA_MAX_VERT_VAR2 ) set DA_MAX_VERT_VAR2 = 99.0          # CV2 variance truncation.
+ if ( ! $?DA_MAX_VERT_VAR3 ) set DA_MAX_VERT_VAR3 = 99.0          # CV3 variance truncation.
+ if ( ! $?DA_MAX_VERT_VAR4 ) set DA_MAX_VERT_VAR4 = 99.0          # CV4 variance truncation.
+ if ( ! $?DA_MAX_VERT_VAR5 ) set DA_MAX_VERT_VAR5 = 99.0          # CV5 variance truncation.
+
+#Not supported default WRF-Var namelist variables (overwrite at your own risk):
  if ( ! $?DA_ANALYSIS_TYPE ) set DA_ANALYSIS_TYPE = 3D-VAR
- if ( ! $?DA_ANALYSIS_DATE ) set DA_ANALYSIS_DATE = 2002-08-03_00:00:00.0000
  if ( ! $?DA_ANALYSIS_ACCU ) set DA_ANALYSIS_ACCU = 900
- if ( ! $?DA_FG_FORMAT )     set DA_FG_FORMAT = 1
- if ( ! $?DA_OB_FORMAT )     set DA_OB_FORMAT = 1
- if ( ! $?DA_NUM_FGAT_TIME ) set DA_NUM_FGAT_TIME = 1
  if ( ! $?DA_PROCESS_OBS )   set DA_PROCESS_OBS = YES
  if ( ! $?DA_QC_POINTER )    set DA_QC_POINTER = 0
- if ( ! $?DA_USE_SYNOPOBS )  set DA_USE_SYNOPOBS = .TRUE. 
- if ( ! $?DA_USE_SHIPSOBS )  set DA_USE_SHIPSOBS = .TRUE. 
- if ( ! $?DA_USE_METAROBS )  set DA_USE_METAROBS = .TRUE. 
- if ( ! $?DA_USE_PILOTOBS )  set DA_USE_PILOTOBS = .TRUE. 
- if ( ! $?DA_USE_SOUNDOBS )  set DA_USE_SOUNDOBS = .TRUE. 
- if ( ! $?DA_USE_SATEMOBS )  set DA_USE_SATEMOBS = .TRUE. 
- if ( ! $?DA_USE_SATOBOBS )  set DA_USE_SATOBOBS = .TRUE. 
- if ( ! $?DA_USE_AIREPOBS )  set DA_USE_AIREPOBS = .TRUE. 
- if ( ! $?DA_USE_GPSPWOBS )  set DA_USE_GPSPWOBS = .TRUE. 
- if ( ! $?DA_USE_RADAROBS )  set DA_USE_RadarObs = .FALSE. 
- if ( ! $?DA_Use_Radar_rv )  set DA_Use_Radar_rv = .FALSE.
- if ( ! $?DA_Use_Radar_rf )  set DA_Use_Radar_rf = .FALSE.
- if ( ! $?DA_USE_GPSREFOBS )  set DA_USE_GPSREFOBS = .TRUE.
- if ( ! $?DA_USE_PROFILEROBS )  set DA_USE_PROFILEROBS = .TRUE. 
- if ( ! $?DA_USE_BUOYOBS     )  set DA_USE_BUOYOBS     = .TRUE.
- if ( ! $?DA_USE_SSMIRETRIEVALOBS  )  set DA_USE_SSMIRETRIEVALOBS = .FALSE.
- if ( ! $?DA_USE_SSMITBOBS ) set DA_USE_SSMITBOBS = .FALSE.
- if ( ! $?DA_USE_SSMT1OBS ) set DA_USE_SSMT1OBS = .FALSE.
- if ( ! $?DA_USE_SSMT2OBS ) set DA_USE_SSMT2OBS = .FALSE.
- if ( ! $?DA_USE_QSCATOBS ) set DA_USE_QSCATOBS = .TRUE.
- if ( ! $?DA_Check_Max_IV )  set DA_Check_Max_IV        = .TRUE.
  if ( ! $?DA_USE_OBS_ERRFAC ) set DA_USE_OBS_ERRFAC = .FALSE.
  if ( ! $?DA_PUT_RAND_SEED ) set DA_PUT_RAND_SEED = .FALSE.
  if ( ! $?DA_OMB_SET_RAND ) set DA_OMB_SET_RAND = .FALSE.
  if ( ! $?DA_OMB_ADD_NOISE ) set DA_OMB_ADD_NOISE = .FALSE.
- if ( ! $?DA_W_INCREMENTS ) set DA_W_INCREMENTS = .FALSE.
- if ( ! $?DA_DT_CLOUD_MODEL ) set DA_DT_CLOUD_MODEL = .FALSE.
- if ( ! $?DA_TIME_WINDOW )   set DA_TIME_WINDOW = 3.
+ if ( ! $?DA_TIME_WINDOW )   set DA_TIME_WINDOW = 3.      
  if ( ! $?DA_PRINT_DETAIL )  set DA_PRINT_DETAIL = 0
- if ( ! $?DA_MAX_EXT_ITS )   set DA_MAX_EXT_ITS = 1
- if ( ! $?DA_EPS )           set DA_EPS = "1.E-02, 1.E-02, 1.E-02, 1.E-02, 1.E-02, 1.E-02, 1.E-02,"
- if ( ! $?DA_NTMAX )         set DA_NTMAX = 100
- if ( ! $?DA_WRITE_SWITCH )  set DA_WRITE_SWITCH   = .FALSE.
+ if ( ! $?DA_WRITE_SWITCH )  set DA_WRITE_SWITCH = .FALSE.
  if ( ! $?DA_WRITE_INTERVAL )set DA_WRITE_INTERVAL = 5
- if ( ! $?DA_WRITE_QCW )     set DA_WRITE_QCW = .TRUE.
- if ( ! $?DA_WRITE_QRN )     set DA_WRITE_QRN = .TRUE.
- if ( ! $?DA_WRITE_QCI )     set DA_WRITE_QCI = .TRUE.
- if ( ! $?DA_WRITE_QSN )     set DA_WRITE_QSN = .TRUE.
- if ( ! $?DA_WRITE_QGR )     set DA_WRITE_QGR = .TRUE.
- if ( ! $?DA_RF_PASSES )     set DA_RF_PASSES = 6
+ if ( ! $?DA_WRITE_QCW )     set DA_WRITE_QCW = .FALSE.
+ if ( ! $?DA_WRITE_QRN )     set DA_WRITE_QRN = .FALSE.
+ if ( ! $?DA_WRITE_QCI )     set DA_WRITE_QCI = .FALSE.
+ if ( ! $?DA_WRITE_QSN )     set DA_WRITE_QSN = .FALSE.
+ if ( ! $?DA_WRITE_QGR )     set DA_WRITE_QGR = .FALSE.
  if ( ! $?DA_VAR_SCALING1 )  set DA_VAR_SCALING1 = 1.0
  if ( ! $?DA_VAR_SCALING2 )  set DA_VAR_SCALING2 = 1.0
  if ( ! $?DA_VAR_SCALING3 )  set DA_VAR_SCALING3 = 1.0
  if ( ! $?DA_VAR_SCALING4 )  set DA_VAR_SCALING4 = 1.0
  if ( ! $?DA_VAR_SCALING5 )  set DA_VAR_SCALING5 = 1.0
-
  if ( ! $?DA_LEN_SCALING1 )  set DA_LEN_SCALING1 = 1.0
  if ( ! $?DA_LEN_SCALING2 )  set DA_LEN_SCALING2 = 1.0
  if ( ! $?DA_LEN_SCALING3 )  set DA_LEN_SCALING3 = 1.0
@@ -218,17 +173,8 @@
  if ( ! $?DA_Y_START_SUB_DOMAIN )set DA_Y_START_SUB_DOMAIN = 35.0
  if ( ! $?DA_X_END_SUB_DOMAIN )set DA_X_END_SUB_DOMAIN = 80.0
  if ( ! $?DA_Y_END_SUB_DOMAIN )set DA_Y_END_SUB_DOMAIN = 60.0
- if ( ! $?DA_TESTING_3DVAR ) set DA_TESTING_3DVAR = .FALSE.
- if ( ! $?DA_TEST_TRANSFORMS )  set DA_TEST_TRANSFORMS = .FALSE.  
- if ( ! $?DA_TEST_STATISTICS )  set DA_TEST_STATISTICS = .FALSE.
- if ( ! $?DA_INTERPOLATE_STATS )  set DA_INTERPOLATE_STATS = .TRUE.
- if ( ! $?DA_MINIMISATION_OPTION) set DA_MINIMISATION_OPTION = 2
  if ( ! $?DA_WRITE_OUTER_LOOP) set DA_WRITE_OUTER_LOOP = .FALSE.
  if ( ! $?DA_LAT_STATS_OPTION) set DA_LAT_STATS_OPTION = .FALSE.
- if ( ! $?DA_CALCULATE_CG_COST_FUNCTION) set DA_CALCULATE_CG_COST_FUNCTION = .FALSE.
- if ( ! $?DA_CV_OPTIONS )    set DA_CV_OPTIONS = 3
- if ( ! $?DA_CV_OPTIONS_HUM ) set DA_CV_OPTIONS_HUM = 1
- if ( ! $?DA_CHECK_RH )      set DA_CHECK_RH = 2
  if ( ! $?DA_as1        )    set DA_as1 = "0.25, 0.75, 1.5"
  if ( ! $?DA_as2        )    set DA_as2 = "0.25, 0.75, 1.5"
  if ( ! $?DA_as3        )    set DA_as3 = "0.25, 0.75, 1.5"
@@ -242,38 +188,83 @@
  if ( ! $?DA_VERT_CORR )     set DA_VERT_CORR = 2
  if ( ! $?DA_VERTICAL_IP )   set DA_VERTICAL_IP = 0
  if ( ! $?DA_VERT_EVALUE )   set DA_VERT_EVALUE = 1
- if ( ! $?DA_MAX_VERT_VAR1 ) set DA_MAX_VERT_VAR1 = 99.0
- if ( ! $?DA_MAX_VERT_VAR2 ) set DA_MAX_VERT_VAR2 = 99.0
- if ( ! $?DA_MAX_VERT_VAR3 ) set DA_MAX_VERT_VAR3 = 99.0
- if ( ! $?DA_MAX_VERT_VAR4 ) set DA_MAX_VERT_VAR4 = 99.0
- if ( ! $?DA_MAX_VERT_VAR5 ) set DA_MAX_VERT_VAR5 = 0.0
  if ( ! $?DA_NUM_PSEUDO ) set DA_NUM_PSEUDO = 0
- if ( ! $?DA_PSEUDO_X ) set DA_PSEUDO_X = 1.0
- if ( ! $?DA_PSEUDO_Y ) set DA_PSEUDO_Y = 1.0
- if ( ! $?DA_PSEUDO_Z ) set DA_PSEUDO_Z = 1.0
+ if ( ! $?DA_PSEUDO_X ) set DA_PSEUDO_X = 165.0
+ if ( ! $?DA_PSEUDO_Y ) set DA_PSEUDO_Y =  65.0
+ if ( ! $?DA_PSEUDO_Z ) set DA_PSEUDO_Z =  15.0
  if ( ! $?DA_PSEUDO_VAL ) set DA_PSEUDO_VAL = 1.0
  if ( ! $?DA_PSEUDO_ERR ) set DA_PSEUDO_ERR = 1.0
- if ( ! $?DA_PSEUDO_VAR ) set DA_PSEUDO_VAR = t
+ if ( ! $?DA_PSEUDO_VAR ) set DA_PSEUDO_VAR = u
+
+ set DA_CY = `echo $START_DATE | cut -c1-4`
+ set DA_MM = `echo $START_DATE | cut -c5-6`
+ set DA_DD = `echo $START_DATE | cut -c7-8`
+ set DA_HH = `echo $START_DATE | cut -c9-10`
+ setenv DA_ANALYSIS_DATE ${DA_CY}-${DA_MM}-${DA_DD}_${DA_HH}:00:00.0000
+
+#-----------------------------------------------------------------------
+# [2.0] Perform sanity checks:
+#-----------------------------------------------------------------------
+
+ if ( ! -s $DA_FIRST_GUESS ) then
+    echo "Error: First Guess file does not exist:"
+    echo  $DA_FIRST_GUESS
+    exit 1
+ endif
+
+ if ( ! -s $DA_OBSERVATIONS ) then
+    echo "Error: Observation file does not exist:"
+    echo  $DA_OBSERVATIONS
+    exit 1
+ endif
+
+ if ( ! -s $DA_BACK_ERRORS ) then
+    echo "Error: Background Error file does not exist:"
+    echo  $DA_BACK_ERRORS
+    exit 1
+ endif
+
+#-----------------------------------------------------------------------
+# [3.0] Prepare for assimilation:
+#-----------------------------------------------------------------------
+
+ rm -rf ${RUN_DIR}/wrf-var >&! /dev/null
+ mkdir ${RUN_DIR}/wrf-var >&! /dev/null
+ cd $RUN_DIR/wrf-var
+
+ cp $WRFVAR_DIR/run/LANDUSE.TBL .
+ cp $WRFVAR_DIR/main/wrfvar.exe  wrfvar.exe
+ cp $WRFVAR_DIR/run/hosts .
+
+ ln -sf $DA_FIRST_GUESS		wrf_3dvar_input
+ ln -sf $DA_BACK_ERRORS		fort.3${DA_CV_OPTIONS}
+ ln -sf $DA_OBSERVATIONS	fort.9${DA_OB_FORMAT}
+
+ if ( -e $DA_SSMI) then
+    ln -sf $DA_SSMI	fort.93
+    set DA_USE_SSMIRETRIEVALOBS = .TRUE.
+ endif
+
+ echo "First Guess Input File:      $DA_FIRST_GUESS"
+ echo "Background Error Input File: $DA_BACK_ERRORS"
+ echo "Observation Input File:      $DA_OBSERVATIONS"
+
+#Create WRF-Var namelist file:
 
 cat >! namelist.3dvar << EOF
 &record1
  MODEL_TYPE = '$DA_MODEL_TYPE',
- WRITE_INCREMENTS = $DA_WRITE_INCREMENTS /
+ WRITE_INCREMENTS = $DA_WRITE_INCREMENTS ,
+ GLOBAL           = $DA_GLOBAL,
+ PRINT_DETAIL   = $DA_PRINT_DETAIL /
 
 &record2
  ANALYSIS_TYPE = '$DA_ANALYSIS_TYPE',
  ANALYSIS_DATE = '$DA_ANALYSIS_DATE',
- ANALYSIS_ACCU = $DA_ANALYSIS_ACCU ,
- W_INCREMENTS  = $DA_W_INCREMENTS,
- DT_CLOUD_MODEL = $DA_DT_CLOUD_MODEL,
- WRITE_QCW      = $DA_WRITE_QCW,
- WRITE_QRN      = $DA_WRITE_QRN,
- WRITE_QCI      = $DA_WRITE_QCI,
- WRITE_QSN      = $DA_WRITE_QSN,
- WRITE_QGR      = $DA_WRITE_QGR /
+ ANALYSIS_ACCU =  $DA_ANALYSIS_ACCU /
 
 &record3
- fg_format = $DA_FG_FORMAT, 
+ fg_format = $DA_FG_FORMAT,
  ob_format = $DA_OB_FORMAT,
  num_fgat_time = $DA_NUM_FGAT_TIME /
 
@@ -286,7 +277,8 @@ cat >! namelist.3dvar << EOF
  Use_PilotObs   = $DA_USE_PILOTOBS,
  Use_SoundObs   = $DA_USE_SOUNDOBS,
  Use_SatemObs   = $DA_USE_SATEMOBS,
- Use_SatobObs   = $DA_USE_SATOBOBS,
+ Use_GeoAMVObs  = $DA_USE_GEO_AMV,
+ Use_PolarAMVObs = $DA_USE_POLAR_AMV,
  Use_AirepObs   = $DA_USE_AIREPOBS,
  Use_GpspwObs   = $DA_USE_GPSPWOBS,
  Use_GpsrefObs   = $DA_USE_GPSREFOBS,
@@ -297,7 +289,7 @@ cat >! namelist.3dvar << EOF
  use_ssmt1obs   = $DA_USE_SSMT1OBS,
  use_ssmt2obs   = $DA_USE_SSMT2OBS,
  use_qscatobs   = $DA_USE_QSCATOBS,
- use_radarobs   = $DA_USE_RadarObs,
+ use_radarobs   = $DA_USE_RADAROBS,
  Use_Radar_rv   = $DA_Use_Radar_rv,
  Use_Radar_rf   = $DA_Use_Radar_rf,
  check_max_iv   = $DA_Check_Max_IV,
@@ -308,7 +300,7 @@ cat >! namelist.3dvar << EOF
 
 &record5
  TIME_WINDOW    = $DA_TIME_WINDOW,
- PRINT_DETAIL   = $DA_PRINT_DETAIL /
+ /
 
 &record6
  max_ext_its    = $DA_MAX_EXT_ITS,
@@ -386,11 +378,7 @@ sfc_assi_options = $DA_SFC_ASSI_OPTIONS,
 
 EOF
 
-#set date
- set DA_CY = `echo $DA_ANALYSIS_DATE | cut -c1-4`
- set DA_MM = `echo $DA_ANALYSIS_DATE | cut -c6-7`
- set DA_DD = `echo $DA_ANALYSIS_DATE | cut -c9-10`
- set DA_HH = `echo $DA_ANALYSIS_DATE | cut -c12-13`
+#Create WRF V2.1 namelist.input file:
 
 cat >! namelist.input << EOF
  &time_control
@@ -410,7 +398,7 @@ cat >! namelist.input << EOF
  end_hour                            = $DA_HH, $DA_HH, $DA_HH,
  end_minute                          = 00,
  end_second                          = 00,
- interval_seconds                    = 10800
+ interval_seconds                    = 21600,
  input_from_file                     = .true.,.false.,.false.,
  history_interval                    = 180,  60,   60,
  frames_per_outfile                  = 1000, 1000, 1000,
@@ -437,14 +425,14 @@ cat >! namelist.input << EOF
  dx                                  = $GRID_DISTANCE, $GRID_DISTANCE, $GRID_DISTANCE,
  dy                                  = $GRID_DISTANCE, $GRID_DISTANCE, $GRID_DISTANCE,
  grid_id                             = 1,     2,     3,
- level                               = 1,     1,     2,
  parent_id                           = 0,     1,     2,
  i_parent_start                      = 0,     30,    30,
  j_parent_start                      = 0,     20,    30,
  parent_grid_ratio                   = 1,     3,     3,
  parent_time_step_ratio              = 1,     3,     3,
  feedback                            = 1,
- smooth_option                       = 0
+ smooth_option                       = 0,
+ nproc_x                             = 1,
  /
 
  &physics
@@ -453,7 +441,7 @@ cat >! namelist.input << EOF
  ra_sw_physics                       = 1,     1,     1,
  radt                                = 10,    10,    10,
  sf_sfclay_physics                   = 1,     1,     1,
- sf_surface_physics                  = 1,     1,     1,
+ sf_surface_physics                  = ${DA_SF_SURFACE_PHYSICS},     1,     1,
  bl_pbl_physics                      = 1,     1,     1,
  bldt                                = 0,     0,     0,
  cu_physics                          = 1,     1,     0,
@@ -461,8 +449,8 @@ cat >! namelist.input << EOF
  isfflx                              = 1,
  ifsnow                              = 0,
  icloud                              = 1,
+ num_soil_layers                     = ${DA_NUM_SOIL_LAYERS},
  surface_input_source                = 1,
- num_soil_layers                     = 5,
  mp_zero_out                         = 0,
  maxiens                             = 1,
  maxens                              = 3,
@@ -511,47 +499,33 @@ cat >! namelist.input << EOF
  open_ye                             = .false.,.false.,.false.,
  nested                              = .false., .true., .true.,
  real_data_init_type                 = $DA_FG_FORMAT
- /
-
+/
  &namelist_quilt
  nio_tasks_per_group = 0,
  nio_groups = 1,
  /
- /
 
 EOF
 
-#-----------------------------------------------------------------------
-# [3.0] Run 3DVAR:
-#-----------------------------------------------------------------------
+#-------------------------------------------------------------------
+#Run WRF-Var:
+#-------------------------------------------------------------------
 
- echo ""
- echo "Running da_3dvar.exe - run output in da_3dvar.out"
+if ( $NUM_PROCS > 1  )then
+#  Remember to create hosts file for your machine (wrfvar/run/hosts file).
+   mpirun -v -np ${NUM_PROCS} -nolocal -machinefile hosts ./wrfvar.exe >&! /dev/null
+else
+   mpirun -v -np 1 ./wrfvar.exe >&! /dev/null #Assumes compile in DM mode.
+endif
 
-#Uncomment for particular machine:
-#DEC, SGI, Linux/PC multiPE: 
- if( ${os} == 'OSF1') then
-    set machine_name = `uname -n`
-cat > hosts << EOF
-$machine_name
-$machine_name
-$machine_name
-$machine_name
-EOF
- endif
-#mpirun -np 4 -machinefile hosts ./da_3dvar.exe
- ./da_3dvar.exe >&! da_3dvar.out
-#BIG : mpirun -np 4 ./da_3dvar.exe
-#    mpirun -np 8 ./da_3dvar.exe 
-#IBM (llsubmit): 
-#  poe ./da_3dvar.exe
-#AFWA: setenv LOADL_INTERACTIVE_CLASS 1
-#AFWA: poe ./da_3dvar.exe -euilib us -hostfile host.afwa -procs 15
+#IBM (llsubmit):
+#poe ./wrfvar.exe
+#mpirun -np ${NUM_PROCS} ./wrfvar.exe
 
- mv fort.12 DAProg_3DVAR.statistics
- mv fort.81 DAProg_3DVAR.cost_fn
- mv fort.82 DAProg_3DVAR.grad_fn
+cp fort.12 DAProg_3DVAR.statistics >&! /dev/null
+cp fort.81 DAProg_3DVAR.cost_fn >&! /dev/null
+cp fort.82 DAProg_3DVAR.grad_fn >&! /dev/null
 
- echo "DA_Run_3DVAR.csh completed"
- exit (0)
+echo "WRF-VAR completed"
 
+exit (0)

@@ -39,7 +39,10 @@ CONTAINS
       INTEGER :: idum1, idum2
 
 #ifdef DEREF_KLUDGE
-      INTEGER     :: sm31 , em31 , sm32 , em32 , sm33 , em33
+!  see http://www.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm
+   INTEGER     :: sm31 , em31 , sm32 , em32 , sm33 , em33
+   INTEGER     :: sm31x, em31x, sm32x, em32x, sm33x, em33x
+   INTEGER     :: sm31y, em31y, sm32y, em32y, sm33y, em33y
 #endif
 
 #include "deref_kludge.h"
@@ -115,6 +118,15 @@ CONTAINS
 
 integer::oops1,oops2
 
+#ifdef DEREF_KLUDGE
+!  see http://www.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm
+      INTEGER     :: sm31 , em31 , sm32 , em32 , sm33 , em33
+      INTEGER     :: sm31x, em31x, sm32x, em32x, sm33x, em33x
+      INTEGER     :: sm31y, em31y, sm32y, em32y, sm33y, em33y
+#endif
+
+#include "deref_kludge.h"
+
 #define COPY_IN
 #include <em_scalar_derefs.inc>
 #ifdef DM_PARALLEL
@@ -179,6 +191,15 @@ integer::oops1,oops2
 
       real_data_init_type = model_config_rec%real_data_init_type
 
+      !  Save the TSK field for later use in the sea ice surface temperature
+      !  for the Noah LSM scheme.
+
+       DO j = jts, MIN(jte,jde-1)
+         DO i = its, MIN(ite,ide-1)
+            tsk_save(i,j) = tsk(i,j)
+         END DO
+      END DO
+
       !  Take the data from the input file and store it in the variables that
       !  use the WRF naming and ordering conventions.
 
@@ -200,6 +221,27 @@ integer::oops1,oops2
       ELSE
          ifndsoilw = 0
       END IF
+
+      !  We require input data for the various LSM schemes.
+
+      enough_data : SELECT CASE ( model_config_rec%sf_surface_physics(grid%id) )
+
+         CASE (SLABSCHEME)
+            IF ( num_st_levels_input .LT. 2 ) THEN
+               CALL wrf_error_fatal ( 'Not enough soil temperature data for 5-layer soil scheme.')
+            END IF
+
+         CASE (LSMSCHEME)
+            IF ( num_st_levels_input .LT. 2 ) THEN
+               CALL wrf_error_fatal ( 'Not enough soil temperature data for Noah LSM scheme.')
+            END IF
+
+         CASE (RUCLSMSCHEME)
+            IF ( num_st_levels_input .LT. 2 ) THEN
+               CALL wrf_error_fatal ( 'Not enough soil temperature data for RUC LSM scheme.')
+            END IF
+
+      END SELECT enough_data
 
       !  For sf_surface_physics = 1, we want to use close to a 10 cm value
       !  for the bottom level of the soil temps.
@@ -462,9 +504,9 @@ integer::oops1,oops2
       CALL nl_get_seaice_threshold ( grid%id , seaice_threshold ) 
       CALL nl_get_isice ( grid%id , isice )
       CALL nl_get_iswater ( grid%id , iswater )
-      CALL adjust_for_seaice_post ( xice , landmask , tsk , ivgtyp , vegcat , lu_index , &
+      CALL adjust_for_seaice_post ( xice , landmask , tsk , tsk_save , ivgtyp , vegcat , lu_index , &
                                     xland , landusef , isltyp , soilcat , soilctop , &
-                                    soilcbot , tmn , &
+                                    soilcbot , tmn , vegfra , &
                                     tslb , smois , sh2o , &
                                     seaice_threshold , &
                                     num_veg_cat , num_soil_top_cat , num_soil_bot_cat , &
@@ -515,6 +557,14 @@ endif
 if(oops2.gt.0) then
 print *,'points artificially set to water: ',oops2
 endif
+! fill sst array with tsk if missing in real input (needed for time-varying sst in wrf)
+      DO j = jts, MIN(jde-1,jte)
+         DO i = its, MIN(ide-1,ite)
+           IF ( flag_sst .NE. 1 ) THEN
+             sst(i,j) = tsk(i,j)
+           ENDIF
+         END DO
+      END DO
 
       !  From the full level data, we can get the half levels, reciprocals, and layer
       !  thicknesses.  These are all defined at half level locations, so one less level.
@@ -708,12 +758,12 @@ endif
       
             k = kte-1
       
-            qvf1 = 0.5*(moist_2(i,k,j,P_QV)+moist_2(i,k,j,P_QV))
+            qvf1 = 0.5*(moist(i,k,j,P_QV)+moist(i,k,j,P_QV))
             qvf2 = 1./(1.+qvf1)
             qvf1 = qvf1*qvf2
       
             p(i,k,j) = - 0.5*(mu_2(i,j)+qvf1*mub(i,j))/rdnw(k)/qvf2
-            qvf = 1. + rvovrd*moist_2(i,k,j,P_QV)
+            qvf = 1. + rvovrd*moist(i,k,j,P_QV)
             alt(i,k,j) = (r_d/p1000mb)*(t_2(i,k,j)+t0)*qvf*(((p(i,k,j)+pb(i,k,j))/p1000mb)**cvpm)
             al(i,k,j) = alt(i,k,j) - alb(i,k,j)
       
@@ -721,11 +771,11 @@ endif
             !  inverse density fields (total and perturbation).
       
             DO k=kte-2,1,-1
-               qvf1 = 0.5*(moist_2(i,k,j,P_QV)+moist_2(i,k+1,j,P_QV))
+               qvf1 = 0.5*(moist(i,k,j,P_QV)+moist(i,k+1,j,P_QV))
                qvf2 = 1./(1.+qvf1)
                qvf1 = qvf1*qvf2
                p(i,k,j) = p(i,k+1,j) - (mu_2(i,j) + qvf1*mub(i,j))/qvf2/rdn(k+1)
-               qvf = 1. + rvovrd*moist_2(i,k,j,P_QV)
+               qvf = 1. + rvovrd*moist(i,k,j,P_QV)
                alt(i,k,j) = (r_d/p1000mb)*(t_2(i,k,j)+t0)*qvf* &
                            (((p(i,k,j)+pb(i,k,j))/p1000mb)**cvpm)
                al(i,k,j) = alt(i,k,j) - alb(i,k,j)
@@ -740,6 +790,28 @@ endif
                ph0(i,k,j) = ph_2(i,k,j) + phb(i,k,j)
             END DO
        
+         END DO
+      END DO
+
+      DO j = jts, min(jde-1,jte)
+         DO i = its, min(ide,ite)
+            u10(i,j)=u_2(i,1,j)
+         END DO
+      END DO
+
+      DO j = jts, min(jde,jte)
+         DO i = its, min(ide-1,ite)
+            v10(i,j)=v_2(i,1,j)
+         END DO
+      END DO
+
+      DO j = jts, min(jde-1,jte)
+         DO i = its, min(ide-1,ite)
+            p_surf = p00 * EXP ( -t00/a + ( (t00/a)**2 - 2.*g*ht(i,j)/a/r_d ) **0.5 ) 
+            psfc(i,j)=p_surf + p(i,1,j)
+            q2(i,j)=moist(i,1,j,P_QV)
+            th2(i,j)=t_2(i,1,j)+300.
+            t2(i,j)=th2(i,j)*(((p(i,1,j)+pb(i,1,j))/p00)**(r_d/cp))
          END DO
       END DO
 
@@ -779,7 +851,10 @@ endif
       TYPE (domain)          :: grid 
 
 #ifdef DEREF_KLUDGE
+!  see http://www.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm
       INTEGER     :: sm31 , em31 , sm32 , em32 , sm33 , em33
+      INTEGER     :: sm31x, em31x, sm32x, em32x, sm33x, em33x
+      INTEGER     :: sm31y, em31y, sm32y, em32y, sm33y, em33y
 #endif
 
 #include "deref_kludge.h"
@@ -822,6 +897,15 @@ endif
                                      its, ite, jts, jte, kts, kte, &
                                      ips, ipe, jps, jpe, kps, kpe, &
                                      i, j, k
+
+#ifdef DEREF_KLUDGE
+!  see http://www.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm
+      INTEGER     :: sm31 , em31 , sm32 , em32 , sm33 , em33
+      INTEGER     :: sm31x, em31x, sm32x, em32x, sm33x, em33x
+      INTEGER     :: sm31y, em31y, sm32y, em32y, sm33y, em33y
+#endif
+
+#include "deref_kludge.h"
 
 #define COPY_IN
 #include <em_scalar_derefs.inc>
@@ -958,12 +1042,12 @@ endif
       
             k = kte-1
       
-            qvf1 = 0.5*(moist_2(i,k,j,P_QV)+moist_2(i,k,j,P_QV))
+            qvf1 = 0.5*(moist(i,k,j,P_QV)+moist(i,k,j,P_QV))
             qvf2 = 1./(1.+qvf1)
             qvf1 = qvf1*qvf2
       
             p(i,k,j) = - 0.5*(mu_2(i,j)+qvf1*mub(i,j))/rdnw(k)/qvf2
-            qvf = 1. + rvovrd*moist_2(i,k,j,P_QV)
+            qvf = 1. + rvovrd*moist(i,k,j,P_QV)
             alt(i,k,j) = (r_d/p1000mb)*(t_2(i,k,j)+t0)*qvf*(((p(i,k,j)+pb(i,k,j))/p1000mb)**cvpm)
             al(i,k,j) = alt(i,k,j) - alb(i,k,j)
       
@@ -971,11 +1055,11 @@ endif
             !  inverse density fields (total and perturbation).
       
             DO k=kte-2,1,-1
-               qvf1 = 0.5*(moist_2(i,k,j,P_QV)+moist_2(i,k+1,j,P_QV))
+               qvf1 = 0.5*(moist(i,k,j,P_QV)+moist(i,k+1,j,P_QV))
                qvf2 = 1./(1.+qvf1)
                qvf1 = qvf1*qvf2
                p(i,k,j) = p(i,k+1,j) - (mu_2(i,j) + qvf1*mub(i,j))/qvf2/rdn(k+1)
-               qvf = 1. + rvovrd*moist_2(i,k,j,P_QV)
+               qvf = 1. + rvovrd*moist(i,k,j,P_QV)
                alt(i,k,j) = (r_d/p1000mb)*(t_2(i,k,j)+t0)*qvf* &
                            (((p(i,k,j)+pb(i,k,j))/p1000mb)**cvpm)
                al(i,k,j) = alt(i,k,j) - alb(i,k,j)

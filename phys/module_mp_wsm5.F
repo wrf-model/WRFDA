@@ -1,3 +1,13 @@
+#define WSM5_OPTIM
+#define INL
+#if (RWORDSIZE == DWORDSIZE)
+#  define VREC(A,B,C) vrec(A,B,C)
+#  define VSQRT(A,B,C) vsqrt(A,B,C)
+#else
+#  define VREC(A,B,C) vsrec(A,B,C)
+#  define VSQRT(A,B,C) vssqrt(A,B,C)
+#endif
+
 MODULE module_mp_wsm5
 !
 !
@@ -42,21 +52,22 @@ MODULE module_mp_wsm5
 !
 ! Specifies code-inlining of fpvs function in WSM52D below. JM 20040507
 !
-#define WSM5_OPTIM
-#define INL
 
 CONTAINS
 !===================================================================
 !
-  SUBROUTINE wsm5(th, q, qc, qr, qi, qs,                           &
-                     w, den, pii, p, delz, rain, rainncv,          &
-                     delt,g, cpd, cpv, rd, rv, t0c,                &
-                     ep1, ep2, qmin,                               &
-                     XLS, XLV0, XLF0, den0, denr,                  &
-                     cliq,cice,psat,                               &
-                     ids,ide, jds,jde, kds,kde,                    &
-                     ims,ime, jms,jme, kms,kme,                    &
-                     its,ite, jts,jte, kts,kte                     )
+  SUBROUTINE wsm5(th, q, qc, qr, qi, qs                            &
+                 ,w, den, pii, p, delz                             &
+                 ,delt,g, cpd, cpv, rd, rv, t0c                    &
+                 ,ep1, ep2, qmin                                   &
+                 ,XLS, XLV0, XLF0, den0, denr                      &
+                 ,cliq,cice,psat                                   &
+                 ,ids,ide, jds,jde, kds,kde                        &
+                 ,ims,ime, jms,jme, kms,kme                        &
+                 ,its,ite, jts,jte, kts,kte                        &
+              ! Optional 
+                 ,rain, rainncv                                    &
+                                                                   )
 !-------------------------------------------------------------------
   IMPLICIT NONE
 !-------------------------------------------------------------------
@@ -94,9 +105,6 @@ CONTAINS
                                                              pii, &
                                                                p, &
                                                             delz
-  REAL, DIMENSION( ims:ime , jms:jme ),                           &
-        INTENT(INOUT) ::                                    rain, &
-                                                         rainncv
   REAL, INTENT(IN   ) ::                                    delt, &
                                                                g, &
                                                               rd, &
@@ -115,6 +123,13 @@ CONTAINS
                                                             cice, &
                                                             psat, &
                                                             denr
+!
+! Optional
+!
+  REAL, DIMENSION( ims:ime , jms:jme ),                           &
+        OPTIONAL,                                                 &
+        INTENT(INOUT) ::                                    rain, &
+                                                         rainncv
 ! LOCAL VAR
   REAL, DIMENSION( its:ite , kts:kte ) ::   t
   REAL, DIMENSION( its:ite , kts:kte, 2 ) ::   qci, qrs
@@ -130,17 +145,20 @@ CONTAINS
             qrs(i,k,2) = qs(i,k,j)
          ENDDO
          ENDDO
-         CALL wsm52D(t, q(ims,kms,j), qci, qrs,                    &
-                     w(ims,kms,j), den(ims,kms,j),                 &
-                     p(ims,kms,j), delz(ims,kms,j), rain(ims,j),   &
-                     rainncv(ims,j),delt,g, cpd, cpv, rd, rv, t0c, &
-                     ep1, ep2, qmin,                               &
-                     XLS, XLV0, XLF0, den0, denr,                  &
-                     cliq,cice,psat,                               &
-                     j,                                            &
-                     ids,ide, jds,jde, kds,kde,                    &
-                     ims,ime, jms,jme, kms,kme,                    &
-                     its,ite, jts,jte, kts,kte                     )
+         CALL wsm52D(t, q(ims,kms,j), qci, qrs                     &
+                    ,w(ims,kms,j), den(ims,kms,j)                  &
+                    ,p(ims,kms,j), delz(ims,kms,j)                 &
+                    ,delt,g, cpd, cpv, rd, rv, t0c                 &
+                    ,ep1, ep2, qmin                                &
+                    ,XLS, XLV0, XLF0, den0, denr                   &
+                    ,cliq,cice,psat                                &
+                    ,j                                             &
+                    ,ids,ide, jds,jde, kds,kde                     &
+                    ,ims,ime, jms,jme, kms,kme                     &
+                    ,its,ite, jts,jte, kts,kte                     &
+                 ! optional
+                    ,rain(ims,j),rainncv(ims,j)                    &
+                                                                   )
          DO K=kts,kte
          DO I=its,ite
             th(i,k,j)=t(i,k)/pii(i,k,j)
@@ -154,15 +172,18 @@ CONTAINS
   END SUBROUTINE wsm5
 !===================================================================
 !
-  SUBROUTINE wsm52D(t, q, qci, qrs, w, den, p, delz, rain,         &
-                     rainncv,delt,g, cpd, cpv, rd, rv, t0c,        &
-                     ep1, ep2, qmin,                               &
-                     XLS, XLV0, XLF0, den0, denr,                  &
-                     cliq,cice,psat,                               &
-                     lat,                                          &
-                     ids,ide, jds,jde, kds,kde,                    &
-                     ims,ime, jms,jme, kms,kme,                    &
-                     its,ite, jts,jte, kts,kte                     )
+  SUBROUTINE wsm52D(t, q, qci, qrs, w, den, p, delz                &
+                   ,delt,g, cpd, cpv, rd, rv, t0c                  &
+                   ,ep1, ep2, qmin                                 &
+                   ,XLS, XLV0, XLF0, den0, denr                    &
+                   ,cliq,cice,psat                                 &
+                   ,lat                                            &
+                   ,ids,ide, jds,jde, kds,kde                      &
+                   ,ims,ime, jms,jme, kms,kme                      &
+                   ,its,ite, jts,jte, kts,kte                      &
+                 ! optional
+                   ,rain,rainncv                                   &
+                                                                   )
 !-------------------------------------------------------------------
   IMPLICIT NONE
 !-------------------------------------------------------------------
@@ -185,9 +206,6 @@ CONTAINS
                                                              den, &
                                                                p, &
                                                             delz
-  REAL, DIMENSION( ims:ime ),                                     &
-        INTENT(INOUT) ::                                    rain, &
-                                                         rainncv
   REAL, INTENT(IN   ) ::                                    delt, &
                                                                g, &
                                                              cpd, &
@@ -206,6 +224,13 @@ CONTAINS
                                                             cice, &
                                                             psat, &
                                                             denr
+!
+! Optional
+!
+  REAL, DIMENSION( ims:ime ),                                     &
+        OPTIONAL,                                                 &
+        INTENT(INOUT) ::                                    rain, &
+                                                         rainncv
 ! LOCAL VAR
   REAL, DIMENSION( its:ite , kts:kte , 2) ::                      &
         rh, qs, rslope, rslope2, rslope3, rslopeb,                &
@@ -330,11 +355,11 @@ CONTAINS
 !
 #ifdef WSM5_OPTIM
       do k = kts, kte
-        CALL vsrec( tvec1(its), den(its,k), ite-its+1 )
+        CALL VREC( tvec1(its), den(its,k), ite-its+1 )
         do i = its, ite
           tvec1(i) = tvec1(i)*den0
         enddo
-        CALL vssqrt( denfac(its,k), tvec1(its), ite-its+1 )
+        CALL VSQRT( denfac(its,k), tvec1(its), ite-its+1 )
       enddo
 #else
       do k = kts, kte
@@ -582,8 +607,8 @@ CONTAINS
       do i = its, ite
         fallsum = fall(i,1,1)+fall(i,1,2)
         if(fallsum.gt.0.) then
-          rainncv(i) = fallsum*delz(i,1)/denr*dtcld*1000.
-          rain(i) = fallsum*delz(i,1)/denr*dtcld*1000. + rain(i)
+          IF(PRESENT(rainncv))rainncv(i) = fallsum*delz(i,1)/denr*dtcld*1000.
+          IF(PRESENT(rain   ))rain(i) = fallsum*delz(i,1)/denr*dtcld*1000. + rain(i)
         endif
       enddo
 !

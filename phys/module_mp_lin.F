@@ -35,18 +35,22 @@ CONTAINS
 !  Lin et al., 1983, JAM, 1065-1092, and
 !  Rutledge and Hobbs, 1984, JAS, 2949-2972
 !-------------------------------------------------------------------
-  SUBROUTINE lin_et_al(th, qv, ql, qr, qi, qs, qg,                 &
-                       qrold, qsold, qgold,                        &
-                       rho, pii, p, RAINNC, RAINNCV,               &
-                       dt_in, z, ht, dz8w,                         &
-                       grav, cp, Rair, rvapor,                     &
-                       XLS, XLV, XLF, rhowater, rhosnow,           &
-                       EP2,SVP1,SVP2,SVP3,SVPT0,                   &
-                       P_QI,P_QS,P_QG,                             &
-                       P_FIRST_SCALAR,                             &
-                       ids,ide, jds,jde, kds,kde,                  & ! domain dims
-                       ims,ime, jms,jme, kms,kme,                  & ! memory dims
-                       its,ite, jts,jte, kts,kte                   ) ! tile   dims
+  SUBROUTINE lin_et_al(th                                          &
+                      ,qv, ql, qr                                  &
+                      ,rho, pii, p                                 &
+                      ,dt_in                                       &
+                      ,z,ht, dz8w                                  &
+                      ,grav, cp, Rair, rvapor                      &
+                      ,XLS, XLV, XLF, rhowater, rhosnow            &
+                      ,EP2,SVP1,SVP2,SVP3,SVPT0                    &
+                      ,ids,ide, jds,jde, kds,kde                   &
+                      ,ims,ime, jms,jme, kms,kme                   &
+                      ,its,ite, jts,jte, kts,kte                   &
+                  ! Optional 
+                      , RAINNC, RAINNCV                            &
+                      , F_QI,F_QS,F_QG                             &
+                      , qi, qs, qg                                 &
+                                                                   )
 !-------------------------------------------------------------------
   IMPLICIT NONE
 !-------------------------------------------------------------------
@@ -55,25 +59,19 @@ CONTAINS
 !
   INTEGER,      INTENT(IN   )    ::   ids,ide, jds,jde, kds,kde , &
                                       ims,ime, jms,jme, kms,kme , &
-                                      its,ite, jts,jte, kts,kte , &
-                                      P_QI,P_QS,P_QG,             &
-                                      P_FIRST_SCALAR
+                                      its,ite, jts,jte, kts,kte
 
   REAL, DIMENSION( ims:ime , kms:kme , jms:jme ),                 &
         INTENT(INOUT) ::                                          &
                                                               th, &
                                                               qv, &
                                                               ql, &
-                                                              qr, &
-                                                              qi, &
-                                                              qs, &
-                                                              qg
+                                                              qr
+
+
 !
   REAL, DIMENSION( ims:ime , kms:kme , jms:jme ),                 &
         INTENT(IN   ) ::                                          &
-                                                           qrold, &
-                                                           qsold, &
-                                                           qgold, &
                                                              rho, &
                                                              pii, &
                                                                p, &
@@ -82,9 +80,6 @@ CONTAINS
   REAL, DIMENSION( ims:ime , kms:kme , jms:jme ),                 &
         INTENT(IN   ) ::                                       z
 
-  REAL, DIMENSION( ims:ime , jms:jme ),                           &
-        INTENT(INOUT) ::                                  RAINNC, &
-                                                         RAINNCV
 
 
   REAL , DIMENSION( ims:ime , jms:jme ) , INTENT(IN) ::       ht
@@ -102,6 +97,22 @@ CONTAINS
 
   REAL, INTENT(IN   ) :: EP2,SVP1,SVP2,SVP3,SVPT0
 
+! Optional
+
+  REAL, DIMENSION( ims:ime , kms:kme , jms:jme ),                 &
+        OPTIONAL,                                                 &
+        INTENT(INOUT) ::                                          &
+                                                              qi, &
+                                                              qs, &
+                                                              qg
+
+  REAL, DIMENSION( ims:ime , jms:jme ),                           &
+        OPTIONAL,                                                 &
+        INTENT(INOUT) ::                                  RAINNC, &
+                                                         RAINNCV
+
+  LOGICAL, INTENT(IN), OPTIONAL :: F_QI,F_QS,F_QG
+
 ! LOCAL VAR
 
   INTEGER             ::                            min_q, max_q
@@ -111,28 +122,36 @@ CONTAINS
 
   REAL, DIMENSION( kts:kte )   ::                  qvz, qlz, qrz, &
                                                    qiz, qsz, qgz, &
-                                                  qrzold, qszold, &
-                                                     qgzold, thz, &
+                                                             thz, &
                                                      tothz, rhoz, &
                                                    orhoz, sqrhoz, &
                                                         prez, zz, &
                                                         dzw
+
+  LOGICAL flag_qi, flag_qs, flag_qg
 !
   REAL    ::         dt, pptrain, pptsnow, pptgraul, rhoe_s,      &
                      gindex, pptice
 
   INTEGER ::               i,j,k
 !
+   flag_qi = .false.
+   flag_qs = .false.
+   flag_qg = .false.
+   IF ( PRESENT ( f_qi ) ) flag_qi = f_qi
+   IF ( PRESENT ( f_qs ) ) flag_qs = f_qs
+   IF ( PRESENT ( f_qg ) ) flag_qg = f_qg
+!
    dt=dt_in
    rhoe_s=1.29
 !
-   IF (P_QI .lt. P_FIRST_SCALAR .or. P_QS .lt. P_FIRST_SCALAR) THEN
+   IF ( .NOT. flag_qi .OR. .NOT. flag_qs ) THEN
       CALL wrf_error_fatal ( 'module_mp_lin: Improper use of Lin et al scheme; no ice phase. Please chose another one.')
    ENDIF
 
    gindex=1.0
 
-   IF (P_QG .lt. P_FIRST_SCALAR) gindex=0.
+   IF (.not.flag_qg) gindex=0.
 
    j_loop:  DO j = jts, jte
    i_loop:  DO i = its, ite
@@ -143,7 +162,6 @@ CONTAINS
       qvz(k)=qv(i,k,j)
       qlz(k)=ql(i,k,j)
       qrz(k)=qr(i,k,j)
-      qrzold(k)=qrold(i,k,j)
       thz(k)=th(i,k,j)
 !
       rhoz(k)=rho(i,k,j)
@@ -155,7 +173,7 @@ CONTAINS
       dzw(k)=dz8w(i,k,j)
    END DO
 
-   IF (P_QI .ge. P_FIRST_SCALAR) THEN
+   IF ( flag_qi .AND. PRESENT( qi ) ) THEN
       DO k = kts, kte
          qiz(k)=qi(i,k,j)
       ENDDO
@@ -165,27 +183,23 @@ CONTAINS
       ENDDO
    ENDIF
 
-   IF (P_QS .ge. P_FIRST_SCALAR) THEN
+   IF ( flag_qs .AND. PRESENT( qs ) ) THEN
       DO k = kts, kte
          qsz(k)=qs(i,k,j)
-         qszold(k)=qsold(i,k,j)
       ENDDO
    ELSE
       DO k = kts, kte
          qsz(k)=0.
-         qszold(k)=0.
       ENDDO
    ENDIF
 
-   IF (P_QG .ge. P_FIRST_SCALAR) THEN
+   IF ( flag_qg .AND. PRESENT( qg ) ) THEN
       DO k = kts, kte
          qgz(k)=qg(i,k,j)
-         qgzold(k)=qgold(i,k,j)
       ENDDO
    ELSE
       DO k = kts, kte
          qgz(k)=0.
-         qgzold(k)=0.
       ENDDO
    ENDIF
 !
@@ -194,7 +208,6 @@ CONTAINS
    pptgraul=0.
    pptice=0.
    CALL clphy1d(    dt, qvz, qlz, qrz, qiz, qsz, qgz,         &
-                    qrzold, qszold, qgzold,                   &
                     thz, tothz, rhoz, orhoz, sqrhoz,          &
                     prez, zz, dzw, ht(I,J),                   &
                     pptrain, pptsnow, pptgraul, pptice,       &
@@ -214,8 +227,8 @@ CONTAINS
    graupel(i,j)=pptgraul
    ice(i,j)=pptice
 !
-   RAINNCV(i,j)= pptrain + pptsnow + pptgraul + pptice
-   RAINNC(i,j)=RAINNC(i,j) + pptrain + pptsnow + pptgraul + pptice
+   IF ( PRESENT( RAINNCV ) ) RAINNCV(i,j)= pptrain + pptsnow + pptgraul + pptice
+   IF ( PRESENT( RAINNC  ) ) RAINNC(i,j)=RAINNC(i,j) + pptrain + pptsnow + pptgraul + pptice
 
 !
 !- update data from 1-D back to 3-D
@@ -228,19 +241,19 @@ CONTAINS
       th(i,k,j)=thz(k)
    END DO
 !
-   IF (P_QI .ge. P_FIRST_SCALAR) THEN
+   IF ( flag_qi .AND. PRESENT( qi ) ) THEN
       DO k = kts, kte
          qi(i,k,j)=qiz(k)
       ENDDO
    ENDIF
 
-   IF (P_QS .ge. P_FIRST_SCALAR) THEN
+   IF ( flag_qs .AND. PRESENT( qs ) ) THEN
       DO k = kts, kte
          qs(i,k,j)=qsz(k)
       ENDDO
    ENDIF
 
-   IF (P_QG .ge. P_FIRST_SCALAR) THEN
+   IF ( flag_qg .AND. PRESENT( qg ) ) THEN
       DO k = kts, kte
          qg(i,k,j)=qgz(k)
       ENDDO
@@ -254,7 +267,6 @@ CONTAINS
 
 !-----------------------------------------------------------------------
    SUBROUTINE clphy1d(dt, qvz, qlz, qrz, qiz, qsz, qgz,                &
-                      qrzold, qszold, qgzold,                          &
                       thz, tothz, rho, orho, sqrho,                    &
                       prez, zz, dzw, zsfc, pptrain, pptsnow, pptgraul, &
                       pptice, grav, cp, Rair, rvapor, gindex,          &
@@ -326,8 +338,7 @@ CONTAINS
 
   REAL,    DIMENSION( kts:kte ),                                      &
            INTENT(IN   )               :: tothz, rho, orho, sqrho,    &
-                                          prez, zz, qrzold, qszold,   &
-                                          qgzold, dzw
+                                          prez, zz, dzw
 
   REAL,    INTENT(IN   )               :: dt, grav, cp, Rair, rvapor, &
                                           XLS, XLV, XLF, rhowater,    &
@@ -648,12 +659,9 @@ CONTAINS
       max_q=kts-1
 !
       do k=kts,kte-1
-!        if (qrzold(k) .gt. 1.0e-12) then
-!!       if (qrzold(k) .gt. 1.0e-8) then
          if (qrz(k) .gt. 1.0e-8) then
             min_q=min0(min_q,k)
             max_q=max0(max_q,k)
-!!          tmp1=sqrt(pi*rhowater*xnor/rho(k)/qrzold(k))
             tmp1=sqrt(pi*rhowater*xnor/rho(k)/qrz(k))
             tmp1=sqrt(tmp1)
             vtrold(k)=o6*consta*gambp4*sqrho(k)/tmp1**constb
@@ -678,14 +686,9 @@ CONTAINS
               notlast=.false.
               del_tv=dtb+del_tv-t_del_tv
          endif
-
-! use small delta t to calculate the q?z flux
-! termi is the qrzold flux pass in the grid box through the upper boundary
-! termo is the qrzold flux pass out the grid box through the lower boundary
 !
          fluxin=0.
          do k=max_q,min_q,-1
-!           fluxout=rho(k)*vtrold(k)*qrzold(k)
             fluxout=rho(k)*vtrold(k)*qrz(k)
             flux=(fluxin-fluxout)/rho(k)/dzw(k)
             tmpqrz=qrz(k)
@@ -717,12 +720,9 @@ CONTAINS
       max_q=kts-1
 !
       do k=kts,kte-1
-!        if (qszold(k) .gt. 1.0e-12) then
-!!       if (qszold(k) .gt. 1.0e-8) then
          if (qsz(k) .gt. 1.0e-8) then
             min_q=min0(min_q,k)
             max_q=max0(max_q,k)
-!!          tmp1=sqrt(pi*rhosnow*xnos/rho(k)/qszold(k))
             tmp1=sqrt(pi*rhosnow*xnos/rho(k)/qsz(k))
             tmp1=sqrt(tmp1)
             vtsold(k)=o6*constc*gamdp4*sqrho(k)/tmp1**constd
@@ -748,14 +748,9 @@ CONTAINS
               notlast=.false.
               del_tv=dtb+del_tv-t_del_tv
          endif
-
-! use small delta t to calculate the qszold flux
-! termi is the qszold flux pass in the grid box through the upper boundary
-! termo is the qszold flux pass out the grid box through the lower boundary
 !
          fluxin=0.
          do k=max_q,min_q,-1
-!!          fluxout=rho(k)*vtsold(k)*qszold(k)
             fluxout=rho(k)*vtsold(k)*qsz(k)
             flux=(fluxin-fluxout)/rho(k)/dzw(k)
             qsz(k)=qsz(k)+del_tv*flux
@@ -787,12 +782,9 @@ CONTAINS
       max_q=kts-1
 !
       do k=kts,kte-1
-!        if (qgzold(k) .gt. 1.0e-12) then
-!!       if (qgzold(k) .gt. 1.0e-8) then
          if (qgz(k) .gt. 1.0e-8) then
             min_q=min0(min_q,k)
             max_q=max0(max_q,k)
-!!          tmp1=sqrt(pi*rhograul*xnog/rho(k)/qgzold(k))
             tmp1=sqrt(pi*rhograul*xnog/rho(k)/qgz(k))
             tmp1=sqrt(tmp1)
             term0=sqrt(4.*grav*rhograul*0.33334/rho(k)/cdrag)
@@ -820,13 +812,9 @@ CONTAINS
               del_tv=dtb+del_tv-t_del_tv
          endif
 
-! use small delta t to calculate the qgzold flux
-! termi is the qgzold flux pass in the grid box through the upper boundary
-! termo is the qgzold flux pass out the grid box through the lower boundary
 !
          fluxin=0.
          do k=max_q,min_q,-1
-!!          fluxout=rho(k)*vtgold(k)*qgzold(k)
             fluxout=rho(k)*vtgold(k)*qgz(k)
             flux=(fluxin-fluxout)/rho(k)/dzw(k)
             qgz(k)=qgz(k)+del_tv*flux
@@ -886,11 +874,6 @@ CONTAINS
               del_tv=dtb+del_tv-t_del_tv
          endif
 
-! use small delta t to calculate the qgzold flux
-! termi is the qgzold flux pass in the grid box through the upper boundary
-! termo is the qgzold flux pass out the grid box through the lower boundary
-!
-
          fluxin=0.
          do k=max_q,min_q,-1
             fluxout=rho(k)*vtiold(k)*qiz(k)
@@ -939,10 +922,7 @@ CONTAINS
 
 !! calculate terminal velocity of rain
 !
-!       if (qrzold(k) .gt. 1.0e-12) then
-!!      if (qrzold(k) .gt. 1.0e-8) then
         if (qrz(k) .gt. 1.0e-8) then
-!!          tmp1=sqrt(pi*rhowater*xnor*orho(k)/qrzold(k))
             tmp1=sqrt(pi*rhowater*xnor*orho(k)/qrz(k))
             xlambdar(k)=sqrt(tmp1)
             olambdar(k)=1.0/xlambdar(k)
@@ -965,10 +945,7 @@ CONTAINS
 !
 !! calculate terminal velocity of snow
 !
-!       if (qszold(k) .gt. 1.0e-12) then
-!!      if (qszold(k) .gt. 1.0e-8) then
         if (qsz(k) .gt. 1.0e-8) then
-!!          tmp1=sqrt(pi*rhosnow*xnos*orho(k)/qszold(k))
             tmp1=sqrt(pi*rhosnow*xnos*orho(k)/qsz(k))
             xlambdas(k)=sqrt(tmp1)
             olambdas(k)=1.0/xlambdas(k)
@@ -991,10 +968,7 @@ CONTAINS
 !
 !! calculate terminal velocity of graupel
 !
-!       if (qgzold(k) .gt. 1.0e-12) then
-!!      if (qgzold(k) .gt. 1.0e-8) then
         if (qgz(k) .gt. 1.0e-8) then
-!!          tmp1=sqrt( pi*rhograul*xnog*orho(k)/qgzold(k))
             tmp1=sqrt( pi*rhograul*xnog*orho(k)/qgz(k))
             xlambdag(k)=sqrt(tmp1)
             olambdag(k)=1.0/xlambdag(k)
@@ -2350,7 +2324,7 @@ CONTAINS
                                         qswz, qvsbar
 
   REAL ::   qsat, qlpqi, ratql, t0, t1, tmp1, ratqi, tsat, absft,    &
-            denom1, denom2, dqvsbar, ftsat, dftsat, qpz, qvold,      &
+            denom1, denom2, dqvsbar, ftsat, dftsat, qpz,             &
             gindex, es
 !
 !---------------------------------------------------------------------
@@ -2368,7 +2342,6 @@ CONTAINS
              exp( 21.8745584*(tem(k)-273.15)/(tem(k)-7.66) )
       end if
       qpz=qvz(k)+qlz(k)+qiz(k)
-      qvold=qvz(k)
       if (qpz .lt. qsat) then
          qvz(k)=qpz
          qiz(k)=0.0

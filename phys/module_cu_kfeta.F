@@ -15,17 +15,22 @@ MODULE module_cu_kfeta
 
 CONTAINS
 
-   SUBROUTINE KF_eta_CPS(DT,KTAU,DX,                         &
-              rho_phy,RTHCUTEN,RQVCUTEN,RQCCUTEN,RQRCUTEN,   &
-              RQICUTEN,RQSCUTEN,RAINCV,NCA,                  &
-              U,V,TH,T,W,QV,dz8w,Pcps,pi,                    &
-              W0AVG,XLV0,XLV1,XLS0,XLS1,CP,R,G,EP1,          &
-              EP2,SVP1,SVP2,SVP3,SVPT0,                      &
-              P_QR,P_QI,P_QS,P_FIRST_SCALAR,STEPCU,          &
-              CU_ACT_FLAG,warm_rain,CUTOP,CUBOT,             &
-              ids,ide, jds,jde, kds,kde,                     &
-              ims,ime, jms,jme, kms,kme,                     &
-              its,ite, jts,jte, kts,kte                      )
+   SUBROUTINE KF_eta_CPS(                                    &
+              ids,ide, jds,jde, kds,kde                      &
+             ,ims,ime, jms,jme, kms,kme                      &
+             ,its,ite, jts,jte, kts,kte                      &
+             ,DT,KTAU,DX                                     &
+             ,rho,RAINCV,NCA                                 &
+             ,U,V,TH,T,W,dz8w,Pcps,pi                        &
+             ,W0AVG,XLV0,XLV1,XLS0,XLS1,CP,R,G,EP1           &
+             ,EP2,SVP1,SVP2,SVP3,SVPT0                       &
+             ,STEPCU,CU_ACT_FLAG,warm_rain,CUTOP,CUBOT       &
+             ,QV                                             &
+            ! optionals
+             ,F_QV    ,F_QC    ,F_QR    ,F_QI    ,F_QS       &
+             ,RTHCUTEN,RQVCUTEN,RQCCUTEN,RQRCUTEN            &
+             ,RQICUTEN,RQSCUTEN                              &
+                                                             )
 !
 !-------------------------------------------------------------
    IMPLICIT NONE
@@ -33,8 +38,7 @@ CONTAINS
    INTEGER,      INTENT(IN   ) ::                            &
                                   ids,ide, jds,jde, kds,kde, &
                                   ims,ime, jms,jme, kms,kme, &
-                                  its,ite, jts,jte, kts,kte, &
-                                  P_QR,P_QI,P_QS,P_FIRST_SCALAR
+                                  its,ite, jts,jte, kts,kte
 
    INTEGER,      INTENT(IN   ) :: STEPCU
    LOGICAL,      INTENT(IN   ) :: warm_rain
@@ -55,21 +59,15 @@ CONTAINS
                                                          QV, &
                                                        dz8w, &
                                                        Pcps, &
-                                                    rho_phy, &
+                                                        rho, &
                                                          pi
 !
-   REAL,  INTENT(IN   ) :: DT, DX
-!
-   REAL, DIMENSION( ims:ime , kms:kme , jms:jme ),           &
-         INTENT(INOUT) ::                                    &
-                                                   RTHCUTEN, &
-                                                   RQVCUTEN, &
-                                                   RQCCUTEN, &
-                                                   RQRCUTEN, &
-                                                   RQICUTEN, &
-                                                   RQSCUTEN, &
+   REAL,  DIMENSION( ims:ime , kms:kme , jms:jme )         , &
+          INTENT(INOUT) ::                                   &
                                                       W0AVG
 
+   REAL,  INTENT(IN   ) :: DT, DX
+!
    REAL, DIMENSION( ims:ime , jms:jme ),                     &
           INTENT(INOUT) ::                           RAINCV
 
@@ -83,7 +81,38 @@ CONTAINS
    LOGICAL, DIMENSION( ims:ime , jms:jme ),                  &
           INTENT(INOUT) :: CU_ACT_FLAG
 
+!
+! Optional arguments
+!
+
+   REAL, DIMENSION( ims:ime , kms:kme , jms:jme ),           &
+         OPTIONAL,                                           &
+         INTENT(INOUT) ::                                    &
+                                                   RTHCUTEN, &
+                                                   RQVCUTEN, &
+                                                   RQCCUTEN, &
+                                                   RQRCUTEN, &
+                                                   RQICUTEN, &
+                                                   RQSCUTEN
+
+!
+! Flags relating to the optional tendency arrays declared above
+! Models that carry the optional tendencies will provdide the
+! optional arguments at compile time; these flags all the model
+! to determine at run-time whether a particular tracer is in
+! use or not.
+!
+   LOGICAL, OPTIONAL ::                                      &
+                                                   F_QV      &
+                                                  ,F_QC      &
+                                                  ,F_QR      &
+                                                  ,F_QI      &
+                                                  ,F_QS
+
+
 ! LOCAL VARS
+
+   LOGICAL :: flag_qr, flag_qi, flag_qs
 
    REAL, DIMENSION( kts:kte ) ::                             &
                                                         U1D, &
@@ -112,11 +141,17 @@ CONTAINS
 !----------------------
    NTST=STEPCU
    TST=float(NTST*2)
+   flag_qr = .FALSE.
+   flag_qi = .FALSE.
+   flag_qs = .FALSE.
+   IF ( PRESENT(F_QR) ) flag_qr = F_QR
+   IF ( PRESENT(F_QI) ) flag_qi = F_QI
+   IF ( PRESENT(F_QS) ) flag_qs = F_QS
 !
   DO J = jts,jte
       DO K=kts,kte
          DO I= its,ite
-!            SCR1=-5.0E-4*G*rho_phy(I,K,J)*(w(I,K,J)+w(I,K+1,J))
+!            SCR1=-5.0E-4*G*rho(I,K,J)*(w(I,K,J)+w(I,K+1,J))
 !            TV=T(I,K,J)*(1.+EP1*QV(I,K,J))
 !            RHOE=Pcps(I,K,J)/(R*TV)
 !            W0=-101.9368*SCR1/RHOE
@@ -139,7 +174,7 @@ CONTAINS
      ENDDO
 
      DO J = jts,jte
-        DO I=its,ite
+       DO I=its,ite
 
          IF ( NINT(NCA(I,J)) .gt. 0 ) then
             CU_ACT_FLAG(i,j) = .false.
@@ -161,13 +196,13 @@ CONTAINS
                U1D(K) =U(I,K,J)
                V1D(K) =V(I,K,J)
                T1D(K) =T(I,K,J)
-               RHO1D(K) =rho_phy(I,K,J)
+               RHO1D(K) =rho(I,K,J)
                QV1D(K)=QV(I,K,J)
                P1D(K) =Pcps(I,K,J)
                W0AVG1D(K) =W0AVG(I,K,J)
                DZ1D(k)=dz8w(I,K,J)
             ENDDO
-          CALL wrf_debug(500,'in kf_eta_para')
+          CALL wrf_debug(500,'calling kf_eta_para')
             CALL KF_eta_PARA(I, J,                  &
                  U1D,V1D,T1D,QV1D,P1D,DZ1D,         &
                  W0AVG1D,DT,DX,DXSQ,RHO1D,          &
@@ -175,46 +210,52 @@ CONTAINS
                  EP2,SVP1,SVP2,SVP3,SVPT0,          &
                  DQDT,DQIDT,DQCDT,DQRDT,DQSDT,DTDT, &
                  RAINCV,NCA,NTST,                   &
-                 P_QI,P_QS,P_FIRST_SCALAR,warm_rain,&
+                 flag_QI,flag_QS,warm_rain,         &
                  CUTOP,CUBOT,                       &
                  ids,ide, jds,jde, kds,kde,         &
                  ims,ime, jms,jme, kms,kme,         &
                  its,ite, jts,jte, kts,kte)
           CALL wrf_debug(500,'after kf_eta_para')
-            DO K=kts,kte
-               RTHCUTEN(I,K,J)=DTDT(K)/pi(I,K,J)
+            IF(PRESENT(rthcuten).AND.PRESENT(rqvcuten)) THEN
+              DO K=kts,kte
+                 RTHCUTEN(I,K,J)=DTDT(K)/pi(I,K,J)
 !              RTHCUMAX=max(abs(RTHCUTEN(I,K,J)),RTHCUMAX)
-               RQVCUTEN(I,K,J)=DQDT(K)
-            ENDDO
+                 RQVCUTEN(I,K,J)=DQDT(K)
+              ENDDO
+            ENDIF
 
-            IF(P_QR .ge. P_FIRST_SCALAR)THEN
-              DO K=kts,kte
-                 RQRCUTEN(I,K,J)=DQRDT(K)
-                 RQCCUTEN(I,K,J)=DQCDT(K)
-              ENDDO
-            ELSE
+            IF(PRESENT(rqrcuten).AND.PRESENT(rqccuten)) THEN
+              IF( F_QR )THEN
+                DO K=kts,kte
+                   RQRCUTEN(I,K,J)=DQRDT(K)
+                   RQCCUTEN(I,K,J)=DQCDT(K)
+                ENDDO
+              ELSE
 ! This is the case for Eta microphysics without 3d rain field
-              DO K=kts,kte
-                 RQRCUTEN(I,K,J)=0.
-                 RQCCUTEN(I,K,J)=DQRDT(K)+DQCDT(K)
-              ENDDO
+                DO K=kts,kte
+                   RQRCUTEN(I,K,J)=0.
+                   RQCCUTEN(I,K,J)=DQRDT(K)+DQCDT(K)
+                ENDDO
+              ENDIF
             ENDIF
 
 !......     QSTEN STORES GRAUPEL TENDENCY IF IT EXISTS, OTHERISE SNOW (V2)
 
 
-            IF(P_QI .ge. P_FIRST_SCALAR)THEN
-
-              DO K=kts,kte
-                 RQICUTEN(I,K,J)=DQIDT(K)
-              ENDDO
+            IF(PRESENT( rqicuten )) THEN
+              IF ( F_QI ) THEN
+                DO K=kts,kte
+                   RQICUTEN(I,K,J)=DQIDT(K)
+                ENDDO
+              ENDIF
             ENDIF
 
-            IF(P_QS .ge. P_FIRST_SCALAR)THEN
-
-              DO K=kts,kte
-                 RQSCUTEN(I,K,J)=DQSDT(K)
-              ENDDO
+            IF(PRESENT( rqscuten )) THEN
+              IF ( F_QS ) THEN
+                DO K=kts,kte
+                   RQSCUTEN(I,K,J)=DQSDT(K)
+                ENDDO
+              ENDIF
             ENDIF
 !
          ENDIF 
@@ -232,7 +273,7 @@ CONTAINS
                       EP2,SVP1,SVP2,SVP3,SVPT0,            &
                       DQDT,DQIDT,DQCDT,DQRDT,DQSDT,DTDT,   &
                       RAINCV,NCA,NTST,                     &
-                      P_QI,P_QS,P_FIRST_SCALAR,warm_rain,  &
+                      F_QI,F_QS,warm_rain,                 &
                       CUTOP,CUBOT,                         &
                       ids,ide, jds,jde, kds,kde,           &
                       ims,ime, jms,jme, kms,kme,           &
@@ -246,7 +287,10 @@ CONTAINS
       INTEGER, INTENT(IN   ) :: ids,ide, jds,jde, kds,kde, &
                                 ims,ime, jms,jme, kms,kme, &
                                 its,ite, jts,jte, kts,kte, &
-                                I,J,NTST,P_QI,P_QS,P_FIRST_SCALAR
+                                I,J,NTST
+          ! ,P_QI,P_QS,P_FIRST_SCALAR
+
+      LOGICAL, INTENT(IN   ) :: F_QI, F_QS
 
       LOGICAL, INTENT(IN   ) :: warm_rain
 !
@@ -360,6 +404,7 @@ CONTAINS
                  NM,LMAX,NCOUNT,NOITR,                     &
                  NSTEP,NTC,NCHM,ISHALL,NSHALL
       LOGICAL :: IPRNT
+      CHARACTER*1024 message
 !
       DATA P00,T00/1.E5,273.16/
       DATA RLF/3.339E5/
@@ -432,7 +477,8 @@ CONTAINS
 !         TKE(K) = Q2(I,J,NK)
          TKE(K) = 0.
          CLDHGT(K) = 0.
-         IF(P0(K).GE.500E2)L5=K
+!        IF(P0(K).GE.500E2)L5=K
+         IF(P0(K).GE.0.5*P0(1))L5=K
          IF(P0(K).GE.P300)LLFC=K
          IF(T0(K).GT.T00)ML=K
       ENDDO
@@ -500,14 +546,24 @@ usl:   DO
            NLAYRS=0
            DPTHMX=0.
            NK=LC-1
-           DO 
-             NK=NK+1   
-             DPTHMX=DPTHMX+DP(NK)
-             NLAYRS=NLAYRS+1
-             IF(DPTHMX.GT.DPMIN)THEN
-               EXIT 
-             ENDIF
-           END DO    
+           IF ( NK+1 .LT. KTS ) THEN
+             WRITE(message,*)'WOULD GO OFF BOTTOM: KF_ETA_PARA I,J,NK',I,J,NK
+             CALL wrf_message (TRIM(message)) 
+           ELSE
+             DO 
+               NK=NK+1   
+               IF ( NK .GT. KTE ) THEN
+                 WRITE(message,*)'WOULD GO OFF TOP: KF_ETA_PARA I,J,DPTHMX,DPMIN',I,J,DPTHMX,DPMIN
+                 CALL wrf_message (TRIM(message))
+                 EXIT
+               ENDIF
+               DPTHMX=DPTHMX+DP(NK)
+               NLAYRS=NLAYRS+1
+               IF(DPTHMX.GT.DPMIN)THEN
+                 EXIT 
+               ENDIF
+             END DO    
+           ENDIF
            IF(DPTHMX.LT.DPMIN)THEN 
              RETURN
            ENDIF
@@ -1217,6 +1273,7 @@ updraft:    DO NK=K,KL-1
 !        KSTART=MAX0(KPBL,KLCL)
 !        KSTART=KPBL                                  ! Changed 7/23/99
          KSTART=KPBL+1                                ! Changed 7/23/99
+         KLFS = LET-1
          DO NK = KSTART+1,KL
            DPPP = P0(KSTART)-P0(NK)
 !          IF(DPPP.GT.200.E2)THEN
@@ -1238,7 +1295,7 @@ updraft:    DO NK=K,KL-1
 !
 !...call tpmix2dd to find wet-bulb temp, qv...
 !
-          call tpmix2dd(p0(lfs),theted(lfs),tz(lfs),qss)
+          call tpmix2dd(p0(lfs),theted(lfs),tz(lfs),qss,i,j)
           THTAD(LFS)=TZ(LFS)*(P00/P0(LFS))**(0.2854*(1.-0.28*QSS))
 !     
 !...TAKE A FIRST GUESS AT THE INITIAL DOWNDRAFT MASS FLUX...
@@ -1281,7 +1338,7 @@ updraft:    DO NK=K,KL-1
           endif
           LDT = MIN0(LFS-1,KSTART-1)
 !
-          call tpmix2dd(p0(kstart),theted(kstart),tz(kstart),qss)
+          call tpmix2dd(p0(kstart),theted(kstart),tz(kstart),qss,i,j)
 !
           tz(kstart) = tz(kstart)-dtmelt
           ES=ALIQ*EXP((BLIQ*TZ(KSTART)-CLIQ)/(TZ(KSTART)-DLIQ))
@@ -1297,7 +1354,7 @@ updraft:    DO NK=K,KL-1
 !
 !...call tpmix2dd to find wet bulb temp, saturation mixing ratio...
 !
-            call tpmix2dd(p0(nd),theted(nd),tz(nd),qss)
+            call tpmix2dd(p0(nd),theted(nd),tz(nd),qss,i,j)
             qsd(nd) = qss
 !
 !...specify RH decrease of 20%/km in downdraft...
@@ -1715,7 +1772,7 @@ iter:     DO NCOUNT=1,10
             NK1=NK+1
             THETEU(NK1) = THETEU(NK)
 !
-            call tpmix2dd(p0(nk1),theteu(nk1),tgu(nk1),qgu(nk1))
+            call tpmix2dd(p0(nk1),theteu(nk1),tgu(nk1),qgu(nk1),i,j)
 !
             TVQU(NK1)=TGU(NK1)*(1.+0.608*QGU(NK1)-QLIQ(NK1)-QICE(NK1))
             IF(NK.EQ.K)THEN
@@ -2093,7 +2150,7 @@ iter:     DO NCOUNT=1,10
 !
 !...IF ICE PHASE IS NOT ALLOWED, MELT ALL FROZEN HYDROMETEORS...
 !
-          IF(P_QI .lt. P_FIRST_SCALAR .and. warm_rain)THEN
+          IF(.NOT. F_QI .and. warm_rain)THEN
 
             CPM=CP*(1.+0.887*QG(K))
             TG(K)=TG(K)-(QIG(K)+QSG(K))*RLF/CPM
@@ -2101,7 +2158,7 @@ iter:     DO NCOUNT=1,10
             DQIDT(K)=0.
             DQRDT(K)=(QRG(K)+QSG(K)-QR0(K)-QS0(K))/TIMEC
             DQSDT(K)=0.
-          ELSEIF(P_QI .lt. P_FIRST_SCALAR .and. .not. warm_rain)THEN
+          ELSEIF(.NOT. F_QI .and. .not. warm_rain)THEN
 !
 !...IF ICE PHASE IS ALLOWED, BUT MIXED PHASE IS NOT, MELT FROZEN HYDROME
 !...BELOW THE MELTING LEVEL, FREEZE LIQUID WATER ABOVE THE MELTING LEVEL
@@ -2116,7 +2173,7 @@ iter:     DO NCOUNT=1,10
             DQIDT(K)=0.
             DQRDT(K)=(QRG(K)+QSG(K)-QR0(K)-QS0(K))/TIMEC
             DQSDT(K)=0.
-          ELSEIF(P_QI .ge. P_FIRST_SCALAR) THEN
+          ELSEIF(F_QI) THEN
 !
 !...IF MIXED PHASE HYDROMETEORS ARE ALLOWED, FEED BACK CONVECTIVE TENDEN
 !...OF HYDROMETEORS DIRECTLY...
@@ -2124,7 +2181,7 @@ iter:     DO NCOUNT=1,10
             DQCDT(K)=(QLG(K)-QL0(K))/TIMEC
             DQIDT(K)=(QIG(K)-QI0(K))/TIMEC
             DQRDT(K)=(QRG(K)-QR0(K))/TIMEC
-            IF (P_QS .ge. P_FIRST_SCALAR) THEN
+            IF (F_QS) THEN
                DQSDT(K)=(QSG(K)-QS0(K))/TIMEC
             ELSE
                DQIDT(K)=DQIDT(K)+(QSG(K)-QS0(K))/TIMEC
@@ -2474,7 +2531,7 @@ iter:     DO NCOUNT=1,10
    END SUBROUTINE PROF5
 
 ! ------------------------------------------------------------------------
-   SUBROUTINE TPMIX2DD(p,thes,ts,qs)
+   SUBROUTINE TPMIX2DD(p,thes,ts,qs,i,j)
 !
 ! Lookup table variables:
 !     INTEGER, PARAMETER :: (KFNT=250,KFNP=220)
@@ -2488,8 +2545,10 @@ iter:     DO NCOUNT=1,10
 !-----------------------------------------------------------------------
    REAL,         INTENT(IN   )   :: P,THES
    REAL,         INTENT(INOUT)   :: TS,QS
+   INTEGER,      INTENT(IN   )   :: i,j     ! avail for debugging
    REAL    ::    TP,QQ,BTH,TTH,PP,T00,T10,T01,T11,Q00,Q10,Q01,Q11
    INTEGER ::    IPTB,ITHTB
+   CHARACTER*256 :: MESS
 !-----------------------------------------------------------------------
 
 !

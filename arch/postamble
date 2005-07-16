@@ -7,6 +7,9 @@ RM	= 	rm -f
 
 #	There is probably no reason to modify these rules
 
+wrf_ioapi_includes :
+	( cd ../external/ioapi_share ; \
+	$(MAKE) NATIVE_RWORDSIZE="$(NATIVE_RWORDSIZE)" RWORDSIZE="$(RWORDSIZE)" )
 
 .F.i:
 	$(RM) $@
@@ -19,7 +22,7 @@ RM	= 	rm -f
 	$(SED_FTN) $*.F > $*.b 
 	$(CPP) -I../inc $(CPPFLAGS) $*.b  > $*.f
 	$(RM) $*.b
-	$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $*.f
+	$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) $*.f
 
 .F.f:
 	$(RM) $@
@@ -29,7 +32,7 @@ RM	= 	rm -f
 
 .f.o:
 	$(RM) $@
-	$(FC) -c $(FCFLAGS) $*.f
+	$(FC) -c $(FCFLAGS) $(PROMOTION) $*.f
 
 .c.o:
 	$(RM) $@
