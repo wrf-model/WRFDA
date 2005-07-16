@@ -308,6 +308,10 @@ SUBROUTINE da_random_omb_all( iv, ob )
                               iv % bogus(n) % u(k) % qc, iv % bogus(n) % u(k) % inv )
             call da_random_omb( iv % bogus(n) % v(k) % error, ob % bogus(n) % v(k), &
                               iv % bogus(n) % v(k) % qc, iv % bogus(n) % v(k) % inv )
+            call da_random_omb( iv % bogus(n) % t(k) % error, ob % bogus(n) % t(k), &
+                              iv % bogus(n) % t(k) % qc, iv % bogus(n) % t(k) % inv )
+            call da_random_omb( iv % bogus(n) % q(k) % error, ob % bogus(n) % q(k), &
+                              iv % bogus(n) % q(k) % qc, iv % bogus(n) % q(k) % inv )
          END DO
 
          call da_random_omb( iv % bogus(n) % slp % error, ob % bogus(n) % slp, &

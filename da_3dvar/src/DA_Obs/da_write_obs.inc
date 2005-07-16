@@ -376,7 +376,9 @@ SUBROUTINE da_write_obs( ob, iv, re )
                          iv % bogus(n) % info % lon, &       ! Longitude
                          iv % bogus(n) % p(k), &             ! Obs Pressure
                          ob%bogus(n)%u(k), iv%bogus(n)%u(k), re%bogus(n)%u(k), &! O,O-B,O-A u
-                         ob%bogus(n)%v(k), iv%bogus(n)%v(k), re%bogus(n)%v(k) ! O,O-B,O-A v 
+                         ob%bogus(n)%v(k), iv%bogus(n)%v(k), re%bogus(n)%v(k), &! O,O-B,O-A v
+                         ob%bogus(n)%t(k), iv%bogus(n)%t(k), re%bogus(n)%t(k), &! O,O-B,O-A t
+                         ob%bogus(n)%q(k), iv%bogus(n)%q(k), re%bogus(n)%q(k)   ! O,O-B,O-A q 
 
          END DO
       END DO

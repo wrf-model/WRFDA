@@ -148,6 +148,8 @@ SUBROUTINE DA_Zero_Y( iv, y )
 
          y % bogus(n) % u(1:nlevels) = 0.0
          y % bogus(n) % v(1:nlevels) = 0.0
+         y % bogus(n) % t(1:nlevels) = 0.0
+         y % bogus(n) % q(1:nlevels) = 0.0
          y % bogus(n) % slp          = 0.0
       end do
    END IF

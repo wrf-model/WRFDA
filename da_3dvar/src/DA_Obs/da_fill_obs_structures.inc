@@ -510,6 +510,19 @@ SUBROUTINE da_fill_obs_structures( iv, ob )
 
             ob % bogus(n) % u(k) = iv % bogus(n) % u(k) % inv
             ob % bogus(n) % v(k) = iv % bogus(n) % v(k) % inv
+            ob % bogus(n) % t(k) = iv % bogus(n) % t(k) % inv
+            ob % bogus(n) % q(k) = iv % bogus(n) % q(k) % inv
+
+!           Calculate q error from rh error:
+
+            rh_error = iv%bogus(n)%q(k)%error ! q error is rh at this stage!
+            call da_get_q_error( iv % bogus(n) % p(k), &
+                                 ob % bogus(n) % t(k), &
+                                 ob % bogus(n) % q(k), &
+                                 iv % bogus(n) % t(k) % error, &
+                                 rh_error, q_error )
+
+            iv % bogus(n) % q(k) % error = q_error
          END DO
          ob % bogus(n) % slp = iv % bogus(n) % slp % inv
       END DO
@@ -517,6 +530,9 @@ SUBROUTINE da_fill_obs_structures( iv, ob )
 !     Initialise obs error factors (optionally overwritten in use_obs_errfac)
       iv % bogus_ef_u = 1.0
       iv % bogus_ef_v = 1.0
+      iv % bogus_ef_t = 1.0
+      iv % bogus_ef_p = 1.0
+      iv % bogus_ef_q = 1.0
       iv % bogus_ef_slp = 1.0
 
    ENDIF

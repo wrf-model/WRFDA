@@ -4,6 +4,7 @@ SUBROUTINE da_transform_xtoy_bogus_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
 !  This subroutine is the adjoint of bogus observation operators.
 !  It includes slp, winds.          Ying Zhang, September 2003.
 !  Port the algorithm to WRF frame. Xiaoyan Zhang and Qingnong Xiao, February 2005.
+!  Modified to be standard structure by Y.-R. Guo   06/21/2005
 !---------------------------------------------------------------------
 
    IMPLICIT NONE
@@ -44,7 +45,44 @@ SUBROUTINE da_transform_xtoy_bogus_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
          dx = iv%bogus(n)%loc%dx
          dxm = iv%bogus(n)%loc%dxm
 
-!        [1.2] Interpolate horizontally from cross points:
+
+!        [1.1] Adjoint feedback from Y to X for u and v:
+
+#ifndef DEREF_KLUDGE
+         call Interp_lin_3D_adj(jo_grad_x % u, xp, i, j, dx, dy, dxm, dym, &
+                                jo_grad_y%bogus(n)%u, num_levs,            &
+                                iv%bogus(n)%zk, num_levs)
+         call Interp_lin_3D_adj(jo_grad_x % v, xp, i, j, dx, dy, dxm, dym, &
+                                jo_grad_y%bogus(n)%v, num_levs,            &
+                                iv%bogus(n)%zk, num_levs)
+         call Interp_lin_3D_adj(jo_grad_x % t, xp, i, j, dx, dy, dxm, dym, &
+                                jo_grad_y%bogus(n)%t, num_levs,            &
+                                iv%bogus(n)%zk, num_levs)
+         call Interp_lin_3D_adj(jo_grad_x % q, xp, i, j, dx, dy, dxm, dym, &
+                                jo_grad_y%bogus(n)%q, num_levs,            &
+                                iv%bogus(n)%zk, num_levs)
+#else
+         call Interp_lin_3D_adj(jo_grad_x % u(xp%ims,xp%jms,xp%kms), &
+                                xp, i, j, dx, dy, dxm, dym, &
+                                jo_grad_y%bogus(n)%u(1), num_levs, &
+                                iv%bogus(n)%zk(1), num_levs)
+         call Interp_lin_3D_adj(jo_grad_x % v(xp%ims,xp%jms,xp%kms), &
+                                xp, i, j, dx, dy, dxm, dym, &
+                                jo_grad_y%bogus(n)%v(1), num_levs, &
+                                iv%bogus(n)%zk(1), num_levs)
+         call Interp_lin_3D_adj(jo_grad_x % t(xp%ims,xp%jms,xp%kms), &
+                                xp, i, j, dx, dy, dxm, dym, &
+                                jo_grad_y%bogus(n)%t(1), num_levs, &
+                                iv%bogus(n)%zk(1), num_levs)
+         call Interp_lin_3D_adj(jo_grad_x % q(xp%ims,xp%jms,xp%kms), &
+                                xp, i, j, dx, dy, dxm, dym, &
+                                jo_grad_y%bogus(n)%q(1), num_levs, &
+                                iv%bogus(n)%zk(1), num_levs)
+#endif
+
+!        [1.2] Compute the feedback from SLP to t and q:
+
+!         1.2.1 Background at the observation location:
 
          do k = xp%kts, xp%kte
             model_t(k) = dym*(dxm*xb%t(i,j,k) + dx*xb%t(i+1,j,k)) &
@@ -59,16 +97,25 @@ SUBROUTINE da_transform_xtoy_bogus_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
                     + dy *(dxm*xb%terr(i,j+1) + dx*xb%terr(i+1,j+1))
          psfc_loc = dym*(dxm*xb%psfc(i,j)   + dx*xb%psfc(i+1,j)) &
                     + dy *(dxm*xb%psfc(i,j+1) + dx*xb%psfc(i+1,j+1))
- 
+
+!         1.2.2 Compute the feedback from SLP to p, t, q, and psfc 
+!               at the observed location:
+         
          call DA_TPQ_To_SLP_Adj(model_t, model_q ,model_p_c,    &
                                terr_loc,  psfc_loc,   &
                                tt, qq, pp, ppsfc,     &
                                jo_grad_y%bogus(n)%slp, xp)  
 
+!         1.2.3 feedback from the observed location to grid space:
+
+!         1.2.3.1 for Psfc
+
          jo_grad_x % psfc(i,j) = jo_grad_x % psfc(i,j) + dym*dxm*ppsfc
          jo_grad_x % psfc(i+1,j) = jo_grad_x % psfc(i+1,j)+ dym*dx*ppsfc
          jo_grad_x % psfc(i,j+1) = jo_grad_x % psfc(i,j+1)+ dy*dxm*ppsfc
          jo_grad_x % psfc(i+1,j+1)=jo_grad_x % psfc(i+1,j+1)+dy*dx*ppsfc
+
+!         1.2.3.2 for t, q, p
 
          do k = xp%kts, xp%kte
             jo_grad_x % t(i,j,k) = jo_grad_x % t(i,j,k)+dym*dxm*tt(k)
@@ -85,25 +132,6 @@ SUBROUTINE da_transform_xtoy_bogus_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
             jo_grad_x % p(i+1,j+1,k)=jo_grad_x % p(i+1,j+1,k)+dy*dx*pp(k)
          enddo
 
-!        [1.3] Get dot pt. horizontal interpolation weights:
-
-#ifndef DEREF_KLUDGE
-         call Interp_lin_3D_adj(jo_grad_x % u, xp, i, j, dx, dy, dxm, dym, &
-                                jo_grad_y%bogus(n)%u, num_levs,            &
-                                iv%bogus(n)%zk, num_levs)
-         call Interp_lin_3D_adj(jo_grad_x % v, xp, i, j, dx, dy, dxm, dym, &
-                                jo_grad_y%bogus(n)%v, num_levs,            &
-                                iv%bogus(n)%zk, num_levs)
-#else
-         call Interp_lin_3D_adj(jo_grad_x % u(xp%ims,xp%jms,xp%kms), &
-                                xp, i, j, dx, dy, dxm, dym, &
-                                jo_grad_y%bogus(n)%u(1), num_levs, &
-                                iv%bogus(n)%zk(1), num_levs)
-         call Interp_lin_3D_adj(jo_grad_x % v(xp%ims,xp%jms,xp%kms), &
-                                xp, i, j, dx, dy, dxm, dym, &
-                                jo_grad_y%bogus(n)%v(1), num_levs, &
-                                iv%bogus(n)%zk(1), num_levs)
-#endif
        endif
 
       END DO

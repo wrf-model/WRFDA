@@ -235,9 +235,13 @@ SUBROUTINE DA_Allocate_Y( iv, y )
          nlevels = iv % bogus(n) % info % levels
          ALLOCATE (y % bogus(n)%u(1:nlevels))
          ALLOCATE (y % bogus(n)%v(1:nlevels))
+         ALLOCATE (y % bogus(n)%t(1:nlevels))
+         ALLOCATE (y % bogus(n)%q(1:nlevels))
 
          y % bogus(n) % u(1:nlevels) = 0.0
          y % bogus(n) % v(1:nlevels) = 0.0
+         y % bogus(n) % t(1:nlevels) = 0.0
+         y % bogus(n) % q(1:nlevels) = 0.0
 
       end do
 

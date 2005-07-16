@@ -31,6 +31,8 @@ SUBROUTINE DA_Calculate_GradY_Bogus( iv, re, jo_grad_y )
 
             if(iv%bogus(n)%u(k)%qc < obs_qc_pointer) re%bogus(n)%u(k) = 0.0
             if(iv%bogus(n)%v(k)%qc < obs_qc_pointer) re%bogus(n)%v(k) = 0.0
+            if(iv%bogus(n)%t(k)%qc < obs_qc_pointer) re%bogus(n)%t(k) = 0.0
+            if(iv%bogus(n)%q(k)%qc < obs_qc_pointer) re%bogus(n)%q(k) = 0.0
 
             jo_grad_y%bogus(n)%u(k) = -re%bogus(n)%u(k) / &
                                       ( iv%bogus(n)%u(k)%error * &
@@ -38,6 +40,12 @@ SUBROUTINE DA_Calculate_GradY_Bogus( iv, re, jo_grad_y )
             jo_grad_y%bogus(n)%v(k) = -re%bogus(n)%v(k) / &
                                       ( iv%bogus(n)%v(k)%error * &
                                         iv%bogus(n)%v(k)%error )
+            jo_grad_y%bogus(n)%t(k) = -re%bogus(n)%t(k) / &
+                                      ( iv%bogus(n)%t(k)%error * &
+                                        iv%bogus(n)%t(k)%error )
+            jo_grad_y%bogus(n)%q(k) = -re%bogus(n)%q(k) / &
+                                      ( iv%bogus(n)%q(k)%error * &
+                                        iv%bogus(n)%q(k)%error )
          end do
        
        endif

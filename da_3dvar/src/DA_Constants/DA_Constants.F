@@ -408,6 +408,8 @@ MODULE DA_Constants
                     max_error_rv             = 5, &
                     max_error_rf             = 5, &
                     max_error_buv            = 500, &
+                    max_error_bt             = 500, &
+                    max_error_bq             = 500, &
                     max_error_slp            = 500
 
 !  Define various ways for bad data to be flagged.  

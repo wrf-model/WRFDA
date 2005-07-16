@@ -803,15 +803,21 @@ loop_level: DO i = 1, platform%info%levels
          ob%bogus(num_bogus)%info = platform%info
          ob%bogus(num_bogus)%loc  = platform%loc
 
+         allocate (ob%bogus(num_bogus)%h (1:nlevels))
          allocate (ob%bogus(num_bogus)%p (1:nlevels))
          allocate (ob%bogus(num_bogus)%zk(1:nlevels))
          allocate (ob%bogus(num_bogus)%u (1:nlevels))
          allocate (ob%bogus(num_bogus)%v (1:nlevels))
+         allocate (ob%bogus(num_bogus)%t (1:nlevels))
+         allocate (ob%bogus(num_bogus)%q (1:nlevels))
 
          do i = 1, nlevels
+           ob%bogus(num_bogus)%h(i) = platform%each(i)%height
            ob%bogus(num_bogus)%p(i) = platform%each(i)%p%inv
            ob%bogus(num_bogus)%u(i) = platform%each(i)%u
            ob%bogus(num_bogus)%v(i) = platform%each(i)%v
+           ob%bogus(num_bogus)%t(i) = platform%each(i)%t
+           ob%bogus(num_bogus)%q(i) = platform%each(i)%q
          enddo
 
          ob%bogus(num_bogus)%slp    = platform%loc%slp
@@ -824,6 +830,8 @@ loop_level: DO i = 1, platform%info%levels
                print*,'ob % num_bogus, i ', num_bogus,i
                print*,'ob%bogus(ob%num_bogus)%u,v=',  &
                        ob%bogus(num_bogus)%u(i),ob%bogus(num_bogus)%v(i)
+               print*,'ob%bogus(ob%num_bogus)%t,q=',  &
+                       ob%bogus(num_bogus)%t(i),ob%bogus(num_bogus)%q(i)
             enddo
             write(*,fmt='(2(a,i4))') 'ob%num_bogus=',num_bogus, &
                                      'nlevels=',nlevels
@@ -985,6 +993,8 @@ loop_level: DO i = 1, platform%info%levels
            'ob%num_qscat=', ob%num_qscat, &
            'ob%ob_numb(ob%current_ob_time)%buoy =', ob%ob_numb(ob%current_ob_time)%buoy , &
            'ob%num_buoy =', ob%num_buoy , &
+           'ob%ob_numb(ob%current_ob_time)%bogus=', ob%ob_numb(ob%current_ob_time)%bogus, &
+           'ob%num_bogus=', ob%num_bogus, &
            'ob%ob_numb(ob%current_ob_time)%ssmt1=', ob%ob_numb(ob%current_ob_time)%ssmt1, &
            'ob%num_ssmt1=', ob%num_ssmt1, &
            'ob%ob_numb(ob%current_ob_time)%ssmt2=', ob%ob_numb(ob%current_ob_time)%ssmt2, &
