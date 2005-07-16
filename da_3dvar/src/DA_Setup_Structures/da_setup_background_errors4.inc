@@ -26,7 +26,6 @@ SUBROUTINE DA_Setup_Background_Errors4(xb, be, xbx, xp)
    logical  :: use_global_eofs               ! True if projected data uses global EOFs
 !
 ! Addeded for new gen_be  Syed Rizvi
-   integer             :: bin_type                   ! Type of bin to average over. 
    integer             :: num_bins_hgt               ! Used if bin_type = 2. 
    real                :: binwidth_lat               ! Used if bin_type = 2 (degrees). 
    real                :: binwidth_hgt               ! Used if bin_type = 2 (m). 
