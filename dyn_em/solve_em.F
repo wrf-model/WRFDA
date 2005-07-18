@@ -575,9 +575,6 @@ BENCH_END(rad_driver_tim)
 BENCH_START(surf_driver_tim)
 
       CALL wrf_debug ( 200 , ' call surface_driver' )
-
-      print *, 'dzs = ', dzs
-
       CALL surface_driver(                                                &
      &         ACSNOM=acsnom      ,ACSNOW=acsnow      ,AKHS=akhs          &
      &        ,AKMS=akms          ,ALBBCK=albbck      ,ALBEDO=albedo      &

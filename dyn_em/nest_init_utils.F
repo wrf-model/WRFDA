@@ -29,8 +29,6 @@ SUBROUTINE init_domain_constants_em ( parent , nest )
 
    CALL nl_get_mminlu ( 1,char_junk(1:4) )
    CALL nl_get_iswater (1, iswater )
-   CALL nl_get_cen_lat ( 1 , cen_lat )
-   CALL nl_get_cen_lon ( 1 , cen_lon )
    CALL nl_get_truelat1 ( 1 , truelat1 )
    CALL nl_get_truelat2 ( 1 , truelat2 )
    CALL nl_get_moad_cen_lat ( 1 , moad_cen_lat )
@@ -44,8 +42,6 @@ SUBROUTINE init_domain_constants_em ( parent , nest )
      CALL nl_set_julyr (nest%id, julyr)
      CALL nl_set_julday (nest%id, julday)
      CALL nl_set_iswater (nest%id, iswater )
-     CALL nl_set_cen_lat ( nest%id , cen_lat )
-     CALL nl_set_cen_lon ( nest%id , cen_lon )
      CALL nl_set_truelat1 ( nest%id , truelat1 )
      CALL nl_set_truelat2 ( nest%id , truelat2 )
      CALL nl_set_moad_cen_lat ( nest%id , moad_cen_lat )
@@ -80,6 +76,7 @@ SUBROUTINE init_domain_constants_em ( parent , nest )
    nest%u_base    = parent%u_base
    nest%v_base    = parent%v_base
    nest%qv_base   = parent%qv_base
+   nest%z_base    = parent%z_base
    nest%dzs       = parent%dzs
    nest%zs        = parent%zs
 
@@ -325,6 +322,8 @@ SUBROUTINE update_after_feedback_em ( grid , &
    INTEGER     :: sm31x , em31x , sm32x , em32x , sm33x , em33x
    INTEGER     :: sm31y , em31y , sm32y , em32y , sm33y , em33y
 
+  CALL wrf_debug( 500, "entering update_after_feedback_em" )
+
 ! Trick problematic compilers into not performing copy-in/copy-out by adding
 ! indices to array arguments in the CALL statements in this routine.
 ! It has the effect of passing only the first element of the array, rather
@@ -343,9 +342,11 @@ SUBROUTINE update_after_feedback_em ( grid , &
                             ims, ime, jms, jme, kms, kme,    &
                             ips, ipe, jps, jpe, kps, kpe    )
 
+  CALL wrf_debug( 500, "before HALO_EM_FEEDBACK.inc in update_after_feedback_em" )
 #ifdef DM_PARALLEL
 #include "HALO_EM_FEEDBACK.inc"
 #endif
+  CALL wrf_debug( 500, "leaving update_after_feedback_em" )
 
 END SUBROUTINE update_after_feedback_em
 

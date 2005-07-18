@@ -411,9 +411,6 @@ CONTAINS
    70 CONTINUE                                                                   
 !     IF(ISOIL.EQ.1)THEN                                                         
       IF(num_soil_layers .gt. 1)THEN                                                         
-        print *, 'SOILFAC,DIFSL,DZS(1),DELTSM=', &
-                  SOILFAC,DIFSL,DZS(1),DELTSM
-
         NSOIL=1+IFIX(SOILFAC*4*DIFSL/DZS(1)*DELTSM/DZS(1))   
         RNSOIL=1./FLOAT(NSOIL)                                                   
 !                                                                                

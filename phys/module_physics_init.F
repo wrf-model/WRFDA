@@ -169,6 +169,8 @@ CONTAINS
    CHARACTER*4 :: MMINLU_loc
    CHARACTER*80 :: message
    INTEGER :: ISWATER
+! to be added to namelist: option to use climatological monthly albedo
+   LOGICAL :: usebgalb
 
    INTEGER :: i, j, itf, jtf
    LOGICAL :: restart
@@ -214,6 +216,8 @@ integer myproc
    THINLD=0.04
    ALBLND=0.2
    XMAVA=0.3
+   usebgalb = .FALSE.
+
    CALL nl_get_cen_lat(id,cen_lat)
    CALL wrf_debug(100,'calling nl_get_iswater, nl_get_mminlu_loc')
    CALL nl_get_iswater(id,iswater)
@@ -244,7 +248,7 @@ integer myproc
    DO j=jts,jtf
    DO i=its,itf
      IF(XLAND(i,j) .LT. 1.5)THEN
-       ALBBCK(i,j)=ALBLND
+       IF(mminlu_loc .EQ. '    ') ALBBCK(i,j)=ALBLND
        ALBEDO(i,j)=ALBLND
        EMISS(i,j)=0.85
        THC(i,j)=THINLD
@@ -254,7 +258,7 @@ integer myproc
 #endif
        MAVAIL(i,j)=XMAVA
      ELSE
-       ALBBCK(i,j)=0.08
+       IF(mminlu_loc .EQ. '    ') ALBBCK(i,j)=0.08
        ALBEDO(i,j)=0.08
        EMISS(i,j)=0.98
        THC(i,j)=THINLD
@@ -274,7 +278,7 @@ integer myproc
 
      CALL landuse_init(lu_index, snowc, albedo, albbck, mavail, emiss,      &
                 znt, Z0, thc, xland, xice, julday, cen_lat, iswater, mminlu_loc,  &
-                allowed_to_read ,                                   &
+                allowed_to_read , usebgalb ,                        &
                 ids, ide, jds, jde, kds, kde,                       &
                 ims, ime, jms, jme, kms, kme,                       &
                 its, ite, jts, jte, kts, kte                       ) 
@@ -297,7 +301,7 @@ integer myproc
    CALL wrf_debug ( 200 , 'module_start: phy_init: Before call to ra_init' )
 
    CALL ra_init(grid,STEPRA,RADT,DT,RTHRATEN,RTHRATENLW,             &
-                RTHRATENSW,CLDFRA,cen_lat,JULYR,JULDAY,GMT,     &
+                RTHRATENSW,CLDFRA,EMISS,cen_lat,JULYR,JULDAY,GMT,    &
                 sfull,shalf,pptop,                              &
                 config_flags,restart,                           & 
                 allowed_to_read ,                                   &
@@ -359,7 +363,7 @@ integer myproc
 !=====================================================================
    SUBROUTINE landuse_init(lu_index, snowc, albedo, albbck, mavail, emiss,  &
                 znt,Z0,thc,xland, xice, julday, cen_lat, iswater, mminlu, &
-                allowed_to_read ,                                   &
+                allowed_to_read , usebgalb ,                        &
                 ids, ide, jds, jde, kds, kde,                       &
                 ims, ime, jms, jme, kms, kme,                       &
                 its, ite, jts, jte, kts, kte                       )
@@ -375,7 +379,7 @@ integer myproc
    INTEGER , INTENT(IN)           :: iswater, julday
    REAL    , INTENT(IN)           :: cen_lat
    CHARACTER*4, INTENT(IN)        :: mminlu
-   LOGICAL,  INTENT(IN)           :: allowed_to_read
+   LOGICAL,  INTENT(IN)           :: allowed_to_read , usebgalb
    REAL,     DIMENSION( ims:ime , jms:jme ) , INTENT(IN   ) :: lu_index, snowc, xice
    REAL,     DIMENSION( ims:ime , jms:jme ) , INTENT(OUT  ) :: albedo, albbck, mavail, emiss, &
                                                          znt, Z0, thc, xland
@@ -494,6 +498,7 @@ integer myproc
 ! Set arrays according to lu_index
       itf = min0(ite, ide-1)
       jtf = min0(jte, jde-1)
+      IF(usebgalb)CALL wrf_message ( 'Climatological albedo is used instead of table values' )
       DO j = jts, jtf
         DO i = its, itf
           IS=nint(lu_index(i,j))
@@ -506,7 +511,7 @@ integer myproc
           IF(IS.EQ.0)THEN                                                
             IS=ISWATER                                                  
           ENDIF                                                        
-          ALBBCK(I,J)=ALBD(IS,ISN)/100.                                  
+          IF(.NOT.usebgalb)ALBBCK(I,J)=ALBD(IS,ISN)/100.                                  
           ALBEDO(I,J)=ALBBCK(I,J)
           IF(SNOWC(I,J) .GT. 0.5)ALBEDO(I,J)=ALBBCK(I,J)*(1.+SCFX(IS))
           THC(I,J)=THERIN(IS,ISN)/100.                               
@@ -543,7 +548,7 @@ integer myproc
    END SUBROUTINE landuse_init 
 !===================================================================== 
    SUBROUTINE ra_init(grid,STEPRA,RADT,DT,RTHRATEN,RTHRATENLW,       & 
-                      RTHRATENSW,CLDFRA,cen_lat,JULYR,JULDAY,GMT,    &
+                      RTHRATENSW,CLDFRA,EMISS,cen_lat,JULYR,JULDAY,GMT,    &
                       sfull,shalf,pptop,                             &
                       config_flags,restart,                          & 
                       allowed_to_read ,                              &
@@ -580,6 +585,7 @@ integer myproc
                                                          RTHRATENLW, &
                                                          RTHRATENSW, &
                                                              CLDFRA
+   REAL , DIMENSION( ims:ime , jms:jme ) , INTENT(INOUT) :: EMISS
    LOGICAL :: etalw = .false.
    integer :: month,iday
 !---------------------------------------------------------------------
@@ -604,9 +610,11 @@ integer myproc
         CASE (GFDLLWSCHEME)
              CALL nl_get_start_month(grid%id,month)
              CALL nl_get_start_day(grid%id,iday)
-             CALL gfdletainit(sfull,shalf,pptop,JULYR,MONTH,IDAY,GMT,&
+             CALL gfdletainit(emiss,sfull,shalf,pptop,JULYR,MONTH,IDAY,GMT,&
                            config_flags,allowed_to_read ,            &
-                           kds, kde, kms, kme, kts, kte     )
+                           ids, ide, jds, jde, kds, kde,    &
+                           ims, ime, jms, jme, kms, kme,    &
+                           its, ite, jts, jte, kts, kte     )
              etalw = .true.
         CASE DEFAULT
 
@@ -630,9 +638,11 @@ integer myproc
              IF(.not.etalw)THEN
              CALL nl_get_start_month(grid%id,month)
              CALL nl_get_start_day(grid%id,iday)
-             CALL gfdletainit(sfull,shalf,pptop,JULYR,MONTH,IDAY,GMT,&
+             CALL gfdletainit(emiss,sfull,shalf,pptop,JULYR,MONTH,IDAY,GMT,&
                            config_flags,allowed_to_read,             &
-                           kds, kde, kms, kme, kts, kte     )
+                           ids, ide, jds, jde, kds, kde,    &
+                           ims, ime, jms, jme, kms, kme,    &
+                           its, ite, jts, jte, kts, kte     )
              ENDIF
 
         CASE DEFAULT
@@ -822,8 +832,8 @@ integer myproc
                      its,ite, jts,jte, kts,kte                 )
 
       CASE (RUCLSMSCHEME)
-           if(isfc .ne. 2)CALL wrf_error_fatal &
-            ( 'module_physics_init: use myjsfc and myjpbl scheme for this lsm option' )
+!          if(isfc .ne. 2)CALL wrf_error_fatal &
+!           ( 'module_physics_init: use myjsfc and myjpbl scheme for this lsm option' )
            CALL lsmrucinit( SMFR3D,TSLB,SMOIS,ISLTYP,              &
                      num_soil_layers, restart,                     &
                      allowed_to_read ,                             &

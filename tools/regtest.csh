@@ -385,6 +385,12 @@ else if ( $NESTED != TRUE ) then
 	if ( $CHEM == TRUE ) then
 		set CORES = ( em_real )
 	endif
+	if ( $ESMF_LIB == TRUE ) then
+		set CORES = ( em_real em_b_wave em_quarter_ss )
+	endif
+	if ( $IO_FORM_NAME[$IO_FORM] == io_grib1 ) then
+		set CORES = ( em_real em_b_wave em_quarter_ss )
+	endif
 endif
 
 #	The b_wave case has binary input (4-byte only), the nmm
@@ -767,7 +773,11 @@ if ( ( $ARCH[1] == AIX ) && \
      ( ( `hostname | cut -c 1-2` == bs ) || \
        ( `hostname | cut -c 1-2` == bd ) ) ) then
 	# NMM requires 32 bit, Apr 2005 Dave, remove this when able
-	setenv OBJECT_MODE 32
+	if ( $IO_FORM_NAME[$IO_FORM] == io_grib1 ) then
+		setenv OBJECT_MODE 64
+	else
+		setenv OBJECT_MODE 32
+	endif
 	set DEF_DIR             = $home
 	set TMPDIR              = /ptmp/$user
 	# keep stuff out of $HOME and /ptmp/$USER
@@ -792,7 +802,7 @@ if ( ( $ARCH[1] == AIX ) && \
 	if ( ! -d $TMPDIR ) mkdir $TMPDIR
 	set MAIL                = /usr/bin/mailx
 	if        ( $NESTED == TRUE )                                                     then
-		set COMPOPTS	= ( 11 12 4 )
+		set COMPOPTS	= ( 10 11 4 )
 	else if ( ( $NESTED != TRUE ) && ( $ESMF_LIB == TRUE ) )                          then
 		set COMPOPTS    = ( 1 2 9 )
 	else if ( ( $NESTED != TRUE ) && ( $ESMF_LIB != TRUE ) && ( $RSL_LITE == TRUE ) ) then
@@ -1455,6 +1465,12 @@ banner 7
 					sed -e '/^OMP/d' -e '/^FCOPTIM/d' -e '/^FCDEBUG/s/#-g/-g/g' ./configure.wrf >! foo ; /bin/mv foo configure.wrf
 				else
 					sed              -e '/^FCOPTIM/d' -e '/^FCDEBUG/s/#-g/-g/g' ./configure.wrf >! foo ; /bin/mv foo configure.wrf
+				endif
+			else if ( `uname` == OSF1 ) then
+		 		if ( ( $compopt == $COMPOPTS[1] ) || ( $compopt == $COMPOPTS[3] ) ) then
+					sed -e '/^OMP/d' -e '/^FCOPTIM/d' -e '/^FCDEBUG/s/#/#/g' ./configure.wrf >! foo ; /bin/mv foo configure.wrf
+				else
+					sed              -e '/^FCOPTIM/d' -e '/^FCDEBUG/s/#/#/g' ./configure.wrf >! foo ; /bin/mv foo configure.wrf
 				endif
 			else
 		 		if ( ( $compopt == $COMPOPTS[1] ) || ( $compopt == $COMPOPTS[3] ) ) then

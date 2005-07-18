@@ -5,7 +5,6 @@ OBJS    = $(OBJSL)
 FFLAGS  = $(FCFLAGS)
 LIBS    = 
 CPP1    = $(CPP) $(TRADFLAG)
-SFC     = f90 -free
 M4      = m4 -Uinclude -Uindex -Ulen
 AR      = ar
 
