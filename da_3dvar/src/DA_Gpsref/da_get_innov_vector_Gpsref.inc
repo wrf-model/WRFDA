@@ -170,10 +170,10 @@ SUBROUTINE da_get_innov_vector_gpsref ( it, xb, xp, ob, iv )
 
        endif
 
-      endif
-
-      IF ( check_max_iv ) &
+       IF ( check_max_iv ) &
          CALL da_check_max_iv_gpsref(it, iv%gpsref(n), pref, fref )
+
+      endif
 
    END DO
 
