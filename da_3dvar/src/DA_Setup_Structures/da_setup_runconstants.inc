@@ -100,9 +100,13 @@ SUBROUTINE DA_Setup_RunConstants( xp, xb, xbx)
 
       nx = xp%ide - xp%ids + xbx%fft_pad_i
       ny = xp%jde - xp%jds + xbx%fft_pad_j
+! YRG: A-grid:
+      coeff_nx = 2.0 * pi / REAL( nx )
+      coeff_ny = 2.0 * pi / REAL( ny )
 
-      coeff_nx = pi / REAL( nx )
-      coeff_ny = pi / REAL( ny )
+! YRG: B-grid::
+!      coeff_nx = pi / REAL( nx )
+!      coeff_ny = pi / REAL( ny )
 
       xbx%fft_ix = nx + 1
       xbx%fft_jy = ny + 1
