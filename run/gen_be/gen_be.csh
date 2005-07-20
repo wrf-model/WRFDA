@@ -17,28 +17,28 @@
 
 #set echo
 #AMPS:
-setenv START_DATE 2004050112
-setenv END_DATE 2004050912
+setenv START_DATE 2004050100
+setenv END_DATE 2004052800
 setenv NUM_LEVELS 30
 setenv RESOLUTION_KM 60
 setenv EXPT 2004-05.AMPS1
 setenv DAT_DIR /data3/dmbarker/data/amps1/noobs/gen_be
 
 #CWB:
-setenv START_DATE 2003081512
-setenv END_DATE 2003083012
-setenv NUM_LEVELS 30
-setenv RESOLUTION_KM 45 
-setenv EXPT 2003-08.CWB
-setenv DAT_DIR /data3/dmbarker/data/cwb
+#setenv START_DATE 2003081512
+#setenv END_DATE 2003083012
+#setenv NUM_LEVELS 30
+#setenv RESOLUTION_KM 45 
+#setenv EXPT 2003-08.CWB
+#setenv DAT_DIR /data3/dmbarker/data/cwb
 
 #CONUS:
-setenv START_DATE 2003010100
-setenv END_DATE 2003010912
-setenv NUM_LEVELS 28
-setenv RESOLUTION_KM 200 
-setenv EXPT 2003-01.CONUS
-setenv DAT_DIR /data4/dmbarker/data/conus2/noobs/gen_be
+#setenv START_DATE 2003010100
+#setenv END_DATE 2003010912
+#setenv NUM_LEVELS 28
+#setenv RESOLUTION_KM 200 
+#setenv EXPT 2003-01.CONUS
+#setenv DAT_DIR /data4/dmbarker/data/conus2/noobs/gen_be
 
 setenv BIN_TYPE 1
 setenv UH_METHOD 'scale'
@@ -48,10 +48,10 @@ setenv WRFVAR_DIR /snowdrift/users/dmbarker/code_development/wrfvar
 setenv RUN_GEN_BE_STAGE1 # Set to run stage 1 (Remove mean, split variables).
 setenv RUN_GEN_BE_STAGE2 # Set to run stage 2 (Regression Coefficients).
 setenv RUN_GEN_BE_STAGE2A # Set to run stage 2 (Regression Coefficients).
-#setenv RUN_GEN_BE_STAGE3 # Set to run stage 3 (Vertical Covariances).
-#setenv RUN_GEN_BE_STAGE4 # Set to run stage 4 (Horizontal Covariances).
-#setenv RUN_GEN_BE_DIAGS  # Set to run gen_be diagnostics.
-#setenv RUN_GEN_BE_DIAGS_READ  # Set to run gen_be diagnostics_read.
+setenv RUN_GEN_BE_STAGE3 # Set to run stage 3 (Vertical Covariances).
+setenv RUN_GEN_BE_STAGE4 # Set to run stage 4 (Horizontal Covariances).
+setenv RUN_GEN_BE_DIAGS  # Set to run gen_be diagnostics.
+setenv RUN_GEN_BE_DIAGS_READ  # Set to run gen_be diagnostics_read.
 
 #-----------------------------------------------------------------------------------
 # Don't change anything below this line.
@@ -212,12 +212,6 @@ if ( $?RUN_GEN_BE_STAGE3 ) then
    foreach CV ( $CONTROL_VARIABLES )
       setenv VARIABLE $CV
 
-      if ( $CV == "ps" ) then
-         echo "Bypassing vertical transform for " $CV
-      else if ( $CV == "ps_u" ) then
-         echo "Bypassing vertical transform for " $CV
-      else
-
 cat >! gen_be_stage3_nl.nl << EOF
   &gen_be_stage3_nl
     start_date = '${START_DATE}',
@@ -241,7 +235,6 @@ cat >! gen_be_stage3_nl.nl << EOF
 EOF
 
          ./gen_be_stage3.exe >& gen_be_stage3.${VARIABLE}.log
-      endif
    end
 endif
 
@@ -280,7 +273,8 @@ if ( $?RUN_GEN_BE_DIAGS ) then
 cat >! gen_be_diags_nl.nl << EOF
   &gen_be_diags_nl
     be_method = '${BE_METHOD}',
-    uh_method = '${UH_METHOD}' /
+    uh_method = '${UH_METHOD}',
+    n_smth_sl = 0, /
 EOF
 
       ./gen_be_diags.exe >& gen_be_diags.log
@@ -298,8 +292,7 @@ if ( $?RUN_GEN_BE_DIAGS_READ ) then
 cat >! gen_be_diags_nl.nl << EOF
   &gen_be_diags_nl
     be_method = '${BE_METHOD}',
-    uh_method = '${UH_METHOD}',
-    n_smth_sl = 0, /
+    uh_method = '${UH_METHOD}' /
 EOF
 
    ln -sf ${SRC_DIR}/gen_be_diags_read.exe .
