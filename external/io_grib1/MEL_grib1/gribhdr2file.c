@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "dprints.h"		/* for dprints */
 #include "gribfuncs.h"		/* prototypes */
 /*
@@ -37,7 +38,7 @@ int    gribhdr2file ( gh, stream, errmsg)
   fd = fileno(stream);
   if (fd == -1) 
     {
-      DPRINT1 ("%s: Invalid file stream encountered.\n", func);
+      DPRINT1 ("%s: Invalid file stream encountered.\n", gribhdr2file);
       return 1;
       
     }
