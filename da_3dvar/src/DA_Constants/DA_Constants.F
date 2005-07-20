@@ -472,7 +472,7 @@ MODULE DA_Constants
                            max_pilot = 30000,  &   ! Maximum Number of PILOT obs.
                            max_metar = 30000,  &   ! Maximum Number of METAR obs.
                            max_gpspw = 4000,   &   ! Maximum Number of GPSPW obs.
-                           max_gpsref= 5000,   &   ! Maximum Number of GPSRef obs.
+                           max_gpsref= 800000, &   ! Maximum Number of GPSRef obs.
                            max_ships = 20000,  &   ! Maximum Number of SHIP obs.
                            max_ssmi_retrieval = 30000, & ! Maximum Number of SSMI_retrieval obs.
                            max_ssmi_tb        = 30000, & ! Maximum Number of SSMI_tb obs.
