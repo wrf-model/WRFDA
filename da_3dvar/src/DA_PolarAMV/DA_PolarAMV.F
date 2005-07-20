@@ -27,7 +27,7 @@ MODULE DA_PolarAMV
 CONTAINS
 
 #include "DA_AO_Stats_PolarAMV.inc"
-#include "DA_Calculate_Jo_and_GradY_PolarAMV.inc"
+#include "DA_Get_Jo_and_GradY_PolarAMV.inc"
 #include "DA_Calculate_Residual_PolarAMV.inc"
 #include "DA_OI_Stats_PolarAMV.inc"
 #include "DA_Print_Stats_PolarAMV.inc"

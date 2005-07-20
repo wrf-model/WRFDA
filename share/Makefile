@@ -60,9 +60,7 @@ OBJS    = 		\
         wrf_auxinput5in.o               \
         wrf_bdyin.o             	\
         wrf_histin.o            	\
-        wrf_restartin.o                 \
-        landread.o
-
+        wrf_restartin.o
 
 NMM_MODULES = 
 

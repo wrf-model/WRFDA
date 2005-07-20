@@ -35,7 +35,7 @@ CONTAINS
 
 #include "DA_AO_Stats_Gpsref.inc"
 #include "DA_Calculate_GradY_Gpsref.inc"
-#include "DA_Calculate_Jo_and_GradY_Gpsref.inc"
+#include "DA_Get_Jo_and_GradY_Gpsref.inc"
 #include "DA_Calculate_Residual_Gpsref.inc"
 #include "DA_OI_Stats_Gpsref.inc"
 #include "DA_Print_Stats_Gpsref.inc"

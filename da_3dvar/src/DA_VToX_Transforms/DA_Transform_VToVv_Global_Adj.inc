@@ -32,7 +32,9 @@ subroutine DA_Transform_VToVv_Global_Adj (xb, xbx, be, cv,vv, &
                                    its, ite, jts, jte )
 
       if( print_detail >= 100 )  then
-         write(unit=0, fmt='(2a,2(2x,a,i6))') 'file:', __FILE__, 'line:', __LINE__, 'vv%v1, k=', k
+         write(unit=0, fmt='(2a,2(2x,a,i6))') &
+              'file:', __FILE__, 'line:', __LINE__, &
+              'vv%v1, k=', k
          write(unit=0, fmt='(a, e24.14)') 'Square sum of cv:', sum(cv(cv_s:cv_e) * cv(cv_s:cv_e))
       endif
 
@@ -47,7 +49,9 @@ subroutine DA_Transform_VToVv_Global_Adj (xb, xbx, be, cv,vv, &
                                    its, ite, jts, jte )
 
       if( print_detail >= 100 )  then
-         write(unit=0, fmt='(2a,2(2x,a,i6))') 'file:', __FILE__, 'line:', __LINE__, 'vv%v2, k=', k
+         write(unit=0, fmt='(2a,2(2x,a,i6))') &
+              'file:', __FILE__, 'line:', __LINE__, &
+              'vv%v2, k=', k
          write(unit=0, fmt='(a, e24.14)') 'Square sum of cv:', sum(cv(cv_s:cv_e) * cv(cv_s:cv_e))
       endif
 
@@ -82,7 +86,9 @@ subroutine DA_Transform_VToVv_Global_Adj (xb, xbx, be, cv,vv, &
    end do
 
    if( print_detail >= 100) then
-      write(unit=0, fmt='(2a,2(2x,a,i6))') 'file:', __FILE__, 'line:', __LINE__, 'vv%v1, k=', k
+       write(unit=0, fmt='(2a,2(2x,a,i6))') &
+            'file:', __FILE__, &
+            'line:', __LINE__
       write(unit=0, fmt='(a, e24.14)') ' in VToVv_Global_Adj  whole: cv.cv = ',sum(cv(1:cv_e) * cv(1:cv_e))
    endif
 

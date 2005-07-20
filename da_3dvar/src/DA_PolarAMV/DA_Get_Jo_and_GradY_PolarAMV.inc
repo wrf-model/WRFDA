@@ -1,4 +1,4 @@
-SUBROUTINE DA_Calculate_Jo_and_GradY_PolarAMV( iv, re, jo, jo_grad_y )
+SUBROUTINE DA_Get_Jo_and_GradY_PolarAMV( iv, re, jo, jo_grad_y )
 !-------------------------------------------------------------------------
 !  HISTORY: 
 !
@@ -57,5 +57,5 @@ SUBROUTINE DA_Calculate_Jo_and_GradY_PolarAMV( iv, re, jo, jo_grad_y )
    END IF
 
      
-END SUBROUTINE DA_Calculate_Jo_and_GradY_PolarAMV
+END SUBROUTINE DA_Get_Jo_and_GradY_PolarAMV
 

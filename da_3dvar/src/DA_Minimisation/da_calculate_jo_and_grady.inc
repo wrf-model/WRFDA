@@ -72,7 +72,7 @@
 
 !     Geostationary Satellite AMVs:
 
-      call da_calculate_jo_and_grady_geoamv( iv, re, jo, jo_grad_y)
+      call da_get_jo_and_grady_geoamv( iv, re, jo, jo_grad_y)
       jo_geoamv = jo % geoamv_u + jo % geoamv_v
       if(print_detail > 0) then
          write(unit=*, fmt='(a, e24.12)') &
@@ -83,7 +83,7 @@
 
 !     Polar orbitting Satellite AMVs:
 
-      call da_calculate_jo_and_grady_polaramv( iv, re, jo, jo_grad_y)
+      call da_get_jo_and_grady_polaramv( iv, re, jo, jo_grad_y)
       jo_polaramv = jo % polaramv_u + jo % polaramv_v
       if(print_detail > 0) then
          write(unit=*, fmt='(a, e24.12)') &
@@ -126,7 +126,7 @@
 
 !     GPSRF:
 
-      call da_calculate_jo_and_grady_Gpsref( iv, re, jo, jo_grad_y)
+      call da_get_jo_and_grady_Gpsref( iv, re, jo, jo_grad_y)
       jo_gpsref = jo % gpsref_ref
 
 !     SSMI:

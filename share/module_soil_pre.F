@@ -585,7 +585,7 @@ cycle
                ELSE IF ( ( soil_elev_max_val .GT. 10000 ) .AND. ( landmask(i,j) .GT. 0.5 ) ) THEN
 print *,'no soil temperature elevation adjustment, soil height too high = ',toposoil(i,j)
 cycle
-                  CALL wrf_error_fatal ( 'TOPOSOIL values have large positive values > 10,000 m , unrealistic.' )
+!                 CALL wrf_error_fatal ( 'TOPOSOIL values have large positive values > 10,000 m , unrealistic.' )
                ENDIF
          
                IF      ( ( ( soil_elev_min_dif .LT. -3000 ) .OR. ( soil_elev_max_dif .GT. 3000 ) ) .AND. &
@@ -595,7 +595,7 @@ cycle
                            ( landmask(i,j) .GT. 0.5 ) ) THEN
 print *,'no soil temperature elevation adjustment, diff of soil height and terrain = ',ter(i,j) - toposoil(i,j)
 cycle
-                  CALL wrf_error_fatal ( 'TOPOSOIL difference with terrain elevation differs by more than 3000 m, unrealistic' )
+!                 CALL wrf_error_fatal ( 'TOPOSOIL difference with terrain elevation differs by more than 3000 m, unrealistic' )
                ENDIF
 
                !  For each of the fields that we would like to modify, check to see if it came in from the SI.
@@ -2001,7 +2001,7 @@ cycle
                ELSE IF ( ( soil_elev_max_val .GT. 10000 ) .AND. ( landmask(i,j) .GT. 0.5 ) ) THEN
 print *,'no soil temperature elevation adjustment, soil height too high = ',toposoil(i,j)
 cycle
-                  CALL wrf_error_fatal ( 'TOPOSOIL values have large positive values > 10,000 m , unrealistic.' )
+!                 CALL wrf_error_fatal ( 'TOPOSOIL values have large positive values > 10,000 m , unrealistic.' )
                ENDIF
          
                IF      ( ( ( soil_elev_min_dif .LT. -3000 ) .OR. ( soil_elev_max_dif .GT. 3000 ) ) .AND. &
@@ -2011,7 +2011,7 @@ cycle
                            ( landmask(i,j) .GT. 0.5 ) ) THEN
 print *,'no soil temperature elevation adjustment, diff of soil height and terrain = ',ter(i,j) - toposoil(i,j)
 cycle
-                  CALL wrf_error_fatal ( 'TOPOSOIL difference with terrain elevation differs by more than 3000 m, unrealistic' )
+!                 CALL wrf_error_fatal ( 'TOPOSOIL difference with terrain elevation differs by more than 3000 m, unrealistic' )
                ENDIF
 
                !  For each of the fields that we would like to modify, check to see if it came in from the SI.

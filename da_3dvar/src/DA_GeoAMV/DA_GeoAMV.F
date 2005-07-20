@@ -26,7 +26,7 @@ MODULE DA_GeoAMV
 CONTAINS
 
 #include "DA_AO_Stats_GeoAMV.inc"
-#include "DA_Calculate_Jo_and_GradY_GeoAMV.inc"
+#include "DA_Get_Jo_and_GradY_GeoAMV.inc"
 #include "DA_Calculate_Residual_GeoAMV.inc"
 #include "DA_OI_Stats_GeoAMV.inc"
 #include "DA_Print_Stats_GeoAMV.inc"

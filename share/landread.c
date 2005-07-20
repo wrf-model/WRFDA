@@ -30,11 +30,15 @@ int GET_TERRAIN (        float *adx,
 #else
 
 #include <stdio.h>
-#include <rpc/xdr.h>
-#include <rpc/types.h>
 #include <math.h>
 #include <malloc.h>
 #include <string.h>
+
+#ifndef bool_t
+#include <rpc/xdr.h>
+#endif
+#include <rpc/types.h>
+
 #include "landread.h"
 #define MAXTOPOFILES  100
 #define MAXLEN        4096

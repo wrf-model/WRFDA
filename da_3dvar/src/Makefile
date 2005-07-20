@@ -401,7 +401,7 @@ DA_GeoAMV.o:		\
 			DA_Tools.o \
 			DA_GeoAMV/DA_GeoAMV.F \
 			DA_GeoAMV/DA_AO_Stats_GeoAMV.inc \
-			DA_GeoAMV/DA_Calculate_Jo_and_GradY_GeoAMV.inc \
+			DA_GeoAMV/DA_Get_Jo_and_GradY_GeoAMV.inc \
 			DA_GeoAMV/DA_Calculate_Residual_GeoAMV.inc \
 			DA_GeoAMV/DA_OI_Stats_GeoAMV.inc \
 			DA_GeoAMV/DA_Print_Stats_GeoAMV.inc \
@@ -422,7 +422,7 @@ DA_PolarAMV.o:		\
 			DA_Tools.o \
 			DA_PolarAMV/DA_PolarAMV.F \
 			DA_PolarAMV/DA_AO_Stats_PolarAMV.inc \
-			DA_PolarAMV/DA_Calculate_Jo_and_GradY_PolarAMV.inc \
+			DA_PolarAMV/DA_Get_Jo_and_GradY_PolarAMV.inc \
 			DA_PolarAMV/DA_Calculate_Residual_PolarAMV.inc \
 			DA_PolarAMV/DA_OI_Stats_PolarAMV.inc \
 			DA_PolarAMV/DA_Print_Stats_PolarAMV.inc \
@@ -656,7 +656,7 @@ DA_Gpsref.o:		\
 			DA_Gpsref/DA_Gpsref.F \
 			DA_Gpsref/DA_AO_Stats_Gpsref.inc \
 			DA_Gpsref/DA_Calculate_GradY_Gpsref.inc \
-			DA_Gpsref/DA_Calculate_Jo_and_GradY_Gpsref.inc \
+			DA_Gpsref/DA_Get_Jo_and_GradY_Gpsref.inc \
 			DA_Gpsref/DA_Calculate_Residual_Gpsref.inc \
 			DA_Gpsref/DA_OI_Stats_Gpsref.inc \
 			DA_Gpsref/DA_Print_Stats_Gpsref.inc \
