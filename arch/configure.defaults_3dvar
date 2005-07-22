@@ -663,14 +663,14 @@ lib_rsl :
                LEARN_BCAST=-DLEARN_BCAST crayx1 )
 
 ###########################################################
-#ARCH   cray1e UNICOS/mp  CRAY1E (KMA)
+#ARCH   crayx1 UNICOS/mp  CRAY X1 (KMA)
 #
 ## Use these for X1 cross compiler to build Registry
-##X1_CROSS_COMP = "gcc"
-##X1_CROSS_CFLG = ""
-## Use these for X1 native (trigger) compiler
 X1_CROSS_COMP = "gcc"
-X1_CROSS_CFLG = "-hcommand"
+X1_CROSS_CFLG = ""
+## Use these for X1 native (trigger) compiler
+#X1_CROSS_COMP = "cc"
+#X1_CROSS_CFLG = "-hcommand"
 CC_TOOLS        =       $(X1_CROSS_COMP) $(X1_CROSS_CFLG)
 
 SED_FTN		=	sed -f ../arch/cray_csd.sed
@@ -679,11 +679,11 @@ OMP             =
 OMPCPP          =
 DMPARALLEL      =       1
 SFC             =       ftn
-SCC             =       gcc
+SCC             =       cc
 FC              =       ftn
 LD              =       ftn
 F77             =       $(FC)
-CC              =       gcc
+CC              =       cc
 
 ARCHFLAGS       =       -DWRF_RSL_IO -DRSL \
                         -DDM_PARALLEL \
@@ -701,7 +701,7 @@ CFLAGS          =       -UCRAY -Dcrayx1 \
 TRADFLAG        =
 #FCOPTIM         =     	-Ofp3 -O3
 #FCOPTIM         =     	-Ofp2 -O1 -Ogen_private_callee
-FCOPTIM         =     	-Ofp2 -O0
+FCOPTIM         =     	-Ofp2 -O1
 FCDEBUG         =       #-g
 FCTYPE          =       -sinteger32 -e m -sreal64 -dp
 FCFORM          =       -f free -N 255
