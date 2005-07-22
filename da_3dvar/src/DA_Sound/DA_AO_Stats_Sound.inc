@@ -16,7 +16,6 @@ SUBROUTINE DA_AO_Stats_Sound( stats_unit, oi, re )
    nv = 0
    nt = 0
    nq = 0
-   num_sound_tot = 0
    
    Sound%maximum%u = maxmin_type( missing_r, 0, 0)
    Sound%maximum%v = maxmin_type( missing_r, 0, 0)
@@ -64,7 +63,7 @@ SUBROUTINE DA_AO_Stats_Sound( stats_unit, oi, re )
    call proc_sum_int( nv )
    call proc_sum_int( nt )
    call proc_sum_int( nq )
-   num_sound_tot = nu + nv + nt + nq
+   num_sound_tot = num_sound_tot + nu + nv + nt + nq
    
    call proc_stats_combine(Sound%average%u, Sound%rms_err%u, &
                            Sound%minimum%u%value, Sound%maximum%u%value, &

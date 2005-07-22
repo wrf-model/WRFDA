@@ -70,7 +70,7 @@ SUBROUTINE DA_AO_Stats_Sonde_sfc( stats_unit, oi, re )
    call proc_sum_int( nt )
    call proc_sum_int( np )
    call proc_sum_int( nq )
-   num_sound_tot = nu + nv + nt + np + nq
+   num_sound_tot = num_sound_tot + nu + nv + nt + np + nq
    
    call proc_stats_combine(Sonde_sfc%average%u, Sonde_sfc%rms_err%u, &
                            Sonde_sfc%minimum%u%value, Sonde_sfc%maximum%u%value, &

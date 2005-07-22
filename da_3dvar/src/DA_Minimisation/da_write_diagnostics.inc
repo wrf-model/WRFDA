@@ -122,6 +122,7 @@
 
 !  [2.1] Sondes:
 
+      num_sound_tot = 0
       call DA_AO_Stats_Sound ( stats_unit, iv, re )
       call DA_AO_Stats_Sonde_sfc ( stats_unit, iv, re )
 
