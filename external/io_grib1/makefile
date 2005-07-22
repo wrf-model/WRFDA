@@ -26,6 +26,7 @@ libio_grib1.a:	$(OBJS) makelib
 
 makelib: .FORCE
 	$(AR) cruv libio_grib1.a $(OBJS)
+	$(RANLIB) libio_grib1.a
 
 io_grib1.o:     io_grib1.F 
 	$(CPP) $(CPPFLAGS) -I../../main io_grib1.F -I. | $(M4) - > io_grib1.f
