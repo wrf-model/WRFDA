@@ -22,7 +22,7 @@ RM      =       /bin/rm -f
 MV      =       /bin/mv -f
 CP      =       /bin/cp -f
 AR      =       ar ru
-M4      =       m4 -B 12000
+M4      =       m4 -B12000
 
 .SUFFIXES: .F .i .o .f .c
 

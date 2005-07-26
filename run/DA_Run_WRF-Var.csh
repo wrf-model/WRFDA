@@ -3,9 +3,9 @@
 # @ job_type   = parallel
 ## @ environment = COPY_ALL
 # @ environment = MP_SHARED_MEMORY=true
-# @ job_name   = wrf3dvar
-# @ output     = wrf3dvar.out
-# @ error      = wrf3dvar.err
+# @ job_name   = wrfvar
+# @ output     = wrfvar.out
+# @ error      = wrfvar.err
 # @ node       = 1
 ## @ network.MPI    = css0,shared,us
 # @ network.MPI    = css0,shared,ip
@@ -26,18 +26,18 @@
 #PBS -lnodes=4:comp -lwalltime=1000
 #Uncomment for JET: source /usr/local/bin/setup-mpi.csh
 #-----------------------------------------------------------------------
-# Script DA_Run_3DVAR.csh
+# Script DA_Run_WRF-Var.csh
 #
-# Purpose: Top level script for running 3DVAR system
+# Purpose: Top level script for running the WRF-Var system
 #
 # Method:  1) Set up links to run directory.
-#          2) Run 3DVAR in run directory.
+#          2) Run WRF-Var in run directory.
 #
 # History: 11/16/99  Original version. Dale Barker
 #          12/01/99  Modifications to defaults and names. Dale Barker
 #          10/14/03  Modifications to defaults for WRF 3DVAR. Wei Huang
 #          06/06/05  Modifications for Polar & Geo AMV's      Syed RH Rizvi
-#          07/15/05  Tidy up prior to WRF V2.1 release. Dale Barker
+#          07/15/05  Tidy up prior to WRF V2.1 release, rename DA_Run_WRF-Var.csh. Dale Barker
 #
 #-----------------------------------------------------------------------
 
@@ -48,8 +48,8 @@
  setenv MP_SHARED_MEMORY yes
 
  echo ""
- echo "Running script DA_Run_3DVAR"
- echo "---------------------------"
+ echo "Running script DA_Run_WRF-Var"
+ echo "-----------------------------"
  echo ""
 
 #-----------------------------------------------------------------------
@@ -96,6 +96,8 @@
  if ( ! $?DA_OB_FORMAT )  setenv DA_OB_FORMAT 2                   # Observation format: 1=BUFR, 2=ASCII "little_r"
  if ( ! $?DA_CV_OPTIONS ) setenv DA_CV_OPTIONS 2                  # Background error statistics: 2=NCAR, 3=NCEP.
  if ( ! $?DA_GLOBAL )     setenv DA_GLOBAL .FALSE.                # Regional/global domain.
+ if ( ! $?NPROC_X )       setenv NPROC_X 0                        # Regional, always set NPROC_X to 0, Global, always 1
+ if (   $DA_GLOBAL == ".TRUE.") setenv NPROC_X 1
  if ( ! $?DA_MODEL_TYPE ) setenv DA_MODEL_TYPE WRF                # WRF, MM5 or KMA.
  if ( ! $?DA_WRITE_INCREMENTS ) setenv DA_WRITE_INCREMENTS .FALSE.# Optionally write increments.
  if ( ! $?DA_NUM_FGAT_TIME ) setenv DA_NUM_FGAT_TIME 1            # Number of FGAT ob windows.
@@ -432,7 +434,7 @@ cat >! namelist.input << EOF
  parent_time_step_ratio              = 1,     3,     3,
  feedback                            = 1,
  smooth_option                       = 0,
- nproc_x                             = 1,
+ nproc_x                             = $NPROC_X,
  /
 
  &physics
@@ -522,10 +524,10 @@ endif
 #poe ./wrfvar.exe
 #mpirun -np ${NUM_PROCS} ./wrfvar.exe
 
-cp fort.12 DAProg_3DVAR.statistics >&! /dev/null
-cp fort.81 DAProg_3DVAR.cost_fn >&! /dev/null
-cp fort.82 DAProg_3DVAR.grad_fn >&! /dev/null
+cp fort.12 DAProg_WRF-Var.statistics >&! /dev/null
+cp fort.81 DAProg_WRF-Var.cost_fn >&! /dev/null
+cp fort.82 DAProg_WRF_Var.grad_fn >&! /dev/null
 
-echo "WRF-VAR completed"
+echo "WRF-Var completed"
 
 exit (0)

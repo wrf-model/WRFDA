@@ -4,7 +4,9 @@
 OMP             =
 OMPCPP          =
 FC              =       f90
+SFC             =       $(FC)
 F77             =       $(FC)
+LD              =       $(FC)
 CC              =       cc
 CC_TOOLS        =       cc
 ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DNETCDF -DINTIO \
@@ -14,7 +16,7 @@ ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DNETCDF -DINTIO \
 CFLAGS          =       $(ARCHFLAGS)
 TRADFLAG        =
 #FCOPTIM         =       -fast -O2 -Olimit 2000
-FCOPTIM         =       -O0
+FCOPTIM         =       -fast -O2
 FCDEBUG         =       -g
 FCTYPE          =       -r8
 FCFORM          =       -free
@@ -27,6 +29,7 @@ EXTRAMODULES    =
 PERL            =       perl
 
 LDFLAGS         =       $(FCOPTIM) $(FCBASE)
+ENVCOMPDEFS     =       CONFIGURE_COMPILEFLAGS
 
 NETCDFPATH      =       CONFIGURE_NETCDF_PATH
 NETCDF_IO_PATH  =       external/io_netcdf
@@ -52,6 +55,7 @@ OMP             =
 OMPCPP          =
 FC              =       mpif90
 F77             =       $(FC)
+LD              =       $(FC)
 CC              =       mpicc
 CC_TOOLS        =       cc
 ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DNETCDF -DINTIO \
@@ -62,7 +66,7 @@ ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DNETCDF -DINTIO \
 CFLAGS          =       $(ARCHFLAGS) -I../external/RSL/RSL
 TRADFLAG        =
 #FCOPTIM         =       -fast -O2 -Olimit 2000
-FCOPTIM         =       -O0
+FCOPTIM         =       -fast -O2
 FCDEBUG         =       -g
 FCTYPE          =       -r8
 FCFORM          =       -free
@@ -75,6 +79,7 @@ EXTRAMODULES    =
 PERL            =       perl
 
 LDFLAGS         =       $(FCOPTIM) $(FCBASE)
+ENVCOMPDEFS     =       CONFIGURE_COMPILEFLAGS
 
 NETCDFPATH      =       CONFIGURE_NETCDF_PATH
 NETCDF_IO_PATH  =       external/io_netcdf
@@ -97,7 +102,7 @@ externals : wrfio_nf wrfio_int wrfio_grib1 esmf_time lib_rsl
 
 lib_rsl :
 	( cd ../external/RSL/RSL ; \
-          make CC=$(CC) FC=$(FC) MAX_DOMAINS=$(MAX_DOMAINS) \
+          make CC="$(CC)" FC="$(FC)" MAX_DOMAINS=$(MAX_DOMAINS) \
                                  MAX_PROC=$(MAX_PROC) \
                                  LEARN_BCAST=-DLEARN_BCAST alpha )
 
@@ -108,6 +113,7 @@ OMP             =
 OMPCPP          =
 FC              =       f90
 F77             =       $(FC)
+LD              =       $(FC)
 CC              =       cc
 CC_TOOLS        =       cc
 ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DNETCDF -DINTIO \
@@ -130,6 +136,7 @@ EXTRAMODULES    =
 PERL            =       perl
 
 LDFLAGS         =       $(FCOPTIM) $(FCBASE)
+ENVCOMPDEFS     =       CONFIGURE_COMPILEFLAGS
 
 NETCDFPATH      =       CONFIGURE_NETCDF_PATH
 NETCDF_IO_PATH  =       external/io_netcdf
@@ -154,11 +161,12 @@ FC              =       pgf90
 F77             =       $(FC)
 CC              =       gcc
 CC_TOOLS        =       gcc
+LD              =       $(FC)
 SFC             =       $(FC)
 CFLAGS          =       
 TRADFLAG        =       -traditional
 FCOPTIM         =       -fast
-FCDEBUG         =       -g
+FCDEBUG         =       #-g
 FCTYPE          =       -r8
 FCFORM          =       -Mfree
 FCHOST          =       
@@ -173,15 +181,16 @@ EXTRAMODULES    =
 PERL            =       perl
 
 LDFLAGS         =
+ENVCOMPDEFS     =       CONFIGURE_COMPILEFLAGS
 
 NETCDFPATH      =       CONFIGURE_NETCDF_PATH
 NETCDF_IO_PATH  =       external/io_netcdf
 NETCDF_LIB	=       CONFIGURE_NETCDF_LIB_PATH
 
-LOCAL_LIBRARIES =       -g -L/usr/local/ncarg/lib -L/usr/X11R6/lib -L/usr/local/lib \
+LOCAL_LIBRARIES =       -L/usr/local/ncarg/lib -L/usr/X11R6/lib -L/usr/local/lib \
 			-lncarg -lncarg_gks -lncarg_c -lX11
 
-CPP             =       /lib/cpp
+CPP             =       /lib/cpp $(TRADFLAG)
 DM_1_CPP_FLAGS  =
 DM_2_CPP_FLAGS  =
 POUND_DEF       =       -DLINUX -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
@@ -196,6 +205,7 @@ externals : CONFIGURE_WRFIO_NF wrfio_int wrfio_grib1 esmf_time
 DMPARALLEL      =       1
 FC              =       mpif90
 F77             =       $(FC)
+LD              =       $(FC)
 CC              =       mpicc
 CC_TOOLS        =       gcc
 SFC             =       pgf90
@@ -210,7 +220,7 @@ CFLAGS          =       -DDM_PARALLEL -DWRF_RSL_IO \
                         -I../external/RSL/RSL
 TRADFLAG        =       -traditional
 FCOPTIM         =       #-fast
-FCDEBUG         =       -g
+FCDEBUG         =       #-g
 FCTYPE          =       -r8
 FCFORM          =       -Mfree
 FCHOST          =
@@ -222,18 +232,19 @@ EXTRAMODULES    =
 PERL            =       perl
 
 LDFLAGS         =       -byteswapio
+ENVCOMPDEFS     =       CONFIGURE_COMPILEFLAGS
 
 NETCDFPATH      =       CONFIGURE_NETCDF_PATH
 NETCDF_IO_PATH  =       external/io_netcdf
 NETCDF_LIB	=       CONFIGURE_NETCDF_LIB_PATH
 MPI_LIB		=	-L../external/RSL/RSL -lrsl
 
-LOCAL_LIBRARIES =       -g -L/usr/local/ncarg/lib -L/usr/X12R6/lib -L/usr/local/lib \
+LOCAL_LIBRARIES =       -L/usr/local/ncarg/lib -L/usr/X12R6/lib -L/usr/local/lib \
                         -lncarg -lncarg_gks -lncarg_c -lX11
 
-CPP             =       /lib/cpp
+CPP             =       /lib/cpp $(TRADFLAG)
 DM_1_CPP_FLAGS  =       -I../external/RSL/RSL -C -P `cat ../inc/dm_comm_cpp_flags` \
-			-DNO_RRTM_PHYSICS  -DPGF90 $(TRADFLAG)
+			-DNO_RRTM_PHYSICS  -DPGF90
 DM_2_CPP_FLAGS  =       -I../../external/RSL/RSL -C -P `cat ../../inc/dm_comm_cpp_flags`
 POUND_DEF       =       -DLINUX -DNO_RRTM_PHYSICS  \
 			-DNONSTANDARD_SYSTEM -DF90_STANDALONE \
@@ -246,11 +257,7 @@ externals : CONFIGURE_WRFIO_NF wrfio_int wrfio_grib1 esmf_time lib_rsl
           /bin/cp module_dm_warning module_dm.F ; cat ../external/RSL/module_dm.F >> module_dm.F )
 
 lib_rsl :
-	( cd ../external/RSL/RSL ; \
-          make CC=$(CC) FC='mpif90 -byteswapio' \
-               MAX_DOMAINS=$(MAX_DOMAINS) \
-               MAX_PROC=$(MAX_PROC) \
-               LEARN_BCAST=-DLEARN_BCAST linux )
+	( cd ../external/RSL/RSL ; make CC="$(CC)" FC="$(FC) -byteswapio" MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) LEARN_BCAST=-DLEARN_BCAST linux )
 
 ###########################################################
 #ARCH Intel xeon i686 ia32 Xeon Linux, ifort compiler (single-threaded, no nesting)
@@ -260,10 +267,11 @@ F77             =       $(FC)
 CC              =       icc
 CC_TOOLS        =       gcc
 SFC             =       $(FC)
+LD              =       $(FC)
 CFLAGS          =       
 TRADFLAG        =       -traditional
 FCOPTIM         =       -O3 -xW
-FCDEBUG         =       -g
+FCDEBUG         =       #-g
 FCTYPE          =       -r8
 FCFORM          =       -FR -cm -w
 FCHOST          =       
@@ -278,15 +286,16 @@ EXTRAMODULES    =
 PERL            =       perl
 
 LDFLAGS         =
+ENVCOMPDEFS     =       CONFIGURE_COMPILEFLAGS
 
 NETCDFPATH      =       CONFIGURE_NETCDF_PATH
 NETCDF_IO_PATH  =       external/io_netcdf
 NETCDF_LIB	=       CONFIGURE_NETCDF_LIB_PATH
 
-LOCAL_LIBRARIES =       -g -L/usr/local/ncarg/lib -L/usr/X11R6/lib -L/usr/local/lib \
+LOCAL_LIBRARIES =       -L/usr/local/ncarg/lib -L/usr/X11R6/lib -L/usr/local/lib \
 			-lncarg -lncarg_gks -lncarg_c -lX11
 
-CPP             =       /lib/cpp -traditional
+CPP             =       /lib/cpp $(TRADFLAG)
 DM_1_CPP_FLAGS  =
 DM_2_CPP_FLAGS  =
 POUND_DEF       =       -DNO_RRTM_PHYSICS -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
@@ -304,6 +313,7 @@ OMP             =
 OMPCPP          =
 FC              =       f90
 F77             =       $(FC)
+LD              =       $(FC)
 CC              =       cc
 CC_TOOLS        =       cc
 ARCHFLAGS       =       -DINTIO \
@@ -327,6 +337,7 @@ EXTRAMODULES    =
 PERL            =       perl
 
 LDFLAGS         =       -64 -mips4
+ENVCOMPDEFS     =       CONFIGURE_COMPILEFLAGS
 
 NETCDFPATH      =       CONFIGURE_NETCDF_PATH
 NETCDF_IO_PATH  =       external/io_netcdf
@@ -356,6 +367,7 @@ OMPCPP          =
 LIBINCLUDE	=	/tea2/huangwei/mpich-1.2.4/include
 FC              =       mpif90
 F77             =       $(FC)
+LD              =       $(FC)
 CC              =       mpicc
 CC_TOOLS        =       cc
 ARCHFLAGS       =       -DINTIO \
@@ -382,6 +394,7 @@ EXTRAMODULES    =
 PERL            =       perl
 
 LDFLAGS         =       $(FCOPTIM) $(FCBASE)
+ENVCOMPDEFS     =       CONFIGURE_COMPILEFLAGS
 
 NETCDFPATH      =       CONFIGURE_NETCDF_PATH
 NETCDF_IO_PATH  =       external/io_netcdf
@@ -418,6 +431,7 @@ OMP             =
 OMPCPP          =
 FC              =       f90
 F77             =       $(FC)
+LD              =       $(FC)
 CC              =       cc
 CC_TOOLS        =       cc
 ARCHFLAGS       =       -DINTIO \
@@ -448,6 +462,7 @@ MPI_LIB		=
 LOCAL_LIBRARIES =       
 
 LDFLAGS         =  	#-Wl"-Z 3000000"
+ENVCOMPDEFS     =       CONFIGURE_COMPILEFLAGS
 
 CPP             =       /usr/lib0/cpp
 DM_1_CPP_FLAGS	=
@@ -482,7 +497,7 @@ FCBASE          =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767
 FCBUFR          =       $(FCBASE)
 FC_FFT_RF       =       $(FCBASE)
 EXTRAMODULES    =
-ARCHFLAGS       =       -DYYY -DINTIO \
+ARCHFLAGS       =       -DGRIB1 -DINTIO \
 			$(WORDSIZE_DEF) \
                         CONFIGURE_NETCDF_FLAG -DTRIEDNTRUE   \
 			-DLIMIT_ARGS -DNO_NAMELIST_PRINT -DNATIVE_MASSV
@@ -492,6 +507,7 @@ NETCDF_LIB	=       CONFIGURE_NETCDF_LIB_PATH
 LOCAL_LIB	=	-lmass -lmassv
 
 LDFLAGS         =	-bmaxstack:256000000 -bmaxdata:2048000000
+ENVCOMPDEFS     =       CONFIGURE_COMPILEFLAGS
 CPP             =       /lib/cpp
 DM_1_CPP_FLAGS	=
 DM_2_CPP_FLAGS	=
@@ -511,7 +527,7 @@ SFC             =       xlf_r
 SCC             =       cc_r
 FC              =       mpxlf90_r
 F77		=	mpxlf_r
-LD              =       mpxlf90_r
+LD              =       $(FC)
 CC              =       mpcc_r
 CC_TOOLS        =       cc
 CFLAGS          =       -DNOUNDERSCORE -DWRF_RSL_IO \
@@ -533,7 +549,7 @@ EXTRAMODULES    =
 ARCHFLAGS       =       -DWRF_RSL_IO -DRSL -DDM_PARALLEL \
 			$(WORDSIZE_DEF) \
 			CONFIGURE_NETCDF_FLAG \
-			-DTRIEDNTRUE -DYYY -DINTIO \
+			-DTRIEDNTRUE -DGRIB1 -DINTIO \
 			-DLIMIT_ARGS -DNO_NAMELIST_PRINT -DNATIVE_MASSV \
 			-DNORESHAPE
 PERL            =       perl
@@ -542,6 +558,7 @@ NETCDF_LIB	=       CONFIGURE_NETCDF_LIB_PATH
 MPI_LIB		=	-L../external/RSL/RSL -lrsl
 LOCAL_LIB	=	-lmass -lmassv
 LDFLAGS         =	-bmaxstack:256000000 -bmaxdata:2048000000
+ENVCOMPDEFS     =       CONFIGURE_COMPILEFLAGS
 CPP		=	/lib/cpp
 DM_1_CPP_FLAGS	=	-I../external/RSL/RSL -C -P `cat ../inc/dm_comm_cpp_flags`
 DM_2_CPP_FLAGS	=	-I../../external/RSL/RSL -C -P `cat ../../inc/dm_comm_cpp_flags`
@@ -561,7 +578,7 @@ lib_rsl :
 	make MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) LEARN_BCAST=-DLEARN_BCAST sp2 )
 
 ###########################################################
-#ARCH   crayx1 UNICOS/mp  CRAY X1         (single-threaded)
+#ARCH   crayx1 UNICOS/mp  CRAY X1
 #
 ## Use these for X1 cross compiler to build Registry
 ##X1_CROSS_COMP = "gcc"
@@ -571,12 +588,15 @@ X1_CROSS_COMP = "cc"
 X1_CROSS_CFLG = "-hcommand"
 CC_TOOLS        =       $(X1_CROSS_COMP) $(X1_CROSS_CFLG)
 
+SED_FTN		=	sed -f ../arch/cray_csd.sed
+
 OMP             =
 OMPCPP          =
 DMPARALLEL      =       1
 SFC             =       ftn
 SCC             =       cc
 FC              =       ftn
+LD              =       $(FC)
 F77             =       $(FC)
 CC              =       cc
 
@@ -585,47 +605,51 @@ ARCHFLAGS       =       -DWRF_RSL_IO -DRSL \
                         $(WORDSIZE_DEF) \
                         CONFIGURE_NETCDF_FLAG \
                         -DTRIEDNTRUE -DONLY_WRFMODEL_IO -DINTIO \
-                        -DNORESHAPE
-CFLAGS          =       -DCRAY \
+                        -DNORESHAPE -Dcrayx1
+CFLAGS          =       -UCRAY -Dcrayx1 \
                         -DWRF_RSL_IO \
                         -I../external/RSL/RSL \
                         -DDM_PARALLEL  \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) \
-                        -DMAXPROC_MAKE=$(MAX_PROC)
+                        -DMAXPROC_MAKE=$(MAX_PROC) \
+			-h gen_private_callee
 TRADFLAG        =
-FCOPTIM         =     	#-Ofp3 -O3
+#FCOPTIM         =     	-Ofp3 -O3
+FCOPTIM         =     	-Ofp2 -O1 -Ogen_private_callee
+#FCOPTIM         =     	-Ofp2 -O0
 FCDEBUG         =       #-g
-#FCTYPE          =       integer32 real64 -e m
-FCTYPE          =       integer32 -e m -sreal64 -dp
-FCFORM          =       -f free
+#FCTYPE          =       -sinteger32 -e m -sreal64 -dp
+FCTYPE          =       -e m -sreal64 -dp
+FCFORM          =       -f free -N 255
 FCHOST          =   
-FCBASE          =       #-Oscalar1 -Ovector0 -Ostream0
+FCBASE          =       #-Ovector0 -Ostream0 -Oscalar1
 FCBUFR          =       $(FCBASE)
 FC_FFT_RF       =       $(FCBASE)
 
 EXTRAMODULES    =       
 PERL            =       perl
 
-LDFLAGS         =       -p../da_3dvar -p../da_3dvar/src -p../frame -p../share \
-			-L../da_3dvar -L../da_3dvar/src -L../frame -L../share
-
+LDFLAGS         =
+ENVCOMPDEFS     =       CONFIGURE_COMPILEFLAGS
 NETCDFPATH      =       CONFIGURE_NETCDF_PATH
 NETCDF_IO_PATH  =       external/io_netcdf
 NETCDF_LIB	=       CONFIGURE_NETCDF_LIB_PATH
 MPI_LIB		=	-L../external/RSL/RSL -lrsl
-LOCAL_LIB	=	../frame/wrf_num_bytes_between.o
-LOCAL_LIBRARIES =     
+LOCAL_LIB	=	-L../frame -L../share -L../da_3dvar -L../da_3dvar/src
+CONVERTOR_LIB	=	-L../convertor
+LOCAL_LIBRARIES =       #-L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c -lX11
 
-CPP             =       cpp
-DM_1_CPP_FLAGS	=
-DM_2_CPP_FLAGS	=
+CPP             =       cpp -C -P -Dcrayx1
+#CPP             =       cpp -C -P
+DM_1_CPP_FLAGS	=	-I../external/RSL/RSL -C -P `cat ../inc/dm_comm_cpp_flags`
+DM_2_CPP_FLAGS	=	-I../../external/RSL/RSL -C -P `cat ../../inc/dm_comm_cpp_flags`
 POUND_DEF       =       -DCRAYX1 \
 			-DNONSTANDARD_SYSTEM -DF90_STANDALONE \
 			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 
 RANLIB          =       echo
 
-externals : wrfio_nf wrfio_int wrfio_grib1 lib_rsl
+externals : wrfio_nf wrfio_int wrfio_grib1 esmf_time lib_rsl
 	( /bin/cp ../tools/gen_comms_warning ../tools/gen_comms.c ; \
           cat ../external/RSL/gen_comms.c >> ../tools/gen_comms.c ; \
           /bin/cp module_dm_warning module_dm.F ; \
@@ -633,7 +657,91 @@ externals : wrfio_nf wrfio_int wrfio_grib1 lib_rsl
 
 lib_rsl :
 	( cd ../external/RSL/RSL ; \
-          make MAX_DOMAINS=$(MAX_DOMAINS) \
+          make CC="$(CC)" \
+	       MAX_DOMAINS=$(MAX_DOMAINS) \
+               MAX_PROC=$(MAX_PROC) \
+               LEARN_BCAST=-DLEARN_BCAST crayx1 )
+
+###########################################################
+#ARCH   crayx1 UNICOS/mp  CRAY X1 (KMA)
+#
+## Use these for X1 cross compiler to build Registry
+X1_CROSS_COMP = "gcc"
+X1_CROSS_CFLG = ""
+## Use these for X1 native (trigger) compiler
+#X1_CROSS_COMP = "cc"
+#X1_CROSS_CFLG = "-hcommand"
+CC_TOOLS        =       $(X1_CROSS_COMP) $(X1_CROSS_CFLG)
+
+SED_FTN		=	sed -f ../arch/cray_csd.sed
+
+OMP             =
+OMPCPP          =
+DMPARALLEL      =       1
+SFC             =       ftn
+SCC             =       cc
+FC              =       ftn
+LD              =       ftn
+F77             =       $(FC)
+CC              =       cc
+
+ARCHFLAGS       =       -DWRF_RSL_IO -DRSL \
+                        -DDM_PARALLEL \
+                        $(WORDSIZE_DEF) \
+                        CONFIGURE_NETCDF_FLAG \
+                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO -DINTIO \
+                        -DNORESHAPE -Dcrayx1
+CFLAGS          =       -UCRAY -Dcrayx1 \
+                        -DWRF_RSL_IO \
+                        -I../external/RSL/RSL \
+                        -DDM_PARALLEL  \
+                        -DMAXDOM_MAKE=$(MAX_DOMAINS) \
+                        -DMAXPROC_MAKE=$(MAX_PROC) \
+			-h gen_private_callee
+TRADFLAG        =
+#FCOPTIM         =     	-Ofp3 -O3
+#FCOPTIM         =     	-Ofp2 -O1 -Ogen_private_callee
+FCOPTIM         =     	-Ofp2 -O1
+FCDEBUG         =       #-g
+FCTYPE          =       -sinteger32 -e m -sreal64 -dp
+FCFORM          =       -f free -N 255
+FCHOST          =   
+FCBASE          =       #-Ovector0 -Ostream0 -Oscalar1
+FCBUFR          =       $(FCBASE)
+FC_FFT_RF       =       $(FCBASE)
+
+EXTRAMODULES    =       
+PERL            =       perl
+
+LDFLAGS         =
+ENVCOMPDEFS     =       CONFIGURE_COMPILEFLAGS
+NETCDFPATH      =       CONFIGURE_NETCDF_PATH
+NETCDF_IO_PATH  =       external/io_netcdf
+NETCDF_LIB	=       CONFIGURE_NETCDF_LIB_PATH
+MPI_LIB		=	-L../external/RSL/RSL -lrsl
+LOCAL_LIB	=	-L../frame -L../share -L../da_3dvar -L../da_3dvar/src
+CONVERTOR_LIB	=	-L../convertor
+LOCAL_LIBRARIES =       #-L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c -lX11
+
+CPP             =       cpp -C -P -Dcrayx1
+DM_1_CPP_FLAGS	=	-I../external/RSL/RSL -C -P `cat ../inc/dm_comm_cpp_flags`
+DM_2_CPP_FLAGS	=	-I../../external/RSL/RSL -C -P `cat ../../inc/dm_comm_cpp_flags`
+POUND_DEF       =       -DCRAYX1 \
+			-DNONSTANDARD_SYSTEM -DF90_STANDALONE \
+			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+
+RANLIB          =       echo
+
+externals : wrfio_nf wrfio_int wrfio_grib1 esmf_time lib_rsl
+	( /bin/cp ../tools/gen_comms_warning ../tools/gen_comms.c ; \
+          cat ../external/RSL/gen_comms.c >> ../tools/gen_comms.c ; \
+          /bin/cp module_dm_warning module_dm.F ; \
+          cat ../external/RSL/module_dm.F >> module_dm.F )
+
+lib_rsl :
+	( cd ../external/RSL/RSL ; \
+          make CC="$(CC)" \
+               MAX_DOMAINS=$(MAX_DOMAINS) \
                MAX_PROC=$(MAX_PROC) \
                LEARN_BCAST=-DLEARN_BCAST crayx1 )
 
@@ -645,7 +753,7 @@ F77             =       xlf_r
 LD              =       xlf90_r
 CC              =       cc
 CC_TOOLS        =       cc
-CFLAGS          =       -DNOUNDERSCORE
+CFLAGS          =       -DNOUNDERSCORE -DLANDREAD_STUB
 TRADFLAG        =
 FCOPTIM         =       -O0 -qarch=auto
 FCDEBUG         =       #-g
@@ -666,6 +774,7 @@ PERL            =       CONFIGURE_PERL_PATH
 REGISTRY        =       Registry
 NETCDF_LIB	=       CONFIGURE_NETCDF_LIB_PATH
 LDFLAGS         =	 -Wl,-stack_size,10000000,-stack_addr,0xc0000000
+ENVCOMPDEFS     =       CONFIGURE_COMPILEFLAGS
 CPP             =       /usr/bin/cpp  -C -P -xassembler-with-cpp
 DM_1_CPP_FLAGS	=
 DM_2_CPP_FLAGS	=
@@ -685,7 +794,7 @@ F77             =       xlf_r
 LD              =       xlf90_r
 CC              =       cc
 CC_TOOLS        =       cc
-CFLAGS          =       -DNOUNDERSCORE
+CFLAGS          =       -DNOUNDERSCORE -DLANDREAD_STUB
 TRADFLAG        =
 FCOPTIM         =       -O0 -qarch=auto
 FCDEBUG         =       #-g
@@ -706,6 +815,7 @@ PERL            =       CONFIGURE_PERL_PATH
 REGISTRY        =       Registry
 NETCDF_LIB	=       CONFIGURE_NETCDF_LIB_PATH
 LDFLAGS         =	 -Wl,-stack_size,10000000,-stack_addr,0xc0000000
+ENVCOMPDEFS     =       CONFIGURE_COMPILEFLAGS
 CPP             =       /usr/bin/cpp  -C -P -xassembler-with-cpp
 DM_1_CPP_FLAGS	=
 DM_2_CPP_FLAGS	=
