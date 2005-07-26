@@ -192,8 +192,10 @@ rlim_ ()
 
    getrusage ( RUSAGE_SELF, &r_usage ) ;
    fprintf(stderr,"sm %ld d %ld s %ld\n",r_usage.ru_ixrss,r_usage.ru_idrss,r_usage.ru_isrss) ;
+#ifndef crayx1
    minf = mallinfo() ;
    fprintf(stderr,"a %ld usm %ld fsm %ld uord %ld ford %ld hblkhd %d\n",minf.arena,minf.usmblks,minf.fsmblks,minf.uordblks,minf.fordblks,minf.hblkhd) ;
+#endif
 # if 0
    fprintf(stderr," outy %d  nouty %d  maxstug %d maxouty %d \n", outy, nouty, maxstug, maxouty ) ;
 # endif
