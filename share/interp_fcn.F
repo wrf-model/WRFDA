@@ -51,6 +51,7 @@
      INTEGER i,j,k
 #endif
 
+#if (DA_CORE != 1)
      ! Iterate over the ND tile and compute the values
      ! from the CD tile. 
 
@@ -145,6 +146,7 @@
            ENDDO
         ENDDO
      ENDDO
+#endif
 #endif
 
      RETURN
@@ -769,6 +771,7 @@
      n2ci(n) = (n+ipos*nri-1)/nri
      n2cj(n) = (n+jpos*nrj-1)/nrj
 
+#if (DA_CORE != 1)
      rdt = 1.D0/cdt
 
      shw = 0
@@ -924,6 +927,7 @@
            ENDDO
         ENDDO
      ENDDO
+#endif
 #endif
 
      RETURN
