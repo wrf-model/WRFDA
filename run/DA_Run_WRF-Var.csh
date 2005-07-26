@@ -96,6 +96,8 @@
  if ( ! $?DA_OB_FORMAT )  setenv DA_OB_FORMAT 2                   # Observation format: 1=BUFR, 2=ASCII "little_r"
  if ( ! $?DA_CV_OPTIONS ) setenv DA_CV_OPTIONS 2                  # Background error statistics: 2=NCAR, 3=NCEP.
  if ( ! $?DA_GLOBAL )     setenv DA_GLOBAL .FALSE.                # Regional/global domain.
+ if ( ! $?NPROC_X )       setenv NPROC_X 0                        # Regional, always set NPROC_X to 0, Global, always 1
+ if (   $DA_GLOBAL == ".TRUE.") setenv NPROC_X 1
  if ( ! $?DA_MODEL_TYPE ) setenv DA_MODEL_TYPE WRF                # WRF, MM5 or KMA.
  if ( ! $?DA_WRITE_INCREMENTS ) setenv DA_WRITE_INCREMENTS .FALSE.# Optionally write increments.
  if ( ! $?DA_NUM_FGAT_TIME ) setenv DA_NUM_FGAT_TIME 1            # Number of FGAT ob windows.
@@ -432,7 +434,7 @@ cat >! namelist.input << EOF
  parent_time_step_ratio              = 1,     3,     3,
  feedback                            = 1,
  smooth_option                       = 0,
- nproc_x                             = 1,
+ nproc_x                             = $NPROC_X,
  /
 
  &physics
