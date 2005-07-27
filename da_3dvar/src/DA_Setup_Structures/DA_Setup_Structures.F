@@ -62,10 +62,10 @@ MODULE DA_Setup_Structures
 #include <da_transfer_kmatoxb.inc>
 #include <da_transfer_xatowrf.inc>
 #include <da_transfer_xatokma.inc>
-#include <da_transfer_wrftltoxa.inc>
-#include <da_transfer_wrftltoxa_adj.inc>
-#include <da_transfer_xatowrftl.inc>
-#include <da_transfer_xatowrftl_adj.inc>
+!include <da_transfer_wrftltoxa.inc>
+!include <da_transfer_wrftltoxa_adj.inc>
+!include <da_transfer_xatowrftl.inc>
+!include <da_transfer_xatowrftl_adj.inc>
 #include <DA_Transfer_XatoAnalysis.inc>
 #include <da_write_interpolated_be.inc>
 #include <da_cloud_model.inc>

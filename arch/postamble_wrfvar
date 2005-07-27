@@ -41,6 +41,7 @@ wrfio_int :
 	( cd ../external/io_int ; \
         make CC="$(CC)" CPP="$(CPP)" \
 	RANLIB="$(RANLIB)" \
+	SFC="$(SFC)" \
 	FC="$(FC)" FCFLAGS="$(FCDEBUG) $(FCFORM) $(FCBASE)" all )
 
 wrfio_grib1 :
@@ -48,6 +49,7 @@ wrfio_grib1 :
         make CPP="$(CPP)" \
 	RANLIB="$(RANLIB)" \
 	CC="$(CC)" CFLAGS="$(CFLAGS)" \
+	SFC="$(SFC)" \
 	FC="$(FC)" FCFLAGS="$(FCDEBUG) -I. $(FCFORM) $(FCBASE)" )
 
 esmf_time : 
