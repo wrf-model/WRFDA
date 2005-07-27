@@ -438,7 +438,7 @@ ARCHFLAGS       =       -DINTIO \
                         $(WORDSIZE_DEF) \
                         -DTRIEDNTRUE -DONLY_WRFMODEL_IO \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) \
-			-DNEC_SX -DWRF3DVAR -DMPI -I$(MPIINCDIR)
+			-DNEC_SX -DWRFVAR -DMPI -I$(MPIINCDIR)
 CFLAGS          =       $(ARCHFLAGS)
 TRADFLAG        =
 FCOPTIM         =
@@ -480,16 +480,16 @@ externals : wrfio_int wrfio_grib1
 ###########################################################
 #ARCH   AIX             (single-threaded, no nesting)
 #
-FC              =       xlf90
-F77             =       xlf
-LD              =       xlf90
-CC              =       cc
-CC_TOOLS        =       cc
-CFLAGS          =       -DNOUNDERSCORE
+FC              =       xlf90_r
+F77             =       xlf_r
+LD              =       xlf90_r
+CC              =       cc_r
+CC_TOOLS        =       cc_r
+CFLAGS          =       -DNOUNDERSCORE -DNCARIBM_NOC99
 TRADFLAG        =
-FCOPTIM         =       -O2 -qarch=auto
+FCOPTIM         =       -O0 -qarch=auto
 FCDEBUG         =       #-g
-FCTYPE          =       -qrealsize=8
+FCTYPE          =       -qrealsize=8 -qintsize=4
 FCFORM          =       -qfree=f90
 FCHOST          =
 FCBASE          =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767
@@ -529,14 +529,14 @@ FC              =       mpxlf90_r
 F77		=	mpxlf_r
 LD              =       $(FC)
 CC              =       mpcc_r
-CC_TOOLS        =       cc
+CC_TOOLS        =       cc_r
 CFLAGS          =       -DNOUNDERSCORE -DWRF_RSL_IO \
 			-I../external/RSL/RSL \
 			-DDM_PARALLEL \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) \
 			-DMAXPROC_MAKE=$(MAX_PROC)
 TRADFLAG        =
-FCOPTIM         =       -O2 -qarch=auto
+FCOPTIM         =       -O0 -qarch=auto
 FCDEBUG         =       #-g
 FCTYPE          =       -qrealsize=8
 FCFORM          =       -qfree=f90
