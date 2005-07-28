@@ -57,10 +57,11 @@
 #-----------------------------------------------------------------------
 
 #e.g.: setenv DAT_DIR /users/dmbarker/data overrides the default below.
-setenv DAT_DIR /tara/dmbarker/tutorial/wrfvar-test_data
-setenv WEST_EAST_GRID_NUMBER 90
-setenv SOUTH_NORTH_GRID_NUMBER 90
-setenv GRID_DISTANCE 100000
+setenv DAT_DIR /wrf/mmm02/wrfvar-testdata
+setenv SRC_DIR /wrf/mmm02
+setenv WEST_EAST_GRID_NUMBER 45
+setenv SOUTH_NORTH_GRID_NUMBER 45
+setenv GRID_DISTANCE 200000
 
 ##########################################################################
 #USER: DO NOT MAKE CHANGES BELOW (if you do, you're on your own!) 
@@ -212,19 +213,19 @@ setenv GRID_DISTANCE 100000
 # [2.0] Perform sanity checks:
 #-----------------------------------------------------------------------
 
- if ( ! -s $DA_FIRST_GUESS ) then
+ if ( ! -e $DA_FIRST_GUESS ) then
     echo "Error: First Guess file does not exist:"
     echo  $DA_FIRST_GUESS
     exit 1
  endif
 
- if ( ! -s $DA_OBSERVATIONS ) then
+ if ( ! -e $DA_OBSERVATIONS ) then
     echo "Error: Observation file does not exist:"
     echo  $DA_OBSERVATIONS
     exit 1
  endif
 
- if ( ! -s $DA_BACK_ERRORS ) then
+ if ( ! -e $DA_BACK_ERRORS ) then
     echo "Error: Background Error file does not exist:"
     echo  $DA_BACK_ERRORS
     exit 1
