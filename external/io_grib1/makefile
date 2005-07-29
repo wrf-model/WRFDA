@@ -1,22 +1,20 @@
-#makefile to build io_int that does binary i/o
+#makefile to build io_grib1 that does GriB i/o
 
 OBJSL   = io_grib1.o gribmap.o gridnav.o open_file.o grib1_routines.o trim.o
 OBJS    = $(OBJSL)
 LIBS    = -lm
 M4      = m4 -Uinclude -Uindex -Ulen
 AR      = ar
-#RANLIB	= ranlib
-RANLIB  = echo
 CPPFLAGS = -C -P
 INCLUDEDIRS  = -I. -Igrib1_util -IMEL_grib1
-FC	= ifort
+RANLIB  = echo
 
 .SUFFIXES:      .F90 .F .f .c .o
 
 all : clean_a LOCAL_LIBS libio_grib1.a wgrib
 
 wgrib :
-	( cd WGRIB ; make "CC=$(CC)" )
+	( cd WGRIB ; make CC="$(CC) $(CFLAGS)" )
 	ln -sf WGRIB/wgrib .
 
 clean_a :
@@ -43,8 +41,8 @@ test_grib1_routines: test_grib1_routines.F90 gridnav.c gribmap.c open_file.c tri
 		libgrib1_util.a libMEL_grib1.a -lm
 
 LOCAL_LIBS :
-	( cd MEL_grib1; make CC=$(CC) archive )
-	( cd grib1_util; make CC=$(CC) archive )
+	( cd MEL_grib1; make CC="$(CC) $(CFLAGS)" archive )
+	( cd grib1_util; make CC="$(CC) $(CFLAGS)" archive )
 
 .FORCE:
 

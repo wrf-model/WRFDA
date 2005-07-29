@@ -4263,7 +4263,7 @@ END
 
 !------------------------------------------------------------------
 
-   SUBROUTINE interp_domain_em_part1 ( grid, intermediate_grid, config_flags ,  &
+   SUBROUTINE interp_domain_em_part1 ( grid, intermediate_grid, ngrid, config_flags ,  &
 !
 #include "em_dummy_args.inc"
 !
@@ -4275,6 +4275,7 @@ END
 !
       TYPE(domain), POINTER :: grid          ! name of the grid being dereferenced (must be "grid")
       TYPE(domain), POINTER :: intermediate_grid
+      TYPE(domain), POINTER :: ngrid
 #include <em_dummy_decl.inc>
       INTEGER nlev, msize
       INTEGER i,j,pig,pjg,cm,cn,nig,njg,retval,k

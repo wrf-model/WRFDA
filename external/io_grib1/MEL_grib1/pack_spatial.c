@@ -42,7 +42,7 @@ int	pack_spatial ( long   		*pt_cnt,
 			unsigned short	*bit_cnt,
 			float		*pack_null,
 			float 		*fbuff,
-			unsigned long  	**ppbitstream,
+			unsigned int  	**ppbitstream,
 			short   	dec_scl_fctr,
 			long    	*BDSlength,
 			char    	*errmsg)
@@ -54,7 +54,7 @@ int	pack_spatial (  pt_cnt, bit_cnt, pack_null, fbuff, ppbitstream,
 			unsigned short	*bit_cnt;
 			float		*pack_null;
 			float 		*fbuff;
-			unsigned long  	**ppbitstream;
+			unsigned int  	**ppbitstream;
 			short   	dec_scl_fctr;
 			long    	*BDSlength;
 			char    	*errmsg;
@@ -67,8 +67,13 @@ int	pack_spatial (  pt_cnt, bit_cnt, pack_null, fbuff, ppbitstream,
     int empty;			/* number of empty bits in word */ 
     int diff;			/* difference of empty - bit1 */ 
     long max_value;		/* max value storable in bit_cnt bits */
+#if 0
     unsigned long itemp;	/* temporary unsigned integer */
     unsigned long *bstr;	/* pointer running across bitstream */
+#else
+    unsigned int itemp;	/* temporary unsigned integer */
+    unsigned int *bstr;	/* pointer running across bitstream */
+#endif
     int pack_bit_cnt;		/* count of bits to pack parameter values */ 
     int unused_bit_cnt; 	/* count of unused bits for i2 words */
     /*long byte4_cnt;		/- count of bytes using i4 words */
@@ -79,7 +84,7 @@ int	pack_spatial (  pt_cnt, bit_cnt, pack_null, fbuff, ppbitstream,
     float reference;		/* reference = minimum value in grid */
     float max_grid;		/* maximum value in grid */
     float ftemp;		/* temporary float containing grid value */
-    unsigned long *pBitstream;
+    unsigned int *pBitstream;
     unsigned long grib_local_ibm();
     int wordnum;
     int zero_cnt;
@@ -299,7 +304,7 @@ int	pack_spatial (  pt_cnt, bit_cnt, pack_null, fbuff, ppbitstream,
    Causing seg faults on free of buffer later on.  Fixed by multiplying
    byte2_cnt by the size of an unsigned long.  Not sure how or why this 
    ever worked. JM 20050720 */
-    pBitstream = ( unsigned long * ) malloc ( sizeof( unsigned long ) * byte2_cnt );
+    pBitstream = ( unsigned int * ) malloc ( sizeof( unsigned long ) * byte2_cnt );
     if ( !pBitstream )
     {
        DPRINT1 ("%s:  MAlloc failed pBitstream\n", func );
@@ -458,7 +463,7 @@ return(-1) ;
     }
 
 /* For little endian machines, swap the bytes in the bstr pointer */
-#ifdef LITTLE_ENDIAN
+#if ( BYTE_ORDER == LITTLE_ENDIAN )
     for (wordnum = 0; wordnum < ceil(byte2_cnt/(float)sizeof(long)); 
 	 wordnum++) {
       pBitstream[wordnum] = htonl(pBitstream[wordnum]);

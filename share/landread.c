@@ -9,9 +9,9 @@
 #   endif
 # endif
 #endif
+#include <stdio.h>
 
 #ifdef LANDREAD_STUB
-
 
 int GET_TERRAIN (        float *adx,
                          float *xlat,
@@ -24,21 +24,21 @@ int GET_TERRAIN (        float *adx,
                          int   *ipath , int * ipathlen)  /* integer coded ASCII string from Funtran and len */
 
 {
+ fprintf(stderr, "***************************************************************\n" ) ;
+ fprintf(stderr, "Access to RSMAS Topo Ingest Code is by Special Arrangement Only\n" ) ;
+ fprintf(stderr, "in WRF 2.1 .  Please contact wrfhelp@ucar.edu .                \n" ) ;
+ fprintf(stderr, "***************************************************************\n" ) ;
  return(0) ;
 }
 
 #else
 
 #include <stdio.h>
+#include <rpc/xdr.h>
+#include <rpc/types.h>
 #include <math.h>
 #include <malloc.h>
 #include <string.h>
-
-#ifndef bool_t
-#include <rpc/xdr.h>
-#endif
-#include <rpc/types.h>
-
 #include "landread.h"
 #define MAXTOPOFILES  100
 #define MAXLEN        4096
