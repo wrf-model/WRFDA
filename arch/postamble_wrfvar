@@ -49,6 +49,7 @@ wrfio_grib1 :
         make CPP="$(CPP)" \
 	RANLIB="$(RANLIB)" \
 	CC="$(CC)" CFLAGS="$(CFLAGS)" \
+	SFC="$(SFC)" \
 	FC="$(FC)" FCFLAGS="$(FCDEBUG) -I. $(FCFORM) $(FCBASE)" )
 
 esmf_time : 

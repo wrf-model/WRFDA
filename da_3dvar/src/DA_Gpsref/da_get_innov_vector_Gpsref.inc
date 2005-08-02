@@ -203,9 +203,11 @@ SUBROUTINE da_get_innov_vector_gpsref ( it, xb, xp, ob, iv )
 
          do k=1, num_levs
 !
-! incremetal refractivity (O-B)/{(O+B)/2} (Lidia Cucurull 2005):
+! incremetal refractivity or the relative error:
+!                 abs[(O-B)/{(O+B)/2}]               (Lidia Cucurull 2005)
+
            ntotal = ntotal + 1
-           percnt = 2.0 * iv%gpsref(n)%ref(k)%inv / (ob%gpsref(n)%ref(k) + model_ref(k))
+           percnt = 2.0 * abs(iv%gpsref(n)%ref(k)%inv / (ob%gpsref(n)%ref(k) + model_ref(k)))
 
            if (iv%gpsref(n)%ref(k)%qc >= obs_qc_pointer) then
 

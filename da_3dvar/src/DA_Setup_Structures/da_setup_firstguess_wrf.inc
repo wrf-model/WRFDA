@@ -106,17 +106,51 @@ SUBROUTINE DA_Setup_FirstGuess_WRF( xbx, grid, &
       map_util_project = PROJ_MERC
    endif
 
-!  call map_set(map_util_project,grid%cen_lat,grid%cen_lon,   &
-!               real(nint((xp%ide-xp%ids+1)/2.)), real(nint((xp%jde-xp%jds+1)/2.)), &
-!               grid%dx,grid%stand_lon,grid%truelat1,grid%truelat2,map_info)
-
-   call map_set(map_util_project,start_lat,start_lon,real(xp%ids),real(xp%jds), &
+   call map_set(map_util_project,grid%cen_lat,grid%cen_lon,   &
+                real(xp%ide-xp%ids+2)/2., real(xp%jde-xp%jds+2)/2., &
                 grid%dx,grid%stand_lon,grid%truelat1,grid%truelat2,map_info)
+
+!  call map_set(map_util_project,start_lat,start_lon,real(xp%ids),real(xp%jds), &
+!               grid%dx,grid%stand_lon,grid%truelat1,grid%truelat2,map_info)
 
 !--Need to set map projection in WRF world.
    map_projection = grid%map_proj
 
    cone_factor = map_info%cone
+
+   if(print_detail == -1) then
+     
+!-------------------------------------------------------------------------
+! Check the ll_to_ij:
+!-------------------------------------------------------------------------
+
+     print '(/a/)',"Check the map_set correctness::::::::::::::::::::::::"
+
+!    Domain center:
+     call  latlon_to_ij(map_info, grid%cen_lat, grid%cen_lon, start_x, start_y)
+     print '(/"Center: latc,lonc,x,y, Xc, Yc:",6f10.3/)',   &
+                 grid%cen_lat, grid%cen_lon, start_x, start_y, &
+                 real(xp%ide-xp%ids+2)/2., real(xp%jde-xp%jds+2)/2.
+
+!    Low-left corner:
+     call  latlon_to_ij(map_info, xlat(xp%ids,xp%jds), xlong(xp%ids,xp%jds), &
+                                                            start_x, start_y)
+       print '(/"Low-left: lat,lon,x,y,xp%ids,xp%jds:",4f10.3,2i6/)',   &
+                xlat(xp%ids,xp%jds),  xlong(xp%ids,xp%jds), start_x, start_y, &
+                                                             xp%ids, xp%jds
+!   Upper-right corner:
+       call  latlon_to_ij(map_info, xlat(xp%ide,xp%jde), xlong(xp%ide,xp%jde),&
+                                                            start_x, start_y)
+       print '(/"Upper-right: lat,lon,x,y,xp%ide,xp%jde:",4f10.3,2i6/)',   &
+                xlat(xp%ide,xp%jde),  xlong(xp%ide,xp%jde), start_x, start_y, &
+                                                             xp%ide, xp%jde
+
+!    Center:
+     call  latlon_to_ij(map_info,grid%cen_lat,grid%cen_lon,   &
+                                                            start_x, start_y)
+       print '(/"Center: grid%cen_lat,grid%cen_lon,x,y:",4f10.3,2i6/)',   &
+                grid%cen_lat,grid%cen_lon, start_x, start_y
+   endif
 
 ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ! Guo: the following lines to setup the domain definition for use of the MM5/GRAPH:
