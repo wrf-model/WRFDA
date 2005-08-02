@@ -23,7 +23,7 @@ SUBROUTINE DA_Statistics_Step0 (grid, config_flags,    &
    TYPE(xbx_type)                  :: xbx         ! Header & non-gridded vars.
 
    CHARACTER(len=120)              :: filename
-   CHARACTER(len=19)               :: fcst_date, file_date
+   CHARACTER(len=19)               :: fcst_date, file_date, file_date1
 
    INTEGER,      INTENT(IN)        :: ids,ide, jds,jde, kds,kde   ! domain dims.
    INTEGER,      INTENT(IN)        :: ims,ime, jms,jme, kms,kme   ! memory dims.
@@ -63,8 +63,8 @@ loop_date:       do while (file_date(1:19) <= end_date(1:19))
 
        write(*,'(/a,i4," *********")') 'PROCESS for T24, member=', number
 
-print *, file_date, fcst_date
        call DA_Make_Filename (file_date, fcst_date, number, filename)
+print *, file_date, fcst_date, filename
        call med_initialdata_input_3dvar ( grid , config_flags, &
                                         fcst_date, filename )
        call DA_Setup_FirstGuess( xbx, grid, &
@@ -82,9 +82,9 @@ print *, file_date, fcst_date
 
        write(*,'(/a)') 'PROCESS for T12'
 
-       call DA_Gen_Date(file_date, fcst_date, t_forecast1)
-       call DA_Make_Filename(file_date, fcst_date, number, filename)
-print *, file_date, fcst_date, filename
+       call DA_Gen_Date(file_date, file_date1, t_forecast1)
+       call DA_Make_Filename(file_date1, fcst_date, number, filename)
+print *, file_date1, fcst_date, filename
 
        call med_initialdata_input_3dvar ( grid , config_flags, &
                                         fcst_date, filename )
