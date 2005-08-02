@@ -306,6 +306,8 @@ loop_level: DO i = 1, platform%info%levels
      if(global .and. &
      (platform%loc%i < xp%ids .or. platform%loc%i >= xp%ide)) ndup= 2
 
+     if( Testing_3DVAR ) ndup = 1
+
      DO n = 1, ndup
 
       SELECT CASE(fm)

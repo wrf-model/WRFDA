@@ -1,10 +1,14 @@
-subroutine da_check( xb, xbx, be, iv, cv, &
-                     xa, vv, vp, xp, ob, y, &
+   subroutine da_check( grid, config_flags,       &
+                     xb, xbx, be, iv, cv,         &
+                     xa, vv, vp, xp, ob, y,       &
                     ids, ide, jds, jde, kds, kde, &
                     ims, ime, jms, jme, kms, kme, &
                     its, ite, jts, jte, kts, kte )
 
    implicit none
+
+   type(domain) ,   TARGET           :: grid
+   type(grid_config_rec_type), intent(inout) :: config_flags
 
    type (xb_type),    intent(in)    :: xb    ! first guess (local).
    type (xbx_type),   intent(in)    :: xbx   ! Header & non-gridded vars.
@@ -33,6 +37,18 @@ subroutine da_check( xb, xbx, be, iv, cv, &
 !--test transforms:
 
    if ( test_transforms ) then
+      if ( .not. Testing_3DVAR ) then 
+      call  DA_Test_VToY_Transform(grid, config_flags, vp, vv, &
+                                   xb, xbx, xp, be, xa, iv, y,&
+                                   ids,ide, jds,jde, kds,kde, &
+                                   ims,ime, jms,jme, kms,kme, &
+                                   its,ite, jts,jte, kts,kte  )
+
+      write(unit=*, fmt='(/a,/,a)') &
+           '-----------------------------',&
+           'Test VToY_Transform Finished.',&
+           '-----------------------------'
+      end if
       write(unit=*, fmt='(/a/)') &
           'Test vxtransform'
       
@@ -41,9 +57,6 @@ subroutine da_check( xb, xbx, be, iv, cv, &
                                ids,ide, jds,jde, kds,kde, &
                                ims,ime, jms,jme, kms,kme, &
                                its,ite, jts,jte, kts,kte )
-
-      write(unit=*, fmt='(/a/)') &
-           'Test vxtransform Finished.'
    endif
     
 !--test adjoint of y=hx transform:
@@ -66,7 +79,6 @@ subroutine da_check( xb, xbx, be, iv, cv, &
 
       call random_number(cv%array(:))
       cv%array(:) = cv%array(:) - 0.5
-
       call da_transform_vtox( xb, xbx, be, cv%array, &
                               vv, vp, xp, xa, &
                               ids, ide, jds, jde, kds, kde,           &

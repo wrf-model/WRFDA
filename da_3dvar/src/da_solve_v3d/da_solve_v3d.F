@@ -108,13 +108,12 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
                                 grid , config_flags , &
 #include <em_dummy_args.inc>
                  )
-
-
       call da_allocate_y( iv, re )
       call da_allocate_y( iv, y )
 
-      call da_check( xb, xbx, be, iv, cv1d, &
-                     xa, vv, vp, xp, ob, y, &
+      call da_check( grid, config_flags,           &
+                     xb, xbx, be, iv, cv1d,        &
+                     xa, vv, vp, xp, ob, y,        &
                      ids, ide, jds, jde, kds, kde, &
                      ims, ime, jms, jme, kms, kme, &
                      its, ite, jts, jte, kts, kte )

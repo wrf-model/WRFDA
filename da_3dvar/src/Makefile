@@ -204,6 +204,8 @@ DA_Minimisation.o:	\
 			DA_Minimisation/da_write_diagnostics.inc \
 			DA_Minimisation/DA_Calculate_GradY.inc   \
 			DA_Minimisation/DA_Minimise_CG.inc       \
+			DA_Minimisation/DA_Transform_VToY.inc     \
+			DA_Minimisation/DA_Transform_VToY_Adj.inc \
 			DA_Minimisation/DA_Minimise_QN.inc
 			$(RM) $@
 			$(CPP) -I./DA_Minimisation $(CPPFLAGS_3DVAR) DA_Minimisation/DA_Minimisation.F > DA_Minimisation.f
@@ -235,6 +237,7 @@ DA_Setup_Structures.o:	\
 			DA_Setup_Structures/da_setup_background_errors2.inc \
 			DA_Setup_Structures/da_setup_background_errors3.inc \
 			DA_Setup_Structures/da_setup_background_errors4.inc \
+			DA_Setup_Structures/da_setup_background_errors5.inc \
 			DA_Setup_Structures/DA_Get_Bins_Info.inc            \
 			DA_Setup_Structures/da_setup_firstguess.inc \
 			DA_Setup_Structures/da_setup_firstguess_mm5.inc \
@@ -1140,6 +1143,7 @@ DA_Test.o:	\
 			DA_Profiler.o \
 			DA_Buoy.o  \
 			DA_Setup_Structures.o	\
+			DA_Minimisation.o    	\
 			DA_Tools.o \
 			da_qscat.o \
 			DA_Test/DA_Test.F \
@@ -1177,6 +1181,8 @@ DA_Test.o:	\
 			DA_Test/da_check_xtoy_adjoint_ssmt1.inc \
 			DA_Test/da_check_xtoy_adjoint_ssmt2.inc \
 			DA_Test/da_setup_testfield.inc \
+			DA_Test/da_get_y_lhs_value.inc \
+			DA_Test/DA_Test_VToY_Transform.inc \
 			DA_Test/set_tst_trnsf_fld.inc
 			$(RM) $@
 			$(CPP) -I./DA_Test $(CPPFLAGS_3DVAR) DA_Test/DA_Test.F > DA_Test.f

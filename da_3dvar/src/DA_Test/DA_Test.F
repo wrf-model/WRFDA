@@ -33,13 +33,11 @@ module DA_Test
    USE DA_Setup_Structures
    USE DA_Tools
    use da_qscat
+   use DA_Minimisation
 
    implicit none
    
-#ifdef DM_PARALLEL
-   LOGICAL, EXTERNAL :: wrf_dm_on_monitor
-#endif
-
+        
 #if ( DWORDSIZE != RWORDSIZE )
 #define TRUE_MPI_REAL     MPI_REAL
 #else
@@ -85,5 +83,7 @@ contains
 #include "da_setup_testfield.inc"
 #include "check_sfc_assi.inc"
 #include "set_tst_trnsf_fld.inc"
+#include "DA_Test_VToY_Transform.inc"
+#include "da_get_y_lhs_value.inc"
 
 end module DA_Test
