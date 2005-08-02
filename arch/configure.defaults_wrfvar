@@ -536,7 +536,7 @@ F77		=	mpxlf_r
 LD              =       $(FC)
 CC              =       mpcc_r
 CC_TOOLS        =       cc_r
-CFLAGS          =       -DNOUNDERSCORE -DWRF_RSL_IO \
+CFLAGS          =       -DDNOUNDERSCORE -DNCARIBM_NOC99 -DWRF_RSL_IO \
 			-I../external/RSL/RSL \
 			-DDM_PARALLEL \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) \
