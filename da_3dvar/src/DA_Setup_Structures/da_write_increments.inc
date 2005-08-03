@@ -57,7 +57,6 @@ SUBROUTINE DA_Write_Increment ( xp, xb, xa, q_cgrid, mu_cgrid, ph_cgrid )
       ALLOCATE (   ph_global (1:ix+1,1:jy+1,1:kz+1) )
       ALLOCATE ( psfc_global (1:ix+1,1:jy+1) )
       ALLOCATE (   mu_global (1:ix+1,1:jy+1) )
-
       call local_to_global( xp, xa % p, gbuf, 3 ) 
       IF ( wrf_dm_on_monitor() ) THEN 
         p_global(1:ix,1:jy,1:kz) = gbuf(1:ix,1:jy,1:kz) 
@@ -157,7 +156,6 @@ SUBROUTINE DA_Write_Increment ( xp, xb, xa, q_cgrid, mu_cgrid, ph_cgrid )
 #endif
 
       if ( wrf_dm_on_monitor() ) then
-
         open(unit=141, file='ANALYSIS_INCREMENT', form='unformatted')
 
          write (141) ANALYSIS_DATE
@@ -185,15 +183,15 @@ SUBROUTINE DA_Write_Increment ( xp, xb, xa, q_cgrid, mu_cgrid, ph_cgrid )
                   lat_global, lon_global, lanu_global, map_factor_global, &
                   cori_global, landmask_global
 
-     print '(/"MAXVAL:: u, v, w, p, t, qv, ph, mu, psfc:",9e13.5)',  &
-      maxval(u_global),maxval(v_global),maxval(w_global ),maxval(p_global ), &
-      maxval(t_global),maxval(q_global),maxval(ph_global),maxval(mu_global), & 
-      maxval(psfc_global)
-     print '(/"MINVAL:: u, v, w, p, t, qv, ph, mu, psfc:",9e13.5)',  &
-      minval(u_global),minval(v_global),minval(w_global ),minval(p_global ), &
-      minval(t_global),minval(q_global),minval(ph_global),minval(mu_global), &
-      minval(psfc_global)
-
+!     print '(/"MAXVAL:: u, v, w, p, t, qv, ph, mu, psfc:",9e13.5)',  &
+!      maxval(u_global),maxval(v_global),maxval(w_global ),maxval(p_global ), &
+!      maxval(t_global),maxval(q_global),maxval(ph_global),maxval(mu_global), & 
+!      maxval(psfc_global)
+!     print '(/"MINVAL:: u, v, w, p, t, qv, ph, mu, psfc:",9e13.5)',  &
+!      minval(u_global),minval(v_global),minval(w_global ),minval(p_global ), &
+!      minval(t_global),minval(q_global),minval(ph_global),minval(mu_global), &
+!      minval(psfc_global)
+ 
 #else
 
 !    .. 3d- and 2d-increments:
@@ -219,14 +217,14 @@ SUBROUTINE DA_Write_Increment ( xp, xb, xa, q_cgrid, mu_cgrid, ph_cgrid )
                     xb%cori(1:ix+1,1:jy+1), &
                     xb%landmask(1:ix+1,1:jy+1)
 
-      print '(/"MAXVAL:: u, v, w, p, t, qv, ph, mu, psfc:",9e13.5)',  &
-         maxval(xa%u),maxval(xa%v),   maxval(xa%w ),   maxval(xa%p ), &
-         maxval(xa%t),maxval(q_cgrid),maxval(ph_cgrid),maxval(mu_cgrid),&
-         maxval(xa%psfc)
-      print '(/"MINVAL:: u, v, w, p, t, qv, ph, mu, psfc:",9e13.5)',  &
-         minval(xa%u),minval(xa%v),   minval(xa%w ),   minval(xa%p ), &
-         minval(xa%t),minval(q_cgrid),minval(ph_cgrid),minval(mu_cgrid),&
-         minval(xa%psfc)
+!      print '(/"MAXVAL:: u, v, w, p, t, qv, ph, mu, psfc:",9e13.5)',  &
+!         maxval(xa%u),maxval(xa%v),   maxval(xa%w ),   maxval(xa%p ), &
+!         maxval(xa%t),maxval(q_cgrid),maxval(ph_cgrid),maxval(mu_cgrid),&
+!         maxval(xa%psfc)
+!      print '(/"MINVAL:: u, v, w, p, t, qv, ph, mu, psfc:",9e13.5)',  &
+!         minval(xa%u),minval(xa%v),   minval(xa%w ),   minval(xa%p ), &
+!         minval(xa%t),minval(q_cgrid),minval(ph_cgrid),minval(mu_cgrid),&
+!         minval(xa%psfc)
 
 #endif
 
