@@ -485,9 +485,9 @@ F77             =       xlf
 LD              =       xlf90
 CC              =       cc
 CC_TOOLS        =       cc
-CFLAGS          =       -DNOUNDERSCORE
+CFLAGS          =       -DNOUNDERSCORE -DNCARIBM_NOC99
 TRADFLAG        =
-FCOPTIM         =       -O2 -qarch=auto
+FCOPTIM         =       #-O2 -qarch=auto
 FCDEBUG         =       #-g
 FCTYPE          =       -qrealsize=8
 FCFORM          =       -qfree=f90
@@ -530,13 +530,13 @@ F77		=	mpxlf_r
 LD              =       $(FC)
 CC              =       mpcc_r
 CC_TOOLS        =       cc
-CFLAGS          =       -DNOUNDERSCORE -DWRF_RSL_IO \
+CFLAGS          =       -DNOUNDERSCORE -DNCARIBM_NOC99 -DWRF_RSL_IO \
 			-I../external/RSL/RSL \
 			-DDM_PARALLEL \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) \
 			-DMAXPROC_MAKE=$(MAX_PROC)
 TRADFLAG        =
-FCOPTIM         =       -O2 -qarch=auto
+FCOPTIM         =       -O0 -qarch=auto
 FCDEBUG         =       #-g
 FCTYPE          =       -qrealsize=8
 FCFORM          =       -qfree=f90
