@@ -15,6 +15,9 @@ SUBROUTINE DA_Test_VXTransform( xb, xbx, xp, be, &
 !           01/30/2005 - Added Spectral transform test      Syed RH Rizvi 
 !           02/04/2005 - Added VvToVpToVv Test              Syed RH Rizvi
 !           02/04/2005 - Added VpToVvToVp Test              Syed RH Rizvi
+!           08/02/2005 - Inverse tests is done only for
+!                        cv_options =5 and                  Syed RH Rizvi
+!                        single processor run               
 !
 !------------------------------------------------------------------------------
 
@@ -71,6 +74,18 @@ SUBROUTINE DA_Test_VXTransform( xb, xbx, xp, be, &
    cv(:) = cv(:) - 0.5
    call da_zero_x(xa)
    
+   if ( cv_options /= 5) then
+   write(unit=*, fmt='(/a,i4,a)') &
+         ' Inverse tests for this cv_options= ',cv_options,' will not be done'
+   go to 1111
+   end if
+
+#ifdef DM_PARALLEL
+   write(unit=*, fmt='(/a/)') &
+         ' Inverse tests will not be done as it is MPP run'
+#else
+   write(unit=*, fmt='(/a/)') &
+         ' Inverse tests follows:'
    call da_transform_vtox( xb, xbx, be, cv, &
                            vv, vp, xp, xa, &
                           ids, ide, jds, jde, kds, kde, &
@@ -234,6 +249,9 @@ SUBROUTINE DA_Test_VXTransform( xb, xbx, xp, be, &
                                ids, ide, jds, jde, kds, kde,    &
                                ims, ime, jms, jme, kms, kme,    &
                                its, ite, jts, jte, kts, kte )
+
+#endif
+1111     continue
 !-------------------------------------------------------------------------
 !  [7.0]: Perform adjoint test on complete transform: <x,x> = <v_adj,v>
 !-------------------------------------------------------------------------
