@@ -11,19 +11,8 @@
 
 #set echo
 #AMPS:
-#setenv END_BE_DATE             2004-05-09_12:00:00
-#setenv DAT_DIR                 /data3/dmbarker/data/amps1/noobs
-#setenv WRFVAR_DIR              /snowdrift/users/dmbarker/code_development/wrfvar
-
-#CWB:
-setenv START_BE_DATE 2003-08-15_12:00:00
-setenv END_BE_DATE   2003-09-15_12:00:00
-setenv WEST_EAST_GRID_NUMBER   222
-setenv SOUTH_NORTH_GRID_NUMBER 128
-setenv VERTICAL_GRID_NUMBER    31
-setenv GRID_DISTANCE           45000
-setenv DA_NUM_SOIL_LAYERS      5
-setenv DAT_DIR                 /mmm/mmmtmp/guo/Duj_FCST/NFS-2.1
+setenv DAT_DIR                 /data3/dmbarker/data/amps1/noobs
+setenv WRFVAR_DIR              /snowdrift/users/dmbarker/code_development/wrfvar
 
 #-----------------------------------------------------------------------------------
 # Don't change anything below this line.
@@ -47,7 +36,7 @@ setenv DAT_DIR                 /mmm/mmmtmp/guo/Duj_FCST/NFS-2.1
  if ( ! $?GRID_DISTANCE )           setenv GRID_DISTANCE           60000
  if ( ! $?DA_NUM_SOIL_LAYERS )      setenv DA_NUM_SOIL_LAYERS      5
 
- if ( ! $?FILE_HEAD )               setenv FILE_HEAD 'nfsout_d01'
+ if ( ! $?FILE_HEAD )               setenv FILE_HEAD 'wrfout_d01'
  if ( ! $?WRFVAR_DIR )              setenv WRFVAR_DIR /home/bluesky/guo/wrfvar_RB_V21
  if ( ! $?SRC_DIR )                 setenv SRC_DIR ${WRFVAR_DIR}/gen_be
  if ( ! $?DAT_DIR )                 setenv DAT_DIR /tara/dmbarker/be/amps_stats
@@ -55,7 +44,7 @@ setenv DAT_DIR                 /mmm/mmmtmp/guo/Duj_FCST/NFS-2.1
     echo "Directory $DAT_DIR doesn't exist. Exiting."
     exit
  endif
- if ( ! $?RUN_DIR )                 setenv RUN_DIR /ptmp/guo/wrfvarv21_be
+ if ( ! $?RUN_DIR )                 setenv RUN_DIR ${DAT_DIR}/gen_be
  if ( ! -d ${RUN_DIR} )             mkdir ${RUN_DIR}
  echo $RUN_DIR
  
