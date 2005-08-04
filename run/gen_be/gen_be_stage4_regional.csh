@@ -69,9 +69,10 @@
 
     while ( $VINDEX <= $MAX_VINDEX )
 
-       mkdir ${TMP_DIR}/dir.${VARIABLE}${VINDEX} >&! /dev/null
+       setenv TMP_DIR1 ${TMP_DIR}/dir.${VARIABLE}${VINDEX}
+       mkdir ${TMP_DIR1} >&! /dev/null
 
-       cd ${TMP_DIR}/dir.${VARIABLE}${VINDEX}
+       cd ${TMP_DIR1}
        ln -sf ${SRC_DIR}/gen_be_stage4_regional.exe .
 
 #      Create namelist:
@@ -94,7 +95,7 @@ EOF
        else
           setenv MACHINE $MACHINES[$JOB]
           echo "Submitting job for variable $VARIABLE and vertical index $VINDEX on $MACHINE"
-          (rsh -n $MACHINE ./gen_be_stage4_regional.exe >&! gen_be_stage4_regional.out) &
+          (rsh -n $MACHINE "cd ${TMP_DIR1}; ./gen_be_stage4_regional.exe >&! gen_be_stage4_regional.out") &
 
           sleep 2 # Create small gap between submissions to avoid overwriting output.
        endif
