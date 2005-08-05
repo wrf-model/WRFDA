@@ -14,6 +14,7 @@ MODULES =                       \
 	module_model_constants.o \
 	module_MPP.o \
 	module_optional_si_input.o	\
+	module_compute_geop.o           \
 	module_soil_pre.o
 
 OBJS    = 		\
@@ -21,6 +22,7 @@ OBJS    = 		\
 	mediation_interp_domain.o	\
 	mediation_force_domain.o	\
 	mediation_feedback_domain.o	\
+        mediation_nest_move.o           \
 	mediation_wrfmain.o		\
 	solve_interface.o               \
         start_domain.o                  \
@@ -60,7 +62,6 @@ OBJS    = 		\
         wrf_histin.o            	\
         wrf_restartin.o
 
-
 NMM_MODULES = 
 
 
@@ -93,7 +94,7 @@ start_domain: start_domain_em.int ../frame/module_domain.o ../frame/module_confi
 module_bc.o: ../frame/module_configure.o ../frame/module_state_description.o \
 		../frame/module_wrf_error.o
 
-module_bc_time_utilities.o: ../external/esmf_time_f90/ESMF_Mod.o
+module_bc_time_utilities.o: $(ESMF_MOD_DEPENDENCE)
 
 module_get_file_names.o: 
 
@@ -105,17 +106,17 @@ module_io_wrf.o: module_date_time.o module_bc_time_utilities.o \
 		../frame/module_wrf_error.o ../frame/module_domain.o \
 		../frame/module_state_description.o ../frame/module_configure.o \
 		../frame/module_io.o ../frame/module_timing.o \
-		../external/esmf_time_f90/ESMF_Mod.o
+		$(ESMF_MOD_DEPENDENCE)
 
 output_wrf.o:   ../frame/module_io.o ../frame/module_wrf_error.o \
                 ../frame/module_domain.o ../frame/module_state_description.o \
                 ../frame/module_configure.o module_io_wrf.o  \
-		../external/esmf_time_f90/ESMF_Mod.o
+		$(ESMF_MOD_DEPENDENCE)
 
 input_wrf.o:    ../frame/module_io.o ../frame/module_wrf_error.o \
                 ../frame/module_domain.o ../frame/module_state_description.o \
                 ../frame/module_configure.o module_io_wrf.o  \
-		../external/esmf_time_f90/ESMF_Mod.o
+		$(ESMF_MOD_DEPENDENCE)
 
 wrf_ext_write_field.o : ../frame/module_io.o ../frame/module_wrf_error.o \
                 ../frame/module_domain.o ../frame/module_timing.o
@@ -131,7 +132,7 @@ module_optional_si_input.o: module_io_wrf.o module_io_domain.o \
 		../frame/module_domain.o ../frame/module_configure.o
 
 mediation_wrfmain.o: ../frame/module_domain.o ../frame/module_configure.o \
-		../frame/module_timing.o ../external/esmf_time_f90/ESMF_Mod.o \
+		../frame/module_timing.o $(ESMF_MOD_DEPENDENCE) \
 		module_bc_time_utilities.o module_io_domain.o
 
 init_modules.o: ../frame/module_configure.o ../frame/module_driver_constants.o \
@@ -151,9 +152,11 @@ mediation_force_domain.o: ../frame/module_domain.o ../frame/module_configure.o
 
 mediation_integrate.o: ../frame/module_domain.o ../frame/module_configure.o \
 			../frame/module_timing.o \
-			../external/esmf_time_f90/ESMF_Mod.o \
+			$(ESMF_MOD_DEPENDENCE) \
 			module_date_time.o module_bc_time_utilities.o \
+			module_compute_geop.o                         \
 			module_io_domain.o
+
 
 mediation_interp_domain.o: ../frame/module_domain.o ../frame/module_configure.o \
 			../frame/module_timing.o
@@ -164,7 +167,7 @@ mediation_interp_domain.o: ../frame/module_domain.o ../frame/module_configure.o 
 #			module_io_domain.o
 
 set_timekeeping.o: ../frame/module_domain.o ../frame/module_configure.o \
-			../external/esmf_time_f90/ESMF_Mod.o
+                   $(ESMF_MOD_DEPENDENCE)
 
 wrf_inputout.o                  : ../frame/module_domain.o \
 				../frame/module_configure.o ../frame/module_io.o module_io_wrf.o module_bc_time_utilities.o 

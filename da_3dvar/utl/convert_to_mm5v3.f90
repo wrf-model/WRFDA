@@ -110,7 +110,7 @@ program convert_to_mm5v3
 
    integer            :: is, ie, js, je, ks, ke
 
-   real(kind=8), allocatable, dimension(:,:,:) :: ua, va, u, v, w, t, p, qv 
+   real(kind=8), allocatable, dimension(:,:,:) :: ua, va, u, v, w, t, p, qv, ph 
    real(kind=8), allocatable, dimension(:,:)   :: mu, terr, snow, lat, lon, &
                                                   lanu, msft, cori, xland,  &
                                                   tgrn, psac, psfc
@@ -162,6 +162,7 @@ program convert_to_mm5v3
               allocate(t (ie+1,je+1,ke+1))
               allocate(p (ie+1,je+1,ke+1))
               allocate(qv(ie+1,je+1,ke+1))
+              allocate(ph(ie+1,je+1,ke+1))
               allocate(mu   (ie+1,je+1))
               allocate(psfc (ie+1,je+1))
 
@@ -181,21 +182,28 @@ program convert_to_mm5v3
       read (iunit2) sigma
       print '("k=",i3," sigma=",f8.5)', (k,sigma(k),k=ks,ke)
 
-      read (iunit2) ua, va, w, p, t, qv, mu, psfc
-      ii = 10
-      jj = 10
-      kk = 10
-      print '("Sample at point(i,j,k)=",3i5)', ii,jj,kk
-      print '(/"ua, va, w, p, t, qv, mu, psfc:",8e14.6)', &
-         ua(ii,jj,kk),va(ii,jj,kk),w(ii,jj,kk),p(ii,jj,kk), &
-          t(ii,jj,kk),qv(ii,jj,kk),mu(ii,jj),psfc(ii,jj)
+      read (iunit2) ua, va, w, p, t, qv, ph, mu, psfc
 
+      print '(/"MAXVAL:: ua, va, w, p, t, qv, ph, mu, psfc:",9e13.5)', &
+         maxval(ua),maxval(va),maxval(w ),maxval(p ), &
+         maxval(t ),maxval(qv),maxval(ph),maxval(mu),maxval(psfc)
+      print '(/"MINVAL:: ua, va, w, p, t, qv, ph, mu, psfc:",9e13.5)', &
+         minval(ua),minval(va),minval(w ),minval(p ), &
+         minval(t ),minval(qv),minval(ph),minval(mu),minval(psfc)
+
+      do k = ks, ke+1
+         print '("k=",i3," Max ph=",e13.5," Min ph=",e13.5)',k, maxval(ph(:,:,k)), minval(ph(:,:,k))
+      enddo
+     
       read (iunit2) psac, tgrn, terr, snow, lat, lon, &
                     lanu, msft, cori, xland
 
-     print '(/"psac,tgrn,terr,snow,lat,lon,lanu,msft,cori,xland:",(5e14.6/))',&
-               psac(ii,jj),tgrn(ii,jj),terr(ii,jj),snow(ii,jj),lat(ii,jj),   &
-                lon(ii,jj),lanu(ii,jj),msft(ii,jj),cori(ii,jj),xland(ii,jj)
+     print '(/"MAXVAL:: psac,tgrn,terr,snow,lat,lon,lanu,msft,cori,xland:",(5e13.5/))',&
+               maxval(psac),maxval(tgrn),maxval(terr),maxval(snow),maxval(lat),   &
+               maxval(lon),maxval(lanu),maxval(msft),maxval(cori),maxval(xland)
+     print '(/"MINVAL:: psac,tgrn,terr,snow,lat,lon,lanu,msft,cori,xland:",(5e13.5/))',&
+               minval(psac),minval(tgrn),minval(terr),minval(snow),minval(lat),   &
+               minval(lon),minval(lanu),minval(msft),minval(cori),minval(xland)
 
 ! A-grid to B-grid:
       
@@ -239,9 +247,16 @@ program convert_to_mm5v3
         bhi(10,1) = coarse_ix
         bhi(11,1) = 0
         bhi(12,1) = 0
-        bhi(13,1) = 1
+
+        if (start_y==1.0 .and. start_x==1.0) then
+          bhi(13,1) = 1
+          bhi(15,1) = 0
+        else
+          bhi(13,1) = 2
+          bhi(15,1) = 1
+        endif
+
         bhi(14,1) = 1
-        bhi(15,1) = 0
         bhi(16,1) = je+1
         bhi(17,1) = ie+1
         bhi(18,1) = int(start_y)
@@ -389,7 +404,7 @@ program convert_to_mm5v3
            do k = 1, end_index(3)
            do i = 1, end_index(1)
            do j = 1, end_index(2)
-           data1(i,j,k,1) = W(j,i,end_index(3)+1-k)
+           data1(i,j,k,1) = ph(j,i,end_index(3)+1-k)
            enddo
            enddo
            enddo

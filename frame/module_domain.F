@@ -2,7 +2,7 @@
 !
 !  Following are the routines contained within this MODULE:
 
-!  alloc_space_domain                1. Allocate the space for a single domain (constants
+!  alloc_and_configure_domain        1. Allocate the space for a single domain (constants
 !                                       and null terminate pointers).
 !                                    2. Connect the domains as a linked list.
 !                                    3. Store all of the domain constants.
@@ -30,7 +30,7 @@ MODULE module_domain
    USE module_state_description
    USE module_configure
    USE module_wrf_error
-   USE esmf_mod
+   USE module_utility
 
    CHARACTER (LEN=80) program_name
 
@@ -49,9 +49,14 @@ MODULE module_domain
                          AUXINPUT1_ALARM=7, AUXINPUT2_ALARM=8, AUXINPUT3_ALARM=9, &
                          AUXINPUT4_ALARM=10, AUXINPUT5_ALARM=11,                  &
                          RESTART_ALARM=12, BOUNDARY_ALARM=13, INPUTOUT_ALARM=14,  &  ! for outputing input (e.g. for 3dvar)
-                         ALARM_SUBTIME=15
+                         ALARM_SUBTIME=15,                                        &
+#ifdef MOVE_NESTS
+                         COMPUTE_VORTEX_CENTER_ALARM=16,                          &
+#endif
+                         MAX_WRF_ALARMS=20  ! WARNING:  MAX_WRF_ALARMS must be 
+                                            ! large enough to include all of 
+                                            ! the alarms declared above.  
 
-!  added for 3dvar code, WCS, 5 June 2002, Wei Huang, 3 November 2004
 #include <state_subtypes.inc>
 
    TYPE domain
@@ -83,6 +88,9 @@ MODULE module_domain
       INTEGER      , DIMENSION( max_parents )             :: child_of_parent
       INTEGER      , DIMENSION( max_nests )               :: active
 
+      INTEGER      , DIMENSION(0:5)                       :: nframes          ! frames per outfile for history 
+                                                                              ! streams (0 is main history)                  
+
       TYPE(domain) , POINTER                              :: next
       TYPE(domain) , POINTER                              :: same_level
 
@@ -90,6 +98,10 @@ MODULE module_domain
 
       LOGICAL                                             :: first_force
 
+#ifdef MOVE_NESTS
+      REAL         :: xi , xj
+      REAL         :: vc_i, vc_j    ! vortex center i and j
+#endif
 
       ! domain dimensions
 
@@ -111,13 +123,18 @@ MODULE module_domain
                     sp21y,  ep21y,  sp22y,  ep22y,                        &
                     sm31y,  em31y,  sm32y,  em32y,  sm33y,  em33y,        &
                     sm21y,  em21y,  sm22y,  em22y
-      Type(ESMF_Clock)                                    :: domain_clock
-      Type(ESMF_Time)                                     :: start_time, stop_time, current_time
-      Type(ESMF_Time)                                     :: start_subtime, stop_subtime
-      Type(ESMF_Time)                                     :: this_bdy_time, next_bdy_time
-      Type(ESMF_Time)                                     :: this_emi_time, next_emi_time
-      Type(ESMF_TimeInterval) :: step_time
-      Type(ESMF_Alarm), pointer :: alarms(:)
+      Type(WRF_UTIL_Clock), POINTER                           :: domain_clock
+      Type(WRF_UTIL_Time)                                     :: start_time, stop_time, current_time
+      Type(WRF_UTIL_Time)                                     :: start_subtime, stop_subtime
+      Type(WRF_UTIL_Time)                                     :: this_bdy_time, next_bdy_time
+      Type(WRF_UTIL_Time)                                     :: this_emi_time, next_emi_time
+      Type(WRF_UTIL_TimeInterval) :: step_time
+      Type(WRF_UTIL_Alarm), pointer :: alarms(:)
+! This awful hackery accounts for the fact that ESMF2.1.0+ alarms cannot tell 
+! us if they have ever been created or not.  So, we have to keep track of this 
+! ourselves to avoid destroying an alarm that has never been created!  Rip this 
+! out once ESMF has useful introspection here...  
+      LOGICAL, pointer :: alarms_created(:)
 
    END TYPE domain
 
@@ -158,6 +175,10 @@ CONTAINS
             grid%ep31  =             grid%ep31 + dx
             grid%sp32  =             grid%sp32 + dy
             grid%ep32  =             grid%ep32 + dy
+            grid%sd31  =             grid%sd31 + dx
+            grid%ed31  =             grid%ed31 + dx
+            grid%sd32  =             grid%sd32 + dy
+            grid%ed32  =             grid%ed32 + dy
 
        CASE  ( DATA_ORDER_YXZ )
             grid%sm31  =             grid%sm31 + dy
@@ -168,6 +189,10 @@ CONTAINS
             grid%ep31  =             grid%ep31 + dy
             grid%sp32  =             grid%sp32 + dx
             grid%ep32  =             grid%ep32 + dx
+            grid%sd31  =             grid%sd31 + dy
+            grid%ed31  =             grid%ed31 + dy
+            grid%sd32  =             grid%sd32 + dx
+            grid%ed32  =             grid%ed32 + dx
 
        CASE  ( DATA_ORDER_ZXY )
             grid%sm32  =             grid%sm32 + dx
@@ -178,6 +203,10 @@ CONTAINS
             grid%ep32  =             grid%ep32 + dx
             grid%sp33  =             grid%sp33 + dy
             grid%ep33  =             grid%ep33 + dy
+            grid%sd32  =             grid%sd32 + dx
+            grid%ed32  =             grid%ed32 + dx
+            grid%sd33  =             grid%sd33 + dy
+            grid%ed33  =             grid%ed33 + dy
 
        CASE  ( DATA_ORDER_ZYX )
             grid%sm32  =             grid%sm32 + dy
@@ -188,6 +217,10 @@ CONTAINS
             grid%ep32  =             grid%ep32 + dy
             grid%sp33  =             grid%sp33 + dx
             grid%ep33  =             grid%ep33 + dx
+            grid%sd32  =             grid%sd32 + dy
+            grid%ed32  =             grid%ed32 + dy
+            grid%sd33  =             grid%sd33 + dx
+            grid%ed33  =             grid%ed33 + dx
 
        CASE  ( DATA_ORDER_XZY )
             grid%sm31  =             grid%sm31 + dx
@@ -198,6 +231,10 @@ CONTAINS
             grid%ep31  =             grid%ep31 + dx
             grid%sp33  =             grid%sp33 + dy
             grid%ep33  =             grid%ep33 + dy
+            grid%sd31  =             grid%sd31 + dx
+            grid%ed31  =             grid%ed31 + dx
+            grid%sd33  =             grid%sd33 + dy
+            grid%ed33  =             grid%ed33 + dy
 
        CASE  ( DATA_ORDER_YZX )
             grid%sm31  =             grid%sm31 + dy
@@ -208,17 +245,23 @@ CONTAINS
             grid%ep31  =             grid%ep31 + dy
             grid%sp33  =             grid%sp33 + dx
             grid%ep33  =             grid%ep33 + dx
+            grid%sd31  =             grid%sd31 + dy
+            grid%ed31  =             grid%ed31 + dy
+            grid%sd33  =             grid%sd33 + dx
+            grid%ed33  =             grid%ed33 + dx
 
     END SELECT data_ordering
 
+#if 0
     CALL dealloc_space_field ( grid )
 
-    CALL alloc_space_field ( grid, grid%id , .FALSE. ,          &
+    CALL alloc_space_field ( grid, grid%id , 1 , 2 , .FALSE. ,     &
                              grid%sd31, grid%ed31, grid%sd32, grid%ed32, grid%sd33, grid%ed33, &
                              grid%sm31,  grid%em31,  grid%sm32,  grid%em32,  grid%sm33,  grid%em33, &
                              grid%sm31x, grid%em31x, grid%sm32x, grid%em32x, grid%sm33x, grid%em33x, &   ! x-xpose
                              grid%sm31y, grid%em31y, grid%sm32y, grid%em32y, grid%sm33y, grid%em33y  &   ! y-xpose
       )
+#endif
 
     RETURN
 
@@ -621,6 +664,7 @@ CONTAINS
       INTEGER                     :: i
       INTEGER                     :: parent_id , parent_domdesc , new_domdesc
       INTEGER                     :: bdyzone_x , bdyzone_y
+      INTEGER                     :: nx, ny
 
 
 ! This next step uses information that is listed in the registry as namelist_derived
@@ -637,6 +681,8 @@ CONTAINS
           CALL nl_get_e_sn( domain_id , ed2 )
           CALL nl_get_s_vert( domain_id , sd3 )
           CALL nl_get_e_vert( domain_id , ed3 )
+          nx = ed1-sd1+1
+          ny = ed2-sd2+1
 
         CASE  ( DATA_ORDER_YXZ )
 
@@ -646,6 +692,8 @@ CONTAINS
           CALL nl_get_e_we( domain_id , ed2 )
           CALL nl_get_s_vert( domain_id , sd3 )
           CALL nl_get_e_vert( domain_id , ed3 )
+          nx = ed2-sd2+1
+          ny = ed1-sd1+1
 
         CASE  ( DATA_ORDER_ZXY )
 
@@ -655,6 +703,8 @@ CONTAINS
           CALL nl_get_e_we( domain_id , ed2 )
           CALL nl_get_s_sn( domain_id , sd3 )
           CALL nl_get_e_sn( domain_id , ed3 )
+          nx = ed2-sd2+1
+          ny = ed3-sd3+1
 
         CASE  ( DATA_ORDER_ZYX )
 
@@ -664,6 +714,8 @@ CONTAINS
           CALL nl_get_e_sn( domain_id , ed2 )
           CALL nl_get_s_we( domain_id , sd3 )
           CALL nl_get_e_we( domain_id , ed3 )
+          nx = ed3-sd3+1
+          ny = ed2-sd2+1
 
         CASE  ( DATA_ORDER_XZY )
 
@@ -673,6 +725,8 @@ CONTAINS
           CALL nl_get_e_vert( domain_id , ed2 )
           CALL nl_get_s_sn( domain_id , sd3 )
           CALL nl_get_e_sn( domain_id , ed3 )
+          nx = ed1-sd1+1
+          ny = ed3-sd3+1
 
         CASE  ( DATA_ORDER_YZX )
 
@@ -682,15 +736,26 @@ CONTAINS
           CALL nl_get_e_vert( domain_id , ed2 )
           CALL nl_get_s_we( domain_id , sd3 )
           CALL nl_get_e_we( domain_id , ed3 )
+          nx = ed3-sd3+1
+          ny = ed1-sd1+1
 
       END SELECT data_ordering
 
 
-      if ( num_time_levels > 3 ) then
-        WRITE ( wrf_err_message , * ) 'module_domain: alloc_and_configure_domain: Incorrect value for num_time_levels ', &
+#ifdef RSL
+! Check domain size to be sure it is within RSLs limit
+      IF ( nx .GE. 1024 .OR. ny .GE. 1024 ) THEN
+        WRITE ( wrf_err_message , * ) 'domain too large for RSL. Use RSL_LITE or other comm package.'
+        CALL wrf_error_fatal ( TRIM ( wrf_err_message ) )
+      ENDIF
+
+#endif
+
+      IF ( num_time_levels > 3 ) THEN
+        WRITE ( wrf_err_message , * ) 'alloc_and_configure_domain: Incorrect value for num_time_levels ', &
                                        num_time_levels
         CALL wrf_error_fatal ( TRIM ( wrf_err_message ) )
-      endif
+      ENDIF
 
       IF (ASSOCIATED(parent)) THEN
         parent_id = parent%id
@@ -717,7 +782,19 @@ CONTAINS
       NULLIFY  (new_grid%j_start)
       NULLIFY  (new_grid%i_end)
       NULLIFY  (new_grid%j_end)
-      NULLIFY  (new_grid%alarms)    ! set with call to ESMF_ClockGetAlarmList
+      ALLOCATE( new_grid%domain_clock )
+      ALLOCATE( new_grid%alarms( MAX_WRF_ALARMS ) )    ! initialize in setup_timekeeping
+      ALLOCATE( new_grid%alarms_created( MAX_WRF_ALARMS ) )
+      DO i = 1, MAX_WRF_ALARMS
+        new_grid%alarms_created( i ) = .FALSE.
+      ENDDO
+
+#ifdef MOVE_NESTS
+      new_grid%xi = -1.0
+      new_grid%xj = -1.0
+      new_grid%vc_i = -1.0
+      new_grid%vc_j = -1.0
+#endif
 
       ! set up the pointers that represent the nest hierarchy
       ! set this up *prior* to calling the patching or allocation
@@ -752,16 +829,18 @@ CONTAINS
                          bdyzone_x  , bdyzone_y , new_grid%bdy_mask &
       ) 
 
+
       new_grid%domdesc = new_domdesc
       new_grid%num_nests = 0
       new_grid%num_siblings = 0
       new_grid%num_parents = 0
       new_grid%max_tiles   = 0
       new_grid%num_tiles_spec   = 0
+      new_grid%nframes   = 0         ! initialize the number of frames per file (array assignment)
 
-      CALL alloc_space_field ( new_grid, domain_id , .TRUE. ,          &
-                               sd1, ed1, sd2, ed2, sd3, ed3, &
-                               sm1,  em1,  sm2,  em2,  sm3,  em3, &
+      CALL alloc_space_field ( new_grid, domain_id , 3 , 3 , .FALSE. ,      &
+                               sd1, ed1, sd2, ed2, sd3, ed3,       &
+                               sm1,  em1,  sm2,  em2,  sm3,  em3,  &
                                sm1x, em1x, sm2x, em2x, sm3x, em3x, &   ! x-xpose
                                sm1y, em1y, sm2y, em2y, sm3y, em3y  &   ! y-xpose
       )
@@ -920,7 +999,7 @@ CONTAINS
 !  below this top-level of data allocation and management (in the solve routine
 !  and below).
 
-   SUBROUTINE alloc_space_field ( grid,   id, setinitval ,            &
+   SUBROUTINE alloc_space_field ( grid,   id, setinitval ,  tl_in , inter_domain_in ,   &
                                   sd31, ed31, sd32, ed32, sd33, ed33, &
                                   sm31 , em31 , sm32 , em32 , sm33 , em33 , &
                                   sm31x, em31x, sm32x, em32x, sm33x, em33x, &
@@ -935,22 +1014,42 @@ CONTAINS
 
       TYPE(domain)               , POINTER          :: grid
       INTEGER , INTENT(IN)            :: id
-      LOGICAL , INTENT(IN)            :: setinitval
+      INTEGER , INTENT(IN)            :: setinitval   ! 3 = everything, 1 = arrays only, 0 = none
       INTEGER , INTENT(IN)            :: sd31, ed31, sd32, ed32, sd33, ed33
       INTEGER , INTENT(IN)            :: sm31, em31, sm32, em32, sm33, em33
       INTEGER , INTENT(IN)            :: sm31x, em31x, sm32x, em32x, sm33x, em33x
       INTEGER , INTENT(IN)            :: sm31y, em31y, sm32y, em32y, sm33y, em33y
+
+      ! this argument is a bitmask. First bit is time level 1, second is time level 2, and so on.
+      ! e.g. to set both 1st and second time level, use 3
+      !      to set only 1st                        use 1
+      !      to set only 2st                        use 2
+      INTEGER , INTENT(IN)            :: tl_in
+  
+      ! true if the allocation is for an intermediate domain (for nesting); only certain fields allocated
+      ! false otherwise (all allocated, modulo tl above)
+      LOGICAL , INTENT(IN)            :: inter_domain_in
 
       !  Local data.
       INTEGER dyn_opt, idum1, idum2, spec_bdy_width
       INTEGER num_bytes_allocated
       REAL    initial_data_value
       CHARACTER (LEN=256) message
+      INTEGER tl
+      LOGICAL inter_domain
 
       !declare ierr variable for error checking ALLOCATE calls
       INTEGER ierr
 
       INTEGER                              :: loop
+
+#if 1
+      tl = tl_in
+      inter_domain = inter_domain_in
+#else
+      tl = 3
+      inter_domain = .FALSE.
+#endif
 
 #if ( RWORDSIZE == 8 )
       initial_data_value = 0.
@@ -966,35 +1065,39 @@ CONTAINS
       num_bytes_allocated = 0 
 
 
-      IF      ( .FALSE. )           THEN
+      IF ( dyn_opt == DYN_NODYN ) THEN
+
+        IF ( grid%id .EQ. 1 ) CALL wrf_message ( 'DYNAMICS OPTION: dynamics disabled ' )
+
+#if ALLOW_NODYN
+# include <nodyn_allocs.inc>
+#else
+        CALL wrf_error_fatal("To run the the NODYN option, recompile -DALLOW_NODYN in ARCHFLAGS settings of configure.wrf") 
+#endif
 
 #if (EM_CORE == 1)
       ELSE IF ( dyn_opt == DYN_EM ) THEN
-        CALL wrf_message ( 'DYNAMICS OPTION: Eulerian Mass Coordinate ')
+        IF ( grid%id .EQ. 1 ) CALL wrf_message ( 'DYNAMICS OPTION: Eulerian Mass Coordinate ')
 # include <em_allocs.inc>
 #endif
 #if (NMM_CORE == 1)
       ELSE IF ( dyn_opt == DYN_NMM ) THEN
-        CALL wrf_message ( 'DYNAMICS OPTION: nmm dyncore' )
+        IF ( grid%id .EQ. 1 ) CALL wrf_message ( 'DYNAMICS OPTION: nmm dyncore' )
 # include <nmm_allocs.inc>
 #endif
 #if (COAMPS_CORE == 1)
       ELSE IF ( dyn_opt == DYN_COAMPS ) THEN
-        CALL wrf_message ( 'DYNAMICS OPTION: coamps dyncore' )
+        IF ( grid%id .EQ. 1 ) CALL wrf_message ( 'DYNAMICS OPTION: coamps dyncore' )
 # include <coamps_allocs.inc>
 #endif
-
-!### 13. Edit frame/module_domain.F to add case for DYN_EXP to
-!### alloc_space_field.  (This is a bug;
-!### one should never have to edit the framework code; will fix this in
-!### coming versions).  Same goes for share/start_domain.F, although this
-!### is not a framework routine.
 #if (EXP_CORE==1)
       ELSE IF ( dyn_opt == DYN_EXP ) THEN
-        CALL wrf_message ( 'DYNAMICS OPTION: experimental dyncore' )
+        IF ( grid%id .EQ. 1 ) CALL wrf_message ( 'DYNAMICS OPTION: experimental dyncore' )
 # include <exp_allocs.inc>
 #endif
+
       ELSE
+      
         WRITE( wrf_err_message , * )'Invalid specification of dynamics: dyn_opt = ',dyn_opt
         CALL wrf_error_fatal ( TRIM ( wrf_err_message ) )
       ENDIF
@@ -1024,6 +1127,7 @@ CONTAINS
 
       TYPE(domain) , POINTER          :: grid
       LOGICAL                         :: found
+      INTEGER                         :: alarmid
 
       !  Initializations required to start the routine.
 
@@ -1040,6 +1144,19 @@ CONTAINS
             found = .TRUE.
             old_grid%next => grid%next
             CALL dealloc_space_field ( grid )
+            DEALLOCATE( grid%parents )
+            DEALLOCATE( grid%nests )
+            ! clean up time manager bits
+            CALL WRF_UTIL_ClockDestroy( grid%domain_clock )
+            DO alarmid = 1, MAX_WRF_ALARMS
+              IF ( grid%alarms_created( alarmid ) ) THEN
+                CALL WRF_UTIL_AlarmDestroy( grid%alarms( alarmid ) )
+                grid%alarms_created( alarmid ) = .FALSE.
+              ENDIF
+            ENDDO
+            DEALLOCATE( grid%alarms )
+            DEALLOCATE( grid%alarms_created )
+            DEALLOCATE( grid%domain_clock )
             DEALLOCATE(grid)
             EXIT find_grid
          END IF

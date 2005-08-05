@@ -6,8 +6,9 @@
     USE module_domain
     USE module_state_description
     USE module_configure
-    USE esmf_mod
+    USE module_utility
     IMPLICIT NONE
+#include <wrf_io_flags.h>
 #include <wrf_status_codes.h>
     TYPE(domain) :: grid
     TYPE(grid_config_rec_type),  INTENT(INOUT)    :: config_flags

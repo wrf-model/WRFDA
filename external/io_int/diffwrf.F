@@ -65,8 +65,8 @@ end module read_util_module
   use read_util_module
   use module_ext_internal
   implicit none
-  include '../io_netcdf/wrf_status_codes.h'
-  include '../io_netcdf/wrf_io_flags.h'
+  include 'wrf_status_codes.h'
+  include 'wrf_io_flags.h'
   character(len=120) :: flnm
   character(len=120) :: flnm2
   character(len=120) :: arg3
@@ -164,12 +164,12 @@ if ( Justplot ) then
       start_index = 1
       end_index = 1
       call ext_int_get_var_info (dh1,VarName,ndim,ordering,staggering,start_index,end_index, WrfType, ierr )
-      if(WrfType /= WRF_REAL4 .AND. WrfType /= WRF_REAL8) then
+      if(WrfType /= WRF_REAL .AND. WrfType /= WRF_DOUBLE) then
         call ext_int_get_next_var (dh1, VarName, Status_next_var)
         cycle
       endif
 
-      write(*,'(A9,1x,I1,3(1x,I3),1x,A,1x,A)')&
+      write(*,'(A9,1x,I1,3(1x,I5),1x,A,1x,A)')&
                VarName, ndim, end_index(1), end_index(2), end_index(3), &
                trim(ordering), trim(DateStr)
 
@@ -188,7 +188,7 @@ if ( Justplot ) then
           ord = '0'
         endif
 
-        call ext_int_read_field(dh1,DateStr,TRIM(name),data,WRF_REAL4,0,0,0,ord,   &
+        call ext_int_read_field(dh1,DateStr,TRIM(name),data,WRF_REAL,0,0,0,ord,   &
                             staggering,          &
                             dimnames,         &
                             start_index,end_index,                      & !dom              
@@ -274,7 +274,7 @@ else
         GOTO 1234
       ENDIF
 
-      if( WrfType == WRF_REAL4) then
+      if( WrfType == WRF_REAL) then
 
         DO i = 1, ndim
           IF ( end_index(i) /= end_index2(i) ) THEN
@@ -307,7 +307,7 @@ else
           ord = '0'
         endif
 
-        call ext_int_read_field(dh1,DateStr,TRIM(VarName),data,WRF_REAL4,0,0,0,ord,   &
+        call ext_int_read_field(dh1,DateStr,TRIM(VarName),data,WRF_REAL,0,0,0,ord,   &
                             staggering,          &
                             dimnames,         &
                             start_index,end_index,                      & !dom              
@@ -323,7 +323,7 @@ else
           write(*,*)'  end_index(3) ',end_index(3)
         ENDIF
 
-        call ext_int_read_field(dh2,DateStr,TRIM(VarName),data2,WRF_REAL4,0,0,0,ord,   &
+        call ext_int_read_field(dh2,DateStr,TRIM(VarName),data2,WRF_REAL,0,0,0,ord,   &
                             staggering,          &
                             dimnames,         &
                             start_index,end_index,                      & !dom              

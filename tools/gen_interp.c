@@ -74,13 +74,13 @@ if      ( down_path[ipath] == INTERP_DOWN ) { sprintf(halo_id,"HALO_%s_INTERP_DO
 else if ( down_path[ipath] == FORCE_DOWN  ) { sprintf(halo_id,"HALO_%s_FORCE_DOWN",upper_case_corename) ; }
 else if ( down_path[ipath] == INTERP_UP   ) { sprintf(halo_id,"HALO_%s_INTERP_UP",upper_case_corename) ; }
 else if ( down_path[ipath] == SMOOTH_UP   ) { sprintf(halo_id,"HALO_%s_INTERP_SMOOTH",upper_case_corename) ; }
-sprintf(halo_define,"48:") ;
+sprintf(halo_define,"80:") ;
 sprintf(halo_use,"dyn_%s",corename) ;
 
 #if 0
-      gen_nest_interp1 ( fp , Domain.fields, corename, down_path[ipath], (down_path[ipath]==FORCE_DOWN)?1:2 ) ;
+      gen_nest_interp1 ( fp , Domain.fields, corename, NULL, down_path[ipath], (down_path[ipath]==FORCE_DOWN)?1:2 ) ;
 #else
-      gen_nest_interp1 ( fp , Domain.fields, corename, down_path[ipath], (down_path[ipath]==FORCE_DOWN)?2:2 ) ;
+      gen_nest_interp1 ( fp , Domain.fields, corename, NULL, down_path[ipath], (down_path[ipath]==FORCE_DOWN)?2:2 ) ;
 #endif
 
 {
@@ -101,7 +101,7 @@ sprintf(halo_use,"dyn_%s",corename) ;
 
 
 int
-gen_nest_interp1 ( FILE * fp , node_t * node, char * corename , int down_path , int use_nest_time_level )
+gen_nest_interp1 ( FILE * fp , node_t * node, char * corename , char * fourdname, int down_path , int use_nest_time_level )
 {
   int i, ii ;
   char * fn = "nest_interp.inc" ;
@@ -111,9 +111,15 @@ gen_nest_interp1 ( FILE * fp , node_t * node, char * corename , int down_path , 
   char ddim[3][2][NAMELEN] ;
   char mdim[3][2][NAMELEN] ;
   char pdim[3][2][NAMELEN] ;
+  char ddim2[3][2][NAMELEN] ;
+  char mdim2[3][2][NAMELEN] ;
+  char pdim2[3][2][NAMELEN] ;
   char nddim[3][2][NAMELEN] ;
   char nmdim[3][2][NAMELEN] ;
   char npdim[3][2][NAMELEN] ;
+  char nddim2[3][2][NAMELEN] ;
+  char nmdim2[3][2][NAMELEN] ;
+  char npdim2[3][2][NAMELEN] ;
   char vname[NAMELEN] ; char vname2[NAMELEN] ; char tag[NAMELEN], tag2[NAMELEN] ; char core[NAMELEN], core2[NAMELEN] ;
   char fcn_name[NAMELEN] ;
   char xstag[NAMELEN], ystag[NAMELEN] ;
@@ -127,8 +133,7 @@ gen_nest_interp1 ( FILE * fp , node_t * node, char * corename , int down_path , 
 
     if ( p1->node_kind & FOURD )
     {
-
-       gen_nest_interp1 ( fp, p1->members, corename, down_path, use_nest_time_level ) ;  /* RECURSE over members */
+       gen_nest_interp1 ( fp, p1->members, corename, p1->name, down_path, use_nest_time_level ) ;  /* RECURSE over members */
        continue ;
     }
     else
@@ -185,7 +190,10 @@ if ( ! contains_tok ( halo_define , vname  , ":," ) ) {
         }
 
         set_dim_strs ( p , ddim , mdim , pdim , "c", 1 ) ;
+        set_dim_strs ( p , ddim2 , mdim2 , pdim2 , "c", 0 ) ;
         set_dim_strs ( p , nddim , nmdim , npdim , "n", 1 ) ;
+        set_dim_strs ( p , nddim2 , nmdim2 , npdim2 , "n", 0 ) ;
+
         zdex = get_index_for_coord( p , COORD_Z ) ;
         xdex = get_index_for_coord( p , COORD_X ) ;
         ydex = get_index_for_coord( p , COORD_Y ) ;
@@ -213,13 +221,15 @@ fprintf(fp,"CALL %s (                                                           
 
         if ( zdex >= 0 ) {
 
+/* note this is only good for IKJ */
+
 fprintf(fp,"                  %s,                                                           &         ! CD field\n",  vname) ;
 fprintf(fp,"                 %s, %s, %s, %s, %s, %s,   &         ! CD dims\n",
                 ddim[0][0], ddim[0][1], ddim[1][0], ddim[1][1], ddim[2][0], ddim[2][1] ) ;
 fprintf(fp,"                 %s, %s, %s, %s, %s, %s,   &         ! CD dims\n",
                 mdim[0][0], mdim[0][1], mdim[1][0], mdim[1][1], mdim[2][0], mdim[2][1] ) ;
 fprintf(fp,"                 %s, %s, %s, %s, %s, %s,   &         ! CD dims\n",
-                pdim[0][0], pdim[0][1], pdim[1][0], pdim[1][1], pdim[2][0], pdim[2][1] ) ;
+                pdim[0][0], pdim[0][1], pdim2[1][0], pdim2[1][1], pdim[2][0], pdim[2][1] ) ;
 if ( ! (down_path  & SMOOTH_UP)  ) {
 fprintf(fp,"                  ngrid%%%s,                                                        &   ! ND field\n", vname2) ;
 }
@@ -228,7 +238,7 @@ fprintf(fp,"                 %s, %s, %s, %s, %s, %s,   &         ! ND dims\n",
 fprintf(fp,"                 %s, %s, %s, %s, %s, %s,   &         ! ND dims\n",
                 nmdim[0][0], nmdim[0][1], nmdim[1][0], nmdim[1][1], nmdim[2][0], nmdim[2][1] ) ;
 fprintf(fp,"                 %s, %s, %s, %s, %s, %s,   &         ! ND dims\n",
-                npdim[0][0], npdim[0][1], npdim[1][0], npdim[1][1], npdim[2][0], npdim[2][1] ) ;
+                npdim[0][0], npdim[0][1], npdim2[1][0], npdim2[1][1], npdim[2][0], npdim[2][1] ) ;
 
         } else {
 
@@ -273,7 +283,13 @@ fprintf(fp,"                  ngrid%%parent_grid_ratio, ngrid%%parent_grid_ratio
 	   } else if ( down_path & INTERP_UP ) {
              strcpy( tmpstr , p->interpu_aux_fields ) ;
 	   } else if ( down_path & FORCE_DOWN ) {
-             strcpy( tmpstr , p->force_aux_fields ) ;
+             /* by default, add the boundary and boundary tendency fields to the arg list */
+             if ( ! p->scalar_array_member ) {
+               sprintf( tmpstr , "%s_b,%s_bt,", p->name, p->name )  ;
+             } else {
+               sprintf( tmpstr , "%s_b,%s_bt,", fourdname, fourdname )  ;
+             }
+             strcat( tmpstr , p->force_aux_fields ) ;
 	   } else if ( down_path & INTERP_DOWN ) {
              strcpy( tmpstr , p->interpd_aux_fields ) ;
 	   }
@@ -283,7 +299,11 @@ fprintf(fp,"                  ngrid%%parent_grid_ratio, ngrid%%parent_grid_ratio
              {
   	       if (!strncmp( nd->use, "dyn_", 4))   sprintf(core2,"%s_",corename,vname) ;
 	       else                                sprintf(core2,"") ;
-               fprintf(fp,",%s,ngrid%%%s%s  &\n", nd->name, core2, nd->name ) ;
+               if ( strcmp( nd->use , "_4d_bdy_array_" ) ) {
+                 fprintf(fp,",%s,ngrid%%%s%s  &\n", nd->name, core2, nd->name ) ;
+               } else {
+                 fprintf(fp,",%s(1,1,1,1,P_%s),ngrid%%%s%s(1,1,1,1,P_%s)  &\n", nd->name, p->name, core2, nd->name, p->name ) ;
+               }
              }
              else
              {

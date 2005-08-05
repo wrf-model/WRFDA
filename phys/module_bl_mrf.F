@@ -5,18 +5,22 @@ MODULE module_bl_mrf
 CONTAINS
 
 !-------------------------------------------------------------------          
-   SUBROUTINE MRF(U3D,V3D,TH3D,T3D,QV3D,QC3D,QI3D,P3D,PI3D,        &
+   SUBROUTINE MRF(U3D,V3D,TH3D,T3D,QV3D,QC3D,P3D,PI3D,             &
                   RUBLTEN,RVBLTEN,RTHBLTEN,                        &
-                  RQVBLTEN,RQCBLTEN,RQIBLTEN,                      & 
-                  CP,G,ROVCP,R,ROVG,P_QI,P_FIRST_SCALAR,           &
-                  dz8w,z,XLV,RV,PSFC,       &
-                  ZNT,UST,ZOL,HOL,PBL,REGIME,PSIM,PSIH,            &
+                  RQVBLTEN,RQCBLTEN,                               &
+                  CP,G,ROVCP,R,ROVG,                               &
+                  dz8w,z,XLV,RV,PSFC,                              &
+                  ZNT,UST,ZOL,HOL,PBL,PSIM,PSIH,                   &
                   XLAND,HFX,QFX,TSK,GZ1OZ0,WSPD,BR,                &
                   DT,DTMIN,KPBL2D,                                 &
                   SVP1,SVP2,SVP3,SVPT0,EP1,EP2,KARMAN,EOMEG,STBOLT,&
+                  flag_qi,                                         &
                   ids,ide, jds,jde, kds,kde,                       &
                   ims,ime, jms,jme, kms,kme,                       &
-                  its,ite, jts,jte, kts,kte                        )
+                  its,ite, jts,jte, kts,kte,                       &
+               ! Optional
+                  QI3D,RQIBLTEN,                                   & 
+                  regime                                           )
 !-------------------------------------------------------------------
       IMPLICIT NONE
 !-------------------------------------------------------------------
@@ -47,7 +51,6 @@ CONTAINS
 !-- ROVCP       R/CP
 !-- R           gas constant for dry air (J/kg/K)
 !-- ROVG        R/G
-!-- P_QI        species index for cloud ice
 !-- dz8w        dz between full levels (m)
 !-- z           height above sea level (m)
 !-- XLV         latent heat of vaporization (J/kg)
@@ -102,8 +105,7 @@ CONTAINS
 
       INTEGER,  INTENT(IN   )   ::      ids,ide, jds,jde, kds,kde, &
                                         ims,ime, jms,jme, kms,kme, &
-                                        its,ite, jts,jte, kts,kte, &
-                                        P_QI,P_FIRST_SCALAR
+                                        its,ite, jts,jte, kts,kte
 
 !
       REAL,     INTENT(IN   )   ::      DT,DTMIN,CP,G,ROVCP,       &
@@ -115,7 +117,6 @@ CONTAINS
       REAL,     DIMENSION( ims:ime, kms:kme, jms:jme )           , &
                 INTENT(IN   )   ::                           QV3D, &
                                                              QC3D, &
-                                                             QI3D, &
                                                               P3D, &
                                                              PI3D, &
                                                              TH3D, &
@@ -128,8 +129,7 @@ CONTAINS
                                                           RVBLTEN, &
                                                          RTHBLTEN, &
                                                          RQVBLTEN, &
-                                                         RQCBLTEN, &
-                                                         RQIBLTEN
+                                                         RQCBLTEN
 
       REAL,     DIMENSION( ims:ime, jms:jme )                    , &
                 INTENT(IN   )   ::                          XLAND, &
@@ -140,8 +140,9 @@ CONTAINS
                 INTENT(INOUT)   ::                            HOL, &
                                                               UST, &
                                                               PBL, &
-                                                              ZNT, &
-                                                           REGIME
+                                                              ZNT
+
+      LOGICAL,  INTENT(IN)      ::                        FLAG_QI
 !
 !m The following 5 variables are changed to memory size from tile size--
 !
@@ -171,6 +172,19 @@ CONTAINS
       REAL,     DIMENSION( ims:ime, kms:kme, jms:jme )           , &
                 INTENT(IN   )   ::                            U3D, &
                                                               V3D
+!
+! Optional
+!
+      REAL,     DIMENSION( ims:ime, jms:jme )                    , &
+                OPTIONAL                                         , &
+                INTENT(INOUT)   ::                         REGIME
+
+      REAL,     DIMENSION( ims:ime, kms:kme, jms:jme )           , &
+                INTENT(INOUT)   ::                       RQIBLTEN
+
+      REAL,     DIMENSION( ims:ime, kms:kme, jms:jme )           , &
+                OPTIONAL                                         , &
+                INTENT(IN   )   ::                           QI3D
 
 ! LOCAL VARS
    REAL,       DIMENSION( its:ite, kts:kte )          ::   dz8w2d, & 
@@ -191,21 +205,26 @@ CONTAINS
 
 
       CALL MRF2D(J,U3D(ims,kms,j),V3D(ims,kms,j),T3D(ims,kms,j),    &
-               QV3D(ims,kms,j),QC3D(ims,kms,j),QI3D(ims,kms,j),     &
+               QV3D(ims,kms,j),QC3D(ims,kms,j),                     &
                P3D(ims,kms,j),RUBLTEN(ims,kms,j),RVBLTEN(ims,kms,j),&
                RTHBLTEN(ims,kms,j),RQVBLTEN(ims,kms,j),             &
-               RQCBLTEN(ims,kms,j),RQIBLTEN(ims,kms,j),             &
-               CP,G,ROVCP,R,ROVG,P_QI,P_FIRST_SCALAR,               &
-               dz8w2d,z2d,XLV,Rv,            &
-               PSFC(ims,j),ZNT(ims,j),UST(ims,j),ZOL(ims,j),        &
-               HOL(ims,j),PBL(ims,j),REGIME(ims,j),PSIM(ims,j),     &
+               RQCBLTEN(ims,kms,j),                                 &
+               CP,G,ROVCP,R,ROVG,                                   &
+               dz8w2d,z2d,XLV,Rv,                                   &
+               PSFC(ims,j),ZNT(ims,j),                              &
+               UST(ims,j),ZOL(ims,j),                               &
+               HOL(ims,j),PBL(ims,j),PSIM(ims,j),                   &
                PSIH(ims,j),XLAND(ims,j),HFX(ims,j),QFX(ims,j),      &
                TSK(ims,j),GZ1OZ0(ims,j),WSPD(ims,j),BR(ims,j),      &
                DT,DTMIN,KPBL2D(ims,j),                              &
                SVP1,SVP2,SVP3,SVPT0,EP1,EP2,KARMAN,EOMEG,STBOLT,    &
+               flag_qi,                                             &
                ids,ide, jds,jde, kds,kde,                           &
                ims,ime, jms,jme, kms,kme,                           &
-               its,ite, jts,jte, kts,kte                            )
+               its,ite, jts,jte, kts,kte,                           &
+            !optional
+               QI2DTEN=RQIBLTEN(ims,kms,j),                         &
+               REGIME=REGIME(ims,j),QI2D=QI3D(ims,kms,j)            )
 
 
       DO k=kts,kte
@@ -219,18 +238,21 @@ CONTAINS
    END SUBROUTINE MRF
 
 !-------------------------------------------------------------------          
-   SUBROUTINE MRF2D(J,U2D,V2D,T2D,QV2D,QC2D,QI2D,P2D,              &
+   SUBROUTINE MRF2D(J,U2D,V2D,T2D,QV2D,QC2D,     P2D,              &
                   U2DTEN,V2DTEN,T2DTEN,                            &
-                  QV2DTEN,QC2DTEN,QI2DTEN,                         & 
-                  CP,G,ROVCP,R,ROVG,P_QI,P_FIRST_SCALAR,           &
-                  dz8w2d,z2d,XLV,RV,PSFCPA, &
-                  ZNT,UST,ZOL,HOL,PBL,REGIME,PSIM,PSIH,            &
+                  QV2DTEN,QC2DTEN,                                 & 
+                  CP,G,ROVCP,R,ROVG,                               &
+                  dz8w2d,z2d,XLV,RV,PSFCPA,                        &
+                  ZNT,UST,ZOL,HOL,PBL,PSIM,PSIH,                   &
                   XLAND,HFX,QFX,TSK,GZ1OZ0,WSPD,BR,                &
                   DT,DTMIN,KPBL1D,                                 &
                   SVP1,SVP2,SVP3,SVPT0,EP1,EP2,KARMAN,EOMEG,STBOLT,&
+                  flag_qi,                                         &
                   ids,ide, jds,jde, kds,kde,                       &
                   ims,ime, jms,jme, kms,kme,                       &
-                  its,ite, jts,jte, kts,kte                        )
+                  its,ite, jts,jte, kts,kte,                       &
+               ! optional
+                  regime, qi2d, QI2DTEN                            )
 !-------------------------------------------------------------------
       IMPLICIT NONE
 !-------------------------------------------------------------------
@@ -287,7 +309,9 @@ CONTAINS
       INTEGER,  INTENT(IN   )   ::      ids,ide, jds,jde, kds,kde, &
                                         ims,ime, jms,jme, kms,kme, &
                                         its,ite, jts,jte, kts,kte, &
-                                        P_QI,P_FIRST_SCALAR,J
+                                        J
+!
+      LOGICAL,  INTENT(IN)      ::                        FLAG_QI
 !
       REAL,     INTENT(IN   )   ::      DT,DTMIN,CP,G,ROVCP,       &
                                         ROVG,R,XLV,RV
@@ -298,7 +322,6 @@ CONTAINS
       REAL,     DIMENSION( ims:ime, kms:kme )                    , &
                 INTENT(IN   )   ::                           QV2D, &
                                                              QC2D, &
-                                                             QI2D, &
                                                               P2D, &
                                                               T2D
 !
@@ -307,15 +330,14 @@ CONTAINS
                                                            V2DTEN, &
                                                            T2DTEN, &
                                                           QV2DTEN, &
-                                                          QC2DTEN, &
-                                                          QI2DTEN
+                                                          QC2DTEN
                                                                   
       REAL,     DIMENSION( ims:ime )                             , &
                 INTENT(INOUT)   ::                            HOL, &
                                                               UST, &
                                                               PBL, &
-                                                              ZNT, &
-                                                           REGIME
+                                                              ZNT
+
       REAL,     DIMENSION( ims:ime )                             , &
                 INTENT(IN   )   ::                          XLAND, &
                                                               HFX, &
@@ -353,6 +375,20 @@ CONTAINS
                 INTENT(IN)      ::                         dz8w2d, &
                                                               z2d
 !                                                                                
+! 
+! Optional
+!
+      REAL,     DIMENSION( ims:ime )                             , &
+                OPTIONAL                                         , &
+                INTENT(INOUT)   ::                         REGIME
+
+      REAL,     DIMENSION( ims:ime, kms:kme )                    , &
+                OPTIONAL                                         , &
+                INTENT(IN   )   ::                           QI2D
+
+      REAL,     DIMENSION( ims:ime, kms:kme )                    , &
+                OPTIONAL                                         , &
+                INTENT(INOUT)   ::                        QI2DTEN
     
 ! LOCAL VARS
 
@@ -371,8 +407,8 @@ CONTAINS
                                                         UTNP,VTNP
 !
       REAL,    DIMENSION( its:ite )             ::     QIXSV,RHOX, &
-                                                           GOVRTH, & 
-                                                            THXSV, &
+                                                     WSPD1,GOVRTH, & 
+                                                       PBL0,THXSV, &
                                                         UXSV,VXSV, &             
                                                        QXSV,QCXSV, & 
                                                      QGH,TGDSA,PS
@@ -380,7 +416,7 @@ CONTAINS
       INTEGER                                   ::   ILXM,JLXM,KL, &
                                                    KLM,KLP1,KLPBL
 !
-      INTEGER, DIMENSION( its:ite )             ::           KPBL
+      INTEGER, DIMENSION( its:ite )             ::     KPBL,KPBL0
 !
       REAL,    DIMENSION( its:ite, kts:kte )    ::      SCR3,SCR4
 !
@@ -514,7 +550,7 @@ CONTAINS
           QCX(I,K)=QC2D(I,NK)
    70 CONTINUE
 
-      IF (P_QI .ge. P_FIRST_SCALAR) THEN
+      IF (flag_QI .AND. PRESENT( QI2D ) ) THEN
          DO K=kts,kte
             NK=kme-K
             DO I=its,ite
@@ -740,7 +776,7 @@ CONTAINS
   330 CONTINUE                   
 !                                                                                
       DO 420 I=its,ite
-        WSPD(I)=SQRT(UX(I,KL)*UX(I,KL)+VX(I,KL)*VX(I,KL))+1.E-9                  
+        WSPD1(I)=SQRT(UX(I,KL)*UX(I,KL)+VX(I,KL)*VX(I,KL))+1.E-9                  
   420 CONTINUE                                                                   
 !                                                                                
 !---- COMPUTE VERTICAL DIFFUSION                                                 
@@ -758,6 +794,8 @@ CONTAINS
         WSCALE(I)=0.                                                             
         KPBL(I)=KL                                                               
         PBL(I)=ZQ(I,KL)                                                        
+        KPBL0(I)=KL                                                    
+        PBL0(I)=ZQ(I,KL)                                              
         PBLFLG(I)=.TRUE.                                                         
         SFCFLG(I)=.TRUE.                                                         
         IF(BR(I).GT.0.0)SFCFLG(I)=.FALSE.                                        
@@ -881,6 +919,44 @@ CONTAINS
           IF(KPBL(I).LE.1)PBLFLG(I)=.FALSE.                                      
         ENDIF                                                                    
       ENDDO                                                                      
+!                                                                                
+!     DIAGNOSTIC PBL HEIGHT WITH BRCR EFFECTIVELY ZERO (PBL0)                    
+!                                                                                
+      DO I=its,ite
+        IF(PBLFLG(I))THEN                                                        
+          STABLE(I)=.FALSE.                                                      
+          BRUP(I)=BR(I)                                                          
+        ENDIF                                                                    
+      ENDDO                                                                      
+      DO K=KLM,KLPBL,-1                                                          
+        DO I=its,ite
+          IF(.NOT.STABLE(I).AND.PBLFLG(I))THEN                                   
+            BRDN(I)=BRUP(I)                                                      
+            SPDK2=MAX((UX(I,K)**2+VX(I,K)**2),1.)                                
+            BRUP(I)=(THVX(I,K)-THERMAL(I))*(G*ZA(I,K)/THVX(I,KL))/SPDK2          
+            KPBL0(I)=K                                                           
+            STABLE(I)=BRUP(I).GT.0.0                                             
+          ENDIF                                                                  
+                                                                                 
+        ENDDO                                                                    
+      ENDDO                                                                      
+!                                                                                
+      DO I=its,ite
+        IF(PBLFLG(I))THEN                                                        
+          K=KPBL0(I)                                                             
+          IF(BRDN(I).GE.0.0)THEN                                                 
+            BRINT=0.                                                             
+          ELSEIF(BRUP(I).LE.0.0)THEN                                             
+            BRINT=1.                                                             
+          ELSE                                                                   
+            BRINT=(0.0-BRDN(I))/(BRUP(I)-BRDN(I))                                
+          ENDIF                                                                  
+          PBL0(I)=ZA(I,K+1)+BRINT*(ZA(I,K)-ZA(I,K+1))                            
+          IF(PBL0(I).LT.ZQ(I,KPBL0(I)+1))KPBL0(I)=KPBL0(I)+1                     
+          IF(KPBL0(I).LE.1)PBLFLG(I)=.FALSE.                                     
+        ENDIF                                                                    
+      ENDDO                                                                      
+
 !                                                                                
 !     COMPUTE DIFFUSION COEFFICIENTS BELOW PBL                                   
 !                                                                                
@@ -1024,8 +1100,10 @@ CONTAINS
  
       DO I=its,ite
         AD(I,1)=1.                                                               
-        A1(I,1)=UX(I,KL)-UX(I,KL)/WSPD(I)*UST(I)*UST(I)/ZQ(I,KL)*DT4         
-        A2(I,1)=VX(I,KL)-VX(I,KL)/WSPD(I)*UST(I)*UST(I)/ZQ(I,KL)*DT4         
+        A1(I,1)=UX(I,KL)-UX(I,KL)/WSPD1(I)*UST(I)*UST(I)/ZQ(I,KL)  &
+                *DT4*(WSPD1(I)/WSPD(I))**2                            
+        A2(I,1)=VX(I,KL)-VX(I,KL)/WSPD1(I)*UST(I)*UST(I)/ZQ(I,KL)  &
+                *DT4*(WSPD1(I)/WSPD(I))**2                          
       ENDDO                                                                      
 !                                                                                
       DO K=kte,kts+1,-1
@@ -1171,7 +1249,7 @@ CONTAINS
            QC2DTEN(I,NK)=QCTNP(I,K)
   850   CONTINUE
 
-      IF(P_QI .ge. P_FIRST_SCALAR) THEN
+      IF(flag_QI .AND. PRESENT( QI2DTEN ) ) THEN
         DO K=kts,kte
         NK=kme-K
           DO I=IBGN,IEND
@@ -1193,8 +1271,11 @@ CONTAINS
 ! KPBL IS NEEDED FOR THE FDDA, AND SINCE THERE IS NO LONGER JUST ONE             
 ! LARGE "J LOOP" IT MUST BE STORED AS (I,J)...                                   
 !                                                                                
+! USE NEW DIAGNOSED PBL DEPTH (CALCULATED WITH brcr=0.0)
+! PBL IS USED FOR OUTPUT AND NEXT-TIME-STEP BELJAARS CALC IN SFCLAY
       DO 950 I=its,ite
-        KPBL1D(I)=KPBL(I)                                                      
+        KPBL1D(I)=KPBL0(I)                                                      
+        PBL(I)=PBL0(I)
   950 CONTINUE                                                                   
 
    END SUBROUTINE MRF2D

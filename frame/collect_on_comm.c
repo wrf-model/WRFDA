@@ -49,7 +49,7 @@ COLLECT_ON_COMM0 ( int * comm, int * typesize ,
                 inbuf, ninbuf , outbuf, noutbuf, 0 ) ;
 }
 
-col_on_comm ( int * comm, int * typesize ,
+col_on_comm ( int * Fcomm, int * typesize ,
               void * inbuf, int *ninbuf , void * outbuf, int * noutbuf, int sw )
 {
 #if defined( DM_PARALLEL ) && !(STUBMPI)
@@ -58,7 +58,10 @@ col_on_comm ( int * comm, int * typesize ,
   int *displace ;
   int noutbuf_loc ;
   int root_task ;
+  MPI_Comm *comm, dummy_comm ;
 
+  comm = &dummy_comm ;
+  *comm = MPI_Comm_f2c( *Fcomm ) ;
   MPI_Comm_size ( *comm, &ntasks ) ;
   MPI_Comm_rank ( *comm, &mytask ) ;
   recvcounts = (int *) malloc( ntasks * sizeof(int)) ;
@@ -116,7 +119,7 @@ DIST_ON_COMM0 ( int * comm, int * typesize ,
                 inbuf, ninbuf , outbuf, noutbuf, 0 ) ;
 }
 
-dst_on_comm ( int * comm, int * typesize ,
+dst_on_comm ( int * Fcomm, int * typesize ,
               void * inbuf, int *ninbuf , void * outbuf, int * noutbuf, int sw )
 {
 #if defined(DM_PARALLEL) && ! defined(STUBMPI)
@@ -125,7 +128,10 @@ dst_on_comm ( int * comm, int * typesize ,
   int *displace ;
   int noutbuf_loc ;
   int root_task ;
+  MPI_Comm *comm, dummy_comm ;
 
+  comm = &dummy_comm ;
+  *comm = MPI_Comm_f2c( *Fcomm ) ;
   MPI_Comm_size ( *comm, &ntasks ) ;
   MPI_Comm_rank ( *comm, &mytask ) ;
   sendcounts = (int *) malloc( ntasks * sizeof(int)) ;
@@ -160,3 +166,39 @@ dst_on_comm ( int * comm, int * typesize ,
   return(0) ;
 }
 
+#include <malloc.h>
+
+#ifndef MACOS
+#  include <sys/resource.h>
+#endif
+
+#if 0
+  int getrusage(
+          int who,
+          struct rusage *r_usage);
+#endif
+
+#if 0
+extern int outy ;
+extern int maxstug, nouty, maxouty ;
+#endif
+
+#if 0
+/*  used internally for chasing memory leaks  */
+rlim_ ()
+{
+
+#ifndef MACOS
+   struct rusage r_usage ;
+   struct mallinfo minf ;
+
+   getrusage ( RUSAGE_SELF, &r_usage ) ;
+   fprintf(stderr,"sm %ld d %ld s %ld\n",r_usage.ru_ixrss,r_usage.ru_idrss,r_usage.ru_isrss) ;
+   minf = mallinfo() ;
+   fprintf(stderr,"a %ld usm %ld fsm %ld uord %ld ford %ld hblkhd %d\n",minf.arena,minf.usmblks,minf.fsmblks,minf.uordblks,minf.fordblks,minf.hblkhd) ;
+# if 0
+   fprintf(stderr," outy %d  nouty %d  maxstug %d maxouty %d \n", outy, nouty, maxstug, maxouty ) ;
+# endif
+#endif
+}
+#endif

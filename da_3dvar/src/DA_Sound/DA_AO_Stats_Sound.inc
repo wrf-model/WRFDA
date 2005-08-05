@@ -6,7 +6,7 @@ SUBROUTINE DA_AO_Stats_Sound( stats_unit, oi, re )
    TYPE (ob_type), INTENT (in)      :: oi            ! OI
    TYPE ( y_type), INTENT (in)      :: re            ! A - O
 
-   TYPE (stats_type)                :: Sound
+   TYPE (stats_sound_type)          :: Sound
    INTEGER                          :: nu, nv, nt, nq
    INTEGER                          :: n, k
 
@@ -16,19 +16,16 @@ SUBROUTINE DA_AO_Stats_Sound( stats_unit, oi, re )
    nv = 0
    nt = 0
    nq = 0
-   num_sound_tot = 0
    
    Sound%maximum%u = maxmin_type( missing_r, 0, 0)
    Sound%maximum%v = maxmin_type( missing_r, 0, 0)
    Sound%maximum%t = maxmin_type( missing_r, 0, 0)
-   Sound%maximum%p = maxmin_type( missing_r, 0, 0)
    Sound%maximum%q = maxmin_type( missing_r, 0, 0)
    Sound%minimum%u = maxmin_type(-missing_r, 0, 0)
    Sound%minimum%v = maxmin_type(-missing_r, 0, 0)
    Sound%minimum%t = maxmin_type(-missing_r, 0, 0)
-   Sound%minimum%p = maxmin_type(-missing_r, 0, 0)
    Sound%minimum%q = maxmin_type(-missing_r, 0, 0)
-   Sound%average = residual_type(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+   Sound%average = residual_sound1_type(0.0, 0.0, 0.0, 0.0)
    Sound%rms_err = Sound%average
 
    IF ( oi%num_Sound > 0 ) THEN
@@ -66,7 +63,7 @@ SUBROUTINE DA_AO_Stats_Sound( stats_unit, oi, re )
    call proc_sum_int( nv )
    call proc_sum_int( nt )
    call proc_sum_int( nq )
-   num_sound_tot = nu + nv + nt + nq
+   num_sound_tot = num_sound_tot + nu + nv + nt + nq
    
    call proc_stats_combine(Sound%average%u, Sound%rms_err%u, &
                            Sound%minimum%u%value, Sound%maximum%u%value, &

@@ -1,0 +1,49 @@
+Change Log for update to WRF 3DVAR code
+---------------------------------------
+
+Author: 	Yong-Run Guo
+Reviewer: 	
+Date: 		07/20/05
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+1, Bug fix in da_setup_runconstants.inc for A-grid.
+
+2, Introduce the quality control procedure for GPS Ref.
+
+Expected Differences
+--------------------
+
+Accuracy:       Point 1. will correct the gen_be calculation, especially
+                for the eigenvalues of psi and chi_u. It will affect the
+                balanced phi_b for cv_options=2 because of the 
+                solution from "DA_Solve_PoissonEqn_FST".
+                   
+                Point 2. improve the quality control for GPS Ref, and
+                the number of GPS ref data points assimilated may be
+                changed. 	
+
+CPU/memory:	minor increase CPU and memory
+
+Test results (run on what machines?)
+------------------------------------------------------
+
+PC Linux (palm).
+ 
+Files added:
+------------
+
+None
+
+Files modified:
+---------------
+
+da_3dvar/src/DA_Setup_Structures/da_setup_runconstants.inc
+da_3dvar/src/DA_Constants/DA_Constants.F
+da_3dvar/src/DA_Gpsref/da_get_innov_vector_Gpsref.inc
+
+Minor-tag:
+---------
+
+

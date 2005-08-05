@@ -23,6 +23,20 @@ SUBROUTINE da_get_innov_vector_gpsref ( it, xb, xp, ob, iv )
 !                                                hor. location.
    INTEGER           :: pref, fref
 
+! For quality control (YRG 07/20/2005):...................................
+
+  real   , parameter :: h_1 = 7000.0, h_2 = 25000.0
+! -- Lidia Cucurull values:
+  real   , parameter :: pcnt1 = 0.05, pcnt2 = 0.04, pcnt3 = 0.10
+! -- testing values:
+!  real   , parameter :: pcnt1 = 0.02, pcnt2 = 0.01, pcnt3 = 0.03
+  integer, parameter :: qc_below = -31, qc_middle = -32, qc_above = -33
+
+  integer :: nn, n1, ntotal, nqc0, nqc1, nqc2, nqc3
+  real    :: percnt
+  character (len=40), dimension(5000) :: name_qc
+  real              , dimension(5000) :: height_below
+! .........................................................................     
 !
 ! GPS REF Pseudo OBS test:
 !
@@ -30,7 +44,7 @@ SUBROUTINE da_get_innov_vector_gpsref ( it, xb, xp, ob, iv )
 
 ! Deallocate:
         if (iv%num_gpsref > 0) then
-          print '(a,i)','iv%num_gpsref=', iv%num_gpsref
+!          print '(a,i6)','iv%num_gpsref=', iv%num_gpsref
           do n = 1, iv%num_gpsref
           deallocate (iv % gpsref(n) %  h )
           deallocate (iv % gpsref(n) %  zk)
@@ -100,6 +114,7 @@ SUBROUTINE da_get_innov_vector_gpsref ( it, xb, xp, ob, iv )
 
    IF ( iv%num_gpsref < 1 ) RETURN
 
+   ntotal = 0
    pref = 0 ; fref = 0
 
    DO n=iv%ob_numb(iv%current_ob_time-1)%gpsref + 1, iv%ob_numb(iv%current_ob_time)%gpsref 
@@ -170,12 +185,124 @@ SUBROUTINE da_get_innov_vector_gpsref ( it, xb, xp, ob, iv )
 
        endif
 
-      endif
+! ============================================================
+! Quality control code is implemeted by Y.-R. Guo, 07/18/2005:
+! ============================================================
 
-      IF ( check_max_iv ) &
+! Quality check 1: Gross error (departure from the background) check 
+! ----------------
+
+       IF ( check_max_iv ) &
          CALL da_check_max_iv_gpsref(it, iv%gpsref(n), pref, fref )
 
+!
+! Quality check 2: Error percentage check.
+! ---------------
+
+       if (.not.(pseudo_var(1:3) == 'ref' .and. num_pseudo > 0)) then
+
+         do k=1, num_levs
+!
+! incremetal refractivity or the relative error:
+!                 abs[(O-B)/{(O+B)/2}]               (Lidia Cucurull 2005)
+
+           ntotal = ntotal + 1
+           percnt = 2.0 * abs(iv%gpsref(n)%ref(k)%inv / (ob%gpsref(n)%ref(k) + model_ref(k)))
+
+           if (iv%gpsref(n)%ref(k)%qc >= obs_qc_pointer) then
+
+              if ( iv%gpsref(n)%h(k) < h_1 ) then
+                 if (percnt > pcnt1) iv%gpsref(n)%ref(k)%qc = qc_below
+              else if ( iv%gpsref(n)%h(k) > h_2) then
+                 if (percnt > pcnt3) iv%gpsref(n)%ref(k)%qc = qc_above
+              else
+                 if (percnt > pcnt2) iv%gpsref(n)%ref(k)%qc = qc_middle
+              endif
+
+           endif
+
+!           write(62,'(a,i6,a,i6,a,i3,a,i8,a,f10.1,"  pecnt, inv, m_ro:", 3f11.4)') &
+!                    "ntotal=",ntotal,"  n=",n, " k=",k, " qc=",iv%gpsref(n)%ref(k)%qc, &
+!                    " h=",iv%gpsref(n)%h(k), percnt, &
+!                    iv%gpsref(n)%ref(k)%inv, .5*(ob%gpsref(n)%ref(k) + model_ref(k)) 
+             
+         enddo
+        endif
+
+      endif
+
+
    END DO
+
+! Quality check 3: Low levels quality control
+! ----------------
+
+         if (.not.(pseudo_var(1:3) == 'ref' .and. num_pseudo > 0)) then
+
+! Search for the GPS RO's name with the 'qc_below':
+
+   nn = 0
+   height_below = 0.0
+   name_qc      = '                                       '
+
+   DO n=iv%ob_numb(iv%current_ob_time-1)%gpsref + 1, iv%ob_numb(iv%current_ob_time)%gpsref 
+
+      if(iv%gpsref(n)%loc%proc_domain_with_halo) then
+
+         nn = nn + 1
+         num_levs = iv%gpsref(n)%info%levels
+         do k=1, num_levs
+           if (iv%gpsref(n)%ref(k)%qc == qc_below) then
+               name_qc(nn) = iv%gpsref(n)%info%name
+               height_below(nn) = max(iv%gpsref(n)%h(k),height_below(nn))
+           endif
+         enddo
+         if (height_below(nn) == 0.0) nn = nn - 1
+
+      endif
+   ENDDO
+
+! Set the flag qc_below to the levels below percnt < pcnt1::
+
+   ntotal = 0
+   nqc0   = 0
+   nqc1   = 0
+   nqc2   = 0
+   nqc3   = 0
+
+   DO n=iv%ob_numb(iv%current_ob_time-1)%gpsref + 1, iv%ob_numb(iv%current_ob_time)%gpsref 
+
+      if(iv%gpsref(n)%loc%proc_domain_with_halo) then
+
+         num_levs = iv%gpsref(n)%info%levels
+
+         do n1 = 1,nn
+           if ( iv%gpsref(n)%info%name == name_qc(n1) ) then
+
+             do k=1, num_levs
+               if (iv%gpsref(n)%h(k) < height_below(n1) .and. &
+                   iv%gpsref(n)%ref(k)%qc >= 0) iv%gpsref(n)%ref(k)%qc = qc_below
+             enddo
+             exit
+           endif
+         enddo
+         
+         do k=1, num_levs
+             ntotal = ntotal + 1
+             if (iv%gpsref(n)%ref(k)%qc == fails_error_max) nqc0 = nqc0 + 1
+             if (iv%gpsref(n)%ref(k)%qc == qc_middle) nqc1 = nqc1 + 1
+             if (iv%gpsref(n)%ref(k)%qc == qc_below ) nqc2 = nqc2 + 1
+             if (iv%gpsref(n)%ref(k)%qc == qc_above ) nqc3 = nqc3 + 1
+!            write(63,'(a,5i6,a,i6,a,i3,a,i8,a,f10.1,a, f11.4)') &
+!             "ntotal, nqc0, nqc1, nqc2, nqc3:",ntotal, nqc0, nqc1, nqc2, nqc3, &
+!             "  n=",n, " k=",k, "  qc=",iv%gpsref(n)%ref(k)%qc,  &
+!             "  h=",iv%gpsref(n)%h(k), "  inv=",iv%gpsref(n)%ref(k)%inv
+         enddo
+
+      endif
+   ENDDO
+
+         endif
 
    write(unit = check_max_iv_unit, FMT ='(A,i5,A)') &
         'For outer iteration ',it, &

@@ -8,6 +8,8 @@ MODULE DA_Tools
 !     HISTORY: 09/28/1999 - Creation of F90 version.           Dale Barker
 !------------------------------------------------------------------------------
    
+   USE module_bc
+
    USE DA_Constants
    USE DA_Define_Structures
    USE LAPACK
@@ -398,6 +400,8 @@ CONTAINS
       
       CASE(PROJ_LC)
         CALL llij_lc(lat,lon,proj,i,j)
+        i = i + proj%knowni - 1.0
+        j = j + proj%knownj - 1.0
 
       CASE DEFAULT
         PRINT '(A,I2)', 'Unrecognized map projection code: ', proj%code
@@ -407,21 +411,26 @@ CONTAINS
     RETURN
   END SUBROUTINE latlon_to_ij
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  SUBROUTINE ij_to_latlon(proj, i, j, lat, lon)
+  SUBROUTINE ij_to_latlon(proj, ii, jj, lat, lon)
     ! Computes geographical latitude and longitude for a given (i,j) point
     ! in a grid with a projection of proj
 
     IMPLICIT NONE
     TYPE(proj_info),INTENT(IN)          :: proj
-    REAL, INTENT(IN)                    :: i
-    REAL, INTENT(IN)                    :: j
+    REAL, INTENT(IN)                    :: ii
+    REAL, INTENT(IN)                    :: jj
     REAL, INTENT(OUT)                   :: lat
     REAL, INTENT(OUT)                   :: lon
+    REAL                                :: i, j
 
     IF (.NOT.proj%init) THEN
       PRINT '(A)', 'You have not called map_set for this projection!'
       STOP 'IJ_TO_LATLON'
     ENDIF
+
+    i = ii
+    j = jj
+
     SELECT CASE (proj%code)
 
       CASE (PROJ_LATLON)
@@ -434,6 +443,9 @@ CONTAINS
         CALL ijll_ps(i, j, proj, lat, lon)
 
       CASE (PROJ_LC)
+
+        i = ii - proj%knowni + 1.0
+        j = jj - proj%knownj + 1.0
         CALL ijll_lc(i, j, proj, lat, lon)
 
       CASE DEFAULT
@@ -461,6 +473,11 @@ CONTAINS
     REAL                              :: scale_top
 
     ! Executable code
+
+! To define the cone factor for polar stereographic projection 
+! (Y.-R. Guo 04/25/2005):
+    proj%cone = 1.0
+
     reflon = proj%stdlon + 90.
 
     ! Compute numerator term of map scale factor
@@ -953,6 +970,7 @@ CONTAINS
 #include "DA_Obs_Sfc_correction.inc"
 #include "DA_Diff_Seconds.inc"
 #include "DA_Read_Namelist.inc"
+#include "da_global_ll_to_xy.inc"
 #include "DA_ll_to_xy.inc"
 #include "Residual.inc"
 #include "da_add_noise.inc"
@@ -972,6 +990,12 @@ CONTAINS
 #include "da_eof_decomposition.inc"
 #include "da_lubksb.inc"
 #include "da_ludcmp.inc"
+#include "DA_Set_Boundary_Xa.inc"
+#include "DA_Set_Boundary_Xb.inc"
+#include "DA_Set_Boundary_3d.inc"
+
+#include "get_2d_sum.inc"
+#include "get_3d_sum.inc"
    
 END MODULE DA_Tools
 

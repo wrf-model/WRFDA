@@ -55,8 +55,12 @@ gen_halos ( char * dirname )
       t1 = strtok_rentr( NULL , "; " , &pos1 ) ;
     }
     print_warning(fp,fname) ;
-    fprintf(fp,"IF ( grid%%comms( %s ) == invalid_message_value ) THEN\n",commname ) ;
+    fprintf(fp,"#ifndef DATA_CALLS_INCLUDED\n") ;
+    fprintf(fp,"--- DELIBERATE SYNTAX ERROR: THIS ROUTINE SHOULD INCLUDE \"%s_data_calls.inc\"\n",p->use+4) ;
+    fprintf(fp,"    BECAUSE IT CONTAINS AN RSL HALO OPERATION\n" ) ;
+    fprintf(fp,"#endif\n") ;
 
+    fprintf(fp,"IF ( grid%%comms( %s ) == invalid_message_value ) THEN\n",commname ) ;
     fprintf(fp,"  CALL wrf_debug ( 50 , 'set up halo %s' )\n",commname ) ;
     fprintf(fp,"  CALL setup_halo_rsl( grid )\n" ) ;
     fprintf(fp,"  CALL reset_msgs_%dpt\n", maxstenwidth ) ;
@@ -114,7 +118,7 @@ gen_halos ( char * dirname )
             else
             {
               strcpy (indices,"");
-              if ( sw_deref_kludge &&  strchr (t2, '%') != NULLCHARPTR )
+              if ( sw_deref_kludge ) /* &&  strchr (t2, '%') != NULLCHARPTR ) */
               {
                 sprintf(post,")") ;
                 sprintf(indices, "%s",index_with_firstelem("(","",tmp3,q,post)) ;
@@ -167,11 +171,14 @@ gen_periods ( char * dirname )
   node_t * p, * q ;
   char commname[NAMELEN] ;
   char fname[NAMELEN] ;
-  char tmp[4096], tmp2[4096], commuse[4096] ;
+  char indices[NAMELEN], post[NAMELEN] ;
+  char tmp[4096], tmp2[4096], tmp3[4096], commuse[4096] ;
   int maxperwidth, perwidth ;
   FILE * fp ;
   char * t1, * t2 ;
   char * pos1 , * pos2 ;
+  node_t * dimd ;
+  int zdex ;
 
   if ( dirname == NULL ) return(1) ;
 
@@ -200,11 +207,16 @@ gen_periods ( char * dirname )
       t1 = strtok_rentr( NULL , ";" , &pos1 ) ;
     }
     print_warning(fp,fname) ;
+
+    fprintf(fp,"#ifndef DATA_CALLS_INCLUDED\n") ;
+    fprintf(fp,"--- DELIBERATE SYNTAX ERROR: THIS ROUTINE SHOULD INCLUDE \"%s_data_calls.inc\"\n",p->use+4) ;
+    fprintf(fp,"    BECAUSE IT CONTAINS AN RSL PERIOD OPERATION\n" ) ;
+    fprintf(fp,"#endif\n") ;
     fprintf(fp,"IF ( grid%%comms( %s ) == invalid_message_value .AND. (config_flags%%periodic_x .OR. config_flags%%periodic_y )) THEN\n",commname ) ;
 
     fprintf(fp,"  CALL wrf_debug ( 50 , 'setting up period %s' )\n",commname ) ;
     fprintf(fp,"  CALL setup_period_rsl( grid )\n" ) ;
-    fprintf(fp,"  CALL rsl_create_message ( msg )\n") ;
+    fprintf(fp,"  CALL reset_period\n") ;
 
     /* pass through description again now and generate the calls  */
     strcpy( tmp, p->comm_define ) ;
@@ -231,33 +243,58 @@ gen_periods ( char * dirname )
           }
           else
           {
-            if ( strcmp( q->type->name , "real" ) )     /* If not real... */
+
+            if ( q->node_kind & FOURD )
             {
-              fprintf(stderr,"WARNING: array %s of type %s cannot be member of period spec %s.\n",t2,q->type->name,commname) ;
-            }
-            else
-            {
-              if ( q->node_kind & FOURD )
+              node_t *member ;
+              zdex = get_index_for_coord( q , COORD_Z ) ;
+              if ( zdex >=1 && zdex <= 3 )
               {
-                node_t *member ;
                 for ( member = q->members ; member != NULL ; member = member->next )
                 {
                   if ( strcmp( member->name, "-" ) )
                   {
-                    fprintf(fp,"  if ( P_%s .GT. 1 ) CALL rsl_build_message ( msg, RSL_REAL_F90 , &\n%s (grid%%sm31,grid%%sm32,grid%%sm33,P_%s) , 3 , decomp , glen , llen )\n", 
-                       member->name , t2 , member->name ) ;
+                    fprintf(fp,"  if ( P_%s .GT. 1 ) CALL add_msg_period_%s ( %s ( grid%%sm31,grid%%sm32,grid%%sm33,P_%s), glen(%d) )\n",
+                       member->name, q->type->name, t2 , member->name, zdex+1 ) ;
                   }
                 }
               }
               else
               {
-                char modstr[NAMELEN] ;
-                strcpy(modstr,"") ;
-                if ( q->stag_x ) strcat( modstr , "x" ) ;
-                if ( q->stag_y ) strcat( modstr , "y" ) ;
-                if ( q->ndims == 2 ) strcat( modstr , "2d" ) ;
-                fprintf(fp,"  CALL rsl_build_message ( msg, RSL_REAL_F90 , &\n%s , %d , decomp%s , glen%s , llen%s )\n", 
-                    t2, q->ndims , modstr, modstr , modstr ) ;
+                fprintf(stderr,"WARNING: %d some dimension info missing for 4d array %s\n",zdex,t2) ;
+              }
+            }
+            else
+            {
+              strcpy (indices,"");
+              if ( sw_deref_kludge ) /* &&  strchr (t2, '%') != NULLCHARPTR ) */
+              {
+                sprintf(post,")") ;
+                sprintf(indices, "%s",index_with_firstelem("(","",tmp3,q,post)) ;
+              }
+              dimd = get_dimnode_for_coord( q , COORD_Z ) ;
+              zdex = get_index_for_coord( q , COORD_Z ) ;
+              if ( dimd != NULL )
+              {
+                char dimstrg[256] ;
+
+                if      ( dimd->len_defined_how == DOMAIN_STANDARD )
+                    sprintf(dimstrg,"(glen(%d))",zdex+1) ;
+                else if ( dimd->len_defined_how == NAMELIST )
+                {
+                  if ( !strcmp(dimd->assoc_nl_var_s,"1") )
+                    sprintf(dimstrg,"config_flags%%%s",dimd->assoc_nl_var_e) ;
+                  else
+                    sprintf(dimstrg,"(config_flags%%%s - config_flags%%%s + 1)",dimd->assoc_nl_var_e,dimd->assoc_nl_var_s) ;
+                }
+                else if ( dimd->len_defined_how == CONSTANT )
+                    sprintf(dimstrg,"(%d - %d + 1)",dimd->coord_end,dimd->coord_start) ;
+
+                fprintf(fp,"  CALL add_msg_period_%s ( %s%s , %s )\n", q->type->name, t2, indices, dimstrg ) ;
+              }
+              else if ( q->ndims == 2 )  /* 2d */
+              {
+                fprintf(fp,"  CALL add_msg_period_%s ( %s%s , %s )\n", q->type->name, t2, indices, "1" ) ;
               }
             }
           }
@@ -267,8 +304,7 @@ gen_periods ( char * dirname )
       }
       t1 = strtok_rentr( NULL , ";" , &pos1 ) ;
     }
-    fprintf(fp,"  CALL rsl_create_period ( grid%%comms ( %s ) )\n",commname ) ;
-    fprintf(fp,"  CALL rsl_describe_period ( grid%%domdesc , grid%%comms ( %s ) , %d , msg )\n",commname , maxperwidth ) ;
+    fprintf(fp,"  CALL period_def ( grid%%domdesc , grid%%comms ( %s ) , %d )\n",commname , maxperwidth ) ;
     fprintf(fp,"ENDIF\n") ;
     fprintf(fp,"IF ( config_flags%%periodic_x ) THEN\n") ; 
     fprintf(fp,"  CALL wrf_debug ( 50 , 'exchanging period %s on x' )\n",commname ) ;
@@ -316,6 +352,10 @@ gen_xposes ( char * dirname )
       }
 
       print_warning(fp,fname) ;
+      fprintf(fp,"#ifndef DATA_CALLS_INCLUDED\n") ;
+      fprintf(fp,"--- DELIBERATE SYNTAX ERROR: THIS ROUTINE SHOULD INCLUDE \"%s_data_calls.inc\"\n",p->use+4) ;
+      fprintf(fp,"    BECAUSE IT CONTAINS AN RSL TRANSPOSE OPERATION\n" ) ;
+      fprintf(fp,"#endif\n") ;
       fprintf(fp,"IF ( grid%%comms( %s ) == invalid_message_value ) THEN\n",commname ) ;
 
       fprintf(fp,"  CALL wrf_debug ( 50 , 'setting up xpose %s' )\n",commname ) ;
@@ -345,11 +385,7 @@ gen_xposes ( char * dirname )
           sprintf(post,")") ;
           sprintf(indices, "%s",index_with_firstelem("(","",tmp3,q,post)) ;
         }
-#if 0
-        fprintf(fp," CALL add_msg_xpose_%s ( %s%s ,", q->type->name, q->name,indices ) ;
-#else
         fprintf(fp," CALL add_msg_xpose_%s ( %s%s ,", q->type->name, t2,indices ) ;
-#endif
         q->subject_to_communication = 1 ;         /* Indicate that this field may be communicated */
 
 /* X array */
@@ -368,11 +404,7 @@ gen_xposes ( char * dirname )
           sprintf(post,")") ;
           sprintf(indices, "%s",index_with_firstelem("(","",tmp3,q,post)) ;
         }
-#if 0
-        fprintf(fp," %s%s ,", q->name, indices ) ;
-#else
         fprintf(fp," %s%s ,", t2, indices ) ;
-#endif
         q->subject_to_communication = 1 ;         /* Indicate that this field may be communicated */
 
 /* Y array */
@@ -391,11 +423,7 @@ gen_xposes ( char * dirname )
           sprintf(post,")") ;
           sprintf(indices, "%s",index_with_firstelem("(","",tmp3,q,post)) ;
         }
-#if 0
-        fprintf(fp," %s%s , 3 )\n", q->name, indices ) ;
-#else
         fprintf(fp," %s%s , 3 )\n", t2, indices ) ;
-#endif
         q->subject_to_communication = 1 ;         /* Indicate that this field may be communicated */
         t1 = strtok_rentr( NULL , ";" , &pos1 ) ;
       }
@@ -534,7 +562,7 @@ if ( !strcmp( p->name , "xf_ens" ) || !strcmp( p->name,"pr_ens" ) )  {
             else
 	    {
               strcpy (indices,"");
-              if ( sw_deref_kludge &&  strchr (p->name, '%') != NULLCHARPTR )
+              if ( sw_deref_kludge ) /* &&  strchr (p->name, '%') != NULLCHARPTR ) */
               {
                 sprintf(post,")") ;
                 sprintf(indices, "%s",index_with_firstelem("(","",tmp3,p,post)) ;
@@ -668,6 +696,7 @@ gen_datacalls ( char * dirname )
     gen_datacalls1( fp , corename, "", I1 , Domain.fields ) ;
     fprintf(fp,"#endif\n") ;
     fprintf(fp," CALL rsl_end_register_f90\n") ;
+    fprintf(fp,"#define  DATA_CALLS_INCLUDED\n") ;
     close_the_file(fp) ;
   }
   return(0) ;
@@ -678,7 +707,7 @@ gen_datacalls1 ( FILE * fp , char * corename , char * structname , int mask , no
 {
   node_t * p, * q  ;
   int i, member_number ;
-  char tmp[NAMELEN] ;
+  char tmp[NAMELEN],tmp2[NAMELEN], tc ;
   char indices[NAMELEN], post[NAMELEN] ;
 
   for ( p = node ; p != NULL ; p = p->next )
@@ -690,6 +719,9 @@ gen_datacalls1 ( FILE * fp , char * corename , char * structname , int mask , no
     {
       if ( p->type->type_type == SIMPLE )
       {
+        if ( !strcmp( p->type->name , "real" ) ) tc = 'R' ;
+        if ( !strcmp( p->type->name , "double" ) ) tc = 'D' ;
+        if ( !strcmp( p->type->name , "integer" ) ) tc = 'I' ;
         for ( i = 1 ; i <= p->ntl ; i++ )
         {
 /* IF (P_QI .ge. P_FIRST_SCALAR */
@@ -699,22 +731,28 @@ gen_datacalls1 ( FILE * fp , char * corename , char * structname , int mask , no
             for ( q = p->members ; q != NULL ; q = q->next )
             {
               sprintf(tmp, "(grid%%sm31,grid%%sm32,grid%%sm33,1+%d)", member_number ) ;
-              if ( p->ntl > 1 ) fprintf(fp," IF(1+%d.LE.num_%s)CALL rsl_register_f90 ( %s%s_%d %s )\n",
-                                             member_number,p->name,structname,p->name,i,tmp) ;
-              else              fprintf(fp," CALL rsl_register_f90 ( %s%s %s )\n"   ,structname,p->name,tmp) ;
+              sprintf(tmp2, "(grid%%em31-grid%%sm31+1)*(grid%%em32-grid%%sm32+1)*(grid%%em33-grid%%sm33+1)*%cWORDSIZE",tc) ;
+              if ( p->ntl > 1 ) fprintf(fp," IF(1+%d.LE.num_%s)CALL rsl_register_f90_base_and_size ( %s%s_%d %s , &\n %s  )\n",
+                                             member_number,p->name,structname,p->name,i,tmp,tmp2) ;
+              else              fprintf(fp," IF(1+%d.LE.num_%s)CALL rsl_register_f90_base_and_size ( %s%s %s, &\n %s )\n",
+                                             member_number,p->name,structname,p->name,tmp,tmp2) ;
               member_number++ ;
             }
           }
           else
           {
             strcpy (indices,"");
-            if ( sw_deref_kludge && parent_type == DERIVED ) 
+            if ( sw_deref_kludge ) /* && parent_type == DERIVED )  */
             {
               sprintf(post,")") ;
               sprintf(indices, "%s",index_with_firstelem("(","",tmp,p,post)) ;
             }
-            if ( p->ntl > 1 ) fprintf(fp," CALL rsl_register_f90 ( %s%s_%d%s )\n",structname,p->name,i,indices) ;
-            else              fprintf(fp," CALL rsl_register_f90 ( %s%s%s )\n"   ,structname,p->name,indices) ;
+            if ( p->ntl > 1 ) fprintf(fp," CALL rsl_register_f90_base_and_size ( %s%s_%d%s , SIZE( %s%s_%d ) * %cWORDSIZE )\n",
+                                                                                   structname,p->name,i,indices,
+                                                                                   structname,p->name,i,tc ) ;
+            else              fprintf(fp," CALL rsl_register_f90_base_and_size ( %s%s%s , SIZE( %s%s  ) * %cWORDSIZE )\n",
+                                                                                   structname,p->name,indices,
+                                                                                   structname,p->name, tc) ;
           }
         }
       }
@@ -877,16 +915,7 @@ gen_nest_unpack ( char * dirname )
           fprintf(fp,"CALL rsl_from_child_info(i,j,pig,pjg,cm,cn,nig,njg,retval)\n") ;
           fprintf(fp,"DO while ( retval .eq. 1 )\n") ;
 
-#if 0
-          fprintf(fp," if ( pig .ge. ips_save+1 .and. pjg .ge. jps_save+1 .and. &\n") ;
-          fprintf(fp,"      pig .le. ipe_save-1 .and. pjg .le. jpe_save-1    ) then\n") ;
-#endif
-
           gen_nest_packunpack ( fp , Domain.fields, corename, UNPACKIT, down_path[ipath] ) ;
-
-#if 0
-          fprintf(fp,"endif\n") ;
-#endif
 
           fprintf(fp,"CALL rsl_from_child_info(i,j,pig,pjg,cm,cn,nig,njg,retval)\n") ;
           fprintf(fp,"ENDDO\n") ;
@@ -959,7 +988,6 @@ gen_nest_packunpack ( FILE *fp , node_t * node , char * corename, int dir, int d
           c = ( dir == UNPACKIT )?'n':'p' ;
           d = ( dir == UNPACKIT )?'2':'1' ;
         }
-#if 1
 
         if ( zdex >= 0 ) {
           if      ( xdex == 0 && zdex == 1 && ydex == 2 )  sprintf(dexes,"pig,k,pjg") ;
@@ -969,53 +997,6 @@ gen_nest_packunpack ( FILE *fp , node_t * node , char * corename, int dir, int d
           if ( xdex == 0 && ydex == 1 )  sprintf(dexes,"pig,pjg") ;
           if ( ydex == 0 && xdex == 1 )  sprintf(dexes,"pjg,pig") ;
         }
-
-#else
-        if      ( dir == PACKIT   && ( down_path == INTERP_DOWN || down_path == FORCE_DOWN ))
-        {
-          if ( zdex >= 0 ) {
-            if      ( xdex == 0 && zdex == 1 && ydex == 2 )  sprintf(dexes,"%cig+%c*shw,k,%cjg+%c*shw",c,d,c,d) ;
-            else if ( zdex == 0 && xdex == 1 && ydex == 2 )  sprintf(dexes,"k,%cig+%c*shw,%cjg+%c*shw",c,d,c,d) ;
-            else if ( xdex == 0 && ydex == 1 && zdex == 2 )  sprintf(dexes,"%cig+%c*shw,%cjg+%c*shw,k",c,d,c,d) ;
-          } else {
-            if ( xdex == 0 && ydex == 1 )  sprintf(dexes,"%cig+%c*shw,%cjg+%c*shw",c,d,c,d) ;
-            if ( ydex == 0 && xdex == 1 )  sprintf(dexes,"%cjg+%c*shw,%cig+%c*shw",c,d,c,d) ;
-          }
-        }
-        else  if ( dir == UNPACKIT && ( down_path == INTERP_DOWN || down_path == FORCE_DOWN ))
-        {
-          if ( zdex >= 0 ) {
-            if      ( xdex == 0 && zdex == 1 && ydex == 2 )  sprintf(dexes,"%cig+i_parent_start-1-shw,k,%cjg+j_parent_start-1-shw",c,c) ;
-            else if ( zdex == 0 && xdex == 1 && ydex == 2 )  sprintf(dexes,"k,%cig+i_parent_start-1-shw,%cjg+j_parent_start-1-shw",c,c) ;
-            else if ( xdex == 0 && ydex == 1 && zdex == 2 )  sprintf(dexes,"%cig+i_parent_start-1-shw,%cjg+j_parent_start-1,shw,k",c,c) ;
-          } else {
-            if ( xdex == 0 && ydex == 1 )  sprintf(dexes,"%cig+i_parent_start-1-shw,%cjg+j_parent_start-1-shw",c,c) ;
-            if ( ydex == 0 && xdex == 1 )  sprintf(dexes,"%cjg+j_parent_start-1-shw,%cig+i_parent_start-1-shw",c,c) ;
-          }
-        }
-        else  if ( dir == PACKIT   && down_path == INTERP_UP )
-        {
-          if ( zdex >= 0 ) {
-            if      ( xdex == 0 && zdex == 1 && ydex == 2 )  sprintf(dexes,"%cig+i_parent_start-1-shw,k,%cjg+j_parent_start-1-shw",c,c) ;
-            else if ( zdex == 0 && xdex == 1 && ydex == 2 )  sprintf(dexes,"k,%cig+i_parent_start-1-shw,%cjg+j_parent_start-1-shw",c,c) ;
-            else if ( xdex == 0 && ydex == 1 && zdex == 2 )  sprintf(dexes,"%cig+i_parent_start-1-shw,%cjg+j_parent_start-1,shw,k",c,c) ;
-          } else {
-            if ( xdex == 0 && ydex == 1 )  sprintf(dexes,"%cig+i_parent_start-1-shw,%cjg+j_parent_start-1-shw",c,c) ;
-            if ( ydex == 0 && xdex == 1 )  sprintf(dexes,"%cjg+j_parent_start-1-shw,%cig+i_parent_start-1-shw",c,c) ;
-          }
-        }
-        else  if ( dir == UNPACKIT && down_path == INTERP_UP )
-        {
-          if ( zdex >= 0 ) {
-            if      ( xdex == 0 && zdex == 1 && ydex == 2 )  sprintf(dexes,"%cig+%c*shw,k,%cjg+%c*shw",c,d,c,d) ;
-            else if ( zdex == 0 && xdex == 1 && ydex == 2 )  sprintf(dexes,"k,%cig+%c*shw,%cjg+%c*shw",c,d,c,d) ;
-            else if ( xdex == 0 && ydex == 1 && zdex == 2 )  sprintf(dexes,"%cig+%c*shw,%cjg+%c*shw,k",c,d,c,d) ;
-          } else {
-            if ( xdex == 0 && ydex == 1 )  sprintf(dexes,"%cig+%c*shw,%cjg+%c*shw",c,d,c,d) ;
-            if ( ydex == 0 && xdex == 1 )  sprintf(dexes,"%cjg+%c*shw,%cig+%c*shw",c,d,c,d) ;
-          }
-        }
-#endif
 
         /* construct variable name */
         if ( p->scalar_array_member )
@@ -1047,11 +1028,7 @@ fprintf(fp,"IF ( P_%s .GE. PARAM_FIRST_SCALAR ) THEN\n",p->name) ;
             if ( zdex >= 0 ) {
 fprintf(fp,"CALL rsl_from_child_msg(((%s)-(%s)+1)*RWORDSIZE,xv) ;\n",ddim[zdex][1], ddim[zdex][0] ) ;
             } else {
-#if 0
-fprintf(fp,"CALL rsl_from_child_msg(RWORDSIZE,xv)\n%s = xv(1)\n", vname) ;
-#else
 fprintf(fp,"CALL rsl_from_child_msg(RWORDSIZE,xv)\n" ) ;
-#endif
             }
 fprintf(fp,"IF ( %s_cd_feedback_mask( pig, ips_save, ipe_save , pjg, jps_save, jpe_save, %s, %s ) ) THEN\n",
                  corename, p->stag_x?".TRUE.":".FALSE." ,p->stag_y?".TRUE.":".FALSE." ) ;

@@ -14,10 +14,10 @@ subroutine da_transform_xtoy_qscat( xa, iv, xp, y )
    
    IF ( iv%num_qscat > 0 ) THEN
 
-      y%qscat(:)%u = 0.0
-      y%qscat(:)%v = 0.0
+!xyh      y%qscat(:)%u = 0.0
+!xyh      y%qscat(:)%v = 0.0
 
-      do n=1, iv % num_qscat
+      do n=iv%ob_numb(iv%current_ob_time-1)%qscat + 1, iv%ob_numb(iv%current_ob_time)%qscat
 
        if(iv%qscat(n)%loc%proc_domain_with_halo) then
 

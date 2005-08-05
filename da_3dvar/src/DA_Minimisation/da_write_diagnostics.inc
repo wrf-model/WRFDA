@@ -1,11 +1,14 @@
       subroutine DA_Write_Diagnostics( ob, iv, re, y, xp, xa, j )
-
 !---- -------------------------------------------------------------------------
 !  PURPOSE: Output data assimilation diagnostics.
 !
 !  METHOD:  See individual routines.
 !
 !  HISTORY: 04/07/2000 - Creation of F90 version.           Dale Barker
+!           03/04/2005 - CMV's from Geostationary and       Syed  RH  Rizvi
+!                        Polar orbiting satellite are
+!                        seperated & used as profile
+!
 !
 !  PARENT_MODULE: DA_Diagnostics
 !------------------------------------------------------------------------------
@@ -37,11 +40,17 @@
 !  [1.2] Surface:
 
       call DA_OI_Stats_Synop ( stats_unit, iv )
-
-!  [1.3] Cloud track winds:
-
-      call DA_OI_Stats_Satob ( stats_unit, iv )
  
+!  [1.3.1] Geostationary Satellite Cloud track winds:
+
+      call DA_OI_Stats_GeoAMV ( stats_unit, iv )
+
+
+!  [1.3.2] Polar Satellite Cloud track winds:
+
+      call DA_OI_Stats_PolarAMV ( stats_unit, iv )
+
+
 !  [1.4] Aireps:
 
       call DA_OI_Stats_Airep ( stats_unit, iv )
@@ -102,6 +111,10 @@
 
       call DA_OI_Stats_Radar ( stats_unit, iv )
 
+!  [1.19] TC bogus:
+
+      call DA_OI_Stats_bogus ( stats_unit, iv )
+
 
 !---- -------------------------------------------------------------------------
 !  [2.0] Calculate residual vector (O-A) statistics:
@@ -109,6 +122,7 @@
 
 !  [2.1] Sondes:
 
+      num_sound_tot = 0
       call DA_AO_Stats_Sound ( stats_unit, iv, re )
       call DA_AO_Stats_Sonde_sfc ( stats_unit, iv, re )
 
@@ -116,9 +130,16 @@
 
       call DA_AO_Stats_Synop ( stats_unit, iv, re )
 
-!  [2.3] Cloud track winds:
+!  [2.3.1] Geostationary Satellite Cloud track winds:
 
-      call DA_AO_Stats_Satob ( stats_unit, iv, re )
+      call DA_AO_Stats_GeoAMV ( stats_unit, iv, re )
+
+
+!  [2.3.2] Polar Satellite Cloud track winds:
+
+      call DA_AO_Stats_PolarAMV ( stats_unit, iv, re )
+
+
 
 !  [2.4] Aireps:
 
@@ -180,6 +201,10 @@
 
       call DA_AO_Stats_Radar ( stats_unit, iv, re )
 
+!  [2.19] TC bogus:
+
+      call DA_AO_Stats_Bogus ( stats_unit, iv, re )
+
 !---- -------------------------------------------------------------------------
 !  [3.0] Calculate analysis increment (A-B) statistics:
 !------------------------------------------------------------------------------
@@ -194,9 +219,10 @@
 !---- -------------------------------------------------------------------------
 !  [5.0] Write observation data (O, O-B, O-A, y=hx'):
 !------------------------------------------------------------------------------
-
-   if ( wrf_dm_on_monitor()  ) then
+!rizvi   if ( wrf_dm_on_monitor()  ) then
       call da_write_obs( ob, iv, re )
+!rizvi   end if
+   if ( wrf_dm_on_monitor()  ) then
       call da_write_y( iv, y )
    end if
  

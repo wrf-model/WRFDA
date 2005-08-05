@@ -14,7 +14,7 @@ subroutine da_transform_xtoy_qscat_adj( iv, xp, jo_grad_y, jo_grad_x )
 
    IF ( iv%num_qscat > 0 ) THEN
 
-      DO n=1, iv % num_qscat
+      do n=iv%ob_numb(iv%current_ob_time-1)%qscat + 1, iv%ob_numb(iv%current_ob_time)%qscat
       
        if(iv%qscat(n)%loc%proc_domain_with_halo) then
 

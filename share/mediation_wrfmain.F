@@ -28,7 +28,7 @@ SUBROUTINE med_initialdata_input ( grid , config_flags )
   ! Model layer
    USE module_configure
    USE module_bc_time_utilities
-   USE esmf_mod
+   USE module_utility
 
    IMPLICIT NONE
 
@@ -50,7 +50,7 @@ SUBROUTINE med_initialdata_input ( grid , config_flags )
    CHARACTER (LEN=80)     :: inpname , rstname, timestr
    CHARACTER (LEN=80)     :: message
    LOGICAL                :: restart
-   TYPE(ESMF_Time)        :: CurrTime
+   TYPE(WRF_UTIL_Time)        :: CurrTime
 
 
    CALL nl_get_restart( 1, restart )
@@ -63,8 +63,8 @@ SUBROUTINE med_initialdata_input ( grid , config_flags )
         CALL       wrf_debug ( 1 , 'wrf main: calling open_r_dataset for wrfinput' )
 
 ! typically <date> will not be part of input_inname but allow for it
-        CALL ESMF_ClockGetCurrTime( grid%domain_clock, CurrTime=CurrTime, rc=ierr )
-        CALL ESMF_TimeGetString( CurrTime, timestr, rc=ierr )
+        CALL WRF_UTIL_ClockGet( grid%domain_clock, CurrTime=CurrTime, rc=ierr )
+        CALL wrf_timetoa ( CurrTime, timestr )
         CALL construct_filename2a ( inpname , config_flags%input_inname , grid%id , 2 , timestr )
 
         CALL open_r_dataset ( fid, TRIM(inpname) , grid , config_flags , "DATASET=INPUT", ierr )
@@ -72,9 +72,31 @@ SUBROUTINE med_initialdata_input ( grid , config_flags )
           WRITE( wrf_err_message , * ) 'program wrf: error opening ',TRIM(inpname),' for reading ierr=',ierr
           CALL WRF_ERROR_FATAL ( wrf_err_message )
         ENDIF
-        CALL       wrf_debug ( 100 , 'wrf: calling input_model_input' )
-        CALL input_model_input ( fid ,   grid , config_flags , ierr )
-        CALL       wrf_debug ( 100 , 'wrf: back from input_model_input' )
+        IF      ( ( grid%id .EQ. 1 ) .OR. ( config_flags%fine_input_stream .EQ. 0 ) ) THEN
+           CALL wrf_debug              (   0 , 'med_initialdata_input: calling input_model_input' )
+           CALL input_model_input      ( fid ,  grid , config_flags , ierr )
+           CALL wrf_debug              ( 100 , 'med_initialdata_input: back from input_model_input' )
+        ELSE IF   ( config_flags%fine_input_stream .EQ. 1 ) THEN
+           CALL wrf_debug              (   0 , 'med_initialdata_input: calling input_aux_model_input1' )
+           CALL input_aux_model_input1 ( fid ,   grid , config_flags , ierr )
+           CALL wrf_debug              ( 100 , 'med_initialdata_input: back from input_aux_model_input1' )
+        ELSE IF   ( config_flags%fine_input_stream .EQ. 2 ) THEN
+           CALL wrf_debug              (   0 , 'med_initialdata_input: calling input_aux_model_input2' )
+           CALL input_aux_model_input2 ( fid ,   grid , config_flags , ierr )
+           CALL wrf_debug              ( 100 , 'med_initialdata_input: back from input_aux_model_input2' )
+        ELSE IF   ( config_flags%fine_input_stream .EQ. 3 ) THEN
+           CALL wrf_debug              (   0 , 'med_initialdata_input: calling input_aux_model_input3' )
+           CALL input_aux_model_input3 ( fid ,   grid , config_flags , ierr )
+           CALL wrf_debug              ( 100 , 'med_initialdata_input: back from input_aux_model_input3' )
+        ELSE IF   ( config_flags%fine_input_stream .EQ. 4 ) THEN
+           CALL wrf_debug              (   0 , 'med_initialdata_input: calling input_aux_model_input4' )
+           CALL input_aux_model_input4 ( fid ,   grid , config_flags , ierr )
+           CALL wrf_debug              ( 100 , 'med_initialdata_input: back from input_aux_model_input4' )
+        ELSE IF   ( config_flags%fine_input_stream .EQ. 5 ) THEN
+           CALL wrf_debug              (   0 , 'med_initialdata_input: calling input_aux_model_input5' )
+           CALL input_aux_model_input5 ( fid ,   grid , config_flags , ierr )
+           CALL wrf_debug              ( 100 , 'med_initialdata_input: back from input_aux_model_input5' )
+        END IF
         CALL close_dataset ( fid , config_flags , "DATASET=INPUT" )
 #ifdef MOVE_NESTS
         grid%nest_pos = grid%ht
@@ -87,12 +109,12 @@ SUBROUTINE med_initialdata_input ( grid , config_flags )
      grid%imask_xystag = 1
      CALL start_domain ( grid , .TRUE. )
    ELSE
-     CALL ESMF_ClockGetCurrTime( grid%domain_clock, CurrTime=CurrTime, rc=ierr )
-     CALL ESMF_TimeGetString( CurrTime, timestr, rc=ierr )
+     CALL WRF_UTIL_ClockGet( grid%domain_clock, CurrTime=CurrTime, rc=ierr )
+     CALL wrf_timetoa ( CurrTime, timestr )
      CALL construct_filename2a ( rstname , config_flags%rst_inname , grid%id , 2 , timestr )
 
-     WRITE(message,*)'opening ',TRIM(rstname),' for reading'
-     CALL wrf_debug ( 1 , message )
+     WRITE(message,*)'RESTART run: opening ',TRIM(rstname),' for reading'
+     CALL wrf_message (  message )
      CALL open_r_dataset ( fid , TRIM(rstname) , grid , config_flags , "DATASET=RESTART", ierr )
      IF ( ierr .NE. 0 ) THEN
        WRITE( message , '("program wrf: error opening ",A32," for reading")') TRIM(rstname)

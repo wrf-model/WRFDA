@@ -8,10 +8,12 @@ OBJS_FOR_ALL =		da_solve_v3d.o		\
 			DA_VToX_Transforms.o	\
 			DA_Obs.o		\
 			DA_Metar.o		\
-			DA_Satob.o		\
+			DA_GeoAMV.o	       \
+			DA_PolarAMV.o	       \
 			DA_Ships.o		\
 			DA_Synop.o		\
 			DA_Sound.o		\
+			DA_Bogus.o		\
 			DA_Airep.o		\
 			DA_Pilot.o		\
 			DA_Radar.o		\
@@ -42,14 +44,66 @@ OBJS_FOR_ALL =		da_solve_v3d.o		\
 			da_mat.o      		\
 			da_rfz.o      		\
 			LAPACK.o		\
+			da_spectral.o           \
+			da_fftpack5.o           \
+			da_gen_be.o             \
 			BLAS.o
 
-OBJS_FOR_GEN_BE =	DA_Constants.o		\
+OBJS_4_GEN_BE_SHORT =	DA_Constants.o		\
 			da_gen_be.o		\
 			da_fftpack5.o		\
+			be_spectral.o           \
 			LAPACK.o		\
-			BLAS.o			\
-			da_spectral.o
+			BLAS.o
+
+OBJS_4_GEN_BE_LONG =	DA_Constants.o		\
+			par_util.o              \
+			DA_Setup_Structures.o	\
+			DA_VToX_Transforms.o	\
+			DA_Obs.o		\
+			DA_Metar.o		\
+			DA_GeoAMV.o		\
+			DA_PolarAMV.o		\
+			DA_Ships.o		\
+			DA_Synop.o		\
+			DA_Sound.o		\
+			DA_Bogus.o		\
+			DA_Airep.o		\
+			DA_Pilot.o		\
+			DA_Radar.o		\
+			DA_Gen_Be_Stats.o	\
+			DA_Gpspw.o		\
+			DA_Gpsref.o		\
+			DA_SSMI.o		\
+			DA_Satem.o		\
+			da_qscat.o		\
+			da_pseudo.o		\
+			DA_Profiler.o		\
+			DA_Buoy.o   		\
+			DA_ReadWrite_MM5.o	\
+			DA_Dynamics.o		\
+			DA_Physics.o		\
+			DA_FFTs.o		\
+			DA_Test.o		\
+			DA_Tools.o		\
+			DA_Grid_Definitions.o	\
+			DA_Define_Structures.o	\
+			DA_Recursive_Filter.o	\
+			DA_Interpolation.o	\
+			DA_Statistics.o		\
+	                da_bufrlib.o 		\
+			da_h_ops.o		\
+			da_c_mat.o		\
+			da_rf.o			\
+			da_mat.o      		\
+			da_rfz.o      		\
+			LAPACK.o		\
+			da_spectral.o           \
+			be_spectral.o           \
+			da_fftpack5.o           \
+			da_gen_be.o             \
+			da_stats_be.o           \
+			BLAS.o
 
 include ../../configure.wrf
 
@@ -57,10 +111,11 @@ TARGETDIR    =  ../..
 3dvar :		$(OBJS_FOR_ALL)
 		$(AR) ../../main/libwrflib.a $(OBJS_FOR_ALL)
 
-include ../../configure.wrf
+gen_be_short :	$(OBJS_4_GEN_BE_SHORT)
+		$(AR) ../../main/libwrflib.a $(OBJS_4_GEN_BE_SHORT)
 
-gen_be :	$(OBJS_FOR_GEN_BE)
-		$(AR) ../../main/libwrflib.a $(OBJS_FOR_GEN_BE)
+gen_be_long :	$(OBJS_4_GEN_BE_LONG)
+		$(AR) ../../main/libwrflib.a $(OBJS_4_GEN_BE_LONG)
 
 ##########################################################################
 
@@ -114,10 +169,12 @@ DA_Minimisation.o:	\
 			DA_VToX_Transforms.o \
 			DA_Obs.o \
 			DA_Metar.o \
-			DA_Satob.o \
+			DA_GeoAMV.o \
+			DA_PolarAMV.o \
 			DA_Ships.o \
 			DA_Synop.o \
 			DA_Sound.o \
+			DA_Bogus.o \
 			DA_Airep.o \
 			DA_Pilot.o \
 			DA_Radar.o \
@@ -136,6 +193,7 @@ DA_Minimisation.o:	\
 			DA_Minimisation/da_calculate_residual.inc \
 			DA_Minimisation/da_get_var_diagnostics.inc \
 			DA_Minimisation/da_get_innov_vector.inc \
+			DA_Minimisation/da_dot.inc \
 			DA_Minimisation/da_lmdir.inc \
 			DA_Minimisation/da_minimisation_warning.inc \
 			DA_Minimisation/da_minimise.inc \
@@ -162,6 +220,8 @@ DA_Setup_Structures.o:	\
 			da_h_ops.o \
 	                da_bufrlib.o \
 	                DA_ReadWrite_MM5.o \
+	                da_spectral.o \
+	                da_gen_be.o  \
 			DA_Setup_Structures/DA_Setup_Structures.F \
 			DA_Setup_Structures/da_add_increments.inc \
 			DA_Setup_Structures/DA_Add_PBL_And_SFC_Info.inc \
@@ -174,9 +234,13 @@ DA_Setup_Structures.o:	\
 			DA_Setup_Structures/da_setup_background_errors.inc \
 			DA_Setup_Structures/da_setup_background_errors2.inc \
 			DA_Setup_Structures/da_setup_background_errors3.inc \
+			DA_Setup_Structures/da_setup_background_errors4.inc \
+			DA_Setup_Structures/da_setup_background_errors5.inc \
+			DA_Setup_Structures/DA_Get_Bins_Info.inc            \
 			DA_Setup_Structures/da_setup_firstguess.inc \
 			DA_Setup_Structures/da_setup_firstguess_mm5.inc \
 			DA_Setup_Structures/da_setup_firstguess_wrf.inc \
+			DA_Setup_Structures/da_setup_firstguess_kma.inc \
 			DA_Setup_Structures/da_setup_obs_structures.inc \
 			DA_Setup_Structures/da_setup_obs_structures_ascii.inc \
 			DA_Setup_Structures/da_setup_obs_structures_bufr.inc \
@@ -184,7 +248,14 @@ DA_Setup_Structures.o:	\
 			DA_Setup_Structures/da_setup_runconstants.inc \
 			DA_Setup_Structures/da_transfer_mm5toxb.inc \
 			DA_Setup_Structures/da_transfer_wrftoxb.inc \
+			DA_Setup_Structures/da_transfer_kmatoxb.inc \
 			DA_Setup_Structures/da_transfer_xatowrf.inc \
+			DA_Setup_Structures/da_transfer_xatokma.inc \
+			DA_Setup_Structures/DA_Write_KMA_Increments.inc   \
+			DA_Setup_Structures/da_transfer_xatowrftl.inc \
+			DA_Setup_Structures/da_transfer_xatowrftl_adj.inc \
+			DA_Setup_Structures/da_transfer_wrftltoxa.inc \
+			DA_Setup_Structures/da_transfer_wrftltoxa_adj.inc \
 			DA_Setup_Structures/DA_Transfer_XatoAnalysis.inc \
 			DA_Setup_Structures/da_write_increments.inc
 			$(RM) $@
@@ -194,7 +265,8 @@ DA_Setup_Structures.o:	\
 da_bufrlib.o:		\
 			da_bufrlib/da_bufrlib.f
 			$(RM) $@
-			$(F77) -c -I./da_bufrlib $(F77FLAGS_BUFR) $(MODULE_DIRS) da_bufrlib/da_bufrlib.f
+			$(CPP) -I./da_bufrlib $(CPPFLAGS_3DVAR)  da_bufrlib/da_bufrlib.f > da_bufrlib.f
+			$(F77) -c -I./da_bufrlib $(F77FLAGS_BUFR) $(MODULE_DIRS) da_bufrlib.f
 
 DA_VToX_Transforms.o:	\
 			par_util.o \
@@ -204,10 +276,14 @@ DA_VToX_Transforms.o:	\
 			DA_Constants.o \
 			DA_Dynamics.o \
 			DA_Physics.o \
+			da_fftpack5.o \
+			da_spectral.o \
 			DA_SSMI.o \
 			DA_VToX_Transforms/DA_VToX_Transforms.F \
 			DA_VToX_Transforms/DA_Transform_VToVv.inc \
 			DA_VToX_Transforms/DA_Transform_VToVv_Adj.inc \
+			DA_VToX_Transforms/DA_Transform_VToVv_Global.inc \
+			DA_VToX_Transforms/DA_Transform_VToVv_Global_Adj.inc \
 			DA_VToX_Transforms/da_transform_vtox.inc \
 			DA_VToX_Transforms/da_transform_vtox_adj.inc \
 			DA_VToX_Transforms/DA_Transform_VpToVv.inc \
@@ -221,6 +297,10 @@ DA_VToX_Transforms.o:	\
 			DA_VToX_Transforms/da_apply_rf_adj.inc    \
 			DA_VToX_Transforms/da_transform_bal.inc   \
 			DA_VToX_Transforms/da_transform_bal_adj.inc   \
+			DA_VToX_Transforms/DA_Get_VPoles.inc   \
+			DA_VToX_Transforms/DA_Get_SPoles.inc   \
+			DA_VToX_Transforms/DA_Get_AVPoles.inc   \
+			DA_VToX_Transforms/DA_Get_ASPoles.inc   \
 			DA_VToX_Transforms/DA_Vertical_Transform.inc
 			$(RM) $@
 			$(CPP) -I./DA_VToX_Transforms $(CPPFLAGS_3DVAR) DA_VToX_Transforms/DA_VToX_Transforms.F > DA_VToX_Transforms.f
@@ -236,11 +316,13 @@ DA_Obs.o:		\
 			DA_Pilot.o \
 			DA_Radar.o \
 			DA_SSMI.o \
-			DA_Satob.o \
+			DA_GeoAMV.o \
+			DA_PolarAMV.o \
 			DA_Satem.o \
 			DA_Ships.o \
 			DA_Synop.o \
 			DA_Sound.o \
+			DA_Bogus.o \
 			da_pseudo.o \
 			da_qscat.o \
 			DA_Profiler.o \
@@ -310,26 +392,47 @@ DA_Metar.o:		\
 			$(CPP) -I./DA_Metar $(CPPFLAGS_3DVAR) DA_Metar/DA_Metar.F > DA_Metar.f
 			$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) DA_Metar.f
 
-DA_Satob.o:		\
+DA_GeoAMV.o:		\
 			DA_Constants.o \
 			par_util.o \
 			DA_Define_Structures.o \
 			DA_Interpolation.o \
 			DA_Statistics.o \
 			DA_Tools.o \
-			DA_Satob/DA_Satob.F \
-			DA_Satob/DA_AO_Stats_Satob.inc \
-			DA_Satob/DA_Calculate_Jo_and_GradY_Satob.inc \
-			DA_Satob/DA_Calculate_Residual_Satob.inc \
-			DA_Satob/DA_OI_Stats_Satob.inc \
-			DA_Satob/DA_Print_Stats_Satob.inc \
-			DA_Satob/DA_Transform_XToY_Satob.inc \
-			DA_Satob/DA_Transform_XToY_Satob_Adj.inc \
-			DA_Satob/da_check_max_iv_satob.inc \
-			DA_Satob/da_get_innov_vector_satob.inc
+			DA_GeoAMV/DA_GeoAMV.F \
+			DA_GeoAMV/DA_AO_Stats_GeoAMV.inc \
+			DA_GeoAMV/DA_Get_Jo_and_GradY_GeoAMV.inc \
+			DA_GeoAMV/DA_Calculate_Residual_GeoAMV.inc \
+			DA_GeoAMV/DA_OI_Stats_GeoAMV.inc \
+			DA_GeoAMV/DA_Print_Stats_GeoAMV.inc \
+			DA_GeoAMV/DA_Transform_XToY_GeoAMV.inc \
+			DA_GeoAMV/DA_Transform_XToY_GeoAMV.inc \
+			DA_GeoAMV/da_check_max_iv_geoamv.inc \
+			DA_GeoAMV/da_get_innov_vector_geoamv.inc
 			$(RM) $@
-			$(CPP) -I./DA_Satob $(CPPFLAGS_3DVAR) DA_Satob/DA_Satob.F > DA_Satob.f
-			$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) DA_Satob.f
+			$(CPP) -I./DA_GeoAMV $(CPPFLAGS_3DVAR) DA_GeoAMV/DA_GeoAMV.F > DA_GeoAMV.f
+			$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) DA_GeoAMV.f
+
+DA_PolarAMV.o:		\
+			DA_Constants.o \
+			par_util.o \
+			DA_Define_Structures.o \
+			DA_Interpolation.o \
+			DA_Statistics.o \
+			DA_Tools.o \
+			DA_PolarAMV/DA_PolarAMV.F \
+			DA_PolarAMV/DA_AO_Stats_PolarAMV.inc \
+			DA_PolarAMV/DA_Get_Jo_and_GradY_PolarAMV.inc \
+			DA_PolarAMV/DA_Calculate_Residual_PolarAMV.inc \
+			DA_PolarAMV/DA_OI_Stats_PolarAMV.inc \
+			DA_PolarAMV/DA_Print_Stats_PolarAMV.inc \
+			DA_PolarAMV/DA_Transform_XToY_PolarAMV.inc \
+			DA_PolarAMV/DA_Transform_XToY_PolarAMV.inc \
+			DA_PolarAMV/da_check_max_iv_polaramv.inc \
+			DA_PolarAMV/da_get_innov_vector_polaramv.inc
+			$(RM) $@
+			$(CPP) -I./DA_PolarAMV $(CPPFLAGS_3DVAR) DA_PolarAMV/DA_PolarAMV.F > DA_PolarAMV.f
+			$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) DA_PolarAMV.f
 
 DA_Satem.o:		\
 			DA_Constants.o \
@@ -414,7 +517,7 @@ DA_Sound.o:		\
 			DA_Sound/da_get_innov_vector_sound.inc \
 			DA_Sound/da_obs_diagnostics.inc	\
 			DA_Sound/DA_Sonde_sfc/DA_AO_Stats_Sonde_sfc.inc \
-			DA_Sound/DA_Sonde_sfc/DA_Calculate_Jo_and_GradY_Sonde_sfc.inc \
+			DA_Sound/DA_Sonde_sfc/DA_Get_Jo_and_GradY_Sonde_sfc.inc \
 			DA_Sound/DA_Sonde_sfc/DA_Calculate_Residual_Sonde_sfc.inc \
 			DA_Sound/DA_Sonde_sfc/DA_OI_Stats_Sonde_sfc.inc \
 			DA_Sound/DA_Sonde_sfc/DA_Print_Stats_Sonde_sfc.inc \
@@ -469,6 +572,28 @@ DA_Pilot.o:		\
 			$(RM) $@
 			$(CPP) -I./DA_Pilot $(CPPFLAGS_3DVAR) DA_Pilot/DA_Pilot.F > DA_Pilot.f
 			$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) DA_Pilot.f
+
+DA_Bogus.o:		\
+			DA_Constants.o \
+			par_util.o \
+			DA_Define_Structures.o \
+			DA_Interpolation.o \
+			DA_Statistics.o \
+			DA_Tools.o \
+			DA_Physics.o \
+			DA_Bogus/DA_Bogus.F \
+			DA_Bogus/DA_AO_Stats_Bogus.inc \
+			DA_Bogus/DA_Calculate_Jo_and_GradY_Bogus.inc \
+			DA_Bogus/DA_Calculate_Residual_Bogus.inc \
+			DA_Bogus/DA_OI_Stats_Bogus.inc \
+			DA_Bogus/DA_Print_Stats_Bogus.inc \
+			DA_Bogus/DA_Transform_XToY_Bogus.inc \
+			DA_Bogus/DA_Transform_XToY_Bogus_Adj.inc \
+			DA_Bogus/da_check_max_iv_bogus.inc \
+			DA_Bogus/da_get_innov_vector_bogus.inc
+			$(RM) $@
+			$(CPP) -I./DA_Bogus $(CPPFLAGS_3DVAR) DA_Bogus/DA_Bogus.F > DA_Bogus.f
+			$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) DA_Bogus.f
 
 DA_Radar.o:		\
 			DA_Constants.o \
@@ -531,7 +656,7 @@ DA_Gpsref.o:		\
 			DA_Gpsref/DA_Gpsref.F \
 			DA_Gpsref/DA_AO_Stats_Gpsref.inc \
 			DA_Gpsref/DA_Calculate_GradY_Gpsref.inc \
-			DA_Gpsref/DA_Calculate_Jo_and_GradY_Gpsref.inc \
+			DA_Gpsref/DA_Get_Jo_and_GradY_Gpsref.inc \
 			DA_Gpsref/DA_Calculate_Residual_Gpsref.inc \
 			DA_Gpsref/DA_OI_Stats_Gpsref.inc \
 			DA_Gpsref/DA_Print_Stats_Gpsref.inc \
@@ -642,7 +767,7 @@ DA_Profiler.o:		\
 			DA_Tools.o \
 			DA_Profiler/DA_Profiler.F \
 			DA_Profiler/DA_AO_Stats_Profiler.inc \
-			DA_Profiler/DA_Calculate_Jo_and_GradY_Profiler.inc \
+			DA_Profiler/DA_Get_Jo_and_GradY_Profiler.inc \
 			DA_Profiler/DA_Calculate_Residual_Profiler.inc \
 			DA_Profiler/DA_OI_Stats_Profiler.inc \
 			DA_Profiler/DA_Print_Stats_Profiler.inc \
@@ -743,6 +868,7 @@ DA_Dynamics.o:		\
 			DA_Dynamics/DA_UV_To_Divergence_Adj.inc \
 			DA_Dynamics/DA_W_Adjustment_Lin.inc \
 			DA_Dynamics/DA_W_Adjustment_Adj.inc \
+			DA_Dynamics/DA_WZ_BASE.inc          \
 			DA_Dynamics/DA_UV_To_Vorticity.inc
 			$(RM) $@
 			$(CPP) -I./DA_Dynamics $(CPPFLAGS_3DVAR) DA_Dynamics/DA_Dynamics.F > DA_Dynamics.f
@@ -764,6 +890,8 @@ DA_Physics.o:		\
 			DA_Physics/DA_TPQ_To_RH.inc \
 			DA_Physics/DA_TPQ_To_RH_Lin.inc \
 			DA_Physics/DA_TPQ_To_SLP.inc \
+			DA_Physics/DA_TPQ_To_SLP_Lin.inc \
+			DA_Physics/DA_TPQ_To_SLP_Adj.inc \
 			DA_Physics/DA_TPQ_To_Thickness.inc \
 			DA_Physics/DA_TPRH_To_Q_Adj.inc \
 			DA_Physics/DA_TPRH_To_Q_Lin.inc \
@@ -795,6 +923,7 @@ DA_Physics.o:		\
 			DA_Physics/da_sfc_pre_Adj.inc \
 			DA_Physics/da_filter.inc \
 			DA_Physics/da_filter_adj.inc \
+			DA_Physics/da_wdt.inc        \
 			DA_Physics/DA_Moist_Phys_Adj.inc \
 			DA_Physics/DA_Moist_Phys_Lin.inc
 			$(RM) $@
@@ -825,6 +954,7 @@ DA_Tools.o:		\
 			DA_Tools/DA_Diff_Seconds.inc \
 			DA_Tools/DA_Read_Namelist.inc \
 			DA_Tools/DA_Obs_Sfc_correction.inc \
+			DA_Tools/da_global_ll_to_xy.inc \
 			DA_Tools/DA_ll_to_xy.inc \
 			DA_Tools/Residual.inc \
 			DA_Tools/da_add_noise.inc \
@@ -833,15 +963,17 @@ DA_Tools.o:		\
 			DA_Tools/da_max_error_qc.inc \
 			DA_Tools/da_random_omb.inc \
 			DA_Tools/da_random_seed.inc \
-			DA_Tools/da_set_randomcv.inc \
 			DA_Tools/gaus_noise.inc \
 			DA_Tools/llxy.inc \
 			DA_Tools/open_afile.inc \
 			DA_Tools/smooth_anl.inc \
 			DA_Tools/toGrid.inc \
 			DA_Tools/unifva.inc \
-			DA_Tools/da_dot.inc \
-			DA_Tools/xyll.inc
+			DA_Tools/DA_Set_Boundary_Xa.inc \
+			DA_Tools/DA_Set_Boundary_Xb.inc \
+			DA_Tools/get_2d_sum.inc \
+			DA_Tools/get_3d_sum.inc \
+			DA_Tools/xyll.inc    
 			$(RM) $@
 			$(CPP) -I./DA_Tools $(CPPFLAGS_3DVAR) DA_Tools/DA_Tools.F > DA_Tools.f
 			$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) DA_Tools.f
@@ -849,6 +981,7 @@ DA_Tools.o:		\
 DA_Recursive_Filter.o:	\
 			DA_Constants.o \
 			DA_Recursive_Filter/DA_Recursive_Filter.F \
+                        DA_Recursive_Filter/da_perform_2drf.inc \
 			DA_Recursive_Filter/DA_Calculate_RF_Factors.inc \
 			DA_Recursive_Filter/DA_RF_Turning_Conditions.inc \
 			DA_Recursive_Filter/DA_Recursive_Filter_1d.inc \
@@ -935,17 +1068,17 @@ DA_Constants.o:		DA_Constants/DA_Constants.F \
 
 da_mat.o:		DA_VToX_Transforms/da_mat.f
 			$(RM) $@
-			$(CPP) DA_VToX_Transforms/da_mat.f > da_mat.f
+			$(CPP) $(TRADFLAG) DA_VToX_Transforms/da_mat.f > da_mat.f
 			$(FC) -c $(FCFLAGS_3DVAR) da_mat.f
 
 da_rfz.o:		DA_VToX_Transforms/da_rfz.f
 			$(RM) $@
-			$(CPP) DA_VToX_Transforms/da_rfz.f > da_rfz.f
+			$(CPP) $(TRADFLAG) DA_VToX_Transforms/da_rfz.f > da_rfz.f
 			$(FC) -c $(FCFLAGS_FFT_RF) da_rfz.f
 
 da_rf.o:		DA_VToX_Transforms/da_rf.f
 			$(RM) $@
-			$(CPP) DA_VToX_Transforms/da_rf.f > da_rf.f
+			$(CPP) $(TRADFLAG) DA_VToX_Transforms/da_rf.f > da_rf.f
 			$(FC) -c $(FCFLAGS_FFT_RF) da_rf.f
 
 LAPACK.o:		\
@@ -998,9 +1131,11 @@ DA_Test.o:	\
 			DA_Radar.o \
 			DA_SSMI.o \
 			DA_Satem.o \
-			DA_Satob.o \
+			DA_GeoAMV.o \
+			DA_PolarAMV.o \
 			DA_Ships.o \
 			DA_Sound.o \
+			DA_Bogus.o \
 			DA_Synop.o \
 			da_pseudo.o \
 			DA_Profiler.o \
@@ -1025,11 +1160,12 @@ DA_Test.o:	\
 			DA_Test/DA_Check_XToY_Adjoint_SSMI.inc \
 			DA_Test/DA_Check_XToY_Adjoint_SSMI_Rv.inc \
 			DA_Test/DA_Check_XToY_Adjoint_SSMI_Tb.inc \
-			DA_Test/DA_Check_XToY_Adjoint_Satem.inc \
-			DA_Test/DA_Check_XToY_Adjoint_Satob.inc \
+			DA_Test/DA_Check_XToY_Adjoint_GeoAMV.inc \
+			DA_Test/DA_Check_XToY_Adjoint_PolarAMV.inc \
 			DA_Test/DA_Check_XToY_Adjoint_Ships.inc \
 			DA_Test/DA_Check_XToY_Adjoint_Sound.inc \
 			DA_Test/DA_Check_XToY_Adjoint_Sonde_sfc.inc \
+			DA_Test/DA_Check_XToY_Adjoint_Bogus.inc \
 			DA_Test/DA_Check_XToY_Adjoint_Synop.inc \
 			DA_Test/DA_Check_XToY_Adjoint_Radar.inc \
 			DA_Test/DA_Check_XToY_Adjoint_Profiler.inc \
@@ -1054,7 +1190,14 @@ da_gen_be.o:	         \
 			DA_VToX_Transforms/DA_Transform_VpToVv.inc	\
 			DA_Tools/da_eof_decomposition.inc	\
 			DA_Tools/da_eof_decomposition_test.inc	\
+                        DA_Recursive_Filter/da_perform_2drf.inc \
+                        DA_Recursive_Filter/DA_Recursive_Filter_1d.inc  \
 			da_gen_be/da_create_bins.inc	\
+                        da_gen_be/da_filter_regcoeffs.inc       \
+                        da_gen_be/da_print_be_stats_h_global.inc       \
+                        da_gen_be/da_print_be_stats_h_regional.inc       \
+                        da_gen_be/da_print_be_stats_p.inc       \
+                        da_gen_be/da_print_be_stats_v.inc       \
 			da_gen_be/da_readwrite_be_stage2.inc	\
 			da_gen_be/da_readwrite_be_stage3.inc	\
 			da_gen_be/da_readwrite_be_stage4.inc	\
@@ -1083,10 +1226,11 @@ da_fftpack5.o:	         \
 			da_fftpack5/xerfft.f	\
 			da_fftpack5/da_fftpack5.F
 			$(CPP) -I./da_fftpack5 $(CPPFLAGS_3DVAR) da_fftpack5/da_fftpack5.F > da_fftpack5.f
-			$(FC) -c $(F77FLAGS_3DVAR) $(MODULE_DIRS) da_fftpack5.f
+			$(F77) -c $(F77FLAGS_3DVAR) $(MODULE_DIRS) da_fftpack5.f
 
 da_spectral.o:		\
 			DA_Constants.o				\
+			DA_Define_Structures.o			\
 			da_fftpack5.o			        \
 			da_spectral/da_asslegpol.inc		\
 			da_spectral/da_calc_power.inc		\
@@ -1100,9 +1244,77 @@ da_spectral.o:		\
 			da_spectral/da_test_spectral.inc	\
 			da_spectral/da_v_to_vv_spectral.inc	\
 			da_spectral/da_vv_to_v_spectral.inc	\
+			da_spectral/da_v_to_vv_spectral_adj.inc	\
+			da_spectral/da_legtra_inv_adj.inc	\
+			da_spectral/da_apply_power.inc		\
 			da_spectral/da_spectral.F
 			$(CPP) -I./da_spectral $(CPPFLAGS_3DVAR) da_spectral/da_spectral.F > da_spectral.f
 			$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) da_spectral.f
+
+be_spectral.o:		\
+			DA_Constants.o				\
+			da_fftpack5.o			        \
+			da_spectral/da_asslegpol.inc		\
+			da_spectral/da_calc_power.inc		\
+			da_spectral/da_get_gausslats.inc	\
+			da_spectral/da_get_reglats.inc		\
+			da_spectral/da_initialize_h.inc		\
+			da_spectral/da_legtra.inc		\
+			da_spectral/da_legtra_inv.inc		\
+			da_spectral/da_setlegpol.inc		\
+			da_spectral/da_setlegpol_test.inc	\
+			da_spectral/da_vv_to_v_spectral.inc	\
+			da_spectral/da_legtra_inv_adj.inc	\
+			da_spectral/da_apply_power.inc		\
+			da_spectral/be_spectral.F
+			$(CPP) -I./da_spectral $(CPPFLAGS_3DVAR) da_spectral/be_spectral.F > be_spectral.f
+			$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) be_spectral.f
+
+da_stats_be.o:		DA_Constants.o		\
+			DA_Define_Structures.o	\
+			DA_Setup_Structures.o	\
+			DA_Test.o		\
+			DA_Tools.o		\
+			DA_Gen_Be_Stats.o	\
+			par_util.o		\
+			da_solve_v3d/da_init_3dvar.inc	\
+			da_stats_be/da_stats_be.F
+			$(RM) $@
+			$(CPP) -I./da_stats_be $(CPPFLAGS_3DVAR) da_stats_be/da_stats_be.F > da_stats_be.f
+			$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) da_stats_be.f
+
+DA_Gen_Be_Stats.o:	../module_wrf_3dvar_io.o		\
+			LAPACK.o				\
+	                DA_FFTs.o				\
+			DA_Test.o				\
+	                DA_Tools.o				\
+	                DA_Dynamics.o				\
+	                DA_Constants.o				\
+	                DA_VToX_Transforms.o			\
+	                DA_Setup_Structures.o			\
+	                DA_Define_Structures.o			\
+	                DA_Gen_Be_Stats/DA_Stats_Namelist.inc	\
+	                DA_Gen_Be_Stats/DA_Statistics_Step0.inc	\
+	                DA_Gen_Be_Stats/DA_advance_cymdh0.inc	\
+	                DA_Gen_Be_Stats/DA_set_current_date.inc	\
+	                DA_Gen_Be_Stats/DA_get_ymdh.inc		\
+	                DA_Gen_Be_Stats/DA_Assign_Value.inc	\
+	                DA_Gen_Be_Stats/DA_Difference.inc	\
+	                DA_Gen_Be_Stats/DA_New_Statistics_Variable.inc \
+	                DA_Gen_Be_Stats/DA_Write_Diff.inc	\
+	                DA_Gen_Be_Stats/DA_Make_Ensemble_Mean.inc \
+	                DA_Gen_Be_Stats/DA_Ens_Sum.inc		\
+	                DA_Gen_Be_Stats/DA_Zero_Ens.inc		\
+	                DA_Gen_Be_Stats/DA_Ens_Magnify.inc	\
+	                DA_Gen_Be_Stats/DA_Test_Transforms.inc	\
+	                DA_Gen_Be_Stats/DA_Mss_Read.inc		\
+	                DA_Gen_Be_Stats/DA_Data_Delete.inc	\
+	                DA_Gen_Be_Stats/DA_Gen_Date.inc		\
+	                DA_Gen_Be_Stats/DA_Make_Filename.inc	\
+			DA_Gen_Be_Stats/DA_Gen_Be_Stats.F
+			$(RM) $@
+			$(CPP) -I./DA_Gen_Be_Stats $(CPPFLAGS_3DVAR) DA_Gen_Be_Stats/DA_Gen_Be_Stats.F > DA_Gen_Be_Stats.f
+			$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) DA_Gen_Be_Stats.f
 
 ##############################################################################
 

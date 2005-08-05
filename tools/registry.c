@@ -1,5 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/time.h>
+#include <sys/resource.h>
+#include <unistd.h>
 
 #define DEFINE_GLOBALS
 #include "protos.h"
@@ -8,11 +11,14 @@
 
 main( int argc, char *argv[], char *env[] )
 {
-  char fname_in[NAMELEN] ;
-  FILE * fp_in ;
+  char fname_in[NAMELEN], fname_tmp[NAMELEN], command[NAMELEN] ;
+  FILE * fp_in, *fp_tmp ;
   char * thisprog  ;
   char * strcpy() ;
+  int mypid ;
+  struct rlimit rlim ;
 
+  mypid = (int) getpid() ;
   strcpy( thiscom, argv[0] ) ;
   argv++ ;
 
@@ -30,6 +36,11 @@ main( int argc, char *argv[], char *env[] )
                                      other data streams are written to file per process */
 
   strcpy( fname_in , "" ) ;
+
+  rlim.rlim_cur = RLIM_INFINITY ;
+  rlim.rlim_max = RLIM_INFINITY ;
+
+  setrlimit ( RLIMIT_STACK , &rlim ) ;
 
   thisprog = *argv ;
   while (*argv) {
@@ -95,9 +106,28 @@ main( int argc, char *argv[], char *env[] )
       fprintf(stderr,"Registry program cannot open %s for reading. Ending.\n", fname_in ) ;
       exit(2) ;
     }
+  
+  sprintf( fname_tmp , "Registry_tmp.%d",mypid) ;
+  if (( fp_tmp = fopen( fname_tmp  , "w" )) == NULL )
+  {
+    fprintf(stderr,"Registry program cannot open temporary %s for writing. Ending.\n", fname_tmp ) ;
+    exit(2) ;
+  }
 
-  reg_parse(fp_in) ;
-  close_the_file(fp_in) ;
+  pre_parse( fp_in, fp_tmp ) ;
+
+  fclose(fp_in) ;
+  fclose(fp_tmp) ;
+
+  if (( fp_tmp = fopen( fname_tmp , "r" )) == NULL )
+  {
+    fprintf(stderr,"Registry program cannot open %s for reading. Ending.\n", fname_tmp ) ;
+    exit(2) ;
+  }
+
+  reg_parse(fp_tmp) ;
+
+  fclose(fp_tmp) ;
 
   check_dimspecs() ;
 
@@ -133,5 +163,10 @@ main( int argc, char *argv[], char *env[] )
   gen_comms( "inc" ) ;    /* this is either package supplied (by copying a */
                           /* gen_comms.c file into this directory) or a    */
                           /* stubs routine.                                */
+
+cleanup:
+  sprintf(command,"/bin/rm -f %s\n",fname_tmp );
+  system( command ) ;
+
 }
 

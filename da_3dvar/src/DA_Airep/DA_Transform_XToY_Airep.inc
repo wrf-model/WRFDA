@@ -14,7 +14,7 @@ Subroutine da_transform_xtoy_airep ( xa, iv, xp, y )
    
    IF ( iv%num_airep > 0 ) THEN
 
-      do n=1, iv % num_airep
+      do n=iv%ob_numb(iv%current_ob_time-1)%airep + 1, iv%ob_numb(iv%current_ob_time)%airep
 
        if(iv%airep(n)%loc%proc_domain_with_halo) then
 
@@ -22,9 +22,9 @@ Subroutine da_transform_xtoy_airep ( xa, iv, xp, y )
 
          if ( k < 1 ) cycle
 
-         y%airep(n)%u(:) = 0.0
-         y%airep(n)%v(:) = 0.0
-         y%airep(n)%t(:) = 0.0
+!xyh         y%airep(n)%u(:) = 0.0
+!xyh         y%airep(n)%v(:) = 0.0
+!xyh         y%airep(n)%t(:) = 0.0
 
 !        [1.1] Get horizontal interpolation weights:
 

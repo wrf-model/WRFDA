@@ -4,6 +4,7 @@ MODULE module_bc
 
    USE module_configure
    USE module_wrf_error
+   IMPLICIT NONE
 
 !   TYPE bcs
 !
@@ -50,6 +51,7 @@ CONTAINS
 ! local variables
 
   INTEGER :: xs_bc, xe_bc, ys_bc, ye_bc, bzone_min
+  INTEGER :: nprocx, nprocy
 
   CALL wrf_debug( 100 , ' checking boundary conditions for grid ' )
 
@@ -172,6 +174,24 @@ CONTAINS
 
        ENDIF
    ENDIF
+
+#ifdef RSL_LITE
+! add a check so that people do not try to specify peridic boundaries
+! if they have compiled with RSL_LITE. It does not support periodic bcs
+   CALL wrf_get_nprocx( nprocx )
+   IF ( nprocx .GT. 1 .AND. config_flags%periodic_x ) THEN
+     WRITE ( wrf_err_message , * ) 'RSL_LITE does not support periodic boundaries for decomposed X-dimension'
+     CALL wrf_message ( TRIM( wrf_err_message ) )
+   ENDIF
+   CALL wrf_get_nprocy( nprocy )
+   IF ( nprocy .GT. 1 .AND. config_flags%periodic_y ) THEN
+     WRITE ( wrf_err_message , * ) 'RSL_LITE does not support periodic boundaries for decomposed Y-dimension'
+     CALL wrf_message ( TRIM( wrf_err_message ) )
+   ENDIF
+   IF ( (nprocy .GT. 1 .AND. config_flags%periodic_y) .OR. (nprocx .GT. 1 .AND. config_flags%periodic_x) ) THEN
+     CALL wrf_error_fatal ( 'Inappropriate selection of periodic bcs detected in boundary_condition_check' )
+   ENDIF
+#endif
 
    CALL wrf_debug ( 100 , ' boundary conditions OK for grid ' )
 
@@ -1696,7 +1716,7 @@ CONTAINS
     INTEGER , INTENT(IN) :: ijds , ijde , spec_bdy_width
     REAL , DIMENSION(ims:ime,kms:kme,jms:jme) , INTENT(IN) :: data3d
 !    REAL , DIMENSION(:,:,:,:) , INTENT(OUT) :: space_bdy
-    REAL , DIMENSION(ijds:ijde,kds:kde,spec_bdy_width,4) , INTENT(OUT) :: space_bdy
+    REAL , DIMENSION(ijds:ijde,kds:kde,spec_bdy_width,4,1) , INTENT(OUT) :: space_bdy
     CHARACTER (LEN=1) , INTENT(IN) :: char_stagger
  
     INTEGER :: i , ii , j , jj , k
@@ -1709,7 +1729,7 @@ CONTAINS
        DO j = MAX(jds,jts) , MIN(jde-1,jte)
        DO k = kds , kde
        DO i = MAX(ids,its) , MIN(ids + spec_bdy_width - 1,ite)
-          space_bdy(j,k,i,P_XSB) = data3d(i,k,j)
+          space_bdy(j,k,i,P_XSB,1) = data3d(i,k,j)
        END DO
        END DO
        END DO
@@ -1717,7 +1737,7 @@ CONTAINS
        DO j = MAX(jds,jts) , MIN(jde-1,jte)
        DO k = kds , kde
        DO i = MAX(ids,its) , MIN(ids + spec_bdy_width - 1,ite)
-          space_bdy(j,k,i,P_XSB) = data3d(i,k,j)
+          space_bdy(j,k,i,P_XSB,1) = data3d(i,k,j)
        END DO
        END DO
        END DO
@@ -1725,7 +1745,7 @@ CONTAINS
        DO j = MAX(jds,jts) , MIN(jde,jte)
        DO k = kds , kde - 1
        DO i = MAX(ids,its) , MIN(ids + spec_bdy_width - 1,ite)
-          space_bdy(j,k,i,P_XSB) = data3d(i,k,j)
+          space_bdy(j,k,i,P_XSB,1) = data3d(i,k,j)
        END DO
        END DO
        END DO
@@ -1733,7 +1753,7 @@ CONTAINS
        DO j = MAX(jds,jts) , MIN(jde-1,jte)
        DO k = kds , kde - 1
        DO i = MAX(ids,its) , MIN(ids + spec_bdy_width - 1,ite)
-          space_bdy(j,k,i,P_XSB) = data3d(i,k,j)
+          space_bdy(j,k,i,P_XSB,1) = data3d(i,k,j)
        END DO
        END DO
        END DO
@@ -1746,7 +1766,7 @@ CONTAINS
        DO k = kds , kde - 1
        DO i = MIN(ide,ite) , MAX(ide - spec_bdy_width + 1,its) , -1
           ii = ide - i + 1
-          space_bdy(j,k,ii,P_XEB) = data3d(i,k,j)
+          space_bdy(j,k,ii,P_XEB,1) = data3d(i,k,j)
        END DO
        END DO
        END DO
@@ -1755,7 +1775,7 @@ CONTAINS
        DO k = kds , kde - 1
        DO i = MIN(ide - 1,ite) , MAX(ide - spec_bdy_width,its) , -1
           ii = ide - i
-          space_bdy(j,k,ii,P_XEB) = data3d(i,k,j)
+          space_bdy(j,k,ii,P_XEB,1) = data3d(i,k,j)
        END DO
        END DO
        END DO
@@ -1764,7 +1784,7 @@ CONTAINS
        DO k = kds , kde
        DO i = MIN(ide - 1,ite) , MAX(ide - spec_bdy_width,its) , -1
           ii = ide - i
-          space_bdy(j,k,ii,P_XEB) = data3d(i,k,j)
+          space_bdy(j,k,ii,P_XEB,1) = data3d(i,k,j)
        END DO
        END DO
        END DO
@@ -1773,7 +1793,7 @@ CONTAINS
        DO k = kds , kde
        DO i = MIN(ide - 1,ite) , MAX(ide - spec_bdy_width,its) , -1
           ii = ide - i
-          space_bdy(j,k,ii,P_XEB) = data3d(i,k,j)
+          space_bdy(j,k,ii,P_XEB,1) = data3d(i,k,j)
        END DO
        END DO
        END DO
@@ -1782,7 +1802,7 @@ CONTAINS
        DO k = kds , kde - 1
        DO i = MIN(ide - 1,ite) , MAX(ide - spec_bdy_width,its) , -1
           ii = ide - i
-          space_bdy(j,k,ii,P_XEB) = data3d(i,k,j)
+          space_bdy(j,k,ii,P_XEB,1) = data3d(i,k,j)
        END DO
        END DO
        END DO
@@ -1794,7 +1814,7 @@ CONTAINS
        DO j = MAX(jds,jts) , MIN(jds + spec_bdy_width - 1,jte)
        DO k = kds , kde
        DO i = MAX(ids,its) , MIN(ide-1,ite)
-          space_bdy(i,k,j,P_YSB) = data3d(i,k,j)
+          space_bdy(i,k,j,P_YSB,1) = data3d(i,k,j)
        END DO
        END DO
        END DO
@@ -1802,7 +1822,7 @@ CONTAINS
        DO j = MAX(jds,jts) , MIN(jds + spec_bdy_width - 1,jte)
        DO k = kds , kde
        DO i = MAX(ids,its) , MIN(ide-1,ite)
-          space_bdy(i,k,j,P_YSB) = data3d(i,k,j)
+          space_bdy(i,k,j,P_YSB,1) = data3d(i,k,j)
        END DO
        END DO
        END DO
@@ -1810,7 +1830,7 @@ CONTAINS
        DO j = MAX(jds,jts) , MIN(jds + spec_bdy_width - 1,jte)
        DO k = kds , kde - 1
        DO i = MAX(ids,its) , MIN(ide,ite)
-          space_bdy(i,k,j,P_YSB) = data3d(i,k,j)
+          space_bdy(i,k,j,P_YSB,1) = data3d(i,k,j)
        END DO
        END DO
        END DO
@@ -1818,7 +1838,7 @@ CONTAINS
        DO j = MAX(jds,jts) , MIN(jds + spec_bdy_width - 1,jte)
        DO k = kds , kde - 1
        DO i = MAX(ids,its) , MIN(ide-1,ite)
-          space_bdy(i,k,j,P_YSB) = data3d(i,k,j)
+          space_bdy(i,k,j,P_YSB,1) = data3d(i,k,j)
        END DO
        END DO
        END DO
@@ -1831,7 +1851,7 @@ CONTAINS
        DO k = kds , kde - 1
        DO i = MAX(ids,its) , MIN(ide-1,ite)
           jj = jde - j + 1
-          space_bdy(i,k,jj,P_YEB) = data3d(i,k,j)
+          space_bdy(i,k,jj,P_YEB,1) = data3d(i,k,j)
        END DO
        END DO
        END DO
@@ -1840,7 +1860,7 @@ CONTAINS
        DO k = kds , kde - 1
        DO i = MAX(ids,its) , MIN(ide,ite)
           jj = jde - j
-          space_bdy(i,k,jj,P_YEB) = data3d(i,k,j)
+          space_bdy(i,k,jj,P_YEB,1) = data3d(i,k,j)
        END DO
        END DO
        END DO
@@ -1849,7 +1869,7 @@ CONTAINS
        DO k = kds , kde
        DO i = MAX(ids,its) , MIN(ide-1,ite)
           jj = jde - j
-          space_bdy(i,k,jj,P_YEB) = data3d(i,k,j)
+          space_bdy(i,k,jj,P_YEB,1) = data3d(i,k,j)
        END DO
        END DO
        END DO
@@ -1858,7 +1878,7 @@ CONTAINS
        DO k = kds , kde
        DO i = MAX(ids,its) , MIN(ide-1,ite)
           jj = jde - j
-          space_bdy(i,k,jj,P_YEB) = data3d(i,k,j)
+          space_bdy(i,k,jj,P_YEB,1) = data3d(i,k,j)
        END DO
        END DO
        END DO
@@ -1867,7 +1887,7 @@ CONTAINS
        DO k = kds , kde - 1
        DO i = MAX(ids,its) , MIN(ide-1,ite)
           jj = jde - j
-          space_bdy(i,k,jj,P_YEB) = data3d(i,k,j)
+          space_bdy(i,k,jj,P_YEB,1) = data3d(i,k,j)
        END DO
        END DO
        END DO
@@ -1894,7 +1914,7 @@ CONTAINS
     INTEGER , INTENT(IN) :: ijds , ijde , spec_bdy_width
     REAL , DIMENSION(ims:ime,kms:kme,jms:jme) , INTENT(IN) :: data3dnew , data3dold
 !    REAL , DIMENSION(:,:,:,:) , INTENT(OUT) :: space_bdy
-    REAL , DIMENSION(ijds:ijde,kds:kde,spec_bdy_width,4) , INTENT(OUT) :: space_bdy
+    REAL , DIMENSION(ijds:ijde,kds:kde,spec_bdy_width,4,1) , INTENT(OUT) :: space_bdy
     CHARACTER (LEN=1) , INTENT(IN) :: char_stagger
     REAL , INTENT(IN) :: time_diff ! seconds
  
@@ -1908,8 +1928,8 @@ CONTAINS
        DO j = MAX(jds,jts) , MIN(jde-1,jte)
        DO k = kds , kde
        DO i = MAX(ids,its) , MIN(ids + spec_bdy_width - 1,ite)
-          space_bdy(j,k,i,P_XSB) = ( data3dnew(i,k,j) - data3dold(i,k,j) ) / time_diff
-!         space_bdy(j,k,i,P_XSB) = 0. ! zeroout
+          space_bdy(j,k,i,P_XSB,1) = ( data3dnew(i,k,j) - data3dold(i,k,j) ) / time_diff
+!         space_bdy(j,k,i,P_XSB,1) = 0. ! zeroout
        END DO
        END DO
        END DO
@@ -1917,8 +1937,8 @@ CONTAINS
        DO j = MAX(jds,jts) , MIN(jde-1,jte)
        DO k = kds , kde
        DO i = MAX(ids,its) , MIN(ids + spec_bdy_width - 1,ite)
-          space_bdy(j,k,i,P_XSB) = ( data3dnew(i,k,j) - data3dold(i,k,j) ) / time_diff
-!         space_bdy(j,k,i,P_XSB) = 0. ! zeroout
+          space_bdy(j,k,i,P_XSB,1) = ( data3dnew(i,k,j) - data3dold(i,k,j) ) / time_diff
+!         space_bdy(j,k,i,P_XSB,1) = 0. ! zeroout
        END DO
        END DO
        END DO
@@ -1926,8 +1946,8 @@ CONTAINS
        DO j = MAX(jds,jts) , MIN(jde,jte)
        DO k = kds , kde - 1
        DO i = MAX(ids,its) , MIN(ids + spec_bdy_width - 1,ite)
-          space_bdy(j,k,i,P_XSB) = ( data3dnew(i,k,j) - data3dold(i,k,j) ) / time_diff
-!         space_bdy(j,k,i,P_XSB) = 0. ! zeroout
+          space_bdy(j,k,i,P_XSB,1) = ( data3dnew(i,k,j) - data3dold(i,k,j) ) / time_diff
+!         space_bdy(j,k,i,P_XSB,1) = 0. ! zeroout
        END DO
        END DO
        END DO
@@ -1935,8 +1955,8 @@ CONTAINS
        DO j = MAX(jds,jts) , MIN(jde-1,jte)
        DO k = kds , kde - 1
        DO i = MAX(ids,its) , MIN(ids + spec_bdy_width - 1,ite)
-          space_bdy(j,k,i,P_XSB) = ( data3dnew(i,k,j) - data3dold(i,k,j) ) / time_diff
-!         space_bdy(j,k,i,P_XSB) = 0. ! zeroout
+          space_bdy(j,k,i,P_XSB,1) = ( data3dnew(i,k,j) - data3dold(i,k,j) ) / time_diff
+!         space_bdy(j,k,i,P_XSB,1) = 0. ! zeroout
        END DO
        END DO
        END DO
@@ -1949,8 +1969,8 @@ CONTAINS
        DO k = kds , kde - 1
        DO i = MIN(ide,ite) , MAX(ide - spec_bdy_width + 1,its) , -1
           ii = ide - i + 1
-          space_bdy(j,k,ii,P_XEB) = ( data3dnew(i,k,j) - data3dold(i,k,j) ) / time_diff
-!         space_bdy(j,k,ii,P_XEB) = 0. ! zeroout
+          space_bdy(j,k,ii,P_XEB,1) = ( data3dnew(i,k,j) - data3dold(i,k,j) ) / time_diff
+!         space_bdy(j,k,ii,P_XEB,1) = 0. ! zeroout
        END DO
        END DO
        END DO
@@ -1959,8 +1979,8 @@ CONTAINS
        DO k = kds , kde - 1
        DO i = MIN(ide - 1,ite) , MAX(ide - spec_bdy_width,its) , -1
           ii = ide - i
-          space_bdy(j,k,ii,P_XEB) = ( data3dnew(i,k,j) - data3dold(i,k,j) ) / time_diff
-!         space_bdy(j,k,ii,P_XEB) = 0. ! zeroout
+          space_bdy(j,k,ii,P_XEB,1) = ( data3dnew(i,k,j) - data3dold(i,k,j) ) / time_diff
+!         space_bdy(j,k,ii,P_XEB,1) = 0. ! zeroout
        END DO
        END DO
        END DO
@@ -1969,8 +1989,8 @@ CONTAINS
        DO k = kds , kde
        DO i = MIN(ide - 1,ite) , MAX(ide - spec_bdy_width,its) , -1
           ii = ide - i
-          space_bdy(j,k,ii,P_XEB) = ( data3dnew(i,k,j) - data3dold(i,k,j) ) / time_diff
-!         space_bdy(j,k,ii,P_XEB) = 0. ! zeroout
+          space_bdy(j,k,ii,P_XEB,1) = ( data3dnew(i,k,j) - data3dold(i,k,j) ) / time_diff
+!         space_bdy(j,k,ii,P_XEB,1) = 0. ! zeroout
        END DO
        END DO
        END DO
@@ -1979,8 +1999,8 @@ CONTAINS
        DO k = kds , kde
        DO i = MIN(ide - 1,ite) , MAX(ide - spec_bdy_width,its) , -1
           ii = ide - i
-          space_bdy(j,k,ii,P_XEB) = ( data3dnew(i,k,j) - data3dold(i,k,j) ) / time_diff
-!         space_bdy(j,k,ii,P_XEB) = 0. ! zeroout
+          space_bdy(j,k,ii,P_XEB,1) = ( data3dnew(i,k,j) - data3dold(i,k,j) ) / time_diff
+!         space_bdy(j,k,ii,P_XEB,1) = 0. ! zeroout
        END DO
        END DO
        END DO
@@ -1989,8 +2009,8 @@ CONTAINS
        DO k = kds , kde - 1
        DO i = MIN(ide - 1,ite) , MAX(ide - spec_bdy_width,its) , -1
           ii = ide - i
-          space_bdy(j,k,ii,P_XEB) = ( data3dnew(i,k,j) - data3dold(i,k,j) ) / time_diff
-!         space_bdy(j,k,ii,P_XEB) = 0. ! zeroout
+          space_bdy(j,k,ii,P_XEB,1) = ( data3dnew(i,k,j) - data3dold(i,k,j) ) / time_diff
+!         space_bdy(j,k,ii,P_XEB,1) = 0. ! zeroout
        END DO
        END DO
        END DO
@@ -2002,8 +2022,8 @@ CONTAINS
        DO j = MAX(jds,jts) , MIN(jds + spec_bdy_width - 1,jte)
        DO k = kds , kde
        DO i = MAX(ids,its) , MIN(ide-1,ite)
-          space_bdy(i,k,j,P_YSB) = ( data3dnew(i,k,j) - data3dold(i,k,j) ) / time_diff
-!         space_bdy(i,k,j,P_YSB) = 0. ! zeroout
+          space_bdy(i,k,j,P_YSB,1) = ( data3dnew(i,k,j) - data3dold(i,k,j) ) / time_diff
+!         space_bdy(i,k,j,P_YSB,1) = 0. ! zeroout
        END DO
        END DO
        END DO
@@ -2011,8 +2031,8 @@ CONTAINS
        DO j = MAX(jds,jts) , MIN(jds + spec_bdy_width - 1,jte)
        DO k = kds , kde
        DO i = MAX(ids,its) , MIN(ide-1,ite)
-          space_bdy(i,k,j,P_YSB) = ( data3dnew(i,k,j) - data3dold(i,k,j) ) / time_diff
-!         space_bdy(i,k,j,P_YSB) = 0. ! zeroout
+          space_bdy(i,k,j,P_YSB,1) = ( data3dnew(i,k,j) - data3dold(i,k,j) ) / time_diff
+!         space_bdy(i,k,j,P_YSB,1) = 0. ! zeroout
        END DO
        END DO
        END DO
@@ -2020,8 +2040,8 @@ CONTAINS
        DO j = MAX(jds,jts) , MIN(jds + spec_bdy_width - 1,jte)
        DO k = kds , kde - 1
        DO i = MAX(ids,its) , MIN(ide,ite)
-          space_bdy(i,k,j,P_YSB) = ( data3dnew(i,k,j) - data3dold(i,k,j) ) / time_diff
-!         space_bdy(i,k,j,P_YSB) = 0. ! zeroout
+          space_bdy(i,k,j,P_YSB,1) = ( data3dnew(i,k,j) - data3dold(i,k,j) ) / time_diff
+!         space_bdy(i,k,j,P_YSB,1) = 0. ! zeroout
        END DO
        END DO
        END DO
@@ -2029,8 +2049,8 @@ CONTAINS
        DO j = MAX(jds,jts) , MIN(jds + spec_bdy_width - 1,jte)
        DO k = kds , kde - 1
        DO i = MAX(ids,its) , MIN(ide-1,ite)
-          space_bdy(i,k,j,P_YSB) = ( data3dnew(i,k,j) - data3dold(i,k,j) ) / time_diff
-!         space_bdy(i,k,j,P_YSB) = 0. ! zeroout
+          space_bdy(i,k,j,P_YSB,1) = ( data3dnew(i,k,j) - data3dold(i,k,j) ) / time_diff
+!         space_bdy(i,k,j,P_YSB,1) = 0. ! zeroout
        END DO
        END DO
        END DO
@@ -2043,8 +2063,8 @@ CONTAINS
        DO k = kds , kde - 1
        DO i = MAX(ids,its) , MIN(ide-1,ite)
           jj = jde - j + 1
-          space_bdy(i,k,jj,P_YEB) = ( data3dnew(i,k,j) - data3dold(i,k,j) ) / time_diff
-!         space_bdy(i,k,jj,P_YEB) = 0. ! zeroout
+          space_bdy(i,k,jj,P_YEB,1) = ( data3dnew(i,k,j) - data3dold(i,k,j) ) / time_diff
+!         space_bdy(i,k,jj,P_YEB,1) = 0. ! zeroout
        END DO
        END DO
        END DO
@@ -2053,8 +2073,8 @@ CONTAINS
        DO k = kds , kde - 1
        DO i = MAX(ids,its) , MIN(ide,ite)
           jj = jde - j
-          space_bdy(i,k,jj,P_YEB) = ( data3dnew(i,k,j) - data3dold(i,k,j) ) / time_diff
-!         space_bdy(i,k,jj,P_YEB) = 0. ! zeroout
+          space_bdy(i,k,jj,P_YEB,1) = ( data3dnew(i,k,j) - data3dold(i,k,j) ) / time_diff
+!         space_bdy(i,k,jj,P_YEB,1) = 0. ! zeroout
        END DO
        END DO
        END DO
@@ -2063,8 +2083,8 @@ CONTAINS
        DO k = kds , kde
        DO i = MAX(ids,its) , MIN(ide-1,ite)
           jj = jde - j
-          space_bdy(i,k,jj,P_YEB) = ( data3dnew(i,k,j) - data3dold(i,k,j) ) / time_diff
-!         space_bdy(i,k,jj,P_YEB) = 0. ! zeroout
+          space_bdy(i,k,jj,P_YEB,1) = ( data3dnew(i,k,j) - data3dold(i,k,j) ) / time_diff
+!         space_bdy(i,k,jj,P_YEB,1) = 0. ! zeroout
        END DO
        END DO
        END DO
@@ -2073,8 +2093,8 @@ CONTAINS
        DO k = kds , kde
        DO i = MAX(ids,its) , MIN(ide-1,ite)
           jj = jde - j
-          space_bdy(i,k,jj,P_YEB) = ( data3dnew(i,k,j) - data3dold(i,k,j) ) / time_diff
-!         space_bdy(i,k,jj,P_YEB) = 0. ! zeroout
+          space_bdy(i,k,jj,P_YEB,1) = ( data3dnew(i,k,j) - data3dold(i,k,j) ) / time_diff
+!         space_bdy(i,k,jj,P_YEB,1) = 0. ! zeroout
        END DO
        END DO
        END DO
@@ -2083,8 +2103,8 @@ CONTAINS
        DO k = kds , kde - 1
        DO i = MAX(ids,its) , MIN(ide-1,ite)
           jj = jde - j
-          space_bdy(i,k,jj,P_YEB) = ( data3dnew(i,k,j) - data3dold(i,k,j) ) / time_diff
-!         space_bdy(i,k,jj,P_YEB) = 0. ! zeroout
+          space_bdy(i,k,jj,P_YEB,1) = ( data3dnew(i,k,j) - data3dold(i,k,j) ) / time_diff
+!         space_bdy(i,k,jj,P_YEB,1) = 0. ! zeroout
        END DO
        END DO
        END DO

@@ -1,12 +1,16 @@
 SUBROUTINE da_random_omb_all( iv, ob )
-!----------------------------------------------------------------------------   
+!----------------------------------------------------------------------------
 !  History:
 !
 !  Additions:
-!             07/08/2003      Profiler and Buoy Obs            S. R. H. Rizvi
+!           07/08/2003 - Profiler and Buoy Obs            Syed  RH  Rizvi
+!           03/04/2005 - AMV's from Geostationary and     Syed  RH  Rizvi
+!                        Polar orbiting satellite are
+!                        seperated & used as profile
 !
-!  Purpose: Randomizes O-B structure via Gaussian noise scaled by ob errors.
-!----------------------------------------------------------------------------   
+!
+!  Purpose: Allocates observation structure and fills it fro iv.
+!----------------------------------------------------------------------------
    IMPLICIT NONE
 
    TYPE (ob_type), INTENT(INOUT) :: iv   ! Obs and header structure.
@@ -75,14 +79,30 @@ SUBROUTINE da_random_omb_all( iv, ob )
       END DO
    ENDIF
 
-!  [2.4] Transfer satob obs:
 
-   IF ( iv % num_satob > 0 ) THEN
-      DO n = 1, iv % num_satob
-         call da_random_omb( iv % satob(n) % u % error, ob % satob(n) % u, &
-                           iv % satob(n) % u % qc, iv % satob(n) % u % inv )
-         call da_random_omb( iv % satob(n) % v % error, ob % satob(n) % v, &
-                           iv % satob(n) % v % qc, iv % satob(n) % v % inv )
+!  [2.4.1] Transfer Geo. AMVs Obs:
+
+   IF ( iv % num_geoamv > 0 ) THEN
+      DO n = 1, iv % num_geoamv 
+        DO k = 1, iv % geoamv(n) % info % levels
+         call da_random_omb( iv % geoamv(n) % u(k) % error, ob % geoamv(n) % u(k), &
+                           iv % geoamv(n) % u(k) % qc, iv % geoamv(n) % u(k) % inv )
+         call da_random_omb( iv % geoamv(n) % v(k) % error, ob % geoamv(n) % v(k), &
+                           iv % geoamv(n) % v(k) % qc, iv % geoamv(n) % v(k) % inv )
+        END DO
+      END DO 
+   ENDIF 
+
+!  [2.4.2] Transfer Polar  AMVs Obs:
+
+   IF ( iv % num_polaramv > 0 ) THEN
+      DO n = 1, iv % num_polaramv
+        DO k = 1, iv % polaramv(n) % info % levels
+         call da_random_omb( iv % polaramv(n) % u(k) % error, ob % polaramv(n) % u(k), &
+                           iv % polaramv(n) % u(k) % qc, iv % polaramv(n) % u(k) % inv )
+         call da_random_omb( iv % polaramv(n) % v(k) % error, ob % polaramv(n) % v(k), &
+                           iv % polaramv(n) % v(k) % qc, iv % polaramv(n) % v(k) % inv )
+        END DO
       END DO
    ENDIF
 
@@ -276,6 +296,26 @@ SUBROUTINE da_random_omb_all( iv, ob )
             call da_random_omb( iv % profiler(n) % v(k) % error, ob % profiler(n) % v(k), &
                               iv % profiler(n) % v(k) % qc, iv % profiler(n) % v(k) % inv )
          END DO
+      END DO
+   ENDIF
+
+!  [2.16] Transfer TC bogus obs:
+
+   IF ( iv % num_bogus > 0 ) THEN
+      DO n = 1, iv % num_bogus
+         DO k = 1, iv % bogus(n) % info % levels
+            call da_random_omb( iv % bogus(n) % u(k) % error, ob % bogus(n) % u(k), &
+                              iv % bogus(n) % u(k) % qc, iv % bogus(n) % u(k) % inv )
+            call da_random_omb( iv % bogus(n) % v(k) % error, ob % bogus(n) % v(k), &
+                              iv % bogus(n) % v(k) % qc, iv % bogus(n) % v(k) % inv )
+            call da_random_omb( iv % bogus(n) % t(k) % error, ob % bogus(n) % t(k), &
+                              iv % bogus(n) % t(k) % qc, iv % bogus(n) % t(k) % inv )
+            call da_random_omb( iv % bogus(n) % q(k) % error, ob % bogus(n) % q(k), &
+                              iv % bogus(n) % q(k) % qc, iv % bogus(n) % q(k) % inv )
+         END DO
+
+         call da_random_omb( iv % bogus(n) % slp % error, ob % bogus(n) % slp, &
+                             iv % bogus(n) % slp % qc, iv % bogus(n) % slp % inv )
       END DO
    ENDIF
 

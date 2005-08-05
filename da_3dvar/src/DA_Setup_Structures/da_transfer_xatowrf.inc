@@ -40,16 +40,9 @@ SUBROUTINE DA_Transfer_XatoWRF( xbx, grid, &
 !=>ARRAYS TO HOLD WRF INCREMENTS ON THE C-grid 
 
    REAL, dimension(xp%ims:xp%ime,xp%jms:xp%jme,xp%kms:xp%kme) :: u_cgrid,  v_cgrid, &
-                                                                 q_cgrid
+                                                                 q_cgrid, ph_cgrid
 
    REAL, dimension(xp%ims:xp%ime,xp%jms:xp%jme)               :: mu_cgrid
-
-   integer, parameter :: P_QV  = 2
-   integer, parameter :: p_qcw = 3
-   integer, parameter :: p_qrn = 4
-   integer, parameter :: p_qci = 4
-   integer, parameter :: p_qsn = 4
-   integer, parameter :: p_qgr = 4
 
    REAL    :: t_full  , p_full, rho_full, q_full, ph_full , ph_xb_hd, &
               qvf1, qvf2, qvf1_b, qvf2_b
@@ -65,6 +58,16 @@ SUBROUTINE DA_Transfer_XatoWRF( xbx, grid, &
    ks = xp % kts
    ke = xp % kte
 
+! .. To keep the background PH perturbation:
+
+   do j=js,je
+   do i=is,ie
+     do k=ks, ke+1
+       ph_cgrid(i,j,k) = ph_2(i,j,k)
+     enddo
+   enddo
+   enddo
+
 !------------------------------------------------------------------------------
 !  [1.0] Get the mixing ratio of moisture first, as it is easy.
 !------------------------------------------------------------------------------
@@ -72,7 +75,11 @@ SUBROUTINE DA_Transfer_XatoWRF( xbx, grid, &
    do k=ks,ke
    do j=js,je
    do i=is,ie
-      q_cgrid(i,j,k) = xa%q(i,j,k)/(1.0 - xb%q(i,j,k))**2
+      if((xb%q(i,j,k)+xa%q(i,j,k)) < 0.0) then
+         q_cgrid(i,j,k) =-xb%q(i,j,k)/(1.0 - xb%q(i,j,k))**2
+      else
+         q_cgrid(i,j,k) = xa%q(i,j,k)/(1.0 - xb%q(i,j,k))**2
+      endif
    enddo
    enddo
    enddo
@@ -87,7 +94,7 @@ SUBROUTINE DA_Transfer_XatoWRF( xbx, grid, &
       s1md=0.0
       do k=ks,ke
          sdmd=sdmd+q_cgrid(i,j,k)*dnw(k)
-         s1md=s1md+(1.0+moist_2(i,j,k,P_QV))*dnw(k)
+         s1md=s1md+(1.0+moist(i,j,k,P_QV))*dnw(k)
       enddo
 
       mu_cgrid(i,j)=-(xa%psfc(i,j)+xb%psac(i,j)*sdmd)/s1md
@@ -105,7 +112,7 @@ SUBROUTINE DA_Transfer_XatoWRF( xbx, grid, &
    do i=is,ie
      k = ke
      qvf1   = 0.5*(q_cgrid(i,j,k)+q_cgrid(i,j,k))
-     qvf1_b = 0.5*(moist_2(i,j,k,P_QV)+moist_2(i,j,k,P_QV))
+     qvf1_b = 0.5*(moist(i,j,k,P_QV)+moist(i,j,k,P_QV))
      qvf2   = - qvf1 / ((1.+qvf1_b)*(1.+qvf1_b))
      qvf2_b = 1./(1.+qvf1)
      qvf1   = qvf1*qvf2_b + qvf1_b*qvf2
@@ -116,7 +123,7 @@ SUBROUTINE DA_Transfer_XatoWRF( xbx, grid, &
 
      do k = ke-1,1,-1
        qvf1   = 0.5*(q_cgrid(i,j,k)+q_cgrid(i,j,k+1))
-       qvf1_b = 0.5*(moist_2(i,j,k,P_QV)+moist_2(i,j,k+1,P_QV))
+       qvf1_b = 0.5*(moist(i,j,k,P_QV)+moist(i,j,k+1,P_QV))
        qvf2   = - qvf1 / ((1.+qvf1_b)*(1.+qvf1_b))
        qvf2_b = 1./(1.+qvf1_b)
        qvf1   = qvf1*qvf2_b + qvf1_b*qvf2
@@ -129,6 +136,99 @@ SUBROUTINE DA_Transfer_XatoWRF( xbx, grid, &
    enddo
    enddo
 
+! ----------------------------------------------------------------------------
+
+!--Adjust xa%q to make xb%q + xa%q > 0.0
+
+   if ( check_rh == 2 ) THEN
+!     Shu-Hua~s TPW conservation:
+      CALL da_check_rh( xb, xa, xp )
+   else
+!     Simple resetting to max/min values:
+      call da_check_rh_simple( xb, xa, xp )
+   end if
+
+   do k=ks,ke
+   do j=js,je
+   do i=is,ie
+      q_cgrid(i,j,k) = xa%q(i,j,k)/(1.0 - xb%q(i,j,k))**2
+   enddo
+   enddo
+   enddo
+
+!------------------------------------------------------------------------------
+!  [4.0] CONVERT TEMPERATURE INCREMENTS INTO THETA INCREMENTS 
+!        EVALUATE ALSO THE INCREMENTS OF (1/rho) AND GEOPOTENTIAL
+!------------------------------------------------------------------------------
+
+   if(print_detail > 10) then
+      write(unit=*, fmt='(a, e24.12)') &
+        'sum(abs(xa%t(is:ie,js:je,ks:ke)))=', sum(abs(xa%t(is:ie,js:je,ks:ke))), &
+        'sum(abs(xa%p(is:ie,js:je,ks:ke)))=', sum(abs(xa%p(is:ie,js:je,ks:ke))), &
+        'sum(abs(xb%t(is:ie,js:je,ks:ke)))=', sum(abs(xb%t(is:ie,js:je,ks:ke))), &
+        'sum(abs(xb%p(is:ie,js:je,ks:ke)))=', sum(abs(xb%p(is:ie,js:je,ks:ke))), &
+        'sum(abs(t_2 (is:ie,js:je,ks:ke)))=', sum(abs(t_2 (is:ie,js:je,ks:ke)))
+
+      write(unit=*, fmt='(2(2x, a, e20.12))') &
+        'maxval(xa%u(is:ie,js:je,ks:ke))=', maxval(xa%u(is:ie,js:je,ks:ke)), &
+        'minval(xa%u(is:ie,js:je,ks:ke))=', minval(xa%u(is:ie,js:je,ks:ke)), &
+        'maxval(xa%v(is:ie,js:je,ks:ke))=', maxval(xa%v(is:ie,js:je,ks:ke)), &
+        'minval(xa%v(is:ie,js:je,ks:ke))=', minval(xa%v(is:ie,js:je,ks:ke)), &
+        'maxval(xa%t(is:ie,js:je,ks:ke))=', maxval(xa%t(is:ie,js:je,ks:ke)), &
+        'minval(xa%t(is:ie,js:je,ks:ke))=', minval(xa%t(is:ie,js:je,ks:ke)), &
+        'maxval(xa%q(is:ie,js:je,ks:ke))=', maxval(xa%q(is:ie,js:je,ks:ke)), &
+        'minval(xa%q(is:ie,js:je,ks:ke))=', minval(xa%q(is:ie,js:je,ks:ke)), &
+        'maxval(xa%p(is:ie,js:je,ks:ke))=', maxval(xa%p(is:ie,js:je,ks:ke)), &
+        'minval(xa%p(is:ie,js:je,ks:ke))=', minval(xa%p(is:ie,js:je,ks:ke)), &
+        'maxval(xa%psfc(is:ie,js:je))   =', maxval(xa%psfc(is:ie,js:je)), &
+        'minval(xa%psfc(is:ie,js:je))   =', minval(xa%psfc(is:ie,js:je))
+   endif
+
+   do j=js,je
+   do i=is,ie
+
+     ph_full  = ht(i,j) * gravity
+     ph_xb_hd = ht(i,j) * gravity
+     do k = ks, ke
+! To obtain all of the full fields: t, p, q(mixing ratio), rho
+
+      t_full   = xa%t(i,j,k) + xb%t(i,j,k)
+      p_full   = xa%p(i,j,k) + xb%p(i,j,k)
+      q_full   = moist(i,j,k,P_QV) + q_cgrid(i,j,k)
+
+! Note: According to WRF, this is the dry air density used to
+!       compute the geopotential height: 
+      rho_full = p_full / (gas_constant*t_full*(1.0+q_full/rd_over_rv))
+
+! To compute the theta increment with the full fields:
+      t_2(i,j,k) = t_full*(ps0/p_full)**kappa - ts0
+
+! The full field of analysis ph:
+         ph_full  = ph_full  &
+                  - xb%dnw(k) * (xb%psac(i,j)+mu_cgrid(i,j)) / rho_full
+!
+! background hydrostatic phi:
+         ph_xb_hd  = ph_xb_hd  &
+                  - xb%dnw(k) * xb%psac(i,j) / xb%rho(i,j,k)
+    
+! The analysis perturbation = Hydro_ph - base_ph + nonhydro_xb_ph:
+         ph_2(i,j,k+1) = ph_full - phb(i,j,k+1) &
+                        + (xb%hf(i,j,k+1)*gravity - ph_xb_hd)
+     enddo
+
+   enddo
+   enddo
+
+! .. To compute the geopotential height increment:
+
+   do k=ks, ke+1
+     do j=js,je
+     do i=is,ie
+       ph_cgrid(i,j,k) = ph_2(i,j,k) - ph_cgrid(i,j,k)
+     enddo
+     enddo
+   enddo
+
 ! ========================
 ! Write out the increment:
 ! ========================
@@ -137,7 +237,7 @@ SUBROUTINE DA_Transfer_XatoWRF( xbx, grid, &
 
       print '(/"WRITE OUT INCREMENT FOR PLOTTING......")'
 
-      call DA_Write_Increment ( xp, xb, xa, q_cgrid, mu_cgrid )
+      call DA_Write_Increment ( xp, xb, xa, q_cgrid, mu_cgrid, ph_cgrid )
 
    endif
 ! ----------------------------------------------------------------------------
@@ -232,69 +332,6 @@ SUBROUTINE DA_Transfer_XatoWRF( xbx, grid, &
 #endif
 
 !------------------------------------------------------------------------------
-!  [4.0] CONVERT TEMPERATURE INCREMENTS INTO THETA INCREMENTS 
-!        EVALUATE ALSO THE INCREMENTS OF (1/rho) AND GEOPOTENTIAL
-!------------------------------------------------------------------------------
-
-   if(print_detail > 10) then
-      write(unit=*, fmt='(a, e24.12)') &
-        'sum(abs(xa%t(is:ie,js:je,ks:ke)))=', sum(abs(xa%t(is:ie,js:je,ks:ke))), &
-        'sum(abs(xa%p(is:ie,js:je,ks:ke)))=', sum(abs(xa%p(is:ie,js:je,ks:ke))), &
-        'sum(abs(xb%t(is:ie,js:je,ks:ke)))=', sum(abs(xb%t(is:ie,js:je,ks:ke))), &
-        'sum(abs(xb%p(is:ie,js:je,ks:ke)))=', sum(abs(xb%p(is:ie,js:je,ks:ke))), &
-        'sum(abs(t_2 (is:ie,js:je,ks:ke)))=', sum(abs(t_2 (is:ie,js:je,ks:ke)))
-
-      write(unit=*, fmt='(2(2x, a, e20.12))') &
-        'maxval(xa%u(is:ie,js:je,ks:ke))=', maxval(xa%u(is:ie,js:je,ks:ke)), &
-        'minval(xa%u(is:ie,js:je,ks:ke))=', minval(xa%u(is:ie,js:je,ks:ke)), &
-        'maxval(xa%v(is:ie,js:je,ks:ke))=', maxval(xa%v(is:ie,js:je,ks:ke)), &
-        'minval(xa%v(is:ie,js:je,ks:ke))=', minval(xa%v(is:ie,js:je,ks:ke)), &
-        'maxval(xa%t(is:ie,js:je,ks:ke))=', maxval(xa%t(is:ie,js:je,ks:ke)), &
-        'minval(xa%t(is:ie,js:je,ks:ke))=', minval(xa%t(is:ie,js:je,ks:ke)), &
-        'maxval(xa%q(is:ie,js:je,ks:ke))=', maxval(xa%q(is:ie,js:je,ks:ke)), &
-        'minval(xa%q(is:ie,js:je,ks:ke))=', minval(xa%q(is:ie,js:je,ks:ke)), &
-        'maxval(xa%p(is:ie,js:je,ks:ke))=', maxval(xa%p(is:ie,js:je,ks:ke)), &
-        'minval(xa%p(is:ie,js:je,ks:ke))=', minval(xa%p(is:ie,js:je,ks:ke)), &
-        'maxval(xa%psfc(is:ie,js:je))   =', maxval(xa%psfc(is:ie,js:je)), &
-        'minval(xa%psfc(is:ie,js:je))   =', minval(xa%psfc(is:ie,js:je))
-   endif
-
-   do j=js,je
-   do i=is,ie
-
-     ph_full  = ht(i,j) * gravity
-     ph_xb_hd = ht(i,j) * gravity
-     do k = ks, ke
-! To obtain all of the full fields: t, p, q(mixing ratio), rho
-
-      t_full   = xa%t(i,j,k) + xb%t(i,j,k)
-      p_full   = xa%p(i,j,k) + xb%p(i,j,k)
-      q_full   = moist_2(i,j,k,P_QV) + q_cgrid(i,j,k)
-
-! Note: According to WRF, this is the dry air density used to
-!       compute the geopotential height: 
-      rho_full = p_full / (gas_constant*t_full*(1.0+q_full/rd_over_rv))
-
-! To compute the theta increment with the full fields:
-      t_2(i,j,k) = t_full*(ps0/p_full)**kappa - ts0
-
-! The full field of analysis ph:
-         ph_full  = ph_full  &
-                  - xb%dnw(k) * (xb%psac(i,j)+mu_cgrid(i,j)) / rho_full
-!
-! background hydrostatic phi:
-         ph_xb_hd  = ph_xb_hd  &
-                  - xb%dnw(k) * xb%psac(i,j) / xb%rho(i,j,k)
-    
-! The analysis perturbation = Hydro_ph - base_ph + nonhydro_xb_ph:
-         ph_2(i,j,k+1) = ph_full - phb(i,j,k+1) &
-                        + (xb%hf(i,j,k+1)*gravity - ph_xb_hd)
-     enddo
-
-   enddo
-   enddo
-
-!------------------------------------------------------------------------------
 !  [5.0] ADD INCREMENT TO THE ORIGINAL GUESS AND UPDATE "grid"
 !------------------------------------------------------------------------------
 
@@ -310,20 +347,27 @@ SUBROUTINE DA_Transfer_XatoWRF( xbx, grid, &
          u_2(i,j,k) = u_2(i,j,k) + u_cgrid(i,j,k)
          v_2(i,j,k) = v_2(i,j,k) + v_cgrid(i,j,k)
          w_2(i,j,k) = w_2(i,j,k) +    xa%w(i,j,k)
-         moist_2(i,j,k,P_QV) = moist_2(i,j,k,P_QV) + q_cgrid(i,j,k)
+         moist(i,j,k,P_QV) = moist(i,j,k,P_QV) + q_cgrid(i,j,k)
+!--------make sure qv is positive.
+         if(moist(i,j,k,P_QV) < 1.0e-6) moist(i,j,k,P_QV) = 1.0e-6
 
-        if ( size(moist_2,dim=4) >= 4 ) then
-         moist_2(i,j,k,p_qcw) = moist_2(i,j,k,p_qcw) + xa%qcw(i,j,k)
-         moist_2(i,j,k,p_qrn) = moist_2(i,j,k,p_qrn) + xa%qrn(i,j,k)
+        if ( size(moist,dim=4) >= 4 ) then
+         moist(i,j,k,p_qc) = moist(i,j,k,p_qc) + xa%qcw(i,j,k)
+         moist(i,j,k,p_qr) = moist(i,j,k,p_qr) + xa%qrn(i,j,k)
+         if(moist(i,j,k,p_qc) < 0.0) moist(i,j,k,p_qc) = 0.0
+         if(moist(i,j,k,p_qr) < 0.0) moist(i,j,k,p_qr) = 0.0
         endif
 
-        if ( size(moist_2,dim=4) >= 6 ) then
-         moist_2(i,j,k,p_qci) = moist_2(i,j,k,p_qci) + xa%qci(i,j,k)
-         moist_2(i,j,k,p_qsn) = moist_2(i,j,k,p_qsn) + xa%qsn(i,j,k)
+        if ( size(moist,dim=4) >= 6 ) then
+         moist(i,j,k,p_qi) = moist(i,j,k,p_qi) + xa%qci(i,j,k)
+         moist(i,j,k,p_qs) = moist(i,j,k,p_qs) + xa%qsn(i,j,k)
+         if(moist(i,j,k,p_qi) < 0.0) moist(i,j,k,p_qi) = 0.0
+         if(moist(i,j,k,p_qs) < 0.0) moist(i,j,k,p_qs) = 0.0
         endif
 
-        if ( size(moist_2,dim=4) >= 7 ) then
-         moist_2(i,j,k,p_qgr) = moist_2(i,j,k,p_qgr) + xa%qgr(i,j,k)
+        if ( size(moist,dim=4) >= 7 ) then
+         moist(i,j,k,p_qg) = moist(i,j,k,p_qg) + xa%qgr(i,j,k)
+         if(moist(i,j,k,p_qg) < 0.0) moist(i,j,k,p_qg) = 0.0
         endif
 
       enddo

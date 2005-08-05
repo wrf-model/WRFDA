@@ -30,6 +30,7 @@ OBJS    = 		        \
 	init_modules_em.o       \
 	solve_em.o              \
         start_em.o              \
+        shift_domain_em.o       \
         couple_or_uncouple_em.o \
         nest_init_utils.o	\
         interp_domain_em.o
@@ -200,7 +201,11 @@ solve_em.o:     module_small_step_em.o \
 		../phys/module_surface_driver.o \
 		../phys/module_cumulus_driver.o \
 		../phys/module_microphysics_driver.o \
+		../phys/module_microphysics_zero_out.o \
 		../phys/module_pbl_driver.o \
 		../phys/module_physics_addtendc.o
+
+#		../chem/module_chem_utilities.o \
+#		../chem/module_input_chem_data.o
 
 # DO NOT DELETE

@@ -6,7 +6,7 @@ SUBROUTINE DA_AO_Stats_Sonde_sfc( stats_unit, oi, re )
    TYPE (ob_type), INTENT (in)      :: oi            ! OI
    TYPE ( y_type), INTENT (in)      :: re            ! A - O
 
-   TYPE (stats_type)                :: sonde_sfc
+   TYPE (stats_sonde_sfc_type)      :: sonde_sfc
    INTEGER                          :: nu, nv, nt, np, nq
    INTEGER                          :: n
 
@@ -28,7 +28,7 @@ SUBROUTINE DA_AO_Stats_Sonde_sfc( stats_unit, oi, re )
    sonde_sfc%minimum%t = maxmin_type(-missing_r, 0, 0)
    sonde_sfc%minimum%p = maxmin_type(-missing_r, 0, 0)
    sonde_sfc%minimum%q = maxmin_type(-missing_r, 0, 0)
-   sonde_sfc%average = residual_type(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+   sonde_sfc%average = residual_sonde_sfc1_type(0.0, 0.0, 0.0, 0.0, 0.0)
    sonde_sfc%rms_err = sonde_sfc%average
 
    IF ( oi%num_sound > 0 ) THEN
@@ -70,7 +70,7 @@ SUBROUTINE DA_AO_Stats_Sonde_sfc( stats_unit, oi, re )
    call proc_sum_int( nt )
    call proc_sum_int( np )
    call proc_sum_int( nq )
-   num_sound_tot = nu + nv + nt + np + nq
+   num_sound_tot = num_sound_tot + nu + nv + nt + np + nq
    
    call proc_stats_combine(Sonde_sfc%average%u, Sonde_sfc%rms_err%u, &
                            Sonde_sfc%minimum%u%value, Sonde_sfc%maximum%u%value, &

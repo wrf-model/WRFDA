@@ -1,0 +1,285 @@
+Change Log for update to WRF 3DVAR code
+---------------------------------------
+
+Author  : Syed RH Rizvi
+Reviewer: Yong-R Guo 
+Date: 06/06/05
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+(a) Different treatment for AMV's from Geostationary and Polar orbitting
+satellites. They are treated as profile data  
+
+(b) When the code is run with "it=1 and NTMAX =0 " it writes all QC'd
+    data on "filtered_obs_iunit = 192" unit. 
+
+    Note: Currently the header giving info about number of obs for various
+          data type is not changed. Eventually this should be updated so 
+          tha to header should give exact number of various type of obs after
+          after filtering.
+
+(c) Activating "sfc_assim_options = 2"                                
+                                             
+Expected Differences
+--------------------
+(a) Differences inresults is expected due to the fact that "SATOB"
+    reports multi level winds and the old code was assimilating 
+    only one (reported last) level whereas, the new code assimilates 
+    all the levels. However if this anomaly is removed, it should produce 
+    same results.
+
+(b) "sfc_assim_options=2" should produce exactly same results as "ncar3dvar" 
+    with same options. However, there will be differences mainly due to 
+    following twi reasons.
+
+    (i) Difference in thermodynamic constants used in "wrfvar" and "ncar3dvar"
+        Currently "wrfvar" uses following constants values
+
+        gas_constant = 287.     
+      gas_constant_v = 461.6  
+      cp = 7.*gas_constant/2. = 1004.5 
+
+      whereas "ncar3dvar" uses the corresponding values as follows:
+                   
+     gas_constant   = 287.04   
+     gas_constant_v = 461.51 
+                 cp = 1004.0             
+
+   (ii) Recently the adjustment of differential factor for psi & chi 
+        (da_rescale_background_errors) is not done for rescaling the 
+        corresponding variances. Since for most of the cases the value 
+        this factor is more than one, it will eventually lead to higher
+        BE variance for psi and chi field resulting in closer fit to 
+        observations. Accordingly the initial gradient will be higher and
+        the convergence will be slow (may need more iterations).
+
+   Out of these two, the second reason dominates the differences in
+   result and the same will be illustrated with examples later.
+
+Accuracy: 
+ 
+CPU:
+
+Slight increase due to more than one level (as reported) in AMV's are utilised.
+Slight increase due to more surface reports are utilized with sfc_assim_options = 2 
+
+memory:
+
+Slight increase due to more data points are utilized.
+
+Test results (run on mac (Mahua) machines
+------------------------------------------------------
+
+
+(a) Comparison of global test run for 10/27/2004 00 UTC at T63 resolution
+                 
+ Results with aasimilation of AMV's seperately form Geo and Polar
+ orbiting satellites:
+
+updated wrfvar code:
+====================
+
+   Original gradient is  1.53361809D+04
+   For this outer iteration Gradient target is  1.53361809D+02
+   Starting Cost function:  1.96808001D+05 Gradient=  1.53361809D+04
+   Final cost function :  7.83013671D+04 and Gradient:  1.50380610D+02
+
+ Results with repository (wrfvar version_2_0_3_1) code:
+========================================================
+   Original gradient is  1.53356852D+04
+   For this outer iteration Gradient target is  1.53356852D+02
+   Starting Cost function:  1.96672808D+05 Gradient=  1.53356852D+04
+   Final cost function :  7.82347030D+04 and Gradient:  1.49932772D+02
+
+
+Note 1: When the code forced to accept only one level (last level) AMV's data  
+        the output matched exactly with the original code. 
+
+(b) Comparison of "ncar3dvar" run and the updated "wrfvar" for
+    sfc_assim_options = 2
+    
+    As stated earlier the differences may be visualised due to two reasons
+
+   (i) Differences due to different values of thermodynamic constants 
+   
+
+     *** output of updated "wrfvar" with wrfvar thermodynamic constants *** 
+     =======================================================================
+  For this outer iteration Gradient target is  2.93565092D+01
+  Starting Cost function:  3.74240018D+03 Gradient=  2.93565092D+03
+ ----------------------------------------------------------
+
+   34      1.80891834D+03      2.83160041D+01      3.98846123D-03
+ ----------------------------------------------------------
+  Inner iteration stopped after   34 iterations
+   Final cost function :  1.80891834D+03 and Gradient:  2.83160041D+01
+ ----------------------------------------------------------
+
+   *** output of updated "ncar3dvar"
+      (without differential factor for psi & chi as done in "wrfvar" but
+       with ncar3dvar thermodynamic constatns *** 
+  =======================================================================
+
+  Starting Cost function:  3.74283758D+03 Gradient=  2.94573500D+03
+ ----------------------------------------------------------
+
+   32      1.86022481D+03      2.85866233D+01      1.23378464D-03
+ ----------------------------------------------------------
+  Inner iteration stopped after   32 iterations
+   Final cost function :  1.86022481D+03 and Gradient:  2.85866233D+01
+ ----------------------------------------------------------
+
+  Thus we see that "ncar3dvar" with ncar3dvar thermodynamic constants leads
+  to both slightly different initial cost function and gradient as comapared 
+  to "wrfvar" with wrfvar constants. 
+
+  The convergence is also slightly affected. It took 34 iterations with 
+  "wrfvar" constants whereas 32 iterations with "ncar3dvar" defined 
+  constants.
+
+  The difference in initial cost function and gradient is caused due to
+  surface pressure correction (in da_sfc_pre, lin and its adjoint) and the 
+  computation of surface parameters (10 m winf abd 2 m temperature & moisture
+  in da_sfc_wtq, linear and adjoint) which uses corresponding different 
+  thermodynamic constant values.
+
+   (ii) Differences due to psi/cshi differential factor adjustment
+
+   *** output of updated "wrfvar" (without psi/cshi differential factor 
+       adjustment and wrfvar thermodynaic constants)
+   =====================================================================
+
+ Starting Cost function:  3.74240018D+03 Gradient=  2.93565092D+03
+ ----------------------------------------------------------
+
+   34      1.80891834D+03      2.83160041D+01      3.98846123D-03
+ ----------------------------------------------------------
+  Inner iteration stopped after   34 iterations
+   Final cost function :  1.80891834D+03 and Gradient:  2.83160041D+01
+
+
+    *** output of updated "ncar3dvar" (original ncar3dvar code but 
+        with wrfvar thermodynamic constants ) ***
+    ====================================================================
+
+  Starting Cost function:  3.74240018D+03 Gradient=  8.11972680D+02
+ ----------------------------------------------------------
+
+   15      2.06507278D+03      7.61081678D+00      5.64508366D-02
+ ----------------------------------------------------------
+  Inner iteration stopped after   15 iterations
+   Final cost function :  2.06507278D+03 and Gradient:  7.61081678D+00
+ ----------------------------------------------------------
+
+
+  Thus keeping same thermodynamic constants, we see that "wrfvar" (which 
+  is without psi/cshi differential factor adjustment) and "ncar3dvar" have
+  same initial cost function. However, the initial gradient is different.
+  It is higher in "wrfvar". The convergence is also very slow in "wrfvar" 
+  and it took 34 iterations  to converge (reduction of original gradient by 
+  two order). Whereas, "ncar3dvar" took just 15 iterations only. 
+
+
+===============================================================
+
+  For this outer iteration Gradient target is  2.93565092D+01
+  Starting Cost function:  3.74240018D+03 Gradient=  2.93565092D+03
+ ----------------------------------------------------------
+
+   34      1.80891834D+03      2.83160041D+01      3.98846123D-03
+ ----------------------------------------------------------
+  Inner iteration stopped after   34 iterations
+   Final cost function :  1.80891834D+03 and Gradient:  2.83160041D+01
+ ----------------------------------------------------------
+
+  *** output with "ncar3dvar" thermodynamic constants ****
+===============================================================
+  Starting Cost function:  3.74283758D+03 Gradient=  2.94573500D+03
+ ----------------------------------------------------------
+
+   32      1.86022481D+03      2.85866233D+01      1.23378464D-03
+ ----------------------------------------------------------
+  Inner iteration stopped after   32 iterations
+   Final cost function :  1.86022481D+03 and Gradient:  2.85866233D+01
+ ----------------------------------------------------------
+
+  Thus we see that "ncar3dvar" constants leads to both slightly different 
+  initial cost function and gradient as comapared to "wrfvar" constants. 
+  The convergence was also slightly affected. It took 34 iterations with 
+  "wrfvar" constants whereas 32 iterations with "ncar3dvar" defined 
+  constants.
+
+Files added:
+-------------------------------------
+
+ wrfvar/da_3dvar/src/DA_PolarAMV
+ wrfvar/da_3dvar/src/DA_GeoAMV
+ wrfvar/da_3dvar/src/DA_Obs/da_write_filtered_obs.inc
+ wrfvar/da_3dvar/src/DA_Test/DA_Check_XToY_Adjoint_PolarAMV.inc
+ wrfvar/da_3dvar/src/DA_Test/DA_Check_XToY_Adjoint_GeoAMV.inc
+
+Files Removed:
+-------------------------------------
+
+Files Modified:
+-------------------------------------
+
+  wrfvar/da_3dvar/src/Makefile
+  wrfvar/da_3dvar/src/DA_Constants/DA_Constants.F
+  wrfvar/da_3dvar/src/DA_Define_Structures/DA_Allocate_Observations.inc
+  wrfvar/da_3dvar/src/DA_Define_Structures/DA_Allocate_Y.inc
+  wrfvar/da_3dvar/src/DA_Define_Structures/DA_Deallocate_Observations.inc
+  wrfvar/da_3dvar/src/DA_Define_Structures/DA_Deallocate_Y.inc
+  wrfvar/da_3dvar/src/DA_Define_Structures/DA_Define_Structures.F
+  wrfvar/da_3dvar/src/DA_Define_Structures/DA_Zero_Y.inc
+  wrfvar/da_3dvar/src/DA_Minimisation/DA_Calculate_GradY.inc
+  wrfvar/da_3dvar/src/DA_Minimisation/DA_Minimisation.F
+  wrfvar/da_3dvar/src/DA_Minimisation/da_calculate_jo_and_grady.inc
+  wrfvar/da_3dvar/src/DA_Minimisation/da_calculate_residual.inc
+  wrfvar/da_3dvar/src/DA_Minimisation/da_get_innov_vector.inc
+  wrfvar/da_3dvar/src/DA_Minimisation/da_get_var_diagnostics.inc
+  wrfvar/da_3dvar/src/DA_Minimisation/da_write_diagnostics.inc
+  wrfvar/da_3dvar/src/DA_Obs/DA_Obs.F
+  wrfvar/da_3dvar/src/DA_Obs/DA_Obs_Count.inc
+  wrfvar/da_3dvar/src/DA_Obs/DA_Read_Obs.inc
+  wrfvar/da_3dvar/src/DA_Obs/DA_Read_Radar.inc
+  wrfvar/da_3dvar/src/DA_Obs/DA_Scan_Obs.inc
+  wrfvar/da_3dvar/src/DA_Obs/DA_Scan_Radar.inc
+  wrfvar/da_3dvar/src/DA_Obs/DA_Transform_XToY.inc
+  wrfvar/da_3dvar/src/DA_Obs/DA_Transform_XToY_Adj.inc
+  wrfvar/da_3dvar/src/DA_Obs/da_add_noise_to_ob.inc
+  wrfvar/da_3dvar/src/DA_Obs/da_fill_obs_structures.inc
+  wrfvar/da_3dvar/src/DA_Obs/da_random_omb_all.inc
+  wrfvar/da_3dvar/src/DA_Obs/da_use_obs_errfac.inc
+  wrfvar/da_3dvar/src/DA_Obs/da_write_obs.inc
+  wrfvar/da_3dvar/src/DA_Obs/da_write_y.inc
+  wrfvar/da_3dvar/src/DA_Physics/DA_Transform_XToWTQ.inc
+  wrfvar/da_3dvar/src/DA_Physics/DA_Transform_XToWTQ_Adj.inc
+  wrfvar/da_3dvar/src/DA_Setup_Structures/da_setup_obs_interp_wts.inc
+  wrfvar/da_3dvar/src/DA_Setup_Structures/da_setup_obs_structures.inc
+  wrfvar/da_3dvar/src/DA_Setup_Structures/da_setup_obs_structures_ascii.inc
+  wrfvar/da_3dvar/src/DA_Setup_Structures/da_setup_obs_structures_bufr.inc
+  wrfvar/da_3dvar/src/DA_Test/DA_Check_XToY_Adjoint.inc
+  wrfvar/da_3dvar/src/DA_Test/DA_Test.F
+  wrfvar/da_3dvar/src/DA_Tools/DA_Read_Namelist.inc
+  wrfvar/da_3dvar/src/DA_Tools/DA_Tools.F
+  wrfvar/da_3dvar/src/DA_VToX_Transforms/da_transform_vtox.inc
+  wrfvar/da_3dvar/src/da_solve_v3d/da_solve_v3d.F
+  wrfvar/da_3dvar/src/par_util/proc_sum_count_obs.inc
+  wrfvar/run/DA_Run_3DVAR.csh
+
+
+
+cvs commit ?
+
+CHANGES
+
+changes/changes_20050606.srh
+
+
+
+Tag:
+
+                  
+

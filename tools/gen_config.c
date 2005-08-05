@@ -152,11 +152,15 @@ gen_get_nl_config ( char * dirname )
         if ( !strcmp( p->nentries, "1" )) {
           if ( ! sw_ifort_kludge ) {
             fprintf(fp,"  IF ( id_id .NE. 1 ) THEN\n") ;
-            fprintf(fp,"    call wrf_debug(1,'WARNING in nl_%s_%s: %s applies to all domains. First arg ignored.')\n",
+            fprintf(fp,"    call wrf_debug(1,&\n'WARNING in nl_%s_%s: %s applies to all domains. First arg ignored.')\n",
                             gs,p->name, p->name ) ;
             fprintf(fp,"  ENDIF\n" ) ;
           }
-          fprintf(fp,"  %s = model_config_rec%%%s\n",p->name,p->name) ;
+          if ( !strncmp(p->type->name,"character",9)) {
+            fprintf(fp,"  %s = trim(model_config_rec%%%s)\n",p->name,p->name) ;
+          }else{
+            fprintf(fp,"  %s = model_config_rec%%%s\n",p->name,p->name) ;
+          }
         } else {
           if ( ! sw_ifort_kludge ) {
             if        ( !strcmp( p->nentries, "max_domains" )) {
@@ -179,11 +183,15 @@ gen_get_nl_config ( char * dirname )
         if ( !strcmp( p->nentries, "1" )) {
           if ( ! sw_ifort_kludge ) {
             fprintf(fp,"  IF ( id_id .NE. 1 ) THEN\n") ;
-            fprintf(fp,"    call wrf_debug(1,'WARNING in nl_%s_%s: %s applies to all domains. First arg ignored.')\n",
+            fprintf(fp,"    call wrf_debug(1,&\n'WARNING in nl_%s_%s: %s applies to all domains. First arg ignored.')\n",
                             gs,p->name, p->name ) ;
             fprintf(fp,"  ENDIF\n" ) ;
           }
-          fprintf(fp,"  model_config_rec%%%s = %s \n",p->name,p->name) ;
+          if ( !strncmp(p->type->name,"character",9)) {
+            fprintf(fp,"  model_config_rec%%%s = trim(%s) \n",p->name,p->name) ;
+          }else{
+            fprintf(fp,"  model_config_rec%%%s = %s \n",p->name,p->name) ;
+          }
         } else {
           if ( ! sw_ifort_kludge ) {
             if        ( !strcmp( p->nentries, "max_domains" )) {

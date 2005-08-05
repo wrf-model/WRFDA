@@ -9,8 +9,9 @@
     USE module_io_wrf
     USE module_date_time
     USE module_bc_time_utilities
-    USE esmf_mod
+    USE module_utility
     IMPLICIT NONE
+#include <wrf_io_flags.h>
 #include <wrf_status_codes.h>
     TYPE(domain) :: grid
     TYPE(grid_config_rec_type),  INTENT(INOUT)    :: config_flags
@@ -39,20 +40,26 @@
     INTEGER       IBDY, NAMELEN
     LOGICAL wrf_dm_on_monitor
     EXTERNAL wrf_dm_on_monitor
-    Type(ESMF_Time)    time, oldtime, newtime, currtime
-    Type(ESMF_TimeInterval)    timetonext
+    Type(WRF_UTIL_Time)    time, oldtime, newtime, currtime
+    Type(WRF_UTIL_TimeInterval)    timetonext
     CHARACTER*19  new_date
     CHARACTER*24  base_date
     CHARACTER*80  fname
     LOGICAL dryrun
     INTEGER idt
-    INTEGER itmp, dyn_opt, filestate
+    INTEGER itmp
+    INTEGER dyn_opt_tmp, dyn_opt, filestate, ierr3
     INTEGER :: ide_compare , jde_compare , kde_compare
     REAL , DIMENSION(16) :: lats16 , lons16
+    CHARACTER (len=19) simulation_start_date
+    REAL dx_compare , dy_compare
 
 !<DESCRIPTION>
 !
 ! Core wrf input routine for all input data streams. Part of mediation layer.
+! 
+! Note that WRF IOAPI routines wrf_get_dom_ti_*() do not return values during 
+! training reads (dryrun).  
 ! 
 !</DESCRIPTION>
 
@@ -63,41 +70,56 @@
                               ims, ime, jms, jme, kms, kme,    &
                               ips, ipe, jps, jpe, kps, kpe    )
 
-    CALL wrf_inquire_filename ( fid , fname , filestate , ierr )
-    IF ( ierr /= 0 ) THEN
-      WRITE(wrf_err_message,*)'module_io_wrf: output_wrf: wrf_inquire_filename Status = ',ierr
-      CALL wrf_error_fatal( wrf_err_message )
+! simulation start time
+    IF ( switch .NE. boundary_only ) THEN
+      CALL wrf_get_dom_ti_char ( fid , 'SIMULATION_START_DATE' , simulation_start_date , ierr )
+      IF ( ierr .EQ. 0 ) THEN
+        READ ( simulation_start_date , fmt = '(I4,1x,I2,1x,I2,1x,I2,1x,I2,1x,I2)' ) &
+               config_flags%simulation_start_year,config_flags%simulation_start_month, &
+               config_flags%simulation_start_day,config_flags%simulation_start_hour, &
+               config_flags%simulation_start_minute,config_flags%simulation_start_second
+        CALL nl_set_simulation_start_year   ( grid%id , config_flags%simulation_start_year   )
+        CALL nl_set_simulation_start_month  ( grid%id , config_flags%simulation_start_month  )
+        CALL nl_set_simulation_start_day    ( grid%id , config_flags%simulation_start_day    )
+        CALL nl_set_simulation_start_hour   ( grid%id , config_flags%simulation_start_hour   )
+        CALL nl_set_simulation_start_minute ( grid%id , config_flags%simulation_start_minute )
+        CALL nl_set_simulation_start_second ( grid%id , config_flags%simulation_start_second )
+      ENDIF
     ENDIF
-
-    dryrun        = ( filestate .EQ. WRF_FILE_OPENED_NOT_COMMITTED )
-
-    check_if_dryrun : IF ( .NOT. dryrun ) THEN
 
 #if (EM_CORE == 1)
 
-    !  Test to make sure that the input data is the right size.
+    !  Test to make sure that the input data is the right size.  Do this for input from real/ideal into
+    !  WRF, and from the standard initialization into real.
 
-    CALL wrf_get_dom_ti_integer ( fid , 'WEST-EAST_GRID_DIMENSION' ,    ide_compare , 1 , icnt , ierr )
-    CALL wrf_get_dom_ti_integer ( fid , 'SOUTH-NORTH_GRID_DIMENSION' ,  jde_compare , 1 , icnt , ierr )
-    CALL wrf_get_dom_ti_integer ( fid , 'BOTTOM-TOP_GRID_DIMENSION' ,   kde_compare , 1 , icnt , ierr )
+    IF ( ( switch .EQ.     model_input_only  ) .OR. &
+         ( switch .EQ. aux_model_input1_only ) ) THEN
+       ierr = 0
+       CALL wrf_get_dom_ti_integer ( fid , 'WEST-EAST_GRID_DIMENSION' ,    ide_compare , 1 , icnt , ierr3 ) 
+       ierr = max( ierr, ierr3 )
+       CALL wrf_get_dom_ti_integer ( fid , 'SOUTH-NORTH_GRID_DIMENSION' ,  jde_compare , 1 , icnt , ierr3 ) 
+       ierr = max( ierr, ierr3 )
+       CALL wrf_get_dom_ti_integer ( fid , 'BOTTOM-TOP_GRID_DIMENSION' ,   kde_compare , 1 , icnt , ierr3 ) 
+       ierr = max( ierr, ierr3 )
+       IF ( ierr3 .NE. 0 ) CALL wrf_error_fatal( 'wrf_get_dom_ti_integer getting dimension information from dataset' )
+   
+       !  Test to make sure that the grid distances are the right size.
+   
+       CALL wrf_get_dom_ti_real ( fid , 'DX' ,  dx_compare , 1 , icnt , ierr )
+       CALL wrf_get_dom_ti_real ( fid , 'DY' ,  dy_compare , 1 , icnt , ierr )
+       IF ( ( ABS ( dx_compare - config_flags%dx ) .GT. 1.E-5 * dx_compare ) .OR. &
+            ( ABS ( dy_compare - config_flags%dy ) .GT. 1.E-5 * dy_compare ) ) THEN
+          CALL wrf_error_fatal( 'DX and DY do not match from the namelist and the input file' )
+       END IF
+    END IF
 
-! do the check only for the model initial data input stream
-    IF ( ( ide .NE. ide_compare    ) .OR. &
-        ( kde .NE. kde_compare    ) .OR. &
-        ( jde .NE. jde_compare    ) ) THEN
-      WRITE(wrf_err_message,*)'input_wrf.F: SIZE MISMATCH:  namelist ide,jde,kde=',ide,jde,kde,&
-                              '; input data ide,jde,kde=',ide_compare , jde_compare , kde_compare
-      CALL wrf_error_fatal( wrf_err_message )
-    ENDIF
+    ! do the check later (see check_if_dryrun below)
 
 #endif
 
+
     CALL nl_get_dyn_opt( 1, dyn_opt )
-    CALL wrf_get_dom_ti_integer ( fid, 'DYN_OPT', itmp, 1, icnt, ierr )
-    IF ( itmp .NE. dyn_opt .AND. switch .EQ. model_input_only ) THEN
-      WRITE(wrf_err_message,*)'input_wrf: dyn_opt in file ',itmp,' NE namelist ',dyn_opt
-      CALL wrf_error_fatal( wrf_err_message )
-    ENDIF
+    CALL wrf_get_dom_ti_integer ( fid, 'DYN_OPT', dyn_opt_tmp, 1, icnt, ierr )
 
     CALL wrf_get_dom_ti_real ( fid , 'CEN_LAT' ,  config_flags%cen_lat , 1 , icnt , ierr )
     WRITE(wrf_err_message,*)'input_wrf: wrf_get_dom_ti_real for CEN_LAT returns ',config_flags%cen_lat
@@ -260,6 +282,58 @@
     ENDIF
     CALL nl_set_isoilwater ( grid%id , config_flags%isoilwater )
 
+#ifdef MOVE_NESTS
+! Added these fields for restarting of moving nests, JM
+! DANGER and TODO
+! It is very important that these be set correctly if they are set at all in here.
+! Garbage values will produce unpredictable results, possibly segfaults, in the nesting
+! code. Need some integrity checking here or elsewhere in the code to at least check to
+! make sure that the istart and jstart values make sense with respect to the nest dimensions
+! and the position in the parent domain.
+    CALL wrf_get_dom_ti_integer ( fid , 'I_PARENT_START' ,  itmp  , 1 , icnt, ierr )
+    IF ( ierr .EQ. 0 .AND. switch .EQ. restart_only ) THEN
+      config_flags%i_parent_start = itmp
+      CALL nl_set_i_parent_start ( grid%id , config_flags%i_parent_start )
+    ENDIF
+    CALL wrf_get_dom_ti_integer ( fid , 'J_PARENT_START' ,  itmp  , 1 , icnt, ierr )
+    IF ( ierr .EQ. 0 .AND. switch .EQ. restart_only ) THEN
+      config_flags%j_parent_start = itmp
+      CALL nl_set_j_parent_start ( grid%id , config_flags%j_parent_start )
+    ENDIF
+#endif
+
+! If this was not a training read (dry run) check for erroneous values.  
+    CALL wrf_inquire_filename ( fid , fname , filestate , ierr )
+    IF ( ierr /= 0 ) THEN
+      WRITE(wrf_err_message,*)'module_io_wrf: output_wrf: wrf_inquire_filename Status = ',ierr
+      CALL wrf_error_fatal( wrf_err_message )
+    ENDIF
+
+    dryrun        = ( filestate .EQ. WRF_FILE_OPENED_NOT_COMMITTED )
+
+    check_if_dryrun : IF ( .NOT. dryrun ) THEN
+
+#if (EM_CORE == 1)
+
+    IF ( ( switch .EQ.     model_input_only  ) .OR. &
+         ( switch .EQ. aux_model_input1_only ) ) THEN
+       !  Test to make sure that the input data is the right size.
+       IF ( ( ide .NE. ide_compare    ) .OR. &
+            ( kde .NE. kde_compare    ) .OR. &
+            ( jde .NE. jde_compare    ) ) THEN
+         WRITE(wrf_err_message,*)'input_wrf.F: SIZE MISMATCH:  namelist ide,jde,kde=',ide,jde,kde,&
+                                 '; input data ide,jde,kde=',ide_compare , jde_compare , kde_compare
+         CALL wrf_error_fatal( wrf_err_message )
+       ENDIF
+    ENDIF
+
+#endif
+
+    IF ( dyn_opt_tmp .NE. dyn_opt .AND. switch .EQ. model_input_only ) THEN
+      WRITE(wrf_err_message,*)'input_wrf: dyn_opt in file ',dyn_opt_tmp,' NE namelist ',dyn_opt
+      CALL wrf_error_fatal( wrf_err_message )
+    ENDIF
+
     ENDIF check_if_dryrun 
 
 !
@@ -274,10 +348,10 @@
     CALL wrf_get_next_time(fid, current_date , ierr)
     WRITE(wrf_err_message,*)fid,' input_wrf: wrf_get_next_time current_date: ',current_date(1:19),' Status = ',ierr
     CALL wrf_debug ( 300 , TRIM(wrf_err_message ) )
-    IF ( ierr .NE. 0 .AND. ierr .NE. WRF_WARN_NOTSUPPORTED ) THEN
+    IF ( ierr .NE. 0 .AND. ierr .NE. WRF_WARN_NOTSUPPORTED .AND. ierr .NE. WRF_WARN_DRYRUN_READ ) THEN 
       CALL wrf_message ( TRIM(wrf_err_message ) )
       CALL wrf_error_fatal ( "... May have run out of valid boundary conditions ..." )
-    ELSE IF ( ierr .NE. WRF_WARN_NOTSUPPORTED ) THEN
+    ELSE IF ( ierr .NE. WRF_WARN_NOTSUPPORTED .AND. ierr .NE. WRF_WARN_DRYRUN_READ) THEN 
 !
 ! check input time against domain time (which will be start time at beginning, see share/set_timekeeping.F)
 ! JM 20040511
@@ -285,17 +359,15 @@
       SELECT CASE ( switch )
         CASE ( model_input_only, aux_model_input1_only, aux_model_input2_only,       &
                aux_model_input3_only, aux_model_input4_only, aux_model_input5_only )
-            CALL atotime( current_date(1:19), time )
-            CALL ESMF_ClockGetCurrTime( grid%domain_clock, CurrTime=currtime, rc=ierr )
-
-            print *, 'time, currtime=', time%yr, time%mm, time%dd, currtime%yr, currtime%mm, currtime%dd
-            print *, 'current_date=', current_date(1:19)
-
+            CALL wrf_atotime( current_date(1:19), time )
+            CALL WRF_UTIL_ClockGet( grid%domain_clock, CurrTime=currtime, rc=ierr )
+            CALL wrf_clockprint(150, grid%domain_clock, &
+                                'DEBUG input_wrf():  get currTime from grid%domain_clock,')
             IF ( time .NE. currtime ) THEN
-                CALL ESMF_TimeGetString( time, errmess , ierr )
+                CALL wrf_timetoa ( time, errmess )
                 WRITE( wrf_err_message , * )'Time in file: ',trim( errmess )
                 CALL wrf_message ( trim(wrf_err_message) )
-                CALL ESMF_TimeGetString( currtime, errmess , ierr )
+                CALL wrf_timetoa ( currtime, errmess )
                 WRITE( wrf_err_message , * )'Time on domain: ',trim( errmess )
                 CALL wrf_message ( trim(wrf_err_message) )
                 CALL wrf_message( "**WARNING** Time in input file not equal to time on domain **WARNING**" )
@@ -311,9 +383,9 @@
 ! 
     IF ( switch .EQ. boundary_only ) THEN
         CALL wrf_get_dom_td_char ( fid , 'THISBDYTIME' ,  current_date(1:19), this_datestr , ierr )
-        CALL atotime( this_datestr(1:19), grid%this_bdy_time )
+        CALL wrf_atotime( this_datestr(1:19), grid%this_bdy_time )
         CALL wrf_get_dom_td_char ( fid , 'NEXTBDYTIME' ,  current_date(1:19), next_datestr , ierr )
-        CALL atotime( next_datestr(1:19), grid%next_bdy_time )
+        CALL wrf_atotime( next_datestr(1:19), grid%next_bdy_time )
     ENDIF
 
 #if 1

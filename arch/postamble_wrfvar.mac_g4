@@ -1,0 +1,116 @@
+#
+LIB		=	$(NETCDF_LIB) $(MPI_LIB) $(LOCAL_LIB) $(WRF_LIB)
+EXTRAMODULES    =
+FCBASEOPTS      =       -w $(FCTYPE) $(FCBASE) $(FCFORM) $(FCHOST) $(FCDEBUG) -I.
+FC_FFT_RF_OPTS  =       $(FCTYPE) $(FC_FFT_RF) $(FCFORM) $(FCHOST) $(FCDEBUG) -I.
+FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS) $(OMP)
+INCLUDE_MODULES =       -I../da_3dvar -I../da_3dvar/src \
+			-I../external/io_netcdf -I../external/io_int \
+                        -I../external/esmf_time_f90 \
+                        -I../frame -I../share -I../phys -I../inc
+
+REGISTRY        =       Registry
+CPPFLAGS        =       -I$(LIBINCLUDE) -C -P $(ARCHFLAGS) $(ENVCOMPDEFS) \
+			$(TRADFLAG) $(DM_1_CPP_FLAGS) $(OMPCPP) $(COREDEFS) $(POUND_DEF)
+
+INC_MOD_3DVAR   =       -I../../$(NETCDF_IO_PATH) \
+			-I../../da_3dvar -I../../da_3dvar/src \
+                        -I../../external/io_int \
+                        -I../../external/esmf_time_f90 \
+                        -I../../frame -I../../share -I../../inc
+FCFLAGS_3DVAR   =       $(FCOPTIM) $(FCBASEOPTS)
+FCFLAGS_FFT_RF  =       $(FCOPTIM) $(FC_FFT_RF_OPTS)
+F77FLAGS_BUFR   =       $(FCTYPE) $(FCBUFR) $(FCHOST) $(FCDEBUG) -I.
+F77FLAGS_3DVAR  =       $(FCTYPE) $(FCBASE) $(FCHOST) $(FCDEBUG) -I.
+CPPFLAGS_3DVAR  =       $(TRADFLAG) $(DM_2_CPP_FLAGS) \
+                        -I$(LIBINCLUDE) -I../../inc -C -P $(ARCHFLAGS)
+FUFLAGS         =       $(FCOPTIM) $(FCBASE) $(FCFORM) $(FCDEBUG)
+
+wrfio_nf : 
+	( cd ../external/io_netcdf ; \
+        make NETCDFPATH=$(NETCDFPATH) CPP="$(CPP) $(TRADFLAG)" \
+	RANLIB="$(RANLIB)" \
+	FC="$(FC)" FCFLAGS="$(FCDEBUG) $(FCFORM) $(FCBASE) -w" TRADFLAG="$(TRADFLAG)" ; \
+	/bin/cp wrf_io_flags.h wrf_status_codes.h ../../inc )
+
+wrfio_int : 
+	( cd ../external/io_int ; \
+        make CC="$(CC)" CPP="$(CPP)" \
+	RANLIB="$(RANLIB)" \
+	FC="$(FC)" FCFLAGS="$(FCDEBUG) $(FCFORM) $(FCBASE)" all )
+
+wrfio_grib1 :
+	( cd ../external/io_grib1 ; \
+        make CC="$(CC)" CPP="$(CPP)" \
+	RANLIB="$(RANLIB)" \
+	CC="$(CC)" CFLAGS="$(CFLAGS)" \
+	FC="$(FC)" FCFLAGS="$(FCDEBUG) $(FCFORM) $(FCBASE)" )
+
+esmf_time : 
+	( cd ../external/esmf_time_f90 ; \
+	make FC="$(FC)" FCFLAGS="$(FCDEBUG) $(FCFLAGS)" \
+	RANLIB="$(RANLIB)" \
+	CPP="$(CPP) -I../../inc -I. $(POUND_DEF) $(TRADFLAG)" )
+
+# compile these without high optimization to speed compile
+module_io_mm5.o : module_io_mm5.F
+module_si_io.o : module_si_io.F
+module_io_wrf.o : module_io_wrf.F
+module_domain.o : module_domain.F
+module_start.o : module_start.F
+module_initialize.o : module_initialize.F
+module_initialize_b_wave.o : module_initialize_b_wave.F
+module_initialize_hill2d_x.o : module_initialize_hill2d_x.F
+module_initialize_quarter_ss.o : module_initialize_quarter_ss.F
+module_initialize_squall2d_x.o : module_initialize_squall2d_x.F
+module_initialize_squall2d_y.o : module_initialize_squall2d_y.F
+module_initialize_real.o : module_initialize_real.F
+module_dm.o : module_dm.F
+start_domain.o : start_domain.F
+module_configure.o : module_configure.F
+mediation_interp_domain.o : mediation_interp_domain.F
+mediation_force_domain.o : mediation_force_domain.F
+mediation_feedback_domain.o : mediation_feedback_domain.F
+
+module_io_mm5.o module_si_io.o module_io_wrf.o module_domain.o \
+module_start.o module_initialize.o module_initialize_b_wave.o  \
+module_initialize_hill2d_x.o module_initialize_quarter_ss.o    \
+module_initialize_squall2d_x.o module_initialize_squall2d_y.o  \
+module_configure.o mediation_interp_domain.o                   \
+mediation_force_domain.o mediation_feedback_domain.o           \
+module_initialize_real.o module_dm.o start_domain.o :
+	$(RM) $@
+	$(MV) $*.F $*.fs
+	$(SED_FTN) $*.fs > $*.b 
+	$(CPP) -I../inc $(CPPFLAGS) $*.b  > $*.f
+	$(RM) $*.b
+	$(FC) -c $(FCBASEOPTS) $(MODULE_DIRS) -O0 $*.f
+	$(MV) $*.fs $*.F
+
+#There is probably no reason to modify these rules
+
+.F.o:
+	$(RM) $@
+	$(MV) $*.F $*.fs
+	$(SED_FTN) $*.fs > $*.b
+	$(CPP) -I../inc $(CPPFLAGS) $*.b  > $*.f
+	$(RM) $*.b
+	$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $*.f
+	$(MV) $*.fs $*.F
+
+.F.f:
+	$(RM) $@
+	$(MV) $*.F $*.fs
+	$(SED_FTN) $*.fs > $*.b 
+	$(CPP) -I../inc $(CPPFLAGS) $*.b > $*.f
+	$(RM) $*.b
+	$(MV) $*.fs $*.F
+
+.f.o:
+	$(RM) $@
+	$(FC) -c $(FCFLAGS) $*.f
+
+.c.o:
+	$(RM) $@
+	$(CC) -c $(CFLAGS) $*.c
+

@@ -1,0 +1,141 @@
+#
+LIB	     =       $(NETCDF_LIB) $(MPI_LIB) $(LOCAL_LIB) $(WRF_LIB)
+EXTRAMODULES    =
+FCBASEOPTS      =       $(FCTYPE) $(FCBASE) $(FCFORM) $(FCHOST) $(FCDEBUG) -I.
+FC_FFT_RF_OPTS  =       $(FCTYPE) $(FC_FFT_RF) $(FCFORM) $(FCHOST) $(FCDEBUG) -I.
+FCFLAGS	 =       $(FCOPTIM) $(FCBASEOPTS)
+INCLUDE_MODULES =       -I../da_3dvar -I../da_3dvar/src \
+			-I../external/io_netcdf -I../external/io_int \
+	                -I../external/esmf_time_f90 \
+	                -I../external/RSL/RSL \
+	                -I../frame -I../share -I../phys -I../inc \
+	                -p../phys \
+	                -p../frame \
+			-p../share \
+			-p../da_3dvar \
+			-p../da_3dvar/src \
+	                -p../external/io_int \
+	                -p../external/esmf_time_f90 \
+	                -p../external/RSL/RSL
+
+LDFLAGS         =       -L../da_3dvar \
+			-L../da_3dvar/src \
+			-L../external/io_netcdf \
+			-L../external/io_int \
+			-L../external/esmf_time_f90 \
+			-L../external/RSL/RSL \
+			-L../frame \
+			-L../share
+
+REGISTRY	=       Registry
+CPPFLAGS	=       -I$(LIBINCLUDE) -C -P $(ARCHFLAGS) $(ENVCOMPDEFS) \
+			$(TRADFLAG) $(DM_1_CPP_FLAGS) $(OMPCPP) $(COREDEFS) $(POUND_DEF)
+
+INC_MOD_3DVAR   =       -I../../$(NETCDF_IO_PATH) \
+	                -p../../frame \
+			-p../../share \
+			-p../../da_3dvar \
+			-p../../da_3dvar/src \
+	                -p../../external/io_int \
+	                -p../../external/esmf_time_f90 \
+	                -p../../external/RSL/RSL \
+	                -I../../external/RSL/RSL \
+			-I../../da_3dvar -I../../da_3dvar/src \
+	                -I../../external/io_int \
+	                -I../../external/esmf_time_f90 \
+	                -I../../frame -I../../share -I../../inc
+FCFLAGS_3DVAR   =       $(FCOPTIM) $(FCBASEOPTS)
+FCFLAGS_FFT_RF  =       $(FCOPTIM) $(FC_FFT_RF_OPTS)
+F77FLAGS_BUFR   =       $(FCTYPE) $(FCBUFR) $(FCHOST) $(FCDEBUG) -I.
+F77FLAGS_3DVAR  =       $(FCTYPE) $(FCBASE) $(FCHOST) $(FCDEBUG) -I.
+CPPFLAGS_3DVAR  =       $(TRADFLAG) $(DM_2_CPP_FLAGS) \
+	                -I$(LIBINCLUDE) -I../../inc -C -P $(ARCHFLAGS)
+FUFLAGS	 =       $(FCOPTIM) $(FCBASE) $(FCFORM) $(FCDEBUG) $(FCTYPE)
+
+wrfio_nf : 
+	( cd ../external/io_netcdf ; \
+	make NETCDFPATH=$(NETCDFPATH) CPP="cpp -C -P -Dcrayx1" \
+	RANLIB="$(RANLIB)" \
+	FC="$(FC)" FCFLAGS="$(FCDEBUG) $(FCFORM) $(FCBASE) $(FCTYPE) -O0" TRADFLAG="$(TRADFLAG)" ; \
+	if [ $(RWORDSIZE) -eq 8 ] ; then \
+	/bin/rm -f foo_io_flags.h; \
+	sed -e 's/104/105/' wrf_io_flags.h > foo_io_flags.h ;\
+	/bin/mv foo_io_flags.h wrf_io_flags.h ; fi ; \
+	/bin/cp wrf_io_flags.h wrf_status_codes.h ../../inc ; \
+	/bin/cp wrf_io_flags.h wrf_status_codes.h ../io_phdf5 )
+
+wrfio_int : 
+	( cd ../external/io_int ; \
+	make CC="$(CC)" CPP="$(CPP)" \
+	RANLIB="$(RANLIB)" \
+	FC="$(FC)" FCFLAGS="$(FCDEBUG) $(FCFORM) $(FCBASE) $(FCTYPE) -O0" all )
+
+wrfio_grib1 :
+	( cd ../external/io_grib1 ; \
+	make CC="$(CC)" CPP="$(CPP)" \
+	RANLIB="$(RANLIB)" \
+	CC="$(CC)" CFLAGS="$(CFLAGS)" \
+	FC="$(FC)" FCFLAGS="$(FCDEBUG) $(FCFORM) $(FCBASE) $(FCTYPE) -O0" )
+
+esmf_time : 
+	( cd ../external/esmf_time_f90 ; \
+	make FC="$(FC) $(FCDEBUG) $(FCFORM) $(FCBASE) $(FCTYPE) -O0" \
+	RANLIB="$(RANLIB)" \
+	CPP="$(CPP) -I../../inc -I. $(POUND_DEF) $(TRADFLAG)" )
+
+# compile these without high optimization to speed compile
+module_io_mm5.o : module_io_mm5.F
+module_si_io.o : module_si_io.F
+module_io_wrf.o : module_io_wrf.F
+module_domain.o : module_domain.F
+module_start.o : module_start.F
+module_initialize.o : module_initialize.F
+module_initialize_b_wave.o : module_initialize_b_wave.F
+module_initialize_hill2d_x.o : module_initialize_hill2d_x.F
+module_initialize_quarter_ss.o : module_initialize_quarter_ss.F
+module_initialize_squall2d_x.o : module_initialize_squall2d_x.F
+module_initialize_squall2d_y.o : module_initialize_squall2d_y.F
+module_initialize_real.o : module_initialize_real.F
+module_dm.o : module_dm.F
+start_domain.o : start_domain.F
+module_configure.o : module_configure.F
+mediation_interp_domain.o : mediation_interp_domain.F
+mediation_force_domain.o : mediation_force_domain.F
+mediation_feedback_domain.o : mediation_feedback_domain.F
+
+module_io_mm5.o module_si_io.o module_io_wrf.o module_domain.o \
+module_start.o module_initialize.o module_initialize_b_wave.o  \
+module_initialize_hill2d_x.o module_initialize_quarter_ss.o    \
+module_initialize_squall2d_x.o module_initialize_squall2d_y.o  \
+module_configure.o mediation_interp_domain.o	           \
+mediation_force_domain.o mediation_feedback_domain.o	   \
+module_initialize_real.o module_dm.o start_domain.o :
+	$(RM) $@
+	$(SED_FTN) $*.F > $*.b 
+	$(CPP) -I../inc $(CPPFLAGS) $*.b  > $*.f
+	$(RM) $*.b
+	$(FC) -c $(FCBASEOPTS) $(MODULE_DIRS) -O0 $*.f
+
+#There is probably no reason to modify these rules
+
+.F.o:
+	$(RM) $@
+	$(SED_FTN) $*.F > $*.b
+	$(CPP) -I../inc $(CPPFLAGS) $*.b  > $*.f
+	$(RM) $*.b
+	$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $*.f
+
+.F.f:
+	$(RM) $@
+	$(SED_FTN) $*.F > $*.b 
+	$(CPP) -I../inc $(CPPFLAGS) $*.b > $*.f
+	$(RM) $*.b
+
+.f.o:
+	$(RM) $@
+	$(FC) -c $(FCFLAGS) $*.f
+
+.c.o:
+	$(RM) $@
+	$(CC) -c $(CFLAGS) $*.c
+
