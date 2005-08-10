@@ -33,12 +33,14 @@ subroutine DA_Transfer_XatoAnalysis( it, xbx, grid, config_flags ,&
 !------------------------------------------------------------------------------      
 
    if(fg_format == 1) then
+#ifdef WRFVAR
       if (write_increments) then
          write(filnam,'(a3,i1)') 'inc',it
          call DA_Transfer_XatoWRFTL( grid, config_flags, filnam, &
 #include <em_dummy_args.inc>
                                  )
       endif
+#endif
 
       call DA_Transfer_XatoWRF( xbx, grid, &
 #include <em_dummy_args.inc>

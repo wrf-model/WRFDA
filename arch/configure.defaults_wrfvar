@@ -16,7 +16,7 @@ ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DNETCDF -DINTIO \
 CFLAGS          =       $(ARCHFLAGS)
 TRADFLAG        =
 #FCOPTIM         =       -fast -O2 -Olimit 2000
-FCOPTIM         =       -O0
+FCOPTIM         =       -fast -O2
 FCDEBUG         =       -g
 FCTYPE          =       -r8
 FCFORM          =       -free
@@ -67,7 +67,7 @@ ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DNETCDF -DINTIO \
 CFLAGS          =       $(ARCHFLAGS) -I../external/RSL/RSL
 TRADFLAG        =
 #FCOPTIM         =       -fast -O2 -Olimit 2000
-FCOPTIM         =       -O0
+FCOPTIM         =       -fast -O2
 FCDEBUG         =       -g
 FCTYPE          =       -r8
 FCFORM          =       -free
@@ -488,6 +488,7 @@ externals : wrfio_int wrfio_grib1
 FC              =       xlf90_r
 F77             =       xlf_r
 LD              =       xlf90_r
+SFC             =       $(FC)
 CC              =       cc_r
 CC_TOOLS        =       cc_r
 CFLAGS          =       -DNOUNDERSCORE -DNCARIBM_NOC99
@@ -535,7 +536,7 @@ F77		=	mpxlf_r
 LD              =       $(FC)
 CC              =       mpcc_r
 CC_TOOLS        =       cc_r
-CFLAGS          =       -DNOUNDERSCORE -DWRF_RSL_IO \
+CFLAGS          =       -DNOUNDERSCORE -DNCARIBM_NOC99 -DWRF_RSL_IO \
 			-I../external/RSL/RSL \
 			-DDM_PARALLEL \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) \
