@@ -1182,7 +1182,7 @@ DA_Test.o:	\
 			DA_Test/da_check_xtoy_adjoint_ssmt2.inc \
 			DA_Test/da_setup_testfield.inc \
 			DA_Test/da_get_y_lhs_value.inc \
-			DA_Test/DA_Test_VToY_Transform.inc \
+			DA_Test/DA_Check_VToY_Adjoint.inc \
 			DA_Test/set_tst_trnsf_fld.inc
 			$(RM) $@
 			$(CPP) -I./DA_Test $(CPPFLAGS_3DVAR) DA_Test/DA_Test.F > DA_Test.f

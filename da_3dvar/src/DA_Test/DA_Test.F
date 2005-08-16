@@ -35,6 +35,10 @@ module DA_Test
    use da_qscat
    use DA_Minimisation
 
+   USE DA_Grid_Definitions
+   USE DA_Physics
+   use module_wrf_3dvar_io
+
    implicit none
    
         
@@ -83,7 +87,9 @@ contains
 #include "da_setup_testfield.inc"
 #include "check_sfc_assi.inc"
 #include "set_tst_trnsf_fld.inc"
-#include "DA_Test_VToY_Transform.inc"
+#include "DA_Check_VToY_Adjoint.inc"
 #include "da_get_y_lhs_value.inc"
+
+#include "da_check_xtow_adjoint.inc"
 
 end module DA_Test
