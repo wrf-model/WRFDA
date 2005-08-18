@@ -3,12 +3,11 @@ SUBROUTINE DA_Transfer_WRFTLtoXa( grid, config_flags, filnam, &
 #include <em_dummy_args.inc>
 !
                               )
-
 !------------------------------------------------------------------------------
 !  PURPOSE: Convert WRFTL variables to analysis increments
-!           (inverse of the incremental part of xatowrf)
-!                                                  Hans Huang, 7 March 2005
-!
+!                                          Hans Huang, 03/07/2005 (original)
+!                                                      08/17/2005 (re-written)
+!------------------------------------------------------------------------------
 !  PARENT_MODULE: DA_Setup_Structures
 !------------------------------------------------------------------------------
 
@@ -29,7 +28,7 @@ SUBROUTINE DA_Transfer_WRFTLtoXa( grid, config_flags, filnam, &
    integer :: is, ie, js, je, ks, ke
 
    real    :: sdmd, s1md, qvf1, qvf2, qvf1_b, qvf2_b
-   real, dimension(xp%ims:xp%ime,xp%jms:xp%jme,xp%kms:xp%kme) :: p_agrid
+   real, dimension(xp%ims:xp%ime,xp%jms:xp%jme,xp%kms:xp%kme) :: g_press
 
    integer ndynopt
 
@@ -39,12 +38,12 @@ SUBROUTINE DA_Transfer_WRFTLtoXa( grid, config_flags, filnam, &
 !  [0.0] INPUT
 !------------------------------------------------------------------------------
 
-   is = xp % its
-   ie = xp % ite
-   js = xp % jts
-   je = xp % jte
-   ks = xp % kts
-   ke = xp % kte
+   is=xp%its
+   ie=xp%ite
+   js=xp%jts
+   je=xp%jte
+   ks=xp%kts
+   ke=xp%kte
 
    ndynopt      = grid%dyn_opt
    grid%dyn_opt = DYN_EM_TL
@@ -89,33 +88,13 @@ SUBROUTINE DA_Transfer_WRFTLtoXa( grid, config_flags, filnam, &
 
    do j=js,je
    do i=is,ie
-
-     k=ke
-
-     qvf1  =g_moist_2(i,j,k,P_QV)
-     qvf1_b=moist_2(i,j,k,P_QV)
-     qvf2  =-qvf1/ ((1.+qvf1_b)*(1.+qvf1_b))
-     qvf2_b=1./(1.+qvf1)
-     qvf1  =qvf1*qvf2_b + qvf1_b*qvf2
-     qvf1_b=qvf1_b*qvf2_b
-
-     p_agrid(i,j,k)=(-0.5/rdnw(k))*                                   &
-                    ((g_mu_2(i,j)+qvf1*mub(i,j))/qvf2_b               &
-                    -(mu_2(i,j)+qvf1_b*mub(i,j))*qvf2/(qvf2_b*qvf2_b))
-
-     do k = ke-1,1,-1
-
-       qvf1  =0.5*(g_moist_2(i,j,k,P_QV)+g_moist_2(i,j,k+1,P_QV))
-       qvf1_b=0.5*(  moist_2(i,j,k,P_QV)+  moist_2(i,j,k+1,P_QV))
-       qvf2  =-qvf1/((1.+qvf1_b)*(1.+qvf1_b))
-       qvf2_b=1./(1.+qvf1_b)
-       qvf1  =qvf1*qvf2_b + qvf1_b*qvf2
-       qvf1_b=qvf1_b*qvf2_b
-
-       p_agrid(i,j,k)=p_agrid(i,j,k+1)-(1./rdn(k+1)) *                 &
-                      ((g_mu_2(i,j)+qvf1*mub(i,j))/qvf2_b              &
-                      -(mu_2(i,j)+qvf1_b*mub(i,j))*qvf2/(qvf2_b*qvf2_b))
-     enddo
+      g_press(i,j,ke+1)=0.0
+      do k=ke,ks,-1
+         g_press(i,j,k)=g_press(i,j,k+1) &
+                 -(g_mu_2(i,j)*(1.0+moist_2(i,j,k,P_QV)) &
+                 +(mu_2(i,j)+mub(i,j))*g_moist_2(i,j,k,P_QV))*dn(k)
+         xa%p(i,j,k)=0.5*(g_press(i,j,k)+g_press(i,j,k+1))
+      enddo
    enddo
    enddo
 
@@ -126,12 +105,13 @@ SUBROUTINE DA_Transfer_WRFTLtoXa( grid, config_flags, filnam, &
    do k=ks,ke
    do j=js,je
    do i=is,ie
-      xa%t(i,j,k)=(g_t_2(i,j,k)+t_2(i,j,k)+ts0)/ &
-                  (ps0/(p_agrid(i,j,k)+xb%p(i,j,k)))**kappa &
-                  - xb%t(i,j,k)
+      xa%t(i,j,k)=xb%t(i,j,k)*(g_t_2(i,j,k)/(300.0+t_2(i,j,k)) &
+                         +kappa*xa%p(i,j,k)/xb%p(i,j,k))
    enddo
    enddo
    enddo
+
+! In the inverse, g_ph information is lost. This should be investigated later!!!
 
 ! ----------------------------------------------------------------------------
 ![5.0] CONVERT FROM C-GRID TO A-GRID
@@ -155,8 +135,8 @@ SUBROUTINE DA_Transfer_WRFTLtoXa( grid, config_flags, filnam, &
 !  [6.0] ALL THE SIMPLE ONES
 !------------------------------------------------------------------------------
 
-   do j=js,je
    do k=ks,ke+1
+   do j=js,je
    do i=is,ie
       xa%w(i,j,k)=g_w_2(i,j,k)
    enddo

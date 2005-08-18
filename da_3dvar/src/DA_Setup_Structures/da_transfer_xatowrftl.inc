@@ -3,12 +3,12 @@ SUBROUTINE DA_Transfer_XatoWRFTL( grid, config_flags, filnam, &
 #include <em_dummy_args.inc>
 !
                               )
-
 !------------------------------------------------------------------------------
 !  PURPOSE: Convert analysis increments into WRFTL increments 
-!           (following xatowrf, but only keep the increments)
-!                                                Hans Huang, 8 March 2005
-!           
+!           (based on an early subroutine by Yong-Run Guo and Wei Huang)
+!                                          Hans Huang, 03/10/2005 (original)
+!                                                      08/16/2005 (re-written)
+!------------------------------------------------------------------------------
 !  PARENT_MODULE: DA_Setup_Structures
 !------------------------------------------------------------------------------
 
@@ -26,34 +26,25 @@ SUBROUTINE DA_Transfer_XatoWRFTL( grid, config_flags, filnam, &
    integer :: i, j, k, n
    integer :: is, ie, js, je, ks, ke
    real    :: sdmd, s1md
+   real    :: rho_cgrid
 
 !---------------------------------------------------------------------------
 
    LOGICAL, EXTERNAL :: wrf_dm_on_monitor
 
-!=>ARRAYS TO HOLD WRF INCREMENTS ON THE C-grid 
-
-   REAL, dimension(xp%ims:xp%ime,xp%jms:xp%jme,xp%kms:xp%kme) :: u_cgrid,  v_cgrid, &
-                                                                 p_cgrid
-
-   REAL, dimension(xp%ims:xp%ime,xp%jms:xp%jme)               :: mu_cgrid
-
-   REAL    :: t_full  , p_full, rho_full, q_full, ph_full , ph_xb_hd, &
-              qvf1, qvf2, qvf1_b, qvf2_b
-
-   REAL, dimension(xp%ims:xp%ime,xp%jms:xp%jme,xp%kms:xp%kme) :: new_t_2, new_ph_2
+   REAL, dimension(xp%ims:xp%ime,xp%jms:xp%jme,xp%kms:xp%kme) :: g_press
 
    integer ndynopt
 
 #ifdef WRFVAR
 
 !---------------------------------------------------------------------------
-   is = xp % its
-   ie = xp % ite
-   js = xp % jts
-   je = xp % jte
-   ks = xp % kts
-   ke = xp % kte
+   is=xp%its
+   ie=xp%ite
+   js=xp%jts
+   je=xp%jte
+   ks=xp%kts
+   ke=xp%kte
 
 !------------------------------------------------------------------------------
 !  [1.0] Get the mixing ratio of moisture first, as it is easy.
@@ -62,18 +53,10 @@ SUBROUTINE DA_Transfer_XatoWRFTL( grid, config_flags, filnam, &
    do k=ks,ke
    do j=js,je
    do i=is,ie
-      g_moist_2(i,j,k,P_QV) = xa%q(i,j,k)/(1.0 - xb%q(i,j,k))**2
+      g_moist_2(i,j,k,P_QV)=xa%q(i,j,k)/(1.0-xb%q(i,j,k))**2
    enddo
    enddo
    enddo
-
-#if 0
-   print *, 'xa%q(41,1,1)=', xa%q(41,1,1)
-   print *, 'xa%q(42,1,1)=', xa%q(42,1,1)
-
-   print *, 'xb%q(41,1,1)=', xb%q(41,1,1)
-   print *, 'xb%q(42,1,1)=', xb%q(42,1,1)
-#endif
 
 !------------------------------------------------------------------------------
 !  [2.0] COMPUTE increments of dry-column air mass per unit area
@@ -87,192 +70,146 @@ SUBROUTINE DA_Transfer_XatoWRFTL( grid, config_flags, filnam, &
          sdmd=sdmd+g_moist_2(i,j,k,P_QV)*dnw(k)
          s1md=s1md+(1.0+moist_2(i,j,k,P_QV))*dnw(k)
       enddo
-
-      mu_cgrid(i,j)=-(xa%psfc(i,j)+xb%psac(i,j)*sdmd)/s1md
+      g_mu_2(i,j)=-(xa%psfc(i,j)+xb%psac(i,j)*sdmd)/s1md
    enddo
    enddo
 
 !------------------------------------------------------------------------------
-!  [3.0] COMPUTE pressure increments 
+!  [3.0] COMPUTE pressure increments (for computing theta increments)
 !------------------------------------------------------------------------------
-
-! Tangent linear code for p_cgrid (based on WRF "real.init.code") 
-! developed by Y.-R. Guo 05/13/2004:
 
    do j=js,je
    do i=is,ie
-     k = ke
-     qvf1   = g_moist_2(i,j,k,P_QV)
-     qvf1_b = moist_2(i,j,k,P_QV)
-     qvf2   = - qvf1 / ((1.+qvf1_b)*(1.+qvf1_b))
-     qvf2_b = 1./(1.+qvf1)
-     qvf1   = qvf1*qvf2_b + qvf1_b*qvf2
-     qvf1_b = qvf1_b*qvf2_b
-     p_cgrid(i,j,k) = (-0.5/rdnw(k)) * &
-                ( (mu_cgrid(i,j)+qvf1*mub(i,j)) / qvf2_b &
-                 -(mu_2(i,j)+qvf1_b*mub(i,j))*qvf2/(qvf2_b*qvf2_b) )
-
-     do k = ke-1,1,-1
-       qvf1   = 0.5*(g_moist_2(i,j,k,P_QV)+g_moist_2(i,j,k,P_QV))
-       qvf1_b = 0.5*(moist_2(i,j,k,P_QV)+moist_2(i,j,k+1,P_QV))
-       qvf2   = - qvf1 / ((1.+qvf1_b)*(1.+qvf1_b))
-       qvf2_b = 1./(1.+qvf1_b)
-       qvf1   = qvf1*qvf2_b + qvf1_b*qvf2
-       qvf1_b = qvf1_b*qvf2_b
-       p_cgrid(i,j,k) = p_cgrid(i,j,k+1)  &
-                  - (1./rdn(k+1)) * &
-                  ( (mu_cgrid(i,j)+qvf1*mub(i,j)) / qvf2_b &
-                   -(mu_2(i,j)+qvf1_b*mub(i,j))*qvf2/(qvf2_b*qvf2_b) )
-     enddo
+      g_press(i,j,ke+1)=0.0
+      do k=ke,ks,-1
+         g_press(i,j,k)=g_press(i,j,k+1) &
+                 -(g_mu_2(i,j)*(1.0+moist_2(i,j,k,P_QV)) &
+                 +(mu_2(i,j)+mub(i,j))*g_moist_2(i,j,k,P_QV))*dn(k)
+         xa%p(i,j,k)=0.5*(g_press(i,j,k)+g_press(i,j,k+1))
+      enddo
    enddo
    enddo
 
-! ----------------------------------------------------------------------------
+!------------------------------------------------------------------------------
+!  [4.0] CONVERT TEMPERATURE INCREMENTS INTO THETA INCREMENTS
+!        EVALUATE ALSO THE INCREMENTS OF (1/rho) AND GEOPOTENTIAL
+!------------------------------------------------------------------------------
 
-!==> CONVERT FROM A-GRID TO C-GRID
+   do k=ks,ke
+   do j=js,je
+   do i=is,ie
+      g_t_2(i,j,k)=(300.0+t_2(i,j,k))*(xa%t(i,j,k)/xb%t(i,j,k) &
+                  -kappa*xa%p(i,j,k)/xb%p(i,j,k))
+   enddo
+   enddo
+   enddo
+   do j=js,je
+   do i=is,ie
+      g_ph_2(i,j,ks)=0.
+      do k=ks,ke
+         rho_cgrid=xb%rho(i,j,k) &
+                   *(xa%p(i,j,k)/xb%p(i,j,k) &
+                   -xa%t(i,j,k)/xb%t(i,j,k) &
+                   -0.61*xa%q(i,j,k)/(1.+0.61*xb%q(i,j,k)))
+         g_ph_2(i,j,k+1)=g_ph_2(i,j,k) &
+                        -(g_press(i,j,k+1)-g_press(i,j,k) &
+                        +(ph_2(i,j,k+1)-ph_2(i,j,k))*rho_cgrid) &
+                        /xb%rho(i,j,k)
+      enddo
+   enddo
+   enddo
+
+
+!------------------------------------------------------------------------------
+!  [5.0] CONVERT FROM A-GRID TO C-GRID
+!------------------------------------------------------------------------------
 
 #ifdef DM_PARALLEL
 !--Fill the halo region for u and v.
 
    call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id3)
 
-   do j=js,je
+!--The southern boundary (fill A-GRID boundaries)
+!--To keep the gradient, A(0) = 2A(1)-A(2)
+   if(js == xp%jds) xa%v(is:ie,js-1,ks:ke)=&
+                    2.0*xa%v(is:ie,js,ks:ke)-xa%v(is:ie,js+1,ks:ke)
+
+!--The western boundary (fill A-GRID boundaries)
+!--To keep the gradient, A(0) = 2A(1)-A(2)
+   if(is == xp%ids) xa%u(is-1,js:je,ks:ke)=&
+                    2.0*xa%u(is,js:je,ks:ke)-xa%u(is+1,js:je,ks:ke)
+
    do k=ks,ke
-      do i=is,ie
-         u_cgrid(i,j,k)=0.5*(xa%u(i-1,j  ,k)+xa%u(i,j,k))
-         v_cgrid(i,j,k)=0.5*(xa%v(i  ,j-1,k)+xa%v(i,j,k))
-      enddo
+   do j=js,je
+   do i=is,ie
+      g_u_2(i,j,k)=0.5*(xa%u(i-1,j  ,k)+xa%u(i,j,k))
+      g_v_2(i,j,k)=0.5*(xa%v(i  ,j-1,k)+xa%v(i,j,k))
    enddo
    enddo
+   enddo
 
-!--Fill the boundary
+!--The northern boundary (compute C-GRID boundaries)
+!--To keep the gradient, A(N+1) = 2A(N)-A(N-1)
+!--and on C-Grid, this will lead to C(N+1)=(A(N)+A(N+1))/2=(3A(N)-A(N-1))/2
+   if(je == xp%jde) g_v_2(is:ie,je+1,ks:ke)=&
+                   (3.0*xa%v(is:ie,je,ks:ke)-xa%v(is:ie,je-1,ks:ke))/2.
 
-!--The southern boundary
-   if(js == xp%jds) then
-      v_cgrid(is:ie,js,ks:ke)=2.0*xa%v(is:ie,js  ,ks:ke) &
-                             -    xa%v(is:ie,js+1,ks:ke)
-   endif
-
-!--The northern boundary
-   if(je == xp%jde) then
-      v_cgrid(is:ie,je+1,ks:ke)=2.0*xa%v(is:ie,je  ,ks:ke) &
-                               -    xa%v(is:ie,je-1,ks:ke)
-   endif
-
-!--The western boundary
-   if(is == xp%ids) then
-      u_cgrid(is,js:je,ks:ke)=2.0*xa%u(is  ,js:je,ks:ke) &
-                             -    xa%u(is+1,js:je,ks:ke)
-   endif
-
-!--The eastern boundary
-   if(ie == xp%ide) then
-      u_cgrid(ie+1,js:je,ks:ke)=2.0*xa%u(ie  ,js:je,ks:ke) &
-                               -    xa%u(ie-1,js:je,ks:ke)
-   endif
+!--The eastern boundary (compute C-GRID boundaries)
+!--To keep the gradient, A(N+1) = 2A(N)-A(N-1)
+!--and on C-Grid, this will lead to C(N+1)=(A(N)+A(N+1))/2=(3A(N)-A(N-1))/2
+   if(ie == xp%ide) g_u_2(ie+1,js:je,ks:ke)=&
+                   (3.0*xa%u(ie,js:je,ks:ke)- xa%u(ie-1,js:je,ks:ke))/2.
 
 #else
-
-!--The eastern boundary
-   u_cgrid(ie+1,js:je,ks:ke)=2.0*xa%u(ie  ,js:je,ks:ke) &
-                            -    xa%u(ie-1,js:je,ks:ke)
-
-!--The northern boundary
-   v_cgrid(is:ie,je+1,ks:ke)=2.0*xa%v(is:ie,je  ,ks:ke) &
-                            -    xa%v(is:ie,je-1,ks:ke)
 
    do k=ks,ke
       do j=js,je
       do i=is+1,ie
-         u_cgrid(i,j,k)=0.5*(xa%u(i-1,j,k)+xa%u(i,j,k))
+         g_u_2(i,j,k)=0.5*(xa%u(i-1,j,k)+xa%u(i,j,k))
       enddo
       enddo
-
       do j=js+1,je
       do i=is,ie
-         v_cgrid(i,j,k)=0.5*(xa%v(i,j-1,k)+xa%v(i,j,k))
+         g_v_2(i,j,k)=0.5*(xa%v(i,j-1,k)+xa%v(i,j,k))
       enddo
       enddo
    enddo
 
+!--To keep the gradient, A(N+1) = 2A(N)-A(N-1)
+!--and on C-Grid, this will lead to C(N+1)=(A(N)+A(N+1))/2=(3A(N)-A(N-1))/2
+
+!--The eastern boundary
+   g_u_2(ie+1,js:je,ks:ke)=(3.0*xa%u(ie,js:je,ks:ke)-xa%u(ie-1,js:je,ks:ke))/2.
+
+!--The northern boundary
+   g_v_2(is:ie,je+1,ks:ke)=(3.0*xa%v(is:ie,je,ks:ke)-xa%v(is:ie,je-1,ks:ke))/2.
+
+!--To keep the gradient, A(0) = 2A(1)-A(2)
+!--and on C-Grid, this will lead to C(1)=(A(0)+A(1))/2=(3A(1)-A(2))/2
+
 !--The western boundary
-   u_cgrid(is,js:je,ks:ke)=2.0*xa%u(is  ,js:je,ks:ke) &
-                          -    xa%u(is+1,js:je,ks:ke)
+   g_u_2(is,js:je,ks:ke)=(3.0*xa%u(is,js:je,ks:ke)-xa%u(is+1,js:je,ks:ke))/2.
 
 !--The southern boundary
-   v_cgrid(is:ie,js,ks:ke)=2.0*xa%v(is:ie,js  ,ks:ke) &
-                          -    xa%v(is:ie,js+1,ks:ke)
+   g_v_2(is:ie,js,ks:ke)=(3.0*xa%v(is:ie,js,ks:ke)-xa%v(is:ie,js+1,ks:ke))/2.
+
 #endif
 
 !------------------------------------------------------------------------------
-!  [4.0] CONVERT TEMPERATURE INCREMENTS INTO THETA INCREMENTS 
-!        EVALUATE ALSO THE INCREMENTS OF (1/rho) AND GEOPOTENTIAL
+!  [6.0] SAVE OTHERINCREMENT 
 !------------------------------------------------------------------------------
 
    do j=js,je
+   do k=ks,ke+1
    do i=is,ie
-
-     ph_full  = ht(i,j) * gravity
-     ph_xb_hd = ht(i,j) * gravity
-
-     new_ph_2(i,j,ks) = 0.
-
-     do k = ks, ke
-! To obtain all of the full fields: t, p, q(mixing ratio), rho
-
-      t_full   = xa%t(i,j,k) + xb%t(i,j,k)
-      p_full   = p_cgrid(i,j,k) + xb%p(i,j,k)
-      q_full   = moist_2(i,j,k,P_QV) + g_moist_2(i,j,k,P_QV)
-
-! Note: According to WRF, this is the dry air density used to
-!       compute the geopotential height: 
-      rho_full = p_full / (gas_constant*t_full*(1.0+q_full/rd_over_rv))
-
-! To compute the theta increment with the full fields:
-
-        new_t_2(i,j,k) = t_full*(ps0/p_full)**kappa - ts0
-
-! The full field of analysis ph:
-         ph_full  = ph_full  &
-                  - xb%dnw(k) * (xb%psac(i,j)+mu_cgrid(i,j)) / rho_full
-!
-! background hydrostatic phi:
-         ph_xb_hd  = ph_xb_hd  &
-                  - xb%dnw(k) * xb%psac(i,j) / xb%rho(i,j,k)
-    
-! The analysis perturbation = Hydro_ph - base_ph + nonhydro_xb_ph:
-
-         new_ph_2(i,j,k+1) = ph_full - phb(i,j,k+1) &
-                           + (xb%hf(i,j,k+1)*gravity - ph_xb_hd)
-
-     enddo
+      g_w_2(i,j,k)=xa%w(i,j,k)
    enddo
    enddo
-
-!------------------------------------------------------------------------------
-!  [5.0] SAVE INCREMENT 
-!------------------------------------------------------------------------------
-
-      do j=js,je
-      do i=is,ie
-         g_mu_2(i,j) =  mu_cgrid(i,j)
-         g_w_2(i,j,ke+1)=   xa%w(i,j,ke+1)
-         g_ph_2(i,j,ke+1)=  new_ph_2(i,j,ke+1) - ph_2(i,j,ke+1)
-      enddo
-
-      do k=ks,ke
-      do i=is,ie
-         g_u_2(i,j,k) =  u_cgrid(i,j,k)
-         g_v_2(i,j,k) =  v_cgrid(i,j,k)
-         g_t_2(i,j,k) =  new_t_2(i,j,k) - t_2(i,j,k)
-         g_ph_2(i,j,k)=  new_ph_2(i,j,k) - ph_2(i,j,k)
-         g_w_2(i,j,k) =     xa%w(i,j,k)
-      enddo
-      enddo
-      enddo
+   enddo
 
 #if 0
-      if ( size(moist_2,dim=4) >= 4 ) then
+! should be considered later
+   if ( size(moist_2,dim=4) >= 4 ) then
       do k=ks,ke
       do j=js,je
       do i=is,ie
@@ -281,9 +218,9 @@ SUBROUTINE DA_Transfer_XatoWRFTL( grid, config_flags, filnam, &
       enddo
       enddo
       enddo
-      endif
+   endif
 
-      if ( size(moist_2,dim=4) >= 6 ) then
+   if ( size(moist_2,dim=4) >= 6 ) then
       do k=ks,ke
       do j=js,je
       do i=is,ie
@@ -292,9 +229,9 @@ SUBROUTINE DA_Transfer_XatoWRFTL( grid, config_flags, filnam, &
       enddo
       enddo
       enddo
-      endif
+   endif
 
-      if ( size(moist_2,dim=4) >= 7 ) then
+   if ( size(moist_2,dim=4) >= 7 ) then
       do k=ks,ke
       do j=js,je
       do i=is,ie
@@ -302,31 +239,12 @@ SUBROUTINE DA_Transfer_XatoWRFTL( grid, config_flags, filnam, &
       enddo
       enddo
       enddo
-      endif
+   endif
+
 #endif
 
-!--The northern boundary
-   if(je == xp%jde) then
-      j=je+1
-      do k=ks,ke
-      do i=is,ie
-         g_v_2(i,j,k) =  v_cgrid(i,j,k)
-      enddo
-      enddo
-   endif
-
-!--The eastern boundary
-   if(ie == xp%ide) then
-      i=ie+1
-      do k=ks,ke
-      do j=js,je
-         g_u_2(i,j,k) =  u_cgrid(i,j,k)
-      enddo
-      enddo
-   endif
-
 !------------------------------------------------------------------------------
-!  [6.0] OUTPUT
+!  [7.0] OUTPUT
 !------------------------------------------------------------------------------
 
    ndynopt      = grid%dyn_opt
