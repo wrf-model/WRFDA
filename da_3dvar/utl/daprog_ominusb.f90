@@ -3,6 +3,8 @@ program daprog_ominusb
    implicit none
    
    character*5, parameter    :: missing_c = '*****'
+   integer, parameter        :: ounit = 10
+   integer, parameter        :: num_bins_p = 10
    integer, parameter        :: obs_qc_pointer = 0
    integer, parameter        :: max_stations = 1000
    integer, parameter        :: max_times = 1000
@@ -10,12 +12,14 @@ program daprog_ominusb
    integer, parameter        :: min_obs = 30
    integer, parameter        :: num_bins = 100
    integer, parameter        :: missing_i = -88
+   real, parameter           :: bottom_pressure = 1000.0
+   real, parameter           :: bin_width_p = 100.0
    real, parameter           :: missing_r = -888888.0
    real, parameter           :: max_distance = 1000      ! km
    real, parameter           :: pi = 3.1415926535897932346
 !  real, parameter           :: earth_radius = 6378.1500 ! km
    real, parameter           :: earth_radius = 6370.00   ! km, consistant with WRF
-   
+
    type sub_type
       integer                :: qcflag(1:max_times)
       real                   :: ominusb(1:max_times)
@@ -39,33 +43,36 @@ program daprog_ominusb
       type (sub_type)        :: data(1:max_stations)
    end type obs_type
 
+   character*80              :: filename
+   character*5               :: station_chosen
    character*5               :: station_id
-   integer                   :: times, n, n1, n2
+   integer                   :: times, n, n1, n2, b
+   integer                   :: bin
    integer                   :: num_times
    integer                   :: qc
    integer                   :: percent_reject
    real                      :: target_p, p_ob
    real                      :: lati, long, iv, error
    logical                   :: surface_obs
-   type (obs_type)           :: obs
+   type (obs_type)           :: obs(1:num_bins_p)
 
-   surface_obs = .true.
-   if ( surface_obs ) then
-      write(6,'(a)')' Assuming surface observations'
-      target_p = 1001.0 ! Indicates surface ob.
-   else
-      target_p = 850.0 ! need to set
-      write(6,'(a,f15.5)')' Assuming upper air observations, p = ', &
-                          target_p
-   end if
+   real                      :: bin_start_p(1:num_bins_p)    ! Number of pressure bins
 
-   call da_init_obs( obs )
+   do b = 1, num_bins_p
+      bin_start_p(b) = bottom_pressure - real(b-1) * bin_width_p
+
+!     Initialize obs structure:
+      call da_init_obs( obs(b) )
+   end do
 
 !-----------------------------------------------------------------------
 !  [1.0] Read in O-B data and fill structure:
 !-----------------------------------------------------------------------
 
    times = 0
+   station_chosen = "MOWV3"
+   filename = "daprog_ominusb_poamvu_"//station_chosen(1:5)//"_omb.out"
+   open(ounit, file = filename, status = "unknown" )
 
    do ! Loop over time:
       times = times + 1
@@ -75,16 +82,29 @@ program daprog_ominusb
          read(inunit,'(a5,2f9.3,3f17.7,i8)')station_id, lati, long, &
                                             p_ob, iv, error, qc
 
-         p_ob = 0.01 * p_ob   ! Convert Pa to hPa
-
 !        [1.1] Exit when come to end of file markers:
          if ( station_id(1:5) == '*****' .or. station_id == '*end*' ) exit
          
 !        [1.2] Store data:
 
-         if ( p_ob == target_p .or. surface_obs ) then
-              call da_store_ominusb( station_id, times, qc, lati, long, &
-                                     p_ob, iv, error, obs )
+         if ( station_id(1:5) == station_chosen ) then
+
+            p_ob = 0.01 * p_ob   ! Convert Pa to hPa
+            if ( p_ob > bin_start_p(2) ) then
+               bin = 1
+            else if ( p_ob <= bin_start_p(num_bins_p-1) ) then
+               bin = num_bins_p
+            else
+               do b = 2, num_bins_p-1
+                  if ( p_ob <= bin_start_p(b) .and. p_ob > bin_start_p(b+1) ) then
+                     bin = b
+                     exit
+                  end if
+               end do
+            end if
+
+            call da_store_ominusb( station_id, times, qc, lati, long, &
+                                   p_ob, iv, error, obs(bin) )
          end if
                
       end do
@@ -98,40 +118,46 @@ program daprog_ominusb
    
    num_times = times
    write(0,'(A,i8)')' Number of analysis times read in = ', num_times
-   write(0,'(A,1pe12.5)')' Pressure (1001hPa for surface)   = ', target_p
    write(0,*)
 
 !-----------------------------------------------------------------------
 !  [2.0]: Calculate O-B statistics over all stations:
 !-----------------------------------------------------------------------
 
-   call da_obs_stats( num_times, obs )
-
-   percent_reject = 0
-   if ( obs % num_stations > 0  ) then
-        percent_reject = nint( 100.0 * real( obs % num_reject) / &
-                         real( obs % num_keep + obs % num_reject ) )
-   end if
-   
    write(0,'(A)')' P(hPA)  Stations Obs-Used Obs-Reject     Mean(O-B)    STDV(O-B)'
-   write(0,'(i6,i8,2x,2i8,a,i3,a,2f13.6)')int(target_p), &
-                                    obs % num_stations, obs % num_keep, &
-                                    obs % num_reject, '/', percent_reject,'%',&
-                                    obs % mean_omb, obs % stdv_omb
+   write(0,'(a,a)')' Station chosen = ', station_chosen
+   do b = 1, num_bins_p
+   call da_obs_stats( num_times, obs(b) )
+
+      percent_reject = 0
+      if ( obs(b) % num_stations > 0  ) then
+           percent_reject = nint( 100.0 * real( obs(b) % num_reject) / &
+                            real( obs(b) % num_keep + obs(b) % num_reject ) )
+      end if
+   
+      write(ounit,'(i6,i8,2x,2i8,i3,2f13.6)')int(bin_start_p(b)), &
+                                             obs(b) % num_stations, obs(b) % num_keep, &
+                                             obs(b) % num_reject, percent_reject, &
+                                             obs(b) % mean_omb, obs(b) % stdv_omb
+   end do
    write(0,*)
 
 !-----------------------------------------------------------------------
 !  [3.0]: Calculate matrix of distances between points:
 !-----------------------------------------------------------------------
 
-   n = obs % num_stations
-   call da_get_distance( n, obs % lat(1:n), obs % lon(1:n), obs % dis(1:n,1:n) )
+!   do b = 1, num_bins_p
+!      n = obs(b) % num_stations
+!      call da_get_distance( n, obs(b) % lat(1:n), obs(b) % lon(1:n), obs(b) % dis(1:n,1:n) )
+!   end do
 
 !-----------------------------------------------------------------------
 !  [4.0]: Calculate O-B covariances:
 !-----------------------------------------------------------------------
 
-   call da_bin_covariance( obs % num_stations, num_times, max_distance, obs )
+!   do b = 1, num_bins_p
+!      call da_bin_covariance( obs(b) % num_stations, num_times, max_distance, obs(b) )
+!   end do
 
 contains
 
@@ -300,18 +326,18 @@ subroutine da_obs_stats( num_times, obs )
    end do
    
    maxcount = maxval(bin_count(:))
-   write(0,'(a,i8)')' Max count = ', maxcount
-   write(0,'(a)')' Bin      x=O-B   z=(x-xm)/sd     Count   exp(-0.5*z*z)'
+!   write(0,'(a,i8)')' Max count = ', maxcount
+!   write(0,'(a)')' Bin      x=O-B   z=(x-xm)/sd     Count   exp(-0.5*z*z)'
    do b = 1, num_bins
       x = bin_start(b) + 0.5 * bin_width
       z = ( x - obs % mean_omb ) / obs % stdv_omb
-      write(0,'(i4,4f12.5)')b, x, z, bin_count(b)/real(maxcount), exp(-0.5*z*z)
+!      write(0,'(i4,4f12.5)')b, x, z, bin_count(b)/real(maxcount), exp(-0.5*z*z)
    end do
-   write(0,*)
+!   write(0,*)
    
 !  Get time series of mean error:
    dommean(:) = 0.0
-   write(0,'(a)')' Time  NumObs Domain Mean'
+!   write(0,'(a)')' Time  NumObs Domain Mean'
    do times = 1, num_times
       count = 0
       do n = 1, obs % num_stations
@@ -321,9 +347,9 @@ subroutine da_obs_stats( num_times, obs )
          end if
       end do
       if ( count > 0 ) dommean(times) = dommean(times) / real(count)
-      write(0,'(i4,i8,f12.5)')times, count, dommean(times)
+!      write(0,'(i4,i8,f12.5)')times, count, dommean(times)
    end do
-   write(0,*)
+!   write(0,*)
 
 !  Remove station mean from O-B values (removes instrumental/model bias):
 

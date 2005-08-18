@@ -2,6 +2,12 @@ subroutine DA_Transform_VpToX_Adj( xb, xbx, xa, vp, be, xp, &
                                    ids,ide, jds,jde, kds,kde,  &
                                    ims,ime, jms,jme, kms,kme,  &
                                    its,ite, jts,jte, kts,kte )
+!--------------------------------------------------------------------------
+! Purpose : Adjoint for Physical transform of variables 
+!
+! History   : Creation                  --
+! Additions : CV_Options = 4         10/06/2005     Syed RH Rizvi
+!--------------------------------------------------------------------------
    implicit none
 
    type (xb_type), intent(in)           :: xb  ! First guess structure.
@@ -14,22 +20,19 @@ subroutine DA_Transform_VpToX_Adj( xb, xbx, xa, vp, be, xp, &
    integer, intent(in)             :: ims,ime, jms,jme, kms,kme ! memory dims.
    integer, intent(in)             :: its,ite, jts,jte, kts,kte ! tile   dims.
 
-   integer         :: i, j, k, kk             ! Loop counters.
+   integer         :: i, j, k, l,  kk         ! Loop counters.
    real            :: sum_v_p                 ! Summing variable.
    real, dimension(ims:ime,jms:jme,kms:kme) :: phi_b ! Balanced mass increment.
 
    real, dimension(kms:kme,ims:ime,jms:jme) :: p_copy
    real, dimension(kms:kme,jms:jme,kms:kme) :: reg_copy
 
+ if( cv_options == 2 ) then
 !--surface pressure increments
 
-   if (sfc_assi_options == 2) then
-      call DA_Transform_XToWTQ_adj( xp, xb, xa )
-   else
       xa%p(its:ite,jts:jte,kts) = xa%p(its:ite,jts:jte,kts) &
                                 + xa%psfc(its:ite,jts:jte)
       xa%psfc(its:ite,jts:jte) = 0.0
-   endif
 
 !    [2.8] Ground temperature control variable:
 
@@ -64,7 +67,6 @@ subroutine DA_Transform_VpToX_Adj( xb, xbx, xa, vp, be, xp, &
 
 
       END IF
-
 !     [2.6] Compute temperature increments from p/rho increments:
                
       CALL DA_PRho_To_T_Adj( xb, xp, xa )
@@ -72,7 +74,7 @@ subroutine DA_Transform_VpToX_Adj( xb, xbx, xa, vp, be, xp, &
 !     [2.5] Compute density increments using hydrostatic eqn:
 
       CALL DA_HydrostaticP_To_Rho_Adj( xb, xp, xa % rho, xa % p )
-
+      
 !     [2.4] Compute phi:
 
       IF ( PRESENT(be) ) THEN
@@ -98,7 +100,6 @@ subroutine DA_Transform_VpToX_Adj( xb, xbx, xa, vp, be, xp, &
       ELSE
          phi_b(its:ite,jts:jte,kts:kte) = xa % p(its:ite,jts:jte,kts:kte)
       END IF
-
       vp % v3(its:ite,jts:jte,kts:kte) = vp % v3(its:ite,jts:jte,kts:kte) + &
                                          xa % p(its:ite,jts:jte,kts:kte)
 
@@ -110,14 +111,115 @@ subroutine DA_Transform_VpToX_Adj( xb, xbx, xa, vp, be, xp, &
                                     its,ite, jts,jte, kts,kte )
 
       CALL wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id3)
+!     [2.2] Transform psi and chi to u and v:
+         
+     CALL DA_PsiChi_To_UV_Adj( xa % u, xa % v, xb % coefx,   &
+                               xb % coefy, vp % v1, vp % v2, &
+                               ids,ide, jds,jde, kds,kde,    &
+                               ims,ime, jms,jme, kms,kme,    &
+                               its,ite, jts,jte, kts,kte )
+ else if( cv_options == 4) then    ! psi, chi_u, t_u, pseudo_rh , psfc_u
+  vp%v4(its:ite,jts:jte,kts:kte)  = vp%v4(its:ite,jts:jte,kts:kte) + &
+                                    xa%q (its:ite,jts:jte,kts:kte) * &
+                                    xb%qs(its:ite,jts:jte,kts:kte)
+                                    
+      CALL wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id3)
 
 !     [2.2] Transform psi and chi to u and v:
+      CALL DA_PsiChi_To_UV_Adj( xa % u, xa % v, xb % coefx,   &
+                                xb % coefy, vp % v1, vp % v2, &
+                                ids,ide, jds,jde, kds,kde,    &
+                                ims,ime, jms,jme, kms,kme,    &
+                                its,ite, jts,jte, kts,kte )
 
-      CALL DA_PsiChi_To_UV_Adj( xa % u, xa % v, xb % map_factor, &
-                            xb % ds, vp % v1, vp % v2, &
-                            ids,ide, jds,jde, kds,kde, &
-                            ims,ime, jms,jme, kms,kme, &
-                            its,ite, jts,jte, kts,kte )
+
+! Surface Pressure
+   do k=kts,kte
+   do j=jts,jte
+      vp%v1(its:ite,j,k)   = vp%v1(its:ite,j,k) + &
+                          be%reg_ps(j,k)*xa%psfc(its:ite,j)
+   enddo
+   enddo
+   vp%v5(its:ite,jts:jte,1) = xa%psfc(its:ite,jts:jte) 
+
+! Chi
+   do k=kts,kte
+   do j=jts,jte
+     vp%v1(its:ite,j,k) = vp%v1(its:ite,j,k)  + &
+                       be%reg_chi(j,k)*vp%v2(its:ite,j,k)
+ 
+   enddo
+   enddo
+
+! Temperature
+   do l=kts,kte
+   do k=kts,kte
+   do j=jts,jte
+       vp%v1(its:ite,j,l) = vp%v1(its:ite,j,l) + &
+                        be%reg_t(j,k,l)*xa%t(its:ite,j,k)
+   enddo
+   enddo
+   enddo
+
+   vp%v3(its:ite,jts:jte,kts:kte) = xa%t(its:ite,jts:jte,kts:kte)
+
+elseif( cv_options == 5) then    ! psi, chi_u, t_u, pseudo_rh , psfc_u
+
+!  [3.4]  adj of Transform psi and chi to u and v:
+
+   CALL wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id3)
+
+   vp%v1(:,:,:)=0.
+   vp%v2(:,:,:)=0.
+         
+   CALL DA_PsiChi_To_UV_Adj( xa % u, xa % v, xb % coefx,   &
+                             xb % coefy, vp % v1, vp % v2, &
+                             ids,ide, jds,jde, kds,kde,    &
+                             ims,ime, jms,jme, kms,kme,    &
+                             its,ite, jts,jte, kts,kte )
+
+!  [3.3]  adj Calculate Psfc_b from psi
+
+    DO k = kts,kte
+    DO j = jts,jte
+    DO i= its,ite
+       vp % v1(i,j,k)= vp % v1(i,j,k)+ &
+                        be % reg_ps(j,k) * xa % psfc(i,j)
+    END DO
+    END DO
+    END DO
+
+   vp % v5(its:ite,jts:jte,1)=xa % psfc(its:ite,jts:jte)
+
+!  [3.2] adj Calculate chi_b from psi
+
+    DO k = kts,kte
+     DO j = jts,jte
+      DO i= its,ite
+         vp % v1(i,j,k)= vp % v1(i,j,k)+ &
+                         be % reg_chi(j,k) * vp % v2(i,j,k)
+      END DO
+     END DO
+    END DO
+
+!  [3.1] Calculate t_b from psi
+
+   DO kk = kts,kte
+    DO k = kts,kte
+     DO j = jts,jte
+      DO i= its,ite
+         vp % v1(i,j,kk)= vp % v1(i,j,kk)+ &
+                          be % reg_t(j,k,kk) * xa % t(i,j,k)
+      END DO
+     END DO
+    END DO
+   END DO
+
+   vp % v3(its:ite,jts:jte,kts:kte)= xa % t(its:ite,jts:jte,kts:kte)
+
+!  [3.5] treat humidity
+      vp % v4(its:ite,jts:jte,kts:kte) = xa % q(its:ite,jts:jte,kts:kte) &
+                                       * xb % qs(its:ite,jts:jte,kts:kte)
+ end if
 
 END subroutine DA_Transform_VpToX_Adj
-

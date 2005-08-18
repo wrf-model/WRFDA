@@ -100,24 +100,53 @@ SUBROUTINE da_add_noise_to_ob( iv, ob )
       END DO
    ENDIF
 
-!  [2.4] Transfer satob obs:
 
-   IF ( iv % num_satob > 0 ) THEN
-   
-      write(rand_unit,'(a,i8)')'satob', iv % num_satob
+!  [2.4.1] Transfer Geostationary AMVs obs:
 
-      DO n = 1, iv % num_satob
+   IF ( iv % num_geoamv > 0 ) THEN
+
+      write(rand_unit,'(a,i8)')'geoamv', iv % num_geoamv
+
+      DO n = 1, iv % num_geoamv
+         write(rand_unit,'(i8)')iv % geoamv(n) % info % levels
+
+         DO k = 1, iv % geoamv(n) % info % levels
 
 !        Add random perturbation:
-         call da_add_noise( iv % satob(n) % u, ob % satob(n) % u, z1 )
-         call da_add_noise( iv % satob(n) % v, ob % satob(n) % v, z2 )
+            call da_add_noise( iv % geoamv(n) % u(k), ob % geoamv(n) % u(k), z1)
+            call da_add_noise( iv % geoamv(n) % v(k), ob % geoamv(n) % v(k), z2)
 
-!        Write out data:
-         write(rand_unit,'(2i8,10e15.7)')n, 1, &
-                                  iv % satob(n) % u % error, z1, &
-                                  iv % satob(n) % v % error, z2
+!           Write out data:
+            write(rand_unit,'(2i8,10e15.7)')n, k, &
+                               iv % geoamv(n) % u(k) % error, z1, &
+                               iv % geoamv(n) % v(k) % error, z2
+         END DO
       END DO
    ENDIF
+
+!  [2.4.2] Transfer Polar AMVs obs:
+
+   IF ( iv % num_polaramv > 0 ) THEN
+
+      write(rand_unit,'(a,i8)')'polaramv', iv % num_polaramv
+
+      DO n = 1, iv % num_geoamv
+         write(rand_unit,'(i8)')iv % polaramv(n) % info % levels
+
+         DO k = 1, iv % polaramv(n) % info % levels
+
+!        Add random perturbation:
+            call da_add_noise( iv % polaramv(n) % u(k), ob % polaramv(n) % u(k), z1)
+            call da_add_noise( iv % polaramv(n) % v(k), ob % polaramv(n) % v(k), z2)
+
+!           Write out data:
+            write(rand_unit,'(2i8,10e15.7)')n, k, &
+                               iv % polaramv(n) % u(k) % error, z1, &
+                               iv % polaramv(n) % v(k) % error, z2
+         END DO
+      END DO
+   ENDIF
+
 
 !  [2.5] Transfer gpspw obs:
 
@@ -393,6 +422,34 @@ SUBROUTINE da_add_noise_to_ob( iv, ob )
                                iv % profiler(n) % u(k) % error, z1, &
                                iv % profiler(n) % v(k) % error, z2
          END DO
+      END DO
+   ENDIF
+
+!  [2.16] Transfer TC bogus obs:
+
+   IF ( iv % num_bogus > 0 ) THEN
+
+      write(rand_unit,'(a,i8)')'bogus', iv % num_bogus
+
+      DO n = 1, iv % num_bogus
+         write(rand_unit,'(i8)')iv % bogus(n) % info % levels
+
+         DO k = 1, iv % bogus(n) % info % levels
+
+!           Add random perturbation:
+            call da_add_noise( iv % bogus(n) % u(k), ob % bogus(n) % u(k), z1)
+            call da_add_noise( iv % bogus(n) % v(k), ob % bogus(n) % v(k), z2)
+
+!           Write out data:
+            write(rand_unit,'(2i8,10e15.7)')n, k, &
+                               iv % bogus(n) % u(k) % error, z1, &
+                               iv % bogus(n) % v(k) % error, z2
+         END DO
+
+         call da_add_noise( iv % bogus(n) % slp, ob % bogus(n) % slp, z3 )
+         write(rand_unit,'(2i8,10e15.7)')n, 1, &
+                                  iv % bogus(n) % slp % error, z3
+
       END DO
    ENDIF
 

@@ -11,6 +11,8 @@ SUBROUTINE DA_UVPRho_To_W_Adj( xb, xa, xp,                 &
 !
 !  HISTORY: 08/21/2002 - Creation of F90 version.  Qingnong Xiao
 !  HISTORY: 04/15/2004 - Modified of F90 version.  Jianfeng Gu
+!           02/02/2005 - Map factor fix and global update      Syed RH Rizvi
+!
 !------------------------------------------------------------------------------
 
    IMPLICIT NONE
@@ -27,7 +29,6 @@ SUBROUTINE DA_UVPRho_To_W_Adj( xb, xa, xp,                 &
    integer                       :: its,ite, jts,jte, kts,kte
 
    integer                       :: I,J,K
-   real                          :: INV_2DS
 
    real, dimension(ims:ime,jms:jme,kms:kme) :: URHO, VRHO
    real, dimension(ims:ime,jms:jme,kms:kme) :: DIV, WZ
@@ -39,8 +40,6 @@ SUBROUTINE DA_UVPRho_To_W_Adj( xb, xa, xp,                 &
 
    WZ(:,:,:)=0.
    URHO(:,:,:)=0.; VRHO(:,:,:)=0.; DIV(:,:,:)=0.; TERM3=0.
-
-   INV_2DS=0.5/xb%ds  ! Refer to DA_UV_To_Divergence, in /DA_Dynamics
 
 ! Integration to calculate the vertical velocity
 
@@ -57,7 +56,7 @@ SUBROUTINE DA_UVPRho_To_W_Adj( xb, xa, xp,                 &
    ENDDO
    ENDDO
 
-   CALL AADJUST(INV_2DS,xb,WZ,             &
+   CALL AADJUST(xb,WZ,                     &
                 ids,ide, jds,jde, kds,kde, &
                 ims,ime, jms,jme, kms,kme, &
                 its,ite, jts,jte, kts,kte )
@@ -103,7 +102,7 @@ SUBROUTINE DA_UVPRho_To_W_Adj( xb, xa, xp,                 &
    ENDDO
    ENDDO
 
-   CALL DA_UV_To_Divergence_Adj(xp, xb%ds,xb%map_factor,URHO,VRHO,DIV, &
+   CALL DA_UV_To_Divergence_Adj(xp, xb, URHO,VRHO, DIV, &
                                 ids,ide, jds,jde, kds,kde,         &
                                 ims,ime, jms,jme, kms,kme,         &
                                 its,ite, jts,jte, kts,kte )
@@ -146,7 +145,7 @@ SUBROUTINE DA_UVPRho_To_W_Adj( xb, xa, xp,                 &
    ENDDO
    ENDDO
 
-   CALL DA_UV_To_Divergence_Adj(xp, xb%ds,xb%map_factor,URHO,VRHO,DIV, &
+   CALL DA_UV_To_Divergence_Adj(xp, xb, URHO,VRHO, DIV, &
                                 ids,ide, jds,jde, kds,kde,         &
                                 ims,ime, jms,jme, kms,kme,         &
                                 its,ite, jts,jte, kts,kte )
@@ -165,7 +164,7 @@ SUBROUTINE DA_UVPRho_To_W_Adj( xb, xa, xp,                 &
 
 ! Term 2.2: Divergence term from basic wind
 
-   CALL DA_UV_To_Divergence(xb%ds,xb%map_factor,xb%u,xb%v,DIV, &
+   CALL DA_UV_To_Divergence(xb, xb%u,xb%v, DIV, &
                             ids,ide, jds,jde, kds,kde,         &
                             ims,ime, jms,jme, kms,kme,         &
                             its,ite, jts,jte, kts,kte )
@@ -188,7 +187,7 @@ SUBROUTINE DA_UVPRho_To_W_Adj( xb, xa, xp,                 &
    ENDDO
    ENDDO
 
-   CALL DA_UV_To_Divergence_adj(xp, xb%ds,xb%map_factor,xa%u,xa%v,DIV, &
+   CALL DA_UV_To_Divergence_adj(xp, xb, xa%u,xa%v, DIV, &
                                 ids,ide, jds,jde, kds,kde,         &
                                 ims,ime, jms,jme, kms,kme,         &
                                 its,ite, jts,jte, kts,kte )
@@ -241,9 +240,9 @@ SUBROUTINE DA_UVPRho_To_W_Adj( xb, xa, xp,                 &
       DO I=is,ie
 
          xa%v(I,J,K)=xa%v(I,J,K)-WZ(I,J,K)*  &
-                     (xb%p(I,J+1,K)-xb%p(I,J-1,K))*INV_2DS
+                     (xb%p(I,J+1,K)-xb%p(I,J-1,K))*xb%coefy(I,J)
          xa%u(I,J,K)=xa%u(I,J,K)-WZ(I,J,K)*  &
-                     (xb%p(I+1,J,K)-xb%p(I-1,J,K))*INV_2DS
+                     (xb%p(I+1,J,K)-xb%p(I-1,J,K))*xb%coefx(I,J)
 
       ENDDO
       ENDDO
@@ -290,10 +289,10 @@ SUBROUTINE DA_UVPRho_To_W_Adj( xb, xa, xp,                 &
       DO J=js,je
       DO I=is,ie
 
-         xa%p(I,J+1,K)=xa%p(I,J+1,K)-WZ(I,J,K)*xb%v(I,J,K)*INV_2DS
-         xa%p(I,J-1,K)=xa%p(I,J-1,K)+WZ(I,J,K)*xb%v(I,J,K)*INV_2DS
-         xa%p(I+1,J,K)=xa%p(I+1,J,K)-WZ(I,J,K)*xb%u(I,J,K)*INV_2DS
-         xa%p(I-1,J,K)=xa%p(I-1,J,K)+WZ(I,J,K)*xb%u(I,J,K)*INV_2DS
+         xa%p(I,J+1,K)=xa%p(I,J+1,K)-WZ(I,J,K)*xb%v(I,J,K)*xb%coefy(I,J)
+         xa%p(I,J-1,K)=xa%p(I,J-1,K)+WZ(I,J,K)*xb%v(I,J,K)*xb%coefy(I,J)
+         xa%p(I+1,J,K)=xa%p(I+1,J,K)-WZ(I,J,K)*xb%u(I,J,K)*xb%coefx(I,J)
+         xa%p(I-1,J,K)=xa%p(I-1,J,K)+WZ(I,J,K)*xb%u(I,J,K)*xb%coefx(I,J)
 
       ENDDO
       ENDDO

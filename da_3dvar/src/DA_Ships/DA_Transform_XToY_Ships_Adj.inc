@@ -18,7 +18,7 @@ SUBROUTINE da_transform_xtoy_ships_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
    IF ( iv%num_ships > 0 ) THEN
 
       if (sfc_assi_options == 1) then
-       DO n=1, iv % num_ships
+       do n=iv%ob_numb(iv%current_ob_time-1)%ships + 1, iv%ob_numb(iv%current_ob_time)%ships
       
        if(iv%ships(n)%loc%proc_domain_with_halo) then
 
@@ -62,7 +62,7 @@ SUBROUTINE da_transform_xtoy_ships_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
 
        END DO
       else if (sfc_assi_options == 2) then
-         DO n=1, iv % num_ships
+         do n=iv%ob_numb(iv%current_ob_time-1)%ships + 1, iv%ob_numb(iv%current_ob_time)%ships
             if(iv%ships(n)%loc%proc_domain_with_halo) then
 
                CALL DA_Transform_XToPsfc_Adj(xb,xp,iv%ships(n), &
