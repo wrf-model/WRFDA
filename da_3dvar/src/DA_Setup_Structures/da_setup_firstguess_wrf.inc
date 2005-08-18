@@ -36,8 +36,6 @@ SUBROUTINE DA_Setup_FirstGuess_WRF( xbx, grid, &
    integer(kind=4)   :: flag
    integer           :: len, index, seconds
 
-   real              :: start_lat, start_lon
-
 !---------------------------------------------------------------------------
 !  [1.0] Read original WRF format first guess:
 !---------------------------------------------------------------------------
@@ -90,6 +88,8 @@ SUBROUTINE DA_Setup_FirstGuess_WRF( xbx, grid, &
            'cen_lon  =', grid%cen_lon,  &
            'truelat1 =', grid%truelat1, &
            'truelat2 =', grid%truelat2, &
+           'start_lat =', start_lat, &
+           'start_lon =', start_lon, &
            'dsm      =', dsm
    endif
 
@@ -106,7 +106,9 @@ SUBROUTINE DA_Setup_FirstGuess_WRF( xbx, grid, &
       map_util_project = PROJ_MERC
    endif
 
-   call map_set(map_util_project,start_lat,start_lon,real(xp%ids),real(xp%jds), &
+!   call map_set(map_util_project,start_lat,start_lon,real(xp%ids),real(xp%jds), &
+   call map_set(map_util_project,grid%cen_lat,grid%cen_lon,   &
+                real(nint((xp%ide-xp%ids+1)/2.)), real(nint((xp%jde-xp%jds+1)/2.)), &
                 grid%dx,grid%stand_lon,grid%truelat1,grid%truelat2,map_info)
 
 !--Need to set map projection in WRF world.

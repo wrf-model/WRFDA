@@ -21,23 +21,27 @@ module DA_Test
    USE DA_Radar
    USE DA_SSMI
    USE DA_Satem
-   USE DA_Satob
+   USE DA_GeoAMV
+   USE DA_PolarAMV
    USE DA_Ships
    USE DA_Sound
    USE DA_Synop
    USE da_pseudo
    USE DA_Profiler
    USE DA_Buoy 
+   USE DA_Bogus 
    USE DA_Setup_Structures
    USE DA_Tools
    use da_qscat
+   use DA_Minimisation
+
+   USE DA_Grid_Definitions
+   USE DA_Physics
+   use module_wrf_3dvar_io
 
    implicit none
    
-#ifdef DM_PARALLEL
-   LOGICAL, EXTERNAL :: wrf_dm_on_monitor
-#endif
-
+        
 #if ( DWORDSIZE != RWORDSIZE )
 #define TRUE_MPI_REAL     MPI_REAL
 #else
@@ -63,9 +67,11 @@ contains
 #include "DA_Check_XToY_Adjoint_SSMI_Rv.inc"
 #include "DA_Check_XToY_Adjoint_SSMI_Tb.inc"
 #include "DA_Check_XToY_Adjoint_Satem.inc"
-#include "DA_Check_XToY_Adjoint_Satob.inc"
+#include "DA_Check_XToY_Adjoint_GeoAMV.inc"
+#include "DA_Check_XToY_Adjoint_PolarAMV.inc"
 #include "DA_Check_XToY_Adjoint_Ships.inc"
 #include "DA_Check_XToY_Adjoint_Radar.inc"
+#include "DA_Check_XToY_Adjoint_Bogus.inc"
 #include "DA_Check_XToY_Adjoint_Sound.inc"
 #include "DA_Check_XToY_Adjoint_Sonde_sfc.inc"
 #include "DA_Check_XToY_Adjoint_Synop.inc"
@@ -81,6 +87,9 @@ contains
 #include "da_setup_testfield.inc"
 #include "check_sfc_assi.inc"
 #include "set_tst_trnsf_fld.inc"
+#include "DA_Check_VToY_Adjoint.inc"
+#include "da_get_y_lhs_value.inc"
+
+#include "da_check_xtow_adjoint.inc"
 
 end module DA_Test
-

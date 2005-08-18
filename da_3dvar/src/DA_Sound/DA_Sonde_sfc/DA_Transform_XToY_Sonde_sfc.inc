@@ -15,14 +15,14 @@ SUBROUTINE DA_Transform_XToY_Sonde_sfc ( xa, xb, iv, xp, y )
    
    IF ( iv%num_sound > 0 ) THEN
 
-      y%sonde_sfc(:)%u = 0.0
-      y%sonde_sfc(:)%v = 0.0
-      y%sonde_sfc(:)%t = 0.0
-      y%sonde_sfc(:)%p = 0.0
-      y%sonde_sfc(:)%q = 0.0
+!xyh      y%sonde_sfc(:)%u = 0.0
+!xyh      y%sonde_sfc(:)%v = 0.0
+!xyh      y%sonde_sfc(:)%t = 0.0
+!xyh      y%sonde_sfc(:)%p = 0.0
+!xyh      y%sonde_sfc(:)%q = 0.0
 
       if (sfc_assi_options == 1) then
-      do n=1, iv % num_sound
+      do n=iv%ob_numb(iv%current_ob_time-1)%sound + 1, iv%ob_numb(iv%current_ob_time)%sound
 
        if(iv%sonde_sfc(n)%loc%proc_domain_with_halo) then
 
@@ -67,7 +67,7 @@ SUBROUTINE DA_Transform_XToY_Sonde_sfc ( xa, xb, iv, xp, y )
 
       end do
       else if (sfc_assi_options == 2) then
-         do n=1, iv % num_sound
+         do n=iv%ob_numb(iv%current_ob_time-1)%sound + 1, iv%ob_numb(iv%current_ob_time)%sound
             if(iv%sonde_sfc(n)%loc%proc_domain_with_halo) then
                CALL DA_Transform_XToPsfc( xb, xa, xp, iv%sonde_sfc(n), y%sonde_sfc(n) )
             endif

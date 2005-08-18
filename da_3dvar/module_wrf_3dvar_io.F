@@ -8,12 +8,13 @@ MODULE module_wrf_3dvar_io
 !--Model layer
 
    USE module_configure
+   USE module_timing
 
 CONTAINS
 
 !------------------------------------------------------------------------------
 
-SUBROUTINE med_initialdata_input_3dvar ( grid , config_flags, in_filename )
+SUBROUTINE med_initialdata_input_3dvar ( grid , config_flags, in_date, in_filename )
 
    IMPLICIT NONE
 
@@ -21,12 +22,14 @@ SUBROUTINE med_initialdata_input_3dvar ( grid , config_flags, in_filename )
 
    TYPE(domain)                               :: grid
    TYPE (grid_config_rec_type), INTENT(INOUT) :: config_flags
+
+   CHARACTER(*),  INTENT (in),  OPTIONAL      :: in_date
    CHARACTER(*),  INTENT (in),  OPTIONAL      :: in_filename
 
 !--Local
 
-   INTEGER                 :: fid , ierr , status
-   CHARACTER (LEN=80)      :: file_name
+   INTEGER                 :: fid , ierr , status, n, nsave, previous_status
+   CHARACTER (LEN=80)      :: file_name, previous_time_string
    CHARACTER (LEN=80)      :: message
    CHARACTER (LEN= 1)      :: char
 
@@ -37,17 +40,13 @@ SUBROUTINE med_initialdata_input_3dvar ( grid , config_flags, in_filename )
 
 !  Initialize the mother domain.
 
-!  CALL start_timing
+   CALL start_timing
 
    grid%input_from_file = .true.
 
    if(present(in_filename)) then
-      write(unit=*, fmt='(2a,2x,a,i6)') &
-           'file:', __FILE__, 'line:', __LINE__
       file_name = trim(in_filename)
    else
-      write(unit=*, fmt='(2a,2x,a,i6)') &
-           'file:', __FILE__, 'line:', __LINE__
       file_name = 'wrf_3dvar_input'
    endif
 
@@ -63,17 +62,43 @@ SUBROUTINE med_initialdata_input_3dvar ( grid , config_flags, in_filename )
      STOP "Stopped with NetCDF error."
    endif
 
-!  print *, 'ready to call get_next_time'
    CALL ext_ncd_get_next_time( fid, current_date, Status )
-!  print *, 'current_date=', trim(current_date)
-  
-!--Set start_date to current_date.
-   read(current_date(1:19), fmt='(i4, 5(a1, i2))') &
-        grid%start_year,  char, &
-        grid%start_month, char, &
-        grid%start_day,   char, &
-        grid%start_hour,  char, &
-        grid%start_second
+
+   if (present(in_date)) then
+!-----Set start_date to current_date.
+      read(in_date(1:19), fmt='(i4, 5(a1, i2))') &
+           grid%start_year,  char, &
+           grid%start_month, char, &
+           grid%start_day,   char, &
+           grid%start_hour,  char, &
+           grid%start_minute,char, &
+           grid%start_second 
+
+      nsave = -1
+      do n=1, 1000
+         message = 'current_date='//trim(current_date)//', in_date='//trim(in_date)
+         CALL wrf_debug ( 100 , trim(message) )
+         if(current_date(1:19) == in_date(1:19)) then
+            nsave = n - 1
+            exit
+         endif
+         CALL ext_ncd_get_next_time( fid, current_date, Status )
+      enddo
+
+      if(nsave < 0) then
+         print *, 'Can not find the needed time'
+         STOP "Stopped with input error."
+      endif
+   else
+!-----Set start_date to current_date.
+      read(current_date(1:19), fmt='(i4, 5(a1, i2))') &
+           grid%start_year,  char, &
+           grid%start_month, char, &
+           grid%start_day,   char, &
+           grid%start_hour,  char, &
+           grid%start_minute,char, &
+           grid%start_second
+   endif
 
    call geth_julgmt(julyr, julday, gmt)
    CALL nl_set_gmt (grid%id, gmt)
@@ -89,17 +114,7 @@ SUBROUTINE med_initialdata_input_3dvar ( grid , config_flags, in_filename )
    CALL nl_set_stand_lon ( grid%id , grid%stand_lon )
    CALL nl_set_map_proj ( grid%id , grid%map_proj )
 
-!  write(unit=*, fmt='(a, 2i8, f12.3)') &
-!       '1: julyr, julday, gmt=', julyr, julday, gmt
-!  write(unit=0, fmt='(a, 2i8, f12.3)') &
-!       '1: julyr, julday, gmt=', julyr, julday, gmt
-
    start_date=current_date
-
-!  write(unit=*, fmt='(2a)') &
-!       'current_date = ', trim(current_date)
-!  write(unit=0, fmt='(2a)') &
-!       'current_date = ', trim(current_date)
 
    call geth_julgmt(julyr, julday, gmt)
    config_flags%gmt = gmt
@@ -107,11 +122,6 @@ SUBROUTINE med_initialdata_input_3dvar ( grid , config_flags, in_filename )
    config_flags%julday = julday
 
    call ext_ncd_ioclose(fid, ierr)
-
-!  write(unit=*, fmt='(a, 2i8, f12.3)') &
-!       '2: julyr, julday, gmt=', julyr, julday, gmt
-!  write(unit=0, fmt='(a, 2i8, f12.3)') &
-!       '2: julyr, julday, gmt=', julyr, julday, gmt
 
    CALL wrf_debug ( 100 , 'da_3dvar/module_wrf_3dvar_io: calling open_r_dataset for wrf 3dvar input' )
    CALL open_r_dataset ( fid, TRIM(file_name), grid , config_flags , "DATASET=INPUT", ierr )
@@ -122,15 +132,22 @@ SUBROUTINE med_initialdata_input_3dvar ( grid , config_flags, in_filename )
      CALL WRF_ERROR_FATAL ( wrf_err_message )
    ENDIF
 
+   if (present(in_date)) then
+      do n=1, nsave
+         message = 'current_date='//trim(current_date)//', in_date='//trim(in_date)
+         CALL wrf_debug ( 100 , trim(message) )
+         CALL ext_ncd_get_next_time( fid, current_date, Status )
+      enddo
+   endif
+
    CALL       wrf_debug ( 100 , 'wrf_da_3dvar: calling input_model_input' )
    CALL input_model_input ( fid ,   grid , config_flags , ierr )
    CALL       wrf_debug ( 100 , 'wrf_da_3dvar: back from input_model_input' )
 
    CALL close_dataset ( fid , config_flags , "DATASET=INPUT" )
 
-   write(unit=0, fmt='(2a,2x,a,i6,2(2x,a))') &
-        'end med_initialdata_input_3dvar file:', __FILE__, 'line:', __LINE__, &
-        'file_name =', trim(file_name)
+   WRITE ( message , FMT = '("Reading 3dvar input for domain ",I8)' ) grid%id
+   CALL end_timing ( TRIM(message) )
 
 END SUBROUTINE med_initialdata_input_3dvar
 
@@ -158,19 +175,13 @@ SUBROUTINE med_initialdata_output_3dvar ( grid , config_flags, out_filename )
    INTEGER :: julyr, julday
    REAL    :: gmt
 
+   CALL start_timing
+
    if(present(out_filename)) then
-      write(unit=*, fmt='(2a,2x,a,i6)') &
-           'file:', __FILE__, 'line:', __LINE__
       file_name = trim(out_filename)
    else
-      write(unit=*, fmt='(2a,2x,a,i6)') &
-           'file:', __FILE__, 'line:', __LINE__
       file_name = 'wrf_3dvar_output'
    endif
-
-!  write(unit=*, fmt='(2a,2x,a,i6,2(2x,a))') &
-!       'file:', __FILE__, 'line:', __LINE__, &
-!       'file_name =', trim(file_name)
 
    CALL wrf_debug ( 100 , 'da_3dvar/module_wrf_3dvar_io: calling open_w_dataset 3dvar output' )
    CALL open_w_dataset ( fid, TRIM(file_name), grid , config_flags , &
@@ -194,8 +205,9 @@ SUBROUTINE med_initialdata_output_3dvar ( grid , config_flags, out_filename )
    CALL output_model_input ( fid, grid , config_flags , ierr )
 
    CALL close_dataset ( fid , config_flags, "DATASET=INPUT" )
+
    WRITE ( message , FMT = '("Writing 3dvar output for domain ",I8)' ) grid%id
-!  CALL end_timing ( TRIM(message) )
+   CALL end_timing ( TRIM(message) )
 
 END SUBROUTINE med_initialdata_output_3dvar
 

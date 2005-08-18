@@ -138,20 +138,43 @@ SUBROUTINE da_fill_obs_structures( iv, ob )
 
    ENDIF
 
-!  [2.4] Transfer satob obs:
+!  [2.4.1] Transfer Geo. AMVs Obs:
 
-   IF ( iv % num_satob > 0 ) THEN
-                           
-      DO n = 1, iv % num_satob
+   IF ( iv % num_geoamv > 0 ) THEN
+
+      DO n = 1, iv % num_geoamv
+         DO k = 1, iv % geoamv(n) % info % levels
 !        Copy observations variables:
 
-         ob % satob(n) % u = iv % satob(n) % u % inv
-         ob % satob(n) % v = iv % satob(n) % v % inv
+         ob % geoamv(n) % u(k) = iv % geoamv(n) % u(k) % inv
+         ob % geoamv(n) % v(k) = iv % geoamv(n) % v(k) % inv
+
+         END DO
       END DO
-      
+
 !     Initialise obs error factors (optionally overwritten in use_obs_errfac)
-      iv % satob_ef_u = 1.0
-      iv % satob_ef_v = 1.0
+      iv % geoamv_ef_u = 1.0
+      iv % geoamv_ef_v = 1.0
+
+   ENDIF
+
+!  [2.4.2] Transfer  Polar AMVs Obs:
+
+   IF ( iv % num_polaramv > 0 ) THEN
+
+      DO n = 1, iv % num_polaramv
+         DO k = 1, iv % polaramv(n) % info % levels
+!        Copy observations variables:
+
+         ob % polaramv(n) % u(k) = iv % polaramv(n) % u(k) % inv
+         ob % polaramv(n) % v(k) = iv % polaramv(n) % v(k) % inv
+
+         END DO
+      END DO
+
+!     Initialise obs error factors (optionally overwritten in use_obs_errfac)
+      iv % geoamv_ef_u = 1.0
+      iv % geoamv_ef_v = 1.0
 
    ENDIF
 
@@ -476,5 +499,26 @@ SUBROUTINE da_fill_obs_structures( iv, ob )
 
    ENDIF
 
+!  [2.19] Transfer TC bogus:
+
+   IF ( iv % num_bogus > 0 ) THEN
+
+      DO n = 1, iv % num_bogus
+         DO k = 1, iv % bogus(n) % info % levels
+
+!           Copy observations variables:
+
+            ob % bogus(n) % u(k) = iv % bogus(n) % u(k) % inv
+            ob % bogus(n) % v(k) = iv % bogus(n) % v(k) % inv
+         END DO
+         ob % bogus(n) % slp = iv % bogus(n) % slp % inv
+      END DO
+
+!     Initialise obs error factors (optionally overwritten in use_obs_errfac)
+      iv % bogus_ef_u = 1.0
+      iv % bogus_ef_v = 1.0
+      iv % bogus_ef_slp = 1.0
+
+   ENDIF
 
 END SUBROUTINE da_fill_obs_structures

@@ -1,12 +1,13 @@
-SUBROUTINE DA_Check_Vp_Errors( vp1, vp2, &
+SUBROUTINE DA_Check_Vp_Errors( vp1, vp2, kkz, &
                                its,ite, jts,jte, kts,kte )
 
 !------------------------------------------------------------------------------
-!  PURPOSE: Test invertibility of transform to/from Vp.
+!  PURPOSE: Test invertibility of transform to/from Vp or Vv
 !
-!  METHOD:  Perform statistics on differences in initial and final vp.
+!  METHOD:  Perform statistics on differences in initial and final Vv or Vp
 !
-!  HISTORY: 02/23/2000 - Creation of F90 version.           Dale Barker
+!  HISTORY: 02/23/2000 - Creation of F90 version.       Dale Barker
+!           02/02/2005 - Updated Rt owork for Vv also   Syed RH Rizvi    
 !------------------------------------------------------------------------------
 
    IMPLICIT NONE
@@ -14,6 +15,7 @@ SUBROUTINE DA_Check_Vp_Errors( vp1, vp2, &
    TYPE (vp_type), INTENT(IN)     :: vp1         ! Test input
    TYPE (vp_type), INTENT(IN)     :: vp2         ! Test output.
 
+   integer, intent(in)            :: kkz(5)      ! Vertical dims               
    integer, intent(in)            :: its,ite, jts,jte, kts,kte ! tile   dims.
 
    REAL                           :: inv_size    ! 1/size of array.
@@ -27,14 +29,13 @@ SUBROUTINE DA_Check_Vp_Errors( vp1, vp2, &
 !-------------------------------------------------------------------------
 !  [1.0]: Check v1 differences:
 !-------------------------------------------------------------------------
+   diff(its:ite, jts:jte, 1:kkz(1)) = vp2 % v1(its:ite, jts:jte, 1:kkz(1)) &
+                                      - vp1 % v1(its:ite, jts:jte, 1:kkz(1))
 
-   diff(its:ite, jts:jte, 1:kz_vp(1)) = vp2 % v1(its:ite, jts:jte, 1:kz_vp(1)) &
-                                      - vp1 % v1(its:ite, jts:jte, 1:kz_vp(1))
-
-   rms_fild = SQRT( SUM( vp1 % v1(its:ite, jts:jte, 1:kz_vp(1)) &
-                       * vp1 % v1(its:ite, jts:jte, 1:kz_vp(1)) ) * inv_size )
-   rms_diff = SQRT( SUM( diff(its:ite, jts:jte, 1:kz_vp(1)) &
-                       * diff(its:ite, jts:jte, 1:kz_vp(1)) ) * inv_size )
+   rms_fild = SQRT( SUM( vp1 % v1(its:ite, jts:jte, 1:kkz(1)) &
+                       * vp1 % v1(its:ite, jts:jte, 1:kkz(1)) ) * inv_size )
+   rms_diff = SQRT( SUM( diff(its:ite, jts:jte, 1:kkz(1)) &
+                       * diff(its:ite, jts:jte, 1:kkz(1)) ) * inv_size )
      
    IF ( rms_fild == 0.0 ) THEN
       write(unit=*, fmt='(a)') ' v1 is zero ' 
@@ -47,13 +48,13 @@ SUBROUTINE DA_Check_Vp_Errors( vp1, vp2, &
 !  [2.0]: Check v2 differences:
 !-------------------------------------------------------------------------
 
-   diff(its:ite, jts:jte, 1:kz_vp(2)) = vp2 % v2(its:ite, jts:jte, 1:kz_vp(2)) &
-                                      - vp1 % v2(its:ite, jts:jte, 1:kz_vp(2))
+   diff(its:ite, jts:jte, 1:kkz(2)) = vp2 % v2(its:ite, jts:jte, 1:kkz(2)) &
+                                      - vp1 % v2(its:ite, jts:jte, 1:kkz(2))
 
-   rms_fild = SQRT( SUM( vp1 % v2(its:ite, jts:jte, 1:kz_vp(2)) &
-                       * vp1 % v2(its:ite, jts:jte, 1:kz_vp(2)) ) * inv_size )
-   rms_diff = SQRT( SUM( diff(its:ite, jts:jte, 1:kz_vp(2)) &
-                       * diff(its:ite, jts:jte, 1:kz_vp(2)) ) * inv_size )
+   rms_fild = SQRT( SUM( vp1 % v2(its:ite, jts:jte, 1:kkz(2)) &
+                       * vp1 % v2(its:ite, jts:jte, 1:kkz(2)) ) * inv_size )
+   rms_diff = SQRT( SUM( diff(its:ite, jts:jte, 1:kkz(2)) &
+                       * diff(its:ite, jts:jte, 1:kkz(2)) ) * inv_size )
      
    IF ( rms_fild == 0.0 ) THEN
       write(unit=*, fmt='(a)') ' v2 is zero ' 
@@ -66,13 +67,13 @@ SUBROUTINE DA_Check_Vp_Errors( vp1, vp2, &
 !  [3.0]: Check v3 differences:
 !-------------------------------------------------------------------------
 
-   diff(its:ite, jts:jte, 1:kz_vp(3)) = vp2 % v3(its:ite, jts:jte, 1:kz_vp(3)) &
-                                      - vp1 % v3(its:ite, jts:jte, 1:kz_vp(3))
+   diff(its:ite, jts:jte, 1:kkz(3)) = vp2 % v3(its:ite, jts:jte, 1:kkz(3)) &
+                                      - vp1 % v3(its:ite, jts:jte, 1:kkz(3))
 
-   rms_fild = SQRT( SUM( vp1 % v3(its:ite, jts:jte, 1:kz_vp(3)) &
-                       * vp1 % v3(its:ite, jts:jte, 1:kz_vp(3)) ) * inv_size )
-   rms_diff = SQRT( SUM( diff(its:ite, jts:jte, 1:kz_vp(3)) &
-                       * diff(its:ite, jts:jte, 1:kz_vp(3)) ) * inv_size )
+   rms_fild = SQRT( SUM( vp1 % v3(its:ite, jts:jte, 1:kkz(3)) &
+                       * vp1 % v3(its:ite, jts:jte, 1:kkz(3)) ) * inv_size )
+   rms_diff = SQRT( SUM( diff(its:ite, jts:jte, 1:kkz(3)) &
+                       * diff(its:ite, jts:jte, 1:kkz(3)) ) * inv_size )
      
    IF ( rms_fild == 0.0 ) THEN
       write(unit=*, fmt='(a)') ' v3 is zero ' 
@@ -85,13 +86,13 @@ SUBROUTINE DA_Check_Vp_Errors( vp1, vp2, &
 !  [4.0]: Check v4 differences:
 !-------------------------------------------------------------------------
 
-   diff(its:ite, jts:jte, 1:kz_vp(4)) = vp2 % v4(its:ite, jts:jte, 1:kz_vp(4)) &
-                                      - vp1 % v4(its:ite, jts:jte, 1:kz_vp(4))
+   diff(its:ite, jts:jte, 1:kkz(4)) = vp2 % v4(its:ite, jts:jte, 1:kkz(4)) &
+                                      - vp1 % v4(its:ite, jts:jte, 1:kkz(4))
 
-   rms_fild = SQRT( SUM( vp1 % v4(its:ite, jts:jte, 1:kz_vp(4)) &
-                       * vp1 % v4(its:ite, jts:jte, 1:kz_vp(4)) ) * inv_size )
-   rms_diff = SQRT( SUM( diff(its:ite, jts:jte, 1:kz_vp(4)) &
-                       * diff(its:ite, jts:jte, 1:kz_vp(4)) ) * inv_size )
+   rms_fild = SQRT( SUM( vp1 % v4(its:ite, jts:jte, 1:kkz(4)) &
+                       * vp1 % v4(its:ite, jts:jte, 1:kkz(4)) ) * inv_size )
+   rms_diff = SQRT( SUM( diff(its:ite, jts:jte, 1:kkz(4)) &
+                       * diff(its:ite, jts:jte, 1:kkz(4)) ) * inv_size )
      
    IF ( rms_fild == 0.0 ) THEN
       write(unit=*, fmt='(a)') ' v4 is zero ' 
@@ -104,13 +105,13 @@ SUBROUTINE DA_Check_Vp_Errors( vp1, vp2, &
 !  [5.0]: Check v5 differences:
 !-------------------------------------------------------------------------
 
-   diff(its:ite, jts:jte, 1:kz_vp(5)) = vp2 % v5(its:ite, jts:jte, 1:kz_vp(5)) &
-                                      - vp1 % v5(its:ite, jts:jte, 1:kz_vp(5))
+   diff(its:ite, jts:jte, 1:kkz(5)) = vp2 % v5(its:ite, jts:jte, 1:kkz(5)) &
+                                      - vp1 % v5(its:ite, jts:jte, 1:kkz(5))
 
-   rms_fild = SQRT( SUM( vp1 % v5(its:ite, jts:jte, 1:kz_vp(5)) &
-                       * vp1 % v5(its:ite, jts:jte, 1:kz_vp(5)) ) * inv_size )
-   rms_diff = SQRT( SUM( diff(its:ite, jts:jte, 1:kz_vp(5)) &
-                       * diff(its:ite, jts:jte, 1:kz_vp(5)) ) * inv_size )
+   rms_fild = SQRT( SUM( vp1 % v5(its:ite, jts:jte, 1:kkz(5)) &
+                       * vp1 % v5(its:ite, jts:jte, 1:kkz(5)) ) * inv_size )
+   rms_diff = SQRT( SUM( diff(its:ite, jts:jte, 1:kkz(5)) &
+                       * diff(its:ite, jts:jte, 1:kkz(5)) ) * inv_size )
      
    IF ( rms_fild == 0.0 ) THEN
       write(unit=*, fmt='(a)') ' v5 is zero ' 
@@ -120,4 +121,3 @@ SUBROUTINE DA_Check_Vp_Errors( vp1, vp2, &
    END IF    
       
 END SUBROUTINE DA_Check_Vp_Errors
-
