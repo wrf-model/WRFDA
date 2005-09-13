@@ -300,7 +300,7 @@ CONTAINS
 
    IF (cu_physics .eq. 0) return
 
-! DON'T JUDGE TIME STEP HERE, SINCE KF NEEDS ACCUMULATED W FIELD.
+! DONT JUDGE TIME STEP HERE, SINCE KF NEEDS ACCUMULATED W FIELD.
 ! DO IT INSIDE THE INDIVIDUAL CUMULUS SCHEME
 
 ! SET START AND END POINTS FOR TILES
@@ -441,7 +441,7 @@ CONTAINS
      CASE DEFAULT 
 
          WRITE( wrf_err_message , * ) 'The cumulus option does not exist: cu_physics = ', cu_physics
-         CALL wrf_error_fatal ( wrf_err_message )
+         CALL wrf_error_fatal3 ( "module_cumulus_driver.b" , 444 ,  wrf_err_message )
 
    END SELECT cps_select
 

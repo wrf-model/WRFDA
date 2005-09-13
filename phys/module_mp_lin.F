@@ -127,7 +127,7 @@ CONTAINS
    rhoe_s=1.29
 !
    IF (P_QI .lt. P_FIRST_SCALAR .or. P_QS .lt. P_FIRST_SCALAR) THEN
-      CALL wrf_error_fatal ( 'module_mp_lin: Improper use of Lin et al scheme; no ice phase. Please chose another one.')
+      CALL wrf_error_fatal3 ( "module_mp_lin.b" , 130 ,  'module_mp_lin: Improper use of Lin et al scheme; no ice phase. Please chose another one.')
    ENDIF
 
    gindex=1.0
@@ -1082,7 +1082,7 @@ CONTAINS
 ! testing
           if( qlz(k) .gt. 1.0e-10 ) then
             temc1=amax1(-30.99,temcc(k))
-!           print*,'temc1',temc1,qlz(k)
+!           print*,temc1,temc1,qlz(k)
             a1=parama1( temc1 )
             a2=parama2( temc1 )
             tmp1=1.0-a2
@@ -1405,9 +1405,9 @@ CONTAINS
          prevp(k)=amax1( tmp3,-qrzodt(k) )
 
 !
-!      if(iout .gt. 0) write(20,*)'tmp1,tmp2,tmp3=',tmp1,tmp2,tmp3
-!      if(iout .gt. 0) write(20,*)'qlz,qiz,qrz=',qlz(k),qiz(k),qrz(k)
-!      if(iout .gt. 0) write(20,*)'tem,qsz,qvz=',tem(k),qsz(k),qvz(k)
+!      if(iout .gt. 0) write(20,*)tmp1,tmp2,tmp3=,tmp1,tmp2,tmp3
+!      if(iout .gt. 0) write(20,*)qlz,qiz,qrz=,qlz(k),qiz(k),qrz(k)
+!      if(iout .gt. 0) write(20,*)tem,qsz,qvz=,tem(k),qsz(k),qvz(k)
 
 
 
@@ -2185,114 +2185,114 @@ CONTAINS
 !******      Write terms in cloud physics to time series dataset   *****
 !***********************************************************************
 !
-!     open(unit=24,form='formatted',status='new',
-!    &     file='cloud.dat')
+!     open(unit=24,form=formatted,status=new,
+!    &     file=cloud.dat)
 
 !9030  format(10e12.6)
 
-!      write(24,*)'tmp'
+!      write(24,*)tmp
 !      write(24,9030) (tem(k),k=kts+1,kte)
-!      write(24,*)'qiz'
+!      write(24,*)qiz
 !      write(24,9030) (qiz(k),k=kts+1,kte)
-!      write(24,*)'qsz'
+!      write(24,*)qsz
 !      write(24,9030) (qsz(k),k=kts+1,kte)
-!      write(24,*)'qrz'
+!      write(24,*)qrz
 !      write(24,9030) (qrz(k),k=kts+1,kte)
-!      write(24,*)'qgz'
+!      write(24,*)qgz
 !      write(24,9030) (qgz(k),k=kts+1,kte)
-!      write(24,*)'qvoqsw'
+!      write(24,*)qvoqsw
 !      write(24,9030) (qvoqswz(k),k=kts+1,kte)
-!      write(24,*)'qvoqsi'
+!      write(24,*)qvoqsi
 !      write(24,9030) (qvoqsiz(k),k=kts+1,kte)
-!      write(24,*)'vtr'
+!      write(24,*)vtr
 !      write(24,9030) (vtr(k),k=kts+1,kte)
-!      write(24,*)'vts'
+!      write(24,*)vts
 !      write(24,9030) (vts(k),k=kts+1,kte)
-!      write(24,*)'vtg'
+!      write(24,*)vtg
 !      write(24,9030) (vtg(k),k=kts+1,kte)
-!      write(24,*)'pclw'
+!      write(24,*)pclw
 !      write(24,9030) (pclw(k),k=kts+1,kte)
-!      write(24,*)'pvapor'
+!      write(24,*)pvapor
 !      write(24,9030) (pvapor(k),k=kts+1,kte)
-!      write(24,*)'pcli'
+!      write(24,*)pcli
 !      write(24,9030) (pcli(k),k=kts+1,kte)
-!      write(24,*)'pimlt'
+!      write(24,*)pimlt
 !      write(24,9030) (pimlt(k),k=kts+1,kte)
-!      write(24,*)'pihom'
+!      write(24,*)pihom
 !      write(24,9030) (pihom(k),k=kts+1,kte)
-!      write(24,*)'pidw'
+!      write(24,*)pidw
 !      write(24,9030) (pidw(k),k=kts+1,kte)
-!      write(24,*)'prain'
+!      write(24,*)prain
 !      write(24,9030) (prain(k),k=kts+1,kte)
-!      write(24,*)'praut'
+!      write(24,*)praut
 !      write(24,9030) (praut(k),k=kts+1,kte)
-!      write(24,*)'pracw'
+!      write(24,*)pracw
 !      write(24,9030) (pracw(k),k=kts+1,kte)
-!      write(24,*)'prevp'
+!      write(24,*)prevp
 !      write(24,9030) (prevp(k),k=kts+1,kte)
-!      write(24,*)'psnow'
+!      write(24,*)psnow
 !      write(24,9030) (psnow(k),k=kts+1,kte)
-!      write(24,*)'psaut'
+!      write(24,*)psaut
 !      write(24,9030) (psaut(k),k=kts+1,kte)
-!      write(24,*)'psfw'
+!      write(24,*)psfw
 !      write(24,9030) (psfw(k),k=kts+1,kte)
-!      write(24,*)'psfi'
+!      write(24,*)psfi
 !      write(24,9030) (psfi(k),k=kts+1,kte)
-!      write(24,*)'praci'
+!      write(24,*)praci
 !      write(24,9030) (praci(k),k=kts+1,kte)
-!      write(24,*)'piacr'
+!      write(24,*)piacr
 !      write(24,9030) (piacr(k),k=kts+1,kte)
-!      write(24,*)'psaci'
+!      write(24,*)psaci
 !      write(24,9030) (psaci(k),k=kts+1,kte)
-!      write(24,*)'psacw'
+!      write(24,*)psacw
 !      write(24,9030) (psacw(k),k=kts+1,kte)
-!      write(24,*)'psdep'
+!      write(24,*)psdep
 !      write(24,9030) (psdep(k),k=kts+1,kte)
-!      write(24,*)'pssub'
+!      write(24,*)pssub
 !      write(24,9030) (pssub(k),k=kts+1,kte)
-!      write(24,*)'pracs'
+!      write(24,*)pracs
 !      write(24,9030) (pracs(k),k=kts+1,kte)
-!      write(24,*)'psacr'
+!      write(24,*)psacr
 !      write(24,9030) (psacr(k),k=kts+1,kte)
-!      write(24,*)'psmlt'
+!      write(24,*)psmlt
 !      write(24,9030) (psmlt(k),k=kts+1,kte)
-!      write(24,*)'psmltevp'
+!      write(24,*)psmltevp
 !      write(24,9030) (psmltevp(k),k=kts+1,kte)
-!      write(24,*)'pladj'
+!      write(24,*)pladj
 !      write(24,9030) (pladj(k),k=kts+1,kte)
-!      write(24,*)'piadj'
+!      write(24,*)piadj
 !      write(24,9030) (piadj(k),k=kts+1,kte)
-!      write(24,*)'pgraupel'
+!      write(24,*)pgraupel
 !      write(24,9030) (pgraupel(k),k=kts+1,kte)
-!      write(24,*)'pgaut'
+!      write(24,*)pgaut
 !      write(24,9030) (pgaut(k),k=kts+1,kte)
-!      write(24,*)'pgfr'
+!      write(24,*)pgfr
 !      write(24,9030) (pgfr(k),k=kts+1,kte)
-!      write(24,*)'pgacw'
+!      write(24,*)pgacw
 !      write(24,9030) (pgacw(k),k=kts+1,kte)
-!      write(24,*)'pgaci'
+!      write(24,*)pgaci
 !      write(24,9030) (pgaci(k),k=kts+1,kte)
-!      write(24,*)'pgacr'
+!      write(24,*)pgacr
 !      write(24,9030) (pgacr(k),k=kts+1,kte)
-!      write(24,*)'pgacs'
+!      write(24,*)pgacs
 !      write(24,9030) (pgacs(k),k=kts+1,kte)
-!      write(24,*)'pgacip'
+!      write(24,*)pgacip
 !      write(24,9030) (pgacip(k),k=kts+1,kte)
-!      write(24,*)'pgacrP'
+!      write(24,*)pgacrP
 !      write(24,9030) (pgacrP(k),k=kts+1,kte)
-!      write(24,*)'pgacsp'
+!      write(24,*)pgacsp
 !      write(24,9030) (pgacsp(k),k=kts+1,kte)
-!      write(24,*)'pgwet'
+!      write(24,*)pgwet
 !      write(24,9030) (pgwet(k),k=kts+1,kte)
-!      write(24,*)'pdry'
+!      write(24,*)pdry
 !      write(24,9030) (pdry(k),k=kts+1,kte)
-!      write(24,*)'pgsub'
+!      write(24,*)pgsub
 !      write(24,9030) (pgsub(k),k=kts+1,kte)
-!      write(24,*)'pgdep'
+!      write(24,*)pgdep
 !      write(24,9030) (pgdep(k),k=kts+1,kte)
-!      write(24,*)'pgmlt'
+!      write(24,*)pgmlt
 !      write(24,9030) (pgmlt(k),k=kts+1,kte)
-!      write(24,*)'pgmltevp'
+!      write(24,*)pgmltevp
 !      write(24,9030) (pgmltevp(k),k=kts+1,kte)
 
 
@@ -2318,7 +2318,7 @@ CONTAINS
 !---------------------------------------------------------------------
    IMPLICIT NONE
 !---------------------------------------------------------------------
-!  This program use Newton's method for finding saturated temperature
+!  This program use Newtons method for finding saturated temperature
 !  and saturation mixing ratio.
 !
 ! In this saturation adjustment scheme we assume
@@ -2527,7 +2527,7 @@ CONTAINS
    10 PF=PF*TEMP
   100 FORMAT(//,5X,'module_mp_lin: INPUT TO GAMMA FUNCTION TOO LARGE, X=',E12.5)
       WRITE(wrf_err_message,100)X
-      CALL wrf_error_fatal(wrf_err_message)
+      CALL wrf_error_fatal3 ( "module_mp_lin.b" , 2530 , wrf_err_message)
    20 G1TO2=1.
       TEMP=TEMP - 1.
       DO 30 K1=1,8

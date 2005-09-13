@@ -231,7 +231,7 @@ CONTAINS
         if(mconv(i).lt.0.)mconv(i)=0.
         if(i.eq.ipr.and.j.eq.jpr)then
 !        do k=kts,ktf
-!          print *,'2',tn(i,k),qo(i,k),pi(i,k,j),po(i,k)
+!          print *,2,tn(i,k),qo(i,k),pi(i,k,j),po(i,k)
 !        enddo
 !        print *,mconv(i)
         endif
@@ -637,7 +637,7 @@ CONTAINS
          edt_ens(nens)=.95-float(nens)*.01
       enddo
 !     if(j.eq.jpr)then
-!       print *,'radius ensemble ',iens,radius
+!       print *,radius ensemble ,iens,radius
 !       print *,mbdt_ens
 !       print *,edt_ens
 !     endif
@@ -970,7 +970,7 @@ CONTAINS
 !     if(j.eq.jpr.and.iedt.eq.1)then
 !      if(j.eq.jpr)then
 !        i=ipr
-!        print *,'in 250 loop ',iedt,edt(ipr),ierr(ipr)
+!        print *,in 250 loop ,iedt,edt(ipr),ierr(ipr)
 !       if(ierr(i).eq.0.or.ierr(i).eq.3)then
 !        print *,k22(I),kbcon(i),ktop(i),jmin(i)
 !        print *,edt(i),aa0(i),aa1(i)
@@ -1040,7 +1040,7 @@ CONTAINS
        scr1(i,k)=0.
        dellaqc(i,k)=0.
        if(ierr(i).eq.0)then
-!       print *,'in vupnewg, after della ',ierr(i),aa0(i),i,j
+!       print *,in vupnewg, after della ,ierr(i),aa0(i),i,j
          scr1(i,k)=qco(i,k)-qrco(i,k)
          if(k.eq.ktop(i)-0)dellaqc(i,k)= &
                       .01*zuo(i,ktop(i))*qrco(i,ktop(i))* &
@@ -1308,12 +1308,12 @@ CONTAINS
 !      if(j.eq.jpr)then
 !      i=ipr
 !       if(ierr(i).eq.0)then
-!         print *,'on output, pre =',pre(i)
+!         print *,on output, pre =,pre(i)
 !        do k=kts,ktf
 !          print *,k,z(i,k),outt(i,k),outq(i,k),outqc(i,k)
 !        enddo
 !        else
-!          print *,'ierror = ',ierr(i)
+!          print *,ierror = ,ierr(i)
 !        endif
 !      endif
 !     do i=its,itf
@@ -1322,7 +1322,7 @@ CONTAINS
 !      endif
 !     enddo
 !sms$to_local end
-!     print *,'ierr(i) = ',ierr(i),pre(i)
+!     print *,ierr(i) = ,ierr(i),pre(i)
 
    END SUBROUTINE CUP_enss
 
@@ -1735,17 +1735,17 @@ CONTAINS
          qcd(i,ki)=qrcd(i,ki)
          pwev(i)=pwev(i)+pwd(i,ki)
 !        if(iloop.eq.1.and.i.eq.102.and.j.eq.62)then
-!         print *,'in cup_dd_moi ', hcd(i,ki),HES_cup(I,Ki),dh,dqeva
+!         print *,in cup_dd_moi , hcd(i,ki),HES_cup(I,Ki),dh,dqeva
 !        endif
       enddo
 !
 !--- end loop over i
        if(pwev(I).eq.0.and.iloop.eq.1)then
-!        print *,'problem with buoy in cup_dd_moisture',i
+!        print *,problem with buoy in cup_dd_moisture,i
          ierr(i)=7
        endif
        if(BU(I).GE.0.and.iloop.eq.1)then
-!        print *,'problem with buoy in cup_dd_moisture',i
+!        print *,problem with buoy in cup_dd_moisture,i
          ierr(i)=7
        endif
       endif
@@ -1911,7 +1911,7 @@ CONTAINS
      ktf=MIN(kte,kde-1)
 !
 !
-!      if(j.eq.jpr)print *,'in cup dellabot '
+!      if(j.eq.jpr)print *,in cup dellabot 
       do 100 i=its,itf
       della(i,1)=0.
       if(ierr(i).ne.0)go to 100
@@ -1987,7 +1987,7 @@ CONTAINS
 !
       i=ipr
 !      if(j.eq.jpr)then
-!        print *,'in dellas kpbl(i),k22(i),kbcon(i),ktop(i),jmin(i)'
+!        print *,in dellas kpbl(i),k22(i),kbcon(i),ktop(i),jmin(i)
 !        print *,kpbl(i),k22(i),kbcon(i),ktop(i),jmin(i)
 !      endif
        DO K=kts+1,ktf
@@ -2043,20 +2043,20 @@ CONTAINS
 !C
          totmas=subin-subdown+detup-entup-entdo+ &
                  detdo-entupk-entdoj+detupk
-!         if(j.eq.jpr.and.i.eq.ipr)print *,'k,totmas,sui,sud = ',k,
+!         if(j.eq.jpr.and.i.eq.ipr)print *,k,totmas,sui,sud = ,k,
 !     1   totmas,subin,subdown
-!         if(j.eq.jpr.and.i.eq.ipr)print *,'updr stuff = ',detup,
+!         if(j.eq.jpr.and.i.eq.ipr)print *,updr stuff = ,detup,
 !     1      entup,entupk,detupk
-!         if(j.eq.jpr.and.i.eq.ipr)print *,'dddr stuff = ',entdo,
+!         if(j.eq.jpr.and.i.eq.ipr)print *,dddr stuff = ,entdo,
 !     1      detdo,entdoj
          if(abs(totmas).gt.1.e-6)then
-!           print *,'*********************',i,j,k,totmas,name
+!           print *,*********************,i,j,k,totmas,name
 !           print *,kpbl(i),k22(i),kbcon(i),ktop(i)
-!c          print *,'updr stuff = ',subin,
+!c          print *,updr stuff = ,subin,
 !c    1      subdown,detup,entup,entupk,detupk
-!c          print *,'dddr stuff = ',entdo,
+!c          print *,dddr stuff = ,entdo,
 !c    1      detdo,entdoj
-         call wrf_error_fatal ( 'totmas .gt.1.e-6' )
+         CALL wrf_error_fatal3 ( "module_cu_gd.b" , 2059 ,  'totmas .gt.1.e-6' )
          endif
          dp=100.*(p_cup(i,k-1)-p_cup(i,k))
          della(i,k)=(subin*he_cup(i,k+1) &
@@ -2285,16 +2285,16 @@ CONTAINS
       AE(1)=BE(1)/273.+ALOG(610.71)
       BE(2)=.622*HT(2)/.286
       AE(2)=BE(2)/273.+ALOG(610.71)
-!      print *, 'TCRIT = ', tcrit,its,ite
+!      print *, TCRIT = , tcrit,its,ite
       DO k=kts,ktf
       do i=its,itf
         if(ierr(i).eq.0)then
 !Csgb - IPH is for phase, dependent on TCRIT (water or ice)
         IPH=1
         IF(T(I,K).LE.TCRIT)IPH=2
-!       print *, 'AE(IPH),BE(IPH) = ',AE(IPH),BE(IPH),AE(IPH)-BE(IPH),T(i,k),i,k
+!       print *, AE(IPH),BE(IPH) = ,AE(IPH),BE(IPH),AE(IPH)-BE(IPH),T(i,k),i,k
         E=EXP(AE(IPH)-BE(IPH)/T(I,K))
-!       print *, 'P, E = ', P(I,K), E
+!       print *, P, E = , P(I,K), E
         QES(I,K)=.622*E/(100.*P(I,K)-E)
         IF(QES(I,K).LE.1.E-08)QES(I,K)=1.E-08
         IF(Q(I,K).GT.QES(I,K))Q(I,K)=QES(I,K)
@@ -2303,7 +2303,7 @@ CONTAINS
       enddo
       enddo
 !
-!--- z's are calculated with changed h's and q's and t's
+!--- zs are calculated with changed hs and qs and ts
 !--- if itest=2
 !
       if(itest.ne.2)then
@@ -2562,7 +2562,7 @@ CONTAINS
 !--- LARGE SCALE FORCING
 !
        DO 100 i=its,itf
-!       if(i.eq.ipr.and.j.eq.jpr)print *,'ierr = ',ierr(i)
+!       if(i.eq.ipr.and.j.eq.jpr)print *,ierr = ,ierr(i)
           if(name.eq.'deeps'.and.ierr(i).gt.995)then
 !          print *,i,j,ierr(i),aa0(i)
            aa0(i)=0.
@@ -2584,9 +2584,9 @@ CONTAINS
            aclim2=acrit(k)*1.e3
            aclim3=acritt(kclim)*1.e3
            aclim4=acritt(k)*1.e3
-!           print *,'p_cup(ktop(i)),kclim,pcrit(kclim)'
+!           print *,p_cup(ktop(i)),kclim,pcrit(kclim)
 !           print *,p_cup(i,ktop(i)),kclim,pcrit(kclim)
-!           print *,'aclim1,aclim2,aclim3,aclim4'
+!           print *,aclim1,aclim2,aclim3,aclim4
 !           print *,aclim1,aclim2,aclim3,aclim4
 !           print *,dtime,name,ierr(i),aa1(i),aa0(i)
 !          print *,dtime,name,ierr(i),aa1(i),aa0(i)
@@ -3357,7 +3357,7 @@ CONTAINS
 !-- now do feedback
 !
       ddtes=200.
-!     if(name.eq.'shal')ddtes=200.
+!     if(name.eq.shal)ddtes=200.
       do i=its,itf
         if(ierr(i).eq.0)then
          if(xmb_ave(i).le.0.)then
@@ -4117,12 +4117,12 @@ CONTAINS
            x_ske(i,k)=x_ske(i,k)/float(num)/a3
            x_cur(i,k)=x_cur(i,k)/float(num)/a4
         endif
-!       print*,'                               '
-!       print*,'Some statistics at gridpoint i,j, ierr',i,j,ierr(i)
-!       print*,'statistics for closure number ',k
-!       print*,'Average= ',x_ave(i,k),'  Std= ',x_std(i,k)
-!       print*,'Skewness= ',x_ske(i,k),' Curtosis= ',x_cur(i,k)
-!       print*,'                               '
+!       print*,                               
+!       print*,Some statistics at gridpoint i,j, ierr,i,j,ierr(i)
+!       print*,statistics for closure number ,k
+!       print*,Average= ,x_ave(i,k),  Std= ,x_std(i,k)
+!       print*,Skewness= ,x_ske(i,k), Curtosis= ,x_cur(i,k)
+!       print*,                               
 
       enddo
       enddo
@@ -4135,11 +4135,11 @@ CONTAINS
            a4=max(1.e-6,xt_std(i)**4)
            xt_ske(i)=xt_ske(i)/float(maxens3)/a3
            xt_cur(i)=xt_cur(i)/float(maxens3)/a4
-!       print*,'                               '
-!       print*,'Total ensemble independent statistics at i =',i
-!       print*,'Average= ',xt_ave(i),'  Std= ',xt_std(i)
-!       print*,'Skewness= ',xt_ske(i),' Curtosis= ',xt_cur(i)
-!       print*,'                               '
+!       print*,                               
+!       print*,Total ensemble independent statistics at i =,i
+!       print*,Average= ,xt_ave(i),  Std= ,xt_std(i)
+!       print*,Skewness= ,xt_ske(i), Curtosis= ,xt_cur(i)
+!       print*,                               
 !
 !  first go around: store massflx for different closures/caps
 !
@@ -4209,14 +4209,14 @@ CONTAINS
            qmemf=min(qmemf,qmem2)
 !
 !
-!          print *,'1',' adjusted massflux by factor ',i,k,qmem,qmem2,qmemf
+!          print *,1, adjusted massflux by factor ,i,k,qmem,qmem2,qmemf
          endif
          if(qmem.lt.-thresh)then
            qmem2=-thresh/qmem
            qmemf=min(qmemf,qmem2)
 !
 !
-!          print *,'2',' adjusted massflux by factor ',i,k,qmem,qmem2,qmemf
+!          print *,2, adjusted massflux by factor ,i,k,qmem,qmem2,qmemf
          endif
       enddo
       do k=kts,ktf
@@ -4227,8 +4227,8 @@ CONTAINS
       pret(i)=pret(i)*qmemf 
       enddo
 !
-! check whether routine produces negative q's. This can happen, since 
-! tendencies are calculated based on forced q's. This should have no
+! check whether routine produces negative qs. This can happen, since 
+! tendencies are calculated based on forced qs. This should have no
 ! influence on conservation properties, it scales linear through all
 ! tendencies
 !
@@ -4247,7 +4247,7 @@ CONTAINS
            qmem2=(thresh-q(i,k))/dt
            qmemf=min(qmemf,qmem2/qmem1)
 !          qmemf=max(0.,qmemf)
-!          print *,'4 adjusted tendencies ',i,k,qmem,qmem2,qmemf
+!          print *,4 adjusted tendencies ,i,k,qmem,qmem2,qmemf
          endif
          endif
       enddo

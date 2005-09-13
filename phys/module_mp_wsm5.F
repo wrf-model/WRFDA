@@ -1,10 +1,10 @@
-#if (RWORDSIZE == DWORDSIZE)
-#  define VREC(A,B,C) vrec(A,B,C)
-#  define VSQRT(A,B,C) vsqrt(A,B,C)
-#else
-#  define VREC(A,B,C) vsrec(A,B,C)
-#  define VSQRT(A,B,C) vssqrt(A,B,C)
-#endif
+
+
+
+
+
+
+
 
 MODULE module_mp_wsm5
 !
@@ -50,8 +50,8 @@ MODULE module_mp_wsm5
 !
 ! Specifies code-inlining of fpvs function in WSM52D below. JM 20040507
 !
-#define WSM5_OPTIM
-#define INL
+
+
 
 CONTAINS
 !===================================================================
@@ -240,10 +240,10 @@ CONTAINS
   REAL  :: holdc, holdci
   INTEGER :: i, j, k, mstepmax,                                   &
             iprt, latd, lond, loop, loops, ifsat, n
-#ifdef INL
+
 ! Temporaries used for inlining fpvs function
   REAL  :: dldti, xb, xai, tr, xbi, xa, hvap, cvap, hsub, dldt, ttp
-#endif
+
 
 !
 !=================================================================
@@ -255,8 +255,8 @@ CONTAINS
 !----------------------------------------------------------------
 !     size distributions: (x=mixing ratio, y=air density):
 !     valid for mixing ratio > 1.e-9 kg/kg.
-#ifdef WSM5_OPTIM
-#define PWR(A,B)  exp(log(A)*(B))
+
+
       lamdar(x,y)=   sqrt(sqrt(pidn0r/(x*y)))      ! (pidn0r/(x*y))**.25
       lamdas(x,y,z)= sqrt(sqrt(pidn0s*z/(x*y)))    ! (pidn0s*z/(x*y))**.25
 !
@@ -264,33 +264,15 @@ CONTAINS
 !     diffus: diffusion coefficient of the water vapor
 !     viscos: kinematic viscosity(m2s-1)
 !
-      diffus(x,y) = 8.794e-5 * PWR(x,1.81) / y        ! 8.794e-5*x**1.81/y
+      diffus(x,y) = 8.794e-5 * exp(log(x)*(1.81)) / y        ! 8.794e-5*x**1.81/y
       viscos(x,y) = 1.496e-6 * (x*sqrt(x)) /(x+120.)/y  ! 1.496e-6*x**1.5/(x+120.)/y
       xka(x,y) = 1.414e3*viscos(x,y)*y
       diffac(a,b,c,d,e) = d*a*a/(xka(c,d)*rv*c*c)+1./(e*diffus(c,b))
 !      venfac(a,b,c) = (viscos(b,c)/diffus(b,a))**(.3333333)       &
 !                      /viscos(b,c)**(.5)*(den0/c)**0.25
-      venfac(a,b,c) = PWR((viscos(b,c)/diffus(b,a)),(.3333333))    &
+      venfac(a,b,c) = exp(log((viscos(b,c)/diffus(b,a)))*((.3333333)))    &
                      /sqrt(viscos(b,c))*sqrt(sqrt(den0/c))
       conden(a,b,c,d,e) = (max(b,qmin)-c)/(1.+d*d/(rv*e)*c/(a*a))
-#else
-#define PWR(A,B)  ((A)**(B))
-!
-      lamdar(x,y)=(pidn0r/(x*y))**.25
-      lamdas(x,y,z)=(pidn0s*z/(x*y))**.25
-!
-!----------------------------------------------------------------
-!     diffus: diffusion coefficient of the water vapor
-!     viscos: kinematic viscosity(m2s-1)
-!
-      diffus(x,y) = 8.794e-5*x**1.81/y
-      viscos(x,y) = 1.496e-6*x**1.5/(x+120.)/y
-      xka(x,y) = 1.414e3*viscos(x,y)*y
-      diffac(a,b,c,d,e) = d*a*a/(xka(c,d)*rv*c*c)+1./(e*diffus(c,b))
-      venfac(a,b,c) = (viscos(b,c)/diffus(b,a))**(.3333333)       &
-             /viscos(b,c)**(.5)*(den0/c)**0.25
-      conden(a,b,c,d,e) = (max(b,qmin)-c)/(1.+d*d/(rv*e)*c/(a*a))
-#endif
 !
       pi = 4. * atan(1.)
 !
@@ -336,23 +318,23 @@ CONTAINS
         flgcld(i) = .true.
       enddo
 !
-#ifdef WSM5_OPTIM
+
       do k = kts, kte
-        CALL VREC( tvec1(its), den(its,k), ite-its+1 )
+        CALL vsrec( tvec1(its), den(its,k), ite-its+1 )
         do i = its, ite
           tvec1(i) = tvec1(i)*den0
         enddo
-        CALL VSQRT( denfac(its,k), tvec1(its), ite-its+1 )
+        CALL vssqrt( denfac(its,k), tvec1(its), ite-its+1 )
       enddo
-#else
-      do k = kts, kte
-        do i = its, ite
-          denfac(i,k) = sqrt(den0/den(i,k))
-        enddo
-      enddo
-#endif
+
+
+
+
+
+
+
 !
-#ifdef INL
+
       hsub = xls
       hvap = xlv0
       cvap = cpv
@@ -363,28 +345,28 @@ CONTAINS
       dldti=cvap-cice
       xai=-dldti/rv
       xbi=xai+hsub/(rv*ttp)
-#endif
+
       do k = kts, kte
         do i = its, ite
-#ifdef INL
+
           tr=ttp/t(i,k)
-          qs(i,k,1)=psat*PWR(tr,xa)*exp(xb*(1.-tr))
-#else
-          qs(i,k,1) = fpvs(t(i,k),0,rd,rv,cpv,cliq,cice,xlv0,xls,psat,t0c)
-#endif
+          qs(i,k,1)=psat*exp(log(tr)*(xa))*exp(xb*(1.-tr))
+
+
+
           qs(i,k,1) = ep2 * qs(i,k,1) / (p(i,k) - qs(i,k,1))
           qs(i,k,1) = max(qs(i,k,1),qmin)
           rh(i,k,1) = max(q(i,k) / qs(i,k,1),qmin)
-#ifdef INL
+
           tr=ttp/t(i,k)
           if(t(i,k).lt.ttp) then
-            qs(i,k,2)=psat*PWR(tr,xai)*exp(xbi*(1.-tr))
+            qs(i,k,2)=psat*exp(log(tr)*(xai))*exp(xbi*(1.-tr))
           else
-            qs(i,k,2)=psat*PWR(tr,xa)*exp(xb*(1.-tr))
+            qs(i,k,2)=psat*exp(log(tr)*(xa))*exp(xb*(1.-tr))
           endif
-#else
-          qs(i,k,2) = fpvs(t(i,k),1,rd,rv,cpv,cliq,cice,xlv0,xls,psat,t0c)
-#endif
+
+
+
           qs(i,k,2) = ep2 * qs(i,k,2) / (p(i,k) - qs(i,k,2))
           qs(i,k,2) = max(qs(i,k,2),qmin)
           rh(i,k,2) = max(q(i,k) / qs(i,k,2),qmin)
@@ -437,7 +419,7 @@ CONTAINS
             rslope3(i,k,1) = rsloper3max
           else
             rslope(i,k,1) = 1./lamdar(qrs(i,k,1),den(i,k))
-            rslopeb(i,k,1) = PWR(rslope(i,k,1),bvtr)
+            rslopeb(i,k,1) = exp(log(rslope(i,k,1))*(bvtr))
             rslope2(i,k,1) = rslope(i,k,1)*rslope(i,k,1)
             rslope3(i,k,1) = rslope2(i,k,1)*rslope(i,k,1)
           endif
@@ -448,21 +430,21 @@ CONTAINS
             rslope3(i,k,2) = rslopes3max
           else
             rslope(i,k,2) = 1./lamdas(qrs(i,k,2),den(i,k),n0sfac(i,k))
-            rslopeb(i,k,2) = PWR(rslope(i,k,2),bvts)
+            rslopeb(i,k,2) = exp(log(rslope(i,k,2))*(bvts))
             rslope2(i,k,2) = rslope(i,k,2)*rslope(i,k,2)
             rslope3(i,k,2) = rslope2(i,k,2)*rslope(i,k,2)
           endif
 !-------------------------------------------------------------
 ! Ni: ice crystal number concentraiton   [HDC 5c]
 !-------------------------------------------------------------
-#ifdef WSM5_OPTIM
+
           temp = (den(i,k)*max(qci(i,k,2),qmin))
           temp = sqrt(sqrt(temp*temp*temp))
           xni(i,k) = min(max(5.38e7*temp,1.e3),1.e6)
-#else
-          xni(i,k) = min(max(5.38e7*(den(i,k)                           &
-                    *max(qci(i,k,2),qmin))**0.75,1.e3),1.e6)
-#endif
+
+
+
+
         enddo
       enddo
 !
@@ -542,12 +524,12 @@ CONTAINS
             work2c(i,k) = 0.
           else
             xmi = den(i,k)*qci(i,k,2)/xni(i,k)
-#ifdef WSM5_OPTIM
+
             diameter  = max(min(dicon * sqrt(xmi),dimax), 1.e-25)
-#else
-            diameter  = min(dicon * sqrt(xmi),dimax)
-#endif
-            work1c(i,k) = 1.49e4*PWR(diameter,1.31)
+
+
+
+            work1c(i,k) = 1.49e4*exp(log(diameter)*(1.31))
             work2c(i,k) = work1c(i,k)/delz(i,k)
           endif
           numdt(i) = max(nint(work2c(i,k)*dtcld+.5),1)
@@ -623,13 +605,13 @@ CONTAINS
 !        (T0>T>-40C: C->I)
 !---------------------------------------------------------------
           if(supcol.gt.0..and.qci(i,k,1).gt.0.) then
-#ifdef WSM5_OPTIM
+
             pfrzdtc = min(pfrz1*(exp(pfrz2*supcol)-1.)                  &
             *den(i,k)/denr/xncr*qci(i,k,1)*qci(i,k,1)*dtcld,qci(i,k,1))
-#else
-            pfrzdtc = min(pfrz1*(exp(pfrz2*supcol)-1.)                  &
-               *den(i,k)/denr/xncr*qci(i,k,1)**2*dtcld,qci(i,k,1))
-#endif
+
+
+
+
             qci(i,k,2) = qci(i,k,2) + pfrzdtc
             t(i,k) = t(i,k) + xlf/cpm(i,k)*pfrzdtc
             qci(i,k,1) = qci(i,k,1)-pfrzdtc
@@ -639,17 +621,17 @@ CONTAINS
 !        (T<T0, R->S)
 !---------------------------------------------------------------
           if(supcol.gt.0..and.qrs(i,k,1).gt.0.) then
-#ifdef WSM5_OPTIM
+
             temp = rslope(i,k,1)
             temp = temp*temp*temp*temp*temp*temp*temp
             pfrzdtr = min(20.*(pi*pi)*pfrz1*n0r*denr/den(i,k)             &
                   *(exp(pfrz2*supcol)-1.)*temp*dtcld,                   &
                   qrs(i,k,1))
-#else
-            pfrzdtr = min(20.*pi**2*pfrz1*n0r*denr/den(i,k)             &
-                  *(exp(pfrz2*supcol)-1.)*rslope(i,k,1)**7*dtcld,       &
-                  qrs(i,k,1))
-#endif
+
+
+
+
+
             qrs(i,k,2) = qrs(i,k,2) + pfrzdtr
             t(i,k) = t(i,k) + xlf/cpm(i,k)*pfrzdtr
             qrs(i,k,1) = qrs(i,k,1)-pfrzdtr
@@ -674,7 +656,7 @@ CONTAINS
             rslope3(i,k,1) = rsloper3max
           else
             rslope(i,k,1) = 1./lamdar(qrs(i,k,1),den(i,k))
-            rslopeb(i,k,1) = PWR(rslope(i,k,1),bvtr)
+            rslopeb(i,k,1) = exp(log(rslope(i,k,1))*(bvtr))
             rslope2(i,k,1) = rslope(i,k,1)*rslope(i,k,1)
             rslope3(i,k,1) = rslope2(i,k,1)*rslope(i,k,1)
           endif
@@ -685,7 +667,7 @@ CONTAINS
             rslope3(i,k,2) = rslopes3max
           else
             rslope(i,k,2) = 1./lamdas(qrs(i,k,2),den(i,k),n0sfac(i,k))
-            rslopeb(i,k,2) = PWR(rslope(i,k,2),bvts)
+            rslopeb(i,k,2) = exp(log(rslope(i,k,2))*(bvts))
             rslope2(i,k,2) = rslope(i,k,2)*rslope(i,k,2)
             rslope3(i,k,2) = rslope2(i,k,2)*rslope(i,k,2)
           endif
@@ -717,7 +699,7 @@ CONTAINS
 !        (C->R)
 !---------------------------------------------------------------
           if(qci(i,k,1).gt.qc0) then
-            paut(i,k,1) = qck1*PWR(qci(i,k,1),(7./3.))
+            paut(i,k,1) = qck1*exp(log(qci(i,k,1))*((7./3.)))
             paut(i,k,1) = min(paut(i,k,1),qci(i,k,1)/dtcld)
           endif
 !---------------------------------------------------------------
@@ -768,14 +750,14 @@ CONTAINS
 !-------------------------------------------------------------
 ! Ni: ice crystal number concentraiton   [HDC 5c]
 !-------------------------------------------------------------
-#ifdef WSM5_OPTIM
+
           temp = (den(i,k)*max(qci(i,k,2),qmin))
           temp = sqrt(sqrt(temp*temp*temp))
           xni(i,k) = min(max(5.38e7*temp,1.e3),1.e6)
-#else
-          xni(i,k) = min(max(5.38e7*(den(i,k)                           &
-                       *max(qci(i,k,2),qmin))**0.75,1.e3),1.e6)
-#endif
+
+
+
+
           eacrs = exp(0.05*(-supcol))
 !
           if(supcol.gt.0) then
@@ -838,7 +820,7 @@ CONTAINS
             if(supsat.gt.0.and.ifsat.ne.1) then
               supice = satdt-pres(i,k,1)-pisd(i,k)-pres(i,k,2)
               xni0 = 1.e3*exp(0.1*supcol)
-              roqi0 = 4.92e-11*PWR(xni0,1.33)
+              roqi0 = 4.92e-11*exp(log(xni0)*(1.33))
               pgen(i,k) = max(0.,(roqi0/den(i,k)-max(qci(i,k,2),0.))    &
                          /dtcld)
               pgen(i,k) = min(min(pgen(i,k),satdt),supice)
@@ -948,7 +930,7 @@ CONTAINS
         enddo
       enddo
 !
-#ifdef INL
+
       hsub = xls
       hvap = xlv0
       cvap = cpv
@@ -959,27 +941,27 @@ CONTAINS
       dldti=cvap-cice
       xai=-dldti/rv
       xbi=xai+hsub/(rv*ttp)
-#endif
+
       do k = kts, kte
         do i = its, ite
-#ifdef INL
+
           tr=ttp/t(i,k)
-          qs(i,k,1)=psat*PWR(tr,xa)*exp(xb*(1.-tr))
-#else
-          qs(i,k,1) = fpvs(t(i,k),0,rd,rv,cpv,cliq,cice,xlv0,xls,psat,t0c)
-#endif
+          qs(i,k,1)=psat*exp(log(tr)*(xa))*exp(xb*(1.-tr))
+
+
+
           qs(i,k,1) = ep2 * qs(i,k,1) / (p(i,k) - qs(i,k,1))
           qs(i,k,1) = max(qs(i,k,1),qmin)
-#ifdef INL
+
           tr=ttp/t(i,k)
           if(t(i,k).lt.ttp) then
-            qs(i,k,2)=psat*PWR(tr,xai)*exp(xbi*(1.-tr))
+            qs(i,k,2)=psat*exp(log(tr)*(xai))*exp(xbi*(1.-tr))
           else
-            qs(i,k,2)=psat*PWR(tr,xa)*exp(xb*(1.-tr))
+            qs(i,k,2)=psat*exp(log(tr)*(xa))*exp(xb*(1.-tr))
           endif
-#else
-          qs(i,k,2) = fpvs(t(i,k),1,rd,rv,cpv,cliq,cice,xlv0,xls,psat,t0c)
-#endif
+
+
+
           qs(i,k,2) = ep2 * qs(i,k,2) / (p(i,k) - qs(i,k,2))
           qs(i,k,2) = max(qs(i,k,2),qmin)
         enddo
@@ -1055,9 +1037,9 @@ CONTAINS
       xbi=xai+hsub/(rv*ttp)
       tr=ttp/t
       if(t.lt.ttp.and.ice.eq.1) then
-        fpvs=psat*PWR(tr,xai)*exp(xbi*(1.-tr))
+        fpvs=psat*exp(log(tr)*(xai))*exp(xbi*(1.-tr))
       else
-        fpvs=psat*PWR(tr,xa)*exp(xb*(1.-tr))
+        fpvs=psat*exp(log(tr)*(xa))*exp(xb*(1.-tr))
       endif
 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       END FUNCTION fpvs

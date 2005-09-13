@@ -6,10 +6,10 @@ SUBROUTINE calc_dpsdt ( itimestep, dt, psfc, psfcm, cn, &
 
   IMPLICIT NONE
 
-#ifdef DM_PARALLEL
-  include "mpif.h"
-  logical, external :: wrf_dm_on_monitor
-#endif
+
+
+
+
    
    ! Input data
 
@@ -47,20 +47,9 @@ SUBROUTINE calc_dpsdt ( itimestep, dt, psfc, psfcm, cn, &
   ENDDO
   avg_abs_dpsdt = avg_abs_dpsdt/( (ide-ids)*(jde-jds) )
 
-#ifdef DM_PARALLEL
-  call MPI_ALLREDUCE( avg_abs_dpsdt, nsum, 1, MPI_REAL, MPI_SUM, &
-                       MPI_COMM_WORLD, IERROR )
-
-  avg_abs_dpsdt = nsum
-
-  IF ( wrf_dm_on_monitor() ) THEN
      write(unit=*, fmt='(A,A,A,i6,2x,f12.5)') &
           ' Step, Domain averaged abs(d',cn,'dt) = ', itimestep, avg_abs_dpsdt
-  ENDIF
-#else
-     write(unit=*, fmt='(A,A,A,i6,2x,f12.5)') &
-          ' Step, Domain averaged abs(d',cn,'dt) = ', itimestep, avg_abs_dpsdt
-#endif
+
 
   IF ( cn .eq. 'ps' ) then
     DO j=jts,jtf

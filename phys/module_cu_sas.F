@@ -420,7 +420,7 @@ CONTAINS
      &,      EPS => con_eps, EPSM1 => con_epsm1
       implicit none
 !
-!     include 'constant.h'
+!     include constant.h
 !
       integer            IM, IX,  KM, JCAP, ncloud,                     &
      &                   KBOT(IM), KTOP(IM), KUO(IM)
@@ -756,15 +756,15 @@ CONTAINS
 !       HEO(I,k) = HEO(I,k)
 !       hesol(k) = HESO(I,k)
 !      IF(LAT.EQ.LATD.AND.lon.eq.lond.and.CNVFLG(I)) THEN
-!        PRINT *, '   HEO ='
+!        PRINT *,    HEO =
 !        PRINT 6001, (HEO(I,K),K=1,KMAX)
-!        PRINT *, '   HESO ='
+!        PRINT *,    HESO =
 !        PRINT 6001, (HESO(I,K),K=1,KMAX)
-!        PRINT *, '   TO ='
+!        PRINT *,    TO =
 !        PRINT 6002, (TO(I,K)-273.16,K=1,KMAX)
-!        PRINT *, '   QO ='
+!        PRINT *,    QO =
 !        PRINT 6003, (QO(I,K),K=1,KMAX)
-!        PRINT *, '   QSO ='
+!        PRINT *,    QSO =
 !        PRINT 6003, (QESO(I,K),K=1,KMAX)
 !      ENDIF
 !
@@ -1039,16 +1039,16 @@ CONTAINS
         ENDDO
       ENDDO
 !      IF(LAT.EQ.LATD.AND.lon.eq.lond.and.CNVFLG(I)) THEN
-!        PRINT *, ' LMIN(I), KT2(I)=', LMIN(I), KT2(I)
-!        PRINT *, ' KBOT, KTOP, JMIN(I) =', KBCON(I), KTCON(I), JMIN(I)
+!        PRINT *,  LMIN(I), KT2(I)=, LMIN(I), KT2(I)
+!        PRINT *,  KBOT, KTOP, JMIN(I) =, KBCON(I), KTCON(I), JMIN(I)
 !      ENDIF
 !     IF(LAT.EQ.LATD.AND.lon.eq.lond) THEN
-!       print *, ' xlamb =', xlamb
-!       print *, ' eta =', (eta(k),k=1,KT2(I))
-!       print *, ' ETAU =', (ETAU(I,k),k=1,KT2(I))
-!       print *, ' HCKO =', (HCKO(I,k),k=1,KT2(I))
-!       print *, ' SUMZ =', (SUMZ(I,k),k=1,KT2(I))
-!       print *, ' SUMH =', (SUMH(I,k),k=1,KT2(I))
+!       print *,  xlamb =, xlamb
+!       print *,  eta =, (eta(k),k=1,KT2(I))
+!       print *,  ETAU =, (ETAU(I,k),k=1,KT2(I))
+!       print *,  HCKO =, (HCKO(I,k),k=1,KT2(I))
+!       print *,  SUMZ =, (SUMZ(I,k),k=1,KT2(I))
+!       print *,  SUMH =, (SUMH(I,k),k=1,KT2(I))
 !     ENDIF
       DO I = 1, IM
         if(DWNFLG(I)) THEN
@@ -1080,8 +1080,8 @@ CONTAINS
         ENDDO
       ENDDO
 !      IF(LAT.EQ.LATD.AND.lon.eq.lond.and.CNVFLG(I)) THEN
-!        PRINT *, ' UCKO=', (UCKO(I,k),k=KBCON(I)+1,KTCON(I))
-!        PRINT *, ' uenv=', (.5*(UO(I,k)+UO(I,k-1)),k=KBCON(I)+1,KTCON(I))
+!        PRINT *,  UCKO=, (UCKO(I,k),k=KBCON(I)+1,KTCON(I))
+!        PRINT *,  uenv=, (.5*(UO(I,k)+UO(I,k-1)),k=KBCON(I)+1,KTCON(I))
 !      ENDIF
       DO I = 1, IM
         if(CNVFLG(I).and.DWNFLG2(I).and.JMIN(I).le.KBCON(I))            &
@@ -1200,7 +1200,7 @@ CONTAINS
       IF(TOTFLG) RETURN
 !!
 !cccc IF(LAT.EQ.LATD.AND.lon.eq.lond.and.CNVFLG(I)) THEN
-!cccc   PRINT *, ' AA1(I) BEFORE DWNDRFT =', AA1(I)
+!cccc   PRINT *,  AA1(I) BEFORE DWNDRFT =, AA1(I)
 !cccc ENDIF
 !
 !------- DOWNDRAFT CALCULATIONS
@@ -1325,7 +1325,7 @@ CONTAINS
         ENDDO
       ENDDO
 !     IF(LAT.EQ.LATD.AND.lon.eq.lond.and.DWNFLG(I)) THEN
-!       PRINT *, ' PWAVO(I), PWEVO(I) =', PWAVO(I), PWEVO(I)
+!       PRINT *,  PWAVO(I), PWEVO(I) =, PWAVO(I), PWEVO(I)
 !     ENDIF
 !
 !--- FINAL DOWNDRAFT STRENGTH DEPENDENT ON PRECIP
@@ -1372,7 +1372,7 @@ CONTAINS
         ENDDO
       ENDDO
 !cccc IF(LAT.EQ.LATD.AND.lon.eq.lond.and.DWNFLG2(I)) THEN
-!cccc   PRINT *, '  AA1(I) AFTER DWNDRFT =', AA1(I)
+!cccc   PRINT *,   AA1(I) AFTER DWNDRFT =, AA1(I)
 !cccc ENDIF
       DO I = 1, IM
         IF(AA1(I).LE.0.) CNVFLG(I)  = .FALSE.
@@ -1701,7 +1701,7 @@ CONTAINS
         ENDDO
       ENDDO
 !cccc IF(LAT.EQ.LATD.AND.lon.eq.lond.and.CNVFLG(I)) THEN
-!cccc   PRINT *, ' XAA BEFORE DWNDRFT =', XAA0(I)
+!cccc   PRINT *,  XAA BEFORE DWNDRFT =, XAA0(I)
 !cccc ENDIF
 !
 !------- DOWNDRAFT CALCULATIONS
@@ -1781,7 +1781,7 @@ CONTAINS
         ENDDO
       ENDDO
 !cccc IF(LAT.EQ.LATD.AND.lon.eq.lond.and.DWNFLG2(I)) THEN
-!cccc   PRINT *, '  XAA AFTER DWNDRFT =', XAA0(I)
+!cccc   PRINT *,   XAA AFTER DWNDRFT =, XAA0(I)
 !cccc ENDIF
 !
 !  CALCULATE CRITICAL CLOUD WORK FUNCTION
@@ -1884,9 +1884,9 @@ CONTAINS
         ENDIF
       ENDDO
 !      IF(LAT.EQ.LATD.AND.lon.eq.lond.and.CNVFLG(I)) THEN
-!        print *, ' RHBAR(I), ACRTFCT(I) =', RHBAR(I), ACRTFCT(I)
-!        PRINT *, '  A1, XA =', AA1(I), XAA0(I)
-!        PRINT *, ' XMB(I), ACRT =', XMB(I), ACRT
+!        print *,  RHBAR(I), ACRTFCT(I) =, RHBAR(I), ACRTFCT(I)
+!        PRINT *,   A1, XA =, AA1(I), XAA0(I)
+!        PRINT *,  XMB(I), ACRT =, XMB(I), ACRT
 !      ENDIF
       TOTFLG = .TRUE.
       DO I = 1, IM
@@ -1980,13 +1980,13 @@ CONTAINS
         ENDDO
       ENDDO
 !     IF(LAT.EQ.LATD.AND.lon.eq.lond.and.CNVFLG(I) ) THEN
-!       PRINT *, ' DELHBAR, DELQBAR, DELTBAR ='
+!       PRINT *,  DELHBAR, DELQBAR, DELTBAR =
 !       PRINT *, DELHBAR, HVAP*DELQBAR, CP*DELTBAR
-!       PRINT *, '   DELLBAR ='
+!       PRINT *,    DELLBAR =
 !       PRINT 6003,  HVAP*DELLbar
-!       PRINT *, '   DELLAQ ='
+!       PRINT *,    DELLAQ =
 !       PRINT 6003, (HVAP*DELLAQ(I,k)*XMB(I),K=1,KMAX)
-!       PRINT *, '   DELLAT ='
+!       PRINT *,    DELLAT =
 !       PRINT 6003, (DELLAH(i,k)*XMB(I)-HVAP*DELLAQ(I,k)*XMB(I),         &
 !    &               K=1,KMAX)
 !     ENDIF
@@ -2058,14 +2058,14 @@ CONTAINS
         ENDDO
       ENDDO
 !      IF(LAT.EQ.LATD.AND.lon.eq.lond.and.CNVFLG(I) ) THEN
-!        PRINT *, '   DELLAH ='
+!        PRINT *,    DELLAH =
 !        PRINT 6003, (DELLAH(k)*XMB(I),K=1,KMAX)
-!        PRINT *, '   DELLAQ ='
+!        PRINT *,    DELLAQ =
 !        PRINT 6003, (HVAP*DELLAQ(I,k)*XMB(I),K=1,KMAX)
-!        PRINT *, ' DELHBAR, DELQBAR, DELTBAR ='
+!        PRINT *,  DELHBAR, DELQBAR, DELTBAR =
 !        PRINT *, DELHBAR, HVAP*DELQBAR, CP*DELTBAR
-!        PRINT *, ' PRECIP =', HVAP*RN(I)*1000./DT2
-!CCCC   PRINT *, '   DELLBAR ='
+!        PRINT *,  PRECIP =, HVAP*RN(I)*1000./DT2
+!CCCC   PRINT *,    DELLBAR =
 !CCCC   PRINT *,  HVAP*DELLbar
 !      ENDIF
 !

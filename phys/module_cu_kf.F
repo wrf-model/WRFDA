@@ -406,7 +406,7 @@ CONTAINS
 
 !...OPTION TO FEED CONVECTIVELY GENERATED RAINWATER      
 !...INTO GRID-RESOLVED RAINWATER (OR SNOW/GRAUPEL)      
-!...FIELD.  'FBFRC' IS THE FRACTION OF AVAILABLE       
+!...FIELD.  FBFRC IS THE FRACTION OF AVAILABLE       
 !...PRECIPITATION TO BE FED BACK (0.0 - 1.0)...      
 !                                                   
       FBFRC=0.0                                    
@@ -1162,7 +1162,7 @@ CONTAINS
             LDB=ND                                            
 !                                                            
 !...IF DOWNDRAFT NEVER BECOMES NEGATIVELY BUOYANT OR IF IT  
-!...IS SHALLOWER 50 mb, DON'T ALLOW IT TO OCCUR AT ALL...             
+!...IS SHALLOWER 50 mb, DONT ALLOW IT TO OCCUR AT ALL...             
 !                                                                    
             IF(NK.EQ.1.OR.(P0(LDB)-P0(LFS)).LT.50.E2)GOTO 141       
 ! testing ---- no downdraft
@@ -1501,7 +1501,7 @@ CONTAINS
         DO 499 NK=1,LTOP                                               
           IF(QG(NK).LT.0.)THEN                                        
             IF(NK.EQ.1)THEN                                          
-              CALL wrf_error_fatal ( 'module_cu_kf.F: problem with kf scheme:  qg = 0 at the surface' )
+              CALL wrf_error_fatal3 ( "module_cu_kf.b" , 1504 ,  'module_cu_kf.F: problem with kf scheme:  qg = 0 at the surface' )
             ENDIF                                                
             NK1=NK+1                                            
             IF(NK.EQ.LTOP)NK1=KLCL                             
@@ -1528,8 +1528,8 @@ CONTAINS
   499   CONTINUE                                                         
         TOPOMG=(UDR(LTOP)-UER(LTOP))*DP(LTOP)*EMSD(LTOP)                
         IF(ABS(TOPOMG-OMG(LTOP)).GT.1.E-3)THEN                         
-!       WRITE(98,*)'ERROR:  MASS DOES NOT BALANCE IN KF SCHEME;'      
-!    * ,'TOPOMG, OMG =',TOPOMG,OMG(LTOP)                             
+!       WRITE(98,*)ERROR:  MASS DOES NOT BALANCE IN KF SCHEME;      
+!    * ,TOPOMG, OMG =,TOPOMG,OMG(LTOP)                             
         WRITE(6,*)'ERROR:  MASS DOES NOT BALANCE IN KF SCHEME;'        & 
        ,'TOPOMG, OMG =',TOPOMG,OMG(LTOP)                            
           ISTOP=1                                                  
@@ -1648,8 +1648,8 @@ CONTAINS
         DABE=AMAX1(ABE-ABEG,0.1*ABE)                               
         FABE=ABEG/(ABE+1.E-8)                                    
         IF(FABE.GT.1.)THEN                                                
-!       WRITE(98,*)'UPDRAFT/DOWNDRAFT COUPLET INCREASES CAPE AT THIS '   
-!    *,'GRID POINT; NO CONVECTION ALLOWED!'                             
+!       WRITE(98,*)UPDRAFT/DOWNDRAFT COUPLET INCREASES CAPE AT THIS    
+!    *,GRID POINT; NO CONVECTION ALLOWED!                             
           GOTO 325                                                     
         ENDIF                                                         
         IF(NCOUNT.NE.1)THEN                                          
@@ -1826,7 +1826,7 @@ CONTAINS
                             U0(K),V0(K),DP(K)/100.,W0AVG1D(K)         
               CALL wrf_message ( TRIM( wrf_err_message ) )
   310       CONTINUE                                                   
-            CALL wrf_error_fatal ( 'module_cu_kf.F: KAIN-FRITSCH' )
+            CALL wrf_error_fatal3 ( "module_cu_kf.b" , 1829 ,  'module_cu_kf.F: KAIN-FRITSCH' )
           ENDIF                                                      
         ENDIF                                                       
         CNDTNF=(1.-EQFRC(LFS))*(QLIQ(LFS)+QICE(LFS))*DMF(LFS)            
@@ -1846,11 +1846,11 @@ CONTAINS
         QFNL=QFNL+PPTFLX*TIMEC*(1.-FBFRC)                              
         ERR2=(QFNL-QINIT)*100./QINIT                                  
 !     WRITE(98,1110)QINIT,QFNL,ERR2                                  
-!        IF(ABS(ERR2).GT.0.05)STOP 'QVERR'                           
-        IF(ABS(ERR2).GT.0.05)CALL wrf_error_fatal( 'module_cu_kf.F: QVERR' )
+!        IF(ABS(ERR2).GT.0.05)STOP QVERR                           
+        IF(ABS(ERR2).GT.0.05)CALL wrf_error_fatal3 ( "module_cu_kf.b" , 1850 ,  'module_cu_kf.F: QVERR' )
         RELERR=ERR2*QINIT/(PPTFLX*TIMEC+1.E-10)                   
 !     WRITE(98,1120)RELERR                                       
-!     WRITE(98,*)'TDER, CPR, USR, TRPPT =',                     
+!     WRITE(98,*)TDER, CPR, USR, TRPPT =,                     
 !    *TDER,CPR*AINC,USR*AINC,TRPPT*AINC                        
 !                                                             
 !...FEEDBACK TO RESOLVABLE SCALE TENDENCIES.                 
@@ -1918,7 +1918,7 @@ CONTAINS
                  DQIDT(K)=DQIDT(K)+(QSG(K)-QS0(K))/TIMEC
               ENDIF
             ELSE                                                    
-              CALL wrf_error_fatal ( 'module_cu_kf: THIS COMBINATION OF IMOIST,  IICE NOT ALLOWED' )
+              CALL wrf_error_fatal3 ( "module_cu_kf.b" , 1921 ,  'module_cu_kf: THIS COMBINATION OF IMOIST,  IICE NOT ALLOWED' )
             ENDIF                                                 
 !         ENDIF                                                  
           DTDT(K)=(TG(K)-T0(K))/TIMEC                      
@@ -1950,16 +1950,16 @@ CONTAINS
       ,F6.3,'VWS=',F5.2)                                                    
 1040          FORMAT(' ','PRECIP EFF = 100%, ENVIR CANNOT SUPPORT DOWND' & 
       ,'RAFTS')                                                          
-!1045  FORMAT('NUMBER OF DOWNDRAFT ITERATIONS EXCEEDS 10...PPTFLX'       & 
-!      ' IS DIFFERENT FROM THAT GIVEN BY PRECIP EFF RELATION')            
+!1045  FORMAT(NUMBER OF DOWNDRAFT ITERATIONS EXCEEDS 10...PPTFLX       & 
+!       IS DIFFERENT FROM THAT GIVEN BY PRECIP EFF RELATION)            
 ! FLIC HAS TROUBLE WITH THIS ONE.                                         
 1045  FORMAT('NUMBER OF DOWNDRAFT ITERATIONS EXCEEDS 10')                
 1050  FORMAT(' ','LCOUNT= ',I3,' PPTFLX/CPR, PEFF= ',F5.3,1X,F5.3,       &  
       'DMF(LFS)/UMF(LCL)= ',F5.3)                                          
 1055     FORMAT(/'*** DEGREE OF STABILIZATION =',F5.3,', NO MORE MASS F' &
       ,'LUX IS ALLOWED')                                                
-!1060     FORMAT(/' ITERATION DOES NOT CONVERGE TO GIVE THE SPECIFIED '  & 
-!      'DEGREE OF STABILIZATION!  FABE= ',F6.4)                             
+!1060     FORMAT(/ ITERATION DOES NOT CONVERGE TO GIVE THE SPECIFIED   & 
+!      DEGREE OF STABILIZATION!  FABE= ,F6.4)                             
 1060  FORMAT(/' ITERATION DOES NOT CONVERGE.  FABE= ',F6.4)                
  1070 FORMAT (16A8)                                                       
  1075 FORMAT (F8.2,3(F8.2),2(F8.3),F8.2,2F8.3,F8.2,6F8.3)                

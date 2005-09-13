@@ -12,7 +12,7 @@ MODULE module_tiles
 CONTAINS
 
 ! CPP macro for error checking
-#define ERROR_TEST(A,O,B) IF( A O B )THEN;WRITE(mess,'(3A4)')'A','O','B';CALL WRF_ERROR_FATAL(mess);ENDIF
+
 
 ! this version is used to compute only on a boundary of some width
 ! The ids, ide, jds, and jde arguments specify the edge of the boundary (a way of
@@ -174,9 +174,9 @@ CONTAINS
      INTEGER                                :: smx, emx, smy, emy
      INTEGER                                :: ntiles
      INTEGER                                :: one
-#ifdef _OPENMP
-     INTEGER , EXTERNAL        :: omp_get_max_threads
-#endif
+
+
+
      CHARACTER*80              :: mess
 
      data_ordering : SELECT CASE ( model_data_order )
@@ -200,12 +200,12 @@ CONTAINS
          smx = grid%sm33 ; emx = grid%em33 ; smy = grid%sm31 ; emy = grid%em31
      END SELECT data_ordering
 
-     ERROR_TEST(ips,<,smx)
-     ERROR_TEST(ipe,>,emx)
-     ERROR_TEST(jps,<,smy)
-     ERROR_TEST(jpe,>,emy)
+     IF( ips < smx )THEN;WRITE(mess,'(3A4)')'ips','<','smx';CALL wrf_error_fatal3 ( "module_tiles.b" , 203 , mess);ENDIF
+     IF( ipe > emx )THEN;WRITE(mess,'(3A4)')'ipe','>','emx';CALL wrf_error_fatal3 ( "module_tiles.b" , 204 , mess);ENDIF
+     IF( jps < smy )THEN;WRITE(mess,'(3A4)')'jps','<','smy';CALL wrf_error_fatal3 ( "module_tiles.b" , 205 , mess);ENDIF
+     IF( jpe > emy )THEN;WRITE(mess,'(3A4)')'jpe','>','emy';CALL wrf_error_fatal3 ( "module_tiles.b" , 206 , mess);ENDIF
 
-     ! Here's how the number of tiles is arrived at:
+     ! Heres how the number of tiles is arrived at:
      !
      !          if tile sizes are specified use those otherwise
      !          if num_tiles is specified use that otherwise
@@ -216,13 +216,13 @@ CONTAINS
      IF ( grid%num_tiles_spec .EQ. 0 ) THEN
        CALL nl_get_numtiles( 1, num_tiles )
        IF ( num_tiles .EQ. 1 ) THEN
-#ifdef _OPENMP
-         num_tiles = omp_get_max_threads()
-         WRITE(mess,'("WRF NUMBER OF TILES FROM OMP_GET_MAX_THREADS = ",I3)')num_tiles
-         CALL WRF_MESSAGE ( mess )
-#else
+
+
+
+
+
          num_tiles = 1
-#endif
+
        ENDIF
 ! override num_tiles setting (however gotten) if tile sizes are specified
        CALL nl_get_tile_sz_x( 1, tile_sz_x )
@@ -278,7 +278,7 @@ CONTAINS
 ! This bit allows the user to specify execution out onto the halo region
 ! in the call to set_tiles. If the low patch boundary specified by the arguments
 ! is less than what the model already knows to be the patch boundary and if
-! the user hasn't erred by specifying something that would fall off memory
+! the user hasnt erred by specifying something that would fall off memory
 ! (safety tests are higher up in this routine, outside the IF) then adjust
 ! the tile boundary of the low edge tiles accordingly. Likewise for high edges.
         IF ( ips .lt. spx .and. ts .eq. spx ) ts = ips ;
@@ -388,13 +388,13 @@ CONTAINS
               iends(num_tiles)   = i
               jstarts(num_tiles) = j
               jends(num_tiles)   = j
-              ! don't check this point again
+              ! dont check this point again
               imaskcopy(i,j) = 0
               ! find length of first row
               DO ir = istarts(num_tiles)+1,ipe
                 IF ( imaskcopy(ir,j) == 1 ) THEN
                   iends(num_tiles) = ir
-                  ! don't check this point again
+                  ! dont check this point again
                   imaskcopy(ir,j) = 0
                 ELSE
                   EXIT
@@ -404,7 +404,7 @@ CONTAINS
               DO jr = jstarts(num_tiles)+1,jpe
                 IF (ALL(imaskcopy(istarts(num_tiles):iends(num_tiles),jr) == 1)) THEN
                   jends(num_tiles) = jr
-                  ! don't check these points again
+                  ! dont check these points again
                   imaskcopy(istarts(num_tiles):iends(num_tiles),jr) = 0
                 ELSE
                   EXIT

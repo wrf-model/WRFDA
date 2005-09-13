@@ -16,13 +16,13 @@
 ! JM NOTE -- can we name this grav instead?
    REAL    , PARAMETER :: g = 9.81  ! acceleration due to gravity (m {s}^-2)
 
-#if ( NMM_CORE == 1 )
-   REAL    , PARAMETER :: r_d          = 287.04
-   REAL    , PARAMETER :: cp           = 1004.6
-#else
+
+
+
+
    REAL    , PARAMETER :: r_d          = 287.
    REAL    , PARAMETER :: cp           = 7.*r_d/2.
-#endif
+
 
    REAL    , PARAMETER :: r_v          = 461.6
    REAL    , PARAMETER :: cv           = cp-r_d
@@ -92,7 +92,7 @@
        REAL , PARAMETER ::  a4=35.86
        REAL , PARAMETER ::  epsq=1.e-12
        REAL , PARAMETER ::  p608=rvovrd-1.
-!#if ( NMM_CORE == 1 )
+!#if ( 0 == 1 )
        REAL , PARAMETER ::  climit=1.e-20
        REAL , PARAMETER ::  cm1=2937.4
        REAL , PARAMETER ::  cm2=4.9283

@@ -3694,7 +3694,7 @@ CONTAINS
       real :: amn2o     ! Molecular weight of nitrous oxide (g/mol)      
       real :: amc11     ! Molecular weight of CFC11 (g/mol) - CFCL3      
       real :: amc12     ! Molecular weight of CFC12 (g/mol) - CF2CL2     
-      real :: avgdro    ! Avogadro's number (molecules/mole)             
+      real :: avgdro    ! Avogadros number (molecules/mole)             
                                                                                  
 ! Atomic weights for conversion from mass to volume mixing ratios                
 
@@ -3798,7 +3798,7 @@ CONTAINS
 !  RRTM is executed for an additional layer (L=kte+1), which extends              
 !  from the model top (ptop) to 0 mb, to calculate the downward                  
 !  flux at the model top interface.  H2O, CO2, and O3 vmrs for this              
-!  extra layer are set to the values in the model's top layer, though            
+!  extra layer are set to the values in the models top layer, though            
 !  the O3 value is reduced by a fraction (0.6) based on the US Std Atm.          
 !  For GCMs with a model top near 0 mb, this extra layer is not needed, and      
 !  NLAYERS should be set to the number of model layers (kte in this case).       
@@ -4170,7 +4170,7 @@ CONTAINS
 !*               respectively (molecules/cm**2)                                * 
 !*     CO2MULT - for bands in which carbon dioxide is implemented as a         * 
 !*               trace species, this is the factor used to multiply the        * 
-!*               band's average CO2 absorption coefficient to get the added    * 
+!*               bands average CO2 absorption coefficient to get the added    * 
 !*               contribution to the optical depth relative to 355 ppm.        * 
 !*     FACij(LAY) - for layer LAY, these are factors that are needed to        * 
 !*                  compute the interpolation factors that multiply the        * 
@@ -6553,9 +6553,9 @@ USE module_dm
         rrtm_unit = -1
  2010   CONTINUE
       ENDIF
-      CALL wrf_dm_bcast_bytes ( rrtm_unit , IWORDSIZE )
+      CALL wrf_dm_bcast_bytes ( rrtm_unit , 4 )
       IF ( rrtm_unit < 0 ) THEN
-        CALL wrf_error_fatal ( 'module_ra_rrtm: rrtm_lookuptable: Can not find unused fortran unit to read in lookup table.' )
+        CALL wrf_error_fatal3 ( "module_ra_rrtm.b" , 6558 ,  'module_ra_rrtm: rrtm_lookuptable: Can not find unused fortran unit to read in lookup table.' )
       ENDIF
 
 ! start data 1
@@ -6612,12 +6612,12 @@ USE module_dm
 !     JT = 1 refers to a temperature of 245.6, JT = 2 refers to 252.8, &        
 !     etc.  The second index runs over the g-channel (1 to 16).                  
 
-#define DM_BCAST_MACRO(A) CALL wrf_dm_bcast_bytes ( A , size ( A ) * RWORDSIZE )
+
 
          IF ( wrf_dm_on_monitor() ) READ (rrtm_unit,ERR=9010) abscoefL1, abscoefH1, SELFREF1
-         DM_BCAST_MACRO(abscoefL1)
-         DM_BCAST_MACRO(abscoefH1)
-         DM_BCAST_MACRO(SELFREF1)
+         CALL wrf_dm_bcast_bytes ( abscoefL1 , size ( abscoefL1 ) * 4 )
+         CALL wrf_dm_bcast_bytes ( abscoefH1 , size ( abscoefH1 ) * 4 )
+         CALL wrf_dm_bcast_bytes ( SELFREF1 , size ( SELFREF1 ) * 4 )
 
 ! **************************************************************************     
 !     The array abscoefL2 contains absorption coefs at the 16 chosen g-values 
@@ -6653,9 +6653,9 @@ USE module_dm
 !     etc.  The second index runs over the g-channel (1 to 16).                  
 
          IF ( wrf_dm_on_monitor() ) READ (rrtm_unit,ERR=9010) abscoefL2, abscoefH2, SELFREF2
-         DM_BCAST_MACRO(abscoefL2)
-         DM_BCAST_MACRO(abscoefH2)
-         DM_BCAST_MACRO(SELFREF2)
+         CALL wrf_dm_bcast_bytes ( abscoefL2 , size ( abscoefL2 ) * 4 )
+         CALL wrf_dm_bcast_bytes ( abscoefH2 , size ( abscoefH2 ) * 4 )
+         CALL wrf_dm_bcast_bytes ( SELFREF2 , size ( SELFREF2 ) * 4 )
                                                                                  
 ! **************************************************************************     
 
@@ -6703,9 +6703,9 @@ USE module_dm
 !     etc.  The second index runs over the g-channel (1 to 16).                  
 
          IF ( wrf_dm_on_monitor() ) READ (rrtm_unit,ERR=9010) abscoefL3, abscoefH3, SELFREF3
-         DM_BCAST_MACRO(abscoefL3)
-         DM_BCAST_MACRO(abscoefH3)
-         DM_BCAST_MACRO(SELFREF3)
+         CALL wrf_dm_bcast_bytes ( abscoefL3 , size ( abscoefL3 ) * 4 )
+         CALL wrf_dm_bcast_bytes ( abscoefH3 , size ( abscoefH3 ) * 4 )
+         CALL wrf_dm_bcast_bytes ( SELFREF3 , size ( SELFREF3 ) * 4 )
                                                                                  
 ! **************************************************************************     
                                                                                  
@@ -6753,9 +6753,9 @@ USE module_dm
 !     etc.  The second index runs over the g-channel (1 to 16).                  
 
          IF ( wrf_dm_on_monitor() ) READ (rrtm_unit,ERR=9010) abscoefL4, abscoefH4, SELFREF4
-         DM_BCAST_MACRO(abscoefL4)
-         DM_BCAST_MACRO(abscoefH4)
-         DM_BCAST_MACRO(SELFREF4)
+         CALL wrf_dm_bcast_bytes ( abscoefL4 , size ( abscoefL4 ) * 4 )
+         CALL wrf_dm_bcast_bytes ( abscoefH4 , size ( abscoefH4 ) * 4 )
+         CALL wrf_dm_bcast_bytes ( SELFREF4 , size ( SELFREF4 ) * 4 )
                                                                                  
 ! **************************************************************************     
                                                                                  
@@ -6803,9 +6803,9 @@ USE module_dm
 !     etc.  The second index runs over the g-channel (1 to 16).                  
 
          IF ( wrf_dm_on_monitor() ) READ (rrtm_unit,ERR=9010) abscoefL5, abscoefH5, SELFREF5
-         DM_BCAST_MACRO(abscoefL5)
-         DM_BCAST_MACRO(abscoefH5)
-         DM_BCAST_MACRO(SELFREF5)
+         CALL wrf_dm_bcast_bytes ( abscoefL5 , size ( abscoefL5 ) * 4 )
+         CALL wrf_dm_bcast_bytes ( abscoefH5 , size ( abscoefH5 ) * 4 )
+         CALL wrf_dm_bcast_bytes ( SELFREF5 , size ( SELFREF5 ) * 4 )
                                                                                  
 ! **************************************************************************     
                                                                                  
@@ -6829,8 +6829,8 @@ USE module_dm
 !     etc.  The second index runs over the g-channel (1 to 16).                  
 
          IF ( wrf_dm_on_monitor() ) READ (rrtm_unit,ERR=9010) abscoefL6, SELFREF6
-         DM_BCAST_MACRO(abscoefL6)
-         DM_BCAST_MACRO(SELFREF6)
+         CALL wrf_dm_bcast_bytes ( abscoefL6 , size ( abscoefL6 ) * 4 )
+         CALL wrf_dm_bcast_bytes ( SELFREF6 , size ( SELFREF6 ) * 4 )
                                                                                  
 ! **************************************************************************     
                                                                                  
@@ -6871,9 +6871,9 @@ USE module_dm
 !     etc.  The second index runs over the g-channel (1 to 16).                  
 
          IF ( wrf_dm_on_monitor() ) READ (rrtm_unit,ERR=9010) abscoefL7, abscoefH7, SELFREF7
-         DM_BCAST_MACRO(abscoefL7)
-         DM_BCAST_MACRO(abscoefH7)
-         DM_BCAST_MACRO(SELFREF7)
+         CALL wrf_dm_bcast_bytes ( abscoefL7 , size ( abscoefL7 ) * 4 )
+         CALL wrf_dm_bcast_bytes ( abscoefH7 , size ( abscoefH7 ) * 4 )
+         CALL wrf_dm_bcast_bytes ( SELFREF7 , size ( SELFREF7 ) * 4 )
                                                                                  
 ! **************************************************************************
                                                                                  
@@ -6917,9 +6917,9 @@ USE module_dm
 !       SELFREF8 is the array for the self-continuum.                                   
 !                                                                                
          IF ( wrf_dm_on_monitor() ) READ (rrtm_unit,ERR=9010) abscoefL8, abscoefH8, SELFREF8
-         DM_BCAST_MACRO(abscoefL8)
-         DM_BCAST_MACRO(abscoefH8)
-         DM_BCAST_MACRO(SELFREF8)
+         CALL wrf_dm_bcast_bytes ( abscoefL8 , size ( abscoefL8 ) * 4 )
+         CALL wrf_dm_bcast_bytes ( abscoefH8 , size ( abscoefH8 ) * 4 )
+         CALL wrf_dm_bcast_bytes ( SELFREF8 , size ( SELFREF8 ) * 4 )
                                                                                  
 ! **************************************************************************
                                                                                  
@@ -6960,9 +6960,9 @@ USE module_dm
 !     etc.  The second index runs over the g-channel (1 to 16).                  
 
          IF ( wrf_dm_on_monitor() ) READ (rrtm_unit,ERR=9010) abscoefL9, abscoefH9, SELFREF9
-         DM_BCAST_MACRO(abscoefL9)
-         DM_BCAST_MACRO(abscoefH9)
-         DM_BCAST_MACRO(SELFREF9)
+         CALL wrf_dm_bcast_bytes ( abscoefL9 , size ( abscoefL9 ) * 4 )
+         CALL wrf_dm_bcast_bytes ( abscoefH9 , size ( abscoefH9 ) * 4 )
+         CALL wrf_dm_bcast_bytes ( SELFREF9 , size ( SELFREF9 ) * 4 )
                                                                                  
 ! **************************************************************************
                                                                                  
@@ -6992,8 +6992,8 @@ USE module_dm
 !     and tells us which g-interval the absorption coefficients are for.         
 
          IF ( wrf_dm_on_monitor() ) READ (rrtm_unit,ERR=9010) abscoefL10, abscoefH10
-         DM_BCAST_MACRO(abscoefL10)
-         DM_BCAST_MACRO(abscoefH10)
+         CALL wrf_dm_bcast_bytes ( abscoefL10 , size ( abscoefL10 ) * 4 )
+         CALL wrf_dm_bcast_bytes ( abscoefH10 , size ( abscoefH10 ) * 4 )
                                                                                  
 ! **************************************************************************
                                                                                  
@@ -7030,9 +7030,9 @@ USE module_dm
 !     etc.  The second index runs over the g-channel (1 to 16).                  
 
          IF ( wrf_dm_on_monitor() ) READ (rrtm_unit,ERR=9010) abscoefL11, abscoefH11, SELFREF11
-         DM_BCAST_MACRO(abscoefL11)
-         DM_BCAST_MACRO(abscoefH11)
-         DM_BCAST_MACRO(SELFREF11)
+         CALL wrf_dm_bcast_bytes ( abscoefL11 , size ( abscoefL11 ) * 4 )
+         CALL wrf_dm_bcast_bytes ( abscoefH11 , size ( abscoefH11 ) * 4 )
+         CALL wrf_dm_bcast_bytes ( SELFREF11 , size ( SELFREF11 ) * 4 )
                                                                                         
 ! **************************************************************************
                                                                                  
@@ -7060,8 +7060,8 @@ USE module_dm
 !     etc.  The second index runs over the g-channel (1 to 16).                  
 
          IF ( wrf_dm_on_monitor() ) READ (rrtm_unit,ERR=9010) abscoefL12, SELFREF12
-         DM_BCAST_MACRO(abscoefL12)
-         DM_BCAST_MACRO(SELFREF12)
+         CALL wrf_dm_bcast_bytes ( abscoefL12 , size ( abscoefL12 ) * 4 )
+         CALL wrf_dm_bcast_bytes ( SELFREF12 , size ( SELFREF12 ) * 4 )
                                                                                  
 ! **************************************************************************
                                                                                  
@@ -7089,8 +7089,8 @@ USE module_dm
 !     etc.  The second index runs over the g-channel (1 to 16).                  
 
          IF ( wrf_dm_on_monitor() ) READ (rrtm_unit,ERR=9010) abscoefL13, SELFREF13
-         DM_BCAST_MACRO(abscoefL13)
-         DM_BCAST_MACRO(SELFREF13)
+         CALL wrf_dm_bcast_bytes ( abscoefL13 , size ( abscoefL13 ) * 4 )
+         CALL wrf_dm_bcast_bytes ( SELFREF13 , size ( SELFREF13 ) * 4 )
                                                                                  
 ! **************************************************************************
                                                                                  
@@ -7127,9 +7127,9 @@ USE module_dm
 !     etc.  The second index runs over the g-channel (1 to 16).                  
 
          IF ( wrf_dm_on_monitor() ) READ (rrtm_unit,ERR=9010) abscoefL14, abscoefH14, SELFREF14
-         DM_BCAST_MACRO(abscoefL14)
-         DM_BCAST_MACRO(abscoefH14)
-         DM_BCAST_MACRO(SELFREF14)
+         CALL wrf_dm_bcast_bytes ( abscoefL14 , size ( abscoefL14 ) * 4 )
+         CALL wrf_dm_bcast_bytes ( abscoefH14 , size ( abscoefH14 ) * 4 )
+         CALL wrf_dm_bcast_bytes ( SELFREF14 , size ( SELFREF14 ) * 4 )
                                                                                         
 ! **************************************************************************
                                                                                  
@@ -7157,8 +7157,8 @@ USE module_dm
 !     etc.  The second index runs over the g-channel (1 to 16).                  
 
          IF ( wrf_dm_on_monitor() ) READ (rrtm_unit,ERR=9010) abscoefL15, SELFREF15
-         DM_BCAST_MACRO(abscoefL15)
-         DM_BCAST_MACRO(SELFREF15)
+         CALL wrf_dm_bcast_bytes ( abscoefL15 , size ( abscoefL15 ) * 4 )
+         CALL wrf_dm_bcast_bytes ( SELFREF15 , size ( SELFREF15 ) * 4 )
                                                                                  
 ! **************************************************************************
                                                                                  
@@ -7186,8 +7186,8 @@ USE module_dm
 !     etc.  The second index runs over the g-channel (1 to 16).                  
 
          IF ( wrf_dm_on_monitor() ) READ (rrtm_unit,ERR=9010) abscoefL16, SELFREF16
-         DM_BCAST_MACRO(abscoefL16)
-         DM_BCAST_MACRO(SELFREF16)
+         CALL wrf_dm_bcast_bytes ( abscoefL16 , size ( abscoefL16 ) * 4 )
+         CALL wrf_dm_bcast_bytes ( SELFREF16 , size ( SELFREF16 ) * 4 )
 
          IF ( wrf_dm_on_monitor() ) CLOSE (rrtm_unit)
                                                                                  
@@ -7346,11 +7346,11 @@ USE module_dm
       RETURN
 9009 CONTINUE
      WRITE( errmess , '(A,I4)' ) 'module_ra_rrtm: error opening RRTM_DATA on unit ',rrtm_unit
-     CALL wrf_error_fatal(errmess)
+     CALL wrf_error_fatal3 ( "module_ra_rrtm.b" , 7349 , errmess)
      RETURN
 9010 CONTINUE
      WRITE( errmess , '(A,I4)' ) 'module_ra_rrtm: error reading RRTM_DATA on unit ',rrtm_unit
-     CALL wrf_error_fatal(errmess)
+     CALL wrf_error_fatal3 ( "module_ra_rrtm.b" , 7353 , errmess)
       END SUBROUTINE rrtm_lookuptable
 
 !------------------------------------------------------------------

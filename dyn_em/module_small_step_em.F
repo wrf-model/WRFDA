@@ -575,7 +575,7 @@ SUBROUTINE calc_p_rho( al, p, ph,                    &
 
 !  divergence damping setup
  
-     IF (step == 0) then   ! we're initializing small timesteps
+     IF (step == 0) then   ! were initializing small timesteps
        DO j=j_start, j_end
        DO k=k_start, k_end
        DO i=i_start, i_end
@@ -583,7 +583,7 @@ SUBROUTINE calc_p_rho( al, p, ph,                    &
        ENDDO
        ENDDO
        ENDDO 
-     ELSE                     ! we're in the small timesteps 
+     ELSE                     ! were in the small timesteps 
        DO j=j_start, j_end    ! and adding div damping component
        DO k=k_start, k_end
        DO i=i_start, i_end
@@ -1156,8 +1156,8 @@ SUBROUTINE advance_mu_t( ww, ww_1, u, u_1, v, v_1,            &
 
 ! CALCULATION OF THETA
 
-! NOTE: theta'' is not coupled with the map-scale factor, 
-!       while the theta'' tendency is coupled (i.e., mult by 1/msft)
+! NOTE: theta is not coupled with the map-scale factor, 
+!       while the theta tendency is coupled (i.e., mult by 1/msft)
 
    DO j=j_start, j_end
      DO k=1,k_end
@@ -1353,8 +1353,8 @@ SUBROUTINE advance_w( w, rw_tend, ww, u, v,       &
     ENDDO
     ENDDO
 
-!  NOTE:  phi'' is not coupled with the map-scale factor  (1/m), 
-!         but it's tendency is, so must multiply by msft here
+!  NOTE:  phi is not coupled with the map-scale factor  (1/m), 
+!         but its tendency is, so must multiply by msft here
 
     DO k=2,k_end+1
     DO i=i_start, i_end
@@ -1433,7 +1433,7 @@ SUBROUTINE advance_w( w, rw_tend, ww, u, v,       &
     ENDDO
     ENDDO
 
-! NOTE:  phi'' is not coupled with the map-scale factor (1/m),
+! NOTE:  phi is not coupled with the map-scale factor (1/m),
 !        but the tendency is, so...
 !        we must multiply tendency by msft here
 

@@ -72,7 +72,7 @@ CONTAINS
 !-- EP2         constant for specific humidity calculation 
 !               (R_d/R_v) (dimensionless)
 !-- KARMAN      Von Karman constant
-!-- EOMEG       angular velocity of earth's rotation (rad/s)
+!-- EOMEG       angular velocity of earths rotation (rad/s)
 !-- STBOLT      Stefan-Boltzmann constant (W/m^2/K^4)
 !-- ids         start index for i in domain
 !-- ide         end index for i in domain

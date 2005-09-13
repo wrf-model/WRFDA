@@ -31,7 +31,7 @@
       REAL W(ims:ime,jms:jme),OV(ims:ime,jms:jme),UN(ims:ime,jms:jme)                     
       REAL MXM(ims:ime,jms:jme),MN(ims:ime,jms:jme)                                 
       REAL FL(ims:ime,jms:jme,0:1)                                            
-      REAL XIG(81), XJG(81)  ! won't use but nine of these fellers.
+      REAL XIG(81), XJG(81)  ! wont use but nine of these fellers.
       INTEGER IFRST
       integer rr
       COMMON /DEPAR2/ XIG,XJG,IFRST
@@ -52,7 +52,7 @@
 !!      XJG(J) = 1./3.-FLOAT(J-1)*1./3
 
       rr = nint(sqrt(float(nf)))
-!!      write(6,*) ' nf, rr are ',nf,rr
+!!      write(6,*)  nf, rr are ,nf,rr
 !!      IF ( IFRST .EQ. 1 ) THEN
 
         rioff = 0
@@ -255,7 +255,7 @@
       REAL W(ims:ime,jms:jme),OV(ims:ime,jms:jme),UN(ims:ime,jms:jme)                     
       REAL MXM(ims:ime,jms:jme),MN(ims:ime,jms:jme)                                 
       REAL FL(ims:ime,jms:jme,0:1)                                            
-      REAL XIG(81), XJG(81)  ! won't use but nine of these fellers.
+      REAL XIG(81), XJG(81)  ! wont use but nine of these fellers.
       INTEGER IFRST
       integer rr
       COMMON /DEPAR2B/ XIG,XJG,IFRST

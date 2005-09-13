@@ -89,7 +89,7 @@ CONTAINS
    
       IMPLICIT NONE
       
-      !  From 2 input mdates ('YYYY-MM-DD HH:MM:SS.ffff'), 
+      !  From 2 input mdates (YYYY-MM-DD HH:MM:SS.ffff), 
       !  compute the time difference.
       
       !  on entry     -  ndate  -  the new hdate.
@@ -284,12 +284,12 @@ CONTAINS
       
       IF (.not. npass) THEN
          WRITE( wrf_err_message , * ) 'module_date_time: geth_idts: Bad NDATE: ', ndate(1:nlen)
-         CALL wrf_error_fatal ( TRIM ( wrf_err_message ) )
+         CALL wrf_error_fatal3 ( "module_date_time.b" , 287 ,  TRIM ( wrf_err_message ) )
       END IF
       
       IF (.not. opass) THEN
          WRITE( wrf_err_message , * ) 'module_date_time: geth_idts: Bad ODATE: ', odate(1:olen)
-         CALL wrf_error_fatal ( TRIM ( wrf_err_message ) )
+         CALL wrf_error_fatal3 ( "module_date_time.b" , 292 ,  TRIM ( wrf_err_message ) )
       END IF
       
       !  Date Checks are completed.  Continue.
@@ -350,7 +350,7 @@ CONTAINS
    
       IMPLICIT NONE
       
-      !  From old date ('YYYY-MM-DD HH:MM:SS.ffff') and 
+      !  From old date (YYYY-MM-DD HH:MM:SS.ffff) and 
       !  delta-time, compute the new date.
    
       !  on entry     -  odate  -  the old hdate.
@@ -494,7 +494,7 @@ CONTAINS
       
       IF (.not.opass) THEN
          WRITE( wrf_err_message , * ) 'module_date_time: GETH_NEWDATE: Bad ODATE: ', odate(1:olen), olen
-         CALL wrf_error_fatal ( TRIM ( wrf_err_message ) )
+         CALL wrf_error_fatal3 ( "module_date_time.b" , 497 ,  TRIM ( wrf_err_message ) )
       END IF
       
       !  Date Checks are completed.  Continue.
@@ -540,7 +540,7 @@ CONTAINS
          nfrac  = 0
       ELSE
          WRITE( wrf_err_message , * ) 'module_date_time: GETH_NEWDATE: Strange length for ODATE: ',olen
-         CALL wrf_error_fatal ( TRIM ( wrf_err_message ) )
+         CALL wrf_error_fatal3 ( "module_date_time.b" , 543 ,  TRIM ( wrf_err_message ) )
       END IF
       
       IF (idt.GE.0) THEN
@@ -749,8 +749,8 @@ END MODULE module_date_time
       CALL ESMF_TimeSet( time, YY=yr, MM=mm, DD=dd, H=h, M=m, S=s, MS=ms, rc=rc )
       CALL wrf_check_error( ESMF_SUCCESS, rc, &
                             'ESMF_TimeSet() in wrf_atotime() FAILED', &
-                            __FILE__ , &
-                            __LINE__  )
+                            "module_date_time.b" , &
+                            753  )
 33 FORMAT (I4.4,1x,I2.2,1x,I2.2,1x,I2.2,1x,I2.2,1x,I2.2)
 34 FORMAT (I4.4,1x,I2.2,1x,I2.2,1x,I2.2,1x,I2.2,1x,I2.2,1x,I4.4)
       RETURN
@@ -770,9 +770,9 @@ END MODULE module_date_time
       CALL ESMF_TimeGet( time, timeString=str, rc=rc )
       CALL wrf_check_error( ESMF_SUCCESS, rc, &
                             'ESMF_TimeGet() in wrf_timetoa() FAILED', &
-                            __FILE__ , &
-                            __LINE__  )
-      ! change ESMF 'T' to WRF '_' -- variant of ISO 8601
+                            "module_date_time.b" , &
+                            774  )
+      ! change ESMF T to WRF _ -- variant of ISO 8601
       str(11:11) = '_'
       WRITE (mess,*) 'DEBUG wrf_timetoa():  returning with str = [',TRIM(str),']'
       CALL wrf_debug ( 150 , mess )

@@ -81,12 +81,12 @@ CONTAINS
 !***  OTHERWISE CALL CO2O3.
 !
       IF(ALLOWED_TO_READ)THEN
-#if (EM_CORE==1)
+
         CALL CO2O3(SFULL,SHALF,PPTOP,KME-KMS,KME-KMS+1,KME-KMS+2)
-#endif
-#if (NMM_CORE==1)
-        CALL CONRAD(KDS,KDE,KMS,KME,KTS,KTE)
-#endif
+
+
+
+
 !
         CALL O3CLIM
         CALL TABLE
@@ -339,7 +339,7 @@ CONTAINS
 ! THS : potential temperature of the ground surface.
 
 ! IHE and IHW are relative location indices needed to locate neighboring
-!       points on the Eta's Arakawa E grid since arrays are indexed locally on
+!       points on the Etas Arakawa E grid since arrays are indexed locally on
 !       each MPI task rather than globally.  IHE refers to the adjacent grid
 !       point (a V point) to the east of the mass point being considered.  IHW
 !       is the adjacent grid point to the west of the given mass point.
@@ -760,7 +760,7 @@ CONTAINS
   250 CONTINUE
 !-----------------------------------------------------------------------
 !---  COMPUTE GRID-SCALE CLOUD COVER FOR RADIATION
-!     (modified by Ferrier, Feb '02)
+!     (modified by Ferrier, Feb 02)
 !
 !---  Cloud fraction parameterization follows Randall, 1994
 !     (see Hong et al., 1998)
@@ -827,7 +827,7 @@ CONTAINS
 !    used for convective cloud fraction as a function of precipitation
 !    rate.  Cloud fractions have been increased by 20% for each rainrate
 !    interval so that shallow, nonprecipitating convection is ascribed a
-!    constant cloud fraction of 0.1  (Ferrier, Feb '02).
+!    constant cloud fraction of 0.1  (Ferrier, Feb 02).
 !-----------------------------------------------------------------
 !
       IF (CNCLD) THEN
@@ -837,7 +837,7 @@ CONTAINS
 !***  CONVECTIVE CLOUDS NEED TO BE AT LEAST 2 MODEL LAYERS THICK.
 !
           IF (HBOT(I,J)-HTOP(I,J) .GT. 1.0) THEN
-!--- Compute convective cloud fractions if appropriate  (Ferrier, Feb '02)
+!--- Compute convective cloud fractions if appropriate  (Ferrier, Feb 02)
             CLFR=CC(1)
             PMOD=CUPPT(I,J)*CONVPRATE
             IF (PMOD .GT. PPT(1)) THEN
@@ -2675,7 +2675,7 @@ CONTAINS
       CO21(I,K,K)=CO2R(I,K)+DIFT(I,K)*(DCO2DT(I,K)+ &
                    HAF*DIFT(I,K)*D2CDT2(I,K))
 206   CONTINUE
-!--- WE AREN'T DOING NBL TFS ON THE 100 CM-1 BANDS .
+!--- WE ARENT DOING NBL TFS ON THE 100 CM-1 BANDS .
       DO 260 K=1,L
       DO 260 I=MYIS,MYIE
       CO2NBL(I,K)=CO2MR(I,K)+VSUM3(I,K)*(CO2MD(I,K)+HAF* &
@@ -3072,13 +3072,13 @@ CONTAINS
 !
 !          LET K = FIXED FLUX LEVEL, KP = VARYING FLUX LEVEL
 !          THEN FLUX(K)=SUM OVER KP : (DELTAB(KP)*TAU(KP,K))
-!               OVER ALL KP'S, FROM 1 TO LP1.
+!               OVER ALL KPS, FROM 1 TO LP1.
 !
-!          WE CAN BREAK DOWN THE CALCULATIONS FOR ALL K'S AS FOLLOWS:
+!          WE CAN BREAK DOWN THE CALCULATIONS FOR ALL KS AS FOLLOWS:
 !
-!          FOR ALL K'S K=1 TO LP1:
+!          FOR ALL KS K=1 TO LP1:
 !              FLUX(K)=SUM OVER KP : (DELTAB(KP)*TAU(KP,K))  (1)
-!                      OVER ALL KP'S, FROM K+1 TO LP1
+!                      OVER ALL KPS, FROM K+1 TO LP1
 !          AND
 !              FOR KP FROM K+1 TO LP1:
 !                 FLUX(KP) = DELTAB(K)*TAU(K,KP)              (2)
@@ -3110,7 +3110,7 @@ CONTAINS
 !---IN ORDER TO PROPERLY EVALUATE EMISS INTEGRATED OVER THE (LP1)
 !   LAYER, A SPECIAL EVALUATION OF EMISS IS DONE. THIS REQUIRES
 !   A SPECIAL COMPUTATION OF AVEPHI, AND IT IS STORED IN THE
-!   (OTHERWISE VACANT) LP1'TH POSITION
+!   (OTHERWISE VACANT) LP1TH POSITION
 !
       DO 803 I=MYIS,MYIE
       AVEPHI(I,LP1)=AVEPHI(I,LM1)+EMX1(I)
@@ -3495,7 +3495,7 @@ CONTAINS
 !
 !
 !***OBTAIN THE PRESSURES AND FLUXES OF THE TOP AND BOTTOM OF
-!   THE NC'TH CLOUD (IT IS ASSUMED THAT ALL KTOP AND KBTM'S HAVE
+!   THE NCTH CLOUD (IT IS ASSUMED THAT ALL KTOP AND KBTMS HAVE
 !   BEEN DEFINED!).
       DO 1361 KK=1,KCLDS
       KMIN=LP1
@@ -5614,7 +5614,7 @@ CONTAINS
 !*   IBEG:		=1
 !*   KO3:		=1 ( READ IN THE QZONE DATA)
 !*   KALB:		=0
-!*   SLMRF(LP1):	THE INTERFACE'S ETA (LP1=L+1)
+!*   SLMRF(LP1):	THE INTERFACES ETA (LP1=L+1)
 !*   SLYMRF(L):		THE MIDLAYER ETA 
 !*   ITIMSW:		=1/0 (SHORTWAVE CALC. ARE DESIRED/NOT DESIRED)
 !*   ITIMLW:		=1/0 (LONGWAVE CALC. ARE DESIRED/NOT DESIRED)
@@ -5709,7 +5709,7 @@ CONTAINS
  REAL,PARAMETER ::      QUARTR=0.25
  REAL,PARAMETER ::      ZERO=0.
 !
-!******FOLLOWING ARE POSITIVE FLOATING POINT CONSTANTS(H'S)
+!******FOLLOWING ARE POSITIVE FLOATING POINT CONSTANTS(HS)
 !       ARRANGED IN DECREASING ORDER
  REAL,PARAMETER ::      H83E26=8.3E26
  REAL,PARAMETER ::      H71E26=7.1E26
@@ -5880,7 +5880,7 @@ CONTAINS
  REAL,PARAMETER ::      H15M14=1.5E-14
  REAL,PARAMETER ::      H14M14=1.4E-14
 !
-!******FOLLOWING ARE NEGATIVE FLOATING POINT CONSTANTS (HM'S)
+!******FOLLOWING ARE NEGATIVE FLOATING POINT CONSTANTS (HMS)
 !          ARRANGED IN DESCENDING ORDER
  REAL,PARAMETER ::      HM2M2=-.02
  REAL,PARAMETER ::      HM6666M2=-.066667
@@ -5960,7 +5960,7 @@ CONTAINS
 !      *    IEMIS=0  USE THE ORG. CLD EMIS SCHEME                     *
 !      *         =1  USE TEMP DEP. CLD EMIS SCHEME                    *
 !      *  UPDATED TO COMPUTE CLD LAYER REFLECTTANCE AND TRANSMITTANCE *
-!      *    INPUT CLD EMISSIVITY AND OPTICAL THICKNESS 'EMIS0,TAUC0'  *
+!      *    INPUT CLD EMISSIVITY AND OPTICAL THICKNESS EMIS0,TAUC0  *
 !      *                                      ......YH FEB 93         *
 !      ****************************************************************
 !--------------------------------
@@ -6913,7 +6913,7 @@ CONTAINS
  REAL,PARAMETER ::      QUARTR=0.25
  REAL,PARAMETER ::      ZERO=0.
 !
-!******FOLLOWING ARE POSITIVE FLOATING POINT CONSTANTS(H'S)
+!******FOLLOWING ARE POSITIVE FLOATING POINT CONSTANTS(HS)
 !       ARRANGED IN DECREASING ORDER
  REAL,PARAMETER ::      H83E26=8.3E26
  REAL,PARAMETER ::      H71E26=7.1E26
@@ -7084,7 +7084,7 @@ CONTAINS
  REAL,PARAMETER ::      H15M14=1.5E-14
  REAL,PARAMETER ::      H14M14=1.4E-14
 !
-!******FOLLOWING ARE NEGATIVE FLOATING POINT CONSTANTS (HM'S)
+!******FOLLOWING ARE NEGATIVE FLOATING POINT CONSTANTS (HMS)
 !          ARRANGED IN DESCENDING ORDER
  REAL,PARAMETER ::      HM2M2=-.02
  REAL,PARAMETER ::      HM6666M2=-.066667
@@ -7588,13 +7588,13 @@ CONTAINS
 !---NOTE: AT PRESENT, THE IA LOOP IS ONLY USED FOR IA=2. THE LOOP STRUCT
 !   IS KEPT SO THAT IN THE FUTURE, WE MAY USE A QUADRATURE SCHEME FOR
 !   THE PLANCK FCTN EVALUATION, RATHER THAN USE THE MID-BAND FREQUENCY.
-#if 0
-      DO 303 IA=1,3
-#else
+
+
+
 !jm -- getting floating point exceptions for IA=1, since 2 is only
 !      used anyway, I disabled the looping.
       DO 303 IA=2,2
-#endif
+
       ANU=CENT+HAF*(IA-2)*DEL
       C1=(H37412M5)*ANU*ANU*ANU+H1M20
 !---TEMPERATURE LOOP---
@@ -7863,7 +7863,7 @@ CONTAINS
 !***
       DATE = MOD(DAT,YEAR)
 !***
-!    SOLVE ORBIT EQUATIONS BY NEWTON'S METHOD
+!    SOLVE ORBIT EQUATIONS BY NEWTONS METHOD
 !***
       EM=PI2*DATE/YEAR
       E=1.E0
@@ -7986,7 +7986,7 @@ CONTAINS
       EXPP=ZB(N,L)/DELTA(N,L)
 !JD single-precision change
 !      FAC=EXP(EXPP)+EXP(-EXPP)
-!mp	write(6,*) '.........................................'
+!mp	write(6,*) .........................................
 !mp what in the hell does the next line do?
 !mp	
 !mp	apparently if statement <0 or =0 then 23, else 24
@@ -8011,7 +8011,7 @@ CONTAINS
 !    1     ALOG((EXP(EXPO)+EXP(-EXPO))/FAC))
    29 TEMP=TEMP+(C(N+1,L)-C(N,L))*0.5*(Z+DELTA(N,L)* &
            (ZLOG-FACLOG))
-!mp	write(6,*) 'ANTEMP pieces (C,C,ZLOG,FACLOG)', C(N+1,L),C(N,L),
+!mp	write(6,*) ANTEMP pieces (C,C,ZLOG,FACLOG), C(N+1,L),C(N,L),
 !mp     +	ZLOG,FACLOG
    20 CONTINUE
       ANTEMP=TEMP
@@ -8118,7 +8118,7 @@ CONTAINS
         WRITE(errmess,360)I,LL,CHECK
         WRITE(errmess,*)' xx=',xx,' patha=',patha
   360   FORMAT(' ERROR,I=',I3,'LL=',I3,'CHECK=',F20.10)
-        CALL wrf_error_fatal ( errmess )
+        CALL wrf_error_fatal3 ( "module_ra_gfdleta.b" , 8121 ,  errmess )
       ENDIF
  1010 CONTINUE
       CA(I)=(1.0D0-TRANSA(I,I-2))**(UEXP/SEXP)/ &
@@ -8373,7 +8373,7 @@ CONTAINS
 !                           PD(I)
 !                           ----
 !             1             ^
-!        -------------  *   ^   TAU ( P',PLM(J) )  DP'
+!        -------------  *   ^   TAU ( P,PLM(J) )  DP
 !        PD(I)-PD(I-1)      ^
 !                        ----
 !                        PD(I-1)
@@ -8415,7 +8415,7 @@ CONTAINS
 !     MODIFICATIONS FOR LAYER-MEAN TRANSMISSIVITIES:
 !          THE PRESSURES INPUTTED ARE THE LAYER-MEAN PRESSURES,PD,
 !     AND THE LAYER-MEAN PRESSURES ,PLM. A SERIES OF TRANSMISSIVITIES
-!     (TAU(P'',PLM(J)) ARE COMPUTED AND THE INTEGRAL GIVEN IN THE
+!     (TAU(P,PLM(J)) ARE COMPUTED AND THE INTEGRAL GIVEN IN THE
 !     DISCUSSION OF PURPOSE 2 IS COMPUTED.FOR PLM(I) NOT EQUAL TO
 !     PLM(J) SIMPSON S RULE IS USED WITH 5 POINTS. IF PLM(I)=PLM(J)
 !     (THE -NEARBY LAYER- CASE) A 49-POINT QUADRATURE IS USED FOR
@@ -8661,7 +8661,7 @@ CONTAINS
 !     ALSO READ IN THE METHOD NO.(1 OR 2)
 !CC         READ (5,202) NMETHD
       IF (RATIO.EQ.1.0) GO TO 621
-      CALL wrf_error_fatal( 'SUBROUTINE CO2INT: 8746' )
+      CALL wrf_error_fatal3 ( "module_ra_gfdleta.b" , 8664 ,  'SUBROUTINE CO2INT: 8746' )
 !NOV89  621   ITAP1=20
 621   ITAP1=ITAPE
 !NOV89
@@ -8720,7 +8720,7 @@ CONTAINS
 !mp       IF (NTAP.EQ.1) READ (ITAPE,100) ((TRANSA(I,J),I=1,109),J=1,109)
         IF (NTAP.EQ.1) THEN
            IF ( wrf_dm_on_monitor() ) READ (ITAPE,743) ((TRANSA(I,J),I=1,109),J=1,109)
-           CALL wrf_dm_bcast_bytes ( TRANSA , size ( TRANSA ) * RWORDSIZE )
+           CALL wrf_dm_bcast_bytes ( TRANSA , size ( TRANSA ) * 4 )
         ENDIF
 !mp	IF (NTAP.EQ.1) READ (ITAPE,100) (tmp(I),I=1,11881
 !mp
@@ -8907,7 +8907,7 @@ CONTAINS
 ! **         AND O3 MIXING RATIOS BY USING AN ANALYTICAL
 ! **         FUNCTION WHICH APPROXIMATES
 ! **         THE US STANDARD (1976).  THIS IS
-! **         CALCULATED IN FUNCTION 'ANTEMP', WHICH IS CALLED BY THE
+! **         CALCULATED IN FUNCTION ANTEMP, WHICH IS CALLED BY THE
 ! **         MAIN PROGRAM.  THE FORM OF THE ANALYTICAL FUNCTION WAS
 ! **         SUGGESTED TO ME IN 1971 BY RICHARD S. LINDZEN.
 ! ******************************************************************
@@ -8985,7 +8985,7 @@ CONTAINS
       DO 100 N=1,NLEV
 !
 ! **         ESTABLISH COMPUTATATIONAL LEVELS BETWEEN USER LEVELS AT
-! **         INTERVALS OF APPROXIMATELY 'DELZAP' KM.
+! **         INTERVALS OF APPROXIMATELY DELZAP KM.
 !
       DLOGP=7.0*ALOG(PRESS(N)/PRESS(N+1))
       NINT=DLOGP/DELZAP
@@ -9003,7 +9003,7 @@ CONTAINS
       RK2=ANTEMP(6,HT+0.5*RK1)*DZ
       RK3=ANTEMP(6,HT+0.5*RK2)*DZ
       RK4=ANTEMP(6,HT+RK3)*DZ
-!mp	write(6,*) 'RK values,DZ ', RK1,RK2,RK3,RK4,DZ
+!mp	write(6,*) RK values,DZ , RK1,RK2,RK3,RK4,DZ
       HT=HT+0.16666667*(RK1+RK2+RK2+RK3+RK3+RK4)
   200 CONTINUE
       ALT(N+1)=HT
@@ -9091,7 +9091,7 @@ CONTAINS
       DIMENSION T41(KP2,2),T42(KP), &
                 T43(KP2,2),T44(KP)
 !     integer :: retval
-!     character(50) :: prsmid='prsmid'
+!     character(50) :: prsmid=prsmid
 !CC   18 LEVEL SIGMAS FOR NMC MRF(NEW) MODEL
 !CC   DATA Q/.021,.074,.124,.175,.225,.275,.325,.375,.425,.497, &
 !CC          .594,.688,.777,.856,.920,.960,.981,.995/
@@ -9106,31 +9106,31 @@ CONTAINS
 !     READ(11,PPTOP,END=12321)
 12321 CONTINUE
 !     WRITE(6,88221)PPTOP,KD,KP
-!88221 FORMAT(' ENTER SIGP PPTOP=',E12.5,' KD=',I2,' KP=',I2)
-!     open(unit=23,file='fort.23',form='unformatted' &
-!     ,    access='sequential')
+!88221 FORMAT( ENTER SIGP PPTOP=,E12.5, KD=,I2, KP=,I2)
+!     open(unit=23,file=fort.23,form=unformatted &
+!     ,    access=sequential)
 !     REWIND 23
 !     READ(23)SIGLY
 !     DO KKK=1,KD
 !      SIGLY(KKK)=1.-(FLOAT(KKK)-0.5)/KD
 !     END DO
 !     WRITE(6,88222)
-!88222 FORMAT(' READ AETA')
+!88222 FORMAT( READ AETA)
 !     DO 37821 LLL=1,KD
 !     WRITE(6,37820)LLL,SIGLY(LLL)
-!37820 FORMAT(' L=',I2,' AETA=',E12.5)
+!37820 FORMAT( L=,I2, AETA=,E12.5)
 !37821 CONTINUE
 !     READ(23)SIGLV
 !     DO KKK=1,KP
 !      SIGLV(KKK)=1.-(FLOAT(KKK-1))/KD
 !     END DO
 !     WRITE(6,88223)
-!88223 FORMAT(' READ ETA')
+!88223 FORMAT( READ ETA)
 !     PRINT 704,(SIGLY(K),K=1,KD)
 !     PRINT 704,(SIGLV(K),K=1,KP)
 !      DO 37823 LLL=1,KP
 !      WRITE(6,37822)LLL,SIGLV(LLL)
-!37822 FORMAT(' L=',I2,' ETA=',E12.5)
+!37822 FORMAT( L=,I2, ETA=,E12.5)
 !37823 CONTINUE
   701 FORMAT(F6.2)
   702 FORMAT(7F10.6)
@@ -9170,9 +9170,9 @@ CONTAINS
 2     CONTINUE
 !       call int_get_fresh_handle(retval)
 !       close(retval)
-!       write(0,*)' before open in CO2O3'
-!       open(unit=retval,file=prsmid,form='UNFORMATTED',iostat=ier)
-!       write(0,*)' after open1'
+!       write(0,*) before open in CO2O3
+!       open(unit=retval,file=prsmid,form=UNFORMATTED,iostat=ier)
+!       write(0,*) after open1
 !       do k=1,62
 !         write(retval)pd(k)
 !       enddo
@@ -9375,7 +9375,7 @@ CONTAINS
       LOGICAL , EXTERNAL      :: wrf_dm_on_monitor
       CHARACTER*80 errmess
 !     integer :: retval,kk,ka,kb
-!     character(50) :: co2='co2'
+!     character(50) :: co2=co2
       INTEGER etarad_unit61, etarad_unit62, etarad_unit63,IERROR
       DIMENSION SGTEMP(LP1,2),CO2D1D(L,6),CO2D2D(LP1,LP1,6)
 !NOV89
@@ -9468,17 +9468,17 @@ CONTAINS
         etarad_unit63 = -1
  2063   CONTINUE
       ENDIF
-      CALL wrf_dm_bcast_bytes ( etarad_unit61 , IWORDSIZE )
+      CALL wrf_dm_bcast_bytes ( etarad_unit61 , 4 )
       IF ( etarad_unit61 < 0 ) THEN
-        CALL wrf_error_fatal ( 'module_ra_gfdleta: co2o3: Can not find unused fortran unit to read in lookup table.' )
+        CALL wrf_error_fatal3 ( "module_ra_gfdleta.b" , 9473 ,  'module_ra_gfdleta: co2o3: Can not find unused fortran unit to read in lookup table.' )
       ENDIF
-      CALL wrf_dm_bcast_bytes ( etarad_unit62 , IWORDSIZE )
+      CALL wrf_dm_bcast_bytes ( etarad_unit62 , 4 )
       IF ( etarad_unit62 < 0 ) THEN
-        CALL wrf_error_fatal ( 'module_ra_gfdleta: co2o3: Can not find unused fortran unit to read in lookup table.' )
+        CALL wrf_error_fatal3 ( "module_ra_gfdleta.b" , 9477 ,  'module_ra_gfdleta: co2o3: Can not find unused fortran unit to read in lookup table.' )
       ENDIF
-      CALL wrf_dm_bcast_bytes ( etarad_unit63 , IWORDSIZE )
+      CALL wrf_dm_bcast_bytes ( etarad_unit63 , 4 )
       IF ( etarad_unit63 < 0 ) THEN
-        CALL wrf_error_fatal ( 'module_ra_gfdleta: co2o3: Can not find unused fortran unit to read in lookup table.' )
+        CALL wrf_error_fatal3 ( "module_ra_gfdleta.b" , 9481 ,  'module_ra_gfdleta: co2o3: Can not find unused fortran unit to read in lookup table.' )
       ENDIF
         IF ( wrf_dm_on_monitor() ) THEN
           OPEN(etarad_unit61,FILE='tr49t85',                  &
@@ -9503,7 +9503,7 @@ CONTAINS
                   SFULL,SHALF,PPTOP,LREAD,L,LP1,LP2)
 !       call int_get_fresh_handle(retval)
 !       close(retval)
-!       open(unit=retval,file=co2,form='UNFORMATTED',iostat=ier)
+!       open(unit=retval,file=co2,form=UNFORMATTED,iostat=ier)
 !       do kk=1,2
 !         write(retval)(sgtemp(k,kk),k=1,61)
 !       enddo
@@ -9657,15 +9657,15 @@ CONTAINS
 9061 CONTINUE
      WRITE( errmess , '(A49,I4)' ) 'module_ra_gfdleta: error reading tr49t85 on unit ',etarad_unit61
      write(0,*)' IERROR=',IERROR
-     CALL wrf_error_fatal(errmess)
+     CALL wrf_error_fatal3 ( "module_ra_gfdleta.b" , 9660 , errmess)
 9062 CONTINUE
      WRITE( errmess , '(A49,I4)' ) 'module_ra_gfdleta: error reading tr49t67 on unit ',etarad_unit62
      write(0,*)' IERROR=',IERROR
-     CALL wrf_error_fatal(errmess)
+     CALL wrf_error_fatal3 ( "module_ra_gfdleta.b" , 9664 , errmess)
 9063 CONTINUE
      WRITE( errmess , '(A49,I4)' ) 'module_ra_gfdleta: error reading tr67t85 on unit ',etarad_unit63
      write(0,*)' IERROR=',IERROR
-     CALL wrf_error_fatal(errmess)
+     CALL wrf_error_fatal3 ( "module_ra_gfdleta.b" , 9668 , errmess)
       END SUBROUTINE CO2O3
 
 
@@ -9701,7 +9701,7 @@ CONTAINS
 !
 !----------------------------------------------------------------------
 !
-!                 CO2 DATA TABLES FOR USER'S VERTICAL COORDINATE
+!                 CO2 DATA TABLES FOR USERS VERTICAL COORDINATE
 !
 !   THE FOLLOWING COMMON BLOCKS CONTAIN PRETABULATED CO2 TRANSMISSION
 !       FUNCTIONS, EVALUATED USING THE METHODS OF FELS AND
@@ -9959,7 +9959,7 @@ CONTAINS
 !
 9014 CONTINUE
      WRITE(errmess,'(A51,I4)')'module_ra_gfdleta: error reading co2_trans on unit ',nunit_co2
-     CALL wrf_error_fatal(errmess)
+     CALL wrf_error_fatal3 ( "module_ra_gfdleta.b" , 9962 , errmess)
 !----------------------------------------------------------------------
       END SUBROUTINE CONRAD
 !----------------------------------------------------------------------

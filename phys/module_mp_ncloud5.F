@@ -345,7 +345,7 @@ CONTAINS
           rh(i,k,2) = max(q(i,k) / qs(i,k,2),qmin)
 !         if(lat.eq.latd.and.i.eq.lond) write(iun,700) qci(i,k,1)*1000., &
 !           qrs(i,k,1)*1000.,qci(i,k,2)*1000.,qrs(i,k,2)*1000.
-!700       format(1x,'before computation', 4f10.4)
+!700       format(1x,before computation, 4f10.4)
         enddo
       enddo
 !
@@ -429,8 +429,8 @@ CONTAINS
 !           if(lat.eq.latd.and.i.eq.lond) write(iun,607) k,-supcol, &
 !             qci(i,k,2)*1000.,xlf/cpm(i,k)*qci(i,k,2)
           endif
-!607  format(1x,'k = ',i3,' t = ',f5.1,' qi melting = ',f10.6,     &
-!            '  del t  = ',f10.6)
+!607  format(1x,k = ,i3, t = ,f5.1, qi melting = ,f10.6,     &
+!              del t  = ,f10.6)
 !
 !     homogeneous freezing of cloud water below -40c
 !
@@ -441,8 +441,8 @@ CONTAINS
 !           if(lat.eq.latd.and.i.eq.lond) write(iun,608) k,-supcol, &
 !             qci(i,k,1)*1000.,xlf/cpm(i,k)*qci(i,k,1)
           endif
-!608  format(1x,'k = ',i3,' t = ',f5.1,' qc home freezing = ',f10.6, &
-!           '  del t  = ',f10.6)
+!608  format(1x,k = ,i3, t = ,f5.1, qc home freezing = ,f10.6, &
+!             del t  = ,f10.6)
 !
 !     heterogeneous freezing of cloud water
 !
@@ -455,8 +455,8 @@ CONTAINS
 !           if(lat.eq.latd.and.i.eq.lond) write(iun,609) k,-supcol,  &
 !             pfrzdtc*1000.,xlf/cpm(i,k)*pfrzdtc
           endif
-!609  format(1x,'k = ',i3,' t = ',f5.1,' qc hete freezing = ',f10.6, &
-!           '  del t  = ',f10.6)
+!609  format(1x,k = ,i3, t = ,f5.1, qc hete freezing = ,f10.6, &
+!             del t  = ,f10.6)
 !
 !     freezing of rain water
 !
@@ -469,8 +469,8 @@ CONTAINS
             qrs(i,k,1) = qrs(i,k,1)-pfrzdtr
 !           if(lat.eq.latd.and.i.eq.lond) write(iun,610) k,-supcol,  &
 !             pfrzdtr*1000.,xlf/cpm(i,k)*pfrzdtr
-!610  format(1x,'k = ',i3,' t = ',f5.1,' qr      freezing = ',f10.6, &
-!           '  del t  = ',f10.6)
+!610  format(1x,k = ,i3, t = ,f5.1, qr      freezing = ,f10.6, &
+!             del t  = ,f10.6)
           endif
         enddo
       enddo
@@ -711,10 +711,10 @@ CONTAINS
           endif
         enddo
       enddo
-!603   format(1x,'  k','     p',                                             &
-!           '    t',' delt','    q',' delq','   rh',                         &
-!           ' pgen',' pcon',' pisd',' paut',' pacr',' pres',                 &
-!           '   qc','   qr','   qi','   qs')
+!603   format(1x,  k,     p,                                             &
+!               t, delt,    q, delq,   rh,                         &
+!            pgen, pcon, pisd, paut, pacr, pres,                 &
+!              qc,   qr,   qi,   qs)
 !604   format(1x,i3,f6.0,4f5.1,f5.0,10f5.2)
 !
 !----------------------------------------------------------------
@@ -814,8 +814,8 @@ CONTAINS
           enddo
         enddo
       enddo
-!605   format(1x,'  k','     p','    t','    q','   rh','     w',                   &
-!            '   vtr','   vts','   qri','   qsi','   qrf','   qsf',' mstep')
+!605   format(1x,  k,     p,    t,    q,   rh,     w,                   &
+!               vtr,   vts,   qri,   qsi,   qrf,   qsf, mstep)
 !606   format(1x,i3,f6.0,2f5.1,f5.0,f6.2,6f6.2,i5)
 !
 !----------------------------------------------------------------
@@ -831,7 +831,7 @@ CONTAINS
       enddo
 !
 !      if(lat.eq.latd) write(iun,601) latd,lond,loop,rain(lond)
-! 601  format(1x,' ncloud5 lat lon loop : rain(mm) ',3i6,f20.2)
+! 601  format(1x, ncloud5 lat lon loop : rain(mm) ,3i6,f20.2)
 !
       enddo                  ! big loops
 

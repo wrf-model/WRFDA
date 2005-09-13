@@ -359,7 +359,7 @@ SUBROUTINE microphysics_driver(th_phy, moist_new, moist_old, w,        &
       CASE DEFAULT 
 
          WRITE( wrf_err_message , * ) 'The microphysics option does not exist: mp_physics = ', config_flags%mp_physics
-         CALL wrf_error_fatal ( wrf_err_message )
+         CALL wrf_error_fatal3 ( "module_microphysics_driver.b" , 362 ,  wrf_err_message )
 
       END SELECT micro_select 
 
@@ -453,7 +453,7 @@ SUBROUTINE microphysics_driver(th_phy, moist_new, moist_old, w,        &
    ELSE
 
       WRITE( wrf_err_message , * ) 'The microphysics option does not exist: mp_physics = ', config_flags%mp_physics
-      CALL wrf_error_fatal ( wrf_err_message )
+      CALL wrf_error_fatal3 ( "module_microphysics_driver.b" , 456 ,  wrf_err_message )
 
    ENDIF
 

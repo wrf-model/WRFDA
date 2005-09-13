@@ -3,7 +3,7 @@
 
 !  This MODULE holds the routines which are used to perform model start-up operations
 !  for the individual domains.  This is the stage after inputting wrfinput and before
-!  calling 'integrate'.
+!  calling integrate.
 
 !  This MODULE CONTAINS the following routines:
 
@@ -17,9 +17,9 @@ MODULE module_physics_init
 !  USE module_timing
    USE module_configure
    USE module_date_time
-#ifdef DM_PARALLEL
-   USE module_dm
-#endif
+
+
+
 
 CONTAINS
 
@@ -247,9 +247,9 @@ integer myproc
        EMISS(i,j)=0.85
        THC(i,j)=THINLD
        ZNT(i,j)=ZZLND
-#if  ! ( NMM_CORE == 1 ) 
+
        Z0(i,j)=ZZLND
-#endif
+
        MAVAIL(i,j)=XMAVA
      ELSE
        ALBBCK(i,j)=0.08
@@ -257,9 +257,9 @@ integer myproc
        EMISS(i,j)=0.98
        THC(i,j)=THINLD
        ZNT(i,j)=ZZWTR
-#if  ! ( NMM_CORE == 1 ) 
+
        Z0(i,j)=ZZWTR
-#endif
+
        MAVAIL(i,j)=1.0 
      ENDIF
    ENDDO
@@ -313,11 +313,11 @@ integer myproc
                 SMSTOT, SFCRUNOFF,UDRUNOFF,ACSNOW,ACSNOM,       &
                 IVGTYP,ISLTYP,SMOIS,SMFR3D,                     &
                 SNOWH,SH2O,FNDSOILW, FNDSNOWH,                  &
-#if (NMM_CORE == 1)
-                Z0,XLAND,XICE,                                  &
-#else
+
+
+
                 ZNT,XLAND,XICE,                                 &
-#endif
+
                 SFCEVP,GRDFLX,                                  &
                 allowed_to_read ,                                   &
                 ids, ide, jds, jde, kds, kde,                   &
@@ -388,7 +388,7 @@ integer myproc
    INTEGER :: ierr
 ! save these fields in case nest moves or has to be reinitialized
 ! and this routine is called with allowed_to_read set to false
-! note that by saving these, we're locking in the same landuse for
+! note that by saving these, were locking in the same landuse for
 ! the duration of a run; possible implications for long climate runs
    INTEGER , SAVE :: ISICE, LUCATS, LUSEAS, ISN
    REAL    , SAVE , DIMENSION( max_cats, max_seas ) :: ALBD, SLMO, SFEM, SFZ0, THERIN, SFHC
@@ -407,7 +407,7 @@ integer myproc
         IF ( ierr .NE. OPEN_OK ) THEN
           WRITE(message,FMT='(A)') &
           'module_physics_init.F: LANDUSE_INIT: open failure for LANDUSE.TBL'
-          CALL wrf_error_fatal ( message ) 
+          CALL wrf_error_fatal3 ( "module_physics_init.b" , 410 ,  message ) 
         END IF
       ENDIF
 ! Determine season (summer=1, winter=2)
@@ -438,9 +438,9 @@ integer myproc
         FOUND_LU = LUTYPE.EQ.MMINLU
       endif
       CALL wrf_dm_bcast_string(lutype, 4)
-      CALL wrf_dm_bcast_bytes (lucats,  IWORDSIZE )
-      CALL wrf_dm_bcast_bytes (luseas,  IWORDSIZE )
-      CALL wrf_dm_bcast_bytes (found_lu,  LWORDSIZE )
+      CALL wrf_dm_bcast_bytes (lucats,  4 )
+      CALL wrf_dm_bcast_bytes (luseas,  4 )
+      CALL wrf_dm_bcast_bytes (found_lu,  4 )
  2000   FORMAT (A4)                                                
         IF(FOUND_LU)THEN                                  
           LUN=LUCATS                                             
@@ -460,8 +460,8 @@ integer myproc
                 READ (landuse_unit,*)LI,ALBD(LC,LS),SLMO(LC,LS),SFEM(LC,LS),        &       
                            SFZ0(LC,LS),THERIN(LC,LS),SCFX(LC),SFHC(LC,LS)       
               ENDIF
-              CALL wrf_dm_bcast_bytes (LI,  IWORDSIZE )
-              IF(LC.NE.LI)CALL wrf_error_fatal ( 'module_start: MISSING LANDUSE UNIT ' )
+              CALL wrf_dm_bcast_bytes (LI,  4 )
+              IF(LC.NE.LI)CALL wrf_error_fatal3 ( "module_physics_init.b" , 464 ,  'module_start: MISSING LANDUSE UNIT ' )
             ELSE                                                            
               IF ( wrf_dm_on_monitor() ) THEN
                 READ (landuse_unit,*)                                                  
@@ -472,13 +472,13 @@ integer myproc
         IF(NSN.EQ.1) THEN
            ISN = 1
         END IF
-        CALL wrf_dm_bcast_bytes (albd,   max_cats * max_seas * RWORDSIZE )
-        CALL wrf_dm_bcast_bytes (slmo,   max_cats * max_seas * RWORDSIZE )
-        CALL wrf_dm_bcast_bytes (sfem,   max_cats * max_seas * RWORDSIZE )
-        CALL wrf_dm_bcast_bytes (sfz0,   max_cats * max_seas * RWORDSIZE )
-        CALL wrf_dm_bcast_bytes (therin, max_cats * max_seas * RWORDSIZE )
-        CALL wrf_dm_bcast_bytes (sfhc,   max_cats * max_seas * RWORDSIZE )
-        CALL wrf_dm_bcast_bytes (scfx,   max_cats *            RWORDSIZE )
+        CALL wrf_dm_bcast_bytes (albd,   max_cats * max_seas * 4 )
+        CALL wrf_dm_bcast_bytes (slmo,   max_cats * max_seas * 4 )
+        CALL wrf_dm_bcast_bytes (sfem,   max_cats * max_seas * 4 )
+        CALL wrf_dm_bcast_bytes (sfz0,   max_cats * max_seas * 4 )
+        CALL wrf_dm_bcast_bytes (therin, max_cats * max_seas * 4 )
+        CALL wrf_dm_bcast_bytes (sfhc,   max_cats * max_seas * 4 )
+        CALL wrf_dm_bcast_bytes (scfx,   max_cats *            4 )
 
         IF(.NOT. FOUND_LU) GOTO 1999
  2001   CONTINUE                                                      
@@ -497,7 +497,7 @@ integer myproc
           ! only do this check on read-in data
           IF(IS.LT.0.OR.IS.GT.LUN.AND.allowed_to_read)THEN                                        
             WRITE ( wrf_err_message , * ) 'ERROR: LANDUSE OUTSIDE RANGE =',IS,' AT ',I,J,' LUN= ',LUN
-            CALL wrf_error_fatal ( TRIM ( wrf_err_message ) )
+            CALL wrf_error_fatal3 ( "module_physics_init.b" , 500 ,  TRIM ( wrf_err_message ) )
           ENDIF                                                            
 !   SET NO-DATA POINTS (IS=0) TO WATER                                    
           IF(IS.EQ.0)THEN                                                
@@ -645,11 +645,11 @@ integer myproc
                 SMSTOT, SFCRUNOFF,UDRUNOFF,ACSNOW,ACSNOM,       &
                 IVGTYP,ISLTYP,SMOIS,SMFR3D,                     &
                 SNOWH,SH2O,FNDSOILW, FNDSNOWH,                  &
-#if  ( NMM_CORE == 1 )
-                Z0,XLAND,XICE,                                  &
-#else
+
+
+
                 ZNT,XLAND,XICE,                                 &
-#endif
+
                 SFCEVP,GRDFLX,                                  &
                 allowed_to_read,                                &
                 ids, ide, jds, jde, kds, kde,                   &
@@ -665,9 +665,9 @@ integer myproc
    USE module_sf_noahlsm
    USE module_sf_ruclsm
    USE module_bl_myjpbl
-#if (NMM_CORE == 1)
-   USE module_sf_lsm_nmm
-#endif
+
+
+
 !--------------------------------------------------------------------
    IMPLICIT NONE
 !--------------------------------------------------------------------
@@ -704,11 +704,11 @@ integer myproc
                                                         SFCEVP, &
                                                         GRDFLX, &
                                                            UST, &
-#if ( NMM_CORE == 1 )
-                                                            Z0, &
-#else
+
+
+
                                                            ZNT, &
-#endif
+
                                                          XLAND, &
                                                          XICE
 
@@ -750,11 +750,11 @@ integer myproc
            CALL sfclayinit( allowed_to_read )
            isfc = 1
       CASE (MYJSFCSCHEME)
-#if ( NMM_CORE == 1 )
-           CALL myjsfcinit(LOWLYR,UST,Z0,XLAND,XICE,           &
-#else
+
+
+
            CALL myjsfcinit(LOWLYR,UST,ZNT,XLAND,XICE,           &
-#endif
+
                          IVGTYP,restart,                       &
                          allowed_to_read ,                     &
                          ids, ide, jds, jde, kds, kde,         &
@@ -778,18 +778,6 @@ integer myproc
                          ids, ide, jds, jde, kds, kde,         &
                          ims, ime, jms, jme, kms, kme,         &
                          its, ite, jts, jte, kts, kte          )
-#if (NMM_CORE == 1)
-      CASE (NMMLSMSCHEME)
-           CALL nmmlsminit(isn,XICE,VEGFRA,SNOW,SNOWC, CANWAT,SMSTAV, &
-                     SMSTOT, SFCRUNOFF,UDRUNOFF,GRDFLX,ACSNOW,     &
-                     ACSNOM,IVGTYP,ISLTYP,TSLB,SMOIS,DZS,SFCEVP,   &
-                     TMN,                                          &
-                     num_soil_layers,                              &
-                     allowed_to_read ,                             &
-                     ids,ide, jds,jde, kds,kde,                    &
-                     ims,ime, jms,jme, kms,kme,                    &
-                     its,ite, jts,jte, kts,kte                     )
-#endif
       CASE (LSMSCHEME)
           CALL LSMINIT(VEGFRA,SNOW,SNOWC,SNOWH,CANWAT,SMSTAV,  &
                      SMSTOT, SFCRUNOFF,UDRUNOFF,ACSNOW,        &

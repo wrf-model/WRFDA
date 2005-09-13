@@ -78,7 +78,7 @@ CONTAINS
 !-- EP1         constant for virtual temperature (R_v/R_d - 1) (dimensionless)
 !-- EP2         constant for specific humidity calculation
 !-- KARMAN      Von Karman constant
-!-- EOMEG       angular velocity of earth's rotation (rad/s)
+!-- EOMEG       angular velocity of earths rotation (rad/s)
 !-- STBOLT      Stefan-Boltzmann constant (W/m^2/K^4)
 !-- ids         start index for i in domain
 !-- ide         end index for i in domain

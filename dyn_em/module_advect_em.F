@@ -1109,7 +1109,7 @@ SUBROUTINE advect_u   ( u, u_old, tendency,            &
    ELSE
 
       WRITE ( wrf_err_message , * ) 'module_advect: advect_u_6a:  h_order not known ',horz_order
-      CALL wrf_error_fatal ( TRIM( wrf_err_message ) )
+      CALL wrf_error_fatal3 ( "module_advect_em.b" , 1112 ,  TRIM( wrf_err_message ) )
 
    ENDIF horizontal_order_test
 
@@ -1146,7 +1146,7 @@ SUBROUTINE advect_u   ( u, u_old, tendency,            &
       ENDIF
 
 !  pick up the rest of the horizontal radiation boundary conditions.
-!  (these are the computations that don't require 'cb')
+!  (these are the computations that dont require cb)
 !  first, set to index ranges
 
       i_start = its
@@ -1387,7 +1387,7 @@ SUBROUTINE advect_u   ( u, u_old, tendency,            &
    ELSE
 
       WRITE ( wrf_err_message , * ) 'module_advect: advect_u_6a: v_order not known ',vert_order
-      CALL wrf_error_fatal ( TRIM( wrf_err_message ) )
+      CALL wrf_error_fatal3 ( "module_advect_em.b" , 1390 ,  TRIM( wrf_err_message ) )
 
    ENDIF vert_order_test
 
@@ -2395,7 +2395,7 @@ SUBROUTINE advect_v   ( v, v_old, tendency,            &
 
 
       WRITE ( wrf_err_message , * ) 'module_advect: advect_v_6a: h_order not known ',horz_order
-      CALL wrf_error_fatal ( TRIM( wrf_err_message ) )
+      CALL wrf_error_fatal3 ( "module_advect_em.b" , 2398 ,  TRIM( wrf_err_message ) )
 
    ENDIF horizontal_order_test
 
@@ -2432,7 +2432,7 @@ SUBROUTINE advect_v   ( v, v_old, tendency,            &
       ENDIF
 
 !  pick up the rest of the horizontal radiation boundary conditions.
-!  (these are the computations that don't require 'cb'.
+!  (these are the computations that dont require cb.
 !  first, set to index ranges
 
       j_start = jts
@@ -2693,7 +2693,7 @@ SUBROUTINE advect_v   ( v, v_old, tendency,            &
    ELSE
 
       WRITE ( wrf_err_message , * ) 'module_advect: advect_v_6a: v_order not known ',vert_order
-      CALL wrf_error_fatal ( TRIM( wrf_err_message ) )
+      CALL wrf_error_fatal3 ( "module_advect_em.b" , 2696 ,  TRIM( wrf_err_message ) )
 
    ENDIF vert_order_test
 
@@ -3610,12 +3610,12 @@ SUBROUTINE advect_scalar   ( field, field_old, tendency,    &
    ELSE
 
       WRITE ( wrf_err_message , * ) 'module_advect: advect_scalar_6a, h_order not known ',horz_order
-      CALL wrf_error_fatal ( TRIM( wrf_err_message ) )
+      CALL wrf_error_fatal3 ( "module_advect_em.b" , 3613 ,  TRIM( wrf_err_message ) )
 
    ENDIF horizontal_order_test
 
 !  pick up the rest of the horizontal radiation boundary conditions.
-!  (these are the computations that don't require 'cb'.
+!  (these are the computations that dont require cb.
 !  first, set to index ranges
 
       i_start = its
@@ -3863,7 +3863,7 @@ SUBROUTINE advect_scalar   ( field, field_old, tendency,    &
    ELSE
 
       WRITE (wrf_err_message,*) ' advect_scalar_6a, v_order not known ',vert_order
-      CALL wrf_error_fatal ( wrf_err_message )
+      CALL wrf_error_fatal3 ( "module_advect_em.b" , 3866 ,  wrf_err_message )
 
    ENDIF vert_order_test
 
@@ -5002,13 +5002,13 @@ ELSE IF (horz_order == 2 ) THEN
    ELSE
 
       WRITE ( wrf_err_message ,*) ' advect_w_6a, h_order not known ',horz_order
-      CALL wrf_error_fatal ( wrf_err_message )
+      CALL wrf_error_fatal3 ( "module_advect_em.b" , 5005 ,  wrf_err_message )
 
    ENDIF horizontal_order_test
 
 
 !  pick up the the horizontal radiation boundary conditions.
-!  (these are the computations that don't require 'cb'.
+!  (these are the computations that dont require cb.
 !  first, set to index ranges
 
 
@@ -5373,7 +5373,7 @@ ELSE IF (horz_order == 2 ) THEN
    ELSE
 
       WRITE (wrf_err_message ,*) ' advect_w, v_order not known ',vert_order
-      CALL wrf_error_fatal ( wrf_err_message )
+      CALL wrf_error_fatal3 ( "module_advect_em.b" , 5376 ,  wrf_err_message )
 
    ENDIF vert_order_test
 

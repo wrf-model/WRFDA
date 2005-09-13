@@ -1394,7 +1394,7 @@ updraft:    DO NK=K,KL-1
 !
 d_mf:   IF(TDER.LT.1.)THEN
 !           WRITE(98,3004)I,J 
-!3004       FORMAT(' ','No Downdraft!;  I=',I3,2X,'J=',I3,'ISHALL =',I2)
+!3004       FORMAT( ,No Downdraft!;  I=,I3,2X,J=,I3,ISHALL =,I2)
           PPTFLX=TRPPT
           CPR=TRPPT
           TDER=0.
@@ -1632,9 +1632,9 @@ iter:     DO NCOUNT=1,10
         DO NK=1,LTOP
           IF(QG(NK).LT.0.)THEN
             IF(NK.EQ.1)THEN                             ! JSK MODS
-!              PRINT *,' PROBLEM WITH KF SCHEME:  ' ! JSK MODS
-!              PRINT *,'QG = 0 AT THE SURFACE!!!!!!!'    ! JSK MODS
-              CALL wrf_error_fatal ( 'QG, QG(NK).LT.0') ! JSK MODS
+!              PRINT *, PROBLEM WITH KF SCHEME:   ! JSK MODS
+!              PRINT *,QG = 0 AT THE SURFACE!!!!!!!    ! JSK MODS
+              CALL wrf_error_fatal3 ( "module_cu_kfeta.b" , 1637 ,  'QG, QG(NK).LT.0') ! JSK MODS
             ENDIF                                       ! JSK MODS
             NK1=NK+1
             IF(NK.EQ.LTOP)THEN
@@ -1650,10 +1650,10 @@ iter:     DO NCOUNT=1,10
             IF(NK.EQ.LTOP)THEN
               QVDIFF=(QG(NK1)-TMA*EMSD(NK1))*100./QG(NK1)
 !              IF(ABS(QVDIFF).GT.1.)THEN
-!             PRINT *,'!!!WARNING!!! CLOUD BASE WATER VAPOR CHANGES BY ',     &
+!             PRINT *,!!!WARNING!!! CLOUD BASE WATER VAPOR CHANGES BY ,     &
 !                      QVDIFF,                                                &
-!                     '% WHEN MOISTURE IS BORROWED TO PREVENT NEGATIVE ',     &
-!                     'VALUES IN KAIN-FRITSCH'
+!                     % WHEN MOISTURE IS BORROWED TO PREVENT NEGATIVE ,     &
+!                     VALUES IN KAIN-FRITSCH
 !              ENDIF
             ENDIF
             QG(NK)=1.E-9
@@ -1663,9 +1663,9 @@ iter:     DO NCOUNT=1,10
         ENDDO
         TOPOMG=(UDR(LTOP)-UER(LTOP))*DP(LTOP)*EMSD(LTOP)
         IF(ABS(TOPOMG-OMG(LTOP)).GT.1.E-3)THEN
-!       WRITE(99,*)'ERROR:  MASS DOES NOT BALANCE IN KF SCHEME;            &
-!      TOPOMG, OMG =',TOPOMG,OMG(LTOP)
-!      TOPOMG, OMG =',TOPOMG,OMG(LTOP)
+!       WRITE(99,*)ERROR:  MASS DOES NOT BALANCE IN KF SCHEME;            &
+!      TOPOMG, OMG =,TOPOMG,OMG(LTOP)
+!      TOPOMG, OMG =,TOPOMG,OMG(LTOP)
           ISTOP=1
           IPRNT=.TRUE.
           EXIT iter
@@ -1781,8 +1781,8 @@ iter:     DO NCOUNT=1,10
 !...THE PERIOD TIMEC...
 !     
           IF(NOITR.EQ.1)THEN
-!         write(98,*)' '
-!         write(98,*)'TAU, I, J, =',NTSD,I,J
+!         write(98,*) 
+!         write(98,*)TAU, I, J, =,NTSD,I,J
 !         WRITE(98,1060)FABE
 !          GOTO 265
           EXIT iter
@@ -1790,8 +1790,8 @@ iter:     DO NCOUNT=1,10
           DABE=AMAX1(ABE-ABEG,0.1*ABE)
           FABE=ABEG/ABE
           IF(FABE.GT.1. .and. ISHALL.EQ.0)THEN
-!          WRITE(98,*)'UPDRAFT/DOWNDRAFT COUPLET INCREASES CAPE AT THIS
-!     *GRID POINT; NO CONVECTION ALLOWED!'
+!          WRITE(98,*)UPDRAFT/DOWNDRAFT COUPLET INCREASES CAPE AT THIS
+!     *GRID POINT; NO CONVECTION ALLOWED!
             RETURN  
           ENDIF
           IF(NCOUNT.NE.1)THEN
@@ -1810,8 +1810,8 @@ iter:     DO NCOUNT=1,10
           AINCOLD=AINC
           FABEOLD=FABE
           IF(AINC/AINCMX.GT.0.999.AND.FABE.GT.1.05-STAB)THEN
-!           write(98,*)' '
-!           write(98,*)'TAU, I, J, =',NTSD,I,J
+!           write(98,*) 
+!           write(98,*)TAU, I, J, =,NTSD,I,J
 !           WRITE(98,1055)FABE
 !            GOTO 265
             EXIT
@@ -1820,8 +1820,8 @@ iter:     DO NCOUNT=1,10
             EXIT iter
           ELSE
             IF(NCOUNT.GT.10)THEN
-!             write(98,*)' '
-!             write(98,*)'TAU, I, J, =',NTSD,I,J
+!             write(98,*) 
+!             write(98,*)TAU, I, J, =,NTSD,I,J
 !             WRITE(98,1060)FABE
 !             GOTO 265
               EXIT
@@ -1962,7 +1962,7 @@ iter:     DO NCOUNT=1,10
 !    if(I.eq.16 .and. J.eq.41)then
 !      IF(ISTOP.EQ.1)THEN
          write(98,*)
-!        write(98,*)'At t(h), I, J =',float(NTSD)*72./3600.,I,J
+!        write(98,*)At t(h), I, J =,float(NTSD)*72./3600.,I,J
          write(98,*)'P(LC), DTP, WKL, WKLCL =',p0(LC)/100.,       &
                      TLCL+DTLCL+dtrh-TENV,WKL,WKLCL
          write(98,*)'TLCL, DTLCL, DTRH, TENV =',TLCL,DTLCL,       &
@@ -2038,7 +2038,7 @@ iter:     DO NCOUNT=1,10
 !    *               U0(K),V0(K),DP(K)/100.,W0AVG(I,J,K)
  310        CONTINUE
             IF(ISTOP.EQ.1)THEN
-              CALL wrf_error_fatal ( 'KAIN-FRITSCH, istop=1, diags' )
+              CALL wrf_error_fatal3 ( "module_cu_kfeta.b" , 2041 ,  'KAIN-FRITSCH, istop=1, diags' )
             ENDIF
 !         ENDIF
   4455  format(8f11.3) 
@@ -2069,7 +2069,7 @@ iter:     DO NCOUNT=1,10
         ERR2=(QFNL-QINIT)*100./QINIT
        IF(IPRNT)WRITE(98,1110)QINIT,QFNL,ERR2
       IF(ABS(ERR2).GT.0.05 .AND. ISTOP.EQ.0)THEN 
-!       write(99,*)'!!!!!!!! MOISTURE BUDGET ERROR IN KFPARA !!!'
+!       write(99,*)!!!!!!!! MOISTURE BUDGET ERROR IN KFPARA !!!
 !       WRITE(99,1110)QINIT,QFNL,ERR2
         IPRNT=.TRUE.
         ISTOP=1
@@ -2088,7 +2088,7 @@ iter:     DO NCOUNT=1,10
 !           call flush(98)
 
 !        GOTO 297
-!         STOP 'QVERR'
+!         STOP QVERR
       ENDIF
  1115 FORMAT (2X,F7.2,2X,F5.1,2X,F6.3,2(2X,F5.1),2X,F7.2,2X,F7.4)
  4456  format(8f12.3)
@@ -2174,8 +2174,8 @@ iter:     DO NCOUNT=1,10
                DQIDT(K)=DQIDT(K)+(QSG(K)-QS0(K))/TIMEC
             ENDIF
           ELSE
-!              PRINT *,'THIS COMBINATION OF IMOIST, IEXICE, IICE NOT ALLOWED!'
-              CALL wrf_error_fatal ( 'KAIN-FRITSCH, THIS COMBINATION OF IMOIST, IEXICE, IICE NOT ALLOWED' )
+!              PRINT *,THIS COMBINATION OF IMOIST, IEXICE, IICE NOT ALLOWED!
+              CALL wrf_error_fatal3 ( "module_cu_kfeta.b" , 2178 ,  'KAIN-FRITSCH, THIS COMBINATION OF IMOIST, IEXICE, IICE NOT ALLOWED' )
           ENDIF
           DTDT(K)=(TG(K)-T0(K))/TIMEC
           DQDT(K)=(QG(K)-Q0(K))/TIMEC
@@ -2187,7 +2187,7 @@ iter:     DO NCOUNT=1,10
  909     FORMAT('AT I, J =',i3,1x,i3,' CONVECTIVE RAINFALL =',F8.4,' mm')
 !      write (98,909)I,J,RNC
 !      write (6,909)I,J,RNC
-!      WRITE(98,*)'at NTSD =',NTSD,',No. of KF points activated =',
+!      WRITE(98,*)at NTSD =,NTSD,,No. of KF points activated =,
 !     *            NCCNT
 !      call flush(98)
 1000  FORMAT(' ',10A8)
@@ -2203,10 +2203,10 @@ iter:     DO NCOUNT=1,10
       F8.1)
 1035  FORMAT(1X,'PEF(WS)=',F4.2,'(CB)=',F4.2,'LC,LET=',2I3,'WKL='       &
       ,F6.3,'VWS=',F5.2)
-!1055  FORMAT('*** DEGREE OF STABILIZATION =',F5.3,                  &
-!      ', NO MORE MASS FLUX IS ALLOWED!')
-!1060     FORMAT(' ITERATION DOES NOT CONVERGE TO GIVE THE SPECIFIED    &
-!      &DEGREE OF STABILIZATION!  FABE= ',F6.4) 
+!1055  FORMAT(*** DEGREE OF STABILIZATION =,F5.3,                  &
+!      , NO MORE MASS FLUX IS ALLOWED!)
+!1060     FORMAT( ITERATION DOES NOT CONVERGE TO GIVE THE SPECIFIED    &
+!      &DEGREE OF STABILIZATION!  FABE= ,F6.4) 
  1070 FORMAT (16A8) 
  1075 FORMAT (F8.2,3(F8.2),2(F8.3),F8.2,2F8.3,F8.2,6F8.3) 
  1080 FORMAT(2X,'LFS,LDB,LDT =',3I3,' TIMEC, TADVEC, NSTEP=',           &

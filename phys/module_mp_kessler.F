@@ -160,10 +160,10 @@ CONTAINS
 
 !------------------------------------------------------------------------------
 ! compute new sedimentation velocity, and check/recompute new 
-! sedimentation timestep if this isn't the last split step.
+! sedimentation timestep if this isnt the last split step.
 !------------------------------------------------------------------------------
 
-      IF( nfall > 1 ) THEN ! this wasn't the last split sedimentation timestep
+      IF( nfall > 1 ) THEN ! this wasnt the last split sedimentation timestep
 
         nfall = nfall - 1
         crmax = 0.

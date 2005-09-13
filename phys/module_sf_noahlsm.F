@@ -431,8 +431,8 @@ CONTAINS
           if ( (SNEQV.ne.0..AND.SNOWHK.eq.0.).or.(SNOWHK.le.SNEQV) )THEN
             SNOWHK= 5.*SNEQV
           endif
-!           print *, 'BEFORE SFLX, in Noahlsm_driver'
-!           print*, 'EMISSI', EMISSI
+!           print *, BEFORE SFLX, in Noahlsm_driver
+!           print*, EMISSI, EMISSI
 !
           IF(IPRINT) THEN 
 !                                                                       
@@ -478,8 +478,8 @@ CONTAINS
                  SMCWLT,SMCDRY,SMCREF,SMCMAX,NROOT)
 
 
-!           print *, 'AFTER SFLX, in Noahlsm_driver'
-!           print*, 'EMISSI', EMISSI
+!           print *, AFTER SFLX, in Noahlsm_driver
+!           print*, EMISSI, EMISSI
 
           IF(IPRINT) THEN 
        print*, 'AFTER SFLX, in Noahlsm_driver'
@@ -614,7 +614,7 @@ CONTAINS
    jtf=min0(jte,jde-1)
 
    IF ( MINVAL ( ISLTYP( its:itf, jts:jtf ) ) .LT. 1 ) THEN
-      CALL wrf_error_fatal( "module_sf_noahlsm.F: lsminit: out of range value of ISLTYP. Is this field in the input?" )
+      CALL wrf_error_fatal3 ( "module_sf_noahlsm.b" , 617 ,  "module_sf_noahlsm.F: lsminit: out of range value of ISLTYP. Is this field in the input?" )
    ENDIF
 
 ! initialize soil liquid water content SH2O
@@ -622,7 +622,7 @@ CONTAINS
 !  IF(.NOT.FNDSOILW) THEN
 
 ! If no SWC, do the following
-!         PRINT *,'SOIL WATER NOT FOUND - VALUE SET IN LSMINIT'
+!         PRINT *,SOIL WATER NOT FOUND - VALUE SET IN LSMINIT
         DO J = jts,jtf
         DO I = its,itf
           BX = BB(ISLTYP(I,J))
@@ -683,7 +683,7 @@ CONTAINS
 ! initialize canopy water to ZERO
 
 !          GO TO 110
-!         print*,'Note that canopy water content (CANWAT) is set to ZERO in LSMINIT' 
+!         print*,Note that canopy water content (CANWAT) is set to ZERO in LSMINIT 
           DO J = jts,jtf
           DO I = its,itf
             CANWAT(I,J)=0.0
@@ -758,7 +758,7 @@ CONTAINS
         IF(ierr .NE. OPEN_OK ) THEN
           WRITE(message,FMT='(A)') &
           'module_sf_noahlsm.F: soil_veg_gen_parm: failure opening VEGPARM.TBL'
-          CALL wrf_error_fatal ( message ) 
+          CALL wrf_error_fatal3 ( "module_sf_noahlsm.b" , 761 ,  message ) 
         END IF
 
         WRITE ( mess, * ) 'INPUT LANDUSE = ',MMINLU                                 
@@ -830,7 +830,7 @@ CONTAINS
         IF(ierr .NE. OPEN_OK ) THEN
           WRITE(message,FMT='(A)') &
           'module_sf_noahlsm.F: soil_veg_gen_parm: failure opening SOILPARM.TBL'
-          CALL wrf_error_fatal ( message ) 
+          CALL wrf_error_fatal3 ( "module_sf_noahlsm.b" , 833 ,  message ) 
         END IF
 
         MMINSL='STAS'                       !oct2
@@ -880,7 +880,7 @@ CONTAINS
       IF(LUMATCH.EQ.0)THEN                                            
           CALL wrf_message( 'SOIl TEXTURE IN INPUT FILE DOES NOT ' )
           CALL wrf_message( 'MATCH SOILPARM TABLE'                 )
-          CALL wrf_error_fatal ( 'INCONSISTENT OR MISSING SOILPARM FILE' )
+          CALL wrf_error_fatal3 ( "module_sf_noahlsm.b" , 883 ,  'INCONSISTENT OR MISSING SOILPARM FILE' )
       ENDIF                                                           
 
 !
@@ -891,7 +891,7 @@ CONTAINS
         IF(ierr .NE. OPEN_OK ) THEN
           WRITE(message,FMT='(A)') &
           'module_sf_noahlsm.F: soil_veg_gen_parm: failure opening GENPARM.TBL'
-          CALL wrf_error_fatal ( message ) 
+          CALL wrf_error_fatal3 ( "module_sf_noahlsm.b" , 894 ,  message ) 
         END IF
 
         READ (19,*)
@@ -1051,7 +1051,7 @@ CONTAINS
 !                VEG PARMS)                                                      
 !   ALB        BACKROUND SNOW-FREE SURFACE ALBEDO (FRACTION), FOR JULIAN         
 !                DAY OF YEAR (USUALLY FROM TEMPORAL INTERPOLATION OF             
-!                MONTHLY MEAN VALUES' CALLING PROG MAY OR MAY NOT                
+!                MONTHLY MEAN VALUES CALLING PROG MAY OR MAY NOT                
 !                INCLUDE DIURNAL SUN ANGLE EFFECT)                               
 !   SNOALB     UPPER BOUND ON MAXIMUM ALBEDO OVER DEEP SNOW (E.G. FROM           
 !                ROBINSON AND KUKLA, 1985, J. CLIM. & APPL. METEOR.)             
@@ -1280,14 +1280,14 @@ CONTAINS
             SNDENS = SNEQV / SNOWH                                               
             IF(SNDENS > 1.0) THEN                                               
              write(*,*)'Physical snow depth is less than snow water equiv.'           
-             CALL wrf_error_fatal ( 'Physical snow depth is less than snow water equiv.' )
+             CALL wrf_error_fatal3 ( "module_sf_noahlsm.b" , 1283 ,  'Physical snow depth is less than snow water equiv.' )
             ENDIF                                                                
             CALL CSNOW (SNCOND,SNDENS)                                           
          END IF                                                                  
 ! ----------------------------------------------------------------------         
-! DETERMINE IF IT'S PRECIPITATING AND WHAT KIND OF PRECIP IT IS.                 
-! IF IT'S PRCPING AND THE AIR TEMP IS COLDER THAN 0 C, IT'S SNOWING!             
-! IF IT'S PRCPING AND THE AIR TEMP IS WARMER THAN 0 C, BUT THE GRND              
+! DETERMINE IF ITS PRECIPITATING AND WHAT KIND OF PRECIP IT IS.                 
+! IF ITS PRCPING AND THE AIR TEMP IS COLDER THAN 0 C, ITS SNOWING!             
+! IF ITS PRCPING AND THE AIR TEMP IS WARMER THAN 0 C, BUT THE GRND              
 ! TEMP IS COLDER THAN 0 C, FREEZING RAIN IS PRESUMED TO BE FALLING.              
 ! ----------------------------------------------------------------------         
          IF (PRCP > 0.0) THEN                                                 
@@ -1502,7 +1502,7 @@ CONTAINS
 ! IF NONZERO GREENNESS FRACTION                                                  
 ! ----------------------------------------------------------------------         
                                                                                  
-!       print*,'after penman ETP',ETP                                            
+!       print*,after penman ETP,ETP                                            
 ! ----------------------------------------------------------------------         
 !  FROZEN GROUND EXTENSION: TOTAL SOIL WATER "SMC" WAS REPLACED                  
 !  BY UNFROZEN SOIL WATER "SH2O" IN CALL TO CANRES BELOW                         
@@ -1947,9 +1947,9 @@ CONTAINS
          ET (K) = 0.                                                             
       END DO                                                                     
                                                                                  
-!      print*,'SHDFAC',SHDFAC,'SMCMAX', SMCMAX,'BEXP',BEXP,                      
-!    & 'DKSAT',DKSAT,'DWSAT',DWSAT,'DRY',SMCDRY,'REF',SMCREF,                    
-!    & 'WLT',SMCWLT,'FXEX',FXEXP,'SMC',SMC                                       
+!      print*,SHDFAC,SHDFAC,SMCMAX, SMCMAX,BEXP,BEXP,                      
+!    & DKSAT,DKSAT,DWSAT,DWSAT,DRY,SMCDRY,REF,SMCREF,                    
+!    & WLT,SMCWLT,FXEX,FXEXP,SMC,SMC                                       
 ! ----------------------------------------------------------------------         
 ! RETRIEVE DIRECT EVAPORATION FROM SOIL SURFACE.  CALL THIS FUNCTION             
 ! ONLY IF VEG COVER NOT COMPLETE.                                                
@@ -2296,7 +2296,7 @@ CONTAINS
             DENOM = 0.5 * ( ZSOIL (K -1) - ZSOIL (K +1) )                        
                                                                                  
 ! ----------------------------------------------------------------------         
-! CALC THE MATRIX COEF, CI, AFTER CALC'NG ITS PARTIAL PRODUCT                    
+! CALC THE MATRIX COEF, CI, AFTER CALCNG ITS PARTIAL PRODUCT                    
 ! ----------------------------------------------------------------------         
             DTSDZ2 = ( STC (K) - STC (K +1) ) / DENOM                            
             DDZ2 = 2. / (ZSOIL (K -1) - ZSOIL (K +1))                            
@@ -2345,7 +2345,7 @@ CONTAINS
 ! THIS ENDS SPECIAL LOOP FOR BOTTOM LAYER.                                       
          END IF                                                                  
 ! ----------------------------------------------------------------------         
-! CALCULATE RHSTS FOR THIS LAYER AFTER CALC'NG A PARTIAL PRODUCT.                
+! CALCULATE RHSTS FOR THIS LAYER AFTER CALCNG A PARTIAL PRODUCT.                
 ! ----------------------------------------------------------------------         
          DENOM = ( ZSOIL (K) - ZSOIL (K -1) ) * HCPCT                            
          RHSTS (K) = ( DF1N * DTSDZ2- DF1K * DTSDZ ) / DENOM                     
@@ -2463,7 +2463,7 @@ CONTAINS
             DENOM = 0.5 * ( ZSOIL (K -1) - ZSOIL (K +1) )                        
                                                                                  
 ! ----------------------------------------------------------------------         
-! CALC THE MATRIX COEF, CI, AFTER CALC'NG ITS PARTIAL PRODUCT.                   
+! CALC THE MATRIX COEF, CI, AFTER CALCNG ITS PARTIAL PRODUCT.                   
 ! ----------------------------------------------------------------------         
             DTSDZ2 = ( STC (K) - STC (K +1) ) / DENOM                            
             DDZ2 = 2. / (ZSOIL (K -1) - ZSOIL (K +1))                            
@@ -2481,7 +2481,7 @@ CONTAINS
                      - ZBOT)                                                     
             CI (K) = 0.                                                          
 ! ----------------------------------------------------------------------         
-! CALC RHSTS FOR THIS LAYER AFTER CALC'NG A PARTIAL PRODUCT.                     
+! CALC RHSTS FOR THIS LAYER AFTER CALCNG A PARTIAL PRODUCT.                     
 ! ----------------------------------------------------------------------         
          END IF                                                                  
          DENOM = ( ZSOIL (K) - ZSOIL (K -1) ) * HCPCT                            
@@ -2642,7 +2642,7 @@ CONTAINS
          DEW = - ETP1                                                            
                                                                                  
 ! ----------------------------------------------------------------------         
-! CONVERT PRCP FROM 'KG M-2 S-1' TO 'M S-1' AND ADD DEW AMOUNT.                  
+! CONVERT PRCP FROM KG M-2 S-1 TO M S-1 AND ADD DEW AMOUNT.                  
 ! ----------------------------------------------------------------------         
          ETP1 = 0.0                                                              
                                                                                  
@@ -2662,7 +2662,7 @@ CONTAINS
                       DRIP)                                                      
                                                                                  
 ! ----------------------------------------------------------------------         
-! CONVERT MODELED EVAPOTRANSPIRATION FROM 'M S-1' TO 'KG M-2 S-1'.               
+! CONVERT MODELED EVAPOTRANSPIRATION FROM M S-1 TO KG M-2 S-1.               
 ! ----------------------------------------------------------------------         
          ETA = ETA1 * 1000.0                                                     
       END IF                                                                     
@@ -2682,7 +2682,7 @@ CONTAINS
       END IF                                                                     
                                                                                  
 ! ----------------------------------------------------------------------         
-! CONVERT MODELED EVAPOTRANSPIRATION COMPONENTS 'M S-1' TO 'KG M-2 S-1'.         
+! CONVERT MODELED EVAPOTRANSPIRATION COMPONENTS M S-1 TO KG M-2 S-1.         
 ! ----------------------------------------------------------------------         
       EDIR = EDIR1*1000.                                                         
       EC = EC1*1000.                                                             
@@ -2861,10 +2861,10 @@ CONTAINS
 ! as sand and to have a hydrulic conductivity as clay                            
 !                                                                                
 ! ----------------------------------------------------------------------         
-! Class parameter 'SLOPETYP' was included to estimate linear reservoir           
-! coefficient 'SLOPE' to the baseflow runoff out of the bottom layer.            
+! Class parameter SLOPETYP was included to estimate linear reservoir           
+! coefficient SLOPE to the baseflow runoff out of the bottom layer.            
 ! lowest class (slopetyp=0) means highest slope parameter = 1.                   
-! definition of slopetyp from 'zobler' slope type:                               
+! definition of slopetyp from zobler slope type:                               
 ! slope class  percent slope                                                     
 ! 1            0-8                                                               
 ! 2            8-30                                                              
@@ -2917,15 +2917,15 @@ CONTAINS
 !                                                                                
                IF (SOILTYP .gt. SLCATS) THEN                                     
                         WRITE (*,*) 'Warning: too many input soil types'         
-                        CALL wrf_error_fatal ( 'Warning: too many input soil types' )
+                        CALL wrf_error_fatal3 ( "module_sf_noahlsm.b" , 2920 ,  'Warning: too many input soil types' )
                END IF                                                            
                IF (VEGTYP .gt. LUCATS) THEN                                      
                      WRITE (*,*) 'Warning: too many input landuse types'         
-                     CALL wrf_error_fatal ( 'Warning: too many input landuse types' )
+                     CALL wrf_error_fatal3 ( "module_sf_noahlsm.b" , 2924 ,  'Warning: too many input landuse types' )
                END IF                                                            
                IF (SLOPETYP .gt. SLPCATS) THEN                                   
                      WRITE (*,*) 'Warning: too many input slope types'           
-                     CALL wrf_error_fatal ( 'Warning: too many input slope types' )
+                     CALL wrf_error_fatal3 ( "module_sf_noahlsm.b" , 2928 ,  'Warning: too many input slope types' )
                END IF                                                            
                                                                                  
 ! ----------------------------------------------------------------------         
@@ -2986,7 +2986,7 @@ CONTAINS
                IF (VEGTYP .eq. BARE) SHDFAC = 0.0                                
                IF (NROOT .gt. NSOIL) THEN                                        
                   WRITE (*,*) 'Warning: too many root layers'                    
-                  CALL wrf_error_fatal ( 'Warning: too many root layers' )
+                  CALL wrf_error_fatal3 ( "module_sf_noahlsm.b" , 2989 ,  'Warning: too many root layers' )
 ! ----------------------------------------------------------------------         
 ! CALCULATE ROOT DISTRIBUTION.  PRESENT VERSION ASSUMES UNIFORM                  
 ! DISTRIBUTION BASED ON SOIL LAYER DEPTHS.                                       
@@ -2999,20 +2999,20 @@ CONTAINS
 ! ----------------------------------------------------------------------         
                END DO                                                            
                                                                                  
-!        print*,'end of PRMRED'                                                  
-!       print*,'VEGTYP',VEGTYP,'SOILTYP',SOILTYP,'SLOPETYP',SLOPETYP,    &       
-!    & 'CFACTR',CFACTR,'CMCMAX',CMCMAX,'RSMAX',RSMAX,'TOPT',TOPT,        &       
-!    & 'REFKDT',REFKDT,'KDT',KDT,'SBETA',SBETA, 'SHDFAC',SHDFAC,         &       
-!    &  'RSMIN',RSMIN,'RGL',RGL,'HS',HS,'ZBOT',ZBOT,'FRZX',FRZX,         &       
-!    &  'PSISAT',PSISAT,'SLOPE',SLOPE,'SNUP',SNUP,'SALP',SALP,'BEXP',    &       
+!        print*,end of PRMRED                                                  
+!       print*,VEGTYP,VEGTYP,SOILTYP,SOILTYP,SLOPETYP,SLOPETYP,    &       
+!    & CFACTR,CFACTR,CMCMAX,CMCMAX,RSMAX,RSMAX,TOPT,TOPT,        &       
+!    & REFKDT,REFKDT,KDT,KDT,SBETA,SBETA, SHDFAC,SHDFAC,         &       
+!    &  RSMIN,RSMIN,RGL,RGL,HS,HS,ZBOT,ZBOT,FRZX,FRZX,         &       
+!    &  PSISAT,PSISAT,SLOPE,SLOPE,SNUP,SNUP,SALP,SALP,BEXP,    &       
 !    &   BEXP,                                                           &       
-!    &  'DKSAT',DKSAT,'DWSAT',DWSAT,                                     &       
-!    &  'SMCMAX',SMCMAX,'SMCWLT',SMCWLT,'SMCREF',SMCREF,'SMCDRY',SMCDRY, &       
-!    &  'F1',F1,'QUARTZ',QUARTZ,'FXEXP',FXEXP,                           &       
-!    &  'RTDIS',RTDIS,'SLDPTH',SLDPTH,'ZSOIL',ZSOIL, 'NROOT',NROOT,      &       
-!    &  'NSOIL',NSOIL,'Z0',Z0,'CZIL',CZIL,'LAI',LAI,                     &       
-!    &  'CSOIL',CSOIL,'PTU',PTU,                                         &       
-!    &  'LOCAL', LOCAL                                                       
+!    &  DKSAT,DKSAT,DWSAT,DWSAT,                                     &       
+!    &  SMCMAX,SMCMAX,SMCWLT,SMCWLT,SMCREF,SMCREF,SMCDRY,SMCDRY, &       
+!    &  F1,F1,QUARTZ,QUARTZ,FXEXP,FXEXP,                           &       
+!    &  RTDIS,RTDIS,SLDPTH,SLDPTH,ZSOIL,ZSOIL, NROOT,NROOT,      &       
+!    &  NSOIL,NSOIL,Z0,Z0,CZIL,CZIL,LAI,LAI,                     &       
+!    &  CSOIL,CSOIL,PTU,PTU,                                         &       
+!    &  LOCAL, LOCAL                                                       
                                                                                  
       END  SUBROUTINE REDPRM
                                                                                  
@@ -3341,7 +3341,7 @@ CONTAINS
          DZ = ZSOIL (K -1) - ZSOIL (K)                                           
       END IF                                                                     
 ! ----------------------------------------------------------------------         
-! VIA FUNCTION FRH2O, COMPUTE POTENTIAL OR 'EQUILIBRIUM' UNFROZEN                
+! VIA FUNCTION FRH2O, COMPUTE POTENTIAL OR EQUILIBRIUM UNFROZEN                
 ! SUPERCOOLED FREE WATER FOR GIVEN SOIL TYPE AND SOIL LAYER TEMPERATURE.         
 ! FUNCTION FRH20 INVOKES EQN (17) FROM V. KOREN ET AL (1999, JGR, VOL.           
 ! 104, PG 19573).  (ASIDE:  LATTER EQN IN JOURNAL IN CENTIGRADE UNITS.           
@@ -3352,11 +3352,11 @@ CONTAINS
 ! ----------------------------------------------------------------------         
 ! IN NEXT BLOCK OF CODE, INVOKE EQN 18 OF V. KOREN ET AL (1999, JGR,             
 ! VOL. 104, PG 19573.)  THAT IS, FIRST ESTIMATE THE NEW AMOUNTOF LIQUID          
-! WATER, 'XH2O', IMPLIED BY THE SUM OF (1) THE LIQUID WATER AT THE BEGIN         
+! WATER, XH2O, IMPLIED BY THE SUM OF (1) THE LIQUID WATER AT THE BEGIN         
 ! OF CURRENT TIME STEP, AND (2) THE FREEZE OF THAW CHANGE IN LIQUID              
-! WATER IMPLIED BY THE HEAT FLUX 'QTOT' PASSED IN FROM ROUTINE HRT.              
-! SECOND, DETERMINE IF XH2O NEEDS TO BE BOUNDED BY 'FREE' (EQUIL AMT) OR         
-! IF 'FREE' NEEDS TO BE BOUNDED BY XH2O.                                         
+! WATER IMPLIED BY THE HEAT FLUX QTOT PASSED IN FROM ROUTINE HRT.              
+! SECOND, DETERMINE IF XH2O NEEDS TO BE BOUNDED BY FREE (EQUIL AMT) OR         
+! IF FREE NEEDS TO BE BOUNDED BY XH2O.                                         
 ! ----------------------------------------------------------------------         
       CALL FRH2O (FREE,TAVG,SMC,SH2O,SMCMAX,BEXP,PSISAT)                         
                                                                                  
@@ -3495,7 +3495,7 @@ CONTAINS
       PRCP1 = PRCPF *0.001                                                       
       ETP1 = ETP * 0.001                                                         
       ESNOW = ETP * SNCOVR                                                       
-!      write(*,*) 'ESNOW,ESDFLX=',ESNOW,ESDFLX                                   
+!      write(*,*) ESNOW,ESDFLX=,ESNOW,ESDFLX                                   
 !     ESDFLX = ESD *1000./ DT                                                    
 !     IF (ESDFLX .lt. ESNOW) THEN                                                
 !ek        ESD = 0.                                                              
@@ -3524,7 +3524,7 @@ CONTAINS
 !        ETP1 = 0.0                                                              
       ELSE                                                                       
          IF (ICE /=  1) THEN                                                    
-!            write(*,*) 'ETP1=',ETP1                                             
+!            write(*,*) ETP1=,ETP1                                             
              IF (SNCOVR <  1.) THEN                                            
                CALL EVAPO (ETA1,SMC,NSOIL,CMC,ETP1,DT,ZSOIL,            &        
                             SH2O,                                       &        
@@ -3554,11 +3554,11 @@ CONTAINS
 !     &                 ET(3)*2.5E+9,                                            
 !     &                 ET(4)*2.5E+9,                                            
 !     &                 ETT*2.5E+9                                               
-!            write(*,*) 'SNCOVR=',SNCOVR                                         
+!            write(*,*) SNCOVR=,SNCOVR                                         
                ETNS = ETNS1*1000.                                                
-!            write(*,*) 'ESNOW[W/M2],ETNS[W/M2]=',                               
+!            write(*,*) ESNOW[W/M2],ETNS[W/M2]=,                               
 !     &                  ESNOW*LSUBS,ETNS*LSUBC                                  
-!            write(*,*) 'ETP[W/M2],ETANRG=',                                     
+!            write(*,*) ETP[W/M2],ETANRG=,                                     
 !     &                  ETP*LSUBS,ETANRG                                        
 ! ----------------------------------------------------------------------         
                                                                                  
@@ -3575,7 +3575,7 @@ CONTAINS
 ! also compute energy units (ETANRG) needed later below                          
 ! ----------------------------------------------------------------------         
                                                                                  
-!      write(*,*)'ESNOW*LSUBS,ETNS*LSUBC,ETANRG=',                               
+!      write(*,*)ESNOW*LSUBS,ETNS*LSUBC,ETANRG=,                               
 !     &           ESNOW*LSUBS,ETNS*LSUBC,ETANRG                                  
       ETANRG = ESNOW * LSUBS + ETNS * LSUBC                                      
                                                                                  
@@ -3591,7 +3591,7 @@ CONTAINS
       ELSE                                                                       
          IF (PRCP >  0.0) FLX1 = CPH2O * PRCP * (T1- SFCTMP)                   
 ! ----------------------------------------------------------------------         
-! CALCULATE AN 'EFFECTIVE SNOW-GRND SFC TEMP' (T12) BASED ON HEAT FLUXES         
+! CALCULATE AN EFFECTIVE SNOW-GRND SFC TEMP (T12) BASED ON HEAT FLUXES         
 ! BETWEEN THE SNOW PACK AND THE SOIL AND ON NET RADIATION.                       
 ! INCLUDE FLX1 (PRECIP-SNOW SFC) AND FLX2 (FREEZING RAIN LATENT HEAT)            
 ! FLUXES.  FLX1 FROM ABOVE, FLX2 BROUGHT IN VIA COMMOM BLOCK RITE.               
@@ -3606,7 +3606,7 @@ CONTAINS
 !ek      T12AX = ( (FDOWN-FLX1-FLX2-SIGMA*T24)/RCH                               
 !ek     &       + TH2 - SFCTMP - ETANRG/RCH ) / RR                               
       DENOM = 1.0+ DF1 / (DTOT * RR * RCH)                                       
-!      write(*,*) 'T12A,T12AX=',T12A,T12AX                                       
+!      write(*,*) T12A,T12AX=,T12A,T12AX                                       
 !Place for emiss, snow emiss=0.90
 !      T12A = ( (FDOWN - FLX1- FLX2- SIGMA * T24)/ RCH                   &        
       T12A = ( (FDOWN - FLX1- FLX2- EMISSI_S*SIGMA * T1**4)/ RCH            &
@@ -3614,12 +3614,12 @@ CONTAINS
       T12B = DF1 * STC (1) / (DTOT * RR * RCH)                                   
                                                                                  
 ! ----------------------------------------------------------------------         
-! IF THE 'EFFECTIVE SNOW-GRND SFC TEMP' IS AT OR BELOW FREEZING, NO SNOW         
+! IF THE EFFECTIVE SNOW-GRND SFC TEMP IS AT OR BELOW FREEZING, NO SNOW         
 ! MELT WILL OCCUR.  SET THE SKIN TEMP TO THIS EFFECTIVE TEMP.  REDUCE            
 ! (BY SUBLIMINATION ) OR INCREASE (BY FROST) THE DEPTH OF THE SNOWPACK,          
 ! DEPENDING ON SIGN OF ETP.                                                      
 ! UPDATE SOIL HEAT FLUX (SSOIL) USING NEW SKIN TEMPERATURE (T1)                  
-! SINCE NO SNOWMELT, SET ACCUMULATED SNOWMELT TO ZERO, SET 'EFFECTIVE'           
+! SINCE NO SNOWMELT, SET ACCUMULATED SNOWMELT TO ZERO, SET EFFECTIVE           
 ! PRECIP FROM SNOWMELT TO ZERO, SET PHASE-CHANGE HEAT FLUX FROM SNOWMELT         
 ! TO ZERO.                                                                       
 ! ----------------------------------------------------------------------         
@@ -3636,7 +3636,7 @@ CONTAINS
                                                                                  
          SNOMLT = 0.0                                                            
 ! ----------------------------------------------------------------------         
-! IF THE 'EFFECTIVE SNOW-GRND SFC TEMP' IS ABOVE FREEZING, SNOW MELT             
+! IF THE EFFECTIVE SNOW-GRND SFC TEMP IS ABOVE FREEZING, SNOW MELT             
 ! WILL OCCUR.  CALL THE SNOW MELT RATE,EX AND AMT, SNOMLT.  REVISE THE           
 ! EFFECTIVE SNOW DEPTH.  REVISE THE SKIN TEMP BECAUSE IT WOULD HAVE CHGD         
 ! DUE TO THE LATENT HEAT RELEASED BY THE MELTING. CALC THE LATENT HEAT           
@@ -3645,7 +3645,7 @@ CONTAINS
 ! CALCULATE QSAT VALID AT FREEZING POINT.  NOTE THAT ESAT (SATURATION            
 ! VAPOR PRESSURE) VALUE OF 6.11E+2 USED HERE IS THAT VALID AT FRZZING            
 ! POINT.  NOTE THAT ETP FROM CALL PENMAN IN SFLX IS IGNORED HERE IN              
-! FAVOR OF BULK ETP OVER 'OPEN WATER' AT FREEZING TEMP.                          
+! FAVOR OF BULK ETP OVER OPEN WATER AT FREEZING TEMP.                          
 ! UPDATE SOIL HEAT FLUX (S) USING NEW SKIN TEMPERATURE (T1)                      
 ! ----------------------------------------------------------------------         
 ! ABOVE FREEZING BLOCK                                                           
@@ -3680,8 +3680,8 @@ CONTAINS
 !           ESD = ESD- ETP2                                                      
             ESD = ESD-ESNOW2                                                     
             ETP3 = ETP * LSUBC                                                   
-!         WRITE (*,*) 'SNCOVR=',SNCOVR                                           
-!         WRITE (*,*) 'ETP3,ETANRG=',ETP3,ETANRG,'ETP',ETP,'LSUBC',LSUBC         
+!         WRITE (*,*) SNCOVR=,SNCOVR                                           
+!         WRITE (*,*) ETP3,ETANRG=,ETP3,ETANRG,ETP,ETP,LSUBC,LSUBC         
             SEH = RCH * (T1- TH2)                                                
             T14 = T1* T1                                                         
 !ek          FLX3 = FDOWN - FLX1 - FLX2 - SIGMA*T14 - SSOIL - SEH - ETP3         
@@ -3690,12 +3690,12 @@ CONTAINS
 !            FLX3 = FDOWN - FLX1- FLX2- SIGMA * T14- SSOIL - SEH - ETANRG         
            FLX3 = FDOWN - FLX1- FLX2- EMISSI_S*SIGMA * T14- SSOIL- SEH-     &
      &            ETANRG
-!            WRITE (*,*) 'FLX3,FLX3X=',FLX3,FLX3X                                
+!            WRITE (*,*) FLX3,FLX3X=,FLX3,FLX3X                                
             IF (FLX3 <= 0.0) FLX3 = 0.0                                         
 ! ----------------------------------------------------------------------         
 ! SNOWMELT REDUCTION DEPENDING ON SNOW COVER                                     
 ! IF SNOW COVER LESS THAN 5% NO SNOWMELT REDUCTION                               
-! ***NOTE:  DOES 'IF' BELOW FAIL TO MATCH THE MELT WATER WITH THE MELT           
+! ***NOTE:  DOES IF BELOW FAIL TO MATCH THE MELT WATER WITH THE MELT           
 !           ENERGY?                                                              
 ! ----------------------------------------------------------------------         
             EX = FLX3*0.001/ LSUBF                                               
@@ -3718,13 +3718,13 @@ CONTAINS
                                                                                  
                ESD = 0.0                                                         
 ! ----------------------------------------------------------------------         
-! END OF 'ESD .LE. ETP2' IF-BLOCK                                                
+! END OF ESD .LE. ETP2 IF-BLOCK                                                
 ! ----------------------------------------------------------------------         
             END IF                                                               
          END IF                                                                  
                                                                                  
 ! ----------------------------------------------------------------------         
-! END OF 'T12 .LE. TFREEZ' IF-BLOCK                                              
+! END OF T12 .LE. TFREEZ IF-BLOCK                                              
 ! ----------------------------------------------------------------------         
          PRCP1 = PRCP1+ EX                                                       
 ! ----------------------------------------------------------------------         
@@ -3732,15 +3732,15 @@ CONTAINS
 ! UNLESS BETA<1.                                                                 
 ! ----------------------------------------------------------------------         
 !ek      ETA = BETA*ETP                                                          
-!      write(*,*) 'ETA,ETAX,ETAX/ETA=',ETA,ETAX,ETAX/ETA                         
+!      write(*,*) ETA,ETAX,ETAX/ETA=,ETA,ETAX,ETAX/ETA                         
 !      IF (ETAX/ETA .GE. 1.0) THEN                                               
-!        write(*,*) '*********************'                                      
-!        write(*,*) '*********************'                                      
-!        write(*,*) '*********************'                                      
-!        write(*,*) 'ETAX/ETA .GE. 1.0 !!!'                                      
-!        write(*,*) '*********************'                                      
-!        write(*,*) '*********************'                                      
-!        write(*,*) '*********************'                                      
+!        write(*,*) *********************                                      
+!        write(*,*) *********************                                      
+!        write(*,*) *********************                                      
+!        write(*,*) ETAX/ETA .GE. 1.0 !!!                                      
+!        write(*,*) *********************                                      
+!        write(*,*) *********************                                      
+!        write(*,*) *********************                                      
 !      ENDIF                                                                     
                                                                                  
 ! ----------------------------------------------------------------------         
@@ -3808,7 +3808,7 @@ CONTAINS
 ! SUBROUTINE SNOWPACK                                                            
 ! ----------------------------------------------------------------------         
 ! CALCULATE COMPACTION OF SNOWPACK UNDER CONDITIONS OF INCREASING SNOW           
-! DENSITY, AS OBTAINED FROM AN APPROXIMATE SOLUTION OF E. ANDERSON'S             
+! DENSITY, AS OBTAINED FROM AN APPROXIMATE SOLUTION OF E. ANDERSONS             
 ! DIFFERENTIAL EQUATION (3.29), NOAA TECHNICAL REPORT NWS 19, BY VICTOR          
 ! KOREN, 03/25/95.                                                               
 ! ----------------------------------------------------------------------         
@@ -3979,8 +3979,8 @@ CONTAINS
                                                                                  
 ! ----------------------------------------------------------------------         
 ! CALCULATING NEW SNOWFALL DENSITY DEPENDING ON TEMPERATURE                      
-! EQUATION FROM GOTTLIB L. 'A GENERAL RUNOFF MODEL FOR SNOWCOVERED               
-! AND GLACIERIZED BASIN', 6TH NORDIC HYDROLOGICAL CONFERENCE,                    
+! EQUATION FROM GOTTLIB L. A GENERAL RUNOFF MODEL FOR SNOWCOVERED               
+! AND GLACIERIZED BASIN, 6TH NORDIC HYDROLOGICAL CONFERENCE,                    
 ! VEMADOLEN, SWEDEN, 1980, 172-177PP.                                            
 !-----------------------------------------------------------------------         
       TEMPC = TEMP -273.15                                                       
@@ -4038,7 +4038,7 @@ CONTAINS
 ! ON FIELD DATA CV DEPENDS ON AREAL MEAN OF FROZEN DEPTH, AND IT CLOSE           
 ! TO CONSTANT = 0.6 IF AREAL MEAN FROZEN DEPTH IS ABOVE 20 CM.  THAT IS          
 ! WHY PARAMETER CVFRZ = 3 (INT{1/0.6*0.6}).                                      
-! CURRENT LOGIC DOESN'T ALLOW CVFRZ BE BIGGER THAN 3                             
+! CURRENT LOGIC DOESNT ALLOW CVFRZ BE BIGGER THAN 3                             
 ! ----------------------------------------------------------------------         
                                                                                  
 ! ----------------------------------------------------------------------         
@@ -4140,9 +4140,9 @@ CONTAINS
             PDDUM = INFMAX                                                       
          END IF                                                                  
 ! ----------------------------------------------------------------------         
-! TO AVOID SPURIOUS DRAINAGE BEHAVIOR, 'UPSTREAM DIFFERENCING' IN LINE           
+! TO AVOID SPURIOUS DRAINAGE BEHAVIOR, UPSTREAM DIFFERENCING IN LINE           
 ! BELOW REPLACED WITH NEW APPROACH IN 2ND LINE:                                  
-! 'MXSMC = MAX(SH2OA(1), SH2OA(2))'                                              
+! MXSMC = MAX(SH2OA(1), SH2OA(2))                                              
 ! ----------------------------------------------------------------------         
       END IF                                                                     
                                                                                  
@@ -4157,7 +4157,7 @@ CONTAINS
       BI (1) = WDF * DDZ / ( - ZSOIL (1) )                                       
                                                                                  
 ! ----------------------------------------------------------------------         
-! CALC RHSTT FOR THE TOP LAYER AFTER CALC'NG THE VERTICAL SOIL MOISTURE          
+! CALC RHSTT FOR THE TOP LAYER AFTER CALCNG THE VERTICAL SOIL MOISTURE          
 ! GRADIENT BTWN THE TOP AND NEXT TO TOP LAYERS.                                  
 ! ----------------------------------------------------------------------         
       CI (1) = - BI (1)                                                          
@@ -4178,9 +4178,9 @@ CONTAINS
          IF (K /= NSOIL) THEN                                                  
                                                                                  
 ! ----------------------------------------------------------------------         
-! AGAIN, TO AVOID SPURIOUS DRAINAGE BEHAVIOR, 'UPSTREAM DIFFERENCING' IN         
+! AGAIN, TO AVOID SPURIOUS DRAINAGE BEHAVIOR, UPSTREAM DIFFERENCING IN         
 ! LINE BELOW REPLACED WITH NEW APPROACH IN 2ND LINE:                             
-! 'MXSMC2 = MAX (SH2OA(K), SH2OA(K+1))'                                          
+! MXSMC2 = MAX (SH2OA(K), SH2OA(K+1))                                          
 ! ----------------------------------------------------------------------         
             SLOPX = 1.                                                           
                                                                                  
@@ -4188,12 +4188,12 @@ CONTAINS
             CALL WDFCND (WDF2,WCND2,MXSMC2,SMCMAX,BEXP,DKSAT,DWSAT,     &        
                           SICEMAX)                                               
 ! -----------------------------------------------------------------------        
-! CALC SOME PARTIAL PRODUCTS FOR LATER USE IN CALC'NG RHSTT                      
+! CALC SOME PARTIAL PRODUCTS FOR LATER USE IN CALCNG RHSTT                      
 ! ----------------------------------------------------------------------         
             DENOM = (ZSOIL (K -1) - ZSOIL (K +1))                                
                                                                                  
 ! ----------------------------------------------------------------------         
-! CALC THE MATRIX COEF, CI, AFTER CALC'NG ITS PARTIAL PRODUCT                    
+! CALC THE MATRIX COEF, CI, AFTER CALCNG ITS PARTIAL PRODUCT                    
 ! ----------------------------------------------------------------------         
             DSMDZ2 = (SH2O (K) - SH2O (K +1)) / (DENOM * 0.5)                    
             DDZ2 = 2.0 / DENOM                                                   
@@ -4213,7 +4213,7 @@ CONTAINS
                             SICEMAX)                                             
                                                                                  
 ! ----------------------------------------------------------------------         
-! CALC A PARTIAL PRODUCT FOR LATER USE IN CALC'NG RHSTT                          
+! CALC A PARTIAL PRODUCT FOR LATER USE IN CALCNG RHSTT                          
 ! ----------------------------------------------------------------------         
                                                                                  
 ! ----------------------------------------------------------------------         
@@ -4222,7 +4222,7 @@ CONTAINS
             DSMDZ2 = 0.0                                                         
             CI (K) = 0.0                                                         
 ! ----------------------------------------------------------------------         
-! CALC RHSTT FOR THIS LAYER AFTER CALC'NG ITS NUMERATOR                          
+! CALC RHSTT FOR THIS LAYER AFTER CALCNG ITS NUMERATOR                          
 ! ----------------------------------------------------------------------         
          END IF                                                                  
          NUMER = (WDF2 * DSMDZ2) + SLOPX * WCND2- (WDF * DSMDZ)         &        
@@ -4279,7 +4279,7 @@ CONTAINS
       REAL                      :: DDZ, RHSCT, STOT, WPLUS
 
 ! ----------------------------------------------------------------------         
-! CREATE 'AMOUNT' VALUES OF VARIABLES TO BE INPUT TO THE                         
+! CREATE AMOUNT VALUES OF VARIABLES TO BE INPUT TO THE                         
 ! TRI-DIAGONAL MATRIX ROUTINE.                                                   
 ! ----------------------------------------------------------------------         
       DO K = 1,NSOIL                                                             
@@ -4331,7 +4331,7 @@ CONTAINS
                                                                                  
 ! ----------------------------------------------------------------------         
 ! UPDATE CANOPY WATER CONTENT/INTERCEPTION (CMC).  CONVERT RHSCT TO              
-! AN 'AMOUNT' VALUE AND ADD TO PREVIOUS CMC VALUE TO GET NEW CMC.                
+! AN AMOUNT VALUE AND ADD TO PREVIOUS CMC VALUE TO GET NEW CMC.                
 ! ----------------------------------------------------------------------         
       RUNOFF3 = WPLUS                                                            
       CMC = CMC + DT * RHSCT                                                     
@@ -4443,8 +4443,8 @@ CONTAINS
       THKW = 0.57                                                                
 !      IF (QZ .LE. 0.2) THKO = 3.0                                               
       THKO = 2.0                                                                 
-! SOLIDS' CONDUCTIVITY                                                           
-! QUARTZ' CONDUCTIVITY                                                           
+! SOLIDS CONDUCTIVITY                                                           
+! QUARTZ CONDUCTIVITY                                                           
       THKQTZ = 7.7                                                               
                                                                                  
 ! UNFROZEN FRACTION (FROM 1., i.e., 100%LIQUID, TO 0. (100% FROZEN))             
@@ -4639,7 +4639,7 @@ CONTAINS
       DO K = 1,NSOIL                                                             
          ET (K) = 0.                                                             
 ! ----------------------------------------------------------------------         
-! CALCULATE AN 'ADJUSTED' POTENTIAL TRANSPIRATION                                
+! CALCULATE AN ADJUSTED POTENTIAL TRANSPIRATION                                
 ! IF STATEMENT BELOW TO AVOID TANGENT LINEAR PROBLEMS NEAR ZERO                  
 ! NOTE: GX AND OTHER TERMS BELOW REDISTRIBUTE TRANSPIRATION BY LAYER,            
 ! ET(K), AS A FUNCTION OF SOIL MOISTURE AVAILABILITY, WHILE PRESERVING           
@@ -4805,14 +4805,14 @@ CONTAINS
 ! ----------------------------------------------------------------------         
 ! NOTE: THE TWO CODE BLOCKS BELOW DEFINE FUNCTIONS                               
 ! ----------------------------------------------------------------------         
-! LECH'S SURFACE FUNCTIONS                                                       
+! LECHS SURFACE FUNCTIONS                                                       
 ! ----------------------------------------------------------------------         
       PSLMU (ZZ)= -0.96* log (1.0-4.5* ZZ)                                       
       PSLMS (ZZ)= ZZ * RRIC -2.076* (1. -1./ (ZZ +1.))                           
       PSLHU (ZZ)= -0.96* log (1.0-4.5* ZZ)                                       
                                                                                  
 ! ----------------------------------------------------------------------         
-! PAULSON'S SURFACE FUNCTIONS                                                    
+! PAULSONS SURFACE FUNCTIONS                                                    
 ! ----------------------------------------------------------------------         
       PSLHS (ZZ)= ZZ * RFAC -2.076* (1. -1./ (ZZ +1.))                           
       PSPMU (XX)= -2.* log ( (XX +1.)*0.5) - log ( (XX * XX +1.)*0.5)   &        
@@ -4862,19 +4862,19 @@ CONTAINS
 ! ----------------------------------------------------------------------         
       ZT = EXP (ZILFC * SQRT (USTAR * Z0))* Z0                                   
       ZSLU = ZLM + ZU                                                            
-!     PRINT*,'ZSLT=',ZSLT                                                        
-!     PRINT*,'ZLM=',ZLM                                                          
-!     PRINT*,'ZT=',ZT                                                            
+!     PRINT*,ZSLT=,ZSLT                                                        
+!     PRINT*,ZLM=,ZLM                                                          
+!     PRINT*,ZT=,ZT                                                            
                                                                                  
       ZSLT = ZLM + ZT                                                            
       RLOGU = log (ZSLU / ZU)                                                    
                                                                                  
       RLOGT = log (ZSLT / ZT)                                                    
-!     PRINT*,'RLMO=',RLMO                                                        
-!     PRINT*,'ELFC=',ELFC                                                        
-!     PRINT*,'AKHS=',AKHS                                                        
-!     PRINT*,'DTHV=',DTHV                                                        
-!     PRINT*,'USTAR=',USTAR                                                      
+!     PRINT*,RLMO=,RLMO                                                        
+!     PRINT*,ELFC=,ELFC                                                        
+!     PRINT*,AKHS=,AKHS                                                        
+!     PRINT*,DTHV=,DTHV                                                        
+!     PRINT*,USTAR=,USTAR                                                      
                                                                                  
       RLMO = ELFC * AKHS * DTHV / USTAR **3                                      
 ! ----------------------------------------------------------------------         
@@ -4899,11 +4899,11 @@ CONTAINS
                XU = SQRT (SQRT (XU4))                                            
                                                                                  
                XT = SQRT (SQRT (XT4))                                            
-!     PRINT*,'-----------1------------'                                          
-!     PRINT*,'PSMZ=',PSMZ                                                        
-!     PRINT*,'PSPMU(ZETAU)=',PSPMU(ZETAU)                                        
-!     PRINT*,'XU=',XU                                                            
-!     PRINT*,'------------------------'                                          
+!     PRINT*,-----------1------------                                          
+!     PRINT*,PSMZ=,PSMZ                                                        
+!     PRINT*,PSPMU(ZETAU)=,PSPMU(ZETAU)                                        
+!     PRINT*,XU=,XU                                                            
+!     PRINT*,------------------------                                          
                PSMZ = PSPMU (XU)                                                 
                SIMM = PSPMU (XLU) - PSMZ + RLOGU                                 
                PSHZ = PSPHU (XT)                                                 
@@ -4911,26 +4911,26 @@ CONTAINS
             ELSE                                                                 
                ZETALU = MIN (ZETALU,ZTMAX)                                       
                ZETALT = MIN (ZETALT,ZTMAX)                                       
-!     PRINT*,'-----------2------------'                                          
-!     PRINT*,'PSMZ=',PSMZ                                                        
-!     PRINT*,'PSPMS(ZETAU)=',PSPMS(ZETAU)                                        
-!     PRINT*,'ZETAU=',ZETAU                                                      
-!     PRINT*,'------------------------'                                          
+!     PRINT*,-----------2------------                                          
+!     PRINT*,PSMZ=,PSMZ                                                        
+!     PRINT*,PSPMS(ZETAU)=,PSPMS(ZETAU)                                        
+!     PRINT*,ZETAU=,ZETAU                                                      
+!     PRINT*,------------------------                                          
                PSMZ = PSPMS (ZETAU)                                              
                SIMM = PSPMS (ZETALU) - PSMZ + RLOGU                              
                PSHZ = PSPHS (ZETAT)                                              
                SIMH = PSPHS (ZETALT) - PSHZ + RLOGT                              
             END IF                                                               
 ! ----------------------------------------------------------------------         
-! LECH'S FUNCTIONS                                                               
+! LECHS FUNCTIONS                                                               
 ! ----------------------------------------------------------------------         
          ELSE                                                                    
             IF (RLMO .lt. 0.)THEN                                                
-!     PRINT*,'-----------3------------'                                          
-!     PRINT*,'PSMZ=',PSMZ                                                        
-!     PRINT*,'PSLMU(ZETAU)=',PSLMU(ZETAU)                                        
-!     PRINT*,'ZETAU=',ZETAU                                                      
-!     PRINT*,'------------------------'                                          
+!     PRINT*,-----------3------------                                          
+!     PRINT*,PSMZ=,PSMZ                                                        
+!     PRINT*,PSLMU(ZETAU)=,PSLMU(ZETAU)                                        
+!     PRINT*,ZETAU=,ZETAU                                                      
+!     PRINT*,------------------------                                          
                PSMZ = PSLMU (ZETAU)                                              
                SIMM = PSLMU (ZETALU) - PSMZ + RLOGU                              
                PSHZ = PSLHU (ZETAT)                                              
@@ -4939,11 +4939,11 @@ CONTAINS
                ZETALU = MIN (ZETALU,ZTMAX)                                       
                                                                                  
                ZETALT = MIN (ZETALT,ZTMAX)                                       
-!     PRINT*,'-----------4------------'                                          
-!     PRINT*,'PSMZ=',PSMZ                                                        
-!     PRINT*,'PSLMS(ZETAU)=',PSLMS(ZETAU)                                        
-!     PRINT*,'ZETAU=',ZETAU                                                      
-!     PRINT*,'------------------------'                                          
+!     PRINT*,-----------4------------                                          
+!     PRINT*,PSMZ=,PSMZ                                                        
+!     PRINT*,PSLMS(ZETAU)=,PSLMS(ZETAU)                                        
+!     PRINT*,ZETAU=,ZETAU                                                      
+!     PRINT*,------------------------                                          
                PSMZ = PSLMS (ZETAU)                                              
                SIMM = PSLMS (ZETALU) - PSMZ + RLOGU                              
                PSHZ = PSLHS (ZETAT)                                              
@@ -4982,18 +4982,18 @@ CONTAINS
          RLMA = RLMO * WOLD+ RLMN * WNEW                                         
 !-----------------------------------------------------------------------         
          RLMO = RLMA                                                             
-!     PRINT*,'----------------------------'                                      
-!     PRINT*,'SFCDIF OUTPUT !  ! ! ! ! ! ! ! !  !   !    !'                      
+!     PRINT*,----------------------------                                      
+!     PRINT*,SFCDIF OUTPUT !  ! ! ! ! ! ! ! !  !   !    !                      
                                                                                  
-!     PRINT*,'ZLM=',ZLM                                                          
-!     PRINT*,'Z0=',Z0                                                            
-!     PRINT*,'THZ0=',THZ0                                                        
-!     PRINT*,'THLM=',THLM                                                        
-!     PRINT*,'SFCSPD=',SFCSPD                                                    
-!     PRINT*,'CZIL=',CZIL                                                        
-!     PRINT*,'AKMS=',AKMS                                                        
-!     PRINT*,'AKHS=',AKHS                                                        
-!     PRINT*,'----------------------------'                                      
+!     PRINT*,ZLM=,ZLM                                                          
+!     PRINT*,Z0=,Z0                                                            
+!     PRINT*,THZ0=,THZ0                                                        
+!     PRINT*,THLM=,THLM                                                        
+!     PRINT*,SFCSPD=,SFCSPD                                                    
+!     PRINT*,CZIL=,CZIL                                                        
+!     PRINT*,AKMS=,AKMS                                                        
+!     PRINT*,AKHS=,AKHS                                                        
+!     PRINT*,----------------------------                                      
                                                                                  
       END DO                                                                     
 ! ----------------------------------------------------------------------         
