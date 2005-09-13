@@ -52,6 +52,9 @@ subroutine ext_ncd_RealFieldIO(IO,NCID,VarID,VStart,VCount,Data,Status)
     stat = NF_PUT_VARA_REAL(NCID,VarID,VStart,VCount,Data)
   else
     stat = NF_GET_VARA_REAL(NCID,VarID,VStart,VCount,Data)
+
+    write(unit=*, fmt='(3a,i6)') 'file: ',__FILE__,', line: ', __LINE__
+    write(unit=*, fmt='(a,f18.4)') 'Data(1)=', Data(1)
   endif
   call netcdf_err(stat,Status)
   if(Status /= WRF_NO_ERR) then
@@ -80,6 +83,9 @@ subroutine ext_ncd_DoubleFieldIO(IO,NCID,VarID,VStart,VCount,Data,Status)
     stat = NF_PUT_VARA_DOUBLE(NCID,VarID,VStart,VCount,Data)
   else
     stat = NF_GET_VARA_DOUBLE(NCID,VarID,VStart,VCount,Data)
+
+    write(unit=*, fmt='(3a,i6)') 'file: ',__FILE__,', line: ', __LINE__
+    write(unit=*, fmt='(a,f18.4)') 'Data=', Data
   endif
   call netcdf_err(stat,Status)
   if(Status /= WRF_NO_ERR) then

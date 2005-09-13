@@ -12,13 +12,13 @@ SUBROUTINE init_modules( phase )
  USE module_tiles
  USE module_io_wrf
  USE module_io
-#ifdef DM_PARALLEL
- USE module_wrf_quilt
- USE module_dm
-#endif
-#ifdef INTIO
+
+
+
+
+
  USE module_ext_internal
-#endif
+
 
 ! <DESCRIPTION>
 ! This routine USES the modules in WRF and then calls the init routines
@@ -58,13 +58,13 @@ IF ( phase == 1 ) THEN
  CALL init_module_domain
  CALL init_module_machine
 
-#ifdef INTIO
+
  CALL init_module_ext_internal  !! must be called before quilt
-#endif
-#ifdef DM_PARALLEL
- CALL init_module_wrf_quilt    !! this *must* be called before init_module_dm
- CALL init_module_dm
-#endif
+
+
+
+
+
 ELSE
  CALL init_module_nesting
  CALL init_module_timing
@@ -73,17 +73,7 @@ ELSE
  CALL init_module_io
 
 ! core specific initializations -- add new cores here
-#if (EM_CORE == 1)
-#  if ( DA_CORE != 1)
- CALL init_modules_em
-#  endif
-#endif
-#if (NMM_CORE == 1)
- CALL init_modules_nmm
-#endif
-#if (COAMPS_CORE == 1)
- CALL init_modules_coamps
-#endif
+
 ENDIF
  
 END SUBROUTINE init_modules

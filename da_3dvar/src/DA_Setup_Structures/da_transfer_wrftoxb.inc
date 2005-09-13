@@ -293,6 +293,11 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
        xb%snow(i,j) = snowc(i,j)
        xb%lanu(i,j) = lu_index(i,j)
        xb%landmask(i,j) = xland(i,j)
+
+       write(unit=*, fmt='(a,2i4,2(2x,a,f12.4))') &
+            'i,j=', i,j, &
+            'xb%lanu(i,j) =', xb%lanu(i,j), &
+            'lu_index(i,j)=', lu_index(i,j)
      enddo
 
 #if 0

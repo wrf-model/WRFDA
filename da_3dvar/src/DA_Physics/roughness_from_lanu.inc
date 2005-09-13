@@ -72,9 +72,16 @@ subroutine roughness_from_lanu(ltbl, mminlu, date_mm5, xp, lanu, rough)
 
 !  write(0,'(''dimensions of lanu: m1,m2,n1,n2='',4I4)') m1,m2,n1,n2
 
+   write(unit=*, fmt='(3a,i6)') 'file:', __FILE__, ', line:', __LINE__
+
    do lc = m1,m2
    do ls = n1,n2
       Li = int(lanu(lc,ls)+0.001)
+
+      write(unit=*, fmt='(a,3i8,2(2x,a,f12.4))') &
+           'lc,ls,li=', lc,ls,li, &
+           'lanu(lc,ls)=', lanu(lc,ls)
+
       rough(lc,ls) =  sfz0(Li,Isn)/100.
    enddo
    enddo
