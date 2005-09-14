@@ -1,4 +1,4 @@
-
+#define LSMRUC_DBG_LVL 3000
 !WRF:MODEL_LAYER:PHYSICS
 !
 MODULE module_sf_ruclsm
@@ -322,7 +322,7 @@ CONTAINS
 
       DO i=its,ite
 
-    IF ( wrf_at_debug_level(3000) ) THEN
+    IF ( wrf_at_debug_level(LSMRUC_DBG_LVL) ) THEN
       print *,' IN LSMRUC ','ims,ime,jms,jme,its,ite,jts,jte,nzs,zsmain,zshalf', &
                 ims,ime,jms,jme,its,ite,jts,jte,nzs,zsmain,zshalf
       print *,' IVGTYP, ISLTYP ', ivgtyp(i,j),isltyp(i,j)
@@ -372,7 +372,7 @@ CONTAINS
           enddo
 
 !-----
-    IF ( wrf_at_debug_level(3000) ) THEN
+    IF ( wrf_at_debug_level(LSMRUC_DBG_LVL) ) THEN
          print *,' ZS, ZSMAIN, ZSHALF, CONFLX --->', zs,zsmain,zshalf,conflx
     ENDIF
 
@@ -381,7 +381,7 @@ CONTAINS
 !-------------------------------------------------------------
         NZS1=NZS-1
 !-----
-    IF ( wrf_at_debug_level(3000) ) THEN
+    IF ( wrf_at_debug_level(LSMRUC_DBG_LVL) ) THEN
          print *,' DT,NZS1, ZSMAIN, ZSHALF --->', dt,nzs1,zsmain,zshalf
     ENDIF
 
@@ -447,13 +447,13 @@ CONTAINS
               TSO(I,K,J)= SOILT(I,J)
             ENDDO
 
-    IF ( wrf_at_debug_level(3000) ) THEN
+    IF ( wrf_at_debug_level(LSMRUC_DBG_LVL) ) THEN
               PRINT*,'  water point, I=',I,                      &
               'J=',J, 'SOILT=', SOILT(i,j)
     ENDIF
          IF(XICE(I,J).EQ.1.)THEN
 !-- Sea-ice case
-    IF ( wrf_at_debug_level(3000) ) THEN
+    IF ( wrf_at_debug_level(LSMRUC_DBG_LVL) ) THEN
               PRINT*,' sea-ice at water point, I=',I,            &
               'J=',J
     ENDIF
@@ -491,7 +491,7 @@ CONTAINS
 
               LMAVAIL(I,J)=min(dqm,soilmois(i,1,j))/DQM
 
-    IF ( wrf_at_debug_level(3000) ) THEN
+    IF ( wrf_at_debug_level(LSMRUC_DBG_LVL) ) THEN
    print *,'LAND, i,j,tso1d,soilm1d,PATM,TABS,QVATM,QCATM,RHO',  &
                   i,j,tso1d,soilm1d,PATM,TABS,QVATM,QCATM,RHO
    print *,'CONFLX =',CONFLX 
@@ -559,12 +559,12 @@ CONTAINS
         SNOW   (i,j) = SNWE*1000.
         CANWAT (I,J) = CANWATR*1000.
 
-    IF ( wrf_at_debug_level(3000) ) THEN
+    IF ( wrf_at_debug_level(LSMRUC_DBG_LVL) ) THEN
        print *,' LAND, I=,J=, QFX, HFX after SFCTMP', i,j,QFX(i,j),hfx(i,j)
     ENDIF
         LH       (I,J) = QFX(I,J)
         QFX      (I,J) = QFX(I,J)/LV
-    IF ( wrf_at_debug_level(3000) ) THEN
+    IF ( wrf_at_debug_level(LSMRUC_DBG_LVL) ) THEN
        print *,' QFX after change', i,j, QFX(i,j)
     ENDIF
 !--- SNOWC snow cover flag
@@ -577,7 +577,7 @@ CONTAINS
         INFILTR(I,J) = INFILTRP
 
 !--- get 3d soil fields
-    IF ( wrf_at_debug_level(3000) ) THEN
+    IF ( wrf_at_debug_level(LSMRUC_DBG_LVL) ) THEN
    print *,'LAND, i,j,tso1d,soilm1d - end of time step',         &
                   i,j,tso1d,soilm1d
     ENDIF
@@ -762,11 +762,11 @@ CONTAINS
 !-----------------------------------------------------------------
         integer,   parameter      ::      ilsnow=99 
         
-    IF ( wrf_at_debug_level(3000) ) THEN
+    IF ( wrf_at_debug_level(LSMRUC_DBG_LVL) ) THEN
         print *,' in SFCTMP',i,j,nzs,nddzs,nroot,                 &
                  SNWE,RHOSN,SNOM,SMELT,TS1D
     ENDIF
-!       print *, in SFCTMP,i,j,nzs,nddzs,nroot,                 &
+!       print *,' in SFCTMP',i,j,nzs,nddzs,nroot,                 &
 !                IVGTYP,ISOIL,ILAND,                              &
 !                PRCPMS,SNWE,RHOSN,                               &
 !                PATM,TABS,QVATM,QCATM,rho
@@ -785,7 +785,7 @@ CONTAINS
         INFILTR=0.
         VEGFRAC=0.01*VEGFRA
 
-    IF ( wrf_at_debug_level(3000) ) THEN
+    IF ( wrf_at_debug_level(LSMRUC_DBG_LVL) ) THEN
         print *,'I,J,KTAU,QKMS,TKMS', i,j,ktau,qkms,tkms
         print *,'GSW, GLW, SOILT, STBOLT, EMISS',           &
                  GSW, GLW, SOILT, STBOLT, EMISS
@@ -824,7 +824,7 @@ CONTAINS
 !*** Calculate fresh snow density (t > -15C, else MIN value)
 !*** Eq. 10 from Koren et al. (1999)
 
-    IF ( wrf_at_debug_level(3000) ) THEN
+    IF ( wrf_at_debug_level(LSMRUC_DBG_LVL) ) THEN
       print *, 'THERE IS NEW SNOW, newsn', newsn
     ENDIF
         if(tabs.lt.258.15) then
@@ -863,7 +863,7 @@ CONTAINS
 
 ! PRCPMS is liquid precipitation rate
 ! RAINF is a flag used for calculation of rain water
-! heat content contribution into heat budget equation. Rains temperature
+! heat content contribution into heat budget equation. Rain's temperature
 ! is set equal to air temperature at the first atmospheric
 ! level.  
 
@@ -988,7 +988,7 @@ CONTAINS
   20   R1=T(I)
        R2=R-I
        QSN=(T(I+1)-R1)*R2 + R1
-!       print *, in QSN, I,R,R1,R2,T(I+1),TN, QSN, I,R,r1,r2,t(i+1),tn,QSN
+!       print *,' in QSN, I,R,R1,R2,T(I+1),TN, QSN', I,R,r1,r2,t(i+1),tn,QSN
 !       RETURN
 !       END
 !-----------------------------------------------------------------------
@@ -1347,7 +1347,7 @@ CONTAINS
           WETCAN=(CST/SAT)**CN
           DRYCAN=1.-WETCAN
 
-!       print *,CST,DRIP,cst,drip
+!       print *,'CST,DRIP',cst,drip
 
 !**************************************************************
 !  TRANSF computes transpiration function
@@ -1879,7 +1879,7 @@ CONTAINS
           enddo
 
 
-!         print *,etaf,etal,etamf,etaml,lwsat,fwsat,
+!         print *,'etaf,etal,etamf,etaml,lwsat,fwsat',
 !     1      soilice,soiliqw,soilicem,soiliqwm,lwsat,fwsat
 
 !******************************************************************
@@ -1990,7 +1990,7 @@ CONTAINS
 ! SOILTEMP soilves heat budget and diffusion eqn. in soil
 !**************************************************************
 
-    IF ( wrf_at_debug_level(3000) ) THEN
+    IF ( wrf_at_debug_level(LSMRUC_DBG_LVL) ) THEN
 print *, 'TSO before calling SNOWTEMP: ', tso
     ENDIF
         CALL SNOWTEMP(                                        &
@@ -2385,7 +2385,7 @@ print *, 'TSO before calling SNOWTEMP: ', tso
         AA1=AA+CC
         PP=PATM*1.E3
         AA1=AA1/PP
-    IF ( wrf_at_debug_level(3000) ) THEN
+    IF ( wrf_at_debug_level(LSMRUC_DBG_LVL) ) THEN
         PRINT *,' VILKA-1'
         print *,'D10,TABS,R21,TN,QVATM,FKQ,UMVEG,VEGFRAC,CAN',        &
                  D10,TABS,R21,TN,QVATM,FKQ,UMVEG,VEGFRAC,CAN
@@ -2409,7 +2409,7 @@ print *, 'TSO before calling SNOWTEMP: ', tso
         GOTO 200
   100   BB=BB-AA*TX2
         AA=(AA*H+CC)/PP
-    IF ( wrf_at_debug_level(3000) ) THEN
+    IF ( wrf_at_debug_level(LSMRUC_DBG_LVL) ) THEN
 !      if(i.eq.1.and.j.eq.57) then
         PRINT *,' VILKA-2'
         print *,'D10,TABS,R21,TN,QVATM,FKQ,UMVEG,VEGFRAC,CAN',        &
@@ -2641,7 +2641,7 @@ print *, 'TSO before calling SNOWTEMP: ', tso
           rhtso    (k)=0.
        enddo
 
-    IF ( wrf_at_debug_level(3000) ) THEN
+    IF ( wrf_at_debug_level(LSMRUC_DBG_LVL) ) THEN
 print *, 'SNOWTEMP: SNHEI,SNTH,SOILT1: ',SNHEI,SNTH,SOILT1,soilt 
     ENDIF
         XLMELT=3.335E+5
@@ -2820,7 +2820,7 @@ print *, 'SNOWTEMP: SNHEI,SNTH,SOILT1: ',SNHEI,SNTH,SOILT1,soilt
         R22SN = R22
         D1SN = D1
         D2SN = D2
-    IF ( wrf_at_debug_level(3000) ) THEN
+    IF ( wrf_at_debug_level(LSMRUC_DBG_LVL) ) THEN
         print *,' SNHEI = 0, D9SN,R22SN,D1SN,D2SN: ',D9SN,R22SN,D1SN,D2SN
     ENDIF
       ENDIF
@@ -2845,7 +2845,7 @@ print *, 'SNOWTEMP: SNHEI,SNTH,SOILT1: ',SNHEI,SNTH,SOILT1,soilt
         AA1=AA+CC
         PP=PATM*1.E3
         AA1=AA1/PP
-    IF ( wrf_at_debug_level(3000) ) THEN
+    IF ( wrf_at_debug_level(LSMRUC_DBG_LVL) ) THEN
         print *,'VILKA-SNOW'
         print *,'tn,aa1,bb,pp,umveg,fkq,r210,vegfrac',               &
                  tn,aa1,bb,pp,umveg,fkq,r210,vegfrac
@@ -2863,7 +2863,7 @@ print *, 'SNOWTEMP: SNHEI,SNTH,SOILT1: ',SNHEI,SNTH,SOILT1,soilt
 !--- SOILT - skin temperature
         SOILT=TS1
 
-    IF ( wrf_at_debug_level(3000) ) THEN
+    IF ( wrf_at_debug_level(LSMRUC_DBG_LVL) ) THEN
         print *,' AFTER VILKA-SNOW'
         print *,' TS1,QS1: ', ts1,qs1
     ENDIF
@@ -3056,7 +3056,7 @@ print *, 'SNOWTEMP: SNHEI,SNTH,SOILT1: ',SNHEI,SNTH,SOILT1,soilt
                     +VEGFRAC*cst
         snheiprint=snweprint*1.E3 / RHOSN
 
-    IF ( wrf_at_debug_level(3000) ) THEN
+    IF ( wrf_at_debug_level(LSMRUC_DBG_LVL) ) THEN
 print *, 'snweprint : ',snweprint
 print *, 'D9SN,SOILT,TSOB : ', D9SN,SOILT,TSOB
     ENDIF
@@ -3228,10 +3228,10 @@ print *, 'D9SN,SOILT,TSOB : ', D9SN,SOILT,TSOB
 !--         water dripping from the canopy and dew 
 !-- With snow - only one source of water - snow melt
 
-!        print *,PRCP,DRIP,DEW,umveg,ras,smelt,
+!        print *,'PRCP,DRIP,DEW,umveg,ras,smelt',
 !     1       PRCP,DRIP,DEW,umveg,ras,smelt
 !        if (drip.ne.0.) then
-!          print *,DRIP non-zero
+!          print *,'DRIP non-zero'
 !          write(6,191) drip
 !          write (6,191)soilmois(1)
 !         write (6,191)soilmois(2)
@@ -3252,7 +3252,7 @@ print *, 'D9SN,SOILT,TSOB : ', D9SN,SOILT,TSOB
 !   CLOSE TO CONSTANT = 0.6 IF AREAL MEAN FROZEN DEPTH IS ABOVE 20 CM.
 !   THAT IS WHY PARAMETER CVFRZ = 3 (INT{1/0.6*0.6})
 !
-!   Current logic doesnt allow CVFRZ be bigger than 3
+!   Current logic doesn't allow CVFRZ be bigger than 3
          CVFRZ = 3.
 
 !-- SCHAAKE/KOREN EXPRESSION for calculation of max infiltration
@@ -3275,7 +3275,7 @@ print *, 'D9SN,SOILT,TSOB : ', D9SN,SOILT,TSOB
          INFMAX1 = (PX*(DDT/(PX+DDT)))/DELT
          INFMAX1 = MIN(INFMAX1, KSAT)
         endif
-!         print *,INFMAX1=,ksat,infmax1,ksat,f1,f2,kdt,val,ddt,px
+!         print *,'INFMAX1=,ksat',infmax1,ksat,f1,f2,kdt,val,ddt,px
 ! -----------     FROZEN GROUND VERSION    --------------------------
 !    REDUCTION OF INFILTRATION BASED ON FROZEN GROUND PARAMETERS
 !
@@ -3300,7 +3300,7 @@ print *, 'D9SN,SOILT,TSOB : ', D9SN,SOILT,TSOB
            END DO
            FCR = 1. - EXP(-ACRT) * SUM
          END IF
-!          print *,FCR--------,fcr
+!          print *,'FCR--------',fcr
          INFMAX1 = INFMAX1* FCR
          INFMAX1 = MIN(INFMAX1, KSAT)
 ! -------------------------------------------------------------------
@@ -3313,7 +3313,7 @@ print *, 'D9SN,SOILT,TSOB : ', D9SN,SOILT,TSOB
           ENDIF
 ! INFILTRP is total infiltration flux in M/S
           INFILTRP=FLX
-!           print *,PRCIP,infiltrp,flx,infmax
+!           print *,'PRCIP',infiltrp,flx,infmax
 ! Solution of moisture budget
           R7=.5*DZS/DELT
           R4=R4+R7
@@ -3731,9 +3731,9 @@ print *, 'D9SN,SOILT,TSOB : ', D9SN,SOILT,TSOB
        QS=(TT(I)+(TT(I)-TT(I+1))*RN)/PP
        GOTO 20
    1   PRINT *,'     AVOST IN VILKA      '
-!       WRITE(12,*)AVOST,TN,D1,D2,PP,NSTEP
+!       WRITE(12,*)'AVOST',TN,D1,D2,PP,NSTEP
        PRINT *,TN,D1,D2,PP,NSTEP,I,TT(i),ii,j,iland,isoil
-       CALL wrf_error_fatal3 ( "module_sf_ruclsm.b" , 3736 , '     AVOST IN VILKA      ' )
+       CALL wrf_error_fatal ('     AVOST IN VILKA      ' )
    20  CONTINUE
 !       RETURN
 !       END

@@ -23,7 +23,7 @@ MODULE module_bc
 !
 !   END TYPE bcs
 
-!  set the bdyzone.  We are hardwiring this here and well
+!  set the bdyzone.  We are hardwiring this here and we'll
 !  decide later where it should be set and stored
 
    INTEGER, PARAMETER            :: bdyzone = 3
@@ -141,7 +141,7 @@ CONTAINS
      write( wrf_err_message ,*) ' nested       ',config_flags%nested
      CALL wrf_message ( wrf_err_message )
      write( wrf_err_message ,*) ' specified    ',config_flags%specified
-     CALL wrf_error_fatal3 ( "module_bc.b" , 144 ,  ' *** Error in boundary condition specification ' )
+     CALL wrf_error_fatal( ' *** Error in boundary condition specification ' )
 
    ENDIF
 
@@ -168,7 +168,7 @@ CONTAINS
          WRITE ( wrf_err_message , * ) ' boundary zone specified      ',bzone
          CALL wrf_message ( wrf_err_message )
          WRITE ( wrf_err_message , * ) ' minimum boundary zone needed ',bzone_min
-         CALL wrf_error_fatal3 ( "module_bc.b" , 171 ,  wrf_err_message )
+         CALL wrf_error_fatal ( wrf_err_message )
 
        ENDIF
    ENDIF

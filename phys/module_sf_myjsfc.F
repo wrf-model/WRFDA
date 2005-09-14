@@ -275,7 +275,7 @@ CONTAINS
 !
 !***  FILL 1-D VERTICAL ARRAYS
 !***  AND FLIP DIRECTION SINCE MYJ SCHEME
-!***  COUNTS DOWNWARD FROM THE DOMAINS TOP
+!***  COUNTS DOWNWARD FROM THE DOMAIN'S TOP
 !
           DO K=KTE,KTS,-1
             KFLIP=KTE+1-K
@@ -1041,6 +1041,41 @@ CONTAINS
       ENDDO
       ENDDO
 !----------------------------------------------------------------------
+#if (NMM_CORE == 1)
+!
+      IF(.NOT.RESTART)THEN
+!       CALL WRF_GET_DM_COMMUNICATOR(MPI_COMM_COMP)
+!       MAXLOC_IVGTYP=MAXVAL(IVGTYP)
+!       CALL MPI_ALLREDUCE(MAXLOC_IVGTYP,MAXGBL_IVGTYP,1,MPI_INTEGER   &
+!    &,                    MPI_MAX,MPI_COMM_COMP,IRECV)
+        MAXGBL_IVGTYP=MAXVAL(IVGTYP)
+        CALL WRF_DM_MAXVAL(MAXGBL_IVGTYP,IDUM,JDUM)
+!
+        IF (MAXGBL_IVGTYP<13) THEN
+          DO J=JTS,JTE
+          DO I=ITS,ITE
+            SM=SEAMASK(I,J)-1.
+            IF(SM+XICE(I,J)<0.5)THEN
+              Z0(I,J)=Z0(I,J)+VZ0TBL(IVGTYP(I,J))
+            ENDIF
+          ENDDO
+          ENDDO
+!
+        ELSE
+!
+          DO J=JTS,JTE
+          DO I=ITS,ITE
+            SM=SEAMASK(I,J)-1.
+            IF(SM+XICE(I,J)<0.5)THEN
+              Z0(I,J)=Z0(I,J)+VZ0TBL_24(IVGTYP(I,J))
+            ENDIF
+          ENDDO
+          ENDDO
+!
+        ENDIF ! Vegtype check
+!
+      ENDIF ! Restart check
+#endif
 !----------------------------------------------------------------------
       IF(.NOT.RESTART)THEN
         DO J=JTS,JTE

@@ -1443,6 +1443,15 @@ SUBROUTINE init_zero_tendency(ru_tendf, rv_tendf, rw_tendf, ph_tendf,  &
                        its, ite, jts, jte, kts, kte  )
    ENDDO
 
+#if xyh0
+!   DO ic=PARAM_FIRST_SCALAR,n_chem
+   DO ic=1,n_chem                       ! make sure first one is zero too
+      CALL zero_tend ( chem_tendf(ims,kms,jms,ic),   &
+                       ids, ide, jds, jde, kds, kde, &
+                       ims, ime, jms, jme, kms, kme, &
+                       its, ite, jts, jte, kts, kte  )
+   ENDDO
+#endif
 
 END SUBROUTINE init_zero_tendency
 

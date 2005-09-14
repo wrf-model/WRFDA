@@ -12,6 +12,15 @@ MODULE module_get_file_names
 CONTAINS
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#ifdef crayx1
+   SUBROUTINE system(cmd)
+      IMPLICIT NONE
+      CHARACTER (LEN=*) , INTENT(IN) :: cmd
+      integer :: ierr
+      call pxfsystem(cmd, len(cmd), ierr)
+   RETURN
+   END SUBROUTINE system
+#endif
 
    SUBROUTINE unix_ls ( root , id )
       USE module_dm
@@ -44,22 +53,22 @@ CONTAINS
          !  number of the those file (i.e. how many there are) in ".foo1".  Also, if we
          !  do get inside one of these CPP ifdefs, then we set our access flag to true.
 
-
+#ifdef NONSTANDARD_SYSTEM 
          CALL SYSTEM ( TRIM ( command ) ) 
          CALL SYSTEM ( '( cat .foo | wc -l > .foo1 )' )
          unix_access_ok = .TRUE.
-
-
-
-
-
-
+#endif
+#ifdef NONSTANDARD_EXEC
+         CALL SYSTEM ( TRIM ( command ) ) 
+         CALL SYSTEM ( '( cat .foo | wc -l > .foo1 )' )
+         unix_access_ok = .TRUE.
+#endif
 
          !  Test to be sure that we did indeed hit one of the ifdefs.
 
          IF ( .NOT. unix_access_ok ) THEN
             PRINT *,'Oops, how can I access UNIX commands from Fortran?'
-            CALL wrf_error_fatal3 ( "module_get_file_names.b" , 71 ,  'system_or_exec_only' )
+            CALL wrf_error_fatal ( 'system_or_exec_only' )
          END IF
 
          !  Read the number of files.
@@ -77,7 +86,7 @@ CONTAINS
 
          IF ( number_of_eligible_files .LE. 0 ) THEN
             PRINT *,'Oops, we need at least ONE input file (wrfout*) for the ndown program to read.'
-            CALL wrf_error_fatal3 ( "module_get_file_names.b" , 89 ,  'need_wrfout_input_data' )
+            CALL wrf_error_fatal ( 'need_wrfout_input_data' )
          END IF
 
       ENDIF monitor_only_code
@@ -96,7 +105,7 @@ CONTAINS
       IF ( ierr .NE. 0 ) THEN
 print *,'tried to allocate ',number_of_eligible_files,' eligible files, (look at ./foo)'
          WRITE(message,*)'module_get_file_names: unix_ls: unable to allocate filename array Status = ',ierr
-         CALL wrf_error_fatal3 ( "module_get_file_names.b" , 108 ,  message )
+         CALL wrf_error_fatal( message )
       END IF
 
       !  Initialize all of the file names to blank.
@@ -125,14 +134,14 @@ print *,TRIM(eligible_file_name(loop))
 
          !   We clean up our own messes.
 
-
+#ifdef NONSTANDARD_SYSTEM 
          CALL SYSTEM ( '/bin/rm -f .foo'  )
          CALL SYSTEM ( '/bin/rm -f .foo1' )
-
-
-
-
-
+#endif
+#ifdef NONSTANDARD_EXEC
+         CALL SYSTEM ( '/bin/rm -f .foo'  )
+         CALL SYSTEM ( '/bin/rm -f .foo1' )
+#endif
 
       ENDIF monitor_only_code2
 
@@ -179,5 +188,5 @@ END MODULE module_get_file_names
 !program foo
 !USE module_get_file_names
 !call init_module_get_file_names
-!call unix_ls ( wrf_real , 1 )
+!call unix_ls ( 'wrf_real' , 1 )
 !end program foo

@@ -761,13 +761,13 @@ USE module_io_domain
          END DO
       END IF
 
-      !  OK, lets do a quick sanity check.
+      !  OK, let's do a quick sanity check.
  
       IF ( ( num_st_levels_input .GT. num_st_levels_alloc ) .OR. &
            ( num_sm_levels_input .GT. num_sm_levels_alloc ) .OR. &
            ( num_sw_levels_input .GT. num_sw_levels_alloc ) ) THEN
          print *,'pain and woe, the soil level allocation is too small'
-         CALL wrf_error_fatal3 ( "module_optional_si_input.b" , 770 ,  'soil_levels_too_few' )
+         CALL wrf_error_fatal ( 'soil_levels_too_few' )
       END IF
 
    END SUBROUTINE optional_lsm_levels

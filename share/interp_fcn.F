@@ -1,7 +1,7 @@
 !WRF:MEDIATION_LAYER:INTERPOLATIONFUNCTION
 !
 
-
+#define MM5_SINT
 !#define DUMBCOPY
 
    SUBROUTINE interp_fcn ( cfld,                                 &  ! CD field
@@ -42,25 +42,25 @@
 !logical first
 
      INTEGER ci, cj, ck, ni, nj, nk, ip, jp, ioff, joff, nioff, njoff
-
+#ifdef MM5_SINT
      INTEGER nfx, ior
      PARAMETER (ior=2)
      INTEGER nf
      REAL psca(cims:cime,cjms:cjme,nri*nrj)
      LOGICAL icmask( cims:cime, cjms:cjme )
      INTEGER i,j,k
-
+#endif
 
      ! Iterate over the ND tile and compute the values
      ! from the CD tile. 
 
-!write(0,("cids:cide, ckds:ckde, cjds:cjde ",6i4))cids,cide, ckds,ckde, cjds,cjde
-!write(0,("cims:cime, ckms:ckme, cjms:cjme ",6i4))cims,cime, ckms,ckme, cjms,cjme
-!write(0,("cits:cite, ckts:ckte, cjts:cjte ",6i4))cits,cite, ckts,ckte, cjts,cjte
-!write(0,("nims:nime, nkms:nkme, njms:njme ",6i4))nims,nime, nkms,nkme, njms,njme
-!write(0,("nits:nite, nkts:nkte, njts:njte ",6i4))nits,nite, nkts,nkte, njts,njte
+!write(0,'("cids:cide, ckds:ckde, cjds:cjde ",6i4)')cids,cide, ckds,ckde, cjds,cjde
+!write(0,'("cims:cime, ckms:ckme, cjms:cjme ",6i4)')cims,cime, ckms,ckme, cjms,cjme
+!write(0,'("cits:cite, ckts:ckte, cjts:cjte ",6i4)')cits,cite, ckts,ckte, cjts,cjte
+!write(0,'("nims:nime, nkms:nkme, njms:njme ",6i4)')nims,nime, nkms,nkme, njms,njme
+!write(0,'("nits:nite, nkts:nkte, njts:njte ",6i4)')nits,nite, nkts,nkte, njts,njte
 
-
+#ifdef MM5_SINT
 
      ioff  = 0 ; joff  = 0
      nioff = 0 ; njoff = 0
@@ -74,10 +74,10 @@
      ENDIF
 
      nfx = nri * nrj
-
+#ifndef crayx1
    !$OMP PARALLEL DO   &
    !$OMP PRIVATE ( i,j,k,ni,nj,ci,cj,ip,jp,nk,ck,nf,icmask,psca )
-
+#endif
      DO k = ckts, ckte
         icmask = .FALSE.
         DO nf = 1,nfx
@@ -106,7 +106,7 @@
                    cims, cime, cjms, cjme, icmask,   &
                    cits-1, cite+1, cjts-1, cjte+1, nrj*nri, xstag, ystag )
 
-!call end_timing(  sint  )
+!call end_timing( ' sint ' )
 
         DO nj = njts, njte+joff
            cj = jpos + (nj-1) / nrj ! j coord of CD point 
@@ -122,11 +122,34 @@
            ENDDO
         ENDDO
      ENDDO
-
+#ifndef crayx1
    !$OMP END PARALLEL DO
+#endif
+#endif
 
+#ifdef DUMBCOPY
+!write(0,'(") cims:cime, ckms:ckme, cjms:cjme ",6i4)')cims,cime, ckms,ckme, cjms,cjme
+!write(0,'(") nims:nime, nkms:nkme, njms:njme ",6i4)')nims,nime, nkms,nkme, njms,njme
+!write(0,'(") cits:cite, ckts:ckte, cjts:cjte ",6i4)')cits,cite, ckts,ckte, cjts,cjte
+!write(0,'(") nits:nite, nkts:nkte, njts:njte ",6i4)')nits,nite, nkts,nkte, njts,njte
 
-
+     DO nj = njts, njte
+        cj = jpos + (nj-1) / nrj     ! j coord of CD point 
+        jp = mod ( nj , nrj )  ! coord of ND w/i CD point
+        DO nk = nkts, nkte
+           ck = nk
+           DO ni = nits, nite
+              ci = ipos + (ni-1) / nri      ! j coord of CD point 
+              ip = mod ( ni , nri )  ! coord of ND w/i CD point
+              ! This is a trivial implementation of the interp_fcn; just copies
+              ! the values from the CD into the ND
+              if ( imask ( ni, nj ) .eq. 1 ) then
+                nfld( ni, nk, nj ) = cfld( ci , ck , cj )
+              endif
+           ENDDO
+        ENDDO
+     ENDDO
+#endif
 
      RETURN
 
@@ -730,7 +753,7 @@
 
      REAL*8 rdt
      INTEGER ci, cj, ck, ni, nj, nk, ni1, nj1, nk1, ip, jp, ioff, joff
-
+#ifdef MM5_SINT
      INTEGER nfx, ior
      PARAMETER (ior=2)
      INTEGER nf
@@ -738,7 +761,7 @@
      REAL psca(cims:cime,cjms:cjme,nri*nrj)
      LOGICAL icmask( cims:cime, cjms:cjme )
      INTEGER i,j,k
-
+#endif
      INTEGER shw
      INTEGER spec_zone 
      INTEGER relax_zone
@@ -761,17 +784,17 @@
      ! Iterate over the ND tile and compute the values
      ! from the CD tile. 
 
-
+#ifdef MM5_SINT
      CALL nl_get_spec_zone( 1, spec_zone )
      CALL nl_get_relax_zone( 1, relax_zone )
      sz = MIN(MAX( spec_zone, relax_zone ),spec_bdy_width)
 
      nfx = nri * nrj
 
-
+#ifndef crayx1
    !$OMP PARALLEL DO   &
    !$OMP PRIVATE ( i,j,k,ni,nj,ni1,nj1,ci,cj,ip,jp,nk,ck,nf,icmask,psca,psca1 )
-
+#endif
      DO k = ckts, ckte
 
         DO nf = 1,nfx
@@ -884,11 +907,32 @@
            ENDDO
         ENDDO
      ENDDO
-
+#ifndef crayx1
    !$OMP END PARALLEL DO
+#endif
+#endif
 
+#ifdef DUMBCOPY
+!write(0,'("cims:cime, ckms:ckme, cjms:cjme ",6i4)')cims,cime, ckms,ckme, cjms,cjme
+!write(0,'("nims:nime, nkms:nkme, njms:njme ",6i4)')nims,nime, nkms,nkme, njms,njme
+!write(0,'("cits:cite, ckts:ckte, cjts:cjte ",6i4)')cits,cite, ckts,ckte, cjts,cjte
+!write(0,'("nits:nite, nkts:nkte, njts:njte ",6i4)')nits,nite, nkts,nkte, njts,njte
 
-
+     DO nj = njts, njte
+        cj = jpos + (nj-1) / nrj     ! j coord of CD point 
+        jp = mod ( nj , nrj )  ! coord of ND w/i CD point
+        DO nk = nkts, nkte
+           ck = nk
+           DO ni = nits, nite
+              ci = ipos + (ni-1) / nri      ! j coord of CD point 
+              ip = mod ( ni , nri )  ! coord of ND w/i CD point
+              ! This is a trivial implementation of the interp_fcn; just copies
+              ! the values from the CD into the ND
+              nfld( ni, nk, nj ) = cfld( ci , ck , cj )
+           ENDDO
+        ENDDO
+     ENDDO
+#endif
 
      RETURN
 
@@ -935,8 +979,8 @@
      ! Iterate over the ND tile and compute the values
      ! from the CD tile. 
 
-!write(0,("cits:cite, ckts:ckte, cjts:cjte ",6i4))cits,cite, ckts,ckte, cjts,cjte
-!write(0,("nits:nite, nkts:nkte, njts:njte ",6i4))nits,nite, nkts,nkte, njts,njte
+!write(0,'("cits:cite, ckts:ckte, cjts:cjte ",6i4)')cits,cite, ckts,ckte, cjts,cjte
+!write(0,'("nits:nite, nkts:nkte, njts:njte ",6i4)')nits,nite, nkts,nkte, njts,njte
 
      DO nj = njts, njte
         cj = jpos + (nj-1) / nrj     ! j coord of CD point 
@@ -996,8 +1040,8 @@
      ! Iterate over the ND tile and compute the values
      ! from the CD tile. 
 
-!write(0,("mask cits:cite, ckts:ckte, cjts:cjte ",6i4))cits,cite, ckts,ckte, cjts,cjte
-!write(0,("mask nits:nite, nkts:nkte, njts:njte ",6i4))nits,nite, nkts,nkte, njts,njte
+!write(0,'("mask cits:cite, ckts:ckte, cjts:cjte ",6i4)')cits,cite, ckts,ckte, cjts,cjte
+!write(0,'("mask nits:nite, nkts:nkte, njts:njte ",6i4)')nits,nite, nkts,nkte, njts,njte
 
      DO nj = njts, njte
         cj = jpos + (nj-1) / nrj     ! j coord of CD point 
@@ -1207,7 +1251,7 @@
                        IF ( icount .GT. 0 ) THEN
                           nfld(ni,nk,nj) = sum / REAL ( icount ) 
                        ELSE
-!                         CALL wrf_error_fatal3 ( "interp_fcn.b" , 1254 ,  "horizontal interp error - island" )
+!                         CALL wrf_error_fatal ( "horizontal interp error - island" )
                           write(message,*) 'horizontal interp error - island, using average ', avg
                           CALL wrf_message ( message )
                           nfld(ni,nk,nj) = avg
@@ -1218,7 +1262,7 @@
            END DO
          ENDIF
       ELSE
-         CALL wrf_error_fatal3 ( "interp_fcn.b" , 1265 ,  "only unstaggered fields right now" )
+         CALL wrf_error_fatal ( "only unstaggered fields right now" )
       END IF
 
    END SUBROUTINE interp_mask_land_field
@@ -1410,7 +1454,7 @@
                      IF ( icount .GT. 0 ) THEN
                         nfld(ni,nk,nj) = sum / REAL ( icount ) 
                      ELSE
-!                       CALL wrf_error_fatal3 ( "interp_fcn.b" , 1457 ,  "horizontal interp error - lake" )
+!                       CALL wrf_error_fatal ( "horizontal interp error - lake" )
                         print *,'horizontal interp error - lake, using average ',avg
                         nfld(ni,nk,nj) = avg
                      END IF        
@@ -1419,7 +1463,7 @@
             END DO
          END DO
       ELSE
-         CALL wrf_error_fatal3 ( "interp_fcn.b" , 1466 ,  "only unstaggered fields right now" )
+         CALL wrf_error_fatal ( "only unstaggered fields right now" )
       END IF
 
    END SUBROUTINE interp_mask_water_field

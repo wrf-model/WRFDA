@@ -68,7 +68,7 @@ CONTAINS
 !-- EP2         constant for specific humidity calculation
 !               (R_d/R_v) (dimensionless)
 !-- KARMAN      Von Karman constant
-!-- EOMEG       angular velocity of earths rotation (rad/s)
+!-- EOMEG       angular velocity of earth's rotation (rad/s)
 !-- STBOLT      Stefan-Boltzmann constant (W/m^2/K^4)
 !-- STEM        soil temperature in 5-layer model
 !-- ZS          depths of centers of soil layers
@@ -519,8 +519,8 @@ CONTAINS
    70     CONTINUE                                                      
 
 !                                                                       
-!        print*,BF SFLX,ISLTPK,ISLTPK,IVGTPK=,IVGTPK,SMOIS1D,&
-!              SMOIS1D,STEMP1,STEMP1D,VGFRCK,VGFRCK
+!        print*,'BF SFLX','ISLTPK',ISLTPK,'IVGTPK=',IVGTPK,'SMOIS1D',&
+!              SMOIS1D,'STEMP1',STEMP1D,'VGFRCK',VGFRCK
 !-----------------------------------------------------------------------
 ! old WRF call to SFLX
 !         CALL SFLX(ICE,SATFLG,DT,Z,NSOIL,NROOT,DZS,FK,SOLDN,SFCPRS,    &
@@ -530,7 +530,7 @@ CONTAINS
 !-----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 ! Ek 12 June 2002 - NEW CALL SFLX
-! ops Eta call to SFLX ...tailor this to WRF
+! ops Eta call to SFLX ...'tailor' this to WRF
 !        CALL SFLX
 !     I    (ICE,DTK,Z,NSOIL,SLDPTH,
 !     I    LWDN,SOLDN,SFCPRS,PRCP,SFCTMP,SFCTH2,Q2K,SFCSPD,Q2SAT,DQSDTK,
@@ -613,6 +613,53 @@ CONTAINS
            TSLB(I,NS,J)=STEMP1D(NS)                                        !  STEMP
    80     CONTINUE                                                      
         ENDIF                                                           
+#if 0
+        NOOUT=0                                                         
+
+        IF((ITIMESTEP.EQ.1.OR.MOD(ITIMESTEP,1).EQ.0)  &
+            .AND. I .EQ.29.AND.J.EQ.23) THEN                                             
+!         print*, 'GLW',GLW(I,J),'GSW',GSW(I,J)
+          print*, 'T2K',T2K,'T1K',T1K,'HFX',HFX(I,J),'RHO',RHO(I),'CPM',CPM(I), &
+                'CHS2',CHS2(I),'soil T',STEMP1D,'soil m', SMOIS1D
+!          print*,'Q2M',Q2M,'Q1K',Q1K,'QFX',QFX(I,J),'RHO',RHO(I),'CHS2',CHS2(I),'latent',ELFLX
+        ENDIF
+
+        IF(NOOUT.EQ.1)GOTO 100                                          
+!     write output to 29                                                
+        IF(ITIMESTEP.EQ.1.AND.I.EQ.1.AND.J.EQ.1) &
+                                                            WRITE (29,*)&
+          'itimestep ','   FK     ','  SOLDN   ','  SFCPR   ',          &
+          '  SFCTMP  ','    Q2K   ','   TBOTK  ',          &
+          '   CHK    ','  ELFLX   ','   HFLX   ','   GFLX   ',          &
+          ' RNOF1K   ',' RNOF2K   ','    T1K   ','   CMCK   ',          &
+          '  SMCK1   ','  SMCK2   ','  SMCK3   ','  SMCK4   ',          &
+          '  STCK1   ','  STCK2   ','  STCK3   ','  STCK4   ',          &
+          ' SNODPK   ','      T2   ',                                   &
+          '     Q2   ',' SMSTOT   ',' SFCEVP   ', ' RAIN'                        
+        IF((ITIMESTEP.EQ.1.OR.MOD(ITIMESTEP,1).EQ.0)  &
+            .AND. I .EQ.29.AND.J.EQ.23) THEN                                             
+        print *,'outputting at itimestep =', itimestep
+          STIMESTEP=FLOAT(itimestep)
+          WRITE (29,1029)STIMESTEP,FK,SOLDN,SFCPRS/100.,SFCTMP,1000.*       &
+                         Q2K,TBOTK,1000.*CHK,ELFLX(i,j),HFLX,GFLX,SFCRUNOFF(I,J)&
+                         ,UDRUNOFF(I,J),T1K,CMCK,SMOIS1D,STEMP1D,SNODPK,        &
+!                       ,UDRUNOFF(I,J),T1K,CMCK,SMOIS1D(3),SMOIS1D(7),SMOIS1D(11),&
+!                        SMOIS1D(14),STEMP1D(3), STEMP1D(7),STEMP1D(11), &
+!                        STEMP1D(14), SNODPK,        &
+                         T2K,1000.*Q2M,SMSTOT(I,J),SFCEVP(I,J),PRCP
+ 1029     FORMAT (29F10.4)                                              
+!         IF(ITIMESTEP.EQ.0)WRITE (39,*)'   P      ','   T      ',      &
+!           '   TH     ','   Q      ','   U      ','   V      ',        &
+!           '   QC     '                                                
+!         WRITE (39,1039)itimestep
+!         DO K=kts,kte
+!           WRITE (39,1039)PRESK,TX(I,K),THX(I,K),1000.*QX(I,K),UX(I,K),&
+!                          VX(I,K),1000.*QCX(I,K)                       
+ 1039       FORMAT (7F10.5)                                             
+!         ENDDO                                                         
+        ENDIF                                                           
+!                                                                       
+#endif
   100 CONTINUE                                                          
 !                                                                       
 !-----------------------------------------------------------------------
@@ -1060,9 +1107,9 @@ CONTAINS
 
 ! ----------------------------------------------------------------------
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-!     DETERMINE IF ITS PRECIPITATING AND WHAT KIND OF PRECIP IT IS.
-!     IF ITS PRCPING AND THE AIR TEMP IS COLDER THAN 0 C, ITS SNOWING!
-!     IF ITS PRCPING AND THE AIR TEMP IS WARMER THAN 0 C, BUT THE GRND
+!     DETERMINE IF IT'S PRECIPITATING AND WHAT KIND OF PRECIP IT IS.
+!     IF IT'S PRCPING AND THE AIR TEMP IS COLDER THAN 0 C, IT'S SNOWING!
+!     IF IT'S PRCPING AND THE AIR TEMP IS WARMER THAN 0 C, BUT THE GRND
 !     TEMP IS COLDER THAN 0 C, FREEZING RAIN IS PRESUMED TO BE FALLING.
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
@@ -1631,7 +1678,7 @@ CONTAINS
       IF ( (SICE .GT. 0.) .OR. (TSURF .LT. T0) .OR.            &
            (STC(1) .LT. T0) .OR. (TBK .LT. T0) ) THEN
 
-!	write(0,*) call SNKSRC... , TSURF, STC(1),TBK,SMC(1),SH2O(1)
+!	write(0,*) 'call SNKSRC... ', TSURF, STC(1),TBK,SMC(1),SH2O(1)
  
 	if (SH2O(1) .lt. 0) then
 	write(0,*) 'NEGATIVE SH2O:: ', SH2O(1)
@@ -1669,7 +1716,7 @@ CONTAINS
       DF1K = DF1
       DO K = 2, NSOIL
 
-!       CALC THIS SOIL LAYERS HEAT CAPACITY
+!       CALC THIS SOIL LAYER'S HEAT CAPACITY
 
         HCPCT = SH2O(K)*CH2O +(1.0-SMCMAX)*CSOIL +(SMCMAX-SMC(K))*CAIR &
               + ( SMC(K) - SH2O(K) )*CICE
@@ -1687,7 +1734,7 @@ CONTAINS
            DENOM = 0.5 * ( ZSOIL(K-1) - ZSOIL(K+1) )
            DTSDZ2 = ( STC(K) - STC(K+1) ) / DENOM
 
-! CALC THE MATRIX COEF, CI, AFTER CALCNG ITS PARTIAL PRODUCT
+! CALC THE MATRIX COEF, CI, AFTER CALC'NG ITS PARTIAL PRODUCT
 
            DDZ2 = 2. / (ZSOIL(K-1) - ZSOIL(K+1))
            CI(K) = -DF1N * DDZ2 / ((ZSOIL(K-1) - ZSOIL(K)) * HCPCT)
@@ -1720,7 +1767,7 @@ CONTAINS
 !+++++++++++++ THIS ENDS SPECIAL CODE FOR BOTTOM LAYER +++++++++
 
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-!       CALC RHSTS FOR THIS LAYER AFTER CALCNG A PARTIAL PRODUCT
+!       CALC RHSTS FOR THIS LAYER AFTER CALC'NG A PARTIAL PRODUCT
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
         DENOM = ( ZSOIL(K) - ZSOIL(K-1) ) * HCPCT
@@ -1857,7 +1904,7 @@ CONTAINS
           DTSDZ2 = ( STC(K) - STC(K+1) ) / DENOM
 
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-!         CALC THE MATRIX COEF, CI, AFTER CALCNG ITS PARTIAL PRODUCT
+!         CALC THE MATRIX COEF, CI, AFTER CALC'NG ITS PARTIAL PRODUCT
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
           DDZ2 = 2. / (ZSOIL(K-1) - ZSOIL(K+1))
@@ -1879,7 +1926,7 @@ CONTAINS
         END IF
 
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-!       CALC RHSTS FOR THIS LAYER AFTER CALCNG A PARTIAL PRODUCT
+!       CALC RHSTS FOR THIS LAYER AFTER CALC'NG A PARTIAL PRODUCT
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
         DENOM = ( ZSOIL(K) - ZSOIL(K-1) ) * HCPCT
@@ -2340,7 +2387,7 @@ CONTAINS
 !    DRYSMC: AIR DRY SOIL MOIST CONTENT LIMITS
 !    SATPSI: SATURATED SOIL POTENTIAL
 !    SATDK:  SATURATED SOIL HYDRAULIC CONDUCTIVITY
-!    BB:     THE B PARAMETER
+!    BB:     THE 'B' PARAMETER
 !    SATDW:  SATURATED SOIL DIFFUSIVITY
 !    F11:    USED TO COMPUTE SOIL DIFFUSIVITY/CONDUCTIVITY
 !    QUARTZ:  SOIL QUARTZ CONTENT
@@ -2529,11 +2576,11 @@ CONTAINS
 
 !#######################################################################
 
-!  CLASS PARAMETER SLOPETYP WAS INCLUDED TO ESTIMATE
-!  LINEAR RESERVOIR COEFFICIENT SLOPE TO THE BASEFLOW RUNOFF
+!  CLASS PARAMETER 'SLOPETYP' WAS INCLUDED TO ESTIMATE
+!  LINEAR RESERVOIR COEFFICIENT 'SLOPE' TO THE BASEFLOW RUNOFF
 !  OUT OF THE BOTTOM LAYER. LOWEST CLASS (SLOPETYP=0)MEANS
 !  HIGHEST SLOPE PARAMETER= 1
-!  DEFINITION OF SLOPETYP FROM ZOBLER SLOPE TYPE
+!  DEFINITION OF SLOPETYP FROM 'ZOBLER' SLOPE TYPE
 !  SLOPE CLASS      PERCENT SLOPE
 !  1                0-8
 !  2                8-30
@@ -2544,8 +2591,8 @@ CONTAINS
 !  7                0-8, 8-30, > 30
 !  9                GLACIAL ICE
 !  BLANK            OCEAN/SEA
-!  NOTE:  CLASS 9 FROM ZOBLER FILE SHOULD BE REPLACED BY 8
-!  AND BLANK  9
+!  NOTE:  CLASS 9 FROM 'ZOBLER' FILE SHOULD BE REPLACED BY 8
+!  AND 'BLANK'  9
 
       REAL SLOPE
       REAL SLOPE_DATA(MAX_SLOPETYP)
@@ -2601,7 +2648,7 @@ CONTAINS
 
 !  SPECIFY SNOW DISTRIBUTION SHAPE PARAMETER
 !  SALP   - SHAPE PARAMETER OF DISTRIBUTION FUNCTION
-!  OF SNOW COVER. FROM ANDERSONS DATA (HYDRO-17)
+!  OF SNOW COVER. FROM ANDERSON'S DATA (HYDRO-17)
 !  BEST FIT IS WHEN SALP = 2.6
       REAL SALP, SALP_DATA
       DATA SALP_DATA /2.6/
@@ -2665,11 +2712,11 @@ CONTAINS
 !           NCO does not allow hardwired file names in the code.
 
 !     IF (LFIRST) THEN
-!        OPEN(58, FILE = namelist_filename.txt)
+!        OPEN(58, FILE = 'namelist_filename.txt')
 ! NAMELIST_NAME must be 50 characters or less.
-!        READ(58,(A)) NAMELIST_NAME
+!        READ(58,'(A)') NAMELIST_NAME
 !        CLOSE(58)
-!        WRITE(*,*) Namelist Filename is , NAMELIST_NAME
+!        WRITE(*,*) 'Namelist Filename is ', NAMELIST_NAME
 !        OPEN(59, FILE = NAMELIST_NAME)
  50      CONTINUE
 !           READ(59, SOIL_VEG, END=100)
@@ -2679,13 +2726,13 @@ CONTAINS
 !        WRITE(*,NML=SOIL_VEG)
 !        LFIRST = .FALSE.
          IF (DEFINED_SOIL .GT. MAX_SOILTYP) THEN
-            CALL wrf_error_fatal3 ( "module_sf_lsm_nmm.b" , 2729 , 'Warning: DEFINED_SOIL too large in namelist') 
+            CALL wrf_error_fatal('Warning: DEFINED_SOIL too large in namelist') 
          END IF
          IF (DEFINED_VEG .GT. MAX_VEGTYP) THEN
-            CALL wrf_error_fatal3 ( "module_sf_lsm_nmm.b" , 2732 , 'Warning: DEFINED_VEG too large in namelist')
+            CALL wrf_error_fatal('Warning: DEFINED_VEG too large in namelist')
          END IF
          IF (DEFINED_SLOPE .GT. MAX_SLOPETYP) THEN
-            CALL wrf_error_fatal3 ( "module_sf_lsm_nmm.b" , 2735 , 'Warning: DEFINED_SLOPE too large in namelist' )
+            CALL wrf_error_fatal('Warning: DEFINED_SLOPE too large in namelist' )
          END IF
 
          DO I = 1, DEFINED_SOIL
@@ -2704,13 +2751,13 @@ CONTAINS
 !     END IF
 
       IF (SOILTYP .GT. DEFINED_SOIL) THEN
-         CALL wrf_error_fatal3 ( "module_sf_lsm_nmm.b" , 2754 ,   'Warning: too many soil types' )
+         CALL wrf_error_fatal(  'Warning: too many soil types' )
       END IF
       IF (VEGTYP .GT. DEFINED_VEG) THEN
-         CALL wrf_error_fatal3 ( "module_sf_lsm_nmm.b" , 2757 ,   'Warning: too many veg types' )
+         CALL wrf_error_fatal(  'Warning: too many veg types' )
       END IF
       IF (SLOPETYP .GT. DEFINED_SLOPE) THEN
-         CALL wrf_error_fatal3 ( "module_sf_lsm_nmm.b" , 2760 ,   'Warning: too many slope types' )
+         CALL wrf_error_fatal(  'Warning: too many slope types' )
       END IF
 
 !  SET-UP UNIVERSAL PARAMETERS 
@@ -2758,7 +2805,7 @@ CONTAINS
       IF(VEGTYP .EQ. BARE) SHDFAC = 0.0
 
       IF (NROOT .GT. NSOIL) THEN
-         CALL wrf_error_fatal3 ( "module_sf_lsm_nmm.b" , 2808 ,  'Warning: too many root layers' )
+         CALL wrf_error_fatal ( 'Warning: too many root layers' )
       END IF
 
 !  CALCULATE ROOT DISTRIBUTION
@@ -2828,7 +2875,7 @@ CONTAINS
 !    DRYSMC: AIR DRY SOIL MOIST CONTENT LIMITS
 !    SATPSI: SATURATED SOIL POTENTIAL
 !    SATDK:  SATURATED SOIL HYDRAULIC CONDUCTIVITY
-!    BB:     THE B PARAMETER
+!    BB:     THE 'B' PARAMETER
 !    SATDW:  SATURATED SOIL DIFFUSIVITY
 !    F11:    USED TO COMPUTE SOIL DIFFUSIVITY/CONDUCTIVITY
 !    QUARTZ:  SOIL QUARTZ CONTENT
@@ -3037,11 +3084,11 @@ CONTAINS
 
 !#######################################################################
 
-!  CLASS PARAMETER SLOPETYP WAS INCLUDED TO ESTIMATE
-!  LINEAR RESERVOIR COEFFICIENT SLOPE TO THE BASEFLOW RUNOFF
+!  CLASS PARAMETER 'SLOPETYP' WAS INCLUDED TO ESTIMATE
+!  LINEAR RESERVOIR COEFFICIENT 'SLOPE' TO THE BASEFLOW RUNOFF
 !  OUT OF THE BOTTOM LAYER. LOWEST CLASS (SLOPETYP=0)MEANS
 !  HIGHEST SLOPE PARAMETER= 1
-!  DEFINITION OF SLOPETYP FROM ZOBLER SLOPE TYPE
+!  DEFINITION OF SLOPETYP FROM 'ZOBLER' SLOPE TYPE
 !  SLOPE CLASS      PERCENT SLOPE
 !  1                0-8
 !  2                8-30
@@ -3052,8 +3099,8 @@ CONTAINS
 !  7                0-8, 8-30, > 30
 !  9                GLACIAL ICE
 !  BLANK            OCEAN/SEA
-!  NOTE:  CLASS 9 FROM ZOBLER FILE SHOULD BE REPLACED BY 8
-!  AND BLANK  9
+!  NOTE:  CLASS 9 FROM 'ZOBLER' FILE SHOULD BE REPLACED BY 8
+!  AND 'BLANK'  9
 
       REAL SLOPE
       REAL SLOPE_DATA(MAX_SLOPETYP)
@@ -3109,7 +3156,7 @@ CONTAINS
 
 !  SPECIFY SNOW DISTRIBUTION SHAPE PARAMETER
 !  SALP   - SHAPE PARAMETER OF DISTRIBUTION FUNCTION
-!  OF SNOW COVER. FROM ANDERSONS DATA (HYDRO-17)
+!  OF SNOW COVER. FROM ANDERSON'S DATA (HYDRO-17)
 !  BEST FIT IS WHEN SALP = 2.6
       REAL SALP, SALP_DATA
       DATA SALP_DATA /2.6/
@@ -3173,11 +3220,11 @@ CONTAINS
 !           NCO does not allow hardwired file names in the code.
 
 !     IF (LFIRST) THEN
-!        OPEN(58, FILE = namelist_filename.txt)
+!        OPEN(58, FILE = 'namelist_filename.txt')
 ! NAMELIST_NAME must be 50 characters or less.
-!        READ(58,(A)) NAMELIST_NAME
+!        READ(58,'(A)') NAMELIST_NAME
 !        CLOSE(58)
-!        WRITE(*,*) Namelist Filename is , NAMELIST_NAME
+!        WRITE(*,*) 'Namelist Filename is ', NAMELIST_NAME
 !        OPEN(59, FILE = NAMELIST_NAME)
  50      CONTINUE
 !           READ(59, SOIL_VEG, END=100)
@@ -3187,13 +3234,13 @@ CONTAINS
 !        WRITE(*,NML=SOIL_VEG)
 !        LFIRST = .FALSE.
          IF (DEFINED_SOIL .GT. MAX_SOILTYP) THEN
-            CALL wrf_error_fatal3 ( "module_sf_lsm_nmm.b" , 3237 ,  'Warning: DEFINED_SOIL too large in namelist' )
+            CALL wrf_error_fatal( 'Warning: DEFINED_SOIL too large in namelist' )
          END IF
          IF (DEFINED_VEG .GT. MAX_VEGTYP) THEN
-            CALL wrf_error_fatal3 ( "module_sf_lsm_nmm.b" , 3240 ,  'Warning: DEFINED_VEG too large in namelist')
+            CALL wrf_error_fatal( 'Warning: DEFINED_VEG too large in namelist')
          END IF
          IF (DEFINED_SLOPE .GT. MAX_SLOPETYP) THEN
-            CALL wrf_error_fatal3 ( "module_sf_lsm_nmm.b" , 3243 ,  'Warning: DEFINED_SLOPE too large in namelist')
+            CALL wrf_error_fatal( 'Warning: DEFINED_SLOPE too large in namelist')
          END IF
 
          DO I = 1, DEFINED_SOIL
@@ -3213,13 +3260,13 @@ CONTAINS
 !     END IF
 
       IF (SOILTYP .GT. DEFINED_SOIL) THEN
-         CALL wrf_error_fatal3 ( "module_sf_lsm_nmm.b" , 3263 ,  'Warning: to many soil types' )
+         CALL wrf_error_fatal( 'Warning: to many soil types' )
       END IF
       IF (VEGTYP .GT. DEFINED_VEG) THEN
-         CALL wrf_error_fatal3 ( "module_sf_lsm_nmm.b" , 3266 ,  'Warning: to many veg types' )
+         CALL wrf_error_fatal( 'Warning: to many veg types' )
       END IF
       IF (SLOPETYP .GT. DEFINED_SLOPE) THEN
-         CALL wrf_error_fatal3 ( "module_sf_lsm_nmm.b" , 3269 ,  'Warning: to many slope types' )
+         CALL wrf_error_fatal( 'Warning: to many slope types' )
       END IF
 
 !  SET-UP UNIVERSAL PARAMETERS
@@ -3267,7 +3314,7 @@ CONTAINS
       IF(VEGTYP .EQ. BARE) SHDFAC = 0.0
 
       IF (NROOT .GT. NSOIL) THEN
-         CALL wrf_error_fatal3 ( "module_sf_lsm_nmm.b" , 3317 ,  'Warning: too many root layers') 
+         CALL wrf_error_fatal( 'Warning: too many root layers') 
       END IF
 
 !  CALCULATE ROOT DISTRIBUTION
@@ -3431,7 +3478,7 @@ CONTAINS
          CALL HSTEP(STCF,STC,RHSTS,DT,NSOIL)
 
 	if (RHSTS(1) .lt. -100.) then
-!	write(0,*) crazy RHSTS returned from HSTEP: , RHSTS
+!	write(0,*) 'crazy RHSTS returned from HSTEP: ', RHSTS
 	endif
 
       ENDIF
@@ -3458,8 +3505,8 @@ CONTAINS
 !      S = DF1 * (STC(1) - T1) / (0.5 * ZSOIL(1))
 
 	if (STC(1) .lt. 230 .and. STCWAS .gt. 230) then
-!	write(0,*) ICE, STC(1) was, is: ,ICE, STCWAS, STC(1)
-!	write(0,*) RHSTS in SHFLX: , RHSTS
+!	write(0,*) 'ICE, STC(1) was, is: ',ICE, STCWAS, STC(1)
+!	write(0,*) 'RHSTS in SHFLX: ', RHSTS
 	endif
 
       END SUBROUTINE SHFLX
@@ -3659,10 +3706,10 @@ CONTAINS
 
       PCPDRP = (1. - SHDFAC) * PRCP1 + DRIP / DT
 
-!      PRINT*, ################ SMLX ##################
-!      PRINT*, PCPDRP=, PCPDRP,  EDIR=, EDIR, ET=, ET,
-!     *      SMC(1)=, SMC(1), SMC(2)=, SMC(2),  PRCP1=, PRCP1,
-!     *      DRIP = , DRIP / DT
+!      PRINT*,' ################ SMLX ##################'
+!      PRINT*,' PCPDRP=', PCPDRP, ' EDIR=', EDIR,' ET=', ET,
+!     *      'SMC(1)=', SMC(1), 'SMC(2)=', SMC(2), ' PRCP1=', PRCP1,
+!     *      'DRIP = ', DRIP / DT
 
 ! ---------------     FROZEN GROUND VERSION     --------------------
 !    STORE ICE CONTENT AT EACH SOIL LAYER BEFORE CALLING SRT & SSTEP
@@ -3925,7 +3972,7 @@ CONTAINS
       DTOT = SNOWH + DSOIL
 
 ! ----------------------------------------------------------------------
-! Calculate an effective snow-grnd sfc temp (T12) based on heat fluxes
+! Calculate an 'effective snow-grnd sfc temp' (T12) based on heat fluxes
 ! between the snow pack and the soil and on net radiation.
 ! Include FLX1 (precip-snow sfc) and FLX2 (freezing rain latent heat)
 ! fluxes.  FLX1 from above, FLX2 brought in via COMMOM block RITE.
@@ -3939,7 +3986,7 @@ CONTAINS
       T12 = (SFCTMP + T12A + T12B ) / DENOM      
 
 ! ----------------------------------------------------------------------
-! IF THE EFFECTIVE SNOW-GRND SFC TEMP IS AT OR BELOW FREEZING, NO SNOW
+! IF THE 'EFFECTIVE SNOW-GRND SFC TEMP' IS AT OR BELOW FREEZING, NO SNOW
 ! MELT WILL OCCUR.  SET THE SKIN TEMP TO THIS EFFECTIVE TEMP AND SET THE
 ! EFFECTIVE PRECIP TO ZERO.
 ! ----------------------------------------------------------------------
@@ -3959,7 +4006,7 @@ CONTAINS
         SNMAX = 0.0
 
 ! ----------------------------------------------------------------------
-! IF THE EFFECTIVE SNOW-GRND SFC TEMP IS ABOVE FREEZING, SNOW MELT
+! IF THE 'EFFECTIVE SNOW-GRND SFC TEMP' IS ABOVE FREEZING, SNOW MELT
 ! WILL OCCUR.  CALL THE SNOW MELT RATE,EX AND AMT, SNMAX.  REVISE THE
 ! EFFECTIVE SNOW DEPTH.  REVISE THE SKIN TEMP BECAUSE IT WOULD HAVE CHGD
 ! DUE TO THE LATENT HEAT RELEASED BY THE MELTING. CALC THE LATENT HEAT
@@ -4089,8 +4136,8 @@ CONTAINS
       ETA = BETA*ETP
 
 ! ----------------------------------------------------------------------
-! THE ADJUSTED TOP SOIL LYR TEMP (YY) AND THE ADJUSTED SOIL HEAT
-! FLUX (ZZ1) ARE SET TO THE TOP SOIL LYR TEMP, AND 1, RESPECTIVELY.
+! THE 'ADJUSTED TOP SOIL LYR TEMP' (YY) AND THE 'ADJUSTED SOIL HEAT
+! FLUX' (ZZ1) ARE SET TO THE TOP SOIL LYR TEMP, AND 1, RESPECTIVELY.
 ! THESE ARE CLOSE-ENOUGH APPROXIMATIONS BECAUSE THE SFC HEAT FLUX TO BE
 ! COMPUTED IN SHFLX WILL EFFECTIVELY BE THE FLUX AT THE SNOW TOP
 ! SURFACE.  T11 IS A DUMMY ARGUEMENT SINCE WE WILL NOT USE ITS VALUE AS
@@ -4100,8 +4147,8 @@ CONTAINS
       YY = STC(1)-0.5*S*ZSOIL(1)*ZZ1/DF1
 
 	if (YY .lt. 200) then
-!	write(0,*) computed YY= , YY
-!	write(0,*) STC(1),S,ZSOIL(1),DF1: , STC(1),S,ZSOIL(1),DF1
+!	write(0,*) 'computed YY= ', YY
+!	write(0,*) 'STC(1),S,ZSOIL(1),DF1: ', STC(1),S,ZSOIL(1),DF1
 	endif
 
 
@@ -4122,7 +4169,7 @@ CONTAINS
         B,F1,DF1,ICE,                                                   &
         QUARTZ,CSOIL)
 
-!	write(0,*) SNOWH, STC(1), STCWAS: , SNOWH, STC(1), STCWAS
+!	write(0,*) 'SNOWH, STC(1), STCWAS: ', SNOWH, STC(1), STCWAS
 	
 	if (STC(1) .lt. 230 .and. STCWAS .gt. 230) then
 	write(0,*) 'in SNOPAC, SHFLX changed from: ', STCWAS, 'to : ', STC(1)
@@ -4137,7 +4184,7 @@ CONTAINS
 ! ----------------------------------------------------------------------
       IF (ESD .GT. 0.) THEN
 ! --- debug ------------------------------------------------------------
-!     write(6,*) SNOPAC1:ESD,SNOWH,SNDENS=,ESD,SNOWH,SNDENS
+!     write(6,*) 'SNOPAC1:ESD,SNOWH,SNDENS=',ESD,SNOWH,SNDENS
 ! --- debug ------------------------------------------------------------
         CALL SNOWPACK(ESD,DT,SNOWH,SNDENS,T1,YY)
 ! --- debug ------------------------------------------------------------
@@ -4145,7 +4192,7 @@ CONTAINS
 !        SNOWH = ESD/SNDENS
 ! --- debug ------------------------------------------------------------
 ! --- debug ------------------------------------------------------------
-!     write(6,*) SNOPAC2:ESD,SNOWH,SNDENS=,ESD,SNOWH,SNDENS
+!     write(6,*) 'SNOPAC2:ESD,SNOWH,SNDENS=',ESD,SNOWH,SNDENS
 ! --- debug ------------------------------------------------------------
       ELSE
         ESD = 0.
@@ -4164,7 +4211,7 @@ CONTAINS
 ! ##############################################################
 ! ##  SUBROUTINE TO CALCULATE COMPACTION OF SNOWPACK  UNDER  ###
 ! ##  CONDITIONS OF INCREASING SNOW DENSITY, AS OBTAINED     ###
-! FROM AN APPROXIMATE SOLUTION OF E. ANDERSONS DIFFERENTIAL ###
+! FROM AN APPROXIMATE SOLUTION OF E. ANDERSON'S DIFFERENTIAL ###
 !     EQUATION (3.29), NOAA TECHNICAL REPORT NWS 19,         ###
 !                 BY   VICTOR KOREN   03/25/95               ###
 ! ##############################################################
@@ -4304,8 +4351,8 @@ CONTAINS
       
 ! ----------------------------------------------------------------------
 ! CALCULATING NEW SNOWFALL DENSITY DEPENDING ON TEMPERATURE
-! EQUATION FROM GOTTLIB L. A GENERAL RUNOFF MODEL FOR SNOWCOVERED
-! AND GLACIERIZED BASIN, 6TH NORDIC HYDROLOGICAL CONFERENCE,
+! EQUATION FROM GOTTLIB L. 'A GENERAL RUNOFF MODEL FOR SNOWCOVERED
+! AND GLACIERIZED BASIN', 6TH NORDIC HYDROLOGICAL CONFERENCE,
 ! VEMADOLEN, SWEDEN, 1980, 172-177PP.
 !-----------------------------------------------------------------------
       IF(TX .LE. -15.) THEN
@@ -4403,13 +4450,13 @@ CONTAINS
 !   CLOSE TO CONSTANT = 0.6 IF AREAL MEAN FROZEN DEPTH IS ABOVE 20 CM.
 !   THAT IS WHY PARAMETER CVFRZ = 3 (INT{1/0.6*0.6})  
 !
-!   Current logic doesnt allow CVFRZ be bigger than 3
+!   Current logic doesn't allow CVFRZ be bigger than 3
         PARAMETER ( CVFRZ = 3 )
 ! ------------------------------------------------------------------
      
-!      PRINT*,in SRT, Declaration -----------------------
-!      PRINT*,NSOIL= , NSOIL
-!      PRINT*,NSOLD= , NSOLD
+!      PRINT*,'in SRT, Declaration -----------------------'
+!      PRINT*,'NSOIL=' , NSOIL
+!      PRINT*,'NSOLD=' , NSOLD
         
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 !     DETERMINE RAINFALL INFILTRATION RATE AND RUNOFF
@@ -4498,9 +4545,9 @@ CONTAINS
 !         MXSMC = MAX ( SH2OA(1), SH2OA(2) ) 
         MXSMC = SH2OA(1)
 
-!      PRINT*,SRT, BEFORE WDFCND - 1 ------------------------------
-!      PRINT*,MXSMC,SMCMAX= , MXSMC,SMCMAX
-!      PRINT*,B,DKSAT,DWSAT= , B,DKSAT,DWSAT
+!      PRINT*,'SRT, BEFORE WDFCND - 1 ------------------------------'
+!      PRINT*,'MXSMC,SMCMAX=' , MXSMC,SMCMAX
+!      PRINT*,'B,DKSAT,DWSAT=' , B,DKSAT,DWSAT
 
       CALL WDFCND ( WDF,WCND,MXSMC,SMCMAX,B,DKSAT,DWSAT,            &
                      SICEMAX )
@@ -4508,10 +4555,10 @@ CONTAINS
             INFMAX = MAX(INFMAX, WCND)
             INFMAX= MIN(INFMAX,PX)
 
-!      PRINT*,SRT, AFTER WDFCND - 1 ------------------------------
-!      PRINT*,WDF,WCND= , WDF,WCND
-!      PRINT*,MXSMC,SMCMAX= , MXSMC,SMCMAX
-!      PRINT*,B,DKSAT,DWSAT= , B,DKSAT,DWSAT
+!      PRINT*,'SRT, AFTER WDFCND - 1 ------------------------------'
+!      PRINT*,'WDF,WCND=' , WDF,WCND
+!      PRINT*,'MXSMC,SMCMAX=' , MXSMC,SMCMAX
+!      PRINT*,'B,DKSAT,DWSAT=' , B,DKSAT,DWSAT
  
 !
           IF ( PCPDRP .GT. INFMAX ) THEN
@@ -4526,17 +4573,17 @@ CONTAINS
 !...MXSMC = MAX( SH2OA(1), SH2OA(2) )
         MXSMC =  SH2OA(1)
 
-!      PRINT*,SRT, BEFORE WDFCND - 2
-!      PRINT*,MXSMC,SMCMAX= , MXSMC,SMCMAX
-!      PRINT*,B,DKSAT,DWSAT= , B,DKSAT,DWSAT
+!      PRINT*,'SRT, BEFORE WDFCND - 2'
+!      PRINT*,'MXSMC,SMCMAX=' , MXSMC,SMCMAX
+!      PRINT*,'B,DKSAT,DWSAT=' , B,DKSAT,DWSAT
 
       CALL WDFCND ( WDF,WCND,MXSMC,SMCMAX,B,DKSAT,DWSAT,          &
       SICEMAX )
 
-!      PRINT*,SRT, AFTER WDFCND - 2
-!      PRINT*,WDF,WCND= , WDF,WCND
-!      PRINT*,MXSMC,SMCMAX= , MXSMC,SMCMAX
-!      PRINT*,B,DKSAT,DWSAT= , B,DKSAT,DWSAT
+!      PRINT*,'SRT, AFTER WDFCND - 2'
+!      PRINT*,'WDF,WCND=' , WDF,WCND
+!      PRINT*,'MXSMC,SMCMAX=' , MXSMC,SMCMAX
+!      PRINT*,'B,DKSAT,DWSAT=' , B,DKSAT,DWSAT
  
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 !     CALC THE MATRIX COEFFICIENTS AI, BI, AND CI FOR THE TOP LAYER
@@ -4548,7 +4595,7 @@ CONTAINS
       CI(1) = -BI(1)
 
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-!     CALC RHSTT FOR THE TOP LAYER AFTER CALCNG THE VERTICAL SOIL
+!     CALC RHSTT FOR THE TOP LAYER AFTER CALC'NG THE VERTICAL SOIL
 !     MOISTURE GRADIENT BTWN THE TOP AND NEXT TO TOP LAYERS.
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
@@ -4576,28 +4623,28 @@ CONTAINS
 !....MXSMC2 = MAX ( SH2OA(K), SH2OA(K+1) )
             MXSMC2 =  SH2OA(K)
 
-!      PRINT*,SRT, BEFORE WDFCND - 3
-!      PRINT*,MXSMC2,SMCMAX= , MXSMC2,SMCMAX
-!      PRINT*,B,DKSAT,DWSAT= , B,DKSAT,DWSAT
-!      PRINT*,K= , K
+!      PRINT*,'SRT, BEFORE WDFCND - 3'
+!      PRINT*,'MXSMC2,SMCMAX=' , MXSMC2,SMCMAX
+!      PRINT*,'B,DKSAT,DWSAT=' , B,DKSAT,DWSAT
+!      PRINT*,'K=' , K
 
             CALL WDFCND ( WDF2,WCND2,MXSMC2,SMCMAX,B,DKSAT,DWSAT,   &
                  SICEMAX )
 
-!      PRINT*,SRT, AFTER WDFCND - 3
-!      PRINT*,WDF2,WCND2= , WDF2,WCND2
-!      PRINT*,MXSMC2,SMCMAX= , MXSMC2,SMCMAX
-!      PRINT*,B,DKSAT,DWSAT= , B,DKSAT,DWSAT
+!      PRINT*,'SRT, AFTER WDFCND - 3'
+!      PRINT*,'WDF2,WCND2=' , WDF2,WCND2
+!      PRINT*,'MXSMC2,SMCMAX=' , MXSMC2,SMCMAX
+!      PRINT*,'B,DKSAT,DWSAT=' , B,DKSAT,DWSAT
  
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-!       CALC SOME PARTIAL PRODUCTS FOR LATER USE IN CALCNG RHSTT
+!       CALC SOME PARTIAL PRODUCTS FOR LATER USE IN CALC'NG RHSTT
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
             DENOM = ( ZSOIL(K-1) - ZSOIL(K+1) )
             DSMDZ2 = ( SH2O(K) - SH2O(K+1) ) / ( DENOM * 0.5 )
 
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-!         CALC THE MATRIX COEF, CI, AFTER CALCNG ITS PARTIAL PRODUCT
+!         CALC THE MATRIX COEF, CI, AFTER CALC'NG ITS PARTIAL PRODUCT
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
             DDZ2 = 2.0 / DENOM
@@ -4615,21 +4662,21 @@ CONTAINS
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
 
-!      PRINT*,SRT, BEFORE WDFCND - 4
-!      PRINT*,SH2OA(NSOIL),SMCMAX= , SH2OA(NSOIL),SMCMAX
-!      PRINT*,B,DKSAT,DWSAT= , B,DKSAT,DWSAT
-!      PRINT*,K= , K
+!      PRINT*,'SRT, BEFORE WDFCND - 4'
+!      PRINT*,'SH2OA(NSOIL),SMCMAX=' , SH2OA(NSOIL),SMCMAX
+!      PRINT*,'B,DKSAT,DWSAT=' , B,DKSAT,DWSAT
+!      PRINT*,'K=' , K
  
             CALL WDFCND ( WDF2,WCND2,SH2OA(NSOIL),SMCMAX,           &
                  B,DKSAT,DWSAT,SICEMAX )
 
-!      PRINT*,SRT, AFTER WDFCND - 4
-!      PRINT*,WDF2,WCND2= , WDF2,WCND2
-!      PRINT*,SH2OA(NSOIL),SMCMAX= , SH2OA(NSOIL),SMCMAX
-!      PRINT*,B,DKSAT,DWSAT= , B,DKSAT,DWSAT
+!      PRINT*,'SRT, AFTER WDFCND - 4'
+!      PRINT*,'WDF2,WCND2=' , WDF2,WCND2
+!      PRINT*,'SH2OA(NSOIL),SMCMAX=' , SH2OA(NSOIL),SMCMAX
+!      PRINT*,'B,DKSAT,DWSAT=' , B,DKSAT,DWSAT
  
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-!         CALC A PARTIAL PRODUCT FOR LATER USE IN CALCNG RHSTT 
+!         CALC A PARTIAL PRODUCT FOR LATER USE IN CALC'NG RHSTT 
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
             DSMDZ2 = 0.0
@@ -4642,7 +4689,7 @@ CONTAINS
          END IF
 
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-!       CALC RHSTT FOR THIS LAYER AFTER CALCNG ITS NUMERATOR
+!       CALC RHSTT FOR THIS LAYER AFTER CALC'NG ITS NUMERATOR
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
          NUMER = (WDF2 * DSMDZ2) + SLOPX * WCND2 - (WDF * DSMDZ)    &
@@ -4673,9 +4720,9 @@ CONTAINS
          END IF
       END DO
 
-!      PRINT*,SRT, final Runoff
-!      PRINT*,RUNOFF1= , RUNOFF1
-!      PRINT*,RUNOFF2= , RUNOFF2
+!      PRINT*,'SRT, final Runoff'
+!      PRINT*,'RUNOFF1=' , RUNOFF1
+!      PRINT*,'RUNOFF2=' , RUNOFF2
  
       END SUBROUTINE SRT
 
@@ -4720,7 +4767,7 @@ CONTAINS
       COMMON /ABCI/ AI, BI, CI
 
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-!     CREATE AMOUNT VALUES OF VARIABLES TO BE INPUT TO THE
+!     CREATE 'AMOUNT' VALUES OF VARIABLES TO BE INPUT TO THE
 !     TRI-DIAGONAL MATRIX ROUTINE.
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
@@ -4767,8 +4814,8 @@ CONTAINS
                        SH2OOUT(K), CI(K), WPLUS
 	endif
         
-!      PRINT*,IN sstep
-!      PRINT*,SH2OOUT=, SH2OOUT
+!      PRINT*,'IN sstep'
+!      PRINT*,'SH2OOUT=', SH2OOUT
         
          STOT = SH2OOUT(K) + SICE(K)
          IF ( STOT .GT. SMCMAX ) THEN
@@ -4821,7 +4868,7 @@ CONTAINS
 
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 !  UPDATE CANOPY WATER CONTENT/INTERCEPTION (CMC).  CONVERT RHSCT TO 
-!  AN AMOUNT VALUE AND ADD TO PREVIOUS CMC VALUE TO GET NEW CMC.
+!  AN 'AMOUNT' VALUE AND ADD TO PREVIOUS CMC VALUE TO GET NEW CMC.
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
       CMC = CMC + DT * RHSCT
@@ -4953,14 +5000,14 @@ CONTAINS
 !      POROS = SMCMAX
 ! SATURATION RATIO:
       SATRATIO = SMC/SMCMAX
-!      print *, SATRATIO=,SATRATIO
+!      print *, 'SATRATIO=',SATRATIO
 !     PARAMETERS  W/(M.K)
       THKICE = 2.2
       THKW = 0.57
       THKO = 2.0
 !      IF (Q .LE. 0.2) THKO = 3.0
       THKQTZ = 7.7
-!  SOLIDS CONDUCTIVITY      
+!  SOLIDS' CONDUCTIVITY      
       THKS = (THKQTZ**Q)*(THKO**(1.- Q))
 !  UNFROZEN FRACTION (FROM 1.0, I.E., 100%LIQUID, TO 0.0 (100% FROZEN))
       XUNFROZ=(SH2O + 1.E-9)/(SMC + 1.E-9)
@@ -4988,7 +5035,7 @@ CONTAINS
         
 ! USE K = KDRY
         AKE = 0.0
-!        print *, AKE (ELSE) = ,AKE
+!        print *, 'AKE (ELSE) = ',AKE
       ENDIF
 !  THERMAL CONDUCTIVITY
 
@@ -5037,7 +5084,7 @@ CONTAINS
       END DO
 
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-!       CALC AN ADJUSTED POTNTL TRANSPIRATION
+!       CALC AN 'ADJUSTED' POTNTL TRANSPIRATION
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
 !cc If statements to avoid TANGENT LINEAR problems near zero
@@ -5120,17 +5167,17 @@ CONTAINS
       REAL WCND
       REAL WDF
 
-!      PRINT*,------------ in WDFCND -------------------------------
-!      PRINT*,BEFORE WDFCND
-!      PRINT*,B=,B
-!      PRINT*,DKSAT=,DKSAT
-!      PRINT*,DWSAT=,DWSAT
-!      PRINT*,EXPON=,EXPON
-!      PRINT*,FACTR2=,FACTR2
-!      PRINT*,SMC=,SMC
-!      PRINT*,SMCMAX=,SMCMAX
-!      PRINT*,WCND=,WCND
-!      PRINT*,WDF=,WDF
+!      PRINT*,'------------ in WDFCND -------------------------------'
+!      PRINT*,'BEFORE WDFCND'
+!      PRINT*,'B=',B
+!      PRINT*,'DKSAT=',DKSAT
+!      PRINT*,'DWSAT=',DWSAT
+!      PRINT*,'EXPON=',EXPON
+!      PRINT*,'FACTR2=',FACTR2
+!      PRINT*,'SMC=',SMC
+!      PRINT*,'SMCMAX=',SMCMAX
+!      PRINT*,'WCND=',WCND
+!      PRINT*,'WDF=',WDF
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 !     CALC THE RATIO OF THE ACTUAL TO THE MAX PSBL SOIL H2O CONTENT
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
@@ -5160,11 +5207,11 @@ CONTAINS
       IF (SICEMAX .GT. 0.0)  THEN
       VKwgt=1./(1.+(500.*SICEMAX)**3.)
       WDF = VKwgt*WDF + (1.- VKwgt)*DWSAT*FACTR1**EXPON
-!      PRINT*,______________________________________________
-!      PRINT*,Weighted approach:
-!      PRINT*,  SICEMAX       VKwgt              Dwgt
+!      PRINT*,'______________________________________________'
+!      PRINT*,'Weighted approach:'
+!      PRINT*,'  SICEMAX       VKwgt              Dwgt'
 !      PRINT*,SICEMAX,  VKwgt, 1.-VKwgt
-!      PRINT*,______________________________________________
+!      PRINT*,'______________________________________________'
       ENDIF
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC 
 !     RESET THE EXPNTL COEF AND CALC THE HYDRAULIC CONDUCTIVITY
@@ -5173,17 +5220,17 @@ CONTAINS
       EXPON = ( 2.0 * B ) + 3.0
       WCND = DKSAT * FACTR2 ** EXPON
 
-!      PRINT*, WDFCND Results --------------------------------
-!      PRINT*,B=,B
-!      PRINT*,DKSAT=,DKSAT
-!      PRINT*,DWSAT=,DWSAT
-!      PRINT*,EXPON=,EXPON
-!      PRINT*,FACTR2=,FACTR2
-!      PRINT*,SMC=,SMC
-!      PRINT*,SMCMAX=,SMCMAX
-!      PRINT*,WCND=,WCND
-!      PRINT*,WDF=,WDF
-!      PRINT*, SMC         WDF           WCND             B
+!      PRINT*,' WDFCND Results --------------------------------'
+!      PRINT*,'B=',B
+!      PRINT*,'DKSAT=',DKSAT
+!      PRINT*,'DWSAT=',DWSAT
+!      PRINT*,'EXPON=',EXPON
+!      PRINT*,'FACTR2=',FACTR2
+!      PRINT*,'SMC=',SMC
+!      PRINT*,'SMCMAX=',SMCMAX
+!      PRINT*,'WCND=',WCND
+!      PRINT*,'WDF=',WDF
+!      PRINT*,' SMC         WDF           WCND             B'
 !      PRINT*,SMC,WDF,WCND,B
 
       END SUBROUTINE WDFCND

@@ -396,7 +396,7 @@ CONTAINS
      &,             HVAP => con_HVAP, ROG => con_ROG, FV => con_FVirt
       implicit none
 !
-!     include constant.h
+!     include 'constant.h'
 !
 !
 !     Arguments

@@ -75,7 +75,7 @@ CONTAINS
 
       SELECT CASE ( io_form_arg )
 
-
+#ifdef NETCDF
         CASE ( IO_NETCDF   )
 
           IF ( outbuf_table(ii)%FieldType .EQ. WRF_REAL ) THEN
@@ -115,8 +115,8 @@ CONTAINS
                                  outbuf_table(ii)%DomainEnd,                          &
                                  Status )
           ENDIF
-
-
+#endif
+#ifdef YYY
       CASE ( IO_YYY   )
 
           IF ( outbuf_table(ii)%FieldType .EQ. WRF_REAL ) THEN
@@ -156,8 +156,8 @@ CONTAINS
                                  outbuf_table(ii)%DomainEnd,                          &
                                  Status )
           ENDIF
-
-
+#endif
+#ifdef INTIO
         CASE ( IO_INTIO  )
           IF ( outbuf_table(ii)%FieldType .EQ. WRF_REAL ) THEN
 
@@ -198,7 +198,7 @@ CONTAINS
                                  Status )
 
           ENDIF
-
+#endif
         CASE DEFAULT
       END SELECT
 
@@ -213,7 +213,7 @@ CONTAINS
 
 END MODULE module_quilt_outbuf_ops
 
-! dont let other programs see the definition of this; type mismatches
+! don't let other programs see the definition of this; type mismatches
 ! on inbuf will result;  may want to make a module program at some point 
   SUBROUTINE store_patch_in_outbuf( inbuf_r, inbuf_i, DateStr, VarName , FieldType, MemoryOrder, Stagger, DimNames, &
                                     DomainStart , DomainEnd , &
@@ -246,7 +246,7 @@ END MODULE module_quilt_outbuf_ops
     INTEGER               :: l,m,n,ii,jj
     LOGICAL               :: found
 
-    ! Find the VarName if its in the buffer already
+    ! Find the VarName if it's in the buffer already
     ii = 1
     found = .false.
     DO WHILE ( .NOT. found .AND. ii .LE. num_entries )
@@ -256,10 +256,10 @@ END MODULE module_quilt_outbuf_ops
           IF ( TRIM(MemoryOrder) .EQ. TRIM(outbuf_table(ii)%MemoryOrder) ) THEN
             found = .true.
           ELSE
-            CALL wrf_error_fatal3 ( "module_quilt_outbuf_ops.b" , 259 , "store_patch_in_outbuf: memory order disagreement")
+            CALL wrf_error_fatal("store_patch_in_outbuf: memory order disagreement")
           ENDIF
         ELSE
-          CALL wrf_error_fatal3 ( "module_quilt_outbuf_ops.b" , 262 , "store_patch_in_outbuf: multiple dates in buffer")
+          CALL wrf_error_fatal("store_patch_in_outbuf: multiple dates in buffer")
         ENDIF
       ELSE
         ii = ii + 1
@@ -275,7 +275,7 @@ END MODULE module_quilt_outbuf_ops
                                                  DomainStart(2):DomainEnd(2),DomainStart(3):DomainEnd(3)) )
       ELSE
         write(mess,*)"store_patch_in_outbuf: unsupported type ", FieldType
-        CALL wrf_error_fatal3 ( "module_quilt_outbuf_ops.b" , 278 , mess)
+        CALL wrf_error_fatal(mess)
       ENDIF
       outbuf_table(num_entries)%VarName = TRIM(VarName)
       outbuf_table(num_entries)%DateStr = TRIM(DateStr)
@@ -368,7 +368,7 @@ END MODULE module_quilt_outbuf_ops
       VarNameAsInts( i ) = ICHAR( VarName(i-1:i-1) )
     ENDDO
     CALL store_piece_of_field_c ( inbuf, VarNameAsInts, Nbytes, ierr )
-    IF ( ierr .NE. 0 ) CALL wrf_error_fatal3 ( "module_quilt_outbuf_ops.b" , 371 ,  "store_piece_of_field" )
+    IF ( ierr .NE. 0 ) CALL wrf_error_fatal ( "store_piece_of_field" )
     RETURN
   END SUBROUTINE store_piece_of_field
 

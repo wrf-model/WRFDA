@@ -35,9 +35,9 @@ CONTAINS
    USE module_sf_myjsfc
    USE module_sf_noahlsm
    USE module_sf_ruclsm
-
-
-
+#if ( NMM_CORE == 1 )
+   USE module_sf_lsm_nmm
+#endif
 
    USE module_sf_slab
 !
@@ -401,7 +401,7 @@ CONTAINS
      sfclay_select: SELECT CASE(config_flags%sf_sfclay_physics)
 
      CASE (SFCLAYSCHEME)
-
+#if (NMM_CORE != 1)
 ! DX varies spatially in NMM, therefore, SFCLAY cannot be called
 ! because it takes a scalar DX. NMM passes in a dummy value for this
 ! scalar.  NEEDS FURTHER ATTENTION. JM 20050215
@@ -416,9 +416,9 @@ CONTAINS
                ids,ide, jds,jde, kds,kde,                          &
                ims,ime, jms,jme, kms,kme,                          &
                i_start(ij),i_end(ij), j_start(ij),j_end(ij), kts,kte    )
-
-
-
+#else
+        CALL wrf_error_fatal('SFCLAY cannot be used with NMM')
+#endif
       CASE (MYJSFCSCHEME)
 
           CALL wrf_debug(100,'in MYJSFC')
@@ -440,7 +440,7 @@ CONTAINS
      CASE DEFAULT
         
        WRITE( wrf_err_message , * ) 'The sfclay option does not exist: sf_sfclay_physics = ', config_flags%sf_sfclay_physics
-       CALL wrf_error_fatal3 ( "module_surface_driver.b" , 443 ,  wrf_err_message )
+       CALL wrf_error_fatal ( wrf_err_message )
 
      END SELECT sfclay_select
      ENDDO
@@ -481,6 +481,29 @@ CONTAINS
                      ims,ime, jms,jme, kms,kme,                    &
              i_start(ij),i_end(ij), j_start(ij),j_end(ij), kts,kte    )
 
+#if ( NMM_CORE == 1 )
+     CASE (NMMLSMSCHEME)
+         IF ( config_flags%dyn_opt .EQ. DYN_NMM ) THEN
+           CALL wrf_debug(100,'in NMM LSM')
+           CALL nmmlsm(dz8w,moist(ims,kms,jms,P_QV),p8w,rho,       &
+                t_phy,th_phy,TSK,CHS,                           &
+                HFX,QFX,QGH,GSW,GLW,LH,RMOL,                    &
+                SMSTAV,SMSTOT,SFCRUNOFF,                        &
+                UDRUNOFF,IVGTYP,ISLTYP,VEGFRA,SFCEVP,POTEVP,    &
+                GRDFLX,SFCEXC,ACSNOW,ACSNOM,SNOPCX,             &
+                ALBBCK,TMN,XLAND,XICE,QZ0,                      &
+                th2,q2,SNOWC,CQS2,QSFC,SOILTB,CHKLOWQ,RAINBL,   &
+                num_soil_layers,DTBL,DZS,itimestep,             &
+                SMOIS,TSLB,SNOW,CANWAT,CPM,RCP,SR,              &    !TSLB
+                ALBEDO,SNOALB,SH2O,SNOWH,                       &
+                ids,ide, jds,jde, kds,kde,                      &
+                ims,ime, jms,jme, kms,kme,                      &
+                i_start(ij),i_end(ij), j_start(ij),j_end(ij), kts,kte    )
+          ELSE
+            CALL wrf_error_fatal( 'Must specify NMM core with NMM LSM' )
+          ENDIF
+          CALL wrf_debug(100,'back from NMM LSM')
+#endif
 
      CASE (LSMSCHEME)
 
@@ -547,7 +570,7 @@ CONTAINS
      CASE DEFAULT
 
        WRITE( wrf_err_message , * ) 'The surface option does not exist: sf_surface_physics = ', config_flags%sf_surface_physics
-       CALL wrf_error_fatal3 ( "module_surface_driver.b" , 573 ,  wrf_err_message )
+       CALL wrf_error_fatal ( wrf_err_message )
 
      END SELECT sfc_select
      ENDDO

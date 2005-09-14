@@ -159,7 +159,7 @@ CONTAINS
 !-- RADT          time for calling radiation (min)
 !-- DEGRAD        conversion factor for 
 !                 degrees to radians (pi/180.) (rad/deg)
-!-- DPD           degrees per day for earths 
+!-- DPD           degrees per day for earth's 
 !                 orbital position (deg/day)
 !-- R_d           gas constant for dry air (J/kg/K)
 !-- CP            heat capacity at constant pressure for dry air (J/kg/K)
@@ -345,10 +345,10 @@ CONTAINS
                    its,ite, jts,jte, kts,kte               )
 
 !pjj/cray  Cray X1 cannot print from threaded region
-
+#ifndef crayx1
    WRITE(wrf_err_message,*)'SOLCON=',SOLCON,DECLIN,XTIME
    CALL wrf_debug(50,wrf_err_message)
-
+#endif
 
    lwrad_select: SELECT CASE(config_flags%ra_lw_physics)
 
@@ -397,7 +397,7 @@ CONTAINS
         CASE DEFAULT
   
              WRITE( wrf_err_message , * ) 'The longwave option does not exist: ra_lw_physics = ', config_flags%ra_lw_physics
-             CALL wrf_error_fatal3 ( "module_radiation_driver.b" , 400 ,  wrf_err_message )
+             CALL wrf_error_fatal ( wrf_err_message )
            
    END SELECT lwrad_select    
 
@@ -479,7 +479,7 @@ CONTAINS
         CASE DEFAULT
 
              WRITE( wrf_err_message , * ) 'The shortwave option does not exist: ra_sw_physics = ', config_flags%ra_sw_physics
-             CALL wrf_error_fatal3 ( "module_radiation_driver.b" , 482 ,  wrf_err_message )
+             CALL wrf_error_fatal ( wrf_err_message )
 
    END SELECT swrad_select    
 
@@ -557,12 +557,12 @@ CONTAINS
    SOLCON=1370.*ECCFAC
    
 !pjj/cray  Cray X1 cannot print from threaded region
-
+#ifndef crayx1
    write(wrf_err_message,10)DECDEG,SOLCON
 10 FORMAT(1X,'*** SOLAR DECLINATION ANGLE = ',F6.2,' DEGREES.',     &
         ' SOLAR CONSTANT = ',F8.2,' W/M**2 ***')
    CALL wrf_debug (50, wrf_err_message)
-
+#endif
 
    END SUBROUTINE radconst
 

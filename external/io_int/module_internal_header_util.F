@@ -217,7 +217,7 @@ SUBROUTINE int_get_write_field_header ( hdrbuf, hdrbufsize, itypesize, ftypesize
   hdrbufsize = hdrbuf(1)
   IF ( hdrbuf(2) .NE. int_field ) THEN
     write(mess,*)'int_get_write_field_header: hdrbuf(2) ne int_field ',hdrbuf(2),int_field
-    CALL wrf_error_fatal3 ( "module_internal_header_util.b" , 220 ,  mess )
+    CALL wrf_error_fatal ( mess )
   ENDIF
   ftypesize = hdrbuf(3)
 
@@ -325,7 +325,7 @@ SUBROUTINE int_get_ofr_header( hdrbuf, hdrbufsize, itypesize, &
 !
   hdrbufsize = hdrbuf(1)
 !  IF ( hdrbuf(2) .NE. int_open_for_read ) THEN
-!    CALL wrf_error_fatal3 ( "module_internal_header_util.b" , 328 ,  "int_get_ofr_header: hdrbuf ne int_open_for_read")
+!    CALL wrf_error_fatal ( "int_get_ofr_header: hdrbuf ne int_open_for_read")
 !  ENDIF
   i = 3
   DataHandle = hdrbuf(i)    ; i = i+1
@@ -387,13 +387,13 @@ SUBROUTINE int_gen_ofwb_header( hdrbuf, hdrbufsize, itypesize, &
   hdrbuf(i) = io_form        ; i = i+1
 !j = i
   call int_pack_string( FileName, hdrbuf(i), n )   ; i = i + n
-!write(0,*)int_gen_ofwb_header FileName ,TRIM(FileName),hdrbuf(j),n
+!write(0,*)'int_gen_ofwb_header FileName ',TRIM(FileName),hdrbuf(j),n
 !j = i
   call int_pack_string( SysDepInfo, hdrbuf(i), n ) ; i = i + n
-!write(0,*)int_gen_ofwb_header SysDepInfo ,TRIM(SysDepInfo),hdrbuf(j),n
+!write(0,*)'int_gen_ofwb_header SysDepInfo ',TRIM(SysDepInfo),hdrbuf(j),n
   hdrbufsize = (i-1) * itypesize  ! return the number in bytes
   hdrbuf(1) = hdrbufsize
-!write(0,*)int_gen_ofwb_header hdrbuf(1) ,hdrbuf(1)
+!write(0,*)'int_gen_ofwb_header hdrbuf(1) ',hdrbuf(1)
   RETURN
 END SUBROUTINE int_gen_ofwb_header
 
@@ -419,25 +419,25 @@ SUBROUTINE int_get_ofwb_header( hdrbuf, hdrbufsize, itypesize, &
   INTEGER i, n, j
 !
   hdrbufsize = hdrbuf(1)
-!write(0,*) int_get_ofwb_header next rec start ,hdrbuf(hdrbufsize+1)
+!write(0,*)' int_get_ofwb_header next rec start ',hdrbuf(hdrbufsize+1)
 !  IF ( hdrbuf(2) .NE. int_open_for_write_begin ) THEN
-!    CALL wrf_error_fatal3 ( "module_internal_header_util.b" , 424 ,  "int_get_ofwb_header: hdrbuf ne int_open_for_write_begin") 
+!    CALL wrf_error_fatal ( "int_get_ofwb_header: hdrbuf ne int_open_for_write_begin") 
 !  ENDIF
   i = 3
   DataHandle = hdrbuf(i)    ; i = i+1
-!write(0,*) int_get_ofwb_header next rec,i, hdrbuf(hdrbufsize+1)
+!write(0,*)' int_get_ofwb_header next rec',i, hdrbuf(hdrbufsize+1)
   io_form    = hdrbuf(i)    ; i = i+1
-!write(0,*) int_get_ofwb_header next rec,i, hdrbuf(hdrbufsize+1)
+!write(0,*)' int_get_ofwb_header next rec',i, hdrbuf(hdrbufsize+1)
 
 !j = i
   call int_unpack_string( FileName, hdrbuf(i), n ) ; i = i+n
-!write(0,*)int_get_ofwb_header FileName ,TRIM(FileName),hdrbuf(j),n
-!write(0,*) int_get_ofwb_header next rec,i, hdrbuf(hdrbufsize+1)
+!write(0,*)'int_get_ofwb_header FileName ',TRIM(FileName),hdrbuf(j),n
+!write(0,*)' int_get_ofwb_header next rec',i, hdrbuf(hdrbufsize+1)
 !j = i
   call int_unpack_string( SysDepInfo, hdrbuf(i), n ) ; i = i+n
-!write(0,*)int_get_ofwb_header SysDepInfo ,TRIM(SysDepInfo),hdrbuf(j),n
-!write(0,*) int_get_ofwb_header next rec,i, hdrbuf(hdrbufsize+1)
-!write(0,*)int_get_ofwb_header hdrbufsize ,hdrbufsize
+!write(0,*)'int_get_ofwb_header SysDepInfo ',TRIM(SysDepInfo),hdrbuf(j),n
+!write(0,*)' int_get_ofwb_header next rec',i, hdrbuf(hdrbufsize+1)
+!write(0,*)'int_get_ofwb_header hdrbufsize ',hdrbufsize
   RETURN
 END SUBROUTINE int_get_ofwb_header
 
@@ -555,7 +555,7 @@ SUBROUTINE int_gen_ti_header_integer( hdrbuf, hdrbufsize, itypesize, typesize, &
   CALL int_gen_ti_header_c ( hdrbuf, hdrbufsize, itypesize, typesize, &
                              DataHandle, Data, Count, code )
   i = hdrbufsize/itypesize + 1 ;
-!write(0,*)int_gen_ti_header_integer ,TRIM(Element)
+!write(0,*)'int_gen_ti_header_integer ',TRIM(Element)
   CALL int_pack_string ( Element, hdrbuf( i ), n ) ; i = i + n
   hdrbufsize = n * itypesize + hdrbufsize ! return the number in bytes
   hdrbuf(1) = hdrbufsize
@@ -583,7 +583,7 @@ SUBROUTINE int_gen_ti_header_real( hdrbuf, hdrbufsize, itypesize, typesize, &
   CALL int_gen_ti_header_c ( hdrbuf, hdrbufsize, itypesize, typesize, &
                              DataHandle, Data, Count, code )
   i = hdrbufsize/itypesize + 1 ;
-!write(0,*)int_gen_ti_header_real ,TRIM(Element)
+!write(0,*)'int_gen_ti_header_real ',TRIM(Element)
   CALL int_pack_string ( Element, hdrbuf( i ), n ) ; i = i + n
   hdrbufsize = n * itypesize + hdrbufsize ! return the number in bytes
   hdrbuf(1) = hdrbufsize
@@ -614,7 +614,7 @@ SUBROUTINE int_get_ti_header_integer( hdrbuf, hdrbufsize, itypesize, typesize, &
                            DataHandle, Data, Count, code )
   i = 1 
   CALL int_unpack_string ( Element, hdrbuf( n/itypesize + 1 ), n ) ;
-!write(0,*)int_get_ti_header_integer ,TRIM(Element), Data(1)
+!write(0,*)'int_get_ti_header_integer ',TRIM(Element), Data(1)
   hdrbufsize = hdrbuf(1)
   RETURN
 END SUBROUTINE int_get_ti_header_integer
@@ -643,7 +643,7 @@ SUBROUTINE int_get_ti_header_real( hdrbuf, hdrbufsize, itypesize, typesize, &
                            DataHandle, Data, Count, code )
   i = 1
   CALL int_unpack_string ( Element, hdrbuf( n/itypesize + 1 ), n ) ;
-!write(0,*)int_get_ti_header_real ,TRIM(Element), Data(1)
+!write(0,*)'int_get_ti_header_real ',TRIM(Element), Data(1)
   hdrbufsize = hdrbuf(1)
   RETURN
 END SUBROUTINE int_get_ti_header_real
@@ -1023,7 +1023,7 @@ SUBROUTINE int_get_noop_header( hdrbuf, hdrbufsize, itypesize )
 !
   hdrbufsize = hdrbuf(1)
   IF ( hdrbuf(2) .NE. int_noop ) THEN
-    CALL wrf_error_fatal3 ( "module_internal_header_util.b" , 1026 ,  "int_get_noop_header: hdrbuf ne int_noop")
+    CALL wrf_error_fatal ( "int_get_noop_header: hdrbuf ne int_noop")
   ENDIF
   i = 3
   RETURN

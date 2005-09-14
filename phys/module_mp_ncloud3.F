@@ -316,7 +316,7 @@ CONTAINS
 !
 !     if(lat.eq.latd) then
 !       i = lond
-!       print*,lat,latd,lat,i
+!       print*,'lat',latd,lat,i
 
 !       do k = kts, kte
 !         press(i,k) = 0.

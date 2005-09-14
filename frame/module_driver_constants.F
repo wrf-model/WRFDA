@@ -15,15 +15,7 @@ MODULE module_driver_constants
    INTEGER , PARAMETER :: DATA_ORDER_XZY = 5
    INTEGER , PARAMETER :: DATA_ORDER_YZX = 6
 
-
-!STARTOFREGISTRYGENERATEDINCLUDE inc/model_data_order.inc
-!
-! WARNING This file is generated automatically by use_registry
-! using the data base in the file named Registry.
-! Do not edit.  Your changes to this file will be lost.
-!
-INTEGER , PARAMETER :: model_data_order   = DATA_ORDER_XZY
-!ENDOFREGISTRYGENERATEDINCLUDE
+#include <model_data_order.inc>
 
    !  1. Following are constants for use in defining maximal values for array
    !     definitions.  
@@ -44,7 +36,7 @@ INTEGER , PARAMETER :: model_data_order   = DATA_ORDER_XZY
 
    !  The maximum number of domains is how many grids the model will be running.
 
-   INTEGER , PARAMETER :: max_domains     =   ( 21 - 1 ) / 2 + 1
+   INTEGER , PARAMETER :: max_domains     =   ( MAX_DOMAINS_F - 1 ) / 2 + 1
 
    !  The maximum number of nest move specifications allowed in a namelist
 
@@ -52,11 +44,11 @@ INTEGER , PARAMETER :: model_data_order   = DATA_ORDER_XZY
 
    !  2. Following related to driver leve data structures for DM_PARALLEL communications
 
-
-
-
+#ifdef DM_PARALLEL
+   INTEGER , PARAMETER :: max_comms       =   1024
+#else
    INTEGER , PARAMETER :: max_comms       =   1
-
+#endif
 
    !  3. Following is information related to the file I/O.
 

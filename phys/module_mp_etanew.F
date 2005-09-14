@@ -75,7 +75,7 @@ MODULE module_mp_etanew
       REAL,   DIMENSION(ITLO:ITHI,5) :: QMAX
       REAL,   DIMENSION(ITLO:ITHI,22):: QTOT
 
-!     SOME VARS WILL BE USED FOR DATA ASSIMILATION (DONT NEED THEM NOW). 
+!     SOME VARS WILL BE USED FOR DATA ASSIMILATION (DON'T NEED THEM NOW). 
 !     THEY ARE TREATED AS LOCAL VARS, BUT WILL BECOME STATE VARS IN THE 
 !     FUTURE. SO, WE DECLARED THEM AS MEMORY SIZES FOR THE FUTURE USE
 
@@ -205,7 +205,7 @@ MODULE module_mp_etanew
 !
 !-----------------------------------------------------------------------
 !--- Variables APREC,PREC,ACPREC,SR are calculated for precip assimilation
-!    and/or ZHAOs scheme in Eta and are not required by this microphysics 
+!    and/or ZHAO's scheme in Eta and are not required by this microphysics 
 !    scheme itself.  
 !--- NSTATS,QMAX,QTOT are used for diagnosis purposes only.  They will be 
 !    printed out when PRINT_diag is true.
@@ -879,11 +879,11 @@ MODULE module_mp_etanew
 !          DUM1=ABS(DUM)
 !          DUM2=TOLER*MIN(WC, QI+QW+QR)
 !          IF (DUM1 .GT. DUM2) THEN
-!            WRITE(6,"(/2(a,i4),a,i2)") {@ i=,I_index, j=,J_index,
-!     &                                  L=,L
+!            WRITE(6,"(/2(a,i4),a,i2)") '{@ i=',I_index,' j=',J_index,
+!     &                                 ' L=',L
 !            WRITE(6,"(4(a12,g11.4,1x))") 
-!     & {@ TCold=,TC,P=,.01*PP,DIFF=,DUM,WCold=,WC,
-!     & {@ QIold=,QI,QWold=,QW,QRold=,QR
+!     & '{@ TCold=',TC,'P=',.01*PP,'DIFF=',DUM,'WCold=',WC,
+!     & '{@ QIold=',QI,'QWold=',QW,'QRold=',QR
 !          ENDIF
 !
 !***********************************************************************
@@ -1081,9 +1081,9 @@ MODULE module_mp_etanew
      &                RimeF1=RHO*(QTICE/NLImax-XSIMASS)/MASSI(INDEXS)
                   ENDIF             ! End IF (XLI .LE. MASSI(MDImin) ) 
 !            WRITE(6,"(4(a12,g11.4,1x))") 
-!     & {$ TC=,TC,P=,.01*PP,NLICE=,NLICE,DUM=,DUM,
-!     & {$ XLI=,XLI,INDEXS=,FLOAT(INDEXS),RHO=,RHO,QTICE=,QTICE,
-!     & {$ XSIMASS=,XSIMASS,RimeF1=,RimeF1
+!     & '{$ TC=',TC,'P=',.01*PP,'NLICE=',NLICE,'DUM=',DUM,
+!     & '{$ XLI=',XLI,'INDEXS=',FLOAT(INDEXS),'RHO=',RHO,'QTICE=',QTICE,
+!     & '{$ XSIMASS=',XSIMASS,'RimeF1=',RimeF1
                 ENDIF                  ! End IF ( (NLICE.GE.NLImin .AND. NLICE.LE.NLImax) ...
               ENDDO                    ! End DO IPASS=0,1
             ENDIF                      ! End IF (QI.LE.CLIMIT .AND. ASNOW.LE.CLIMIT)
@@ -1615,7 +1615,7 @@ MODULE module_mp_etanew
    !--- Use same algorithm as above for calculating mean drop diameter
    !      (IDR, in microns), which is used to estimate the time-averaged
    !      fall speed of rain drops at the bottom of the grid layer.  This
-   !      isnt perfect, but the alternative is solving a transcendental 
+   !      isn't perfect, but the alternative is solving a transcendental 
    !      equation that is numerically inefficient and nasty to program
    !      (coded in earlier versions of GSMCOLUMN prior to 8-22-01).
    !
@@ -2151,10 +2151,10 @@ nsteps = 0
  2061     CONTINUE
         ENDIF
 !
-        CALL wrf_dm_bcast_bytes ( etampnew_unit1 , 4 )
+        CALL wrf_dm_bcast_bytes ( etampnew_unit1 , IWORDSIZE )
 !
         IF ( etampnew_unit1 < 0 ) THEN
-          CALL wrf_error_fatal3 ( "module_mp_etanew.b" , 2157 ,  'module_mp_etanew: etanewinit: Can not find unused fortran unit to read in lookup table.' )
+          CALL wrf_error_fatal ( 'module_mp_etanew: etanewinit: Can not find unused fortran unit to read in lookup table.' )
         ENDIF
 !
         IF ( wrf_dm_on_monitor() ) THEN
@@ -2178,18 +2178,18 @@ nsteps = 0
           CLOSE (etampnew_unit1)
         ENDIF
 !
-        CALL wrf_dm_bcast_bytes ( VENTR1 , size ( VENTR1 ) * 4 )
-        CALL wrf_dm_bcast_bytes ( VENTR2 , size ( VENTR2 ) * 4 )
-        CALL wrf_dm_bcast_bytes ( ACCRR , size ( ACCRR ) * 4 )
-        CALL wrf_dm_bcast_bytes ( MASSR , size ( MASSR ) * 4 )
-        CALL wrf_dm_bcast_bytes ( VRAIN , size ( VRAIN ) * 4 )
-        CALL wrf_dm_bcast_bytes ( RRATE , size ( RRATE ) * 4 )
-        CALL wrf_dm_bcast_bytes ( VENTI1 , size ( VENTI1 ) * 4 )
-        CALL wrf_dm_bcast_bytes ( VENTI2 , size ( VENTI2 ) * 4 )
-        CALL wrf_dm_bcast_bytes ( ACCRI , size ( ACCRI ) * 4 )
-        CALL wrf_dm_bcast_bytes ( MASSI , size ( MASSI ) * 4 )
-        CALL wrf_dm_bcast_bytes ( VSNOWI , size ( VSNOWI ) * 4 )
-        CALL wrf_dm_bcast_bytes ( VEL_RF , size ( VEL_RF ) * 4 )
+        CALL wrf_dm_bcast_bytes ( VENTR1 , size ( VENTR1 ) * RWORDSIZE )
+        CALL wrf_dm_bcast_bytes ( VENTR2 , size ( VENTR2 ) * RWORDSIZE )
+        CALL wrf_dm_bcast_bytes ( ACCRR , size ( ACCRR ) * RWORDSIZE )
+        CALL wrf_dm_bcast_bytes ( MASSR , size ( MASSR ) * RWORDSIZE )
+        CALL wrf_dm_bcast_bytes ( VRAIN , size ( VRAIN ) * RWORDSIZE )
+        CALL wrf_dm_bcast_bytes ( RRATE , size ( RRATE ) * RWORDSIZE )
+        CALL wrf_dm_bcast_bytes ( VENTI1 , size ( VENTI1 ) * RWORDSIZE )
+        CALL wrf_dm_bcast_bytes ( VENTI2 , size ( VENTI2 ) * RWORDSIZE )
+        CALL wrf_dm_bcast_bytes ( ACCRI , size ( ACCRI ) * RWORDSIZE )
+        CALL wrf_dm_bcast_bytes ( MASSI , size ( MASSI ) * RWORDSIZE )
+        CALL wrf_dm_bcast_bytes ( VSNOWI , size ( VSNOWI ) * RWORDSIZE )
+        CALL wrf_dm_bcast_bytes ( VEL_RF , size ( VEL_RF ) * RWORDSIZE )
 !
 !--- Calculates coefficients for growth rates of ice nucleated in water
 !    saturated conditions, scaled by physics time step (lookup table)
@@ -2309,7 +2309,7 @@ nsteps = 0
       WRITE( errmess , '(A,I4)' )                                        &
        'module_mp_etanew: error opening ETAMPNEW_DATA on unit '          &
      &, etampnew_unit1
-      CALL wrf_error_fatal3 ( "module_mp_etanew.b" , 2312 , errmess)
+      CALL wrf_error_fatal(errmess)
 !
 !-----------------------------------------------------------------------
       END SUBROUTINE etanewinit

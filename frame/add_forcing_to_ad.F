@@ -1,7 +1,7 @@
 SUBROUTINE add_forcing_to_ad(grid)
    USE module_domain
    TYPE(domain), INTENT(INOUT)  :: grid
-
+#ifdef WRFVAR
    grid%em_a_u_1  = grid%em_a_u_1  + grid%em_g_u_1
    grid%em_a_u_2  = grid%em_a_u_2  + grid%em_g_u_2
    grid%em_a_v_1  = grid%em_a_v_1  + grid%em_g_v_1
@@ -20,5 +20,5 @@ SUBROUTINE add_forcing_to_ad(grid)
    print*,' grid%em_g_t_2(1,1,1) =', grid%em_g_t_2(1,1,1)
    print*,' grid%em_a_t_1(1,1,1) =', grid%em_a_t_1(1,1,1)
    print*,' grid%em_a_t_2(1,1,1) =', grid%em_a_t_2(1,1,1)
-
+#endif
 END SUBROUTINE add_forcing_to_ad

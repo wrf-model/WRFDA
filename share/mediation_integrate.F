@@ -93,6 +93,27 @@ SUBROUTINE med_before_solve_io ( grid , config_flags )
 ! this needs to be looked at again so we can get rid of the special
 ! handling of AUXINPUT5 but for now...
 
+#ifdef WRF_CHEM
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! add for wrf_chem emiss input
+! - Get chemistry data
+  IF( config_flags%chem_opt > 0 ) THEN
+   IF( ESMF_AlarmIsRinging( grid%alarms( AUXINPUT5_ALARM ), rc=rc ) ) THEN
+    print *,' CALL med_read_wrf_chem_emiss '
+     CALL med_read_wrf_chem_emiss ( grid , config_flags )
+     CALL ESMF_AlarmRingerOff( grid%alarms( AUXINPUT5_ALARM ), rc=rc )
+    print *,' back from CALL med_read_wrf_chem_emiss '
+
+   ENDIF
+! end for wrf chem emiss input
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  ELSE
+   IF( ESMF_AlarmIsRinging( grid%alarms( AUXINPUT5_ALARM ), rc=rc ) ) THEN
+     CALL med_auxinput5_in ( grid , config_flags )
+     CALL ESMF_AlarmRingerOff( grid%alarms( AUXINPUT5_ALARM ), rc=rc )
+   ENDIF
+  ENDIF
+#endif
 
 ! - RESTART OUTPUT
    IF( ESMF_AlarmIsRinging( grid%alarms( RESTART_ALARM ), rc=rc ) ) THEN
@@ -137,7 +158,7 @@ SUBROUTINE med_nest_initial ( parent , nest , config_flags )
    TYPE (grid_config_rec_type) , INTENT(IN)   :: config_flags
    TYPE (grid_config_rec_type)                :: nest_config_flags
 
-
+#if (EM_CORE == 1 && DA_CORE != 1)
   ! Local
    INTEGER                                    :: idum1 , idum2 , fid, ierr
    INTEGER                                    :: i , j
@@ -237,10 +258,10 @@ SUBROUTINE med_nest_initial ( parent , nest , config_flags )
      nest%imask_ystag = 1
      nest%imask_xystag = 1
 
-
-
-
-
+#ifdef MOVE_NESTS
+     parent%nest_pos = parent%ht
+     where ( parent%nest_pos .gt. 0. ) parent%nest_pos = parent%nest_pos + 500.  ! make a cliff
+#endif
 
      CALL med_interp_domain( parent, nest )
 
@@ -374,7 +395,7 @@ SUBROUTINE med_nest_initial ( parent , nest , config_flags )
      CALL open_r_dataset ( fid , TRIM(rstname) , nest , config_flags , "DATASET=RESTART", ierr )
      IF ( ierr .NE. 0 ) THEN
        WRITE( message , '("program wrf: error opening ",A32," for reading")') TRIM(rstname)
-       CALL wrf_error_fatal3 ( "mediation_integrate.b" , 398 ,  message )
+       CALL WRF_ERROR_FATAL ( message )
      ENDIF
      CALL input_restart ( fid,   nest , config_flags , ierr )
      CALL close_dataset ( fid , config_flags , "DATASET=RESTART" )
@@ -387,7 +408,7 @@ SUBROUTINE med_nest_initial ( parent , nest , config_flags )
 
   ENDIF
 
-
+#endif
 
   RETURN
 END SUBROUTINE med_nest_initial
@@ -396,7 +417,7 @@ SUBROUTINE init_domain_constants ( parent , nest )
    USE module_domain
    IMPLICIT NONE
    TYPE(domain) :: parent , nest
-
+#if (EM_CORE == 1 && DA_CORE != 1)
    INTERFACE 
      SUBROUTINE med_init_domain_constants ( parent , nest )
         USE module_domain
@@ -404,10 +425,357 @@ SUBROUTINE init_domain_constants ( parent , nest )
      END SUBROUTINE med_init_domain_constants
    END INTERFACE 
    CALL init_domain_constants_em ( parent, nest )
-
+#endif
 END SUBROUTINE init_domain_constants
 
+#ifdef MOVE_NESTS
+SUBROUTINE med_nest_move ( parent, nest )
+  ! Driver layer
+   USE module_domain
+   USE module_timing
+   USE module_configure
+   USE module_io_domain
+   TYPE(domain) , POINTER                     :: parent, nest, grid
+   INTEGER dx, dy       ! number of parent domain points to move
+  ! Local 
+   INTEGER i, j, p, parent_grid_ratio
+   INTEGER px, py       ! number and direction of nd points to move
+   INTEGER                         :: ids , ide , jds , jde , kds , kde , &
+                                      ims , ime , jms , jme , kms , kme , &
+                                      ips , ipe , jps , jpe , kps , kpe
+   INTEGER ierr, fid
 
+#if ( EM_CORE == 1 && defined(DM_PARALLEL) )
+   INTERFACE
+     SUBROUTINE med_interp_domain ( parent , nest )
+        USE module_domain
+        TYPE(domain) , POINTER                 :: parent , nest
+     END SUBROUTINE med_interp_domain
+     SUBROUTINE start_domain ( grid , allowed_to_move )
+        USE module_domain
+        TYPE(domain) :: grid
+        LOGICAL, INTENT(IN) :: allowed_to_move
+     END SUBROUTINE start_domain
+     SUBROUTINE shift_domain_em ( grid, disp_x, disp_y,  &
+!
+# include <em_dummy_args.inc>
+!
+                           )
+        USE module_domain
+        USE module_configure
+        USE module_timing
+        IMPLICIT NONE
+        INTEGER disp_x, disp_y
+        TYPE(domain) , POINTER                 :: grid
+#include <em_dummy_decl.inc>
+     END SUBROUTINE shift_domain_em
+     LOGICAL FUNCTION time_for_move ( parent , nest , dx , dy )
+        USE module_domain
+        USE WRF_ESMF_MOD
+        TYPE(domain) , POINTER    :: parent , nest
+        INTEGER, INTENT(OUT)      :: dx , dy
+     END FUNCTION time_for_move
+   END INTERFACE
+
+#ifdef DEREF_KLUDGE
+! see <a href="www.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm">here</a>
+   INTEGER     :: sm31 , em31 , sm32 , em32 , sm33 , em33
+   INTEGER     :: sm31x, em31x, sm32x, em32x, sm33x, em33x
+   INTEGER     :: sm31y, em31y, sm32y, em32y, sm33y, em33y
+#endif
+
+  ! set grid pointer for code in deref_kludge (if used)
+  grid => nest
+#include "deref_kludge.h"
+
+! mask should be defined in nest domain
+
+   check_for_move: IF ( time_for_move ( parent , nest , dx, dy ) ) THEN
+
+     IF ( dx .gt. 1 .or. dy .gt. 1 ) THEN
+       CALL wrf_error_fatal( 'med_nest_move' )
+     ENDIF
+write(0,*)' moving ',grid%id,dx,dy
+
+
+     CALL get_ijk_from_grid (  grid ,                   &
+                               ids, ide, jds, jde, kds, kde,    &
+                               ims, ime, jms, jme, kms, kme,    &
+                               ips, ipe, jps, jpe, kps, kpe    )
+
+#ifdef RSL
+! tell RSL about the move; this needs to be moved into external directory
+     CALL rsl_move_nest ( parent%domdesc, nest%intermediate_grid%domdesc, dx, dy )
+     CALL adjust_domain_dims_for_move( nest%intermediate_grid , dx, dy )
+#endif
+
+     CALL get_ijk_from_grid (  grid ,                   &
+                               ids, ide, jds, jde, kds, kde,    &
+                               ims, ime, jms, jme, kms, kme,    &
+                               ips, ipe, jps, jpe, kps, kpe    )
+
+     grid => nest 
+
+     CALL shift_domain_em( grid, dx, dy,  &
+!
+# include <em_actual_args.inc>
+!
+                         )
+
+     px = grid%parent_grid_ratio*dx
+     py = grid%parent_grid_ratio*dy
+
+     grid%i_parent_start = grid%i_parent_start + px / grid%parent_grid_ratio 
+     CALL nl_set_i_parent_start( grid%id, grid%i_parent_start )
+     grid%j_parent_start = grid%j_parent_start + py / grid%parent_grid_ratio
+     CALL nl_set_j_parent_start( grid%id, grid%j_parent_start )
+
+     CALL med_interp_domain( parent, nest )
+
+     nest%moved = .true.
+! masks associated with nest will have been set by shift_domain_em above
+     CALL start_domain ( nest , .FALSE. )
+     nest%moved = .false.
+
+! copy time level 2 to time level 1 in new regions of multi-time level fields
+! this should be registry generated.
+     do k = kms,kme
+       where ( nest%imask_xstag  .EQ. 1 ) nest%em_u_1(:,k,:)   = nest%em_u_2(:,k,:)
+       where ( nest%imask_ystag  .EQ. 1 ) nest%em_v_1(:,k,:)   = nest%em_v_2(:,k,:)
+       where ( nest%imask_nostag .EQ. 1 ) nest%em_t_1(:,k,:)   = nest%em_t_2(:,k,:)
+       where ( nest%imask_nostag .EQ. 1 ) nest%em_w_1(:,k,:)   = nest%em_w_2(:,k,:)
+       where ( nest%imask_nostag .EQ. 1 ) nest%em_ph_1(:,k,:)  = nest%em_ph_2(:,k,:)
+       where ( nest%imask_nostag .EQ. 1 ) nest%em_tp_1(:,k,:)  = nest%em_tp_2(:,k,:)
+       where ( nest%imask_nostag .EQ. 1 ) nest%em_tke_1(:,k,:) = nest%em_tke_2(:,k,:)
+     enddo
+     do p = PARAM_FIRST_SCALAR , num_moist
+       do k = kms,kme
+         where ( nest%imask_nostag .EQ. 1 ) nest%moist_1(:,k,:,p) = nest%moist_2(:,k,:,p)
+       enddo
+     enddo
+     do p = PARAM_FIRST_SCALAR , num_chem
+       do k = kms,kme
+         where ( nest%imask_nostag .EQ. 1 ) nest%chem_1(:,k,:,p) = nest%chem_2(:,k,:,p)
+       enddo
+     enddo
+     where ( nest%imask_nostag .EQ. 1 ) nest%em_mu_1(:,:)  = nest%em_mu_2(:,:)
+!
+
+   ENDIF check_for_move
+
+#endif
+
+END SUBROUTINE med_nest_move
+
+LOGICAL FUNCTION time_for_move2 ( parent , grid , move_cd_x, move_cd_y )
+  ! Driver layer
+   USE module_domain
+   USE module_configure
+   USE WRF_ESMF_MOD
+   IMPLICIT NONE
+! arguments
+   TYPE(domain) , POINTER    :: parent, grid
+   INTEGER, INTENT(OUT)      :: move_cd_x , move_cd_y
+! local
+   INTEGER  i, num_moves, rc
+   INTEGER  move_interval , move_id
+   TYPE(ESMF_Time) :: ct, st
+   TYPE(ESMF_TimeInterval) :: ti
+   CHARACTER*256 mess
+
+   time_for_move2 = .FALSE.
+   CALL ESMF_ClockGet( grid%domain_clock, CurrTime=ct, StartTime=st, rc=rc )
+   CALL nl_get_num_moves( 1, num_moves )
+   IF ( num_moves .GT. max_moves ) THEN
+     WRITE(mess,*)'time_for_moves2: num_moves (',num_moves,') .GT. max_moves (',max_moves,')'
+     CALL wrf_error_fatal( TRIM(mess) )
+   ENDIF
+   DO I = 1, num_moves
+     CALL nl_get_move_id( i, move_id )
+     IF ( move_id .EQ. grid%id ) THEN
+       CALL nl_get_move_interval( i, move_interval )
+       IF ( move_interval .LT. 999999999 ) THEN
+         CALL ESMF_TimeIntervalSet ( ti, M=move_interval, rc=rc )
+         IF ( ct .GE. grid%start_time + ti ) THEN
+           CALL nl_get_move_cd_x ( i, move_cd_x )
+           CALL nl_get_move_cd_y ( i, move_cd_y )
+           CALL nl_set_move_interval ( i, 999999999 )
+           time_for_move2 = .TRUE.
+           EXIT
+         ENDIF
+       ENDIF
+     ENDIF
+   ENDDO
+   RETURN
+END FUNCTION time_for_move2
+
+LOGICAL FUNCTION time_for_move ( parent , grid , move_cd_x, move_cd_y )
+   USE module_domain
+   USE module_configure
+   USE WRF_ESMF_MOD
+   IMPLICIT NONE
+! arguments
+   TYPE(domain) , POINTER    :: parent, grid
+   INTEGER, INTENT(OUT)      :: move_cd_x , move_cd_y
+! local
+   INTEGER     :: coral_dist, kid
+   INTEGER     :: dw, de, ds, dn, pgr
+   INTEGER     :: cids, cide, cjds, cjde, ckds, ckde, &
+                  cims, cime, cjms, cjme, ckms, ckme, &
+                  cips, cipe, cjps, cjpe, ckps, ckpe, &
+                  nids, nide, njds, njde, nkds, nkde, &
+                  nims, nime, njms, njme, nkms, nkme, &
+                  nips, nipe, njps, njpe, nkps, nkpe
+! interface
+   INTERFACE
+     LOGICAL FUNCTION time_for_move2 ( parent , nest , dx , dy )
+        USE module_domain
+        USE WRF_ESMF_MOD
+        TYPE(domain) , POINTER    :: parent , nest
+        INTEGER, INTENT(OUT)      :: dx , dy
+     END FUNCTION time_for_move2
+   END INTERFACE
+! executable
+! 
+! Simplifying assumption: domains in moving nest simulations have only 
+! one parent and only one child.
+   IF   ( grid%num_nests .GT. 1 ) THEN
+     CALL wrf_error_fatal ( 'domains in moving nest simulations can have only 1 nest' )
+   ENDIF
+   kid = 1
+!
+! find out if this is the innermost nest (will not have kids)
+   IF   ( grid%num_nests .EQ. 0 ) THEN
+     ! code that executes on innermost nest
+     time_for_move = time_for_move2 ( parent , grid , move_cd_x, move_cd_y )
+   ELSE
+     ! code that executes on parent to see if parent needs to move
+     ! get closest number of cells we'll allow nest edge to approach parent bdy
+     CALL nl_get_coral_dist ( grid%id , coral_dist )
+     ! get dims
+     CALL get_ijk_from_grid (  grid%nests(kid)%ptr ,               &
+                               nids, nide, njds, njde, nkds, nkde, &
+                               nims, nime, njms, njme, nkms, nkme, &
+                               nips, nipe, njps, njpe, nkps, nkpe  )
+     CALL get_ijk_from_grid (  grid ,                              &
+                               cids, cide, cjds, cjde, ckds, ckde, &
+                               cims, cime, cjms, cjme, ckms, ckme, &
+                               cips, cipe, cjps, cjpe, ckps, ckpe  )
+     CALL nl_get_parent_grid_ratio ( grid%nests(kid)%ptr%id , pgr )
+     ! perform measurements...
+     !  from western boundary
+     dw = grid%nests(kid)%ptr%i_parent_start - 1
+     !  from southern boundary
+     ds = grid%nests(kid)%ptr%j_parent_start - 1
+     !  from eastern boundary
+     de = cide - ( grid%nests(kid)%ptr%i_parent_start + (nide-nids+1)/pgr )
+     !  from northern boundary
+     dn = cjde - ( grid%nests(kid)%ptr%j_parent_start + (njde-njds+1)/pgr )
+
+     ! move this domain (the parent containing the moving nest)
+     ! in a direction that reestablishes the distance from 
+     ! the boundary.
+     move_cd_x = 0
+     move_cd_y = 0
+     if ( dw .LT. coral_dist ) move_cd_x = move_cd_x - 1
+     if ( de .LT. coral_dist ) move_cd_x = move_cd_x + 1
+     if ( ds .LT. coral_dist ) move_cd_y = move_cd_y - 1
+     if ( dn .LT. coral_dist ) move_cd_y = move_cd_y + 1
+
+     time_for_move = ( move_cd_x .NE. 0 ) .OR. ( move_cd_y .NE. 0 )
+
+     IF ( time_for_move .AND. grid%id .EQ. 1 ) THEN
+       CALL wrf_message( 'DANGER: Nest has moved too close to boundary of outermost domain.' )
+       time_for_move = .FALSE.
+     ENDIF 
+
+   ENDIF
+
+   RETURN
+
+END FUNCTION time_for_move
+
+#endif
+
+#if ( EM_CORE == 1 && defined(DM_PARALLEL) && MOVE_NESTS )
+
+SUBROUTINE shift_domain_em ( grid , disp_x, disp_y, &
+!
+# include <em_dummy_args.inc>
+!
+                           )
+   USE module_domain
+   USE module_timing
+   USE module_configure
+   USE module_dm
+   USE module_timing
+   IMPLICIT NONE
+  ! Arguments
+   INTEGER disp_x, disp_y       ! number of parent domain points to move
+   TYPE(domain) , POINTER                     :: grid
+  ! Local 
+   INTEGER i, j, ii
+   INTEGER px, py       ! number and direction of nd points to move
+   INTEGER                         :: ids , ide , jds , jde , kds , kde , &
+                                      ims , ime , jms , jme , kms , kme , &
+                                      ips , ipe , jps , jpe , kps , kpe
+   TYPE (grid_config_rec_type)  :: config_flags
+#ifdef DEREF_KLUDGE
+! see <a href="www.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm">here</a>
+   INTEGER     :: sm31 , em31 , sm32 , em32 , sm33 , em33
+   INTEGER     :: sm31x, em31x, sm32x, em32x, sm33x, em33x
+   INTEGER     :: sm31y, em31y, sm32y, em32y, sm33y, em33y
+#endif
+
+   !  Definitions of dummy arguments to solve
+#include <em_dummy_decl.inc>
+
+#define COPY_IN
+#include <em_scalar_derefs.inc>
+#include "deref_kludge.h"
+#ifdef DM_PARALLEL
+#      include <em_data_calls.inc>
+#endif
+
+   CALL model_to_grid_config_rec ( grid%id , model_config_rec , config_flags )
+
+   CALL get_ijk_from_grid (  grid ,                   &
+                             ids, ide, jds, jde, kds, kde,    &
+                             ims, ime, jms, jme, kms, kme,    &
+                             ips, ipe, jps, jpe, kps, kpe    )
+
+   px = isign(parent_grid_ratio,disp_x)
+   py = isign(parent_grid_ratio,disp_y)
+
+   imask_nostag = 1
+   imask_xstag = 1
+   imask_ystag = 1
+   imask_xystag = 1
+
+   imask_nostag(ips:min(ide-1,ipe),jps:min(jde-1,jpe)) = 0
+   imask_xstag(ips:ipe,jps:min(jde-1,jpe)) = 0
+   imask_ystag(ips:min(ide-1,ipe),jps:jpe) = 0
+   imask_xystag(ips:ipe,jps:jpe) = 0
+
+#if 1
+
+! shift the nest domain in x
+   do ii = 1,abs(disp_x)
+#include <em_shift_halo_x.inc>
+   enddo
+
+! shift the nest domain in y
+   do ii = 1,abs(disp_y)
+#include <em_shift_halo_y.inc>
+   enddo
+
+#endif
+
+#define COPY_OUT
+#include <em_scalar_derefs.inc>
+
+END SUBROUTINE shift_domain_em
+#endif
 
 SUBROUTINE med_nest_force ( parent , nest )
   ! Driver layer
@@ -482,6 +850,23 @@ SUBROUTINE med_nest_feedback ( parent , nest , config_flags )
     IF ( .NOT. ESMF_ClockIsStopTime(nest%domain_clock ,rc=rc) .AND. &
          config_flags%feedback .NE. 0 ) THEN
       CALL med_feedback_domain( parent, nest )
+#ifdef MOVE_NESTS
+      CALL get_ijk_from_grid (  parent ,                         &
+                                ids, ide, jds, jde, kds, kde,    &
+                                ims, ime, jms, jme, kms, kme,    &
+                                ips, ipe, jps, jpe, kps, kpe    )
+      DO j = jps, MIN(jpe,jde-1)
+      DO i = ips, MIN(ipe,ide-1)
+        IF      ( parent%nest_pos(i,j) .EQ. 9021000. ) THEN
+          parent%nest_pos(i,j) = parent%ht(i,j)*1.5 + 1000.
+        ELSE IF ( parent%ht(i,j) .NE. 0. ) THEN
+          parent%nest_pos(i,j) = parent%ht(i,j) + 500.
+        ELSE 
+          parent%nest_pos(i,j) = 0.
+        ENDIF
+      ENDDO
+      ENDDO
+#endif
     END IF
 
    RETURN
@@ -614,7 +999,7 @@ SUBROUTINE med_hist_out ( grid , stream, config_flags )
 
    IF ( stream .LT. 0 .OR. stream .GT. 5 ) THEN
      WRITE(message,*)'med_hist_out: invalid history stream ',stream
-     CALL wrf_error_fatal3 ( "mediation_integrate.b" , 1002 ,  message )
+     CALL wrf_error_fatal( message )
    ENDIF
    IF (      ( stream .eq. 0 .and. grid%oid          .eq. 0 )    &
         .or. ( stream .eq. 1 .and. grid%auxhist1_oid .eq. 0 )    &
@@ -762,7 +1147,7 @@ SUBROUTINE med_auxinput2_in4ad ( grid , config_flags , nl_timestr )
    TYPE (grid_config_rec_type) , INTENT(IN)   :: config_flags
    character(len=*),             INTENT(IN)   :: nl_timestr
 
-   write(unit=*, fmt='(3a,i6)') 'file:', "mediation_integrate.b", ', line:', 1150
+   write(unit=*, fmt='(3a,i6)') 'file:', __FILE__, ', line:', __LINE__
    print *, 'nl_timestr=', nl_timestr
    CALL med_auxinput4ad( grid , 2 , config_flags , nl_timestr )
    RETURN
@@ -827,7 +1212,7 @@ SUBROUTINE med_auxinput_in ( grid , stream, config_flags )
 
    IF ( stream .LT. 1 .OR. stream .GT. 5 ) THEN
      WRITE(message,*)'med_auxinput_in: invalid inputory stream ',stream
-     CALL wrf_error_fatal3 ( "mediation_integrate.b" , 1215 ,  message )
+     CALL wrf_error_fatal( message )
    ENDIF
 
    IF(stream == 2) THEN
@@ -977,13 +1362,13 @@ SUBROUTINE med_auxinput4ad ( grid , stream, config_flags, nl_timestr )
 
    IF ( stream /= 2 ) THEN
      WRITE(message,*)'med_auxinput4ad: invalid inputory stream ',stream
-     CALL wrf_error_fatal3 ( "mediation_integrate.b" , 1365 ,  message )
+     CALL wrf_error_fatal( message )
    ENDIF
 
      timestr = trim( nl_timestr )
      ierr = 0
 
-     write(unit=*, fmt='(3a,i6)') 'file:', "mediation_integrate.b", ', line:', 1371
+     write(unit=*, fmt='(3a,i6)') 'file:', __FILE__, ', line:', __LINE__
      print *, 'nl_timestr=', nl_timestr
 
      CALL construct_filename2a ( auxname , config_flags%auxinput2_inname , grid%id , 2 , timestr )
@@ -1047,11 +1432,11 @@ SUBROUTINE med_filter_out ( grid , config_flags )
      CALL open_w_dataset ( fid, TRIM(outname), grid ,  &
                            config_flags , output_model_input , "DATASET=INPUT", ierr )
      IF ( ierr .NE. 0 ) THEN
-       CALL wrf_error_fatal3 ( "mediation_integrate.b" , 1435 ,  message )
+       CALL wrf_error_fatal( message )
      ENDIF
 
      IF ( ierr .NE. 0 ) THEN
-       CALL wrf_error_fatal3 ( "mediation_integrate.b" , 1439 ,  message )
+       CALL wrf_error_fatal( message )
      ENDIF
 
    CALL output_model_input ( fid, grid , config_flags , ierr )
@@ -1078,140 +1463,7 @@ SUBROUTINE med_latbound_in ( grid , config_flags )
 
    IMPLICIT NONE
 
-
-  
-!WRF Error and Warning messages (1-999)
-!All i/o package-specific status codes you may want to add must be handled by your package (see below)
-! WRF handles these and netCDF messages only
-  integer, parameter  :: WRF_NO_ERR                  =  0       !no error
-  integer, parameter  :: WRF_WARN_FILE_NF            = -1       !file not found, or incomplete
-  integer, parameter  :: WRF_WARN_MD_NF              = -2       !metadata not found
-  integer, parameter  :: WRF_WARN_TIME_NF            = -3       !timestamp not found
-  integer, parameter  :: WRF_WARN_TIME_EOF           = -4       !no more timestamps
-  integer, parameter  :: WRF_WARN_VAR_NF             = -5       !variable not found
-  integer, parameter  :: WRF_WARN_VAR_EOF            = -6       !no more variables for the current time
-  integer, parameter  :: WRF_WARN_TOO_MANY_FILES     = -7       !too many open files
-  integer, parameter  :: WRF_WARN_TYPE_MISMATCH      = -8       !data type mismatch
-  integer, parameter  :: WRF_WARN_WRITE_RONLY_FILE   = -9       !attempt to write readonly file
-  integer, parameter  :: WRF_WARN_READ_WONLY_FILE    = -10      !attempt to read writeonly file
-  integer, parameter  :: WRF_WARN_FILE_NOT_OPENED    = -11      !attempt to access unopened file
-  integer, parameter  :: WRF_WARN_2DRYRUNS_1VARIABLE = -12      !attempt to do 2 trainings for 1 variable
-  integer, parameter  :: WRF_WARN_READ_PAST_EOF      = -13      !attempt to read past EOF
-  integer, parameter  :: WRF_WARN_BAD_DATA_HANDLE    = -14      !bad data handle
-  integer, parameter  :: WRF_WARN_WRTLEN_NE_DRRUNLEN = -15      !write length not equal to training length
-  integer, parameter  :: WRF_WARN_TOO_MANY_DIMS      = -16      !more dimensions requested than training
-  integer, parameter  :: WRF_WARN_COUNT_TOO_LONG     = -17      !attempt to read more data than exists
-  integer, parameter  :: WRF_WARN_DIMENSION_ERROR    = -18      !input dimension inconsistent
-  integer, parameter  :: WRF_WARN_BAD_MEMORYORDER    = -19      !input MemoryOrder not recognized
-  integer, parameter  :: WRF_WARN_DIMNAME_REDEFINED  = -20      !a dimension name with 2 different lengths
-  integer, parameter  :: WRF_WARN_CHARSTR_GT_LENDATA = -21      !string longer than provided storage
-  integer, parameter  :: WRF_WARN_NOTSUPPORTED       = -22      !function not supportable
-  integer, parameter  :: WRF_WARN_NOOP               = -23      !package implements this routine as NOOP
-
-!Fatal errors 
-  integer, parameter  :: WRF_ERR_FATAL_ALLOCATION_ERROR  = -100 !allocation error
-  integer, parameter  :: WRF_ERR_FATAL_DEALLOCATION_ERR  = -101 !dealloc error
-  integer, parameter  :: WRF_ERR_FATAL_BAD_FILE_STATUS   = -102 !bad file status
-
-
-!Package specific errors (1000+)        
-!Netcdf status codes
-!WRF will accept status codes of 1000+, but it is up to the package to handle
-! and return the status to the user.
-
-  integer, parameter  :: WRF_ERR_FATAL_BAD_VARIABLE_DIM  = -1004
-  integer, parameter  :: WRF_ERR_FATAL_MDVAR_DIM_NOT_1D  = -1005
-  integer, parameter  :: WRF_ERR_FATAL_TOO_MANY_TIMES    = -1006
-  integer, parameter  :: WRF_WARN_BAD_DATA_TYPE      = -1007    !this code not in either spec?
-  integer, parameter  :: WRF_WARN_FILE_NOT_COMMITTED = -1008    !this code not in either spec?
-  integer, parameter  :: WRF_WARN_FILE_OPEN_FOR_READ = -1009
-  integer, parameter  :: WRF_IO_NOT_INITIALIZED      = -1010
-  integer, parameter  :: WRF_WARN_MD_AFTER_OPEN      = -1011
-  integer, parameter  :: WRF_WARN_TOO_MANY_VARIABLES = -1012
-  integer, parameter  :: WRF_WARN_DRYRUN_CLOSE       = -1013
-  integer, parameter  :: WRF_WARN_DATESTR_BAD_LENGTH = -1014
-  integer, parameter  :: WRF_WARN_ZERO_LENGTH_READ   = -1015
-  integer, parameter  :: WRF_WARN_DATA_TYPE_NOT_FOUND = -1016
-  integer, parameter  :: WRF_WARN_DATESTR_ERROR      = -1017
-  integer, parameter  :: WRF_WARN_DRYRUN_READ        = -1018
-  integer, parameter  :: WRF_WARN_ZERO_LENGTH_GET    = -1019
-  integer, parameter  :: WRF_WARN_ZERO_LENGTH_PUT    = -1020
-  integer, parameter  :: WRF_WARN_NETCDF             = -1021    
-  integer, parameter  :: WRF_WARN_LENGTH_LESS_THAN_1 = -1022    
-  integer, parameter  :: WRF_WARN_MORE_DATA_IN_FILE  = -1023    
-  integer, parameter  :: WRF_WARN_DATE_LT_LAST_DATE  = -1024
-
-! For HDF5 only
-  integer, parameter  :: WRF_HDF5_ERR_FILE                 = -200
-  integer, parameter  :: WRF_HDF5_ERR_MD                   = -201
-  integer, parameter  :: WRF_HDF5_ERR_TIME                 = -202
-  integer, parameter  :: WRF_HDF5_ERR_TIME_EOF             = -203
-  integer, parameter  :: WRF_HDF5_ERR_MORE_DATA_IN_FILE    = -204
-  integer, parameter  :: WRF_HDF5_ERR_DATE_LT_LAST_DATE    = -205
-  integer, parameter  :: WRF_HDF5_ERR_TOO_MANY_FILES       = -206
-  integer, parameter  :: WRF_HDF5_ERR_TYPE_MISMATCH        = -207
-  integer, parameter  :: WRF_HDF5_ERR_LENGTH_LESS_THAN_1   = -208
-  integer, parameter  :: WRF_HDF5_ERR_WRITE_RONLY_FILE     = -209
-  integer, parameter  :: WRF_HDF5_ERR_READ_WONLY_FILE      = -210
-  integer, parameter  :: WRF_HDF5_ERR_FILE_NOT_OPENED      = -211
-  integer, parameter  :: WRF_HDF5_ERR_DATESTR_ERROR        = -212
-  integer, parameter  :: WRF_HDF5_ERR_DRYRUN_READ          = -213
-  integer, parameter  :: WRF_HDF5_ERR_ZERO_LENGTH_GET      = -214
-  integer, parameter  :: WRF_HDF5_ERR_ZERO_LENGTH_PUT      = -215
-  integer, parameter  :: WRF_HDF5_ERR_2DRYRUNS_1VARIABLE   = -216
-  integer, parameter  :: WRF_HDF5_ERR_DATA_TYPE_NOTFOUND   = -217
-  integer, parameter  :: WRF_HDF5_ERR_READ_PAST_EOF        = -218
-  integer, parameter  :: WRF_HDF5_ERR_BAD_DATA_HANDLE      = -219
-  integer, parameter  :: WRF_HDF5_ERR_WRTLEN_NE_DRRUNLEN   = -220
-  integer, parameter  :: WRF_HDF5_ERR_DRYRUN_CLOSE         = -221
-  integer, parameter  :: WRF_HDF5_ERR_DATESTR_BAD_LENGTH   = -222
-  integer, parameter  :: WRF_HDF5_ERR_ZERO_LENGTH_READ     = -223
-  integer, parameter  :: WRF_HDF5_ERR_TOO_MANY_DIMS        = -224
-  integer, parameter  :: WRF_HDF5_ERR_TOO_MANY_VARIABLES   = -225
-  integer, parameter  :: WRF_HDF5_ERR_COUNT_TOO_LONG       = -226
-  integer, parameter  :: WRF_HDF5_ERR_DIMENSION_ERROR      = -227
-  integer, parameter  :: WRF_HDF5_ERR_BAD_MEMORYORDER      = -228
-  integer, parameter  :: WRF_HDF5_ERR_DIMNAME_REDEFINED    = -229
-  integer, parameter  :: WRF_HDF5_ERR_MD_AFTER_OPEN        = -230
-  integer, parameter  :: WRF_HDF5_ERR_CHARSTR_GT_LENDATA   = -231
-  integer, parameter  :: WRF_HDF5_ERR_BAD_DATA_TYPE        = -232
-  integer, parameter  :: WRF_HDF5_ERR_FILE_NOT_COMMITTED   = -233
-
-  integer, parameter  :: WRF_HDF5_ERR_ALLOCATION        = -2001
-  integer, parameter  :: WRF_HDF5_ERR_DEALLOCATION      = -2002
-  integer, parameter  :: WRF_HDF5_ERR_BAD_FILE_STATUS   = -2003
-  integer, parameter  :: WRF_HDF5_ERR_BAD_VARIABLE_DIM  = -2004
-  integer, parameter  :: WRF_HDF5_ERR_MDVAR_DIM_NOT_1D  = -2005
-  integer, parameter  :: WRF_HDF5_ERR_TOO_MANY_TIMES    = -2006
-  integer, parameter ::  WRF_HDF5_ERR_DATA_ID_NOTFOUND  = -2007
-
-  integer, parameter ::  WRF_HDF5_ERR_DATASPACE         = -300
-  integer, parameter ::  WRF_HDF5_ERR_DATATYPE          = -301
-  integer, parameter :: WRF_HDF5_ERR_PROPERTY_LIST      = -302
-
-  integer, parameter :: WRF_HDF5_ERR_DATASET_CREATE     = -303
-  integer, parameter :: WRF_HDF5_ERR_DATASET_READ       = -304
-  integer, parameter :: WRF_HDF5_ERR_DATASET_WRITE      = -305
-  integer, parameter :: WRF_HDF5_ERR_DATASET_OPEN       = -306
-  integer, parameter :: WRF_HDF5_ERR_DATASET_GENERAL    = -307
-  integer, parameter :: WRF_HDF5_ERR_GROUP              = -308
-
-  integer, parameter :: WRF_HDF5_ERR_FILE_OPEN          = -309
-  integer, parameter :: WRF_HDF5_ERR_FILE_CREATE        = -310
-  integer, parameter :: WRF_HDF5_ERR_DATASET_CLOSE      = -311
-  integer, parameter :: WRF_HDF5_ERR_FILE_CLOSE         = -312
-  integer, parameter :: WRF_HDF5_ERR_CLOSE_GENERAL      = -313
-
-  integer, parameter :: WRF_HDF5_ERR_ATTRIBUTE_CREATE   = -314
-  integer, parameter :: WRF_HDF5_ERR_ATTRIBUTE_READ     = -315
-  integer, parameter :: WRF_HDF5_ERR_ATTRIBUTE_WRITE    = -316
-  integer, parameter :: WRF_HDF5_ERR_ATTRIBUTE_OPEN     = -317
-  integer, parameter :: WRF_HDF5_ERR_ATTRIBUTE_GENERAL  = -318
-  integer, parameter :: WRF_HDF5_ERR_ATTRIBUTE_CLOSE    = -319
-
-  integer, parameter :: WRF_HDF5_ERR_OTHERS             = -320
-  integer, parameter :: WRF_HDF5_ERR_ATTRIBUTE_OTHERS   = -321
-
+#include <wrf_status_codes.h>
 
   ! Arguments
    TYPE(domain)                               :: grid
@@ -1227,18 +1479,7 @@ SUBROUTINE med_latbound_in ( grid , config_flags )
    Type (ESMF_Time )                      :: time, btime
    Type (ESMF_Time )                      :: current_time
 
-
-      integer, parameter  :: WRF_FILE_NOT_OPENED                  = 100
-      integer, parameter  :: WRF_FILE_OPENED_NOT_COMMITTED        = 101
-      integer, parameter  :: WRF_FILE_OPENED_FOR_WRITE            = 102
-      integer, parameter  :: WRF_FILE_OPENED_FOR_READ             = 103
-      integer, parameter  :: WRF_REAL                             = 104
-      integer, parameter  :: WRF_DOUBLE               = 105
-      integer, parameter  :: WRF_INTEGER                          = 106
-      integer, parameter  :: WRF_LOGICAL                          = 107
-      integer, parameter  :: WRF_COMPLEX                          = 108
-      integer, parameter  :: WRF_DOUBLE_COMPLEX                   = 109
-      integer, parameter  :: WRF_FILE_OPENED_FOR_UPDATE           = 110
+#include <wrf_io_flags.h>
 
    CALL wrf_debug ( 1 , 'in med_latbound_in' )
 
@@ -1254,7 +1495,7 @@ SUBROUTINE med_latbound_in ( grid , config_flags )
        CALL ESMF_AlarmRingerOff( grid%alarms( BOUNDARY_ALARM ), rc=rc )
        IF ( wrf_dm_on_monitor() ) CALL start_timing
 
-! typically a <date> wouldnt be part of the bdy_inname, so just pass a dummy
+! typically a <date> wouldn't be part of the bdy_inname, so just pass a dummy
        CALL construct_filename2a ( bdyname , config_flags%bdy_inname , grid%id , 2 , 'dummydate' )
 
        CALL wrf_inquire_opened(head_grid%lbc_fid , TRIM(bdyname) , open_status , ierr ) 
@@ -1263,13 +1504,13 @@ SUBROUTINE med_latbound_in ( grid , config_flags )
        ELSE
          lbc_opened = .FALSE.
        ENDIF
-       CALL wrf_dm_bcast_bytes ( lbc_opened , 4 )
+       CALL wrf_dm_bcast_bytes ( lbc_opened , LWORDSIZE )
        IF ( .NOT. lbc_opened ) THEN
          CALL construct_filename1 ( bdyname , 'wrfbdy' , grid%id , 2 )
          CALL open_r_dataset ( head_grid%lbc_fid, TRIM(bdyname) , grid , config_flags , "DATASET=BOUNDARY", ierr )
           IF ( ierr .NE. 0 ) THEN
             WRITE( message, * ) 'med_latbound_in: error opening ',TRIM(bdyname), ' for reading. IERR = ',ierr
-            CALL wrf_error_fatal3 ( "mediation_integrate.b" , 1513 ,  message )
+            CALL WRF_ERROR_FATAL( message )
           ENDIF
        ELSE
          CALL wrf_debug( 100 , bdyname // 'already opened' )
@@ -1286,7 +1527,7 @@ SUBROUTINE med_latbound_in ( grid , config_flags )
 
        IF ( ierr .NE. 0 .and. ierr .NE. WRF_WARN_NETCDF ) THEN
          WRITE( message, * ) 'med_latbound_in: error reading ',TRIM(bdyname), ' IERR = ',ierr
-         CALL wrf_error_fatal3 ( "mediation_integrate.b" , 1530 ,  message )
+         CALL WRF_ERROR_FATAL( message )
        ENDIF
        IF ( grid%current_time .EQ. grid%this_bdy_time ) grid%dtbc = 0.
   
@@ -1342,9 +1583,9 @@ SUBROUTINE med_read_wrf_chem_emiss ( grid , config_flags )
   ! Model layer
    USE module_configure
    USE module_bc_time_utilities
-
-
-
+#ifdef DM_PARALLEL
+   USE module_dm
+#endif
    USE module_date_time
    USE WRF_ESMF_Mod
 
@@ -1367,18 +1608,7 @@ SUBROUTINE med_read_wrf_chem_emiss ( grid , config_flags )
    CHARACTER (LEN=256)                    :: message, current_date_char, date_string
    CHARACTER (LEN=80)                     :: inpname
 
-
-      integer, parameter  :: WRF_FILE_NOT_OPENED                  = 100
-      integer, parameter  :: WRF_FILE_OPENED_NOT_COMMITTED        = 101
-      integer, parameter  :: WRF_FILE_OPENED_FOR_WRITE            = 102
-      integer, parameter  :: WRF_FILE_OPENED_FOR_READ             = 103
-      integer, parameter  :: WRF_REAL                             = 104
-      integer, parameter  :: WRF_DOUBLE               = 105
-      integer, parameter  :: WRF_INTEGER                          = 106
-      integer, parameter  :: WRF_LOGICAL                          = 107
-      integer, parameter  :: WRF_COMPLEX                          = 108
-      integer, parameter  :: WRF_DOUBLE_COMPLEX                   = 109
-      integer, parameter  :: WRF_FILE_OPENED_FOR_UPDATE           = 110
+#include <wrf_io_flags.h>
 
      CALL model_to_grid_config_rec ( grid%id , model_config_rec , config_flags )
 
@@ -1412,7 +1642,7 @@ SUBROUTINE med_read_wrf_chem_emiss ( grid , config_flags )
                               "DATASET=AUXINPUT5", ierr )
         IF ( ierr .NE. 0 ) THEN
            WRITE( message , * ) 'med_read_wrf_chem_emissions: error opening ', TRIM( inpname )
-           CALL wrf_error_fatal3 ( "mediation_integrate.b" , 1645 ,  TRIM( message ) )
+           CALL wrf_error_fatal( TRIM( message ) )
         ENDIF
       ELSE IF ( tupdate .EQ. 0. .AND. current_date_char(12:13) .EQ. '12' ) THEN
          CALL construct_filename1 ( inpname , 'wrfchemi_12z' , grid%id , 2 )
@@ -1427,7 +1657,7 @@ SUBROUTINE med_read_wrf_chem_emiss ( grid , config_flags )
                               "DATASET=AUXINPUT5", ierr )
         IF ( ierr .NE. 0 ) THEN
            WRITE( message , * ) 'med_read_wrf_chem_emissions: error opening ', TRIM( inpname )
-           CALL wrf_error_fatal3 ( "mediation_integrate.b" , 1660 ,  TRIM( message ) )
+           CALL wrf_error_fatal( TRIM( message ) )
         ENDIF
       ENDIF
 
@@ -1468,9 +1698,9 @@ SUBROUTINE med_read_wrf_chem_bioemiss ( grid , config_flags )
   ! Model layer
    USE module_configure
    USE module_bc_time_utilities
-
-
-
+#ifdef DM_PARALLEL
+   USE module_dm
+#endif
    USE module_date_time
    USE WRF_ESMF_Mod
 
@@ -1492,18 +1722,7 @@ SUBROUTINE med_read_wrf_chem_bioemiss ( grid , config_flags )
    CHARACTER (LEN=256)                    :: message, current_date_char, date_string
    CHARACTER (LEN=80)                     :: inpname
 
-
-      integer, parameter  :: WRF_FILE_NOT_OPENED                  = 100
-      integer, parameter  :: WRF_FILE_OPENED_NOT_COMMITTED        = 101
-      integer, parameter  :: WRF_FILE_OPENED_FOR_WRITE            = 102
-      integer, parameter  :: WRF_FILE_OPENED_FOR_READ             = 103
-      integer, parameter  :: WRF_REAL                             = 104
-      integer, parameter  :: WRF_DOUBLE               = 105
-      integer, parameter  :: WRF_INTEGER                          = 106
-      integer, parameter  :: WRF_LOGICAL                          = 107
-      integer, parameter  :: WRF_COMPLEX                          = 108
-      integer, parameter  :: WRF_DOUBLE_COMPLEX                   = 109
-      integer, parameter  :: WRF_FILE_OPENED_FOR_UPDATE           = 110
+#include <wrf_io_flags.h>
     IF ( grid%id .EQ. 1 ) THEN
 
       CALL ESMF_ClockGet( grid%domain_clock, CurrTime=grid%current_time, rc=ierr )
@@ -1525,7 +1744,7 @@ SUBROUTINE med_read_wrf_chem_bioemiss ( grid , config_flags )
                               "DATASET=AUXINPUT4", ierr )
         IF ( ierr .NE. 0 ) THEN
            WRITE( message , * ) 'med_read_wrf_chem_bioemissions: error opening ', TRIM( inpname )
-           CALL wrf_error_fatal3 ( "mediation_integrate.b" , 1747 ,  TRIM( message ) )
+           CALL wrf_error_fatal( TRIM( message ) )
         ENDIF
 
          WRITE(message,*)'mediation_integrate: med_read_wrf_chem_bioemissions: Read biogenic emissions at time ',&

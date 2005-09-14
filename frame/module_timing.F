@@ -55,13 +55,13 @@ CONTAINS
       elapsed_seconds_total = elapsed_seconds_total + elapsed_seconds
 
       WRITE(6,'(A,A,A,F10.5,A)') 'Timing for ',TRIM(string),': ',elapsed_seconds,' elapsed seconds.'
-
-
-
+#if defined(DM_PARALLEL) && ! defined(STUBMPI)
+      WRITE(0,'(A,A,A,F10.5,A)') 'Timing for ',TRIM(string),': ',elapsed_seconds,' elapsed seconds.'
+#endif
 
 !     cpu_seconds = cpu_2 - cpu_1
 !     cpu_seconds_total = cpu_seconds_total + cpu_seconds
-!     PRINT (A,A,A,F10.5,A) ,Timing for ,TRIM(string),: ,cpu_seconds, cpu seconds.
+!     PRINT '(A,A,A,F10.5,A)' ,'Timing for ',TRIM(string),': ',cpu_seconds,' cpu seconds.'
 
       cn = cn - 1
 

@@ -74,8 +74,6 @@ ELSE
 
 ! core specific initializations -- add new cores here
 
- CALL init_modules_em
-
 ENDIF
  
 END SUBROUTINE init_modules

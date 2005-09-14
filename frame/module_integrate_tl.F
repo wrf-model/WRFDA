@@ -32,11 +32,11 @@ RECURSIVE SUBROUTINE integrate_tl ( grid, nl_date_string, nl_date_index )
 ! 
 ! The integrate routine takes a domain pointed to by the argument
 ! <em>grid</em> and advances the domain and its associated nests from the
-! grids current time, stored as grid%current_time, to a given time
+! grid's current time, stored as grid%current_time, to a given time
 ! forward in the simulation, stored as grid%stop_subtime. The
 ! stop_subtime value is arbitrary and does not have to be the same as
 ! time that the domain finished integrating.  The simulation stop time
-! for the grid is known to the grids clock (grid%domain_clock) and that
+! for the grid is known to the grid's clock (grid%domain_clock) and that
 ! is checked with a call to ESMF_ClockIsStopTime prior to beginning the
 ! loop over time period that is specified by the
 ! current_time/stop_subtime interval.
@@ -74,10 +74,10 @@ RECURSIVE SUBROUTINE integrate_tl ( grid, nl_date_string, nl_date_index )
 ! 
 ! 2. <a href=model_to_grid_config_rec.html>Model_to_grid_config_rec</a> is called to load the local config_flags
 ! structure with the configuration information for the grid stored
-! in model_config_rec and indexed by the grids unique integer id. These
+! in model_config_rec and indexed by the grid's unique integer id. These
 ! structures are defined in frame/module_configure.F.
 ! 
-! 3. The current time of the domain is retrieved from the domains clock
+! 3. The current time of the domain is retrieved from the domain's clock
 ! using ESMF_ClockGet.  There is another call to ESMF_ClockGet
 ! inside the WHILE loop that follows.
 ! 
@@ -86,12 +86,12 @@ RECURSIVE SUBROUTINE integrate_tl ( grid, nl_date_string, nl_date_index )
 ! 4.a. Start timing for this iteration (only on node zero in distributed-memory runs)
 ! 
 ! 4.b. Call <a href=med_setup_step.html>med_setup_step</a> to allow the mediation layer to 
-! do anything thats needed to call the solver for this domain.  In WRF this means setting
+! do anything that's needed to call the solver for this domain.  In WRF this means setting
 ! the indices into the 4D tracer arrays for the domain.
 ! 
 ! 4.c. Check for any nests that need to be started up at this time.  This is done 
 ! calling the logical function <a href=nests_to_open.html>nests_to_open</a> (defined in 
-! frame/module_nesting.F) which returns true and the index into the current domains list
+! frame/module_nesting.F) which returns true and the index into the current domain's list
 ! of children to use for the nest when one needs to be started.
 ! 
 ! 4.c.1  Call <a href=alloc_and_configure_domain.html>alloc_and_configure_domain</a> to allocate
@@ -99,7 +99,7 @@ RECURSIVE SUBROUTINE integrate_tl ( grid, nl_date_string, nl_date_index )
 ! 
 ! 4.c.2  Call <a href=setup_Timekeeping.html>setup_Timekeeping</a> for the nest.
 ! 
-! 4.c.3  Initialize the nests arrays by calling <a href=med_nest_initial.html>med_nest_initial</a>. This will
+! 4.c.3  Initialize the nest's arrays by calling <a href=med_nest_initial.html>med_nest_initial</a>. This will
 ! either interpolate data from this grid onto the nest, read it in from a file, or both. In a restart run, this
 ! is also where the nest reads in its restart file.
 ! 
@@ -111,7 +111,7 @@ RECURSIVE SUBROUTINE integrate_tl ( grid, nl_date_string, nl_date_index )
 ! restart data is output.
 ! 
 ! 4.f  Call <a href=solve_interface_tl.html>solve_interface_tl</a> which calls the solver that advance the domain 
-! one time step, then advance the domains clock by calling ESMF_ClockAdvance.  Upon advancing the clock,
+! one time step, then advance the domain's clock by calling ESMF_ClockAdvance.  Upon advancing the clock,
 ! the current time for the grid is updated by calling ESMF_ClockGet. The enclosing WHILE loop around
 ! this section is for handling other domains with which this domain may overlap.  It is not active in WRF 2.0 and
 ! only executes one trip.  
@@ -124,10 +124,10 @@ RECURSIVE SUBROUTINE integrate_tl ( grid, nl_date_string, nl_date_index )
 ! 4.h.1  Force the nested domain boundaries from this domain by calling <a href=med_nest_force.html>med_nest_force</a>.
 ! 
 ! 4.h.2  Setup the time period over which the nest is to run. Sine the current grid has been advanced one time step
-! and the nest has not, the start for the nest is this grids current time minus one time step.  The nests stop_subtime
+! and the nest has not, the start for the nest is this grid's current time minus one time step.  The nest's stop_subtime
 ! is the current time, bringing the nest up the same time level as this grid, its parent.
 ! 
-! 4.h.3  Recursively call this routine, integrate, to advance the nests time.  Since it is recursive, this will
+! 4.h.3  Recursively call this routine, integrate, to advance the nest's time.  Since it is recursive, this will
 ! also advance all the domains who are nests of this nest and so on.  In other words, when this call returns, all
 ! the domains rooted at the nest will be at the current time.
 ! 
@@ -137,7 +137,7 @@ RECURSIVE SUBROUTINE integrate_tl ( grid, nl_date_string, nl_date_index )
 ! 
 ! 5. Give the mediation layer an opportunity to do I/O at the end of the sequence of steps that brought the
 ! grid up to stop_subtime with a call to <a href=med_last_solve_io.html>med_last_solve_io</a>.  In WRF, this 
-! is used to generate the final history and/or restart output when the domain reaches the end of its integration.
+! is used to generate the final history and/or restart output when the domain reaches the end of it's integration.
 ! There is logic here to make sure this occurs correctly on a nest, since the nest may finish before its parent.
 ! </DESCRIPTION>
 
@@ -209,13 +209,13 @@ RECURSIVE SUBROUTINE integrate_tl ( grid, nl_date_string, nl_date_index )
        TYPE (grid_config_rec_type) config_flags
      END SUBROUTINE med_nest_force
 
-
-
-
-
-
-
-
+#ifdef MOVE_NESTS
+     SUBROUTINE med_nest_move ( parent , grid )
+       USE module_domain
+       USE module_configure
+       TYPE (domain), POINTER ::  grid , parent
+     END SUBROUTINE med_nest_move
+#endif
 
        ! mediation-supplied routine that gives mediation layer opportunity to 
        ! provide parent->nest feedback
@@ -270,7 +270,7 @@ RECURSIVE SUBROUTINE integrate_tl ( grid, nl_date_string, nl_date_index )
          ! for each nest whose time has come...
          DO WHILE ( nests_to_open( grid , nestid , kid ) )
             ! nestid is index into model_config_rec (module_configure) of the grid
-            ! to be opened; kid is index into an open slot in grids list of children
+            ! to be opened; kid is index into an open slot in grid's list of children
             a_nest_was_opened = .true.
             CALL alloc_and_configure_domain ( domain_id  = nestid ,                          &
                                               grid       = new_nest ,                        &
@@ -316,8 +316,8 @@ RECURSIVE SUBROUTINE integrate_tl ( grid, nl_date_string, nl_date_index )
             CALL ESMF_ClockAdvance( grid_ptr%domain_clock, rc=rc )
             CALL wrf_check_error( ESMF_SUCCESS, rc, &
                                   'ESMF_ClockAdvance() FAILED', &
-                                  "module_integrate_tl.b" , &
-                                  320  )
+                                  __FILE__ , &
+                                  __LINE__  )
             CALL wrf_clockprint ( 150, grid_ptr%domain_clock, &
                                   'DEBUG integrate_tl():  after ESMF_ClockAdvance,' )
             CALL ESMF_ClockGet( grid_ptr%domain_clock, currTime=grid_ptr%current_time, rc=rc )
@@ -341,9 +341,9 @@ RECURSIVE SUBROUTINE integrate_tl ( grid, nl_date_string, nl_date_index )
                 CALL wrf_debug( 100 , 'module_integrate_tl: calling med_nest_feedback ' )
                 CALL med_nest_feedback ( grid_ptr , grid_ptr%nests(kid)%ptr , config_flags )
                 CALL wrf_debug( 100 , 'module_integrate_tl: back from med_nest_feedback ' )
-
-
-
+#ifdef MOVE_NESTS
+                CALL med_nest_move ( grid_ptr , grid_ptr%nests(kid)%ptr )
+#endif
               END IF
             END DO
             grid_ptr => grid_ptr%sibling

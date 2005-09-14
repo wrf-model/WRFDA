@@ -26,7 +26,7 @@ CONTAINS
       INTEGER                    :: max_dom
       TYPE (ESMF_Time)           :: nest_start, nest_stop
 !#define STUB_FOR_NOW
-
+#ifndef STUB_FOR_NOW
       nestid = 0
       kid = 0
       nests_to_open = .false.
@@ -56,11 +56,11 @@ CONTAINS
           END IF
         END IF
       END DO
-
-
-
-
-
+#else
+      nestid = 0
+      kid = 0
+      nests_to_open = .false.
+#endif
       RETURN
    END FUNCTION nests_to_open
 

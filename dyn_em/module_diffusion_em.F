@@ -982,7 +982,7 @@
                                ims, ime, jms, jme, kms, kme,            &
                                its, ite, jts, jte, kts, kte             )
       CASE DEFAULT
-            CALL wrf_error_fatal3 ( "module_diffusion_em.b" , 985 ,  'Please choose diffusion coefficient scheme' )
+            CALL wrf_error_fatal( 'Please choose diffusion coefficient scheme' )
 
     END SELECT km_coef
 
@@ -4377,7 +4377,7 @@ END SUBROUTINE phy_bc
     END DO
     END DO
 
-! MARTA: change in the computation of the tkes tendency  at the surface.
+! MARTA: change in the computation of the tke's tendency  at the surface.
 !  the buoyancy flux is the average of the surface heat flux (0.06) and the
 !   flux at the first w level
 !
@@ -4540,7 +4540,7 @@ END SUBROUTINE phy_bc
         deltas  = ( dx * dy / rdzw(i,k,j) )**0.33333333
         tketmp  = MAX( tke(i,k,j), 1.0e-6 )
 
-! Apply Deardorffs (1980) "wall effect" at the bottom of the domain. 
+! Apply Deardorff's (1980) "wall effect" at the bottom of the domain. 
 
         IF ( k .eq. kts .or. k .eq. ktf ) then
           coefc = 3.9
@@ -4916,7 +4916,7 @@ END SUBROUTINE phy_bc
         i_end   = MIN( ite, ide-1 )
       END IF
 
-! Compute z at w points for rdz and rdzw computations.  Well switch z
+! Compute z at w points for rdz and rdzw computations.  We'll switch z
 ! to z at p points before returning
 
       DO k = 1, kte
@@ -4950,7 +4950,7 @@ END SUBROUTINE phy_bc
 
 ! End bug fix.
 
-! Now compute zx and zy; well assume that the halo for ph and phb is
+! Now compute zx and zy; we'll assume that the halo for ph and phb is
 ! properly filled.
 
     i_start = its

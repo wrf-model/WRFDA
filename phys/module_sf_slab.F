@@ -73,7 +73,7 @@ CONTAINS
 !-- EP2         constant for specific humidity calculation 
 !               (R_d/R_v) (dimensionless)
 !-- KARMAN      Von Karman constant
-!-- EOMEG       angular velocity of earths rotation (rad/s)
+!-- EOMEG       angular velocity of earth's rotation (rad/s)
 !-- STBOLT      Stefan-Boltzmann constant (W/m^2/K^4)
 !-- TSLB        soil temperature in 5-layer model
 !-- ZS          depths of centers of soil layers
@@ -362,7 +362,7 @@ CONTAINS
         ENDIF                                                                    
    20 CONTINUE                                                                   
 !                                                                                
-!-----CONVERT TSK(THETAG) TO TG FOR IUP CALCULATION ....                   
+!-----CONVERT 'TSK(THETAG)' TO 'TG' FOR 'IUP' CALCULATION ....                   
 !       IF WE ARE USING THE BLACKADAR MULTI-LEVEL (HIGH-RESOLUTION)              
 !       PBL MODEL                                                                
 !                                                                                

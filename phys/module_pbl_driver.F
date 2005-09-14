@@ -413,7 +413,7 @@ CONTAINS
      CASE DEFAULT
 
        WRITE( wrf_err_message , * ) 'The pbl option does not exist: bl_pbl_physics = ', config_flags%bl_pbl_physics
-       CALL wrf_error_fatal3 ( "module_pbl_driver.b" , 416 ,  wrf_err_message )
+       CALL wrf_error_fatal ( wrf_err_message )
 
    END SELECT pbl_select
 

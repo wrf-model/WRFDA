@@ -1,7 +1,7 @@
 ! IBM libmassv compatibility library
 ! 
 
-
+#ifndef NATIVE_MASSV
       subroutine vdiv(z,x,y,n)
       real*8 x(*),y(*),z(*)
       do 10 j=1,n
@@ -214,7 +214,7 @@
       return
       end
 
-
+#ifndef MAC_OS
       subroutine vdint(y,x,n)
       real*8 x(*),y(*)
       do 10 j=1,n
@@ -230,7 +230,7 @@
    10 continue
       return
       end
-
+#endif
 
       subroutine vlog10(y,x,n)
       real*8 x(*),y(*)
@@ -379,5 +379,4 @@
    10 continue
       return
       end
-
-
+#endif

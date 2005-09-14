@@ -757,7 +757,7 @@ CONTAINS
 !        pl(i,j,np+1) is the surface pressure.
 !    (3) the pressure levels ict and icb correspond approximately
 !        to 400 and 700 mb.
-!    (4) if overcast=true, the clear-sky flux, flc, is not computed.
+!    (4) if overcast='true', the clear-sky flux, flc, is not computed.
 !        
 !**************************************************************************
       implicit none
@@ -2918,7 +2918,7 @@ CONTAINS
            enddo
            O3(i,k)=O3(i,k)/(pres(ko-1)-pres(1))
         ENDIF
-!       print*,O3=,i,k,ko,O3(i,k),p(i,k),ko,pres(ko),pres(ko-1)
+!       print*,'O3=',i,k,ko,O3(i,k),p(i,k),ko,pres(ko),pres(ko-1)
       end do
       
       end subroutine o3prof

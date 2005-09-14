@@ -1348,7 +1348,7 @@ SUBROUTINE rhs_ph( ph_tend, u, v, ww,               &
 !
 ! rhs_ph calculates the large-timestep tendency terms for the geopotential
 ! equation.  These terms include the advection and "gw".  The geopotential
-! equation is cast in advective form, so we dont use the flux form advection
+! equation is cast in advective form, so we don't use the flux form advection
 ! algorithms here.
 !
 !</DESCRIPTION>
@@ -2162,15 +2162,15 @@ SUBROUTINE w_damp( rw_tend, ww, w, mut, rdnw, dt,     &
 
      DO k = 2, kde-1
      DO i = its,itf
-
-
-
-
+#if 0
+        cfl = abs(ww(i,k,j)/mut(i,j)*rdnw(k)*dt)
+        if(cfl .gt. w_beta)then
+#else
 ! restructure to get rid of divide
         cf_n = abs(ww(i,k,j))
         cf_d = abs(mut(i,j)*rdnw(k)*dt)
         if(cf_n .gt. cf_d*w_beta )then
-
+#endif
 
            print *,i,j,k,'cfl,w,d(eta)=',cfl,w(i,k,j),-1./rdnw(k)
            rw_tend(i,k,j) = rw_tend(i,k,j)-sign(1.,w(i,k,j))*w_alpha*(cfl-w_beta)*mut(i,j)
@@ -4010,7 +4010,7 @@ SUBROUTINE zero_tend ( tendency,                     &
 !
 !</DESCRIPTION>
 
-!  set up loop bounds for this grids boundary conditions
+!  set up loop bounds for this grid's boundary conditions
 
     i_start = its
     i_end   = min( ite,ide-1 )
@@ -4085,7 +4085,7 @@ SUBROUTINE zero_tend ( tendency,                     &
     enddo
 
 !  extrapolate p and t to surface and top.
-!  well use an extrapolation in z for now
+!  we'll use an extrapolation in z for now
 
     do j = j_start,j_end
     do i = i_start, i_end
@@ -4332,7 +4332,7 @@ END SUBROUTINE phy_prep
 !
 !</DESCRIPTION>
 
-!  set up loop bounds for this grids boundary conditions
+!  set up loop bounds for this grid's boundary conditions
 
     i_start = its    
     i_end   = min( ite,ide-1 )
@@ -4396,7 +4396,7 @@ END SUBROUTINE phy_prep
     enddo
 
 !  extrapolate p and t to surface and top.
-!  well use an extrapolation in z for now
+!  we'll use an extrapolation in z for now
 
     do j = j_start,j_end
     do i = i_start, i_end
@@ -4467,7 +4467,7 @@ END SUBROUTINE phy_prep
 !
 !</DESCRIPTION>
 
-!  set up loop bounds for this grids boundary conditions
+!  set up loop bounds for this grid's boundary conditions
 
 
     i_start = its    

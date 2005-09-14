@@ -2,7 +2,7 @@
 !
 ! note: this module really belongs in the dyn_em directory since it is 
 !       specific only to the EM core. Leaving here for now, with an 
-!       #if ( 1 == 1 ) directive. JM 20031201
+!       #if ( EM_CORE == 1 ) directive. JM 20031201
 !
 
 !  This MODULE holds the routines which are used to perform updates of the
@@ -18,7 +18,7 @@
 
 MODULE module_physics_addtendc
 
-
+#if ( EM_CORE == 1 )
 
    USE module_state_description
    USE module_configure
@@ -68,7 +68,7 @@ SUBROUTINE update_phy_ten(rt_tendf,ru_tendf,rv_tendf,moist_tendf,  &
                                                        RQSCUTEN
 !------------------------------------------------------------------
 
-!  set up loop bounds for this grids boundary conditions
+!  set up loop bounds for this grid's boundary conditions
 
    if (config_flags%ra_lw_physics .gt. 0 .or.                  &
        config_flags%ra_sw_physics .gt. 0)                      &
@@ -728,7 +728,7 @@ SUBROUTINE add_a2c_v(lvar,rvar,config_flags,                &
 
 END SUBROUTINE add_a2c_v
 
-! end of ifdef for 1 == 1 -- this module actually belongs in the dyn_em directory
-
+! end of ifdef for EM_CORE == 1 -- this module actually belongs in the dyn_em directory
+#endif
 
 END MODULE module_physics_addtendc
