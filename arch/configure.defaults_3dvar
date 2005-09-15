@@ -763,6 +763,7 @@ FCBASE          =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767
 #                       -qflttrap=zerodivide:invalid:enable -qsigtrap
 FCBUFR          =       $(FCBASE)
 FC_FFT_RF       =       $(FCBASE)
+EXTRAMODULES    =
 EXTRAMODULES    =       
 ARCHFLAGS       =       -DINTIO \
 			$(WORDSIZE_DEF) \
@@ -803,6 +804,7 @@ FCBASE          =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767
 #                       -qflttrap=zerodivide:invalid:enable -qsigtrap
 FCBUFR          =       $(FCBASE)
 FC_FFT_RF       =       $(FCBASE)
+EXTRAMODULES    =
 EXTRAMODULES    =       
 ARCHFLAGS       =       -DINTIO \
 			$(WORDSIZE_DEF) \
