@@ -1,5 +1,4 @@
-#
-LIB		=	$(NETCDF_LIB) $(MPI_LIB) $(LOCAL_LIB) $(WRF_LIB)
+LIB				=       $(NETCDF_LIB) $(MPI_LIB) $(LOCAL_LIB) $(WRF_LIB)
 EXTRAMODULES    =
 FCBASEOPTS      =       -w $(FCTYPE) $(FCBASE) $(FCFORM) $(FCHOST) $(FCDEBUG) -I.
 FC_FFT_RF_OPTS  =       $(FCTYPE) $(FC_FFT_RF) $(FCFORM) $(FCHOST) $(FCDEBUG) -I.
@@ -23,15 +22,18 @@ FCFLAGS_FFT_RF  =       $(FCOPTIM) $(FC_FFT_RF_OPTS)
 F77FLAGS_BUFR   =       $(FCTYPE) $(FCBUFR) $(FCHOST) $(FCDEBUG) -I.
 F77FLAGS_3DVAR  =       $(FCTYPE) $(FCBASE) $(FCHOST) $(FCDEBUG) -I.
 CPPFLAGS_3DVAR  =       $(TRADFLAG) $(DM_2_CPP_FLAGS) \
-                        -I$(LIBINCLUDE) -I../../inc -C -P $(ARCHFLAGS)
+                        -I$(LIBINCLUDE) -I../../inc -C -P $(ARCHFLAGS) \
+						 $(WRFVAR)
 FUFLAGS         =       $(FCOPTIM) $(FCBASE) $(FCFORM) $(FCDEBUG)
 
 wrfio_nf : 
 	( cd ../external/io_netcdf ; \
         make NETCDFPATH=$(NETCDFPATH) CPP="$(CPP) $(TRADFLAG)" \
 	RANLIB="$(RANLIB)" \
-	FC="$(FC)" FCFLAGS="$(FCDEBUG) $(FCFORM) $(FCBASE) -w" TRADFLAG="$(TRADFLAG)" ; \
-	/bin/cp wrf_io_flags.h wrf_status_codes.h ../../inc )
+	FC="$(FC)" FCFLAGS="$(FCDEBUG) $(FCFORM) $(FCBASE) -w" TRADFLAG="$(TRADFLAG)" RWORDSIZE="$(RWORDSIZE)"; \
+	/bin/cp wrf_io_flags.h wrf_status_codes.h ../../inc ; \
+	/bin/cp wrf_io_flags.h wrf_status_codes.h ../io_phdf5 ; \
+	/bin/cp wrf_io_flags.h ../io_quilt )
 
 wrfio_int : 
 	( cd ../external/io_int ; \
