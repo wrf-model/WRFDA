@@ -1,6 +1,7 @@
 #
+LIB		=	$(NETCDF_LIB) $(MPI_LIB) $(LOCAL_LIB) $(WRF_LIB)
 EXTRAMODULES    =
-FCBASEOPTS      =       -w $(FCTYPE) $(FCBASE) $(FCFORM) $(FCHOST) $(FCDEBUG) -I.
+FCBASEOPTS      =       $(FCTYPE) $(FCBASE) $(FCFORM) $(FCHOST) $(FCDEBUG) -I.
 FC_FFT_RF_OPTS  =       $(FCTYPE) $(FC_FFT_RF) $(FCFORM) $(FCHOST) $(FCDEBUG) -I.
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS) $(OMP)
 INCLUDE_MODULES =       -I../da_3dvar -I../da_3dvar/src \
@@ -9,8 +10,8 @@ INCLUDE_MODULES =       -I../da_3dvar -I../da_3dvar/src \
                         -I../frame -I../share -I../phys -I../inc
 
 REGISTRY        =       Registry
-CPPFLAGS        =       -I$(LIBINCLUDE) -C -P $(ARCHFLAGS) \
-			$(TRADFLAG) $(DM_1_CPP_FLAGS) $(OMPCPP) $(COREDEFS) $(POUND_DEF)
+CPPFLAGS        =       -I$(LIBINCLUDE) -C -P $(ARCHFLAGS) $(ENVCOMPDEFS) \
+			$(DM_1_CPP_FLAGS) $(COREDEFS) $(POUND_DEF)
 
 INC_MOD_3DVAR   =       -I../../$(NETCDF_IO_PATH) \
 			-I../../da_3dvar -I../../da_3dvar/src \
@@ -21,18 +22,20 @@ FCFLAGS_3DVAR   =       $(FCOPTIM) $(FCBASEOPTS)
 FCFLAGS_FFT_RF  =       $(FCOPTIM) $(FC_FFT_RF_OPTS)
 F77FLAGS_BUFR   =       $(FCTYPE) $(FCBUFR) $(FCHOST) $(FCDEBUG) -I.
 F77FLAGS_3DVAR  =       $(FCTYPE) $(FCBASE) $(FCHOST) $(FCDEBUG) -I.
-CPPFLAGS_3DVAR  =       $(TRADFLAG) $(DM_2_CPP_FLAGS) \
-                        -I$(LIBINCLUDE) -I../../inc -C -P $(ARCHFLAGS)
+CPPFLAGS_3DVAR  =       $(DM_2_CPP_FLAGS) \
+                        -I$(LIBINCLUDE) -I../../inc -C -P $(ARCHFLAGS) $(POUND_DEF) $(WRFVAR)
 FUFLAGS         =       $(FCOPTIM) $(FCBASE) $(FCFORM) $(FCDEBUG)
 
 wrfio_nf : 
 	( cd ../external/io_netcdf ; \
-        make NETCDFPATH=$(NETCDFPATH) CPP="$(CPP) $(TRADFLAG)" \
+        make NETCDFPATH=$(NETCDFPATH) CPP="$(CPP)" \
 	RANLIB="$(RANLIB)" \
-	FC="$(FC)" FCFLAGS="$(FCDEBUG) $(FCFORM) $(FCBASE) -w" TRADFLAG="$(TRADFLAG)" ; \
-	/bin/cp wrf_io_flags.h wrf_status_codes.h ../../inc ; \
-	/bin/cp wrf_io_flags.h wrf_status_codes.h ../io_phdf5 ; \
-	/bin/cp wrf_io_flags.h ../io_quilt )
+	FC="$(FC)" FCFLAGS="$(FCDEBUG) $(FCFORM) $(FCBASE) -w" TRADFLAG="$(TRADFLAG)" RWORDSIZE = $(RWORDSIZE); \
+	if [ $(RWORDSIZE) -eq 8 ] ; then \
+	/bin/rm -f foo_io_flags.h; \
+	sed -e 's/104/105/' wrf_io_flags.h > foo_io_flags.h ;\
+	/bin/mv foo_io_flags.h wrf_io_flags.h ; fi ; \
+	/bin/cp wrf_io_flags.h wrf_status_codes.h ../../inc )
 
 wrfio_int : 
 	( cd ../external/io_int ; \
@@ -42,22 +45,22 @@ wrfio_int :
 
 wrfio_grib1 :
 	( cd ../external/io_grib1 ; \
-        make CC="$(CC)" CPP="$(CPP)" \
+        make CPP="$(CPP)" \
 	RANLIB="$(RANLIB)" \
 	CC="$(CC)" CFLAGS="$(CFLAGS)" \
-	FC="$(FC)" FCFLAGS="$(FCDEBUG) $(FCFORM) $(FCBASE)" )
+	FC="$(FC)" FCFLAGS="$(FCDEBUG) -I. $(FCFORM) $(FCBASE)" )
 
 esmf_time : 
 	( cd ../external/esmf_time_f90 ; \
-	make FC="$(FC)" FCFLAGS="$(FCDEBUG) $(FCFLAGS)" \
+	make FC="$(FC) $(FCFLAGS)" \
 	RANLIB="$(RANLIB)" \
-	CPP="$(CPP) -I../../inc -I. $(POUND_DEF) $(TRADFLAG)" )
+	CPP="$(CPP) -I../../inc -I. $(POUND_DEF)" )
 
 # compile these without high optimization to speed compile
+
 module_io_mm5.o : module_io_mm5.F
 module_si_io.o : module_si_io.F
 module_io_wrf.o : module_io_wrf.F
-module_domain.o : module_domain.F
 module_start.o : module_start.F
 module_initialize.o : module_initialize.F
 module_initialize_b_wave.o : module_initialize_b_wave.F
@@ -68,6 +71,7 @@ module_initialize_squall2d_y.o : module_initialize_squall2d_y.F
 module_initialize_real.o : module_initialize_real.F
 module_dm.o : module_dm.F
 start_domain.o : start_domain.F
+module_domain.o : module_domain.F
 module_configure.o : module_configure.F
 mediation_interp_domain.o : mediation_interp_domain.F
 mediation_force_domain.o : mediation_force_domain.F

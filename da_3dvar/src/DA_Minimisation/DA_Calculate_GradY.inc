@@ -29,9 +29,15 @@
 
       call DA_Calculate_GradY_Synop( iv, re,  jo_grad_y)
                  
-!     Satellite wind track
 
-      call DA_Calculate_GradY_Satob( iv, re,  jo_grad_y)
+!     Geostationary Satellite AMVs
+
+      call DA_Calculate_GradY_GeoAMV( iv, re,  jo_grad_y)
+
+!     Polar orbitting Satellite AMVs
+
+      call DA_Calculate_GradY_PolarAMV( iv, re,  jo_grad_y)
+
 
 !     Airep
 
@@ -83,6 +89,10 @@
 !     Pseudo obs:
 
       call DA_Calculate_GradY_Pseudo( iv, re,  jo_grad_y )    
+
+!     TC bogus obs:
+
+      call DA_Calculate_GradY_bogus( iv, re,  jo_grad_y )    
                   
 !     Quikscat scatterometer:
 

@@ -22,10 +22,18 @@ libwrfio_nf.a:		$(OBJS) $(CODE)
 
 wrf_io_flags.h:
 			sed -e '1,/BEGINIOFLAGS/d' -e '/ENDIOFLAGS/,$$d' wrf_io.F90 > wrf_io_flags.h
+			if [ $(RWORDSIZE) -eq 8 ] ; then \
+				/bin/rm -f foo_io_flags.h ; \
+				sed -e 's/104/105/' wrf_io_flags.h > foo_io_flags.h ; \
+				/bin/mv foo_io_flags.h wrf_io_flags.h ; fi
 
 wrf_io.o:               wrf_io.F90 $(CODE)
 			$(CPP1) wrf_io.F90 | $(M4) - > wrf_io.f
-			$(FC) $(FFLAGS) -c wrf_io.f
+#			if [ $(RWORDSIZE) -eq 8 ] ; then \
+#				/bin/rm -f foo_wrf_io.f; \
+#				sed -e 's/104/105/' wrf_io.f > foo_wrf_io.f ;\
+#			/bin/mv foo_wrf_io.f wrf_io.f ; fi
+			$(FC) $(FFLAGS) -I. -c wrf_io.f
 
 diffwrf:                diffwrf.F90
 			$(CPP1) diffwrf.F90 > diffwrf.f

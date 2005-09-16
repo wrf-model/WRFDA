@@ -15,7 +15,7 @@ SUBROUTINE da_transform_xtoy_sound_adj( iv, xp, jo_grad_y, jo_grad_x )
 
    IF ( iv%num_sound > 0 ) THEN
 
-      do n=1, iv % num_sound
+      do n=iv%ob_numb(iv%current_ob_time-1)%sound + 1, iv%ob_numb(iv%current_ob_time)%sound
        if(iv%sound(n)%loc%proc_domain_with_halo) then
       
 !        [1.1] Get horizontal interpolation weights:

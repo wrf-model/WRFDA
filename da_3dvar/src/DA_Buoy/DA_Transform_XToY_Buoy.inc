@@ -15,14 +15,14 @@ SUBROUTINE DA_Transform_XToY_Buoy ( xa, xb, iv, xp, y )
    
    IF ( iv%num_buoy > 0 ) THEN
 
-      y%buoy(:)%u = 0.0
-      y%buoy(:)%v = 0.0
-      y%buoy(:)%t = 0.0
-      y%buoy(:)%p = 0.0
-      y%buoy(:)%q = 0.0
+!xyh      y%buoy(:)%u = 0.0
+!xyh      y%buoy(:)%v = 0.0
+!xyh      y%buoy(:)%t = 0.0
+!xyh      y%buoy(:)%p = 0.0
+!xyh      y%buoy(:)%q = 0.0
 
       if (sfc_assi_options == 1) then
-      do n=1, iv % num_buoy
+      do n=iv%ob_numb(iv%current_ob_time-1)%buoy + 1, iv%ob_numb(iv%current_ob_time)%buoy
 
        if(iv%buoy(n)%loc%proc_domain_with_halo) then
 
@@ -68,7 +68,7 @@ SUBROUTINE DA_Transform_XToY_Buoy ( xa, xb, iv, xp, y )
 ! [2.0] Surface assimilation approach 2
 
       else if (sfc_assi_options == 2) then
-         do n=1, iv % num_buoy
+         do n=iv%ob_numb(iv%current_ob_time-1)%buoy + 1, iv%ob_numb(iv%current_ob_time)%buoy
             if(iv%buoy(n)%loc%proc_domain_with_halo) then
                CALL DA_Transform_XToPsfc(xb,xa,xp,iv%buoy(n),y%buoy(n))
             endif

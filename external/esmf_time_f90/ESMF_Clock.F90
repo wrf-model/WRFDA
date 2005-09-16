@@ -68,6 +68,7 @@
         type(ESMF_Time)  :: CurrTime
         type(ESMF_Time)  :: PrevTime
         integer(ESMF_IKIND_I8) :: AdvanceCount
+        integer(ESMF_IKIND_I8) :: BackCount
         integer :: ClockMutex
         integer :: NumAlarms
         type(ESMF_Alarm), pointer, dimension(:) :: AlarmList
@@ -80,7 +81,10 @@
 !
 ! !PUBLIC MEMBER FUNCTIONS:
       public ESMF_ClockSet
+      public ESMF_ClockSetOLD
+      public ESMF_ClockGet
       public ESMF_ClockGetAdvanceCount
+      public ESMF_ClockGetBackCount
       public ESMF_ClockGetTimeStep
       public ESMF_ClockSetTimeStep
       public ESMF_ClockGetCurrTime
@@ -96,7 +100,10 @@
       public ESMF_ClockGetNumAlarms
       public ESMF_ClockSyncToWallClock
       public ESMF_ClockAdvance
+      public ESMF_ClockBack
       public ESMF_ClockIsStopTime
+      public ESMF_ClockIsStartTime
+      public ESMF_ClockStopTimeDisable
 
 ! Required inherited and overridden ESMF_Base class methods
 
@@ -121,10 +128,10 @@
 !
 !------------------------------------------------------------------------------
 !BOP
-! !IROUTINE: ESMF_ClockSet - Initialize a clock
+! !IROUTINE: ESMF_ClockSetOLD - Initialize a clock
 
 ! !INTERFACE:
-      subroutine ESMF_ClockSet(clock, TimeStep, StartTime, StopTime, &
+      subroutine ESMF_ClockSetOLD(clock, TimeStep, StartTime, StopTime, &
                                RefTime, rc)
 
 ! !ARGUMENTS:
@@ -169,17 +176,141 @@
       clock%StopTime = StopTime
       clock%NumAlarms = 0
       clock%AdvanceCount = 0
+      clock%BackCount = 0
       ALLOCATE(clock%AlarmList(MAX_ALARMS))
       DO i = 1, MAX_ALARMS
-	alarm = clock%AlarmList(i)
-	alarm%Enabled = .FALSE.
-	clock%AlarmList(i) = alarm
+         alarm = clock%AlarmList(i)
+         alarm%Enabled = .FALSE.
+         clock%AlarmList(i) = alarm
       ENDDO
     
+      end subroutine ESMF_ClockSetOLD
+
+
+! !IROUTINE: ESMF_ClockSet - Set clock properties -- for compatibility with ESMF 2.0.1
+
+! !INTERFACE:
+      subroutine ESMF_ClockSet(clock, TimeStep, StartTime, StopTime, &
+                               RefTime, CurrTime, rc)
+
+! !ARGUMENTS:
+      type(ESMF_Clock), intent(inout) :: clock
+      type(ESMF_TimeInterval), intent(in), optional :: TimeStep
+      type(ESMF_Time), intent(in), optional :: StartTime
+      type(ESMF_Time), intent(in), optional :: StopTime
+      type(ESMF_Time), intent(in), optional :: RefTime
+      type(ESMF_Time), intent(in), optional :: CurrTime
+      integer, intent(out), optional :: rc
+! Local
+      integer i, ierr
+      type (ESMF_Alarm) :: alarm
+    
+! !DESCRIPTION:
+!     Initialize an {\tt ESMF\_Clock}
+!     
+!     The arguments are:
+!     \begin{description}
+!     \item[clock]
+!          The object instance to initialize
+!     \item[{[TimeStep]}]
+!          The {\tt ESMF\_Clock}'s time step interval
+!     \item[StartTime]
+!          The {\tt ESMF\_Clock}'s starting time
+!     \item[StopTime]
+!          The {\tt ESMF\_Clock}'s stopping time
+!     \item[{[RefTime]}]
+!          The {\tt ESMF\_Clock}'s reference time
+!     \item[{[rc]}]
+!          Return code; equals {\tt ESMF\_SUCCESS} if there are no errors.
+!     \end{description}
+!     
+! !REQUIREMENTS:
+!     TMG3.1, TMG3.4.4
+!EOP
+      ierr = ESMF_SUCCESS
+      IF ( PRESENT(TimeStep) ) THEN
+        CALL ESMF_ClockSetTimeStep ( clock, TimeStep, rc=ierr )
+      ENDIF
+      IF ( PRESENT(RefTime) ) clock%RefTime = RefTime
+      IF ( PRESENT(StartTime) ) clock%StartTime = StartTime
+      IF ( PRESENT(StopTime) ) clock%StopTime = StopTime
+      IF ( PRESENT(CurrTime) ) THEN
+        CALL ESMF_ClockSetCurrTime(clock, CurrTime, rc=ierr)
+      ENDIF
+      IF ( PRESENT(rc) ) rc = ierr
+
       end subroutine ESMF_ClockSet
 
 !------------------------------------------------------------------------------
 !BOP
+! !IROUTINE: ESMF_ClockGet - Get clock properties -- for compatibility with ESMF 2.0.1
+
+! !INTERFACE:
+      subroutine ESMF_ClockGet(clock, StartTime, CurrTime, &
+                               AdvanceCount, BackCount, StopTime, rc)
+
+! !ARGUMENTS:
+      type(ESMF_Clock), intent(in) :: clock
+      type(ESMF_Time), intent(out), optional :: StartTime
+      type(ESMF_Time), intent(out), optional :: CurrTime
+      type(ESMF_Time), intent(out), optional :: StopTime
+      integer, intent(out), optional :: AdvanceCount
+      integer, intent(out), optional :: BackCount
+      integer, intent(out), optional :: rc
+      integer :: ierr
+      integer(ESMF_IKIND_I8) :: AdvanceCountLcl
+      integer(ESMF_IKIND_I8) :: BackCountLcl
+
+! !DESCRIPTION:
+!     Returns the number of times the {\tt ESMF\_Clock} has been advanced
+!     (time stepped)
+!
+!     The arguments are:
+!     \begin{description}
+!     \item[clock]
+!          The object instance to get the advance count from
+!     \item[StartTime]
+!          The start time
+!     \item[CurrTime]
+!          The current time
+!     \item[AdvanceCount]
+!          The number of times the {\tt ESMF\_Clock} has been advanced
+!     \item[BackCount]
+!          The number of times the {\tt ESMF\_Clock} has been backed
+!     \item[{[rc]}]
+!          Return code; equals {\tt ESMF\_SUCCESS} if there are no errors.
+!     \end{description}
+
+! !REQUIREMENTS:
+!     TMG3.5.1
+!EOP
+      ierr = ESMF_SUCCESS
+
+      IF ( PRESENT (StartTime) ) THEN
+        CALL ESMF_ClockGetStartTime( clock, StartTime=StartTime, rc=ierr )
+      ENDIF
+      IF ( PRESENT (CurrTime) ) THEN
+        CALL ESMF_ClockGetCurrTime( clock , CurrTime, ierr )
+      ENDIF
+      IF ( PRESENT (StopTime) ) THEN
+        CALL ESMF_ClockGetStopTime( clock , StopTime, ierr )
+      ENDIF
+      IF ( PRESENT (AdvanceCount) ) THEN
+        CALL ESMF_ClockGetAdvanceCount(clock, AdvanceCountLcl, ierr)
+        AdvanceCount = AdvanceCountLcl
+      ENDIF
+      IF ( PRESENT (BackCount) ) THEN
+        CALL ESMF_ClockGetBackCount(clock, BackCountLcl, ierr)
+        BackCount = BackCountLcl
+      ENDIF
+
+      IF ( PRESENT (rc) ) THEN
+        rc = ierr
+      ENDIF
+    
+      end subroutine ESMF_ClockGet
+
+
 ! !IROUTINE: ESMF_ClockGetAdvanceCount - Get the clock's advance count
 
 ! !INTERFACE:
@@ -187,11 +318,7 @@
 
 ! !ARGUMENTS:
       type(ESMF_Clock), intent(in) :: clock
-#ifdef F90_STANDALONE
-      integer, intent(out) :: AdvanceCount
-#else
       integer(ESMF_IKIND_I8), intent(out) :: AdvanceCount
-#endif
       integer, intent(out) :: rc
 
 ! !DESCRIPTION:
@@ -219,6 +346,42 @@
       rc = ESMF_SUCCESS
     
       end subroutine ESMF_ClockGetAdvanceCount
+
+! !IROUTINE: ESMF_ClockGetBackCount - Get the clock's back count
+
+! !INTERFACE:
+      subroutine ESMF_ClockGetBackCount(clock, BackCount, rc)
+
+! !ARGUMENTS:
+      type(ESMF_Clock), intent(in) :: clock
+      integer(ESMF_IKIND_I8), intent(out) :: BackCount
+      integer, intent(out) :: rc
+
+! !DESCRIPTION:
+!     Returns the number of times the {\tt ESMF\_Clock} has been backed
+!     (time stepped)
+!
+!     The arguments are:
+!     \begin{description}
+!     \item[clock]
+!          The object instance to get the back count from
+!     \item[BackCount]
+!          The number of times the {\tt ESMF\_Clock} has been backed
+!     \item[{[rc]}]
+!          Return code; equals {\tt ESMF\_SUCCESS} if there are no errors.
+!     \end{description}
+
+! !REQUIREMENTS:
+!     TMG3.5.1
+!EOP
+
+      call c_ESMC_ClockGetBackCount(clock, BackCount, rc)
+
+      BackCount = clock%BackCount
+
+      rc = ESMF_SUCCESS
+    
+      end subroutine ESMF_ClockGetBackCount
 
 !------------------------------------------------------------------------------
 !BOP
@@ -392,6 +555,9 @@
 !EOP
 
       call c_ESMC_ClockGetStartTime(clock, StartTime, rc)
+
+      StartTime = clock%StartTime
+      rc = ESMF_SUCCESS
     
       end subroutine ESMF_ClockGetStartTime
 
@@ -635,6 +801,10 @@
 !EOP
 
 !      call c_ESMC_ClockGetAlarmList(clock, AlarmList, rc)
+      ! This HACK is for compatibility with ESMF 2.0.1+
+      IF ( ASSOCIATED( AlarmList) ) THEN
+         DEALLOCATE( AlarmList )
+      ENDIF
       AlarmList => clock%AlarmList
       rc = ESMF_SUCCESS
       
@@ -767,7 +937,7 @@ use esmf_timemod
             IF ( alarm%RingIntervalSet ) THEN
 	       PRED3 = ( alarm%PrevRingTime + alarm%RingInterval <= clock%CurrTime )
 	    ENDIF
-           
+
             IF (                                                                           &
                  ( .NOT.  ( pred1                                                   ))     &
                    .AND.                                                                   &
@@ -778,7 +948,7 @@ use esmf_timemod
                  )                                                                         &
                ) THEN
                alarm%Ringing = .TRUE.
-               alarm%PrevRingTime = alarm%PrevRingTime + alarm%RingInterval
+               IF ( PRED3) alarm%PrevRingTime = alarm%PrevRingTime + alarm%RingInterval
                IF ( PRESENT( RingingAlarmList ) .AND. PRESENT ( NumRingingAlarms ) ) THEN
                  NumRingingAlarms = NumRingingAlarms + 1
                  RingingAlarmList( NumRingingAlarms ) = alarm
@@ -800,6 +970,112 @@ use esmf_timemod
       ENDDO
     
       end subroutine ESMF_ClockAdvance
+
+!------------------------------------------------------------------------------
+!BOP
+! !IROUTINE: ESMF_ClockBack - Back a clock's current time by one time step
+
+! !INTERFACE:
+      subroutine ESMF_ClockBack(clock, RingingAlarmList, &
+                                NumRingingAlarms, rc)
+
+use esmf_timemod
+
+! !ARGUMENTS:
+      type(ESMF_Clock), intent(inout) :: clock
+      type(ESMF_Alarm), dimension(MAX_ALARMS), intent(out), optional :: &
+                                        RingingAlarmList
+      integer, intent(out), optional :: NumRingingAlarms
+      integer, intent(out) :: rc
+! Local
+      logical pred1, pred2, pred3
+      integer i, n
+      type(ESMF_Alarm) :: alarm
+!   
+! !DESCRIPTION:
+!     Back an {\tt ESMF\_Clock}'s current time by one time step
+!  
+!     The arguments are:
+!     \begin{description}
+!     \item[clock]
+!          The object instance to Back
+!     \item[{[RingingAlarmList]}]
+!          Return a list of any ringing alarms after the time step
+!     \item[{[NumRingingAlarms]}]
+!          The number of ringing alarms returned
+!     \item[{[rc]}]
+!          Return code; equals {\tt ESMF\_SUCCESS} if there are no errors.
+!     \end{description}
+!  
+! !REQUIREMENTS:
+!     TMG3.4.1
+!EOP
+      call c_ESMC_ClockBack(clock, RingingAlarmList, NumRingingAlarms, rc)
+      clock%CurrTime = clock%CurrTime - clock%TimeStep
+
+      IF ( Present(NumRingingAlarms) ) NumRingingAlarms = 0
+      clock%BackCount = clock%BackCount + 1
+      DO i = 1, MAX_ALARMS
+        alarm = clock%AlarmList(i)
+        IF ( alarm%Enabled ) THEN
+          IF ( alarm%RingIntervalSet ) THEN
+	    pred1 = .FALSE. ; pred2 = .FALSE. ; pred3 = .FALSE.
+            IF ( alarm%StopTimeSet ) THEN
+	       PRED1 = clock%CurrTime < Alarm%StopTime
+	    ENDIF
+            IF ( alarm%RingTimeSet ) THEN
+	       PRED2 = ( alarm%RingTime >= clock%CurrTime                            &
+		         .AND. clock%CurrTime > alarm%RingTime - clock%TimeStep )
+	    ENDIF
+            IF ( alarm%RingIntervalSet ) THEN
+	       PRED3 = ( alarm%PrevRingTime - alarm%RingInterval >= clock%CurrTime )
+	    ENDIF
+
+            IF (                                                                           &
+                 ( .NOT.  ( pred1                                                   ))     &
+                   .AND.                                                                   &
+                 (                                                                         &
+                   ( pred2 )                                                               &
+	            .OR.                                                                   &
+	 	   ( pred3 )                                                               &
+                 )                                                                         &
+               ) THEN
+               alarm%Ringing = .TRUE.
+               IF ( PRED3) alarm%PrevRingTime = alarm%PrevRingTime + alarm%RingInterval
+               IF ( PRESENT( RingingAlarmList ) .AND. PRESENT ( NumRingingAlarms ) ) THEN
+                 NumRingingAlarms = NumRingingAlarms + 1
+                 RingingAlarmList( NumRingingAlarms ) = alarm
+               ENDIF
+            ENDIF
+          ELSE IF ( alarm%RingTimeSet ) THEN
+            IF ( alarm%RingTime >= clock%CurrTime ) THEN
+               alarm%Ringing = .TRUE.
+               IF ( PRESENT( RingingAlarmList ) .AND. PRESENT ( NumRingingAlarms ) ) THEN
+                 NumRingingAlarms = NumRingingAlarms + 1
+                 RingingAlarmList( NumRingingAlarms ) = alarm
+               ENDIF
+            ENDIF
+          ENDIF
+        ENDIF
+        clock%AlarmList(i) = alarm
+      ENDDO
+    
+      end subroutine ESMF_ClockBack
+
+!------------------------------------------------------------------------------
+!BOP
+! !IROUTINE: ESMF_ClockStopTimeDisable - NOOP for compatibility with ESMF 2.1.0+
+
+! !INTERFACE:
+      subroutine ESMF_ClockStopTimeDisable(clock, rc)
+!
+! !ARGUMENTS:
+      type(ESMF_Clock), intent(in) :: clock
+      integer, intent(out) :: rc
+
+      rc = ESMF_SUCCESS
+
+      end subroutine ESMF_ClockStopTimeDisable
 
 !------------------------------------------------------------------------------
 !BOP
@@ -839,6 +1115,45 @@ use esmf_timemod
       endif
     
       end function ESMF_ClockIsStopTime
+
+!------------------------------------------------------------------------------
+!BOP
+! !IROUTINE: ESMF_ClockIsStartTime - Has the clock reached its start time ?
+
+! !INTERFACE:
+      function ESMF_ClockIsStartTime(clock, rc)
+!
+! !RETURN VALUE:
+      logical :: ESMF_ClockIsStartTime
+
+! !ARGUMENTS:
+      type(ESMF_Clock), intent(in) :: clock
+      integer, intent(out) :: rc
+
+! !DESCRIPTION:
+!     Return true if {\tt ESMF\_Clock} has reached its stop time, false 
+!     otherwise     
+!
+!     The arguments are:
+!     \begin{description}
+!     \item[clock]
+!          The object instance to check
+!     \item[{[rc]}]
+!          Return code; equals {\tt ESMF\_SUCCESS} if there are no errors.
+!     \end{description}
+
+! !REQUIREMENTS:
+!     TMG3.5.6
+!EOP
+
+      call c_ESMC_ClockIsStartTime(clock, ESMF_ClockIsStartTime, rc)
+      if ( clock%CurrTime .GT. clock%StartTime ) THEN
+        ESMF_ClockIsStartTime = .FALSE.
+      else
+        ESMF_ClockIsStartTime = .TRUE.
+      endif
+    
+      end function ESMF_ClockIsStartTime
 
 !------------------------------------------------------------------------------
 !

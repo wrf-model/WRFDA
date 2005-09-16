@@ -22,6 +22,10 @@ typedef struct node_struct {
   char    descrip[NAMELEN] ;
   char    units[NAMELEN] ;
 
+/*Wei's adding for 4dvar*/
+  char    var_name[NAMELEN] ;
+  int     var_numb ;
+
 /* Fields for 4D scalar arrays */
   int           scalar_array_member ;
   int           has_scalar_array_tendencies ;
@@ -107,6 +111,9 @@ EXTERN int sw_all_y_staggered ;
 EXTERN int sw_dm_serial_in_only ;
 EXTERN int sw_ifort_kludge ;
 EXTERN char sw_commpath[NAMELEN] ;
+
+/*Wei's change for 4dvar*/
+EXTERN int sw_wrfvar ;
 
 EXTERN node_t * Type ;
 EXTERN node_t * Dim ;

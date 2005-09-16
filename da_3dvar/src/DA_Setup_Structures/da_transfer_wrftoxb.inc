@@ -11,7 +11,7 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
 !
 !  HISTORY: 09/27/2002		Wei Huang
 !
-!  HISTORY: 06/28/2004 with respect to the cloud water and rain water   Jianfeng Gu
+!  HISTORY: 06/28/2004 with respect to the cloud water and rain water        Jianfeng Gu
 !
 !  PARENT_MODULE: DA_Setup_Structures
 !------------------------------------------------------------------------------
@@ -48,19 +48,11 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
 
    integer :: ierror, size2d
 
-   LOGICAL, EXTERNAL :: wrf_dm_on_monitor
-
-   integer, parameter :: P_QV  = 2
-   integer, parameter :: p_qcw = 3
-   integer, parameter :: p_qrn = 4
-   integer, parameter :: p_qci = 5
-   integer, parameter :: p_qsn = 6
-   integer, parameter :: p_qgr = 7
-
    real, dimension(xp%kms:xp%kme) :: DDT
 !------------------------------------------------------------------------------
 
-   REAL   :: qvf1, qvf2
+   REAL   :: qvf1, cvpm, cpovcv, ppb, ttb, albn, aln
+
 !---------------------------------------------------------------------------
 !--Set xb array range indices for processor subdomain.
 !---------------------------------------------------------------------------
@@ -90,10 +82,10 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
 !---------------------------------------------------------------------------
 
    ptop = grid%p_top
-   ps0  = 100000.0
-   ts0  = 300.0
-   tis0 = 0.0
-   tlp  = 0.0
+   ps0  = 100000.0    ! Base sea level pressure
+   ts0  = 300.0       ! Base potential temperature for all levels.
+   tis0 = 290.0       ! Base sea level temperature
+   tlp  = 50.0        ! temperature difference from 1000mb to 300mb
 
    xb%sigmaf(ke+1) = znw(ke+1)
 
@@ -303,6 +295,7 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
        xb%landmask(i,j) = xland(i,j)
      enddo
 
+#if 0
 ! Adapted the code from "real.init.code" by Y.-R. Guo 05/13/2004:
 
      do i=is,ie
@@ -318,6 +311,33 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
        qvf1 = qvf1*qvf2
        p(i,j,k) = p(i,j,k+1) - (mu_2(i,j)+qvf1*mub(i,j))/qvf2/rdn(k+1)
      enddo
+     enddo
+#endif
+
+! Adapted the code from WRF module_big_step_utilities_em.F ----
+!         subroutine calc_p_rho_phi      Y.-R. Guo (10/20/2004)
+
+     cvpm =  - (1. - gas_constant/cp)
+     cpovcv = cp / (cp - gas_constant)
+
+     do k=ks,ke
+       do i=is,ie
+! .. The base specific volume (from real.init.code):...........
+         ppb  = znu(k) * mub(i,j) + ptop
+         ttb  = (tis0 + tlp*log(ppb/ps0)) * (ps0/ppb)**kappa
+         albn = (gas_constant/ps0) * ttb * (ppb/ps0)**cvpm
+! .............................................................
+         qvf1 = 1. + moist_2(i,j,k,P_QV) / rd_over_rv
+         aln  = -1. / (mub(i,j)+mu_2(i,j)) * ( albn*mu_2(i,j) &
+                + rdnw(k) *(ph_2(i,j,k+1) - ph_2(i,j,k)) )
+! .. total pressure:
+         xb%p(i,j,k) = ps0 * ( (gas_constant*(ts0+t_2(i,j,k))*qvf1) / &
+                            (ps0*(aln+albn)) )**cpovcv
+! .. total density
+         xb%rho(i,j,k)= 1.0 / (albn+aln)
+! .. pressure purtubation:
+         p(i,j,k) = xb%p(i,j,k) - ppb
+       enddo
      enddo
 
      do k=ks,ke+1
@@ -336,21 +356,10 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
          xb%wh(i,j,k)= 0.5*(xb%w(i,j,k)+xb%w(i,j,k+1))
          xb%h(i,j,k) = 0.5*(xb%hf(i,j,k)+xb%hf(i,j,k+1))
 
-         xb%p(i,j,k) = grid%p_top+xb%znu(k)*mub(i,j)+p(i,j,k)
-
          xb%q(i,j,k) = moist_2(i,j,k,P_QV)
 
          theta = ts0 + t_2(i,j,k)
          xb%t(i,j,k) = theta*(xb%p(i,j,k)/ps0)**kappa
-
-! YRG: This the dry air density used to compute the geopotential height: 
-!      (see WRF document Klemp, et al 2000:"Conservative split-explicit
-!       time integration methods for the compressible nonhydrostatic 
-!       equations", Page 12):
-
-         xb%rho(i,j,k)=xb%p(i,j,k) &
-                /(gas_constant*xb%t(i,j,k)*(1.0+xb%q(i,j,k)/rd_over_rv))
-! .....................................................................
 
 !  Convert to specific humidity from mixing ratio of water vapor:
          xb%q(i,j,k)=xb%q(i,j,k)/(1.0+xb%q(i,j,k))
@@ -362,18 +371,18 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
 
          if( size(moist_2,dim=4) >= 4 ) then
 !          write(6,*)'P_QV, P_QCW, P_QRN:',P_QV, P_QCW, P_QRN
-           xb%qcw(i,j,k) = moist_2(i,j,k,p_qcw)
-           xb%qrn(i,j,k) = moist_2(i,j,k,p_qrn)
+           xb%qcw(i,j,k) = moist_2(i,j,k,p_qc)
+           xb%qrn(i,j,k) = moist_2(i,j,k,p_qr)
            xb%qt (i,j,k) = xb%q(i,j,k) + xb%qcw(i,j,k) + xb%qrn(i,j,k)
          endif
 
          if( size(moist_2,dim=4) >= 6 ) then
-           xb%qci(i,j,k) = moist_2(i,j,k,p_qci)
-           xb%qsn(i,j,k) = moist_2(i,j,k,p_qsn)
+           xb%qci(i,j,k) = moist_2(i,j,k,p_qi)
+           xb%qsn(i,j,k) = moist_2(i,j,k,p_qs)
          endif
 
          if( size(moist_2,dim=4) >= 7 ) then
-           xb%qgr(i,j,k) = moist_2(i,j,k,p_qgr)
+           xb%qgr(i,j,k) = moist_2(i,j,k,p_qg)
          endif
 
        enddo
@@ -411,7 +420,6 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
      print *, 'xb%q(is,js,ke)=', xb%q(is,js,ke)
      print *, 'xb%h(is,js,ke)=', xb%h(is,js,ke)
      print *, 'xb%hf(is,js,ke)=', xb%hf(is,js,ke)
-
      print *, 'xb%map_factor(is,js)=', xb%map_factor(is,js)
      print *, 'xb%cori(is,js)=', xb%cori(is,js)
      print *, 'xb%tgrn(is,js)=', xb%tgrn(is,js)
@@ -421,6 +429,9 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
      print *, 'xb%snow(is,js)=', xb%snow(is,js)
      print *, 'xb%lanu(is,js)=', xb%lanu(is,js)
      print *, 'xb%landmask(is,js)=', xb%landmask(is,js)
+     print *, '(ie,je)=', ie,je                   !hcl
+     print *, 'xb%lat(ie,je)=', xb%lat(ie,je)     !hcl
+     print *, 'xb%lon(ie,je)=', xb%lon(ie,je)     !hcl
      print *, ' '
    endif
 
@@ -554,6 +565,14 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
    endif
 
    call DA_WRF_TPQ_2_SLP ( xb )
+
+!  do j = js,je
+!  do i = is,ie
+!     call DA_TPQ_To_SLP( xb%t(i,j,:), xb%q(i,j,:), xb%p(i,j,:), xb%terr(i,j), &
+!                        xb%psfc(i,j), xb%slp(i,j), xp )
+!  end do
+!  end do
+
    call INTEGRAT_dZ( xb )
 
 !------------------------------------------------------------------------------
@@ -609,10 +628,18 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
    call da_transform_XTogpsref(xb, xp)
 
 !------------------------------------------------------------------------------
+!--Ground-based GPS ZTD must follow the GPS Refractivity calculation. YRG 04/05/05
+!------------------------------------------------------------------------------
+
+!  if (Use_GpsztdObs) call DA_Transform_XToZTD( xb )
+
+!------------------------------------------------------------------------------
 !--Calculate means for later use in setting up background errors.
 !------------------------------------------------------------------------------
 
-   allocate ( xbx % latc_mean(xp%jds:xp%jde) )
+!  if(.not. associated(xbx % latc_mean)) then
+      allocate ( xbx % latc_mean(xp%jds:xp%jde) )
+!  endif
 
    size2d = (xp%ide-xp%ids+1)*(xp%jde-xp%jds+1)
 
@@ -646,7 +673,6 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
       print *, 'xbx % latc_mean=', xbx % latc_mean(js)
    endif
 
-
 !---Calculate time step from one dimensional cloud model parameterization-------------
 
    IF ( DT_cloud_model ) THEN
@@ -666,7 +692,6 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
      enddo
 
    ENDIF
-
 
 END SUBROUTINE DA_Transfer_WRFToXb
 

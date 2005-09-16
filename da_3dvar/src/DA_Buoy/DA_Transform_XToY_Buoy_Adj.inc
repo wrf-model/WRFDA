@@ -16,7 +16,7 @@ SUBROUTINE da_transform_xtoy_buoy_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
    IF ( iv%num_buoy > 0 ) THEN
 
       if (sfc_assi_options == 1) then
-       DO n=1, iv % num_buoy
+       do n=iv%ob_numb(iv%current_ob_time-1)%buoy + 1, iv%ob_numb(iv%current_ob_time)%buoy
       
        if(iv%buoy(n)%loc%proc_domain_with_halo) then
 
@@ -60,7 +60,7 @@ SUBROUTINE da_transform_xtoy_buoy_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
 
        END DO
       else if (sfc_assi_options == 2) then
-         DO n=1, iv % num_buoy
+         do n=iv%ob_numb(iv%current_ob_time-1)%buoy + 1, iv%ob_numb(iv%current_ob_time)%buoy
             if(iv%buoy(n)%loc%proc_domain_with_halo) then
                CALL DA_Transform_XToPsfc_Adj(xb,xp,iv%buoy(n), &
                                              jo_grad_y%buoy(n),jo_grad_x)

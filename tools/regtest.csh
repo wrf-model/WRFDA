@@ -14,6 +14,14 @@
 # @ ja_report		= yes
 # @ queue
 
+# QSUB -q ded_4             # submit to 4 proc
+# QSUB -l mpp_p=4           # request 4 processors
+# QSUB -lT  21600           # max. job time limit is 6 h
+# QSUB -lF 250Mw            # max. job file size limit is 250 Megawords
+# QSUB -eo                  # merge error and output into one file
+# QSUB -o  reg.out          # output file name
+# QSUB                      # there are no further QSUB commands
+
 #PBS -V -A acb
 #PBS -lnodes=4:comp -l walltime=40000
 
@@ -52,7 +60,7 @@ set clrm = 0          # compile local run mmmtmp, for using clsroom cluster and 
 #	If this is a batch job (NCAR's IBMs or FSL's Intel and Alpha), we need to muck with the "input"
 #	parameters a bit.
 
-if      ( `uname` == AIX ) then
+if      ( ( `uname` == AIX ) || ( `hostname` == tempest ) ) then
 	set argv = ( -here )
 	set argv = ( -ftp )
         set argv = ( -D today )
@@ -87,7 +95,7 @@ else if ( (`hostname | cut -c 1-6` == joshua ) || \
           ( `hostname` == maple ) || (`hostname | cut -c 1-7` == service ) ) then
 	set WRFREGDATAEM = /users/gill/WRF-data-EM
 	set WRFREGDATANMM = /users/gill/WRF-data-NMM
-else if ( ( `hostname | cut -c 1-2` == bs ) || ( `hostname | cut -c 1-2` == bf ) ) then
+else if ( ( `hostname | cut -c 1-2` == bs ) || ( `hostname` == tempest ) ) then
 	set WRFREGDATAEM = /mmm/users/gill/WRF-data-EM
 	set WRFREGDATANMM = /mmm/users/gill/WRF-data-NMM
 else
@@ -186,12 +194,19 @@ set start = ( `date` )
 set NESTED = TRUE
 set NESTED = FALSE
 
-if ( ( $NESTED == TRUE ) && ( ( `uname` == OSF1 ) || ( `hostname` == bay-mmm ) ) ) then
+if ( ( $NESTED == TRUE ) && ( ( `uname` == OSF1 ) || ( `uname` == Linux ) || ( `uname` == AIX ) ) ) then
 	echo DOING a NESTED TEST
 else if ( $NESTED == TRUE ) then
-	echo NESTED option is only valid on DEC machines or bay-mmm
+	echo NESTED option is only valid on DEC, Linux, or AIX machines
 	exit ( 1 ) 
 endif
+
+#	The default floating point precision is either 4 bytes or 8 bytes.
+#	We assume that it is 4 (or the default for the architecture) unless 
+#	REAL8 is set to TRUE.
+
+set REAL8 = TRUE
+set REAL8 = FALSE
 
 #	Are we shooting for a bit-for-bit run (serial vs OpenMP, serial vs MPI), or not?
 #	If you want to do a performance-only run, the forecasts are still short, but you
@@ -200,16 +215,70 @@ endif
 set REG_TYPE = OPTIMIZED
 set REG_TYPE = BIT4BIT
 
-#	For the real data case, we can run either one of two data cases.
+#	For a Linux machine, we can use PGI or Intel compilers.
+
+if ( `uname` == Linux ) then
+	set LINUX_COMP = INTEL
+	set LINUX_COMP = PGI
+endif
+
+#	Is this a WRF chem test?  
+
+if ( $NESTED != TRUE ) then
+	set CHEM = TRUE
+	set CHEM = FALSE
+else if ( $NESTED == TRUE ) then
+	set CHEM = FALSE
+endif
+if ( $CHEM == TRUE ) then
+	setenv WRF_CHEM 1
+else if ( $CHEM == FALSE ) then
+	setenv WRF_CHEM 0 
+endif
+
+#	For the real data case, we can run either one of two data cases.  If this is
+#	a chemistry run, we are forced to use that data.
 
 set dataset = jun01
 set dataset = jan00
+if ( $CHEM == TRUE ) then
+	set dataset = chem
+endif
 
 #	Yet another local variable to change the name of where the data is located.
 
 set thedataem = ${WRFREGDATAEM}/${dataset}
 set thedatanmm = $WRFREGDATANMM
 
+#	For non-nested runs, the distributed memory option RSL_LITE may be selected
+
+if ( $NESTED != TRUE ) then
+	set RSL_LITE = TRUE
+	set RSL_LITE = FALSE
+else if ( $NESTED == TRUE ) then
+	set RSL_LITE = FALSE
+endif
+
+#	A separately installed version of the latest ESMF library (NOT the 
+#	ESMF library included in the WRF tarfile) can be tested by setting 
+#	"ESMF_LIB" to "TRUE" below.  This test is not supported on all 
+#	machines.  
+
+set ESMF_LIB = TRUE
+set ESMF_LIB = FALSE
+
+if ( $ESMF_LIB == TRUE ) then
+	if ( ( `uname` == AIX ) && ( ( `hostname | cut -c 1-2` == bs ) ) ) then
+		echo "A separately installed version of the latest ESMF library"
+		echo "(NOT the ESMF library included in the WRF tarfile) will"
+		echo "be used for some tests"
+		setenv OBJECT_MODE 32
+	else
+		echo "Only the ESMF library included in the WRF tarfile is"
+		echo "tested on this machine"
+		exit ( 3 ) 
+	endif
+endif
 
 #	A single WRF output "quilt" server can be tested by setting "QUILT"  to 
 #       "TRUE" below.  At the moment, testing of I/O quilt servers is not supported 
@@ -219,16 +288,18 @@ set QUILT = TRUE
 set QUILT = FALSE
 
 if ( $QUILT == TRUE ) then
-	if ( ( `uname` == AIX ) && ( ( `hostname | cut -c 1-2` == bs ) || ( `hostname | cut -c 1-2` == bf ) ) ) then
+	if ( ( `uname` == AIX ) && ( ( `hostname | cut -c 1-2` == bs ) ) ) then
 		echo "One WRF output quilt server will be used for some tests"
-	else if ( ( `uname` == OSF1 ) && ( `hostname | cut -c 1-4` == duku ) ) then
+	else if ( ( `uname` == OSF1 ) && \
+		  ( ( `hostname` == duku    ) || \
+		    ( `hostname` == joshua1 ) || \
+		    ( `hostname` == joshua3 ) ) ) then
 		echo "One WRF output quilt server will be used for some tests"
 	else
-		echo "WRF output quilt servers are not tested on this mahchine"
+		echo "WRF output quilt servers are not tested on this machine"
 		exit ( 3 ) 
 	endif
 endif
-
 
 #	Baseline data sets can be generated and archived or compared against.  
 #       - To generate and archive, set GENERATE_BASELINE to a pathname that can 
@@ -266,18 +337,48 @@ if ( $COMPARE_BASELINE != FALSE ) then
 	endif
 endif
 
+#	Set the input/output format type (currently 1, 2 or 5 OK).
+#	Binary		NetCDF				PHDF, IBM	GriB, history only
+#	1		2		3		4		5
 
+set IO_FORM = 2
+set IO_FORM_NAME = ( io_bin io_netcdf io_dummy io_phdf5 io_grib1 )
+set IO_FORM_WHICH =( IO     IO        IO       IO       O        )
 
 #	If we are doing nested runs, we are usually trying that non-MPI-but-using-RSL
-#	option.  That is not going to work with NMM due to needing MPI.
+#	option.  That is not going to work with NMM due to needing MPI.  If this is
+#	a non-nested run and an RSL_LITE run, we cannot do any periodic bc runs.  That 
+#	means no b_wave cases at all, and fewer quarter_ss cases.  It is therefore easier
+#	to zap all idealized runs.
 
 if      ( $NESTED == TRUE ) then
-	set CORES = (  em_real em_b_wave em_quarter_ss          )
+	set CORES = ( em_real em_b_wave em_quarter_ss          )
 else if ( $NESTED != TRUE ) then
-	set CORES = (  em_real em_b_wave em_quarter_ss nmm_real )
+	set CORES = ( em_real em_b_wave em_quarter_ss nmm_real )
+	if ( $RSL_LITE == TRUE ) then
+		set CORES = ( em_real nmm_real )
+	endif
+	if ( $CHEM == TRUE ) then
+		set CORES = ( em_real )
+	endif
 endif
 
-set PHYSOPTS =	( 1 2 3 )
+#	The b_wave case has binary input (4-byte only), the nmm
+#	core has raw MPI calls, skip them if we are doing real*8 floats.
+#	Bump up the OMP stack size for real*8 on OSF1 architectures.
+
+if      ( $REAL8 == TRUE ) then
+	if ( `uname` == OSF1 ) then
+		setenv MP_STACK_SIZE 64000000
+	endif
+	set CORES = ( em_real em_quarter_ss )
+endif
+
+if ( $CHEM != TRUE ) then
+	set PHYSOPTS =	( 1 2 3 )
+else if ( $CHEM == TRUE ) then
+	set PHYSOPTS =	( 1 )
+endif
 
 #	This is an ugly kludge.  The MP=2 does not work with the ideal cases with the
 #	special DEC build options.
@@ -318,6 +419,11 @@ cat >! dom_real << EOF
  parent_time_step_ratio              = 1,     3,     3,
  feedback                            = 1,
  smooth_option                       = 0
+ num_moves                           = 3
+ move_id                             = 2 , 2 , 2
+ move_interval                       = 3 , 6 , 9
+ move_cd_x                           = 1 , 1 , 1
+ move_cd_y                           = 1 , 1 , 1
 EOF
 else if ( $dataset == jun01 ) then
 cat >! dom_real << EOF
@@ -342,6 +448,11 @@ cat >! dom_real << EOF
  parent_time_step_ratio              = 1,     3,     3,
  feedback                            = 1,
  smooth_option                       = 0
+ num_moves                           = 3
+ move_id                             = 2 , 2 , 2
+ move_interval                       = 1 , 2 , 3
+ move_cd_x                           = 1 , 1 , 1
+ move_cd_y                           = 1 , 1 , 1
 EOF
 endif
 cat >! dom_ideal << EOF
@@ -580,10 +691,36 @@ cat >! phys_quarter_ss_3d << EOF
  open_ye                             = .false.,.false.,.false.,
 EOF
 
+if      ( $IO_FORM_WHICH[$IO_FORM] == IO ) then
+cat >! io_format << EOF
+ io_form_history                     = $IO_FORM
+ io_form_restart                     = $IO_FORM
+ io_form_input                       = $IO_FORM
+ io_form_boundary                    = $IO_FORM
+EOF
+else if ( $IO_FORM_WHICH[$IO_FORM] == I  ) then
+cat >! io_format << EOF
+ io_form_history                     = 2
+ io_form_restart                     = 2
+ io_form_input                       = $IO_FORM
+ io_form_boundary                    = $IO_FORM
+EOF
+else if ( $IO_FORM_WHICH[$IO_FORM] ==  O ) then
+cat >! io_format << EOF
+ io_form_history                     = $IO_FORM
+ io_form_restart                     = 2
+ io_form_input                       = 2
+ io_form_boundary                    = 2
+EOF
+endif
+
+
 if ( $dataset == jun01 ) then
 	set filetag_real=2001-06-11_12:00:00
 else if ( $dataset == jan00 ) then
 	set filetag_real=2000-01-24_12:00:00
+else if ( $dataset == chem ) then
+	set filetag_real=2004-06-25_12:00:00
 endif
 
 set filetag_ideal=0001-01-01_00:00:00
@@ -603,9 +740,10 @@ set ZAP_SERIAL          = FALSE
 set ZAP_OPENMP          = FALSE
 set SERIALRUNCOMMAND	= 
 set OMPRUNCOMMAND	= 
+set MPIRUNCOMMANDPOST   = 
 
 touch version_info
-if      ( ( $ARCH[1] == AIX ) && ( `hostname | cut -c 1-2` == bf ) ) then
+if ( ( $ARCH[1] == AIX ) && ( `hostname | cut -c 1-2` == bs ) ) then
 	set DEF_DIR             = $home
 	set TMPDIR              = /ptmp/$user
 	# keep stuff out of $HOME and /ptmp/$USER
@@ -629,70 +767,25 @@ if      ( ( $ARCH[1] == AIX ) && ( `hostname | cut -c 1-2` == bf ) ) then
 	endif
 	if ( ! -d $TMPDIR ) mkdir $TMPDIR
 	set MAIL                = /usr/bin/mailx
-	set COMPOPTS            = ( 1 2 4 )
-	set Num_Procs		= 4
-	set OPENMP 		= $Num_Procs
-        setenv MP_PROCS  $Num_Procs
-        setenv MP_RMPOOL 1
-	set MPIRUNCOMMAND       =  poe 
-	set ZAP_OPENMP		= FALSE
-	echo "Compiler version info: " >! version_info
-	pmrinfo | grep "FORTRAN:" >>&! version_info
-	echo " " >>! version_info
-	echo "OS version info: " >>! version_info
-	pmrinfo | grep "AIX:" >>&! version_info
-	echo " " >>! version_info
-	setenv MP_SHARED_MEMORY yes
-else if ( ( $ARCH[1] == AIX ) && ( `hostname | cut -c 1-2` == bs ) ) then
-	set DEF_DIR             = $home
-	set TMPDIR              = /ptmp/$user
-	# keep stuff out of $HOME and /ptmp/$USER
-	# this allows multiple regressions tests to run simultaneously
-	# extend this to other machines later
-	if ( ! $?LOADL_JOB_NAME ) then
-		echo "${0}: ERROR::  This batch script must be submitted via"
-		echo "${0}:          LoadLeveler on an AIX machine\!"
-	else
-		set job_id              = `echo ${LOADL_JOB_NAME} | cut -f2 -d'.'`
-		set DEF_DIR             = /ptmp/$user/wrf_regression.${job_id}
-		set TMPDIR              = $DEF_DIR
-		if ( -d $DEF_DIR ) then
-			echo "${0}: ERROR::  Directory ${DEF_DIR} exists, please remove it"
-			exit ( 1 ) 
-		else
-			mkdir -p $DEF_DIR
-			echo "See directory ${DEF_DIR}/ for wrftest.output and other test results"
-		endif
-		set CUR_DIR = ${LOADL_STEP_INITDIR}
+	if        ( $NESTED == TRUE )                                                     then
+		set COMPOPTS	= ( 12 13 4 )
+	else if ( ( $NESTED != TRUE ) && ( $ESMF_LIB == TRUE ) )                          then
+		set COMPOPTS    = ( 1 2 10 )
+	else if ( ( $NESTED != TRUE ) && ( $ESMF_LIB != TRUE ) && ( $RSL_LITE == TRUE ) ) then
+		set COMPOPTS	= ( 1 2 3 )
+	else if ( ( $NESTED != TRUE ) && ( $ESMF_LIB != TRUE ) && ( $RSL_LITE != TRUE ) ) then
+		set COMPOPTS    = ( 1 2 4 )
 	endif
-	if ( ! -d $TMPDIR ) mkdir $TMPDIR
-	set MAIL                = /usr/bin/mailx
-	set COMPOPTS            = ( 1 2 4 )
 	set Num_Procs		= 4
 	set OPENMP 		= $Num_Procs
         setenv MP_PROCS  $Num_Procs
         setenv MP_RMPOOL 1
 	set MPIRUNCOMMAND       =  poe 
-	set ZAP_OPENMP		= FALSE
-	echo "Compiler version info: " >! version_info
-	pmrinfo | grep "FORTRAN:" >>&! version_info
-	echo " " >>! version_info
-	echo "OS version info: " >>! version_info
-	pmrinfo | grep "AIX:" >>&! version_info
-	echo " " >>! version_info
-	setenv MP_SHARED_MEMORY yes
-else if ( ( $ARCH[1] == AIX ) && ( `hostname | cut -c 1-2` == bb ) ) then
-	set DEF_DIR             = $home
-	set TMPDIR              = /ptmp/$user
-	if ( ! -d $TMPDIR ) mkdir $TMPDIR
-	set MAIL                = /usr/bin/mailx
-	set COMPOPTS            = ( 1 2 4 )
-	set Num_Procs		= 4
-	set OPENMP 		= $Num_Procs
-        setenv MP_PROCS  $Num_Procs
-        setenv MP_RMPOOL 1
-	set MPIRUNCOMMAND       = poe
-	set ZAP_OPENMP		= FALSE
+	if ( $CHEM == TRUE ) then
+		set ZAP_OPENMP		= TRUE
+	else if ( $CHEM == FALSE ) then
+		set ZAP_OPENMP		= FALSE
+	endif
 	echo "Compiler version info: " >! version_info
 	pmrinfo | grep "FORTRAN:" >>&! version_info
 	echo " " >>! version_info
@@ -709,9 +802,11 @@ else if ( $ARCH[1] == OSF1 && $clrm == 0 ) then
 	endif
 	set TMPDIR              = .
 	set MAIL		= /usr/bin/mailx
-	if      ( $NESTED == TRUE ) then
+	if        ( $NESTED == TRUE )                            then
 		set COMPOPTS	= ( 2 4 6 )
-	else if ( $NESTED != TRUE ) then
+	else if ( ( $NESTED != TRUE ) && ( $RSL_LITE == TRUE ) ) then
+		set COMPOPTS	= ( 1 3 5 )
+	else if ( ( $NESTED != TRUE ) && ( $RSL_LITE != TRUE ) ) then
 		set COMPOPTS	= ( 1 3 6 )
 	endif
 	set Num_Procs		= 4
@@ -726,7 +821,11 @@ EOF
 	set SERIALRUNCOMMAND	= 
 	set OMPRUNCOMMAND	= 
 	set MPIRUNCOMMAND 	= ( /usr/local/mpich/bin/mpirun -np $Num_Procs -machinefile $Mach )
-	set ZAP_OPENMP		= FALSE
+	if ( $CHEM == TRUE ) then
+		set ZAP_OPENMP		= TRUE
+	else if ( $CHEM == FALSE ) then
+		set ZAP_OPENMP		= FALSE
+	endif
 	echo "Compiler version info: " >! version_info
 	f90 -version >>&! version_info
 	echo " " >>! version_info
@@ -737,9 +836,11 @@ else if ( $ARCH[1] == OSF1 && $clrm == 1 ) then
 	set DEF_DIR		= /`hostname | cut -d. -f1`/$user
 	set TMPDIR		= /mmmtmp/$user
 	set MAIL		= /usr/bin/mailx
-	if      ( $NESTED == TRUE ) then
+	if        ( $NESTED == TRUE )                            then
 		set COMPOPTS	= ( 2 4 6 )
-	else if ( $NESTED != TRUE ) then
+	else if ( ( $NESTED != TRUE ) && ( $RSL_LITE == TRUE ) ) then
+		set COMPOPTS	= ( 1 3 5 )
+	else if ( ( $NESTED != TRUE ) && ( $RSL_LITE != TRUE ) ) then
 		set COMPOPTS	= ( 1 3 6 )
 	endif
 	set Num_Procs		= 4
@@ -759,106 +860,25 @@ EOF
 	echo "OS version info: " >>! version_info
 	uname -a >>&! version_info
 	echo " " >>! version_info
-else if ( ( $ARCH[1] == Linux ) && ( `hostname` == jacaranda ) ) then
-	set DEF_DIR		= /data1/$USER/`hostname`
-	set TMPDIR		= .
-	set MAIL		= /bin/mail
-	set COMPOPTS		= ( 2 4 3 )
-	set Num_Procs		= 4
-	set OPENMP		= 2
-	set MPIRUNCOMMAND	= ( mpirun -np $Num_Procs )
-	set ZAP_OPENMP		= TRUE
-	echo "Compiler version info: " >! version_info
-	ifort -V | grep Intel >>! version_info
-	ifort -V | grep Version >>! version_info
-	echo " " >>! version_info
-	echo "OS version info: " >>! version_info
-	uname -a >>&! version_info
-	echo " " >>! version_info
-else if ( ( $ARCH[1] == Linux ) && ( `hostname` == master ) ) then
-	set DEF_DIR		= /big6/gill/DO_NOT_REMOVE_DIR
-	set TMPDIR		= .
-	set MAIL		= /bin/mail
-	set COMPOPTS		= ( 1 3 5 )
-	set Num_Procs		= 4
-	set OPENMP		= 2
-	set MPIRUNCOMMAND	= ( mpirun -np $Num_Procs )
-	set ZAP_OPENMP		= TRUE
-	echo "Compiler version info: " >! version_info
-	pgf90 -V >>&! version_info
-	echo " " >>! version_info
-	echo "OS version info: " >>! version_info
-	uname -a >>&! version_info
-	echo " " >>! version_info
-else if ( ( $ARCH[1] == Linux ) && ( `hostname` == atc-c1 ) ) then
-	if ( $user == gill Da) then
-		set DEF_DIR	= /data/bourgeoi/DAVE
-	else
-		set DEF_DIR	= /data/$user
-	endif
-	set TMPDIR              = .
-	set MAIL		= /bin/mail
-	set COMPOPTS		= ( 1 3 5 )
-	set Num_Procs		= 4
-	set OPENMP 		= 2
-	set MPIRUNCOMMAND 	= ( mpirun -np $Num_Procs )
-	set ZAP_OPENMP		= FALSE
-	echo "Compiler version info: " >! version_info
-	pgf90 -V >>&! version_info
-	echo " " >>! version_info
-	echo "OS version info: " >>! version_info
-	uname -a >>&! version_info
-	echo " " >>! version_info
-	setenv NETCDF /data/bourgeoi/netcdf
-else if ( ( $ARCH[1] == Linux ) && ( `hostname` == kola ) ) then
-	set DEF_DIR		= /kola2/$user
-	set TMPDIR              = .
-	set MAIL		= /bin/mail
-	set COMPOPTS		= ( 1 3 5 )
-	set Num_Procs		= 2
-	set OPENMP 		= $Num_Procs
-	cat >! machfile << EOF
-kola
-kola
-EOF
-	set Mach = `pwd`/machfile
-	set MPIRUNCOMMAND 	= ( mpirun -np $Num_Procs -machinefile $Mach )
-	set ZAP_OPENMP		= FALSE
-	echo "Compiler version info: " >! version_info
-	pgf90 -V >>&! version_info
-	echo " " >>! version_info
-	echo "OS version info: " >>! version_info
-	uname -a >>&! version_info
-	echo " " >>! version_info
-else if ( ( $ARCH[1] == Linux ) && ( `hostname` == she ) ) then
-	set DEF_DIR		= /she/users/$user
-	set TMPDIR		= .
-	set MAIL		= /bin/mail
-	set COMPOPTS		= ( 1 3 5 )
-	set Num_Procs		= 2
-	set OPENMP		= $Num_Procs
-	cat >! machfile << EOF
-she
-she
-EOF
-	set Mach		= `pwd`/machfile
-	set ZAP_OPENMP		= FALSE
-	set MPIRUNCOMMAND       = ( mpirun -np $Num_Procs -machinefile $Mach )
-	echo "Compiler version info: " >! version_info
-	pgf90 -V >>&! version_info
-	echo " " >>! version_info
-	echo "OS version info: " >>! version_info
-	uname -a >>&! version_info
-	echo " " >>! version_info
 else if ( ( $ARCH[1] == Linux ) && ( `hostname` == bay-mmm ) ) then
 	set DEF_DIR	= /mmmtmp/${user}/`hostname`
 	if ( ! -d $DEF_DIR ) mkdir $DEF_DIR
 	set TMPDIR		= .
 	set MAIL		= /bin/mail
-	if ( $NESTED == TRUE ) then
-		set COMPOPTS	= ( 2 4 5 )
-	else
-		set COMPOPTS	= ( 1 3 5 )
+	if      ( $LINUX_COMP == PGI ) then
+		if        ( $NESTED == TRUE )                            then
+			set COMPOPTS	= ( 2 4 5 )
+		else if ( ( $NESTED != TRUE ) && ( $RSL_LITE == TRUE ) ) then
+			set COMPOPTS	= ( 1 3 6 )
+		else if ( ( $NESTED != TRUE ) && ( $RSL_LITE != TRUE ) ) then
+			set COMPOPTS	= ( 1 3 5 )
+		endif
+	else if ( $LINUX_COMP == INTEL ) then
+		if        ( $NESTED == TRUE )                            then
+			set COMPOPTS	= ( 8 10 11 )
+		else if   ( $NESTED != TRUE )                            then
+			set COMPOPTS	= ( 7  9 11 )
+		endif
 	endif
 	set Num_Procs		= 2
 	set OPENMP		= $Num_Procs
@@ -869,10 +889,18 @@ else if ( ( $ARCH[1] == Linux ) && ( `hostname` == bay-mmm ) ) then
 `hostname`
 EOF
 	set Mach		= `pwd`/machfile
-	set ZAP_OPENMP		= FALSE
+	if ( $CHEM == TRUE ) then
+		set ZAP_OPENMP		= TRUE
+	else if ( $CHEM == FALSE ) then
+		set ZAP_OPENMP		= FALSE
+	endif
 	set MPIRUNCOMMAND       = ( mpirun -np $Num_Procs -machinefile $Mach )
 	echo "Compiler version info: " >! version_info
-	pgf90 -V >>&! version_info
+	if      ( $LINUX_COMP == PGI ) then
+		pgf90 -V >>&! version_info
+	else if ( $LINUX_COMP == INTEL ) then
+		ifort -v >>&! version_info
+	endif
 	echo " " >>! version_info
 	echo "OS version info: " >>! version_info
 	uname -a >>&! version_info
@@ -889,7 +917,21 @@ else if ( ( $ARCH[1] == Linux ) && ( `hostname` == loquat ) ) then
 		echo "See directory ${DEF_DIR}/ for wrftest.output and other test results"
 	endif
 	set MAIL		= /bin/mail
-	set COMPOPTS		= ( 1 3 5 )
+	if      ( $LINUX_COMP == PGI ) then
+		if        ( $NESTED == TRUE )                            then
+			set COMPOPTS	= ( 2 4 5 )
+		else if ( ( $NESTED != TRUE ) && ( $RSL_LITE == TRUE ) ) then
+			set COMPOPTS	= ( 1 3 6 )
+		else if ( ( $NESTED != TRUE ) && ( $RSL_LITE != TRUE ) ) then
+			set COMPOPTS	= ( 1 3 5 )
+		endif
+	else if ( $LINUX_COMP == INTEL ) then
+		if        ( $NESTED == TRUE )                            then
+			set COMPOPTS	= ( 8 10 11 )
+		else if   ( $NESTED != TRUE )                            then
+			set COMPOPTS	= ( 7  9 11 )
+		endif
+	endif
 	set Num_Procs		= 2
 	set OPENMP		= $Num_Procs
 	cat >! machfile << EOF
@@ -899,10 +941,95 @@ else if ( ( $ARCH[1] == Linux ) && ( `hostname` == loquat ) ) then
 `hostname`
 EOF
 	set Mach		= `pwd`/machfile
-	set ZAP_OPENMP		= FALSE
+	if ( $CHEM == TRUE ) then
+		set ZAP_OPENMP		= TRUE
+	else if ( $CHEM == FALSE ) then
+		set ZAP_OPENMP		= FALSE
+	endif
 	set MPIRUNCOMMAND       = ( mpirun -np $Num_Procs -machinefile $Mach )
 	echo "Compiler version info: " >! version_info
-	pgf90 -V >>&! version_info
+	if      ( $LINUX_COMP == PGI ) then
+		pgf90 -V >>&! version_info
+	else if ( $LINUX_COMP == INTEL ) then
+		ifort -v >>&! version_info
+	endif
+	echo " " >>! version_info
+	echo "OS version info: " >>! version_info
+	uname -a >>&! version_info
+	echo " " >>! version_info
+else if ( `hostname` == tempest ) then
+	set DEF_DIR	= /ptmp/${user}/wrf_regtest.${QSUB_REQID}
+	if ( ! -d $DEF_DIR ) mkdir $DEF_DIR
+	set TMPDIR		= .
+	set MAIL		= /usr/sbin/Mail
+	set COMPOPTS		= ( 1 2 3 )
+	set Num_Procs		= 4
+	set OPENMP		= $Num_Procs
+	set Mach		= `pwd`/machfile
+	set ZAP_OPENMP		= TRUE
+	set MPIRUNCOMMAND       = ( mpirun -np $Num_Procs )
+	echo "Compiler version info: " >! version_info
+	f90 -version >>&! version_info
+	echo " " >>! version_info
+	echo "OS version info: " >>! version_info
+	uname -a >>&! version_info
+	echo " " >>! version_info
+else if ( ( $ARCH[1] == Linux ) && ( `hostname` == jacaranda ) ) then
+	set DEF_DIR		= /data1/$USER/`hostname`
+	set TMPDIR		= .
+	set MAIL		= /bin/mail
+	set COMPOPTS		= ( 2 4 3 )
+	set Num_Procs		= 4
+	set OPENMP		= 2
+	set MPIRUNCOMMAND	= ( mpirun -np $Num_Procs )
+	set ZAP_OPENMP		= TRUE
+	echo "Compiler version info: " >! version_info
+	ifort -v >>! version_info
+	echo " " >>! version_info
+	echo "OS version info: " >>! version_info
+	uname -a >>&! version_info
+	echo " " >>! version_info
+else if ( ( $ARCH[1] == Linux ) && ( `hostname` == master ) ) then
+	set DEF_DIR		= /big6/gill/DO_NOT_REMOVE_DIR
+	set TMPDIR		= .
+	set MAIL		= /bin/mail
+	if      ( $LINUX_COMP == PGI ) then
+		if        ( $NESTED == TRUE )                            then
+			set COMPOPTS	= ( 2 4 5 )
+		else if ( ( $NESTED != TRUE ) && ( $RSL_LITE == TRUE ) ) then
+			set COMPOPTS	= ( 1 3 6 )
+		else if ( ( $NESTED != TRUE ) && ( $RSL_LITE != TRUE ) ) then
+			set COMPOPTS	= ( 1 3 5 )
+		endif
+	else if ( $LINUX_COMP == INTEL ) then
+		if        ( $NESTED == TRUE )                            then
+			set COMPOPTS	= ( 8 10 11 )
+		else if   ( $NESTED != TRUE )                            then
+			set COMPOPTS	= ( 7  9 11 )
+		endif
+	endif
+	set Num_Procs		= 4
+	set OPENMP		= 2
+	cat >! machfile << EOF
+node3
+node3
+node4
+node4
+EOF
+	set Mach		= `pwd`/machfile
+	if ( $CHEM == TRUE ) then
+		set ZAP_OPENMP		= TRUE
+	else if ( $CHEM == FALSE ) then
+		set ZAP_OPENMP		= FALSE
+	endif
+	set MPIRUNCOMMAND       = ( mpirun -v -np $Num_Procs -machinefile $Mach -nolocal )
+	set MPIRUNCOMMANDPOST   = "< /dev/null"
+	echo "Compiler version info: " >! version_info
+	if      ( $LINUX_COMP == PGI ) then
+		pgf90 -V >>&! version_info
+	else if ( $LINUX_COMP == INTEL ) then
+		ifort -v >>&! version_info
+	endif
 	echo " " >>! version_info
 	echo "OS version info: " >>! version_info
 	uname -a >>&! version_info
@@ -938,37 +1065,48 @@ else if ( ( $ARCH[1] == Linux ) && ( `hostname | cut -d. -f2-` == fsl.noaa.gov )
 	uname -a >>&! version_info
 	echo " " >>! version_info
 	setenv NETCDF /usr/local/netcdf-3.4
-else if ( ( $ARCH[1] == IRIX64 ) && ( `hostname` == dataproc ) ) then
-	set DEF_DIR		= /ptmp/$user
+else if ( ( $ARCH[1] == Linux ) && ( `hostname` == kola ) ) then
+	set DEF_DIR		= /kola2/$user
 	set TMPDIR              = .
-	set MAIL		= /usr/sbin/mailx
-	set COMPOPTS		= ( 1 2 3 )
-	set Num_Procs		= 4
+	set MAIL		= /bin/mail
+	if      ( $LINUX_COMP == PGI ) then
+		if        ( $NESTED == TRUE )                            then
+			set COMPOPTS	= ( 2 4 5 )
+		else if ( ( $NESTED != TRUE ) && ( $RSL_LITE == TRUE ) ) then
+			set COMPOPTS	= ( 1 3 6 )
+		else if ( ( $NESTED != TRUE ) && ( $RSL_LITE != TRUE ) ) then
+			set COMPOPTS	= ( 1 3 5 )
+		endif
+	else if ( $LINUX_COMP == INTEL ) then
+		if        ( $NESTED == TRUE )                            then
+			set COMPOPTS	= ( 8 10 11 )
+		else if   ( $NESTED != TRUE )                            then
+			set COMPOPTS	= ( 7  9 11 )
+		endif
+	endif
+	set Num_Procs		= 2
 	set OPENMP		= $Num_Procs
-	set MPIRUNCOMMAND	= ( mpirun -np $Num_Procs )
-	set ZAP_OPENMP		= FALSE
+	cat >! machfile << EOF
+`hostname`
+`hostname`
+EOF
+	set Mach		= `pwd`/machfile
+	if ( $CHEM == TRUE ) then
+		set ZAP_OPENMP		= TRUE
+	else if ( $CHEM == FALSE ) then
+		set ZAP_OPENMP		= FALSE
+	endif
+	set MPIRUNCOMMAND       = ( mpirun -np $Num_Procs -machinefile $Mach )
 	echo "Compiler version info: " >! version_info
-	f90 -version >>&! version_info
+	if      ( $LINUX_COMP == PGI ) then
+		pgf90 -V >>&! version_info
+	else if ( $LINUX_COMP == INTEL ) then
+		ifort -v >>&! version_info
+	endif
 	echo " " >>! version_info
 	echo "OS version info: " >>! version_info
 	uname -a >>&! version_info
 	echo " " >>! version_info
-else if ( ( $ARCH[1] == IRIX64 ) && ( `hostname` == gs2 ) ) then
-	set DEF_DIR		= /fer2/${user}/DAVE
-	set TMPDIR              = .
-	set MAIL		= /usr/sbin/mailx
-	set COMPOPTS		= ( 1 2 3 )
-	set Num_Procs		= 4
-	set OPENMP		= $Num_Procs
-	set MPIRUNCOMMAND	= ( mpirun -np $Num_Procs )
-	echo "Compiler version info: " >! version_info
-	set ZAP_OPENMP		= FALSE
-	f90 -version >>&! version_info
-	echo " " >>! version_info
-	echo "OS version info: " >>! version_info
-	uname -a >>&! version_info
-	echo " " >>! version_info
-	setenv NETCDF /disk2/people3/wesley/netcdf_Dave_WRF_64
 else
 	echo "Unrecognized architecture for regression test"  >! error_message
 	echo `uname`                                          >> error_message
@@ -1100,6 +1238,24 @@ else if ( $REG_TYPE == OPTIMIZED ) then
 	echo "No inter-comparisons are made. " >>! ${DEF_DIR}/wrftest.output
 	echo " " >>! ${DEF_DIR}/wrftest.output
 endif
+if ( $REAL8 == TRUE ) then
+	echo "Floating point precision is 8-bytes" >>! ${DEF_DIR}/wrftest.output
+	echo " " >>! ${DEF_DIR}/wrftest.output
+endif
+if ( $CHEM == TRUE ) then
+	echo "WRF_CHEM tests run for em_real core only, no other cores run" >>! ${DEF_DIR}/wrftest.output
+	echo " " >>! ${DEF_DIR}/wrftest.output
+endif
+if ( $RSL_LITE == TRUE ) then
+	echo "Parallel DM portion using RSL_LITE build option" >>! ${DEF_DIR}/wrftest.output
+	echo " " >>! ${DEF_DIR}/wrftest.output
+endif
+if ( $ESMF_LIB == TRUE ) then
+	echo "A separately installed version of the latest ESMF library" >>! ${DEF_DIR}/wrftest.output
+	echo "(NOT the ESMF library included in the WRF tarfile) will" >>! ${DEF_DIR}/wrftest.output
+	echo "be used for some tests" >>! ${DEF_DIR}/wrftest.output
+	echo " " >>! ${DEF_DIR}/wrftest.output
+endif
 if ( $QUILT == TRUE ) then
 	echo "One WRF output quilt server will be used for some tests" >>! ${DEF_DIR}/wrftest.output
 	echo " " >>! ${DEF_DIR}/wrftest.output
@@ -1112,6 +1268,17 @@ endif
 if ( $COMPARE_BASELINE != FALSE ) then
 	echo "WRF output will be compared with files in baseline directory ${COMPARE_BASELINE} for some tests" >>! \
 	     ${DEF_DIR}/wrftest.output
+	echo " " >>! ${DEF_DIR}/wrftest.output
+endif
+echo "The selected I/O option is $IO_FORM ($IO_FORM_NAME[$IO_FORM])" >>! ${DEF_DIR}/wrftest.output
+if      ( $IO_FORM_WHICH[$IO_FORM] == IO ) then
+	echo "This option is for both input and history files" >>! ${DEF_DIR}/wrftest.output
+	echo " " >>! ${DEF_DIR}/wrftest.output
+else if ( $IO_FORM_WHICH[$IO_FORM] == I  ) then
+	echo "This option is for input files only" >>! ${DEF_DIR}/wrftest.output
+	echo " " >>! ${DEF_DIR}/wrftest.output
+else if ( $IO_FORM_WHICH[$IO_FORM] ==  O ) then
+	echo "This option is for history files only" >>! ${DEF_DIR}/wrftest.output
 	echo " " >>! ${DEF_DIR}/wrftest.output
 endif
 
@@ -1185,22 +1352,22 @@ banner 6
 			if      ( ( $compopt == $COMPOPTS[1] ) && \
                                   ( -e main/wrf_${core}.exe.$compopt ) && \
                                   ( -e main/real_${core}.exe.1 ) && \
-                                  ( -e ${DEF_DIR}/regression_test/WRFV2/external/io_netcdf/diffwrf ) ) then
+                                  ( -e ${DEF_DIR}/regression_test/WRFV2/external/$IO_FORM_NAME[$IO_FORM]/diffwrf ) ) then
 				goto GOT_THIS_EXEC
 			else if ( ( $compopt != $COMPOPTS[1] ) && \
                                   ( -e main/wrf_${core}.exe.$compopt ) && \
-                                  ( -e ${DEF_DIR}/regression_test/WRFV2/external/io_netcdf/diffwrf ) ) then
+                                  ( -e ${DEF_DIR}/regression_test/WRFV2/external/$IO_FORM_NAME[$IO_FORM]/diffwrf ) ) then
 				goto GOT_THIS_EXEC
 			endif
 		else
 			if      ( ( $compopt == $COMPOPTS[1] ) && \
                                   ( -e main/wrf_${core}.exe.$compopt ) && \
                                   ( -e main/ideal_${core}.exe.1 ) && \
-                                  ( -e ${DEF_DIR}/regression_test/WRFV2/external/io_netcdf/diffwrf ) ) then
+                                  ( -e ${DEF_DIR}/regression_test/WRFV2/external/$IO_FORM_NAME[$IO_FORM]/diffwrf ) ) then
 				goto GOT_THIS_EXEC
 			else if ( ( $compopt != $COMPOPTS[1] ) && \
                                   ( -e main/wrf_${core}.exe.$compopt ) && \
-                                  ( -e ${DEF_DIR}/regression_test/WRFV2/external/io_netcdf/diffwrf ) ) then
+                                  ( -e ${DEF_DIR}/regression_test/WRFV2/external/$IO_FORM_NAME[$IO_FORM]/diffwrf ) ) then
 				goto GOT_THIS_EXEC
 			endif
 		endif
@@ -1210,13 +1377,24 @@ banner 6
 		#	The WRF configuration file works with a single integer
 		#	input, which is the compiler option.  By convention, option $COMPOPTS[1] is
 		#	serial, $COMPOPTS[2] is OMP, and $COMPOPTS[3] is MPI.
+
+		#	Print info about use of separately installed ESMF library.  
+		set esmf_lib_str = " - - - - - - - - - - - - - "
+		if ( $ESMF_LIB == TRUE ) then
+			if ( $compopt == $COMPOPTS[3] ) then
+				echo "A separately installed version of the latest ESMF library" >>! ${DEF_DIR}/wrftest.output
+				echo "(NOT the ESMF library included in the WRF tarfile) is" >>! ${DEF_DIR}/wrftest.output
+				echo "being used for this test of $core parallel $compopt..." >>! ${DEF_DIR}/wrftest.output
+				set esmf_lib_str = "using separate ESMF library"
+			endif
+		endif
 	
 #DAVE###################################################
 echo start build mechanism
 banner 7
 #set ans = "$<"
 #DAVE###################################################
-		./clean
+		./clean -a
 		echo $compopt | ./configure
 	
 		#	Decide whether this a bit-for-bit run or an fully optimized run.  We are just
@@ -1244,6 +1422,22 @@ banner 7
 				endif
 			endif
 		endif
+
+		#	We also need to modify the configure.wrf file based on whether or not there is
+		#	going to be nesting.  All regtest em_real nesting runs utilize a moving nest.  All of the
+		#	ARCHFLAGS macros need to have -DMOVE_NESTS added to the list of options. 
+
+		if ( ( $NESTED == TRUE ) && ( $core == em_real ) ) then
+			sed -e '/^ARCHFLAGS/s/=/=	-DMOVE_NESTS/' ./configure.wrf >! foo ; /bin/mv foo configure.wrf
+		endif
+
+		#	The configure.wrf file needs to be adjusted as to whether we are requesting real*4 or real*8
+		#	as the default floating precision.
+
+		if ( $REAL8 == TRUE ) then
+			sed -e 's/^RWORDSIZE *= *[0-9]/RWORDSIZE = 8/' ./configure.wrf >! foo ; /bin/mv foo configure.wrf
+		endif
+
 #DAVE###################################################
 echo configure built with optim mods removed, ready to compile
 banner 8
@@ -1265,11 +1459,11 @@ banner 9
                 if ( ! -x main/wrf.exe ) set ok = 1
 
 		if ( $ok != 0 ) then
-			echo "SUMMARY compilation    for $core           parallel $compopt FAIL" >>! ${DEF_DIR}/wrftest.output
+			echo "SUMMARY compilation    for $core           parallel $compopt $esmf_lib_str FAIL" >>! ${DEF_DIR}/wrftest.output
 			$MAIL -s "REGRESSION FAILURE $ARCH[1] " $FAIL_MAIL < ${DEF_DIR}/wrftest.output
 			exit ( 3 )
 		else
-			echo "SUMMARY compilation    for $core           parallel $compopt PASS" >>! ${DEF_DIR}/wrftest.output
+			echo "SUMMARY compilation    for $core           parallel $compopt $esmf_lib_str PASS" >>! ${DEF_DIR}/wrftest.output
 			echo "-------------------------------------------------------------" >> ${DEF_DIR}/wrftest.output
 			mv main/wrf.exe main/wrf_${core}.exe.$compopt
 			if (  ( $core == em_real ) && ( $compopt == $COMPOPTS[1] ) ) then
@@ -1345,40 +1539,51 @@ banner 12
 				#	Create the correct namelist.input file for real data cases.
 				#
 
-				cp ${CUR_DIR}/phys_real_${phys_option} phys_opt
-				cp ${CUR_DIR}/dom_real dom_real
-
-				set time_step = `awk ' /^ time_step /{ print $3 } ' namelist.input.$dataset | cut -d, -f1`
-
-				#	Wanna do more/less time steps on the real cases?  Easy. Those last two numbers
-				#	in the eqns are all you need.  Their product must be 60.  So, instead of 3 and 20,
-				#	(3 coarse grid timesteps), you could use 20 and 3 (20 coarse grid time steps).
-
-				if      ( $NESTED == TRUE ) then
-					@ run_seconds = $time_step * 3
-					@ history_interval = $time_step / 20
-				else if ( $NESTED != TRUE ) then
-					@ run_seconds = $time_step * 10
-					@ history_interval = $time_step / 6
-				endif
-				rm ed_in namelist.input.temp
-				cat >! ed_in << EOF
+				if ( $CHEM != TRUE ) then
+					cp ${CUR_DIR}/phys_real_${phys_option} phys_opt
+					cp ${CUR_DIR}/dom_real dom_real
+	
+					set time_step = `awk ' /^ time_step /{ print $3 } ' namelist.input.$dataset | cut -d, -f1`
+	
+					#	Wanna do more/less time steps on the real cases?  Easy. Those last two numbers
+					#	in the eqns are all you need.  Their product must be 60.  So, instead of 3 and 20,
+					#	(3 coarse grid timesteps), you could use 20 and 3 (20 coarse grid time steps).
+	
+					if      ( $NESTED == TRUE ) then
+						@ run_seconds = $time_step * 3
+						@ history_interval = $time_step / 20
+					else if ( $NESTED != TRUE ) then
+						@ run_seconds = $time_step * 10
+						@ history_interval = $time_step / 6
+					endif
+					rm ed_in namelist.input.temp
+					cat >! ed_in << EOF
 g/run_seconds/s/[0-9]/$run_seconds
 g/history_interval/s/[0-9][0-9][0-9]/$history_interval
 w namelist.input.temp
 q
 EOF
-				ed namelist.input.$dataset < ed_in
+					ed namelist.input.$dataset < ed_in
+	
+					cp ${CUR_DIR}/io_format io_format
+					sed -e '/^ mp_physics/,/ensdim/d' -e '/^ &physics/r ./phys_opt' \
+					    -e '/^ time_step /,/^ smooth_option/d' -e '/^ &domains/r ./dom_real' \
+					    -e '/^ io_form_history /,/^ io_form_boundary/d' -e '/^ restart_interval/r ./io_format' \
+					    -e 's/ frames_per_outfile *= [0-9][0-9]*/ frames_per_outfile = 200/g' \
+					    -e 's/ run_days *= [0-9][0-9]*/ run_days = 0/g' \
+					    -e 's/ run_hours *= [0-9][0-9]*/ run_hours = 0/g' \
+					    -e 's/ run_minutes *= [0-9][0-9]*/ run_minutes = 0/g' \
+					namelist.input.temp >! namelist.input
+				
+				#	The chem run has its own namelist, due to special input files (io_form not tested for chem)
 
-				sed -e '/^ mp_physics/,/ensdim/d' -e '/^ &physics/r ./phys_opt' \
-				    -e '/^ time_step /,/^ smooth_option/d' -e '/^ &domains/r ./dom_real' \
-				    -e 's/ frames_per_outfile *= [0-9][0-9]*/ frames_per_outfile = 200/g' \
-				    -e 's/ run_days *= [0-9][0-9]*/ run_days = 0/g' \
-				    -e 's/ run_hours *= [0-9][0-9]*/ run_hours = 0/g' \
-				    -e 's/ run_minutes *= [0-9][0-9]*/ run_minutes = 0/g' \
-				namelist.input.temp >! namelist.input
+				else if ( $CHEM == TRUE ) then
+					cp namelist.input.$dataset namelist.input
+				endif
+
 				# WRF output quilt servers are only tested for MPI configuration.  
-				# Currenlty, only one WRF output quilt server is used.  
+				# Currently, only one WRF output quilt server is used.  
+
 				if ( $QUILT == TRUE ) then
 					if ( $compopt == $COMPOPTS[3] ) then
 						#	For now, test only one group of one output quilt servers.  
@@ -1438,17 +1643,19 @@ banner 15
 					#	Did making the IC BC files work?
 
 					if ( ( -e wrfinput_d01 ) && ( -e wrfbdy_d01 ) && ( $success == 0 ) ) then
-						echo "SUMMARY generate IC/BC for $core physics $phys_option parallel $compopt PASS" >>! ${DEF_DIR}/wrftest.output
+						echo "SUMMARY generate IC/BC for $core physics $phys_option parallel $compopt $esmf_lib_str PASS" >>! ${DEF_DIR}/wrftest.output
 						echo "-------------------------------------------------------------" >> ${DEF_DIR}/wrftest.output
 					else
-						echo "SUMMARY generate IC/BC for $core physics $phys_option parallel $compopt FAIL" >>! ${DEF_DIR}/wrftest.output
+						echo "SUMMARY generate IC/BC for $core physics $phys_option parallel $compopt $esmf_lib_str FAIL" >>! ${DEF_DIR}/wrftest.output
 						$MAIL -s "WRF FAIL making IC/BC $ARCH[1] " $FAIL_MAIL < ${DEF_DIR}/wrftest.output
 						exit ( 4 )
 					endif
 #DAVE###################################################
 echo IC BC must be OK
 ls -ls wrfi* wrfb*
-ncdump -v Times wrfb* | tail -20
+if ( $IO_FORM_NAME[$IO_FORM] == io_netcdf ) then
+	ncdump -v Times wrfb* | tail -20
+endif
 banner 16
 #set ans = "$<"
 #DAVE###################################################
@@ -1457,6 +1664,30 @@ banner 16
 				#	Run the forecast for this core, physics package and parallel option
 
 				rm $TMPDIR/wrfout_d01_${filetag}.${core}.${phys_option}.$compopt >& /dev/null
+				
+				#	The chem run has its own namelist, due to special input files, and it changes between
+				#	the IC generation and the forecast parts.  Just edit the existing one since the
+				#	quilt mods would have already been added.
+
+				if ( $CHEM == TRUE ) then
+					sed -e 's/ chem_in_opt *= *[0-9]*/ chem_in_opt = 0/g' namelist.input >! namelist.input.temp
+					mv namelist.input.temp namelist.input
+
+					# WRF output quilt servers are only tested for MPI configuration.  
+					# Currently, only one WRF output quilt server is used.  
+	
+					if ( $QUILT == TRUE ) then
+						if ( $compopt == $COMPOPTS[3] ) then
+							#	For now, test only one group of one output quilt servers.  
+							sed -e 's/ nio_tasks_per_group *= *[0-9][0-9]*/ nio_tasks_per_group = 1/g' \
+							    -e 's/ nio_groups *= *[0-9][0-9]*/ nio_groups = 1/g' \
+							namelist.input >! namelist.input.temp
+							mv -f namelist.input.temp namelist.input
+							echo "Building namelist.input.$core.${phys_option}.$compopt with one I/O quilt server enabled."
+							echo "NOTE  one I/O quilt server enabled for $core physics $phys_option parallel $compopt..." >>! ${DEF_DIR}/wrftest.output
+						endif
+					endif
+				endif
 
 				if      ( $compopt == $COMPOPTS[1] ) then
 					setenv OMP_NUM_THREADS 1
@@ -1483,7 +1714,7 @@ banner 16
 					if ( `uname` == AIX ) then
 						setenv XLSMPOPTS "parthds=1"
 					endif
-					$MPIRUNCOMMAND ../../main/wrf_${core}.exe.$compopt
+					$MPIRUNCOMMAND ../../main/wrf_${core}.exe.$compopt $MPIRUNCOMMANDPOST
 					mv rsl.error.0000 print.out.wrf_${core}_Phys=${phys_option}_Parallel=${compopt}.exe
 				endif
 #DAVE###################################################
@@ -1495,27 +1726,40 @@ banner 17
 				grep "SUCCESS COMPLETE" print.out.wrf_${core}_Phys=${phys_option}_Parallel=${compopt}.exe
 				set success = $status
 
-				#	Did making the forecast work, by that, we mean "is there an output file created?"
+				#	Did making the forecast work, by that, we mean "is there an output file created", and "are there 2 times periods".
 
 				if ( ( -e wrfout_d01_${filetag} ) && ( $success == 0 ) ) then
-					ncdump -h wrfout_d01_${filetag} | grep Time | grep UNLIMITED | grep currently | grep -q 2
-					set ok = $status
+					if      ( $IO_FORM_NAME[$IO_FORM] == io_netcdf ) then
+						ncdump -h wrfout_d01_${filetag} | grep Time | grep UNLIMITED | grep currently | grep -q 2
+						set ok = $status
+					else if ( $IO_FORM_NAME[$IO_FORM] == io_grib1  ) then
+#						set joe_times = `../../external/io_grib1/wgrib -s -4yr wrfout_d01_${filetag} |  grep -v ":anl:" | wc -l`
+#						if ( $joe_times >= 100 ) then
+						set joe_times = `../../external/io_grib1/wgrib -s -4yr wrfout_d01_${filetag} |  grep "UGRD:10 m" | wc -l`
+						if ( $joe_times == 2 ) then
+							set ok = 0
+						else
+							set ok = 1
+						endif
+					endif
 					if ( $ok == 0 ) then
-						echo "SUMMARY generate FCST  for $core physics $phys_option parallel $compopt PASS" >>! ${DEF_DIR}/wrftest.output
+						echo "SUMMARY generate FCST  for $core physics $phys_option parallel $compopt $esmf_lib_str PASS" >>! ${DEF_DIR}/wrftest.output
 						echo "-------------------------------------------------------------" >> ${DEF_DIR}/wrftest.output
 					else
-						echo "SUMMARY generate FCST  for $core physics $phys_option parallel $compopt FAIL" >>! ${DEF_DIR}/wrftest.output
+						echo "SUMMARY generate FCST  for $core physics $phys_option parallel $compopt $esmf_lib_str FAIL" >>! ${DEF_DIR}/wrftest.output
 						$MAIL -s "WRF FAIL FCST $ARCH[1] " $FAIL_MAIL < ${DEF_DIR}/wrftest.output
 						exit ( 5 )
 					endif
 				else
-					echo "SUMMARY generate FCST  for $core physics $phys_option parallel $compopt FAIL" >>! ${DEF_DIR}/wrftest.output
+					echo "SUMMARY generate FCST  for $core physics $phys_option parallel $compopt $esmf_lib_str FAIL" >>! ${DEF_DIR}/wrftest.output
 					$MAIL -s "WRF FAIL FCST $ARCH[1] " $FAIL_MAIL < ${DEF_DIR}/wrftest.output
 					exit ( 6 )
 				endif
 #DAVE###################################################
 echo success or failure of fcst
-ncdump -v Times wrfout_d01_${filetag} | tail -20
+if ( $IO_FORM_NAME[$IO_FORM] == io_netcdf ) then
+	ncdump -v Times wrfout_d01_${filetag} | tail -20
+endif
 banner 18
 #set ans = "$<"
 #DAVE###################################################
@@ -1558,7 +1802,9 @@ banner 19a
 #set ans = "$<"
 #DAVE###################################################
 
-                        /bin/cp namelist.input.hi_regtest namelist.input
+			cp ${CUR_DIR}/io_format io_format
+			sed -e '/^ io_form_history /,/^ io_form_boundary/d' -e '/^ restart_interval/r ./io_format' \
+			    namelist.input.hi_regtest >! namelist.input
 #DAVE###################################################
 echo did cp of namelist
 ls -ls namelist.input
@@ -1595,11 +1841,11 @@ endif
 					popd
 				endif
 
-				ln -sf /ptmp/gill/wrfinput_d01 .
-				ln -sf /ptmp/gill/wrfbdy_d01 .
+				ln -sf /ptmp/gill/IO_FORM=${IO_FORM}/wrfinput_d01 .
+				ln -sf /ptmp/gill/IO_FORM=${IO_FORM}/wrfbdy_d01 .
 			else
 				set RUNCOMMAND = `echo $MPIRUNCOMMAND | sed "s/$Num_Procs/1/"`
-				$RUNCOMMAND ../../main/convert_nmm.exe >&! print.out.convert_${core}_Phys
+				$RUNCOMMAND ../../main/convert_nmm.exe >&! print.out.convert_${core}_Phys $MPIRUNCOMMANDPOST
 			endif
 #DAVE###################################################
 echo ran nmm convert.exe except on IBM
@@ -1612,63 +1858,88 @@ banner 19c
 #DAVE###################################################
 echo did convert for nmm input, it fails on IBM, but we copied 1 p input data over
 ls -lsL wrfinput* wrfb*
-ncdump -v Times wrfb* | tail -20
+if ( $IO_FORM_NAME[$IO_FORM] == io_netcdf ) then
+	ncdump -v Times wrfb* | tail -20
+endif
 banner 20
 #set ans = "$<"
 #DAVE###################################################
 
-                        # run on 1 and then on Num_Procs processors
-                        foreach n ( 1 $Num_Procs )
+			#	Run on 1 and then on Num_Procs processors
+
+			foreach n ( 1 $Num_Procs )
 #DAVE###################################################
 echo running nmm on $n procs
 banner 21
 #set ans = "$<"
 #DAVE###################################################
-			if ( `uname` == AIX ) then
-				set RUNCOMMAND = $MPIRUNCOMMAND
-			else
-				set RUNCOMMAND = `echo $MPIRUNCOMMAND | sed "s/$Num_Procs/$n/"`
-			endif
+				if ( `uname` == AIX ) then
+					set RUNCOMMAND = $MPIRUNCOMMAND
+				else
+					set RUNCOMMAND = `echo $MPIRUNCOMMAND | sed "s/$Num_Procs/$n/"`
+				endif
+	
+				# WRF output quilt servers are only tested for MPI configuration.  
+				# Currently, only one WRF output quilt server is used.  
+		
+				if ( ( $QUILT == TRUE ) && ( $n == $Num_Procs ) ) then
+					if ( $compopt == $COMPOPTS[3] ) then
+						#	For now, test only one group of one output quilt servers.  
+						sed -e 's/ nio_tasks_per_group *= *[0-9][0-9]*/ nio_tasks_per_group = 1/g' \
+						    -e 's/ nio_groups *= *[0-9][0-9]*/ nio_groups = 1/g' \
+						namelist.input >! namelist.input.temp
+						mv -f namelist.input.temp namelist.input
+						echo "Building namelist.input.$core.${phys_option}.$compopt with one I/O quilt server enabled."
+						echo "NOTE  one I/O quilt server enabled for $core physics $phys_option parallel $compopt..." >>! ${DEF_DIR}/wrftest.output
+					endif
+				endif
 
-                         # NMM can fail on spurious fp exceptions that don't affect soln. Retry if necessary.
-                         set tries=0
-                         while ( $tries < 2 )
+				#	NMM can fail on spurious fp exceptions that don't affect soln. Retry if necessary.
+
+				set tries=0
+				while ( $tries < 2 )
 #DAVE###################################################
 echo try attempt $tries allowed to be less than 2
 banner 22
 #set ans = "$<"
 #DAVE###################################################
-                          @ tries = $tries + 1
-                          $RUNCOMMAND ../../main/wrf_${core}.exe.$compopt
-                          mv rsl.error.0000 print.out.wrf_${core}_Phys=${phys_option}_Parallel=${compopt}.exe_${n}p
-			  grep "SUCCESS COMPLETE" print.out.wrf_${core}_Phys=${phys_option}_Parallel=${compopt}.exe_${n}p
-			  set success = $status
-                          if ( ( -e wrfout_d01_${filetag} ) && ( $success == 0 ) ) then
-                                ncdump -h wrfout_d01_${filetag} | grep Time | grep UNLIMITED | grep currently | grep -q 2
-                                set ok = $status
-                                if ( $ok == 0 ) then
-                                       echo "SUMMARY generate FCST  for $core physics $phys_option parallel $compopt PASS" >>! ${DEF_DIR}/wrftest.output
-                                       echo "-------------------------------------------------------------" >> ${DEF_DIR}/wrftest.output
-                                       set tries=2  # success, bail from loop
-                                else
-                                       echo "SUMMARY generate FCST  for $core physics $phys_option parallel $compopt FAIL" >>! ${DEF_DIR}/wrftest.output
-                                       $MAIL -s "WRF FAIL FCST $ARCH[1] " $FAIL_MAIL < ${DEF_DIR}/wrftest.output
-                                       if ( $tries == 2 ) exit ( 5 )
-                                endif
-                           else
-                                echo "SUMMARY generate FCST  for $core physics $phys_option parallel $compopt FAIL" >>! ${DEF_DIR}/wrftest.output
-                                $MAIL -s "WRF FAIL FCST $ARCH[1] " $FAIL_MAIL < ${DEF_DIR}/wrftest.output
-                                if ( $tries == 2 ) exit ( 6 )
-                           endif
-			   mv wrfout_d01_${filetag} $TMPDIR/wrfout_d01_${filetag}.${core}.${phys_option}.${compopt}_${n}p
+					@ tries = $tries + 1
+					$RUNCOMMAND ../../main/wrf_${core}.exe.$compopt $MPIRUNCOMMANDPOST
+					mv rsl.error.0000 print.out.wrf_${core}_Phys=${phys_option}_Parallel=${compopt}.exe_${n}p
+					grep "SUCCESS COMPLETE" print.out.wrf_${core}_Phys=${phys_option}_Parallel=${compopt}.exe_${n}p
+					set success = $status
+					set ok = $status
+					if ( ( -e wrfout_d01_${filetag} ) && ( $success == 0 ) ) then
+						if      ( $IO_FORM_NAME[$IO_FORM] == io_netcdf ) then
+							ncdump -h wrfout_d01_${filetag} | grep Time | grep UNLIMITED | grep currently | grep -q 2
+							set ok = $status
+						else if ( $IO_FORM_NAME[$IO_FORM] == io_grib1  ) then
+							../../external/io_grib1/wgrib -s -4yr wrfout_d01_${filetag} |  grep "UGRD:10 m above gnd:3600 sec fcst"
+							set ok = $status
+						endif
+						if ( $ok == 0 ) then
+							echo "SUMMARY generate FCST  for $core physics $phys_option parallel $compopt $esmf_lib_str PASS" >>! ${DEF_DIR}/wrftest.output
+							echo "-------------------------------------------------------------" >> ${DEF_DIR}/wrftest.output
+							set tries=2  # success, bail from loop
+						else
+							echo "SUMMARY generate FCST  for $core physics $phys_option parallel $compopt $esmf_lib_str FAIL" >>! ${DEF_DIR}/wrftest.output
+							$MAIL -s "WRF FAIL FCST $ARCH[1] " $FAIL_MAIL < ${DEF_DIR}/wrftest.output
+							if ( $tries == 2 ) exit ( 5 )
+						endif
+					else
+						echo "SUMMARY generate FCST  for $core physics $phys_option parallel $compopt $esmf_lib_str FAIL" >>! ${DEF_DIR}/wrftest.output
+						$MAIL -s "WRF FAIL FCST $ARCH[1] " $FAIL_MAIL < ${DEF_DIR}/wrftest.output
+						if ( $tries == 2 ) exit ( 6 )
+					endif
+					mv wrfout_d01_${filetag} $TMPDIR/wrfout_d01_${filetag}.${core}.${phys_option}.${compopt}_${n}p
 #DAVE###################################################
 echo did nmm fcst
 ls -ls $TMPDIR/wrfout_d01_${filetag}.${core}.${phys_option}.${compopt}_${n}p
 banner 23
 #set ans = "$<"
 #DAVE###################################################
-                         end
-                        end
+				end
+			end
 
                         popd
 
@@ -1723,7 +1994,8 @@ banner 25
 					cp ${CUR_DIR}/phys_b_wave_${phys_option}b     phys_mp
 					cp ${CUR_DIR}/phys_b_wave_${phys_option}c     phys_nh
 				endif
-			
+
+				cp ${CUR_DIR}/io_format io_format
 				if      ( $NESTED == TRUE ) then
 					if      ( $core == em_quarter_ss )  then
 						sed -e 's/ run_days *= *[0-9][0-9]*/ run_days = 00/g'                              		\
@@ -1732,6 +2004,7 @@ banner 25
 		                                    -e 's/ history_interval *= [0-9][0-9]*/ history_interval = 1/g'                     	\
 						    -e 's/ frames_per_outfile *= [0-9][0-9]*/ frames_per_outfile = 100/g'               	\
 						    -e '/^ diff_opt/d' -e '/^ km_opt/d' -e '/^ damp_opt/d' -e '/^ rk_ord/r ./phys_tke' 		\
+ 		                                    -e '/^ io_form_history /,/^ io_form_boundary/d' -e '/^ restart_interval/r ./io_format'	\
 						    -e '/^ mp_physics/d' -e '/^ &physics/r ./phys_mp' 						\
 						    -e '/^ non_hydrostatic/d' -e '/^ epssm/r ./phys_nh' 					\
 						    -e '/^ periodic_x/d' -e '/^ open_xs/d' -e '/^ open_xe/d' 					\
@@ -1742,9 +2015,10 @@ banner 25
 					else if ( $core == em_b_wave     ) then
 						sed -e 's/ run_days *= *[0-9][0-9]*/ run_days = 00/g'                              		\
 						    -e 's/ run_minutes *= *[0-9][0-9]*/ run_minutes = 20/g'                       		\
-						    -e 's/ history_interval *= [0-9][0-9]*/ history_interval = 20/g'                   	\
+						    -e 's/ history_interval *= [0-9][0-9]*/ history_interval = 20/g'                   		\
 						    -e 's/ frames_per_outfile *= [0-9][0-9]*/ frames_per_outfile = 100/g'               	\
 						    -e '/^ diff_opt/d' -e '/^ km_opt/d' -e '/^ damp_opt/d' -e '/^ rk_ord/r ./phys_tke' 		\
+ 		                                    -e '/^ io_form_history /,/^ io_form_boundary/d' -e '/^ restart_interval/r ./io_format'	\
 						    -e '/^ mp_physics/d' -e '/^ &physics/r ./phys_mp' 						\
 						    -e '/^ non_hydrostatic/d' -e '/^ epssm/r ./phys_nh' 					\
 						    -e '/^ max_dom/d' -e '/^ time_step_fract_den/r ./dom_ideal'					\
@@ -1757,6 +2031,7 @@ banner 25
 		                                    -e 's/ history_interval *= [0-9][0-9]*/ history_interval = 2/g'                     	\
 						    -e 's/ frames_per_outfile *= [0-9][0-9]*/ frames_per_outfile = 100/g'               	\
 						    -e '/^ diff_opt/d' -e '/^ km_opt/d' -e '/^ damp_opt/d' -e '/^ rk_ord/r ./phys_tke' 		\
+ 		                                    -e '/^ io_form_history /,/^ io_form_boundary/d' -e '/^ restart_interval/r ./io_format'	\
 						    -e '/^ mp_physics/d' -e '/^ &physics/r ./phys_mp' 						\
 						    -e '/^ non_hydrostatic/d' -e '/^ epssm/r ./phys_nh' 					\
 						    -e '/^ periodic_x/d' -e '/^ open_xs/d' -e '/^ open_xe/d' 					\
@@ -1770,10 +2045,26 @@ banner 25
 						    -e 's/ history_interval *= [0-9][0-9]*/ history_interval = 100/g'                   	\
 						    -e 's/ frames_per_outfile *= [0-9][0-9]*/ frames_per_outfile = 100/g'               	\
 						    -e '/^ diff_opt/d' -e '/^ km_opt/d' -e '/^ damp_opt/d' -e '/^ rk_ord/r ./phys_tke' 		\
+ 		                                    -e '/^ io_form_history /,/^ io_form_boundary/d' -e '/^ restart_interval/r ./io_format'	\
 						    -e '/^ mp_physics/d' -e '/^ &physics/r ./phys_mp' 						\
 						    -e '/^ non_hydrostatic/d' -e '/^ epssm/r ./phys_nh' 					\
 						    -e '/^ max_dom/d' -e '/^ time_step_fract_den/r ./dom_ideal'					\
 						./namelist.input.template >! namelist.input
+					endif
+				endif
+
+				# WRF output quilt servers are only tested for MPI configuration.  
+				# Currently, only one WRF output quilt server is used.  
+
+				if ( $QUILT == TRUE ) then
+					if ( $compopt == $COMPOPTS[3] ) then
+						#	For now, test only one group of one output quilt servers.  
+						sed -e 's/ nio_tasks_per_group *= *[0-9][0-9]*/ nio_tasks_per_group = 1/g' \
+						    -e 's/ nio_groups *= *[0-9][0-9]*/ nio_groups = 1/g' \
+						namelist.input >! namelist.input.temp
+						mv -f namelist.input.temp namelist.input
+						echo "Building namelist.input.$core.${phys_option}.$compopt with one I/O quilt server enabled."
+						echo "NOTE  one I/O quilt server enabled for $core physics $phys_option parallel $compopt..." >>! ${DEF_DIR}/wrftest.output
 					endif
 				endif
 #DAVE###################################################
@@ -1806,11 +2097,11 @@ banner 27
 
 					#	Did making the IC BC files work?
 
-					if ( ( -e wrfinput_d01 ) && ( -e wrfbdy_d01 ) && ( $success == 0 ) ) then
-						echo "SUMMARY generate IC/BC for $core physics $phys_option parallel $compopt PASS" >>! ${DEF_DIR}/wrftest.output
+					if ( ( -e wrfinput_d01 ) && ( $success == 0 ) ) then
+						echo "SUMMARY generate IC/BC for $core physics $phys_option parallel $compopt $esmf_lib_str PASS" >>! ${DEF_DIR}/wrftest.output
 						echo "-------------------------------------------------------------" >> ${DEF_DIR}/wrftest.output
 					else
-						echo "SUMMARY generate IC/BC for $core physics $phys_option parallel $compopt FAIL" >>! ${DEF_DIR}/wrftest.output
+						echo "SUMMARY generate IC/BC for $core physics $phys_option parallel $compopt $esmf_lib_str FAIL" >>! ${DEF_DIR}/wrftest.output
 						$MAIL -s "WRF FAIL making IC/BC $ARCH[1] " $FAIL_MAIL < ${DEF_DIR}/wrftest.output
 						exit ( 7 )
 					endif
@@ -1845,7 +2136,7 @@ banner 27
 					if ( `uname` == AIX ) then
 						setenv XLSMPOPTS "parthds=1"
 					endif
-					$MPIRUNCOMMAND ../../main/wrf_${core}.exe.$compopt
+					$MPIRUNCOMMAND ../../main/wrf_${core}.exe.$compopt $MPIRUNCOMMANDPOST
 					mv rsl.error.0000 print.out.wrf_${core}_Parallel=${compopt}.exe
 				endif
 #DAVE###################################################
@@ -1860,18 +2151,29 @@ banner 28
 				#	Did making the forecast work, by that, we mean "is there an output file created?"
 
 				if ( ( -e wrfout_d01_${filetag} ) && ( $success == 0 ) ) then
-					ncdump -h wrfout_d01_${filetag} | grep Time | grep UNLIMITED | grep currently | grep -q 2
-					set ok = $status
+					if      ( $IO_FORM_NAME[$IO_FORM] == io_netcdf ) then
+						ncdump -h wrfout_d01_${filetag} | grep Time | grep UNLIMITED | grep currently | grep -q 2
+						set ok = $status
+					else if ( $IO_FORM_NAME[$IO_FORM] == io_grib1  ) then
+#						set joe_times = `../../external/io_grib1/wgrib -s -4yr wrfout_d01_${filetag} |  grep -v ":anl:" | wc -l`
+#						if ( $joe_times >= 100 ) then
+						set joe_times = `../../external/io_grib1/wgrib -s -4yr wrfout_d01_${filetag} |  grep "UGRD:10 m" | wc -l`
+						if ( $joe_times == 2 ) then
+							set ok = 0
+						else
+							set ok = 1
+						endif
+					endif
 					if ( $ok == 0 ) then
-						echo "SUMMARY generate FCST  for $core physics $phys_option parallel $compopt PASS" >>! ${DEF_DIR}/wrftest.output
+						echo "SUMMARY generate FCST  for $core physics $phys_option parallel $compopt $esmf_lib_str PASS" >>! ${DEF_DIR}/wrftest.output
 						echo "-------------------------------------------------------------" >> ${DEF_DIR}/wrftest.output
 					else
-						echo "SUMMARY generate FCST  for $core physics $phys_option parallel $compopt FAIL" >>! ${DEF_DIR}/wrftest.output
+						echo "SUMMARY generate FCST  for $core physics $phys_option parallel $compopt $esmf_lib_str FAIL" >>! ${DEF_DIR}/wrftest.output
 						$MAIL -s "WRF FAIL FCST $ARCH[1] " $FAIL_MAIL < ${DEF_DIR}/wrftest.output
 						exit ( 8 )
 					endif
 				else
-					echo "SUMMARY generate FCST  for $core physics $phys_option parallel $compopt FAIL" >>! ${DEF_DIR}/wrftest.output
+					echo "SUMMARY generate FCST  for $core physics $phys_option parallel $compopt $esmf_lib_str FAIL" >>! ${DEF_DIR}/wrftest.output
 					$MAIL -s "WRF FAIL FCST $ARCH[1] " $FAIL_MAIL < ${DEF_DIR}/wrftest.output
 					exit ( 9 )
 				endif
@@ -1889,7 +2191,9 @@ banner 28
 #DAVE###################################################
 echo fcst was a success
 ls -ls $TMPDIR/wrfout_d01_${filetag}.${core}.${phys_option}.$compopt
-ncdump -v Times $TMPDIR/wrfout_d01_${filetag}.${core}.${phys_option}.$compopt | tail -20
+if ( $IO_FORM_NAME[$IO_FORM] == io_netcdf ) then
+	ncdump -v Times $TMPDIR/wrfout_d01_${filetag}.${core}.${phys_option}.$compopt | tail -20
+endif
 banner 29
 #set ans = "$<"
 #DAVE###################################################
@@ -1911,7 +2215,7 @@ banner 29
 	                if ( $core == nmm_real ) then
 	
 				pushd ${DEF_DIR}/regression_test/WRFV2/test/$core
-				set DIFFWRF = ${DEF_DIR}/regression_test/WRFV2/external/io_netcdf/diffwrf
+				set DIFFWRF = ${DEF_DIR}/regression_test/WRFV2/external/$IO_FORM_NAME[$IO_FORM]/diffwrf
 	
 	                        if ( ( -e $TMPDIR/wrfout_d01_${filetag}.${core}.${phys_option}.$COMPOPTS[3]_1p ) && \
 	                             ( -e $TMPDIR/wrfout_d01_${filetag}.${core}.${phys_option}.$COMPOPTS[3]_${Num_Procs}p ) ) then
@@ -1940,29 +2244,45 @@ banner 29
 	                                touch fort.88 fort.98
 	                        endif
 	                        if ( ! -e fort.88 ) then
-	                                echo "SUMMARY 1 vs $Num_Procs MPI  for $core physics $phys_option            PASS" >>! ${DEF_DIR}/wrftest.output
+	                                echo "SUMMARY 1 vs $Num_Procs MPI  for $core physics $phys_option $esmf_lib_str            PASS" >>! ${DEF_DIR}/wrftest.output
 	                                echo "-------------------------------------------------------------" >> ${DEF_DIR}/wrftest.output
 	                        else
-	                                echo "SUMMARY 1 vs $Num_Procs MPI  for $core physics $phys_option            FAIL" >>! ${DEF_DIR}/wrftest.output
+	                                echo "SUMMARY 1 vs $Num_Procs MPI  for $core physics $phys_option $esmf_lib_str            FAIL" >>! ${DEF_DIR}/wrftest.output
 	                                echo "-------------------------------------------------------------" >> ${DEF_DIR}/wrftest.output
 	                        endif
 	
 	
 	                        #       1p vs baseline output from 20031015
 	
-	                        rm fort.88 fort.98 >& /dev/null
 	                        if ( ( -e $TMPDIR/wrfout_d01_${filetag}.${core}.${phys_option}.$COMPOPTS[3]_1p ) && \
 	                             ( -e wrfout_d01_2003-04-17_00:00:00.nmm_baseline ) ) then
+	                                set foo1 = ( ` \ls -ls $TMPDIR/wrfout_d01_${filetag}.${core}.${phys_option}.$COMPOPTS[3]_1p `)
+	                                set foo2 = ( ` \ls -lsL wrfout_d01_2003-04-17_00:00:00.nmm_baseline `)
+	                                set size1 = $foo1[6]
+	                                set size2 = $foo2[6]
+	                                if ( $size1 == $size2 ) then
+	                                        set RIGHT_SIZE = TRUE
+	                                else
+	                                        set RIGHT_SIZE = FALSE
+	                                endif
+	                        else
+	                                set RIGHT_SIZE = FALSE
+	                        endif
+
+	                        rm fort.88 fort.98 >& /dev/null
+	                        if ( ( -e $TMPDIR/wrfout_d01_${filetag}.${core}.${phys_option}.$COMPOPTS[3]_1p ) && \
+	                             ( -e wrfout_d01_2003-04-17_00:00:00.nmm_baseline ) && \
+	                             ( $RIGHT_SIZE == TRUE ) ) then
 	                                $DIFFWRF $TMPDIR/wrfout_d01_${filetag}.${core}.${phys_option}.$COMPOPTS[3]_1p \
 	                                         wrfout_d01_2003-04-17_00:00:00.nmm_baseline >& /dev/null
 	                        else
 	                                touch fort.88 fort.98
 	                        endif
 	                        if ( ! -e fort.88 ) then
-	                                echo "SUMMARY 1 vs 20031015 baseline output for $core physics $phys_option            PASS" >>! ${DEF_DIR}/wrftest.output
+	                                echo "SUMMARY 1 vs 20031015 baseline output for $core physics $phys_option $esmf_lib_str            PASS" >>! ${DEF_DIR}/wrftest.output
 	                                echo "-------------------------------------------------------------" >> ${DEF_DIR}/wrftest.output
 	                        else
-	                                echo "SUMMARY 1 vs 20031015 baseline output for $core physics $phys_option            FAIL" >>! ${DEF_DIR}/wrftest.output
+	                                echo "SUMMARY 1 vs 20031015 baseline output for $core physics $phys_option $esmf_lib_str            FAIL" >>! ${DEF_DIR}/wrftest.output
 	                                echo "-------------------------------------------------------------" >> ${DEF_DIR}/wrftest.output
 	                        endif
 	
@@ -1981,7 +2301,7 @@ banner 29
 				#	if they are S^2D^2.
 		
 				pushd ${DEF_DIR}/regression_test/WRFV2/test/$core
-				set DIFFWRF = ${DEF_DIR}/regression_test/WRFV2/external/io_netcdf/diffwrf
+				set DIFFWRF = ${DEF_DIR}/regression_test/WRFV2/external/$IO_FORM_NAME[$IO_FORM]/diffwrf
 	
 				#	Are we skipping the OpenMP runs?
 	
@@ -2043,10 +2363,10 @@ banner 29
 					touch fort.88 fort.98
 				endif
 				if ( ! -e fort.88 ) then
-					echo "SUMMARY serial vs OMP  for $core physics $phys_option            PASS" >>! ${DEF_DIR}/wrftest.output
+					echo "SUMMARY serial vs OMP  for $core physics $phys_option $esmf_lib_str            PASS" >>! ${DEF_DIR}/wrftest.output
 					echo "-------------------------------------------------------------" >> ${DEF_DIR}/wrftest.output
 				else
-					echo "SUMMARY serial vs OMP  for $core physics $phys_option            FAIL" >>! ${DEF_DIR}/wrftest.output
+					echo "SUMMARY serial vs OMP  for $core physics $phys_option $esmf_lib_str            FAIL" >>! ${DEF_DIR}/wrftest.output
 					echo "-------------------------------------------------------------" >> ${DEF_DIR}/wrftest.output
 				endif
 	
@@ -2064,10 +2384,10 @@ banner 29
 					touch fort.88 fort.98
 				endif
 				if ( ! -e fort.88 ) then
-					echo "SUMMARY serial vs MPI  for $core physics $phys_option            PASS" >>! ${DEF_DIR}/wrftest.output
+					echo "SUMMARY serial vs MPI  for $core physics $phys_option $esmf_lib_str            PASS" >>! ${DEF_DIR}/wrftest.output
 					echo "-------------------------------------------------------------" >> ${DEF_DIR}/wrftest.output
 				else
-					echo "SUMMARY serial vs MPI  for $core physics $phys_option            FAIL" >>! ${DEF_DIR}/wrftest.output
+					echo "SUMMARY serial vs MPI  for $core physics $phys_option $esmf_lib_str            FAIL" >>! ${DEF_DIR}/wrftest.output
 					echo "-------------------------------------------------------------" >> ${DEF_DIR}/wrftest.output
 				endif
 		
@@ -2118,7 +2438,7 @@ banner 29
 						# Compare against baseline output file
 						set basefilenm = wrfout_d01_${filetag}.${core}.${phys_option}
 						set basefile = ${COMPARE_BASELINE}/${basefilenm}
-						set DIFFWRF = ${DEF_DIR}/regression_test/WRFV2/external/io_netcdf/diffwrf
+						set DIFFWRF = ${DEF_DIR}/regression_test/WRFV2/external/$IO_FORM_NAME[$IO_FORM]/diffwrf
 						set testdir = ${DEF_DIR}/regression_test/WRFV2/test/$core
 						pushd ${testdir}
 						foreach compopt ( $COMPOPTS )
@@ -2149,12 +2469,12 @@ banner 29
 								touch fort.88 fort.98
 							endif
 							if ( ! -e fort.88 ) then
-			echo "SUMMARY compare vs baseline ${COMPARE_BASELINE} for $core physics $phys_option compopt $compopt  PASS" >>! \
+			echo "SUMMARY compare vs baseline ${COMPARE_BASELINE} for $core physics $phys_option compopt $compopt $esmf_lib_str  PASS" >>! \
 								     ${DEF_DIR}/wrftest.output
 								echo "-------------------------------------------------------------" >> \
 								     ${DEF_DIR}/wrftest.output
 							else
-			echo "SUMMARY compare vs baseline ${COMPARE_BASELINE} for $core physics $phys_option compopt $compopt  FAIL" >>! \
+			echo "SUMMARY compare vs baseline ${COMPARE_BASELINE} for $core physics $phys_option compopt $compopt $esmf_lib_str  FAIL" >>! \
 								     ${DEF_DIR}/wrftest.output
 								echo "-------------------------------------------------------------" >> \
 								     ${DEF_DIR}/wrftest.output

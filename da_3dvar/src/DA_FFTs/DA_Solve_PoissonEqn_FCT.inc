@@ -104,7 +104,6 @@ SUBROUTINE DA_Solve_PoissonEqn_FCT( xb, xbx, del2b, b, xp)
             work_1d(ij) = 0.0
          enddo
       enddo
-
       CALL DA_Fast_Cosine_Transform( Forward_FFT, vector_inc, vector_jump, &
                                      num_vectors, vector_size, &
                                      xbx%fft_factors_x, xbx%trig_functs_x, &
@@ -181,7 +180,6 @@ SUBROUTINE DA_Solve_PoissonEqn_FCT( xb, xbx, del2b, b, xp)
 !------------------------------------------------------------------------------
 !  [4.0] Solve spectral Poisson equation:
 !------------------------------------------------------------------------------
-
       ij = 0
       do j=xp%jds, xbx%fft_jy
          do i=xp%itsy, xp%itey
