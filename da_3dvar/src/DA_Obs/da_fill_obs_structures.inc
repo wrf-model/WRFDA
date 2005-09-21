@@ -55,6 +55,8 @@ SUBROUTINE da_fill_obs_structures( iv, ob )
                               ob % synop(n) % q, &
                               iv % synop(n) % t % error, &
                               rh_error, iv % synop(n) % q % error )
+         if(iv%synop(n)% q % error == missing_r) iv%synop(n)% q % qc = missing_data
+
 !        ENDIF
 
       END DO
@@ -91,6 +93,7 @@ SUBROUTINE da_fill_obs_structures( iv, ob )
                               iv % metar(n) % t % error, &
                               rh_error, q_error )
          iv % metar(n) % q % error = q_error
+         if(iv%metar(n)% q % error == missing_r) iv%metar(n)% q % qc = missing_data
 
       END DO
       
@@ -127,6 +130,7 @@ SUBROUTINE da_fill_obs_structures( iv, ob )
                               rh_error, q_error )
          iv % ships(n) % q % error = q_error
 
+         if(iv%ships(n)% q % error == missing_r) iv%ships(n)% q % qc = missing_data
       END DO
       
 !     Initialise obs error factors (optionally overwritten in use_obs_errfac)
@@ -240,6 +244,7 @@ SUBROUTINE da_fill_obs_structures( iv, ob )
                                  rh_error, q_error )
 
             iv % sound(n) % q(k) % error = q_error
+         if(iv%sound(n)% q(k) % error == missing_r) iv%sound(n)% q(k) % qc = missing_data
          END DO
 
 !        Copy observations variables:
@@ -258,6 +263,7 @@ SUBROUTINE da_fill_obs_structures( iv, ob )
                               ob % sonde_sfc(n) % q, &
                               iv % sonde_sfc(n) % t % error, &
                               rh_error, iv % sonde_sfc(n) % q % error )
+         if(iv%sonde_sfc(n)% q % error == missing_r) iv%sonde_sfc(n)% q % qc = missing_data
 
       END DO
 
@@ -467,6 +473,7 @@ SUBROUTINE da_fill_obs_structures( iv, ob )
                               rh_error, q_error )
          iv % buoy(n) % q % error = q_error
 
+         if(iv%buoy (n)% q % error == missing_r) iv%buoy (n)% q % qc = missing_data
       END DO
       
 !     Initialise obs error factors (optionally overwritten in use_obs_errfac)
@@ -523,6 +530,7 @@ SUBROUTINE da_fill_obs_structures( iv, ob )
                                  rh_error, q_error )
 
             iv % bogus(n) % q(k) % error = q_error
+         if(iv%bogus(n)% q(k) % error == missing_r) iv%bogus(n)% q(k) % qc = missing_data
          END DO
          ob % bogus(n) % slp = iv % bogus(n) % slp % inv
       END DO
