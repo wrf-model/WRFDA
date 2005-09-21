@@ -19,6 +19,9 @@ SUBROUTINE DA_Read_Obs (iunit, ob, xp, filename)
 !                     03/30/2005           Syed RH Rizvi
 !              For global option duplicate obs at East/West boundary
 !                        
+!                     08/30/2005           Syed RH Rizvi
+!           Writing original errors & thicknesses on unit 193
+!           desired for outputting QC obs with NTMAX = 0
 !-----------------------------------------------------------------------------!
 
    implicit none
@@ -43,11 +46,8 @@ SUBROUTINE DA_Read_Obs (iunit, ob, xp, filename)
 
    LOGICAL                      :: inside_halo
    LOGICAL                      :: outside
-
    INTEGER                      :: surface_level
-
    REAL                         :: height_error, u_comp, v_comp
-
    INTEGER                      :: total_obs, &
                                    num_sound, &
                                    num_synop, &
@@ -68,6 +68,7 @@ SUBROUTINE DA_Read_Obs (iunit, ob, xp, filename)
                                    num_profiler, num_buoy, num_bogus
 
    INTEGER                        :: ndup, n
+   LOGICAL                        :: surface_sound
 
 !--------------------------------------------------------------------
 
@@ -261,7 +262,7 @@ loop_level: DO i = 1, platform%info%levels
               platform%each (i)%v,            &
               platform%each (i)%height,       &
               platform%each (i)%height_qc,    &
-              height_error,                       &
+              height_error,                   &
               platform%each (i)%t,            &
               platform%each (i)%td,           &
               platform%each (i)%rh
@@ -317,7 +318,6 @@ loop_level: DO i = 1, platform%info%levels
       ENDIF
 
       nlevels = platform%info%levels
-
       if( nlevels > max_ob_levels) then
          nlevels = max_ob_levels
 
@@ -356,7 +356,6 @@ loop_level: DO i = 1, platform%info%levels
       CALL DA_Obs_Proc_Station(platform)
 
       nlevels = platform%info%levels
-
 !    Loop over duplicating obs for global
      ndup = 1
      if(global .and. &
@@ -565,22 +564,27 @@ loop_level: DO i = 1, platform%info%levels
 
          ob%satem(num_satem)%p(1) = platform%each(1)%p%inv
          ob%satem(num_satem)%thickness(1) = platform%each(1)%t
+!  write original thickness errors for filtered obs on 193 unit 
+         do i = 1, nlevels
+         if(NTMAX == 0) write(193,'(i8,2x,i8,2f12.3)') &
+              num_satem,i,platform%each(i)%t%inv,platform%each(i)%t%error 
+         end do 
 
 !        Splitting the reported Satem data into smaller layers.
 
          do i = 2, nlevels
            ob%satem(num_satem)%p(i) = platform%each(i)%p%inv
            ob%satem(num_satem)%thickness(i) = platform%each(i)%t
-
-           if(ABS(platform%each(i)%t%inv - missing_r) > 1.  .and. &
-              ABS(platform%each(i-1)%t%inv - missing_r) > 1.) then
+           if(platform%each(i)%t%qc /= missing_data   .and. &
+              platform%each(i-1)%t%qc /= missing_data) then
               ob%satem(num_satem)%thickness(i)%inv =            &
               platform%each(i)%t%inv - platform%each(i-1)%t%inv
            else
               ob%satem(num_satem)%thickness(i)%inv = missing_r
+              ob%satem(num_satem)%thickness(i)%qc  = missing_data
            endif
          enddo
-
+   
 !--------Thickness error (m):
 
          do i = nlevels, 2, -1
@@ -592,7 +596,6 @@ loop_level: DO i = 1, platform%info%levels
          ob%satem(num_satem)%thickness(1)%error = &
                         sqrt( ob%satem(num_satem)%thickness(1)%error ** 2 + &
                         platform%loc%pw%error ** 2) / gravity
-
 
 !--------Geostatinary ot Polar orbitting Satellite AMVs:
 

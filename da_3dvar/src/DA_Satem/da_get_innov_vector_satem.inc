@@ -10,6 +10,9 @@ SUBROUTINE da_get_innov_vector_satem ( it, xb, xp, ob, iv )
 !               2. Extra diagnostics added for generating detailed information
 !                  about rejected obs in various outer iterations
 !
+!                       08/30/2005                    Syed RH Rizvi  
+!               3. Correction for data holes in thicknesses           
+!
 !-------------------------------------------------------------------------
    IMPLICIT NONE
 
@@ -71,11 +74,13 @@ SUBROUTINE da_get_innov_vector_satem ( it, xb, xp, ob, iv )
 
             iv % satem(n) % thickness(k) % inv = 0.0
 
-            IF ( ABS(ob % satem(n) % thickness(k) - missing_r) > 1. ) THEN
-
                call find_layer(layer1,tv1,iv%satem(n)%p(k),pre_ma,tv_ma,ks,ke)
                call thickness(pre_ma,tv_ma,ks,ke,tv1,tv2,layer1,layer2,   &
                     iv%satem(n)%p(k),pres2,model_thickness(k))
+
+            IF ( ABS(ob % satem(n) % thickness(k) - missing_r) > 1. .and. &
+                 iv % satem(n) % thickness(k)%qc /= missing_data ) THEN
+
 
                iv % satem(n) % thickness(k) % inv =     &
                      ob % satem(n) % thickness(k) - model_thickness(k)
@@ -85,12 +90,11 @@ SUBROUTINE da_get_innov_vector_satem ( it, xb, xp, ob, iv )
 !                     ob%satem(n)%thickness(k), &
 !                     model_thickness(k), 0.01*pres2, " -", &
 !                     iv%satem(n)%p(k)*0.01,'hPa'
+            ENDIF
 
                pres2 = iv%satem(n)%p(k)
                layer2 = layer1
                tv2 = tv1
-
-            ENDIF
 
          END DO
 

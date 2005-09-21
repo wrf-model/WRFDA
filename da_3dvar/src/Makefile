@@ -345,6 +345,7 @@ DA_Obs.o:		\
 			DA_Obs/da_store_obs_grid_info.inc \
 			DA_Obs/da_use_obs_errfac.inc \
 			DA_Obs/da_write_obs.inc \
+			DA_Obs/da_write_filtered_obs.inc \
 			DA_Obs/da_write_y.inc
 			$(RM) $@
 			$(CPP) -I./DA_Obs $(CPPFLAGS_3DVAR) DA_Obs/DA_Obs.F > DA_Obs.f

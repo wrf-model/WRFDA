@@ -35,12 +35,12 @@ SUBROUTINE da_write_filtered_obs(iunit, ounit, ob, iv )
    INTEGER                      :: i, j, iost, nlevels, fm
    TYPE (multi_level_type)      :: platform
 
-   integer                       :: n, k, zero , ships_elv_qual
+   integer                       :: n1, n2, n, k, zero , ships_elv_qual
    integer                       :: thick_qc, dir_qc, td_qc, rh_qc, height_qc
    real                          :: es, qs, speed, dir, rh, rh_error, uu, vv
    real                          :: xmiss, height, height_error, pr_error, slp_error
    real                          :: thick1, thick, thick_error,dir_error,speed_error
-   real                          :: td, td_error , elv_err,ships_elv
+   real                          :: td, td_error , elv_err,ships_elv, ships_pr_error
    logical, external             :: wrf_dm_on_monitor
 
 !----------------------------------------------------------------------------!
@@ -58,11 +58,12 @@ SUBROUTINE da_write_filtered_obs(iunit, ounit, ob, iv )
 ! Currently following errors are fixed 
    rh_error     = 10.0       
    pr_error = 100.
+   ships_pr_error = 160.
    slp_error = 200.
    elv_err = 6.0
    dir_error = 5.0
    ships_elv = 0.0
-   ships_elv_qual = -5
+   ships_elv_qual = 0 
 
 !----------------------------------------------------------------------------!
 !
@@ -132,6 +133,10 @@ SUBROUTINE da_write_filtered_obs(iunit, ounit, ob, iv )
                    iv%synop(i)%info%lon,         &
                    iv%synop(i)%info%elv,         &
                    iv%synop(i)%info%id
+    if( iv%synop(i)%p%qc <= fails_error_max) then
+    iv%synop(i)%loc%slp%inv = missing_r
+    iv%synop(i)%loc%slp%qc  = missing_data
+    end if
      write(ounit, FMT = fmt_loc) iv%synop(i)%loc%slp, iv%synop(i)%loc%pw
 !
 !----------------------------------------------------------------------------!
@@ -209,6 +214,10 @@ SUBROUTINE da_write_filtered_obs(iunit, ounit, ob, iv )
                    iv%metar(i)%info%lon,         &
                    iv%metar(i)%info%elv,         &
                    iv%metar(i)%info%id
+     if( iv%metar(i)%p%qc <= fails_error_max) then
+     iv%metar(i)%loc%slp%inv = missing_r
+     iv%metar(i)%loc%slp%qc  = missing_data
+     end if
      write(ounit, FMT = fmt_loc) iv%metar(i)%loc%slp, iv%metar(i)%loc%pw
 !----------------------------------------------------------------------------!
 ! get speed and direction
@@ -284,6 +293,10 @@ SUBROUTINE da_write_filtered_obs(iunit, ounit, ob, iv )
                    iv%ships(i)%info%lon,         &
                    iv%ships(i)%info%elv,         &
                    iv%ships(i)%info%id
+     if( iv%ships(i)%p%qc <= fails_error_max) then
+     iv%ships(i)%loc%slp%inv = missing_r
+     iv%ships(i)%loc%slp%qc  = missing_data
+     end if
      write(ounit, FMT = fmt_loc) iv%ships(i)%loc%slp, iv%ships(i)%loc%pw
 !----------------------------------------------------------------------------!
 ! get speed and direction
@@ -327,7 +340,7 @@ SUBROUTINE da_write_filtered_obs(iunit, ounit, ob, iv )
    end if
 !----------------------------------------------------------------------------!
       write(ounit, FMT = TRIM (fmt_each))                   &
-         ob%ships(i)%p,iv%ships(i)%p%qc,pr_error,           &
+         ob%ships(i)%p,iv%ships(i)%p%qc,ships_pr_error,     &
          speed,iv%ships(i)%u%qc,speed_error,                &
          dir  ,iv%ships(i)%v%qc,dir_error,                  &
          ships_elv, ships_elv_qual, elv_err,                &
@@ -360,6 +373,10 @@ SUBROUTINE da_write_filtered_obs(iunit, ounit, ob, iv )
                    iv%buoy (i)%info%lon,         &
                    iv%buoy (i)%info%elv,         &
                    iv%buoy (i)%info%id
+     if( iv%buoy (i)%p%qc <= fails_error_max) then
+     iv%buoy (i)%loc%slp%inv = missing_r
+     iv%buoy (i)%loc%slp%qc  = missing_data
+     end if
      write(ounit, FMT = fmt_loc) iv%buoy (i)%loc%slp, iv%buoy(i)%loc%pw
 !----------------------------------------------------------------------------!
 ! get speed and direction
@@ -557,16 +574,21 @@ SUBROUTINE da_write_filtered_obs(iunit, ounit, ob, iv )
                    iv%sound(i)%info%lon,         &
                    iv%sound(i)%info%elv,         &
                    iv%sound(i)%info%id
+    if( iv%sonde_sfc(i)%p%qc <= fails_error_max) then
+    iv%sound(i)%loc%slp%inv = missing_r
+    iv%sound(i)%loc%slp%qc  = missing_data
+    end if
+
      write(ounit, FMT = fmt_loc) iv%sound(i)%loc%slp, iv%sound(i)%loc%pw
 !----------------------------------------------------------------------------!
 ! First write surface level information
 !----------------------------------------------------------------------------!
 ! get speed and direction
       if( iv%sonde_sfc(i)%u%qc >= obs_qc_pointer .and. &
-          iv%sonde_sfc(i)%v%qc >= obs_qc_pointer) then  
+          iv%sonde_sfc(i)%v%qc >= obs_qc_pointer) then
          uu = ob%sonde_sfc(i)%u
          vv = ob%sonde_sfc(i)%v
-         call FFDDUV( speed, dir, uu, vv, iv%sonde_sfc(i)%info%lon, -1)                        
+         call FFDDUV( speed, dir, uu, vv, iv%sonde_sfc(i)%info%lon, -1)
        speed_error = iv%sonde_sfc(i)%u%error
       else
          speed = missing_r
@@ -576,11 +598,11 @@ SUBROUTINE da_write_filtered_obs(iunit, ounit, ob, iv )
        iv%sonde_sfc(i)%v%qc = missing_data
       end if
 !----------------------------------------------------------------------------!
-! get RH from Q & T    
+! get RH from Q & T
       if( iv%sonde_sfc(i)%q%qc >= obs_qc_pointer .and.  &
           abs(iv%sonde_sfc(i)%q%error - missing_r ) > 1. .and.  &
           abs(ob%sonde_sfc(i)%t       - missing_r ) > 1. .and.  &
-          abs(ob%sonde_sfc(i)%p       - missing_r ) > 1.    ) then 
+          abs(ob%sonde_sfc(i)%p       - missing_r ) > 1.    ) then
          call DA_TP_To_Qs(ob%sonde_sfc(i)%t, ob%sonde_sfc(i)%p, es, qs )
          rh = (ob%sonde_sfc(i)%q/qs ) * 100.
        rh_qc = iv%sonde_sfc(i)%q%qc
@@ -593,13 +615,13 @@ SUBROUTINE da_write_filtered_obs(iunit, ounit, ob, iv )
    end if
 !----------------------------------------------------------------------------!
    if( iv%sonde_sfc(i)%p%qc <= fails_error_max) then
-     iv%sonde_sfc(i)%p%qc = missing_data  
-     ob%sonde_sfc(i)%p    = missing_r     
+     iv%sonde_sfc(i)%p%qc = missing_data
+     ob%sonde_sfc(i)%p    = missing_r
    end if
    if( iv%sonde_sfc(i)%t%qc <= fails_error_max) then
-    iv%sonde_sfc(i)%t%qc = missing_data  
-     ob%sonde_sfc(i)%t   = missing_r     
-     iv%sonde_sfc(i)%t%error = xmiss     
+    iv%sonde_sfc(i)%t%qc = missing_data
+     ob%sonde_sfc(i)%t   = missing_r
+     iv%sonde_sfc(i)%t%error = xmiss
    end if
 !----------------------------------------------------------------------------!
       write(ounit, FMT = TRIM (fmt_each))                       &
@@ -612,7 +634,6 @@ SUBROUTINE da_write_filtered_obs(iunit, ounit, ob, iv )
          rh, rh_qc,  rh_error                
 !----------------------------------------------------------------------------!
       DO n = 1, iv%sound(i)%info%levels 
-!----------------------------------------------------------------------------!
 !----------------------------------------------------------------------------!
 ! get speed and direction
       if( iv%sound(i)%u(n)%qc >= obs_qc_pointer .and. &
@@ -766,6 +787,7 @@ SUBROUTINE da_write_filtered_obs(iunit, ounit, ob, iv )
     if(print_detail > 1) print*,' writing filtered Obs for satem  ',iv%num_satem 
 !----------------------------------------------------------------------------!
 !  Write Satem:          
+   rewind 193
    DO i = 1, iv % num_satem           
      write(ounit, FMT = fmt_info, IOSTAT = iost) &
                    iv%satem(i)%info%platform,    &
@@ -779,20 +801,14 @@ SUBROUTINE da_write_filtered_obs(iunit, ounit, ob, iv )
      write(ounit, FMT = fmt_loc) iv%satem(i)%loc%slp, iv%satem(i)%loc%pw
      DO n = 1, iv%satem(i)%info%levels 
 !
-!  Approximate thickness errors are recovered 
-         thick_error = iv%satem(i)%thickness(n)%error*gravity / 1.414 
-!
-       if( n ==  1 ) then
-         thick1 = ob%satem(i)%thickness(1)
-       else
-         thick1 = thick1 + ob%satem(i)%thickness(n) 
-       end if
-       thick = thick1
-       thick_qc = iv%satem(i)%thickness(n)%qc 
-       if( iv%satem(i)%thickness(n)%qc < obs_qc_pointer)then
-        thick = missing_r
-        thick_qc = missing_data
-       end if
+! read original thickness error from unit 193
+     read(193,'(i8,2x,i8,2f12.3)')n1,n2,thick,thick_error
+     if( n1 /= i  .or. n2 /= n) then
+     print*,' mismatch in reading thickness errors from unit 193 ',i,n1,n,n2
+     stop
+     end if
+       thick_qc = iv%satem(i)%thickness(n)%qc
+       if( iv%satem(i)%thickness(n)%qc < obs_qc_pointer) thick_qc = missing_data
 !
          write(ounit, FMT = TRIM (fmt_each))               &
          iv%satem(i)%p(n),zero, slp_error,                 &
@@ -803,9 +819,9 @@ SUBROUTINE da_write_filtered_obs(iunit, ounit, ob, iv )
          missing_r, missing_data, xmiss,                   &
          missing_r, missing_data, xmiss
 
-      ENDDO 
+      ENDDO
 !
-      ENDDO 
+      ENDDO
    ENDIF
 
 !----------------------------------------------------------------------------!
