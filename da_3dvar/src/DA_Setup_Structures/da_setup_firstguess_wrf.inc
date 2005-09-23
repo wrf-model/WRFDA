@@ -28,7 +28,7 @@ SUBROUTINE DA_Setup_FirstGuess_WRF( xbx, grid, &
 
    integer           :: i, j, map_util_project
    integer           :: wrf_dim1, wrf_dim2, wrf_dim3
-   REAL              :: x, y, xxc, yyc, xxx, yyy
+   REAL              :: x, y, xxc, yyc, xxx, yyy, lat_cen, lon_cen
   
    real              :: theta1, theta2, conv
 
@@ -128,6 +128,15 @@ SUBROUTINE DA_Setup_FirstGuess_WRF( xbx, grid, &
      print '(/"Center: latc,lonc,x,y, Xc, Yc:",6f10.3/)',   &
                  grid%cen_lat, grid%cen_lon, start_x, start_y, &
                  real(xp%ide-xp%ids+2)/2., real(xp%jde-xp%jds+2)/2.
+
+     start_x = real(xp%ide-xp%ids+2)/2
+     start_y = real(xp%jde-xp%jds+2)/2
+     lat_cen = -999.9
+     lon_cen = -999.9
+     call  ij_to_latlon(map_info, start_x, start_y, lat_cen, lon_cen)
+     print '(/"Center: X, Y, latc, lonc, phic, xlonc:",6f10.3/)',   &
+                      start_x, start_y, lat_cen, lon_cen,   &
+                      grid%cen_lat, grid%cen_lon
 
 !    Low-left corner:
      call  latlon_to_ij(map_info, xlat(xp%ids,xp%jds), xlong(xp%ids,xp%jds), &
