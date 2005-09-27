@@ -612,6 +612,7 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
           'Brightness temperature'
    endif
 
+   if ( Use_SsmiTbObs)   &
    call DA_Transform_XToTb( xb )
 
 !------------------------------------------------------------------------------
