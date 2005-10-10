@@ -62,6 +62,20 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
 
    CALL DA_Read_Namelist
 
+! For writing out the "CLEAN" observations or verification, to set 
+! ntmax =0 and max_ext_its =1 (Y.-R. Guo 10/07/2005)
+
+          if (ANALYSIS_TYPE == 'QC-OBS' .or. &
+              ANALYSIS_TYPE == 'VERIFY') then
+              max_ext_its = 1
+              if (ANALYSIS_TYPE == 'QC-OBS') then
+                ntmax = 0
+              else
+                ntmax = 1
+              endif
+              print '(/a,a/)', 'ANALYSIS_TYPE =',ANALYSIS_TYPE
+          endif
+
 !------------------------------------------------------------------------------
 !  [2.0] Initialise 3D-Var parameters:
 !------------------------------------------------------------------------------
@@ -141,6 +155,10 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
 #include <em_dummy_args.inc>
                  )
 
+! No minimization for VERIFY (Y.-R. Guo, 10/07/2005):
+
+      if (ANALYSIS_TYPE == 'VERIFY') ntmax = 0
+
 !     [8.3] Interpolate x_g to low resolution grid
 
 !     [8.4] Minimize cost function:
@@ -156,9 +174,10 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
                         ims, ime, jms, jme, kms, kme,        &
                         its, ite, jts, jte, kts, kte         )
 !------------------------------------------------------------------------------
+
 !   For first outer loop write filtered obs when ntmax = 0
-   if(it == 1 .and. ntmax == 0) &
-    CALL da_write_filtered_obs(gts_iunit, filtered_obs_iunit, ob, iv)
+     if(it == 1 .and. ntmax == 0 .and. ANALYSIS_TYPE == 'QC-OBS') &
+      CALL da_write_filtered_obs(gts_iunit, filtered_obs_iunit, ob, iv)
 
 !     [8.5] Update latest analysis solution:
 
@@ -195,6 +214,8 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
 ! (2) Seperate treatment for WRF and KMA updating of Xa and Xb array
 ! (3) Treatment for MM5 format FG(fg_format = 2) remains same as original
 !------------------------------------------------------------------------------
+
+      if (ANALYSIS_TYPE == '3D-VAR') &
       call DA_Transfer_XatoAnalysis( it, xbx, grid, config_flags ,&
 #include <em_dummy_args.inc>
                            )

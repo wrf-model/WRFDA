@@ -36,6 +36,27 @@ SUBROUTINE DA_Setup_FirstGuess_WRF( xbx, grid, &
    integer(kind=4)   :: flag
    integer           :: len, index, seconds, i_grid,  j_grid, m_expand
 
+!--------------------------------------------------------------------------
+!  [0.0] check the xb_date
+!--------------------------------------------------------------------------
+
+       write(xb_date, '(i4.4,2("-",i2.2),"_",i2.2,2(":",i2.2),".0000")')  &
+            grid%start_year, grid%start_month, grid%start_day, &
+            grid%start_hour, grid%start_minute,grid%start_second
+
+       len = len_trim(ANALYSIS_DATE)
+   
+       write(an_date(1:len), fmt='(a)') trim(ANALYSIS_DATE)
+
+       seconds = DA_Diff_Seconds(an_date, xb_date)
+
+       if (seconds > ANALYSIS_ACCU) then
+         print '("xb_date=",a," an_date=",a)', xb_date, an_date
+         print '("diff=",i6,"   ANALYSIS_ACCU=",i6)',seconds, ANALYSIS_ACCU
+         print '(/a)',"=======> Wrong xb time found???"
+         stop 22222
+       endif
+
 !---------------------------------------------------------------------------
 !  [1.0] Read original WRF format first guess:
 !---------------------------------------------------------------------------
