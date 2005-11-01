@@ -30,7 +30,7 @@ wrfio_nf :
 	( cd ../external/io_netcdf ; \
         make NETCDFPATH=$(NETCDFPATH) CPP="$(CPP)" \
 	RANLIB="$(RANLIB)" \
-	FC="$(FC)" FCFLAGS="$(FCDEBUG) $(FCFORM) $(FCBASE) -w" TRADFLAG="$(TRADFLAG)" RWORDSIZE = $(RWORDSIZE); \
+	FC="$(FC)" FCFLAGS="$(FCDEBUG) $(FCFORM) $(FCBASE) -w" TRADFLAG="$(TRADFLAG)" RWORDSIZE="$(RWORDSIZE)"; \
 	if [ $(RWORDSIZE) -eq 8 ] ; then \
 	/bin/rm -f foo_io_flags.h; \
 	sed -e 's/104/105/' wrf_io_flags.h > foo_io_flags.h ;\
