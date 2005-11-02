@@ -22,7 +22,7 @@ libwrfio_nf.a:		$(OBJS) $(CODE)
 
 wrf_io_flags.h:
 			/bin/rm -f wrf_io_flags.h
-			sed -e "1,/BEGINIOFLAGS/d" -e "/ENDIOFLAGS/,$$d" wrf_io.F90 > wrf_io_flags.h
+			sed -e '1,/BEGINIOFLAGS/d' -e '/ENDIOFLAGS/,$$d' wrf_io.F90 > wrf_io_flags.h
 			if [ $(RWORDSIZE) -eq 8 ] ; then \
 				/bin/rm -f foo_io_flags.h ; \
 				sed -e "s/104/105/" wrf_io_flags.h > foo_io_flags.h ; \
