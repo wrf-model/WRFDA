@@ -14,6 +14,7 @@ SUBROUTINE DA_Allocate_Y( iv, y )
 !           03/04/2005 - CMV's from Geostationary and       Syed  RH  Rizvi
 !                        Polar orbiting satellite are
 !                        seperated & used as profile
+!              07/2005 - Add radiance part                  Zhiquan Liu
 !
 !
 ! PARENT_MODULE: DA_Setup_Structures
@@ -23,7 +24,7 @@ SUBROUTINE DA_Allocate_Y( iv, y )
    TYPE (ob_type), INTENT(IN)            :: iv      ! Ob type input.
    TYPE (y_type), INTENT(INOUT)          :: y       ! Residual type structure.
 
-   INTEGER                               :: n       ! Loop counter.
+   INTEGER                               :: n, i, j ! Loop counter.
    INTEGER                               :: nlevels ! Number of levels.
 
 !------------------------------------------------------------------------------
@@ -52,6 +53,7 @@ SUBROUTINE DA_Allocate_Y( iv, y )
    y % num_qscat = iv % num_qscat
    y % num_profiler = iv % num_profiler
    y % num_buoy     = iv % num_buoy    
+   y % num_inst     = iv % num_inst
 
 !------------------------------------------------------------------------------
 !  [2.0] Allocate:
@@ -340,6 +342,26 @@ SUBROUTINE DA_Allocate_Y( iv, y )
       y % buoy(1:y % num_buoy) % t = 0.0
       y % buoy(1:y % num_buoy) % p = 0.0
       y % buoy(1:y % num_buoy) % q = 0.0
+   END IF
+
+!  Initialize radiance:
+
+   IF ( y % num_inst > 0 ) THEN
+      ALLOCATE (y % instid(1:y % num_inst))
+    do i = 1,  y % num_inst
+      y % instid(i) % num_rad = iv % instid(i) % num_rad
+      y % instid(i) % nchan   = iv % instid(i) % nchan
+!      ALLOCATE (y % instid(i) % ichan(1:y % instid(i) % nchan ))
+!      do n = 1, y % instid(i) % nchan
+!       y % instid(i) % ichan(n) = n
+!      end do
+      if (y % instid(i) % num_rad < 1) cycle
+      ALLOCATE ( y % instid(i) % rad(1:y % instid(i) % num_rad) )
+      do j = 1, y % instid(i) % num_rad
+        ALLOCATE ( y % instid(i) % rad(j) % tb (1:y % instid(i) % nchan) )
+        y % instid(i) % rad(j)% tb(:) = 0.0
+      end do
+    end do
    END IF
 
 END SUBROUTINE DA_Allocate_Y

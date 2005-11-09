@@ -8,6 +8,7 @@ SUBROUTINE da_setup_obs_structures( xp, ob, iv )
 !  HISTORY: 10/05/2001 - Creation of F90 version.           Dale Barker
 !           10/19/2001 - Mods for parallel implementation.  Al Bourgeois
 !           02/12/2002 - Compute interplation weights.      Al Bourgeois
+!              07/2005 - Add radiance part                  Zhiquan Liu
 !
 !  PARENT_MODULE: DA_Setup_Structures
 !------------------------------------------------------------------------------
@@ -30,6 +31,10 @@ SUBROUTINE da_setup_obs_structures( xp, ob, iv )
    iv%missing = missing
 !  iv%ptop    = xb%ptop
 
+   iv%total_obs         = 0
+   iv%total_rad_pixel   = 0
+   iv%total_rad_channel = 0
+   
    iv%num_sound=0
    iv%num_synop=0
    iv%num_geoamv=0
@@ -50,6 +55,7 @@ SUBROUTINE da_setup_obs_structures( xp, ob, iv )
    iv%num_profiler=0
    iv%num_radar=0
    iv%num_bogus=0
+   iv%num_inst=0
 
    iv%num_pseudo=num_pseudo
 
@@ -68,18 +74,36 @@ SUBROUTINE da_setup_obs_structures( xp, ob, iv )
          iv%pseudo(1)%loc%dxm=1.0-iv%pseudo(1)%loc%dx
          iv%pseudo(1)%loc%dym=1.0-iv%pseudo(1)%loc%dy
       else
-         write(6,'(a)')'    Using BUFR format observation input'
+       if (use_obsgts) then
+         write(6,'(a)')'    Using BUFR conventional observation input'
          call da_setup_obs_structures_bufr( xp, ob, iv )
+       end if
+!     [1.3] TOVS BUFR radiance input file (from NCEP):
+       if (use_radiance) then
+          write(6,'(a)')'    Using NCEP TOVSBUFR radiance 1b input'
+          call da_setup_bufrtovs_structures( xp, ob, iv )
+       end if
       endif
    else if ( ob_format == 2 ) then
 
 !     [1.2] MM5 observation input file:
+     if (use_obsgts) then
       write(6,'(a)')'    Using MM5 format observation input'
       call da_setup_obs_structures_ascii( xp, ob, iv )
-
+     end if
+!     [1.3] TOVS BUFR radiance input file (from NCEP):
+     if (use_radiance) then
+      write(6,'(a)')'    Using NCEP TOVSBUFR radiance 1b input'
+      call da_setup_bufrtovs_structures( xp, ob, iv )
+     end if
    end if
+
+   write (6, *) ' iv%total_rad_channel = ', iv%total_rad_channel
+   write (6, *) ' iv%total_rad_pixel   = ', iv%total_rad_pixel
+   write (6, *) ' iv%total_obs         = ', iv%total_obs
 
 !     Get horizontal interpolation weights.
       call da_setup_obs_interp_wts( xp, iv )     
+
 END SUBROUTINE da_setup_obs_structures
 

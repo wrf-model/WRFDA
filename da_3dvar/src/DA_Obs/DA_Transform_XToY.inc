@@ -1,5 +1,7 @@
 SUBROUTINE da_transform_xtoy( xb, iv, xa, xp, y )
    
+!      08/2005 - Add radiance part                  Zhiquan Liu
+!------------------------------------------------------------------
    implicit none
    
    type (xb_type), intent(in)    :: xb       ! first guess state.
@@ -127,5 +129,11 @@ SUBROUTINE da_transform_xtoy( xb, iv, xa, xp, y )
 !------------------------------------------------------------------------------
 
    call da_transform_xtoy_Bogus ( xa, xb, iv, xp, y )
+
+!------------------------------------------------------------------------------
+!  [20.0] Radiance observation operator y = H(x):
+!------------------------------------------------------------------------------
+
+   call da_transform_xtoy_rad ( xa, iv, xp, y )
 
 END SUBROUTINE da_transform_xtoy

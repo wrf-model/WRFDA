@@ -8,6 +8,7 @@ SUBROUTINE DA_Setup_Obs_Interp_Wts ( xp, iv )
 !           03/04/2005 - AMV's from Geostationary and       Syed RH Rizvi
 !                        Polar orbiting satellite are
 !                        seperated & used as profile
+!              07/2005 - Add radiance part                  Zhiquan Liu
 !-------------------------------------------------------------------------
 
    IMPLICIT NONE
@@ -15,7 +16,7 @@ SUBROUTINE DA_Setup_Obs_Interp_Wts ( xp, iv )
    TYPE (xpose_type), INTENT(IN)  :: xp         ! Domain decomposition vars.
    TYPE (ob_type), INTENT(INOUT)  :: iv         ! Innovation vector (O-B).
 
-   INTEGER                        :: n          ! Loop counter.
+   INTEGER                        :: inst, n          ! Loop counter.
 
    do n=1, iv % num_sound
      CALL DA_Store_Obs_Grid_Info( xp, iv%sound(n)%loc )
@@ -103,6 +104,14 @@ SUBROUTINE DA_Setup_Obs_Interp_Wts ( xp, iv )
    do n=1, iv % num_bogus
      CALL DA_Store_Obs_Grid_Info( xp, iv%bogus(n)%loc )
    enddo
+
+ do inst = 1, iv % num_inst
+   if (iv % instid(inst) % num_rad < 1) cycle
+   do n=1, iv % instid(inst) % num_rad
+     CALL DA_Store_Obs_Grid_Info( xp, iv % instid(inst) % rad(n)%loc )
+   enddo
+ end do
+
 
 END SUBROUTINE DA_Setup_Obs_Interp_Wts
 

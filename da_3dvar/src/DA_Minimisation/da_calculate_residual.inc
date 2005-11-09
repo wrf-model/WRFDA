@@ -1,5 +1,7 @@
       subroutine da_calculate_residual( iv, y, re )
 
+!      07/2005 - Add radiance part    Zhiquan Liu
+!------------------------------------------------------
       implicit none
       
       type (ob_type), intent(in)        :: iv     ! Innovation vector (O-B).
@@ -120,6 +122,11 @@
 !     for buoy   
 
       call da_calculate_residual_Buoy( iv, y, re, np_missing, np_bad_data, & 
+                                        np_obs_used, np_available )
+
+!     for radiance
+
+      call da_calculate_residual_rad( iv, y, re, np_missing, np_bad_data, &
                                         np_obs_used, np_available )
 
       end subroutine da_calculate_residual
