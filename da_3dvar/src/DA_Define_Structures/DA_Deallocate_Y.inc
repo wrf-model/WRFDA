@@ -9,13 +9,14 @@ SUBROUTINE DA_Deallocate_Y( y )
 !           07/08/2003 - Updated for Profiler Data          S. R. H. Rizvi
 !           07/08/2003 - Updated for Buoy     Data          S. R. H. Rizvi
 !           05/27/2004 - GPS Refractivity Data              Y.-R. Guo
+!              07/2005 - Add radiance part                  Zhiquan Liu
 !
 ! PARENT_MODULE: DA_Setup_Structures
 !------------------------------------------------------------------------------
    IMPLICIT NONE
    
    TYPE (y_type), INTENT(INOUT)          :: y      ! residual type structure.
-   INTEGER                               :: n       ! Loop counter.
+   INTEGER                               :: n,i,j  ! Loop counter.
 
 !------------------------------------------------------------------------------
 !  [1.0] Deallocate:
@@ -128,5 +129,19 @@ SUBROUTINE DA_Deallocate_Y( y )
    endif
 
    IF ( y % num_buoy  > 0 ) DEALLOCATE (y % buoy )
+
+!  radiance:
+ 
+   IF ( y % num_inst > 0 ) THEN
+    do i = 1,  y % num_inst
+      if (y % instid(i) % num_rad < 1) cycle
+!      DEALLOCATE ( y % instid(i) % ichan )
+      do j = 1, y % instid(i) % num_rad
+        DEALLOCATE ( y % instid(i) % rad(j) % tb )
+      end do
+      DEALLOCATE ( y % instid(i) % rad )
+    end do
+     DEALLOCATE (y % instid)
+   END IF
 
 END SUBROUTINE DA_Deallocate_Y

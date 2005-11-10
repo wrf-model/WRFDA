@@ -1,0 +1,26 @@
+Interface
+!
+Subroutine rttov_errorhandling (Err_unit, verbosity_level)
+
+  Use rttov_const, Only :   &
+       errorstatus_info    ,&
+       errorstatus_success ,&
+       errorstatus_fatal   ,&
+       errorstatus_warning ,&
+       ErrorStatus_text,    &
+       NerrorStatus,        &
+       default_err_unit
+
+  Use rttov_global, Only: &
+       verbose_message,     &
+       err_init,            &
+       error_unit
+
+  Use parkind1, Only : jpim     ,jprb
+  Implicit None
+  Integer(Kind=jpim), Intent (in) :: Err_Unit       ! Logical error unit
+  Integer(Kind=jpim), Intent (in) :: verbosity_level
+
+
+End Subroutine rttov_errorhandling
+End Interface

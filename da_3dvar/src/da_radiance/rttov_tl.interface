@@ -1,0 +1,70 @@
+Interface
+!
+Subroutine rttov_tl( &
+     errorstatus,    & ! out
+     nfrequencies,   & ! in
+     nchannels,      & ! in
+     nbtout,         & ! in
+     nprofiles,      & ! in
+     channels,       & ! in
+     polarisations,  & ! in
+     lprofiles,      & ! in
+     profiles,       & ! in
+     coef,           & ! in
+     addcloud,       & ! in
+     calcemis,       & ! in
+     emissivity,     & ! inout
+     profiles_tl,    & ! in
+     emissivity_tl,  & ! inout
+     transmission,   & ! inout
+     transmission_tl,& ! inout
+     radiancedata,   & ! inout
+     radiancedata_tl ) ! inout
+  Use rttov_const, Only :   &
+       errorstatus_success ,&
+       errorstatus_warning ,&
+       errorstatus_fatal   ,&
+       max_optical_depth   ,&
+       sensor_id_mw        ,&
+       sensor_id_ir
+
+  Use rttov_types, Only : &
+       rttov_coef     ,&
+       profile_Type   ,&
+       geometry_Type  ,&
+       predictors_Type,&
+       profile_aux    ,&
+       transmission_Type  ,&
+       radiance_Type  ,&
+       radiance_aux
+
+  Use parkind1, Only : jpim     ,jprb
+  Implicit None
+
+  Integer(Kind=jpim),      Intent(in)    :: nfrequencies
+  Integer(Kind=jpim),      Intent(in)    :: nchannels
+  Integer(Kind=jpim),      Intent(in)    :: nbtout
+  Integer(Kind=jpim),      Intent(in)    :: nprofiles
+  Integer(Kind=jpim),      Intent(out)   :: errorstatus(nprofiles)
+  Integer(Kind=jpim),      Intent(in)    :: channels(nfrequencies)
+  Integer(Kind=jpim),      Intent(in)    :: polarisations(nchannels,3)
+  Integer(Kind=jpim),      Intent(in)    :: lprofiles(nfrequencies)
+  Logical,                 Intent(in)    :: addcloud
+  Type(profile_Type),      Intent(in)    :: profiles(nprofiles)
+  Type(rttov_coef),        Intent(in)    :: coef
+  Logical,                 Intent(in)    :: calcemis(nchannels)
+  Real(Kind=jprb),         Intent(inout) :: emissivity(nchannels)
+  Type(transmission_Type), Intent(inout) :: transmission! in because of meme allocation
+  Type(radiance_Type),     Intent(inout) :: radiancedata! in because of meme allocation
+
+
+  Type(profile_Type),      Intent(in)    :: profiles_tl(nprofiles)
+  Real(Kind=jprb),         Intent(inout) :: emissivity_tl(nchannels)
+  Type(transmission_Type), Intent(inout) :: transmission_tl! in because of meme allocation
+  Type(radiance_Type),     Intent(inout) :: radiancedata_tl ! in because of meme allocation
+
+
+
+
+End Subroutine rttov_tl
+End Interface

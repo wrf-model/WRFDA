@@ -8,6 +8,7 @@
 !     HISTORY: 01/07/2000 - Creation.                           Dale Barker
 !   Additions: 07/15/2003 - Added Buo and Profiler               S.R.H. Rizvi
 !   Additions: 07/20/2003 - Added DA_Add_PBL_And_SFC_Info        S.R.H. Rizvi
+!   Additions:    07/2005 - Added Radiance module               Zhiquan Liu
 !------------------------------------------------------------------------------
 
       USE DA_Constants
@@ -32,6 +33,7 @@
       USE DA_Buoy 
       USE DA_Setup_Structures
       use da_qscat
+      use da_radiance
 
       USE module_wrf_3dvar_io
 

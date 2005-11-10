@@ -1,0 +1,38 @@
+Interface
+   !
+   Subroutine rttov_readscattcoeffs  (&
+         & errorstatus,   &! out
+         & coef_rttov,    &! in
+         & coef_scatt,    &! out
+         & file_id       ) ! in Optional
+
+     ! Imported Type Definitions:
+     Use rttov_types, Only : &
+          & rttov_coef, &
+          & rttov_scatt_coef
+
+     Use rttov_const, Only :   &
+          & inst_name           ,&
+          & platform_name       ,&
+          & errorstatus_info    ,&
+          & errorstatus_success ,&
+          & errorstatus_fatal
+
+     Use parkind1, Only : jpim     ,jprb
+     Implicit None
+
+     ! subroutine arguments
+     ! scalar arguments with intent(out):
+     Integer(Kind=jpim), Intent (out) :: errorstatus             ! return code
+
+     ! scalar arguments with optional intent(in):
+     Integer(Kind=jpim), Optional, Intent (in)  :: file_id       ! file logical unit number
+
+     ! array arguments with intent(in):
+     Type( rttov_coef ), Intent (in) :: coef_rttov               ! clear-sky coefficients
+
+     ! array arguments with intent(out):
+     Type( rttov_scatt_coef ), Intent (out) :: coef_scatt        ! coefficients
+
+   End Subroutine rttov_readscattcoeffs
+End Interface

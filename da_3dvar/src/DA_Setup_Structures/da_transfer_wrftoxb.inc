@@ -12,6 +12,8 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
 !  HISTORY: 09/27/2002		Wei Huang
 !
 !  HISTORY: 06/28/2004 with respect to the cloud water and rain water        Jianfeng Gu
+!              07/2005 - Add skin temperature to xb structure                Zhiquan Liu
+!                        also in Registry file
 !
 !  PARENT_MODULE: DA_Setup_Structures
 !------------------------------------------------------------------------------
@@ -294,6 +296,17 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
        xb%lanu(i,j) = lu_index(i,j)
        xb%landmask(i,j) = landmask(i,j)
        xb%xland(i,j) = xland(i,j)
+       xb%tsk(i,j) = tsk(i,j)
+       xb%smois(i,j) = smois(i,j,1)
+       xb%tslb(i,j) = tslb(i,j,1)
+       xb%xice(i,j) = xice(i,j)
+       xb%ivgtyp(i,j) = ivgtyp(i,j)
+       xb%isltyp(i,j) = isltyp(i,j)
+       xb%vegfra(i,j) = vegfra(i,j)
+!       xb%snowh(i,j) = snowh(i,j)
+       xb%snowh(i,j) = snow(i,j)*10.     ! convert snow water equivalent kg/m2 to snow depth mm
+!      print *, i, j, nint(xb%landmask(i,j)), nint(xb%xice(i,j)), nint(xb%snow(i,j))
+
      enddo
 
 #if 0
@@ -375,15 +388,22 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
            xb%qcw(i,j,k) = moist(i,j,k,p_qc)
            xb%qrn(i,j,k) = moist(i,j,k,p_qr)
            xb%qt (i,j,k) = xb%q(i,j,k) + xb%qcw(i,j,k) + xb%qrn(i,j,k)
+           if(xb%qcw(i,j,k) < 0.0 ) xb%qcw(i,j,k) = 0.0
+           if(xb%qrn(i,j,k) < 0.0 ) xb%qrn(i,j,k) = 0.0
+           if(xb%qt(i,j,k)  < 0.0 ) xb%qt(i,j,k) = 0.0
+
          endif
 
          if( size(moist,dim=4) >= 6 ) then
            xb%qci(i,j,k) = moist(i,j,k,p_qi)
            xb%qsn(i,j,k) = moist(i,j,k,p_qs)
+           if(xb%qci(i,j,k) < 0.0 ) xb%qci(i,j,k) = 0.0
+           if(xb%qsn(i,j,k) < 0.0 ) xb%qsn(i,j,k) = 0.0
          endif
 
          if( size(moist,dim=4) >= 7 ) then
            xb%qgr(i,j,k) = moist(i,j,k,p_qg)
+           if(xb%qgr(i,j,k) < 0.0 ) xb%qgr(i,j,k) = 0.0
          endif
 
        enddo

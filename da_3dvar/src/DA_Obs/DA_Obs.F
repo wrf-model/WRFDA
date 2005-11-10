@@ -22,6 +22,7 @@ MODULE DA_Obs
    USE DA_Buoy 
    USE par_util
    USE DA_Tools
+   USE da_radiance
 
    IMPLICIT NONE
 

@@ -11,6 +11,7 @@ SUBROUTINE DA_Read_Namelist
 !  Additions:
 !             07/08/2003      Profiler and Buoy Obs            Syed RH Rizvi
 !             01/31/2005      Added global option              Syed RH Rizvi
+!             07/18/2005      Add rtminit options              Zhiquan Liu
 !----------------------------------------------------------------------------
    IMPLICIT NONE
 
@@ -101,6 +102,10 @@ SUBROUTINE DA_Read_Namelist
                        max_vert_var3, max_vert_var4, max_vert_var5
    NAMELIST /pseudo_ob_nl/ num_pseudo, pseudo_x, pseudo_y, pseudo_z, &
                            pseudo_val, pseudo_err, pseudo_var
+   NAMELIST /rtminit/  rtminit_errunit, rtminit_print, rtminit_nsensor, &
+                       rtminit_platform,rtminit_satid, rtminit_sensor,  &
+                       use_obsgts, use_radiance, use_hirs2, use_hirs3,  &
+                       use_msu, use_amsua, use_amsub, mw_emis_sea
 
 !----------------------------------------------------------------------------------
    write(unit=*, fmt='(a)') &
@@ -275,6 +280,22 @@ SUBROUTINE DA_Read_Namelist
    pseudo_val     = 1.0
    pseudo_err     = 1.0
    pseudo_var     = 't'
+
+!--rtminit
+   rtminit_errunit       = 99
+   rtminit_print         = 1
+   rtminit_nsensor       = 1
+   rtminit_platform (:)  = -1
+   rtminit_satid    (:)  = -1
+   rtminit_sensor   (:)  = -1
+   use_obsgts            = .FALSE.
+   use_radiance          = .FALSE.
+   use_hirs2             = .FALSE.
+   use_hirs3             = .FALSE.
+   use_msu               = .FALSE.
+   use_amsua             = .FALSE.
+   use_amsub             = .FALSE.
+
 
 !----------------------------------------------------------------------------
 !  [1.0] Open namelist file:
@@ -483,6 +504,24 @@ SUBROUTINE DA_Read_Namelist
      check_max_iv   = .FALSE.
    endif
 
+   READ  ( UNIT = namelist_unit, NML = rtminit, ERR = 8000, IOSTAT = IOST)
+   if ( print_detail >= 1 ) then
+      WRITE(6,'(A,I4  )') ' rtminit_errunit  = ', rtminit_errunit
+      WRITE(6,'(A,I4  )') ' rtminit_print    = ', rtminit_print
+      WRITE(6,'(A,I4  )') ' rtminit_nsensor  = ', rtminit_nsensor
+      WRITE(6,'(A,10I4)') ' rtminit_platform = ', rtminit_platform(1:rtminit_nsensor)
+      WRITE(6,'(A,10I4)') ' rtminit_satid    = ', rtminit_satid   (1:rtminit_nsensor)
+      WRITE(6,'(A,10I4)') ' rtminit_sensor   = ', rtminit_sensor  (1:rtminit_nsensor)
+      WRITE(6,'(A,L10  )') ' use_obsgts   = ', use_obsgts
+      WRITE(6,'(A,L10  )') ' use_radiance = ', use_radiance
+      WRITE(6,'(A,L10  )') ' use_hirs2    = ', use_hirs2
+      WRITE(6,'(A,L10  )') ' use_hirs3    = ', use_hirs3
+      WRITE(6,'(A,L10  )') ' use_msu      = ', use_msu
+      WRITE(6,'(A,L10  )') ' use_amsua    = ', use_amsua
+      WRITE(6,'(A,L10  )') ' use_amsub    = ', use_amsub
+   end if
+  
+
    CLOSE (namelist_unit)
 
    len = len_trim(ANALYSIS_DATE)
@@ -668,6 +707,20 @@ SUBROUTINE DA_Read_Namelist
       WRITE(6,'(A,3x,A3)')     ' pseudo_var = ', pseudo_var
    end if
    
+      WRITE(6,'(A,I4  )') ' rtminit_errunit  = ', rtminit_errunit
+      WRITE(6,'(A,I4  )') ' rtminit_print    = ', rtminit_print
+      WRITE(6,'(A,I4  )') ' rtminit_nsensor  = ', rtminit_nsensor
+      WRITE(6,'(A,10I4)') ' rtminit_platform = ', rtminit_platform(1:rtminit_nsensor)
+      WRITE(6,'(A,10I4)') ' rtminit_satid    = ', rtminit_satid   (1:rtminit_nsensor)
+      WRITE(6,'(A,10I4)') ' rtminit_sensor   = ', rtminit_sensor  (1:rtminit_nsensor)
+      WRITE(6,'(A,L10  )') ' use_obsgts   = ', use_obsgts 
+      WRITE(6,'(A,L10  )') ' use_radiance = ', use_radiance
+      WRITE(6,'(A,L10  )') ' use_hirs2    = ', use_hirs2
+      WRITE(6,'(A,L10  )') ' use_hirs3    = ', use_hirs3
+      WRITE(6,'(A,L10  )') ' use_msu      = ', use_msu
+      WRITE(6,'(A,L10  )') ' use_amsua    = ', use_amsua
+      WRITE(6,'(A,L10  )') ' use_amsub    = ', use_amsub
+
    end if
    
    WRITE(6,'(A)')''

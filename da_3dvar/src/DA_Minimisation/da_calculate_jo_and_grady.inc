@@ -6,6 +6,7 @@
 !                    Polar orbiting satellite are
 !                    seperated & used as profile
 !                    Initialised contribution of all obs in Jo
+!          08/2005 - Add radiance part                  Zhiquan Liu
 !
 !-------------------------------------------------------------------------
       
@@ -19,7 +20,9 @@
                                       jo_metar, jo_ships, jo_gpspw, &
                                       jo_ssmi , jo_ssmt1, jo_ssmt2, &
                                       jo_pseudo, jo_qscat, jo_buoy, &
-                                      jo_profiler, jo_Radar, jo_gpsref, jo_bogus
+                                      jo_profiler, jo_Radar, jo_gpsref, jo_bogus, &
+                                      jo_radiance
+      integer                      :: i
 !-------------------------------------------------------------------------
 !     [1.0] Compute components of Grad_y(Jo):
 !-------------------------------------------------------------------------
@@ -176,6 +179,24 @@
       jo_buoy = jo % buoy_u + jo % buoy_v + jo % buoy_t + &
                 jo % buoy_p + jo % buoy_q
 
+!     Radiance:
+
+      call da_calculate_jo_and_grady_rad ( iv, re, jo, jo_grad_y)
+      if ( use_radiance ) then
+        jo_radiance = sum ( jo % rad(:) )
+      else
+        jo_radiance = 0.
+      end if
+
+      if(print_detail > 0) then
+         write(unit=*, fmt='(a, e24.12)') &
+              'jo_radiance =', jo_radiance
+       do i = 1, iv%num_inst
+         write(unit=*, fmt='(a, e24.12)') &
+              trim('jo_'//iv%instid(i)%rttovid_string), jo % rad(i)
+       end do
+      end if
+
 !-------------------------------------------------------------------------
 !     [2.0] Jo = 1/2 * (yo-y)**2/ob_err_variance:
 !-------------------------------------------------------------------------
@@ -184,7 +205,7 @@
                    jo_pilot + jo_airep + jo_metar + jo_ships + &
                    jo_gpspw + jo_ssmi + jo_ssmt1 + jo_ssmt2 + &
                    jo_pseudo + jo_qscat + jo_profiler + jo_buoy + &
-                   jo_Radar + jo_gpsref + jo_bogus
+                   jo_Radar + jo_gpsref + jo_bogus + jo_radiance
                    
       jot = jo % total
 
@@ -212,7 +233,8 @@
               'jo_buoy  =', jo_buoy, &
               'jo_Radar =', jo_Radar, &
               'jo_gpsref =', jo_gpsref, &
-              'jo_bogus =', jo_bogus
+              'jo_bogus =', jo_bogus,  &
+              'jo_radiance =', jo_radiance
       endif
                    
       end subroutine da_calculate_jo_and_grady
