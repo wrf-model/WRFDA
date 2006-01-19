@@ -4,6 +4,11 @@ module read_util_module
 #define iargc ipxfargc
 #endif
 
+! this bit is for wrfvar which writes double-precision output
+#if ( RWORDSIZE == DWORDSIZE )
+#define WRF_REAL WRF_DOUBLE
+#endif
+
 contains
 
 #ifdef crayx1
@@ -208,6 +213,20 @@ if ( Justplot ) then
         endif
 
 
+#if 0
+! uncomment this to have the code give i-slices 
+        do i = 1, end_index(1)
+          if ( levlim .eq. -1 .or. i .eq. levlim ) then
+            write(88,*)end_index(2),end_index(3),' ',trim(name),' ',k,' time ',TRIM(Datestr)
+            do k = start_index(3), end_index(3)
+            do j = 1, end_index(2)
+                write(88,*) data(i,j,k,1)
+              enddo
+            enddo
+          endif
+        enddo
+#else
+! give k-slices 
         do k = start_index(3), end_index(3)
           if ( levlim .eq. -1 .or. k .eq. levlim ) then
             write(88,*)end_index(1),end_index(2),' ',trim(name),' ',k,' time ',TRIM(Datestr)
@@ -218,6 +237,7 @@ if ( Justplot ) then
             enddo
           endif
         enddo
+#endif
         deallocate(data)
       endif
       call ext_ncd_get_next_var (dh1, VarName, Status_next_var)
@@ -354,11 +374,11 @@ else
         ELSE
           serr = sqrt ( sum1 )
         ENDIF
-        IF ( diff2 .GT. 0.0d0 ) THEN
-          perr = diff1/diff2
-        ELSE
+!        IF ( diff2 .GT. 0.0d0 ) THEN
+!          perr = diff1/diff2
+!        ELSE
           perr = diff1
-        ENDIF
+!        ENDIF
            
         IF (IFDIFFS .NE. 0 ) THEN
            ! create the fort.88 and fort.98 files because regression scripts will

@@ -40,10 +40,6 @@ SUBROUTINE DA_Check_CvToVv_Adjoint( xb, xbx, xp, be, cv, vv, &
    real, dimension(cv_size) :: cv_2
 
 !-------------------------------------------------------------------------
-
-   integer                        :: ierror        ! MPI error code.
-
-!-------------------------------------------------------------------------
 !  [1.0] Initialise:
 !-------------------------------------------------------------------------
 
@@ -105,30 +101,20 @@ SUBROUTINE DA_Check_CvToVv_Adjoint( xb, xbx, xp, be, cv, vv, &
    endif
 
 
-#ifdef DM_PARALLEL
-   call MPI_ALLREDUCE( adj_par_lhs, adj_sum_lhs, 1, TRUE_MPI_REAL, MPI_SUM, &
-                       MPI_COMM_WORLD, IERROR )
+   adj_sum_lhs = wrf_dm_sum_real( adj_par_lhs )
+
    if( global) then
    adj_sum_rhs = adj_par_rhs
    else
-   call MPI_ALLREDUCE( adj_par_rhs, adj_sum_rhs, 1, TRUE_MPI_REAL, MPI_SUM, &
-                       MPI_COMM_WORLD, IERROR )
+   adj_sum_rhs = wrf_dm_sum_real( adj_par_rhs )
    endif  
+PRINT *,'TEST_COVERAGE_DA_Check_CvToVv_Adjoint:  adj_sum_lhs,adj_sum_rhs = ', adj_sum_lhs,adj_sum_rhs
    IF ( wrf_dm_on_monitor() ) THEN
       write(unit=*, fmt='(/)')
       write(unit=*, fmt='(a,1pe22.14)') &
            'Whole  Domain: < Vv, Vv >     = ', adj_sum_lhs, &
            'Whole  Domain: < cv_adj, cv > = ', adj_sum_rhs
    ENDIF
-#else
-   adj_sum_lhs = adj_par_lhs
-   adj_sum_rhs = adj_par_rhs
-
-   write(unit=*, fmt='(/)')
-   write(unit=*, fmt='(a,1pe22.14)') &
-        'Whole  Domain: < Vv, Vv >     = ', adj_sum_lhs, &
-        'Whole  Domain: < cv_adj, cv > = ', adj_sum_rhs
-#endif
       
    write(unit=*, fmt='(/a/)') &
         'DA_Check_CvToVv_Adjoint: Test Finished.'

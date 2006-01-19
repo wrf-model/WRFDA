@@ -31,12 +31,6 @@ MODULE DA_Gen_Be_Stats
    integer :: T_FORECAST1, T_FORECAST2, FILE_INTERVAL
 
 
-#if 0
-#ifdef DM_PARALLEL
-   INCLUDE 'mpif.h'
-#endif
-#endif
-
    CONTAINS
 
 #include "DA_Stats_Namelist.inc"

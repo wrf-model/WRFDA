@@ -23,12 +23,17 @@ MODULE PAR_UTIL
 #if ( DWORDSIZE != RWORDSIZE )
 #define TRUE_MPI_REAL     MPI_REAL
 #define TRUE_RSL_REAL     RSL_REAL
-#define TRUE_RSL_REAL_F90 RSL_REAL_F90
 #else
 #define TRUE_MPI_REAL     MPI_REAL8
 #define TRUE_RSL_REAL     RSL_DOUBLE
-#define TRUE_RSL_REAL_F90 RSL_DOUBLE_F90
 #endif
+
+#include <generic_typedefs.inc>
+
+      INTERFACE wv_patch_to_global
+        MODULE PROCEDURE wv_patch_to_global_2d
+        MODULE PROCEDURE wv_patch_to_global_3d
+      END INTERFACE
 
     CONTAINS
 
@@ -42,6 +47,11 @@ MODULE PAR_UTIL
 #include <pack_count_obs.inc>
 #include <unpack_count_obs.inc>
 #include <transpose.inc>
+#include <cv_to_global.inc>
+#include <generic_methods.inc>
+#include <specific_methods.inc>
+#include <generic_boilerplate.inc>
+#include <y_facade_to_global.inc>
 
 #ifdef DM_PARALLEL
 

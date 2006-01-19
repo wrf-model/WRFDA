@@ -40,10 +40,6 @@ SUBROUTINE DA_Check_VpToX_Adjoint( xb, xbx, be, xa, xp, vp,  &
 
 !-------------------------------------------------------------------------
 
-   integer                        :: ierror        ! MPI error code.
-
-!-------------------------------------------------------------------------
-
    write(unit=*, fmt='(/a/)') &
         ' DA_Check_VpToX_Adjoint: Adjoint Test Results:'
 
@@ -80,12 +76,9 @@ SUBROUTINE DA_Check_VpToX_Adjoint( xb, xbx, be, xa, xp, vp,  &
    adj_par_rhs = SUM( vp % v1(its:ite,jts:jte,:) * vp2_v1(its:ite,jts:jte,:) )
    adj_par_rhs = SUM( vp % v2(its:ite,jts:jte,:) * vp2_v2(its:ite,jts:jte,:) ) + adj_par_rhs
 
-#ifdef DM_PARALLEL 
-   call MPI_ALLREDUCE( adj_par_lhs, adj_sum_lhs, 1, TRUE_MPI_REAL, MPI_SUM, &
-                       MPI_COMM_WORLD, IERROR )
-   
-   call MPI_ALLREDUCE( adj_par_rhs, adj_sum_rhs, 1, TRUE_MPI_REAL, MPI_SUM, &
-                       MPI_COMM_WORLD, IERROR )
+   adj_sum_lhs = wrf_dm_sum_real( adj_par_lhs )
+   adj_sum_rhs = wrf_dm_sum_real( adj_par_rhs )
+PRINT *,'TEST_COVERAGE_DA_Check_VpToX_Adjoint A:  adj_sum_lhs,adj_sum_rhs = ', adj_sum_lhs,adj_sum_rhs
 
    IF ( wrf_dm_on_monitor() ) THEN
       write(unit=*, fmt='(/a/)') &
@@ -96,18 +89,6 @@ SUBROUTINE DA_Check_VpToX_Adjoint( xb, xbx, be, xa, xp, vp,  &
            'Whole  Domain: < u_v,     u_v         > = ', adj_sum_lhs, &
            'Whole  Domain: < psi_chi, psi_chi_adj > = ', adj_sum_rhs
    ENDIF
-#else
-   write(unit=*, fmt='(/a/)') &
-        ' DA_Check_DA_PsiChi_To_UV: Adjoint Test Results:'
-
-   adj_sum_lhs = adj_par_lhs
-   adj_sum_rhs = adj_par_rhs
-
-   write(unit=*, fmt='(/)')
-   write(unit=*, fmt='(a,1pe22.14)') &
-        'Whole  Domain: < u_v,     u_v         > = ', adj_sum_lhs, &
-        'Whole  Domain: < psi_chi, psi_chi_adj > = ', adj_sum_rhs
-#endif
 
    vp%v1(:,:,:) = vp2_v1(:,:,:)
    vp%v2(:,:,:) = vp2_v2(:,:,:)
@@ -233,12 +214,9 @@ SUBROUTINE DA_Check_VpToX_Adjoint( xb, xbx, be, xa, xp, vp,  &
 !  [7.0] Print output:
 !-------------------------------------------------------------------------
 
-#ifdef DM_PARALLEL
-   call MPI_ALLREDUCE( adj_par_lhs, adj_sum_lhs, 1, TRUE_MPI_REAL, MPI_SUM, &
-                       MPI_COMM_WORLD, IERROR )
-
-   call MPI_ALLREDUCE( adj_par_rhs, adj_sum_rhs, 1, TRUE_MPI_REAL, MPI_SUM, &
-                       MPI_COMM_WORLD, IERROR )
+   adj_sum_lhs = wrf_dm_sum_real( adj_par_lhs )
+   adj_sum_rhs = wrf_dm_sum_real( adj_par_rhs )
+PRINT *,'TEST_COVERAGE_DA_Check_VpToX_Adjoint B:  adj_sum_lhs,adj_sum_rhs = ', adj_sum_lhs,adj_sum_rhs
 
    IF ( wrf_dm_on_monitor() ) THEN
       write(unit=*, fmt='(/)')
@@ -246,15 +224,6 @@ SUBROUTINE DA_Check_VpToX_Adjoint( xb, xbx, be, xa, xp, vp,  &
            'Whole  Domain: < x, x >       = ', adj_sum_lhs, &
            'Whole  Domain: < vp_adj, vp > = ', adj_sum_rhs
    ENDIF
-#else
-   adj_sum_lhs = adj_par_lhs
-   adj_sum_rhs = adj_par_rhs
-
-   write(unit=*, fmt='(/)')
-   write(unit=*, fmt='(a,1pe22.14)') &
-        'Whole  Domain: < x, x >       = ', adj_sum_lhs, &
-        'Whole  Domain: < vp_adj, vp > = ', adj_sum_rhs
-#endif
 
    vp % v1(:,:,:) = vp2_v1(:,:,:)
    vp % v2(:,:,:) = vp2_v2(:,:,:)

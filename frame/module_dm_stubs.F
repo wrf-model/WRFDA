@@ -24,11 +24,25 @@ MODULE module_dm
       wrf_dm_sum_real = inval
    END FUNCTION wrf_dm_sum_real
 
+   SUBROUTINE wrf_dm_sum_reals ( inval, retval )
+      IMPLICIT NONE
+      REAL, INTENT(IN   ) :: inval(:)
+      REAL, INTENT(  OUT) :: retval(:)
+      retval = inval
+   END SUBROUTINE wrf_dm_sum_reals
+
    INTEGER FUNCTION wrf_dm_sum_integer ( inval )
       IMPLICIT NONE
       INTEGER inval
       wrf_dm_sum_integer = inval
    END FUNCTION wrf_dm_sum_integer
+
+   SUBROUTINE wrf_dm_sum_integers ( inval, retval )
+      IMPLICIT NONE
+      INTEGER, INTENT(IN   ) :: inval(:)
+      INTEGER, INTENT(  OUT) :: retval(:)
+      retval = inval
+   END SUBROUTINE wrf_dm_sum_integers
 
    SUBROUTINE wrf_dm_maxval ( val, idex, jdex )
       IMPLICIT NONE

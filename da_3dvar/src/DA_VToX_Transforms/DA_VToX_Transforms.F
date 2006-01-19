@@ -36,9 +36,6 @@ MODULE DA_VToX_Transforms
 
    IMPLICIT NONE
 
-#ifdef DM_PARALLEL
-   include 'mpif.h'
-#endif
 
    CONTAINS
 

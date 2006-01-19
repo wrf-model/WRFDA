@@ -46,12 +46,13 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
 
    real, dimension(xp%jds:xp%jde) :: loc_latc_mean
 
-   integer :: ierror, size2d
+   integer :: size2d
 
    real, dimension(xp%kms:xp%kme) :: DDT
 !------------------------------------------------------------------------------
 
    REAL   :: qvf1, cvpm, cpovcv, ppb, ttb, albn, aln
+   REAL, ALLOCATABLE :: arrayglobal(:,:)
 
 !---------------------------------------------------------------------------
 !--Set xb array range indices for processor subdomain.
@@ -647,25 +648,52 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
 
    tmpvar = 1.0/real(size2d)
 
-   loc_psac_mean = tmpvar*SUM( xb % psac(xp%its:xp%ite,xp%jts:xp%jte) )
+   ! Bitwise-exact reduction preserves operation order of serial code for
+   ! testing, at the cost of much-increased run-time.  Turn it off when not     
+   ! testing.  This will always be .FALSE. for a serial or 1-process MPI run.
+   IF ( testing_dm_bitwise_exact ) THEN
+      ALLOCATE( arrayglobal( xp%ids:xp%ide, xp%jds:xp%jde ) )
+      CALL wv_patch_to_global( xb%psac, arrayglobal, xp%domdesc, &
+                               xp%ids, xp%ide, xp%jds, xp%jde,   &
+                               xp%ims, xp%ime, xp%jms, xp%jme,   &
+                               xp%its, xp%ite, xp%jts, xp%jte )
+      loc_psac_mean = tmpvar*SUM( arrayglobal(xp%ids:xp%ide,xp%jds:xp%jde) )
+      DEALLOCATE( arrayglobal )
+   ELSE
+     loc_psac_mean = tmpvar*SUM( xb % psac(xp%its:xp%ite,xp%jts:xp%jte) )
+   ENDIF
 
    tmpvar = 1.0/real(xp%ide-xp%ids+1)
 
    loc_latc_mean(:) = 0.0
 
-   do j=js,je
-      loc_latc_mean(j) = tmpvar*SUM( xb % lat(is:ie, j) )
-   enddo
+   IF ( testing_dm_bitwise_exact ) THEN
+      ALLOCATE( arrayglobal( xp%ids:xp%ide, xp%jds:xp%jde ) )
+      CALL wv_patch_to_global( xb%lat, arrayglobal, xp%domdesc, &
+                               xp%ids, xp%ide, xp%jds, xp%jde,  &
+                               xp%ims, xp%ime, xp%jms, xp%jme,  &
+                               xp%its, xp%ite, xp%jts, xp%jte )
+      do j=xp%jds,xp%jde
+         loc_latc_mean(j) = tmpvar*SUM( arrayglobal(xp%ids:xp%ide, j) )
+      enddo
+      DEALLOCATE( arrayglobal )
+   ELSE
+      do j=js,je
+         loc_latc_mean(j) = tmpvar*SUM( xb % lat(is:ie, j) )
+      enddo
+   ENDIF
 
-#ifdef DM_PARALLEL
-   call MPI_ALLREDUCE( loc_psac_mean, xbx % psac_mean, 1, TRUE_MPI_REAL, MPI_SUM, &
-                       MPI_COMM_WORLD, IERROR )
-   call MPI_ALLREDUCE( loc_latc_mean, xbx % latc_mean, (xp%jde-xp%jds+1), &
-                       TRUE_MPI_REAL, MPI_SUM, MPI_COMM_WORLD, IERROR )
-#else
-   xbx % psac_mean = loc_psac_mean
-   xbx % latc_mean = loc_latc_mean
-#endif
+   IF ( testing_dm_bitwise_exact ) THEN
+     ! Broadcast result from monitor to other tasks.
+     CALL wrf_dm_bcast_real( loc_psac_mean, 1 )
+     xbx % psac_mean = loc_psac_mean
+     ! Broadcast result from monitor to other tasks.
+     CALL wrf_dm_bcast_real( loc_latc_mean, (xp%jde-xp%jds+1) )
+     xbx % latc_mean = loc_latc_mean
+   ELSE
+     xbx % psac_mean = wrf_dm_sum_real( loc_psac_mean )
+     CALL wrf_dm_sum_reals( loc_latc_mean, xbx % latc_mean )
+   ENDIF
 
    if(print_detail > 10) then
 !     print *, 'loc_psac_mean  =', loc_psac_mean

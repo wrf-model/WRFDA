@@ -23,10 +23,6 @@ SUBROUTINE DA_Solve_PoissonEqn_FCT( xb, xbx, del2b, b, xp)
    REAL, DIMENSION(xp%ims:xp%ime,xp%jms:xp%jme,xp%kms:xp%kme), &
                       INTENT(OUT)   :: b       ! B
 
-#ifdef DM_PARALLEL
-   include 'mpif.h'
-#endif
-
 !------------------------------------------------------------------------------
 
    INTEGER                  :: vector_inc    ! Increment between FST data.
@@ -44,7 +40,6 @@ SUBROUTINE DA_Solve_PoissonEqn_FCT( xb, xbx, del2b, b, xp)
    REAL, DIMENSION(xp%kts:xp%kte) :: global_mean, local_mean
 
    REAL :: rij
-   INTEGER :: ierror
 
 !------------------------------------------------------------------------------
 !  [1.0] Initialise:
@@ -281,14 +276,10 @@ SUBROUTINE DA_Solve_PoissonEqn_FCT( xb, xbx, del2b, b, xp)
       local_mean(k) = SUM(xp%v1z(xp%its:xp%ite,xp%jts:xp%jte,k))*rij
    enddo
 
-   n = xp%kte - xp%kts + 1
-
-#ifdef DM_PARALLEL
-   call MPI_ALLREDUCE( local_mean, global_mean, n, TRUE_MPI_REAL, MPI_SUM, &
-                       MPI_COMM_WORLD, IERROR )
-#else
-   global_mean(xp%kts:xp%kte) = local_mean(xp%kts:xp%kte)
-#endif
+   CALL wrf_dm_sum_reals ( local_mean, global_mean )
+do k=xp%kts,xp%kte
+PRINT *,'TEST_COVERAGE_DA_Solve_PoissonEqn_FCT:  global_mean(',k,') = ', global_mean(k)
+enddo
 
 !  [2.5] Write data array into b:
 

@@ -43,8 +43,6 @@ subroutine da_calculate_j( it, iter, xb, xbx, be, iv, xhat, cv, vv, &
  
       type (y_type)    :: jo_grad_y ! Grad_y(jo)
 
-      integer          :: ierror
-
       character(len=4) :: filnam
 
 !-------------------------------------------------------------------------
@@ -76,22 +74,22 @@ subroutine da_calculate_j( it, iter, xb, xbx, be, iv, xhat, cv, vv, &
 
       call da_calculate_jo_and_grady( iv, re, jo_partial, j % jo, jo_grad_y)
 
-#ifdef DM_PARALLEL
-      call MPI_ALLREDUCE( jo_partial, j % jo % total, 1, TRUE_MPI_REAL, MPI_SUM, &
-                          MPI_COMM_WORLD, IERROR )
-#else
+    IF ( testing_dm_bitwise_exact ) THEN
       j % jo % total = jo_partial
-#endif
+    ELSE
+      j % jo % total = wrf_dm_sum_real( jo_partial )
+    ENDIF
  
-
 !-------------------------------------------------------------------------
 !     [1.0] calculate jb:
 !-------------------------------------------------------------------------
 
      if(minimisation_option == 1) then
-        j%jb = 0.5*da_dot(cv,cv,cv_size)
+        j%jb = 0.5*da_dot_cv(cv,cv,cv_size,xp, &
+                     (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz /) )
      else if(minimisation_option == 2) then
-        j%jb = 0.5*da_dot(cv+xhat,cv+xhat,cv_size)
+        j%jb = 0.5*da_dot_cv(cv+xhat,cv+xhat,cv_size,xp, &
+                     (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz /) )
      endif
 
 !-------------------------------------------------------------------------
@@ -133,7 +131,8 @@ subroutine da_calculate_j( it, iter, xb, xbx, be, iv, xhat, cv, vv, &
 !     [3.0] calculate grad_v (j) = grad_v (jb) + grad_v (jo):
 !-------------------------------------------------------------------------
 
-      gnorm_jo= da_dot(j_grad,j_grad,cv_size)
+      gnorm_jo= da_dot_cv(j_grad,j_grad,cv_size,xp, &
+                  (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz /) )
 
       gnorm_jo= sqrt(gnorm_jo)
 
@@ -142,11 +141,13 @@ subroutine da_calculate_j( it, iter, xb, xbx, be, iv, xhat, cv, vv, &
       if(minimisation_option == 1) then
          j_grad =  cv        + j_grad
 
-         gnorm_cv=da_dot(cv, cv, cv_size)
+         gnorm_cv=da_dot_cv(cv, cv, cv_size, xp,  &
+                    (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz /) )
       else if(minimisation_option == 2) then
          j_grad =  cv + xhat + j_grad
 
-         gnorm_cv=da_dot(cv + xhat, cv + xhat, cv_size)
+         gnorm_cv=da_dot_cv(cv + xhat, cv + xhat, cv_size, xp,  &
+                    (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz /) )
       else
          write(unit=*, fmt='(a)') 'Wrong minimisation_option.'
       endif
@@ -160,7 +161,8 @@ subroutine da_calculate_j( it, iter, xb, xbx, be, iv, xhat, cv, vv, &
 
       gnorm_cv= sqrt(gnorm_cv)
 
-      gnorm_j = da_dot(j_grad, j_grad,cv_size)
+      gnorm_j = da_dot_cv(j_grad, j_grad,cv_size, xp,  &
+                  (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz /) )
 
       gnorm_j = sqrt(gnorm_j )
 

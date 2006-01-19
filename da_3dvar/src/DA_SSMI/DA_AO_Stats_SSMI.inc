@@ -2,27 +2,14 @@ SUBROUTINE DA_AO_Stats_SSMI ( stats_unit, oi, re )
 
    IMPLICIT NONE
 
-#ifdef DM_PARALLEL
-   INCLUDE 'mpif.h'
-#endif
-
    INTEGER,        INTENT (in)      :: stats_unit    ! Output unit for stats.
    TYPE (ob_type), INTENT (in)      :: oi            ! OI
    TYPE ( y_type), INTENT (in)      :: re            ! A - O
 
    integer  :: num_ssmi_tb, num_ssmi_retrieval       ! # obs over global domain.
-   integer  :: ierror                                ! MPI return code.
 
-#ifdef DM_PARALLEL
-   call MPI_ALLREDUCE(oi%num_ssmi_tb, num_ssmi_tb, 1, &
-                      MPI_INTEGER, MPI_SUM, MPI_COMM_WORLD, ierror)
-
-   call MPI_ALLREDUCE(oi%num_ssmi_retrieval, num_ssmi_retrieval, 1, &
-                      MPI_INTEGER, MPI_SUM, MPI_COMM_WORLD, ierror)
-#else
-   num_ssmi_tb = oi%num_ssmi_tb
-   num_ssmi_retrieval = oi%num_ssmi_retrieval
-#endif
+   num_ssmi_tb = wrf_dm_sum_integer( oi%num_ssmi_tb )
+   num_ssmi_retrieval = wrf_dm_sum_integer( oi%num_ssmi_retrieval )
 
    IF ( num_ssmi_tb .gt. 0 ) THEN
 

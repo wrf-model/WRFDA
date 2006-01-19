@@ -137,10 +137,8 @@ SUBROUTINE DA_Transfer_WRFTLtoXa( grid, config_flags, filnam, &
 ![5.0] CONVERT FROM C-GRID TO A-GRID
 ! ----------------------------------------------------------------------------
 
-#ifdef DM_PARALLEL
 !--Fill the halo region for u and v.
    call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id3)
-#endif
 
    do k=ks,ke
    do j=js,je

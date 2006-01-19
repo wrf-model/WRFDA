@@ -87,7 +87,8 @@ subroutine DA_Minimise_CG( grid, config_flags,            &
       ghat  = j_grad
       phat  = - ghat
    
-      rrmold = da_dot(ghat, ghat, cv_size)
+      rrmold = da_dot_cv(ghat, ghat, cv_size, xp, &
+                 (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz /) )
 
       if( j%total == 0.0) go to 1004
       if(it == 1) cv % j_grad_norm_target =  sqrt (rrmold)
@@ -134,7 +135,8 @@ subroutine DA_Minimise_CG( grid, config_flags,            &
                                      grid, config_flags                                )
 
          fhat = - fhat + phat
-         apdotp = da_dot(fhat, phat, cv_size)
+         apdotp = da_dot_cv(fhat, phat, cv_size, xp, &
+                    (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz /) )
          step = 0.0
          if(apdotp .gt. 0.0   ) step = rrmold/apdotp
          ghat = ghat + step * fhat
@@ -147,10 +149,12 @@ subroutine DA_Minimise_CG( grid, config_flags,            &
                                ims, ime, jms, jme, kms, kme,             &
                                its, ite, jts, jte, kts, kte,             &
                                grid, config_flags                        )
-           ob_grad = sqrt(da_dot(j_grad,j_grad,cv_size))  
+           ob_grad = sqrt(da_dot_cv(j_grad,j_grad,cv_size,xp, &
+             (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz /) ) )
          end if
 
-         rrmnew = da_dot (ghat, ghat, cv_size)
+         rrmnew = da_dot_cv (ghat, ghat, cv_size, xp, &
+                    (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz /) )
 
          rrmnew_norm = sqrt(rrmnew)
 
@@ -195,7 +199,8 @@ subroutine DA_Minimise_CG( grid, config_flags,            &
                               its, ite, jts, jte, kts, kte,             &
                               grid, config_flags                        )
 
-         rrmnew_norm = sqrt( da_dot(j_grad,j_grad,cv_size) )
+         rrmnew_norm = sqrt( da_dot_cv(j_grad,j_grad,cv_size,xp, &
+           (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz /) ) )
        endif
         
        write(6,15)j%total , rrmnew_norm

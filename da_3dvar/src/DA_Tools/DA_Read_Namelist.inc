@@ -22,6 +22,7 @@ SUBROUTINE DA_Read_Namelist
 
    CHARACTER(LEN=24)         :: tmp_date
    INTEGER                   :: len
+   INTEGER                   :: nproc
 
 !  Namelist contents :
 
@@ -89,7 +90,8 @@ SUBROUTINE DA_Read_Namelist
                        x_start_sub_domain, x_end_sub_domain, &
                        y_start_sub_domain, y_end_sub_domain
    NAMELIST /RECORD10/ Testing_3DVAR, test_transforms, &
-                       test_statistics, interpolate_stats
+                       test_statistics, interpolate_stats, &
+                       testing_dm_bitwise_exact
    NAMELIST /RECORD11/ cv_options, cv_options_hum, check_rh, &
                        as1,as2,as3,as4,as5, set_omb_rand_fac, &
                        seed_array1, seed_array2, &
@@ -221,6 +223,7 @@ SUBROUTINE DA_Read_Namelist
    Test_Transforms = .FALSE.
    Test_Statistics = .FALSE.
    Interpolate_Stats = .TRUE.
+   testing_dm_bitwise_exact = .FALSE.
 
 !--record11
    minimisation_option = 1
@@ -396,11 +399,28 @@ SUBROUTINE DA_Read_Namelist
    
    READ  ( UNIT = namelist_unit, NML = RECORD10, ERR = 8000, IOSTAT = IOST)
    
+! testing_dm_bitwise_exact can be set to .true. to force DM_PARALLEL runs 
+! to produce results that are bitwise-identical regardless of the number of 
+! MPI tasks used.  This is useful for validating that multi-processor runs are 
+! not a source of bugs.  Runtime will be much longer.  This option is 
+! automatically overridden to .false. for serial or 1-MPI-task runs.  
+   IF ( testing_dm_bitwise_exact ) THEN
+     CALL wrf_get_nproc( nproc )
+     IF ( nproc == 1 ) THEN
+       testing_dm_bitwise_exact = .FALSE.
+       IF ( print_detail >= 1 ) THEN
+         WRITE(6,*) &
+           ' testing_dm_bitwise_exact overridden to .FALSE. for serial or 1-MPI-task run'
+       ENDIF
+     ENDIF
+   ENDIF
+
    if ( print_detail >= 1 ) then
       WRITE(6,*)               ' Testing_3DVAR = ',Testing_3DVAR
       WRITE(6,*)               ' Test_Inverse  = ',test_transforms
       WRITE(6,*)               ' Test_Statisti = ',test_statistics
       WRITE(6,*)               ' Interpolate_S = ',interpolate_stats
+      WRITE(6,*)               ' testing_dm_bitwise_exact = ',testing_dm_bitwise_exact
    end if
    
    READ  ( UNIT = namelist_unit, NML = RECORD11, ERR = 8000, IOSTAT = IOST)
@@ -636,6 +656,7 @@ SUBROUTINE DA_Read_Namelist
    WRITE(6,'(A,3X,L10   )') ' Test_Inverse  = ',test_transforms
    WRITE(6,'(A,3X,L10   )') ' Test_Statisti = ',test_statistics
    WRITE(6,'(A,3X,L10   )') ' Interpolate_S = ',interpolate_stats
+   WRITE(6,'(A,3X,L10   )') ' testing_dm_bitwise_exact = ',testing_dm_bitwise_exact
    WRITE(6,'(A,3X,I10   )') ' Balance_Type  = ',balance_type
    WRITE(6,'(A,3X,I10   )') ' CV_Options    = ',cv_options
    WRITE(6,'(A,3X,3F9.5 )') ' as1           = ',as1(1:3), &

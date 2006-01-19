@@ -1,5 +1,5 @@
 SUBROUTINE DA_ll_to_xy (info, loc, xp, &
-                        outside, inside_halo)
+                        outside, inside_halo, outside_all)
 
 !  This routine convert the (lat, lon) into (x,y) coordinates
 !  Additions:      10/26/2004    Syed RH Rizvi
@@ -13,6 +13,7 @@ SUBROUTINE DA_ll_to_xy (info, loc, xp, &
    TYPE(xpose_type),      intent(in)    :: xp           !Domain decomposition vars.
    LOGICAL      ,         intent(out)   :: outside      !wrt local domain
    LOGICAL      ,         intent(out)   :: inside_halo
+   LOGICAL, OPTIONAL,     intent(out)   :: outside_all  !wrt all domains
 
    outside = .false.
    inside_halo = .true.
@@ -33,6 +34,23 @@ SUBROUTINE DA_ll_to_xy (info, loc, xp, &
 
    call toGrid (loc%x, xp%its-2, xp%ite+2, loc%i, loc%dx, loc%dxm)
    call toGrid (loc%y, xp%jts-2, xp%jte+2, loc%j, loc%dy, loc%dym)
+
+   ! refactor to remove this ugly duplication later
+   IF ( PRESENT( outside_all ) ) THEN
+     outside_all = .false.
+     if((int(loc%x) < xp%ids) .or. (int(loc%x) >= xp%ide) .or. &
+        (int(loc%y) < xp%jds) .or. (int(loc%y) >= xp%jde)) then
+!     if((loc%i < xp%ids) .or. (loc%i >= xp%ide) .or. &
+!        (loc%j < xp%jds) .or. (loc%j >= xp%jde)) then
+        outside_all = .true. 
+     endif
+     if(def_sub_domain ) then
+        if( x_start_sub_domain > loc%x .or. y_start_sub_domain > loc%y .or. &
+            x_end_sub_domain   < loc%x .or. y_end_sub_domain   < loc%y) then
+            outside_all = .true.
+        endif
+     endif
+   ENDIF
 
    if(fg_format == 3)then
       if((loc%j < xp%jts-1) .or. (loc%j > xp%jte)) then

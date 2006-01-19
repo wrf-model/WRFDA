@@ -221,6 +221,11 @@ MODULE DA_Define_Structures
       real                    :: dym
       logical                 :: proc_domain
       logical                 :: proc_domain_with_halo
+      ! obs_global_index is the original index of this obs in the serial 
+      ! code.  It is used to reassemble obs in serial-code-order to replicate 
+      ! summation order for bitwise-exact testing of distributed-memory 
+      ! parallel configurations.  
+      integer                 :: obs_global_index
 
       integer                 :: v_interp_optn  ! 0, not specified
                                                 ! 1, vertical interpolate in pressure

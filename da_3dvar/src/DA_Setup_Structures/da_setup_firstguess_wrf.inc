@@ -51,10 +51,8 @@ SUBROUTINE DA_Setup_FirstGuess_WRF( xbx, grid, &
       start_lon = xlong(xp%its, xp%jts)
    endif
 
-#ifdef DM_PARALLEL
    call wrf_dm_bcast_real(start_lat, 1)
    call wrf_dm_bcast_real(start_lon, 1)
-#endif
 
 !---------------------------------------------------------------------------
 !  Setup Map utility

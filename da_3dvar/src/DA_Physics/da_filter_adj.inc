@@ -17,10 +17,6 @@ SUBROUTINE da_filter_adj(var, xp)
 
    data  w/0.25,0.5,0.25/
 
-#ifdef DM_PARALLEL
-   include 'mpif.h'
-#endif
-
 !------------------------------------------------------------------------------
 
 !  Copy var for transpose.

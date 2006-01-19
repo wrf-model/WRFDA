@@ -1,5 +1,5 @@
 
-SUBROUTINE cv_to_vv ( cv_size, cv_array, xp, be, vv )
+SUBROUTINE cv_to_vv ( cv_size, cv_array, xp, mzs, vv )
 
 !------------------------------------------------------------------------------
 !  PURPOSE: Fill (local) vv arrays from 1D (local) cv array.
@@ -8,7 +8,7 @@ SUBROUTINE cv_to_vv ( cv_size, cv_array, xp, be, vv )
    INTEGER,        INTENT(IN)    :: cv_size     ! Length of CV array.
    REAL,           INTENT(IN)    :: cv_array(1:cv_size) ! Control variables v.
    TYPE (xpose_type), INTENT(IN) :: xp          ! Dimensions and xpose buffers.
-   TYPE (be_type), intent(in)    :: be          ! Background error structure.
+   INTEGER,        INTENT(IN)    :: mzs(:) ! Background error structure levels.
    TYPE (vp_type), INTENT(OUT)   :: vv          ! Grdipt/EOF cv_array.
 
    integer   :: is,ie       ! Local grid range in y coordinate.
@@ -27,7 +27,7 @@ SUBROUTINE cv_to_vv ( cv_size, cv_array, xp, be, vv )
    cv_e = 0
 
 !Fill v1
-   mz = be % v1 % mz
+   mz = mzs(1)
    if ( mz > 0 ) then
      ijm = ix * jy * mz
      cv_s = cv_e + 1
@@ -35,7 +35,7 @@ SUBROUTINE cv_to_vv ( cv_size, cv_array, xp, be, vv )
      vv % v1(is:ie,js:je,1:mz) = RESHAPE( cv_array(cv_s:cv_e),(/ix, jy, mz/) )
    end if
 !Fill v2
-   mz = be % v2 % mz
+   mz = mzs(2)
    if ( mz > 0 ) then
      ijm = ix * jy * mz
      cv_s = cv_e + 1
@@ -43,7 +43,7 @@ SUBROUTINE cv_to_vv ( cv_size, cv_array, xp, be, vv )
      vv % v2(is:ie,js:je,1:mz) = RESHAPE( cv_array(cv_s:cv_e),(/ix, jy, mz/) )
    end if
 !Fill v3
-   mz = be % v3 % mz
+   mz = mzs(3)
    if ( mz > 0 ) then
      ijm = ix * jy * mz
      cv_s = cv_e + 1
@@ -51,7 +51,7 @@ SUBROUTINE cv_to_vv ( cv_size, cv_array, xp, be, vv )
      vv % v3(is:ie,js:je,1:mz) = RESHAPE( cv_array(cv_s:cv_e),(/ix, jy, mz/) )
    end if
 !Fill v4
-   mz = be % v4 % mz
+   mz = mzs(4)
    if ( mz > 0 ) then
      ijm = ix * jy * mz
      cv_s = cv_e + 1
@@ -59,7 +59,7 @@ SUBROUTINE cv_to_vv ( cv_size, cv_array, xp, be, vv )
      vv % v4(is:ie,js:je,1:mz) = RESHAPE( cv_array(cv_s:cv_e),(/ix, jy, mz/) )
    end if
 !Fill v5
-   mz = be % v5 % mz
+   mz = mzs(5)
    if ( mz > 0 ) then
      ijm = ix * jy * mz
      cv_s = cv_e + 1
@@ -70,10 +70,10 @@ SUBROUTINE cv_to_vv ( cv_size, cv_array, xp, be, vv )
 #ifdef DEBUG_RESHAPE
    print *, ' '
    print *, 'FILE:', __FILE__, '  LINE:', __LINE__
-   print *, 'sum(vv)=', sum(vv % v1(is:ie,js:je,1:be % v1 % mz)) &
-                      + sum(vv % v2(is:ie,js:je,1:be % v2 % mz)) &
-                      + sum(vv % v3(is:ie,js:je,1:be % v3 % mz)) &
-                      + sum(vv % v4(is:ie,js:je,1:be % v4 % mz))
+   print *, 'sum(vv)=', sum(vv % v1(is:ie,js:je,1:mzs(1))) &
+                      + sum(vv % v2(is:ie,js:je,1:mzs(2))) &
+                      + sum(vv % v3(is:ie,js:je,1:mzs(3))) &
+                      + sum(vv % v4(is:ie,js:je,1:mzs(4)))
    print *, 'sum(cv)=', sum(cv_array(1:cv_size))
    print *, ' '
 #endif

@@ -20,7 +20,8 @@ SUBROUTINE da_apply_be( be, cv, vp ,xb ,xp,&
 !  [1.0] Make local-grid copy of vp from 1-dimensional global-grid cv.
 !-------------------------------------------------------------------------
 
-   call cv_to_vv( cv_size, cv, xp, be, vp )
+   call cv_to_vv( cv_size, cv, xp, &
+                  (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz /) , vp )
 
 !  [2.0] Transform control variable:
 

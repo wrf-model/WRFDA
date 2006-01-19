@@ -1,4 +1,4 @@
-SUBROUTINE vv_to_cv(vv, xp, be, cv_size, cv_array )
+SUBROUTINE vv_to_cv(vv, xp, mzs, cv_size, cv_array )
 
 !------------------------------------------------------------------------------
 !  PURPOSE: Fill (local) 1D cv array from 3D (local) vv arrays.
@@ -6,7 +6,7 @@ SUBROUTINE vv_to_cv(vv, xp, be, cv_size, cv_array )
 
    TYPE (vp_type), INTENT(IN)    :: vv          ! Grdipt/EOF cv_array.
    TYPE (xpose_type), INTENT(IN) :: xp          ! Dimensions and xpose buffers.
-   TYPE (be_type), intent(in)    :: be          ! Background error structure.
+   INTEGER,        INTENT(IN)    :: mzs(:) ! Background error structure levels.
    INTEGER,        INTENT(IN)    :: cv_size     ! Length of CV array.
    REAL,           INTENT(OUT)   :: cv_array(1:cv_size) ! Control variables v.
 
@@ -30,7 +30,7 @@ SUBROUTINE vv_to_cv(vv, xp, be, cv_size, cv_array )
    cv_e = 0
 
 !Store v1
-   mz = be % v1 % mz
+   mz = mzs(1)
 
 
    if ( mz > 0 ) then
@@ -52,7 +52,7 @@ SUBROUTINE vv_to_cv(vv, xp, be, cv_size, cv_array )
 #endif
    end if
 !Store v2
-   mz = be % v2 % mz
+   mz = mzs(2)
    if ( mz > 0 ) then
      ijm = ix * jy * mz
      cv_s = cv_e + 1
@@ -71,7 +71,7 @@ SUBROUTINE vv_to_cv(vv, xp, be, cv_size, cv_array )
 #endif
    end if
 !Store v3
-   mz = be % v3 % mz
+   mz = mzs(3)
    if ( mz > 0 ) then
      ijm = ix * jy * mz
      cv_s = cv_e + 1
@@ -91,7 +91,7 @@ SUBROUTINE vv_to_cv(vv, xp, be, cv_size, cv_array )
 #endif
    end if
 !Store v4
-   mz = be % v4 % mz
+   mz = mzs(4)
    if ( mz > 0 ) then
      ijm = ix * jy * mz
      cv_s = cv_e + 1
@@ -110,7 +110,7 @@ SUBROUTINE vv_to_cv(vv, xp, be, cv_size, cv_array )
 #endif
    end if
 !Store v5
-   mz = be % v5 % mz
+   mz = mzs(5)
    if ( mz > 0 ) then
      ijm = ix * jy * mz
      cv_s = cv_e + 1
@@ -134,17 +134,17 @@ SUBROUTINE vv_to_cv(vv, xp, be, cv_size, cv_array )
        'file:', __FILE__, ', line:', __LINE__
 
    write(unit=*, fmt='(a, i4)') &
-        'be % v1 % mz=', be % v1 % mz, &
-        'be % v2 % mz=', be % v2 % mz, &
-        'be % v3 % mz=', be % v3 % mz, &
-        'be % v4 % mz=', be % v4 % mz, &
-        'be % v5 % mz=', be % v5 % mz
+        'mzs(1)=', mzs(1), &
+        'mzs(2)=', mzs(2), &
+        'mzs(3)=', mzs(3), &
+        'mzs(4)=', mzs(4), &
+        'mzs(5)=', mzs(5)
 
    print *, ' '
-   print *, 'sum(vv)=', sum(vv % v1(is:ie,js:je,1:be % v1 % mz)) &
-                      + sum(vv % v2(is:ie,js:je,1:be % v2 % mz)) &
-                      + sum(vv % v3(is:ie,js:je,1:be % v3 % mz)) &
-                      + sum(vv % v4(is:ie,js:je,1:be % v4 % mz))
+   print *, 'sum(vv)=', sum(vv % v1(is:ie,js:je,1:mzs(1))) &
+                      + sum(vv % v2(is:ie,js:je,1:mzs(2))) &
+                      + sum(vv % v3(is:ie,js:je,1:mzs(3))) &
+                      + sum(vv % v4(is:ie,js:je,1:mzs(4)))
    print *, 'sum(cv)=', sum(cv_array(1:cv_size))
    print *, ' '
 #endif

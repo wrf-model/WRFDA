@@ -13,7 +13,6 @@ SUBROUTINE DA_AO_Stats_Gpspw( stats_unit, oi, re )
    real                             :: o_minus_b_0, o_minus_a_0, sigma_o_0, sigma_b_0 
 
    LOGICAL, EXTERNAL :: wrf_dm_on_monitor
-   integer                        :: ierror        ! MPI error code.
 
    ntpw = 0
    num_gpspw_tot = 0
@@ -47,32 +46,15 @@ SUBROUTINE DA_AO_Stats_Gpspw( stats_unit, oi, re )
 
                 sigma_b = SQRT( (o_minus_b - o_minus_a) &
                        / o_minus_a ) * sigma_o
-#ifdef DM_PARALLEL  
-#if 0
-   call MPI_ALLREDUCE( o_minus_b, o_minus_b_0, 1, TRUE_MPI_REAL, MPI_SUM, &  
-                       MPI_COMM_WORLD, IERROR )  
-   call MPI_ALLREDUCE( o_minus_a, o_minus_a_0, 1, TRUE_MPI_REAL, MPI_SUM, &  
-                       MPI_COMM_WORLD, IERROR )  
-   call MPI_ALLREDUCE( sigma_o, sigma_o_0, 1, TRUE_MPI_REAL, MPI_SUM, &  
-                       MPI_COMM_WORLD, IERROR )  
-   call MPI_ALLREDUCE( sigma_b, sigma_b_0, 1, TRUE_MPI_REAL, MPI_SUM, &  
-                       MPI_COMM_WORLD, IERROR )  
+   o_minus_b_0 = wrf_dm_sum_real( o_minus_b )
+   o_minus_a_0 = wrf_dm_sum_real( o_minus_a )
+   sigma_o_0 = wrf_dm_sum_real( sigma_o )
+   sigma_b_0 = wrf_dm_sum_real( sigma_b )
+PRINT *,'TEST_COVERAGE_DA_AO_Stats_Gpspw:  o_minus_b_0 = ', o_minus_b_0
+PRINT *,'TEST_COVERAGE_DA_AO_Stats_Gpspw:  o_minus_a_0 = ', o_minus_a_0
+PRINT *,'TEST_COVERAGE_DA_AO_Stats_Gpspw:  sigma_o_0 = ', sigma_o_0
+PRINT *,'TEST_COVERAGE_DA_AO_Stats_Gpspw:  sigma_b_0 = ', sigma_b_0
    IF ( wrf_dm_on_monitor() ) THEN  
-                write(stats_unit,'(/A,A3,A,f12.3)')  &
-                         ' Pseudo ', pseudo_var, ' O-B: ', o_minus_b
-                write(stats_unit,'( A,A3,A,f12.3)')  &
-                         ' Pseudo ', pseudo_var, ' O-A: ', o_minus_a
-                write(stats_unit,'( A,A3,A,f12.3)')  &
-                         ' Pseudo ', pseudo_var, ' sigma_o: ', sigma_o
-                write(stats_unit,'(A,A3,A,f12.3)')  &
-                         ' Pseudo ', pseudo_var, ' sigma_b: ', sigma_b
-   ENDIF  
-#endif
-#else  
-   o_minus_b_0 = o_minus_b 
-   o_minus_a_0 = o_minus_a 
-   sigma_o_0   = sigma_o 
-   sigma_b_0   = sigma_b 
              write(stats_unit,'(/A,A3,A,f12.3)')  &  
                          ' Pseudo ', pseudo_var, ' O-B: ', o_minus_b_0  
              write(stats_unit,'( A,A3,A,f12.3)')  &  
@@ -81,7 +63,7 @@ SUBROUTINE DA_AO_Stats_Gpspw( stats_unit, oi, re )
                          ' Pseudo ', pseudo_var, ' sigma_o: ', sigma_o_0  
              write(stats_unit,'(A,A3,A,f12.3)')  &  
                          ' Pseudo ', pseudo_var, ' sigma_b: ', sigma_b_0 
-#endif  
+   ENDIF  
 
            endif
 

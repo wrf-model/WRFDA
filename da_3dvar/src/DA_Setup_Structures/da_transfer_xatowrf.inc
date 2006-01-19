@@ -244,7 +244,12 @@ SUBROUTINE DA_Transfer_XatoWRF( xbx, grid, &
 
 !==> CONVERT FROM A-GRID TO C-GRID
 
-#ifdef DM_PARALLEL
+!TBH:  NOTE that xp%halo_id3 = HALO_PSICHI_UV_ADJ which is currently defined 
+!TBH:  in the Registry as "dyn_em 24:xa%u,xa%v,xa%psfc".  Clearly it is not 
+!TBH:  necessary to update halos in xa%psfc here!  Also, 24-point stencil is 
+!TBH:  too thick, 9-point should suffice.  Apparently, xp%halo_id3 is used 
+!TBH:  in many places!  This needs to be fixed.  
+
 !--Fill the halo region for u and v.
 
    call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id3)
@@ -275,8 +280,8 @@ SUBROUTINE DA_Transfer_XatoWRF( xbx, grid, &
                             -    xa%u(ie-1,js:je,ks:ke)
    endif
 
-   do j=js,je+1
    do k=ks,ke
+   do j=js,je+1
       do i=is,ie+1
          u_cgrid(i,j,k)=0.5*(xa%u(i-1,j  ,k)+xa%u(i,j,k))
          v_cgrid(i,j,k)=0.5*(xa%v(i  ,j-1,k)+xa%v(i,j,k))
@@ -297,39 +302,6 @@ SUBROUTINE DA_Transfer_XatoWRF( xbx, grid, &
       v_cgrid(ie+1,js:je+1,ks:ke)=0.0
    endif
 !---------------------------------------------------------------------------
-
-#else
-
-!--The eastern boundary
-   xa%u(ie+1,js:je,ks:ke)=2.0*xa%u(ie  ,js:je,ks:ke) &
-                         -    xa%u(ie-1,js:je,ks:ke)
-
-!--The northern boundary
-   xa%v(is:ie,je+1,ks:ke)=2.0*xa%v(is:ie,je  ,ks:ke) &
-                         -    xa%v(is:ie,je-1,ks:ke)
-
-   do k=ks,ke
-      do j=js,je
-      do i=is+1,ie+1
-         u_cgrid(i,j,k)=0.5*(xa%u(i-1,j,k)+xa%u(i,j,k))
-      enddo
-      enddo
-
-      do j=js+1,je+1
-      do i=is,ie
-         v_cgrid(i,j,k)=0.5*(xa%v(i,j-1,k)+xa%v(i,j,k))
-      enddo
-      enddo
-   enddo
-
-!--The western boundary
-   u_cgrid(is,js:je,ks:ke)=2.0*xa%u(is  ,js:je,ks:ke) &
-                          - u_cgrid(is+1,js:je,ks:ke)
-
-!--The southern boundary
-   v_cgrid(is:ie,js,ks:ke)=2.0*xa%v(is:ie,js  ,ks:ke) &
-                          - v_cgrid(is:ie,js+1,ks:ke)
-#endif
 
 !------------------------------------------------------------------------------
 !  [5.0] ADD INCREMENT TO THE ORIGINAL GUESS AND UPDATE "grid"

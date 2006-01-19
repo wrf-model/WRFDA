@@ -519,6 +519,15 @@ CONTAINS
       wrf_dm_sum_real = retval
    END FUNCTION wrf_dm_sum_real
 
+   SUBROUTINE wrf_dm_sum_reals ( inval, retval )
+      IMPLICIT NONE
+      INCLUDE 'mpif.h'
+      REAL, INTENT(IN   ) :: inval(:)
+      REAL, INTENT(  OUT) :: retval(:)
+      INTEGER ierr
+      CALL mpi_allreduce ( inval, retval , SIZE(inval), MPI_REAL, MPI_SUM, mpi_comm_local, ierr )
+   END SUBROUTINE wrf_dm_sum_reals
+
    INTEGER FUNCTION wrf_dm_sum_integer ( inval )
       IMPLICIT NONE
       INCLUDE 'mpif.h'
@@ -527,6 +536,15 @@ CONTAINS
       CALL mpi_allreduce ( inval, retval , 1, MPI_INTEGER, MPI_SUM, local_communicator, ierr )
       wrf_dm_sum_integer = retval
    END FUNCTION wrf_dm_sum_integer
+
+   SUBROUTINE wrf_dm_sum_integers ( inval, retval )
+      IMPLICIT NONE
+      INCLUDE 'mpif.h'
+      INTEGER, INTENT(IN   ) :: inval(:)
+      INTEGER, INTENT(  OUT) :: retval(:)
+      INTEGER ierr
+      CALL mpi_allreduce ( inval, retval , SIZE(inval), MPI_INTEGER, MPI_SUM, mpi_comm_local, ierr )
+   END SUBROUTINE wrf_dm_sum_integers
 
    SUBROUTINE wrf_dm_maxval_real ( val, idex, jdex )
       IMPLICIT NONE

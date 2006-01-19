@@ -332,24 +332,8 @@ CONTAINS
       integer dim
       if (      dim == 3 ) then
         CALL rsl_build_message(msg_z,TRUE_RSL_REAL_F90,fld_z,dim,decomp(1),glen(1),llen(1))
-#ifdef D3VAR_IRY_KLUDGE
-!
-! The transpose utility was developed in rsl originally with MM5 3DVAR in mind, and the way
-! the implementers worked around the I->Y issue was by calling I->X in the Registry but then
-! calling the other (Z2Y) transpose throughout the code to effect the correct orientation.
-! The result is that although it's basically wrong here for codes that actually are I->X,
-! we cannot fix it without breaking 3DVAR. Hence the KLUDGE to keep it the old wrong way
-! for 3DVAR and fix it for everyone else. There was already a D3VAR_KLUDGE needed in the
-! registry anyway, to make sure the WRF I/O API gets called properly -- again, to manage
-! this MM5 assumption that was hidden in the 3DVAR code -- so we can make use of that here.
-! This needs to be revisited once the I->Y assumption is purged from 3DVAR. JM 20020910
-!
-        CALL rsl_build_message(msg_x,TRUE_RSL_REAL_F90,fld_x,dim,decomp(1),glen(1),llen_tx(1))
-        CALL rsl_build_message(msg_y,TRUE_RSL_REAL_F90,fld_y,dim,decomp(1),glen(1),llen_ty(1))
-#else
         CALL rsl_build_message(msg_y,TRUE_RSL_REAL_F90,fld_x,dim,decomp(1),glen(1),llen_tx(1))  ! msg_y->msg_x 20020908
         CALL rsl_build_message(msg_x,TRUE_RSL_REAL_F90,fld_y,dim,decomp(1),glen(1),llen_ty(1))  ! msg_x->msg_y 20020908
-#endif
       endif
    END SUBROUTINE add_msg_xpose_real
 
@@ -360,13 +344,8 @@ CONTAINS
       integer dim
       if (      dim == 3 ) then
         CALL rsl_build_message(msg_z,RSL_DOUBLE_F90,fld_z,dim,decomp(1),glen(1),llen(1))
-#ifdef D3VAR_IRY_KLUDGE
-        CALL rsl_build_message(msg_x,RSL_DOUBLE_F90,fld_x,dim,decomp(1),glen(1),llen_tx(1))
-        CALL rsl_build_message(msg_y,RSL_DOUBLE_F90,fld_y,dim,decomp(1),glen(1),llen_ty(1))
-#else
         CALL rsl_build_message(msg_y,RSL_DOUBLE_F90,fld_x,dim,decomp(1),glen(1),llen_tx(1))  ! msg_y->msg_x 20020908
         CALL rsl_build_message(msg_x,RSL_DOUBLE_F90,fld_y,dim,decomp(1),glen(1),llen_ty(1))  ! msg_x->msg_y 20020908
-#endif
       endif
    END SUBROUTINE add_msg_xpose_doubleprecision
 #endif
@@ -378,13 +357,8 @@ CONTAINS
       integer dim
       if (      dim == 3 ) then
         CALL rsl_build_message(msg_z,RSL_INTEGER_F90,fld_z,dim,decomp(1),glen(1),llen(1))
-#ifdef D3VAR_IRY_KLUDGE
-        CALL rsl_build_message(msg_x,RSL_INTEGER_F90,fld_x,dim,decomp(1),glen(1),llen_tx(1))
-        CALL rsl_build_message(msg_y,RSL_INTEGER_F90,fld_y,dim,decomp(1),glen(1),llen_ty(1))
-#else
         CALL rsl_build_message(msg_y,RSL_INTEGER_F90,fld_x,dim,decomp(1),glen(1),llen_tx(1))  ! msg_y->msg_x 20020908
         CALL rsl_build_message(msg_x,RSL_INTEGER_F90,fld_y,dim,decomp(1),glen(1),llen_ty(1))  ! msg_x->msg_y 20020908
-#endif
       endif
    END SUBROUTINE add_msg_xpose_integer
 
@@ -2444,14 +2418,8 @@ messages(120)=  s5e5
 #endif
                                   idim   ,  jdim   ,  kdim   ,     &
                                   mloc   ,  nloc   ,  zloc   ,     &
-#ifdef D3VAR_IRY_KLUDGE
-! see comment above, 20020910 JM
-                                  mloc_x ,  nloc_x ,  zloc_x ,     &
-                                  mloc_y ,  nloc_y ,  zloc_y       )
-#else
                                   mloc_y ,  nloc_y ,  zloc_y ,     &   ! x->y 20020908
                                   mloc_x ,  nloc_x ,  zloc_x       )   ! y->x 20020908
-#endif
          CALL show_domain_decomp(domdesc)
          ! this computes the dimension information for the
          ! nest and passes these back
@@ -2496,14 +2464,8 @@ messages(120)=  s5e5
 #endif
                                   idim   ,  jdim   ,  kdim   ,     &
                                   mloc   ,  nloc   ,  zloc   ,     &
-#  ifdef D3VAR_IRY_KLUDGE
-! see comment above, 20020910 JM
-                                  mloc_x ,  nloc_x ,  zloc_x ,     &
-                                  mloc_y ,  nloc_y ,  zloc_y       )
-#  else
                                   mloc_y ,  nloc_y ,  zloc_y ,     &     ! x->y 20020910
                                   mloc_x ,  nloc_x ,  zloc_x       )     ! y->x 20020910
-#  endif
          CALL show_domain_decomp(domdesc)
          ! this computes the dimension information for the
          ! nest and passes these back
@@ -2813,11 +2775,7 @@ messages(120)=  s5e5
            sm1 = sp1
            em1 = sm1 + zloc - 1
 
-#ifdef D3VAR_IRY_KLUDGE
-           CALL rsl_reg_patchinfo_mz ( domdesc ,                       &
-#else
            CALL rsl_reg_patchinfo_nz ( domdesc ,                       &                    ! switched m->n 20020910
-#endif
                        sp2x , ep2x , sp3x , ep3x ,  sp1x , ep1x  )
            sp1x = sp1x - ( 1 - sd1 ) ; ep1x = ep1x - ( 1 - sd1 )   ! adjust if domain start not 1
            sp2x = sp2x - ( 1 - sd2 ) ; ep2x = ep2x - ( 1 - sd2 )
@@ -2829,11 +2787,7 @@ messages(120)=  s5e5
            sm1x = sp1x
            em1x = sm1x + zloc_x - 1
 
-#ifdef D3VAR_IRY_KLUDGE
-           CALL rsl_reg_patchinfo_nz ( domdesc ,                       &
-#else
            CALL rsl_reg_patchinfo_mz ( domdesc ,                       &                    ! switched n->m 20020910
-#endif
                        sp2y , ep2y , sp3y , ep3y ,  sp1y , ep1y  )
            sp1y = sp1y - ( 1 - sd1 ) ; ep1y = ep1y - ( 1 - sd1 )   ! adjust if domain start not 1
            sp2y = sp2y - ( 1 - sd2 ) ; ep2y = ep2y - ( 1 - sd2 )
@@ -2861,11 +2815,7 @@ messages(120)=  s5e5
            sm2 = sp2
            em2 = sm2 + zloc - 1
 
-#ifdef D3VAR_IRY_KLUDGE
-           CALL rsl_reg_patchinfo_mz ( domdesc ,                       &
-#else
            CALL rsl_reg_patchinfo_nz ( domdesc ,                       &   ! switched m->n 20020908
-#endif
                        sp1x , ep1x , sp3x , ep3x ,  sp2x , ep2x  )
            sp1x = sp1x - ( 1 - sd1 ) ; ep1x = ep1x - ( 1 - sd1 )   ! adjust if domain start not 1
            sp2x = sp2x - ( 1 - sd2 ) ; ep2x = ep2x - ( 1 - sd2 )
@@ -2877,11 +2827,7 @@ messages(120)=  s5e5
            sm2x = sp2x
            em2x = sm2x + zloc_x - 1
 
-#ifdef D3VAR_IRY_KLUDGE
-           CALL rsl_reg_patchinfo_nz ( domdesc ,                       &
-#else
            CALL rsl_reg_patchinfo_mz ( domdesc ,                       &   ! switched n->m 20020908
-#endif
                        sp1y , ep1y , sp3y , ep3y ,  sp2y , ep2y  )
            sp1y = sp1y - ( 1 - sd1 ) ; ep1y = ep1y - ( 1 - sd1 )   ! adjust if domain start not 1
            sp2y = sp2y - ( 1 - sd2 ) ; ep2y = ep2y - ( 1 - sd2 )
@@ -2907,11 +2853,7 @@ messages(120)=  s5e5
            sm3 = sp3
            em3 = sm3 + zloc - 1
 
-#ifdef D3VAR_IRY_KLUDGE
-           CALL rsl_reg_patchinfo_mz ( domdesc ,                       &
-#else
            CALL rsl_reg_patchinfo_nz ( domdesc ,                       &     ! switched m->n 20020910
-#endif
                        sp1x , ep1x , sp2x , ep2x ,  sp3x , ep3x  )
            sp1x = sp1x - ( 1 - sd1 ) ; ep1x = ep1x - ( 1 - sd1 )   ! adjust if domain start not 1
            sp2x = sp2x - ( 1 - sd2 ) ; ep2x = ep2x - ( 1 - sd2 )
@@ -2923,11 +2865,7 @@ messages(120)=  s5e5
            sm3x = sp3x
            em3x = sm3x + zloc_x - 1
 
-#ifdef D3VAR_IRY_KLUDGE
-           CALL rsl_reg_patchinfo_nz ( domdesc ,                       &
-#else
            CALL rsl_reg_patchinfo_mz ( domdesc ,                       &     ! switched n->m 20020910
-#endif
                        sp1y , ep1y , sp2y , ep2y ,  sp3y , ep3y  )
            sp1y = sp1y - ( 1 - sd1 ) ; ep1y = ep1y - ( 1 - sd1 )   ! adjust if domain start not 1
            sp2y = sp2y - ( 1 - sd2 ) ; ep2y = ep2y - ( 1 - sd2 )
@@ -2954,11 +2892,7 @@ messages(120)=  s5e5
            sm3 = sp3
            em3 = sm3 + zloc - 1
 
-#ifdef D3VAR_IRY_KLUDGE
-           CALL rsl_reg_patchinfo_mz ( domdesc ,                       &
-#else
            CALL rsl_reg_patchinfo_nz ( domdesc ,                       &     ! switched n->m 20020910
-#endif
                        sp2x , ep2x , sp1x , ep1x ,  sp3x , ep3x  )
            sp1x = sp1x - ( 1 - sd1 ) ; ep1x = ep1x - ( 1 - sd1 )   ! adjust if domain start not 1
            sp2x = sp2x - ( 1 - sd2 ) ; ep2x = ep2x - ( 1 - sd2 )
@@ -2970,11 +2904,7 @@ messages(120)=  s5e5
            sm3x = sp3x
            em3x = sm3x + zloc_x - 1
 
-#ifdef D3VAR_IRY_KLUDGE
-           CALL rsl_reg_patchinfo_nz ( domdesc ,                       &
-#else
            CALL rsl_reg_patchinfo_mz ( domdesc ,                       &     ! switched m->n 20020910
-#endif
                        sp2y , ep2y , sp1y , ep1y ,  sp3y , ep3y  )
            sp1y = sp1y - ( 1 - sd1 ) ; ep1y = ep1y - ( 1 - sd1 )   ! adjust if domain start not 1
            sp2y = sp2y - ( 1 - sd2 ) ; ep2y = ep2y - ( 1 - sd2 )
@@ -3035,6 +2965,25 @@ messages(120)=  s5e5
       CALL set_def_decomp_fcn ( rsl_patch_decomp )
    END SUBROUTINE init_module_dm
 
+! internal, used below for switching the argument to MPI calls
+! if reals are being autopromoted to doubles in the build of WRF
+   INTEGER function getrealmpitype()
+#ifndef STUBMPI
+      IMPLICIT NONE
+      INCLUDE 'mpif.h'
+      INTEGER rtypesize, dtypesize, ierr
+      CALL mpi_type_size ( MPI_REAL, rtypesize, ierr )
+      CALL mpi_type_size ( MPI_DOUBLE_PRECISION, dtypesize, ierr )
+      IF ( RWORDSIZE .EQ. rtypesize ) THEN
+        getrealmpitype = MPI_REAL
+      ELSE IF ( RWORDSIZE .EQ. dtypesize ) THEN
+        getrealmpitype = MPI_DOUBLE_PRECISION
+      ELSE
+        CALL wrf_error_fatal ( 'RWORDSIZE or DWORDSIZE does not match any MPI type' )
+      ENDIF
+#endif
+      RETURN
+   END FUNCTION getrealmpitype
 
    REAL FUNCTION wrf_dm_max_real ( inval )
       IMPLICIT NONE
@@ -3047,7 +2996,7 @@ messages(120)=  s5e5
 ! </DESCRIPTION>
 #ifndef STUBMPI
       INCLUDE 'mpif.h'
-      CALL mpi_allreduce ( inval, retval , 1, MPI_REAL, MPI_MAX, mpi_comm_local, ierr )
+      CALL mpi_allreduce ( inval, retval , 1, getrealmpitype() , MPI_MAX, mpi_comm_local, ierr )
       wrf_dm_max_real = retval
 #else
       wrf_dm_max_real = inval
@@ -3057,6 +3006,7 @@ messages(120)=  s5e5
    REAL FUNCTION wrf_dm_min_real ( inval )
       IMPLICIT NONE
       REAL inval, retval
+      INTEGER typesize, op
       INTEGER ierr
 ! <DESCRIPTION>
 ! Collective operation. Each processor calls passing a local value; on return
@@ -3065,7 +3015,7 @@ messages(120)=  s5e5
 ! </DESCRIPTION>
 #ifndef STUBMPI
       INCLUDE 'mpif.h'
-      CALL mpi_allreduce ( inval, retval , 1, MPI_REAL, MPI_MIN, mpi_comm_local, ierr )
+      CALL mpi_allreduce ( inval, retval , 1, getrealmpitype() , MPI_MIN, mpi_comm_local, ierr )
       wrf_dm_min_real = retval
 #else
       wrf_dm_min_real = inval
@@ -3075,6 +3025,7 @@ messages(120)=  s5e5
    REAL FUNCTION wrf_dm_sum_real ( inval )
       IMPLICIT NONE
       INTEGER ierr
+      INTEGER typesize, op
       REAL inval, retval
 ! <DESCRIPTION>
 ! Collective operation. Each processor calls passing a local value; on return
@@ -3083,12 +3034,31 @@ messages(120)=  s5e5
 ! </DESCRIPTION>
 #ifndef STUBMPI
       INCLUDE 'mpif.h'
-      CALL mpi_allreduce ( inval, retval , 1, MPI_REAL, MPI_SUM, mpi_comm_local, ierr )
+      CALL mpi_allreduce ( inval, retval , 1, getrealmpitype() , MPI_SUM, mpi_comm_local, ierr )
       wrf_dm_sum_real = retval
 #else
       wrf_dm_sum_real = inval
 #endif
    END FUNCTION wrf_dm_sum_real
+
+   SUBROUTINE wrf_dm_sum_reals ( inval, retval )
+      IMPLICIT NONE
+      INTEGER ierr
+      REAL, INTENT(IN   ) :: inval(:)
+      REAL, INTENT(  OUT) :: retval(:)
+! <DESCRIPTION>
+! Array version.  
+! Collective operation. Each processor calls passing a local value; on return
+! all processors are passed back the sum of all values passed.
+!
+! </DESCRIPTION>
+#ifndef STUBMPI
+      INCLUDE 'mpif.h'
+      CALL mpi_allreduce ( inval, retval , SIZE(inval), getrealmpitype() , MPI_SUM, mpi_comm_local, ierr )
+#else
+      retval = inval
+#endif
+   END SUBROUTINE wrf_dm_sum_reals
 
    INTEGER FUNCTION wrf_dm_sum_integer ( inval )
       IMPLICIT NONE
@@ -3106,6 +3076,25 @@ messages(120)=  s5e5
       wrf_dm_sum_integer = inval
 #endif
    END FUNCTION wrf_dm_sum_integer
+
+   SUBROUTINE wrf_dm_sum_integers ( inval, retval )
+      IMPLICIT NONE
+      INTEGER ierr
+      INTEGER, INTENT(IN   ) :: inval(:)
+      INTEGER, INTENT(  OUT) :: retval(:)
+! <DESCRIPTION>
+! Array version.  
+! Collective operation. Each processor calls passing a local value; on return
+! all processors are passed back the sum of all values passed.
+!
+! </DESCRIPTION>
+#ifndef STUBMPI
+      INCLUDE 'mpif.h'
+      CALL mpi_allreduce ( inval, retval , SIZE(inval), MPI_INTEGER, MPI_SUM, mpi_comm_local, ierr )
+#else
+      retval = inval
+#endif
+   END SUBROUTINE wrf_dm_sum_integers
 
 
    SUBROUTINE wrf_dm_maxval_real ( val, idex, jdex )
@@ -3126,7 +3115,7 @@ messages(120)=  s5e5
       CALL wrf_get_dm_communicator ( comm )
       dex(1) = idex ; dex(2) = jdex
       CALL mpi_allgather ( dex, 2, MPI_INTEGER, dex_all , 2, MPI_INTEGER, comm, ierr )
-      CALL mpi_allgather ( val, 1, MPI_REAL, val_all , 1, MPI_REAL, comm, ierr )
+      CALL mpi_allgather ( val, 1, getrealmpitype(), val_all , 1, getrealmpitype(), comm, ierr )
       val = val_all(1)
       idex = dex_all(1,1) ; jdex = dex_all(2,1)
       DO i = 2, rsl_nproc
@@ -3157,7 +3146,7 @@ messages(120)=  s5e5
       CALL wrf_get_dm_communicator ( comm )
       dex(1) = idex ; dex(2) = jdex
       CALL mpi_allgather ( dex, 2, MPI_INTEGER, dex_all , 2, MPI_INTEGER, comm, ierr )
-      CALL mpi_allgather ( val, 1, MPI_REAL, val_all , 1, MPI_REAL, comm, ierr )
+      CALL mpi_allgather ( val, 1, getrealmpitype(), val_all , 1, getrealmpitype(), comm, ierr )
       val = val_all(1)
       idex = dex_all(1,1) ; jdex = dex_all(2,1)
       DO i = 2, rsl_nproc
@@ -3534,11 +3523,7 @@ SUBROUTINE wrf_dm_xpose_z2y ( domdesc , comms , xpose_id )
    USE module_dm
    IMPLICIT NONE
    INTEGER domdesc , comms(*) , xpose_id
-#ifdef D3VAR_IRY_KLUDGE
-   CALL rsl_xpose_mn_nz ( domdesc , comms( xpose_id ) )
-#else
    CALL rsl_xpose_mn_mz ( domdesc , comms( xpose_id ) )      ! switched nz->mz 20020910
-#endif
    RETURN
 END SUBROUTINE wrf_dm_xpose_z2y
 
@@ -3546,11 +3531,7 @@ SUBROUTINE wrf_dm_xpose_y2z ( domdesc , comms , xpose_id )
    USE module_dm
    IMPLICIT NONE
    INTEGER domdesc , comms(*) , xpose_id
-#ifdef D3VAR_IRY_KLUDGE
-   CALL rsl_xpose_nz_mn ( domdesc , comms( xpose_id ) )
-#else
    CALL rsl_xpose_mz_mn ( domdesc , comms( xpose_id ) )      ! switched nz->mz 20020910
-#endif
    RETURN
 END SUBROUTINE wrf_dm_xpose_y2z
 
@@ -3558,11 +3539,7 @@ SUBROUTINE wrf_dm_xpose_y2x ( domdesc , comms , xpose_id )
    USE module_dm
    IMPLICIT NONE
    INTEGER domdesc , comms(*) , xpose_id
-#ifdef D3VAR_IRY_KLUDGE
-   CALL rsl_xpose_nz_mz ( domdesc , comms( xpose_id ) )
-#else
    CALL rsl_xpose_mz_nz ( domdesc , comms( xpose_id ) )      ! switched nz<->mz 20020910
-#endif
    RETURN
 END SUBROUTINE wrf_dm_xpose_y2x
 
@@ -3570,11 +3547,7 @@ SUBROUTINE wrf_dm_xpose_x2y ( domdesc , comms , xpose_id )
    USE module_dm
    IMPLICIT NONE
    INTEGER domdesc , comms(*) , xpose_id
-#ifdef D3VAR_IRY_KLUDGE
-   CALL rsl_xpose_mz_nz ( domdesc , comms( xpose_id ) )
-#else
    CALL rsl_xpose_nz_mz ( domdesc , comms( xpose_id ) )      ! switched nz<->mz 20020910
-#endif
    RETURN
 END SUBROUTINE wrf_dm_xpose_x2y
 
@@ -3582,11 +3555,7 @@ SUBROUTINE wrf_dm_xpose_x2z ( domdesc , comms , xpose_id )
    USE module_dm
    IMPLICIT NONE
    INTEGER domdesc , comms(*) , xpose_id
-#ifdef D3VAR_IRY_KLUDGE
-   CALL rsl_xpose_mz_mn ( domdesc , comms( xpose_id ) )
-#else
    CALL rsl_xpose_nz_mn ( domdesc , comms( xpose_id ) )      ! switched mz->nz 20020910
-#endif
    RETURN
 END SUBROUTINE wrf_dm_xpose_x2z
 
@@ -3594,11 +3563,7 @@ SUBROUTINE wrf_dm_xpose_z2x ( domdesc , comms , xpose_id )
    USE module_dm
    IMPLICIT NONE
    INTEGER domdesc , comms(*) , xpose_id
-#ifdef D3VAR_IRY_KLUDGE
-   CALL rsl_xpose_mn_mz ( domdesc , comms( xpose_id ) )
-#else
    CALL rsl_xpose_mn_nz ( domdesc , comms( xpose_id ) )      ! switched mz->nz 20020910
-#endif
    RETURN
 END SUBROUTINE wrf_dm_xpose_z2x
 
@@ -3942,17 +3907,10 @@ END
            IF ( .NOT. has_char( stagger, 'y' ) ) DE2 = DE2+1
            IF ( .NOT. has_char( stagger, 'z' ) ) DE3 = DE3+1
          CASE ( 'yxz','yx' )
-#ifndef D3VAR_IRY_KLUDGE
            ord = io3d_jik_internal ; ord2d = io2d_ji_internal
            IF ( .NOT. has_char( stagger, 'x' ) ) DE2 = DE2+1
            IF ( .NOT. has_char( stagger, 'y' ) ) DE1 = DE1+1
            IF ( .NOT. has_char( stagger, 'z' ) ) DE3 = DE3+1
-#else
-           ord = io3d_ijk_internal ; ord2d = io2d_ij_internal
-           IF ( .NOT. has_char( stagger, 'x' ) ) DE2 = DE2+1
-           IF ( .NOT. has_char( stagger, 'y' ) ) DE1 = DE1+1
-           IF ( .NOT. has_char( stagger, 'z' ) ) DE3 = DE3+1
-#endif
          CASE ( 'zxy' )
            IF ( .NOT. has_char( stagger, 'x' ) ) DE2 = DE2+1
            IF ( .NOT. has_char( stagger, 'y' ) ) DE3 = DE3+1
@@ -4143,17 +4101,10 @@ END
            IF ( .NOT. has_char( stagger, 'y' ) ) DE2 = DE2+1
            IF ( .NOT. has_char( stagger, 'z' ) ) DE3 = DE3+1
          CASE ( 'yxz','yx' )
-#ifndef D3VAR_IRY_KLUDGE
            ord = io3d_jik_internal ; ord2d = io2d_ji_internal
            IF ( .NOT. has_char( stagger, 'x' ) ) DE2 = DE2+1
            IF ( .NOT. has_char( stagger, 'y' ) ) DE1 = DE1+1
            IF ( .NOT. has_char( stagger, 'z' ) ) DE3 = DE3+1
-#else
-           ord = io3d_ijk_internal ; ord2d = io2d_ij_internal
-           IF ( .NOT. has_char( stagger, 'x' ) ) DE2 = DE2+1
-           IF ( .NOT. has_char( stagger, 'y' ) ) DE1 = DE1+1
-           IF ( .NOT. has_char( stagger, 'z' ) ) DE3 = DE3+1
-#endif
          CASE ( 'zxy' )
            ord = io3d_kij_internal ; ord2d = io2d_ij_internal
            IF ( .NOT. has_char( stagger, 'x' ) ) DE2 = DE2+1
@@ -4287,9 +4238,11 @@ END
       INTEGER       ::          nids, nide, njds, njde, nkds, nkde,    &
                                 nims, nime, njms, njme, nkms, nkme,    &
                                 nips, nipe, njps, njpe, nkps, nkpe
+
 #define COPY_IN
 #include <em_scalar_derefs.inc>
 !
+
       CALL get_ijk_from_grid (  grid ,                   &
                                 cids, cide, cjds, cjde, ckds, ckde,    &
                                 cims, cime, cjms, cjme, ckms, ckme,    &
@@ -4601,6 +4554,7 @@ END
                                 root                        , &    ! root
                                 communicator                , &    ! communicator
                                 ierr )
+   USE module_dm
    IMPLICIT NONE
    INCLUDE 'mpif.h'
    INTEGER field_ofst, glob_ofst
@@ -4610,11 +4564,11 @@ END
 
            CALL mpi_gatherv( Field( field_ofst ),      &    ! sendbuf
                             my_count ,                       &    ! sendcount
-                            MPI_REAL         ,               &    ! sendtype
+                            getrealmpitype()         ,               &    ! sendtype
                             globbuf( glob_ofst ) ,                 &    ! recvbuf
                             counts                         , &    ! recvcounts
                             displs                         , &    ! displs
-                            MPI_REAL                       , &    ! recvtype
+                            getrealmpitype()                       , &    ! recvtype
                             root                           , &    ! root
                             communicator                   , &    ! communicator
                             ierr )
@@ -4629,6 +4583,7 @@ END
                                 root                        , &    ! root
                                 communicator                , &    ! communicator
                                 ierr )
+   USE module_dm
    IMPLICIT NONE
    INCLUDE 'mpif.h'
    INTEGER field_ofst, glob_ofst
@@ -4657,6 +4612,7 @@ END
                                 root                        , &    ! root
                                 communicator                , &    ! communicator
                                 ierr )
+   USE module_dm
    IMPLICIT NONE
    INCLUDE 'mpif.h'
    INTEGER field_ofst, glob_ofst
@@ -4670,7 +4626,7 @@ END
                             globbuf( glob_ofst ) ,                 &    ! recvbuf
                             counts                         , &    ! recvcounts
                             displs                         , &    ! displs
-                            MPI_REAL                       , &    ! recvtype
+                            MPI_DOUBLE_PRECISION                      , &    ! recvtype
                             root                           , &    ! root
                             communicator                   , &    ! communicator
                             ierr )

@@ -36,15 +36,7 @@ module DA_Test
 
    implicit none
    
-#ifdef DM_PARALLEL
    LOGICAL, EXTERNAL :: wrf_dm_on_monitor
-#endif
-
-#if ( DWORDSIZE != RWORDSIZE )
-#define TRUE_MPI_REAL     MPI_REAL
-#else
-#define TRUE_MPI_REAL     MPI_REAL8
-#endif
 
 contains
 

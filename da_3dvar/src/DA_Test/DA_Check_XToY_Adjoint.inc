@@ -28,10 +28,6 @@ SUBROUTINE DA_Check_XToY_Adjoint( xb, xa, iv, xp, y, &
 
 !-------------------------------------------------------------------------
 
-   integer                        :: ierror        ! MPI error code.
-
-!-------------------------------------------------------------------------
-
    REAL                           :: adj_ttl_lhs   ! < y, y >
    REAL                           :: adj_ttl_rhs   ! < x, x_adj >
 
@@ -278,22 +274,12 @@ SUBROUTINE DA_Check_XToY_Adjoint( xb, xa, iv, xp, y, &
         ' Tile < y, y     > = ', pertile_lhs, &
         ' Tile < x, x_adj > = ', pertile_rhs
 
-#ifdef DM_PARALLEL
-   call MPI_ALLREDUCE( partial_lhs, adj_ttl_lhs, 1, TRUE_MPI_REAL, MPI_SUM, &
-                       MPI_COMM_WORLD, IERROR )
-
-   call MPI_ALLREDUCE( partial_rhs, adj_ttl_rhs, 1, TRUE_MPI_REAL, MPI_SUM, &
-                       MPI_COMM_WORLD, IERROR )
+   adj_ttl_lhs = wrf_dm_sum_real( partial_lhs )
+   adj_ttl_rhs = wrf_dm_sum_real( partial_rhs )
    
    IF ( wrf_dm_on_monitor() ) THEN
       write(unit=*, fmt='(A,1pe22.14)') ' Whole Domain < y, y     > = ', adj_ttl_lhs
       write(unit=*, fmt='(A,1pe22.14)') ' Whole Domain < x, x_adj > = ', adj_ttl_rhs
    ENDIF
-#else
-   adj_ttl_lhs = partial_lhs
-   adj_ttl_rhs = partial_rhs
-   write(unit=*, fmt='(A,1pe22.14)') ' Whole Domain < y, y     > = ', adj_ttl_lhs
-   write(unit=*, fmt='(A,1pe22.14)') ' Whole Domain < x, x_adj > = ', adj_ttl_rhs
-#endif
    
 END SUBROUTINE DA_Check_XToY_Adjoint

@@ -79,7 +79,9 @@
 !  [1.0] Fill 1D cv array from 3-dimensional vv arrays.
 !-------------------------------------------------------------------------
 
-   call vv_to_cv( vv, xp, be, cv_size, cv )
+   call vv_to_cv( vv, xp, &
+                  (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz /), &
+                  cv_size, cv )
 
 END subroutine DA_Transform_VToVv_Adj
 

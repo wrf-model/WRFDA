@@ -38,7 +38,7 @@ SUBROUTINE DA_Transfer_KMAToXb( xbx, grid, &
 
    real, dimension(xp%jds:xp%jde) :: loc_latc_mean
 
-   integer :: ierror
+   REAL, ALLOCATABLE :: arrayglobal(:,:)
 
 !---------------------------------------------------------------------------
 
@@ -263,19 +263,13 @@ SUBROUTINE DA_Transfer_KMAToXb( xbx, grid, &
 
   tmp_ps  = sum(xb%psfc(is:ie,js:je)) /real((xp%ide-xp%ids+1)*(xp%jde-xp%jds+1))
 
-#ifdef DM_PARALLEL
-   call MPI_ALLREDUCE(tmp_ps,tmpps,1, MPI_REAL8, MPI_SUM, MPI_COMM_WORLD, IERROR )
-#else
-   tmpps = tmp_ps                    
-#endif
+  tmpps = wrf_dm_sum_real( tmp_ps )
+PRINT *,'TEST_COVERAGE_da_transfer_kmatoxb_A:  tmpps = ', tmpps
 
  do k=ks,ke
   tmp_p  = sum(xb%p(is:ie,js:je,k)) /real((xp%ide-xp%ids+1)*(xp%jde-xp%jds+1))
-#ifdef DM_PARALLEL
-   call MPI_ALLREDUCE(tmp_p,tmpp,1, MPI_REAL8, MPI_SUM, MPI_COMM_WORLD, IERROR )
-#else
-   tmpp = tmp_p                    
-#endif
+  tmpp = wrf_dm_sum_real( tmp_p )
+PRINT *,'TEST_COVERAGE_da_transfer_kmatoxb_B:  tmpp(',k,') = ', tmpp
 
 ! 0.01 is added to see that sigmah should not become negative
   xb%sigmah(ke+ks-k) = (tmpp - ptop+0.01 ) / (tmpps- ptop+0.01 ) 
@@ -531,16 +525,34 @@ SUBROUTINE DA_Transfer_KMAToXb( xbx, grid, &
    tmpvar = 1.0/real(xp%ide-xp%ids+1)
    loc_latc_mean(:) = 0.0
 
-   do j=js,je
-      loc_latc_mean(j) = tmpvar*SUM( xb % lat(is:ie, j) )
-   enddo
-
-#ifdef DM_PARALLEL
-   call MPI_ALLREDUCE( loc_latc_mean, xbx % latc_mean, (xp%jde-xp%jds+1), &
-                       MPI_REAL8, MPI_SUM, MPI_COMM_WORLD, IERROR )
-#else
-   xbx % latc_mean = loc_latc_mean
-#endif
+   ! Bitwise-exact reduction preserves operation order of serial code for
+   ! testing, at the cost of much-increased run-time.  Turn it off when not     
+   ! testing.  This will always be .FALSE. for a serial or 1-process MPI run.  
+   IF ( testing_dm_bitwise_exact ) THEN
+      ALLOCATE( arrayglobal( xp%ids:xp%ide, xp%jds:xp%jde ) )
+      CALL wv_patch_to_global( xb%lat, arrayglobal, xp%domdesc, &
+                               xp%ids, xp%ide, xp%jds, xp%jde,  &
+                               xp%ims, xp%ime, xp%jms, xp%jme,  &
+                               xp%its, xp%ite, xp%jts, xp%jte )
+      do j=xp%jds,xp%jde
+         loc_latc_mean(j) = tmpvar*SUM( arrayglobal(xp%ids:xp%ide, j) )
+      enddo
+      DEALLOCATE( arrayglobal )
+      ! Broadcast result from monitor to other tasks.
+      CALL wrf_dm_bcast_real( loc_latc_mean, (xp%jde-xp%jds+1) )
+      xbx % latc_mean = loc_latc_mean
+   ELSE
+      do j=js,je
+         loc_latc_mean(j) = tmpvar*SUM( xb % lat(is:ie, j) )
+      enddo
+      CALL wrf_dm_sum_reals ( loc_latc_mean, xbx % latc_mean )
+do j=xp%jds,xp%jde
+PRINT *,'TEST_COVERAGE_da_transfer_kmatoxb_C:  xbx%latc_mean(',j,') = ', xbx%latc_mean(j)
+enddo
+   ENDIF
+do j=xp%jds,xp%jde
+PRINT *,'TEST_COVERAGE_da_transfer_kmatoxb_D:  xbx%latc_mean(',j,') = ', xbx%latc_mean(j)
+enddo
 
 END SUBROUTINE DA_Transfer_KMAToXb
 

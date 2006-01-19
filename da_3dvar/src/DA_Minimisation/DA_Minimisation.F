@@ -49,17 +49,9 @@
       INTEGER     :: sm31x , em31x , sm32x , em32x , sm33x , em33x
       INTEGER     :: sm31y , em31y , sm32y , em32y , sm33y , em33y
 
-#ifdef DM_PARALLEL
       LOGICAL, EXTERNAL :: wrf_dm_on_monitor
 
-#if ( DWORDSIZE != RWORDSIZE )
-#define TRUE_MPI_REAL     MPI_REAL
-#else
-#define TRUE_MPI_REAL     MPI_REAL8
-#endif
-#endif
-
-      private :: da_dot
+      private :: da_dot, da_dot_cv
       private :: infoc, brackt, stage1
       private :: dg,dgm,dginit,dgtest,dgx,dgxm,dgy,dgym, &
                  finit,ftest1,fm,fx,fxm,fy,fym,p5,p66,stx,sty, &
@@ -80,6 +72,7 @@
 #include <da_vd05ad.inc>
 #include <da_vd05bd.inc>
 #include <da_dot.inc>
+#include <da_dot_cv.inc>
 #include <da_write_diagnostics.inc>
 #include <DA_Minimise_CG.inc>
 #include <DA_Minimise_QN.inc>

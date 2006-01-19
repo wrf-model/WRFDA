@@ -121,8 +121,11 @@ gen_be_long :	$(OBJS_4_GEN_BE_LONG)
 
 clean:
 #	@ echo 'use the clean script
-	$(RM) *.o *.mod *.f *.stb *.out core *~ mpif.h
+	$(RM) *.o *.mod *.f *.stb *.out core *~ mpif.h par_util/generic_boilerplate.inc
 
+par_util/generic_boilerplate.inc:	par_util/generic_boilerplate.m4
+			$(RM) par_util/generic_boilerplate.inc
+			$(M4) par_util/generic_boilerplate.m4 > par_util/generic_boilerplate.inc
 
 par_util.o:		DA_Define_Structures.o		\
 			DA_Constants.o			\
@@ -144,6 +147,12 @@ par_util.o:		DA_Define_Structures.o		\
 			par_util/unpack_count_obs.inc		\
 			par_util/vv_to_cv.inc			\
 			par_util/wrf_dm_interface.inc		\
+			par_util/cv_to_global.inc		\
+			par_util/generic_typedefs.inc		\
+			par_util/generic_methods.inc		\
+			par_util/specific_methods.inc		\
+			par_util/generic_boilerplate.inc		\
+			par_util/y_facade_to_global.inc		\
 			par_util/par_util.F
 			$(RM) $@
 			$(CPP) -I./par_util $(CPPFLAGS_3DVAR) par_util/par_util.F > par_util.f
@@ -194,6 +203,7 @@ DA_Minimisation.o:	\
 			DA_Minimisation/da_get_var_diagnostics.inc \
 			DA_Minimisation/da_get_innov_vector.inc \
 			DA_Minimisation/da_dot.inc \
+			DA_Minimisation/da_dot_cv.inc \
 			DA_Minimisation/da_lmdir.inc \
 			DA_Minimisation/da_minimisation_warning.inc \
 			DA_Minimisation/da_minimise.inc \
@@ -491,6 +501,7 @@ DA_Synop.o:		\
 			DA_Synop/da_get_innov_vector_synop.inc \
 			DA_Synop/DA_AO_Stats_Synop.inc \
 			DA_Synop/DA_Calculate_Jo_and_GradY_Synop.inc \
+			DA_Synop/compute_jo_synop_uvtq.inc \
 			DA_Synop/DA_Calculate_Residual_Synop.inc \
 			DA_Synop/DA_OI_Stats_Synop.inc \
 			DA_Synop/DA_Print_Stats_Synop.inc \
@@ -509,6 +520,7 @@ DA_Sound.o:		\
 			DA_Tools.o \
 			DA_Sound/DA_AO_Stats_Sound.inc \
 			DA_Sound/DA_Calculate_Jo_and_GradY_Sound.inc \
+			DA_Sound/compute_jo_sound_uvtq.inc \
 			DA_Sound/DA_Calculate_Residual_Sound.inc \
 			DA_Sound/DA_OI_Stats_Sound.inc \
 			DA_Sound/DA_Print_Stats_Sound.inc \
@@ -519,6 +531,7 @@ DA_Sound.o:		\
 			DA_Sound/da_obs_diagnostics.inc	\
 			DA_Sound/DA_Sonde_sfc/DA_AO_Stats_Sonde_sfc.inc \
 			DA_Sound/DA_Sonde_sfc/DA_Get_Jo_and_GradY_Sonde_sfc.inc \
+			DA_Sound/DA_Sonde_sfc/compute_jo_sonde_sfc_uvtq.inc \
 			DA_Sound/DA_Sonde_sfc/DA_Calculate_Residual_Sonde_sfc.inc \
 			DA_Sound/DA_Sonde_sfc/DA_OI_Stats_Sonde_sfc.inc \
 			DA_Sound/DA_Sonde_sfc/DA_Print_Stats_Sonde_sfc.inc \

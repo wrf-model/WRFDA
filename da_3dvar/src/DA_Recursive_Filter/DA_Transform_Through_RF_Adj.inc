@@ -27,7 +27,7 @@ SUBROUTINE DA_Transform_Through_RF_Adj( mz, grid_box_area, rf_alpha, val,&
 
    real, intent(in)    :: grid_box_area(ims:ime,jms:jme) ! From first guess. 
    real, intent(in)    :: rf_alpha(mz)      ! RF scale parameter. 
-   real, intent(in)    :: val(jts:jte,mz)   ! Error standard deviation.
+   real, intent(in)    :: val(jds:jde,mz)   ! Error standard deviation.
    real, intent(inout) :: field(ims:ime,jms:jme,kms:kme) ! Field to be transformed. 
 
    type (xpose_type), intent(inout) :: xp   ! Dimensions and xpose buffers.

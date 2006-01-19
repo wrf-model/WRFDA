@@ -21,7 +21,7 @@ SUBROUTINE DA_GET_ASPoles(x,              &
    integer, intent(in)    :: its, ite, jts, jte, kts, kte
    real, intent(inout)    :: x(ims:ime,jms:jme,kms:kme)   
 !---------------------------------------------------------------------------
-   integer                :: ierror, k
+   integer                :: k
    real                   :: tmpvar,tmps,tmp_s
 !---------------------------------------------------------------------------
    tmpvar      = 1.0/real(ide-ids+1)
@@ -30,11 +30,8 @@ SUBROUTINE DA_GET_ASPoles(x,              &
    tmps =0.0  ; tmp_s =0.0
    if( jts == jds) tmp_s = tmpvar*sum(x(its:ite,jts,k))
 
-#ifdef DM_PARALLEL
-   call MPI_ALLREDUCE(tmp_s,tmps,1, MPI_REAL8, MPI_SUM, MPI_COMM_WORLD, IERROR )
-#else
-   tmps = tmp_s                    
-#endif
+   tmps = wrf_dm_sum_real( tmp_s )
+PRINT *,'TEST_COVERAGE_DA_GET_ASPoles_A:  tmps = ',tmps
    if( jts == jds) then
       x(its:ite,jts+1,k) = x(its:ite,jts+1,k) + tmps
       x(its:ite,jts,k) = 0.0
@@ -43,11 +40,8 @@ SUBROUTINE DA_GET_ASPoles(x,              &
    tmps =0.0  ; tmp_s =0.0
    if( jte == jde) tmp_s = tmpvar*sum(x(its:ite,jte,k))
 
-#ifdef DM_PARALLEL
-   call MPI_ALLREDUCE(tmp_s,tmps,1, MPI_REAL8, MPI_SUM, MPI_COMM_WORLD, IERROR )
-#else
-   tmps = tmp_s                    
-#endif
+   tmps = wrf_dm_sum_real( tmp_s )
+PRINT *,'TEST_COVERAGE_DA_GET_ASPoles_B:  tmps = ',tmps
    if( jte == jde) then
       x(its:ite,jte-1,k) = x(its:ite,jte-1,k) + tmps
       x(its:ite,jte,k) = 0.0

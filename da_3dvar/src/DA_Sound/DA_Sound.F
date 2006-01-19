@@ -45,10 +45,17 @@ MODULE DA_Sound
         TYPE (residual_sonde_sfc1_type)     :: average, rms_err
    END TYPE stats_sonde_sfc_type
 
+#if ( DWORDSIZE != RWORDSIZE )
+#define TRUE_MPI_REAL     MPI_REAL
+#else
+#define TRUE_MPI_REAL     MPI_REAL8
+#endif
+
 CONTAINS
 
 #include "DA_AO_Stats_Sound.inc"
 #include "DA_Calculate_Jo_and_GradY_Sound.inc"
+#include "compute_jo_sound_uvtq.inc"
 #include "DA_Calculate_Residual_Sound.inc"
 #include "DA_OI_Stats_Sound.inc"
 #include "DA_Print_Stats_Sound.inc"
@@ -61,6 +68,7 @@ CONTAINS
 
 #include "DA_Sonde_sfc/DA_AO_Stats_Sonde_sfc.inc"
 #include "DA_Sonde_sfc/DA_Get_Jo_and_GradY_Sonde_sfc.inc"
+#include "DA_Sonde_sfc/compute_jo_sonde_sfc_uvtq.inc"
 #include "DA_Sonde_sfc/DA_Calculate_Residual_Sonde_sfc.inc"
 #include "DA_Sonde_sfc/DA_OI_Stats_Sonde_sfc.inc"
 #include "DA_Sonde_sfc/DA_Print_Stats_Sonde_sfc.inc"

@@ -27,10 +27,17 @@ MODULE DA_Synop
         TYPE (residual_synop1_type)     :: average, rms_err
    END TYPE stats_synop_type
 
+#if ( DWORDSIZE != RWORDSIZE )
+#define TRUE_MPI_REAL     MPI_REAL
+#else
+#define TRUE_MPI_REAL     MPI_REAL8
+#endif
+
 CONTAINS
 
 #include "DA_AO_Stats_Synop.inc"
 #include "DA_Calculate_Jo_and_GradY_Synop.inc"
+#include "compute_jo_synop_uvtq.inc"
 #include "DA_Calculate_Residual_Synop.inc"
 #include "DA_OI_Stats_Synop.inc"
 #include "DA_Print_Stats_Synop.inc"

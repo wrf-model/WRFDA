@@ -118,11 +118,3 @@ SUBROUTINE transpose_x2z ( xp )
 
 END SUBROUTINE transpose_x2z
 
-#ifndef DM_PARALLEL
-SUBROUTINE wrf_dm_halo ( domdesc , comms , stencil_id )
-   IMPLICIT NONE
-   INTEGER domdesc , comms(*) , stencil_id
-   RETURN
-END SUBROUTINE wrf_dm_halo
-#endif
-

@@ -41,7 +41,8 @@ COREDEFS = -DEM_CORE=$(WRF_EM_CORE) \
 #### For wrfvar, always use RWORDSIZE 8
 
 RWORDSIZE	=	8
-WORDSIZE_DEF	=	-DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4
+DWORDSIZE	=	8
+WORDSIZE_DEF	=	-DIWORDSIZE=4 -DDWORDSIZE=$(DWORDSIZE) -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4
 
 #### Single location for defining total number of domains.  You need
 #### at least 1 + 2*(number of total nests).  For example, 1 coarse

@@ -12,10 +12,6 @@ SUBROUTINE DA_Analysis_Stats ( stats_unit, xp, xa )
 
    implicit none
 
-#ifdef DM_PARALLEL
-   INCLUDE 'mpif.h'
-#endif
-
    INTEGER,       INTENT (in)      :: stats_unit    ! Output unit for stats.
    TYPE (xpose_type), INTENT(in)   :: xp            ! Dimensions and xpose buffers.
    TYPE (x_type), INTENT (in)      :: xa            ! gridded analysis increments.
@@ -26,7 +22,6 @@ SUBROUTINE DA_Analysis_Stats ( stats_unit, xp, xa )
    integer                         :: is, ie        ! i range of processor subdomain.
    integer                         :: js, je        ! j range of processor subdomain.
    integer                         :: ks, ke, kdim  ! k range 
-   integer                         :: ierror        ! MPI return code.
 
    REAL                            :: rij, rijk                     ! On local domain.
    REAL                            :: um, vm, tm, pm, qm            ! On local domain.

@@ -39,10 +39,6 @@ SUBROUTINE DA_Check_VvToVp_Adjoint( xb, xbx, xp, be, vp, vv, &
                                                  vv2_v4, vv2_v5
 
 !-------------------------------------------------------------------------
-
-   integer                        :: ierror        ! MPI error code.
-
-!-------------------------------------------------------------------------
 !  [1.0] Initialise:
 !-------------------------------------------------------------------------
 
@@ -129,12 +125,9 @@ SUBROUTINE DA_Check_VvToVp_Adjoint( xb, xbx, xp, be, vp, vv, &
         'Single domain < vp,     vp > = ', adj_par_lhs, &
         'Single domain < Vv_adj, Vv > = ', adj_par_rhs
 
-#ifdef DM_PARALLEL
-   call MPI_ALLREDUCE( adj_par_lhs, adj_sum_lhs, 1, TRUE_MPI_REAL, MPI_SUM, &
-                       MPI_COMM_WORLD, IERROR )
-
-   call MPI_ALLREDUCE( adj_par_rhs, adj_sum_rhs, 1, TRUE_MPI_REAL, MPI_SUM, &
-                       MPI_COMM_WORLD, IERROR )
+   adj_sum_lhs = wrf_dm_sum_real( adj_par_lhs )
+   adj_sum_rhs = wrf_dm_sum_real( adj_par_rhs )
+PRINT *,'TEST_COVERAGE_DA_Check_VvToVp_Adjoint:  adj_sum_lhs,adj_sum_rhs = ', adj_sum_lhs,adj_sum_rhs
 
    IF ( wrf_dm_on_monitor() ) THEN
       write(unit=*, fmt='(/)')
@@ -142,15 +135,6 @@ SUBROUTINE DA_Check_VvToVp_Adjoint( xb, xbx, xp, be, vp, vv, &
            'Whole  Domain: < Vp, Vp >     = ', adj_sum_lhs, &
            'Whole  Domain: < Vv_adj, Vv > = ', adj_sum_rhs
    ENDIF
-#else
-   adj_sum_lhs = adj_par_lhs
-   adj_sum_rhs = adj_par_rhs
-
-   write(unit=*, fmt='(/)')
-   write(unit=*, fmt='(a,1pe22.14)') &
-        'Whole  Domain: < Vp, Vp >     = ', adj_sum_lhs, &
-        'Whole  Domain: < Vv_adj, Vv > = ', adj_sum_rhs
-#endif
       
    vv % v1(its:ite,jts:jte,1:kz_vv(1)) = vv2_v1(its:ite,jts:jte,1:kz_vv(1))
    vv % v2(its:ite,jts:jte,1:kz_vv(2)) = vv2_v2(its:ite,jts:jte,1:kz_vv(2))

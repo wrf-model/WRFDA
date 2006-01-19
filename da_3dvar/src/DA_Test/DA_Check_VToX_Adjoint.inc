@@ -42,10 +42,6 @@ SUBROUTINE DA_Check_VToX_Adjoint( xb, xbx, be, cv1, vv, vp, xp, xa, &
 
 !-------------------------------------------------------------------------
 
-   integer                        :: ierror        ! MPI error code.
-
-!-------------------------------------------------------------------------
-
    write(unit=*, fmt='(/a/)') &
         'DA_Check_VToX_Adjoint: Adjoint Test Results:'
       
@@ -145,16 +141,14 @@ SUBROUTINE DA_Check_VToX_Adjoint( xb, xbx, be, cv1, vv, vp, xp, xa, &
 !  [7.0] Print output:
 !-------------------------------------------------------------------------
 
-#ifdef DM_PARALLEL
-   call MPI_ALLREDUCE( adj_par_lhs, adj_sum_lhs, 1, TRUE_MPI_REAL, MPI_SUM, &
-                       MPI_COMM_WORLD, IERROR )
+   adj_sum_lhs = wrf_dm_sum_real( adj_par_lhs )
 
    if( global ) then
    adj_sum_rhs = adj_par_rhs
    else
-   call MPI_ALLREDUCE( adj_par_rhs, adj_sum_rhs, 1, TRUE_MPI_REAL, MPI_SUM, &
-                       MPI_COMM_WORLD, IERROR )
+   adj_sum_rhs = wrf_dm_sum_real( adj_par_rhs )
    end if
+PRINT *,'TEST_COVERAGE_DA_Check_VToX_Adjoint:  adj_sum_lhs,adj_sum_rhs = ', adj_sum_lhs,adj_sum_rhs
 
    IF ( wrf_dm_on_monitor() ) THEN
    write(unit=*, fmt='(/)')
@@ -162,15 +156,6 @@ SUBROUTINE DA_Check_VToX_Adjoint( xb, xbx, be, cv1, vv, vp, xp, xa, &
         'Whole  Domain: < x, x >     = ', adj_sum_lhs, &
         'Whole  Domain: < v_adj, v > = ', adj_sum_rhs
    ENDIF
-#else
-   adj_sum_lhs = adj_par_lhs
-   adj_sum_rhs = adj_par_rhs
-
-   write(unit=*, fmt='(/)')
-   write(unit=*, fmt='(a,1pe22.14)') &
-        'Whole  Domain: < x, x >     = ', adj_sum_lhs, &
-        'Whole  Domain: < v_adj, v > = ', adj_sum_rhs
-#endif
 
    write(unit=*, fmt='(/a/)') &
         'DA_Check_VToX_Adjoint: Finished'

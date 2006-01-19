@@ -192,6 +192,28 @@ SUBROUTINE da_setup_obs_structures_ascii( xp, ob, iv )
    iv%num_radar  = 0
    iv%num_bogus  = 0
 
+   iv%num_sound_glo=0
+   iv%num_synop_glo=0
+   iv%num_pilot_glo=0
+   iv%num_geoamv_glo=0
+   iv%num_polaramv_glo=0
+   iv%num_satem_glo=0
+   iv%num_airep_glo=0
+   iv%num_metar_glo=0
+   iv%num_ships_glo=0
+   iv%num_gpspw_glo=0
+   iv%num_gpsref_glo=0
+   iv%num_ssmi_retrieval_glo=0
+   iv%num_ssmi_tb_glo=0
+   iv%num_ssmt1_glo=0
+   iv%num_ssmt2_glo=0
+   iv%num_pseudo_glo=0
+   iv%num_qscat_glo=0
+   iv%num_profiler_glo=0
+   iv%num_buoy_glo=0
+   iv%num_Radar_glo=0
+   iv%num_bogus_glo=0
+
 !-----------------------------------------------------------------------------
 
    if(num_fgat_time > 1) then

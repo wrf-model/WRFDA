@@ -332,6 +332,9 @@ MODULE DA_Constants
  logical       :: interpolate_stats
  logical       :: gaussian_lats      
 
+! switch for testing different dm parallel task configurations
+ LOGICAL       :: testing_dm_bitwise_exact
+
 !Namelist variables in future?:
  REAL, PARAMETER :: maximum_rh = 100.0
  REAL, PARAMETER :: minimum_rh =  10.0

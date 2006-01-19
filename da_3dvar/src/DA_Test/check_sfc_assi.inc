@@ -17,10 +17,6 @@ SUBROUTINE check_sfc_assi( xb, xa, iv, xp, y, &
 
 !-------------------------------------------------------------------------
 
-   integer                        :: ierror        ! MPI error code.
-
-!-------------------------------------------------------------------------
-
    REAL                           :: adj_ttl_lhs   ! < y, y >
    REAL                           :: adj_ttl_rhs   ! < x, x_adj >
 
@@ -150,23 +146,13 @@ SUBROUTINE check_sfc_assi( xb, xa, iv, xp, y, &
         ' Tile < y, y     > = ', pertile_lhs, &
         ' Tile < x, x_adj > = ', pertile_rhs
 
-#ifdef DM_PARALLEL
-   call MPI_ALLREDUCE( partial_lhs, adj_ttl_lhs, 1, TRUE_MPI_REAL, MPI_SUM, &
-                       MPI_COMM_WORLD, IERROR )
-
-   call MPI_ALLREDUCE( partial_rhs, adj_ttl_rhs, 1, TRUE_MPI_REAL, MPI_SUM, &
-                       MPI_COMM_WORLD, IERROR )
-   
+   adj_ttl_lhs = wrf_dm_sum_real( partial_lhs )
+   adj_ttl_rhs = wrf_dm_sum_real( partial_rhs )
+PRINT *,'TEST_COVERAGE_check_sfc_assi_A:  adj_ttl_lhs,adj_ttl_rhs = ', adj_ttl_lhs,adj_ttl_rhs
    IF ( wrf_dm_on_monitor() ) THEN
       write(unit=*, fmt='(A,1pe22.14)') ' Whole Domain < y, y     > = ', adj_ttl_lhs
       write(unit=*, fmt='(A,1pe22.14)') ' Whole Domain < x, x_adj > = ', adj_ttl_rhs
    ENDIF
-#else
-   adj_ttl_lhs = partial_lhs
-   adj_ttl_rhs = partial_rhs
-   write(unit=*, fmt='(A,1pe22.14)') ' Whole Domain < y, y     > = ', adj_ttl_lhs
-   write(unit=*, fmt='(A,1pe22.14)') ' Whole Domain < x, x_adj > = ', adj_ttl_rhs
-#endif
 
 !-------------------------------------------------------------------------
 !--recover xa
@@ -206,10 +192,6 @@ SUBROUTINE check_psfc( xb, xa, iv, xp, y, &
    integer, intent(in)               :: ids,ide, jds,jde, kds,kde ! domain dims.
    integer, intent(in)               :: ims,ime, jms,jme, kms,kme ! memory dims.
    integer, intent(in)               :: its,ite, jts,jte, kts,kte ! tile   dims.
-
-!-------------------------------------------------------------------------
-
-   integer                        :: ierror        ! MPI error code.
 
 !-------------------------------------------------------------------------
 
@@ -314,23 +296,13 @@ SUBROUTINE check_psfc( xb, xa, iv, xp, y, &
         ' Tile < y, y     > = ', pertile_lhs, &
         ' Tile < x, x_adj > = ', pertile_rhs
 
-#ifdef DM_PARALLEL
-   call MPI_ALLREDUCE( partial_lhs, adj_ttl_lhs, 1, TRUE_MPI_REAL, MPI_SUM, &
-                       MPI_COMM_WORLD, IERROR )
-
-   call MPI_ALLREDUCE( partial_rhs, adj_ttl_rhs, 1, TRUE_MPI_REAL, MPI_SUM, &
-                       MPI_COMM_WORLD, IERROR )
-   
+   adj_ttl_lhs = wrf_dm_sum_real( partial_lhs )
+   adj_ttl_rhs = wrf_dm_sum_real( partial_rhs )
+PRINT *,'TEST_COVERAGE_check_sfc_assi_B:  adj_ttl_lhs,adj_ttl_rhs = ', adj_ttl_lhs,adj_ttl_rhs
    IF ( wrf_dm_on_monitor() ) THEN
       write(unit=*, fmt='(A,1pe22.14)') ' Whole Domain < y, y     > = ', adj_ttl_lhs
       write(unit=*, fmt='(A,1pe22.14)') ' Whole Domain < x, x_adj > = ', adj_ttl_rhs
    ENDIF
-#else
-   adj_ttl_lhs = partial_lhs
-   adj_ttl_rhs = partial_rhs
-   write(unit=*, fmt='(A,1pe22.14)') ' Whole Domain < y, y     > = ', adj_ttl_lhs
-   write(unit=*, fmt='(A,1pe22.14)') ' Whole Domain < x, x_adj > = ', adj_ttl_rhs
-#endif
 
 !--recover
    xa%psfc(ims:ime, jms:jme) = xa2_psfc(ims:ime, jms:jme)

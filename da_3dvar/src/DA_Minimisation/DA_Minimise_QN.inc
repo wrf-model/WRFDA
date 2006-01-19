@@ -109,7 +109,8 @@ subroutine DA_Minimise_QN( grid, config_flags,               &
 
       llfin = .false.
 
-      j_grad_norm = sqrt( da_dot( j_grad, j_grad, cv_size ) )
+      j_grad_norm = sqrt( da_dot_cv( j_grad, j_grad, cv_size, xp, &
+                      (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz /) ) )
 
       if (j_grad_norm > 1.0e-20) step = 1.0 / j_grad_norm
       j_grad_old = j_grad
@@ -122,7 +123,8 @@ subroutine DA_Minimise_QN( grid, config_flags,               &
 !     print initial cost function and gradient norm:
 
       call da_va15bd( iprint, 0, ifun, cv_size, nsave, cv % array, j % total, &
-                 j_grad, step, eps(it)*cv % j_grad_norm_target, llfin)
+                 j_grad, step, eps(it)*cv % j_grad_norm_target, llfin, &
+                 xp, (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz /) )
 
 !-------------------------------------------------------------------------
 !     [2.0] iteratively solve for minimum of cost function:
@@ -139,7 +141,8 @@ subroutine DA_Minimise_QN( grid, config_flags,               &
 !        call da_lmdir ( step, iter_inner, ipoint, iflag,  &
         call da_lmdir ( step, iter, ipoint, iflag,  &
                       cv_size, j_grad, j_grad_old, &
-                      nsave, zs, zy, zw )
+                      nsave, zs, zy, zw, xp, &
+                      (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz /) )
 
          if (iflag < 0 ) exit              ! minimisation achieved.
 
@@ -158,7 +161,8 @@ subroutine DA_Minimise_QN( grid, config_flags,               &
                call da_vd05ad(cv_size, cv % array, j % total, j_grad,  &
                               zs(ip+1), &
                               step, ftol, gtol, xtol, stpmin,  &
-                              stpmax, maxfev, info, ifev, work)
+                              stpmax, maxfev, info, ifev, work, xp, &
+                              (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz /) )
                xhat = xhat + cv % array
                if ( info == -1 ) then
                   iflag = 1
@@ -183,7 +187,8 @@ subroutine DA_Minimise_QN( grid, config_flags,               &
 !        [3.4] perform diagnostics and print current step of minimisation:
 
          call da_va15bd( iprint, iter, ifun, cv_size, nsave, cv % array, &
-            j % total, j_grad, step, eps(it)*cv % j_grad_norm_target, llfin)
+            j % total, j_grad, step, eps(it)*cv % j_grad_norm_target, llfin, &
+            xp, (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz /) )
 
          if ( llfin ) exit
       end do

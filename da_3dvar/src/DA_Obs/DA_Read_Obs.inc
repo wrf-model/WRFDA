@@ -46,6 +46,7 @@ SUBROUTINE DA_Read_Obs (iunit, ob, xp, filename)
 
    LOGICAL                      :: inside_halo
    LOGICAL                      :: outside
+   LOGICAL                      :: outside_all
    INTEGER                      :: surface_level
    REAL                         :: height_error, u_comp, v_comp
    INTEGER                      :: total_obs, &
@@ -64,7 +65,7 @@ SUBROUTINE DA_Read_Obs (iunit, ob, xp, filename)
                                    num_ssmi_tb      , &
                                    num_ssmt1, &
                                    num_ssmt2, &
-                                   num_pseudo, num_qscat, &
+                                   num_qscat, &
                                    num_profiler, num_buoy, num_bogus
 
    INTEGER                        :: ndup, n
@@ -92,7 +93,6 @@ SUBROUTINE DA_Read_Obs (iunit, ob, xp, filename)
    num_profiler = ob%num_profiler
    num_buoy = ob%num_buoy
    num_bogus= ob%num_bogus
-   num_pseudo = 0
 !----------------------------------------------------------------------------!
 !  OPEN FILE
 !  ---------
@@ -311,9 +311,9 @@ loop_level: DO i = 1, platform%info%levels
       ENDDO loop_level
 
       call DA_ll_to_xy (platform%info, platform%loc,   &
-                        xp, outside, inside_halo )
+                        xp, outside, inside_halo, outside_all )
 
-      IF(outside) THEN
+      IF(outside_all) THEN
          cycle reports
       ENDIF
 
@@ -361,6 +361,10 @@ loop_level: DO i = 1, platform%info%levels
      if(global .and. &
      (platform%loc%i < xp%ids .or. platform%loc%i >= xp%ide)) ndup= 2
 
+!    It is possible that logic for counting obs is incorrect for the 
+!    global case with >1 MPI tasks due to obs duplication, halo, etc.  
+!    TBH:  20050913
+    IF(.not.outside) THEN
      if( print_detail >= 10 .and. ndup > 1) then
          write(unit=*, FMT = fmt_info) &
                platform%info%platform,    &
@@ -378,7 +382,8 @@ loop_level: DO i = 1, platform%info%levels
           platform%loc%dx, platform%loc%dxm, &
           platform%loc%dy, platform%loc%dym
 
-    end if
+     end if
+    ENDIF
 
    dup_loop: DO n = 1, ndup
 
@@ -388,9 +393,17 @@ loop_level: DO i = 1, platform%info%levels
 
          CASE (12) ;
 
+         ob%num_synop_glo = ob%num_synop_glo + 1
+         IF(outside) THEN
+            CYCLE reports
+         ENDIF
+
          if(.not.use_SynopObs) cycle reports
 
          num_synop = num_synop + 1
+         ! Track serial obs index for reassembly of obs during bit-for-bit 
+         ! tests with different numbers of MPI tasks.  
+         platform%loc%obs_global_index = ob%num_synop_glo
 
          ob%synop(num_synop)%info = platform%info
          ob%synop(num_synop)%loc  = platform%loc
@@ -407,9 +420,17 @@ loop_level: DO i = 1, platform%info%levels
 
          CASE (13, 17) ;                  ! ships          
 
+         ob%num_ships_glo = ob%num_ships_glo + 1
+         IF(outside) THEN
+            CYCLE reports
+         ENDIF
+
          if(.not.use_ShipsObs) cycle reports
 
          num_ships  = num_ships  + 1
+         ! Track serial obs index for reassembly of obs during bit-for-bit 
+         ! tests with different numbers of MPI tasks.  
+         platform%loc%obs_global_index = ob%num_ships_glo
 
          ob%ships(num_ships)%info = platform%info
          ob%ships(num_ships)%loc  = platform%loc
@@ -425,9 +446,17 @@ loop_level: DO i = 1, platform%info%levels
 
          CASE (15:16) ;
 
+         ob%num_metar_glo = ob%num_metar_glo + 1
+         IF(outside) THEN
+            CYCLE reports
+         ENDIF
+
          if(.not.use_MetarObs) cycle reports
 
          num_metar = num_metar + 1
+         ! Track serial obs index for reassembly of obs during bit-for-bit 
+         ! tests with different numbers of MPI tasks.  
+         platform%loc%obs_global_index = ob%num_metar_glo
 
          ob%metar(num_metar)%info = platform%info
          ob%metar(num_metar)%loc  = platform%loc
@@ -443,9 +472,17 @@ loop_level: DO i = 1, platform%info%levels
 
          CASE (32:34) ;
 
+         ob%num_pilot_glo = ob%num_pilot_glo + 1
+         IF(outside) THEN
+            CYCLE reports
+         ENDIF
+
          if(.not.use_PilotObs) cycle reports
 
          num_pilot = num_pilot + 1
+         ! Track serial obs index for reassembly of obs during bit-for-bit 
+         ! tests with different numbers of MPI tasks.  
+         platform%loc%obs_global_index = ob%num_pilot_glo
 
          ob%pilot(num_pilot)%info = platform%info
          ob%pilot(num_pilot)%loc  = platform%loc
@@ -465,9 +502,17 @@ loop_level: DO i = 1, platform%info%levels
 
          CASE (35:38) ;
 
+         ob%num_sound_glo = ob%num_sound_glo + 1
+         IF(outside) THEN
+            CYCLE reports
+         ENDIF
+
          if(.not.use_SoundObs) cycle reports
 
          num_sound = num_sound + 1
+         ! Track serial obs index for reassembly of obs during bit-for-bit 
+         ! tests with different numbers of MPI tasks.  
+         platform%loc%obs_global_index = ob%num_sound_glo
 
          ob%sonde_sfc(num_sound)%info = platform%info
          ob%sonde_sfc(num_sound)%loc  = platform%loc
@@ -542,6 +587,11 @@ loop_level: DO i = 1, platform%info%levels
 
          CASE (86)    ;
 
+         ob%num_satem_glo = ob%num_satem_glo + 1
+         IF(outside) THEN
+            CYCLE reports
+         ENDIF
+
          if(.not.use_SatemObs) cycle reports
 
 !--------Reject cloudy Satem obs.
@@ -551,6 +601,9 @@ loop_level: DO i = 1, platform%info%levels
          endif
 
          num_satem = num_satem + 1
+         ! Track serial obs index for reassembly of obs during bit-for-bit 
+         ! tests with different numbers of MPI tasks.  
+         platform%loc%obs_global_index = ob%num_satem_glo
 
          ob%satem(num_satem)%info = platform%info
          ob%satem(num_satem)%loc  = platform%loc
@@ -603,9 +656,18 @@ loop_level: DO i = 1, platform%info%levels
 
       if(index(platform%info%name, 'MODIS') > 0 .or. &
          index(platform%info%name, 'modis') > 0 )  then
+
+         ob%num_polaramv_glo = ob%num_polaramv_glo + 1
+         IF(outside) THEN
+            CYCLE reports
+         ENDIF
+
          if(.not.use_polaramvObs) cycle reports
    
          num_polaramv = num_polaramv + 1
+         ! Track serial obs index for reassembly of obs during bit-for-bit 
+         ! tests with different numbers of MPI tasks.  
+         platform%loc%obs_global_index = ob%num_polaramv_glo
         
          ob%polaramv(num_polaramv)%info = platform%info
          ob%polaramv(num_polaramv)%loc  = platform%loc
@@ -622,9 +684,18 @@ loop_level: DO i = 1, platform%info%levels
          end do
 
       else
+
+         ob%num_geoamv_glo = ob%num_geoamv_glo + 1
+         IF(outside) THEN
+            CYCLE reports
+         ENDIF
+
          if(.not.use_geoamvObs) cycle reports
 
          num_geoamv = num_geoamv + 1
+         ! Track serial obs index for reassembly of obs during bit-for-bit 
+         ! tests with different numbers of MPI tasks.  
+         platform%loc%obs_global_index = ob%num_geoamv_glo
 
          ob%geoamv(num_geoamv)%info = platform%info
          ob%geoamv(num_geoamv)%loc  = platform%loc
@@ -646,9 +717,17 @@ loop_level: DO i = 1, platform%info%levels
 
          CASE (42,96:97) ;
 
+         ob%num_airep_glo = ob%num_airep_glo + 1
+         IF(outside) THEN
+            CYCLE reports
+         ENDIF
+
          if(.not.use_AirepObs) cycle reports
 
          num_airep = num_airep + 1
+         ! Track serial obs index for reassembly of obs during bit-for-bit 
+         ! tests with different numbers of MPI tasks.  
+         platform%loc%obs_global_index = ob%num_airep_glo
 
          ob%airep(num_airep)%info = platform%info
          ob%airep(num_airep)%loc  = platform%loc
@@ -672,9 +751,17 @@ loop_level: DO i = 1, platform%info%levels
         ! GPSPW(111), GPSZD(114):
          CASE (111, 114) ;
          
+         ob%num_gpspw_glo = ob%num_gpspw_glo + 1
+         IF(outside) THEN
+            CYCLE reports
+         ENDIF
+
          if(.not.use_GpspwObs) cycle reports
 
          num_gpspw = num_gpspw + 1
+         ! Track serial obs index for reassembly of obs during bit-for-bit 
+         ! tests with different numbers of MPI tasks.  
+         platform%loc%obs_global_index = ob%num_gpspw_glo
 
          ob%gpspw(num_gpspw)%info = platform%info
          ob%gpspw(num_gpspw)%loc  = platform%loc
@@ -682,9 +769,18 @@ loop_level: DO i = 1, platform%info%levels
 
 !     else if(index(platform%info%source, 'GPSRF') > 0) then
          CASE (116) ;
+
+         ob%num_gpsref_glo = ob%num_gpsref_glo + 1
+         IF(outside) THEN
+            CYCLE reports
+         ENDIF
+
          if(.not.use_GpsrefObs) cycle reports
 
          num_gpsref = num_gpsref + 1
+         ! Track serial obs index for reassembly of obs during bit-for-bit 
+         ! tests with different numbers of MPI tasks.  
+         platform%loc%obs_global_index = ob%num_gpsref_glo
 
          ob%gpsref(num_gpsref)%info = platform%info
          ob%gpsref(num_gpsref)%loc  = platform%loc
@@ -710,9 +806,17 @@ loop_level: DO i = 1, platform%info%levels
 !        SSM/T1 temperatures:
          CASE (121) ;
 
+         ob%num_ssmt1_glo = ob%num_ssmt1_glo + 1
+         IF(outside) THEN
+            CYCLE reports
+         ENDIF
+
          if(.not.use_ssmt1obs) cycle reports
 
          num_ssmt1 = num_ssmt1 + 1
+         ! Track serial obs index for reassembly of obs during bit-for-bit 
+         ! tests with different numbers of MPI tasks.  
+         platform%loc%obs_global_index = ob%num_ssmt1_glo
 
          ob%ssmt1(num_ssmt1)%info = platform%info
          ob%ssmt1(num_ssmt1)%loc  = platform%loc
@@ -731,9 +835,17 @@ loop_level: DO i = 1, platform%info%levels
 !        SSM/T2 relative humidities:
          CASE (122) ;
 
+         ob%num_ssmt2_glo = ob%num_ssmt2_glo + 1
+         IF(outside) THEN
+            CYCLE reports
+         ENDIF
+
          if(.not.use_ssmt2obs) cycle reports
 
          num_ssmt2 = num_ssmt2 + 1
+         ! Track serial obs index for reassembly of obs during bit-for-bit 
+         ! tests with different numbers of MPI tasks.  
+         platform%loc%obs_global_index = ob%num_ssmt2_glo
 
          ob%ssmt2(num_ssmt2)%info = platform%info
          ob%ssmt2(num_ssmt2)%loc  = platform%loc
@@ -753,9 +865,17 @@ loop_level: DO i = 1, platform%info%levels
 
          CASE (281)    ;
 
+         ob%num_qscat_glo = ob%num_qscat_glo + 1
+         IF(outside) THEN
+            CYCLE reports
+         ENDIF
+
          if(.not.use_qscatobs) cycle reports
 
          num_qscat  = num_qscat  + 1
+         ! Track serial obs index for reassembly of obs during bit-for-bit 
+         ! tests with different numbers of MPI tasks.  
+         platform%loc%obs_global_index = ob%num_qscat_glo
 
          ob%qscat(num_qscat)%info = platform%info
          ob%qscat(num_qscat)%loc  = platform%loc
@@ -771,9 +891,17 @@ loop_level: DO i = 1, platform%info%levels
 
          CASE (132) ;
 
+         ob%num_profiler_glo = ob%num_profiler_glo + 1
+         IF(outside) THEN
+            CYCLE reports
+         ENDIF
+
          if(.not.use_ProfilerObs) cycle reports
 
          num_profiler = num_profiler + 1
+         ! Track serial obs index for reassembly of obs during bit-for-bit 
+         ! tests with different numbers of MPI tasks.  
+         platform%loc%obs_global_index = ob%num_profiler_glo
 
          ob%profiler(num_profiler)%info = platform%info
          ob%profiler(num_profiler)%loc  = platform%loc
@@ -793,9 +921,17 @@ loop_level: DO i = 1, platform%info%levels
 
          CASE (135) ;
 
+         ob%num_bogus_glo = ob%num_bogus_glo + 1
+         IF(outside) THEN
+            CYCLE reports
+         ENDIF
+
          if(.not.use_BogusObs) cycle reports
 
          num_bogus = num_bogus + 1
+         ! Track serial obs index for reassembly of obs during bit-for-bit 
+         ! tests with different numbers of MPI tasks.  
+         platform%loc%obs_global_index = ob%num_bogus_glo
 
          if( num_bogus > max_bogus_input) then
                   write(0,'(A,I6,A,I6)') 'Bogus #=', num_bogus, &
@@ -842,9 +978,17 @@ loop_level: DO i = 1, platform%info%levels
 
          CASE (18,19) ;             ! bouy
 
+         ob%num_buoy_glo = ob%num_buoy_glo + 1
+         IF(outside) THEN
+            CYCLE reports
+         ENDIF
+
          if(.not.use_BuoyObs) cycle reports
 
          num_buoy  = num_buoy  + 1
+         ! Track serial obs index for reassembly of obs during bit-for-bit 
+         ! tests with different numbers of MPI tasks.  
+         platform%loc%obs_global_index = ob%num_buoy_glo
 
          ob%buoy(num_buoy)%info = platform%info
          ob%buoy(num_buoy)%loc  = platform%loc
