@@ -109,9 +109,9 @@ Files modified:
 ---------------
 
 Unless otherwise indicated, modifications were made to implement the new 
-TESTING_BITWISE_EXACT feature.  For other changes, explanation appears inside 
-parenthesis.  Numerals inside parenthesis refer to the enumerated list at the 
-end of the "Reason for changes" section (above).  
+TESTING_DM_BITWISE_EXACT feature.  For other changes, explanation appears 
+inside parenthesis.  Numerals inside parenthesis refer to the enumerated list 
+at the end of the "Reason for changes" section (above).  
 
 Makefile  (1)
 arch/configure.defaults_3dvar
@@ -242,7 +242,7 @@ TO DO List:
     - Test on >8 MPI tasks
     - Create a process for testing addition of other obs to bitwise-exact test 
       cases.  
-    - Extend TESTING_BITWISE_EXACT to "global" (fg_format==3) case.  
+    - Extend TESTING_DM_BITWISE_EXACT to "global" (fg_format==3) case.  
 
   Merge TODO:
     - Modify wrfvar_regtest to call Dale's DA_Run_WRF-Var.csh script instead 
