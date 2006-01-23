@@ -80,7 +80,7 @@ SUBROUTINE da_setup_obs_structures( xp, ob, iv )
        end if
 !     [1.3] TOVS BUFR radiance input file (from NCEP):
        if (use_radiance) then
-          write(6,'(a)')'    Using NCEP TOVSBUFR radiance 1b input'
+          write(6,'(a)')'    Using NCEP BUFR radiance 1b input'
           call da_setup_bufrtovs_structures( xp, ob, iv )
        end if
       endif
@@ -93,7 +93,7 @@ SUBROUTINE da_setup_obs_structures( xp, ob, iv )
      end if
 !     [1.3] TOVS BUFR radiance input file (from NCEP):
      if (use_radiance) then
-      write(6,'(a)')'    Using NCEP TOVSBUFR radiance 1b input'
+      write(6,'(a)')'    Using NCEP BUFR radiance 1b input'
       call da_setup_bufrtovs_structures( xp, ob, iv )
      end if
    end if

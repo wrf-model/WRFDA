@@ -144,7 +144,8 @@ SUBROUTINE da_transform_xtoy_rad_adj ( iv, xp, jo_grad_y, jo_grad_x )
 !
 !    adjoint of q(kg/kg) to ppmv
 !
-               con_vars_ad(nprofiles)%q(k) = model_mr(k) * 1.60771704e+6
+!               con_vars_ad(nprofiles)%q(k) = model_mr(k) * 1.60771704e+6
+               con_vars_ad(nprofiles)%q(k) = model_mr(k) * q2ppmv
 !               call rttov_v2q (&
 !                 & gas_unit_ppmv,      &! in
 !                 & model_mr(k),        &! in

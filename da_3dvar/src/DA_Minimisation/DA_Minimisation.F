@@ -43,7 +43,7 @@
       logical :: brackt,stage1
       real :: dg,dgm,dginit,dgtest,dgx,dgxm,dgy,dgym, &
               finit,ftest1,fm,fx,fxm,fy,fym,p5,p66,stx,sty, &
-              stmin,stmax,width,width1,xtrapf,zero
+              stmin,stmax,width,width1,xtrapf
 
 ! These are used if -DDEREF_KLUDGE is compiled
 !  see http://www.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm

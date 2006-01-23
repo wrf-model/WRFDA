@@ -33,6 +33,7 @@ module da_radiance
 !   use irsse_model, only: forward_irsse
    implicit none
    
+   real, parameter             :: q2ppmv = 1.60771704e+6
    integer                     :: n_scatt_coef
    character(len=5), pointer   :: coefs_scatt_instname(:)
    TYPE( rttov_coef ), pointer :: coefs(:)         ! RTTOV8_5 coefficients
@@ -40,6 +41,7 @@ module da_radiance
 
    TYPE datalink
      type (rad_type)           :: rad
+     type (residual_rad_type)  :: rad_ob
      integer                   :: sensor_index
      type (datalink), pointer  :: next ! pointer to next data
    END TYPE datalink
@@ -151,11 +153,27 @@ module da_radiance
 
    END TYPE rad_data_type
 
+   TYPE satinfo_type
+        integer, pointer   :: ichan(:)      ! channel index
+        integer, pointer   :: iuse (:)      ! usage flag (-1: not use)
+        real   , pointer   :: error(:)      ! error Standard Deviation
+        real   , pointer   :: polar(:)      ! polarisation (0:vertical; 1:horizontal)
+        real   , pointer   :: rms(:,:)      ! rms of bias corr file
+        real   , pointer   :: std(:,:)      ! std of bias corr file
+        real   , pointer   :: a(:,:)        ! bias corr coef a Tb*(xb)=a+b*Tb(xb)
+        real   , pointer   :: b(:,:)        ! bias corr coef b
+   END TYPE satinfo_type
+   
+   TYPE (satinfo_type), pointer :: satinfo(:)
+
 CONTAINS
 
 #include "da_calculate_jo_and_grady_rad.inc"
 #include "da_calculate_residual_rad.inc"
-!#include "da_check_max_iv_rad.inc"
+#include "da_biascorr_rad.inc"
+#include "da_qc_rad.inc"
+#include "da_qc_amsua.inc"
+#include "da_qc_amsub.inc"
 #include "da_get_innov_vector_rad.inc"
 #include "da_detsurtyp.inc"
 #include "da_oma_stats_rad.inc"
@@ -170,6 +188,8 @@ CONTAINS
 #include "da_rtm_tl.inc"
 #include "da_rtm_ad.inc"
 #include "da_read_bufrtovs.inc"
+#include "da_read_bufrairs.inc"
+#include "da_read_kma1dvar.inc"
 #include "da_setup_bufrtovs_structures.inc"
 
 #include "gsi_emiss.inc"

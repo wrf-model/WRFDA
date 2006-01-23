@@ -205,12 +205,12 @@ subroutine da_read_bufrtovs (obstype, iv, xp, lnbufr, infile)
 !  2.0     Extract observation location and other required information
 !     QC1:  juge if data is in the domain, read next record if not
 !-------------------------------------------------------------------------
-        rlat = bfr1bhdr(9)
-        rlon = bfr1bhdr(10)
+!        rlat = bfr1bhdr(9)
+!        rlon = bfr1bhdr(10)
 !        if(rlon < 0.0) rlon = rlon+360.0
 
-        info%lat  =  rlat
-        info%lon  =  rlon
+        info%lat  =  bfr1bhdr(9)  ! rlat
+        info%lon  =  bfr1bhdr(10) ! rlon
         call DA_ll_to_xy (info, loc, xp, outside, inside_halo )
         if (outside) cycle
 

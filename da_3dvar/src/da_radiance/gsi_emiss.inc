@@ -259,12 +259,18 @@ subroutine gsi_emiss(inst,knchpf,kprof,kchan,knchan,indexn,zasat,zlsat,&
            else
               if(freqghz<80._r_kind)then  !snow & f<80GHz
 !               currently landem only works for frequencies < 80 Ghz
+               if (use_landem) then
                  call landem(zasat(n),freqghz,  &
                       soilm5(n),vegf5(n),vegtype5(n),soiltype5(n),soilt5(n), &
                       ts5(n),snow5(n),ehorz,evert)
                  call ehv2pem( ehorz,evert,zlsat(n),polar(kch), pems5(nn) )
                  pemsv(nn) = evert !because esv=esh
                  pemsh(nn) = ehorz
+               else
+                 pemsv(nn) = 0.90_r_kind
+                 pemsh(nn) = 0.90_r_kind
+                 pems5(nn) = 0.90_r_kind
+               end if
               else  !snow & f>=80GHz
                  pemsv(nn) = 0.90_r_kind
                  pemsh(nn) = 0.90_r_kind
@@ -324,12 +330,18 @@ subroutine gsi_emiss(inst,knchpf,kprof,kchan,knchan,indexn,zasat,zlsat,&
 !      ----- land (snow-free or snow thin ) MW -------
            if(freqghz<80._r_kind)then  !land & f<80GHz
 !             currently landem only works for frequencies < 80 Ghz
+             if (use_landem) then
               call landem(zasat(n),freqghz,  &
                    soilm5(n),vegf5(n),vegtype5(n),soiltype5(n),soilt5(n), &
                    ts5(n),snow5(n),ehorz,evert  )
               call ehv2pem( ehorz,evert,zlsat(n),polar(kch), pems5(nn) )
               pemsv(nn) = evert
               pemsh(nn) = ehorz
+             else
+              pemsv(nn) = 0.95_r_kind
+              pemsh(nn) = 0.95_r_kind
+              pems5(nn) = 0.95_r_kind
+             end if
            else  !land & f>=80GHz
               pemsv(nn) = 0.95_r_kind
               pemsh(nn) = 0.95_r_kind

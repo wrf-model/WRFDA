@@ -1,63 +1,30 @@
 !
-SUBROUTINE da_biascorr_rad ( it, xb, xp, ob, iv )
+SUBROUTINE da_biascorr_rad ( inst, nchan, tb_ob, iv )
 !------------------------------------------------------------------------------
-!  PURPOSE: perform quality control for radiance data.
+!  PURPOSE: perform bias correction for radiance data.
 !
-!  METHOD:  d = y - H(x)
-!       1. interpolate xb to obs location
-!       2. call foreward RTM to get simulated bright temperature
-!       3. obs BT - simulated BT
+!  METHOD:  Tb*(xb)=a+b*Tb(xb)
 !
-!  HISTORY: 2005/10/17 - Creation            Zhiquan Liu
+!  HISTORY: 2005/12/13 - Creation            Zhiquan Liu
 !
 !------------------------------------------------------------------------------
 
    IMPLICIT NONE
 
-   INTEGER, INTENT(IN)            :: it       ! External iteration.
-   TYPE (xb_type), INTENT(IN)     :: xb       ! first guess state.
-   TYPE (xpose_type), INTENT(IN)  :: xp       ! Domain decomposition vars.
-   TYPE (y_type),     INTENT(IN)  :: ob       ! Observation structure.
-   TYPE (ob_type), INTENT(INOUT)  :: iv       ! O-B structure.
+   INTEGER, INTENT(IN)             :: inst       ! sensor index.
+   INTEGER, INTENT(IN)             :: nchan      ! number of channel
+   REAL,    INTENT(IN)             :: tb_ob(nchan)  ! Observation Tb.
+   TYPE (rad_type), INTENT(INOUT)  :: iv         ! O-B structure.
 
+! Local variables
 
-!   print *, ' not implemented yet'
+   INTEGER   :: i,iscan
+   REAL      :: tb_xb
 
-   do inst = 1, iv%num_inst                 ! loop for sensor
-     if ( iv%instid(inst)%num_rad < 1 ) cycle
-     num_levs  = iv%instid(inst)%nlevels
-     nchanl    = iv%instid(inst)%nchan
-
-     amsua = trim( inst_name(rtminit_sensor(inst))) == 'amsua'
-     amsub = trim( inst_name(rtminit_sensor(inst))) == 'amsub'
-     hirs  = trim( inst_name(rtminit_sensor(inst))) == 'hirs'
-
-!  1.0 QC for HIRS
-!------------------------------
-   if ( hirs ) then
-!  infrared cloud check
-
-
-!  2.0 QC for AMSU-A
-!------------------------------
-   else if ( amsua ) then
-
-!  microwave precipitation check
-
-!  surface type check (land/sea/sea-ice/snow etc.)
-
-!  high Topography Check
-
-!  latitude band check
-
-!  3.0 QC for AMSU-B
-!------------------------------
-   else if ( amsub ) then
-
-
-   else
-     write(*,*) 'Unrecognized Instrument'
-     stop ' in da_qc_rad'
+   iscan = iv%scanpos
+   do i=1,nchan
+     tb_xb = satinfo(inst)%a(iscan,i) + satinfo(inst)%b(iscan,i)*iv%tb_xb(i)
+     iv%tb(i)%inv = tb_ob(i) - tb_xb
    end do
 
    return

@@ -13,7 +13,9 @@
 
    IMPLICIT NONE
    
+#ifdef DM_PARALLEL
    INCLUDE 'mpif.h'
+#endif
 
 !#include "rttov_q2v.interface"
 
@@ -46,7 +48,7 @@
    REAL, DIMENSION(xp%kms:xp%kme)   :: v_p, model_tm, &     ! Model value p at ob hor. location.
                                        model_qrn, model_qcw, &
                                        model_qci, model_qsn, &
-                                       model_qgr
+                                       model_qgr, model_qm
 
    INTEGER            :: inst, nprofiles, nchanl, unit, iprof, ios
    INTEGER            :: nfrequencies, nchannels, nbtout
@@ -54,7 +56,7 @@
    REAL,    pointer   :: pres(:)
    character(len=30)  :: filename
    real,    pointer   :: tb(:,:)
-   logical            :: lprinttovs, amsua, amsub, mhs, ssmi
+   logical            :: amsua, amsub, mhs, ssmi
    integer            :: myproc, ierr, ndomain
 
    integer            :: ip,kn,knchpf,sensor_type
@@ -66,7 +68,15 @@
    type(con_vars_type),  pointer  :: con_vars(:)
    type(aux_vars_type),  pointer  :: aux_vars(:)
 
+! variables for computing clwp
+   REAL, dimension(xp%kms:xp%kme)     :: vtm, clw, dlnpf
+   REAL, dimension(xp%kms:xp%kme+1)   :: pf
+   REAL                               :: clwp
+
+
+#ifdef DM_PARALLEL
    LOGICAL, EXTERNAL :: wrf_dm_on_monitor
+#endif
 
    print *, ' Computing Radiance Innovation------- '
 
@@ -107,6 +117,7 @@
          allocate (iv%instid(inst)%rad(n)%t(1:num_levs), stat= alloc_status(7) )
          allocate (iv%instid(inst)%rad(n)%mr(1:num_levs), stat= alloc_status(8) )
          allocate (iv%instid(inst)%rad(n)%tm(xp%kms:xp%kme), stat= alloc_status(9) )
+         allocate (iv%instid(inst)%rad(n)%qm(xp%kms:xp%kme), stat= alloc_status(16) )
          allocate (iv%instid(inst)%rad(n)%qrn(xp%kms:xp%kme), stat= alloc_status(10) )
          allocate (iv%instid(inst)%rad(n)%qcw(xp%kms:xp%kme), stat= alloc_status(11) )
          allocate (iv%instid(inst)%rad(n)%qci(xp%kms:xp%kme), stat= alloc_status(12) )
@@ -145,7 +156,7 @@
          do k=xp%kts,xp%kte
             v_p(k) = dym*(dxm*xb%p(i,j  ,k) + dx*xb%p(i+1,j  ,k)) &
                    + dy *(dxm*xb%p(i,j+1,k) + dx*xb%p(i+1,j+1,k))
-            v_p(k) = v_p(k)/100.0  ! convert to mb
+            v_p(k) = 0.01*v_p(k)  ! convert to mb
          enddo
 
          do k=1, num_levs
@@ -169,7 +180,8 @@
                model_t(k) = coefs(inst) % ref_prfl_t(k,gas_id_watervapour)  ! outside model level
                model_mr(k) = coefs(inst) % ref_prfl_mr(k,gas_id_watervapour)
             ELSE
-            model_mr(k) = model_q(k) * 1.60771704e+6 ! convert q(kg/kg) to ppmv
+!            model_mr(k) = model_q(k) * 1.60771704e+6 ! convert q(kg/kg) to ppmv
+             model_mr(k) = model_q(k) * q2ppmv
 !               call rttov_q2v (&
 !                 & gas_unit_specconc,  &! in
 !                 & model_q(k),         &! in
@@ -221,6 +233,7 @@
                              model_vegfra(1) )
 
 !         model_snowh(1) = model_snowh(1)*100.0   ! convert from m to mm
+         model_vegfra(1) = 0.01*model_vegfra(1)  ! convert range to 0~1
 
 !
 ! determine surface type of obs location
@@ -238,6 +251,9 @@
          call Interp_lin_2D( xb%t(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
                              i, j, dx, dy, dxm, dym, &      ! temperature at model level
                              model_tm(k) )
+         call Interp_lin_2D( xb%q(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
+                             i, j, dx, dy, dxm, dym, &      ! temperature at model level
+                             model_qm(k) )
          call Interp_lin_2D( xb%qrn(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
                              i, j, dx, dy, dxm, dym, &      ! rain
                              model_qrn(k) )
@@ -256,17 +272,44 @@
 
             iv%instid(inst)%rad(n)%pm(k)  = v_p(k)
             iv%instid(inst)%rad(n)%tm(k)  = model_tm(k)
+            iv%instid(inst)%rad(n)%qm(k)  = model_qm(k)
             iv%instid(inst)%rad(n)%qrn(k) = model_qrn(k)
             iv%instid(inst)%rad(n)%qcw(k) = model_qcw(k)
             iv%instid(inst)%rad(n)%qci(k) = model_qci(k)
             iv%instid(inst)%rad(n)%qsn(k) = model_qsn(k)
             iv%instid(inst)%rad(n)%qgr(k) = model_qgr(k)
 
+! ADD for computing cloud liquid water path
+
+        vtm (k) = (1.+0.608*model_qm(k))*model_tm(k)  ! virtual T
+!        clw (k) = model_qcw(k)*v_p(k)*100.*0.0289644/8.31451/model_tm(k) ! convert kg/kg to g/m3
+        clw (k) = 0.34836*model_qcw(k)*v_p(k)/model_tm(k)
+        if ( v_p(k)<100. ) clw (k) = 0.
+
        enddo
 
-               model_psfc = model_psfc/100.0  ! convert to hPa 
+          model_psfc = 0.01*model_psfc           ! convert to hPa 
+!          model_mr2m = model_q2m * 1.60771704e+6  ! convert q(kg/kg) to ppmv
+          model_mr2m = model_q2m * q2ppmv
 
-          model_mr2m = model_q2m * 1.60771704e+6  ! convert q(kg/kg) to ppmv
+!   ADD for computing cloud liquid water path (mm) from guess
+!
+    pf(xp%kts) = 100.*model_psfc
+    do k = 2,xp%kte
+!      pf(k) = 100.*(v_p(k-1)+v_p(k))*0.5  ! full level pressure
+      pf(k) = 50.*(v_p(k-1)+v_p(k))
+    end do
+!    pf(xp%kte+1)= 100.*v_p(xp%kte)*0.5
+    pf(xp%kte+1)= 50.*v_p(xp%kte)
+
+      clwp = 0.
+    do k = xp%kts,xp%kte
+      dlnpf(k) = log(pf(k)) - log(pf(k+1))
+!      clw  (k) = clw(k)*vtm(k)*287.05/9.80665*dlnpf(k)
+      clw  (k) = 29.27095*clw(k)*vtm(k)*dlnpf(k)
+      clwp  = clwp + clw(k)
+    end do
+    !  clwp = 0.001*clwp   ! kg/m2 = mm
 
 !               call rttov_q2v (&
 !                 & gas_unit_specconc,  &! in
@@ -289,7 +332,7 @@
          iv%instid(inst)%rad(n)%soiltyp  = model_isltyp(1)
          iv%instid(inst)%rad(n)%vegtyp   = model_ivgtyp(1)
          iv%instid(inst)%rad(n)%vegfra  = model_vegfra(1)
-
+         iv%instid(inst)%rad(n)%clwp    = clwp
 
 !     Compute surface emissivity for observation
 !-----------------------------------------------------
@@ -305,14 +348,14 @@
   Allocate ( pemsh  (knchpf), stat = alloc_status(9) )
   Allocate ( pems5  (knchpf), stat = alloc_status(11) )
   Allocate ( calcemis(knchpf), stat = alloc_status(8) )
-  Allocate ( iv%instid(inst)%rad(n)%calcemis(knchpf), stat = alloc_status(10) )
+  Allocate ( iv%instid(inst)%rad(n)%tb_xb(nchanl), stat = alloc_status(10) )
+!  Allocate ( iv%instid(inst)%rad(n)%calcemis(knchpf), stat = alloc_status(10) )
   
          if ( any(alloc_status /= 0) ) then
            write(*,*) ' Error at Allocate mem before emiss ! '
            write(*,*) ' alloc_status =', alloc_status
            stop ' in da_get_innov_vector_rad '
          end if
-
 
   sensor_type  = coefs(inst)%id_sensor - 1  ! 0:IR 1:MW
 
@@ -342,7 +385,7 @@
       pemsv(:)    = 0.0
       pemsh(:)    = 0.0
    if (amsua) then
-       polar(1:4) = 0.0
+       polar(1:4) = 0.0  ! polarizition: 0:vertical; 1:horizontal
        polar(5:6) = 1.0
        polar(7)   = 0.0
        polar(8:14)= 1.0
@@ -387,6 +430,8 @@
 
 !        [1.3] Call RTM foreward model
 
+         !print *, n, iv%instid(inst)%rad(n)%info%lat,iv%instid(inst)%rad(n)%info%lon
+
          call da_rtm_direct (inst, model_isflg(1), nchanl, nprofiles, &
                              nfrequencies, nchannels, nbtout, &
                              con_vars, aux_vars, &
@@ -403,22 +448,25 @@
 
          do k = 1, nchanl
           if ( iv%instid(inst)%rad(n)%tb(k)%inv > missing_r ) then 
+            iv%instid(inst)%rad(n)%tb_xb(k)  = tb(nprofiles,k)
             iv%instid(inst)%rad(n)%tb(k)%inv = &
-            iv%instid(inst)%rad(n)%tb(k)%inv - &
-                  tb(nprofiles,k)
-            iv%instid(inst)%rad(n)%tb(k)%error = 1.0
-            iv%instid(inst)%rad(n)%tb(k)%qc    = 1
+               ob%instid(inst)%rad(n)%tb(k) - tb(nprofiles,k)
+!            iv%instid(inst)%rad(n)%tb(k)%error = satinfo(inst)%error(k)
+!            iv%instid(inst)%rad(n)%tb(k)%qc    = 1 !satinfo(inst)%iuse (k)
           else
+            iv%instid(inst)%rad(n)%tb_xb(k)    = tb(nprofiles,k)
             iv%instid(inst)%rad(n)%tb(k)%inv   = missing_r
-            iv%instid(inst)%rad(n)%tb(k)%error = 50.0
-            iv%instid(inst)%rad(n)%tb(k)%qc    = -1
+!            iv%instid(inst)%rad(n)%tb(k)%error = 500.0
+!            iv%instid(inst)%rad(n)%tb(k)%qc    = -1
           end if
 
-          if ( abs(iv%instid(inst)%rad(n)%tb(k)%inv) > 1. ) then
-            iv%instid(inst)%rad(n)%tb(k)%qc    = -1
-          end if
+!          if ( abs(iv%instid(inst)%rad(n)%tb(k)%inv) > 5.*satinfo(inst)%error(k) ) then
+!            iv%instid(inst)%rad(n)%tb(k)%qc    = -1
+!            iv%instid(inst)%rad(n)%tb(k)%error = 500.0
+!          end if
 !            iv%instid(inst)%rad(n)%emiss(k) = pems5(k) 
-            iv%instid(inst)%rad(n)%calcemis(k) = calcemis(k)
+!            iv%instid(inst)%rad(n)%calcemis(k) = calcemis(k)
+
          end do
                
     if (coefs(inst)%id_sensor == 2) then ! microwave
@@ -426,10 +474,22 @@
     else
          iv%instid(inst)%rad(n)%emiss(1:nchanl) = emissivity(1:nchanl)
     end if
+
 !------------------------------------------------------------------------
-!        [3.0] Perform QC check:
+!        [3.0] Apply Bias Correction 
 !------------------------------------------------------------------------
-!        call da_qc_rad(it,xb,xp,ob,iv)
+        if (lbiascorr) then
+            call da_biascorr_rad(inst,nchanl,  &
+                                 ob%instid(inst)%rad(n)%tb, &
+                                 iv%instid(inst)%rad(n) )
+        end if
+
+!------------------------------------------------------------------------
+!        [4.0] Perform QC check
+!------------------------------------------------------------------------
+!            call da_qc_rad(inst,nchanl,  &
+!                           ob%instid(inst)%rad(n)%tb, &
+!                           iv%instid(inst)%rad(n) )
 
 !------------------------------------------------------------------------
 !        [4.0] Perform optional maximum error check:
@@ -455,11 +515,12 @@
 
 !  6.0  print iv output
 !------------------------------
- lprinttovs = .true.
- if ( lprinttovs ) then
+ if ( lwrite_iv ) then
+#ifdef DM_PARALLEL
  call MPI_COMM_RANK( MPI_COMM_WORLD, myproc, ierr )
  print *, ' ierr= ', ierr
  print *, ' myproc = ', myproc
+#endif
  do n = 1, iv%num_inst
   if (iv%instid(n)%num_rad < 1) cycle
 
@@ -472,22 +533,31 @@
     ndomain = ndomain + 1
   end if
   end do
+#ifdef DM_PARALLEL
   write(6,'(a,i3,a,i7)') 'number of obs in proc # ', myproc,' : ', ndomain
+#else
+  write(6,'(a,i7)') 'number of obs in proc # ', ndomain
+#endif
 
   unit = 14
+#ifdef DM_PARALLEL
   write(filename, '(a,i2.2)') trim(iv%instid(n)%rttovid_string)//'.inv_', myproc
+#else
+  write(filename, '(a)') trim(iv%instid(n)%rttovid_string)//'.inv'
+#endif
   open(unit,file=trim(filename),form='formatted',iostat=ios)
   if( ios /= 0 ) Then
       Write(*,*) 'error opening the output file ', filename
       Stop ' in da_setup_bufrtovs_structures '
   Endif
-    write(unit,'(a,a,i7,a,i5,a,20i3)') trim(iv%instid(n)%rttovid_string), &
+    write(unit,'(a,a,i7,a,i5,a)') trim(iv%instid(n)%rttovid_string), &
                         ' number-of-pixels : ', ndomain, &
                         ' channel-number-of-each-pixel : ', iv%instid(n)%nchan, &
-                        ' index-of-channels : ', iv%instid(n)%ichan
+                        ' index-of-channels : '
+    write(unit,'(10i5)') iv%instid(n)%ichan
     write(unit, *) ' pixel-info : i date scanpos landsea_mask  elv lat lon  satzen satazi '
     write(unit, *) ' xb-surf-info : i t2m mr2m(ppmv) u10 v10 ps ts smois tslb snowh isflg &
-                    & soiltyp vegtyp vegfra elev'
+                    & soiltyp vegtyp vegfra elev clwp'
    ndomain = 0
   do i =1,iv%instid(n)%num_rad
    if(iv%instid(n)%rad(i)%loc%proc_domain) then
@@ -502,7 +572,7 @@
                              iv%instid(n)%rad(i)%satzen,    &
                              iv%instid(n)%rad(i)%satazi
  if (iv%instid(n)%rad(i)%isflg==0) then
-    write(unit,'(a,i7,9f10.2,3i3,f8.3,f10.2)') ' SEA : ', i, &
+    write(unit,'(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') ' SEA : ', i, &
                              iv%instid(n)%rad(i)%t2m, &
                              iv%instid(n)%rad(i)%mr2m,   &
                              iv%instid(n)%rad(i)%u10, &
@@ -516,9 +586,10 @@
                              nint(iv%instid(n)%rad(i)%soiltyp), &
                              nint(iv%instid(n)%rad(i)%vegtyp), &
                              iv%instid(n)%rad(i)%vegfra, &
-                             iv%instid(n)%rad(i)%elevation
+                             iv%instid(n)%rad(i)%elevation, &
+                             iv%instid(n)%rad(i)%clwp
  else if (iv%instid(n)%rad(i)%isflg==1) then
-   write(unit,'(a,i7,9f10.2,3i3,f8.3,f10.2)') ' ICE : ', i, &
+   write(unit,'(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') ' ICE : ', i, &
                              iv%instid(n)%rad(i)%t2m, &
                              iv%instid(n)%rad(i)%mr2m,   &
                              iv%instid(n)%rad(i)%u10, &
@@ -532,9 +603,10 @@
                              nint(iv%instid(n)%rad(i)%soiltyp), &
                              nint(iv%instid(n)%rad(i)%vegtyp), &
                              iv%instid(n)%rad(i)%vegfra, &
-                             iv%instid(n)%rad(i)%elevation
+                             iv%instid(n)%rad(i)%elevation, &
+                             iv%instid(n)%rad(i)%clwp
  else if (iv%instid(n)%rad(i)%isflg==2) then
-   write(unit,'(a,i7,9f10.2,3i3,f8.3,f10.2)') 'LAND : ', i, &
+   write(unit,'(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') 'LAND : ', i, &
                              iv%instid(n)%rad(i)%t2m, &
                              iv%instid(n)%rad(i)%mr2m,   &
                              iv%instid(n)%rad(i)%u10, &
@@ -548,9 +620,10 @@
                              nint(iv%instid(n)%rad(i)%soiltyp), &
                              nint(iv%instid(n)%rad(i)%vegtyp), &
                              iv%instid(n)%rad(i)%vegfra, &
-                             iv%instid(n)%rad(i)%elevation
+                             iv%instid(n)%rad(i)%elevation, &
+                             iv%instid(n)%rad(i)%clwp
  else if (iv%instid(n)%rad(i)%isflg==3) then
-   write(unit,'(a,i7,9f10.2,3i3,f8.3,f10.2)') 'SNOW : ', i, &
+   write(unit,'(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') 'SNOW : ', i, &
                              iv%instid(n)%rad(i)%t2m, &
                              iv%instid(n)%rad(i)%mr2m,   &
                              iv%instid(n)%rad(i)%u10, &
@@ -564,9 +637,10 @@
                              nint(iv%instid(n)%rad(i)%soiltyp), &
                              nint(iv%instid(n)%rad(i)%vegtyp), &
                              iv%instid(n)%rad(i)%vegfra, &
-                             iv%instid(n)%rad(i)%elevation
+                             iv%instid(n)%rad(i)%elevation, &
+                             iv%instid(n)%rad(i)%clwp
  else if (iv%instid(n)%rad(i)%isflg==4) then
-   write(unit,'(a,i7,9f10.2,3i3,f8.3,f10.2)') 'MSEA : ', i, &
+   write(unit,'(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') 'MSEA : ', i, &
                              iv%instid(n)%rad(i)%t2m, &
                              iv%instid(n)%rad(i)%mr2m,   &
                              iv%instid(n)%rad(i)%u10, &
@@ -580,9 +654,10 @@
                              nint(iv%instid(n)%rad(i)%soiltyp), &
                              nint(iv%instid(n)%rad(i)%vegtyp), &
                              iv%instid(n)%rad(i)%vegfra, &
-                             iv%instid(n)%rad(i)%elevation
+                             iv%instid(n)%rad(i)%elevation, &
+                             iv%instid(n)%rad(i)%clwp
  else if (iv%instid(n)%rad(i)%isflg==5) then
-   write(unit,'(a,i7,9f10.2,3i3,f8.3,f10.2)') 'MICE : ', i, &
+   write(unit,'(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') 'MICE : ', i, &
                              iv%instid(n)%rad(i)%t2m, &
                              iv%instid(n)%rad(i)%mr2m,   &
                              iv%instid(n)%rad(i)%u10, &
@@ -596,9 +671,10 @@
                              nint(iv%instid(n)%rad(i)%soiltyp), &
                              nint(iv%instid(n)%rad(i)%vegtyp), &
                              iv%instid(n)%rad(i)%vegfra, &
-                             iv%instid(n)%rad(i)%elevation
+                             iv%instid(n)%rad(i)%elevation, &
+                             iv%instid(n)%rad(i)%clwp
  else if (iv%instid(n)%rad(i)%isflg==6) then
-   write(unit,'(a,i7,9f10.2,3i3,f8.3,f10.2)') 'MLND : ', i, &
+   write(unit,'(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') 'MLND : ', i, &
                              iv%instid(n)%rad(i)%t2m, &
                              iv%instid(n)%rad(i)%mr2m,   &
                              iv%instid(n)%rad(i)%u10, &
@@ -612,9 +688,10 @@
                              nint(iv%instid(n)%rad(i)%soiltyp), &
                              nint(iv%instid(n)%rad(i)%vegtyp), &
                              iv%instid(n)%rad(i)%vegfra, &
-                             iv%instid(n)%rad(i)%elevation
+                             iv%instid(n)%rad(i)%elevation, &
+                             iv%instid(n)%rad(i)%clwp
  else if (iv%instid(n)%rad(i)%isflg==7) then
-   write(unit,'(a,i7,9f10.2,3i3,f8.3,f10.2)') 'MSNO : ', i, &
+   write(unit,'(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') 'MSNO : ', i, &
                              iv%instid(n)%rad(i)%t2m, &
                              iv%instid(n)%rad(i)%mr2m,   &
                              iv%instid(n)%rad(i)%u10, &
@@ -628,50 +705,59 @@
                              nint(iv%instid(n)%rad(i)%soiltyp), &
                              nint(iv%instid(n)%rad(i)%vegtyp), &
                              iv%instid(n)%rad(i)%vegfra, &
-                             iv%instid(n)%rad(i)%elevation
+                             iv%instid(n)%rad(i)%elevation, &
+                             iv%instid(n)%rad(i)%clwp
  end if
 
-    write(unit,'(a,19f11.2)') 'OBS  : ', ob%instid(n)%rad(i)%tb(:)
-    write(unit,'(a,19f11.2)') 'INV  : ', iv%instid(n)%rad(i)%tb(:)%inv
-!    write(unit,'(a,19L11)')   'CAL  : ', iv%instid(n)%rad(i)%calcemis(:)
-!    write(unit,'(a,30f11.2)') 'EMS  : ', iv%instid(n)%rad(i)%emiss(:)
-    write(unit,'(a,19f11.2)') 'EMS  : ', iv%instid(n)%rad(i)%emiss(1:iv%instid(n)%nchan)
+!    write(unit,'(a,19f11.2)') 'OBS  : ', ob%instid(n)%rad(i)%tb(:)
+!    write(unit,'(a,19f11.2)') 'INV  : ', iv%instid(n)%rad(i)%tb(:)%inv
+!    write(unit,'(a,19f11.2)') 'EMS  : ', iv%instid(n)%rad(i)%emiss(1:iv%instid(n)%nchan)
+    write(unit,'(a)') 'OBS  : '
+    write(unit,'(10f11.2)') ob%instid(n)%rad(i)%tb(:)
+    write(unit,'(a)') 'INV  : '
+    write(unit,'(10f11.2)')  iv%instid(n)%rad(i)%tb(:)%inv
+    write(unit,'(a)') 'EMS  : '
+    write(unit,'(10f11.2)')  iv%instid(n)%rad(i)%emiss(1:iv%instid(n)%nchan)
+
 !    write(unit,'(a,19f11.2)') 'ERR  : ', iv%instid(n)%rad(i)%tb(:)%error
 !    write(unit,'(a,19i11)')   'QC   : ', iv%instid(n)%rad(i)%tb(:)%qc
 
-    write(unit,*)'RTM_level pres(mb) T(k) Q(ppmv) WRF_level pres(mb) T(k) clw(g/kg) rain(g/kg)'
 
+  if (lwrite_profile) then
+    write(unit,*)'RTM_level pres(mb) T(k) Q(ppmv) WRF_level pres(mb) T(k) q(g/kg) clw(g/kg) rain(g/kg)'
     do k=xp%kts,xp%kte
      if (k <= num_levs) then
-      write(unit,'(i3,f10.2,f8.2,e11.4,i3,f10.2,f8.2,2e11.4)') &
+      write(unit,'(i3,f10.2,f8.2,e11.4,i3,f10.2,f8.2,3e11.4)') &
             k, &                             ! RTTOV levels
             coefs(n) % ref_prfl_p(k) , &
             iv%instid(n)%rad(i)%t(k) , &
             iv%instid(n)%rad(i)%mr(k), &
-            k,  &                            ! WRF levels
+            k,  &                            ! WRF model levels
             iv%instid(n)%rad(i)%pm(k) , &
             iv%instid(n)%rad(i)%tm(k) , &
+            iv%instid(n)%rad(i)%qm(k)*1000 , &    
             iv%instid(n)%rad(i)%qcw(k)*1000., &
             iv%instid(n)%rad(i)%qrn(k)*1000.
 
      else
-      write(unit,'(32x,i3,f10.2,f8.2,2e11.4)') k, &
+      write(unit,'(32x,i3,f10.2,f8.2,3e11.4)') k, &
             iv%instid(n)%rad(i)%pm(k) , &
             iv%instid(n)%rad(i)%tm(k) , &
+            iv%instid(n)%rad(i)%qm(k)*1000 , &
             iv%instid(n)%rad(i)%qcw(k)*1000., &
             iv%instid(n)%rad(i)%qrn(k)*1000.
 !            iv%instid(n)%rad(i)%qci(k)*1000., &
 !            iv%instid(n)%rad(i)%qsn(k)*1000., &
 !            iv%instid(n)%rad(i)%qgr(k)*1000.
-     end if
+     end if  
+    end do   ! end loop profile
+    end if   ! end if write_profile
 
-    end do
-
-   end if
-  end do
+   end if    ! end if proc_domain
+  end do     ! end do pixels
   close(unit)
- end do
-end if
+ end do    !! end do instruments
+end if     !! end if lwrite_iv
 
  return
  

@@ -104,8 +104,11 @@ SUBROUTINE DA_Read_Namelist
                            pseudo_val, pseudo_err, pseudo_var
    NAMELIST /rtminit/  rtminit_errunit, rtminit_print, rtminit_nsensor, &
                        rtminit_platform,rtminit_satid, rtminit_sensor,  &
-                       use_obsgts, use_radiance, use_hirs2, use_hirs3,  &
-                       use_msu, use_amsua, use_amsub, mw_emis_sea
+                       use_obsgts, use_radiance, use_kma1dvar,use_hirs2, use_hirs3,  &
+                       use_msu, use_amsua, use_amsub,  &
+                       use_eos_rad, use_airs,use_eos_amsua,use_hsb, &
+                       lmonitoring,lbiascorr, lrttov_scatt, &
+                       lwrite_iv,lwrite_profile,use_landem, mw_emis_sea
 
 !----------------------------------------------------------------------------------
    write(unit=*, fmt='(a)') &

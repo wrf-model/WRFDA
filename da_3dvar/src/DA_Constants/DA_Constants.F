@@ -523,13 +523,18 @@ MODULE DA_Constants
  integer, dimension(maxsensor) :: rtminit_platform, &
                                   rtminit_satid,    &
                                   rtminit_sensor
+
+ logical                       :: use_landem      ! if use weng's landem model
  integer                       :: mw_emis_sea     ! surface emissivity type over sea
                                                   ! 0:FASTEM-2; 1:Weng's model
 
 ! type( rttov_coef ), pointer :: coefs(:)         ! RTTOV8_5 coefficients
- logical                       :: use_obsgts
+ logical                       :: use_obsgts, use_kma1dvar
  logical                       :: use_radiance, use_hirs2, use_hirs3, &
-                                  use_msu, use_amsua, use_amsub
+                                  use_msu, use_amsua, use_amsub, &
+                                  lbiascorr, lrttov_scatt, lmonitoring, &
+                                  lwrite_iv, lwrite_profile, use_eos_rad, use_airs, &
+                                  use_eos_amsua, use_hsb
 
  CONTAINS
 

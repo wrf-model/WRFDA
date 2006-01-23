@@ -262,26 +262,30 @@ end if
      & radiance )        ! inout
 
  if ( any(errorstatus(:) /= 0 )) then
-     write (*,*) 'rttov_direct error code = ', errorstatus(:)
-     write (*,*) 'nfrequencies = ', nfrequencies
-     write (*,*) 'nchannels    = ', nchannels
-     write (*,*) 'nbtout       = ', nbtout
-     write (*,*) 'nprofiles    = ', nprofiles
-     write (*,*) 'channels     = ', channels
-     write (*,*) 'polarisations= ', polarisations
-     write (*,*) 'lprofiles    = ', lprofiles
-     write (*,*) 'profiles%s2m   = ', profiles(1)%s2m
-     write (*,*) 'profiles%skin   = ', profiles(1)%skin
-     write (*,*) 'profiles%zenangle = ', profiles(1)%zenangle
-     write (*,*) 'profiles%azangle = ', profiles(1)%azangle
-     write (*,*) 'profiles%p   = ', profiles(1)%p
-     write (*,*) 'profiles%t   = ', profiles(1)%t
-     write (*,*) 'profiles%q   = ', profiles(1)%q
-     write (*,*) 'addcloud     = ', addcloud
-     write (*,*) 'calcemis     = ', calcemis
-     write (*,*) 'emissivity   = ', emissivity
-     write (*,*) 'radiance = ', radiance%out_clear
-     stop ' in da_rtm_direct '
+     !write (*,*) 'rttov_direct error code = ', errorstatus(:)
+     !write (*,*) 'nfrequencies = ', nfrequencies
+     !write (*,*) 'nchannels    = ', nchannels
+     !write (*,*) 'nbtout       = ', nbtout
+     !write (*,*) 'nprofiles    = ', nprofiles
+     !write (*,*) 'channels     = ', channels
+     !write (*,*) 'polarisations= ', polarisations
+     !write (*,*) 'lprofiles    = ', lprofiles
+     !write (*,*) 'profiles%s2m   = ', profiles(1)%s2m
+     !write (*,*) 'profiles%skin   = ', profiles(1)%skin
+     write(6,'(6f12.2)') profiles(1)%s2m%p,profiles(1)%skin%t,profiles(1)%s2m%t,profiles(1)%s2m%q,profiles(1)%s2m%u,profiles(1)%s2m%v
+     !write (*,*) 'profiles%zenangle = ', profiles(1)%zenangle
+     !write (*,*) 'profiles%azangle = ', profiles(1)%azangle
+     !write (*,*) 'profiles%p   = ', profiles(1)%p
+     !write (*,*) 'profiles%t   = ', profiles(1)%t
+     !write (*,*) 'profiles%q   = ', profiles(1)%q
+     !do i=coef%nlevels,1,-1
+     !  write(6,'(i4,3f12.2)') i, profiles(1)%p(i),profiles(1)%t(i),profiles(1)%q(i)
+     !end do
+     !write (*,*) 'addcloud     = ', addcloud
+     !write (*,*) 'calcemis     = ', calcemis
+     !write (*,*) 'emissivity   = ', emissivity
+     !write (*,*) 'radiance = ', radiance%out_clear
+     !stop ' in da_rtm_direct '
  endif
  
   nc = nbtout / nprofiles

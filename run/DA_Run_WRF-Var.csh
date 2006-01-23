@@ -382,6 +382,33 @@ sfc_assi_options = $DA_SFC_ASSI_OPTIONS,
  pseudo_err     = $DA_PSEUDO_ERR,
  pseudo_var     = '$DA_PSEUDO_VAR' /
 
+&rtminit
+ rtminit_errunit     = 99,
+ rtminit_print       = 3,
+ rtminit_nsensor     = 6,
+ rtminit_platform    =  1,1,1,1,9,9,
+ rtminit_satid       =  14,15,16,17,2,2,
+ rtminit_sensor      =  0,0,0,0,3,11,
+ use_obsgts          = .false.,
+ use_radiance        = .true.,
+ use_kma1dvar        = .false.,
+ use_hirs2           = .true.,
+ use_hirs3           = .true.,
+ use_msu             = .false.,
+ use_amsua           = .false.,
+ use_amsub           = .false.,
+ use_eos_rad         = .true.,
+ use_airs            = .true.,
+ use_eos_amsua       = .true.,
+ use_hsb             = .false.,
+ lmonitoring         = .true.,
+ lbiascorr           = .false.,
+ lrttov_scatt        = .false.,
+ lwrite_iv           = .true.,
+ lwrite_profile      = .true.,
+ use_landem          = .false.,
+ mw_emis_sea         = 1 /
+
 EOF
 
 #Create WRF V2.1 namelist.input file:

@@ -543,11 +543,11 @@ MODULE DA_Define_Structures
         real      ::  satzen, satazi, solzen, solazi        !  satellite and solar angles
 ! channels' bright temperature
         type(field_type), pointer   ::   tb(:)                       !  bright temperatures
-        real,    pointer   ::   emiss(:)
-        logical, pointer   ::   calcemis(:)
+        real,    pointer   ::   emiss(:), tb_xb(:)
+!        logical, pointer   ::   calcemis(:)
         real,    pointer   ::   t(:), mr(:), zk(:)
-        real,    pointer   ::   pm(:), tm(:), qrn(:), qcw(:),qci(:),qsn(:),qgr(:)
-        real               ::   ps,ts,t2m,mr2m,u10,v10
+        real,    pointer   ::   pm(:), tm(:), qm(:), qrn(:), qcw(:),qci(:),qsn(:),qgr(:)
+        real               ::   ps,ts,t2m,mr2m,u10,v10, clwp
         real               ::   smois, tslb, snowh, elevation,soiltyp,vegtyp,vegfra
         integer            ::   isflg
 

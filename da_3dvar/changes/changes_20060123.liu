@@ -1,0 +1,120 @@
+Change Log for update to WRF 3DVAR code
+---------------------------------------
+
+Author: Zhiquan Liu
+Reviewer: 
+Date: 01/23/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+add radiance assimilation components
+
+1. add RTTOV8_5 interface to WRF-VAR
+2. add radiance innovation computations capability for NOAA and AUQA satellites
+   contain NOAA HIRS/AMSUA/AMUSB and AUQA AIRS/AMSUA/HSB
+3. add quality control for amsua/amsub
+4. add bias correction interface (simple scan-dependent linear regression ).
+5. modified namelist parameters (RTMINIT)
+
+Test results (run on which machines?)
+------------------------------------------------------
+
+Tested 2 domains on bluesky :
+
+WRF      AMPS (60km31L) domain - September 21 2004 data.
+WRF Hurricane (12km51L) domain - August 2005 data.
+
+--------------------------------------------------------------------------------------
+
+Files added:
+------------
+in the directory src/da_radiance/
+
+da_biascorr_rad.inc
+da_calculate_grady_rad.inc
+da_calculate_jo_and_grady_rad.inc
+da_calculate_residual_rad.inc
+da_detsurtyp.inc
+da_get_innov_vector_rad.inc
+da_oma_stats_rad.inc
+da_omb_stats_rad.inc
+da_print_stats_rad.inc
+da_qc_amsua.inc
+da_qc_amsub.inc
+da_qc_rad.inc
+da_radiance.F
+da_read_bufrairs.inc
+da_read_bufrtovs.inc
+da_read_kma1dvar.inc
+da_rtm_ad.inc
+da_rtm_direct.inc
+da_rtm_init.inc
+da_rtm_tl.inc
+da_setup_bufrtovs_structures.inc
+da_transform_xtoy_rad.inc
+da_transform_xtoy_rad_adj.inc
+emiss_ssmi.inc
+gsi_constants.F
+gsi_emiss.inc
+gsi_kinds.F
+iceem_amsu.inc
+landem.inc
+seaem.inc
+snwem_amsu.inc
+parkind1.F
+rttov_ad.interface
+rttov_cld.interface
+rttov_const.F
+rttov_direct.interface
+rttov_errorhandling.interface
+rttov_global.F
+rttov_initcoeffs.interface
+rttov_q2v.interface
+rttov_readcoeffs.interface
+rttov_readscattcoeffs.interface
+rttov_scatt.interface
+rttov_setup.interface
+rttov_tl.interface
+rttov_types.F
+rttov_v2q.interface
+
+da_3dvar/changes/changes_20060123.liu (this file)
+
+Files modified:
+---------------
+DA_Constants/DA_Constants.F
+
+DA_Define_Structures/DA_Allocate_Y.inc
+DA_Define_Structures/DA_Deallocate_Y.inc
+DA_Define_Structures/DA_Define_Structures.F
+
+DA_Minimisation/DA_Calculate_GradY.inc
+DA_Minimisation/DA_Minimisation.F
+DA_Minimisation/da_calculate_j.inc
+DA_Minimisation/da_calculate_jo_and_grady.inc
+DA_Minimisation/da_calculate_residual.inc
+DA_Minimisation/da_get_innov_vector.inc
+DA_Minimisation/da_write_diagnostics.inc
+
+DA_Obs/DA_Transform_XToY.inc
+DA_Obs/DA_Transform_XToY_Adj.inc
+
+DA_Setup_Structures/DA_Setup_Structures.F
+DA_Setup_Structures/da_setup_obs_interp_wts.inc
+DA_Setup_Structures/da_setup_obs_structures.inc
+DA_Setup_Structures/da_transfer_wrftoxb.inc
+DA_Setup_Structures/da_transfer_kmatoxb.inc
+
+DA_Tools/DA_Read_Namelist.inc
+
+wrfvar/Registry/Registry.3DVAR         add  'tsk' etc. to the background structure
+wrfvar/arch/configure.defaults_3dvar   add  'rttov8_5' and 'NCEP bufr' library
+wrfvar/da_3dvar/src/Makefile           add  new source and object files
+wrfvar/run/DA_Run_3DVAR.csh            add  new namelist  'rtminit'
+
+Branch : BR_radiance_liu 
+Tag:     BR_radiance_liu_20060123
+
+version_2_?
+

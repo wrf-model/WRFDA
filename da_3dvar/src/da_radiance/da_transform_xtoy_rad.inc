@@ -115,7 +115,8 @@ SUBROUTINE da_transform_xtoy_rad ( xa, iv, xp, y )
                model_t(k)  = 0.  !coefs(inst) % ref_prfl_t(k,gas_id_watervapour)
                model_mr(k) = 0.  !coefs(inst) % ref_prfl_mr(k,gas_id_watervapour)
             ELSE
-            model_mr(k) = model_q(k) * 1.60771704e+6 ! convert q(kg/kg) to ppmv 
+!            model_mr(k) = model_q(k) * 1.60771704e+6 ! convert q(kg/kg) to ppmv 
+            model_mr(k) = model_q(k) * q2ppmv
 !               call rttov_q2v (&
 !                 & gas_unit_specconc,  &! in
 !                 & model_q(k),         &! in

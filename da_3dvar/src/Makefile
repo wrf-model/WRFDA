@@ -1336,7 +1336,13 @@ da_radiance.o:		DA_Constants.o          \
 			da_radiance/da_transform_xtoy_rad.inc \
 			da_radiance/da_transform_xtoy_rad_adj.inc \
 			da_radiance/da_get_innov_vector_rad.inc \
+			da_radiance/da_biascorr_rad.inc \
+			da_radiance/da_qc_rad.inc \
+			da_radiance/da_qc_amsua.inc \
+			da_radiance/da_qc_amsub.inc \
 			da_radiance/da_read_bufrtovs.inc \
+			da_radiance/da_read_bufrairs.inc \
+			da_radiance/da_read_kma1dvar.inc \
 			da_radiance/da_setup_bufrtovs_structures.inc \
 			da_radiance/da_oma_stats_rad.inc  \
 			da_radiance/da_omb_stats_rad.inc  \
