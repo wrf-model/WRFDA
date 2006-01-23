@@ -36,7 +36,6 @@ OBJS_FOR_ALL =		da_solve_v3d.o		\
 			DA_Grid_Definitions.o	\
 			DA_Statistics.o		\
 			DA_Define_Structures.o	\
-	                da_bufrlib.o 		\
 			da_h_ops.o		\
 			da_c_mat.o		\
 			DA_Constants.o		\
@@ -47,6 +46,13 @@ OBJS_FOR_ALL =		da_solve_v3d.o		\
 			da_spectral.o           \
 			da_fftpack5.o           \
 			da_gen_be.o             \
+			da_radiance.o		\
+			rttov_const.o		\
+			rttov_global.o		\
+			rttov_types.o		\
+			parkind1.o	\
+			gsi_kinds.o		\
+			gsi_constants.o		\
 			BLAS.o
 
 OBJS_4_GEN_BE_SHORT =	DA_Constants.o		\
@@ -91,7 +97,6 @@ OBJS_4_GEN_BE_LONG =	DA_Constants.o		\
 			DA_Recursive_Filter.o	\
 			DA_Interpolation.o	\
 			DA_Statistics.o		\
-	                da_bufrlib.o 		\
 			da_h_ops.o		\
 			da_c_mat.o		\
 			da_rf.o			\
@@ -187,6 +192,7 @@ DA_Minimisation.o:	\
 			DA_Profiler.o \
 			DA_Buoy.o  \
 			DA_Setup_Structures.o		\
+			da_radiance.o \
 			DA_Minimisation/DA_Minimisation.F \
 			DA_Minimisation/da_calculate_j.inc \
 			DA_Minimisation/da_calculate_jo_and_grady.inc \
@@ -218,10 +224,10 @@ DA_Setup_Structures.o:	\
 			DA_VToX_Transforms.o \
 			DA_Physics.o \
 			da_h_ops.o \
-	                da_bufrlib.o \
 	                DA_ReadWrite_MM5.o \
 	                da_spectral.o \
 	                da_gen_be.o  \
+			da_radiance.o \
 			DA_Setup_Structures/DA_Setup_Structures.F \
 			DA_Setup_Structures/da_add_increments.inc \
 			DA_Setup_Structures/DA_Add_PBL_And_SFC_Info.inc \
@@ -261,12 +267,6 @@ DA_Setup_Structures.o:	\
 			$(RM) $@
 			$(CPP) -I./DA_Setup_Structures $(CPPFLAGS_3DVAR) DA_Setup_Structures/DA_Setup_Structures.F > DA_Setup_Structures.f
 			$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) DA_Setup_Structures.f
-
-da_bufrlib.o:		\
-			da_bufrlib/da_bufrlib.f
-			$(RM) $@
-			$(CPP) -I./da_bufrlib $(CPPFLAGS_3DVAR)  da_bufrlib/da_bufrlib.f > da_bufrlib.f
-			$(F77) -c -I./da_bufrlib $(F77FLAGS_BUFR) $(MODULE_DIRS) da_bufrlib.f
 
 DA_VToX_Transforms.o:	\
 			par_util.o \
@@ -325,6 +325,7 @@ DA_Obs.o:		\
 			DA_Bogus.o \
 			da_pseudo.o \
 			da_qscat.o \
+			da_radiance.o \
 			DA_Profiler.o \
 			DA_Buoy.o  \
 			par_util.o \
@@ -345,7 +346,6 @@ DA_Obs.o:		\
 			DA_Obs/da_store_obs_grid_info.inc \
 			DA_Obs/da_use_obs_errfac.inc \
 			DA_Obs/da_write_obs.inc \
-			DA_Obs/da_write_filtered_obs.inc \
 			DA_Obs/da_write_y.inc
 			$(RM) $@
 			$(CPP) -I./DA_Obs $(CPPFLAGS_3DVAR) DA_Obs/DA_Obs.F > DA_Obs.f
@@ -1051,8 +1051,7 @@ DA_Define_Structures.o:	\
 			DA_Define_Structures/DA_Zero_vp_type.inc \
 			DA_Define_Structures/da_allocate_cv.inc \
 			DA_Define_Structures/da_deallocate_cv.inc \
-			DA_Define_Structures/da_gauss_noise.inc  \
-			DA_Define_Structures/DA_Zero_Y.inc  
+			DA_Define_Structures/da_gauss_noise.inc  
 			$(RM) $@
 			$(CPP) -I./DA_Define_Structures $(CPPFLAGS_3DVAR) DA_Define_Structures/DA_Define_Structures.F > DA_Define_Structures.f
 			$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) DA_Define_Structures.f
@@ -1316,6 +1315,83 @@ DA_Gen_Be_Stats.o:	../module_wrf_3dvar_io.o		\
 			$(RM) $@
 			$(CPP) -I./DA_Gen_Be_Stats $(CPPFLAGS_3DVAR) DA_Gen_Be_Stats/DA_Gen_Be_Stats.F > DA_Gen_Be_Stats.f
 			$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) DA_Gen_Be_Stats.f
+
+da_radiance.o:		DA_Constants.o          \
+			DA_Define_Structures.o  \
+			DA_Interpolation.o \
+			DA_Statistics.o \
+			DA_Tools.o		\
+			par_util.o		\
+			rttov_const.o	\
+			rttov_types.o  \
+			gsi_kinds.o		\
+			gsi_constants.o	\
+			da_radiance/da_rtm_init.inc   \
+			da_radiance/da_rtm_direct.inc \
+			da_radiance/da_rtm_tl.inc \
+			da_radiance/da_rtm_ad.inc \
+			da_radiance/da_calculate_grady_rad.inc \
+			da_radiance/da_calculate_jo_and_grady_rad.inc \
+			da_radiance/da_calculate_residual_rad.inc \
+			da_radiance/da_transform_xtoy_rad.inc \
+			da_radiance/da_transform_xtoy_rad_adj.inc \
+			da_radiance/da_get_innov_vector_rad.inc \
+			da_radiance/da_biascorr_rad.inc \
+			da_radiance/da_qc_rad.inc \
+			da_radiance/da_qc_amsua.inc \
+			da_radiance/da_qc_amsub.inc \
+			da_radiance/da_read_bufrtovs.inc \
+			da_radiance/da_read_bufrairs.inc \
+			da_radiance/da_read_kma1dvar.inc \
+			da_radiance/da_setup_bufrtovs_structures.inc \
+			da_radiance/da_oma_stats_rad.inc  \
+			da_radiance/da_omb_stats_rad.inc  \
+			da_radiance/da_print_stats_rad.inc \
+			da_radiance/da_detsurtyp.inc \
+			da_radiance/gsi_emiss.inc \
+			da_radiance/emiss_ssmi.inc \
+			da_radiance/iceem_amsu.inc \
+			da_radiance/landem.inc \
+			da_radiance/snwem_amsu.inc \
+			da_radiance/seaem.inc \
+			da_radiance/da_radiance.F
+			$(RM) $@
+			$(CPP) -I./da_radiance $(CPPFLAGS_3DVAR) da_radiance/da_radiance.F > da_radiance.f
+			$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) da_radiance.f
+
+rttov_const.o:		parkind1.o	\
+			da_radiance/rttov_const.F
+			$(RM) $@
+			$(CPP) -I./da_radiance $(CPPFLAGS_3DVAR) da_radiance/rttov_const.F > rttov_const.f
+			$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) rttov_const.f
+
+rttov_global.o:		parkind1.o	\
+			rttov_const.o	\
+			da_radiance/rttov_global.F
+			$(RM) $@
+			$(CPP) -I./da_radiance $(CPPFLAGS_3DVAR) da_radiance/rttov_global.F > rttov_global.f
+			$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) rttov_global.f
+
+rttov_types.o:		parkind1.o	\
+			rttov_const.o	\
+			da_radiance/rttov_types.F
+			$(CPP) -I./da_radiance $(CPPFLAGS_3DVAR) da_radiance/rttov_types.F > rttov_types.f
+			$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) rttov_types.f
+
+parkind1.o:		\
+			da_radiance/parkind1.F
+			$(CPP) -I./da_radiance $(CPPFLAGS_3DVAR) da_radiance/parkind1.F > parkind1.f
+			$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) parkind1.f
+
+gsi_kinds.o:		\
+			da_radiance/gsi_kinds.F
+			$(CPP) -I./da_radiance $(CPPFLAGS_3DVAR) da_radiance/gsi_kinds.F > gsi_kinds.f
+			$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) gsi_kinds.f
+
+gsi_constants.o:	gsi_kinds.o      \
+			da_radiance/gsi_constants.F
+			$(CPP) -I./da_radiance $(CPPFLAGS_3DVAR) da_radiance/gsi_constants.F > gsi_constants.f
+			$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) gsi_constants.f
 
 ##############################################################################
 

@@ -4,6 +4,7 @@
 !  HISTORY: 
 !
 !      Created: 02/17/2003                   S. R. H. Rizvi
+!                  07/2005 - Add radiance part   Zhiquan Liu
 !
 !      Purpose:
 !            
@@ -102,4 +103,8 @@
 
       call DA_Calculate_GradY_Radar( iv, re, jo_grad_y)
                    
+!     Radiance:
+
+      call DA_Calculate_GradY_Rad( iv, re, jo_grad_y)
+
       end subroutine DA_Calculate_GradY

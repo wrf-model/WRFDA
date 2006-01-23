@@ -9,6 +9,7 @@ SUBROUTINE da_get_innov_vector( it, ob, iv, &
 !           03/04/2005 - AMV's from Geostationary and       Syed  RH  Rizvi
 !                        Polar orbiting satellite are
 !                        seperated & used as profile
+!              07/2005 - Add radiance part                  Zhiquan Liu
 !
 !----------------------------------------------------------------------------
 
@@ -35,6 +36,9 @@ SUBROUTINE da_get_innov_vector( it, ob, iv, &
    write (6,'(A)')   ' [5.1] Calculate innovation vector (iv)'
    write (6,'(A)')   ' --------------------------------------'
    write(6,*)
+
+   print *, 'iv % num_inst = ', iv % num_inst
+   print *, 'ob % num_inst = ', ob % num_inst
 
    iv%ptop    = xb%ptop
 
@@ -128,6 +132,10 @@ SUBROUTINE da_get_innov_vector( it, ob, iv, &
 !-----Buoy:
 
       call da_get_innov_vector_buoy( it, xb, xp, ob, iv )
+
+!-----Radiance:
+
+      call da_get_innov_vector_rad( it, xb, xp, ob, iv )
 
 !-----Pseudo obs:
 

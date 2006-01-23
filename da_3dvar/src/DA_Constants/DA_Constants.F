@@ -6,6 +6,8 @@ MODULE DA_Constants
 !  METHOD:  Straightforward definitions.
 !
 !  HISTORY: 11/08/1999 - Creation.                           Dale Barker
+!              07/2005 - Add radiance assimilation           Zhiquan Liu
+!                        namelist parameter 'rtminit'
 !------------------------------------------------------------------------------
 
    IMPLICIT NONE
@@ -508,6 +510,32 @@ MODULE DA_Constants
  integer                :: numb_procs, &         ! Number of total processors.
                            my_proc_id            ! My processor ID.
  LOGICAL                :: global 
+
+!
+! RTM_INIT setup parameter (read from namelist.3dvar)
+!
+ integer, parameter            :: maxsensor = 30
+
+ integer                       :: rtminit_errunit,  &
+                                  rtminit_print,    &
+                                  rtminit_nsensor
+
+ integer, dimension(maxsensor) :: rtminit_platform, &
+                                  rtminit_satid,    &
+                                  rtminit_sensor
+
+ logical                       :: use_landem      ! if use weng's landem model
+ integer                       :: mw_emis_sea     ! surface emissivity type over sea
+                                                  ! 0:FASTEM-2; 1:Weng's model
+
+! type( rttov_coef ), pointer :: coefs(:)         ! RTTOV8_5 coefficients
+ logical                       :: use_obsgts, use_kma1dvar
+ logical                       :: use_radiance, use_hirs2, use_hirs3, &
+                                  use_msu, use_amsua, use_amsub, &
+                                  lbiascorr, lrttov_scatt, lmonitoring, &
+                                  lwrite_iv, lwrite_profile, use_eos_rad, use_airs, &
+                                  use_eos_amsua, use_hsb
+
  CONTAINS
 
 #include "da_advance_cymdh.inc"

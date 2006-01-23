@@ -8,6 +8,7 @@
 !           03/04/2005 - CMV's from Geostationary and       Syed  RH  Rizvi
 !                        Polar orbiting satellite are
 !                        seperated & used as profile
+!              07/2005 - Add radiance part                  Zhiquan Liu
 !
 !
 !  PARENT_MODULE: DA_Diagnostics
@@ -115,6 +116,11 @@
 
       call DA_OI_Stats_bogus ( stats_unit, iv )
 
+!  [1.20] Radiance:
+
+!      print *, 'iv%num_inst = ', iv%num_inst
+      call DA_OMB_Stats_Rad ( stats_unit, iv )
+
 
 !---- -------------------------------------------------------------------------
 !  [2.0] Calculate residual vector (O-A) statistics:
@@ -204,6 +210,10 @@
 !  [2.19] TC bogus:
 
       call DA_AO_Stats_Bogus ( stats_unit, iv, re )
+
+!  [2.20] Radiance:
+
+      call DA_OMA_Stats_Rad ( stats_unit, iv, re )
 
 !---- -------------------------------------------------------------------------
 !  [3.0] Calculate analysis increment (A-B) statistics:

@@ -188,7 +188,8 @@ NETCDF_IO_PATH  =       external/io_netcdf
 NETCDF_LIB	=       CONFIGURE_NETCDF_LIB_PATH
 
 LOCAL_LIBRARIES =       -L/usr/local/ncarg/lib -L/usr/X11R6/lib -L/usr/local/lib \
-			-lncarg -lncarg_gks -lncarg_c -lX11
+			-lncarg -lncarg_gks -lncarg_c -lX11 \
+			-L../../../rttov8_5 -lrttov8.5 -L../../../bufrlib -lbufr
 
 CPP             =       /lib/cpp $(TRADFLAG)
 DM_1_CPP_FLAGS  =
@@ -240,7 +241,8 @@ NETCDF_LIB	=       CONFIGURE_NETCDF_LIB_PATH
 MPI_LIB		=	-L../external/RSL/RSL -lrsl
 
 LOCAL_LIBRARIES =       -L/usr/local/ncarg/lib -L/usr/X12R6/lib -L/usr/local/lib \
-                        -lncarg -lncarg_gks -lncarg_c -lX11
+                        -lncarg -lncarg_gks -lncarg_c -lX11 \
+			-L../../../rttov8_5 -lrttov8.5 -L../../../bufrlib -lbufr
 
 CPP             =       /lib/cpp $(TRADFLAG)
 DM_1_CPP_FLAGS  =       -I../external/RSL/RSL -C -P `cat ../inc/dm_comm_cpp_flags` \
@@ -504,7 +506,7 @@ ARCHFLAGS       =       -DGRIB1 -DINTIO \
 PERL            =       CONFIGURE_PERL_PATH
 REGISTRY        =       Registry
 NETCDF_LIB	=       CONFIGURE_NETCDF_LIB_PATH
-LOCAL_LIB	=	-lmass -lmassv
+LOCAL_LIB	=	-lmass -lmassv -L../../../rttov8_5 -lrttov8.5 -L../../../bufrlib -lbufr_d_64
 
 LDFLAGS         =	-bmaxstack:256000000 -bmaxdata:2048000000
 ENVCOMPDEFS     =       CONFIGURE_COMPILEFLAGS
@@ -556,7 +558,7 @@ PERL            =       perl
 REGISTRY        =       Registry
 NETCDF_LIB	=       CONFIGURE_NETCDF_LIB_PATH
 MPI_LIB		=	-L../external/RSL/RSL -lrsl
-LOCAL_LIB	=	-lmass -lmassv
+LOCAL_LIB	=	-lmass -lmassv -L../../../rttov8_5 -lrttov8.5 -L../../../bufrlib -lbufr_d_64
 LDFLAGS         =	-bmaxstack:256000000 -bmaxdata:2048000000
 ENVCOMPDEFS     =       CONFIGURE_COMPILEFLAGS
 CPP		=	/lib/cpp
