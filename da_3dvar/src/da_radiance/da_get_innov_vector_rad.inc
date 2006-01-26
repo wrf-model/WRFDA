@@ -451,22 +451,10 @@
             iv%instid(inst)%rad(n)%tb_xb(k)  = tb(nprofiles,k)
             iv%instid(inst)%rad(n)%tb(k)%inv = &
                ob%instid(inst)%rad(n)%tb(k) - tb(nprofiles,k)
-!            iv%instid(inst)%rad(n)%tb(k)%error = satinfo(inst)%error(k)
-!            iv%instid(inst)%rad(n)%tb(k)%qc    = 1 !satinfo(inst)%iuse (k)
           else
             iv%instid(inst)%rad(n)%tb_xb(k)    = tb(nprofiles,k)
             iv%instid(inst)%rad(n)%tb(k)%inv   = missing_r
-!            iv%instid(inst)%rad(n)%tb(k)%error = 500.0
-!            iv%instid(inst)%rad(n)%tb(k)%qc    = -1
           end if
-
-!          if ( abs(iv%instid(inst)%rad(n)%tb(k)%inv) > 5.*satinfo(inst)%error(k) ) then
-!            iv%instid(inst)%rad(n)%tb(k)%qc    = -1
-!            iv%instid(inst)%rad(n)%tb(k)%error = 500.0
-!          end if
-!            iv%instid(inst)%rad(n)%emiss(k) = pems5(k) 
-!            iv%instid(inst)%rad(n)%calcemis(k) = calcemis(k)
-
          end do
                
     if (coefs(inst)%id_sensor == 2) then ! microwave
@@ -487,15 +475,9 @@
 !------------------------------------------------------------------------
 !        [4.0] Perform QC check
 !------------------------------------------------------------------------
-!            call da_qc_rad(inst,nchanl,  &
-!                           ob%instid(inst)%rad(n)%tb, &
-!                           iv%instid(inst)%rad(n) )
-
-!------------------------------------------------------------------------
-!        [4.0] Perform optional maximum error check:
-!------------------------------------------------------------------------
-!         IF ( check_max_iv ) CALL da_check_max_iv_sound(it, iv % sound(n), &
-!                        itu,ituf,itvv,itvvf,itt,ittf,itqv,itqvf)
+            call da_qc_rad(inst,nchanl,  &
+                           ob%instid(inst)%rad(n)%tb, &
+                           iv%instid(inst)%rad(n) )
 
        end if   !  end endif for within_halo
 

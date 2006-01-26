@@ -532,7 +532,7 @@ MODULE DA_Constants
  logical                       :: use_obsgts, use_kma1dvar
  logical                       :: use_radiance, use_hirs2, use_hirs3, &
                                   use_msu, use_amsua, use_amsub, &
-                                  lbiascorr, lrttov_scatt, lmonitoring, &
+                                  lread_biascoef,lbiascorr, lrttov_scatt, lmonitoring, &
                                   lwrite_iv, lwrite_profile, use_eos_rad, use_airs, &
                                   use_eos_amsua, use_hsb
 

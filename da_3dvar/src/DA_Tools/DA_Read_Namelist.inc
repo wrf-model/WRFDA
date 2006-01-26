@@ -107,7 +107,7 @@ SUBROUTINE DA_Read_Namelist
                        use_obsgts, use_radiance, use_kma1dvar,use_hirs2, use_hirs3,  &
                        use_msu, use_amsua, use_amsub,  &
                        use_eos_rad, use_airs,use_eos_amsua,use_hsb, &
-                       lmonitoring,lbiascorr, lrttov_scatt, &
+                       lmonitoring,lread_biascoef,lbiascorr, lrttov_scatt, &
                        lwrite_iv,lwrite_profile,use_landem, mw_emis_sea
 
 !----------------------------------------------------------------------------------

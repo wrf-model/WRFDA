@@ -324,7 +324,7 @@ subroutine da_rtm_init(iv,ob)
 !  6.0 read bias correction coefs files
 !-------------------------------------------------------
 
- if (lbiascorr) then
+ if (lread_biascoef) then
   bunit = 109
   open(bunit,file=trim(iv%instid(n)%rttovid_string)//'.bias', &
            form='formatted',iostat = iost, status='old')
