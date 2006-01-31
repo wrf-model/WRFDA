@@ -1,0 +1,55 @@
+Change Log for update to WRF 3DVAR code
+---------------------------------------
+
+Author: 	Yong-Run Guo
+Reviewer: 	
+Date: 		01/31/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Bugs fix 
+
+1, da_3dvar/src/DA_VToX_Transforms/da_transform_vtox_adj.inc
+
+   if (sfc_assi_options == 2) call DA_Transform_XToWTQ_adj( xp, xb, xa )
+
+   should be out of the IF-block:
+
+           if ( use_ssmt1obs .or. use_ssmt2obs .or. Use_GpspwObs .or. &
+           Use_SsmiTbObs .or. Use_SsmiRetrievalObs .or. use_GpsrefObs) then
+           ...............................................................
+           endif
+2, DA_Read_Obs.inc
+
+   For assimilation of the single level sounding data, change
+
+         if(nlevels < 1) cycle reports
+
+         if(nlevels < 1) then
+              ob%sound(num_sound)%info%levels = 0
+              cycle reports
+         endif   
+
+Expected Differences
+--------------------
+
+Accuracy:       
+
+not chnage.
+
+Files added:
+------------
+
+da_3dvar/changes/change_20060131.yrg
+
+Files modified:
+---------------
+
+M da_3dvar/src/DA_Obs/DA_Read_Obs.inc
+M da_3dvar/src/DA_VToX_Transforms/da_transform_vtox_adj.inc
+
+Minor-tag:
+---------
+
+
