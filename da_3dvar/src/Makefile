@@ -332,6 +332,7 @@ DA_Obs.o:		\
 	                DA_Obs/DA_Obs_Proc_Station.inc \
 			DA_Obs/DA_Read_Obs.inc \
 			DA_Obs/DA_Scan_Obs.inc \
+			DA_Obs/DA_Count_Filtered_Obs.inc \
 			DA_Obs/DA_Read_Radar.inc \
 			DA_Obs/DA_Scan_Radar.inc \
 			DA_Obs/DA_Transform_XToY.inc \

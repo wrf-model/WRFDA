@@ -51,6 +51,7 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
                                    its , ite , jts , jte , kts , kte
 
    TYPE (cv_type)               :: xhat  ! Increament control variable
+   INTEGER                      :: ierr  
 
 !------------------------------------------------------------------------------
 
@@ -62,20 +63,12 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
 
    CALL DA_Read_Namelist
 
-! For writing out the "CLEAN" observations or verification, to set 
-! ntmax =0 and max_ext_its =1 (Y.-R. Guo 10/07/2005)
-
-          if (ANALYSIS_TYPE == 'QC-OBS' .or. &
-              ANALYSIS_TYPE == 'VERIFY') then
-              max_ext_its = 1
-              if (ANALYSIS_TYPE == 'QC-OBS') then
-                ntmax = 0
-              else
-                ntmax = 1
-              endif
-              print '(/a,a/)', 'ANALYSIS_TYPE =',ANALYSIS_TYPE
-          endif
-
+!------------------------------------------------------------------------------
+! If it is verification run set check_max_iv as .false.
+!------------------------------------------------------------------------------
+   if( (analysis_type(1:6) == "VERIFY" .or.  analysis_type(1:6) == "verify") ) then
+     check_max_iv = .false.
+   endif
 !------------------------------------------------------------------------------
 !  [2.0] Initialise 3D-Var parameters:
 !------------------------------------------------------------------------------
@@ -148,16 +141,13 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
 #endif
       endif
 
+!------------------------------------------------------------------------------
 !     [8.2] Calculate innovation vector (O-B):
 
       CALL da_get_innov_vector( it, ob, iv, &
                                 grid , config_flags , &
 #include <em_dummy_args.inc>
                  )
-
-! No minimization for VERIFY (Y.-R. Guo, 10/07/2005):
-
-      if (ANALYSIS_TYPE == 'VERIFY') ntmax = 0
 
 !     [8.3] Interpolate x_g to low resolution grid
 
@@ -174,10 +164,28 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
                         ims, ime, jms, jme, kms, kme,        &
                         its, ite, jts, jte, kts, kte         )
 !------------------------------------------------------------------------------
-
-!   For first outer loop write filtered obs when ntmax = 0
-     if(it == 1 .and. ntmax == 0 .and. ANALYSIS_TYPE == 'QC-OBS') &
-      CALL da_write_filtered_obs(gts_iunit, filtered_obs_iunit, ob, iv)
+   
+     if( (analysis_type(1:6) == "QC-OBS" .or.  analysis_type(1:6) == "qc-obs") )then
+       if( ob_format == 1) then
+         write(*,'(a)')  &
+         'Since input Obs are in BUFR-format Filtered-Obs (fort.192) will not be written'
+       elseif( ob_format == 2) then
+#ifdef DM_PARALLEL 
+         call MPI_COMM_SIZE(MPI_COMM_WORLD, numb_procs, ierr)
+         print*,' I am using num_proc = ',numb_procs   
+         if( numb_procs == 1) then
+           if( it == 1) CALL da_write_filtered_obs(ob, iv, xp)
+         else
+           write(*,'(a,i3)')'Since it is MPI-run with processore (>1) ',numb_procs
+           write(*,'(a)')   ' Filtered-Obs (fort.192)  will not be written'
+         endif
+#else
+         if( it == 1) CALL da_write_filtered_obs(ob, iv, xp)
+#endif
+       else
+         print*,' Unknown Observation format: ',ob_format
+       endif
+     end if
 
 !     [8.5] Update latest analysis solution:
 
@@ -214,8 +222,6 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
 ! (2) Seperate treatment for WRF and KMA updating of Xa and Xb array
 ! (3) Treatment for MM5 format FG(fg_format = 2) remains same as original
 !------------------------------------------------------------------------------
-
-      if (ANALYSIS_TYPE == '3D-VAR') &
       call DA_Transfer_XatoAnalysis( it, xbx, grid, config_flags ,&
 #include <em_dummy_args.inc>
                            )

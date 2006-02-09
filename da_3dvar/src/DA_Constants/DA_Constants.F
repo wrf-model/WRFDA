@@ -215,6 +215,7 @@ MODULE DA_Constants
    INTEGER, PARAMETER :: v_interp_not_specified = missing, &
                          v_interp_p             = 1, &
                          v_interp_h             = 2
+   INTEGER            :: p_below = 0, p_above = 0, h_below = 0, h_above = 0
 
 !------------------------------------------------------------------------------
 ! 3DVAR scalar constants:

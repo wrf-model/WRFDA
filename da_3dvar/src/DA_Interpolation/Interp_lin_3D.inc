@@ -25,7 +25,10 @@ subroutine Interp_lin_3D(fm3d, xp, &
   fo3d(:) = 0.0
 
   do kk = 1, nl
-     if(zk(kk) > 0.0) then
+     if(zk(kk) > 0.0 .or. &
+       (ANALYSIS_TYPE == 'VERIFY' .or. ANALYSIS_TYPE == 'verify')) then
+! Guo... for 'VERIFY', any of zk(kk) values are allowed:
+    
         call toGrid(zk(kk), xp%kts, xp%kte, k, dz, dzm)
         fo3d(kk) = dzm*fmz(k) + dz*fmz(k+1)
      endif

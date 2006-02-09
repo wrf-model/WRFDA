@@ -165,5 +165,10 @@ SUBROUTINE da_get_innov_vector( it, ob, iv, &
                               )
    endif
 
+ if (ANALYSIS_TYPE == 'VERIFY' .or. ANALYSIS_TYPE == 'verify') then
+ write(*,'(/a,i5,a,i5)') "OBS below lowest  level: p#=",p_below,"  h#=",h_below
+ write(*,'(a,i5,a,i5/)') "OBS above highest level: p#=",p_above,"  h#=",h_above
+ endif
+
 END SUBROUTINE da_get_innov_vector
 

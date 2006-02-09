@@ -568,11 +568,12 @@ loop_level: DO i = 1, platform%info%levels
          ob%satem(num_satem)%p(1) = platform%each(1)%p%inv
          ob%satem(num_satem)%thickness(1) = platform%each(1)%t
 !  write original thickness errors for filtered obs on 193 unit 
+         if(analysis_type(1:6)=='QC-OBS' .or. analysis_type(1:6) == 'qc-obs') then
          do i = 1, nlevels
-         if(NTMAX == 0) write(193,'(i8,2x,i8,2f12.3)') &
-              num_satem,i,platform%each(i)%t%inv,platform%each(i)%t%error 
+         write(193,'(i8,2x,i8,2f12.3)') &
+         num_satem,i,platform%each(i)%t%inv,platform%each(i)%t%error 
          end do 
-
+         endif
 !        Splitting the reported Satem data into smaller layers.
 
          do i = 2, nlevels
