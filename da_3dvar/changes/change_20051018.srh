@@ -1,0 +1,57 @@
+Change Log for update to WRF-Var (RB_V21) code
+---------------------------------------
+
+Author  : Syed RH Rizvi
+Reviewer: 
+Date: 10/18/2005
+
+Reason for changes 
+-------------------
+
+Update for QC'd observations & Run script
+New procedure do not changes the original ob & iv arrays
+while writing the filtered obs. It also writes count for various 
+observation types used in filtered obs are writes it in its headrer.
+
+Files removed:
+--------------
+None
+
+Files added:
+------------
+da_3dvar/src/DA_Obs/DA_Count_Filtered_Obs.inc  
+da_3dvar/changes/change_20051018.srh
+
+
+Files modified:
+---------------
+da_3dvar/src/DA_Obs/DA_Obs.F                 
+da_3dvar/src/DA_Obs/DA_Read_Obs.inc             
+da_3dvar/src/DA_Obs/da_write_filtered_obs.inc
+da_3dvar/src/da_solve_v3d/da_solve_v3.F
+da_3dvar/src/Makefile
+run/DA_Run_WRF-Var.csh
+
+
+Expected Differences
+--------------------
+
+No changes are expected 
+
+Accuracy: 
+
+CPU:
+
+No changes are expected.
+
+memory:
+
+No changes are expected.
+
+Test results (run on mac machines?)
+------------------------------------------------------
+
+No changes are observed in "DAProg_WRF-Var.statistics" output 
+when WRF-Var is run with input as filtered obs (initially generated 
+with check_max_iv = .true.) with and without "check_max_iv".
+ 
