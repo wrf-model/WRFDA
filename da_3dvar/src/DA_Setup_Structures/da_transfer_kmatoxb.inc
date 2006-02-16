@@ -8,6 +8,7 @@ SUBROUTINE DA_Transfer_KMAToXb( xbx, grid, &
 !  PURPOSE: Transfers fields from KMA to first guess (xb) structure.
 !
 !  HISTORY:   08/06/2004	                 Syed RH Rizvi
+!             2005/12/08   Add RTTOV variables   Zhiquan Liu 
 !
 !  PARENT_MODULE: DA_Setup_Structures
 !------------------------------------------------------------------------------
@@ -175,6 +176,26 @@ SUBROUTINE DA_Transfer_KMAToXb( xbx, grid, &
        xb%psfc(i,j) = psfc(i,j)
        xb%terr(i,j) = ht(i,j)
 
+! Zhiquan Liu add some RTTOV variables
+!--------------------------------------
+        xb%t2(i,j) = t2(i,j)
+        xb%q2(i,j) = q2(i,j)
+        xb%u10(i,j) = u10(i,j)
+        xb%v10(i,j) = v10(i,j)
+        xb%tsk(i,j) = sst(i,j)
+        xb%landmask(i,j) = landmask(i,j)
+        xb%xland(i,j) = xland(i,j)
+
+       xb%smois(i,j) = smois(i,j,1)
+       xb%tslb(i,j) = tslb(i,j,1)
+       xb%xice(i,j) = xice(i,j)
+       xb%ivgtyp(i,j) = ivgtyp(i,j)
+       xb%isltyp(i,j) = isltyp(i,j)
+       xb%vegfra(i,j) = vegfra(i,j)
+       xb%snowh(i,j) = snowh(i,j)
+       xb%snowh(i,j) = snow(i,j)*10. ! convert snow water equivalent kg/m2 to snow depth(mm)
+
+      ! print *, xb%psfc(i,j),xb%tsk(i,j),xb%t2(i,j),xb%q2(i,j),xb%u10(i,j),xb%v10(i,j)
 !------------------------------------------------------------------------------
 !  Syed RH Rizvi
 ! 
@@ -390,6 +411,8 @@ PRINT *,'TEST_COVERAGE_da_transfer_kmatoxb_B:  tmpp(',k,') = ', tmpp
                    xb%h(i,j,ks), xb%rough(i,j),xb%landmask(i,j), &
                    xb%u10(i,j), xb%v10(i,j), xb%t2(i,j), xb%q2(i,j), &
                    xb%regime(i,j))
+
+      print *, i,j,xb%psfc(i,j),xb%t2(i,j),xb%q2(i,j),xb%u10(i,j),xb%v10(i,j)
 !------------------------------------------------------------------------------
 !
 # endif
@@ -553,6 +576,15 @@ enddo
 do j=xp%jds,xp%jde
 PRINT *,'TEST_COVERAGE_da_transfer_kmatoxb_D:  xbx%latc_mean(',j,') = ', xbx%latc_mean(j)
 enddo
+
+!------------------------------------------------------------------------------
+    print *, 'js je is ie= ', js,je,is,ie
+!   do j=js,je
+!     do i=is,ie
+!       write(6,'(2i4,3f12.2,e12.4,2f12.2)') j,i,xb%psfc(i,j),xb%tsk(i,j),xb%t2(i,j),xb%q2(i,j),xb%u10(i,j),xb%v10(i,j)
+!     end do
+!   end do
+
 
 END SUBROUTINE DA_Transfer_KMAToXb
 

@@ -8,6 +8,8 @@ subroutine da_calculate_j( it, iter, xb, xbx, be, iv, xhat, cv, vv, &
 ! PURPOSE: Initialises the Y-array
 !
 ! PARENT_MODULE: DA_DA_Minimisation  
+!
+!      08/2005  - replace da_zero_y by da_allocate_y     Zhiquan Liu
 !------------------------------------------------------------------------------
 
       implicit none
@@ -55,9 +57,9 @@ subroutine da_calculate_j( it, iter, xb, xbx, be, iv, xhat, cv, vv, &
       
 !     [2.1] transform from control variable to model grid space:
 
-      call da_zero_y (iv, y)
+      call da_allocate_y (iv, y)
 !-----initialising now the residual array
-      call da_zero_y (iv, re)
+      call da_allocate_y (iv, re)
 !
       if ( iter > 0 ) &
          call DA_Transform_VToY( be, xhat, iv, vp, vv, xa, xb, xbx, xp, y, &
@@ -75,6 +77,7 @@ subroutine da_calculate_j( it, iter, xb, xbx, be, iv, xhat, cv, vv, &
       call da_calculate_jo_and_grady( iv, re, jo_partial, j % jo, jo_grad_y)
 
     IF ( testing_dm_bitwise_exact ) THEN
+      ! jo_partial has been already summed at lower level
       j % jo % total = jo_partial
     ELSE
       j % jo % total = wrf_dm_sum_real( jo_partial )

@@ -1,5 +1,7 @@
 SUBROUTINE DA_Transform_XToY_Adj( xb, iv, xp, jo_grad_y, jo_grad_x )
    
+!      07/2005 - Add radiance part        Zhiquan Liu
+!-----------------------------------------------------
    implicit none
    
    type (xb_type), intent(in)        :: xb          ! first guess state.
@@ -127,6 +129,12 @@ SUBROUTINE DA_Transform_XToY_Adj( xb, iv, xp, jo_grad_y, jo_grad_x )
 !------------------------------------------------------------------------------
 
    call da_transform_xtoy_Bogus_adj ( xb, iv, xp, jo_grad_y, jo_grad_x )
+
+!------------------------------------------------------------------------------
+!  [20.0] Radiance observation operator y = H(x):
+!------------------------------------------------------------------------------
+
+   call da_transform_xtoy_rad_adj ( iv, xp, jo_grad_y, jo_grad_x )
 
 !------------------------------------------------------------------------------
 END SUBROUTINE DA_Transform_XToY_Adj

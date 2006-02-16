@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# First argument is input big endian BUFR file
+# Second argument is output little endian BUFR, for PC Linux etc
+
+./bufr_little_endian.exe $1 ${1}.little_endian
+

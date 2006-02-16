@@ -8,6 +8,7 @@
 $sw_perl_path = perl ;
 $sw_netcdf_path = "" ;
 $sw_phdf5_path=""; 
+$sw_rttov_path=""; 
 $sw_ldflags=""; 
 $sw_compileflags=""; 
 $WRFCHEM = 0 ;
@@ -27,6 +28,10 @@ while ( substr( $ARGV[0], 0, 1 ) eq "-" )
   if ( substr( $ARGV[0], 1, 6 ) eq "phdf5=" )
   {
     $sw_phdf5_path = substr( $ARGV[0], 7 ) ;
+  }
+  if ( substr( $ARGV[0], 1, 6 ) eq "rttov=" )
+  {
+    $sw_rttov_path = substr( $ARGV[0], 7 ) ;
   }
   if ( substr( $ARGV[0], 1, 3 ) eq "os=" )
   {
@@ -118,6 +123,7 @@ while ( <CONFIGURE_DEFAULTS> )
     $_ =~ s/CONFIGURE_PERL_PATH/$sw_perl_path/g ;
     $_ =~ s/CONFIGURE_NETCDF_PATH/$sw_netcdf_path/g ;
     $_ =~ s/CONFIGURE_PHDF5_PATH/$sw_phdf5_path/g ;
+    $_ =~ s/CONFIGURE_RTTOV_PATH/$sw_rttov_path/g ;
     $_ =~ s/CONFIGURE_LDFLAGS/$sw_ldflags/g ;
     $_ =~ s/CONFIGURE_COMPILEFLAGS/$sw_compileflags/g ;
     if ( $sw_netcdf_path ) 
@@ -142,6 +148,15 @@ while ( <CONFIGURE_DEFAULTS> )
 	$_ =~ s:CONFIGURE_PHDF5_FLAG::g ;
 	$_ =~ s:CONFIGURE_PHDF5_LIB_PATH::g ;
 	 }
+
+    if ( $sw_rttov_path ) {
+      $_ =~ s:CONFIGURE_RTTOV_FLAG:-DRTTOV: ;
+      $_ =~ s:CONFIGURE_RTTOV_LIB:-L$sw_rttov_path/lib -lrttov: ;
+    } else {
+      $_ =~ s:CONFIGURE_RTTOV_FLAG::g ;
+      $_ =~ s:CONFIGURE_RTTOV_LIB::g ;
+    }
+
     @machopts = ( @machopts, $_ ) ;
     if ( substr( $_, 0, 10 ) eq "ENVCOMPDEF" )
     {

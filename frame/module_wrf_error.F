@@ -4,6 +4,8 @@
 MODULE module_wrf_error
   INTEGER           :: wrf_debug_level = 0
   CHARACTER*256     :: wrf_err_message
+  CHARACTER(LEN=256) :: errmsg(100)
+  INTEGER            :: msgcount
 CONTAINS
 
   LOGICAL FUNCTION wrf_at_debug_level ( level )
@@ -65,6 +67,16 @@ SUBROUTINE wrf_message( str )
 #endif
 END SUBROUTINE wrf_message
 
+SUBROUTINE wrf_messages( str )
+  USE module_wrf_error
+  IMPLICIT NONE
+  CHARACTER(LEN=*) :: str(:)
+  INTEGER I
+  DO I=1,SIZE(str)
+    CALL wrf_message(str(i))
+  END DO
+END SUBROUTINE wrf_messages
+
 ! intentionally write to stderr only
 SUBROUTINE wrf_message2( str )
   USE module_wrf_error
@@ -79,6 +91,15 @@ SUBROUTINE wrf_message2( str )
   ENDIF
 #endif
 END SUBROUTINE wrf_message2
+
+! Quick way of showing location
+SUBROUTINE wrf_oi( str,line )
+  IMPLICIT NONE
+  CHARACTER*(*) str
+  INTEGER, INTENT(IN) :: line
+
+  write(0,*) str, line
+END SUBROUTINE wrf_oi
 
 SUBROUTINE wrf_error_fatal3( file_str, line, str )
   USE module_wrf_error

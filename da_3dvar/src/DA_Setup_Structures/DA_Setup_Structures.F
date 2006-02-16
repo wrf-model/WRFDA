@@ -7,6 +7,7 @@ MODULE DA_Setup_Structures
 !
 !  HISTORY: 01/06/2000 - Creation of F90 version.           Dale Barker
 !           11/15/2004 - Added spectral transform programs  Syed RH Rizvi 
+!              07/2005 - Add radiance module                  Zhiquan Liu
 !
 !------------------------------------------------------------------------------
 
@@ -25,6 +26,7 @@ MODULE DA_Setup_Structures
    USE da_spectral
    USE da_gen_be  
    use module_wrf_3dvar_io
+   use da_radiance
 
    IMPLICIT NONE
 

@@ -11,6 +11,7 @@ SUBROUTINE DA_Read_Namelist
 !  Additions:
 !             07/08/2003      Profiler and Buoy Obs            Syed RH Rizvi
 !             01/31/2005      Added global option              Syed RH Rizvi
+!             07/18/2005      Add rtminit options              Zhiquan Liu
 !----------------------------------------------------------------------------
    IMPLICIT NONE
 
@@ -26,7 +27,8 @@ SUBROUTINE DA_Read_Namelist
 
 !  Namelist contents :
 
-   NAMELIST /RECORD1/  MODEL_TYPE, write_increments, global, print_detail, lvar4d
+   NAMELIST /RECORD1/  MODEL_TYPE, write_increments, global, print_detail, lvar4d, &
+                       stdout_unit, stderr_unit
    NAMELIST /RECORD2/  ANALYSIS_TYPE, ANALYSIS_DATE, ANALYSIS_ACCU, W_INCREMENTS, &
                        DT_cloud_model, &
                        write_qcw, write_qrn, write_qci, write_qsn, write_qgr
@@ -54,6 +56,13 @@ SUBROUTINE DA_Read_Namelist
                        use_ProfilerObs, &
                        use_BuoyObs, &
                        use_BogusObs, &
+                       use_Hirs2Obs, use_Hirs3Obs,  &
+                       use_MsuObs, &
+                       use_AmsuaObs, use_AmsubObs,  &
+                       use_AirsObs, &
+                       use_Eos_amsuaObs, &
+                       use_Eos_radObs, &
+                       use_HsbObs, &
                        check_max_iv, &
                        use_obs_errfac, &
                        put_rand_seed, &
@@ -101,6 +110,11 @@ SUBROUTINE DA_Read_Namelist
    NAMELIST /RECORD13/ vert_corr, vertical_ip, vert_evalue, &
                        max_vert_var1, max_vert_var2, &
                        max_vert_var3, max_vert_var4, max_vert_var5
+   NAMELIST /RECORD14/ rtminit_print, rtminit_nsensor, &
+                       rtminit_platform,rtminit_satid, rtminit_sensor,  &
+                       use_kma1dvar,  &
+                       lmonitoring,lread_biascoef,lbiascorr, lrttov_scatt, &
+                       lwrite_iv,lwrite_profile,use_landem, mw_emis_sea
    NAMELIST /pseudo_ob_nl/ num_pseudo, pseudo_x, pseudo_y, pseudo_z, &
                            pseudo_val, pseudo_err, pseudo_var
 
@@ -118,6 +132,8 @@ SUBROUTINE DA_Read_Namelist
    lvar4d           = .false.
    PRINT_DETAIL     = 0
    global           = .FALSE. 
+   stdout_unit      = 6
+   stderr_unit      = 0
 
 
 !--record2
@@ -159,6 +175,15 @@ SUBROUTINE DA_Read_Namelist
    use_ssmt1obs   = .FALSE.
    use_ssmt2obs   = .FALSE.
    use_qscatobs   = .FALSE.
+   use_hirs2Obs   = .FALSE.       
+   use_hirs3Obs   = .FALSE.       
+   Use_MsuObs     = .FALSE.       
+   Use_AmsuaObs   = .FALSE.       
+   Use_AmsubObs   = .FALSE.
+   Use_AirsObs    = .FALSE.
+   Use_Eos_AmsuaObs = .FALSE.
+   Use_Eos_RadObs = .FALSE.
+   Use_HsbObs     = .FALSE.
    check_max_iv   = .TRUE.
    use_obs_errfac = .FALSE.
    put_rand_seed  = .FALSE.
@@ -270,6 +295,14 @@ SUBROUTINE DA_Read_Namelist
    max_vert_var4  = 99.0
    max_vert_var5  = 0.0
 
+!--record14
+   rtminit_print         = 1
+   rtminit_nsensor       = 1
+   rtminit_platform (:)  = -1
+   rtminit_satid    (:)  = -1
+   rtminit_sensor   (:)  = -1
+
+
 !--pseudo_ob_nl
    num_pseudo     = 0
    pseudo_x       = 1.0
@@ -279,125 +312,200 @@ SUBROUTINE DA_Read_Namelist
    pseudo_err     = 1.0
    pseudo_var     = 't'
 
+
 !----------------------------------------------------------------------------
 !  [1.0] Open namelist file:
 !----------------------------------------------------------------------------
 
    namelist_file = 'namelist.3dvar'
-   WRITE (6, '(3x,A,A)' ) ' 3DVAR namelist options used are in: ', namelist_file
+   WRITE (UNIT=stdout,FMT='(3x,A,A)' ) ' 3DVAR namelist options used are in: ', namelist_file
    IOST = 0
 
    OPEN ( FILE   = namelist_file, UNIT   = namelist_unit, &
           STATUS = 'OLD' , ACCESS = 'SEQUENTIAL', &
           FORM   = 'FORMATTED', ACTION = 'READ', &
-          ERR    = 8000, IOSTAT = IOST )
+          IOSTAT = IOST )
+     IF (iost /= 0) THEN
+       CALL wrf_error_fatal3(__FILE__,__LINE__, &
+         "ERROR OPENING NAMELIST FILE "//TRIM (namelist_file))
+     END IF
 
 !----------------------------------------------------------------------------
 !  [2.0] Read namelist and close:
 !----------------------------------------------------------------------------
    IOST = 0
 
+   READ  ( UNIT = namelist_unit, NML = RECORD1 , IOSTAT = IOST)
+   IF (iost /= 0) THEN
+     CALL wrf_error_fatal3(__FILE__,__LINE__, &
+       "ERROR READING NAMELIST FILE "//TRIM (namelist_file))
+   ENDIF
 
-   READ  ( UNIT = namelist_unit, NML = RECORD1 , ERR = 8000, IOSTAT = IOST)
+   stdout = stdout_unit
+   stderr = stderr_unit
 
    if ( print_detail >= 1 ) then
-      WRITE(6,'(A,3X,A     )') ' MODEL_TYPE    = ', trim(MODEL_TYPE)
-      WRITE(6,'(A,I4       )') ' print_detail  = ',print_detail
-      WRITE(6,'(A,3X,L10   )') ' write_increments = ', write_increments
-      WRITE(6,'(A,3X,L10   )') ' Global analysis option=', global         
-      WRITE(6,'(A,3X,L10   )') ' VAR4d =', lvar4d
+      WRITE(UNIT=stdout,FMT='(A,3X,A)')   ' MODEL_TYPE       = ', trim(MODEL_TYPE)
+      WRITE(UNIT=stdout,FMT='(A,I4)')     ' print_detail     = ',print_detail
+      WRITE(UNIT=stdout,FMT='(A,3X,L10')  ' write_increments = ', write_increments
+      WRITE(UNIT=stdout,FMT='(A,3X,L10)') ' Global analysis option=', global         
+      WRITE(UNIT=stdout,FMT='(A,3X,L10)') ' VAR4d            =', lvar4d         
+      WRITE(UNIT=stdout,FMT='(A,3X,I5)')  ' stdout_unit      =', stdout_unit     
+      WRITE(UNIT=stdout,FMT='(A,3X,I5)')  ' stderr_unit      =', stderr_unit
    endif
 
-   READ  ( UNIT = namelist_unit, NML = RECORD2 , ERR = 8000, IOSTAT = IOST)
+   READ  ( UNIT = namelist_unit, NML = RECORD2 , IOSTAT = IOST)
+   IF (iost /= 0) THEN
+     CALL wrf_error_fatal3(__FILE__,__LINE__, &
+       "ERROR READING NAMELIST FILE "//TRIM (namelist_file))
+   ENDIF
 
    if ( print_detail >= 1 ) then
-      WRITE(6,'(A,3X,A6    )') ' ANALYSIS TYPE = ',ANALYSIS_TYPE
-      WRITE(6,'(A,3X,A     )') ' ANALYSIS DATE = ',ANALYSIS_DATE
-      WRITE(6,'(A,3X,i6    )') ' ANALYSIS ACCU = ',ANALYSIS_ACCU
-      WRITE(6,'(A,3X,L10   )') ' W INCREMENTS  = ',W_INCREMENTS
+      WRITE(UNIT=stdout,FMT='(A,3X,A6    )') ' ANALYSIS TYPE = ',ANALYSIS_TYPE
+      WRITE(UNIT=stdout,FMT='(A,3X,A     )') ' ANALYSIS DATE = ',ANALYSIS_DATE
+      WRITE(UNIT=stdout,FMT='(A,3X,i6    )') ' ANALYSIS ACCU = ',ANALYSIS_ACCU
+      WRITE(UNIT=stdout,FMT='(A,3X,L10   )') ' W INCREMENTS  = ',W_INCREMENTS
    endif
 
-   READ  ( UNIT = namelist_unit, NML = RECORD3 , ERR = 8000, IOSTAT = IOST)
+   READ  ( UNIT = namelist_unit, NML = RECORD3 , IOSTAT = IOST)
+   IF (iost /= 0) THEN
+     CALL wrf_error_fatal3(__FILE__,__LINE__, &
+       "ERROR READING NAMELIST FILE "//TRIM (namelist_file))
+   ENDIF
 
    if ( print_detail >= 1 ) then
-      WRITE(6,'(A,3X,i4    )') ' fg_format     = ',    fg_format
-      WRITE(6,'(A,3X,i4    )') ' ob_format     = ',    ob_format
+      WRITE(UNIT=stdout,FMT='(A,3X,i4    )') ' fg_format     = ',    fg_format
+      WRITE(UNIT=stdout,FMT='(A,3X,i4    )') ' ob_format     = ',    ob_format
    endif
 
-   READ  ( UNIT = namelist_unit, NML = RECORD4 , ERR = 8000, IOSTAT = IOST)
+   READ  ( UNIT = namelist_unit, NML = RECORD4 , IOSTAT = IOST)
+   IF (iost /= 0) THEN
+     CALL wrf_error_fatal3(__FILE__,__LINE__, &
+       "ERROR READING NAMELIST FILE "//TRIM (namelist_file))
+   ENDIF
    
    if ( print_detail >= 1 ) then
-      WRITE(6,'(A,3X,A8    )') ' PROCESS_OBS   = ',PROCESS_OBS
-      WRITE(6,'(A,3X,I4    )') ' obs_qc_pointer= ',obs_qc_pointer
-      WRITE(6,'(A,3X,L10   )') ' Use_SynopObs  =', Use_SynopObs, &
-                               ' Use_ShipsObs  =', Use_ShipsObs, &
-                               ' Use_MetarObs  =', Use_MetarObs, &
-                               ' Use_PilotObs  =', Use_PilotObs, &
-                               ' Use_ProfilerObs  =', Use_ProfilerObs, &
-                               ' Use_BuoyObs  =', Use_BuoyObs, &
-                               ' Use_SoundObs  =', Use_SoundObs, &
-                               ' Use_BogusObs  =', Use_BogusObs, &
-                               ' Use_RadarObs  =', Use_RadarObs, &
-                               ' Use_Radar_rv  =', Use_Radar_rv, &
-                               ' Use_Radar_rf  =', Use_Radar_rf, &
-                               ' Use_SatemObs  =', Use_SatemObs, &
-                               ' Use_GeoAMVObs  =', Use_GeoAMVObs, &
-                               ' Use_PolarAMVObs  =', Use_PolarAMVObs, &
-                               ' Use_AirepObs  =', Use_AirepObs, &
-                               ' Use_GpspwObs  =', Use_GpspwObs, &
-                               ' Use_GpsrefObs  =', Use_GpsrefObs, &
-                               ' Use_SsmiRetrievalObs =', Use_SsmiRetrievalObs, &
-                               ' Use_SsmiTbObs =', Use_SsmiTbObs, &
-                               ' Use_SSMT1Obs  =', Use_SSMT1Obs, &
-                               ' Use_SSMT2Obs  =', Use_SSMT2Obs, &
-                               ' use_qscatobs  =', use_qscatobs, &
-                               ' check_max_iv  =', check_max_iv, &
-                               ' use_obs_errfac=', use_obs_errfac, &
-                               ' put_rand_seed =', put_rand_seed, &
-                               ' omb_set_rand =', omb_set_rand, &
-                               ' omb_add_noise=', omb_add_noise
+      WRITE(UNIT=stdout,FMT='(A,3X,A8)') ' PROCESS_OBS      = ', PROCESS_OBS
+      WRITE(UNIT=stdout,FMT='(A,3X,I4)') ' obs_qc_pointer   = ', obs_qc_pointer
+      WRITE(UNIT=stdout,FMT='(A,3X,L10)') ' Use_SynopObs     = ', Use_SynopObs, &
+                                          ' Use_ShipsObs     = ', Use_ShipsObs, &
+                                          ' Use_MetarObs     = ', Use_MetarObs, &
+                                          ' Use_PilotObs     = ', Use_PilotObs, &
+                                          ' Use_ProfilerObs  = ', Use_ProfilerObs, &
+                                          ' Use_BuoyObs      = ', Use_BuoyObs, &
+                                          ' Use_SoundObs     = ', Use_SoundObs, &
+                                          ' Use_BogusObs     = ', Use_BogusObs, &
+                                          ' Use_RadarObs     = ', Use_RadarObs, &
+                                          ' Use_Radar_rv     = ', Use_Radar_rv, &
+                                          ' Use_Radar_rf     = ', Use_Radar_rf, &
+                                          ' Use_SatemObs     = ', Use_SatemObs, &
+                                          ' Use_GeoAMVObs    = ', Use_GeoAMVObs, &
+                                          ' Use_PolarAMVObs  = ', Use_PolarAMVObs, &
+                                          ' Use_AirepObs     = ', Use_AirepObs, &
+                                          ' Use_GpspwObs     = ', Use_GpspwObs, &
+                                          ' Use_GpsrefObs    = ', Use_GpsrefObs, &
+                                          ' Use_SsmiRetrievalObs =', Use_SsmiRetrievalObs, &
+                                          ' Use_SsmiTbObs    = ', Use_SsmiTbObs, &
+                                          ' Use_SSMT1Obs     = ', Use_SSMT1Obs, &
+                                          ' Use_SSMT2Obs     = ', Use_SSMT2Obs, &
+                                          ' use_qscatobs     = ', use_qscatobs, &
+                                          ' use_Hirs2Obs     = ', use_Hirs2Obs , &
+                                          ' use_Hirs3Obs     = ', use_Hirs3Obs , &
+                                          ' use_MsuObs       = ', use_MsuObs , & 
+                                          ' use_AmsuaObs     = ', use_AmsuaObs , &
+                                          ' use_AmsubObs     = ', use_AmsubObs , &
+                                          ' use_AirsObs      = ', use_AirsObs , &
+                                          ' use_Eos_AmsuaObs = ', use_Eos_AmsuaObs , &
+                                          ' use_Eos_RadObs   = ', use_Eos_RadObs , &
+                                          ' use_HsbObs       = ', use_HsbObs , &
+                                          ' check_max_iv     = ', check_max_iv, &
+                                          ' use_obs_errfac   = ', use_obs_errfac, &
+                                          ' put_rand_seed    = ', put_rand_seed, &
+                                          ' omb_set_rand     = ', omb_set_rand, &
+                                          ' omb_add_noise    = ', omb_add_noise
    end if
 
-   READ  ( UNIT = namelist_unit, NML = RECORD5 , ERR = 8000, IOSTAT = IOST)
+  IF (Use_SynopObs .OR. Use_ShipsObs .OR. Use_MetarObs .OR. Use_PilotObs .OR. &
+      Use_ProfilerObs .OR. Use_BuoyObs .OR. Use_SoundObs .OR. Use_BogusObs .OR. &
+      Use_RadarObs .OR. Use_Radar_rv .OR. Use_Radar_rf .OR. Use_SatemObs .OR. &
+      Use_GeoAMVObs .OR. Use_PolarAMVObs .OR. Use_AirepObs .OR. &
+      Use_GpspwObs .OR. Use_GpsrefObs .OR. Use_SsmiRetrievalObs .OR. &
+      Use_SsmiTbObs .OR. Use_SSMT1Obs .OR. Use_SSMT2Obs .OR. use_qscatobs) THEN
+ 
+    use_obsgts = .TRUE.
+  ELSE
+    use_obsgts = .FALSE.
+  END IF
+
+  IF (use_Hirs2Obs .OR. use_Hirs3Obs .OR. use_MsuObs .OR. use_AmsuaObs .OR. &
+      use_AmsubObs .OR. use_AirsObs .OR. use_Eos_AmsuaObs .OR. &
+      use_Eos_RadObs .OR. use_HsbObs) THEN
+    use_radiance = .TRUE.
+  ELSE
+    use_radiance = .FALSE.
+  END IF
+
+
+   READ  ( UNIT = namelist_unit, NML = RECORD5 , IOSTAT = IOST)
+   IF (iost /= 0) THEN
+     CALL wrf_error_fatal3(__FILE__,__LINE__, &
+       "ERROR READING NAMELIST FILE "//TRIM (namelist_file))
+   ENDIF
    
    if ( print_detail >= 1 ) then
-      WRITE(6,'(A,1X,F6.2,A)') ' TIME_WINDOW   = ',TIME_WINDOW, ' hour(s)'
+      WRITE(UNIT=stdout,FMT='(A,1X,F6.2,A)') ' TIME_WINDOW   = ',TIME_WINDOW, ' hour(s)'
    end if
    
-   READ  ( UNIT = namelist_unit, NML = RECORD6 , ERR = 8000, IOSTAT = IOST)
+   READ  ( UNIT = namelist_unit, NML = RECORD6 , IOSTAT = IOST)
+   IF (iost /= 0) THEN
+     CALL wrf_error_fatal3(__FILE__,__LINE__, &
+       "ERROR READING NAMELIST FILE "//TRIM (namelist_file))
+   ENDIF
    
    if ( print_detail >= 1 ) then
-      WRITE(6,'(A,I4       )') ' max_ext_its   = ',max_ext_its
-      WRITE(6,'(A,3X,20E10.2)') ' EPS          = ',EPS
-      WRITE(6,'(A,I4       )') ' NTMAX         = ',NTMAX
-      WRITE(6,'(A,I4       )') ' NSAVE         = ',NSAVE
-      WRITE(6,'(A,L10      )') ' WRITE_SWITCH  = ',write_switch
-      WRITE(6,'(A,I4       )') ' WRITE_INTERVAL= ',write_interval
+      WRITE(UNIT=stdout,FMT='(A,I4       )') ' max_ext_its   = ',max_ext_its
+      WRITE(UNIT=stdout,FMT='(A,3X,20E10.2)') ' EPS          = ',EPS
+      WRITE(UNIT=stdout,FMT='(A,I4       )') ' NTMAX         = ',NTMAX
+      WRITE(UNIT=stdout,FMT='(A,I4       )') ' NSAVE         = ',NSAVE
+      WRITE(UNIT=stdout,FMT='(A,L10      )') ' WRITE_SWITCH  = ',write_switch
+      WRITE(UNIT=stdout,FMT='(A,I4       )') ' WRITE_INTERVAL= ',write_interval
    end if
    
-   READ  ( UNIT = namelist_unit, NML = RECORD7 , ERR = 8000, IOSTAT = IOST)
+   READ  ( UNIT = namelist_unit, NML = RECORD7 , IOSTAT = IOST)
+   IF (iost /= 0) THEN
+     CALL wrf_error_fatal3(__FILE__,__LINE__, &
+       "ERROR READING NAMELIST FILE "//TRIM (namelist_file))
+   ENDIF
    
    if ( print_detail >= 1 ) then
-      WRITE(6,'(A,I4       )') ' RF_PASSES     = ',RF_PASSES
-      WRITE(6,'(A,1PE8.2   )') ' RF_VAR_SCALING1 = ',var_scaling1
-      WRITE(6,'(A,1PE8.2   )') ' RF_VAR_SCALING2 = ',var_scaling2
-      WRITE(6,'(A,1PE8.2   )') ' RF_VAR_SCALING3 = ',var_scaling3
-      WRITE(6,'(A,1PE8.2   )') ' RF_VAR_SCALING4 = ',var_scaling4
-      WRITE(6,'(A,1PE8.2   )') ' RF_VAR_SCALING5 = ',var_scaling5
-      WRITE(6,'(A,1PE8.2   )') ' RF_LEN_SCALING1 = ',len_scaling1
-      WRITE(6,'(A,1PE8.2   )') ' RF_LEN_SCALING2 = ',len_scaling2
-      WRITE(6,'(A,1PE8.2   )') ' RF_LEN_SCALING3 = ',len_scaling3
-      WRITE(6,'(A,1PE8.2   )') ' RF_LEN_SCALING4 = ',len_scaling4
-      WRITE(6,'(A,1PE8.2   )') ' RF_LEN_SCALING5 = ',len_scaling5
+      WRITE(UNIT=stdout,FMT='(A,I4       )') ' RF_PASSES       = ',RF_PASSES
+      WRITE(UNIT=stdout,FMT='(A,1PE8.2   )') ' RF_VAR_SCALING1 = ',var_scaling1
+      WRITE(UNIT=stdout,FMT='(A,1PE8.2   )') ' RF_VAR_SCALING2 = ',var_scaling2
+      WRITE(UNIT=stdout,FMT='(A,1PE8.2   )') ' RF_VAR_SCALING3 = ',var_scaling3
+      WRITE(UNIT=stdout,FMT='(A,1PE8.2   )') ' RF_VAR_SCALING4 = ',var_scaling4
+      WRITE(UNIT=stdout,FMT='(A,1PE8.2   )') ' RF_VAR_SCALING5 = ',var_scaling5
+      WRITE(UNIT=stdout,FMT='(A,1PE8.2   )') ' RF_LEN_SCALING1 = ',len_scaling1
+      WRITE(UNIT=stdout,FMT='(A,1PE8.2   )') ' RF_LEN_SCALING2 = ',len_scaling2
+      WRITE(UNIT=stdout,FMT='(A,1PE8.2   )') ' RF_LEN_SCALING3 = ',len_scaling3
+      WRITE(UNIT=stdout,FMT='(A,1PE8.2   )') ' RF_LEN_SCALING4 = ',len_scaling4
+      WRITE(UNIT=stdout,FMT='(A,1PE8.2   )') ' RF_LEN_SCALING5 = ',len_scaling5
    end if
    
-   READ  ( UNIT = namelist_unit, NML = RECORD8 , ERR = 8000, IOSTAT = IOST)
+   READ  ( UNIT = namelist_unit, NML = RECORD8 , IOSTAT = IOST)
+   IF (iost /= 0) THEN
+     CALL wrf_error_fatal3(__FILE__,__LINE__, &
+       "ERROR READING NAMELIST FILE "//TRIM (namelist_file))
+   ENDIF
    
    if ( print_detail >= 1 ) then
-      WRITE(6,'(A, L10)') ' def_sub_domain = ', def_sub_domain
+      WRITE(UNIT=stdout,FMT='(A, L10)') ' def_sub_domain = ', def_sub_domain
    end if
    
-   READ  ( UNIT = namelist_unit, NML = RECORD10, ERR = 8000, IOSTAT = IOST)
+   READ  ( UNIT = namelist_unit, NML = RECORD10, IOSTAT = IOST)
+   IF (iost /= 0) THEN
+     CALL wrf_error_fatal3(__FILE__,__LINE__, &
+       "ERROR READING NAMELIST FILE "//TRIM (namelist_file))
+   ENDIF
    
 ! testing_dm_bitwise_exact can be set to .true. to force DM_PARALLEL runs 
 ! to produce results that are bitwise-identical regardless of the number of 
@@ -409,78 +517,106 @@ SUBROUTINE DA_Read_Namelist
      IF ( nproc == 1 ) THEN
        testing_dm_bitwise_exact = .FALSE.
        IF ( print_detail >= 1 ) THEN
-         WRITE(6,*) &
+         WRITE(UNIT=stdout,FMT='(A)') &
            ' testing_dm_bitwise_exact overridden to .FALSE. for serial or 1-MPI-task run'
        ENDIF
      ENDIF
    ENDIF
 
    if ( print_detail >= 1 ) then
-      WRITE(6,*)               ' Testing_3DVAR = ',Testing_3DVAR
-      WRITE(6,*)               ' Test_Inverse  = ',test_transforms
-      WRITE(6,*)               ' Test_Statisti = ',test_statistics
-      WRITE(6,*)               ' Interpolate_S = ',interpolate_stats
-      WRITE(6,*)               ' testing_dm_bitwise_exact = ',testing_dm_bitwise_exact
+      WRITE(UNIT=stdout,FMT='(A,L10)')               ' Testing_3DVAR = ',Testing_3DVAR
+      WRITE(UNIT=stdout,FMT='(A,L10)')               ' Test_Inverse  = ',test_transforms
+      WRITE(UNIT=stdout,FMT='(A,L10)')               ' Test_Statisti = ',test_statistics
+      WRITE(UNIT=stdout,FMT='(A,L10)')               ' Interpolate_S = ',interpolate_stats
+      WRITE(UNIT=stdout,FMT='(A,L10)')               ' testing_dm_bitwise_exact = ',testing_dm_bitwise_exact
    end if
    
-   READ  ( UNIT = namelist_unit, NML = RECORD11, ERR = 8000, IOSTAT = IOST)
+   READ  ( UNIT = namelist_unit, NML = RECORD11, IOSTAT = IOST)
+   IF (iost /= 0) THEN
+     CALL wrf_error_fatal3(__FILE__,__LINE__, &
+       "ERROR READING NAMELIST FILE "//TRIM (namelist_file))
+   ENDIF
    
    if ( print_detail >= 1 ) then
-      WRITE(6,'(A,3X,I4    )') ' Minimisation_Option = ',Minimisation_Option 
-      WRITE(6,'(A,3X,L10   )') ' calculate_cg_cost_function = ',calculate_cg_cost_function
-      WRITE(6,'(A,3X,L10   )') ' Write_Outer_Loop   = ',write_outer_loop
-      WRITE(6,'(A,3X,L10   )') ' Lat_Stats_Option   = ',lat_stats_option
-      WRITE(6,'(A,3X,I4    )') ' Balance_Type  = ',balance_type
-      WRITE(6,'(A,3X,I4    )') ' CV_Options    = ',cv_options
-      WRITE(6,'(A,3X,3F9.5 )') ' as1           = ',as1(1:3), &
-                               ' as2           = ',as2(1:3), &
-                               ' as3           = ',as3(1:3), &
-                               ' as4           = ',as4(1:3), &
-                               ' as5           = ',as5(1:3)
-      WRITE(6,'(A,1PE8.2   )') ' set_omb_rand_fac = ',set_omb_rand_fac
-      WRITE(6,'(A,i16   )')    ' seed_array1 = ', seed_array1
-      WRITE(6,'(A,i16   )')    ' seed_array2 = ', seed_array2
-      WRITE(6,'(A,3X,I4    )') ' sfc_assi_optn = ',sfc_assi_options
-      WRITE(6,'(A,3X,I4    )') ' CV_Options_Hum= ',cv_options_hum
-      WRITE(6,'(A,3X,I4    )') ' check_rh      = ',check_rh
+      WRITE(UNIT=stdout,FMT='(A,3X,I4    )') ' Minimisation_Option = ', Minimisation_Option 
+      WRITE(UNIT=stdout,FMT='(A,3X,L10   )') ' calculate_cg_cost_function = ',calculate_cg_cost_function
+      WRITE(UNIT=stdout,FMT='(A,3X,L10   )') ' Write_Outer_Loop    = ', write_outer_loop
+      WRITE(UNIT=stdout,FMT='(A,3X,L10   )') ' Lat_Stats_Option    = ', lat_stats_option
+      WRITE(UNIT=stdout,FMT='(A,3X,I4    )') ' Balance_Type        = ', balance_type
+      WRITE(UNIT=stdout,FMT='(A,3X,I4    )') ' CV_Options          = ', cv_options
+      WRITE(UNIT=stdout,FMT='(A,3X,3F9.5 )') ' as1                 = ', as1(1:3), &
+                            ' as2                 = ', as2(1:3), &
+                            ' as3                 = ', as3(1:3), &
+                            ' as4                 = ', as4(1:3), &
+                            ' as5                 = ', as5(1:3)
+      WRITE(UNIT=stdout,FMT='(A,1PE8.2   )') ' set_omb_rand_fac    = ', set_omb_rand_fac
+      WRITE(UNIT=stdout,FMT='(A,i16   )')    ' seed_array1         = ', seed_array1
+      WRITE(UNIT=stdout,FMT='(A,i16   )')    ' seed_array2         = ', seed_array2
+      WRITE(UNIT=stdout,FMT='(A,3X,I4    )') ' sfc_assi_optn       = ', sfc_assi_options
+      WRITE(UNIT=stdout,FMT='(A,3X,I4    )') ' CV_Options_Hum      = ', cv_options_hum
+      WRITE(UNIT=stdout,FMT='(A,3X,I4    )') ' check_rh            = ', check_rh
    end if
    
-   READ  ( UNIT = namelist_unit, NML = RECORD12, ERR = 8000, IOSTAT = IOST)
+   READ  ( UNIT = namelist_unit, NML = RECORD12, IOSTAT = IOST)
+   IF (iost /= 0) THEN
+     CALL wrf_error_fatal3(__FILE__,__LINE__, &
+       "ERROR READING NAMELIST FILE "//TRIM (namelist_file))
+   ENDIF
    
    if ( print_detail >= 1 ) then
-      WRITE(6,*)               ' Balance_Type  = ',balance_type
+      WRITE(UNIT=stdout,FMT='(A,I10)')      ' Balance_Type  = ',balance_type
    end if
    
-   READ  ( UNIT = namelist_unit, NML = RECORD13, ERR = 8000, IOSTAT = IOST)
+   READ  ( UNIT = namelist_unit, NML = RECORD13, IOSTAT = IOST)
+   IF (iost /= 0) THEN
+     CALL wrf_error_fatal3(__FILE__,__LINE__, &
+       "ERROR READING NAMELIST FILE "//TRIM (namelist_file))
+   ENDIF
    
    if ( print_detail >= 1 ) then
-      WRITE(6,'(A,I4       )') ' vert_corr     = ',vert_corr
-      WRITE(6,'(A,I4       )') ' vertical_ip   = ',vertical_ip
-      WRITE(6,'(A,I4       )') ' vert_evalue   = ',vert_evalue
-      WRITE(6,'(A,5f10.3)')    ' Vert var limit= ',max_vert_var1, &
+      WRITE(UNIT=stdout,FMT='(A,I4       )') ' vert_corr     = ',vert_corr
+      WRITE(UNIT=stdout,FMT='(A,I4       )') ' vertical_ip   = ',vertical_ip
+      WRITE(UNIT=stdout,FMT='(A,I4       )') ' vert_evalue   = ',vert_evalue
+      WRITE(UNIT=stdout,FMT='(A,5f10.3)')    ' Vert var limit= ',max_vert_var1, &
                                                    max_vert_var2, &
                                                    max_vert_var3, &
                                                    max_vert_var4, &
                                                    max_vert_var5
    end if
-   
-   READ  ( UNIT = namelist_unit, NML = pseudo_ob_nl, ERR = 8000, IOSTAT = IOST)
-   
+
+   READ  ( UNIT = namelist_unit, NML = RECORD14, IOSTAT = IOST)
+   IF (iost /= 0) THEN
+     CALL wrf_error_fatal3(__FILE__,__LINE__, &
+       "ERROR READING NAMELIST FILE "//TRIM (namelist_file))
+   ENDIF
    if ( print_detail >= 1 ) then
-      WRITE(6,*)               ' num_pseudo = ',   num_pseudo
+      WRITE(UNIT=stdout,FMT='(A,I4  )') ' rtminit_print    = ', rtminit_print
+      WRITE(UNIT=stdout,FMT='(A,I4  )') ' rtminit_nsensor  = ', rtminit_nsensor
+      WRITE(UNIT=stdout,FMT='(A,10I4)') ' rtminit_platform = ', rtminit_platform(1:rtminit_nsensor)
+      WRITE(UNIT=stdout,FMT='(A,10I4)') ' rtminit_satid    = ', rtminit_satid   (1:rtminit_nsensor)
+      WRITE(UNIT=stdout,FMT='(A,10I4)') ' rtminit_sensor   = ', rtminit_sensor  (1:rtminit_nsensor)
+   end if
+   
+   READ  ( UNIT = namelist_unit, NML = pseudo_ob_nl, IOSTAT = IOST)
+   IF (iost /= 0) THEN
+     CALL wrf_error_fatal3(__FILE__,__LINE__, &
+       "ERROR READING NAMELIST FILE "//TRIM (namelist_file))
+   ENDIF
+
+   if ( print_detail >= 1 ) then
+      WRITE(UNIT=stdout,FMT='(A,I5)')               ' num_pseudo = ',   num_pseudo
       IF ( num_pseudo > 0 ) THEN
-         WRITE(6,*)               ' pseudo_x   = ', pseudo_x
-         WRITE(6,*)               ' pseudo_y   = ', pseudo_y
-         WRITE(6,*)               ' pseudo_z   = ', pseudo_z
-         WRITE(6,*)               ' pseudo_val = ', pseudo_val
-         WRITE(6,*)               ' pseudo_err = ', pseudo_err
-         WRITE(6,'(A,3x,A3)')     ' pseudo_var = ', pseudo_var
+         WRITE(UNIT=stdout,FMT='(A,F12.2)')               ' pseudo_x   = ', pseudo_x
+         WRITE(UNIT=stdout,FMT='(A,F12.2)')               ' pseudo_y   = ', pseudo_y
+         WRITE(UNIT=stdout,FMT='(A,F12.2)')               ' pseudo_z   = ', pseudo_z
+         WRITE(UNIT=stdout,FMT='(A,F12.2)')               ' pseudo_val = ', pseudo_val
+         WRITE(UNIT=stdout,FMT='(A,F12.2)')               ' pseudo_err = ', pseudo_err
+         WRITE(UNIT=stdout,FMT='(A,3x,A3)')     ' pseudo_var = ', pseudo_var
       end if
    end if
            
    if ( num_pseudo > 0 ) then
-     WRITE(6,'(/5X,a/)') &
-     '*** Single OBS Test:: Turn off all the OBS switches ***'  
+     CALL wrf_message("Single OBS Test:: Turn off all the OBS switches ***")
      Use_SynopObs         = .FALSE.
      Use_ShipsObs         = .FALSE.
      Use_MetarObs         = .FALSE.
@@ -500,10 +636,21 @@ SUBROUTINE DA_Read_Namelist
      use_ssmt1obs         = .FALSE.
      use_ssmt2obs         = .FALSE.
      use_qscatobs         = .FALSE.
-     check_max_iv   = .FALSE.
+     use_Hirs2Obs         = .FALSE.
+     use_Hirs3Obs         = .FALSE.
+     use_MsuObs           = .FALSE.
+     use_AmsuaObs         = .FALSE.
+     use_AmsubObs         = .FALSE.
+     use_AirsObs          = .FALSE.
+     use_Eos_AmsuaObs     = .FALSE.
+     use_Eos_radObs       = .FALSE.
+     use_HsbObs           = .FALSE.
+     Use_Obsgts           = .FALSE.
+     Use_Radiance         = .FALSE.
    endif
+  
 
-   CLOSE (namelist_unit)
+   CLOSE (UNIT=namelist_unit)
 
    len = len_trim(ANALYSIS_DATE)
 
@@ -517,20 +664,21 @@ SUBROUTINE DA_Read_Namelist
 !------------------------------------------------------------------------------
 
    IF ( cv_options < 1 .OR. cv_options > 5 ) THEN
-      WRITE(0,'(A,I3)')' DA_Read_Namelist: Invalid cv_options = ', cv_options
-      STOP
+     WRITE(UNIT=errmsg(1),FMT='(A,I3)') &
+       'Invalid cv_options = ', cv_options
+     CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
    END IF
    
    IF ( cv_options_hum < 1 .OR. cv_options_hum > 3 ) THEN
-      WRITE(0,'(A,I3)')' DA_Read_Namelist: Invalid cv_options_hum = ', &
-                       cv_options_hum
-      STOP
+     WRITE(UNIT=errmsg(1),FMT='(A,I3)') &
+       'Invalid cv_options_hum = ', cv_options_hum
+     CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
    END IF
 
    IF ( sfc_assi_options < 1 .OR. sfc_assi_options > 2 ) THEN
-      WRITE(0,'(A,I3)')' DA_Read_Namelist: Invalid sfc_assi_option = ', &
-                       sfc_assi_options
-      STOP
+     WRITE(UNIT=errmsg(1),FMT='(A,I3)') &
+       'Invalid sfc_assi_option = ', sfc_assi_options
+     CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
    END IF
 
    IF (Use_SsmiRetrievalObs .OR. Use_SsmiTbObs) THEN
@@ -539,14 +687,14 @@ SUBROUTINE DA_Read_Namelist
           ACCESS = 'SEQUENTIAL', &
           IOSTAT =  iost,     &
           STATUS = 'OLD')
-     CLOSE(ssmi_iunit)
+     CLOSE(UNIT=ssmi_iunit)
 
      IF (iost /= 0) THEN
-         WRITE (0,'(/,A,I3,A,/)') &
-       ' INPUT FILE UNIT ',ssmi_iunit, &
-       ' FOR SSMI OBSERVATIONS CANNOT BE FOUND OR CANNOT BE OPENED'
-         Use_SsmiRetrievalObs=.false.
-         Use_SsmiTbObs=.false.
+       WRITE (UNIT=stderr,FMT='(/,A,I3,A,/)') &
+         ' INPUT FILE UNIT ',ssmi_iunit, &
+         ' FOR SSMI OBSERVATIONS CANNOT BE FOUND OR CANNOT BE OPENED'
+       Use_SsmiRetrievalObs=.false.
+       Use_SsmiTbObs=.false.
 
      ENDIF
      
@@ -555,13 +703,12 @@ SUBROUTINE DA_Read_Namelist
    
    IF ( cv_options == 1 ) THEN
       IF ( cv_options_hum == 2 ) THEN
-         WRITE(0,'(/,A,/,A,/)')' DA_Setup_Background_Errors: Can only have', &
-                               ' cv_option_hum=2 with cv_option=2.'
-         STOP
+         CALL wrf_error_fatal3(__FILE__,__LINE__, &
+           "Can only have cv_option_hum=2 with cv_option=2.")
       END IF
    
       IF ( vert_corr == 2 ) THEN
-         WRITE (0,'(A,A)') ' DA_Read_Namelist: Invalid cv_options /', &
+         WRITE (UNIT=stderr,FMT='(A,A)') ' DA_Read_Namelist: Invalid cv_options /', &
                            ' vert_corr combination. Set vert_corr=1'
          vert_corr = 1
       END IF
@@ -570,139 +717,147 @@ SUBROUTINE DA_Read_Namelist
 
    IF ( vert_corr == 2 ) THEN
       IF ( vertical_ip < 0 .OR. vertical_ip > 2 ) THEN
-         WRITE (0,'(A,I3)') ' DA_Read_Namelist: Invalid vertical_ip = ', &
+         WRITE (UNIT=stderr,FMT='(A,I3)') ' DA_Read_Namelist: Invalid vertical_ip = ', &
                            vertical_ip
       END IF
    END IF
 
    IF ( 0.5 * REAL(rf_passes) /= REAL(rf_passes / 2) ) THEN
-      WRITE(6,'(A,I4,A)')' DA_Read_Namelist: rf_passes = ', &
+      WRITE(UNIT=stdout,FMT='(A,I4,A)')' DA_Read_Namelist: rf_passes = ', &
                          rf_passes, ' .Should be even.'
       rf_passes = INT( REAL( rf_passes / 2 ) )
-      WRITE(6,'(A,I4)') 'Resetting rf_passes = ', rf_passes
+      WRITE(UNIT=stdout,FMT='(A,I4)') 'Resetting rf_passes = ', rf_passes
    END IF
 
    if ( analysis_type == 'randomcv' ) then
       ntmax = 0
-      write(6,*)' Resetting ntmax = 0 for analysis_type = randomcv' 
+      write(UNIT=stdout)' Resetting ntmax = 0 for analysis_type = randomcv' 
    end if
 
 !----------------------------------------------------------------------------
 !  [4.0] Print namelist:
 !----------------------------------------------------------------------------
    
-   if ( print_detail >= 1 ) then
-   WRITE(6,'(A,3X,A     )') ' MODEL_TYPE    = ', trim(MODEL_TYPE)
-   WRITE(6,'(A,3X,L10   )') ' write_increments = ', write_increments
-   WRITE(6,'(A,3X,A6    )') ' ANALYSIS TYPE = ',ANALYSIS_TYPE
-   WRITE(6,'(A,3X,A     )') ' ANALYSIS DATE = ',ANALYSIS_DATE
-   WRITE(6,'(A,3X,i6    )') ' ANALYSIS ACCU = ',ANALYSIS_ACCU
-   WRITE(6,'(A,3X,L10   )') ' W INCREMENTS  = ',W_INCREMENTS
-   WRITE(6,'(A,3X,i4    )') ' fg_format     = ',    fg_format
-   WRITE(6,'(A,3X,i4    )') ' ob_format     = ',    ob_format
-   WRITE(6,'(A,3X,A8    )') ' PROCESS_OBS   = ',PROCESS_OBS
-   WRITE(6,'(A,3X,I4    )') ' obs_qc_pointer= ',obs_qc_pointer
-   WRITE(6,'(A,3X,L10   )') ' Use_SynopObs  =', Use_SynopObs, &
-                            ' Use_ShipsObs  =', Use_ShipsObs, &
-                            ' Use_MetarObs  =', Use_MetarObs, &
-                            ' Use_PilotObs  =', Use_PilotObs, &
-                            ' Use_ProfilerObs  =', Use_ProfilerObs, &
-                            ' Use_BuoyObs  =', Use_BuoyObs, &
-                            ' Use_SoundObs  =', Use_SoundObs, &
-                            ' Use_RadarObs  =', Use_RadarObs, &
-                            ' Use_Radar_rv  =', Use_Radar_rv, &
-                            ' Use_Radar_rf  =', Use_Radar_rf, &
-                            ' Use_SatemObs  =', Use_SatemObs, &
-                            ' Use_GeoAMVObs =', Use_GeoAMVObs, &
-                            ' Use_PolarAMVObs =', Use_PolarAMVObs, &
-                            ' Use_BogusObs  =', Use_BogusObs, &
-                            ' Use_AirepObs  =', Use_AirepObs, &
-                            ' Use_GpspwObs  =', Use_GpspwObs, &
-                            ' Use_GpsrefObs  =', Use_GpsrefObs, &
-                            ' Use_SsmiRetrievalObs =', Use_SsmiRetrievalObs, &
-                            ' Use_SsmiTbObs =', Use_SsmiTbObs, &
-                            ' Use_SSMT1Obs  =', Use_SSMT1Obs, &
-                            ' Use_SSMT2Obs  =', Use_SSMT2Obs, &
-                            ' use_qscatobs  =', use_qscatobs, &
-                            ' check_max_iv  =', check_max_iv, &
-                            ' use_obs_errfac=', use_obs_errfac, &
-                            ' put_rand_seed =', put_rand_seed, &
-                            ' omb_set_rand =', omb_set_rand, &
-                            ' omb_add_noise=', omb_add_noise
-   WRITE(6,'(A,1X,F6.2,A)') ' TIME_WINDOW   = ',TIME_WINDOW, ' hour(s)'
-   WRITE(6,'(A,I4       )') ' print_detail  = ',print_detail
-   WRITE(6,'(A,I4       )') ' max_ext_its   = ',max_ext_its
-   WRITE(6,'(A,3X,20E10.2)') ' EPS          = ',EPS
-   WRITE(6,'(A,I4       )') ' NTMAX         = ',NTMAX
-   WRITE(6,'(A,I4       )') ' NSAVE         = ',NSAVE
-   WRITE(6,'(A,L10      )') ' WRITE_SWITCH  = ',write_switch
-   WRITE(6,'(A,I4       )') ' WRITE_INTERVAL= ',write_interval
-   WRITE(6,'(A,I4       )') ' RF_PASSES     = ',RF_PASSES
-   WRITE(6,'(A,1PE8.2   )') ' RF_VAR_SCALING1 = ',var_scaling1
-   WRITE(6,'(A,1PE8.2   )') ' RF_VAR_SCALING2 = ',var_scaling2
-   WRITE(6,'(A,1PE8.2   )') ' RF_VAR_SCALING3 = ',var_scaling3
-   WRITE(6,'(A,1PE8.2   )') ' RF_VAR_SCALING4 = ',var_scaling4
-   WRITE(6,'(A,1PE8.2   )') ' RF_VAR_SCALING5 = ',var_scaling5
-   WRITE(6,'(A,1PE8.2   )') ' RF_LEN_SCALING1 = ',len_scaling1
-   WRITE(6,'(A,1PE8.2   )') ' RF_LEN_SCALING2 = ',len_scaling2
-   WRITE(6,'(A,1PE8.2   )') ' RF_LEN_SCALING3 = ',len_scaling3
-   WRITE(6,'(A,1PE8.2   )') ' RF_LEN_SCALING4 = ',len_scaling4
-   WRITE(6,'(A,1PE8.2   )') ' RF_LEN_SCALING5 = ',len_scaling5
-   WRITE(6,'(A,3X,I4    )') ' Minimise _Option = ',Minimisation_Option 
-   WRITE(6,'(A,3X,L10   )') ' In_CG_COST_FUNCTION_NEEDED = ',calculate_cg_cost_function
-   WRITE(6,'(A,3X,L10   )') ' Outer_Loop_Write   = ',write_outer_loop
-   WRITE(6,'(A,3X,L10   )') ' Lat_Stats_Option   = ',lat_stats_option
-   WRITE(6,'(A,3X,L10   )') ' Testing_3DVAR = ',Testing_3DVAR
-   WRITE(6,'(A,3X,L10   )') ' Test_Inverse  = ',test_transforms
-   WRITE(6,'(A,3X,L10   )') ' Test_Statisti = ',test_statistics
-   WRITE(6,'(A,3X,L10   )') ' Interpolate_S = ',interpolate_stats
-   WRITE(6,'(A,3X,L10   )') ' testing_dm_bitwise_exact = ',testing_dm_bitwise_exact
-   WRITE(6,'(A,3X,I10   )') ' Balance_Type  = ',balance_type
-   WRITE(6,'(A,3X,I10   )') ' CV_Options    = ',cv_options
-   WRITE(6,'(A,3X,3F9.5 )') ' as1           = ',as1(1:3), &
-                            ' as2           = ',as2(1:3), &
-                            ' as3           = ',as3(1:3), &
-                            ' as4           = ',as4(1:3), &
-                            ' as5           = ',as5(1:3)
-   WRITE(6,'(A,1PE8.2   )') ' set_omb_rand_fac = ',set_omb_rand_fac
-   WRITE(6,'(A,i16   )')    ' seed_array1 = ', seed_array1
-   WRITE(6,'(A,i16   )')    ' seed_array2 = ', seed_array2
-   WRITE(6,*)               ' sfc_assi_optn = ',sfc_assi_options
-   WRITE(6,*)               ' CV_Options_Hum= ',cv_options_hum
-   WRITE(6,*)               ' check_rh      = ',check_rh
-   WRITE(6,'(A,I4       )') ' vert_corr     = ',vert_corr
-   WRITE(6,'(A,I4       )') ' vertical_ip   = ',vertical_ip
-   WRITE(6,'(A,I4       )') ' vert_evalue   = ',vert_evalue
-   WRITE(6,'(A,5f10.3)')    ' Vert var limit= ',max_vert_var1, &
+  if ( print_detail >= 1 ) then
+   WRITE(UNIT=stdout,FMT='(A,3X,A  )') ' MODEL_TYPE       = ', trim(MODEL_TYPE)
+   WRITE(UNIT=stdout,FMT='(A,3X,L10)') ' write_increments = ', write_increments
+   WRITE(UNIT=stdout,FMT='(A,3X,A6 )') ' ANALYSIS TYPE    = ', ANALYSIS_TYPE
+   WRITE(UNIT=stdout,FMT='(A,3X,A  )') ' ANALYSIS DATE    = ', ANALYSIS_DATE
+   WRITE(UNIT=stdout,FMT='(A,3X,i6 )') ' ANALYSIS ACCU    = ', ANALYSIS_ACCU
+   WRITE(UNIT=stdout,FMT='(A,3X,L10)') ' W INCREMENTS     = ', W_INCREMENTS
+   WRITE(UNIT=stdout,FMT='(A,3X,i4 )') ' fg_format        = ', fg_format
+   WRITE(UNIT=stdout,FMT='(A,3X,i4 )') ' ob_format        = ', ob_format
+   WRITE(UNIT=stdout,FMT='(A,3X,A8 )') ' PROCESS_OBS      = ', PROCESS_OBS
+   WRITE(UNIT=stdout,FMT='(A,3X,I4 )') ' obs_qc_pointer   = ', obs_qc_pointer
+   WRITE(UNIT=stdout,FMT='(A,3X,L10)') ' Use_SynopObs     = ', Use_SynopObs, &
+                                       ' Use_ShipsObs     = ', Use_ShipsObs, &
+                                       ' Use_MetarObs     = ', Use_MetarObs, &
+                                       ' Use_PilotObs     = ', Use_PilotObs, &
+                                       ' Use_ProfilerObs  = ', Use_ProfilerObs, &
+                                       ' Use_BuoyObs      = ', Use_BuoyObs, &
+                                       ' Use_SoundObs     = ', Use_SoundObs, &
+                                       ' Use_RadarObs     = ', Use_RadarObs, &
+                                       ' Use_Radar_rv     = ', Use_Radar_rv, &
+                                       ' Use_Radar_rf     = ', Use_Radar_rf, &
+                                       ' Use_SatemObs     = ', Use_SatemObs, &
+                                       ' Use_GeoAMVObs    = ', Use_GeoAMVObs, &
+                                       ' Use_PolarAMVObs  = ', Use_PolarAMVObs, &
+                                       ' Use_BogusObs     = ', Use_BogusObs, &
+                                       ' Use_AirepObs     = ', Use_AirepObs, &
+                                       ' Use_GpspwObs     = ', Use_GpspwObs, &
+                                       ' Use_GpsrefObs    = ', Use_GpsrefObs, &
+                                       ' Use_SsmiRetrievalObs =', Use_SsmiRetrievalObs, &
+                                       ' Use_SsmiTbObs    = ', Use_SsmiTbObs, &
+                                       ' Use_SSMT1Obs     = ', Use_SSMT1Obs, &
+                                       ' Use_SSMT2Obs     = ', Use_SSMT2Obs, &
+                                       ' use_qscatobs     = ', use_qscatobs, &
+                                       ' use_Hirs2Obs     = ', use_hirs2Obs , &
+                                       ' use_Hirs3Obs     = ', use_hirs3Obs, &
+                                       ' use_MsuObs       = ', use_MsuObs, & 
+                                       ' use_AmsuaObs     = ', use_AmsuaObs, & 
+                                       ' use_AmsubObs     = ', use_AmsubObs, & 
+                                       ' use_AirsObs      = ', use_AirsObs, & 
+                                       ' use_Eos_AmsuaObs = ', use_Eos_AmsuaObs, & 
+                                       ' use_Eos_RadObs   = ', use_Eos_RadObs, &  
+                                       ' use_Eos_HsbObs   = ', use_HsbObs, & 
+                                       ' check_max_iv     = ', check_max_iv, &
+                                       ' use_obs_errfac   = ', use_obs_errfac, &
+                                       ' put_rand_seed    = ', put_rand_seed, &
+                                       ' omb_set_rand     = ', omb_set_rand, &
+                                       ' omb_add_noise    = ', omb_add_noise, &
+                                       ' use_radiance     = ', use_radiance, &
+                                       ' use_obsgts       = ', use_obsgts
+   WRITE(UNIT=stdout,FMT='(A,1X,F6.2,A)') ' TIME_WINDOW      = ',TIME_WINDOW, ' hour(s)'
+   WRITE(UNIT=stdout,FMT='(A,I4       )') ' print_detail     = ',print_detail
+   WRITE(UNIT=stdout,FMT='(A,I4       )') ' max_ext_its      = ',max_ext_its
+   WRITE(UNIT=stdout,FMT='(A,3X,20E10.2)')' EPS              = ',EPS
+   WRITE(UNIT=stdout,FMT='(A,I4       )') ' NTMAX            = ',NTMAX
+   WRITE(UNIT=stdout,FMT='(A,I4       )') ' NSAVE            = ',NSAVE
+   WRITE(UNIT=stdout,FMT='(A,L10      )') ' WRITE_SWITCH     = ',write_switch
+   WRITE(UNIT=stdout,FMT='(A,I4       )') ' WRITE_INTERVAL   = ',write_interval
+   WRITE(UNIT=stdout,FMT='(A,I4       )') ' RF_PASSES        = ',RF_PASSES
+   WRITE(UNIT=stdout,FMT='(A,1PE8.2   )') ' RF_VAR_SCALING1 = ',var_scaling1
+   WRITE(UNIT=stdout,FMT='(A,1PE8.2   )') ' RF_VAR_SCALING2 = ',var_scaling2
+   WRITE(UNIT=stdout,FMT='(A,1PE8.2   )') ' RF_VAR_SCALING3 = ',var_scaling3
+   WRITE(UNIT=stdout,FMT='(A,1PE8.2   )') ' RF_VAR_SCALING4 = ',var_scaling4
+   WRITE(UNIT=stdout,FMT='(A,1PE8.2   )') ' RF_VAR_SCALING5 = ',var_scaling5
+   WRITE(UNIT=stdout,FMT='(A,1PE8.2   )') ' RF_LEN_SCALING1 = ',len_scaling1
+   WRITE(UNIT=stdout,FMT='(A,1PE8.2   )') ' RF_LEN_SCALING2 = ',len_scaling2
+   WRITE(UNIT=stdout,FMT='(A,1PE8.2   )') ' RF_LEN_SCALING3 = ',len_scaling3
+   WRITE(UNIT=stdout,FMT='(A,1PE8.2   )') ' RF_LEN_SCALING4 = ',len_scaling4
+   WRITE(UNIT=stdout,FMT='(A,1PE8.2   )') ' RF_LEN_SCALING5 = ',len_scaling5
+   WRITE(UNIT=stdout,FMT='(A,3X,I4    )') ' Minimise _Option = ',Minimisation_Option 
+   WRITE(UNIT=stdout,FMT='(A,3X,L10   )') ' In_CG_COST_FUNCTION_NEEDED = ',calculate_cg_cost_function
+   WRITE(UNIT=stdout,FMT='(A,3X,L10   )') ' Outer_Loop_Write   = ',write_outer_loop
+   WRITE(UNIT=stdout,FMT='(A,3X,L10   )') ' Lat_Stats_Option   = ',lat_stats_option
+   WRITE(UNIT=stdout,FMT='(A,3X,L10   )') ' Testing_3DVAR = ',Testing_3DVAR
+   WRITE(UNIT=stdout,FMT='(A,3X,L10   )') ' Test_Inverse  = ',test_transforms
+   WRITE(UNIT=stdout,FMT='(A,3X,L10   )') ' Test_Statisti = ',test_statistics
+   WRITE(UNIT=stdout,FMT='(A,3X,L10   )') ' Interpolate_S = ',interpolate_stats
+   WRITE(UNIT=stdout,FMT='(A,3X,L10   )') ' testing_dm_bitwise_exact = ',testing_dm_bitwise_exact
+   WRITE(UNIT=stdout,FMT='(A,3X,I10   )') ' Balance_Type  = ',balance_type
+   WRITE(UNIT=stdout,FMT='(A,3X,I10   )') ' CV_Options    = ',cv_options
+   WRITE(UNIT=stdout,FMT='(A,3X,3F9.5 )') ' as1           = ',as1(1:3), &
+                                          ' as2           = ',as2(1:3), &   
+                                          ' as3           = ',as3(1:3), &   
+                                          ' as4           = ',as4(1:3), &   
+                                          ' as5           = ',as5(1:3)      
+   WRITE(UNIT=stdout,FMT='(A,1PE8.2   )') ' set_omb_rand_fac = ',set_omb_rand_fac
+   WRITE(UNIT=stdout,FMT='(A,i16   )')    ' seed_array1   = ', seed_array1
+   WRITE(UNIT=stdout,FMT='(A,i16   )')    ' seed_array2   = ', seed_array2
+   WRITE(UNIT=stdout,FMT='(A,3X,I4    )') ' sfc_assi_optn = ', sfc_assi_options
+   WRITE(UNIT=stdout,FMT='(A,3X,I4    )') ' CV_Options_Hum= ', cv_options_hum
+   WRITE(UNIT=stdout,FMT='(A,3X,I4    )') ' check_rh      = ', check_rh
+   WRITE(UNIT=stdout,FMT='(A,I4       )') ' vert_corr     = ',vert_corr
+   WRITE(UNIT=stdout,FMT='(A,I4       )') ' vertical_ip   = ',vertical_ip
+   WRITE(UNIT=stdout,FMT='(A,I4       )') ' vert_evalue   = ',vert_evalue
+   WRITE(UNIT=stdout,FMT='(A,5f10.3)')    ' Vert var limit= ',max_vert_var1, &
                                                 max_vert_var2, &
                                                 max_vert_var3, &
                                                 max_vert_var4, &
                                                 max_vert_var5
 
-   WRITE(6,*)               ' num_pseudo = ',   num_pseudo
+      WRITE(UNIT=stdout,FMT='(A,I4  )') ' rtminit_print    = ', rtminit_print
+      WRITE(UNIT=stdout,FMT='(A,I4  )') ' rtminit_nsensor  = ', rtminit_nsensor
+      WRITE(UNIT=stdout,FMT='(A,10I4)') ' rtminit_platform = ', rtminit_platform(1:rtminit_nsensor)
+      WRITE(UNIT=stdout,FMT='(A,10I4)') ' rtminit_satid    = ', rtminit_satid   (1:rtminit_nsensor)
+      WRITE(UNIT=stdout,FMT='(A,10I4)') ' rtminit_sensor   = ', rtminit_sensor  (1:rtminit_nsensor)
+
+   WRITE(UNIT=stdout,FMT='(A,I5)')        ' num_pseudo = ',   num_pseudo
    IF ( num_pseudo > 0 ) THEN
-      WRITE(6,*)               ' pseudo_x   = ', pseudo_x
-      WRITE(6,*)               ' pseudo_y   = ', pseudo_y
-      WRITE(6,*)               ' pseudo_z   = ', pseudo_z
-      WRITE(6,*)               ' pseudo_val = ', pseudo_val
-      WRITE(6,*)               ' pseudo_err = ', pseudo_err
-      WRITE(6,'(A,3x,A3)')     ' pseudo_var = ', pseudo_var
+     WRITE(UNIT=stdout,FMT='(A,F12.2)')  ' pseudo_x   = ', pseudo_x
+     WRITE(UNIT=stdout,FMT='(A,F12.2)')  ' pseudo_y   = ', pseudo_y
+     WRITE(UNIT=stdout,FMT='(A,F12.2)')  ' pseudo_z   = ', pseudo_z
+     WRITE(UNIT=stdout,FMT='(A,F12.2)')  ' pseudo_val = ', pseudo_val
+     WRITE(UNIT=stdout,FMT='(A,F12.2)')  ' pseudo_err = ', pseudo_err
+     WRITE(UNIT=stdout,FMT='(A,3x,A3)')  ' pseudo_var = ', pseudo_var
    end if
    
-   end if
+  end if
    
-   WRITE(6,'(A)')''
+   WRITE(UNIT=stdout,FMT='(A)') "----------------------------------------"
 
    RETURN
-
-!----------------------------------------------------------------------------
-!  [4.0] Report error:
-!----------------------------------------------------------------------------
-
-8000  WRITE (0,'(/,A,A,A,I3,/)') ' ERROR READING NAMELIST FILE ', &
-                                 TRIM (namelist_file),' IOSTAT = ', IOST
-
-   STOP                       ' in DA_Read_Namelist.f90'
 
 END SUBROUTINE DA_Read_Namelist
 

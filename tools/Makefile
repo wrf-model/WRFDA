@@ -21,6 +21,13 @@ clean:
 gen_comms.c : gen_comms.stub
 	/bin/cp gen_comms.stub gen_comms.c
 
+bufr_little_endian.exe : bufr_little_endian.f
+			$(RM) $@
+			$(FC) -o bufr_little_endian.exe bufr_little_endian.f ../da_3dvar/src/da_bufrlib.o \
+                          ../da_3dvar/src/bort_exit.o ../da_3dvar/src/restd.o \
+                          ../da_3dvar/src/wrdesc.o
+
+
 # regenerate this list with "makedepend -Y *.c"
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.

@@ -1,24 +1,25 @@
-#! /bin/csh -f
+#!/bin/csh
+##@ network.MPI=csss,shared,us
+##@ notification=error
 #IBM:
 # @ job_type   = parallel
-## @ environment = COPY_ALL
-# @ environment = MP_SHARED_MEMORY=true
+# @ environment = COPY_ALL
 # @ job_name   = wrfvar
-# @ output     = wrfvar.out
-# @ error      = wrfvar.err
-# @ node       = 1
+# @ output     = wrfvar.e$(jobid)
+# @ error      = wrfvar.o$(jobid)
+# @ node       = 2
 ## @ network.MPI    = css0,shared,us
 # @ network.MPI    = css0,shared,ip
-# @ tasks_per_node = 16
-# @ node_usage = not_shared
+# @ tasks_per_node = 8
+# @ node_usage = shared
 # @ checkpoint = no
 # @ wall_clock_limit = 01:30:00
 # NCEP IBM=dev
 # NCAR IBM(bluesky)=com_rg8:
 # NCAR IBM(blackforest)=com_reg:
 # NCAR IBM(blackforest_nighthawk)=com_nh:
-# @ class      =  com_nh
-## @ class      =  com_reg
+# @ class      =  share
+## @ class      =  com_rg8
 # @ queue
 #
 #FSL JET (Alpha/Linux):
@@ -43,6 +44,8 @@
 
 #set echo
 
+set 
+
  unlimit
 
  setenv MP_SHARED_MEMORY yes
@@ -57,11 +60,7 @@
 #-----------------------------------------------------------------------
 
 #e.g.: setenv DAT_DIR /users/dmbarker/data overrides the default below.
-setenv DAT_DIR /wrf/mmm02/wrfvar-testdata
-setenv SRC_DIR /wrf/mmm02
-setenv WEST_EAST_GRID_NUMBER 45
-setenv SOUTH_NORTH_GRID_NUMBER 45
-setenv GRID_DISTANCE 200000
+#setenv DAT_DIR /wrf/mmm02/wrfvar-testdata
 
 ##########################################################################
 #USER: DO NOT MAKE CHANGES BELOW (if you do, you're on your own!) 
@@ -86,6 +85,9 @@ setenv GRID_DISTANCE 200000
  if ( ! $?DA_BACK_ERRORS ) setenv DA_BACK_ERRORS ${DAT_DIR}/be.cv_${DA_CV_OPTIONS}    # wrfvar background errors.
  if ( ! $?DA_SSMI ) setenv DA_SSMI ${DAT_DIR}/ssmi.dat         # SSM/I radiances (ignore if not using).
  if ( ! $?DA_RADAR) setenv DA_RADAR ${DAT_DIR}/radar.dat       # Radar data (ignore if not using).
+
+ if ( ! $?RTTOV) setenv RTTOV $HOME/rttov/rttov85       # RTTOV
+ if ( ! $?DA_RTTOV_COEFFS) setenv DA_RTTOV_COEFFS $RTTOV/rtcoef_rttov7 # RTTOV coefficients
 
 #Default WRF namelist variables:
  if ( ! $?NUM_PROCS ) setenv NUM_PROCS 1                          # Number of processors to run on.
@@ -128,6 +130,15 @@ setenv GRID_DISTANCE 200000
  if ( ! $?DA_USE_SSMT1OBS )  set DA_USE_SSMT1OBS = .FALSE.        # Assimilate this observation type.
  if ( ! $?DA_USE_SSMT2OBS )  set DA_USE_SSMT2OBS = .FALSE.        # Assimilate this observation type.
  if ( ! $?DA_USE_QSCATOBS )  set DA_USE_QSCATOBS = .TRUE.         # Assimilate this observation type.
+ if ( ! $?DA_USE_HIRS2OBS )  set DA_USE_HIRS2OBS = .TRUE.
+ if ( ! $?DA_USE_HIRS3OBS )  set DA_USE_HIRS3OBS = .TRUE.
+ if ( ! $?DA_USE_MSUOBS )    set DA_USE_MSUOBS = .TRUE.
+ if ( ! $?DA_USE_AMSUAOBS )  set DA_USE_AMSUAOBS = .TRUE.
+ if ( ! $?DA_USE_AMSUBOBS )  set DA_USE_AMSUBOBS = .TRUE.
+ if ( ! $?DA_USE_AIRSOBS )   set DA_USE_AIRSOBS = .TRUE.
+ if ( ! $?DA_USE_EOS_AMSUAOBS )  set DA_USE_EOS_AMSUAOBS = .TRUE.
+ if ( ! $?DA_USE_EOS_RADOBS )  set DA_USE_EOS_RADOBS = .TRUE.
+ if ( ! $?DA_USE_HSBOBS )    set DA_USE_HSBOBS = .TRUE.
  if ( ! $?DA_Check_Max_IV )  set DA_Check_Max_IV = .TRUE.         # Perform O-B > 5sigma_o QC if true.
  if ( ! $?DA_MAX_EXT_ITS )   set DA_MAX_EXT_ITS = 1               # Maximum number of "WRF-Var outer loops".
  if ( ! $?DA_EPS )           set DA_EPS = "1.E-02, 1.E-02, 1.E-02, 1.E-02, 1.E-02, 1.E-02, 1.E-02," # Convergence criteria.
@@ -235,9 +246,17 @@ setenv GRID_DISTANCE 200000
 # [3.0] Prepare for assimilation:
 #-----------------------------------------------------------------------
 
- rm -rf ${RUN_DIR}/wrf-var >&! /dev/null
- mkdir ${RUN_DIR}/wrf-var >&! /dev/null
- cd $RUN_DIR/wrf-var
+ rm -rf ${RUN_DIR}/$ID >&! /dev/null
+ mkdir ${RUN_DIR}/$ID >&! /dev/null
+ cd $RUN_DIR/$ID
+
+#JRB
+ln -s ../*bias .
+ln -s ../*tbl .
+ln -s ../*info .
+ln -s ../*bufr .
+ln -s ../gribmap.txt .
+ln -s $DA_RTTOV_COEFFS/* .
 
  cp $WRFVAR_DIR/run/LANDUSE.TBL .
  cp $WRFVAR_DIR/main/wrfvar.exe  wrfvar.exe
@@ -295,6 +314,15 @@ cat >! namelist.3dvar << EOF
  use_ssmt1obs   = $DA_USE_SSMT1OBS,
  use_ssmt2obs   = $DA_USE_SSMT2OBS,
  use_qscatobs   = $DA_USE_QSCATOBS,
+ use_Hirs2Obs   = $DA_USE_HIRS2OBS,
+ use_Hirs3Obs   = $DA_USE_HIRS3OBS,
+ use_MsuObs     = $DA_USE_MSUOBS,
+ use_AmsuaObs   = $DA_USE_AMSUAOBS,
+ use_AmsubObs   = $DA_USE_AMSUBOBS,
+ use_AirsObs    = $DA_USE_AIRSOBS,
+ use_Eos_AmsuaObs = $DA_USE_EOS_AMSUAOBS,
+ use_Eos_RadObs = $DA_USE_EOS_RADOBS,
+ use_HsbObs     = $DA_USE_HSBOBS,
  use_radarobs   = $DA_USE_RADAROBS,
  Use_Radar_rv   = $DA_Use_Radar_rv,
  Use_Radar_rf   = $DA_Use_Radar_rf,
@@ -372,6 +400,23 @@ sfc_assi_options = $DA_SFC_ASSI_OPTIONS,
  max_vert_var3  = $DA_MAX_VERT_VAR3,
  max_vert_var4  = $DA_MAX_VERT_VAR4,
  max_vert_var5  = $DA_MAX_VERT_VAR5 /
+
+&record14
+ rtminit_errunit     = 99,
+ rtminit_print       = 3,
+ rtminit_nsensor     = 2,
+ rtminit_platform    =  1,1,
+ rtminit_satid       =  15,16,
+ rtminit_sensor      =  3,3,
+ use_kma1dvar        = .false.,
+ lmonitoring         = .false.,
+ lread_biascoef      = .true.,
+ lbiascorr           = .false.,
+ lrttov_scatt        = .false.,
+ lwrite_iv           = .true.,
+ lwrite_profile      = .true.,
+ use_landem          = .false.,
+ mw_emis_sea         = 1 /
  
 &pseudo_ob_nl
  num_pseudo     = $DA_NUM_PSEUDO, 

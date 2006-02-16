@@ -1,36 +1,34 @@
-/************************************************************************
-C* BORT_EXIT                                                            *
-C*                                                                      *
-C* This c subroutine will terminate the application program and return  *
-C* an implementation-defined non-zero status code to the executing      *
-C* shell script.                                                        *
-C*                                                                      *
-C* BORT_EXIT                                                            *
-C*                                                                      *
-C**                                                                     *
-C* Log:                                                                 *
-C* J. Ator/NCEP         04/03   Original author                         *
-C*                                                                      *
-C* Remarks:                                                             *
-C*    This routine calls: None                                          *
-C*    This routine is called by: BORT, BORT2 - normally not called by   *
-C*                               any application programs but it        *
-C*                               could be                               *
-C***********************************************************************/
+/*$$$  SUBPROGRAM DOCUMENTATION BLOCK
+C
+C SUBPROGRAM:    BORT_EXIT
+C   PRGMMR: ATOR             ORG: NP12       DATE: 2003-11-04
+C
+C ABSTRACT: THIS SUBROUTINE WILL TERMINATE THE APPLICATION PROGRAM AND
+C   RETURN AN IMPLEMENTATION-DEFINED NON-ZERO STATUS CODE TO THE
+C   EXECUTING SHELL SCRIPT.
+C
+C PROGRAM HISTORY LOG:
+C 2003-11-04  J. ATOR    -- ORIGINAL AUTHOR
+C 2003-11-04  D. KEYSER  -- UNIFIED/PORTABLE FOR WRF
+C 2004-08-18  J. ATOR    -- USE bufrlib.h INCLUDE FILE
+C
+C USAGE:    CALL BORT_EXIT
+C
+C REMARKS:
+C    THIS ROUTINE CALLS:        None
+C    THIS ROUTINE IS CALLED BY: BORT     BORT2
+C                               Normally not called by application
+C                               programs but it could be.
+C
+C ATTRIBUTES:
+C   LANGUAGE: C
+C   MACHINE:  PORTABLE TO ALL PLATFORMS
+C
+C$$$*/
 
-#include <stdlib.h>
-
-/* depending on the operating system, may need to append an underscore */
-#ifdef UNDERSCORE
-#define bort_exit bort_exit_
-#endif
-
-/* declare prototype for ANSI C compatibility */
-void bort_exit( void );
+#include "bufrlib.h"
 
 void bort_exit( )
-
 {
     exit( EXIT_FAILURE );
 }
-

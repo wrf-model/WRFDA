@@ -418,7 +418,7 @@ loop_level: DO i = 1, platform%info%levels
 !     else if(index(platform%info%source, 'SHIP') > 0 .or. &
 !             index(platform%info%source, 'BOUY') > 0) then
 
-         CASE (13, 17) ;                  ! ships          
+         CASE (13, 17) ;                  ! ships   
 
          ob%num_ships_glo = ob%num_ships_glo + 1
          IF(outside) THEN
@@ -934,9 +934,9 @@ loop_level: DO i = 1, platform%info%levels
          platform%loc%obs_global_index = ob%num_bogus_glo
 
          if( num_bogus > max_bogus_input) then
-                  write(0,'(A,I6,A,I6)') 'Bogus #=', num_bogus, &
-                         ' > max_bogus_input=', max_bogus_input
-                  STOP
+           write(UNIT=errmsg(1),FMT='(A,I6,A,I6)') &
+             'Bogus #=', num_bogus, ' > max_bogus_input=', max_bogus_input
+           CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
          endif
 
          ob%bogus(num_bogus)%info = platform%info

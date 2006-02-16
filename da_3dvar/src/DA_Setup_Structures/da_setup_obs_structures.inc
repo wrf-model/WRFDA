@@ -8,6 +8,7 @@ SUBROUTINE da_setup_obs_structures( xp, ob, iv )
 !  HISTORY: 10/05/2001 - Creation of F90 version.           Dale Barker
 !           10/19/2001 - Mods for parallel implementation.  Al Bourgeois
 !           02/12/2002 - Compute interplation weights.      Al Bourgeois
+!              07/2005 - Add radiance part                  Zhiquan Liu
 !
 !  PARENT_MODULE: DA_Setup_Structures
 !------------------------------------------------------------------------------
@@ -30,6 +31,10 @@ SUBROUTINE da_setup_obs_structures( xp, ob, iv )
    iv%missing = missing
 !  iv%ptop    = xb%ptop
 
+   iv%total_obs         = 0
+   iv%total_rad_pixel   = 0
+   iv%total_rad_channel = 0
+   
    iv%num_sound=0
    iv%num_synop=0
    iv%num_geoamv=0
@@ -50,6 +55,7 @@ SUBROUTINE da_setup_obs_structures( xp, ob, iv )
    iv%num_profiler=0
    iv%num_radar=0
    iv%num_bogus=0
+   iv%num_inst=0
 
    iv%num_sound_glo=0
    iv%num_synop_glo=0
@@ -75,33 +81,55 @@ SUBROUTINE da_setup_obs_structures( xp, ob, iv )
    iv%num_pseudo=num_pseudo
    iv%num_pseudo_glo=iv%num_pseudo
 
-   if ( ob_format == 1 ) then
-
-!     [1.1] BUFR observation input file:
-      if(iv%num_pseudo > 0) then
-         write(unit=*, fmt='(/6x,a/)') 'Pseudo test only.'
-!--------Test pseudo_obs only.
-         call DA_Allocate_Y( iv, ob )
-         call da_setup_pseudo_obs( iv, ob )
+CALL wrf_oi(__FILE__,__LINE__)
+   IF (use_obsgts) then
+CALL wrf_oi(__FILE__,__LINE__)
+     ! Conventional obs can be in BUFR or ascii format
+     IF ( ob_format == 1 ) THEN
+CALL wrf_oi(__FILE__,__LINE__)
+       CALL wrf_message('Using MM5 format observation input')
+       ! [1.1] BUFR observation input file:
+CALL wrf_oi(__FILE__,__LINE__)
+       IF (iv%num_pseudo > 0) THEN
+CALL wrf_oi(__FILE__,__LINE__)
+         CALL wrf_message('Pseudo test only.')
+         CALL DA_Allocate_Y( iv, ob )
+         CALL da_setup_pseudo_obs( iv, ob )
          iv%pseudo(1)%loc%i=int(iv%pseudo(1)%loc%x)
          iv%pseudo(1)%loc%j=int(iv%pseudo(1)%loc%y)
          iv%pseudo(1)%loc%dx=iv%pseudo(1)%loc%x-real(iv%pseudo(1)%loc%i)
          iv%pseudo(1)%loc%dy=iv%pseudo(1)%loc%y-real(iv%pseudo(1)%loc%j)
          iv%pseudo(1)%loc%dxm=1.0-iv%pseudo(1)%loc%dx
          iv%pseudo(1)%loc%dym=1.0-iv%pseudo(1)%loc%dy
-      else
-         write(6,'(a)')'    Using BUFR format observation input'
-         call da_setup_obs_structures_bufr( xp, ob, iv )
-      endif
-   else if ( ob_format == 2 ) then
+       ELSE
+CALL wrf_oi(__FILE__,__LINE__)
+         CALL da_setup_obs_structures_bufr( xp, ob, iv )
+CALL wrf_oi(__FILE__,__LINE__)
+       END IF 
+     ELSE IF ( ob_format == 2 ) THEN
+       ! [1.2] MM5 observation input file:
+CALL wrf_oi(__FILE__,__LINE__)
+       CALL da_setup_obs_structures_ascii( xp, ob, iv )
+CALL wrf_oi(__FILE__,__LINE__)
+     END IF
+CALL wrf_oi(__FILE__,__LINE__)
+   END IF
 
-!     [1.2] MM5 observation input file:
-      write(6,'(a)')'    Using MM5 format observation input'
-      call da_setup_obs_structures_ascii( xp, ob, iv )
+   ! Radiance files can only be in BUFR
 
-   end if
+CALL wrf_oi(__FILE__,__LINE__)
+   IF (use_radiance) then
+CALL wrf_oi(__FILE__,__LINE__)
+     CALL wrf_message('Using NCEP BUFR radiance 1b input')
+     CALL da_setup_bufrtovs_structures( xp, ob, iv )
+     ! These are per processor, so uninteresting
+     ! write (6, *) ' iv%total_rad_channel = ', iv%total_rad_channel
+     ! write (6, *) ' iv%total_rad_pixel   = ', iv%total_rad_pixel
+   END IF
+CALL wrf_oi(__FILE__,__LINE__)
 
 !     Get horizontal interpolation weights.
       call da_setup_obs_interp_wts( xp, iv )     
+
 END SUBROUTINE da_setup_obs_structures
 

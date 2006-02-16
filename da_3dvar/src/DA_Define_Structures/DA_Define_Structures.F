@@ -21,6 +21,7 @@ MODULE DA_Define_Structures
 !           03/04/2005 - CMV's from Geostationary and       Syed  RH  Rizvi
 !                        Polar orbiting satellite are
 !                        seperated & used as profile
+!              07/2005 - Add radiance related data structure    Zhiquan Liu
 !------------------------------------------------------------------------------
 
    USE DA_Constants
@@ -537,6 +538,35 @@ MODULE DA_Define_Structures
       TYPE (field_type)       :: v              ! v-wind.
    END TYPE qscat_type
 
+   TYPE rad_type
+
+      TYPE (info_type)        :: info
+      TYPE (model_loc_type)   :: loc
+
+        integer   ::  landsea_mask
+        integer   ::  scanline, scanpos
+        real      ::  satzen, satazi, solzen, solazi        !  satellite and solar angles
+! channels' bright temperature
+        type(field_type), pointer   ::   tb(:)                       !  bright temperatures
+        real,    pointer   ::   emiss(:), tb_xb(:)
+!        logical, pointer   ::   calcemis(:)
+        real,    pointer   ::   t(:), mr(:), zk(:)
+        real,    pointer   ::   pm(:), tm(:), qm(:), qrn(:), qcw(:),qci(:),qsn(:),qgr(:)
+        real               ::   ps,ts,t2m,mr2m,u10,v10, clwp
+        real               ::   smois, tslb, snowh, elevation,soiltyp,vegtyp,vegfra
+        integer            ::   isflg
+
+   END TYPE rad_type
+
+   TYPE instid_type
+!! Instrument triplet, follow the convension of RTTOV
+      INTEGER              :: platform_id, satellite_id, sensor_id
+      CHARACTER(LEN=20)    :: rttovid_string
+      INTEGER              :: num_rad, nchan, nlevels
+      INTEGER ,  pointer   :: ichan(:)
+      TYPE (rad_type)    , pointer   :: rad(:)  ! radiance type
+   END TYPE instid_type
+
    TYPE ob_numb_type
       INTEGER :: total, &
                  synop, & 
@@ -559,7 +589,8 @@ MODULE DA_Define_Structures
                  qscat, &
                  profiler, &
                  buoy, &
-                 Radar
+                 Radar, &
+                 radiance
    END TYPE ob_numb_type
 
    TYPE ob_type
@@ -575,7 +606,8 @@ MODULE DA_Define_Structures
                  num_ssmi_tb, num_ssmi_retrieval, &
                  num_ssmt1, num_ssmt2, num_pseudo, &
                  num_qscat, num_profiler, num_buoy, &
-                 num_Radar, num_gpsref, num_bogus
+                 num_Radar, num_gpsref, num_bogus, &
+                 num_inst, total_rad_pixel, total_rad_channel
 
       INTEGER :: num_synop_glo, &
                  num_sound_glo, num_geoamv_glo, num_polaramv_glo, &
@@ -585,7 +617,8 @@ MODULE DA_Define_Structures
                  num_ssmi_tb_glo, num_ssmi_retrieval_glo, &
                  num_ssmt1_glo, num_ssmt2_glo, num_pseudo_glo, &
                  num_qscat_glo, num_profiler_glo, num_buoy_glo, &
-                 num_Radar_glo, num_gpsref_glo, num_bogus_glo
+                 num_Radar_glo, num_gpsref_glo, num_bogus_glo, &
+                 num_inst_glo
 
       real    :: synop_ef_u, synop_ef_v, synop_ef_t, synop_ef_p, synop_ef_q
       real    :: metar_ef_u, metar_ef_v, metar_ef_t, metar_ef_p, metar_ef_q
@@ -627,6 +660,7 @@ MODULE DA_Define_Structures
       TYPE (pilot_type)         , pointer :: profiler(:)
       TYPE (bogus_type)         , pointer :: bogus(:)
       TYPE (Radar_type)         , pointer :: Radar(:)
+      TYPE (instid_type)        , pointer :: instid(:)
 
       REAL :: missing
       REAL :: ptop
@@ -661,6 +695,7 @@ MODULE DA_Define_Structures
       type (bad_info)       :: rv
       type (bad_info)       :: rf
       type (bad_info)       :: slp
+      type (bad_info)       :: rad
    END TYPE bad_data_type
 
    TYPE count_obs_number_type
@@ -793,6 +828,17 @@ MODULE DA_Define_Structures
       REAL, POINTER :: rf(:)                    ! rf
    END TYPE residual_Radar_type
 
+   TYPE residual_rad_type
+      real    , POINTER :: tb(:)
+   END TYPE residual_rad_type
+
+   TYPE residual_instid_type
+      integer                          :: num_rad
+      integer                          :: nchan
+      integer ,  pointer               :: ichan (:)
+      type(residual_rad_type), POINTER :: rad(:)
+   END TYPE residual_instid_type
+
    TYPE y_type
         TYPE(ob_numb_type) :: ob_numb
 
@@ -804,7 +850,8 @@ MODULE DA_Define_Structures
                    num_ssmi_tb, num_ssmi_retrieval, &
                    num_ssmt1, num_ssmt2, num_pseudo, &
                    num_qscat, num_profiler, num_buoy, &
-                   num_Radar, num_gpsref, num_bogus
+                   num_Radar, num_gpsref, num_bogus, &
+                   num_inst
 
         TYPE (residual_synop_type), POINTER :: synop(:)
         TYPE (residual_synop_type), POINTER :: metar(:) ! Same as synop type
@@ -828,6 +875,7 @@ MODULE DA_Define_Structures
         TYPE (residual_synop_type),  POINTER :: buoy(:) ! Same as synop type
         TYPE (residual_pilot_type), POINTER :: profiler(:) ! Same as pilot type
         TYPE (residual_Radar_type), POINTER :: Radar(:)
+        TYPE (residual_instid_type), POINTER :: instid(:)
    END TYPE y_type
 
 !-----------------------------------------------------------------------------
@@ -867,6 +915,7 @@ MODULE DA_Define_Structures
       real                :: buoy_u, buoy_v, buoy_t, buoy_p, buoy_q
       real                :: Radar_rv, Radar_rf
       real                :: bogus_u, bogus_v, bogus_t, bogus_q, bogus_slp
+      real, pointer       :: rad(:)
    end type jo_type
 
    type j_type
@@ -962,7 +1011,7 @@ CONTAINS
 #include "DA_Deallocate_Observations.inc"
 #include "DA_Deallocate_Y.inc"
 #include "DA_Zero_X.inc"
-#include "DA_Zero_Y.inc"
+!#include "DA_Zero_Y.inc"
 #include "DA_Zero_vp_type.inc"
 #include "da_allocate_cv.inc"
 #include "da_deallocate_cv.inc"

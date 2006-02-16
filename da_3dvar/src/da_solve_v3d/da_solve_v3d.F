@@ -141,6 +141,8 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
 #include <em_dummy_args.inc>
                  )
 
+    if (lmonitoring) call wrf_shutdown
+
 !     [8.3] Interpolate x_g to low resolution grid
 
 !     [8.4] Minimize cost function:

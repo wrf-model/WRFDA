@@ -10,8 +10,9 @@ foreach dir ( frame chem share dyn_em dyn_exp dyn_nmm phys main tools )
 end
 
 ( cd da_3dvar ; /bin/rm -f *.f *.o *.mod mpif.h *.stb .*.m *.lst )
-( cd da_3dvar/src ; /bin/rm -f *.f *.o *.mod *.stb .*.m *.lst )
-( cd external/RSL/RSL ; /bin/rm -f *.lst )
+( cd da_3dvar/src ; /bin/rm -f *.f *.o *.mod *.stb .*.m *.lst bufrlib.prm \
+  par_util/generic_boilerplate.inc )
+( cd external/RSL/RSL ; /bin/rm -f *.lst LAST_MADE* )
 ( cd convertor ; /bin/rm -f *.f *.o *.mod *.exe *.stb .*.m *.lst )
 ( cd gen_be ; /bin/rm -f *.o *.mod *.exe *.stb .*.m *.lst )
 

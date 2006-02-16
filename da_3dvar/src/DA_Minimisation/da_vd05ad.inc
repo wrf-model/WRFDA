@@ -149,7 +149,7 @@
       p5 = 0.5
       p66 = 0.66
       xtrapf = 4.0
-      zero = 0.0
+!      zero = 0.0
       nfev = 0
       
       if(info == -1) go to 45

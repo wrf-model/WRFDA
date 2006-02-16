@@ -6,6 +6,8 @@ MODULE DA_Constants
 !  METHOD:  Straightforward definitions.
 !
 !  HISTORY: 11/08/1999 - Creation.                           Dale Barker
+!              07/2005 - Add radiance assimilation           Zhiquan Liu
+!                        namelist parameter 'rtminit'
 !------------------------------------------------------------------------------
 
    IMPLICIT NONE
@@ -140,6 +142,14 @@ MODULE DA_Constants
    REAL, PARAMETER    :: inv_typ_vp5_sumsq = 0.00001 ! 1/SUM(?**2)
 
 !  Fortran unit  parameters:
+
+   ! Stderr and stdout can be controlled by namelist Record1. 
+   ! stdout is set to stdout_unit, ditto stderr
+   INTEGER :: stdout_unit = 6      ! Standard output
+   INTEGER :: stderr_unit = 0     ! Standard error
+   INTEGER :: stdout = 6          ! Standard output
+   INTEGER :: stderr = 0          ! Standard error
+
    INTEGER, PARAMETER :: jpout = 11           ! Unit number for x output.
    INTEGER, PARAMETER :: stats_unit = 12      ! Unit number for stats output.
 
@@ -159,6 +169,8 @@ MODULE DA_Constants
    integer, parameter :: fac_unit = 49        ! Input components of ErrFac.
    integer, parameter :: omb_unit = 50        ! Output for O-B values.
 
+    INTEGER, PARAMETER :: bufrtovs_unit = 55  ! Input BUFR/TOVS data
+
    INTEGER, PARAMETER :: check_max_iv_unit=60 ! Unit number for O-B check.
 
    integer, parameter :: cost_unit = 81       ! Output of cost-function value
@@ -168,7 +180,10 @@ MODULE DA_Constants
    INTEGER, PARAMETER :: gts_iunit  = 92      ! Unit number for GTS obs input.
    INTEGER, PARAMETER :: ssmi_iunit = 93      ! Unit number for SSMI obs input.
    INTEGER, PARAMETER :: Radar_iunit = 94     ! Unit number for Radar input.
+   INTEGER, PARAMETER :: airs_table_unit = 95 ! AIRS bufr table input
+   INTEGER, PARAMETER :: rtm_error_unit = 99  ! RTTOV error unit
    INTEGER, PARAMETER :: filtered_obs_iunit  = 192  ! Unit number for writing filtered obs
+   INTEGER, PARAMETER :: unit_983            = 983 ! TBD
    integer, parameter  :: iunit = 70
    integer, parameter  :: ounit = iunit + 1
    integer, parameter  :: namelist_unit = 72
@@ -363,7 +378,16 @@ MODULE DA_Constants
                    use_Radar_rv, &  
                    use_Radar_rf, &  
                    use_profilerObs, &
-                   use_buoyObs
+                   use_buoyObs, &
+                   use_Hirs2Obs, &
+                   use_Hirs3Obs, &
+                   use_MsuObs, &
+                   use_AmsuaObs, &
+                   use_AmsubObs, &
+                   use_Eos_RadObs, &
+                   use_Eos_AmsuaObs, &
+                   use_AirsObs, &
+                   use_HsbObs
 
    logical :: def_sub_domain
    real    :: x_start_sub_domain, x_end_sub_domain, &
@@ -511,6 +535,29 @@ MODULE DA_Constants
  integer                :: numb_procs, &         ! Number of total processors.
                            my_proc_id            ! My processor ID.
  LOGICAL                :: global 
+
+!
+! RTM_INIT setup parameter (read from namelist.3dvar)
+!
+ integer, parameter            :: maxsensor = 30
+
+ integer                       :: rtminit_print,    &
+                                  rtminit_nsensor
+
+ integer, dimension(maxsensor) :: rtminit_platform, &
+                                  rtminit_satid,    &
+                                  rtminit_sensor
+
+ logical                       :: use_landem      ! if use weng's landem model
+ integer                       :: mw_emis_sea     ! surface emissivity type over sea
+                                                  ! 0:FASTEM-2; 1:Weng's model
+
+! type( rttov_coef ), pointer :: coefs(:)         ! RTTOV coefficients
+ logical                       :: use_kma1dvar
+ logical                       :: use_radiance,  use_obsgts, &
+                                  lread_biascoef,lbiascorr, lrttov_scatt, lmonitoring, &
+                                  lwrite_iv, lwrite_profile
+
  CONTAINS
 
 #include "da_advance_cymdh.inc"

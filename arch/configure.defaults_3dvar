@@ -9,7 +9,7 @@ F77             =       $(FC)
 LD              =       $(FC)
 CC              =       cc
 CC_TOOLS        =       cc
-ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DNETCDF -DINTIO \
+ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE CONFIGURE_NETCDF_FLAG CONFIGURE_RTTOV_FLAG -DINTIO \
                         $(WORDSIZE_DEF) \
                         -DTRIEDNTRUE -DONLY_WRFMODEL_IO \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC)
@@ -35,6 +35,9 @@ NETCDFPATH      =       CONFIGURE_NETCDF_PATH
 NETCDF_IO_PATH  =       external/io_netcdf
 NETCDF_LIB	=       CONFIGURE_NETCDF_LIB_PATH
 
+RTTOVPATH       =       CONFIGURE_RTTOV_PATH
+RTTOV_LIB	=       CONFIGURE_RTTOV_LIB
+
 LOCAL_LIBRARIES =       -L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c -lX11
 
 CPP             =       /usr/bin/cpp
@@ -59,7 +62,7 @@ F77             =       $(FC)
 LD              =       $(FC)
 CC              =       mpicc
 CC_TOOLS        =       cc
-ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DNETCDF -DINTIO \
+ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE CONFIGURE_NETCDF_FLAG CONFIGURE_RTTOV_FLAG -DINTIO \
                         -DWRF_RSL_IO -DDM_PARALLEL -DRSL \
                         $(WORDSIZE_DEF) \
                         -DTRIEDNTRUE -DONLY_WRFMODEL_IO \
@@ -85,6 +88,8 @@ ENVCOMPDEFS     =       CONFIGURE_COMPILEFLAGS
 NETCDFPATH      =       CONFIGURE_NETCDF_PATH
 NETCDF_IO_PATH  =       external/io_netcdf
 NETCDF_LIB	=       CONFIGURE_NETCDF_LIB_PATH
+RTTOVPATH       =       CONFIGURE_RTTOV_PATH
+RTTOV_LIB	=       CONFIGURE_RTTOV_LIB
 MPI_LIB		=	-L../external/RSL/RSL -lrsl
 
 LOCAL_LIBRARIES =       -L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c -lX11
@@ -118,7 +123,7 @@ F77             =       $(FC)
 LD              =       $(FC)
 CC              =       cc
 CC_TOOLS        =       cc
-ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DNETCDF -DINTIO \
+ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE CONFIGURE_NETCDF_FLAG CONFIGURE_RTTOV_FLAG -DINTIO \
                         $(WORDSIZE_DEF) \
                         -DTRIEDNTRUE -DONLY_WRFMODEL_IO \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC)
@@ -143,6 +148,9 @@ ENVCOMPDEFS     =       CONFIGURE_COMPILEFLAGS
 NETCDFPATH      =       CONFIGURE_NETCDF_PATH
 NETCDF_IO_PATH  =       external/io_netcdf
 NETCDF_LIB	=       CONFIGURE_NETCDF_LIB_PATH
+
+RTTOVPATH       =       CONFIGURE_RTTOV_PATH
+RTTOV_LIB	=       CONFIGURE_RTTOV_LIB
 
 LOCAL_LIBRARIES =       -L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c -lX11
 
@@ -178,7 +186,7 @@ FCBASE          =       $(FCBUFR) -byteswapio
 FC_FFT_RF       =       $(FCBUFR) -byteswapio
 ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE \
                         $(WORDSIZE_DEF) \
-                        CONFIGURE_NETCDF_FLAG \
+                        CONFIGURE_NETCDF_FLAG CONFIGURE_RTTOV_FLAG \
                         -DTRIEDNTRUE -DONLY_WRFMODEL_IO
 EXTRAMODULES    =       
 PERL            =       perl
@@ -190,10 +198,15 @@ NETCDFPATH      =       CONFIGURE_NETCDF_PATH
 NETCDF_IO_PATH  =       external/io_netcdf
 NETCDF_LIB	=       CONFIGURE_NETCDF_LIB_PATH
 
+RTTOVPATH       =       CONFIGURE_RTTOV_PATH
+RTTOV_LIB	=       CONFIGURE_RTTOV_LIB
+
 LOCAL_LIBRARIES =       -L/usr/local/ncarg/lib -L/usr/X11R6/lib -L/usr/local/lib \
 			-lncarg -lncarg_gks -lncarg_c -lX11
 
 CPP             =       /lib/cpp $(TRADFLAG)
+CPPFLAGS_BUFR   =       -C -P -DLINUX -Dlinux
+CCFLAGS_BUFR    =       -DUNDERSCORE
 DM_1_CPP_FLAGS  =
 DM_2_CPP_FLAGS  =
 POUND_DEF       =       -DLINUX -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
@@ -216,7 +229,7 @@ SFC             =       pgf90
 ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE \
                         -DINTIO -DWRF_RSL_IO -DRSL -DDM_PARALLEL \
                         $(WORDSIZE_DEF) \
-                        CONFIGURE_NETCDF_FLAG \
+                        CONFIGURE_NETCDF_FLAG CONFIGURE_RTTOV_FLAG \
                         -DTRIEDNTRUE -DONLY_WRFMODEL_IO
 CFLAGS          =       -DDM_PARALLEL -DWRF_RSL_IO \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) \
@@ -241,12 +254,16 @@ ENVCOMPDEFS     =       CONFIGURE_COMPILEFLAGS
 NETCDFPATH      =       CONFIGURE_NETCDF_PATH
 NETCDF_IO_PATH  =       external/io_netcdf
 NETCDF_LIB	=       CONFIGURE_NETCDF_LIB_PATH
+RTTOVPATH       =       CONFIGURE_RTTOV_PATH
+RTTOV_LIB	=       CONFIGURE_RTTOV_LIB
 MPI_LIB		=	-L../external/RSL/RSL -lrsl
 
 LOCAL_LIBRARIES =       -L/usr/local/ncarg/lib -L/usr/X12R6/lib -L/usr/local/lib \
-                        -lncarg -lncarg_gks -lncarg_c -lX11
+                        -lncarg -lncarg_gks -lncarg_c -lX11 
 
 CPP             =       /lib/cpp $(TRADFLAG)
+CPPFLAGS_BUFR   =       -C -P -DLINUX -Dlinux
+CCFLAGS_BUFR    =       -DUNDERSCORE
 DM_1_CPP_FLAGS  =       -I../external/RSL/RSL -C -P `cat ../inc/dm_comm_cpp_flags` \
 			-DNO_RRTM_PHYSICS  -DPGF90
 DM_2_CPP_FLAGS  =       -I../../external/RSL/RSL -C -P `cat ../../inc/dm_comm_cpp_flags`
@@ -285,7 +302,7 @@ FCBASE          =       $(FCBUFR) -convert big_endian
 FC_FFT_RF       =       $(FCBUFR) -convert big_endian
 ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE \
                         $(WORDSIZE_DEF) \
-                        CONFIGURE_NETCDF_FLAG \
+                        CONFIGURE_NETCDF_FLAG CONFIGURE_RTTOV_FLAG \
                         -DTRIEDNTRUE -DONLY_WRFMODEL_IO
 EXTRAMODULES    =       
 PERL            =       perl
@@ -296,6 +313,8 @@ ENVCOMPDEFS     =       CONFIGURE_COMPILEFLAGS
 NETCDFPATH      =       CONFIGURE_NETCDF_PATH
 NETCDF_IO_PATH  =       external/io_netcdf
 NETCDF_LIB	=       CONFIGURE_NETCDF_LIB_PATH
+
+RTTOV_LIB	=       CONFIGURE_RTTOV_LIB
 
 LOCAL_LIBRARIES =       -L/usr/local/ncarg/lib -L/usr/X11R6/lib -L/usr/local/lib \
 			-lncarg -lncarg_gks -lncarg_c -lX11
@@ -324,7 +343,7 @@ CC              =       cc
 CC_TOOLS        =       cc
 ARCHFLAGS       =       -DINTIO \
                         $(WORDSIZE_DEF) \
-                        CONFIGURE_NETCDF_FLAG \
+                        CONFIGURE_NETCDF_FLAG CONFIGURE_RTTOV_FLAG \
                         -DTRIEDNTRUE -DONLY_WRFMODEL_IO \
                         -DNORESHAPE
 CFLAGS          =       -w -64 -mips4 -DUNDERSCORE \
@@ -348,6 +367,7 @@ ENVCOMPDEFS     =       CONFIGURE_COMPILEFLAGS
 NETCDFPATH      =       CONFIGURE_NETCDF_PATH
 NETCDF_IO_PATH  =       external/io_netcdf
 NETCDF_LIB	=       CONFIGURE_NETCDF_LIB_PATH
+RTTOV_LIB	=       CONFIGURE_RTTOV_LIB
 
 LOCAL_LIBRARIES =       -L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c -lX11
 
@@ -380,7 +400,7 @@ CC_TOOLS        =       cc
 ARCHFLAGS       =       -DINTIO \
                         -DWRF_RSL_IO -DDM_PARALLEL -DRSL \
                         $(WORDSIZE_DEF) \
-                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO
+                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO CONFIGURE_RTTOV_FLAG
 CFLAGS          =       -w -64 -mips4 \
                         -DWRF_RSL_IO -DDM_PARALLEL \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) \
@@ -406,6 +426,7 @@ ENVCOMPDEFS     =       CONFIGURE_COMPILEFLAGS
 NETCDFPATH      =       CONFIGURE_NETCDF_PATH
 NETCDF_IO_PATH  =       external/io_netcdf
 NETCDF_LIB	=       CONFIGURE_NETCDF_LIB_PATH
+RTTOV_LIB	=       CONFIGURE_RTTOV_LIB
 MPI_LIB		=	-L../external/RSL/RSL -lrsl -lmpi
 
 LOCAL_LIBRARIES =       -L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c -lX11
@@ -446,7 +467,7 @@ ARCHFLAGS       =       -DINTIO \
                         $(WORDSIZE_DEF) \
                         -DTRIEDNTRUE -DONLY_WRFMODEL_IO \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) \
-			-DNEC_SX -DWRF3DVAR -DMPI -I$(MPIINCDIR)
+			-DNEC_SX -DWRF3DVAR -DMPI -I$(MPIINCDIR) CONFIGURE_RTTOV_FLAG
 CFLAGS          =       $(ARCHFLAGS)
 TRADFLAG        =
 FCOPTIM         =
@@ -465,6 +486,7 @@ PERL            =       perl
 
 NETCDF_IO_PATH  =       main
 NETCDF_LIB	=
+RTTOV_LIB	=       CONFIGURE_RTTOV_LIB
 MPI_LIB		=
 
 LOCAL_LIBRARIES =       
@@ -513,6 +535,7 @@ ARCHFLAGS       =       -DGRIB1 -DINTIO \
 PERL            =       CONFIGURE_PERL_PATH
 REGISTRY        =       Registry
 NETCDF_LIB	=       CONFIGURE_NETCDF_LIB_PATH
+RTTOV_LIB	=       CONFIGURE_RTTOV_LIB
 LOCAL_LIB	=	-lmass -lmassv
 
 LDFLAGS         =	-bmaxstack:256000000 -bmaxdata:2048000000
@@ -558,13 +581,14 @@ FC_FFT_RF       =       $(FCBASE)
 EXTRAMODULES    =
 ARCHFLAGS       =       -DWRF_RSL_IO -DRSL -DDM_PARALLEL \
 			$(WORDSIZE_DEF) \
-			CONFIGURE_NETCDF_FLAG \
+			CONFIGURE_NETCDF_FLAG CONFIGURE_RTTOV_FLAG \
 			-DTRIEDNTRUE -DGRIB1 -DINTIO \
 			-DLIMIT_ARGS -DNO_NAMELIST_PRINT -DNATIVE_MASSV \
 			-DNORESHAPE
 PERL            =       perl
 REGISTRY        =       Registry
 NETCDF_LIB	=       CONFIGURE_NETCDF_LIB_PATH
+RTTOV_LIB	=       CONFIGURE_RTTOV_LIB
 MPI_LIB		=	-L../external/RSL/RSL -lrsl
 LOCAL_LIB	=	-lmass -lmassv
 LDFLAGS         =	-bmaxstack:256000000 -bmaxdata:2048000000
@@ -645,6 +669,7 @@ ENVCOMPDEFS     =       CONFIGURE_COMPILEFLAGS
 NETCDFPATH      =       CONFIGURE_NETCDF_PATH
 NETCDF_IO_PATH  =       external/io_netcdf
 NETCDF_LIB	=       CONFIGURE_NETCDF_LIB_PATH
+RTTOV_LIB	=       CONFIGURE_RTTOV_LIB
 MPI_LIB		=	-L../external/RSL/RSL -lrsl
 LOCAL_LIB	=	-L../frame -L../share -L../da_3dvar -L../da_3dvar/src
 CONVERTOR_LIB	=	-L../convertor
@@ -700,7 +725,7 @@ CC              =       cc
 ARCHFLAGS       =       -DWRF_RSL_IO -DRSL \
                         -DDM_PARALLEL \
                         $(WORDSIZE_DEF) \
-                        CONFIGURE_NETCDF_FLAG \
+                        CONFIGURE_NETCDF_FLAG CONFIGURE_RTTOV_FLAG \
                         -DTRIEDNTRUE -DONLY_WRFMODEL_IO -DINTIO \
                         -DNORESHAPE -Dcrayx1
 CFLAGS          =       -UCRAY -Dcrayx1 \
@@ -730,6 +755,7 @@ ENVCOMPDEFS     =       CONFIGURE_COMPILEFLAGS
 NETCDFPATH      =       CONFIGURE_NETCDF_PATH
 NETCDF_IO_PATH  =       external/io_netcdf
 NETCDF_LIB	=       CONFIGURE_NETCDF_LIB_PATH
+RTTOV_LIB	=       CONFIGURE_RTTOV_LIB
 MPI_LIB		=	-L../external/RSL/RSL -lrsl
 LOCAL_LIB	=	-L../frame -L../share -L../da_3dvar -L../da_3dvar/src
 CONVERTOR_LIB	=	-L../convertor
@@ -781,11 +807,12 @@ EXTRAMODULES    =
 EXTRAMODULES    =       
 ARCHFLAGS       =       -DINTIO \
 			$(WORDSIZE_DEF) \
-                        CONFIGURE_NETCDF_FLAG -DTRIEDNTRUE   \
+                        CONFIGURE_NETCDF_FLAG CONFIGURE_RTTOV_FLAG -DTRIEDNTRUE   \
 			-DLIMIT_ARGS -DNO_NAMELIST_PRINT
 PERL            =       CONFIGURE_PERL_PATH
 REGISTRY        =       Registry
 NETCDF_LIB	=       CONFIGURE_NETCDF_LIB_PATH
+RTTOV_LIB	=       CONFIGURE_RTTOV_LIB
 LDFLAGS         =	 -Wl,-stack_size,10000000,-stack_addr,0xc0000000
 ENVCOMPDEFS     =       CONFIGURE_COMPILEFLAGS
 CPP             =       /usr/bin/cpp  -C -P -xassembler-with-cpp
