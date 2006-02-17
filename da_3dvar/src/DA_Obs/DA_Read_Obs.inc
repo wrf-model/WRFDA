@@ -416,7 +416,7 @@ loop_level: DO i = 1, platform%info%levels
          ob%synop(num_synop)%p = platform%each(1)%p
 
 !     else if(index(platform%info%source, 'SHIP') > 0 .or. &
-!             index(platform%info%source, 'BOUY') > 0) then
+!             index(platform%info%source, 'BUOY') > 0) then
 
          CASE (13, 17) ;                  ! ships   
 
@@ -976,7 +976,7 @@ loop_level: DO i = 1, platform%info%levels
                                      'nlevels=',nlevels
          end if
 
-         CASE (18,19) ;             ! bouy
+         CASE (18,19) ;             ! buoy
 
          ob%num_buoy_glo = ob%num_buoy_glo + 1
          IF(outside) THEN

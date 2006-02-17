@@ -320,7 +320,7 @@ loop_level: DO i = 1, platform%info%levels
             num_synop = num_synop + 1
 
 !        else if(index(platform%info%source, 'SHIP') > 0 .or. &
-!                index(platform%info%source, 'BOUY') > 0) then
+!                index(platform%info%source, 'BUOY') > 0) then
 
          CASE (13, 17) ;                  ! ships          
 
@@ -426,7 +426,7 @@ loop_level: DO i = 1, platform%info%levels
             if(.not.use_BogusObs) cycle reports
             num_bogus = num_bogus + 1
 
-         CASE (18,19) ;             ! bouy
+         CASE (18,19) ;             ! buoy
 
             if(.not.use_BuoyObs) cycle reports
             num_buoy  = num_buoy  + 1
