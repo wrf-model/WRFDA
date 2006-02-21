@@ -50,7 +50,7 @@
                                        model_qci, model_qsn, &
                                        model_qgr, model_qm
 
-   INTEGER            :: inst, nprofiles, nchanl, unit, iprof, ios
+   INTEGER            :: inst, nprofiles, nchanl, iprof, ios
    INTEGER            :: nfrequencies, nchannels, nbtout
    REAL,    pointer   :: zk(:), polar(:)
    REAL,    pointer   :: pres(:)
@@ -82,7 +82,7 @@
 
    IF ( iv%num_inst < 1 ) return
 
-   print *, ' Computing Radiance Innovation------- '
+   WRITE(UNIT=stdout,FMT='(A)') ' Computing Radiance Innovation------- '
 
 !------------------------------------------------------
 !   [1.0] calculate the background bright temperature
@@ -497,8 +497,6 @@
  if ( lwrite_iv ) then
 #ifdef DM_PARALLEL
  call MPI_COMM_RANK( MPI_COMM_WORLD, myproc, ierr )
- print *, ' ierr= ', ierr
- print *, ' myproc = ', myproc
 #endif
  do n = 1, iv%num_inst
   if (iv%instid(n)%num_rad < 1) cycle
@@ -513,35 +511,36 @@
   end if
   end do
 #ifdef DM_PARALLEL
-  write(6,'(a,i3,a,i7)') 'number of obs in proc # ', myproc,' : ', ndomain
+  write(UNIT=stdout,FMT='(a,i3,a,i7)') 'number of obs in proc # ', myproc,' : ', ndomain
 #else
-  write(6,'(a,i7)') 'number of obs in proc # ', ndomain
+  write(UNIT=stdout,FMT='(a,i7)') 'number of obs in proc # ', ndomain
 #endif
 
-  unit = 14
 #ifdef DM_PARALLEL
-  write(filename, '(a,i2.2)') trim(iv%instid(n)%rttovid_string)//'.inv_', myproc
+  write(UNIT=filename,FMT='(a,i2.2)') trim(iv%instid(n)%rttovid_string)//'.inv_', myproc
 #else
-  write(filename, '(a)') trim(iv%instid(n)%rttovid_string)//'.inv'
+  write(UNIT=filename,FMT='(a)') trim(iv%instid(n)%rttovid_string)//'.inv'
 #endif
-  open(unit,file=trim(filename),form='formatted',iostat=ios)
+  open(UNIT=innov_vector_unit,file=trim(filename),form='formatted',iostat=ios)
   if( ios /= 0 ) Then
     CALL wrf_error_fatal3(__FILE__,__LINE__,&
       "Cannot open output file "//TRIM(filename))
   Endif
-    write(unit,'(a,a,i7,a,i5,a)') trim(iv%instid(n)%rttovid_string), &
+    write(UNIT=innov_vector_unit,FMT='(a,a,i7,a,i5,a)') &
+      trim(iv%instid(n)%rttovid_string), &
                         ' number-of-pixels : ', ndomain, &
                         ' channel-number-of-each-pixel : ', iv%instid(n)%nchan, &
                         ' index-of-channels : '
-    write(unit,'(10i5)') iv%instid(n)%ichan
-    write(unit, *) ' pixel-info : i date scanpos landsea_mask  elv lat lon  satzen satazi '
-    write(unit, *) ' xb-surf-info : i t2m mr2m(ppmv) u10 v10 ps ts smois tslb snowh isflg &
+    write(UNIT=innov_vector_unit,FMT='(10i5)') iv%instid(n)%ichan
+    write(UNIT=innov_vector_unit, *) ' pixel-info : i date scanpos landsea_mask  elv lat lon  satzen satazi '
+    write(UNIT=innov_vector_unit, *) ' xb-surf-info : i t2m mr2m(ppmv) u10 v10 ps ts smois tslb snowh isflg &
                     & soiltyp vegtyp vegfra elev clwp'
    ndomain = 0
   do i =1,iv%instid(n)%num_rad
    if(iv%instid(n)%rad(i)%loc%proc_domain) then
     ndomain=ndomain+1
-    write(unit,'(a,i7,2x,a,2i3,f6.0,4f8.2)') 'INFO : ', ndomain, &
+    write(UNIT=innov_vector_unit,'(a,i7,2x,a,2i3,f6.0,4f8.2)') &
+      'INFO : ', ndomain, &
                              iv%instid(n)%rad(i)%info%date_char, &
                              iv%instid(n)%rad(i)%scanpos,   &
                              iv%instid(n)%rad(i)%landsea_mask, &
@@ -551,7 +550,8 @@
                              iv%instid(n)%rad(i)%satzen,    &
                              iv%instid(n)%rad(i)%satazi
  if (iv%instid(n)%rad(i)%isflg==0) then
-    write(unit,'(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') ' SEA : ', i, &
+    write(UNIT=innov_vector_unit,FMT='(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') &
+      ' SEA : ', i, &
                              iv%instid(n)%rad(i)%t2m, &
                              iv%instid(n)%rad(i)%mr2m,   &
                              iv%instid(n)%rad(i)%u10, &
@@ -568,7 +568,8 @@
                              iv%instid(n)%rad(i)%elevation, &
                              iv%instid(n)%rad(i)%clwp
  else if (iv%instid(n)%rad(i)%isflg==1) then
-   write(unit,'(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') ' ICE : ', i, &
+   write(UNIT=innov_vector_unit,FMT='(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') &
+     ' ICE : ', i, &
                              iv%instid(n)%rad(i)%t2m, &
                              iv%instid(n)%rad(i)%mr2m,   &
                              iv%instid(n)%rad(i)%u10, &
@@ -585,7 +586,8 @@
                              iv%instid(n)%rad(i)%elevation, &
                              iv%instid(n)%rad(i)%clwp
  else if (iv%instid(n)%rad(i)%isflg==2) then
-   write(unit,'(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') 'LAND : ', i, &
+   write(UNIT=innov_vector_unit,FMT='(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') &
+     'LAND : ', i, &
                              iv%instid(n)%rad(i)%t2m, &
                              iv%instid(n)%rad(i)%mr2m,   &
                              iv%instid(n)%rad(i)%u10, &
@@ -602,7 +604,8 @@
                              iv%instid(n)%rad(i)%elevation, &
                              iv%instid(n)%rad(i)%clwp
  else if (iv%instid(n)%rad(i)%isflg==3) then
-   write(unit,'(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') 'SNOW : ', i, &
+   write(UNIT=innov_vector_unit,FMT='(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') &
+     'SNOW : ', i, &
                              iv%instid(n)%rad(i)%t2m, &
                              iv%instid(n)%rad(i)%mr2m,   &
                              iv%instid(n)%rad(i)%u10, &
@@ -619,7 +622,8 @@
                              iv%instid(n)%rad(i)%elevation, &
                              iv%instid(n)%rad(i)%clwp
  else if (iv%instid(n)%rad(i)%isflg==4) then
-   write(unit,'(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') 'MSEA : ', i, &
+   write(UNIT=innov_vector_unit,FMT='(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') &
+     'MSEA : ', i, &
                              iv%instid(n)%rad(i)%t2m, &
                              iv%instid(n)%rad(i)%mr2m,   &
                              iv%instid(n)%rad(i)%u10, &
@@ -636,7 +640,8 @@
                              iv%instid(n)%rad(i)%elevation, &
                              iv%instid(n)%rad(i)%clwp
  else if (iv%instid(n)%rad(i)%isflg==5) then
-   write(unit,'(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') 'MICE : ', i, &
+   write(UNIT=innov_vector_unit,FMT='(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') &
+     'MICE : ', i, &
                              iv%instid(n)%rad(i)%t2m, &
                              iv%instid(n)%rad(i)%mr2m,   &
                              iv%instid(n)%rad(i)%u10, &
@@ -653,7 +658,8 @@
                              iv%instid(n)%rad(i)%elevation, &
                              iv%instid(n)%rad(i)%clwp
  else if (iv%instid(n)%rad(i)%isflg==6) then
-   write(unit,'(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') 'MLND : ', i, &
+   write(UNIT=innov_vector_unit,FMT='(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') &
+     'MLND : ', i, &
                              iv%instid(n)%rad(i)%t2m, &
                              iv%instid(n)%rad(i)%mr2m,   &
                              iv%instid(n)%rad(i)%u10, &
@@ -670,7 +676,8 @@
                              iv%instid(n)%rad(i)%elevation, &
                              iv%instid(n)%rad(i)%clwp
  else if (iv%instid(n)%rad(i)%isflg==7) then
-   write(unit,'(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') 'MSNO : ', i, &
+   write(UNIT=innov_vector_unit, FMT='(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') &
+     'MSNO : ', i, &
                              iv%instid(n)%rad(i)%t2m, &
                              iv%instid(n)%rad(i)%mr2m,   &
                              iv%instid(n)%rad(i)%u10, &
@@ -688,25 +695,34 @@
                              iv%instid(n)%rad(i)%clwp
  end if
 
-!    write(unit,'(a,19f11.2)') 'OBS  : ', ob%instid(n)%rad(i)%tb(:)
-!    write(unit,'(a,19f11.2)') 'INV  : ', iv%instid(n)%rad(i)%tb(:)%inv
-!    write(unit,'(a,19f11.2)') 'EMS  : ', iv%instid(n)%rad(i)%emiss(1:iv%instid(n)%nchan)
-    write(unit,'(a)') 'OBS  : '
-    write(unit,'(10f11.2)') ob%instid(n)%rad(i)%tb(:)
-    write(unit,'(a)') 'INV  : '
-    write(unit,'(10f11.2)')  iv%instid(n)%rad(i)%tb(:)%inv
-    write(unit,'(a)') 'EMS  : '
-    write(unit,'(10f11.2)')  iv%instid(n)%rad(i)%emiss(1:iv%instid(n)%nchan)
+!    write(UNIT=innov_vector_unit,FMT='(a,19f11.2)')
+!      'OBS  : ', ob%instid(n)%rad(i)%tb(:)
+!    write(UNIT=innov_vector_unit,FMT='(a,19f11.2)')
+!      'INV  : ', iv%instid(n)%rad(i)%tb(:)%inv
+!    write(UNIT=innov_vector_unit,FMT='(a,19f11.2)')
+!      'EMS  : ', iv%instid(n)%rad(i)%emiss(1:iv%instid(n)%nchan)
+    write(UNIT=innov_vector_unit,FMT='(a)') 'OBS  : '
+    write(UNIT=innov_vector_unit,FMT='(10f11.2)') &
+      ob%instid(n)%rad(i)%tb(:)
+    write(UNIT=innov_vector_unit,FMT='(a)') 'INV  : '
+    write(UNIT=innov_vector_unit,FMT='(10f11.2)') &
+      iv%instid(n)%rad(i)%tb(:)%inv
+    write(UNIT=innov_vector_unit,FMT='(a)') 'EMS  : '
+    write(UNIT=innov_vector_unit,FMT='(10f11.2)') &
+      iv%instid(n)%rad(i)%emiss(1:iv%instid(n)%nchan)
 
-!    write(unit,'(a,19f11.2)') 'ERR  : ', iv%instid(n)%rad(i)%tb(:)%error
-!    write(unit,'(a,19i11)')   'QC   : ', iv%instid(n)%rad(i)%tb(:)%qc
+!    write(UNIT=innov_vector_unit,FMT='(a,19f11.2)') &
+!      'ERR  : ', iv%instid(n)%rad(i)%tb(:)%error
+!    write(UNIT=innov_vector_unit,FMT='(a,19i11)') &
+!      'QC   : ', iv%instid(n)%rad(i)%tb(:)%qc
 
 
   if (lwrite_profile) then
-    write(unit,*)'RTM_level pres(mb) T(k) Q(ppmv) WRF_level pres(mb) T(k) q(g/kg) clw(g/kg) rain(g/kg)'
+    write(UNIT=innov_vector_unit,*) &
+      'RTM_level pres(mb) T(k) Q(ppmv) WRF_level pres(mb) T(k) q(g/kg) clw(g/kg) rain(g/kg)'
     do k=xp%kts,xp%kte
      if (k <= num_levs) then
-      write(unit,'(i3,f10.2,f8.2,e11.4,i3,f10.2,f8.2,3e11.4)') &
+      write(UNIT=innov_vector_unit,FMT='(i3,f10.2,f8.2,e11.4,i3,f10.2,f8.2,3e11.4)') &
             k, &                             ! RTTOV levels
             coefs(n) % ref_prfl_p(k) , &
             iv%instid(n)%rad(i)%t(k) , &
@@ -719,7 +735,7 @@
             iv%instid(n)%rad(i)%qrn(k)*1000.
 
      else
-      write(unit,'(32x,i3,f10.2,f8.2,3e11.4)') k, &
+      write(UNIT=innov_vector_unit,FMT='(32x,i3,f10.2,f8.2,3e11.4)') k, &
             iv%instid(n)%rad(i)%pm(k) , &
             iv%instid(n)%rad(i)%tm(k) , &
             iv%instid(n)%rad(i)%qm(k)*1000 , &
@@ -734,7 +750,7 @@
 
    end if    ! end if proc_domain
   end do     ! end do pixels
-  close(unit)
+  close(UNIT=innov_vector_unit)
  end do    !! end do instruments
 end if     !! end if lwrite_iv
 

@@ -73,10 +73,9 @@ subroutine da_read_kma1dvar (inst,iv, ob, xp, inunit, infile)
   if (iost /= 0) then
     CALL wrf_error_fatal3(__FILE__,__LINE__,&
       "Cannot open file "//TRIM(infile))
-     return
   end if
 
-  read(inunit,'(A,I10,I12)') instrument,idate,npass
+  read(UNIT=inunit,FMT='(A,I10,I12)') instrument,idate,npass
 
 ! Loop to read pixel and assign information to a sequential structure
 !-------------------------------------------------------------------------
@@ -87,15 +86,15 @@ subroutine da_read_kma1dvar (inst,iv, ob, xp, inunit, infile)
   size = 0
 
   OUT_LOOP: DO j=1,npass
-    read(inunit,'(2F12.4)')    rlat,rlon
-    read(inunit,'(I5,20I5)')   knchan,(kchan(i),i=1,knchan)
+    read(UNIT=inunit,FMT='(2F12.4)')    rlat,rlon
+    read(UNIT=inunit,FMT='(I5,20I5)')   knchan,(kchan(i),i=1,knchan)
 ! landsea_mask: 0:land ; 1:sea (same as RTTOV)
-    read(inunit,'(I5,F12.4,I5,F12.4)')  scanpos,satzen,landsea_mask,srf_height
-    read(inunit,'(20F12.4)') (oerr(i),i=1,knchan)
-    read(inunit,'(20F12.4)') (emiss(i),i=1,knchan)
-    read(inunit,'(5F12.4)')  (fastem(i),i=1,5)
-    read(inunit,'(20F12.4)') (otb(i),i=1,knchan)
-    read(inunit,'(20F12.4)') (inov(i),i=1,knchan)
+    read(UNIT=inunit,FMT='(I5,F12.4,I5,F12.4)')  scanpos,satzen,landsea_mask,srf_height
+    read(UNIT=inunit,FMT='(20F12.4)') (oerr(i),i=1,knchan)
+    read(UNIT=inunit,FMT='(20F12.4)') (emiss(i),i=1,knchan)
+    read(UNIT=inunit,FMT='(5F12.4)')  (fastem(i),i=1,5)
+    read(UNIT=inunit,FMT='(20F12.4)') (otb(i),i=1,knchan)
+    read(UNIT=inunit,FMT='(20F12.4)') (inov(i),i=1,knchan)
 
 !  1.0     Extract observation location and other required information
 !          juge if data is in the domain, read next record if not
@@ -107,7 +106,7 @@ subroutine da_read_kma1dvar (inst,iv, ob, xp, inunit, infile)
         if (outside) cycle
 
         info%elv = srf_height
-        write(info%date_char, '(i10)') idate 
+        write(UNIT=info%date_char, '(i10)') idate 
 
         tb(1:nchanl) = missing_r
         inv(1:nchanl) = missing_r
@@ -172,7 +171,7 @@ subroutine da_read_kma1dvar (inst,iv, ob, xp, inunit, infile)
       iv%instid(inst)%num_rad = size
       ob%instid(inst)%num_rad = size
       
-      write(6,'(a,i3,2x,a,3x,i10)')  ' allocating space for radiance innov structure', &
+      write(UNIT=stdout,FMT='(a,i3,2x,a,3x,i10)')  ' allocating space for radiance innov structure', &
                              i, iv%instid(inst)%rttovid_string, iv%instid(inst)%num_rad
       allocate( iv%instid(inst)%rad(1:iv%instid(inst)%num_rad), stat = error )
       If( error /= 0 ) Then
@@ -206,7 +205,7 @@ subroutine da_read_kma1dvar (inst,iv, ob, xp, inunit, infile)
    allocate ( ob%instid(inst)%rad(i)%tb(1:nchanl) )
    ob%instid(inst)%rad(i)%tb(1:nchanl) = p%rad_ob%tb(1:nchanl)
 
-!   print *, inst, nread, iv%instid(inst)%rad(i)%tb(1:nchanl)%inv
+!   WRITE(UNIT=stdout,*) inst, nread, iv%instid(inst)%rad(i)%tb(1:nchanl)%inv
    current => p
    p => p%next
 
@@ -221,7 +220,7 @@ subroutine da_read_kma1dvar (inst,iv, ob, xp, inunit, infile)
 !
 !  p => head
 !  do i = 1, size
-!   print *, i, p%rad%tb(1:nchanl)%inv
+!   WRITE(UNIT=stdout,*) i, p%rad%tb(1:nchanl)%inv
 !   p => p%next
 !  end do
 

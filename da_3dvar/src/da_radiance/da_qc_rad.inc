@@ -61,7 +61,7 @@ SUBROUTINE da_qc_rad ( inst, nchan, tb_ob, iv )
    else if ( msu ) then
 
    !   call da_qc_msu(inst,nchan,tb_ob,iv)
-      print *, 'QC Not impemented for MSU'
+      WRITE(UNIT=stderr,*) 'QC Not impemented for MSU'
 
    else
      CALL wrf_error_fatal3(__FILE__,__LINE__, &

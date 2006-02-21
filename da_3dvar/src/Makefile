@@ -101,6 +101,7 @@ OBJS_4_GEN_BE_LONG =	DA_Constants.o		\
 			DA_Recursive_Filter.o	\
 			DA_Interpolation.o	\
 			DA_Statistics.o		\
+	                da_bufrlib.o 		\
 			da_h_ops.o		\
 			da_c_mat.o		\
 			da_rf.o			\
@@ -371,6 +372,8 @@ DA_Obs.o:		\
 	                DA_Obs/DA_Obs_Proc_Station.inc \
 			DA_Obs/DA_Read_Obs.inc \
 			DA_Obs/DA_Scan_Obs.inc \
+			DA_Obs/DA_Read_BUFR_Obs.inc \
+			DA_Obs/DA_Scan_BUFR_Obs.inc \
 			DA_Obs/DA_Read_Radar.inc \
 			DA_Obs/DA_Scan_Radar.inc \
 			DA_Obs/DA_Transform_XToY.inc \
@@ -384,6 +387,7 @@ DA_Obs.o:		\
 			DA_Obs/da_store_obs_grid_info.inc \
 			DA_Obs/da_use_obs_errfac.inc \
 			DA_Obs/da_write_obs.inc \
+			DA_Obs/da_write_filtered_obs.inc \
 			DA_Obs/da_write_y.inc
 			$(RM) $@
 			$(CPP) -I./DA_Obs $(CPPFLAGS_3DVAR) DA_Obs/DA_Obs.F > DA_Obs.f
@@ -1092,7 +1096,8 @@ DA_Define_Structures.o:	\
 			DA_Define_Structures/DA_Zero_vp_type.inc \
 			DA_Define_Structures/da_allocate_cv.inc \
 			DA_Define_Structures/da_deallocate_cv.inc \
-			DA_Define_Structures/da_gauss_noise.inc  
+			DA_Define_Structures/da_gauss_noise.inc  \
+			DA_Define_Structures/DA_Zero_Y.inc    
 			$(RM) $@
 			$(CPP) -I./DA_Define_Structures $(CPPFLAGS_3DVAR) DA_Define_Structures/DA_Define_Structures.F > DA_Define_Structures.f
 			$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) DA_Define_Structures.f

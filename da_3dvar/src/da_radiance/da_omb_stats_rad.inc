@@ -20,8 +20,8 @@ SUBROUTINE da_omb_stats_rad ( stats_unit, iv )
 
    IF ( iv%num_inst < 1 ) RETURN
 
-   print *, 'stats_unit  = ', stats_unit
-   print *, 'iv%num_inst = ', iv%num_inst
+   WRITE(UNIT=stdout,*) 'stats_unit  = ', stats_unit
+   WRITE(UNIT=stdout,*) 'iv%num_inst = ', iv%num_inst
 
  Allocate ( rad(1:iv%num_inst) )
 

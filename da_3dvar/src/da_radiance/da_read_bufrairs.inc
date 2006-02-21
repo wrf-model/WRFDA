@@ -188,8 +188,9 @@ subroutine da_read_bufrairs(obstype,iv,xp,lnbufr,infile)
   table_file = 'gmao_airs_bufr.tbl'      ! make table file name
   inquire(file=table_file,exist=airstab)
   if (airstab) then
-      write(6,*)'DA_READ_BUFRAIRS:  Reading BUFR Table A file: ',trim(table_file)
-      open(airs_table_unit,file=table_file,iostat = iost)
+      write(UNIT=stdout,*) &
+        'DA_READ_BUFRAIRS:  Reading BUFR Table A file: ',trim(table_file)
+      open(UNIT=airs_table_unit,file=table_file,iostat = iost)
     IF (iost /= 0) THEN
       CALL wrf_error_fatal3(__FILE__,__LINE__, &
         "Cannot open file "//TRIM(table_file))
@@ -197,7 +198,7 @@ subroutine da_read_bufrairs(obstype,iv,xp,lnbufr,infile)
   endif
 
 ! Open BUFR file
-  open(lnbufr,file=trim(infile),form='unformatted',iostat = iost)
+  open(UNIT=lnbufr,file=trim(infile),form='unformatted',iostat = iost)
   IF (iost /= 0) THEN
     CALL wrf_error_fatal3(__FILE__,__LINE__, &
       "Cannot open file "//TRIM(infile))
@@ -220,9 +221,9 @@ subroutine da_read_bufrairs(obstype,iv,xp,lnbufr,infile)
   ihh = 0
   if( iret /= 0 ) goto 1000     ! no data?
 
-  write(date,'( i10)') idate
-  read(date,'(i4,3i2)') iy,im,idd,ihh
-  write(6,*) 'DA_READ_BUFRAIRS:     bufr file date is ',iy,im,idd,ihh
+  write(UNIT=date,'( i10)') idate
+  read(UNIT=date,'(i4,3i2)') iy,im,idd,ihh
+  write(UNIT=stdout,*) 'DA_READ_BUFRAIRS:     bufr file date is ',iy,im,idd,ihh
   
 !   3.0 Loop over observations
 !----------------------------
@@ -258,7 +259,8 @@ subroutine da_read_bufrairs(obstype,iv,xp,lnbufr,infile)
      call ufbseq(lnbufr,airschan,N_AIRSCHAN_LIST,N_MAXCHAN,iret,channame)
 
      if( iret /= nchanlr)then
-        write(6,*)'DA_READ_BUFRAIRS:  ### ERROR IN READING ', channame, ' BUFR DATA:', &
+        write(UNIT=stderr,*) &
+          'DA_READ_BUFRAIRS:  ### ERROR IN READING ', channame, ' BUFR DATA:', &
              iret, ' CH DATA IS READ INSTEAD OF', nchanlr
         cycle LOOP_OBSPOINTS
      endif
@@ -303,7 +305,7 @@ subroutine da_read_bufrairs(obstype,iv,xp,lnbufr,infile)
         cycle LOOP_OBSPOINTS
      endif
 
-   write(info%date_char, '(i4.4,a,i2.2,a,i2.2,a,i2.2,a,i2.2,a,i2.2)')  &
+   write(UNIT=info%date_char, '(i4.4,a,i2.2,a,i2.2,a,i2.2,a,i2.2,a,i2.2)')  &
             idate5(1), '-', idate5(2), '-', idate5(3), '_', idate5(4), &
             ':', idate5(5), ':', idate5(6)
 
@@ -314,7 +316,8 @@ subroutine da_read_bufrairs(obstype,iv,xp,lnbufr,infile)
      if( airsspot%fovn <    0._r_kind .or. airsspot%fovn > 100._r_kind .or. &
           airsspot%saza < -360._r_kind .or. airsspot%saza > 360._r_kind .or. &
           aquaspot%soza < -180._r_kind .or. aquaspot%soza > 180._r_kind )then
-        write(6,*)'READ_AIRS:  ### ERROR IN READING ', channame, ' BUFR DATA:', &
+        write(UNIT=stderr,*) &
+          'READ_AIRS:  ### ERROR IN READING ', channame, ' BUFR DATA:', &
              ' STRANGE OBS INFO(FOV,SAZA,SOZA):', airsspot%fovn, airsspot%saza, aquaspot%soza
         cycle LOOP_OBSPOINTS
      endif
@@ -346,7 +349,8 @@ subroutine da_read_bufrairs(obstype,iv,xp,lnbufr,infile)
      end do
 
      if( .not. iflag )then
-       write(6,*)'READ_AIRS:  ### ERROR IN READING ', channame, ' BUFR DATA:', &
+       write(UNIT=stderr,*) &
+         'READ_AIRS:  ### ERROR IN READING ', channame, ' BUFR DATA:', &
             ' ALL TB DATA IS MISSING'
         cycle LOOP_OBSPOINTS
      endif
@@ -389,7 +393,8 @@ subroutine da_read_bufrairs(obstype,iv,xp,lnbufr,infile)
 !  do i = 1, iv%num_inst
    if ( nobs > 0 ) then
       iv%instid(inst)%num_rad = nobs
-      write(6,'(a,i3,2x,a,3x,i10)')  ' allocating space for radiance innov structure', &
+      write(UNIT=stdout,FMT='(a,i3,2x,a,3x,i10)') &
+        ' allocating space for radiance innov structure', &
                              inst, iv%instid(inst)%rttovid_string, iv%instid(inst)%num_rad
       allocate( iv%instid(inst)%rad(1:iv%instid(inst)%num_rad), stat = error )
       If( error /= 0 ) Then
@@ -422,13 +427,13 @@ subroutine da_read_bufrairs(obstype,iv,xp,lnbufr,infile)
 !   iv%instid(inst)%rad(n)%inv(1:nchanl) = 0.0
 !   iv%instid(inst)%rad(n)%err(1:nchanl) = 0.0
 
-!    write(6,'(4i10)') inst,n, iv%instid(inst)%rad(n)%scanline,iv%instid(inst)%rad(n)%scanpos
-!     write(6,'(4i5)') nint(aquaspot%said), nint(airsspot%siid), nint(aquaspot%slnm),ifov
-!     write(6,'(7f10.2)') iv%instid(inst)%rad(n)%info%lat,iv%instid(inst)%rad(n)%info%lon, &
+!    write(UNIT=stdout,FMT='(4i10)') inst,n, iv%instid(inst)%rad(n)%scanline,iv%instid(inst)%rad(n)%scanpos
+!     write(UNIT=stdout,FMT='(4i5)') nint(aquaspot%said), nint(airsspot%siid), nint(aquaspot%slnm),ifov
+!     write(UNIT=stdout,FMT='(7f10.2)') iv%instid(inst)%rad(n)%info%lat,iv%instid(inst)%rad(n)%info%lon, &
 !                         iv%instid(inst)%rad(n)%info%elv, &
 !                         iv%instid(inst)%rad(n)%satzen, iv%instid(inst)%rad(n)%satazi, &
 !                         iv%instid(inst)%rad(n)%solzen, iv%instid(inst)%rad(n)%solazi 
-!     write(6,'(10f8.2)') iv%instid(inst)%rad(n)%tb(1:nchanl)%inv
+!     write(UNIT=stdout,FMT='(10f8.2)') iv%instid(inst)%rad(n)%tb(1:nchanl)%inv
 
    current => p
    p => p%next

@@ -89,6 +89,7 @@ subroutine da_read_bufrtovs (obstype, iv, xp, lnbufr, infile)
 
 !**************************************************************************
 ! Initialize variables
+CALL wrf_oi(__FILE__,__LINE__)
 
   nchanl = 20
   allocate(nread(1:rtminit_nsensor))
@@ -157,11 +158,11 @@ subroutine da_read_bufrtovs (obstype, iv, xp, lnbufr, infile)
   call datelen(10)
   call readmg(lnbufr,subset,idate,iret)
   if( subset /= subfgn) then
-     write(6,*) 'READ_BUFRTOVS:  *** WARNING: ',&
+     write(UNIT=stderr,*) 'READ_BUFRTOVS:  *** WARNING: ',&
           'THE FILE TITLE NOT MATCH DATA SUBSET'
-     write(6,*) '  infile=', lnbufr, infile,' subset=',&
+     write(UNIT=stderr,*) '  infile=', lnbufr, infile,' subset=',&
           subset, ' subfgn=',subfgn
-     write(6,*) 'SKIP PROCESSING OF THIS 1B FILE'
+     write(UNIT=stderr,*) 'SKIP PROCESSING OF THIS 1B FILE'
      call closbf(lnbufr)
      return
   end if
@@ -170,9 +171,9 @@ subroutine da_read_bufrtovs (obstype, iv, xp, lnbufr, infile)
   im=0
   idd=0
   ihh=0
-  write(date,'( i10)') idate
-  read(date,'(i4,3i2)') iy,im,idd,ihh
-  write(6,*) 'da_read_bufrtovs: bufr file date is ',iy,im,idd,ihh,infile
+  write(UNIT=date,'( i10)') idate
+  read(UNIT=date,'(i4,3i2)') iy,im,idd,ihh
+  write(UNIT=stdout,*) 'da_read_bufrtovs: bufr file date is ',iy,im,idd,ihh,infile
 
 
 ! Loop to read bufr file and assign information to a sequential structure
@@ -187,9 +188,9 @@ subroutine da_read_bufrtovs (obstype, iv, xp, lnbufr, infile)
   do while (IREADMG(lnbufr,subset,idate)==0 .and. subset==subfgn)
      do while (IREADSB(lnbufr)==0)
 
-!  open(15, file='bufr.out')
+!  open(UNIT=15, file='bufr.out')
 !  call ufbdmp(lnbufr, 6)
-!  close(15)
+!  close(UNIT=15)
 !  return
 
 
@@ -208,7 +209,9 @@ subroutine da_read_bufrtovs (obstype, iv, xp, lnbufr, infile)
 
         info%lat  =  bfr1bhdr(9)  ! rlat
         info%lon  =  bfr1bhdr(10) ! rlon
+CALL wrf_oi(__FILE__,__LINE__)
         call DA_ll_to_xy (info, loc, xp, outside, inside_halo )
+CALL wrf_oi(__FILE__,__LINE__)
         if (outside) cycle
 
 !  3.0     Extract other informations
@@ -229,7 +232,7 @@ subroutine da_read_bufrtovs (obstype, iv, xp, lnbufr, infile)
         minute = bfr1bhdr(7) !minute
         second = bfr1bhdr(8) !second
 
-   write(info%date_char, '(i4,a,i2.2,a,i2.2,a,i2.2,a,i2.2,a,i2.2)')  &
+   write(UNIT=info%date_char, '(i4,a,i2.2,a,i2.2,a,i2.2,a,i2.2,a,i2.2)')  &
             year, '-', month, '-', day, '_', hour, ':', minute, ':', second
 
 !  QC3: time consistency check with the background date
@@ -237,6 +240,7 @@ subroutine da_read_bufrtovs (obstype, iv, xp, lnbufr, infile)
 !  3.3     Find wrfvar instrument index from RTTOV instrument triplet
 !          go to next data if id is not in the lists
 !
+CALL wrf_oi(__FILE__,__LINE__)
       do inst = 1, rtminit_nsensor
         if (    platform_id  == rtminit_platform(inst) &
           .and. satellite_id == rtminit_satid(inst)    &
@@ -245,6 +249,7 @@ subroutine da_read_bufrtovs (obstype, iv, xp, lnbufr, infile)
             exit
         end if
       end do
+CALL wrf_oi(__FILE__,__LINE__)
 
       if ( inst == rtminit_nsensor .and.           &
            platform_id  /= rtminit_platform(inst)  &
@@ -285,10 +290,12 @@ subroutine da_read_bufrtovs (obstype, iv, xp, lnbufr, infile)
           if ( tb(k) < tbmin .or. tb(k) > tbmax) &
                tb(k) = missing_r
         end do
+CALL wrf_oi(__FILE__,__LINE__)
 
 !  4.0   assign information to sequential radiance structure
 !--------------------------------------------------------------------------
    allocate ( p % rad % tb (1:nchanl) )
+CALL wrf_oi(__FILE__,__LINE__)
    p%rad%info             = info
    p%rad%loc              = loc
    p%rad%landsea_mask     = landsea_mask
@@ -301,6 +308,7 @@ subroutine da_read_bufrtovs (obstype, iv, xp, lnbufr, infile)
 
    size = size + 1
    allocate ( p%next, stat=error)   ! add next data
+CALL wrf_oi(__FILE__,__LINE__)
    if (error /= 0 ) then
      CALL wrf_error_fatal3(__FILE__,__LINE__, &
        "Cannot allocate radiance structure")
@@ -315,6 +323,7 @@ subroutine da_read_bufrtovs (obstype, iv, xp, lnbufr, infile)
    iv%total_obs = iv%total_obs + size
    iv%total_rad_pixel   = iv%total_rad_pixel + size
    iv%total_rad_channel = iv%total_rad_channel + size*nchanl
+CALL wrf_oi(__FILE__,__LINE__)
 
    deallocate(tb)  
    call closbf(lnbufr)
@@ -324,14 +333,17 @@ subroutine da_read_bufrtovs (obstype, iv, xp, lnbufr, infile)
   do i = 1, iv%num_inst
       if ( nread(i) < 1 ) cycle
       iv%instid(i)%num_rad = nread (i)
-      write(6,'(a,i3,2x,a,3x,i10)')  ' allocating space for radiance innov structure', &
-                             i, iv%instid(i)%rttovid_string, iv%instid(i)%num_rad
+      write(UNIT=stdout,FMT='(a,i3,2x,a,3x,i10)') &
+        ' allocating space for radiance innov structure', &
+        i, iv%instid(i)%rttovid_string, iv%instid(i)%num_rad
       allocate( iv%instid(i)%rad(1:iv%instid(i)%num_rad), stat = error )
+CALL wrf_oi(__FILE__,__LINE__)
       If( error /= 0 ) Then
         CALL wrf_error_fatal3(__FILE__,__LINE__, &
           & "mem allocation error to iv%instid(i)%rad")
       End If
   end do
+CALL wrf_oi(__FILE__,__LINE__)
 
 !  6.0 assign sequential structure to innovation structure
 !-------------------------------------------------------------
@@ -339,6 +351,8 @@ subroutine da_read_bufrtovs (obstype, iv, xp, lnbufr, infile)
   p => head
 !  do while ( associated(p) )
   do i = 1, size
+CALL wrf_oi(__FILE__,__LINE__)
+
    inst = p%sensor_index
    nread(inst) = nread(inst) + 1
 
@@ -352,7 +366,14 @@ subroutine da_read_bufrtovs (obstype, iv, xp, lnbufr, infile)
    iv%instid(inst)%rad(nread(inst))%satazi = p%rad%satazi
    iv%instid(inst)%rad(nread(inst))%solzen = p%rad%solzen
 !   iv%instid(inst)%rad(nread(inst))%solazi
-   allocate ( iv%instid(inst)%rad(nread(inst))%tb(1:nchanl) )
+CALL wrf_oi(__FILE__,__LINE__)
+write (0,*) "inst,nchanl",inst,nchanl
+   allocate ( iv%instid(inst)%rad(nread(inst))%tb(1:nchanl), stat = error  )
+     IF (error /= 0) THEN
+       CALL wrf_error_fatal3(__FILE__,__LINE__, &
+         & "mem allocation error to iv%instid(inst)%rad(nread(inst))%tb")
+     END IF
+CALL wrf_oi(__FILE__,__LINE__)
    iv%instid(inst)%rad(nread(inst))%tb(1:nchanl)%inv = p%rad%tb(1:nchanl)%inv
 !   iv%instid(inst)%rad(nread(inst))%inv(1:nchanl) = 0.0
 !   iv%instid(inst)%rad(nread(inst))%err(1:nchanl) = 0.0
@@ -360,6 +381,7 @@ subroutine da_read_bufrtovs (obstype, iv, xp, lnbufr, infile)
 !   print *, inst, nread(inst), iv%instid(inst)%rad(nread(inst))%tb(1:nchanl)%inv
    current => p
    p => p%next
+CALL wrf_oi(__FILE__,__LINE__)
 
 ! free current data
    deallocate ( current % rad % tb )
@@ -367,6 +389,7 @@ subroutine da_read_bufrtovs (obstype, iv, xp, lnbufr, infile)
 
  end do
    deallocate (nread)
+CALL wrf_oi(__FILE__,__LINE__)
 
 ! check if sequential structure has been freed
 !

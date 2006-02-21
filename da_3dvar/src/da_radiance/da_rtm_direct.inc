@@ -273,7 +273,7 @@ end if
      !write (*,*) 'lprofiles    = ', lprofiles
      !write (*,*) 'profiles%s2m   = ', profiles(1)%s2m
      !write (*,*) 'profiles%skin   = ', profiles(1)%skin
-     write(6,'(6f12.2)') profiles(1)%s2m%p,profiles(1)%skin%t,profiles(1)%s2m%t,profiles(1)%s2m%q,profiles(1)%s2m%u,profiles(1)%s2m%v
+     write(UNIT=stdout,FMT='(6f12.2)') profiles(1)%s2m%p,profiles(1)%skin%t,profiles(1)%s2m%t,profiles(1)%s2m%q,profiles(1)%s2m%u,profiles(1)%s2m%v
      !write (*,*) 'profiles%zenangle = ', profiles(1)%zenangle
      !write (*,*) 'profiles%azangle = ', profiles(1)%azangle
      !write (*,*) 'profiles%p   = ', profiles(1)%p

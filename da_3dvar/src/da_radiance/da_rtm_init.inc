@@ -19,7 +19,7 @@ subroutine da_rtm_init(iv,ob)
 
 !  local arguments
 !------------------- 
- integer   :: n, k,j,bunit, iscan,ichan,npos
+ integer   :: n, k,j, iscan,ichan,npos
  real      :: ave
 
 !
@@ -69,11 +69,11 @@ subroutine da_rtm_init(iv,ob)
   sensor (3,1:nsensor)  = rtminit_sensor   (1:nsensor)
   coefs_channels(:,:)   = 0
 
-  print *, ' verbosity_level = ', verbosity_level
-  print *, ' nsensor         = ', nsensor
-  print *, ' sensor (1,1:nsensor) = ', sensor (1,1:nsensor)
-  print *, ' sensor (2,1:nsensor) = ', sensor (2,1:nsensor)
-  print *, ' sensor (3,1:nsensor) = ', sensor (3,1:nsensor)
+  WRITE(UNIT=stdout,*) ' verbosity_level      = ', verbosity_level
+  WRITE(UNIT=stdout,*) ' nsensor              = ', nsensor
+  WRITE(UNIT=stdout,*) ' sensor (1,1:nsensor) = ', sensor (1,1:nsensor)
+  WRITE(UNIT=stdout,*) ' sensor (2,1:nsensor) = ', sensor (2,1:nsensor)
+  WRITE(UNIT=stdout,*) ' sensor (3,1:nsensor) = ', sensor (3,1:nsensor)
 
 !----------------------------------------------------------------
 !  2.0 set up some common varibles for innovation/observation structure
@@ -96,12 +96,12 @@ subroutine da_rtm_init(iv,ob)
    iv%instid(n)%satellite_id = rtminit_satid(n)
    iv%instid(n)%sensor_id    = rtminit_sensor(n)
  if ( rtminit_satid(n) < 10 ) then
-   write(iv%instid(n)%rttovid_string, '(a,i1,a)')  &
+   write(UNIT=iv%instid(n)%rttovid_string, '(a,i1,a)')  &
              trim( platform_name(rtminit_platform(n)) )//'-',  &
              rtminit_satid(n),     &
              '-'//trim( inst_name(rtminit_sensor(n)) )
  else
-   write(iv%instid(n)%rttovid_string, '(a,i2.2,a)')  &
+   write(UNIT=iv%instid(n)%rttovid_string, '(a,i2.2,a)')  &
              trim( platform_name(rtminit_platform(n)) )//'-',  &
              rtminit_satid(n),     &
              '-'//trim( inst_name(rtminit_sensor(n)) )
@@ -148,7 +148,7 @@ subroutine da_rtm_init(iv,ob)
 
      if (trim( inst_name(rtminit_sensor(n))) == 'airs') then
 
-  open(109,file=trim(iv%instid(n)%rttovid_string)//'.info', &
+  open(UNIT=rtm_info_unit,file=trim(iv%instid(n)%rttovid_string)//'.info', &
            form='formatted',iostat = iost, status='old')
 
   if (iost /= 0) then
@@ -162,9 +162,9 @@ subroutine da_rtm_init(iv,ob)
   allocate ( satinfo(n) % error(nchanl(n)) )
   allocate ( satinfo(n) % polar(nchanl(n)) )
 
-  read(109,*)
+  read(UNIT=rtm_info_unit,*)
   do j = 1, nchanl(n)
-    read(109,'(1x,5i5,2e18.10)')    &
+    read(UNIT=rtm_info_unit,'(1x,5i5,2e18.10)')    &
                      wmo_sensor_id, &
                satinfo(n)%ichan(j), &
                        sensor_type, &
@@ -274,7 +274,7 @@ subroutine da_rtm_init(iv,ob)
 
   iv%instid(1:nsensor)%nlevels = coefs(1:nsensor)%nlevels
 
-  write(6,*) ' Have read in the RTTOV coef files for the following sensors '
+  write(UNIT=stdout,*) ' Have read in the RTTOV coef files for the following sensors '
 
   loop_sensor2: do n = 1, nsensor
 
@@ -282,7 +282,7 @@ subroutine da_rtm_init(iv,ob)
 !  5.1 get more information about sensor
 !---------------------------------------------------
    nprofiles = 1
-   write(6,'(a,2x,a,i5,2x,a,i5)') iv%instid(n)%rttovid_string, &
+   write(UNIT=stdout,FMT='(a,2x,a,i5,2x,a,i5)') iv%instid(n)%rttovid_string, &
                         'nchanl=',nchanl(n), 'nscan=',nscan(n)
 
  call rttov_setupchan(nprofiles, nchanl(n), coefs(n), &    ! in
@@ -300,15 +300,15 @@ subroutine da_rtm_init(iv,ob)
                   lprofiles, channels, polarisations,     &    ! out
                   emissivity  )
 
-     write (*,*) 'nprofiles = ', nprofiles, '  nchanl = ', nchanl(n), &
+     write (UNIT=stdout,*) 'nprofiles = ', nprofiles, '  nchanl = ', nchanl(n), &
                  ' nfrequencies = ', nfrequencies, &
                  ' nchannels    = ', nchannels, &
                  ' nbtout       = ', nbtout
-     write (*,*) 'lprofiles    = ', lprofiles
-     write (*,*) 'channels     = ', channels
-!     write (*,*) 'polarisations(:,1)= ', polarisations(:,1)
-!     write (*,*) 'polarisations(:,2)= ', polarisations(:,2)
-!     write (*,*) 'polarisations(:,3)= ', polarisations(:,3)
+     write (UNIT=stdout,*) 'lprofiles    = ', lprofiles
+     write (UNIT=stdout,*) 'channels     = ', channels
+!     write (UNIT=stdout,*) 'polarisations(:,1)= ', polarisations(:,1)
+!     write (UNIT=stdout,*) 'polarisations(:,2)= ', polarisations(:,2)
+!     write (UNIT=stdout,*) 'polarisations(:,3)= ', polarisations(:,3)
 
 
      deallocate ( lprofiles )
@@ -322,8 +322,7 @@ subroutine da_rtm_init(iv,ob)
 !-------------------------------------------------------
 
  if (lread_biascoef) then
-  bunit = 109
-  open(bunit,file=trim(iv%instid(n)%rttovid_string)//'.bias', &
+  open(UNIT=rtm_bias_unit,file=trim(iv%instid(n)%rttovid_string)//'.bias', &
            form='formatted',iostat = iost, status='old')
   if (iost /= 0) then
     CALL wrf_error_fatal3(__FILE__,__LINE__, &
@@ -335,39 +334,39 @@ subroutine da_rtm_init(iv,ob)
   allocate ( satinfo(n) %   a(nscan(n),nchanl(n)) )
   allocate ( satinfo(n) %   b(nscan(n),nchanl(n)) )
 
-   read(bunit,*)  !trim(platform),'-',trim(satid),'-',trim(instrument)
-   read(bunit,*)  !trim(cdate)
-   read(bunit,*)  !nchan, nscan
+   read(UNIT=rtm_bias_unit,*)  !trim(platform),'-',trim(satid),'-',trim(instrument)
+   read(UNIT=rtm_bias_unit,*)  !trim(cdate)
+   read(UNIT=rtm_bias_unit,*)  !nchan, nscan
 
-   read(bunit,*) !  ' Number of    total obs                    = ', num_rad
-   read(bunit,*) !
-   read(bunit,*) !
-   read(bunit,*) !  ' Number of rejected obs by SI>3K           = ', nscat
-   read(bunit,*) !  ' Number of rejected obs by CLWP>0.2mm      = ', nclwp
-   read(bunit,*) !  ' Number of rejected obs by Mixture surface = ', nsurf
-   read(bunit,*) !  ' Number of rejected obs by abs(IV)>20      = ', ninv(:)
-   read(bunit,*) !  ' Number of rejected obs by abs(IV)>5*sigma = ', nerr(:)
-   read(bunit,*) !  ' Number of     good obs                    = ', ngood(:)
+   read(UNIT=rtm_bias_unit,*) !  ' Number of    total obs                    = ', num_rad
+   read(UNIT=rtm_bias_unit,*) !
+   read(UNIT=rtm_bias_unit,*) !
+   read(UNIT=rtm_bias_unit,*) !  ' Number of rejected obs by SI>3K           = ', nscat
+   read(UNIT=rtm_bias_unit,*) !  ' Number of rejected obs by CLWP>0.2mm      = ', nclwp
+   read(UNIT=rtm_bias_unit,*) !  ' Number of rejected obs by Mixture surface = ', nsurf
+   read(UNIT=rtm_bias_unit,*) !  ' Number of rejected obs by abs(IV)>20      = ', ninv(:)
+   read(UNIT=rtm_bias_unit,*) !  ' Number of rejected obs by abs(IV)>5*sigma = ', nerr(:)
+   read(UNIT=rtm_bias_unit,*) !  ' Number of     good obs                    = ', ngood(:)
 
-   read(bunit,*) !  'scan  ', 'chan ', 'number ', 'average ', 'rms  std ', 'a ','b '
+   read(UNIT=rtm_bias_unit,*) !  'scan  ', 'chan ', 'number ', 'average ', 'rms  std ', 'a ','b '
 
    do j = 1,nchanl(n)
-      read(bunit,*)
-!     read(bunit,'(i3,i5,i8,2(2x,f8.3),2(2x,f11.3))') &
+      read(UNIT=rtm_bias_unit,*)
+!     read(UNIT=rtm_bias_unit,FMT='(i3,i5,i8,2(2x,f8.3),2(2x,f11.3))') &
 !                 iscan, ichan(j), bias_nc(j), bias_ave(j), &
 !                 bias_std(j),bias_a(j),bias_b(j)
    end do
 
    do k = 1,nscan(n)
    do j = 1,nchanl(n)
-      read(bunit,'(i3,i5,i8,3(2x,f8.3),2(2x,f11.3))') &
+      read(UNIT=rtm_bias_unit,'(i3,i5,i8,3(2x,f8.3),2(2x,f11.3))') &
          iscan, ichan, npos,ave, &
          satinfo(n)%rms(k,j),satinfo(n)%std(k,j), &
          satinfo(n)%a(k,j),  satinfo(n)%b(k,j)
    end do
    end do
 
-   close(bunit)
+   close(UNIT=rtm_bias_unit)
 
  end if
 

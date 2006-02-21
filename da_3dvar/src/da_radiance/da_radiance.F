@@ -15,6 +15,7 @@ module da_radiance
    USE DA_Tools
 !   USE DA_Obs
    USE PAR_UTIL
+   USE module_wrf_error
 
    use rttov_const,  only : &
             errorstatus_success, &

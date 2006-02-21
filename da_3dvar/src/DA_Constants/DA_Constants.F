@@ -152,6 +152,7 @@ MODULE DA_Constants
 
    INTEGER, PARAMETER :: jpout = 11           ! Unit number for x output.
    INTEGER, PARAMETER :: stats_unit = 12      ! Unit number for stats output.
+   INTEGER, PARAMETER :: innov_vector_unit = 14 ! Innovation vector diagnostics
 
    INTEGER, PARAMETER :: be_cv_2_unit = 32    ! Unit number for be input.
    INTEGER, PARAMETER :: be_cv_3_unit = 33    ! Unit number for be input.
@@ -182,6 +183,8 @@ MODULE DA_Constants
    INTEGER, PARAMETER :: Radar_iunit = 94     ! Unit number for Radar input.
    INTEGER, PARAMETER :: airs_table_unit = 95 ! AIRS bufr table input
    INTEGER, PARAMETER :: rtm_error_unit = 99  ! RTTOV error unit
+   INTEGER, PARAMETER :: rtm_info_unit = 109  ! Radiance info file
+   INTEGER, PARAMETER :: rtm_bias_unit = 110  ! Radiance bias file
    INTEGER, PARAMETER :: filtered_obs_iunit  = 192  ! Unit number for writing filtered obs
    INTEGER, PARAMETER :: unit_983            = 983 ! TBD
    integer, parameter  :: iunit = 70
