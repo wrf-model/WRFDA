@@ -17,7 +17,10 @@ subroutine da_max_error_qc (it, info, field, max_error, ix, ixf, iunit, var, &
   INTEGER                            :: qc_flag
  
   failed = .false.
- 
+
+! For data with missing error, no check_max_iv need to be done:
+     if ( field % error == missing_r) return
+
      qc_flag = field % qc
      err_max = field % error * max_error
      err     = field % inv
@@ -34,8 +37,8 @@ subroutine da_max_error_qc (it, info, field, max_error, ix, ixf, iunit, var, &
 
         IF (print .and. failed) THEN
            IF (err_max .LE. 0.) THEN
-              WRITE (iunit , FMT = '(A,3(F8.1,1X),A,A,A,A5,A,A,3f10.2)')   &
-                     "Err_max < 0 ==> ",err,err_max,max_error, " for ", var, &
+              WRITE (iunit , FMT = '(A,4(F11.1,1X),A,A,A,A5,A,A,3f10.2)')   &
+                     "Err_max < 0 ==> ",err,field%error,err_max,max_error, " for ", var, &
                      " OBS ID: ", info % id, info % platform,     &
                      " LA/LON/ELV:", info % lat, info % lon, info % elv
 !              STOP

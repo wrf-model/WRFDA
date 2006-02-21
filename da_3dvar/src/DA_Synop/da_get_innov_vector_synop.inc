@@ -1,3 +1,4 @@
+
 SUBROUTINE da_get_innov_vector_synop ( it, xb, xp, ob, iv )
 !-------------------------------------------------------------------------
 !
@@ -89,7 +90,8 @@ SUBROUTINE da_get_innov_vector_synop ( it, xb, xp, ob, iv )
 
             hd = v_h(xp%kts) - iv % synop(n) % h
 
-            if (abs(hd) <= Max_StHeight_Diff) THEN
+            if ( (abs(hd) <= Max_StHeight_Diff) .or. &
+                 (ANALYSIS_TYPE == 'VERIFY' .or. ANALYSIS_TYPE == 'verify') ) THEN
 
                if(iv % synop(n) % h < v_h(xp%kts)) then
 
@@ -118,7 +120,8 @@ SUBROUTINE da_get_innov_vector_synop ( it, xb, xp, ob, iv )
 
             call to_zk(ob % synop(n) % p, v_p, xp, v_interp_p, iv%synop(n)%zk)
 
-            if(iv%synop(n)%zk < 0.0) then
+            if(iv%synop(n)%zk < 0.0 .and. &
+              (ANALYSIS_TYPE /= 'VERIFY' .and. ANALYSIS_TYPE /= 'verify') ) then
                iv % synop(n) % p % inv = missing_r
                iv % synop(n) % p % qc  = missing
  
@@ -130,7 +133,8 @@ SUBROUTINE da_get_innov_vector_synop ( it, xb, xp, ob, iv )
 !        [2.0] Initialise components of innovation vector:
 !------------------------------------------------------------------------
 
-         if(iv%synop(n)%zk < 0.0) then
+         if(iv%synop(n)%zk < 0.0 .and. &
+           (ANALYSIS_TYPE /= 'VERIFY' .and. ANALYSIS_TYPE /= 'verify') ) then
             iv % synop(n) % u % qc = missing
             iv % synop(n) % v % qc = missing
             iv % synop(n) % t % qc = missing
@@ -162,6 +166,7 @@ SUBROUTINE da_get_innov_vector_synop ( it, xb, xp, ob, iv )
                                      model_p, iv%synop(n)%zk)
 #endif
           endif
+
       else if (sfc_assi_options == 2) then
 
 !------- Surface data assimilation approca 2
@@ -185,6 +190,9 @@ SUBROUTINE da_get_innov_vector_synop ( it, xb, xp, ob, iv )
                              i, j, dx, dy, dxm, dym, &
                              model_p )
 
+! No height, no sfc pressure calculation (YRG 02/16/2006):
+         if (iv%synop(n)%h == missing_r ) iv%synop(n)%p%qc = missing
+ 
          if (iv%synop(n)%p%qc >= 0) then
 
 !.......... model surface p, t, q, h at observed site:

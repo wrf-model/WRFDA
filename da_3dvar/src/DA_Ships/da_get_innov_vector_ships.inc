@@ -87,7 +87,8 @@ SUBROUTINE da_get_innov_vector_ships ( it, xb, xp, ob, iv )
 
             hd = v_h(xp%kts) - iv % ships(n) % h
 
-            if (abs(hd) <= Max_StHeight_Diff) THEN
+            if ( (abs(hd) <= Max_StHeight_Diff) .or. &
+                 (ANALYSIS_TYPE == 'VERIFY' .or. ANALYSIS_TYPE == 'verify') ) THEN
 
                if(iv % ships(n) % h < v_h(xp%kts)) then
 
@@ -116,7 +117,8 @@ SUBROUTINE da_get_innov_vector_ships ( it, xb, xp, ob, iv )
 
             call to_zk(ob % ships(n) % p, v_p, xp, v_interp_p, iv%ships(n)%zk)
 
-            if(iv%ships(n)%zk < 0.0) then
+            if(iv%ships(n)%zk < 0.0 .and. &
+              (ANALYSIS_TYPE /= 'VERIFY' .and. ANALYSIS_TYPE /= 'verify') ) then
                iv % ships(n) % p % inv = missing_r
                iv % ships(n) % p % qc  = missing
  
@@ -128,7 +130,8 @@ SUBROUTINE da_get_innov_vector_ships ( it, xb, xp, ob, iv )
 !        [2.0] Initialise components of innovation vector:
 !------------------------------------------------------------------------
 
-         if(iv%ships(n)%zk < 0.0) then
+         if(iv%ships(n)%zk < 0.0 .and. &
+           (ANALYSIS_TYPE /= 'VERIFY' .and. ANALYSIS_TYPE /= 'verify') ) then
             iv % ships(n) % u % qc = missing
             iv % ships(n) % v % qc = missing
             iv % ships(n) % t % qc = missing
@@ -182,6 +185,9 @@ SUBROUTINE da_get_innov_vector_ships ( it, xb, xp, ob, iv )
          call Interp_lin_2D( xb % psfc, xp%ims, xp%ime, xp%jms, xp%jme, &
                              i, j, dx, dy, dxm, dym, &
                              model_p )
+
+! No height, no sfc pressure calculation (YRG 02/16/2006):
+         if (iv%ships(n)%h == missing_r ) iv%ships(n)%p%qc = missing
 
          if (iv%ships(n)%p%qc >= 0) then
 
