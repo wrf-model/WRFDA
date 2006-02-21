@@ -1,0 +1,62 @@
+Change Log for update to WRF-Var (RB_V21) code
+---------------------------------------
+
+Author  : Yong-Run Guo
+Reviewer: 
+Date: 02/20/2006
+
+Reason for changes 
+-------------------
+
+1, With sfc_assi_options=1, the number of observations for SYNOP, METAR, 
+   SHIPS, and BUOY are still different for the different experiments. 
+
+   The problems come from those with zk < 0. 
+
+   In QC-OBS run, the retrieved heights are used when elevation is missng.
+   In VERIFY, the extrapolations are carried out based on pressure when
+   the height (elevation) is missing. So the zk could be a negative value
+   but not -888888.000.
+
+   Modifications have been added to correct this problem.
+
+2, Bug fix in da_transfer_xatowrf.inc for check_rh. When "check_rh == 0", no
+   "check_rh" will be done, especially for single OBS tests.
+ 
+Files removed:
+--------------
+None
+
+Files added:
+------------
+
+da_3dvar/changes/change_20060220.yrg
+
+
+Files modified:
+---------------
+M da_3dvar/src/DA_Buoy/da_get_innov_vector_buoy.inc
+M da_3dvar/src/DA_Metar/da_get_innov_vector_metar.inc
+M da_3dvar/src/DA_Ships/da_get_innov_vector_ships.inc
+M da_3dvar/src/DA_Synop/da_get_innov_vector_synop.inc
+M da_3dvar/src/DA_Setup_Structures/da_transfer_xatowrf.inc
+
+Expected Differences
+--------------------
+
+It makes working properly with sfc_assi_optins=1 for SYNOP, METAR, SHIPS, and
+BUOY for ANALYSIS_TYPE = 'VERIFY'  
+
+Accuracy: 
+
+CPU:
+
+No changes are expected.
+
+memory:
+
+No changes are expected.
+
+Test results (run on mac machines?)
+------------------------------------------------------
+
