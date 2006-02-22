@@ -11,37 +11,36 @@ MODULE module_gen_be_esmf_super
 ! Note that WRF_ESMF_MOD is USEd by module_domain.  
 !</DESCRIPTION>
 
-   USE module_machine
-   USE module_domain
-   USE module_integrate
-   USE module_driver_constants
-   USE module_configure
+  USE module_machine
+  USE module_domain
+  USE module_integrate
+  USE module_driver_constants
+  USE module_configure
 
-   USE module_timing
-   USE module_wrf_error
+  USE module_timing
+  USE module_wrf_error
 
 !ifdef DM_PARALLEL
 !  USE module_dm
 !endif
 
-   USE module_wrf_3dvar_io
-   USE module_gen_be_stats_interface
+  USE module_wrf_3dvar_io
+  USE module_gen_be_stats_interface
 
-   IMPLICIT NONE
+  IMPLICIT NONE
 
-   REAL    :: time
+  REAL    :: time
 
-   INTEGER :: loop , &
-              levels_to_process
+  INTEGER :: loop, levels_to_process
 
-   TYPE (domain) , POINTER :: keep_grid, grid_ptr, null_domain
-   TYPE (grid_config_rec_type), SAVE :: config_flags
-   INTEGER                 :: number_at_same_level
-   INTEGER                 :: time_step_begin_restart
+  TYPE (domain) , POINTER :: keep_grid, grid_ptr, null_domain
+  TYPE (grid_config_rec_type), SAVE :: config_flags
+  INTEGER                 :: number_at_same_level
+  INTEGER                 :: time_step_begin_restart
 
-   INTEGER :: max_dom , domain_id , fid , oid , idum1 , idum2 , ierr
-   INTEGER :: debug_level
-   LOGICAL :: input_from_file
+  INTEGER :: max_dom , domain_id , fid , oid , idum1 , idum2 , ierr
+  INTEGER :: debug_level
+  LOGICAL :: input_from_file
 
 !ifdef DM_PARALLEL
 !  INTEGER                 :: nbytes
@@ -50,24 +49,26 @@ MODULE module_gen_be_esmf_super
 !  LOGICAL , EXTERNAL      :: wrf_dm_on_monitor
 !endif
 
-   CHARACTER (LEN=80)      :: rstname
-   CHARACTER (LEN=80)      :: message
+  CHARACTER (LEN=80)      :: rstname
+  CHARACTER (LEN=80)      :: message
 
-   INTERFACE 
-     SUBROUTINE Setup_Timekeeping( grid )
+  INTERFACE 
+    SUBROUTINE Setup_Timekeeping( grid )
       USE module_domain
       TYPE(domain), POINTER :: grid
-     END SUBROUTINE Setup_Timekeeping
-   END INTERFACE
+    END SUBROUTINE Setup_Timekeeping
+  END INTERFACE
 
 
 CONTAINS
 
-   SUBROUTINE gen_be_init( gcomp, importState, exportState, clock, rc )
-     TYPE(ESMF_GridComp), INTENT(INOUT) :: gcomp
-     TYPE(ESMF_State), INTENT(INOUT) :: importState, exportState
-     TYPE(ESMF_Clock), INTENT(INOUT) :: clock
-     INTEGER, INTENT(OUT) :: rc
+  SUBROUTINE gen_be_init( gcomp, importState, exportState, clock, rc )
+
+  TYPE(ESMF_GridComp), INTENT(INOUT) :: gcomp
+  TYPE(ESMF_State),    INTENT(INOUT) :: importState, exportState
+  TYPE(ESMF_Clock),    INTENT(INOUT) :: clock
+  INTEGER,             INTENT(OUT)   :: rc
+
 !<DESCRIPTION>
 !     WRFVAR init routine.
 !
@@ -93,12 +94,12 @@ CONTAINS
 !
 !</DESCRIPTION>
 
-   program_name = "WRFVAR 2.0.2.0 (COMPATIBLE TO WRF V2.0.3.1) MODEL"
+  program_name = "WRFVAR 2.0.2.0 (COMPATIBLE TO WRF V2.0.3.1) MODEL"
 
-   !  Get the NAMELIST data for input.
+  !  Get the NAMELIST data for input.
 
-   CALL init_modules(2)   ! Phase 2 resumes after MPI_INIT() (if it is called)
-                          ! Phase 1 is called before ESMF starts up
+  CALL init_modules(2)   ! Phase 2 resumes after MPI_INIT() (if it is called)
+                         ! Phase 1 is called before ESMF starts up
 
 !<DESCRIPTION>
 ! The wrf namelist.input file is read and stored in the USE associated
@@ -123,7 +124,7 @@ CONTAINS
 !  CALL set_config_as_buffer( configbuf, configbuflen )
 !  CALL wrf_dm_initialize
 !else
-   CALL initial_config
+  CALL initial_config
 !endif
 
 !<DESCRIPTION>
@@ -138,12 +139,12 @@ CONTAINS
 ! 
 !</DESCRIPTION>
 
-   CALL nl_get_debug_level ( 1, debug_level )
-   CALL set_wrf_debug_level ( debug_level )
+  CALL nl_get_debug_level ( 1, debug_level )
+  CALL set_wrf_debug_level ( debug_level )
 
-   ! allocated and configure the mother domain
+  ! allocated and configure the mother domain
 
-   NULLIFY( null_domain )
+  NULLIFY( null_domain )
 
 !<DESCRIPTION>
 ! RSL is required for WRFVAR nesting options.
@@ -154,8 +155,8 @@ CONTAINS
 ! run option or we are on an acceptable machine.
 !</DESCRIPTION>
 
-   CALL nl_get_max_dom( 1, max_dom )
-   IF ( max_dom > 1 ) THEN
+  CALL nl_get_max_dom( 1, max_dom )
+  IF ( max_dom > 1 ) THEN
 !if ( ! defined(DM_PARALLEL)  &&   ! defined(STUBMPI) )
 !  CALL wrf_error_fatal( &
 !    'nesting requires either an MPI build or use of the -DSTUBMPI option' ) 
@@ -166,7 +167,7 @@ CONTAINS
 !  CALL wrf_message( '                 IN THIS VERSION OF WRF                      ' )
 !  CALL wrf_message( '          U S E   A T   Y O U R   O W N   R I S K            ' )
 !endif
-   END IF
+  END IF
 
 !<DESCRIPTION>
 ! The top-most domain in the simulation is then allocated and configured
@@ -184,26 +185,26 @@ CONTAINS
 ! broadcast of the configuration information.
 ! 
 !</DESCRIPTION>
-   CALL       wrf_message ( program_name )
-   CALL       wrf_debug ( 100 , 'wrf: calling alloc_and_configure_domain ' )
-   CALL alloc_and_configure_domain ( domain_id  = 1 ,                  &
-                                     grid       = head_grid ,          &
-                                     parent     = null_domain ,        &
-                                     kid        = -1                   )
+  CALL       wrf_message ( program_name )
+  CALL       wrf_debug ( 100 , 'wrf: calling alloc_and_configure_domain ' )
+  CALL alloc_and_configure_domain ( domain_id  = 1 ,                  &
+                                    grid       = head_grid ,          &
+                                    parent     = null_domain ,        &
+                                    kid        = -1                   )
 
-   CALL       wrf_debug ( 100 , 'wrf: calling model_to_grid_config_rec ' )
-   CALL model_to_grid_config_rec ( head_grid%id , model_config_rec , config_flags )
-   CALL       wrf_debug ( 100 , 'wrf: calling set_scalar_indices_from_config ' )
-   CALL set_scalar_indices_from_config ( head_grid%id , idum1, idum2 )
-   CALL       wrf_debug ( 100 , 'wrf: calling init_wrfio' )
-   CALL init_wrfio
+  CALL       wrf_debug ( 100 , 'wrf: calling model_to_grid_config_rec ' )
+  CALL model_to_grid_config_rec ( head_grid%id , model_config_rec , config_flags )
+  CALL       wrf_debug ( 100 , 'wrf: calling set_scalar_indices_from_config ' )
+  CALL set_scalar_indices_from_config ( head_grid%id , idum1, idum2 )
+  CALL       wrf_debug ( 100 , 'wrf: calling init_wrfio' )
+  CALL init_wrfio
 
-   print *, 'p_qv=', p_qv
-   print *, 'p_qc=', p_qc
-   print *, 'p_qr=', p_qr
-   print *, 'p_qi=', p_qi
-   print *, 'p_qs=', p_qs
-   print *, 'p_qg=', p_qg
+  print *, 'p_qv=', p_qv
+  print *, 'p_qc=', p_qc
+  print *, 'p_qr=', p_qr
+  print *, 'p_qi=', p_qi
+  print *, 'p_qs=', p_qs
+  print *, 'p_qg=', p_qg
 
 !ifdef DM_PARALLEL
 !  CALL get_config_as_buffer( configbuf, configbuflen, nbytes )
@@ -211,7 +212,7 @@ CONTAINS
 !  CALL set_config_as_buffer( configbuf, configbuflen )
 !endif
 
-   CALL Setup_Timekeeping (head_grid)
+  CALL Setup_Timekeeping (head_grid)
 
 !<DESCRIPTION>
 ! The head grid is initialized with read-in data through the call to <a
@@ -234,9 +235,10 @@ CONTAINS
 ! 
 !</DESCRIPTION>
 
-   if((config_flags%real_data_init_type == 1) .or. (config_flags%real_data_init_type == 3)) then
-     CALL med_initialdata_input_3dvar( head_grid , config_flags )
-   endif
+  IF ((config_flags%real_data_init_type == 1) .OR. &
+      (config_flags%real_data_init_type == 3)) THEN
+    CALL med_initialdata_input_3dvar( head_grid , config_flags )
+  END IF
 
 !<DESCRIPTION>
 ! Once the top-level domain has been allocated, configured, and
@@ -256,24 +258,26 @@ CONTAINS
 !</DESCRIPTION>
 
 
-   !  The forecast integration for the most coarse grid is now started.  The
-   !  integration is from the first step (1) to the last step of the simulation.
+  !  The forecast integration for the most coarse grid is now started.  The
+  !  integration is from the first step (1) to the last step of the simulation.
 
-   head_grid%start_subtime = head_grid%start_time
-   head_grid%stop_subtime = head_grid%stop_time
+  head_grid%start_subtime = head_grid%start_time
+  head_grid%stop_subtime = head_grid%stop_time
 
-   ! return success status
-   rc = ESMF_SUCCESS
+  ! return success status
+  rc = ESMF_SUCCESS
 
-   END SUBROUTINE gen_be_init
+  END SUBROUTINE gen_be_init
 
 
 
-   SUBROUTINE gen_be_run( gcomp, importState, exportState, clock, rc )
-     TYPE(ESMF_GridComp), INTENT(INOUT) :: gcomp
-     TYPE(ESMF_State), INTENT(INOUT) :: importState, exportState
-     TYPE(ESMF_Clock), INTENT(INOUT) :: clock
-     INTEGER, INTENT(OUT) :: rc
+  SUBROUTINE gen_be_run( gcomp, importState, exportState, clock, rc )
+
+    TYPE(ESMF_GridComp), INTENT(INOUT) :: gcomp
+    TYPE(ESMF_State),    INTENT(INOUT) :: importState, exportState
+    TYPE(ESMF_Clock),    INTENT(INOUT) :: clock
+    INTEGER,             INTENT(OUT)   :: rc
+
 !<DESCRIPTION>
 !     WRFVAR run routine.
 !
@@ -289,21 +293,23 @@ CONTAINS
 
 !--do gen_be
 
-   CALL wrf_debug ( 100 , 'gen_be: calling gen_be ' )
-   CALL da_gen_be_stats_interface ( head_grid, config_flags )
-   CALL wrf_debug ( 100 , 'gen_be: back from gen_be ' )
+  CALL wrf_debug ( 100 , 'gen_be: calling gen_be ' )
+  CALL da_gen_be_stats_interface ( head_grid, config_flags )
+  CALL wrf_debug ( 100 , 'gen_be: back from gen_be ' )
 
-   ! return success status
-   rc = ESMF_SUCCESS
+  ! return success status
+  rc = ESMF_SUCCESS
 
-   END SUBROUTINE gen_be_run
+  END SUBROUTINE gen_be_run
 
 
-   SUBROUTINE gen_be_finalize( gcomp, importState, exportState, clock, rc )
-     TYPE(ESMF_GridComp), INTENT(INOUT) :: gcomp
-     TYPE(ESMF_State), INTENT(INOUT) :: importState, exportState
-     TYPE(ESMF_Clock), INTENT(INOUT) :: clock
-     INTEGER, INTENT(OUT) :: rc
+  SUBROUTINE gen_be_finalize( gcomp, importState, exportState, clock, rc )
+
+    TYPE(ESMF_GridComp), INTENT(INOUT) :: gcomp
+    TYPE(ESMF_State),    INTENT(INOUT) :: importState, exportState
+    TYPE(ESMF_Clock),    INTENT(INOUT) :: clock
+    INTEGER,             INTENT(OUT)   :: rc
+
 !<DESCRIPTION>
 !     WRFVAR finalize routine.
 !
@@ -318,20 +324,21 @@ CONTAINS
 
 !--output 3dvar analysis
 
-   if((config_flags%real_data_init_type == 1) .or. (config_flags%real_data_init_type == 3)) then
-     CALL med_initialdata_output_3dvar( head_grid , config_flags )
+  IF ((config_flags%real_data_init_type == 1) .OR. &
+      (config_flags%real_data_init_type == 3)) THEN
+    CALL med_initialdata_output_3dvar( head_grid , config_flags )
 
-     CALL med_shutdown_io ( head_grid , config_flags )
-     CALL       wrf_debug ( 100 , 'wrf: back from med_shutdown_io' )
-   endif
+    CALL med_shutdown_io ( head_grid , config_flags )
+    CALL       wrf_debug ( 100 , 'wrf: back from med_shutdown_io' )
+  END IF
 
-   CALL       wrf_debug (   0 , 'gen_be: SUCCESS COMPLETE WRFVAR' )
-   CALL wrf_shutdown
+  CALL       wrf_debug (   0 , 'gen_be: SUCCESS COMPLETE WRFVAR' )
+  CALL wrf_shutdown
 
-   ! return success status
-   rc = ESMF_SUCCESS
+  ! return success status
+  rc = ESMF_SUCCESS
 
-   END SUBROUTINE gen_be_finalize
+  END SUBROUTINE gen_be_finalize
 
 END MODULE module_gen_be_esmf_super
 
