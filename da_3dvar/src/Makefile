@@ -102,6 +102,9 @@ OBJS_4_GEN_BE_LONG =	DA_Constants.o		\
 			DA_Interpolation.o	\
 			DA_Statistics.o		\
 	                da_bufrlib.o 		\
+	                bort_exit.o 		\
+	                restd.o 		\
+	                wrdesc.o 		\
 			da_h_ops.o		\
 			da_c_mat.o		\
 			da_rf.o			\
@@ -112,7 +115,10 @@ OBJS_4_GEN_BE_LONG =	DA_Constants.o		\
 			be_spectral.o           \
 			da_fftpack5.o           \
 			da_gen_be.o             \
+			da_radiance.o		\
 			da_stats_be.o           \
+			gsi_kinds.o		\
+			gsi_constants.o		\
 			BLAS.o
 
 include ../../configure.wrf
