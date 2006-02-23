@@ -76,8 +76,8 @@ until ( $validresponse ) {
   printf "Please select from among the following supported platforms.\n\n" ;
 
   $opt = 1 ;
-  open CONFIGURE_DEFAULTS, "< ./arch/configure.defaults_3dvar" 
-      or die "Cannot open ./arch/configure.defaults_3dvar for reading" ;
+  open CONFIGURE_DEFAULTS, "< ./arch/configure.defaults_wrfvar" 
+      or die "Cannot open ./arch/configure.defaults_wrfvar for reading" ;
   while ( <CONFIGURE_DEFAULTS> )
   {
     if ( substr( $_, 0, 5 ) eq "#ARCH" && ( index( $_, $sw_os ) >= 0 ) && ( index( $_, $sw_mach ) >= 0 ) )
@@ -109,8 +109,8 @@ printf "------------------------------------------------------------------------
 
 $optchoice = $response ;
 
-open CONFIGURE_DEFAULTS, "< ./arch/configure.defaults_3dvar" 
-      or die "Cannot open ./arch/configure.defaults_3dvar for reading" ;
+open CONFIGURE_DEFAULTS, "< ./arch/configure.defaults_wrfvar" 
+      or die "Cannot open ./arch/configure.defaults_wrfvar for reading" ;
 $latchon = 0 ;
 while ( <CONFIGURE_DEFAULTS> )
 {
@@ -187,11 +187,11 @@ printf "------------------------------------------------------------------------
 printf "These will be written to the file configure.wrf here in the top-level\n" ;
 printf "directory.  If you wish to change settings, please edit that file.\n" ;
 printf "If you wish to change the default options, edit the file:\n\n" ;
-printf "     arch/configure.defaults_3dvar\n" ;
+printf "     arch/configure.defaults_wrfvar\n" ;
 printf "\n" ;
 
 open CONFIGURE_WRF, "> configure.wrf" or die "cannot append configure.wrf" ;
-open ARCH_PREAMBLE, "< arch/preamble_3dvar" or die "cannot open arch/preamble_3dvar" ;
+open ARCH_PREAMBLE, "< arch/preamble_wrfvar" or die "cannot open arch/preamble_wrfvar" ;
 while ( <ARCH_PREAMBLE> ) { print CONFIGURE_WRF } ;
 close ARCH_PREAMBLE ;
 printf CONFIGURE_WRF "# Settings for %s", $optstr[$optchoice] ;
@@ -203,23 +203,23 @@ if($sw_os =~ m/darwin/i)
 
    if($optchoice != 1)
    {
-      open ARCH_POSTAMBLE, "< arch/postamble_3dvar.mac_g4"
-      or die "cannot open arch/postamble_3dvar.mac_g4" ;
+      open ARCH_POSTAMBLE, "< arch/postamble_wrfvar.mac_g4"
+      or die "cannot open arch/postamble_wrfvar.mac_g4" ;
    }
    else
    {
-      open ARCH_POSTAMBLE, "< arch/postamble_3dvar"
-      or die "cannot open arch/postamble_3dvar" ;
+      open ARCH_POSTAMBLE, "< arch/postamble_wrfvar"
+      or die "cannot open arch/postamble_wrfvar" ;
    }
 }
 elsif(($sw_os =~ m/crayx1/i) || ($sw_os =~ m/cray1e/i) || ($sw_os =~ m/UNICOS/i))
 {
-   open ARCH_POSTAMBLE, "< arch/postamble_3dvar.cray1e"
-   or die "cannot open arch/postamble_3dvar.cray1e" ;
+   open ARCH_POSTAMBLE, "< arch/postamble_wrfvar.cray1e"
+   or die "cannot open arch/postamble_wrfvar.cray1e" ;
 }
 else
 {
-   open ARCH_POSTAMBLE, "< arch/postamble_3dvar" or die "cannot open arch/postamble_3dvar" ;
+   open ARCH_POSTAMBLE, "< arch/postamble_wrfvar" or die "cannot open arch/postamble_wrfvar" ;
 }
 
 while ( <ARCH_POSTAMBLE> ) { print CONFIGURE_WRF } ;
