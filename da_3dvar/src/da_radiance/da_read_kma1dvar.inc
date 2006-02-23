@@ -106,7 +106,7 @@ subroutine da_read_kma1dvar (inst,iv, ob, xp, inunit, infile)
         if (outside) cycle
 
         info%elv = srf_height
-        write(UNIT=info%date_char, '(i10)') idate 
+        write(UNIT=info%date_char,FMT='(i10)') idate 
 
         tb(1:nchanl) = missing_r
         inv(1:nchanl) = missing_r

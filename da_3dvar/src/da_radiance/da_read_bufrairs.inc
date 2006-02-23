@@ -188,7 +188,7 @@ subroutine da_read_bufrairs(obstype,iv,xp,lnbufr,infile)
   table_file = 'gmao_airs_bufr.tbl'      ! make table file name
   inquire(file=table_file,exist=airstab)
   if (airstab) then
-      write(UNIT=stdout,*) &
+      write(UNIT=stdout,FMT=*) &
         'DA_READ_BUFRAIRS:  Reading BUFR Table A file: ',trim(table_file)
       open(UNIT=airs_table_unit,file=table_file,iostat = iost)
     IF (iost /= 0) THEN
@@ -221,9 +221,9 @@ subroutine da_read_bufrairs(obstype,iv,xp,lnbufr,infile)
   ihh = 0
   if( iret /= 0 ) goto 1000     ! no data?
 
-  write(UNIT=date,'( i10)') idate
-  read(UNIT=date,'(i4,3i2)') iy,im,idd,ihh
-  write(UNIT=stdout,*) 'DA_READ_BUFRAIRS:     bufr file date is ',iy,im,idd,ihh
+  write(UNIT=date,FMT='( i10)') idate
+  read(UNIT=date,FMT='(i4,3i2)') iy,im,idd,ihh
+  write(UNIT=stdout,FMT=*) 'DA_READ_BUFRAIRS:     bufr file date is ',iy,im,idd,ihh
   
 !   3.0 Loop over observations
 !----------------------------
@@ -259,7 +259,7 @@ subroutine da_read_bufrairs(obstype,iv,xp,lnbufr,infile)
      call ufbseq(lnbufr,airschan,N_AIRSCHAN_LIST,N_MAXCHAN,iret,channame)
 
      if( iret /= nchanlr)then
-        write(UNIT=stderr,*) &
+        write(UNIT=stderr,FMT=*) &
           'DA_READ_BUFRAIRS:  ### ERROR IN READING ', channame, ' BUFR DATA:', &
              iret, ' CH DATA IS READ INSTEAD OF', nchanlr
         cycle LOOP_OBSPOINTS
@@ -305,7 +305,7 @@ subroutine da_read_bufrairs(obstype,iv,xp,lnbufr,infile)
         cycle LOOP_OBSPOINTS
      endif
 
-   write(UNIT=info%date_char, '(i4.4,a,i2.2,a,i2.2,a,i2.2,a,i2.2,a,i2.2)')  &
+   write(UNIT=info%date_char,FMT='(i4.4,a,i2.2,a,i2.2,a,i2.2,a,i2.2,a,i2.2)')  &
             idate5(1), '-', idate5(2), '-', idate5(3), '_', idate5(4), &
             ':', idate5(5), ':', idate5(6)
 
@@ -316,7 +316,7 @@ subroutine da_read_bufrairs(obstype,iv,xp,lnbufr,infile)
      if( airsspot%fovn <    0._r_kind .or. airsspot%fovn > 100._r_kind .or. &
           airsspot%saza < -360._r_kind .or. airsspot%saza > 360._r_kind .or. &
           aquaspot%soza < -180._r_kind .or. aquaspot%soza > 180._r_kind )then
-        write(UNIT=stderr,*) &
+        write(UNIT=stderr,FMT=*) &
           'READ_AIRS:  ### ERROR IN READING ', channame, ' BUFR DATA:', &
              ' STRANGE OBS INFO(FOV,SAZA,SOZA):', airsspot%fovn, airsspot%saza, aquaspot%soza
         cycle LOOP_OBSPOINTS
@@ -349,7 +349,7 @@ subroutine da_read_bufrairs(obstype,iv,xp,lnbufr,infile)
      end do
 
      if( .not. iflag )then
-       write(UNIT=stderr,*) &
+       write(UNIT=stderr,FMT=*) &
          'READ_AIRS:  ### ERROR IN READING ', channame, ' BUFR DATA:', &
             ' ALL TB DATA IS MISSING'
         cycle LOOP_OBSPOINTS

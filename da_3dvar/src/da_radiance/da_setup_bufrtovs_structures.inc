@@ -241,14 +241,15 @@ if ( lprinttovs ) then
     CALL wrf_error_fatal3(__FILE__,__LINE__, &
       "Cannot open output file "//TRIM(filename))
   Endif
-    write(UNIT=innov_vector_unit,'(a,a,i7,a,i5,a,20i3)') trim(iv%instid(n)%rttovid_string), &
+    write(UNIT=innov_vector_unit,FMT='(a,a,i7,a,i5,a,20i3)') trim(iv%instid(n)%rttovid_string), &
                         ' number-of-pixels: ', iv%instid(n)%num_rad, &
                         ' channel-number: ', iv%instid(n)%nchan, &
                         ' index-of-channels : ', iv%instid(n)%ichan
-    write(UNIT=innov_vector_unit, *) ' pixel-info: i date scanpos landsea_mask  elv lat lon  satzen satazi '                   
+    write(UNIT=innov_vector_unit,FMT='(A)') &
+      ' pixel-info: i date scanpos landsea_mask  elv lat lon  satzen satazi '                   
 CALL wrf_oi(__FILE__,__LINE__)
   do i =1,iv%instid(n)%num_rad
-    write(UNIT=innov_vector_unit,'(a,i7,2x,a,2i3,f6.0,4f8.2)') 'info: ', i, &
+    write(UNIT=innov_vector_unit,FMT='(a,i7,2x,a,2i3,f6.0,4f8.2)') 'info: ', i, &
                              iv%instid(n)%rad(i)%info%date_char, &
                              iv%instid(n)%rad(i)%scanpos,   &
                              iv%instid(n)%rad(i)%landsea_mask, &
@@ -257,7 +258,7 @@ CALL wrf_oi(__FILE__,__LINE__)
                              iv%instid(n)%rad(i)%info%lon, & 
                              iv%instid(n)%rad(i)%satzen,    &
                              iv%instid(n)%rad(i)%satazi
-    write(UNIT=innov_vector_unit,'(a,19f11.2)') ' BT: ', iv%instid(n)%rad(i)%tb(:)%inv
+    write(UNIT=innov_vector_unit,FMT='(a,19f11.2)') ' BT: ', iv%instid(n)%rad(i)%tb(:)%inv
   end do
   close(UNIT=innov_vector_unit)
  end do

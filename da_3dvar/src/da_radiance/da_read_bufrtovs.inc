@@ -158,11 +158,11 @@ CALL wrf_oi(__FILE__,__LINE__)
   call datelen(10)
   call readmg(lnbufr,subset,idate,iret)
   if( subset /= subfgn) then
-     write(UNIT=stderr,*) 'READ_BUFRTOVS:  *** WARNING: ',&
+     write(UNIT=stderr,FMT=*) 'READ_BUFRTOVS:  *** WARNING: ',&
           'THE FILE TITLE NOT MATCH DATA SUBSET'
-     write(UNIT=stderr,*) '  infile=', lnbufr, infile,' subset=',&
+     write(UNIT=stderr,FMT=*) '  infile=', lnbufr, infile,' subset=',&
           subset, ' subfgn=',subfgn
-     write(UNIT=stderr,*) 'SKIP PROCESSING OF THIS 1B FILE'
+     write(UNIT=stderr,FMT=*) 'SKIP PROCESSING OF THIS 1B FILE'
      call closbf(lnbufr)
      return
   end if
@@ -171,9 +171,10 @@ CALL wrf_oi(__FILE__,__LINE__)
   im=0
   idd=0
   ihh=0
-  write(UNIT=date,'( i10)') idate
-  read(UNIT=date,'(i4,3i2)') iy,im,idd,ihh
-  write(UNIT=stdout,*) 'da_read_bufrtovs: bufr file date is ',iy,im,idd,ihh,infile
+  write(UNIT=date,FMT='( i10)') idate
+  read(UNIT=date,FMT='(i4,3i2)') iy,im,idd,ihh
+  write(UNIT=stdout,FMT=*) &
+    'da_read_bufrtovs: bufr file date is ',iy,im,idd,ihh,infile
 
 
 ! Loop to read bufr file and assign information to a sequential structure
@@ -232,7 +233,7 @@ CALL wrf_oi(__FILE__,__LINE__)
         minute = bfr1bhdr(7) !minute
         second = bfr1bhdr(8) !second
 
-   write(UNIT=info%date_char, '(i4,a,i2.2,a,i2.2,a,i2.2,a,i2.2,a,i2.2)')  &
+   write(UNIT=info%date_char,FMT='(i4,a,i2.2,a,i2.2,a,i2.2,a,i2.2,a,i2.2)')  &
             year, '-', month, '-', day, '_', hour, ':', minute, ':', second
 
 !  QC3: time consistency check with the background date
@@ -367,7 +368,6 @@ CALL wrf_oi(__FILE__,__LINE__)
    iv%instid(inst)%rad(nread(inst))%solzen = p%rad%solzen
 !   iv%instid(inst)%rad(nread(inst))%solazi
 CALL wrf_oi(__FILE__,__LINE__)
-write (0,*) "inst,nchanl",inst,nchanl
    allocate ( iv%instid(inst)%rad(nread(inst))%tb(1:nchanl), stat = error  )
      IF (error /= 0) THEN
        CALL wrf_error_fatal3(__FILE__,__LINE__, &

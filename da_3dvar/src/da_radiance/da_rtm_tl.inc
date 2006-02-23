@@ -250,34 +250,34 @@ subroutine da_rtm_tl( inst, nchanl, nprofiles, con_vars, aux_vars, &
      & radiance_tl ) ! inout
 
  if ( any(errorstatus(:) /= 0 )) then
-     write (UNIT=errmsg(1),*)  'rttov_direct error code = ', errorstatus(:)
-     write (UNIT=errmsg(2),*)  'nfrequencies            = ', nfrequencies
-     write (UNIT=errmsg(3),*)  'nchannels               = ', nchannels
-     write (UNIT=errmsg(4),*)  'nbtout                  = ', nbtout
-     write (UNIT=errmsg(5),*)  'nprofiles               = ', nprofiles
-     write (UNIT=errmsg(6),*)  'channels                = ', channels
-     write (UNIT=errmsg(7),*)  'polarisations           = ', polarisations
-     write (UNIT=errmsg(8),*)  'lprofiles               = ', lprofiles
-     write (UNIT=errmsg(9),*)  'addcloud                = ', addcloud
-     write (UNIT=errmsg(10),*) 'calcemis                = ', calcemis
-     write (UNIT=errmsg(11),*) 'profiles%s2m            = ', profiles(1)%s2m
-     write (UNIT=errmsg(12),*) 'profiles%skin           = ', profiles(1)%skin
-     write (UNIT=errmsg(13),*) 'profiles%zenangle       = ', profiles(1)%zenangle
-     write (UNIT=errmsg(14),*) 'profiles%azangle        = ', profiles(1)%azangle
-     write (UNIT=errmsg(15),*) 'profiles%p              = ', profiles(1)%p
-     write (UNIT=errmsg(16),*) 'profiles%t              = ', profiles(1)%t
-     write (UNIT=errmsg(17),*) 'profiles%q              = ', profiles(1)%q
-     write (UNIT=errmsg(18),*) 'emissivity              = ', emissivity
-     write (UNIT=errmsg(19),*) 'radiance                = ', radiance%out_clear
-     write (UNIT=errmsg(20),*) 'profiles_tl%s2m         = ', profiles_tl(1)%s2m
-     write (UNIT=errmsg(21),*) 'profiles_tl%skin        = ', profiles_tl(1)%skin
-     write (UNIT=errmsg(22),*) 'profiles_tl%zenangle    = ', profiles_tl(1)%zenangle
-     write (UNIT=errmsg(23),*) 'profiles_tl%azangle     = ', profiles_tl(1)%azangle
-     write (UNIT=errmsg(24),*) 'profiles_tl%p           = ', profiles_tl(1)%p 
-     write (UNIT=errmsg(25),*) 'profiles_tl%t           = ', profiles_tl(1)%t 
-     write (UNIT=errmsg(26),*) 'profiles_tl%q           = ', profiles_tl(1)%q 
-     write (UNIT=errmsg(27),*) 'emissivity_tl           = ', emissivity_tl    
-     write (UNIT=errmsg(28),*) 'radiance_tl             = ', radiance_tl%out_clear
+     write (errmsg(1),*)  'rttov_direct error code = ', errorstatus(:)
+     write (errmsg(2),*)  'nfrequencies            = ', nfrequencies
+     write (errmsg(3),*)  'nchannels               = ', nchannels
+     write (errmsg(4),*)  'nbtout                  = ', nbtout
+     write (errmsg(5),*)  'nprofiles               = ', nprofiles
+     write (errmsg(6),*)  'channels                = ', channels
+     write (errmsg(7),*)  'polarisations           = ', polarisations
+     write (errmsg(8),*)  'lprofiles               = ', lprofiles
+     write (errmsg(9),*)  'addcloud                = ', addcloud
+     write (errmsg(10),*) 'calcemis                = ', calcemis
+     write (errmsg(11),*) 'profiles%s2m            = ', profiles(1)%s2m
+     write (errmsg(12),*) 'profiles%skin           = ', profiles(1)%skin
+     write (errmsg(13),*) 'profiles%zenangle       = ', profiles(1)%zenangle
+     write (errmsg(14),*) 'profiles%azangle        = ', profiles(1)%azangle
+     write (errmsg(15),*) 'profiles%p              = ', profiles(1)%p
+     write (errmsg(16),*) 'profiles%t              = ', profiles(1)%t
+     write (errmsg(17),*) 'profiles%q              = ', profiles(1)%q
+     write (errmsg(18),*) 'emissivity              = ', emissivity
+     write (errmsg(19),*) 'radiance                = ', radiance%out_clear
+     write (errmsg(20),*) 'profiles_tl%s2m         = ', profiles_tl(1)%s2m
+     write (errmsg(21),*) 'profiles_tl%skin        = ', profiles_tl(1)%skin
+     write (errmsg(22),*) 'profiles_tl%zenangle    = ', profiles_tl(1)%zenangle
+     write (errmsg(23),*) 'profiles_tl%azangle     = ', profiles_tl(1)%azangle
+     write (errmsg(24),*) 'profiles_tl%p           = ', profiles_tl(1)%p 
+     write (errmsg(25),*) 'profiles_tl%t           = ', profiles_tl(1)%t 
+     write (errmsg(26),*) 'profiles_tl%q           = ', profiles_tl(1)%q 
+     write (errmsg(27),*) 'emissivity_tl           = ', emissivity_tl    
+     write (errmsg(28),*) 'radiance_tl             = ', radiance_tl%out_clear
      CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1:28)) 
  endif
  

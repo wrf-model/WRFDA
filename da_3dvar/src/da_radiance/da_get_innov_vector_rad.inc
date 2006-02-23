@@ -532,14 +532,14 @@
                         ' channel-number-of-each-pixel : ', iv%instid(n)%nchan, &
                         ' index-of-channels : '
     write(UNIT=innov_vector_unit,FMT='(10i5)') iv%instid(n)%ichan
-    write(UNIT=innov_vector_unit, *) ' pixel-info : i date scanpos landsea_mask  elv lat lon  satzen satazi '
-    write(UNIT=innov_vector_unit, *) ' xb-surf-info : i t2m mr2m(ppmv) u10 v10 ps ts smois tslb snowh isflg &
+    write(UNIT=innov_vector_unit,FMT=*) ' pixel-info : i date scanpos landsea_mask  elv lat lon  satzen satazi '
+    write(UNIT=innov_vector_unit,FMT=*) ' xb-surf-info : i t2m mr2m(ppmv) u10 v10 ps ts smois tslb snowh isflg &
                     & soiltyp vegtyp vegfra elev clwp'
    ndomain = 0
   do i =1,iv%instid(n)%num_rad
    if(iv%instid(n)%rad(i)%loc%proc_domain) then
     ndomain=ndomain+1
-    write(UNIT=innov_vector_unit,'(a,i7,2x,a,2i3,f6.0,4f8.2)') &
+    write(UNIT=innov_vector_unit,FMT='(a,i7,2x,a,2i3,f6.0,4f8.2)') &
       'INFO : ', ndomain, &
                              iv%instid(n)%rad(i)%info%date_char, &
                              iv%instid(n)%rad(i)%scanpos,   &
@@ -718,7 +718,7 @@
 
 
   if (lwrite_profile) then
-    write(UNIT=innov_vector_unit,*) &
+    write(UNIT=innov_vector_unit,FMT=*) &
       'RTM_level pres(mb) T(k) Q(ppmv) WRF_level pres(mb) T(k) q(g/kg) clw(g/kg) rain(g/kg)'
     do k=xp%kts,xp%kte
      if (k <= num_levs) then
