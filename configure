@@ -343,8 +343,8 @@ if test -n "$PERL" ; then
   echo option = $option
 
   if [ "$option" = "var" -o "$option" = "4dvar" -o "$option" = "be" ] ; then
-     echo "configure for var"
-     $PERL arch/Config_3dvar.pl -perl=$PERL -netcdf=$NETCDF -phdf5=$PHDF5 -rttov=$RTTOV -os=$os -mach=$mach -ldflags=$ldflags \
+     echo "configure for wrfvar"
+     $PERL arch/Config_wrfvar.pl -perl=$PERL -netcdf=$NETCDF -phdf5=$PHDF5 -rttov=$RTTOV -os=$os -mach=$mach -ldflags=$ldflags \
        -compileflags=$compileflags
      echo "configure for var/be"
   else

@@ -1,5 +1,5 @@
 #
-LIB		=	$(NETCDF_LIB) $(MPI_LIB) $(LOCAL_LIB) $(WRF_LIB)
+LIB		=	$(NETCDF_LIB) $(RTTOV_LIB) $(MPI_LIB) $(LOCAL_LIB) $(WRF_LIB)
 EXTRAMODULES    =
 FCBASEOPTS      =       $(FCTYPE) $(FCBASE) $(FCFORM) $(FCHOST) $(FCDEBUG) -I.
 FC_FFT_RF_OPTS  =       $(FCTYPE) $(FC_FFT_RF) $(FCFORM) $(FCHOST) $(FCDEBUG) -I.
@@ -41,7 +41,6 @@ wrfio_int :
 	( cd ../external/io_int ; \
         make CC="$(CC)" CPP="$(CPP)" \
 	RANLIB="$(RANLIB)" \
-	SFC="$(SFC)" \
 	FC="$(FC)" FCFLAGS="$(FCDEBUG) $(FCFORM) $(FCBASE)" all )
 
 wrfio_grib1 :
@@ -49,7 +48,6 @@ wrfio_grib1 :
         make CPP="$(CPP)" \
 	RANLIB="$(RANLIB)" \
 	CC="$(CC)" CFLAGS="$(CFLAGS)" \
-	SFC="$(SFC)" \
 	FC="$(FC)" FCFLAGS="$(FCDEBUG) -I. $(FCFORM) $(FCBASE)" )
 
 esmf_time : 
@@ -96,29 +94,29 @@ module_initialize_real.o module_dm.o start_domain.o :
 
 
 .F.i:
-	$(RM) $@
-	$(CPP) -I../inc $(CPPFLAGS) $*.F > $@
-	mv $*.i $(DEVTOP)/pick/$*.f
-	cp $*.F $(DEVTOP)/pick
+	@ $(RM) $@
+	  $(CPP) -I../inc $(CPPFLAGS) $*.F > $@
+	@ $(MV) $*.i $(DEVTOP)/pick/$*.f
+	@ $(CP) $*.F $(DEVTOP)/pick
 
 .F.o:
-	$(RM) $@
-	$(SED_FTN) $*.F > $*.b
-	$(CPP) -I../inc $(CPPFLAGS) $*.b  > $*.f
-	$(RM) $*.b
-	$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $*.f
+	@ $(RM) $@
+	@ $(SED_FTN) $*.F > $*.b
+	  $(CPP) -I../inc $(CPPFLAGS) $*.b  > $*.f
+	@ $(RM) $*.b
+	  $(FC) -c $(FCFLAGS) $(MODULE_DIRS) $*.f
 
 .F.f:
-	$(RM) $@
-	$(SED_FTN) $*.F > $*.b 
-	$(CPP) -I../inc $(CPPFLAGS) $*.b > $*.f
-	$(RM) $*.b
+	@ $(RM) $@
+	@ $(SED_FTN) $*.F > $*.b 
+	  $(CPP) -I../inc $(CPPFLAGS) $*.b > $*.f
+	@ $(RM) $*.b
 
 .f.o:
-	$(RM) $@
-	$(FC) -c $(FCFLAGS) $*.f
+	@ $(RM) $@
+	  $(FC) -c $(FCFLAGS) $*.f
 
 .c.o:
-	$(RM) $@
-	$(CC) -c $(CFLAGS) $*.c
+	@ $(RM) $@
+	  $(CC) -c $(CFLAGS) $*.c
 
