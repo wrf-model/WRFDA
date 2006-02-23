@@ -1,31 +1,31 @@
 MODULE DA_Synop
 
-   USE DA_Constants
-   USE DA_Define_Structures
-   USE DA_Interpolation
-   USE DA_Statistics
-   USE DA_Tools
-   USE DA_Physics
-   USE PAR_UTIL
+  USE DA_Constants
+  USE DA_Define_Structures
+  USE DA_Interpolation
+  USE DA_Statistics
+  USE DA_Tools
+  USE DA_Physics
+  USE PAR_UTIL
 
-! The "stats_synop_type" is ONLY used locally in DA_Synop:
+  ! The "stats_synop_type" is ONLY used locally in DA_Synop:
 
-   TYPE residual_synop1_type
-      REAL          :: u                        ! u-wind.
-      REAL          :: v                        ! v-wind.
-      REAL          :: t                        ! temperature
-      REAL          :: p                        ! pressure
-      REAL          :: q                        ! specific humidity
-   END TYPE residual_synop1_type
+  TYPE residual_synop1_type
+    REAL          :: u                        ! u-wind.
+    REAL          :: v                        ! v-wind.
+    REAL          :: t                        ! temperature
+    REAL          :: p                        ! pressure
+    REAL          :: q                        ! specific humidity
+  END TYPE residual_synop1_type
 
-   TYPE maxmin_synop_stats_type
-        TYPE (maxmin_type)         :: u, v, t, p, q
-   END TYPE maxmin_synop_stats_type
+  TYPE maxmin_synop_stats_type
+    TYPE (maxmin_type)         :: u, v, t, p, q
+  END TYPE maxmin_synop_stats_type
 
-   TYPE stats_synop_type
-        TYPE (maxmin_synop_stats_type)  :: maximum, minimum
-        TYPE (residual_synop1_type)     :: average, rms_err
-   END TYPE stats_synop_type
+  TYPE stats_synop_type
+    TYPE (maxmin_synop_stats_type)  :: maximum, minimum
+    TYPE (residual_synop1_type)     :: average, rms_err
+  END TYPE stats_synop_type
 
 #if ( DWORDSIZE != RWORDSIZE )
 #define TRUE_MPI_REAL     MPI_REAL
