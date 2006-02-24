@@ -37,7 +37,7 @@ POUND_DEF       =       -DDEC_ALPHA -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
 			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 M4              =       m4 -B 12000
 
-externals : CONFIGURE_WRFIO_NF wrfio_int wrfio_grib1 esmf_time
+externals : $(WRFIO) esmf_time
 	( /bin/cp module_dm_warning module_dm.F ; \
           cat module_dm_stubs.F >> module_dm.F )
 
@@ -131,7 +131,7 @@ POUND_DEF       =       -DDEC_ALPHA -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
                         -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 M4              =       m4 -B 12000
 
-externals : CONFIGURE_WRFIO_NF wrfio_int wrfio_grib1 esmf_time
+externals : $(WRFIO) esmf_time
 	( /bin/cp module_dm_warning module_dm.F ; \
           cat module_dm_stubs.F >> module_dm.F )
 
@@ -171,7 +171,7 @@ POUND_DEF       =       -DLINUX -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
 			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 M4              =       m4
 
-externals : CONFIGURE_WRFIO_NF wrfio_int wrfio_grib1 esmf_time
+externals : $(WRFIO) esmf_time
 	( /bin/cp module_dm_warning module_dm.F ; cat module_dm_stubs.F >> module_dm.F )
 
 ###########################################################
@@ -220,7 +220,7 @@ POUND_DEF       =       -DLINUX -DNO_RRTM_PHYSICS  \
 M4              =       m4
 
 
-externals : CONFIGURE_WRFIO_NF wrfio_int wrfio_grib1 esmf_time lib_rsl
+externals : $(WRFIO) esmf_time lib_rsl
 	( /bin/cp ../tools/gen_comms_warning ../tools/gen_comms.c ; \
           cat ../external/RSL/gen_comms.c >> ../tools/gen_comms.c ;  \
           /bin/cp module_dm_warning module_dm.F ; cat ../external/RSL/module_dm.F >> module_dm.F )
@@ -262,10 +262,49 @@ POUND_DEF       =       -DNO_RRTM_PHYSICS -DNONSTANDARD_SYSTEM -DF90_STANDALONE 
 			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 M4              =       m4 -B12000
 
-externals : CONFIGURE_WRFIO_NF wrfio_int wrfio_grib1 esmf_time
+externals : $(WRFIO) esmf_time
 	( /bin/cp ../tools/gen_comms_warning ../tools/gen_comms.c ; \
 	cat ../external/RSL/gen_comms.c >> ../tools/gen_comms.c ; \
 	/bin/cp module_dm_warning module_dm.F ; cat module_dm_stubs.F >> module_dm.F )
+
+###########################################################
+#ARCH Settings for PC Linux i486 i586 i686, g95 compiler  (Single-threaded)
+#
+FC              =       g95
+F77             =       $(FC)
+CC              =       gcc
+CC_TOOLS        =       gcc
+LD              =       $(FC)
+SFC             =       $(FC)
+TRADFLAG        =       -traditional
+FCOPTIM         =       
+FCDEBUG         =       #-g
+FCTYPE          =       #-r8
+FCFORM          =       -ffree-form -cpp -Wno=155,158,139,101,155
+FCHOST          =       
+FCBUFR          =       -Wno=155,158,139,101,155
+FCBASE          =       $(FCBUFR)
+FC_FFT_RF       =       $(FCBUFR)
+ARCHFLAGS3      =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE \
+                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO
+EXTRAMODULES    =       
+
+LDFLAGS         =
+
+LOCAL_LIBRARIES =       -L/usr/local/ncarg/lib -L/usr/X11R6/lib -L/usr/local/lib \
+			-lncarg -lncarg_gks -lncarg_c -lX11
+
+CPP             =       /lib/cpp $(TRADFLAG)
+CPPFLAGS_BUFR   =       -C -P -DLINUX -Dlinux
+CCFLAGS_BUFR    =       -DUNDERSCORE
+DM_1_CPP_FLAGS  =
+DM_2_CPP_FLAGS  =
+POUND_DEF       =       -DLINUX -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
+			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+M4              =       m4
+
+externals : $(WRFIO) esmf_time
+	( /bin/cp module_dm_warning module_dm.F ; cat module_dm_stubs.F >> module_dm.F )
 
 ###########################################################
 #ARCH       SGI 64 bit machine IRIX64     (single-threaded)
@@ -308,7 +347,7 @@ POUND_DEF       =       -DIRIX \
 RANLIB          =       echo
 M4              =       m4 -B12000
 
-externals : CONFIGURE_WRFIO_NF wrfio_int wrfio_grib1 esmf_time
+externals : $(WRFIO) esmf_time
 	( /bin/cp module_dm_warning module_dm.F ; \
           cat module_dm_stubs.F >> module_dm.F )
 
@@ -456,7 +495,7 @@ POUND_DEF       =       -DAIX \
 NETCDFPATH	=	CONFIGURE_NETCDF_PATH
 M4              =       m4 -B12000
 
-externals : CONFIGURE_WRFIO_NF wrfio_int wrfio_grib1 esmf_time
+externals : $(WRFIO) esmf_time
 	( /bin/cp module_dm_warning module_dm.F ; cat module_dm_stubs.F >> module_dm.F )
 
 ###########################################################
@@ -500,7 +539,7 @@ POUND_DEF       =       -DAIX \
 			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 M4              =       m4 -B12000
 
-externals :	CONFIGURE_WRFIO_NF wrfio_int wrfio_grib1 esmf_time lib_rsl
+externals :	$(WRFIO) esmf_time lib_rsl
 	( /bin/cp ../tools/gen_comms_warning ../tools/gen_comms.c ; \
 	cat ../external/RSL/gen_comms.c >> ../tools/gen_comms.c )
 	( /bin/cp module_dm_warning module_dm.F ; \
@@ -696,7 +735,7 @@ POUND_DEF       =       -DDARWIN -DMAC_OS \
 NETCDFPATH	=	CONFIGURE_NETCDF_PATH
 M4              =       m4 -B12000
 
-externals : CONFIGURE_WRFIO_NF wrfio_int wrfio_grib1 esmf_time
+externals : $(WRFIO) esmf_time
 	( /bin/cp module_dm_warning module_dm.F ; cat module_dm_stubs.F >> module_dm.F )
 
 ###########################################################
@@ -732,7 +771,7 @@ POUND_DEF       =       -DDARWIN -DMAC_OS \
 			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 M4              =       m4 -B12000
 
-externals : CONFIGURE_WRFIO_NF wrfio_int wrfio_grib1 esmf_time
+externals : $(WRFIO) esmf_time
 	( /bin/cp module_dm_warning module_dm.F ; cat module_dm_stubs.F >> module_dm.F )
 
 ###########################################################

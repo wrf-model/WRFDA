@@ -155,39 +155,6 @@ while ( <CONFIGURE_DEFAULTS> ) {
     $latchon = 0 ;
   }
   if ( $latchon == 1 ) {
-    $_ =~ s/CONFIGURE_PERL_PATH/$sw_perl_path/g ;
-    $_ =~ s/CONFIGURE_NETCDF_PATH/$sw_netcdf_path/g ;
-    $_ =~ s/CONFIGURE_PHDF5_PATH/$sw_phdf5_path/g ;
-    $_ =~ s/CONFIGURE_RTTOV_PATH/$sw_rttov_path/g ;
-    $_ =~ s/CONFIGURE_LDFLAGS/$sw_ldflags/g ;
-    $_ =~ s/CONFIGURE_COMPILEFLAGS/$sw_compileflags/g ;
-    if ( $sw_netcdf_path ) { 
-      $_ =~ s/CONFIGURE_WRFIO_NF/wrfio_nf/g ;
-      $_ =~ s:CONFIGURE_NETCDF_FLAG:-DNETCDF: ;
-      $_ =~ s:CONFIGURE_NETCDF_LIB_PATH:-L\$(EXTERNAL)/io_netcdf -lwrfio_nf -L$sw_netcdf_path/lib -lnetcdf: ;
-    } else { 
-      $_ =~ s/CONFIGURE_WRFIO_NF//g ;
-      $_ =~ s:CONFIGURE_NETCDF_FLAG::g ;
-      $_ =~ s:CONFIGURE_NETCDF_LIB_PATH::g ;
-    }
-
-    if ( $sw_phdf5_path ) { 
-      $_ =~ s/CONFIGURE_WRFIO_PHDF5/wrfio_phdf5/g ;
-      $_ =~ s:CONFIGURE_PHDF5_FLAG:-DPHDF5: ;
-      $_ =~ s:CONFIGURE_PHDF5_LIB_PATH:-L\$(EXTERNAL)/io_phdf5 -lwrfio_phdf5 -L$sw_phdf5_path/lib -lhdf5_fortran -lhdf5 -lm -lz -L$sw_phdf5_path/lib -lsz: ;
-    } else { 
-      $_ =~ s/CONFIGURE_WRFIO_PHDF5//g ;
-      $_ =~ s:CONFIGURE_PHDF5_FLAG::g ;
-      $_ =~ s:CONFIGURE_PHDF5_LIB_PATH::g ;
-    }
-
-    if ( $sw_rttov_path ) {
-      $_ =~ s:CONFIGURE_RTTOV_FLAG:-DRTTOV: ;
-      $_ =~ s:CONFIGURE_RTTOV_LIB:-L$sw_rttov_path/lib -lrttov: ;
-    } else {
-      $_ =~ s:CONFIGURE_RTTOV_FLAG::g ;
-      $_ =~ s:CONFIGURE_RTTOV_LIB::g ;
-    }
 
     @machopts2 = ( @machopts2, $_ ) ;
 
