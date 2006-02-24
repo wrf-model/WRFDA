@@ -89,7 +89,6 @@ subroutine da_read_bufrtovs (obstype, iv, xp, lnbufr, infile)
 
 !**************************************************************************
 ! Initialize variables
-CALL wrf_oi(__FILE__,__LINE__)
 
   nchanl = 20
   allocate(nread(1:rtminit_nsensor))
@@ -210,9 +209,7 @@ CALL wrf_oi(__FILE__,__LINE__)
 
         info%lat  =  bfr1bhdr(9)  ! rlat
         info%lon  =  bfr1bhdr(10) ! rlon
-CALL wrf_oi(__FILE__,__LINE__)
         call DA_ll_to_xy (info, loc, xp, outside, inside_halo )
-CALL wrf_oi(__FILE__,__LINE__)
         if (outside) cycle
 
 !  3.0     Extract other informations
@@ -241,7 +238,6 @@ CALL wrf_oi(__FILE__,__LINE__)
 !  3.3     Find wrfvar instrument index from RTTOV instrument triplet
 !          go to next data if id is not in the lists
 !
-CALL wrf_oi(__FILE__,__LINE__)
       do inst = 1, rtminit_nsensor
         if (    platform_id  == rtminit_platform(inst) &
           .and. satellite_id == rtminit_satid(inst)    &
@@ -250,7 +246,6 @@ CALL wrf_oi(__FILE__,__LINE__)
             exit
         end if
       end do
-CALL wrf_oi(__FILE__,__LINE__)
 
       if ( inst == rtminit_nsensor .and.           &
            platform_id  /= rtminit_platform(inst)  &
@@ -291,12 +286,10 @@ CALL wrf_oi(__FILE__,__LINE__)
           if ( tb(k) < tbmin .or. tb(k) > tbmax) &
                tb(k) = missing_r
         end do
-CALL wrf_oi(__FILE__,__LINE__)
 
 !  4.0   assign information to sequential radiance structure
 !--------------------------------------------------------------------------
    allocate ( p % rad % tb (1:nchanl) )
-CALL wrf_oi(__FILE__,__LINE__)
    p%rad%info             = info
    p%rad%loc              = loc
    p%rad%landsea_mask     = landsea_mask
@@ -309,7 +302,6 @@ CALL wrf_oi(__FILE__,__LINE__)
 
    size = size + 1
    allocate ( p%next, stat=error)   ! add next data
-CALL wrf_oi(__FILE__,__LINE__)
    if (error /= 0 ) then
      CALL wrf_error_fatal3(__FILE__,__LINE__, &
        "Cannot allocate radiance structure")
@@ -324,7 +316,6 @@ CALL wrf_oi(__FILE__,__LINE__)
    iv%total_obs = iv%total_obs + size
    iv%total_rad_pixel   = iv%total_rad_pixel + size
    iv%total_rad_channel = iv%total_rad_channel + size*nchanl
-CALL wrf_oi(__FILE__,__LINE__)
 
    deallocate(tb)  
    call closbf(lnbufr)
@@ -338,13 +329,11 @@ CALL wrf_oi(__FILE__,__LINE__)
         ' allocating space for radiance innov structure', &
         i, iv%instid(i)%rttovid_string, iv%instid(i)%num_rad
       allocate( iv%instid(i)%rad(1:iv%instid(i)%num_rad), stat = error )
-CALL wrf_oi(__FILE__,__LINE__)
       If( error /= 0 ) Then
         CALL wrf_error_fatal3(__FILE__,__LINE__, &
           & "mem allocation error to iv%instid(i)%rad")
       End If
   end do
-CALL wrf_oi(__FILE__,__LINE__)
 
 !  6.0 assign sequential structure to innovation structure
 !-------------------------------------------------------------
@@ -352,7 +341,6 @@ CALL wrf_oi(__FILE__,__LINE__)
   p => head
 !  do while ( associated(p) )
   do i = 1, size
-CALL wrf_oi(__FILE__,__LINE__)
 
    inst = p%sensor_index
    nread(inst) = nread(inst) + 1
@@ -367,13 +355,11 @@ CALL wrf_oi(__FILE__,__LINE__)
    iv%instid(inst)%rad(nread(inst))%satazi = p%rad%satazi
    iv%instid(inst)%rad(nread(inst))%solzen = p%rad%solzen
 !   iv%instid(inst)%rad(nread(inst))%solazi
-CALL wrf_oi(__FILE__,__LINE__)
    allocate ( iv%instid(inst)%rad(nread(inst))%tb(1:nchanl), stat = error  )
      IF (error /= 0) THEN
        CALL wrf_error_fatal3(__FILE__,__LINE__, &
          & "mem allocation error to iv%instid(inst)%rad(nread(inst))%tb")
      END IF
-CALL wrf_oi(__FILE__,__LINE__)
    iv%instid(inst)%rad(nread(inst))%tb(1:nchanl)%inv = p%rad%tb(1:nchanl)%inv
 !   iv%instid(inst)%rad(nread(inst))%inv(1:nchanl) = 0.0
 !   iv%instid(inst)%rad(nread(inst))%err(1:nchanl) = 0.0
@@ -381,7 +367,6 @@ CALL wrf_oi(__FILE__,__LINE__)
 !   print *, inst, nread(inst), iv%instid(inst)%rad(nread(inst))%tb(1:nchanl)%inv
    current => p
    p => p%next
-CALL wrf_oi(__FILE__,__LINE__)
 
 ! free current data
    deallocate ( current % rad % tb )
@@ -389,7 +374,6 @@ CALL wrf_oi(__FILE__,__LINE__)
 
  end do
    deallocate (nread)
-CALL wrf_oi(__FILE__,__LINE__)
 
 ! check if sequential structure has been freed
 !

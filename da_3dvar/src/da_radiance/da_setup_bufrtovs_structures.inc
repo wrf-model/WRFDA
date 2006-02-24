@@ -27,16 +27,13 @@ SUBROUTINE da_setup_bufrtovs_structures( xp, ob, iv )
 !-------------------------------------------------------------------
 !  [1.0] Initialize RTTOV coefs and innovations vector for radiance
 !-------------------------------------------------------------------
-CALL wrf_oi(__FILE__,__LINE__)
     inunit = bufrtovs_unit
     call da_rtm_init(iv,ob)
-CALL wrf_oi(__FILE__,__LINE__)
 
 !-------------------------------------------------------------------
 !  [2.0] Read NCEP bufr tovs data in radiance innovations vector
 !-------------------------------------------------------------------
    filename = ' '    ! initialise filename
-CALL wrf_oi(__FILE__,__LINE__)
 
    if(num_fgat_time > 1) then
       filename = ' '
@@ -46,7 +43,6 @@ CALL wrf_oi(__FILE__,__LINE__)
          write(UNIT=filename(1:10), fmt='(a, i2.2)') 'fgat_ob.', n
 
          if(use_Hirs2Obs) then
-CALL wrf_oi(__FILE__,__LINE__)
             write(UNIT=stdout,FMT='(a, i2.2)')  ' Reading radiance 1b data from hirs2.bufr', n
             filename = ' '
             write(UNIT=filename(1:12), fmt='(a, i2.2)') 'hirs2.bufr', n
@@ -54,7 +50,6 @@ CALL wrf_oi(__FILE__,__LINE__)
          endif
 
          if(use_MsuObs) then
-CALL wrf_oi(__FILE__,__LINE__)
             write(UNIT=stdout,FMT='(a, i2.2)')  ' Reading radiance 1b data from msu.bufr', n
             filename = ' '
             write(UNIT=filename(1:10), fmt='(a, i2.2)') 'msu.bufr', n
@@ -62,7 +57,6 @@ CALL wrf_oi(__FILE__,__LINE__)
          endif
 
          if(use_Hirs3Obs) then
-CALL wrf_oi(__FILE__,__LINE__)
             write(UNIT=stdout,FMT='(a, i2.2)')  ' Reading radiance 1b data from hirs3.bufr', n
             filename = ' '
             write(UNIT=filename(1:12), fmt='(a, i2.2)') 'hirs3.bufr', n
@@ -70,7 +64,6 @@ CALL wrf_oi(__FILE__,__LINE__)
          endif
 
          if(use_AmsuaObs) then
-CALL wrf_oi(__FILE__,__LINE__)
             write(UNIT=stdout,FMT='(a, i2.2)')  ' Reading radiance 1b data from amsua.bufr', n
             filename = ' '
             write(UNIT=filename(1:12), fmt='(a, i2.2)') 'amsua.bufr', n
@@ -78,7 +71,6 @@ CALL wrf_oi(__FILE__,__LINE__)
          endif
 
          if(use_AmsubObs) then
-CALL wrf_oi(__FILE__,__LINE__)
             write(UNIT=stdout,FMT='(a, i2.2)')  ' Reading radiance 1b data from amsub.bufr', n
             filename = ' '
             write(UNIT=filename(1:12), fmt='(a, i2.2)') 'amsub.bufr', n
@@ -86,16 +78,13 @@ CALL wrf_oi(__FILE__,__LINE__)
          endif
 
          if(use_AirsObs) then
-CALL wrf_oi(__FILE__,__LINE__)
             write(UNIT=stdout,FMT='(a, i2.2)')  ' Reading airs 1b data from airs.bufr', n
             filename = ' '
             write(UNIT=filename(1:11), fmt='(a, i2.2)') 'airs.bufr', n
             call da_read_bufrairs ('airs     ',iv, xp, inunit, filename)
          endif
-CALL wrf_oi(__FILE__,__LINE__)
 
          if(use_Eos_AmsuaObs) then
-CALL wrf_oi(__FILE__,__LINE__)
             write(UNIT=stdout,FMT='(a, i2.2)')  ' Reading eos_amsua 1b data from airs.bufr', n
             filename = ' '
             write(UNIT=filename(1:11), fmt='(a, i2.2)') 'airs.bufr', n
@@ -103,7 +92,6 @@ CALL wrf_oi(__FILE__,__LINE__)
          endif
 
          if(use_HsbObs) then
-CALL wrf_oi(__FILE__,__LINE__)
             write(UNIT=stdout,FMT='(a, i2.2)')  ' Reading hsb 1b data from airs.bufr', n
             filename = ' '
             write(UNIT=filename(1:11), fmt='(a, i2.2)') 'airs.bufr', n
@@ -112,12 +100,10 @@ CALL wrf_oi(__FILE__,__LINE__)
 
       enddo
    else
-CALL wrf_oi(__FILE__,__LINE__)
 
       iv%current_ob_time = 1
 
          if(use_Hirs2Obs) then
-CALL wrf_oi(__FILE__,__LINE__)
             write(UNIT=stdout,FMT='(a)')  ' Reading radiance 1b data from hirs2.bufr'
             filename = ' '
             write(UNIT=filename(1:10), fmt='(a)') 'hirs2.bufr'
@@ -125,7 +111,6 @@ CALL wrf_oi(__FILE__,__LINE__)
          endif
 
          if(use_MsuObs) then
-CALL wrf_oi(__FILE__,__LINE__)
             filename = ' '
             write(UNIT=stdout,FMT='(a)')  ' Reading radiance 1b data from msu.bufr'
             write(UNIT=filename(1:8), fmt='(a)') 'msu.bufr'
@@ -140,7 +125,6 @@ CALL wrf_oi(__FILE__,__LINE__)
          endif
 
          if(use_AmsuaObs) then
-CALL wrf_oi(__FILE__,__LINE__)
             write(UNIT=stdout,FMT='(a)')  ' Reading radiance 1b data from amsua.bufr'
             filename = ' '
             write(UNIT=filename(1:10), fmt='(a)') 'amsua.bufr'
@@ -176,7 +160,6 @@ CALL wrf_oi(__FILE__,__LINE__)
          endif
 
          if(use_kma1dvar) then
-CALL wrf_oi(__FILE__,__LINE__)
            do i=1,rtminit_nsensor
             filename = ' '
             filename='kma1dvar-'//trim(iv%instid(i)%rttovid_string)//'.inv'
@@ -184,10 +167,8 @@ CALL wrf_oi(__FILE__,__LINE__)
             call da_read_kma1dvar (i,iv, ob, xp, inunit, filename)
            end do
          endif
-CALL wrf_oi(__FILE__,__LINE__)
 
    endif
-CALL wrf_oi(__FILE__,__LINE__)
 
 !-----------------------------------------------------------------------------
 !  [3.0] create (smaller) ob structure:
@@ -196,7 +177,6 @@ CALL wrf_oi(__FILE__,__LINE__)
 !   CALL da_fill_obs_structures( iv, ob )   ! problem of cross 'use' with da_obs
 
  if (.not. use_kma1dvar) then
-CALL wrf_oi(__FILE__,__LINE__)
 
    do i = 1,  ob % num_inst
       ob % instid(i) % num_rad = iv % instid(i) % num_rad
@@ -218,7 +198,6 @@ CALL wrf_oi(__FILE__,__LINE__)
    end do
 
  end if
-CALL wrf_oi(__FILE__,__LINE__)
 
    iv%current_ob_time = 1
 
@@ -247,7 +226,6 @@ if ( lprinttovs ) then
                         ' index-of-channels : ', iv%instid(n)%ichan
     write(UNIT=innov_vector_unit,FMT='(A)') &
       ' pixel-info: i date scanpos landsea_mask  elv lat lon  satzen satazi '                   
-CALL wrf_oi(__FILE__,__LINE__)
   do i =1,iv%instid(n)%num_rad
     write(UNIT=innov_vector_unit,FMT='(a,i7,2x,a,2i3,f6.0,4f8.2)') 'info: ', i, &
                              iv%instid(n)%rad(i)%info%date_char, &
@@ -263,7 +241,6 @@ CALL wrf_oi(__FILE__,__LINE__)
   close(UNIT=innov_vector_unit)
  end do
 end if
-CALL wrf_oi(__FILE__,__LINE__)
 
  return
 
