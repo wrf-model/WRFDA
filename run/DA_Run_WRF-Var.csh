@@ -169,6 +169,8 @@ set
  if ( ! $?DA_OMB_ADD_NOISE ) set DA_OMB_ADD_NOISE = .FALSE.
  if ( ! $?DA_TIME_WINDOW )   set DA_TIME_WINDOW = 3.      
  if ( ! $?DA_PRINT_DETAIL )  set DA_PRINT_DETAIL = 0
+ if ( ! $?DA_STDOUT_UNIT )   set DA_STDOUT_UNIT  = 6
+ if ( ! $?DA_STDERR_UNIT )   set DA_STDERR_UNIT  = 0
  if ( ! $?DA_WRITE_SWITCH )  set DA_WRITE_SWITCH = .FALSE.
  if ( ! $?DA_WRITE_INTERVAL )set DA_WRITE_INTERVAL = 5
  if ( ! $?DA_WRITE_QCW )     set DA_WRITE_QCW = .FALSE.
@@ -206,6 +208,22 @@ set
  if ( ! $?DA_VERT_CORR )     set DA_VERT_CORR = 2
  if ( ! $?DA_VERTICAL_IP )   set DA_VERTICAL_IP = 0
  if ( ! $?DA_VERT_EVALUE )   set DA_VERT_EVALUE = 1
+
+ if ( ! $?DA_RTMINIT_PRINT )  set DA_RTMINIT_PRINT = 3
+ if ( ! $?DA_RTMINIT_NSENSOR )  set DA_RTMINIT_NSENSOR = 2
+ if ( ! $?DA_RTMINIT_PLATFORM )  set DA_RTMINIT_PLATFORM = 1,1
+ if ( ! $?DA_RTMINIT_SATID )  set DA_RTMINIT_SATID = 15,16
+ if ( ! $?DA_RTMINIT_SENSOR )  set DA_RTMINIT_SENSOR = 3,3
+ if ( ! $?DA_USE_KMA1DVAR )  set DA_USE_KMA1DVAR = .FALSE.
+ if ( ! $?DA_LMONITORING )  set DA_LMONITORING = .FALSE.
+ if ( ! $?DA_LREAD_BIASCOEF )  set DA_LREAD_BIASCOEF = .TRUE.
+ if ( ! $?DA_LBIASCORR )  set DA_LBIASCORR = .FALSE.
+ if ( ! $?DA_LRTTOV_SCATT )  set DA_LRTTOV_SCATT = .FALSE.
+ if ( ! $?DA_LWRITE_IV )  set DA_LWRITE_IV = .TRUE.
+ if ( ! $?DA_LWRITE_PROFILE )  set DA_LWRITE_PROFILE = .TRUE.
+ if ( ! $?DA_USE_LANDEM )  set DA_USE_LANDEM = .FALSE.
+ if ( ! $?DA_MW_EMIS_SEA )  set DA_MW_EMIS_SEA = 1
+
  if ( ! $?DA_NUM_PSEUDO ) set DA_NUM_PSEUDO = 0
  if ( ! $?DA_PSEUDO_X ) set DA_PSEUDO_X = 165.0
  if ( ! $?DA_PSEUDO_Y ) set DA_PSEUDO_Y =  65.0
@@ -255,9 +273,9 @@ ln -s ../*bias .
 ln -s ../*tbl .
 ln -s ../*info .
 ln -s ../*bufr .
-ln -s ../gribmap.txt .
 ln -s $DA_RTTOV_COEFFS/* .
 
+ cp $WRFVAR_DIR/run/gribmap.txt .
  cp $WRFVAR_DIR/run/LANDUSE.TBL .
  cp $WRFVAR_DIR/main/wrfvar.exe  wrfvar.exe
 
@@ -281,7 +299,9 @@ cat >! namelist.3dvar << EOF
  MODEL_TYPE = '$DA_MODEL_TYPE',
  WRITE_INCREMENTS = $DA_WRITE_INCREMENTS ,
  GLOBAL           = $DA_GLOBAL,
- PRINT_DETAIL   = $DA_PRINT_DETAIL /
+ PRINT_DETAIL     = $DA_PRINT_DETAIL,
+ STDOUT_UNIT      = $DA_STDOUT_UNIT,
+ STDERR_UNIT      = $DA_STDERR_UNIT /
 
 &record2
  ANALYSIS_TYPE = '$DA_ANALYSIS_TYPE',
@@ -402,21 +422,20 @@ sfc_assi_options = $DA_SFC_ASSI_OPTIONS,
  max_vert_var5  = $DA_MAX_VERT_VAR5 /
 
 &record14
- rtminit_errunit     = 99,
- rtminit_print       = 3,
- rtminit_nsensor     = 2,
- rtminit_platform    =  1,1,
- rtminit_satid       =  15,16,
- rtminit_sensor      =  3,3,
- use_kma1dvar        = .false.,
- lmonitoring         = .false.,
- lread_biascoef      = .true.,
- lbiascorr           = .false.,
- lrttov_scatt        = .false.,
- lwrite_iv           = .true.,
- lwrite_profile      = .true.,
- use_landem          = .false.,
- mw_emis_sea         = 1 /
+ rtminit_print       = $DA_RTMINIT_PRINT,
+ rtminit_nsensor     = $DA_RTMINIT_NSENSOR2,
+ rtminit_platform    = $DA_RTMINIT_PLATFORM,
+ rtminit_satid       = $DA_RTMINIT_SATID,
+ rtminit_sensor      = $DA_RTMINIT_SENSOR,
+ use_kma1dvar        = $DA_USE_KMA1DVAR,
+ lmonitoring         = $DA_LMONITORING,
+ lread_biascoef      = $DA_LREAD_BIASCOEF,
+ lbiascorr           = $DA_LBIASCORR,
+ lrttov_scatt        = $DA_LRTTOV_SCATT,
+ lwrite_iv           = $DA_LWRITE_IV,
+ lwrite_profile      = $DA_LWRITE_PROFILE,
+ use_landem          = $DA_USE_LANDEM,
+ mw_emis_sea         = $DA_MW_EMIS_SEA/
  
 &pseudo_ob_nl
  num_pseudo     = $DA_NUM_PSEUDO, 
@@ -562,20 +581,27 @@ EOF
 #Run WRF-Var:
 #-------------------------------------------------------------------
 
-#PC-Linux:
-#if ( $NUM_PROCS > 1  )then
-# cp $WRFVAR_DIR/run/hosts .
-#   mpirun -v -np ${NUM_PROCS} -nolocal -machinefile hosts ./wrfvar.exe >&! /dev/null
-#else
-#   mpirun -v -np 1 ./wrfvar.exe >&! /dev/null #Assumes compile in DM mode.
-#endif
+
+PLATFORM=`uname`
+
+if ( $PLATFORM == "Linux" ) then
+  if ( $NUM_PROCS > 1 ) then
+    cp $DAT_DIR/hosts .
+    mpirun -v -np ${NUM_PROCS} -nolocal -machinefile hosts ./wrfvar.exe
+  else
+    mpirun -v -np 1 ./wrfvar.exe > /dev/null #Assumes compile in DM mode.
+  endif
+endif
 
 #DEC:
-./wrfvar.exe >&! wrfvar.out
+#./wrfvar.exe > wrfvar.out
 
-#IBM (llsubmit):
-#poe ./wrfvar.exe
-#mpirun -np ${NUM_PROCS} ./wrfvar.exe
+if ( $PLATFORM == "AIX" ) then
+  #IBM (llsubmit):
+  #poe ./wrfvar.exe
+  #mpirun -np ${NUM_PROCS} ./wrfvar.exe
+  ./wrfvar.exe > wrfvar.out
+endif
 
 cp fort.12 DAProg_WRF-Var.statistics >&! /dev/null
 cp fort.81 DAProg_WRF-Var.cost_fn >&! /dev/null

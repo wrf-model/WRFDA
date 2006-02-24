@@ -26,21 +26,6 @@
 #PBS -V -A sfmlidar
 #PBS -lnodes=4:comp -lwalltime=1000
 #Uncomment for JET: source /usr/local/bin/setup-mpi.csh
-#-----------------------------------------------------------------------
-# Script DA_Run_WRF-Var.csh
-#
-# Purpose: Top level script for running the WRF-Var system
-#
-# Method:  1) Set up links to run directory.
-#          2) Run WRF-Var in run directory.
-#
-# History: 11/16/99  Original version. Dale Barker
-#          12/01/99  Modifications to defaults and names. Dale Barker
-#          10/14/03  Modifications to defaults for WRF 3DVAR. Wei Huang
-#          06/06/05  Modifications for Polar & Geo AMV's      Syed RH Rizvi
-#          07/15/05  Tidy up prior to WRF V2.1 release, rename DA_Run_WRF-Var.csh. Dale Barker
-#
-#-----------------------------------------------------------------------
 
 export MP_SHARED_MEMORY=yes
 
@@ -216,7 +201,7 @@ export DA_VERT_CORR=${DA_VERT_CORR:-2}
 export DA_VERTICAL_IP=${DA_VERTICAL_IP:-0}
 export DA_VERT_EVALUE=${DA_VERT_EVALUE:-1}
 
-export DA_rtminit_print=${DA_rtminit_print:-3}
+export DA_RTMINIT_PRINT=${DA_RTMINIT_PRINT:-3}
 export DA_RTMINIT_NSENSOR=${DA_RTMINIT_NSENSOR:-2}
 export DA_RTMINIT_PLATFORM=${DA_RTMINIT_PLATFORM:-1,1}
 export DA_RTMINIT_SATID=${DA_RTMINIT_SATID:-15,16}
@@ -280,9 +265,9 @@ ln -s ../*bias .
 ln -s ../*tbl .
 ln -s ../*info .
 ln -s ../*bufr .
-ln -s ../gribmap.txt .
 ln -s $DA_RTTOV_COEFFS/* .
 
+cp $WRFVAR_DIR/run/gribmap.txt .
 cp $WRFVAR_DIR/run/LANDUSE.TBL .
 cp $WRFVAR_DIR/main/wrfvar.exe  wrfvar.exe
 
