@@ -28,7 +28,7 @@ makelib: .FORCE
 
 io_grib1.o:     io_grib1.F 
 	$(CPP) $(CPPFLAGS) -I../../main io_grib1.F -I. | $(M4) - > io_grib1.f
-	$(FC) $(FCFLAGS) -I../../main -I../../inc -I. -c io_grib1.f
+	$(FC) $(FCFLAGS) -I../../main -I../../inc -I../ioapi_share -I. -c io_grib1.f
 
 test_write_grib: test_write_grib.c grib1_routines.c gridnav.c gribmap.c open_file.c trim.c
 	$(CC) $(CFLAGS) -g test_write_grib.c grib1_routines.c gridnav.c gribmap.c open_file.c trim.c \

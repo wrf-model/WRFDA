@@ -22,7 +22,7 @@ MODULE module_ext_mcel
   INTEGER, DIMENSION(512, int_num_handles)  :: open_file_descriptors
   INCLUDE "MCEL.inc"
   INCLUDE 'intio_tags.h'
-  INCLUDE 'wrf_io_flags.h'
+#include <wrf_io_flags.h>
   INCLUDE 'wrf_status_codes.h'
   CHARACTER*80  LAT_R(int_num_handles), LON_R(int_num_handles), LANDMASK_I(int_num_handles)
 

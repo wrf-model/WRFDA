@@ -30,8 +30,7 @@ wrfio_nf :
 	( cd ../external/io_netcdf ; \
         make NETCDFPATH=$(NETCDFPATH) CPP="$(CPP) $(TRADFLAG)" \
 	RANLIB="$(RANLIB)" \
-	FC="$(FC)" FCFLAGS="$(FCDEBUG) $(FCFORM) $(FCBASE) -w" TRADFLAG="$(TRADFLAG)" ; \
-	/bin/cp wrf_io_flags.h wrf_status_codes.h ../../inc )
+	FC="$(FC)" FCFLAGS="$(FCDEBUG) $(FCFORM) $(FCBASE) -w" TRADFLAG="$(TRADFLAG)" )
 
 wrfio_int : 
 	( cd ../external/io_int ; \

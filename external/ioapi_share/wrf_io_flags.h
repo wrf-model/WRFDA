@@ -2,8 +2,12 @@
       integer, parameter  :: WRF_FILE_OPENED_NOT_COMMITTED        = 101
       integer, parameter  :: WRF_FILE_OPENED_FOR_WRITE            = 102
       integer, parameter  :: WRF_FILE_OPENED_FOR_READ             = 103
+#if (RWORDSIZE != 8) 
       integer, parameter  :: WRF_REAL                             = 104
-      integer, parameter  :: WRF_DOUBLE               = 105
+#else      
+      integer, parameter  :: WRF_REAL                             = 105
+#endif      
+      integer, parameter  :: WRF_DOUBLE                           = 105
       integer, parameter  :: WRF_INTEGER                          = 106
       integer, parameter  :: WRF_LOGICAL                          = 107
       integer, parameter  :: WRF_COMPLEX                          = 108

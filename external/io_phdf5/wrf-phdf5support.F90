@@ -45,7 +45,7 @@ module wrf_phdf5_data
   integer                , parameter      :: MemOrdLen        = 3
   character (DateStrLen) , parameter      :: ZeroDate = '0000-00-00-00:00:00'
 
-  include 'wrf_io_flags.h'
+#include <wrf_io_flags.h>
 ! This is a hack.  WRF IOAPI no longer supports WRF_CHARACTER.  Rip this out!  
   integer, parameter  :: WRF_CHARACTER                        = 1080
 

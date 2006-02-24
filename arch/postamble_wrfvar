@@ -1,4 +1,6 @@
 #
+ARCHFLAGS       =       $(ARCHFLAGS1) $(ARCHFLAGS2) $(ARCHFLAGS3)
+CFLAGS          =       $(ARCHFLAGS) $(ARCHFLAGS4)
 LIB		=	$(NETCDF_LIB) $(RTTOV_LIB) $(MPI_LIB) $(LOCAL_LIB) $(WRF_LIB)
 EXTRAMODULES    =
 FCBASEOPTS      =       $(FCTYPE) $(FCBASE) $(FCFORM) $(FCHOST) $(FCDEBUG) -I.
@@ -9,8 +11,7 @@ INCLUDE_MODULES =       -I../da_3dvar -I../da_3dvar/src \
                         -I../external/esmf_time_f90 \
                         -I../frame -I../share -I../phys -I../inc
 
-REGISTRY        =       Registry
-CPPFLAGS        =       -I$(LIBINCLUDE) -C -P $(ARCHFLAGS) $(ENVCOMPDEFS) \
+CPPFLAGS        =       $(LIBINCLUDE) -C -P $(ARCHFLAGS) $(ENVCOMPDEFS) \
 			$(DM_1_CPP_FLAGS) $(COREDEFS) $(POUND_DEF)
 
 INC_MOD_3DVAR   =       -I../../$(NETCDF_IO_PATH) \
@@ -23,19 +24,14 @@ FCFLAGS_FFT_RF  =       $(FCOPTIM) $(FC_FFT_RF_OPTS)
 F77FLAGS_BUFR   =       $(FCTYPE) $(FCBUFR) $(FCHOST) $(FCDEBUG) -I.
 F77FLAGS_3DVAR  =       $(FCTYPE) $(FCBASE) $(FCHOST) $(FCDEBUG) -I.
 CPPFLAGS_3DVAR  =       $(DM_2_CPP_FLAGS) \
-                        -I$(LIBINCLUDE) -I../../inc -C -P $(ARCHFLAGS) $(POUND_DEF) $(WRFVAR)
+                        $(LIBINCLUDE) -C -P $(ARCHFLAGS) $(POUND_DEF) $(WRFVAR)
 FUFLAGS         =       $(FCOPTIM) $(FCBASE) $(FCFORM) $(FCDEBUG)
 
 wrfio_nf : 
 	( cd ../external/io_netcdf ; \
         make NETCDFPATH=$(NETCDFPATH) CPP="$(CPP)" \
 	RANLIB="$(RANLIB)" \
-	FC="$(FC)" FCFLAGS="$(FCDEBUG) $(FCFORM) $(FCBASE) -w" TRADFLAG="$(TRADFLAG)" ; \
-	if [ $(RWORDSIZE) -eq 8 ] ; then \
-	/bin/rm -f foo_io_flags.h; \
-	sed -e 's/104/105/' wrf_io_flags.h > foo_io_flags.h ;\
-	/bin/mv foo_io_flags.h wrf_io_flags.h ; fi ; \
-	/bin/cp wrf_io_flags.h wrf_status_codes.h ../../inc )
+	FC="$(FC)" FCFLAGS="$(FCDEBUG) $(FCFORM) $(FCBASE) -w" TRADFLAG="$(TRADFLAG)" )
 
 wrfio_int : 
 	( cd ../external/io_int ; \
@@ -45,10 +41,10 @@ wrfio_int :
 
 wrfio_grib1 :
 	( cd ../external/io_grib1 ; \
-        make CPP="$(CPP)" \
+        make CPP="$(CPP)" CPPFLAGS="$(CPPFLAGS)"\
 	RANLIB="$(RANLIB)" \
 	CC="$(CC)" CFLAGS="$(CFLAGS)" \
-	FC="$(FC)" FCFLAGS="$(FCDEBUG) -I. $(FCFORM) $(FCBASE)" )
+	FC="$(FC)" FCFLAGS="$(FCDEBUG) $(LIBINCLUDE) $(FCFORM) $(FCBASE)" )
 
 esmf_time : 
 	( cd ../external/esmf_time_f90 ; \
@@ -85,8 +81,9 @@ module_configure.o mediation_interp_domain.o                   \
 mediation_force_domain.o mediation_feedback_domain.o           \
 module_initialize_real.o module_dm.o start_domain.o :
 	$(RM) $@
+#JRB SED does nothing much useful
 	$(SED_FTN) $*.F > $*.b 
-	$(CPP) -I../inc $(CPPFLAGS) $*.b  > $*.f
+	$(CPP) $(CPPFLAGS) $*.b  > $*.f
 	$(RM) $*.b
 	$(FC) -c $(FCBASEOPTS) $(MODULE_DIRS) -O0 $*.f
 
@@ -95,21 +92,22 @@ module_initialize_real.o module_dm.o start_domain.o :
 
 .F.i:
 	@ $(RM) $@
-	  $(CPP) -I../inc $(CPPFLAGS) $*.F > $@
+	  $(CPP) $(CPPFLAGS) $*.F > $@
 	@ $(MV) $*.i $(DEVTOP)/pick/$*.f
 	@ $(CP) $*.F $(DEVTOP)/pick
 
 .F.o:
 	@ $(RM) $@
+# JRB sed slows things up too much, and does nothing vital
 	@ $(SED_FTN) $*.F > $*.b
-	  $(CPP) -I../inc $(CPPFLAGS) $*.b  > $*.f
+	  $(CPP) $(CPPFLAGS) $*.b  > $*.f
 	@ $(RM) $*.b
 	  $(FC) -c $(FCFLAGS) $(MODULE_DIRS) $*.f
 
 .F.f:
 	@ $(RM) $@
 	@ $(SED_FTN) $*.F > $*.b 
-	  $(CPP) -I../inc $(CPPFLAGS) $*.b > $*.f
+	  $(CPP) $(CPPFLAGS) $*.b > $*.f
 	@ $(RM) $*.b
 
 .f.o:

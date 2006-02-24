@@ -57,7 +57,7 @@ CONTAINS
 !</DESCRIPTION>
     USE module_state_description
     IMPLICIT NONE
-    INCLUDE 'wrf_io_flags.h'
+#include <wrf_io_flags.h>
     INTEGER , INTENT(IN)  :: DataHandle, io_form_arg
     INTEGER               :: ii,ds1,de1,ds2,de2,ds3,de3
     INTEGER               :: Comm, IOComm, DomainDesc ! dummy
@@ -317,7 +317,7 @@ END MODULE module_quilt_outbuf_ops
 !</DESCRIPTION>
     USE module_quilt_outbuf_ops
     IMPLICIT NONE
-    INCLUDE 'wrf_io_flags.h'
+#include <wrf_io_flags.h>
     INTEGER ,                INTENT(IN) :: FieldType
     REAL    , DIMENSION(*) , INTENT(IN) :: inbuf_r
     INTEGER , DIMENSION(*) , INTENT(IN) :: inbuf_i

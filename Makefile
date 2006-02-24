@@ -285,7 +285,7 @@ framework :
 	@ echo '--------------------------------------'
 	( cd frame ; $(MAKE) framework; \
 	cd ../external/io_netcdf ; make NETCDFPATH="$(NETCDFPATH)" FC="$(FC) $(FCBASEOPTS)" RANLIB="$(RANLIB)" CPP="$(CPP) -DRWORDSIZE=$(RWORDSIZE) -DDWORDSIZE=$(DWORDSIZE)" diffwrf; \
-	cd ../io_grib1 ; make FC="$(FC) -I. $(FCBASEOPTS)" CC="$(CC)" CFLAGS="$(CFLAGS)" RANLIB="$(RANLIB)" CPP="$(CPP)"; \
+	cd ../io_grib1 ; make FC="$(FC) -I. $(FCBASEOPTS)" CC="$(CC)" CFLAGS="$(CFLAGS)" RANLIB="$(RANLIB)" CPP="$(CPP)" CPPFLAGS="$(CPPFLAGS)"; \
 	cd ../io_int ; $(MAKE) FC="$(FC) $(FCBASEOPTS)" RANLIB="$(RANLIB)" CPP="$(CPP)" diffwrf ; cd ../../frame )
 
 shared :

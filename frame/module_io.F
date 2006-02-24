@@ -2432,7 +2432,7 @@ SUBROUTINE collect_fld_and_call_pkg (    fcn, donotcollect_arg,                 
 !</PRE>
 !</DESCRIPTION>
   IMPLICIT NONE
-  include 'wrf_io_flags.h'
+#include <wrf_io_flags.h>
   EXTERNAL fcn
   LOGICAL,        INTENT(IN)    :: donotcollect_arg
   INTEGER ,       INTENT(IN)    :: Hndl
@@ -2766,7 +2766,7 @@ SUBROUTINE collect_generic_and_call_pkg ( fcn, globbuf,                         
   USE module_state_description
   USE module_driver_constants
   IMPLICIT NONE
-  include 'wrf_io_flags.h'
+#include <wrf_io_flags.h>
 #if defined( DM_PARALLEL ) && ! defined(STUBMPI)
 include "mpif.h"
 #endif
@@ -3152,7 +3152,7 @@ SUBROUTINE call_pkg_and_dist (       fcn, donotdist_arg, update_arg,            
 !</PRE>
 !</DESCRIPTION>
   IMPLICIT NONE
-  include 'wrf_io_flags.h'
+#include <wrf_io_flags.h>
   EXTERNAL fcn
   LOGICAL,        INTENT(IN)    :: donotdist_arg, update_arg  ! update means collect old field update it and dist
   INTEGER ,       INTENT(IN)    :: Hndl
