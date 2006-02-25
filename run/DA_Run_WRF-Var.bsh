@@ -594,9 +594,9 @@ if test $PLATFORM == "AIX"; then
   ./wrfvar.exe > wrfvar.out
 fi
 
-cp fort.12 DAProg_WRF-Var.statistics
-cp fort.81 DAProg_WRF-Var.cost_fn
-cp fort.82 DAProg_WRF_Var.grad_fn
+cp fort.12 statistics
+cp fort.81 cost_fn
+cp fort.82 grad_fn
 
 echo "WRF-Var completed"
 
