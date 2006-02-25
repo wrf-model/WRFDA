@@ -25,14 +25,14 @@ SUBROUTINE DA_Check_Balance( phi, phi_u )
    REAL, ALLOCATABLE            :: accuracy(:,:)   ! Accuracy.
           
    IF ( balance_type == balance_geo ) THEN
-      write(unit=*, fmt='(a)') ' DA_Check_Balance: Balance is geostrophic.'
+      write(UNIT=stdout, fmt='(a)') ' DA_Check_Balance: Balance is geostrophic.'
    ELSE IF ( balance_type == balance_cyc ) THEN
-      write(unit=*, fmt='(a)') ' DA_Check_Balance: Balance is cyclostrophic.'
+      write(UNIT=stdout, fmt='(a)') ' DA_Check_Balance: Balance is cyclostrophic.'
    ELSE IF ( balance_type == balance_geocyc ) THEN
-      write(unit=*, fmt='(a)') ' DA_Check_Balance: Balance is geo/cyclostrophic.'
+      write(UNIT=stdout, fmt='(a)') ' DA_Check_Balance: Balance is geo/cyclostrophic.'
    END IF
       
-   write(unit=*, fmt='(a)') ' DA_Check_Balance: Correlation/accuracy: '
+   write(UNIT=stdout, fmt='(a)') ' DA_Check_Balance: Correlation/accuracy: '
       
 !-------------------------------------------------------------------------
 !  [1.0]: Initialise:
@@ -71,7 +71,7 @@ SUBROUTINE DA_Check_Balance( phi, phi_u )
                                    phi(2:iy-1,2:jx-1,k), &
                                    corr_coef, accurac )
 
-      write(unit=*, fmt='(i6,1pe9.2,1pe9.2)') &
+      write(UNIT=stdout, fmt='(i6,1pe9.2,1pe9.2)') &
             k, corr_coef, accurac
 
    end do

@@ -17,7 +17,7 @@ SUBROUTINE DA_OI_Stats_SSMI_Tb ( stats_unit, oi )
    LOGICAL, EXTERNAL :: wrf_dm_on_monitor
 !----------------------------------------------------------------------------
 
-   WRITE(0,'(A)')'DA_OI_Stats_SSMI_Tb. '
+   WRITE(UNIT=stderr,FMT='(A)')'DA_OI_Stats_SSMI_Tb. '
 
    ntb19v = 0
    ntb19h = 0

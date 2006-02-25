@@ -90,26 +90,26 @@ subroutine da_write_analysis_mm5( ix, jy, kz, xp, xb, xa, it )
 
    nv = 1
 
-   rewind(jpin)
+   rewind(UNIT=jpin)
    
 !--Loop through headers to find the right time.
 
    time_loop: do
-      read(jpin, iostat=ier) flag
+      read(UNIT=jpin, iostat=ier) flag
 
       if(ier/=0) then
-         write(unit=0,fmt='(a)') 'Error reading header flag'
-         call abort()
+        CALL wrf_error_fatal3(__FILE__,__LINE__, &
+          "Error reading header flag")
       endif
 
       if (flag == 0) then
-         read(jpin, iostat=ier) xb_mm5 % big_header % bhi, &
+         read(UNIT=jpin, iostat=ier) xb_mm5 % big_header % bhi, &
                                 xb_mm5 % big_header % bhr,&
                                 xb_mm5 % big_header % bhic, &
                                 xb_mm5 % big_header % bhrc
          if(ier/=0) then
-            write(0,'("Error reading big header")')
-            call abort()
+           CALL wrf_error_fatal3(__FILE__,__LINE__, &
+             "Error reading big header")
          endif
 
          if(print_info) &
@@ -118,7 +118,7 @@ subroutine da_write_analysis_mm5( ix, jy, kz, xp, xb, xa, it )
          big_head_flag = flag
       elseif (flag == 1) then
 
-         read(jpin,iostat=ier) &
+         read(UNIT=jpin,iostat=ier) &
               xb_mm5%sub_header(nv)%ndim, &
               xb_mm5%sub_header(nv)%start_index, &
               xb_mm5%sub_header(nv)%end_index, &
@@ -131,8 +131,8 @@ subroutine da_write_analysis_mm5( ix, jy, kz, xp, xb, xa, it )
               xb_mm5%sub_header(nv)%description
 
          if(ier/=0) then
-            write(0,'("Error reading subheader")')
-            call abort()
+           CALL wrf_error_fatal3(__FILE__,__LINE__, &
+             "Error reading subheader")
          endif
 
          if(print_info) then
@@ -154,14 +154,14 @@ subroutine da_write_analysis_mm5( ix, jy, kz, xp, xb, xa, it )
                        xb_mm5%sub_header(nv)%start_index(3):xb_mm5%sub_header(nv)%end_index(3), &
                        xb_mm5%sub_header(nv)%start_index(4):xb_mm5%sub_header(nv)%end_index(4)))
 
-         read(jpin,iostat=ier) data
+         read(UNIT=jpin,iostat=ier) data
 
          deallocate(data)
 
       elseif (flag == 2) then
          cycle
       else
-         stop
+        CALL wrf_error_fatal3(__FILE__,__LINE__, "??")
       endif
    enddo time_loop
 
@@ -172,31 +172,31 @@ subroutine da_write_analysis_mm5( ix, jy, kz, xp, xb, xa, it )
 
 !-----Four-digit year of start time
 
-      read(ANALYSIS_DATE( 1:04), fmt='(I4)') xb_mm5 % big_header % bhi( 5, 5)
+      read(UNIT=ANALYSIS_DATE( 1:04), fmt='(I4)') xb_mm5 % big_header % bhi( 5, 5)
 
 !-----Month of the year of the start time (1-12)
 
-      read(ANALYSIS_DATE( 6:07), fmt='(I2)') xb_mm5 % big_header % bhi( 6, 5)
+      read(UNIT=ANALYSIS_DATE( 6:07), fmt='(I2)') xb_mm5 % big_header % bhi( 6, 5)
 
 !-----Day of the month of the start time (1-31)
 
-      read(ANALYSIS_DATE( 9:10), fmt='(I2)') xb_mm5 % big_header % bhi( 7, 5)
+      read(UNIT=ANALYSIS_DATE( 9:10), fmt='(I2)') xb_mm5 % big_header % bhi( 7, 5)
 
 !-----Hour of the day of the start time (0-23)
 
-      read(ANALYSIS_DATE(12:13), fmt='(I2)') xb_mm5 % big_header % bhi( 8, 5)
+      read(UNIT=ANALYSIS_DATE(12:13), fmt='(I2)') xb_mm5 % big_header % bhi( 8, 5)
 
 !-----Minute of the start time (0-59)
 
-      read(ANALYSIS_DATE(15:16), fmt='(I2)') xb_mm5 % big_header % bhi( 9, 5)
+      read(UNIT=ANALYSIS_DATE(15:16), fmt='(I2)') xb_mm5 % big_header % bhi( 9, 5)
 
 !-----Second of the start time (0-59)
 
-      read(ANALYSIS_DATE(18:19), fmt='(I2)') xb_mm5 % big_header % bhi(10, 5)
+      read(UNIT=ANALYSIS_DATE(18:19), fmt='(I2)') xb_mm5 % big_header % bhi(10, 5)
 
 !-----Ten thousandths of a second of the start time (0-9999)
 
-      read(ANALYSIS_DATE(21:24), fmt='(I4)') xb_mm5 % big_header % bhi(11, 5)
+      read(UNIT=ANALYSIS_DATE(21:24), fmt='(I4)') xb_mm5 % big_header % bhi(11, 5)
 
 !     do len=1,xb_mm5 % num_of_var
 !        xb_mm5 % sub_header(len) % current_time = 0.0           ! Forecast time=0
@@ -211,9 +211,9 @@ subroutine da_write_analysis_mm5( ix, jy, kz, xp, xb, xa, it )
 
       open(unit=inc_unit, form='unformatted', status='unknown')
 
-      write(inc_unit) big_head_flag
+      write(UNIT=inc_unit) big_head_flag
 
-      write(inc_unit) xb_mm5%big_header%bhi,  xb_mm5%big_header%bhr, &
+      write(UNIT=inc_unit) xb_mm5%big_header%bhi,  xb_mm5%big_header%bhr, &
                       xb_mm5%big_header%bhic, xb_mm5%big_header%bhrc
    end if
 
@@ -221,9 +221,9 @@ subroutine da_write_analysis_mm5( ix, jy, kz, xp, xb, xa, it )
 
    open(unit=anl_unit, form='unformatted', status='unknown')
 
-   write(anl_unit) big_head_flag
+   write(UNIT=anl_unit) big_head_flag
 
-   write(anl_unit) xb_mm5%big_header%bhi,  xb_mm5%big_header%bhr, &
+   write(UNIT=anl_unit) xb_mm5%big_header%bhi,  xb_mm5%big_header%bhr, &
                    xb_mm5%big_header%bhic, xb_mm5%big_header%bhrc
 
       ALLOCATE ( u_global (1:ix+1,1:jy+1,1:kz) )
@@ -428,9 +428,9 @@ subroutine da_write_analysis_mm5( ix, jy, kz, xp, xb, xa, it )
          call DA_print_sub_header(xb_mm5%sub_header(n))
       endif
 
-      write(anl_unit) flag
+      write(UNIT=anl_unit) flag
 
-      write(anl_unit) &
+      write(UNIT=anl_unit) &
             xb_mm5%sub_header(n)%ndim, &
             xb_mm5%sub_header(n)%start_index, &
             xb_mm5%sub_header(n)%end_index, &
@@ -443,9 +443,9 @@ subroutine da_write_analysis_mm5( ix, jy, kz, xp, xb, xa, it )
             xb_mm5%sub_header(n)%description
 
       if ( write_increments ) then
-         write(inc_unit) flag
+         write(UNIT=inc_unit) flag
 
-         write(inc_unit) &
+         write(UNIT=inc_unit) &
                xb_mm5%sub_header(n)%ndim, &
                xb_mm5%sub_header(n)%start_index, &
                xb_mm5%sub_header(n)%end_index, &
@@ -463,7 +463,7 @@ subroutine da_write_analysis_mm5( ix, jy, kz, xp, xb, xa, it )
                     xb_mm5%sub_header(nv)%start_index(3):xb_mm5%sub_header(nv)%end_index(3), &
                     xb_mm5%sub_header(nv)%start_index(4):xb_mm5%sub_header(nv)%end_index(4)))
 
-      read(jpin,iostat=ier) data
+      read(UNIT=jpin,iostat=ier) data
 
       if (xb_mm5%sub_header(nv)%name == 'U        ') then
          call add_3d(data, u_global, ix+1, jy+1, kz)
@@ -511,7 +511,7 @@ subroutine da_write_analysis_mm5( ix, jy, kz, xp, xb, xa, it )
          call add_2d(data, tgglobal, ix+1, jy+1)
       end if
 
-      write(anl_unit) data
+      write(UNIT=anl_unit) data
 
       if ( write_increments ) then
          if (xb_mm5%sub_header(nv)%name == 'U        ') then
@@ -551,28 +551,28 @@ subroutine da_write_analysis_mm5( ix, jy, kz, xp, xb, xa, it )
             call add_2d(data, tgglobal, ix+1, jy+1)
          end if
 
-         write(inc_unit) data
+         write(UNIT=inc_unit) data
       end if
 
       deallocate(data)
 
 !-----Read new flag
 
-      read(jpin, iostat=ier) flag
+      read(UNIT=jpin, iostat=ier) flag
 
       if(ier/=0) then
-         write(0,'("Error reading header flag")')
-         call abort()
+        CALL wrf_error_fatal3(__FILE__,__LINE__, &
+          "Error reading header flag")
       endif
 
       if (flag == 0) then
-         read(jpin, iostat=ier) xb_mm5 % big_header % bhi, &
+         read(UNIT=jpin, iostat=ier) xb_mm5 % big_header % bhi, &
                                 xb_mm5 % big_header % bhr,&
                                 xb_mm5 % big_header % bhic, &
                                 xb_mm5 % big_header % bhrc
          if(ier/=0) then
-            write(0,'("Error reading big header")')
-            call abort()
+           CALL wrf_error_fatal3(__FILE__,__LINE__, &
+             "Error reading big header")
          endif
 
          if(print_info) &
@@ -583,14 +583,14 @@ subroutine da_write_analysis_mm5( ix, jy, kz, xp, xb, xa, it )
          nv = nv + 1
 
          if( nv > max_num_of_var) then
-           write(unit=*, fmt='(2(/a))') &
+           write(unit=stdout, fmt='(2(/a))') &
                 'WARNING  WARNING  WARNING  WARNING  WARNING', &
                 'No. of vars exceeded max_num_of_var set in DA_Constants/DA_Constants.F'
-           write(unit=*, fmt='(/a,i4)') &
+           write(unit=stdout, fmt='(/a,i4)') &
                 'nv = ', nv, &
                 'max_num_of_var = ', max_num_of_var
 
-           write(unit=*, fmt='(/a/)') &
+           write(unit=stdout, fmt='(/a/)') &
                 'The New IC written out MAY LOSE variables for MM5.'
 
            nv = max_num_of_var
@@ -609,8 +609,8 @@ subroutine da_write_analysis_mm5( ix, jy, kz, xp, xb, xa, it )
               xb_mm5%sub_header(nv)%description
 
          if(ier/=0) then
-            write(0,'("Error reading subheader")')
-            call abort()
+           CALL wrf_error_fatal3(__FILE__,__LINE__, &
+             "Error reading subheader")
          endif
 
          if(print_info) then
@@ -624,7 +624,7 @@ subroutine da_write_analysis_mm5( ix, jy, kz, xp, xb, xa, it )
 
          exit
       else
-         stop
+        CALL wrf_error_fatal3(__FILE__,__LINE__,"??")
       endif
 
    enddo var_loop
@@ -640,7 +640,7 @@ subroutine da_write_analysis_mm5( ix, jy, kz, xp, xb, xa, it )
       read(terrain_unit, iostat=ier) flag
 
       if(ier/=0) then
-         write(0,'("Error reading terrain header flag")')
+         write(UNIT=stderr) "Error reading terrain header flag"
          exit ter_loop
       endif
 
@@ -650,7 +650,7 @@ subroutine da_write_analysis_mm5( ix, jy, kz, xp, xb, xa, it )
                                         xb_mm5 % big_header % bhic, &
                                         xb_mm5 % big_header % bhrc
          if(ier/=0) then
-            write(0,'("Error reading terrain header flag")')
+            write(UNIT=stderr) "Error reading terrain header flag"
             exit ter_loop
          endif
 
@@ -672,8 +672,8 @@ subroutine da_write_analysis_mm5( ix, jy, kz, xp, xb, xa, it )
               xb_mm5%sub_header(nv)%description
 
          if(ier/=0) then
-            write(0,'("Error reading subheader")')
-            call abort()
+           CALL wrf_error_fatal3(__FILE__,__LINE__, &
+             "Error reading subheader")
          endif
 
          if(print_info) then
@@ -706,9 +706,9 @@ subroutine da_write_analysis_mm5( ix, jy, kz, xp, xb, xa, it )
                call DA_print_big_header(xb_mm5%big_header%bhi, xb_mm5%big_header%bhr, &
                                         xb_mm5%big_header%bhic,xb_mm5%big_header%bhrc)
 
-            write(anl_unit) flag
+            write(UNIT=anl_unit) flag
 
-            write(anl_unit) &
+            write(UNIT=anl_unit) &
                   xb_mm5%sub_header(n)%ndim, &
                   xb_mm5%sub_header(n)%start_index, &
                   xb_mm5%sub_header(n)%end_index, &
@@ -720,12 +720,12 @@ subroutine da_write_analysis_mm5( ix, jy, kz, xp, xb, xa, it )
                   xb_mm5%sub_header(n)%units, &
                   xb_mm5%sub_header(n)%description
 
-            write(anl_unit) data
+            write(UNIT=anl_unit) data
 
             if ( write_increments ) then
-               write(inc_unit) flag
+               write(UNIT=inc_unit) flag
       
-               write(inc_unit) &
+               write(UNIT=inc_unit) &
                      xb_mm5%sub_header(n)%ndim, &
                      xb_mm5%sub_header(n)%start_index, &
                      xb_mm5%sub_header(n)%end_index, &
@@ -737,20 +737,20 @@ subroutine da_write_analysis_mm5( ix, jy, kz, xp, xb, xa, it )
                      xb_mm5%sub_header(n)%units, &
                      xb_mm5%sub_header(n)%description
 
-               write(inc_unit) data
+               write(UNIT=inc_unit) data
             end if
          end if
 
          deallocate(data)
 
       elseif (flag == 2) then
-         write(anl_unit) flag
+         write(UNIT=anl_unit) flag
 
-         if ( write_increments ) write(inc_unit) flag
+         if ( write_increments ) write(UNIT=inc_unit) flag
 
          exit
       else
-         stop
+        CALL wrf_error_fatal3(__FILE__,__LINE__,"??")
       end if
 
    enddo ter_loop
@@ -758,9 +758,9 @@ subroutine da_write_analysis_mm5( ix, jy, kz, xp, xb, xa, it )
    if ( ier /= 0 ) then
       flag = 2
 
-      write(anl_unit) flag
+      write(UNIT=anl_unit) flag
 
-      if ( write_increments ) write(inc_unit) flag
+      if ( write_increments ) write(UNIT=inc_unit) flag
    end if
    END IF
 

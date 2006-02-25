@@ -74,14 +74,14 @@ SUBROUTINE DA_Data_Distribution( ob_name, num_obs, min_val, max_val, &
 !  [3.0] Output statistics:
 !------------------------------------------------------------------------------
    
-   WRITE(0,'(A,A,A,I8)')' Number of ', TRIM( ob_name ), ' obs = ', num_obs
-   WRITE(0,'(A,I8)')' Number with missing data indicator = ',  num_missing
-   WRITE(0,'(A,f12.5,A,I8)')' Number below minimum O-B(', &
+   WRITE(UNIT=stderr,FMT='(A,A,A,I8)')' Number of ', TRIM( ob_name ), ' obs = ', num_obs
+   WRITE(UNIT=stderr,FMT='(A,I8)')' Number with missing data indicator = ',  num_missing
+   WRITE(UNIT=stderr,FMT='(A,f12.5,A,I8)')' Number below minimum O-B(', &
                             min_val-0.5*bin_width, ') = ', num_in_bin(0)
    DO bin = 1, num_bins
-      WRITE(0,'(I4,f12.5,I8)')bin, bin_val(bin), num_in_bin(bin)
+      WRITE(UNIT=stderr,FMT='(I4,f12.5,I8)')bin, bin_val(bin), num_in_bin(bin)
    END DO
-   WRITE(0,'(A,f12.5,A,I8)')' Number above maximum O-B(', &
+   WRITE(UNIT=stderr,FMT='(A,f12.5,A,I8)')' Number above maximum O-B(', &
                             max_val+0.5*bin_width, ') = ', &
                             num_in_bin(num_bins+1)
                                

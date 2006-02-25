@@ -19,13 +19,13 @@
 !     Writes the scalar field a
 
       amax = MAXVAL(abs(a))
-      WRITE(unit=*, fmt='(a, 1pe15.8, 4i8)') &
+      WRITE(UNIT=stdout, fmt='(a, 1pe15.8, 4i8)') &
            'max(a)=', amax, shape(a)
 
-      WRITE(unit=*,fmt='(a, 1pe15.8, a)') &
+      WRITE(UNIT=stdout,fmt='(a, 1pe15.8, a)') &
            'max(a)=', amax, ', i down, j horiz.'
 
-      WRITE(unit=*,fmt='(6x,288i3)') (i,i=1,len2)
+      WRITE(UNIT=stdout,fmt='(6x,288i3)') (i,i=1,len2)
 
 !     Direction indicates the order of the rows of the print out:
 
@@ -41,7 +41,7 @@
 
       if (amax.ne.0.)then
          do j=jstart,jend,jump
-            WRITE(unit=*,fmt='(1x,i5,288i3)') j, (INT(a(j,i)/amax*99.),i=1,len2)
+            WRITE(UNIT=stdout,fmt='(1x,i5,288i3)') j, (INT(a(j,i)/amax*99.),i=1,len2)
          end do
       endif
 

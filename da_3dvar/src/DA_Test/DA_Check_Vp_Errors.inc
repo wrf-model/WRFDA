@@ -38,9 +38,9 @@ SUBROUTINE DA_Check_Vp_Errors( vp1, vp2, kkz, &
                        * diff(its:ite, jts:jte, 1:kkz(1)) ) * inv_size )
      
    IF ( rms_fild == 0.0 ) THEN
-      write(unit=*, fmt='(a)') ' v1 is zero ' 
+      write(unit=stdout, fmt='(a)') ' v1 is zero ' 
    ELSE
-      write(unit=*, fmt='(a,1pe10.4)') &
+      write(unit=stdout, fmt='(a,1pe10.4)') &
            ' v1 RMS error/RMS field = ', rms_diff/rms_fild
    END IF      
 
@@ -57,9 +57,9 @@ SUBROUTINE DA_Check_Vp_Errors( vp1, vp2, kkz, &
                        * diff(its:ite, jts:jte, 1:kkz(2)) ) * inv_size )
      
    IF ( rms_fild == 0.0 ) THEN
-      write(unit=*, fmt='(a)') ' v2 is zero ' 
+      write(unit=stdout, fmt='(a)') ' v2 is zero ' 
    ELSE
-      write(unit=*, fmt='(a,1pe10.4)') &
+      write(unit=stdout, fmt='(a,1pe10.4)') &
            ' v2 RMS error/RMS field = ', rms_diff/rms_fild
    END IF                    
      
@@ -76,9 +76,9 @@ SUBROUTINE DA_Check_Vp_Errors( vp1, vp2, kkz, &
                        * diff(its:ite, jts:jte, 1:kkz(3)) ) * inv_size )
      
    IF ( rms_fild == 0.0 ) THEN
-      write(unit=*, fmt='(a)') ' v3 is zero ' 
+      write(unit=stdout, fmt='(a)') ' v3 is zero ' 
    ELSE
-      write(unit=*, fmt='(a,1pe10.4)') &
+      write(unit=stdout, fmt='(a,1pe10.4)') &
            ' v3 RMS error/RMS field = ', rms_diff/rms_fild
    END IF                        
 
@@ -95,9 +95,9 @@ SUBROUTINE DA_Check_Vp_Errors( vp1, vp2, kkz, &
                        * diff(its:ite, jts:jte, 1:kkz(4)) ) * inv_size )
      
    IF ( rms_fild == 0.0 ) THEN
-      write(unit=*, fmt='(a)') ' v4 is zero ' 
+      write(unit=stdout, fmt='(a)') ' v4 is zero ' 
    ELSE
-      write(unit=*, fmt='(a,1pe10.4)') &
+      write(unit=stdout, fmt='(a,1pe10.4)') &
            ' v4 RMS error/RMS field = ', rms_diff/rms_fild
    END IF    
       
@@ -114,9 +114,9 @@ SUBROUTINE DA_Check_Vp_Errors( vp1, vp2, kkz, &
                        * diff(its:ite, jts:jte, 1:kkz(5)) ) * inv_size )
      
    IF ( rms_fild == 0.0 ) THEN
-      write(unit=*, fmt='(a)') ' v5 is zero ' 
+      write(unit=stdout, fmt='(a)') ' v5 is zero ' 
    ELSE
-      write(unit=*, fmt='(a,1pe10.4)') &
+      write(unit=stdout, fmt='(a,1pe10.4)') &
            ' v5 RMS error/RMS field = ', rms_diff/rms_fild
    END IF    
       

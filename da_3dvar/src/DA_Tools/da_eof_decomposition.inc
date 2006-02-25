@@ -37,9 +37,9 @@ subroutine da_eof_decomposition( kz, bx, e, l )
    call dsyev( 'V', 'U', kz, ecopy, kz, lcopy, work_array, work, info )
    
    if ( info /= 0 ) then
-      write(0,'(A,I4,A)')' da_eof_decomposition: info = ', &
-                         info,' - error in decomposition. Stop.'
-      stop
+     write(UNIT=errmsg(1),FMT='(A,I4)') &
+       "Error in decomposition, info = ", info
+       CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
    end if
    
 !--Swap order of eigenvalues, vectors so 1st is one with most variance:

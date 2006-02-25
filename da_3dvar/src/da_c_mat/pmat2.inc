@@ -268,7 +268,10 @@ SUBROUTINE CLIB(a,m1,m2,mah1,mah2) ! Clip the dead space of the band matrix, a
 INTEGER, INTENT(IN)   :: m1, m2, mah1, mah2
 REAL,    INTENT(INOUT):: a(m1,-mah1:mah2)
 INTEGER               :: j
-IF(m2-m1+mah1 < 0)STOP 'In CLIB; form of band matrix implies redundant rows'
+IF(m2-m1+mah1 < 0) THEN
+  CALL wrf_error_fatal3(__FILE__,__LINE__, &
+    "In CLIB; form of band matrix implies redundant rows")
+END IF
 DO j=1,mah1; a(1:j,-j)=0.; ENDDO; DO j=m2-m1+1,mah2; a(m2-j+1:m1,j)=0.; ENDDO
 END SUBROUTINE CLIB
 !=============================================================================
@@ -277,7 +280,10 @@ SUBROUTINE DCLIB(a,m1,m2,mah1,mah2) ! Real(8) version of clib
 INTEGER, INTENT(IN)   :: m1, m2, mah1, mah2
 REAL(8), INTENT(INOUT):: a(m1,-mah1:mah2)
 INTEGER               :: j
-IF(m2-m1+mah1 < 0)STOP 'In CLIB_D; form of band matrix implies redundant rows'
+IF(m2-m1+mah1 < 0) THEN
+  CALL wrf_error_fatal3(__FILE__,__LINE__, &
+    "In CLIB_D; form of band matrix implies redundant rows")
+END IF
 DO j=1,mah1; a(1:j,-j)=0.; ENDDO; DO j=m2-m1+1,mah2; a(m2-j+1:m1,j)=0.; ENDDO
 END SUBROUTINE DCLIB
 
@@ -297,7 +303,9 @@ REAL,     INTENT(INOUT):: a(0:m1-1,-mah1:mah2)
 !-----------------------------------------------------------------------------
 INTEGER                :: i,i2,jm,jp,jpmax
 !=============================================================================
-IF(mirror2+mah1 > mah2)STOP 'In CAD1B; mah2 insufficient'
+IF(mirror2+mah1 > mah2) THEN
+  CALL wrf_error_fatal3(__FILE__,__LINE__, "In CAD1B; mah2 insufficient")
+END IF
 DO i=0,m1-1; i2=i*2; jpmax=mirror2+mah1-i2; IF(jpmax <= -mah1)EXIT
    DO jm=-mah1,mah2; jp=mirror2-jm-i2; IF(jp <= jm)EXIT
       a(i,jp)=a(i,jp)+a(i,jm) ! Reflect and add
@@ -316,7 +324,9 @@ REAL,     INTENT(INOUT):: a(0:m1-1,-mah1:mah2)
 !-----------------------------------------------------------------------------
 INTEGER                :: i,i2,jm,jp,jpmax
 !=============================================================================
-IF(mirror2+mah1 > mah2)STOP 'In CSB1B; mah2 insufficient'
+IF(mirror2+mah1 > mah2) THEN
+  CALL wrf_error_fatal3(__FILE__,__LINE__,"In CSB1B; mah2 insufficient")
+END IF
 DO i=0,m1-1; i2=i*2; jpmax=mirror2+mah1-i2; IF(jpmax < -mah1)EXIT
    DO jm=-mah1,mah2; jp=mirror2-jm-i2; IF(jp < jm)EXIT
       a(i,jp)=a(i,jp)-a(i,jm) ! Reflect and subtract
@@ -341,7 +351,9 @@ REAL,     INTENT(INOUT):: a(1-m1:0,m1-m2-mah1:m1-m2+mah2)
 INTEGER                :: i,i2,jm,jp,jmmin,nah1,nah2,mirror,j0
 !=============================================================================
 nah1=mah1+m2-m1; nah2=mah2+m1-m2 ! Effective 2nd-index bounds of A
-IF(mirror2-nah1 > -nah2)STOP 'In CAD2B; mah1 insufficient'
+IF(mirror2-nah1 > -nah2) THEN
+  CALL wrf_error_fatal3(__FILE__,__LINE__, "In CAD2B; mah1 insufficient")
+END IF
 DO i=0,1-m1,-1; i2=i*2; jmmin=mirror2-nah2-i2; IF(jmmin >= nah2)EXIT
    DO jp=nah2,nah1,-1; jm=mirror2-jp-i2; IF(jm >= jp)EXIT
       a(i,jm)=a(i,jm)+a(i,jp) ! Reflect and add
@@ -359,7 +371,9 @@ REAL,     INTENT(INOUT):: a(1-m1:0,m1-m2-mah1:m1-m2+mah2)
 INTEGER                :: i,i2,jm,jp,jmmin,nah1,nah2,mirror,j0
 !=============================================================================
 nah1=mah1+m2-m1; nah2=mah2+m1-m2 ! Effective 2nd-index bounds of A
-IF(mirror2-nah1 > -nah2)STOP 'In CSB2B; mah1 insufficient'
+IF(mirror2-nah1 > -nah2) THEN
+  CALL wrf_error_fatal3(__FILE__,__LINE__,"In CSB2B; mah1 insufficient")
+END IF
 DO i=0,1-m1,-1; i2=i*2; jmmin=mirror2-nah2-i2; IF(jmmin > nah2)EXIT
    DO jp=nah2,nah1,-1; jm=mirror2-jp-i2; IF(jm > jp)EXIT
       a(i,jm)=a(i,jm)-a(i,jp) ! Reflect and subtract
@@ -377,9 +391,13 @@ REAL,     INTENT(INOUT):: a(1-m1:0,m1-m2-mah1:m1-m2+mah2)
 INTEGER                :: i,i2,jm,jp,jmmin,nah1,nah2,mirror,j0
 !=============================================================================
 nah1=mah1+m2-m1; nah2=mah2+m1-m2 ! Effective 2nd-index bounds of A
-IF(mirror2-nah1 > -nah2)STOP 'In CEX2B; mah1 insufficient'
+IF(mirror2-nah1 > -nah2) THEN
+  CALL wrf_error_fatal3(__FILE__,__LINE__,"In CEX2B; mah1 insufficient")
+END IF
 mirror=mirror2/2
-IF(mirror*2 /= mirror2)STOP 'In CEX2B; mirror2 is not even'
+IF(mirror*2 /= mirror2) THEN
+  CALL wrf_error_fatal3(__FILE__,__LINE__,"In CEX2B; mirror2 is not even")
+END IF
 DO i=0,1-m1,-1; i2=i*2; jmmin=mirror2-nah2-i2; IF(jmmin >= nah2)EXIT
    j0=mirror-i
    DO jp=nah2,nah1,-1; jm=mirror2-jp-i2; IF(jm >= jp)EXIT
@@ -507,7 +525,9 @@ REAL,     INTENT(INOUT) :: c(m1,-mch1:mch2)
 INTEGER                 :: nch1, nch2, j, k, jpk, i1,i2
 !=============================================================================
 nch1=mah1+mbh1; nch2=mah2+mbh2
-IF(nch1 /= mch1 .OR. nch2 /= mch2)STOP 'In MADBB; dimensions inconsistent'
+IF(nch1 /= mch1 .OR. nch2 /= mch2) THEN
+  CALL wrf_error_fatal3(__FILE__,__LINE__,"In MADBB; dimensions inconsistent")
+END IF
 DO j=-mah1,mah2
    DO k=-mbh1,mbh2; jpk=j+k; i1=MAX(1,1-j); i2=MIN(m1,m2-j)
       c(i1:i2,jpk)=c(i1:i2,jpk)+a(i1:i2,j)*b(j+i1:j+i2,k)
@@ -543,8 +563,8 @@ DO j=1,m
   jp=j+1
   ajj=a(j,0)
   IF(ajj == 0.)THEN
-    PRINT '(" Failure in LDUB:"/" Matrix requires pivoting or is singular")'
-    STOP
+    CALL wrf_error_fatal3(__FILE__,__LINE__, &
+      " Matrix requires pivoting or is singular")
   ENDIF
   ajji=1./ajj
   a(j,0)=ajji
@@ -571,8 +591,8 @@ DO j=1,m
   jp=j+1
   ajj=a(j,0)
   IF(ajj == 0)THEN
-    PRINT '(" Fails in LDUB_d:"/" Matrix requires pivoting or is singular")'
-    STOP
+    CALL wrf_error_fatal3(__FILE__,__LINE__, &
+      " Fails in LDUB_d: Matrix requires pivoting or is singular") 
   ENDIF
   ajji=1./ajj
   a(j,0)=ajji
@@ -616,7 +636,10 @@ DO j=1,m
   jleast=MAX(1,j-mah1)
   jp=j+1
   ajj=a(j,0)
-  IF(ajj == 0.)STOP 'In L1UBB; zero element found in diagonal factor'
+  IF(ajj == 0.) THEN
+    CALL wrf_error_fatal3(__FILE__,__LINE__, &
+      "In L1UBB; zero element found in diagonal factor")
+  END IF
   ajji=1./ajj
   a(j,jleast-j:jmost-j) = ajji * a(j,jleast-j:jmost-j)
   DO i=jp,imost
@@ -642,7 +665,10 @@ DO j=1,m
   jleast=MAX(1,j-mah1)
   jp=j+1
   ajj=a(j,0)
-  IF(ajj == 0)STOP 'In L1UBB_d; zero element found in diagonal factor'
+  IF(ajj == 0) THEN
+     CALL wrf_error_fatal3(__FILE__,__LINE__, &
+       "In L1UBB_d; zero element found in diagonal factor")
+  END IF
   ajji=1./ajj
   a(j,jleast-j:jmost-j) = ajji * a(j,jleast-j:jmost-j)
   DO i=jp,imost
@@ -689,7 +715,10 @@ DO j=1,m
   jleast=MAX(0,j-mah1)
   jp=j+1
   ajj=a(j,0)
-  IF(ajj == 0.)STOP 'In L1UEB; zero element found in diagonal factor'
+  IF(ajj == 0.) THEN
+    CALL wrf_error_fatal3(__FILE__,__LINE__, &
+      "In L1UEB; zero element found in diagonal factor")
+  END IF
   ajji=1./ajj
   a(j,jleast-j:jmost-j) = ajji * a(j,jleast-j:jmost-j)
   DO i=jp,imost
@@ -715,7 +744,10 @@ DO j=1,m
   jleast=MAX(0,j-mah1)
   jp=j+1
   ajj=a(j,0)
-  IF(ajj == 0)STOP 'In L1UEB_D; zero element found in diagonal factor'
+  IF(ajj == 0) THEN
+    CALL wrf_error_fatal3(__FILE__,__LINE__, &
+      "In L1UEB_D; zero element found in diagonal factor")
+  END IF
   ajji=1./ajj
   a(j,jleast-j:jmost-j) = ajji * a(j,jleast-j:jmost-j)
   DO i=jp,imost
@@ -741,8 +773,9 @@ CALL CLIB(b,m,m,mah,0)
 DO j=1,m
    s=a(j,0)-DOT_PRODUCT(b(j,-mah:-1),b(j,-mah:-1))
    IF(s <= 0.)THEN
-      PRINT '(" In L1LB; non-positivity at diagonal index",i5)',j
-      STOP
+     WRITE(UNIT=errmsg(1),FMT='(A,I5)') &
+       "In L1LB; non-positivity at diagonal index",j
+     CALL wrf_error_fatal3(__FILE__,__LINE__, errmsg(1))
    ENDIF
    s=SQRT(s); b(j,0)=s; s=1./s
    DO i=j+1,MIN(m,j+mah); jmi=j-i
@@ -769,8 +802,9 @@ DO j=1,m; lj=MAX(-mah,1-j)
       s=s-b(j,k)**2*d(k+j)
    ENDDO
    IF(s <= 0.)THEN
-      PRINT '(" In LDLB; non-positivity at diagonal index",i5)',j
-      STOP
+     WRITE(UNIT=errmsg(1),FMT='(A,I5)') &
+       "In CLIB; non-positivity at diagonal index",j
+     CALL wrf_error_fatal3(__FILE__,__LINE__, errmsg(1))
    ENDIF
    d(j)=s; s=1./s
    DO i=j+1,MIN(m,j+mah); jmi=j-i; li=MAX(-mah,1-i); lj=li-jmi
@@ -801,8 +835,9 @@ DO j=1,m; lj=MAX(-mah,1-j)
       s=s-b(j,k)**2*d(k+j)
    ENDDO
    IF(s <= 0.)THEN
-      PRINT '(" In LDLB_D; non-positivity at diagonal index",i5)',j
-      STOP
+     WRITE(UNIT=errmsg(1),FMT='(A,I5)') &
+       "In CLIB; non-positivity at diagonal index",j
+     CALL wrf_error_fatal3(__FILE__,__LINE__, errmsg(1))
    ENDIF
    d(j)=s; s=1./s
    DO i=j+1,MIN(m,j+mah); jmi=j-i;  

@@ -54,7 +54,7 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
 
 !------------------------------------------------------------------------------
 
-   write (6, '(/,A,/)') ' ***  VARIATIONAL ANALYSIS ***'
+   CALL wrf_message("***  VARIATIONAL ANALYSIS ***")
 
 !------------------------------------------------------------------------------
 !  [1.0] Read 3DVAR namelist:
@@ -210,9 +210,8 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
    call da_deallocate_cv( xhat )
    call da_deallocate_y( re )
    call da_deallocate_y( y )
-   
-   write(6,'(a)') ' *** 3DVAR completed successfully ***'
-   write(6,*)
+
+   CALL wrf_message("*** 3DVAR completed successfully ***")
 
    CALL wrf_debug ( 200 , ' call end of solve_v3d' )
 

@@ -25,7 +25,7 @@ SUBROUTINE DA_New_Statistics_Variable( diff, xb, xbx, xp, &
 
 !-------------------------------------------------------------------------
 
-   print *, 'cv_options=', cv_options
+   WRITE(UNIT=stdout,FMT='(A,I5)') 'cv_options=', cv_options
 
    coeff(its:ite,jts:jte) = 1.0 / ( xb % map_factor(its:ite,jts:jte) * &
                                        xb % map_factor(its:ite,jts:jte) )
@@ -42,7 +42,7 @@ SUBROUTINE DA_New_Statistics_Variable( diff, xb, xbx, xp, &
                             ims,ime, jms,jme, kms,kme,  &
                             its,ite, jts,jte, kts,kte )
 
-!   write (*,'(a,e20.12)') '1, Vor: diff%vor(10,10,10)=', diff%vor(10,10,10)
+!   write (UNIT=stdout,FMT='(a,e20.12)') '1, Vor: diff%vor(10,10,10)=', diff%vor(10,10,10)
 
 !  Convert vorticity to Del**2 psi:
 
@@ -50,7 +50,7 @@ SUBROUTINE DA_New_Statistics_Variable( diff, xb, xbx, xp, &
      diff%vor(its:ite,jts:jte,k) = coeff(its:ite,jts:jte) * & 
                                    diff%vor(its:ite,jts:jte,k)
    END DO
-!   write (*,'(a,e20.12)') '2, Vor: diff%vor(10,10,10)=', diff%vor(10,10,10)
+!   write (UNIT=stdout,FMT='(a,e20.12)') '2, Vor: diff%vor(10,10,10)=', diff%vor(10,10,10)
 
 !--------------------------------------------------------------------
    CALL DA_Solve_PoissonEqn_FST(xb, xbx, xp, diff%vor, diff%psi,    &

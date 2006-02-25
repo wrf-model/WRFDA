@@ -757,8 +757,8 @@ CASE('8t')
    CALL set_ext(np,0,2,0,N0,L2,N0,w_L_8t)
    CALL set_ext(np,0,2,0,N0,K2,N0,w_K_8t)
 CASE default
-   PRINT '(" In set_cpt_wexts; compact operation code not recognized:")'
-   WRITE(*,*)ch
+   WRITE(UNIT=stderr) &
+     " In set_cpt_wexts; compact operation code not recognized:"//ch
 END SELECT
 
 END SUBROUTINE set_cpt_wexts

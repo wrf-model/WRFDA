@@ -114,9 +114,8 @@ SUBROUTINE FFDDUV (F,D,U,V,YLON,ID)
       ENDIF
 
       CASE DEFAULT
-
-           WRITE (0,'(/,A,I2,/)') ' UNKNOWN OPTION ',ID
-           STOP ' in ffdduv.F'
+        WRITE(UNIT=errmsg(1),FMT='(A,I2)') ' UNKNOWN OPTION ',ID
+        CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
 
     END SELECT
 

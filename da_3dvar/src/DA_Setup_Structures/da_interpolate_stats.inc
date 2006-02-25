@@ -97,7 +97,7 @@ subroutine da_interpolate_stats( kzs, kz, meanp_stats, meanp_xb, &
       
       s(k) = ( 1.0 - weight(k) ) * be_lengthscale(ks) + &
              weight(k) * be_lengthscale(ks+1)
-!      write(0,'(2i4,4f12.5)')k, ks, weight(k), be_lengthscale(ks), &
+!      write(UNIT=stderr,FMT='(2i4,4f12.5)')k, ks, weight(k), be_lengthscale(ks), &
 !                             be_lengthscale(ks+1), s(k)
    end do
 
@@ -240,7 +240,7 @@ subroutine da_interpolate_stats( kzs, kz, meanp_stats, meanp_xb, &
    call da_1d_eigendecomposition( b, e, l )
 
 !   do k1 = 1, kz
-!      write(0,'(i3,4e15.5)')k1, l(k1)
+!      write(UNIT=stderr,FMT='(i3,4e15.5)')k1, l(k1)
 !   end do
    
 !  [5.4] Final elimination of small negative values:

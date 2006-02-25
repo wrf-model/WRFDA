@@ -87,7 +87,7 @@ SUBROUTINE DA_Read_BUFR_Obs (iunit, ob, xp, filename)
            STATUS = 'OLD')
 
       IF (iost /= 0) THEN
-         write(unit=*, fmt='(/A,I3,3(2X,A)/)') &
+         write(UNIT=stdout, fmt='(/A,I3,3(2X,A)/)') &
               'ERROR IN OBS INPUT FILE UNIT ',iunit, &
               'OBS FILENAME:', trim(filename), &
               'FOR GTS OBSERVATIONS CANNOT BE FOUND OR CANNOT BE OPENED'
@@ -111,7 +111,7 @@ SUBROUTINE DA_Read_BUFR_Obs (iunit, ob, xp, filename)
    call readmg(iunit,subset,idate,iret)
 
    if(iret/=0) then
-      write(unit=*, fmt='(a, i4)') &
+      write(UNIT=stdout, fmt='(a, i4)') &
            'return code from readmg:', iret, &
            'Reach the end of obs unit: ', iunit
 
@@ -127,7 +127,7 @@ SUBROUTINE DA_Read_BUFR_Obs (iunit, ob, xp, filename)
          call readmg(iunit,subset,idate,iret)
 
          if(iret/=0) then
-            write(unit=*, fmt='(a, i4)') &
+            write(UNIT=stdout, fmt='(a, i4)') &
                  'return code from readmg:', iret, &
                  'Reach the end of obs unit: ', iunit
 
@@ -193,18 +193,18 @@ SUBROUTINE DA_Read_BUFR_Obs (iunit, ob, xp, filename)
 !-----Conventional data
 
       call ufbint(iunit,pmo,2,1,nlevels,'PMO PMQ')
-!     write(6,*) 'PMO = ',pmo(1,1)
+!     write(UNIT=stdout,FMT=*) 'PMO = ',pmo(1,1)
 
       call ufbint(iunit,obs,9,255,nlevels,obstr)
       call ufbint(iunit,qms,9,255,nlevels,qmstr)
       call ufbint(iunit,oes,9,255,nlevels,oestr)
       if (c8id(1:5) .eq. 'RJOR ') then
 !       if (kx .eq. 180) then
-      write(6,*) 'report, ',c8id(1:5),' typ = ',kx,' nlevels = ',nlevels
+      write(UNIT=stdout,FMT=*) 'report, ',c8id(1:5),' typ = ',kx,' nlevels = ',nlevels
           do ix = 1,nlevels
-            write(6,'(9(f10.4,2x))') (obs(jx,ix),jx=1,9)
-            write(6,'(9(f10.4,2x))') (qms(jx,ix),jx=1,9)
-            write(6,*) 'PMO = ',pmo(1,1)
+            write(UNIT=stdout,FMT='(9(f10.4,2x))') (obs(jx,ix),jx=1,9)
+            write(UNIT=stdout,FMT='(9(f10.4,2x))') (qms(jx,ix),jx=1,9)
+            write(UNIT=stdout,FMT=*) 'PMO = ',pmo(1,1)
           enddo
 !         kx = 180
 !       endif
@@ -266,7 +266,7 @@ SUBROUTINE DA_Read_BUFR_Obs (iunit, ob, xp, filename)
       loop_level: DO k = 1, platform % info % levels
          pob=obs(1,k)
 ! scale q and compute t from tv and set units to Kelvin, if they aren't missing
-!         write(6,*) '--------- k = ',k,' q = ',obs(2,k),' t = ',obs(3,k)
+!         WRITE(UNIT=stdout,FMT=*) '--------- k = ',k,' q = ',obs(2,k),' t = ',obs(3,k)
 
 
 	 if ( obs(2,k) .gt. 0. .and. obs(2,k) .lt. 1e9 ) then   
@@ -277,7 +277,7 @@ SUBROUTINE DA_Read_BUFR_Obs (iunit, ob, xp, filename)
 	 else
 	   if (obs(3,k) .gt. -200. .and. obs(3,k) .lt. 300. ) then
 	     obs(3,k) = obs(3,k) + t_kelvin
-!            write(6,*) '--------- t is now ',obs(3,k)
+!            WRITE(UNIT=stdout,FMT=*) '--------- t is now ',obs(3,k)
 	   endif
 	 endif
          qob=obs(2,k)
@@ -372,11 +372,11 @@ SUBROUTINE DA_Read_BUFR_Obs (iunit, ob, xp, filename)
             platform % each (k) % p % qc  =pqm
             platform % each (k) % p % error =poe
          endif
-!           write(6,*) 'id = ',c8id,' elv = ',hdr(6),' k = ',k
-!           write(6,*) 'slp = ',platform % loc % slp % inv,' z = ',platform % each (k) % height
-!           write(6,*) 't = ',platform % each (k) % t % inv , &
+!           WRITE(UNIT=stdout,FMT=*) 'id = ',c8id,' elv = ',hdr(6),' k = ',k
+!           WRITE(UNIT=stdout,FMT=*) 'slp = ',platform % loc % slp % inv,' z = ',platform % each (k) % height
+!           WRITE(UNIT=stdout,FMT=*) 't = ',platform % each (k) % t % inv , &
 !             ' q = ',platform % each (k) % q % inv
-!           write(6,*) 'u = ',platform % each (k) % u % inv,' v = ', platform % each (k) % v % inv
+!           WRITE(UNIT=stdout,FMT=*) 'u = ',platform % each (k) % u % inv,' v = ', platform % each (k) % v % inv
 
       ENDDO loop_level
 
@@ -385,10 +385,10 @@ SUBROUTINE DA_Read_BUFR_Obs (iunit, ob, xp, filename)
       if(nlevels > max_ob_levels) then
          nlevels = max_ob_levels
 
-         write(unit=*, fmt='(/a/)') &
+         write(UNIT=stdout, fmt='(/a/)') &
                'WARNING: Too many levels.'
 
-          write(unit=*, fmt='(/2a/2a/2x,a,2f8.2,2(2x,a,f9.2)/2(2x,a,i4)/)') &
+          write(UNIT=stdout, fmt='(/2a/2a/2x,a,2f8.2,2(2x,a,f9.2)/2(2x,a,i4)/)') &
                'Subset:   ', platform%info%name(1:8), &
                'Platfrom: ', trim(platform%info%platform), &
                'Loc(lat, lon): ', platform%info%lat, platform%info%lon, &
@@ -397,10 +397,10 @@ SUBROUTINE DA_Read_BUFR_Obs (iunit, ob, xp, filename)
                'level: ', platform%info%levels, &
                'kx:    ', kx
        else if( (nlevels < 1) .and. ((kx /= 164) .or. (kx /= 174))) then
-          write(unit=*, fmt='(/a/)') &
+          write(UNIT=stdout, fmt='(/a/)') &
                'WARNING: Too few levels.'
   
-          write(unit=*, fmt='(/2a/2a/2x,a,2f8.2,2(2x,a,f9.2)/2(2x,a,i4)/)') &
+          write(UNIT=stdout, fmt='(/2a/2a/2x,a,2f8.2,2(2x,a,f9.2)/2(2x,a,i4)/)') &
                'Subset:   ', platform%info%name(1:8), &
                'Platfrom: ', trim(platform%info%platform), &
                'Loc(lat, lon): ', platform%info%lat, platform%info%lon, &
@@ -430,7 +430,7 @@ SUBROUTINE DA_Read_BUFR_Obs (iunit, ob, xp, filename)
 !    TBH:  20050913
     IF(.not.outside) THEN
      if( print_detail >= 10 .and. ndup > 1) then
-         write(unit=*, FMT = '(A12,1X,A19,1X,A40,1X,I6,3(F12.3,11X),6X,A5)') &  
+         write(UNIT=stdout, FMT = '(A12,1X,A19,1X,A40,1X,I6,3(F12.3,11X),6X,A5)') &  
                platform%info%platform,    &
                platform%info%date_char,   &
                platform%info%name,        &
@@ -440,7 +440,7 @@ SUBROUTINE DA_Read_BUFR_Obs (iunit, ob, xp, filename)
                platform%info%elv,         &
                platform%info%id
 
-         write(unit=*, FMT = '(a,2i5,4e20.10)') &
+         write(UNIT=stdout, FMT = '(a,2i5,4e20.10)') &
           ' duplicating obs since loc% i,j,dx,dxm,dy & dym ', &
           platform%loc%i,  platform%loc%j,   &
           platform%loc%dx, platform%loc%dxm, &
@@ -626,13 +626,13 @@ SUBROUTINE DA_Read_BUFR_Obs (iunit, ob, xp, filename)
               ob % ships ( num_ships ) % q = platform % each(1) % q
               ob % ships ( num_ships ) % zk= platform % each(1) % zk
 
-!           write(6,*) 'id = ',c8id,' elv = ',hdr(6),' t29 = ',t29,' numships = ',num_ships
-!           write(6,*) 'lat = ',hdr(3),' lon = ',hdr(2)
-!           write(6,*) 'slp = ',ob % ships ( num_ships ) % p,' z = ',ob % ships ( num_ships ) % h
-!           write(6,*) 't = ',ob % ships ( num_ships ) % t , &
+!           write(UNIT=stdout,FMT=*) 'id = ',c8id,' elv = ',hdr(6),' t29 = ',t29,' numships = ',num_ships
+!           write(UNIT=stdout,FMT=*) 'lat = ',hdr(3),' lon = ',hdr(2)
+!           write(UNIT=stdout,FMT=*) 'slp = ',ob % ships ( num_ships ) % p,' z = ',ob % ships ( num_ships ) % h
+!           write(UNIT=stdout,FMT=*) 't = ',ob % ships ( num_ships ) % t , &
 !          ' q = ',ob % ships ( num_ships ) % q
-!           write(6,*) 'zk = ',ob % ships ( num_ships ) % zk 
-!           write(6,*) 'u = ',ob % ships ( num_ships ) % u,' v = ',ob % ships ( num_ships ) % v 
+!           write(UNIT=stdout,FMT=*) 'zk = ',ob % ships ( num_ships ) % zk 
+!           write(UNIT=stdout,FMT=*) 'u = ',ob % ships ( num_ships ) % u,' v = ',ob % ships ( num_ships ) % v 
 !           stop
 
 	    CASE (531, 561, 562) ;          ! Buoy  
@@ -687,7 +687,7 @@ SUBROUTINE DA_Read_BUFR_Obs (iunit, ob, xp, filename)
             ob % synop ( num_synop ) % q = platform % each(1) % q
             ob % synop ( num_synop ) % zk= platform % each(1) % zk
 
-!         write(6,*) 'using obs from synop ',platform%info%id,' t = ',platform%each(1)%t
+!         write(UNIT=stdout,FMT=*) 'using obs from synop ',platform%info%id,' t = ',platform%each(1)%t
 
             if(ob % synop(num_synop) % h < ob % synop (num_synop) % info % elv) then
                ob % synop(num_synop) % h = ob % synop (num_synop) % info % elv
@@ -720,7 +720,7 @@ SUBROUTINE DA_Read_BUFR_Obs (iunit, ob, xp, filename)
             ob % metar ( num_metar ) % q = platform % each(1) % q
             ob % metar ( num_metar ) % zk= platform % each(1) % zk
      
-!         write(6,*) 'using obs from metar ',platform%info%id,' t = ',platform%each(1)%t
+!         WRITE(UNIT=stdout,FMT=*) 'using obs from metar ',platform%info%id,' t = ',platform%each(1)%t
 
 
          CASE (63)
@@ -791,7 +791,7 @@ SUBROUTINE DA_Read_BUFR_Obs (iunit, ob, xp, filename)
            ob%gpspw(num_gpspw)%loc  = platform%loc 
            ob%gpspw(num_gpspw)%tpw  = platform%loc%pw
 
-!         write(6,*) 'using obs from gps ',platform%info%id,' tpw = ',platform%loc%pw
+!         WRITE(UNIT=stdout,FMT=*) 'using obs from gps ',platform%info%id,' tpw = ',platform%loc%pw
 
 	 CASE (584)       ! GPS REF
 	   ob%num_gpsref_glo = ob%num_gpsref_glo + 1
@@ -816,7 +816,7 @@ SUBROUTINE DA_Read_BUFR_Obs (iunit, ob, xp, filename)
 	   allocate (ob%gpsref(num_gpsref)%  t(1:nlevels))
 	   allocate (ob%gpsref(num_gpsref)%  q(1:nlevels))
 
-!         write(6,*) 'using obs from gps ref ',platform%info%id
+!         WRITE(UNIT=stdout,FMT=*) 'using obs from gps ref ',platform%info%id
 	   do i = 1, nlevels
 	     ob%gpsref(num_gpsref)%h(i)   = platform%each(i)%height
 ! u is used to store ref in this routine (ascii version uses td)
@@ -826,8 +826,8 @@ SUBROUTINE DA_Read_BUFR_Obs (iunit, ob, xp, filename)
 	     ob%gpsref(num_gpsref)%t(i)   = platform%each(i)%t
 	     ob%gpsref(num_gpsref)%q(i)   = platform%each(i)%q
 	   
-!         write(6,*) 'p = ',ob%gpsref(num_gpsref)%p(i),' ref = ',ob%gpsref(num_gpsref)%ref(i)
-!         write(6,*) 't = ',ob%gpsref(num_gpsref)%t(i),' q = ',ob%gpsref(num_gpsref)%q(i)
+!         WRITE(UNIT=stdout,FMT=*) 'p = ',ob%gpsref(num_gpsref)%p(i),' ref = ',ob%gpsref(num_gpsref)%ref(i)
+!         WRITE(UNIT=stdout,FMT=*) 't = ',ob%gpsref(num_gpsref)%t(i),' q = ',ob%gpsref(num_gpsref)%q(i)
 
 	   enddo
 
@@ -878,9 +878,9 @@ SUBROUTINE DA_Read_BUFR_Obs (iunit, ob, xp, filename)
          platform%loc%obs_global_index = ob%num_bogus_glo
 
          if( num_bogus > max_bogus_input) then
-                  write(0,'(A,I6,A,I6)') 'Bogus #=', num_bogus, &
-                         ' > max_bogus_input=', max_bogus_input
-                  STOP
+           WRITE(UNIT=errmsg(1),FMT='(A,I6,A,I6)') &
+             'Bogus #=', num_bogus, ' > max_bogus_input=', max_bogus_input
+           CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
          endif
 
          ob%bogus(num_bogus)%info = platform%info
@@ -907,15 +907,15 @@ SUBROUTINE DA_Read_BUFR_Obs (iunit, ob, xp, filename)
 
          CASE DEFAULT
 
-            write(unit=*, fmt='(/a/)') &
+            write(UNIT=stdout, fmt='(/a/)') &
                  'WARNING   WARNING   WARNING   WARNING   WARNING :'
 
-            write(unit=*, fmt='(a, i12)') 'unsaved obs found with type: ',kx
+            write(UNIT=stdout, fmt='(a, i12)') 'unsaved obs found with type: ',kx
 
-            write(unit=*, fmt='(2a)') &
+            write(UNIT=stdout, fmt='(2a)') &
                  'platform%info%platform=', platform%info%platform
 
-            write(unit=*, fmt='(a, i3)') &
+            write(UNIT=stdout, fmt='(a, i3)') &
                  'platform%info%levels=', platform%info%levels
 
         END SELECT
@@ -970,9 +970,9 @@ SUBROUTINE DA_Read_BUFR_Obs (iunit, ob, xp, filename)
 
    if(print_detail > 0) then
 
-      write(6, fmt='(/a,i6/)') 'ob%current_ob_time=', ob%current_ob_time
+      write(UNIT=stdout, fmt='(/a,i6/)') 'ob%current_ob_time=', ob%current_ob_time
 
-      write(6, fmt='(5x,a,i6,a)') &
+      write(UNIT=stdout, fmt='(5x,a,i6,a)') &
            'Read:  ', num_sound, ' SOUND       reports,', &
            'Read:  ', num_synop, ' SYNOP       reports,', &
            'Read:  ', num_pilot, ' PILOT       reports,', &
@@ -1024,7 +1024,7 @@ SUBROUTINE DA_Read_BUFR_Obs (iunit, ob, xp, filename)
       (ob%ob_numb(ob%current_ob_time)%ssmt2 /= ob%num_ssmt2) .or. &
       (ob%ob_numb(ob%current_ob_time)%profiler /= ob%num_profiler)) then
 
-      write(unit=*, fmt='(a, i6, 2x, a, i6)') &
+      write(UNIT=stdout, fmt='(a, i6, 2x, a, i6)') &
            'ob%ob_numb(ob%current_ob_time)%sound=', ob%ob_numb(ob%current_ob_time)%sound, &
            'ob%num_sound=', ob%num_sound, &
            'ob%ob_numb(ob%current_ob_time)%synop=', ob%ob_numb(ob%current_ob_time)%synop, &

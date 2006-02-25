@@ -44,7 +44,7 @@ SUBROUTINE da_get_innov_vector_gpsref ( it, xb, xp, ob, iv )
 
 ! Deallocate:
         if (iv%num_gpsref > 0) then
-!          print '(a,i6)','iv%num_gpsref=', iv%num_gpsref
+!          WRITE(UNIT=stdout,FMT='(a,i6)') 'iv%num_gpsref=', iv%num_gpsref
           do n = 1, iv%num_gpsref
           deallocate (iv % gpsref(n) %  h )
           deallocate (iv % gpsref(n) %  zk)
@@ -71,7 +71,7 @@ SUBROUTINE da_get_innov_vector_gpsref ( it, xb, xp, ob, iv )
         allocate (ob%gpsref(1:num_pseudo))
         allocate (ob%gpsref(num_pseudo)%ref(1:1))
         
-        write(6,'(a,i2)') '==> GPS REF pseudo OBS test: num_pseudo=',num_pseudo
+        write(UNIT=stdout,FMT='(a,i2)') '==> GPS REF pseudo OBS test: num_pseudo=',num_pseudo
 !       ......................................................................
         
         iv%gpsref(1)%info%levels = 1
@@ -106,8 +106,8 @@ SUBROUTINE da_get_innov_vector_gpsref ( it, xb, xp, ob, iv )
            endif 
         endif
 
-        write(6,'(a4,2f15.5)') pseudo_var, pseudo_val, pseudo_err
-        write(6,'(3f15.5)')    pseudo_x, pseudo_y, pseudo_z
+        write(UNIT=stdout,FMT='(a4,2f15.5)') pseudo_var, pseudo_val, pseudo_err
+        write(UNIT=stdout,FMT='(3f15.5)')    pseudo_x, pseudo_y, pseudo_z
     endif
 
 ! .......................................................................
@@ -221,7 +221,7 @@ SUBROUTINE da_get_innov_vector_gpsref ( it, xb, xp, ob, iv )
 
            endif
 
-!           write(62,'(a,i6,a,i6,a,i3,a,i8,a,f10.1,"  pecnt, inv, m_ro:", 3f11.4)') &
+!           write(UNIT=stdout,FMT='(a,i6,a,i6,a,i3,a,i8,a,f10.1,"  pecnt, inv, m_ro:", 3f11.4)') &
 !                    "ntotal=",ntotal,"  n=",n, " k=",k, " qc=",iv%gpsref(n)%ref(k)%qc, &
 !                    " h=",iv%gpsref(n)%h(k), percnt, &
 !                    iv%gpsref(n)%ref(k)%inv, .5*(ob%gpsref(n)%ref(k) + model_ref(k)) 
@@ -293,7 +293,7 @@ SUBROUTINE da_get_innov_vector_gpsref ( it, xb, xp, ob, iv )
              if (iv%gpsref(n)%ref(k)%qc == qc_middle) nqc1 = nqc1 + 1
              if (iv%gpsref(n)%ref(k)%qc == qc_below ) nqc2 = nqc2 + 1
              if (iv%gpsref(n)%ref(k)%qc == qc_above ) nqc3 = nqc3 + 1
-!            write(63,'(a,5i6,a,i6,a,i3,a,i8,a,f10.1,a, f11.4)') &
+!            write(UNIT=stdout,FMT='(a,5i6,a,i6,a,i3,a,i8,a,f10.1,a, f11.4)') &
 !             "ntotal, nqc0, nqc1, nqc2, nqc3:",ntotal, nqc0, nqc1, nqc2, nqc3, &
 !             "  n=",n, " k=",k, "  qc=",iv%gpsref(n)%ref(k)%qc,  &
 !             "  h=",iv%gpsref(n)%h(k), "  inv=",iv%gpsref(n)%ref(k)%inv

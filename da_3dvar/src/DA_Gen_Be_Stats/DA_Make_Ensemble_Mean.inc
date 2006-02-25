@@ -30,7 +30,7 @@ SUBROUTINE DA_Make_Ensemble_Mean (grid, config_flags, file_date, &
 
 !-------------------------------------------------------------------------------
 
-       write(*,'(a)') 'PROCESS of Ensemble Mean'
+       write(UNIT=stdout,FMT='(a)') 'PROCESS of Ensemble Mean'
 
        numfiles = 0
   
@@ -47,7 +47,8 @@ SUBROUTINE DA_Make_Ensemble_Mean (grid, config_flags, file_date, &
                            )
        call DA_Ens_Sum (xb, xb12)
  
-       print*,'xb12 ',xb%u(10,10,10), xb12%u(10,10,10) 
+       WRITE (UNIT=stdout,FMT='(A,2F12.2)') &
+         'xb12 ',xb%u(10,10,10), xb12%u(10,10,10) 
 
        enddo
 

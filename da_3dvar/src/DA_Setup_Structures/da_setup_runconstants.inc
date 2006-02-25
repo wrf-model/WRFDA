@@ -58,8 +58,8 @@ SUBROUTINE DA_Setup_RunConstants( xp, xb, xbx)
       END DO
       
       IF ( .NOT. found_magic ) THEN
-         WRITE(0,'(A)')' DA_Setup_RunConstants: No factor found. Stop'
-         STOP
+        CALL wrf_error_fatal3(__FILE__,__LINE__, &
+          "No factor found")
       END IF
       
       ALLOCATE( xbx % trig_functs_x(1:3*fft_size_i) )  
@@ -85,8 +85,8 @@ SUBROUTINE DA_Setup_RunConstants( xp, xb, xbx)
       END DO
       
       IF ( .NOT. found_magic ) THEN
-         WRITE(0,'(A)')' DA_Setup_RunConstants: No factor found. Stop'
-         STOP
+        CALL wrf_error_fatal3(__FILE__,__LINE__, &
+          "No factor found")
       END IF
       
       ALLOCATE( xbx % trig_functs_y(1:3*fft_size_j) )  
@@ -145,7 +145,7 @@ SUBROUTINE DA_Setup_RunConstants( xp, xb, xbx)
       if(xbx%fft_pad_i <= 0) then
          need_pad = .FALSE.
       else if(xbx%fft_pad_i > (xp%ide-xp%ids+1)) then
-        write(unit=*, fmt='(2x,a,i4)') &
+        write(UNIT=stdout, fmt='(2x,a,i4)') &
              '(xp%ide-xp%ids+1) = ', (xp%ide-xp%ids+1), &
              'xbx%fft_pad_i = ', xbx%fft_pad_i
         write(wrf_err_message, fmt='(a)') &
@@ -201,7 +201,7 @@ SUBROUTINE DA_Setup_RunConstants( xp, xb, xbx)
     xbx%c_cv_size= (xbx%max_wavenumber+1)*(xbx%max_wavenumber+2)/2
 
   if(print_detail > 0) then
-   write(unit=*, fmt='(a, i6)') &
+   write(UNIT=stdout, fmt='(a, i6)') &
         'inc   =', xbx%inc   , &
         'ni    =', xbx%ni    , &
         'nj    =', xbx%nj    , &

@@ -43,7 +43,7 @@ SUBROUTINE DA_Check_CvToVv_Adjoint( xb, xbx, xp, be, cv, vv, &
 !  [1.0] Initialise:
 !-------------------------------------------------------------------------
 
-   write(unit=*, fmt='(/a/)') &
+   write(unit=stdout, fmt='(/a/)') &
         'DA_Check_CvToVv_Adjoint: Test Results:'
       
 !-------------------------------------------------------------------------
@@ -95,7 +95,7 @@ SUBROUTINE DA_Check_CvToVv_Adjoint( xb, xbx, xp, be, cv, vv, &
 !-------------------------------------------------------------------------
 
    if( .not. global) then
-   write(unit=*, fmt='(a,1pe22.14)') &
+   write(unit=stdout, fmt='(a,1pe22.14)') &
         'Single Domain: < Vv, Vv >     = ', adj_par_lhs, &
         'Single Domain: < cv_adj, cv > = ', adj_par_rhs
    endif
@@ -108,15 +108,17 @@ SUBROUTINE DA_Check_CvToVv_Adjoint( xb, xbx, xp, be, cv, vv, &
    else
    adj_sum_rhs = wrf_dm_sum_real( adj_par_rhs )
    endif  
-PRINT *,'TEST_COVERAGE_DA_Check_CvToVv_Adjoint:  adj_sum_lhs,adj_sum_rhs = ', adj_sum_lhs,adj_sum_rhs
+   WRITE(UNIT=stdout,FMT='(A,2F12.2)') &
+     'TEST_COVERAGE_DA_Check_CvToVv_Adjoint:  adj_sum_lhs,adj_sum_rhs = ', &
+     adj_sum_lhs,adj_sum_rhs
    IF ( wrf_dm_on_monitor() ) THEN
-      write(unit=*, fmt='(/)')
-      write(unit=*, fmt='(a,1pe22.14)') &
+      write(unit=stdout, fmt='(/)')
+      write(unit=stdout, fmt='(a,1pe22.14)') &
            'Whole  Domain: < Vv, Vv >     = ', adj_sum_lhs, &
            'Whole  Domain: < cv_adj, cv > = ', adj_sum_rhs
    ENDIF
       
-   write(unit=*, fmt='(/a/)') &
+   write(unit=stdout, fmt='(/a/)') &
         'DA_Check_CvToVv_Adjoint: Test Finished.'
 
 END SUBROUTINE DA_Check_CvToVv_Adjoint

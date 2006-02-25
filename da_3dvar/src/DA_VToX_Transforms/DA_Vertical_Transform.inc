@@ -367,13 +367,8 @@ subroutine DA_Vertical_Transform( string, be, vertical_wgt, vv, vp, &
       END IF
 
    case default;
-   
-      write(0,'(A,A)') "Invalid DA_Vertical_Transform option ", TRIM(string)
-
-      CALL wrf_shutdown
-
-      STOP 'Stopped, Invalid DA_Vertical_Transform option.'
-
+     CALL wrf_error_fatal3(__FILE__,__LINE__, &
+       "Invalid DA_Vertical_Transform option "//TRIM(string))
    end select
 
 END subroutine DA_Vertical_Transform

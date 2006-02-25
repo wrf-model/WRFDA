@@ -95,17 +95,17 @@ SUBROUTINE DA_Write_KMA_Increments(xp, xb, xa)
    (((p_g(i,j,k),i=xb%ids,xb%ide),j=xb%ids,xb%jde),k=xb%kds,xb%kde)
 
 !
-   write(710,'(10e15.7)') & 
+   write(UNIT=stdout,FMT='(10e15.7)') & 
    ((psfc_g(i,j),i=xb%ids,xb%ide),j=xb%jds,xb%jde)
-   write(710,'(10e15.7)') &
+   write(UNIT=stdout,FMT='(10e15.7)') &
    (((u_g(i,j,k),i=xb%ids,xb%ide),j=xb%ids,xb%jde),k=xb%kds,xb%kde)
-   write(710,'(10e15.7)') &
+   write(UNIT=stdout,FMT='(10e15.7)') &
    (((v_g(i,j,k),i=xb%ids,xb%ide),j=xb%ids,xb%jde),k=xb%kds,xb%kde)
-   write(710,'(10e15.7)') &
+   write(UNIT=stdout,FMT='(10e15.7)') &
    (((t_g(i,j,k),i=xb%ids,xb%ide),j=xb%ids,xb%jde),k=xb%kds,xb%kde)
-   write(710,'(10e15.7)') &
+   write(UNIT=stdout,FMT='(10e15.7)') &
    (((q_g(i,j,k),i=xb%ids,xb%ide),j=xb%ids,xb%jde),k=xb%kds,xb%kde)
-   write(710,'(10e15.7)') &
+   write(UNIT=stdout,FMT='(10e15.7)') &
    (((p_g(i,j,k),i=xb%ids,xb%ide),j=xb%ids,xb%jde),k=xb%kds,xb%kde)
 
 #else
@@ -125,17 +125,17 @@ SUBROUTINE DA_Write_KMA_Increments(xp, xb, xa)
    write(anl_inc_unit) &
    (((xa%p(i,j,k),i=xb%ids,xb%ide),j=xb%jds,xb%jde),k=xb%kds,xb%kde)
 !
-   write(710,'(10e15.7)') &
+   write(UNIT=stdout,FMT='(10e15.7)') &
    ((xa%psfc(i,j),i=xb%ids,xb%ide),j=xb%jds,xb%jde)
-   write(710,'(10e15.7)') &
+   write(UNIT=stdout,FMT='(10e15.7)') &
    (((xa%u(i,j,k),i=xb%ids,xb%ide),j=xb%jds,xb%jde),k=xb%kds,xb%kde)
-   write(710,'(10e15.7)') &
+   write(UNIT=stdout,FMT='(10e15.7)') &
    (((xa%v(i,j,k),i=xb%ids,xb%ide),j=xb%jds,xb%jde),k=xb%kds,xb%kde)
-   write(710,'(10e15.7)') &
+   write(UNIT=stdout,FMT='(10e15.7)') &
    (((xa%t(i,j,k),i=xb%ids,xb%ide),j=xb%jds,xb%jde),k=xb%kds,xb%kde)
-   write(710,'(10e15.7)') &
+   write(UNIT=stdout,FMT='(10e15.7)') &
    (((xa%q(i,j,k),i=xb%ids,xb%ide),j=xb%jds,xb%jde),k=xb%kds,xb%kde)
-   write(710,'(10e15.7)') &
+   write(UNIT=stdout,FMT='(10e15.7)') &
    (((xa%p(i,j,k),i=xb%ids,xb%ide),j=xb%jds,xb%jde),k=xb%kds,xb%kde)
 #endif
 

@@ -51,7 +51,7 @@ SUBROUTINE DA_Scan_SSMI (iunit, ob, xp, filename)
            STATUS = 'OLD')
 
       IF (iost /= 0) THEN
-         write(unit=*, fmt='(/A,I3,3(2X,A)/)') &
+         write(UNIT=stdout, fmt='(/A,I3,3(2X,A)/)') &
               'ERROR IN SSMI INPUT FILE UNIT ',iunit, &
               'SSMI FILENAME:', trim(filename), &
               'FOR SSMI CANNOT BE FOUND OR CANNOT BE OPENED'
@@ -65,7 +65,7 @@ SUBROUTINE DA_Scan_SSMI (iunit, ob, xp, filename)
            STATUS = 'OLD')
 
       IF (iost /= 0) THEN
-         write(unit=*, fmt='(/A,I3,2X,A/)') &
+         write(UNIT=stdout, fmt='(/A,I3,2X,A/)') &
               'ERROR IN INPUT FILE UNIT ',iunit, &
               'FOR SSMI OBSERVATIONS CANNOT BE FOUND OR CANNOT BE OPENED'
          RETURN
@@ -86,13 +86,13 @@ SUBROUTINE DA_Scan_SSMI (iunit, ob, xp, filename)
 !     -------------
 
    IF (iost /= 0) THEN
-      write(unit=0, fmt='(/a,i3/)') &
+      write(unit=stderr, fmt='(/a,i3/)') &
            'ERROR READING FILE UNIT:', iunit, &
            'ERROR CODE:', iost
 
       return
    else
-      write(unit=*, fmt='(/2a/)') &
+      write(UNIT=stdout, fmt='(/2a/)') &
            'in DA_Read_SSMI_Info.inc, char_ned=', trim(char_ned)
    ENDIF
 
@@ -103,7 +103,7 @@ head_line_1:  DO
    READ (UNIT = iunit, FMT = '(A)', IOSTAT = iost) char_ned
 
    IF (iost /= 0) THEN
-      write(unit=0, fmt='(/a,i3/)') &
+      write(unit=stderr, fmt='(/a,i3/)') &
            'ERROR READING FILE UNIT:', iunit, &
            'ERROR CODE:', iost
 
@@ -128,20 +128,20 @@ head_line_2:  DO
 !  READ FORMATS
 !  ------------
 
-   READ (iunit, FMT = '(A,1X,A)') &
+   READ (UNIT=iunit, FMT = '(A,1X,A)') &
         fmt_name, fmt_info, &
         fmt_name, fmt_loc
 
-! write(unit=*, fmt='(2a)') &
+! write(UNIT=stdout, fmt='(2a)') &
 !      'fmt_info=', TRIM (fmt_info), &
 !      'fmt_loc =', TRIM (fmt_loc)
 
 !  SKIP 1 line
 !  -----------
 
-   READ (iunit, FMT = '(A)') fmt_name
+   READ (UNIT=iunit, FMT = '(A)') fmt_name
 
-!  WRITE (UNIT = *, FMT = '(/,2(A,F3.0,/))')  &
+!  WRITE (UNIT = stdout, FMT = '(/,2(A,F3.0,/))')  &
 !     'Error max test ratio for SWS = ',max_error_uv,  &
 !     'Error max test ratio for PW  = ',max_error_pw,  &
 !     'Error max test ratio for PW  = ',max_error_tb
@@ -155,7 +155,7 @@ head_line_2:  DO
 !  READ STATION GENERAL INFO
 !  =========================
 
-      READ (iunit, FMT = fmt_info, IOSTAT = iost) &
+      READ (UNIT=iunit, FMT = fmt_info, IOSTAT = iost) &
                    info % platform,    &
                    info % date_char,   &
                    info % name,        &
@@ -165,7 +165,7 @@ head_line_2:  DO
                    info % elv,         &
                    info % id
 
-      read(info % platform (4:6), '(I3)') fm
+      read(UNIT=info % platform (4:6),FMT='(I3)') fm
 
       IF (iost /= 0) THEN
          EXIT reports
@@ -178,15 +178,15 @@ head_line_2:  DO
       SELECT CASE(fm)
          CASE (125)    ;
 !-----------READ SURFACE WIND SPEED AND PRECIPITABLE WATER
-            READ (iunit, FMT = fmt_loc) speed, tpw
+            READ (UNIT=iunit, FMT = fmt_loc) speed, tpw
          CASE (126)    ;
-            READ (iunit, FMT = fmt_loc) &
+            READ (UNIT=iunit, FMT = fmt_loc) &
                tb19v, tb19h, tb22v, tb37v, tb37h, tb85v, tb85h
          CASE DEFAULT;
-            write(unit=*, fmt='(/a/)') &
+            write(UNIT=stdout, fmt='(/a/)') &
                  'WARNING   WARNING   WARNING   WARNING   WARNING :'
-            write(unit=*, fmt='(a, i6)') 'unsaved ssmi obs found, fm=', fm
-            write(unit=*, fmt='(a, 2f12.6)') &
+            write(UNIT=stdout, fmt='(a, i6)') 'unsaved ssmi obs found, fm=', fm
+            write(UNIT=stdout, fmt='(a, 2f12.6)') &
                  'info%(lon,lat)=', info%lon, info%lat
       END SELECT
 
@@ -251,17 +251,17 @@ head_line_2:  DO
 
    ENDDO reports
 
-   close(iunit)
+   close(UNIT=iunit)
    
 !  PRINT OUT
 !  =========
  
-   write(unit=*, fmt='(5x,a,i6,a)') &
+   write(UNIT=stdout, fmt='(5x,a,i6,a)') &
         'Read:  ', ob % num_ssmi_retrieval , ' SSMI_RETRIEVAL reports,', &
         'Read:  ', ob % num_ssmi_tb ,        ' SSMI_Tb reports,', &
         'Read:  ', ob % total_obs, ' Total Observations.'
 
-   write(unit=*, fmt='(/,5x,a,i6/)') '** Rain contaminated SSMI_Tb =', irain
+   write(UNIT=stdout, fmt='(/,5x,a,i6/)') '** Rain contaminated SSMI_Tb =', irain
 
    ob%ob_numb(ob%current_ob_time)%ssmi_retrieval = ob%num_ssmi_retrieval
    ob%ob_numb(ob%current_ob_time)%ssmi_tb        = ob%num_ssmi_tb

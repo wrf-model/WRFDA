@@ -23,6 +23,7 @@ MODULE DA_Obs
    USE par_util
    USE DA_Tools
    USE da_radiance
+   USE module_wrf_error
 
    IMPLICIT NONE
 

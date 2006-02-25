@@ -162,14 +162,14 @@ SUBROUTINE DA_Transfer_XatoWRF( xbx, grid, &
 !------------------------------------------------------------------------------
 
    if(print_detail > 10) then
-      write(unit=*, fmt='(a, e24.12)') &
+      write(unit=stdout, fmt='(a, e24.12)') &
         'sum(abs(xa%t(is:ie,js:je,ks:ke)))=', sum(abs(xa%t(is:ie,js:je,ks:ke))), &
         'sum(abs(xa%p(is:ie,js:je,ks:ke)))=', sum(abs(xa%p(is:ie,js:je,ks:ke))), &
         'sum(abs(xb%t(is:ie,js:je,ks:ke)))=', sum(abs(xb%t(is:ie,js:je,ks:ke))), &
         'sum(abs(xb%p(is:ie,js:je,ks:ke)))=', sum(abs(xb%p(is:ie,js:je,ks:ke))), &
         'sum(abs(t_2 (is:ie,js:je,ks:ke)))=', sum(abs(t_2 (is:ie,js:je,ks:ke)))
 
-      write(unit=*, fmt='(2(2x, a, e20.12))') &
+      write(unit=stdout, fmt='(2(2x, a, e20.12))') &
         'maxval(xa%u(is:ie,js:je,ks:ke))=', maxval(xa%u(is:ie,js:je,ks:ke)), &
         'minval(xa%u(is:ie,js:je,ks:ke))=', minval(xa%u(is:ie,js:je,ks:ke)), &
         'maxval(xa%v(is:ie,js:je,ks:ke))=', maxval(xa%v(is:ie,js:je,ks:ke)), &
@@ -235,7 +235,7 @@ SUBROUTINE DA_Transfer_XatoWRF( xbx, grid, &
 
    if (write_increments) then
 
-      print '(/"WRITE OUT INCREMENT FOR PLOTTING......")'
+      WRITE(UNIT=stdout,FMT='(/"WRITE OUT INCREMENT FOR PLOTTING......")')
 
       call DA_Write_Increment ( xp, xb, xa, q_cgrid, mu_cgrid, ph_cgrid )
 
@@ -368,36 +368,36 @@ SUBROUTINE DA_Transfer_XatoWRF( xbx, grid, &
 
    if(print_detail > 10) then
       if(print_detail > 100) then
-      write(unit=*, fmt='(/5a/)') ' simple varbles:'
+      write(unit=stdout, fmt='(/5a/)') ' simple varbles:'
 
       if(ie == xp%ide) then
          print *, ' '
 
          do k=ks+5,ke,10
             do j=js,je,10
-               write(unit=*, fmt='(3(a,i5),a,e20.12)') &
+               write(unit=stdout, fmt='(3(a,i5),a,e20.12)') &
                     'u_2(', xp%ide+1, ',', j, ',', k, ')=', &
                      u_2(xp%ide+1,j,k)
             enddo
-            print *, ' '
+            write(unit=stdout, fmt=*) ' '
          enddo
       endif
 
       if(je == xp%jde) then
-         print *, ' '
+        write(unit=stdout, fmt=*) ' '
 
          do k=ks+5,ke,10
             do i=is,ie,10
-               write(unit=*, fmt='(3(a,i5),a,e20.12)') &
+               write(unit=stdout, fmt='(3(a,i5),a,e20.12)') &
                     'v_2(', i, ',', xp%jde+1, ',', k, ')=', &
                      v_2(i, xp%jde+1,k)
             enddo
-            print *, ' '
+            write(unit=stdout, fmt=*) ' '
          enddo
       endif
       endif
 
-      write(unit=*, fmt='(2(2x, a, e20.12))') &
+      write(unit=stdout, fmt='(2(2x, a, e20.12))') &
         'maxval(mu_cgrid(is:ie,js:je))       =', maxval(mu_cgrid(is:ie,js:je)), &
         'minval(mu_cgrid(is:ie,js:je))       =', minval(mu_cgrid(is:ie,js:je)), &
         'maxval(u_cgrid(is:ie,js:je,ks:ke))  =', maxval(u_cgrid(is:ie,js:je,ks:ke)), &
@@ -408,9 +408,9 @@ SUBROUTINE DA_Transfer_XatoWRF( xbx, grid, &
         'minval(q_cgrid(is:ie,js:je,ks:ke))  =', minval(q_cgrid(is:ie,js:je,ks:ke))
 
       do k=ks,ke
-         write(unit=*, fmt='(a, i3)') 'k=', k
+         write(unit=stdout, fmt='(a, i3)') 'k=', k
 
-         write(unit=*, fmt='(2(2x, a, e20.12))') &
+         write(unit=stdout, fmt='(2(2x, a, e20.12))') &
         'maxval(u_cgrid(is:ie,js:je,k))  =', maxval(u_cgrid(is:ie,js:je,k)), &
         'minval(u_cgrid(is:ie,js:je,k))  =', minval(u_cgrid(is:ie,js:je,k)), &
         'maxval(v_cgrid(is:ie,js:je,k))  =', maxval(v_cgrid(is:ie,js:je,k)), &

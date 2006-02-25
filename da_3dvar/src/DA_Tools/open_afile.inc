@@ -64,10 +64,8 @@
 ! --------------------
  
  2000 CONTINUE
-      WRITE (0, '(/,A,A,A,I3)') ' ERROR OPENING FILE ', &
-                                TRIM(CDFILE),' UNIT ',KUNIT
-      WRITE (0, '(A,I3,/)')   ' IOSTAT =  ',IOST
-      STOP                    ' in open_afile.F'
+      CALL wrf_error_fatal3(__FILE__,__LINE__, &
+        "Cannot open file"//TRIM(CDFILE))
 
       END SUBROUTINE OPENFILE
 

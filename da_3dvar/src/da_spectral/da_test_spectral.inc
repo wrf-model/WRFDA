@@ -87,7 +87,10 @@ subroutine da_test_spectral(xbx, field, &
       index_end   = index_start + xbx%max_wavenumber - m
 
    do mm = index_start, index_end
-   if( 2*mm > 2*xbx%c_cv_size) stop 'rcv_out index bounce'
+   IF (2*mm > 2*xbx%c_cv_size) THEN
+     CALL wrf_error_fatal3(__FILE__,__LINE__, &
+       "rcv_out index bounce")
+   END IF
    cv(mm) = cmplx (rcv_out(2*mm-1), rcv_out(2*mm))                    
    end do
    r_leg = 0.0

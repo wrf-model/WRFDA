@@ -1,4 +1,4 @@
-# Makefile for 3DVAR Program and its applications
+# Makefile for WRF-VAR Program and its applications
 # Lower level Makefile
 
 OBJS_FOR_ALL =		da_solve_v3d.o		\
@@ -70,26 +70,7 @@ OBJS_4_GEN_BE_LONG =	DA_Constants.o		\
 			par_util.o              \
 			DA_Setup_Structures.o	\
 			DA_VToX_Transforms.o	\
-			DA_Obs.o		\
-			DA_Metar.o		\
-			DA_GeoAMV.o		\
-			DA_PolarAMV.o		\
-			DA_Ships.o		\
-			DA_Synop.o		\
-			DA_Sound.o		\
-			DA_Bogus.o		\
-			DA_Airep.o		\
-			DA_Pilot.o		\
-			DA_Radar.o		\
 			DA_Gen_Be_Stats.o	\
-			DA_Gpspw.o		\
-			DA_Gpsref.o		\
-			DA_SSMI.o		\
-			DA_Satem.o		\
-			da_qscat.o		\
-			da_pseudo.o		\
-			DA_Profiler.o		\
-			DA_Buoy.o   		\
 			DA_ReadWrite_MM5.o	\
 			DA_Dynamics.o		\
 			DA_Physics.o		\

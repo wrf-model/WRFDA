@@ -13,21 +13,21 @@ subroutine DA_print_big_header(bhi, bhr, bhic, bhrc)
 
    loop_index: do
 
-   write(6, fmt='(/a/)') '-----------Integers-----------'
+   write(UNIT=stdout, fmt='(/a/)') '-----------Integers-----------'
 
    do i=1,size(bhi,1)
       if (bhi(i,index) /= -999) then
-         write(6, fmt='(a,I3,a,I2,a,I9,2a)') &
+         write(UNIT=stdout, fmt='(a,I3,a,I2,a,I9,2a)') &
                'BHI(', i, ',', index, ')=', &
                 bhi(i,index),' : ',trim(bhic(i,index))
       endif
    enddo
 
-   write(6, fmt='(/a/)') '------------Floats------------'
+   write(UNIT=stdout, fmt='(/a/)') '------------Floats------------'
 
    do i=1,size(bhr,1)
       if (abs(bhr(i,index)+999.) > 0.1) then
-         write(6, fmt='(a,I3,a,I2,a,F9.2,2a)') &
+         write(UNIT=stdout, fmt='(a,I3,a,I2,a,F9.2,2a)') &
               'BHR(', i, ',', index, ')=', &
                bhr(i,index),' : ',trim(bhrc(i,index))
       endif

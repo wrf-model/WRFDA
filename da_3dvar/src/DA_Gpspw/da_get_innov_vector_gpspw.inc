@@ -47,7 +47,8 @@ SUBROUTINE da_get_innov_vector_gpspw ( it, xb, xp, ob, iv )
   IF ( pseudo_var(1:3) == 'tpw' .and. num_pseudo > 0 ) then
     ! Deallocate:
     if (iv%num_gpspw > 0) then
-      write(unit=*, fmt='(a,i4)') 'iv%num_gpspw =', iv%num_gpspw
+      write(unit=stdout, fmt='(a,i4)') &
+        'iv%num_gpspw =', iv%num_gpspw
       deallocate (iv % gpspw)
       deallocate (ob % gpspw)
     endif
@@ -62,7 +63,8 @@ SUBROUTINE da_get_innov_vector_gpspw ( it, xb, xp, ob, iv )
     allocate (iv % gpspw (1:num_pseudo))
     allocate (ob % gpspw (1:num_pseudo))
 
-    write(6,'(a,i2)') '==> GPS TPW pseudo OBS test: num_pseudo=',num_pseudo
+    write(UNIT=stdout,FMT='(a,i2)') &
+      '==> GPS TPW pseudo OBS test: num_pseudo=',num_pseudo
 
     iv % gpspw(1) % loc % x   = pseudo_x
     iv % gpspw(1) % loc % y   = pseudo_y
@@ -105,9 +107,9 @@ SUBROUTINE da_get_innov_vector_gpspw ( it, xb, xp, ob, iv )
       endif  
     endif 
 
-    write(6,'(a4,2f15.5)') pseudo_var, pseudo_val, pseudo_err
-    write(6,'(3f15.5)')    pseudo_x,  pseudo_y,  pseudo_z
-    write(6,'(a,f8.2)')    'iv%gpspw: elv=',iv%gpspw(1)%info%elv
+    write(UNIT=stdout,FMT='(a4,2f15.5)') pseudo_var, pseudo_val, pseudo_err
+    write(UNIT=stdout,FMT='(3f15.5)')    pseudo_x,  pseudo_y,  pseudo_z
+    write(UNIT=stdout,FMT='(a,f8.2)')    'iv%gpspw: elv=',iv%gpspw(1)%info%elv
 
   ENDIF 
   ! ----------------------------------------------------------------------------

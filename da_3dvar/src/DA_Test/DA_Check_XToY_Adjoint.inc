@@ -51,7 +51,7 @@ SUBROUTINE DA_Check_XToY_Adjoint( xb, xa, iv, xp, y, &
 
 !-------------------------------------------------------------------------
 
-   write(unit=*, fmt='(/a)') ' DA_Check_XToY_Adjoint: Adjoint Test Results:'
+   write(UNIT=stdout, fmt='(/a)') ' DA_Check_XToY_Adjoint: Adjoint Test Results:'
 
 !-------------------------------------------------------------------------
 !     [1.0] Initialise:
@@ -107,9 +107,8 @@ SUBROUTINE DA_Check_XToY_Adjoint( xb, xa, iv, xp, y, &
       if ( use_ssmt1obs .or. use_ssmt2obs .or. &
            Use_SsmiTbObs .or. Use_SsmiRetrievalObs ) then
          if( cv_options == 4) then
-         print*,' This will not work as xb%speed is not available' 
-         print*,' Please see the comments in da_transfer_kmatoxb.inc'
-         stop
+           CALL wrf_error_fatal3(__LINE__,__FILE__, &
+             "xb%speed is not available, see da_transfer_kmatoxb.inc")
          end if
          call DA_Transform_XToSeaSfcWind_Lin( xa, xb )
       endif
@@ -218,9 +217,8 @@ SUBROUTINE DA_Check_XToY_Adjoint( xb, xa, iv, xp, y, &
       if ( use_ssmt1obs .or. use_ssmt2obs .or. &
            Use_SsmiTbObs .or. Use_SsmiRetrievalObs ) then
          if( cv_options == 4) then
-         print*,' This will not work as xb%speed is not available' 
-         print*,' Please see the comments in da_transfer_kmatoxb.inc'
-         stop
+           CALL wrf_error_fatal3(__LINE__,__FILE__, &
+             "xb%speed is not available, see da_transfer_kmatoxb.inc")
          end if
          call DA_Transform_XToSeaSfcWind_Adj( xa, xb )
       endif
@@ -270,7 +268,7 @@ SUBROUTINE DA_Check_XToY_Adjoint( xb, xa, iv, xp, y, &
 !     [7.0] Print output:
 !-------------------------------------------------------------------------
    
-   write(unit=*, fmt='(A,1pe22.14)') &
+   write(UNIT=stdout, fmt='(A,1pe22.14)') &
         ' Tile < y, y     > = ', pertile_lhs, &
         ' Tile < x, x_adj > = ', pertile_rhs
 
@@ -278,8 +276,8 @@ SUBROUTINE DA_Check_XToY_Adjoint( xb, xa, iv, xp, y, &
    adj_ttl_rhs = wrf_dm_sum_real( partial_rhs )
    
    IF ( wrf_dm_on_monitor() ) THEN
-      write(unit=*, fmt='(A,1pe22.14)') ' Whole Domain < y, y     > = ', adj_ttl_lhs
-      write(unit=*, fmt='(A,1pe22.14)') ' Whole Domain < x, x_adj > = ', adj_ttl_rhs
+      write(UNIT=stdout, fmt='(A,1pe22.14)') ' Whole Domain < y, y     > = ', adj_ttl_lhs
+      write(UNIT=stdout, fmt='(A,1pe22.14)') ' Whole Domain < x, x_adj > = ', adj_ttl_rhs
    ENDIF
    
 END SUBROUTINE DA_Check_XToY_Adjoint

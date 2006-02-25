@@ -115,103 +115,103 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
 !---------------------------------------------------------------------------
 
    if(print_detail > 0) then
-     write(unit=*, fmt='(3a, i8)') &
+     write(unit=stdout, fmt='(3a, i8)') &
           'file:', __FILE__, ', line:', __LINE__
 
-     print *, 'is,ie=', is,ie
-     print *, 'js,je=', js,je
-     print *, 'ks,ke=', ks,ke
+     write(unit=stdout, fmt=*) 'is,ie=', is,ie
+     write(unit=stdout, fmt=*) 'js,je=', js,je
+     write(unit=stdout, fmt=*) 'ks,ke=', ks,ke
 
      if(print_detail > 10) then
-     write(unit=*, fmt='(/5a/)') &
+     write(unit=stdout, fmt='(/5a/)') &
           'lvl         dnw                dn 		rdnw       rdn'
 
      do k=ks,ke+1
-        write(unit=*, fmt='(i3,8f16.8)') k, &
+        write(unit=stdout, fmt='(i3,8f16.8)') k, &
               dnw(k), dn(k), rdnw(k), rdn(k)
      enddo
 
-     write(unit=*, fmt='(/5a/)') &
+     write(unit=stdout, fmt='(/5a/)') &
           'lvl         znu                 znw		rdnw       rdn'
 
      do k=ks,ke+1
-        write(unit=*, fmt='(i3,8f16.8)') k, &
+        write(unit=stdout, fmt='(i3,8f16.8)') k, &
               xb%sigmah(k), xb%sigmaf(k), rdnw(k), rdn(k)
      enddo
      endif
 
      if(print_detail > 100) then
-     write(unit=*, fmt='(/5a/)') &
+     write(unit=stdout, fmt='(/5a/)') &
           'lvl         phb                 ph_2'
 
      do k=ks,ke
-        write(unit=*, fmt='(i3,8e20.12)') k, &
+        write(unit=stdout, fmt='(i3,8e20.12)') k, &
               phb(is,js,k), ph_2(is,js,k)
      enddo
 
-     write(unit=*, fmt='(/5a/)') ' simple varbles:'
+     write(unit=stdout, fmt='(/5a/)') ' simple varbles:'
 
      if(je == xp%jde) then
-        print *, ' '
+        write(unit=stdout, fmt=*) ' '
         
         do k=ks+5,ke,10
            do i=is,ie,10
-              write(unit=*, fmt='(3(a,i5),a,e20.12)') &
+              write(unit=stdout, fmt='(3(a,i5),a,e20.12)') &
                    'v_2(', i, ',', xp%jde+1, ',', k, ')=', &
                     v_2(i, xp%jde+1,k)
            enddo
-           print *, ' '
+           write(unit=stdout, fmt=*) ' '
         enddo
      endif
 
      if(ie == xp%ide) then
-        print *, ' '
+        write(unit=stdout, fmt=*) ' '
 
         do k=ks+5,ke,10
            do j=js,je,10
-              write(unit=*, fmt='(3(a,i5),a,e20.12)') &
+              write(unit=stdout, fmt='(3(a,i5),a,e20.12)') &
                    'u_2(', xp%ide+1, ',', j, ',', k, ')=', &
                     u_2(xp%ide+1,j,k)
            enddo
-           print *, ' '
+           write(unit=stdout, fmt=*) ' '
         enddo
      endif
      endif
 
-     write(unit=*, fmt='(/5a/)') ' simple varbles:'
+     write(unit=stdout, fmt='(/5a/)') ' simple varbles:'
 
-     print *, ' u_1(is,js,ks)=',  u_1(is,js,ks)
-     print *, ' v_1(is,js,ks)=',  v_1(is,js,ks)
-     print *, ' w_1(is,js,ks)=',  w_1(is,js,ks)
-     print *, ' t_1(is,js,ks)=',  t_1(is,js,ks)
-     print *, 'ph_1(is,js,ks)=', ph_1(is,js,ks)
+     write(unit=stdout, fmt=*) ' u_1(is,js,ks)=',  u_1(is,js,ks)
+     write(unit=stdout, fmt=*) ' v_1(is,js,ks)=',  v_1(is,js,ks)
+     write(unit=stdout, fmt=*) ' w_1(is,js,ks)=',  w_1(is,js,ks)
+     write(unit=stdout, fmt=*) ' t_1(is,js,ks)=',  t_1(is,js,ks)
+     write(unit=stdout, fmt=*) 'ph_1(is,js,ks)=', ph_1(is,js,ks)
 
 
-     print *, ' u_2(is,je,ks)=',  u_2(is,je,ks)
-     print *, ' v_2(ie,js,ks)=',  v_2(ie,js,ks)
-     print *, ' w_2(is,js,ks)=',  w_2(is,js,ks)
-     print *, ' t_2(is,js,ks)=',  t_2(is,js,ks)
-     print *, 'ph_2(is,js,ks)=', ph_2(is,js,ks)
-     print *, ' phb(is,js,ks)=',  phb(is,js,ks)
+     write(unit=stdout, fmt=*) ' u_2(is,je,ks)=',  u_2(is,je,ks)
+     write(unit=stdout, fmt=*) ' v_2(ie,js,ks)=',  v_2(ie,js,ks)
+     write(unit=stdout, fmt=*) ' w_2(is,js,ks)=',  w_2(is,js,ks)
+     write(unit=stdout, fmt=*) ' t_2(is,js,ks)=',  t_2(is,js,ks)
+     write(unit=stdout, fmt=*) 'ph_2(is,js,ks)=', ph_2(is,js,ks)
+     write(unit=stdout, fmt=*) ' phb(is,js,ks)=',  phb(is,js,ks)
 
-     print *, 'grid%sm31,grid%em31,grid%sm32,grid%em32,grid%sm33,grid%em33=', &
+     write(unit=stdout, fmt=*) 'grid%sm31,grid%em31,grid%sm32,grid%em32,grid%sm33,grid%em33=', &
                grid%sm31,grid%em31,grid%sm32,grid%em32,grid%sm33,grid%em33
 
-     print *, 'p_top=', grid%p_top
-     print *, 'znu(ks)=', znu(ks)
-     print *, 'mu0(is,js)=', mu0(is,js)
-     print *, 'mub(is,js)=', mub(is,js)
-     print *, 'mu_2(is,js)=', mu_2(is,js)
+     write(unit=stdout, fmt=*) 'p_top=', grid%p_top
+     write(unit=stdout, fmt=*) 'znu(ks)=', znu(ks)
+     write(unit=stdout, fmt=*) 'mu0(is,js)=', mu0(is,js)
+     write(unit=stdout, fmt=*) 'mub(is,js)=', mub(is,js)
+     write(unit=stdout, fmt=*) 'mu_2(is,js)=', mu_2(is,js)
 
-     print *, 'hbot(is,js)=', hbot(is,js)
-     print *, 'htop(is,js)=', htop(is,js)
+     write(unit=stdout, fmt=*) 'hbot(is,js)=', hbot(is,js)
+     write(unit=stdout, fmt=*) 'htop(is,js)=', htop(is,js)
 
-     print *, 'grid%p_top=', grid%p_top
-     print *, 'num_moist=', num_moist
-     print *, 'P_QV=', P_QV
+     write(unit=stdout, fmt=*) 'grid%p_top=', grid%p_top
+     write(unit=stdout, fmt=*) 'num_moist=', num_moist
+     write(unit=stdout, fmt=*) 'P_QV=', P_QV
 
-     print *, 'moist(is,js,ks,2)=', moist(is,js,ks,2)
-     print *, ' '
+     write(unit=stdout, fmt=*) 'moist(is,js,ks,2)=', moist(is,js,ks,2)
+     write(unit=stdout, fmt=*) ' '
    endif
 
 !---------------------------------------------------------------
@@ -248,37 +248,37 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
 !---------------------------------------------------------------
 
    if(print_detail > 0) then
-   print *, 'is,ie,js,je,ks,ke=', is,ie,js,je,ks,ke
-   print *, 'xp%its, xp%ite=', xp%its, xp%ite
-   print *, 'xp%jts, xp%jte=', xp%jts, xp%jte
-   print *, 'xp%kts, xp%kte=', xp%kts, xp%kte
-   print *, 'xp%ims, xp%ime=', xp%ims, xp%ime
-   print *, 'xp%jms, xp%jme=', xp%jms, xp%jme
-   print *, 'xp%kms, xp%kme=', xp%kms, xp%kme
-   print *, 'xp%ids, xp%ide=', xp%ids, xp%ide
-   print *, 'xp%jds, xp%jde=', xp%jds, xp%jde
-   print *, 'xp%kds, xp%kde=', xp%kds, xp%kde
+   write(unit=stdout, fmt=*) 'is,ie,js,je,ks,ke=', is,ie,js,je,ks,ke
+   write(unit=stdout, fmt=*) 'xp%its, xp%ite=', xp%its, xp%ite
+   write(unit=stdout, fmt=*) 'xp%jts, xp%jte=', xp%jts, xp%jte
+   write(unit=stdout, fmt=*) 'xp%kts, xp%kte=', xp%kts, xp%kte
+   write(unit=stdout, fmt=*) 'xp%ims, xp%ime=', xp%ims, xp%ime
+   write(unit=stdout, fmt=*) 'xp%jms, xp%jme=', xp%jms, xp%jme
+   write(unit=stdout, fmt=*) 'xp%kms, xp%kme=', xp%kms, xp%kme
+   write(unit=stdout, fmt=*) 'xp%ids, xp%ide=', xp%ids, xp%ide
+   write(unit=stdout, fmt=*) 'xp%jds, xp%jde=', xp%jds, xp%jde
+   write(unit=stdout, fmt=*) 'xp%kds, xp%kde=', xp%kds, xp%kde
 
-   print *, 'size(xb%u, dim=1)=', size(xb%u, dim=1)
-   print *, 'size(xb%u, dim=2)=', size(xb%u, dim=2)
-   print *, 'size(xb%u, dim=3)=', size(xb%u, dim=3)
-   print *, 'size(xb%v, dim=1)=', size(xb%v, dim=1)
-   print *, 'size(xb%v, dim=2)=', size(xb%v, dim=2)
-   print *, 'size(xb%v, dim=3)=', size(xb%v, dim=3)
+   write(unit=stdout, fmt=*) 'size(xb%u, dim=1)=', size(xb%u, dim=1)
+   write(unit=stdout, fmt=*) 'size(xb%u, dim=2)=', size(xb%u, dim=2)
+   write(unit=stdout, fmt=*) 'size(xb%u, dim=3)=', size(xb%u, dim=3)
+   write(unit=stdout, fmt=*) 'size(xb%v, dim=1)=', size(xb%v, dim=1)
+   write(unit=stdout, fmt=*) 'size(xb%v, dim=2)=', size(xb%v, dim=2)
+   write(unit=stdout, fmt=*) 'size(xb%v, dim=3)=', size(xb%v, dim=3)
 
-   print *, 'size(xa%u, dim=1)=', size(xa%u, dim=1)
-   print *, 'size(xa%u, dim=2)=', size(xa%u, dim=2)
-   print *, 'size(xa%u, dim=3)=', size(xa%u, dim=3)
-   print *, 'size(xa%v, dim=1)=', size(xa%v, dim=1)
-   print *, 'size(xa%v, dim=2)=', size(xa%v, dim=2)
-   print *, 'size(xa%v, dim=3)=', size(xa%v, dim=3)
+   write(unit=stdout, fmt=*) 'size(xa%u, dim=1)=', size(xa%u, dim=1)
+   write(unit=stdout, fmt=*) 'size(xa%u, dim=2)=', size(xa%u, dim=2)
+   write(unit=stdout, fmt=*) 'size(xa%u, dim=3)=', size(xa%u, dim=3)
+   write(unit=stdout, fmt=*) 'size(xa%v, dim=1)=', size(xa%v, dim=1)
+   write(unit=stdout, fmt=*) 'size(xa%v, dim=2)=', size(xa%v, dim=2)
+   write(unit=stdout, fmt=*) 'size(xa%v, dim=3)=', size(xa%v, dim=3)
 
-   print *, 'size(u_2, dim=1)=', size(u_2, dim=1)
-   print *, 'size(u_2, dim=2)=', size(u_2, dim=2)
-   print *, 'size(u_2, dim=3)=', size(u_2, dim=3)
-   print *, 'size(v_2, dim=1)=', size(v_2, dim=1)
-   print *, 'size(v_2, dim=2)=', size(v_2, dim=2)
-   print *, 'size(v_2, dim=3)=', size(v_2, dim=3)
+   write(unit=stdout, fmt=*) 'size(u_2, dim=1)=', size(u_2, dim=1)
+   write(unit=stdout, fmt=*) 'size(u_2, dim=2)=', size(u_2, dim=2)
+   write(unit=stdout, fmt=*) 'size(u_2, dim=3)=', size(u_2, dim=3)
+   write(unit=stdout, fmt=*) 'size(v_2, dim=1)=', size(v_2, dim=1)
+   write(unit=stdout, fmt=*) 'size(v_2, dim=2)=', size(v_2, dim=2)
+   write(unit=stdout, fmt=*) 'size(v_2, dim=3)=', size(v_2, dim=3)
    endif
 
    do j=js,je
@@ -306,7 +306,7 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
        xb%vegfra(i,j) = vegfra(i,j)
 !       xb%snowh(i,j) = snowh(i,j)
        xb%snowh(i,j) = snow(i,j)*10.     ! convert snow water equivalent kg/m2 to snow depth mm
-!      print *, i, j, nint(xb%landmask(i,j)), nint(xb%xice(i,j)), nint(xb%snow(i,j))
+!      write(unit=stdout, fmt=*) i, j, nint(xb%landmask(i,j)), nint(xb%xice(i,j)), nint(xb%snow(i,j))
 
      enddo
 
@@ -385,7 +385,7 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
 ! Background qrn needed for Radar Radial velocity assimilation:
 
          if( size(moist,dim=4) >= 4 ) then
-!          write(6,*)'P_QV, P_QCW, P_QRN:',P_QV, P_QCW, P_QRN
+!          write(UNIT=stdout,FMT=*)'P_QV, P_QCW, P_QRN:',P_QV, P_QCW, P_QRN
            xb%qcw(i,j,k) = moist(i,j,k,p_qc)
            xb%qrn(i,j,k) = moist(i,j,k,p_qr)
            xb%qt (i,j,k) = xb%q(i,j,k) + xb%qcw(i,j,k) + xb%qrn(i,j,k)
@@ -422,39 +422,39 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
    xb%ztop = xb%hf(is,js,ke+1)
 
    if(print_detail > 0) then
-     print *, ' '
+     write(unit=stdout, fmt=*) ' '
      if(print_detail > 10) then
-     write(unit=*, fmt='(/5a/)') &
+     write(unit=stdout, fmt='(/5a/)') &
           'lvl         h                 p                t'
 
      do k=ks,ke
-        write(unit=*, fmt='(i3,8e20.12)') k, &
+        write(unit=stdout, fmt='(i3,8e20.12)') k, &
               xb%h(is,js,k), xb%p(is,js,k), xb%t(is,js,k)
      enddo
      endif
 
-     print *, ' '
-     print *, 'xb%u(is,je,ke)=', xb%u(is,je,ke)
-     print *, 'xb%v(ie,js,ke)=', xb%v(ie,js,ke)
-     print *, 'xb%w(is,js,ke)=', xb%w(is,js,ke)
-     print *, 'xb%t(is,js,ke)=', xb%t(is,js,ke)
-     print *, 'xb%p(is,js,ke)=', xb%p(is,js,ke)
-     print *, 'xb%q(is,js,ke)=', xb%q(is,js,ke)
-     print *, 'xb%h(is,js,ke)=', xb%h(is,js,ke)
-     print *, 'xb%hf(is,js,ke)=', xb%hf(is,js,ke)
-     print *, 'xb%map_factor(is,js)=', xb%map_factor(is,js)
-     print *, 'xb%cori(is,js)=', xb%cori(is,js)
-     print *, 'xb%tgrn(is,js)=', xb%tgrn(is,js)
-     print *, 'xb%lat(is,js)=', xb%lat(is,js)
-     print *, 'xb%lon(is,js)=', xb%lon(is,js)
-     print *, 'xb%terr(is,js)=', xb%terr(is,js)
-     print *, 'xb%snow(is,js)=', xb%snow(is,js)
-     print *, 'xb%lanu(is,js)=', xb%lanu(is,js)
-     print *, 'xb%landmask(is,js)=', xb%landmask(is,js)
-     print *, '(ie,je)=', ie,je                   !hcl
-     print *, 'xb%lat(ie,je)=', xb%lat(ie,je)     !hcl
-     print *, 'xb%lon(ie,je)=', xb%lon(ie,je)     !hcl
-     print *, ' '
+     write(unit=stdout, fmt=*) ' '
+     write(unit=stdout, fmt=*) 'xb%u(is,je,ke)=', xb%u(is,je,ke)
+     write(unit=stdout, fmt=*) 'xb%v(ie,js,ke)=', xb%v(ie,js,ke)
+     write(unit=stdout, fmt=*) 'xb%w(is,js,ke)=', xb%w(is,js,ke)
+     write(unit=stdout, fmt=*) 'xb%t(is,js,ke)=', xb%t(is,js,ke)
+     write(unit=stdout, fmt=*) 'xb%p(is,js,ke)=', xb%p(is,js,ke)
+     write(unit=stdout, fmt=*) 'xb%q(is,js,ke)=', xb%q(is,js,ke)
+     write(unit=stdout, fmt=*) 'xb%h(is,js,ke)=', xb%h(is,js,ke)
+     write(unit=stdout, fmt=*) 'xb%hf(is,js,ke)=', xb%hf(is,js,ke)
+     write(unit=stdout, fmt=*) 'xb%map_factor(is,js)=', xb%map_factor(is,js)
+     write(unit=stdout, fmt=*) 'xb%cori(is,js)=', xb%cori(is,js)
+     write(unit=stdout, fmt=*) 'xb%tgrn(is,js)=', xb%tgrn(is,js)
+     write(unit=stdout, fmt=*) 'xb%lat(is,js)=', xb%lat(is,js)
+     write(unit=stdout, fmt=*) 'xb%lon(is,js)=', xb%lon(is,js)
+     write(unit=stdout, fmt=*) 'xb%terr(is,js)=', xb%terr(is,js)
+     write(unit=stdout, fmt=*) 'xb%snow(is,js)=', xb%snow(is,js)
+     write(unit=stdout, fmt=*) 'xb%lanu(is,js)=', xb%lanu(is,js)
+     write(unit=stdout, fmt=*) 'xb%landmask(is,js)=', xb%landmask(is,js)
+     write(unit=stdout, fmt=*) '(ie,je)=', ie,je                   !hcl
+     write(unit=stdout, fmt=*) 'xb%lat(ie,je)=', xb%lat(ie,je)     !hcl
+     write(unit=stdout, fmt=*) 'xb%lon(ie,je)=', xb%lon(ie,je)     !hcl
+     write(unit=stdout, fmt=*) ' '
    endif
 
 !------------------------------------------------------------------------------
@@ -485,7 +485,7 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
 
    current_date = '2000-01-01_00:00:00'
 
-   write(current_date(1:19), fmt='(i4.4, 5(a1, i2.2))') &
+   write(UNIT=current_date(1:19), fmt='(i4.4, 5(a1, i2.2))') &
          grid%start_year, '-', &
          grid%start_month, '-', &
          grid%start_day, '_', &
@@ -493,7 +493,7 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
          grid%start_minute, ':', &
          grid%start_second
 
-   print *, 'current_date=', current_date
+   write(unit=stdout, fmt=*) 'current_date=', current_date
 
    xbx % mminlu = 'USGS'
 
@@ -509,10 +509,10 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
 !------------------------------------------------------------------------------
 
    if(print_detail > 0) then
-       write(unit=*, fmt='(/a, e24.16)') &
+       write(unit=stdout, fmt='(/a, e24.16)') &
            'xb % ds=', xb % ds
 
-      write(unit=*, fmt='(a, e24.16/)') &
+      write(unit=stdout, fmt='(a, e24.16/)') &
            'xb % map_factor(is,js)=', xb % map_factor(is,js)
    endif
 
@@ -566,12 +566,12 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
    if(print_detail > 10) then
       i=is; j=js; k=ks
 
-      print *, 'i,j,k=', i,j,k
-      print *, 'xb % td(i,j,k)=', xb % td(i,j,k)
-      print *, 'xb % es(i,j,k)=', xb % es(i,j,k)
-      print *, 'xb % rh(i,j,k)=', xb % rh(i,j,k)
-      print *, 'xb % qs(i,j,k)=', xb % qs(i,j,k)
-      print *, ' '
+      write(unit=stdout, fmt=*) 'i,j,k=', i,j,k
+      write(unit=stdout, fmt=*) 'xb % td(i,j,k)=', xb % td(i,j,k)
+      write(unit=stdout, fmt=*) 'xb % es(i,j,k)=', xb % es(i,j,k)
+      write(unit=stdout, fmt=*) 'xb % rh(i,j,k)=', xb % rh(i,j,k)
+      write(unit=stdout, fmt=*) 'xb % qs(i,j,k)=', xb % qs(i,j,k)
+      write(unit=stdout, fmt=*) ' '
    endif
 
 !------------------------------------------------------------------------------
@@ -579,10 +579,10 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
 !------------------------------------------------------------------------------
 
    if(print_detail > 0) then
-     write(unit=*, fmt='(3a, i8)') &
+     write(unit=stdout, fmt='(3a, i8)') &
           'file:', __FILE__, ', line:', __LINE__
 
-     write(unit=*, fmt='(a)') &
+     write(unit=stdout, fmt='(a)') &
           'Sea level pressure and total precipitable water'
    endif
 
@@ -602,10 +602,10 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
 !------------------------------------------------------------------------------
 
    if(print_detail > 0) then
-     write(unit=*, fmt='(3a, i8)') &
+     write(unit=stdout, fmt='(3a, i8)') &
           'file:', __FILE__, ', line:', __LINE__
 
-     write(unit=*, fmt='(a)') &
+     write(unit=stdout, fmt='(a)') &
           'Surface Wind speed'
    endif
 
@@ -626,10 +626,10 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
 !------------------------------------------------------------------------------
 
    if(print_detail > 0) then
-     write(unit=*, fmt='(3a, i8)') &
+     write(unit=stdout, fmt='(3a, i8)') &
           'file:', __FILE__, ', line:', __LINE__
 
-     write(unit=*, fmt='(a)') &
+     write(unit=stdout, fmt='(a)') &
           'Brightness temperature'
    endif
 
@@ -641,10 +641,10 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
 !------------------------------------------------------------------------------
 
    if(print_detail > 0) then
-     write(unit=*, fmt='(3a, i8)') &
+     write(unit=stdout, fmt='(3a, i8)') &
           'file:', __FILE__, ', line:', __LINE__
 
-     write(unit=*, fmt='(a)') &
+     write(unit=stdout, fmt='(a)') &
           'GPS Refractivity'
    endif
 
@@ -716,11 +716,11 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
    ENDIF
 
    if(print_detail > 10) then
-!     print *, 'loc_psac_mean  =', loc_psac_mean
-      print *, 'xbx % psac_mean=', xbx % psac_mean
+!     write(unit=stdout, fmt=*) 'loc_psac_mean  =', loc_psac_mean
+      write(unit=stdout, fmt=*) 'xbx % psac_mean=', xbx % psac_mean
 
-!     print *, 'loc_latc_mean  =', loc_latc_mean(js)
-      print *, 'xbx % latc_mean=', xbx % latc_mean(js)
+!     write(unit=stdout, fmt=*) 'loc_latc_mean  =', loc_latc_mean(js)
+      write(unit=stdout, fmt=*) 'xbx % latc_mean=', xbx % latc_mean(js)
    endif
 
 !---Calculate time step from one dimensional cloud model parameterization-------------

@@ -48,7 +48,7 @@ SUBROUTINE stats_be ( grid , config_flags , &
 
 !------------------------------------------------------------------------------
 !
-   write (6, '(/,A,/)') ' *** DA_Generate_Be_Stats ***'
+   write (UNIT=stdout,FMT='(/,A,/)') ' *** DA_Generate_Be_Stats ***'
 
 !------------------------------------------------------------------------------
 !  [1.0] Initialise STATS parameters:
@@ -71,7 +71,7 @@ SUBROUTINE stats_be ( grid , config_flags , &
 #include <em_dummy_args.inc>
                  )
 
-   write(unit=*, fmt='(a,i2,2x,a)') &
+   write(UNIT=stdout, fmt='(a,i2,2x,a)') &
         'DA_Gen_Be_Statistics step Finished normally.'
 
 !-------------------------------------------------------------------------------

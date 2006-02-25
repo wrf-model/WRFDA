@@ -53,13 +53,7 @@ subroutine DA_Minimise_QN( grid, config_flags,               &
       integer, dimension(2)             :: iprint
       logical                           :: llfin
 
-      write (6,'(A)') &
-        ' --------------------------------------------------------'
-      write (6,'(A)') &
-        ' [5.2] Minimizing cost function using Quasi Newton Method'
-      write (6,'(A)') &
-        ' --------------------------------------------------------'
-      write(6,*)
+      CALL wrf_message("[5.2] Minimizing cost function using Quasi Newton Method")
 
       iflag = 0
       llfin = .false.

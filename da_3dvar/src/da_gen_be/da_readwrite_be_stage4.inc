@@ -41,27 +41,29 @@ if (uh_method .eq. 'power') then
       open (iunit, file = filename, form='unformatted')
       read(iunit)cvar
       if ( trim(cvar) /=  trim(variable) ) then
-         write(6,'(a)')' Variable name inconsistency in da_readwrite_be_stage4. Stop'
-         stop
-      end if
+        CALL wrf_error_fatal3(__FILE__,__LINE__, &
+          "Variable name inconsistency")
+      END IF
 
       read(iunit)max_wavenumber, kdum
       if ( kdum /= k ) then
-         write(6,'(a)')' Inconsistent vertical label in da_readwrite_stage4. Stop'
-         stop
+        CALL wrf_error_fatal3(__FILE__,__LINE__, &
+         "Inconsistent vertical label")
       end if
 
       read(iunit)data_on_levels, use_global_eofs
 
       if ( first_time ) then
-         if ( .not. data_on_levels ) then
-            if ( use_global_eofs ) then
-               write(6,'(a)')' Power spectra calculated for 2D field projected onto global EOFs.'
-            else
-               write(6,'(a)')' Power spectra calculated for 2D field projected onto local EOFs.'
-            end if
-         end if
-         allocate( total_power(0:max_wavenumber) )
+        if ( .not. data_on_levels ) then
+          if ( use_global_eofs ) then
+            write(UNIT=stdout,FMT='(a)') &
+              ' Power spectra calculated for 2D field projected onto global EOFs.'
+          else
+            write(UNIT=stdout,FMT='(a)') &
+              ' Power spectra calculated for 2D field projected onto local EOFs.'
+          end if
+        end if
+        allocate( total_power(0:max_wavenumber) )
       end if
 
       read(iunit)total_power(:)

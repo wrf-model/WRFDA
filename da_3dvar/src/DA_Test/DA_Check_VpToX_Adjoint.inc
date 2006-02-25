@@ -40,7 +40,7 @@ SUBROUTINE DA_Check_VpToX_Adjoint( xb, xbx, be, xa, xp, vp,  &
 
 !-------------------------------------------------------------------------
 
-   write(unit=*, fmt='(/a/)') &
+   write(UNIT=stdout, fmt='(/a/)') &
         ' DA_Check_VpToX_Adjoint: Adjoint Test Results:'
 
 !-------------------------------------------------------------------------
@@ -81,11 +81,11 @@ SUBROUTINE DA_Check_VpToX_Adjoint( xb, xbx, be, xa, xp, vp,  &
 PRINT *,'TEST_COVERAGE_DA_Check_VpToX_Adjoint A:  adj_sum_lhs,adj_sum_rhs = ', adj_sum_lhs,adj_sum_rhs
 
    IF ( wrf_dm_on_monitor() ) THEN
-      write(unit=*, fmt='(/a/)') &
+      write(UNIT=stdout, fmt='(/a/)') &
            ' DA_Check_DA_PsiChi_To_UV: Adjoint Test Results:'
 
-      write(unit=*, fmt='(/)')
-      write(unit=*, fmt='(a,1pe22.14)') &
+      write(UNIT=stdout, fmt='(/)')
+      write(UNIT=stdout, fmt='(a,1pe22.14)') &
            'Whole  Domain: < u_v,     u_v         > = ', adj_sum_lhs, &
            'Whole  Domain: < psi_chi, psi_chi_adj > = ', adj_sum_rhs
    ENDIF
@@ -219,8 +219,8 @@ PRINT *,'TEST_COVERAGE_DA_Check_VpToX_Adjoint A:  adj_sum_lhs,adj_sum_rhs = ', a
 PRINT *,'TEST_COVERAGE_DA_Check_VpToX_Adjoint B:  adj_sum_lhs,adj_sum_rhs = ', adj_sum_lhs,adj_sum_rhs
 
    IF ( wrf_dm_on_monitor() ) THEN
-      write(unit=*, fmt='(/)')
-      write(unit=*, fmt='(a,1pe22.14)') &
+      write(UNIT=stdout, fmt='(/)')
+      write(UNIT=stdout, fmt='(a,1pe22.14)') &
            'Whole  Domain: < x, x >       = ', adj_sum_lhs, &
            'Whole  Domain: < vp_adj, vp > = ', adj_sum_rhs
    ENDIF
@@ -231,7 +231,7 @@ PRINT *,'TEST_COVERAGE_DA_Check_VpToX_Adjoint B:  adj_sum_lhs,adj_sum_rhs = ', a
    vp % v4(:,:,:) = vp2_v4(:,:,:)
    vp % v5(:,:,:) = vp2_v5(:,:,:)
 
-   write(unit=*, fmt='(/a/)') &
+   write(UNIT=stdout, fmt='(/a/)') &
         'End of DA_Check_VpToX_Adjoint.'
       
 END SUBROUTINE DA_Check_VpToX_Adjoint

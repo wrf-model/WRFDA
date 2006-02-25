@@ -32,7 +32,7 @@
         !
         ! This is a necessary but not sufficient condition!
         IF ( n /= cv_size ) THEN
-          CALL wrf_error_fatal( 'ERROR in cv_to_global:  incorrect vector size' )
+          CALL wrf_error_fatal3(__FILE__,__LINE__, 'incorrect vector size' )
         ENDIF
 
         ! k?e varies with variable v1 - v5
@@ -256,28 +256,28 @@ SUBROUTINE write_3d_debug( localpatch, domdesc, mz, fnameheader, &
     IF ( wrf_dm_on_monitor() ) THEN
       ! binary
       IF ( PRESENT( fnameID ) ) THEN
-        WRITE (debugfname,'(a,i0.2)') TRIM(fnameheader),fnameID
+        WRITE (UNIT=debugfname,FMT='(a,i0.2)') TRIM(fnameheader),fnameID
       ELSE
-        WRITE (debugfname,'(a)') TRIM(fnameheader)
+        WRITE (UNIT=debugfname,FMT='(a)') TRIM(fnameheader)
       ENDIF
-      OPEN( UNIT=983, FILE=TRIM(debugfname), FORM='unformatted' )
-      WRITE (983) arrayglobal
-      CLOSE (983)
+      OPEN( UNIT=unit_983, FILE=TRIM(debugfname), FORM='unformatted' )
+      WRITE (UNIT=unit_983) arrayglobal
+      CLOSE (UNIT=unit_983)
       ! ASCII
       IF ( PRESENT( fnameID ) ) THEN
         WRITE (debugfname,'(a,a,i0.2)') TRIM(fnameheader),'_ASCII_',fnameID
       ELSE
         WRITE (debugfname,'(a,a)') TRIM(fnameheader),'_ASCII'
       ENDIF
-      OPEN( UNIT=983, FILE=TRIM(debugfname), FORM='formatted' )
+      OPEN( UNIT=unit_983, FILE=TRIM(debugfname), FORM='formatted' )
       DO k = 1, mz
         DO j = jds, jde
           DO i = ids, ide
-            WRITE (983,*) arrayglobal(i,j,k)
+            WRITE (UNIT=unit_983,FMT=*) arrayglobal(i,j,k)
           ENDDO
         ENDDO
       ENDDO
-      CLOSE (983)
+      CLOSE (UNIT=unit_983)
     ENDIF
     DEALLOCATE( arrayglobal )
   ENDIF

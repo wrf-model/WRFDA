@@ -29,15 +29,9 @@ SUBROUTINE DA_Setup_Background_Errors( xb, xbx, be, xp )
      CALL DA_Setup_Background_Errors5(xb,be,xbx, xp)
      
    else
-
-      write(unit=*, fmt='(a,i8/a)') &
-           'Invalid cv_options =', cv_options, &
-           "Program stopped."
-
-      WRITE( message , * ) &
-           'da_3dvar/src/DA_Setup_Structures/da_setup_background_errors.inc: ', &
-           'Invalid cv_options =', cv_options
-      CALL WRF_ERROR_FATAL ( message )
+     WRITE(UNIT=errmsg(1),FMT='(A,I8)') &
+       "Invalid cv_options",cv_options
+     CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
    endif
 
 END SUBROUTINE DA_Setup_Background_Errors

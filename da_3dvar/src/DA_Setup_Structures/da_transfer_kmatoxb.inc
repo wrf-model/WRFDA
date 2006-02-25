@@ -64,11 +64,11 @@ SUBROUTINE DA_Transfer_KMAToXb( xbx, grid, &
 
    if(print_detail > 0) then
      print *, ' '
-     write(unit=*, fmt='(/a/)') &
+     write(UNIT=stdout, fmt='(/a/)') &
           'lvl         kma_a                 kma_b'
 
      do k=ks,ke
-        write(unit=*, fmt='(i3,8e20.12)') k, xb%kma_a(k), xb%kma_b(k)
+        write(UNIT=stdout, fmt='(i3,8e20.12)') k, xb%kma_a(k), xb%kma_b(k)
      enddo
    endif
 
@@ -309,11 +309,11 @@ PRINT *,'TEST_COVERAGE_da_transfer_kmatoxb_B:  tmpp(',k,') = ', tmpp
    if(print_detail > 0) then
      print *, ' '
      if(print_detail > 10) then
-     write(unit=*, fmt='(/5a/)') &
+     write(UNIT=stdout, fmt='(/5a/)') &
           'lvl         h                 p                t'
 
      do k=ks,ke
-        write(unit=*, fmt='(i3,8e20.12)') k, &
+        write(UNIT=stdout, fmt='(i3,8e20.12)') k, &
               xb%h(is,js,k), xb%p(is,js,k), xb%t(is,js,k)
      enddo
      endif
@@ -459,10 +459,10 @@ PRINT *,'TEST_COVERAGE_da_transfer_kmatoxb_B:  tmpp(',k,') = ', tmpp
 !------------------------------------------------------------------------------
 
    if(print_detail > 0) then
-     write(unit=*, fmt='(3a, i8)') &
+     write(UNIT=stdout, fmt='(3a, i8)') &
           'file:', __FILE__, ', line:', __LINE__
 
-     write(unit=*, fmt='(a)') &
+     write(UNIT=stdout, fmt='(a)') &
           'Sea level pressure and total precipitable water'
    endif
 
@@ -491,10 +491,10 @@ PRINT *,'TEST_COVERAGE_da_transfer_kmatoxb_B:  tmpp(',k,') = ', tmpp
 #if 0
 !------------------------------------------------------------------------------
    if(print_detail > 0) then
-     write(unit=*, fmt='(3a, i8)') &
+     write(UNIT=stdout, fmt='(3a, i8)') &
           'file:', __FILE__, ', line:', __LINE__
 
-     write(unit=*, fmt='(a)') &
+     write(UNIT=stdout, fmt='(a)') &
           'Surface Wind speed'
    endif
 
@@ -527,10 +527,10 @@ PRINT *,'TEST_COVERAGE_da_transfer_kmatoxb_B:  tmpp(',k,') = ', tmpp
 !------------------------------------------------------------------------------
 
   if(print_detail > 0) then
-   write(unit=*, fmt='(3a, i8)') &
+   write(UNIT=stdout, fmt='(3a, i8)') &
    'file:', __FILE__, ', line:', __LINE__
 
-    write(unit=*, fmt='(a)') &
+    write(UNIT=stdout, fmt='(a)') &
          'Brightness temperature'
  endif
 !
@@ -570,18 +570,18 @@ PRINT *,'TEST_COVERAGE_da_transfer_kmatoxb_B:  tmpp(',k,') = ', tmpp
       enddo
       CALL wrf_dm_sum_reals ( loc_latc_mean, xbx % latc_mean )
 do j=xp%jds,xp%jde
-PRINT *,'TEST_COVERAGE_da_transfer_kmatoxb_C:  xbx%latc_mean(',j,') = ', xbx%latc_mean(j)
+  write(UNIT=stdout,FMT=*) 'TEST_COVERAGE_da_transfer_kmatoxb_C:  xbx%latc_mean(',j,') = ', xbx%latc_mean(j)
 enddo
    ENDIF
 do j=xp%jds,xp%jde
-PRINT *,'TEST_COVERAGE_da_transfer_kmatoxb_D:  xbx%latc_mean(',j,') = ', xbx%latc_mean(j)
+  write(UNIT=stdout,FMT=*) 'TEST_COVERAGE_da_transfer_kmatoxb_D:  xbx%latc_mean(',j,') = ', xbx%latc_mean(j)
 enddo
 
 !------------------------------------------------------------------------------
-    print *, 'js je is ie= ', js,je,is,ie
+    write(UNIT=stdout,FMT=*) 'js je is ie= ', js,je,is,ie
 !   do j=js,je
 !     do i=is,ie
-!       write(6,'(2i4,3f12.2,e12.4,2f12.2)') j,i,xb%psfc(i,j),xb%tsk(i,j),xb%t2(i,j),xb%q2(i,j),xb%u10(i,j),xb%v10(i,j)
+!       write(UNIT=stdout,FMT='(2i4,3f12.2,e12.4,2f12.2)') j,i,xb%psfc(i,j),xb%tsk(i,j),xb%t2(i,j),xb%q2(i,j),xb%u10(i,j),xb%v10(i,j)
 !     end do
 !   end do
 

@@ -30,8 +30,7 @@ subroutine DA_Read_MM5(input_unit, new, error)
       read(input_unit, iostat=ier) flag
 
       if(ier/=0) then
-         write(0,'("Error reading header flag")')
-         call abort()
+        CALL wrf_error_fatal3(__FILE__,__LINE__,"Error reading header flag")
       endif
 
       if (flag == 0) then
@@ -39,8 +38,7 @@ subroutine DA_Read_MM5(input_unit, new, error)
                                      new%big_header%bhic, new%big_header%bhrc
 
          if(ier/=0) then
-            write(0,'("Error reading big header")')
-            call abort()
+           CALL wrf_error_fatal3(__FILE__,__LINE__,"Error reading big header")
          endif
 
          if(print_info) &
@@ -62,8 +60,7 @@ subroutine DA_Read_MM5(input_unit, new, error)
               new%sub_header(nv)%description
 
          if(ier/=0) then
-            write(0,'("Error reading subheader")')
-            call abort()
+           CALL wrf_error_fatal3(__FILE__,__LINE__,"Error reading subheader")
          endif
 
          if(print_info) then
@@ -78,8 +75,7 @@ subroutine DA_Read_MM5(input_unit, new, error)
          read(input_unit,iostat=ier) data
          
          if(ier/=0) then
-            write(0,'("Error reading data")')
-            call abort()
+           CALL wrf_error_fatal3(__FILE__,__LINE__,"Error reading data")
          endif
 
          call DA_cleanrows(data, new%sub_header(nv))
@@ -264,14 +260,14 @@ subroutine DA_Read_MM5(input_unit, new, error)
 
          else
             if(new%sub_header(nv)%ordering(1:2) /= 'CA') then
-!               write(unit=*, fmt='(a)') &
+!               write(unit=stdout, fmt='(a)') &
 !                    'Warning!!! A variable is not saved.'
 
 !               call DA_print_sub_header(new%sub_header(nv))
             endif
 
             if(print_info) then
-               write(6, fmt='(a,4(i2,a),e24.14)') &
+               write(UNIT=stdout, fmt='(a,4(i2,a),e24.14)') &
                     'Sample value(', &
                      new%sub_header(nv)%start_index(1),',', &
                      new%sub_header(nv)%start_index(2),',', &
@@ -295,14 +291,16 @@ subroutine DA_Read_MM5(input_unit, new, error)
 
          return
       else
-         stop
+        WRITE(UNIT=errmsg(1),FMT='(A,I5)') &
+          "Invalid value of flag=",flag
+        CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
       endif
 
    enddo
 
    error = 1
 
-   write(0,'(/,"Hit the end of file of unit ", I3)') &
+   write(UNIT=stderr,FMT='(/,"Hit the end of file of unit ", I3)') &
          input_unit
 
 END SUBROUTINE DA_Read_MM5

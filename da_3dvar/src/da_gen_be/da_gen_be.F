@@ -11,6 +11,7 @@ module da_gen_be
    use da_constants
    use LAPACK
    use BLAS
+   USE module_wrf_error
 
    implicit none
 

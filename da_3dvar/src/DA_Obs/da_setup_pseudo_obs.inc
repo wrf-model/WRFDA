@@ -12,7 +12,7 @@ SUBROUTINE da_setup_pseudo_obs( iv, ob )
    integer                       :: n    ! Loop counters.
 
 
-   write(unit=*, fmt='(a, i8)') &
+   write(UNIT=stdout, fmt='(a, i8)') &
         'num_pseudo=', num_pseudo
 
    iv % num_pseudo = num_pseudo
@@ -86,8 +86,8 @@ SUBROUTINE da_setup_pseudo_obs( iv, ob )
             iv % pseudo(n) % q % qc = 0
          end if 
          
-         write(6,'(a4,2f15.5)')pseudo_var, pseudo_val, pseudo_err
-         write(6,'(3f15.5)')pseudo_x, pseudo_y, pseudo_z
+         write(UNIT=stdout,FMT='(a4,2f15.5)')pseudo_var, pseudo_val, pseudo_err
+         write(UNIT=stdout,FMT='(3f15.5)')pseudo_x, pseudo_y, pseudo_z
       end do
    end if
 

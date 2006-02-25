@@ -92,10 +92,9 @@
 ! 
       return
 95    iflag= -7
-      if (lp > 0) write(lp,135) iflag
+      if (lp > 0) write(UNIT=lp,FMT='(A,I2,/2A)') &
+        "iflag= ",iflag,"the diagonal element of the", &
+        " inverse hessian approximation is not positive"
       return
-! 
- 135  format(/' iflag= ',i2,/' the diagonal element of the', &
-             ' inverse hessian approximation is not positive')
   
       end subroutine da_lmdir

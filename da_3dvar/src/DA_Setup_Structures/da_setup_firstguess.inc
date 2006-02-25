@@ -30,11 +30,11 @@ SUBROUTINE DA_Setup_FirstGuess( xbx, grid, &
    integer :: is, ie, js, je
    real    :: ddx , ddy     
 
-   write(unit=*, fmt='(/a)') &
+   write(unit=stdout, fmt='(/a)') &
         '-----------------------------------'
-   write(unit=*, fmt='(/a)') &
+   write(unit=stdout, fmt='(/a)') &
         '[2.0] Set up first guess field (xb)'
-   write(unit=*, fmt='(a/a)') &
+   write(unit=stdout, fmt='(a/a)') &
         '-----------------------------------'
 
    is = xp % its
@@ -88,8 +88,9 @@ SUBROUTINE DA_Setup_FirstGuess( xbx, grid, &
      xb% coefx(is:ie,js:je) = 0.5 / (ddx * cos(xlat(is:ie,js:je)*pi/180.))
      xb% coefy(is:ie,js:je) = 0.5 /  ddy
    else
-     print*,' Wrong choice for fg_format = ',fg_format
-     stop 'wrong fg_format.'
+     WRITE(UNIT=errmsg(1),FMT='(A,I5)') &
+       "Wrong choice for fg_format = ",fg_format
+     CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
    end if
 
    CALL wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id0)
@@ -100,11 +101,11 @@ SUBROUTINE DA_Setup_FirstGuess( xbx, grid, &
      call da_set_boundary_xb(xb)
    end if
 !------------------------------------------------------------------------------
-!  write(unit=*, fmt='(4x,a,i4)') &
+!  write(unit=stdout, fmt='(4x,a,i4)') &
 !       'I Dimension grid points: ', xb % mix, &
 !       'J Dimension grid points: ', xb % mjy, &
 !       'K Dimension grid points: ', xb % mkz
-!  write(unit=*, fmt='(/)')
+!  write(unit=stdout, fmt='(/)')
 
 !------------------------------------------------------------------------------      
 !  [2.0] Setup grid-dependent constants used:

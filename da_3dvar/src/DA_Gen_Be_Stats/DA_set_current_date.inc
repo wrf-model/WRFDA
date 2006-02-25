@@ -9,10 +9,10 @@ subroutine DA_set_current_date(current_date,yy,mm,dd,hh)
    character(*), intent(out) :: current_date
    integer,      intent(in)  :: yy, mm, dd, hh
 
-   write(current_date(1:4),'(I4.4)') yy
-   write(current_date(6:7),'(I2.2)') mm
-   write(current_date(9:10),'(I2.2)') dd
-   write(current_date(12:13),'(I2.2)') hh
+   write(UNIT=current_date(1:4),  FMT='(I4.4)') yy
+   write(UNIT=current_date(6:7),  FMT='(I2.2)') mm
+   write(UNIT=current_date(9:10), FMT='(I2.2)') dd
+   write(UNIT=current_date(12:13),FMT='(I2.2)') hh
 
    current_date(5:5)='-'
    current_date(8:8)='-'

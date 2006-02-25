@@ -102,14 +102,14 @@ subroutine da_calculate_j( it, iter, xb, xbx, be, iv, xhat, cv, vv, &
       j % total = j % jb + j % jo % total
 
       if(it == 1 .and. iter == 0) then
-      write(81,'(a)')'Outer   EPS   Inner      J          Jb      Jo'
-      write(81,'(a)')'Iter          Iter                            '
-      write(82,'(a)')'Outer   EPS   Inner      G          Gb      Go'
-      write(82,'(a)')'Iter          Iter                            '
+      write(UNIT=cost_unit,FMT='(a)')'Outer   EPS   Inner      J          Jb      Jo'
+      write(UNIT=cost_unit,FMT='(a)')'Iter          Iter                            '
+      write(UNIT=grad_unit,FMT='(a)')'Outer   EPS   Inner      G          Gb      Go'
+      write(UNIT=grad_unit,FMT='(a)')'Iter          Iter                            '
       endif
 
-      write(81,81) it, EPS(it), iter, j % total, j % jb, j % jo % total
- 81   format(2x,i2,1x,f6.3,2x,i4,2x,3f10.3)
+      write(UNIT=cost_unit,FMT='(2x,i2,1x,f6.3,2x,i4,2x,3f10.3') &
+        it, EPS(it), iter, j % total, j % jb, j % jo % total
 
 !-------------------------------------------------------------------------
 !     [2.0] calculate grad_v (jo):
@@ -124,10 +124,10 @@ subroutine da_calculate_j( it, iter, xb, xbx, be, iv, xhat, cv, vv, &
       call da_deallocate_y( jo_grad_y )
 
       if( print_detail >= 100) then
-         write(unit=0, fmt='(2a,2(2x,a,i6))') 'file:', __FILE__, 'line:', __LINE__, 'iter=', iter
-         write(unit=0, fmt='(a, e24.14)') ' in da_calculate_j: cv.cv = ',sum(cv(1:cv_size) * cv(1:cv_size))
-         write(unit=0, fmt='(a, e24.14)') ' in da_calculate_j: xhat.xhat = ',sum(xhat(1:cv_size) * xhat(1:cv_size))
-         write(unit=0, fmt='(a, e24.14)') ' in da_calculate_j: j_grad.j_grad = ',sum(j_grad(1:cv_size) * j_grad(1:cv_size))
+         write(unit=stderr, fmt='(2a,2(2x,a,i6))') 'file:', __FILE__, 'line:', __LINE__, 'iter=', iter
+         write(unit=stderr, fmt='(a, e24.14)') ' in da_calculate_j: cv.cv = ',sum(cv(1:cv_size) * cv(1:cv_size))
+         write(unit=stderr, fmt='(a, e24.14)') ' in da_calculate_j: xhat.xhat = ',sum(xhat(1:cv_size) * xhat(1:cv_size))
+         write(unit=stderr, fmt='(a, e24.14)') ' in da_calculate_j: j_grad.j_grad = ',sum(j_grad(1:cv_size) * j_grad(1:cv_size))
       endif
 
 !-------------------------------------------------------------------------
@@ -152,14 +152,14 @@ subroutine da_calculate_j( it, iter, xb, xbx, be, iv, xhat, cv, vv, &
          gnorm_cv=da_dot_cv(cv + xhat, cv + xhat, cv_size, xp,  &
                     (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz /) )
       else
-         write(unit=*, fmt='(a)') 'Wrong minimisation_option.'
+         write(unit=stderr, fmt='(a)') 'Wrong minimisation_option.'
       endif
 
       if( print_detail >= 100) then
-         write(unit=0, fmt='(2a,2(2x,a,i6))') 'file:', __FILE__, 'line:', __LINE__, 'iter=', iter
-         write(unit=0, fmt='(a, e24.14)') ' in da_calculate_j: cv.cv = ',sum(cv(1:cv_size) * cv(1:cv_size))
-         write(unit=0, fmt='(a, e24.14)') ' in da_calculate_j: xhat.xhat = ',sum(xhat(1:cv_size) * xhat(1:cv_size))
-         write(unit=0, fmt='(a, e24.14)') ' in da_calculate_j: j_grad.j_grad = ',sum(j_grad(1:cv_size) * j_grad(1:cv_size))
+         write(unit=stderr, fmt='(2a,2(2x,a,i6))') 'file:', __FILE__, 'line:', __LINE__, 'iter=', iter
+         write(unit=stderr, fmt='(a, e24.14)') ' in da_calculate_j: cv.cv = ',sum(cv(1:cv_size) * cv(1:cv_size))
+         write(unit=stderr, fmt='(a, e24.14)') ' in da_calculate_j: xhat.xhat = ',sum(xhat(1:cv_size) * xhat(1:cv_size))
+         write(unit=stderr, fmt='(a, e24.14)') ' in da_calculate_j: j_grad.j_grad = ',sum(j_grad(1:cv_size) * j_grad(1:cv_size))
       endif
 
       gnorm_cv= sqrt(gnorm_cv)
@@ -169,7 +169,8 @@ subroutine da_calculate_j( it, iter, xb, xbx, be, iv, xhat, cv, vv, &
 
       gnorm_j = sqrt(gnorm_j )
 
-      write(82,81) it, EPS(it), iter, gnorm_j, gnorm_cv, gnorm_jo
+      write(grad_unit,FMT='(2x,i2,1x,f6.3,2x,i4,2x,3f10.3)') & 
+        it, EPS(it), iter, gnorm_j, gnorm_cv, gnorm_jo
 
   end subroutine da_calculate_j
 

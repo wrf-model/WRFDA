@@ -27,7 +27,7 @@ subroutine da_setup_testfield( xb, xa, xp, &
 !  [1.0]: initialise:
 !-------------------------------------------------------------------------
 
-   write(unit=*, fmt='(/a/)') &
+   write(UNIT=stdout, fmt='(/a/)') &
         'Starting da_setup_testfield ...'
 
 !-------------------------------------------------------------------------
@@ -65,7 +65,7 @@ subroutine da_setup_testfield( xb, xa, xp, &
    xa%p   (xp%its:xp%ite, xp%jts:xp%jte, xp%kts)
 
    if(print_detail > 100) then
-   write(unit=*, fmt='(2a,4x,a,i8)') &
+   write(UNIT=stdout, fmt='(2a,4x,a,i8)') &
         'file:', __FILE__, 'line:', __LINE__
 
    print *, 'xp%its, xp%ite, xp%jts, xp%jte) =', xp%its, xp%ite, xp%jts, xp%jte
@@ -73,7 +73,7 @@ subroutine da_setup_testfield( xb, xa, xp, &
    do j=xp%jts, xp%jte
    do i=xp%its, xp%ite
       if(i == j) then
-         write(unit=*, fmt='(2(a,i4),a,f14.6)') &
+         write(UNIT=stdout, fmt='(2(a,i4),a,f14.6)') &
               'xa%psfc(', i, ',', j, ') =', xa%psfc(i, j)
       endif
    enddo
@@ -113,7 +113,7 @@ subroutine da_setup_testfield( xb, xa, xp, &
       CALL wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id8)
    endif
 
-   write(unit=*, fmt='(/a/)') &
+   write(UNIT=stdout, fmt='(/a/)') &
         'End of da_setup_testfield.'
 
 end subroutine da_setup_testfield

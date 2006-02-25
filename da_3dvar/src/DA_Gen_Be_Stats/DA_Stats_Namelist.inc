@@ -36,17 +36,17 @@ Subroutine DA_Stats_Namelist
    read(10, nml = timerecd)
    read(10, nml = analtype)
 
-   write(unit=*, fmt='(2a)') ' DIRECTORY =  ',directory_name
-   write(unit=*, fmt='(2a)') ' FILE_HEAD =  ',file_head
-   write(unit=*, fmt='(2a)') ' BGN_DATE  =  ',bgn_date
-   write(unit=*, fmt='(2a)') ' END_DATE  =  ',end_date
+   write(unit=stdout, fmt='(2a)') ' DIRECTORY =  ',directory_name
+   write(unit=stdout, fmt='(2a)') ' FILE_HEAD =  ',file_head
+   write(unit=stdout, fmt='(2a)') ' BGN_DATE  =  ',bgn_date
+   write(unit=stdout, fmt='(2a)') ' END_DATE  =  ',end_date
 
-   write(unit=*, fmt='(a,I4,a)') ' T_FORECAST1 = ',t_forecast1,' hour(s)'
-   write(unit=*, fmt='(a,I4,a)') ' T_FORECAST2 = ',t_forecast2,' hour(s)'
-   write(unit=*, fmt='(a,I4,a)') ' FILE_INTERVAL = ',file_interval,' hour(s)'
+   write(unit=stdout, fmt='(a,I4,a)') ' T_FORECAST1 = ',t_forecast1,' hour(s)'
+   write(unit=stdout, fmt='(a,I4,a)') ' T_FORECAST2 = ',t_forecast2,' hour(s)'
+   write(unit=stdout, fmt='(a,I4,a)') ' FILE_INTERVAL = ',file_interval,' hour(s)'
 
-   write(unit=*, fmt='(a,i4)') ' BE_TYPE  = ', background_option
-   if (background_option == 2) write (unit=*, fmt='(a,i2)') ' members  = ', members
+   write(unit=stdout, fmt='(a,i4)') ' BE_TYPE  = ', background_option
+   if (background_option == 2) write (unit=stdout, fmt='(a,i2)') ' members  = ', members
 
    close(10)
 

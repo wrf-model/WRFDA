@@ -46,7 +46,7 @@ SUBROUTINE DA_Scan_Radar (iunit, ob, xp, filename)
            STATUS = 'OLD')
 
       IF (iost /= 0) THEN
-         write(unit=*, fmt='(/A,I3,3(2X,A)/)') &
+         write(UNIT=stdout, fmt='(/A,I3,3(2X,A)/)') &
               'ERROR IN OBS INPUT FILE UNIT ',iunit, &
               'OBS FILENAME:', trim(filename), &
               'FOR RADAR OBSERVATIONS CANNOT BE FOUND OR CANNOT BE OPENED'
@@ -60,7 +60,7 @@ SUBROUTINE DA_Scan_Radar (iunit, ob, xp, filename)
            STATUS = 'OLD')
 
       IF (iost /= 0) THEN
-         write(unit=*, fmt='(/A,I3,2X,A/)') &
+         write(UNIT=stdout, fmt='(/A,I3,2X,A/)') &
               'ERROR IN INPUT FILE UNIT ',iunit, &
               'FOR RADAR OBSERVATIONS CANNOT BE FOUND OR CANNOT BE OPENED'
          RETURN
@@ -78,25 +78,25 @@ SUBROUTINE DA_Scan_Radar (iunit, ob, xp, filename)
 ! 2.1 READ FIRST LINE
 !     ---------------
 
-   READ (iunit, FMT = '(A)', IOSTAT = iost) char_total_Radar
+   READ (UNIT=iunit, FMT = '(A)', IOSTAT = iost) char_total_Radar
 
 ! 2.2 PROCESS ERROR
 !     -------------
 
    IF (iost /= 0) THEN
-       WRITE (0,'(/A,i3/)') ' ERROR READING FILE UNIT:', iunit
-       STOP         ' in read_Radar_header.F'
+     CALL wrf_error_fatal3(__FILE__,__LINE__, &
+       "Cannot read radar file")
    ENDIF
 
 ! 2.3 TOTAL RADAR NUMBER
 !     ------------------
 
-   READ (char_total_Radar (15:17), '(I3)', IOSTAT = iost) total_Radar
+   READ (UNIT=char_total_Radar (15:17),FMT='(I3)', IOSTAT = iost) total_Radar
 
 !  2.4 SKIP ONE LINES
 !      --------------
 
-   READ (iunit, FMT = '(A)', IOSTAT = iost)
+   READ (UNIT=iunit, FMT = '(A)', IOSTAT = iost)
 
 !----------------------------------------------------------------------------!
 ! 3. READ RADAR DATA
@@ -107,24 +107,24 @@ SUBROUTINE DA_Scan_Radar (iunit, ob, xp, filename)
 !  3.1 SKIP ONE BLANK LINES
 !  ------------------------
 
-   READ (iunit, FMT = '(A)', IOSTAT = iost)
+   READ (UNIT=iunit, FMT = '(A)', IOSTAT = iost)
 
 !  3.2 READ HEADER
 !  ---------------
 
-   READ (iunit, FMT = '(A)', IOSTAT = iost) char_ned
+   READ (UNIT=iunit, FMT = '(A)', IOSTAT = iost) char_ned
 
 !  3.3 READ HEADER INFORMATION
 !      -----------------------
 
-   READ (char_ned (69:74), '(I6)', IOSTAT = iost) platform % stn % numObs
+   READ (UNIT=char_ned (69:74), FMT='(I6)', IOSTAT = iost) platform % stn % numObs
 
 !----------------------------------------------------------------------------!
 !  3.4 SKIP TWO LINES
 !  ------------------
 
-   READ (iunit, FMT = '(A)', IOSTAT = iost)
-   READ (iunit, FMT = '(A)', IOSTAT = iost)
+   READ (UNIT=iunit, FMT = '(A)', IOSTAT = iost)
+   READ (UNIT=iunit, FMT = '(A)', IOSTAT = iost)
 
 !----------------------------------------------------------------------------!
 !  3.5 LOOP OVER RECORDS
@@ -144,7 +144,7 @@ SUBROUTINE DA_Scan_Radar (iunit, ob, xp, filename)
                    platform % info % elv,       &
                    platform % info % levels
 
-      read(platform % info % platform (4:6), '(I3)') fm
+      read(UNIT=platform % info % platform (4:6), FMT='(I3)') fm
 
       ob % total_obs = ob % total_obs + 1
 
@@ -178,7 +178,7 @@ SUBROUTINE DA_Scan_Radar (iunit, ob, xp, filename)
 
       if( nlevels > max_ob_levels) then
 
-          write(0,'(A,2I8)') &
+          write(UNIT=stderr,FMT='(A,2I8)') &
           ' Radar=> nlevels > max_ob_levels:',nlevels, max_ob_levels
 
           nlevels = max_ob_levels
@@ -205,19 +205,19 @@ SUBROUTINE DA_Scan_Radar (iunit, ob, xp, filename)
           num_Radar = num_Radar + 1
 
           if( num_Radar > max_Radar ) then
-                write(0,'(A,I6,A,I6)') ' Radar #= ',ob % num_Radar, &
-                          ' > max_Radar = ', max_Radar
-                STOP
+            write(UNIT=errmsg(1),FMT='(A,I6,A,I6)') &
+              ' Radar #= ',ob % num_Radar, ' > max_Radar = ', max_Radar
+            CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
           endif
 
         CASE DEFAULT;
 
-          write(unit=*, fmt='(a)') 'Warining: unsaved obs found:'
+          write(UNIT=stdout, fmt='(a)') 'Warining: unsaved obs found:'
 
-          write(unit=*, fmt='(2a)') &
+          write(UNIT=stdout, fmt='(2a)') &
                'platform % info % platform=', platform % info % platform
 
-          write(unit=*, fmt='(a, i3)') &
+          write(UNIT=stdout, fmt='(a, i3)') &
                'platform % info % levels=', platform % info % levels
 
       END SELECT
@@ -233,10 +233,10 @@ SUBROUTINE DA_Scan_Radar (iunit, ob, xp, filename)
 ! 4. PRINT OUT
 ! ============
  
-   if(print_detail > 0) write(unit=*, fmt='(/5x,a,i6,a)') &
+   if(print_detail > 0) write(UNIT=stdout, fmt='(/5x,a,i6,a)') &
          ' Read:  ', num_Radar, ' Radar reports '
 
-   WRITE (0,'(/,A,I3,/)') ' END OF UNIT: ',iunit
+   WRITE (unit=stderr,FMT='(/,A,I3,/)') ' END OF UNIT: ',iunit
 
    ob%num_Radar = ob%num_Radar + num_Radar
 

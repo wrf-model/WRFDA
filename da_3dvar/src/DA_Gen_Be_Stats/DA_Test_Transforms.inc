@@ -128,9 +128,9 @@ SUBROUTINE DA_Test_Transforms (diff, xb, xbx, xp,  &
    rms_diff = SQRT( SUM( rdiff(its:ite, jts:jte, kts:kte) &
                        * rdiff(its:ite, jts:jte, kts:kte) ) )
 
-   write(unit=*, fmt='(a,1pe10.4)') ' u RMS error = ', rms_diff
-   write(unit=*, fmt='(a,1pe10.4)') ' u RMS field = ', rms_fild
-   write(unit=*, fmt='(a,1pe10.4)') ' u RMS error/RMS field = ', rms_diff/rms_fild
+   write(UNIT=stdout, fmt='(a,1pe10.4)') ' u RMS error = ', rms_diff
+   write(UNIT=stdout, fmt='(a,1pe10.4)') ' u RMS field = ', rms_fild
+   write(UNIT=stdout, fmt='(a,1pe10.4)') ' u RMS error/RMS field = ', rms_diff/rms_fild
 
 !v inverse test
    rdiff(its:ite, jts:jte, kts:kte) = v(its:ite, jts:jte, kts:kte) &
@@ -141,8 +141,8 @@ SUBROUTINE DA_Test_Transforms (diff, xb, xbx, xp,  &
    rms_diff = SQRT( SUM( rdiff(its:ite, jts:jte, kts:kte) &
                        * rdiff(its:ite, jts:jte, kts:kte) ) )
 
-   write(unit=*, fmt='(a,1pe10.4)') ' v RMS error = ', rms_diff
-   write(unit=*, fmt='(a,1pe10.4)') ' v RMS field = ', rms_fild
-   write(unit=*, fmt='(a,1pe10.4)') ' v RMS error/RMS field = ', rms_diff/rms_fild
+   write(UNIT=stdout, fmt='(a,1pe10.4)') ' v RMS error = ', rms_diff
+   write(UNIT=stdout, fmt='(a,1pe10.4)') ' v RMS field = ', rms_fild
+   write(UNIT=stdout, fmt='(a,1pe10.4)') ' v RMS error/RMS field = ', rms_diff/rms_fild
 
 END SUBROUTINE DA_Test_Transforms

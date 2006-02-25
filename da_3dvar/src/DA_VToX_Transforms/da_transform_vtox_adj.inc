@@ -115,9 +115,8 @@ subroutine da_transform_vtox_adj( xb, xbx, be, xa, xp, vp, vv, cv, &
          if ( use_ssmt1obs .or. use_ssmt2obs .or. &
               Use_SsmiTbObs .or. Use_SsmiRetrievalObs ) then
          if( cv_options == 4) then
-         print*,' This will not work as xb%speed is not available' 
-         print*,' Please see the comments in da_transfer_kmatoxb.inc'
-         stop
+           CALL wrf_error_fatal3(__FILE__,__LINE__, &
+             "xb%speed is not available, see da_transfer_kmatoxb.inc")
          end if
             call DA_Transform_XToSeaSfcWind_Adj( xa, xb )
          endif
@@ -240,11 +239,9 @@ subroutine da_transform_vtox_adj( xb, xbx, be, xa, xp, vp, vv, cv, &
                                 ims,ime, jms,jme, kms,kme,  &
                                 its,ite, jts,jte, kts,kte )
  else
-    write(unit=*, fmt='(a, i4)') &
-         'Unkown cv_options:', cv_options
-
-    CALL wrf_shutdown
-    STOP 'Stopped, as cv_options not valid.'
+   WRITE(UNIT=errmsg(1),FMT='(a, i4)') &
+     'Unknown cv_options:', cv_options
+   CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
  endif
 
  if(cv_options == 2 .or. cv_options == 5) then

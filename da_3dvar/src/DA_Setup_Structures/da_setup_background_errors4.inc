@@ -45,10 +45,9 @@ SUBROUTINE DA_Setup_Background_Errors4(xb, be, xbx, xp)
 
    write (6,'(A)') ' ----------------------------------------------------------'
    IF(cv_options /= 4) THEN
-      write(unit=*, fmt='(a, i2)') &
-           'cv_options:', cv_options
-
-      STOP "Stopped in setting up errors due to wrong CV_OPTION."
+     WRITE(UNIT=errmsg(1),FMT='(A,I5,A)') &
+       "cv_options=",cv_options,"must be 4"
+     CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
    ENDIF
    be % cv % option = cv_options
    write (6,'(A,I3)') ' [3.0] Set up background errors (be) for cv_option:', cv_options
@@ -71,8 +70,10 @@ SUBROUTINE DA_Setup_Background_Errors4(xb, be, xbx, xp)
    read(be_cv_4_unit, err = 100)bin2d(1:ni,1:nj)
 
 !---------------------------------------------------------
-   if( ni /= xbx%ni .or. nj /= xbx%nj .or. nk /= xbx%nk ) &
-   stop ' Cannot generate BE at this resolution'
+   IF (ni /= xbx%ni .or. nj /= xbx%nj .or. nk /= xbx%nk ) THEN
+     CALL wrf_error_fatal3(__FILE__,__LINE__, &
+       "Cannot generate BE at this resolution")
+   END IF
 
    allocate (regcoeff1(1:num_bins))
    allocate (regcoeff2(1:nk,1:num_bins2d))
@@ -259,7 +260,11 @@ SUBROUTINE DA_Setup_Background_Errors4(xb, be, xbx, xp)
    cv_size = be % cv % size
    close(be_cv_4_unit)
    return
-99  write(6,'(a, i5)')' Unexpected end on BE-unit = ',be_cv_4_unit
-100 write(6,'(a, i5)')' Read error on BE-unit = ',be_cv_4_unit
-   stop     
+
+99 WRITE(UNIT=errmsg(1),FMT='(A,I5)') "Unexpected end on BE-unit = ",be_cv_4_unit
+   CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
+
+100 WRITE(UNIT=errmsg(1),FMT='(A,I5)') "Read error on BE-unit = ",be_cv_4_unit
+    CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
+
 END SUBROUTINE DA_Setup_Background_Errors4

@@ -22,20 +22,20 @@ subroutine da_read_errfac( ob_name, f1, f2, f3, f4, f5 )
    f4 = 1.0
    f5 = 1.0
 
-   open( fac_unit, status='old', file = 'errfac.dat', iostat=ierr )
+   open(UNIT=fac_unit, status='old', file = 'errfac.dat', iostat=ierr )
 
    if ( ierr == 0 ) then
    
       do 
-         read(fac_unit,'(x,a5,a21,a91)')ob_name1, string1, string2
+         read(UNIT=fac_unit,FMT='(x,a5,a21,a91)')ob_name1, string1, string2
 
          if ( ob_name == ob_name1 .and. &
               string1 == ' obs, Error Factor = ' ) then
-            read(string2(17:31),*)d1
-            read(string2(32:46),*)d2
-            read(string2(47:61),*)d3
-            read(string2(62:76),*)d4
-            read(string2(77:91),*)d5
+            read(UNIT=string2(17:31),FMT=*)d1
+            read(UNIT=string2(32:46),FMT=*)d2
+            read(UNIT=string2(47:61),FMT=*)d3
+            read(UNIT=string2(62:76),FMT=*)d4
+            read(UNIT=string2(77:91),FMT=*)d5
             if ( d1 > 0.0 ) f1 = d1
             if ( d2 > 0.0 ) f2 = d2
             if ( d3 > 0.0 ) f3 = d3
@@ -44,15 +44,15 @@ subroutine da_read_errfac( ob_name, f1, f2, f3, f4, f5 )
 
             exit
          else if ( ob_name1 == 'Total' ) then
-            write(0,'(a,a)')' No Tuning Error factors for ', ob_name
-            write(0,'(a)')' So setting to 1.0 i.e. default errors.'  
+            write(UNIT=stderr,FMT='(a,a)')' No Tuning Error factors for ', ob_name
+            write(UNIT=stderr,FMT='(a)')' So setting to 1.0 i.e. default errors.'  
             exit
          end if
 
       end do
       
    else   
-      write(0,'(a)')' WARNING: Error reading errfac.dat - Not tuning ob errors'
+      write(UNIT=stderr,FMT='(a)')' WARNING: Error reading errfac.dat - Not tuning ob errors'
    end if
 
    close( fac_unit )

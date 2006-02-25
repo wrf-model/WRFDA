@@ -62,12 +62,14 @@ subroutine da_setlegpol_test ( nj, max_wavenumber, alp_size, int_wgts, alp )
             alp_norm_test = 0.5 * ( alp_norm_test + eq_coeff * eq_term )
 
 !            if ( l1 /= l2 .and. abs(alp_norm_test) >= tolerance ) then
-!               write(6,'(a,3i6,f15.10,a,f15.10)')' WARNING: ALP normalization error (m, l1, l2) = ', !&
+!               write(UNIT=stdout,FMT='(a,3i6,f15.10,a,f15.10)')
+!                 ' WARNING: ALP normalization error (m, l1, l2) = ', !&
 !                                                 m, l1, l2, alp_norm_test, &
 !                                                 ', > tolerance = ', tolerance
 !            end if
             if ( l1 == l2 .and. abs(alp_norm_test-1.0) >= tolerance ) then
-               write(spec_unit,'(a,3i6,f15.10,a,f15.10)')' WARNING: ALP normalization error (m, l1, l2) = ', &
+               write(UNIT=spec_unit,FMT='(a,3i6,f15.10,a,f15.10)') &
+                 ' WARNING: ALP normalization error (m, l1, l2) = ', &
                                                  m, l1, l2, alp_norm_test - 1.0, &
                                                  ', > tolerance = ', tolerance
 

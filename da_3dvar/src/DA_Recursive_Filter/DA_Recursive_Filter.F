@@ -11,6 +11,7 @@ MODULE DA_Recursive_Filter
    USE DA_Constants
    USE DA_Define_Structures
    USE PAR_UTIL
+   USE module_wrf_error
 
    IMPLICIT NONE
 

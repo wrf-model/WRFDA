@@ -18,7 +18,7 @@ subroutine roughness_from_lanu(ltbl, mminlu, date_mm5, xp, lanu, rough)
   character (len=4)                     :: LUTYPE
   logical                               :: exist
 
-  read(date_mm5,'(I4,1x,I2,1X,I2)') year, month, day
+  read(UNIT=date_mm5,FMT='(I4,1x,I2,1X,I2)') year, month, day
   call Julian_DAY(year,month,day,Julday, 1)
   Isn = 1
   IF(JULDAY < 105 .OR. JULDAY > 288) Isn=2
@@ -29,40 +29,40 @@ subroutine roughness_from_lanu(ltbl, mminlu, date_mm5, xp, lanu, rough)
     OPEN (UNIT = ltbl, FILE = 'LANDUSE.TBL', FORM='formatted', &
                      ACTION = 'read', IOSTAT = io_error )
   else
-    WRITE(unit=0, fmt='(a)') 'No file: LANDUSE.TBL for conversion of roughness'
-    WRITE(unit=*, fmt='(a)') 'No file: LANDUSE.TBL for conversion of roughness'
-    CALL wrf_shutdown
-    stop 22222
+    CALL wrf_error_fatal3(__FILE__,__LINE__,&
+      "Cannot open file LANDUSE.TBL for conversion of roughness")
   endif
 
   LUMATCH=0  
 
   DO
-      READ (ltbl,'(A4)', IOSTAT=io_error) LUTYPE
+      READ (UNIT=ltbl,FMT='(A4)', IOSTAT=io_error) LUTYPE
       if (io_error /= 0) exit
-      READ (ltbl,*, IOSTAT=io_error) LUCATS,LUSEAS
+      READ (UNIT=ltbl,FMT=*, IOSTAT=io_error) LUCATS,LUSEAS
 
       IF(LUTYPE == MMINLU) LUMATCH=1 
 
       DO LS=1,LUSEAS 
-         READ (ltbl,*)  
+         READ (UNIT=ltbl,FMT=*)  
          DO LC=1,LUCATS 
             IF(LUTYPE == MMINLU)THEN 
-               READ (ltbl,*) LI, ALBD, SLMO, SFEM, SFZ0(LC,LS)
-               IF(LC /= LI) STOP 'MISSING LANDUSE: LC'   
+               READ (UNIT=ltbl,FMT=*) LI, ALBD, SLMO, SFEM, SFZ0(LC,LS)
+               IF(LC /= LI) THEN
+                 CALL wrf_error_fatal3(__FILE__,__LINE__, &
+                   "MISSING LANDUSE: LC")
+               END IF
             ELSE 
-               READ (ltbl,*) 
+               READ (UNIT=ltbl,FMT=*) 
             ENDIF 
          ENDDO 
       ENDDO
    ENDDO
 
-   close (ltbl)
+   close (UNIT=ltbl)
 
    IF(LUMATCH == 0)THEN
-      CALL wrf_shutdown
-      PRINT *,'LANDUSE IN INPUT FILE DOES NOT MATCH LUTABLE' 
-      STOP 'INCONSISTENT OR MISSING LUTABLE FILE' 
+    CALL wrf_error_fatal3(__FILE__,__LINE__,&
+      "LANDUSE IN INPUT FILE DOES NOT MATCH LUTABLE")
    ENDIF   
 
    m1 = xp % its
@@ -70,7 +70,7 @@ subroutine roughness_from_lanu(ltbl, mminlu, date_mm5, xp, lanu, rough)
    n1 = xp % jts
    n2 = xp % jte
 
-!  write(0,'(''dimensions of lanu: m1,m2,n1,n2='',4I4)') m1,m2,n1,n2
+!  write(UNIT=stderr,FMT='(''dimensions of lanu: m1,m2,n1,n2='',4I4)') m1,m2,n1,n2
 
    do lc = m1,m2
    do ls = n1,n2

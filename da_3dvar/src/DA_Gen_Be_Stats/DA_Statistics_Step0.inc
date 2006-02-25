@@ -47,7 +47,7 @@ loop_date:       do while (file_date(1:19) <= end_date(1:19))
 
        IF ( BACKGROUND_OPTION == 1 .and. &
            file_date(1:19) == end_date(1:19) ) EXIT loop_date
-       write(*,'(a,2a20)') 'do while ',file_date(1:19),end_date(1:19)
+       write(UNIT=stdout,FMT='(a,2a20)') 'do while ',file_date(1:19),end_date(1:19)
 
        if (from_mss) call DA_Mss_Read (file_date)
 
@@ -61,7 +61,7 @@ loop_date:       do while (file_date(1:19) <= end_date(1:19))
 !------T24 READ
        do number = 1, members
 
-       write(*,'(/a,i4," *********")') 'PROCESS for T24, member=', number
+       write(UNIT=stdout,FMT='(/a,i4," *********")') 'PROCESS for T24, member=', number
 
        call DA_Make_Filename (file_date, fcst_date, number, filename)
 print *, file_date, fcst_date, filename
@@ -71,7 +71,7 @@ print *, file_date, fcst_date, filename
 #include <em_dummy_args.inc>
                            )
        call DA_Assign_Value (xb, xb24) 
-       write(*,'(3(a,e20.12))')   &
+       write(UNIT=stdout,FMT='(3(a,e20.12))')   &
           'xb24: xb%u(10,10,10)=',xb%u(10,10,10), &
               '  xb%t(10,10,10)=',xb%t(10,10,10), &
            '  xb%Psfc(10,10)   =',xb%psfc(10,10)
@@ -80,11 +80,11 @@ print *, file_date, fcst_date, filename
 
        if (BACKGROUND_OPTION == 1) then
 
-       write(*,'(/a)') 'PROCESS for T12'
+       write(UNIT=stdout,FMT='(/a)') 'PROCESS for T12'
 
        call DA_Gen_Date(file_date, file_date1, t_forecast1)
        call DA_Make_Filename(file_date1, fcst_date, number, filename)
-print *, file_date1, fcst_date, filename
+WRITE(UNIT=stdout,FMT='(3A)') file_date1, fcst_date, filename
 
        call med_initialdata_input_3dvar ( grid , config_flags, &
                                         fcst_date, filename )
@@ -97,7 +97,7 @@ print *, file_date1, fcst_date, filename
        endif
       
        call DA_Difference (diff, xb24, xb12,its,ite, jts,jte, kts,kte)
-!       write(*,'(3(a,E20.12))')   &
+!       write(UNIT=stdout,FMT='(3(a,E20.12))')   &
 !          'diff: diff%u(10,10,10)=',diff%u(10,10,10), &
 !              '  diff%t(10,10,10)=',diff%t(10,10,10), &
 !           '  diff%Psfc(10,10)   =',diff%psfc(10,10)
@@ -105,7 +105,7 @@ print *, file_date1, fcst_date, filename
                                ids,ide, jds,jde, kds,kde,  &
                                ims,ime, jms,jme, kms,kme,  &
                                its,ite, jts,jte, kts,kte )
-!       write(*,'(2(a,e20.12))')   &
+!       write(UNIT=stdout,FMT='(2(a,e20.12))')   &
 !          'diff: diff%psi(10,10,10)=',diff%psi(10,10,10), &
 !              '  diff%chi(10,10,10)=',diff%chi(10,10,10)
        unit=51
@@ -137,6 +137,7 @@ print *, file_date1, fcst_date, filename
        enddo loop_date
 
        factors= 1./float(numfiles*members)
-       print*,'numfiles ',numfiles,members, factors
+       WRITE(UNIT=stdout,FMT='(A,I5,I5,F12.2)') &
+         'numfiles ',numfiles,members, factors
 
 END SUBROUTINE DA_Statistics_Step0

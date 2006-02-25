@@ -56,8 +56,9 @@ SUBROUTINE DA_Allocate_Background_Errors ( jy, kz, l, e, be_eval_loc, &
          do j = 1, jy
          do k = 1, mz
          if(be_eval_loc(j,k) <=0) then
-         print*,'At lat= ',j,' For mode = ',k,' local eigen value= ',be_eval_loc(j,k)
-         stop
+           WRITE(UNIT=errmsg(1),FMT='(A,I5,A,I5,A,F10.2)') &
+             "At lat= ",j," For mode = ",k," local eigen value= ",be_eval_loc(j,k)
+           CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
          end if
          end do
          end do
@@ -66,7 +67,7 @@ SUBROUTINE DA_Allocate_Background_Errors ( jy, kz, l, e, be_eval_loc, &
          END IF
  
          IF ( Test_Statistics ) THEN
-            WRITE(0,'(/A,A)')' j*k Eigenvalues for ', be_sub % name
+            WRITE(UNIT=stderr,FMT='(/A,A)')' j*k Eigenvalues for ', be_sub % name
             CALL DA_Array_Print(2, be_sub % val(1:jy,1:mz), 'j*k Eigenvalues' )
          END IF
 
@@ -91,11 +92,11 @@ SUBROUTINE DA_Allocate_Background_Errors ( jy, kz, l, e, be_eval_loc, &
          END IF
          
          IF ( Test_Statistics ) THEN      
-            WRITE(0,'(/A,A)')' k*k Eigenvectors for j = 1', be_sub % name
+            WRITE(UNIT=stderr,FMT='(/A,A)')' k*k Eigenvectors for j = 1', be_sub % name
             CALL DA_Array_Print( 2, be_sub % evec(1,1:kz,1:mz), &
                                  'Eigenvectors for j=1' )
          
-            WRITE(0,'(/A,A)')' k*k Eigenvectors for j = jy', be_sub % name
+            WRITE(UNIT=stderr,FMT='(/A,A)')' k*k Eigenvectors for j = jy', be_sub % name
             CALL DA_Array_Print( 2, be_sub % evec(jy,1:kz,1:mz), &
                                  'Eigenvectors for j=jy' )
          END IF
@@ -107,7 +108,7 @@ SUBROUTINE DA_Allocate_Background_Errors ( jy, kz, l, e, be_eval_loc, &
          be_sub % evec_g(1:kz,1:mz) = e(1:kz,1:mz)
       ELSE IF ( vert_corr == 1 ) THEN
 
-         print *, 'Change be std dev to variance in NMC code'
+         WRITE(UNIT=stdout) 'Change be std dev to variance in NMC code'
          be_sub % val(1:jy,1:mz) = be_eval_loc(1:jy,1:mz)
 
       END IF

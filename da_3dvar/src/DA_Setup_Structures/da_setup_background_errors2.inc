@@ -73,10 +73,7 @@ SUBROUTINE DA_Setup_Background_Errors2( xb, xbx, be )
    integer(kind=4)   :: flag
    LOGICAL, EXTERNAL :: wrf_dm_on_monitor
    
-   write (6,'(A)') ' -----------------------------------'
-   write (6,'(A)') ' [3.0] Set up background errors (be)'
-   write (6,'(A)') ' -----------------------------------'
-   write (6,*)
+   CALL wrf_message("[3.0] Set up background errors (be)")
    
    be % cv % option = cv_options
 
@@ -90,12 +87,9 @@ SUBROUTINE DA_Setup_Background_Errors2( xb, xbx, be )
       be % v3 % name = 'phi_u'           ! Unbalanced mass variable (p/M).
       be % v5 % name = 'tgrn '           ! Ground temperature
    ELSE
-      write(unit=*, fmt='(a, i2)') &
-           'cv_options:', cv_options
-
-      CALL wrf_shutdown
-
-      STOP "Stopped for Wrong CV_OPTION."
+     WRITE(UNIT=errmsg(1),FMT='(A, I2)') &
+       "Wrong cv_option:", cv_options
+     CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
    END IF
    
    IF ( cv_options_hum == 1 ) THEN
@@ -106,14 +100,14 @@ SUBROUTINE DA_Setup_Background_Errors2( xb, xbx, be )
       be % v4 % name = 'qt   '
    END IF
 
-   write(6,'(3x,A)')' DA_Setup_Background_Errors: 3DVAR dry control variables are:'
-   write(6,'(4x,7A)')TRIM(be % v1 % name), ', ', TRIM(be % v2 % name), ', ', &
+   write(UNIT=stdout,FMT='(3x,A)')' DA_Setup_Background_Errors: 3DVAR dry control variables are:'
+   write(UNIT=stdout,FMT='(4x,7A)')TRIM(be % v1 % name), ', ', TRIM(be % v2 % name), ', ', &
                   TRIM(be % v3 % name), ' and ', TRIM(be % v5 % name)
                           
-   write(6,'(3x,A,A)')' DA_Setup_Background_Errors: 3DVAR humidity control variable is ',&
+   write(UNIT=stdout,FMT='(3x,A,A)')' DA_Setup_Background_Errors: 3DVAR humidity control variable is ',&
                      TRIM(be % v4 % name)
                      
-   write(6,*)
+   write(UNIT=stdout,FMT=*)
                      
 !------------------------------------------------------------------------------
 !  [2.0] Read input file:
@@ -125,10 +119,9 @@ SUBROUTINE DA_Setup_Background_Errors2( xb, xbx, be )
       READ(be_cv_2_unit, iostat=ier) flag
 
       if(ier /= 0) then
-         write(0, fmt='(a, i4, a)') &
-              'Error in read from unit:', be_cv_2_unit, &
-              'Stopped here.'
-         call abort()
+         write(UNIT=errmsg(1), FMT='(A,I4)') &
+           "Cannot read from unit:", be_cv_2_unit
+         CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
       end if
 
       READ(be_cv_2_unit, iostat=ier) x_mm5 % big_header % bhi, &
@@ -230,54 +223,45 @@ SUBROUTINE DA_Setup_Background_Errors2( xb, xbx, be )
    
    IF ( ( iys /= jy+1 .or. iys /= jy+1 .or. kzs /= kz ) .and. &
           .not. interpolate_stats ) then
-         write(0,'(/,A,A,/)')' DA_Setup_Background_Errors: ', &
-                             ' Inconsistent grid dimensions with interpolate_stats=.f.'
-         STOP
+     CALL wrf_error_fatal3(__FILE__,__LINE__, &
+       "Inconsistent grid dimensions with interpolate_stats=.f.")
    END IF
 
    IF ( interpolate_stats .and. vert_evalue /= 1 ) then
-         write(0,'(/,A,A,/)')' DA_Setup_Background_Errors: ', &
-                             ' Can only use interpolate_stats=.t. with vert_evalue = 1'
-         STOP
+     CALL WRF_error_fatal3(__FILE__,__LINE__, &
+       "Can only use interpolate_stats=.t. with vert_evalue = 1")
    END IF
 
    IF ( x_mm5 % big_header % bhi(26,10) /= vert_corr ) THEN
-      write(0,'(A)') ' DA_Setup_Background_Errors: Inconsistent vert_corr'
-      write(0,'(A,I6)')' 3DVAR namelist value = ', vert_corr
-      write(0,'(A,I6)')' BackError file value = ', x_mm5 % big_header % bhi(26,10)
-      STOP
+     errmsg(1)="Inconsistent vert_corr"
+     WRITE(UNIT=errmsg(2),FMT='(A,I6)') "3DVAR namelist value = ", vert_corr
+     WRITE(UNIT=errmsg(3),FMT='(A,I6)') "BackError file value = ", x_mm5 % big_header % bhi(26,10)
+     CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1:3))
    END IF
 
    IF ( x_mm5 % big_header % bhi(27,10) /= cv_options ) THEN
-      write(0,'(A,A)') ' DA_Setup_Background_Errors: Inconsistent cv_options'
-      write(0,'(A,I6)')' 3DVAR namelist value = ', cv_options
-      write(0,'(A,I6)')' BackError file value = ', x_mm5 % big_header % bhi(27,10)
-      STOP
+     errmsg(1)="Inconsistent cv_options"
+     WRITE(UNIT=errmsg(2),FMT='(A,I6)') "3DVAR namelist value = ", cv_options
+     WRITE(UNIT=errmsg(3),FMT='(A,I6)') "BackError file value = ", x_mm5 % big_header % bhi(27,10)
+     CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1:3))
    END IF
    
    IF ( x_mm5 % big_header % bhi(28,10) /= balance_type .AND. cv_options == 2 ) THEN
-      write(0,'(A,A)') ' DA_Setup_Background_Errors: Inconsistent balance_type'
-      write(0,'(A,I6)')' 3DVAR namelist value = ', balance_type
-      write(0,'(A,I6)')' BackError file value = ', x_mm5 % big_header % bhi(28,10)
-      STOP
+     errmsg(1)="Inconsistent balance_type"
+     WRITE(UNIT=errmsg(2),FMT='(A,I6)') "3DVAR namelist value = ", balance_type
+     WRITE(UNIT=errmsg(3),FMT='(A,I6)') "BackError file value = ", x_mm5 % big_header % bhi(28,10)
+     CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1:3))
    END IF
 
    IF ( x_mm5 % big_header % bhi(30,10) /= 1 ) THEN
-      write(0,'(A,A)') ' DA_Setup_Background_Errors:', &
-                       ' Error file does not contain RF lengthscales.'
-!     STOP
-
-      write(unit=*, fmt='(a)') &
-           ' WARNING  WARNING WARNING', &
-           ' DA_Setup_Background_Errors:', &
-           ' Error file does not contain RF lengthscales.'
+     CALL wrf_message("WARNING: Background error file does not contain RF lengthscales")
    END IF
    
    IF ( x_mm5 % big_header % bhi(31,10) /= vertical_ip .AND. vert_corr == 2 ) THEN
-      write(0,'(A,A)') ' DA_Setup_Background_Errors: Inconsistent vertical_ip'
-      write(0,'(A,I6)')' 3DVAR namelist value = ', vertical_ip
-      write(0,'(A,I6)')' BackError file value = ', x_mm5 % big_header % bhi(31,10)
-      STOP
+     errmsg(1)="Inconsistent vertical_ip"
+     WRITE(UNIT=errmsg(2),FMT='(A,I6)') "3DVAR namelist value = ", vertical_ip
+     WRITE(UNIT=errmsg(3),FMT='(A,I6)') "BackError file value = ", x_mm5 % big_header % bhi(31,10)
+     CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1:3))
    END IF
    
 !------------------------------------------------------------------------------
@@ -441,10 +425,10 @@ SUBROUTINE DA_Setup_Background_Errors2( xb, xbx, be )
    end if
 
    if(print_detail > 0) then
-   write(unit=*, fmt='(//a)') 'Input Scale length'
+   write(unit=stdout, fmt='(//a)') 'Input Scale length'
 
    do k=1,kzs
-      write(unit=*, fmt='(a, i3, 5f24.4)') &
+      write(unit=stdout, fmt='(a, i3, 5f24.4)') &
            'level:', k, &
            be1_rf_lengthscale(k), &
            be2_rf_lengthscale(k), &
@@ -453,10 +437,10 @@ SUBROUTINE DA_Setup_Background_Errors2( xb, xbx, be )
            be5_rf_lengthscale(k)
    enddo
 
-   write(unit=*, fmt='(//a)') 'Input eval'
+   write(unit=stdout, fmt='(//a)') 'Input eval'
 
    do k=1,kzs
-      write(unit=*, fmt='(a, i3, 5f24.4)') &
+      write(unit=stdout, fmt='(a, i3, 5f24.4)') &
            'level:', k, &
            be1_eval_glo(k), &
            be2_eval_glo(k), &
@@ -465,9 +449,9 @@ SUBROUTINE DA_Setup_Background_Errors2( xb, xbx, be )
            be5_eval_glo(k)
    enddo
 
-   write(unit=*, fmt='(//a)') 'Input evec (diagnol)'
+   write(unit=stdout, fmt='(//a)') 'Input evec (diagnol)'
    do k=1,kzs
-      write(unit=*, fmt='(a, i3, 5f24.4)') &
+      write(unit=stdout, fmt='(a, i3, 5f24.4)') &
            'level:', k, &
            be1_evec_glo(k,k), &
            be2_evec_glo(k,k), &
@@ -476,10 +460,10 @@ SUBROUTINE DA_Setup_Background_Errors2( xb, xbx, be )
            be5_evec_glo(k,k)
    enddo
 
-   write(unit=*, fmt='(//a)') 'used Scale lenght'
+   write(unit=stdout, fmt='(//a)') 'used Scale lenght'
 
    do k=1,kz
-      write(unit=*, fmt='(a, i3, 5f24.4)') &
+      write(unit=stdout, fmt='(a, i3, 5f24.4)') &
            'level:', k, &
            s1(k), &
            s2(k), &
@@ -488,10 +472,10 @@ SUBROUTINE DA_Setup_Background_Errors2( xb, xbx, be )
            s5(k)
    enddo
 
-   write(unit=*, fmt='(//a)') 'used eval'
+   write(unit=stdout, fmt='(//a)') 'used eval'
 
    do k=1,kz
-      write(unit=*, fmt='(a, i3, 5f24.4)') &
+      write(unit=stdout, fmt='(a, i3, 5f24.4)') &
            'level:', k, &
            l1(k), &
            l2(k), &
@@ -500,9 +484,9 @@ SUBROUTINE DA_Setup_Background_Errors2( xb, xbx, be )
            l5(k)
    enddo
 
-   write(unit=*, fmt='(//a)') 'used evec (diagnol)'
+   write(unit=stdout, fmt='(//a)') 'used evec (diagnol)'
    do k=1,kz
-      write(unit=*, fmt='(a, i3, 5f24.4)') &
+      write(unit=stdout, fmt='(a, i3, 5f24.4)') &
            'level:', k, &
            e1(k,k), &
            e2(k,k), &
@@ -643,7 +627,7 @@ SUBROUTINE DA_Setup_Background_Errors2( xb, xbx, be )
 ! ....................................................................
 ! To average the regression coefficients (YRG 20040817):
    if (.not.lat_stats_option) then
-     write(unit=*, fmt='(/5x, a/)') &
+     write(unit=stdout, fmt='(/5x, a/)') &
      '*** Using the averaged regression coefficients for balanced P ***'
      do k1 = 1, kz
      do k2 = 1, kz
@@ -656,13 +640,13 @@ SUBROUTINE DA_Setup_Background_Errors2( xb, xbx, be )
 ! .....................................................................
    
    IF ( Test_Statistics ) THEN 
-      write(6,'(/A)')' k*k Vertical Regression Coefficients for i=1'
+      write(stdout,FMT='(/A)')' k*k Vertical Regression Coefficients for i=1'
       CALL DA_Array_Print(2, be % pb_vert_reg(1,:,:), 'j=1 Vert Reg Coeffs' )
-      write(6,'(/A)')' k*k Vertical Regression Coefficients for j=jy'
+      write(stdout,FMT='(/A)')' k*k Vertical Regression Coefficients for j=jy'
       CALL DA_Array_Print(2, be % pb_vert_reg(jy,:,:), 'j=jy Vert Reg Coeffs' )
-      write(6,'(/A)')' i*k Vertical Regression Coefficients for k=1'
+      write(stdout,FMT='(/A)')' i*k Vertical Regression Coefficients for k=1'
       CALL DA_Array_Print(2, be % pb_vert_reg(:,1,:), 'k=1 vert Reg Coeffs' )
-      write(6,'(/A)')' i*k Vertical Regression Coefficients for k=kz'
+      write(stdout,FMT='(/A)')' i*k Vertical Regression Coefficients for k=kz'
       CALL DA_Array_Print(2, be % pb_vert_reg(:,kz,:), 'k=kz vert Reg Coeffs' )
    END IF
 

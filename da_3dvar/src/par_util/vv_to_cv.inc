@@ -130,23 +130,25 @@ SUBROUTINE vv_to_cv(vv, xp, mzs, cv_size, cv_array )
    end if
 
 #ifdef DEBUG_RESHAPE
-   write(unit=*, fmt='(2a, 2(a, i8)/)') &
+   write(unit=stdout, fmt='(2a, 2(a, i8)/)') &
        'file:', __FILE__, ', line:', __LINE__
 
-   write(unit=*, fmt='(a, i4)') &
+   write(unit=stdout, fmt='(a, i4)') &
         'mzs(1)=', mzs(1), &
         'mzs(2)=', mzs(2), &
         'mzs(3)=', mzs(3), &
         'mzs(4)=', mzs(4), &
         'mzs(5)=', mzs(5)
 
-   print *, ' '
-   print *, 'sum(vv)=', sum(vv % v1(is:ie,js:je,1:mzs(1))) &
+   WRITE(UNIT=stdout) ' '
+   WRITE(UNIT=stdout,FMT='(A,F12.2)') &
+     'sum(vv)=', sum(vv % v1(is:ie,js:je,1:mzs(1))) &
                       + sum(vv % v2(is:ie,js:je,1:mzs(2))) &
                       + sum(vv % v3(is:ie,js:je,1:mzs(3))) &
                       + sum(vv % v4(is:ie,js:je,1:mzs(4)))
-   print *, 'sum(cv)=', sum(cv_array(1:cv_size))
-   print *, ' '
+   WRITE(UNIT=stdout,FMT='(A,F12.2)') &
+     'sum(cv)=', sum(cv_array(1:cv_size))
+   WRITE(UNIT=stdout) ' '
 #endif
 
 END SUBROUTINE vv_to_cv

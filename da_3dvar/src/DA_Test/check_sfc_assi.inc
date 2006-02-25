@@ -40,7 +40,7 @@ SUBROUTINE check_sfc_assi( xb, xa, iv, xp, y, &
 
 !-------------------------------------------------------------------------
    
-   write(unit=*, fmt='(/a)') ' check_sfc_assi: Adjoint Test Results:'
+   CALL wrf_message("check_sfc_assi: Adjoint Test Results:")
    
 !-------------------------------------------------------------------------
    
@@ -142,7 +142,7 @@ SUBROUTINE check_sfc_assi( xb, xa, iv, xp, y, &
 !     [7.0] Print output:
 !-------------------------------------------------------------------------
    
-   write(unit=*, fmt='(A,1pe22.14)') &
+   write(UNIT=stdout, fmt='(A,1pe22.14)') &
         ' Tile < y, y     > = ', pertile_lhs, &
         ' Tile < x, x_adj > = ', pertile_rhs
 
@@ -150,8 +150,8 @@ SUBROUTINE check_sfc_assi( xb, xa, iv, xp, y, &
    adj_ttl_rhs = wrf_dm_sum_real( partial_rhs )
 PRINT *,'TEST_COVERAGE_check_sfc_assi_A:  adj_ttl_lhs,adj_ttl_rhs = ', adj_ttl_lhs,adj_ttl_rhs
    IF ( wrf_dm_on_monitor() ) THEN
-      write(unit=*, fmt='(A,1pe22.14)') ' Whole Domain < y, y     > = ', adj_ttl_lhs
-      write(unit=*, fmt='(A,1pe22.14)') ' Whole Domain < x, x_adj > = ', adj_ttl_rhs
+      write(UNIT=stdout, fmt='(A,1pe22.14)') ' Whole Domain < y, y     > = ', adj_ttl_lhs
+      write(UNIT=stdout, fmt='(A,1pe22.14)') ' Whole Domain < x, x_adj > = ', adj_ttl_rhs
    ENDIF
 
 !-------------------------------------------------------------------------
@@ -215,7 +215,7 @@ SUBROUTINE check_psfc( xb, xa, iv, xp, y, &
 
 !-------------------------------------------------------------------------
    
-   write(unit=*, fmt='(/3a,i6/a)') &
+   write(UNIT=stdout, fmt='(/3a,i6/a)') &
         'File: ', __FILE__, ', line:', __LINE__, &
         'Adjoint Test Results:'
 
@@ -292,7 +292,7 @@ SUBROUTINE check_psfc( xb, xa, iv, xp, y, &
 !     [7.0] Print output:
 !-------------------------------------------------------------------------
    
-   write(unit=*, fmt='(A,1pe22.14)') &
+   write(UNIT=stdout, fmt='(A,1pe22.14)') &
         ' Tile < y, y     > = ', pertile_lhs, &
         ' Tile < x, x_adj > = ', pertile_rhs
 
@@ -300,8 +300,8 @@ SUBROUTINE check_psfc( xb, xa, iv, xp, y, &
    adj_ttl_rhs = wrf_dm_sum_real( partial_rhs )
 PRINT *,'TEST_COVERAGE_check_sfc_assi_B:  adj_ttl_lhs,adj_ttl_rhs = ', adj_ttl_lhs,adj_ttl_rhs
    IF ( wrf_dm_on_monitor() ) THEN
-      write(unit=*, fmt='(A,1pe22.14)') ' Whole Domain < y, y     > = ', adj_ttl_lhs
-      write(unit=*, fmt='(A,1pe22.14)') ' Whole Domain < x, x_adj > = ', adj_ttl_rhs
+      write(UNIT=stdout, fmt='(A,1pe22.14)') ' Whole Domain < y, y     > = ', adj_ttl_lhs
+      write(UNIT=stdout, fmt='(A,1pe22.14)') ' Whole Domain < x, x_adj > = ', adj_ttl_rhs
    ENDIF
 
 !--recover

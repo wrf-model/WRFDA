@@ -28,10 +28,9 @@ SUBROUTINE local_to_global(xp, x, xg, dim)
      enddo
      enddo
    else
-     write(6,*) 'SUBROUTINE local_to_global: dim = ',dim,&
-                'Only legal value is 2 for 2D or 3 for 3D.'
-     call wrf_shutdown
-     stop
+     WRITE(UNIT=errmsg(1),FMT='(A,I5,A)') &
+       "dim=",dim,"must be 2 or 3"
+     CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
    end if
 
 END SUBROUTINE local_to_global

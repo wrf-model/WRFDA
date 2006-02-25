@@ -73,7 +73,7 @@ SUBROUTINE DA_Get_Vertical_Truncation( max_vert_var, eigenval, be_sub )
 
    END IF
 
-   WRITE(6,'(3x,A,A6,A3,I3,A1,f7.2,A2)')' Vertical truncation for ', name, &
+   WRITE(UNIT=stdout,FMT='(3x,A,A6,A3,I3,A1,f7.2,A2)')' Vertical truncation for ', name, &
                                        ' = ', be_sub % mz, '(', &
                                        max_vert_var, '%)'
                                        

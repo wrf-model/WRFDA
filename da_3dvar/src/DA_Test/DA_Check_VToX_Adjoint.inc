@@ -42,7 +42,7 @@ SUBROUTINE DA_Check_VToX_Adjoint( xb, xbx, be, cv1, vv, vp, xp, xa, &
 
 !-------------------------------------------------------------------------
 
-   write(unit=*, fmt='(/a/)') &
+   write(UNIT=stdout, fmt='(/a/)') &
         'DA_Check_VToX_Adjoint: Adjoint Test Results:'
       
 !-------------------------------------------------------------------------
@@ -151,13 +151,13 @@ SUBROUTINE DA_Check_VToX_Adjoint( xb, xbx, be, cv1, vv, vp, xp, xa, &
 PRINT *,'TEST_COVERAGE_DA_Check_VToX_Adjoint:  adj_sum_lhs,adj_sum_rhs = ', adj_sum_lhs,adj_sum_rhs
 
    IF ( wrf_dm_on_monitor() ) THEN
-   write(unit=*, fmt='(/)')
-   write(unit=*, fmt='(a,1pe22.14)') &
+   write(UNIT=stdout, fmt='(/)')
+   write(UNIT=stdout, fmt='(a,1pe22.14)') &
         'Whole  Domain: < x, x >     = ', adj_sum_lhs, &
         'Whole  Domain: < v_adj, v > = ', adj_sum_rhs
    ENDIF
 
-   write(unit=*, fmt='(/a/)') &
+   write(UNIT=stdout, fmt='(/a/)') &
         'DA_Check_VToX_Adjoint: Finished'
 
 END SUBROUTINE DA_Check_VToX_Adjoint

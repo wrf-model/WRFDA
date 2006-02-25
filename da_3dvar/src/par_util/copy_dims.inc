@@ -147,43 +147,43 @@ SUBROUTINE copy_dims(grid, xp, &
    xp%kpe = kpe
 
    if(print_detail > 0) then
-      write(unit=*, fmt='(2(a, i4, 5x))') &
+      write(unit=stdout, fmt='(2(a, i4, 5x))') &
            'xp%ids =', xp%ids , 'xp%ide =', xp%ide , &
            'xp%jds =', xp%jds , 'xp%jde =', xp%jde , &
            'xp%kds =', xp%kds , 'xp%kde =', xp%kde
-      write(unit=*, fmt='(//)')
+      write(unit=stdout, fmt='(//)')
 
-      write(unit=*, fmt='(2(a, i4, 5x))') &
+      write(unit=stdout, fmt='(2(a, i4, 5x))') &
            'xp%ims =', xp%ims , 'xp%ime =', xp%ime , &
            'xp%jms =', xp%jms , 'xp%jme =', xp%jme , &
            'xp%kms =', xp%kms , 'xp%kme =', xp%kme
-      write(unit=*, fmt='(//)')
+      write(unit=stdout, fmt='(//)')
 
-      write(unit=*, fmt='(2(a, i4, 5x))') &
+      write(unit=stdout, fmt='(2(a, i4, 5x))') &
            'xp%ips =', xp%ips , 'xp%ipe =', xp%ipe , &
            'xp%jps =', xp%jps , 'xp%jpe =', xp%jpe , &
            'xp%kps =', xp%kps , 'xp%kpe =', xp%kpe
-      write(unit=*, fmt='(//)')
+      write(unit=stdout, fmt='(//)')
 
-      write(unit=*, fmt='(2(a, i4, 5x))') &
+      write(unit=stdout, fmt='(2(a, i4, 5x))') &
            'xp%imsx =', xp%imsx, 'xp%imex=', xp%imex, &
            'xp%jmsx =', xp%jmsx, 'xp%jmex=', xp%jmex, &
            'xp%kmsx =', xp%kmsx, 'xp%kmex=', xp%kmex
-      write(unit=*, fmt='(//)')
+      write(unit=stdout, fmt='(//)')
 
-      write(unit=*, fmt='(2(a, i4, 5x))') &
+      write(unit=stdout, fmt='(2(a, i4, 5x))') &
            'xp%ipsx =', xp%ipsx, 'xp%ipex=', xp%ipex, &
            'xp%jpsx =', xp%jpsx, 'xp%jpex=', xp%jpex, &
            'xp%kpsx =', xp%kpsx, 'xp%kpex=', xp%kpex
-      write(unit=*, fmt='(//)')
+      write(unit=stdout, fmt='(//)')
 
-      write(unit=*, fmt='(2(a, i4, 5x))') &
+      write(unit=stdout, fmt='(2(a, i4, 5x))') &
            'xp%imsy =', xp%imsy, 'xp%imey=', xp%imey, &
            'xp%jmsy =', xp%jmsy, 'xp%jmey=', xp%jmey, &
            'xp%kmsy =', xp%kmsy, 'xp%kmey=', xp%kmey
-      write(unit=*, fmt='(//)')
+      write(unit=stdout, fmt='(//)')
 
-      write(unit=*, fmt='(2(a, i4, 5x))') &
+      write(unit=stdout, fmt='(2(a, i4, 5x))') &
            'xp%ipsy =', xp%ipsy, 'xp%ipey=', xp%ipey, &
            'xp%jpsy =', xp%jpsy, 'xp%jpey=', xp%jpey, &
            'xp%kpsy =', xp%kpsy, 'xp%kpey=', xp%kpey

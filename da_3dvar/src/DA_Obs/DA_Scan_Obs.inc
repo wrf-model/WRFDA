@@ -92,7 +92,7 @@ SUBROUTINE DA_Scan_Obs (iunit, ob, xp, filename)
            STATUS = 'OLD')
 
       IF (iost /= 0) THEN
-         write(unit=*, fmt='(/A,I3,3(2X,A)/)') &
+         write(UNIT=stdout, fmt='(/A,I3,3(2X,A)/)') &
               'ERROR IN OBS INPUT FILE UNIT ',iunit, &
               'OBS FILENAME:', trim(filename), &
               'FOR GTS OBSERVATIONS CANNOT BE FOUND OR CANNOT BE OPENED'
@@ -107,7 +107,7 @@ SUBROUTINE DA_Scan_Obs (iunit, ob, xp, filename)
            STATUS = 'OLD')
 
       IF (iost /= 0) THEN
-         write(unit=*, fmt='(/A,I3,2X,a,i3/A/)') &
+         write(UNIT=stdout, fmt='(/A,I3,2X,a,i3/A/)') &
               'ERROR IN OBS INPUT FILE UNIT ',iunit, 'iost=', iost, &
               'FOR GTS OBSERVATIONS CANNOT BE FOUND OR CANNOT BE OPENED'
          RETURN
@@ -149,7 +149,7 @@ SUBROUTINE DA_Scan_Obs (iunit, ob, xp, filename)
       READ (UNIT = iunit, FMT = '(A)', IOSTAT = iost) info_string
 
       IF (iost /= 0) THEN
-         write(unit=*, fmt='(/a,i3/a/)') &
+         write(UNIT=stdout, fmt='(/a,i3/a/)') &
               'ERROR READING FILE UNIT:', iunit, &
               'in read_obs_gts_header.F' 
 
@@ -171,13 +171,13 @@ SUBROUTINE DA_Scan_Obs (iunit, ob, xp, filename)
         fmt_name, fmt_each
 
    IF (iost /= 0) THEN
-      write(unit=*, fmt='(/A,I3,A/)') &
+      write(UNIT=stdout, fmt='(/A,I3,A/)') &
            ' ERROR IN INPUT FILE UNIT ',iunit, &
            ' FOR GTS OBSERVATIONS CANNOT BE FOUND OR CANNOT BE OPENED'
       RETURN
    ENDIF
 
-! write(unit=*, fmt='(2a)') &
+! write(UNIT=stdout, fmt='(2a)') &
 !      'fmt_info=', fmt_info, &
 !      'fmt_loc =', fmt_loc,  &
 !      'fmt_each=', fmt_each
@@ -208,13 +208,13 @@ SUBROUTINE DA_Scan_Obs (iunit, ob, xp, filename)
                    platform%info%id
 
       IF (iost /= 0) THEN
-          WRITE (0,'(/A,I9)') ' END OF OBS UNIT: ',iunit
-          WRITE (0,'(/A,I9)') ' IOSTAT:          ',iost
+          WRITE (UNIT=stderr,FMT='(/A,I9)') ' END OF OBS UNIT: ',iunit
+          WRITE (UNIT=stderr,FMT='(/A,I9)') ' IOSTAT:          ',iost
          EXIT reports
       ENDIF
 
       if(print_detail > 100) then
-         write(unit=*, FMT = fmt_info) &
+         write(UNIT=stdout, FMT = fmt_info) &
                platform%info%platform,    &
                platform%info%date_char,   &
                platform%info%name,        &
@@ -274,8 +274,8 @@ loop_level: DO i = 1, platform%info%levels
               platform%each (i)%td,           &
               platform%each (i)%rh
 
-!      write(unit=*, FMT = '( a, i6)') 'i=', i
-!      write(unit=*, FMT = TRIM (fmt_each)) &
+!      write(UNIT=stdout, FMT = '( a, i6)') 'i=', i
+!      write(UNIT=stdout, FMT = TRIM (fmt_each)) &
 !             platform%each (i)%p,            &
 !             platform%each (i)%speed,        &
 !             platform%each (i)%v,            &
@@ -433,15 +433,15 @@ loop_level: DO i = 1, platform%info%levels
 
          CASE DEFAULT;
 
-            write(unit=*, fmt='(/a/)') &
+            write(UNIT=stdout, fmt='(/a/)') &
                  'WARNING   WARNING   WARNING   WARNING   WARNING :'
 
-            write(unit=*, fmt='(a)') 'unsaved obs found:'
+            write(UNIT=stdout, fmt='(a)') 'unsaved obs found:'
 
-            write(unit=*, fmt='(2a)') &
+            write(UNIT=stdout, fmt='(2a)') &
                  'platform%info%platform=', platform%info%platform
  
-            write(unit=*, fmt='(a, i3)') &
+            write(UNIT=stdout, fmt='(a, i3)') &
                  'platform%info%levels=', platform%info%levels
 
       END SELECT
@@ -505,9 +505,9 @@ loop_level: DO i = 1, platform%info%levels
 
    if(print_detail > 0) then
 
-      write(6, fmt='(a)')  ' '
+      write(UNIT=stdout, fmt='(a)')  ' '
 
-      write(6, fmt='(5x,a,i6,a)') &
+      write(UNIT=stdout, fmt='(5x,a,i6,a)') &
            'Scan:  ', ob%current_ob_time, ' ob time:', &
            'Scan:  ', total_obs, ' Total Observations.', &
            'Scan:  ', num_sound, ' SOUND reports,', &
@@ -528,7 +528,7 @@ loop_level: DO i = 1, platform%info%levels
            'Scan:  ', num_ssmt1, ' SSMT1 reports,', &
            'Scan:  ', num_ssmt2, ' SSMT2 reports.'
 
-!     write(6, fmt='(5x,a,i6,a)') &
+!     write(UNIT=stdout, fmt='(5x,a,i6,a)') &
 !          'Scan:  ', num_ssmi_retrieval , ' SSMI_RETRIEVAL reports,', &
 !          'Scan:  ', num_ssmi_tb        , ' SSMI_TB        reports.'
 

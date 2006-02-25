@@ -62,10 +62,11 @@ SUBROUTINE DA_TPQ_To_SLP_Adj ( T, Q, P, TERR, PSFC, &
       enddo k_loop
 
       IF(klo < 1) THEN                                      
-         WRITE(0,'(A,F11.3,A)') &
-              'ERROR FINDING PRESSURE LEVEL ',PCONST,' MB ABOVE THE SURFACE'
-         WRITE(0,'(A,F11.3,2X,A,F11.3)') 'PL=',PL,'  PSFC=',psfc
-         CALL ABORT                                               
+        WRITE(UNIT=errmsg(1),FMT='(A,F11.3,A)') &
+          'ERROR FINDING PRESSURE LEVEL ',PCONST,' MB ABOVE THE SURFACE'
+        WRITE(UNIT=errmsg(2),FMT='(A,F11.3,2X,A,F11.3)') &
+          'PL=',PL,'  PSFC=',psfc
+        CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1:2))
       END IF                                                         
 
 ! ... GET TEMPERATURE AT PL (TL), EXTRAPOLATE T AT SURFACE (TS)     

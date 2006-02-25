@@ -19,10 +19,8 @@ SUBROUTINE da_setup_obs_structures( xp, ob, iv )
    TYPE ( y_type), INTENT(OUT)  :: ob          ! Observation structure.
    TYPE (ob_type), INTENT(OUT)  :: iv          ! O-B structure.
 
-   write (6,'(A)') ' ------------------------------'
-   write (6,'(A)') ' [4.0] Set up observations (ob)'
-   write (6,'(A)') ' ------------------------------'
-   write (6,*)
+
+   CALL wrf_message('[4.0] Set up observations (ob)')
 
 !------------------------------------------------------------------------------      
 !  [1.0] Setup and read in fields from first guess:
@@ -111,8 +109,8 @@ SUBROUTINE da_setup_obs_structures( xp, ob, iv )
      CALL wrf_message('Using NCEP BUFR radiance 1b input')
      CALL da_setup_bufrtovs_structures( xp, ob, iv )
      ! These are per processor, so uninteresting
-     ! write (6, *) ' iv%total_rad_channel = ', iv%total_rad_channel
-     ! write (6, *) ' iv%total_rad_pixel   = ', iv%total_rad_pixel
+     ! write (UNIT=stderr,FMT=*) ' iv%total_rad_channel = ', iv%total_rad_channel
+     ! write (UNIT=stderr,FMT=*) ' iv%total_rad_pixel   = ', iv%total_rad_pixel
    END IF
 
 !     Get horizontal interpolation weights.

@@ -33,6 +33,7 @@ module DA_Test
    USE DA_Setup_Structures
    USE DA_Tools
    use da_qscat
+   USE module_wrf_error
 
    implicit none
    

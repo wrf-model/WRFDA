@@ -15,7 +15,10 @@ REAL, DIMENSION(m,m), INTENT(OUT):: p
 INTEGER i,k,nt,nu
 REAL, DIMENSION(m,m):: t
 !----------------------------------------------------------------------------
-if(n < 0)stop 'In matpow, n is illegally negative'
+IF (n < 0) THEN
+  CALL wrf_error_fatal3(__FILE__,__LINE__, &
+    "n is illegally negative")
+END IF
 p=0.; DO i=1,m; p(i,i)=1.; ENDDO
 t=a
 nt=n
@@ -24,7 +27,8 @@ DO k=1,50
    nu=nt/2; IF(nt-nu*2 == 1)p=MATMUL(t,p); nt=nu
    t=MATMUL(t,t)
 ENDDO
-STOP 'No solution obtained in powmat'
+CALL wrf_error_fatal3(__FILE__,__LINE__, &
+  "No solution obtained in powmat")
 END SUBROUTINE powmat
 
 SUBROUTINE dpowmat(a,p,m,n)
@@ -40,7 +44,10 @@ REAL(8), DIMENSION(m,m), INTENT(OUT):: p
 INTEGER i,k,nt,nu
 REAL(8), DIMENSION(m,m):: t
 !----------------------------------------------------------------------------
-if(n < 0)stop 'In matpow, n is illegally negative'
+if(n < 0) THEN
+  CALL wrf_error_fatal3(__FILE__,__LINE__, &
+    "n is illegally negative")
+END IF
 p=0.; DO i=1,m; p(i,i)=1.; ENDDO
 t=a
 nt=n
@@ -49,5 +56,6 @@ DO k=1,50
    nu=nt/2; IF(nt-nu*2 == 1)p=MATMUL(t,p); nt=nu
    t=MATMUL(t,t)
 ENDDO
-STOP 'No solution obtained in dpowmat'
+CALL wrf_error_fatal3(__FILE__,__LINE__, &
+  "No solution obtained in dpowmat")
 END SUBROUTINE dpowmat

@@ -63,10 +63,10 @@ SUBROUTINE DA_Test_VXTransform( xb, xbx, xp, be, &
    call da_zero_vp_type(vp1)
    call da_zero_vp_type(vv1)
 
-   write(unit=*, fmt='(/a/)') &
+   write(UNIT=stdout, fmt='(/a/)') &
         'DA_TestVXTransform:'
 
-   write(unit=*, fmt='(/a/)') &
+   write(UNIT=stdout, fmt='(/a/)') &
         '---------------------------------------'
 !--Make cv all constant value 1.0
 
@@ -75,16 +75,16 @@ SUBROUTINE DA_Test_VXTransform( xb, xbx, xp, be, &
    call da_zero_x(xa)
    
    if ( cv_options /= 5) then
-   write(unit=*, fmt='(/a,i4,a)') &
+   write(UNIT=stdout, fmt='(/a,i4,a)') &
          ' Inverse tests for this cv_options= ',cv_options,' will not be done'
    go to 1111
    end if
 
 #ifdef DM_PARALLEL
-   write(unit=*, fmt='(/a/)') &
+   write(UNIT=stdout, fmt='(/a/)') &
          ' Inverse tests will not be done as it is MPP run'
 #else
-   write(unit=*, fmt='(/a/)') &
+   write(UNIT=stdout, fmt='(/a/)') &
          ' Inverse tests follows:'
    call da_transform_vtox( xb, xbx, be, cv, &
                            vv, vp, xp, xa, &
@@ -155,7 +155,7 @@ SUBROUTINE DA_Test_VXTransform( xb, xbx, xp, be, &
       vv % v5(its:ite,jts:jte,1:kz_vv(5)) = vp % v5(its:ite,jts:jte,1:kz_vp(5))
    end if
 !-------------------------------------------------------------------------
-   write(unit=*, fmt='(/a/)') &
+   write(UNIT=stdout, fmt='(/a/)') &
         'DA_Check_VvToVpToVv_Errors'
 
    call DA_Check_Vp_Errors( vv1, vv, kz_vv, its,ite, jts,jte, kts,kte )
@@ -187,7 +187,7 @@ SUBROUTINE DA_Test_VXTransform( xb, xbx, xp, be, &
 !-------------------------------------------------------------------------
 !  Check inverse errors:
 
-   write(unit=*, fmt='(/a/)') &
+   write(UNIT=stdout, fmt='(/a/)') &
         'DA_Check_VpToVvToVp_Errors'
 
    call DA_Check_Vp_Errors( vp1, vp, kz_vv, its,ite, jts,jte, kts,kte )
@@ -211,7 +211,7 @@ SUBROUTINE DA_Test_VXTransform( xb, xbx, xp, be, &
 
 !  [4.1] Test XToVpToX differences:
 
-     write(unit=*, fmt='(/a/)') &
+     write(UNIT=stdout, fmt='(/a/)') &
           'DA_Check_XToVpToX_Errors'
    
      CALL DA_Check_XToVpToX_Errors( xa, xa2_u, xa2_v, xa2_w, xa2_t, &
@@ -230,7 +230,7 @@ SUBROUTINE DA_Test_VXTransform( xb, xbx, xp, be, &
       
 !  [2.4] Check inverse errors:
 
-     write(unit=*, fmt='(/a/)') &
+     write(UNIT=stdout, fmt='(/a/)') &
           'DA_Check_VpToXToVp_Errors'
 
      call DA_Check_Vp_Errors( vp, vv, kz_vp, its,ite, jts,jte, kts,kte )

@@ -24,9 +24,9 @@ SUBROUTINE a2c(u,v,mix,mjx,mkx)
    ids=1 ; ide=mjx ; ims=1-nhalo ; ime=mjx+nhalo ; its=1 ; ite=mjx
    jds=1 ; jde=mix ; jms=1-nhalo ; jme=mix+nhalo ; jts=1 ; jte=mix
 
-   write(unit=*, fmt='(3a,4x,i8)') &
+   write(UNIT=stdout, fmt='(3a,4x,i8)') &
         'File:', __FILE__, 'Line:', __LINE__
-   write(unit=*, fmt='(a,2i8)') &
+   write(UNIT=stdout, fmt='(a,2i8)') &
         'its,jts=', its,jts, &
         'ite,jte=', ite,jte, &
         'ids,jds=', ids,jds, &

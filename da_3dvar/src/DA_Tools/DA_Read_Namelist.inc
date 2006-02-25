@@ -119,10 +119,9 @@ SUBROUTINE DA_Read_Namelist
                            pseudo_val, pseudo_err, pseudo_var
 
 !----------------------------------------------------------------------------------
-   write(unit=*, fmt='(a)') &
-    ' -------------------------', &
-    ' [1.0] Read 3DVAR namelist', &
-    ' -------------------------'
+   
+
+   CALL wrf_message("[1.0] Read 3DVAR namelist")
 
 !  Namelist defaults:
 
@@ -347,7 +346,7 @@ SUBROUTINE DA_Read_Namelist
    if ( print_detail >= 1 ) then
       WRITE(UNIT=stdout,FMT='(A,3X,A)')   ' MODEL_TYPE       = ', trim(MODEL_TYPE)
       WRITE(UNIT=stdout,FMT='(A,I4)')     ' print_detail     = ',print_detail
-      WRITE(UNIT=stdout,FMT='(A,3X,L10')  ' write_increments = ', write_increments
+      WRITE(UNIT=stdout,FMT='(A,3X,L10)') ' write_increments = ', write_increments
       WRITE(UNIT=stdout,FMT='(A,3X,L10)') ' Global analysis option=', global         
       WRITE(UNIT=stdout,FMT='(A,3X,L10)') ' VAR4d            =', lvar4d         
       WRITE(UNIT=stdout,FMT='(A,3X,I5)')  ' stdout_unit      =', stdout_unit     

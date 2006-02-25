@@ -70,5 +70,5 @@ sump=sump+p(i,j)**2
 enddo
 write(iunit)plot
  total=sumu+sumv+sumt+sumq+sump
-write(6,*)'graph energy=',iunit,sumu,sumv,sumt,sumq,sump,total
+write(UNIT=stdout,FMT=*)'graph energy=',iunit,sumu,sumv,sumt,sumq,sump,total
 END SUBROUTINE graph      

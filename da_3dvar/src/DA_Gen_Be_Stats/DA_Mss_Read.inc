@@ -19,20 +19,20 @@ Subroutine DA_Mss_Read(file_date)
                    //file_head(1:6)//'_'//tar_date//'.tar '// &
                    trim(directory_name)//'/.'
 
-       write(*,'(a90)') trim(cmd_line)
+       write(UNIT=stdout,FMT='(a90)') trim(cmd_line)
        call system(cmd_line)
 
        cmd_line = 'tar -xvf '//trim(directory_name)//'/' &
                    //file_head(1:6)//'_'//tar_date//'.tar '
 
-       write(*,'(a90)') trim(cmd_line)
+       write(UNIT=stdout,FMT='(a90)') trim(cmd_line)
 
        call system(cmd_line)
 
        cmd_line = 'mv '//trim(file_head)//'* '//&
                   trim(directory_name)//'/.'
 
-       write(*,'(a90)') trim(cmd_line)
+       write(UNIT=stdout,FMT='(a90)') trim(cmd_line)
 
        call system(cmd_line)
 #endif

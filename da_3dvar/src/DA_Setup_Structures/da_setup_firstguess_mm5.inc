@@ -35,7 +35,7 @@ SUBROUTINE DA_Setup_FirstGuess_MM5( xb, xbx, xp)
 !  [1.0] Read original MM5 format first guess:
 !---------------------------------------------------------------------------
 
-!   WRITE (0,'(/,A,I3,/,A)')' READ MM5 BACKGROUND STATE VECTOR IN UNIT ',JPIN, &
+!   WRITE (UNIT=stderr,FMT='(/,A,I3,/,A)')' READ MM5 BACKGROUND STATE VECTOR IN UNIT ',JPIN, &
 !                           ' ---------------------------------------- '
 
    IF ( wrf_dm_on_monitor() ) THEN
@@ -46,10 +46,9 @@ SUBROUTINE DA_Setup_FirstGuess_MM5( xb, xbx, xp)
       READ(jpin, iostat=ier) flag
 
       if( ier /= 0) then
-          write(0, fmt='(a, i4, a)') &
-               'Error in read from unit:', jpin, &
-               'Stopped here.'
-          call abort()
+        WRITE(UNIT=errmsg(1),FMT='(A,I4,A)') &
+          "Error in read from unit:", jpin
+        CALL wrf_error_fatal(__FILE__,__LINE__,errmsg(1))
       end if
 
       READ(jpin, iostat=ier) xb_mm5 % big_header % bhi, &
@@ -65,10 +64,9 @@ SUBROUTINE DA_Setup_FirstGuess_MM5( xb, xbx, xp)
          call DA_Read_MM5 ( jpin, xb_mm5, ier)
 
          if( ier /= 0) then
-             write(0, fmt='(a, i4, a)') &
-                  'Error in read from unit:', jpin, &
-                  'Stopped here.'
-             call abort()
+           WRITE(UNIT=errmsg(1),FMT='(A,I4,A)') &
+             "Error in read from unit:", jpin
+           CALL wrf_error_fatal(__FILE__,__LINE__,errmsg(1))
          end if
 
          index = xb_mm5 % big_header % bhi(1,1)
@@ -117,7 +115,7 @@ SUBROUTINE DA_Setup_FirstGuess_MM5( xb, xbx, xp)
    CALL Set_Map_Para ! set up the map background parameters
 
    CALL llxy( PHIC,XLONC,X,Y )
-!   WRITE(0,'(''PHIC,XLONC,X,Y:'',4F10.2)') PHIC,XLONC,X,Y
+!   WRITE(UNIT=stderr,FMT='(''PHIC,XLONC,X,Y:'',4F10.2)') PHIC,XLONC,X,Y
 
 !---------------------------------------------------------------------------
 !  [4.0] Interpolate MM5 B-grid winds to p points of 3DVAR grid (interpolate 
@@ -138,11 +136,10 @@ SUBROUTINE DA_Setup_FirstGuess_MM5( xb, xbx, xp)
    
    if ( xb % mix /= wrf_dim1 .or. xb % mjy /= wrf_dim2 .or. &
         xb % mkz /= wrf_dim3  ) then
-        
-      write(0,'(a)')' DA_Setup_FirstGuess_MM5: Inconsistent WRF/3DVAR namelist'
-      write(0,'(6i6)')xb % mix, wrf_dim1, xb % mjy, wrf_dim2, xb % mkz, wrf_dim3
-      stop
-      
+     errmsg(1)="Inconsistent WRF/3DVAR namelist"
+     WRITE(UNIT=errmsg(2),FMT='(6i6)') &
+       xb % mix, wrf_dim1, xb % mjy, wrf_dim2, xb % mkz, wrf_dim3
+     CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1:2))
    end if
    
    call b2a(xb_mm5 % u,mjy+1,mix+1,mkz,1)

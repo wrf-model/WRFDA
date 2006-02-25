@@ -15,9 +15,9 @@ subroutine get_3d_sum(var, name, &
    partial = SUM(var(its:ite,jts:jte,kts:kte)*var(its:ite,jts:jte,kts:kte))
 
    total = wrf_dm_sum_real( partial )
-PRINT *,'TEST_COVERAGE_get_3d_sum:  total = ', total
+   WRITE(UNIT=*,FMT=*) 'TEST_COVERAGE_get_3d_sum:  total = ', total
 
-   write(unit=0, fmt='(3a, e24.14)') &
+   write(unit=stderr, fmt='(3a, e24.14)') &
         'Square sum of <', trim(name), '>=', total
 
 end subroutine get_3d_sum

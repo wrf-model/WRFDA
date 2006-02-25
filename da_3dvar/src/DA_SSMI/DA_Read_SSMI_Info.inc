@@ -75,13 +75,13 @@ SUBROUTINE DA_Read_SSMI_Info (iunit, ob, xb, xbx)
       use_ssmt1obs   = .false.
       use_ssmt2obs   = .false.
 
-      write(unit=0, fmt='(/a,i3/)') &
+      write(unit=stderr, fmt='(/a,i3/)') &
            'ERROR READING FILE UNIT:', iunit, &
            'ERROR CODE:', iost
 
       return
    else
-      write(unit=*, fmt='(/2a/)') &
+      write(UNIT=stdout, fmt='(/2a/)') &
            'in DA_Read_SSMI_Info.inc, char_ned=', trim(char_ned)
    ENDIF
 
@@ -146,7 +146,7 @@ head_line_1:  DO
       use_ssmt1obs   = .false.
       use_ssmt2obs   = .false.
 
-      write(unit=0, fmt='(/a,i3/)') &
+      write(unit=stderr, fmt='(/a,i3/)') &
            'ERROR READING FILE UNIT:', iunit, &
            'ERROR CODE:', iost
 
@@ -194,7 +194,7 @@ subroutine read_integer_array(aa,nn,i0,i_step)
 
   do i = 1, nn
     ii = i_step*(i-1) + i0
-    READ (char_ned (ii:ii+8),'((I7,2X))') aa(i)
+    READ (UNIT=char_ned (ii:ii+8),FMT='((I7,2X))') aa(i)
   enddo
 end subroutine read_integer_array
 
@@ -207,7 +207,7 @@ subroutine read_real_array(aa,nn,i0,i_step)
 
   do i = 1, nn
     ii = i_step*(i-1) + i0
-    READ (char_ned (ii:ii+8),'((f7.2,2X))') aa(i)
+    READ (UNIT=char_ned (ii:ii+8),FMT='((f7.2,2X))') aa(i)
   enddo
 end subroutine read_real_array
 

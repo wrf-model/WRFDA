@@ -403,8 +403,9 @@ DO i=1,m
     IF(aa > aam)aam=aa
   ENDDO
   IF(aam == 0.)THEN
-    PRINT '(" row ",i3," of matrix in ldum vanishes")',i
-    STOP
+    WRITE(UNIT=errmsg(1),FMT='(A,I3,A)') &
+      " row ",i," of matrix in ldum vanishes"
+    CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
   ENDIF
   s(i)=1./aam
 ENDDO
@@ -431,8 +432,9 @@ DO j=1,m-1
   ajj=a(j,j)
   IF(ajj == 0.)THEN
     jm=j-1
-    PRINT '(" failure in ldum:"/" matrix singular, rank=",i3)',jm
-    STOP
+    WRITE(UNIT=errmsg(1),FMT='(A,I3)') &
+      "matrix singular, rank=",jm
+    CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
   ENDIF
   ajji=1./ajj
   DO i=jp,m
@@ -456,8 +458,9 @@ DO i=1,m
     IF(aa > aam)aam=aa
   ENDDO
   IF(aam == 0.d0)THEN
-    PRINT '(" row ",i3," of matrix in dldum vanishes")',i
-    STOP
+    WRITE(UNIT=errmsg(1),FMT='(A,I3,A)') &
+      " row ",i," of matrix vanishes"
+    CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
   ENDIF
   s(i)=1./aam
 ENDDO
@@ -484,8 +487,9 @@ DO j=1,m-1
   ajj=a(j,j)
   IF(ajj == 0.d0)THEN
     jm=j-1
-    PRINT '(" Failure in dldum:"/" matrix singular, rank=",i3)',jm
-    STOP
+    WRITE(UNIT=errmsg(1),FMT='(A,I3)') &
+      "matrix singular, rank=",jm
+    CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
   ENDIF
   ajji=1./ajj
   DO i=jp,m
@@ -654,7 +658,9 @@ DO i=1,nc
       p=p+LOG(dw)
     ENDIF
   ENDDO
-  IF(E == 0.)STOP 'W effectively singular in LINVAN'
+  IF(E == 0.) THEN
+    CALL wrf_error_fatal3(__FILE__,__LINE__,"W effectively singular in LINVAN")
+  END IF
   d1(i)=EXP(-p/e)
 ENDDO
 CALL muldm(d1,w2,w)
@@ -669,7 +675,9 @@ DO j=1,nc
       p=p+LOG(dw)
     ENDIF
   ENDDO
-  IF(E == 0.)STOP 'W effectively singular in LINVAN'
+  IF(E == 0.) THEN
+    CALL wrf_error_fatal3(__FILE__,__LINE__,"W effectively singular in LINVAN")
+  END IF
   d2(j)=EXP(-p/e)
 ENDDO
 CALL mulmd(w,d2,w)
@@ -774,7 +782,9 @@ DO i=1,nc
       p=p+LOG(dw)
     ENDIF
   ENDDO
-  IF(e == 0.d0)STOP 'w effectively singular in linvan'
+  IF(e == 0.d0) THEN
+    CALL wrf_error_fatal3(__FILE__,__LINE__,"W effectively singular in LINVAN")
+  END IF
   d1(i)=EXP(-p/e)
 ENDDO
 CALL muldm_d(d1,w2,w)
@@ -789,7 +799,9 @@ DO j=1,nc
       p=p+LOG(dw)
     ENDIF
   ENDDO
-  IF(e == 0.)STOP 'w effectively singular in linvan'
+  IF(e == 0.) THEN
+    CALL wrf_error_fatal3(__FILE__,__LINE__,"W effectively singular in LINVAN")
+  END IF
   d2(j)=EXP(-p/e)
 ENDDO
 CALL mulmd_d(w,d2,w)
@@ -911,8 +923,9 @@ DO j=1,m
   jp=j+1
   s = a(j,j) - SUM(b(j,1:jm)*b(j,1:jm))
   IF(S <= 0.)THEN
-    PRINT '(" L1LM detects non-positivity at diagonal index",i2)',J
-    STOP
+    WRITE(UNIT=errmsg(1),FMT='(A,I2)') &
+      "L1LM detects non-positivity at diagonal index",J
+    CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1)) 
   ENDIF
   b(j,j)=SQRT(s)
   bjji=1./b(j,j)
@@ -934,8 +947,9 @@ DO j=1,m
   jp=j+1
   s = a(j,j) - SUM(b(j,1:jm)*b(j,1:jm))
   IF(s <= 0.d0)THEN
-    PRINT '(" L1LM detects non-positivity at diagonal index",i2)',J
-    STOP
+    WRITE(UNIT=errmsg(1),FMT='(A,I2)') &
+      "DL1LM detects non-positivity at diagonal index",J
+    CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1)) 
   ENDIF
   b(j,j)=SQRT(s)
   bjji=1./b(j,j)
@@ -962,8 +976,9 @@ DO j=1,m
   
   b(j,j) = 1.
   IF(d(j) == 0.)THEN
-    PRINT '(" LDLM detects singularity at diagonal index",i2)',J
-    STOP
+    WRITE(UNIT=errmsg(1),FMT='(A,I2)') &
+      "LDLM detects non-positivity at diagonal index",J
+    CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1)) 
   ENDIF
   bjji=1./d(j)
   DO i=jp,m
@@ -985,8 +1000,9 @@ DO j=1,m; jm=j-1; jp=j+1
   d(j)=a(j,j) - SUM(b(1:jm,j)*b(j,1:jm))
   b(j,j) = 1.
   IF(d(j) == 0.d0)THEN
-    PRINT '(" DLDLM detects singularity at diagonal index",i2)',J
-    STOP
+    WRITE(UNIT=errmsg(1),FMT='(A,I2)') &
+      "DLDLM detects non-positivity at diagonal index",J
+    CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1)) 
   ENDIF
   bjji=1./d(j)
   DO i=jp,m
@@ -1115,16 +1131,18 @@ SUBROUTINE linlv(a,u)
 REAL,    INTENT(IN   ) :: a(:,:)
 REAL,    INTENT(INOUT) :: u(:)
 INTEGER             :: i
-if(size(a,1) /= size(a,2) .or. size(a,1) /= size(u))&
-     stop 'In linlv; incompatible array dimensions'
+IF (SIZE(a,1) /= SIZE(a,2) .or. SIZE(a,1) /= SIZE(u)) THEN
+  CALL wrf_error_fatal3(__FILE__,__LINE__,"incompatible array dimensions")
+END IF
 DO i=1,SIZE(u); u(i)=(u(i) - SUM(u(:i-1)*a(i,:i-1)))/a(i,i); ENDDO
 end subroutine linlv
 SUBROUTINE dlinlv(a,u)
 REAL(8), INTENT(IN   ) :: a(:,:)
 REAL(8), INTENT(INOUT) :: u(:)
 INTEGER                :: i
-if(size(a,1) /= size(a,2) .or. size(a,1) /= size(u))&
-     stop 'In dlinlv; incompatible array dimensions'
+if(size(a,1) /= size(a,2) .or. size(a,1) /= size(u)) THEN
+  CALL wrf_error_fatal3(__FILE__,__LINE__,"incompatible array dimensions")
+END IF
 DO i=1,SIZE(u); u(i)=(u(i) - SUM(u(:i-1)*a(i,:i-1)))/a(i,i); ENDDO
 end subroutine dlinlv
 
@@ -1139,16 +1157,18 @@ subroutine linuv(a,u)
 REAL,    INTENT(IN   ) :: a(:,:)
 REAL,    INTENT(INOUT) :: u(:)
 INTEGER             :: i
-if(size(a,1) /= size(a,2) .or. size(a,1) /= size(u))&
-     stop 'In linuv; incompatible array dimensions'
+if(size(a,1) /= size(a,2) .or. size(a,1) /= size(u)) THEN
+  CALL wrf_error_fatal3(__FILE__,__LINE__,"incompatible array dimensions")
+END IF
 DO i=size(u),1,-1; u(i)=(u(i) - SUM(a(i+1:,i)*u(i+1:)))/a(i,i); ENDDO
 END SUBROUTINE linuv
 subroutine dlinuv(a,u)
 REAL(8), INTENT(IN   ) :: a(:,:)
 REAL(8), INTENT(INOUT) :: u(:)
 INTEGER             :: i
-if(size(a,1) /= size(a,2) .or. size(a,1) /= size(u))&
-     stop 'In dlinuv; incompatible array dimensions'
+if(size(a,1) /= size(a,2) .or. size(a,1) /= size(u)) THEN
+  CALL wrf_error_fatal3(__FILE__,__LINE__,"incompatible array dimensions")
+END IF
 DO i=size(u),1,-1; u(i)=(u(i) - SUM(a(i+1:,i)*u(i+1:)))/a(i,i); ENDDO
 END SUBROUTINE dlinuv
 
@@ -1252,8 +1272,9 @@ REAL,   DIMENSION(:,:),INTENT(INOUT):: a
 REAL,   DIMENSION(:),  INTENT(INOUT):: b
 INTEGER,DIMENSION(SIZE(a,1))        :: ipiv
 REAL                                :: d
-IF(SIZE(a,1) /= SIZE(a,2).or. SIZE(a,1) /= SIZE(b))&
-     STOP 'In linmvt; incompatible array dimensions'
+IF(SIZE(a,1) /= SIZE(a,2).or. SIZE(a,1) /= SIZE(b)) THEN
+  CALL wrf_error_fatal3(__FILE__,__LINE__,"incompatible array dimensions")
+END IF
 CALL ldum(a,ipiv,d); CALL udlmm(a,b,ipiv)
 END SUBROUTINE linmvt
 SUBROUTINE dlinmvt(a,b)
@@ -1261,8 +1282,9 @@ REAL(8),DIMENSION(:,:),INTENT(INOUT):: a
 REAL(8),DIMENSION(:),  INTENT(INOUT):: b
 INTEGER,DIMENSION(SIZE(a,1))        :: ipiv
 REAL(8)                             :: d
-IF(SIZE(a,1) /= SIZE(a,2).or. SIZE(a,1) /= SIZE(b))&
-     STOP 'In dlinmvt; incompatible array dimensions'
+IF(SIZE(a,1) /= SIZE(a,2).or. SIZE(a,1) /= SIZE(b)) THEN
+  CALL wrf_error_fatal3(__FILE__,__LINE__,"incompatible array dimensions")
+END IF
 CALL ldum_d(a,ipiv,d); CALL udlmm_d(a,b,ipiv)
 END SUBROUTINE dlinmvt
 

@@ -180,7 +180,7 @@ subroutine  snwem_amsu(theta,frequency,snow_depth,ts,tba,tbb,esh,esv)
         exit
      end if
   end do
-!    write(6,'(a,2f6.1,i5,a,4f7.1,a,2f7.1)') 'freq,theta,input_tyep=',frequency,theta,input_type, ' tba=',tba,' tbb=',tbb
+!    write(UNIT=stdout,FMT='(a,2f6.1,i5,a,4f7.1,a,2f7.1)') 'freq,theta,input_tyep=',frequency,theta,input_type, ' tba=',tba,' tbb=',tbb
 
   GET_option: SELECT CASE (input_type)
   CASE (1)

@@ -54,7 +54,7 @@ SUBROUTINE DA_Read_SSMI (iunit, ob, xp, filename)
            STATUS = 'OLD')
 
       IF (iost /= 0) THEN
-         write(unit=*, fmt='(/A,I3,3(2X,A)/)') &
+         write(unit=stderr, fmt='(/A,I3,3(2X,A)/)') &
               'ERROR IN SSMI INPUT FILE UNIT ',iunit, &
               'SSMI FILENAME:', trim(filename), &
               'FOR SSMI CANNOT BE FOUND OR CANNOT BE OPENED'
@@ -68,7 +68,7 @@ SUBROUTINE DA_Read_SSMI (iunit, ob, xp, filename)
            STATUS = 'OLD')
 
       IF (iost /= 0) THEN
-         write(unit=*, fmt='(/A,I3,2X,A/)') &
+         write(unit=stderr, fmt='(/A,I3,2X,A/)') &
               'ERROR IN INPUT FILE UNIT ',iunit, &
               'FOR SSMI OBSERVATIONS CANNOT BE FOUND OR CANNOT BE OPENED'
          RETURN
@@ -89,13 +89,13 @@ SUBROUTINE DA_Read_SSMI (iunit, ob, xp, filename)
 !     -------------
 
    IF (iost /= 0) THEN
-      write(unit=0, fmt='(/a,i3/)') &
+      write(unit=stderr, fmt='(/a,i3/)') &
            'ERROR READING FILE UNIT:', iunit, &
            'ERROR CODE:', iost
 
       return
    else
-      write(unit=*, fmt='(/2a/)') &
+      write(unit=stdout, fmt='(/2a/)') &
            'in DA_Read_SSMI_Info.inc, char_ned=', trim(char_ned)
    ENDIF
 
@@ -106,7 +106,7 @@ head_line_1:  DO
    READ (UNIT = iunit, FMT = '(A)', IOSTAT = iost) char_ned
 
    IF (iost /= 0) THEN
-      write(unit=0, fmt='(/a,i3/)') &
+      write(unit=stderr, fmt='(/a,i3/)') &
            'ERROR READING FILE UNIT:', iunit, &
            'ERROR CODE:', iost
 
@@ -131,18 +131,18 @@ head_line_2:  DO
 !  READ FORMATS
 !  ------------
 
-   READ (iunit, FMT = '(A,1X,A)') &
+   READ (UNIT=iunit, FMT = '(A,1X,A)') &
         fmt_name, fmt_info, &
         fmt_name, fmt_loc
 
-! write(unit=*, fmt='(2a)') &
+! write(unit=stdout, fmt='(2a)') &
 !      'fmt_info=', TRIM (fmt_info), &
 !      'fmt_loc =', TRIM (fmt_loc)
 
 !  SKIP 1 line
 !  -----------
 
-   READ (iunit, FMT = '(A)') fmt_name
+   READ (UNIT=iunit, FMT = '(A)') fmt_name
 
 !  WRITE (UNIT = *, FMT = '(/,2(A,F3.0,/))')  &
 !     'Error max test ratio for SWS = ',max_error_uv,  &
@@ -158,7 +158,7 @@ head_line_2:  DO
 !  READ STATION GENERAL INFO
 !  =========================
 
-      READ (iunit, FMT = fmt_info, IOSTAT = iost) &
+      READ (UNIT=iunit, FMT = fmt_info, IOSTAT = iost) &
                    info % platform,    &
                    info % date_char,   &
                    info % name,        &
@@ -168,7 +168,7 @@ head_line_2:  DO
                    info % elv,         &
                    info % id
 
-      read(info % platform (4:6), '(I3)') fm
+      read(UNIT=info % platform (4:6),FMT='(I3)') fm
 
       IF (iost /= 0) THEN
          EXIT reports
@@ -181,9 +181,9 @@ head_line_2:  DO
       SELECT CASE(fm)
          CASE (125)    ;
 !-----------READ SURFACE WIND SPEED AND PRECIPITABLE WATER
-            READ (iunit, FMT = fmt_loc) speed, tpw
+            READ (UNIT=iunit, FMT = fmt_loc) speed, tpw
          CASE (126)    ;
-            READ (iunit, FMT = fmt_loc) &
+            READ (UNIT=iunit, FMT = fmt_loc) &
                tb19v, tb19h, tb22v, tb37v, tb37h, tb85v, tb85h
 
                tb19v % error = tb19v % error + 2.
@@ -195,12 +195,12 @@ head_line_2:  DO
                tb85v % error = tb85v % error + 2.
 
          CASE DEFAULT;
-            write(unit=*, fmt='(/a/)') &
+            write(unit=stderr, fmt='(/a/)') &
                  'WARNING   WARNING   WARNING   WARNING   WARNING :'
 
-            write(unit=*, fmt='(a, i6)') 'unsaved ssmi obs found, fm=', fm
+            write(unit=stderr, fmt='(a, i6)') 'unsaved ssmi obs found, fm=', fm
 
-            write(unit=*, fmt='(a, 2f12.6)') &
+            write(unit=stderr, fmt='(a, 2f12.6)') &
                  'info%(lon,lat)=', info%lon, info%lat
       END SELECT
 
@@ -331,7 +331,7 @@ head_line_2:  DO
 !  PRINT OUT
 !  =========
  
-   write(unit=*, fmt='(5x,a,i6,a)') &
+   write(unit=stdout, fmt='(5x,a,i6,a)') &
         'Read:  ', ob % num_ssmi_retrieval , ' SSMI_RETRIEVAL reports,', &
         'Read:  ', ob % num_ssmi_tb ,        ' SSMI_Tb reports,', &
         'Read:  ', ob % total_obs, ' Total Observations.', &
@@ -340,16 +340,16 @@ head_line_2:  DO
                  - ob % num_ssmi_tb,               &
                 '  Observations unsaved.'
 
-   write(unit=*, fmt='(/,25x,a)') &
+   write(unit=stdout, fmt='(/,25x,a)') &
                         '     used   outdomain  max_er_chk   missing' 
-   write(unit=*, fmt='(4x,a,4i11)') &
+   write(unit=stdout, fmt='(4x,a,4i11)') &
                    'SSMI_RETRIEVAL_diag: ', count_obs_ssmir
-   write(unit=*, fmt='(4x,a,4i11)') &
+   write(unit=stdout, fmt='(4x,a,4i11)') &
                    'SSMI_Tb_diag:        ', count_obs_ssmit
-   write(unit=*, fmt='(/,a)') &
+   write(unit=stdout, fmt='(/,a)') &
  "------------------------------------------------------------------------------"
 
-   write(unit=*, fmt='(/,5x,a,i6/)') '** Rain contaminated SSMI_Tb =', irain
+   write(unit=stdout, fmt='(/,5x,a,i6/)') '** Rain contaminated SSMI_Tb =', irain
 
 END SUBROUTINE DA_Read_SSMI
 
@@ -419,7 +419,7 @@ REAL                    :: theta,tc,wv,u,alw19,alw37,alw85
              alw19 .gt. -999. .and. alw37 .gt. -999. .and. &
              alw85 .gt. -999.  ) then
              ipass2 = 1
-!            write(0,*)a1,a2,lat,long,theta,tb(1),tb(2),tb(3), &
+!            write(UNIT=stdout,*)a1,a2,lat,long,theta,tb(1),tb(2),tb(3), &
 !                      tb(4),tb(5),tb(6),tb(7)
          endif
 
@@ -431,21 +431,19 @@ REAL                    :: theta,tc,wv,u,alw19,alw37,alw85
 !               alw19 .ge. -0.01 .and. alw19 .le. 0.5 .and. &
 !               alw37 .ge. -0.01 .and. alw37 .le. 0.5 .and. &
 !               alw85 .ge. -0.01 .and. alw85 .le. 0.5 ) then
-!!              write(0,*)a1,a2,lat,long,theta,tb(1),tb(2),tb(3), &
+!!              write(UNIT=stdout,*)a1,a2,lat,long,theta,tb(1),tb(2),tb(3), &
 !!                        tb(4),tb(5),tb(6),tb(7)
 !!              ipass = .true.
 !           endif
 !        endif
 !        if (iprecip .eq. 1 ) then
 !           ipass = .true.
-!           print*,'precipitation',lat,long,wv,u,alw19,alw37,alw85,iprecip
+!           WRITE(UNIT=stdout,*) 'precipitation',lat,long,wv,u,alw19,alw37,alw85,iprecip
 !        else
 !           ipass = .true.
 !        endif
      endif
-!    print*,'pass=',ipass1,ipass2,iprecip,ipass
-
- 15  format(a9,1x,a5,1x,f6.2,1x,f7.2,1x,f5.2,7(f6.1))
+!    WRITE(UNIT=stdout,*) 'pass=',ipass1,ipass2,iprecip,ipass
 
 
 END SUBROUTINE filter
@@ -1135,7 +1133,7 @@ END SUBROUTINE filter
          enddo
          u = u + coeff2(7)*(theta-53.0)
       else
-         stop 'Invalid algorithm ID'
+        CALL wrf_error_fatal3(__FILE__,__LINE__,"Invalid algorithm ID")
       endif
 
       end subroutine ualg

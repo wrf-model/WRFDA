@@ -39,7 +39,7 @@ SUBROUTINE DA_Obs_Sfc_correction(sfc_obs, xb )
  
 ! 2. Model profile at OBS site for surface correction
 
-!     WRITE(0,'(A)') "MODEL PROFILE:"
+!     WRITE(UNIT=stderr,FMT='(A)') "MODEL PROFILE:"
 
          i = sfc_obs%loc%i
          j = sfc_obs%loc%j
@@ -118,13 +118,13 @@ SUBROUTINE DA_Obs_Sfc_correction(sfc_obs, xb )
 
           return
 
-           WRITE(unit=*, fmt='(/3(1x,a))') &
-                'MISSING HEIGHT OR PRESSURE OBSERVATION ID ', &
-                 TRIM (sfc_obs%info % id), TRIM (sfc_obs%info % name)
+!           WRITE(unit=stdout, fmt='(/3(1x,a))') &
+!                'MISSING HEIGHT OR PRESSURE OBSERVATION ID ', &
+!                 TRIM (sfc_obs%info % id), TRIM (sfc_obs%info % name)
 
-           WRITE(unit=*, fmt='(2(A,F12.3,/))') &
-                               ' height   = ',ho,&
-                               ' pressure = ',po
+!           WRITE(unit=stdout, fmt='(2(A,F12.3,/))') &
+!                               ' height   = ',ho,&
+!                               ' pressure = ',po
 !          STOP                ' in DA_Sfc_correction'
 
       ENDIF
@@ -365,11 +365,11 @@ SUBROUTINE INTPSFC_TEM (val, ho, po, to, height, pressure, temp, kts, kte)
 
        IF ((k_100mb .LE. kts) .OR. (k_200mb .LE. kts) .OR. &
            (k_200mb .LT. k_100mb)) THEN
-            WRITE (0,'(A)') ' ERROR CANNOT FIND SFC + 200hPA AND SFC + 100hPA' 
-            WRITE (0,'(A,I2,A,F10.3)') ' P (',k_200mb,') = ',prs_mb (k_200mb) 
-            WRITE (0,'(A,I2,A,F10.3)') ' P (',k_100mb,') = ',prs_mb (k_100mb) 
-            WRITE (0,'(A,F10.3)')      ' P_SFC  = ',         prs_mb (kts) 
-            STOP 'in intpsfc_tem.F90'
+            WRITE (UNIT=errmsg(1),FMT='(A)') ' ERROR CANNOT FIND SFC + 200hPA AND SFC + 100hPA' 
+            WRITE (UNIT=errmsg(2),FMT='(A,I2,A,F10.3)') ' P (',k_200mb,') = ',prs_mb (k_200mb) 
+            WRITE (UNIT=errmsg(3),FMT='(A,I2,A,F10.3)') ' P (',k_100mb,') = ',prs_mb (k_100mb) 
+            WRITE (UNIT=errmsg(4),FMT='(A,F10.3)')      ' P_SFC  = ',         prs_mb (kts) 
+            CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1:4))
        ENDIF
 
 
@@ -711,15 +711,16 @@ END FUNCTION MO_CORRECTION
       END DO
 
       IF ( ( K850 .EQ. 0 ) .OR. ( K700 .EQ. 0 ) .OR. ( K500 .EQ. 0 ) ) THEN
-!         PRINT '(A,3f8.0,A)','Error in finding p level for ',PLMB(1), &
-!                             PLMB(2), PLMB(3),' Pa.'
+!       WRITE(UNIT=errmsg(1),FMT='(A,3f8.0,A)') &
+!         'Error in finding p level for ',PLMB(1), PLMB(2), PLMB(3),' Pa.'
 !         DO K = 1, KX
-!            PRINT '(A,I3,A,F10.2)','K = ',K,'  PRESSURE = ',P(K)
+!           WRITE(UNIT=errmsg(k+1),FMT='(A,I3,A,F10.2)') 'K = ',K,'  PRESSURE = ',P(K)
 !         END DO
-!         PRINT '(A,2f8.0,A,f8.0,A)','Expected ',    &
-!               PLMB(1), PLMB(2),' and ',PLMB(3),' Pa. values, at least.'
-!         STOP 'not_enough_levels'
-!         PRINT '(A)','Change the pressure levels by -25mb'
+!         WRITE(UNIT=errmsg(kx+2),FMT='(A,2f8.0,A,f8.0,A)) ','Expected ',    &
+!           PLMB(1), PLMB(2),' and ',PLMB(3),' Pa. values, at least.'
+!         errmsg(kx+3)="not enough levels"
+!         errmsg(kx+4)="Change the pressure levels by -25mb"
+!         CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1:kx+4))
          PLMB(1) = PLMB(1) - 2500.
          PLMB(2) = PLMB(2) - 2500.
          PLMB(3) = PLMB(3) - 2500.

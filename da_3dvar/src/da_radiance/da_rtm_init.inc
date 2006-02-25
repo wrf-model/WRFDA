@@ -106,7 +106,7 @@ subroutine da_rtm_init(iv,ob)
              rtminit_satid(n),     &
              '-'//trim( inst_name(rtminit_sensor(n)) )
  end if
-!   write(*,*)  iv%instid(n)%rttovid_string
+!   write(UNIT=stdout,FMT=*)  iv%instid(n)%rttovid_string
 
    if ( trim( inst_name(rtminit_sensor(n))) == 'msu' ) then
       nchanl(n)  = 4
@@ -162,7 +162,7 @@ subroutine da_rtm_init(iv,ob)
   allocate ( satinfo(n) % error(nchanl(n)) )
   allocate ( satinfo(n) % polar(nchanl(n)) )
 
-  read(rtm_info_unit,*)
+  read(UNIT=rtm_info_unit,FMT=*)
   do j = 1, nchanl(n)
     read(UNIT=rtm_info_unit,FMT='(1x,5i5,2e18.10)')    &
                      wmo_sensor_id, &

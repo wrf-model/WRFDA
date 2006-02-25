@@ -22,14 +22,14 @@ subroutine da_readwrite_be_stage3( outunit, nk, variable, be_method )
    open (iunit, file = filename, form='unformatted')
    read(iunit)vardum
    if ( trim(vardum) /= trim(variable) ) then
-      write(6,'(a)')' Inconsistent variable name. Stop'
-      stop
+     CALL wrf_error_fatal3(__FILE__,__LINE__, &
+       "Inconsistent variable name")
    end if
 
    read(iunit)nkdum, num_bins2d
    if ( nkdum /= nk ) then
-      write(6,'(a)')' Inconsistent nk between regression coefficients and vertical modes. Stop'
-      stop
+     CALL wrf_error_fatal3(__FILE__,__LINE__, &
+       "Inconsistent nk between regression coefficients and vertical modes")
    end if
 
    allocate( e_vec_loc(1:nk,1:nk,1:num_bins2d) )

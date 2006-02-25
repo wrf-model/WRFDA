@@ -41,9 +41,9 @@ SUBROUTINE DA_Rescale_Background_Errors ( ix, jy, var_scaling, len_scaling, &
       s(1:mz) = len_scaling * s(1:mz)
    
       IF ( Test_Statistics ) THEN
-         WRITE(0,'(a,a)')TRIM(be_sub % name), 'Error Lengthscales (m):'
+         WRITE(UNIT=stderr,FMT='(a,a)')TRIM(be_sub % name), 'Error Lengthscales (m):'
          do m = 1, mz
-            WRITE(0,'(a,i4,1pe13.5)')be_sub % name, m, s(m)
+            WRITE(UNIT=stderr,FMT='(a,i4,1pe13.5)')be_sub % name, m, s(m)
          end do
       END IF
       

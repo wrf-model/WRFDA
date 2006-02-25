@@ -156,30 +156,30 @@ SUBROUTINE DA_Write_Increment ( xp, xb, xa, q_cgrid, mu_cgrid, ph_cgrid )
 #endif
 
       if ( wrf_dm_on_monitor() ) then
-        open(unit=141, file='ANALYSIS_INCREMENT', form='unformatted')
+        open(UNIT=anl_inc_unit, file='ANALYSIS_INCREMENT', form='unformatted')
 
-         write (141) ANALYSIS_DATE
+         write (UNIT=anl_inc_unit) ANALYSIS_DATE
 
-         write (141) 1, ix, 1, jy, 1, kz 
+         write (UNIT=anl_inc_unit) 1, ix, 1, jy, 1, kz 
 
 ! .. Map projection information:
-         write (141) &
+         write (UNIT=anl_inc_unit) &
           map_projection, coarse_ix, coarse_jy, coarse_ds, start_x, start_y, &
           phic, xlonc, cone_factor, truelat1_3dv, truelat2_3dv, pole, dsm,   &
           psi1, c2, ptop, ps0, ts0, tlp, tis0
 
 !    .. 1d constant fields:
 
-         write (141) xb%sigmah, xb%sigmaf
+         write (UNIT=anl_inc_unit) xb%sigmah, xb%sigmaf
 
 #ifdef DM_PARALLEL
 
 !    .. 3d- and 2d-increments:
-         write (141) u_global, v_global, w_global, p_global, t_global, &
+         write (UNIT=anl_inc_unit) u_global, v_global, w_global, p_global, t_global, &
                    q_global, ph_global, mu_global, psfc_global
 
 !    .. 2d-constant fields:
-         write (141) psac_global, tgrn_global, terr_global, snow_global,  &
+         write (UNIT=anl_inc_unit) psac_global, tgrn_global, terr_global, snow_global,  &
                   lat_global, lon_global, lanu_global, map_factor_global, &
                   cori_global, landmask_global
 
@@ -195,7 +195,7 @@ SUBROUTINE DA_Write_Increment ( xp, xb, xa, q_cgrid, mu_cgrid, ph_cgrid )
 #else
 
 !    .. 3d- and 2d-increments:
-        write (141) xa%u(1:ix+1,1:jy+1,1:kz+1), &
+        write (UNIT=anl_inc_unit) xa%u(1:ix+1,1:jy+1,1:kz+1), &
                     xa%v(1:ix+1,1:jy+1,1:kz+1), &
                     xa%w(1:ix+1,1:jy+1,1:kz+1), &
                     xa%p(1:ix+1,1:jy+1,1:kz+1), &
@@ -206,7 +206,7 @@ SUBROUTINE DA_Write_Increment ( xp, xb, xa, q_cgrid, mu_cgrid, ph_cgrid )
                     xa%psfc(1:ix+1,1:jy+1)
 
 !    .. 2d-constant fields:
-        write (141) xb%psac(1:ix+1,1:jy+1), &
+        write (UNIT=anl_inc_unit) xb%psac(1:ix+1,1:jy+1), &
                     xb%tgrn(1:ix+1,1:jy+1), &
                     xb%terr(1:ix+1,1:jy+1), &
                     xb%snow(1:ix+1,1:jy+1), &
@@ -217,11 +217,11 @@ SUBROUTINE DA_Write_Increment ( xp, xb, xa, q_cgrid, mu_cgrid, ph_cgrid )
                     xb%cori(1:ix+1,1:jy+1), &
                     xb%landmask(1:ix+1,1:jy+1)
 
-!      print '(/"MAXVAL:: u, v, w, p, t, qv, ph, mu, psfc:",9e13.5)',  &
+!      WRITE(UNIT=stdout,FMT='(/"MAXVAL:: u, v, w, p, t, qv, ph, mu, psfc:",9e13.5)')  &
 !         maxval(xa%u),maxval(xa%v),   maxval(xa%w ),   maxval(xa%p ), &
 !         maxval(xa%t),maxval(q_cgrid),maxval(ph_cgrid),maxval(mu_cgrid),&
 !         maxval(xa%psfc)
-!      print '(/"MINVAL:: u, v, w, p, t, qv, ph, mu, psfc:",9e13.5)',  &
+!      WRITE(UNIT=stdout,FMT='(/"MINVAL:: u, v, w, p, t, qv, ph, mu, psfc:",9e13.5)')  &
 !         minval(xa%u),minval(xa%v),   minval(xa%w ),   minval(xa%p ), &
 !         minval(xa%t),minval(q_cgrid),minval(ph_cgrid),minval(mu_cgrid),&
 !         minval(xa%psfc)

@@ -32,7 +32,7 @@ SUBROUTINE da_get_innov_vector_pseudo( xb, xp, ob, iv )
          dx = iv%pseudo(n)%loc%dx
          dxm = iv%pseudo(n)%loc%dxm
 
-         write(unit=*, fmt='(/a,2i5/a,4f15.5/)') &
+         write(UNIT=stdout, fmt='(/a,2i5/a,4f15.5/)') &
               'pseudo: i,j=', i,j, &
               'pseudo: dy, dym, dx, dxm=', dy, dym, dx, dxm
 

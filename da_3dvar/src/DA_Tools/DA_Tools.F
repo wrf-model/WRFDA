@@ -13,6 +13,7 @@ MODULE DA_Tools
    USE DA_Constants
    USE DA_Define_Structures
    USE LAPACK
+   USE module_wrf_error
    
    IMPLICIT NONE
    
@@ -296,27 +297,24 @@ CONTAINS
 
     ! First, check for validity of mandatory variables in proj
     IF ( ABS(lat1) .GT. 90. ) THEN
-      PRINT '(A)', 'Latitude of origin corner required as follows:'
-      PRINT '(A)', '    -90N <= lat1 < = 90.N'
-      STOP 'MAP_INIT'
+      CALL wrf_error_fatal3(__FILE__,__LINE__, &
+        "Latitude of origin corner required as follows: -90N <= lat1 < = 90.N")
     ENDIF
     IF ( ABS(lon1) .GT. 180.) THEN
-      PRINT '(A)', 'Longitude of origin required as follows:'
-      PRINT '(A)', '   -180E <= lon1 <= 180W'
-      STOP 'MAP_INIT'
+      CALL wrf_error_fatal3(__FILE__,__LINE__, &
+        "Longitude of origin required as follows: -180E <= lon1 <= 180W")
     ENDIF
     IF ((dx .LE. 0.).AND.(proj_code .NE. PROJ_LATLON)) THEN
-      PRINT '(A)', 'Require grid spacing (dx) in meters be positive!'
-      STOP 'MAP_INIT'
+      CALL wrf_error_fatal3(__FILE__,__LINE__, &
+        "Require grid spacing (dx) in meters be positive!")
     ENDIF
     IF ((ABS(stdlon) .GT. 180.).AND.(proj_code .NE. PROJ_MERC)) THEN
-      PRINT '(A)', 'Need orientation longitude (stdlon) as: '
-      PRINT '(A)', '   -180E <= lon1 <= 180W' 
-      STOP 'MAP_INIT'
+      CALL wrf_error_fatal3(__FILE__,__LINE__, &
+        "Need orientation longitude (stdlon) as: -180E <= lon1 <= 180W") 
     ENDIF
     IF (ABS(truelat1).GT.90.) THEN
-      PRINT '(A)', 'Set true latitude 1 for all projections!'
-      STOP 'MAP_INIT'
+      CALL wrf_error_fatal3(__FILE__,__LINE__, &
+        "Set true latitude 1 for all projections!")
     ENDIF
    
     CALL map_init(proj) 
@@ -341,32 +339,31 @@ CONTAINS
     pick_proj: SELECT CASE(proj%code)
 
       CASE(PROJ_PS)
-        PRINT '(A)', 'Setting up POLAR STEREOGRAPHIC map...'
+        WRITE(UNIT=stdout,FMT='(A)') 'Setting up POLAR STEREOGRAPHIC map...'
         CALL set_ps(proj)
 
       CASE(PROJ_LC)
-        PRINT '(A)', 'Setting up LAMBERT CONFORMAL map...'
+        WRITE(UNIT=stdout,FMT='(A)') 'Setting up LAMBERT CONFORMAL map...'
         IF (ABS(proj%truelat2) .GT. 90.) THEN
-          PRINT '(A)', 'Second true latitude not set, assuming a tangent'
-          PRINT '(A,F10.3)', 'projection at truelat1: ', proj%truelat1
+          WRITE(UNIT=stdout,FMT='(A)') 'Second true latitude not set, assuming a tangent'
+          WRITE(UNIT=stdout,FMT='(A,F10.3)') 'projection at truelat1: ', proj%truelat1
           proj%truelat2=proj%truelat1
         ENDIF
         CALL set_lc(proj)
    
       CASE (PROJ_MERC)
-        PRINT '(A)', 'Setting up MERCATOR map...'
+        WRITE(UNIT=stdout,FMT='(A)') 'Setting up MERCATOR map...'
         CALL set_merc(proj)
    
       CASE (PROJ_LATLON)
-        PRINT '(A)', 'Setting up CYLINDRICAL EQUIDISTANT LATLON map...'
+        WRITE(UNIT=stdout,FMT='(A)') 'Setting up CYLINDRICAL EQUIDISTANT LATLON map...'
         ! Convert lon1 to 0->360 notation
         IF (proj%lon1 .LT. 0.) proj%lon1 = proj%lon1 + 360.
    
       CASE DEFAULT
-        PRINT '(A,I2)', 'Unknown projection code: ', proj%code
-        STOP 'MAP_INIT'
-    
-    END SELECT pick_proj
+        WRITE(UNIT=errmsg(1),FMT='(A,I2)') 'Unknown projection code: ', proj%code
+        CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
+      END SELECT pick_proj
     proj%init = .TRUE.
     RETURN
   END SUBROUTINE map_set
@@ -383,8 +380,8 @@ CONTAINS
     REAL, INTENT(OUT)                    :: j
 
     IF (.NOT.proj%init) THEN
-      PRINT '(A)', 'You have not called map_set for this projection!'
-      STOP 'LATLON_TO_IJ'
+      CALL wrf_error_fatal3(__FILE__,__LINE__, &
+        "You have not called map_set for this projection!")
     ENDIF
 
     SELECT CASE(proj%code)
@@ -406,8 +403,9 @@ CONTAINS
         j = j + proj%knownj - 1.0
 
       CASE DEFAULT
-        PRINT '(A,I2)', 'Unrecognized map projection code: ', proj%code
-        STOP 'LATLON_TO_IJ'
+        WRITE(UNIT=errmsg(1),FMT='(A,I2)') &
+          'Unrecognized map projection code: ', proj%code
+        CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
  
     END SELECT
     RETURN
@@ -426,8 +424,8 @@ CONTAINS
     REAL                                :: i, j
 
     IF (.NOT.proj%init) THEN
-      PRINT '(A)', 'You have not called map_set for this projection!'
-      STOP 'IJ_TO_LATLON'
+      CALL wrf_error_fatal3(__FILE__,__LINE__, &
+        "You have not called map_set for this projection!")
     ENDIF
 
     i = ii
@@ -453,8 +451,9 @@ CONTAINS
         CALL ijll_lc(i, j, proj, lat, lon)
 
       CASE DEFAULT
-        PRINT '(A,I2)', 'Unrecognized map projection code: ', proj%code
-        STOP 'IJ_TO_LATLON'
+        WRITE(UNIT=errmsg(1),FMT='(A,I2)') &
+          "Unrecognized map projection code: ", proj%code
+        CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
 
     END SELECT
     RETURN

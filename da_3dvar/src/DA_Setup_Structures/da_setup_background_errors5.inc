@@ -74,12 +74,9 @@ SUBROUTINE DA_Setup_Background_Errors5(xb, be, xbx, xp)
    write (6,*)
 
    IF(cv_options /= 5) THEN
-      write(unit=*, fmt='(a, i2)') &
-           'cv_options:', cv_options
-
-      CALL wrf_shutdown
-
-      STOP "Stopped for Wrong CV_OPTION."
+     WRITE(UNIT=errmsg(1),FMT='(A,I5,A)') &
+       "cv_options=",cv_options,"should be 5"
+     CALL wrf_error_fatal3(__FILE__,__LINE__, errmsg(1))
    ENDIF
 
    be % cv % option = cv_options
@@ -189,7 +186,7 @@ rewind (be_cv_5_unit)
 ! 1.3 Domain_averaged regression coefficients
 
     if (.not.lat_stats_option) then
-     write(unit=*, fmt='(/5x, a/)') &
+     write(UNIT=stdout, fmt='(/5x, a/)') &
      '*** Using the averaged regression coefficients for unbalanced part ***'
 
     do k=1,nk
@@ -223,7 +220,7 @@ rewind (be_cv_5_unit)
 
     else
 
-    write(unit=*, fmt='(/5x, a/)') &
+    write(UNIT=stdout, fmt='(/5x, a/)') &
     '*** Using the latitude-dependent regression coefficients for unbalanced part ***'
     endif
     
@@ -495,9 +492,9 @@ rewind (be_cv_5_unit)
     CALL DA_Rescale_Background_Errors( ix, jy, var_scaling5, len_scaling5, &
                                       xb % ds, be5_rf_lengthscale, be % v5 )
 
-!     print '(/a,f10.2)','xb%ds=',xb%ds
+!     write(UNIT=stdout,FMT='(/a,f10.2)') 'xb%ds=',xb%ds
 !     do k=1,nk
-!       write(*,'(I4,5F10.3 )' ) k, be1_rf_lengthscale(k), be2_rf_lengthscale(k), &
+!       write(UNIT=stdout,FMT='(I4,5F10.3 )' ) k, be1_rf_lengthscale(k), be2_rf_lengthscale(k), &
 !             be3_rf_lengthscale(k), be4_rf_lengthscale(k),be5_rf_lengthscale(1)
 !     enddo
 

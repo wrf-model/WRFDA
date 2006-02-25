@@ -37,11 +37,9 @@ SUBROUTINE DA_Transform_XToVp( xb, xbx, xa, xp, vp, be, &
 !-------------------------------------------------------------------      
    print*,' in XToVp'     
    IF ( cv_options /= 2 .and. cv_options /=4 .and. cv_options /= 5) THEN
-      write(unit=*, fmt='(a,i6)') &
-           'Cannot perform Transform_XToVp for cv_options:', cv_options
-
-      CALL wrf_shutdown
-      stop 'Wrong cv_options.'
+     WRITE(UNIT=errmsg(1),FMT='(a,i6)') &
+       'Cannot perform Transform_XToVp for cv_options:', cv_options
+     CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
    ENDIF
 
 
@@ -65,26 +63,27 @@ SUBROUTINE DA_Transform_XToVp( xb, xbx, xa, xp, vp, be, &
                             its,ite, jts,jte, kts,kte )
 
 !  Convert vorticity to Del**2 psi:
-   if(.not. global ) then               
-     if (fg_format == 1 .or. fg_format == 2) then
-    one_over_m2(its:ite,jts:jte) = 1.0 / ( xb % map_factor(its:ite,jts:jte) * &
+  IF (.not. global ) then               
+    IF (fg_format == 1 .or. fg_format == 2) then
+      one_over_m2(its:ite,jts:jte) = 1.0 / ( xb % map_factor(its:ite,jts:jte) * &
                                         xb % map_factor(its:ite,jts:jte) )
-    DO k = kts, kte
-       vor(its:ite,jts:jte,k) = one_over_m2(its:ite,jts:jte)*vor(its:ite,jts:jte,k)
-    END DO
-    else
-    print*,' Wrong choice of fg_format= ',fg_format,' with global = ',global
-    stop
-    end if
-   end if
+      DO k = kts, kte
+        vor(its:ite,jts:jte,k) = one_over_m2(its:ite,jts:jte)*vor(its:ite,jts:jte,k)
+      END DO
+    ELSE
+      WRITE(UNIT=errmsg(1),FMT='(A,I5,A,L10)') &
+        ' Wrong choice of fg_format= ',fg_format,' with global = ',global
+      CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
+    END IF
+ END IF
 
 !  Calculate psi:
-  print*,' calling Solve_PoissonEquation for Psi'
+  CALL wrf_message("calling Solve_PoissonEquation for Psi")
    CALL DA_Solve_PoissonEqn_FCT(xb, xbx, vor, vp%v1, xp)
 
 !  [2.3] Transform u, v to velocity potential via divergence:
 
-  print*,' calling UV_To_Divergence'
+  CALL wrf_message("calling UV_To_Divergence")
 #ifndef DEREF_KLUDGE
    CALL DA_UV_To_Divergence(xb, xa % u, xa % v, div, &
 #else
@@ -97,25 +96,26 @@ SUBROUTINE DA_Transform_XToVp( xb, xbx, xa, xp, vp, be, &
                             its,ite, jts,jte, kts,kte )
 
 !  Convert divergence to Del**2 chi:
-   if(.not. global )  then              
-     if (fg_format == 1 .or. fg_format == 2) then
-    DO k = kts, kte
-      div(its:ite,jts:jte,k) = one_over_m2(its:ite,jts:jte) * div(its:ite,jts:jte,k)
-    END DO
-    else
-    print*,' Wrong choice of fg_format= ',fg_format,' with global = ',global
-    stop
-    end if
-   end if
+  IF (.not. global )  then              
+    IF (fg_format == 1 .or. fg_format == 2) then
+      DO k = kts, kte
+        div(its:ite,jts:jte,k) = one_over_m2(its:ite,jts:jte) * div(its:ite,jts:jte,k)
+      END DO
+    ELSE
+      WRITE(UNIT=errmsg(1),FMT='(A,I5,A,L10)') &
+        'Wrong choice of fg_format= ',fg_format,' with global = ',global
+      CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
+    END IF
+  END IF
 
 !  Calculate chi:
 
-  print*,' calling Solve_PoissonEquation for Chi'
+  CALL wrf_message("calling Solve_PoissonEquation for Chi")
    CALL DA_Solve_PoissonEqn_FCT(xb, xbx, div, vp%v2, xp)
 
    if( cv_options == 4 .or.cv_options == 5 ) then
 !  [2.4] Transform chi to chi_u:
-  print*,' calculating chi_u'                         
+  CALL wrf_message("calculating chi_u")
     do k=kts,kte
     do j=jts,jte
       vp%v2(its:ite,j,k) = vp%v2(its:ite,j,k) - be%reg_chi(j,k)*vp%v1(its:ite,j,k)
@@ -172,7 +172,7 @@ SUBROUTINE DA_Transform_XToVp( xb, xbx, xa, xp, vp, be, &
      vp % v3(its:ite,jts:jte,kts:kte) = xa % p(its:ite,jts:jte,kts:kte)
 
    else if( cv_options == 4 .or. cv_options == 5 ) then
-     print*,' calculating t_u'                         
+     CALL wrf_message("calculating t_u")
 !  [2.4] Compute t_u:
      do k=kts,kte
      do j=jts,jte
@@ -204,7 +204,7 @@ SUBROUTINE DA_Transform_XToVp( xb, xbx, xa, xp, vp, be, &
      end if
    else if( cv_options == 4 .or. cv_options == 5 ) then       ! Pseudo RH
 
-     print*,' calculating psudo rh'                    
+     CALL wrf_message("calculating psudo rh")                    
      vp % v4(its:ite,jts:jte,kts:kte) = xa % q  (its:ite,jts:jte,kts:kte) /   &
                                         xb % qs (its:ite,jts:jte,kts:kte) 
    end if
@@ -217,7 +217,7 @@ SUBROUTINE DA_Transform_XToVp( xb, xbx, xa, xp, vp, be, &
 
    else if ( cv_options == 4 .or.cv_options == 5 ) then
 !  [2.7] compute psfc_u:
-     print*,' calculating psfc_u '                     
+     CALL wrf_message("calculating psfc_u")
      do j=jts,jte
      do i=its,ite
        vp % v5(i,j,1) = xa%psfc(i,j) - sum(be%reg_ps(j,kts:kte)*vp%v1(i,j,kts:kte))

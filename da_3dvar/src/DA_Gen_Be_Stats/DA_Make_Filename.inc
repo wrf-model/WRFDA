@@ -18,8 +18,8 @@ SUBROUTINE DA_Make_Filename (file_date, fcst_date, number, filename)
 
 !--------------------------------------------------------------------------
 
-       if (number.lt.10) write(mem,'(I1)') number
-       if (number.ge.10.and.number.lt.100) write(mem,'(I2)') number
+       if (number.lt.10) write(UNIT=mem,'(I1)') number
+       if (number.ge.10.and.number.lt.100) write(UNIT=mem,'(I2)') number
 
        cdate(1:10) = file_date(1:4)//file_date(6:7)//file_date(9:10)//file_date(12:13)
        filename =trim(directory_name)//&

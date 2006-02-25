@@ -32,10 +32,7 @@ SUBROUTINE da_get_innov_vector( it, ob, iv, &
 
 !----------------------------------------------------------------------------   
 
-   write (6,'(/,A)') ' --------------------------------------'
-   write (6,'(A)')   ' [5.1] Calculate innovation vector (iv)'
-   write (6,'(A)')   ' --------------------------------------'
-   write(6,*)
+   CALL wrf_message("[5.1] Calculate innovation vector (iv)")
 
    iv%ptop    = xb%ptop
 
@@ -45,7 +42,7 @@ SUBROUTINE da_get_innov_vector( it, ob, iv, &
       iv%current_ob_time = n
 
       if(num_fgat_time > 1) then
-         write(filename(1:10), fmt='(a, i2.2)') 'fgat_fg.', n
+         write(UNIT=filename(1:10), fmt='(a, i2.2)') 'fgat_fg.', n
          call med_initialdata_input_3dvar ( grid , config_flags, in_filename=filename )
          call DA_Setup_FirstGuess( xbx, grid, &
 #include <em_dummy_args.inc>

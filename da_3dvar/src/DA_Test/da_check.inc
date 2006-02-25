@@ -24,16 +24,16 @@ subroutine da_check( xb, xbx, be, iv, cv, &
    
 !------------------------------------------------------------------------------------
 
-   write(unit=*, fmt='(a)') &
+   write(UNIT=stdout, fmt='(a)') &
         '----------------------------------', &
         ' Transform test and adjoint check ', &
         '----------------------------------'
-   write(unit=*, fmt='(/)')
+   write(UNIT=stdout, fmt='(/)')
 
 !--test transforms:
 
    if ( test_transforms ) then
-      write(unit=*, fmt='(/a/)') &
+      write(UNIT=stdout, fmt='(/a/)') &
           'Test vxtransform'
       
       call da_test_vxtransform( xb, xbx, xp, be, &
@@ -42,7 +42,7 @@ subroutine da_check( xb, xbx, be, iv, cv, &
                                ims,ime, jms,jme, kms,kme, &
                                its,ite, jts,jte, kts,kte )
 
-      write(unit=*, fmt='(/a/)') &
+      write(UNIT=stdout, fmt='(/a/)') &
            'Test vxtransform Finished.'
    endif
     
@@ -50,7 +50,7 @@ subroutine da_check( xb, xbx, be, iv, cv, &
 
    if ( Testing_3DVAR ) then
 
-      write(unit=*, fmt='(/a/)') &
+      write(UNIT=stdout, fmt='(/a/)') &
            'check_xtoy_adjoint'
 
       call da_zero_x(xa)
@@ -84,16 +84,16 @@ subroutine da_check( xb, xbx, be, iv, cv, &
                                  ims,ime, jms,jme, kms,kme, &
                                  its,ite, jts,jte, kts,kte )
 
-      write(unit=*, fmt='(/a/)') &
+      write(UNIT=stdout, fmt='(/a/)') &
            'check_xtoy_adjoint  Finished.'
    endif
 
-   write(unit=*, fmt='(/)')
-   write(unit=*, fmt='(a)') &
+   write(UNIT=stdout, fmt='(/)')
+   write(UNIT=stdout, fmt='(a)') &
         '-------------------------------------------', &
         ' Finished transform test and adjoint check ', &
         '-------------------------------------------'
-   write(unit=*, fmt='(/)')
+   write(UNIT=stdout, fmt='(/)')
 
    CALL wrf_shutdown
    stop 'in da_check'

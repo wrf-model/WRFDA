@@ -1,5 +1,8 @@
 MODULE da_c_mat
 
+USE module_wrf_error
+USE DA_Constants
+
 IMPLICIT NONE
 
 REAL(8) ::                                                 &

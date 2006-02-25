@@ -448,9 +448,9 @@ SUBROUTINE sfc_wtq_Adj (psfc, tg, ps, ts, qs, us, vs, regime,&
        endif
 
        CASE DEFAULT;
-
-       write(unit=*, fmt='(/a,i2,a/)') "Regime=",iregime," is invalid."
-       stop "sfc_wtq_adj"
+         WRITE(UNIT=errmsg(1),FMT='(A,I2,A)') &
+          "Regime=",iregime," is invalid."
+         CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
 
       END SELECT
 !
@@ -760,9 +760,9 @@ SUBROUTINE sfc_wtq_Adj (psfc, tg, ps, ts, qs, us, vs, regime,&
         psih_prime = 0.
 
        CASE DEFAULT;
-
-       write(unit=*, fmt='(/a,i2,a/)') "Regime=",iregime," is invalid."
-       stop "sfc_wtq_Adj"
+         WRITE(UNIT=errmsg(1),FMT='(A,I2,A)') &
+          "Regime=",iregime," is invalid."
+         CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
 
       END SELECT
  

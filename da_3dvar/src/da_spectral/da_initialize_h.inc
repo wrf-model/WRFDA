@@ -25,19 +25,19 @@ subroutine da_initialize_h( ni, nj, max_wavenumber, lensav, alp_size, &
    integer             :: ier                        ! Error return.
 
 !---------------------------------------------------------------------------------------------
-!   write(6,'(a)')' [1] Initialize FFT coefficients.'
+!   write(UNIT=stdout,FMT='(a)')' [1] Initialize FFT coefficients.'
 !---------------------------------------------------------------------------------------------
 
    wsave(:) = 0.0
    call rfft1i( ni, wsave, lensav, ier )
 
    if ( ier /= 0 ) then
-      write(6,'(a,i4)')'Fourier initialization failed. ier = ', ier
-      stop
+     WRITE(UNIT=errmsg(1),FMT='(A,I4)') "Fourier initialization failed. ier = ", ier
+     CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
    end if
 
 !---------------------------------------------------------------------------------------------
-!   write(6,'(a)')' [2] Calculate latitudes, and their sines/cosines.'
+!   write(UNIT=stdout,FMT='(a)')' [2] Calculate latitudes, and their sines/cosines.'
 !---------------------------------------------------------------------------------------------
  
    if ( gaussian_lats ) then
@@ -53,7 +53,7 @@ subroutine da_initialize_h( ni, nj, max_wavenumber, lensav, alp_size, &
    end do
 
 !---------------------------------------------------------------------------------------------
-!   write(6,'(a)')' [3] Initialize Legendre coefficients.'
+!   write(UNIT=stdout,FMT='(a)')' [3] Initialize Legendre coefficients.'
 !---------------------------------------------------------------------------------------------
 
    call da_setlegpol( nj, max_wavenumber, alp_size, sinlat, coslat, alp )

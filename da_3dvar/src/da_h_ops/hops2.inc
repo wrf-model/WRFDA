@@ -186,7 +186,10 @@ SUBROUTINE haee2i(a, wext,                                                  &
 !============================================================================
 nhalo=SIZE(wext,1)
 mhalo=SIZE(wext,2)
-IF(nhalo > ime-ite)STOP 'In haee2i; nhalo wider than memory dimension allows'
+IF(nhalo > ime-ite) THEN
+  CALL wrf_error_fatal3(__FILE__,__LINE__, &
+    "nhalo wider than memory dimension allows")
+END IF
 DO j=jts,jte
 DO in=1,nhalo
    a(ite+in,j)=0.
@@ -218,7 +221,11 @@ SUBROUTINE hass2i(a, wext,                                                  &
 !============================================================================
 nhalo=SIZE(wext,1)
 mhalo=SIZE(wext,2)
-IF(nhalo > its-ims)STOP 'In hass2i; nhalo wider than memory dimension allows'
+IF(nhalo > its-ims) THEN
+  CALL wrf_error_fatal3(__FILE__,__LINE__, &
+    "nhalo wider than memory dimension allows")
+END IF
+
 DO j=jts,jte
 DO in=1,nhalo
    a(its-in,j)=0.
@@ -417,7 +424,11 @@ SUBROUTINE hass2j(a, wext,                                                  &
 !============================================================================
 nhalo=SIZE(wext,1)
 mhalo=SIZE(wext,2)
-IF(nhalo > jts-jms)STOP 'In hass2j; nhalo wider than memory dimension allows'
+IF(nhalo > jts-jms) THEN
+  CALL wrf_error_fatal3(__FILE__,__LINE__, &
+    "nhalo wider than memory dimension allows")
+END IF
+
 DO jn=1,nhalo
    DO i=its,ite
       a(i,jts-jn)=0.
@@ -451,7 +462,11 @@ SUBROUTINE haee2j(a, wext,                                                  &
 !============================================================================
 nhalo=SIZE(wext,1)
 mhalo=SIZE(wext,2)
-IF(nhalo > jme-jte)STOP 'In haee2j; nhalo wider than memory dimension allows'
+IF(nhalo > jme-jte) THEN
+  CALL wrf_error_fatal3(__FILE__,__LINE__, &
+    "nhalo wider than memory dimension allows")
+END IF
+
 DO jn=1,nhalo
    DO i=its,ite
       a(i,jte+jn)=0.

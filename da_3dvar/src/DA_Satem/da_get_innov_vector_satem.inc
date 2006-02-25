@@ -80,11 +80,9 @@ SUBROUTINE da_get_innov_vector_satem ( it, xb, xp, ob, iv )
 
            IF ( ABS(ob % satem(n) % thickness(k) - missing_r) > 1. .and. &
                 iv % satem(n) % thickness(k)%qc /= missing_data ) THEN
-
              iv % satem(n) % thickness(k) % inv =     &
                     ob % satem(n) % thickness(k) - model_thickness(k)
-
-             ! write(1,"(A, 2F10.3,F10.0,A,F5.0,A)") &
+             ! write(UNIT=stdout,FMT="(A, 2F10.3,F10.0,A,F5.0,A)") &
              !   "observed, model_thickness, layer = ", &
              !   ob%satem(n)%thickness(k), &
              ! model_thickness(k), 0.01*pres2, " -", &

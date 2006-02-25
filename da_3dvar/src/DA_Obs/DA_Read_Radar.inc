@@ -50,7 +50,7 @@ SUBROUTINE DA_Read_Radar (iunit, ob, xp, filename)
            STATUS = 'OLD')
 
       IF (iost /= 0) THEN
-         write(unit=*, fmt='(/A,I3,3(2X,A)/)') &
+         write(unit=stderr, fmt='(/A,I3,3(2X,A)/)') &
               'ERROR IN OBS INPUT FILE UNIT ',iunit, &
               'OBS FILENAME:', trim(filename), &
               'FOR RADAR OBSERVATIONS CANNOT BE FOUND OR CANNOT BE OPENED'
@@ -64,7 +64,7 @@ SUBROUTINE DA_Read_Radar (iunit, ob, xp, filename)
            STATUS = 'OLD')
 
       IF (iost /= 0) THEN
-         write(unit=*, fmt='(/A,I3,2X,A/)') &
+         write(unit=stderr, fmt='(/A,I3,2X,A/)') &
               'ERROR IN INPUT FILE UNIT ',iunit, &
               'FOR RADAR OBSERVATIONS CANNOT BE FOUND OR CANNOT BE OPENED'
          RETURN
@@ -78,27 +78,27 @@ SUBROUTINE DA_Read_Radar (iunit, ob, xp, filename)
 !  2.1 READ FIRST LINE
 !      ---------------
 
-   READ (iunit, FMT = '(A)', IOSTAT = iost) char_total_Radar
+   READ (UNIT=iunit, FMT = '(A)', IOSTAT = iost) char_total_Radar
 
 !  2.2 PROCESS ERROR
 !      -------------
 
    IF (iost /= 0) THEN
-       WRITE (0,'(/A,i3/)') ' ERROR READING FILE UNIT:', iunit
-       STOP         ' in read_Radar_header.F'
+     CALL wrf_error_fatal3(__FILE__,__LINE__, &
+       "Cannot read radar file")
    ENDIF
 
 !  2.3 TOTAL RADAR NUMBER
 !      ------------------
 
-   READ (char_total_Radar (15:17), '(I3)', IOSTAT = iost) total_Radar
+   READ (UNIT=char_total_Radar (15:17),FMT='(I3)', IOSTAT = iost) total_Radar
 
-   if(print_detail > 0) WRITE (0,'(/,A,I3,/)') ' TOTAL RADAR: ', total_Radar
+   if(print_detail > 0) WRITE (UNIT=stderr,FMT='(/,A,I3,/)') ' TOTAL RADAR: ', total_Radar
 
 !  2.4 SKIP ONE LINE
 !      -------------
 
-   READ (iunit, FMT = '(A)', IOSTAT = iost)
+   READ (UNIT=iunit, FMT = '(A)', IOSTAT = iost)
 
 !----------------------------------------------------------------------------!
 ! 3. READ RADAR DATA
@@ -109,64 +109,64 @@ SUBROUTINE DA_Read_Radar (iunit, ob, xp, filename)
 !  3.1 SKIP ONE BLANK LINE
 !  -----------------------
 
-   READ (iunit, FMT = '(A)', IOSTAT = iost)
+   READ (UNIT=iunit, FMT = '(A)', IOSTAT = iost)
 
 ! 3.2 READ HEADER
 !     -----------
 
-   READ (iunit, FMT = '(A)', IOSTAT = iost) char_ned
+   READ (UNIT=iunit, FMT = '(A)', IOSTAT = iost) char_ned
 
 ! 3.3 READ HEADER INFORMATION
 !     -----------------------
 
-   READ (char_ned (1:5),'(A5)', IOSTAT = iost) platform % stn % platform
+   READ (UNIT=char_ned (1:5),FMT='(A5)', IOSTAT = iost) platform % stn % platform
 
-   if(print_detail > 0) WRITE (0, '(A)') 'RADAR Observations information'
+   if(print_detail > 0) WRITE (UNIT=stderr,FMT='(A)') 'RADAR Observations information'
 
-   READ (char_ned (8:19), '(A12)', IOSTAT = iost) platform % stn % name
+   READ (UNIT=char_ned (8:19),FMT='(A12)', IOSTAT = iost) platform % stn % name
 
-   if(print_detail > 0) WRITE (0,'(A,A5,A,A12)')  &
+   if(print_detail > 0) WRITE (UNIT=stderr,FMT='(A,A5,A,A12)')  &
                         ' Expect: ',platform % stn % platform, &
                         'data at station:', platform % stn % name
 
-   READ (char_ned (20:27), '(F8.3)', IOSTAT = iost) platform % stn % lon
+   READ (UNIT=char_ned(20:27),FMT='(F8.3)', IOSTAT = iost) platform % stn % lon
 
-   READ (char_ned (30:37), '(F8.3)', IOSTAT = iost) platform % stn % lat
+   READ (UNIT=char_ned (30:37),FMT='(F8.3)', IOSTAT = iost) platform % stn % lat
 
-   READ (char_ned (40:47), '(F8.1)', IOSTAT = iost) platform % stn % elv
+   READ (UNIT=char_ned (40:47),FMT='(F8.1)', IOSTAT = iost) platform % stn % elv
 
-   if(print_detail > 0) WRITE (0, '(A,2(F8.3,2X),F8.1)')  &
+   if(print_detail > 0) WRITE (UNIT=stderr,FMT='(A,2(F8.3,2X),F8.1)')  &
                         'The station longitude, latutude, and altitude are: ', &
                          platform % stn % lon, &
                          platform % stn % lat, platform % stn % elv
 
-   READ (char_ned (50:68), '(A19)', IOSTAT = iost) platform % stn % date_char
+   READ (UNIT=char_ned (50:68),FMT='(A19)', IOSTAT = iost) platform % stn % date_char
 
-   if(print_detail > 0) WRITE (0, '(A,A19)')   &
+   if(print_detail > 0) WRITE (UNIT=stderr,FMT='(A,A19)')   &
                         'The observation time for this data is ',     &
                         platform % stn % date_char
 
-   READ (char_ned (69:74), '(I6)', IOSTAT = iost) platform % stn % numObs
+   READ (UNIT=char_ned (69:74),FMT='(I6)', IOSTAT = iost) platform % stn % numObs
 
-   if(print_detail > 0) WRITE (0, '(A,I6)')   &
+   if(print_detail > 0) WRITE (UNIT=stderr,FMT='(A,I6)')   &
                         'Total number of Super-observations is ', &
                         platform % stn % numObs
 
-   READ (char_ned (75:80), '(I6)', IOSTAT = iost) platform % stn % levels
+   READ (UNIT=char_ned (75:80),FMT='(I6)', IOSTAT = iost) platform % stn % levels
 
-   if(print_detail > 0) WRITE (0, '(A,I6)')   &
+   if(print_detail > 0) WRITE (UNIT=stderr,FMT='(A,I6)')   &
                         'Vertical layers for each Super-observation is ', &
                         platform % stn % levels
 
-   WRITE (0,'(A)')  &
+   WRITE (UNIT=stderr,FMT='(A)')  &
    '--------------------------------------------------------------------------'
 
 !----------------------------------------------------------------------------!
 !  3.4 SKIP TWO LINES
 !      --------------
 
-   READ (iunit, FMT = '(A)', IOSTAT = iost)
-   READ (iunit, FMT = '(A)', IOSTAT = iost)
+   READ (UNIT=iunit, FMT = '(A)', IOSTAT = iost)
+   READ (UNIT=iunit, FMT = '(A)', IOSTAT = iost)
 
 !----------------------------------------------------------------------------!
 !  3.5 LOOP OVER RECORDS
@@ -239,7 +239,7 @@ SUBROUTINE DA_Read_Radar (iunit, ob, xp, filename)
 
     if( nlevels > max_ob_levels) then
 
-       write(0,'(A,2I8)') &
+       write(UNIT=stderr,FMT='(A,2I8)') &
        ' Radar=> nlevels > max_ob_levels:',nlevels, max_ob_levels
     
        nlevels = max_ob_levels
@@ -264,9 +264,9 @@ SUBROUTINE DA_Read_Radar (iunit, ob, xp, filename)
           num_Radar = num_Radar + 1
    
           if( num_Radar > max_Radar ) then
-                write(0,'(A,I6,A,I6)') 'Radar #= ',ob % num_Radar, &
-                          ' > max_Radar = ', max_Radar
-                STOP
+            WRITE(UNIT=errmsg(1),FMT='(A,I6,A,I6)') &
+              "Radar #= ",ob % num_Radar, " > max_Radar = ", max_Radar
+            CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
           endif
 
           ob % Radar ( num_Radar ) % stn_loc % lon = platform % stn % lon
@@ -294,12 +294,12 @@ SUBROUTINE DA_Read_Radar (iunit, ob, xp, filename)
 
           CASE DEFAULT;
 
-          write(unit=*, fmt='(a)') 'Warining: unsaved obs found:'
+          write(unit=stdout, fmt='(a)') 'Warining: unsaved obs found:'
 
-          write(unit=*, fmt='(2a)') &
+          write(unit=stdout, fmt='(2a)') &
                'platform % info % platform=', platform % info % platform
 
-          write(unit=*, fmt='(a, i3)') &
+          write(UNIT=stdout, fmt='(a, i3)') &
                'platform % info % levels=', platform % info % levels
 
        END SELECT
@@ -332,20 +332,21 @@ SUBROUTINE DA_Read_Radar (iunit, ob, xp, filename)
  
   if(print_detail > 0) then
 
-    write(unit=*, fmt='(a)')  ' '
+    write(unit=stdout, fmt='(a)')  ' '
 
-    write(unit=*, fmt='(5x,a,i6,a)') &
+    write(unit=stdout, fmt='(5x,a,i6,a)') &
          ' Read:  ', ob % num_Radar, ' Radar reports '
 
   endif
 
-    WRITE (0,'(/,A,I3,/)') ' END OF UNIT: ',iunit
+    WRITE (UNIT=stderr,FMT='(/,A,I3,/)') ' END OF UNIT: ',iunit
 
     if(ob%ob_numb(ob%current_ob_time)%Radar /= ob%num_Radar) then
-      write(unit=*, fmt='(a, i6, 2x, a, i6)') &
-           'ob%ob_numb(ob%current_ob_time)%Radar=', ob%ob_numb(ob%current_ob_time)%Radar, &
-           'ob%num_Radar=', ob%num_Radar
-      stop 'Radar Obs Mismatch.'
+      WRITE(UNIT=errmsg(1),FMT='(a, i6, 2x, a, i6)') &
+        'Radar obs mismatch ob%ob_numb(ob%current_ob_time)%Radar=', &
+        ob%ob_numb(ob%current_ob_time)%Radar, &
+        'ob%num_Radar=', ob%num_Radar
+      CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
     endif
 !----------------------------------------------------------------------------!
 

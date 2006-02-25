@@ -42,7 +42,7 @@ SUBROUTINE DA_Check_VvToVp_Adjoint( xb, xbx, xp, be, vp, vv, &
 !  [1.0] Initialise:
 !-------------------------------------------------------------------------
 
-   write(unit=*, fmt='(/a/)') &
+   write(UNIT=stdout, fmt='(/a/)') &
         'DA_Check_VvToVp_Adjoint: Adjoint Test Results:'
       
 !-------------------------------------------------------------------------
@@ -121,7 +121,7 @@ SUBROUTINE DA_Check_VvToVp_Adjoint( xb, xbx, xp, be, vp, vv, &
 !  [7.0] Print output:
 !-------------------------------------------------------------------------
 
-   write(unit=*, fmt='(a,1pe22.14)') &
+   write(UNIT=stdout, fmt='(a,1pe22.14)') &
         'Single domain < vp,     vp > = ', adj_par_lhs, &
         'Single domain < Vv_adj, Vv > = ', adj_par_rhs
 
@@ -130,8 +130,8 @@ SUBROUTINE DA_Check_VvToVp_Adjoint( xb, xbx, xp, be, vp, vv, &
 PRINT *,'TEST_COVERAGE_DA_Check_VvToVp_Adjoint:  adj_sum_lhs,adj_sum_rhs = ', adj_sum_lhs,adj_sum_rhs
 
    IF ( wrf_dm_on_monitor() ) THEN
-      write(unit=*, fmt='(/)')
-      write(unit=*, fmt='(a,1pe22.14)') &
+      write(UNIT=stdout, fmt='(/)')
+      write(UNIT=stdout, fmt='(a,1pe22.14)') &
            'Whole  Domain: < Vp, Vp >     = ', adj_sum_lhs, &
            'Whole  Domain: < Vv_adj, Vv > = ', adj_sum_rhs
    ENDIF
@@ -142,7 +142,7 @@ PRINT *,'TEST_COVERAGE_DA_Check_VvToVp_Adjoint:  adj_sum_lhs,adj_sum_rhs = ', ad
    vv % v4(its:ite,jts:jte,1:kz_vv(4)) = vv2_v4(its:ite,jts:jte,1:kz_vv(4))
    vv % v5(its:ite,jts:jte,1:kz_vv(5)) = vv2_v5(its:ite,jts:jte,1:kz_vv(5))
 
-   write(unit=*, fmt='(/a/)') &
+   write(UNIT=stdout, fmt='(/a/)') &
         'DA_Check_VvToVp_Adjoint: Test Finished.'
 
 END SUBROUTINE DA_Check_VvToVp_Adjoint

@@ -126,7 +126,7 @@ subroutine emiss_ssmi(ntype_index,theta,frequency,mv,veg_frac, veg_tp, soil_tp, 
   eair = dcmplx(one, -one)
   t_scat = t_skin
   b = t_scat
-!        write(6,'(a,i3,a,7f8.2)') 'emiss_ssmi: type=',ntype_index,' tbb=',tbb
+!        write(UNIT=stdout,FMT='(a,i3,a,7f8.2)') 'emiss_ssmi: type=',ntype_index,' tbb=',tbb
   if (ntype_index .ne. 4) then
      tv(1) = tbb(1);  tv(2) = tbb(3);  tv(3) = tbb(4);  tv(4) = tbb(6)
      th(1) = tbb(2); th(2) = tbb(5);  th(3) = tbb(7)

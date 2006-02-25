@@ -154,6 +154,8 @@ MODULE DA_Constants
    INTEGER, PARAMETER :: stats_unit = 12      ! Unit number for stats output.
    INTEGER, PARAMETER :: innov_vector_unit = 14 ! Innovation vector diagnostics
 
+   INTEGER, PARAMETER :: cov_unit = 25 ! Covariances unit
+
    INTEGER, PARAMETER :: be_cv_2_unit = 32    ! Unit number for be input.
    INTEGER, PARAMETER :: be_cv_3_unit = 33    ! Unit number for be input.
    INTEGER, PARAMETER :: be_cv_4_unit = 34    ! Unit number for be input. 

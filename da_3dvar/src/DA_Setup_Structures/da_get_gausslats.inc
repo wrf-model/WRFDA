@@ -112,8 +112,8 @@ subroutine da_get_gausslats( nj, pi, glats, sinlat, coslat, gausswgts )
 !         print*, 'Root ',k,' number of iterations ',i
 
          if (i >= MaxIter) then
-            write(6,'(a)')' No convergence finding Gaussian latitudes. Stop.'
-            stop
+           CALL wrf_error_fatal3(__FILE__,__LINE__, &
+             "No convergence finding Gaussian latitudes")
          end if
 
          glats(k) = ASIN(x)
@@ -127,8 +127,7 @@ subroutine da_get_gausslats( nj, pi, glats, sinlat, coslat, gausswgts )
    end do
 
    if (k /= nj+1) then
-      write(6,'(a)')' Not all roots found. Stop.'
-      stop
+     CALL wrf_error_fatal3(__FILE__,__LINE__, "Not all roots found")
    end if
 
 !  Calculate sin, cosine:

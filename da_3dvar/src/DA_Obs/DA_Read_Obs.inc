@@ -106,7 +106,7 @@ SUBROUTINE DA_Read_Obs (iunit, ob, xp, filename)
            STATUS = 'OLD')
 
       IF (iost /= 0) THEN
-         write(unit=*, fmt='(/A,I3,3(2X,A)/)') &
+         write(unit=stdout, fmt='(/A,I3,3(2X,A)/)') &
               'ERROR IN OBS INPUT FILE UNIT ',iunit, &
               'OBS FILENAME:', trim(filename), &
               'FOR GTS OBSERVATIONS CANNOT BE FOUND OR CANNOT BE OPENED'
@@ -121,7 +121,7 @@ SUBROUTINE DA_Read_Obs (iunit, ob, xp, filename)
            STATUS = 'OLD')
 
       IF (iost /= 0) THEN
-         write(unit=*, fmt='(/A,I3,2X,a,i3/A/)') &
+         write(unit=stdout, fmt='(/A,I3,2X,a,i3/A/)') &
               'ERROR IN OBS INPUT FILE UNIT ',iunit, 'iost=', iost, &
               'FOR GTS OBSERVATIONS CANNOT BE FOUND OR CANNOT BE OPENED'
          RETURN
@@ -137,7 +137,7 @@ SUBROUTINE DA_Read_Obs (iunit, ob, xp, filename)
       READ (UNIT = iunit, FMT = '(A)', IOSTAT = iost) info_string
 
       IF (iost /= 0) THEN
-         write(unit=*, fmt='(/a,i3/a/)') &
+         write(unit=stdout, fmt='(/a,i3/a/)') &
               'ERROR READING FILE UNIT:', iunit, &
               'in read_obs_gts_header.F' 
          return
@@ -158,14 +158,14 @@ SUBROUTINE DA_Read_Obs (iunit, ob, xp, filename)
         fmt_name, fmt_each
 
    IF (iost /= 0) THEN
-      write(unit=*, fmt='(/A,I3,A/)') &
+      write(unit=stdout, fmt='(/A,I3,A/)') &
            ' ERROR IN INPUT FILE UNIT ',iunit, &
            ' FOR GTS OBSERVATIONS CANNOT BE FOUND OR CANNOT BE OPENED'
       RETURN
    ENDIF
 
    if(print_detail > 500) then
-      write(unit=*, fmt='(2a)') &
+      write(unit=stdout, fmt='(2a)') &
            'fmt_info=', fmt_info, &
            'fmt_loc =', fmt_loc,  &
            'fmt_each=', fmt_each
@@ -197,13 +197,13 @@ SUBROUTINE DA_Read_Obs (iunit, ob, xp, filename)
                    platform%info%id
 
       IF (iost /= 0) THEN
-         WRITE (0,'(/A,I9)') ' END OF OBS UNIT: ',iunit
-         WRITE (0,'(/A,I9)') ' IOSTAT:          ',iost
+         WRITE (UNIT=stderr,FMT='(/A,I9)') ' END OF OBS UNIT: ',iunit
+         WRITE (UNIT=stderr,FMT='(/A,I9)') ' IOSTAT:          ',iost
          EXIT reports
       ENDIF
 
       if(print_detail > 500) then
-         write(unit=*, fmt=fmt_info) &
+         write(unit=stdout, fmt=fmt_info) &
                platform%info%platform,    &
                platform%info%date_char,   &
                platform%info%name,        &
@@ -268,8 +268,8 @@ loop_level: DO i = 1, platform%info%levels
               platform%each (i)%rh
 
       if(print_detail > 500) then
-         write(unit=*, FMT = '( a, i6)') 'i=', i
-         write(unit=*, FMT = TRIM (fmt_each)) &
+         write(unit=stdout, FMT = '( a, i6)') 'i=', i
+         write(unit=stdout, FMT = TRIM (fmt_each)) &
               platform%each (i)%p,            &
               platform%each (i)%speed,        &
               platform%each (i)%v,            &
@@ -321,10 +321,10 @@ loop_level: DO i = 1, platform%info%levels
       if( nlevels > max_ob_levels) then
          nlevels = max_ob_levels
 
-         write(unit=*, fmt='(/a/)') &
+         write(unit=stdout, fmt='(/a/)') &
               'WARNING   WARNING   WARNING   WARNING   WARNING :'
 
-         write(unit=*, fmt='(/4(2a,2x),a,2f8.2,2x,2(a,f9.2,2x),2(a,i4,2x)/)') &
+         write(unit=stdout, fmt='(/4(2a,2x),a,2f8.2,2x,2(a,f9.2,2x),2(a,i4,2x)/)') &
               'Station: ', trim(platform%info%name), &
               'ID: ', trim(platform%info%id), &
               'Platfrom: ', trim(platform%info%platform), &
@@ -335,7 +335,7 @@ loop_level: DO i = 1, platform%info%levels
               'Has level: ', platform%info%levels, &
               'which is great than max_ob_levels: ', max_ob_levels
 
-             write (unit=*, FMT = '(A,1X,A,1X,A,1X,I4,2f9.3,f9.1,1X,A)') &
+             write (unit=stdout, FMT = '(A,1X,A,1X,A,1X,I4,2f9.3,f9.1,1X,A)') &
              platform%info%name,        &
              platform%info%platform,    &
              platform%info%date_char,   &
@@ -366,7 +366,7 @@ loop_level: DO i = 1, platform%info%levels
 !    TBH:  20050913
     IF(.not.outside) THEN
      if( print_detail >= 10 .and. ndup > 1) then
-         write(unit=*, FMT = fmt_info) &
+         write(unit=stdout, FMT = fmt_info) &
                platform%info%platform,    &
                platform%info%date_char,   &
                platform%info%name,        &
@@ -376,7 +376,7 @@ loop_level: DO i = 1, platform%info%levels
                platform%info%elv,         &
                platform%info%id
 
-         write(unit=*, FMT = '(a,2i5,4e20.10)') &
+         write(unit=stdout, FMT = '(a,2i5,4e20.10)') &
           ' duplicating obs since loc% i,j,dx,dxm,dy & dym ', &
           platform%loc%i,  platform%loc%j,   &
           platform%loc%dx, platform%loc%dxm, &
@@ -962,17 +962,17 @@ loop_level: DO i = 1, platform%info%levels
          ob%bogus(num_bogus)%slp    = platform%loc%slp
 
          if ( print_detail > 0) then
-            print*,'nlevels=', nlevels
-            print*,'ob % num_bogus,slp', num_bogus,  &
+           WRITE(UNIT=stdout,FMT=*) 'nlevels=', nlevels
+           WRITE(UNIT=stdout,FMT=*) 'ob % num_bogus,slp', num_bogus,  &
                     ob % bogus ( num_bogus ) % slp
   	    do i=1,nlevels
-               print*,'ob % num_bogus, i ', num_bogus,i
-               print*,'ob%bogus(ob%num_bogus)%u,v=',  &
+               WRITE(UNIT=stdout,FMT=*) 'ob % num_bogus, i ', num_bogus,i
+               WRITE(UNIT=stdout,FMT=*) 'ob%bogus(ob%num_bogus)%u,v=',  &
                        ob%bogus(num_bogus)%u(i),ob%bogus(num_bogus)%v(i)
-               print*,'ob%bogus(ob%num_bogus)%t,q=',  &
+               WRITE(UNIT=stdout,FMT=*) 'ob%bogus(ob%num_bogus)%t,q=',  &
                        ob%bogus(num_bogus)%t(i),ob%bogus(num_bogus)%q(i)
             enddo
-            write(*,fmt='(2(a,i4))') 'ob%num_bogus=',num_bogus, &
+            write(UNIT=stdout,fmt='(2(a,i4))') 'ob%num_bogus=',num_bogus, &
                                      'nlevels=',nlevels
          end if
 
@@ -1002,15 +1002,15 @@ loop_level: DO i = 1, platform%info%levels
 
          CASE DEFAULT;
 
-            write(unit=*, fmt='(/a/)') &
+            write(unit=stdout, fmt='(/a/)') &
                  'WARNING   WARNING   WARNING   WARNING   WARNING :'
 
-            write(unit=*, fmt='(a)') 'unsaved obs found:'
+            write(unit=stdout, fmt='(a)') 'unsaved obs found:'
 
-            write(unit=*, fmt='(2a)') &
+            write(unit=stdout, fmt='(2a)') &
                  'platform%info%platform=', platform%info%platform
  
-            write(unit=*, fmt='(a, i3)') &
+            write(unit=stdout, fmt='(a, i3)') &
                  'platform%info%levels=', platform%info%levels
 
       END SELECT
@@ -1059,9 +1059,9 @@ loop_level: DO i = 1, platform%info%levels
 
    if(print_detail > 0) then
 
-      write(6, fmt='(/a,i6/)') 'ob%current_ob_time=', ob%current_ob_time
+      write(UNIT=stdout, fmt='(/a,i6/)') 'ob%current_ob_time=', ob%current_ob_time
 
-      write(6, fmt='(5x,a,i6,a)') &
+      write(UNIT=stdout, fmt='(5x,a,i6,a)') &
            'Read:  ', num_sound, ' SOUND       reports,', &
            'Read:  ', num_synop, ' SYNOP       reports,', &
            'Read:  ', num_pilot, ' PILOT       reports,', &
@@ -1113,7 +1113,7 @@ loop_level: DO i = 1, platform%info%levels
       (ob%ob_numb(ob%current_ob_time)%ssmt2 /= ob%num_ssmt2) .or. &
       (ob%ob_numb(ob%current_ob_time)%profiler /= ob%num_profiler)) then
 
-      write(unit=*, fmt='(a, i6, 2x, a, i6)') &
+      write(unit=stdout, fmt='(a, i6, 2x, a, i6)') &
            'ob%ob_numb(ob%current_ob_time)%sound=', ob%ob_numb(ob%current_ob_time)%sound, &
            'ob%num_sound=', ob%num_sound, &
            'ob%ob_numb(ob%current_ob_time)%synop=', ob%ob_numb(ob%current_ob_time)%synop, &
@@ -1154,7 +1154,7 @@ loop_level: DO i = 1, platform%info%levels
 
 !  if((ob%ob_numb(ob%current_ob_time)%ssmi_tb        /= ob%num_ssmi_tb) .or. &
 !     (ob%ob_numb(ob%current_ob_time)%ssmi_retrieval /= ob%num_ssmi_retrieval)) then
-!     write(unit=*, fmt='(a, i6, 2x, a, i6)') &
+!     write(unit=stdout, fmt='(a, i6, 2x, a, i6)') &
 !          'ob%ob_numb(ob%current_ob_time)%ssmi_tb       =', ob%ob_numb(ob%current_ob_time)%ssmi_tb, &
 !          'ob%num_ssmi_tb       =', ob%num_ssmi_tb, &
 !          'ob%ob_numb(ob%current_ob_time)%ssmi_retrieval=', ob%ob_numb(ob%current_ob_time)%ssmi_retrieval, &

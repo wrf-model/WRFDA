@@ -80,7 +80,7 @@ SUBROUTINE DA_Scan_BUFR_Obs (iunit, ob, xp, filename)
            STATUS = 'OLD')
 
       IF (iost /= 0) THEN
-         write(unit=*, fmt='(/A,I3,3(2X,A)/)') &
+         write(UNIT=stdout, fmt='(/A,I3,3(2X,A)/)') &
               'ERROR IN OBS INPUT FILE UNIT ',iunit, &
               'OBS FILENAME:', trim(filename), &
               'BUFR GTS OBSERVATIONS CANNOT BE FOUND OR CANNOT BE OPENED'
@@ -125,23 +125,20 @@ SUBROUTINE DA_Scan_BUFR_Obs (iunit, ob, xp, filename)
 
    call datelen(10)
 
-   print*,' rizvi opening file via openbf'
    call openbf(iunit,'IN',iunit)
    call readmg(iunit,subset,idate,iret)
 
    if(iret/=0) then
-      write(unit=*, fmt='(a, i4)') &
-           'return code from readmg:', iret, &
-           'Reach the end of obs unit: ', iunit
-
-      CALL wrf_shutdown
-
-      STOP "Stopped. No BUFR observations."
+     errmsg(1) = "No BUFR observations"
+     write(UNIT=errmsg(2), fmt='(a, i4)') &
+       'return code from readmg:', iret, &
+       'Reach the end of obs unit: ', iunit
+     CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1:2))
    end if
 
-   write(date,'( i10)') idate
-   read (date,'(i4,3i2)') year,month, day,hour
-   write(6,*)'READ_BUFR:  bufr file date is ',year,month, day,hour
+   write(UNIT=date,FMT='( i10)') idate
+   read (UNIT=date,FMT='(i4,3i2)') year,month, day,hour
+   write(UNIT=stdout,FMT=*)'READ_BUFR:  bufr file date is ',year,month, day,hour
 
    reports: do
       call readsb(iunit,iret)
@@ -150,7 +147,7 @@ SUBROUTINE DA_Scan_BUFR_Obs (iunit, ob, xp, filename)
          call readmg(iunit,subset,idate,iret)
 
          if(iret/=0) then
-            write(unit=*, fmt='(a, i4)') &
+            write(UNIT=stdout, fmt='(a, i4)') &
                  'return code from readmg:', iret, &
                  'Reach the end of obs unit: ', iunit
    
@@ -287,12 +284,12 @@ SUBROUTINE DA_Scan_BUFR_Obs (iunit, ob, xp, filename)
          CASE DEFAULT 
 
          miscd  = miscd  + 1
-            write(unit=*, fmt='(/a/)') &
+            write(UNIT=stdout, fmt='(/a/)') &
                  'WARNING   WARNING   WARNING   WARNING   WARNING :'
 
-            write(unit=*, fmt='(a)') 'unsaved obs found:'
+            write(UNIT=stdout, fmt='(a)') 'unsaved obs found:'
 
-            write(unit=*, fmt='(2a)') &
+            write(UNIT=stdout, fmt='(2a)') &
                  'platform%info%platform=', platform%info%platform
 
         END SELECT
@@ -304,9 +301,9 @@ SUBROUTINE DA_Scan_BUFR_Obs (iunit, ob, xp, filename)
    rewind iunit
 !   close(iunit)
 
-   write(6,*) 'READ_BUFR:  total bufr records =',nrecs
-   write(6,*) 'READ_BUFR:  number in domain   =',total_obs
-   write(6,*) 'READ_BUFR:  number Unhandled   =',miscd 
+   WRITE(UNIT=stdout,FMT=*) 'READ_BUFR:  total bufr records =',nrecs
+   WRITE(UNIT=stdout,FMT=*) 'READ_BUFR:  number in domain   =',total_obs
+   WRITE(UNIT=stdout,FMT=*) 'READ_BUFR:  number Unhandled   =',miscd 
 
 !------------------------------------------------------------------------
 !--Check the numbers again, make sure we have the right number.
@@ -360,9 +357,9 @@ SUBROUTINE DA_Scan_BUFR_Obs (iunit, ob, xp, filename)
 
    if(print_detail > 0) then
 
-      write(6, fmt='(a)')  ' '
+      WRITE(UNIT=stdout, fmt='(a)')  ' '
 
-      write(6, fmt='(5x,a,i6,a)') &
+      WRITE(UNIT=stdout, fmt='(5x,a,i6,a)') &
            'Scan:  ', ob%current_ob_time, ' ob time:', &
            'Scan:  ', total_obs, ' Total Observations.', &
            'Scan:  ', num_sound, ' SOUND reports,', &
@@ -383,7 +380,7 @@ SUBROUTINE DA_Scan_BUFR_Obs (iunit, ob, xp, filename)
            'Scan:  ', num_ssmt1, ' SSMT1 reports,', &
            'Scan:  ', num_ssmt2, ' SSMT2 reports.'
 
-!     write(6, fmt='(5x,a,i6,a)') &
+!     WRITE(UNIT=stdout, fmt='(5x,a,i6,a)') &
 !          'Scan:  ', num_ssmi_retrieval , ' SSMI_RETRIEVAL reports,', &
 !          'Scan:  ', num_ssmi_tb        , ' SSMI_TB        reports.'
 

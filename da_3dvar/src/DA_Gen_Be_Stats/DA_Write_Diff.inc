@@ -31,29 +31,29 @@ SUBROUTINE DA_Write_Diff (unit, file_date, number, diff, xp,   &
   IF (BACKGROUND_OPTION == 1) then
   filename = trim(head)//file_date(1:19)
   ELSEIF (BACKGROUND_OPTION == 2) then
-  if (number.lt.10) write(mem,'(I1)') number
-  if (number.ge.10.and.number.lt.100) write(mem,'(I2)') number
+  if (number.lt.10) write(UNIT=mem,FMT='(I1)') number
+  if (number.ge.10.and.number.lt.100) write(UNIT=mem,FMT='(I2)') number
   filename = trim(head)//file_date(1:19)//'.'//trim(mem)
   ENDIF
 
 !--------------------------------------------------------------------
-  open(unit,file=filename,form='unformatted')
+  open(UNIT=unit,file=filename,form='unformatted')
 
   time(1:10)=file_date(1:4)//file_date(6:7)//file_date(9:10)//file_date(12:13)
 
-  write(unit)  time,  ide, jde, kde    
+  write(UNIT=unit)  time,  ide, jde, kde    
 
 !
-  write(unit) diff%psi(its:ite,jts:jte,kts:kte)
+  write(UNIT=unit) diff%psi(its:ite,jts:jte,kts:kte)
 
-  write(unit) diff%chi(its:ite,jts:jte,kts:kte)
-  write(unit) diff%t(its:ite,jts:jte,kts:kte)
-  write(unit) diff%rh(its:ite,jts:jte,kts:kte)
-  write(unit) diff%psfc(its:ite,jts:jte)
+  write(UNIT=unit) diff%chi(its:ite,jts:jte,kts:kte)
+  write(UNIT=unit) diff%t(its:ite,jts:jte,kts:kte)
+  write(UNIT=unit) diff%rh(its:ite,jts:jte,kts:kte)
+  write(UNIT=unit) diff%psfc(its:ite,jts:jte)
 
-  write(unit) xb%h(its:ite,jts:jte,kts:kte)
-  write(unit) xb%lat(its:ite,jts:jte)
+  write(UNIT=unit) xb%h(its:ite,jts:jte,kts:kte)
+  write(UNIT=unit) xb%lat(its:ite,jts:jte)
 
-  close(unit)
+  close(UNIT=unit)
 
   END SUBROUTINE DA_Write_Diff

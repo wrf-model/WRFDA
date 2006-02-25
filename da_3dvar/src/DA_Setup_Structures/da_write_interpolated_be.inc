@@ -69,8 +69,8 @@
       read(jpin, iostat=ier) flag
 
       if(ier/=0) then
-         write(unit=0,fmt='(a)') 'Error reading header flag'
-         call abort()
+        CALL wrf_error_fatal3(__FILE__,__LINE__, &
+          'Error reading header flag')
       endif
 
       if (flag == 0) then
@@ -79,8 +79,8 @@
                                 x_mm5 % big_header % bhic, &
                                 x_mm5 % big_header % bhrc
          if(ier/=0) then
-            write(0,'("Error reading big header")')
-            call abort()
+           CALL wrf_error_fatal3(__FILE__,__LINE__, &
+             "Error reading big header")
          endif
 
          if(print_info) &
@@ -92,7 +92,7 @@
 !  1.1 Write out the big header flag
 !  ---------------------------------
 
-        write(ibe_unit) flag
+        write(UNIT=ibe_unit) flag
 
 !  1.1.1 Modifty the Index
 
@@ -111,17 +111,17 @@
 
 ! 1.1.2 Year, month, day, hour, minute, second,....
 
-        read(ANALYSIS_DATE( 1:04), fmt='(I4)') x_mm5 % big_header % bhi( 5, 5)
-        read(ANALYSIS_DATE( 6:07), fmt='(I2)') x_mm5 % big_header % bhi( 6, 5)
-        read(ANALYSIS_DATE( 9:10), fmt='(I2)') x_mm5 % big_header % bhi( 7, 5)
-        read(ANALYSIS_DATE(12:13), fmt='(I2)') x_mm5 % big_header % bhi( 8, 5)
-        read(ANALYSIS_DATE(15:16), fmt='(I2)') x_mm5 % big_header % bhi( 9, 5)
-        read(ANALYSIS_DATE(18:19), fmt='(I2)') x_mm5 % big_header % bhi(10, 5)
-        read(ANALYSIS_DATE(21:24), fmt='(I4)') x_mm5 % big_header % bhi(11, 5)
+        read(UNIT=ANALYSIS_DATE( 1:04), fmt='(I4)') x_mm5 % big_header % bhi( 5, 5)
+        read(UNIT=ANALYSIS_DATE( 6:07), fmt='(I2)') x_mm5 % big_header % bhi( 6, 5)
+        read(UNIT=ANALYSIS_DATE( 9:10), fmt='(I2)') x_mm5 % big_header % bhi( 7, 5)
+        read(UNIT=ANALYSIS_DATE(12:13), fmt='(I2)') x_mm5 % big_header % bhi( 8, 5)
+        read(UNIT=ANALYSIS_DATE(15:16), fmt='(I2)') x_mm5 % big_header % bhi( 9, 5)
+        read(UNIT=ANALYSIS_DATE(18:19), fmt='(I2)') x_mm5 % big_header % bhi(10, 5)
+        read(UNIT=ANALYSIS_DATE(21:24), fmt='(I4)') x_mm5 % big_header % bhi(11, 5)
 
         sub_header%char_date = ANALYSIS_DATE( 3:04)//ANALYSIS_DATE( 6:07)// &
                                ANALYSIS_DATE( 9:10)//ANALYSIS_DATE(12:13)
-!        print *,"sub_header%char_date =",sub_header%char_date 
+!        WRITE(UNIT=stdout,FMT='(2A)') "sub_header%char_date =",sub_header%char_date 
     
 ! 1.1.3 Characteristics of the Background Error Statistics form the OLD BE
 
@@ -134,7 +134,7 @@
 !  1.2 Write out the big_header
 !  ----------------------------
  
-        write(ibe_unit) x_mm5 % big_header % bhi,  &
+        write(UNIT=ibe_unit) x_mm5 % big_header % bhi,  &
                         x_mm5 % big_header % bhr,  &
                         x_mm5 % big_header % bhic, &
                         x_mm5 % big_header % bhrc
@@ -151,7 +151,7 @@
 
      elseif (flag == 1) then
 
-         read(jpin,iostat=ier) &
+         read(UNIT=jpin,iostat=ier) &
               x_mm5%sub_header(n)%ndim, &
               x_mm5%sub_header(n)%start_index, &
               x_mm5%sub_header(n)%end_index, &
@@ -164,8 +164,8 @@
               x_mm5%sub_header(n)%description
 
          if(ier/=0) then
-            write(0,'("Error reading subheader")')
-            call abort()
+           CALL wrf_error_fatal3(__FILE__,__LINE__, &
+             "Error reading subheader")
          endif
 
          if(print_info) then
@@ -178,7 +178,7 @@
           x_mm5%sub_header(n)%start_index(3):x_mm5%sub_header(n)%end_index(3),&
           x_mm5%sub_header(n)%start_index(4):x_mm5%sub_header(n)%end_index(4)))
 
-         read(jpin,iostat=ier) data
+         read(UNIT=jpin,iostat=ier) data
 
 !  1.3 To write out the select the necessary constant fields:
 !  ---------------------------------------------------------
@@ -195,9 +195,9 @@
             x_mm5%sub_header(n)%name == 'SNOWCOVR' .or. &
             x_mm5%sub_header(n)%name == 'SIGMAH  ' ) then
   
-            write(ibe_unit) flag
+            write(UNIT=ibe_unit) flag
 
-            write(ibe_unit) &
+            write(UNIT=ibe_unit) &
             x_mm5%sub_header(n)%ndim, &
             x_mm5%sub_header(n)%start_index, &
             x_mm5%sub_header(n)%end_index, &
@@ -209,7 +209,7 @@
             x_mm5%sub_header(n)%units, &
             x_mm5%sub_header(n)%description
 
-            write(ibe_unit) data
+            write(UNIT=ibe_unit) data
 !            print '(I2," name=",a9," flag=",i2)', n,x_mm5%sub_header(n)%name,flag
             n = n + 1
         endif
@@ -262,14 +262,14 @@
    sub_header%end_index(2) = mkz
    sub_header%end_index(3) = 1
 !  
-   write(ibe_unit) flag1
+   write(UNIT=ibe_unit) flag1
    call sub_write 
    call data_allocate
    data(:,:,1,1) = e1(:,:)
-   write(ibe_unit) data
+   write(UNIT=ibe_unit) data
    deallocate (data)
    n = n + 1
-   print '(I2," Wrote field:",a)', n, sub_header%name
+   WRITE(UNIT=stdout,FMT='(I2," Wrote field:",a)') n, sub_header%name
 !
 ! 3.1.2 GLOBAL EIGEN VALUES  for PSI
 !  
@@ -282,14 +282,14 @@
    sub_header%end_index(2) = 1
    sub_header%end_index(3) = 1      
 !  
-   write(ibe_unit) flag1
+   write(UNIT=ibe_unit) flag1
    call sub_write 
    call data_allocate
    data(:,1,1,1) = l1(:)
-   write(ibe_unit) data
+   write(UNIT=ibe_unit) data
    deallocate (data)
    n = n + 1
-   print '(I2," Wrote field:",a)', n, sub_header%name
+   WRITE(UNIT=stdout,FMT='(I2," Wrote field:",a)') n, sub_header%name
 !
 ! 3.2.1 GLOBAL EIGEN VECTORS for CHI
 !  
@@ -302,14 +302,14 @@
    sub_header%end_index(2) = mkz
    sub_header%end_index(3) = 1
 !  
-   write(ibe_unit) flag1
+   write(UNIT=ibe_unit) flag1
    call sub_write 
    call data_allocate
    data(:,:,1,1) = e2(:,:)
-   write(ibe_unit) data
+   write(UNIT=ibe_unit) data
    deallocate (data)
    n = n + 1
-   print '(I2," Wrote field:",a)', n, sub_header%name
+   WRITE(UNIT=stdout,FMT='(I2," Wrote field:",a)') n, sub_header%name
 !
 ! 3.2.2 GLOBAL EIGEN VALUES  for CHI
 !  
@@ -322,14 +322,14 @@
    sub_header%end_index(2) = 1
    sub_header%end_index(3) = 1      
 !  
-   write(ibe_unit) flag1
+   write(UNIT=ibe_unit) flag1
    call sub_write 
    call data_allocate
    data(:,1,1,1) = l2(:)
-   write(ibe_unit) data
+   write(UNIT=ibe_unit) data
    deallocate (data)
    n = n + 1
-   print '(I2," Wrote field:",a)', n, sub_header%name
+   WRITE(UNIT=stdout,FMT='(I2," Wrote field:",a)') n, sub_header%name
 !
 ! 3.3.1 GLOBAL EIGEN VECTORS for P_U
 !  
@@ -342,14 +342,14 @@
    sub_header%end_index(2) = mkz
    sub_header%end_index(3) = 1
 !  
-   write(ibe_unit) flag1
+   write(UNIT=ibe_unit) flag1
    call sub_write 
    call data_allocate
    data(:,:,1,1) = e3(:,:)
-   write(ibe_unit) data
+   write(UNIT=ibe_unit) data
    deallocate (data)
    n = n + 1
-   print '(I2," Wrote field:",a)', n, sub_header%name
+   WRITE(UNIT=stdout,FMT='(I2," Wrote field:",a)') n, sub_header%name
 !
 ! 3.3.4 GLOBAL EIGEN VALUES  for P_U
 !  
@@ -362,14 +362,14 @@
    sub_header%end_index(2) = 1
    sub_header%end_index(3) = 1      
 !  
-   write(ibe_unit) flag1
+   write(UNIT=ibe_unit) flag1
    call sub_write 
    call data_allocate
    data(:,1,1,1) = l3(:)
-   write(ibe_unit) data
+   write(UNIT=ibe_unit) data
    deallocate (data)
    n = n + 1
-   print '(I2," Wrote field:",a)', n, sub_header%name
+   WRITE(UNIT=stdout,FMT='(I2," Wrote field:",a)') n, sub_header%name
 !
 ! 3.4.1 GLOBAL EIGEN VECTORS for Q or RH
 !  
@@ -388,14 +388,14 @@
    sub_header%end_index(2) = mkz
    sub_header%end_index(3) = 1
 !  
-   write(ibe_unit) flag1
+   write(UNIT=ibe_unit) flag1
    call sub_write 
    call data_allocate
    data(:,:,1,1) = e4(:,:)
-   write(ibe_unit) data
+   write(UNIT=ibe_unit) data
    deallocate (data)
    n = n + 1
-   print '(I2," Wrote field:",a)', n, sub_header%name
+   WRITE(UNIT=stdout,FMT='(I2," Wrote field:",a)') n, sub_header%name
 !
 ! 3.4.4 GLOBAL EIGEN VALUES  for Q
 !  
@@ -414,14 +414,14 @@
    sub_header%end_index(2) = 1
    sub_header%end_index(3) = 1      
 !  
-   write(ibe_unit) flag1
+   write(UNIT=ibe_unit) flag1
    call sub_write 
    call data_allocate
    data(:,1,1,1) = l4(:)
-   write(ibe_unit) data
+   write(UNIT=ibe_unit) data
    deallocate (data)
    n = n + 1
-   print '(I2," Wrote field:",a)', n, sub_header%name
+   WRITE(UNIT=stdout,FMT='(I2," Wrote field:",a)') n, sub_header%name
 !
 ! -------------------------------------------------------------------------
 ! 4. Write out the vertical regression coefficients
@@ -437,17 +437,17 @@
    sub_header%end_index(2) = mkz
    sub_header%end_index(3) = mkz
 !  
-   write(ibe_unit) flag1
+   write(UNIT=ibe_unit) flag1
    call sub_write 
    call data_allocate
 
    data(1:mix-1,:,:,1) = pb_vert_reg(1:mix-1,:,:)
    data(mix,:,:,1) = pb_vert_reg(mix-1,:,:)
 
-   write(ibe_unit) data
+   write(UNIT=ibe_unit) data
    deallocate (data)
    n = n + 1
-   print '(I2," Wrote field:",a)', n, sub_header%name
+   WRITE(UNIT=stdout,FMT='(I2," Wrote field:",a)') n, sub_header%name
 !
 ! -------------------------------------------------------------------------
 ! 5. Write out Scale length                
@@ -472,12 +472,12 @@
    sub_header%name         = 'PSI_S_LEN' 
    sub_header%description  = 'PSI SCALE LENGTH '
 !  
-   write(ibe_unit) flag1
+   write(UNIT=ibe_unit) flag1
    call sub_write 
    data(:,1,1,1) = s1(:) / ds
-   write(ibe_unit) data
+   write(UNIT=ibe_unit) data
    n = n + 1
-   print '(I2," Wrote field:",a)', n, sub_header%name
+   WRITE(UNIT=stdout,FMT='(I2," Wrote field:",a)') n, sub_header%name
 !
 ! 5.2.2 CHI scale length
 ! ----------------------
@@ -485,12 +485,12 @@
    sub_header%name         = 'CHI_S_LEN' 
    sub_header%description  = 'CHI SCALE LENGTH '
 !  
-   write(ibe_unit) flag1
+   write(UNIT=ibe_unit) flag1
    call sub_write 
    data(:,1,1,1) = s2(:) / ds
-   write(ibe_unit) data
+   write(UNIT=ibe_unit) data
    n = n + 1
-   print '(I2," Wrote field:",a)', n, sub_header%name
+   WRITE(UNIT=stdout,FMT='(I2," Wrote field:",a)') n, sub_header%name
 !
 ! 5.2.3 P_U scale length
 ! ----------------------
@@ -498,12 +498,12 @@
    sub_header%name         = 'P_U_S_LEN' 
    sub_header%description  = 'P_U SCALE LENGTH '
 !  
-   write(ibe_unit) flag1
+   write(UNIT=ibe_unit) flag1
    call sub_write 
    data(:,1,1,1) = s3(:) / ds
-   write(ibe_unit) data
+   write(UNIT=ibe_unit) data
    n = n + 1
-   print '(I2," Wrote field:",a)', n, sub_header%name
+   WRITE(UNIT=stdout,FMT='(I2," Wrote field:",a)') n, sub_header%name
 !
 ! 5.2.4 Q scale length
 ! --------------------
@@ -516,28 +516,28 @@
      sub_header%description  = 'RH SCALE LENGTH '
    endif
 !  
-   write(ibe_unit) flag1
+   write(UNIT=ibe_unit) flag1
    call sub_write 
    data(:,1,1,1) = s4(:) / ds
-   write(ibe_unit) data
+   write(UNIT=ibe_unit) data
    n = n + 1
-   print '(I2," Wrote field:",a)', n, sub_header%name
+   WRITE(UNIT=stdout,FMT='(I2," Wrote field:",a)') n, sub_header%name
    deallocate (data)
 
 ! --------------------------------------------------------------------------
 ! 6. Write out the last record  
 ! --------------------------------------------------------------------------
 
-   write(ibe_unit) flag2
+   write(UNIT=ibe_unit) flag2
 
-   write(*,'(/A)') "Interpolated Background Error Statistics file written out"
-   write(*,'(I2," constant fields, and ",I3," BE fields."/)') nv, n
+   WRITE(UNIT=stdout,FMT='(/A)') "Interpolated Background Error Statistics file written out"
+   WRITE(UNIT=stdout,FMT='(I2," constant fields, and ",I3," BE fields."/)') nv, n
 
 contains
 
 subroutine sub_write 
 
-   write(ibe_unit) &
+   write(UNIT=ibe_unit) &
      sub_header%ndim, &
      sub_header%start_index, &
      sub_header%end_index, &

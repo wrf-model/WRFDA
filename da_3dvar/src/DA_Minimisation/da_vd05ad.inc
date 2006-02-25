@@ -229,8 +229,8 @@
          do 40 j = 1, n
             x(j) = wa(j) + stp*s(j)
    40       continue
-!       write (0,*) 'in vd05ad   step=',stp
-!       write (0,*) 'in vd05ad    new x=',sum(x**2)
+!       write (UNIT=stderr,FMT=*) 'in vd05ad   step=',stp
+!       write (UNIT=stderr,FMT=*) 'in vd05ad    new x=',sum(x**2)
          info=-1
          return
 ! 

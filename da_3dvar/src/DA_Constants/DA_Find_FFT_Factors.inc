@@ -59,7 +59,7 @@ SUBROUTINE DA_Find_FFT_Factors( n, n_ok, fft_factors )
    IF (IFAC .GT. 1) GO TO 20
 
 !  Illegal factors:
-!   write (0, '(a,i4,a)') 'N = ', N, ' contains illegal factors.'
+!   write (UNIT=stderr,FMT='(a,i4,a)') 'N = ', N, ' contains illegal factors.'
    
    GOTO 9
 

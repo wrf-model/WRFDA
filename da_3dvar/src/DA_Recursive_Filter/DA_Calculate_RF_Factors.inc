@@ -67,14 +67,14 @@ SUBROUTINE DA_Calculate_RF_Factors( rf_lengthscale, rf_alpha, rf_scale_factor )
       rf_scale_factor(k) = 1.0 / field_out(0)
 
 !     Uncomment the following to test equivalence of UU^T and RF:
-!      WRITE(0,'(A,f15.5)')' RF Scaling Factor = ', 1.0 / field_out(0)
+!      WRITE(UNIT=stderr,FMT='(A,f15.5)')' RF Scaling Factor = ', 1.0 / field_out(0)
 !      field_out1(-n:n) = field_in(-n:n)
 !      DO pass = 1, rf_passes
 !         CALL DA_Recursive_Filter_1D( pass, rf_alpha(k), field_out1, 2*n+1 )
 !      END DO
          
 !      do nn = -n, n
-!         WRITE(0,'(2i5,4f12.5)')k, nn, field_in(nn), &
+!         WRITE(UNIT=stderr,FMT='(2i5,4f12.5)')k, nn, field_in(nn), &
 !                                field_out(nn) / field_out(0), &
 !                                field_out1(nn) / field_out1(0), &
 !                                exp( -0.125*(REAL(nn)/rf_lengthscale(k))**2 )

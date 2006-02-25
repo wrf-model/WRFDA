@@ -49,11 +49,11 @@ SUBROUTINE DA_Check_XToVpToX_Errors( xa, xa2_u, xa2_v, xa2_w, xa2_t, &
                        * diff(its:ite, jts:jte, kts:kte) ) )
      
    IF ( rms_fild == 0.0 ) THEN
-      write(unit=*, fmt='(a)') ' u is zero ' 
+      write(UNIT=stdout, fmt='(a)') ' u is zero ' 
    ELSE
-      write(unit=*, fmt='(a,1pe10.4)') ' u RMS error = ', rms_diff
-      write(unit=*, fmt='(a,1pe10.4)') ' u RMS field = ', rms_fild
-      write(unit=*, fmt='(a,1pe10.4)') ' u RMS error/RMS field = ', rms_diff/rms_fild
+      write(UNIT=stdout, fmt='(a,1pe10.4)') ' u RMS error = ', rms_diff
+      write(UNIT=stdout, fmt='(a,1pe10.4)') ' u RMS field = ', rms_fild
+      write(UNIT=stdout, fmt='(a,1pe10.4)') ' u RMS error/RMS field = ', rms_diff/rms_fild
    END IF        
      
 !-------------------------------------------------------------------------
@@ -69,11 +69,11 @@ SUBROUTINE DA_Check_XToVpToX_Errors( xa, xa2_u, xa2_v, xa2_w, xa2_t, &
                        * diff(its:ite, jts:jte, kts:kte) ) )
      
    IF ( rms_fild == 0.0 ) THEN
-      write(unit=*, fmt='(a)') ' v is zero ' 
+      write(UNIT=stdout, fmt='(a)') ' v is zero ' 
    ELSE
-      write(unit=*, fmt='(a,1pe10.4)') ' v RMS error = ', rms_diff
-      write(unit=*, fmt='(a,1pe10.4)') ' v RMS field = ', rms_fild
-      write(unit=*, fmt='(a,1pe10.4)') ' v RMS error/RMS field = ', rms_diff/rms_fild
+      write(UNIT=stdout, fmt='(a,1pe10.4)') ' v RMS error = ', rms_diff
+      write(UNIT=stdout, fmt='(a,1pe10.4)') ' v RMS field = ', rms_fild
+      write(UNIT=stdout, fmt='(a,1pe10.4)') ' v RMS error/RMS field = ', rms_diff/rms_fild
    END IF    
       
 !-------------------------------------------------------------------------
@@ -89,11 +89,11 @@ SUBROUTINE DA_Check_XToVpToX_Errors( xa, xa2_u, xa2_v, xa2_w, xa2_t, &
                        * diff(its:ite, jts:jte, kts:kte) ) )
 
    IF ( rms_fild == 0.0 ) THEN
-      write(unit=*, fmt='(a)') ' t is zero ' 
+      write(UNIT=stdout, fmt='(a)') ' t is zero ' 
    ELSE
-      write(unit=*, fmt='(a,1pe10.4)') ' t RMS error = ', rms_diff
-      write(unit=*, fmt='(a,1pe10.4)') ' t RMS field = ', rms_fild
-      write(unit=*, fmt='(a,1pe10.4)') ' t RMS error/RMS field = ', rms_diff/rms_fild
+      write(UNIT=stdout, fmt='(a,1pe10.4)') ' t RMS error = ', rms_diff
+      write(UNIT=stdout, fmt='(a,1pe10.4)') ' t RMS field = ', rms_fild
+      write(UNIT=stdout, fmt='(a,1pe10.4)') ' t RMS error/RMS field = ', rms_diff/rms_fild
    END IF         
         
 !-------------------------------------------------------------------------
@@ -109,11 +109,11 @@ SUBROUTINE DA_Check_XToVpToX_Errors( xa, xa2_u, xa2_v, xa2_w, xa2_t, &
                        * diff(its:ite, jts:jte, kts:kte) ) )
 
    IF ( rms_fild == 0.0 ) THEN
-      write(unit=*, fmt='(a)') ' p is zero ' 
+      write(UNIT=stdout, fmt='(a)') ' p is zero ' 
    ELSE
-      write(unit=*, fmt='(a,1pe10.4)') ' p RMS error = ', rms_diff
-      write(unit=*, fmt='(a,1pe10.4)') ' p RMS field = ', rms_fild
-      write(unit=*, fmt='(a,1pe10.4)') ' p RMS error/RMS field = ', rms_diff/rms_fild
+      write(UNIT=stdout, fmt='(a,1pe10.4)') ' p RMS error = ', rms_diff
+      write(UNIT=stdout, fmt='(a,1pe10.4)') ' p RMS field = ', rms_fild
+      write(UNIT=stdout, fmt='(a,1pe10.4)') ' p RMS error/RMS field = ', rms_diff/rms_fild
    END IF           
 
 !-------------------------------------------------------------------------
@@ -129,11 +129,11 @@ SUBROUTINE DA_Check_XToVpToX_Errors( xa, xa2_u, xa2_v, xa2_w, xa2_t, &
                        * diff(its:ite, jts:jte, kts:kte) ) )
 
    IF ( rms_fild == 0.0 ) THEN
-      write(unit=*, fmt='(a)') ' q is zero ' 
+      write(UNIT=stdout, fmt='(a)') ' q is zero ' 
    ELSE
-      write(unit=*, fmt='(a,1pe10.4)') ' q RMS error = ', rms_diff
-      write(unit=*, fmt='(a,1pe10.4)') ' q RMS field = ', rms_fild
-      write(unit=*, fmt='(a,1pe10.4)') ' q RMS error/RMS field = ', rms_diff/rms_fild
+      write(UNIT=stdout, fmt='(a,1pe10.4)') ' q RMS error = ', rms_diff
+      write(UNIT=stdout, fmt='(a,1pe10.4)') ' q RMS field = ', rms_fild
+      write(UNIT=stdout, fmt='(a,1pe10.4)') ' q RMS error/RMS field = ', rms_diff/rms_fild
    END IF        
 
 !-------------------------------------------------------------------------
@@ -149,11 +149,11 @@ SUBROUTINE DA_Check_XToVpToX_Errors( xa, xa2_u, xa2_v, xa2_w, xa2_t, &
                        * diff(its:ite, jts:jte, kts:kte) ) )
 
    IF ( rms_fild == 0.0 ) THEN
-      write(unit=*, fmt='(a)') ' rho is zero ' 
+      write(UNIT=stdout, fmt='(a)') ' rho is zero ' 
    ELSE
-      write(unit=*, fmt='(a,1pe10.4)') ' rho RMS error = ', rms_diff
-      write(unit=*, fmt='(a,1pe10.4)') ' rho RMS field = ', rms_fild
-      write(unit=*, fmt='(a,1pe10.4)') ' rho RMS error/RMS field = ', rms_diff/rms_fild
+      write(UNIT=stdout, fmt='(a,1pe10.4)') ' rho RMS error = ', rms_diff
+      write(UNIT=stdout, fmt='(a,1pe10.4)') ' rho RMS field = ', rms_fild
+      write(UNIT=stdout, fmt='(a,1pe10.4)') ' rho RMS error/RMS field = ', rms_diff/rms_fild
    END IF        
 
 !-------------------------------------------------------------------------
@@ -169,11 +169,11 @@ SUBROUTINE DA_Check_XToVpToX_Errors( xa, xa2_u, xa2_v, xa2_w, xa2_t, &
                        * diff(its:ite, jts:jte, kts:kte+1) ) )
 
    IF ( rms_fild == 0.0 ) THEN
-      write(unit=*, fmt='(a)') ' w is zero '
+      write(UNIT=stdout, fmt='(a)') ' w is zero '
    ELSE
-      write(unit=*, fmt='(a,1pe10.4)') ' w RMS error = ', rms_diff
-      write(unit=*, fmt='(a,1pe10.4)') ' w RMS field = ', rms_fild
-      write(unit=*, fmt='(a,1pe10.4)') ' w RMS error/RMS field = ', rms_diff/rms_fild
+      write(UNIT=stdout, fmt='(a,1pe10.4)') ' w RMS error = ', rms_diff
+      write(UNIT=stdout, fmt='(a,1pe10.4)') ' w RMS field = ', rms_fild
+      write(UNIT=stdout, fmt='(a,1pe10.4)') ' w RMS error/RMS field = ', rms_diff/rms_fild
    END IF
 
 !!!-------------------------------------------------------------------------
@@ -191,11 +191,11 @@ if ( cv_options_hum == 3 ) then
                        * diff(its:ite, jts:jte, kts:kte) ) )
 
    IF ( rms_fild == 0.0 ) THEN
-      write(unit=*, fmt='(a)') ' qt is zero '
+      write(UNIT=stdout, fmt='(a)') ' qt is zero '
    ELSE
-      write(unit=*, fmt='(a,1pe10.4)') ' qt RMS error = ', rms_diff
-      write(unit=*, fmt='(a,1pe10.4)') ' qt RMS field = ', rms_fild
-      write(unit=*, fmt='(a,1pe10.4)') ' qt RMS error/RMS field = ', rms_diff/rms_fild
+      write(UNIT=stdout, fmt='(a,1pe10.4)') ' qt RMS error = ', rms_diff
+      write(UNIT=stdout, fmt='(a,1pe10.4)') ' qt RMS field = ', rms_fild
+      write(UNIT=stdout, fmt='(a,1pe10.4)') ' qt RMS error/RMS field = ', rms_diff/rms_fild
    END IF
 
 !-------------------------------------------------------------------------
@@ -211,11 +211,11 @@ if ( cv_options_hum == 3 ) then
                        * diff(its:ite, jts:jte, kts:kte) ) )
 
    IF ( rms_fild == 0.0 ) THEN
-      write(unit=*, fmt='(a)') ' qcw is zero '
+      write(UNIT=stdout, fmt='(a)') ' qcw is zero '
    ELSE
-      write(unit=*, fmt='(a,1pe10.4)') ' qcw RMS error = ', rms_diff
-      write(unit=*, fmt='(a,1pe10.4)') ' qcw RMS field = ', rms_fild
-      write(unit=*, fmt='(a,1pe10.4)') ' qcw RMS error/RMS field = ', rms_diff/rms_fild
+      write(UNIT=stdout, fmt='(a,1pe10.4)') ' qcw RMS error = ', rms_diff
+      write(UNIT=stdout, fmt='(a,1pe10.4)') ' qcw RMS field = ', rms_fild
+      write(UNIT=stdout, fmt='(a,1pe10.4)') ' qcw RMS error/RMS field = ', rms_diff/rms_fild
    END IF
 
 !-------------------------------------------------------------------------
@@ -231,18 +231,18 @@ if ( cv_options_hum == 3 ) then
                        * diff(its:ite, jts:jte, kts:kte) ) )
 
    IF ( rms_fild == 0.0 ) THEN
-      write(unit=*, fmt='(a)') ' qrn is zero '
+      write(UNIT=stdout, fmt='(a)') ' qrn is zero '
    ELSE
-      write(unit=*, fmt='(a,1pe10.4)') ' qrn RMS error = ', rms_diff
-      write(unit=*, fmt='(a,1pe10.4)') ' qrn RMS field = ', rms_fild
-      write(unit=*, fmt='(a,1pe10.4)') ' qrn RMS error/RMS field = ', rms_diff/rms_fild
+      write(UNIT=stdout, fmt='(a,1pe10.4)') ' qrn RMS error = ', rms_diff
+      write(UNIT=stdout, fmt='(a,1pe10.4)') ' qrn RMS field = ', rms_fild
+      write(UNIT=stdout, fmt='(a,1pe10.4)') ' qrn RMS error/RMS field = ', rms_diff/rms_fild
    END IF
 
 !-------------------------------------------------------------------------
 endif
 !!!-------------------------------------------------------------------------
 
-   write(unit=*, fmt='(/a/)') 'End of DA_Check_XToVpToX_Errors'
+   write(UNIT=stdout, fmt='(/a/)') 'End of DA_Check_XToVpToX_Errors'
          
 END SUBROUTINE DA_Check_XToVpToX_Errors
 

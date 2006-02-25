@@ -57,20 +57,20 @@ subroutine DA_Minimise_CG( grid, config_flags,            &
 
       character(len=4)                  :: filnam
 
-      write (6,'(A)') &
+      WRITE(UNIT=stdout,FMT='(A)') &
         ' ----------------------------------------------------------'
-      write(6,*)
-      write (6,'(A)') ' [5.2] Minimize cost function Using CG Method'
+      WRITE(UNIT=stdout,FMT=*) ' '
+      WRITE(UNIT=stdout,FMT='(A)') ' [5.2] Minimize cost function Using CG Method'
       if( calculate_cg_cost_function ) then
-        write (6,'(A)') &
+        WRITE(UNIT=stdout,FMT='(A)') &
           '  For this run cost function diagnostics will be written'
       else
-        write (6,'(A)') &
+        WRITE(UNIT=stdout,FMT='(A)') &
           '  For this run cost function diagnostics will not be written'
       end if
-      write (6,'(A)') &
+      WRITE(UNIT=stdout,FMT='(A)') &
         ' ----------------------------------------------------------'
-      write(6,*)
+      WRITE(UNIT=stdout,FMT=*) ' '
 
       xhat   = 0.0
       j_grad = 0.0
@@ -94,22 +94,22 @@ subroutine DA_Minimise_CG( grid, config_flags,            &
       if(it == 1) cv % j_grad_norm_target =  sqrt (rrmold)
 
 !-------------------------------------------------------------------------
-      write(6,10)it
+      WRITE(UNIT=stdout,FMT=10)it
 10    format(2x,'Starting outer iteration : ',i3)
-      write(6,11)cv%j_grad_norm_target,eps(it)*cv%j_grad_norm_target, &
+      WRITE(UNIT=stdout,FMT=11)cv%j_grad_norm_target,eps(it)*cv%j_grad_norm_target, &
                  j%total, sqrt(rrmold)
 11    format(2x,'Original gradient is ',1PD15.8,/,&
              2x,'For this outer iteration Gradient target is ',1PD15.8,/,&
              2x,'Starting Cost function: ' ,1PD15.8,' Gradient= ',1PD15.8)
-      write (6,'(A)') &
+      WRITE(UNIT=stdout,FMT='(A)') &
         ' ----------------------------------------------------------'
       if( calculate_cg_cost_function ) then
-      write(6,'(2x,/,2x,A)') &
+      WRITE(UNIT=stdout,FMT='(2x,/,2x,A)') &
         ' Iter    Cost Function         Gradient             Step'
       else
-      write(6,'(2x,/,2x,A)')' Iter      Gradient             Step'
+      WRITE(UNIT=stdout,FMT='(2x,/,2x,A)')' Iter      Gradient             Step'
       endif
-      write(6,*)
+      WRITE(UNIT=stdout,FMT=*) ' '
 
 !-------------------------------------------------------------------------
 !     [2.0] iteratively solve for minimum of cost function:
@@ -166,9 +166,9 @@ subroutine DA_Minimise_CG( grid, config_flags,            &
 
          rrmold=rrmnew
          if( calculate_cg_cost_function ) then
-           write(6,12)iter, j%total, ob_grad, step
+           WRITE(UNIT=stdout,FMT=12)iter, j%total, ob_grad, step
          else
-           write(6,14)iter, rrmnew_norm , step
+           WRITE(UNIT=stdout,FMT=14)iter, rrmnew_norm , step
          endif
 12       format(2x,i3,5x,1PD15.8,5x,1PD15.8,5x,1PD15.8)
 14       format(2x,i3,5x,1PD15.8,5x,1PD15.8)
@@ -180,14 +180,14 @@ subroutine DA_Minimise_CG( grid, config_flags,            &
        go to 1003
 1002   continue
        if( calculate_cg_cost_function ) then
-         write(6,12)iter, j%total, ob_grad, step
+         WRITE(UNIT=stdout,FMT=12)iter, j%total, ob_grad, step
        else
-         write(6,14)iter, rrmnew_norm , step
+         WRITE(UNIT=stdout,FMT=14)iter, rrmnew_norm , step
        endif
 1003   continue
-       write (6,'(A)') &
+       WRITE(UNIT=stdout,FMT='(A)') &
          ' ----------------------------------------------------------'
-       write(6,13)iter
+       WRITE(UNIT=stdout,FMT=13)iter
 13     format(2x,'Inner iteration stopped after ',i4,' iterations')
        if( calculate_cg_cost_function ) then 
          rrmnew_norm = ob_grad
@@ -203,9 +203,9 @@ subroutine DA_Minimise_CG( grid, config_flags,            &
            (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz /) ) )
        endif
         
-       write(6,15)j%total , rrmnew_norm
+       WRITE(UNIT=stdout,FMT=15)j%total , rrmnew_norm
 15     format(2x,' Final cost function : ',1PD15.8,' and Gradient: ',1PD15.8)
-       write (6,'(A)') &
+       WRITE(UNIT=stdout,FMT='(A)') &
          ' ----------------------------------------------------------'
 1004   continue
 !

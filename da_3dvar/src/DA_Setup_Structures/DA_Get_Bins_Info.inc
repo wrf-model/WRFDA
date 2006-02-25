@@ -47,7 +47,9 @@ subroutine DA_Get_Bins_Info(ni, nj, nk, num_bins2d, bin2d, evec_g, eval_g,&
        end do
     end do
  else
-  stop 'Wrong choice of vert_evalue'
+   WRITE(UNIT=errmsg(1),FMT='(A,I5)') &
+     "Invalid value of vert_evalue=",vert_evalue
+   CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
  end if
 
     CALL DA_Get_Vertical_Truncation(max_vert_var, eval_g, be_sub)

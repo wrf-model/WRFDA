@@ -16,7 +16,7 @@ SUBROUTINE mm5_struct_bcast( x_mm5 )
 
     LOGICAL, EXTERNAL :: wrf_dm_on_monitor
 
-!  write(6,'(/A)')'Performing mm5_struct_bcast operation ...'
+!  write(UNIT=stdout,'(/A)')'Performing mm5_struct_bcast operation ...'
 
    call wrf_dm_bcast_integer ( x_mm5 % big_header % bhi, 50*20 )
    call wrf_dm_bcast_real ( x_mm5 % big_header % bhr, 20*20 )

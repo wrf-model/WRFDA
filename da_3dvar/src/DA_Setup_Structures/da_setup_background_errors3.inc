@@ -62,12 +62,8 @@ SUBROUTINE DA_Setup_Background_Errors3( xb, be, xp )
    write (6,*)
 
    IF(cv_options /= 3) THEN
-      write(unit=*, fmt='(a, i2)') &
-           'cv_options:', cv_options
-
-      CALL wrf_shutdown
-
-      STOP "Stopped for Wrong CV_OPTION."
+     CALL wrf_error_fatal3(__FILE__,__LINE__, &
+       "cv_option must be 3")
    ENDIF
 
    its = xp%its

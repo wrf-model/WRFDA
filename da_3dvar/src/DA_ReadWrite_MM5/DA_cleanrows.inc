@@ -11,7 +11,7 @@ subroutine DA_cleanrows(data, sub_header)
       if(sub_header%staggering(1:1) == 'c' .or. &
          sub_header%staggering(1:1) == 'C') then
 
-!        write(unit=*, fmt='(5a,i6,a,8i4)') &
+!        write(UNIT=stdout, fmt='(5a,i6,a,8i4)') &
 !             'call DA_cleanrows for <', sub_header%name, &
 !             '>    sub_header%staggering(1:1)=<', sub_header%staggering(1:1), &
 !             '>    sub_header%ndim=', sub_header%ndim, &

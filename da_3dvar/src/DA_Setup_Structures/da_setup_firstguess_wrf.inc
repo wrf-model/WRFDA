@@ -78,10 +78,10 @@ SUBROUTINE DA_Setup_FirstGuess_WRF( xbx, grid, &
    map_util_project = grid%map_proj
 
    if(print_detail > 0) then
-      write(unit=*, fmt='(a, i6)') &
+      write(unit=stdout, fmt='(a, i6)') &
            'map_proj =', grid%map_proj
 
-      write(unit=*, fmt='(a, e16.6)') &
+      write(unit=stdout, fmt='(a, e16.6)') &
            'cen_lat  =', grid%cen_lat,  &
            'cen_lon  =', grid%cen_lon,  &
            'truelat1 =', grid%truelat1, &
@@ -119,11 +119,12 @@ SUBROUTINE DA_Setup_FirstGuess_WRF( xbx, grid, &
 ! Check the ll_to_ij:
 !-------------------------------------------------------------------------
 
-     print '(/a/)',"Check the map_set correctness::::::::::::::::::::::::"
+     WRITE(UNIT=stdout,FMT='(/a/)') &
+       "Check the map_set correctness::::::::::::::::::::::::"
 
 !    Domain center:
      call  latlon_to_ij(map_info, grid%cen_lat, grid%cen_lon, start_x, start_y)
-     print '(/"Center: latc,lonc,x,y, Xc, Yc:",6f10.3/)',   &
+     WRITE(UNIT=stdout,FMT='(/"Center: latc,lonc,x,y, Xc, Yc:",6f10.3/)') &
                  grid%cen_lat, grid%cen_lon, start_x, start_y, &
                  real(xp%ide-xp%ids+2)/2., real(xp%jde-xp%jds+2)/2.
 
@@ -132,20 +133,20 @@ SUBROUTINE DA_Setup_FirstGuess_WRF( xbx, grid, &
      lat_cen = -999.9
      lon_cen = -999.9
      call  ij_to_latlon(map_info, start_x, start_y, lat_cen, lon_cen)
-     print '(/"Center: X, Y, latc, lonc, phic, xlonc:",6f10.3/)',   &
+     WRITE(UNIT=stdout,FMT='(/"Center: X, Y, latc, lonc, phic, xlonc:",6f10.3/)') &
                       start_x, start_y, lat_cen, lon_cen,   &
                       grid%cen_lat, grid%cen_lon
 
 !    Low-left corner:
      call  latlon_to_ij(map_info, xlat(xp%ids,xp%jds), xlong(xp%ids,xp%jds), &
                                                             start_x, start_y)
-       print '(/"Low-left: lat,lon,x,y,xp%ids,xp%jds:",4f10.3,2i6/)',   &
+       WRITE(UNIT=stdout,FMT='(/"Low-left: lat,lon,x,y,xp%ids,xp%jds:",4f10.3,2i6/)') &
                 xlat(xp%ids,xp%jds),  xlong(xp%ids,xp%jds), start_x, start_y, &
                                                              xp%ids, xp%jds
 !   Upper-right corner:
        call  latlon_to_ij(map_info, xlat(xp%ide,xp%jde), xlong(xp%ide,xp%jde),&
                                                             start_x, start_y)
-       print '(/"Upper-right: lat,lon,x,y,xp%ide,xp%jde:",4f10.3,2i6/)',   &
+       WRITE(UNIT=stdout,FMT='(/"Upper-right: lat,lon,x,y,xp%ide,xp%jde:",4f10.3,2i6/)') &
                 xlat(xp%ide,xp%jde),  xlong(xp%ide,xp%jde), start_x, start_y, &
                                                              xp%ide, xp%jde
    endif
@@ -165,11 +166,11 @@ SUBROUTINE DA_Setup_FirstGuess_WRF( xbx, grid, &
    if (grid%cen_lon /= grid%stand_lon .or. &
        grid%cen_lat /= grid%moad_cen_lat) then
 !
-     print '(/a,2e20.12)','grid%cen_lon  , grid%cen_lat     :', &
+     WRITE(UNIT=stdout,FMT='(/a,2e20.12)')'grid%cen_lon  , grid%cen_lat     :', &
                            grid%cen_lon, grid%cen_lat
-     print '( a,2e20.12)','grid%stand_lon, grid%moad_cen_lat:', &
+     WRITE(UNIT=stdout,FMT='( a,2e20.12)')'grid%stand_lon, grid%moad_cen_lat:', &
                            grid%stand_lon, grid%moad_cen_lat
-     print '(a)',  &
+     WRITE(UNIT=stdout,FMT='(a)')  &
        '## Compute the coarse_ix, coarse_jy, start_x, and start_y: ##'
 
      call latlon_to_ij(map_info, phic        , xlonc       , xxx, yyy)
@@ -177,7 +178,7 @@ SUBROUTINE DA_Setup_FirstGuess_WRF( xbx, grid, &
      i_grid = nint(xxx-xxc)
      j_grid = nint(yyy-yyc)
      m_expand = 16
-!     print '("i_grid, j_grid,  m_expand:",3I8)', i_grid, j_grid,  m_expand
+!     WRITE(UNIT=stdout,FMT='("i_grid, j_grid,  m_expand:",3I8)') i_grid, j_grid,  m_expand
 
      coarse_ix = coarse_ix + 2*abs(i_grid) + m_expand
      coarse_jy = coarse_jy + 2*abs(j_grid) + m_expand
@@ -187,7 +188,7 @@ SUBROUTINE DA_Setup_FirstGuess_WRF( xbx, grid, &
      start_y = m_expand/2 + 1
      if (j_grid < 0) start_y = start_y - 2*j_grid
 
-     print '(a,2i5,2x,a,2f6.1)', &
+     WRITE(UNIT=stdout,FMT='(a,2i5,2x,a,2f6.1)') &
            'Dimension of MOAD: ix, jy:',coarse_ix, coarse_jy, &
            'parent_x, parent_y:', start_x, start_y
 
@@ -198,8 +199,8 @@ SUBROUTINE DA_Setup_FirstGuess_WRF( xbx, grid, &
 !   CALL llxy( PHIC,XLONC,X,Y )
 
    CALL llxy(grid%cen_lat,grid%cen_lon,x,y)
-   print '(/a)',"Please check if the domain's central point (x,y) is correct:"
-   print '(a,4f12.3/)', 'grid%cen_lat,grid%cen_lon,x,y:', &
+   WRITE(UNIT=stdout,FMT='(/a)')"Please check if the domain's central point (x,y) is correct:"
+   WRITE(UNIT=stdout,FMT='(a,4f12.3/)') 'grid%cen_lat,grid%cen_lon,x,y:', &
                          grid%cen_lat,grid%cen_lon,x,y
 ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

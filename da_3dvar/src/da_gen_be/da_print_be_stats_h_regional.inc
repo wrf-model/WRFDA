@@ -9,14 +9,14 @@ subroutine da_print_be_stats_h_regional( outunit, variable, nk, scale_length )
 
    integer                  :: k                     ! Loop counter.
 
-   write(6,'(3a,i5)')' Scale length for variable ', trim(variable), ' in unit ', outunit
+   write(UNIT=stdout,FMT='(3a,i5)')' Scale length for variable ', trim(variable), ' in unit ', outunit
 
    do k = 1, nk
-      write(outunit,'(i4,1pe15.5)')k, scale_length(k)
+     write(UNIT=outunit,FMT='(i4,1pe15.5)')k, scale_length(k)
    end do
 
    outunit = outunit + 1
-   write(6,*)
+   write(UNIT=stdout)
 
 end subroutine da_print_be_stats_h_regional
 

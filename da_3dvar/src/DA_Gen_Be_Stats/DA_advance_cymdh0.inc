@@ -27,9 +27,9 @@ Subroutine DA_advance_cymdh0 ( ccyy, mm, dd, hh, delta )
    end do
 
    if ((hh < 0) .OR. (hh > 23)) then
-      print *, 'hh=', hh
-      print *, 'This is incredible. Let us stop here.'
-      stop
+     WRITE(UNIT=errmsg(1),FMT='(A,I5,A)') &
+       "hour hh=",hh,"outside range 0 to 23"
+     CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
    endif
    
 END Subroutine DA_advance_cymdh0

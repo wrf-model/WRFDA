@@ -16,14 +16,14 @@ Subroutine DA_Data_Delete(file_date)
        cmd_line = 'rm -rf '//trim(directory_name)//'/' &
                    //trim(file_head)//'_'//trim(file_date)//'*'
 
-       write(*,'(a90)') trim(cmd_line)
+       write(UNIT=stdout,FMT='(a90)') trim(cmd_line)
 
        call system(cmd_line)
 
        cmd_line = 'rm -rf '//trim(directory_name)//'/' &
                    //'*.tar'
 
-       write(*,'(a90)') trim(cmd_line)
+       write(UNIT=stdout,FMT='(a90)') trim(cmd_line)
 
        call system(cmd_line)
 #endif

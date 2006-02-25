@@ -75,18 +75,16 @@ SUBROUTINE da_setup_obs_structures_bufr( xp, ob, iv )
    call readmg(bufr_iunit,subset,idate,iret)
 
    if(iret/=0) then
-      write(unit=*, fmt='(a, i4)') &
+     errmsg(1) = "No BUFR observations"
+      write(unit=errmsg(2), fmt='(a, i4)') &
            'return code from readmg:', iret, &
            'Reach the end of obs unit: ', bufr_iunit
-
-      CALL wrf_shutdown
-
-      STOP "Stopped. No observations."
+      CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1:2))
    end if
 
-   write(date,'( i10)') idate
-   read (date,'(i4,3i2)') iy,im,id,ih
-   write(6,*)'READ_BUFR:  bufr file date is ',iy,im,id,ih
+   write(UNIT=date,FMT='( i10)') idate
+   read (UNIT=date,FMT='(i4,3i2)') iy,im,id,ih
+   write(UNIT=stdout,FMT=*)'READ_BUFR:  bufr file date is ',iy,im,id,ih
 
    header_loop: do
       call readsb(bufr_iunit,iret)
@@ -95,7 +93,7 @@ SUBROUTINE da_setup_obs_structures_bufr( xp, ob, iv )
          call readmg(bufr_iunit,subset,idate,iret)
 
          if(iret/=0) then
-            write(unit=*, fmt='(a, i4)') &
+            write(unit=stdout, fmt='(a, i4)') &
                  'return code from readmg:', iret, &
                  'Reach the end of obs unit: ', bufr_iunit
    
@@ -119,10 +117,10 @@ SUBROUTINE da_setup_obs_structures_bufr( xp, ob, iv )
                         xp, outside, inside_halo )
 
       if(print_detail > 100) then
-         print *, 'nmrecs, outside, inside_halo=', &
+        WRITE(UNIT=stdout,FMT=*) 'nmrecs, outside, inside_halo=', &
                    nmrecs, outside, inside_halo
 
-         write(unit=*, fmt='(2(a,2f12.4, 4x), 2(a, 2i6, 4x))') &
+         write(unit=stdout, fmt='(2(a,2f12.4, 4x), 2(a, 2i6, 4x))') &
               'loc(lon,lat)=', platform%info%lon, platform%info%lat, &
               'loc(  x,  y)=', platform%loc%x,   platform%loc%y, &
               'loc(  i,  j)=', platform%loc%i,   platform%loc%j, &
@@ -150,17 +148,17 @@ SUBROUTINE da_setup_obs_structures_bufr( xp, ob, iv )
             nairep=nairep+1
          CASE DEFAULT ;
             nmdisc=nmdisc+1
-!           write(unit=*, fmt='(/a, i8, 4x, a, e20.12/)') &
+!           write(unit=stdout, fmt='(/a, i8, 4x, a, e20.12/)') &
 !                'Unkown kx=', kx, 'Unhandled hdr(5)=', hdr(5)
       END SELECT
    enddo header_loop
 
-   write(6,*) 'READ_BUFR:  total bufr records =',nmrecs
-   write(6,*) 'READ_BUFR:  number in domain   =',nmindm
-   write(6,*) 'READ_BUFR:  number Unhandled   =',nmdisc
+   write(UNIT=stdout,FMT=*) 'READ_BUFR:  total bufr records =',nmrecs
+   write(UNIT=stdout,FMT=*) 'READ_BUFR:  number in domain   =',nmindm
+   write(UNIT=stdout,FMT=*) 'READ_BUFR:  number Unhandled   =',nmdisc
 
 
-   write(unit=*, fmt='(a, i8)') &
+   write(unit=stdout, fmt='(a, i8)') &
         'iv%num_synop=', nsynop, &
         'iv%num_sound=', nsound, &
         'iv%num_metar=', nmetar, &
@@ -233,7 +231,7 @@ SUBROUTINE da_setup_obs_structures_bufr( xp, ob, iv )
          call readmg(bufr_iunit,subset,idate,iret)
 
          if(iret/=0) then
-            write(unit=*, fmt='(a, i4)') &
+            write(unit=stdout, fmt='(a, i4)') &
                  'return code from readmg:', iret, &
                  'Reach the end of obs unit: ', bufr_iunit
 
@@ -413,10 +411,10 @@ SUBROUTINE da_setup_obs_structures_bufr( xp, ob, iv )
       if(nlevels > max_ob_levels) then
          nlevels = max_ob_levels
 
-         write(unit=*, fmt='(/a/)') &
+         write(unit=stdout, fmt='(/a/)') &
                'WARNING: Too many levels.'
 
-          write(unit=*, fmt='(/2a/2a/2x,a,2f8.2,2(2x,a,f9.2)/2(2x,a,i4)/)') &
+          write(unit=stdout, fmt='(/2a/2a/2x,a,2f8.2,2(2x,a,f9.2)/2(2x,a,i4)/)') &
                'Subset:   ', platform%info%name(1:8), &
                'Platfrom: ', trim(platform%info%platform), &
                'Loc(lat, lon): ', platform%info%lat, platform%info%lon, &
@@ -425,10 +423,10 @@ SUBROUTINE da_setup_obs_structures_bufr( xp, ob, iv )
                'level: ', platform%info%levels, &
                'kx:    ', kx
        else if( (nlevels < 1) .and. ((kx /= 164) .or. (kx /= 174))) then
-          write(unit=*, fmt='(/a/)') &
+          write(unit=stdout, fmt='(/a/)') &
                'WARNING: Too few levels.'
   
-          write(unit=*, fmt='(/2a/2a/2x,a,2f8.2,2(2x,a,f9.2)/2(2x,a,i4)/)') &
+          write(unit=stdout, fmt='(/2a/2a/2x,a,2f8.2,2(2x,a,f9.2)/2(2x,a,i4)/)') &
                'Subset:   ', platform%info%name(1:8), &
                'Platfrom: ', trim(platform%info%platform), &
                'Loc(lat, lon): ', platform%info%lat, platform%info%lon, &
@@ -608,28 +606,28 @@ SUBROUTINE da_setup_obs_structures_bufr( xp, ob, iv )
          CASE DEFAULT ;
             platform  % info % platform ='FM-999 UNKNO'
 
-            write(unit=*, fmt='(/a, i8, 4x, a, e20.12/)') &
+            write(unit=stdout, fmt='(/a, i8, 4x, a, e20.12/)') &
                  'Unkown kx=', kx, 'Unhandled hdr(5)=', hdr(5)
-            write(unit=*, fmt='(3a, i8)') &
+            write(unit=stdout, fmt='(3a, i8)') &
                  'file:', __FILE__, ', line:', __LINE__
-            write(unit=*, fmt='(2(2x,a))') &
+            write(unit=stdout, fmt='(2(2x,a))') &
                  'subset:', trim(subset)
-            write(unit=*, fmt='(2(2x,a))') &
+            write(unit=stdout, fmt='(2(2x,a))') &
                  'hdstr:', trim(hdstr)
-            write(unit=*, fmt='(2(2x,a))') &
+            write(unit=stdout, fmt='(2(2x,a))') &
                  'obstr:', trim(obstr)
-            write(unit=*, fmt='(2x,a,i12))') &
+            write(unit=stdout, fmt='(2x,a,i12))') &
                  'idate:', idate
-            write(unit=*, fmt='(2x,a,2f8.2/2(2x,a,f9.2)/2x,a,i4/)') &
+            write(unit=stdout, fmt='(2x,a,2f8.2/2(2x,a,f9.2)/2x,a,i4/)') &
                'Loc(lat, lon): ', platform%info%lat, platform%info%lon, &
                'elv:  ', platform%info%elv, &
                'pstar:', platform%info%pstar, &
                'levx: ', levs
 
             do k = 1, levs
-               write(unit=*, fmt='(2x,a,i4)') 'lev:', k
+               write(unit=stdout, fmt='(2x,a,i4)') 'lev:', k
 
-               write(unit=*, fmt='(2x,a,e20.12)') &
+               write(unit=stdout, fmt='(2x,a,e20.12)') &
                     'p obs(1,k)=', obs(1,k), &
                     'q obs(2,k)=', obs(2,k), &
                     't obs(3,k)=', obs(3,k), &
@@ -639,9 +637,9 @@ SUBROUTINE da_setup_obs_structures_bufr( xp, ob, iv )
                     'p obs(7,k)=', obs(7,k), &
                     'c obs(8,k)=', obs(8,k)
 
-               write(unit=*, fmt='(/)')
+               write(unit=stdout, fmt='(/)')
 
-               write(unit=*, fmt='(2x,a,i12)') &
+               write(unit=stdout, fmt='(2x,a,i12)') &
                     'p qms(1,k)=', nint(qms(1,k),8), &
                     'q qms(2,k)=', nint(qms(2,k),8), &
                     't qms(3,k)=', nint(qms(3,k),8), &
@@ -662,7 +660,7 @@ SUBROUTINE da_setup_obs_structures_bufr( xp, ob, iv )
    close(bufr_iunit)
 !-----------------------------------------------------------------------
 
-   write(6,*) 'READ_BUFR:  number of bufr data records read  =',nmrecs
+   write(UNIT=stdout,FMT=*) 'READ_BUFR:  number of bufr data records read  =',nmrecs
 
    if(iv%num_sound > nso) &
       iv%sound(nso+1:iv%num_sound)%info%levels=0
@@ -680,14 +678,14 @@ SUBROUTINE da_setup_obs_structures_bufr( xp, ob, iv )
    iv%num_polaramv=nst
 
 
-   write(6,*)'obs no with bufr=',nsy,nso,nsh,nar,nst,nme
+   write(UNIT=stdout,FMT=*)'obs no with bufr=',nsy,nso,nsh,nar,nst,nme
 
 !  PRINT OUT
 !  =============
 
-   write(unit=*, fmt='(a)')  ' '
+   write(unit=stdout, fmt='(a)')  ' '
 
-   write(unit=*, fmt='(5x,a,i6,a)') &
+   write(unit=stdout, fmt='(5x,a,i6,a)') &
         'Read:  ', iv % num_sound, ' SOUND reports,', &
         'Read:  ', iv % num_synop, ' SYNOP reports,', &
         'Read:  ', iv % num_pilot, ' PILOT reports,', &

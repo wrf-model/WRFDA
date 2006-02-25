@@ -39,7 +39,10 @@ SUBROUTINE hase3j(a, nhalo,                                                 &
 !----------------------------------------------------------------------------
   INTEGER                   :: i,k,j
 !============================================================================
-IF(nhalo > jts-jms)STOP 'In hase3j; nhalo wider than memory dimension allows'
+IF(nhalo > jts-jms) THEN
+  CALL wrf_error_fatal3(__FILE__,__LINE__, &
+    "nhalo wider than memory dimension allows")
+END IF
 DO j=1,nhalo
 DO k=kts,kte
 DO i=its,ite
@@ -65,7 +68,11 @@ SUBROUTINE haes3j(a, nhalo,                                                 &
 !----------------------------------------------------------------------------
   INTEGER                   :: i,k,j
 !============================================================================
-IF(nhalo > jme-jte)STOP 'In haes3j; nhalo wider than memory dimension allows'
+IF(nhalo > jme-jte) THEN
+  CALL wrf_error_fatal3(__FILE__,__LINE__, &
+    "nhalo wider than memory dimension allows")
+END IF
+
 DO j=1,nhalo
 DO k=kts,kte
 DO i=its,ite
@@ -98,7 +105,11 @@ SUBROUTINE hass3j(a, wext,                                                  &
 !============================================================================
 nhalo=SIZE(wext,1)
 mhalo=SIZE(wext,2)
-IF(nhalo > jts-jms)STOP 'In hass3j; nhalo wider than memory dimension allows'
+IF(nhalo > jts-jms) THEN
+  CALL wrf_error_fatal3(__FILE__,__LINE__, &
+    "nhalo wider than memory dimension allows")
+END IF
+
 DO jn=1,nhalo
    DO k=kts,kte
    DO i=its,ite
@@ -174,7 +185,11 @@ SUBROUTINE haee3j(a, wext,                                                  &
 !============================================================================
 nhalo=SIZE(wext,1)
 mhalo=SIZE(wext,2)
-IF(nhalo > jme-jte)STOP 'In haee3j; nhalo wider than memory dimension allows'
+IF(nhalo > jme-jte) THEN
+  CALL wrf_error_fatal3(__FILE__,__LINE__, &
+    "nhalo wider than memory dimension allows")
+END IF
+
 DO jn=1,nhalo
    DO k=kts,kte
    DO i=its,ite
@@ -248,7 +263,11 @@ SUBROUTINE hasp3j(a,p,                                                      &
   INTEGER                   :: nhalo
 !============================================================================
 nhalo=SIZE(p,3)
-IF(nhalo > jts-jms)STOP 'In hasp3j; nhalo wider than memory dimension allows'
+IF(nhalo > jts-jms) THEN
+  CALL wrf_error_fatal3(__FILE__,__LINE__, &
+    "nhalo wider than memory dimension allows")
+END IF
+
 DO j=1,nhalo
 DO k=kts,kte
 DO i=its,ite
@@ -276,7 +295,11 @@ SUBROUTINE ha11sp3j(a,p,lq1,kq1,                                            &
 !----------------------------------------------------------------------------
   INTEGER                   :: i,k
 !============================================================================
-IF(1 > jts-jms)STOP 'In ha11sp3j; nhalo wider than memory dimension allows'
+IF(1 > jts-jms) THEN
+  CALL wrf_error_fatal3(__FILE__,__LINE__, &
+    "nhalo wider than memory dimension allows")
+END IF
+
 DO k=kts,kte
 DO i=its,ite
    a(i,k,jts-1)=p(i,k,1    )
@@ -304,7 +327,11 @@ SUBROUTINE ha12sp3j(a,p,lq1,kq1,kq2,                                        &
 !----------------------------------------------------------------------------
   INTEGER                   :: i,k
 !============================================================================
-IF(1 > jts-jms)STOP 'In ha12sp3j; nhalo wider than memory dimension allows'
+IF(1 > jts-jms) THEN
+  CALL wrf_error_fatal3(__FILE__,__LINE__, &
+    "nhalo wider than memory dimension allows")
+END IF
+
 DO k=kts,kte
 DO i=its,ite
    a(i,k,jts-1)=p(i,k,1    )
@@ -334,7 +361,11 @@ SUBROUTINE ha21sp3j(a,p,lq1,lq2,kq1,                                        &
 !----------------------------------------------------------------------------
   INTEGER                   :: i,k
 !============================================================================
-IF(2 > jts-jms)STOP 'In ha21sp3j; nhalo wider than memory dimension allows'
+IF(2 > jts-jms) THEN
+  CALL wrf_error_fatal3(__FILE__,__LINE__, &
+    "nhalo wider than memory dimension allows")
+END IF
+
 DO k=kts,kte
 DO i=its,ite
    a(i,k,jts-2)=p(i,k,2    )+kq1*p(i,k,1)
@@ -363,7 +394,11 @@ SUBROUTINE ha22sp3j(a,p,lq1,lq2,kq1,kq2,                                    &
 !----------------------------------------------------------------------------
   INTEGER                   :: i,k
 !============================================================================
-IF(2 > jts-jms)STOP 'In ha22sp3j; nhalo wider than memory dimension allows'
+IF(2 > jts-jms) THEN
+  CALL wrf_error_fatal3(__FILE__,__LINE__, &
+    "nhalo wider than memory dimension allows")
+END IF
+
 DO k=kts,kte
 DO i=its,ite
    a(i,k,jts-2)=p(i,k,2    )+kq1*p(i,k,1)
@@ -396,7 +431,11 @@ SUBROUTINE haep3j(a,p,                                                      &
   INTEGER                   :: nhalo
 !============================================================================
 nhalo=SIZE(p,3)
-IF(nhalo > jme-jte)STOP 'In haep3j; nhalo wider than memory dimension allows'
+IF(nhalo > jme-jte) THEN
+  CALL wrf_error_fatal3(__FILE__,__LINE__, &
+    "nhalo wider than memory dimension allows")
+END IF
+
 DO j=1,nhalo
 DO k=kts,kte
 DO i=its,ite
@@ -424,7 +463,11 @@ SUBROUTINE ha11ep3j(a,p,lq1,kq1,                                            &
 !----------------------------------------------------------------------------
   INTEGER                   :: i,k
 !============================================================================
-IF(1 > jme-jte)STOP 'In ha11ep3j; nhalo wider than memory dimension allows'
+IF(1 > jme-jte) THEN
+  CALL wrf_error_fatal3(__FILE__,__LINE__, &
+    "nhalo wider than memory dimension allows")
+END IF
+
 DO k=kts,kte
 DO i=its,ite
    a(i,k,jte+1)=p(i,k,1    )
@@ -452,7 +495,11 @@ SUBROUTINE ha12ep3j(a,p,lq1,kq1,kq2,                                        &
 !----------------------------------------------------------------------------
   INTEGER                   :: i,k
 !============================================================================
-IF(1 > jme-jte)STOP 'In ha12ep3j; nhalo wider than memory dimension allows'
+IF(1 > jme-jte) THEN
+  CALL wrf_error_fatal3(__FILE__,__LINE__, &
+    "nhalo wider than memory dimension allows")
+END IF
+
 DO k=kts,kte
 DO i=its,ite
    a(i,k,jte+1)=p(i,k,1    )
@@ -482,7 +529,11 @@ SUBROUTINE ha21ep3j(a,p,lq1,lq2,kq1,                                        &
 !----------------------------------------------------------------------------
   INTEGER                   :: i,k
 !============================================================================
-IF(2 > jme-jte)STOP 'In ha21ep3j; nhalo wider than memory dimension allows'
+IF(2 > jme-jte) THEN
+  CALL wrf_error_fatal3(__FILE__,__LINE__, &
+    "nhalo wider than memory dimension allows")
+END IF
+
 DO k=kts,kte
 DO i=its,ite
    a(i,k,jte+2)=p(i,k,    2)+kq1*p(i,k,1)
@@ -511,7 +562,11 @@ SUBROUTINE ha22ep3j(a,p,lq1,lq2,kq1,kq2,                                    &
 !----------------------------------------------------------------------------
   INTEGER                   :: i,k
 !============================================================================
-IF(2 > jme-jte)STOP 'In ha22ep3j; nhalo wider than memory dimension allows'
+IF(2 > jme-jte) THEN
+  CALL wrf_error_fatal3(__FILE__,__LINE__, &
+    "nhalo wider than memory dimension allows")
+END IF
+
 DO k=kts,kte
 DO i=its,ite
    a(i,k,jte+2)=p(i,k,  2)+kq1*p(i,k,1)
@@ -541,7 +596,11 @@ SUBROUTINE hasz3j(a,  nhalo,                                                &
 !----------------------------------------------------------------------------
   INTEGER                   :: i,k,j
 !============================================================================
-IF(nhalo > jts-jms)STOP 'In hasz3j; nhalo wider than memory dimension allows'
+IF(nhalo > jts-jms) THEN
+  CALL wrf_error_fatal3(__FILE__,__LINE__, &
+    "nhalo wider than memory dimension allows")
+END IF
+
 DO j=1,nhalo
 DO k=kts,kte
 DO i=its,ite
@@ -567,7 +626,11 @@ SUBROUTINE haez3j(a,  nhalo,                                                &
 !----------------------------------------------------------------------------
   INTEGER                   :: i,k,j
 !============================================================================
-IF(nhalo > jme-jte)STOP 'In haez3j; nhalo wider than memory dimension allows'
+IF(nhalo > jme-jte) THEN
+  CALL wrf_error_fatal3(__FILE__,__LINE__, &
+    "nhalo wider than memory dimension allows")
+END IF
+
 DO j=1,nhalo
 DO k=kts,kte
 DO i=its,ite
