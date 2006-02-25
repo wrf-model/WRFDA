@@ -45,8 +45,8 @@ if( $compare_wrf != 1 ) then
   echo "Type <compile be> to compile gen_be stage 1 - 4"
   echo "Type <compile be_wrf> to compile gen_be stage 0 - 4"
   echo "Type <compile pure_be_wrf> to compile gen_be stage 0 - 4 only (assume WRF frame has compiled)"
-  echo "Type <compile k2n> to compile convetor for converting KMA data to NetCDF data format"
-  echo "Type <compile n2k> to compile convetor for converting NetCDF data to KMA data format"
+  echo "Type <compile k2n> to compile convertor for converting KMA data to NetCDF data format"
+  echo "Type <compile n2k> to compile convertor for converting NetCDF data to KMA data format"
 
   exit 2
 endif

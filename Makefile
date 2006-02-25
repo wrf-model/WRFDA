@@ -13,7 +13,10 @@ EM_MODULES =  $(EM_MODULE_DIR)
 DA_3DVAR_MODULES = $(INCLUDE_MODULES)
 DA_3DVAR_MODULES_2 = $(INC_MOD_3DVAR)
 
-DA_CONVERTOR_MOD_DIR = -I../convertor -p../convertor
+#JRB -p../convertor is not a valid option on Linux or Aix, I wonder
+# what it was for?
+#DA_CONVERTOR_MOD_DIR = -I../convertor -p../convertor
+DA_CONVERTOR_MOD_DIR = -I../convertor
 DA_CONVERTOR_MODULES = $(DA_CONVERTOR_MOD_DIR) $(INCLUDE_MODULES)
 
 #### 3.d.   add macros to specify the modules for this core
