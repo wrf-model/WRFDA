@@ -161,6 +161,11 @@ MODULE DA_Constants
    INTEGER, PARAMETER :: be_cv_4_unit = 34    ! Unit number for be input. 
    INTEGER, PARAMETER :: be_cv_5_unit = 35    ! Unit number for be input.
 
+   INTEGER, PARAMETER :: sound_diag_unit1 = 36 ! For da_sound/da_obs_diagnostics
+   INTEGER, PARAMETER :: sound_diag_unit2 = 37
+   INTEGER, PARAMETER :: sound_diag_unit3 = 38
+   INTEGER, PARAMETER :: sound_diag_unit4 = 39
+
    INTEGER, PARAMETER :: terrain_unit = 40    ! Unit number for terrain input.
    INTEGER, PARAMETER :: jpin = 41            ! Unit number for xb input.
 
