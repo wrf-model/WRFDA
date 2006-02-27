@@ -1,49 +1,49 @@
 MODULE DA_Sound
 
-   USE DA_Constants
-   USE DA_Define_Structures
-   USE DA_Interpolation
-   USE DA_Statistics
-   USE DA_Tools
-   USE DA_Physics
-   USE PAR_UTIL
+  USE DA_Constants
+  USE DA_Define_Structures
+  USE DA_Interpolation
+  USE DA_Statistics
+  USE DA_Tools
+  USE DA_Physics
+  USE PAR_UTIL
 
-! The "stats_sound_type" is ONLY used locally in DA_Sound:
+  ! The "stats_sound_type" is ONLY used locally in DA_Sound:
 
-   TYPE residual_sound1_type
-      REAL          :: u                        ! u-wind.
-      REAL          :: v                        ! v-wind.
-      REAL          :: t                        ! temperature
-      REAL          :: q                        ! specific humidity
-   END TYPE residual_sound1_type
+  TYPE residual_sound1_type
+    REAL          :: u                        ! u-wind.
+    REAL          :: v                        ! v-wind.
+    REAL          :: t                        ! temperature
+    REAL          :: q                        ! specific humidity
+  END TYPE residual_sound1_type
 
-   TYPE maxmin_sound_stats_type
-        TYPE (maxmin_type)         :: u, v, t, q
-   END TYPE maxmin_sound_stats_type
+  TYPE maxmin_sound_stats_type
+    TYPE (maxmin_type)         :: u, v, t, q
+  END TYPE maxmin_sound_stats_type
 
-   TYPE stats_sound_type
-        TYPE (maxmin_sound_stats_type)  :: maximum, minimum
-        TYPE (residual_sound1_type)     :: average, rms_err
-   END TYPE stats_sound_type
+  TYPE stats_sound_type
+    TYPE (maxmin_sound_stats_type)  :: maximum, minimum
+    TYPE (residual_sound1_type)     :: average, rms_err
+  END TYPE stats_sound_type
 
-! The "stats_sonde_sfc_type" is ONLY used locally in DA_Sonde_Sfc:
+  ! The "stats_sonde_sfc_type" is ONLY used locally in DA_Sonde_Sfc:
 
-   TYPE residual_sonde_sfc1_type
-      REAL          :: u                        ! u-wind.
-      REAL          :: v                        ! v-wind.
-      REAL          :: t                        ! temperature
-      REAL          :: p                        ! pressure
-      REAL          :: q                        ! specific humidity
-   END TYPE residual_sonde_sfc1_type
+  TYPE residual_sonde_sfc1_type
+    REAL          :: u                        ! u-wind.
+    REAL          :: v                        ! v-wind.
+    REAL          :: t                        ! temperature
+    REAL          :: p                        ! pressure
+    REAL          :: q                        ! specific humidity
+  END TYPE residual_sonde_sfc1_type
 
-   TYPE maxmin_sonde_sfc_stats_type
-        TYPE (maxmin_type)         :: u, v, t, p, q
-   END TYPE maxmin_sonde_sfc_stats_type
+  TYPE maxmin_sonde_sfc_stats_type
+    TYPE (maxmin_type)         :: u, v, t, p, q
+  END TYPE maxmin_sonde_sfc_stats_type
 
-   TYPE stats_sonde_sfc_type
-        TYPE (maxmin_sonde_sfc_stats_type)  :: maximum, minimum
-        TYPE (residual_sonde_sfc1_type)     :: average, rms_err
-   END TYPE stats_sonde_sfc_type
+  TYPE stats_sonde_sfc_type
+    TYPE (maxmin_sonde_sfc_stats_type)  :: maximum, minimum
+    TYPE (residual_sonde_sfc1_type)     :: average, rms_err
+  END TYPE stats_sonde_sfc_type
 
 #if ( DWORDSIZE != RWORDSIZE )
 #define TRUE_MPI_REAL     MPI_REAL
