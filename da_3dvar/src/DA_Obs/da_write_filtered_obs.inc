@@ -1139,6 +1139,10 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xp )
     if(print_detail > 1) print*,' writing filtered Obs for gpspw ', iv % num_gpspw 
 !----------------------------------------------------------------------------!
    DO i = 1, iv % num_gpspw
+
+! hardwired the # of levels = 0 for GPSPW (YRG 03/02/2006)
+     iv%gpspw(i)%info%levels = 0
+
      write(ounit, FMT = fmt_info, IOSTAT = iost) &
                    iv%gpspw(i)%info%platform,    &
                    iv%gpspw(i)%info%date_char,   &
