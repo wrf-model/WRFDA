@@ -89,13 +89,14 @@ SUBROUTINE da_get_innov_vector_sonde_sfc ( it, xb, xp, ob, iv )
 
             hd = v_h(xp%kts) - iv % sonde_sfc(n) % h
 
-            if (abs(hd) <= Max_StHeight_Diff) THEN
+            if ( (abs(hd) <= Max_StHeight_Diff) .or. &
+                 (ANALYSIS_TYPE == 'VERIFY' .or. ANALYSIS_TYPE == 'verify') ) THEN
 
                if(iv % sonde_sfc(n) % h < v_h(xp%kts)) then
 
                   iv%sonde_sfc(n)%zk = 1.0+1.0e-6
 
-                  CALL DA_Obs_Sfc_correction(iv%sonde_sfc(n), xb)
+                  CALL DA_Obs_Sfc_correction(iv%sonde_sfc(n), xb, sfc_assi_options)
 
 ! To keep the original "ob" with no change for multiple outer-loops use:
 
@@ -118,7 +119,8 @@ SUBROUTINE da_get_innov_vector_sonde_sfc ( it, xb, xp, ob, iv )
 
             call to_zk(ob % sonde_sfc(n) % p, v_p, xp, v_interp_p, iv%sonde_sfc(n)%zk)
 
-            if(iv%sonde_sfc(n)%zk < 0.0) then
+            if(iv%sonde_sfc(n)%zk < 0.0 .and. &
+              (ANALYSIS_TYPE /= 'VERIFY' .and. ANALYSIS_TYPE /= 'verify') ) then
                iv % sonde_sfc(n) % p % inv = missing_r
                iv % sonde_sfc(n) % p % qc  = missing
  
@@ -130,7 +132,8 @@ SUBROUTINE da_get_innov_vector_sonde_sfc ( it, xb, xp, ob, iv )
 !        [2.0] Initialise components of innovation vector:
 !------------------------------------------------------------------------
 
-         if(iv%sonde_sfc(n)%zk < 0.0) then
+          if(iv%sonde_sfc(n)%zk < 0.0 .and. &
+           (ANALYSIS_TYPE /= 'VERIFY' .and. ANALYSIS_TYPE /= 'verify') ) then
             iv % sonde_sfc(n) % u % qc = missing
             iv % sonde_sfc(n) % v % qc = missing
             iv % sonde_sfc(n) % t % qc = missing
@@ -167,6 +170,10 @@ SUBROUTINE da_get_innov_vector_sonde_sfc ( it, xb, xp, ob, iv )
 !------- Surface data assimilation approca 2
 !-------------------------------------------
 
+! Retrieve the surface pressure from the Sea Level Pressure (SLP) first:
+         CALL DA_Obs_Sfc_correction(iv%sonde_sfc(n), xb, sfc_assi_options)
+         ob%sonde_sfc(n)%p = iv%sonde_sfc(n)%p%inv         
+
 !------- 1.2.1 Surface assimilation approach 2 (10-m u, v, 2-m t, q, and sfc_p)
 
          call Interp_lin_2D( xb % u10, xp%ims, xp%ime, xp%jms, xp%jme, &
@@ -184,6 +191,9 @@ SUBROUTINE da_get_innov_vector_sonde_sfc ( it, xb, xp, ob, iv )
          call Interp_lin_2D( xb % psfc, xp%ims, xp%ime, xp%jms, xp%jme, &
                              i, j, dx, dy, dxm, dym, &
                              model_p )
+
+! No height, no sfc pressure calculation (YRG 02/16/2006):
+         if (iv%sonde_sfc(n)%h == missing_r ) iv%sonde_sfc(n)%p%qc = missing
 
          if (iv%sonde_sfc(n)%p%qc >= 0) then
 

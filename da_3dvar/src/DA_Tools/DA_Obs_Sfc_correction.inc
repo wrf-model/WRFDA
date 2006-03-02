@@ -1,4 +1,4 @@
-SUBROUTINE DA_Obs_Sfc_correction(sfc_obs, xb )
+SUBROUTINE DA_Obs_Sfc_correction(sfc_obs, xb, sfc_assi_options)
 
 !--------------------------------------------------------------------!
 ! This subroutine is used to correct the surface measurements (wind, !
@@ -19,6 +19,7 @@ SUBROUTINE DA_Obs_Sfc_correction(sfc_obs, xb )
 
    TYPE(synop_type),       intent(inout) :: sfc_obs
    TYPE(xb_type),          intent(in)    :: xb
+   integer,                intent(in)    :: sfc_assi_options
 
    REAL                                  :: roughness, psfc, &
                                             mslp, dx, dxm, dy, dym,    &
@@ -107,6 +108,9 @@ SUBROUTINE DA_Obs_Sfc_correction(sfc_obs, xb )
       if(sfc_obs % p % inv < 1.0) then
          sfc_obs % p % qc  = missing
       endif
+
+! If sfc_assi_options = 2, no further actions taken (Guo 03/01/2006):
+      if (sfc_assi_options == 2) return
 
       po = sfc_obs % p % inv
 

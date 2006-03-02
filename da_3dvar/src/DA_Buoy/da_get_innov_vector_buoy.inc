@@ -94,7 +94,7 @@ SUBROUTINE da_get_innov_vector_buoy ( it, xb, xp, ob, iv )
 
                   iv%buoy(n)%zk = 1.0+1.0e-6
 
-                  CALL DA_Obs_Sfc_correction(iv%buoy(n), xb)
+                  CALL DA_Obs_Sfc_correction(iv%buoy(n), xb, sfc_assi_options)
 
 ! To keep the original "ob" with no change for multiple outer-loops use:
 
@@ -167,6 +167,10 @@ SUBROUTINE da_get_innov_vector_buoy ( it, xb, xp, ob, iv )
 
 !------- Surface data assimilation approca 2
 !-------------------------------------------
+
+! Retrieve the surface pressure from the Sea Level Pressure (SLP) first:
+         CALL DA_Obs_Sfc_correction(iv%buoy(n), xb, sfc_assi_options)
+         ob%buoy(n)%p = iv%buoy(n)%p%inv
 
 !------- 1.2.1 Surface assimilation approach 2 (10-m u, v, 2-m t, q, and sfc_p)
 
