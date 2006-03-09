@@ -548,17 +548,17 @@ DA_Sound.o:		\
 			DA_Sound/da_check_max_iv_sound.inc \
 			DA_Sound/da_get_innov_vector_sound.inc \
 			DA_Sound/da_obs_diagnostics.inc	\
-			DA_Sound/DA_Sonde_sfc/DA_AO_Stats_Sonde_sfc.inc \
-			DA_Sound/DA_Sonde_sfc/DA_Get_Jo_and_GradY_Sonde_sfc.inc \
-			DA_Sound/DA_Sonde_sfc/compute_jo_sonde_sfc_uvtq.inc \
-			DA_Sound/DA_Sonde_sfc/DA_Calculate_Residual_Sonde_sfc.inc \
-			DA_Sound/DA_Sonde_sfc/DA_OI_Stats_Sonde_sfc.inc \
-			DA_Sound/DA_Sonde_sfc/DA_Print_Stats_Sonde_sfc.inc \
-			DA_Sound/DA_Sonde_sfc/DA_Transform_XToY_Sonde_sfc.inc \
-			DA_Sound/DA_Sonde_sfc/DA_Transform_XToY_Sonde_sfc_Adj.inc \
-			DA_Sound/DA_Sonde_sfc/da_get_innov_vector_sonde_sfc.inc \
-			DA_Sound/DA_Sonde_sfc/da_check_max_iv_sonde_sfc.inc \
-			DA_Sound/DA_Sonde_sfc/DA_Calculate_GradY_Sonde_sfc.inc \
+			DA_Sound/DA_AO_Stats_Sonde_sfc.inc \
+			DA_Sound/DA_Get_Jo_and_GradY_Sonde_sfc.inc \
+			DA_Sound/compute_jo_sonde_sfc_uvtq.inc \
+			DA_Sound/DA_Calculate_Residual_Sonde_sfc.inc \
+			DA_Sound/DA_OI_Stats_Sonde_sfc.inc \
+			DA_Sound/DA_Print_Stats_Sonde_sfc.inc \
+			DA_Sound/DA_Transform_XToY_Sonde_sfc.inc \
+			DA_Sound/DA_Transform_XToY_Sonde_sfc_Adj.inc \
+			DA_Sound/da_get_innov_vector_sonde_sfc.inc \
+			DA_Sound/da_check_max_iv_sonde_sfc.inc \
+			DA_Sound/DA_Calculate_GradY_Sonde_sfc.inc \
 			DA_Sound/DA_Sound.F
 			$(RM) $@
 			$(CPP) -I./DA_Sound $(CPPFLAGS_3DVAR) DA_Sound/DA_Sound.F > DA_Sound.f
