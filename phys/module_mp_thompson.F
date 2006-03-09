@@ -158,7 +158,8 @@ CONTAINS
    rhoe_s=1.29
 !
    IF (  .NOT. flag_qi .OR. .NOT. flag_qs ) THEN
-      CALL wrf_error_fatal ( 'module_mp_thompson: Improper use of thompson scheme; no ice phase. Please chose another one.')
+      CALL wrf_error_fatal ( &
+        'Improper use of thompson scheme; no ice phase. Please chose another one.')
    ENDIF
 
    gindex=1.0
@@ -449,7 +450,7 @@ CONTAINS
                                      FALOUTG, SLOG, SLOG2, PGFR, PICNG, PGIACW, PGEMB, GONV
 ! ARRAYS FOR NCI                                                             
                                                                               
-  REAL,  DIMENSION( kts:kte )   ::  NI_RS, NI_AG, NI_CG, NI_DE, NI_EV, SCR4N, FALOUTN                                                                                
+  REAL,  DIMENSION( kts:kte )   ::  NI_RS, NI_AG, NI_CG, NI_DE, NI_EV, SCR4N, FALOUTN
 ! EXTRA ARRAYS                                                                  
                                                                             
   REAL,  DIMENSION( kts:kte )   ::  DUM11, DUM21, DUM31, SCR4, SCR8, RHOFAC, rkz,  &

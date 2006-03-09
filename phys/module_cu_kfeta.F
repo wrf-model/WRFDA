@@ -2051,7 +2051,8 @@ iter:     DO NCOUNT=1,10
 !    *               U0(K),V0(K),DP(K)/100.,W0AVG(I,J,K)
  310        CONTINUE
             IF(ISTOP.EQ.1)THEN
-              CALL wrf_error_fatal ( 'KAIN-FRITSCH, istop=1, diags' )
+              CALL wrf_error_fatal (&
+                'KAIN-FRITSCH, istop=1, diags' )
             ENDIF
 !         ENDIF
   4455  format(8f11.3) 
@@ -2188,7 +2189,8 @@ iter:     DO NCOUNT=1,10
             ENDIF
           ELSE
 !              PRINT *,'THIS COMBINATION OF IMOIST, IEXICE, IICE NOT ALLOWED!'
-              CALL wrf_error_fatal ( 'KAIN-FRITSCH, THIS COMBINATION OF IMOIST, IEXICE, IICE NOT ALLOWED' )
+              CALL wrf_error_fatal ( &
+                'KAIN-FRITSCH, THIS COMBINATION OF IMOIST, IEXICE, IICE NOT ALLOWED' )
           ENDIF
           DTDT(K)=(TG(K)-T0(K))/TIMEC
           DQDT(K)=(QG(K)-Q0(K))/TIMEC

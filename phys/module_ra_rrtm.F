@@ -6584,7 +6584,8 @@ USE module_dm
       ENDIF
       CALL wrf_dm_bcast_bytes ( rrtm_unit , IWORDSIZE )
       IF ( rrtm_unit < 0 ) THEN
-        CALL wrf_error_fatal ( 'module_ra_rrtm: rrtm_lookuptable: Can not find unused fortran unit to read in lookup table.' )
+        CALL wrf_error_fatal ( &
+          'rrtm_lookuptable: Can not find unused fortran unit to read in lookup table.' )
       ENDIF
 
 ! start data 1

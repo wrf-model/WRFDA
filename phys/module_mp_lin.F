@@ -146,7 +146,8 @@ CONTAINS
    rhoe_s=1.29
 !
    IF ( .NOT. flag_qi .OR. .NOT. flag_qs ) THEN
-      CALL wrf_error_fatal ( 'module_mp_lin: Improper use of Lin et al scheme; no ice phase. Please chose another one.')
+      CALL wrf_error_fatal ( &
+        'module_mp_lin: Improper use of Lin et al scheme; no ice phase. Please chose another one.')
    ENDIF
 
    gindex=1.0
