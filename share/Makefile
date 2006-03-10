@@ -12,7 +12,6 @@ MODULES =                       \
 	module_get_file_names.o	\
 	module_io_domain.o	\
 	module_model_constants.o \
-	module_MPP.o \
 	module_optional_si_input.o	\
 	module_compute_geop.o           \
 	module_soil_pre.o
