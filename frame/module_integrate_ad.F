@@ -15,6 +15,7 @@ RECURSIVE SUBROUTINE integrate_ad ( grid, nl_date_string, nl_date_index, ad_date
    USE module_configure
    USE module_timing
    USE WRF_ESMF_MOD
+   USE JRB_Stubs
 
    IMPLICIT NONE
 
@@ -301,8 +302,8 @@ RECURSIVE SUBROUTINE integrate_ad ( grid, nl_date_string, nl_date_index, ad_date
       endif
 !-----end check adjoint input
 
-      CALL ESMF_TimeIntervalPrint(grid%domain_clock%TimeStep, 'DEBUG:  integrate_ad.', rc)
-      CALL print_a_timeinterval(grid%domain_clock%TimeStep)
+!JRB      CALL ESMF_TimeIntervalPrint(grid%domain_clock%TimeStep, 'DEBUG:  integrate_ad.', rc)
+!JRB      CALL print_a_timeinterval(grid%domain_clock%TimeStep)
       DO WHILE ( grid%current_time .GT. grid%start_subtime )
          IF ( wrf_dm_on_monitor() ) THEN
            CALL start_timing

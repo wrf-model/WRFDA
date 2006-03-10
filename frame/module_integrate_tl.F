@@ -258,8 +258,9 @@ RECURSIVE SUBROUTINE integrate_tl ( grid, nl_date_string, nl_date_index )
       CALL wrf_clockprint ( 150, grid%domain_clock, &
                             'DEBUG:  top of integrate_tl(),' )
 
-      CALL ESMF_TimeIntervalPrint(grid%domain_clock%TimeStep, 'DEBUG:  integrate_tl.', rc)
-      CALL print_a_timeinterval(grid%domain_clock%TimeStep)
+!JRB
+!      CALL ESMF_TimeIntervalPrint(grid%domain_clock%TimeStep, 'DEBUG:  integrate_tl.', rc)
+!      CALL print_a_timeinterval(grid%domain_clock%TimeStep)
 
       DO WHILE ( grid%current_time .LT. grid%stop_subtime )
          IF ( wrf_dm_on_monitor() ) THEN
