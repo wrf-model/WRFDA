@@ -18,7 +18,7 @@ done
 
 # Tidy up bogus links
 
-rm -f '*.F90 *.F *.inc *.f *.c *.h *.m4 *.code *.int'
+rm -f '*.F90 *.F *.f *.inc *.int *.c *.h *make *.m4 *.code *.sed'
 
 ln -s ../da_3dvar/src/da_bufrlib/bufrlib.PRM .
 ln -s ../arch/*.sed .

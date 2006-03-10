@@ -22,7 +22,7 @@ FRAME_OBJS    =       wrf_num_bytes_between.o    \
                 collect_on_comm.o
 
 #compile as a .o but do not link into the main library
-SPECIAL =       module_internal_header_util.o pack_utils.o
+FRAME_SPECIAL_OBJS =       module_internal_header_util.o pack_utils.o
    
 wrf_num_bytes_between.o :
 	$(CC) -c $(CFLAGS) wrf_num_bytes_between.c
@@ -87,7 +87,8 @@ module_io.o : md_calls.inc \
 
 module_io_quilt.o: module_state_description.o \
 		module_internal_header_util.o \
-		module_quilt_outbuf_ops.o 
+		module_quilt_outbuf_ops.o \
+                pack_utils.o
 
 module_machine.o: module_driver_constants.o
 

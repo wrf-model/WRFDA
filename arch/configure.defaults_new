@@ -142,7 +142,7 @@ LOCAL_LIBRARIES =       -L/usr/local/ncarg/lib -L/usr/X11R6/lib -L/usr/local/lib
 			-lncarg -lncarg_gks -lncarg_c -lX11
 
 CPPFLAGS_BUFR   =       -C -P $(TRADFLAG) -DLINUX -Dlinux
-CFLAGS_BUFR    =       -DUNDERSCORE
+CFLAGS_BUFR     =       -DUNDERSCORE
 POUND_DEF       =       -DLINUX -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
 			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 
@@ -186,12 +186,12 @@ LOCAL_LIBRARIES =       -L/usr/local/ncarg/lib -L/usr/X12R6/lib -L/usr/local/lib
                         -lncarg -lncarg_gks -lncarg_c -lX11 
 
 CPPFLAGS_BUFR   =       -C -P $(TRADFLAG) -DLINUX -Dlinux
-CFLAGS_BUFR    =       -DUNDERSCORE
+CFLAGS_BUFR     =       -DUNDERSCORE
 POUND_DEF       =       -DLINUX -DNO_RRTM_PHYSICS  \
 			-DNONSTANDARD_SYSTEM -DF90_STANDALONE \
 			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 
-arch : module_dm_stubs.F
+arch : $(RSL_PATH)/module_dm.F $(RSL_PATH)/gen_comms.c
 	$(LN) $(RSL_PATH)/module_dm.F .
 	$(LN) $(RSL_PATH)/gen_comms.c .
 	( cd $(RSL_PATH)/RSL ; make CC="$(CC)" FC="$(FC) -byteswapio" MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) LEARN_BCAST=-DLEARN_BCAST linux )
@@ -221,7 +221,7 @@ LOCAL_LIBRARIES =       -L/usr/local/ncarg/lib -L/usr/X11R6/lib -L/usr/local/lib
 			-lncarg -lncarg_gks -lncarg_c -lX11
 
 CPPFLAGS_BUFR   =       -C -P $(TRADFLAG) -DLINUX -Dlinux
-CFLAGS_BUFR    =       -DUNDERSCORE
+CFLAGS_BUFR     =       -DUNDERSCORE
 
 POUND_DEF       =       -DNO_RRTM_PHYSICS -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
 			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
@@ -255,7 +255,7 @@ LOCAL_LIBRARIES =       -L/usr/local/ncarg/lib -L/usr/X11R6/lib -L/usr/local/lib
 			-lncarg -lncarg_gks -lncarg_c -lX11
 
 CPPFLAGS_BUFR   =       -C -P  $(TRADFLAG) -DLINUX -Dlinux
-CFLAGS_BUFR    =       -DUNDERSCORE
+CFLAGS_BUFR     =       -DUNDERSCORE
 POUND_DEF       =       -DLINUX -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
 			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 
@@ -342,7 +342,7 @@ POUND_DEF       =       -DIRIX \
 RANLIB          =       echo
 M4              =       m4 -B12000
 
-arch :
+arch : $(RSL_PATH)/module_dm.F $(RSL_PATH)/gen_comms.c
 	$(LN) $(RSL_PATH)/module_dm.F .
 	$(LN) $(RSL_PATH)/gen_comms.c .
 	( cd $(RSL_PATH)/RSL ; \
@@ -465,7 +465,7 @@ POUND_DEF       =       -DAIX \
 			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 M4              =       m4 -B12000
 
-arch : module_dm_stubs.F
+arch : $(RSL_PATH)/module_dm.F $(RSL_PATH)/gen_comms.c
 	$(LN) $(RSL_PATH)/module_dm.F .
 	$(LN) $(RSL_PATH)/gen_comms.c .
 	( cd $(RSL_PATH)/RSL ; make MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) LEARN_BCAST=-DLEARN_BCAST sp2 )
@@ -527,7 +527,7 @@ POUND_DEF       =       -DCRAYX1 \
 RANLIB          =       echo
 M4              =       m4 -B12000
 
-arch : module_dm_stubs.F
+arch : $(RSL_PATH)/module_dm.F $(RSL_PATH)/gen_comms.c
 	$(LN) $(RSL_PATH)/module_dm.F .
 	$(LN) $(RSL_PATH)/gen_comms.c .
 	( cd $(RSL_PATH)/RSL ; make CC="$(CC)" \
@@ -592,7 +592,7 @@ POUND_DEF       =       -DCRAYX1 \
 RANLIB          =       echo
 M4              =       m4 -B12000
 
-arch : module_dm_stubs.F
+arch : $(RSL_PATH)/module_dm.F $(RSL_PATH)/gen_comms.c
 	$(LN) $(RSL_PATH)/module_dm.F .
 	$(LN) $(RSL_PATH)/gen_comms.c .
 	( cd $(RSL_PATH)/RSL ; make CC="$(CC)" \

@@ -17,11 +17,11 @@ include io_grib1.make
 include ioapi_share.make
 include main.make
 
-OBJS=$(SHARE_OBJS) $(FRAME_OBJS) $(PHYS_OBJS) $(DYN_EM_OBJS) \
+OBJS=$(SHARE_OBJS) $(FRAME_OBJS) $(PHYS_OBJS) $(DYN_OBJS) \
   $(ESMF_TIME_F90_OBJS) $(IO_INT_OBJS) \
-  module_wrf_top.o
+  module_wrf_top.o $(FRAME_SPECIAL_OBJS)
 
-MODULES=$(SHARE_MODULES) $(FRAME_MODULES) $(PHYS_MODULES) $(DYN_EM_MODULES)
+MODULES=$(SHARE_MODULES) $(FRAME_MODULES) $(PHYS_MODULES) $(DYN_MODULES)
 
 libwrflib.a : $(MODULES) $(OBJS)
 	$(AR) ru libwrflib.a $(MODULES) $(OBJS)
