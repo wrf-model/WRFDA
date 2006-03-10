@@ -551,7 +551,7 @@ PRINT *,'TEST_COVERAGE_da_transfer_kmatoxb_B:  tmpp(',k,') = ', tmpp
    ! Bitwise-exact reduction preserves operation order of serial code for
    ! testing, at the cost of much-increased run-time.  Turn it off when not     
    ! testing.  This will always be .FALSE. for a serial or 1-process MPI run.  
-   IF ( testing_dm_bitwise_exact ) THEN
+   IF ( testing_dm_exact ) THEN
       ALLOCATE( arrayglobal( xp%ids:xp%ide, xp%jds:xp%jde ) )
       CALL wv_patch_to_global( xb%lat, arrayglobal, xp%domdesc, &
                                xp%ids, xp%ide, xp%jds, xp%jde,  &

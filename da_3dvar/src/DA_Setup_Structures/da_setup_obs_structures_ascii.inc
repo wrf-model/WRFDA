@@ -142,8 +142,8 @@ SUBROUTINE da_setup_obs_structures_ascii( xp, ob, iv )
       iv%num_gpspw = max_gpspw_input
    if(iv%num_gpsref > max_gpsref_input ) &
       iv%num_gpsref = max_gpsref_input
-   if(iv%num_ssmi_retrieval > max_ssmi_retrieval_input ) &
-      iv%num_ssmi_retrieval = max_ssmi_retrieval_input
+   if(iv%num_ssmi_retrieval > max_ssmi_ret_input ) &
+      iv%num_ssmi_retrieval = max_ssmi_ret_input
    if(iv%num_ssmi_tb > max_ssmi_tb_input ) &
       iv%num_ssmi_tb = max_ssmi_tb_input
    if(iv%num_ssmt1 > max_ssmt1_input ) &

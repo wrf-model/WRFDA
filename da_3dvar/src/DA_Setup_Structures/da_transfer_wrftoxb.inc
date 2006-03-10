@@ -671,7 +671,7 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
    ! Bitwise-exact reduction preserves operation order of serial code for
    ! testing, at the cost of much-increased run-time.  Turn it off when not     
    ! testing.  This will always be .FALSE. for a serial or 1-process MPI run.
-   IF ( testing_dm_bitwise_exact ) THEN
+   IF ( testing_dm_exact ) THEN
       ALLOCATE( arrayglobal( xp%ids:xp%ide, xp%jds:xp%jde ) )
       CALL wv_patch_to_global( xb%psac, arrayglobal, xp%domdesc, &
                                xp%ids, xp%ide, xp%jds, xp%jde,   &
@@ -687,7 +687,7 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
 
    loc_latc_mean(:) = 0.0
 
-   IF ( testing_dm_bitwise_exact ) THEN
+   IF ( testing_dm_exact ) THEN
       ALLOCATE( arrayglobal( xp%ids:xp%ide, xp%jds:xp%jde ) )
       CALL wv_patch_to_global( xb%lat, arrayglobal, xp%domdesc, &
                                xp%ids, xp%ide, xp%jds, xp%jde,  &
@@ -703,7 +703,7 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
       enddo
    ENDIF
 
-   IF ( testing_dm_bitwise_exact ) THEN
+   IF ( testing_dm_exact ) THEN
      ! Broadcast result from monitor to other tasks.
      CALL wrf_dm_bcast_real( loc_psac_mean, 1 )
      xbx % psac_mean = loc_psac_mean
