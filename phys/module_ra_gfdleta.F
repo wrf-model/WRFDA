@@ -8742,7 +8742,7 @@ CONTAINS
 	do J=109,1,-6
 !mp	write(6,697)(TRANSA(I,J),I=5,105,10)
 	enddo
- 697	format(11(f5.3,x))
+ 697	format(11(f5.3,1x))
 !mp
 !NOV89
       DO 4 I=1,IAP
@@ -9485,15 +9485,18 @@ CONTAINS
       ENDIF
       CALL wrf_dm_bcast_bytes ( etarad_unit61 , IWORDSIZE )
       IF ( etarad_unit61 < 0 ) THEN
-        CALL wrf_error_fatal ( 'module_ra_gfdleta: co2o3: Can not find unused fortran unit to read in lookup table.' )
+        CALL wrf_error_fatal ( &
+          'co2o3: Can not find unused fortran unit to read in lookup table.' )
       ENDIF
       CALL wrf_dm_bcast_bytes ( etarad_unit62 , IWORDSIZE )
       IF ( etarad_unit62 < 0 ) THEN
-        CALL wrf_error_fatal ( 'module_ra_gfdleta: co2o3: Can not find unused fortran unit to read in lookup table.' )
+        CALL wrf_error_fatal ( &
+          'co2o3: Can not find unused fortran unit to read in lookup table.' )
       ENDIF
       CALL wrf_dm_bcast_bytes ( etarad_unit63 , IWORDSIZE )
       IF ( etarad_unit63 < 0 ) THEN
-        CALL wrf_error_fatal ( 'module_ra_gfdleta: co2o3: Can not find unused fortran unit to read in lookup table.' )
+        CALL wrf_error_fatal ( &
+          'co2o3: Can not find unused fortran unit to read in lookup table.' )
       ENDIF
         IF ( wrf_dm_on_monitor() ) THEN
           OPEN(etarad_unit61,FILE='tr49t85',                  &
