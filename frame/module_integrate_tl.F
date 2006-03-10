@@ -292,7 +292,7 @@ RECURSIVE SUBROUTINE integrate_tl ( grid, nl_date_string, nl_date_index )
             CALL wrf_timetoa( grid%current_time, currTime_str )
 
             if(currTime_str(1:19) .eq. nl_date_string(nl_date_index)(1:19)) then
-               write(unit=*, fmt='(a,i5,4(x,a))') &
+               write(unit=*, fmt='(a,i5,4(1x,a))') &
                     'xyh nl_date_index =', nl_date_index, &
                     'read NL at currTime_str(1:19)=', currTime_str(1:19), &
                     'nl_date_string(nl_date_index)(1:19)=', nl_date_string(nl_date_index)(1:19)
