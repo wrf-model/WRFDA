@@ -20,7 +20,7 @@ SUBROUTINE DA_Get_Jo_and_GradY_Sonde_sfc( iv, re, jo, jo_grad_y )
   jo % sonde_sfc_p = 0.0
   jo % sonde_sfc_q = 0.0
 
-  IF ( testing_dm_bitwise_exact ) THEN
+  IF ( testing_dm_exact ) THEN
     IF ( iv%num_sound_glo == 0 ) RETURN
   ELSE
     IF ( iv%num_sound < 1 ) return
@@ -45,7 +45,7 @@ SUBROUTINE DA_Get_Jo_and_GradY_Sonde_sfc( iv, re, jo, jo_grad_y )
   ! Bitwise-exact reduction preserves operation order of serial code for
   ! testing, at the cost of much-increased run-time.  Turn it off when not
   ! testing.  This will always be .FALSE. for a serial run.
-  IF ( testing_dm_bitwise_exact ) THEN
+  IF ( testing_dm_exact ) THEN
     ! collect all obs in serial order and allocate global objects
     CALL to_global_sonde_sfc( iv,      re,      jo_grad_y, &
                           iv_glob, re_glob, jo_grad_y_glob )

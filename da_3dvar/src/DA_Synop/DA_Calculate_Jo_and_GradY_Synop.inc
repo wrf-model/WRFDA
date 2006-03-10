@@ -20,7 +20,7 @@ SUBROUTINE DA_Calculate_Jo_and_GradY_Synop( iv, re, jo, jo_grad_y )
   jo % synop_p = 0.0
   jo % synop_q = 0.0
 
-  IF ( testing_dm_bitwise_exact ) THEN
+  IF ( testing_dm_exact ) THEN
     IF ( iv%num_synop_glo == 0 ) RETURN
   ELSE
     IF ( iv%num_synop < 1 ) return
@@ -46,7 +46,7 @@ SUBROUTINE DA_Calculate_Jo_and_GradY_Synop( iv, re, jo, jo_grad_y )
   ! Bitwise-exact reduction preserves operation order of serial code for
   ! testing, at the cost of much-increased run-time.  Turn it off when not
   ! testing.  This will always be .FALSE. for a serial run.
-  IF ( testing_dm_bitwise_exact ) THEN
+  IF ( testing_dm_exact ) THEN
     ! collect all obs in serial order and allocate global objects
     CALL to_global_synop( iv,      re,      jo_grad_y, &
                           iv_glob, re_glob, jo_grad_y_glob )

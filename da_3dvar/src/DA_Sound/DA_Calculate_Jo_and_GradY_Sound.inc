@@ -19,7 +19,7 @@ SUBROUTINE DA_Calculate_Jo_and_GradY_sound( iv, re, jo, jo_grad_y )
   jo % sound_t = 0.0
   jo % sound_q = 0.0
 
-  IF ( testing_dm_bitwise_exact ) THEN
+  IF ( testing_dm_exact ) THEN
     IF ( iv%num_sound_glo == 0 ) RETURN
   ELSE
     IF ( iv%num_sound < 0 ) RETURN
@@ -47,7 +47,7 @@ SUBROUTINE DA_Calculate_Jo_and_GradY_sound( iv, re, jo, jo_grad_y )
   ! Bitwise-exact reduction preserves operation order of serial code for 
   ! testing, at the cost of much-increased run-time.  Turn it off when not 
   ! testing.  This will always be .FALSE. for a serial or 1-MPI-process run.  
-  IF ( testing_dm_bitwise_exact ) THEN
+  IF ( testing_dm_exact ) THEN
     ! collect all obs in serial order and allocate global objects
     CALL to_global_sound( iv,      re,      jo_grad_y, &
                           iv_glob, re_glob, jo_grad_y_glob )
