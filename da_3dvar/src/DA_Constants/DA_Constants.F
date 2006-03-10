@@ -254,7 +254,7 @@ MODULE DA_Constants
  integer                :: mkz         ! 3rd dimension of analysis grid.
 
 !Minimisation:
- logical                :: calculate_cg_cost_function
+ logical                :: calculate_cg_cost_fn
  logical                :: write_outer_loop
  logical                :: lat_stats_option
  logical                :: W_INCREMENTS  ! Analysis includes w increments
@@ -358,7 +358,7 @@ MODULE DA_Constants
  logical       :: gaussian_lats      
 
 ! switch for testing different dm parallel task configurations
- LOGICAL       :: testing_dm_bitwise_exact
+ LOGICAL       :: testing_dm_exact
 
 !Namelist variables in future?:
  REAL, PARAMETER :: maximum_rh = 100.0
@@ -532,7 +532,7 @@ MODULE DA_Constants
                            max_gpspw_input, &
                            max_gpsref_input, &
                            max_ships_input, &
-                           max_ssmi_retrieval_input, &
+                           max_ssmi_ret_input, &
                            max_ssmi_tb_input, &
                            max_ssmt1_input, &
                            max_ssmt2_input, &

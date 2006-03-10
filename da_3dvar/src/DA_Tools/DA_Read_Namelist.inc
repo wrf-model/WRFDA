@@ -82,7 +82,7 @@ SUBROUTINE DA_Read_Namelist
                        max_ships_input, &
                        max_profiler_input, &
                        max_buoy_input, &
-                       max_ssmi_retrieval_input, &
+                       max_ssmi_ret_input, &
                        max_ssmi_tb_input, &
                        max_ssmt1_input, &
                        max_ssmt2_input, &
@@ -100,11 +100,11 @@ SUBROUTINE DA_Read_Namelist
                        y_start_sub_domain, y_end_sub_domain
    NAMELIST /RECORD10/ Testing_3DVAR, test_transforms, &
                        test_statistics, interpolate_stats, &
-                       testing_dm_bitwise_exact
+                       testing_dm_exact
    NAMELIST /RECORD11/ cv_options, cv_options_hum, check_rh, &
                        as1,as2,as3,as4,as5, set_omb_rand_fac, &
                        seed_array1, seed_array2, &
-                       sfc_assi_options, calculate_cg_cost_function, &
+                       sfc_assi_options, calculate_cg_cost_fn, &
                        minimisation_option, write_outer_loop,lat_stats_option
    NAMELIST /RECORD12/ balance_type
    NAMELIST /RECORD13/ vert_corr, vertical_ip, vert_evalue, &
@@ -203,7 +203,7 @@ SUBROUTINE DA_Read_Namelist
    max_profiler_input = max_profiler
    max_bogus_input = max_bogus
    max_buoy_input = max_buoy
-   max_ssmi_retrieval_input = max_ssmi_retrieval
+   max_ssmi_ret_input = max_ssmi_retrieval
    max_ssmi_tb_input = max_ssmi_tb
    max_ssmt1_input = max_ssmt1
    max_ssmt2_input = max_ssmt2
@@ -247,7 +247,7 @@ SUBROUTINE DA_Read_Namelist
    Test_Transforms = .FALSE.
    Test_Statistics = .FALSE.
    Interpolate_Stats = .TRUE.
-   testing_dm_bitwise_exact = .FALSE.
+   testing_dm_exact = .FALSE.
 
 !--record11
    minimisation_option = 1
@@ -259,7 +259,7 @@ SUBROUTINE DA_Read_Namelist
    seed_array2    = 0
    sfc_assi_options = 1
    minimisation_option = 1
-   calculate_cg_cost_function = .true.
+   calculate_cg_cost_fn = .true.
    write_outer_loop = .false.
    lat_stats_option = .true.
 
@@ -506,18 +506,18 @@ SUBROUTINE DA_Read_Namelist
        "ERROR READING NAMELIST FILE "//TRIM (namelist_file))
    ENDIF
    
-! testing_dm_bitwise_exact can be set to .true. to force DM_PARALLEL runs 
+! testing_dm_exact can be set to .true. to force DM_PARALLEL runs 
 ! to produce results that are bitwise-identical regardless of the number of 
 ! MPI tasks used.  This is useful for validating that multi-processor runs are 
 ! not a source of bugs.  Runtime will be much longer.  This option is 
 ! automatically overridden to .false. for serial or 1-MPI-task runs.  
-   IF ( testing_dm_bitwise_exact ) THEN
+   IF ( testing_dm_exact ) THEN
      CALL wrf_get_nproc( nproc )
      IF ( nproc == 1 ) THEN
-       testing_dm_bitwise_exact = .FALSE.
+       testing_dm_exact = .FALSE.
        IF ( print_detail >= 1 ) THEN
          WRITE(UNIT=stdout,FMT='(A)') &
-           ' testing_dm_bitwise_exact overridden to .FALSE. for serial or 1-MPI-task run'
+           ' testing_dm_exact overridden to .FALSE. for serial or 1-MPI-task run'
        ENDIF
      ENDIF
    ENDIF
@@ -527,7 +527,7 @@ SUBROUTINE DA_Read_Namelist
       WRITE(UNIT=stdout,FMT='(A,L10)')               ' Test_Inverse  = ',test_transforms
       WRITE(UNIT=stdout,FMT='(A,L10)')               ' Test_Statisti = ',test_statistics
       WRITE(UNIT=stdout,FMT='(A,L10)')               ' Interpolate_S = ',interpolate_stats
-      WRITE(UNIT=stdout,FMT='(A,L10)')               ' testing_dm_bitwise_exact = ',testing_dm_bitwise_exact
+      WRITE(UNIT=stdout,FMT='(A,L10)')               ' testing_dm_exact = ',testing_dm_exact
    end if
    
    READ  ( UNIT = namelist_unit, NML = RECORD11, IOSTAT = IOST)
@@ -538,7 +538,7 @@ SUBROUTINE DA_Read_Namelist
    
    if ( print_detail >= 1 ) then
       WRITE(UNIT=stdout,FMT='(A,3X,I4    )') ' Minimisation_Option = ', Minimisation_Option 
-      WRITE(UNIT=stdout,FMT='(A,3X,L10   )') ' calculate_cg_cost_function = ',calculate_cg_cost_function
+      WRITE(UNIT=stdout,FMT='(A,3X,L10   )') ' calculate_cg_cost_fn = ',calculate_cg_cost_fn
       WRITE(UNIT=stdout,FMT='(A,3X,L10   )') ' Write_Outer_Loop    = ', write_outer_loop
       WRITE(UNIT=stdout,FMT='(A,3X,L10   )') ' Lat_Stats_Option    = ', lat_stats_option
       WRITE(UNIT=stdout,FMT='(A,3X,I4    )') ' Balance_Type        = ', balance_type
@@ -806,14 +806,14 @@ SUBROUTINE DA_Read_Namelist
    WRITE(UNIT=stdout,FMT='(A,1PE8.2   )') ' RF_LEN_SCALING4 = ',len_scaling4
    WRITE(UNIT=stdout,FMT='(A,1PE8.2   )') ' RF_LEN_SCALING5 = ',len_scaling5
    WRITE(UNIT=stdout,FMT='(A,3X,I4    )') ' Minimise _Option = ',Minimisation_Option 
-   WRITE(UNIT=stdout,FMT='(A,3X,L10   )') ' In_CG_COST_FUNCTION_NEEDED = ',calculate_cg_cost_function
+   WRITE(UNIT=stdout,FMT='(A,3X,L10   )') ' In_CG_COST_FN_NEEDED = ',calculate_cg_cost_fn
    WRITE(UNIT=stdout,FMT='(A,3X,L10   )') ' Outer_Loop_Write   = ',write_outer_loop
    WRITE(UNIT=stdout,FMT='(A,3X,L10   )') ' Lat_Stats_Option   = ',lat_stats_option
    WRITE(UNIT=stdout,FMT='(A,3X,L10   )') ' Testing_3DVAR = ',Testing_3DVAR
    WRITE(UNIT=stdout,FMT='(A,3X,L10   )') ' Test_Inverse  = ',test_transforms
    WRITE(UNIT=stdout,FMT='(A,3X,L10   )') ' Test_Statisti = ',test_statistics
    WRITE(UNIT=stdout,FMT='(A,3X,L10   )') ' Interpolate_S = ',interpolate_stats
-   WRITE(UNIT=stdout,FMT='(A,3X,L10   )') ' testing_dm_bitwise_exact = ',testing_dm_bitwise_exact
+   WRITE(UNIT=stdout,FMT='(A,3X,L10   )') ' testing_dm_exact = ',testing_dm_exact
    WRITE(UNIT=stdout,FMT='(A,3X,I10   )') ' Balance_Type  = ',balance_type
    WRITE(UNIT=stdout,FMT='(A,3X,I10   )') ' CV_Options    = ',cv_options
    WRITE(UNIT=stdout,FMT='(A,3X,3F9.5 )') ' as1           = ',as1(1:3), &
