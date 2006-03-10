@@ -61,7 +61,7 @@ subroutine DA_Minimise_CG( grid, config_flags,            &
         ' ----------------------------------------------------------'
       WRITE(UNIT=stdout,FMT=*) ' '
       WRITE(UNIT=stdout,FMT='(A)') ' [5.2] Minimize cost function Using CG Method'
-      if( calculate_cg_cost_function ) then
+      if( calculate_cg_cost_fn ) then
         WRITE(UNIT=stdout,FMT='(A)') &
           '  For this run cost function diagnostics will be written'
       else
@@ -103,7 +103,7 @@ subroutine DA_Minimise_CG( grid, config_flags,            &
              2x,'Starting Cost function: ' ,1PD15.8,' Gradient= ',1PD15.8)
       WRITE(UNIT=stdout,FMT='(A)') &
         ' ----------------------------------------------------------'
-      if( calculate_cg_cost_function ) then
+      if( calculate_cg_cost_fn ) then
       WRITE(UNIT=stdout,FMT='(2x,/,2x,A)') &
         ' Iter    Cost Function         Gradient             Step'
       else
@@ -141,7 +141,7 @@ subroutine DA_Minimise_CG( grid, config_flags,            &
          if(apdotp .gt. 0.0   ) step = rrmold/apdotp
          ghat = ghat + step * fhat
          xhat = xhat + step * phat
-         if( calculate_cg_cost_function ) then
+         if( calculate_cg_cost_fn ) then
            j_grad = 0.
            call da_calculate_j(it,iter, xb, xbx, be, iv, xhat, cv%array, &
                                vv, vp, xp, re, y, xa, j, j_grad,         &
@@ -165,7 +165,7 @@ subroutine DA_Minimise_CG( grid, config_flags,            &
          phat = - ghat       + ratio * phat
 
          rrmold=rrmnew
-         if( calculate_cg_cost_function ) then
+         if( calculate_cg_cost_fn ) then
            WRITE(UNIT=stdout,FMT=12)iter, j%total, ob_grad, step
          else
            WRITE(UNIT=stdout,FMT=14)iter, rrmnew_norm , step
@@ -179,7 +179,7 @@ subroutine DA_Minimise_CG( grid, config_flags,            &
        iter = iter -1
        go to 1003
 1002   continue
-       if( calculate_cg_cost_function ) then
+       if( calculate_cg_cost_fn ) then
          WRITE(UNIT=stdout,FMT=12)iter, j%total, ob_grad, step
        else
          WRITE(UNIT=stdout,FMT=14)iter, rrmnew_norm , step
@@ -189,7 +189,7 @@ subroutine DA_Minimise_CG( grid, config_flags,            &
          ' ----------------------------------------------------------'
        WRITE(UNIT=stdout,FMT=13)iter
 13     format(2x,'Inner iteration stopped after ',i4,' iterations')
-       if( calculate_cg_cost_function ) then 
+       if( calculate_cg_cost_fn ) then 
          rrmnew_norm = ob_grad
        else
          call da_calculate_j( it, iter, xb, xbx,be,iv,xhat, cv % array, &

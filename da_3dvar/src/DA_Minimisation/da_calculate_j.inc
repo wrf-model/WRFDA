@@ -76,7 +76,7 @@ subroutine da_calculate_j( it, iter, xb, xbx, be, iv, xhat, cv, vv, &
 
       call da_calculate_jo_and_grady( iv, re, jo_partial, j % jo, jo_grad_y)
 
-    IF ( testing_dm_bitwise_exact ) THEN
+    IF ( testing_dm_exact ) THEN
       ! jo_partial has been already summed at lower level
       j % jo % total = jo_partial
     ELSE

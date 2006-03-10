@@ -29,7 +29,7 @@
         ! testing, at the cost of much-increased run-time.  Turn it off when not
         ! testing.  This will always be .FALSE. for a serial run or 
         ! one-processor DM_PARALLEL run.
-        IF ( testing_dm_bitwise_exact ) THEN
+        IF ( testing_dm_exact ) THEN
 
           ! Collect local cv arrays x and y to globally-sized serially-ordered 
           ! arrays xg and yg.  Note that xg and yg will only exist on the 
