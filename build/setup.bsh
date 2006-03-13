@@ -1,9 +1,7 @@
 #!/bin/bash
 
-make clean
-
 rm -rf *.F90 *.F *.f *.inc *.int *.c *.h *.make *.m4 *code \
-  bufrlib.PRM *.sed Makefile1 registry gen_comms.stub inc/*
+  bufrlib.PRM *.sed registry gen_comms.stub inc/*
 
 for DIR in dyn_em main share frame phys convertor tools \
   external/esmf_time_f90 external/esmf_wrapper external/io_int \
@@ -13,13 +11,16 @@ for DIR in dyn_em main share frame phys convertor tools \
   ln -fs ../$DIR/$NAME.make ../$DIR/*.F90 ../$DIR/*.F ../$DIR/*.inc \
     ../$DIR/*.f ../$DIR/*.c ../$DIR/*.h ../$DIR/*.m4 ../$DIR/*code \
     ../$DIR/*.int .
-  echo include $DIR.make >> Makefile1
+#  echo include $DIR.make >> Makefile1
 done
 
 # Tidy up bogus links
 
-rm -f '*.F90 *.F *.f *.inc *.int *.c *.h *make *.m4 *.code *.sed'
+rm -f '*.F90' '*.F' '*.f' '*.inc' '*.int' '*.c' '*.h' '*make' '*.m4' \
+  '*.code' '*.sed'
 
 ln -s ../da_3dvar/src/da_bufrlib/bufrlib.PRM .
 ln -s ../arch/*.sed .
-ln -s ../tools/gen_comms.stub .
+ln -s ../tools/gen_comms.stub  gen_comms.c
+
+make clean
