@@ -19,8 +19,8 @@ done
 rm -f '*.F90' '*.F' '*.f' '*.inc' '*.int' '*.c' '*.h' '*make' '*.m4' \
   '*.code' '*.sed'
 
-ln -s ../da_3dvar/src/da_bufrlib/bufrlib.PRM .
-ln -s ../arch/*.sed .
-ln -s ../tools/gen_comms.stub  gen_comms.c
+ln -fs ../da_3dvar/src/da_bufrlib/bufrlib.PRM .
+ln -fs ../arch/*.sed .
+ln -fs ../tools/gen_comms.stub  gen_comms.c
 
 make clean

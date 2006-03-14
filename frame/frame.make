@@ -14,7 +14,8 @@ FRAME_MODULES =       module_driver_constants.o  \
                 module_io.o                \
                 module_dm.o                \
                 module_quilt_outbuf_ops.o  \
-                module_io_quilt.o
+                module_io_quilt.o          \
+                JRB_Stubs.o
 
 FRAME_OBJS    =       wrf_num_bytes_between.o    \
                 wrf_shutdown.o             \

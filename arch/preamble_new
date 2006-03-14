@@ -30,7 +30,7 @@ PHDF5_PATH  = CONFIGURE_PHDF5_PATH
 RTTOV_PATH  = CONFIGURE_RTTOV_PATH
 RTTOV_LIB   = CONFIGURE_RTTOV_LIB
 ENVCOMPDEFS = CONFIGURE_COMPILEFLAGS
-ARCHFLAGS1  = CONFIGURE_NETCDF_FLAG CONFIGURE_RTTOV_FLAG
+ARCHFLAGS1  = CONFIGURE_NETCDF_FLAG CONFIGURE_RTTOV_FLAG $(WORDSIZE_DEF)
 WRFIO       = CONFIGURE_WRFIO_NF wrfio_int wrfio_grib1
 INCS        = -I. -I./inc CONFIGURE_RTTOV_INC
 
@@ -39,8 +39,6 @@ INCS        = -I. -I./inc CONFIGURE_RTTOV_INC
 EXTERNAL  = $(DEVTOP)/external
 
 PHDF5_LIB  = -L$(EXTERNAL)/io_phdf5 -lwrfio_phdf5 -L$(PHDF5_PATH)/lib -lhdf5_fortran -lhdf5 -lm -lz -L$(PHDF5PATH)/lib -lsz
-
-ARCHFLAGS2      = $(WORDSIZE_DEF)
 
 #### Get core settings from environment (set in compile script)
 #### Note to add a core, this has to be added to.

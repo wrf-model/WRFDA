@@ -13,9 +13,6 @@ $(TOOLS_OBJ) :
 registry : $(TOOLS_OBJ)
 	$(CC_TOOLS) -o registry $(TOOLS_OBJ)
 
-gen_comms.c : gen_comms.stub
-	$(CP) gen_comms.stub gen_comms.c
-
 bufr_little_endian.exe : bufr_little_endian.f
 			$(RM) $@
 			$(FC) -o bufr_little_endian.exe bufr_little_endian.f da_bufrlib.o \
