@@ -44,12 +44,17 @@ PHDF5_LIB  = -L$(EXTERNAL)/io_phdf5 -lwrfio_phdf5 -L$(PHDF5_PATH)/lib -lhdf5_for
 #### Note to add a core, this has to be added to.
 WRFVAR   = -DWRFVAR
 
-COREDEFS = -DEM_CORE=$(WRF_EM_CORE) \
-           -DNMM_CORE=$(WRF_NMM_CORE) -DNMM_MAX_DIM=1250 \
-	   -DCOAMPS_CORE=$(WRF_COAMPS_CORE) \
-           -DEXP_CORE=$(WRF_EXP_CORE) \
-           -DDA_CORE=$(WRF_DA_CORE) \
+
+COREDEFS = -DEM_CORE=1        \
+           -DDA_CORE=1        \
+           -DNMM_CORE=0       \
+           -DEXP_CORE=0       \
+           -DCOAMPS_CORE=0    \
+           -DNMM_MAX_DIM=1250 \
 	   $(WRFVAR)
+
+REGISTRY=Registry.wrfvar
+SOLVER=em
 
 #### For wrfvar, always use RWORDSIZE 8
 

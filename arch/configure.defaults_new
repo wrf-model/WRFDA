@@ -30,8 +30,9 @@ POUND_DEF       =       -DDEC_ALPHA -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
 			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 M4              =       m4 -B 12000
 
-arch :  module_dm_stubs.F
+arch :  module_dm_stubs.F gen_comms.stub
 	$(LN) module_dm_stubs.F module_dm.F
+	$(LN) gen_comms.stub gen_comms.c 
 
 ###########################################################
 #ARCH       Compaq OSF1 alpha DM       (RSL, MPICH, RSL IO)
@@ -113,8 +114,9 @@ POUND_DEF       =       -DDEC_ALPHA -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
 M4              =       m4 -B 12000
 
 
-arch :  module_dm_stubs.F
+arch :  module_dm_stubs.F gen_comms.stub
 	$(LN) module_dm_stubs.F module_dm.F
+	$(LN) gen_comms.stub gen_comms.c 
 
 ###########################################################
 #ARCH Settings for PC Linux i486 i586 i686, PGI compiler  (Single-threaded)
@@ -146,8 +148,9 @@ CFLAGS_BUFR     =       -DUNDERSCORE
 POUND_DEF       =       -DLINUX -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
 			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 
-arch :  module_dm_stubs.F
+arch :  module_dm_stubs.F gen_comms.stub
 	$(LN) module_dm_stubs.F module_dm.F
+	$(LN) gen_comms.stub gen_comms.c 
 
 
 ###########################################################
@@ -227,8 +230,9 @@ POUND_DEF       =       -DNO_RRTM_PHYSICS -DNONSTANDARD_SYSTEM -DF90_STANDALONE 
 			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 M4              =       m4 -B12000
 
-arch : module_dm_stubs.F
+arch :  module_dm_stubs.F gen_comms.stub
 	$(LN) module_dm_stubs.F module_dm.F
+	$(LN) gen_comms.stub gen_comms.c 
 
 ###########################################################
 #ARCH Settings for PC Linux i486 i586 i686, g95 compiler  (Single-threaded)
@@ -259,8 +263,9 @@ CFLAGS_BUFR     =       -DUNDERSCORE
 POUND_DEF       =       -DLINUX -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
 			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 
-arch : module_dm_stubs.F
+arch :  module_dm_stubs.F gen_comms.stub
 	$(LN) module_dm_stubs.F module_dm.F
+	$(LN) gen_comms.stub gen_comms.c 
 
 
 ###########################################################
@@ -297,8 +302,9 @@ POUND_DEF       =       -DIRIX \
 RANLIB          =       echo
 M4              =       m4 -B12000
 
-arch : module_dm_stubs.F
+arch :  module_dm_stubs.F gen_comms.stub
 	$(LN) module_dm_stubs.F module_dm.F
+	$(LN) gen_comms.stub gen_comms.c 
 
 ###########################################################
 #ARCH   SGI O2K DM IRIX64            (RSL, RSL_IO, SGI-MPI)
@@ -386,8 +392,9 @@ MAX_PROC        =       256
 RANLIB          =       echo
 M4              =       m4 -B12000
 
-arch :  module_dm_stubs.F
+arch :  module_dm_stubs.F gen_comms.stub
 	$(LN) module_dm_stubs.F module_dm.F
+	$(LN) gen_comms.stub gen_comms.c 
 
 ###########################################################
 #ARCH   AIX             (single-threaded, no nesting)
@@ -420,8 +427,9 @@ POUND_DEF       =       -DAIX \
 			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 M4              =       m4 -B12000
 
-arch :  module_dm_stubs.F
+arch :  module_dm_stubs.F gen_comms.stub
 	$(LN) module_dm_stubs.F module_dm.F
+	$(LN) gen_comms.stub gen_comms.c 
 
 ###########################################################
 #ARCH	AIX DM-Parallel          (RSL, IBM-MPI, supports nesting)
@@ -632,8 +640,9 @@ POUND_DEF       =       -DDARWIN -DMAC_OS \
 			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 M4              =       m4 -B12000
 
-arch :  module_dm_stubs.F
+arch :  module_dm_stubs.F gen_comms.stub
 	$(LN) module_dm_stubs.F module_dm.F
+	$(LN) gen_comms.stub gen_comms.c 
 
 ###########################################################
 #ARCH Darwin		(single-threaded, no nesting, for G4)
@@ -667,8 +676,9 @@ POUND_DEF       =       -DDARWIN -DMAC_OS \
 			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 M4              =       m4 -B12000
 
-arch :  module_dm_stubs.F
+arch :  module_dm_stubs.F gen_comms.stub
 	$(LN) module_dm_stubs.F module_dm.F
+	$(LN) gen_comms.stub gen_comms.c 
 
 ###########################################################
 #ARCH  NULL
