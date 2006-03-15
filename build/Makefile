@@ -28,7 +28,7 @@ libwrflib.a : $(MODULES) $(OBJS)
 	$(RANLIB) libwrflib.a
 
 clean :
-	@ $(RM) *.exe *.o *.mod *.b *.a inc/*.inc frame/*.F registry \
+	@ $(RM) *.exe *.o *.mod *.b *.a *.f inc/*.inc frame/*.F registry \
           Registry_tmp* module_state_description.F \
           '*.F90' '*.F' '*.f' '*.inc' '*.int' '*.c' '*.h' '*.make' '*.m4' \
           '*.code' '*.sed'
