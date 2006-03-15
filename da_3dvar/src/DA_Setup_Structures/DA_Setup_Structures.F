@@ -24,7 +24,6 @@ MODULE DA_Setup_Structures
    USE da_h_ops
    USE DA_ReadWrite_MM5
    USE da_spectral
-   USE da_gen_be  
    use module_wrf_3dvar_io
    use da_radiance
    USE module_wrf_error

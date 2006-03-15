@@ -1,4 +1,4 @@
-DA_OBJS_FOR_ALL =	da_solve_v3d.o		\
+DA_OBJS        =	da_solve_v3d.o		\
 			par_util.o              \
 			DA_Setup_Structures.o	\
 			DA_Minimisation.o	\
@@ -46,7 +46,6 @@ DA_OBJS_FOR_ALL =	da_solve_v3d.o		\
 			LAPACK.o		\
 			da_spectral.o           \
 			da_fftpack5.o           \
-			da_gen_be.o             \
 			da_radiance.o		\
 			rttov_const.o		\
 			rttov_global.o		\
@@ -99,9 +98,8 @@ DA_OBJS_4_GEN_BE_LONG =	DA_Constants.o		\
 			gsi_constants.o		\
 			BLAS.o
 
-DA_MODULES_IO		=	module_wrf_3dvar_io.o
-
-DA_MODULES_INTERFACE	=	module_wrf_3dvar_interface.o	\
+DA_MODULES		=	module_wrf_3dvar_io.o \
+                                module_wrf_3dvar_interface.o	\
 	   			module_wrfvar_top.o
 
 DA_MODULES_BE_INTERFACE	=	module_da_gen_be_stats_interface.o	\
@@ -123,8 +121,8 @@ module_wrfvar_top.o : module_wrf_3dvar_interface.o \
 module_wrf_3dvar_io.o : module_io_domain.o
 
 
-wrfvar_obj :	$(DA_OBJS_FOR_ALL)
-		$(AR) ru libwrflib.a $(DA_OBJS_FOR_ALL)
+wrfvar_obj :	$(DA_OBJS)
+		$(AR) ru libwrflib.a $(DA_OBJS)
 
 gen_be_short :	$(DA_OBJS_4_GEN_BE_SHORT)
 		$(AR) ru libwrflib.a $(DA_OBJS_4_GEN_BE_SHORT)
@@ -244,7 +242,6 @@ DA_Setup_Structures.o:	\
 	                wrdesc.o \
 	                DA_ReadWrite_MM5.o \
 	                da_spectral.o \
-	                da_gen_be.o  \
 			da_radiance.o \
 			DA_Setup_Structures.F \
 			da_add_increments.inc \
