@@ -12,6 +12,8 @@ wgrib :
 
 libio_grib1.a:	$(IO_GRIB1_OBJS)
 	$(AR) cruv ../external/io_grib1/libio_grib1.a $(IO_GRIB1_OBJS)
+	( cd ../external/io_grib1/MEL_grib1;  make CC="$(CC) $(CFLAGS)" archive )
+	( cd ../external/io_grib1/grib1_util; make CC="$(CC) $(CFLAGS)" archive )
 	$(RANLIB) ../external/io_grib1/libio_grib1.a
 
 io_grib1.o:     io_grib1.F 
@@ -30,11 +32,5 @@ test_grib1_routines: test_grib1_routines.F90 gridnav.c gribmap.c open_file.c tri
 	$(CC) $(CFLAGS) -c -g grib1_routines.c gridnav.c gribmap.c open_file.c trim.c
 	$(FC) -g -o test_grib1_routines test_grib1_routines.o grib1_routines.o gridnav.o gribmap.o open_file.o trim.o \
 		-L../external/io_grib1/ -lio_grib1.a -lm
-
-libMEL_grib1.a :
-	( cd ../external/io_grib1/MEL_grib1; make CC="$(CC) $(CFLAGS)" archive )
-
-libgrib1_util.a :
-	( cd ../external/io_grib1/grib1_util; make CC="$(CC) $(CFLAGS)" archive )
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.
