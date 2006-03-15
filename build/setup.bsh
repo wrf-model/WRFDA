@@ -13,7 +13,7 @@ for DIR in dyn_$SOLVER main share frame phys convertor tools \
   external/io_netcdf external/io_grib1 da_3dvar da_3dvar/src/*; do
   NAME=`basename $DIR`
   ln -fs ../$DIR/$NAME.make ../$DIR/*.F90 ../$DIR/*.F ../$DIR/*.inc \
-    ../$DIR/*.f ../$DIR/*.c ../$DIR/*.h ../$DIR/*.m4 ../$DIR/*.code \
+    ../$DIR/*.c ../$DIR/*.h ../$DIR/*.m4 ../$DIR/*.code \
     ../$DIR/*.int .
 #  echo include $DIR.make >> Makefile1
 done

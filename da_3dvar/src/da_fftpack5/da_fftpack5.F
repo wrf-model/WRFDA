@@ -9,26 +9,26 @@
 
       CONTAINS
 
-#   include <rfft1b.f>          
-#   include <rfft1i.f>          
-#   include <rffti1.f>          
+#   include <rfft1b.inc>          
+#   include <rfft1i.inc>          
+#   include <rffti1.inc>          
 
-#   include <xerfft.f>          
-#   include <rfftb1.f>          
+#   include <xerfft.inc>          
+#   include <rfftb1.inc>          
 
-#   include <r1f2kb.f>          
-#   include <r1f3kb.f>          
-#   include <r1f4kb.f>          
-#   include <r1f5kb.f>          
-#   include <r1fgkb.f>          
+#   include <r1f2kb.inc>          
+#   include <r1f3kb.inc>          
+#   include <r1f4kb.inc>          
+#   include <r1f5kb.inc>          
+#   include <r1fgkb.inc>          
 
-#   include <rfft1f.f>          
+#   include <rfft1f.inc>          
 
-#   include <rfftf1.f>          
+#   include <rfftf1.inc>          
 
-#   include <r1f2kf.f>          
-#   include <r1f3kf.f>          
-#   include <r1f4kf.f>          
-#   include <r1f5kf.f>          
-#   include <r1fgkf.f>          
+#   include <r1f2kf.inc>          
+#   include <r1f3kf.inc>          
+#   include <r1f4kf.inc>          
+#   include <r1f5kf.inc>          
+#   include <r1fgkf.inc>          
       end module da_fftpack5

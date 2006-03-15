@@ -54,21 +54,21 @@ if ( -e plot_gen_be.exe ) rm plot_gen_be.exe
 
 if ( $First_word == 'OSF1' ) then
 # DEC_alpha
-  ncargf90 -o plot_gen_be.exe -convert big_endian -free plot_gen_be.f
+  ncargf90 -o plot_gen_be.exe -convert big_endian -free plot_gen_be.f90
 
 else if ( $First_word == 'Linu' ) then
 # PC Linux:
   pgf90    -o plot_gen_be.exe -byteswapio -Mfreeform \
            -L/usr/local/ncarg/lib -L/usr/X11R6/lib -lncarg -lncarg_gks -lncarg_c \
            -lX11 -L/usr/pgi/linux86/lib -L/usr/lib -lf2c \
-           plot_gen_be.f
+           plot_gen_be.f90
 
 else if ( $First_word == 'AIX' ) then
 # IBM:
   xlf_r -o plot_gen_be.exe \
       -L/usr/local/lib32/r4i4 -lncarg -lncarg_gks -lncarg_c -lX11 -lm \
       -qfree -qarch=auto -qmaxmem=-1 -qnosave \
-      plot_gen_be.f
+      plot_gen_be.f90
 endif
 # -----------------------------------------------------------------------
 

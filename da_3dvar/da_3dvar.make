@@ -284,8 +284,9 @@ bufrlib.prm:		bufrlib.PRM
 			$(RM) $@
 			$(CPP) $(CPPFLAGS_BUFR) bufrlib.PRM > bufrlib.prm
 
-da_bufrlib.o:		da_bufrlib.f bufrlib.prm
+da_bufrlib.o:		da_bufrlib.F bufrlib.prm
 			$(RM) $@
+			$(CPP) $(CPPFLAGS) da_bufrlib.F > da_bufrlib.f
 			$(F77) -c $(F77FLAGS) da_bufrlib.f
 
 bort_exit.o:		bort_exit.c
@@ -1020,7 +1021,7 @@ da_rfz.o:		da_rfz.F
 
 LAPACK.o:		\
 			BLAS.o \
-			LAPACK.f \
+			LAPACK.F \
 			dlae2.inc \
 			dlaev2.inc \
 			dlamc1.inc \
@@ -1033,26 +1034,28 @@ LAPACK.o:		\
 			dlansy.inc \
 			dlapy2.inc \
 			dsyev.inc
+			$(CPP) $(CPPFLAGS) LAPACK.F > LAPACK.f
 			$(F77) -c $(F77FLAGS) LAPACK.f
 
 BLAS.o:	         \
-		       daxpy.f    \
-		       dcopy.f    \
-		       ddot.f     \
-		       dgemm.f    \
-		       dgemv.f    \
-		       dger.f     \
-		       dnrm2.f    \
-		       dscal.f    \
-		       dswap.f    \
-		       dsymv.f    \
-		       dsyr2.f    \
-		       dsyr2k.f   \
-		       dtrmm.f    \
-		       dtrmv.f    \
+		       daxpy.inc    \
+		       dcopy.inc    \
+		       ddot.inc     \
+		       dgemm.inc    \
+		       dgemv.inc    \
+		       dger.inc     \
+		       dnrm2.inc    \
+		       dscal.inc    \
+		       dswap.inc    \
+		       dsymv.inc    \
+		       dsyr2.inc    \
+		       dsyr2k.inc   \
+		       dtrmm.inc    \
+		       dtrmv.inc    \
 		       lsame.inc  \
 		       xerbla.inc \
-		       BLAS.f
+		       BLAS.F
+			$(CPP) $(CPPFLAGS) BLAS.F > BLAS.f
 			$(F77) -c $(F77FLAGS) BLAS.f
 
 DA_Test.o:	\
@@ -1139,23 +1142,23 @@ da_gen_be.o:	         \
 
 da_fftpack5.o:	         \
 			DA_Constants.o		\
-			r1f2kb.f    \
-			r1f2kf.f    \
-			r1f3kb.f    \
-			r1f3kf.f    \
-			r1f4kb.f    \
-			r1f4kf.f    \
-			r1f5kb.f    \
-			r1f5kf.f    \
-			r1fgkb.f    \
-			r1fgkf.f    \
-			rfft1b.f    \
-			rfft1f.f    \
-			rfft1i.f    \
-			rfftb1.f    \
-			rfftf1.f    \
-			rffti1.f    \
-			xerfft.f    \
+			r1f2kb.inc    \
+			r1f2kf.inc    \
+			r1f3kb.inc    \
+			r1f3kf.inc    \
+			r1f4kb.inc    \
+			r1f4kf.inc    \
+			r1f5kb.inc    \
+			r1f5kf.inc    \
+			r1fgkb.inc    \
+			r1fgkf.inc    \
+			rfft1b.inc    \
+			rfft1f.inc    \
+			rfft1i.inc    \
+			rfftb1.inc    \
+			rfftf1.inc    \
+			rffti1.inc    \
+			xerfft.inc    \
 			da_fftpack5.F
 			$(CPP) $(CPPFLAGS) da_fftpack5.F > da_fftpack5.f
 			$(F77) -c $(F77FLAGS) da_fftpack5.f

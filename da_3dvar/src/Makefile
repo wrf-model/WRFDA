@@ -278,9 +278,10 @@ bufrlib.prm:		da_bufrlib/bufrlib.PRM
 			$(RM) $@
 			$(CPP) -I./da_bufrlib $(CPPFLAGS_BUFR) da_bufrlib/bufrlib.PRM > bufrlib.prm
 
-da_bufrlib.o:		da_bufrlib/da_bufrlib.f bufrlib.prm
+da_bufrlib.o:		da_bufrlib/da_bufrlib.F bufrlib.prm
 			$(RM) $@
-			$(F77) -c $(F77FLAGS_BUFR) $(MODULE_DIRS) da_bufrlib/da_bufrlib.f
+			$(CPP) $(CPPFLAGS) da_bufrlib/da_bufrlib.F > da_bufrlib.f
+			$(F77) -c $(F77FLAGS_BUFR) $(MODULE_DIRS) da_bufrlib.f
 
 bort_exit.o:		da_bufrlib/bort_exit.c
 			$(RM) $@
@@ -1116,7 +1117,7 @@ da_rf.o:		DA_VToX_Transforms/da_rf.F
 
 LAPACK.o:		\
 			BLAS.o \
-			LAPACK/LAPACK.f \
+			LAPACK/LAPACK.F \
 			LAPACK/dlae2.inc \
 			LAPACK/dlaev2.inc \
 			LAPACK/dlamc1.inc \
@@ -1129,27 +1130,29 @@ LAPACK.o:		\
 			LAPACK/dlansy.inc \
 			LAPACK/dlapy2.inc \
 			LAPACK/dsyev.inc
-			$(F77) -c -I./LAPACK $(F77FLAGS_3DVAR) $(MODULE_DIRS) LAPACK/LAPACK.f
+			$(CPP) -I./LAPACK $(CPPFLAGS_3DVAR) LAPACK/LAPACK.F > LAPACK.f
+			$(F77) -c -I./LAPACK $(F77FLAGS_3DVAR) $(MODULE_DIRS) LAPACK.f
 
 BLAS.o:	         \
-			BLAS/daxpy.f	\
-			BLAS/dcopy.f	\
-			BLAS/ddot.f	\
-			BLAS/dgemm.f	\
-			BLAS/dgemv.f	\
-			BLAS/dger.f	\
-			BLAS/dnrm2.f	\
-			BLAS/dscal.f	\
-			BLAS/dswap.f	\
-			BLAS/dsymv.f	\
-			BLAS/dsyr2.f	\
-			BLAS/dsyr2k.f	\
-			BLAS/dtrmm.f	\
-			BLAS/dtrmv.f	\
+			BLAS/daxpy.inc	\
+			BLAS/dcopy.inc	\
+			BLAS/ddot.inc	\
+			BLAS/dgemm.inc	\
+			BLAS/dgemv.inc	\
+			BLAS/dger.inc	\
+			BLAS/dnrm2.inc	\
+			BLAS/dscal.inc	\
+			BLAS/dswap.inc	\
+			BLAS/dsymv.inc	\
+			BLAS/dsyr2.inc	\
+			BLAS/dsyr2k.inc	\
+			BLAS/dtrmm.inc	\
+			BLAS/dtrmv.inc	\
 			BLAS/lsame.inc	\
 			BLAS/xerbla.inc \
-			BLAS/BLAS.f
-			$(F77) -c -I./BLAS $(F77FLAGS_3DVAR) $(MODULE_DIRS) BLAS/BLAS.f
+			BLAS/BLAS.F
+			$(CPP) -I./BLAS $(CPPFLAGS_3DVAR) BLAS/BLAS.F > BLAS.f
+			$(F77) -c -I./BLAS $(F77FLAGS_3DVAR) $(MODULE_DIRS) BLAS.f
 
 DA_Test.o:	\
 			DA_Constants.o \
@@ -1240,23 +1243,23 @@ da_gen_be.o:	         \
 
 da_fftpack5.o:	         \
 			DA_Constants.o		\
-			da_fftpack5/r1f2kb.f	\
-			da_fftpack5/r1f2kf.f	\
-			da_fftpack5/r1f3kb.f	\
-			da_fftpack5/r1f3kf.f	\
-			da_fftpack5/r1f4kb.f	\
-			da_fftpack5/r1f4kf.f	\
-			da_fftpack5/r1f5kb.f	\
-			da_fftpack5/r1f5kf.f	\
-			da_fftpack5/r1fgkb.f	\
-			da_fftpack5/r1fgkf.f	\
-			da_fftpack5/rfft1b.f	\
-			da_fftpack5/rfft1f.f	\
-			da_fftpack5/rfft1i.f	\
-			da_fftpack5/rfftb1.f	\
-			da_fftpack5/rfftf1.f	\
-			da_fftpack5/rffti1.f	\
-			da_fftpack5/xerfft.f	\
+			da_fftpack5/r1f2kb.inc	\
+			da_fftpack5/r1f2kf.inc	\
+			da_fftpack5/r1f3kb.inc	\
+			da_fftpack5/r1f3kf.inc	\
+			da_fftpack5/r1f4kb.inc	\
+			da_fftpack5/r1f4kf.inc	\
+			da_fftpack5/r1f5kb.inc	\
+			da_fftpack5/r1f5kf.inc	\
+			da_fftpack5/r1fgkb.inc	\
+			da_fftpack5/r1fgkf.inc	\
+			da_fftpack5/rfft1b.inc	\
+			da_fftpack5/rfft1f.inc	\
+			da_fftpack5/rfft1i.inc	\
+			da_fftpack5/rfftb1.inc	\
+			da_fftpack5/rfftf1.inc	\
+			da_fftpack5/rffti1.inc	\
+			da_fftpack5/xerfft.inc	\
 			da_fftpack5/da_fftpack5.F
 			$(CPP) -I./da_fftpack5 $(CPPFLAGS_3DVAR) da_fftpack5/da_fftpack5.F > da_fftpack5.f
 			$(F77) -c $(F77FLAGS_3DVAR) $(MODULE_DIRS) da_fftpack5.f
