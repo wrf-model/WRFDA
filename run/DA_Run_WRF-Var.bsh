@@ -56,6 +56,7 @@ export DA_CV_OPTIONS=${DA_CV_OPTIONS:-3}             # Background error statisti
 
 export SRC_DIR=${SRC_DIR:-$HOME/code_development}
 export WRFVAR_DIR=${WRFVAR_DIR:-$SRC_DIR/wrfvar}
+export BUILD_DIR=${BUILD_DIR:-$WRFVAR_DIR/main}
 export DAT_DIR=${DAT_DIR:-/data4/dmbarker/data/amps1}
 export RUN_DIR=${RUN_DIR:-$DAT_DIR}
 
@@ -269,7 +270,7 @@ ln -s $DA_RTTOV_COEFFS/* .
 
 cp $WRFVAR_DIR/run/gribmap.txt .
 cp $WRFVAR_DIR/run/LANDUSE.TBL .
-cp $WRFVAR_DIR/main/wrfvar.exe  wrfvar.exe
+cp $BUILD_DIR/wrfvar.exe  wrfvar.exe
 
 ln -sf $DA_FIRST_GUESS		wrf_3dvar_input
 ln -sf $DA_BACK_ERRORS		fort.3${DA_CV_OPTIONS}

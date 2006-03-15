@@ -2,7 +2,7 @@ include configure.wrf
 
 LIBS = libwrflib.a libwrfio_nf.a libio_grib1.a libMEL_grib1.a libgrib1_util.a libesmf_time.a
 
-include dyn_em.make
+include dyn_$(SOLVER).make
 include share.make
 include frame.make
 include phys.make
@@ -18,7 +18,7 @@ include ioapi_share.make
 include main.make
 
 OBJS=$(SHARE_OBJS) $(FRAME_OBJS) $(PHYS_OBJS) $(DYN_OBJS) \
-  $(ESMF_TIME_F90_OBJS) $(IO_INT_OBJS) \
+  $(ESMF_TIME_F90_OBJS) $(IO_INT_OBJS) $(IO_NETCDF_OBJS) \
   module_wrf_top.o $(FRAME_SPECIAL_OBJS)
 
 MODULES=$(SHARE_MODULES) $(FRAME_MODULES) $(PHYS_MODULES) $(DYN_MODULES)
@@ -27,10 +27,13 @@ libwrflib.a : $(MODULES) $(OBJS)
 	$(AR) ru libwrflib.a $(MODULES) $(OBJS)
 	$(RANLIB) libwrflib.a
 
-WRF_MODULES = module_wrf_top.o
-
-wrf.exe : $(MODULES) $(WRF_LIBS) wrf.o
-	$(LD) $(LDFLAGS) -o wrf.exe wrf.o $(WRF_MODULES) $(LIB)
-
 clean :
-	@ $(RM) *.exe *.o *.mod *.b *.a inc/*.inc inc/*.F registry
+	@ $(RM) *.exe *.o *.mod *.b *.a inc/*.inc frame/*.F registry \
+          Registry_tmp* \
+          '*.F90' '*.F' '*.f' '*.inc' '*.int' '*.c' '*.h' '*.make' '*.m4' \
+          '*.code' '*.sed'
+
+superclean : clean
+	@ $(RM) *.F90 *.F *.f *.inc *.int *.c *.h *.m4 *.code \
+          bufrlib.PRM *.sed registry gen_comms.stub inc/* \
+          convert_tool kma_wave2grid wave2grid_kma mm5_wrf wrf_mm5

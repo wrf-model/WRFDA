@@ -344,20 +344,21 @@ if test -n "$PERL" ; then
   $PERL arch/Config_new.pl -perl=$PERL -netcdf=$NETCDF -phdf5=$PHDF5 -rttov=$RTTOV -os=$os -mach=$mach -ldflags=$ldflags \
      -compileflags=$compileflags
 
+  cp build/configure.wrf .
 fi
 
 export CONFIG=build/configure.wrf
 
 # new feb 2005.  test whether MPI-2
-if test -e CONFIG ; then
-  grepresult=`grep 'DMPARALLEL.*=.*1' CONFIG`
+if test -e $CONFIG ; then
+  grepresult=`grep 'DMPARALLEL.*=.*1' $CONFIG`
   if [ "$grepresult" != "" ] ; then
     echo testing for MPI_Comm_f2c and MPI_Comm_c2f 
     /bin/rm -f tools/mpi2_test
     make mpi2_test
     if test -x tools/mpi2_test ; then
       echo "  " MPI_Comm_f2c and MPI_Comm_c2f are supported
-      sed '/^CC .*=/s/$/ -DMPI2_SUPPORT/' CONFIG > xx$$ ; /bin/mv xx$$ CONFIG
+      sed '/^CC .*=/s/$/ -DMPI2_SUPPORT/' $CONFIG > xx$$ ; /bin/mv xx$$ $CONFIG
     else
       echo "  " MPI_Comm_f2c and MPI_Comm_c2f are not supported
     fi
@@ -365,6 +366,6 @@ if test -e CONFIG ; then
 fi
 
 if [ "$option" = "var" -o "$option" = "wrf" -o "$option" = "be" ] ; then
-  sed -e 's/-DWRFVAR//g' CONFIG > xx$$ ; /bin/mv xx$$ CONFIG
+  sed -e 's/-DWRFVAR//g' $CONFIG > xx$$ ; /bin/mv xx$$ $CONFIG
 fi
 

@@ -1,26 +1,31 @@
 #!/bin/bash
 
-rm -rf *.F90 *.F *.f *.inc *.int *.c *.h *.make *.m4 *code \
-  bufrlib.PRM *.sed registry gen_comms.stub inc/*
+export SOLVER=${SOLVER:-em}
 
-for DIR in dyn_em main share frame phys convertor tools \
+rm -rf *.F90 *.F *.f *.inc *.int *.c *.h *.make *.m4 *.code \
+  bufrlib.PRM *.sed registry gen_comms.stub inc/* \
+
+rm -rf convert_tool kma_wave2grid wave2grid_kma mm5_wrf wrf_mm5
+
+for DIR in dyn_$SOLVER main share frame phys convertor tools \
   external/esmf_time_f90 external/esmf_wrapper external/io_int \
   external/ioapi_share inc \
   external/io_netcdf external/io_grib1 da_3dvar da_3dvar/src/*; do
   NAME=`basename $DIR`
   ln -fs ../$DIR/$NAME.make ../$DIR/*.F90 ../$DIR/*.F ../$DIR/*.inc \
-    ../$DIR/*.f ../$DIR/*.c ../$DIR/*.h ../$DIR/*.m4 ../$DIR/*code \
+    ../$DIR/*.f ../$DIR/*.c ../$DIR/*.h ../$DIR/*.m4 ../$DIR/*.code \
     ../$DIR/*.int .
 #  echo include $DIR.make >> Makefile1
 done
 
-# Tidy up bogus links
-
-rm -f '*.F90' '*.F' '*.f' '*.inc' '*.int' '*.c' '*.h' '*make' '*.m4' \
-  '*.code' '*.sed'
-
 ln -fs ../da_3dvar/src/da_bufrlib/bufrlib.PRM .
 ln -fs ../arch/*.sed .
-ln -fs ../tools/gen_comms.stub  gen_comms.c
+ln -fs ../tools/gen_comms.stub .
+
+ln -fs ../convertor/convert_tool .
+ln -fs ../convertor/kma_wave2grid .
+ln -fs ../convertor/wave2grid_kma .
+ln -fs ../convertor/mm5_wrf .
+ln -fs ../convertor/wrf_mm5 .
 
 make clean

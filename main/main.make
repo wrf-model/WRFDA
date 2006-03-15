@@ -1,45 +1,58 @@
 # MAIN
 
-var : arch wrfvar.o $(LIBS)
-	$(LD) -o wrfvar.exe $(LDFLAGS) wrfvar.o $(LIB)
+var : wrfvar
+
+wrfvar : arch $(LIBS) $(DA_MODULES) wrfvar_obj wrfvar.o
+	$(LD) -o wrfvar.exe $(LDFLAGS) wrfvar.o $(DA_MODULES) $(LIB)
 
 wrf : arch wrf.o $(LIBS)
 	$(LD) -o wrf.exe $(LDFLAGS) wrf.o $(LIB)
 
-kma2netcdf : kma2netcdf.o
-	$(LD) -o kma2netcdf.exe $(LDFLAGS) kma2netcdf.o libwrflib.a $(LIB)
+kma2netcdf :  arch $(LIBS) $(CONVERTOR_MODULES) $(CONVERTOR_OBJS) kma2netcdf.o
+	$(LD) -o kma2netcdf.exe $(LDFLAGS) kma2netcdf.o libwrflib.a \
+          $(CONVERTOR_MODULES) $(CONVERTOR_OBJS) $(LIB)
 
-netcdf2kma : netcdf2kma.o
-	$(LD) -o netcdf2kma.exe $(LDFLAGS) netcdf2kma.o libwrflib.a $(LIB)
+netcdf2kma : arch $(LIBS) $(CONVERTOR_MODULES) $(CONVERTOR_OBJS) netcdf2kma.o
+	$(LD) -o netcdf2kma.exe $(LDFLAGS) netcdf2kma.o libwrflib.a \
+           $(CONVERTOR_MODULES) $(CONVERTOR_OBJS) $(LIB)
 
-$(SOLVER) : $(SOLVER).o
+$(SOLVER) : arch $(SOLVER).o
 	$(LD) -o $(SOLVER).exe $(LDFLAGS) $(SOLVER).o libwrflib.a $(LIB)
 
-$(SOLVER)_wrf : wrf.o
+$(SOLVER)_wrf : arch wrf.o
 	$(LD) -o wrf.exe $(LDFLAGS) wrf.o libwrflib.a $(LIB)
 
-$(SOLVER)_ideal : module_initialize ideal.o
-	$(LD) -o ideal.exe $(LDFLAGS) ideal.o ../dyn_$(SOLVER)/module_initialize_$(IDEAL_CASE).o libwrflib.a $(LIB)
+$(SOLVER)_ideal : arch module_initialize ideal.o
+	$(LD) -o ideal.exe $(LDFLAGS) ideal.o module_initialize_$(IDEAL_CASE).o libwrflib.a $(LIB)
 
-$(SOLVER)_real : module_initialize real_$(SOLVER).o ndown_$(SOLVER).o
-	$(LD) -o real.exe $(LDFLAGS) real_$(SOLVER).o ../dyn_$(SOLVER)/module_initialize_$(IDEAL_CASE).o libwrflib.a $(LIB)
-	$(LD) -o ndown.exe $(LDFLAGS) ndown_$(SOLVER).o  ../dyn_$(SOLVER)/module_initialize_$(IDEAL_CASE).o libwrflib.a $(LIB)
+$(SOLVER)_real : arch module_initialize real_$(SOLVER).o ndown_$(SOLVER).o
+	$(LD) -o real.exe $(LDFLAGS) real_$(SOLVER).o module_initialize_$(IDEAL_CASE).o libwrflib.a $(LIB)
+	$(LD) -o ndown.exe $(LDFLAGS) ndown_$(SOLVER).o  module_initialize_$(IDEAL_CASE).o libwrflib.a $(LIB)
 
-convert_bioemiss : convert_bioemiss.o
+convert_bioemiss : arch convert_bioemiss.o
 	$(FC) -o convert_bioemiss.exe $(LDFLAGS) convert_bioemiss.o libwrflib.a $(LIB)
 
-convert_emiss : convert_emiss.o
+convert_emiss : arch convert_emiss.o
 	$(FC) -o convert_emiss.exe $(LDFLAGS) convert_emiss.o libwrflib.a $(LIB)
 
-real_nmm : real_nmm.o
-	( cd ../dyn_nmm ;  $(MAKE) module_initialize_real.o )
-	$(FC) -o real_nmm.exe $(LDFLAGS) real_nmm.o module_initialize_real.o module_optional_si_input.o input_wrf.o module_io_domain.o libwrflib.a $(LIB)
+real_nmm : arch real_nmm.o module_initialize_real.o \
+          module_optional_si_input.o input_wrf.o module_io_domain.o
+	$(FC) -o real_nmm.exe $(LDFLAGS) real_nmm.o module_initialize_real.o \
+          module_optional_si_input.o input_wrf.o module_io_domain.o $(LIB)
 
-convert_nmm : convert_nmm.o
-	$(FC) -o convert_nmm.exe $(LDFLAGS) convert_nmm.o libwrflib.a $(LIB)
+convert_nmm : arch convert_nmm.o
+	$(FC) -o convert_nmm.exe $(LDFLAGS) convert_nmm.o $(LIB)
 
-module_initialize :
-	( cd ../dyn_$(SOLVER) ;  $(MAKE) module_initialize_$(IDEAL_CASE).o )
+module_initialize : module_initialize_$(IDEAL_CASE).o
+
+
+diffwrf : diffwrf_netcdf.exe diffwrf_int.exe
+
+diffwrf_netcdf.exe : diffwrf_netcdf.o $( LIBS)
+	$(FC) $(LDFLAGS) -o diffwrf_netcdf.exe diffwrf_netcdf.o $(LIB)
+
+diffwrf_int.exe : diffwrf_int.o $( LIBS)
+	$(FC) $(LDFLAGS) -o diffwrf_int.exe diffwrf_int.o $(LIB)
 
 #############################################################################################################################
 
@@ -66,7 +79,7 @@ ideal.o: \
 	module_dm.o \
 	module_wrf_esmf_super.o \
 	module_io_domain.o \
-	../dyn_$(SOLVER)/$(CASE_MODULE) \
+	$(CASE_MODULE) \
 	$(ESMF_MOD_DEPENDENCE) $(EXTRAMODULES)
 
 ndown_em.o: \
@@ -118,14 +131,5 @@ wrf.o: \
 	module_wrf_esmf_super.o \
         module_wrf_top.o \
 	$(ESMF_MOD_DEPENDENCE) $(EXTRAMODULES)
-
-# Needs explicit rule because of clashing wrfvar.c from tools/CodeBase
-
-wrfvar.o: wrfvar_interface wrfvar_io wrfvar_obj $(LIBS)
-	@ $(RM) $@
-	@ $(SED_FTN) $*.F > $*.b
-	  $(CPP) $(CPPFLAGS) $*.b  > $*.f
-	@ $(RM) $*.b
-	  $(FC) -c $(FCFLAGS) $*.f
 
 # DO NOT DELETE

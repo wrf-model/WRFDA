@@ -141,7 +141,7 @@ else
   echo "."
   echo " "
 
-  make $arglist A2DCASE="$A2DCASE"
+  make -r $arglist A2DCASE="$A2DCASE"
 
 endif
 

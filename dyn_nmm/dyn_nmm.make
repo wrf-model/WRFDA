@@ -46,20 +46,20 @@ module_DIFFUSION_NMM.o: module_MPP.o module_INDX.o
 module_IGWAVE_ADJUST.o: module_MPP.o module_INDX.o module_ZEROX.o module_TIMERS.o
 
 module_PHYSICS_CALLS.o: \
-		../frame/module_domain.o		\
-		../frame/module_dm.o		\
-		../frame/module_configure.o		\
-		../frame/module_tiles.o		\
-		../frame/module_state_description.o		\
-		../share/module_model_constants.o		\
-		../phys/module_ra_gfdleta.o  \
-		../phys/module_radiation_driver.o  \
-		../phys/module_sf_myjsfc.o  \
-		../phys/module_surface_driver.o  \
-		../phys/module_pbl_driver.o  \
-		../phys/module_cu_bmj.o  \
-		../phys/module_cumulus_driver.o  \
-		../phys/module_mp_etanew.o  \
-		../phys/module_microphysics_driver.o
+		module_domain.o                \
+		module_dm.o            \
+		module_configure.o             \
+		module_tiles.o         \
+		module_state_description.o             \
+		module_model_constants.o               \
+		module_ra_gfdleta.o  \
+		module_radiation_driver.o  \
+		module_sf_myjsfc.o  \
+		module_surface_driver.o  \
+		module_pbl_driver.o  \
+		module_cu_bmj.o  \
+		module_cumulus_driver.o  \
+		module_mp_etanew.o  \
+		module_microphysics_driver.o
 
 # DO NOT DELETE
