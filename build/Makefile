@@ -29,7 +29,7 @@ libwrflib.a : $(MODULES) $(OBJS)
 
 clean :
 	@ $(RM) *.exe *.o *.mod *.b *.a inc/*.inc frame/*.F registry \
-          Registry_tmp* \
+          Registry_tmp* module_state_description.F \
           '*.F90' '*.F' '*.f' '*.inc' '*.int' '*.c' '*.h' '*.make' '*.m4' \
           '*.code' '*.sed'
 
