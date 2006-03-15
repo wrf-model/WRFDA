@@ -27,7 +27,6 @@ PHYS_MODULES = \
 	module_sf_gfs.o \
 	module_sf_slab.o  \
 	module_sf_noahlsm.o  \
-	module_sf_lsm_nmm.o  \
 	module_sf_ruclsm.o \
 	module_sf_sfcdiags.o \
 	module_sf_myjsfc.o \
@@ -127,8 +126,7 @@ module_physics_init.o : \
 		module_wrf_error.o \
 		module_dm.o \
 		module_model_constants.o \
-		module_date_time.o  \
-		module_sf_lsm_nmm.o	
+		module_date_time.o	
 
 module_microphysics_driver.o: \
                 module_mp_kessler.o module_mp_lin.o \
@@ -180,7 +178,6 @@ module_surface_driver.o: \
 		module_sf_sfcdiags.o		\
 		module_state_description.o \
 		module_configure.o \
-		module_model_constants.o  \
- 		module_sf_lsm_nmm.o
+		module_model_constants.o
 
 # DO NOT DELETE
