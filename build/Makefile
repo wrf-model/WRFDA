@@ -1,6 +1,6 @@
 include configure.wrf
 
-LIBS = libwrflib.a libwrfio_nf.a libio_grib1.a libMEL_grib1.a libgrib1_util.a libesmf_time.a
+LIBS = libwrflib.a libwrfio_nf.a libio_grib1.a libesmf_time.a
 
 include dyn_$(SOLVER).make
 include share.make
