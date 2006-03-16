@@ -91,7 +91,8 @@ SUBROUTINE da_get_innov_vector_sound ( it, xb, xp, ob, iv )
                call to_zk(iv%sound(n)%h(k), v_h, xp, v_interp_h, iv%sound(n)%zk(k))
             ENDIF
 
-            if(iv%sound(n)%zk(k) < 0.0) then
+            if(iv%sound(n)%zk(k) < 0.0 .and. &
+               (ANALYSIS_TYPE /= 'VERIFY' .and. ANALYSIS_TYPE /= 'verify') ) then
                iv%sound(n)%u(k)%qc = missing
                iv%sound(n)%v(k)%qc = missing
                iv%sound(n)%t(k)%qc = missing
