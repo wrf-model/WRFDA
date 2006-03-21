@@ -31,14 +31,14 @@ SUBROUTINE DA_GET_SPoles(x,              &
    if( jts == jds)  tmp_s = tmpvar*sum(x(its:ite,jts+1,k))
 
    tmps = wrf_dm_sum_real( tmp_s )
-PRINT *,'TEST_COVERAGE_DA_GET_SPoles_A:  tmps = ',tmps
+!PRINT *,'TEST_COVERAGE_DA_GET_SPoles_A:  tmps = ',tmps
    if( jts == jds) x(its:ite,jts,k) = tmps
 !
    tmps =0.0  ; tmp_s =0.0
    if( jte == jde) tmp_s = tmpvar*sum(x(its:ite,jte-1,k))
 
    tmps = wrf_dm_sum_real( tmp_s )
-PRINT *,'TEST_COVERAGE_DA_GET_SPoles_B:  tmps = ',tmps
+!PRINT *,'TEST_COVERAGE_DA_GET_SPoles_B:  tmps = ',tmps
    if( jte == jde) x(its:ite,jte,k) = tmps
  end do
 END SUBROUTINE DA_GET_SPoles

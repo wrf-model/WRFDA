@@ -285,12 +285,10 @@ SUBROUTINE DA_Transfer_KMAToXb( xbx, grid, &
   tmp_ps  = sum(xb%psfc(is:ie,js:je)) /real((xp%ide-xp%ids+1)*(xp%jde-xp%jds+1))
 
   tmpps = wrf_dm_sum_real( tmp_ps )
-PRINT *,'TEST_COVERAGE_da_transfer_kmatoxb_A:  tmpps = ', tmpps
 
  do k=ks,ke
   tmp_p  = sum(xb%p(is:ie,js:je,k)) /real((xp%ide-xp%ids+1)*(xp%jde-xp%jds+1))
   tmpp = wrf_dm_sum_real( tmp_p )
-PRINT *,'TEST_COVERAGE_da_transfer_kmatoxb_B:  tmpp(',k,') = ', tmpp
 
 ! 0.01 is added to see that sigmah should not become negative
   xb%sigmah(ke+ks-k) = (tmpp - ptop+0.01 ) / (tmpps- ptop+0.01 ) 
@@ -569,13 +567,7 @@ PRINT *,'TEST_COVERAGE_da_transfer_kmatoxb_B:  tmpp(',k,') = ', tmpp
          loc_latc_mean(j) = tmpvar*SUM( xb % lat(is:ie, j) )
       enddo
       CALL wrf_dm_sum_reals ( loc_latc_mean, xbx % latc_mean )
-do j=xp%jds,xp%jde
-  write(UNIT=stdout,FMT=*) 'TEST_COVERAGE_da_transfer_kmatoxb_C:  xbx%latc_mean(',j,') = ', xbx%latc_mean(j)
-enddo
    ENDIF
-do j=xp%jds,xp%jde
-  write(UNIT=stdout,FMT=*) 'TEST_COVERAGE_da_transfer_kmatoxb_D:  xbx%latc_mean(',j,') = ', xbx%latc_mean(j)
-enddo
 
 !------------------------------------------------------------------------------
     write(UNIT=stdout,FMT=*) 'js je is ie= ', js,je,is,ie

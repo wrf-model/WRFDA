@@ -38,6 +38,9 @@ SUBROUTINE DA_ll_to_xy (info, loc, xp, &
    ! refactor to remove this ugly duplication later
    IF ( PRESENT( outside_all ) ) THEN
      outside_all = .false.
+! Syed RH Rizvi  03/16/2006
+! Do not check for global options 
+    IF ( .not. global) then 
      if((int(loc%x) < xp%ids) .or. (int(loc%x) >= xp%ide) .or. &
         (int(loc%y) < xp%jds) .or. (int(loc%y) >= xp%jde)) then
 !     if((loc%i < xp%ids) .or. (loc%i >= xp%ide) .or. &
@@ -50,6 +53,7 @@ SUBROUTINE DA_ll_to_xy (info, loc, xp, &
             outside_all = .true.
         endif
      endif
+    ENDIF
    ENDIF
 
    if(fg_format == 3)then

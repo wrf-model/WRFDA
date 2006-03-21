@@ -48,8 +48,8 @@ SUBROUTINE DA_GET_VPoles(u,v,lon,        &
 
    tmpu = wrf_dm_sum_real( tmp_u )
    tmpv = wrf_dm_sum_real( tmp_v )
-PRINT *,'TEST_COVERAGE_DA_GET_VPoles_A:  tmpu = ',tmpu
-PRINT *,'TEST_COVERAGE_DA_GET_VPoles_A:  tmpv = ',tmpv
+!PRINT *,'TEST_COVERAGE_DA_GET_VPoles_A:  tmpu = ',tmpu
+!PRINT *,'TEST_COVERAGE_DA_GET_VPoles_A:  tmpv = ',tmpv
    if( jts == jds) then 
      u(its:ite,jts,k) = -tmpu*cos(xls(its:ite)) -tmpv*sin(xls(its:ite))
      v(its:ite,jts,k) =  tmpu*sin(xls(its:ite)) -tmpv*cos(xls(its:ite))
@@ -68,8 +68,8 @@ PRINT *,'TEST_COVERAGE_DA_GET_VPoles_A:  tmpv = ',tmpv
    end if
    tmpu = wrf_dm_sum_real( tmp_u )
    tmpv = wrf_dm_sum_real( tmp_v )
-PRINT *,'TEST_COVERAGE_DA_GET_VPoles_B:  tmpu = ',tmpu
-PRINT *,'TEST_COVERAGE_DA_GET_VPoles_B:  tmpv = ',tmpv
+!PRINT *,'TEST_COVERAGE_DA_GET_VPoles_B:  tmpu = ',tmpu
+!PRINT *,'TEST_COVERAGE_DA_GET_VPoles_B:  tmpv = ',tmpv
    if( jte == jde) then 
      u(its:ite,jte,k) = -tmpu*cos(xln(its:ite)) +tmpv*sin(xln(its:ite))
      v(its:ite,jte,k) = -tmpu*sin(xln(its:ite)) -tmpv*cos(xln(its:ite))

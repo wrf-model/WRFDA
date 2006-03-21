@@ -31,7 +31,7 @@ SUBROUTINE DA_GET_ASPoles(x,              &
    if( jts == jds) tmp_s = tmpvar*sum(x(its:ite,jts,k))
 
    tmps = wrf_dm_sum_real( tmp_s )
-PRINT *,'TEST_COVERAGE_DA_GET_ASPoles_A:  tmps = ',tmps
+!PRINT *,'TEST_COVERAGE_DA_GET_ASPoles_A:  tmps = ',tmps
    if( jts == jds) then
       x(its:ite,jts+1,k) = x(its:ite,jts+1,k) + tmps
       x(its:ite,jts,k) = 0.0
@@ -41,7 +41,7 @@ PRINT *,'TEST_COVERAGE_DA_GET_ASPoles_A:  tmps = ',tmps
    if( jte == jde) tmp_s = tmpvar*sum(x(its:ite,jte,k))
 
    tmps = wrf_dm_sum_real( tmp_s )
-PRINT *,'TEST_COVERAGE_DA_GET_ASPoles_B:  tmps = ',tmps
+!PRINT *,'TEST_COVERAGE_DA_GET_ASPoles_B:  tmps = ',tmps
    if( jte == jde) then
       x(its:ite,jte-1,k) = x(its:ite,jte-1,k) + tmps
       x(its:ite,jte,k) = 0.0
