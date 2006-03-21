@@ -129,7 +129,7 @@ SUBROUTINE DA_Read_BUFR_Obs (iunit, ob, xp, filename)
          if(iret/=0) then
             write(UNIT=stdout, fmt='(a, i4)') &
                  'return code from readmg:', iret, &
-                 'Reach the end of obs unit: ', iunit
+                 'Reach the end of prepbufr obs unit: ', iunit
 
             exit reports
          endif
@@ -912,11 +912,11 @@ SUBROUTINE DA_Read_BUFR_Obs (iunit, ob, xp, filename)
 
             write(UNIT=stdout, fmt='(a, i12)') 'unsaved obs found with type: ',kx
 
-            write(UNIT=stdout, fmt='(2a)') &
-                 'platform%info%platform=', platform%info%platform
+!            write(UNIT=stdout, fmt='(2a)') &
+!                 'platform%info%platform=', platform%info%platform
 
-            write(UNIT=stdout, fmt='(a, i3)') &
-                 'platform%info%levels=', platform%info%levels
+!            write(UNIT=stdout, fmt='(a, i3)') &
+!                 'platform%info%levels=', platform%info%levels
 
         END SELECT
       END SELECT

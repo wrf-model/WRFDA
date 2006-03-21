@@ -82,7 +82,7 @@ SUBROUTINE da_setup_obs_structures( xp, ob, iv )
    IF (use_obsgts) then
      ! Conventional obs can be in BUFR or ascii format
      IF ( ob_format == 1 ) THEN
-       CALL wrf_message('Using MM5 format observation input')
+       CALL wrf_message('Using BUFR format observation input')
        ! [1.1] BUFR observation input file:
        IF (iv%num_pseudo > 0) THEN
          CALL wrf_message('Pseudo test only.')
