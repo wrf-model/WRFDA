@@ -1,0 +1,79 @@
+Change Log for update to WRF 3DVAR code
+---------------------------------------
+
+Author: Syed RH Rizvi
+Reviewer: Dale Baker
+Date: 03/21/2006
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+Update for KMA2NETCDF, NETCDF2KMA  converters and i
+WRF-Var for global option  (cv_options = 4)
+
+
+
+Expected Differences
+--------------------
+No changes are expected
+
+
+Accuracy: 
+CPU/memory:
+
+No changes
+
+Test results (run on what machines?)
+------------------------------------------------------
+
+On Linux machine (Snowdrift)
+ 
+No changes in the output with the current repository copde .
+
+However, comparison of Global run with the output made in Dec. 2005
+for 20041027 12 UTC starts differing slightly from 18th iterations
+onward as follows.
+
+
+ Repository code
+
+>    18      1.04718726D+05      2.39692363D+03      7.70476738D-04
+>    19      1.02203745D+05      2.19052810D+03      8.75500309D-04
+>    20      1.00232728D+05      2.48587529D+03      8.21528481D-04
+ December run
+<    18      1.04718726D+05      2.39692360D+03      7.70476739D-04
+<    19      1.02203744D+05      2.19052212D+03      8.75500589D-04
+<    20      1.00232579D+05      2.48491327D+03      8.21594976D-04
+
+
+
+Files removed:
+--------------
+
+None
+
+Files added:
+------------
+
+run/namelist.kma2netcdf
+da_3dvar/changes/changes_20060321.srh
+
+
+Files modified:
+---------------
+main/kma2netcdf.F
+convertor/module_kma2netcdf_interface.F
+convertor/module_netcdf2kma_interface.F
+convertor/kma_wave2grid/module_kma_wave2grid.F
+convertor/kma_wave2grid/W2GCONV.inc
+
+da_3dvar/src/DA_Tools/DA_ll_to_xy.inc
+da_3dvar/src/DA_VToX_Transforms/DA_Get_VPoles.inc
+da_3dvar/src/DA_VToX_Transforms/DA_Get_SPoles.inc
+da_3dvar/src/DA_VToX_Transforms/DA_Get_AVPoles.inc
+da_3dvar/src/DA_VToX_Transforms/DA_Get_ASPoles.inc
+da_3dvar/src/DA_Setup_Structures/da_transfer_kmatoxb.inc
+
+cvs commit ?
+ 
+commited to main repository  
+
