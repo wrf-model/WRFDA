@@ -118,7 +118,7 @@ SUBROUTINE netcdf2kma_interface ( grid, config_flags )
                              grid%sd33:grid%ed33-1),&
                              grid%ed31-grid%sd31  ,grid%ed32-grid%sd32   ,&
                              grid%ed33-grid%sd33)
-   call reorder_for_kma(grid%moist_2(grid%sd31:grid%ed31-1,grid%sd32:grid%ed32-1,&
+   call reorder_for_kma(grid%moist(grid%sd31:grid%ed31-1,grid%sd32:grid%ed32-1,&
                              grid%sd33:grid%ed33-1,P_qv:P_qv),&
                              grid%ed31-grid%sd31  ,grid%ed32-grid%sd32   ,&
                              grid%ed33-grid%sd33)
@@ -134,7 +134,7 @@ SUBROUTINE netcdf2kma_interface ( grid, config_flags )
         grid%em_t_2(grid%sd31:grid%ed31-1,grid%sd32:grid%ed32-1,grid%sd33:grid%ed33-1),&
         grid%em_u_2(grid%sd31:grid%ed31-1,grid%sd32:grid%ed32-1,grid%sd33:grid%ed33-1),&
         grid%em_v_2(grid%sd31:grid%ed31-1,grid%sd32:grid%ed32-1,grid%sd33:grid%ed33-1),&
-    grid%moist_2(grid%sd31:grid%ed31-1,grid%sd32:grid%ed32-1,grid%sd33:grid%ed33-1,P_qv),&                   !shc
+    grid%moist(grid%sd31:grid%ed31-1,grid%sd32:grid%ed32-1,grid%sd33:grid%ed33-1,P_qv),&                   !shc
     PSB,TB,UB,VB,QB)         !shc
 
     endif         !shc

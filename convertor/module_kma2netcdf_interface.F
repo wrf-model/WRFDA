@@ -12,14 +12,13 @@ MODULE module_kma2netcdf_interface
 
 CONTAINS
 
-SUBROUTINE kma2netcdf_interface ( grid, config_flags )
+SUBROUTINE kma2netcdf_interface ( grid, config_flags)
 
 !  IMPLICIT NONE    !shc-wei
 
 !--Input data.
    TYPE (grid_config_rec_type)   :: config_flags
-   TYPE(domain), TARGET               :: grid
-
+   TYPE(domain), TARGET          :: grid
 #ifdef DEREF_KLUDGE
    INTEGER     :: sm31 , em31 , sm32 , em32 , sm33 , em33
 
@@ -52,36 +51,59 @@ SUBROUTINE kma2netcdf_solver( grid, config_flags, &
 !  Definitions of dummy arguments to solve
 
 #include <em_dummy_decl.inc>
-#ifdef DM_PARALLEL
-    INCLUDE 'mpif.h'
-#endif
-
+!    INCLUDE 'mpif.h'
     real, allocatable      :: q(:,:,:) 
     Integer                :: my_proc_id, ierr 
+    Integer                :: ii, jj,landmask_T213(428,215)  
 !---------------------------------------------------------------------------
    INTEGER  :: ids,ide, jds,jde, kds,kde   ! domain dims.
    INTEGER  :: ims,ime, jms,jme, kms,kme   ! memory dims.
    INTEGER  :: ips,ipe, jps,jpe, kps,kpe   ! patch  dims.
    INTEGER  :: its,ite, jts,jte, kts,kte   ! Tile   dims.
    INTEGER  :: i
+!rizvi add ------------------------------------------------------------------
+   NAMELIST /kma2netcdf_parm/ IGRD, JGRD, KGRD, JCAP, KMAX, INTVL                           
+!
+      open( UNIT = 111, file= 'namelist.kma2netcdf', status= 'old')   
+
+      READ  (111, NML = kma2netcdf_parm, ERR = 8000)
+      close (111)
+      print*,' kma2netcdf_parm namelist data read are as follows:'
+      print*,' IGRD= ',IGRD
+      print*,' JGRD= ',JGRD
+      print*,' KGRD= ',KGRD
+      print*,' JCAP =  ',JCAP
+      print*,' KMAX =  ',KMAX
+      print*,' INTVL=  ',INTVL
+
+      DPHI=180./(JGRD-1)
+      LMAX=KGRD-1
+      KLMAX=KMAX
+      MEND1 = JCAP + 1
+      NEND1 = JCAP + 1
+      JEND1 = JCAP + 1
+      IMAXG = IGRD 
+      JMAXG = JGRD - 1 
+
+      IMAX  =360./DPHI+0.5
+      IOUT  =IMAX/INTVL  
+      JMAX  =180./DPHI+1.5
+      JOUT  =(JMAX-1)/INTVL+1
+      IMX   =IMAX+2
+      JOUTHF= (JOUT+1)/2
+      JMXGHF= (1+JMAXG)/2
+      KMX2  =KMAX*2  
+      LMX2 =LMAX*2
+      MNWAV =MEND1*(MEND1+1)/2
+
+
+!rizvi add ------------------------------------------------------------------
    CALL model_to_grid_config_rec ( grid%id , model_config_rec , config_flags )
 
   call copy_dims( grid, xp, &
                    ids, ide, jds, jde, kds, kde, &
                    ims, ime, jms, jme, kms, kme, &
                    ips, ipe, jps, jpe, kps, kpe  )
-   print*,' after copy_dims ims/e= ',ims,ime      
-   print*,' after copy_dims jms/e= ',jms,jme      
-   print*,' after copy_dims kms/e= ',kms,kme      
-
-   print*,' after copy_dims ids/e= ',ids,ide      
-   print*,' after copy_dims jds/e= ',jds,jde      
-   print*,' after copy_dims kds/e= ',kds,kde      
-
-   print*,' after copy_dims ips/e= ',ips,ipe      
-   print*,' after copy_dims jps/e= ',jps,jpe      
-   print*,' after copy_dims kps/e= ',kps,kpe      
-
 !--Compute these starting and stopping locations for each tile and number of tiles.
 
    CALL set_tiles ( grid , ids , ide , jds , jde , ips , ipe , jps , jpe )
@@ -91,12 +113,18 @@ SUBROUTINE kma2netcdf_solver( grid, config_flags, &
    allocate (q(ims:ime,jms:jme,kms:kme))
     
 #ifndef DEREF_KLUDGE
-     call W2GCONV(ht, psfc, t_2, u_2, v_2, q, KMA_A, KMA_B, &
+     call W2GCONV(IGRD, JGRD, KGRD, JCAP, KMAX, INTVL , &
+             DPHI, LMAX, KLMAX, MEND1, NEND1, JEND1, IMAXG, JMAXG, &
+             IMAX, IOUT, JMAX, JOUT, IMX, JOUTHF, JMXGHF, KMX2, LMX2, MNWAV, &                            
+             ht, psfc, t_2, u_2, v_2, q, KMA_A, KMA_B, &
              xp%ims, xp%jms, xp%kms, xp%ime, xp%jme, xp%kme,&
              xp%ids, xp%jds, xp%kds, xp%ide, xp%jde, xp%kde,&
              xp%its, xp%jts, xp%kts, xp%ite, xp%jte, xp%kte )
 #else
-     call W2GCONV(ht(ims,jms),psfc(ims,jms),t_2(ims,jms,kms),& 
+     call W2GCONV(IGRD, JGRD, KGRD, JCAP, KMAX, INTVL , &
+             DPHI, LMAX, KLMAX, MEND1, NEND1, JEND1, IMAXG, JMAXG, &
+             IMAX, IOUT, JMAX, JOUT, IMX, JOUTHF, JMXGHF, KMX2, LMX2, MNWAV, &                            
+     ht(ims,jms),psfc(ims,jms),t_2(ims,jms,kms),& 
      u_2(ims,jms,kms), v_2(ims,jms,kms), q(ims,jms,kms),&
      KMA_A(kms),KMA_B(kms), ims, jms, kms, ime, jme, kme, &
                             ids, jds, kds, ide, jde, kde, &
@@ -113,32 +141,27 @@ SUBROUTINE kma2netcdf_solver( grid, config_flags, &
    my_proc_id = 0
 #endif
 
-   moist_2(ims:ime,jms:jme,kms:kme,P_qv) = q(ims:ime,jms:jme,kms:kme)
+   moist(ims:ime,jms:jme,kms:kme,P_qv) = q(ims:ime,jms:jme,kms:kme)
    deallocate (q)                 
+! Load landmask from KMA-original land mask for T213
+    if( JCAP == 213 ) then
+      open( UNIT = 111, file= 'KMA_landmask_428_215', status= 'old')   
 
-!   write(61)ht(ids:ide,jds:jde)                 
-!   write(61)psfc(ids:ide,jds:jde)                 
-!   write(61)u_2(ids:ide,jds:jde,kds:kde)
-!   write(61)v_2(ids:ide,jds:jde,kds:kde)
-!   write(61)t_2(ids:ide,jds:jde,kds:kde)
-!   write(61)moist_2(ids:ide,jds:jde,kds:kde,P_qv)
-!
-   write(610+my_proc_id,'(10e15.7)')ht(ids:ide,jts:jte)                 
-   write(610+my_proc_id,'(10e15.7)')psfc(ids:ide,jts:jte)                 
-   write(610+my_proc_id,'(10e15.7)')u_2(ids:ide,jts:jte,kds:kde)
-   write(610+my_proc_id,'(10e15.7)')v_2(ids:ide,jts:jte,kds:kde)
-   write(610+my_proc_id,'(10e15.7)')t_2(ids:ide,jts:jte,kds:kde)
-   write(610+my_proc_id,'(10e15.7)')moist_2(ids:ide,jts:jte,kds:kde,P_qv)
+       do jj=1,215
+        read(111,'(428i1)', err=9000) (landmask_T213(ii,jj),ii=1,428)
+        landmask(its:ite,215-jj+1) = landmask_T213(its:ite,jj)
+       enddo
+       close (111) 
+    else
+    print*,' Land mask is not available for this truncation T',JCAP
+    endif
 
-!   write(610,'(10e15.7)')ht(ids:ide,jts:jte)                 
-!   write(611,'(10e15.7)')psfc(ids:ide,jts:jte)                 
-!   write(612,'(10e15.7)')u_2(ids:ide,jts:jte,kds:kde)
-!   write(613,'(10e15.7)')v_2(ids:ide,jts:jte,kds:kde)
-!   write(614,'(10e15.7)')T_2(IDS:IDE,JTS:JTE,KDS:Kde)
-!   write(615,'(10e15.7)')moist_2(ids:ide,jts:jte,kds:kde,P_qv)
-!
-! end if
-   
+     print*,' job done for kma2netcdf_solver' 
+     return
+8000  print*,' read error on namelist unit 111'
+     stop
+9000  print*,' read error on landmask unit 111'
+     stop
 END SUBROUTINE kma2netcdf_solver
 
 SUBROUTINE copy_dims(grid, xp, &
@@ -335,7 +358,6 @@ SUBROUTINE copy_tile_dims( grid, xp, its, ite, jts, jte, kts, kte )
         write(unit=*, fmt='(A,i3,A,5x,3(i3,A,i3,5x))') 'Tile ',ij, &
                 ' size:', its,':',ite, jts,':',jte, kts,':',kte
    END DO
-
 END SUBROUTINE copy_tile_dims
 
 END MODULE module_kma2netcdf_interface
