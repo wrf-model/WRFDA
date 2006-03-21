@@ -1,4 +1,7 @@
-      SUBROUTINE W2GCONV(ht, psfc, t, u, v, q, A, B,
+      SUBROUTINE W2GCONV(IGRD, JGRD, KGRD, JCAP, KMAX, INTVL , 
+     C  DPHI, LMAX, KLMAX, MEND1, NEND1, JEND1, IMAXG, JMAXG, 
+     C  IMAX, IOUT, JMAX, JOUT, IMX, JOUTHF, JMXGHF, KMX2, LMX2, MNWAV, 
+     C          ht, psfc, t, u, v, q, A, B,
      C          ims , jms, kms, ime , jme, kme, 
      C          ids , jds, kds, ide , jde, kde, 
      C          its , jts, kts, ite , jte, kte  )
@@ -319,14 +322,17 @@ C----------------------------------------------------------------------
      I  IFAX ,TRIGS,PNM  ,QDAT1,
      O  EDAT1,
      W  EDAT2)
+       print*,' Done  Wave to grid transform for Moisture calling cut'
         CALL CUT(TMP1,IOUT,JOUT,KMAX,EDAT1,IMAX,INTVL)
 C rizvi fix negative humidity to 0.000001
         CALL FIX_NEG_MOIST(TMP1,IOUT,JOUT,KMAX)
+       print*,' Done  cut calling reorder_for_wrf'
 c---------------------------------------------------------------
        call reorder_for_wrf(TMP1,  Q,IOUT,JOUT, KLMAX,
      C          ims , jms, kms, ime , jme, kme, 
      C          ids , jds, kds, ide , jde, kde,
      C          its , jts, kts, ite , jte, kte )
+       print*,' Done  calling reorder_for_wrf'
 c---------------------------------------------------------------
         IF(IDEBUG.GE.1) THEN
           K=KMAX
