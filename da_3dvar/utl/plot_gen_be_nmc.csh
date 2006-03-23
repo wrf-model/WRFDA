@@ -1,6 +1,6 @@
 #! /bin/csh -xvf
 #---------------------------------------------------------------
-# Purpose : Plot gen_be for cv_options=5  
+# Purpose : Plot gen_be for LAM data  
 # History : 
 #       06/07/2005                             Yong-Run Guo
 #---------------------------------------------------------------

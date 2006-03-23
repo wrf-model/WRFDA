@@ -1,5 +1,5 @@
       subroutine da_vd05ad(n,x,f,g,s,stp,ftol,gtol,xtol, &
-                        stpmin,stpmax,maxfev,info,nfev,wa,xp,mzs)
+                        stpmin,stpmax,maxfev,info,nfev,wa)
 !
 ! 
 !     subroutine vd05ad
@@ -134,9 +134,6 @@
       integer,intent(inout)              :: info
       integer,intent(out)                :: nfev
       real,dimension(n),intent(inout)    :: wa
-      integer, intent(in)                :: mzs(:) ! levels in background 
-                                                   ! error structure.
-      type (xpose_type), intent(in) :: xp     ! Domain decomposition vars.
       integer :: j
 
 !     integer infoc,j
@@ -149,7 +146,6 @@
       p5 = 0.5
       p66 = 0.66
       xtrapf = 4.0
-!      zero = 0.0
       nfev = 0
       
       if(info == -1) go to 45
@@ -164,7 +160,7 @@
 !     compute the initial gradient in the search direction
 !     and check that s is a descent direction.
 ! 
-      dginit=da_dot_cv(g,s,n,xp,mzs)
+      dginit=da_dot(g,s,n)
       if (dginit >= zero) return
 !      print *, 'dginit = ', dginit
 ! 
@@ -236,7 +232,7 @@
 ! 
    45    info=0
          nfev = nfev + 1
-         dg=da_dot_cv(g,s,n,xp,mzs)
+         dg=da_dot(g,s,n)
          ftest1 = finit + stp*dgtest
 ! 
 !        test for convergence.

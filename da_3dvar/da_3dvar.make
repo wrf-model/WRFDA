@@ -40,9 +40,6 @@ DA_OBJS        =	da_solve_v3d.o		\
 			da_h_ops.o		\
 			da_c_mat.o		\
 			DA_Constants.o		\
-			da_rf.o			\
-			da_mat.o      		\
-			da_rfz.o      		\
 			LAPACK.o		\
 			da_spectral.o           \
 			da_fftpack5.o           \
@@ -84,9 +81,6 @@ DA_OBJS_4_GEN_BE_LONG =	DA_Constants.o		\
 	                wrdesc.o 		\
 			da_h_ops.o		\
 			da_c_mat.o		\
-			da_rf.o			\
-			da_mat.o      		\
-			da_rfz.o      		\
 			LAPACK.o		\
 			da_spectral.o           \
 			be_spectral.o           \
@@ -111,8 +105,8 @@ gen_be_interface :	$(DA_MODULES_BE_INTERFACE)
 wrfvar_interface :	$(DA_MODULES_INTERFACE)
 		$(AR) ru libwrflib.a $(DA_MODULES_INTERFACE)
 
-wrfvar_io :	$(DA_MODULES_IO)
-		$(AR) ru libwrflib.a $(DA_MODULES_IO)
+wrfvar_modules :	$(DA_MODULES)
+		$(AR) ru libwrflib.a $(DA_MODULES)
 
 module_wrfvar_top.o : module_wrf_3dvar_interface.o \
                       module_integrate.o \
@@ -140,7 +134,6 @@ par_util.o:		DA_Define_Structures.o		\
 			DA_Constants.o			\
 			alloc_and_copy_be_arrays.inc   \
 			be_local_copy.inc              \
-			calculate_cv_local_size.inc    \
 			copy_dims.inc                  \
 			copy_tile_dims.inc             \
 			cv_to_vv.inc                   \
@@ -156,10 +149,6 @@ par_util.o:		DA_Define_Structures.o		\
 			unpack_count_obs.inc           \
 			vv_to_cv.inc                   \
 			wrf_dm_interface.inc           \
-			cv_to_global.inc               \
-			generic_typedefs.inc           \
-			generic_methods.inc            \
-			specific_methods.inc           \
 			generic_boilerplate.inc                \
 			y_facade_to_global.inc         \
 			par_util.F
@@ -170,7 +159,8 @@ module_wrf_3dvar_interface.o : module_domain.o \
                         module_model_constants.o \
                         da_solve_v3d.o
 
-da_solve_v3d.o:		DA_Constants.o			\
+da_solve_v3d.o:		module_model_constants.o \
+                        DA_Constants.o			\
 			DA_Define_Structures.o		\
 			DA_Setup_Structures.o		\
 			DA_Test.o			\
@@ -213,7 +203,6 @@ DA_Minimisation.o:	\
 			da_get_var_diagnostics.inc \
 			da_get_innov_vector.inc \
 			da_dot.inc \
-			da_dot_cv.inc \
 			da_lmdir.inc \
 			da_minimisation_warning.inc \
 			da_minimise.inc \
@@ -223,8 +212,7 @@ DA_Minimisation.o:	\
 			da_vd05ad.inc \
 			da_write_diagnostics.inc \
 			DA_Calculate_GradY.inc   \
-			DA_Minimise_CG.inc       \
-			DA_Minimise_QN.inc
+			DA_Minimise_CG.inc
 
 DA_Setup_Structures.o:	\
                         module_wrf_3dvar_io.o \
@@ -253,9 +241,6 @@ DA_Setup_Structures.o:	\
 			da_write_interpolated_be.inc \
 			da_rescale_background_errors.inc \
 			da_setup_background_errors.inc \
-			da_setup_background_errors2.inc \
-			da_setup_background_errors3.inc \
-			da_setup_background_errors4.inc \
 			da_setup_background_errors5.inc \
 			DA_Get_Bins_Info.inc            \
 			da_setup_firstguess.inc \
@@ -302,6 +287,7 @@ wrdesc.o:		wrdesc.c
 			$(CC) -c $(CFLAGS_BUFR) wrdesc.c
 
 DA_VToX_Transforms.o:	\
+                        module_tiles.o \
 			par_util.o \
 			DA_Define_Structures.o \
 			DA_Tools.o \
@@ -324,12 +310,6 @@ DA_VToX_Transforms.o:	\
 			DA_Transform_VpToX_Adj.inc \
 			DA_Transform_VvToVp.inc \
 			DA_Transform_VvToVp_Adj.inc \
-			da_apply_be.inc      \
-			da_apply_be_adj.inc    \
-			da_apply_rf.inc      \
-			da_apply_rf_adj.inc    \
-			da_transform_bal.inc   \
-			da_transform_bal_adj.inc   \
 			DA_Get_VPoles.inc   \
 			DA_Get_SPoles.inc   \
 			DA_Get_AVPoles.inc   \
@@ -997,10 +977,10 @@ DA_Define_Structures.o:	\
 			DA_Deallocate_Y.inc \
 			DA_Zero_X.inc \
 			DA_Zero_vp_type.inc \
-			da_allocate_cv.inc \
-			da_deallocate_cv.inc \
 			da_gauss_noise.inc  \
-			DA_Zero_Y.inc 
+			DA_Zero_Y.inc \
+                        module_dm.o \
+                        module_domain.o
 
 DA_Constants.o:		DA_Constants.F \
 			DA_Array_Print.inc \
@@ -1008,16 +988,6 @@ DA_Constants.o:		DA_Constants.F \
 			da_change_date.inc \
 			DA_Find_FFT_Factors.inc \
 			DA_Find_FFT_Trig_Funcs.inc
-
-da_rf.o:		da_rf.F
-			$(RM) $@
-			$(CPP) $(CPPFLAGS) da_rf.F > da_rf.f
-			$(FC) -c $(FCFLAGS_FFT_RF) da_rf.f
-
-da_rfz.o:		da_rfz.F
-			$(RM) $@
-			$(CPP) $(CPPFLAGS) da_rfz.F > da_rfz.f
-			$(FC) -c $(FCFLAGS_FFT_RF) da_rfz.f
 
 LAPACK.o:		\
 			BLAS.o \
@@ -1110,7 +1080,6 @@ DA_Test.o:	\
 			DA_Check_XToY_Adjoint_Radar.inc \
 			DA_Check_XToY_Adjoint_Profiler.inc \
 			DA_Check_XToY_Adjoint_Buoy.inc  \
-			DA_Test_VXTransform.inc \
 			DA_Transform_XToVp.inc \
 			da_check.inc \
 			da_check_xtoy_adjoint_pseudo.inc \

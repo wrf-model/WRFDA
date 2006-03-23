@@ -106,7 +106,7 @@ SUBROUTINE DA_Check_XToY_Adjoint( xb, xa, iv, xp, y, &
 
       if ( use_ssmt1obs .or. use_ssmt2obs .or. &
            Use_SsmiTbObs .or. Use_SsmiRetrievalObs ) then
-         if( cv_options == 4) then
+         if( global) then
            CALL wrf_error_fatal3(__LINE__,__FILE__, &
              "xb%speed is not available, see da_transfer_kmatoxb.inc")
          end if
@@ -216,7 +216,7 @@ SUBROUTINE DA_Check_XToY_Adjoint( xb, xa, iv, xp, y, &
 
       if ( use_ssmt1obs .or. use_ssmt2obs .or. &
            Use_SsmiTbObs .or. Use_SsmiRetrievalObs ) then
-         if( cv_options == 4) then
+         if( global) then
            CALL wrf_error_fatal3(__LINE__,__FILE__, &
              "xb%speed is not available, see da_transfer_kmatoxb.inc")
          end if

@@ -1,31 +1,28 @@
-subroutine da_transform_vtox_adj( xb, xbx, be, xa, xp, vp, vv, cv, &
+subroutine da_transform_vtox_adj( cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv, &
                                   ids, ide, jds, jde, kds, kde,           &
                                   ims, ime, jms, jme, kms, kme,           &
                                   its, ite, jts, jte, kts, kte )
+
 !--------------------------------------------------------------------------
 ! Purpose   : Control variable transform Adjoint
-!
-! History   : Creation                  --
-! Additions : fg_format  = 3 (KMA)   09/13/2004     Syed RH Rizvi
-!             CV_Options = 4         10/06/2005     Syed RH Rizvi
-!             Spectral transform     11/15/2004     Syed RH Rizvi
-!
 !--------------------------------------------------------------------------
    implicit none
 
+   integer, intent(in)              :: cv_size ! Size of cv array.
    type (xb_type), intent(in)       :: xb   ! first guess.
    TYPE (xbx_type),intent(in)       :: xbx  ! For header & non-grid arrays.
    type (be_type), intent(in)       :: be   ! background errors.
+   type (ep_type), intent(in)       :: ep   ! ensemble perturbation structure.
    type (x_type), intent(inout)     :: xa   ! grad_x(jo)
    type (xpose_type), intent(inout) :: xp   ! Dimensions and xpose buffers. 
    type (vp_type),intent(out)       :: vp   ! grdipt/level cv (local).
    type (vp_type),intent(out)       :: vv   ! grdipt/eof cv (local).
-   real, intent(inout)              :: cv(:)! grad_v(jo)
+   real, intent(inout)              :: cv(1:cv_size) ! control variables.
    integer, intent(in)              :: ids,ide, jds,jde, kds,kde ! domain dims.
    integer, intent(in)              :: ims,ime, jms,jme, kms,kme ! memory dims.
    integer, intent(in)              :: its,ite, jts,jte, kts,kte ! tile   dims
 
-   integer :: i, j, k, cv_s, cv_e             
+   integer                          :: i, j, k
    real :: sdmd, s1md, mu
    real, dimension(xb%kms:xb%kme) :: p, mr_a, mr_b
    real    :: PU, PD, coeff
@@ -114,9 +111,9 @@ subroutine da_transform_vtox_adj( xb, xbx, be, xa, xp, vp, vv, cv, &
 
          if ( use_ssmt1obs .or. use_ssmt2obs .or. &
               Use_SsmiTbObs .or. Use_SsmiRetrievalObs ) then
-         if( cv_options == 4) then
-           CALL wrf_error_fatal3(__FILE__,__LINE__, &
-             "xb%speed is not available, see da_transfer_kmatoxb.inc")
+         if( global ) then
+           CALL wrf_error_fatal( &
+             "xb%speed is not available. See the comments in da_transfer_kmatoxb.inc")
          end if
             call DA_Transform_XToSeaSfcWind_Adj( xa, xb )
          endif
@@ -133,7 +130,6 @@ subroutine da_transform_vtox_adj( xb, xbx, be, xa, xp, vp, vv, cv, &
       endif
    endif
 !-------------------------------------------------------------------------
- if(cv_options == 3 .or. cv_options == 4 .or. cv_options == 5) then
  
   call DA_PT_To_Rho_Adj( xb, xa )
    do j=xb%jts,xb%jte
@@ -183,20 +179,17 @@ subroutine da_transform_vtox_adj( xb, xbx, be, xa, xp, vp, vv, cv, &
      endif
    enddo
    enddo
- endif
 
  if( global ) then     
    call DA_Set_Boundary_Xa(xa, xb)
  endif
 
 !-------------------------------------------------------------------------
- if(cv_options == 2 .or. cv_options == 4 .or. cv_options == 5)then
-
-!-------------------------------------------------------------------------
 !  [3.0]: Perform x = u_p vp transform::
 !-------------------------------------------------------------------------
+
    call DA_Zero_vp_type ( vp )
-   call da_transform_vptox_adj( xb, xbx, xa, vp, be, xp, &
+   call da_transform_vptox_adj( xb, xbx, xa, vp, be, ep, xp, &
                                 ids,ide, jds,jde, kds,kde,  &
                                 ims,ime, jms,jme, kms,kme,  &
                                 its,ite, jts,jte, kts,kte )
@@ -206,6 +199,12 @@ subroutine da_transform_vtox_adj( xb, xbx, be, xa, xp, vp, vv, cv, &
 !-------------------------------------------------------------------------
 
    call DA_Zero_vp_type ( vv )
+
+!  Uv for alpha is a null transform:
+   if ( be % ne > 0 ) then
+      vv % alpha(its:ite,jts:jte,1:be%ne) = vp % alpha(its:ite,jts:jte,1:be%ne) 
+   end if
+
    if ( vert_corr == 2 ) then      
       call DA_Vertical_Transform( 'u_adj', be, &
 #ifndef DEREF_KLUDGE
@@ -222,39 +221,24 @@ subroutine da_transform_vtox_adj( xb, xbx, be, xa, xp, vp, vv, cv, &
       vv % v2(its:ite,jts:jte,kts:kte) = vp % v2(its:ite,jts:jte,kts:kte)
       vv % v3(its:ite,jts:jte,kts:kte) = vp % v3(its:ite,jts:jte,kts:kte)
       vv % v4(its:ite,jts:jte,kts:kte) = vp % v4(its:ite,jts:jte,kts:kte)
-      vv % v5(its:ite,jts:jte,kts:kte) = vp % v5(its:ite,jts:jte,kts:kte)
+      vv % v5(its:ite,jts:jte) = vp % v5(its:ite,jts:jte)
    end if
 
 !-------------------------------------------------------------------------
 !  [1.0]: perform vv = u_h cv transform:
 !-------------------------------------------------------------------------
 
- else if(cv_options==3 ) then
-   call da_transform_bal_adj( xb, vp, xa, be,xp,&
-                                ids,ide, jds,jde, kds,kde,  &
-                                ims,ime, jms,jme, kms,kme,  &
-                                its,ite, jts,jte, kts,kte )
-   call da_apply_be_adj( be, cv, vp ,xb,xp,&
-                                ids,ide, jds,jde, kds,kde,  &
-                                ims,ime, jms,jme, kms,kme,  &
-                                its,ite, jts,jte, kts,kte )
- else
-   WRITE(UNIT=errmsg(1),FMT='(a, i4)') &
-     'Unknown cv_options:', cv_options
-   CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
- endif
-
- if(cv_options == 2 .or. cv_options == 5) then
-   call da_transform_vtovv_adj( xb, be, vv, cv, xp, &
-                                ids,ide, jds,jde, kds,kde,  &
-                                ims,ime, jms,jme, kms,kme,  &
-                                its,ite, jts,jte, kts,kte )
- else if(cv_options == 4 ) then
-  call DA_Transform_VToVv_Global_Adj(xb, xbx, be, cv, vv, &
-                              ids,ide, jds,jde, kds,kde,  &
-                              ims,ime, jms,jme, kms,kme,  &
-                              its,ite, jts,jte, kts,kte )
- endif
+   if ( global ) then
+      call DA_Transform_VToVv_Global_Adj( cv_size, xb, xbx, be, cv, vv, &
+                                          ids,ide, jds,jde, kds,kde,  &
+                                          ims,ime, jms,jme, kms,kme,  &
+                                          its,ite, jts,jte, kts,kte )
+   else
+      call da_transform_vtovv_adj( cv_size, xb, be, cv, vv, xp, &
+                                   ids,ide, jds,jde, kds,kde,  &
+                                   ims,ime, jms,jme, kms,kme,  &
+                                   its,ite, jts,jte, kts,kte )
+   end if
 
 end subroutine da_transform_vtox_adj
 

@@ -109,37 +109,13 @@ subroutine DA_Vertical_Transform( string, be, vertical_wgt, vv, vp, &
          vp % v4(its:ite,jts:jte,kts:kte) = 0.0
       END IF
 
-      IF ( be % v5 % mz > 0 ) THEN
-        if( cv_options == 4 ) then
-         vp % v5(its:ite,jts:jte,1) = vv % v5(its:ite,jts:jte,1)
-        else
-           if( cv_options == 5 ) then
-              k_end = kts
-           else
-              k_end = kte
-           endif
+      vp % v5(its:ite,jts:jte) = 0.0
+      IF ( be % v5 % mz == 1 ) vp % v5(its:ite,jts:jte) = vv % v5(its:ite,jts:jte)
 
-         CALL DA_Transform_VvToVp( &
-#ifndef DEREF_KLUDGE
-                                   be % v5 % evec, &
-                                   be % v5 % val, &
-                                   vertical_wgt, &
-                                   vv % v5, vp % v5, &
-#else
-                                   be % v5 % evec(jds,kds,1), &
-                                   be % v5 % val(jds,1), &
-                                   vertical_wgt(ims,jms,kms), &
-                                   vv % v5(ims,jms,1), vp % v5(ims,jms,kms), &
-#endif
-                                   be % v5 % mz, &
-                                   ids,ide, jds,jde, kds,kde,  &
-                                   ims,ime, jms,jme, kms,kme,  &
-                                   its,ite, jts,jte, kts,k_end )
-        endif
-
-      ELSE
-         vp % v5(its:ite,jts:jte,kts:kte) = 0.0
-      END IF
+      if ( be % ne > 0 ) then
+!        Uv transform is null:
+         vp % alpha(its:ite,jts:jte,1:be%ne) = vv % alpha(its:ite,jts:jte,1:be%ne)
+      end if
 
    case ( 'u_inv');
      
@@ -223,33 +199,13 @@ subroutine DA_Vertical_Transform( string, be, vertical_wgt, vv, vp, &
                                    its,ite, jts,jte, kts,kte )
       END IF
 
-      IF ( be % v5 % mz > 0 ) THEN
-        if( cv_options == 4 ) then
-         vv % v5(its:ite,jts:jte,1) = vp % v5(its:ite,jts:jte,1)
-        else
-           if( cv_options == 5 ) then
-              k_end = kts
-           else
-              k_end = kte
-           endif
-         CALL DA_Transform_VpToVv( &
-#ifndef DEREF_KLUDGE
-                                   be % v5 % evec, &
-                                   be % v5 % val, &
-                                   vertical_wgt, &
-                                   vp % v5, vv % v5, &
-#else
-                                   be % v5 % evec(jts,kts,1), &
-                                   be % v5 % val(jts,1), &
-                                   vertical_wgt(ims,jms,1), &
-                                   vp % v5(ims,jms,1), vv % v5(ims,jms,1), &
-#endif
-                                   be % v5 % mz, &
-                                   ids,ide, jds,jde, kds,kde,  &
-                                   ims,ime, jms,jme, kms,kme,  &
-                                   its,ite, jts,jte, kts,k_end )
-        endif
-      END IF
+      vv % v5(its:ite,jts:jte) = 0.0
+      IF ( be % v5 % mz == 1 ) vv % v5(its:ite,jts:jte) = vp % v5(its:ite,jts:jte)
+
+      if ( be % ne > 0 ) then
+!        Uv transform is null:
+         vv % alpha(its:ite,jts:jte,1:be%ne) = vp % alpha(its:ite,jts:jte,1:be%ne)
+      end if
 
    case ('u_adj');
     
@@ -337,34 +293,13 @@ subroutine DA_Vertical_Transform( string, be, vertical_wgt, vv, vp, &
                                        its,ite, jts,jte, kts,kte )
       END IF
 
-      IF ( be % v5 % mz > 0 ) THEN
-        if( cv_options == 4 ) then
-         vv % v5(its:ite,jts:jte,1) = vp % v5(its:ite,jts:jte,1)
-        else
-           if( cv_options == 5 ) then
-              k_end = kts
-           else
-              k_end = kte
-           endif
-         CALL DA_Transform_VvToVp_Adj( &
-#ifndef DEREF_KLUDGE
-                                       be % v5 % evec, &
-                                       be % v5 % val, &
-                                       vertical_wgt, &
-                                       vp % v5, &
-                                       vv % v5, be % v5 % mz, &
-#else
-                                       be % v5 % evec(jds,kds,1), &
-                                       be % v5 % val(jds,1), &
-                                       vertical_wgt(ims,jms,kms), &
-                                       vp % v5(ims,jms,kms), &
-                                       vv % v5(ims,jms,1), be % v5 % mz, &
-#endif
-                                       ids,ide, jds,jde, kds,kde,  &
-                                       ims,ime, jms,jme, kms,kme,  &
-                                       its,ite, jts,jte, kts,k_end )
-        endif 
-      END IF
+      vv % v5(its:ite,jts:jte) = 0.0
+      if ( be % v5 % mz == 1 ) vv % v5(its:ite,jts:jte) = vp % v5(its:ite,jts:jte)
+
+      if ( be % ne > 0 ) then
+!        Uv transform is null:
+         vv % alpha(its:ite,jts:jte,1:be%ne) = vp % alpha(its:ite,jts:jte,1:be%ne)
+      end if
 
    case default;
      CALL wrf_error_fatal3(__FILE__,__LINE__, &

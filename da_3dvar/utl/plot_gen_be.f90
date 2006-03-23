@@ -10,7 +10,7 @@ program plot_reg_coeff
 !          3) Plot the scale-lengths for psi, chi_u, t_u, rh, and ps_u.    !
 !                                                                          !  
 ! Note: this program is working for gen_be.NMC.dat and gen_be.ENS.dat for  !
-!       for cv_options=5.                                                  !
+!       for LAM data                                                       !
 !                                                                          !
 ! History:                                                                 !
 !   06/09/2005   Original developer.                     Yong-Run Guo      ! 

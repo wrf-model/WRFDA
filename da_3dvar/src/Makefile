@@ -128,7 +128,6 @@ par_util.o:		DA_Define_Structures.o		\
 			DA_Constants.o			\
 			par_util/alloc_and_copy_be_arrays.inc	\
 			par_util/be_local_copy.inc		\
-			par_util/calculate_cv_local_size.inc	\
 			par_util/copy_dims.inc			\
 			par_util/copy_tile_dims.inc		\
 			par_util/cv_to_vv.inc			\
@@ -144,7 +143,6 @@ par_util.o:		DA_Define_Structures.o		\
 			par_util/unpack_count_obs.inc		\
 			par_util/vv_to_cv.inc			\
 			par_util/wrf_dm_interface.inc		\
-			par_util/cv_to_global.inc		\
 			par_util/generic_typedefs.inc		\
 			par_util/generic_methods.inc		\
 			par_util/specific_methods.inc		\
@@ -201,7 +199,6 @@ DA_Minimisation.o:	\
 			DA_Minimisation/da_get_var_diagnostics.inc \
 			DA_Minimisation/da_get_innov_vector.inc \
 			DA_Minimisation/da_dot.inc \
-			DA_Minimisation/da_dot_cv.inc \
 			DA_Minimisation/da_lmdir.inc \
 			DA_Minimisation/da_minimisation_warning.inc \
 			DA_Minimisation/da_minimise.inc \
@@ -211,8 +208,7 @@ DA_Minimisation.o:	\
 			DA_Minimisation/da_vd05ad.inc \
 			DA_Minimisation/da_write_diagnostics.inc \
 			DA_Minimisation/DA_Calculate_GradY.inc   \
-			DA_Minimisation/DA_Minimise_CG.inc       \
-			DA_Minimisation/DA_Minimise_QN.inc
+			DA_Minimisation/DA_Minimise_CG.inc
 			$(RM) $@
 			$(CPP) -I./DA_Minimisation $(CPPFLAGS_3DVAR) DA_Minimisation/DA_Minimisation.F > DA_Minimisation.f
 			$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) DA_Minimisation.f
@@ -244,14 +240,13 @@ DA_Setup_Structures.o:	\
 			DA_Setup_Structures/da_write_interpolated_be.inc \
 			DA_Setup_Structures/da_rescale_background_errors.inc \
 			DA_Setup_Structures/da_setup_background_errors.inc \
-			DA_Setup_Structures/da_setup_background_errors2.inc \
-			DA_Setup_Structures/da_setup_background_errors3.inc \
-			DA_Setup_Structures/da_setup_background_errors4.inc \
+			DA_Setup_Structures/da_setup_be_global.inc \
 			DA_Setup_Structures/da_setup_background_errors5.inc \
 			DA_Setup_Structures/DA_Get_Bins_Info.inc            \
 			DA_Setup_Structures/da_setup_firstguess.inc \
 			DA_Setup_Structures/da_setup_firstguess_mm5.inc \
 			DA_Setup_Structures/da_setup_firstguess_wrf.inc \
+			DA_Setup_Structures/da_setup_flow_predictors.inc \
 			DA_Setup_Structures/da_setup_firstguess_kma.inc \
 			DA_Setup_Structures/da_setup_obs_structures.inc \
 			DA_Setup_Structures/da_setup_obs_structures_ascii.inc \
@@ -318,12 +313,6 @@ DA_VToX_Transforms.o:	\
 			DA_VToX_Transforms/DA_Transform_VpToX_Adj.inc \
 			DA_VToX_Transforms/DA_Transform_VvToVp.inc \
 			DA_VToX_Transforms/DA_Transform_VvToVp_Adj.inc \
-			DA_VToX_Transforms/da_apply_be.inc	\
-			DA_VToX_Transforms/da_apply_be_adj.inc    \
-			DA_VToX_Transforms/da_apply_rf.inc	\
-			DA_VToX_Transforms/da_apply_rf_adj.inc    \
-			DA_VToX_Transforms/da_transform_bal.inc   \
-			DA_VToX_Transforms/da_transform_bal_adj.inc   \
 			DA_VToX_Transforms/DA_Get_VPoles.inc   \
 			DA_VToX_Transforms/DA_Get_SPoles.inc   \
 			DA_VToX_Transforms/DA_Get_AVPoles.inc   \
@@ -1082,8 +1071,7 @@ DA_Define_Structures.o:	\
 			DA_Define_Structures/DA_Deallocate_Y.inc \
 			DA_Define_Structures/DA_Zero_X.inc \
 			DA_Define_Structures/DA_Zero_vp_type.inc \
-			DA_Define_Structures/da_allocate_cv.inc \
-			DA_Define_Structures/da_deallocate_cv.inc \
+			DA_Define_Structures/da_initialize_cv.inc \
 			DA_Define_Structures/da_gauss_noise.inc  \
 			DA_Define_Structures/DA_Zero_Y.inc    
 			$(RM) $@
@@ -1206,7 +1194,6 @@ DA_Test.o:	\
 			DA_Test/DA_Check_XToY_Adjoint_Radar.inc \
 			DA_Test/DA_Check_XToY_Adjoint_Profiler.inc \
 			DA_Test/DA_Check_XToY_Adjoint_Buoy.inc  \
-			DA_Test/DA_Test_VXTransform.inc \
 			DA_Test/DA_Transform_XToVp.inc \
 			DA_Test/da_check.inc \
 			DA_Test/da_check_xtoy_adjoint_pseudo.inc \
@@ -1270,6 +1257,7 @@ da_spectral.o:		\
 			da_fftpack5.o			        \
 			da_spectral/da_asslegpol.inc		\
 			da_spectral/da_calc_power.inc		\
+			da_spectral/da_calc_power_spectrum.inc  \
 			da_spectral/da_get_gausslats.inc	\
 			da_spectral/da_get_reglats.inc		\
 			da_spectral/da_initialize_h.inc		\

@@ -45,15 +45,15 @@ MODULE DA_Setup_Structures
 #include <da_interpolate_stats.inc>
 #include <da_rescale_background_errors.inc>
 #include <da_setup_background_errors.inc>
-#include <da_setup_background_errors2.inc>
-#include <da_setup_background_errors3.inc>
-#include <da_setup_background_errors4.inc>
+#include <da_setup_be_global.inc>
+#include <da_setup_cv.inc>
 #include <da_setup_background_errors5.inc>
 #include <da_chgvres.inc>
 #include <da_setup_firstguess.inc>
 #include <da_setup_firstguess_mm5.inc>
 #include <da_setup_firstguess_wrf.inc>
 #include <da_setup_firstguess_kma.inc>
+#include <da_setup_flow_predictors.inc>
 #include <da_setup_obs_structures.inc>
 #include <da_setup_obs_structures_ascii.inc>
 #include <da_setup_obs_structures_bufr.inc>
@@ -74,5 +74,6 @@ MODULE DA_Setup_Structures
 #include <da_write_increments.inc>
 #include <DA_Write_KMA_Increments.inc>
 #include <DA_Get_Bins_Info.inc>
+#include <da_truncate_spectra.inc>
 
 END MODULE DA_Setup_Structures

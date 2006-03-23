@@ -1,14 +1,15 @@
-	subroutine DA_Transform_VToVv_Adj( xb, be, vv, cv, xp, &
-                                   ids,ide, jds,jde, kds,kde,  &
-                                   ims,ime, jms,jme, kms,kme,  &
-                                   its,ite, jts,jte, kts,kte )
+   subroutine DA_Transform_VToVv_Adj( cv_size, xb, be, cv, vv, xp, &
+                                      ids,ide, jds,jde, kds,kde,  &
+                                      ims,ime, jms,jme, kms,kme,  &
+                                      its,ite, jts,jte, kts,kte )
 
    implicit none
 
+   integer, intent(in)              :: cv_size ! Size of cv array.
    type (xb_type), intent(in)       :: xb   ! First guess structure.
    type (be_type), intent(in)       :: be   ! Background error structure.
-   type (vp_type), intent(inout)    :: vv   ! Grid point/EOF control var.
-   real, intent(inout)              :: cv(:)! Grad_v(Jo)
+   real, intent(inout)              :: cv(1:cv_size)   ! control variables.
+   type (vp_type), intent(in)       :: vv   ! Grid point/EOF control var.
    type (xpose_type), intent(inout) :: xp   ! Dimensions and xpose buffers. 
    integer, intent(in)              :: ids,ide, jds,jde, kds,kde ! domain dims.
    integer, intent(in)              :: ims,ime, jms,jme, kms,kme ! memory dims.
@@ -75,13 +76,22 @@
                                     its,ite, jts,jte, kts,kte )
    END IF
 
+!  [2.6] Transform alpha control variable
+
+   mz = be % alpha % mz
+   IF ( mz > 0 ) then
+      CALL DA_Transform_Through_RF_adj( mz, xb % grid_box_area, be % alpha % rf_alpha,&
+                                        be % alpha % val, xp, vv % alpha, &
+                                        ids,ide, jds,jde, kds,kde,  &
+                                        ims,ime, jms,jme, kms,kme,  &
+                                        its,ite, jts,jte, kts,kte )
+   END IF
+
 !-------------------------------------------------------------------------
 !  [1.0] Fill 1D cv array from 3-dimensional vv arrays.
 !-------------------------------------------------------------------------
 
-   call vv_to_cv( vv, xp, &
-                  (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz /), &
-                  cv_size, cv )
+   call vv_to_cv( vv, xp, be, cv_size, cv )
 
 END subroutine DA_Transform_VToVv_Adj
 

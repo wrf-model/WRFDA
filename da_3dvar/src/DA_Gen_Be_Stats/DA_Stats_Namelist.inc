@@ -19,7 +19,6 @@ Subroutine DA_Stats_Namelist
 ! ------ Default Values:                                                                                                
    TEST_TRANSFORMS = .TRUE.
 
-   cv_options = 3
    FG_FORMAT = 1
    directory_name  = './'
    file_head       = 'wrfout_d1'

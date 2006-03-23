@@ -50,7 +50,6 @@ export MP_SHARED_MEMORY=yes
 #-----------------------------------------------------------------------
 
 export START_DATE=${START_DATE:-2003010112}       # Analysis date.
-export DA_CV_OPTIONS=${DA_CV_OPTIONS:-3}             # Background error statistics: 2=NCAR, 3=NCEP.
 
 #Default directories/files:
 
@@ -66,7 +65,7 @@ fi
 
 export DA_FIRST_GUESS=${DA_FIRST_GUESS:-$DAT_DIR/wrfinput_d01.$START_DATE}    # wrfvar "first guess" input.
 export DA_OBSERVATIONS=${DA_OBSERVATIONS:-$DAT_DIR/obs_gts.3dvar.$START_DATE} # wrfvar observation input.
-export DA_BACK_ERRORS=${DA_BACK_ERRORS:-$DAT_DIR/be.cv_$DA_CV_OPTIONS} # wrfvar background errors.
+export DA_BACK_ERRORS=${DA_BACK_ERRORS:-$DAT_DIR/be.cv_4} # global wrfvar background errors.
 export DA_SSMI=${DA_SSMI:-$DAT_DIR/ssmi.dat}                          # SSM/I radiances (ignore if not using).
 export DA_RADAR=${DA_RADAR:-$DAT_DIR/radar.dat}                       # Radar data (ignore if not using).
 
@@ -181,6 +180,9 @@ export DA_LEN_SCALING2=${DA_LEN_SCALING2:-1.0}
 export DA_LEN_SCALING3=${DA_LEN_SCALING3:-1.0}
 export DA_LEN_SCALING4=${DA_LEN_SCALING4:-1.0}
 export DA_LEN_SCALING5=${DA_LEN_SCALING5:-1.0}
+export DA_POWER_TRUNCATION=${DA_POWER_TRUNCATION:-1.0}
+export DA_JB_FACTOR=${DA_JB_FACTOR:-1.0}
+export DA_JE_FACTOR=${DA_JE_FACTOR:-1.0}
 export DA_DEF_SUB_DOMAIN=${DA_DEF_SUB_DOMAIN:-.FALSE.}
 export DA_X_START_SUB_DOMAIN=${DA_X_START_SUB_DOMAIN:-55.0}
 export DA_Y_START_SUB_DOMAIN=${DA_Y_START_SUB_DOMAIN:-35.0}
@@ -216,6 +218,14 @@ export DA_LWRITE_IV=${DA_LWRITE_IV:-.TRUE.}
 export DA_LWRITE_PROFILE=${DA_LWRITE_PROFILE:-.TRUE.}
 export DA_USE_LANDEM=${DA_USE_LANDEM:-.FALSE.}
 export DA_MW_EMIS_SEA=${DA_MW_EMIS_SEA:-1}
+
+# RECORD15
+
+export DA_ENSDIM=${DA_ENSDIM:-0}
+export DA_ALPHA_TRUNCATION=${DA_ALPHA_TRUNCATION:-0}
+export DA_ALPHA_CORR_TYPE=${DA_ALPHA_CORR_TYPE:-3}
+export DA_ALPHA_CORR_SCALE=${DA_ALPHA_CORR_SCALE:-1500.0}
+export DA_ALPHA_STD_DEV=${DA_ALPHA_STD_DEV:-1.0}
 
 export DA_NUM_PSEUDO=${DA_NUM_PSEUDO:-0}
 export DA_PSEUDO_X=${DA_PSEUDO_X:-165.0}
@@ -273,7 +283,7 @@ cp $WRFVAR_DIR/run/LANDUSE.TBL .
 cp $BUILD_DIR/wrfvar.exe  wrfvar.exe
 
 ln -sf $DA_FIRST_GUESS		wrf_3dvar_input
-ln -sf $DA_BACK_ERRORS		fort.3${DA_CV_OPTIONS}
+ln -sf $DA_BACK_ERRORS		fort.34
 ln -sf $DA_OBSERVATIONS	fort.9${DA_OB_FORMAT}
 
 if test -r $DA_SSMI; then
@@ -358,17 +368,20 @@ cat > namelist.3dvar << EOF
  WRITE_INTERVAL = $DA_WRITE_INTERVAL /
 
 &record7
- RF_PASSES      = $DA_RF_PASSES,
- VAR_SCALING1   = $DA_VAR_SCALING1,
- VAR_SCALING2   = $DA_VAR_SCALING2,
- VAR_SCALING3   = $DA_VAR_SCALING3,
- VAR_SCALING4   = $DA_VAR_SCALING4,
- VAR_SCALING5   = $DA_VAR_SCALING5,
- LEN_SCALING1   = $DA_LEN_SCALING1,
- LEN_SCALING2   = $DA_LEN_SCALING2,
- LEN_SCALING3   = $DA_LEN_SCALING3,
- LEN_SCALING4   = $DA_LEN_SCALING4,
- LEN_SCALING5   = $DA_LEN_SCALING5 /
+ RF_PASSES        = $DA_RF_PASSES,
+ VAR_SCALING1     = $DA_VAR_SCALING1,
+ VAR_SCALING2     = $DA_VAR_SCALING2,
+ VAR_SCALING3     = $DA_VAR_SCALING3,
+ VAR_SCALING4     = $DA_VAR_SCALING4,
+ VAR_SCALING5     = $DA_VAR_SCALING5,
+ LEN_SCALING1     = $DA_LEN_SCALING1,
+ LEN_SCALING2     = $DA_LEN_SCALING2,
+ LEN_SCALING3     = $DA_LEN_SCALING3,
+ LEN_SCALING4     = $DA_LEN_SCALING4,
+ LEN_SCALING5     = $DA_LEN_SCALING5,
+ power_truncation = $DA_POWER_TRUNCATION,
+ jb_factor        = $DA_JB_FACTOR,
+ je_factor        = $DA_JE_FACTOR /
 
 &record8
  def_sub_domain     = $DA_DEF_SUB_DOMAIN,
@@ -388,14 +401,13 @@ cat > namelist.3dvar << EOF
  write_outer_loop    = $DA_WRITE_OUTER_LOOP,
  lat_stats_option    = $DA_LAT_STATS_OPTION,
  calculate_cg_cost_fn = $DA_CALCULATE_CG_COST_FN,
- cv_options          = $DA_CV_OPTIONS,
  cv_options_hum      = $DA_CV_OPTIONS_HUM,
  check_rh            = $DA_CHECK_RH,
- as1                 = $DA_as1,
- as2                 = $DA_as2,
- as3                 = $DA_as3,
- as4                 = $DA_as4,
- as5                 = $DA_as5,
+ as1                 = $DA_AS1,
+ as2                 = $DA_AS2,
+ as3                 = $DA_AS3,
+ as4                 = $DA_AS4,
+ as5                 = $DA_AS5,
  sfc_assi_options    = $DA_SFC_ASSI_OPTIONS,
  set_omb_rand_fac    = $DA_SET_OMB_RAND_FAC,
  seed_array1         = $DA_SEED_ARRAY1,
@@ -416,7 +428,7 @@ cat > namelist.3dvar << EOF
 
 &record14
  rtminit_print       = $DA_RTMINIT_PRINT,
- rtminit_nsensor     = $DA_RTMINIT_NSENSOR2,
+ rtminit_nsensor     = $DA_RTMINIT_NSENSOR,
  rtminit_platform    = $DA_RTMINIT_PLATFORM,
  rtminit_satid       = $DA_RTMINIT_SATID,
  rtminit_sensor      = $DA_RTMINIT_SENSOR,
@@ -429,6 +441,13 @@ cat > namelist.3dvar << EOF
  lwrite_profile      = $DA_LWRITE_PROFILE,
  use_landem          = $DA_USE_LANDEM,
  mw_emis_sea         = $DA_MW_EMIS_SEA/
+
+&record15
+ ensdim           = $DA_ENSDIM,
+ alpha_truncation = $DA_ALPHA_TRUNCATION,
+ alpha_corr_type  = $DA_ALPHA_CORR_TYPE,
+ alpha_corr_scale = $DA_ALPHA_CORR_SCALE,
+ alpha_std_dev    = $DA_ALPHA_STD_DEV/
  
 &pseudo_ob_nl
  num_pseudo     = $DA_NUM_PSEUDO, 

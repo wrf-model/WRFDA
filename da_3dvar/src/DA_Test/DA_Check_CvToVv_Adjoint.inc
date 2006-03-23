@@ -1,25 +1,22 @@
-SUBROUTINE DA_Check_CvToVv_Adjoint( xb, xbx, xp, be, cv, vv, &
+SUBROUTINE DA_Check_CvToVv_Adjoint( cv_size, xb, xbx, xp, be, cv, vv, &
                                     ids,ide, jds,jde, kds,kde, &
                                     ims,ime, jms,jme, kms,kme, &
                                     its,ite, jts,jte, kts,kte )
 
 !------------------------------------------------------------------------------
-!  PURPOSE: Test Vv to Vp routine and adjoint for compatibility.
+!  PURPOSE: Test vtovv routine and adjoint for compatibility.
 !
-!  METHOD:  Standard adjoint test: < Vp, Vp > = < Vv_adj, Vv >.
-!
-!  HISTORY: 02/23/2000 - Creation of F90 version.           Dale Barker
-!           02/04/2005 - Updated for cv_option =4           Syed RH Rizvi
+!  METHOD:  Standard adjoint test: < vv, vv > = < cv_adj, cv >.
 !------------------------------------------------------------------------------
 
    IMPLICIT NONE
       
+   integer, intent(in)               :: cv_size ! Size of cv array.
    type (xb_type), intent(in)        :: xb    ! first guess (local).
    type (xbx_type),intent(in)        :: xbx   ! Header & non-gridded vars.
    type (xpose_type), intent(inout)  :: xp    ! Dimensions and xpose buffers.
    type (be_type), intent(in)        :: be    ! background error structure.
-   real,dimension(cv_size), &
-                   intent(inout)     :: cv    ! control variable (local).
+   real, intent(in)                  :: cv(1:cv_size) ! control variable.
    type (vp_type), intent(inout)     :: vv    ! CV(i,j,m).
 
    integer, intent(in)               :: ids,ide, jds,jde, kds,kde ! domain dims.
@@ -35,9 +32,7 @@ SUBROUTINE DA_Check_CvToVv_Adjoint( xb, xbx, xp, be, cv, vv, &
    REAL                           :: adj_sum_lhs ! < Vv, Vv >
    REAL                           :: adj_sum_rhs ! < cv_adj, cv >
 
-!-------------------------------------------------------------------------
-
-   real, dimension(cv_size) :: cv_2
+   real                              :: cv2(1:cv_size)! control variable.
 
 !-------------------------------------------------------------------------
 !  [1.0] Initialise:
@@ -50,45 +45,49 @@ SUBROUTINE DA_Check_CvToVv_Adjoint( xb, xbx, xp, be, cv, vv, &
 !  [2.0] Perform Vp = U_v Vv transform:
 !-------------------------------------------------------------------------
 
-   cv_2(1:cv_size) = cv(1:cv_size)
-   if( cv_options == 2 .or. cv_options == 5 ) &
-   call da_transform_vtovv( xb, be, cv, vv, xp,         &
-                            ids,ide, jds,jde, kds,kde,  &
-                            ims,ime, jms,jme, kms,kme,  &
-                            its,ite, jts,jte, kts,kte )
-   if( cv_options == 4) &
-       call DA_Transform_VToVv_Global(xb, xbx, be, cv,vv, &
-                                ids, ide, jds, jde, kds, kde, &
-                                ims, ime, jms, jme, kms, kme, &
-                                its, ite, jts, jte, kts, kte )
+   if ( global ) then
+      call DA_Transform_VToVv_Global( cv_size, xb, xbx, be, cv, vv, &
+                                      ids, ide, jds, jde, kds, kde, &
+                                      ims, ime, jms, jme, kms, kme, &
+                                      its, ite, jts, jte, kts, kte )
+   else
+      call da_transform_vtovv( cv_size, xb, be, cv, vv, xp,         &
+                               ids,ide, jds,jde, kds,kde,  &
+                               ims,ime, jms,jme, kms,kme,  &
+                               its,ite, jts,jte, kts,kte )
+   end if
 
 !-------------------------------------------------------------------------
 !  [3.0] Calculate LHS of adjoint test equation:
 !-------------------------------------------------------------------------
 
-   adj_par_lhs = SUM( vv % v1(its:ite,jts:jte,1:kz_vv(1))**2 ) &
-               + SUM( vv % v2(its:ite,jts:jte,1:kz_vv(2))**2 ) &
-               + SUM( vv % v3(its:ite,jts:jte,1:kz_vv(3))**2 ) &
-               + SUM( vv % v4(its:ite,jts:jte,1:kz_vv(4))**2 ) &
-               + SUM( vv % v5(its:ite,jts:jte,1:kz_vv(5))**2 )
+   adj_par_lhs = SUM( vv % v1(its:ite,jts:jte,1:be%v1%mz)**2 ) &
+               + SUM( vv % v2(its:ite,jts:jte,1:be%v2%mz)**2 ) &
+               + SUM( vv % v3(its:ite,jts:jte,1:be%v3%mz)**2 ) &
+               + SUM( vv % v4(its:ite,jts:jte,1:be%v4%mz)**2 ) &
+               + SUM( vv % v5(its:ite,jts:jte)**2 )
+
+   if ( be % ne > 0 ) then
+      adj_par_lhs = adj_par_lhs + sum( vv % alpha(its:ite,jts:jte,1:be%ne)**2 )
+   end if
 
 !-------------------------------------------------------------------------
-!  [4.0] Calculate LHS of adjoint test equation:
+!  [4.0] Calculate RHS of adjoint test equation:
 !-------------------------------------------------------------------------
 
-   if( cv_options == 2 .or. cv_options == 5 ) &
-   call DA_Transform_VToVv_Adj( xb, be, vv, cv, xp, &
-                               ids,ide, jds,jde, kds,kde,  &
-                               ims,ime, jms,jme, kms,kme,  &
-                               its,ite, jts,jte, kts,kte )
-   if( cv_options == 4) &
-       call DA_Transform_VToVv_Global_Adj(xb, xbx, be, cv,vv, &
-                                ids, ide, jds, jde, kds, kde, &
-                                ims, ime, jms, jme, kms, kme, &
-                                its, ite, jts, jte, kts, kte )
+   if ( global ) then
+       call DA_Transform_VToVv_Global_Adj( cv_size, xb, xbx, be, cv2, vv, &
+                                           ids, ide, jds, jde, kds, kde, &
+                                           ims, ime, jms, jme, kms, kme, &
+                                           its, ite, jts, jte, kts, kte )
+   else
+      call DA_Transform_VToVv_Adj( cv_size, xb, be, cv2, vv, xp, &
+                                   ids,ide, jds,jde, kds,kde,  &
+                                   ims,ime, jms,jme, kms,kme,  &
+                                   its,ite, jts,jte, kts,kte )
+   end if
 
-
-   adj_par_rhs = SUM( cv(1:cv_size) * cv_2(1:cv_size) )
+   adj_par_rhs = SUM( cv(1:cv_size) * cv2(1:cv_size) )
 
 !-------------------------------------------------------------------------
 !  [5.0] Print output:

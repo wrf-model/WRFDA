@@ -188,7 +188,7 @@ SUBROUTINE DA_Setup_RunConstants( xp, xb, xbx)
       endif
 
 !------------------------------------------------------------------------------
-   IF ( cv_options == 4 ) THEN
+   IF ( global ) THEN
 ! Set up Spectral transform constants:
     xbx%inc    = 1
     xbx%ni     = xp%ide-xp%ids+1
@@ -198,7 +198,6 @@ SUBROUTINE DA_Setup_RunConstants( xp, xb, xbx)
     xbx%lenwrk = xbx%ni
     xbx%max_wavenumber = xbx%ni/2 -1
     xbx%alp_size = (xbx%nj+ 1)*(xbx%max_wavenumber+1)*( xbx%max_wavenumber + 2)/ 4
-    xbx%c_cv_size= (xbx%max_wavenumber+1)*(xbx%max_wavenumber+2)/2
 
   if(print_detail > 0) then
    write(UNIT=stdout, fmt='(a, i6)') &

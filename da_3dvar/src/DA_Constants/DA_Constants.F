@@ -140,6 +140,7 @@ MODULE DA_Constants
    REAL, PARAMETER    :: inv_typ_vp3_sumsq = 0.00001 ! 1/SUM(phi_u**2)
    REAL, PARAMETER    :: inv_typ_vp4_sumsq = 10000.0 ! 1/SUM(q**2)
    REAL, PARAMETER    :: inv_typ_vp5_sumsq = 0.00001 ! 1/SUM(?**2)
+   REAL, PARAMETER    :: inv_typ_vpalpha_sumsq = 1.0 ! 1/SUM(?**2)
 
 !  Fortran unit  parameters:
 
@@ -156,10 +157,7 @@ MODULE DA_Constants
 
    INTEGER, PARAMETER :: cov_unit = 25 ! Covariances unit
 
-   INTEGER, PARAMETER :: be_cv_2_unit = 32    ! Unit number for be input.
-   INTEGER, PARAMETER :: be_cv_3_unit = 33    ! Unit number for be input.
-   INTEGER, PARAMETER :: be_cv_4_unit = 34    ! Unit number for be input. 
-   INTEGER, PARAMETER :: be_cv_5_unit = 35    ! Unit number for be input.
+   INTEGER, PARAMETER :: be_unit = 34    ! Unit number for be input.
 
    INTEGER, PARAMETER :: sound_diag_unit1 = 36 ! For da_sound/da_obs_diagnostics
    INTEGER, PARAMETER :: sound_diag_unit2 = 37
@@ -181,6 +179,11 @@ MODULE DA_Constants
 
    INTEGER, PARAMETER :: check_max_iv_unit=60 ! Unit number for O-B check.
 
+   INTEGER, PARAMETER :: num_alpha_corr_types = 3
+
+   INTEGER, PARAMETER :: alpha_corr_unit1(num_alpha_corr_types) = (/61,62,63/)
+   INTEGER, PARAMETER :: alpha_corr_unit2(num_alpha_corr_types) = (/71,72,73/)
+
    integer, parameter :: cost_unit = 81       ! Output of cost-function value
    integer, parameter :: grad_unit = 82       ! Output of gradient norm
 
@@ -198,6 +201,7 @@ MODULE DA_Constants
    integer, parameter  :: ounit = iunit + 1
    integer, parameter  :: namelist_unit = 72
    integer, parameter  :: spec_unit = 73     ! Unit for spectral diag. output.
+   integer, parameter  :: ep_unit = 74        ! Ensemble perturbation input.
 
    INTEGER, PARAMETER :: max_num_of_var = 200 ! Maximum # of stored fields.
 
@@ -268,13 +272,10 @@ MODULE DA_Constants
  integer                :: max_ext_its ! Max. number of external iterations.
  integer                :: ntmax       ! Max. number of minim. its.
  integer                :: nsave       ! #Minimisation states to store.
- integer                :: minimisation_option  ! Minimisation option. 1. QN, 2 CG.
+ integer                :: minimisation_option  ! Minimisation option. 2 CG.
 
  real, dimension(10)    :: eps         ! Fraction of initial gradient
                                        ! required for min. convergence.
-
- INTEGER                :: cv_size     ! Size of control variable.
- INTEGER,dimension(5)   :: kz_vv,kz_vp ! vertical dimensions of vv and vp arrays
 
 !Recursive filter:
  INTEGER                :: rf_passes   ! Number of passes in recursive filter.
@@ -336,8 +337,15 @@ MODULE DA_Constants
  integer       :: seed_array1, seed_array2
  real          :: set_omb_rand_fac ! Scaling factor for random O-B (*sigma_o).
  logical       :: omb_add_noise ! Add random noise to O-Bs if .true.
+
+!Ensemble parameters:
+ integer       :: ensdim
+ integer       :: alpha_truncation     ! Spectral truncation of alpha.
+ integer       :: alpha_corr_type      ! 1=Exponential, 2=SOAR, 3=Gaussian.
+ real          :: alpha_corr_scale     ! Alpha correlation scale (km).
+ real          :: alpha_std_dev        ! Alpha control variable standard deviation.
+
  INTEGER       :: obs_qc_pointer ! 3dvar uses the obs data with qc >= obs_qc_pointer
- INTEGER       :: cv_options
  integer       :: sfc_assi_options     ! Surface assimilation option.
 
  REAL, DIMENSION(3) :: as1, as2, as3, as4, as5
@@ -349,6 +357,9 @@ MODULE DA_Constants
  INTEGER       :: vert_evalue
  REAL          :: max_vert_var1, max_vert_var2, max_vert_var3, &
                   max_vert_var4, max_vert_var5
+ real          :: power_truncation
+ real          :: jb_factor            ! Scaling factor.
+ real          :: je_factor            ! Scaling factor.
  LOGICAL       :: test_transforms
  LOGICAL       :: test_statistics
  LOGICAL       :: print_obs_info

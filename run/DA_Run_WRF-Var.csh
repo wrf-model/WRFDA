@@ -71,7 +71,7 @@ set
 #-----------------------------------------------------------------------
 
  if ( ! $?START_DATE )              setenv START_DATE 2003010112       # Analysis date.
- if ( ! $?DA_CV_OPTIONS )           setenv DA_CV_OPTIONS 3             # Background error statistics: 2=NCAR, 3=NCEP.
+ if ( ! $?DA_GLOBAL )               setenv DA_GLOBAL .FALSE.
 
 #Default directories/files:
  if ( ! $?SRC_DIR )    setenv SRC_DIR    ${HOME}/code_development
@@ -82,7 +82,7 @@ set
 
  if ( ! $?DA_FIRST_GUESS ) setenv DA_FIRST_GUESS ${DAT_DIR}/wrfinput_d01.${START_DATE} # wrfvar "first guess" input.
  if ( ! $?DA_OBSERVATIONS ) setenv DA_OBSERVATIONS ${DAT_DIR}/obs_gts.3dvar.${START_DATE} # wrfvar observation input.
- if ( ! $?DA_BACK_ERRORS ) setenv DA_BACK_ERRORS ${DAT_DIR}/be.cv_${DA_CV_OPTIONS}    # wrfvar background errors.
+ if ( ! $?DA_BACK_ERRORS ) setenv DA_BACK_ERRORS ${DAT_DIR}/be.cv_5    # wrfvar background errors.
  if ( ! $?DA_SSMI ) setenv DA_SSMI ${DAT_DIR}/ssmi.dat         # SSM/I radiances (ignore if not using).
  if ( ! $?DA_RADAR) setenv DA_RADAR ${DAT_DIR}/radar.dat       # Radar data (ignore if not using).
 
@@ -395,7 +395,6 @@ cat >! namelist.3dvar << EOF
  write_outer_loop    = $DA_WRITE_OUTER_LOOP,
  lat_stats_option    = $DA_LAT_STATS_OPTION,
  calculate_cg_cost_function = $DA_CALCULATE_CG_COST_FUNCTION,
- cv_options     = $DA_CV_OPTIONS,
  cv_options_hum = $DA_CV_OPTIONS_HUM,
  check_rh       = $DA_CHECK_RH,
  as1            = $DA_as1,

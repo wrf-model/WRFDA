@@ -35,7 +35,7 @@ cat >! namelist.title << EOF
 main_title1 = 'TEST WRF BACKGROUND ERROR' ,
 main_title2 = 'REGRESSION COEFFICIENTS     ' ,
 Km_Resolution = 100.0,
-cv_options = 5,
+global = .false.,
 fg_format = 1,
 im=89,
 jm=89,
