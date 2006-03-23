@@ -35,7 +35,7 @@ SUBROUTINE da_add_increments( it, xp, xa, xb, xbx )
 !  [1.0] Check bounds on relative humidity and recalculate rh, q increments:
 !------------------------------------------------------------------------------
 
-   if ( cv_options == 3 .or. cv_options_hum == 1  ) then
+   if ( cv_options_hum == 1  ) then
 
 !     Calculate rh increments 
 !     (This is the only place they are used with cv_options_hum=1)

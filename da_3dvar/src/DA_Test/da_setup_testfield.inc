@@ -68,7 +68,7 @@ subroutine da_setup_testfield( xb, xa, xp, &
    write(UNIT=stdout, fmt='(2a,4x,a,i8)') &
         'file:', __FILE__, 'line:', __LINE__
 
-   print *, 'xp%its, xp%ite, xp%jts, xp%jte) =', xp%its, xp%ite, xp%jts, xp%jte
+   write(UNIT=stdout, fmt=*) 'xp%its, xp%ite, xp%jts, xp%jte) =', xp%its, xp%ite, xp%jts, xp%jte
    
    do j=xp%jts, xp%jte
    do i=xp%its, xp%ite
@@ -78,12 +78,6 @@ subroutine da_setup_testfield( xb, xa, xp, &
       endif
    enddo
    enddo
-   endif
-
-   if (cv_options < 3) then
-      if (sfc_assi_options == 2) then
-         call DA_Transform_XToWTQ ( xp, xb, xa )
-      endif
    endif
 
 !--Exchange XA halo region.

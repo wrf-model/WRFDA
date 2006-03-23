@@ -1,5 +1,6 @@
 subroutine da_minimise( grid, config_flags, &
-                        it, ob, xb, xbx, be, iv, xhat, &
+                        it, cv_size, cv_size_jb, cv_size_je, &
+                        ob, xb, xbx, be, ep, iv, xhat, &
                         cv, xa, vv, vp, xp, re, y, j,  &
                         ids, ide, jds, jde, kds, kde,  &
                         ims, ime, jms, jme, kms, kme,  &
@@ -15,13 +16,17 @@ subroutine da_minimise( grid, config_flags, &
    type(grid_config_rec_type), intent(inout) :: config_flags
 
    integer, intent(in)               :: it    ! external iteration.
+   integer, intent(in)               :: cv_size    ! Total cv size.
+   integer, intent(in)               :: cv_size_jb ! Jb cv size.
+   integer, intent(in)               :: cv_size_je ! Je cv size.
    type (y_type), intent(in)         :: ob    ! Observation structure.
    type (xb_type), intent(in)        :: xb    ! first guess (local).
    type (xbx_type),intent(in)        :: xbx   ! Header & non-gridded vars.
    type (be_type), intent(in)        :: be    ! background error structure.
+   type (ep_type), intent(in)        :: ep    ! Ensemble perturbation input.
    type (ob_type), intent(inout)     :: iv    ! ob. increment vector.
-   real,intent(out),dimension(cv_size)::xhat! Increament control variable
-   type (cv_type), intent(inout)     :: cv    ! control variable (local).
+   real,intent(out)                  :: xhat(1:cv_size)! Increament control variable
+   real, intent(inout)               :: cv(1:cv_size)  ! control variable (local).
    type (x_type), intent(out)        :: xa    ! analysis increments (local).
    type (vp_type), intent(inout)     :: vv    ! Grdipt/EOF CV.
    type (vp_type), intent(inout)     :: vp    ! Grdipt/level CV.
@@ -33,8 +38,6 @@ subroutine da_minimise( grid, config_flags, &
    integer, intent(in)               :: ids,ide, jds,jde, kds,kde ! domain dims.
    integer, intent(in)               :: ims,ime, jms,jme, kms,kme ! memory dims.
    integer, intent(in)               :: its,ite, jts,jte, kts,kte ! tile   dims.
-
-   character(len=120)                :: message
 
    sm31             = grid%sm31
    em31             = grid%em31
@@ -60,24 +63,19 @@ subroutine da_minimise( grid, config_flags, &
 !--Minimize cost function:
 
    if(minimisation_option == 1) then
-      CALL DA_Minimise_QN( grid, config_flags, &
-                           it, ob, xb, xbx, be, iv, xhat, &
-                           cv, xa, vv, vp, xp, re, y, j,  &
-                           ids, ide, jds, jde, kds, kde,  &
-                           ims, ime, jms, jme, kms, kme,  &
-                           its, ite, jts, jte, kts, kte )
+     CALL wrf_error_fatal("QN minimization switched off!")
    else if(minimisation_option == 2) then
       CALL DA_Minimise_CG( grid, config_flags, &
-                           it, ob, xb, xbx, be, iv, xhat, &
+                           it, cv_size, cv_size_jb, cv_size_je, &
+                           ob, xb, xbx, be, ep, iv, xhat, &
                            cv, xa, vv, vp, xp, re, y, j,  &
                            ids, ide, jds, jde, kds, kde,  &
                            ims, ime, jms, jme, kms, kme,  &
                            its, ite, jts, jte, kts, kte )
    else
-      WRITE( message , * ) &
-           'da_3dvar/src/DA_Minimisation/da_minimise.inc: ', &
-           'Invalid minimisation_option =', minimisation_option
-      CALL WRF_ERROR_FATAL ( message )
+      WRITE(UNIT=errmsg(1),FMT=*) &
+        "Invalid minimisation_option =", minimisation_option
+      CALL WRF_ERROR_FATAL (errmsg(1))
    endif
 
 end subroutine da_minimise

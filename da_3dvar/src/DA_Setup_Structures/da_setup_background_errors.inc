@@ -1,4 +1,6 @@
-SUBROUTINE DA_Setup_Background_Errors( xb, xbx, be, xp )
+subroutine da_setup_background_errors( xb, xbx, be, xp, &
+                                       its, ite, jts, jte, kts, kte, &
+                                       ids, ide, jds, jde, kds, kde )
 
 !------------------------------------------------------------------------------
 !  PURPOSE: Define and allocate components of background errors.
@@ -11,28 +13,16 @@ SUBROUTINE DA_Setup_Background_Errors( xb, xbx, be, xp )
    TYPE (xbx_type),INTENT(IN)  :: xbx                   ! Header & non-gridded vars.
    TYPE (be_type), INTENT(OUT) :: be                    ! Back. errors structure.
    type (xpose_type), intent(inout) :: xp               ! Dimensions and xpose buffers.
+   integer, intent(in)         :: its, ite, jts, jte, kts, kte ! Tile dimensions.
+   integer, intent(in)         :: ids, ide, jds, jde, kds, kde ! Tile dimensions.
 
-   CHARACTER (LEN=120)         :: message
-
-   if(cv_options == 2)then
-      CALL DA_Setup_Background_Errors2( xb, xbx, be )
-   else if(cv_options == 3)then
-
-      CALL DA_Setup_Background_Errors3( xb,be,xp )
-
-   else if(cv_options == 4)then
-
-      CALL DA_Setup_Background_Errors4( xb,be, xbx, xp )
-
-   else if(cv_options == 5)then
-
-     CALL DA_Setup_Background_Errors5(xb,be,xbx, xp)
-     
+   if ( global ) then
+      call da_setup_be_global( ide, jde, kde, be )
    else
-     WRITE(UNIT=errmsg(1),FMT='(A,I8)') &
-       "Invalid cv_options",cv_options
-     CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
+      call da_setup_background_errors5( xb, be, xbx, xp )
    endif
 
-END SUBROUTINE DA_Setup_Background_Errors
+   call da_setup_cv( its, ite, jts, jte, be )
+
+end subroutine da_setup_background_errors
 

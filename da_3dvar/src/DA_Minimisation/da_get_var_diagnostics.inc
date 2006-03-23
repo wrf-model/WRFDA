@@ -88,17 +88,20 @@ subroutine da_get_var_diagnostics ( iv, j )
          write(UNIT=stdout,FMT=*) ' '
                     
          write(UNIT=stdout,FMT='(a30,i8)')   '    Total number of obs.    = ', num_obs_tot
-         write(UNIT=stdout,FMT='(a30,f15.5)')'    Final 3DVAR value of J  = ', j % total
-         write(UNIT=stdout,FMT='(a30,f15.5)')'    Final 3DVAR value of Jo = ', j % jo % total
-         write(UNIT=stdout,FMT='(a30,f15.5)')'    Final 3DVAR value of Jb = ', j % jb
+         write(UNIT=stdout,FMT='(a30,f15.5)')'    Final value of J  = ', j % total
+         write(UNIT=stdout,FMT='(a30,f15.5)')'    Final value of Jo = ', j % jo % total
+         write(UNIT=stdout,FMT='(a30,f15.5)')'    Final value of Jb = ', j % jb
+         write(UNIT=stdout,FMT='(a30,f15.5)')'    Final value of Je = ', j % je
          if(num_obs_tot > 0) &
          write(UNIT=stdout,FMT='(a30,f15.5)')'    Final J / total num_obs = ', j % total / &
                                                              real(num_obs_tot)
-         write(UNIT=stdout,FMT='(a30,f15.5)')'    3DVAR Jb factor used (1)= ', var_scaling1
-         write(UNIT=stdout,FMT='(a30,f15.5)')'    3DVAR Jb factor used (2)= ', var_scaling2
-         write(UNIT=stdout,FMT='(a30,f15.5)')'    3DVAR Jb factor used (3)= ', var_scaling3
-         write(UNIT=stdout,FMT='(a30,f15.5)')'    3DVAR Jb factor used (4)= ', var_scaling4
-         write(UNIT=stdout,FMT='(a30,f15.5)')'    3DVAR Jb factor used (5)= ', var_scaling5
+         write(UNIT=stdout,FMT='(a30,f15.5)')'    Jb factor used (1)= ', var_scaling1
+         write(UNIT=stdout,FMT='(a30,f15.5)')'    Jb factor used (2)= ', var_scaling2
+         write(UNIT=stdout,FMT='(a30,f15.5)')'    Jb factor used (3)= ', var_scaling3
+         write(UNIT=stdout,FMT='(a30,f15.5)')'    Jb factor used (4)= ', var_scaling4
+         write(UNIT=stdout,FMT='(a30,f15.5)')'    Jb factor used (5)= ', var_scaling5
+         write(UNIT=stdout,FMT='(a30,f15.5)')'    Jb factor used    = ', jb_factor
+         write(UNIT=stdout,FMT='(a30,f15.5)')'    Je factor used    = ', je_factor
          write(UNIT=stdout,FMT=*) ' '
 
 !        [4.2] Output components of Jo:

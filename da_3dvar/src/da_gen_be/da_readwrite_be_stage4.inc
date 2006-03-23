@@ -2,7 +2,7 @@ subroutine da_readwrite_be_stage4( outunit, nk, be_method, uh_method, n_smth_sl,
 
    implicit none
 
-   real, parameter          :: spike_tolerance = 2.0      ! Threshold for detecting spikes in data. 
+   real, parameter          :: spike_tolerance = 1.5      ! Threshold for detecting spikes in data. 
 
    integer, intent(in)      :: outunit                    ! Output unit number.
    integer, intent(in)      :: nk                         ! Number of vertical levels/modes.
@@ -97,11 +97,11 @@ if (uh_method .eq. 'power') then
              scale_length(k) = scale_length(k-1)
       end do
 
-!     Remove spikes in lengthscales (average if spike detected):
-      do k = 2, nk-1
-         mean_scale = 0.5 * ( scale_length(k-1) + scale_length(k+1) )
-         if ( scale_length(k) > spike_tolerance * mean_scale ) then
-            scale_length(k) = mean_scale
+!     Remove spikes in lengthscales (extrapolate if spike detected):
+      do k = 3, nk
+         mean_scale = 0.5 * ( scale_length(k-1) + scale_length(k-2) )
+         if ( abs(scale_length(k)-mean_scale) > abs(spike_tolerance * mean_scale) ) then
+            scale_length(k) = 2.0 * scale_length(k-1) - scale_length(k-2)
          end if
       enddo
 

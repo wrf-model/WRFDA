@@ -21,7 +21,7 @@ module da_spectral
    CONTAINS
 
 #include "da_asslegpol.inc"
-#include "da_calc_power.inc"
+#include "da_calc_power_spectrum.inc"
 #include "da_get_gausslats.inc"
 #include "da_get_reglats.inc"
 #include "da_initialize_h.inc"

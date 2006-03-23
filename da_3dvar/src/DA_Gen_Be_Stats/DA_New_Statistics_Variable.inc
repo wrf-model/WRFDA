@@ -25,8 +25,6 @@ SUBROUTINE DA_New_Statistics_Variable( diff, xb, xbx, xp, &
 
 !-------------------------------------------------------------------------
 
-   WRITE(UNIT=stdout,FMT='(A,I5)') 'cv_options=', cv_options
-
    coeff(its:ite,jts:jte) = 1.0 / ( xb % map_factor(its:ite,jts:jte) * &
                                        xb % map_factor(its:ite,jts:jte) )
 

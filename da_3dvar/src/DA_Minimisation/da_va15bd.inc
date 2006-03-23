@@ -1,4 +1,4 @@
-      subroutine da_va15bd(iprint,iter,nfun,n,m,x,f,g,stp,eps,finish,xp,mzs)
+      subroutine da_va15bd(iprint,iter,nfun,n,m,x,f,g,stp,eps,finish)
 ! 
 !     ------------------------------------------------------------------
 !     this routine prints monitoring information. the frequency and amou
@@ -27,13 +27,10 @@
       real,intent(in)                         :: stp
       real,intent(in)                         :: eps
       logical,intent(out)                     :: finish
-      integer, intent(in)                     :: mzs(:) ! levels in background 
-                                                        ! error structure.
-      type (xpose_type), intent(in) :: xp     ! Domain decomposition vars.
       integer  :: i
       real gnorm
 
-      gnorm= da_dot_cv(g,g,n,xp,mzs)
+      gnorm= da_dot(g,g,n)
       gnorm= sqrt(gnorm)
 !
 !     convergence check

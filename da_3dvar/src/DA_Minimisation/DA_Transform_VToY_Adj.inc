@@ -1,22 +1,20 @@
-subroutine DA_Transform_VToY_Adj(be, cv, iv, vp, vv, xa, xb, xbx, xp, y, &
-                                 ids, ide, jds, jde, kds, kde,     &
-                                 ims, ime, jms, jme, kms, kme,     &
-                                 its, ite, jts, jte, kts, kte,     &
-                                 grid, config_flags )
+subroutine DA_Transform_VToY_Adj( cv_size, be, ep, cv, iv, vp, vv, xa, xb, xbx, xp, y, &
+                                  ids, ide, jds, jde, kds, kde,     &
+                                  ims, ime, jms, jme, kms, kme,     &
+                                  its, ite, jts, jte, kts, kte,     &
+                                  grid, config_flags )
 
 !-------------------------------------------------------------------------
-!  History:
-!
 !    Purpose:  Does Adjoint of control variable (V) transform to Obs-space(Y)
-!
-!   Creation:  03/14/2005                    Syed RH Rizvi
 !
 ! PARENT_MODULE:  DA_VToX_Transforms
 !-------------------------------------------------------------------------
-     implicit none
 
+     implicit none
+      integer, intent(in)                :: cv_size ! Size of cv array.
       type (be_type), intent(in)         :: be     ! background error structure.
-      real,dimension(cv_size),intent(out):: cv     ! control variable
+      type (ep_type), intent(in)         :: ep     ! ensemble perturbation structure.
+      real, intent(out)                  :: cv(1:cv_size) ! control variables.
       type (ob_type), intent(inout)      :: iv     ! innovation vector (o-b).
       type (vp_type), intent(inout)      :: vp     ! Grdipt/level CV.
       type (vp_type), intent(inout)      :: vv     ! Grdipt/EOF CV.
@@ -45,8 +43,8 @@ subroutine DA_Transform_VToY_Adj(be, cv, iv, vp, vv, xa, xb, xbx, xp, y, &
             iv%current_ob_time = nobwin
             call DA_zero_x(xa)
             call da_transform_xtoy_adj( xb, iv, xp, y, xa )
-            write(filnam,'(a2,i2.2)') 'af',nobwin-1
-            write(UNIT=stdout, fmt='(2a,2x,a,i6)') 'file:', __FILE__, 'line:', __LINE__
+            write(UNIT=filnam,FMT='(a2,i2.2)') 'af',nobwin-1
+            write(unit=*, fmt='(2a,2x,a,i6)') 'file:', __FILE__, 'line:', __LINE__
             call DA_Transfer_WRFTLtoXa_Adj( grid, config_flags, filnam, &
 #include <em_actual_args.inc>
                                  )
@@ -69,11 +67,11 @@ subroutine DA_Transform_VToY_Adj(be, cv, iv, vp, vv, xa, xb, xbx, xp, y, &
       endif ! lvar4d
 
 !-------------------------------------------------------------------------
-      cv = 0.
-      call da_transform_vtox_adj( xb, xbx, be, xa, xp, vp, vv, cv, &
-                               ids, ide, jds, jde, kds, kde,       &
-                               ims, ime, jms, jme, kms, kme,       &
-                               its, ite, jts, jte, kts, kte )
-!
+      cv = 0.0
+      call da_transform_vtox_adj( cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv, &
+                                  ids, ide, jds, jde, kds, kde,       &
+                                  ims, ime, jms, jme, kms, kme,       &
+                                  its, ite, jts, jte, kts, kte )
+
 end subroutine DA_Transform_VToY_Adj
 

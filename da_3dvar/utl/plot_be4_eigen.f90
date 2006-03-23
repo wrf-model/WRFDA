@@ -28,16 +28,16 @@ program plot_eigen_scale
    character(len=80)  ::infile
 
    namelist /plot_title/main_title1,main_title2,KM_resolution, &
-                        cv_options, fg_format, im,jm, km,&
+                        global, fg_format, im,jm, km,&
                         cvv, be_method,scale_length, power_spectra, infile 
 
    character(len=120)          :: main_title1
    character(len=120)          :: main_title2
  
    real     :: KM_resolution
-   integer  :: cv_options, fg_format
+   integer  :: fg_format
    integer  :: im,jm,km
-   logical  :: scale_length, power_spectra
+   logical  :: scale_length, power_spectra, global
 
    logical  :: first_time
    integer             :: max_wavenumber

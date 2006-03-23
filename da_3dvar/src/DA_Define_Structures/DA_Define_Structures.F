@@ -176,7 +176,6 @@ MODULE DA_Define_Structures
       INTEGER          :: nj
       INTEGER          :: nk
       INTEGER          :: max_wavenumber
-      INTEGER          :: c_cv_size
       INTEGER          :: lenr
       INTEGER          :: lensav
       INTEGER          :: lenwrk
@@ -921,20 +920,28 @@ MODULE DA_Define_Structures
    type j_type
       real             :: total
       real             :: jb
+      real             :: je
       type (jo_type)   :: jo
    end type j_type
 
-   TYPE cv_type
-      REAL             :: j_grad_norm_target ! Target norm(Grad_v J) 
+   TYPE cv_type 
 
-      INTEGER          :: option             ! 1 = use u, v,t,q,p, 2 = use psi, chi etc.
+!JRB
+!      INTEGER          :: option             ! 1 = use u, v,t,q,p, 2 = use psi, chi etc.
       INTEGER          :: size               ! Total size of control variable.
+      INTEGER          :: size_jb            ! Size of CV array for Jb term.
+      INTEGER          :: size_je            ! Size of CV array for Je term.
+      INTEGER          :: size1c             ! Complex size of CV array of 1st variable error.
+      INTEGER          :: size2c             ! Complex size of CV array of 2nd variable error.
+      INTEGER          :: size3c             ! Complex size of CV array of 3rd variable error.
+      INTEGER          :: size4c             ! Complex size of CV array of 4th variable error.
+      INTEGER          :: size5c             ! Complex size of CV array of 5th variable error.
+      integer          :: size_alphac        ! Size of alpha control variable (complex).
       INTEGER          :: size1              ! Size of CV array of 1st variable error.
       INTEGER          :: size2              ! Size of CV array of 2nd variable error.
       INTEGER          :: size3              ! Size of CV array of 3rd variable error.
       INTEGER          :: size4              ! Size of CV array of 4th variable error.
       INTEGER          :: size5              ! Size of CV array of 5th variable error.
-      real, POINTER    :: array(:)           ! Control variables v.
 
    END TYPE cv_type
 
@@ -946,10 +953,14 @@ MODULE DA_Define_Structures
       REAL, POINTER     :: evec(:,:,:)       ! LOcal Vertical eigenvectors.
       REAL, POINTER     :: val_g(:)          ! Global Standard dev./sqrt(eigenvalue).
       REAL, POINTER     :: evec_g(:,:)       ! Global Vertical eigenvectors.
+!Global only:
+      integer           :: max_wave          ! Horizontal spectral truncation.
       REAL, POINTER     :: power(:,:)        ! Power spectrum
    END TYPE be_subtype
 
    TYPE be_type
+      integer           :: ne
+      integer           :: max_wave           ! Smallest spectral mode (global).
 !     Grid point errors:
       INTEGER           :: mix
       INTEGER           :: mjy
@@ -959,27 +970,12 @@ MODULE DA_Define_Structures
       TYPE (be_subtype) :: v4
       TYPE (be_subtype) :: v5
       REAL, POINTER     :: pb_vert_reg(:,:,:)
+      TYPE (be_subtype) :: alpha
 !
 !     Control variable space errors:
+!JRB because of clash with cv passed as argumnt to calculate_j
       TYPE (cv_type)    :: cv
 
-!-----For cv option 3:
-      INTEGER          :: ndeg,nta
-      REAL             :: swidth
-      REAL, POINTER    :: be(:)
-      REAL, POINTER    :: rate(:)
-      REAL, POINTER    :: table(:,:)
-      REAL, POINTER    :: agvz(:,:,:,:)
-      REAL, POINTER    :: bvz(:,:,:)
-      REAL, POINTER    :: wgvz(:,:,:)
-      REAL, POINTER    :: slix(:,:,:,:)
-      REAL, POINTER    :: slipx(:,:)
-      REAL, POINTER    :: sljy(:,:,:,:)
-      REAL, POINTER    :: sljpy(:,:)
-      REAL, POINTER    :: vz(:,:,:,:)
-      REAL, POINTER    :: corz(:,:,:,:)
-      REAL, POINTER    :: corp(:,:)
-!-----For cv option 4 and 5:
       REAL, POINTER     :: reg_chi(:,:)
       REAL, POINTER     :: reg_t  (:,:,:)
       REAL, POINTER     :: reg_ps (:,:)
@@ -1013,8 +1009,7 @@ CONTAINS
 #include "DA_Zero_X.inc"
 !#include "DA_Zero_Y.inc"
 #include "DA_Zero_vp_type.inc"
-#include "da_allocate_cv.inc"
-#include "da_deallocate_cv.inc"
+#include "da_initialize_cv.inc"
 #include "da_gauss_noise.inc"
 
 END MODULE DA_Define_Structures

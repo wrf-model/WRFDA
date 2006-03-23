@@ -53,7 +53,7 @@
 
       LOGICAL, EXTERNAL :: wrf_dm_on_monitor
 
-      private :: da_dot, da_dot_cv
+      private :: da_dot
       private :: infoc, brackt, stage1
       private :: dg,dgm,dginit,dgtest,dgx,dgxm,dgy,dgym, &
                  finit,ftest1,fm,fx,fxm,fy,fym,p5,p66,stx,sty, &
@@ -68,16 +68,13 @@
 #include <da_get_innov_vector.inc>
 #include <da_lmdir.inc>
 #include <da_minimisation_warning.inc>
-#include <da_minimise.inc>
 #include <da_sum_reals.inc>
 #include <da_va15bd.inc>
 #include <da_vd05ad.inc>
 #include <da_vd05bd.inc>
 #include <da_dot.inc>
-#include <da_dot_cv.inc>
 #include <da_write_diagnostics.inc>
 #include <DA_Minimise_CG.inc>
-#include <DA_Minimise_QN.inc>
 #include "DA_Calculate_GradY.inc"
 #include "DA_Transform_VToY.inc"
 #include "DA_Transform_VToY_Adj.inc"

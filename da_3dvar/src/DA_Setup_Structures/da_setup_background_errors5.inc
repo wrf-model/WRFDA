@@ -68,54 +68,44 @@ SUBROUTINE DA_Setup_Background_Errors5(xb, be, xbx, xp)
    real, allocatable           :: regcoeff3(:,:,:)
    real                        :: avg,avg2,avg3
 !---------------------------------------------------------------------
-   write (6,'(A)') ' ----------------------------------------------------------'
-   write (6,'(A,I3)') ' [3.0] Set up background errors (be) for cv_option:', cv_options
-   write (6,'(A)') ' ----------------------------------------------------------'
-   write (6,*)
 
-   IF(cv_options /= 5) THEN
-     WRITE(UNIT=errmsg(1),FMT='(A,I5,A)') &
-       "cv_options=",cv_options,"should be 5"
-     CALL wrf_error_fatal3(__FILE__,__LINE__, errmsg(1))
-   ENDIF
+   CALL wrf_message("[3.0] Set up background errors (be) for LAM")
 
-   be % cv % option = cv_options
-!!!!!!!!! cv_options=3
       be % v1 % name = 'psi  '           ! Streamfunction
       be % v2 % name = 'chi_u'           ! Uncorrelated velocity potential.
       be % v3 % name = 't_u'             ! Unbalanced temperature.
       be % v4 % name = 'q/qsg'
       be % v5 % name = 'psfc'            ! surface pressure
 
-   write(6,'(3x,A)')' DA_Setup_Background_Errors: 3DVAR dry control variables are:'
-   write(6,'(4x,7A)')TRIM(be % v1 % name), ', ', TRIM(be % v2 % name), ', ', &
+   write(UNIT=stdout,FMT='(3x,A)')' DA_Setup_Background_Errors: 3DVAR dry control variables are:'
+   write(UNIT=stdout,FMT='(4x,7A)')TRIM(be % v1 % name), ', ', TRIM(be % v2 % name), ', ', &
                   TRIM(be % v3 % name), ' and ', TRIM(be % v5 % name)
 
-   write(6,'(3x,A,A)')' DA_Setup_Background_Errors: humidity control variable is ',&
+   write(UNIT=stdout,FMT='(3x,A,A)')' DA_Setup_Background_Errors: humidity control variable is ',&
                      TRIM(be % v4 % name)
 
-   write(6,*)
+   write(UNIT=stdout,FMT=*) ' '
 !---------------------------------------------------------
    ix = xb % mix
    jy = xb % mjy
    kz = xb % mkz
 
 !-------------------------
-rewind (be_cv_5_unit)
+rewind (UNIT=be_unit)
 !---------------------------------------------------------
-   read(be_cv_5_unit) ni, nj, nk
+   read(UNIT=be_unit) ni, nj, nk
 
      allocate( bin(1:ni,1:nj,1:nk) )
      allocate( bin2d(1:ni,1:nj) )
 
-     read(be_cv_5_unit)bin_type
-     read(be_cv_5_unit)lat_min, lat_max, binwidth_lat
-     read(be_cv_5_unit)hgt_min, hgt_max, binwidth_hgt
-     read(be_cv_5_unit)num_bins, num_bins2d
-     read(be_cv_5_unit)bin(1:ni,1:nj,1:nk)
-     read(be_cv_5_unit)bin2d(1:ni,1:nj)
+     read(UNIT=be_unit)bin_type
+     read(UNIT=be_unit)lat_min, lat_max, binwidth_lat
+     read(UNIT=be_unit)hgt_min, hgt_max, binwidth_hgt
+     read(UNIT=be_unit)num_bins, num_bins2d
+     read(UNIT=be_unit)bin(1:ni,1:nj,1:nk)
+     read(UNIT=be_unit)bin2d(1:ni,1:nj)
 
-!   read(be_cv_5_unit) num_bins, num_bins2d
+!   read(UNIT=be_unit) num_bins, num_bins2d
 !---------------------------------------------------------
 
 ! 1.0 Load the regression coefficients
@@ -127,9 +117,9 @@ rewind (be_cv_5_unit)
    allocate (regcoeff2(1:nk,1:num_bins2d))
    allocate (regcoeff3(1:nk,1:nk,1:num_bins2d))
 
-   read(be_cv_5_unit) regcoeff1  
-   read(be_cv_5_unit) regcoeff2 
-   read(be_cv_5_unit) regcoeff3  
+   read(UNIT=be_unit) regcoeff1  
+   read(UNIT=be_unit) regcoeff2 
+   read(UNIT=be_unit) regcoeff3  
 
 ! 1.2 Re-assign the regression coefficients
 
@@ -143,7 +133,8 @@ rewind (be_cv_5_unit)
  !  call da_create_bins( ni, nj, nk, bin_type, num_bins, &
  !                               num_bins2d, bin, bin2d )
 
-   print '("ni, nj, nk, num_bins, num_bins2d:",5i8)', ni, nj, nk, num_bins, num_bins2d
+   WRITE(UNIT=stdout,FMT='("ni, nj, nk, num_bins, num_bins2d:",5i8)') &
+     ni, nj, nk, num_bins, num_bins2d
 !--------------------------------------------------------------
 ! Following "latitude, height" variables are optional arguments 
 ! The same may be added, if required
@@ -224,7 +215,8 @@ rewind (be_cv_5_unit)
     '*** Using the latitude-dependent regression coefficients for unbalanced part ***'
     endif
     
-    print '(2x,a,i8,a,i4)',"a) Finished regression coefficients processing! jy=",jy," kz=",kz
+    WRITE(UNIT=stdout,FMT='(2x,a,i8,a,i4)') &
+      "a) Finished regression coefficients processing! jy=",jy," kz=",kz
 
 ! 2.0 Load the eigenvector and eigenvalue
 ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -262,58 +254,58 @@ rewind (be_cv_5_unit)
 
 ! 2.2.1 Control variable 1 (psi)
 
-   read(be_cv_5_unit) variable   
-   read(be_cv_5_unit) nk, num_bins2d 
-   read(be_cv_5_unit)  be1_evec_glo   
-   read(be_cv_5_unit)  be1_eval_glo    
-   read(be_cv_5_unit)  be1_evec_loc     
-   read(be_cv_5_unit)  be1_eval_loc    
+   read(UNIT=be_unit) variable   
+   read(UNIT=be_unit) nk, num_bins2d 
+   read(UNIT=be_unit)  be1_evec_glo   
+   read(UNIT=be_unit)  be1_eval_glo    
+   read(UNIT=be_unit)  be1_evec_loc     
+   read(UNIT=be_unit)  be1_eval_loc    
 
    be % v1 % name = variable
 !   print*,'variable ',be % v1 % name,nk,num_bins2d
 !
 ! 2.2.2 Control variable 2 (chi_u)
 
-   read(be_cv_5_unit) variable
-   read(be_cv_5_unit) nk, num_bins2d
-   read(be_cv_5_unit)  be2_evec_glo
-   read(be_cv_5_unit)  be2_eval_glo
-   read(be_cv_5_unit)  be2_evec_loc
-   read(be_cv_5_unit)  be2_eval_loc
+   read(UNIT=be_unit) variable
+   read(UNIT=be_unit) nk, num_bins2d
+   read(UNIT=be_unit)  be2_evec_glo
+   read(UNIT=be_unit)  be2_eval_glo
+   read(UNIT=be_unit)  be2_evec_loc
+   read(UNIT=be_unit)  be2_eval_loc
 
    be % v2 % name = variable
 !   print*,'variable ',be % v2 % name,nk,num_bins2d
 
 ! 2.2.3 Control variable 3 (t_u)
 
-   read(be_cv_5_unit) variable
-   read(be_cv_5_unit) nk, num_bins2d
-   read(be_cv_5_unit)  be3_evec_glo
-   read(be_cv_5_unit)  be3_eval_glo
-   read(be_cv_5_unit)  be3_evec_loc
-   read(be_cv_5_unit)  be3_eval_loc
+   read(UNIT=be_unit) variable
+   read(UNIT=be_unit) nk, num_bins2d
+   read(UNIT=be_unit)  be3_evec_glo
+   read(UNIT=be_unit)  be3_eval_glo
+   read(UNIT=be_unit)  be3_evec_loc
+   read(UNIT=be_unit)  be3_eval_loc
 
    be % v3 % name = variable
 !   print*,'variable ',be % v3 % name,nk,num_bins2d
 
 ! 2.2.4 Control variable 4 (q/qsg)
 
-   read(be_cv_5_unit) variable
-   read(be_cv_5_unit) nk, num_bins2d
-   read(be_cv_5_unit)  be4_evec_glo
-   read(be_cv_5_unit)  be4_eval_glo
-   read(be_cv_5_unit)  be4_evec_loc
-   read(be_cv_5_unit)  be4_eval_loc
+   read(UNIT=be_unit) variable
+   read(UNIT=be_unit) nk, num_bins2d
+   read(UNIT=be_unit)  be4_evec_glo
+   read(UNIT=be_unit)  be4_eval_glo
+   read(UNIT=be_unit)  be4_evec_loc
+   read(UNIT=be_unit)  be4_eval_loc
 !
    be % v4 % name = variable
 !   print*,'variable ',be % v4 % name,nk,num_bins2d
 
-   read(be_cv_5_unit) variable
-   read(be_cv_5_unit) nk_2d, num_bins2d
-   read(be_cv_5_unit)  be5_evec_glo
-   read(be_cv_5_unit)  be5_eval_glo
-   read(be_cv_5_unit)  be5_evec_loc
-   read(be_cv_5_unit)  be5_eval_loc
+   read(UNIT=be_unit) variable
+   read(UNIT=be_unit) nk_2d, num_bins2d
+   read(UNIT=be_unit)  be5_evec_glo
+   read(UNIT=be_unit)  be5_eval_glo
+   read(UNIT=be_unit)  be5_evec_loc
+   read(UNIT=be_unit)  be5_eval_loc
 
    be % v5 % name = variable
 !   print*,'variable ',be % v5 % name,nk_2d,num_bins2d
@@ -341,7 +333,7 @@ rewind (be_cv_5_unit)
 
       be % v5 % mz = 1
 
-      write(6,*)
+      write(UNIT=stdout,FMT=*) ' '
 
    ELSE
 
@@ -355,36 +347,10 @@ rewind (be_cv_5_unit)
 
    END IF
 
-! 4.0 Initialise control variable space components of header:
-! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-!This is for DA_Test
-
-   kz_vv(1) = be % v1 % mz
-   kz_vv(2) = be % v2 % mz
-   kz_vv(3) = be % v3 % mz
-   kz_vv(4) = be % v4 % mz
-   kz_vv(5) = be % v5 % mz
-   kz_vp    = xb % mkz
-!------
-
 ! 4.1 Compute the size of the control variables
 
    be % mix = ix
    be % mjy = jy
-
-   ij = ix * jy
-
-   be % cv % size1  = ij * be % v1 % mz    ! Fix size, read from file later.
-   be % cv % size2  = ij * be % v2 % mz    ! Fix size, read from file later.
-   be % cv % size3  = ij * be % v3 % mz    ! Fix size, read from file later.
-   be % cv % size4  = ij * be % v4 % mz    ! Fix size, read from file later.
-   be % cv % size5  = ij * be % v5 % mz    ! Fix size, read from file later.
-
-   be % cv % size = be % cv % size1 + be % cv % size2 + be % cv % size3 + &
-                    be % cv % size4 + be % cv % size5
-
-   cv_size = be % cv % size
 
 ! 4.2 Transfer errors to error structure:
 
@@ -402,7 +368,7 @@ rewind (be_cv_5_unit)
    CALL DA_Allocate_Background_Errors( jy,  1, be5_eval_glo, be5_evec_glo, be5_eval_loc, &
                                        be5_evec_loc, be % v5 )
 
-   print '(2x,a,i10)',"b) Finished eigenvector processing! ij=", ij
+   WRITE(UNIT=stdout,FMT='(2x,a,i10)') "b) Finished eigenvector processing! ij=", ij
    
 ! 5.0 Load the scale lengths
 ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -417,20 +383,20 @@ rewind (be_cv_5_unit)
 
 ! 5.2 read in the scale lengths
 
-     read(be_cv_5_unit) variable
-     read(be_cv_5_unit) be1_rf_lengthscale
+     read(UNIT=be_unit) variable
+     read(UNIT=be_unit) be1_rf_lengthscale
 
-     read(be_cv_5_unit) variable
-     read(be_cv_5_unit) be2_rf_lengthscale
+     read(UNIT=be_unit) variable
+     read(UNIT=be_unit) be2_rf_lengthscale
 
-     read(be_cv_5_unit) variable
-     read(be_cv_5_unit) be3_rf_lengthscale
+     read(UNIT=be_unit) variable
+     read(UNIT=be_unit) be3_rf_lengthscale
 
-     read(be_cv_5_unit) variable
-     read(be_cv_5_unit) be4_rf_lengthscale
+     read(UNIT=be_unit) variable
+     read(UNIT=be_unit) be4_rf_lengthscale
 
-     read(be_cv_5_unit) variable
-     read(be_cv_5_unit) be5_rf_lengthscale(1:1)
+     read(UNIT=be_unit) variable
+     read(UNIT=be_unit) be5_rf_lengthscale(1:1)
      be%v5%name = variable
 
 ! 5.3 Convert the scale lengths in the real distance (meter)
@@ -458,22 +424,9 @@ rewind (be_cv_5_unit)
                                      be%v4%name)
     END IF
 
-! 6.1 Re-assign the control variable size
-
-   be % cv % size1  = ij * be % v1 % mz
-   be % cv % size2  = ij * be % v2 % mz
-   be % cv % size3  = ij * be % v3 % mz
-   be % cv % size4  = ij * be % v4 % mz
-   be % cv % size5  = ij * be % v5 % mz
-
-   be % cv % size = be % cv % size1 + be % cv % size2 + be % cv % size3 + &
-                    be % cv % size4 + be % cv % size5
-
-   cv_size = be % cv % size
-
 ! 6.2 Close the be unit
 
-   close(be_cv_5_unit)
+   close(UNIT=be_unit)
 
 ! 7.0 Apply empirical and recursive filter rescaling factor:
 ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -486,25 +439,9 @@ rewind (be_cv_5_unit)
                                       xb % ds, be3_rf_lengthscale, be % v3 )
    CALL DA_Rescale_Background_Errors( ix, jy, var_scaling4, len_scaling4, &
                                       xb % ds, be4_rf_lengthscale, be % v4 )
-
-    
-
+   
     CALL DA_Rescale_Background_Errors( ix, jy, var_scaling5, len_scaling5, &
                                       xb % ds, be5_rf_lengthscale, be % v5 )
-
-!     write(UNIT=stdout,FMT='(/a,f10.2)') 'xb%ds=',xb%ds
-!     do k=1,nk
-!       write(UNIT=stdout,FMT='(I4,5F10.3 )' ) k, be1_rf_lengthscale(k), be2_rf_lengthscale(k), &
-!             be3_rf_lengthscale(k), be4_rf_lengthscale(k),be5_rf_lengthscale(1)
-!     enddo
-
-    print '(2x,a)',"c) Finished the scale length processing!"
-
-    print '(a,i10/5(a,i10))',   &
-      "Size of control variable =",  cv_size, &
-      " and the size for each of control vaiables: cv1=", be % cv % size1, &
-                        " cv2=",be % cv % size2, " cv3=", be % cv % size3, &
-                        " cv4=",be % cv % size4, " cv5=", be % cv % size5
 
 ! 8.0 Deallocate input model state:
 ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
