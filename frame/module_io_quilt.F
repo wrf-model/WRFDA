@@ -108,7 +108,7 @@ MODULE module_wrf_quilt
       ENDDO
 33    CONTINUE
       IF ( retval < 0 )  THEN
-        CALL wrf_error_fatal("frame/module_io_quilt.F: int_get_fresh_handle() can not")
+        CALL wrf_error_fatal("int_get_fresh_handle() can not")
       ENDIF
       int_handle_in_use(i) = .TRUE.
       NULLIFY ( int_local_output_buffer )
@@ -1320,7 +1320,7 @@ MODULE module_wrf_quilt
 
       CALL MPI_INITIALIZED( mpi_inited, ierr )
       IF ( mpi_inited ) THEN
-        CALL wrf_error_fatal("frame/module_io_quilt.F: quilt initialization must be called before MPI_Init") ;
+        CALL wrf_error_fatal("quilt initialization must be called before MPI_Init") ;
       ENDIF
 
       CALL mpi_init ( ierr )
@@ -1541,7 +1541,7 @@ SUBROUTINE wrf_quilt_open_for_read ( FileName , Comm_compute, Comm_io, SysDepInf
   CALL wrf_debug ( DEBUG_LVL, 'in wrf_quilt_open_for_read' ) 
   DataHandle = -1
   Status = -1
-  CALL wrf_error_fatal ( "frame/module_io_quilt.F: wrf_quilt_open_for_read not yet supported" )
+  CALL wrf_error_fatal ( "wrf_quilt_open_for_read not yet supported" )
 #endif
   RETURN  
 END SUBROUTINE wrf_quilt_open_for_read
@@ -1689,7 +1689,7 @@ SUBROUTINE wrf_quilt_iosync ( DataHandle, Status )
     DEALLOCATE ( int_local_output_buffer )
     NULLIFY ( int_local_output_buffer )
   ELSE
-    CALL wrf_message ("frame/module_io_quilt.F: wrf_quilt_iosync: no buffer allocated")
+    CALL wrf_message ("wrf_quilt_iosync: no buffer allocated")
   ENDIF
   Status = 0
 #endif
@@ -3178,10 +3178,10 @@ SUBROUTINE wrf_quilt_write_field ( DataHandle , DateStr , VarName , Field , Fiel
   CALL wrf_debug ( DEBUG_LVL, 'in wrf_quilt_write_field' ) 
 
   IF ( .NOT. (DataHandle .GE. 1 .AND. DataHandle .LE. int_num_handles) ) THEN
-    CALL wrf_error_fatal("frame/module_io_quilt.F: wrf_quilt_write_field: invalid data handle" )
+    CALL wrf_error_fatal("wrf_quilt_write_field: invalid data handle" )
   ENDIF
   IF ( .NOT. int_handle_in_use( DataHandle ) ) THEN
-    CALL wrf_error_fatal("frame/module_io_quilt.F: wrf_quilt_write_field: DataHandle not opened" )
+    CALL wrf_error_fatal("wrf_quilt_write_field: DataHandle not opened" )
   ENDIF
 
   locsize = (PatchEnd(1)-PatchStart(1)+1)* &
