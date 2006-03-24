@@ -102,7 +102,6 @@ CONTAINS
 #  include <namelist_defaults.inc>
 
 ! Statements that read the namelist are in this file
-#  define NAMELIST_READ_ERROR_LABEL 9200
 #  include <config_reads.inc>
 
 ! 2004/04/28  JM (with consensus by the group of developers)
@@ -134,8 +133,6 @@ CONTAINS
       ENDIF
 
       RETURN
-9200  CONTINUE
-      CALL wrf_error_fatal( 'module_configure: initial_config: error reading namelist' )
 
    END SUBROUTINE initial_config
 

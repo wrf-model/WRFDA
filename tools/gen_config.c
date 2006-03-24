@@ -277,9 +277,6 @@ gen_config_reads ( char * dirname )
   fprintf(fp,"#ifndef NAMELIST_READ_UNIT\n") ;
   fprintf(fp,"#  define NAMELIST_READ_UNIT nml_unit\n") ;
   fprintf(fp,"#endif\n") ;
-  fprintf(fp,"#ifndef NAMELIST_READ_ERROR_LABEL\n") ;
-  fprintf(fp,"#  define NAMELIST_READ_ERROR_LABEL 9200\n") ;
-  fprintf(fp,"#endif\n") ;
   fprintf(fp,"!\n") ;
 
   sym_forget() ;
@@ -301,7 +298,10 @@ gen_config_reads ( char * dirname )
         }
 	if (sym_get( p2 ) == NULL)  /* not in table yet */
 	{
-          fprintf(fp," READ  ( UNIT = NAMELIST_READ_UNIT , NML = %s , ERR = NAMELIST_READ_ERROR_LABEL )\n",p2) ;
+          fprintf(fp," READ  ( UNIT = NAMELIST_READ_UNIT , NML = %s , IOSTAT=io_status )\n",p2) ;
+          fprintf(fp," IF (io_status /= 0) THEN\n") ;
+          fprintf(fp,"   CALL wrf_error_fatal(\"Cannot read namelist %s\")\n",p2) ;
+          fprintf(fp," END IF\n") ;
           fprintf(fp,"#ifndef NO_NAMELIST_PRINT\n") ;
           fprintf(fp," WRITE ( UNIT = *                  , NML = %s )\n",p2) ;
           fprintf(fp,"#endif\n") ;
