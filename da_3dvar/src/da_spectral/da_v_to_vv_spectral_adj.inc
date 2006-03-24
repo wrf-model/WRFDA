@@ -52,7 +52,8 @@ subroutine da_v_to_vv_spectral_adj(xbx, power, rcv, field, &
    v_fou = 0.
    do j = jts, jte
       r_fou(its:ite) = field(its:ite,j) 
-      call rfft1f( xbx%ni, xbx%inc, r_fou, xbx%lenr, xbx%wsave, xbx%lensav, work, xbx%lenwrk, ier )
+      call rfft1f( xbx%ni, xbx%inc, r_fou, xbx%lenr, xbx%wsave, xbx%lensav, &
+        work, xbx%lenwrk, ier )
 !-------------------------------------------------------------------------
 !  Adjust the output for adjoint test
 !-------------------------------------------------------------------------
@@ -60,7 +61,8 @@ subroutine da_v_to_vv_spectral_adj(xbx, power, rcv, field, &
        r_fou(its) =  r_fou(its)   * 2.0       
 
 !      if(.not. odd_longitudes) r_fou(ite) = 2.0*r_fou(ite)   
-!------make r_fou(ni) zero as there is no power computed corresponding to this wavenumber
+!------make r_fou(ni) zero as there is no power computed corresponding to this 
+!      wavenumber
        r_fou(ite) = 0.
 
        v_fou(j,0) = CMPLX( r_fou(its), r_fou(ite) )
@@ -81,14 +83,17 @@ subroutine da_v_to_vv_spectral_adj(xbx, power, rcv, field, &
 
 #ifdef DM_PARALLEL
       cv_local(index_start:index_end) = 0.0
-      call da_legtra_inv_adj( jds, jde, jts, jte, xbx%max_wavenumber, xbx%alp_size, m, xbx%alp, &
-                              cv_local(index_start:index_end), v_fou(jts:jte,m) )
+      call da_legtra_inv_adj( jds, jde, jts, jte, xbx%max_wavenumber, &
+        xbx%alp_size, m, xbx%alp, &
+        cv_local(index_start:index_end), v_fou(jts:jte,m) )
 
       n = index_end - index_start + 1
-      call MPI_ALLREDUCE( cv_local(index_start:index_end), cv(index_start:index_end), n, TRUE_MPI_COMPLEX, MPI_SUM, MPI_COMM_WORLD, IER )
+      call MPI_ALLREDUCE( cv_local(index_start:index_end), &
+        cv(index_start:index_end), n, TRUE_MPI_COMPLEX, MPI_SUM, &
+        MPI_COMM_WORLD, IER )
 #else
-      call da_legtra_inv_adj( jds, jde, jts, jte, xbx%max_wavenumber, xbx%alp_size, m, xbx%alp, &
-                               cv(index_start:index_end), v_fou(jts:jte,m) )
+      call da_legtra_inv_adj( jds, jde, jts, jte, xbx%max_wavenumber, &
+        xbx%alp_size, m, xbx%alp, cv(index_start:index_end), v_fou(jts:jte,m) )
 #endif
    end do
 !-------------------------------------------------------------------------
