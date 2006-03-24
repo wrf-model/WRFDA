@@ -731,7 +731,7 @@ CONTAINS
        
       ! Longitude
       lon = proj%stdlon + deg_per_rad * ATAN2(proj%hemi*xx,yy)/proj%cone
-      lon = AMOD(lon+360., 360.)
+      lon = MOD(lon+360., 360.)
 
       ! Latitude.  Latitude determined by solving an equation adapted 
       ! from:
@@ -953,7 +953,7 @@ CONTAINS
       lon = -999.
     ELSE
       lon = lon + 360.
-      lon = AMOD(lon,360.)
+      lon = MOD(lon,360.)
       IF (lon .GT. 180.) lon = lon -360.
     ENDIF
 
