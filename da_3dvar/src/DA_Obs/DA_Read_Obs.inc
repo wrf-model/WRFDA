@@ -1089,8 +1089,8 @@ loop_level: DO i = 1, platform%info%levels
                                    - num_ssmi_retrieval  &
                                    - num_ssmi_tb - num_ssmt1 - num_ssmt2 &
                                    - num_gpspw - num_gpsref - num_qscat  &
-                                   - num_profiler - num_buoy, &
-                                   - num_bogus - num_bogus, &
+                                   - num_profiler - num_buoy &
+                                   - num_bogus, &
                                    '  Observations unsaved.'
 
    end if
