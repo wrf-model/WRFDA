@@ -27,9 +27,9 @@ if ( "$1" == '-a' ) then
     /bin/rm -f configure.wrf
   endif
 
-  if ( -f configure.3dvar ) then
-    /bin/cp configure.3dvar configure.3dvar.backup
-    /bin/rm -f configure.3dvar
+  if ( -f configure.wrfvar ) then
+    /bin/cp configure.wrfvar configure.wrfvar.backup
+    /bin/rm -f configure.wrfvar
   endif
 
   if ( -f Registry/Registry ) then
