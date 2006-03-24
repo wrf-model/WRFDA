@@ -48,7 +48,7 @@ SUBROUTINE DA_Setup_FirstGuess_MM5( xb, xbx, xp)
       if( ier /= 0) then
         WRITE(UNIT=errmsg(1),FMT='(A,I4,A)') &
           "Error in read from unit:", jpin
-        CALL wrf_error_fatal(__FILE__,__LINE__,errmsg(1))
+        CALL wrf_error_fatal(errmsg(1))
       end if
 
       READ(jpin, iostat=ier) xb_mm5 % big_header % bhi, &
@@ -66,7 +66,7 @@ SUBROUTINE DA_Setup_FirstGuess_MM5( xb, xbx, xp)
          if( ier /= 0) then
            WRITE(UNIT=errmsg(1),FMT='(A,I4,A)') &
              "Error in read from unit:", jpin
-           CALL wrf_error_fatal(__FILE__,__LINE__,errmsg(1))
+           CALL wrf_error_fatal(errmsg(1))
          end if
 
          index = xb_mm5 % big_header % bhi(1,1)
@@ -139,7 +139,7 @@ SUBROUTINE DA_Setup_FirstGuess_MM5( xb, xbx, xp)
      errmsg(1)="Inconsistent WRF/3DVAR namelist"
      WRITE(UNIT=errmsg(2),FMT='(6i6)') &
        xb % mix, wrf_dim1, xb % mjy, wrf_dim2, xb % mkz, wrf_dim3
-     CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1:2))
+     CALL wrf_error_fatal(errmsg(1:2))
    end if
    
    call b2a(xb_mm5 % u,mjy+1,mix+1,mkz,1)
