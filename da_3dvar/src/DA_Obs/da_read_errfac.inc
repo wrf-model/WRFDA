@@ -27,7 +27,7 @@ subroutine da_read_errfac( ob_name, f1, f2, f3, f4, f5 )
    if ( ierr == 0 ) then
    
       do 
-         read(UNIT=fac_unit,FMT='(x,a5,a21,a91)')ob_name1, string1, string2
+         read(UNIT=fac_unit,FMT='(1x,a5,a21,a91)')ob_name1, string1, string2
 
          if ( ob_name == ob_name1 .and. &
               string1 == ' obs, Error Factor = ' ) then
