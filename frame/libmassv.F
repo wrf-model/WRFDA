@@ -175,7 +175,7 @@
       subroutine vacos(y,x,n)
       real*8 x(*),y(*)
       do 10 j=1,n
-      y(j)=acos(x(j))
+      y(j)=cos(x(j))
    10 continue
       return
       end
@@ -302,7 +302,7 @@
       subroutine vsacos(y,x,n)
       real*4 x(*),y(*)
       do 10 j=1,n
-      y(j)=acos(x(j))
+      y(j)=cos(x(j))
    10 continue
       return
       end

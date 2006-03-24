@@ -4518,7 +4518,7 @@ CONTAINS
          IF (SPECPARM .GE. ONEMINUS) SPECPARM = ONEMINUS                         
          SPECMULT = 8.*(SPECPARM)                                                
          JS = 1 + INT(SPECMULT)                                                  
-         FS = AMOD(SPECMULT,1.0)                                                 
+         FS = MOD(SPECMULT,1.0)                                                 
          IF (JS .EQ. 8) THEN                                                     
             IF (FS .GE. 0.9) THEN                                                
                JS = 9                                                            
@@ -4581,7 +4581,7 @@ CONTAINS
          IF (SPECPARM .GE. ONEMINUS) SPECPARM = ONEMINUS                         
          SPECMULT = 4.*(SPECPARM)                                                
          JS = 1 + INT(SPECMULT)                                                  
-         FS = AMOD(SPECMULT,1.0)                                                 
+         FS = MOD(SPECMULT,1.0)                                                 
          NS = JS + INT(FS + 0.5)                                                 
          FP = FAC01(LAY) + FAC11(LAY)                                            
          FAC000 = (1. - FS) * FAC00(LAY)                                         
@@ -4678,7 +4678,7 @@ CONTAINS
          IF (SPECPARM .GE. ONEMINUS) SPECPARM = ONEMINUS                         
          SPECMULT = 8.*(SPECPARM)                                                
          JS = 1 + INT(SPECMULT)                                                  
-         FS = AMOD(SPECMULT,1.0)                                                 
+         FS = MOD(SPECMULT,1.0)                                                 
          FAC000 = (1. - FS) * FAC00(LAY)                                         
          FAC010 = (1. - FS) * FAC10(LAY)                                         
          FAC100 = FS * FAC00(LAY)                                                
@@ -4717,7 +4717,7 @@ CONTAINS
          IF (SPECPARM .GE. ONEMINUS) SPECPARM = ONEMINUS                         
          SPECMULT = 4.*(SPECPARM)                                                
          JS = 1 + INT(SPECMULT)                                                  
-         FS = AMOD(SPECMULT,1.0)                                                 
+         FS = MOD(SPECMULT,1.0)                                                 
          IF (JS .GT. 1) THEN                                                     
             JS = JS + 1                                                          
          ELSEIF (FS .GE. 0.0024) THEN                                            
@@ -4810,7 +4810,7 @@ CONTAINS
          IF (SPECPARM .GE. ONEMINUS) SPECPARM = ONEMINUS                         
          SPECMULT = 8.*(SPECPARM)                                                
          JS = 1 + INT(SPECMULT)                                                  
-         FS = AMOD(SPECMULT,1.0)                                                 
+         FS = MOD(SPECMULT,1.0)                                                 
          FAC000 = (1. - FS) * FAC00(LAY)                                         
          FAC010 = (1. - FS) * FAC10(LAY)                                         
          FAC100 = FS * FAC00(LAY)                                                
@@ -4850,7 +4850,7 @@ CONTAINS
          IF (SPECPARM .GE. ONEMINUS) SPECPARM = ONEMINUS                         
          SPECMULT = 4.*(SPECPARM)                                                
          JS = 1 + INT(SPECMULT)                                                  
-         FS = AMOD(SPECMULT,1.0)                                                 
+         FS = MOD(SPECMULT,1.0)                                                 
          FAC000 = (1. - FS) * FAC00(LAY)                                         
          FAC010 = (1. - FS) * FAC10(LAY)                                         
          FAC100 = FS * FAC00(LAY)                                                
@@ -5007,7 +5007,7 @@ CONTAINS
          IF (SPECPARM .GE. ONEMINUS) SPECPARM = ONEMINUS                         
          SPECMULT = 8.*SPECPARM                                                  
          JS = 1 + INT(SPECMULT)                                                  
-         FS = AMOD(SPECMULT,1.0)                                                 
+         FS = MOD(SPECMULT,1.0)                                                 
          FAC000 = (1. - FS) * FAC00(LAY)                                         
          FAC010 = (1. - FS) * FAC10(LAY)                                         
          FAC100 = FS * FAC00(LAY)                                                
@@ -5272,7 +5272,7 @@ CONTAINS
          SPECMULT = 8.*(SPECPARM)                                                
          JS = 1 + INT(SPECMULT)                                                  
          JFRAC = JS                                                              
-         FS = AMOD(SPECMULT,1.0)                                                 
+         FS = MOD(SPECMULT,1.0)                                                 
          FFRAC = FS                                                              
          IF (JS .EQ. 8) THEN                                                     
             IF (FS .LE. 0.68) THEN                                               
@@ -5538,7 +5538,7 @@ CONTAINS
          IF (SPECPARM .GE. ONEMINUS) SPECPARM = ONEMINUS                         
          SPECMULT = 8.*(SPECPARM)                                                
          JS = 1 + INT(SPECMULT)                                                  
-         FS = AMOD(SPECMULT,1.0)                                                 
+         FS = MOD(SPECMULT,1.0)                                                 
          FAC000 = (1. - FS) * FAC00(LAY)                                         
          FAC010 = (1. - FS) * FAC10(LAY)                                         
          FAC100 = FS * FAC00(LAY)                                                
@@ -5628,7 +5628,7 @@ CONTAINS
          IF (SPECPARM .GE. ONEMINUS) SPECPARM = ONEMINUS                         
          SPECMULT = 8.*(SPECPARM)                                                
          JS = 1 + INT(SPECMULT)                                                  
-         FS = AMOD(SPECMULT,1.0)                                                 
+         FS = MOD(SPECMULT,1.0)                                                 
          FAC000 = (1. - FS) * FAC00(LAY)                                         
          FAC010 = (1. - FS) * FAC10(LAY)                                         
          FAC100 = FS * FAC00(LAY)                                                
@@ -5791,7 +5791,7 @@ CONTAINS
          IF (SPECPARM .GE. ONEMINUS) SPECPARM = ONEMINUS                         
          SPECMULT = 8.*(SPECPARM)                                                
          JS = 1 + INT(SPECMULT)                                                  
-         FS = AMOD(SPECMULT,1.0)                                                 
+         FS = MOD(SPECMULT,1.0)                                                 
          FAC000 = (1. - FS) * FAC00(LAY)                                         
          FAC010 = (1. - FS) * FAC10(LAY)                                         
          FAC100 = FS * FAC00(LAY)                                                
@@ -5880,7 +5880,7 @@ CONTAINS
          IF (SPECPARM .GE. ONEMINUS) SPECPARM = ONEMINUS                         
          SPECMULT = 8.*(SPECPARM)                                                
          JS = 1 + INT(SPECMULT)                                                  
-         FS = AMOD(SPECMULT,1.0)                                                 
+         FS = MOD(SPECMULT,1.0)                                                 
          FAC000 = (1. - FS) * FAC00(LAY)                                         
          FAC010 = (1. - FS) * FAC10(LAY)                                         
          FAC100 = FS * FAC00(LAY)                                                
