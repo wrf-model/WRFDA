@@ -108,7 +108,7 @@ subroutine da_calculate_j( it, iter, xb, xbx, be, iv, xhat, cv, vv, &
       write(UNIT=grad_unit,FMT='(a)')'Iter          Iter                            '
       endif
 
-      write(UNIT=cost_unit,FMT='(2x,i2,1x,f6.3,2x,i4,2x,3f10.3') &
+      write(UNIT=cost_unit,FMT='(2x,i2,1x,f6.3,2x,i4,2x,3f10.3)') &
         it, EPS(it), iter, j % total, j % jb, j % jo % total
 
 !-------------------------------------------------------------------------
