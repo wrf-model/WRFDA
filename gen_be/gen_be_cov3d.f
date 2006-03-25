@@ -152,13 +152,17 @@ program gen_be_cov3d
 
    filename = trim(variable1)//'.'//trim(variable2)//'.'//trim(be_method)
    open (ounit, file = filename, status='unknown')
-   
+
    do k = 1, nk
       do j = 1, nj
-	     b = bin(ni/2,j,k)
-             print *, k, j
- 	     write(ounit,'(f22.5)')covar(b) / var(b)
-	  end do
+         b = bin(ni/2,j,k) ! Take value from center of i dimension.
+         if ( var(b) /= 0.0 ) then
+            write(ounit,'(f22.5)')covar(b) / var(b)
+         else
+            write(ounit,'(f22.5)')0.0
+         end if
+      end do
    end do
 
 end program gen_be_cov3d
+

@@ -15,50 +15,64 @@
 
 #Define job via environment variables:
 
+setenv LOCAL .FALSE.
+setenv USER dmbarker
+setenv NUM_JOBS 8 
+setenv BIN_TYPE 5
+setenv UH_METHOD 'scale'
+#setenv STRIDE 2 
 #set echo
-#AMPS:
-setenv START_DATE 2004050100
-setenv END_DATE 2004052800
-setenv NUM_LEVELS 30
-setenv RESOLUTION_KM 60
-setenv EXPT 2004-05.AMPS1
-setenv DAT_DIR /data3/dmbarker/data/amps1/noobs/gen_be
 
-#CWB:
-#setenv START_DATE 2003081512
-#setenv END_DATE 2003083012
+#AMPS:
+#setenv DATA_DISK /data4
+#setenv DOMAIN amps1
+#setenv START_DATE 2004050200
+#setenv END_DATE 2004052812
 #setenv NUM_LEVELS 30
-#setenv RESOLUTION_KM 45 
-#setenv EXPT 2003-08.CWB
-#setenv DAT_DIR /data3/dmbarker/data/cwb
+#setenv RESOLUTION_KM 60
+#setenv EXPT 2004-05.AMPS1
 
 #CONUS:
-#setenv START_DATE 2003010100
-#setenv END_DATE 2003010912
-#setenv NUM_LEVELS 28
-#setenv RESOLUTION_KM 200 
+#setenv DATA_DISK /ocotillo1
+#setenv DOMAIN con200
+#setenv START_DATE 2003010200
+#setenv END_DATE 2003012812
+#setenv NUM_LEVELS 27
+#setenv RESOLUTION_KM 200
 #setenv EXPT 2003-01.CONUS
-#setenv DAT_DIR /data4/dmbarker/data/conus2/noobs/gen_be
 
-setenv BIN_TYPE 1
-setenv UH_METHOD 'scale'
-setenv WRFVAR_DIR /snowdrift/users/dmbarker/code_development/wrfvar
+#Katrina:
+#setenv DATA_DISK /ocotillo1
+#setenv DOMAIN katrina.12km
+#setenv START_DATE 2005080200
+#setenv END_DATE 2005083100
+#setenv NUM_LEVELS 51
+#setenv RESOLUTION_KM 12
+#setenv EXPT 2005-08.Katrina
+
+#AFWA:
+setenv DATA_DISK /ocotillo1
+setenv DOMAIN t4b.afwa
+setenv START_DATE 2006020412
+setenv END_DATE 2006020700
+setenv NUM_LEVELS 42
+setenv RESOLUTION_KM 15
+setenv EXPT 2006-02.T44test
+
+setenv WRFVAR_DIR ${HOME}/code_development/WRF_V2.1.2/wrfvar.devel.eotd 
 
 #Uncomment the stages you wish to run:
 setenv RUN_GEN_BE_STAGE1 # Set to run stage 1 (Remove mean, split variables).
 setenv RUN_GEN_BE_STAGE2 # Set to run stage 2 (Regression Coefficients).
 setenv RUN_GEN_BE_STAGE2A # Set to run stage 2 (Regression Coefficients).
 setenv RUN_GEN_BE_STAGE3 # Set to run stage 3 (Vertical Covariances).
-setenv RUN_GEN_BE_STAGE4 # Set to run stage 4 (Horizontal Covariances).
+#setenv RUN_GEN_BE_STAGE4 # Set to run stage 4 (Horizontal Covariances).
 setenv RUN_GEN_BE_DIAGS  # Set to run gen_be diagnostics.
 setenv RUN_GEN_BE_DIAGS_READ  # Set to run gen_be diagnostics_read.
 
 #-----------------------------------------------------------------------------------
 # Don't change anything below this line.
 #-----------------------------------------------------------------------------------
-
-set BEGIN_CPU = `date`
-echo "Beginning CPU time: ${BEGIN_CPU}"
 
 if ( ! $?START_DATE )    setenv START_DATE    2004120200 # Starting time of period.
 if ( ! $?END_DATE )      setenv END_DATE      2004122012 # Ending time of period.
@@ -81,6 +95,7 @@ if ( ! $?USE_GLOBAL_EOFS ) setenv USE_GLOBAL_EOFS .true. # True if using global 
 if ( ! $?DATA_ON_LEVELS )  setenv DATA_ON_LEVELS .false. # False if fields projected onto modes.
 if ( ! $?UH_METHOD )     setenv UH_METHOD 'power'        # 'scale for regional. 'power' for global.
 if ( ! $?NUM_LEVELS )    setenv NUM_LEVELS    30         # Hard-wired for now....
+if ( ! $?N_SMTH_SL )     setenv N_SMTH_SL     0          # Amount of lengthscale smoothing (0=none).
 if ( ! $?STRIDE )        setenv STRIDE 1                 # Calculate correlation evert STRIDE point (stage4 regional).
 if ( ! $?NUM_JOBS )      setenv NUM_JOBS 1               # Number of jobs to run (stage4 regional)).
 if ( ! $?RESOLUTION_KM ) setenv RESOLUTION_KM 60         # Hard-wired for now (only used for regional)
@@ -88,9 +103,11 @@ if ( ! $?TESTING_SPECTRAL ) setenv TESTING_SPECTRAL .true.  # True if performing
 
 if ( ! $?EXPT )          setenv EXPT 2004-12.T213.elat
 if ( ! $?ID )            setenv ID ${BE_METHOD}.bin_type${BIN_TYPE}
-if ( ! $?WRFVAR_DIR )    setenv WRFVAR_DIR /tara/dmbarker/code_development/wrfvar
-if ( ! $?SRC_DIR )       setenv SRC_DIR ${WRFVAR_DIR}/gen_be
-if ( ! $?DAT_DIR )       setenv DAT_DIR /tara/dmbarker/be/kma_stats/${EXPT}
+if ( ! $?SRC_DIR )       setenv SRC_DIR ${HOME}/code_development/WRF_V2.1.2
+if ( ! $?WRFVAR_DIR )    setenv WRFVAR_DIR ${SRC_DIR}/wrfvar
+if ( ! $?DATA_DISK )     setenv DATA_DISK /tara
+if ( ! $?DOMAIN )        setenv DOMAIN katrina.12km
+if ( ! $?DAT_DIR )       setenv DAT_DIR ${DATA_DISK}/${user}/data/${DOMAIN}/noobs/gen_be
 if ( ! $?RUN_DIR )       setenv RUN_DIR ${DAT_DIR}/${ID}
 if ( ! -d ${RUN_DIR} )   mkdir ${RUN_DIR}
 
@@ -101,10 +118,14 @@ foreach SV ( fullflds psi chi t rh ps )
 end
 
 set CONTROL_VARIABLES = ( psi chi_u t_u rh ps_u )
+#set CONTROL_VARIABLES = ( t_u rh ps_u )
 
 foreach CV ( $CONTROL_VARIABLES )
    if ( ! -d ${RUN_DIR}/$CV ) mkdir ${RUN_DIR}/$CV
 end
+
+set DELETE_DIRS = (  )
+#Uncomment to tidy (after running gen_be_cov3d) set DELETE_DIRS = ( chi t ps )
 
 cd ${RUN_DIR}
 
@@ -113,11 +134,15 @@ cd ${RUN_DIR}
 #------------------------------------------------------------------------
 
 if ( $?RUN_GEN_BE_STAGE1 ) then
+
    echo "---------------------------------------------------------------"
    echo "Run Stage 1: Read "standard fields", and remove time/ensemble/area mean."
    echo "---------------------------------------------------------------"
 
-   ln -sf ${SRC_DIR}/gen_be_stage1.exe .
+   set BEGIN_CPU = `date`
+   echo "Beginning CPU time: ${BEGIN_CPU}"
+
+   ln -sf ${WRFVAR_DIR}/gen_be/gen_be_stage1.exe .
 
 cat >! gen_be_stage1_nl.nl << EOF
   &gen_be_stage1_nl
@@ -140,6 +165,10 @@ cat >! gen_be_stage1_nl.nl << EOF
 EOF
 
    ./gen_be_stage1.exe >& gen_be_stage1.log
+
+   set END_CPU = `date`
+   echo "Ending CPU time: ${END_CPU}"
+
 endif
 
 #------------------------------------------------------------------------
@@ -152,7 +181,11 @@ if ( $?RUN_GEN_BE_STAGE2 ) then
    echo "Run Stage 2: Calculate regression coefficients."
    echo "---------------------------------------------------------------"
 
-   ln -sf ${SRC_DIR}/gen_be_stage2.exe .
+   set BEGIN_CPU = `date`
+   echo "Beginning CPU time: ${BEGIN_CPU}"
+
+
+   ln -sf ${WRFVAR_DIR}/gen_be/gen_be_stage2.exe .
 
 cat >! gen_be_stage2_nl.nl << EOF
   &gen_be_stage2_nl
@@ -167,6 +200,10 @@ cat >! gen_be_stage2_nl.nl << EOF
 EOF
 
    ./gen_be_stage2.exe >& gen_be_stage2.log
+
+   set END_CPU = `date`
+   echo "Ending CPU time: ${END_CPU}"
+
 endif
 #------------------------------------------------------------------------
 #  Run Stage 2a: Calculate control variable fields.
@@ -178,7 +215,10 @@ if ( $?RUN_GEN_BE_STAGE2A ) then
    echo "Run Stage 2a: Calculate control variable fields."
    echo "---------------------------------------------------------------"
 
-   ln -sf ${SRC_DIR}/gen_be_stage2a.exe .
+   set BEGIN_CPU = `date`
+   echo "Beginning CPU time: ${BEGIN_CPU}"
+
+   ln -sf ${WRFVAR_DIR}/gen_be/gen_be_stage2a.exe .
 
 cat >! gen_be_stage2a_nl.nl << EOF
   &gen_be_stage2a_nl
@@ -195,6 +235,11 @@ cat >! gen_be_stage2a_nl.nl << EOF
 EOF
 
    ./gen_be_stage2a.exe >& gen_be_stage2a.log
+
+   rm -rf ${DELETE_DIRS} >&! /dev/null
+   set END_CPU = `date`
+   echo "Ending CPU time: ${END_CPU}"
+
 endif
 
 #------------------------------------------------------------------------
@@ -207,17 +252,23 @@ if ( $?RUN_GEN_BE_STAGE3 ) then
    echo "Run Stage 3: Read 3D control variable fields, and calculate vertical covariances."
    echo "---------------------------------------------------------------"
 
-   ln -sf ${SRC_DIR}/gen_be_stage3.exe .
+   set BEGIN_CPU = `date`
+   echo "Beginning CPU time: ${BEGIN_CPU}"
+
+   ln -sf ${WRFVAR_DIR}/gen_be/gen_be_stage3.exe .
 
    foreach CV ( $CONTROL_VARIABLES )
-      setenv VARIABLE $CV
+
+      if ( $CV == "ps" || $CV == "ps_u" ) then
+         echo "   Bypassing stage3 for 2D variable $CV"
+      else
 
 cat >! gen_be_stage3_nl.nl << EOF
   &gen_be_stage3_nl
     start_date = '${START_DATE}',
     end_date = '${END_DATE}', 
     interval = ${INTERVAL},
-    variable = '${VARIABLE}',
+    variable = '${CV}',
     be_method = '${BE_METHOD}',
     ne = ${NE},
     bin_type = ${BIN_TYPE},
@@ -234,8 +285,13 @@ cat >! gen_be_stage3_nl.nl << EOF
     dat_dir = '${DAT_DIR}' /
 EOF
 
-         ./gen_be_stage3.exe >& gen_be_stage3.${VARIABLE}.log
+         ./gen_be_stage3.exe >& gen_be_stage3.${CV}.log
+      endif
    end
+
+   set END_CPU = `date`
+   echo "Ending CPU time: ${END_CPU}"
+
 endif
 
 #------------------------------------------------------------------------
@@ -268,18 +324,16 @@ endif
 #------------------------------------------------------------------------
 
 if ( $?RUN_GEN_BE_DIAGS ) then
-   ln -sf ${SRC_DIR}/gen_be_diags.exe .
+   ln -sf ${WRFVAR_DIR}/gen_be/gen_be_diags.exe .
 
 cat >! gen_be_diags_nl.nl << EOF
   &gen_be_diags_nl
     be_method = '${BE_METHOD}',
     uh_method = '${UH_METHOD}',
-    n_smth_sl = 0, /
+    n_smth_sl = ${N_SMTH_SL}, /
 EOF
 
       ./gen_be_diags.exe >& gen_be_diags.log
-
-#mv gen_be.${BE_METHOD}.dat gen_be.${BE_METHOD}.dat.${UH_METHOD}
 
 endif
 
@@ -295,12 +349,9 @@ cat >! gen_be_diags_nl.nl << EOF
     uh_method = '${UH_METHOD}' /
 EOF
 
-   ln -sf ${SRC_DIR}/gen_be_diags_read.exe .
+   ln -sf ${WRFVAR_DIR}/gen_be/gen_be_diags_read.exe .
    ./gen_be_diags_read.exe >& gen_be_diags_read.log
 
 endif
-
-set END_CPU = `date`
-echo "Ending CPU time: ${END_CPU}"
 
 exit(0)

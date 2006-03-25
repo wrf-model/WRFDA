@@ -2,43 +2,40 @@
 #-----------------------------------------------------------------------
 set echo
 
+setenv BIN_TYPE 5
 setenv VARIABLE1 t_u
 setenv VARIABLE2 t
-setenv SRC_DIR /snowdrift/users/dmbarker/code_development/wrfvar/gen_be
 
-#AMPS:
-setenv START_DATE 2004050112
-setenv END_DATE 2004050912
-setenv DAT_DIR /data3/dmbarker/data/amps1/noobs/gen_be.tara/NMC.bin_type5 
+#T4B:
+setenv DATA_DISK /ocotillo1
+setenv DOMAIN t4b.afwa
+setenv START_DATE 2006020412
+setenv END_DATE 2006020700
+setenv EXPT 2006-02.T44test
+setenv BIN_TYPE 5
 
-#CWB:
-setenv START_DATE 2003081512
-setenv END_DATE 2003083012
-setenv DAT_DIR /data3/dmbarker/data/cwb/NMC.bin_type5 
+setenv WRFVAR_DIR ${HOME}/code_development/WRF_V2.1.2/wrfvar.devel.eotd
 
-#CONUS:
-setenv START_DATE 2003010100
-setenv END_DATE 2003010912
-setenv DAT_DIR /data4/dmbarker/data/conus2/noobs/gen_be/NMC.bin_type1
- 
 if ( ! $?START_DATE )    setenv START_DATE    2004030212 # Starting time of period.
 if ( ! $?END_DATE )      setenv END_DATE      2004033112 # Ending time of period.
 if ( ! $?INTERVAL )      setenv INTERVAL      12         # Period between files (hours).
 if ( ! $?BE_METHOD )     setenv BE_METHOD     NMC        # NMC (NMC-method), ENS (Ensemble-Method).
 if ( ! $?NE )            setenv NE 1                     # Number of ensemble members (for ENS).
+if ( ! $?BIN_TYPE )      setenv BIN_TYPE      1          # 0=None, 1=1:ni, 2=latitude, ....
 if ( ! $?VARIABLE1 )     setenv VARIABLE1     chi_u      # Experiment ID
 if ( ! $?VARIABLE2 )     setenv VARIABLE2     chi        # Experiment ID (normalizing field)
 
-if ( ! $?SRC_DIR )       setenv SRC_DIR /tara/dmbarker/wrfvar/gen_be
-if ( ! $?DAT_DIR )       setenv DAT_DIR /tara2/dmbarker/kma_stats
+if ( ! $?ID )            setenv ID ${BE_METHOD}.bin_type${BIN_TYPE}
+if ( ! $?SRC_DIR )       setenv SRC_DIR ${HOME}/code_development/WRF_V2.1.2
+if ( ! $?WRFVAR_DIR )    setenv WRFVAR_DIR ${SRC_DIR}/wrfvar
+if ( ! $?DATA_DISK )     setenv DATA_DISK /tara
+if ( ! $?DOMAIN )        setenv DOMAIN katrina.12km
+if ( ! $?DAT_DIR )       setenv DAT_DIR ${DATA_DISK}/${user}/data/${DOMAIN}/noobs/gen_be
+if ( ! $?RUN_DIR )       setenv RUN_DIR ${DAT_DIR}/${ID}
 
-cd ${DAT_DIR}
+cd ${RUN_DIR}
 
-echo "---------------------------------------------------------------"
-echo "Run Stage 1: Read "standard fields", and remove time/ensemble/area mean."
-echo "---------------------------------------------------------------"
-
-ln -sf ${SRC_DIR}/gen_be_cov3d.exe .
+ln -sf ${WRFVAR_DIR}/gen_be/gen_be_cov3d.exe .
 
 cat >! gen_be_cov3d_nl.nl << EOF
   &gen_be_cov3d_nl
@@ -55,3 +52,4 @@ EOF
 ./gen_be_cov3d.exe
 
 exit(0)
+

@@ -26,14 +26,16 @@
  if ( ! $?NUM_LEVELS )    setenv NUM_LEVELS    31         # Hard-wired for now....
  if ( ! $?TESTING_SPECTRAL ) setenv TESTING_SPECTRAL .false. # True if performing spectral tests.
 
- if ( ! $?EXPT )          setenv EXPT amps1.60km.may04.NMC
- if ( ! $?ID )            setenv ID ${EXPT}.bin_type${BIN_TYPE}
- if ( ! $?WRFVAR_DIR )    setenv WRFVAR_DIR /tara/dmbarker/code_development/wrfvar
- if ( ! $?SRC_DIR )       setenv SRC_DIR ${WRFVAR_DIR}/gen_be
- if ( ! $?DAT_DIR )       setenv DAT_DIR /tara/dmbarker/be/amps_stats/${EXPT}
- if ( ! $?RUN_DIR )       setenv RUN_DIR ${DAT_DIR}/${ID}
+ if ( ! $?EXPT )          setenv EXPT 2004-12.T213.elat   
+ if ( ! $?ID )            setenv ID ${BE_METHOD}.bin_type${BIN_TYPE}
+ if ( ! $?SRC_DIR )       setenv SRC_DIR ${HOME}/code_development/WRF_V2.1.2
+ if ( ! $?WRFVAR_DIR )    setenv WRFVAR_DIR ${SRC_DIR}/wrfvar
+ if ( ! $?DATA_DISK )     setenv DATA_DISK /tara
+ if ( ! $?DOMAIN )        setenv DOMAIN katrina.12km
+ if ( ! $?DAT_DIR )       setenv DAT_DIR ${DATA_DISK}/${user}/data/${DOMAIN}/noobs/gen_be
+ if ( ! $?RUN_DIR )       setenv RUN_DIR ${DAT_DIR}/${ID} 
  if ( ! -d ${RUN_DIR} )   mkdir ${RUN_DIR}
-# if ( ! $?CONTROL_VARIABLES) setenv CONTROL_VARIABLES ( psi chi_u t_u rh ps_u ) # Fields to process.
+
  set CONTROL_VARIABLES = ( psi chi_u t_u rh ps_u ) 
 
  foreach CV ( $CONTROL_VARIABLES )
@@ -45,7 +47,7 @@
 
  cd ${RUN_DIR}
    
- ln -sf ${SRC_DIR}/gen_be_stage4_global.exe .
+ ln -sf ${WRFVAR_DIR}/gen_be/gen_be_stage4_global.exe .
 
  foreach CV ( $CONTROL_VARIABLES )
     setenv VARIABLE $CV

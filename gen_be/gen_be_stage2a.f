@@ -52,7 +52,6 @@ program gen_be_stage2a
    real, allocatable   :: covar3(:,:,:)              ! Covariance between input fields.
    real, allocatable   :: var1(:)                    ! Autocovariance of field.
    real, allocatable   :: var2(:,:,:)                ! Autocovariance of field.
-   real, allocatable   :: var2_inv(:,:,:)            ! Inverse Autocovariance of field.
 
    real, allocatable   :: work(:,:)                  ! EOF work array.
    real, allocatable   :: evec(:,:)                  ! Gridpoint eigenvectors.

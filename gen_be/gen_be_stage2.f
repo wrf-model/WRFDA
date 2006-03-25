@@ -179,7 +179,6 @@ program gen_be_stage2
          read(iunit)chi
          close(iunit)
 
-
 !        Read T:
          variable = 't'
          filename = trim(variable)//'/'//date(1:10)

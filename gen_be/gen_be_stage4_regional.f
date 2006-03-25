@@ -44,7 +44,6 @@ program gen_be_stage4_regional
    k = 1
    stride = 1
    run_dir = '/mmmtmp/dmbarker'
-
    open(unit=namelist_unit, file='gen_be_stage4_regional_nl.nl', &
         form='formatted', status='old', action='read')
    read(namelist_unit, gen_be_stage4_regional_nl)
@@ -95,7 +94,6 @@ program gen_be_stage4_regional
             cov(0:nn) = 0.0
 
             call get_grid_info( ni, nj, nn, stride, nr )
-
          end if
 
          read(iunit)data_on_levels, use_global_eofs

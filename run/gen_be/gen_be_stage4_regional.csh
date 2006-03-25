@@ -34,15 +34,17 @@
 
  if ( ! $?EXPT )          setenv EXPT         wrfvar_cwb_be
  if ( ! $?ID )            setenv ID           cwb_wrf
- if ( ! $?WRFVAR_DIR )    setenv WRFVAR_DIR   /palm/users/guo/wrfvar
- if ( ! $?SRC_DIR )       setenv SRC_DIR      ${WRFVAR_DIR}/gen_be
- if ( ! $?DAT_DIR )       setenv DAT_DIR      /mmmtmp/guo/${EXPT}
- if ( ! $?RUN_DIR )       setenv RUN_DIR      ${DAT_DIR}/${ID}
+ if ( ! $?SRC_DIR )       setenv SRC_DIR      ${HOME}/code_development/WRF_V2.1.2
+ if ( ! $?WRFVAR_DIR )    setenv WRFVAR_DIR   ${SRC_DIR}/wrfvar
+ if ( ! $?DATA_DISK )     setenv DATA_DISK /tara
+ if ( ! $?DOMAIN )        setenv DOMAIN katrina.12km
+ if ( ! $?DAT_DIR )       setenv DAT_DIR ${DATA_DISK}/${user}/data/${DOMAIN}/noobs/gen_be
+ if ( ! $?RUN_DIR )       setenv RUN_DIR ${DAT_DIR}/${ID} 
  if ( ! -d ${RUN_DIR} )   mkdir ${RUN_DIR}
-
- if ( ! $?LOCAL )         setenv LOCAL       .true.                                          # True if local machine.
- if ( ! $?NUM_JOBS )      setenv NUM_JOBS    1                                               # Number of jobs to run.
- if ( ! $?MACHINES )      set MACHINES = ( node1 node2 node3 node4 node1 node2 node3 node4)  # For parallel runs.
+ if ( ! $?LOCAL )         setenv LOCAL .true.             # True if local machine.
+ if ( ! $?NUM_JOBS )      setenv NUM_JOBS    1            # Number of jobs to run.
+ if ( ! $?MACHINES )      set MACHINES = ( node1 node2 node3 node4 node5 node6 node7 node8 \
+                                           node1 node2 node3 node4 node5 node6 node7 node8 )  # For parallel runs.
  if ( ! $?CONTROL_VARIABLES) set CONTROL_VARIABLES = ( psi chi_u t_u rh ps_u )               # Fields to process.
 
  setenv TMP_DIR ${RUN_DIR}/gen_be_stage4_regional.${STRIDE}
@@ -69,10 +71,11 @@
 
     while ( $VINDEX <= $MAX_VINDEX )
 
-       mkdir ${TMP_DIR}/dir.${VARIABLE}${VINDEX} >&! /dev/null
+       setenv TMP_DIR1 ${TMP_DIR}/dir.${VARIABLE}${VINDEX}
+       mkdir ${TMP_DIR1} >&! /dev/null
+       cd ${TMP_DIR1}
 
-       cd ${TMP_DIR}/dir.${VARIABLE}${VINDEX}
-       ln -sf ${SRC_DIR}/gen_be_stage4_regional.exe .
+       ln -sf ${WRFVAR_DIR}/gen_be/gen_be_stage4_regional.exe .
 
 #      Create namelist:
 cat >! gen_be_stage4_regional_nl.nl << EOF
@@ -94,7 +97,7 @@ EOF
        else
           setenv MACHINE $MACHINES[$JOB]
           echo "Submitting job for variable $VARIABLE and vertical index $VINDEX on $MACHINE"
-          (rsh -n $MACHINE ./gen_be_stage4_regional.exe >&! gen_be_stage4_regional.out) &
+          (rsh -n $MACHINE "cd $TMP_DIR1; ./gen_be_stage4_regional.exe >&! gen_be_stage4_regional.out") &
 
           sleep 2 # Create small gap between submissions to avoid overwriting output.
        endif
