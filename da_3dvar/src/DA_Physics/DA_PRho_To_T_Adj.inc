@@ -33,7 +33,7 @@ SUBROUTINE DA_PRho_To_T_Adj( xb, xp, xa )
    ks = xp%kts
    ke = xp%kte
    
-   if ( Testing_3DVAR ) then
+   if ( Testing_WRFVAR ) then
       is = xb%its-1
       js = xb%jts-1
 

@@ -25,7 +25,7 @@ SUBROUTINE DA_Transform_XToSeaSfcWind_Adj( xa, xb )
    ie = xb%ite
    je = xb%jte
 
-   if ( Testing_3DVAR ) then
+   if ( Testing_WRFVAR ) then
       is = xb%its-1
       js = xb%jts-1
 

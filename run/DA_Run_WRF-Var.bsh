@@ -137,7 +137,7 @@ export DA_MAX_EXT_ITS=${DA_MAX_EXT_ITS:-1}                  # Maximum number of 
 export DA_EPS=${DA_EPS:-1.E-02, 1.E-02, 1.E-02, 1.E-02, 1.E-02, 1.E-02, 1.E-02,} # Convergence criteria.
 export DA_NTMAX=${DA_NTMAX:-100}                            # Maximum number of inner loop iterations.
 export DA_RF_PASSES=${DA_RF_PASSES:-6}                      # Number of recursive filter passes.
-export DA_TESTING_3DVAR=${DA_TESTING_3DVAR:-.FALSE.}        # Test WRF-Var code.
+export DA_TESTING_WRFVAR=${DA_TESTING_WRFVAR:-.FALSE.}      # Test WRF-Var code.
 export DA_TEST_TRANSFORMS=${DA_TEST_TRANSFORMS:-.FALSE.}    # Test WRF-Var transforms.
 export DA_TEST_STATISTICS=${DA_TEST_STATISTICS:-.FALSE.}    # Test WRF-Var statistics.
 export DA_INTERPOLATE_STATS=${DA_INTERPOLATE_STATS:-.TRUE.} # True if statistics computed on different domain.
@@ -378,7 +378,7 @@ cat > namelist.3dvar << EOF
  y_end_sub_domain   = $DA_Y_END_SUB_DOMAIN /
 
 &record10
- Testing_3DVAR  = $DA_TESTING_3DVAR,
+ Testing_WRFVAR  = $DA_TESTING_WRFVAR,
  Test_Transforms = $DA_TEST_TRANSFORMS,
  Test_Statistics = $DA_TEST_STATISTICS,
  Interpolate_Stats = $DA_INTERPOLATE_STATS /

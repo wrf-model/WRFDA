@@ -2,7 +2,7 @@
 
 !------------------------------------------------------------------------------
 !     PURPOSE: This module CONTAINS routines within the BLAS (basic linear 
-!     algegra software) package that are currently used within the 3DVAR system.
+!     algegra software) package that are currently used within the WRFVAR system.
 !
 !     Routines not currently used are contained in the Not_Yet_Used subdir. They
 !     will be added to this module as and when required.

@@ -10,8 +10,8 @@ include ./configure.wrf
 EM_MODULE_DIR = -I../dyn_em
 EM_MODULES =  $(EM_MODULE_DIR)
 
-DA_3DVAR_MODULES = $(INCLUDE_MODULES)
-DA_3DVAR_MODULES_2 = $(INC_MOD_3DVAR)
+DA_WRFVAR_MODULES = $(INCLUDE_MODULES)
+DA_WRFVAR_MODULES_2 = $(INC_MOD_WRFVAR)
 
 #JRB -p../convertor is not a valid option on Linux or Aix, I wonder
 # what it was for?
@@ -64,44 +64,44 @@ wrf : configcheck
 
 var : 
 	/bin/rm -f main/libwrflib.a
-	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" ext
-	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" toolsdir
-	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" REGISTRY="Registry" framework
-	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" shared
-	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" da_3dvar_io
-	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" wrfvar_src
-	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" da_3dvar_interface
-	( cd main ; $(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" wrfvar )
+	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" ext
+	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" toolsdir
+	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" REGISTRY="Registry" framework
+	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" shared
+	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" da_3dvar_io
+	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" wrfvar_src
+	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" da_3dvar_interface
+	( cd main ; $(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" wrfvar )
 
 pure_var : 
 	@ echo 'This option assumes that you have already compiled the WRF frame part correctly.'
 	@ echo 'If you have not done so, please use compile 3dvar'
-	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" da_3dvar_io
-	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" wrfvar_src
-	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" da_3dvar_interface
-	( cd main ; $(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" wrfvar )
+	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" da_3dvar_io
+	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" wrfvar_src
+	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" da_3dvar_interface
+	( cd main ; $(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" wrfvar )
 
 k2n : 
-	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" ext
-	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" toolsdir
-	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" REGISTRY="Registry" framework
-	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" shared
+	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" ext
+	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" toolsdir
+	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" REGISTRY="Registry" framework
+	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" shared
 	$(MAKE) MODULE_DIRS="$(ALL_MODULES)" physics
 	$(MAKE) MODULE_DIRS="$(ALL_MODULES)" em_core
-	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" da_3dvar_io
+	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" da_3dvar_io
 	$(MAKE) MODULE_DIRS="$(DA_CONVERTOR_MODULES)" convertor_drivers
 	( cd main ; \
           /bin/rm -f kma2netcdf.exe ; \
 	  $(MAKE) MODULE_DIRS="$(DA_CONVERTOR_MODULES)" kma2netcdf )
 
 n2k : 
-	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" ext
-	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" toolsdir
-	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" REGISTRY="Registry" framework
-	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" shared
+	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" ext
+	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" toolsdir
+	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" REGISTRY="Registry" framework
+	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" shared
 	$(MAKE) MODULE_DIRS="$(ALL_MODULES)" physics
 	$(MAKE) MODULE_DIRS="$(ALL_MODULES)" em_core
-	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" da_3dvar_io
+	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" da_3dvar_io
 	$(MAKE) MODULE_DIRS="$(DA_CONVERTOR_MODULES)" convertor_drivers
 	( cd main ; \
           /bin/rm -f netcdf2kma.exe ; \
@@ -109,35 +109,35 @@ n2k :
 
 be :
 	/bin/rm -f main/libwrflib.a
-	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES_2)" gen_be_short
+	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES_2)" gen_be_short
 	( cd gen_be ; \
 	/bin/rm -f *.exe ; \
-	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" SOLVER=gen_be )
+	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" SOLVER=gen_be )
 
 be_wrf :
 	/bin/rm -f main/libwrflib.a
-	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" ext
-	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" toolsdir
-	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" REGISTRY="Registry" framework
-	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" shared
-	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" da_3dvar_io
-	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES_2)" gen_be_long
-	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" gen_be_interface
+	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" ext
+	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" toolsdir
+	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" REGISTRY="Registry" framework
+	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" shared
+	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" da_3dvar_io
+	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES_2)" gen_be_long
+	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" gen_be_interface
 	( cd gen_be ; \
 	/bin/rm -f *.exe ; \
-	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" SOLVER=gen_be ; \
-	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" gen_be_stage0 )
+	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" SOLVER=gen_be ; \
+	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" gen_be_stage0 )
 
 pure_be_wrf :
 	@ echo 'This option assumes that you have already compiled the WRF frame part correctly.'
 	@ echo 'If you have not done so, please use compile be_wrf'
-	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" da_3dvar_io
-	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES_2)" gen_be_long
-	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" gen_be_interface
+	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" da_3dvar_io
+	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES_2)" gen_be_long
+	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" gen_be_interface
 	( cd gen_be ; \
 	/bin/rm -f *.exe ; \
-	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" SOLVER=gen_be ; \
-	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" gen_be_stage0 )
+	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" SOLVER=gen_be ; \
+	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" gen_be_stage0 )
 
 ### 3.a.  rules to build the framework and then the experimental core
 
@@ -309,19 +309,19 @@ em_core :
 
 wrfvar_src :
 	@ echo '--------------------------------------'
-	( cd da_3dvar/src; $(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES_2)" 3dvar )
+	( cd da_3dvar/src; $(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES_2)" 3dvar )
 
 da_3dvar_io :
 	@ echo '--------------------------------------'
-	( cd da_3dvar; $(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" da_3dvar_io )
+	( cd da_3dvar; $(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" da_3dvar_io )
 
 da_3dvar_interface :
 	@ echo '--------------------------------------'
-	( cd da_3dvar; $(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" da_3dvar_interface )
+	( cd da_3dvar; $(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" da_3dvar_interface )
 
 gen_be_interface :
 	@ echo '--------------------------------------'
-	( cd da_3dvar; $(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" gen_be_interface )
+	( cd da_3dvar; $(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" gen_be_interface )
 
 convertor_drivers :
 	@ echo '--------------------------------------'
@@ -329,11 +329,11 @@ convertor_drivers :
 
 gen_be_short :
 	@ echo '--------------------------------------'
-	( cd da_3dvar/src; $(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES_2)" gen_be_short )
+	( cd da_3dvar/src; $(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES_2)" gen_be_short )
 
 gen_be_long :
 	@ echo '--------------------------------------'
-	( cd da_3dvar/src; $(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES_2)" gen_be_long )
+	( cd da_3dvar/src; $(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES_2)" gen_be_long )
 
 # rule used by configure to test if this will compile with MPI 2 calls MPI_Comm_f2c and _c2f
 mpi2_test :

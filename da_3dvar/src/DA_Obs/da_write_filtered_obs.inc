@@ -52,7 +52,7 @@ SUBROUTINE da_write_filtered_obs(iunit, ounit, ob, iv )
 
     if(print_detail > 1) print*,' Going to write filtered obs on unit: ',ounit   
    zero = 0
-! Note: Currently in 3DVAR there is no active role of 
+! Note: Currently in WRFVAR there is no active role of 
 !       "height" and "TD"        
    xmiss  = -888.0
    height       = missing_r

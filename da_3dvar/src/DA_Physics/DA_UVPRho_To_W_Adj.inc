@@ -108,7 +108,7 @@ SUBROUTINE DA_UVPRho_To_W_Adj( xb, xa, xp,                 &
                                 its,ite, jts,jte, kts,kte )
 
 !  Computation to check for edge of domain:
-   if(Testing_3DVAR) then
+   if(Testing_WRFVAR) then
       is = its-1; ie = ite+1; js = jts-1; je = jte+1
       if ( its == ids ) is = ids; if ( ite == ide ) ie = ide
       if ( jts == jds ) js = jds; if ( jte == jde ) je = jde

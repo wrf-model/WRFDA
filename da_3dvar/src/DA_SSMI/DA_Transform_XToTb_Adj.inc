@@ -33,7 +33,7 @@ SUBROUTINE DA_Transform_XToTb_Adj (xa, xb)
    ie = xb%ite
    je = xb%jte
    ke = xb%kte
-   if ( Testing_3DVAR ) then
+   if ( Testing_WRFVAR ) then
       is = xb%its-1
       js = xb%jts-1
 
@@ -46,7 +46,7 @@ SUBROUTINE DA_Transform_XToTb_Adj (xa, xb)
       if ( ie > xb%ide ) ie = xb%ide
       if ( je > xb%jde ) je = xb%jde
    endif
-!   print*,'Testing_3DVAR=',Testing_3DVAR,is,js,ie,je
+!   print*,'Testing_WRFVAR=',Testing_WRFVAR,is,js,ie,je
 
 ! Mean fields
 

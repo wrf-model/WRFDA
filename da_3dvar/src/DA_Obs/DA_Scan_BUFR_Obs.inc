@@ -209,7 +209,7 @@ SUBROUTINE DA_Scan_BUFR_Obs (iunit, ob, xp, filename)
      if(global .and. &
      (platform%loc%i < xp%ids .or. platform%loc%i >= xp%ide)) ndup= 2
 
-     if( Testing_3DVAR ) ndup = 1
+     if( Testing_WRFVAR ) ndup = 1
 
      DO n = 1, ndup
 

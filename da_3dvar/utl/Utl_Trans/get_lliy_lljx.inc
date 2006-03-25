@@ -20,7 +20,7 @@
 
       integer :: lliy_CAA_domain, lljx_CAA_domain, miy_CAA_domain_coarse, mjx_CAA_domain_coarse
 
-!  For 3DVAR domain
+!  For WRFVAR domain
 
 !  lliy_current: low-left corner i-direction (y-direction) in its mother domain
 !  lljx_current: low-left corner j-direction (x-direction) in its mother domain
@@ -31,13 +31,13 @@
 
       real :: dx, dy
 
-!     Current 3DVAR Domain size
+!     Current WRFVAR Domain size
 
       miy_current=big_header_current%bhi(16,1)
       mjx_current=big_header_current%bhi(17,1)
 
 !     Calcuclate distance of the low-left corner to its
-!     mother domain's low-left corner (3DVAR domain)
+!     mother domain's low-left corner (WRFVAR domain)
 
       dy = 0.5+(big_header_current%bhr(10,1)-1.0) &
          * real(big_header_current%bhi(20,1))
@@ -49,7 +49,7 @@
       lliy_current=int(dy) + 1
       lljx_current=int(dx) + 1
 
-!     the coarsest domain size: 3DVAR domain
+!     the coarsest domain size: WRFVAR domain
 
       miy_current_coarse=big_header_current%bhi(5,1)
       mjx_current_coarse=big_header_current%bhi(6,1)
@@ -72,7 +72,7 @@
       dx = 0.5+(big_header_CAA_domain%bhr(11,1)-1.0) &
          * real(big_header_CAA_domain%bhi(20,1))
 
-!     grid numbers difference between 3DVAR and CAA domain
+!     grid numbers difference between WRFVAR and CAA domain
 
       lliy=(miy_current_coarse - miy_CAA_domain_coarse)/2
       lljx=(mjx_current_coarse - mjx_CAA_domain_coarse)/2
@@ -80,9 +80,9 @@
       lliy_CAA_domain=big_header_CAA_domain%bhi(20,1)*lliy+int(dy)+1
       lljx_CAA_domain=big_header_CAA_domain%bhi(20,1)*lljx+int(dx)+1
 
-!     low-left corner index of CAA original domain in 3DVAR domain.
-!     (3DVAR is extended CAA domain, &
-!      so 3DVAR domain is bigger than CAA domain)
+!     low-left corner index of CAA original domain in WRFVAR domain.
+!     (WRFVAR is extended CAA domain, &
+!      so WRFVAR domain is bigger than CAA domain)
 
       lliy=lliy_CAA_domain - lliy_current + 1
       lljx=lljx_CAA_domain - lljx_current + 1

@@ -149,7 +149,7 @@ SUBROUTINE DA_Setup_RunConstants( xp, xb, xbx)
              '(xp%ide-xp%ids+1) = ', (xp%ide-xp%ids+1), &
              'xbx%fft_pad_i = ', xbx%fft_pad_i
         write(wrf_err_message, fmt='(a)') &
-             'WRF3DVAR ERROR in da_setup_runconstants.inc.'
+             'WRFVAR ERROR in da_setup_runconstants.inc.'
         CALL WRF_ERROR_FATAL ( wrf_err_message )
 
         write(wrf_err_message, fmt='(a)') &

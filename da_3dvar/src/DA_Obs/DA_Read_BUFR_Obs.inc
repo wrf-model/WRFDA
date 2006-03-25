@@ -921,7 +921,7 @@ SUBROUTINE DA_Read_BUFR_Obs (iunit, ob, xp, filename)
         END SELECT
       END SELECT
     if( global .and. n < 2 ) then
-      if( Testing_3DVAR ) exit dup_loop
+      if( Testing_WRFVAR ) exit dup_loop
       if( platform%loc % i >= xp % ide) then
          platform%loc%i = platform%loc % i - xp % ide
       else if( platform%loc % i < xp % ids) then

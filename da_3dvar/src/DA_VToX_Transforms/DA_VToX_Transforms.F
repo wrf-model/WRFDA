@@ -9,7 +9,7 @@ MODULE DA_VToX_Transforms
 !  HISTORY: 01/07/2000 - Creation of F90 version.           Dale Barker
 !
 ! Additions: 
-!           10/26/2004 - Poles Treatment for Global 3DVAR   Syed RH Rizvi
+!           10/26/2004 - Poles Treatment for Global WRFVAR   Syed RH Rizvi
 !------------------------------------------------------------------------------
 
 ! Driver layer modules

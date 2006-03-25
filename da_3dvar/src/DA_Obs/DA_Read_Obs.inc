@@ -795,7 +795,7 @@ loop_level: DO i = 1, platform%info%levels
          do i = 1, nlevels
            ob%gpsref(num_gpsref)%h(i)   = platform%each(i)%height
 
-! ==> In 3DVAR_OBSPROC, use "td" field to store "gpsref" (Y.-R. Guo):
+! ==> In WRFVAR_OBSPROC, use "td" field to store "gpsref" (Y.-R. Guo):
            ob%gpsref(num_gpsref)%ref(i) = platform%each(i)%td
 ! ==> Keep the retrieved p and t (and q) as "field_type":   
            ob%gpsref(num_gpsref)%p(i)   = platform%each(i)%p
@@ -1016,7 +1016,7 @@ loop_level: DO i = 1, platform%info%levels
       END SELECT
 
      if( global .and. n < 2 ) then
-      if( Testing_3DVAR ) exit dup_loop
+      if( Testing_WRFVAR ) exit dup_loop
       if( platform%loc % i >= xp % ide) then
          platform%loc%i = platform%loc % i - xp % ide
       else if( platform%loc % i < xp % ids) then

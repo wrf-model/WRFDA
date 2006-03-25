@@ -57,7 +57,7 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
    CALL wrf_message("***  VARIATIONAL ANALYSIS ***")
 
 !------------------------------------------------------------------------------
-!  [1.0] Read 3DVAR namelist:
+!  [1.0] Read WRFVAR namelist:
 !------------------------------------------------------------------------------
 
    CALL DA_Read_Namelist
@@ -103,7 +103,7 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
 !  [7.0] Test:
 !------------------------------------------------------------------------------
 
-   if ( test_transforms .or. Testing_3DVAR ) then
+   if ( test_transforms .or. Testing_WRFVAR ) then
       CALL da_get_innov_vector( it, ob, iv, &
                                 grid , config_flags , &
 #include <em_dummy_args.inc>
@@ -188,7 +188,7 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
       CALL DA_Write_Diagnostics( ob, iv, re, y, xp, xa, j )
 
 !------------------------------------------------------------------------------
-!  [8.0] Output 3DVAR analysis and analysis increments:
+!  [8.0] Output WRFVAR analysis and analysis increments:
 !------------------------------------------------------------------------------
 
 !------------------------------------------------------------------------------
@@ -211,7 +211,7 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
    call da_deallocate_y( re )
    call da_deallocate_y( y )
 
-   CALL wrf_message("*** 3DVAR completed successfully ***")
+   CALL wrf_message("*** WRFVAR completed successfully ***")
 
    CALL wrf_debug ( 200 , ' call end of solve_v3d' )
 

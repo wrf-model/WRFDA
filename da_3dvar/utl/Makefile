@@ -1,4 +1,4 @@
-# Makefile for 3DVAR Program and its applications
+# Makefile for WRFVAR Program and its applications
 
 # Lower level Makefile
 

@@ -166,7 +166,7 @@ What is in WRF V2?
       NetCDF and Parallel HDF5 formats
       Five auxiliary history output streams separately controllable through the namelist
       Output file names and time-stamps specifiable through namelist
-      Special output stream for 3DVAR
+      Special output stream for WRFVAR
   * Efficient execution on a range of computing platforms:
       IBM SP systems, (e.g. NCAR "bluesky" Power4-based system)
       HP/Compaq Alpha/OSF workstation, SMP, and MPP systems (e.g. Pittsburgh 

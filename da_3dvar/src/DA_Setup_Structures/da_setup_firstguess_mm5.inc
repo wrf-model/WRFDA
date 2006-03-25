@@ -7,7 +7,7 @@ SUBROUTINE DA_Setup_FirstGuess_MM5( xb, xbx, xp)
 !
 !  HISTORY: 01/06/2000 - Creation of F90 version.           Dale Barker
 !           10/19/2001 - Mods for parallel implementation.  Al Bourgeois
-!           08/10/2004 - Make it work with WRF3DVAR.        Wei Huang
+!           08/10/2004 - Make it work with WRFVAR.        Wei Huang
 !
 !  PARENT_MODULE: DA_Setup_Structures
 !------------------------------------------------------------------------------
@@ -118,7 +118,7 @@ SUBROUTINE DA_Setup_FirstGuess_MM5( xb, xbx, xp)
 !   WRITE(UNIT=stderr,FMT='(''PHIC,XLONC,X,Y:'',4F10.2)') PHIC,XLONC,X,Y
 
 !---------------------------------------------------------------------------
-!  [4.0] Interpolate MM5 B-grid winds to p points of 3DVAR grid (interpolate 
+!  [4.0] Interpolate MM5 B-grid winds to p points of WRFVAR grid (interpolate 
 !  u,v to the NORTH-EAST p point). 
 !---------------------------------------------------------------------------
 
@@ -136,7 +136,7 @@ SUBROUTINE DA_Setup_FirstGuess_MM5( xb, xbx, xp)
    
    if ( xb % mix /= wrf_dim1 .or. xb % mjy /= wrf_dim2 .or. &
         xb % mkz /= wrf_dim3  ) then
-     errmsg(1)="Inconsistent WRF/3DVAR namelist"
+     errmsg(1)="Inconsistent WRF/WRFVAR namelist"
      WRITE(UNIT=errmsg(2),FMT='(6i6)') &
        xb % mix, wrf_dim1, xb % mjy, wrf_dim2, xb % mkz, wrf_dim3
      CALL wrf_error_fatal(errmsg(1:2))

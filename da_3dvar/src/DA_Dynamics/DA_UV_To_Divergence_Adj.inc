@@ -49,7 +49,7 @@ SUBROUTINE DA_UV_To_Divergence_adj( xp, xb, u, v, div, &
 
    one_third = 1.0 / 3.0
 
-   if(Testing_3DVAR) then
+   if(Testing_WRFVAR) then
       is = its; ie = ite; js = jts; je = jte
    else
       is = its - 1; ie = ite + 1; js = jts - 1; je = jte + 1
@@ -124,7 +124,7 @@ SUBROUTINE DA_UV_To_Divergence_adj( xp, xb, u, v, div, &
 !     This is only for adjoint, as we have to cross the processor boundary
 !     to get the contribution.
 
-      if(.not. Testing_3DVAR) then
+      if(.not. Testing_WRFVAR) then
          xp%vxy(its:ite, jts:jte) = div(its:ite, jts:jte, k)
          call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id12)
 

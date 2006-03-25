@@ -66,7 +66,7 @@ MODULE DA_Constants
    real, parameter    :: coeff = 3.73e5 / 77.6
    
 !------------------------------------------------------------------------------
-!  [2.0] 3DVAR parameter constants:
+!  [2.0] WRFVAR parameter constants:
 !------------------------------------------------------------------------------
 
 ! Missing values and the index number of the quality contro
@@ -75,7 +75,7 @@ MODULE DA_Constants
    REAL   , PARAMETER ::  missing_r     = -888888.
    REAL   , PARAMETER ::  Max_StHeight_Diff = 100.
 
-!  3DVAR Minimisation:
+!  WRFVAR Minimisation:
    LOGICAL            :: write_switch   ! switch to write results in the
    INTEGER            :: write_interval ! write_interval (number of iterations)
    INTEGER            :: iter
@@ -242,7 +242,7 @@ MODULE DA_Constants
                          v_interp_h             = 2
 
 !------------------------------------------------------------------------------
-! 3DVAR scalar constants:
+! WRFVAR scalar constants:
 !------------------------------------------------------------------------------
  integer                :: Anal_Space  ! Space of analysis
                                        ! ( 1 = Full model,
@@ -330,7 +330,7 @@ MODULE DA_Constants
  CHARACTER*(8) :: PROCESS_OBS   ! Observation preprocessing parameter.
  REAL          :: TIME_WINDOW   ! Assimilation time window.
  integer       :: print_detail  ! 0=Minimum, 1=More, 2=excessive!
- LOGICAL       :: Testing_3DVAR ! Adjoint, gradient tests if done if .TRUE.
+ LOGICAL       :: Testing_WRFVAR ! Adjoint, gradient tests if done if .TRUE.
  logical       :: omb_set_rand  ! Randomize O-Bs if .true.
  logical       :: put_rand_seed ! Used to initialise random numbers.
  integer       :: seed_array1, seed_array2

@@ -2,7 +2,7 @@ SUBROUTINE da_get_innov_vector_bogus ( it, xb, xp, ob, iv )
 
   !------------------------------------------------------------------------------
   !  This subroutine is to calculate the innovations for the bogus data.
-  !  History: Initial setup for MM5 3DVAR, on September 2003, by Ying Zhang.
+  !  History: Initial setup for MM5 WRFVAR, on September 2003, by Ying Zhang.
   !  History: Port to WRF frame,           on November  2004, by Qingnong Xiao
   !------------------------------------------------------------------------------
 

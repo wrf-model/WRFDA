@@ -1,7 +1,7 @@
 SUBROUTINE DA_Read_Namelist
 
 !----------------------------------------------------------------------------
-!  PURPOSE:       Read in 3DVAR input parameters from namelist.
+!  PURPOSE:       Read in WRFVAR input parameters from namelist.
 !
 !  METHOD:        Open namelist input file and read in values.
 !
@@ -98,7 +98,7 @@ SUBROUTINE DA_Read_Namelist
    NAMELIST /RECORD8/  def_sub_domain, &
                        x_start_sub_domain, x_end_sub_domain, &
                        y_start_sub_domain, y_end_sub_domain
-   NAMELIST /RECORD10/ Testing_3DVAR, test_transforms, &
+   NAMELIST /RECORD10/ Testing_WRFVAR, test_transforms, &
                        test_statistics, interpolate_stats, &
                        testing_dm_exact
    NAMELIST /RECORD11/ cv_options, cv_options_hum, check_rh, &
@@ -121,7 +121,7 @@ SUBROUTINE DA_Read_Namelist
 !----------------------------------------------------------------------------------
    
 
-   CALL wrf_message("[1.0] Read 3DVAR namelist")
+   CALL wrf_message("[1.0] Read WRFVAR namelist")
 
 !  Namelist defaults:
 
@@ -243,7 +243,7 @@ SUBROUTINE DA_Read_Namelist
    y_end_sub_domain   = 1.0e10   
 
 !--record10
-   Testing_3DVAR  = .FALSE.
+   Testing_WRFVAR  = .FALSE.
    Test_Transforms = .FALSE.
    Test_Statistics = .FALSE.
    Interpolate_Stats = .TRUE.
@@ -316,8 +316,8 @@ SUBROUTINE DA_Read_Namelist
 !  [1.0] Open namelist file:
 !----------------------------------------------------------------------------
 
-   namelist_file = 'namelist.3dvar'
-   WRITE (UNIT=stdout,FMT='(3x,A,A)' ) ' 3DVAR namelist options used are in: ', namelist_file
+   namelist_file = 'namelist.WRFVAR'
+   WRITE (UNIT=stdout,FMT='(3x,A,A)' ) ' WRFVAR namelist options used are in: ', namelist_file
    IOST = 0
 
    OPEN ( FILE   = namelist_file, UNIT   = namelist_unit, &
@@ -523,7 +523,7 @@ SUBROUTINE DA_Read_Namelist
    ENDIF
 
    if ( print_detail >= 1 ) then
-      WRITE(UNIT=stdout,FMT='(A,L10)')               ' Testing_3DVAR = ',Testing_3DVAR
+      WRITE(UNIT=stdout,FMT='(A,L10)')               ' Testing_WRFVAR = ',Testing_WRFVAR
       WRITE(UNIT=stdout,FMT='(A,L10)')               ' Test_Inverse  = ',test_transforms
       WRITE(UNIT=stdout,FMT='(A,L10)')               ' Test_Statisti = ',test_statistics
       WRITE(UNIT=stdout,FMT='(A,L10)')               ' Interpolate_S = ',interpolate_stats
@@ -809,7 +809,7 @@ SUBROUTINE DA_Read_Namelist
    WRITE(UNIT=stdout,FMT='(A,3X,L10   )') ' In_CG_COST_FN_NEEDED = ',calculate_cg_cost_fn
    WRITE(UNIT=stdout,FMT='(A,3X,L10   )') ' Outer_Loop_Write   = ',write_outer_loop
    WRITE(UNIT=stdout,FMT='(A,3X,L10   )') ' Lat_Stats_Option   = ',lat_stats_option
-   WRITE(UNIT=stdout,FMT='(A,3X,L10   )') ' Testing_3DVAR = ',Testing_3DVAR
+   WRITE(UNIT=stdout,FMT='(A,3X,L10   )') ' Testing_WRFVAR = ',Testing_WRFVAR
    WRITE(UNIT=stdout,FMT='(A,3X,L10   )') ' Test_Inverse  = ',test_transforms
    WRITE(UNIT=stdout,FMT='(A,3X,L10   )') ' Test_Statisti = ',test_statistics
    WRITE(UNIT=stdout,FMT='(A,3X,L10   )') ' Interpolate_S = ',interpolate_stats

@@ -95,7 +95,7 @@ lib_rsl :
                                  LEARN_BCAST=-DLEARN_BCAST alpha )
 
 ###########################################################
-#ARCH       Compaq OSF1 alpha    (single-threaded, for compare with MM5 3DVAR)
+#ARCH       Compaq OSF1 alpha    (single-threaded, for compare with MM5 VAR)
 #
 OMP             =
 OMPCPP          =
@@ -423,7 +423,7 @@ CC_TOOLS        =       cc
 ARCHFLAGS3      =       -DINTIO \
                         -DTRIEDNTRUE -DONLY_WRFMODEL_IO \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) \
-			-DWRF3DVAR -DMPI -I$(MPIINCDIR) 
+			-DMPI -I$(MPIINCDIR) 
 TRADFLAG        =
 FCOPTIM         =
 FCDEBUG         =      

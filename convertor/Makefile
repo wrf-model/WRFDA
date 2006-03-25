@@ -66,7 +66,7 @@ module_kma_wave2grid.o: \
 		kma_wave2grid/ZNME2PXX.inc \
 		kma_wave2grid/module_kma_wave2grid.F
 		$(CPP) -I./kma_wave2grid $(CPPFLAGS) kma_wave2grid/module_kma_wave2grid.F > module_kma_wave2grid.f
-		$(FC) -c -I./kma_wave2grid $(F77FLAGS_3DVAR) $(MODULE_DIRS) module_kma_wave2grid.f
+		$(FC) -c -I./kma_wave2grid $(F77FLAGS_WRFVAR) $(MODULE_DIRS) module_kma_wave2grid.f
 
 module_wave2grid_kma.o: \
 		wave2grid_kma/BSSLZ1.inc \
@@ -103,7 +103,7 @@ module_wave2grid_kma.o: \
 		wave2grid_kma/RELHUM.inc       \
 		wave2grid_kma/module_wave2grid_kma.F
 		$(CPP) -I./wave2grid_kma $(CPPFLAGS) wave2grid_kma/module_wave2grid_kma.F > module_wave2grid_kma.f
-		$(FC) -c -I./wave2grid_kma $(F77FLAGS_3DVAR) $(MODULE_DIRS) module_wave2grid_kma.f
+		$(FC) -c -I./wave2grid_kma $(F77FLAGS_WRFVAR) $(MODULE_DIRS) module_wave2grid_kma.f
 
 clean:
 	$(RM) *.f *.o *.mod

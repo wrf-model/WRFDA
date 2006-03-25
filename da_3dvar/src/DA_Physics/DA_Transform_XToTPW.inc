@@ -47,7 +47,7 @@ SUBROUTINE INTEGRAT_dZ( xb )
 !
 !  Output    : PW
 !         
-!  Modified for WRF 3DVAR: 04/18/03                     Wei Huang
+!  Modified for WRFVAR: 04/18/03                     Wei Huang
 !
 !------------------------------------------------------------------------------
 

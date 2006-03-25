@@ -47,11 +47,11 @@
 # rm wrf_3dvar_input
 # rm fgat_fg*
 
- mv fort.12 DAProg_3DVAR.statistics
+ mv fort.12 statistics
  mv fort.47 obsrelated
  mv fort.48 jo
  mv fort.50 obsagain
  mv fort.60 qc
- mv fort.81 DAProg_3DVAR.cost_fn
- mv fort.82 DAProg_3DVAR.grad_fn
+ mv fort.81 cost_fn
+ mv fort.82 grad_fn
 

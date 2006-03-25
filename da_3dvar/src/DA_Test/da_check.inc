@@ -48,7 +48,7 @@ subroutine da_check( xb, xbx, be, iv, cv, &
     
 !--test adjoint of y=hx transform:
 
-   if ( Testing_3DVAR ) then
+   if ( Testing_WRFVAR ) then
 
       write(UNIT=stdout, fmt='(/a/)') &
            'check_xtoy_adjoint'

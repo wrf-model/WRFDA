@@ -34,7 +34,7 @@ subroutine da_transform_vtox_adj( xb, xbx, be, xa, xp, vp, vv, cv, &
 !   Polar treatment for Global
 !-------------------------------------------------------------------------
    if( global ) then     
-!  Poles treatment for global 3DVAR
+!  Poles treatment for global WRFVAR
 #ifndef DEREF_KLUDGE
     call DA_Get_AVPoles(xa%u,xa%v,xb%lon,&
           ids, ide, jds, jde, kds, kde,  &
@@ -103,9 +103,9 @@ subroutine da_transform_vtox_adj( xb, xbx, be, xa, xp, vp, vv, cv, &
      endif
 
 !-------------------------------------------------------------------------
-!--If Testing_3DVAR = .TRUE., not "XToY" transform needed to do here (YRG):
+!--If Testing_WRFVAR = .TRUE., not "XToY" transform needed to do here (YRG):
 
-   if (.not.Testing_3DVAR) then
+   if (.not.Testing_WRFVAR) then
 
       if ( use_ssmt1obs .or. use_ssmt2obs .or. Use_GpspwObs .or. &
            Use_SsmiTbObs .or. Use_SsmiRetrievalObs .or. use_GpsrefObs) then

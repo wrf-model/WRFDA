@@ -65,47 +65,47 @@ $(SOLVER)_diags_read : $(SOLVER)_diags_read.o
 
 gen_be_stage0.o:
 	$(RM) $@
-	$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) gen_be_stage0.f
+	$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) gen_be_stage0.f
 
 gen_be_stage1.o:
 	$(RM) $@
-	$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) gen_be_stage1.f
+	$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) gen_be_stage1.f
 
 gen_be_stage2.o:
 	$(RM) $@
-	$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) gen_be_stage2.f
+	$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) gen_be_stage2.f
 
 gen_be_stage2a.o:
 	$(RM) $@
-	$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) gen_be_stage2a.f
+	$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) gen_be_stage2a.f
 
 gen_be_stage3.o:
 	$(RM) $@
-	$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) gen_be_stage3.f
+	$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) gen_be_stage3.f
 
 gen_be_stage4_global.o:
 	$(RM) $@
-	$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) gen_be_stage4_global.f
+	$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) gen_be_stage4_global.f
 
 gen_be_stage4_regional.o:
 	$(RM) $@
-	$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) gen_be_stage4_regional.f
+	$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) gen_be_stage4_regional.f
 
 gen_be_cov2d.o:
 	$(RM) $@
-	$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) gen_be_cov2d.f
+	$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) gen_be_cov2d.f
 
 gen_be_cov3d.o:
 	$(RM) $@
-	$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) gen_be_cov3d.f
+	$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) gen_be_cov3d.f
 
 gen_be_diags.o:
 	$(RM) $@
-	$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) gen_be_diags.f
+	$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) gen_be_diags.f
 
 gen_be_diags_read.o:
 	$(RM) $@
-	$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) gen_be_diags_read.f
+	$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) gen_be_diags_read.f
 
 clean:
 	@ echo 'use the clean script'

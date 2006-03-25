@@ -397,7 +397,7 @@ SUBROUTINE DA_Transfer_KMAToXb( xbx, grid, &
 ! 
 ! Following code for calculating roughness length needs to be activated  
 ! to calculate surface variables (10-m wind, and 2-m T, Q) , 
-! After testing KMA-3DVAR for SFC_ASSIM_OPTIONS = 2
+! After testing KMA-WRFVAR for SFC_ASSIM_OPTIONS = 2
 !
 #if 0
 !------------------------------------------------------------------------------

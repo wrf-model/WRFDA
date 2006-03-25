@@ -140,9 +140,9 @@ subroutine da_transform_vtox( xb, xbx, be, cv, vv, vp, xp, xa,        &
    call DA_PT_To_Rho_Lin( xb, xa, xp )
  endif
 !
-! If Testing_3DVAR = .TRUE., not "XToY" transform needed to do here (YRG):
+! If Testing_WRFVAR = .TRUE., not "XToY" transform needed to do here (YRG):
 !
-   if (.not.Testing_3DVAR) then
+   if (.not.Testing_WRFVAR) then
 !--Exchange XA halo region.
    CALL wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id4)
 

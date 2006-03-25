@@ -28,7 +28,7 @@ SUBROUTINE DA_TPRH_To_Q_Adj( xb, xp, xa )
    js = xp%jts; je = xp%jte
    ks = xp%kts; ke = xp%kte   
 
-   if ( Testing_3DVAR ) then
+   if ( Testing_WRFVAR ) then
       is = xb%its-1
       js = xb%jts-1
 

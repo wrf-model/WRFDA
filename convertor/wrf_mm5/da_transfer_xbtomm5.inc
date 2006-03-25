@@ -5,8 +5,8 @@ subroutine da_transfer_xbtomm5( xp, xb )
 !
 !  METHOD: 1) Read MM5 format first guess.
 !          2) Interpolate u, v to MM5 B-grid.
-!          3) Write out 3DVAR header information.
-!          4) Write out 3DVAR analysis (and increments).
+!          3) Write out WRFVAR header information.
+!          4) Write out WRFVAR analysis (and increments).
 !
 !  HISTORY: 07/21/2004
 !           Wei Huang
@@ -186,7 +186,7 @@ subroutine da_transfer_xbtomm5( xp, xb )
 !     xb_mm5 % big_header % bhi(11,5) = 0   ! TEN THOUSANDTHS OF SECONDS
    end if
 
-   xb_mm5 % big_header % bhic(1,1) = 'MM5 3DVAR Analysis                          '
+   xb_mm5 % big_header % bhic(1,1) = 'MM5 WRFVAR Analysis                          '
 
    open(unit=anl_unit, form='unformatted', status='unknown')
 
@@ -305,7 +305,7 @@ subroutine da_transfer_xbtomm5( xp, xb )
    END IF   !end if(wrf_dm_on_monitor())
 
 !------------------------------------------------------------------------------
-!  calculate 3DVAR analysis increments:
+!  calculate WRFVAR analysis increments:
 !------------------------------------------------------------------------------
 
 !w

@@ -10,7 +10,7 @@ SUBROUTINE DA_Solve_PoissonEqn_FCT_Adj( xb, xbx, b, del2b, xp)
 !
 !  HISTORY: 09/28/1999 - Creation of F90 version.           Dale Barker
 !           10/19/2001 - Mods for parallel implementation.  Al Bourgeois
-!           02/17/2004 - parallel implementation(for WRF 3DVAR). Wei Huang
+!           02/17/2004 - parallel implementation(for WRFVAR). Wei Huang
 !------------------------------------------------------------------------------
 
    IMPLICIT NONE

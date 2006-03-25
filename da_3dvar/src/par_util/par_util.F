@@ -1,7 +1,7 @@
 !WRF:MODEL_LAYER:PAR_UTIL
 !
 
-! Utility subroutines for parallel 3DVAR.
+! Utility subroutines for parallel WRFVAR.
 !---------------------------------------------------------------------------
 
 MODULE PAR_UTIL

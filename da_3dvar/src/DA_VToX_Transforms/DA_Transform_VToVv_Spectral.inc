@@ -3,7 +3,7 @@ subroutine DA_Transform_VToVv_Spectral (xb, xbx, be, cv, vv, &
                              ims, ime, jms, jme, kms, kme, &
                              its, ite, jts, jte, kts, kte )
 !--------------------------------------------------------------------------
-! Purpose   : Control variable transform for global 3DVAR 
+! Purpose   : Control variable transform for global WRFVAR 
 !
 ! History   : Creation          12/02/2004     Syed RH Rizvi
 !--------------------------------------------------------------------------

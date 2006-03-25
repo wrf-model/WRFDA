@@ -68,7 +68,7 @@
  y_end_sub_domain   = 60.0 /
 
 &record10
- Testing_3DVAR  = .FALSE.,
+ Testing_WRFVAR  = .FALSE.,
  Test_Transforms = .FALSE.,
  Test_Statistics = .FALSE.,
  Interpolate_Stats = .TRUE. /

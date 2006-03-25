@@ -669,7 +669,7 @@ if ( pass == 0 )
 
           set_mem_order( p, memord , NAMELEN) ;
 
-/* kludge for WRF 3DVAR I/O with MM5 analysis kernel */
+/* kludge for WRFVAR I/O with MM5 analysis kernel */
           if ( sw_3dvar_iry_kludge && !strcmp(memord,"XYZ") ) sprintf(memord,"YXZ") ;
           if ( sw_3dvar_iry_kludge && !strcmp(memord,"XY") ) sprintf(memord,"YX") ;
 

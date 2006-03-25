@@ -31,7 +31,7 @@ REGISTRY	=       Registry
 CPPFLAGS	=       -I$(LIBINCLUDE) -C -P $(ARCHFLAGS) $(ENVCOMPDEFS) \
 			$(TRADFLAG) $(DM_1_CPP_FLAGS) $(OMPCPP) $(COREDEFS) $(POUND_DEF)
 
-INC_MOD_3DVAR   =       -I../../$(NETCDF_IO_PATH) \
+INC_MOD_WRFVAR   =       -I../../$(NETCDF_IO_PATH) \
 	                -p../../frame \
 			-p../../share \
 			-p../../da_3dvar \
@@ -44,11 +44,11 @@ INC_MOD_3DVAR   =       -I../../$(NETCDF_IO_PATH) \
 	                -I../../external/io_int \
 	                -I../../external/esmf_time_f90 \
 	                -I../../frame -I../../share -I../../inc
-FCFLAGS_3DVAR   =       $(FCOPTIM) $(FCBASEOPTS)
+FCFLAGS_WRFVAR   =       $(FCOPTIM) $(FCBASEOPTS)
 FCFLAGS_FFT_RF  =       $(FCOPTIM) $(FC_FFT_RF_OPTS)
 F77FLAGS_BUFR   =       $(FCTYPE) $(FCBUFR) $(FCHOST) $(FCDEBUG) -I.
-F77FLAGS_3DVAR  =       $(FCTYPE) $(FCBASE) $(FCHOST) $(FCDEBUG) -I.
-CPPFLAGS_3DVAR  =       $(TRADFLAG) $(DM_2_CPP_FLAGS) \
+F77FLAGS_WRFVAR  =       $(FCTYPE) $(FCBASE) $(FCHOST) $(FCDEBUG) -I.
+CPPFLAGS_WRFVAR  =       $(TRADFLAG) $(DM_2_CPP_FLAGS) \
 	                -I$(LIBINCLUDE) -I../../inc -C -P $(ARCHFLAGS)
 FUFLAGS	 =       $(FCOPTIM) $(FCBASE) $(FCFORM) $(FCDEBUG) $(FCTYPE)
 

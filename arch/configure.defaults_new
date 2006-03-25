@@ -83,7 +83,7 @@ arch : module_dm_stubs.F
                                  LEARN_BCAST=-DLEARN_BCAST alpha )
 
 ###########################################################
-#ARCH       Compaq OSF1 alpha    (single-threaded, for compare with MM5 3DVAR)
+#ARCH       Compaq OSF1 alpha    (single-threaded, for compare with MM5 VAR)
 #
 FC              =       f90
 F77             =       $(FC)
@@ -382,7 +382,7 @@ LDFLAGS         =  	#-Wl"-Z 3000000"
 ARCHFLAGS2      =       -DINTIO \
                         -DTRIEDNTRUE -DONLY_WRFMODEL_IO \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) \
-			-DWRF3DVAR -DMPI -I$(MPIINCDIR)
+			-DMPI -I$(MPIINCDIR)
 
 POUND_DEF       =       -DNEC \
 			-DNONSTANDARD_SYSTEM -DF90_STANDALONE \

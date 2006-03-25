@@ -1,7 +1,7 @@
 !WRF:MODEL_LAYER:DEFINE_STRUCTURES
 !
 
-! DA_Define_Structures code to define 3DVAR structures.
+! DA_Define_Structures code to define WRFVAR structures.
 !---------------------------------------------------------------------------
 
 MODULE DA_Define_Structures

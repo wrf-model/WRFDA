@@ -205,7 +205,7 @@ SUBROUTINE DA_Setup_FirstGuess_WRF( xbx, grid, &
 ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 !---------------------------------------------------------------------------
-!  [3.0] Interpolate WRF C-grid winds to p points of 3DVAR grid (interpolate 
+!  [3.0] Interpolate WRF C-grid winds to p points of WRFVAR grid (interpolate 
 !  u to west, v to south?
 !---------------------------------------------------------------------------
 

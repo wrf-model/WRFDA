@@ -14,16 +14,16 @@ INCLUDE_MODULES =       -I../da_3dvar -I../da_3dvar/src \
 CPPFLAGS        =       $(LIBINCLUDE) -C -P $(ARCHFLAGS) $(ENVCOMPDEFS) \
 			$(DM_1_CPP_FLAGS) $(COREDEFS) $(POUND_DEF)
 
-INC_MOD_3DVAR   =       -I../../$(NETCDF_IO_PATH) \
+INC_MOD_WRFVAR   =       -I../../$(NETCDF_IO_PATH) \
 			-I../../da_3dvar -I../../da_3dvar/src \
                         -I../../external/io_int \
                         -I../../external/esmf_time_f90 \
                         -I../../frame -I../../share -I../../inc
-FCFLAGS_3DVAR   =       $(FCOPTIM) $(FCBASEOPTS)
+FCFLAGS_WRFVAR   =       $(FCOPTIM) $(FCBASEOPTS)
 FCFLAGS_FFT_RF  =       $(FCOPTIM) $(FC_FFT_RF_OPTS)
 F77FLAGS_BUFR   =       $(FCTYPE) $(FCBUFR) $(FCHOST) $(FCDEBUG) -I.
-F77FLAGS_3DVAR  =       $(FCTYPE) $(FCBASE) $(FCHOST) $(FCDEBUG) -I.
-CPPFLAGS_3DVAR  =       $(DM_2_CPP_FLAGS) \
+F77FLAGS_WRFVAR  =       $(FCTYPE) $(FCBASE) $(FCHOST) $(FCDEBUG) -I.
+CPPFLAGS_WRFVAR  =       $(DM_2_CPP_FLAGS) \
                         $(LIBINCLUDE) -C -P $(ARCHFLAGS) $(POUND_DEF) $(WRFVAR)
 FUFLAGS         =       $(FCOPTIM) $(FCBASE) $(FCFORM) $(FCDEBUG)
 

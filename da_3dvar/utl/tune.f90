@@ -1507,16 +1507,16 @@ subroutine da_get_j( ob )
       read(in_unit,'(a30,a15)')str, str1
       string = str(5:30)
       
-      if ( string == 'Final 3DVAR value of J  = ' ) then
+      if ( string == 'Final WRFVAR value of J  = ' ) then
          read(str1,*)jn
          j = j + jn
-      else if ( string == 'Final 3DVAR value of Jo = ' ) then
+      else if ( string == 'Final WRFVAR value of Jo = ' ) then
          read(str1,*)jon
          jo = jo + jon
-      else if ( string == 'Final 3DVAR value of Jb = ' ) then
+      else if ( string == 'Final WRFVAR value of Jb = ' ) then
          read(str1,*)jbn
          jb = jb + jbn
-      else if ( string == '3DVAR Jb factor used (1)= ' ) then
+      else if ( string == 'WRFVAR Jb factor used (1)= ' ) then
          read(str1,*)jb_factor_oldn
          jb_factor_old = jb_factor_old + jb_factor_oldn
          icount = icount + 1

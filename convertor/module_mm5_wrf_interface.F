@@ -55,7 +55,7 @@ SUBROUTINE mm5_wrf_interface(grid, config_flags)
    write (6, '(/,A,/)') ' *** MM5 TO WRF CONVERTOR ***'
 
 !------------------------------------------------------------------------------
-!  Read 3DVAR namelist:
+!  Read WRFVAR namelist:
 !------------------------------------------------------------------------------
 
    CALL DA_Read_Namelist

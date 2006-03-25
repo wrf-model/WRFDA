@@ -18,9 +18,9 @@ SUBROUTINE da_write_y( iv, y )
    real                          :: f1, f2, f3, f4, f5, f6, f7
 
    if ( omb_add_noise ) then
-      unit = yp_unit            ! 3DVAR is a perturbed ob run.
+      unit = yp_unit            ! WRFVAR is a perturbed ob run.
    else
-      unit = y_unit             ! 3DVAR is an unperturbed ob run.
+      unit = y_unit             ! WRFVAR is an unperturbed ob run.
    end if
 
 !  [1] Transfer surface obs:

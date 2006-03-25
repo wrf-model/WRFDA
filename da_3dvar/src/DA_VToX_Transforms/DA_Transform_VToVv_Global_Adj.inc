@@ -4,7 +4,7 @@ subroutine DA_Transform_VToVv_Global_Adj (xb, xbx, be, cv,vv, &
                                 its, ite, jts, jte, kts, kte )
 
 !--------------------------------------------------------------------------
-! Purpose   : Control variable transform for global 3DVAR 
+! Purpose   : Control variable transform for global WRFVAR 
 !
 ! History   : Creation          12/02/2004     Syed RH Rizvi
 !--------------------------------------------------------------------------

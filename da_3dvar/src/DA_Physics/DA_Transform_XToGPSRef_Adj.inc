@@ -23,7 +23,7 @@ subroutine da_transform_XTogpsref_adj(xa, xb, xp)
    js = xp%jts; je = xp%jte
    ks = xp%kts; ke = xp%kte      
 
-   if ( Testing_3DVAR ) then
+   if ( Testing_WRFVAR ) then
       is = xb%its-1
       js = xb%jts-1
 
