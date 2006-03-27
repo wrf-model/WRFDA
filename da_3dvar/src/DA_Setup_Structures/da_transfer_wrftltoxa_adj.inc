@@ -26,7 +26,7 @@ SUBROUTINE DA_Transfer_WRFTLtoXa_Adj( grid, config_flags, filnam, &
    integer :: i, j, k, n, ndynopt
    integer :: is, ie, js, je, ks, ke
 
-#ifdef WRFVAR
+#ifdef VAR4DPOSS
 
 !---------------------------------------------------------------------------
 

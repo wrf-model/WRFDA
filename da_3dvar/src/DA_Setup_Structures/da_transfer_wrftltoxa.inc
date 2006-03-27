@@ -33,7 +33,7 @@ SUBROUTINE DA_Transfer_WRFTLtoXa( grid, config_flags, filnam, &
 
    integer ndynopt
 
-#ifdef WRFVAR
+#ifdef VAR4DPOSS
 
 !------------------------------------------------------------------------------
 !  [0.0] INPUT

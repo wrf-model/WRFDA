@@ -10,7 +10,8 @@ F77FLAGS        =       $(FCOPTIM) $(FCBASE) $(FCDEBUG) $(FCTYPE)
 F77FLAGS_BUFR   =       $(FCOPTIM) $(FCBUFR) $(FCDEBUG) $(FCTYPE)
 FCFLAGS_FFT_RF  =       $(FCFLAGS) $(FC_FFT_RF)
 
-CPPFLAGS        =       -C -P $(TRADFLAG) $(INCS) $(ARCHFLAGS) $(COREDEFS) $(ENVCOMPDEFS) $(POUND_DEF) $(DM_CPP_FLAGS)
+CPPFLAGS        =       -C -P $(TRADFLAG) $(INCS) $(ARCHFLAGS) $(COREDEFS) $(ENVCOMPDEFS) \
+                        $(POUND_DEF) $(DM_CPP_FLAGS) $(VAR4DPOSS)
 
 # compile these without high optimization to speed compile
 

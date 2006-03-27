@@ -365,7 +365,3 @@ if test -e $CONFIG ; then
   fi
 fi
 
-if [ "$option" = "var" -o "$option" = "wrf" -o "$option" = "be" ] ; then
-  sed -e 's/-DWRFVAR//g' $CONFIG > xx$$ ; /bin/mv xx$$ $CONFIG
-fi
-

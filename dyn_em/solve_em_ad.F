@@ -102,7 +102,7 @@ SUBROUTINE solve_em_ad ( grid , config_flags , &
 ! storage for tendencies and decoupled state (generated from Registry)
 #include <em_i1_decl.inc>
 
-#ifdef WRFVAR
+#ifdef VAR4DPOSS
 integer , dimension(grid%sm31:grid%em31,grid%sm33:grid%em31) :: xxxxx , yyyyy , zzzzz , xx1 , xx2 , xx3
 
    INTEGER :: rc 
@@ -250,7 +250,7 @@ real, DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33,num_
 
 #include <bench_solve_em_init.h>
 
-#ifdef WRFVAR
+#ifdef VAR4DPOSS
    write(unit=*, fmt='(2a,2x,a,i6)') 'file:', __FILE__, 'line:', __LINE__
    return
 

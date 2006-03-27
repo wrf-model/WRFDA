@@ -1,5 +1,5 @@
 #
-ARCHFLAGS       =       $(ARCHFLAGS1) $(ARCHFLAGS2) $(ARCHFLAGS3)
+ARCHFLAGS       =       $(ARCHFLAGS1) $(ARCHFLAGS2) $(ARCHFLAGS3) 
 CFLAGS          =       $(ARCHFLAGS) $(ARCHFLAGS4)
 LIB		=	$(NETCDF_LIB) $(RTTOV_LIB) $(MPI_LIB) $(LOCAL_LIB) $(WRF_LIB) $(EXTRA_LIBS)
 EXTRAMODULES    =
@@ -12,7 +12,7 @@ INCLUDE_MODULES =       -I../da_3dvar -I../da_3dvar/src \
                         -I../frame -I../share -I../phys -I../inc
 
 CPPFLAGS        =       $(LIBINCLUDE) -C -P $(ARCHFLAGS) $(ENVCOMPDEFS) \
-			$(DM_1_CPP_FLAGS) $(COREDEFS) $(POUND_DEF)
+			$(DM_1_CPP_FLAGS) $(COREDEFS) $(POUND_DEF) $(VAR4DPOSS)
 
 INC_MOD_WRFVAR   =       -I../../$(NETCDF_IO_PATH) \
 			-I../../da_3dvar -I../../da_3dvar/src \
@@ -24,7 +24,7 @@ FCFLAGS_FFT_RF  =       $(FCOPTIM) $(FC_FFT_RF_OPTS)
 F77FLAGS_BUFR   =       $(FCTYPE) $(FCBUFR) $(FCHOST) $(FCDEBUG) -I.
 F77FLAGS_WRFVAR  =       $(FCTYPE) $(FCBASE) $(FCHOST) $(FCDEBUG) -I.
 CPPFLAGS_WRFVAR  =       $(DM_2_CPP_FLAGS) \
-                        $(LIBINCLUDE) -C -P $(ARCHFLAGS) $(POUND_DEF) $(WRFVAR)
+                        $(LIBINCLUDE) -C -P $(ARCHFLAGS) $(POUND_DEF) $(VAR4DPOSS)
 FUFLAGS         =       $(FCOPTIM) $(FCBASE) $(FCFORM) $(FCDEBUG)
 
 wrfio_nf : 

@@ -151,7 +151,7 @@ SUBROUTINE solve_em_tst ( grid , config_flags , &
 ! Initialize timers if compiled with -DBENCH
 #include <bench_solve_em_init.h>
 
-#ifdef WRFVAR
+#ifdef VAR4DPOSS
 
 !  set leapfrog or runge-kutta solver (2nd or 3rd order)
 

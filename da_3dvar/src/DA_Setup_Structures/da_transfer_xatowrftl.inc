@@ -45,7 +45,7 @@ SUBROUTINE DA_Transfer_XatoWRFTL( grid, config_flags, filnam, &
 
    integer ndynopt
 
-#ifdef WRFVAR
+#ifdef VAR4DPOSS
 
 !---------------------------------------------------------------------------
    is = xp % its

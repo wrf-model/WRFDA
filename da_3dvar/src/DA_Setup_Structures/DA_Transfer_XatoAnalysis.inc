@@ -33,7 +33,7 @@ subroutine DA_Transfer_XatoAnalysis( it, xbx, grid, config_flags ,&
 !------------------------------------------------------------------------------      
 
    if(fg_format == 1) then
-#ifdef WRFVAR
+#ifdef VAR4DPOSS
       if (write_increments) then
          write(UNIT=filnam,FMT='(a3,i1)') 'inc',it
          call DA_Transfer_XatoWRFTL( grid, config_flags, filnam, &

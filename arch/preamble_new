@@ -42,16 +42,16 @@ PHDF5_LIB  = -L$(EXTERNAL)/io_phdf5 -lwrfio_phdf5 -L$(PHDF5_PATH)/lib -lhdf5_for
 
 #### Get core settings from environment (set in compile script)
 #### Note to add a core, this has to be added to.
-WRFVAR   = -DWRFVAR
 
+# Does not work yet
+# VAR4DPOSS=-DVAR4DPOSS
 
 COREDEFS = -DEM_CORE=1        \
            -DDA_CORE=1        \
            -DNMM_CORE=0       \
            -DEXP_CORE=0       \
            -DCOAMPS_CORE=0    \
-           -DNMM_MAX_DIM=1250 \
-	   $(WRFVAR)
+           -DNMM_MAX_DIM=1250
 
 REGISTRY=Registry.wrfvar
 SOLVER=em

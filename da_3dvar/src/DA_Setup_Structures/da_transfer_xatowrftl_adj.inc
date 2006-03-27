@@ -30,7 +30,7 @@ SUBROUTINE DA_Transfer_XatoWRFTL_Adj( grid, config_flags, filnam, &
 
    integer ndynopt
 
-#ifdef WRFVAR
+#ifdef VAR4DPOSS
 !------------------------------------------------------------------------------
 !  [0.0] INPUT
 !------------------------------------------------------------------------------

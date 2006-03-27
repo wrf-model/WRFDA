@@ -71,7 +71,7 @@ SUBROUTINE solve_em_tl ( grid , config_flags , &
 ! storage for tendencies and decoupled state (generated from Registry)
 #include <em_i1_decl.inc>
 
-#ifdef WRFVAR
+#ifdef VAR4DPOSS
    INTEGER :: rc 
    INTEGER :: number_of_small_timesteps, rk_step
    INTEGER :: klevel,ijm,ijp,i,j,k,size1,size2    ! for prints/plots only
@@ -172,7 +172,7 @@ SUBROUTINE solve_em_tl ( grid , config_flags , &
 ! Initialize timers if compiled with -DBENCH
 #include <bench_solve_em_init.h>
 
-#ifdef WRFVAR
+#ifdef VAR4DPOSS
 
 ! xyh identity operation return here
    return
