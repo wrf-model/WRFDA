@@ -107,37 +107,15 @@ n2k :
           /bin/rm -f netcdf2kma.exe ; \
 	  $(MAKE) MODULE_DIRS="$(DA_CONVERTOR_MODULES)" netcdf2kma )
 
-be :
-	/bin/rm -f main/libwrflib.a
-	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES_2)" gen_be_short
+BE_OBJS = da_gen_be.o DA_Constants.o be_spectral.o LAPACK.o BLAS.o da_fftpack5.o
+BE_MODULES1 = -I../../frame
+BE_MODULES2 = -I../da_3dvar/src -I../frame
+be : 
+	( cd frame; $(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" externals module_wrf_error.o )
+	( cd da_3dvar/src; $(MAKE) MODULE_DIRS="$(BE_MODULES1)" $(BE_OBJS) da_gen_be.o )
 	( cd gen_be ; \
 	/bin/rm -f *.exe ; \
-	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" SOLVER=gen_be )
-
-be_wrf :
-	/bin/rm -f main/libwrflib.a
-	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" ext
-	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" toolsdir
-	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" REGISTRY="Registry" framework
-	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" shared
-	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" da_3dvar_io
-	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES_2)" gen_be_long
-	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" gen_be_interface
-	( cd gen_be ; \
-	/bin/rm -f *.exe ; \
-	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" SOLVER=gen_be ; \
-	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" gen_be_stage0 )
-
-pure_be_wrf :
-	@ echo 'This option assumes that you have already compiled the WRF frame part correctly.'
-	@ echo 'If you have not done so, please use compile be_wrf'
-	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" da_3dvar_io
-	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES_2)" gen_be_long
-	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" gen_be_interface
-	( cd gen_be ; \
-	/bin/rm -f *.exe ; \
-	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" SOLVER=gen_be ; \
-	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" gen_be_stage0 )
+	$(MAKE) MODULE_DIRS="$(BE_MODULES2)" gen_be )
 
 ### 3.a.  rules to build the framework and then the experimental core
 
@@ -319,21 +297,9 @@ da_3dvar_interface :
 	@ echo '--------------------------------------'
 	( cd da_3dvar; $(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" da_3dvar_interface )
 
-gen_be_interface :
-	@ echo '--------------------------------------'
-	( cd da_3dvar; $(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" gen_be_interface )
-
 convertor_drivers :
 	@ echo '--------------------------------------'
 	( cd convertor ; $(MAKE) )
-
-gen_be_short :
-	@ echo '--------------------------------------'
-	( cd da_3dvar/src; $(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES_2)" gen_be_short )
-
-gen_be_long :
-	@ echo '--------------------------------------'
-	( cd da_3dvar/src; $(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES_2)" gen_be_long )
 
 # rule used by configure to test if this will compile with MPI 2 calls MPI_Comm_f2c and _c2f
 mpi2_test :

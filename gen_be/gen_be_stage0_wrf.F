@@ -18,25 +18,12 @@ program gen_be_stage0_wrf
 !
 !----------------------------------------------------------------------
 
+
+   USE DA_Constants
+
    implicit none
 
-   integer, parameter    :: ounit = 30                ! Output unit.
    integer, parameter    :: nrange = 50               ! Range to search for efficient FFT.
-   integer, parameter    :: num_fft_factors = 10      ! Maximum number of FFT factors. 
-   real, parameter       :: pi = 3.1415926535897932346! pi
-   real, parameter       :: gravity = 9.81            ! Gravity.
-   real, parameter       :: ts0 = 300.0               ! Base potential temperature.
-   real, parameter       :: t_kelvin = 273.15
-   real, parameter       :: ps0_inv = 1.0 / 100000.0  ! Base pressure.
-   real, parameter       :: gas_constant = 287.0      ! WRF value.
-   real, parameter       :: gas_constant_v = 461.6    ! WRF value.
-   real, parameter       :: cp = 7.*gas_constant/2.   ! WRF value.
-   real, parameter       :: kappa = gas_constant / cp
-   real, parameter       :: es_alpha = 611.2          !
-   real, parameter       :: es_beta = 17.67           !
-   real, parameter       :: es_gamma = 243.5          !
-   real, parameter       :: rd_over_rv = gas_constant / gas_constant_v
-   real, parameter       :: rd_over_rv1 = rd_over_rv - 1
 
    character (len=200)   :: input_file1               ! NETCDF input file 1.
    character (len=200)   :: input_file2               ! NETCDF input file 2.
@@ -116,7 +103,8 @@ program gen_be_stage0_wrf
 
    numarg = iargc()
    if ( numarg /= 3 )then
-      write(6,'(a)')' Usage: gen_be_stage0_wrf date <wrf_filename1> <wrf_filename2>. Stop'
+      write(UNIT=stdout,FMT='(a)') &
+        "Usage: gen_be_stage0_wrf date <wrf_filename1> <wrf_filename2>. Stop"
       stop
    end if 
 
@@ -320,20 +308,20 @@ print *, k, var, input_file2
    write(6,'(a)')' [5] Write out data'
 !---------------------------------------------------------------------------------------------
 
-   open (ounit, file = 'diff', form='unformatted')
-   write(ounit)date, dim1, dim2, dim3
-   write(ounit)psi
-   write(ounit)chi
-   write(ounit)temp
-   write(ounit)rh
-   write(ounit)psfc
+   open (gen_be_ounit, file = 'diff', form='unformatted')
+   write(gen_be_ounit)date, dim1, dim2, dim3
+   write(gen_be_ounit)psi
+   write(gen_be_ounit)chi
+   write(gen_be_ounit)temp
+   write(gen_be_ounit)rh
+   write(gen_be_ounit)psfc
 !Double precision hardwire until put in WRF-Var:
    allocate( xlatd(1:dim1,1:dim2) )
    xlatd = xlat
    allocate( heightd(1:dim1,1:dim2,1:dim3) )
    heightd = height
-   write(ounit)heightd
-   write(ounit)xlatd
+   write(gen_be_ounit)heightd
+   write(gen_be_ounit)xlatd
 
 
    deallocate( psi )
@@ -1228,138 +1216,6 @@ subroutine da_test_inverse2( dim1, dim2, ds, mapfac_m, mapfac_u, mapfac_v, &
 end subroutine da_test_inverse2
 
 !------------------------------------------------------------------------------
-
-SUBROUTINE DA_Find_FFT_Factors( n, n_ok, fft_factors )
-   
-!------------------------------------------------------------------------------
-!  PURPOSE: Calculates prime factors of input number.
-!
-!  METHOD: 
-!
-!  HISTORY: 1988     - Clive Temperton~s original.
-!           1995     - Modified by Andrew Lorenc at UKMO.
-!           02/08/00 - Modified to f90 WRF format.
-!-----------------------------------------------------------------------------
-   
-   IMPLICIT NONE
-   
-   INTEGER, INTENT(IN)        :: n
-   LOGICAL, INTENT(OUT)       :: n_ok
-   INTEGER, INTENT(OUT)       :: fft_factors(:)
-
-   INTEGER                    :: i, k, l
-   INTEGER                    :: nfax, nu, ifac
-   INTEGER                    :: jfax(num_fft_factors)
-   INTEGER                    :: lfax(7)
-
-   DATA lfax /6,8,5,4,3,2,1/
-   
-!------------------------------------------------------------------------------
-!  [1.0] Find factors of vector size (8,6,5,4,3,2; ONLY ONE 8 ALLOWED):
-!------------------------------------------------------------------------------
-
-   n_ok = .FALSE.
-   fft_factors(:) = 0
-
-!  LOOK FOR SIXES FIRST, STORE FACTORS IN DESCENDING ORDER
-   NU=N
-   IFAC=6
-   K=0
-   L=1
-
-20 CONTINUE
-
-   IF (MOD(NU,IFAC).NE.0) GO TO 30
-   
-!  6 is a factor:
-   K=K+1
-   JFAX(K)=IFAC
-   IF (IFAC.NE.8) GO TO 25
-   IF (K.EQ.1) GO TO 25
-   JFAX(1)=8
-   JFAX(K)=6
-
-25 CONTINUE
-   NU=NU/IFAC
-   IF (NU.EQ.1) GO TO 50
-   IF (IFAC.NE.8) GO TO 20
-
-30 CONTINUE
-   L=L+1
-   IFAC=LFAX(L)
-   IF (IFAC .GT. 1) GO TO 20
-
-!  Illegal factors:
-!   write (0, '(a,i4,a)') 'N = ', N, ' contains illegal factors.'
-   GOTO 9
-
-!     NOW REVERSE ORDER OF FACTORS
-50 CONTINUE
-   NFAX=K
-   fft_factors(1)=NFAX
-   DO I=1,NFAX
-      fft_factors(NFAX+2-I)=JFAX(I)
-   END DO
-
-   n_ok = .TRUE.
-
-9  CONTINUE
-
-END SUBROUTINE DA_Find_FFT_Factors
-
-SUBROUTINE DA_Find_FFT_Trig_Funcs( n, trig_functs )
-
-!------------------------------------------------------------------------------
-!  PURPOSE: Set up constants required for Fourier, sine and cosine transforms.
-!  
-!  METHOD:  Calculate sin, cos of points on grid for trig_functs array.
-!
-!  HISTORY: 1988     - Clive Temperton~s original.
-!           1995     - Modified by Andrew Lorenc at UKMO.
-!           02/08/00 - Modified to f90 WRF format.
-!-----------------------------------------------------------------------------
-
-   IMPLICIT NONE
-
-   INTEGER, INTENT(IN)        :: n
-   REAL, INTENT(OUT)          :: trig_functs(:)
-
-   INTEGER                    :: k, nil, nhl
-   REAL                       :: del, angle
-
-!------------------------------------------------------------------------------
-!  [1.0] Trig functions for real periodic transform:
-!------------------------------------------------------------------------------
-
-   trig_functs(:) = 0.0
-
-   DEL=4.0*ASIN(1.0)/FLOAT(N)
-   NIL=0
-   NHL=(N/2)-1
-
-   DO K=NIL,NHL
-      ANGLE=FLOAT(K)*DEL
-      trig_functs(2*K+1)=COS(ANGLE)
-      trig_functs(2*K+2)=SIN(ANGLE)
-   END DO
-
-!  [1.1] Extra trig functions for cosine transform:
-
-   DEL=0.5*DEL
-   DO K=1,NHL
-      ANGLE=FLOAT(K)*DEL
-      trig_functs(2*N+K)=SIN(ANGLE)
-   END DO
-
-!  [1.2] Extra trig functions for shifted cosine transform:
-
-   DEL=0.5*DEL
-   DO K=1,N
-      ANGLE=FLOAT(K)*DEL
-      trig_functs(N+K)=SIN(ANGLE)
-   END DO
-
-END SUBROUTINE DA_Find_FFT_Trig_Funcs
 
 !DECK FFT551
 !     SUBROUTINE 'FFT551' - MULTIPLE FAST COSINE TRANSFORM

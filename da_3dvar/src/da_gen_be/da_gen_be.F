@@ -28,10 +28,14 @@ contains
 #include "da_readwrite_be_stage4.inc"
 
 !Files from other modules:
-#include "../DA_VToX_Transforms/DA_Transform_VpToVv.inc"
-#include "../DA_Tools/da_eof_decomposition.inc"
-#include "../DA_Tools/da_eof_decomposition_test.inc"
-#include "../DA_Recursive_Filter/da_perform_2drf.inc"
-#include "../DA_Recursive_Filter/DA_Recursive_Filter_1d.inc"
+#include "DA_Transform_VpToVv.inc"
+#include "da_eof_decomposition.inc"
+#include "da_eof_decomposition_test.inc"
+#include "da_perform_2drf.inc"
+#include "DA_Recursive_Filter_1d.inc"
 
 end module da_gen_be
+
+SUBROUTINE wrf_abort
+  STOP
+END SUBROUTINE wrf_abort

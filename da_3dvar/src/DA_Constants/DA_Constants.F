@@ -28,6 +28,8 @@ MODULE DA_Constants
    REAL, PARAMETER    :: cp = 7.*gas_constant/2. ! Value used in WRF.
 #endif
    REAL, PARAMETER    :: t_kelvin = 273.15
+   REAL, PARAMETER    :: ts0 = 300.0        ! Base potential temperature.
+   REAL, PARAMETER       :: ps0_inv = 1.0 / 100000.0  ! Base pressure.
 
    REAL, PARAMETER    :: kappa = gas_constant / cp
    REAL, PARAMETER    :: rd_over_rv = gas_constant / gas_constant_v
@@ -155,6 +157,8 @@ MODULE DA_Constants
    INTEGER, PARAMETER :: innov_vector_unit = 14 ! Innovation vector diagnostics
 
    INTEGER, PARAMETER :: cov_unit = 25 ! Covariances unit
+
+   INTEGER, PARAMETER :: gen_be_ounit = 30
 
    INTEGER, PARAMETER :: be_cv_2_unit = 32    ! Unit number for be input.
    INTEGER, PARAMETER :: be_cv_3_unit = 33    ! Unit number for be input.

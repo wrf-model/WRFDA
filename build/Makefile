@@ -7,6 +7,7 @@ include share.make
 include frame.make
 include phys.make
 include da_3dvar.make
+include gen_be.make
 include convertor.make
 include tools.make
 include esmf_time_f90.make

@@ -4,131 +4,121 @@ LN      =       ln -sf
 MAKE    =       make -i -r
 RM      =       rm -f
 
-$(SOLVER) :	$(SOLVER)_stage0_wrf	\
-		$(SOLVER)_stage1	\
-		$(SOLVER)_stage1_1dvar	\
-		$(SOLVER)_stage2	\
-		$(SOLVER)_stage2_1dvar	\
-		$(SOLVER)_stage2a	\
-		$(SOLVER)_stage3	\
-		$(SOLVER)_stage4_global	\
-		$(SOLVER)_stage4_regional	\
-		$(SOLVER)_cov2d		\
-		$(SOLVER)_cov3d		\
-		$(SOLVER)_diags		\
-		$(SOLVER)_diags_read
+gen_be : 	gen_be_stage0_wrf	\
+		gen_be_stage1	\
+		gen_be_stage1_1dvar	\
+		gen_be_stage2	\
+		gen_be_stage2_1dvar	\
+		gen_be_stage2a	\
+		gen_be_stage3	\
+		gen_be_stage4_global	\
+		gen_be_stage4_regional	\
+		gen_be_cov2d		\
+		gen_be_cov3d		\
+		gen_be_diags		\
+		gen_be_diags_read
+
+GEN_BE_OBJS = ../da_3dvar/src/da_gen_be.o ../da_3dvar/src/DA_Constants.o ../da_3dvar/src/be_spectral.o \
+  ../da_3dvar/src/LAPACK.o ../da_3dvar/src/BLAS.o ../frame/module_wrf_error.o \
+  ../da_3dvar/src/da_fftpack5.o
 
 include ../configure.wrf
 
-$(SOLVER)_stage0_wrf : $(SOLVER)_stage0_wrf.o
-	$(RANLIB) ../main/libwrflib.a
-#	$(LD) -o $(SOLVER)_stage0_wrf.exe $(LDFLAGS) $(SOLVER)_stage0_wrf.o ../main/libwrflib.a $(LIB)
-	$(LD) -o $(SOLVER)_stage0_wrf.exe $(LDFLAGS) $(SOLVER)_stage0_wrf.o -L$(NETCDF)/lib -lnetcdf
+gen_be_stage0_wrf : gen_be_stage0_wrf.o
+	$(LD) -o gen_be_stage0_wrf.exe $(LDFLAGS) $(GEN_BE_OBJS) gen_be_stage0_wrf.o -L$(NETCDF)/lib -lnetcdf
 
-$(SOLVER)_stage1 : $(SOLVER)_stage1.o
-	$(RANLIB) ../main/libwrflib.a
-	$(LD) -o $(SOLVER)_stage1.exe $(LDFLAGS) $(SOLVER)_stage1.o ../main/libwrflib.a
+gen_be_stage1 : gen_be_stage1.o
+	$(LD) -o gen_be_stage1.exe $(LDFLAGS) $(GEN_BE_OBJS) gen_be_stage1.o
 
-$(SOLVER)_stage1_1dvar : $(SOLVER)_stage1_1dvar.o
-	$(RANLIB) ../main/libwrflib.a
-	$(LD) -o $(SOLVER)_stage1_1dvar.exe $(LDFLAGS) $(SOLVER)_stage1_1dvar.o ../main/libwrflib.a
+gen_be_stage1_1dvar : gen_be_stage1_1dvar.o
+	$(LD) -o gen_be_stage1_1dvar.exe $(LDFLAGS) $(GEN_BE_OBJS) gen_be_stage1_1dvar.o
 
-$(SOLVER)_stage2 : $(SOLVER)_stage2.o
-	$(RANLIB) ../main/libwrflib.a
-	$(LD) -o $(SOLVER)_stage2.exe $(LDFLAGS) $(SOLVER)_stage2.o ../main/libwrflib.a
+gen_be_stage2 : gen_be_stage2.o
+	$(LD) -o gen_be_stage2.exe $(LDFLAGS) $(GEN_BE_OBJS) gen_be_stage2.o
 
-$(SOLVER)_stage2_1dvar : $(SOLVER)_stage2_1dvar.o
-	$(RANLIB) ../main/libwrflib.a
-	$(LD) -o $(SOLVER)_stage2_1dvar.exe $(LDFLAGS) $(SOLVER)_stage2_1dvar.o ../main/libwrflib.a
+gen_be_stage2_1dvar : gen_be_stage2_1dvar.o
+	$(LD) -o gen_be_stage2_1dvar.exe $(LDFLAGS) $(GEN_BE_OBJS) gen_be_stage2_1dvar.o
 
-$(SOLVER)_stage2a : $(SOLVER)_stage2a.o
-	$(RANLIB) ../main/libwrflib.a
-	$(LD) -o $(SOLVER)_stage2a.exe $(LDFLAGS) $(SOLVER)_stage2a.o ../main/libwrflib.a
+gen_be_stage2a : gen_be_stage2a.o
+	$(LD) -o gen_be_stage2a.exe $(LDFLAGS) $(GEN_BE_OBJS) gen_be_stage2a.o
 
-$(SOLVER)_stage3 : $(SOLVER)_stage3.o
-	$(RANLIB) ../main/libwrflib.a
-	$(LD) -o $(SOLVER)_stage3.exe $(LDFLAGS) $(SOLVER)_stage3.o ../main/libwrflib.a
+gen_be_stage3 : gen_be_stage3.o
+	$(LD) -o gen_be_stage3.exe $(LDFLAGS) $(GEN_BE_OBJS) gen_be_stage3.o
 
-$(SOLVER)_stage4_global : $(SOLVER)_stage4_global.o
-	$(RANLIB) ../main/libwrflib.a
-	$(LD) -o $(SOLVER)_stage4_global.exe $(LDFLAGS) $(SOLVER)_stage4_global.o ../main/libwrflib.a
+gen_be_stage4_global : gen_be_stage4_global.o
+	$(LD) -o gen_be_stage4_global.exe $(LDFLAGS) $(GEN_BE_OBJS) gen_be_stage4_global.o
 
-$(SOLVER)_stage4_regional : $(SOLVER)_stage4_regional.o
-	$(RANLIB) ../main/libwrflib.a
-	$(LD) -o $(SOLVER)_stage4_regional.exe $(LDFLAGS) $(SOLVER)_stage4_regional.o ../main/libwrflib.a
+gen_be_stage4_regional : gen_be_stage4_regional.o
+	$(LD) -o gen_be_stage4_regional.exe $(LDFLAGS) $(GEN_BE_OBJS) gen_be_stage4_regional.o
 
-$(SOLVER)_cov2d : $(SOLVER)_cov2d.o
-	$(RANLIB) ../main/libwrflib.a
-	$(LD) -o $(SOLVER)_cov2d.exe $(LDFLAGS) $(SOLVER)_cov2d.o ../main/libwrflib.a
+gen_be_cov2d : gen_be_cov2d.o
+	$(LD) -o gen_be_cov2d.exe $(LDFLAGS) $(GEN_BE_OBJS) gen_be_cov2d.o
 
-$(SOLVER)_cov3d : $(SOLVER)_cov3d.o
-	$(RANLIB) ../main/libwrflib.a
-	$(LD) -o $(SOLVER)_cov3d.exe $(LDFLAGS) $(SOLVER)_cov3d.o ../main/libwrflib.a
+gen_be_cov3d : gen_be_cov3d.o
+	$(LD) -o gen_be_cov3d.exe $(LDFLAGS) $(GEN_BE_OBJS) gen_be_cov3d.o
 
-$(SOLVER)_diags : $(SOLVER)_diags.o
-	$(RANLIB) ../main/libwrflib.a
-	$(LD) -o $(SOLVER)_diags.exe $(LDFLAGS) $(SOLVER)_diags.o ../main/libwrflib.a
+gen_be_diags : gen_be_diags.o
+	$(LD) -o gen_be_diags.exe $(LDFLAGS) $(GEN_BE_OBJS) gen_be_diags.o
 
-$(SOLVER)_diags_read : $(SOLVER)_diags_read.o
-	$(RANLIB) ../main/libwrflib.a
-	$(LD) -o $(SOLVER)_diags_read.exe $(LDFLAGS) $(SOLVER)_diags_read.o ../main/libwrflib.a
+gen_be_diags_read : gen_be_diags_read.o
+	$(LD) -o gen_be_diags_read.exe $(LDFLAGS) $(GEN_BE_OBJS) gen_be_diags_read.o
 
 #
 
-gen_be_stage0_wrf.o:
+gen_be_stage0_wrf.o: 
 	$(RM) $@
-	$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) -I${NETCDF}/include gen_be_stage0_wrf.f
+	$(FC) -c $(FCFORM) $(FCTYPE) -I${NETCDF}/include gen_be_stage0_wrf.F
 
 gen_be_stage1.o:
 	$(RM) $@
-	$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) gen_be_stage1.f
+	$(FC) -c $(FCFORM) $(FCTYPE) $(MODULE_DIRS) gen_be_stage1.F
 
 gen_be_stage1_1dvar.o:
 	$(RM) $@
-	$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) gen_be_stage1_1dvar.f
+	$(FC) -c $(FCFORM) $(FCTYPE) $(MODULE_DIRS) gen_be_stage1_1dvar.F
 
 gen_be_stage2.o:
 	$(RM) $@
-	$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) gen_be_stage2.f
+	$(FC) -c $(FCFORM) $(FCTYPE) $(MODULE_DIRS) gen_be_stage2.F
 
 gen_be_stage2_1dvar.o:
 	$(RM) $@
-	$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) gen_be_stage2_1dvar.f
+	$(FC) -c $(FCFORM) $(FCTYPE) $(MODULE_DIRS) gen_be_stage2_1dvar.F
 
 gen_be_stage2a.o:
 	$(RM) $@
-	$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) gen_be_stage2a.f
+	$(FC) -c $(FCFORM) $(FCTYPE) $(MODULE_DIRS) gen_be_stage2a.F
 
 gen_be_stage3.o:
 	$(RM) $@
-	$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) gen_be_stage3.f
+	$(FC) -c $(FCFORM) $(FCTYPE) $(MODULE_DIRS) gen_be_stage3.F
 
 gen_be_stage4_global.o:
 	$(RM) $@
-	$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) gen_be_stage4_global.f
+	$(FC) -c $(FCFORM) $(FCTYPE) $(MODULE_DIRS) gen_be_stage4_global.F
 
 gen_be_stage4_regional.o:
 	$(RM) $@
-	$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) gen_be_stage4_regional.f
+	$(FC) -c $(FCFORM) $(FCTYPE) $(MODULE_DIRS) gen_be_stage4_regional.F
 
 gen_be_cov2d.o:
 	$(RM) $@
-	$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) gen_be_cov2d.f
+	$(FC) -c $(FCFORM) $(FCTYPE) $(MODULE_DIRS) gen_be_cov2d.F
 
 gen_be_cov3d.o:
 	$(RM) $@
-	$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) gen_be_cov3d.f
+	$(FC) -c $(FCFORM) $(FCTYPE) $(MODULE_DIRS) gen_be_cov3d.F
 
 gen_be_diags.o:
 	$(RM) $@
-	$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) gen_be_diags.f
+	$(FC) -c $(FCFORM) $(FCTYPE) $(MODULE_DIRS) gen_be_diags.F
 
 gen_be_diags_read.o:
 	$(RM) $@
-	$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) gen_be_diags_read.f
+	$(FC) -c $(FCFORM) $(FCTYPE) $(MODULE_DIRS) gen_be_diags_read.F
 
-clean:
+clean: 
 	@ echo 'use the clean script'
 
-# DEPENDENCIES : only dependencies after this line (don't remove the word DEPENDENCIES)
+# DEPENDENCIES : $(GEN_BE_OBJS) only dependencies after this line (don't remove the word DEPENDENCIES)
 

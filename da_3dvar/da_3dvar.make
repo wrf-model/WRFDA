@@ -55,58 +55,9 @@ DA_OBJS        =	da_solve_v3d.o		\
 			gsi_constants.o		\
 			BLAS.o
 
-DA_OBJS_4_GEN_BE_SHORT =DA_Constants.o		\
-			da_gen_be.o		\
-			da_fftpack5.o		\
-			be_spectral.o           \
-			LAPACK.o		\
-			BLAS.o
-
-DA_OBJS_4_GEN_BE_LONG =	DA_Constants.o		\
-			par_util.o              \
-			DA_Setup_Structures.o	\
-			DA_VToX_Transforms.o	\
-			DA_Gen_Be_Stats.o	\
-			DA_ReadWrite_MM5.o	\
-			DA_Dynamics.o		\
-			DA_Physics.o		\
-			DA_FFTs.o		\
-			DA_Test.o		\
-			DA_Tools.o		\
-			DA_Grid_Definitions.o	\
-			DA_Define_Structures.o	\
-			DA_Recursive_Filter.o	\
-			DA_Interpolation.o	\
-			DA_Statistics.o		\
-	                da_bufrlib.o 		\
-	                bort_exit.o 		\
-	                restd.o 		\
-	                wrdesc.o 		\
-			da_h_ops.o		\
-			da_c_mat.o		\
-			da_rf.o			\
-			da_mat.o      		\
-			da_rfz.o      		\
-			LAPACK.o		\
-			da_spectral.o           \
-			be_spectral.o           \
-			da_fftpack5.o           \
-			da_gen_be.o             \
-			da_radiance.o		\
-			da_stats_be.o           \
-			gsi_kinds.o		\
-			gsi_constants.o		\
-			BLAS.o
-
 DA_MODULES		=	module_wrf_3dvar_io.o \
                                 module_wrf_3dvar_interface.o	\
 	   			module_wrfvar_top.o
-
-DA_MODULES_BE_INTERFACE	=	module_da_gen_be_stats_interface.o	\
-				module_gen_be_top.o
-
-gen_be_interface :	$(DA_MODULES_BE_INTERFACE)
-		$(AR) ru libwrflib.a $(DA_MODULES_BE_INTERFACE)
 
 wrfvar_interface :	$(DA_MODULES_INTERFACE)
 		$(AR) ru libwrflib.a $(DA_MODULES_INTERFACE)
@@ -123,12 +74,6 @@ module_wrf_3dvar_io.o : module_io_domain.o
 
 wrfvar_obj :	$(DA_OBJS)
 		$(AR) ru libwrflib.a $(DA_OBJS)
-
-gen_be_short :	$(DA_OBJS_4_GEN_BE_SHORT)
-		$(AR) ru libwrflib.a $(DA_OBJS_4_GEN_BE_SHORT)
-
-gen_be_long :	$(DA_OBJS_4_GEN_BE_LONG)
-		$(AR) ru libwrflib.a $(DA_OBJS_4_GEN_BE_LONG)
 
 ##########################################################################
 
@@ -1120,8 +1065,8 @@ DA_Test.o:	\
 			da_setup_testfield.inc \
 			set_tst_trnsf_fld.inc
 
-da_gen_be.o:	         \
-			DA_Constants.o			\
+da_gen_be.o:		module_wrf_error.o \
+                        DA_Constants.o			\
 			LAPACK.o			\
 			BLAS.o				\
 			DA_Transform_VpToVv.inc	\
@@ -1200,46 +1145,6 @@ be_spectral.o:		\
 			da_legtra_inv_adj.inc       \
 			da_apply_power.inc          \
 			be_spectral.F
-
-da_stats_be.o:		DA_Constants.o		\
-			DA_Define_Structures.o	\
-			DA_Setup_Structures.o	\
-			DA_Test.o		\
-			DA_Tools.o		\
-			DA_Gen_Be_Stats.o	\
-			par_util.o		\
-			da_init_3dvar.inc	\
-			da_stats_be.F
-
-DA_Gen_Be_Stats.o:	module_wrf_3dvar_io.o			\
-			LAPACK.o				\
-	                DA_FFTs.o				\
-			DA_Test.o				\
-	                DA_Tools.o				\
-	                DA_Dynamics.o				\
-	                DA_Constants.o				\
-	                DA_VToX_Transforms.o			\
-	                DA_Setup_Structures.o			\
-	                DA_Define_Structures.o			\
-	                DA_Stats_Namelist.inc	\
-	                DA_Statistics_Step0.inc	\
-	                DA_advance_cymdh0.inc	\
-	                DA_set_current_date.inc	\
-	                DA_get_ymdh.inc		\
-	                DA_Assign_Value.inc	\
-	                DA_Difference.inc	\
-	                DA_New_Statistics_Variable.inc \
-	                DA_Write_Diff.inc	\
-	                DA_Make_Ensemble_Mean.inc \
-	                DA_Ens_Sum.inc		\
-	                DA_Zero_Ens.inc		\
-	                DA_Ens_Magnify.inc	\
-	                DA_Test_Transforms.inc	\
-	                DA_Mss_Read.inc		\
-	                DA_Data_Delete.inc	\
-	                DA_Gen_Date.inc		\
-	                DA_Make_Filename.inc	\
-			DA_Gen_Be_Stats.F
 
 da_radiance.o:		DA_Constants.o          \
 			DA_Define_Structures.o  \
