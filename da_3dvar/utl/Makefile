@@ -87,7 +87,7 @@ tune:			tune.o
 
 bufr_little_endian_convert:	\
 			$(OBJ_bufr_convert)
-			$(FC) -o $@.exe $(OBJ_bufr_convert) ../../da_3dvar/src/da_bufrlib.o
+			$(FC) -o $@.exe $(OBJ_bufr_convert) $(DA_SRC)/da_bufrlib.o
 
 grabbufr:		$(OBJ_FOR_ALL)		\
 			grabbufr.f90
@@ -250,8 +250,8 @@ TAR_FLS =		Makefile			\
 			Utl_Define/*.inc
 
 tar:
-			tar cvf utl_3dvar.tar $(TAR_FLS)
-			gzip utl_3dvar.tar
-			mswrite -t 1000 utl_3dvar.tar.gz \
-					$(MSS_DIR)/utl_3dvar.tar.gz
-			$(RM) utl_3dvar.tar.gz
+			tar cvf utl_wrfvar.tar $(TAR_FLS)
+			gzip utl_wrfvar.tar
+			mswrite -t 1000 utl_wrfvar.tar.gz \
+					$(MSS_DIR)/utl_wrfvar.tar.gz
+			$(RM) utl_wrfvar.tar.gz
