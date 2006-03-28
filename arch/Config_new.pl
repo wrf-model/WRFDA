@@ -177,16 +177,8 @@ close CONFIGURE_DEFAULTS ;
 
 
 printf "\nYou have chosen: %s",$optstr[$optchoice] ;
-printf "These are the default options for this platform:\n" ;
-printf "------------------------------------------------------------------------\n" ;
-#foreach $f ( @machopts2 )
-#{
-#  if ( substr( $f , 0 , 8 ) eq "external" ) { last ; }
-#  print $f ;
-#}
-printf "------------------------------------------------------------------------\n" ;
-printf "These will be written to the file configure.wrf here in the top-level\n" ;
-printf "directory.  If you wish to change settings, please edit that file.\n" ;
+printf "The options for this platform have been written to the file build/configure.wrf\n" ;
+printf "If you wish to change settings, please edit that file.\n" ;
 printf "If you wish to change the default options, edit the file:\n\n" ;
 printf "     arch/configure.defaults_new\n" ;
 printf "\n" ;
@@ -221,7 +213,7 @@ print CONFIGURE_WRF "#--------------------------------------------------------\n
 if($sw_os =~ m/darwin/i) {
    chomp $optchoice;
 
-   if($optchoice != 1) {
+   if($optchoice == 2) {
      open ARCH_POSTAMBLE, "< arch/postamble_wrfvar.mac_g4"
        or die "cannot open arch/postamble_wrfvar.mac_g4" ;
    } else {
@@ -242,7 +234,7 @@ while ( <ARCH_POSTAMBLE> ) {
 close ARCH_POSTAMBLE ;
 close CONFIGURE_WRF ;
 
-printf "Configuration successful for $sw_os. To build the model type compile . \n" ;
-printf "------------------------------------------------------------------------\n" ;
+printf "Configuration successful for $sw_os. To build the model 'cd build; make target'.\n" ;
+printf "--------------------------------------------------------------------------------\n" ;
 
 

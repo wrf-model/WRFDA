@@ -59,13 +59,14 @@ export WRFVAR_DIR=${WRFVAR_DIR:-$SRC_DIR/wrfvar}
 export BUILD_DIR=${BUILD_DIR:-$WRFVAR_DIR/main}
 export DAT_DIR=${DAT_DIR:-/data4/dmbarker/data/amps1}
 export RUN_DIR=${RUN_DIR:-$DAT_DIR}
+export HOSTS=${HOSTS:-$PWD/hosts}
 
 if test ! -d $RUN_DIR; then
   mkdir $RUN_DIR
 fi
 
-export DA_FIRST_GUESS=${DA_FIRST_GUESS:-$DAT_DIR/wrfinput_d01.$START_DATE}    # wrfvar "first guess" input.
-export DA_OBSERVATIONS=${DA_OBSERVATIONS:-$DAT_DIR/obs_gts.3dvar.$START_DATE} # wrfvar observation input.
+export DA_FIRST_GUESS=${DA_FIRST_GUESS:-$DAT_DIR/wrfinput_d01}    # wrfvar "first guess" input.
+export DA_OBSERVATIONS=${DA_OBSERVATIONS:-$DAT_DIR/ob.ascii} # wrfvar observation input.
 export DA_BACK_ERRORS=${DA_BACK_ERRORS:-$DAT_DIR/be.cv_$DA_CV_OPTIONS} # wrfvar background errors.
 export DA_SSMI=${DA_SSMI:-$DAT_DIR/ssmi.dat}                          # SSM/I radiances (ignore if not using).
 export DA_RADAR=${DA_RADAR:-$DAT_DIR/radar.dat}                       # Radar data (ignore if not using).
@@ -261,11 +262,6 @@ rm -rf ${RUN_DIR}/$ID
 mkdir ${RUN_DIR}/$ID
 cd $RUN_DIR/$ID
 
-#JRB
-ln -s ../*bias .
-ln -s ../*tbl .
-ln -s ../*info .
-ln -s ../*bufr .
 ln -s $DA_RTTOV_COEFFS/* .
 
 cp $WRFVAR_DIR/run/gribmap.txt .
@@ -529,14 +525,14 @@ cat > namelist.input << EOF
  diff_opt                            = 0,
  km_opt                              = 1,
  damp_opt                            = 0,
- base_temp                           = 290.
+ base_temp                           = 290.,
  zdamp                               = 5000.,  5000.,  5000.,
- dampcoef                            = 0.01,   0.01,   0.01
+ dampcoef                            = 0.01,   0.01,   0.01,
  khdif                               = 0,      0,      0,
  kvdif                               = 0,      0,      0,
  smdiv                               = 0.1,    0.1,    0.1,
  emdiv                               = 0.01,   0.01,   0.01,
- epssm                               = 0.1,    0.1,    0.1
+ epssm                               = 0.1,    0.1,    0.1,
  non_hydrostatic                     = .true., .true., .true.,
  time_step_sound                     = 4,      4,      4,
  h_mom_adv_order                     = 5,      5,      5,
@@ -578,11 +574,14 @@ PLATFORM=`uname`
 
 if test $PLATFORM == "Linux"; then
   if test $NUM_PROCS > 1; then
-    cp $DAT_DIR/hosts .
-    mpirun -v -np ${NUM_PROCS} -nolocal -machinefile hosts ./wrfvar.exe
+    mpirun -v -np $NUM_PROCS -nolocal -machinefile $HOSTS ./wrfvar.exe
   else
     mpirun -v -np 1 ./wrfvar.exe > /dev/null #Assumes compile in DM mode.
   fi
+fi
+
+if test $PLATFORM == "Darwin"; then
+  ./wrfvar.exe
 fi
 
 #DEC:

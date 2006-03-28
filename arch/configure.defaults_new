@@ -144,7 +144,7 @@ LOCAL_LIBRARIES =       -L/usr/local/ncarg/lib -L/usr/X11R6/lib -L/usr/local/lib
 			-lncarg -lncarg_gks -lncarg_c -lX11
 
 CPPFLAGS_BUFR   =       -C -P $(TRADFLAG) -DLINUX -Dlinux
-CFLAGS_BUFR     =       -DUNDERSCORE
+CCFLAGS_BUFR    =       -DUNDERSCORE
 POUND_DEF       =       -DLINUX -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
 			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 
@@ -189,7 +189,7 @@ LOCAL_LIBRARIES =       -L/usr/local/ncarg/lib -L/usr/X12R6/lib -L/usr/local/lib
                         -lncarg -lncarg_gks -lncarg_c -lX11 
 
 CPPFLAGS_BUFR   =       -C -P $(TRADFLAG) -DLINUX -Dlinux
-CFLAGS_BUFR     =       -DUNDERSCORE
+CCFLAGS_BUFR    =       -DUNDERSCORE
 POUND_DEF       =       -DLINUX -DNO_RRTM_PHYSICS  \
 			-DNONSTANDARD_SYSTEM -DF90_STANDALONE \
 			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
@@ -224,7 +224,7 @@ LOCAL_LIBRARIES =       -L/usr/local/ncarg/lib -L/usr/X11R6/lib -L/usr/local/lib
 			-lncarg -lncarg_gks -lncarg_c -lX11
 
 CPPFLAGS_BUFR   =       -C -P $(TRADFLAG) -DLINUX -Dlinux
-CFLAGS_BUFR     =       -DUNDERSCORE
+CCFLAGS_BUFR    =       -DUNDERSCORE
 
 POUND_DEF       =       -DNO_RRTM_PHYSICS -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
 			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
@@ -248,18 +248,17 @@ TRADFLAG        =       -traditional
 FCOPTIM         =       
 FCDEBUG         =       #-g
 FCFORM          =       -ffree-form
-FCBUFR          =       -cpp -Wno=155,158,139,101,155
-FCBASE          =       -cpp -Wno=155,158,139,101,155
+FCBASE          =       -cpp -Wno=101,139,155,158 -fno-second-underscore
+FCBUFR          =       $(FCBASE)
 FCTYPE          =       -r8
 
-ARCHFLAGS2      =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE \
-                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO
+ARCHFLAGS2      =       -DTRIEDNTRUE -DONLY_WRFMODEL_IO
 
 LOCAL_LIBRARIES =       -L/usr/local/ncarg/lib -L/usr/X11R6/lib -L/usr/local/lib \
 			-lncarg -lncarg_gks -lncarg_c -lX11
 
 CPPFLAGS_BUFR   =       -C -P  $(TRADFLAG) -DLINUX -Dlinux
-CFLAGS_BUFR     =       -DUNDERSCORE
+CCFLAGS_BUFR    =       -DUNDERSCORE
 POUND_DEF       =       -DLINUX -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
 			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 
@@ -267,6 +266,50 @@ arch :  module_dm_stubs.F gen_comms.stub
 	$(LN) module_dm_stubs.F module_dm.F
 	$(LN) gen_comms.stub gen_comms.c 
 
+
+###########################################################
+#ARCH Settings for PC Linux i486 i586 i686, g95 compiler  (RSL, MPICH, RSL IO)
+#
+FC              =       mpif90
+F77             =       $(FC)
+SFC             =       pgf90
+LD              =       $(FC)
+CC              =       mpicc
+CC_TOOLS        =       gcc
+
+TRADFLAG        =       -traditional
+FCOPTIM         =       #-fast
+FCDEBUG         =       #-g
+FCFORM          =       -ffree-form
+FCBASE          =       -cpp -Wno=101,139,155,158 -fno-second-underscore
+FCBUFR          =       $(FCBASE)
+FCTYPE          =       -r8
+
+DMPARALLEL      =       1
+RSL_PATH        =       $(DEVTOP)/external/RSL
+MPI_LIB		=	-L$(RSL_PATH)/RSL -lrsl
+DM_CPP_FLAGS    =       -I$(RSL_PATH)/RSL `cat inc/dm_comm_cpp_flags`
+
+
+ARCHFLAGS2      =       -DINTIO -DWRF_RSL_IO -DRSL -DDM_PARALLEL \
+                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO
+ARCHFLAGS4      =       -DMAXDOM_MAKE=$(MAX_DOMAINS) \
+                        -DMAXPROC_MAKE=$(MAX_PROC) \
+                        -I$(RSL_PATH)/RSL
+
+LOCAL_LIBRARIES =       -L/usr/local/ncarg/lib -L/usr/X12R6/lib -L/usr/local/lib \
+                        -lncarg -lncarg_gks -lncarg_c -lX11 
+
+CPPFLAGS_BUFR   =       -C -P $(TRADFLAG) -DLINUX -Dlinux
+CCFLAGS_BUFR    =       -DUNDERSCORE
+POUND_DEF       =       -DLINUX -DNO_RRTM_PHYSICS  \
+			-DNONSTANDARD_SYSTEM -DF90_STANDALONE \
+			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+
+arch : $(RSL_PATH)/module_dm.F $(RSL_PATH)/gen_comms.c
+	$(LN) $(RSL_PATH)/module_dm.F .
+	$(LN) $(RSL_PATH)/gen_comms.c .
+	( cd $(RSL_PATH)/RSL ; make CC="$(CC)" FC="$(FC) $(FCBASE)" MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) LEARN_BCAST=-DLEARN_BCAST linux )
 
 ###########################################################
 #ARCH       SGI 64 bit machine IRIX64     (single-threaded)
@@ -609,7 +652,7 @@ arch : $(RSL_PATH)/module_dm.F $(RSL_PATH)/gen_comms.c
                LEARN_BCAST=-DLEARN_BCAST crayx1 )
 
 ###########################################################
-#ARCH Darwin		(single-threaded, no nesting, for G5)
+#ARCH Darwin		(xlf single-threaded, no nesting, for G5)
 #
 FC              =       xlf90_r
 F77             =       xlf_r
@@ -617,42 +660,7 @@ SFC             =       $(FC)
 LD              =       xlf90_r
 CC              =       cc
 CC_TOOLS        =       cc
-
-FCOPTIM         =       -O0 -qarch=auto
-FCDEBUG         =       #-g
-FCTYPE       =       -qrealsize=8
-FCFORM          =       -qfree=f90
-FCBASE          =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767
-#                       -qflttrap=zerodivide:invalid:enable -qsigtrap
-FCBUFR          =       $(FCBASE)
-FC_FFT_RF       =       $(FCBASE)
-LDFLAGS         =	 -Wl,-stack_size,10000000,-stack_addr,0xc0000000
-
-ARCHFLAGS2      =       -DINTIO \
-                        -DTRIEDNTRUE   \
-			-DLIMIT_ARGS -DNO_NAMELIST_PRINT
-ARCHFLAGS4      =       -DNOUNDERSCORE -DLANDREAD_STUB
-
-CPPFLAGS        =       -C -P -xassembler-with-cpp
-
-POUND_DEF       =       -DDARWIN -DMAC_OS \
-			-DNONSTANDARD_SYSTEM -DF90_STANDALONE \
-			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
-M4              =       m4 -B12000
-
-arch :  module_dm_stubs.F gen_comms.stub
-	$(LN) module_dm_stubs.F module_dm.F
-	$(LN) gen_comms.stub gen_comms.c 
-
-###########################################################
-#ARCH Darwin		(single-threaded, no nesting, for G4)
-#
-FC              =       xlf90_r
-F77             =       xlf_r
-SFC             =       $(FC)
-LD              =       xlf90_r
-CC              =       cc
-CC_TOOLS        =       cc
+CPP             =       /usr/bin/cpp
 
 FCOPTIM         =       -O0 -qarch=auto
 FCDEBUG         =       #-g
@@ -667,11 +675,83 @@ LDFLAGS         =	 -Wl,-stack_size,10000000,-stack_addr,0xc0000000
 ARCHFLAGS2      =       -DINTIO \
                         -DTRIEDNTRUE   \
 			-DLIMIT_ARGS -DNO_NAMELIST_PRINT
-ARCHFLAGS4      =       -DNOUNDERSCORE -DLANDREAD_STUB
+ARCHFLAGS4      =       -DNOUNDERSCORE -DLANDREAD_STUB -DMACOS
 
-CPPFAGS         =       -C -P -xassembler-with-cpp
+CPPFLAGS        =       -C -P -xassembler-with-cpp
 
-POUND_DEF       =       -DDARWIN -DMAC_OS \
+POUND_DEF       =       -DMACOS \
+			-DNONSTANDARD_SYSTEM -DF90_STANDALONE \
+			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+M4              =       m4 -B12000
+
+arch :  module_dm_stubs.F gen_comms.stub
+	$(LN) module_dm_stubs.F module_dm.F
+	$(LN) gen_comms.stub gen_comms.c 
+
+###########################################################
+#ARCH Darwin		(xlf single-threaded, no nesting, for G4)
+#
+FC              =       xlf90_r
+F77             =       xlf_r
+SFC             =       $(FC)
+LD              =       xlf90_r
+CC              =       cc
+CC_TOOLS        =       cc
+CPP             =       /usr/bin/cpp
+
+FCOPTIM         =       -O0 -qarch=auto
+FCDEBUG         =       #-g
+FCTYPE          =       -qrealsize=8
+FCFORM          =       -qfree=f90
+FCBASE          =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767
+#                       -qflttrap=zerodivide:invalid:enable -qsigtrap
+FCBUFR          =       $(FCBASE)
+FC_FFT_RF       =       $(FCBASE)
+LDFLAGS         =	 -Wl,-stack_size,10000000,-stack_addr,0xc0000000
+
+ARCHFLAGS2      =       -DINTIO \
+                        -DTRIEDNTRUE   \
+			-DLIMIT_ARGS -DNO_NAMELIST_PRINT
+ARCHFLAGS4      =       -DNOUNDERSCORE -DLANDREAD_STUB -DMACOS
+
+CPPFLAGS         =       -C -P -xassembler-with-cpp
+
+POUND_DEF       =       -DMACOS \
+			-DNONSTANDARD_SYSTEM -DF90_STANDALONE \
+			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+M4              =       m4 -B12000
+
+arch :  module_dm_stubs.F gen_comms.stub
+	$(LN) module_dm_stubs.F module_dm.F
+	$(LN) gen_comms.stub gen_comms.c 
+
+###########################################################
+#ARCH Darwin		(g95 single-threaded, no nesting, for G4/5)
+#
+FC              =       g95
+F77             =       $(FC)
+SFC             =       $(FC)
+LD              =       $(FC)
+CC              =       cc
+CC_TOOLS        =       cc
+CPP             =       /usr/bin/cpp
+
+FCOPTIM         =       
+FCDEBUG         =       #-g
+FCTYPE          =       -r8
+FCFORM          =       -ffree-form
+FCBASE          =       -cpp -Wno=101,139,155,158 -fno-second-underscore -ftrace=full
+FCBUFR          =       $(FCBASE)
+
+ARCHFLAGS2      =       -DINTIO \
+                        -DTRIEDNTRUE   \
+			-DLIMIT_ARGS -DNO_NAMELIST_PRINT
+ARCHFLAGS4      =       -DLANDREAD_STUB -DMACOS
+EXTRA_LIBS      =       -lSystemStubs
+
+CPPFLAGS         =       -C -P -xassembler-with-cpp
+CCFLAGS_BUFR    =       -DUNDERSCORE
+POUND_DEF       =       -DMACOS \
 			-DNONSTANDARD_SYSTEM -DF90_STANDALONE \
 			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 M4              =       m4 -B12000

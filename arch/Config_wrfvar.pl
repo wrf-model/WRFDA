@@ -216,13 +216,13 @@ print CONFIGURE_WRF "#--------------------------------------------------------\n
 if($sw_os =~ m/darwin/i) {
    chomp $optchoice;
 
-   if($optchoice != 1) {
-     open ARCH_POSTAMBLE, "< arch/postamble_wrfvar.mac_g4"
-       or die "cannot open arch/postamble_wrfvar.mac_g4" ;
-   } else {
+#   if($optchoice != 1) {
+#     open ARCH_POSTAMBLE, "< arch/postamble_wrfvar.mac_g4"
+#       or die "cannot open arch/postamble_wrfvar.mac_g4" ;
+#   } else {
      open ARCH_POSTAMBLE, "< arch/postamble_wrfvar"
        or die "cannot open arch/postamble_wrfvar" ;
-   }
+#   }
 } elsif(($sw_os =~ m/crayx1/i) || ($sw_os =~ m/cray1e/i) || ($sw_os =~ m/UNICOS/i)) {
   open ARCH_POSTAMBLE, "< arch/postamble_wrfvar.cray1e"
     or die "cannot open arch/postamble_wrfvar.cray1e" ;

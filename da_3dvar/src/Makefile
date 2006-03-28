@@ -234,15 +234,15 @@ da_bufrlib.o:		da_bufrlib/da_bufrlib.F bufrlib.prm
 
 bort_exit.o:		da_bufrlib/bort_exit.c
 			$(RM) $@
-			$(CC) -c $(CCFLAGS_BUFR) da_bufrlib/bort_exit.c
+			$(CC) -c $(CFLAGS_BUFR) da_bufrlib/bort_exit.c
 
 restd.o:		da_bufrlib/restd.c
 			$(RM) $@
-			$(CC) -c $(CCFLAGS_BUFR) da_bufrlib/restd.c
+			$(CC) -c $(CFLAGS_BUFR) da_bufrlib/restd.c
 
 wrdesc.o:		da_bufrlib/wrdesc.c
 			$(RM) $@
-			$(CC) -c $(CCFLAGS_BUFR) da_bufrlib/wrdesc.c
+			$(CC) -c $(CFLAGS_BUFR) da_bufrlib/wrdesc.c
 
 DA_VToX_Transforms.o:	\
 			par_util.o \

@@ -26,7 +26,7 @@ FRAME_OBJS    =       wrf_num_bytes_between.o    \
 FRAME_SPECIAL_OBJS =       module_internal_header_util.o pack_utils.o
    
 wrf_num_bytes_between.o :
-	$(CC) -c $(CFLAGS) wrf_num_bytes_between.c
+	$(CC) -c $(CCFLAGS) wrf_num_bytes_between.c
 
 module_state_description.F : registry ../Registry/$(REGISTRY)
 	./registry $(ARCHFLAGS) ../Registry/$(REGISTRY)

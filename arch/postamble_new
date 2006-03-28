@@ -1,9 +1,9 @@
 #
 ARCHFLAGS       =       $(ARCHFLAGS1) $(ARCHFLAGS2)
-CFLAGS          =       $(ARCHFLAGS3) $(ARCHFLAGS4)
+CCFLAGS         =       $(ARCHFLAGS3) $(ARCHFLAGS4)
 LIB             =       -L. -lwrflib -lwrfio_nf -lesmf_time \
                         -L$(EXTERNAL)/io_grib1 -lio_grib1 \
-                        $(NETCDF_LIB) $(RTTOV_LIB) $(MPI_LIB)
+                        $(NETCDF_LIB) $(RTTOV_LIB) $(MPI_LIB) $(EXTRA_LIBS)
 
 FCFLAGS         =       $(FCOPTIM) $(FCBASE) $(FCDEBUG) $(FCTYPE) $(FCFORM)
 F77FLAGS        =       $(FCOPTIM) $(FCBASE) $(FCDEBUG) $(FCTYPE)
@@ -77,5 +77,5 @@ module_initialize_real.o module_dm.o start_domain.o :
 
 .c.o:
 	@ $(RM) $@
-	  $(CC) -c $(CFLAGS) $*.c
+	  $(CC) -c $(CCFLAGS) $*.c
 
