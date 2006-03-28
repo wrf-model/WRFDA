@@ -141,6 +141,6 @@ wrf.o: \
 	../share/module_wrf_esmf_super.o \
 	$(ESMF_MOD_DEPENDENCE) $(EXTRAMODULES)
 
-wrfvar.o: ../da_3dvar/module_wrfvar_top.o
+wrfvar.o: $(DA_VAR)/module_wrfvar_top.o
 
 # DO NOT DELETE

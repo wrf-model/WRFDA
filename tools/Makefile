@@ -23,9 +23,9 @@ gen_comms.c : gen_comms.stub
 
 bufr_little_endian.exe : bufr_little_endian.f
 			$(RM) $@
-			$(FC) -o bufr_little_endian.exe bufr_little_endian.f ../da_3dvar/src/da_bufrlib.o \
-                          ../da_3dvar/src/bort_exit.o ../da_3dvar/src/restd.o \
-                          ../da_3dvar/src/wrdesc.o
+			$(FC) -o bufr_little_endian.exe bufr_little_endian.f $(DA_SRC)/da_bufrlib.o \
+                          $(DA_SRC)/bort_exit.o $(DA_SRC)/restd.o \
+                          $(DA_SRC)/wrdesc.o
 
 
 # regenerate this list with "makedepend -Y *.c"

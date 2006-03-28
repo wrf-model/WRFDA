@@ -4,7 +4,7 @@ EXTRAMODULES    =
 FCBASEOPTS      =       $(FCTYPE) $(FCBASE) $(FCFORM) $(FCHOST) $(FCDEBUG) -I.
 FC_FFT_RF_OPTS  =       $(FCTYPE) $(FC_FFT_RF) $(FCFORM) $(FCHOST) $(FCDEBUG) -I.
 FCFLAGS	 =       $(FCOPTIM) $(FCBASEOPTS)
-INCLUDE_MODULES =       -I../da_3dvar -I../da_3dvar/src \
+INCLUDE_MODULES =       -I$(DA_VAR) -I$(DA_SRC) \
 			-I../external/io_netcdf -I../external/io_int \
 	                -I../external/esmf_time_f90 \
 	                -I../external/RSL/RSL \
@@ -12,14 +12,14 @@ INCLUDE_MODULES =       -I../da_3dvar -I../da_3dvar/src \
 	                -p../phys \
 	                -p../frame \
 			-p../share \
-			-p../da_3dvar \
-			-p../da_3dvar/src \
+			-p$(DA_VAR) \
+			-p$(DA_SRC) \
 	                -p../external/io_int \
 	                -p../external/esmf_time_f90 \
 	                -p../external/RSL/RSL
 
-LDFLAGS         =       -L../da_3dvar \
-			-L../da_3dvar/src \
+LDFLAGS         =       -L$(DA_VAR) \
+			-L$(DA_SRC) \
 			-L../external/io_netcdf \
 			-L../external/io_int \
 			-L../external/esmf_time_f90 \
@@ -34,13 +34,13 @@ CPPFLAGS	=       -I$(LIBINCLUDE) -C -P $(ARCHFLAGS) $(ENVCOMPDEFS) \
 INC_MOD_WRFVAR  =       -I../../$(NETCDF_IO_PATH) \
 	                -p../../frame \
 			-p../../share \
-			-p../../da_3dvar \
-			-p../../da_3dvar/src \
+			-p../$(DA_VAR) \
+			-p$(DA_SRC) \
 	                -p../../external/io_int \
 	                -p../../external/esmf_time_f90 \
 	                -p../../external/RSL/RSL \
 	                -I../../external/RSL/RSL \
-			-I../../da_3dvar -I../../da_3dvar/src \
+			-I../$(DA_VAR) -I$(DA_SRC) \
 	                -I../../external/io_int \
 	                -I../../external/esmf_time_f90 \
 	                -I../../frame -I../../share -I../../inc

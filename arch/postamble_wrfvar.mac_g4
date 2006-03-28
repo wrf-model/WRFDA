@@ -4,7 +4,7 @@ EXTRAMODULES    =
 FCBASEOPTS      =       -w $(FCTYPE) $(FCBASE) $(FCFORM) $(FCHOST) $(FCDEBUG) -I.
 FC_FFT_RF_OPTS  =       $(FCTYPE) $(FC_FFT_RF) $(FCFORM) $(FCHOST) $(FCDEBUG) -I.
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS) $(OMP)
-INCLUDE_MODULES =       -I../da_3dvar -I../da_3dvar/src \
+INCLUDE_MODULES =       -I$(DA_VAR) -I$(DA_SRC) \
 			-I../external/io_netcdf -I../external/io_int \
                         -I../external/esmf_time_f90 \
                         -I../frame -I../share -I../phys -I../inc
@@ -14,7 +14,7 @@ CPPFLAGS        =       -I$(LIBINCLUDE) -C -P $(ARCHFLAGS) $(ENVCOMPDEFS) \
 			$(TRADFLAG) $(DM_1_CPP_FLAGS) $(OMPCPP) $(COREDEFS) $(POUND_DEF)
 
 INC_MOD_WRFVAR   =       -I../../$(NETCDF_IO_PATH) \
-			-I../../da_3dvar -I../../da_3dvar/src \
+			-I$(DA_VAR) -I$(DA_SRC) \
                         -I../../external/io_int \
                         -I../../external/esmf_time_f90 \
                         -I../../frame -I../../share -I../../inc

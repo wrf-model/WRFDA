@@ -646,7 +646,7 @@ EXTRAMODULES    =
 
 LDFLAGS         =
 MPI_LIB		=	-L../external/RSL/RSL -lrsl
-LOCAL_LIB	=	-L../frame -L../share -L../da_3dvar -L../da_3dvar/src
+LOCAL_LIB	=	-L../frame -L../share -L$(DA_VAR) -L$(DA_SRC)
 CONVERTOR_LIB	=	-L../convertor
 LOCAL_LIBRARIES =       #-L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c -lX11
 
@@ -722,7 +722,7 @@ EXTRAMODULES    =
 
 LDFLAGS         =
 MPI_LIB		=	-L../external/RSL/RSL -lrsl
-LOCAL_LIB	=	-L../frame -L../share -L../da_3dvar -L../da_3dvar/src
+LOCAL_LIB	=	-L../frame -L../share -L$(DA_VAR) -L$(DA_SRC)
 CONVERTOR_LIB	=	-L../convertor
 LOCAL_LIBRARIES =       #-L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c -lX11
 
