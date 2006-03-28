@@ -68,17 +68,17 @@ var :
 	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" toolsdir
 	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" REGISTRY="Registry" framework
 	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" shared
-	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" da_3dvar_io
+	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" wrfvar_io
 	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" wrfvar_src
-	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" da_3dvar_interface
+	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" wrfvar_interface
 	( cd main ; $(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" wrfvar )
 
 pure_var : 
 	@ echo 'This option assumes that you have already compiled the WRF frame part correctly.'
-	@ echo 'If you have not done so, please use compile 3dvar'
-	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" da_3dvar_io
+	@ echo 'If you have not done so, please use compile var'
+	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" wrfvar_io
 	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" wrfvar_src
-	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" da_3dvar_interface
+	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" wrfvar_interface
 	( cd main ; $(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" wrfvar )
 
 k2n : 
@@ -88,7 +88,7 @@ k2n :
 	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" shared
 	$(MAKE) MODULE_DIRS="$(ALL_MODULES)" physics
 	$(MAKE) MODULE_DIRS="$(ALL_MODULES)" em_core
-	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" da_3dvar_io
+	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" wrfvar_io
 	$(MAKE) MODULE_DIRS="$(DA_CONVERTOR_MODULES)" convertor_drivers
 	( cd main ; \
           /bin/rm -f kma2netcdf.exe ; \
@@ -101,7 +101,7 @@ n2k :
 	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" shared
 	$(MAKE) MODULE_DIRS="$(ALL_MODULES)" physics
 	$(MAKE) MODULE_DIRS="$(ALL_MODULES)" em_core
-	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" da_3dvar_io
+	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" wrfvar_io
 	$(MAKE) MODULE_DIRS="$(DA_CONVERTOR_MODULES)" convertor_drivers
 	( cd main ; \
           /bin/rm -f netcdf2kma.exe ; \
@@ -287,15 +287,15 @@ em_core :
 
 wrfvar_src :
 	@ echo '--------------------------------------'
-	( cd da_3dvar/src; $(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES_2)" 3dvar )
+	( cd da_3dvar/src; $(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES_2)" wrfvar )
 
-da_3dvar_io :
+wrfvar_io :
 	@ echo '--------------------------------------'
-	( cd da_3dvar; $(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" da_3dvar_io )
+	( cd da_3dvar; $(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" wrfvar_io )
 
-da_3dvar_interface :
+wrfvar_interface :
 	@ echo '--------------------------------------'
-	( cd da_3dvar; $(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" da_3dvar_interface )
+	( cd da_3dvar; $(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" wrfvar_interface )
 
 convertor_drivers :
 	@ echo '--------------------------------------'

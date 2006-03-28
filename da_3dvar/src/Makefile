@@ -61,7 +61,7 @@ OBJS_FOR_ALL =		da_solve_v3d.o		\
 include ../../configure.wrf
 
 TARGETDIR    =  ../..
-3dvar :		$(OBJS_FOR_ALL)
+wrfvar :	$(OBJS_FOR_ALL)
 		$(AR) ../../main/libwrflib.a $(OBJS_FOR_ALL)
 
 ##########################################################################

@@ -10,10 +10,10 @@ MODULES_INTERFACE	=	module_wrf_3dvar_interface.o	\
 	   			module_wrfvar_top.o
 OBJS    = 
 
-da_3dvar_interface :	$(MODULES_INTERFACE) $(OBJS)
+wrfvar_interface :	$(MODULES_INTERFACE) $(OBJS)
 		$(AR) ../main/libwrflib.a $(MODULES_INTERFACE) $(OBJS)
 
-da_3dvar_io :	$(MODULES_IO)
+wrfvar_io :	$(MODULES_IO)
 		$(AR) ../main/libwrflib.a $(MODULES_IO)
 
 include ../configure.wrf
