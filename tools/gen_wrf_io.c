@@ -175,24 +175,12 @@ set_dim_strs ( node_t *node , char ddim[3][2][NAMELEN], char mdim[3][2][NAMELEN]
     p = node->dims[i] ;
     if      ( p->len_defined_how == DOMAIN_STANDARD )
     {
-      if ( sw_3dvar_iry_kludge ) {
-        switch( p->coord_axis )
-        {
-                                                 /* vvv */
-        case(COORD_X) : d = 'i' ; stag = (node->stag_y||sw_disregard_stag)?"%s%cde":"(%s%cde-1)" ; break ;
-        case(COORD_Y) : d = 'j' ; stag = (node->stag_x||sw_disregard_stag)?"%s%cde":"(%s%cde-1)" ; break ;
-                                                 /* ^^^ */
-        case(COORD_Z) : d = 'k' ; stag = (node->stag_z||sw_disregard_stag)?"%s%cde":"(%s%cde-1)" ; break ;
-        default : stag = "1" ; break ;
-        }
-      } else {
-        switch( p->coord_axis )
-        {
-        case(COORD_X) : d = 'i' ; stag = (node->stag_x||sw_disregard_stag)?"%s%cde":"(%s%cde-1)" ; break ;
-        case(COORD_Y) : d = 'j' ; stag = (node->stag_y||sw_disregard_stag)?"%s%cde":"(%s%cde-1)" ; break ;
-        case(COORD_Z) : d = 'k' ; stag = (node->stag_z||sw_disregard_stag)?"%s%cde":"(%s%cde-1)" ; break ;
-        default : stag = "1" ; break ;
-        }
+      switch( p->coord_axis )
+      {
+      case(COORD_X) : d = 'i' ; stag = (node->stag_x||sw_disregard_stag)?"%s%cde":"(%s%cde-1)" ; break ;
+      case(COORD_Y) : d = 'j' ; stag = (node->stag_y||sw_disregard_stag)?"%s%cde":"(%s%cde-1)" ; break ;
+      case(COORD_Z) : d = 'k' ; stag = (node->stag_z||sw_disregard_stag)?"%s%cde":"(%s%cde-1)" ; break ;
+      default : stag = "1" ; break ;
       }
        
       sprintf(ddim[i][0],"%s%cds",prepend,d) ;
@@ -669,10 +657,6 @@ if ( pass == 0 )
 
           set_mem_order( p, memord , NAMELEN) ;
 
-/* kludge for WRFVAR I/O with MM5 analysis kernel */
-          if ( sw_3dvar_iry_kludge && !strcmp(memord,"XYZ") ) sprintf(memord,"YXZ") ;
-          if ( sw_3dvar_iry_kludge && !strcmp(memord,"XY") ) sprintf(memord,"YX") ;
-
           if ( strlen(dname) < 1 ) {
             fprintf(stderr,"gen_wrf_io.c: Registry WARNING:: no data name for %s \n",p->name) ;
           }
@@ -876,13 +860,13 @@ if ( pass == 0 )
 	        switch ( dimnode->coord_axis )
 	        {
 	        case (COORD_X) : 
-		  if ( ( ! sw_3dvar_iry_kludge && p->stag_x ) || ( sw_3dvar_iry_kludge && p->stag_y ) )
+		  if ( p->stag_x )
 		   { sprintf( dimname[i] ,"%s_stag", dimnode->dim_data_name) ; } 
 		  else 
 		   { strcpy( dimname[i], dimnode->dim_data_name) ; }
 		  break ;
 	        case (COORD_Y) : 
-		  if ( ( ! sw_3dvar_iry_kludge && p->stag_y ) || ( sw_3dvar_iry_kludge && p->stag_x ) )
+		  if ( p->stag_y )
 		   { sprintf( dimname[i] ,"%s_stag", dimnode->dim_data_name) ; } 
 		  else 
 		   { strcpy( dimname[i], dimnode->dim_data_name) ; }

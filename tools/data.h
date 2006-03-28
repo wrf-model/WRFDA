@@ -98,7 +98,6 @@ typedef struct node_struct {
 
 EXTERN int sw_deref_kludge ;
 EXTERN int sw_io_deref_kludge ;
-EXTERN int sw_3dvar_iry_kludge ;
 EXTERN int sw_distrib_io_layer ;
 EXTERN int sw_limit_args ;
 EXTERN int sw_dm_parallel  ;
