@@ -268,7 +268,7 @@ cp $WRFVAR_DIR/run/gribmap.txt .
 cp $WRFVAR_DIR/run/LANDUSE.TBL .
 cp $BUILD_DIR/wrfvar.exe  wrfvar.exe
 
-ln -sf $DA_FIRST_GUESS		wrf_3dvar_input
+ln -sf $DA_FIRST_GUESS		wrfvar_input
 ln -sf $DA_BACK_ERRORS		fort.3${DA_CV_OPTIONS}
 ln -sf $DA_OBSERVATIONS	fort.9${DA_OB_FORMAT}
 
@@ -573,10 +573,11 @@ EOF
 PLATFORM=`uname`
 
 if test $PLATFORM == "Linux"; then
-  if test $NUM_PROCS > 1; then
+  if test $NUM_PROCS -gt 1; then
     mpirun -v -np $NUM_PROCS -nolocal -machinefile $HOSTS ./wrfvar.exe
   else
-    mpirun -v -np 1 ./wrfvar.exe > /dev/null #Assumes compile in DM mode.
+#    mpirun -v -np 1 ./wrfvar.exe > /dev/null #Assumes compile in DM mode.
+    ./wrfvar.exe
   fi
 fi
 

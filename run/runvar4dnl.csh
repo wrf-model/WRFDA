@@ -3,8 +3,8 @@
 # Called from solve_3d inside WRFVAR. The script is only temporary until we can
 # couple the models through memory rather than files
 #
-# When called the first time, wrf_3dvar_output does not exist, so use the
-# existng wrf_3dvar_input as the initial file
+# When called the first time, wrfvar_output does not exist, so use the
+# existng wrfvar_input as the initial file
 #
 # Not sure why the auxhistfiles are commented out
 #
@@ -17,10 +17,10 @@
 
  cp namelist.var4dnl namelist.input
 
- if ( -e wrf_3dvar_output ) then
-   mv wrf_3dvar_output wrfinput_d01
+ if ( -e wrfvar_output ) then
+   mv wrfvar_output wrfinput_d01
  else
-   cp wrf_3dvar_input wrfinput_d01
+   cp wrfvar_input wrfinput_d01
  endif
 
  wrf.exe >>& stdout.nl
@@ -31,7 +31,7 @@
 # cp auxhist2_d01_2000-01-25_03:00:00 fgat_fg.04
 
  cp wrfinput_d01                            fgat_fg.01
- mv wrf_3dvar_input_d01_2000-01-25_01:00:00 fgat_fg.02
- mv wrf_3dvar_input_d01_2000-01-25_02:00:00 fgat_fg.03
- mv wrf_3dvar_input_d01_2000-01-25_03:00:00 fgat_fg.04
+ mv wrfvar_input_d01_2000-01-25_01:00:00 fgat_fg.02
+ mv wrfvar_input_d01_2000-01-25_02:00:00 fgat_fg.03
+ mv wrfvar_input_d01_2000-01-25_03:00:00 fgat_fg.04
 

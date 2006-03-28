@@ -18,11 +18,11 @@
  cp ${WRF_ROOT}/data/namelist.var4dtl .
  cp ${WRF_ROOT}/data/namelist.var4dad .
 
- cp ${WRF_ROOT}/data/namelist.var4d namelist.3dvar
+ cp ${WRF_ROOT}/data/namelist.var4d namelist.wrfvar
 
  cp                  namelist.var4dnl namelist.input
 
- cp ${WRF_ROOT}/data/wrf_3dvar_input_d01_2000-01-25_00:00:00 wrf_3dvar_input
+ cp ${WRF_ROOT}/data/wrfvar_input_d01_2000-01-25_00:00:00 wrfvar_input
  cp ${WRF_ROOT}/data/obs2000012500 fgat_ob.01
  cp ${WRF_ROOT}/data/obs2000012501 fgat_ob.02
  cp ${WRF_ROOT}/data/obs2000012502 fgat_ob.03
@@ -39,12 +39,12 @@
  chmod 777 *
 
  ln -s ${WRF_TEMP}/wrfmodel/main/wrf.exe .
- ln -s ${WRF_TEMP}/wrfvda/main/da_3dvar.exe .
+ ln -s ${WRF_TEMP}/wrfvda/main/wrfvar.exe .
 
- da_3dvar.exe > stdout.mi
+ wrfvar.exe > stdout.mi
 
-# rm namelist.input namelist.3dvar
-# rm wrf_3dvar_input
+# rm namelist.input namelist.wrfvar
+# rm wrfvar_input
 # rm fgat_fg*
 
  mv fort.12 statistics

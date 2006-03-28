@@ -64,7 +64,7 @@ Additional ones when running WRFVAR:
 
  write_input                         = t,       ; write input-formatted data as output
  inputout_interval                   = 180,     ; interval in minutes when writing input-formatted data 
- input_outname                       = 'wrf_3dvar_input_d<domain>_<date>' ; you may change the output file name
+ input_outname                       = 'wrfvar_input_d<domain>_<date>' ; you may change the output file name
  inputout_begin_y                    = 0
  inputout_begin_mo                   = 0
  inputout_begin_d                    = 0

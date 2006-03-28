@@ -33,7 +33,7 @@
  inputout_begin_h                    = 0
  inputout_begin_s                    = 0
  inputout_interval                   = 60,
- input_outname                       = 'wrf_3dvar_input_d<domain>_<date>'
+ input_outname                       = 'wrfvar_input_d<domain>_<date>'
  auxinput3_inname                    = 'auxinput3_d<domain>_<date>'
  auxinput3_begin_y                   = 0,
  auxinput3_begin_mo                  = 0,

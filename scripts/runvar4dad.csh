@@ -4,7 +4,7 @@
 
  cp namelist.var4dad namelist.input
 
- cp wrf_3dvar_input wrfinput_d01
+ cp wrfvar_input wrfinput_d01
 
  rm tl0* 
 
@@ -15,7 +15,7 @@
 
  wrf.exe  >>& stdout.ad
 
- mv wrf_3dvar_input_d01_2000-01-25_00:00:00 gr00
+ mv wrfvar_input_d01_2000-01-25_00:00:00 gr00
 
  cp namelist.var4dnl namelist.input
 

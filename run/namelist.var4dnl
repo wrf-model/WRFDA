@@ -28,7 +28,7 @@
  debug_level                         = 0
  write_input                         = .true.,
  inputout_interval                   = 60,
- input_outname                       = 'wrf_3dvar_input_d<domain>_<date>',
+ input_outname                       = 'wrfvar_input_d<domain>_<date>',
  auxhist2_inname                     = 'auxhist2_d<domain>_<date>'
  auxhist2_interval                   = 10,
  frames_per_auxhist2                 = 1,
