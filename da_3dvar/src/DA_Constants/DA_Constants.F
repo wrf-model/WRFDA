@@ -28,7 +28,6 @@ MODULE DA_Constants
    REAL, PARAMETER    :: cp = 7.*gas_constant/2. ! Value used in WRF.
 #endif
    REAL, PARAMETER    :: t_kelvin = 273.15
-   REAL, PARAMETER    :: ts0 = 300.0        ! Base potential temperature.
    REAL, PARAMETER       :: ps0_inv = 1.0 / 100000.0  ! Base pressure.
 
    REAL, PARAMETER    :: kappa = gas_constant / cp
@@ -143,6 +142,9 @@ MODULE DA_Constants
    REAL, PARAMETER    :: inv_typ_vp4_sumsq = 10000.0 ! 1/SUM(q**2)
    REAL, PARAMETER    :: inv_typ_vp5_sumsq = 0.00001 ! 1/SUM(?**2)
 
+   CHARACTER(LEN=*),PARAMETER :: wrfvar_version = "WRFVAR V2.2.0.0"
+   CHARACTER(LEN=*),PARAMETER :: wrf_version    = "WRFVAR V2.0.3.1"
+
 !  Fortran unit  parameters:
 
    ! Stderr and stdout can be controlled by namelist Record1. 
@@ -151,6 +153,8 @@ MODULE DA_Constants
    INTEGER :: stderr_unit = 0     ! Standard error
    INTEGER :: stdout = 6          ! Standard output
    INTEGER :: stderr = 0          ! Standard error
+
+   ! Do not use unit 10, as that is used by WRF for reading namelist.input
 
    INTEGER, PARAMETER :: jpout = 11           ! Unit number for x output.
    INTEGER, PARAMETER :: stats_unit = 12      ! Unit number for stats output.
@@ -233,7 +237,8 @@ MODULE DA_Constants
 
    REAL               :: ptop
    REAL               :: ps0
-   REAL               :: ts0
+   REAL               :: ts0 = 300.0          ! Base potential temperture
+                                              ! mm5 code may try to change value
    REAL               :: tlp
    REAL               :: tis0
 
@@ -340,7 +345,7 @@ MODULE DA_Constants
  integer       :: seed_array1, seed_array2
  real          :: set_omb_rand_fac ! Scaling factor for random O-B (*sigma_o).
  logical       :: omb_add_noise ! Add random noise to O-Bs if .true.
- INTEGER       :: obs_qc_pointer ! 3dvar uses the obs data with qc >= obs_qc_pointer
+ INTEGER       :: obs_qc_pointer ! wrfvar uses the obs data with qc >= obs_qc_pointer
  INTEGER       :: cv_options
  integer       :: sfc_assi_options     ! Surface assimilation option.
 
@@ -551,7 +556,7 @@ MODULE DA_Constants
  LOGICAL                :: global 
 
 !
-! RTM_INIT setup parameter (read from namelist.3dvar)
+! RTM_INIT setup parameter (read from namelist.wrfvar)
 !
  integer, parameter            :: maxsensor = 30
 

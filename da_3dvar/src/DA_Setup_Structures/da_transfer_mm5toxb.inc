@@ -77,7 +77,6 @@ SUBROUTINE DA_Transfer_MM5ToXb( ix, jy, kz, xp, xb_mm5, xb, xbx )
 
    xb%ptop = xb_mm5%big_header%bhr(2,2)
    xb%ps0  = xb_mm5%big_header%bhr(2,5)
-   xb%ts0  = xb_mm5%big_header%bhr(3,5)
    xb%tlp  = xb_mm5%big_header%bhr(4,5)
    xb%tis0 = xb_mm5%big_header%bhr(5,5)
 

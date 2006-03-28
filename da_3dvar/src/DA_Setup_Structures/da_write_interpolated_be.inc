@@ -25,7 +25,7 @@
 !          b) The moisture control variable depends on "cv_options_hum" setting.
 !             If cv_options_hum = 1, only Q  statistics are written out;
 !             If cv_options_hum = 2, only RH statistics are written out.
-!             When you want to use this interpolated BE file to run 3dvar, you
+!             When you want to use this interpolated BE file to run wrfvar, you
 !             must check if cv_options_hum setting is consistent.
 !
 !

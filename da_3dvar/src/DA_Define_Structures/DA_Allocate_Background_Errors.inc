@@ -2,7 +2,7 @@ SUBROUTINE DA_Allocate_Background_Errors ( jy, kz, l, e, be_eval_loc, &
                                            be_evec_loc, be_sub )
 
 !------------------------------------------------------------------------------
-!  PURPOSE: Allocate components of 3dvar background errors.
+!  PURPOSE: Allocate components of wrfvar background errors.
 !
 !  METHOD:  Allocate component in turn.
 !

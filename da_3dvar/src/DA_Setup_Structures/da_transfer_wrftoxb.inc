@@ -86,7 +86,6 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
 
    ptop = grid%p_top
    ps0  = 100000.0    ! Base sea level pressure
-   ts0  = 300.0       ! Base potential temperature for all levels.
    tis0 = 290.0       ! Base sea level temperature
    tlp  = 50.0        ! temperature difference from 1000mb to 300mb
 
@@ -107,7 +106,6 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
 
    xb % ptop = ptop
    xb % ps0  = ps0
-   xb % ts0  = ts0
    xb % tlp  = tlp
       
 !---------------------------------------------------------------------------

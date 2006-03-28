@@ -75,7 +75,6 @@ subroutine da_minimise( grid, config_flags, &
                            its, ite, jts, jte, kts, kte )
    else
       WRITE( message , * ) &
-           'da_3dvar/src/DA_Minimisation/da_minimise.inc: ', &
            'Invalid minimisation_option =', minimisation_option
       CALL WRF_ERROR_FATAL ( message )
    endif

@@ -283,7 +283,7 @@ echo "Observation Input File:      $DA_OBSERVATIONS"
 
 # Create WRF-Var namelist file:
 
-cat > namelist.3dvar << EOF
+cat > namelist.wrfvar << EOF
 &record1
  MODEL_TYPE       = '$DA_MODEL_TYPE',
  WRITE_INCREMENTS = $DA_WRITE_INCREMENTS,

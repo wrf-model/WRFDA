@@ -83,13 +83,11 @@ SUBROUTINE DA_Transfer_KMAToXb( xbx, grid, &
 
    ptop = 1000.0     
    ps0  = 100000.0
-   ts0  = 300.0
    tis0 = 0.0
    tlp  = 0.0
 
    xb % ptop = ptop
    xb % ps0  = ps0
-   xb % ts0  = ts0
    xb % tlp  = tlp
       
 !---------------------------------------------------------------------------

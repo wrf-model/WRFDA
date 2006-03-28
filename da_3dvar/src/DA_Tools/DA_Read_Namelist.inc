@@ -316,7 +316,7 @@ SUBROUTINE DA_Read_Namelist
 !  [1.0] Open namelist file:
 !----------------------------------------------------------------------------
 
-   namelist_file = 'namelist.WRFVAR'
+   namelist_file = 'namelist.wrfvar'
    WRITE (UNIT=stdout,FMT='(3x,A,A)' ) ' WRFVAR namelist options used are in: ', namelist_file
    IOST = 0
 
