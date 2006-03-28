@@ -8,8 +8,6 @@ if [ "$option" = "wrf" ] ; then
     echo "configure wrf"
 elif [ "$option" = "var" ] ; then
     echo "configure var"
-elif [ "$option" = "4dvar" ] ; then
-    echo "configure var for 4dvar"
 elif [ "$option" = "wrfplus" ] ; then
     echo "configure wrf for 4dvar"
 elif [ "$option" = "be" ] ; then
@@ -17,7 +15,6 @@ elif [ "$option" = "be" ] ; then
 else
    echo "Please type : <configure wrf> to compile wrf,"
    echo "    or type : <configure var> to compile var."
-   echo "    or type : <configure 4dvar> to compile var for 4dvar."
    echo "    or type : <configure wrfplus> to compile wrf for 4dvar."
    echo "    or type : <configure be> to compile be."
    exit
@@ -120,7 +117,7 @@ fi
 
 # Look for RTTOV for VAR radiances. Only needed for satellite radiances
 
-if [ "$option" = "var" -o "$option" = "4dvar" ] ; then
+if [ "$option" = "var" ] ; then
   if test -z "$RTTOV" ; then
     for p in /usr/local/rttov; do
       if test -d $p; then
@@ -270,7 +267,7 @@ else
   echo "PHDF5 not set in environment. Will configure WRF for use without."
 fi
 
-if [ "$option" = "var" -o "$option" = "4dvar" ] ; then
+if [ "$option" = "var" ] ; then
   if [ -n "$RTTOV" ] ; then
     echo "Will use RTTOV in dir: $RTTOV"
   else
