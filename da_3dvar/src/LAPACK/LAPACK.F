@@ -24,39 +24,39 @@
 
       CONTAINS
 
-         INCLUDE 'dlae2.inc'
-         INCLUDE 'dlaev2.inc'
-         INCLUDE 'dlamc1.inc'
-         INCLUDE 'dlamc2.inc'
-         INCLUDE 'dlamc3.inc'
-         INCLUDE 'dlamc4.inc'
-         INCLUDE 'dlamc5.inc'
-         INCLUDE 'dlamch.inc'
-         INCLUDE 'dlanst.inc'
-         INCLUDE 'dlansy.inc'
-         INCLUDE 'dlapy2.inc'
-         INCLUDE 'dlarf.inc'
-         INCLUDE 'dlarfb.inc'
-         INCLUDE 'dlarfg.inc'
-         INCLUDE 'dlarft.inc'
-         INCLUDE 'dlartg.inc'
-         INCLUDE 'dlascl.inc'
-         INCLUDE 'dlaset.inc'
-         INCLUDE 'dlasr.inc'
-         INCLUDE 'dlasrt.inc'
-         INCLUDE 'dlassq.inc'
-         INCLUDE 'dlatrd.inc'
-         INCLUDE 'dorg2l.inc'
-         INCLUDE 'dorg2r.inc'
-         INCLUDE 'dorgql.inc'
-         INCLUDE 'dorgqr.inc'
-         INCLUDE 'dorgtr.inc'
-         INCLUDE 'dsteqr.inc'
-         INCLUDE 'dsterf.inc'
-         INCLUDE 'dsyev.inc'
-         INCLUDE 'dsytd2.inc'
-         INCLUDE 'dsytrd.inc'
-         INCLUDE 'ieeeck.inc'
-         INCLUDE 'ilaenv.inc'
+#include <dlae2.inc>
+#include <dlaev2.inc>
+#include <dlamc1.inc>
+#include <dlamc2.inc>
+#include <dlamc3.inc>
+#include <dlamc4.inc>
+#include <dlamc5.inc>
+#include <dlamch.inc>
+#include <dlanst.inc>
+#include <dlansy.inc>
+#include <dlapy2.inc>
+#include <dlarf.inc>
+#include <dlarfb.inc>
+#include <dlarfg.inc>
+#include <dlarft.inc>
+#include <dlartg.inc>
+#include <dlascl.inc>
+#include <dlaset.inc>
+#include <dlasr.inc>
+#include <dlasrt.inc>
+#include <dlassq.inc>
+#include <dlatrd.inc>
+#include <dorg2l.inc>
+#include <dorg2r.inc>
+#include <dorgql.inc>
+#include <dorgqr.inc>
+#include <dorgtr.inc>
+#include <dsteqr.inc>
+#include <dsterf.inc>
+#include <dsyev.inc>
+#include <dsytd2.inc>
+#include <dsytrd.inc>
+#include <ieeeck.inc>
+#include <ilaenv.inc>
 
       END MODULE LAPACK
