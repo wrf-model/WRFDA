@@ -19,22 +19,22 @@
 
       CONTAINS
 
-         INCLUDE 'daxpy.inc'
-         INCLUDE 'dcopy.inc'
-         INCLUDE 'ddot.inc'
-         INCLUDE 'dgemm.inc'
-         INCLUDE 'dgemv.inc'
-         INCLUDE 'dger.inc'
-         INCLUDE 'dnrm2.inc'
-         INCLUDE 'dscal.inc'
-         INCLUDE 'dswap.inc'
-         INCLUDE 'dsymv.inc'
-         INCLUDE 'dsyr2.inc'
-         INCLUDE 'dsyr2k.inc'
-         INCLUDE 'dtrmm.inc'
-         INCLUDE 'dtrmv.inc'
-         INCLUDE 'lsame.inc'
-         INCLUDE 'xerbla.inc'
+#include <daxpy.inc>
+#include <dcopy.inc>
+#include <ddot.inc>
+#include <dgemm.inc>
+#include <dgemv.inc>
+#include <dger.inc>
+#include <dnrm2.inc>
+#include <dscal.inc>
+#include <dswap.inc>
+#include <dsymv.inc>
+#include <dsyr2.inc>
+#include <dsyr2k.inc>
+#include <dtrmm.inc>
+#include <dtrmv.inc>
+#include <lsame.inc>
+#include <xerbla.inc>
 
       END MODULE BLAS
 
