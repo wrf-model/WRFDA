@@ -29,10 +29,12 @@
 
 export MP_SHARED_MEMORY=yes
 
- echo ""
- echo "Running script DA_Run_WRF-Var.bsh"
- echo "---------------------------------"
- echo ""
+echo ""
+echo "Running script DA_Run_WRF-Var.bsh"
+echo "---------------------------------"
+echo ""
+
+date
 
 #-----------------------------------------------------------------------
 # USER: Define non-default job via environment variables: 
@@ -124,15 +126,15 @@ export DA_USE_SSMITBOBS=${DA_USE_SSMITBOBS:-.FALSE.}       # Assimilate this obs
 export DA_USE_SSMT1OBS=${DA_USE_SSMT1OBS:-.FALSE.}         # Assimilate this observation type.
 export DA_USE_SSMT2OBS=${DA_USE_SSMT2OBS:-.FALSE.}         # Assimilate this observation type.
 export DA_USE_QSCATOBS=${DA_USE_QSCATOBS:-.TRUE.}          # Assimilate this observation type.
-export DA_USE_HIRS2OBS=${DA_USE_HIRS2OBS:-.TRUE.}
-export DA_USE_HIRS3OBS=${DA_USE_HIRS3OBS:-.TRUE.}
-export DA_USE_MSUOBS=${DA_USE_MSUOBS:-.TRUE.}
-export DA_USE_AMSUAOBS=${DA_USE_AMSUAOBS:-.TRUE.}
-export DA_USE_AMSUBOBS=${DA_USE_AMSUBOBS:-.TRUE.}
-export DA_USE_AIRSOBS=${DA_USE_AIRSOBS:-.TRUE.}
-export DA_USE_EOS_AMSUAOBS=${DA_USE_EOS_AMSUAOBS:-.TRUE.}
-export DA_USE_EOS_RADOBS=${DA_USE_EOS_RADOBS:-.TRUE.}
-export DA_USE_HSBOBS=${DA_USE_HSBOBS:-.TRUE.}
+export DA_USE_HIRS2OBS=${DA_USE_HIRS2OBS:-.FALSE.}
+export DA_USE_HIRS3OBS=${DA_USE_HIRS3OBS:-.FALSE.}
+export DA_USE_MSUOBS=${DA_USE_MSUOBS:-.FALSE.}
+export DA_USE_AMSUAOBS=${DA_USE_AMSUAOBS:-.FALSE.}
+export DA_USE_AMSUBOBS=${DA_USE_AMSUBOBS:-.FALSE.}
+export DA_USE_AIRSOBS=${DA_USE_AIRSOBS:-.FALSE.}
+export DA_USE_EOS_AMSUAOBS=${DA_USE_EOS_AMSUAOBS:-.FALSE.}
+export DA_USE_EOS_RADOBS=${DA_USE_EOS_RADOBS:-.FALSE.}
+export DA_USE_HSBOBS=${DA_USE_HSBOBS:-.FALSE.}
 export DA_CHECK_MAX_IV=${DA_CHECK_MAX_IV:-.TRUE.}           # Perform O-B > 5sigma_o QC if true.
 export DA_MAX_EXT_ITS=${DA_MAX_EXT_ITS:-1}                  # Maximum number of "WRF-Var outer loops".
 export DA_EPS=${DA_EPS:-1.E-02, 1.E-02, 1.E-02, 1.E-02, 1.E-02, 1.E-02, 1.E-02,} # Convergence criteria.
@@ -268,9 +270,16 @@ cp $WRFVAR_DIR/run/gribmap.txt .
 cp $WRFVAR_DIR/run/LANDUSE.TBL .
 cp $BUILD_DIR/wrfvar.exe  wrfvar.exe
 
+
 ln -sf $DA_FIRST_GUESS		wrfvar_input
 ln -sf $DA_BACK_ERRORS		fort.3${DA_CV_OPTIONS}
 ln -sf $DA_OBSERVATIONS	fort.9${DA_OB_FORMAT}
+ln -sf $DAT_DIR/*.bias .
+ln -sf $DAT_DIR/*.bufr .
+
+# JRB support old code
+ln -sf wrfvar_input wrf_3dvar_input # JRB
+ln -sf namelist.wrfvar namelist.3dvar # JRB
 
 if test -r $DA_SSMI; then
   ln -sf $DA_SSMI	fort.93
@@ -387,11 +396,11 @@ cat > namelist.wrfvar << EOF
  cv_options          = $DA_CV_OPTIONS,
  cv_options_hum      = $DA_CV_OPTIONS_HUM,
  check_rh            = $DA_CHECK_RH,
- as1                 = $DA_as1,
- as2                 = $DA_as2,
- as3                 = $DA_as3,
- as4                 = $DA_as4,
- as5                 = $DA_as5,
+ as1                 = $DA_AS1,
+ as2                 = $DA_AS2,
+ as3                 = $DA_AS3,
+ as4                 = $DA_AS4,
+ as5                 = $DA_AS5,
  sfc_assi_options    = $DA_SFC_ASSI_OPTIONS,
  set_omb_rand_fac    = $DA_SET_OMB_RAND_FAC,
  seed_array1         = $DA_SEED_ARRAY1,
@@ -412,7 +421,7 @@ cat > namelist.wrfvar << EOF
 
 &record14
  rtminit_print       = $DA_RTMINIT_PRINT,
- rtminit_nsensor     = $DA_RTMINIT_NSENSOR2,
+ rtminit_nsensor     = $DA_RTMINIT_NSENSOR,
  rtminit_platform    = $DA_RTMINIT_PLATFORM,
  rtminit_satid       = $DA_RTMINIT_SATID,
  rtminit_sensor      = $DA_RTMINIT_SENSOR,
@@ -534,7 +543,6 @@ cat > namelist.input << EOF
  emdiv                               = 0.01,   0.01,   0.01,
  epssm                               = 0.1,    0.1,    0.1,
  non_hydrostatic                     = .true., .true., .true.,
- time_step_sound                     = 4,      4,      4,
  h_mom_adv_order                     = 5,      5,      5,
  v_mom_adv_order                     = 3,      3,      3,
  h_sca_adv_order                     = 5,      5,      5,
@@ -577,7 +585,7 @@ if test $PLATFORM == "Linux"; then
     mpirun -v -np $NUM_PROCS -nolocal -machinefile $HOSTS ./wrfvar.exe
   else
 #    mpirun -v -np 1 ./wrfvar.exe > /dev/null #Assumes compile in DM mode.
-    ./wrfvar.exe
+    ./wrfvar.exe > wrfvar.out 2>wrfvar.error
   fi
 fi
 
@@ -586,13 +594,13 @@ if test $PLATFORM == "Darwin"; then
 fi
 
 #DEC:
-#./wrfvar.exe > wrfvar.out
+#./wrfvar.exe > wrfvar.out 2>wrfvar.error
 
 if test $PLATFORM == "AIX"; then
   #IBM (llsubmit):
   #poe ./wrfvar.exe
   #mpirun -np ${NUM_PROCS} ./wrfvar.exe
-  ./wrfvar.exe > wrfvar.out
+  ./wrfvar.exe > wrfvar.out 2>wrfvar.error
 fi
 
 cp fort.12 statistics
@@ -600,5 +608,6 @@ cp fort.81 cost_fn
 cp fort.82 grad_fn
 
 echo "WRF-Var completed"
+date
 
 exit 0
