@@ -142,8 +142,8 @@ MODULE DA_Constants
    REAL, PARAMETER    :: inv_typ_vp4_sumsq = 10000.0 ! 1/SUM(q**2)
    REAL, PARAMETER    :: inv_typ_vp5_sumsq = 0.00001 ! 1/SUM(?**2)
 
-   CHARACTER(LEN=*),PARAMETER :: wrfvar_version = "WRFVAR V2.2.0.0"
-   CHARACTER(LEN=*),PARAMETER :: wrf_version    = "WRFVAR V2.0.3.1"
+   CHARACTER(LEN=*),PARAMETER :: wrfvar_version = "WRFVAR V2.1.2"
+   CHARACTER(LEN=*),PARAMETER :: wrf_version    = "WRF V2.1.2"
 
 !  Fortran unit  parameters:
 
