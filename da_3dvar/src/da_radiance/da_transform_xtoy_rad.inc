@@ -137,7 +137,7 @@ SUBROUTINE da_transform_xtoy_rad ( xa, iv, xp, y )
                              i, j, dx, dy, dxm, dym, &
                              model_psfc )
 
-         model_psfc = model_psfc/100.0  ! convert to hPa 
+         model_psfc = 0.01*model_psfc  ! convert to hPa 
 
         do iprof = 1, nprofiles
 
@@ -200,11 +200,7 @@ SUBROUTINE da_transform_xtoy_rad ( xa, iv, xp, y )
 !------------------------------------------------------------------------
 
          do k = 1, nchanl
-          if ( iv%instid(inst)%rad(n)%tb(k)%inv > missing_r ) then 
             y%instid(inst)%rad(n)%tb(k) = tb(nprofiles,k)
-          else
-            y%instid(inst)%rad(n)%tb(k) = missing_r
-          end if
          end do
                
        end if   !  end endif for within_halo
