@@ -67,7 +67,7 @@ gen_be_diags_read : gen_be_diags_read.o
 
 gen_be_stage0_wrf.o: 
 	$(RM) $@
-	$(FC) -c $(FCFORM) $(FCTYPE) -I${NETCDF}/include gen_be_stage0_wrf.F
+	$(FC) -c $(FCFORM) $(FCTYPE) $(MODULE_DIRS) -I${NETCDF}/include gen_be_stage0_wrf.F
 
 gen_be_stage1.o:
 	$(RM) $@
