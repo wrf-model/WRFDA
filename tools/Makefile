@@ -21,11 +21,14 @@ clean:
 gen_comms.c : gen_comms.stub
 	/bin/cp gen_comms.stub gen_comms.c
 
-bufr_little_endian.exe : bufr_little_endian.f
+bufr_little_endian.exe : bufr_little_endian.o
 			$(RM) $@
-			$(FC) -o bufr_little_endian.exe bufr_little_endian.f $(DA_SRC)/da_bufrlib.o \
-                          $(DA_SRC)/bort_exit.o $(DA_SRC)/restd.o \
-                          $(DA_SRC)/wrdesc.o
+			$(FC) -o bufr_little_endian.exe bufr_little_endian.o $(DA_SRC)/da_bufrlib.o \
+                          $(DA_SRC)/bort_exit.o $(DA_SRC)/restd.o $(DA_SRC)/wrdesc.o
+
+bufr_little_endian.o : $(DA_SRC)/bort_exit.o $(DA_SRC)/restd.o $(DA_SRC)/wrdesc.o $(DA_SRC)/da_bufrlib.o
+			$(CPP) $(CPPFLAGS) bufr_little_endian.F > bufr_little_endian.f
+			$(FC) -c $(F77FLAGS_ENDIAN) bufr_little_endian.f
 
 
 # regenerate this list with "makedepend -Y *.c"
