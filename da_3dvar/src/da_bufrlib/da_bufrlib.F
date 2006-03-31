@@ -481,7 +481,9 @@ C$$$
       PRINT*,STR2
       PRINT*,'**************BUFR ARCHIVE LIBRARY ABORT*****************'
       PRINT*
-      CALL BORT_EXIT
+C     USE WRF abort routine
+C      CALL BORT_EXIT
+      CALL wrf_abort
       END
       SUBROUTINE BORT(STR)
 
@@ -564,7 +566,9 @@ C$$$
       PRINT*,STR
       PRINT*,'**************BUFR ARCHIVE LIBRARY ABORT*****************'
       PRINT*
-      CALL BORT_EXIT
+C     USE WRF abort routine
+C      CALL BORT_EXIT
+      CALL wrf_abort
       END
 	SUBROUTINE CADN30( IDN, ADN )
 
