@@ -63,6 +63,7 @@ SUBROUTINE DA_Read_Namelist
                        use_Eos_amsuaObs, &
                        use_Eos_radObs, &
                        use_HsbObs, &
+                       use_kma1dvar, &
                        check_max_iv, &
                        use_obs_errfac, &
                        put_rand_seed, &
@@ -112,7 +113,6 @@ SUBROUTINE DA_Read_Namelist
                        max_vert_var3, max_vert_var4, max_vert_var5
    NAMELIST /RECORD14/ rtminit_print, rtminit_nsensor, &
                        rtminit_platform,rtminit_satid, rtminit_sensor,  &
-                       use_kma1dvar,  &
                        lmonitoring,lread_biascoef,lbiascorr, lrttov_scatt, &
                        lwrite_iv,lwrite_profile,use_landem, mw_emis_sea
    NAMELIST /pseudo_ob_nl/ num_pseudo, pseudo_x, pseudo_y, pseudo_z, &
@@ -438,7 +438,7 @@ SUBROUTINE DA_Read_Namelist
 
   IF (use_Hirs2Obs .OR. use_Hirs3Obs .OR. use_MsuObs .OR. use_AmsuaObs .OR. &
       use_AmsubObs .OR. use_AirsObs .OR. use_Eos_AmsuaObs .OR. &
-      use_Eos_RadObs .OR. use_HsbObs) THEN
+      use_Eos_RadObs .OR. use_HsbObs .OR. use_kma1dvar) THEN
     use_radiance = .TRUE.
   ELSE
     use_radiance = .FALSE.

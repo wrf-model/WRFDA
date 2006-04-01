@@ -425,6 +425,8 @@
 
         end do
 
+      if (.not. use_kma1dvar) then
+
 !        [1.3] Call RTM foreward model
 
          !print *, n, iv%instid(inst)%rad(n)%info%lat,iv%instid(inst)%rad(n)%info%lon
@@ -433,11 +435,6 @@
                              nfrequencies, nchannels, nbtout, &
                              con_vars, aux_vars, &
                              tb, calcemis, pemsv, pemsh, emissivity )
-
-       do iprof = 1, nprofiles
-         deallocate (con_vars(iprof) % t)
-         deallocate (con_vars(iprof) % q)
-       end do
 
 !------------------------------------------------------------------------
 !        [2.0] calculate components of innovation vector:
@@ -454,12 +451,6 @@
           end if
          end do
                
-    if (coefs(inst)%id_sensor == 2) then ! microwave
-         iv%instid(inst)%rad(n)%emiss(1:nchanl) = pems5(1:nchanl)
-    else
-         iv%instid(inst)%rad(n)%emiss(1:nchanl) = emissivity(1:nchanl)
-    end if
-
 !------------------------------------------------------------------------
 !        [3.0] Apply Bias Correction 
 !------------------------------------------------------------------------
@@ -475,6 +466,19 @@
             call da_qc_rad(inst,nchanl,  &
                            ob%instid(inst)%rad(n)%tb, &
                            iv%instid(inst)%rad(n) )
+
+       end if   ! end if .not. use_kma1dvar
+
+          if (coefs(inst)%id_sensor == 2) then ! microwave
+             iv%instid(inst)%rad(n)%emiss(1:nchanl) = pems5(1:nchanl)
+          else
+             iv%instid(inst)%rad(n)%emiss(1:nchanl) = emissivity(1:nchanl)
+          end if
+
+          do iprof = 1, nprofiles
+             deallocate (con_vars(iprof) % t)
+             deallocate (con_vars(iprof) % q)
+          end do
 
        end if   !  end endif for within_halo
 

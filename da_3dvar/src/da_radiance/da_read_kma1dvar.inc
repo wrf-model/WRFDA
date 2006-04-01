@@ -16,7 +16,7 @@ subroutine da_read_kma1dvar (inst,iv, ob, xp, inunit, infile)
 
 ! subroutine argument
   integer           ,  intent (in)    :: inst
-  character(20)     ,  intent (in)    :: infile
+  character(200)    ,  intent (in)    :: infile
   integer           ,  intent (in)    :: inunit
   type (xpose_type) ,  intent (in)    :: xp
   type (y_type)     ,  intent (inout) :: ob
@@ -51,6 +51,8 @@ subroutine da_read_kma1dvar (inst,iv, ob, xp, inunit, infile)
 
 !**************************************************************************
 ! Initialize variables
+
+  call init_constants_derived
 
   nchanl = iv%instid(inst)%nchan
 
@@ -127,7 +129,7 @@ subroutine da_read_kma1dvar (inst,iv, ob, xp, inunit, infile)
    p%rad%loc              = loc
    p%rad%landsea_mask     = landsea_mask
    p%rad%scanpos          = scanpos
-   p%rad%satzen           = satzen
+   p%rad%satzen           = abs(satzen)
    p%rad%satazi           = missing_r
    p%rad%solzen           = missing_r
    p%rad%tb(1:nchanl)%inv = inv(1:nchanl)
