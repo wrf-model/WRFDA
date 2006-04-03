@@ -325,7 +325,7 @@ SUBROUTINE DA_Read_Namelist
           FORM   = 'FORMATTED', ACTION = 'READ', &
           IOSTAT = IOST )
      IF (iost /= 0) THEN
-       CALL wrf_error_fatal3(__FILE__,__LINE__, &
+       CALL wrf_error_fatal( &
          "ERROR OPENING NAMELIST FILE "//TRIM (namelist_file))
      END IF
 
@@ -336,7 +336,7 @@ SUBROUTINE DA_Read_Namelist
 
    READ  ( UNIT = namelist_unit, NML = RECORD1 , IOSTAT = IOST)
    IF (iost /= 0) THEN
-     CALL wrf_error_fatal3(__FILE__,__LINE__, &
+     CALL wrf_error_fatal( &
        "ERROR READING NAMELIST FILE "//TRIM (namelist_file))
    ENDIF
 
@@ -355,7 +355,7 @@ SUBROUTINE DA_Read_Namelist
 
    READ  ( UNIT = namelist_unit, NML = RECORD2 , IOSTAT = IOST)
    IF (iost /= 0) THEN
-     CALL wrf_error_fatal3(__FILE__,__LINE__, &
+     CALL wrf_error_fatal( &
        "ERROR READING NAMELIST FILE "//TRIM (namelist_file))
    ENDIF
 
@@ -368,7 +368,7 @@ SUBROUTINE DA_Read_Namelist
 
    READ  ( UNIT = namelist_unit, NML = RECORD3 , IOSTAT = IOST)
    IF (iost /= 0) THEN
-     CALL wrf_error_fatal3(__FILE__,__LINE__, &
+     CALL wrf_error_fatal( &
        "ERROR READING NAMELIST FILE "//TRIM (namelist_file))
    ENDIF
 
@@ -379,7 +379,7 @@ SUBROUTINE DA_Read_Namelist
 
    READ  ( UNIT = namelist_unit, NML = RECORD4 , IOSTAT = IOST)
    IF (iost /= 0) THEN
-     CALL wrf_error_fatal3(__FILE__,__LINE__, &
+     CALL wrf_error_fatal( &
        "ERROR READING NAMELIST FILE "//TRIM (namelist_file))
    ENDIF
    
@@ -447,7 +447,7 @@ SUBROUTINE DA_Read_Namelist
 
    READ  ( UNIT = namelist_unit, NML = RECORD5 , IOSTAT = IOST)
    IF (iost /= 0) THEN
-     CALL wrf_error_fatal3(__FILE__,__LINE__, &
+     CALL wrf_error_fatal( &
        "ERROR READING NAMELIST FILE "//TRIM (namelist_file))
    ENDIF
    
@@ -457,7 +457,7 @@ SUBROUTINE DA_Read_Namelist
    
    READ  ( UNIT = namelist_unit, NML = RECORD6 , IOSTAT = IOST)
    IF (iost /= 0) THEN
-     CALL wrf_error_fatal3(__FILE__,__LINE__, &
+     CALL wrf_error_fatal( &
        "ERROR READING NAMELIST FILE "//TRIM (namelist_file))
    ENDIF
    
@@ -472,7 +472,7 @@ SUBROUTINE DA_Read_Namelist
    
    READ  ( UNIT = namelist_unit, NML = RECORD7 , IOSTAT = IOST)
    IF (iost /= 0) THEN
-     CALL wrf_error_fatal3(__FILE__,__LINE__, &
+     CALL wrf_error_fatal( &
        "ERROR READING NAMELIST FILE "//TRIM (namelist_file))
    ENDIF
    
@@ -492,7 +492,7 @@ SUBROUTINE DA_Read_Namelist
    
    READ  ( UNIT = namelist_unit, NML = RECORD8 , IOSTAT = IOST)
    IF (iost /= 0) THEN
-     CALL wrf_error_fatal3(__FILE__,__LINE__, &
+     CALL wrf_error_fatal( &
        "ERROR READING NAMELIST FILE "//TRIM (namelist_file))
    ENDIF
    
@@ -502,7 +502,7 @@ SUBROUTINE DA_Read_Namelist
    
    READ  ( UNIT = namelist_unit, NML = RECORD10, IOSTAT = IOST)
    IF (iost /= 0) THEN
-     CALL wrf_error_fatal3(__FILE__,__LINE__, &
+     CALL wrf_error_fatal( &
        "ERROR READING NAMELIST FILE "//TRIM (namelist_file))
    ENDIF
    
@@ -532,7 +532,7 @@ SUBROUTINE DA_Read_Namelist
    
    READ  ( UNIT = namelist_unit, NML = RECORD11, IOSTAT = IOST)
    IF (iost /= 0) THEN
-     CALL wrf_error_fatal3(__FILE__,__LINE__, &
+     CALL wrf_error_fatal( &
        "ERROR READING NAMELIST FILE "//TRIM (namelist_file))
    ENDIF
    
@@ -558,7 +558,7 @@ SUBROUTINE DA_Read_Namelist
    
    READ  ( UNIT = namelist_unit, NML = RECORD12, IOSTAT = IOST)
    IF (iost /= 0) THEN
-     CALL wrf_error_fatal3(__FILE__,__LINE__, &
+     CALL wrf_error_fatal( &
        "ERROR READING NAMELIST FILE "//TRIM (namelist_file))
    ENDIF
    
@@ -568,7 +568,7 @@ SUBROUTINE DA_Read_Namelist
    
    READ  ( UNIT = namelist_unit, NML = RECORD13, IOSTAT = IOST)
    IF (iost /= 0) THEN
-     CALL wrf_error_fatal3(__FILE__,__LINE__, &
+     CALL wrf_error_fatal( &
        "ERROR READING NAMELIST FILE "//TRIM (namelist_file))
    ENDIF
    
@@ -585,7 +585,7 @@ SUBROUTINE DA_Read_Namelist
 
    READ  ( UNIT = namelist_unit, NML = RECORD14, IOSTAT = IOST)
    IF (iost /= 0) THEN
-     CALL wrf_error_fatal3(__FILE__,__LINE__, &
+     CALL wrf_error_fatal( &
        "ERROR READING NAMELIST FILE "//TRIM (namelist_file))
    ENDIF
    if ( print_detail >= 1 ) then
@@ -598,7 +598,7 @@ SUBROUTINE DA_Read_Namelist
    
    READ  ( UNIT = namelist_unit, NML = pseudo_ob_nl, IOSTAT = IOST)
    IF (iost /= 0) THEN
-     CALL wrf_error_fatal3(__FILE__,__LINE__, &
+     CALL wrf_error_fatal( &
        "ERROR READING NAMELIST FILE "//TRIM (namelist_file))
    ENDIF
 
@@ -665,19 +665,19 @@ SUBROUTINE DA_Read_Namelist
    IF ( cv_options < 1 .OR. cv_options > 5 ) THEN
      WRITE(UNIT=errmsg(1),FMT='(A,I3)') &
        'Invalid cv_options = ', cv_options
-     CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
+     CALL wrf_error_fatal(errmsg(1))
    END IF
    
    IF ( cv_options_hum < 1 .OR. cv_options_hum > 3 ) THEN
      WRITE(UNIT=errmsg(1),FMT='(A,I3)') &
        'Invalid cv_options_hum = ', cv_options_hum
-     CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
+     CALL wrf_error_fatal(errmsg(1))
    END IF
 
    IF ( sfc_assi_options < 1 .OR. sfc_assi_options > 2 ) THEN
      WRITE(UNIT=errmsg(1),FMT='(A,I3)') &
        'Invalid sfc_assi_option = ', sfc_assi_options
-     CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
+     CALL wrf_error_fatal(errmsg(1))
    END IF
 
    IF (Use_SsmiRetrievalObs .OR. Use_SsmiTbObs) THEN
@@ -702,7 +702,7 @@ SUBROUTINE DA_Read_Namelist
    
    IF ( cv_options == 1 ) THEN
       IF ( cv_options_hum == 2 ) THEN
-         CALL wrf_error_fatal3(__FILE__,__LINE__, &
+         CALL wrf_error_fatal( &
            "Can only have cv_option_hum=2 with cv_option=2.")
       END IF
    
