@@ -27,6 +27,8 @@
 #PBS -lnodes=4:comp -lwalltime=1000
 #Uncomment for JET: source /usr/local/bin/setup-mpi.csh
 
+PLATFORM=`uname`
+
 export MP_SHARED_MEMORY=yes
 
 echo ""
@@ -270,14 +272,49 @@ ln -s $DA_RTTOV_COEFFS/* .
 
 cp $WRFVAR_DIR/run/gribmap.txt .
 cp $WRFVAR_DIR/run/LANDUSE.TBL .
+cp $WRFVAR_DIR/run/gmao_airs_bufr.tbl .
 cp $BUILD_DIR/wrfvar.exe  wrfvar.exe
 
 
-ln -sf $DA_FIRST_GUESS		wrfvar_input
-ln -sf $DA_BACK_ERRORS		fort.3${DA_CV_OPTIONS}
-ln -sf $DA_OBSERVATIONS	fort.9${DA_OB_FORMAT}
-ln -sf $DAT_DIR/*.bias .
-ln -sf $DAT_DIR/*.bufr .
+ln -sf $DA_FIRST_GUESS	 wrfvar_input
+ln -sf $DA_BACK_ERRORS   fort.3${DA_CV_OPTIONS}
+ln -sf $DA_OBSERVATIONS	 fort.9${DA_OB_FORMAT}
+
+for FILE in $DAT_DIR/*.inv; do
+  if test -f $FILE; then
+    ln -s $FILE .
+  fi
+done
+
+for FILE in $DAT_DIR/*.bias; do
+  if test -f $FILE; then
+    ln -s $FILE .
+  fi
+done
+
+# Link to bufr files, picking which endian type when a
+# choice is available
+
+for FILE in $DAT_DIR/*.bufr; do
+  if test -f $FILE; then
+    ln -s $FILE .
+  fi
+done
+
+if test $PLATFORM == "Linux"; then
+  ENDIAN=little_endian
+fi
+
+if test $PLATFORM == "Darwin" -o $PLATFORM == "AIX"; then
+  ENDIAN=big_endian
+fi
+
+for FILE in $DAT_DIR/*.$ENDIAN; do 
+  if test -f $FILE; then
+    FILE1=`basename $FILE`
+    ln -sf $FILE ${FILE1%%.$ENDIAN}
+  fi
+done
 
 # JRB support old code
 ln -sf wrfvar_input wrf_3dvar_input # JRB
@@ -580,8 +617,6 @@ EOF
 #Run WRF-Var:
 #-------------------------------------------------------------------
 
-PLATFORM=`uname`
-
 if test $PLATFORM == "Linux"; then
   if test $NUM_PROCS -gt 1; then
     mpirun -v -np $NUM_PROCS -nolocal -machinefile $HOSTS ./wrfvar.exe
@@ -592,7 +627,7 @@ if test $PLATFORM == "Linux"; then
 fi
 
 if test $PLATFORM == "Darwin"; then
-  ./wrfvar.exe
+  ./wrfvar.exe > wrfvar.out 2>wrfvar.error
 fi
 
 #DEC:
