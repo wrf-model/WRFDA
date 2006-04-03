@@ -63,8 +63,10 @@ export DAT_DIR=${DAT_DIR:-/data4/dmbarker/data/amps1}
 export RUN_DIR=${RUN_DIR:-$DAT_DIR}
 export HOSTS=${HOSTS:-$PWD/hosts}
 
+echo "test: " $test
 if test ! -d $RUN_DIR; then
-  mkdir $RUN_DIR
+echo "Now making RUN_ID"
+  mkdir  $RUN_DIR
 fi
 
 export DA_FIRST_GUESS=${DA_FIRST_GUESS:-$DAT_DIR/wrfinput_d01}    # wrfvar "first guess" input.
@@ -341,6 +343,7 @@ cat > namelist.wrfvar << EOF
  use_Eos_AmsuaObs = $DA_USE_EOS_AMSUAOBS,
  use_Eos_RadObs   = $DA_USE_EOS_RADOBS,
  use_HsbObs       = $DA_USE_HSBOBS,
+ use_kma1dvar     = $DA_USE_KMA1DVAR,
  use_radarobs     = $DA_USE_RADAROBS,
  Use_Radar_rv     = $DA_USE_RADAR_RV,
  Use_Radar_rf     = $DA_USE_RADAR_RF,
@@ -425,7 +428,6 @@ cat > namelist.wrfvar << EOF
  rtminit_platform    = $DA_RTMINIT_PLATFORM,
  rtminit_satid       = $DA_RTMINIT_SATID,
  rtminit_sensor      = $DA_RTMINIT_SENSOR,
- use_kma1dvar        = $DA_USE_KMA1DVAR,
  lmonitoring         = $DA_LMONITORING,
  lread_biascoef      = $DA_LREAD_BIASCOEF,
  lbiascorr           = $DA_LBIASCORR,
