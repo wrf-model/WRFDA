@@ -23,6 +23,8 @@ MODULE module_wrfvar_top
   USE module_wrf_3dvar_io
   USE module_wrf_3dvar_interface
 
+  USE DA_Constants
+
   IMPLICIT NONE
 
   REAL    :: time
@@ -78,7 +80,7 @@ CONTAINS
 !
 !</DESCRIPTION>
 
-  program_name = "WRFVAR V2.1.0.0 MODEL"
+  program_name = wrfvar_version//" (COMPATIBLE WITH "//wrf_version//") MODEL"
 
   ! Initialize WRF modules:  
   ! Phase 1 returns after MPI_INIT() (if it is called)
@@ -89,6 +91,8 @@ CONTAINS
   ENDIF
   ! Phase 2 resumes after MPI_INIT() (if it is called)
   CALL init_modules(2)
+
+  CALL start_timing ! end_timing call in wrfvar_finalize
 
 !<DESCRIPTION>
 ! The wrf namelist.input file is read and stored in the USE associated
@@ -281,6 +285,8 @@ CONTAINS
   END IF
 
   CALL wrf_debug (   0 , 'wrfvar: SUCCESS COMPLETE WRFVAR' )
+
+  CALL end_timing ("wrfvar overall") ! start call in wrfvar_init
 
   IF ( .NOT. PRESENT( no_shutdown ) ) THEN
     ! Finalize time manager
