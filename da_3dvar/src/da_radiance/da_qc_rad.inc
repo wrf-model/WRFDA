@@ -9,6 +9,8 @@ SUBROUTINE da_qc_rad ( inst, nchan, tb_ob, iv )
 !
 !------------------------------------------------------------------------------
 
+   USE module_wrf_error
+
    IMPLICIT NONE
 
    INTEGER, INTENT(IN)             :: inst       ! sensor index.
@@ -64,8 +66,9 @@ SUBROUTINE da_qc_rad ( inst, nchan, tb_ob, iv )
       WRITE(UNIT=stderr,FMT='(A)') 'QC Not impemented for MSU'
 
    else
-     CALL wrf_error_fatal3(__FILE__,__LINE__, &
-       'Unrecognized Instrument')
+     WRITE(UNIT=errmsg(1),FMT='(A,A)') &
+       "Unrecognized Instrument",TRIM(inst_name(rtminit_sensor(inst)))
+     CALL wrf_error_fatal(errmsg(1))
    end if
 
    return
