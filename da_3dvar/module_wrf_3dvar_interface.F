@@ -84,8 +84,6 @@ CONTAINS
   em33             = grid%em33
 #endif
 
-  write(unit=0, fmt='(3a,i6)') 'before CALL solve_v3d:', __FILE__, ', line:', __LINE__
-
   CALL solve_v3d ( grid , config_flags , &
 #include <em_actual_args.inc>
     )
