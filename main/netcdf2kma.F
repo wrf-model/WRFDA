@@ -37,6 +37,14 @@ PROGRAM netcdf2kma
 
    CHARACTER (LEN=80)      :: message
 
+   INTERFACE
+     SUBROUTINE Setup_Timekeeping( grid )
+      USE module_domain
+      TYPE(domain), POINTER :: grid
+     END SUBROUTINE Setup_Timekeeping
+   END INTERFACE
+
+
 !--Define the name of this program (program_name defined in module_domain)
 
    program_name = "NETCDF2KMA"
@@ -84,7 +92,7 @@ PROGRAM netcdf2kma
    CALL       wrf_debug ( 100 , 'wrf: calling set_scalar_indices_from_config ' )
    CALL set_scalar_indices_from_config ( head_grid%id , idum1, idum2 )
    CALL       wrf_debug ( 100 , 'wrf: calling init_wrfio' )
-
+   CALL Setup_Timekeeping ( head_grid )
    if(config_flags%real_data_init_type == 1 .or. &
       config_flags%real_data_init_type == 3) then
      CALL init_wrfio

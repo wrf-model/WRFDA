@@ -37,6 +37,13 @@ PROGRAM kma2netcdf
 
    CHARACTER (LEN=80)      :: message
 
+   INTERFACE
+     SUBROUTINE Setup_Timekeeping( grid )
+      USE module_domain
+      TYPE(domain), POINTER :: grid
+     END SUBROUTINE Setup_Timekeeping
+   END INTERFACE
+
 !  Definitions of dummy arguments to solve
 
 !--Define the name of this program (program_name defined in module_domain)
@@ -87,9 +94,9 @@ PROGRAM kma2netcdf
    CALL       wrf_debug ( 100 , 'wrf: calling set_scalar_indices_from_config ' )
    CALL set_scalar_indices_from_config ( head_grid%id , idum1, idum2 )
    CALL       wrf_debug ( 100 , 'wrf: calling init_wrfio' )
-
-!  if(config_flags%real_data_init_type == 1 .or. & 
-!     config_flags%real_data_init_type == 3) then
+   CALL Setup_Timekeeping ( head_grid )
+  if(config_flags%real_data_init_type == 1 .or. & 
+     config_flags%real_data_init_type == 3) then
      CALL init_wrfio
 
 #ifdef DM_PARALLEL
@@ -97,13 +104,14 @@ PROGRAM kma2netcdf
      CALL wrf_dm_bcast_bytes( configbuf, nbytes )
      CALL set_config_as_buffer( configbuf, configbuflen )
 #endif
-!  endif
+  endif
    call med_add_config_info_to_grid ( head_grid )
 
 !--read  kma-ascii grid data and pack in grid-array
 
    CALL wrf_debug ( 100 , 'kma2netcdf: calling kma2netcdf_interface ' )
-   CALL kma2netcdf_interface ( head_grid, config_flags )
+
+   CALL kma2netcdf_interface ( head_grid, config_flags)   
 
    CALL wrf_debug ( 100 , 'kma2netcdf: back from kma2netcdf_interface ' )
 
