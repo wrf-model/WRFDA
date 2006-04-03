@@ -4,8 +4,6 @@
 #
 # Purpose: To calculate correlation lengthscales for 2D control variable fields. 
 #
-# History:
-#     06/06/2005    Modified by                          Y.-R. Guo
 #-----------------------------------------------------------------------
 
 #Define job by overriding default environment variables:
@@ -41,10 +39,10 @@
  if ( ! $?DAT_DIR )       setenv DAT_DIR ${DATA_DISK}/${user}/data/${DOMAIN}/noobs/gen_be
  if ( ! $?RUN_DIR )       setenv RUN_DIR ${DAT_DIR}/${ID} 
  if ( ! -d ${RUN_DIR} )   mkdir ${RUN_DIR}
- if ( ! $?LOCAL )         setenv LOCAL .true.             # True if local machine.
+ if ( ! $?LOCAL )         setenv LOCAL .false.            # True if local machine.
  if ( ! $?NUM_JOBS )      setenv NUM_JOBS    1            # Number of jobs to run.
- if ( ! $?MACHINES )      set MACHINES = ( node1 node2 node3 node4 node5 node6 node7 node8 \
-                                           node1 node2 node3 node4 node5 node6 node7 node8 )  # For parallel runs.
+ if ( ! $?MACHINES )      set MACHINES = ( node1 node1 node2 node2 node3 node3 node4 node4 \
+                                           node5 node5 node6 node6 node7 node7 node8 node8 )  # For parallel runs.
  if ( ! $?CONTROL_VARIABLES) set CONTROL_VARIABLES = ( psi chi_u t_u rh ps_u )               # Fields to process.
 
  setenv TMP_DIR ${RUN_DIR}/gen_be_stage4_regional.${STRIDE}

@@ -4,9 +4,6 @@ subroutine da_readwrite_be_stage2( outunit, be_method, nk )
 ! Purpose: Read and write the dimensions, bin information, and 
 !          regression coefficients.
 !
-! History:
-!
-!     Modified   by  Y.-R. Guo                  06/20/2005
 ! ----------------------------------------------------------------------
    implicit none
 
@@ -33,11 +30,14 @@ subroutine da_readwrite_be_stage2( outunit, be_method, nk )
    real, allocatable   :: regcoeff3(:,:,:)                ! psi/T regression cooefficient.
 
 ! Read in the coefficients:
-
+print *, 'at least got here'
    filename = 'gen_be_stage2.'//trim(be_method)//'.dat'
    open (iunit, file = filename, form='unformatted')
    read(iunit)ni, nj, nk
+print *, ni, nj, nk 
    read(iunit)num_bins, num_bins2d
+print *, num_bins, num_bins2d
+stop
 
    allocate( regcoeff1(1:num_bins) )
    allocate( regcoeff2(1:nk,1:num_bins2d) )
@@ -54,15 +54,15 @@ subroutine da_readwrite_be_stage2( outunit, be_method, nk )
    allocate( bin2d(1:ni,1:nj) )
 
    filename = 'bin.data'
-   open (iunit-1, file = filename, form='unformatted')
+   open (iunit, file = filename, form='unformatted')
 
-   read(iunit-1)bin_type
-   read(iunit-1)lat_min, lat_max, binwidth_lat
-   read(iunit-1)hgt_min, hgt_max, binwidth_hgt
-   read(iunit-1)num_bins, num_bins2d
-   read(iunit-1)bin(1:ni,1:nj,1:nk)
-   read(iunit-1)bin2d(1:ni,1:nj)
-   close(iunit-1)
+   read(iunit)bin_type
+   read(iunit)lat_min, lat_max, binwidth_lat
+   read(iunit)hgt_min, hgt_max, binwidth_hgt
+   read(iunit)num_bins, num_bins2d
+   read(iunit)bin(1:ni,1:nj,1:nk)
+   read(iunit)bin2d(1:ni,1:nj)
+   close(iunit)
 
 ! Write out the dimensions and bin information:
 

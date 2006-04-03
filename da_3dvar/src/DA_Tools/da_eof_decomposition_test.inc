@@ -42,7 +42,7 @@ subroutine da_eof_decomposition_test( kz, bx, e, l )
             k, l(k), cum_variance / tot_variance, e(k,k)
    end do
 
-   write(UNIT=stderr)
+   write(UNIT=stderr,fmt=*)
    
    call da_array_print( 1, e, 'Global Eigenvectors' )
 
@@ -82,7 +82,7 @@ subroutine da_eof_decomposition_test( kz, bx, e, l )
       max_off_diag = maxval(abs(work(k1,:)),mask=array_mask(:))
       write(UNIT=stderr,FMT='(I4,4x,1pe12.4,10x,1pe12.4)')k1, work(k1,k1), max_off_diag
    end do
-   write(UNIT=stderr)
+   write(UNIT=stderr,fmt=*)
 
 !-------------------------------------------------------------------------
 !  [4]  check B correctness: B = E*L*E^T
@@ -106,7 +106,7 @@ subroutine da_eof_decomposition_test( kz, bx, e, l )
          end do
       end do
 
-      WRITE(UNIT=stdout,FMT='(I5,2F12.2)') bx(k1,k1), bc(k1,k1)
+      WRITE(UNIT=stdout,FMT='(I5,2F20.5)') k1, bx(k1,k1), bc(k1,k1)
    end do
 
    do k2=1,kz
@@ -115,7 +115,7 @@ subroutine da_eof_decomposition_test( kz, bx, e, l )
            'lvl                 Real-B                    Calculated-B'
 
       do k1=1,kz
-        WRITE(UNIT=stdout,FMT='(I5,2F12.2)') k1, bx(k1,k2), bc(k1,k2)
+        WRITE(UNIT=stdout,FMT='(I5,2F20.5)') k1, bx(k1,k2), bc(k1,k2)
       end do
    end do
    

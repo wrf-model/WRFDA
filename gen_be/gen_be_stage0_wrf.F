@@ -7,10 +7,6 @@ program gen_be_stage0_wrf
 !
 !  Output : Binary files for use of the gen_be_stage1.
 !
-!  Compilation: pgf90 gen_be_stage0_wrf.f -L${NETCDF}/lib \
-!               -lnetcdf -I${NETCDF}/include -Mfree \
-!               -byteswapio -o gen_be_stage0_wrf.exe
-!
 !  Author: Dale Barker (NCAR/MMM)
 !  Please acknowledge author/institute in work that uses this code.
 !
@@ -18,8 +14,7 @@ program gen_be_stage0_wrf
 !
 !----------------------------------------------------------------------
 
-
-   USE DA_Constants
+   use da_constants
 
    implicit none
 
@@ -84,13 +79,11 @@ program gen_be_stage0_wrf
    real, allocatable     :: fft_coeffss(:,:)          ! FFT coefficients.
 
 !  Output difference fields:
-   real (kind=8), allocatable     :: psi(:,:,:)                ! Streamfunction.
-   real (kind=8), allocatable     :: chi(:,:,:)                ! Velocity Potential.
-   real (kind=8), allocatable     :: temp(:,:,:)               ! Temperature.
-   real (kind=8), allocatable     :: rh(:,:,:)                 ! Relative humidity.
-   real (kind=8), allocatable     :: psfc(:,:)                 ! Surface pressure.
-   real (kind=8), allocatable     :: heightd(:,:,:)             ! Height.
-   real (kind=8), allocatable     :: xlatd(:,:)                 ! Latitude of mass points.
+   real, allocatable     :: psi(:,:,:)                ! Streamfunction.
+   real, allocatable     :: chi(:,:,:)                ! Velocity Potential.
+   real, allocatable     :: temp(:,:,:)               ! Temperature.
+   real, allocatable     :: rh(:,:,:)                 ! Relative humidity.
+   real, allocatable     :: psfc(:,:)                 ! Surface pressure.
 
 !---------------------------------------------------------------------------------------------
    write(6,'(a)')' [1] Initialize information.'
@@ -130,6 +123,7 @@ program gen_be_stage0_wrf
 
    var = "XLAT"
    call get_field( input_file1, var, 2, dim1, dim2, 1, 1, xlat )
+
    var = "MAPFAC_M"
    call get_field( input_file1, var, 2, dim1, dim2, 1, 1, mapfac_m )
    var = "MAPFAC_U"
@@ -185,16 +179,12 @@ program gen_be_stage0_wrf
       call get_field( input_file1, var, 3, dim1+1, dim2, dim3, k, u1 )
       call get_field( input_file2, var, 3, dim1+1, dim2, dim3, k, u2 )
       u1(:,:) = u1(:,:) - u2(:,:)
-  !    u1(:,:) = u1(:,:) - sum(u1(:,:)) * dim12_inv_u ! Remove mean wind.
 
 !     Read v fields, and create difference v1 = v1 - v2:
       var = "V"
-print *, k, var, input_file1
       call get_field( input_file1, var, 3, dim1, dim2+1, dim3, k, v1 )
-print *, k, var, input_file2
       call get_field( input_file2, var, 3, dim1, dim2+1, dim3, k, v2 )
       v1(:,:) = v1(:,:) - v2(:,:)
- !     v1(:,:) = v1(:,:) - sum(v1(:,:)) * dim12_inv_v ! Remove mean wind.
 
 !     Calculate vorticity (in center of mass grid on WRF's Arakawa C-grid):
       call da_uv_to_vor_c( dim1, dim2, ds, &
@@ -220,8 +210,6 @@ print *, k, var, input_file2
       end if
 
       if ( test_inverse .and. k == ktest) then
-!         call da_test_inverse2( dim1, dim2, ds, mapfac_m, mapfac_u, mapfac_v, &
-!                               u1, v1, psi2d, chi2d )
          call da_test_inverse( dim1, dim2, ds, mapfac_m, mapfac_u, mapfac_v, &
                                n1, n2, fft_method, ifax1, ifax2, trigs1, trigs2, fft_coeffs, &
                                n1s, n2s, ifax1s, ifax2s, trigs1s, trigs2s, fft_coeffss, &
@@ -237,16 +225,6 @@ print *, k, var, input_file2
                                   psi2d(i,j+1) + psi2d(i+1,j+1) )
          end do
       end do
-
-!     Remove mean from psi/chi fields:
-!      psi_mean = sum( psi(1:dim1,1:dim2,k) ) * dim12_inv
-!      psi(1:dim1,1:dim2,k) = psi(1:dim1,1:dim2,k) - psi_mean 
-!      chi_mean = sum( chi(1:dim1,1:dim2,k) ) * dim12_inv
-!      chi(1:dim1,1:dim2,k) = chi(1:dim1,1:dim2,k) - chi_mean 
-
-!      psi_mean = sum( psi(1:dim1,1:dim2,k) ) * dim12_inv
-!      chi_mean = sum( chi(1:dim1,1:dim2,k) ) * dim12_inv
-!      print *, psi_mean, chi_mean
    end do
 
    deallocate( u1 )
@@ -295,12 +273,6 @@ print *, k, var, input_file2
    call get_field( input_file2, var, 2, dim1, dim2, dim3, 1, psfc2 )
    psfc(:,:) = psfc1(:,:) - psfc2(:,:)
 
-   do j = 1, dim2
-   do i = 1, dim1
-   write(300,'(1pe15.5)')psfc(i,j)
-   end do
-   end do
-
    deallocate( psfc1 )
    deallocate( psfc2 )
 
@@ -315,14 +287,8 @@ print *, k, var, input_file2
    write(gen_be_ounit)temp
    write(gen_be_ounit)rh
    write(gen_be_ounit)psfc
-!Double precision hardwire until put in WRF-Var:
-   allocate( xlatd(1:dim1,1:dim2) )
-   xlatd = xlat
-   allocate( heightd(1:dim1,1:dim2,1:dim3) )
-   heightd = height
-   write(gen_be_ounit)heightd
-   write(gen_be_ounit)xlatd
-
+   write(gen_be_ounit)height
+   write(gen_be_ounit)xlat
 
    deallocate( psi )
    deallocate( chi )
@@ -476,7 +442,7 @@ subroutine stage0_initialize( input_file1, input_file2, var, &
 
    integer                        :: dimids(10)       !
    integer                        :: dims(1:4)        ! Dimensions of field. 
-   real, allocatable              :: value_real(:)    ! Real attribute value. 
+   real (kind=4), allocatable     :: value_real(:)    ! Real attribute value. 
    character (len=80)             :: value_chr        ! Character.
 !   integer                        :: nf_open
 !   external                          nf_open
@@ -640,9 +606,8 @@ subroutine get_field( input_file, var, field_dims, dim1, dim2, dim3, k, field )
 
    integer                        :: istart(4)        ! Start value of arrays.
    integer                        :: iend(4)          ! End value of arrays.
-   real, allocatable              :: field3d(:,:,:)   ! Used if 3D field read. 
-!   integer                        :: nf_open
-!   external                          nf_open
+   real (kind=4), allocatable     :: field2d(:,:)     ! Used if 2D field read. 
+   real (kind=4), allocatable     :: field3d(:,:,:)   ! Used if 3D field read. 
 
    length = len_trim(input_file)
    rcode = nf_open( input_file(1:length), NF_NOWRITE, cdfid )
@@ -661,8 +626,11 @@ subroutine get_field( input_file, var, field_dims, dim1, dim2, dim3, k, field )
 
    if ( field_dims == 2 ) then
       iend(3) = 1
-      call ncvgt( cdfid, id_var, istart, iend, field, rcode )
+      allocate ( field2d(1:dim1,1:dim2) )
+      call ncvgt( cdfid, id_var, istart, iend, field2d, rcode )
+      field(:,:) = field2d(:,:)
       rcode = nf_close( cdfid )
+      deallocate( field2d )
    else if ( field_dims == 3 ) then
       iend(3) = dim3
       allocate ( field3d(1:dim1,1:dim2,1:dim3) )

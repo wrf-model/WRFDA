@@ -12,11 +12,12 @@
 
 #set echo
 
-setenv DATA_DISK /ocotillo1
-setenv DOMAIN t4b.afwa
-setenv WRFVAR_DIR /ocotillo/users/dmbarker/code_development/WRF_V2.1.2/wrfvar.devel.eotd 
-setenv START_DATE 2006020600
-setenv FINAL_DATE 2006020612
+setenv WRFVAR_DIR ${HOME}/code_development/WRF_V2.1.2/tmp/wrfvar.gen_be.test 
+
+#AFWA T4B:
+#setenv DOMAIN t4b
+#setenv START_DATE 2006020300
+#setenv END_DATE 2006030100
 
 #-----------------------------------------------------------------------------------
 # Don't change anything below this line.
@@ -31,7 +32,7 @@ setenv FINAL_DATE 2006020612
 
 #Define environment variables:
  if ( ! $?START_DATE )    setenv START_DATE    2003010100 # Initial time of first forecast.
- if ( ! $?FINAL_DATE )    setenv FINAL_DATE    2003012800 # Initial time of penultimate forecast. 
+ if ( ! $?END_DATE )      setenv END_DATE      2003012800 # Initial time of last forecast. 
  if ( ! $?FCST_RANGE )    setenv FCST_RANGE    24         # Forecast range of forecast (hours).
  if ( ! $?INTERVAL )      setenv INTERVAL      12         # Period between files (hours).
  if ( ! $?BE_METHOD )     setenv BE_METHOD     1          # 1 (NMC-method), 2 (Ensemble-Method).
@@ -40,7 +41,7 @@ setenv FINAL_DATE 2006020612
  if ( ! $?BIN_DIR )       setenv BIN_DIR      ${HOME}/bin
  if ( ! $?SRC_DIR )       setenv SRC_DIR      ${HOME}/code_development/WRF_V2.1.2
  if ( ! $?WRFVAR_DIR )    setenv WRFVAR_DIR   ${SRC_DIR}/wrfvar
- if ( ! $?DATA_DISK )     setenv DATA_DISK    /tara
+ if ( ! $?DATA_DISK )     setenv DATA_DISK    /ocotillo1
  if ( ! $?DOMAIN )        setenv DOMAIN       con200      # Application name.
  if ( ! $?DAT_DIR )       setenv DAT_DIR      ${DATA_DISK}/${USER}/data/${DOMAIN}/noobs
  if ( ! $?RUN_DIR )       setenv RUN_DIR      ${DAT_DIR}/gen_be
@@ -50,7 +51,7 @@ setenv FINAL_DATE 2006020612
 
  setenv DATE $START_DATE
 
- while ( $DATE < $FINAL_DATE )
+ while ( $DATE < $END_DATE )
 
    setenv TMP_DIR ${RUN_DIR}/${DATE}
    rm -rf ${TMP_DIR} >&! /dev/null
@@ -79,8 +80,8 @@ setenv FINAL_DATE 2006020612
 
    ./gen_be_stage0_wrf.exe ${FCST_TIME} $FILE1 $FILE2 >&! gen_be_stage0_wrf.out
    mv diff ../diff.${FILE_DATE}
-
-#   rm -rf $TMP_DIR >&! /dev/null
+   mv gen_be_stage0_wrf.out ../gen_be_stage0_wrf.out.${FILE_DATE}
+   rm -rf $TMP_DIR >&! /dev/null
 
    setenv DATE $DATE2
 
