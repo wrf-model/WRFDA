@@ -167,7 +167,7 @@ CC              =       mpicc
 CC_TOOLS        =       gcc
 
 TRADFLAG        =       -traditional
-FCOPTIM         =       #-fast
+FCOPTIM         =       -fast
 FCDEBUG         =       #-g
 FCTYPE          =       -r8
 FCFORM          =       -Mfree
@@ -315,6 +315,89 @@ arch : $(RSL_PATH)/module_dm.F $(RSL_PATH)/gen_comms.c
 	$(LN) $(RSL_PATH)/module_dm.F .
 	$(LN) $(RSL_PATH)/gen_comms.c .
 	( cd $(RSL_PATH)/RSL ; make CC="$(CC)" FC="$(FC) $(FCBASE)" MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) LEARN_BCAST=-DLEARN_BCAST linux )
+
+###########################################################
+#ARCH Settings for PC Linux x86_64, PGI compiler  (Single-threaded)
+#
+FC              =       pgf90
+F77             =       $(FC)
+SFC             =       $(FC)
+LD              =       $(FC)
+CC              =       gcc
+CC_TOOLS        =       $(CC)
+
+TRADFLAG        =       -traditional
+FCOPTIM         =       -fastsse
+FCDEBUG         =       #-g
+FCTYPE          =       -r8
+FCFORM          =       -Mfree
+FCENDIAN        =       -byteswapio
+FCBASE          =       
+
+LDFLAGS         =       $(FCENDIAN)
+
+ARCHFLAGS2      =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE \
+                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO
+
+LOCAL_LIBRARIES =       -L/usr/local/ncarg/lib -L/usr/X11R6/lib -L/usr/local/lib \
+			-lncarg -lncarg_gks -lncarg_c -lX11
+
+CPPFLAGS_BUFR   =       -C -P $(TRADFLAG) -DLINUX -Dlinux
+CCFLAGS_BUFR    =       -DUNDERSCORE
+POUND_DEF       =       -DLINUX -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
+			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+
+arch :  module_dm_stubs.F gen_comms.stub
+	$(LN) module_dm_stubs.F module_dm.F
+	$(LN) gen_comms.stub gen_comms.c 
+
+
+###########################################################
+#ARCH Settings for PC Linux x86_64, PGI compiler  (RSL, MPICH, RSL IO)
+#
+FC              =       mpif90
+F77             =       $(FC)
+SFC             =       pgf90
+LD              =       $(FC)
+CC              =       mpicc
+CC_TOOLS        =       gcc
+
+TRADFLAG        =       -traditional
+FCOPTIM         =       -fastsse
+FCDEBUG         =       #-g
+FCTYPE          =       -r8
+FCFORM          =       -Mfree
+FCENDIAN        =       -byteswapio
+FCBASE          =       
+
+LDFLAGS         =       $(FCENDIAN)
+
+DMPARALLEL      =       1
+RSL_PATH        =       $(DEVTOP)/external/RSL
+MPI_LIB		=	-L$(RSL_PATH)/RSL -lrsl
+DM_CPP_FLAGS    =       -I$(RSL_PATH)/RSL `cat inc/dm_comm_cpp_flags`
+
+
+ARCHFLAGS2      =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE \
+                        -DINTIO -DWRF_RSL_IO -DRSL -DDM_PARALLEL \
+                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO
+ARCHFLAGS4      =       -DMAXDOM_MAKE=$(MAX_DOMAINS) \
+                        -DMAXPROC_MAKE=$(MAX_PROC) \
+                        -I$(RSL_PATH)/RSL
+
+LOCAL_LIBRARIES =       -L/usr/local/ncarg/lib -L/usr/X12R6/lib -L/usr/local/lib \
+                        -lncarg -lncarg_gks -lncarg_c -lX11 
+
+CPPFLAGS_BUFR   =       -C -P $(TRADFLAG) -DLINUX -Dlinux
+CCFLAGS_BUFR    =       -DUNDERSCORE
+POUND_DEF       =       -DLINUX -DNO_RRTM_PHYSICS  \
+			-DNONSTANDARD_SYSTEM -DF90_STANDALONE \
+			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+
+arch : $(RSL_PATH)/module_dm.F $(RSL_PATH)/gen_comms.c
+	$(LN) $(RSL_PATH)/module_dm.F .
+	$(LN) $(RSL_PATH)/gen_comms.c .
+	( cd $(RSL_PATH)/RSL ; make CC="$(CC)" FC="$(FC) -byteswapio" MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) LEARN_BCAST=-DLEARN_BCAST linux )
 
 ###########################################################
 #ARCH       SGI 64 bit machine IRIX64     (single-threaded)

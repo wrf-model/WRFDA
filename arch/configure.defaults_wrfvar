@@ -355,6 +355,98 @@ externals : $(WRFIO) esmf_time lib_rsl
 lib_rsl :
 	( cd ../external/RSL/RSL ; make CC="$(CC)" FC="$(FC) $(FCBASE)" MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) LEARN_BCAST=-DLEARN_BCAST linux )
 
+###########################################################
+#ARCH Settings for PC Linux x86_64, PGI compiler  (Single-threaded)
+#
+FC              =       pgf90
+F77             =       $(FC)
+CC              =       gcc
+CC_TOOLS        =       gcc
+LD              =       $(FC)
+SFC             =       $(FC)
+TRADFLAG        =       -traditional
+FCOPTIM         =       -fastsse
+FCDEBUG         =       #-g
+FCTYPE          =       -r8
+FCFORM          =       -Mfree
+FCHOST          =       
+FCBUFR          =       
+FCBASE          =       $(FCBUFR) -byteswapio
+FC_FFT_RF       =       $(FCBUFR) -byteswapio
+ARCHFLAGS3      =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE \
+                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO
+EXTRAMODULES    =       
+
+LDFLAGS         =
+
+LOCAL_LIBRARIES =       -L/usr/local/ncarg/lib -L/usr/X11R6/lib -L/usr/local/lib \
+			-lncarg -lncarg_gks -lncarg_c -lX11
+
+CPP             =       /lib/cpp $(TRADFLAG)
+CPPFLAGS_BUFR   =       -C -P -DLINUX -Dlinux
+CFLAGS_BUFR     =       -DUNDERSCORE
+DM_1_CPP_FLAGS  =
+DM_2_CPP_FLAGS  =
+POUND_DEF       =       -DLINUX -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
+			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+M4              =       m4
+
+externals : $(WRFIO) esmf_time
+	( /bin/cp module_dm_warning module_dm.F ; cat module_dm_stubs.F >> module_dm.F )
+
+###########################################################
+#ARCH Settings for PC Linux x86_64, PGI compiler  (RSL, MPICH, RSL IO)
+#
+DMPARALLEL      =       1
+FC              =       mpif90
+F77             =       $(FC)
+LD              =       $(FC)
+CC              =       mpicc
+CC_TOOLS        =       gcc
+SFC             =       pgf90
+ARCHFLAGS3      =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE \
+                        -DINTIO -DWRF_RSL_IO -DRSL -DDM_PARALLEL \
+                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO
+ARCHFLAGS4      =       -DMAXDOM_MAKE=$(MAX_DOMAINS) \
+                        -DMAXPROC_MAKE=$(MAX_PROC) \
+                        -I../external/RSL/RSL
+TRADFLAG        =       -traditional
+FCOPTIM         =       -fastsse
+FCDEBUG         =       #-g
+FCTYPE          =       -r8
+FCFORM          =       -Mfree
+FCHOST          =
+FCBUFR          =       
+FCBASE          =       $(FCBUFR) -byteswapio
+FC_FFT_RF       =       $(FCBUFR) -byteswapio
+
+EXTRAMODULES    =       
+
+LDFLAGS         =       -byteswapio
+MPI_LIB		=	-L../external/RSL/RSL -lrsl
+
+LOCAL_LIBRARIES =       -L/usr/local/ncarg/lib -L/usr/X12R6/lib -L/usr/local/lib \
+                        -lncarg -lncarg_gks -lncarg_c -lX11 
+
+CPP             =       /lib/cpp $(TRADFLAG)
+CPPFLAGS_BUFR   =       -C -P -DLINUX -Dlinux
+CFLAGS_BUFR     =       -DUNDERSCORE
+DM_1_CPP_FLAGS  =       -I../external/RSL/RSL -C -P `cat ../inc/dm_comm_cpp_flags` \
+			-DNO_RRTM_PHYSICS  -DPGF90
+DM_2_CPP_FLAGS  =       -I../../external/RSL/RSL -C -P `cat ../../inc/dm_comm_cpp_flags`
+POUND_DEF       =       -DLINUX -DNO_RRTM_PHYSICS  \
+			-DNONSTANDARD_SYSTEM -DF90_STANDALONE \
+			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+M4              =       m4
+
+
+externals : $(WRFIO) esmf_time lib_rsl
+	( /bin/cp ../tools/gen_comms_warning ../tools/gen_comms.c ; \
+          cat ../external/RSL/gen_comms.c >> ../tools/gen_comms.c ;  \
+          /bin/cp module_dm_warning module_dm.F ; cat ../external/RSL/module_dm.F >> module_dm.F )
+
+lib_rsl :
+	( cd ../external/RSL/RSL ; make CC="$(CC)" FC="$(FC) -byteswapio" MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) LEARN_BCAST=-DLEARN_BCAST linux )
 
 ###########################################################
 #ARCH       SGI 64 bit machine IRIX64     (single-threaded)
