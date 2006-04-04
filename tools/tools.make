@@ -13,6 +13,11 @@ $(TOOLS_OBJ) :
 registry : $(TOOLS_OBJ)
 	$(CC_TOOLS) -o registry $(TOOLS_OBJ)
 
+advance_cymdh : advance_cymdh.o 
+	$(RM) $@
+	$(FC) -o advance_cymdh advance_cymdh.o
+	
+
 bufr_little_endian.exe : bufr_little_endian.o
 			$(RM) $@
 			$(FC) -o bufr_little_endian.exe bufr_little_endian.o da_bufrlib.o \

@@ -21,6 +21,13 @@ clean:
 gen_comms.c : gen_comms.stub
 	/bin/cp gen_comms.stub gen_comms.c
 
+advance_cymdh : advance_cymdh.o 
+	$(RM) $@
+	$(FC) -o advance_cymdh advance_cymdh.o
+
+advance_cymdh.o : advance_cymdh.F
+	$(FC) $(FCFLAGS) -o advance_cymdh.o advance_cymdh.F
+
 bufr_little_endian.exe : bufr_little_endian.o
 			$(RM) $@
 			$(FC) -o bufr_little_endian.exe bufr_little_endian.o $(DA_SRC)/da_bufrlib.o \
