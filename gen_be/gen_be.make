@@ -1,19 +1,20 @@
 #
 
-be :		arch \
+be :		arch                    \
                 gen_be_stage0_wrf	\
-		gen_be_stage1	\
+		gen_be_stage1	        \
 		gen_be_stage1_1dvar	\
-		gen_be_stage2	\
+		gen_be_stage2	        \
 		gen_be_stage2_1dvar	\
-		gen_be_stage2a	\
-		gen_be_stage3	\
+		gen_be_stage2a	        \
+		gen_be_stage3	        \
 		gen_be_stage4_global	\
 		gen_be_stage4_regional	\
 		gen_be_cov2d		\
 		gen_be_cov3d		\
 		gen_be_diags		\
-		gen_be_diags_read
+		gen_be_diags_read       \
+                advance_cymdh
 
 GEN_BE_OBJS = da_gen_be.o DA_Constants.o be_spectral.o LAPACK.o BLAS.o module_wrf_error.o \
   da_fftpack5.o
@@ -57,59 +58,11 @@ gen_be_diags : gen_be_diags.o
 gen_be_diags_read : gen_be_diags_read.o
 	$(LD) -o gen_be_diags_read.exe $(LDFLAGS) $(GEN_BE_OBJS) gen_be_diags_read.o 
 
-#
+
 
 gen_be_stage0_wrf.o: $(GEN_BE_OBJS)
 	$(RM) $@
-	$(FC) -c $(FCFORM) $(FCTYPE) -I${NETCDF}/include gen_be_stage0_wrf.F
-
-gen_be_stage1.o: $(GEN_BE_OBJS)
-	$(RM) $@
-	$(FC) -c $(FCFORM) $(FCTYPE) gen_be_stage1.F
-
-gen_be_stage1_1dvar.o: $(GEN_BE_OBJS)
-	$(RM) $@
-	$(FC) -c $(FCFORM) $(FCTYPE) gen_be_stage1_1dvar.F
-
-gen_be_stage2.o: $(GEN_BE_OBJS)
-	$(RM) $@
-	$(FC) -c $(FCFORM) $(FCTYPE) gen_be_stage2.F
-
-gen_be_stage2_1dvar.o: $(GEN_BE_OBJS)
-	$(RM) $@
-	$(FC) -c $(FCFORM) $(FCTYPE) gen_be_stage2_1dvar.F
-
-gen_be_stage2a.o: $(GEN_BE_OBJS)
-	$(RM) $@
-	$(FC) -c $(FCFORM) $(FCTYPE) gen_be_stage2a.F
-
-gen_be_stage3.o: $(GEN_BE_OBJS)
-	$(RM) $@
-	$(FC) -c $(FCFORM) $(FCTYPE) gen_be_stage3.F
-
-gen_be_stage4_global.o: $(GEN_BE_OBJS)
-	$(RM) $@
-	$(FC) -c $(FCFORM) $(FCTYPE) gen_be_stage4_global.F
-
-gen_be_stage4_regional.o: $(GEN_BE_OBJS)
-	$(RM) $@
-	$(FC) -c $(FCFORM) $(FCTYPE) gen_be_stage4_regional.F
-
-gen_be_cov2d.o: $(GEN_BE_OBJS)
-	$(RM) $@
-	$(FC) -c $(FCFORM) $(FCTYPE) gen_be_cov2d.F
-
-gen_be_cov3d.o: $(GEN_BE_OBJS)
-	$(RM) $@
-	$(FC) -c $(FCFORM) $(FCTYPE) gen_be_cov3d.F
-
-gen_be_diags.o:
-	$(RM) $@
-	$(FC) -c $(FCFORM) $(FCTYPE) gen_be_diags.F
-
-gen_be_diags_read.o: $(GEN_BE_OBJS)
-	$(RM) $@
-	$(FC) -c $(FCFORM) $(FCTYPE) gen_be_diags_read.F
+	$(FC) -c $(FCFLAGS) -I${NETCDF}/include gen_be_stage0_wrf.F
 
 # DEPENDENCIES : only dependencies after this line (don't remove the word DEPENDENCIES)
 
