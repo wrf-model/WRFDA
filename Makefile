@@ -111,6 +111,7 @@ BE_OBJS = da_gen_be.o DA_Constants.o be_spectral.o LAPACK.o BLAS.o da_fftpack5.o
 BE_MODULES1 = -I../../frame
 BE_MODULES2 = -I../da_3dvar/src -I../frame
 be : 
+	( cd tools; $(MAKE) FC="$(FC)" FCFLAGS="$(FCFLAGS)" advance_cymdh )
 	( cd frame; $(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" externals module_wrf_error.o )
 	( cd da_3dvar/src; $(MAKE) MODULE_DIRS="$(BE_MODULES1)" $(BE_OBJS) da_gen_be.o )
 	( cd gen_be ; \
@@ -321,6 +322,12 @@ nmm_core :
 toolsdir :
 	@ echo '--------------------------------------'
 	( cd tools ; $(MAKE) CC="$(CC_TOOLS)" )
+
+
+bufr_little_endian :
+	@ echo '--------------------------------------'
+	( cd tools ; $(MAKE) CC="$(CC_TOOLS)" DA_SRC="$(DA_SRC)" \
+            FC="$(FC)" F77FLAGS_ENDIAN="$(F77FLAGS_ENDIAN)" bufr_little_endian.exe)
 
 clean :
 		@ echo 'Use the clean script'
