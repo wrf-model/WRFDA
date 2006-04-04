@@ -620,14 +620,24 @@ EOF
 if test $PLATFORM == "Linux"; then
   if test $NUM_PROCS -gt 1; then
     mpirun -v -np $NUM_PROCS -nolocal -machinefile $HOSTS ./wrfvar.exe
+    ln -s rsl.out.0000 wrfvar.out
+    ln -s rsl.error.0000 wrfvar.error
   else
 #    mpirun -v -np 1 ./wrfvar.exe > /dev/null #Assumes compile in DM mode.
+#    ln -s rsl.out.0000 wrfvar.out
+#    ln -s rsl.error.0000 wrfvar.error
     ./wrfvar.exe > wrfvar.out 2>wrfvar.error
   fi
 fi
 
 if test $PLATFORM == "Darwin"; then
-  ./wrfvar.exe > wrfvar.out 2>wrfvar.error
+  if test $NUM_PROCS -gt 1; then
+    mpirun -v -np $NUM_PROCS -machinefile $HOSTS ./wrfvar.exe
+    ln -s rsl.out.0000 wrfvar.out
+    ln -s rsl.error.0000 wrfvar.error
+  else
+    ./wrfvar.exe > wrfvar.out 2>wrfvar.error
+  fi
 fi
 
 #DEC:
