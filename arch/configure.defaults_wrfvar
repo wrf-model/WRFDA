@@ -280,9 +280,9 @@ TRADFLAG        =       -traditional
 FCOPTIM         =       
 FCDEBUG         =       #-g
 FCTYPE          =       -r8
-FCFORM          =       -ffree-form -cpp -Wno=155,158,139,101,155
+FCFORM          =       -ffree-form
 FCHOST          =       
-FCBUFR          =       -Wno=155,158,139,101,155
+FCBUFR          =       -cpp -Wno=101,139,155,158 -fno-second-underscore -ftrace=full
 FCBASE          =       $(FCBUFR)
 FC_FFT_RF       =       $(FCBUFR)
 ARCHFLAGS3      =       -DTRIEDNTRUE -DONLY_WRFMODEL_IO
@@ -319,9 +319,9 @@ TRADFLAG        =       -traditional
 FCOPTIM         =       
 FCDEBUG         =       #-g
 FCTYPE          =       -r8
-FCFORM          =       -ffree-form -cpp -Wno=155,158,139,101,155
+FCFORM          =       -ffree-form
 FCHOST          =       
-FCBUFR          =       -Wno=155,158,139,101,155
+FCBUFR          =       -cpp -Wno=101,139,155,158 -fno-second-underscore -ftrace=full
 FCBASE          =       $(FCBUFR)
 FC_FFT_RF       =       $(FCBUFR)
 ARCHFLAGS3      =       -DINTIO -DWRF_RSL_IO -DRSL -DDM_PARALLEL \
@@ -332,6 +332,7 @@ ARCHFLAGS4      =       -DMAXDOM_MAKE=$(MAX_DOMAINS) \
 EXTRAMODULES    =       
 
 LDFLAGS         =
+MPI_LIB		=	-L../external/RSL/RSL -lrsl
 
 LOCAL_LIBRARIES =       -L/usr/local/ncarg/lib -L/usr/X11R6/lib -L/usr/local/lib \
 			-lncarg -lncarg_gks -lncarg_c -lX11

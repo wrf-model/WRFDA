@@ -6,6 +6,7 @@ EXTRAMODULES    =
 FCBASEOPTS      =       $(FCTYPE) $(FCBASE) $(FCFORM) $(FCHOST) $(FCDEBUG) -I.
 FC_FFT_RF_OPTS  =       $(FCTYPE) $(FC_FFT_RF) $(FCFORM) $(FCHOST) $(FCDEBUG) -I.
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS) $(OMP)
+F77FLAGS_ENDIAN =       $(FCTYPE)
 INCLUDE_MODULES =       -I$(DA_VAR) -I$(DA_SRC) \
 			-I../external/io_netcdf -I../external/io_int \
                         -I../external/esmf_time_f90 \
