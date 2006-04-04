@@ -15,18 +15,25 @@
 
 #Define job via environment variables:
 
+# SRC_DIR
+# WRFVAR_DIR
+# BUILD_DIR
+# ID
+# EXPT
+# DAT_DIR
+# RUN_DIR
+
 #set echo
 
-setenv WRFVAR_DIR ${HOME}/code_development/WRF_V2.1.2/tmp/wrfvar.gen_be.test
+# Define variables for the stages you wish to run:
 
-#Uncomment the stages you wish to run:
-setenv RUN_GEN_BE_STAGE1 # Set to run stage 1 (Remove mean, split variables).
-setenv RUN_GEN_BE_STAGE2 # Set to run stage 2 (Regression Coefficients).
-setenv RUN_GEN_BE_STAGE2A # Set to run stage 2 (Regression Coefficients).
-setenv RUN_GEN_BE_STAGE3 # Set to run stage 3 (Vertical Covariances).
-setenv RUN_GEN_BE_STAGE4 # Set to run stage 4 (Horizontal Covariances).
-setenv RUN_GEN_BE_DIAGS  # Set to run gen_be diagnostics.
-setenv RUN_GEN_BE_DIAGS_READ  # Set to run gen_be diagnostics_read.
+#setenv RUN_GEN_BE_STAGE1 # Set to run stage 1 (Remove mean, split variables).
+#setenv RUN_GEN_BE_STAGE2 # Set to run stage 2 (Regression Coefficients).
+#setenv RUN_GEN_BE_STAGE2A # Set to run stage 2 (Regression Coefficients).
+#setenv RUN_GEN_BE_STAGE3 # Set to run stage 3 (Vertical Covariances).
+#setenv RUN_GEN_BE_STAGE4 # Set to run stage 4 (Horizontal Covariances).
+#setenv RUN_GEN_BE_DIAGS  # Set to run gen_be diagnostics.
+#setenv RUN_GEN_BE_DIAGS_READ  # Set to run gen_be diagnostics_read.
 
 #-----------------------------------------------------------------------------------
 # Don't change anything below this line.
@@ -63,6 +70,7 @@ if ( ! $?EXPT )          setenv EXPT 2003-01.test
 if ( ! $?ID )            setenv ID ${BE_METHOD}.bin_type${BIN_TYPE}
 if ( ! $?SRC_DIR )       setenv SRC_DIR ${HOME}/code_development/WRF_V2.1.2
 if ( ! $?WRFVAR_DIR )    setenv WRFVAR_DIR ${SRC_DIR}/wrfvar
+if ( ! $?BUILD_DIR )     setenv BUILD_DIR ${WRFVAR_DIR}/gen_be
 if ( ! $?DATA_DISK )     setenv DATA_DISK /ocotillo1
 if ( ! $?DOMAIN )        setenv DOMAIN con200
 if ( ! $?DAT_DIR )       setenv DAT_DIR ${DATA_DISK}/${user}/data/${DOMAIN}/noobs/gen_be
@@ -99,7 +107,7 @@ if ( $?RUN_GEN_BE_STAGE1 ) then
    set BEGIN_CPU = `date`
    echo "Beginning CPU time: ${BEGIN_CPU}"
 
-   ln -sf ${WRFVAR_DIR}/gen_be/gen_be_stage1.exe .
+   ln -sf ${BUILD_DIR}/gen_be_stage1.exe .
 
 cat >! gen_be_stage1_nl.nl << EOF
   &gen_be_stage1_nl
@@ -122,6 +130,11 @@ cat >! gen_be_stage1_nl.nl << EOF
 EOF
 
    ./gen_be_stage1.exe >& gen_be_stage1.log
+   set RC = $status
+   if ( $RC != 0 ) then
+     echo "Stage 1 failed with error" $RC
+     exit 1
+   endif
 
    set END_CPU = `date`
    echo "Ending CPU time: ${END_CPU}"
@@ -142,7 +155,7 @@ if ( $?RUN_GEN_BE_STAGE2 ) then
    echo "Beginning CPU time: ${BEGIN_CPU}"
 
 
-   ln -sf ${WRFVAR_DIR}/gen_be/gen_be_stage2.exe .
+   ln -sf ${BUILD_DIR}/gen_be_stage2.exe .
 
 cat >! gen_be_stage2_nl.nl << EOF
   &gen_be_stage2_nl
@@ -157,6 +170,11 @@ cat >! gen_be_stage2_nl.nl << EOF
 EOF
 
    ./gen_be_stage2.exe >& gen_be_stage2.log
+   set RC = $status
+   if ( $RC != 0 ) then
+     echo "Stage 2 failed with error" $RC
+     exit 1
+   endif
 
    set END_CPU = `date`
    echo "Ending CPU time: ${END_CPU}"
@@ -175,7 +193,7 @@ if ( $?RUN_GEN_BE_STAGE2A ) then
    set BEGIN_CPU = `date`
    echo "Beginning CPU time: ${BEGIN_CPU}"
 
-   ln -sf ${WRFVAR_DIR}/gen_be/gen_be_stage2a.exe .
+   ln -sf ${BUILD_DIR}/gen_be_stage2a.exe .
 
 cat >! gen_be_stage2a_nl.nl << EOF
   &gen_be_stage2a_nl
@@ -192,6 +210,11 @@ cat >! gen_be_stage2a_nl.nl << EOF
 EOF
 
    ./gen_be_stage2a.exe >& gen_be_stage2a.log
+   set RC = $status
+   if ( $RC != 0 ) then
+     echo "Stage 2a failed with error" $RC
+     exit 1
+   endif
 
    rm -rf ${DELETE_DIRS} >&! /dev/null
    set END_CPU = `date`
@@ -212,7 +235,7 @@ if ( $?RUN_GEN_BE_STAGE3 ) then
    set BEGIN_CPU = `date`
    echo "Beginning CPU time: ${BEGIN_CPU}"
 
-   ln -sf ${WRFVAR_DIR}/gen_be/gen_be_stage3.exe .
+   ln -sf ${BUILD_DIR}/gen_be_stage3.exe .
 
    foreach CV ( $CONTROL_VARIABLES )
 
@@ -242,7 +265,12 @@ cat >! gen_be_stage3_nl.nl << EOF
     dat_dir = '${DAT_DIR}' /
 EOF
 
-         ./gen_be_stage3.exe >& gen_be_stage3.${CV}.log
+        ./gen_be_stage3.exe >& gen_be_stage3.${CV}.log
+        set RC = $status
+        if ( $RC != 0 ) then
+          echo "Stage 3 failed with error" $RC
+          exit 1
+        endif
       endif
    end
 
@@ -263,6 +291,11 @@ if ( $?RUN_GEN_BE_STAGE4 ) then
       echo "---------------------------------------------------------------"
 
       ${WRFVAR_DIR}/run/gen_be/gen_be_stage4_global.csh >&! gen_be_stage4_global.log
+      set RC = $status
+      if ( $RC != 0 ) then
+        echo "Stage 4 global failed with error" $RC
+        exit 1
+      endif
 
    else
 
@@ -271,6 +304,11 @@ if ( $?RUN_GEN_BE_STAGE4 ) then
       echo "---------------------------------------------------------------"
 
       ${WRFVAR_DIR}/run/gen_be/gen_be_stage4_regional.csh >&! gen_be_stage4_regional.log
+      set RC = $status
+      if ( $RC != 0 ) then
+        echo "Stage 4 regional failed with error" $RC
+        exit 1
+      endif
 
    endif 
 
@@ -281,7 +319,7 @@ endif
 #------------------------------------------------------------------------
 
 if ( $?RUN_GEN_BE_DIAGS ) then
-   ln -sf ${WRFVAR_DIR}/gen_be/gen_be_diags.exe .
+   ln -sf ${BUILD_DIR}/gen_be_diags.exe .
 
 cat >! gen_be_diags_nl.nl << EOF
   &gen_be_diags_nl
@@ -291,6 +329,11 @@ cat >! gen_be_diags_nl.nl << EOF
 EOF
 
       ./gen_be_diags.exe >& gen_be_diags.log
+      set RC = $status
+      if ( $RC != 0 ) then
+        echo "BE diags failed with error" $RC
+        exit 1
+      endif
 
 endif
 
@@ -306,8 +349,13 @@ cat >! gen_be_diags_nl.nl << EOF
     uh_method = '${UH_METHOD}' /
 EOF
 
-   ln -sf ${WRFVAR_DIR}/gen_be/gen_be_diags_read.exe .
+   ln -sf ${BUILD_DIR}/gen_be_diags_read.exe .
    ./gen_be_diags_read.exe >& gen_be_diags_read.log
+   set RC = $status
+   if ( $RC != 0 ) then
+     echo "BE diags read failed with error" $RC
+     exit 1
+   endif
 
 endif
 

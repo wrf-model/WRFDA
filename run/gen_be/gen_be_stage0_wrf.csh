@@ -41,6 +41,7 @@ setenv WRFVAR_DIR ${HOME}/code_development/WRF_V2.1.2/tmp/wrfvar.gen_be.test
  if ( ! $?BIN_DIR )       setenv BIN_DIR      ${HOME}/bin
  if ( ! $?SRC_DIR )       setenv SRC_DIR      ${HOME}/code_development/WRF_V2.1.2
  if ( ! $?WRFVAR_DIR )    setenv WRFVAR_DIR   ${SRC_DIR}/wrfvar
+ if ( ! $?BUILD_DIR )     setenv BUILD_DIR    ${WRFVAR_DIR}/gen_be
  if ( ! $?DATA_DISK )     setenv DATA_DISK    /ocotillo1
  if ( ! $?DOMAIN )        setenv DOMAIN       con200      # Application name.
  if ( ! $?DAT_DIR )       setenv DAT_DIR      ${DATA_DISK}/${USER}/data/${DOMAIN}/noobs
@@ -76,7 +77,7 @@ setenv WRFVAR_DIR ${HOME}/code_development/WRF_V2.1.2/tmp/wrfvar.gen_be.test
       set FILE2 = ${DAT_DIR}/${DATE2}/wrfout_d01_${FILE_DATE}
    endif
 
-   ln -sf ${WRFVAR_DIR}/gen_be/gen_be_stage0_wrf.exe .
+   ln -sf ${BUILD_DIR}/gen_be_stage0_wrf.exe .
 
    ./gen_be_stage0_wrf.exe ${FCST_TIME} $FILE1 $FILE2 >&! gen_be_stage0_wrf.out
    mv diff ../diff.${FILE_DATE}

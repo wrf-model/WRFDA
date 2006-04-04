@@ -30,6 +30,7 @@
  if ( ! $?ID )            setenv ID ${BE_METHOD}.bin_type${BIN_TYPE}
  if ( ! $?SRC_DIR )       setenv SRC_DIR ${HOME}/code_development/WRF_V2.1.2
  if ( ! $?WRFVAR_DIR )    setenv WRFVAR_DIR ${SRC_DIR}/wrfvar
+ if ( ! $?BUILD_DIR )     setenv BUILD_DIR ${WRFVAR_DIR}/gen_be
  if ( ! $?DATA_DISK )     setenv DATA_DISK /tara
  if ( ! $?DOMAIN )        setenv DOMAIN katrina.12km
  if ( ! $?DAT_DIR )       setenv DAT_DIR ${DATA_DISK}/${user}/data/${DOMAIN}/noobs/gen_be
@@ -47,7 +48,7 @@
 
  cd ${RUN_DIR}
    
- ln -sf ${WRFVAR_DIR}/gen_be/gen_be_stage4_global.exe .
+ ln -sf ${BUILD_DIR}/gen_be_stage4_global.exe .
 
  foreach CV ( $CONTROL_VARIABLES )
     setenv VARIABLE $CV
