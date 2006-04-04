@@ -10,14 +10,14 @@ CC_TOOLS        =       cc
 
 #FCOPTIM         =       -fast -O2 -Olimit 2000
 FCOPTIM         =       -fast -O2
-FCDEBUG         =       -g
+FCDEBUG         =       #-g
 FCTYPE          =       -r8
 FCFORM          =       -free
 FCHOST          =       -arch host
-FCBASE          =       -automatic -cpp -fpe0 -align dcommons -align records -convert big_endian
-FCBUFR          =       -automatic -cpp -fpe0 -align dcommons -align records
+FCENDIAN        =       -convert big_endian
+FCBASE          =       -automatic -cpp -fpe0 -align dcommons -align records
 LDFLAGS         =       $(FCOPTIM) $(FCBASE)
-FC_FFT_RF       =       -automatic -cpp -fpe2 -align dcommons -align records -convert big_endian
+FC_FFT_RF       =       $(FCBASE) $(FCENDIAN)
 
 ARCHFLAGS2      =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DINTIO \
                         -DTRIEDNTRUE -DONLY_WRFMODEL_IO \
@@ -46,14 +46,15 @@ CC_TOOLS        =       cc
 
 #FCOPTIM         =       -fast -O2 -Olimit 2000
 FCOPTIM         =       -fast -O2
-FCDEBUG         =       -g
+FCDEBUG         =       #-g
 FCTYPE          =       -r8
 FCFORM          =       -free
 FCHOST          =       -arch host
-FCBASE          =       -automatic -cpp -fpe0 -align dcommons -align records -convert big_endian
-FCBUFR          =       -automatic -cpp -fpe0 -align dcommons -align records
-FC_FFT_RF       =       -automatic -cpp -fpe2 -align dcommons -align records -convert big_endian
-LDFLAGS         =       $(FCOPTIM) $(FCBASE)
+FCENDIAN        =       -convert big_endian
+FCBASE          =       -automatic -cpp -fpe0 -align dcommons -align records
+FC_FFT_RF       =       $(FCBASE) $(FCENDIAN)
+LDFLAGS         =       $(FCOPTIM) $(FCBASE) $(FCENDIAN)
+
 
 DMPARALLEL      =       1
 RSL_PATH        =       $(DEVTOP)/external/RSL
@@ -94,14 +95,15 @@ CC_TOOLS        =       cc
 
 #FCOPTIM         =       -fast -O2 -Olimit 2000
 FCOPTIM         =       -O0
-FCDEBUG         =       -g
+FCDEBUG         =       #-g
 FCTYPE          =       -r8
 FCFORM          =       -free
 FCHOST          =       -arch host
-FCBASE          =       -automatic -cpp -fpe0 -align dcommons -align records -convert big_endian
-FCBUFR          =       -automatic -cpp -fpe0 -align dcommons -align records
-FC_FFT_RF       =       -automatic -cpp -fpe2 -align dcommons -align records -convert big_endian
-LDFLAGS         =       $(FCOPTIM) $(FCBASE)
+FCENDIAN        =       -convert big_endian
+FCBASE          =       -automatic -cpp -fpe0 -align dcommons -align records
+FC_FFT_RF       =       $(FCBASE) $(FCENDIAN)
+
+LDFLAGS         =       $(FCOPTIM) $(FCBASE) $(FCENDIAN)
 
 ARCHFLAGS2      =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DINTIO \
                         -DTRIEDNTRUE -DONLY_WRFMODEL_IO \
@@ -133,9 +135,10 @@ FCOPTIM         =       -fast
 FCDEBUG         =       #-g
 FCTYPE          =       -r8
 FCFORM          =       -Mfree
-FCBUFR          =       -Ktrap=fp -tp p6
-FCBASE          =       -Ktrap=fp -tp p6 -byteswapio
-LDFLAGS         =       -byteswapio
+FCENDIAN        =       -byteswapio
+FCBASE          =       -Ktrap=fp -tp p6
+
+LDFLAGS         =       $(FCENDIAN)
 
 ARCHFLAGS2      =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE \
                         -DTRIEDNTRUE -DONLY_WRFMODEL_IO
@@ -168,9 +171,10 @@ FCOPTIM         =       #-fast
 FCDEBUG         =       #-g
 FCTYPE          =       -r8
 FCFORM          =       -Mfree
-FCBUFR          =       -Ktrap=fp -tp p6
-FCBASE          =       -Ktrap=fp -tp p6 -byteswapio
-LDFLAGS         =       -byteswapio
+FCENDIAN        =       -byteswapio
+FCBASE          =       -Ktrap=fp -tp p6
+
+LDFLAGS         =       $(FCENDIAN)
 
 DMPARALLEL      =       1
 RSL_PATH        =       $(DEVTOP)/external/RSL
@@ -213,8 +217,8 @@ TRADFLAG        =       -traditional
 FCOPTIM         =       -O3 -xW
 FCDEBUG         =       #-g
 FCFORM          =       -FR -cm -w
-FCBASE          =       -convert big_endian
-FCBUFR          =       $(FCBASE)
+FCENDIAN        =       -convert big_endian
+FCBASE          =       
 FCTYPE          =       -r8
 
 ARCHFLAGS2      =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE \
@@ -248,8 +252,9 @@ TRADFLAG        =       -traditional
 FCOPTIM         =       
 FCDEBUG         =       #-g
 FCFORM          =       -ffree-form
-FCBASE          =       -cpp -Wno=101,139,155,158 -fno-second-underscore
-FCBUFR          =       $(FCBASE)
+FCENDIAN        =
+FCBASE          =       -cpp -Wno=101,139,155,158 -fno-second-underscore \
+                          -ftrace=full
 FCTYPE          =       -r8
 
 ARCHFLAGS2      =       -DTRIEDNTRUE -DONLY_WRFMODEL_IO
@@ -272,17 +277,17 @@ arch :  module_dm_stubs.F gen_comms.stub
 #
 FC              =       mpif90
 F77             =       $(FC)
-SFC             =       pgf90
+SFC             =       g95
 LD              =       $(FC)
 CC              =       mpicc
 CC_TOOLS        =       gcc
 
 TRADFLAG        =       -traditional
-FCOPTIM         =       #-fast
+FCOPTIM         =      
 FCDEBUG         =       #-g
 FCFORM          =       -ffree-form
-FCBASE          =       -cpp -Wno=101,139,155,158 -fno-second-underscore
-FCBUFR          =       $(FCBASE)
+FCENDIAN        =
+FCBASE          =       -cpp -Wno=101,139,155,158 -fno-second-underscore -ftrace=full
 FCTYPE          =       -r8
 
 DMPARALLEL      =       1
@@ -323,12 +328,12 @@ CC_TOOLS        =       cc
 
 TRADFLAG        =
 FCOPTIM         =       -O2
-FCDEBUG         =       -g
+FCDEBUG         =       #-g
 FCTYPE          =       -r8
 FCFORM          =       -freeform
+FCENDIAN        =
 FCBASE          =       -64 -mips4
-FCBUFR          =       $(FCBASE)
-LDFLAGS         =       -64 -mips4
+LDFLAGS         =       $(FCBASE)
 
 ARCHFLAGS2      =       -DINTIO \
                         -DTRIEDNTRUE -DONLY_WRFMODEL_IO \
@@ -361,11 +366,11 @@ CC              =       mpicc
 CC_TOOLS        =       cc
 
 FCOPTIM         =       -O3 -OPT:roundoff=3:IEEE_arithmetic=3
-FCDEBUG         =       -g
+FCDEBUG         =       #-g
 FCTYPE          =       -r8
 FCFORM          =       -freeform
+FCENDIAN        =
 FCBASE          =       -64 -mips4 -w
-FCBUFR          =       $(FCBASE)
 LDFLAGS         =       $(FCOPTIM) $(FCBASE)
 
 DMPARALLEL      =       1
@@ -414,10 +419,10 @@ FCOPTIM         =
 FCDEBUG         =      
 FCTYPE          =   
 FCFORM          =     	-f4
+FCENDIAN        =
 FCBASE          =       -C hopt \
 			-Wf"-init stack=zero heap=zero -pvctl loopcnt=100000000 noassume -O nooverlap" \
                         -pi -ew -eb -float0 -Wf"-L fmtlist"
-FCBUFR          =       $(FCBASE)
 FC_FFT_RF       =       $(FCBASE)
 LDFLAGS         =  	#-Wl"-Z 3000000"
 
@@ -453,9 +458,9 @@ FCOPTIM         =       -O0 -qarch=auto
 FCDEBUG         =       #-g -qfullpath
 FCTYPE          =       -qrealsize=8
 FCFORM          =       -qfree=f90
+FCENDIAN        =
 FCBASE          =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767
 #                       -qflttrap=zerodivide:invalid:enable -qsigtrap
-FCBUFR          =       $(FCBASE)
 FC_FFT_RF       =       $(FCBASE)
 LDFLAGS         =	-bmaxstack:256000000 -bmaxdata:2048000000
 
@@ -486,12 +491,12 @@ CC_TOOLS        =       cc
 SCC             =       cc_r
 
 FCOPTIM         =       -O0 -qarch=auto
-FCDEBUG         =       -g -qfullpath
+FCDEBUG         =       #-g -qfullpath
 FCTYPE          =       -qrealsize=8
 FCFORM          =       -qfree=f90
+FCENDIAN        =
 FCBASE          =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767
 #			-qflttrap=zerodivide:invalid:enable -qsigtrap
-FCBUFR          =       $(FCBASE)
 FC_FFT_RF       =       $(FCBASE)
 LDFLAGS         =	-bmaxstack:256000000 -bmaxdata:2048000000
 
@@ -557,8 +562,8 @@ FCDEBUG         =       #-g
 #FCTYPE          =       -sinteger32 -e m -sreal64 -dp
 FCTYPE          =       -e m -sreal64 -dp
 FCFORM          =       -f free -N 255
+FCENDIAN        =
 FCBASE          =       #-Ovector0 -Ostream0 -Oscalar1
-FCBUFR          =       $(FCBASE)
 FC_FFT_RF       =       $(FCBASE)
 LDFLAGS         =
 
@@ -612,8 +617,8 @@ FCOPTIM         =     	-Ofp2 -O1
 FCDEBUG         =       #-g
 FCTYPE          =       -sinteger32 -e m -sreal64 -dp
 FCFORM          =       -f free -N 255
+FCENDIAN        =
 FCBASE          =       #-Ovector0 -Ostream0 -Oscalar1
-FCBUFR          =       $(FCBASE)
 FC_FFT_RF       =       $(FCBASE)
 
 DMPARALLEL      =       1
@@ -666,9 +671,9 @@ FCOPTIM         =       -O0 -qarch=auto
 FCDEBUG         =       #-g
 FCTYPE          =       -qrealsize=8
 FCFORM          =       -qfree=f90
+FCENDIAN        =
 FCBASE          =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767
 #                       -qflttrap=zerodivide:invalid:enable -qsigtrap
-FCBUFR          =       $(FCBASE)
 FC_FFT_RF       =       $(FCBASE)
 LDFLAGS         =	 -Wl,-stack_size,10000000,-stack_addr,0xc0000000
 
@@ -676,8 +681,10 @@ ARCHFLAGS2      =       -DINTIO \
                         -DTRIEDNTRUE   \
 			-DLIMIT_ARGS -DNO_NAMELIST_PRINT
 ARCHFLAGS4      =       -DNOUNDERSCORE -DLANDREAD_STUB -DMACOS
+EXTRA_LIBS      =       -lSystemStubs
 
 CPPFLAGS        =       -C -P -xassembler-with-cpp
+CPPFLAGS_BUFR   =       -C -P $(TRADFLAG)
 
 POUND_DEF       =       -DMACOS \
 			-DNONSTANDARD_SYSTEM -DF90_STANDALONE \
@@ -703,9 +710,9 @@ FCOPTIM         =       -O0 -qarch=auto
 FCDEBUG         =       #-g
 FCTYPE          =       -qrealsize=8
 FCFORM          =       -qfree=f90
+FCENDIAN        =
 FCBASE          =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767
 #                       -qflttrap=zerodivide:invalid:enable -qsigtrap
-FCBUFR          =       $(FCBASE)
 FC_FFT_RF       =       $(FCBASE)
 LDFLAGS         =	 -Wl,-stack_size,10000000,-stack_addr,0xc0000000
 
@@ -713,6 +720,7 @@ ARCHFLAGS2      =       -DINTIO \
                         -DTRIEDNTRUE   \
 			-DLIMIT_ARGS -DNO_NAMELIST_PRINT
 ARCHFLAGS4      =       -DNOUNDERSCORE -DLANDREAD_STUB -DMACOS
+EXTRA_LIBS      =       -lSystemStubs
 
 CPPFLAGS         =       -C -P -xassembler-with-cpp
 
@@ -740,8 +748,8 @@ FCOPTIM         =
 FCDEBUG         =       #-g
 FCTYPE          =       -r8
 FCFORM          =       -ffree-form
+FCENDIAN        =
 FCBASE          =       -cpp -Wno=101,139,155,158 -fno-second-underscore -ftrace=full
-FCBUFR          =       $(FCBASE)
 
 ARCHFLAGS2      =       -DINTIO \
                         -DTRIEDNTRUE   \
