@@ -30,14 +30,10 @@ subroutine da_readwrite_be_stage2( outunit, be_method, nk )
    real, allocatable   :: regcoeff3(:,:,:)                ! psi/T regression cooefficient.
 
 ! Read in the coefficients:
-print *, 'at least got here'
    filename = 'gen_be_stage2.'//trim(be_method)//'.dat'
    open (iunit, file = filename, form='unformatted')
    read(iunit)ni, nj, nk
-print *, ni, nj, nk 
    read(iunit)num_bins, num_bins2d
-print *, num_bins, num_bins2d
-stop
 
    allocate( regcoeff1(1:num_bins) )
    allocate( regcoeff2(1:nk,1:num_bins2d) )
