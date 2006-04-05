@@ -1,39 +1,29 @@
 #! /bin/csh -f
 #-----------------------------------------------------------------------
 # Purpose : Create BE statistics from input perturbation files.
+# Run Stage 0: Calculate ensemble perturbations from model forecasts.
+# Run Stage 1: Read "standard fields", and remove time/ensemble/area mean.
 # Run Stage 1: Read "standard fields", and remove time/ensemble/area mean.
 # Run Stage 2: Calculate regression coefficients.
 # Run Stage 2a: Calculate control variable fields.
 # Run Stage 3: Read 3D control variable fields, and calculate vertical covariances.
 # Run Stage 4: Calculate horizontal covariances.
 # Finally, gather data together into a single BE file.
-#
-# History : 10/01/2004 Creation.                       Dale Barker
-#           05/21/2005 Modify for inclusion in wrfvar  Dale Barker
-#           06/06/2005 Modified by                     Y.-R. Guo
 #-----------------------------------------------------------------------
 
-#Define job via environment variables:
-
-# SRC_DIR
-# WRFVAR_DIR
-# BUILD_DIR
-# ID
-# EXPT
-# DAT_DIR
-# RUN_DIR
-
 #set echo
+#Define job via environment variables:
+setenv WRFVAR_DIR ${HOME}/code_development/WRF_V2.1.2/tmp/wrfvar.gen_be.test
 
-# Define variables for the stages you wish to run:
-
-#setenv RUN_GEN_BE_STAGE1 # Set to run stage 1 (Remove mean, split variables).
-#setenv RUN_GEN_BE_STAGE2 # Set to run stage 2 (Regression Coefficients).
-#setenv RUN_GEN_BE_STAGE2A # Set to run stage 2 (Regression Coefficients).
-#setenv RUN_GEN_BE_STAGE3 # Set to run stage 3 (Vertical Covariances).
-#setenv RUN_GEN_BE_STAGE4 # Set to run stage 4 (Horizontal Covariances).
-#setenv RUN_GEN_BE_DIAGS  # Set to run gen_be diagnostics.
-#setenv RUN_GEN_BE_DIAGS_READ  # Set to run gen_be diagnostics_read.
+# Uncomment variables for the stages you wish to run:
+setenv RUN_GEN_BE_STAGE0 # Set to run stage 0 (create perturbation files).
+setenv RUN_GEN_BE_STAGE1 # Set to run stage 1 (Remove mean, split variables).
+setenv RUN_GEN_BE_STAGE2 # Set to run stage 2 (Regression Coefficients).
+setenv RUN_GEN_BE_STAGE2A # Set to run stage 2 (Regression Coefficients).
+setenv RUN_GEN_BE_STAGE3 # Set to run stage 3 (Vertical Covariances).
+setenv RUN_GEN_BE_STAGE4 # Set to run stage 4 (Horizontal Covariances).
+setenv RUN_GEN_BE_DIAGS  # Set to run gen_be diagnostics.
+setenv RUN_GEN_BE_DIAGS_READ  # Set to run gen_be diagnostics_read.
 
 #-----------------------------------------------------------------------------------
 # Don't change anything below this line.
@@ -74,12 +64,12 @@ if ( ! $?BUILD_DIR )     setenv BUILD_DIR ${WRFVAR_DIR}/gen_be
 if ( ! $?BIN_DIR )       setenv BIN_DIR   ${WRFVAR_DIR}/tools
 if ( ! $?DATA_DISK )     setenv DATA_DISK /ocotillo1
 if ( ! $?DOMAIN )        setenv DOMAIN con200
-if ( ! $?DAT_DIR )       setenv DAT_DIR ${DATA_DISK}/${user}/data/${DOMAIN}/noobs/gen_be
+if ( ! $?DAT_DIR )       setenv DAT_DIR ${DATA_DISK}/${user}/data/${DOMAIN}/noobs
 if ( ! $?RUN_DIR )       setenv RUN_DIR ${DAT_DIR}/gen_be
-if ( ! $?DIFF_DIR )      setenv DIFF_DIR ${RUN_DIR}/diff
+if ( ! $?STAGE0_DIR )    setenv STAGE0_DIR ${RUN_DIR}/stage0
 
 if ( ! -d ${RUN_DIR} )   mkdir ${RUN_DIR}
-if ( ! -d ${DIFF_DIR} )  mkdir ${DIFF_DIR}
+if ( ! -d ${STAGE0_DIR} )  mkdir ${STAGE0_DIR}
 
 #List of control variables:
 
@@ -98,15 +88,29 @@ set DELETE_DIRS = (  )
 
 cd ${RUN_DIR}
 
-# Stage 0: Calculate ensemble perturbations from model forecasts
+#------------------------------------------------------------------------
+# Run Stage 0: Calculate ensemble perturbations from model forecasts.
+#------------------------------------------------------------------------
 
-if ( $MODEL == WRF ) then
-  $WRFVAR_DIR/run/gen_be/gen_be_stage0_wrf.csh
+if ( $?RUN_GEN_BE_STAGE0 ) then
+
+   echo "---------------------------------------------------------------"
+   echo "Run Stage 0: Calculate ensemble perturbations from model forecasts."
+   echo "---------------------------------------------------------------"
+
+   set BEGIN_CPU = `date`
+   echo "Beginning CPU time: ${BEGIN_CPU}"
+
+   $WRFVAR_DIR/run/gen_be/gen_be_stage0_wrf.csh >& gen_be_stage0_wrf.log
+
    set RC = $status
    if ( $RC != 0 ) then
      echo "Stage 0 for WRF failed with error" $RC
      exit 1
    endif
+
+   set END_CPU = `date`
+   echo "Ending CPU time: ${END_CPU}"
 endif
 
 # advance start date by 1 day and end date by 12 hours, as our differencing
@@ -148,7 +152,7 @@ cat >! gen_be_stage1_nl.nl << EOF
     remove_mean = ${REMOVE_MEAN},
     gaussian_lats = ${GAUSSIAN_LATS},
     expt = '${EXPT}',
-    dat_dir = '${DIFF_DIR}' /
+    dat_dir = '${STAGE0_DIR}' /
 EOF
 
    ./gen_be_stage1.exe >& gen_be_stage1.log
@@ -306,6 +310,10 @@ endif
 #------------------------------------------------------------------------
 
 if ( $?RUN_GEN_BE_STAGE4 ) then
+
+   set BEGIN_CPU = `date`
+   echo "Beginning CPU time: ${BEGIN_CPU}"
+
    if (${UH_METHOD} == 'power') then    
 
       echo "---------------------------------------------------------------"
@@ -333,6 +341,9 @@ if ( $?RUN_GEN_BE_STAGE4 ) then
       endif
 
    endif 
+
+   set END_CPU = `date`
+   echo "Ending CPU time: ${END_CPU}"
 
 endif
 

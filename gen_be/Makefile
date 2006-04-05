@@ -67,55 +67,7 @@ gen_be_diags_read : gen_be_diags_read.o
 
 gen_be_stage0_wrf.o: 
 	$(RM) $@
-	$(FC) -c $(FCFORM) $(FCTYPE) $(MODULE_DIRS) -I${NETCDF}/include gen_be_stage0_wrf.F
-
-gen_be_stage1.o:
-	$(RM) $@
-	$(FC) -c $(FCFORM) $(FCTYPE) $(MODULE_DIRS) gen_be_stage1.F
-
-gen_be_stage1_1dvar.o:
-	$(RM) $@
-	$(FC) -c $(FCFORM) $(FCTYPE) $(MODULE_DIRS) gen_be_stage1_1dvar.F
-
-gen_be_stage2.o:
-	$(RM) $@
-	$(FC) -c $(FCFORM) $(FCTYPE) $(MODULE_DIRS) gen_be_stage2.F
-
-gen_be_stage2_1dvar.o:
-	$(RM) $@
-	$(FC) -c $(FCFORM) $(FCTYPE) $(MODULE_DIRS) gen_be_stage2_1dvar.F
-
-gen_be_stage2a.o:
-	$(RM) $@
-	$(FC) -c $(FCFORM) $(FCTYPE) $(MODULE_DIRS) gen_be_stage2a.F
-
-gen_be_stage3.o:
-	$(RM) $@
-	$(FC) -c $(FCFORM) $(FCTYPE) $(MODULE_DIRS) gen_be_stage3.F
-
-gen_be_stage4_global.o:
-	$(RM) $@
-	$(FC) -c $(FCFORM) $(FCTYPE) $(MODULE_DIRS) gen_be_stage4_global.F
-
-gen_be_stage4_regional.o:
-	$(RM) $@
-	$(FC) -c $(FCFORM) $(FCTYPE) $(MODULE_DIRS) gen_be_stage4_regional.F
-
-gen_be_cov2d.o:
-	$(RM) $@
-	$(FC) -c $(FCFORM) $(FCTYPE) $(MODULE_DIRS) gen_be_cov2d.F
-
-gen_be_cov3d.o:
-	$(RM) $@
-	$(FC) -c $(FCFORM) $(FCTYPE) $(MODULE_DIRS) gen_be_cov3d.F
-
-gen_be_diags.o:
-	$(RM) $@
-	$(FC) -c $(FCFORM) $(FCTYPE) $(MODULE_DIRS) gen_be_diags.F
-
-gen_be_diags_read.o:
-	$(RM) $@
-	$(FC) -c $(FCFORM) $(FCTYPE) $(MODULE_DIRS) gen_be_diags_read.F
+	$(FC) -c ${FCFORM} $(FCBASE) ${FCTYPE} ${MODULE_DIRS} -I${NETCDF}/include gen_be_stage0_wrf.F
 
 clean: 
 	@ echo 'use the clean script'

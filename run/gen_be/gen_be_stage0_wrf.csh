@@ -4,18 +4,11 @@
 #
 # Purpose: To calculate ensemble perturbations in "standard fields".
 #
-# History:
-#     09/13/2005    Created. Dale Barker
 #-----------------------------------------------------------------------
 
 #Define job by overriding default environment variables:
 
 #set echo
-
-#AFWA T4B:
-#setenv DOMAIN t4b
-#setenv START_DATE 2006020300
-#setenv END_DATE 2006030100
 
 #-----------------------------------------------------------------------------------
 # Don't change anything below this line.
@@ -44,10 +37,10 @@
  if ( ! $?DOMAIN )        setenv DOMAIN       con200      # Application name.
  if ( ! $?DAT_DIR )       setenv DAT_DIR      ${DATA_DISK}/${USER}/data/${DOMAIN}/noobs
  if ( ! $?RUN_DIR )       setenv RUN_DIR      ${DAT_DIR}/gen_be
- if ( ! $?DIFF_DIR )      setenv DIFF_DIR     ${RUN_DIR}/diff
+ if ( ! $?STAGE0_DIR )    setenv STAGE0_DIR   ${RUN_DIR}/stage0
 
  if ( ! -d ${RUN_DIR} )   mkdir ${RUN_DIR}
- if ( ! -d ${DIFF_DIR} )  mkdir ${DIFF_DIR}
+ if ( ! -d ${STAGE0_DIR} )  mkdir ${STAGE0_DIR}
 
 #OK, let's go!
 
@@ -80,8 +73,8 @@
 
    ln -fs ${BUILD_DIR}/gen_be_stage0_wrf.exe .
    ./gen_be_stage0_wrf.exe ${FCST_TIME} $FILE1 $FILE2 >&! gen_be_stage0_wrf.out
-   mv diff ${DIFF_DIR}/diff.${FILE_DATE}
-   mv gen_be_stage0_wrf.out ../gen_be_stage0_wrf.out.${FILE_DATE}
+   mv diff ${STAGE0_DIR}/diff.${FILE_DATE}
+   mv gen_be_stage0_wrf.out ${STAGE0_DIR}/gen_be_stage0_wrf.out.${FILE_DATE}
    rm -rf $TMP_DIR >&! /dev/null
 
    setenv DATE $DATE2
