@@ -39,8 +39,8 @@
 # Don't change anything below this line.
 #-----------------------------------------------------------------------------------
 
-if ( ! $?START_DATE )    setenv START_DATE    2003010200 # Time of first perturbation.
-if ( ! $?END_DATE )      setenv END_DATE      2003012812 # Time of last perturbation.
+if ( ! $?START_DATE )    setenv START_DATE    2003010100 # Time of first perturbation.
+if ( ! $?END_DATE )      setenv END_DATE      2003012800 # Time of last perturbation.
 if ( ! $?INTERVAL )      setenv INTERVAL      12         # Period between files (hours).
 if ( ! $?BE_METHOD )     setenv BE_METHOD     NMC        # NMC (NMC-method), ENS (Ensemble-Method).
 if ( ! $?NE )            setenv NE            1          # Number of ensemble members (for ENS).
@@ -67,15 +67,19 @@ if ( ! $?RESOLUTION_KM ) setenv RESOLUTION_KM 200        # Hard-wired for now (o
 if ( ! $?TESTING_SPECTRAL ) setenv TESTING_SPECTRAL .false. # True if performing spectral tests.
 
 if ( ! $?EXPT )          setenv EXPT 2003-01.test
-if ( ! $?ID )            setenv ID ${BE_METHOD}.bin_type${BIN_TYPE}
+if ( ! $?ID1 )           setenv ID1 ${BE_METHOD}.bin_type${BIN_TYPE}
 if ( ! $?SRC_DIR )       setenv SRC_DIR ${HOME}/code_development/WRF_V2.1.2
 if ( ! $?WRFVAR_DIR )    setenv WRFVAR_DIR ${SRC_DIR}/wrfvar
 if ( ! $?BUILD_DIR )     setenv BUILD_DIR ${WRFVAR_DIR}/gen_be
+if ( ! $?BIN_DIR )       setenv BIN_DIR   ${WRFVAR_DIR}/tools
 if ( ! $?DATA_DISK )     setenv DATA_DISK /ocotillo1
 if ( ! $?DOMAIN )        setenv DOMAIN con200
 if ( ! $?DAT_DIR )       setenv DAT_DIR ${DATA_DISK}/${user}/data/${DOMAIN}/noobs/gen_be
-if ( ! $?RUN_DIR )       setenv RUN_DIR ${DAT_DIR}/${ID}
+if ( ! $?RUN_DIR )       setenv RUN_DIR ${DAT_DIR}/gen_be
+if ( ! $?DIFF_DIR )      setenv DIFF_DIR ${RUN_DIR}/diff
+
 if ( ! -d ${RUN_DIR} )   mkdir ${RUN_DIR}
+if ( ! -d ${DIFF_DIR} )  mkdir ${DIFF_DIR}
 
 #List of control variables:
 
@@ -93,6 +97,24 @@ set DELETE_DIRS = (  )
 #Uncomment to tidy (after running gen_be_cov3d) set DELETE_DIRS = ( chi t ps )
 
 cd ${RUN_DIR}
+
+# Stage 0: Calculate ensemble perturbations from model forecasts
+
+if ( $MODEL == WRF ) then
+  $WRFVAR_DIR/run/gen_be/gen_be_stage0_wrf.csh
+   set RC = $status
+   if ( $RC != 0 ) then
+     echo "Stage 0 for WRF failed with error" $RC
+     exit 1
+   endif
+endif
+
+# advance start date by 1 day and end date by 12 hours, as our differencing
+# calculation moves the time window
+
+setenv START_DATE `${BIN_DIR}/advance_cymdh $START_DATE $INTERVAL`
+setenv START_DATE `${BIN_DIR}/advance_cymdh $START_DATE $INTERVAL`
+setenv END_DATE   `${BIN_DIR}/advance_cymdh $END_DATE $INTERVAL`
 
 #------------------------------------------------------------------------
 #  Run Stage 1: Read "standard fields", and remove time/ensemble/area mean.
@@ -126,7 +148,7 @@ cat >! gen_be_stage1_nl.nl << EOF
     remove_mean = ${REMOVE_MEAN},
     gaussian_lats = ${GAUSSIAN_LATS},
     expt = '${EXPT}',
-    dat_dir = '${DAT_DIR}' /
+    dat_dir = '${DIFF_DIR}' /
 EOF
 
    ./gen_be_stage1.exe >& gen_be_stage1.log
@@ -166,7 +188,7 @@ cat >! gen_be_stage2_nl.nl << EOF
     ne = ${NE},
     testing_eofs = ${TESTING_EOFS},
     expt = '${EXPT}',
-    dat_dir = '${DAT_DIR}' /
+    dat_dir = '${RUN_DIR}' /
 EOF
 
    ./gen_be_stage2.exe >& gen_be_stage2.log
@@ -178,8 +200,8 @@ EOF
 
    set END_CPU = `date`
    echo "Ending CPU time: ${END_CPU}"
-
 endif
+
 #------------------------------------------------------------------------
 #  Run Stage 2a: Calculate control variable fields.
 #------------------------------------------------------------------------
@@ -206,7 +228,7 @@ cat >! gen_be_stage2a_nl.nl << EOF
     rf_scale = ${RF_SCALE},
     testing_eofs = ${TESTING_EOFS},
     expt = '${EXPT}',
-    dat_dir = '${DAT_DIR}' /
+    dat_dir = '${RUN_DIR}' /
 EOF
 
    ./gen_be_stage2a.exe >& gen_be_stage2a.log
@@ -262,7 +284,7 @@ cat >! gen_be_stage3_nl.nl << EOF
     use_global_eofs = ${USE_GLOBAL_EOFS},
     data_on_levels = ${DATA_ON_LEVELS},
     expt = '${EXPT}',
-    dat_dir = '${DAT_DIR}' /
+    dat_dir = '${RUN_DIR}' /
 EOF
 
         ./gen_be_stage3.exe >& gen_be_stage3.${CV}.log

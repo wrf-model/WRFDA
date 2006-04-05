@@ -12,8 +12,6 @@
 
 #set echo
 
-setenv WRFVAR_DIR ${HOME}/code_development/WRF_V2.1.2/tmp/wrfvar.gen_be.test 
-
 #AFWA T4B:
 #setenv DOMAIN t4b
 #setenv START_DATE 2006020300
@@ -35,18 +33,21 @@ setenv WRFVAR_DIR ${HOME}/code_development/WRF_V2.1.2/tmp/wrfvar.gen_be.test
  if ( ! $?END_DATE )      setenv END_DATE      2003012800 # Initial time of last forecast. 
  if ( ! $?FCST_RANGE )    setenv FCST_RANGE    24         # Forecast range of forecast (hours).
  if ( ! $?INTERVAL )      setenv INTERVAL      12         # Period between files (hours).
- if ( ! $?BE_METHOD )     setenv BE_METHOD     1          # 1 (NMC-method), 2 (Ensemble-Method).
+ if ( ! $?BE_METHOD )     setenv BE_METHOD     NMC        # NMC-method or Ensemble-Method
  if ( ! $?NE )            setenv NE 1                     # Number of ensemble members (for ENS).
 
- if ( ! $?BIN_DIR )       setenv BIN_DIR      ${HOME}/bin
  if ( ! $?SRC_DIR )       setenv SRC_DIR      ${HOME}/code_development/WRF_V2.1.2
  if ( ! $?WRFVAR_DIR )    setenv WRFVAR_DIR   ${SRC_DIR}/wrfvar
  if ( ! $?BUILD_DIR )     setenv BUILD_DIR    ${WRFVAR_DIR}/gen_be
+ if ( ! $?BIN_DIR )       setenv BIN_DIR      ${WRFVAR_DIR}/tools
  if ( ! $?DATA_DISK )     setenv DATA_DISK    /ocotillo1
  if ( ! $?DOMAIN )        setenv DOMAIN       con200      # Application name.
  if ( ! $?DAT_DIR )       setenv DAT_DIR      ${DATA_DISK}/${USER}/data/${DOMAIN}/noobs
  if ( ! $?RUN_DIR )       setenv RUN_DIR      ${DAT_DIR}/gen_be
+ if ( ! $?DIFF_DIR )      setenv DIFF_DIR     ${RUN_DIR}/diff
+
  if ( ! -d ${RUN_DIR} )   mkdir ${RUN_DIR}
+ if ( ! -d ${DIFF_DIR} )  mkdir ${DIFF_DIR}
 
 #OK, let's go!
 
@@ -71,16 +72,15 @@ setenv WRFVAR_DIR ${HOME}/code_development/WRF_V2.1.2/tmp/wrfvar.gen_be.test
 
    set DATE2 = `${BIN_DIR}/advance_cymdh $DATE $INTERVAL`
 
-   if ( $BE_METHOD == 1 ) then
+   if ( $BE_METHOD == NMC ) then
 #     Create filenames for NMC-method input:
       set FILE1 = ${DAT_DIR}/${DATE}/wrfout_d01_${FILE_DATE}
       set FILE2 = ${DAT_DIR}/${DATE2}/wrfout_d01_${FILE_DATE}
    endif
 
-   ln -sf ${BUILD_DIR}/gen_be_stage0_wrf.exe .
-
+   ln -fs ${BUILD_DIR}/gen_be_stage0_wrf.exe .
    ./gen_be_stage0_wrf.exe ${FCST_TIME} $FILE1 $FILE2 >&! gen_be_stage0_wrf.out
-   mv diff ../diff.${FILE_DATE}
+   mv diff ${DIFF_DIR}/diff.${FILE_DATE}
    mv gen_be_stage0_wrf.out ../gen_be_stage0_wrf.out.${FILE_DATE}
    rm -rf $TMP_DIR >&! /dev/null
 
