@@ -51,15 +51,15 @@ program gen_be_stage4_regional
 
    read(start_date(1:10), fmt='(i10)')sdate
    read(end_date(1:10), fmt='(i10)')edate
-   write(6,'(4a)')' Computing error correlation scales for dates ', start_date, ' to ', end_date
-   write(6,'(a,i8,a)')' Interval between dates = ', interval, 'hours.'
-   write(6,'(a,i8)')' Number of ensemble members at each time = ', ne
-   write(6,'(a,i8)')' Stride over which to jump points in correlation calculation = ', stride
+   write(UNIT=stdout,FMT='(4a)')' Computing error correlation scales for dates ', start_date, ' to ', end_date
+   write(UNIT=stdout,FMT='(a,i8,a)')' Interval between dates = ', interval, 'hours.'
+   write(UNIT=stdout,FMT='(a,i8)')' Number of ensemble members at each time = ', ne
+   write(UNIT=stdout,FMT='(a,i8)')' Stride over which to jump points in correlation calculation = ', stride
 
    date = start_date
    cdate = sdate
 
-   write(ck,'(i2)') k
+   write(UNIT=ck,FMT='(i2)') k
    if ( k < 10 ) ck = '0'//ck(2:2)
    k_label = 'm'
 
@@ -72,18 +72,18 @@ program gen_be_stage4_regional
    do while ( cdate <= edate )
       do member = 1, ne
 
-         write(6,'(5a,i4)')'    Date = ', date, ', variable ', trim(variable), &
+         write(UNIT=stdout,FMT='(5a,i4)')'    Date = ', date, ', variable ', trim(variable), &
                            ' and member ', member
 
-         write(ce,'(i3)')member
+         write(UNIT=ce,FMT='(i3)')member
          if ( member < 10 ) ce = '00'//ce(3:3)
          if ( member >= 10 .and. member < 100 ) ce = '0'//ce(2:3)
 
 !        Assumes variable directory has been created by script:
          filename = trim(run_dir)//'/'//trim(variable)//'/'//date(1:10)//'.'//trim(variable)
          filename = trim(filename)//'.'//trim(be_method)//'.e'//ce//'.'//ck
-         open (iunit, file = filename, form='unformatted')
-         read(iunit) ni, nj, kdum
+         open (UNIT=iunit, file = filename, form='unformatted')
+         read(UNIT=iunit) ni, nj, kdum
 
          if ( count == 1.0 ) then
             nn = ni * ni + nj * nj  ! Maximum radius across grid (squared).
@@ -96,9 +96,9 @@ program gen_be_stage4_regional
             call get_grid_info( ni, nj, nn, stride, nr )
          end if
 
-         read(iunit)data_on_levels, use_global_eofs
-         read(iunit)field(1:ni,1:nj)
-         close(iunit)
+         read(UNIT=iunit)data_on_levels, use_global_eofs
+         read(UNIT=iunit)field(1:ni,1:nj)
+         close(UNIT=iunit)
 
 !        Calculate spatial correlation:
          call get_covariance( ni, nj, nn, stride, count, nr, field, cov )
@@ -114,7 +114,7 @@ program gen_be_stage4_regional
    end do
 
 !---------------------------------------------------------------------------------------------
-   write(6,'(a)')' [3] Compute fit of correlation to a straight line.'
+   write(UNIT=stdout,FMT='(a)')' [3] Compute fit of correlation to a straight line.'
 !---------------------------------------------------------------------------------------------
 
    filename = 'sl_print.'//trim(variable)//'.'//ck
@@ -237,6 +237,8 @@ subroutine make_scale_length( variable, ck, ounit, nn, nr, cov )
 !  cov(r) = cov(0) * exp(-r**2 / 8)
 !  Dale Barker: 17th May 2005.
 
+   use da_constants, ONLY : stdout
+
    implicit none
 
    character*10, intent(in):: variable               ! Variable name
@@ -263,12 +265,12 @@ subroutine make_scale_length( variable, ck, ounit, nn, nr, cov )
 
    yr_cutoff = 3.0                                   ! Value taken from Yong-Run's experiments!
    corr_min = exp( -0.125 * yr_cutoff * yr_cutoff )  ! yr_cutoff = sqrt(8 ln corr_min)
-   write(6,'(a,1pe15.5)')' Fit Gaussian curve to data for correlations >= ', corr_min
+   write(UNIT=stdout,FMT='(a,1pe15.5)')' Fit Gaussian curve to data for correlations >= ', corr_min
 
-   write(6,'(5a)')'  n  ', ' nr(n) ', ' d(n) ', ' cov(n) ', ' yr(n)  '
+   write(UNIT=stdout,FMT='(5a)')'  n  ', ' nr(n) ', ' d(n) ', ' cov(n) ', ' yr(n)  '
    n = 0
    nrr(n) = real(nr(n))
-   write(6,'(i6,4e13.5)') n, nrr(n), d(0), cov(n), yr(n)
+   write(UNIT=stdout,FMT='(i6,4e13.5)') n, nrr(n), d(0), cov(n), yr(n)
 
    do d2 = 1, nn
 
@@ -279,7 +281,7 @@ subroutine make_scale_length( variable, ck, ounit, nn, nr, cov )
          yr(n) = sqrt( 8.0 * log(cov(0) / cov(d2)) )
          nrr(n) = real(nr(d2))
          d(n) = sqrt(real(d2))                  ! Distance
-         write(6,'(i6,4e13.5)') n, nrr(n), d(n), cov(d2), yr(n)
+         write(UNIT=stdout,FMT='(i6,4e13.5)') n, nrr(n), d(n), cov(d2), yr(n)
        end if
    end do
    nmax = n
@@ -306,7 +308,7 @@ subroutine make_scale_length( variable, ck, ounit, nn, nr, cov )
    coeff2 = 0.0
 
    do n = 1, nmax
-      print '("n, nrr, d, yr:",i3,3e15.6)', n, nrr(n), d(n), yr(n)
+      WRITE(UNIT=stdout,FMT='("n, nrr, d, yr:",i3,3e15.6)') n, nrr(n), d(n), yr(n)
       coeff1 = coeff1 + nrr(n) * d(n) * yr(n)
       coeff2 = coeff2 + nrr(n) * d(n) * d(n)
    end do
@@ -326,9 +328,9 @@ subroutine make_scale_length( variable, ck, ounit, nn, nr, cov )
 
    endif
 
-   write(6,'(/3a,3e30.8/)') trim(variable), ' scale-length at mode:', ck, ml, sl
+   write(UNIT=stdout,FMT='(/3a,3e30.8/)') trim(variable), ' scale-length at mode:', ck, ml, sl
 
-   write(ounit,'(a,2e20.8)') ck, ml, sl
+   write(UNIT=ounit,FMT='(a,2e20.8)') ck, ml, sl
 
 end subroutine make_scale_length
 
