@@ -42,7 +42,7 @@ if ( "$1" == '-a' ) then
   ( cd external ; make -i superclean )
   ( cd tools ; /bin/rm -f registry gen_comms.c )
   ( cd inc; /bin/rm -f dm_comm_cpp_flags )
-  ( cd run ; /bin/rm -f gm* out* fort* ideal* )
+  ( cd run ; /bin/rm -f out* fort* ideal* )
   ( cd test/exp_real ; /bin/rm -f gm* out* fort* real* )
 
   ( /bin/rm -f main/mpif.h main/*.stb )
