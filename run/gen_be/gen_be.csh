@@ -13,7 +13,10 @@
 
 #set echo
 #Define job via environment variables:
-setenv WRFVAR_DIR ${HOME}/code_development/WRF_V2.1.2/tmp/wrfvar
+
+if ( ! $?WRFVAR_DIR ) then
+  setenv WRFVAR_DIR ${HOME}/code_development/WRF_V2.1.2/tmp/wrfvar
+endif
 
 # Uncomment variables for the stages you wish to run:
 #setenv RUN_GEN_BE_STAGE0 # Set to run stage 0 (create perturbation files).
