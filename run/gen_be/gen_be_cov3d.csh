@@ -3,9 +3,9 @@
 
 #set echo
 
-setenv VARIABLE1 t_u
-setenv VARIABLE2 t
-setenv WRFVAR_DIR ${HOME}/code_development/WRF_V2.1.2/tmp/wrfvar.gen_be.test
+#setenv VARIABLE1 t_u
+#setenv VARIABLE2 t
+setenv WRFVAR_DIR ${HOME}/code_development/WRF_V2.1.2/tmp/wrfvar
 
 if ( ! $?START_DATE )    setenv START_DATE    2003010200 # Starting time of period.
 if ( ! $?END_DATE )      setenv END_DATE      2003012812 # Ending time of period.
@@ -21,8 +21,8 @@ if ( ! $?SRC_DIR )       setenv SRC_DIR ${HOME}/code_development/WRF_V2.1.2
 if ( ! $?WRFVAR_DIR )    setenv WRFVAR_DIR ${SRC_DIR}/wrfvar
 if ( ! $?DATA_DISK )     setenv DATA_DISK /ocotillo1
 if ( ! $?DOMAIN )        setenv DOMAIN con200
-if ( ! $?DAT_DIR )       setenv DAT_DIR ${DATA_DISK}/${user}/data/${DOMAIN}/noobs/gen_be
-if ( ! $?RUN_DIR )       setenv RUN_DIR ${DAT_DIR}/${ID}
+if ( ! $?DAT_DIR )       setenv DAT_DIR ${DATA_DISK}/${user}/data/${DOMAIN}/noobs
+if ( ! $?RUN_DIR )       setenv RUN_DIR ${DAT_DIR}/gen_be
 
 cd ${RUN_DIR}
 

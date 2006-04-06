@@ -13,15 +13,15 @@
 
 #set echo
 #Define job via environment variables:
-setenv WRFVAR_DIR ${HOME}/code_development/WRF_V2.1.2/tmp/wrfvar.gen_be.test
+setenv WRFVAR_DIR ${HOME}/code_development/WRF_V2.1.2/tmp/wrfvar
 
 # Uncomment variables for the stages you wish to run:
-setenv RUN_GEN_BE_STAGE0 # Set to run stage 0 (create perturbation files).
-setenv RUN_GEN_BE_STAGE1 # Set to run stage 1 (Remove mean, split variables).
-setenv RUN_GEN_BE_STAGE2 # Set to run stage 2 (Regression Coefficients).
-setenv RUN_GEN_BE_STAGE2A # Set to run stage 2 (Regression Coefficients).
-setenv RUN_GEN_BE_STAGE3 # Set to run stage 3 (Vertical Covariances).
-setenv RUN_GEN_BE_STAGE4 # Set to run stage 4 (Horizontal Covariances).
+#setenv RUN_GEN_BE_STAGE0 # Set to run stage 0 (create perturbation files).
+#setenv RUN_GEN_BE_STAGE1 # Set to run stage 1 (Remove mean, split variables).
+#setenv RUN_GEN_BE_STAGE2 # Set to run stage 2 (Regression Coefficients).
+#setenv RUN_GEN_BE_STAGE2A # Set to run stage 2 (Regression Coefficients).
+#setenv RUN_GEN_BE_STAGE3 # Set to run stage 3 (Vertical Covariances).
+#setenv RUN_GEN_BE_STAGE4 # Set to run stage 4 (Horizontal Covariances).
 setenv RUN_GEN_BE_DIAGS  # Set to run gen_be diagnostics.
 setenv RUN_GEN_BE_DIAGS_READ  # Set to run gen_be diagnostics_read.
 
@@ -265,10 +265,6 @@ if ( $?RUN_GEN_BE_STAGE3 ) then
 
    foreach CV ( $CONTROL_VARIABLES )
 
-      if ( $CV == "ps" || $CV == "ps_u" ) then
-         echo "   Bypassing stage3 for 2D variable $CV"
-      else
-
 cat >! gen_be_stage3_nl.nl << EOF
   &gen_be_stage3_nl
     start_date = '${START_DATE}',
@@ -291,13 +287,12 @@ cat >! gen_be_stage3_nl.nl << EOF
     dat_dir = '${RUN_DIR}' /
 EOF
 
-        ./gen_be_stage3.exe >& gen_be_stage3.${CV}.log
-        set RC = $status
-        if ( $RC != 0 ) then
-          echo "Stage 3 failed with error" $RC
-          exit 1
-        endif
-      endif
+     ./gen_be_stage3.exe >& gen_be_stage3.${CV}.log
+     set RC = $status
+     if ( $RC != 0 ) then
+        echo "Stage 3 failed with error" $RC
+        exit 1
+     endif
    end
 
    set END_CPU = `date`
