@@ -17,8 +17,6 @@ subroutine da_print_be_stats_v( outunit, variable, nk, num_bins2d, &
 !           fort.177,181,185,189,(193) --- The first 5 local eigenvalues
 !      
 !          * in parenthisis, the units for 2d fields ps_u (ps).
-!
-!                                                    Yong-Run Guo  02/23/2005
 !--------------------------------------------------------------------------------------- 
    implicit none
 
@@ -91,7 +89,7 @@ subroutine da_print_be_stats_v( outunit, variable, nk, num_bins2d, &
    close(UNIT=outunit)
 
    outunit = outunit + 1 
-   write(UNIT=stdout)
+   write(UNIT=stdout,*)
 
 end subroutine da_print_be_stats_v
 

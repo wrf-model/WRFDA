@@ -33,7 +33,8 @@ program gen_be_stage3
    logical             :: testing_eofs               ! True if testing EOF decomposition.
    logical             :: use_global_eofs            ! True if projected data uses global EOFs.
    logical             :: data_on_levels             ! True if output level data (diagnostic).
-   logical             :: ldum1, ldum2
+   logical             :: twod_field                 ! True if 2D field.
+   logical             :: ldum1, ldum2               ! Dummy logicals.
 
    integer, allocatable:: bin(:,:,:)                 ! Bin assigned to each 3D point.
    integer, allocatable:: bin2d(:,:)                 ! Bin assigned to each 2D point.
@@ -64,6 +65,7 @@ program gen_be_stage3
 !---------------------------------------------------------------------------------------------
 
    vertical_ip = 0
+   twod_field = .false.
 
    start_date = '2004030312'
    end_date = '2004033112'
@@ -143,6 +145,10 @@ program gen_be_stage3
 
          filename = trim(variable)//'/'//date(1:10)
          filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce
+         if ( trim(variable) == 'ps_u' .or. trim(variable) == 'ps' ) then ! 2D field
+            twod_field = .true.
+            filename = trim(filename)//'.01'
+         end if
 
          open (iunit, file = filename, form='unformatted')
          read(iunit)ni, nj, nk
@@ -154,11 +160,8 @@ program gen_be_stage3
             bv(:,:,:) = 0.0
             first_time = .false.
          endif
-         if ( nk == 1 ) then
-            write(6,'(a)')'    No need to run gen_be_stage3 for 2D field. Exit.'
-            stop
-         end if
 
+         if ( twod_field ) read (iunit) ldum1, ldum2
          read(iunit)field
          close(iunit)
 
@@ -274,66 +277,68 @@ program gen_be_stage3
    cdate = sdate
    first_time = .true.
 
-   do while ( cdate <= edate )
-      do member = 1, ne
-         write(6,'(5a,i4)')'    Date = ', date, ', variable ', trim(variable), &
-                           ' and member ', member
+   if ( .not. twod_field ) then
+      do while ( cdate <= edate )
+         do member = 1, ne
+            write(6,'(5a,i4)')'    Date = ', date, ', variable ', trim(variable), &
+                              ' and member ', member
 
-         write(ce,'(i3)')member
-         if ( member < 10 ) ce = '00'//ce(3:3)
-         if ( member >= 10 .and. member < 100 ) ce = '0'//ce(2:3)
+            write(ce,'(i3)')member
+            if ( member < 10 ) ce = '00'//ce(3:3)
+            if ( member >= 10 .and. member < 100 ) ce = '0'//ce(2:3)
 
-         filename = trim(variable)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce
+            filename = trim(variable)//'/'//date(1:10)
+            filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce
 
-         open (iunit, file = filename, form='unformatted')
-         read(iunit)ni, nj, nk
+            open (iunit, file = filename, form='unformatted')
+            read(iunit)ni, nj, nk
 
-         if ( first_time ) then
-            if ( data_on_levels) allocate( latitude(1:ni,1:nj) )   ! Not allocated earlier.
-            if ( data_on_levels) allocate( field(1:ni,1:nj,1:nk) ) ! Not allocated earlier.
-            allocate( field_out(1:ni,1:nj,1:nk) )
-            allocate( vertical_wgt(1:ni,1:nj,1:nk) )
-            vertical_wgt(1:ni,1:nj,1:nk) = 1.0 ! vertical_ip = 0 hardwired.
-            first_time = .false.
-         endif
+            if ( first_time ) then
+               if ( data_on_levels) allocate( latitude(1:ni,1:nj) )   ! Not allocated earlier.
+               if ( data_on_levels) allocate( field(1:ni,1:nj,1:nk) ) ! Not allocated earlier.
+               allocate( field_out(1:ni,1:nj,1:nk) )
+               allocate( vertical_wgt(1:ni,1:nj,1:nk) )
+               vertical_wgt(1:ni,1:nj,1:nk) = 1.0 ! vertical_ip = 0 hardwired.
+               first_time = .false.
+            endif
 
-         read(iunit)field
-         close(iunit)
+            read(iunit)field
+            close(iunit)
 
-         if ( data_on_levels ) then
-!           Keep data on vertical levels:
-            field_out(:,:,:) = field(:,:,:)
-         else
-!           Project fields onto vertical modes:
-            call da_transform_vptovv( evec, eval, vertical_wgt, &
-                                      field, field_out, nk, &
-                                      1, ni, 1, nj, 1, nk, & ! WRF ids, ide etc.
-                                      1, ni, 1, nj, 1, nk, & ! WRF ims, ime etc.
-                                      1, ni, 1, nj, 1, nk )  ! WRF its, ite etc.
-         end if
+            if ( data_on_levels ) then
+!              Keep data on vertical levels:
+               field_out(:,:,:) = field(:,:,:)
+            else
+!              Project fields onto vertical modes:
+               call da_transform_vptovv( evec, eval, vertical_wgt, &
+                                         field, field_out, nk, &
+                                         1, ni, 1, nj, 1, nk, & ! WRF ids, ide etc.
+                                         1, ni, 1, nj, 1, nk, & ! WRF ims, ime etc.
+                                         1, ni, 1, nj, 1, nk )  ! WRF its, ite etc.
+            end if
 
-!        Output fields (split into 2D files to allow parallel horizontal treatment):
+!           Output fields (split into 2D files to allow parallel horizontal treatment):
 
-         do k = 1, nk
-            write(ck,'(i2)')k
-            if ( k < 10 ) ck = '0'//ck(2:2)
-!           Assumes variable directory has been created by script:
-            filename = trim(variable)//'/'//date(1:10)//'.'//trim(variable)
-            filename = trim(filename)//'.'//trim(be_method)//'.e'//ce//'.'//ck
-            open (ounit, file = filename, form='unformatted')
-            write(ounit)ni, nj, k
-            write(ounit)data_on_levels, use_global_eofs
-            write(ounit)field_out(1:ni,1:nj,k)
-            close(ounit)
-         end do
-      end do ! End loop over members.
+            do k = 1, nk
+               write(ck,'(i2)')k
+               if ( k < 10 ) ck = '0'//ck(2:2)
+!              Assumes variable directory has been created by script:
+               filename = trim(variable)//'/'//date(1:10)//'.'//trim(variable)
+               filename = trim(filename)//'.'//trim(be_method)//'.e'//ce//'.'//ck
+               open (ounit, file = filename, form='unformatted')
+               write(ounit)ni, nj, k
+               write(ounit)data_on_levels, use_global_eofs
+               write(ounit)field_out(1:ni,1:nj,k)
+               close(ounit)
+            end do
+         end do ! End loop over members.
 
-!     Calculate next date:
-      call da_advance_cymdh( date, interval, new_date )
-      date = new_date
-      read(date(1:10), fmt='(i10)')cdate
-   end do
+!        Calculate next date:
+         call da_advance_cymdh( date, interval, new_date )
+         date = new_date
+         read(date(1:10), fmt='(i10)')cdate
+      end do
+   end if
 
 end program gen_be_stage3
 
