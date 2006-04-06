@@ -18,15 +18,18 @@
  echo "Run Stage 4: Calculate horizontal covariances (global power spectra)."
  echo "---------------------------------------------------------------------"
 
+ set BEGIN_CPU = `date`
+ echo "Beginning CPU time: ${BEGIN_CPU}"
+
  if ( ! $?START_DATE )    setenv START_DATE    2004050112 # Starting time of period.
  if ( ! $?END_DATE )      setenv END_DATE      2004052800 # Ending time of period.
  if ( ! $?INTERVAL )      setenv INTERVAL      12         # Period between files (hours).
  if ( ! $?BE_METHOD )     setenv BE_METHOD     NMC        # NMC (NMC-method), ENS (Ensemble-Method).
  if ( ! $?NE )            setenv NE 1                     # Number of ensemble members (for ENS).
- if ( ! $?NUM_LEVELS )    setenv NUM_LEVELS    31         # Hard-wired for now....
+ if ( ! $?NUM_LEVELS )    setenv NUM_LEVELS    27         # Hard-wired for now....
  if ( ! $?TESTING_SPECTRAL ) setenv TESTING_SPECTRAL .false. # True if performing spectral tests.
 
- if ( ! $?EXPT )          setenv EXPT 2004-12.T213.elat   
+ if ( ! $?GAUSSIAN_LATS ) setenv GAUSSIAN_LATS .FALSE.   
  if ( ! $?ID )            setenv ID ${BE_METHOD}.bin_type${BIN_TYPE}
  if ( ! $?SRC_DIR )       setenv SRC_DIR ${HOME}/code_development/WRF_V2.1.2
  if ( ! $?WRFVAR_DIR )    setenv WRFVAR_DIR ${SRC_DIR}/wrfvar
@@ -45,8 +48,6 @@
        exit
     endif
  end
-
- cd ${RUN_DIR}
    
  ln -sf ${BUILD_DIR}/gen_be_stage4_global.exe .
 
@@ -70,12 +71,11 @@ cat >! gen_be_stage4_global_nl.nl << EOF
     end_date = '${END_DATE}', 
     interval = ${INTERVAL},
     variable = '${VARIABLE}',
+    gaussian_lats = ${GAUSSIAN_LATS},
+    testing_spectral = ${TESTING_SPECTRAL},
     be_method = '${BE_METHOD}',
     ne = ${NE},
-    k = ${VINDEX},
-    testing_spectral = ${TESTING_SPECTRAL},
-    expt = '${EXPT}',
-    dat_dir = '${DAT_DIR}' /
+    k = ${VINDEX} /
 EOF
 
          ./gen_be_stage4_global.exe >& gen_be_stage4_global.log
