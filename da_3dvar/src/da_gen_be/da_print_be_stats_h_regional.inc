@@ -16,7 +16,7 @@ subroutine da_print_be_stats_h_regional( outunit, variable, nk, scale_length )
    end do
 
    outunit = outunit + 1
-   write(UNIT=stdout,*)
+   write(UNIT=stdout,FMT=*) ' '
 
 end subroutine da_print_be_stats_h_regional
 

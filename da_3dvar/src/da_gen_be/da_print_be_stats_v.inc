@@ -89,7 +89,7 @@ subroutine da_print_be_stats_v( outunit, variable, nk, num_bins2d, &
    close(UNIT=outunit)
 
    outunit = outunit + 1 
-   write(UNIT=stdout,*)
+   write(UNIT=stdout,FMT=*) ' '
 
 end subroutine da_print_be_stats_v
 

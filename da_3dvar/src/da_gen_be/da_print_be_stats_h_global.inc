@@ -24,7 +24,7 @@ subroutine da_print_be_stats_h_global( outunit, variable, k, max_wavenumber, tot
    end do
 
    outunit = outunit + 1
-   write(UNIT=stdout,*)
+   write(UNIT=stdout,FMT=*) ''
 
 end subroutine da_print_be_stats_h_global
 
