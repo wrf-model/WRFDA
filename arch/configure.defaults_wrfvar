@@ -866,6 +866,7 @@ ARCHFLAGS3      =       -DINTIO \
                         -DTRIEDNTRUE   \
 			-DLIMIT_ARGS -DNO_NAMELIST_PRINT
 ARCHFLAGS4      =       -DNOUNDERSCORE -DLANDREAD_STUB -DMACOS
+EXTRA_LIBS      =       -lSystemStubs
 LDFLAGS         =	 -Wl,-stack_size,10000000,-stack_addr,0xc0000000
 CPP             =       /usr/bin/cpp  -C -P -xassembler-with-cpp
 DM_1_CPP_FLAGS	=
@@ -902,6 +903,7 @@ ARCHFLAGS3      =       -DINTIO \
                         -DTRIEDNTRUE   \
 			-DLIMIT_ARGS -DNO_NAMELIST_PRINT
 ARCHFLAGS4      =       -DNOUNDERSCORE -DLANDREAD_STUB -DMACOS
+EXTRA_LIBS      =       -lSystemStubs
 LDFLAGS         =	 -Wl,-stack_size,10000000,-stack_addr,0xc0000000
 CPP             =       /usr/bin/cpp  -C -P -xassembler-with-cpp
 DM_1_CPP_FLAGS	=
