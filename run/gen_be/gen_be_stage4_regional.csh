@@ -28,7 +28,7 @@
  if ( ! $?BE_METHOD )     setenv BE_METHOD     NMC        # NMC (NMC-method), ENS (Ensemble-Method).
  if ( ! $?NE )            setenv NE 1                     # Number of ensemble members (for ENS).
  if ( ! $?STRIDE )        setenv STRIDE 1                 # Calculate correlation evert STRIDE point.
- if ( ! $?NUM_LEVELS )    setenv NUM_LEVELS    30         # Hard-wired for now....
+ if ( ! $?NUM_LEVELS )    setenv NUM_LEVELS    27         # Hard-wired for now....
 
  if ( ! $?EXPT )          setenv EXPT         wrfvar_cwb_be
  if ( ! $?ID )            setenv ID           cwb_wrf
