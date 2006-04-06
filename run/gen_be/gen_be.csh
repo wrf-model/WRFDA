@@ -49,9 +49,8 @@ if ( ! $?GAUSSIAN_LATS ) setenv GAUSSIAN_LATS .false.    # Set if Gaussian latit
 if ( ! $?TESTING_EOFS )  setenv TESTING_EOFS  .true.     # True if performing EOF tests.
 if ( ! $?NUM_PASSES )    setenv NUM_PASSES    0          # Number of passes of recursive filter.
 if ( ! $?RF_SCALE )      setenv RF_SCALE      1.0        # Recursive filter scale.
-if ( ! $?USE_GLOBAL_EOFS ) setenv USE_GLOBAL_EOFS .true. # True if using global EOFs.
 if ( ! $?DATA_ON_LEVELS )  setenv DATA_ON_LEVELS .false. # False if fields projected onto modes.
-if ( ! $?UH_METHOD )     setenv UH_METHOD 'scale'        # 'scale for regional. 'power' for global.
+if ( ! $?GLOBAL )        setenv GLOBAL false             # Global or regional models
 if ( ! $?NUM_LEVELS )    setenv NUM_LEVELS    27         # Hard-wired for now....
 if ( ! $?N_SMTH_SL )     setenv N_SMTH_SL     0          # Amount of lengthscale smoothing (0=none).
 if ( ! $?STRIDE )        setenv STRIDE 1                 # Calculate correlation evert STRIDE point (stage4 regional).
@@ -73,6 +72,15 @@ if ( ! $?STAGE0_DIR )    setenv STAGE0_DIR ${RUN_DIR}/stage0
 
 if ( ! -d ${RUN_DIR} )   mkdir ${RUN_DIR}
 if ( ! -d ${STAGE0_DIR} )  mkdir ${STAGE0_DIR}
+
+
+if ( $GLOBAL == true ) then
+  setenv UH_METHOD power
+  if ( ! $?USE_GLOBAL_EOFS ) setenv USE_GLOBAL_EOFS .false.
+else
+  setenv UH_METHOD scale
+  if ( ! $?USE_GLOBAL_EOFS ) setenv USE_GLOBAL_EOFS .true.
+endif
 
 #List of control variables:
 
@@ -312,7 +320,7 @@ if ( $?RUN_GEN_BE_STAGE4 ) then
    set BEGIN_CPU = `date`
    echo "Beginning CPU time: ${BEGIN_CPU}"
 
-   if (${UH_METHOD} == 'power') then    
+   if ( ${GLOBAL} == true ) then    
 
       echo "---------------------------------------------------------------"
       echo "Run Stage 4: Calculate horizontal covariances (global power spectra)."
