@@ -336,8 +336,10 @@ CONTAINS
       CALL ESMF_ClockGetCurrTime( head_grid%domain_clock, currTime=head_grid%current_time, rc=rc )
 
       CALL integrate_ad ( head_grid, nl_date_string, nl_date_index, ad_date_string, ad_date_index )
+#if 0
    ELSE IF ( config_flags%dyn_opt == DYN_EM_TST ) THEN
       CALL integrate_tst ( head_grid )
+#endif
    ENDIF
 
    CALL       wrf_debug ( 100 , 'wrf: back from integrate' )
