@@ -30,6 +30,10 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
 
    IMPLICIT NONE
 
+#ifdef DM_PARALLEL 
+   INCLUDE 'mpif.h'
+#endif
+
    TYPE(domain),                intent(inout) :: grid
    TYPE (grid_config_rec_type), intent(inout) :: config_flags
 
@@ -51,6 +55,7 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
                                    its , ite , jts , jte , kts , kte
 
    TYPE (cv_type)               :: xhat  ! Increament control variable
+   INTEGER                      :: ierr
 
 !------------------------------------------------------------------------------
 
