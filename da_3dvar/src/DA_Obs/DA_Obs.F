@@ -49,5 +49,6 @@ CONTAINS
 #include "da_write_y.inc"
 #include "DA_Read_BUFR_Obs.inc"
 #include "DA_Scan_BUFR_Obs.inc"
+#include "DA_Count_Filtered_Obs.inc"
 
 END MODULE DA_Obs

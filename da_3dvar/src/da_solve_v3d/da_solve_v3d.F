@@ -156,9 +156,28 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
                         ims, ime, jms, jme, kms, kme,        &
                         its, ite, jts, jte, kts, kte         )
 !------------------------------------------------------------------------------
-!   For first outer loop write filtered obs when ntmax = 0
-   if(it == 1 .and. ntmax == 0) &
-    CALL da_write_filtered_obs(gts_iunit, filtered_obs_iunit, ob, iv)
+
+     if( (analysis_type(1:6) == "QC-OBS" .or.  analysis_type(1:6) == "qc-obs") )then
+       if( ob_format == 1) then
+     write(*,'(a)')'Since input Obs are in BUFR-format Filtered-Obs (fort.192) will not be written'
+     elseif( ob_format == 2) then
+#ifdef DM_PARALLEL 
+     call MPI_COMM_SIZE(MPI_COMM_WORLD, numb_procs, ierr)
+     print*,' I am using num_proc = ',numb_procs
+     if( numb_procs == 1) then
+     if( it == 1) CALL da_write_filtered_obs(ob, iv, xp)
+     else
+     write(*,'(a,i3)')'Since it is MPI-run with processore (>1) ',numb_procs
+     write(*,'(a)')   ' Filtered-Obs (fort.192)  will not be written'
+     endif
+#else
+     if( it == 1) CALL da_write_filtered_obs(ob, iv, xp)
+#endif
+     else
+     print*,' Unknown Observation format: ',ob_format
+     endif
+     end if
+!------------------------------------------------------------------------------
 
 !     [8.5] Update latest analysis solution:
 
