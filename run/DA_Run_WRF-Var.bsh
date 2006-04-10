@@ -63,12 +63,13 @@ export WRFVAR_DIR=${WRFVAR_DIR:-$SRC_DIR/wrfvar}
 export BUILD_DIR=${BUILD_DIR:-$WRFVAR_DIR/main}
 export DAT_DIR=${DAT_DIR:-/data4/dmbarker/data/amps1}
 export RUN_DIR=${RUN_DIR:-$DAT_DIR}
+export DA_ID=${DA_ID:-wrfvar}
 export HOSTS=${HOSTS:-$PWD/hosts}
 
 echo "test: " $test
-if test ! -d $RUN_DIR; then
-echo "Now making RUN_ID"
-  mkdir  $RUN_DIR
+if test ! -d ${RUN_DIR}/${RUN_ID}; then
+echo "Now making ${RUN_DIR}/${RUN_ID}"
+  mkdir  ${RUN_DIR}/${DA_ID}
 fi
 
 export DA_FIRST_GUESS=${DA_FIRST_GUESS:-$DAT_DIR/wrfinput_d01}    # wrfvar "first guess" input.
@@ -264,9 +265,9 @@ fi
 # [3.0] Prepare for assimilation:
 #-----------------------------------------------------------------------
 
-rm -rf ${RUN_DIR}/$ID
-mkdir ${RUN_DIR}/$ID
-cd $RUN_DIR/$ID
+rm -rf ${RUN_DIR}/${DA_ID}
+mkdir ${RUN_DIR}/${DA_ID}
+cd ${RUN_DIR}/${DA_ID}
 
 ln -s $DA_RTTOV_COEFFS/* .
 
