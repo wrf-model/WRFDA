@@ -616,8 +616,8 @@ FCDEBUG         =       -g -qfullpath
 FCTYPE          =       -qrealsize=8
 FCFORM          =       -qfree=f90
 FCHOST          =
-FCBASE          =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767
-#                       -qflttrap=zerodivide:invalid:enable -qsigtrap
+FCBASE          =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767 \
+                        -qflttrap=zerodivide:invalid:enable -qsigtrap=xl__trce
 FCBUFR          =       $(FCBASE)
 FC_FFT_RF       =       $(FCBASE)
 EXTRAMODULES    =
@@ -656,8 +656,8 @@ FCDEBUG         =       -g -qfullpath
 FCTYPE          =       -qrealsize=8
 FCFORM          =       -qfree=f90
 FCHOST          =
-FCBASE          =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767
-#			-qflttrap=zerodivide:invalid:enable -qsigtrap
+FCBASE          =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767 \
+			-qflttrap=zerodivide:invalid:enable -qsigtrap=xl__trce
 FCBUFR          =       $(FCBASE)
 FC_FFT_RF       =       $(FCBASE)
 EXTRAMODULES    =
@@ -856,8 +856,8 @@ FCDEBUG         =       #-g
 FCTYPE          =       -qrealsize=8
 FCFORM          =       -qfree=f90
 FCHOST          =
-FCBASE          =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767
-#                       -qflttrap=zerodivide:invalid:enable -qsigtrap
+FCBASE          =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767 \
+                        -qflttrap=zerodivide:invalid:enable -qsigtrap=xl__trce
 FCBUFR          =       $(FCBASE)
 FC_FFT_RF       =       $(FCBASE)
 EXTRAMODULES    =
@@ -893,8 +893,8 @@ FCDEBUG         =       #-g
 FCTYPE          =       -qrealsize=8
 FCFORM          =       -qfree=f90
 FCHOST          =
-FCBASE          =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767
-#                       -qflttrap=zerodivide:invalid:enable -qsigtrap
+FCBASE          =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767 \
+                        -qflttrap=zerodivide:invalid:enable -qsigtrap=xl__trce
 FCBUFR          =       $(FCBASE)
 FC_FFT_RF       =       $(FCBASE)
 EXTRAMODULES    =
