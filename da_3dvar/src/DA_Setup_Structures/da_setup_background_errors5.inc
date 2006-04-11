@@ -114,7 +114,6 @@ rewind (be_cv_5_unit)
      read(be_cv_5_unit)num_bins, num_bins2d
      read(be_cv_5_unit)bin(1:ni,1:nj,1:nk)
      read(be_cv_5_unit)bin2d(1:ni,1:nj)
-
 !   read(be_cv_5_unit) num_bins, num_bins2d
 !---------------------------------------------------------
 
@@ -143,7 +142,6 @@ rewind (be_cv_5_unit)
  !  call da_create_bins( ni, nj, nk, bin_type, num_bins, &
  !                               num_bins2d, bin, bin2d )
 
-   print '("ni, nj, nk, num_bins, num_bins2d:",5i8)', ni, nj, nk, num_bins, num_bins2d
 !--------------------------------------------------------------
 ! Following "latitude, height" variables are optional arguments 
 ! The same may be added, if required
@@ -231,11 +229,11 @@ rewind (be_cv_5_unit)
 
 ! 2.1 Allocate the arrays
 
-   ALLOCATE ( be1_eval_loc (1:kz,1:jy) )
-   ALLOCATE ( be2_eval_loc (1:kz,1:jy) )
-   ALLOCATE ( be3_eval_loc (1:kz,1:jy) )
-   ALLOCATE ( be4_eval_loc (1:kz,1:jy) )
-   ALLOCATE ( be5_eval_loc (1:1,1:jy) )
+   ALLOCATE ( be1_eval_loc (1:kz,1:num_bins2d) )
+   ALLOCATE ( be2_eval_loc (1:kz,1:num_bins2d) )
+   ALLOCATE ( be3_eval_loc (1:kz,1:num_bins2d) )
+   ALLOCATE ( be4_eval_loc (1:kz,1:num_bins2d) )
+   ALLOCATE ( be5_eval_loc (1:1,1:num_bins2d) )
 
    IF ( vert_corr == 2 ) THEN
 
@@ -245,11 +243,11 @@ rewind (be_cv_5_unit)
       ALLOCATE ( be4_eval_glo(1:kz) )
       ALLOCATE ( be5_eval_glo(1:1) )
 
-      ALLOCATE ( be1_evec_loc(1:kz,1:kz,1:jy) )
-      ALLOCATE ( be2_evec_loc(1:kz,1:kz,1:jy) )
-      ALLOCATE ( be3_evec_loc(1:kz,1:kz,1:jy) )
-      ALLOCATE ( be4_evec_loc(1:kz,1:kz,1:jy) )
-      ALLOCATE ( be5_evec_loc(1:1,1:1,1:jy) )
+      ALLOCATE ( be1_evec_loc(1:kz,1:kz,1:num_bins2d) )
+      ALLOCATE ( be2_evec_loc(1:kz,1:kz,1:num_bins2d) )
+      ALLOCATE ( be3_evec_loc(1:kz,1:kz,1:num_bins2d) )
+      ALLOCATE ( be4_evec_loc(1:kz,1:kz,1:num_bins2d) )
+      ALLOCATE ( be5_evec_loc(1:1,1:1,1:num_bins2d) )
 
       ALLOCATE ( be1_evec_glo(1:kz,1:kz) )
       ALLOCATE ( be2_evec_glo(1:kz,1:kz) )
@@ -270,7 +268,6 @@ rewind (be_cv_5_unit)
    read(be_cv_5_unit)  be1_eval_loc    
 
    be % v1 % name = variable
-!   print*,'variable ',be % v1 % name,nk,num_bins2d
 !
 ! 2.2.2 Control variable 2 (chi_u)
 
@@ -282,7 +279,6 @@ rewind (be_cv_5_unit)
    read(be_cv_5_unit)  be2_eval_loc
 
    be % v2 % name = variable
-!   print*,'variable ',be % v2 % name,nk,num_bins2d
 
 ! 2.2.3 Control variable 3 (t_u)
 
@@ -294,7 +290,6 @@ rewind (be_cv_5_unit)
    read(be_cv_5_unit)  be3_eval_loc
 
    be % v3 % name = variable
-!   print*,'variable ',be % v3 % name,nk,num_bins2d
 
 ! 2.2.4 Control variable 4 (q/qsg)
 
@@ -306,7 +301,6 @@ rewind (be_cv_5_unit)
    read(be_cv_5_unit)  be4_eval_loc
 !
    be % v4 % name = variable
-!   print*,'variable ',be % v4 % name,nk,num_bins2d
 
    read(be_cv_5_unit) variable
    read(be_cv_5_unit) nk_2d, num_bins2d
@@ -316,7 +310,6 @@ rewind (be_cv_5_unit)
    read(be_cv_5_unit)  be5_eval_loc
 
    be % v5 % name = variable
-!   print*,'variable ',be % v5 % name,nk_2d,num_bins2d
 
 ! 3.0 Check and get the truncated number of the vertical modes
 ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
