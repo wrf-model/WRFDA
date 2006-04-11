@@ -45,6 +45,7 @@ SUBROUTINE DA_Scan_BUFR_Obs (iunit, ob, xp, filename)
    integer           :: iost, ndup, n
    integer           :: year,month, day,hour
    integer           :: iret,idate, kx, nrecs,miscd, t29
+   logical           :: exist
 
 !----------------------------------------------------------------------------!
 !--default value.
@@ -125,6 +126,13 @@ SUBROUTINE DA_Scan_BUFR_Obs (iunit, ob, xp, filename)
 
    call datelen(10)
 
+   INQUIRE (iunit, EXIST = exist )
+   if ( .not. exist ) then
+     errmsg(1) = "BUFR file does not exist"
+     write(UNIT=errmsg(2), fmt='(a, i4)') &
+       'INQUIRE cannot find unit: ',iunit
+     CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1:2))
+   endif
    call openbf(iunit,'IN',iunit)
    call readmg(iunit,subset,idate,iret)
 
