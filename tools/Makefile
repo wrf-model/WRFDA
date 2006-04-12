@@ -26,7 +26,7 @@ advance_cymdh : advance_cymdh.o
 	$(FC) -o advance_cymdh advance_cymdh.o
 
 advance_cymdh.o : advance_cymdh.F
-	$(FC) $(FCFLAGS) -o advance_cymdh.o advance_cymdh.F
+	$(FC) -c $(FCFLAGS) -o advance_cymdh.o advance_cymdh.F
 
 bufr_little_endian.exe : bufr_little_endian.o
 			$(RM) $@
