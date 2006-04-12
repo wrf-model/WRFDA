@@ -251,7 +251,7 @@ program gen_be_stage0_wrf
       call da_get_trh( input_file2, dim1, dim2, dim3, k, temp2, rh2 )
 
       temp(:,:,k) = temp1(:,:) - temp2(:,:)
-      rh(:,:,k) = rh1(:,:) - rh2(:,:)
+      rh(:,:,k) = 0.01 * ( rh1(:,:) - rh2(:,:) ) ! *0.01 to conform with WRF-Var units.
 
    end do
 
