@@ -1,9 +1,0 @@
-See http://manse.johnbray.org.uk/mmmwiki/index.php/KMA
-
-KMA modified the DA_Scan_radar.inc and da_Read_radar.inc to read KMA radar
-data.
-
-To assimilate Radar RF, we need to change the following programs.
-DA_Transform_VpToX.inc and DA_Transform_VpToX_Adj.inc  This is working on
-only  cv_options_hum = 3   and we should calculate Qt background error
-statistics.
