@@ -1,4 +1,6 @@
       SUBROUTINE XERBLA( SRNAME, INFO )
+
+      USE module_wrf_error
 *
 *  -- LAPACK auxiliary routine (version 3.0) --
 *     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
@@ -34,9 +36,9 @@
 *
 *     .. Executable Statements ..
 *
-      WRITE( *, FMT = 9999 )SRNAME, INFO
+      WRITE(UNIT=errmsg(1), FMT = 9999 )SRNAME, INFO
 *
-      STOP
+      CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
 *
  9999 FORMAT( ' ** On entry to ', A6, ' parameter number ', I2, ' had ',
      $      'an illegal value' )

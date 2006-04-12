@@ -87,10 +87,9 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xp )
       write(ounit, FMT = '(A80)') blank
 
       IF (iost /= 0) THEN
-         write(unit=*, fmt='(/a,i3/a/)') &
-              'ERROR READING FILE UNIT:', iunit, &
-              'in read_obs_gts_header.F'
-         stop   
+         write(unit=errmsg(1), fmt='(/a,i3)') &
+            'ERROR READING FILE UNIT:', iunit
+         CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))   
       ENDIF
 
       if (blank(1:6) == 'EACH  ') EXIT
@@ -111,10 +110,10 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xp )
         each_fmt_name, fmt_each
 
    IF (iost /= 0) THEN
-      write(unit=*, fmt='(/A,I3,A/)') &
+      write(unit=errmsg(1), fmt='(/A,I3,A/)') &
            ' ERROR IN INPUT FILE UNIT ',iunit, &
            ' FOR GTS OBSERVATIONS CANNOT BE FOUND OR CANNOT BE OPENED'
-      stop   
+      CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
    ENDIF
 !----------------------------------------------------------------------------!
     READ (iunit, FMT = '(A80)') blank
@@ -584,9 +583,9 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xp )
          iv%sonde_sfc(i)%info%lon      /= iv%sound(i)%info%lon      .or. &
          iv%sonde_sfc(i)%info%elv      /= iv%sound(i)%info%elv      .or. &
          iv%sonde_sfc(i)%info%id       /= iv%sound(i)%info%id       ) then
-     print*,' Mismatch for Sound surface and upper air report '
-     print*,' Surface Sound Deatils:            '
-      write(unit=*, fmt=fmt_info) &
+       WRITE(UNIT=errmsg(1),FMT='(A)') "Mismatch for Sound surface and upper air reports"
+       WRITE(UNIT=errmsg(2),FMT='(A)') "Surface details:            "
+       WRITE(unit=errmsg(3), fmt=fmt_info) &
             iv%sonde_sfc(i)%info%platform,    &
             iv%sonde_sfc(i)%info%date_char,   &
             iv%sonde_sfc(i)%info%name,        &
@@ -596,8 +595,8 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xp )
             iv%sonde_sfc(i)%info%elv,         &
             iv%sonde_sfc(i)%info%id
 
-     print*,' Upper level  Deatils: '
-      write(unit=*, fmt=fmt_info) &
+       WRITE(UNIT=errmsg(4),FMT='(A)') "Upper level details: "
+       write(unit=errmsg(5), fmt=fmt_info) &
             iv%sound(i)%info%platform,    &
             iv%sound(i)%info%date_char,   &
             iv%sound(i)%info%name,        &
@@ -606,7 +605,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xp )
             iv%sound(i)%info%lon,         &
             iv%sound(i)%info%elv,         &
             iv%sound(i)%info%id
-     stop
+       CALL wrf_error_fatal3(__FILE__,__LINE__, errmsg(1:5))
      end if
      write(ounit, FMT = fmt_info, IOSTAT = iost) &
                    iv%sound(i)%info%platform,    &
@@ -872,8 +871,9 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xp )
 ! read original thickness error from unit 193
      read(193,'(i8,2x,i8,2f12.3)')n1,n2,thick,thick_error
      if( n1 /= i  .or. n2 /= n) then
-     print*,' mismatch in reading thickness errors from unit 193 ',i,n1,n,n2
-     stop
+       WRITE(UNIT=errmsg(1),FMT='(A,4I)') &
+         "mismatch in reading thickness errors from unit 193 ",i,n1,n,n2
+       CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
      end if
        thick_qc = iv%satem(i)%thickness(n)%qc
        if( iv%satem(i)%thickness(n)%qc < obs_qc_pointer) thick_qc = missing_data

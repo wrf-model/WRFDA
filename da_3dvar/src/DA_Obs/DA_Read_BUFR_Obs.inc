@@ -115,9 +115,8 @@ SUBROUTINE DA_Read_BUFR_Obs (iunit, ob, xp, filename)
            'return code from readmg:', iret, &
            'Reach the end of obs unit: ', iunit
 
-      CALL wrf_shutdown
-
-      STOP "Stopped. No BUFR observations."
+      CALL wrf_error_fatal3(__FILE__,__LINE__, &
+        "No BUFR observations")
    end if
 !------------------------------------------------------------------------------
    reports: do
@@ -633,7 +632,6 @@ SUBROUTINE DA_Read_BUFR_Obs (iunit, ob, xp, filename)
 !          ' q = ',ob % ships ( num_ships ) % q
 !           write(UNIT=stdout,FMT=*) 'zk = ',ob % ships ( num_ships ) % zk 
 !           write(UNIT=stdout,FMT=*) 'u = ',ob % ships ( num_ships ) % u,' v = ',ob % ships ( num_ships ) % v 
-!           stop
 
 	    CASE (531, 561, 562) ;          ! Buoy  
 	     ob%num_buoy_glo = ob%num_buoy_glo + 1
@@ -1024,7 +1022,7 @@ SUBROUTINE DA_Read_BUFR_Obs (iunit, ob, xp, filename)
       (ob%ob_numb(ob%current_ob_time)%ssmt2 /= ob%num_ssmt2) .or. &
       (ob%ob_numb(ob%current_ob_time)%profiler /= ob%num_profiler)) then
 
-      write(UNIT=stdout, fmt='(a, i6, 2x, a, i6)') &
+      write(UNIT=stderr, fmt='(a, i6, 2x, a, i6)') &
            'ob%ob_numb(ob%current_ob_time)%sound=', ob%ob_numb(ob%current_ob_time)%sound, &
            'ob%num_sound=', ob%num_sound, &
            'ob%ob_numb(ob%current_ob_time)%synop=', ob%ob_numb(ob%current_ob_time)%synop, &
@@ -1060,6 +1058,6 @@ SUBROUTINE DA_Read_BUFR_Obs (iunit, ob, xp, filename)
            'ob%ob_numb(ob%current_ob_time)%profiler=', ob%ob_numb(ob%current_ob_time)%profiler, &
            'ob%num_profiler=', ob%num_profiler
 
-      stop 'BUFR Obs mismatch.'
+      CALL wrf_error_fatal3(__FILE__,__LINE__,"Obs mismatch")
    endif
 END SUBROUTINE DA_Read_BUFR_Obs
