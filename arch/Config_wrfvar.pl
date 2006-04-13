@@ -61,7 +61,8 @@ $validresponse = 0 ;
 # Display the choices to the user and get selection
 until ( $validresponse ) {
   printf "------------------------------------------------------------------------\n" ;
-  printf "Please select from among the following supported platforms.\n\n" ;
+  printf "Please select from among the following supported platforms.\n" ;
+  printf "Choose single-threaded options for gen_be.\n\n" ;
 
   $opt = 1 ;
   open CONFIGURE_DEFAULTS, "< ./arch/configure.defaults_wrfvar" 
