@@ -22,7 +22,7 @@ gen_comms.c : gen_comms.stub
 	/bin/cp gen_comms.stub gen_comms.c
 
 advance_cymdh : advance_cymdh.o 
-	rm $@
+	/bin/rm -f $@
 	$(FC) -o advance_cymdh advance_cymdh.o
 
 advance_cymdh.o : advance_cymdh.F
