@@ -56,13 +56,12 @@ if ( ! $?TESTING_SPECTRAL ) setenv TESTING_SPECTRAL .false. # True if performing
 
 if ( ! $?EXPT )          setenv EXPT 2003-01.test
 if ( ! $?ID1 )           setenv ID1 ${BE_METHOD}.bin_type${BIN_TYPE}
-if ( ! $?SRC_DIR )       setenv SRC_DIR ${HOME}/code_development/WRF_V2.1.2
-if ( ! $?WRFVAR_DIR )    setenv WRFVAR_DIR ${SRC_DIR}/wrfvar
-if ( ! $?BUILD_DIR )     setenv BUILD_DIR ${WRFVAR_DIR}/gen_be
-if ( ! $?BIN_DIR )       setenv BIN_DIR   ${WRFVAR_DIR}/tools
+if ( ! $?GEN_BE_DIR )    setenv GEN_BE_DIR ${HOME}/code_development/WRF_V2.1.2/wrfvar
+if ( ! $?BUILD_DIR )     setenv BUILD_DIR ${GEN_BE_DIR}/gen_be
+if ( ! $?BIN_DIR )       setenv BIN_DIR   ${GEN_BE_DIR}/tools
 if ( ! $?DATA_DISK )     setenv DATA_DISK /ocotillo1
-if ( ! $?DOMAIN )        setenv DOMAIN con200
-if ( ! $?DAT_DIR )       setenv DAT_DIR ${DATA_DISK}/${user}/data/${DOMAIN}/noobs
+if ( ! $?REGION )        setenv REGION con200
+if ( ! $?DAT_DIR )       setenv DAT_DIR ${DATA_DISK}/${USER}/data/${REGION}/noobs
 if ( ! $?RUN_DIR )       setenv RUN_DIR ${DAT_DIR}/gen_be
 if ( ! $?STAGE0_DIR )    setenv STAGE0_DIR ${RUN_DIR}/stage0
 
@@ -108,7 +107,7 @@ if ( $?RUN_GEN_BE_STAGE0 ) then
    set BEGIN_CPU = `date`
    echo "Beginning CPU time: ${BEGIN_CPU}"
 
-   $WRFVAR_DIR/run/gen_be/gen_be_stage0_wrf.csh >& gen_be_stage0_wrf.log
+   $GEN_BE_DIR/run/gen_be/gen_be_stage0_wrf.csh >& gen_be_stage0_wrf.log
 
    set RC = $status
    if ( $RC != 0 ) then
@@ -322,7 +321,7 @@ if ( $?RUN_GEN_BE_STAGE4 ) then
       echo "Run Stage 4: Calculate horizontal covariances (global power spectra)."
       echo "---------------------------------------------------------------"
 
-      ${WRFVAR_DIR}/run/gen_be/gen_be_stage4_global.csh >&! gen_be_stage4_global.log
+      ${GEN_BE_DIR}/run/gen_be/gen_be_stage4_global.csh >&! gen_be_stage4_global.log
       set RC = $status
       if ( $RC != 0 ) then
         echo "Stage 4 global failed with error" $RC
@@ -335,7 +334,7 @@ if ( $?RUN_GEN_BE_STAGE4 ) then
       echo "Run Stage 4: Calculate horizontal covariances (regional lengthscales)."
       echo "---------------------------------------------------------------"
 
-      ${WRFVAR_DIR}/run/gen_be/gen_be_stage4_regional.csh >&! gen_be_stage4_regional.log
+      ${GEN_BE_DIR}/run/gen_be/gen_be_stage4_regional.csh >&! gen_be_stage4_regional.log
       set RC = $status
       if ( $RC != 0 ) then
         echo "Stage 4 regional failed with error" $RC
