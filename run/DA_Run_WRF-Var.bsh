@@ -53,40 +53,52 @@ date
 # [1.0] Specify default environment variables:
 #-----------------------------------------------------------------------
 
-export START_DATE=${START_DATE:-2003010112}       # Analysis date.
+export DA_DATE=${DA_DATE:-2003010112}       # Analysis date.
 export DA_CV_OPTIONS=${DA_CV_OPTIONS:-3}             # Background error statistics: 2=NCAR, 3=NCEP.
 
 #Default directories/files:
 
-export SRC_DIR=${SRC_DIR:-$HOME/code_development}
-export WRFVAR_DIR=${WRFVAR_DIR:-$SRC_DIR/wrfvar}
-export BUILD_DIR=${BUILD_DIR:-$WRFVAR_DIR/main}
-export DAT_DIR=${DAT_DIR:-/data4/dmbarker/data/amps1}
-export RUN_DIR=${RUN_DIR:-$DAT_DIR}
+export DA_DIR=${DA_DIR:-$HOME/code_development/wrfvar}
+export DA_BUILD_DIR=${DA_BUILD_DIR:-$DA_DIR/main}
 export DA_ID=${DA_ID:-wrfvar}
 export HOSTS=${HOSTS:-$PWD/hosts}
+export REGION=${REGION:-con200}
+export EXPT=${EXPT:-test}
+export DAT_DIR=${DAT_DIR:-/data7/da/bray/data}
+export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION}
+export OB_DIR=${OB_DIR:-$REG_DIR/ob}
+export BE_DIR=${BE_DIR:-$REG_DIR/be}
+export CS_DIR=${CS_DIR:-$REG_DIR/cs}
 
-echo "test: " $test
-if test ! -d ${RUN_DIR}/${RUN_ID}; then
-echo "Now making ${RUN_DIR}/${RUN_ID}"
-  mkdir  ${RUN_DIR}/${DA_ID}
-fi
+export EXP_DIR=${EXP_DIR:-$REG_DIR/$EXPT}
+export RUN_DIR=${RUN_DIR:-$EXP_DIR/$DA_ID}
 
-export DA_FIRST_GUESS=${DA_FIRST_GUESS:-$DAT_DIR/wrfinput_d01}    # wrfvar "first guess" input.
-export DA_OBSERVATIONS=${DA_OBSERVATIONS:-$DAT_DIR/ob.ascii} # wrfvar observation input.
-export DA_BACK_ERRORS=${DA_BACK_ERRORS:-$DAT_DIR/be.cv_$DA_CV_OPTIONS} # wrfvar background errors.
-export DA_SSMI=${DA_SSMI:-$DAT_DIR/ssmi.dat}                          # SSM/I radiances (ignore if not using).
-export DA_RADAR=${DA_RADAR:-$DAT_DIR/radar.dat}                       # Radar data (ignore if not using).
+rm -rf ${RUN_DIR}
+mkdir -p ${RUN_DIR}
+cd $RUN_DIR
+
+export DA_FIRST_GUESS=${DA_FIRST_GUESS:-$CS_DIR/$DA_DATE/wrfinput_d01}    # wrfvar "first guess" input.
+export DA_OBSERVATIONS=${DA_OBSERVATIONS:-$OB_DIR/$DA_DATE/ob.ascii} # wrfvar observation input.
+export DA_BACK_ERRORS=${DA_BACK_ERRORS:-$BE_DIR/be.cv_$DA_CV_OPTIONS} # wrfvar background errors.
+export DA_SSMI=${DA_SSMI:-$OB_DIR/$DA_DATE/ssmi.dat}               # SSM/I radiances (ignore if not using).
+export DA_RADAR=${DA_RADAR:-$OB_DIR/$DA_DATE/radar.dat}            # Radar data (ignore if not using).
+
+# DA_FG01_DATE=$DA_DATE
+# DA_FG02_DATE=`$BIN_DIR/advance_cymdh $DA_FG01 1`
+# DA_FG03_DATE=`$BIN_DIR/advance_cymdh $DA_FG01 2`
+# DA_FG04_DATE=`$BIN_DIR/advance_cymdh $DA_FG01 3`
+# export DA_FG01=${DA_FG01:-$OB_DIR
 
 export RTTOV=${RTTOV:-$HOME/rttov/rttov85}                            # RTTOV
 export DA_RTTOV_COEFFS=${DA_RTTOV_COEFFS:-$RTTOV/rtcoef_rttov7}       # RTTOV coefficients
 
 # Default WRF namelist variables:
-export NUM_PROCS=${NUM_PROCS:-1}                               # Number of processors to run on.
-export WEST_EAST_GRID_NUMBER=${WEST_EAST_GRID_NUMBER:-180}     # X grid dimension.
-export SOUTH_NORTH_GRID_NUMBER=${SOUTH_NORTH_GRID_NUMBER:-180} # Y grid dimension.
-export VERTICAL_GRID_NUMBER=${VERTICAL_GRID_NUMBER:-28}        # Z grid dimension.
-export GRID_DISTANCE=${GRID_DISTANCE:-50000}                   # Grid resolution (m).
+export NUM_PROCS=${NUM_PROCS:-1}               # Number of processors to run on.
+export DA_E_WE=${DA_E_WE:-180}                 # X grid dimension.
+export DA_E_SN=${DA_E_SN:-180}                 # Y grid dimension.
+export DA_E_VERT=${DA_E_VERT:-28}              # Z grid dimension.
+export DA_DX=${DA_DX:-50000}                   # x grid resolution (m).
+export DA_DX=${DA_DX:-50000}                   # y grid resolution (m).
 export DA_SF_SURFACE_PHYSICS=${DA_SF_SURFACE_PHYSICS:-1}       #(1=Thermal diffusion, 2=Noah LSM).
 
 if test $DA_SF_SURFACE_PHYSICS == 1; then
@@ -233,10 +245,10 @@ export DA_PSEUDO_VAL=${DA_PSEUDO_VAL:-1.0}
 export DA_PSEUDO_ERR=${DA_PSEUDO_ERR:-1.0}
 export DA_PSEUDO_VAR=${DA_PSEUDO_VAR:-u}
 
-export DA_CY=`echo $START_DATE | cut -c1-4`
-export DA_MM=`echo $START_DATE | cut -c5-6`
-export DA_DD=`echo $START_DATE | cut -c7-8`
-export DA_HH=`echo $START_DATE | cut -c9-10`
+export DA_CY=`echo $DA_DATE | cut -c1-4`
+export DA_MM=`echo $DA_DATE | cut -c5-6`
+export DA_DD=`echo $DA_DATE | cut -c7-8`
+export DA_HH=`echo $DA_DATE | cut -c9-10`
 DA_ANALYSIS_DATE=${DA_CY}-${DA_MM}-${DA_DD}_${DA_HH}:00:00.0000
 
 #-----------------------------------------------------------------------
@@ -265,16 +277,12 @@ fi
 # [3.0] Prepare for assimilation:
 #-----------------------------------------------------------------------
 
-rm -rf ${RUN_DIR}/${DA_ID}
-mkdir ${RUN_DIR}/${DA_ID}
-cd ${RUN_DIR}/${DA_ID}
-
 ln -s $DA_RTTOV_COEFFS/* .
 
-cp $WRFVAR_DIR/run/gribmap.txt .
-cp $WRFVAR_DIR/run/LANDUSE.TBL .
-cp $WRFVAR_DIR/run/gmao_airs_bufr.tbl .
-cp $BUILD_DIR/wrfvar.exe  wrfvar.exe
+cp $DA_DIR/run/gribmap.txt .
+cp $DA_DIR/run/LANDUSE.TBL .
+cp $DA_DIR/run/gmao_airs_bufr.tbl .
+cp $DA_BUILD_DIR/wrfvar.exe  wrfvar.exe
 
 
 ln -sf $DA_FIRST_GUESS	 wrfvar_input
@@ -287,7 +295,7 @@ for FILE in $DAT_DIR/*.inv; do
   fi
 done
 
-for FILE in $WRFVAR_DIR/run/*.bias; do
+for FILE in $DA_DIR/run/*.bias; do
   if test -f $FILE; then
     ln -s $FILE .
   fi
@@ -303,7 +311,8 @@ for FILE in $DAT_DIR/*.bufr; do
 done
 
 if test $PLATFORM == "Linux"; then
-  ENDIAN=little_endian
+#  ENDIAN=little_endian
+  ENDIAN=big_endian
 fi
 
 if test $PLATFORM == "Darwin" -o $PLATFORM == "AIX"; then
@@ -326,6 +335,8 @@ if test -r $DA_SSMI; then
   set DA_USE_SSMIRETRIEVALOBS = .TRUE.
 fi
 
+echo "Run directory:               $RUN_DIR"
+echo "Build directory:             $DA_BUILD_DIR"
 echo "First Guess Input File:      $DA_FIRST_GUESS"
 echo "Background Error Input File: $DA_BACK_ERRORS"
 echo "Observation Input File:      $DA_OBSERVATIONS"
@@ -525,13 +536,13 @@ cat > namelist.input << EOF
  time_step_fract_den                 = 1,
  max_dom                             = 1,
  s_we                                = 1, 1, 1,
- e_we                                = $WEST_EAST_GRID_NUMBER, $WEST_EAST_GRID_NUMBER, $WEST_EAST_GRID_NUMBER,
+ e_we                                = $DA_E_WE, $DA_E_WE, $DA_E_WE,
  s_sn                                = 1, 1, 1,
- e_sn                                = $SOUTH_NORTH_GRID_NUMBER, $SOUTH_NORTH_GRID_NUMBER, $SOUTH_NORTH_GRID_NUMBER,
+ e_sn                                = $DA_E_SN, $DA_E_SN, $DA_E_SN,
  s_vert                              = 1, 1, 1,
- e_vert                              = $VERTICAL_GRID_NUMBER, $VERTICAL_GRID_NUMBER, $VERTICAL_GRID_NUMBER,
- dx                                  = $GRID_DISTANCE, $GRID_DISTANCE, $GRID_DISTANCE,
- dy                                  = $GRID_DISTANCE, $GRID_DISTANCE, $GRID_DISTANCE,
+ e_vert                              = $DA_E_VERT, $DA_E_VERT, $DA_E_VERT,
+ dx                                  = $DA_DX, $DA_DX, $DA_DX,
+ dy                                  = $DA_DY, $DA_DY, $DA_DY,
  grid_id                             = 1,     2,     3,
  parent_id                           = 0,     1,     2,
  i_parent_start                      = 0,     30,    30,
@@ -651,9 +662,21 @@ if test $PLATFORM == "AIX"; then
   ./wrfvar.exe > wrfvar.out 2>wrfvar.error
 fi
 
-cp fort.12 statistics
-cp fort.81 cost_fn
-cp fort.82 grad_fn
+if test -f fort.12; then
+  ln -s $PWD/fort.12  $EXP_DIR/statistics
+fi
+
+if test -f fort.81; then 
+  ln -fs $PWD/fort.81      $EXP_DIR/cost_fn
+fi
+
+if test -f fort.82; then
+  ln -fs $PWD/fort.82      $EXP_DIR/grad_fn
+fi
+
+ln -fs $PWD/rsl*         $EXP_DIR
+ln -fs $PWD/wrfvar.out   $EXP_DIR
+ln -fs $PWD/wrfvar.error $EXP_DIR
 
 echo "WRF-Var completed"
 date
