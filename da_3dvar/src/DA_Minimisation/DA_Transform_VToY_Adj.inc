@@ -42,8 +42,9 @@ subroutine DA_Transform_VToY_Adj( cv_size, be, ep, cv, iv, vp, vv, xa, xb, xbx, 
             iv%current_ob_time = nobwin
             call DA_zero_x(xa)
             call da_transform_xtoy_adj( xb, iv, xp, y, xa )
-            write(filnam,'(a2,i2.2)') 'af',nobwin-1
-            write(unit=*, fmt='(2a,2x,a,i6)') 'file:', __FILE__, 'line:', __LINE__
+            write(UNIT=filnam,FMT='(a2,i2.2)') 'af',nobwin-1
+            write(unit=stdout, fmt='(2a,2x,a,i6)') 'file:', __FILE__, 'line:', __LINE__
+
             call DA_Transfer_WRFTLtoXa_Adj( grid, config_flags, filnam, &
 #include <em_actual_args.inc>
                                  )
