@@ -92,10 +92,11 @@ subroutine da_test_spectral( max_wave, sizec, xbx, field, &
       index_end   = index_start + max_wave - m
 
    do mm = index_start, index_end
-      IF (2*mm > 2*sizec) THEN
-         CALL wrf_error_fatal3(__FILE__,__LINE__, "rcv_out index bounce")
+      if( 2*mm > 2*sizec) THEN
+         CALL wrf_error_fatal3(__FILE__,__LINE__, &
+            "rcv_out index bounce")
       END IF
-      ccv(mm) = cmplx (rcv_out(2*mm-1), rcv_out(2*mm))                    
+      ccv(mm) = cmplx (rcv_out(2*mm-1), rcv_out(2*mm))
    end do
    r_leg = 0.0
    call da_legtra_inv( jds, jde, jts, jte, max_wave, xbx%alp_size, m, xbx%alp, &
