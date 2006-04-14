@@ -9,7 +9,7 @@
    type (xb_type), intent(in)       :: xb   ! First guess structure.
    type (be_type), intent(in)       :: be   ! Background error structure.
    real, intent(inout)              :: cv(1:cv_size)   ! control variables.
-   type (vp_type), intent(in)       :: vv   ! Grid point/EOF control var.
+   type (vp_type), intent(inout)    :: vv   ! Grid point/EOF control var.
    type (xpose_type), intent(inout) :: xp   ! Dimensions and xpose buffers. 
    integer, intent(in)              :: ids,ide, jds,jde, kds,kde ! domain dims.
    integer, intent(in)              :: ims,ime, jms,jme, kms,kme ! memory dims.
