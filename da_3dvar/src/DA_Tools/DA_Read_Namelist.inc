@@ -390,11 +390,11 @@ SUBROUTINE DA_Read_Namelist
    READ  ( UNIT = namelist_unit, NML = ens_info , IOSTAT = IOST)
 
    if ( print_detail >= 1 ) then
-      WRITE(unit=stdout,'(A,3X,i4    )') ' Ensemble size = ', ensdim
-      WRITE(unit=stdout,'(A,3X,i4    )') ' Alpha CV truncation = ', alpha_truncation
-      WRITE(unit=stdout,'(A,3X,i4    )') ' Alpha corr_type = ', alpha_corr_type
-      WRITE(unit=stdout,'(A,3X,f12.2 )') ' Alpha correlation scale = ', alpha_corr_scale
-      WRITE(unit=stdout,'(A,3X,f12.2 )') ' Alpha standard deviation= ', alpha_std_dev
+      WRITE(unit=stdout,FMT='(A,3X,i4    )') ' Ensemble size = ', ensdim
+      WRITE(unit=stdout,FMT='(A,3X,i4    )') ' Alpha CV truncation = ', alpha_truncation
+      WRITE(unit=stdout,FMT='(A,3X,i4    )') ' Alpha corr_type = ', alpha_corr_type
+      WRITE(unit=stdout,FMT='(A,3X,f12.2 )') ' Alpha correlation scale = ', alpha_corr_scale
+      WRITE(unit=stdout,FMT='(A,3X,f12.2 )') ' Alpha standard deviation= ', alpha_std_dev
    endif
 
    READ  ( UNIT = namelist_unit, NML = RECORD4 , IOSTAT = IOST)
@@ -508,9 +508,9 @@ SUBROUTINE DA_Read_Namelist
       WRITE(UNIT=stdout,FMT='(A,1PE8.2   )') ' RF_LEN_SCALING3 = ',len_scaling3
       WRITE(UNIT=stdout,FMT='(A,1PE8.2   )') ' RF_LEN_SCALING4 = ',len_scaling4
       WRITE(UNIT=stdout,FMT='(A,1PE8.2   )') ' RF_LEN_SCALING5 = ',len_scaling5
-      WRITE(UNIT=stdout,'(A,1PE8.2   )')     ' power_truncation = ', power_truncation
-      WRITE(UNIT=stdout,'(A,3X,f12.2 )')     ' Jb scaling factor = ', jb_factor
-      WRITE(UNIT=stdout,'(A,3X,f12.2 )')     ' Je scaling factor = ', je_factor
+      WRITE(UNIT=stdout,FMT='(A,1PE8.2   )') ' power_truncation = ', power_truncation
+      WRITE(UNIT=stdout,FMT='(A,3X,f12.2 )') ' Jb scaling factor = ', jb_factor
+      WRITE(UNIT=stdout,FMT='(A,3X,f12.2 )') ' Je scaling factor = ', je_factor
 
    end if
    
@@ -749,11 +749,11 @@ SUBROUTINE DA_Read_Namelist
    WRITE(UNIT=stdout,FMT='(A,3X,L10)') ' write_filtered_obs = ', write_filtered_obs
    WRITE(UNIT=stdout,FMT='(A,3X,i4 )') ' fg_format        = ', fg_format
    WRITE(UNIT=stdout,FMT='(A,3X,i4 )') ' ob_format        = ', ob_format
-   WRITE(unit=stdout,'(A,3X,i4    )')  ' ensdim           = ', ensdim
-   WRITE(unit=stdout,'(A,3X,i4    )')  ' alpha_truncation = ', alpha_truncation
-   WRITE(unit=stdout,'(A,3X,i4    )')  ' alpha_corr_type  = ', alpha_corr_type
-   WRITE(unit=stdout,'(A,3X,f12.2 )')  ' alpha_corr_scale = ', alpha_corr_scale
-   WRITE(unit=stdout,'(A,3X,f12.2 )')  ' alpha_std_dev    = ', alpha_std_dev
+   WRITE(unit=stdout,FMT='(A,3X,i4    )')  ' ensdim           = ', ensdim
+   WRITE(unit=stdout,FMT='(A,3X,i4    )')  ' alpha_truncation = ', alpha_truncation
+   WRITE(unit=stdout,FMT='(A,3X,i4    )')  ' alpha_corr_type  = ', alpha_corr_type
+   WRITE(unit=stdout,FMT='(A,3X,f12.2 )')  ' alpha_corr_scale = ', alpha_corr_scale
+   WRITE(unit=stdout,FMT='(A,3X,f12.2 )')  ' alpha_std_dev    = ', alpha_std_dev
    WRITE(UNIT=stdout,FMT='(A,3X,A8 )') ' PROCESS_OBS      = ', PROCESS_OBS
    WRITE(UNIT=stdout,FMT='(A,3X,I4 )') ' obs_qc_pointer   = ', obs_qc_pointer
    WRITE(UNIT=stdout,FMT='(A,3X,L10)') ' Use_SynopObs     = ', Use_SynopObs, &
@@ -813,8 +813,8 @@ SUBROUTINE DA_Read_Namelist
    WRITE(UNIT=stdout,FMT='(A,1PE8.2   )') ' RF_LEN_SCALING3 = ',len_scaling3
    WRITE(UNIT=stdout,FMT='(A,1PE8.2   )') ' RF_LEN_SCALING4 = ',len_scaling4
    WRITE(UNIT=stdout,FMT='(A,1PE8.2   )') ' RF_LEN_SCALING5 = ',len_scaling5
-   WRITE(unit=stdout,'(A,3X,f12.2 )')     ' jb_factor       = ', jb_factor
-   WRITE(unit=stdout,'(A,3X,f12.2 )')     ' je_factor       = ', je_factor
+   WRITE(unit=stdout,FMT='(A,3X,f12.2 )')     ' jb_factor       = ', jb_factor
+   WRITE(unit=stdout,FMT='(A,3X,f12.2 )')     ' je_factor       = ', je_factor
    WRITE(UNIT=stdout,FMT='(A,3X,L10   )') ' In_CG_COST_FN_NEEDED = ',calculate_cg_cost_fn
    WRITE(UNIT=stdout,FMT='(A,3X,L10   )') ' Outer_Loop_Write   = ',write_outer_loop
    WRITE(UNIT=stdout,FMT='(A,3X,L10   )') ' Lat_Stats_Option   = ',lat_stats_option
