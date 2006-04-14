@@ -185,6 +185,11 @@ MODULE DA_Constants
 
    INTEGER, PARAMETER :: check_max_iv_unit=60 ! Unit number for O-B check.
 
+   INTEGER, PARAMETER :: num_alpha_corr_types = 3
+
+   INTEGER, PARAMETER :: alpha_corr_unit1(num_alpha_corr_types) = (/61,62,63/)
+   INTEGER, PARAMETER :: alpha_corr_unit2(num_alpha_corr_types) = (/71,72,73/)
+
    integer, parameter :: cost_unit = 81       ! Output of cost-function value
    integer, parameter :: grad_unit = 82       ! Output of gradient norm
 
