@@ -72,7 +72,7 @@ if ( ! $?STAGE0_DIR )    setenv STAGE0_DIR ${RUN_DIR}/stage0
 if ( ! -d ${RUN_DIR} )   mkdir ${RUN_DIR}
 if ( ! -d ${STAGE0_DIR} )  mkdir ${STAGE0_DIR}
 
-if ( $GLOBAL == .true. ) then
+if ( $GLOBAL == true ) then
   setenv UH_METHOD power
 else
   setenv UH_METHOD scale
