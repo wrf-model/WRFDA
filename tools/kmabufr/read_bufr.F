@@ -112,6 +112,7 @@ C               -------------------------------
 C
       IRET=0 
       CALL PBOPEN(IUNIT,CFIN(1:ILN),'R',IRET)
+      write(6,*) 'opening ',cfin(1:iln)
       IF(IRET.EQ.-1) STOP 'OPEN FAILED'
       IF(IRET.EQ.-2) STOP 'INVALID FILE NAME'
       IF(IRET.EQ.-3) STOP 'INVALID OPEN MODE SPECIFIED'
@@ -445,7 +446,7 @@ c         write(6,*) i,kt(k),v(j)
           if (is_sound .and. z(1) .eq. elev) then
 	    psfc = p(1)
 	  endif
-	  if (is_sound .and. ifm .ne. 96) then
+	  if (is_sound .and. (ifm .ne. 96 .and. ifm .ne. 88 )) then
 	    call cmprsnd (p, z, t, td, spd, dir, kx, xmis)
 	  endif
             call write_obs (p, z,
@@ -646,5 +647,10 @@ c     write(6,*) 'begin loop, il = ',il,' ih = ',ih
       enddo
       il = min0(k,kx)
       ih = max0(ih - 1,1)
-      goto 10
+      if ( il .eq. 1 .and. ih .eq. 1 ) then
+        kx = 1    ! if all levels are missing, return just one.
+	return
+      else
+        goto 10
+      endif
       end
