@@ -4,11 +4,6 @@
 !     PURPOSE: Collection of routines associated with minimisation.
 !
 !     METHOD:  Straightforward definitions.
-!
-!     HISTORY: 01/07/2000 - Creation.                           Dale Barker
-!   Additions: 07/15/2003 - Added Buo and Profiler               S.R.H. Rizvi
-!   Additions: 07/20/2003 - Added DA_Add_PBL_And_SFC_Info        S.R.H. Rizvi
-!   Additions:    07/2005 - Added Radiance module               Zhiquan Liu
 !------------------------------------------------------------------------------
 
       USE DA_Constants
@@ -66,12 +61,8 @@
 #include <da_calculate_residual.inc>
 #include <da_get_var_diagnostics.inc>
 #include <da_get_innov_vector.inc>
-!#include <da_lmdir.inc>
 #include <da_minimisation_warning.inc>
 #include <da_sum_reals.inc>
-!#include <da_va15bd.inc>
-!#include <da_vd05ad.inc>
-!#include <da_vd05bd.inc>
 #include <da_dot.inc>
 #include <da_dot_cv.inc>
 #include <da_write_diagnostics.inc>
