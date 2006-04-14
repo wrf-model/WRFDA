@@ -62,6 +62,7 @@ $validresponse = 0 ;
 until ( $validresponse ) {
   printf "------------------------------------------------------------------------\n" ;
   printf "Please select from among the following supported platforms.\n\n" ;
+  printf "Choose single-threaded options for gen_be.\n\n" ;
 
   $opt = 1 ;
   open CONFIGURE_DEFAULTS, "< ./arch/configure.defaults_new" 
