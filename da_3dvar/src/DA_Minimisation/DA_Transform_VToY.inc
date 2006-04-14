@@ -1,22 +1,20 @@
-subroutine DA_Transform_VToY(be, cv, iv, vp, vv, xa, xb, xbx, xp, y, &
-                             ids, ide, jds, jde, kds, kde,  &
-                             ims, ime, jms, jme, kms, kme,  &
-                             its, ite, jts, jte, kts, kte,  &
-                             grid, config_flags )
+subroutine DA_Transform_VToY( cv_size, be, ep, cv, iv, vp, vv, xa, xb, xbx, xp, y, &
+                              ids, ide, jds, jde, kds, kde,  &
+                              ims, ime, jms, jme, kms, kme,  &
+                              its, ite, jts, jte, kts, kte,  &
+                              grid, config_flags )
 
 !-------------------------------------------------------------------------
-!  History:
-!
 !    Purpose:  Does transform of control variable (V) to Obs-space (Y)
-!
-!   Creation:  03/14/2005                    Syed RH Rizvi
 !
 ! PARENT_MODULE:  DA_VToX_Transforms 
 !-------------------------------------------------------------------------
       implicit none
 
+      integer, intent(in)                :: cv_size ! Size of cv array.
       type (be_type), intent(in)         :: be     ! background error structure.
-      real,dimension(cv_size),intent(in) :: cv     ! control variable (local).
+      type (ep_type), intent(in)         :: ep     ! Ensemble perturbation structure.
+      real, intent(in)                   :: cv(1:cv_size)     ! control variables.
       type (ob_type), intent(inout)      :: iv     ! innovation vector (o-b).
       type (vp_type), intent(inout)      :: vp     ! Grdipt/level CV.
       type (vp_type), intent(inout)      :: vv     ! Grdipt/EOF CV.
@@ -37,8 +35,7 @@ subroutine DA_Transform_VToY(be, cv, iv, vp, vv, xa, xb, xbx, xp, y, &
 
       character(len=4) :: filnam
 
-!
-      call da_transform_vtox( xb, xbx, be, cv, vv, vp, xp, xa,  &
+      call da_transform_vtox( cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa,  &
                               ids, ide, jds, jde, kds, kde,     &
                               ims, ime, jms, jme, kms, kme,     &
                               its, ite, jts, jte, kts, kte )

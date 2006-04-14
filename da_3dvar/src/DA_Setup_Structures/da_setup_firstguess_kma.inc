@@ -26,6 +26,7 @@ SUBROUTINE DA_Setup_FirstGuess_KMA( xbx, grid, &
 
    integer           :: i, j
    integer           :: is, ie, js, je, ks, ke
+   integer           :: max_wavenumber
 
 !---------------------------------------------------------------------------
 
@@ -90,10 +91,9 @@ SUBROUTINE DA_Setup_FirstGuess_KMA( xbx, grid, &
    xbx%nk  = grid%e_vert - 1
 !---------------------------------------------------------------
    xbx% lenwrk    = xbx%ni
-   xbx% max_wavenumber = xbx%ni/2-1
    xbx% lenr           = xbx%inc * (xbx%ni - 1 ) + 1
-   xbx% c_cv_size =(xbx%max_wavenumber+1)*(xbx%max_wavenumber+2)/2 
-   xbx% alp_size = (xbx%nj+1)*(xbx%max_wavenumber+1)*(xbx%max_wavenumber+2)/4
+   max_wavenumber = xbx%ni/2-1
+   xbx % alp_size = (xbx%nj+1)*(max_wavenumber+1)*(max_wavenumber+2)/4
 !---------------------------------------------------------------
 
    CALL DA_Transfer_KMAToXb( xbx, grid, &

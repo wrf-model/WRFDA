@@ -91,6 +91,7 @@ subroutine da_get_var_diagnostics ( iv, j )
          write(UNIT=stdout,FMT='(a30,f15.5)')'    Final WRFVAR value of J  = ', j % total
          write(UNIT=stdout,FMT='(a30,f15.5)')'    Final WRFVAR value of Jo = ', j % jo % total
          write(UNIT=stdout,FMT='(a30,f15.5)')'    Final WRFVAR value of Jb = ', j % jb
+         write(UNIT=stdout,FMT='(a30,f15.5)')'    Final WRFVAR value of Je = ', j % je
          if(num_obs_tot > 0) &
          write(UNIT=stdout,FMT='(a30,f15.5)')'    Final J / total num_obs = ', j % total / &
                                                              real(num_obs_tot)
@@ -99,6 +100,8 @@ subroutine da_get_var_diagnostics ( iv, j )
          write(UNIT=stdout,FMT='(a30,f15.5)')'    WRFVAR Jb factor used (3)= ', var_scaling3
          write(UNIT=stdout,FMT='(a30,f15.5)')'    WRFVAR Jb factor used (4)= ', var_scaling4
          write(UNIT=stdout,FMT='(a30,f15.5)')'    WRFVAR Jb factor used (5)= ', var_scaling5
+         write(UNIT=stdout,FMT='(a30,f15.5)')'    WRFVAR Jb factor used    = ', jb_factor
+         write(UNIT=stdout,FMT='(a30,f15.5)')'    WRFVAR Je factor used    = ', je_factor
          write(UNIT=stdout,FMT=*) ' '
 
 !        [4.2] Output components of Jo:

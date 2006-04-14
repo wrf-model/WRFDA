@@ -1,7 +1,7 @@
-SUBROUTINE DA_Check_VpToX_Adjoint( xb, xbx, be, xa, xp, vp,  &
-                                  ids, ide, jds, jde, kds, kde, &
-                                  ims, ime, jms, jme, kms, kme, &
-                                  its, ite, jts, jte, kts, kte )
+SUBROUTINE DA_Check_VpToX_Adjoint( ne, xb, xbx, be, ep, xp, vp, xa, &
+                                   ids, ide, jds, jde, kds, kde, &
+                                   ims, ime, jms, jme, kms, kme, &
+                                   its, ite, jts, jte, kts, kte )
 
 !------------------------------------------------------------------------------
 !  PURPOSE: Test Vp to X routine and adjoint for compatibility.
@@ -13,39 +13,35 @@ SUBROUTINE DA_Check_VpToX_Adjoint( xb, xbx, be, xa, xp, vp,  &
 
    implicit none
 
+   integer, intent(in)              :: ne   ! Ensemble size.
    type (xb_type), intent(in)       :: xb   ! first guess.
    TYPE (xbx_type),intent(in)       :: xbx  ! For header & non-grid arrays.
    type (be_type), intent(in)       :: be   ! background errors.
-   type (x_type), intent(inout)     :: xa   ! grad_x(jo)
-   type (xpose_type), intent(inout) :: xp   ! Dimensions and xpose buffers.
+   type (ep_type), intent(in)       :: ep   ! Ensemble perturbation type.
+   type (xpose_type), intent(in)    :: xp   ! Dimensions and xpose buffers.
    type (vp_type),intent(inout)     :: vp   ! grdipt/level cv (local).
+   type (x_type), intent(inout)     :: xa   ! grad_x(jo)
    integer, intent(in)              :: ids,ide, jds,jde, kds,kde ! domain dims.
    integer, intent(in)              :: ims,ime, jms,jme, kms,kme ! memory dims.
    integer, intent(in)              :: its,ite, jts,jte, kts,kte ! tile   dims
 
-!-------------------------------------------------------------------------
-      
-   INTEGER                        :: k           ! Loop counter.
-
-   REAL                           :: adj_par_lhs ! < x, x >
-   REAL                           :: adj_par_rhs ! < v_adj, v >
-
-   REAL                           :: adj_sum_lhs ! < x, x >
-   REAL                           :: adj_sum_rhs ! < v_adj, v >
-
-!-------------------------------------------------------------------------
-
-   real, dimension(ims:ime, jms:jme, kms:kme) :: vp2_v1, vp2_v2, vp2_v3, &
-                                                 vp2_v4, vp2_v5
-
-!-------------------------------------------------------------------------
-
-   write(UNIT=stdout, fmt='(/a/)') &
-        ' DA_Check_VpToX_Adjoint: Adjoint Test Results:'
+   INTEGER                          :: k           ! Loop counter.
+   REAL                             :: adj_par_lhs ! < x, x >
+   REAL                             :: adj_par_rhs ! < v_adj, v >
+   REAL                             :: adj_sum_lhs ! < x, x >
+   REAL                             :: adj_sum_rhs ! < v_adj, v >
+   real                             :: vp2_v1(ims:ime,jms:jme,kms:kme)
+   real                             :: vp2_v2(ims:ime,jms:jme,kms:kme)
+   real                             :: vp2_v3(ims:ime,jms:jme,kms:kme)
+   real                             :: vp2_v4(ims:ime,jms:jme,kms:kme)
+   real                             :: vp2_v5(ims:ime,jms:jme)
+   real                             :: vp2_alpha(ims:ime,jms:jme,1:ne)
 
 !-------------------------------------------------------------------------
 !  [1.0] Initialise:
 !-------------------------------------------------------------------------
+
+   write(unit=*, fmt='(/a/)') 'da_check_vptox_adjoint: Test Results:'
 
    CALL DA_Zero_X( xa )
 
@@ -101,15 +97,16 @@ PRINT *,'TEST_COVERAGE_DA_Check_VpToX_Adjoint A:  adj_sum_lhs,adj_sum_rhs = ', a
    vp2_v2(:,:,:) = vp % v2(:,:,:)
    vp2_v3(:,:,:) = vp % v3(:,:,:)
    vp2_v4(:,:,:) = vp % v4(:,:,:)
-   vp2_v5(:,:,:) = vp % v5(:,:,:)
+   vp2_v5(:,:) = vp % v5(:,:)
+   if ( be % ne > 0 ) vp2_alpha(:,:,:) = vp % alpha(:,:,:)
 
 !-------------------------------------------------------------------------
 !  [2.0] Perform x = U vp transform:
 !-------------------------------------------------------------------------
 
-   call da_transform_vptox( xb, xbx, vp, xp, xa, be,    &
-                            ids,ide, jds,jde, kds,kde,  &
-                            ims,ime, jms,jme, kms,kme,  &
+   call da_transform_vptox( xb, xbx, vp, xp, xa, be, ep, &
+                            ids,ide, jds,jde, kds,kde,   &
+                            ims,ime, jms,jme, kms,kme,   &
                             its,ite, jts,jte, kts,kte )
 
 !-------------------------------------------------------------------------
@@ -194,9 +191,9 @@ PRINT *,'TEST_COVERAGE_DA_Check_VpToX_Adjoint A:  adj_sum_lhs,adj_sum_rhs = ', a
 
    call DA_Zero_vp_type ( vp )
 
-   call da_transform_vptox_adj( xb, xbx, xa, vp, be, xp, &
-                                ids,ide, jds,jde, kds,kde,  &
-                                ims,ime, jms,jme, kms,kme,  &
+   call da_transform_vptox_adj( xb, xbx, xa, vp, be, ep, xp, &
+                                ids,ide, jds,jde, kds,kde,   &
+                                ims,ime, jms,jme, kms,kme,   &
                                 its,ite, jts,jte, kts,kte )
 
 !-------------------------------------------------------------------------
@@ -207,8 +204,10 @@ PRINT *,'TEST_COVERAGE_DA_Check_VpToX_Adjoint A:  adj_sum_lhs,adj_sum_rhs = ', a
    adj_par_rhs = SUM( vp % v2(its:ite,jts:jte,:) * vp2_v2(its:ite,jts:jte,:) ) + adj_par_rhs
    adj_par_rhs = SUM( vp % v3(its:ite,jts:jte,:) * vp2_v3(its:ite,jts:jte,:) ) + adj_par_rhs
    adj_par_rhs = SUM( vp % v4(its:ite,jts:jte,:) * vp2_v4(its:ite,jts:jte,:) ) + adj_par_rhs
-   adj_par_rhs = SUM( vp % v5(its:ite,jts:jte,:) * vp2_v5(its:ite,jts:jte,:) ) + adj_par_rhs
-!  adj_par_rhs = SUM( vp % v5(its:ite,jts:jte,kts) * vp2_v5(its:ite,jts:jte,kts) ) + adj_par_rhs
+   adj_par_rhs = SUM( vp % v5(its:ite,jts:jte) * vp2_v5(its:ite,jts:jte) ) + adj_par_rhs
+   if ( be % ne > 0 ) then
+      adj_par_rhs = SUM( vp % alpha(its:ite,jts:jte,:) * vp2_alpha(its:ite,jts:jte,:) ) + adj_par_rhs
+   end if
 
 !-------------------------------------------------------------------------
 !  [7.0] Print output:
@@ -229,7 +228,8 @@ PRINT *,'TEST_COVERAGE_DA_Check_VpToX_Adjoint B:  adj_sum_lhs,adj_sum_rhs = ', a
    vp % v2(:,:,:) = vp2_v2(:,:,:)
    vp % v3(:,:,:) = vp2_v3(:,:,:)
    vp % v4(:,:,:) = vp2_v4(:,:,:)
-   vp % v5(:,:,:) = vp2_v5(:,:,:)
+   vp % v5(:,:) = vp2_v5(:,:)
+   if ( be % ne > 0 ) vp % alpha(:,:,:) = vp2_alpha(:,:,:)
 
    write(UNIT=stdout, fmt='(/a/)') &
         'End of DA_Check_VpToX_Adjoint.'

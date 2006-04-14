@@ -1,4 +1,4 @@
-      real function da_dot(x,y,n)
+      real function da_dot(n,x,y)
 !
 !     forms the dot product of two vectors.
 !     uses unrolled loops for increments equal to one.

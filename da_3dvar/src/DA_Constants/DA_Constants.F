@@ -67,7 +67,7 @@ MODULE DA_Constants
    real, parameter    :: coeff = 3.73e5 / 77.6
    
 !------------------------------------------------------------------------------
-!  [2.0] WRFVAR parameter constants:
+!  [2.0] WRF-Var parameter constants:
 !------------------------------------------------------------------------------
 
 ! Missing values and the index number of the quality contro
@@ -141,6 +141,7 @@ MODULE DA_Constants
    REAL, PARAMETER    :: inv_typ_vp3_sumsq = 0.00001 ! 1/SUM(phi_u**2)
    REAL, PARAMETER    :: inv_typ_vp4_sumsq = 10000.0 ! 1/SUM(q**2)
    REAL, PARAMETER    :: inv_typ_vp5_sumsq = 0.00001 ! 1/SUM(?**2)
+   REAL, PARAMETER    :: inv_typ_vpalpha_sumsq = 1.0 ! 1/SUM(?**2)
 
    CHARACTER(LEN=*),PARAMETER :: wrfvar_version = "WRFVAR V2.1.2"
    CHARACTER(LEN=*),PARAMETER :: wrf_version    = "WRF V2.1.2"
@@ -161,13 +162,8 @@ MODULE DA_Constants
    INTEGER, PARAMETER :: innov_vector_unit = 14 ! Innovation vector diagnostics
 
    INTEGER, PARAMETER :: cov_unit = 25 ! Covariances unit
-
+   INTEGER, PARAMETER :: be_unit = 34    ! Unit number for be input.
    INTEGER, PARAMETER :: gen_be_ounit = 30
-
-   INTEGER, PARAMETER :: be_cv_2_unit = 32    ! Unit number for be input.
-   INTEGER, PARAMETER :: be_cv_3_unit = 33    ! Unit number for be input.
-   INTEGER, PARAMETER :: be_cv_4_unit = 34    ! Unit number for be input. 
-   INTEGER, PARAMETER :: be_cv_5_unit = 35    ! Unit number for be input.
 
    INTEGER, PARAMETER :: sound_diag_unit1 = 36 ! For da_sound/da_obs_diagnostics
    INTEGER, PARAMETER :: sound_diag_unit2 = 37
@@ -205,8 +201,8 @@ MODULE DA_Constants
    integer, parameter  :: iunit = 70
    integer, parameter  :: ounit = iunit + 1
    integer, parameter  :: namelist_unit = 72
-   integer, parameter  :: spec_unit = 73     ! Unit for spectral diag. output.
-
+   integer, parameter  :: spec_unit = 73      ! Unit for spectral diag. output.
+   integer, parameter  :: ep_unit = 74        ! Ensemble perturbation input.
    INTEGER, PARAMETER :: max_num_of_var = 200 ! Maximum # of stored fields.
 
 !------------------------------------------------------------------------------
@@ -282,9 +278,6 @@ MODULE DA_Constants
  real, dimension(10)    :: eps         ! Fraction of initial gradient
                                        ! required for min. convergence.
 
- INTEGER                :: cv_size     ! Size of control variable.
- INTEGER,dimension(5)   :: kz_vv,kz_vp ! vertical dimensions of vv and vp arrays
-
 !Recursive filter:
  INTEGER                :: rf_passes   ! Number of passes in recursive filter.
  REAL                   :: var_scaling1! Variance rescaling factor.
@@ -330,7 +323,7 @@ MODULE DA_Constants
 
  CHARACTER(LEN=24) :: ANALYSIS_DATE ! Analysis time, "CCYY-MM-DD_HH:MM:SS.ssss"
  INTEGER           :: ANALYSIS_ACCU ! Analysis time accuracy in seconds.
-
+ logical           :: write_filtered_obs ! Output QCed observation file if true.
  integer       :: fg_format     ! 1 = WRF Input/Output.
                                 ! 2 = MM5 Input/Output.
  integer       :: ob_format     ! 1 = WRF (BUFR) Input/Output.
@@ -346,8 +339,14 @@ MODULE DA_Constants
  real          :: set_omb_rand_fac ! Scaling factor for random O-B (*sigma_o).
  logical       :: omb_add_noise ! Add random noise to O-Bs if .true.
  INTEGER       :: obs_qc_pointer ! wrfvar uses the obs data with qc >= obs_qc_pointer
- INTEGER       :: cv_options
  integer       :: sfc_assi_options     ! Surface assimilation option.
+
+!Ensemble parameters: 
+ integer       :: ensdim
+ integer       :: alpha_truncation     ! Spectral truncation of alpha.
+ integer       :: alpha_corr_type      ! 1=Exponential, 2=SOAR, 3=Gaussian.
+ real          :: alpha_corr_scale     ! Alpha correlation scale (km).
+ real          :: alpha_std_dev        ! Alpha control variable standard deviation.
 
  REAL, DIMENSION(3) :: as1, as2, as3, as4, as5
 
@@ -358,6 +357,12 @@ MODULE DA_Constants
  INTEGER       :: vert_evalue
  REAL          :: max_vert_var1, max_vert_var2, max_vert_var3, &
                   max_vert_var4, max_vert_var5
+ real          :: power_truncation
+ integer       :: cv_size_domain_jb    ! Total jb cv size.
+ integer       :: cv_size_domain_je    ! Total je cv size.
+ integer       :: cv_size_domain       ! Total cv size.
+ real          :: jb_factor            ! Scaling factor.
+ real          :: je_factor            ! Scaling factor.
  LOGICAL       :: test_transforms
  LOGICAL       :: test_statistics
  LOGICAL       :: print_obs_info

@@ -1,23 +1,22 @@
-SUBROUTINE DA_Check_VToX_Adjoint( xb, xbx, be, cv1, vv, vp, xp, xa, &
-                                 ids, ide, jds, jde, kds, kde,      &
-                                 ims, ime, jms, jme, kms, kme,      &
-                                 its, ite, jts, jte, kts, kte )
-                                  
+SUBROUTINE DA_Check_VToX_Adjoint( cv_size, xb, xbx, be, ep, cv1, vv, vp, xp, xa, &
+                                  ids, ide, jds, jde, kds, kde,      &
+                                  ims, ime, jms, jme, kms, kme,      &
+                                  its, ite, jts, jte, kts, kte )
 
 !------------------------------------------------------------------------------
 !  PURPOSE: Test V to X routine and adjoint for compatibility.
 !
 !  METHOD:  Standard adjoint test: < x, x > = < v_adj, v >.
-!
-!  HISTORY: 02/23/2000 - Creation of F90 version.           Dale Barker
 !------------------------------------------------------------------------------
 
    IMPLICIT NONE
 
+   integer, intent(in)                :: cv_size
    type (xb_type), intent(in)         :: xb     ! first guess (local).
    type (xbx_type),intent(in)         :: xbx    ! For header & non-grid arrays.
    type (be_type), intent(in)         :: be     ! background error structure.
-   real,dimension(cv_size),intent(in) :: cv1    ! control variable (local).
+   type (ep_type), intent(in)         :: ep     ! Ensemble perturbation structure.
+   real, intent(in)                   :: cv1(1:cv_size) ! control variable (local).
    type (vp_type), intent(inout)      :: vv     ! Grdipt/EOF CV.
    type (vp_type), intent(inout)      :: vp     ! Grdipt/level CV.
    type (xpose_type), intent(inout)   :: xp     ! Domain decomposition vars.
@@ -28,23 +27,15 @@ SUBROUTINE DA_Check_VToX_Adjoint( xb, xbx, be, cv1, vv, vp, xp, xa, &
    integer, intent(in)                :: ims,ime, jms,jme, kms,kme ! memory dims.
    integer, intent(in)                :: its,ite, jts,jte, kts,kte ! tile   dims.
 
-   real,dimension(cv_size) :: cv2 ! control variable (local).
-
-!-------------------------------------------------------------------------
-
+   real                               :: cv2(1:cv_size)    ! control variable (local).
    INTEGER                        :: k           ! Loop counter.
-
    REAL                           :: adj_par_lhs ! < x, x >
    REAL                           :: adj_par_rhs ! < x, x >
-
    REAL                           :: adj_sum_lhs ! < x, x >
    REAL                           :: adj_sum_rhs ! < v_adj, v >
 
-!-------------------------------------------------------------------------
+   write(unit=stdout, fmt='(/a/)') 'da_check_vtox_adjoint: Adjoint Test Results:'
 
-   write(UNIT=stdout, fmt='(/a/)') &
-        'DA_Check_VToX_Adjoint: Adjoint Test Results:'
-      
 !-------------------------------------------------------------------------
 !  [1.0] Initialise:
 !-------------------------------------------------------------------------
@@ -56,10 +47,11 @@ SUBROUTINE DA_Check_VToX_Adjoint( xb, xbx, be, cv1, vv, vp, xp, xa, &
 !-------------------------------------------------------------------------
 
    call da_zero_x ( xa )
-   call da_transform_vtox( xb, xbx, be, cv1, vv, vp, xp, xa, &
-                          ids, ide, jds, jde, kds, kde,      &
-                          ims, ime, jms, jme, kms, kme,      &
-                          its, ite, jts, jte, kts, kte )
+
+   call da_transform_vtox( cv_size, xb, xbx, be, ep, cv1, vv, vp, xp, xa, &
+                           ids, ide, jds, jde, kds, kde,      &
+                           ims, ime, jms, jme, kms, kme,      &
+                           its, ite, jts, jte, kts, kte )
 
 !-------------------------------------------------------------------------
 !  [3.0] Calculate LHS of adjoint test equation:
@@ -126,10 +118,11 @@ SUBROUTINE DA_Check_VToX_Adjoint( xb, xbx, be, cv1, vv, vp, xp, xa, &
 !-------------------------------------------------------------------------
 !  [5.0] Perform adjoint operation:
 !-------------------------------------------------------------------------
-   call da_transform_vtox_adj( xb, xbx, be, xa, xp, vp, vv, cv2, &
-                              ids, ide, jds, jde, kds, kde,      &
-                              ims, ime, jms, jme, kms, kme,      &
-                              its, ite, jts, jte, kts, kte )
+
+   call da_transform_vtox_adj( cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv2, &
+                               ids, ide, jds, jde, kds, kde,      &
+                               ims, ime, jms, jme, kms, kme,      &
+                               its, ite, jts, jte, kts, kte )
 
 !-------------------------------------------------------------------------
 !  [6.0] Calculate RHS of adjoint test equation:
@@ -157,8 +150,7 @@ PRINT *,'TEST_COVERAGE_DA_Check_VToX_Adjoint:  adj_sum_lhs,adj_sum_rhs = ', adj_
         'Whole  Domain: < v_adj, v > = ', adj_sum_rhs
    ENDIF
 
-   write(UNIT=stdout, fmt='(/a/)') &
-        'DA_Check_VToX_Adjoint: Finished'
+   write(UNIT=stdout, fmt='(/a/)') 'DA_Check_VToX_Adjoint: Finished'
 
 END SUBROUTINE DA_Check_VToX_Adjoint
 

@@ -1324,7 +1324,20 @@ typedef vp_type real    v2                      ijk      -         1        -   
 typedef vp_type real    v3                      ijk      -         1        -       -
 typedef vp_type real    v4                      ijk      -         1        -       -
 typedef vp_type real    v5                      ijk      -         1        -       -
+typedef vp_type real    alpha                   ije      -         1        -       -
 # END VP_TYPE DEFINITION
+
+# BEGIN EP_TYPE DEFINITION:
+#      <Table>  <Type>  <Sym>                <Dims>   <Use>   <NumTLev> <Stagger> <IO>     <DNAME>             <DESCRIP>     <UNITS>
+#typedef ep_sub_type character name
+#typedef ep_sub_type integer   nk
+typedef ep_type integer ne
+typedef ep_type real    v1                      ijke     -         1        -       -
+typedef ep_type real    v2                      ijke     -         1        -       -
+typedef ep_type real    v3                      ijke     -         1        -       -
+typedef ep_type real    v4                      ijke     -         1        -       -
+typedef ep_type real    v5                      ijke     -         1        -       -
+# END EP_TYPE DEFINITION
 
 # BEGIN XB_TYPE DEFINITION:
 typedef xb_type integer      map
@@ -1615,6 +1628,7 @@ state real dummy i dyn_em 1
 #Set state
 state vp_type vv - -
 state vp_type vp - -
+state ep_type ep - -
 state xb_type xb - -
 state x_type xa - -
 state xpose_type xp - -
