@@ -56,7 +56,9 @@ if ( ! $?TESTING_SPECTRAL ) setenv TESTING_SPECTRAL .false. # True if performing
 
 if ( ! $?EXPT )          setenv EXPT 2003-01.test
 if ( ! $?ID1 )           setenv ID1 ${BE_METHOD}.bin_type${BIN_TYPE}
-if ( ! $?GEN_BE_DIR )    setenv GEN_BE_DIR ${HOME}/code_development/WRF_V2.1.2/wrfvar
+if ( ! $?RELEASE )       setenv RELEASE WRF_V2.1.2
+if ( ! $?REL_DIR )       setenv REL_DIR ${HOME}/code_development/${RELEASE}
+if ( ! $?GEN_BE_DIR )    setenv GEN_BE_DIR ${REL_DIR}/wrfvar
 if ( ! $?BUILD_DIR )     setenv BUILD_DIR ${GEN_BE_DIR}/gen_be
 if ( ! $?BIN_DIR )       setenv BIN_DIR   ${GEN_BE_DIR}/tools
 if ( ! $?DATA_DISK )     setenv DATA_DISK /ocotillo1
