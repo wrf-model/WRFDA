@@ -58,7 +58,9 @@ export DA_CV_OPTIONS=${DA_CV_OPTIONS:-3}             # Background error statisti
 
 #Default directories/files:
 
-export DA_DIR=${DA_DIR:-$HOME/code_development/wrfvar}
+export RELEASE=${RELEASE:-WRF_V2.1.2}
+export REL_DIR=${REL_DIR:-$HOME/code_development/$RELEASE}
+export DA_DIR=${DA_DIR:-$REL_DIR/wrfvar}
 export DA_BUILD_DIR=${DA_BUILD_DIR:-$DA_DIR/main}
 export DA_ID=${DA_ID:-wrfvar}
 export HOSTS=${HOSTS:-$PWD/hosts}
@@ -650,12 +652,12 @@ EOF
 if test $PLATFORM == "Linux"; then
   if test $NUM_PROCS -gt 1; then
     mpirun -v -np $NUM_PROCS -nolocal -machinefile $HOSTS ./wrfvar.exe
-    ln -s rsl.out.0000 wrfvar.out
-    ln -s rsl.error.0000 wrfvar.error
+    ln -fs rsl.out.0000 wrfvar.out
+    ln -fs rsl.error.0000 wrfvar.error
   else
 #    mpirun -v -np 1 ./wrfvar.exe > /dev/null #Assumes compile in DM mode.
-#    ln -s rsl.out.0000 wrfvar.out
-#    ln -s rsl.error.0000 wrfvar.error
+#    ln -fs rsl.out.0000   wrfvar.out
+#    ln -fs rsl.error.0000 wrfvar.error
     ./wrfvar.exe > wrfvar.out 2>wrfvar.error
   fi
 fi
@@ -663,8 +665,8 @@ fi
 if test $PLATFORM == "Darwin"; then
   if test $NUM_PROCS -gt 1; then
     mpirun -v -np $NUM_PROCS -machinefile $HOSTS ./wrfvar.exe
-    ln -s rsl.out.0000 wrfvar.out
-    ln -s rsl.error.0000 wrfvar.error
+    ln -fs rsl.out.0000   wrfvar.out
+    ln -fs rsl.error.0000 wrfvar.error
   else
     ./wrfvar.exe > wrfvar.out 2>wrfvar.error
   fi
@@ -681,7 +683,7 @@ if test $PLATFORM == "AIX"; then
 fi
 
 if test -f fort.12; then
-  ln -s $PWD/fort.12  $EXP_DIR/statistics
+  ln -fs $PWD/fort.12  $EXP_DIR/statistics
 fi
 
 if test -f fort.81; then 
