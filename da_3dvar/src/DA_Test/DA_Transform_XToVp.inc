@@ -132,7 +132,7 @@ SUBROUTINE DA_Transform_XToVp( xb, xbx, xa, xp, vp, be, ep, &
      print*,' calculating psfc_u '                     
      do j=jts,jte
      do i=its,ite
-       vp % v5(i,j) = xa%psfc(i,j) - sum(be%reg_ps(j,kts:kte)*vp%v1(i,j,kts:kte))
+       vp % v5(i,j,1) = xa%psfc(i,j) - sum(be%reg_ps(j,kts:kte)*vp%v1(i,j,kts:kte))
      end do
      end do
 

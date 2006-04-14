@@ -44,7 +44,7 @@ subroutine DA_Transform_VpToX_Adj( xb, xbx, xa, vp, be, ep, xp, &
                               be%reg_ps(j,k)*xa%psfc(its:ite,j)
       end do
    end do
-   vp%v5(its:ite,jts:jte) = xa%psfc(its:ite,jts:jte) 
+   vp%v5(its:ite,jts:jte,1) = xa%psfc(its:ite,jts:jte) 
 
 ! Temperature
    do k1 = kts,kte
@@ -74,12 +74,12 @@ subroutine DA_Transform_VpToX_Adj( xb, xbx, xa, vp, be, ep, xp, &
 
    do n = be % ne, 1, -1
 
-!     ps_u:
-      vp % alpha(its:ite,jts:jte,n) = vp % alpha(its:ite,jts:jte,n) + &
-                                      ep % v5(its:ite,jts:jte,n) * &
-                                      vp % v5(its:ite,jts:jte)
-
       do k = kte, kts, -1
+!       ps_u:
+
+        vp % alpha(its:ite,jts:jte,n) = vp % alpha(its:ite,jts:jte,n) + &
+                                        ep % v5(its:ite,jts:jte,k,n) * &
+                                        vp % v5(its:ite,jts:jte,k)
 
 !        rh:
          vp % alpha(its:ite,jts:jte,n) = vp % alpha(its:ite,jts:jte,n) + &

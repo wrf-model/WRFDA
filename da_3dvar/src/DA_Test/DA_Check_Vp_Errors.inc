@@ -104,9 +104,9 @@ SUBROUTINE DA_Check_Vp_Errors( vp1, vp2, ne, &
 
    inv_size = 1.0 / REAL( (ite-its+1) * (jte-jts+1) )
 
-   diff(its:ite, jts:jte,1) = vp2 % v5(its:ite, jts:jte) - vp1 % v5(its:ite, jts:jte)
+   diff(its:ite, jts:jte,kts:kte) = vp2 % v5(its:ite, jts:jte,kts:kte) - vp1 % v5(its:ite, jts:jte,kts:kte)
 
-   rms_fild = SQRT( SUM( vp1 % v5(its:ite, jts:jte) * vp1 % v5(its:ite, jts:jte) ) * inv_size )
+   rms_fild = SQRT( SUM( vp1 % v5(its:ite, jts:jte,kts:kte) * vp1 % v5(its:ite, jts:jte,kts:kte) ) * inv_size )
    rms_diff = SQRT( SUM( diff(its:ite, jts:jte,1) * diff(its:ite, jts:jte,1) ) * inv_size )
      
    IF ( rms_fild == 0.0 ) THEN

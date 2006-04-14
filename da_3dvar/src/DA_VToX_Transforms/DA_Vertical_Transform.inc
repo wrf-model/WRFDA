@@ -109,8 +109,8 @@ subroutine DA_Vertical_Transform( string, be, vertical_wgt, vv, vp, &
          vp % v4(its:ite,jts:jte,kts:kte) = 0.0
       END IF
 
-      vp % v5(its:ite,jts:jte) = 0.0
-      IF ( be % v5 % mz == 1 ) vp % v5(its:ite,jts:jte) = vv % v5(its:ite,jts:jte)
+      vp % v5(its:ite,jts:jte,kts:kte) = 0.0
+      IF ( be % v5 % mz == 1 ) vp % v5(its:ite,jts:jte,kts:kte) = vv % v5(its:ite,jts:jte,kts:kte)
 
       if ( be % ne > 0 ) then
 !        Uv transform is null:
@@ -199,8 +199,8 @@ subroutine DA_Vertical_Transform( string, be, vertical_wgt, vv, vp, &
                                    its,ite, jts,jte, kts,kte )
       END IF
 
-      vv % v5(its:ite,jts:jte) = 0.0
-      IF ( be % v5 % mz == 1 ) vv % v5(its:ite,jts:jte) = vp % v5(its:ite,jts:jte)
+      vv % v5(its:ite,jts:jte,kts:kte) = 0.0
+      IF ( be % v5 % mz == 1 ) vv % v5(its:ite,jts:jte,kts:kte) = vp % v5(its:ite,jts:jte,kts:kte)
 
       if ( be % ne > 0 ) then
 !        Uv transform is null:
@@ -293,8 +293,8 @@ subroutine DA_Vertical_Transform( string, be, vertical_wgt, vv, vp, &
                                        its,ite, jts,jte, kts,kte )
       END IF
 
-      vv % v5(its:ite,jts:jte) = 0.0
-      if ( be % v5 % mz == 1 ) vv % v5(its:ite,jts:jte) = vp % v5(its:ite,jts:jte)
+      vv % v5(its:ite,jts:jte,kts:kte) = 0.0
+      if ( be % v5 % mz == 1 ) vv % v5(its:ite,jts:jte,kts:kte) = vp % v5(its:ite,jts:jte,kts:kte)
 
       if ( be % ne > 0 ) then
 !        Uv transform is null:

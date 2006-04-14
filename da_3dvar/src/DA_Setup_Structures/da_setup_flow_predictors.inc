@@ -21,7 +21,7 @@ subroutine da_setup_flow_predictors( ix, jy, kz, ne, ep )
    character*10                :: var                   ! Variable name.
    integer                     :: ni, nj, nk            ! Grid dimensions.
    integer                     :: e, i, j               ! Loop counters.
-   logical                     :: ldum1, ldum2          ! Dummy.
+   logical                     :: ldum1, ldum2,nkdum    ! Dummy.
    real                        :: temp3d(1:ix,1:jy,1:kz)! Temporary, real*4 array.
    real                        :: temp2d(1:ix,1:jy)     ! Temporary, real*4 array.
 
@@ -88,10 +88,10 @@ subroutine da_setup_flow_predictors( ix, jy, kz, ne, ep )
       var = 'ps_u'
       filename = 'ep/'//trim(var)//'.e'//trim(ce)
       open(ep_unit, file = filename, form = 'unformatted', status = 'old' )
-      read(ep_unit) ni, nj, nk
+      read(ep_unit) ni, nj, nkdum
       read(ep_unit) ldum1, ldum2
       read(ep_unit) temp2d(1:ix,1:jy)
-      ep % v5(1:ix,1:jy,e) = temp2d(1:ix,1:jy)
+      ep % v5(1:ix,1:jy,1,e) = temp2d(1:ix,1:jy)
       close(ep_unit)
 
    end do 

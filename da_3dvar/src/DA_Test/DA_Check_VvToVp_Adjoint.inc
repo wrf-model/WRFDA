@@ -31,7 +31,7 @@ SUBROUTINE DA_Check_VvToVp_Adjoint( ne, xb, xbx,  be, vv, vp, &
    real                              :: vv2_v2(ims:ime,jms:jme,kms:kme)
    real                              :: vv2_v3(ims:ime,jms:jme,kms:kme)
    real                              :: vv2_v4(ims:ime,jms:jme,kms:kme)
-   real                              :: vv2_v5(ims:ime,jms:jme)
+   real                              :: vv2_v5(ims:ime,jms:jme,kms:kme)
    real                              :: vv2_alpha(ims:ime,jms:jme,1:ne)
 
 !-------------------------------------------------------------------------
@@ -63,7 +63,7 @@ SUBROUTINE DA_Check_VvToVp_Adjoint( ne, xb, xbx,  be, vv, vp, &
                + SUM( vp % v2(its:ite,jts:jte,kts:kte)**2 ) * inv_typ_vp2_sumsq &
                + SUM( vp % v3(its:ite,jts:jte,kts:kte)**2 ) * inv_typ_vp3_sumsq &
                + SUM( vp % v4(its:ite,jts:jte,kts:kte)**2 ) * inv_typ_vp4_sumsq &
-               + SUM( vp % v5(its:ite,jts:jte)**2 ) * inv_typ_vp5_sumsq
+               + SUM( vp % v5(its:ite,jts:jte,kts:kte)**2 ) * inv_typ_vp5_sumsq
 
    if ( be % ne > 0 ) then
       adj_par_lhs = adj_par_lhs + &
@@ -78,9 +78,9 @@ SUBROUTINE DA_Check_VvToVp_Adjoint( ne, xb, xbx,  be, vv, vp, &
    vp % v2(its:ite,jts:jte,kts:kte) = vp % v2(its:ite,jts:jte,kts:kte) * inv_typ_vp2_sumsq
    vp % v3(its:ite,jts:jte,kts:kte) = vp % v3(its:ite,jts:jte,kts:kte) * inv_typ_vp3_sumsq
    vp % v4(its:ite,jts:jte,kts:kte) = vp % v4(its:ite,jts:jte,kts:kte) * inv_typ_vp4_sumsq
-   vp % v5(its:ite,jts:jte) = vp % v5(its:ite,jts:jte) * inv_typ_vp5_sumsq
+   vp % v5(its:ite,jts:jte,kts:kte) = vp % v5(its:ite,jts:jte,kts:kte) * inv_typ_vp5_sumsq
 
-   if ( be % ne ) vp % alpha(its:ite,jts:jte,1:be%ne) = vp % alpha(its:ite,jts:jte,1:be%ne) * &
+   if ( be % ne > 0) vp % alpha(its:ite,jts:jte,1:be%ne) = vp % alpha(its:ite,jts:jte,1:be%ne) * &
                                                         inv_typ_vpalpha_sumsq
 
 !-------------------------------------------------------------------------
@@ -91,7 +91,7 @@ SUBROUTINE DA_Check_VvToVp_Adjoint( ne, xb, xbx,  be, vv, vp, &
    vv2_v2(its:ite,jts:jte,1:be%v2%mz) = vv % v2(its:ite,jts:jte,1:be%v2%mz)
    vv2_v3(its:ite,jts:jte,1:be%v3%mz) = vv % v3(its:ite,jts:jte,1:be%v3%mz)
    vv2_v4(its:ite,jts:jte,1:be%v4%mz) = vv % v4(its:ite,jts:jte,1:be%v4%mz)
-   vv2_v5(its:ite,jts:jte) = vv % v5(its:ite,jts:jte)
+   vv2_v5(its:ite,jts:jte,1:be%v5%mz) = vv % v5(its:ite,jts:jte,1:be%v5%mz)
 
    if ( be % ne > 0 ) then
       vv2_alpha(its:ite,jts:jte,1:be%ne) = vv % alpha(its:ite,jts:jte,1:be%ne)
@@ -122,7 +122,7 @@ SUBROUTINE DA_Check_VvToVp_Adjoint( ne, xb, xbx,  be, vv, vp, &
    IF ( be % v4 % mz > 0 ) &
       adj_par_rhs = SUM( vv % v4(its:ite,jts:jte,1:be%v4%mz) * vv2_v4(its:ite,jts:jte,1:be%v4%mz) ) + adj_par_rhs
    IF ( be % v5 % mz == 1 ) &
-      adj_par_rhs = SUM( vv % v5(its:ite,jts:jte) * vv2_v5(its:ite,jts:jte) ) + adj_par_rhs
+      adj_par_rhs = SUM( vv % v5(its:ite,jts:jte,1:be%v5%mz) * vv2_v5(its:ite,jts:jte,1:be%v5%mz) ) + adj_par_rhs
    IF ( be % ne > 0 ) &
       adj_par_rhs = SUM( vv % alpha(its:ite,jts:jte,1:be%ne) * vv2_alpha(its:ite,jts:jte,1:be%ne)) + adj_par_rhs
 
@@ -149,7 +149,7 @@ PRINT *,'TEST_COVERAGE_DA_Check_VvToVp_Adjoint:  adj_sum_lhs,adj_sum_rhs = ', ad
    vv % v2(its:ite,jts:jte,1:be%v2%mz) = vv2_v2(its:ite,jts:jte,1:be%v2%mz)
    vv % v3(its:ite,jts:jte,1:be%v3%mz) = vv2_v3(its:ite,jts:jte,1:be%v3%mz)
    vv % v4(its:ite,jts:jte,1:be%v4%mz) = vv2_v4(its:ite,jts:jte,1:be%v4%mz)
-   vv % v5(its:ite,jts:jte) = vv2_v5(its:ite,jts:jte)
+   vv % v5(its:ite,jts:jte,1:be%v5%mz) = vv2_v5(its:ite,jts:jte,1:be%v5%mz)
 
    if ( be % ne > 0 ) then
       vv % alpha(its:ite,jts:jte,1:be%ne) = vv2_alpha(its:ite,jts:jte,1:be%ne)

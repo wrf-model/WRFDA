@@ -49,12 +49,11 @@ subroutine da_transform_vptox( xb, xbx, vp, xp, xa, be, ep, &
          vp % v4(its:ite,jts:jte,k) = vp % v4(its:ite,jts:jte,k) + &
                                       vp % alpha(its:ite,jts:jte,n) * &
                                       ep % v4(its:ite,jts:jte,k,n)
+!       ps_u
+        vp % v5(its:ite,jts:jte,k) = vp % v5(its:ite,jts:jte,k) + &
+                                     vp % alpha(its:ite,jts:jte,n) * &
+                                     ep % v5(its:ite,jts:jte,k,n)
       end do
-
-!     ps_u
-      vp % v5(its:ite,jts:jte) = vp % v5(its:ite,jts:jte) + &
-                                 vp % alpha(its:ite,jts:jte,n) * &
-                                 ep % v5(its:ite,jts:jte,n)
    end do
 
 !--------------------------------------------------------------------------
@@ -81,7 +80,7 @@ subroutine da_transform_vptox( xb, xbx, vp, xp, xa, be, ep, &
    end do
 
 !  Surface Pressure
-   xa%psfc(its:ite,jts:jte) = vp%v5(its:ite,jts:jte) 
+   xa%psfc(its:ite,jts:jte) = vp%v5(its:ite,jts:jte,1) 
    do k = kts,kte
       do j = jts,jte
          xa%psfc(its:ite,j) = xa%psfc(its:ite,j) + be%reg_ps(j,k)*vp%v1(its:ite,j,k)

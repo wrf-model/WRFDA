@@ -81,16 +81,18 @@ subroutine DA_Transform_VToVv_Global_Adj ( cv_size, xb, xbx, be, cv, vv, &
    end do
 
 !  v5:
-   cv_e = cv_s + 2 * be % cv % size5c - 1 
-   call da_v_to_vv_spectral_adj( be % v5 % max_wave, be % cv % size5c, &
-                                 xbx % lenr, xbx % lenwrk, xbx % lensav, &
-                                 xbx % inc, xbx % alp_size, xbx % alp, &
-                                 xbx % wsave, be%v5%power(0:be % v5 % max_wave), &
-                                 cv(cv_s:cv_e), vv%v5(its:ite,jts:jte), &
-                                 ids, ide, jds, jde, &
-                                 ims, ime, jms, jme, &
-                                 its, ite, jts, jte )
-   cv_s = cv_e + 1
+   do k = 1, be%v5%mz
+     cv_e = cv_s + 2 * be % cv % size5c - 1 
+     call da_v_to_vv_spectral_adj( be % v5 % max_wave, be % cv % size5c, &
+                                   xbx % lenr, xbx % lenwrk, xbx % lensav, &
+                                   xbx % inc, xbx % alp_size, xbx % alp, &
+                                   xbx % wsave, be%v5%power(0:be % v5 % max_wave,k), &
+                                   cv(cv_s:cv_e), vv%v5(its:ite,jts:jte,kts:kte), &
+                                   ids, ide, jds, jde, &
+                                   ims, ime, jms, jme, &
+                                   its, ite, jts, jte )
+     cv_s = cv_e + 1
+   end do
 
 !-------------------------------------------------------------------------
 ! [2] Spectral to grid transform for flow-dependent control variables:
@@ -101,7 +103,7 @@ subroutine DA_Transform_VToVv_Global_Adj ( cv_size, xb, xbx, be, cv, vv, &
       call da_v_to_vv_spectral_adj( be % alpha % max_wave, be % cv % size_alphac, &
                                     xbx % lenr, xbx % lenwrk, xbx % lensav, &
                                     xbx % inc, xbx % alp_size, xbx % alp, &
-                                    xbx % wsave, be % alpha % power(0:be%alpha%max_wave), &
+                                    xbx % wsave, be % alpha % power(0:be%alpha%max_wave,1), &
                                     cv(cv_s:cv_e), vv%alpha(its:ite,jts:jte,m), &
                                     ids, ide, jds, jde, &
                                     ims, ime, jms, jme, &

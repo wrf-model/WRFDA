@@ -59,7 +59,7 @@ SUBROUTINE DA_Check_CvToVv_Adjoint( cv_size, xb, xbx, xp, be, cv, vv, &
                + SUM( vv % v2(its:ite,jts:jte,1:be%v2%mz)**2 ) &
                + SUM( vv % v3(its:ite,jts:jte,1:be%v3%mz)**2 ) &
                + SUM( vv % v4(its:ite,jts:jte,1:be%v4%mz)**2 ) &
-               + SUM( vv % v5(its:ite,jts:jte)**2 )
+               + SUM( vv % v5(its:ite,jts:jte,1:be%v5%mz)**2 )
 
    if ( be % ne > 0 ) then
       adj_par_lhs = adj_par_lhs + sum( vv % alpha(its:ite,jts:jte,1:be%ne)**2 )
