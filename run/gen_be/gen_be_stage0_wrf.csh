@@ -4,6 +4,9 @@
 #
 # Purpose: To calculate ensemble perturbations in "standard fields".
 #
+# Note: START_DATE and END_DATE are defined as the times of the first and 
+# last perturbation. We derive START_DATE_STAGE0 and END_DATE_STAGE0
+# from these using FCST_RANGE.  
 #-----------------------------------------------------------------------
 
 #Define job by overriding default environment variables:
@@ -22,8 +25,8 @@
  echo "Beginning CPU time: ${BEGIN_CPU}"
 
 #Define environment variables:
- if ( ! $?START_DATE )    setenv START_DATE    2003010100 # Initial time of first forecast.
- if ( ! $?END_DATE )      setenv END_DATE      2003012800 # Initial time of last forecast. 
+ if ( ! $?START_DATE )    setenv START_DATE    2003010200 # Time of first perturbation.
+ if ( ! $?END_DATE )      setenv END_DATE      2003012812 # Time of last perturbation.
  if ( ! $?FCST_RANGE )    setenv FCST_RANGE    24         # Forecast range of forecast (hours).
  if ( ! $?INTERVAL )      setenv INTERVAL      12         # Period between files (hours).
  if ( ! $?BE_METHOD )     setenv BE_METHOD     NMC        # NMC-method or Ensemble-Method
@@ -44,9 +47,13 @@
 
 #OK, let's go!
 
- setenv DATE $START_DATE
+#Derive times of initial/final FCST_RANGE forecasts:
+ setenv START_DATE_STAGE0 `${BIN_DIR}/advance_cymdh $START_DATE -$FCST_RANGE`
+ setenv END_DATE_STAGE0   `${BIN_DIR}/advance_cymdh $END_DATE   -$FCST_RANGE`
 
- while ( $DATE < $END_DATE )
+ setenv DATE $START_DATE_STAGE0
+
+ while ( $DATE <= $END_DATE_STAGE0 )
 
    setenv TMP_DIR ${RUN_DIR}/${DATE}
    rm -rf ${TMP_DIR} >&! /dev/null

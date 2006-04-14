@@ -15,12 +15,12 @@
 #Define job via environment variables:
 
 # Uncomment variables for the stages you wish to run:
-#setenv RUN_GEN_BE_STAGE0 # Set to run stage 0 (create perturbation files).
-#setenv RUN_GEN_BE_STAGE1 # Set to run stage 1 (Remove mean, split variables).
-#setenv RUN_GEN_BE_STAGE2 # Set to run stage 2 (Regression Coefficients).
-#setenv RUN_GEN_BE_STAGE2A # Set to run stage 2 (Regression Coefficients).
-#setenv RUN_GEN_BE_STAGE3 # Set to run stage 3 (Vertical Covariances).
-#setenv RUN_GEN_BE_STAGE4 # Set to run stage 4 (Horizontal Covariances).
+setenv RUN_GEN_BE_STAGE0 # Set to run stage 0 (create perturbation files).
+setenv RUN_GEN_BE_STAGE1 # Set to run stage 1 (Remove mean, split variables).
+setenv RUN_GEN_BE_STAGE2 # Set to run stage 2 (Regression Coefficients).
+setenv RUN_GEN_BE_STAGE2A # Set to run stage 2 (Regression Coefficients).
+setenv RUN_GEN_BE_STAGE3 # Set to run stage 3 (Vertical Covariances).
+setenv RUN_GEN_BE_STAGE4 # Set to run stage 4 (Horizontal Covariances).
 setenv RUN_GEN_BE_DIAGS  # Set to run gen_be diagnostics.
 setenv RUN_GEN_BE_DIAGS_READ  # Set to run gen_be diagnostics_read.
 
@@ -28,8 +28,8 @@ setenv RUN_GEN_BE_DIAGS_READ  # Set to run gen_be diagnostics_read.
 # Don't change anything below this line.
 #-----------------------------------------------------------------------------------
 
-if ( ! $?START_DATE )    setenv START_DATE    2003010100 # Time of first perturbation.
-if ( ! $?END_DATE )      setenv END_DATE      2003012800 # Time of last perturbation.
+if ( ! $?START_DATE )    setenv START_DATE    2003010200 # Time of first perturbation.
+if ( ! $?END_DATE )      setenv END_DATE      2003012812 # Time of last perturbation.
 if ( ! $?INTERVAL )      setenv INTERVAL      12         # Period between files (hours).
 if ( ! $?BE_METHOD )     setenv BE_METHOD     NMC        # NMC (NMC-method), ENS (Ensemble-Method).
 if ( ! $?NE )            setenv NE            1          # Number of ensemble members (for ENS).
@@ -45,6 +45,7 @@ if ( ! $?GAUSSIAN_LATS ) setenv GAUSSIAN_LATS .false.    # Set if Gaussian latit
 if ( ! $?TESTING_EOFS )  setenv TESTING_EOFS  .true.     # True if performing EOF tests.
 if ( ! $?NUM_PASSES )    setenv NUM_PASSES    0          # Number of passes of recursive filter.
 if ( ! $?RF_SCALE )      setenv RF_SCALE      1.0        # Recursive filter scale.
+if ( ! $?USE_GLOBAL_EOFS ) setenv USE_GLOBAL_EOFS .true. # Use domain-averaged EOFS for stage3.
 if ( ! $?DATA_ON_LEVELS )  setenv DATA_ON_LEVELS .false. # False if fields projected onto modes.
 if ( ! $?GLOBAL )        setenv GLOBAL false             # Global or regional models
 if ( ! $?NUM_LEVELS )    setenv NUM_LEVELS    27         # Hard-wired for now....
@@ -69,15 +70,6 @@ if ( ! $?STAGE0_DIR )    setenv STAGE0_DIR ${RUN_DIR}/stage0
 
 if ( ! -d ${RUN_DIR} )   mkdir ${RUN_DIR}
 if ( ! -d ${STAGE0_DIR} )  mkdir ${STAGE0_DIR}
-
-
-if ( $GLOBAL == true ) then
-  setenv UH_METHOD power
-  if ( ! $?USE_GLOBAL_EOFS ) setenv USE_GLOBAL_EOFS .false.
-else
-  setenv UH_METHOD scale
-  if ( ! $?USE_GLOBAL_EOFS ) setenv USE_GLOBAL_EOFS .true.
-endif
 
 #List of control variables:
 
@@ -120,13 +112,6 @@ if ( $?RUN_GEN_BE_STAGE0 ) then
    set END_CPU = `date`
    echo "Ending CPU time: ${END_CPU}"
 endif
-
-# advance start date by 1 day and end date by 12 hours, as our differencing
-# calculation moves the time window
-
-setenv START_DATE `${BIN_DIR}/advance_cymdh $START_DATE $INTERVAL`
-setenv START_DATE `${BIN_DIR}/advance_cymdh $START_DATE $INTERVAL`
-setenv END_DATE   `${BIN_DIR}/advance_cymdh $END_DATE $INTERVAL`
 
 #------------------------------------------------------------------------
 #  Run Stage 1: Read "standard fields", and remove time/ensemble/area mean.
