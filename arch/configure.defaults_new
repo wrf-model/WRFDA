@@ -9,7 +9,7 @@ CC              =       cc
 CC_TOOLS        =       cc
 
 #FCOPTIM         =       -fast -O2 -Olimit 2000
-FCOPTIM         =       -fast -O2
+FCOPTIM         =       #-fast -O2
 FCDEBUG         =       #-g
 FCTYPE          =       -r8
 FCFORM          =       -free
@@ -131,7 +131,7 @@ CC              =       gcc
 CC_TOOLS        =       $(CC)
 
 TRADFLAG        =       -traditional
-FCOPTIM         =       -fast
+FCOPTIM         =       #-fast
 FCDEBUG         =       #-g
 FCTYPE          =       -r8
 FCFORM          =       -Mfree
@@ -167,7 +167,7 @@ CC              =       mpicc
 CC_TOOLS        =       gcc
 
 TRADFLAG        =       -traditional
-FCOPTIM         =       -fast
+FCOPTIM         =       #-fast
 FCDEBUG         =       #-g
 FCTYPE          =       -r8
 FCFORM          =       -Mfree
@@ -327,7 +327,7 @@ CC              =       gcc
 CC_TOOLS        =       $(CC)
 
 TRADFLAG        =       -traditional
-FCOPTIM         =       -fastsse
+FCOPTIM         =       #-fastsse
 FCDEBUG         =       #-g
 FCTYPE          =       -r8
 FCFORM          =       -Mfree
@@ -363,7 +363,7 @@ CC              =       mpicc
 CC_TOOLS        =       gcc
 
 TRADFLAG        =       -traditional
-FCOPTIM         =       -fastsse
+FCOPTIM         =       #-fastsse
 FCDEBUG         =       #-g
 FCTYPE          =       -r8
 FCFORM          =       -Mfree
@@ -543,7 +543,7 @@ FCTYPE          =       -qrealsize=8
 FCFORM          =       -qfree=f90
 FCENDIAN        =
 FCBASE          =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767 \
-                        -qflttrap=zerodivide:invalid:enable -qsigtrap=xl__trce
+                        -qflttrap=zerodivide:invalid:enable -qsigtrap=xl__trce -C
 FC_FFT_RF       =       $(FCBASE)
 LDFLAGS         =	-bmaxstack:256000000 -bmaxdata:2048000000
 
@@ -579,7 +579,7 @@ FCTYPE          =       -qrealsize=8
 FCFORM          =       -qfree=f90
 FCENDIAN        =
 FCBASE          =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767 \
- 			-qflttrap=zerodivide:invalid:enable -qsigtrap=xl__trce
+ 			-qflttrap=zerodivide:invalid:enable -qsigtrap=xl__trce -C
 FC_FFT_RF       =       $(FCBASE)
 LDFLAGS         =	-bmaxstack:256000000 -bmaxdata:2048000000
 
@@ -756,7 +756,7 @@ FCTYPE          =       -qrealsize=8
 FCFORM          =       -qfree=f90
 FCENDIAN        =
 FCBASE          =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767 \
-                        -qflttrap=zerodivide:invalid:enable -qsigtrap=xl__trce
+                        -qflttrap=zerodivide:invalid:enable -qsigtrap=xl__trce -C
 FC_FFT_RF       =       $(FCBASE)
 LDFLAGS         =	 -Wl,-stack_size,10000000,-stack_addr,0xc0000000
 
@@ -795,7 +795,7 @@ FCTYPE          =       -qrealsize=8
 FCFORM          =       -qfree=f90
 FCENDIAN        =
 FCBASE          =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767 \
-                        -qflttrap=zerodivide:invalid:enable -qsigtrap=xl__trce
+                        -qflttrap=zerodivide:invalid:enable -qsigtrap=xl__trce -C
 FC_FFT_RF       =       $(FCBASE)
 LDFLAGS         =	 -Wl,-stack_size,10000000,-stack_addr,0xc0000000
 
