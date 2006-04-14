@@ -27,6 +27,8 @@ MODULE module_wrfvar_esmf_super
   USE module_wrf_3dvar_io
   USE module_wrf_3dvar_interface
 
+  USE DA_Constants
+
   IMPLICIT NONE
 
   REAL    :: time
@@ -94,7 +96,7 @@ CONTAINS
 !
 !</DESCRIPTION>
 
-  program_name = "WRFVAR 2.0.4.0 (COMPATIBLE TO WRF V2.0.3.1) MODEL"
+  program_name = version//" (COMPATIBLE WITH "//wrf_version//") MODEL"
 
   !  Get the NAMELIST data for input.
 
