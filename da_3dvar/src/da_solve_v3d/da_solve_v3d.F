@@ -148,9 +148,8 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
                         its, ite, jts, jte, kts, kte )
       end if
 
-      if ( write_filtered_obs .and. it == 1 ) then
-         call da_write_filtered_obs(gts_iunit, filtered_obs_iunit, ob, iv)
-      end if
+!     Write "clean" QCed observations if requested:
+      if ( write_filtered_obs .and. it == 1 ) call da_write_filtered_obs( ob, iv, xp )
 
       if (lmonitoring) call wrf_shutdown
 
@@ -169,12 +168,6 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
                            ids, ide, jds, jde, kds, kde,        &
                            ims, ime, jms, jme, kms, kme,        &
                            its, ite, jts, jte, kts, kte         )
-
-!------------------------------------------------------------------------------
-
-     if ( write_filtered_obs .and. it == 1 ) call da_write_filtered_obs(ob, iv, xp)
-
-!------------------------------------------------------------------------------
 
 !     [8.5] Update latest analysis solution:
 
