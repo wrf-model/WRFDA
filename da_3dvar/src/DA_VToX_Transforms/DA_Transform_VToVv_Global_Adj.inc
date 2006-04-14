@@ -1,96 +1,113 @@
-subroutine DA_Transform_VToVv_Global_Adj (xb, xbx, be, cv,vv, &
-                                ids, ide, jds, jde, kds, kde, &
-                                ims, ime, jms, jme, kms, kme, &
-                                its, ite, jts, jte, kts, kte )
+subroutine DA_Transform_VToVv_Global_Adj ( cv_size, xb, xbx, be, cv, vv, &
+                                           ids, ide, jds, jde, kds, kde, &
+                                           ims, ime, jms, jme, kms, kme, &
+                                           its, ite, jts, jte, kts, kte )
 
 !--------------------------------------------------------------------------
-! Purpose   : Control variable transform for global WRFVAR 
-!
-! History   : Creation          12/02/2004     Syed RH Rizvi
+! Purpose   : Control variable transform for global WRF-Var 
 !--------------------------------------------------------------------------
+
    implicit none
 
+   integer, intent(in)                  :: cv_size ! Size of cv array.
    type (xb_type), intent(in)           :: xb   ! first guess.
    type (xbx_type),intent(in)           :: xbx  ! For header & non-grid arrays.
    type (be_type), intent(in)           :: be   ! background errors.
-   real, intent(out)                    :: cv(:)! control variable.
+   real, intent(out)                    :: cv(1:cv_size) ! control variables.
    type (vp_type),intent(in)            :: vv   ! grdipt/eof cv (local).
-   integer, intent(in)              :: ids,ide, jds,jde, kds,kde ! domain dims.
-   integer, intent(in)              :: ims,ime, jms,jme, kms,kme ! memory dims.
-   integer, intent(in)              :: its,ite, jts,jte, kts,kte ! tile   dims
+   integer, intent(in)                  :: ids,ide, jds,jde, kds,kde ! domain dims.
+   integer, intent(in)                  :: ims,ime, jms,jme, kms,kme ! memory dims.
+   integer, intent(in)                  :: its,ite, jts,jte, kts,kte ! tile   dims
 
-   integer :: k, cv_s, cv_e
+   integer                              :: k, m ! Loop counters.
+   integer                              :: cv_s ! Counter.
+   integer                              :: cv_e ! Counter.
 
+!-------------------------------------------------------------------------
+! [1] Spectral to grid transform for standard control variables:
 !-------------------------------------------------------------------------
 
    cv_s = 1        
    do k = 1, be%v1%mz
-      cv_e = cv_s + 2*xbx%c_cv_size - 1 
-      call da_v_to_vv_spectral_adj(xbx, be%v1%power(0:xbx%max_wavenumber,k), cv(cv_s:cv_e), vv%v1(ims:ime, jms:jme, k), &
-                                   ids, ide, jds, jde, &
-                                   ims, ime, jms, jme, &
-                                   its, ite, jts, jte )
-
-      if( print_detail >= 100 )  then
-         write(unit=stderr, fmt='(2a,2(2x,a,i6))') &
-              'file:', __FILE__, 'line:', __LINE__, &
-              'vv%v1, k=', k
-         write(unit=stderr, fmt='(a, e24.14)') 'Square sum of cv:', sum(cv(cv_s:cv_e) * cv(cv_s:cv_e))
-      endif
-
+      cv_e = cv_s + 2 * be % cv % size1c - 1
+      call da_v_to_vv_spectral_adj( be % v1 % max_wave, be % cv % size1c, &
+                                    xbx % lenr, xbx % lenwrk, xbx % lensav, &
+                                    xbx % inc, xbx % alp_size, xbx % alp, &
+                                    xbx % wsave, be%v1%power(0:be % v1 % max_wave,k), &
+                                    cv(cv_s:cv_e), vv%v1(its:ite,jts:jte,k), &
+                                    ids, ide, jds, jde, &
+                                    ims, ime, jms, jme, &
+                                    its, ite, jts, jte )
       cv_s = cv_e + 1
    end do
 
    do k = 1, be%v2%mz
-      cv_e = cv_s + 2*xbx%c_cv_size - 1
-      call da_v_to_vv_spectral_adj(xbx, be%v2%power(0:xbx%max_wavenumber,k), cv(cv_s:cv_e), vv%v2(ims:ime, jms:jme, k), &
-                                   ids, ide, jds, jde, &
-                                   ims, ime, jms, jme, &
-                                   its, ite, jts, jte )
-
-      if( print_detail >= 100 )  then
-         write(unit=stderr, fmt='(2a,2(2x,a,i6))') &
-              'file:', __FILE__, 'line:', __LINE__, &
-              'vv%v2, k=', k
-         write(unit=stderr, fmt='(a, e24.14)') 'Square sum of cv:', sum(cv(cv_s:cv_e) * cv(cv_s:cv_e))
-      endif
-
+      cv_e = cv_s + 2 * be % cv % size2c - 1
+      call da_v_to_vv_spectral_adj( be % v2 % max_wave, be % cv % size2c, &
+                                    xbx % lenr, xbx % lenwrk, xbx % lensav, &
+                                    xbx % inc, xbx % alp_size, xbx % alp, &
+                                    xbx % wsave, be%v2%power(0:be % v2 % max_wave,k), &
+                                    cv(cv_s:cv_e), vv%v2(its:ite,jts:jte,k), &
+                                    ids, ide, jds, jde, &
+                                    ims, ime, jms, jme, &
+                                    its, ite, jts, jte )
       cv_s = cv_e + 1
    end do
 
    do k = 1, be%v3%mz
-      cv_e = cv_s + 2*xbx%c_cv_size - 1
-      call da_v_to_vv_spectral_adj(xbx, be%v3%power(0:xbx%max_wavenumber,k), cv(cv_s:cv_e), vv%v3(ims:ime, jms:jme, k), &
-                                   ids, ide, jds, jde, &
-                                   ims, ime, jms, jme, &
-                                   its, ite, jts, jte )
+      cv_e = cv_s + 2 * be % cv % size3c - 1
+      call da_v_to_vv_spectral_adj( be % v3 % max_wave, be % cv % size3c, &
+                                    xbx % lenr, xbx % lenwrk, xbx % lensav, &
+                                    xbx % inc, xbx % alp_size, xbx % alp, &
+                                    xbx % wsave, be%v3%power(0:be % v3 % max_wave,k), &
+                                    cv(cv_s:cv_e), vv%v3(its:ite,jts:jte,k), &
+                                    ids, ide, jds, jde, &
+                                    ims, ime, jms, jme, &
+                                    its, ite, jts, jte )
       cv_s = cv_e + 1
    end do
 
    do k = 1, be%v4%mz
-      cv_e = cv_s + 2*xbx%c_cv_size - 1
-      call da_v_to_vv_spectral_adj(xbx, be%v4%power(0:xbx%max_wavenumber,k), cv(cv_s:cv_e), vv%v4(ims:ime, jms:jme, k), &
-                                   ids, ide, jds, jde, &
-                                   ims, ime, jms, jme, &
-                                   its, ite, jts, jte )
+      cv_e = cv_s + 2 * be % cv % size4c - 1
+      call da_v_to_vv_spectral_adj( be % v4 % max_wave, be % cv % size4c, &
+                                    xbx % lenr, xbx % lenwrk, xbx % lensav, &
+                                    xbx % inc, xbx % alp_size, xbx % alp, &
+                                    xbx % wsave, be%v4%power(0:be % v4 % max_wave,k), &
+                                    cv(cv_s:cv_e), vv%v4(its:ite,jts:jte,k), &
+                                    ids, ide, jds, jde, &
+                                    ims, ime, jms, jme, &
+                                    its, ite, jts, jte )
       cv_s = cv_e + 1
    end do
 
-   do k = 1, be%v5%mz
-      cv_e = cv_s + 2*xbx%c_cv_size - 1 
-      call da_v_to_vv_spectral_adj(xbx, be%v5%power(0:xbx%max_wavenumber,k), cv(cv_s:cv_e), vv%v5(ims:ime, jms:jme, k), &
-                                   ids, ide, jds, jde, &
-                                   ims, ime, jms, jme, &
-                                   its, ite, jts, jte )
+!  v5:
+   cv_e = cv_s + 2 * be % cv % size5c - 1 
+   call da_v_to_vv_spectral_adj( be % v5 % max_wave, be % cv % size5c, &
+                                 xbx % lenr, xbx % lenwrk, xbx % lensav, &
+                                 xbx % inc, xbx % alp_size, xbx % alp, &
+                                 xbx % wsave, be%v5%power(0:be % v5 % max_wave), &
+                                 cv(cv_s:cv_e), vv%v5(its:ite,jts:jte), &
+                                 ids, ide, jds, jde, &
+                                 ims, ime, jms, jme, &
+                                 its, ite, jts, jte )
+   cv_s = cv_e + 1
+
+!-------------------------------------------------------------------------
+! [2] Spectral to grid transform for flow-dependent control variables:
+!-------------------------------------------------------------------------
+
+   do m = 1, be % ne
+      cv_e = cv_s + 2 * be % cv % size_alphac - 1
+      call da_v_to_vv_spectral_adj( be % alpha % max_wave, be % cv % size_alphac, &
+                                    xbx % lenr, xbx % lenwrk, xbx % lensav, &
+                                    xbx % inc, xbx % alp_size, xbx % alp, &
+                                    xbx % wsave, be % alpha % power(0:be%alpha%max_wave), &
+                                    cv(cv_s:cv_e), vv%alpha(its:ite,jts:jte,m), &
+                                    ids, ide, jds, jde, &
+                                    ims, ime, jms, jme, &
+                                    its, ite, jts, jte )
       cv_s = cv_e + 1
    end do
-
-   if( print_detail >= 100) then
-       write(unit=stderr, fmt='(2a,2(2x,a,i6))') &
-            'file:', __FILE__, &
-            'line:', __LINE__
-      write(unit=stderr, fmt='(a, e24.14)') ' in VToVv_Global_Adj  whole: cv.cv = ',sum(cv(1:cv_e) * cv(1:cv_e))
-   endif
 
 end subroutine DA_Transform_VToVv_Global_Adj
 

@@ -121,6 +121,11 @@ fi
 export DA_MODEL_TYPE=${DA_MODEL_TYPE:-WRF}                 # WRF, MM5 or KMA.
 export DA_WRITE_INCREMENTS=${DA_WRITE_INCREMENTS:-.FALSE.} # Optionally write increments.
 export DA_NUM_FGAT_TIME=${DA_NUM_FGAT_TIME:-1}             # Number of FGAT ob windows.
+export DA_ENSDIM=${DA_ENSDIM:-0}                           # Ensemble size (for hybrid). 
+export DA_ALPHA_TRUNCATION=${DA_ALPHA_TRUNCATION:-0}       # Spectral truncation of alpha CV (global hybrid). 
+export DA_ALPHA_CORR_TYPE=${DA_ALPHA_CORR_TYPE:-3}         # Alpha correlation type (1=Expt,2=SOAR,3=Gauss).
+export DA_ALPHA_CORR_SCALE=${DA_ALPHA_CORR_SCALE:-1500.0}  # Alpha correlation scale (km).
+export DA_ALPHA_STD_DEV=${DA_ALPHA_STD_DEV:-1.0}           # Alpha standard deviation.
 export DA_USE_SYNOPOBS=${DA_USE_SYNOPOBS:-.TRUE.}          # Assimilate this observation type.
 export DA_USE_SHIPSOBS=${DA_USE_SHIPSOBS:-.TRUE.}          # Assimilate this observation type.
 export DA_USE_METAROBS=${DA_USE_METAROBS:-.TRUE.}          # Assimilate this observation type.
@@ -174,6 +179,7 @@ export DA_MAX_VERT_VAR5=${DA_MAX_VERT_VAR5:-99.0}         # CV5 variance truncat
 # Not supported default WRF-Var namelist variables (overwrite at your own risk):
 export DA_ANALYSIS_TYPE=${DA_ANALYSIS_TYPE:-3D-VAR}
 export DA_ANALYSIS_ACCU=${DA_ANALYSIS_ACCU:-900}
+export DA_WRITE_FILTERED_OBS=${DA_WRITE_FILTERED_OBS:-.FALSE.}
 export DA_PROCESS_OBS=${DA_PROCESS_OBS:-YES}
 export DA_QC_POINTER=${DA_QC_POINTER:-0}
 export DA_USE_OBS_ERRFAC=${DA_USE_OBS_ERRFAC:-.FALSE.}
@@ -201,6 +207,9 @@ export DA_LEN_SCALING2=${DA_LEN_SCALING2:-1.0}
 export DA_LEN_SCALING3=${DA_LEN_SCALING3:-1.0}
 export DA_LEN_SCALING4=${DA_LEN_SCALING4:-1.0}
 export DA_LEN_SCALING5=${DA_LEN_SCALING5:-1.0}
+export DA_POWER_TRUNCATION=${DA_POWER_TRUNCATION:-1.0}     # Truncation of power spectrum (%age - global).
+export DA_JB_FACTOR=${DA_JB_FACTOR:-1.0}                   # Jb factor.
+export DA_JE_FACTOR=${DA_JE_FACTOR:-1.0}                   # Je factor.
 export DA_DEF_SUB_DOMAIN=${DA_DEF_SUB_DOMAIN:-.FALSE.}
 export DA_X_START_SUB_DOMAIN=${DA_X_START_SUB_DOMAIN:-55.0}
 export DA_Y_START_SUB_DOMAIN=${DA_Y_START_SUB_DOMAIN:-35.0}
@@ -286,7 +295,7 @@ cp $DA_BUILD_DIR/wrfvar.exe  wrfvar.exe
 
 
 ln -sf $DA_FIRST_GUESS	 wrfvar_input
-ln -sf $DA_BACK_ERRORS   fort.3${DA_CV_OPTIONS}
+ln -sf $DA_BACK_ERRORS   fort.34
 ln -sf $DA_OBSERVATIONS	 fort.9${DA_OB_FORMAT}
 
 for FILE in $DAT_DIR/*.inv; do
@@ -355,12 +364,20 @@ cat > namelist.wrfvar << EOF
 &record2
  ANALYSIS_TYPE = '$DA_ANALYSIS_TYPE',
  ANALYSIS_DATE = '$DA_ANALYSIS_DATE',
- ANALYSIS_ACCU =  $DA_ANALYSIS_ACCU /
+ ANALYSIS_ACCU = $DA_ANALYSIS_ACCU,
+ WRITE_FILTERED_OBS = $DA_WRITE_FILTERED_OBS  /
 
 &record3
  fg_format     = $DA_FG_FORMAT,
  ob_format     = $DA_OB_FORMAT,
  num_fgat_time = $DA_NUM_FGAT_TIME /
+
+&ens_info
+ ensdim =           ${DA_ENSDIM},
+ alpha_truncation = ${DA_ALPHA_TRUNCATION},
+ alpha_corr_type  = ${DA_ALPHA_CORR_TYPE},
+ alpha_corr_scale = ${DA_ALPHA_CORR_SCALE},
+ alpha_std_dev    = ${DA_ALPHA_STD_DEV} /
 
 &record4
  PROCESS_OBS      = '$DA_PROCESS_OBS',    
@@ -425,7 +442,10 @@ cat > namelist.wrfvar << EOF
  LEN_SCALING2   = $DA_LEN_SCALING2,
  LEN_SCALING3   = $DA_LEN_SCALING3,
  LEN_SCALING4   = $DA_LEN_SCALING4,
- LEN_SCALING5   = $DA_LEN_SCALING5 /
+ LEN_SCALING5   = $DA_LEN_SCALING5,
+ power_truncation = $DA_POWER_TRUNCATION,
+ jb_factor      = $DA_JB_FACTOR,
+ je_factor      = $DA_JE_FACTOR /
 
 &record8
  def_sub_domain     = $DA_DEF_SUB_DOMAIN,
@@ -441,11 +461,9 @@ cat > namelist.wrfvar << EOF
  Interpolate_Stats = $DA_INTERPOLATE_STATS /
  
 &record11
- minimisation_option = $DA_MINIMISATION_OPTION,
  write_outer_loop    = $DA_WRITE_OUTER_LOOP,
  lat_stats_option    = $DA_LAT_STATS_OPTION,
  calculate_cg_cost_fn = $DA_CALCULATE_CG_COST_FN,
- cv_options          = $DA_CV_OPTIONS,
  cv_options_hum      = $DA_CV_OPTIONS_HUM,
  check_rh            = $DA_CHECK_RH,
  as1                 = $DA_AS1,
@@ -575,7 +593,7 @@ cat > namelist.input << EOF
  maxens                              = 3,
  maxens2                             = 3,
  maxens3                             = 16,
- ensdim                              = 144,
+ ensdim                              = ${DA_ENSDIM},
  /
 
  &dynamics

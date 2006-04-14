@@ -46,20 +46,8 @@ MODULE DA_VToX_Transforms
 #include "da_transform_vtox_adj.inc"
 #include "DA_Transform_VpToX.inc"
 #include "DA_Transform_VpToX_Adj.inc"
-
-#include "da_apply_be.inc"
-#include "da_apply_be_adj.inc"
-#include "da_apply_rf_1v.inc"
-#include "da_apply_rf_1v_adj.inc"
-#include "da_apply_rf.inc"
-#include "da_apply_rf_adj.inc"
-#include "da_calc_covariance.inc"
-#include "da_transform_bal.inc"
-#include "da_transform_bal_adj.inc"
-
 #include "DA_Transform_VvToVp.inc"
 #include "DA_Transform_VvToVp_Adj.inc"
-
 #include "DA_Transform_VpToVv.inc"
 #include "DA_Vertical_Transform.inc"
 #include "DA_Get_VPoles.inc"

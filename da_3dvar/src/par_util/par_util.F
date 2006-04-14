@@ -41,7 +41,6 @@ MODULE PAR_UTIL
 #include <vv_to_cv.inc>
 #include <alloc_and_copy_be_arrays.inc>
 #include <be_local_copy.inc>
-#include <calculate_cv_local_size.inc>
 #include <copy_dims.inc>
 #include <copy_tile_dims.inc>
 #include <pack_count_obs.inc>

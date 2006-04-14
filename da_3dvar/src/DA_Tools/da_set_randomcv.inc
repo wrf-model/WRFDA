@@ -1,4 +1,4 @@
-subroutine da_set_randomcv( cv_size, cv )
+subroutine da_set_randomcv( cv_size, rcv )
 
 !------------------------------------------------------------------------------
 !  PURPOSE: Allocate components of control variable.
@@ -13,7 +13,7 @@ subroutine da_set_randomcv( cv_size, cv )
    implicit none
 
    integer, intent(in)                  :: cv_size
-   real, intent(inout)                  :: cv(1:cv_size)     ! Control variable structure.
+   real, intent(inout)                  :: rcv(1:cv_size)     ! Control variable structure.
 
    integer                              :: i
    real                                 :: mean_cv, rms_cv, std_dev_cv
@@ -29,10 +29,10 @@ subroutine da_set_randomcv( cv_size, cv )
 !  [2] Calculate random numbers with Gaussian distribution:
 
    do i = 1, cv_size
-      call da_gauss_noise(cv(i))
+      call da_gauss_noise(rcv(i))
 
-      sum_cv = sum_cv + cv(i)
-      sum_cv2 = sum_cv2 + cv(i) * cv(i)
+      sum_cv = sum_cv + rcv(i)
+      sum_cv2 = sum_cv2 + rcv(i) * rcv(i)
   end do
 
   mean_cv = sum_cv / real(cv_size)

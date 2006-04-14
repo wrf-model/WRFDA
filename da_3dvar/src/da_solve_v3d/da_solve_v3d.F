@@ -42,11 +42,12 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
 
    TYPE (xbx_type)              :: xbx         ! For header & non-grid arrays.
    TYPE (be_type)               :: be          ! Background error structure.
+   real, allocatable            :: cvt(:)      ! Control variable structure.
+   real, allocatable            :: xhat(:)     ! Control variable structure.
    TYPE (y_type)                :: ob          ! Observation structure.
    TYPE (ob_type)               :: iv          ! Obs. increment structure.
    TYPE (y_type)                :: re          ! Residual (o-a) structure.
    TYPE (y_type)                :: y           ! y = H(x_inc) structure.
-   TYPE (cv_type)               :: cv1d        ! Control variable structure (local processor grid).
    INTEGER                      :: it          ! External loop counter.
    type (j_type)                :: j           ! Cost function.
 
@@ -54,8 +55,8 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
                                    ims , ime , jms , jme , kms , kme , &
                                    its , ite , jts , jte , kts , kte
 
-   TYPE (cv_type)               :: xhat  ! Increament control variable
-   INTEGER                      :: ierr
+   integer                      :: cv_size
+   real                         :: j_grad_norm_target ! TArget j norm.
 
 !------------------------------------------------------------------------------
 
@@ -94,40 +95,35 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
 !  [5.0] Set up background errors (be):
 !------------------------------------------------------------------------------
 
-   call DA_Setup_Background_Errors( xb, xbx, be, xp )
+   call DA_Setup_Background_Errors( xb, xbx, be, xp, &
+                                    its, ite, jts, jte, kts, kte, &
+                                    ids, ide, jds, jde, kds, kde )
+   cv_size = be % cv % size
 
 !------------------------------------------------------------------------------
-!  [6.0] Allocate cv:
+!  [6.0] Set up ensemble perturbation input:
 !------------------------------------------------------------------------------
 
-   call calculate_cv_local_size( xbx, xp, be, cv1d, cv_size )
-   call da_allocate_cv( cv_size, cv1d )
-   call da_allocate_cv( cv_size, xhat )
-      
+   ep % ne = be % ne
+   if ( be % ne > 0 ) call da_setup_flow_predictors( ide, jde, kde, be % ne, ep )
+
 !------------------------------------------------------------------------------
-!  [7.0] Test:
+!  [7.0] Setup control variable (cv):
 !------------------------------------------------------------------------------
 
-   if ( test_transforms .or. Testing_WRFVAR ) then
-      CALL da_get_innov_vector( it, ob, iv, &
-                                grid , config_flags , &
-#include <em_dummy_args.inc>
-                 )
+   allocate( cvt(1:cv_size) )
+   allocate( xhat(1:cv_size) )
+   call da_initialize_cv( cv_size, cvt )
+   call da_initialize_cv( cv_size, xhat )
 
-
-      call da_allocate_y( iv, re )
-      call da_allocate_y( iv, y )
-
-      call da_check( xb, xbx, be, iv, cv1d, &
-                     xa, vv, vp, xp, ob, y, &
-                     ids, ide, jds, jde, kds, kde, &
-                     ims, ime, jms, jme, kms, kme, &
-                     its, ite, jts, jte, kts, kte )
-   endif
+   call da_zero_vp_type( vv )
+   call da_zero_vp_type( vp )
 
 !------------------------------------------------------------------------------
 !  [8] Outerloop
 !------------------------------------------------------------------------------
+
+   j_grad_norm_target = 1.0
 
    DO it = 1, max_ext_its
 
@@ -144,7 +140,19 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
 #include <em_dummy_args.inc>
                  )
 
-    if (lmonitoring) call wrf_shutdown
+      if ( testing_wrfvar ) then
+         call da_check( cv_size, xb, xbx, be, ep, iv, &
+                        xa, vv, vp, xp, ob, y, &
+                        ids, ide, jds, jde, kds, kde, &
+                        ims, ime, jms, jme, kms, kme, &
+                        its, ite, jts, jte, kts, kte )
+      end if
+
+      if ( write_filtered_obs .and. it == 1 ) then
+         call da_write_filtered_obs(gts_iunit, filtered_obs_iunit, ob, iv)
+      end if
+
+      if (lmonitoring) call wrf_shutdown
 
 !     [8.3] Interpolate x_g to low resolution grid
 
@@ -153,40 +161,24 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
       call da_allocate_y( iv, re )
       call da_allocate_y( iv, y )
 
-!------------------------------------------------------------------------------
-      CALL DA_Minimise( grid, config_flags,                  &
-                        it, ob, xb, xbx, be, iv, xhat%array, &
-                        cv1d, xa, vv, vp, xp, re, y, j,      &
-                        ids, ide, jds, jde, kds, kde,        &
-                        ims, ime, jms, jme, kms, kme,        &
-                        its, ite, jts, jte, kts, kte         )
+      CALL DA_Minimise_CG( grid, config_flags,                  &
+                           it, be % cv % size, &
+                           ob, xb, xbx, be, ep, iv, &
+                           j_grad_norm_target, xhat, cvt, &
+                           xa, vv, vp, xp, re, y, j,    &
+                           ids, ide, jds, jde, kds, kde,        &
+                           ims, ime, jms, jme, kms, kme,        &
+                           its, ite, jts, jte, kts, kte         )
+
 !------------------------------------------------------------------------------
 
-     if( (analysis_type(1:6) == "QC-OBS" .or.  analysis_type(1:6) == "qc-obs") )then
-       if( ob_format == 1) then
-     write(*,'(a)')'Since input Obs are in BUFR-format Filtered-Obs (fort.192) will not be written'
-     elseif( ob_format == 2) then
-#ifdef DM_PARALLEL 
-     call MPI_COMM_SIZE(MPI_COMM_WORLD, numb_procs, ierr)
-     print*,' I am using num_proc = ',numb_procs
-     if( numb_procs == 1) then
-     if( it == 1) CALL da_write_filtered_obs(ob, iv, xp)
-     else
-     write(*,'(a,i3)')'Since it is MPI-run with processore (>1) ',numb_procs
-     write(*,'(a)')   ' Filtered-Obs (fort.192)  will not be written'
-     endif
-#else
-     if( it == 1) CALL da_write_filtered_obs(ob, iv, xp)
-#endif
-     else
-     print*,' Unknown Observation format: ',ob_format
-     endif
-     end if
+     if ( write_filtered_obs .and. it == 1 ) call da_write_filtered_obs(ob, iv, xp)
+
 !------------------------------------------------------------------------------
 
 !     [8.5] Update latest analysis solution:
 
-      call da_transform_vtox( xb, xbx, be, xhat%array, vv, vp, xp, xa,  &
+      call da_transform_vtox( cv_size, xb, xbx, be, ep, xhat, vv, vp, xp, xa,  &
                               ids, ide, jds, jde, kds, kde,             &
                               ims, ime, jms, jme, kms, kme,             &
                               its, ite, jts, jte, kts, kte )
@@ -213,12 +205,6 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
 !  [8.0] Output WRFVAR analysis and analysis increments:
 !------------------------------------------------------------------------------
 
-!------------------------------------------------------------------------------
-! Following lines are added by  Syed RH Rizvi due to following reasons:
-! (1) To accomodate KMA FG(fg_format =  3)
-! (2) Seperate treatment for WRF and KMA updating of Xa and Xb array
-! (3) Treatment for MM5 format FG(fg_format = 2) remains same as original
-!------------------------------------------------------------------------------
       call DA_Transfer_XatoAnalysis( it, xbx, grid, config_flags ,&
 #include <em_dummy_args.inc>
                            )
@@ -228,12 +214,12 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
 !  [9.0] Tidy up:
 !------------------------------------------------------------------------------
 
-   call da_deallocate_cv( cv1d )
-   call da_deallocate_cv( xhat )
+   deallocate ( cvt )
+   deallocate ( xhat )
    call da_deallocate_y( re )
    call da_deallocate_y( y )
 
-   CALL wrf_message("*** WRFVAR completed successfully ***")
+   CALL wrf_message("*** WRF-Var completed successfully ***")
 
    CALL wrf_debug ( 200 , ' call end of solve_v3d' )
 

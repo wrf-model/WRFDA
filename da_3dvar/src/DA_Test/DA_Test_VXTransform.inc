@@ -11,14 +11,6 @@ SUBROUTINE DA_Test_VXTransform( xb, xbx, xp, be, &
 !           2) Test inverse and adjoint of vertical transform.
 !           3) Perform adjoint test on complete transform: <x,x> = <v_adj,v>.
 !
-!  HISTORY: 02/23/2000 - Creation of F90 version.           Dale Barker
-!           01/30/2005 - Added Spectral transform test      Syed RH Rizvi 
-!           02/04/2005 - Added VvToVpToVv Test              Syed RH Rizvi
-!           02/04/2005 - Added VpToVvToVp Test              Syed RH Rizvi
-!           08/02/2005 - Inverse tests is done only for
-!                        cv_options =5 and                  Syed RH Rizvi
-!                        single processor run               
-!
 !------------------------------------------------------------------------------
 
    IMPLICIT NONE
@@ -74,10 +66,10 @@ SUBROUTINE DA_Test_VXTransform( xb, xbx, xp, be, &
    cv(:) = cv(:) - 0.5
    call da_zero_x(xa)
    
-   if ( cv_options /= 5) then
-   write(UNIT=stdout, fmt='(/a,i4,a)') &
-         ' Inverse tests for this cv_options= ',cv_options,' will not be done'
-   go to 1111
+   if ( global ) then
+      write(UNIT=stdout, fmt='(/a/)') &
+      ' Inverse tests not performed for global application'
+      go to 1111
    end if
 
 #ifdef DM_PARALLEL
@@ -200,9 +192,10 @@ SUBROUTINE DA_Test_VXTransform( xb, xbx, xp, be, &
                                its, ite, jts, jte, kts, kte )
 !-------------------------------------------------------------------------
 !  [4.0] Test inverse physical variable transform:
-!  Note: Currently these test are developed for cp_options = 2 only
+!  Note: Currently these test are developed for regional only
 !-------------------------------------------------------------------------
-   if(  cv_options == 2 .or. cv_options == 5 ) then
+
+   if( .not. global ) then
      call da_zero_x(xa)
      call da_transform_vptox( xb, xbx, vp, xp, xa, be,    &
                               ids,ide, jds,jde, kds,kde,  &

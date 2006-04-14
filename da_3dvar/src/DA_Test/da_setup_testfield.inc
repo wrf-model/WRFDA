@@ -80,12 +80,6 @@ subroutine da_setup_testfield( xb, xa, xp, &
    enddo
    endif
 
-   if (cv_options < 3) then
-      if (sfc_assi_options == 2) then
-         call DA_Transform_XToWTQ ( xp, xb, xa )
-      endif
-   endif
-
 !--Exchange XA halo region.
    CALL wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id4)
 

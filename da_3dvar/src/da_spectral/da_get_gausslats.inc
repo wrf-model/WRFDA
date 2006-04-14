@@ -1,4 +1,4 @@
-subroutine da_get_gausslats( nj, pi, glats, sinlat, coslat, gausswgts )
+subroutine da_get_gausslats( nj, glats, gwgts, sinlat, coslat )
 
    implicit none
 
@@ -21,11 +21,10 @@ subroutine da_get_gausslats( nj, pi, glats, sinlat, coslat, gausswgts )
 !  (Algorithm from Numerical Recipies (Fortran version), 1989, p 258)
 
    integer, intent(in)    :: nj                       ! Gridpoints in N-S direction.
-   real, intent(in)       :: pi                       ! pi
    real, intent(out)      :: glats(1:nj)              ! Gaussian latitudes (S->N, radians).
-   real, intent(out)      :: sinlat(1:nj)             ! sin(Latitude).
-   real, intent(out)      :: coslat(1:nj)             ! cos(Latitude).
-   real, intent(out)      :: gausswgts(1:nj)          ! Gaussian weights.
+   real, intent(out)      :: gwgts(1:nj)              ! Gaussian weights.
+   real, intent(out), optional :: sinlat(1:nj)        ! sin(Latitude).
+   real, intent(out), optional :: coslat(1:nj)        ! cos(Latitude).
 
    integer, parameter     :: maxiter = 100            ! Maximum number of iterations.
    integer                :: i, j, k                  ! Loop counters.
@@ -49,7 +48,7 @@ subroutine da_get_gausslats( nj, pi, glats, sinlat, coslat, gausswgts )
    if (mod(nj,2) == 1) then
       call da_asslegpol(nj-1,0,xj,z,fn1)
       glats(k) = 0.0
-      gausswgts(k) = 2.0 * (1.0 - xj * xj) / (real(nj) * fn1)**2
+      gwgts(k) = 2.0 * (1.0 - xj * xj) / (real(nj) * fn1)**2
       k = k+1
    end if
 
@@ -112,22 +111,22 @@ subroutine da_get_gausslats( nj, pi, glats, sinlat, coslat, gausswgts )
 !         print*, 'Root ',k,' number of iterations ',i
 
          if (i >= MaxIter) then
-           CALL wrf_error_fatal3(__FILE__,__LINE__, &
-             "No convergence finding Gaussian latitudes")
+            CALL wrf_error_fatal3(__FILE__,__LINE__, &
+              "No convergence finding Gaussian latitudes")
          end if
 
          glats(k) = ASIN(x)
          z = SQRT(1.0-x*x)
          call da_asslegpol(nj-1,0,x,z,fn1)
-         gausswgts(k) = 2.0*(1.0 - x * x) / (REAL(nj) * fn1)**2
+         gwgts(k) = 2.0*(1.0 - x * x) / (REAL(nj) * fn1)**2
          glats(nj+1-k) = -glats(k)
-         GaussWgts(nj+1-k) = GaussWgts(k)
+         gwgts(nj+1-k) = gwgts(k)
          k=k+1
       end if
    end do
 
    if (k /= nj+1) then
-     CALL wrf_error_fatal3(__FILE__,__LINE__,"Not all roots found")
+      CALL wrf_error_fatal3(__FILE__,__LINE__,"Not all roots found")
    end if
 
 !  Calculate sin, cosine:

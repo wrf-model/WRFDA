@@ -1,12 +1,11 @@
-
-SUBROUTINE cv_to_vv ( cv_size, cv_array, xp, mzs, vv )
+subroutine cv_to_vv ( cv_size, rcv, xp, mzs, vv )
 
 !------------------------------------------------------------------------------
 !  PURPOSE: Fill (local) vv arrays from 1D (local) cv array.
 !------------------------------------------------------------------------------
 
    INTEGER,        INTENT(IN)    :: cv_size     ! Length of CV array.
-   REAL,           INTENT(IN)    :: cv_array(1:cv_size) ! Control variables v.
+   REAL,           INTENT(IN)    :: rcv(1:cv_size) ! Control variables v.
    TYPE (xpose_type), INTENT(IN) :: xp          ! Dimensions and xpose buffers.
    INTEGER,        INTENT(IN)    :: mzs(:) ! Background error structure levels.
    TYPE (vp_type), INTENT(OUT)   :: vv          ! Grdipt/EOF cv_array.
@@ -26,13 +25,17 @@ SUBROUTINE cv_to_vv ( cv_size, cv_array, xp, mzs, vv )
    jy = je-js+1
    cv_e = 0
 
+!--------------------------------------------------------------------------
+! [1] Transfer components of Jb control variable:
+!--------------------------------------------------------------------------
+
 !Fill v1
    mz = mzs(1)
    if ( mz > 0 ) then
      ijm = ix * jy * mz
      cv_s = cv_e + 1
      cv_e = cv_s + ijm - 1
-     vv % v1(is:ie,js:je,1:mz) = RESHAPE( cv_array(cv_s:cv_e),(/ix, jy, mz/) )
+     vv % v1(is:ie,js:je,1:mz) = RESHAPE( rcv(cv_s:cv_e),(/ix, jy, mz/) )
    end if
 !Fill v2
    mz = mzs(2)
@@ -40,7 +43,7 @@ SUBROUTINE cv_to_vv ( cv_size, cv_array, xp, mzs, vv )
      ijm = ix * jy * mz
      cv_s = cv_e + 1
      cv_e = cv_s + ijm - 1
-     vv % v2(is:ie,js:je,1:mz) = RESHAPE( cv_array(cv_s:cv_e),(/ix, jy, mz/) )
+     vv % v2(is:ie,js:je,1:mz) = RESHAPE( rcv(cv_s:cv_e),(/ix, jy, mz/) )
    end if
 !Fill v3
    mz = mzs(3)
@@ -48,7 +51,7 @@ SUBROUTINE cv_to_vv ( cv_size, cv_array, xp, mzs, vv )
      ijm = ix * jy * mz
      cv_s = cv_e + 1
      cv_e = cv_s + ijm - 1
-     vv % v3(is:ie,js:je,1:mz) = RESHAPE( cv_array(cv_s:cv_e),(/ix, jy, mz/) )
+     vv % v3(is:ie,js:je,1:mz) = RESHAPE( rcv(cv_s:cv_e),(/ix, jy, mz/) )
    end if
 !Fill v4
    mz = mzs(4)
@@ -56,27 +59,28 @@ SUBROUTINE cv_to_vv ( cv_size, cv_array, xp, mzs, vv )
      ijm = ix * jy * mz
      cv_s = cv_e + 1
      cv_e = cv_s + ijm - 1
-     vv % v4(is:ie,js:je,1:mz) = RESHAPE( cv_array(cv_s:cv_e),(/ix, jy, mz/) )
+     vv % v4(is:ie,js:je,1:mz) = RESHAPE( rcv(cv_s:cv_e),(/ix, jy, mz/) )
    end if
 !Fill v5
    mz = mzs(5)
-   if ( mz > 0 ) then
+   if ( mz == 1 ) then ! Can only be 0 or 1 (2D ps_u field)
      ijm = ix * jy * mz
      cv_s = cv_e + 1
      cv_e = cv_s + ijm - 1
-     vv % v5(is:ie,js:je,1:mz) = RESHAPE( cv_array(cv_s:cv_e),(/ix, jy, mz/) )
+     vv % v5(is:ie,js:je,1:mz) = RESHAPE( rcv(cv_s:cv_e),(/ix, jy,mz/) )
    end if
 
-#ifdef DEBUG_RESHAPE
-   print *, ' '
-   print *, 'FILE:', __FILE__, '  LINE:', __LINE__
-   print *, 'sum(vv)=', sum(vv % v1(is:ie,js:je,1:mzs(1))) &
-                      + sum(vv % v2(is:ie,js:je,1:mzs(2))) &
-                      + sum(vv % v3(is:ie,js:je,1:mzs(3))) &
-                      + sum(vv % v4(is:ie,js:je,1:mzs(4)))
-   print *, 'sum(cv)=', sum(cv_array(1:cv_size))
-   print *, ' '
-#endif
+!--------------------------------------------------------------------------
+!  [2] Transfer components of Je control variable:
+!--------------------------------------------------------------------------
 
-END SUBROUTINE cv_to_vv
+   mz = mzs(6)
+   if ( mz > 0 ) then
+      ijm = ix * jy * mz
+      cv_s = cv_e + 1
+      cv_e = cv_s + ijm - 1
+      vv % alpha(is:ie,js:je,1:mz) = RESHAPE( rcv(cv_s:cv_e),(/ix, jy, mz/) )
+   end if
+
+end subroutine cv_to_vv
 

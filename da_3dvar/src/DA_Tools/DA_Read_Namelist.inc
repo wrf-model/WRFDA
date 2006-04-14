@@ -4,14 +4,6 @@ SUBROUTINE DA_Read_Namelist
 !  PURPOSE:       Read in WRFVAR input parameters from namelist.
 !
 !  METHOD:        Open namelist input file and read in values.
-!
-!  MODIFICATIONS:
-!  99/11/30: Creation (D. Barker)
-!
-!  Additions:
-!             07/08/2003      Profiler and Buoy Obs            Syed RH Rizvi
-!             01/31/2005      Added global option              Syed RH Rizvi
-!             07/18/2005      Add rtminit options              Zhiquan Liu
 !----------------------------------------------------------------------------
    IMPLICIT NONE
 
@@ -31,8 +23,11 @@ SUBROUTINE DA_Read_Namelist
                        stdout_unit, stderr_unit
    NAMELIST /RECORD2/  ANALYSIS_TYPE, ANALYSIS_DATE, ANALYSIS_ACCU, W_INCREMENTS, &
                        DT_cloud_model, &
-                       write_qcw, write_qrn, write_qci, write_qsn, write_qgr
+                       write_qcw, write_qrn, write_qci, write_qsn, write_qgr, &
+                       write_filtered_obs
    NAMELIST /RECORD3/  fg_format, ob_format, num_fgat_time
+   namelist / ens_info / ensdim, alpha_truncation, alpha_corr_type, &
+                         alpha_corr_scale, alpha_std_dev
    NAMELIST /RECORD4/  PROCESS_OBS, obs_qc_pointer, &
                        use_SynopObs, &
                        use_ShipsObs, &
@@ -95,18 +90,19 @@ SUBROUTINE DA_Read_Namelist
                        var_scaling1, var_scaling2, var_scaling3, &
                        var_scaling4, var_scaling5, &
                        len_scaling1, len_scaling2, len_scaling3, &
-                       len_scaling4, len_scaling5
+                       len_scaling4, len_scaling5, power_truncation, &
+                       jb_factor, je_factor
    NAMELIST /RECORD8/  def_sub_domain, &
                        x_start_sub_domain, x_end_sub_domain, &
                        y_start_sub_domain, y_end_sub_domain
    NAMELIST /RECORD10/ Testing_WRFVAR, test_transforms, &
                        test_statistics, interpolate_stats, &
                        testing_dm_exact
-   NAMELIST /RECORD11/ cv_options, cv_options_hum, check_rh, &
+   NAMELIST /RECORD11/ cv_options_hum, check_rh, &
                        as1,as2,as3,as4,as5, set_omb_rand_fac, &
                        seed_array1, seed_array2, &
                        sfc_assi_options, calculate_cg_cost_fn, &
-                       minimisation_option, write_outer_loop,lat_stats_option
+                       write_outer_loop,lat_stats_option
    NAMELIST /RECORD12/ balance_type
    NAMELIST /RECORD13/ vert_corr, vertical_ip, vert_evalue, &
                        max_vert_var1, max_vert_var2, &
@@ -146,11 +142,19 @@ SUBROUTINE DA_Read_Namelist
    write_qci = .FALSE.
    write_qsn = .FALSE.
    write_qgr = .FALSE.
+   write_filtered_obs = .false.
 
 !--record3
    fg_format = 1
    ob_format = 2
    num_fgat_time = 1
+
+!--ensemble parameters:
+   ensdim = 0
+   alpha_truncation = 0
+   alpha_corr_type = 3       ! Gaussian
+   alpha_corr_scale = 1500.0 ! km
+   alpha_std_dev = 1.0 
 
 !--record4
    PROCESS_OBS    = 'YES'
@@ -234,6 +238,9 @@ SUBROUTINE DA_Read_Namelist
    LEN_SCALING3   = 1.0
    LEN_SCALING4   = 1.0
    LEN_SCALING5   = 1.0
+   power_truncation = 1.0
+   jb_factor = 1.0
+   je_factor = 1.0
 
 !--record8
    def_sub_domain = .FALSE.
@@ -250,15 +257,12 @@ SUBROUTINE DA_Read_Namelist
    testing_dm_exact = .FALSE.
 
 !--record11
-   minimisation_option = 1
-   cv_options     = 2
    cv_options_hum = 1
    check_rh       = 1
    set_omb_rand_fac = 1.0
    seed_array1    = 0
    seed_array2    = 0
    sfc_assi_options = 1
-   minimisation_option = 1
    calculate_cg_cost_fn = .true.
    write_outer_loop = .false.
    lat_stats_option = .true.
@@ -372,9 +376,25 @@ SUBROUTINE DA_Read_Namelist
        "ERROR READING NAMELIST FILE "//TRIM (namelist_file))
    ENDIF
 
+   if ( ob_format == 1 .and. write_filtered_obs ) then
+      WRITE(UNIT=stdout,FMT='(A)') ' Cannot write_filtered_obs with ob_format = 1. Setting to false.'
+      write_filtered_obs = .false.
+   end if
+
    if ( print_detail >= 1 ) then
+      WRITE(UNIT=stdout,FMT='(A,3X,L10   )') ' write_filtered_obs = ', write_filtered_obs
       WRITE(UNIT=stdout,FMT='(A,3X,i4    )') ' fg_format     = ',    fg_format
       WRITE(UNIT=stdout,FMT='(A,3X,i4    )') ' ob_format     = ',    ob_format
+   endif
+
+   READ  ( UNIT = namelist_unit, NML = ens_info , IOSTAT = IOST)
+
+   if ( print_detail >= 1 ) then
+      WRITE(unit=stdout,'(A,3X,i4    )') ' Ensemble size = ', ensdim
+      WRITE(unit=stdout,'(A,3X,i4    )') ' Alpha CV truncation = ', alpha_truncation
+      WRITE(unit=stdout,'(A,3X,i4    )') ' Alpha corr_type = ', alpha_corr_type
+      WRITE(unit=stdout,'(A,3X,f12.2 )') ' Alpha correlation scale = ', alpha_corr_scale
+      WRITE(unit=stdout,'(A,3X,f12.2 )') ' Alpha standard deviation= ', alpha_std_dev
    endif
 
    READ  ( UNIT = namelist_unit, NML = RECORD4 , IOSTAT = IOST)
@@ -488,6 +508,10 @@ SUBROUTINE DA_Read_Namelist
       WRITE(UNIT=stdout,FMT='(A,1PE8.2   )') ' RF_LEN_SCALING3 = ',len_scaling3
       WRITE(UNIT=stdout,FMT='(A,1PE8.2   )') ' RF_LEN_SCALING4 = ',len_scaling4
       WRITE(UNIT=stdout,FMT='(A,1PE8.2   )') ' RF_LEN_SCALING5 = ',len_scaling5
+      WRITE(UNIT=stdout,'(A,1PE8.2   )')     ' power_truncation = ', power_truncation
+      WRITE(UNIT=stdout,'(A,3X,f12.2 )')     ' Jb scaling factor = ', jb_factor
+      WRITE(UNIT=stdout,'(A,3X,f12.2 )')     ' Je scaling factor = ', je_factor
+
    end if
    
    READ  ( UNIT = namelist_unit, NML = RECORD8 , IOSTAT = IOST)
@@ -542,7 +566,6 @@ SUBROUTINE DA_Read_Namelist
       WRITE(UNIT=stdout,FMT='(A,3X,L10   )') ' Write_Outer_Loop    = ', write_outer_loop
       WRITE(UNIT=stdout,FMT='(A,3X,L10   )') ' Lat_Stats_Option    = ', lat_stats_option
       WRITE(UNIT=stdout,FMT='(A,3X,I4    )') ' Balance_Type        = ', balance_type
-      WRITE(UNIT=stdout,FMT='(A,3X,I4    )') ' CV_Options          = ', cv_options
       WRITE(UNIT=stdout,FMT='(A,3X,3F9.5 )') ' as1                 = ', as1(1:3), &
                             ' as2                 = ', as2(1:3), &
                             ' as3                 = ', as3(1:3), &
@@ -662,12 +685,6 @@ SUBROUTINE DA_Read_Namelist
 !  [3.0] Error traps:
 !------------------------------------------------------------------------------
 
-   IF ( cv_options < 1 .OR. cv_options > 5 ) THEN
-     WRITE(UNIT=errmsg(1),FMT='(A,I3)') &
-       'Invalid cv_options = ', cv_options
-     CALL wrf_error_fatal(errmsg(1))
-   END IF
-   
    IF ( cv_options_hum < 1 .OR. cv_options_hum > 3 ) THEN
      WRITE(UNIT=errmsg(1),FMT='(A,I3)') &
        'Invalid cv_options_hum = ', cv_options_hum
@@ -699,21 +716,6 @@ SUBROUTINE DA_Read_Namelist
      
    END IF 
 
-   
-   IF ( cv_options == 1 ) THEN
-      IF ( cv_options_hum == 2 ) THEN
-         CALL wrf_error_fatal( &
-           "Can only have cv_option_hum=2 with cv_option=2.")
-      END IF
-   
-      IF ( vert_corr == 2 ) THEN
-         WRITE (UNIT=stderr,FMT='(A,A)') ' DA_Read_Namelist: Invalid cv_options /', &
-                           ' vert_corr combination. Set vert_corr=1'
-         vert_corr = 1
-      END IF
-      
-   END IF
-
    IF ( vert_corr == 2 ) THEN
       IF ( vertical_ip < 0 .OR. vertical_ip > 2 ) THEN
          WRITE (UNIT=stderr,FMT='(A,I3)') ' DA_Read_Namelist: Invalid vertical_ip = ', &
@@ -744,8 +746,14 @@ SUBROUTINE DA_Read_Namelist
    WRITE(UNIT=stdout,FMT='(A,3X,A  )') ' ANALYSIS DATE    = ', ANALYSIS_DATE
    WRITE(UNIT=stdout,FMT='(A,3X,i6 )') ' ANALYSIS ACCU    = ', ANALYSIS_ACCU
    WRITE(UNIT=stdout,FMT='(A,3X,L10)') ' W INCREMENTS     = ', W_INCREMENTS
+   WRITE(UNIT=stdout,FMT='(A,3X,L10)') ' write_filtered_obs = ', write_filtered_obs
    WRITE(UNIT=stdout,FMT='(A,3X,i4 )') ' fg_format        = ', fg_format
    WRITE(UNIT=stdout,FMT='(A,3X,i4 )') ' ob_format        = ', ob_format
+   WRITE(unit=stdout,'(A,3X,i4    )')  ' ensdim           = ', ensdim
+   WRITE(unit=stdout,'(A,3X,i4    )')  ' alpha_truncation = ', alpha_truncation
+   WRITE(unit=stdout,'(A,3X,i4    )')  ' alpha_corr_type  = ', alpha_corr_type
+   WRITE(unit=stdout,'(A,3X,f12.2 )')  ' alpha_corr_scale = ', alpha_corr_scale
+   WRITE(unit=stdout,'(A,3X,f12.2 )')  ' alpha_std_dev    = ', alpha_std_dev
    WRITE(UNIT=stdout,FMT='(A,3X,A8 )') ' PROCESS_OBS      = ', PROCESS_OBS
    WRITE(UNIT=stdout,FMT='(A,3X,I4 )') ' obs_qc_pointer   = ', obs_qc_pointer
    WRITE(UNIT=stdout,FMT='(A,3X,L10)') ' Use_SynopObs     = ', Use_SynopObs, &
@@ -805,7 +813,8 @@ SUBROUTINE DA_Read_Namelist
    WRITE(UNIT=stdout,FMT='(A,1PE8.2   )') ' RF_LEN_SCALING3 = ',len_scaling3
    WRITE(UNIT=stdout,FMT='(A,1PE8.2   )') ' RF_LEN_SCALING4 = ',len_scaling4
    WRITE(UNIT=stdout,FMT='(A,1PE8.2   )') ' RF_LEN_SCALING5 = ',len_scaling5
-   WRITE(UNIT=stdout,FMT='(A,3X,I4    )') ' Minimise _Option = ',Minimisation_Option 
+   WRITE(unit=stdout,'(A,3X,f12.2 )')     ' jb_factor       = ', jb_factor
+   WRITE(unit=stdout,'(A,3X,f12.2 )')     ' je_factor       = ', je_factor
    WRITE(UNIT=stdout,FMT='(A,3X,L10   )') ' In_CG_COST_FN_NEEDED = ',calculate_cg_cost_fn
    WRITE(UNIT=stdout,FMT='(A,3X,L10   )') ' Outer_Loop_Write   = ',write_outer_loop
    WRITE(UNIT=stdout,FMT='(A,3X,L10   )') ' Lat_Stats_Option   = ',lat_stats_option
@@ -815,7 +824,6 @@ SUBROUTINE DA_Read_Namelist
    WRITE(UNIT=stdout,FMT='(A,3X,L10   )') ' Interpolate_S = ',interpolate_stats
    WRITE(UNIT=stdout,FMT='(A,3X,L10   )') ' testing_dm_exact = ',testing_dm_exact
    WRITE(UNIT=stdout,FMT='(A,3X,I10   )') ' Balance_Type  = ',balance_type
-   WRITE(UNIT=stdout,FMT='(A,3X,I10   )') ' CV_Options    = ',cv_options
    WRITE(UNIT=stdout,FMT='(A,3X,3F9.5 )') ' as1           = ',as1(1:3), &
                                           ' as2           = ',as2(1:3), &   
                                           ' as3           = ',as3(1:3), &   

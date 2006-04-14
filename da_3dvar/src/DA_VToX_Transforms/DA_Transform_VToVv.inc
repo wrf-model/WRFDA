@@ -1,13 +1,14 @@
-subroutine DA_Transform_VToVv( xb, be, cv, vv, xp, &
+subroutine DA_Transform_VToVv( cv_size, xb, be, cv, vv, xp, &
                                ids,ide, jds,jde, kds,kde, &
                                ims,ime, jms,jme, kms,kme, &
                                its,ite, jts,jte, kts,kte )
 
    implicit none
 
+   integer, intent(in)              :: cv_size ! Size of cv array.
    type (xb_type), intent(in)       :: xb   ! First guess structure.
    type (be_type), intent(in)       :: be   ! Background error structure.
-   real, intent(in)                 :: cv(:)! Control variable.
+   real, intent(in)                 :: cv(1:cv_size)   ! control variables.
    type (vp_type), intent(inout)    :: vv   ! Grid point/EOF equivalent.
    type (xpose_type), intent(inout) :: xp   ! Dimensions and xpose buffers. 
    integer, intent(in)              :: ids,ide, jds,jde, kds,kde ! domain dims.
@@ -21,7 +22,8 @@ subroutine DA_Transform_VToVv( xb, be, cv, vv, xp, &
 !-------------------------------------------------------------------------
 
    call cv_to_vv( cv_size, cv, xp, &
-                  (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz /) , vv )
+                  (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%ne /), &
+                  vv )
 
 !-------------------------------------------------------------------------
 !  [2.0] Perform VToVV Transform:
@@ -82,5 +84,16 @@ subroutine DA_Transform_VToVv( xb, be, cv, vv, xp, &
                                     its,ite, jts,jte, kts,kte )
    END IF
 
-END subroutine DA_Transform_VToVv
+!  [2.6] Transform alpha control variable
+
+   mz = be % alpha % mz
+   IF ( mz > 0 ) then
+      CALL DA_Transform_Through_RF( mz, xb % grid_box_area, be % alpha % rf_alpha,&
+                                    be % alpha % val, xp, vv % alpha, &
+                                    ids,ide, jds,jde, kds,kde,  &
+                                    ims,ime, jms,jme, kms,kme,  &
+                                    its,ite, jts,jte, kts,kte )
+   END IF
+
+end subroutine DA_Transform_VToVv
 

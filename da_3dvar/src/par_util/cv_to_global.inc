@@ -1,20 +1,20 @@
 
-      SUBROUTINE cv_to_global( x, n, xp, mzs, cv_size_global, xg )
+      SUBROUTINE cv_to_global( cv_size, cv_size_global, x, xp, mzs, xg )
 !
-!     Gathers local cv-array x into global cv-array xg(:).  
+!     Gathers local cv-array x into domain cv-array xg(:).  
 !     Global cv-array xg will only be valid on the "monitor" task.  
 !
 !     Must be called by all MPI tasks.  
 !
         IMPLICIT NONE
 
-        INTEGER,           INTENT(IN) :: n    ! size of local cv-array
-        REAL,              INTENT(IN) :: x(n) ! local cv-array
+        INTEGER,           INTENT(IN) :: cv_size        ! Size of local cv-array
+        INTEGER,           INTENT(IN) :: cv_size_global ! Size of domain cv-array
+        REAL,              INTENT(IN) :: x(1:cv_size)   ! local cv-array
         TYPE (xpose_type), INTENT(IN) :: xp   ! decomposed dimensions
         INTEGER,           INTENT(IN) :: mzs(:)  ! mz for each variable
                                               ! (to identify empty or 2D arrays)
-        INTEGER,          INTENT( IN) :: cv_size_global !size of global cv-array
-        REAL,           INTENT(INOUT) :: xg(:) ! global cv-array
+        REAL,           INTENT(INOUT) :: xg(1:cv_size_global) ! global cv-array
 
 #ifdef DM_PARALLEL
 
@@ -30,10 +30,6 @@
         !
         ! Gather to mimic serial summation order.  
         !
-        ! This is a necessary but not sufficient condition!
-        IF ( n /= cv_size ) THEN
-          CALL wrf_error_fatal3(__FILE__,__LINE__, 'incorrect vector size' )
-        ENDIF
 
         ! k?e varies with variable v1 - v5
         ids = xp%ids; ide = xp%ide; jds = xp%jds; jde = xp%jde; kds = xp%kds
@@ -47,6 +43,7 @@
         ALLOCATE( vv_x%v3(xp%ims:xp%ime,xp%jms:xp%jme,mzs(3)) )
         ALLOCATE( vv_x%v4(xp%ims:xp%ime,xp%jms:xp%jme,mzs(4)) )
         ALLOCATE( vv_x%v5(xp%ims:xp%ime,xp%jms:xp%jme,mzs(5)) )
+        ALLOCATE( vv_x%alpha(xp%ims:xp%ime,xp%jms:xp%jme,mzs(6)) )
 
         CALL cv_to_vv ( cv_size, x, xp, mzs, vv_x )
 
@@ -57,6 +54,7 @@
           ALLOCATE( vv_xg%v3(xp%ids:xp%ide,xp%jds:xp%jde,mzs(3)) )
           ALLOCATE( vv_xg%v4(xp%ids:xp%ide,xp%jds:xp%jde,mzs(4)) )
           ALLOCATE( vv_xg%v5(xp%ids:xp%ide,xp%jds:xp%jde,mzs(5)) )
+          ALLOCATE( vv_xg%alpha(xp%ids:xp%ide,xp%jds:xp%jde,mzs(6)) )
         ELSE
           ! Allocate dummy array for non-monitor process to keep Fortran
           ! CICO happy...
@@ -65,6 +63,7 @@
           ALLOCATE( vv_xg%v3(1,1,1) )
           ALLOCATE( vv_xg%v4(1,1,1) )
           ALLOCATE( vv_xg%v5(1,1,1) )
+          ALLOCATE( vv_xg%alpha(1,1,1) )
         ENDIF
 
         ! TODO:  encapsulate this crap!  
@@ -92,7 +91,12 @@
                                  ims, ime, jms, jme, kms, &
                                  ips, ipe, jps, jpe, kps )
         CALL wv_patch_to_global( vv_x%v5, vv_xg%v5,       &
-                                 xp%domdesc, mzs(5),    &
+                                 xp%domdesc, mzs(5), &
+                                 ids, ide, jds, jde, kds, &
+                                 ims, ime, jms, jme, kms, &
+                                 ips, ipe, jps, jpe, kps )
+        CALL wv_patch_to_global( vv_x%alpha, vv_xg%alpha,       &
+                                 xp%domdesc, mzs(6),    &
                                  ids, ide, jds, jde, kds, &
                                  ims, ime, jms, jme, kms, &
                                  ips, ipe, jps, jpe, kps )
@@ -115,7 +119,7 @@
         ENDIF
 
         ! deallocate vv_xg
-        DEALLOCATE( vv_xg%v1, vv_xg%v2, vv_xg%v3, vv_xg%v4, vv_xg%v5 )
+        DEALLOCATE( vv_xg%v1, vv_xg%v2, vv_xg%v3, vv_xg%v4, vv_xg%v5, vv_xg%alpha )
 
 #endif
 
@@ -211,156 +215,4 @@ SUBROUTINE wv_patch_to_global_2d( vlocal, vglobal,    &
 #endif
 
 END SUBROUTINE wv_patch_to_global_2d
-
-
-
-SUBROUTINE write_3d_debug( localpatch, domdesc, mz, fnameheader, &
-                           ids, ide, jds, jde, kds,              &
-                           ims, ime, jms, jme, kms,              &
-                           its, ite, jts, jte, kts, fnameID )
-!
-!     Gathers local 3D array localpatch into a global array and writes 
-!     to disk in various debug formats.  Assumes that "k" is not 
-!     decomposed.  End indicies in the "k" dimension are inferred from 
-!     mz, which can be less than kde.  
-!
-!     Must be called by all MPI tasks.  
-!
-!     Writes nothing without complaint if mz<=0 .  
-!
-
-  IMPLICIT NONE
-
-  REAL,              INTENT(IN   ) :: localpatch(:,:,:)
-  INTEGER,           INTENT(IN   ) :: domdesc
-  INTEGER,           INTENT(IN   ) :: mz
-  CHARACTER(LEN=*),  INTENT(IN   ) :: fnameheader
-  INTEGER,           INTENT(IN   ) :: ids,ide, jds,jde, kds ! domain dims.
-  INTEGER,           INTENT(IN   ) :: ims,ime, jms,jme, kms ! memory dims.
-  INTEGER,           INTENT(IN   ) :: its,ite, jts,jte, kts ! tile   dims.
-  INTEGER, OPTIONAL, INTENT(IN   ) :: fnameID       ! optional file ID tag
-#ifdef DM_PARALLEL
-  ! Local declarations
-  REAL, ALLOCATABLE :: arrayglobal(:,:,:)
-  INTEGER :: i, j, k
-  LOGICAL, EXTERNAL :: wrf_dm_on_monitor
-  CHARACTER(LEN=256) :: debugfname
-
-  IF ( mz > 0 ) THEN
-    ALLOCATE( arrayglobal( ids:ide, jds:jde, 1:mz ) )
-    CALL wv_patch_to_global( localpatch, arrayglobal, &
-                             domdesc, mz,             &
-                             ids, ide, jds, jde, kds, &
-                             ims, ime, jms, jme, kms, &
-                             its, ite, jts, jte, kts )
-    IF ( wrf_dm_on_monitor() ) THEN
-      ! binary
-      IF ( PRESENT( fnameID ) ) THEN
-        WRITE (UNIT=debugfname,FMT='(a,i0.2)') TRIM(fnameheader),fnameID
-      ELSE
-        WRITE (UNIT=debugfname,FMT='(a)') TRIM(fnameheader)
-      ENDIF
-      OPEN( UNIT=unit_983, FILE=TRIM(debugfname), FORM='unformatted' )
-      WRITE (UNIT=unit_983) arrayglobal
-      CLOSE (UNIT=unit_983)
-      ! ASCII
-      IF ( PRESENT( fnameID ) ) THEN
-        WRITE (debugfname,'(a,a,i0.2)') TRIM(fnameheader),'_ASCII_',fnameID
-      ELSE
-        WRITE (debugfname,'(a,a)') TRIM(fnameheader),'_ASCII'
-      ENDIF
-      OPEN( UNIT=unit_983, FILE=TRIM(debugfname), FORM='formatted' )
-      DO k = 1, mz
-        DO j = jds, jde
-          DO i = ids, ide
-            WRITE (UNIT=unit_983,FMT=*) arrayglobal(i,j,k)
-          ENDDO
-        ENDDO
-      ENDDO
-      CLOSE (UNIT=unit_983)
-    ENDIF
-    DEALLOCATE( arrayglobal )
-  ENDIF
-#endif
-END SUBROUTINE write_3d_debug
-
-
-
-
-SUBROUTINE write_2d_debug( localpatch, domdesc, fnameheader, &
-                           ids, ide, jds, jde,               &
-                           ims, ime, jms, jme,               &
-                           its, ite, jts, jte, fnameID )
-!
-!     Gathers local 2D array localpatch into a global array and writes 
-!     to disk in various debug formats.  
-!
-!     Must be called by all MPI tasks.  
-!
-
-  IMPLICIT NONE
-
-  REAL,              INTENT(IN   ) :: localpatch(ims:ime,jms:jme)
-  INTEGER,           INTENT(IN   ) :: domdesc
-  CHARACTER(LEN=*),  INTENT(IN   ) :: fnameheader
-  INTEGER,           INTENT(IN   ) :: ids,ide, jds,jde      ! domain dims.
-  INTEGER,           INTENT(IN   ) :: ims,ime, jms,jme      ! memory dims.
-  INTEGER,           INTENT(IN   ) :: its,ite, jts,jte      ! tile   dims.
-  INTEGER, OPTIONAL, INTENT(IN   ) :: fnameID       ! optional file ID tag
-#ifdef DM_PARALLEL
-  ! Local declarations
-  REAL :: array3d(ims:ime,jms:jme,1)
-
-  array3d(its:ite,jts:jte,1) = localpatch(its:ite,jts:jte)
-  CALL write_3d_debug( array3d, domdesc, 1, fnameheader, &
-                       ids, ide, jds, jde, 1,            &
-                       ims, ime, jms, jme, 1,            &
-                       its, ite, jts, jte, 1, fnameID )
-#endif
-END SUBROUTINE write_2d_debug
-
-
-
-
-SUBROUTINE write_vp_debug( vv, be, xp, fnameheader, &
-                           ids, ide, jds, jde, kds, &
-                           ims, ime, jms, jme, kms, &
-                           its, ite, jts, jte, kts )
-
-  IMPLICIT NONE
-
-  TYPE (vp_type),    INTENT(INOUT) :: vv   ! Grid point/EOF control var.
-  TYPE (be_type),    INTENT(IN   ) :: be   ! Background error structure.
-  TYPE (xpose_type), INTENT(INOUT) :: xp   ! Dimensions and xpose buffers. 
-  CHARACTER(LEN=*),  INTENT(IN   ) :: fnameheader
-  INTEGER,           INTENT(IN   ) :: ids,ide, jds,jde, kds ! domain dims.
-  INTEGER,           INTENT(IN   ) :: ims,ime, jms,jme, kms ! memory dims.
-  INTEGER,           INTENT(IN   ) :: its,ite, jts,jte, kts ! tile   dims.
-  ! Local declarations
-  ! List of 3D vectors
-  TYPE vec3d
-    REAL, POINTER :: ptr(:,:,:)
-    INTEGER :: mz
-  END TYPE vec3d
-  TYPE (vec3d) :: arraylist(5) ! list of arrays
-  INTEGER :: arrayID
-
-  arraylist(1)%ptr => vv%v1
-  arraylist(1)%mz  =  be%v1%mz
-  arraylist(2)%ptr => vv%v2
-  arraylist(2)%mz  =  be%v2%mz
-  arraylist(3)%ptr => vv%v3
-  arraylist(3)%mz  =  be%v3%mz
-  arraylist(4)%ptr => vv%v4
-  arraylist(4)%mz  =  be%v4%mz
-  arraylist(5)%ptr => vv%v5
-  arraylist(5)%mz  =  be%v5%mz
-  DO arrayID=1,5
-    CALL write_3d_debug( arraylist(arrayID)%ptr, xp%domdesc, &
-                         arraylist(arrayID)%mz, fnameheader, &
-                         ids, ide, jds, jde, kds,            &
-                         ims, ime, jms, jme, kms,            &
-                         its, ite, jts, jte, kts, arrayID )
-  ENDDO
-END SUBROUTINE write_vp_debug
 

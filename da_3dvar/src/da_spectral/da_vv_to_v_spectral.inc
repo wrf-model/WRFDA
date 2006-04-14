@@ -1,14 +1,10 @@
 subroutine da_vv_to_v_spectral( ni, nj, max_wavenumber, inc, lenr, lensav, lenwrk, &
                                 alp_size, r_cvsize, alp, wsave, int_wgts, rcv, field)
+
 !-------------------------------------------------------------------------
 !  Performs gridpoint to spectral transformation on a sphere.
 !  Note: Routine works for both regular and Gaussian latitude (latitude integration
 !  weights contain necessary info).
-
-!  History:
-!  October  10th 2004: Coded by                           Dale Barker.
-!  November 29th 2004: Updated for v_to_vv and other 
-!                      with real control input array      Syed RH Rizvi
 !-------------------------------------------------------------------------
 
    implicit none
@@ -30,7 +26,7 @@ subroutine da_vv_to_v_spectral( ni, nj, max_wavenumber, inc, lenr, lensav, lenwr
 
    integer             :: i, j, k, m, mm             ! Loop counters.
    integer             :: ier                        ! Error return.
-   integer             :: c_cvsize                   ! Size of complex cv-array
+   integer             :: sizec                      ! Size of complex cv-array
    integer             :: index_r, index_c           ! Array index for complex v_fou.
    integer             :: index_start, index_end     ! Position markers in cv.
    real                :: r_fou(1:lenr)              ! FFT array.
@@ -38,10 +34,10 @@ subroutine da_vv_to_v_spectral( ni, nj, max_wavenumber, inc, lenr, lensav, lenwr
    logical             :: odd_longitudes
    complex             :: v_fou(1:nj,0:max_wavenumber)! Intermediate Fourier state.
    complex             :: r_leg(1:nj)                 ! Intermediate Fourier state.
-   complex, allocatable:: cv(:)                      ! Spectral modes.
+   complex, allocatable:: ccv(:)                      ! Spectral modes.
 !-------------------------------------------------------------------------
-    c_cvsize = 0.5 * r_cvsize
-   allocate (cv(1:c_cvsize))
+    sizec = 0.5 * r_cvsize
+   allocate (ccv(1:sizec))
 !-------------------------------------------------------------------------
    if ( (ni+1) / 2 == ni/2 + 1 ) then  ! Odd number of longitudes:
       odd_longitudes = .true.
@@ -85,13 +81,14 @@ subroutine da_vv_to_v_spectral( ni, nj, max_wavenumber, inc, lenr, lensav, lenwr
        index_end   = index_start + max_wavenumber - m
        r_leg(1:nj) = v_fou(1:nj,m)
        call da_legtra ( nj, max_wavenumber, alp_size, m, int_wgts, alp, r_leg, &
-                        cv(index_start:index_end) )
+                        ccv(index_start:index_end) )
     end do
 
-    do i=1,c_cvsize
+    do i=1,sizec
      mm = 2*i - 1
-     rcv(mm  ) = real ( cv(i) )
-     rcv(mm+1) = aimag( cv(i) )
+     rcv(mm  ) = real ( ccv(i) )
+     rcv(mm+1) = aimag( ccv(i) )
     end do
- deallocate (cv)
+ deallocate (ccv)
+
 end subroutine da_vv_to_v_spectral
