@@ -561,7 +561,6 @@ SUBROUTINE DA_Read_Namelist
    ENDIF
    
    if ( print_detail >= 1 ) then
-      WRITE(UNIT=stdout,FMT='(A,3X,I4    )') ' Minimisation_Option = ', Minimisation_Option 
       WRITE(UNIT=stdout,FMT='(A,3X,L10   )') ' calculate_cg_cost_fn = ',calculate_cg_cost_fn
       WRITE(UNIT=stdout,FMT='(A,3X,L10   )') ' Write_Outer_Loop    = ', write_outer_loop
       WRITE(UNIT=stdout,FMT='(A,3X,L10   )') ' Lat_Stats_Option    = ', lat_stats_option

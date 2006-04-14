@@ -167,7 +167,6 @@ export DA_TESTING_WRFVAR=${DA_TESTING_WRFVAR:-.FALSE.}      # Test WRF-Var code.
 export DA_TEST_TRANSFORMS=${DA_TEST_TRANSFORMS:-.FALSE.}    # Test WRF-Var transforms.
 export DA_TEST_STATISTICS=${DA_TEST_STATISTICS:-.FALSE.}    # Test WRF-Var statistics.
 export DA_INTERPOLATE_STATS=${DA_INTERPOLATE_STATS:-.TRUE.} # True if statistics computed on different domain.
-export DA_MINIMISATION_OPTION=${DA_MINIMISATION_OPTION:-2}  # 1=Quasi-Newton, 2=Conjugate gradient.
 export DA_CALCULATE_CG_COST_FN=${DA_CALCULATE_CG_COST_FN:-.FALSE.} # True if want CG diagnostic output. 
 export DA_CV_OPTIONS_HUM=${DA_CV_OPTIONS_HUM:-3}            # Moist control variable (1-3).
 export DA_CHECK_RH=${DA_CHECK_RH:-2}                        # Physical check on humidity (0-2).

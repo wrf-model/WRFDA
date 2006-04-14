@@ -273,7 +273,6 @@ MODULE DA_Constants
  integer                :: max_ext_its ! Max. number of external iterations.
  integer                :: ntmax       ! Max. number of minim. its.
  integer                :: nsave       ! #Minimisation states to store.
- integer                :: minimisation_option  ! Minimisation option. 1. QN, 2 CG.
 
  real, dimension(10)    :: eps         ! Fraction of initial gradient
                                        ! required for min. convergence.

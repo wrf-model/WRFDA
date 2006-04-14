@@ -161,15 +161,13 @@ DA_Minimisation.o:	DA_Minimisation.F             \
 			da_dot_cv.inc                 \
 			da_lmdir.inc                  \
 			da_minimisation_warning.inc   \
-			da_minimise.inc               \
 			da_sum_reals.inc              \
 			da_va15bd.inc                 \
 			da_vd05bd.inc                 \
 			da_vd05ad.inc                 \
 			da_write_diagnostics.inc      \
 			DA_Calculate_GradY.inc        \
-			DA_Minimise_CG.inc            \
-			DA_Minimise_QN.inc
+			DA_Minimise_CG.inc
 
 DA_Setup_Structures.o:	DA_Setup_Structures.F             \
                         module_wrf_3dvar_io.o             \
@@ -197,10 +195,6 @@ DA_Setup_Structures.o:	DA_Setup_Structures.F             \
 			da_write_interpolated_be.inc      \
 			da_rescale_background_errors.inc  \
 			da_setup_background_errors.inc    \
-			da_setup_background_errors2.inc   \
-			da_setup_background_errors3.inc   \
-			da_setup_background_errors4.inc   \
-			da_setup_background_errors5.inc   \
 			DA_Get_Bins_Info.inc              \
 			da_setup_firstguess.inc           \
 			da_setup_firstguess_mm5.inc       \
