@@ -342,7 +342,7 @@ MODULE DA_Constants
  integer       :: sfc_assi_options     ! Surface assimilation option.
 
 !Ensemble parameters: 
- integer       :: ensdim
+ integer       :: ensdim_alpha
  integer       :: alpha_truncation     ! Spectral truncation of alpha.
  integer       :: alpha_corr_type      ! 1=Exponential, 2=SOAR, 3=Gaussian.
  real          :: alpha_corr_scale     ! Alpha correlation scale (km).

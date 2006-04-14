@@ -280,7 +280,7 @@ subroutine da_setup_be_global( ide, jde, kde, be  )
 !  [6] Set up alpha (flow-dependent) control variable "errors": 
 !--------------------------------------------------------------
 
-   be % ne = ensdim                                ! Size of ensemble.
+   be % ne = ensdim_alpha                          ! Size of ensemble.
 
    if ( be % ne > 0 ) then
       be % alpha % mz = be % ne

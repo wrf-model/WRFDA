@@ -26,7 +26,7 @@ SUBROUTINE DA_Read_Namelist
                        write_qcw, write_qrn, write_qci, write_qsn, write_qgr, &
                        write_filtered_obs
    NAMELIST /RECORD3/  fg_format, ob_format, num_fgat_time
-   namelist / ens_info / ensdim, alpha_truncation, alpha_corr_type, &
+   namelist / ens_info / ensdim_alpha, alpha_truncation, alpha_corr_type, &
                          alpha_corr_scale, alpha_std_dev
    NAMELIST /RECORD4/  PROCESS_OBS, obs_qc_pointer, &
                        use_SynopObs, &
@@ -150,7 +150,7 @@ SUBROUTINE DA_Read_Namelist
    num_fgat_time = 1
 
 !--ensemble parameters:
-   ensdim = 0
+   ensdim_alpha = 0
    alpha_truncation = 0
    alpha_corr_type = 3       ! Gaussian
    alpha_corr_scale = 1500.0 ! km
@@ -390,7 +390,7 @@ SUBROUTINE DA_Read_Namelist
    READ  ( UNIT = namelist_unit, NML = ens_info , IOSTAT = IOST)
 
    if ( print_detail >= 1 ) then
-      WRITE(unit=stdout,FMT='(A,3X,i4    )') ' Ensemble size = ', ensdim
+      WRITE(unit=stdout,FMT='(A,3X,i4    )') ' Ensemble size alpha= ', ensdim_alpha
       WRITE(unit=stdout,FMT='(A,3X,i4    )') ' Alpha CV truncation = ', alpha_truncation
       WRITE(unit=stdout,FMT='(A,3X,i4    )') ' Alpha corr_type = ', alpha_corr_type
       WRITE(unit=stdout,FMT='(A,3X,f12.2 )') ' Alpha correlation scale = ', alpha_corr_scale
@@ -749,7 +749,7 @@ SUBROUTINE DA_Read_Namelist
    WRITE(UNIT=stdout,FMT='(A,3X,L10)') ' write_filtered_obs = ', write_filtered_obs
    WRITE(UNIT=stdout,FMT='(A,3X,i4 )') ' fg_format        = ', fg_format
    WRITE(UNIT=stdout,FMT='(A,3X,i4 )') ' ob_format        = ', ob_format
-   WRITE(unit=stdout,FMT='(A,3X,i4    )')  ' ensdim           = ', ensdim
+   WRITE(unit=stdout,FMT='(A,3X,i4    )')  ' ensdim_alpha = ', ensdim_alpha
    WRITE(unit=stdout,FMT='(A,3X,i4    )')  ' alpha_truncation = ', alpha_truncation
    WRITE(unit=stdout,FMT='(A,3X,i4    )')  ' alpha_corr_type  = ', alpha_corr_type
    WRITE(unit=stdout,FMT='(A,3X,f12.2 )')  ' alpha_corr_scale = ', alpha_corr_scale
