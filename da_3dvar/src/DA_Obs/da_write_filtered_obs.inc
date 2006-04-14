@@ -869,16 +869,16 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xp )
      DO n = 1, iv%satem(i)%info%levels 
 !
 ! read original thickness error from unit 193
-     read(193,'(i8,2x,i8,2f12.3)')n1,n2,thick,thick_error
+     read(UNIT=193,FMT='(i8,2x,i8,2f12.3)')n1,n2,thick,thick_error
      if( n1 /= i  .or. n2 /= n) then
-       WRITE(UNIT=errmsg(1),FMT='(A,4I)') &
+       WRITE(UNIT=errmsg(1),FMT='(A,4I5)') &
          "mismatch in reading thickness errors from unit 193 ",i,n1,n,n2
        CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
      end if
        thick_qc = iv%satem(i)%thickness(n)%qc
        if( iv%satem(i)%thickness(n)%qc < obs_qc_pointer) thick_qc = missing_data
 !
-         write(ounit, FMT = TRIM (fmt_each))               &
+         write(UNIT=ounit, FMT = TRIM (fmt_each))               &
          iv%satem(i)%p(n),zero, slp_error,                 &
          missing_r, missing_data, xmiss,                   &
          missing_r, missing_data, xmiss,                   &
