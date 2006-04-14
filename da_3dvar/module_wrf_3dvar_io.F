@@ -5,7 +5,7 @@ MODULE module_wrf_3dvar_io
   USE module_domain
   USE module_io_domain
 
- !--Model layer
+  !--Model layer
 
   USE module_configure
   USE module_timing
@@ -47,7 +47,7 @@ CONTAINS
   IF (present(in_filename)) THEN
     file_name = trim(in_filename)
   ELSE
-    file_name = 'wrf_3dvar_input'
+    file_name = 'wrfvar_input'
   END IF
 
   CALL ext_ncd_open_for_read( trim(file_name), 0, 0, "", fid, ierr)
@@ -56,7 +56,7 @@ CONTAINS
     write(message,*) 'NetCDF error in ',__FILE__,', line', __LINE__
     call wrf_debug ( 0 , message)
 
-    write(unit=0, fmt='(2a)') 'Erro to open file:', trim(file_name)
+    write(unit=0, fmt='(2a)') 'Error opening file:', trim(file_name)
     CALL wrf_shutdown
 
     STOP "Stopped with NetCDF error."
@@ -86,8 +86,7 @@ CONTAINS
     enddo
 
     if(nsave < 0) then
-      print *, 'Can not find the needed time'
-      STOP "Stopped with input error."
+      CALL wrf_error_fatal("Can not find the needed time")
     endif
   else
     !-----Set start_date to current_date.
@@ -123,11 +122,11 @@ CONTAINS
 
   call ext_ncd_ioclose(fid, ierr)
 
-  CALL wrf_debug ( 100 , 'da_3dvar/module_wrf_3dvar_io: calling open_r_dataset for wrf 3dvar input' )
+  CALL wrf_debug ( 100 , __FILE__//': calling open_r_dataset for wrfvar input' )
   CALL open_r_dataset ( fid, TRIM(file_name), grid , config_flags , "DATASET=INPUT", ierr )
 
   IF ( ierr .NE. 0 ) THEN
-    WRITE( wrf_err_message , * ) 'da_3dvar/module_wrf_3dvar_io: error opening ', &
+    WRITE( wrf_err_message , * ) __FILE__//': error opening ', &
       TRIM(file_name),' for reading ierr=',ierr
     CALL WRF_ERROR_FATAL ( wrf_err_message )
   ENDIF
@@ -140,13 +139,14 @@ CONTAINS
     enddo
   endif
 
-  CALL wrf_debug ( 100 , 'wrf_da_3dvar: calling input_model_input' )
+  CALL wrf_debug ( 100 , __FILE__//': calling input_model_input' )
   CALL input_model_input ( fid ,   grid , config_flags , ierr )
-  CALL wrf_debug ( 100 , 'wrf_da_3dvar: back from input_model_input' )
+  CALL wrf_debug ( 100 , __FILE__//': back from input_model_input' )
 
   CALL close_dataset ( fid , config_flags , "DATASET=INPUT" )
 
-  WRITE ( message , FMT = '("Reading 3dvar input for domain ",I8)' ) grid%id
+  WRITE ( message , FMT = '("reading wrfvar input for domain ",I8)' ) grid%id
+
   CALL end_timing ( TRIM(message) )
 
   END SUBROUTINE med_initialdata_input_3dvar
@@ -180,15 +180,15 @@ CONTAINS
   if(present(out_filename)) then
      file_name = trim(out_filename)
   else
-     file_name = 'wrf_3dvar_output'
+     file_name = 'wrfvar_output'
   endif
 
-  CALL wrf_debug ( 100 , 'da_3dvar/module_wrf_3dvar_io: calling open_w_dataset 3dvar output' )
+  CALL wrf_debug ( 100 , __FILE__//': calling open_w_dataset wrfvar output' )
   CALL open_w_dataset ( fid, TRIM(file_name), grid , config_flags , &
                         output_model_input , "DATASET=INPUT", ierr )
 
   IF ( ierr .NE. 0 ) THEN
-    WRITE( wrf_err_message , * ) 'da_3dvar/module_wrf_3dvar_io: error opening ', &
+    WRITE( wrf_err_message , * ) __FILE__//': error opening ', &
                                  TRIM(file_name),' for writing ierr=',ierr
     CALL wrf_error_fatal( wrf_err_message )
   ENDIF
@@ -206,7 +206,8 @@ CONTAINS
 
   CALL close_dataset ( fid , config_flags, "DATASET=INPUT" )
 
-  WRITE ( message , FMT = '("Writing 3dvar output for domain ",I8)' ) grid%id
+  WRITE ( message , FMT = '("writing wrfvar output for domain ",I8)' ) grid%id
+
   CALL end_timing ( TRIM(message) )
 
   END SUBROUTINE med_initialdata_output_3dvar
