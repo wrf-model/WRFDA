@@ -54,7 +54,6 @@ date
 #-----------------------------------------------------------------------
 
 export DA_DATE=${DA_DATE:-2003010112}       # Analysis date.
-export DA_CV_OPTIONS=${DA_CV_OPTIONS:-3}             # Background error statistics: 2=NCAR, 3=NCEP.
 
 #Default directories/files:
 
@@ -81,7 +80,7 @@ cd $RUN_DIR
 
 export DA_FIRST_GUESS=${DA_FIRST_GUESS:-$CS_DIR/$DA_DATE/wrfinput_d01}    # wrfvar "first guess" input.
 export DA_OBSERVATIONS=${DA_OBSERVATIONS:-$OB_DIR/$DA_DATE/ob.ascii} # wrfvar observation input.
-export DA_BACK_ERRORS=${DA_BACK_ERRORS:-$BE_DIR/be.cv_$DA_CV_OPTIONS} # wrfvar background errors.
+export DA_BACK_ERRORS=${DA_BACK_ERRORS:-$BE_DIR/gen_be.NMC.dat} # wrfvar background errors.
 export DA_SSMI=${DA_SSMI:-$OB_DIR/$DA_DATE/ssmi.dat}               # SSM/I radiances (ignore if not using).
 export DA_RADAR=${DA_RADAR:-$OB_DIR/$DA_DATE/radar.dat}            # Radar data (ignore if not using).
 
@@ -123,7 +122,7 @@ fi
 export DA_MODEL_TYPE=${DA_MODEL_TYPE:-WRF}                 # WRF, MM5 or KMA.
 export DA_WRITE_INCREMENTS=${DA_WRITE_INCREMENTS:-.FALSE.} # Optionally write increments.
 export DA_NUM_FGAT_TIME=${DA_NUM_FGAT_TIME:-1}             # Number of FGAT ob windows.
-export DA_ENSDIM=${DA_ENSDIM:-0}                           # Ensemble size (for hybrid). 
+export DA_ENSDIM_ALPHA=${DA_ENSDIM_ALPHA:-0}               # Ensemble size (for hybrid). 
 export DA_ALPHA_TRUNCATION=${DA_ALPHA_TRUNCATION:-0}       # Spectral truncation of alpha CV (global hybrid). 
 export DA_ALPHA_CORR_TYPE=${DA_ALPHA_CORR_TYPE:-3}         # Alpha correlation type (1=Expt,2=SOAR,3=Gauss).
 export DA_ALPHA_CORR_SCALE=${DA_ALPHA_CORR_SCALE:-1500.0}  # Alpha correlation scale (km).
@@ -375,7 +374,7 @@ cat > namelist.wrfvar << EOF
  num_fgat_time = $DA_NUM_FGAT_TIME /
 
 &ens_info
- ensdim =           ${DA_ENSDIM},
+ ensdim_alpha     = ${DA_ENSDIM_ALPHA},
  alpha_truncation = ${DA_ALPHA_TRUNCATION},
  alpha_corr_type  = ${DA_ALPHA_CORR_TYPE},
  alpha_corr_scale = ${DA_ALPHA_CORR_SCALE},
@@ -595,7 +594,7 @@ cat > namelist.input << EOF
  maxens                              = 3,
  maxens2                             = 3,
  maxens3                             = 16,
- ensdim                              = ${DA_ENSDIM},
+ ensdim                              = ${DA_ENSDIM_ALPHA},
  /
 
  &dynamics
