@@ -14,15 +14,15 @@
 #set echo
 #Define job via environment variables:
 
-# Uncomment variables for the stages you wish to run:
-setenv RUN_GEN_BE_STAGE0 # Set to run stage 0 (create perturbation files).
-setenv RUN_GEN_BE_STAGE1 # Set to run stage 1 (Remove mean, split variables).
-setenv RUN_GEN_BE_STAGE2 # Set to run stage 2 (Regression Coefficients).
-setenv RUN_GEN_BE_STAGE2A # Set to run stage 2 (Regression Coefficients).
-setenv RUN_GEN_BE_STAGE3 # Set to run stage 3 (Vertical Covariances).
-setenv RUN_GEN_BE_STAGE4 # Set to run stage 4 (Horizontal Covariances).
-setenv RUN_GEN_BE_DIAGS  # Set to run gen_be diagnostics.
-setenv RUN_GEN_BE_DIAGS_READ  # Set to run gen_be diagnostics_read.
+# Define the following variables for the stages you wish to run:
+# RUN_GEN_BE_STAGE0 # Set to run stage 0 (create perturbation files).
+# RUN_GEN_BE_STAGE1 # Set to run stage 1 (Remove mean, split variables).
+# RUN_GEN_BE_STAGE2 # Set to run stage 2 (Regression Coefficients).
+# RUN_GEN_BE_STAGE2A # Set to run stage 2 (Regression Coefficients).
+# RUN_GEN_BE_STAGE3 # Set to run stage 3 (Vertical Covariances).
+# RUN_GEN_BE_STAGE4 # Set to run stage 4 (Horizontal Covariances).
+# RUN_GEN_BE_DIAGS  # Set to run gen_be diagnostics.
+# RUN_GEN_BE_DIAGS_READ  # Set to run gen_be diagnostics_read.
 
 #-----------------------------------------------------------------------------------
 # Don't change anything below this line.
@@ -55,6 +55,7 @@ if ( ! $?NUM_JOBS )      setenv NUM_JOBS 8               # Number of jobs to run
 if ( ! $?RESOLUTION_KM ) setenv RESOLUTION_KM 200        # Hard-wired for now (only used for regional)
 if ( ! $?TESTING_SPECTRAL ) setenv TESTING_SPECTRAL .false. # True if performing spectral tests.
 
+
 if ( ! $?EXPT )          setenv EXPT 2003-01.test
 if ( ! $?ID1 )           setenv ID1 ${BE_METHOD}.bin_type${BIN_TYPE}
 if ( ! $?RELEASE )       setenv RELEASE WRF_V2.1.2
@@ -70,6 +71,12 @@ if ( ! $?STAGE0_DIR )    setenv STAGE0_DIR ${RUN_DIR}/stage0
 
 if ( ! -d ${RUN_DIR} )   mkdir ${RUN_DIR}
 if ( ! -d ${STAGE0_DIR} )  mkdir ${STAGE0_DIR}
+
+if ( $GLOBAL == .true. ) then
+  setenv UH_METHOD power
+else
+  setenv UH_METHOD scale
+endif
 
 #List of control variables:
 
