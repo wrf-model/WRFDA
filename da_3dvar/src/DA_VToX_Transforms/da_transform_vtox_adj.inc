@@ -125,9 +125,10 @@ subroutine da_transform_vtox_adj( cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv, 
 !--------Now for PW.
          call DA_Transform_XToTPW_ADJ( xa, xb )
 
-         if (sfc_assi_options == 2) call DA_Transform_XToWTQ_adj( xp, xb, xa )
+      end if
 
-      endif
+      if (sfc_assi_options == 2) call DA_Transform_XToWTQ_adj( xp, xb, xa )
+
    endif
 !-------------------------------------------------------------------------
  
