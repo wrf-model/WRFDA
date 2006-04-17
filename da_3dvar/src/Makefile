@@ -108,7 +108,7 @@ da_solve_v3d.o:		DA_Constants.o			\
 			DA_Tools.o			\
 			DA_Minimisation.o		\
 			par_util.o			\
-			da_solve_v3d/da_init_3dvar.inc	\
+			da_solve_v3d/da_init_wrfvar.inc	\
 			da_solve_v3d/da_solve_v3d.F
 			$(RM) $@
 			$(CPP) -I./da_solve_v3d $(CPPFLAGS_WRFVAR) da_solve_v3d/da_solve_v3d.F > da_solve_v3d.f

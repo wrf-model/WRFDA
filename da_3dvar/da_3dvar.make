@@ -123,7 +123,7 @@ da_solve_v3d.o:		DA_Constants.o			\
 			DA_Tools.o			\
 			DA_Minimisation.o		\
 			par_util.o			\
-			da_init_3dvar.inc               \
+			da_init_wrfvar.inc              \
 			da_solve_v3d.F
 
 DA_Minimisation.o:	DA_Minimisation.F             \

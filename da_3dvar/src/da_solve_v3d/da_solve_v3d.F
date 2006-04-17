@@ -72,7 +72,7 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
 !  [2.0] Initialise 3D-Var parameters:
 !------------------------------------------------------------------------------
 
-   call da_init_3dvar( grid, xp, xb, &
+   call da_init_wrfvar( grid, xp, xb, &
                        ids, ide, jds, jde, kds, kde, &
                        ims, ime, jms, jme, kms, kme, &
                        its, ite, jts, jte, kts, kte )
@@ -218,7 +218,7 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
 
 CONTAINS
 
-#include "da_init_3dvar.inc"
+#include "da_init_wrfvar.inc"
 
 END SUBROUTINE solve_v3d
 

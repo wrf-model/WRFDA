@@ -78,7 +78,7 @@ SUBROUTINE wrf_mm5_interface(grid, config_flags)
 !  Initialise 3D-Var parameters:
 !------------------------------------------------------------------------------
 
-   call da_init_3dvar(grid, &
+   call da_init_wrfvar(grid, &
                       ids, ide, jds, jde, kds, kde, &
                       ims, ime, jms, jme, kms, kme, &
                       its, ite, jts, jte, kts, kte, &
