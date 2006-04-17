@@ -3,8 +3,6 @@ SUBROUTINE DA_Scan_BUFR_Obs (iunit, ob, xp, filename)
 !  Purpose: Scan BUFR observation file for input to wrfvar
 !-----------------------------------------------------------------------------!
 !
-! HISTORY: 08/03/2005 - Creation of F90 version         Syed RH Rizvi
-!
 ! PARENT_MODULE: DA_Obs              
 !-----------------------------------------------------------------------------!
 
@@ -74,7 +72,6 @@ SUBROUTINE DA_Scan_BUFR_Obs (iunit, ob, xp, filename)
 !  ---------
 
    if(present(filename)) then
-     print*,' rizvi in scan_bufr opening BUFR file '
       OPEN(UNIT   = iunit,     &
            FILE   = trim(filename), &
            IOSTAT =  iost,     &
@@ -126,6 +123,14 @@ SUBROUTINE DA_Scan_BUFR_Obs (iunit, ob, xp, filename)
 
    call datelen(10)
 
+   INQUIRE (FILE='fort.91', EXIST = exist )
+   if ( .not. exist ) then
+     errmsg(1) = "BUFR file does not exist"
+     write(UNIT=errmsg(2), fmt='(a, i4)') &
+       'INQUIRE cannot find unit: ',iunit
+     CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1:2))
+   endif
+
    INQUIRE (iunit, EXIST = exist )
    if ( .not. exist ) then
      errmsg(1) = "BUFR file does not exist"
@@ -133,6 +138,7 @@ SUBROUTINE DA_Scan_BUFR_Obs (iunit, ob, xp, filename)
        'INQUIRE cannot find unit: ',iunit
      CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1:2))
    endif
+
    call openbf(iunit,'IN',iunit)
    call readmg(iunit,subset,idate,iret)
 
