@@ -225,7 +225,9 @@ MODULE DA_Define_Structures
       ! code.  It is used to reassemble obs in serial-code-order to replicate 
       ! summation order for bitwise-exact testing of distributed-memory 
       ! parallel configurations.  
+      ! obs_global_report is the index in the input data file
       integer                 :: obs_global_index
+      integer                 :: obs_global_report
 
       integer                 :: v_interp_optn  ! 0, not specified
                                                 ! 1, vertical interpolate in pressure

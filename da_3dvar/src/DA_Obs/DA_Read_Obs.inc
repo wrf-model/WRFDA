@@ -68,7 +68,7 @@ SUBROUTINE DA_Read_Obs (iunit, ob, xp, filename)
                                    num_qscat, &
                                    num_profiler, num_buoy, num_bogus
 
-   INTEGER                        :: ndup, n
+   INTEGER                        :: ndup, n, report
    LOGICAL                        :: surface_sound
 
 !--------------------------------------------------------------------
@@ -181,8 +181,12 @@ SUBROUTINE DA_Read_Obs (iunit, ob, xp, filename)
 !  LOOP OVER RECORDS
 !  -----------------
 
+   report = 0 ! report number in file
+
    reports: &
    DO
+
+     report = report+1
 !     READ STATION GENERAL INFO
 !     =============================
 
@@ -312,6 +316,7 @@ loop_level: DO i = 1, platform%info%levels
 
       call DA_ll_to_xy (platform%info, platform%loc,   &
                         xp, outside, inside_halo, outside_all )
+
 
       IF(outside_all) THEN
          cycle reports
@@ -512,7 +517,8 @@ loop_level: DO i = 1, platform%info%levels
          num_sound = num_sound + 1
          ! Track serial obs index for reassembly of obs during bit-for-bit 
          ! tests with different numbers of MPI tasks.  
-         platform%loc%obs_global_index = ob%num_sound_glo
+         platform%loc%obs_global_index  = ob%num_sound_glo
+         platform%loc%obs_global_report = report
 
          ob%sonde_sfc(num_sound)%info = platform%info
          ob%sonde_sfc(num_sound)%loc  = platform%loc
@@ -1113,7 +1119,7 @@ loop_level: DO i = 1, platform%info%levels
       (ob%ob_numb(ob%current_ob_time)%ssmt2 /= ob%num_ssmt2) .or. &
       (ob%ob_numb(ob%current_ob_time)%profiler /= ob%num_profiler)) then
 
-      write(unit=stdout, fmt='(a, i6, 2x, a, i6)') &
+      write(unit=stderr, fmt='(a, i6, 2x, a, i6)') &
            'ob%ob_numb(ob%current_ob_time)%sound=', ob%ob_numb(ob%current_ob_time)%sound, &
            'ob%num_sound=', ob%num_sound, &
            'ob%ob_numb(ob%current_ob_time)%synop=', ob%ob_numb(ob%current_ob_time)%synop, &
@@ -1149,7 +1155,7 @@ loop_level: DO i = 1, platform%info%levels
            'ob%ob_numb(ob%current_ob_time)%profiler=', ob%ob_numb(ob%current_ob_time)%profiler, &
            'ob%num_profiler=', ob%num_profiler
 
-      stop 'Obs mismatch.'
+      CALL wrf_error_fatal3(__FILE__,__LINE__,"Obs mismatch")
    endif
 
 !  if((ob%ob_numb(ob%current_ob_time)%ssmi_tb        /= ob%num_ssmi_tb) .or. &
