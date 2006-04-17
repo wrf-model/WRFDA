@@ -925,7 +925,6 @@ MODULE DA_Define_Structures
    end type j_type
 
    TYPE cv_type
-!      INTEGER          :: option             ! 1 = use u, v,t,q,p, 2 = use psi, chi etc.
       INTEGER          :: size               ! Total size of control variable.
       INTEGER          :: size_jb            ! Size of CV array for Jb term.
       INTEGER          :: size_je            ! Size of CV array for Je term.
@@ -970,7 +969,6 @@ MODULE DA_Define_Structures
 !     Control variable space errors:
       TYPE (cv_type)    :: cv
 
-!-----For cv option 4 and 5:
       REAL, POINTER     :: reg_chi(:,:)
       REAL, POINTER     :: reg_t  (:,:,:)
       REAL, POINTER     :: reg_ps (:,:)
