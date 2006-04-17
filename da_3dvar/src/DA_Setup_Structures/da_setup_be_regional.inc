@@ -86,30 +86,26 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
                      TRIM(be % v4 % name)
 
    write(6,*)
-!---------------------------------------------------------
+
    ix = xb % mix
    jy = xb % mjy
    kz = xb % mkz
 
-!-------------------------
-rewind (be_unit)
-!---------------------------------------------------------
+   rewind (be_unit)
    read(be_unit) ni, nj, nk
 
-     allocate( bin(1:ni,1:nj,1:nk) )
-     allocate( bin2d(1:ni,1:nj) )
+   allocate( bin(1:ni,1:nj,1:nk) )
+   allocate( bin2d(1:ni,1:nj) )
 
-     read(be_unit)bin_type
-     read(be_unit)lat_min, lat_max, binwidth_lat
-     read(be_unit)hgt_min, hgt_max, binwidth_hgt
-     read(be_unit)num_bins, num_bins2d
-     read(be_unit)bin(1:ni,1:nj,1:nk)
-     read(be_unit)bin2d(1:ni,1:nj)
+   read(be_unit)bin_type
+   read(be_unit)lat_min, lat_max, binwidth_lat
+   read(be_unit)hgt_min, hgt_max, binwidth_hgt
+   read(be_unit)num_bins, num_bins2d
+   read(be_unit)bin(1:ni,1:nj,1:nk)
+   read(be_unit)bin2d(1:ni,1:nj)
+   print '("ni, nj, nk, num_bins, num_bins2d:",5i8)', ni, nj, nk, num_bins, num_bins2d
 
-! 1.0 Load the regression coefficients
-! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-! 1.1 Read in regression coefficients
+!  1.1 Read in regression coefficients
 
    allocate (regcoeff1(1:num_bins))
    allocate (regcoeff2(1:nk,1:num_bins2d))
@@ -119,25 +115,7 @@ rewind (be_unit)
    read(be_unit) regcoeff2 
    read(be_unit) regcoeff3  
 
-! 1.2 Re-assign the regression coefficients
-
-! 1.2.1 Create the bins
-
- !  allocate( bin(1:ni,1:nj,1:nk) )
- !  allocate( bin2d(1:ni,1:nj) )
-
- !  bin_type = 1
- !  print '(/a,i4)', "bin_type=",bin_type
- !  call da_create_bins( ni, nj, nk, bin_type, num_bins, &
- !                               num_bins2d, bin, bin2d )
-
-   print '("ni, nj, nk, num_bins, num_bins2d:",5i8)', ni, nj, nk, num_bins, num_bins2d
-!--------------------------------------------------------------
-! Following "latitude, height" variables are optional arguments 
-! The same may be added, if required
-!--------------------------------------------------------------
-
-! 1.2.2 Fill regression coeff. array
+! 1.2 Fill regression coeff. array
 
    allocate (be%reg_chi(1:nj,1:nk))
    allocate (be%reg_ps (1:nj,1:nk))
@@ -150,14 +128,13 @@ rewind (be_unit)
     end do
    end do
 
-!
    do j=1,nj
       b = bin2d(1,j)
       do k=1,nk
        be%reg_ps(j,k) = regcoeff2(k,b)
       end do
    end do
-!
+
    do j=1,nj
       b = bin2d(1,j)
       do i=1,nk
@@ -173,7 +150,7 @@ rewind (be_unit)
 
 ! 1.3 Domain_averaged regression coefficients
 
-    if (.not.lat_stats_option) then
+   if (.not.lat_stats_option) then
      write(UNIT=stdout, fmt='(/5x, a/)') &
      '*** Using the averaged regression coefficients for unbalanced part ***'
 
@@ -206,24 +183,19 @@ rewind (be_unit)
     enddo
     enddo
 
-    else
+   else
 
-    write(UNIT=stdout, fmt='(/5x, a/)') &
+   write(UNIT=stdout, fmt='(/5x, a/)') &
     '*** Using the latitude-dependent regression coefficients for unbalanced part ***'
-    endif
+   endif
     
-    print '(2x,a,i8,a,i4)',"a) Finished regression coefficients processing! jy=",jy," kz=",kz
+!  2.0 Load the eigenvector and eigenvalue
 
-! 2.0 Load the eigenvector and eigenvalue
-! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-! 2.1 Allocate the arrays
-
-   ALLOCATE ( be1_eval_loc (1:kz,1:jy) )
-   ALLOCATE ( be2_eval_loc (1:kz,1:jy) )
-   ALLOCATE ( be3_eval_loc (1:kz,1:jy) )
-   ALLOCATE ( be4_eval_loc (1:kz,1:jy) )
-   ALLOCATE ( be5_eval_loc (1:1,1:jy) )
+   ALLOCATE ( be1_eval_loc (1:kz,1:num_bins2d) )
+   ALLOCATE ( be2_eval_loc (1:kz,1:num_bins2d) )
+   ALLOCATE ( be3_eval_loc (1:kz,1:num_bins2d) )
+   ALLOCATE ( be4_eval_loc (1:kz,1:num_bins2d) )
+   ALLOCATE ( be5_eval_loc (1:1,1:num_bins2d) )
 
    IF ( vert_corr == 2 ) THEN
 
@@ -233,11 +205,11 @@ rewind (be_unit)
       ALLOCATE ( be4_eval_glo(1:kz) )
       ALLOCATE ( be5_eval_glo(1:1) )
 
-      ALLOCATE ( be1_evec_loc(1:kz,1:kz,1:jy) )
-      ALLOCATE ( be2_evec_loc(1:kz,1:kz,1:jy) )
-      ALLOCATE ( be3_evec_loc(1:kz,1:kz,1:jy) )
-      ALLOCATE ( be4_evec_loc(1:kz,1:kz,1:jy) )
-      ALLOCATE ( be5_evec_loc(1:1,1:1,1:jy) )
+      ALLOCATE ( be1_evec_loc(1:kz,1:kz,1:num_bins2d) )
+      ALLOCATE ( be2_evec_loc(1:kz,1:kz,1:num_bins2d) )
+      ALLOCATE ( be3_evec_loc(1:kz,1:kz,1:num_bins2d) )
+      ALLOCATE ( be4_evec_loc(1:kz,1:kz,1:num_bins2d) )
+      ALLOCATE ( be5_evec_loc(1:1,1:1,1:num_bins2d) )
 
       ALLOCATE ( be1_evec_glo(1:kz,1:kz) )
       ALLOCATE ( be2_evec_glo(1:kz,1:kz) )
@@ -258,8 +230,6 @@ rewind (be_unit)
    read(be_unit)  be1_eval_loc    
 
    be % v1 % name = variable
-!   print*,'variable ',be % v1 % name,nk,num_bins2d
-!
 ! 2.2.2 Control variable 2 (chi_u)
 
    read(be_unit) variable
