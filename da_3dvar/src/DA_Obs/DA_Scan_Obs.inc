@@ -32,7 +32,7 @@ SUBROUTINE DA_Scan_Obs (iunit, ob, xp, filename)
    TYPE (multi_level_type)      :: platform
 
    LOGICAL                      :: inside_halo
-   LOGICAL                      :: outside
+   LOGICAL                      :: outside, outside_all
 
    REAL                         :: height_error
 
@@ -208,8 +208,9 @@ SUBROUTINE DA_Scan_Obs (iunit, ob, xp, filename)
                    platform%info%id
 
       IF (iost /= 0) THEN
-          WRITE (UNIT=stderr,FMT='(/A,I9)') ' END OF OBS UNIT: ',iunit
-          WRITE (UNIT=stderr,FMT='(/A,I9)') ' IOSTAT:          ',iost
+         ! This is expected, but its unclear how we handle failure
+         ! here without assuming the fortran2003 convention on
+         ! error statuses
          EXIT reports
       ENDIF
 
@@ -289,7 +290,7 @@ loop_level: DO i = 1, platform%info%levels
       ENDDO loop_level
 
       call DA_ll_to_xy (platform%info, platform%loc,   &
-                        xp, outside, inside_halo )
+                        xp, outside, inside_halo,outside_all )
 
       IF(outside) THEN
          cycle reports

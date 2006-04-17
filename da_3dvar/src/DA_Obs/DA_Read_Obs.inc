@@ -201,8 +201,9 @@ SUBROUTINE DA_Read_Obs (iunit, ob, xp, filename)
                    platform%info%id
 
       IF (iost /= 0) THEN
-         WRITE (UNIT=stderr,FMT='(/A,I9)') ' END OF OBS UNIT: ',iunit
-         WRITE (UNIT=stderr,FMT='(/A,I9)') ' IOSTAT:          ',iost
+         ! This is expected, but its unclear how we handle failure
+         ! here without assuming the fortran2003 convention on
+         ! error statuses
          EXIT reports
       ENDIF
 
