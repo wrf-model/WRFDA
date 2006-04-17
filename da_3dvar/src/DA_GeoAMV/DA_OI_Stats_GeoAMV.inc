@@ -34,12 +34,14 @@ SUBROUTINE DA_OI_Stats_GeoAMV( stats_unit, oi )
     DO n=1, oi%num_geoamv
       if( oi%geoamv(n)%loc%proc_domain ) then
         do k=1, oi%geoamv(n)%info%levels
-          CALL Stats_Calculate( n, 0, oi%geoamv(n)%u(k)%qc, &
+          CALL Stats_Calculate( oi%geoamv(n)%loc%obs_global_index, &
+                              0, oi%geoamv(n)%u(k)%qc, &
                               oi%geoamv(n)%u(k)%inv, nu, &
                               geoamv%minimum%u, geoamv%maximum%u, &
                               geoamv%average%u, geoamv%rms_err%u )
 
-          CALL Stats_Calculate( n, 0, oi%geoamv(n)%v(k)%qc, &
+          CALL Stats_Calculate( oi%geoamv(n)%loc%obs_global_index, &
+                              0, oi%geoamv(n)%v(k)%qc, &
                               oi%geoamv(n)%v(k)%inv, nv, &
                               geoamv%minimum%v, geoamv%maximum%v, &
                               geoamv%average%v, geoamv%rms_err%v )

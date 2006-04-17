@@ -22,7 +22,8 @@ SUBROUTINE DA_OI_Stats_Satem ( stats_unit, oi )
     DO n=1, oi%num_Satem
       if( oi%satem(n)%loc%proc_domain ) then
         do k=1, oi%satem(n)%info%levels
-          CALL Stats_Calculate( n, k, oi%Satem(n)%thickness(k)%qc, &
+          CALL Stats_Calculate( oi%Satem(n)%loc%obs_global_index, &
+                         k, oi%Satem(n)%thickness(k)%qc, &
                          oi%Satem(n)%thickness(k)%inv, nthickness, &
                          Satem%minimum%thickness, Satem%maximum%thickness, &
                          Satem%average%thickness, Satem%rms_err%thickness)

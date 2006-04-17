@@ -28,15 +28,18 @@ SUBROUTINE DA_OI_Stats_Airep ( stats_unit, oi )
     DO n=1, oi%num_Airep
       if( oi%airep(n)%loc%proc_domain ) then
         do k=1, oi%Airep(n)%info%levels
-          CALL Stats_Calculate( n, k, oi%Airep(n)%u(k)%qc, &
+          CALL Stats_Calculate( oi%Airep(n)%loc%obs_global_index, &
+                              k, oi%Airep(n)%u(k)%qc, &
                               oi%Airep(n)%u(k)%inv, nu, &
                               Airep%minimum%u, Airep%maximum%u, &
                               Airep%average%u, Airep%rms_err%u)
-          CALL Stats_Calculate( n, k, oi%Airep(n)%v(k)%qc, &
+          CALL Stats_Calculate( oi%Airep(n)%loc%obs_global_index, &
+                              k, oi%Airep(n)%v(k)%qc, &
                               oi%Airep(n)%v(k)%inv, nv, &
                               Airep%minimum%v, Airep%maximum%v, &
                               Airep%average%v, Airep%rms_err%v)
-          CALL Stats_Calculate( n, k, oi%Airep(n)%t(k)%qc, &
+          CALL Stats_Calculate( oi%Airep(n)%loc%obs_global_index, &
+                              k, oi%Airep(n)%t(k)%qc, &
                               oi%Airep(n)%t(k)%inv, nt, &
                               Airep%minimum%t, Airep%maximum%t, &
                               Airep%average%t, Airep%rms_err%t)

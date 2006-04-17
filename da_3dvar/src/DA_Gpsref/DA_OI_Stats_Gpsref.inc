@@ -28,7 +28,8 @@ SUBROUTINE DA_OI_Stats_GPSRef ( stats_unit, oi )
       if( oi%gpsref(n)%loc%proc_domain ) then
          do k=1, oi%gpsref(n)%info%levels
 
-            CALL Stats_Calculate( n, k, oi%GPSRef(n)%ref(k)%qc, &
+            CALL Stats_Calculate( oi%GPSRef(n)%loc%obs_global_index, &
+                          k, oi%GPSRef(n)%ref(k)%qc, &
                           oi%GPSRef(n)%ref(k)%inv, ngpsref, &
                           GPSRef%minimum%ref, GPSRef%maximum%ref, &
                           GPSRef%average%ref, GPSRef%rms_err%ref)

@@ -33,24 +33,29 @@ SUBROUTINE DA_OI_Stats_Bogus ( stats_unit, oi )
     DO n=1, oi%num_Bogus
       if( oi%bogus(n)%loc%proc_domain ) then
         do k=1, oi%bogus(n)%info%levels
-          CALL Stats_Calculate( n, k, oi%Bogus(n)%u(k)%qc, &
+          CALL Stats_Calculate( oi%Bogus(n)%loc%obs_global_index, &
+                              k, oi%Bogus(n)%u(k)%qc, &
                               oi%Bogus(n)%u(k)%inv, nu, &
                               Bogus%minimum%u, Bogus%maximum%u, &
                               Bogus%average%u, Bogus%rms_err%u)
-          CALL Stats_Calculate( n, k, oi%Bogus(n)%v(k)%qc, &
+          CALL Stats_Calculate( oi%Bogus(n)%loc%obs_global_index, &
+                              k, oi%Bogus(n)%v(k)%qc, &
                               oi%Bogus(n)%v(k)%inv, nv, &
                               Bogus%minimum%v, Bogus%maximum%v, &
                               Bogus%average%v, Bogus%rms_err%v)
-          CALL Stats_Calculate( n, k, oi%Bogus(n)%t(k)%qc, &
+          CALL Stats_Calculate( oi%Bogus(n)%loc%obs_global_index, &
+                              k, oi%Bogus(n)%t(k)%qc, &
                               oi%Bogus(n)%t(k)%inv, nt, &
                               Bogus%minimum%t, Bogus%maximum%t, &
                               Bogus%average%t, Bogus%rms_err%t)
-          CALL Stats_Calculate( n, k, oi%Bogus(n)%q(k)%qc, &
+          CALL Stats_Calculate( oi%Bogus(n)%loc%obs_global_index, &
+                              k, oi%Bogus(n)%q(k)%qc, &
                               oi%Bogus(n)%q(k)%inv, nq, &
                               Bogus%minimum%q, Bogus%maximum%q, &
                               Bogus%average%q, Bogus%rms_err%q)
         end do
-        CALL Stats_Calculate( n, 0, oi%Bogus(n)%slp%qc, &
+        CALL Stats_Calculate(  oi%Bogus(n)%loc%obs_global_index, &
+                           0, oi%Bogus(n)%slp%qc, &
                            oi%Bogus(n)%slp%inv, nslp,  &
                            Bogus%minimum%slp, Bogus%maximum%slp, &
                            Bogus%average%slp, Bogus%rms_err%slp)

@@ -33,23 +33,28 @@ SUBROUTINE DA_OI_Stats_Ships ( stats_unit, oi )
   IF ( oi%num_ships > 0 ) THEN
     DO n=1, oi%num_ships
       if( oi%ships(n)%loc%proc_domain ) then
-        CALL Stats_Calculate( n, 0, oi%ships(n)%u%qc, &
+        CALL Stats_Calculate( oi%ships(n)%loc%obs_global_index, &
+                              0, oi%ships(n)%u%qc, &
                               oi%ships(n)%u%inv, nu, &
                               ships%minimum%u, ships%maximum%u, &
                               ships%average%u, ships%rms_err%u)
-        CALL Stats_Calculate( n, 0, oi%ships(n)%v%qc, &
+        CALL Stats_Calculate( oi%ships(n)%loc%obs_global_index, &
+                              0, oi%ships(n)%v%qc, &
                               oi%ships(n)%v%inv, nv, &
                               ships%minimum%v, ships%maximum%v, &
                               ships%average%v, ships%rms_err%v)
-        CALL Stats_Calculate( n, 0, oi%ships(n)%t%qc, &
+        CALL Stats_Calculate( oi%ships(n)%loc%obs_global_index, &
+                              0, oi%ships(n)%t%qc, &
                               oi%ships(n)%t%inv, nt, &
                               ships%minimum%t, ships%maximum%t, &
                               ships%average%t, ships%rms_err%t)
-        CALL Stats_Calculate( n, 0, oi%ships(n)%p%qc, &
+        CALL Stats_Calculate( oi%ships(n)%loc%obs_global_index, &
+                              0, oi%ships(n)%p%qc, &
                               oi%ships(n)%p%inv, np, &
                               ships%minimum%p, ships%maximum%p, &
                               ships%average%p, ships%rms_err%p)
-        CALL Stats_Calculate( n, 0, oi%ships(n)%q%qc, &
+        CALL Stats_Calculate( oi%ships(n)%loc%obs_global_index, &
+                              0, oi%ships(n)%q%qc, &
                               oi%ships(n)%q%inv, nq, &
                               ships%minimum%q, ships%maximum%q, &
                               ships%average%q, ships%rms_err%q)

@@ -33,24 +33,29 @@ SUBROUTINE DA_OI_Stats_Synop ( stats_unit, oi )
   IF ( oi%num_synop > 0 ) THEN
     DO n=1, oi%num_synop
       if( oi%synop(n)%loc%proc_domain ) then
-        CALL Stats_Calculate( n, 0, oi%synop(n)%u%qc, &
+        CALL Stats_Calculate( oi%Synop(n)%loc%obs_global_index, &
+                              0, oi%synop(n)%u%qc, &
                               oi%synop(n)%u%inv, nu, &
                               synop%minimum%u, synop%maximum%u, &
                               synop%average%u, synop%rms_err%u)
-        CALL Stats_Calculate( n, 0, oi%synop(n)%v%qc, &
+        CALL Stats_Calculate( oi%Synop(n)%loc%obs_global_index, &
+                              0, oi%synop(n)%v%qc, &
                               oi%synop(n)%v%inv, nv, &
                               synop%minimum%v, synop%maximum%v, &
                               synop%average%v, synop%rms_err%v)
-        CALL Stats_Calculate( n, 0, oi%synop(n)%t%qc, &
+        CALL Stats_Calculate( oi%Synop(n)%loc%obs_global_index, &
+                              0, oi%synop(n)%t%qc, &
                               oi%synop(n)%t%inv, nt, &
                               synop%minimum%t, synop%maximum%t, &
                               synop%average%t, synop%rms_err%t)
-        CALL Stats_Calculate( n, 0, oi%synop(n)%p%qc, &
+        CALL Stats_Calculate( oi%Synop(n)%loc%obs_global_index, &
+                              0, oi%synop(n)%p%qc, &
                               oi%synop(n)%p%inv, np, &
                               synop%minimum%p, synop%maximum%p, &
                               synop%average%p, synop%rms_err%p)
 
-        CALL Stats_Calculate( n, 0, oi%synop(n)%q%qc, &
+        CALL Stats_Calculate( oi%Synop(n)%loc%obs_global_index, &
+                              0, oi%synop(n)%q%qc, &
                               oi%synop(n)%q%inv, nq, &
                               synop%minimum%q, synop%maximum%q, &
                               synop%average%q, synop%rms_err%q )

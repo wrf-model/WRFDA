@@ -28,11 +28,13 @@ SUBROUTINE DA_OI_Stats_Profiler ( stats_unit, oi )
       if( oi%profiler(n)%loc%proc_domain ) then
 
        do k=1, oi%Profiler(n)%info%levels
-         CALL Stats_Calculate( n, k, oi%Profiler(n)%u(k)%qc,  &
+         CALL Stats_Calculate( oi%Profiler(n)%loc%obs_global_index, &
+                               k, oi%Profiler(n)%u(k)%qc,  &
                                oi%Profiler(n)%u(k)%inv, nu, &
                                Profiler%minimum%u, Profiler%maximum%u, &
                                Profiler%average%u, Profiler%rms_err%u)
-         CALL Stats_Calculate( n, k, oi%Profiler(n)%v(k)%qc, &
+         CALL Stats_Calculate( oi%Profiler(n)%loc%obs_global_index, &
+                               k, oi%Profiler(n)%v(k)%qc, &
                                oi%Profiler(n)%v(k)%inv, nv, &
                                Profiler%minimum%v, Profiler%maximum%v, &
                                Profiler%average%v, Profiler%rms_err%v)

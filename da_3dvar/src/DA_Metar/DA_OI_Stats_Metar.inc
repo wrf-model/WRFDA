@@ -34,23 +34,28 @@ SUBROUTINE DA_OI_Stats_Metar ( stats_unit, oi )
     DO n=1, oi%num_metar
       if( oi%metar(n)%loc%proc_domain ) then
 
-        CALL Stats_Calculate( n, 0, oi%metar(n)%u%qc, &
+        CALL Stats_Calculate( oi%metar(n)%loc%obs_global_index, &
+                              0, oi%metar(n)%u%qc, &
                               oi%metar(n)%u%inv, nu, &
                               metar%minimum%u, metar%maximum%u, &
                               metar%average%u, metar%rms_err%u )
-        CALL Stats_Calculate( n, 0, oi%metar(n)%v%qc, &
+        CALL Stats_Calculate( oi%metar(n)%loc%obs_global_index, &
+                              0, oi%metar(n)%v%qc, &
                               oi%metar(n)%v%inv, nv, &
                               metar%minimum%v, metar%maximum%v, &
                               metar%average%v, metar%rms_err%v)
-        CALL Stats_Calculate( n, 0, oi%metar(n)%t%qc, &
+        CALL Stats_Calculate( oi%metar(n)%loc%obs_global_index, &
+                              0, oi%metar(n)%t%qc, &
                               oi%metar(n)%t%inv, nt, &
                               metar%minimum%t, metar%maximum%t, &
                               metar%average%t, metar%rms_err%t)
-        CALL Stats_Calculate( n, 0, oi%metar(n)%p%qc, &
+        CALL Stats_Calculate( oi%metar(n)%loc%obs_global_index, &
+                              0, oi%metar(n)%p%qc, &
                               oi%metar(n)%p%inv, np, &
                               metar%minimum%p, metar%maximum%p, &
                               metar%average%p, metar%rms_err%p)
-        CALL Stats_Calculate( n, 0, oi%metar(n)%q%qc, &
+        CALL Stats_Calculate( oi%metar(n)%loc%obs_global_index, &
+                              0, oi%metar(n)%q%qc, &
                               oi%metar(n)%q%inv, nq, &
                               metar%minimum%q, metar%maximum%q, &
                               metar%average%q, metar%rms_err%q)

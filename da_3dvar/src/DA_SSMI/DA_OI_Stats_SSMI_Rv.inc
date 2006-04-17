@@ -26,14 +26,16 @@ SUBROUTINE DA_OI_Stats_SSMI_Rv( stats_unit, oi )
 
       if( oi%ssmi_retrieval(n)%loc%proc_domain ) then
 
-        CALL Stats_Calculate( n, 0, oi%ssmi_retrieval(n)%tpw%qc, &
+        CALL Stats_Calculate( oi%ssmi_retrieval(n)%loc%obs_global_index, &
+                              0, oi%ssmi_retrieval(n)%tpw%qc, &
                               oi%ssmi_retrieval(n)%tpw%inv, ntpw, &
                               ssmi_retrieval%minimum%tpw, &
                               ssmi_retrieval%maximum%tpw,  &
                               ssmi_retrieval%average%tpw, &
                               ssmi_retrieval%rms_err%tpw )
 
-        CALL Stats_Calculate( n, 0, oi%ssmi_retrieval(n)%speed%qc, &
+        CALL Stats_Calculate( oi%ssmi_retrieval(n)%loc%obs_global_index, &
+                              0, oi%ssmi_retrieval(n)%speed%qc, &
                               oi%ssmi_retrieval(n)%speed%inv, nspeed, &
                               ssmi_retrieval%minimum%speed, &
                               ssmi_retrieval%maximum%speed, &

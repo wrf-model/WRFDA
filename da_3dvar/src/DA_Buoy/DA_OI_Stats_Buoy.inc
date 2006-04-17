@@ -33,23 +33,28 @@ SUBROUTINE DA_OI_Stats_Buoy ( stats_unit, oi )
   IF ( oi%num_buoy > 0 ) THEN
     DO n=1, oi%num_buoy
       if( oi%buoy(n)%loc%proc_domain ) then
-        CALL Stats_Calculate( n, 0, oi%buoy(n)%u%qc, &
+        CALL Stats_Calculate( oi%buoy(n)%loc%obs_global_index, &
+                              0, oi%buoy(n)%u%qc, &
                               oi%buoy(n)%u%inv, nu, &
                               buoy%minimum%u, buoy%maximum%u, &
                               buoy%average%u, buoy%rms_err%u)
-        CALL Stats_Calculate( n, 0, oi%buoy(n)%v%qc, &
+        CALL Stats_Calculate( oi%buoy(n)%loc%obs_global_index, &
+                              0, oi%buoy(n)%v%qc, &
                               oi%buoy(n)%v%inv, nv, &
                               buoy%minimum%v, buoy%maximum%v, &
                               buoy%average%v, buoy%rms_err%v)
-        CALL Stats_Calculate( n, 0, oi%buoy(n)%t%qc, &
+        CALL Stats_Calculate( oi%buoy(n)%loc%obs_global_index, &
+                              0, oi%buoy(n)%t%qc, &
                               oi%buoy(n)%t%inv, nt, &
                               buoy%minimum%t, buoy%maximum%t, &
                               buoy%average%t, buoy%rms_err%t)
-        CALL Stats_Calculate( n, 0, oi%buoy(n)%p%qc, &
+        CALL Stats_Calculate( oi%buoy(n)%loc%obs_global_index, &
+                              0, oi%buoy(n)%p%qc, &
                               oi%buoy(n)%p%inv, np, &
                               buoy%minimum%p, buoy%maximum%p, &
                               buoy%average%p, buoy%rms_err%p)
-        CALL Stats_Calculate( n, 0, oi%buoy(n)%q%qc, &
+        CALL Stats_Calculate( oi%buoy(n)%loc%obs_global_index, &
+                              0, oi%buoy(n)%q%qc, &
                               oi%buoy(n)%q%inv, nq, &
                               buoy%minimum%q, buoy%maximum%q, &
                               buoy%average%q, buoy%rms_err%q)

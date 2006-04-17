@@ -30,14 +30,16 @@ SUBROUTINE DA_OI_Stats_Radar ( stats_unit, oi )
       do k=1, oi%Radar(n)%info%levels
          
          IF ( USE_Radar_rv ) THEN
-         CALL Stats_Calculate( n, k, oi%Radar(n)%rv(k)%qc, &
+         CALL Stats_Calculate( oi%Radar(n)%loc%obs_global_index, &
+                               k, oi%Radar(n)%rv(k)%qc, &
                                oi%Radar(n)%rv(k)%inv, nrv, &
                                Radar%minimum%rv, Radar%maximum%rv, &
                                Radar%average%rv, Radar%rms_err%rv)
         ENDIF
 
          IF ( USE_Radar_rf ) THEN
-         CALL Stats_Calculate( n, k, oi%Radar(n)%rf(k)%qc, &
+         CALL Stats_Calculate( oi%Radar(n)%loc%obs_global_index, &
+                               k, oi%Radar(n)%rf(k)%qc, &
                                oi%Radar(n)%rf(k)%inv, nrf, &
                                Radar%minimum%rf, Radar%maximum%rf, &
                                Radar%average%rf, Radar%rms_err%rf)
