@@ -42,10 +42,7 @@ subroutine da_setup_be_global( ide, jde, kde, be  )
    real, allocatable           :: power(:)               ! Temporary power spectrum.
    real, allocatable           :: power2d(:,:)           ! Temporary power spectrum.
 
-   write (6,'(A)') ' ----------------------------------------------------------'
-   write (6,'(a)') ' [3.0] Set up background errors (be) for global WRF-Var'
-   write (6,'(A)') ' ----------------------------------------------------------'
-   write (6,*)
+   CALL wrf_message("[3.0] Set up background errors (be) for global WRF-Var")
 
    be % max_wave = ide / 2 - 1
 
@@ -66,8 +63,10 @@ subroutine da_setup_be_global( ide, jde, kde, be  )
    read(be_unit, err = 100)bin(1:ni,1:nj,1:nk)
    read(be_unit, err = 100)bin2d(1:ni,1:nj)
 
-   if( ni /= ide .or. nj /= jde .or. nk /= kde ) &
-   stop ' Cannot generate BE at this resolution'
+   if( ni /= ide .or. nj /= jde .or. nk /= kde ) THEN
+     CALL wrf_error_fatal3(__FILE__,__LINE__, &
+       "Cannot generate BE at this resolution")
+   END IF
 
 !---------------------------------------------------------------------
 !  [2] Read in be regression coefficients:
@@ -182,7 +181,7 @@ subroutine da_setup_be_global( ide, jde, kde, be  )
    end do
 
    be % v1 % max_wave = maxval(max_wave(1:nk))
-   write(6,'(/4x,3a,i6)')'Horizontal truncation for ', be % v1 % name, ' = ', be % v1 % max_wave
+   write(UNIT=stdout,FMT='(/4x,3a,i6)')'Horizontal truncation for ', be % v1 % name, ' = ', be % v1 % max_wave
    allocate( be % v1 % power(0:be % v1 % max_wave,1:nk))
    be % v1 % power(0:be % v1 % max_wave,1:nk) = power2d(0:be % v1 % max_wave,1:nk)
    be % v1 % power(0,1:nk) = len_scaling1 * be % v1 % power(0,1:nk) 
@@ -200,7 +199,7 @@ subroutine da_setup_be_global( ide, jde, kde, be  )
    end do
 
    be % v2 % max_wave = maxval(max_wave(1:nk))
-   write(6,'(4x,3a,i6)')'Horizontal truncation for ', be % v2 % name, ' = ', be % v2 % max_wave
+   write(UNIT=stdout,FMT='(4x,3a,i6)')'Horizontal truncation for ', be % v2 % name, ' = ', be % v2 % max_wave
    allocate( be % v2 % power(0:be % v2 % max_wave,1:nk))
    be % v2 % power(0:be % v2 % max_wave,1:nk) = power2d(0:be % v2 % max_wave,1:nk)
    be % v2 % power(0,1:nk) = len_scaling2 * be % v2 % power(0,1:nk) 
@@ -218,7 +217,7 @@ subroutine da_setup_be_global( ide, jde, kde, be  )
    end do
 
    be % v3 % max_wave = maxval(max_wave(1:nk))
-   write(6,'(4x,3a,i6)')'Horizontal truncation for ', be % v3 % name, ' = ', be % v3 % max_wave
+   write(UNIT=stdout,FMT='(4x,3a,i6)')'Horizontal truncation for ', be % v3 % name, ' = ', be % v3 % max_wave
    allocate( be % v3 % power(0:be % v3 % max_wave,1:nk))
    be % v3 % power(0:be % v3 % max_wave,1:nk) = power2d(0:be % v3 % max_wave,1:nk)
    be % v3 % power(0,1:nk) = len_scaling3 * be % v3 % power(0,1:nk) 
@@ -236,7 +235,7 @@ subroutine da_setup_be_global( ide, jde, kde, be  )
    end do
 
    be % v4 % max_wave = maxval(max_wave(1:nk))
-   write(6,'(4x,3a,i6)')'Horizontal truncation for ', be % v4 % name, ' = ', be % v4 % max_wave
+   write(UNIT=stdout,FMT='(4x,3a,i6)')'Horizontal truncation for ', be % v4 % name, ' = ', be % v4 % max_wave
    allocate( be % v4 % power(0:be % v4 % max_wave,1:nk))
    be % v4 % power(0:be % v4 % max_wave,1:nk) = power2d(0:be % v4 % max_wave,1:nk)
    be % v4 % power(0,1:nk) = len_scaling4 * be % v4 % power(0,1:nk) 
@@ -254,7 +253,7 @@ subroutine da_setup_be_global( ide, jde, kde, be  )
    call da_truncate_spectra( be % max_wave, max_wave_in, power_truncation, &
                              power, be % v5 % max_wave )
 
-   write(6,'(4x,3a,i6)')'Horizontal truncation for ', be % v5 % name, ' = ', be % v5 % max_wave
+   write(UNIT=stdout,FMT='(4x,3a,i6)')'Horizontal truncation for ', be % v5 % name, ' = ', be % v5 % max_wave
    allocate( be % v5 % power(0:be % v5 % max_wave,1))
    be % v5 % power(0:be % v5 % max_wave,1) = power(0:be % v5 % max_wave)
    be % v5 % power(0,1) = len_scaling5 * be%v5%power(0,1) 
@@ -286,7 +285,7 @@ subroutine da_setup_be_global( ide, jde, kde, be  )
       be % alpha % mz = be % ne
       be % alpha % name = 'alpha'
       be % alpha % max_wave = alpha_truncation
-      write(6,'(4x,3a,i6)')'Horizontal truncation for ', be % alpha % name, ' = ', be % alpha % max_wave
+      write(UNIT=stdout,FMT='(4x,3a,i6)')'Horizontal truncation for ', be % alpha % name, ' = ', be % alpha % max_wave
 
       allocate( power(0:be % alpha % max_wave) )
       call da_calc_power_spectrum( be % alpha % max_wave, power )
@@ -301,8 +300,8 @@ subroutine da_setup_be_global( ide, jde, kde, be  )
 
    close(be_unit)
    return
-99  write(6,'(a, i5)')' Unexpected end on BE-unit = ',be_unit
-100 write(6,'(a, i5)')' Read error on BE-unit = ',be_unit
+99  write(UNIT=stdout,FMT='(a, i5)')' Unexpected end on BE-unit = ',be_unit
+100 write(UNIT=stdout,FMT='(a, i5)')' Read error on BE-unit = ',be_unit
    stop     
 
    deallocate( power )
