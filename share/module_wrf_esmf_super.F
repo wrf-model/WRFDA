@@ -20,11 +20,13 @@ MODULE module_wrf_esmf_super
    USE module_timing
    USE module_wrf_error
 
+   USE ESMF_BaseMod
+   USE ESMF_Stubs
+
 #ifdef DM_PARALLEL
    USE module_dm
 #endif
 
-   USE JRB_Stubs
    USE ESMF_ClockMod
 
    IMPLICIT NONE

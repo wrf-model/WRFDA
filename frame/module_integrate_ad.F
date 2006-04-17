@@ -15,7 +15,6 @@ RECURSIVE SUBROUTINE integrate_ad ( grid, nl_date_string, nl_date_index, ad_date
    USE module_configure
    USE module_timing
    USE WRF_ESMF_MOD
-   USE JRB_Stubs
 
    IMPLICIT NONE
 
