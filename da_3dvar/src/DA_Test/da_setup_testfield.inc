@@ -3,18 +3,16 @@ subroutine da_setup_testfield( xb, xa, xp, &
                               ims,ime, jms,jme, kms,kme, &
                               its,ite, jts,jte, kts,kte )
 
-!------------------------------------------------------------------------------
-!  PURPOSE: produce test increment field based on xb field.
-!
-!  METHOD:  pass through x=uv transfom to ensure satisfies boundary conditions.
-!
-!  HISTORY: 02/23/2000 - creation of f90 version.        Dale Barker
-!------------------------------------------------------------------------------
+   !----------------------------------------------------------------------------
+   ! PURPOSE: produce test increment field based on xb field.
+   !
+   ! METHOD:  pass through x=uv transfom to ensure satisfies boundary conditions
+   !----------------------------------------------------------------------------
 
    implicit none
 
-   type (xb_type), intent(in)  :: xb     ! first guess (local).
-   type (x_type) , intent(out) :: xa     ! gridded analy. incs. (local)
+   type (xb_type),    intent(in)  :: xb  ! first guess (local).
+   type (x_type) ,    intent(out) :: xa  ! gridded analy. incs. (local)
    type (xpose_type), intent(in)  :: xp  ! Transpose variables.
 
    integer, intent(in)  :: ids,ide, jds,jde, kds,kde  ! domain dims.
@@ -23,18 +21,18 @@ subroutine da_setup_testfield( xb, xa, xp, &
 
    integer :: i, j
 
-!-------------------------------------------------------------------------
-!  [1.0]: initialise:
-!-------------------------------------------------------------------------
+   !-------------------------------------------------------------------------
+   ! [1.0]: initialise:
+   !-------------------------------------------------------------------------
 
    write(UNIT=stdout, fmt='(/a/)') &
-        'Starting da_setup_testfield ...'
+      'Starting da_setup_testfield ...'
 
-!-------------------------------------------------------------------------
-!  [2.0]: set up test increment field structure:
-!-------------------------------------------------------------------------
+   !-------------------------------------------------------------------------
+   ! [2.0]: set up test increment field structure:
+   !-------------------------------------------------------------------------
 
-!  [2.1] test wind, temperature, pressure, and humidity.
+   ! [2.1] test wind, temperature, pressure, and humidity.
 
 #ifndef DEREF_KLUDGE
    call set_tst_trnsf_fld(xp, xa%u, xb%u, typical_u_rms)
@@ -57,7 +55,7 @@ subroutine da_setup_testfield( xb, xa, xp, &
 
 #endif
 
-!  [2.5] get test density increment from linearised ideal gas law:
+   ! [2.5] get test density increment from linearised ideal gas law:
 
    call da_pt_to_rho_lin( xb, xa, xp )
 
@@ -65,37 +63,38 @@ subroutine da_setup_testfield( xb, xa, xp, &
    xa%p   (xp%its:xp%ite, xp%jts:xp%jte, xp%kts)
 
    if(print_detail > 100) then
-   write(UNIT=stdout, fmt='(2a,4x,a,i8)') &
-        'file:', __FILE__, 'line:', __LINE__
+      write(UNIT=stdout, fmt='(2a,4x,a,i8)') &
+         'file:', __FILE__, 'line:', __LINE__
 
-   print *, 'xp%its, xp%ite, xp%jts, xp%jte) =', xp%its, xp%ite, xp%jts, xp%jte
+      write(UNIT=stdout, fmt=*) 'xp%its, xp%ite, xp%jts, xp%jte) =', &
+         xp%its, xp%ite, xp%jts, xp%jte
    
-   do j=xp%jts, xp%jte
-   do i=xp%its, xp%ite
-      if(i == j) then
-         write(UNIT=stdout, fmt='(2(a,i4),a,f14.6)') &
-              'xa%psfc(', i, ',', j, ') =', xa%psfc(i, j)
-      endif
-   enddo
-   enddo
+      do j=xp%jts, xp%jte
+         do i=xp%its, xp%ite
+            if(i == j) then
+               write(UNIT=stdout, fmt='(2(a,i4),a,f14.6)') &
+                  'xa%psfc(', i, ',', j, ') =', xa%psfc(i, j)
+            endif
+         enddo
+      enddo
    endif
 
-!--Exchange XA halo region.
+   !--Exchange XA halo region.
    CALL wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id4)
 
    if (sfc_assi_options == 2) then
-!-----Exchange XA (surface variable) halo region.
+      !-----Exchange XA (surface variable) halo region.
       CALL wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id6)
    endif
 
    if ( use_ssmt1obs .or. use_ssmt2obs .or. Use_GpspwObs .or. &
         Use_SsmiTbObs .or. Use_SsmiRetrievalObs ) then
 
-!-----Now do something for PW
+      !-----Now do something for PW
       call DA_Transform_XToTPW( xa, xb )
 
-!--------GPS Refractivity:
-         if ( use_GpsrefObs ) &
+      !--------GPS Refractivity:
+      if ( use_GpsrefObs ) &
          call da_transform_XTogpsref_lin(xa, xb, xp)
 
       if ( use_ssmt1obs .or. use_ssmt2obs .or. &
@@ -103,12 +102,12 @@ subroutine da_setup_testfield( xb, xa, xp, &
          call DA_Transform_XToSeaSfcWind_Lin( xa, xb )
       endif
 
-!-----Exchange XA halo region.
+      !-----Exchange XA halo region.
       CALL wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id8)
    endif
 
    write(UNIT=stdout, fmt='(/a/)') &
-        'End of da_setup_testfield.'
+      'End of da_setup_testfield.'
 
 end subroutine da_setup_testfield
 
