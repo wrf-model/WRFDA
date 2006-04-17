@@ -123,8 +123,9 @@ SUBROUTINE DA_Count_Filtered_Obs (iunit, xp)
                    platform%info%elv,         &
                    platform%info%id
       IF (iost /= 0) THEN
-          WRITE (0,'(/A,I9)') ' END OF OBS UNIT: ',iunit
-          WRITE (0,'(/A,I9)') ' IOSTAT:          ',iost
+         ! This is expected, but its unclear how we handle failure
+         ! here without assuming the fortran2003 convention on
+         ! error statuses
          if( first_time) then
          EXIT reports
          else
