@@ -62,8 +62,7 @@ SHARE_OBJS    = 		\
 
 module_wrf_esmf_super.o : module_integrate_ad.o \
                           module_integrate_tl.o \
-                          module_integrate_tst.o \
-                          JRB_Stubs.o
+                          module_integrate_tst.o
 
 solve_interface.o: solve_em.int module_domain.o module_configure.o \
 		module_timing.o module_driver_constants.o \

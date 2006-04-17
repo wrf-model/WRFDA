@@ -14,8 +14,7 @@ FRAME_MODULES =       module_driver_constants.o  \
                 module_io.o                \
                 module_dm.o                \
                 module_quilt_outbuf_ops.o  \
-                module_io_quilt.o          \
-                JRB_Stubs.o
+                module_io_quilt.o
 
 FRAME_OBJS    =       wrf_num_bytes_between.o    \
                 wrf_shutdown.o             \
@@ -76,7 +75,6 @@ module_integrate_ad.o: module_domain.o \
 		module_state_description.o \
 		module_nesting.o \
 		module_configure.o \
-                JRB_Stubs.o \
 		$(ESMF_MOD_DEPENDENCE)
 
 module_io.o : md_calls.inc \
