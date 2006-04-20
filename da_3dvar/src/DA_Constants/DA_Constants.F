@@ -155,6 +155,9 @@ MODULE DA_Constants
    INTEGER :: stdout = 6          ! Standard output
    INTEGER :: stderr = 0          ! Standard error
 
+   ! trace_unit can be controlled by record1 in namelist
+   INTEGER :: trace_unit = 99
+
    ! Do not use unit 10, as that is used by WRF for reading namelist.input
 
    INTEGER, PARAMETER :: jpout = 11           ! Unit number for x output.
@@ -585,6 +588,20 @@ MODULE DA_Constants
  logical                       :: use_radiance,  use_obsgts, &
                                   lread_biascoef,lbiascorr, lrttov_scatt, lmonitoring, &
                                   lwrite_iv, lwrite_profile
+
+! Tracing
+
+LOGICAL :: trace_use    = .FALSE.        ! Is tracing on overall?
+LOGICAL :: trace_memory = .TRUE.        ! Should memory useage info be collected
+! CHARACTER (LEN=200) :: TraceFile="trace.html" ! trace filename
+INTEGER :: trace_pe=0                   ! PE number for tracing (defaults to 0)
+INTEGER :: trace_max_depth=100          ! Maximum depth for PRINTing trace
+INTEGER :: trace_repeat_head=100        ! Number of times trace header details
+                                        ! can be PRINTed
+INTEGER :: trace_repeat_body=100        ! Number of times trace body details
+                                        ! can be PRINTed
+INTEGER :: trace_start_points=0         ! Number of routines to initiate trace (0=all)
+CHARACTER(LEN=200) :: DocumentationURL="http://box.mmm.ucar.edu/people/bray/wrfvar/html"
 
  CONTAINS
 
