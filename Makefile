@@ -68,9 +68,7 @@ var :
 	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" toolsdir
 	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" REGISTRY="Registry" framework
 	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" shared
-	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" wrfvar_io
 	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" wrfvar_src
-	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" wrfvar_interface
 	( cd main ; $(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" wrfvar )
 
 pure_var : 
@@ -289,14 +287,6 @@ em_core :
 wrfvar_src :
 	@ echo '--------------------------------------'
 	( cd da_3dvar/src; $(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES_2)" wrfvar )
-
-wrfvar_io :
-	@ echo '--------------------------------------'
-	( cd da_3dvar; $(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" wrfvar_io )
-
-wrfvar_interface :
-	@ echo '--------------------------------------'
-	( cd da_3dvar; $(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" wrfvar_interface )
 
 convertor_drivers :
 	@ echo '--------------------------------------'
