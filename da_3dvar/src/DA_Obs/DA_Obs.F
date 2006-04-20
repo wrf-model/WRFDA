@@ -22,6 +22,7 @@ MODULE DA_Obs
    USE DA_Buoy 
    USE par_util
    USE DA_Tools
+   USE da_tracing
    USE da_radiance
    USE module_wrf_error
 
