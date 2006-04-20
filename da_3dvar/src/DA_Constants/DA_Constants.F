@@ -591,7 +591,7 @@ MODULE DA_Constants
 
 ! Tracing
 
-LOGICAL :: trace_use    = .FALSE.        ! Is tracing on overall?
+LOGICAL :: trace_use    = .TRUE.        ! Is tracing on overall?
 LOGICAL :: trace_memory = .TRUE.        ! Should memory useage info be collected
 ! CHARACTER (LEN=200) :: TraceFile="trace.html" ! trace filename
 INTEGER :: trace_pe=0                   ! PE number for tracing (defaults to 0)
