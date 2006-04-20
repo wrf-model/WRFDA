@@ -18,6 +18,9 @@ SUBROUTINE DA_Deallocate_Y( y )
    TYPE (y_type), INTENT(INOUT)          :: y      ! residual type structure.
    INTEGER                               :: n,i,j  ! Loop counter.
 
+
+   IF (trace_use) CALL da_trace_entry("da_deallocate_y")
+
 !------------------------------------------------------------------------------
 !  [1.0] Deallocate:
 !------------------------------------------------------------------------------
@@ -143,5 +146,7 @@ SUBROUTINE DA_Deallocate_Y( y )
     end do
      DEALLOCATE (y % instid)
    END IF
+
+   IF (trace_use) CALL da_trace_exit("da_deallocate_y")
 
 END SUBROUTINE DA_Deallocate_Y
