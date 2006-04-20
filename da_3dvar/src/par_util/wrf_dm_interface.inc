@@ -42,40 +42,6 @@ SUBROUTINE mm5_struct_bcast( x_mm5 )
    RETURN
 END SUBROUTINE mm5_struct_bcast
 
-SUBROUTINE proc_sum_int ( value )
-
-!------------------------------------------------------------------------------
-!  PURPOSE: Do MPI sum operation across processors to get the global sum of
-!           an integer value. The sum is returned only on the root processor,
-!           i.e., processor 0. (In this way, we do not have to do all-to-all 
-!           communication.)
-!
-!------------------------------------------------------------------------------
-
-   INTEGER,   INTENT(IN)      :: value     ! Value on processor.
-
-   return
-
-END SUBROUTINE proc_sum_int
-
-SUBROUTINE proc_sum_real ( n, value )
-
-!------------------------------------------------------------------------------
-!  PURPOSE: Do MPI reduction operation across processors to sum a real vector.  
-!           On return, each of the N components of the vector "value" represents
-!           the sum of parts from each processor. The result is stored only on 
-!           the root processor, i.e., processor 0. (In this way, we do not have 
-!           to do all-to-all communication.)
-!
-!------------------------------------------------------------------------------
-
-   INTEGER, INTENT(IN)         :: n        ! Length of value array. 
-   REAL,    INTENT(INOUT)      :: value(n) ! Array to be summed componentwise.
-
-   return
-
-END SUBROUTINE proc_sum_real
-
 SUBROUTINE proc_sum_count_obs ( count_obs )
 
 !------------------------------------------------------------------------------
