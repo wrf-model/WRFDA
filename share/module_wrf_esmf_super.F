@@ -311,8 +311,8 @@ CONTAINS
 
       head_grid%current_time = head_grid%start_time
 ! JRB bugger it
-!      CALL ESMF_ClockSetCurrTime( head_grid%domain_clock, currTime=head_grid%current_time, rc=rc )
-!      CALL ESMF_ClockGetCurrTime( head_grid%domain_clock, currTime=head_grid%current_time, rc=rc )
+      CALL ESMF_ClockSetCurrTime( head_grid%domain_clock, currTime=head_grid%current_time, rc=rc )
+      CALL ESMF_ClockGetCurrTime( head_grid%domain_clock, currTime=head_grid%current_time, rc=rc )
 
       CALL integrate_tl ( head_grid, nl_date_string, nl_date_index )
 
@@ -328,8 +328,8 @@ CONTAINS
 
       head_grid%current_time = head_grid%stop_time
 !JRB bugger it
-!      CALL ESMF_ClockSetCurrTime( head_grid%domain_clock, currTime=head_grid%current_time, rc=rc )
-!      CALL ESMF_ClockGetCurrTime( head_grid%domain_clock, currTime=head_grid%current_time, rc=rc )
+      CALL ESMF_ClockSetCurrTime( head_grid%domain_clock, currTime=head_grid%current_time, rc=rc )
+      CALL ESMF_ClockGetCurrTime( head_grid%domain_clock, currTime=head_grid%current_time, rc=rc )
 
       CALL integrate_ad ( head_grid, nl_date_string, nl_date_index, ad_date_string, ad_date_index )
    ELSE IF ( config_flags%dyn_opt == DYN_EM_TST ) THEN
