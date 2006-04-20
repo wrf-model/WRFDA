@@ -19,7 +19,9 @@ SUBROUTINE proc_sum_count_obs ( count_obs )
 !         07/08/2003 - Updated for Buoy     obs.           S. R. H. Rizvi
 !-------------------------------------------------------------------------------
 
+#ifdef DM_PARALLEL
    INCLUDE 'mpif.h'
+#endif
    
    integer, parameter:: numvals = 100
 
@@ -33,6 +35,8 @@ SUBROUTINE proc_sum_count_obs ( count_obs )
    INTEGER           :: offset                ! Index into procval and sumval arrays.
 
    LOGICAL, EXTERNAL :: wrf_dm_on_monitor
+
+#ifdef DM_PARALLEL
 
 ! Get rank of monitor processor and broadcast to others.
    call MPI_COMM_RANK( MPI_COMM_WORLD, myrank, ierr )
@@ -85,6 +89,9 @@ SUBROUTINE proc_sum_count_obs ( count_obs )
      call unpack_count_obs( count_obs % num_bogus, offset, sumval )
      call unpack_count_obs( count_obs % num_buoy, offset, sumval )
    END IF
+
+#endif
+
    RETURN
 END SUBROUTINE proc_sum_count_obs
 

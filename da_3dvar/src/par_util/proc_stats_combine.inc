@@ -9,7 +9,9 @@ SUBROUTINE proc_stats_combine( proc_ave, proc_err, proc_min, proc_max, &
 !
 !------------------------------------------------------------------------------
 
+#ifdef DM_PARALLEL
    INCLUDE 'mpif.h'
+#endif
 
    REAL,      INTENT(INOUT)      :: proc_ave       ! Processor average.
    REAL,      INTENT(INOUT)      :: proc_err       ! Processor rms error.
@@ -31,6 +33,8 @@ SUBROUTINE proc_stats_combine( proc_ave, proc_err, proc_min, proc_max, &
    INTEGER :: status(mpi_status_size) ! MPI status.
 
    LOGICAL, EXTERNAL :: wrf_dm_on_monitor
+
+#ifdef DM_PARALLEL
 
 ! Get rank of monitor processor and broadcast to others.
    call MPI_COMM_RANK( MPI_COMM_WORLD, myrank, ierr ) 
@@ -92,5 +96,7 @@ SUBROUTINE proc_stats_combine( proc_ave, proc_err, proc_min, proc_max, &
      end if
    end if
    RETURN
+#endif
+
 END SUBROUTINE proc_stats_combine
 

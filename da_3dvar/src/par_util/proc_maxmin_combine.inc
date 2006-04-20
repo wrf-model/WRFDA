@@ -11,7 +11,10 @@ SUBROUTINE proc_maxmin_combine( n, max, min )
 !
 !------------------------------------------------------------------------------
 
+#ifdef DM_PARALLEL
    INCLUDE 'mpif.h'
+#endif
+
 
    INTEGER,   INTENT(IN)                    :: n       ! Length of input fields.
    TYPE (maxmin_field_type), INTENT(INOUT)  :: max(n)  ! Max values over proc.
@@ -27,6 +30,8 @@ SUBROUTINE proc_maxmin_combine( n, max, min )
    INTEGER :: status(mpi_status_size) ! MPI status.
 
    LOGICAL, EXTERNAL :: wrf_dm_on_monitor
+
+#ifdef DM_PARALLEL
 
 ! Get rank of monitor processor and broadcast to others.
    call MPI_COMM_RANK( MPI_COMM_WORLD, myrank, ierr ) 
@@ -103,5 +108,7 @@ SUBROUTINE proc_maxmin_combine( n, max, min )
    end do
 
    RETURN
+#endif
+
 END SUBROUTINE proc_maxmin_combine
 

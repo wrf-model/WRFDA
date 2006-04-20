@@ -8,7 +8,9 @@ SUBROUTINE proc_diagnostics_collect(num_sound, iv, re )
 !
 !------------------------------------------------------------------------------
 
+#ifdef DM_PARALLEL
    INCLUDE 'mpif.h'
+#endif
 
    integer, intent(in)                       :: num_sound
    type (sound_type), intent(inout)          :: iv(:)
@@ -33,6 +35,8 @@ SUBROUTINE proc_diagnostics_collect(num_sound, iv, re )
    INTEGER :: status(mpi_status_size) ! MPI status.
 
    LOGICAL, EXTERNAL :: wrf_dm_on_monitor
+
+#ifdef DM_PARALLEL
 
 ! Allocate buffer.
    sum_levels = 0
@@ -184,5 +188,7 @@ SUBROUTINE proc_diagnostics_collect(num_sound, iv, re )
    DEALLOCATE ( t )
    DEALLOCATE ( q )
    RETURN
+#endif
+
 END SUBROUTINE proc_diagnostics_collect
 

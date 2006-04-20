@@ -8,7 +8,9 @@ SUBROUTINE proc_sum_int ( value )
 !
 !------------------------------------------------------------------------------
 
+#ifdef DM_PARALLEL
    INCLUDE 'mpif.h'
+#endif
 
    INTEGER,   INTENT(INOUT)      :: value     ! Value on processor.
 
@@ -19,6 +21,8 @@ SUBROUTINE proc_sum_int ( value )
 
    LOGICAL, EXTERNAL :: wrf_dm_on_monitor
 
+#ifdef DM_PARALLEL
+
 ! Get rank of monitor processor and broadcast to others.
    call MPI_COMM_RANK( MPI_COMM_WORLD, myrank, ierr )
 
@@ -28,6 +32,7 @@ SUBROUTINE proc_sum_int ( value )
    call MPI_REDUCE(value, sum, 1, MPI_INTEGER, MPI_SUM, root, MPI_COMM_WORLD, IERR )
 
    IF ( myrank .eq. root ) value = sum
-   RETURN
+#endif
+
 END SUBROUTINE proc_sum_int
 
