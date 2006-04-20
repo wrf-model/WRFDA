@@ -2,14 +2,17 @@
 # Lower level Makefile
 
 OBJS_FOR_ALL =		da_solve_v3d.o		\
+                        da_memory.o             \
+                        da_tracing.o            \
 			par_util.o              \
+			par_util1.o             \
 			DA_Setup_Structures.o	\
 			DA_Minimisation.o	\
 			DA_VToX_Transforms.o	\
 			DA_Obs.o		\
 			DA_Metar.o		\
-			DA_GeoAMV.o	       \
-			DA_PolarAMV.o	       \
+			DA_GeoAMV.o	        \
+			DA_PolarAMV.o	        \
 			DA_Ships.o		\
 			DA_Synop.o		\
 			DA_Sound.o		\
@@ -50,10 +53,13 @@ OBJS_FOR_ALL =		da_solve_v3d.o		\
 			rttov_const.o		\
 			rttov_global.o		\
 			rttov_types.o		\
-			parkind1.o	\
+			parkind1.o	        \
 			gsi_kinds.o		\
 			gsi_constants.o		\
-			BLAS.o
+			BLAS.o                  \
+                        module_wrfvar_top.o     \
+                        module_wrf_3dvar_interface.o \
+                        module_wrf_3dvar_io.o
 
 include ../../configure.wrf
 
@@ -73,6 +79,7 @@ par_util/generic_boilerplate.inc:	par_util/generic_boilerplate.m4
 
 par_util.o:		DA_Define_Structures.o		\
 			DA_Constants.o			\
+                        par_util1.o                      \
 			par_util/alloc_and_copy_be_arrays.inc	\
 			par_util/be_local_copy.inc		\
 			par_util/copy_dims.inc			\
@@ -101,6 +108,13 @@ par_util.o:		DA_Define_Structures.o		\
 			$(CPP) -I./par_util $(CPPFLAGS_WRFVAR) par_util/par_util.F > par_util.f
 			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) par_util.f
 
+par_util1.o:		par_util/proc_sum_int.inc		\
+			par_util/proc_sum_real.inc \
+			par_util/par_util1.F
+			$(RM) $@
+			$(CPP) -I./par_util $(CPPFLAGS_WRFVAR) par_util/par_util1.F > par_util1.f
+			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) par_util1.f
+
 da_solve_v3d.o:		DA_Constants.o			\
 			DA_Define_Structures.o		\
 			DA_Setup_Structures.o		\
@@ -115,7 +129,7 @@ da_solve_v3d.o:		DA_Constants.o			\
 			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) da_solve_v3d.f
 
 DA_Minimisation.o:	\
-			../module_wrf_3dvar_io.o \
+			module_wrf_3dvar_io.o \
 			DA_Constants.o \
 			DA_Define_Structures.o \
 			DA_VToX_Transforms.o \
@@ -173,6 +187,7 @@ DA_Setup_Structures.o:	\
 	                DA_ReadWrite_MM5.o \
 	                da_spectral.o \
 			da_radiance.o \
+                        module_wrf_3dvar_io.o \
 			DA_Setup_Structures/DA_Setup_Structures.F \
 			DA_Setup_Structures/da_add_increments.inc \
 			DA_Setup_Structures/DA_Add_PBL_And_SFC_Info.inc \
@@ -233,6 +248,10 @@ wrdesc.o:		da_bufrlib/wrdesc.c
 			$(RM) $@
 			$(CC) -c $(CFLAGS_BUFR) da_bufrlib/wrdesc.c
 
+da_memory.o:		da_tracing/da_memory.c
+			$(RM) $@
+			$(CC) -c $(CFLAGS) da_tracing/da_memory.c
+
 DA_VToX_Transforms.o:	\
 			par_util.o \
 			DA_Define_Structures.o \
@@ -287,6 +306,7 @@ DA_Obs.o:		\
 			da_radiance.o \
 			DA_Profiler.o \
 			DA_Buoy.o  \
+                        da_tracing.o \
 			par_util.o \
 			DA_Obs/DA_Obs.F \
 	                DA_Obs/DA_Obs_Proc_Station.inc \
@@ -1004,6 +1024,7 @@ DA_Statistics.o:	\
 
 DA_Define_Structures.o:	\
 			DA_Constants.o \
+                        da_tracing.o \
 			DA_Define_Structures/DA_Define_Structures.F \
 			DA_Define_Structures/DA_Allocate_Background_Errors.inc \
 			DA_Define_Structures/DA_Allocate_MM5_Model.inc \
@@ -1205,6 +1226,43 @@ da_spectral.o:		\
 			da_spectral/da_spectral.F
 			$(CPP) -I./da_spectral $(CPPFLAGS_WRFVAR) da_spectral/da_spectral.F > da_spectral.f
 			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) da_spectral.f
+
+
+module_wrf_3dvar_interface.o : da_modules/module_wrf_3dvar_interface.F \
+                               da_tracing.o
+			$(CPP) -I./da_modules $(CPPFLAGS_WRFVAR) da_modules/module_wrf_3dvar_interface.F > module_wrf_3dvar_interface.f
+			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) module_wrf_3dvar_interface.f
+
+module_wrf_3dvar_io.o : da_modules/module_wrf_3dvar_io.F \
+                        da_tracing.o
+			$(CPP) -I./da_modules $(CPPFLAGS_WRFVAR) da_modules/module_wrf_3dvar_io.F > module_wrf_3dvar_io.f
+			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) module_wrf_3dvar_io.f
+
+module_wrfvar_top.o : da_modules/module_wrfvar_top.F \
+                      module_wrf_3dvar_interface.o \
+                      da_tracing.o
+			$(CPP) -I./da_modules $(CPPFLAGS_WRFVAR) da_modules/module_wrfvar_top.F > module_wrfvar_top.f
+			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) module_wrfvar_top.f
+
+module_wrfvar_esmf_super.o : da_modules/module_wrfvar_esmf_super.F \
+                             module_wrf_3dvar_io.o \
+                             module_wrf_3dvar_interface.o
+			$(CPP) -I./da_modules $(CPPFLAGS_WRFVAR) da_modules/module_wrfvar_esmf_super.F > module_wrfvar_esmf_super.f
+			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) module_wrfvar_esmf_super.f
+
+da_tracing.o:           da_tracing/da_tracing.F           \
+                        da_tracing/da_trace_init.inc      \
+                        da_tracing/da_trace_entry.inc     \
+                        da_tracing/da_trace.inc           \
+                        da_tracing/da_trace_exit.inc      \
+                        da_tracing/da_trace_int_sort.inc  \
+                        da_tracing/da_trace_real_sort.inc \
+                        da_tracing/da_trace_report.inc    \
+                        DA_Constants.o                    \
+                        da_memory.o                       \
+                        par_util1.o
+			$(CPP) -I./da_tracing $(CPPFLAGS_WRFVAR) da_tracing/da_tracing.F > da_tracing.f
+			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) da_tracing.f
 
 be_spectral.o:		\
 			DA_Constants.o				\

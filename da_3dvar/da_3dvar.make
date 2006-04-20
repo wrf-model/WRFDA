@@ -1,5 +1,6 @@
 DA_OBJS        =	da_solve_v3d.o		\
 			par_util.o              \
+			par_util1.o             \
 			DA_Setup_Structures.o	\
 			DA_Minimisation.o	\
 			DA_VToX_Transforms.o	\
@@ -40,13 +41,12 @@ DA_OBJS        =	da_solve_v3d.o		\
 			da_h_ops.o		\
 			da_c_mat.o		\
 			DA_Constants.o		\
-			da_rf.o			\
-			da_mat.o      		\
-			da_rfz.o      		\
 			LAPACK.o		\
 			da_spectral.o           \
 			da_fftpack5.o           \
 			da_radiance.o		\
+                        da_tracing.o            \
+                        da_memory.o             \
 			rttov_const.o		\
 			rttov_global.o		\
 			rttov_types.o		\
@@ -69,7 +69,8 @@ module_wrfvar_top.o : module_wrf_3dvar_interface.o \
                       module_integrate.o \
                       module_wrf_3dvar_io.o
 
-module_wrf_3dvar_io.o : module_io_domain.o
+module_wrf_3dvar_io.o : module_io_domain.o  \
+                        da_tracing.o
 
 
 wrfvar_obj :	$(DA_OBJS)
@@ -84,7 +85,6 @@ generic_boilerplate.inc: generic_boilerplate.m4
 par_util.o:		par_util.F                     \
 			alloc_and_copy_be_arrays.inc   \
 			be_local_copy.inc              \
-			calculate_cv_local_size.inc    \
 			copy_dims.inc                  \
 			copy_tile_dims.inc             \
 			cv_to_vv.inc                   \
@@ -94,8 +94,6 @@ par_util.o:		par_util.F                     \
 			proc_maxmin_combine.inc        \
 			proc_stats_combine.inc         \
 			proc_sum_count_obs.inc         \
-			proc_sum_int.inc               \
-			proc_sum_real.inc              \
 			transpose.inc                  \
 			unpack_count_obs.inc           \
 			vv_to_cv.inc                   \
@@ -108,6 +106,10 @@ par_util.o:		par_util.F                     \
 			y_facade_to_global.inc         \
                         DA_Define_Structures.o	       \
 			DA_Constants.o
+
+par_util1.o:		par_util1.F                     \
+			proc_sum_int.inc               \
+			proc_sum_real.inc
 
 module_wrf_3dvar_interface.o : module_wrf_3dvar_interface.F \
                         module_domain.o                     \
@@ -159,12 +161,9 @@ DA_Minimisation.o:	DA_Minimisation.F             \
 			da_get_innov_vector.inc       \
 			da_dot.inc                    \
 			da_dot_cv.inc                 \
-			da_lmdir.inc                  \
 			da_minimisation_warning.inc   \
 			da_sum_reals.inc              \
-			da_va15bd.inc                 \
 			da_vd05bd.inc                 \
-			da_vd05ad.inc                 \
 			da_write_diagnostics.inc      \
 			DA_Calculate_GradY.inc        \
 			DA_Minimise_CG.inc
@@ -216,7 +215,8 @@ DA_Setup_Structures.o:	DA_Setup_Structures.F             \
 			da_transfer_wrftltoxa.inc         \
 			da_transfer_wrftltoxa_adj.inc     \
 			DA_Transfer_XatoAnalysis.inc      \
-			da_write_increments.inc
+			da_write_increments.inc           \
+                        da_setup_cv.inc
 
 bufrlib.prm:		bufrlib.PRM
 			$(RM) $@
@@ -261,12 +261,6 @@ DA_VToX_Transforms.o:	DA_VToX_Transforms.F              \
 			DA_Transform_VpToX_Adj.inc        \
 			DA_Transform_VvToVp.inc           \
 			DA_Transform_VvToVp_Adj.inc       \
-			da_apply_be.inc                   \
-			da_apply_be_adj.inc               \
-			da_apply_rf.inc                   \
-			da_apply_rf_adj.inc               \
-			da_transform_bal.inc              \
-			da_transform_bal_adj.inc          \
 			DA_Get_VPoles.inc                 \
 			DA_Get_SPoles.inc                 \
 			DA_Get_AVPoles.inc                \
@@ -897,6 +891,7 @@ DA_Statistics.o:	DA_Statistics.F            \
 
 DA_Define_Structures.o:	DA_Define_Structures.F              \
 			DA_Constants.o                      \
+                        da_tracing.o                        \
 			DA_Define_Structures.F              \
 			DA_Allocate_Background_Errors.inc   \
 			DA_Allocate_MM5_Model.inc           \
@@ -911,7 +906,9 @@ DA_Define_Structures.o:	DA_Define_Structures.F              \
 			da_allocate_cv.inc                  \
 			da_deallocate_cv.inc                \
 			da_gauss_noise.inc                  \
-			DA_Zero_Y.inc 
+			DA_Zero_Y.inc                       \
+                        module_domain.o                     \
+                        module_dm.o                 
 
 DA_Constants.o:		DA_Constants.F             \
 			DA_Array_Print.inc         \
@@ -919,16 +916,6 @@ DA_Constants.o:		DA_Constants.F             \
 			da_change_date.inc         \
 			DA_Find_FFT_Factors.inc    \
 			DA_Find_FFT_Trig_Funcs.inc
-
-da_rf.o:		da_rf.F
-			$(RM) $@
-			$(CPP) $(CPPFLAGS) da_rf.F > da_rf.f
-			$(FC) -c $(FCFLAGS_FFT_RF) da_rf.f
-
-da_rfz.o:		da_rfz.F
-			$(RM) $@
-			$(CPP) $(CPPFLAGS) da_rfz.F > da_rfz.f
-			$(FC) -c $(FCFLAGS_FFT_RF) da_rfz.f
 
 LAPACK.o:		LAPACK.F   \
 			BLAS.o     \
@@ -1147,6 +1134,19 @@ da_radiance.o:		da_radiance.F                     \
 			landem.inc                        \
 			snwem_amsu.inc                    \
 			seaem.inc
+
+da_tracing.o:           da_tracing.F                      \
+                        da_trace_init.inc                 \
+                        da_trace_entry.inc                \
+                        da_trace.inc                      \
+                        da_trace_exit.inc                 \
+                        da_trace_int_sort.inc             \
+                        da_trace_real_sort.inc            \
+                        da_trace_report.inc               \
+                        DA_Constants.o                    \
+                        da_memory.o                       \
+                        module_wrf_error.o                \
+                        par_util1.o
 
 rttov_const.o:		parkind1.o	\
 			rttov_const.F
