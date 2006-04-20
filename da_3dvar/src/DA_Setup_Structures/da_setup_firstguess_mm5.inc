@@ -31,6 +31,9 @@ SUBROUTINE DA_Setup_FirstGuess_MM5( xb, xbx, xp)
 
    LOGICAL, EXTERNAL :: wrf_dm_on_monitor
 
+   IF (trace_use) CALL da_trace_entry("da_setup_firstguess_mm5")
+
+
 !---------------------------------------------------------------------------
 !  [1.0] Read original MM5 format first guess:
 !---------------------------------------------------------------------------
@@ -153,6 +156,9 @@ SUBROUTINE DA_Setup_FirstGuess_MM5( xb, xbx, xp)
 !---------------------------------------------------------------------------
 
    CALL DA_Deallocate_MM5_Model( xb_mm5 )
+
+   IF (trace_use) CALL da_trace_exit("da_setup_firstguess_mm5")
+
    
 END SUBROUTINE DA_Setup_FirstGuess_MM5
 

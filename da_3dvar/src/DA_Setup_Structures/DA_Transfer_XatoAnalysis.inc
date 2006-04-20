@@ -28,6 +28,8 @@ subroutine DA_Transfer_XatoAnalysis( it, xbx, grid, config_flags ,&
 
    character*4 filnam
 
+   IF (trace_use) CALL da_trace_entry("da_transfer_xatoanalysis")
+
 !------------------------------------------------------------------------------      
 !  Write out analysis in differing formats:
 !------------------------------------------------------------------------------      
@@ -72,6 +74,9 @@ subroutine DA_Transfer_XatoAnalysis( it, xbx, grid, config_flags ,&
                            )
       end if
    end if
+
+   IF (trace_use) CALL da_trace_exit("da_transfer_xatoanalysis")
+
 
 end subroutine DA_Transfer_XatoAnalysis
 

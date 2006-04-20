@@ -16,6 +16,8 @@ subroutine da_setup_background_errors( xb, xbx, be, xp, &
    integer, intent(in)         :: its, ite, jts, jte, kts, kte ! Tile dimensions.
    integer, intent(in)         :: ids, ide, jds, jde, kds, kde ! Tile dimensions.
 
+   IF (trace_use) CALL da_trace_entry("da_setup_background_errors")
+
    if ( global ) then
       call da_setup_be_global( ide, jde, kde, be )
    else
@@ -24,6 +26,8 @@ subroutine da_setup_background_errors( xb, xbx, be, xp, &
 
    call da_setup_cv( its, ite, jts, jte, &
                      ids, ide, jds, jde, be )
+
+   IF (trace_use) CALL da_trace_exit("da_setup_background_errors")
 
 end subroutine da_setup_background_errors
 

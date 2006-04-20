@@ -25,6 +25,9 @@ SUBROUTINE da_chgvres(nlath,nsig,kz,sigmah,sigma_avn,&
    real agv_avn(0:nlath*2+1,1:nsig,1:nsig)
    real bv_avn(0:nlath*2+1,1:nsig),wgv_avn(0:nlath*2+1,1:nsig)
 
+   IF (trace_use) CALL da_trace_entry("da_chgvres")
+
+
    if(kz==nsig)then
      corz_kz=corz_avn
      cord_kz=cord_avn
@@ -131,6 +134,9 @@ SUBROUTINE da_chgvres(nlath,nsig,kz,sigmah,sigma_avn,&
      enddo
      enddo
   enddo
+
+   IF (trace_use) CALL da_trace_exit("da_chgvres")
+
 
 END SUBROUTINE da_chgvres
 

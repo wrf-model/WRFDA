@@ -29,6 +29,10 @@ SUBROUTINE DA_Setup_RunConstants( xp, xb, xbx)
    REAL                     :: cos_coeff_nx  ! Multiplicative coefficients.
    REAL                     :: cos_coeff_ny  ! Multiplicative coefficients.
    real                     :: delta_phi 
+
+   IF (trace_use) CALL da_trace_entry("da_setup_runconstants")
+
+
 !------------------------------------------------------------------------------
 !  [1.0] Calculate padded grid-size required for efficient FFTs and factors:
 !------------------------------------------------------------------------------
@@ -223,5 +227,8 @@ SUBROUTINE DA_Setup_RunConstants( xp, xb, xbx)
 
 
    END IF
+
+   IF (trace_use) CALL da_trace_exit("da_setup_runconstants")
+
    
 END SUBROUTINE DA_Setup_RunConstants

@@ -36,6 +36,9 @@ subroutine da_interpolate_stats( kzs, kz, meanp_stats, meanp_xb, &
 
    real                        :: work(1:kz)
 
+   IF (trace_use) CALL da_trace_entry("da_interpolate_stats")
+
+
 !---------------------------------------------------------------------------
 !  [1.0] Compare stats/xb levels and compute interpolation weights:
 !---------------------------------------------------------------------------
@@ -268,6 +271,10 @@ subroutine da_interpolate_stats( kzs, kz, meanp_stats, meanp_xb, &
       e(:,k2) = work(:)
    enddo
 ! ................................................................
+
+   IF (trace_use) CALL da_trace_exit("da_interpolate_stats")
+
+
 end subroutine da_interpolate_stats
 
 

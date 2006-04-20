@@ -33,6 +33,9 @@ SUBROUTINE DA_Transfer_WRFTLtoXa( grid, config_flags, filnam, &
 
    integer ndynopt
 
+IF (trace_use) CALL da_trace_entry("da_transfer_wrftltoxa")
+
+
 #ifdef VAR4DPOSS
 
 !------------------------------------------------------------------------------
@@ -196,6 +199,9 @@ SUBROUTINE DA_Transfer_WRFTLtoXa( grid, config_flags, filnam, &
 #endif
 
 #endif
+
+IF (trace_use) CALL da_trace_exit("da_transfer_wrftltoxa")
+
 
 END SUBROUTINE DA_Transfer_WRFTLtoXa
 

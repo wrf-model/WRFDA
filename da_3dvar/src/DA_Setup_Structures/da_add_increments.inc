@@ -24,6 +24,8 @@ SUBROUTINE da_add_increments( it, xp, xa, xb, xbx )
 
    integer                              :: is,ie,js,je,ks,ke
 
+   IF (trace_use) CALL da_trace_entry("da_add_increments")
+
    is = xp%its
    ie = xp%ite
    js = xp%jts
@@ -111,6 +113,9 @@ SUBROUTINE da_add_increments( it, xp, xa, xb, xbx )
 !------------------------------------------------------------------------------
 
    CALL DA_Add_PBL_And_SFC_Info( xp, xb, xbx )
+
+   IF (trace_use) CALL da_trace_exit("da_add_increments")
+
 
 end subroutine da_add_increments
 

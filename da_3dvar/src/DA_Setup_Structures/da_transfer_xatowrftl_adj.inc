@@ -30,6 +30,9 @@ SUBROUTINE DA_Transfer_XatoWRFTL_Adj( grid, config_flags, filnam, &
 
    integer ndynopt
 
+   IF (trace_use) CALL da_trace_entry("da_transfer_xatowrftl_adj")
+
+
 #ifdef VAR4DPOSS
 !------------------------------------------------------------------------------
 !  [0.0] INPUT
@@ -114,6 +117,9 @@ SUBROUTINE DA_Transfer_XatoWRFTL_Adj( grid, config_flags, filnam, &
    endif
 #endif
 #endif
+
+   IF (trace_use) CALL da_trace_exit("da_transfer_xatowrftl_adj")
+
 
 END SUBROUTINE DA_Transfer_XatoWRFTL_Adj
 

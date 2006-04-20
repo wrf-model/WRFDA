@@ -67,6 +67,8 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
    real, allocatable           :: regcoeff3(:,:,:)
    real                        :: avg,avg2,avg3
 
+   IF (trace_use) CALL da_trace_entry("da_setup_be_regional")
+
    write (6,'(A)') ' -------------------------------------------------------'
    write (6,'(A)') ' [3.0] Set up background errors for regional application'
    write (6,'(A)') ' -------------------------------------------------------'
@@ -443,6 +445,9 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
 
    deallocate( bin )
    deallocate( bin2d )
+
+   IF (trace_use) CALL da_trace_exit("da_setup_be_regional")
+
 
 end subroutine da_setup_be_regional
 

@@ -28,6 +28,9 @@ SUBROUTINE DA_Write_KMA_Increments(xp, xb, xa)
    integer                                     :: i, j, k
 ! ---------------------------------------------------------------------------
 
+   IF (trace_use) CALL da_trace_entry("da_write_kma_increments")
+
+
 ! .. Dimension of the domain:
       ix = xb%mix
       jy = xb%mjy
@@ -140,5 +143,8 @@ SUBROUTINE DA_Write_KMA_Increments(xp, xb, xa)
 #endif
 
  end if
+
+
+   IF (trace_use) CALL da_trace_exit("da_write_kma_increments")
 
 END SUBROUTINE DA_Write_KMA_Increments 

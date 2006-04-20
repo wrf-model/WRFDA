@@ -28,7 +28,10 @@ SUBROUTINE DA_Setup_FirstGuess( xbx, grid, &
 !  Definitions of dummy arguments to solve
 #include <em_dummy_decl.inc>
    integer :: is, ie, js, je
-   real    :: ddx , ddy     
+   real    :: ddx , ddy    
+
+    IF (trace_use) CALL da_trace_entry("da_setup_firstguess")
+
 
    write(unit=stdout, fmt='(/a)') &
         '-----------------------------------'
@@ -114,6 +117,9 @@ SUBROUTINE DA_Setup_FirstGuess( xbx, grid, &
 !  [2.1] Set up fast Fourier & Legendre transform constants:
 
    CALL DA_Setup_RunConstants( xp, xb, xbx)
+
+   IF (trace_use) CALL da_trace_exit("da_setup_firstguess")
+
 
 END SUBROUTINE DA_Setup_FirstGuess
 

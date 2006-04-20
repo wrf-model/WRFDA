@@ -42,6 +42,9 @@ subroutine da_setup_be_global( ide, jde, kde, be  )
    real, allocatable           :: power(:)               ! Temporary power spectrum.
    real, allocatable           :: power2d(:,:)           ! Temporary power spectrum.
 
+   IF (trace_use) CALL da_trace_entry("da_setup_be_global")
+
+
    CALL wrf_message("[3.0] Set up background errors (be) for global WRF-Var")
 
    be % max_wave = ide / 2 - 1
@@ -299,10 +302,18 @@ subroutine da_setup_be_global( ide, jde, kde, be  )
    deallocate( max_wave )
 
    close(be_unit)
+
+   IF (trace_use) CALL da_trace_exit("da_setup_be_global")
+
    return
-99  write(UNIT=stdout,FMT='(a, i5)')' Unexpected end on BE-unit = ',be_unit
-100 write(UNIT=stdout,FMT='(a, i5)')' Read error on BE-unit = ',be_unit
-   stop     
+
+99  write(UNIT=errmsg(1),FMT='(a, i5)')' Unexpected end on BE-unit = ',be_unit
+    CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
+
+100 write(UNIT=errmsg(1),FMT='(a, i5)')' Read error on BE-unit = ',be_unit
+    CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
+
+! JRB daft having these here
 
    deallocate( power )
    deallocate( power2d )

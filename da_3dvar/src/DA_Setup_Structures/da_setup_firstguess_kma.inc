@@ -28,6 +28,9 @@ SUBROUTINE DA_Setup_FirstGuess_KMA( xbx, grid, &
    integer           :: is, ie, js, je, ks, ke
    integer           :: max_wavenumber
 
+   IF (trace_use) CALL da_trace_entry("da_setup_firstguess_kma")
+
+
 !---------------------------------------------------------------------------
 
    is = xp % its
@@ -100,5 +103,9 @@ SUBROUTINE DA_Setup_FirstGuess_KMA( xbx, grid, &
  
 #include <em_dummy_args.inc>
                              )
+
+
+   IF (trace_use) CALL da_trace_exit("da_setup_firstguess_kma")
+
 END SUBROUTINE DA_Setup_FirstGuess_KMA
 

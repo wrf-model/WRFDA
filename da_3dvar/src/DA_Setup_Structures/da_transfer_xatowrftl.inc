@@ -45,6 +45,9 @@ SUBROUTINE DA_Transfer_XatoWRFTL( grid, config_flags, filnam, &
 
    integer ndynopt
 
+   IF (trace_use) CALL da_trace_entry("da_transfer_xatowrftl")
+
+
 #ifdef VAR4DPOSS
 
 !---------------------------------------------------------------------------
@@ -339,6 +342,9 @@ SUBROUTINE DA_Transfer_XatoWRFTL( grid, config_flags, filnam, &
    call nl_set_dyn_opt ( 1 , DYN_EM )
 
 #endif
+
+   IF (trace_use) CALL da_trace_exit("da_transfer_xatowrftl")
+
 
 END SUBROUTINE DA_Transfer_XatoWRFTL
 

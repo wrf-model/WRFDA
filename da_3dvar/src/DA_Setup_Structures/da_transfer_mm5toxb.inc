@@ -33,6 +33,8 @@ SUBROUTINE DA_Transfer_MM5ToXb( ix, jy, kz, xp, xb_mm5, xb, xbx )
 
    real, dimension(xp%kms:xp%kme) :: DDT
 
+   IF (trace_use) CALL da_trace_entry("da_transfer_mm5toxb")
+
 
 ! Set xb array range indices for processor subdomain.
    is = xp%its
@@ -278,6 +280,9 @@ SUBROUTINE DA_Transfer_MM5ToXb( ix, jy, kz, xp, xb_mm5, xb, xbx )
      enddo
 
    ENDIF
+
+   IF (trace_use) CALL da_trace_exit("da_transfer_mm5toxb")
+
 
 END SUBROUTINE DA_Transfer_MM5ToXb
 

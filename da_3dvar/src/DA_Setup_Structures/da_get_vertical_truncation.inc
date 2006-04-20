@@ -22,6 +22,9 @@ SUBROUTINE DA_Get_Vertical_Truncation( max_vert_var, eigenval, be_sub )
    REAL                             :: cum_variance    ! Cumulative variance.
    CHARACTER (LEN = 6)              :: name            ! Variable name.
 
+   IF (trace_use) CALL da_trace_entry("da_get_vertical_truncation")
+
+
 !------------------------------------------------------------------------------
 !  [1.0] Initialise:
 !------------------------------------------------------------------------------
@@ -76,5 +79,8 @@ SUBROUTINE DA_Get_Vertical_Truncation( max_vert_var, eigenval, be_sub )
    WRITE(UNIT=stdout,FMT='(3x,A,A6,A3,I3,A1,f7.2,A2)')' Vertical truncation for ', name, &
                                        ' = ', be_sub % mz, '(', &
                                        max_vert_var, '%)'
+
+   IF (trace_use) CALL da_trace_exit("da_get_vertical_truncation")
+
                                        
 END SUBROUTINE DA_Get_Vertical_Truncation

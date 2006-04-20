@@ -18,6 +18,9 @@ SUBROUTINE DA_Setup_Obs_Interp_Wts ( xp, iv )
 
    INTEGER                        :: inst, n          ! Loop counter.
 
+   IF (trace_use) CALL da_trace_entry("da_setup_obs_interp_wts")
+
+
    do n=1, iv % num_sound
      CALL DA_Store_Obs_Grid_Info( xp, iv%sound(n)%loc )
 
@@ -111,6 +114,8 @@ SUBROUTINE DA_Setup_Obs_Interp_Wts ( xp, iv )
      CALL DA_Store_Obs_Grid_Info( xp, iv % instid(inst) % rad(n)%loc )
    enddo
  end do
+
+   IF (trace_use) CALL da_trace_exit("da_setup_obs_interp_wts")
 
 
 END SUBROUTINE DA_Setup_Obs_Interp_Wts

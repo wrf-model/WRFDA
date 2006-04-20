@@ -26,6 +26,9 @@ SUBROUTINE DA_Transfer_WRFTLtoXa_Adj( grid, config_flags, filnam, &
    integer :: i, j, k, n, ndynopt
    integer :: is, ie, js, je, ks, ke
 
+  IF (trace_use) CALL da_trace_entry("da_transfer_wrftltoxa_adj")
+
+
 #ifdef VAR4DPOSS
 
 !---------------------------------------------------------------------------
@@ -178,6 +181,9 @@ SUBROUTINE DA_Transfer_WRFTLtoXa_Adj( grid, config_flags, filnam, &
    call nl_set_dyn_opt ( 1 , DYN_EM )
 
 #endif
+
+  IF (trace_use) CALL da_trace_exit("da_transfer_wrftltoxa_adj")
+
 
 END SUBROUTINE DA_Transfer_WRFTLtoXa_Adj
 

@@ -39,7 +39,10 @@ SUBROUTINE DA_Transfer_KMAToXb( xbx, grid, &
 
    real, dimension(xp%jds:xp%jde) :: loc_latc_mean
 
-   REAL, ALLOCATABLE :: arrayglobal(:,:)
+   REAL, ALLOCATABLE :: arrayglobal(:,:) 
+
+   IF (trace_use) CALL da_trace_entry("da_transfer_kmatoxb")
+
 
 !---------------------------------------------------------------------------
 
@@ -574,6 +577,9 @@ SUBROUTINE DA_Transfer_KMAToXb( xbx, grid, &
 !       write(UNIT=stdout,FMT='(2i4,3f12.2,e12.4,2f12.2)') j,i,xb%psfc(i,j),xb%tsk(i,j),xb%t2(i,j),xb%q2(i,j),xb%u10(i,j),xb%v10(i,j)
 !     end do
 !   end do
+
+   IF (trace_use) CALL da_trace_exit("da_transfer_kmatoxb")
+
 
 
 END SUBROUTINE DA_Transfer_KMAToXb

@@ -26,6 +26,8 @@ SUBROUTINE da_cloud_model ( TB, PB, QB, QCWB, QRNB, ZB, ZFB, DT, kts, kte )
    real                       :: G, ALPHA, RC, MU, XX, YY
    real, dimension(kts:kte+1) :: W0, W
 
+   IF (trace_use) CALL da_trace_entry("da_cloud_model")
+
    G=9.81
    ALPHA=0.5
    RC=100.0
@@ -86,6 +88,9 @@ SUBROUTINE da_cloud_model ( TB, PB, QB, QCWB, QRNB, ZB, ZFB, DT, kts, kte )
        DT(k) = 0.0
      ENDIF
    ENDDO
+
+   IF (trace_use) CALL da_trace_exit("da_cloud_model")
+
 
 
 END SUBROUTINE da_cloud_model

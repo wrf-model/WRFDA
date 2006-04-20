@@ -56,6 +56,8 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
    REAL   :: qvf1, cvpm, cpovcv, ppb, ttb, albn, aln
    REAL, ALLOCATABLE :: arrayglobal(:,:)
 
+   IF (trace_use) CALL da_trace_entry("da_transfer_wrftoxb")
+
 !---------------------------------------------------------------------------
 !--Set xb array range indices for processor subdomain.
 !---------------------------------------------------------------------------
@@ -740,6 +742,9 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
      enddo
 
    ENDIF
+
+   IF (trace_use) CALL da_trace_exit("da_transfer_wrftoxb")
+
 
 END SUBROUTINE DA_Transfer_WRFToXb
 

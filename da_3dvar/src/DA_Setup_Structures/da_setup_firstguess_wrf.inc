@@ -36,6 +36,9 @@ SUBROUTINE DA_Setup_FirstGuess_WRF( xbx, grid, &
    integer(kind=4)   :: flag
    integer           :: len, index, seconds, i_grid,  j_grid, m_expand
 
+   IF (trace_use) CALL da_trace_entry("da_setup_firstguess_wrf")
+
+
 !--------------------------------------------------------------------------
 !  [0.0] check the xb_date
 !--------------------------------------------------------------------------
@@ -245,6 +248,9 @@ SUBROUTINE DA_Setup_FirstGuess_WRF( xbx, grid, &
 #include <em_dummy_args.inc>
 
                            )
+
+   IF (trace_use) CALL da_trace_exit("da_setup_firstguess_wrf")
+
 
 END SUBROUTINE DA_Setup_FirstGuess_WRF
 

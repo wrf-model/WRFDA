@@ -24,6 +24,9 @@ SUBROUTINE DA_Rescale_Background_Errors ( ix, jy, var_scaling, len_scaling, &
    INTEGER                          :: mz                ! Vertical truncation.
    INTEGER                          :: m
    REAL, ALLOCATABLE                :: rf_scale_factor(:)! RF rescaling.
+
+   IF (trace_use) CALL da_trace_entry("da_rescale_background_errors")
+
    
 !-----------------------------------------------------------------------------
 !  [1.0] Initialise:
@@ -67,6 +70,9 @@ SUBROUTINE DA_Rescale_Background_Errors ( ix, jy, var_scaling, len_scaling, &
       DEALLOCATE ( rf_scale_factor )   
 
    END IF
+
+   IF (trace_use) CALL da_trace_exit("da_rescale_background_errors")
+
 
 END SUBROUTINE DA_Rescale_Background_Errors
 

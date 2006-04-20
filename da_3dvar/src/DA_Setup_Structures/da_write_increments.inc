@@ -39,6 +39,9 @@ SUBROUTINE DA_Write_Increment ( xp, xb, xa, q_cgrid, mu_cgrid, ph_cgrid )
 !
 !                                        Yong-Run Guo 07/20/2004
 
+   IF (trace_use) CALL da_trace_entry("da_write_increment")
+
+
 ! .. Dimension of the domain:
       ix = xb%mix
       jy = xb%mjy
@@ -229,5 +232,8 @@ SUBROUTINE DA_Write_Increment ( xp, xb, xa, q_cgrid, mu_cgrid, ph_cgrid )
 #endif
 
       endif
+
+   IF (trace_use) CALL da_trace_exit("da_write_increment")
+
 
 END SUBROUTINE DA_Write_Increment 

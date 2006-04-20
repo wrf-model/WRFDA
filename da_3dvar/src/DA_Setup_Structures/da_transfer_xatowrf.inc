@@ -47,6 +47,8 @@ SUBROUTINE DA_Transfer_XatoWRF( xbx, grid, &
    REAL    :: t_full  , p_full, rho_full, q_full, ph_full , ph_xb_hd, &
               qvf1, qvf2, qvf1_b, qvf2_b
 
+   IF (trace_use) CALL da_trace_entry("da_transfer_xatowrf")
+
 !---------------------------------------------------------------------------
 !--SET ARRAY RANGE INDICES FOR PROCESSOR SUBDOMAIN.
 !---------------------------------------------------------------------------
@@ -419,6 +421,9 @@ SUBROUTINE DA_Transfer_XatoWRF( xbx, grid, &
         'minval(q_cgrid(is:ie,js:je,k))  =', minval(q_cgrid(is:ie,js:je,k))
      enddo
    endif
+
+   IF (trace_use) CALL da_trace_exit("da_transfer_xatowrf")
+
 
 END SUBROUTINE DA_Transfer_XatoWRF
 

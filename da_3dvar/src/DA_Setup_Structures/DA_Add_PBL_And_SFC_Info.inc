@@ -24,6 +24,9 @@ SUBROUTINE DA_Add_PBL_And_SFC_Info( xp, xb, xbx )
    REAL                               :: tpw,alw,zrhom,htpw
    REAL                               :: dum1
 
+   IF (trace_use) CALL da_trace_entry("da_add_pbl_and_sfc_info")
+
+
 ! Set xb array range indices for processor subdomain.
    is = xp%its
    ie = xp%ite
@@ -152,6 +155,9 @@ SUBROUTINE DA_Add_PBL_And_SFC_Info( xp, xb, xbx )
                    xb%regime(i,j))
    enddo
    enddo
+
+   IF (trace_use) CALL da_trace_exit("da_add_pbl_and_sfc_info")
+
 
 END SUBROUTINE DA_Add_PBL_And_SFC_Info
 

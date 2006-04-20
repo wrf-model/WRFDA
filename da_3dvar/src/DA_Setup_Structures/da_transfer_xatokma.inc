@@ -26,6 +26,9 @@ SUBROUTINE DA_Transfer_XatoKMA( xbx, grid, &
    integer :: is, ie, js, je, ks, ke
    real    :: sdmd, s1md
    real    :: PU, PD, coeff
+
+   IF (trace_use) CALL da_trace_entry("da_transfer_xatokma")
+
 !---------------------------------------------------------------------------
 !--SET ARRAY RANGE INDICES FOR PROCESSOR SUBDOMAIN.
 !---------------------------------------------------------------------------
@@ -86,5 +89,8 @@ SUBROUTINE DA_Transfer_XatoKMA( xbx, grid, &
       enddo
       enddo
    enddo
+
+   IF (trace_use) CALL da_trace_exit("da_transfer_xatokma")
+
 
 END SUBROUTINE DA_Transfer_XatoKMA

@@ -53,6 +53,9 @@
 
    integer  :: ib1, ib2, ib3, id1, id2
 
+   IF (trace_use) CALL da_trace_entry("da_write_interpolated_be")
+
+
 ! -------------------------------------------------------------------------
    nv = 1
    n  = nv
@@ -532,6 +535,9 @@
 
    WRITE(UNIT=stdout,FMT='(/A)') "Interpolated Background Error Statistics file written out"
    WRITE(UNIT=stdout,FMT='(I2," constant fields, and ",I3," BE fields."/)') nv, n
+
+   IF (trace_use) CALL da_trace_exit("da_write_interpolated_be")
+
 
 contains
 
