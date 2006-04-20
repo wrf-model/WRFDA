@@ -20,7 +20,8 @@ SUBROUTINE DA_Read_Namelist
 !  Namelist contents :
 
    NAMELIST /RECORD1/  MODEL_TYPE, write_increments, global, print_detail, lvar4d, &
-                       stdout_unit, stderr_unit
+                       stdout_unit, stderr_unit, trace_use, trace_unit, &
+                       trace_pe, trace_memory
    NAMELIST /RECORD2/  ANALYSIS_TYPE, ANALYSIS_DATE, ANALYSIS_ACCU, W_INCREMENTS, &
                        DT_cloud_model, &
                        write_qcw, write_qrn, write_qci, write_qsn, write_qgr, &
@@ -129,6 +130,10 @@ SUBROUTINE DA_Read_Namelist
    global           = .FALSE. 
    stdout_unit      = 6
    stderr_unit      = 0
+   trace_use        = .FALSE.
+   trace_unit       = 99
+   trace_pe         = 0
+   trace_memory     = .TRUE.
 
 
 !--record2
@@ -355,6 +360,10 @@ SUBROUTINE DA_Read_Namelist
       WRITE(UNIT=stdout,FMT='(A,3X,L10)') ' VAR4d            =', lvar4d         
       WRITE(UNIT=stdout,FMT='(A,3X,I5)')  ' stdout_unit      =', stdout_unit     
       WRITE(UNIT=stdout,FMT='(A,3X,I5)')  ' stderr_unit      =', stderr_unit
+      WRITE(UNIT=stdout,FMT='(A,3X,L10)') ' trace_use        =', trace_use
+      WRITE(UNIT=stdout,FMT='(A,3X,I5)')  ' trace_unit       =', trace_unit
+      WRITE(UNIT=stdout,FMT='(A,3X,I5)')  ' trace_pe         =', trace_pe
+      WRITE(UNIT=stdout,FMT='(A,3X,L10)') ' trace_memory     =', trace_memory
    endif
 
    READ  ( UNIT = namelist_unit, NML = RECORD2 , IOSTAT = IOST)
