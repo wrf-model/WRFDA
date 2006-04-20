@@ -55,8 +55,8 @@ subroutine da_setup_cv( its, ite, jts, jte, &
       be % cv % size_je  = 2 * be % cv % size_alphac * be % alpha % mz
    else
       be % cv % size_je = ij * be % alpha % mz
-      write(6,'(a)')' flow-dependence not yet coded for regional!'
-      stop
+      CALL wrf_error_fatal3(__FILE__,__LINE__, &
+         "flow-dependence not yet coded for regional!")
    end if
 
    be % cv % size = be % cv % size_jb +  be % cv % size_je
