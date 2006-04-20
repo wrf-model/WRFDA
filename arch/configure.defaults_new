@@ -136,7 +136,7 @@ FCDEBUG         =       #-g
 FCTYPE          =       -r8
 FCFORM          =       -Mfree
 FCENDIAN        =       -byteswapio
-FCBASE          =       -Ktrap=fp -tp p6
+FCBASE          =       -Ktrap=fp -tp p6 -C
 
 LDFLAGS         =       $(FCENDIAN)
 
@@ -172,7 +172,7 @@ FCDEBUG         =       #-g
 FCTYPE          =       -r8
 FCFORM          =       -Mfree
 FCENDIAN        =       -byteswapio
-FCBASE          =       -Ktrap=fp -tp p6
+FCBASE          =       -Ktrap=fp -tp p6 -C
 
 LDFLAGS         =       $(FCENDIAN)
 
@@ -332,7 +332,7 @@ FCDEBUG         =       #-g
 FCTYPE          =       -r8
 FCFORM          =       -Mfree
 FCENDIAN        =       -byteswapio
-FCBASE          =       -Ktrap=fp
+FCBASE          =       -Ktrap=fp -C
 
 LDFLAGS         =       $(FCENDIAN)
 
@@ -368,7 +368,7 @@ FCDEBUG         =       #-g
 FCTYPE          =       -r8
 FCFORM          =       -Mfree
 FCENDIAN        =       -byteswapio
-FCBASE          =       
+FCBASE          =       -C
 
 LDFLAGS         =       $(FCENDIAN)
 
