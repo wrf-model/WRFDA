@@ -93,6 +93,13 @@ export DA_RADAR=${DA_RADAR:-$OB_DIR/$DA_DATE/radar.dat}            # Radar data 
 export RTTOV=${RTTOV:-$HOME/rttov/rttov85}                            # RTTOV
 export DA_RTTOV_COEFFS=${DA_RTTOV_COEFFS:-$RTTOV/rtcoef_rttov7}       # RTTOV coefficients
 
+# Tracing
+
+export DA_TRACE_USE=${DA_TRACE_USE:-.FALSE.}
+export DA_TRACE_UNIT=${DA_TRACE_UNIT:-99}
+export DA_TRACE_PE=${DA_TRACE_PE:-0}
+export DA_TRACE_MEMORY=${DA_TRACE_MEMORY:-.TRUE.}
+
 # Default WRF namelist variables:
 export NUM_PROCS=${NUM_PROCS:-1}               # Number of processors to run on.
 export DA_E_WE=${DA_E_WE:-180}                 # X grid dimension.
@@ -344,6 +351,7 @@ if test -r $DA_SSMI; then
   set DA_USE_SSMIRETRIEVALOBS = .TRUE.
 fi
 
+echo "Experiment directory:        $EXP_DIR"
 echo "Run directory:               $RUN_DIR"
 echo "Build directory:             $DA_BUILD_DIR"
 echo "First Guess Input File:      $DA_FIRST_GUESS"
@@ -358,6 +366,10 @@ cat > namelist.wrfvar << EOF
  WRITE_INCREMENTS = $DA_WRITE_INCREMENTS,
  GLOBAL           = $DA_GLOBAL,
  PRINT_DETAIL     = $DA_PRINT_DETAIL,
+ TRACE_USE        = $DA_TRACE_USE,
+ TRACE_UNIT       = $DA_TRACE_UNIT,
+ TRACE_PE         = $DA_TRACE_PE,
+ TRACE_MEMORY     = $DA_TRACE_MEMORY,
  STDOUT_UNIT      = $DA_STDOUT_UNIT,
  STDERR_UNIT      = $DA_STDERR_UNIT /
 
@@ -681,20 +693,25 @@ if test $PLATFORM == "AIX"; then
 fi
 
 if test -f fort.12; then
-  ln -fs $PWD/fort.12  $EXP_DIR/statistics
+  cp $PWD/fort.12      $EXP_DIR/statistics
 fi
 
 if test -f fort.81; then 
-  ln -fs $PWD/fort.81      $EXP_DIR/cost_fn
+  cp $PWD/fort.81      $EXP_DIR/cost_fn
 fi
 
 if test -f fort.82; then
-  ln -fs $PWD/fort.82      $EXP_DIR/grad_fn
+  cp $PWD/fort.82      $EXP_DIR/grad_fn
 fi
 
-ln -fs $PWD/rsl*         $EXP_DIR
-ln -fs $PWD/wrfvar.out   $EXP_DIR
-ln -fs $PWD/wrfvar.error $EXP_DIR
+if test -f fort.99; then
+  cp $PWD/fort.99      $EXP_DIR/trace.html
+fi
+
+cp $PWD/namelist.*   $EXP_DIR
+cp $PWD/rsl*         $EXP_DIR
+cp $PWD/wrfvar.out   $EXP_DIR
+cp $PWD/wrfvar.error $EXP_DIR
 
 echo "WRF-Var completed"
 date
