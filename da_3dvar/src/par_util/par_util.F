@@ -17,6 +17,7 @@ MODULE PAR_UTIL
 
     USE DA_Define_Structures   ! For xb_, cv_, xp_, be_, x_type definitions.
     USE DA_Constants           ! print_detail
+    USE PAR_UTIL1
     
     IMPLICIT NONE
 
@@ -56,8 +57,6 @@ MODULE PAR_UTIL
 
 #include <local_to_global.inc>
 #include <mm5_struct_bcast.inc>
-#include <proc_sum_int.inc>
-#include <proc_sum_real.inc>
 #include <proc_sum_count_obs.inc>
 #include <proc_stats_combine.inc>
 #include <proc_maxmin_combine.inc>
