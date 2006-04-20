@@ -73,6 +73,8 @@ SUBROUTINE DA_Read_Obs (iunit, ob, xp, filename)
 
 !--------------------------------------------------------------------
 
+   if (trace_use) CALL da_trace_entry("da_read_obs")
+
    total_obs = ob%total_obs
    num_sound = ob%num_sound
    num_synop = ob%num_synop
@@ -1168,5 +1170,7 @@ loop_level: DO i = 1, platform%info%levels
 !          'ob%num_ssmi_retrieval=', ob%num_ssmi_retrieval
 !     stop 'Obs mismatch.'
 !  endif
+
+   IF (trace_use) CALL da_trace_exit("da_read_obs")
 
 END SUBROUTINE DA_Read_Obs
