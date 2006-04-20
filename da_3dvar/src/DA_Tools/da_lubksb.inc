@@ -2,11 +2,11 @@ subroutine da_lubksb( n, np, indx, a, b)
 
    implicit none
 
-!  Adapted Numerical Recipes routine to solve the set of n linear equations A.X=B.
-!  Routine takes in to account possibility that B will begin with many zero elements, 
-!  so it is efficient for matrix inversion.
+   !  Adapted Numerical Recipes routine to solve the set of n linear equations A.X=B.
+   !  Routine takes in to account possibility that B will begin with many zero elements, 
+   !  so it is efficient for matrix inversion.
 
-!  Adapted for WRF by Dale Barker, 11/5/04.
+   !  Adapted for WRF by Dale Barker, 11/5/04.
 
    integer, intent(in)  :: n              ! Logical size of array.
    integer, intent(in)  :: np             ! Physical size of array.

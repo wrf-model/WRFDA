@@ -1,4 +1,4 @@
-real function DA_Diff_Seconds(date_char_1, date_char_2)
+real function da_diff_seconds(date_char_1, date_char_2)
 
    implicit none
 
@@ -97,5 +97,5 @@ real function DA_Diff_Seconds(date_char_1, date_char_2)
 
    DA_Diff_Seconds = abs(s_1 - s_2)
 
-END function DA_Diff_Seconds
+END function da_diff_seconds
 

@@ -1,15 +1,11 @@
-subroutine DA_1D_EigenDecomposition( bx, e, l )
-   
-!------------------------------------------------------------------------------
-!  PURPOSE: Compute eigenvectors E and eigenvalues L of vertical covariance matrix
-!           B_{x} defined by equation:  E^{T} B_{x} E = L, given input 3D field of
-!           errors (sum over all horizontal locations).
-!
-!  METHOD:
-!
-!  HISTORY: 05/18/2000 - Creation of F90 version.           Dale Barker
-!------------------------------------------------------------------------------
-   
+subroutine da_1d_eigendecomposition( bx, e, l )
+
+   !------------------------------------------------------------------------------
+   !  PURPOSE: Compute eigenvectors E and eigenvalues L of vertical covariance matrix
+   !           B_{x} defined by equation:  E^{T} B_{x} E = L, given input 3D field of
+   !           errors (sum over all horizontal locations).
+   !------------------------------------------------------------------------------
+
    implicit none
    
    real, intent(in)         :: bx(:,:)          ! Global vert. background error.
@@ -26,15 +22,15 @@ subroutine DA_1D_EigenDecomposition( bx, e, l )
    real, allocatable        :: lcopy(:)
    real, allocatable        :: work_array(:)
 
-!-------------------------------------------------------------------------
-!     [1.0]: Initialise:
-!-------------------------------------------------------------------------
+   !-------------------------------------------------------------------------
+   ! [1.0]: Initialise:
+   !-------------------------------------------------------------------------
    
    kz = size(bx, dim=1)
    
-!-------------------------------------------------------------------------
-!     [5.0]: Perform global eigenvalue decomposition using LAPACK software:
-!-------------------------------------------------------------------------
+   !-------------------------------------------------------------------------
+   ! [5.0]: Perform global eigenvalue decomposition using LAPACK software:
+   !-------------------------------------------------------------------------
    
    work = 3 * kz - 1
    allocate( work_array(1:work) )
@@ -50,14 +46,14 @@ subroutine DA_1D_EigenDecomposition( bx, e, l )
               work_array, work, info )
    
    if ( info /= 0 ) then
-     WRITE(UNIT=errmsg(1),FMT='(A,I4,A)') &
-       ' DA_Perform_EigenDecomposition: info = ', &
-       info,' - error in decomposition.'
-     CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
+      WRITE(UNIT=errmsg(1),FMT='(A,I4,A)') &
+         ' DA_Perform_EigenDecomposition: info = ', &
+         info,' - error in decomposition.'
+      CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
    end if
    
-!--Swap order of eigenvalues, vectors so 1st is one with most
-!  variance, etc:
+   !--Swap order of eigenvalues, vectors so 1st is one with most
+   !  variance, etc:
    
    do m=1,kz
       l(m) = lcopy(kz+1-m)
@@ -68,5 +64,5 @@ subroutine DA_1D_EigenDecomposition( bx, e, l )
    deallocate( ecopy )
    deallocate( lcopy )
    
-end subroutine DA_1D_EigenDecomposition
+end subroutine da_1d_eigendecomposition
 

@@ -1,15 +1,10 @@
 subroutine da_eof_decomposition( kz, bx, e, l )
    
-!------------------------------------------------------------------------------
-!  PURPOSE: Compute eigenvectors E and eigenvalues L of vertical covariance matrix
-!           B_{x} defined by equation:  E^{T} B_{x} E = L, given input kz x kz 
-!           BE field.
-!
-!  METHOD:
-!
-!  HISTORY: 05/18/2000 - Creation of F90 version.           Dale Barker
-!           10/15/2004 - 2D version for WRF.                Dale Barker
-!------------------------------------------------------------------------------
+   !------------------------------------------------------------------------------
+   ! PURPOSE: Compute eigenvectors E and eigenvalues L of vertical covariance matrix
+   !          B_{x} defined by equation:  E^{T} B_{x} E = L, given input kz x kz 
+   !          BE field.
+   !------------------------------------------------------------------------------
    
    implicit none
 
@@ -26,9 +21,9 @@ subroutine da_eof_decomposition( kz, bx, e, l )
    real                     :: ecopy(1:kz,1:kz)
    real                     :: lcopy(1:kz)
 
-!-------------------------------------------------------------------------
-!     [5.0]: Perform global eigenvalue decomposition using LAPACK software:
-!-------------------------------------------------------------------------
+   !-------------------------------------------------------------------------
+   ! [5.0]: Perform global eigenvalue decomposition using LAPACK software:
+   !-------------------------------------------------------------------------
    
    work = 3 * kz - 1   
    ecopy(1:kz,1:kz) = bx(1:kz,1:kz)
@@ -37,12 +32,12 @@ subroutine da_eof_decomposition( kz, bx, e, l )
    call dsyev( 'V', 'U', kz, ecopy, kz, lcopy, work_array, work, info )
    
    if ( info /= 0 ) then
-     write(UNIT=errmsg(1),FMT='(A,I4)') &
-       "Error in decomposition, info = ", info
-       CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
+      write(UNIT=errmsg(1),FMT='(A,I4)') &
+         "Error in decomposition, info = ", info
+      CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
    end if
    
-!--Swap order of eigenvalues, vectors so 1st is one with most variance:
+   !--Swap order of eigenvalues, vectors so 1st is one with most variance:
    
    do m = 1, kz
       l(m) = lcopy(kz+1-m)

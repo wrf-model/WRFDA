@@ -5,9 +5,9 @@ subroutine da_random_seed
    integer              :: seed_size
    integer, allocatable :: seed_array(:)
 
-!----------------------------------------------------------------------------
-!  Check that right seed_size is being used:
-!----------------------------------------------------------------------------
+   !----------------------------------------------------------------------------
+   !  Check that right seed_size is being used:
+   !----------------------------------------------------------------------------
 
    call random_seed(size=seed_size)              ! Get size of seed array.
    allocate( seed_array(1:seed_size) )
@@ -15,7 +15,8 @@ subroutine da_random_seed
 
    if ( put_rand_seed ) then            ! Manually set random seed.
       if ( seed_size /= 2 ) then
-         write(UNIT=stdout,FMT='(a)')' Warning: Only setting first two values of seed_array'
+         write(UNIT=stdout,FMT='(a)') &
+            ' Warning: Only setting first two values of seed_array'
       end if
      
       seed_array(1) = seed_array1

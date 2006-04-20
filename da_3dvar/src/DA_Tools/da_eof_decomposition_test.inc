@@ -1,15 +1,11 @@
 subroutine da_eof_decomposition_test( kz, bx, e, l )
    
-!------------------------------------------------------------------------------
-!  PURPOSE: [1] Print eigenvalues:
-!           [2] Test orthogonality of eigenvectors - sum_k (e_m(k) e_n(k)) = delta_mn:
-!           [3] Test eigenvectors completeness - sum_m (e_m(k1) e_m(k2)) = delta_k1k2:
-!           [4] Check B correctness: B = E*L*E^T
-!------------------------------------------------------------------------------
-!
-!  HISTORY: 05/18/2000 - Creation of F90 version.           Dale Barker
-!           10/15/2004 - Tidied up for WRF.                 Dale Barker
-!------------------------------------------------------------------------------
+   !------------------------------------------------------------------------------
+   ! PURPOSE: [1] Print eigenvalues:
+   !          [2] Test orthogonality of eigenvectors - sum_k (e_m(k) e_n(k)) = delta_mn:
+   !          [3] Test eigenvectors completeness - sum_m (e_m(k1) e_m(k2)) = delta_k1k2:
+   !          [4] Check B correctness: B = E*L*E^T
+   !------------------------------------------------------------------------------
    
    implicit none
 
@@ -27,9 +23,9 @@ subroutine da_eof_decomposition_test( kz, bx, e, l )
    real                     :: bc(1:kz,1:kz)    ! 2D Work matrix.
    logical                  :: array_mask(1:kz) ! Array mask for MAXVAL.
 
-!-------------------------------------------------------------------------
-!  [1] Print eigenvalues:
-!-------------------------------------------------------------------------
+   !------------------------------------------------------------------------- 
+   ! [1] Print eigenvalues:
+   !-------------------------------------------------------------------------
 
    tot_variance = sum(l(1:kz))
    cum_variance = 0.0
@@ -46,9 +42,9 @@ subroutine da_eof_decomposition_test( kz, bx, e, l )
    
    call da_array_print( 1, e, 'Global Eigenvectors' )
 
-!-------------------------------------------------------------------------
-!  [2] Test orthogonality of eigenvectors - sum_k (e_m(k) e_n(k)) = delta_mn:
-!-------------------------------------------------------------------------
+   !-------------------------------------------------------------------------
+   ! [2] Test orthogonality of eigenvectors - sum_k (e_m(k) e_n(k)) = delta_mn:
+   !-------------------------------------------------------------------------
    
    write(UNIT=stdout,FMT='(A)')' Eigenvector orthogonality check:'
    write(UNIT=stdout,FMT='(A)')' Mode     Diagonal         Maximum off-diagonal'
@@ -65,9 +61,9 @@ subroutine da_eof_decomposition_test( kz, bx, e, l )
    end do
    write(UNIT=stdout,FMT=*)
 
-!-------------------------------------------------------------------------   
-!  [3] Test eigenvectors completeness - sum_m (e_m(k1) e_m(k2)) = delta_k1k2:
-!-------------------------------------------------------------------------   
+   !-------------------------------------------------------------------------   
+   ! [3] Test eigenvectors completeness - sum_m (e_m(k1) e_m(k2)) = delta_k1k2:
+   !-------------------------------------------------------------------------   
    
    write(UNIT=stdout,FMT='(A)')' Eigenvector completeness check:'
    write(UNIT=stdout,FMT='(A)')' Level    Diagonal         Maximum off-diagonal'
@@ -84,9 +80,9 @@ subroutine da_eof_decomposition_test( kz, bx, e, l )
    end do
    write(UNIT=stdout,fmt=*)
 
-!-------------------------------------------------------------------------
-!  [4]  check B correctness: B = E*L*E^T
-!-------------------------------------------------------------------------
+   !-------------------------------------------------------------------------
+   ! [4]  check B correctness: B = E*L*E^T
+   !-------------------------------------------------------------------------
 
    write(UNIT=stdout,FMT='(a/a)') &
         'Real and Calculated B (diagonal)', &

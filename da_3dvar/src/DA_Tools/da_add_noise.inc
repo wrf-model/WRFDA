@@ -12,12 +12,12 @@ subroutine da_add_noise( fld, yo, z )
 
    if ( fld % qc >= obs_qc_pointer ) then
 
-!     [1] Calculate scaled Gaussian noise:
+      ! [1] Calculate scaled Gaussian noise:
 
       call da_gauss_noise( z )      
       noise = fld % error * z
       
-!     [3] Recalculate corresponding O and O-B:
+      ! [3] Recalculate corresponding O and O-B:
       yo = yo + noise
       fld % inv = fld % inv + noise
 
