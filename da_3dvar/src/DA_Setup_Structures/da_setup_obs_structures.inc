@@ -19,6 +19,8 @@ SUBROUTINE da_setup_obs_structures( xp, ob, iv )
    TYPE ( y_type), INTENT(OUT)  :: ob          ! Observation structure.
    TYPE (ob_type), INTENT(OUT)  :: iv          ! O-B structure.
 
+   IF (trace_use) CALL da_trace_entry("da_setup_obs_structures")
+
 
    CALL wrf_message('[4.0] Set up observations (ob)')
 
@@ -114,7 +116,9 @@ SUBROUTINE da_setup_obs_structures( xp, ob, iv )
    END IF
 
 !     Get horizontal interpolation weights.
-      call da_setup_obs_interp_wts( xp, iv )     
+      call da_setup_obs_interp_wts( xp, iv ) 
+
+   IF (trace_use) CALL da_trace_exit("da_setup_obs_structures")    
 
 END SUBROUTINE da_setup_obs_structures
 

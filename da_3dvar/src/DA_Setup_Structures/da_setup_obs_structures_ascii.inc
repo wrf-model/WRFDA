@@ -19,6 +19,8 @@ SUBROUTINE da_setup_obs_structures_ascii( xp, ob, iv )
 
    CHARACTER(len=120)           :: filename
    integer                      :: n
+
+   IF (trace_use) CALL da_trace_entry("da_setup_obs_structures_ascii")
    
 !-----------------------------------------------------------------------------
 !  [0.0] Initialize the counters.
@@ -261,6 +263,9 @@ SUBROUTINE da_setup_obs_structures_ascii( xp, ob, iv )
    CALL da_fill_obs_structures( iv, ob )
 
    iv%current_ob_time = 1
+
+   IF (trace_use) CALL da_trace_exit("da_setup_obs_structures_ascii")
+
 
 END SUBROUTINE da_setup_obs_structures_ascii
 

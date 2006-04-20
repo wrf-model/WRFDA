@@ -27,6 +27,7 @@ MODULE DA_Setup_Structures
    use module_wrf_3dvar_io
    use da_radiance
    USE module_wrf_error
+   use da_tracing
 
    IMPLICIT NONE
 
