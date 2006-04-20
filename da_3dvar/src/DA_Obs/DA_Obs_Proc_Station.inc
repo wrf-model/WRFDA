@@ -16,6 +16,21 @@
 
 loop_levels: DO i = 1, obs % info % levels
 
+! Add gross check for t, p, rh (Y.-R. Guo, 04/17/2006):....................
+
+   if (obs%each(i)%t %inv <  75.0 .or. obs%each(i)%t %inv > 350.0   ) then
+                                       obs%each(i)%t %inv = missing_r
+                                       obs%each(i)%t %qc  = missing
+   endif
+   if (obs%each(i)%p %inv <=  0.0 .or. obs%each(i)%p %inv > 110000.0) then
+                                       obs%each(i)%p %inv = missing_r
+                                       obs%each(i)%p %qc  = missing
+   endif
+   if (obs%each(i)%rh%inv < 0.0)  then
+                                       obs%each(i)%rh%inv = missing_r
+                                       obs%each(i)%rh%qc  = missing
+   endif
+! ..........................................................................
       ho   = obs % each(i) % height
       po   = obs % each(i) % p  % inv
       to   = obs % each(i) % t  % inv
@@ -27,13 +42,12 @@ loop_levels: DO i = 1, obs % info % levels
              abs(rho-  missing_r) > 1.) then
 
              call DA_TP_To_Qs(to, po, es, qs )
-
+             
              if (rho > 100.) then
                qvo = qs
              else
                qvo  = rho * qs / 100.
              endif
-
          else
              qvo       = missing_r
          endif
