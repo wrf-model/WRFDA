@@ -45,7 +45,6 @@ SUBROUTINE da_trace_report
    ! start of code
    !==========================================================================
 
-call wrf_oi(__FILE__,__LINE__)
    CALL SYSTEM_CLOCK (COUNT=temp)
 
    TotalElapsedTime=temp-BaseElapsedTime ! on PE 0
@@ -67,18 +66,18 @@ call wrf_oi(__FILE__,__LINE__)
    ELSE
       MasterNoRoutines=0
    END IF
-call wrf_oi(__FILE__,__LINE__)
+
    CALL proc_sum_int(MasterNoRoutines)
-call wrf_oi(__FILE__,__LINE__)
+   ! Only PE knows the result
+
 #ifdef DM_PARALLEL
-   CALL MPI_BCAST(MasterTimerNames(1:MasterNoRoutines), &
-                  TraceNameLen*MasterNoRoutines, &
-                  MPI_CHARACTER,0, MPI_COMM_WORLD,istat)
+   CALL MPI_BCAST(MasterTimerNames(1:MaxNoRoutines), &
+                  TraceNameLen*MaxNoRoutines, &
+                  MPI_CHARACTER,trace_pe, MPI_COMM_WORLD,istat)
 
 !   CALL GC_CBCAST(1001,TraceNameLen*MasterNoRoutines,0,nproc,istat, &
 !      MasterTimerNames(1:MasterNoRoutines))
 #endif
-call wrf_oi(__FILE__,__LINE__)
 
    MasterElapsedTime(:,:)=0.0
    MasterCPUTime(:,:)=0.0
@@ -86,8 +85,8 @@ call wrf_oi(__FILE__,__LINE__)
    MasterCPUTimeLocal(:,:)=0.0
    MasterNoCalls(:,:)=0
    MasterMaxHeap(:,:)=0
-call wrf_oi(__FILE__,__LINE__)
-   DO Loop1=1,MasterNoRoutines
+
+   DO Loop1=1,MaxNoRoutines
       DO Loop2=1,NoRoutines
          IF (TimerNames(Loop2) == MasterTimerNames(Loop1)) THEN
             MasterElapsedTime(mype,Loop1)=ElapsedTime(Loop2)
@@ -100,34 +99,34 @@ call wrf_oi(__FILE__,__LINE__)
          END IF
       END DO
    END DO
-call wrf_oi(__FILE__,__LINE__)
-write (0,*) "nproc,MaxNoRoutines",nproc,MaxNoRoutines
-write (0,*) "SIZE(MasterElapsedTime)",SIZE(MasterElapsedTime)
+
    DO i=0,nproc-1
       CALL proc_sum_real(MaxNoRoutines,MasterElapsedTime(i,:))
       CALL proc_sum_real(MaxNoRoutines,MasterCPUTime(i,:))
       CALL proc_sum_real(MaxNoRoutines,MasterElapsedTimeLocal(i,:))
       CALL proc_sum_real(MaxNoRoutines,MasterCPUTimeLocal(i,:))
-      DO j=1,MaxNoRoutines
-         CALL proc_sum_int(MasterNoCalls(i,j))
-      END DO
    END DO
-   rtemp1(:)=SUM(MasterElapsedTimeLocal(:,:),1)
 
-   !==========================================================================
-   ! Sort subroutines into time order based on local Elapsed Time.
-   ! All PEs should have the same sort order after the sum.
-   !==========================================================================
+   IF (mype == 0) THEN
 
-   ALLOCATE (Index(MasterNoRoutines))
+      DO j=1,MasterNoRoutines
+        rtemp1(j)=SUM(MasterElapsedTimeLocal(:,j))
+      END DO
+      !==========================================================================
+      ! Sort subroutines into time order based on local Elapsed Time.
+      ! All PEs should have the same sort order after the sum.
+      !==========================================================================
 
-   CALL da_trace_real_sort(rtemp1,MasterNoRoutines,index)
+      ALLOCATE (Index(MasterNoRoutines))
 
-   OverallElapsedTime(:)=SUM(MasterElapsedTimeLocal(:,:),1)
-   OverallCPUTime(:)=SUM(MasterCPUTimeLocal(:,:),1)
-   OverallNoCalls(:)=SUM(MasterNoCalls(:,:),1)
+      CALL da_trace_real_sort(rtemp1,MasterNoRoutines,index)
 
-   IF (mype == trace_pe) THEN
+      DO j=1,MasterNoRoutines
+         OverallElapsedTime(j)=SUM(MasterElapsedTimeLocal(:,j))
+         OverallCPUTime(j)=SUM(MasterCPUTimeLocal(:,j))
+         OverallNoCalls(j)=SUM(MasterNoCalls(:,j))
+      END DO
+
       ! Output timing information
 
       WRITE(UNIT=trace_unit, &
@@ -145,7 +144,7 @@ write (0,*) "SIZE(MasterElapsedTime)",SIZE(MasterElapsedTime)
          WRITE (UNIT=trace_unit,FMT='(A)') &
             "No estimate can be made of time in trace itself.<p>"
       END IF
-call wrf_oi(__FILE__,__LINE__)
+
       WRITE(UNIT=trace_unit, &
          FMT='("<TABLE BORDER>")')
       WRITE(UNIT=trace_unit, &
@@ -229,21 +228,21 @@ call wrf_oi(__FILE__,__LINE__)
       WRITE(UNIT=trace_unit, &
          FMT='("</TABLE><p><p>")')
 
-   END IF ! mype==trace_pe
+      !===================================================================================
+      ! Sort subroutines into time order based on overall Elapsed Time.
+      ! All PEs should have the same sort order after the sum. 
+      !===================================================================================
 
-   !===================================================================================
-   ! Sort subroutines into time order based on overall Elapsed Time.
-   ! All PEs should have the same sort order after the sum. 
-   !===================================================================================
+      DO j=1,MasterNoRoutines
+        rtemp1(j)=SUM(MasterElapsedTime(:,j))
+      END DO
 
-   rtemp1(:)=SUM(MasterElapsedTime(:,:),1)
+      CALL da_trace_real_sort(rtemp1,MasterNoRoutines,index)
 
-   CALL da_trace_real_sort(rtemp1,MasterNoRoutines,index)
-
-   OverallElapsedTime(:)=SUM(MasterElapsedTime(:,:),1)
-   OverallCPUTime(:)=SUM(MasterCPUTime(:,:),1)
-
-   IF (mype == trace_pe) THEN
+      DO j=1,MasterNoRoutines
+         OverallElapsedTime(j)=SUM(MasterElapsedTime(:,j))
+         OverallCPUTime(j)=SUM(MasterCPUTime(:,j))
+      END DO
 
       ! Output timing information
 
@@ -334,7 +333,7 @@ call wrf_oi(__FILE__,__LINE__)
       WRITE(UNIT=trace_unit, &
          FMT='("</TABLE>")')
 
-   END IF ! mype==trace_pe
+   END IF ! mype==0
 
    !===================================================================================
    ! Sort subroutines into memory use order by max memory on one PE
@@ -348,11 +347,13 @@ call wrf_oi(__FILE__,__LINE__)
          END DO
       END DO
 
-      itemp1(:)=MAXVAL(MasterMaxHeap(:,:),1)
+      IF (mype == 0) THEN
 
-      CALL da_trace_int_sort(itemp1,MasterNoRoutines,index)
+         DO i=1,MasterNoRoutines
+            itemp1(j)=MAXVAL(MasterMaxHeap(:,j))
+         END DO
 
-      IF (mype == trace_pe) THEN
+         CALL da_trace_int_sort(itemp1,MasterNoRoutines,index)
 
          WRITE (UNIT=trace_unit,FMT='("<hr><a name=memory><h2>Maximum memory usage for routines</h2></a>")')
          WRITE (UNIT=trace_unit,FMT='("<TABLE BORDER>")')
@@ -370,8 +371,8 @@ call wrf_oi(__FILE__,__LINE__)
       END IF
    END IF
 
-   DEALLOCATE(index)
+   CLOSE(trace_unit)
 
-   RETURN
+   DEALLOCATE(index)
 
 END SUBROUTINE da_trace_report
