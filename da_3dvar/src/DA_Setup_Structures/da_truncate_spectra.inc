@@ -12,9 +12,6 @@ subroutine da_truncate_spectra( max_wave, nw, power_truncation, power, max_wave_
    real                     :: truncated_power   ! Truncated power.
    real                     :: cumul_power       ! Cumulative power.
 
-   IF (trace_use) CALL da_trace_entry("da_truncate_spectra")
-
-
    truncated_power = power_truncation * sum(power(0:nw))
 
    cumul_power = 0.0
@@ -33,9 +30,6 @@ subroutine da_truncate_spectra( max_wave, nw, power_truncation, power, max_wave_
       write(6,'(a,i8)')' Truncating to wavenumber = ', max_wave_trunc
       max_wave_trunc = max_wave
    end if
-
-   IF (trace_use) CALL da_trace_exit("da_truncate_spectra")
-
 
 end subroutine da_truncate_spectra
 
