@@ -24,6 +24,7 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
    USE DA_Tools
    USE DA_Minimisation
    USE par_util
+   USE da_tracing
 
 ! Registry generated module
    USE module_state_description
@@ -57,6 +58,8 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
 
    integer                      :: cv_size
    real                         :: j_grad_norm_target ! TArget j norm.
+
+   IF (trace_use) CALL da_trace_entry("solve_v3d")
 
 !------------------------------------------------------------------------------
 
@@ -215,6 +218,8 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
    CALL wrf_message("*** WRF-Var completed successfully ***")
 
    CALL wrf_debug ( 200 , ' call end of solve_v3d' )
+
+   IF (trace_use) CALL da_trace_exit("solve_v3d")
 
 CONTAINS
 
