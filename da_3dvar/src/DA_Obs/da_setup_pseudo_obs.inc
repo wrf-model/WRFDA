@@ -12,8 +12,8 @@ SUBROUTINE da_setup_pseudo_obs( iv, ob )
    integer                       :: n    ! Loop counters.
 
 
-   write(UNIT=stdout, fmt='(a, i8)') &
-        'num_pseudo=', num_pseudo
+!   write(UNIT=stdout, fmt='(a, i8)') &
+!        'num_pseudo=', num_pseudo
 
    iv % num_pseudo = num_pseudo
    ob % num_pseudo = num_pseudo
