@@ -69,10 +69,10 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
 
    IF (trace_use) CALL da_trace_entry("da_setup_be_regional")
 
-   write (6,'(A)') ' -------------------------------------------------------'
-   write (6,'(A)') ' [3.0] Set up background errors for regional application'
-   write (6,'(A)') ' -------------------------------------------------------'
-   write (6,*)
+   write (UNIT=stdout,FMT='(A)') ' -------------------------------------------------------'
+   write (UNIT=stdout,FMT='(A)') ' [3.0] Set up background errors for regional application'
+   write (UNIT=stdout,FMT='(A)') ' -------------------------------------------------------'
+   write (UNIT=stdout,FMT=*) ' '
 
    be % v1 % name = 'psi  '           ! Streamfunction
    be % v2 % name = 'chi_u'           ! Uncorrelated velocity potential.
@@ -80,14 +80,14 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
    be % v4 % name = 'q/qsg'
    be % v5 % name = 'psfc'            ! surface pressure
 
-   write(6,'(3x,A)')' DA_Setup_Background_Errors: WRF-Var dry control variables are:'
-   write(6,'(4x,7A)')TRIM(be % v1 % name), ', ', TRIM(be % v2 % name), ', ', &
+   write(UNIT=stdout,FMT='(3x,A)')' DA_Setup_Background_Errors: WRF-Var dry control variables are:'
+   write(UNIT=stdout,FMT='(4x,7A)')TRIM(be % v1 % name), ', ', TRIM(be % v2 % name), ', ', &
                   TRIM(be % v3 % name), ' and ', TRIM(be % v5 % name)
 
-   write(6,'(3x,A,A)')' DA_Setup_Background_Errors: humidity control variable is ',&
+   write(UNIT=stdout,FMT='(3x,A,A)')' DA_Setup_Background_Errors: humidity control variable is ',&
                      TRIM(be % v4 % name)
 
-   write(6,*)
+   write(UNIT=stdout,FMT=*) ' '
 
    ix = xb % mix
    jy = xb % mjy
@@ -105,7 +105,7 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
    read(be_unit)num_bins, num_bins2d
    read(be_unit)bin(1:ni,1:nj,1:nk)
    read(be_unit)bin2d(1:ni,1:nj)
-   print '("ni, nj, nk, num_bins, num_bins2d:",5i8)', ni, nj, nk, num_bins, num_bins2d
+!   print '("ni, nj, nk, num_bins, num_bins2d:",5i8)', ni, nj, nk, num_bins, num_bins2d
 
 !  1.1 Read in regression coefficients
 
@@ -301,7 +301,7 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
 
       be % v5 % mz = 1
 
-      write(6,*)
+      write(UNIT=stdout,FMT=*) ' '
 
    ELSE
 
@@ -339,7 +339,7 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
    CALL DA_Allocate_Background_Errors( jy,  1, be5_eval_glo, be5_evec_glo, be5_eval_loc, &
                                        be5_evec_loc, be % v5 )
 
-   print '(2x,a,i10)',"b) Finished eigenvector processing! ij=", ij
+   WRITE(UNIT=stdout,FMT='(2x,a,i10)') "b) Finished eigenvector processing! ij=", ij
    
 ! 5.0 Load the scale lengths
 ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
