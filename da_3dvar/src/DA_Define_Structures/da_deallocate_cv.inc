@@ -13,12 +13,17 @@ SUBROUTINE da_deallocate_cv( cv )
    IMPLICIT NONE
 
    TYPE (cv_type), INTENT(INOUT)        :: cv     ! Control variable structure.
+
+   IF (trace_use) CALL da_trace_entry("da_deallocate_cv")
+
    
 !------------------------------------------------------------------------------
 !  [1.0] Deallocate arrays:
 !------------------------------------------------------------------------------
 
    DEALLOCATE ( cv % array )
+
+   IF (trace_use) CALL da_trace_exit("da_deallocate_cv")
    
 END SUBROUTINE da_deallocate_cv
 

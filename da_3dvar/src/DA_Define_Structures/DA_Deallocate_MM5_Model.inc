@@ -16,6 +16,8 @@ SUBROUTINE DA_Deallocate_MM5_Model( x_mm5 )
 
 !-End Of Header----------------------------------------------------------------
 
+  IF (trace_use) CALL da_trace_entry("da_deallocate_mm5_model")
+
 !------------------------------------------------------------------------------
 !  [1.0] Deallocate components of MM5 fields in structure:
 !------------------------------------------------------------------------------
@@ -99,5 +101,7 @@ SUBROUTINE DA_Deallocate_MM5_Model( x_mm5 )
       END IF
       
    end if
+
+   IF (trace_use) CALL da_trace_exit("da_deallocate_mm5_model")
 
 END SUBROUTINE DA_Deallocate_MM5_Model

@@ -155,7 +155,7 @@ SUBROUTINE DA_Allocate_Y( iv, y )
       ALLOCATE (y % sound(1:y % num_sound))
       do n = 1, y % num_sound
 
-         nlevels = iv % sound(n) % info % levels
+         nlevels = max(1,iv % sound(n) % info % levels)
          ALLOCATE (y % sound(n)%u(1:nlevels))
          ALLOCATE (y % sound(n)%v(1:nlevels))
          ALLOCATE (y % sound(n)%t(1:nlevels))

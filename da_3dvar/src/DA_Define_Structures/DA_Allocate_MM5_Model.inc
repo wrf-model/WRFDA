@@ -21,6 +21,8 @@ SUBROUTINE DA_Allocate_MM5_Model( x_mm5 )
 
 !-End Of Header----------------------------------------------------------------
 
+   IF (trace_use) CALL da_trace_entry("da_allocate_mm5_model")
+
 !------------------------------------------------------------------------------
 !  [1.0] Initialise:
 !------------------------------------------------------------------------------
@@ -139,5 +141,7 @@ SUBROUTINE DA_Allocate_MM5_Model( x_mm5 )
    x_mm5 % pp_c (:,:,:)  = 0.0
    x_mm5 % w (:,:,:)  = 0.0
    x_mm5 % tgrn(:,:) = 0.0
+
+   IF (trace_use) CALL da_trace_exit("da_allocate_mm5_model")
    
 END SUBROUTINE DA_Allocate_MM5_Model

@@ -15,6 +15,7 @@ SUBROUTINE DA_Deallocate_Observations ( ob )
    TYPE (ob_type), intent(inout)        :: ob     ! Observation structure.
    integer   :: n
 
+   IF (trace_use) CALL da_trace_entry("da_deallocate_observations")
 
 !------------------------------------------------------------------------------
 !  [1.0] Deallocate:
@@ -144,6 +145,8 @@ SUBROUTINE DA_Deallocate_Observations ( ob )
    endif
 
    if(ob%num_buoy     > 0) DEALLOCATE(ob%buoy)
+
+   IF (trace_use) CALL da_trace_exit("da_deallocate_observations")
 
 END SUBROUTINE DA_Deallocate_Observations
 

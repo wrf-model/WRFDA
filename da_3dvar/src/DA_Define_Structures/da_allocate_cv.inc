@@ -19,6 +19,9 @@ subroutine da_allocate_cv( cv_size, cv )
    real                                 :: z, mean_cv, rms_cv, std_dev_cv
    real                                 :: sum_cv, sum_cv2
 
+   IF (trace_use) CALL da_trace_entry("da_allocate_cv")
+
+
 !------------------------------------------------------------------------------
 !  [1.0] Initialize parameters:
 !------------------------------------------------------------------------------
@@ -69,5 +72,8 @@ subroutine da_allocate_cv( cv_size, cv )
       cv % array = 0.0
 
    end if
+
+   IF (trace_use) CALL da_trace_exit("da_allocate_cv")
+
 
 end subroutine da_allocate_cv

@@ -16,6 +16,9 @@ SUBROUTINE DA_Deallocate_Background_Errors ( be )
    
 !-----End Of Header------------------------------------------------------------
 
+   IF (trace_use) CALL da_trace_entry("da_deallocate_background_errors")
+
+
 !  Deallocate gridpoint errors:
 
    IF ( be % v1 % mz > 0 ) DEALLOCATE ( be % v1 % val )
@@ -52,5 +55,8 @@ SUBROUTINE DA_Deallocate_Background_Errors ( be )
 !  eg NMC error correlations).
 
 !  DEALLOCATE ( be % cv % val )
+
+   IF (trace_use) CALL da_trace_exit("da_deallocate_background_errors")
+
 
 END SUBROUTINE DA_Deallocate_Background_Errors

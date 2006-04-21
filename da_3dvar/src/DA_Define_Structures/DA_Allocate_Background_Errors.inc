@@ -24,6 +24,9 @@ SUBROUTINE DA_Allocate_Background_Errors ( jy, kz, l, e, be_eval_loc, &
    INTEGER                          :: mz                 ! Vertical truncation.
    INTEGER                          :: j, m, k            ! Loop counter.
 
+   IF (trace_use) CALL da_trace_entry("da_allocate_background_errors")
+
+
 !-----------------------------------------------------------------------------
 !  [1.0] Initialise:
 !-----------------------------------------------------------------------------
@@ -122,6 +125,8 @@ SUBROUTINE DA_Allocate_Background_Errors ( jy, kz, l, e, be_eval_loc, &
       be_sub % rf_alpha(1:mz) = 1.0
       
    END IF
+
+   IF (trace_use) CALL da_trace_exit("da_allocate_background_errors")
 
 END SUBROUTINE DA_Allocate_Background_Errors
 

@@ -17,6 +17,9 @@ SUBROUTINE DA_Allocate_Observations ( ob )
 
    TYPE (ob_type), intent(inout)        :: ob     ! Observation structure.
 
+   IF (trace_use) CALL da_trace_entry("da_allocate_observations")
+
+
 !------------------------------------------------------------------------------
 
    if(ob%num_sound > 0) then
@@ -81,5 +84,8 @@ SUBROUTINE DA_Allocate_Observations ( ob )
 
    if(ob%num_Bogus     > 0) &
       ALLOCATE(ob%Bogus(1:ob%num_Bogus))
+
+   IF (trace_use) CALL da_trace_exit("da_allocate_observations")
+
 
 END SUBROUTINE DA_Allocate_Observations

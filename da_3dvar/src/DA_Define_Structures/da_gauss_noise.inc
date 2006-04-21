@@ -5,6 +5,9 @@ subroutine da_gauss_noise( z )
    real,intent(out)     :: z
    real                 :: x, y, r, coeff
 
+   IF (trace_use) CALL da_trace_entry("da_gauss_noise")
+
+
 !  [2.1] Get two uniform variate random numbers in range 0 to 1:
 
    do
@@ -26,5 +29,7 @@ subroutine da_gauss_noise( z )
 
    coeff = sqrt( -2.0 * log(r) / r )         
    z = coeff * x
+
+   IF (trace_use) CALL da_trace_exit("da_gauss_noise")
       
 end subroutine da_gauss_noise
