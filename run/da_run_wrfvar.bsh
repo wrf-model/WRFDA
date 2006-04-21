@@ -79,7 +79,7 @@ export DA_E_WE=${DA_E_WE:-180}                 # X grid dimension.
 export DA_E_SN=${DA_E_SN:-180}                 # Y grid dimension.
 export DA_E_VERT=${DA_E_VERT:-28}              # Z grid dimension.
 export DA_DX=${DA_DX:-50000}                   # x grid resolution (m).
-export DA_DX=${DA_DX:-50000}                   # y grid resolution (m).
+export DA_DY=${DA_DY:-50000}                   # y grid resolution (m).
 export DA_SF_SURFACE_PHYSICS=${DA_SF_SURFACE_PHYSICS:-1}       #(1=Thermal diffusion, 2=Noah LSM).
 
 if test $DA_SF_SURFACE_PHYSICS == 1; then
