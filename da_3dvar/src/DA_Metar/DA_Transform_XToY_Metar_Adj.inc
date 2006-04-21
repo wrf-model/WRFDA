@@ -13,6 +13,8 @@ SUBROUTINE da_transform_xtoy_metar_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
   REAL                          :: dx, dxm  ! 
   REAL                          :: dy, dym  !
 
+  IF (trace_use) CALL da_trace_entry("da_transform_xtoy_metar_adj")
+
   IF ( iv%num_metar > 0 ) THEN
     if (sfc_assi_options == 1) then
       do n=iv%ob_numb(iv%current_ob_time-1)%metar + 1, iv%ob_numb(iv%current_ob_time)%metar
@@ -64,6 +66,9 @@ SUBROUTINE da_transform_xtoy_metar_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
       ENDDO
     endif
   END IF
+
+  IF (trace_use) CALL da_trace_exit("da_transform_xtoy_metar_adj")
+
 
 END SUBROUTINE da_transform_xtoy_metar_adj
 

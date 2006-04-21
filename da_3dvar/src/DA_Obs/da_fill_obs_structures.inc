@@ -16,6 +16,9 @@ SUBROUTINE da_fill_obs_structures( iv, ob )
    REAL                          :: rh_error ! RH obs. error.
    REAL                          :: q_error  ! q obs. error.
 
+   if (trace_use) CALL da_trace_entry("da_fill_obs_structures")
+
+
 !---------------------------------------------------------------------------
 !  [1.0] Allocate innovation vector and observation structures:
 !---------------------------------------------------------------------------
@@ -544,5 +547,8 @@ SUBROUTINE da_fill_obs_structures( iv, ob )
       iv % bogus_ef_slp = 1.0
 
    ENDIF
+
+   if (trace_use) CALL da_trace_exit("da_fill_obs_structures")
+
 
 END SUBROUTINE da_fill_obs_structures

@@ -14,6 +14,8 @@ SUBROUTINE DA_Calculate_Residual_Metar( oi, y, re,                        &
   TYPE (bad_data_type)              :: n_obs_bad
   INTEGER                           :: n
 
+  IF (trace_use) CALL da_trace_entry("da_calculate_residual_metar")
+
   IF ( oi%num_metar > 0 ) THEN
     n_obs_bad % u % num = number(0, 0, 0)
     n_obs_bad % v % num = number(0, 0, 0)
@@ -49,6 +51,8 @@ SUBROUTINE DA_Calculate_Residual_Metar( oi, y, re,                        &
                    n_obs_bad % p % num % use + n_obs_bad % q % num % use
 
   ENDIF
+
+  IF (trace_use) CALL da_trace_exit("da_calculate_residual_metar")
 
 END SUBROUTINE DA_Calculate_Residual_Metar
 

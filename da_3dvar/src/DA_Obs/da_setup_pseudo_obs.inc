@@ -11,6 +11,9 @@ SUBROUTINE da_setup_pseudo_obs( iv, ob )
 
    integer                       :: n    ! Loop counters.
 
+  IF (trace_use) CALL da_trace_entry("da_setup_pseudo_obs")
+
+
 
 !   write(UNIT=stdout, fmt='(a, i8)') &
 !        'num_pseudo=', num_pseudo
@@ -90,6 +93,8 @@ SUBROUTINE da_setup_pseudo_obs( iv, ob )
          write(UNIT=stdout,FMT='(3f15.5)')pseudo_x, pseudo_y, pseudo_z
       end do
    end if
+
+   IF (trace_use) CALL da_trace_exit("da_setup_pseudo_obs")
 
 END SUBROUTINE da_setup_pseudo_obs
 

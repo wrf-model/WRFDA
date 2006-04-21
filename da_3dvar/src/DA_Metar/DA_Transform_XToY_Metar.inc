@@ -13,6 +13,8 @@ SUBROUTINE da_transform_xtoy_metar ( xa, xb, iv, xp, y )
   REAL                         :: dx, dxm  ! 
   REAL                         :: dy, dym  !
 
+  IF (trace_use) CALL da_trace_entry("da_transform_xtoy_metar")
+
   IF ( iv%num_metar > 0 ) THEN
 
     !xyh      y%metar(:)%u = 0.0
@@ -71,6 +73,8 @@ SUBROUTINE da_transform_xtoy_metar ( xa, xb, iv, xp, y )
       end do
     endif
   ENDIF
+
+  IF (trace_use) CALL da_trace_exit("da_transform_xtoy_metar")
 
 END SUBROUTINE da_transform_xtoy_metar
 

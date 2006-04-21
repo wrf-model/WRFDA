@@ -32,6 +32,9 @@ SUBROUTINE DA_Read_Radar (iunit, ob, xp, filename)
    INTEGER                       :: total_obs, num_Radar, total_Radar
    INTEGER                        ::n_dup, ndup
 
+   if (trace_use) CALL da_trace_entry("da_read_radar")
+
+
 ! -------------------------------------------------------------------
 
    total_obs = ob%total_obs
@@ -349,6 +352,9 @@ SUBROUTINE DA_Read_Radar (iunit, ob, xp, filename)
       CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
     endif
 !----------------------------------------------------------------------------!
+
+   if (trace_use) CALL da_trace_exit("da_read_radar")
+
 
 END SUBROUTINE DA_Read_Radar
 

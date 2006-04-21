@@ -27,6 +27,9 @@ subroutine da_transform_vtox_adj( cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv, 
    real, dimension(xb%kms:xb%kme) :: p, mr_a, mr_b
    real    :: PU, PD, coeff
 
+  IF (trace_use) CALL da_trace_entry("da_transform_vtox_adj")
+
+
 !-------------------------------------------------------------------------
 !   Polar treatment for Global
 !-------------------------------------------------------------------------
@@ -240,6 +243,9 @@ subroutine da_transform_vtox_adj( cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv, 
                                    ims,ime, jms,jme, kms,kme,  &
                                    its,ite, jts,jte, kts,kte )
    end if
+
+  IF (trace_use) CALL da_trace_exit("da_transform_vtox_adj")
+
 
 end subroutine da_transform_vtox_adj
 

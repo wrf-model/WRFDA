@@ -30,6 +30,9 @@ SUBROUTINE da_get_innov_vector( it, ob, iv, &
 
    integer            :: n
 
+   IF (trace_use) CALL da_trace_entry("da_get_innov_vector")
+
+
 !----------------------------------------------------------------------------   
 
    CALL wrf_message("[5.1] Calculate innovation vector (iv)")
@@ -166,6 +169,9 @@ SUBROUTINE da_get_innov_vector( it, ob, iv, &
 #include <em_dummy_args.inc>
                               )
    endif
+
+   IF (trace_use) CALL da_trace_exit("da_get_innov_vector")
+
 
 END SUBROUTINE da_get_innov_vector
 

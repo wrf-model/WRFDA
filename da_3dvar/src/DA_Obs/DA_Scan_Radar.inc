@@ -27,6 +27,7 @@ SUBROUTINE DA_Scan_Radar (iunit, ob, xp, filename)
    LOGICAL                       :: outside, inside_halo
    INTEGER                        ::n_dup, ndup
 
+   if (trace_use) CALL da_trace_entry("da_scan_radar")
 
 ! -------------------------------------------------------------------
 !--default value.
@@ -241,6 +242,9 @@ SUBROUTINE DA_Scan_Radar (iunit, ob, xp, filename)
    ob%num_Radar = ob%num_Radar + num_Radar
 
    ob%ob_numb(ob%current_ob_time)%Radar = ob%num_Radar
+
+   if (trace_use) CALL da_trace_exit("da_scan_radar")
+
 
 END SUBROUTINE DA_Scan_Radar
 

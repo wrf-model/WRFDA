@@ -17,6 +17,8 @@ SUBROUTINE DA_Calculate_GradY_Metar( iv, re, jo_grad_y )
 
   INTEGER                      :: n
 
+  IF (trace_use) CALL da_trace_entry("da_calculate_grady_metar")
+
   IF ( iv%num_metar > 0 ) THEN
     DO n=1, iv%num_metar
       if( iv%metar(n)%loc%proc_domain_with_halo ) then
@@ -39,6 +41,8 @@ SUBROUTINE DA_Calculate_GradY_Metar( iv, re, jo_grad_y )
       endif
     END DO
   END IF
+
+  IF (trace_use) CALL da_trace_exit("da_calculate_grady_metar")
      
 END SUBROUTINE DA_Calculate_GradY_Metar
 

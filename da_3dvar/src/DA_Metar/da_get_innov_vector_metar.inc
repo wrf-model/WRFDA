@@ -51,6 +51,8 @@ SUBROUTINE da_get_innov_vector_metar ( it, xb, xp, ob, iv )
 
   if ( iv % num_metar < 1 ) return
 
+  IF (trace_use) CALL da_trace_entry("da_get_innov_vector_metar")
+
   !-------------------------------------------------------------------------
 
   itu   = 0; itvv    = 0; itp  = 0; itt  = 0; itqv  = 0;
@@ -273,6 +275,8 @@ SUBROUTINE da_get_innov_vector_metar ( it, xb, xp, ob, iv )
     'Number of failed mixing ratio observations:',itqvf,' on ',itqv, &
     'Finally Total Metar rejections ',ituf+itvvf+itpf+ittf+itqvf,' on ',&
                                       itu +itvv +itp +itt +itqv
+
+  IF (trace_use) CALL da_trace_exit("da_get_innov_vector_metar")
 
 END SUBROUTINE da_get_innov_vector_metar
 

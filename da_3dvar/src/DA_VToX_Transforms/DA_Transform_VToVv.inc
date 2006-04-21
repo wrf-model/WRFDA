@@ -17,6 +17,9 @@ subroutine DA_Transform_VToVv( cv_size, xb, be, cv, vv, xp, &
 
    integer                          :: mz   ! Vertical truncation.
 
+  IF (trace_use) CALL da_trace_entry("da_transform_vtovv")
+
+
 !-------------------------------------------------------------------------
 !  [1.0] Fill vv arrays from 1-dimensional cv array.
 !-------------------------------------------------------------------------
@@ -94,6 +97,9 @@ subroutine DA_Transform_VToVv( cv_size, xb, be, cv, vv, xp, &
                                     ims,ime, jms,jme, kms,kme,  &
                                     its,ite, jts,jte, kts,kte )
    END IF
+
+   IF (trace_use) CALL da_trace_exit("da_transform_vtovv")
+
 
 end subroutine DA_Transform_VToVv
 

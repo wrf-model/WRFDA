@@ -23,6 +23,9 @@ subroutine DA_Transform_VToVv_Global_Adj ( cv_size, xb, xbx, be, cv, vv, &
    integer                              :: cv_s ! Counter.
    integer                              :: cv_e ! Counter.
 
+  IF (trace_use) CALL da_trace_entry("da_transform_vtovv_global_adj")
+
+
 !-------------------------------------------------------------------------
 ! [1] Spectral to grid transform for standard control variables:
 !-------------------------------------------------------------------------
@@ -110,6 +113,9 @@ subroutine DA_Transform_VToVv_Global_Adj ( cv_size, xb, xbx, be, cv, vv, &
                                     its, ite, jts, jte )
       cv_s = cv_e + 1
    end do
+
+  IF (trace_use) CALL da_trace_exit("da_transform_vtovv_global_adj")
+
 
 end subroutine DA_Transform_VToVv_Global_Adj
 

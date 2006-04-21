@@ -17,6 +17,8 @@
 
    integer                          :: mz   ! Vertical truncation.
 
+   IF (trace_use) CALL da_trace_entry("da_transform_vtovv_adj")
+
 !-------------------------------------------------------------------------
 !  [2.0] Perform VToVV Transform:
 !-------------------------------------------------------------------------
@@ -94,6 +96,9 @@
    call vv_to_cv( vv, xp, &
                   (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%ne /), &
                   cv_size, cv )
+
+   IF (trace_use) CALL da_trace_exit("da_transform_vtovv_adj")
+
 
 END subroutine DA_Transform_VToVv_Adj
 

@@ -7,6 +7,7 @@ MODULE DA_Metar
   USE DA_Tools
   USE DA_Physics
   USE PAR_UTIL
+  USE da_tracing
 
   ! The "stats_metar_type" is ONLY used locally in DA_Metar:
 

@@ -19,6 +19,7 @@ MODULE DA_VToX_Transforms
    USE module_machine
    USE module_tiles
    USE module_dm
+   USE da_tracing
 
 ! Registry generated module
    USE module_state_description

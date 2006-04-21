@@ -22,6 +22,9 @@ SUBROUTINE da_check_max_iv_metar(it, metar, &
   INTEGER                                :: i
   LOGICAL                                :: failed
 
+  IF (trace_use) CALL da_trace_entry("da_check_max_iv_metar")
+
+
   !-----------------------------------------------------------------------------!
   ! [1.0] Open diagnostic file:
   !-----------------------------------------------------------------------------!
@@ -72,6 +75,8 @@ SUBROUTINE da_check_max_iv_metar(it, metar, &
   CALL da_max_error_qc (it, metar % info, metar % q, &
           max_error_q, itqv, itqvf, check_max_iv_unit, 'QV   ', &
                          failed, check_max_iv_print)
+
+  IF (trace_use) CALL da_trace_exit("da_check_max_iv_metar")
 
 END SUBROUTINE da_check_max_iv_metar
 

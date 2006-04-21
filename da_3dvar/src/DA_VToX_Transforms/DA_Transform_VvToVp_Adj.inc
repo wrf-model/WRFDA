@@ -29,6 +29,9 @@ SUBROUTINE DA_Transform_VvToVp_Adj( evec, eval, vertical_wgt, &
    INTEGER               :: i, j, m, k                 ! Loop counters.
    REAL                  :: temp
 
+  IF (trace_use) CALL da_trace_entry("da_transform_vvtovp_adj")
+
+
 !-------------------------------------------------------------------
 !  [1.0] Apply inner-product weighting if vertical_ip > 0:
 !------------------------------------------------------------------- 
@@ -56,6 +59,9 @@ SUBROUTINE DA_Transform_VvToVp_Adj( evec, eval, vertical_wgt, &
          END DO
       END DO
    END DO
+
+  IF (trace_use) CALL da_trace_exit("da_transform_vvtovp_adj")
+
 
 END SUBROUTINE DA_Transform_VvToVp_Adj
 

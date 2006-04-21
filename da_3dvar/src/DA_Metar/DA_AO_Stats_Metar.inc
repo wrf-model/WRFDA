@@ -12,6 +12,9 @@ SUBROUTINE DA_AO_Stats_Metar( stats_unit, oi, re )
 
   LOGICAL, EXTERNAL :: wrf_dm_on_monitor
 
+  IF (trace_use) CALL da_trace_entry("da_ao_stats_metar")
+
+
   nu = 0
   nv = 0
   nt = 0
@@ -95,6 +98,9 @@ SUBROUTINE DA_AO_Stats_Metar( stats_unit, oi, re )
       call DA_Print_Stats_Metar(stats_unit, nu, nv, nt, np, nq, metar)
     END IF
   END IF
+
+  IF (trace_use) CALL da_trace_exit("da_ao_stats_metar")
+
 
 END SUBROUTINE DA_AO_Stats_Metar
 

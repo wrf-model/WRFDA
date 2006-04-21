@@ -53,6 +53,9 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xp )
 !----------------------------------------------------------------------------!
    INTEGER                       :: iunit, ounit
 !----------------------------------------------------------------------------!
+
+   if (trace_use) CALL da_trace_entry("da_write_filtered_obs")
+
    iunit = gts_iunit
    ounit = filtered_obs_iunit - 10
    zero = 0
@@ -1156,4 +1159,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xp )
    call DA_Count_Filtered_Obs(ounit, xp)
    close (ounit)
 !--------------------------------------------------------------------------
+
+   if (trace_use) CALL da_trace_exit("da_write_filtered_obs")
+
 END SUBROUTINE da_write_filtered_obs

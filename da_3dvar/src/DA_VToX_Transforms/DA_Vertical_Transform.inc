@@ -17,6 +17,9 @@ subroutine DA_Vertical_Transform( string, be, vertical_wgt, vv, vp, &
 
    integer :: k_end
 
+   IF (trace_use) CALL da_trace_entry("da_vertical_transform")
+
+
    select case( string )
       
       case ( 'u' );
@@ -307,6 +310,8 @@ subroutine DA_Vertical_Transform( string, be, vertical_wgt, vv, vp, &
                             "Invalid DA_Vertical_Transform option "//TRIM(string))
 
    end select
+
+   IF (trace_use) CALL da_trace_exit("da_vertical_transform")
 
 END subroutine DA_Vertical_Transform
 

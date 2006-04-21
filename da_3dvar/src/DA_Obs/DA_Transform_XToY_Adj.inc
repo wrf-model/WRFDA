@@ -11,6 +11,9 @@ SUBROUTINE DA_Transform_XToY_Adj( xb, iv, xp, jo_grad_y, jo_grad_x )
    type (x_type), intent(inout)      :: jo_grad_x   ! grad_x(jo)
 
    integer :: i, j
+
+   if (trace_use) CALL da_trace_entry("da_transform_xtoy_adj")
+
    
 !-----------------------------------------------------------------------------
 !  [1.0] Radiosonde observation operator y = H(x):
@@ -137,5 +140,9 @@ SUBROUTINE DA_Transform_XToY_Adj( xb, iv, xp, jo_grad_y, jo_grad_x )
    call da_transform_xtoy_rad_adj ( iv, xp, jo_grad_y, jo_grad_x )
 
 !------------------------------------------------------------------------------
+
+   if (trace_use) CALL da_trace_exit("da_transform_xtoy_adj")
+
+
 END SUBROUTINE DA_Transform_XToY_Adj
 

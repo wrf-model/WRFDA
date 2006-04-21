@@ -30,6 +30,9 @@ subroutine da_transform_vtox( cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa, &
    real, dimension(xb%kms:xb%kme) :: p, mr_a, mr_b
    real    :: PU, PD, coeff
 
+  IF (trace_use) CALL da_trace_entry("da_transform_vtox")
+
+
    call da_zero_x ( xa )
 
 !-------------------------------------------------------------------------
@@ -241,6 +244,9 @@ subroutine da_transform_vtox( cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa, &
 #endif
     call DA_Set_Boundary_Xa(xa, xb)
    end if   
+
+  IF (trace_use) CALL da_trace_exit("da_transform_vtox")
+
 
 end subroutine da_transform_vtox
 

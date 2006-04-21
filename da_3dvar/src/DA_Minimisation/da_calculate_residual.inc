@@ -9,6 +9,8 @@
       type (y_type), intent(out)        :: re     ! Residual (O-A).
 
       integer    :: np_available, np_obs_used, np_missing  , np_bad_data 
+
+      IF (trace_use) CALL da_trace_entry("da_calculate_residual")
       
       np_available = 0
       np_obs_used  = 0
@@ -128,5 +130,8 @@
 
       call da_calculate_residual_rad( iv, y, re, np_missing, np_bad_data, &
                                         np_obs_used, np_available )
+
+      IF (trace_use) CALL da_trace_exit("da_calculate_residual")
+
 
       end subroutine da_calculate_residual

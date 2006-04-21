@@ -18,7 +18,10 @@ SUBROUTINE da_write_obs( ob, iv, re )
       
    integer                       :: n, k
    real                          :: f1, f2, f3, f4, f5
-   logical, external             :: wrf_dm_on_monitor
+   logical, external             :: wrf_dm_on_monitor 
+
+  if (trace_use) CALL da_trace_entry("da_write_obs")
+
 
   if ( wrf_dm_on_monitor() ) then
 !  [1] Transfer surface obs:
@@ -387,6 +390,9 @@ SUBROUTINE da_write_obs( ob, iv, re )
    write(omb_unit,'(a5,i8)')'*****', 0
 
    end if
+
+  if (trace_use) CALL da_trace_exit("da_write_obs")
+
    
 END SUBROUTINE da_write_obs
 
