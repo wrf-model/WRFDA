@@ -71,7 +71,7 @@ SUBROUTINE wrf_messages( str )
   USE module_wrf_error
   IMPLICIT NONE
   CHARACTER(LEN=*) :: str(:)
-  INTEGER I
+  INTEGER :: I
   DO I=1,SIZE(str)
     CALL wrf_message(str(i))
   END DO
@@ -91,6 +91,23 @@ SUBROUTINE wrf_message2( str )
   ENDIF
 #endif
 END SUBROUTINE wrf_message2
+
+SUBROUTINE wrf_messages2( str )
+  USE module_wrf_error
+  USE module_utility
+  IMPLICIT NONE
+  CHARACTER(LEN=*) :: str(:)
+  INTEGER :: I
+  write(0,*) str
+!TBH:  work around deficiencies in build-automation
+#ifdef USE_LOGERR
+  IF ( WRF_UTIL_IsInitialized() ) THEN
+    DO I=1,SIZE(str)
+      CALL WRF_UTIL_LogWrite( str, WRF_UTIL_LOG_INFO )
+    END DO
+  ENDIF
+#endif
+END SUBROUTINE wrf_messages2
 
 ! Quick way of showing location
 SUBROUTINE wrf_oi( str,line )
@@ -116,7 +133,7 @@ SUBROUTINE wrf_error_fatal3( file_str, line, str )
   IF ( line > 0 ) THEN
     CALL wrf_message( 'FATAL CALLED FROM FILE:  '//file_str//'  LINE:  '//TRIM(line_str) )
   ENDIF
-  CALL wrf_message( str )
+  CALL wrf_messages( str )
   CALL wrf_message( '-------------------------------------------' )
 #else
   CALL wrf_message2( '-------------- FATAL CALLED ---------------' )
@@ -129,6 +146,34 @@ SUBROUTINE wrf_error_fatal3( file_str, line, str )
 #endif
   CALL wrf_abort
 END SUBROUTINE wrf_error_fatal3
+
+SUBROUTINE wrf_warning3( file_str, line, str )
+  USE module_wrf_error
+  IMPLICIT NONE
+  CHARACTER*(*) file_str
+  INTEGER , INTENT (IN) :: line  ! only print file and line if line > 0
+  CHARACTER(LEN=*) :: str(:)
+  CHARACTER*256 :: line_str
+
+  write(line_str,'(i6)') line
+#if defined( DM_PARALLEL ) && ! defined( STUBMPI )
+  CALL wrf_message( '-------------- WARNING      ---------------' )
+  ! only print file and line if line is positive
+  IF ( line > 0 ) THEN
+    CALL wrf_message( 'WARNING FROM FILE:  '//file_str//'  LINE:  '//TRIM(line_str) )
+  ENDIF
+  CALL wrf_messages( str )
+  CALL wrf_message( '-------------------------------------------' )
+#else
+  CALL wrf_message2( '-------------- FATAL CALLED ---------------' )
+  ! only print file and line if line is positive
+  IF ( line > 0 ) THEN
+    CALL wrf_message( 'WARNING FROM FILE:  '//file_str//'  LINE:  '//TRIM(line_str) )
+  ENDIF
+  CALL wrf_messages2( str )
+  CALL wrf_message2( '-------------------------------------------' )
+#endif
+END SUBROUTINE wrf_warning3
 
 SUBROUTINE wrf_error_fatal( str )
   USE module_wrf_error
