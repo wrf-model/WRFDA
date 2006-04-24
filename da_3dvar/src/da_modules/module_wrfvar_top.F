@@ -121,6 +121,11 @@ CONTAINS
   CALL initial_config
 #endif
 
+  ! JRB In the long term, trace_use will be defined in namelist.input,
+  ! read above. Until then, initialise it to true here
+
+  trace_use = .TRUE.
+
   IF (trace_use) CALL da_trace_init
   IF (trace_use) CALL da_trace_entry("wrfvar_init")
 
