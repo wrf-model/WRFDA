@@ -67,16 +67,16 @@ SUBROUTINE da_trace_report
       MasterNoRoutines=0
    END IF
 
+#ifdef DM_PARALLEL
    CALL proc_sum_int(MasterNoRoutines)
    ! Only PE knows the result
 
-#ifdef DM_PARALLEL
    CALL MPI_BCAST(MasterTimerNames(1:MaxNoRoutines), &
                   TraceNameLen*MaxNoRoutines, &
                   MPI_CHARACTER,trace_pe, MPI_COMM_WORLD,istat)
 
 !   CALL GC_CBCAST(1001,TraceNameLen*MasterNoRoutines,0,nproc,istat, &
-!      MasterTimerNames(1:MasterNoRoutines))
+!      MasterTimerNames(1:MasterNoRoutines))  
 #endif
 
    MasterElapsedTime(:,:)=0.0
@@ -100,12 +100,14 @@ SUBROUTINE da_trace_report
       END DO
    END DO
 
+#ifdef DM_PARALLEL
    DO i=0,nproc-1
       CALL proc_sum_real(MaxNoRoutines,MasterElapsedTime(i,:))
       CALL proc_sum_real(MaxNoRoutines,MasterCPUTime(i,:))
       CALL proc_sum_real(MaxNoRoutines,MasterElapsedTimeLocal(i,:))
       CALL proc_sum_real(MaxNoRoutines,MasterCPUTimeLocal(i,:))
    END DO
+#endif
 
    IF (mype == 0) THEN
 
@@ -340,12 +342,14 @@ SUBROUTINE da_trace_report
    !===================================================================================
 
    IF (trace_memory) THEN
- 
+
+#ifdef DM_PARALLEL
       DO i=0,nproc-1
          DO j=1,MaxNoRoutines
             CALL proc_sum_int(MasterMaxHeap(i,j))
          END DO
       END DO
+#endif
 
       IF (mype == 0) THEN
 

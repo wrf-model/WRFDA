@@ -13,8 +13,13 @@ SUBROUTINE da_trace_init
 
    IOStatus = 0
 
+#ifdef DM_PARALLEL
    CALL wrf_get_nproc(nproc)
    CALL wrf_get_myproc(mype)
+#else
+   nproc=1
+   mype=0
+#endif
 
    !-----------------------------------------------------------------
    ! Open trace output file. 
