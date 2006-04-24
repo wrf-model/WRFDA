@@ -136,7 +136,7 @@ SUBROUTINE da_transform_xtoy( xb, iv, xa, xp, y )
 !  [20.0] Radiance observation operator y = H(x):
 !------------------------------------------------------------------------------
 
-   call da_transform_xtoy_rad ( xa, iv, xp, y )
+   IF (use_radiance) call da_transform_xtoy_rad ( xa, iv, xp, y )
 
    if (trace_use) CALL da_trace_exit("da_transform_xtoy")
 
