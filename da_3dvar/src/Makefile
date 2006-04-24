@@ -1160,6 +1160,7 @@ da_gen_be.o:	         \
 			DA_Constants.o			\
 			LAPACK.o			\
 			BLAS.o				\
+                        da_tracing.o                    \
 			DA_VToX_Transforms/DA_Transform_VpToVv.inc	\
 			DA_Tools/da_eof_decomposition.inc	\
 			DA_Tools/da_eof_decomposition_test.inc	\
