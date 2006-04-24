@@ -205,6 +205,7 @@ MODULE DA_Constants
    INTEGER, PARAMETER :: rtm_info_unit = 109  ! Radiance info file
    INTEGER, PARAMETER :: rtm_bias_unit = 110  ! Radiance bias file
    INTEGER, PARAMETER :: filtered_obs_iunit  = 192  ! Unit number for writing filtered obs
+   INTEGER, PARAMETER :: thickness_errors_unit = 193 ! See DA_Read_Obs
    INTEGER, PARAMETER :: unit_983            = 983 ! TBD
    integer, parameter  :: iunit = 70
    integer, parameter  :: ounit = iunit + 1
@@ -561,7 +562,11 @@ MODULE DA_Constants
                            max_buoy_input,  &
                            max_Radar_input, &
                            max_Bogus_input, &
-                           max_qscat_input
+                           max_qscat_input, &
+                           report_start, &
+                           report_end
+
+ LOGICAL                   print_obs_mapping
 
  integer                :: numb_procs, &         ! Number of total processors.
                            my_proc_id            ! My processor ID.
@@ -591,7 +596,7 @@ MODULE DA_Constants
 
 ! Tracing
 
-LOGICAL :: trace_use    = .TRUE.        ! Is tracing on overall?
+LOGICAL :: trace_use    = .FALSE.       ! Is tracing on overall?
 LOGICAL :: trace_memory = .TRUE.        ! Should memory useage info be collected
 ! CHARACTER (LEN=200) :: TraceFile="trace.html" ! trace filename
 INTEGER :: trace_pe=0                   ! PE number for tracing (defaults to 0)
