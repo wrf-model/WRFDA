@@ -5,22 +5,11 @@ PLATFORM=`uname`
 export MP_SHARED_MEMORY=yes
 
 echo ""
-echo "Running script run_wrfvar.bsh"
+echo "Running script da_run_wrfvar.bsh"
 echo "---------------------------------"
 echo ""
 
 date
-
-#-----------------------------------------------------------------------
-# USER: Define non-default job via environment variables: 
-#-----------------------------------------------------------------------
-
-#e.g.: export DAT_DIR=/users/dmbarker/data overrides the default below.
-#export DAT_DIR=/wrf/mmm02/wrfvar-testdata
-
-##########################################################################
-#USER: DO NOT MAKE CHANGES BELOW (if you do, you're on your own!) 
-##########################################################################
 
 #-----------------------------------------------------------------------
 # [1.0] Specify default environment variables:
@@ -150,6 +139,9 @@ export DA_INTERPOLATE_STATS=${DA_INTERPOLATE_STATS:-.TRUE.} # True if statistics
 export DA_CALCULATE_CG_COST_FN=${DA_CALCULATE_CG_COST_FN:-.FALSE.} # True if want CG diagnostic output. 
 export DA_CV_OPTIONS_HUM=${DA_CV_OPTIONS_HUM:-3}            # Moist control variable (1-3).
 export DA_CHECK_RH=${DA_CHECK_RH:-2}                        # Physical check on humidity (0-2).
+export DA_REPORT_START=${DA_REPORT_START:-1}                # Useful for debugging
+export DA_REPORT_END=${DA_REPORT_END:-10000000}             # Useful for debugging
+export DA_PRINT_OBS_MAPPING=${DA_PRINT_OBS_MAPPING:-.FALSE.}
 export DA_MAX_VERT_VAR1=${DA_MAX_VERT_VAR1:-99.0}           # CV1 variance truncation.
 export DA_MAX_VERT_VAR2=${DA_MAX_VERT_VAR2:-99.0}          # CV2 variance truncation.
 export DA_MAX_VERT_VAR3=${DA_MAX_VERT_VAR3:-99.0}          # CV3 variance truncation.
@@ -402,7 +394,10 @@ cat > namelist.wrfvar << EOF
  use_obs_errfac   = $DA_USE_OBS_ERRFAC,
  put_rand_seed    = $DA_PUT_RAND_SEED,
  omb_set_rand     = $DA_OMB_SET_RAND,
- omb_add_noise    = $DA_OMB_ADD_NOISE /
+ omb_add_noise    = $DA_OMB_ADD_NOISE, 
+ report_start     = $DA_REPORT_START,
+ report_end       = $DA_REPORT_END,
+ print_obs_mapping = $DA_PRINT_OBS_MAPPING /
 
 &record5
  TIME_WINDOW    = $DA_TIME_WINDOW,
