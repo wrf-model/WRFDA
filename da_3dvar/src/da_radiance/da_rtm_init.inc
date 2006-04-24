@@ -11,8 +11,10 @@ subroutine da_rtm_init(iv,ob)
 
  implicit none 
 
+#ifdef RTTOV
 #include "rttov_setup.interface"
 #include "rttov_readscattcoeffs.interface"
+#endif
  
  type (ob_type), intent (inout) :: iv
  type (y_type) , intent (inout) :: ob
@@ -192,6 +194,7 @@ subroutine da_rtm_init(iv,ob)
 ! 3.0 call rttov_setup for reading clear sky coefficients
 !-----------------------------------------------------------
 
+#ifdef RTTOV
  call rttov_setup (&
       & errorstatus,      &! out
       & rtm_error_unit,   &! in
@@ -200,6 +203,7 @@ subroutine da_rtm_init(iv,ob)
       & coefs,            &! out
       & sensor,           &! in
       & coefs_channels )   ! in Optional
+#endif
 
   if( any(errorstatus(:) /= errorstatus_success )) then
     CALL wrf_error_fatal3(__FILE__,__LINE__, &
@@ -224,8 +228,10 @@ subroutine da_rtm_init(iv,ob)
      allocate (coefs_scatt(n_scatt_coef))
      allocate (coefs_scatt_instname(n_scatt_coef))
      coefs_scatt_instname(1) = 'amsua'
+#ifdef RTTOV
      call rttov_readscattcoeffs(coef_errorstatus, coefs(i_amsua), &
                                 coefs_scatt(1))
+#endif
      if(coef_errorstatus /= errorstatus_success ) then
        CALL wrf_error_fatal3(__FILE__,__LINE__, &
          'rttov_readscattcoeffs failed')
@@ -236,8 +242,10 @@ subroutine da_rtm_init(iv,ob)
       allocate (coefs_scatt(n_scatt_coef))
       allocate (coefs_scatt_instname(n_scatt_coef))
       coefs_scatt_instname(1) = 'amsub'
+#ifdef RTTOV
       call rttov_readscattcoeffs(coef_errorstatus, coefs(i_amsub), &
                                  coefs_scatt(1))
+#endif
       if(coef_errorstatus /= errorstatus_success ) then
        CALL wrf_error_fatal3(__FILE__,__LINE__, &
          'rttov_readscattcoeffs failed')
@@ -249,15 +257,19 @@ subroutine da_rtm_init(iv,ob)
     allocate (coefs_scatt(n_scatt_coef))
     allocate (coefs_scatt_instname(n_scatt_coef))
     coefs_scatt_instname(1) = 'amsua'
+#ifdef RTTOV
     call rttov_readscattcoeffs(coef_errorstatus, coefs(i_amsua), &
                                coefs_scatt(1))
+#endif
     if(coef_errorstatus /= errorstatus_success ) then
        CALL wrf_error_fatal3(__FILE__,__LINE__, &
          'rttov_readscattcoeffs failed')
     endif
     coefs_scatt_instname(2) = 'amsub'
+#ifdef RTTOV
     call rttov_readscattcoeffs(coef_errorstatus, coefs(i_amsub), &
                                coefs_scatt(2))
+#endif
     if(coef_errorstatus /= errorstatus_success ) then
        CALL wrf_error_fatal3(__FILE__,__LINE__, &
          'rttov_readscattcoeffs failed')
@@ -285,8 +297,10 @@ subroutine da_rtm_init(iv,ob)
    write(UNIT=stdout,FMT='(a,2x,a,i5,2x,a,i5)') iv%instid(n)%rttovid_string, &
                         'nchanl=',nchanl(n), 'nscan=',nscan(n)
 
+#ifdef RTTOV
  call rttov_setupchan(nprofiles, nchanl(n), coefs(n), &    ! in
                   nfrequencies, nchannels, nbtout )        ! out
+#endif
 
   Allocate ( lprofiles(nfrequencies) )
   Allocate ( channels (nfrequencies) )
@@ -295,11 +309,12 @@ subroutine da_rtm_init(iv,ob)
   Allocate ( surfem ( nchannels ) )
   surfem(:) = 0.
 
+#ifdef RTTOV
  call rttov_setupindex(nchanl(n), nprofiles, nfrequencies, &    ! in
                   nchannels, nbtout, coefs(n), surfem,  &    ! in
                   lprofiles, channels, polarisations,     &    ! out
                   emissivity  )
-
+#endif
      write (UNIT=stdout,FMT=*) 'nprofiles = ', nprofiles, '  nchanl = ', nchanl(n), &
                  ' nfrequencies = ', nfrequencies, &
                  ' nchannels    = ', nchannels, &

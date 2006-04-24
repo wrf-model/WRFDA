@@ -12,7 +12,9 @@ subroutine da_rtm_ad( inst, nchanl, nprofiles, con_vars, &
 
  implicit none
 
+#ifdef RTTOV
 #include "rttov_ad.interface"
+#endif
 
  integer             ,  intent (in) :: inst, nchanl, nprofiles
  type (con_vars_type),  intent (in) :: con_vars (nprofiles)
@@ -130,8 +132,10 @@ subroutine da_rtm_ad( inst, nchanl, nprofiles, con_vars, &
 
  end do
 
+#ifdef RTTOV
  call rttov_setupchan(nprofiles, nchan, coef, &             ! in
                     nfrequencies, nchannels, nbtout )       ! out
+#endif
 
 
   Allocate ( lprofiles(nfrequencies), stat = alloc_status(31) )
@@ -220,10 +224,12 @@ subroutine da_rtm_ad( inst, nchanl, nprofiles, con_vars, &
  end do 
   
  surfem (:) = 0.
+#ifdef RTTOV
  call rttov_setupindex(nchan, nprofiles, nfrequencies, &    ! in
                nchannels, nbtout, coef, surfem,  &          ! in
                lprofiles, channels, polarisations,     &    ! out
                emissivity  )                                ! out                       
+#endif
 
  nc = nchannels/nprofiles
 
@@ -245,6 +251,7 @@ subroutine da_rtm_ad( inst, nchanl, nprofiles, con_vars, &
   end do
  end if
 
+#ifdef RTTOV
   call rttov_ad( & 
      & errorstatus,     &! out
      & nfrequencies,    &! in
@@ -266,6 +273,7 @@ subroutine da_rtm_ad( inst, nchanl, nprofiles, con_vars, &
      & transmission_ad, &! inout  adjoint input
      & radiance,    &! inout  direct model   (input due to pointers alloc)
      & radiance_ad ) ! inout  adjoint input  (output if converstion Bt -> rad)
+#endif
 
  if ( any(errorstatus(:) /= 0 )) then
      write (errmsg(1),*) 'rttov_direct error code = ', errorstatus(:)

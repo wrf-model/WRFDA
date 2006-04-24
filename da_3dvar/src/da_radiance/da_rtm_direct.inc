@@ -14,7 +14,9 @@ subroutine da_rtm_direct( inst, isflg, nchanl, nprofiles, &
 
  implicit none
 
+#ifdef RTTOV
 #include "rttov_direct.interface"
+#endif
 
  integer             ,  intent (in) :: inst, isflg, nchanl, nprofiles
  integer             ,  intent (in) :: nfrequencies, nchannels, nbtout
@@ -118,8 +120,10 @@ subroutine da_rtm_direct( inst, isflg, nchanl, nprofiles, &
     profiles(n) % cfraction   = 0.
  end do
 
+!#ifdef RTTOV
 ! call rttov_setupchan(nprofiles, nchan, coef, &             ! in
 !                    nfrequencies, nchannels, nbtout )       ! out
+!#endif
 
 
   Allocate ( lprofiles(nfrequencies), stat = alloc_status(31) )
@@ -159,10 +163,12 @@ subroutine da_rtm_direct( inst, isflg, nchanl, nprofiles, &
   End If
 
   surfem (:) = 0.
+#ifdef RTTOV
  call rttov_setupindex(nchan, nprofiles, nfrequencies, &    ! in
                nchannels, nbtout, coef, surfem,  &          ! in
                lprofiles, channels, polarisations,     &    ! out
                emissivity  )                                ! out                       
+#endif
 
 !  surface emissivity scheme
 !----------------------------------------------------------
@@ -245,6 +251,7 @@ end if
 !-----------------------------------
 !  calling RTTOV foreward model
 !----------------------------------
+#ifdef RTTOV
  call rttov_direct( &
      & errorstatus,     &! out
      & nfrequencies,    &! in
@@ -261,6 +268,7 @@ end if
      & emissivity,      &! inout
      & transmission,    &! inout
      & radiance )        ! inout
+#endif
 
  if ( any(errorstatus(:) /= 0 )) then
      !WRITE (UNIT=stdout,FMT=*) 'rttov_direct error code = ', errorstatus(:)

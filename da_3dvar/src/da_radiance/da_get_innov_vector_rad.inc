@@ -374,8 +374,10 @@
       zasat(1:nprofiles) = iv%instid(inst)%rad(n)%satzen * deg2rad
       zlsat(1:nprofiles) = iv%instid(inst)%rad(n)%satazi * deg2rad
 
+#ifdef RTTOV
       call rttov_setupchan(nprofiles, nchanl, coefs(inst), &   ! in
                      nfrequencies, nchannels, nbtout )      ! out
+#endif
       allocate(emissivity(nchannels))
       Allocate ( iv%instid(inst)%rad(n)%emiss(nchannels))
 
