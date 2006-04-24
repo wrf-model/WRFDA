@@ -83,7 +83,10 @@ SUBROUTINE DA_Read_Namelist
                        max_ssmi_tb_input, &
                        max_ssmt1_input, &
                        max_ssmt2_input, &
-                       max_qscat_input 
+                       max_qscat_input, &
+                       report_start, &
+                       report_end, &
+                       print_obs_mapping
    NAMELIST /RECORD5/  TIME_WINDOW, print_obs_info
    NAMELIST /RECORD6/  max_ext_its, EPS, NTMAX, NSAVE, &
                        write_switch, write_interval
@@ -192,6 +195,7 @@ SUBROUTINE DA_Read_Namelist
    Use_Eos_AmsuaObs = .FALSE.
    Use_Eos_RadObs = .FALSE.
    Use_HsbObs     = .FALSE.
+   use_kma1dvar   = .FALSE.
    check_max_iv   = .TRUE.
    use_obs_errfac = .FALSE.
    put_rand_seed  = .FALSE.
@@ -218,6 +222,9 @@ SUBROUTINE DA_Read_Namelist
    max_ssmt2_input = max_ssmt2
    max_qscat_input = max_qscat
    max_gpsref_input = max_gpsref
+   report_start    = 1
+   report_end      = 100000000
+   print_obs_mapping = .FALSE.
 
 !--record5
    TIME_WINDOW    = 3.
@@ -465,6 +472,10 @@ SUBROUTINE DA_Read_Namelist
     use_obsgts = .FALSE.
   END IF
 
+write (0,*) use_Hirs2Obs,use_Hirs3Obs, use_MsuObs, use_AmsuaObs, &
+      use_AmsubObs, use_AirsObs, use_Eos_AmsuaObs, &
+      use_Eos_RadObs, use_HsbObs, use_kma1dvar
+
   IF (use_Hirs2Obs .OR. use_Hirs3Obs .OR. use_MsuObs .OR. use_AmsuaObs .OR. &
       use_AmsubObs .OR. use_AirsObs .OR. use_Eos_AmsuaObs .OR. &
       use_Eos_RadObs .OR. use_HsbObs .OR. use_kma1dvar) THEN
@@ -472,6 +483,8 @@ SUBROUTINE DA_Read_Namelist
   ELSE
     use_radiance = .FALSE.
   END IF
+
+write (0,*) "oi use_radiance",use_radiance
 
 
    READ  ( UNIT = namelist_unit, NML = RECORD5 , IOSTAT = IOST)
@@ -871,6 +884,8 @@ SUBROUTINE DA_Read_Namelist
   end if
    
    WRITE(UNIT=stdout,FMT='(A)') "----------------------------------------"
+
+write (0,*) "oi2 use_radiance",use_radiance
 
    RETURN
 
