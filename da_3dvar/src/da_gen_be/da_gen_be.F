@@ -12,6 +12,7 @@ module da_gen_be
    use LAPACK
    use BLAS
    USE module_wrf_error
+   USE da_tracing
 
    implicit none
 

@@ -2,6 +2,7 @@ program gen_be_stage2
 
    use da_constants
    use da_gen_be
+   use da_tracing
 
    implicit none
 
@@ -68,6 +69,9 @@ program gen_be_stage2
 !---------------------------------------------------------------------------------------------
    write(6,'(a)')' [1] Initialize namelist variables and other scalars.'
 !---------------------------------------------------------------------------------------------
+
+   if (trace_use) call da_trace_init
+   if (trace_use) call da_trace_entry("gen_be_stage2")
 
    start_date = '2004030312'
    end_date = '2004033112'
@@ -380,5 +384,8 @@ program gen_be_stage2
          write(63,'(3i6,1pe13.5)')k, j, b, var2_inv(k,k,b)
       end do
    end do
+
+   if (trace_use) call da_trace_exit("gen_be_stage2")
+   if (trace_use) call da_trace_report
 
 end program gen_be_stage2

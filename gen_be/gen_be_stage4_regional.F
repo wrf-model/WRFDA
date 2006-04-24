@@ -1,6 +1,7 @@
 program gen_be_stage4_regional
 
    use da_constants
+   use da_tracing
 
    implicit none
 
@@ -30,6 +31,10 @@ program gen_be_stage4_regional
 
    namelist / gen_be_stage4_regional_nl / start_date, end_date, interval, variable, &
                                           be_method, ne, k, stride, run_dir
+
+
+   if (trace_use) call da_trace_init
+   if (trace_use) call da_trace_entry("gen_be_stage4_regional")
 
 !---------------------------------------------------------------------------------------------
    write(6,'(a)')' [1] Initialize namelist variables and other scalars.'
@@ -128,6 +133,9 @@ program gen_be_stage4_regional
    deallocate (field) 
    deallocate (r)
    deallocate (cov)
+
+   if (trace_use) call da_trace_exit("gen_be_stage4_regional")
+   if (trace_use) call da_trace_report
 
 end program gen_be_stage4_regional
 

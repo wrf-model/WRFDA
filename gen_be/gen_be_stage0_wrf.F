@@ -15,6 +15,7 @@ program gen_be_stage0_wrf
 !----------------------------------------------------------------------
 
    use da_constants
+   use da_tracing
 
    implicit none
 
@@ -88,6 +89,9 @@ program gen_be_stage0_wrf
 !---------------------------------------------------------------------------------------------
    write(6,'(a)')' [1] Initialize information.'
 !---------------------------------------------------------------------------------------------
+
+   if (trace_use) call da_trace_init
+   if (trace_use) call da_trace_entry("gen_be_stage0_wrf")
 
    test_inverse = .true.
    ktest = 1
@@ -297,6 +301,9 @@ program gen_be_stage0_wrf
    deallocate( psfc )
    deallocate( height )
    deallocate( xlat )
+
+   if (trace_use) call da_trace_exit("gen_be_stage0_wrf")
+   if (trace_use) call da_trace_report
 
 CONTAINS
 

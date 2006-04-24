@@ -2,6 +2,7 @@ program gen_be_stage4_global
 
    use da_constants
    use be_spectral
+   use da_tracing
 
    implicit none
 
@@ -56,6 +57,9 @@ program gen_be_stage4_global
 
    namelist / gen_be_stage4_global_nl / start_date, end_date, interval, variable, gaussian_lats, &
                                         testing_spectral, be_method, ne, k
+
+   if (trace_use) call da_trace_init
+   if (trace_use) call da_trace_entry("gen_be_stage4_global")
 
    pi_over_180 = pi / 180.0
 
@@ -213,5 +217,8 @@ program gen_be_stage4_global
    write(ounit)max_wavenumber, k
    write(ounit)data_on_levels, use_global_eofs
    write(ounit)total_power
+
+   if (trace_use) call da_trace_exit("gen_be_stage4_global")
+   if (trace_use) call da_trace_report
 
 end program gen_be_stage4_global

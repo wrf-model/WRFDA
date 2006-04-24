@@ -17,7 +17,7 @@ be :		arch                    \
                 advance_cymdh
 
 GEN_BE_OBJS = da_gen_be.o DA_Constants.o be_spectral.o LAPACK.o BLAS.o module_wrf_error.o \
-  da_fftpack5.o
+  da_fftpack5.o da_tracing.o da_memory.o
 
 gen_be_stage0_wrf : gen_be_stage0_wrf.o
 	$(LD) -o gen_be_stage0_wrf.exe $(LDFLAGS) $(GEN_BE_OBJS)  gen_be_stage0_wrf.o -L$(NETCDF)/lib -lnetcdf $(EXTRA_LIBS)

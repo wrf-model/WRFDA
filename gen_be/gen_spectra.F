@@ -2,6 +2,7 @@ program gen_spectra
 
    use da_constants
    use da_spectral
+   use da_tracing
 
    implicit none
 
@@ -56,6 +57,9 @@ program gen_spectra
    real, allocatable   :: power(:)                   ! Power spectrum (n).
    complex, allocatable:: cv(:)                      ! Control variable vector.
    complex, allocatable:: cv_out(:)                  ! Control variable vector copy for tests.
+
+   if (trace_use) call da_trace_init
+   if (trace_use) call da_trace_entry("gen_spectra")
 
    pi = 4.0 * atan(1.0)
    pi_over_180 = pi / 180.0
@@ -217,5 +221,8 @@ program gen_spectra
 
       end do  ! End loop over ensemble members.
    end do     ! End loop over times.
+
+   if (trace_use) call da_trace_exit("gen_spectra")
+   if (trace_use) call da_trace_report
 
 end program gen_spectra

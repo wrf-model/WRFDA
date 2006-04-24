@@ -2,6 +2,7 @@ program gen_be_stage3
 
    use da_constants
    use da_gen_be
+   use da_tracing
 
    implicit none
 
@@ -59,6 +60,10 @@ program gen_be_stage3
                                  hgt_min, hgt_max, binwidth_hgt, &
                                  testing_eofs, use_global_eofs, data_on_levels, &
                                  expt, dat_dir
+
+
+   if (trace_use) call da_trace_init
+   if (trace_use) call da_trace_entry("gen_be_stage3")
 
 !---------------------------------------------------------------------------------------------
    write(6,'(a)')' [1] Initialize namelist variables and other scalars.'
@@ -339,6 +344,9 @@ program gen_be_stage3
          read(date(1:10), fmt='(i10)')cdate
       end do
    end if
+
+   if (trace_use) call da_trace_exit("gen_be_stage3")
+   if (trace_use) call da_trace_report
 
 end program gen_be_stage3
 
