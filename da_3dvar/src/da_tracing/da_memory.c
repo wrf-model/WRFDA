@@ -15,7 +15,7 @@ void da_memory_(
 
   memory_used)
 
-  long *memory_used;
+  int *memory_used;
 {
 #ifndef MACOS
 struct mallinfo result;
