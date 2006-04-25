@@ -1,16 +1,11 @@
-MODULE DA_Grid_Definitions
+MODULE da_grid_definitions
    
-!------------------------------------------------------------------------------
-!  PURPOSE: Calculation of analysis grid variables:
-!
-!  METHOD:  Varied.
-!
-!  HISTORY: 01/06/2000 - Creation of F90 version.           Dale Barker
-!
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! PURPOSE: Calculation of analysis grid variables:
+   !---------------------------------------------------------------------------
    
-   USE DA_Constants
-   USE DA_Define_Structures     ! For xpose_type.
+   USE da_constants
+   USE da_define_structures     ! For xpose_type.
    
    IMPLICIT NONE
    
@@ -22,5 +17,4 @@ MODULE DA_Grid_Definitions
 #include <earth_2_model_wind.inc>
 #include <set_map_para.inc>
 
-END MODULE DA_Grid_Definitions
-
+END MODULE da_grid_definitions
