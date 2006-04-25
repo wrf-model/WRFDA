@@ -250,6 +250,7 @@ DA_VToX_Transforms.o:	DA_VToX_Transforms.F              \
 			da_fftpack5.o                     \
 			da_spectral.o                     \
 			DA_SSMI.o                         \
+                        da_tracing.o                      \
 			DA_Transform_VToVv.inc            \
 			DA_Transform_VToVv_Adj.inc        \
 			DA_Transform_VToVv_Global.inc     \
@@ -309,7 +310,8 @@ DA_Obs.o:		DA_Obs.F                   \
 			da_use_obs_errfac.inc      \
 			da_write_obs.inc           \
 			da_write_filtered_obs.inc  \
-			da_write_y.inc
+			da_write_y.inc             \
+                        da_deallocate_obs.inc
 
 da_pseudo.o:		da_pseudo.F                      \
 			DA_Constants.o                   \
@@ -1022,6 +1024,7 @@ da_gen_be.o:		da_gen_be.F                      \
                         DA_Constants.o			 \
 			LAPACK.o			 \
 			BLAS.o				 \
+                        da_tracing.o                     \
 			DA_Transform_VpToVv.inc	         \
 			da_eof_decomposition.inc         \
 			da_eof_decomposition_test.inc    \
