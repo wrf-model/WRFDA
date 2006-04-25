@@ -1,21 +1,16 @@
-SUBROUTINE DA_UV_To_Divergence( xb, u, v, div, &
+SUBROUTINE da_uv_to_divergence( xb, u, v, div, &
                                ids,ide, jds,jde, kds,kde,  &
                                ims,ime, jms,jme, kms,kme,  &
                                its,ite, jts,jte, kts,kte )
- 
-!------------------------------------------------------------------------------
-!  PURPOSE: Calculate divergence on a co-ordinate surface, given an input
-!           wind field.
-!
-!
-!  HISTORY: 09/28/1999 - Creation of F90 version.           Dale Barker
-!           02/02/2005 - Global update       Syed RH Rizvi
-!           06/02/2005 - add correct divergence for regional. Y.-R. Guo
-!.
-!                        d   U      d   V
-!           Div = m^2 *[---(---) + ---(---) ] 
-!                        dx  m      dy  M
-!------------------------------------------------------------------------------
+
+   !---------------------------------------------------------------------------
+   !  PURPOSE: Calculate divergence on a co-ordinate surface, given an input
+   !           wind field.
+   !
+   !                        d   U      d   V
+   !           Div = m^2 *[---(---) + ---(---) ] 
+   !                        dx  m      dy  M
+   !---------------------------------------------------------------------------
 
    implicit none
 
@@ -37,15 +32,18 @@ SUBROUTINE DA_UV_To_Divergence( xb, u, v, div, &
    real               :: coeff, inv_2ds
    real               :: um(ims:ime,jms:jme)          ! Temp. storage of u/m.
    real               :: vm(ims:ime,jms:jme)          ! Temp. storage of v/m.
-!------------------------------------------------------------------------------
-!  [1.0] Initialise:
-!------------------------------------------------------------------------------
+
+   !---------------------------------------------------------------------------
+   ! [1.0] Initialise:
+   !---------------------------------------------------------------------------
+
    one_third = 1.0 / 3.0
    div = 0.0
 
-!------------------------------------------------------------------------------
-!  Computation to check for edge of domain:
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! Computation to check for edge of domain:
+   !---------------------------------------------------------------------------
+
    is = its; ie = ite; js = jts; je = jte
    if ( .not. global .and. its == ids ) is = ids+1  
    if ( .not. global .and. ite == ide ) ie = ide-1
@@ -53,78 +51,75 @@ SUBROUTINE DA_UV_To_Divergence( xb, u, v, div, &
   
    if ( .not.global ) inv_2ds = 0.5 / xb%ds
 
-!------------------------------------------------------------------------------
-!  [2.0] Calculate divergence:
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! [2.0] Calculate divergence:
+   !---------------------------------------------------------------------------
+
    DO k = kts, kte
-   
-!     [2.1] Compute fd divergence at interior points:
+      ! [2.1] Compute fd divergence at interior points:
 
-   if ( global ) then
- 
-      DO j = js, je
-      DO i = is, ie
-         div(i,j,k) = xb%coefx(i,j) * (u(i+1,j,k) - u(i-1,j,k) ) + &
-                      xb%coefy(i,j) * (v(i,j+1,k) - v(i,j-1,k) )
-      END DO
-      END DO
+      if ( global ) then
+         DO j = js, je
+            DO i = is, ie
+               div(i,j,k) = xb%coefx(i,j) * (u(i+1,j,k) - u(i-1,j,k) ) + &
+                            xb%coefy(i,j) * (v(i,j+1,k) - v(i,j-1,k) )
+            END DO
+         END DO
 
-!      if( global ) cycle
-   else
+         ! if( global ) cycle
+      else
 
-      um(is-1:ie+1,js-1:je+1) = u(is-1:ie+1,js-1:je+1,k) / xb%map_factor(is-1:ie+1,js-1:je+1)
-      vm(is-1:ie+1,js-1:je+1) = v(is-1:ie+1,js-1:je+1,k) / xb%map_factor(is-1:ie+1,js-1:je+1)
+         um(is-1:ie+1,js-1:je+1) = u(is-1:ie+1,js-1:je+1,k) / xb%map_factor(is-1:ie+1,js-1:je+1)
+         vm(is-1:ie+1,js-1:je+1) = v(is-1:ie+1,js-1:je+1,k) / xb%map_factor(is-1:ie+1,js-1:je+1)
 
-!     [2.1] Compute fd divergence at interior points:
+         ! [2.1] Compute fd divergence at interior points:
 
-      DO j = js, je
-      DO i = is, ie
-         coeff = xb%map_factor(i,j) * xb%map_factor(i,j) * inv_2ds
-         div(i,j,k) = ( um(i+1,j) - um(i-1,j) + vm(i,j+1) - vm(i,j-1) ) * coeff
-      END DO
-      END DO
+         DO j = js, je
+            DO i = is, ie
+               coeff = xb%map_factor(i,j) * xb%map_factor(i,j) * inv_2ds
+               div(i,j,k) = ( um(i+1,j) - um(i-1,j) + vm(i,j+1) - vm(i,j-1) ) * coeff
+            END DO
+         END DO
 
-!     [2.2] Impose zero divergence gradient condition at boundaries:
+         ! [2.2] Impose zero divergence gradient condition at boundaries:
 
-!     [2.2.1] Bottom boundaries:
+         ! [2.2.1] Bottom boundaries:
 
-      if ( its == ids ) then
-         i = its 
-         do j = jts, jte
-            div(i,j,k) = one_third * ( 4.0 * div(i+1,j,k) - div(i+2,j,k) )
-         end do
-      end if
+         if ( its == ids ) then
+            i = its 
+            do j = jts, jte
+               div(i,j,k) = one_third * ( 4.0 * div(i+1,j,k) - div(i+2,j,k) )
+            end do
+         end if
 
-!     [2.2.2] Top boundaries:
+         ! [2.2.2] Top boundaries:
 
-      if ( ite == ide ) then
-         i = ite
-         do j = jts, jte
-            div(i,j,k) = one_third * ( 4.0 * div(i-1,j,k) - div(i-2,j,k) )
-         end do
-      end if
+         if ( ite == ide ) then
+            i = ite
+            do j = jts, jte
+               div(i,j,k) = one_third * ( 4.0 * div(i-1,j,k) - div(i-2,j,k) )
+            end do
+         end if
 
-!     [2.2.3] Left boundaries:
+         ! [2.2.3] Left boundaries:
 
-      if ( jts == jds ) then
-         j = jts
-         do i = its, ite
-            div(i,j,k) = one_third * ( 4.0 * div(i,j+1,k) - div(i,j+2,k) )
-         end do
-      end if
+         if ( jts == jds ) then
+            j = jts
+            do i = its, ite
+               div(i,j,k) = one_third * ( 4.0 * div(i,j+1,k) - div(i,j+2,k) )
+            end do
+         end if
 
-!     [2.2.4] right boundaries:
+         ! [2.2.4] right boundaries:
 
-      if ( jte == jde ) then
-         j = jte
-         do i = its, ite
-            div(i,j,k) = one_third * ( 4.0 * div(i,j-1,k) - div(i,j-2,k) )
-         end do
-      end if
-   
-    endif
-
-    END DO
+         if ( jte == jde ) then
+            j = jte
+            do i = its, ite
+               div(i,j,k) = one_third * ( 4.0 * div(i,j-1,k) - div(i,j-2,k) )
+            end do
+         end if
+      endif
+   END DO
 
    if( global ) then
       call da_set_boundary_3d(div, &
@@ -133,5 +128,5 @@ SUBROUTINE DA_UV_To_Divergence( xb, u, v, div, &
                               its,ite, jts,jte, kts,kte )
    endif
 
-END SUBROUTINE DA_UV_To_Divergence
+END SUBROUTINE da_uv_to_divergence
 

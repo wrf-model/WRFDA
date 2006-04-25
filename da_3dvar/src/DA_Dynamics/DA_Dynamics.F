@@ -1,19 +1,15 @@
-MODULE DA_Dynamics
+MODULE da_dynamics
 
-!------------------------------------------------------------------------------
-!  PURPOSE: Contains routines to calculate dynamical quantities.
-!
-!  METHOD:  See individual routines.
-!
-!  HISTORY: 11/08/1999 - Creation.                           Dale Barker
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   !  PURPOSE: Contains routines to calculate dynamical quantities.
+   !---------------------------------------------------------------------------
 
-   USE DA_Constants
-   USE DA_Define_Structures
-   USE DA_FFTs
-   USE DA_Statistics
-   USE DA_Interpolation
-   USE DA_Tools        
+   USE da_constants
+   USE da_define_structures
+   USE da_ffts
+   USE da_statistics
+   USE da_interpolation
+   USE da_tools        
 
    IMPLICIT NONE
 
@@ -38,5 +34,5 @@ MODULE DA_Dynamics
 #include "DA_UV_To_Vorticity.inc"
 #include "DA_WZ_BASE.inc"           
 
-END MODULE DA_Dynamics
+END MODULE da_dynamics
 

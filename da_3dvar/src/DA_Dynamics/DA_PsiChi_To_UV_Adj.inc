@@ -1,28 +1,19 @@
-subroutine DA_PsiChi_To_UV_Adj( u, v, coefx, coefy, psi, chi, &
+subroutine da_psichi_to_uv_adj( u, v, coefx, coefy, psi, chi, &
                                ids,ide, jds,jde, kds,kde,  &
                                ims,ime, jms,jme, kms,kme,  &
                                its,ite, jts,jte, kts,kte )
 
-!------------------------------------------------------------------------------
-!  PURPOSE: Adjoint code of DA_PsiChi_To_UV  
-!
-!  METHOD:  u = coefx * ( -dpsi/dy + dchi/dx )
-!           v = coefy * (  dpsi/dx + dchi/dy )
-!
-!  ASSUMPTIONS: Unstaggered grid.
-!               Lateral boundary conditions - dpsi/dn, dchi/dn = 0 (FCT)
-!               grid size may or may not be equal
-!
-!  HISTORY: 02/03/2000 - Creation of F90 version.           Dale Barker
-!           10/30/2001 - Parallel version.                  Dale Barker
-!
-!           09/27/2004 - Variable grid size with lat/lon or equal distance
-!                        Author:     Syed RH Rizvi ,    Org: NCAR/MMM
-!           12/11/2004 - Implementation of East-West periodic boundary 
-!                        for Global applications
-!                        Author:     Syed RH Rizvi ,    Org: NCAR/MMM
-!
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   !  PURPOSE: Adjoint code of DA_PsiChi_To_UV  
+   !
+   !  METHOD:  u = coefx * ( -dpsi/dy + dchi/dx )
+   !           v = coefy * (  dpsi/dx + dchi/dy )
+   !
+   !  ASSUMPTIONS: Unstaggered grid.
+   !               Lateral boundary conditions - dpsi/dn, dchi/dn = 0 (FCT)
+   !               grid size may or may not be equal
+   !
+   !---------------------------------------------------------------------------
 
    implicit none
 
@@ -42,173 +33,164 @@ subroutine DA_PsiChi_To_UV_Adj( u, v, coefx, coefy, psi, chi, &
    integer            :: is, ie                       ! 1st dim. end points.
    integer            :: js, je                       ! 2nd dim. end points.
 
-!------------------------------------------------------------------------------
-!  [5.0] For Global application, set Wast-Eest Periodic boundary
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! [5.0] For Global application, set Wast-Eest Periodic boundary
+   !---------------------------------------------------------------------------
+
    if( global ) then
-    call da_set_boundary_3d(u, &
+      call da_set_boundary_3d(u, &
                             ids,ide, jds,jde, kds,kde,  & 
                             ims,ime, jms,jme, kms,kme,  & 
                             its,ite, jts,jte, kts,kte ) 
-    call da_set_boundary_3d(v, &
+      call da_set_boundary_3d(v, &
                             ids,ide, jds,jde, kds,kde,  & 
                             ims,ime, jms,jme, kms,kme,  & 
                             its,ite, jts,jte, kts,kte ) 
    end if
 
-!------------------------------------------------------------------------------
-!  Computation to check for edge of domain:
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! Computation to check for edge of domain:
+   !---------------------------------------------------------------------------
 
-   is = its-1; ie = ite+1
-   js = jts-1; je = jte+1
-   if ( jts == jds ) js = jds+1; if ( jte == jde ) je = jde-1
+   is = its-1
+   ie = ite+1
+   js = jts-1
+   je = jte+1
+   if ( jts == jds ) js = jds+1
+   if ( jte == jde ) je = jde-1
 
    if ( .not. global ) then
       if ( its == ids ) is = ids+1
       if ( ite == ide ) ie = ide-1
-!------------------------------------------------------------------------------
-   do k = kts, kte
-   
-!------------------------------------------------------------------------------
-!     [4.0] Corner points (assume average of surrounding points - poor?):
-!------------------------------------------------------------------------------
 
-!     [4.1] Bottom-left point:
+      do k = kts, kte
 
-      if ( its == ids .AND. jts == jds ) then
-         u(its+1,jts,k) = u(its+1,jts,k) + 0.5 * u(its,jts,k)
-         u(its,jts+1,k) = u(its,jts+1,k) + 0.5 * u(its,jts,k)
-         v(its+1,jts,k) = v(its+1,jts,k) + 0.5 * v(its,jts,k)
-         v(its,jts+1,k) = v(its,jts+1,k) + 0.5 * v(its,jts,k)
-      end if
+         !---------------------------------------------------------------------
+         ! [4.0] Corner points (assume average of surrounding points - poor?):
+         !---------------------------------------------------------------------
 
-!     [4.2] Top-left point:
+         ! [4.1] Bottom-left point:
 
-      if ( ite == ide .AND. jts == jds ) then
-         u(ite-1,jts,k) = u(ite-1,jts,k) + 0.5 * u(ite,jts,k)
-         u(ite,jts+1,k) = u(ite,jts+1,k) + 0.5 * u(ite,jts,k)
-         v(ite-1,jts,k) = v(ite-1,jts,k) + 0.5 * v(ite,jts,k)
-         v(ite,jts+1,k) = v(ite,jts+1,k) + 0.5 * v(ite,jts,k)
-      end if
-      
-!     [4.3] Bottom-right point:
+         if ( its == ids .AND. jts == jds ) then
+            u(its+1,jts,k) = u(its+1,jts,k) + 0.5 * u(its,jts,k)
+            u(its,jts+1,k) = u(its,jts+1,k) + 0.5 * u(its,jts,k)
+            v(its+1,jts,k) = v(its+1,jts,k) + 0.5 * v(its,jts,k)
+            v(its,jts+1,k) = v(its,jts+1,k) + 0.5 * v(its,jts,k)
+         end if
 
-      if ( its == ids .AND. jte == jde ) then
-         u(its+1,jte,k) = u(its+1,jte,k) + 0.5 * u(its,jte,k)
-         u(its,jte-1,k) = u(its,jte-1,k) + 0.5 * u(its,jte,k)
-         v(its+1,jte,k) = v(its+1,jte,k) + 0.5 * v(its,jte,k)
-         v(its,jte-1,k) = v(its,jte-1,k) + 0.5 * v(its,jte,k)
-      end if
+        ! [4.2] Top-left point:
 
-!     [4.4] Top-right point:
+         if ( ite == ide .AND. jts == jds ) then
+            u(ite-1,jts,k) = u(ite-1,jts,k) + 0.5 * u(ite,jts,k)
+            u(ite,jts+1,k) = u(ite,jts+1,k) + 0.5 * u(ite,jts,k)
+            v(ite-1,jts,k) = v(ite-1,jts,k) + 0.5 * v(ite,jts,k)
+            v(ite,jts+1,k) = v(ite,jts+1,k) + 0.5 * v(ite,jts,k)
+         end if
 
-      if ( ite == ide .AND. jte == jde ) then
-         u(ite-1,jte,k) = u(ite-1,jte,k) + 0.5 * u(ite,jte,k)
-         u(ite,jte-1,k) = u(ite,jte-1,k) + 0.5 * u(ite,jte,k)
-         v(ite-1,jte,k) = v(ite-1,jte,k) + 0.5 * v(ite,jte,k)
-         v(ite,jte-1,k) = v(ite,jte-1,k) + 0.5 * v(ite,jte,k)
-      end if
-      
-   enddo
+         ! [4.3] Bottom-right point:
+
+         if ( its == ids .AND. jte == jde ) then
+            u(its+1,jte,k) = u(its+1,jte,k) + 0.5 * u(its,jte,k)
+            u(its,jte-1,k) = u(its,jte-1,k) + 0.5 * u(its,jte,k)
+            v(its+1,jte,k) = v(its+1,jte,k) + 0.5 * v(its,jte,k)
+            v(its,jte-1,k) = v(its,jte-1,k) + 0.5 * v(its,jte,k)
+         end if
+
+         ! [4.4] Top-right point:
+
+         if ( ite == ide .AND. jte == jde ) then
+            u(ite-1,jte,k) = u(ite-1,jte,k) + 0.5 * u(ite,jte,k)
+            u(ite,jte-1,k) = u(ite,jte-1,k) + 0.5 * u(ite,jte,k)
+            v(ite-1,jte,k) = v(ite-1,jte,k) + 0.5 * v(ite,jte,k)
+            v(ite,jte-1,k) = v(ite,jte-1,k) + 0.5 * v(ite,jte,k)
+         end if
+      enddo
    endif
-!------------------------------------------------------------------------------
-!  [3.0] Compute u, v at domain boundaries:
 
+   ! [3.0] Compute u, v at domain boundaries:
 
    do k = kts, kte
+      if( .not. global ) then
+         ! [3.4] Northern boundaries:
 
-     if( .not. global ) then
-!     [3.4] Northern boundaries:
+         if ( jte == jde ) then
+            j = jte
 
-      if ( jte == jde ) then
-         j = jte
+            do i = ie, is, -1
+               psi(i+1,j,k) = psi(i+1,j,k) + coefx(i,j) * v(i,j,k)
+               psi(i-1,j,k) = psi(i-1,j,k) - coefx(i,j) * v(i,j,k)
+               chi(i,j  ,k) = chi(i,j  ,k) + coefy(i,j) * v(i,j,k)
+               chi(i,j-2,k) = chi(i,j-2,k) - coefy(i,j) * v(i,j,k)
 
-         do i = ie, is, -1
+               psi(i,j  ,k) = psi(i,j  ,k) - coefy(i,j) * u(i,j,k)
+               psi(i,j-2,k) = psi(i,j-2,k) + coefy(i,j) * u(i,j,k)
+               chi(i+1,j,k) = chi(i+1,j,k) + coefx(i,j) * u(i,j,k)
+               chi(i-1,j,k) = chi(i-1,j,k) - coefx(i,j) * u(i,j,k)
+            end do
+         end if
 
+         ! [3.3] Southern boundaries:
 
-            psi(i+1,j,k) = psi(i+1,j,k) + coefx(i,j) * v(i,j,k)
-            psi(i-1,j,k) = psi(i-1,j,k) - coefx(i,j) * v(i,j,k)
-            chi(i,j  ,k) = chi(i,j  ,k) + coefy(i,j) * v(i,j,k)
-            chi(i,j-2,k) = chi(i,j-2,k) - coefy(i,j) * v(i,j,k)
+         if ( jts == jds ) then
+            j = jts
 
-            psi(i,j  ,k) = psi(i,j  ,k) - coefy(i,j) * u(i,j,k)
-            psi(i,j-2,k) = psi(i,j-2,k) + coefy(i,j) * u(i,j,k)
-            chi(i+1,j,k) = chi(i+1,j,k) + coefx(i,j) * u(i,j,k)
-            chi(i-1,j,k) = chi(i-1,j,k) - coefx(i,j) * u(i,j,k)
-
-         end do
-      end if
-
-
-!     [3.3] Southern boundaries:
-
-      if ( jts == jds ) then
-         j = jts
-
-         do i = ie, is, -1
+            do i = ie, is, -1
 
 
-            psi(i+1,j,k) = psi(i+1,j,k) + coefx(i,j) * v(i,j,k)
-            psi(i-1,j,k) = psi(i-1,j,k) - coefx(i,j) * v(i,j,k)
-            chi(i,j+2,k) = chi(i,j+2,k) + coefy(i,j) * v(i,j,k)
-            chi(i,j  ,k) = chi(i,j  ,k) - coefy(i,j) * v(i,j,k)
+               psi(i+1,j,k) = psi(i+1,j,k) + coefx(i,j) * v(i,j,k)
+               psi(i-1,j,k) = psi(i-1,j,k) - coefx(i,j) * v(i,j,k)
+               chi(i,j+2,k) = chi(i,j+2,k) + coefy(i,j) * v(i,j,k)
+               chi(i,j  ,k) = chi(i,j  ,k) - coefy(i,j) * v(i,j,k)
 
-            psi(i,j+2,k) = psi(i,j+2,k) - coefy(i,j) * u(i,j,k)
-            psi(i,j  ,k) = psi(i,j  ,k) + coefy(i,j) * u(i,j,k)
-            chi(i+1,j,k) = chi(i+1,j,k) + coefx(i,j) * u(i,j,k)
-            chi(i-1,j,k) = chi(i-1,j,k) - coefx(i,j) * u(i,j,k)
+               psi(i,j+2,k) = psi(i,j+2,k) - coefy(i,j) * u(i,j,k)
+               psi(i,j  ,k) = psi(i,j  ,k) + coefy(i,j) * u(i,j,k)
+               chi(i+1,j,k) = chi(i+1,j,k) + coefx(i,j) * u(i,j,k)
+               chi(i-1,j,k) = chi(i-1,j,k) - coefx(i,j) * u(i,j,k)
 
-         end do
-      end if
+            end do
+         end if
 
-!     [3.2] Eastern boundaries:
+         ! [3.2] Eastern boundaries:
 
-      if ( ite == ide ) then
-         i = ite
+         if ( ite == ide ) then
+            i = ite
+            do j = je, js, -1
+               psi(i  ,j,k) = psi(i  ,j,k) + coefx(i,j) * v(i,j,k)
+               psi(i-2,j,k) = psi(i-2,j,k) - coefx(i,j) * v(i,j,k)
+               chi(i,j+1,k) = chi(i,j+1,k) + coefy(i,j) * v(i,j,k)
+               chi(i,j-1,k) = chi(i,j-1,k) - coefy(i,j) * v(i,j,k)
 
-         do j = je, js, -1
+               psi(i,j+1,k) = psi(i,j+1,k) - coefy(i,j) * u(i,j,k)
+               psi(i,j-1,k) = psi(i,j-1,k) + coefy(i,j) * u(i,j,k)
+               chi(i  ,j,k) = chi(i  ,j,k) + coefx(i,j) * u(i,j,k)
+               chi(i-2,j,k) = chi(i-2,j,k) - coefx(i,j) * u(i,j,k)
+            end do
+         end if
 
+         ! [3.1] Western boundaries:
+         if ( its == ids ) then
+            i = its
 
-            psi(i  ,j,k) = psi(i  ,j,k) + coefx(i,j) * v(i,j,k)
-            psi(i-2,j,k) = psi(i-2,j,k) - coefx(i,j) * v(i,j,k)
-            chi(i,j+1,k) = chi(i,j+1,k) + coefy(i,j) * v(i,j,k)
-            chi(i,j-1,k) = chi(i,j-1,k) - coefy(i,j) * v(i,j,k)
+            do j = je, js, -1
+               psi(i+2,j,k) = psi(i+2,j,k) + coefx(i,j) * v(i,j,k)
+               psi(i  ,j,k) = psi(i  ,j,k) - coefx(i,j) * v(i,j,k)
+               chi(i,j+1,k) = chi(i,j+1,k) + coefy(i,j) * v(i,j,k)
+               chi(i,j-1,k) = chi(i,j-1,k) - coefy(i,j) * v(i,j,k)
 
-            psi(i,j+1,k) = psi(i,j+1,k) - coefy(i,j) * u(i,j,k)
-            psi(i,j-1,k) = psi(i,j-1,k) + coefy(i,j) * u(i,j,k)
-            chi(i  ,j,k) = chi(i  ,j,k) + coefx(i,j) * u(i,j,k)
-            chi(i-2,j,k) = chi(i-2,j,k) - coefx(i,j) * u(i,j,k)
-         end do
-      end if
+               psi(i,j+1,k) = psi(i,j+1,k) - coefy(i,j) * u(i,j,k)
+               psi(i,j-1,k) = psi(i,j-1,k) + coefy(i,j) * u(i,j,k)
+               chi(i+2,j,k) = chi(i+2,j,k) + coefx(i,j) * u(i,j,k)
+               chi(i,  j,k) = chi(i,  j,k) - coefx(i,j) * u(i,j,k)
+            end do
+         end if
+      endif
 
-!     [3.1] Western boundaries:
-      if ( its == ids ) then
-         i = its
-
-         do j = je, js, -1
-
-            psi(i+2,j,k) = psi(i+2,j,k) + coefx(i,j) * v(i,j,k)
-            psi(i  ,j,k) = psi(i  ,j,k) - coefx(i,j) * v(i,j,k)
-            chi(i,j+1,k) = chi(i,j+1,k) + coefy(i,j) * v(i,j,k)
-            chi(i,j-1,k) = chi(i,j-1,k) - coefy(i,j) * v(i,j,k)
-
-            psi(i,j+1,k) = psi(i,j+1,k) - coefy(i,j) * u(i,j,k)
-            psi(i,j-1,k) = psi(i,j-1,k) + coefy(i,j) * u(i,j,k)
-            chi(i+2,j,k) = chi(i+2,j,k) + coefx(i,j) * u(i,j,k)
-            chi(i,  j,k) = chi(i,  j,k) - coefx(i,j) * u(i,j,k)
-
-         end do
-      end if
-
-   endif
-!------------------------------------------------------------------------------
-!  [2.0] Compute u, v at interior points (2nd order central finite diffs):
-!------------------------------------------------------------------------------
+      !------------------------------------------------------------------------
+      ! [2.0] Compute u, v at interior points (2nd order central finite diffs):
+      !------------------------------------------------------------------------
 
       do j = je, js, -1
          do i = ie, is, -1
-
             psi(i+1,j,k) = psi(i+1,j,k) + coefx(i,j) * v(i,j,k)
             psi(i-1,j,k) = psi(i-1,j,k) - coefx(i,j) * v(i,j,k)
             chi(i,j+1,k) = chi(i,j+1,k) + coefy(i,j) * v(i,j,k)
@@ -220,23 +202,22 @@ subroutine DA_PsiChi_To_UV_Adj( u, v, coefx, coefy, psi, chi, &
             chi(i-1,j,k) = chi(i-1,j,k) - coefx(i,j) * u(i,j,k)
          end do
       end do
-
-!------------------------------------------------------------------------------
    end do    !  loop over levels
 
-!------------------------------------------------------------------------------
-!  [5.0] For Global application, set Wast-Eest Periodic boundary
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! [5.0] For Global application, set Wast-Eest Periodic boundary
+   !---------------------------------------------------------------------------
+
    if( global ) then
-    call da_set_boundary_3d(psi, &
+       call da_set_boundary_3d(psi, &
                             ids,ide, jds,jde, kds,kde,  &
                             ims,ime, jms,jme, kms,kme,  &
                             its,ite, jts,jte, kts,kte )
-    call da_set_boundary_3d(chi, &
+       call da_set_boundary_3d(chi, &
                             ids,ide, jds,jde, kds,kde,  &
                             ims,ime, jms,jme, kms,kme,  &
                             its,ite, jts,jte, kts,kte )
    end if
 
-end subroutine DA_PsiChi_To_UV_Adj
+end subroutine da_psichi_to_uv_adj
 
