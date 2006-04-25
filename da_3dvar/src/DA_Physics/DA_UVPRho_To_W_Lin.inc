@@ -222,7 +222,7 @@ SUBROUTINE DA_UVPRho_To_W_Lin( xb, xa, xp,                 &
 
 ! Integration to calculate the vertical velocity 
 
-   CALL LADJUST(xb,xa%w,WZ,                  &
+   CALL da_w_adjustment_lin(xb,xa%w,WZ,                  &
                 ids,ide, jds,jde, kds,kde,   &
                 ims,ime, jms,jme, kms,kme,   &
                 its,ite, jts,jte, kts,kte )

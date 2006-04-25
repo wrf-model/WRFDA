@@ -1,4 +1,4 @@
-SUBROUTINE wz_base(xb,WZ_b,                       &
+SUBROUTINE da_wz_base(xb,WZ_b,                       &
                       ids,ide, jds,jde, kds,kde,  &
                       ims,ime, jms,jme, kms,kme,  &
                       its,ite, jts,jte, kts,kte )
@@ -142,4 +142,4 @@ SUBROUTINE wz_base(xb,WZ_b,                       &
       ENDDO
    ENDDO
 
-END SUBROUTINE wz_base
+END SUBROUTINE da_wz_base

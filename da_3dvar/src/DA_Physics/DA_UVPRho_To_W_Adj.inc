@@ -56,7 +56,7 @@ SUBROUTINE DA_UVPRho_To_W_Adj( xb, xa, xp,                 &
    ENDDO
    ENDDO
 
-   CALL AADJUST(xb,WZ,                     &
+   CALL da_w_adjustment_adj(xb,WZ,                     &
                 ids,ide, jds,jde, kds,kde, &
                 ims,ime, jms,jme, kms,kme, &
                 its,ite, jts,jte, kts,kte )

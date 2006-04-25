@@ -1,4 +1,4 @@
-SUBROUTINE ladjust(xb,W_a,WZ_a,                 &
+SUBROUTINE da_w_adjustment_lin(xb,W_a,WZ_a,                 &
                    ids,ide, jds,jde, kds,kde,   &
                    ims,ime, jms,jme, kms,kme,   &
                    its,ite, jts,jte, kts,kte )
@@ -28,7 +28,7 @@ SUBROUTINE ladjust(xb,W_a,WZ_a,                 &
    real :: EBXL1,EBXL2
    real :: EBXL19,EBXL29
 
-   CALL wz_base(xb,WZ_b,                    &
+   CALL da_wz_base(xb,WZ_b,                    &
                 ids,ide, jds,jde, kds,kde,  &
                 ims,ime, jms,jme, kms,kme,  &
                 its,ite, jts,jte, kts,kte )
@@ -56,5 +56,5 @@ SUBROUTINE ladjust(xb,W_a,WZ_a,                 &
       ENDDO
    ENDDO
 
-END SUBROUTINE ladjust
+END SUBROUTINE da_w_adjustment_lin
 
