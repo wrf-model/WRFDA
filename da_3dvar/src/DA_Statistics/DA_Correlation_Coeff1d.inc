@@ -1,23 +1,15 @@
-SUBROUTINE DA_Correlation_Coeff1d( field1, field2, corr_coeff, &
+SUBROUTINE da_correlation_coeff1d( field1, field2, corr_coeff, &
                                    rel_acc )
    
-!---- -------------------------------------------------------------------------
-!     PURPOSE: Calculate correlation coefficient between two fields.
-!
-!     METHOD:  Straightforward.
-!
-!     HISTORY: 09/28/1999 - Creation of F90 version.           Dale Barker
-!
-!     PARENT MODULE: DA_Statistics
-!------------------------------------------------------------------------------
+   !---- -------------------------------------------------------------------------
+   ! PURPOSE: Calculate correlation coefficient between two fields.  
+   !------------------------------------------------------------------------------
    
-!Subr utine arguments:
    real, intent(in)           :: field1(:)       ! input field 1.
    real, intent(in)           :: field2(:)       ! input field 2.
    real, intent(out)          :: corr_coeff      ! correlation coefficient
    real, intent(out)          :: rel_acc       ! relative error.
    
-!Loca  scalars:
    integer                    :: jx              ! 2nd dimension of field.
    real                       :: j_inv           ! 1/(jx)
    real                       :: coeff0          ! coefficient.
@@ -28,13 +20,13 @@ SUBROUTINE DA_Correlation_Coeff1d( field1, field2, corr_coeff, &
    real, allocatable          :: data1(:)
    real, allocatable          :: data2(:)
    
-!     [1.0] Set up scalars:
+   ! [1.0] Set up scalars:
    
    jx = size(field1(:))
    
    j_inv = 1.0 / real(jx)
    
-!     [2.0] Calculate mean and remove from field:
+   ! [2.0] Calculate mean and remove from field:
    
    field_mean = sum( field1(:) ) * j_inv
    allocate( data1(1:jx) )
@@ -44,7 +36,7 @@ SUBROUTINE DA_Correlation_Coeff1d( field1, field2, corr_coeff, &
    allocate( data2(1:jx) )
    data2(:) = field2(:) - field_mean
    
-!     [3.0] Calculate correlation coefficient:
+   ! [3.0] Calculate correlation coefficient:
    
    coeff0 = sum( data1(:) * data2(:) )
    coeff1 = sum( data1(:) * data1(:) )
@@ -56,7 +48,7 @@ SUBROUTINE DA_Correlation_Coeff1d( field1, field2, corr_coeff, &
       corr_coeff = 0.0
    end if
    
-!     [4.0] Calculate accuracy:
+   ! [4.0] Calculate accuracy:
    
    coeff3 = sum( (data2(:) - data1(:))**2 )
    if ( coeff2 /= 0.0 ) then
@@ -68,4 +60,4 @@ SUBROUTINE DA_Correlation_Coeff1d( field1, field2, corr_coeff, &
    deallocate( data1 )
    deallocate( data2 )
    
-END SUBROUTINE DA_Correlation_Coeff1d
+END SUBROUTINE da_correlation_coeff1d

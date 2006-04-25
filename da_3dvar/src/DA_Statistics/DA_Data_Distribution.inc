@@ -1,15 +1,9 @@
-SUBROUTINE DA_Data_Distribution( ob_name, num_obs, min_val, max_val, &
+SUBROUTINE da_data_distribution( ob_name, num_obs, min_val, max_val, &
                                  bin_width, ob )
    
-!---- -------------------------------------------------------------------------
-!  PURPOSE: Bin ob data to get distribution.
-!
-!  METHOD:  Straightforward.
-!
-!  HISTORY: 10/16/2000 - Creation of F90 version.           Dale Barker
-!
-!  PARENT MODULE: DA_Statistics
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! PURPOSE: Bin ob data to get distribution.
+   !---------------------------------------------------------------------------
    
    CHARACTER (LEN=*), INTENT(IN)    :: ob_name       ! Data description.
    INTEGER, INTENT(IN)              :: num_obs       ! Number of obs.
@@ -27,9 +21,9 @@ SUBROUTINE DA_Data_Distribution( ob_name, num_obs, min_val, max_val, &
    REAL, ALLOCATABLE                :: bin_min(:)    ! Minimum value of bin.
    INTEGER, ALLOCATABLE             :: num_in_bin(:) ! Number of values in bin.   
    
-!------------------------------------------------------------------------------
-!  [1.0] Initialise bins:
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! [1.0] Initialise bins:
+   !---------------------------------------------------------------------------
 
    num_bins = INT( ( max_val - min_val ) / bin_width ) + 1
 
@@ -47,12 +41,11 @@ SUBROUTINE DA_Data_Distribution( ob_name, num_obs, min_val, max_val, &
    num_in_bin(0:num_bins+1) = 0
    num_missing = 0
    
-!------------------------------------------------------------------------------
-!  [2.0] Assign data to bins:
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! [2.0] Assign data to bins:
+   !---------------------------------------------------------------------------
    
    DO n = 1, num_obs
-
       IF ( ob(n) == missing_r ) THEN
          num_missing = num_missing + 1
       ELSE IF ( ob(n) < bin_min(1) .AND. ob(n) /= missing_r ) THEN
@@ -67,30 +60,30 @@ SUBROUTINE DA_Data_Distribution( ob_name, num_obs, min_val, max_val, &
             END IF
          END DO
       END IF
-
    END DO
 
-!------------------------------------------------------------------------------
-!  [3.0] Output statistics:
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! [3.0] Output statistics:
+   !---------------------------------------------------------------------------
    
-   WRITE(UNIT=stderr,FMT='(A,A,A,I8)')' Number of ', TRIM( ob_name ), ' obs = ', num_obs
-   WRITE(UNIT=stderr,FMT='(A,I8)')' Number with missing data indicator = ',  num_missing
+   WRITE(UNIT=stderr,FMT='(A,A,A,I8)')' Number of ', TRIM( ob_name ), &
+      ' obs = ', num_obs
+   WRITE(UNIT=stderr,FMT='(A,I8)')' Number with missing data indicator = ', &
+      num_missing
    WRITE(UNIT=stderr,FMT='(A,f12.5,A,I8)')' Number below minimum O-B(', &
-                            min_val-0.5*bin_width, ') = ', num_in_bin(0)
+      min_val-0.5*bin_width, ') = ', num_in_bin(0)
    DO bin = 1, num_bins
       WRITE(UNIT=stderr,FMT='(I4,f12.5,I8)')bin, bin_val(bin), num_in_bin(bin)
    END DO
    WRITE(UNIT=stderr,FMT='(A,f12.5,A,I8)')' Number above maximum O-B(', &
-                            max_val+0.5*bin_width, ') = ', &
-                            num_in_bin(num_bins+1)
+      max_val+0.5*bin_width, ') = ', num_in_bin(num_bins+1)
                                
-!------------------------------------------------------------------------------
-!  [4.0] Tidy up:
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! [4.0] Tidy up:
+   !---------------------------------------------------------------------------
 
    DEALLOCATE( bin_val )
    DEALLOCATE( bin_min )
    DEALLOCATE( num_in_bin )
 
-END SUBROUTINE DA_Data_Distribution
+END SUBROUTINE da_data_distribution

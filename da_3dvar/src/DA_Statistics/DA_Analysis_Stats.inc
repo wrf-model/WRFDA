@@ -1,31 +1,25 @@
-SUBROUTINE DA_Analysis_Stats ( stats_unit, xp, xa )
+SUBROUTINE da_analysis_stats ( stats_unit, xp, xa )
    
-!---- -------------------------------------------------------------------------
-!     PURPOSE: Calculate min, max, mean and RMS of input 1d field.
-!
-!     METHOD:  Straightforward.
-!
-!     HISTORY: 09/28/1999 - Creation of F90 version.           Dale Barker
-!
-!     PARENT MODULE: DA_Statistics
-!------------------------------------------------------------------------------
+   !------------------------------------------------------------------------
+   ! PURPOSE: Calculate min, max, mean and RMS of input 1d field.
+   !------------------------------------------------------------------------
 
    implicit none
 
-   INTEGER,       INTENT (in)      :: stats_unit    ! Output unit for stats.
-   TYPE (xpose_type), INTENT(in)   :: xp            ! Dimensions and xpose buffers.
-   TYPE (x_type), INTENT (in)      :: xa            ! gridded analysis increments.
+   INTEGER,           INTENT (in) :: stats_unit ! Output unit for stats.
+   TYPE (xpose_type), INTENT (in) :: xp         ! Dimensions and xpose buffers.
+   TYPE (x_type),     INTENT (in) :: xa         ! gridded analysis increments.
    
-   INTEGER                         :: i, j, k
-   INTEGER                         :: ij, ijk       ! 2D and 3D subdomain sizes.
-   INTEGER                         :: ij_g, ijk_g   ! ij, ijk for global domain. 
-   integer                         :: is, ie        ! i range of processor subdomain.
-   integer                         :: js, je        ! j range of processor subdomain.
-   integer                         :: ks, ke, kdim  ! k range 
+   INTEGER :: i, j, k
+   INTEGER :: ij, ijk       ! 2D and 3D subdomain sizes.
+   INTEGER :: ij_g, ijk_g   ! ij, ijk for global domain. 
+   integer :: is, ie        ! i range of processor subdomain.
+   integer :: js, je        ! j range of processor subdomain.
+   integer :: ks, ke, kdim  ! k range 
 
-   REAL                            :: rij, rijk                     ! On local domain.
-   REAL                            :: um, vm, tm, pm, qm            ! On local domain.
-   REAL                            :: rij_g, rijk_g                 ! On global domain.
+   REAL    :: rij, rijk          ! On local domain.
+   REAL    :: um, vm, tm, pm, qm ! On local domain.
+   REAL    :: rij_g, rijk_g      ! On global domain.
 
    TYPE (maxmin_field_type) :: max_u(xp%kts:xp%kte), max_v(xp%kts:xp%kte), &
                                max_t(xp%kts:xp%kte), max_p(xp%kts:xp%kte), &
@@ -39,8 +33,6 @@ SUBROUTINE DA_Analysis_Stats ( stats_unit, xp, xa )
                                qv(xp%kts:xp%kte)
 
    logical, external        :: wrf_dm_on_monitor
-
-!------------------------------------------------------------------------------
 
    is = xp%its
    ie = xp%ite
@@ -60,20 +52,18 @@ SUBROUTINE DA_Analysis_Stats ( stats_unit, xp, xa )
    rijk = 1.0/real(ijk)
    rij_g  = 1.0/real(ij_g)
    rijk_g = 1.0/real(ijk_g)
-
-!------------------------------------------------------------------------------
-   
+  
    IF ( wrf_dm_on_monitor() ) THEN
-     write(unit=stats_unit, fmt='(/a/)') &
-        ' Minimum of gridded analysis increments'
+      write(unit=stats_unit, fmt='(/a/)') &
+         ' Minimum of gridded analysis increments'
 
-     write(unit=stats_unit, fmt='(6a/)') &
-        ' Lvl         ', &
-        'u     i    j          ', &
-        'v     i    j          ', &
-        't     i    j          ', &
-        'p     i    j          ', &
-        'q     i    j          '
+      write(unit=stats_unit, fmt='(6a/)') &
+         ' Lvl         ', &
+         'u     i    j          ', &
+         'v     i    j          ', &
+         't     i    j          ', &
+         'p     i    j          ', &
+         'q     i    j          '
    END IF
 
    call maxmin_in_field(xa%u(is:ie,js:je,ks:ke), max_u, min_u)
@@ -93,11 +83,10 @@ SUBROUTINE DA_Analysis_Stats ( stats_unit, xp, xa )
    pm = 999999.0
    qm = 999999.0
 
-   do k = ks, ke
-   
+   do k = ks, ke   
       IF ( wrf_dm_on_monitor() ) THEN
-       write(unit=stats_unit, fmt='(i4,4(f12.4,2i5),e12.4,2i5)') k, &
-              min_u(k), min_v(k), min_t(k), min_p(k), min_q(k)
+         write(unit=stats_unit, fmt='(i4,4(f12.4,2i5),e12.4,2i5)') k, &
+            min_u(k), min_v(k), min_t(k), min_p(k), min_q(k)
       END IF
 
       um=minval(min_u(:)%value)
@@ -105,31 +94,29 @@ SUBROUTINE DA_Analysis_Stats ( stats_unit, xp, xa )
       tm=minval(min_t(:)%value)
       pm=minval(min_p(:)%value)
       qm=minval(min_q(:)%value)
-
    end do
 
    IF ( wrf_dm_on_monitor() ) THEN
-     write(unit=stats_unit, fmt='(a,4(f12.4,10x),e12.4)') ' ALL', &
-          um, vm, tm, pm, qm
+      write(unit=stats_unit, fmt='(a,4(f12.4,10x),e12.4)') ' ALL', &
+         um, vm, tm, pm, qm
    
-!------------------------------------------------------------------------------
   
-     write(unit=stats_unit, fmt='(/a/)') ' Maximum of gridded analysis increments'
+      write(unit=stats_unit, fmt='(/a/)') &
+         ' Maximum of gridded analysis increments'
 
-     write(unit=stats_unit, fmt='(6a/)') &
-        ' Lvl         ', &
-        'u     i    j          ', &
-        'v     i    j          ', &
-        't     i    j          ', &
-        'p     i    j          ', &
-        'q     i    j          '
+      write(unit=stats_unit, fmt='(6a/)') &
+         ' Lvl         ', &
+         'u     i    j          ', &
+         'v     i    j          ', &
+         't     i    j          ', &
+         'p     i    j          ', &
+         'q     i    j          '
    END IF
 
    do k = ks, ke
-   
      IF ( wrf_dm_on_monitor() ) THEN
         write(unit=stats_unit, fmt='(i4,4(f12.4,2i5),e12.4,2i5)') k, &
-                max_u(k), max_v(k), max_t(k), max_p(k), max_q(k)
+           max_u(k), max_v(k), max_t(k), max_p(k), max_q(k)
      END IF
 
      um=maxval(max_u(:)%value)
@@ -137,19 +124,16 @@ SUBROUTINE DA_Analysis_Stats ( stats_unit, xp, xa )
      tm=maxval(max_t(:)%value)
      pm=maxval(max_p(:)%value)
      qm=maxval(max_q(:)%value)
-
    end do
 
    IF ( wrf_dm_on_monitor() ) THEN
       write(unit=stats_unit, fmt='(a,4(f12.4,10x),e12.4)') ' ALL', &
-           um, vm, tm, pm, qm
+         um, vm, tm, pm, qm
    
-!------------------------------------------------------------------------------
- 
-   write(unit=stats_unit, fmt='(/a/)') ' Mean of gridded analysis increments'
+      write(unit=stats_unit, fmt='(/a/)') ' Mean of gridded analysis increments'
 
-   write(unit=stats_unit, fmt='(a/)') &
-        ' Lvl        u           v           t           p           q'
+      write(unit=stats_unit, fmt='(a/)') &
+         ' Lvl        u           v           t           p           q'
    END IF
 
    um = 0.0
@@ -173,31 +157,28 @@ SUBROUTINE DA_Analysis_Stats ( stats_unit, xp, xa )
    call proc_sum_real ( kdim, qv )
 
    IF ( wrf_dm_on_monitor() ) THEN
-     do k = ks, ke
-        write(unit=stats_unit, fmt='(i4,4f12.4,4e12.4)') k, &
+      do k = ks, ke
+         write(unit=stats_unit, fmt='(i4,4f12.4,4e12.4)') k, &
             uv(k)*rij_g, vv(k)*rij_g, tv(k)*rij_g, &
             pv(k)*rij_g, qv(k)*rij_g
 
-        um=um+uv(k)
-        vm=vm+vv(k)
-        tm=tm+tv(k)
-        pm=pm+pv(k)
-        qm=qm+qv(k)
-
-     end do
+         um=um+uv(k)
+         vm=vm+vv(k)
+         tm=tm+tv(k)
+         pm=pm+pv(k)
+         qm=qm+qv(k)
+      end do
    END IF
 
    IF ( wrf_dm_on_monitor() ) THEN
-     write(unit=stats_unit, fmt='(a,4f12.4,4e12.4)') ' ALL', &
-        um*rijk_g, vm*rijk_g, tm*rijk_g, pm*rijk_g, qm*rijk_g
+      write(unit=stats_unit, fmt='(a,4f12.4,4e12.4)') ' ALL', &
+         um*rijk_g, vm*rijk_g, tm*rijk_g, pm*rijk_g, qm*rijk_g
 
-!------------------------------------------------------------------------------
- 
-     write(unit=stats_unit, fmt='(/a/)') ' RMSE of gridded analysis increments'
+      write(unit=stats_unit, fmt='(/a/)') ' RMSE of gridded analysis increments'
 
-     write(unit=stats_unit, fmt='(a/)') &
-        ' Lvl        u           v           t           p           q'
-   ENDIF
+      write(unit=stats_unit, fmt='(a/)') &
+         ' Lvl        u           v           t           p           q'
+   end if
 
    um = 0.0
    vm = 0.0
@@ -212,13 +193,13 @@ SUBROUTINE DA_Analysis_Stats ( stats_unit, xp, xa )
 
    do k = ks, ke
       do j=js,je
-      do i=is,ie
-         uv(k) = uv(k) + xa%u(i,j,k) * xa%u(i,j,k)
-         vv(k) = vv(k) + xa%v(i,j,k) * xa%v(i,j,k)
-         tv(k) = tv(k) + xa%t(i,j,k) * xa%t(i,j,k)
-         pv(k) = pv(k) + xa%p(i,j,k) * xa%p(i,j,k)
-         qv(k) = qv(k) + xa%q(i,j,k) * xa%q(i,j,k)
-      enddo
+         do i=is,ie
+            uv(k) = uv(k) + xa%u(i,j,k) * xa%u(i,j,k)
+            vv(k) = vv(k) + xa%v(i,j,k) * xa%v(i,j,k)
+            tv(k) = tv(k) + xa%t(i,j,k) * xa%t(i,j,k)
+            pv(k) = pv(k) + xa%p(i,j,k) * xa%p(i,j,k)
+            qv(k) = qv(k) + xa%q(i,j,k) * xa%q(i,j,k)
+         enddo
       enddo
    end do
 
@@ -229,57 +210,55 @@ SUBROUTINE DA_Analysis_Stats ( stats_unit, xp, xa )
    call proc_sum_real ( kdim, qv )
 
    IF ( wrf_dm_on_monitor() ) THEN
-     do k = ks, ke
-        write(unit=stats_unit, fmt='(i4,4f12.4,4e12.4)') k, &
+      do k = ks, ke
+         write(unit=stats_unit, fmt='(i4,4f12.4,4e12.4)') k, &
             sqrt(uv(k)*rij_g), &
             sqrt(vv(k)*rij_g), &
             sqrt(tv(k)*rij_g), &
             sqrt(pv(k)*rij_g), &
             sqrt(qv(k)*rij_g)
 
-        um=um+uv(k)
-        vm=vm+vv(k)
-        tm=tm+tv(k)
-        pm=pm+pv(k)
-        qm=qm+qv(k)
-     end do
+         um=um+uv(k)
+         vm=vm+vv(k)
+         tm=tm+tv(k)
+         pm=pm+pv(k)
+         qm=qm+qv(k)
+      end do
    END IF
 
    IF ( wrf_dm_on_monitor() ) THEN
-     write(unit=stats_unit, fmt='(a,4f12.4,4e12.4)') ' ALL', &
+      write(unit=stats_unit, fmt='(a,4f12.4,4e12.4)') ' ALL', &
          sqrt(um*rijk_g), sqrt(vm*rijk_g), sqrt(tm*rijk_g), &
          sqrt(pm*rijk_g), sqrt(qm*rijk_g)
    END IF
 
-!------------------------------------------------------------------------------
+CONTAINS
 
-contains
+   subroutine maxmin_in_field(field, max, min)
 
-  subroutine maxmin_in_field(field, max, min)
+      REAL                  :: field(is:ie,js:je,ks:ke)
 
-   REAL                  :: field(is:ie,js:je,ks:ke)
+      TYPE (maxmin_field_type) :: max(xp%kts:xp%kte), min(xp%kts:xp%kte)
 
-   TYPE (maxmin_field_type) :: max(xp%kts:xp%kte), min(xp%kts:xp%kte)
-
-   do k = ks, ke
-     max(k)%value = -1.E20
-     min(k)%value =  1.E20
-     do j = js, je
-     do i = is, ie
-       if (field(i,j,k) > max(k)%value) then
-          max(k)%value = field(i,j,k)
-          max(k)%i     = i
-          max(k)%j     = j
-       endif
-       if (field(i,j,k) < min(k)%value) then
-          min(k)%value = field(i,j,k)
-          min(k)%i     = i
-          min(k)%j     = j
-       endif
-     end do
-     end do
-   end do
+      do k = ks, ke
+         max(k)%value = -1.E20
+         min(k)%value =  1.E20
+         do j = js, je
+            do i = is, ie
+               if (field(i,j,k) > max(k)%value) then
+                  max(k)%value = field(i,j,k)
+                  max(k)%i     = i
+                  max(k)%j     = j
+               end if
+               if (field(i,j,k) < min(k)%value) then
+                  min(k)%value = field(i,j,k)
+                  min(k)%i     = i
+                  min(k)%j     = j
+               end if
+            end do
+         end do
+      end do
 
    end subroutine maxmin_in_field
    
-END SUBROUTINE DA_Analysis_Stats
+END SUBROUTINE da_analysis_stats

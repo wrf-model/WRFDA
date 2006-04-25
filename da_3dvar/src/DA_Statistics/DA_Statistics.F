@@ -1,15 +1,11 @@
-MODULE DA_Statistics
+MODULE da_statistics
    
-!---- -------------------------------------------------------------------------
-!     PURPOSE: Contains routines used to calculates statistical quantities.
-!
-!     METHOD:  See individual routines.
-!
-!     HISTORY: 09/28/1999 - Creation of F90 version.        Dale Barker
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! PURPOSE: Contains routines used to calculates statistical quantities.
+   !---------------------------------------------------------------------------
    
-   USE DA_Define_Structures
-   USE PAR_UTIL
+   USE da_define_structures
+   USE par_util
    
    IMPLICIT NONE
    
@@ -21,5 +17,5 @@ MODULE DA_Statistics
 #include "DA_Data_Distribution.inc"
 #include "Stats_Calculate.inc"
 
-END MODULE DA_Statistics
+END MODULE da_statistics
 
