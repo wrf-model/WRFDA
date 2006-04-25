@@ -51,5 +51,6 @@ CONTAINS
 #include "DA_Read_BUFR_Obs.inc"
 #include "DA_Scan_BUFR_Obs.inc"
 #include "DA_Count_Filtered_Obs.inc"
+#include "da_deallocate_obs.inc"
 
 END MODULE DA_Obs
