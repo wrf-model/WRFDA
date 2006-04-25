@@ -352,8 +352,7 @@ SUBROUTINE da_trace_report
 #endif
 
       IF (mype == 0) THEN
-
-         DO i=1,MasterNoRoutines
+         DO j=1,MasterNoRoutines
             itemp1(j)=MAXVAL(MasterMaxHeap(:,j))
          END DO
 
