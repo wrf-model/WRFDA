@@ -20,7 +20,7 @@ SUBROUTINE DA_Read_Obs (iunit, ob, xp, filename)
 !              For global option duplicate obs at East/West boundary
 !                        
 !                     08/30/2005           Syed RH Rizvi
-!           Writing original errors & thicknesses on unit 193
+!           Writing original errors & thicknesses
 !           desired for outputting QC obs with NTMAX = 0
 !-----------------------------------------------------------------------------!
 
@@ -189,6 +189,17 @@ SUBROUTINE DA_Read_Obs (iunit, ob, xp, filename)
    DO
 
      report = report+1
+
+     ! Restrict to a range of reports, useful for debugging
+
+     IF (report < report_start) THEN
+       CYCLE
+     END IF
+
+     IF (report > report_end) THEN
+       EXIT
+     END IF
+
 !     READ STATION GENERAL INFO
 !     =============================
 
@@ -203,7 +214,7 @@ SUBROUTINE DA_Read_Obs (iunit, ob, xp, filename)
                    platform%info%id
 
       IF (iost /= 0) THEN
-         ! This is expected, but its unclear how we handle failure
+         ! JRB This is expected, but its unclear how we handle failure
          ! here without assuming the fortran2003 convention on
          ! error statuses
          EXIT reports
@@ -325,17 +336,23 @@ loop_level: DO i = 1, platform%info%levels
          cycle reports
       ENDIF
 
+      IF (print_obs_mapping) THEN
+        ! Simplistic approach, could be improved to get it all done on PE 0
+        IF (.NOT. outside) THEN
+          WRITE(UNIT=stdout,FMT='(A,I4,A,F8.2,A,F8.2,A,I3,A,2F8.2)') &
+             "Report",report," at",platform%info%lon,"E",platform%info%lat, &
+             "N on processor", my_proc_id,", position", platform%loc%x,platform%loc%y
+        END IF
+      END IF
+
+
       nlevels = platform%info%levels
       if( nlevels > max_ob_levels) then
          nlevels = max_ob_levels
-
-         write(unit=stdout, fmt='(/a/)') &
-              'WARNING   WARNING   WARNING   WARNING   WARNING :'
-
-         write(unit=stdout, fmt='(/4(2a,2x),a,2f8.2,2x,2(a,f9.2,2x),2(a,i4,2x)/)') &
+         write(unit=errmsg(1), fmt='(/4(2a,2x),a,2f8.2,2x,2(a,f9.2,2x),2(a,i4,2x)/)') &
               'Station: ', trim(platform%info%name), &
               'ID: ', trim(platform%info%id), &
-              'Platfrom: ', trim(platform%info%platform), &
+              'Platform: ', trim(platform%info%platform), &
               'Date: ', trim(platform%info%date_char), &
               'At Loc(lat, lon): ', platform%info%lat, platform%info%lon, &
               'At elv: ', platform%info%elv, &
@@ -343,7 +360,7 @@ loop_level: DO i = 1, platform%info%levels
               'Has level: ', platform%info%levels, &
               'which is great than max_ob_levels: ', max_ob_levels
 
-             write (unit=stdout, FMT = '(A,1X,A,1X,A,1X,I4,2f9.3,f9.1,1X,A)') &
+          write (unit=errmsg(2), FMT = '(A,1X,A,1X,A,1X,I4,2f9.3,f9.1,1X,A)') &
              platform%info%name,        &
              platform%info%platform,    &
              platform%info%date_char,   &
@@ -352,6 +369,7 @@ loop_level: DO i = 1, platform%info%levels
              platform%info%lon,         &
              platform%info%elv,         &
              platform%info%id
+         CALL wrf_warning3(__FILE__,__LINE__,errmsg(1:2))
 
          platform%info%levels = nlevels
       else if( nlevels < 1) then
@@ -626,9 +644,9 @@ loop_level: DO i = 1, platform%info%levels
 
          ob%satem(num_satem)%p(1) = platform%each(1)%p%inv
          ob%satem(num_satem)%thickness(1) = platform%each(1)%t
-!  write original thickness errors for filtered obs on 193 unit 
+!  write original thickness errors for filtered obs
          do i = 1, nlevels
-         if(NTMAX == 0) write(193,'(i8,2x,i8,2f12.3)') &
+         if(NTMAX == 0) write(thickness_errors_unit,'(i8,2x,i8,2f12.3)') &
               num_satem,i,platform%each(i)%t%inv,platform%each(i)%t%error 
          end do 
 
@@ -1011,16 +1029,12 @@ loop_level: DO i = 1, platform%info%levels
 
          CASE DEFAULT;
 
-            write(unit=stdout, fmt='(/a/)') &
-                 'WARNING   WARNING   WARNING   WARNING   WARNING :'
-
-            write(unit=stdout, fmt='(a)') 'unsaved obs found:'
-
-            write(unit=stdout, fmt='(2a)') &
-                 'platform%info%platform=', platform%info%platform
- 
-            write(unit=stdout, fmt='(a, i3)') &
-                 'platform%info%levels=', platform%info%levels
+            write(unit=errmsg(1), fmt='(a)') 'unsaved obs found:'
+            write(unit=errmsg(2), fmt='(2a)') &
+               'platform%info%platform=', platform%info%platform
+            write(unit=errmsg(3), fmt='(a, i3)') &
+               'platform%info%levels=', platform%info%levels
+            CALL wrf_warning3(__FILE__,__LINE__,errmsg(1:3))
 
       END SELECT
 
@@ -1071,26 +1085,26 @@ loop_level: DO i = 1, platform%info%levels
       write(UNIT=stdout, fmt='(/a,i6/)') 'ob%current_ob_time=', ob%current_ob_time
 
       write(UNIT=stdout, fmt='(5x,a,i6,a)') &
-           'Read:  ', num_sound, ' SOUND       reports,', &
-           'Read:  ', num_synop, ' SYNOP       reports,', &
-           'Read:  ', num_pilot, ' PILOT       reports,', &
-           'Read:  ', num_satem, ' SATEM       reports,', &
-           'Read:  ', num_geoamv, ' Geo AMV     reports,', & 
-           'Read:  ', num_polaramv,' Polar AMV     reports,', & 
-           'Read:  ', num_airep, ' AIREP       reports,', &
-           'Read:  ', num_gpspw , ' GPSPW/GPSZD reports,', &
-           'Read:  ', num_gpsref, ' GPSRF       reports,', &
-           'Read:  ', num_metar, ' METAR       reports,', &
-           'Read:  ', num_ships , ' SHIP       reports,', &
+           'Read:  ', num_sound,           ' SOUND          reports,', &
+           'Read:  ', num_synop,           ' SYNOP          reports,', &
+           'Read:  ', num_pilot,           ' PILOT          reports,', &
+           'Read:  ', num_satem,           ' SATEM          reports,', &
+           'Read:  ', num_geoamv,          ' Geo AMV        reports,', & 
+           'Read:  ', num_polaramv,        ' Polar AMV      reports,', & 
+           'Read:  ', num_airep,           ' AIREP          reports,', &
+           'Read:  ', num_gpspw ,          ' GPSPW/GPSZD    reports,', &
+           'Read:  ', num_gpsref,          ' GPSRF          reports,', &
+           'Read:  ', num_metar,           ' METAR          reports,', &
+           'Read:  ', num_ships ,          ' SHIP           reports,', &
            'Read:  ', num_ssmi_retrieval , ' SSMI_RETRIEVAL reports,', &
            'Read:  ', num_ssmi_tb,         ' SSMI_TB        reports,', &
-           'Read:  ', num_ssmt1, ' SSMT1       reports,', &
-           'Read:  ', num_ssmt2, ' SSMT2       reports,', &
-           'Read:  ', num_qscat, ' QSCAT       reports,', &
-           'Read:  ', num_profiler, ' Profiler reports,', &
-           'Read:  ', num_buoy, ' Buoy         reports,', &
-           'Read:  ', num_bogus, ' Bogus       reports,', &
-           'Read:  ', total_obs, ' Total Observations.', &
+           'Read:  ', num_ssmt1,           ' SSMT1          reports,', &
+           'Read:  ', num_ssmt2,           ' SSMT2          reports,', &
+           'Read:  ', num_qscat,           ' QSCAT          reports,', &
+           'Read:  ', num_profiler,        ' Profiler       reports,', &
+           'Read:  ', num_buoy,            ' Buoy           reports,', &
+           'Read:  ', num_bogus,           ' Bogus          reports,', &
+           'Read:  ', total_obs,           ' Total reports.', &
            'There are ', total_obs - num_sound - num_synop &
                                    - num_pilot - num_satem &
                                    - num_geoamv - num_polaramv - num_airep &
@@ -1101,7 +1115,7 @@ loop_level: DO i = 1, platform%info%levels
                                    - num_profiler - num_buoy &
                                    - num_bogus, &
                                    '  Observations unsaved.'
-
+      write(unit=stdout,FMT=*) ' '
    end if
 
    if((ob%ob_numb(ob%current_ob_time)%sound /= ob%num_sound) .or. &

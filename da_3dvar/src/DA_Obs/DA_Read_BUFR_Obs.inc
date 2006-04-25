@@ -46,7 +46,7 @@ SUBROUTINE DA_Read_BUFR_Obs (iunit, ob, xp, filename)
    real,dimension(9,255) :: drf,obs,qms,oes
    real                  :: time,woe,qob,toe,qoe,poe,pob,tob,zob,rob,roe
 
-   integer               :: iost, ndup, n, i, j, k, surface_level
+   integer               :: iost, ndup, n, i, j, k, surface_level, report
    integer               :: year, month, day,hour
    integer               :: iret, idate, kx, nlevels, nrecs,miscd, t29, jx, ix
    integer               :: cat,zqm,pqm,qqm,tqm,wqm,pwq,pmq,rqm
@@ -119,7 +119,21 @@ SUBROUTINE DA_Read_BUFR_Obs (iunit, ob, xp, filename)
         "No BUFR observations")
    end if
 !------------------------------------------------------------------------------
+
+   report = 0 ! report number in file
    reports: do
+      report = report+1
+
+      ! Restrict to a range of reports, useful for debugging
+
+      IF (report < report_start) THEN
+        CYCLE
+      END IF
+
+      IF (report > report_end) THEN
+        EXIT
+      END IF
+
       call readsb(iunit,iret)
 
       if(iret/=0) then
@@ -164,6 +178,15 @@ SUBROUTINE DA_Read_BUFR_Obs (iunit, ob, xp, filename)
                         xp, outside, inside_halo, outside_all )
 
       if(outside_all) cycle reports
+
+      IF (print_obs_mapping) THEN
+        ! Simplistic approach, could be improved to get it all done on PE 0
+        IF (.NOT. outside) THEN
+          WRITE(UNIT=stdout,FMT='(A,I4,A,F8.2,A,F8.2,A,I3,A,2I3)') &
+             "Report",report,"at",platform%info%lon,"E",platform%info%lat,"N", &
+             "on processor", my_proc_id,"position", platform%loc%x,platform%loc%y
+        END IF
+      END IF
 
       time=hdr(4)
       if(time >  3.) time=3.
@@ -971,26 +994,26 @@ SUBROUTINE DA_Read_BUFR_Obs (iunit, ob, xp, filename)
       write(UNIT=stdout, fmt='(/a,i6/)') 'ob%current_ob_time=', ob%current_ob_time
 
       write(UNIT=stdout, fmt='(5x,a,i6,a)') &
-           'Read:  ', num_sound, ' SOUND       reports,', &
-           'Read:  ', num_synop, ' SYNOP       reports,', &
-           'Read:  ', num_pilot, ' PILOT       reports,', &
-           'Read:  ', num_satem, ' SATEM       reports,', &
-           'Read:  ', num_geoamv, ' Geo AMV     reports,', &
-           'Read:  ', num_polaramv,' Polar AMV     reports,', &
-           'Read:  ', num_airep, ' AIREP       reports,', &
-           'Read:  ', num_gpspw , ' GPSPW/GPSZD reports,', &
-           'Read:  ', num_gpsref, ' GPSRF       reports,', &
-           'Read:  ', num_metar, ' METAR       reports,', &
-           'Read:  ', num_ships , ' SHIP       reports,', &
+           'Read:  ', num_sound,           ' SOUND          reports,', &
+           'Read:  ', num_synop,           ' SYNOP          reports,', &
+           'Read:  ', num_pilot,           ' PILOT          reports,', &
+           'Read:  ', num_satem,           ' SATEM          reports,', &
+           'Read:  ', num_geoamv,          ' Geo AMV        reports,', &
+           'Read:  ', num_polaramv,        ' Polar AMV      reports,', &
+           'Read:  ', num_airep,           ' AIREP          reports,', &
+           'Read:  ', num_gpspw ,          ' GPSPW/GPSZD    reports,', &
+           'Read:  ', num_gpsref,          ' GPSRF          reports,', &
+           'Read:  ', num_metar,           ' METAR          reports,', &
+           'Read:  ', num_ships ,          ' SHIP           reports,', &
            'Read:  ', num_ssmi_retrieval , ' SSMI_RETRIEVAL reports,', &
            'Read:  ', num_ssmi_tb,         ' SSMI_TB        reports,', &
-           'Read:  ', num_ssmt1, ' SSMT1       reports,', &
-           'Read:  ', num_ssmt2, ' SSMT2       reports,', &
-           'Read:  ', num_qscat, ' QSCAT       reports,', &
-           'Read:  ', num_profiler, ' Profiler reports,', &
-           'Read:  ', num_buoy, ' Buoy         reports,', &
-           'Read:  ', num_bogus, ' Bogus       reports,', &
-           'Read:  ', total_obs, ' Total Observations.', &
+           'Read:  ', num_ssmt1,           ' SSMT1          reports,', &
+           'Read:  ', num_ssmt2,           ' SSMT2          reports,', &
+           'Read:  ', num_qscat,           ' QSCAT          reports,', &
+           'Read:  ', num_profiler,        ' Profiler       reports,', &
+           'Read:  ', num_buoy,            ' Buoy           reports,', &
+           'Read:  ', num_bogus,           ' Bogus          reports,', &
+           'Read:  ', total_obs,           ' Total reports.', &
            'There are ', total_obs - num_sound - num_synop &
                                    - num_pilot - num_satem &
                                    - num_geoamv - num_polaramv - num_airep &
@@ -1000,8 +1023,8 @@ SUBROUTINE DA_Read_BUFR_Obs (iunit, ob, xp, filename)
                                    - num_gpspw - num_gpsref - num_qscat  &
                                    - num_profiler - num_buoy, &
                                    - num_bogus - num_bogus, &
-                                   '  Observations unsaved.'
-
+                                   '  reports unsaved.'
+      write(UNIT=stdout, fmt=*) ' '
    end if
 
    if((ob%ob_numb(ob%current_ob_time)%sound /= ob%num_sound) .or. &

@@ -40,7 +40,7 @@ SUBROUTINE DA_Scan_BUFR_Obs (iunit, ob, xp, filename)
    character(len=8 ) :: subset
    real,dimension(7) :: hdr
 
-   integer           :: iost, ndup, n
+   integer           :: iost, ndup, n, report
    integer           :: year,month, day,hour
    integer           :: iret,idate, kx, nrecs,miscd, t29
    logical           :: exist
@@ -154,7 +154,22 @@ SUBROUTINE DA_Scan_BUFR_Obs (iunit, ob, xp, filename)
    read (UNIT=date,FMT='(i4,3i2)') year,month, day,hour
    write(UNIT=stdout,FMT=*)'READ_BUFR:  bufr file date is ',year,month, day,hour
 
+   report = 0 ! report number in file
+
    reports: do
+
+     report = report+1
+
+     ! Restrict to a range of reports, useful for debugging
+
+     IF (report < report_start) THEN
+       CYCLE
+     END IF
+
+     IF (report > report_end) THEN
+       EXIT
+     END IF
+
       call readsb(iunit,iret)
 
       if(iret/=0) then
@@ -375,24 +390,25 @@ SUBROUTINE DA_Scan_BUFR_Obs (iunit, ob, xp, filename)
 
       WRITE(UNIT=stdout, fmt='(5x,a,i6,a)') &
            'Scan:  ', ob%current_ob_time, ' ob time:', &
-           'Scan:  ', total_obs, ' Total Observations.', &
-           'Scan:  ', num_sound, ' SOUND reports,', &
-           'Scan:  ', num_synop, ' SYNOP reports,', &
-           'Scan:  ', num_pilot, ' PILOT reports,', &
-           'Scan:  ', num_satem, ' SATEM reports,', &
-           'Scan:  ', num_geoamv,' Geo. AMVs rports,', &
-           'Scan:  ', num_polaramv,' Polar AMVs rports,', &
-           'Scan:  ', num_airep, ' AIREP reports,', &
-           'Scan:  ', num_gpspw, ' GPSPW reports,', &
-           'Scan:  ', num_gpsref,' GPSRF reports,', &
-           'Scan:  ', num_metar, ' METAR reports,', &
-           'Scan:  ', num_ships, ' SHIP  reports,', &
-           'Scan:  ', num_qscat, ' QSCAT reports,', &
-           'Scan:  ', num_profiler, ' Profiler reports,', &
-           'Scan:  ', num_buoy, ' Buoy reports,', &
-           'Scan:  ', num_bogus, ' TCBGS reports,', &
-           'Scan:  ', num_ssmt1, ' SSMT1 reports,', &
-           'Scan:  ', num_ssmt2, ' SSMT2 reports.'
+           'Scan:  ', total_obs,    ' Total reports.', &
+           'Scan:  ', num_sound,    ' SOUND      reports,', &
+           'Scan:  ', num_synop,    ' SYNOP      reports,', &
+           'Scan:  ', num_pilot,    ' PILOT      reports,', &
+           'Scan:  ', num_satem,    ' SATEM      reports,', &
+           'Scan:  ', num_geoamv,   ' Geo. AMVs  reports,', &
+           'Scan:  ', num_polaramv, ' Polar AMVs reports,', &
+           'Scan:  ', num_airep,    ' AIREP      reports,', &
+           'Scan:  ', num_gpspw,    ' GPSPW      reports,', &
+           'Scan:  ', num_gpsref,   ' GPSRF      reports,', &
+           'Scan:  ', num_metar,    ' METAR      reports,', &
+           'Scan:  ', num_ships,    ' SHIP       reports,', &
+           'Scan:  ', num_qscat,    ' QSCAT      reports,', &
+           'Scan:  ', num_profiler, ' Profiler   reports,', &
+           'Scan:  ', num_buoy,     ' Buoy       reports,', &
+           'Scan:  ', num_bogus,    ' TCBGS      reports,', & 
+           'Scan:  ', num_ssmt1,    ' SSMT1      reports,', & 
+           'Scan:  ', num_ssmt2,    ' SSMT2      reports.'    
+      write(UNIT=stdout,FMT=*) ' '
 
 !     WRITE(UNIT=stdout, fmt='(5x,a,i6,a)') &
 !          'Scan:  ', num_ssmi_retrieval , ' SSMI_RETRIEVAL reports,', &

@@ -27,7 +27,7 @@ SUBROUTINE DA_Scan_Obs (iunit, ob, xp, filename)
                                    fmt_loc, & 
                                    fmt_each
 
-   INTEGER                      :: i, j, iost, fm
+   INTEGER                      :: i, j, iost, fm, report
 
    TYPE (multi_level_type)      :: platform
 
@@ -192,8 +192,23 @@ SUBROUTINE DA_Scan_Obs (iunit, ob, xp, filename)
 !  LOOP OVER RECORDS
 !  -----------------
 
+   report = 0 ! report number in file
+
    reports: &
    DO
+
+     report = report+1
+
+     ! Restrict to a range of reports, useful for debugging
+
+     IF (report < report_start) THEN
+       CYCLE
+     END IF
+
+     IF (report > report_end) THEN
+       EXIT
+     END IF
+
 !     READ STATION GENERAL INFO
 !     =============================
 
