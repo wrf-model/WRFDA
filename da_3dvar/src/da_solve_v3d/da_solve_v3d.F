@@ -212,6 +212,7 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
 
    deallocate ( cvt )
    deallocate ( xhat )
+   call da_deallocate_obs(iv)
    call da_deallocate_y( re )
    call da_deallocate_y( y )
 

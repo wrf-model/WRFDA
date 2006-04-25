@@ -329,7 +329,8 @@ DA_Obs.o:		\
 			DA_Obs/da_use_obs_errfac.inc \
 			DA_Obs/da_write_obs.inc \
 			DA_Obs/da_write_filtered_obs.inc \
-			DA_Obs/da_write_y.inc
+			DA_Obs/da_write_y.inc \
+                        DA_Obs/da_deallocate_obs.inc
 			$(RM) $@
 			$(CPP) -I./DA_Obs $(CPPFLAGS_WRFVAR) DA_Obs/DA_Obs.F > DA_Obs.f
 			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) DA_Obs.f
