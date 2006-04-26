@@ -1,18 +1,15 @@
-MODULE DA_Physics
+MODULE da_physics
 
-!------------------------------------------------------------------------------
-!  PURPOSE: Contains routines to calculate physical quantities.
-!
-!  METHOD:  See individual routines.
-!
-!  HISTORY: 10/03/2000 - Creation.                           Dale Barker
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   !  PURPOSE: Contains routines to calculate physical quantities.
+   !---------------------------------------------------------------------------
 
-   USE DA_Constants
-   USE DA_Define_Structures
-   USE DA_Grid_Definitions
-   USE DA_Interpolation
-   USE DA_Dynamics
+   USE da_constants
+   USE da_define_structures
+   USE da_grid_definitions
+   USE da_interpolation
+   USE da_dynamics
+   USE module_wrf_error
 
    IMPLICIT NONE
 
@@ -73,5 +70,5 @@ MODULE DA_Physics
 #include "da_filter_adj.inc"
 #include "da_wdt.inc"
 
-END MODULE DA_Physics
+END MODULE da_physics
 
