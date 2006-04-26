@@ -1,15 +1,8 @@
 SUBROUTINE da_setup_obs_structures_ascii( xp, ob, iv )
 
-!------------------------------------------------------------------------------
-! PURPOSE: Define, allocate and read of observation structure.
-!
-! METHOD:  Define, allocate and read of observation structure.
-!
-! HISTORY: 01/20/2000 - Creation of F90 version.           Dale Barker
-!          10/19/2001 - Mods for parallel implementation.  Al Bourgeois
-!
-! PARENT_MODULE: DA_Setup_Structures
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! PURPOSE: Define, allocate and read of observation structure.
+   !---------------------------------------------------------------------------
 
    IMPLICIT NONE
 
@@ -22,9 +15,9 @@ SUBROUTINE da_setup_obs_structures_ascii( xp, ob, iv )
 
    IF (trace_use) CALL da_trace_entry("da_setup_obs_structures_ascii")
    
-!-----------------------------------------------------------------------------
-!  [0.0] Initialize the counters.
-!-----------------------------------------------------------------------------
+   !--------------------------------------------------------------------------
+   ! [0.0] Initialize the counters.
+   !--------------------------------------------------------------------------
 
    iv%total_obs = 0
    iv%num_sound = 0
@@ -74,9 +67,9 @@ SUBROUTINE da_setup_obs_structures_ascii( xp, ob, iv )
       iv%ob_numb(n)%bogus  = 0
    enddo
 
-!-----------------------------------------------------------------------------
-!  [1.0] Scan GTS observation header and get idea of number of obs:
-!-----------------------------------------------------------------------------
+   !--------------------------------------------------------------------------
+   ! [1.0] Scan GTS observation header and get idea of number of obs:
+   !--------------------------------------------------------------------------
   
    if(num_fgat_time > 1) then
       filename = ' '
@@ -86,41 +79,42 @@ SUBROUTINE da_setup_obs_structures_ascii( xp, ob, iv )
 
          write(filename(1:10), fmt='(a, i2.2)') 'fgat_ob.', n
 
-!--------scan MAIN BODY OF GTS OBSERVATION FILE
-         call DA_Scan_Obs (gts_iunit, iv, xp, filename)
+         ! scan main body of gts observation file
+         call da_scan_obs (gts_iunit, iv, xp, filename)
 
          if(Use_SsmiRetrievalObs .or. Use_SsmiTbObs) then
-!-----------SCAN SSMI OBSERVATION FILE
+            ! scan SSMI observation file
             write(filename(1:10), fmt='(a, i2.2)') 'ssmi_ob.', n
-            call DA_Scan_SSMI (ssmi_iunit, iv, xp, filename)
+            call da_scan_ssmi (ssmi_iunit, iv, xp, filename)
          endif
 
          if(Use_RadarObs) then
-!-----------scan Radar OBSERVATION FILE
+            ! scan radar observation file
             write(filename(1:10), fmt='(a, i2.2)') 'radarob.', n
-            call DA_Scan_Radar(Radar_iunit, iv, xp, filename)
+            call da_scan_radar(Radar_iunit, iv, xp, filename)
          endif
       enddo
    else
       iv%current_ob_time = 1
-      call DA_Scan_Obs(gts_iunit, iv, xp)
+      call da_scan_obs(gts_iunit, iv, xp)
 
-!-----------------------------------------------------------------------------
-!     READ HEADER OF SSMI OBSERVATION FILE
-!-----------------------------------------------------------------------------
+      !-----------------------------------------------------------------------
+      ! read header of ssmi observation file
+      !-----------------------------------------------------------------------
       if(Use_SsmiRetrievalObs .or. Use_SsmiTbObs) then
-         call DA_Scan_SSMI(ssmi_iunit, iv, xp)
+         call da_scan_ssmi(ssmi_iunit, iv, xp)
       endif
 
-!-----scan MAIN BODY OF Radar OBSERVATION FILE
+      ! scan main body of radar observation file
       if(Use_RadarObs) then
-         call DA_Scan_Radar(Radar_iunit, iv, xp)
+         call da_scan_radar(Radar_iunit, iv, xp)
       endif
    endif
 
-!--------------------------------------------------------------------
-!--Safety guard.
-!--------------------------------------------------------------------
+   !--------------------------------------------------------------------  
+   ! Safety guard.
+   !--------------------------------------------------------------------
+
    if(iv%num_sound > max_sound_input ) &
       iv%num_sound = max_sound_input
 
@@ -160,16 +154,14 @@ SUBROUTINE da_setup_obs_structures_ascii( xp, ob, iv )
       iv%num_radar = max_radar_input
    if(iv%num_bogus > max_bogus_input ) &
       iv%num_bogus = max_bogus_input
-!  if(iv%num_pseudo > max_pseudo_input ) &
-!     iv%num_pseudo = max_pseudo_input
+   ! if(iv%num_pseudo > max_pseudo_input ) &
+   !    iv%num_pseudo = max_pseudo_input
 
-!-----------------------------------------------------------------------------
-!   Allocate the ob based on inputed number of obs:
-!-----------------------------------------------------------------------------
+   !--------------------------------------------------------------------------
+   ! Allocate the ob based on inputed number of obs:
+   !--------------------------------------------------------------------------
 
-   CALL DA_Allocate_Observations ( iv )
-
-!-----------------------------------------------------------------------------
+   CALL da_allocate_observations ( iv )
 
    iv%total_obs = 0
    iv%num_sound = 0
@@ -216,56 +208,52 @@ SUBROUTINE da_setup_obs_structures_ascii( xp, ob, iv )
    iv%num_Radar_glo=0
    iv%num_bogus_glo=0
 
-!-----------------------------------------------------------------------------
-
    if(num_fgat_time > 1) then
       do n=1, num_fgat_time
          iv%current_ob_time = n
 
          write(filename(1:10), fmt='(a, i2.2)') 'fgat_ob.', n
 
-!--------Read GTS OBSERVATION FILE
-         call DA_Read_Obs (gts_iunit, iv, xp, filename)
+         ! Read gts observation file
+         call da_read_obs (gts_iunit, iv, xp, filename)
 
          if(Use_SsmiRetrievalObs .or. Use_SsmiTbObs) then
-!-----------READ SSMI OBSERVATION FILE
+            ! read ssmi observation file
             write(filename(1:10), fmt='(a, i2.2)') 'ssmi_ob.', n
-            call DA_Read_SSMI (ssmi_iunit, iv, xp, filename)
+            call da_read_ssmi (ssmi_iunit, iv, xp, filename)
          endif
 
          if(Use_RadarObs) then
-!-----------Read Radar OBSERVATION FILE
+            ! read radar observation file
             write(filename(1:10), fmt='(a, i2.2)') 'radarob.', n
-            call DA_Read_Radar(Radar_iunit, iv, xp, filename)
+            call da_read_radar(Radar_iunit, iv, xp, filename)
          endif
       enddo
    else
-
       iv%current_ob_time = 1
 
-      call DA_Read_Obs(gts_iunit, iv, xp)
+      call da_read_obs(gts_iunit, iv, xp)
 
       if(Use_SsmiRetrievalObs .or. Use_SsmiTbObs) then
-!--------READ SSMI OBSERVATION FILE
-         call DA_Read_SSMI (ssmi_iunit, iv, xp)
+         ! read ssmi observation file
+         call da_read_ssmi (ssmi_iunit, iv, xp)
       endif
 
       if(Use_RadarObs) then
-!--------Read Radar OBSERVATION FILE
-         call DA_Read_Radar(Radar_iunit, iv, xp)
+         ! read radar observation file
+         call da_read_radar(Radar_iunit, iv, xp)
       endif
    endif
 
-!-----------------------------------------------------------------------------
-!  [3.0] Calculate innovation vector (O-B) and create (smaller) ob structure:
-!-----------------------------------------------------------------------------
+   !--------------------------------------------------------------------------
+   ! [3.0] Calculate innovation vector (O-B) and create (smaller) ob structure:
+   !--------------------------------------------------------------------------
 
    CALL da_fill_obs_structures( iv, ob )
 
    iv%current_ob_time = 1
 
    IF (trace_use) CALL da_trace_exit("da_setup_obs_structures_ascii")
-
 
 END SUBROUTINE da_setup_obs_structures_ascii
 
