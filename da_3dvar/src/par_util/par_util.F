@@ -4,22 +4,20 @@
 ! Utility subroutines for parallel WRFVAR.
 !---------------------------------------------------------------------------
 
-MODULE PAR_UTIL
+MODULE par_util
 
-!------------------------------------------------------------------------------
-!  PURPOSE: Routines for local-to-global and global-to-local grid operations.
-!
-!  METHOD:  RSL/MPI.
-!
-!  HISTORY: 10/25/2001 - Creation of F90 version.           Al Bourgeois
-!
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! PURPOSE: Routines for local-to-global and global-to-local grid operations.
+   !
+   ! METHOD:  RSL/MPI.
+   !---------------------------------------------------------------------------
 
-    USE DA_Define_Structures   ! For xb_, cv_, xp_, be_, x_type definitions.
-    USE DA_Constants           ! print_detail
-    USE PAR_UTIL1
+   USE da_define_structures   ! For xb_, cv_, xp_, be_, x_type definitions.
+   USE da_constants           ! print_detail
+   USE par_util1
+   USE module_wrf_error
     
-    IMPLICIT NONE
+   IMPLICIT NONE
 
 #if ( DWORDSIZE != RWORDSIZE )
 #define TRUE_MPI_REAL     MPI_REAL
@@ -31,12 +29,12 @@ MODULE PAR_UTIL
 
 #include <generic_typedefs.inc>
 
-      INTERFACE wv_patch_to_global
-        MODULE PROCEDURE wv_patch_to_global_2d
-        MODULE PROCEDURE wv_patch_to_global_3d
-      END INTERFACE
+   INTERFACE wv_patch_to_global
+      MODULE PROCEDURE wv_patch_to_global_2d
+      MODULE PROCEDURE wv_patch_to_global_3d
+   END INTERFACE
 
-    CONTAINS
+   CONTAINS
 
 #include <cv_to_vv.inc>
 #include <vv_to_cv.inc>
@@ -67,5 +65,5 @@ MODULE PAR_UTIL
 
 #endif
 
-END MODULE PAR_UTIL
+END MODULE par_util
 
