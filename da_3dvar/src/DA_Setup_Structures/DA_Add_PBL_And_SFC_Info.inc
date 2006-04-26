@@ -1,13 +1,8 @@
-SUBROUTINE DA_Add_PBL_And_SFC_Info( xp, xb, xbx )
+SUBROUTINE da_add_pbl_and_sfc_info( xp, xb, xbx )
 
-!------------------------------------------------------------------------------
-!  PURPOSE: Updates PBL and Surface parameters information for background field                                 
-!
-!
-!  HISTORY: 07/25/2003 - Creation of F90 version.         S.R.H. Rizvi
-!
-!  PARENT_MODULE: DA_Minimisation    
-!------------------------------------------------------------------------------
+   !------------------------------------------------------------------------------
+   !  PURPOSE: Updates PBL and Surface parameters information for background field 
+   !------------------------------------------------------------------------------
 
    IMPLICIT NONE
    
@@ -26,8 +21,7 @@ SUBROUTINE DA_Add_PBL_And_SFC_Info( xp, xb, xbx )
 
    IF (trace_use) CALL da_trace_entry("da_add_pbl_and_sfc_info")
 
-
-! Set xb array range indices for processor subdomain.
+   ! Set xb array range indices for processor subdomain.
    is = xp%its
    ie = xp%ite
    js = xp%jts
@@ -35,129 +29,127 @@ SUBROUTINE DA_Add_PBL_And_SFC_Info( xp, xb, xbx )
    ks = xp%kts
    ke = xp%kte
 
-!------------------------------------------------------------------------------
-!  [1.0] Calculate density:
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------  
+   ! [1.0] Calculate density:
+   !---------------------------------------------------------------------------
 
    xb%rho(is:ie,js:je,ks:ke) = xb%p(is:ie,js:je,ks:ke) /  &
                                    ( gas_constant * xb%t(is:ie,js:je,ks:ke) )
 
-!------------------------------------------------------------------------------
-!  [2.0] Calculate 1/grid box areas:
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! [2.0] Calculate 1/grid box areas:
+   !---------------------------------------------------------------------------
 
    xb%grid_box_area(is:ie,js:je) = xb%ds * xb%ds / &
                 ( xb%map_factor(is:ie,js:je) * xb%map_factor(is:ie,js:je) )
 
-!------------------------------------------------------------------------------
-!  [3.0] Calculate saturation vapour pressure and relative humidity:
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! [3.0] Calculate saturation vapour pressure and relative humidity:
+   !---------------------------------------------------------------------------
 
    do j = js,je
-   do k = ks, ke
-   do i = is,ie
-      call DA_TPQ_To_RH( xb%t(i,j,k), xb%p(i,j,k), xb%q(i,j,k), &
-                         xb%es(i,j,k), xb%qs(i,j,k), xb%rh(i,j,k) )
+      do k = ks, ke
+         do i = is,ie
+            call da_tpq_to_rh( xb%t(i,j,k), xb%p(i,j,k), xb%q(i,j,k), &
+                               xb%es(i,j,k), xb%qs(i,j,k), xb%rh(i,j,k) )
+         end do
+      end do
    end do
-   end do
-   end do
 
-!------------------------------------------------------------------------------
-!  [3.0]  Calculate dew point temperature:
-!------------------------------------------------------------------------------
+   !------------------------------------------------------------------------------
+   ! [3.0]  Calculate dew point temperature:
+   !------------------------------------------------------------------------------
 
-   call DA_TRH_To_TD ( xb%rh, xb%t, xb%td, xp )
+   call da_trh_to_td ( xb%rh, xb%t, xb%td, xp )
 
-!------------------------------------------------------------------------------
-! [4.0] Calculate  Sea level pressure and total precipitable water
-!------------------------------------------------------------------------------
+   !------------------------------------------------------------------------------
+   ! [4.0] Calculate  Sea level pressure and total precipitable water
+   !------------------------------------------------------------------------------
 
-   call DA_WRF_TPQ_2_SLP ( xb )
+   call da_wrf_tpq_2_slp ( xb )
 
-!  do j = js,je
-!  do i = is,ie
-!     call DA_TPQ_To_SLP( xb%t(i,j,:), xb%q(i,j,:), xb%p(i,j,:), xb%terr(i,j), &
-!                        xb%psfc(i,j), xb%slp(i,j), xp )
-!  end do
-!  end do
+   ! do j = js,je
+   !    do i = is,ie
+   !       call DA_TPQ_To_SLP( xb%t(i,j,:), xb%q(i,j,:), xb%p(i,j,:), xb%terr(i,j), &
+   !                        xb%psfc(i,j), xb%slp(i,j), xp )
+   !    end do
+   ! end do
 
-   CALL INTEGRAT_dZ(xb)
+   CALL integrat_dz(xb)
 
-!------------------------------------------------------------------------------
-! [5.0] Calculate Roughness length 
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! [5.0] Calculate Roughness length 
+   !---------------------------------------------------------------------------
 
    call roughness_from_lanu(19, xbx%mminlu, ANALYSIS_DATE(1:19), &
                             xp, xb%lanu, xb%rough)
 
-!------------------------------------------------------------------------------
-! [6.0]  Surface Wind speed SH Chen
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! [6.0]  Surface Wind speed SH Chen
+   !---------------------------------------------------------------------------
 
    do j=js,je
-   do i=is,ie
-      CALL DA_Transform_XToSeaSfcWind( xb%u(i,j,ks),xb%v(i,j,ks), &
+      do i=is,ie
+         CALL da_transform_xtoseasfcwind( xb%u(i,j,ks),xb%v(i,j,ks), &
                                        xb%speed(i,j),xb%h(i,j,ks)  )
-   enddo
+      enddo
    enddo
 
-!------------------------------------------------------------------------------
-! [7.0]  Brightness temperature SH Chen
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! [7.0]  Brightness temperature SH Chen
+   !---------------------------------------------------------------------------
 
 
    if(Use_SsmiTbObs) then
-   zcld  = 1                           ! effective cloud height (km)
-                                       ! = 1 if no cloud infomation
-   alw   = 0.
-   do j=js,je
-   do i=is,ie
-      ta    = xb%tgrn(i,j) + &
-              (xb%t(i,j,ks)-xb%tgrn(i,j))*log(2./0.0001)/ &
-              log(xb%h(i,j,ks)/0.0001)
+      zcld  = 1                           ! effective cloud height (km)
+                                          ! = 1 if no cloud infomation
+      alw   = 0.
+      do j=js,je
+         do i=is,ie
+            ta    = xb%tgrn(i,j) + &
+                    (xb%t(i,j,ks)-xb%tgrn(i,j))*log(2./0.0001)/ &
+                    log(xb%h(i,j,ks)/0.0001)
 
-      gamma = (ta-270)*0.023 + 5.03  ! effective lapse rate   (km) (4.0 - 6.5)
-      tpw   = xb%tpw(i,j) * 10.
+            gamma = (ta-270)*0.023 + 5.03  ! effective lapse rate   (km) (4.0 - 6.5)
+            tpw   = xb%tpw(i,j) * 10.
 
-      zrhom = 0.0
-      do k=ks,ke
-         zrhom=zrhom+(xb%hf(i,j,k+1)-xb%hf(i,j,k))*xb%h(i,j,k)*xb%q(i,j,k)*xb%rho(i,j,k)
-      END DO
+            zrhom = 0.0
+            do k=ks,ke
+               zrhom=zrhom+(xb%hf(i,j,k+1)-xb%hf(i,j,k))*xb%h(i,j,k)*xb%q(i,j,k)*xb%rho(i,j,k)
+            END DO
 
-!      call DA_Transform_XToZRhoQ(xb, i, j, xb%h(i,j,:), xb%hf(i,j,:), zrhom)
+            !  call DA_Transform_XToZRhoQ(xb, i, j, xb%h(i,j,:), xb%hf(i,j,:), zrhom)
 
-      htpw  = zrhom/tpw/1000.
+            htpw  = zrhom/tpw/1000.
 
-      call tb(1,53.,0.01*xb%psfc(i,j),ta,gamma,xb%tgrn(i,j),tpw,htpw,xb%speed(i,j),alw,zcld,       &
-              xb%tb19v(i,j),xb%tb19h(i,j)                            )
-      call tb(2,53.,0.01*xb%psfc(i,j),ta,gamma,xb%tgrn(i,j),tpw,htpw,xb%speed(i,j),alw,zcld,       &
-              xb%tb22v(i,j),dum1                                     )
-      call tb(3,53.,0.01*xb%psfc(i,j),ta,gamma,xb%tgrn(i,j),tpw,htpw,xb%speed(i,j),alw,zcld,       &
-              xb%tb37v(i,j),xb%tb37h(i,j)                            )
-      call tb(4,53.,0.01*xb%psfc(i,j),ta,gamma,xb%tgrn(i,j),tpw,htpw,xb%speed(i,j),alw,zcld,       &
-              xb%tb85v(i,j),xb%tb85h(i,j)                            )
-   enddo
-   enddo
+            call tb(1,53.,0.01*xb%psfc(i,j),ta,gamma,xb%tgrn(i,j),tpw,htpw, &
+                    xb%speed(i,j),alw,zcld, xb%tb19v(i,j),xb%tb19h(i,j))
+            call tb(2,53.,0.01*xb%psfc(i,j),ta,gamma,xb%tgrn(i,j),tpw, &
+                    htpw,xb%speed(i,j),alw,zcld, xb%tb22v(i,j),dum1)
+            call tb(3,53.,0.01*xb%psfc(i,j),ta,gamma,xb%tgrn(i,j),tpw, &
+                    htpw,xb%speed(i,j),alw,zcld, xb%tb37v(i,j),xb%tb37h(i,j))
+            call tb(4,53.,0.01*xb%psfc(i,j),ta,gamma,xb%tgrn(i,j),tpw, &
+               htpw,xb%speed(i,j),alw,zcld, xb%tb85v(i,j),xb%tb85h(i,j))
+         enddo
+      enddo
    endif
 
-!------------------------------------------------------------------------------
-! [7.0]  Calculate surface variable(wind (10-m) , moistureR & temperature (2-m)
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! [7.0]  Calculate surface variable(wind (10-m) , moistureR & temperature (2-m)
+   !---------------------------------------------------------------------------
 
    do j=js,je
-   do i=is,ie
-      call sfc_wtq(xb%psfc(i,j), xb%tgrn(i,j), &
-                   xb%p(i,j,1), xb%t(i,j,1), xb%q(i,j,1), &
-                   xb%u(i,j,1), xb%v(i,j,1), &
-                   xb%p(i,j,2), xb%t(i,j,2), xb%q(i,j,2), &
-                   xb%h(i,j,1), xb%rough(i,j),xb%landmask(i,j), &
-                   xb%u10(i,j), xb%v10(i,j), xb%t2(i,j), xb%q2(i,j), &
-                   xb%regime(i,j))
-   enddo
+      do i=is,ie
+         call sfc_wtq(xb%psfc(i,j), xb%tgrn(i,j), &
+                      xb%p(i,j,1), xb%t(i,j,1), xb%q(i,j,1), &
+                      xb%u(i,j,1), xb%v(i,j,1), &
+                      xb%p(i,j,2), xb%t(i,j,2), xb%q(i,j,2), &
+                      xb%h(i,j,1), xb%rough(i,j),xb%landmask(i,j), &
+                      xb%u10(i,j), xb%v10(i,j), xb%t2(i,j), xb%q2(i,j), &
+                      xb%regime(i,j))
+      enddo
    enddo
 
    IF (trace_use) CALL da_trace_exit("da_add_pbl_and_sfc_info")
 
-
-END SUBROUTINE DA_Add_PBL_And_SFC_Info
-
+END SUBROUTINE da_add_pbl_and_sfc_info

@@ -63,8 +63,8 @@ SUBROUTINE DA_Transfer_XatoKMA( xbx, grid, &
           coeff=xb%KMA_B(K)  *1.0/(PD-PU)**2*(-PU*(LOG(PD)-LOG(PU))+PD-PU)&
               + xb%KMA_B(K+1)*1.0/(PD-PU)**2*( PD*(LOG(PD)-LOG(PU))-PD+PU)
        end if
-       xa%p(i,j,k) = xa%psfc(i,i) * coeff
-       xa%p(i,j,k) = xb%psfc(i,j)*xa%psfc(i,i) 
+       xa%p(i,j,k) = xa%psfc(i,j) * coeff
+       xa%p(i,j,k) = xb%psfc(i,j)*xa%psfc(i,j)
        xb%p(i,j,k) = xb%p(i,j,k) + xa%p(I,J,k)
      enddo
        xb%psfc(i,j) = xb%psfc(i,j) + xa%psfc(i,j)

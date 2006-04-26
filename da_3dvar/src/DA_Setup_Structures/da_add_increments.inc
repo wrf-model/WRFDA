@@ -1,18 +1,8 @@
 SUBROUTINE da_add_increments( it, xp, xa, xb, xbx )
 
-!------------------------------------------------------------------------------
-!  PURPOSE: Add analysis increments to background field.
-!
-!  METHOD:
-!
-!  HISTORYi : 05/02/2001 - Creation of F90 version.           Dale Barker
-!  Additions: 07/25/2003 -                                    S.R.H. Rizvi
-!                     1. Surface fields are updated
-!                        by calling da_transfer_xbtoxb 
-!                     2. Check on Humidity is applied for each outer iteration
-!  PARENT_MODULE: DA_Minimisation
-!  
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   !  PURPOSE: Add analysis increments to background field.  
+   !---------------------------------------------------------------------------
 
    implicit none
 
@@ -33,33 +23,27 @@ SUBROUTINE da_add_increments( it, xp, xa, xb, xbx )
    ks = xp%kts
    ke = xp%kte
 
-!------------------------------------------------------------------------------
-!  [1.0] Check bounds on relative humidity and recalculate rh, q increments:
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! [1.0] Check bounds on relative humidity and recalculate rh, q increments:
+   !---------------------------------------------------------------------------
 
    if ( cv_options_hum == 1  ) then
-
-!     Calculate rh increments 
-!     (This is the only place they are used with cv_options_hum=1)
-
+      ! Calculate rh increments 
+      ! (This is the only place they are used with cv_options_hum=1)
       call da_tpq_to_rh_lin( xb, xp, xa )
    end if
 
-      if ( check_rh == 1 ) THEN
+   if ( check_rh == 1 ) THEN
+      ! Simple resetting to max/min values:
+      call da_check_rh_simple( xb, xa, xp )
+   else if ( check_rh == 2 ) THEN
+      ! Shu-Hua~s TPW conservation:
+      CALL da_check_rh( xb, xa, xp )
+   end if
 
-!        Simple resetting to max/min values:
-         call da_check_rh_simple( xb, xa, xp )
-
-      else if ( check_rh == 2 ) THEN
-
-!        Shu-Hua~s TPW conservation:
-         CALL da_check_rh( xb, xa, xp )
-
-      end if
-
-!----------------------------------------------------------------------------
-!  [2.0] Straightforward addition:
-!----------------------------------------------------------------------------
+   !-------------------------------------------------------------------------
+   ! [2.0] Straightforward addition:
+   !-------------------------------------------------------------------------
 
    xb % u (is:ie,js:je,ks:ke) = xb % u (is:ie,js:je,ks:ke) + xa % u (is:ie,js:je,ks:ke)
    xb % v (is:ie,js:je,ks:ke) = xb % v (is:ie,js:je,ks:ke) + xa % v (is:ie,js:je,ks:ke)
@@ -85,37 +69,36 @@ SUBROUTINE da_add_increments( it, xp, xa, xb, xbx )
       xb % w(is:ie,js:je,ks:ke+1) = xb % w(is:ie,js:je,ks:ke+1) + xa % w(is:ie,js:je,ks:ke+1)
    endif
 
-!------------------------------------------------------------------------------
-!  [3.0] Calculate derived variables:
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! [3.0] Calculate derived variables:
+   !---------------------------------------------------------------------------
 
-!  Calculate density:
+   ! Calculate density:
 
    xb % rho(is:ie,js:je,ks:ke) = xb % p(is:ie,js:je,ks:ke) / &
                               ( gas_constant * xb % t(is:ie,js:je,ks:ke) )
 
-!------------------------------------------------------------------------------
-!  [4.0] Calculate humidity variables:
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! [4.0] Calculate humidity variables:
+   !---------------------------------------------------------------------------
 
-!  Calculate dew-point temperature
+   !  Calculate dew-point temperature
 
-   call DA_TRH_To_TD (xb % rh, xb % t, xb % td, xp )
+   call da_trh_to_td (xb % rh, xb % t, xb % td, xp )
       
-!---- -------------------------------------------------------------------------
-!  [5.0] Calculate analysis increment (A-B) statistics:
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! [5.0] Calculate analysis increment (A-B) statistics:
+   !---------------------------------------------------------------------------
 
-!   CALL DA_Analysis_Stats ( stats_unit, xp, xa )
+   ! CALL da_analysis_stats ( stats_unit, xp, xa )
 
-!------------------------------------------------------------------------------
-!  [6.0] ADD PBL and SURFACE INFO.
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! [6.0] ADD PBL and SURFACE INFO.
+   !---------------------------------------------------------------------------
 
-   CALL DA_Add_PBL_And_SFC_Info( xp, xb, xbx )
+   CALL da_add_pbl_and_sfc_info( xp, xb, xbx )
 
    IF (trace_use) CALL da_trace_exit("da_add_increments")
-
 
 end subroutine da_add_increments
 
