@@ -14,7 +14,7 @@ rm -rf $EXP_DIR
 mkdir $EXP_DIR
 cd $EXP_DIR
 
-if test $HOSTNAME == "bs1201en"; then # bluesky
+if test $HOSTNAME = "bs1101en" -o $HOSTNAME = "bs1201en"; then # bluesky
 
   # Rather simplistic node calculation 
   let NODES=($NUM_PROCS-1)/8+1
