@@ -982,7 +982,7 @@
                                ims, ime, jms, jme, kms, kme,            &
                                its, ite, jts, jte, kts, kte             )
       CASE DEFAULT
-            CALL wrf_error_fatal3 ( "module_diffusion_em.b" , 985 ,  'Please choose diffusion coefficient scheme' )
+            CALL wrf_error_fatal ('Please choose diffusion coefficient scheme' )
 
     END SELECT km_coef
 

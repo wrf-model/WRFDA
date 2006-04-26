@@ -237,7 +237,7 @@ integer , dimension(grid%sm31:grid%em31,grid%sm33:grid%em31) :: xxxxx , yyyyy , 
    ELSE
 
       write(wrf_err_message,*)' unknown solver, error exit for dynamics_option = ',dynamics_option
-      CALL wrf_error_fatal3 ( "solve_em.b" , 234 ,  wrf_err_message )
+      CALL wrf_error_fatal (wrf_err_message )
 
    END IF
 
