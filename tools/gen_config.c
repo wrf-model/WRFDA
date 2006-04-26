@@ -6,6 +6,7 @@
 #include "data.h"
 #include <string.h>
 #include <strings.h>
+#include <ctype.h>
 #include "sym.h"
 
 int
@@ -116,6 +117,77 @@ gen_namelist_statements ( char * dirname )
 }
 
 int
+gen_namelist_script ( char * dirname )
+{
+  FILE * fp ;
+  char  fname[NAMELEN] ;
+  char  *fn = "namelist_script.inc" ;
+  node_t *p,*q ;
+  char *p1, *p2, *p3, *p4 ;
+  char *i;
+  char  howset1[NAMELEN] ;
+  char  howset2[NAMELEN] ;
+
+  if ( strlen(dirname) > 0 ) { sprintf(fname,"%s/%s",dirname,fn) ; }
+  if ((fp = fopen( fname , "w" )) == NULL ) return(1) ;
+
+  sym_forget() ;
+
+  fprintf(fp,"# Machine generated, do not edit\n\n") ;
+
+  for ( p = Domain.fields ; p != NULL ; p = p-> next )
+  {
+    if ( p->node_kind & RCONFIG )
+    {
+      strcpy(howset1,p->howset) ;
+      p1 = strtok(howset1,",") ;
+      p2 = strtok(NULL,",") ;
+      if ( !strcmp(p1,"namelist") ) {
+        if ( p2 == NULL ) {
+          fprintf(stderr,
+          "Warning: no namelist section specified for nl %s\n",p->name) ;
+          continue ;
+        }
+	if (sym_get( p2 ) == NULL) { /* not in table yet */
+          fprintf(fp,"echo \\&%s >> namelist.input\n",p2) ;
+          for ( q = Domain.fields ; q != NULL ; q = q-> next ) {
+            if ( q->node_kind & RCONFIG) {
+              strcpy(howset2,q->howset) ;
+              p3 = strtok(howset2,",") ;
+              p4 = strtok(NULL,",") ;
+              if ( p4 == NULL ) {
+                continue ;
+              }
+
+              if ( !strcmp(p2,p4)) {
+                fprintf(fp,"if test ! -z \"$WRF_") ;
+                for (i=q->name; *i!='\0'; i++) {
+                  fputc(toupper(*i),fp); 
+                }
+                fprintf(fp,"\"; then echo \"%s=${WRF_",q->name) ;
+                for (i=q->name; *i!='\0'; i++) {
+                  fputc(toupper(*i),fp); 
+                }
+
+                fprintf(fp,"},\" >> namelist.input;fi\n") ;
+              }
+
+            }
+          }
+          fprintf(fp,"echo / >> namelist.input\n") ;
+	  sym_add(p2) ;
+	}
+      }
+    }
+  }
+
+  fclose( fp ) ;
+  return(0) ;
+}
+
+
+
+int
 gen_get_nl_config ( char * dirname )
 {
   FILE * fp ;
@@ -166,14 +238,18 @@ gen_get_nl_config ( char * dirname )
             if        ( !strcmp( p->nentries, "max_domains" )) {
               fprintf(fp,"  IF ( id_id .LT. 1 .OR. id_id .GT. model_config_rec%%max_dom ) THEN\n") ;
               fprintf(fp,"    WRITE(emess,*)'nl_%s_%s: Out of range domain number: ',id_id\n",gs,p->name) ;
+              fprintf(fp,"    CALL wrf_error_fatal(emess)\n") ;
+              fprintf(fp,"  ENDIF\n" ) ;
 	    } else if ( !strcmp( p->nentries, "max_moves" )) {
               fprintf(fp,"  IF ( id_id .LT. 1 .OR. id_id .GT. model_config_rec%%num_moves ) THEN\n") ;
               fprintf(fp,"    WRITE(emess,*)'nl_%s_%s: Out of range move number: ',id_id\n",gs,p->name) ;
+              fprintf(fp,"    CALL wrf_error_fatal(emess)\n") ;
+              fprintf(fp,"  ENDIF\n" ) ;
 	    } else {
+/* JRB I can't see we can't have generic multi-elements
 	      fprintf(stderr,"Registry WARNING: multi element rconfig entry must be either max_domains or max_moves\n") ;
+*/
 	    }
-            fprintf(fp,"    CALL wrf_error_fatal(emess)\n") ;
-            fprintf(fp,"  ENDIF\n" ) ;
           }
           fprintf(fp,"  %s = model_config_rec%%%s(id_id)\n",p->name,p->name) ;
         }
@@ -197,14 +273,18 @@ gen_get_nl_config ( char * dirname )
             if        ( !strcmp( p->nentries, "max_domains" )) {
               fprintf(fp,"  IF ( id_id .LT. 1 .OR. id_id .GT. model_config_rec%%max_dom ) THEN\n") ;
               fprintf(fp,"    WRITE(emess,*)'nl_%s_%s: Out of range domain number: ',id_id\n",gs,p->name) ;
+              fprintf(fp,"    CALL wrf_error_fatal(emess)\n") ;
+              fprintf(fp,"  ENDIF\n" ) ;
 	    } else if ( !strcmp( p->nentries, "max_moves" )) {
               fprintf(fp,"  IF ( id_id .LT. 1 .OR. id_id .GT. model_config_rec%%num_moves ) THEN\n") ;
               fprintf(fp,"    WRITE(emess,*)'nl_%s_%s: Out of range move number: ',id_id\n",gs,p->name) ;
+              fprintf(fp,"    CALL wrf_error_fatal(emess)\n") ;
+              fprintf(fp,"  ENDIF\n" ) ;
 	    } else {
+/* JRB I cannot see why we cannot have multi-element ones
+
 	      fprintf(stderr,"Registry WARNING: multi element rconfig entry must be either max_domains or max_moves\n") ;
-	    }
-            fprintf(fp,"    CALL wrf_error_fatal(emess)\n") ;
-            fprintf(fp,"  ENDIF\n" ) ;
+*/	    }
           }
           fprintf(fp,"  model_config_rec%%%s(id_id) = %s\n",p->name,p->name) ;
         }
@@ -275,7 +355,10 @@ gen_config_reads ( char * dirname )
 
   fprintf(fp,"! Contains namelist statements for module_config.F.\n") ;
   fprintf(fp,"#ifndef NAMELIST_READ_UNIT\n") ;
-  fprintf(fp,"#  define NAMELIST_READ_UNIT nml_unit\n") ;
+  fprintf(fp,"#  define NAMELIST_READ_UNIT nml_read_unit\n") ;
+  fprintf(fp,"#endif\n") ;
+  fprintf(fp,"#ifndef NAMELIST_WRITE_UNIT\n") ;
+  fprintf(fp,"#  define NAMELIST_WRITE_UNIT nml_write_unit\n") ;
   fprintf(fp,"#endif\n") ;
   fprintf(fp,"!\n") ;
 
@@ -303,7 +386,7 @@ gen_config_reads ( char * dirname )
           fprintf(fp,"   CALL wrf_error_fatal(\"Cannot read namelist %s\")\n",p2) ;
           fprintf(fp," END IF\n") ;
           fprintf(fp,"#ifndef NO_NAMELIST_PRINT\n") ;
-          fprintf(fp," WRITE ( UNIT = *                  , NML = %s )\n",p2) ;
+          fprintf(fp," WRITE ( UNIT = NAMELIST_WRITE_UNIT, NML = %s )\n",p2) ;
           fprintf(fp,"#endif\n") ;
 	  sym_add(p2) ;
 	}
