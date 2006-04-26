@@ -1,11 +1,12 @@
-module DA_ReadWrite_MM5
+module da_readwrite_mm5
 
-   USE DA_Constants
-   USE DA_Define_Structures
-   USE DA_Grid_Definitions
-   USE DA_Tools
-   USE DA_h_ops
-   USE PAR_UTIL
+   USE da_constants
+   USE da_define_structures
+   USE da_grid_definitions
+   USE da_tools
+   USE da_h_ops
+   USE par_util
+   use module_wrf_error
 
    implicit none
 
@@ -18,4 +19,4 @@ CONTAINS
 #include "DA_print_big_header.inc"
 #include "DA_print_sub_header.inc"
 
-end module DA_ReadWrite_MM5
+end module da_readwrite_mm5

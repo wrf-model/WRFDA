@@ -1,15 +1,16 @@
-MODULE DA_SSMI
+MODULE da_ssmi
 
-   USE DA_Constants
-   USE DA_Define_Structures
-   USE DA_Interpolation
-   USE DA_Statistics
-   USE DA_Grid_Definitions
-   USE DA_Physics
-   USE DA_Tools
-   USE PAR_UTIL
+   USE da_constants
+   USE da_define_structures
+   USE da_interpolation
+   USE da_statistics
+   USE da_grid_definitions
+   USE da_physics
+   USE da_tools
+   USE par_util
+   USE module_wrf_error
 
-! The "stats_ssmi_rv_type" is ONLY used locally in DA_Ssmi_Rv:
+   ! The "stats_ssmi_rv_type" is ONLY used locally in DA_Ssmi_Rv:
 
    TYPE maxmin_ssmi_rv_stats_type
         TYPE (maxmin_type)         :: tpw      ! Toatl precipitable water cm
@@ -21,7 +22,7 @@ MODULE DA_SSMI
         TYPE (residual_ssmi_retrieval_type)   :: average, rms_err
    END TYPE stats_ssmi_retrieval_type
 
-! The "stats_ssmi_tb_type" is ONLY used locally in DA_Ssmi_tb:
+   ! The "stats_ssmi_tb_type" is ONLY used locally in DA_Ssmi_tb:
 
    TYPE maxmin_ssmi_tb_stats_type
         TYPE (maxmin_type)         :: tb19v    ! brightness temperature (K)
@@ -100,5 +101,5 @@ CONTAINS
 #include "DA_Calculate_GradY_SSMT1.inc"
 #include "DA_Calculate_GradY_SSMT2.inc"
    
-END MODULE DA_SSMI
+END MODULE da_ssmi
 

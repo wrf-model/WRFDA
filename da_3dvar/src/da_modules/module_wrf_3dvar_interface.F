@@ -87,6 +87,9 @@ CONTAINS
   em33             = grid%em33
 #endif
 
+!call wrf_oi(__FILE__,__LINE__)
+!write (0,*) "sm31,em31,sm32,em32,sm33,em33",sm31,em31,sm32,em32,sm33,em33
+
   CALL solve_v3d ( grid , config_flags , &
 #include <em_actual_args.inc>
     )

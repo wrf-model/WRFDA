@@ -9,6 +9,7 @@ MODULE DA_Define_Structures
     USE module_domain   ! for typedefs (vp_type, xb_type, xpose_type)
     USE module_dm       ! for rsl definitions
     USE da_tracing
+    USE module_wrf_error
 
 !------------------------------------------------------------------------------
 !  PURPOSE: Collection of routines to define and allocate structures.
