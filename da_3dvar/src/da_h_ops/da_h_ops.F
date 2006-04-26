@@ -1,6 +1,7 @@
 MODULE da_h_ops
 
 USE da_c_mat
+USE module_wrf_error
 
 IMPLICIT NONE
 
