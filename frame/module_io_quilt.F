@@ -1333,7 +1333,9 @@ MODULE module_wrf_quilt
         OPEN ( unit=27, file="namelist.input", form="formatted", status="old" )
         nio_groups = 1
         nio_tasks_per_group  = 0
-        READ ( 27 , namelist_quilt )
+        ! Not finding the namelist should not be an error. This will go when
+        ! this namelist is folded into Registry by the WRF team
+        READ ( 27 , namelist_quilt, IOSTAT=ierr )
         CLOSE ( 27 )
       ENDIF
       CALL mpi_bcast( nio_tasks_per_group  , 1 , MPI_INTEGER , 0 , MPI_COMM_WORLD, ierr )
