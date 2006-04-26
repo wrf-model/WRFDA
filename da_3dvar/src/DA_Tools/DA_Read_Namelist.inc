@@ -472,10 +472,6 @@ SUBROUTINE DA_Read_Namelist
     use_obsgts = .FALSE.
   END IF
 
-write (0,*) use_Hirs2Obs,use_Hirs3Obs, use_MsuObs, use_AmsuaObs, &
-      use_AmsubObs, use_AirsObs, use_Eos_AmsuaObs, &
-      use_Eos_RadObs, use_HsbObs, use_kma1dvar
-
   IF (use_Hirs2Obs .OR. use_Hirs3Obs .OR. use_MsuObs .OR. use_AmsuaObs .OR. &
       use_AmsubObs .OR. use_AirsObs .OR. use_Eos_AmsuaObs .OR. &
       use_Eos_RadObs .OR. use_HsbObs .OR. use_kma1dvar) THEN
@@ -483,9 +479,6 @@ write (0,*) use_Hirs2Obs,use_Hirs3Obs, use_MsuObs, use_AmsuaObs, &
   ELSE
     use_radiance = .FALSE.
   END IF
-
-write (0,*) "oi use_radiance",use_radiance
-
 
    READ  ( UNIT = namelist_unit, NML = RECORD5 , IOSTAT = IOST)
    IF (iost /= 0) THEN
@@ -884,8 +877,6 @@ write (0,*) "oi use_radiance",use_radiance
   end if
    
    WRITE(UNIT=stdout,FMT='(A)') "----------------------------------------"
-
-write (0,*) "oi2 use_radiance",use_radiance
 
    RETURN
 
