@@ -1,6 +1,8 @@
 include configure.wrf
 
-LIBS = libwrflib.a libwrfio_nf.a libio_grib1.a libesmf_time.a
+WRF_LIBS = libwrflib.a libwrfio_nf.a libio_grib1.a libesmf_time.a
+
+VAR_LIBS = ${WRF_LIBS} libwrfvar.a
 
 include dyn_$(SOLVER).make
 include share.make
@@ -18,14 +20,14 @@ include io_grib1.make
 include ioapi_share.make
 include main.make
 
-OBJS=$(SHARE_OBJS) $(FRAME_OBJS) $(PHYS_OBJS) $(DYN_OBJS) \
+WRF_OBJS=$(SHARE_OBJS) $(FRAME_OBJS) $(PHYS_OBJS) $(DYN_OBJS) \
   $(ESMF_TIME_F90_OBJS) $(IO_INT_OBJS) $(IO_NETCDF_OBJS) \
   module_wrf_top.o $(FRAME_SPECIAL_OBJS)
 
-MODULES=$(SHARE_MODULES) $(FRAME_MODULES) $(PHYS_MODULES) $(DYN_MODULES)
+WRF_MODULES=$(SHARE_MODULES) $(FRAME_MODULES) $(PHYS_MODULES) $(DYN_MODULES)
 
-libwrflib.a : $(MODULES) $(OBJS)
-	$(AR) ru libwrflib.a $(MODULES) $(OBJS)
+libwrflib.a : $(WRF_MODULES) $(WRF_OBJS)
+	$(AR) ru libwrflib.a $(WRF_MODULES) $(WRF_OBJS)
 	$(RANLIB) libwrflib.a
 
 clean :

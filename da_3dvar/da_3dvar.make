@@ -53,17 +53,18 @@ DA_OBJS        =	da_solve_v3d.o		\
 			parkind1.o	        \
 			gsi_kinds.o		\
 			gsi_constants.o		\
-			BLAS.o
-
-DA_MODULES =		module_wrf_3dvar_io.o \
+			BLAS.o                  \
+                        module_wrf_3dvar_io.o \
                         module_wrf_3dvar_interface.o	\
 	   		module_wrfvar_top.o
 
-wrfvar_interface :	$(DA_MODULES_INTERFACE)
-		$(AR) ru libwrflib.a $(DA_MODULES_INTERFACE)
+libwrfvar.a : $(DA_OBJS)
+	$(AR) ru libwrfvar.a $(DA_OBJS)
+	$(RANLIB) libwrfvar.a
 
-wrfvar_io :	$(DA_MODULES_IO)
-		$(AR) ru libwrflib.a $(DA_MODULES_IO)
+##########################################################################
+
+wrfvar.o : module_wrfvar_top.o
 
 module_wrfvar_top.o : module_wrf_3dvar_interface.o \
                       module_integrate.o \
@@ -71,12 +72,6 @@ module_wrfvar_top.o : module_wrf_3dvar_interface.o \
 
 module_wrf_3dvar_io.o : module_io_domain.o  \
                         da_tracing.o
-
-
-wrfvar_obj :	$(DA_OBJS)
-		$(AR) ru libwrflib.a $(DA_OBJS)
-
-##########################################################################
 
 generic_boilerplate.inc: generic_boilerplate.m4
 			$(RM) generic_boilerplate.inc

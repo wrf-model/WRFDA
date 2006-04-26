@@ -2,10 +2,10 @@
 
 var : wrfvar
 
-wrfvar : arch $(LIBS) $(DA_MODULES) wrfvar_obj wrfvar.o
-	$(LD) -o wrfvar.exe $(LDFLAGS) wrfvar.o $(DA_MODULES) $(LIB)
+wrfvar : arch $(VAR_LIBS) wrfvar.o libwrfvar.a
+	$(LD) -o wrfvar.exe $(LDFLAGS) wrfvar.o -lwrfvar $(LIB)
 
-wrf : arch wrf.o $(LIBS)
+wrf : arch wrf.o $(WRF_LIBS)
 	$(LD) -o wrf.exe $(LDFLAGS) wrf.o $(LIB)
 
 kma2netcdf :  arch $(LIBS) $(CONVERTOR_MODULES) $(CONVERTOR_OBJS) kma2netcdf.o
