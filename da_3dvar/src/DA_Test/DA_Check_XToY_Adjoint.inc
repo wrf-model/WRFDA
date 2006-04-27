@@ -107,7 +107,7 @@ SUBROUTINE DA_Check_XToY_Adjoint( xb, xa, iv, xp, y, &
       if ( use_ssmt1obs .or. use_ssmt2obs .or. &
            Use_SsmiTbObs .or. Use_SsmiRetrievalObs ) then
          if( global ) then
-           CALL wrf_error_fatal3(__LINE__,__FILE__, &
+           CALL wrf_error_fatal3(__FILE__,__LINE__, &
              "xb%speed is not available, see da_transfer_kmatoxb.inc")
          end if
          call DA_Transform_XToSeaSfcWind_Lin( xa, xb )
@@ -217,7 +217,7 @@ SUBROUTINE DA_Check_XToY_Adjoint( xb, xa, iv, xp, y, &
       if ( use_ssmt1obs .or. use_ssmt2obs .or. &
            Use_SsmiTbObs .or. Use_SsmiRetrievalObs ) then
          if( global ) then
-           CALL wrf_error_fatal3(__LINE__,__FILE__, &
+           CALL wrf_error_fatal3(__FILE__,__LINE__, &
              "xb%speed is not available, see da_transfer_kmatoxb.inc")
          end if
          call DA_Transform_XToSeaSfcWind_Adj( xa, xb )
