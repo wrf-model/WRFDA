@@ -77,8 +77,10 @@ CONTAINS
 !</DESCRIPTION>
       IMPLICIT NONE
 
-      INTEGER              :: io_status, nml_unit
+      INTEGER              :: io_status
       INTEGER              :: i
+
+      INTEGER, PARAMETER :: nml_read_unit = 10
 
 ! define as temporaries
 #include <namelist_defines.inc>
@@ -86,7 +88,7 @@ CONTAINS
 ! Statements that specify the namelists
 #include <namelist_statements.inc>
 
-      OPEN ( UNIT   = 10               ,      &
+      OPEN ( UNIT   = nml_read_unit    ,      &
              FILE   = "namelist.input" ,      &
              FORM   = "FORMATTED"      ,      &
              STATUS = "OLD"            ,      &
@@ -95,8 +97,6 @@ CONTAINS
       IF ( io_status .NE. 0 ) THEN
         CALL WRF_ERROR_FATAL ( 'ERROR OPENING namelist.input' )
       ENDIF
-
-      nml_unit = 10
 
 ! Statements that set the namelist vars to default vals
 #  include <namelist_defaults.inc>
@@ -126,7 +126,7 @@ CONTAINS
 #define SOURCE_REC_DEX
 #include <config_assigns.inc>
 
-      CLOSE ( UNIT = 10 , IOSTAT = io_status )
+      CLOSE ( UNIT = nml_read_unit , IOSTAT = io_status )
 
       IF ( io_status .NE. 0 ) THEN
         CALL WRF_ERROR_FATAL ( 'ERROR CLOSING namelist.input' )
