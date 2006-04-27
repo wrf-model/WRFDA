@@ -660,6 +660,10 @@ if test $PLATFORM == "AIX"; then
   ./wrfvar.exe > wrfvar.out 2>wrfvar.error
 fi
 
+if test -f fort.9; then
+  cp $PWD/fort.9      $EXP_DIR/namelist.output
+fi
+
 if test -f fort.12; then
   cp $PWD/fort.12      $EXP_DIR/statistics
 fi

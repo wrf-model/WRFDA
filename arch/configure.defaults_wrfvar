@@ -10,7 +10,7 @@ LD              =       $(FC)
 CC              =       cc
 CC_TOOLS        =       cc
 ARCHFLAGS3      =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DINTIO \
-                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO -DNO_NAMELIST_PRINT \
+                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO  \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC)
 TRADFLAG        =
 #FCOPTIM         =       -fast -O2 -Olimit 2000
@@ -54,7 +54,7 @@ CC              =       mpicc
 CC_TOOLS        =       cc
 ARCHFLAGS3      =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DINTIO \
                         -DWRF_RSL_IO -DDM_PARALLEL -DRSL \
-                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO -DNO_NAMELIST_PRINT \
+                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO  \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC)
 ARCHFLAGS4      =       -I../external/RSL/RSL
 TRADFLAG        =
@@ -105,7 +105,7 @@ LD              =       $(FC)
 CC              =       cc
 CC_TOOLS        =       cc
 ARCHFLAGS3       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DINTIO \
-                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO -DNO_NAMELIST_PRINT \
+                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO  \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC)
 TRADFLAG        =
 #FCOPTIM         =       -fast -O2 -Olimit 2000
@@ -154,7 +154,7 @@ FCBUFR          =       -Ktrap=fp -tp p6
 FCBASE          =       $(FCBUFR) -byteswapio
 FC_FFT_RF       =       $(FCBUFR) -byteswapio
 ARCHFLAGS3      =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE \
-                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO -DNO_NAMELIST_PRINT 
+                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO  
 EXTRAMODULES    =       
 
 LDFLAGS         =
@@ -186,7 +186,7 @@ CC_TOOLS        =       gcc
 SFC             =       pgf90
 ARCHFLAGS3      =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE \
                         -DINTIO -DWRF_RSL_IO -DRSL -DDM_PARALLEL \
-                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO -DNO_NAMELIST_PRINT
+                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO 
 ARCHFLAGS4      =       -DMAXDOM_MAKE=$(MAX_DOMAINS) \
                         -DMAXPROC_MAKE=$(MAX_PROC) \
                         -I../external/RSL/RSL
@@ -247,7 +247,7 @@ FCBUFR          =
 FCBASE          =       $(FCBUFR) -convert big_endian
 FC_FFT_RF       =       $(FCBUFR) -convert big_endian
 ARCHFLAGS3      =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE \
-                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO -DNO_NAMELIST_PRINT
+                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO 
 EXTRAMODULES    =       
 
 LDFLAGS         =
@@ -285,7 +285,7 @@ FCHOST          =
 FCBUFR          =       -cpp -Wno=101,139,155,158 -fno-second-underscore -ftrace=full
 FCBASE          =       $(FCBUFR)
 FC_FFT_RF       =       $(FCBUFR)
-ARCHFLAGS3      =       -DTRIEDNTRUE -DONLY_WRFMODEL_IO -DNO_NAMELIST_PRINT
+ARCHFLAGS3      =       -DTRIEDNTRUE -DONLY_WRFMODEL_IO 
 EXTRAMODULES    =       
 
 LDFLAGS         =
@@ -324,7 +324,7 @@ FCBUFR          =
 FCBASE          =       $(FCBUFR) -byteswapio
 FC_FFT_RF       =       $(FCBUFR) -byteswapio
 ARCHFLAGS3      =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE \
-                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO -DNO_NAMELIST_PRINT
+                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO 
 EXTRAMODULES    =       
 
 LDFLAGS         =
@@ -356,7 +356,7 @@ CC_TOOLS        =       gcc
 SFC             =       pgf90
 ARCHFLAGS3      =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE \
                         -DINTIO -DWRF_RSL_IO -DRSL -DDM_PARALLEL \
-                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO -DNO_NAMELIST_PRINT
+                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO 
 ARCHFLAGS4      =       -DMAXDOM_MAKE=$(MAX_DOMAINS) \
                         -DMAXPROC_MAKE=$(MAX_PROC) \
                         -I../external/RSL/RSL
@@ -410,7 +410,7 @@ CC              =       cc
 CC_TOOLS        =       cc
 ARCHFLAGS3      =       -DINTIO \
                         -DTRIEDNTRUE -DONLY_WRFMODEL_IO \
-                        -DNORESHAPE -DNO_NAMELIST_PRINT
+                        -DNORESHAPE 
 ARCHFLAGS4      =       -w -64 -mips4 -DUNDERSCORE \
                         -I../external/RSL/RSL
 TRADFLAG        =
@@ -457,7 +457,7 @@ CC              =       mpicc
 CC_TOOLS        =       cc
 ARCHFLAGS3      =       -DINTIO \
                         -DWRF_RSL_IO -DDM_PARALLEL -DRSL \
-                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO -DNO_NAMELIST_PRINT
+                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO 
 ARCHFLAGS4      =       -w -64 -mips4 \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) \
                         -DMAXPROC_MAKE=$(MAX_PROC) \
@@ -513,7 +513,7 @@ LD              =       $(FC)
 CC              =       cc
 CC_TOOLS        =       cc
 ARCHFLAGS3      =       -DINTIO \
-                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO -DNO_NAMELIST_PRINT \
+                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO  \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) \
 			-DMPI -I$(MPIINCDIR) 
 TRADFLAG        =
@@ -573,7 +573,7 @@ FC_FFT_RF       =       $(FCBASE)
 EXTRAMODULES    =
 ARCHFLAGS3      =       -DGRIB1 -DINTIO \
                         -DTRIEDNTRUE   \
-			-DLIMIT_ARGS -DNO_NAMELIST_PRINT -DNATIVE_MASSV
+			-DLIMIT_ARGS  -DNATIVE_MASSV
 ARCHFLAGS4      =       -DNOUNDERSCORE -DNCARIBM_NOC99
 LOCAL_LIB	=	-lmass -lmassv
 
@@ -613,7 +613,7 @@ FC_FFT_RF       =       $(FCBASE)
 EXTRAMODULES    =
 ARCHFLAGS3      =       -DWRF_RSL_IO -DRSL -DDM_PARALLEL \
 			-DTRIEDNTRUE -DGRIB1 -DINTIO \
-			-DLIMIT_ARGS -DNO_NAMELIST_PRINT -DNATIVE_MASSV \
+			-DLIMIT_ARGS  -DNATIVE_MASSV \
 			-DNORESHAPE
 ARCHFLAGS4      =       -DNOUNDERSCORE -DNCARIBM_NOC99 \
 			-I../external/RSL/RSL \
@@ -666,7 +666,7 @@ CC              =       cc
 ARCHFLAGS3      =       -DWRF_RSL_IO -DRSL \
                         -DDM_PARALLEL \
                         -DTRIEDNTRUE -DONLY_WRFMODEL_IO -DINTIO \
-                        -DNORESHAPE -Dcrayx1 -DNO_NAMELIST_PRINT
+                        -DNORESHAPE -Dcrayx1 
 ARCHFLAGS4      =       -UCRAY \
                         -I../external/RSL/RSL \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) \
@@ -743,7 +743,7 @@ CC              =       cc
 ARCHFLAGS3      =       -DWRF_RSL_IO -DRSL \
                         -DDM_PARALLEL \
                         -DTRIEDNTRUE -DONLY_WRFMODEL_IO -DINTIO \
-                        -DNORESHAPE -Dcrayx1 -DNO_NAMELIST_PRINT
+                        -DNORESHAPE -Dcrayx1 
 ARCHFLAGS4      =       -UCRAY \
                         -I../external/RSL/RSL \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) \
@@ -814,7 +814,7 @@ EXTRAMODULES    =
 EXTRAMODULES    =       
 ARCHFLAGS3      =       -DINTIO \
                         -DTRIEDNTRUE   \
-			-DLIMIT_ARGS -DNO_NAMELIST_PRINT
+			-DLIMIT_ARGS 
 ARCHFLAGS4      =       -DNOUNDERSCORE -DLANDREAD_STUB -DMACOS
 EXTRA_LIBS      =       -lSystemStubs
 LDFLAGS         =	 -Wl,-stack_size,10000000,-stack_addr,0xc0000000
@@ -851,7 +851,7 @@ EXTRAMODULES    =
 EXTRAMODULES    =       
 ARCHFLAGS3      =       -DINTIO \
                         -DTRIEDNTRUE   \
-			-DLIMIT_ARGS -DNO_NAMELIST_PRINT
+			-DLIMIT_ARGS 
 ARCHFLAGS4      =       -DNOUNDERSCORE -DLANDREAD_STUB -DMACOS
 EXTRA_LIBS      =       -lSystemStubs
 LDFLAGS         =	 -Wl,-stack_size,10000000,-stack_addr,0xc0000000
@@ -886,7 +886,7 @@ EXTRAMODULES    =
 EXTRAMODULES    =       
 ARCHFLAGS3      =       -DINTIO \
                         -DTRIEDNTRUE   \
-			-DLIMIT_ARGS -DNO_NAMELIST_PRINT
+			-DLIMIT_ARGS 
 ARCHFLAGS4      =       -DLANDREAD_STUB -DMACOS
 EXTRA_LIBS      =       -lSystemStubs
 LDFLAGS         =	 -Wl,-stack_size,10000000,-stack_addr,0xc0000000

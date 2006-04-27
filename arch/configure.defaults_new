@@ -20,7 +20,7 @@ LDFLAGS         =       $(FCOPTIM) $(FCBASE)
 FC_FFT_RF       =       $(FCBASE) $(FCENDIAN)
 
 ARCHFLAGS2      =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DINTIO \
-                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO -DNO_NAMELIST_PRINT \
+                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO  \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC)
 
 
@@ -63,7 +63,7 @@ DM_CPP_FLAGS	=	-I$(RSL_PATH)/RSL `cat inc/dm_comm_cpp_flags`
 
 ARCHFLAGS2      =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DINTIO \
                         -DWRF_RSL_IO -DDM_PARALLEL -DRSL \
-                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO -DNO_NAMELIST_PRINT \
+                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO  \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC)
 ARCHFLAGS4      =       -I$(RSL_PATH)/RSL
 
@@ -106,7 +106,7 @@ FC_FFT_RF       =       $(FCBASE) $(FCENDIAN)
 LDFLAGS         =       $(FCOPTIM) $(FCBASE) $(FCENDIAN)
 
 ARCHFLAGS2      =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DINTIO \
-                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO -DNO_NAMELIST_PRINT \
+                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO  \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC)
 
 LOCAL_LIBRARIES =       -L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c -lX11
@@ -141,7 +141,7 @@ FCBASE          =       -Ktrap=fp -tp p6 -C
 LDFLAGS         =       $(FCENDIAN)
 
 ARCHFLAGS2      =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE \
-                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO -DNO_NAMELIST_PRINT
+                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO 
 
 LOCAL_LIBRARIES =       -L/usr/local/ncarg/lib -L/usr/X11R6/lib -L/usr/local/lib \
 			-lncarg -lncarg_gks -lncarg_c -lX11
@@ -184,7 +184,7 @@ DM_CPP_FLAGS    =       -I$(RSL_PATH)/RSL `cat inc/dm_comm_cpp_flags`
 
 ARCHFLAGS2      =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE \
                         -DINTIO -DWRF_RSL_IO -DRSL -DDM_PARALLEL \
-                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO -DNO_NAMELIST_PRINT
+                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO 
 ARCHFLAGS4      =       -DMAXDOM_MAKE=$(MAX_DOMAINS) \
                         -DMAXPROC_MAKE=$(MAX_PROC) \
                         -I$(RSL_PATH)/RSL
@@ -222,7 +222,7 @@ FCBASE          =
 FCTYPE          =       -r8
 
 ARCHFLAGS2      =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE \
-                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO -DNO_NAMELIST_PRINT
+                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO 
 
 LOCAL_LIBRARIES =       -L/usr/local/ncarg/lib -L/usr/X11R6/lib -L/usr/local/lib \
 			-lncarg -lncarg_gks -lncarg_c -lX11
@@ -257,7 +257,7 @@ FCBASE          =       -cpp -Wno=101,139,155,158 -fno-second-underscore \
                           -ftrace=full
 FCTYPE          =       -r8
 
-ARCHFLAGS2      =       -DTRIEDNTRUE -DONLY_WRFMODEL_IO -DNO_NAMELIST_PRINT
+ARCHFLAGS2      =       -DTRIEDNTRUE -DONLY_WRFMODEL_IO 
 
 LOCAL_LIBRARIES =       -L/usr/local/ncarg/lib -L/usr/X11R6/lib -L/usr/local/lib \
 			-lncarg -lncarg_gks -lncarg_c -lX11
@@ -297,7 +297,7 @@ DM_CPP_FLAGS    =       -I$(RSL_PATH)/RSL `cat inc/dm_comm_cpp_flags`
 
 
 ARCHFLAGS2      =       -DINTIO -DWRF_RSL_IO -DRSL -DDM_PARALLEL \
-                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO -DNO_NAMELIST_PRINT
+                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO 
 ARCHFLAGS4      =       -DMAXDOM_MAKE=$(MAX_DOMAINS) \
                         -DMAXPROC_MAKE=$(MAX_PROC) \
                         -I$(RSL_PATH)/RSL
@@ -337,7 +337,7 @@ FCBASE          =       -Ktrap=fp -C
 LDFLAGS         =       $(FCENDIAN)
 
 ARCHFLAGS2      =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE \
-                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO -DNO_NAMELIST_PRINT
+                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO 
 
 LOCAL_LIBRARIES =       -L/usr/local/ncarg/lib -L/usr/X11R6/lib -L/usr/local/lib \
 			-lncarg -lncarg_gks -lncarg_c -lX11
@@ -378,7 +378,7 @@ MPI_LIB		=	-L$(RSL_PATH)/RSL -lrsl
 DM_CPP_FLAGS    =       -I$(RSL_PATH)/RSL `cat inc/dm_comm_cpp_flags`
 
 
-ARCHFLAGS2      =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DNO_NAMELIST_PRINT \
+ARCHFLAGS2      =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE  \
                         -DINTIO -DWRF_RSL_IO -DRSL -DDM_PARALLEL \
                         -DTRIEDNTRUE -DONLY_WRFMODEL_IO
 ARCHFLAGS4      =       -DMAXDOM_MAKE=$(MAX_DOMAINS) \
@@ -420,7 +420,7 @@ LDFLAGS         =       $(FCBASE)
 
 ARCHFLAGS2      =       -DINTIO \
                         -DTRIEDNTRUE -DONLY_WRFMODEL_IO \
-                        -DNORESHAPE -DNO_NAMELIST_PRINT
+                        -DNORESHAPE 
 ARCHFLAGS4      =       -w -64 -mips4 -DUNDERSCORE
 
 
@@ -463,7 +463,7 @@ DM_CPP_FLAGS	=	-I$(RSL_PATH)/RSL `cat inc/dm_comm_cpp_flags`
 
 ARCHFLAGS2      =       -DINTIO \
                         -DWRF_RSL_IO -DDM_PARALLEL -DRSL \
-                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO -DNO_NAMELIST_PRINT
+                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO 
 ARCHFLAGS4      =       -w -64 -mips4 \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) \
                         -DMAXPROC_MAKE=$(MAX_PROC) \
@@ -510,7 +510,7 @@ FC_FFT_RF       =       $(FCBASE)
 LDFLAGS         =  	#-Wl"-Z 3000000"
 
 
-ARCHFLAGS2      =       -DINTIO -DNO_NAMELIST_PRINT \
+ARCHFLAGS2      =       -DINTIO  \
                         -DTRIEDNTRUE -DONLY_WRFMODEL_IO \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) \
 			-DMPI -I$(MPIINCDIR)
@@ -548,8 +548,8 @@ FC_FFT_RF       =       $(FCBASE)
 LDFLAGS         =	-bmaxstack:256000000 -bmaxdata:2048000000
 
 ARCHFLAGS2      =       -DGRIB1 -DINTIO \
-                        -DTRIEDNTRUE -DNO_NAMELIST_PRINT \
-			-DLIMIT_ARGS -DNO_NAMELIST_PRINT -DNATIVE_MASSV
+                        -DTRIEDNTRUE  \
+			-DLIMIT_ARGS  -DNATIVE_MASSV
 ARCHFLAGS4      =       -DNOUNDERSCORE -DNCARIBM_NOC99
 LOCAL_LIB	=	-lmass -lmassv
 
@@ -590,7 +590,7 @@ DM_CPP_FLAGS	=	-I$(RSL_PATH)/RSL `cat inc/dm_comm_cpp_flags`
 
 ARCHFLAGS2      =       -DWRF_RSL_IO -DRSL -DDM_PARALLEL \
 			-DTRIEDNTRUE -DGRIB1 -DINTIO \
-			-DLIMIT_ARGS -DNO_NAMELIST_PRINT -DNATIVE_MASSV \
+			-DLIMIT_ARGS  -DNATIVE_MASSV \
 			-DNORESHAPE
 ARCHFLAGS4      =       -DNOUNDERSCORE -DNCARIBM_NOC99 \
 			-I$(RSL_PATH)/RSL \
@@ -712,7 +712,7 @@ DM_CPP_FLAGS	=	-I$(RSL_PATH)/RSL `cat inc/dm_comm_cpp_flags`
 ARCHFLAGS2      =       -DWRF_RSL_IO -DRSL \
                         -DDM_PARALLEL \
                         -DTRIEDNTRUE -DONLY_WRFMODEL_IO -DINTIO \
-                        -DNORESHAPE -Dcrayx1 -DNO_NAMELIST_PRINT
+                        -DNORESHAPE -Dcrayx1 
 ARCHFLAGS4      =       -UCRAY \
                         -I$(RSL_PATH)/RSL \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) \
@@ -762,7 +762,7 @@ LDFLAGS         =	 -Wl,-stack_size,10000000,-stack_addr,0xc0000000
 
 ARCHFLAGS2      =       -DINTIO \
                         -DTRIEDNTRUE   \
-			-DLIMIT_ARGS -DNO_NAMELIST_PRINT
+			-DLIMIT_ARGS 
 ARCHFLAGS4      =       -DNOUNDERSCORE -DLANDREAD_STUB -DMACOS
 EXTRA_LIBS      =       -lSystemStubs
 
@@ -801,7 +801,7 @@ LDFLAGS         =	 -Wl,-stack_size,10000000,-stack_addr,0xc0000000
 
 ARCHFLAGS2      =       -DINTIO \
                         -DTRIEDNTRUE   \
-			-DLIMIT_ARGS -DNO_NAMELIST_PRINT
+			-DLIMIT_ARGS 
 ARCHFLAGS4      =       -DNOUNDERSCORE -DLANDREAD_STUB -DMACOS
 EXTRA_LIBS      =       -lSystemStubs
 
@@ -836,7 +836,7 @@ FCBASE          =       -cpp -Wno=101,139,155,158 -fno-second-underscore -ftrace
 
 ARCHFLAGS2      =       -DINTIO \
                         -DTRIEDNTRUE   \
-			-DLIMIT_ARGS -DNO_NAMELIST_PRINT
+			-DLIMIT_ARGS 
 ARCHFLAGS4      =       -DLANDREAD_STUB -DMACOS
 EXTRA_LIBS      =       -lSystemStubs
 

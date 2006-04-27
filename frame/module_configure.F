@@ -80,6 +80,7 @@ CONTAINS
       INTEGER              :: io_status
       INTEGER              :: i
 
+      INTEGER, PARAMETER :: nml_write_unit= 9
       INTEGER, PARAMETER :: nml_read_unit = 10
 
 ! define as temporaries
