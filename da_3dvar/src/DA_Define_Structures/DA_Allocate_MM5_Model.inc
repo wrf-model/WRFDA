@@ -1,14 +1,8 @@
-SUBROUTINE DA_Allocate_MM5_Model( x_mm5 )
+SUBROUTINE da_allocate_mm5_model( x_mm5 )
 
-!------------------------------------------------------------------------------
-! PURPOSE: Allocate arrays of MM5 mode structure.
-!
-! METHOD:  Allocate component in turn.
-!
-! HISTORY: 01/06/2000 - Creation of F90 version.           Dale Barker
-!
-! PARENT_MODULE: DA_Setup_Structures
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! PURPOSE: Allocate arrays of MM5 mode structure.
+   !---------------------------------------------------------------------------
 
    IMPLICIT NONE
 
@@ -19,13 +13,11 @@ SUBROUTINE DA_Allocate_MM5_Model( x_mm5 )
    INTEGER                              :: kz     ! 3rd dimension of arrays.
    INTEGER                              :: kp     ! number of pressure level.
 
-!-End Of Header----------------------------------------------------------------
-
    IF (trace_use) CALL da_trace_entry("da_allocate_mm5_model")
 
-!------------------------------------------------------------------------------
-!  [1.0] Initialise:
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! [1.0] Initialise:
+   !---------------------------------------------------------------------------
 
    iy = x_mm5 % big_header % bhi(16, 1)
    jx = x_mm5 % big_header % bhi(17, 1)
@@ -36,9 +28,9 @@ SUBROUTINE DA_Allocate_MM5_Model( x_mm5 )
    if(kp < 1) kp = x_mm5 % big_header % bhi(12, 2)
    if(kp < 1) kp = 1
 
-!------------------------------------------------------------------------------
-!  [2.0] Allocate components of MM5 fields in structure:
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! [2.0] Allocate components of MM5 fields in structure:
+   !---------------------------------------------------------------------------
 
    ALLOCATE ( x_mm5 % u (1:iy,1:jx,1:kz) )
    ALLOCATE ( x_mm5 % v (1:iy,1:jx,1:kz) )
@@ -108,10 +100,9 @@ SUBROUTINE DA_Allocate_MM5_Model( x_mm5 )
 
       ALLOCATE ( x_mm5 % pb_vert_reg    (1:iy,1:kz,1:kz) )
 
-!-----Assign pb_vert_reg to 1.0 in case pb_vert_reg has no value.
+      ! Assign pb_vert_reg to 1.0 in case pb_vert_reg has no value.
 
       x_mm5 % pb_vert_reg = 1.0
-
    END IF
 
    IF ( x_mm5 % big_header % bhi(30, 10) == 1) THEN
@@ -130,9 +121,9 @@ SUBROUTINE DA_Allocate_MM5_Model( x_mm5 )
       x_mm5 % rh_sl (1:kz) = 0.0
    END IF
 
-!------------------------------------------------------------------------------
-!  [3.0] Initialise to zero:
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! [3.0] Initialise to zero:
+   !---------------------------------------------------------------------------
 
    x_mm5 % u (:,:,:)  = 0.0
    x_mm5 % v (:,:,:)  = 0.0
@@ -144,4 +135,4 @@ SUBROUTINE DA_Allocate_MM5_Model( x_mm5 )
 
    IF (trace_use) CALL da_trace_exit("da_allocate_mm5_model")
    
-END SUBROUTINE DA_Allocate_MM5_Model
+END SUBROUTINE da_allocate_mm5_model

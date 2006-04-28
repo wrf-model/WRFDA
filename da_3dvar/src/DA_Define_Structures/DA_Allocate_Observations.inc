@@ -1,26 +1,14 @@
-SUBROUTINE DA_Allocate_Observations ( ob )
+SUBROUTINE da_allocate_observations ( ob )
 
-!------------------------------------------------------------------------------
-!  PURPOSE: Allocate components of observation structure.
-!
-!  METHOD:  Allocate components in turn.
-!
-!  HISTORY:
-!           01/06/2000 - Creation of F90 version.           Dale Barker
-!           07/08/2003 - Updated for Profiler Data          S. R. H. Rizvi
-!           07/08/2003 - Updated for Buoy     Data          S. R. H. Rizvi
-!           05/27/2004 - GPS refractivity                   Y.-R. Guo
-!
-!  PARENT_MODULE: DA_Define_Structures
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! PURPOSE: Allocate components of observation structure.
+   !---------------------------------------------------------------------------
+
    IMPLICIT NONE
 
    TYPE (ob_type), intent(inout)        :: ob     ! Observation structure.
 
    IF (trace_use) CALL da_trace_entry("da_allocate_observations")
-
-
-!------------------------------------------------------------------------------
 
    if(ob%num_sound > 0) then
       ALLOCATE(ob%sound(1:ob%num_sound))
@@ -87,5 +75,4 @@ SUBROUTINE DA_Allocate_Observations ( ob )
 
    IF (trace_use) CALL da_trace_exit("da_allocate_observations")
 
-
-END SUBROUTINE DA_Allocate_Observations
+END SUBROUTINE da_allocate_observations

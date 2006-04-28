@@ -1,26 +1,18 @@
-SUBROUTINE DA_Deallocate_MM5_Model( x_mm5 )
+SUBROUTINE da_deallocate_mm5_model( x_mm5 )
 
-!------------------------------------------------------------------------------
-! PURPOSE: Deallocate arrays of MM5 mode structure.
-!
-! METHOD:  Deallocate arrays in turn.
-!
-! HISTORY: 01/06/2000 - Creation of F90 version.           Dale Barker
-!
-! PARENT_MODULE: DA_Setup_Structures
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! PURPOSE: Deallocate arrays of MM5 mode structure.
+   !---------------------------------------------------------------------------
 
    IMPLICIT NONE
 
    TYPE (mm5_model_type), intent(inout) :: x_mm5
 
-!-End Of Header----------------------------------------------------------------
+   IF (trace_use) CALL da_trace_entry("da_deallocate_mm5_model")
 
-  IF (trace_use) CALL da_trace_entry("da_deallocate_mm5_model")
-
-!------------------------------------------------------------------------------
-!  [1.0] Deallocate components of MM5 fields in structure:
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! [1.0] Deallocate components of MM5 fields in structure:
+   !---------------------------------------------------------------------------
 
    DEALLOCATE ( x_mm5 % u )
    DEALLOCATE ( x_mm5 % v )
@@ -98,10 +90,9 @@ SUBROUTINE DA_Deallocate_MM5_Model( x_mm5 )
          DEALLOCATE ( x_mm5 %      t_sl )
          DEALLOCATE ( x_mm5 %      q_sl )
          DEALLOCATE ( x_mm5 %     rh_sl )
-      END IF
-      
+      END IF   
    end if
 
    IF (trace_use) CALL da_trace_exit("da_deallocate_mm5_model")
 
-END SUBROUTINE DA_Deallocate_MM5_Model
+END SUBROUTINE da_deallocate_mm5_model

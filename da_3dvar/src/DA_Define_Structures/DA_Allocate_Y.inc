@@ -1,24 +1,9 @@
-SUBROUTINE DA_Allocate_Y( iv, y )
+SUBROUTINE da_allocate_y( iv, y )
 
-!------------------------------------------------------------------------------
-! PURPOSE: Allocate arrays used in y and residual obs structures.
-!
-! METHOD:  Allocate component in turn.
-!
-!
-!  HISTORY:
-!           01/06/2000 - Creation of F90 version.           Dale Barker
-!           07/08/2003 - Updated for Profiler Data          S. R. H. Rizvi
-!           07/08/2003 - Updated for Buoy     Data          S. R. H. Rizvi
-!           05/27/2004 - GPS Refractivity Data              Y.-R. Guo
-!           03/04/2005 - CMV's from Geostationary and       Syed  RH  Rizvi
-!                        Polar orbiting satellite are
-!                        seperated & used as profile
-!              07/2005 - Add radiance part                  Zhiquan Liu
-!
-!
-! PARENT_MODULE: DA_Setup_Structures
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! PURPOSE: Allocate arrays used in y and residual obs structures.
+   !---------------------------------------------------------------------------
+
    IMPLICIT NONE
    
    TYPE (ob_type), INTENT(IN)            :: iv      ! Ob type input.
@@ -27,9 +12,9 @@ SUBROUTINE DA_Allocate_Y( iv, y )
    INTEGER                               :: n, i, j ! Loop counter.
    INTEGER                               :: nlevels ! Number of levels.
 
-!------------------------------------------------------------------------------
-!  [1.0] Copy number of observations:
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   !  [1.0] Copy number of observations:
+   !---------------------------------------------------------------------------
 
    y % total_obs = iv % total_obs
    y % num_synop = iv % num_synop
@@ -55,11 +40,11 @@ SUBROUTINE DA_Allocate_Y( iv, y )
    y % num_buoy     = iv % num_buoy    
    y % num_inst     = iv % num_inst
 
-!------------------------------------------------------------------------------
-!  [2.0] Allocate:
-!------------------------------------------------------------------------------
+  !---------------------------------------------------------------------------
+  ! [2.0] Allocate:
+  !---------------------------------------------------------------------------
 
-!  Initialize synops:
+   ! Initialize synops:
 
    IF ( y % num_synop > 0 ) THEN
       ALLOCATE (y % synop(1:y % num_synop))
@@ -70,7 +55,7 @@ SUBROUTINE DA_Allocate_Y( iv, y )
       y % synop(1:y % num_synop) % q = 0.0
    END IF
 
-!  Initialize ships:
+   ! Initialize ships:
 
    IF ( y % num_ships > 0 ) THEN
       ALLOCATE (y % ships(1:y % num_ships))
@@ -81,7 +66,7 @@ SUBROUTINE DA_Allocate_Y( iv, y )
       y % ships(1:y % num_ships) % q = 0.0
    END IF
 
-!  Initialize metars:
+   ! Initialize metars:
 
    IF ( y % num_metar > 0 ) THEN
       ALLOCATE (y % metar(1:y % num_metar))
@@ -92,49 +77,45 @@ SUBROUTINE DA_Allocate_Y( iv, y )
       y % metar(1:y % num_metar) % q = 0.0
    END IF
 
-!  Initialize Geo. CMVs Obs:
+   ! Initialize Geo. CMVs Obs:
 
    IF ( y % num_geoamv > 0 ) THEN
       ALLOCATE (y % geoamv(1:y % num_geoamv))
       do n = 1, y % num_geoamv
-
          nlevels = iv % geoamv(n) % info % levels
          ALLOCATE (y % geoamv(n)%u(1:nlevels))
          ALLOCATE (y % geoamv(n)%v(1:nlevels))
          y % geoamv(n) % u(1:nlevels) = 0.0
          y % geoamv(n) % v(1:nlevels) = 0.0
-
-     end do
+      end do
    END IF
 
-!  Initialize Polar CMVS;
+   ! Initialize Polar CMVS;
 
    IF ( y % num_polaramv > 0 ) THEN
       ALLOCATE (y % polaramv(1:y % num_polaramv))
 
       do n = 1, y % num_polaramv
-
          nlevels = iv % polaramv(n) % info % levels
          ALLOCATE (y % polaramv(n)%u(1:nlevels))
          ALLOCATE (y % polaramv(n)%v(1:nlevels))
          y % polaramv(n) % u(1:nlevels) = 0.0
          y % polaramv(n) % v(1:nlevels) = 0.0
-
-     end do
+      end do
    END IF
-!  Initialize GPS TPW:
 
+   ! Initialize GPS TPW:
+ 
    IF ( y % num_gpspw > 0 ) THEN
       ALLOCATE (y % gpspw(1:y % num_gpspw))
       y % gpspw(1:y % num_gpspw) % tpw = 0.0
    END IF
 
-!  Initialize GPS Refractivity:
+   ! Initialize GPS Refractivity:
 
    IF ( y % num_gpsref > 0 ) THEN
       ALLOCATE (y % gpsref(1:y % num_gpsref))
       do n = 1, y % num_gpsref
-
          nlevels = iv % gpsref(n) % info % levels
          ALLOCATE (y % gpsref(n)%ref(1:nlevels))
          ALLOCATE (y % gpsref(n)%  p(1:nlevels))
@@ -146,15 +127,13 @@ SUBROUTINE DA_Allocate_Y( iv, y )
          y % gpsref(n) %   t(1:nlevels) = 0.0
          y % gpsref(n) %   q(1:nlevels) = 0.0
       end do
-
    END IF
 
-!  Initialize sondes:
+   !  Initialize sondes:
 
    IF ( y % num_sound > 0 ) THEN
       ALLOCATE (y % sound(1:y % num_sound))
       do n = 1, y % num_sound
-
          nlevels = max(1,iv % sound(n) % info % levels)
          ALLOCATE (y % sound(n)%u(1:nlevels))
          ALLOCATE (y % sound(n)%v(1:nlevels))
@@ -167,7 +146,7 @@ SUBROUTINE DA_Allocate_Y( iv, y )
          y % sound(n) % q(1:nlevels) = 0.0
       end do
 
-!     Initialize sonde_sfc
+      ! Initialize sonde_sfc
 
       ALLOCATE (y % sonde_sfc(1:y % num_sound))
 
@@ -178,44 +157,39 @@ SUBROUTINE DA_Allocate_Y( iv, y )
       y % sonde_sfc(1:y % num_sound) % q = 0.0
    END IF
 
-!  Initialize pilots:
+   ! Initialize pilots:
 
    IF ( y % num_pilot > 0 ) THEN
       ALLOCATE (y % pilot(1:y % num_pilot))
       do n = 1, y % num_pilot
-
          nlevels = iv % pilot(n) % info % levels
          ALLOCATE (y % pilot(n)%u(1:nlevels))
          ALLOCATE (y % pilot(n)%v(1:nlevels))
 
          y % pilot(n) % u(1:nlevels) = 0.0
          y % pilot(n) % v(1:nlevels) = 0.0
-
       end do
    END IF
 
-!  Initialize Radar:
+   ! Initialize Radar:
 
    IF ( y % num_Radar > 0 ) THEN
       ALLOCATE (y % Radar(1:y % num_Radar))
       do n = 1, y % num_Radar
-
          nlevels = iv % Radar(n) % info % levels
          ALLOCATE (y % Radar(n)%rv(1:nlevels))
          ALLOCATE (y % Radar(n)%rf(1:nlevels))
 
          y % Radar(n) % rv(1:nlevels) = 0.0
          y % Radar(n) % rf(1:nlevels) = 0.0
-
       end do
    END IF
 
-!  Initialize AIREPs:
+   ! Initialize AIREPs:
 
    IF ( y % num_airep > 0 ) THEN
       ALLOCATE (y % airep(1:y % num_airep))
       do n = 1, y % num_airep
-
          nlevels = iv % airep(n) % info % levels
          ALLOCATE (y % airep(n)%u(1:nlevels))
          ALLOCATE (y % airep(n)%v(1:nlevels))
@@ -224,16 +198,14 @@ SUBROUTINE DA_Allocate_Y( iv, y )
          y % airep(n) % u(1:nlevels) = 0.0
          y % airep(n) % v(1:nlevels) = 0.0
          y % airep(n) % t(1:nlevels) = 0.0
-
       end do
    END IF
 
-!  Initialize Bogus:
+   ! Initialize Bogus:
 
    IF ( y % num_bogus > 0 ) THEN
       ALLOCATE (y % bogus(1:y % num_bogus))
       do n = 1, y % num_bogus
-
          nlevels = iv % bogus(n) % info % levels
          ALLOCATE (y % bogus(n)%u(1:nlevels))
          ALLOCATE (y % bogus(n)%v(1:nlevels))
@@ -244,24 +216,20 @@ SUBROUTINE DA_Allocate_Y( iv, y )
          y % bogus(n) % v(1:nlevels) = 0.0
          y % bogus(n) % t(1:nlevels) = 0.0
          y % bogus(n) % q(1:nlevels) = 0.0
-
       end do
 
       y % bogus(1:y % num_bogus) % slp = 0.0
-
    END IF
 
-!  Initialize satem:
+   ! Initialize satem:
 
    IF ( y % num_satem > 0 ) THEN
       ALLOCATE (y % satem(1:y % num_satem))
       do n = 1, y % num_satem
-
          nlevels = iv % satem(n) % info % levels
          ALLOCATE (y % satem(n) % thickness(1:nlevels))
 
          y % satem(n) % thickness(1:nlevels) = 0.0
-
       end do
    END IF
 
@@ -309,7 +277,7 @@ SUBROUTINE DA_Allocate_Y( iv, y )
         y % pseudo(1:y % num_pseudo) % q = 0.0
    ENDIF
 
-!  Initialize Quikscat:
+   ! Initialize Quikscat:
 
    IF ( y % num_qscat > 0 ) THEN
       ALLOCATE (y % qscat(1:y % num_qscat))
@@ -317,7 +285,7 @@ SUBROUTINE DA_Allocate_Y( iv, y )
       y % qscat(1:y % num_qscat) % v = 0.0
    END IF
       
-!  Initialize profilers:
+   ! Initialize profilers:
 
    IF ( y % num_profiler > 0 ) THEN
       ALLOCATE (y % profiler(1:y % num_profiler))
@@ -333,7 +301,7 @@ SUBROUTINE DA_Allocate_Y( iv, y )
       end do
    END IF
 
-!  Initialize buoy:
+   ! Initialize buoy:
 
    IF ( y % num_buoy > 0 ) THEN
       ALLOCATE (y % buoy(1:y % num_buoy))
@@ -344,24 +312,24 @@ SUBROUTINE DA_Allocate_Y( iv, y )
       y % buoy(1:y % num_buoy) % q = 0.0
    END IF
 
-!  Initialize radiance:
+   ! Initialize radiance:
 
    IF ( y % num_inst > 0 ) THEN
       ALLOCATE (y % instid(1:y % num_inst))
-    do i = 1,  y % num_inst
-      y % instid(i) % num_rad = iv % instid(i) % num_rad
-      y % instid(i) % nchan   = iv % instid(i) % nchan
-!      ALLOCATE (y % instid(i) % ichan(1:y % instid(i) % nchan ))
-!      do n = 1, y % instid(i) % nchan
-!       y % instid(i) % ichan(n) = n
-!      end do
-      if (y % instid(i) % num_rad < 1) cycle
-      ALLOCATE ( y % instid(i) % rad(1:y % instid(i) % num_rad) )
-      do j = 1, y % instid(i) % num_rad
-        ALLOCATE ( y % instid(i) % rad(j) % tb (1:y % instid(i) % nchan) )
-        y % instid(i) % rad(j)% tb(:) = 0.0
+      do i = 1,  y % num_inst
+         y % instid(i) % num_rad = iv % instid(i) % num_rad
+         y % instid(i) % nchan   = iv % instid(i) % nchan
+         ! ALLOCATE (y % instid(i) % ichan(1:y % instid(i) % nchan ))
+         ! do n = 1, y % instid(i) % nchan
+         !     y % instid(i) % ichan(n) = n
+         ! end do
+         if (y % instid(i) % num_rad < 1) cycle
+         ALLOCATE ( y % instid(i) % rad(1:y % instid(i) % num_rad) )
+         do j = 1, y % instid(i) % num_rad
+            ALLOCATE ( y % instid(i) % rad(j) % tb (1:y % instid(i) % nchan) )
+            y % instid(i) % rad(j)% tb(:) = 0.0
+         end do
       end do
-    end do
    END IF
 
 END SUBROUTINE DA_Allocate_Y
