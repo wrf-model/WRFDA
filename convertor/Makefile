@@ -5,7 +5,10 @@ MAKE    =       make -i -r
 RM      =       rm -f
 
 OBJS	=	module_kma2netcdf_interface.o \
-		module_netcdf2kma_interface.o
+		module_netcdf2kma_interface.o \
+                da_tracing.o                  \
+                da_memory.o                   \
+                par_util1.o
 
 MODULES =	module_kma_wave2grid.o \
 		module_wave2grid_kma.o
