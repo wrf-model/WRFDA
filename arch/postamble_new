@@ -1,6 +1,7 @@
 #
 ARCHFLAGS       =       $(ARCHFLAGS1) $(ARCHFLAGS2)
 CCFLAGS         =       $(ARCHFLAGS3) $(ARCHFLAGS4)
+REGFLAGS        =       $(ARCHFLAGS)
 LIB             =       -L. -lwrflib -lwrfio_nf -lesmf_time \
                         -L$(EXTERNAL)/io_grib1 -lio_grib1 \
                         $(NETCDF_LIB) $(RTTOV_LIB) $(MPI_LIB) $(EXTRA_LIBS)
