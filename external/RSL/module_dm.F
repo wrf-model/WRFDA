@@ -4157,6 +4157,7 @@ END
       TYPE(domain), POINTER :: grid          ! name of the grid being dereferenced (must be "grid")
       TYPE(domain), POINTER :: ngrid
 #include <em_dummy_decl.inc>
+#include <namelist_defines2.inc>
 #include <em_i1_decl.inc>
       INTEGER nlev, msize
       INTEGER i,j,pig,pjg,cm,cn,nig,njg,retval,k
@@ -4228,6 +4229,7 @@ END
       TYPE(domain), POINTER :: intermediate_grid
       TYPE(domain), POINTER :: ngrid
 #include <em_dummy_decl.inc>
+#include <namelist_defines2.inc>
       INTEGER nlev, msize
       INTEGER i,j,pig,pjg,cm,cn,nig,njg,retval,k
       TYPE (grid_config_rec_type)            :: config_flags
@@ -4275,6 +4277,7 @@ END
       TYPE(domain), POINTER :: grid          ! name of the grid being dereferenced (must be "grid")
       TYPE(domain), POINTER :: ngrid
 #include <em_dummy_decl.inc>
+#include <namelist_defines2.inc>
 #include <em_i1_decl.inc>
       INTEGER nlev, msize
       INTEGER i,j,pig,pjg,cm,cn,nig,njg,retval,k
@@ -4348,6 +4351,7 @@ END
                                                   ! soil temp, moisture, etc., has vertical dim
                                                   ! of soil categories
 #include <em_dummy_decl.inc>
+#include <namelist_defines2.inc>
 
 #ifdef DEREF_KLUDGE
 !  see http://www.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm
@@ -4385,6 +4389,7 @@ END
       TYPE(domain), POINTER :: grid          ! name of the grid being dereferenced (must be "grid")
       TYPE(domain), POINTER :: ngrid
 #include <em_dummy_decl.inc>
+#include <namelist_defines2.inc>
       INTEGER nlev, msize
       INTEGER i,j,pig,pjg,cm,cn,nig,njg,retval,k
       TYPE(domain), POINTER :: xgrid
@@ -4480,6 +4485,7 @@ END
       TYPE(domain), POINTER :: intermediate_grid
       TYPE(domain), POINTER :: ngrid
 #include <em_dummy_decl.inc>
+#include <namelist_defines2.inc>
 #include <em_i1_decl.inc>
       INTEGER nlev, msize
       INTEGER i,j,pig,pjg,cm,cn,nig,njg,retval,k
