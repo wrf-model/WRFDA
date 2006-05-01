@@ -66,7 +66,7 @@ WORDSIZE_DEF	=	-DIWORDSIZE=4 -DDWORDSIZE=$(DWORDSIZE) -DRWORDSIZE=$(RWORDSIZE) -
 #### at least 1 + 2*(number of total nests).  For example, 1 coarse
 #### grid + three fine grids = 1 + 2(3) = 7, so MAX_DOMAINS=7.
 
-MAX_DOMAINS	=	21
+MAX_DOMAINS	=	1
 MAX_PROC	=	1024
 
 #### DM buffer length for the configuration flags.
