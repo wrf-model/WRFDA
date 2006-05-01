@@ -160,16 +160,25 @@ gen_namelist_script ( char * dirname )
               }
 
               if ( !strcmp(p2,p4)) {
-                fprintf(fp,"if test ! -z \"$WRF_") ;
+                fprintf(fp,"if test ! -z \"$NL_") ;
                 for (i=q->name; *i!='\0'; i++) {
                   fputc(toupper(*i),fp); 
                 }
-                fprintf(fp,"\"; then echo \"%s=${WRF_",q->name) ;
-                for (i=q->name; *i!='\0'; i++) {
-                  fputc(toupper(*i),fp); 
+                if ( !strncmp(q->type->name,"character",9)) {
+                   fprintf(fp,"\"; then echo \"%s=\\\"${NL_",q->name) ;
+                   for (i=q->name; *i!='\0'; i++) {
+                     fputc(toupper(*i),fp); 
+                   }
+                   fprintf(fp,"}\\\",\"") ;
+                } else {
+                  fprintf(fp,"\"; then echo \"%s=${NL_",q->name) ;
+                  for (i=q->name; *i!='\0'; i++) {
+                    fputc(toupper(*i),fp); 
+                  }
+                  fprintf(fp,"},\"") ;
                 }
 
-                fprintf(fp,"},\" >> namelist.input;fi\n") ;
+                fprintf(fp," >> namelist.input;fi\n") ;
               }
 
             }
