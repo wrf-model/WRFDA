@@ -370,7 +370,7 @@ SUBROUTINE DA_Transfer_XatoWRF( xbx, grid, &
 
    if(print_detail > 10) then
       if(print_detail > 100) then
-      write(unit=stdout, fmt='(/5a/)') ' simple varbles:'
+      write(unit=stdout, fmt='(/5a/)') ' simple variables:'
 
       if(ie == xp%ide) then
          print *, ' '

@@ -149,7 +149,7 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
               phb(is,js,k), ph_2(is,js,k)
      enddo
 
-     write(unit=stdout, fmt='(/5a/)') ' simple varbles:'
+     write(unit=stdout, fmt='(/5a/)') ' simple variables:'
 
      if(je == xp%jde) then
         write(unit=stdout, fmt=*) ' '
@@ -178,7 +178,7 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
      endif
      endif
 
-     write(unit=stdout, fmt='(/5a/)') ' simple varbles:'
+     write(unit=stdout, fmt='(/5a/)') ' simple variables:'
 
      write(unit=stdout, fmt=*) ' u_1(is,js,ks)=',  u_1(is,js,ks)
      write(unit=stdout, fmt=*) ' v_1(is,js,ks)=',  v_1(is,js,ks)
