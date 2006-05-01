@@ -573,7 +573,7 @@ FC_FFT_RF       =       $(FCBASE)
 EXTRAMODULES    =
 ARCHFLAGS3      =       -DGRIB1 -DINTIO \
                         -DTRIEDNTRUE   \
-			-DLIMIT_ARGS  -DNATIVE_MASSV
+			-DNATIVE_MASSV
 ARCHFLAGS4      =       -DNOUNDERSCORE -DNCARIBM_NOC99
 LOCAL_LIB	=	-lmass -lmassv
 
@@ -613,7 +613,7 @@ FC_FFT_RF       =       $(FCBASE)
 EXTRAMODULES    =
 ARCHFLAGS3      =       -DWRF_RSL_IO -DRSL -DDM_PARALLEL \
 			-DTRIEDNTRUE -DGRIB1 -DINTIO \
-			-DLIMIT_ARGS  -DNATIVE_MASSV \
+			-DNATIVE_MASSV \
 			-DNORESHAPE
 ARCHFLAGS4      =       -DNOUNDERSCORE -DNCARIBM_NOC99 \
 			-I../external/RSL/RSL \
@@ -813,8 +813,7 @@ FC_FFT_RF       =       $(FCBASE)
 EXTRAMODULES    =
 EXTRAMODULES    =       
 ARCHFLAGS3      =       -DINTIO \
-                        -DTRIEDNTRUE   \
-			-DLIMIT_ARGS 
+                        -DTRIEDNTRUE
 ARCHFLAGS4      =       -DNOUNDERSCORE -DLANDREAD_STUB -DMACOS
 EXTRA_LIBS      =       -lSystemStubs
 LDFLAGS         =	 -Wl,-stack_size,10000000,-stack_addr,0xc0000000
@@ -850,8 +849,7 @@ FC_FFT_RF       =       $(FCBASE)
 EXTRAMODULES    =
 EXTRAMODULES    =       
 ARCHFLAGS3      =       -DINTIO \
-                        -DTRIEDNTRUE   \
-			-DLIMIT_ARGS 
+                        -DTRIEDNTRUE
 ARCHFLAGS4      =       -DNOUNDERSCORE -DLANDREAD_STUB -DMACOS
 EXTRA_LIBS      =       -lSystemStubs
 LDFLAGS         =	 -Wl,-stack_size,10000000,-stack_addr,0xc0000000
@@ -885,8 +883,7 @@ FC_FFT_RF       =       $(FCBASE)
 EXTRAMODULES    =
 EXTRAMODULES    =       
 ARCHFLAGS3      =       -DINTIO \
-                        -DTRIEDNTRUE   \
-			-DLIMIT_ARGS 
+                        -DTRIEDNTRUE
 ARCHFLAGS4      =       -DLANDREAD_STUB -DMACOS
 EXTRA_LIBS      =       -lSystemStubs
 LDFLAGS         =	 -Wl,-stack_size,10000000,-stack_addr,0xc0000000

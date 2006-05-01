@@ -548,8 +548,7 @@ FC_FFT_RF       =       $(FCBASE)
 LDFLAGS         =	-bmaxstack:256000000 -bmaxdata:2048000000
 
 ARCHFLAGS2      =       -DGRIB1 -DINTIO \
-                        -DTRIEDNTRUE  \
-			-DLIMIT_ARGS  -DNATIVE_MASSV
+                          -DTRIEDNTRUE -DNATIVE_MASSV
 ARCHFLAGS4      =       -DNOUNDERSCORE -DNCARIBM_NOC99
 LOCAL_LIB	=	-lmass -lmassv
 
@@ -590,7 +589,7 @@ DM_CPP_FLAGS	=	-I$(RSL_PATH)/RSL `cat inc/dm_comm_cpp_flags`
 
 ARCHFLAGS2      =       -DWRF_RSL_IO -DRSL -DDM_PARALLEL \
 			-DTRIEDNTRUE -DGRIB1 -DINTIO \
-			-DLIMIT_ARGS  -DNATIVE_MASSV \
+			  -DNATIVE_MASSV \
 			-DNORESHAPE
 ARCHFLAGS4      =       -DNOUNDERSCORE -DNCARIBM_NOC99 \
 			-I$(RSL_PATH)/RSL \
@@ -761,8 +760,7 @@ FC_FFT_RF       =       $(FCBASE)
 LDFLAGS         =	 -Wl,-stack_size,10000000,-stack_addr,0xc0000000
 
 ARCHFLAGS2      =       -DINTIO \
-                        -DTRIEDNTRUE   \
-			-DLIMIT_ARGS 
+                        -DTRIEDNTRUE
 ARCHFLAGS4      =       -DNOUNDERSCORE -DLANDREAD_STUB -DMACOS
 EXTRA_LIBS      =       -lSystemStubs
 
@@ -800,8 +798,7 @@ FC_FFT_RF       =       $(FCBASE)
 LDFLAGS         =	 -Wl,-stack_size,10000000,-stack_addr,0xc0000000
 
 ARCHFLAGS2      =       -DINTIO \
-                        -DTRIEDNTRUE   \
-			-DLIMIT_ARGS 
+                        -DTRIEDNTRUE
 ARCHFLAGS4      =       -DNOUNDERSCORE -DLANDREAD_STUB -DMACOS
 EXTRA_LIBS      =       -lSystemStubs
 
@@ -835,8 +832,7 @@ FCENDIAN        =
 FCBASE          =       -cpp -Wno=101,139,155,158 -fno-second-underscore -ftrace=full
 
 ARCHFLAGS2      =       -DINTIO \
-                        -DTRIEDNTRUE   \
-			-DLIMIT_ARGS 
+                        -DTRIEDNTRUE
 ARCHFLAGS4      =       -DLANDREAD_STUB -DMACOS
 EXTRA_LIBS      =       -lSystemStubs
 
