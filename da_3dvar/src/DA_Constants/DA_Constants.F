@@ -10,7 +10,11 @@ MODULE DA_Constants
 !                        namelist parameter 'rtminit'
 !------------------------------------------------------------------------------
 
+  USE module_driver_constants
+
    IMPLICIT NONE
+
+#include <namelist_defines.inc>
 
 !------------------------------------------------------------------------------
 !  [1.0] Physical parameter constants (all NIST standard values):
@@ -77,8 +81,7 @@ MODULE DA_Constants
    REAL   , PARAMETER ::  Max_StHeight_Diff = 100.
 
 !  WRFVAR Minimisation:
-   LOGICAL            :: write_switch   ! switch to write results in the
-   INTEGER            :: write_interval ! write_interval (number of iterations)
+
    INTEGER            :: iter
    INTEGER, PARAMETER :: MP = 6
    INTEGER, PARAMETER :: LP = 6
@@ -148,17 +151,9 @@ MODULE DA_Constants
 
 !  Fortran unit  parameters:
 
-   ! Stderr and stdout can be controlled by namelist Record1. 
-   ! stdout is set to stdout_unit, ditto stderr
-   INTEGER :: stdout_unit = 6      ! Standard output
-   INTEGER :: stderr_unit = 0     ! Standard error
-   INTEGER :: stdout = 6          ! Standard output
-   INTEGER :: stderr = 0          ! Standard error
+   ! stdout, stderr, trace_unit all controlled from namelist
 
-   ! trace_unit can be controlled by record1 in namelist
-   INTEGER :: trace_unit = 99
-
-   ! Do not use unit 10, as that is used by WRF for reading namelist.input
+   ! Units 9,10 are used for reading and writing namelist.input/output in WRF
 
    INTEGER, PARAMETER :: jpout = 11           ! Unit number for x output.
    INTEGER, PARAMETER :: stats_unit = 12      ! Unit number for stats output.
@@ -267,37 +262,7 @@ MODULE DA_Constants
  integer                :: mjy         ! 2nd dimension of analysis grid.
  integer                :: mkz         ! 3rd dimension of analysis grid.
 
-!Minimisation:
- logical                :: calculate_cg_cost_fn
- logical                :: write_outer_loop
- logical                :: lat_stats_option
- logical                :: W_INCREMENTS  ! Analysis includes w increments
- logical                :: DT_cloud_model ! Time step from cloud model parameterization 
- logical                :: write_qrn
- logical                :: write_qcw
- logical                :: write_qci
- logical                :: write_qsn
- logical                :: write_qgr
-
- integer                :: max_ext_its ! Max. number of external iterations.
- integer                :: ntmax       ! Max. number of minim. its.
- integer                :: nsave       ! #Minimisation states to store.
-
- real, dimension(10)    :: eps         ! Fraction of initial gradient
-                                       ! required for min. convergence.
-
 !Recursive filter:
- INTEGER                :: rf_passes   ! Number of passes in recursive filter.
- REAL                   :: var_scaling1! Variance rescaling factor.
- REAL                   :: var_scaling2! Variance rescaling factor.
- REAL                   :: var_scaling3! Variance rescaling factor.
- REAL                   :: var_scaling4! Variance rescaling factor.
- REAL                   :: var_scaling5! Variance rescaling factor.
- REAL                   :: len_scaling1! Correlation rescaling factor.
- REAL                   :: len_scaling2! Correlation rescaling factor.
- REAL                   :: len_scaling3! Correlation rescaling factor.
- REAL                   :: len_scaling4! Correlation rescaling factor.
- REAL                   :: len_scaling5! Correlation rescaling factor.
 
  REAL, ALLOCATABLE      :: rf_turnconds(:) ! RF turning conditions.
 
@@ -314,116 +279,18 @@ MODULE DA_Constants
                            num_profiler_tot, num_buoy_tot, num_gpsref_tot, &
                            num_Radar_tot, num_bogus_tot
 
- integer       :: num_pseudo
- real          :: pseudo_x, pseudo_y, pseudo_z
- real          :: pseudo_val, pseudo_err
- character*3   :: pseudo_var = '   '
+ logical       :: gaussian_lats  
 
-!------------------------------------------------------------------------------
-! 2.0 Namelist parameters:
-!------------------------------------------------------------------------------
 
- logical :: lvar4d ! select 4dvar
-
- CHARACTER*(8) :: MODEL_TYPE    ! Model type.
- CHARACTER*(8) :: ANALYSIS_TYPE ! Either '3D-PSAS' OR '3D-VAR'
- LOGICAL       :: write_increments ! Write out analysis increments if true.
-
- CHARACTER(LEN=24) :: ANALYSIS_DATE ! Analysis time, "CCYY-MM-DD_HH:MM:SS.ssss"
- INTEGER           :: ANALYSIS_ACCU ! Analysis time accuracy in seconds.
- logical           :: write_filtered_obs ! Output QCed observation file if true.
- integer       :: fg_format     ! 1 = WRF Input/Output.
-                                ! 2 = MM5 Input/Output.
- integer       :: ob_format     ! 1 = WRF (BUFR) Input/Output.
-                                ! 2 = MM5 (ASCII) Input/Output.
- integer       :: num_fgat_time ! number of FGAT time level.
- CHARACTER*(8) :: PROCESS_OBS   ! Observation preprocessing parameter.
- REAL          :: TIME_WINDOW   ! Assimilation time window.
- integer       :: print_detail  ! 0=Minimum, 1=More, 2=excessive!
- LOGICAL       :: Testing_WRFVAR ! Adjoint, gradient tests if done if .TRUE.
- logical       :: omb_set_rand  ! Randomize O-Bs if .true.
- logical       :: put_rand_seed ! Used to initialise random numbers.
- integer       :: seed_array1, seed_array2
- real          :: set_omb_rand_fac ! Scaling factor for random O-B (*sigma_o).
- logical       :: omb_add_noise ! Add random noise to O-Bs if .true.
- INTEGER       :: obs_qc_pointer ! wrfvar uses the obs data with qc >= obs_qc_pointer
- integer       :: sfc_assi_options     ! Surface assimilation option.
-
-!Ensemble parameters: 
- integer       :: ensdim_alpha
- integer       :: alpha_truncation     ! Spectral truncation of alpha.
- integer       :: alpha_corr_type      ! 1=Exponential, 2=SOAR, 3=Gaussian.
- real          :: alpha_corr_scale     ! Alpha correlation scale (km).
- real          :: alpha_std_dev        ! Alpha control variable standard deviation.
-
- REAL, DIMENSION(3) :: as1, as2, as3, as4, as5
-
- INTEGER       :: cv_options_hum
- INTEGER       :: balance_type
- INTEGER       :: vert_corr
- INTEGER       :: vertical_ip
- INTEGER       :: vert_evalue
- REAL          :: max_vert_var1, max_vert_var2, max_vert_var3, &
-                  max_vert_var4, max_vert_var5
- real          :: power_truncation
  integer       :: cv_size_domain_jb    ! Total jb cv size.
  integer       :: cv_size_domain_je    ! Total je cv size.
- integer       :: cv_size_domain       ! Total cv size.
- real          :: jb_factor            ! Scaling factor.
- real          :: je_factor            ! Scaling factor.
- LOGICAL       :: test_transforms
- LOGICAL       :: test_statistics
- LOGICAL       :: print_obs_info
- LOGICAL       :: check_max_iv
- INTEGER       :: check_rh
- logical       :: interpolate_stats
- logical       :: gaussian_lats      
+ integer       :: cv_size_domain       ! Total cv size.    
 
-! switch for testing different dm parallel task configurations
- LOGICAL       :: testing_dm_exact
+      
 
 !Namelist variables in future?:
  REAL, PARAMETER :: maximum_rh = 100.0
  REAL, PARAMETER :: minimum_rh =  10.0
-
-! set to .TRUE. to select the obs type to be assimilated:
-
-  logical       :: use_obs_errfac, &
-                   use_synopObs, &                    
-                   use_shipsObs, &
-                   use_metarObs, &  
-                   use_pilotObs, &  
-                   use_soundObs, &  
-                   use_bogusObs, &  
-                   use_satemObs, &
-                   use_GeoAMVObs, &
-                   use_polaramvObs, &
-                   use_airepObs, & 
-                   use_gpspwObs , &
-                   use_gpsrefObs, &
-                   use_ssmiretrievalobs , &
-                   use_ssmitbobs, &
-                   use_ssmt1obs, &
-                   use_ssmt2obs, &
-                   use_qscatobs, &  
-                   use_RadarObs, &  
-                   use_Radar_rv, &  
-                   use_Radar_rf, &  
-                   use_profilerObs, &
-                   use_buoyObs, &
-                   use_Hirs2Obs, &
-                   use_Hirs3Obs, &
-                   use_MsuObs, &
-                   use_AmsuaObs, &
-                   use_AmsubObs, &
-                   use_Eos_RadObs, &
-                   use_Eos_AmsuaObs, &
-                   use_AirsObs, &
-                   use_HsbObs
-
-   logical :: def_sub_domain
-   real    :: x_start_sub_domain, x_end_sub_domain, &
-              y_start_sub_domain, y_end_sub_domain
 
 !other
 
@@ -522,6 +389,7 @@ MODULE DA_Constants
    Other_check             =  88        ! passed other quality check
 
 !Observations:
+
  INTEGER, PARAMETER     :: max_sound = 5000,   &   ! Maximum Number of radiosonde obs.
                            max_synop = 50000,  &   ! Maximum Number of surface obs.
                            max_geoamv= 300000, &   ! Maximum Number of Geo. AMV  wind obs.
@@ -543,63 +411,24 @@ MODULE DA_Constants
                            max_qscat  = 50000, &   ! Maximum Number of Quik SCAT obs.
                            max_bogus  = 5000       ! Maximum Number of bogus obs.
 
- integer                :: max_sound_input, &
-                           max_synop_input, &
-                           max_geoamv_input, &
-                           max_polaramv_input, &
-                           max_airep_input, &
-                           max_satem_input, &
-                           max_pilot_input, &
-                           max_metar_input, &
-                           max_gpspw_input, &
-                           max_gpsref_input, &
-                           max_ships_input, &
-                           max_ssmi_ret_input, &
-                           max_ssmi_tb_input, &
-                           max_ssmt1_input, &
-                           max_ssmt2_input, &
-                           max_profiler_input, &
-                           max_buoy_input,  &
-                           max_Radar_input, &
-                           max_Bogus_input, &
-                           max_qscat_input, &
-                           report_start, &
-                           report_end
 
- LOGICAL                   print_obs_mapping
 
  integer                :: numb_procs, &         ! Number of total processors.
                            my_proc_id            ! My processor ID.
- LOGICAL                :: global 
 
 !
 ! RTM_INIT setup parameter (read from namelist.wrfvar)
 !
  integer, parameter            :: maxsensor = 30
 
- integer                       :: rtminit_print,    &
-                                  rtminit_nsensor
-
- integer, dimension(maxsensor) :: rtminit_platform, &
-                                  rtminit_satid,    &
-                                  rtminit_sensor
-
  logical                       :: use_landem      ! if use weng's landem model
  integer                       :: mw_emis_sea     ! surface emissivity type over sea
                                                   ! 0:FASTEM-2; 1:Weng's model
 
 ! type( rttov_coef ), pointer :: coefs(:)         ! RTTOV coefficients
- logical                       :: use_kma1dvar
- logical                       :: use_radiance,  use_obsgts, &
-                                  lread_biascoef,lbiascorr, lrttov_scatt, lmonitoring, &
-                                  lwrite_iv, lwrite_profile
 
 ! Tracing
 
-LOGICAL :: trace_use    = .FALSE.       ! Is tracing on overall?
-LOGICAL :: trace_memory = .TRUE.        ! Should memory useage info be collected
-! CHARACTER (LEN=200) :: TraceFile="trace.html" ! trace filename
-INTEGER :: trace_pe=0                   ! PE number for tracing (defaults to 0)
 INTEGER :: trace_max_depth=100          ! Maximum depth for PRINTing trace
 INTEGER :: trace_repeat_head=100        ! Number of times trace header details
                                         ! can be PRINTed

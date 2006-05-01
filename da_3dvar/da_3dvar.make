@@ -190,6 +190,8 @@ DA_Setup_Structures.o:	DA_Setup_Structures.F             \
 			da_rescale_background_errors.inc  \
 			da_setup_background_errors.inc    \
 			DA_Get_Bins_Info.inc              \
+			da_setup_be_global.inc            \
+			da_setup_be_regional.inc          \
 			da_setup_firstguess.inc           \
 			da_setup_firstguess_mm5.inc       \
 			da_setup_firstguess_wrf.inc       \
@@ -235,6 +237,7 @@ wrdesc.o:		wrdesc.c
 			$(CC) -c $(CCFLAGS_BUFR) wrdesc.c
 
 DA_VToX_Transforms.o:	DA_VToX_Transforms.F              \
+                        module_tiles.o                    \
 			par_util.o                        \
 			DA_Define_Structures.o            \
 			DA_Tools.o                        \
@@ -821,7 +824,6 @@ DA_Tools.o:		DA_Tools.F                     \
 			DA_Define_Structures.o         \
 			DA_1D_EigenDecomposition.inc   \
 			DA_Diff_Seconds.inc            \
-			DA_Read_Namelist.inc           \
 			DA_Obs_Sfc_correction.inc      \
 			da_global_ll_to_xy.inc         \
 			DA_ll_to_xy.inc                \
@@ -912,7 +914,7 @@ DA_Constants.o:		DA_Constants.F             \
 			da_advance_cymdh.inc       \
 			da_change_date.inc         \
 			DA_Find_FFT_Factors.inc    \
-			DA_Find_FFT_Trig_Funcs.inc
+			DA_Find_FFT_Trig_Funcs.inc 
 
 LAPACK.o:		LAPACK.F   \
 			BLAS.o     \

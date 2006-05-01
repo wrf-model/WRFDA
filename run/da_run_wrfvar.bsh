@@ -53,184 +53,36 @@ export DA_RADAR=${DA_RADAR:-$OB_DIR/$DA_DATE/radar.dat}            # Radar data 
 # export DA_FG01=${DA_FG01:-$OB_DIR
 
 export RTTOV=${RTTOV:-$HOME/rttov/rttov85}                            # RTTOV
-export DA_RTTOV_COEFFS=${DA_RTTOV_COEFFS:-$RTTOV/rtcoef_rttov7}       # RTTOV coefficients
 
-# Tracing
-
-export DA_TRACE_USE=${DA_TRACE_USE:-.FALSE.}
-export DA_TRACE_UNIT=${DA_TRACE_UNIT:-99}
-export DA_TRACE_PE=${DA_TRACE_PE:-0}
-export DA_TRACE_MEMORY=${DA_TRACE_MEMORY:-.TRUE.}
-
-# Default WRF namelist variables:
 export NUM_PROCS=${NUM_PROCS:-1}               # Number of processors to run on.
-export DA_E_WE=${DA_E_WE:-180}                 # X grid dimension.
-export DA_E_SN=${DA_E_SN:-180}                 # Y grid dimension.
-export DA_E_VERT=${DA_E_VERT:-28}              # Z grid dimension.
-export DA_DX=${DA_DX:-50000}                   # x grid resolution (m).
-export DA_DY=${DA_DY:-50000}                   # y grid resolution (m).
-export DA_SF_SURFACE_PHYSICS=${DA_SF_SURFACE_PHYSICS:-1}       #(1=Thermal diffusion, 2=Noah LSM).
 
-if test $DA_SF_SURFACE_PHYSICS == 1; then
-  DA_NUM_SOIL_LAYERS=5                                         # (Thermal diffusion surface physics).
-fi
-if test $DA_SF_SURFACE_PHYSICS == 2; then
-  DA_NUM_SOIL_LAYERS=4                                         # (Noah LSM surface physics).
-fi
+export NL_GLOBAL=${NL_GLOBAL:-.FALSE.}
 
-# Supported default WRF-Var namelist variables:
-
-export DA_FG_FORMAT=${DA_FG_FORMAT:-1}              # First guess format: 1=WRF, 2=MM5, 3=KMA
-export DA_OB_FORMAT=${DA_OB_FORMAT:-2}              # Observation format: 1=BUFR, 2=ASCII "little_r"
-export DA_GLOBAL=${DA_GLOBAL:-.FALSE.}              # Regional/global domain.
 export NPROC_X=${NPROC_X:-0}                        # Regional, always set NPROC_X to 0, Global, always 1
-if test $DA_GLOBAL == ".TRUE."; then
+if test $NL_GLOBAL == ".TRUE."; then
   export NPROC_X=1
 fi
-
-export DA_MODEL_TYPE=${DA_MODEL_TYPE:-WRF}                 # WRF, MM5 or KMA.
-export DA_WRITE_INCREMENTS=${DA_WRITE_INCREMENTS:-.FALSE.} # Optionally write increments.
-export DA_NUM_FGAT_TIME=${DA_NUM_FGAT_TIME:-1}             # Number of FGAT ob windows.
-export DA_ENSDIM_ALPHA=${DA_ENSDIM_ALPHA:-0}               # Ensemble size (for hybrid). 
-export DA_ALPHA_TRUNCATION=${DA_ALPHA_TRUNCATION:-0}       # Spectral truncation of alpha CV (global hybrid). 
-export DA_ALPHA_CORR_TYPE=${DA_ALPHA_CORR_TYPE:-3}         # Alpha correlation type (1=Expt,2=SOAR,3=Gauss).
-export DA_ALPHA_CORR_SCALE=${DA_ALPHA_CORR_SCALE:-1500.0}  # Alpha correlation scale (km).
-export DA_ALPHA_STD_DEV=${DA_ALPHA_STD_DEV:-1.0}           # Alpha standard deviation.
-export DA_USE_SYNOPOBS=${DA_USE_SYNOPOBS:-.TRUE.}          # Assimilate this observation type.
-export DA_USE_SHIPSOBS=${DA_USE_SHIPSOBS:-.TRUE.}          # Assimilate this observation type.
-export DA_USE_METAROBS=${DA_USE_METAROBS:-.TRUE.}          # Assimilate this observation type.
-export DA_USE_PILOTOBS=${DA_USE_PILOTOBS:-.TRUE.}          # Assimilate this observation type.
-export DA_USE_SOUNDOBS=${DA_USE_SOUNDOBS:-.TRUE.}          # Assimilate this observation type.
-export DA_USE_SATEMOBS=${DA_USE_SATEMOBS:-.TRUE.}          # Assimilate this observation type.
-export DA_USE_GEO_AMV=${DA_USE_GEO_AMV:-.TRUE.}            # Assimilate this observation type.
-export DA_USE_POLAR_AMV=${DA_USE_POLAR_AMV:-.TRUE.}        # Assimilate this observation type.
-export DA_USE_AIREPOBS=${DA_USE_AIREPOBS:-.TRUE.}          # Assimilate this observation type.
-export DA_USE_GPSPWOBS=${DA_USE_GPSPWOBS:-.TRUE.}          # Assimilate this observation type.
-export DA_USE_RADAROBS=${DA_USE_RADAROBS:-.FALSE.}         # Assimilate this observation type.
-export DA_USE_RADAR_RV=${DA_USE_RADAR_RV:-.FALSE.}         # Assimilate this observation type.
-export DA_USE_RADAR_RF=${DA_USE_RADAR_RF:-.FALSE.}         # Assimilate this observation type.
-export DA_USE_BOGUSOBS=${DA_USE_BOGUSOBS:-.FALSE.}         # Assimilate this observation type.
-export DA_USE_GPSREFOBS=${DA_USE_GPSREFOBS:-.TRUE.}        # Assimilate this observation type.
-export DA_USE_PROFILEROBS=${DA_USE_PROFILEROBS:-.TRUE.}    # Assimilate this observation type.
-export DA_USE_BUOYOBS=${DA_USE_BUOYOBS:-.TRUE.}            # Assimilate this observation type.
-export DA_USE_SSMIRETRIEVALOBS=${DA_USE_SSMIRETRIEVALOBS:-.FALSE.} # Assimilate this observation type.
-export DA_USE_SSMITBOBS=${DA_USE_SSMITBOBS:-.FALSE.}       # Assimilate this observation type.
-export DA_USE_SSMT1OBS=${DA_USE_SSMT1OBS:-.FALSE.}         # Assimilate this observation type.
-export DA_USE_SSMT2OBS=${DA_USE_SSMT2OBS:-.FALSE.}         # Assimilate this observation type.
-export DA_USE_QSCATOBS=${DA_USE_QSCATOBS:-.TRUE.}          # Assimilate this observation type.
-export DA_USE_HIRS2OBS=${DA_USE_HIRS2OBS:-.FALSE.}
-export DA_USE_HIRS3OBS=${DA_USE_HIRS3OBS:-.FALSE.}
-export DA_USE_MSUOBS=${DA_USE_MSUOBS:-.FALSE.}
-export DA_USE_AMSUAOBS=${DA_USE_AMSUAOBS:-.FALSE.}
-export DA_USE_AMSUBOBS=${DA_USE_AMSUBOBS:-.FALSE.}
-export DA_USE_AIRSOBS=${DA_USE_AIRSOBS:-.FALSE.}
-export DA_USE_EOS_AMSUAOBS=${DA_USE_EOS_AMSUAOBS:-.FALSE.}
-export DA_USE_EOS_RADOBS=${DA_USE_EOS_RADOBS:-.FALSE.}
-export DA_USE_HSBOBS=${DA_USE_HSBOBS:-.FALSE.}
-export DA_CHECK_MAX_IV=${DA_CHECK_MAX_IV:-.TRUE.}           # Perform O-B > 5sigma_o QC if true.
-export DA_MAX_EXT_ITS=${DA_MAX_EXT_ITS:-1}                  # Maximum number of "WRF-Var outer loops".
-export DA_EPS=${DA_EPS:-1.E-02, 1.E-02, 1.E-02, 1.E-02, 1.E-02, 1.E-02, 1.E-02,} # Convergence criteria.
-export DA_NTMAX=${DA_NTMAX:-100}                            # Maximum number of inner loop iterations.
-export DA_RF_PASSES=${DA_RF_PASSES:-6}                      # Number of recursive filter passes.
-export DA_TESTING_WRFVAR=${DA_TESTING_WRFVAR:-.FALSE.}      # Test WRF-Var code.
-export DA_TEST_TRANSFORMS=${DA_TEST_TRANSFORMS:-.FALSE.}    # Test WRF-Var transforms.
-export DA_TEST_STATISTICS=${DA_TEST_STATISTICS:-.FALSE.}    # Test WRF-Var statistics.
-export DA_INTERPOLATE_STATS=${DA_INTERPOLATE_STATS:-.TRUE.} # True if statistics computed on different domain.
-export DA_CALCULATE_CG_COST_FN=${DA_CALCULATE_CG_COST_FN:-.FALSE.} # True if want CG diagnostic output. 
-export DA_CV_OPTIONS_HUM=${DA_CV_OPTIONS_HUM:-3}            # Moist control variable (1-3).
-export DA_CHECK_RH=${DA_CHECK_RH:-2}                        # Physical check on humidity (0-2).
-export DA_REPORT_START=${DA_REPORT_START:-1}                # Useful for debugging
-export DA_REPORT_END=${DA_REPORT_END:-10000000}             # Useful for debugging
-export DA_PRINT_OBS_MAPPING=${DA_PRINT_OBS_MAPPING:-.FALSE.}
-export DA_MAX_VERT_VAR1=${DA_MAX_VERT_VAR1:-99.0}           # CV1 variance truncation.
-export DA_MAX_VERT_VAR2=${DA_MAX_VERT_VAR2:-99.0}          # CV2 variance truncation.
-export DA_MAX_VERT_VAR3=${DA_MAX_VERT_VAR3:-99.0}          # CV3 variance truncation.
-export DA_MAX_VERT_VAR4=${DA_MAX_VERT_VAR4:-99.0}          # CV4 variance truncation.
-export DA_MAX_VERT_VAR5=${DA_MAX_VERT_VAR5:-99.0}         # CV5 variance truncation.
-
-# Not supported default WRF-Var namelist variables (overwrite at your own risk):
-export DA_ANALYSIS_TYPE=${DA_ANALYSIS_TYPE:-3D-VAR}
-export DA_ANALYSIS_ACCU=${DA_ANALYSIS_ACCU:-900}
-export DA_WRITE_FILTERED_OBS=${DA_WRITE_FILTERED_OBS:-.FALSE.}
-export DA_PROCESS_OBS=${DA_PROCESS_OBS:-YES}
-export DA_QC_POINTER=${DA_QC_POINTER:-0}
-export DA_USE_OBS_ERRFAC=${DA_USE_OBS_ERRFAC:-.FALSE.}
-export DA_PUT_RAND_SEED=${DA_PUT_RAND_SEED:-.FALSE.}
-export DA_OMB_SET_RAND=${DA_OMB_SET_RAND:-.FALSE.}
-export DA_OMB_ADD_NOISE=${DA_OMB_ADD_NOISE:-.FALSE.}
-export DA_TIME_WINDOW=${DA_TIME_WINDOW:-3.}
-export DA_PRINT_DETAIL=${DA_PRINT_DETAIL:-0}
-export DA_STDOUT_UNIT=${DA_STDOUT_UNIT:-6}
-export DA_STDERR_UNIT=${DA_STDERR_UNIT:-0}
-export DA_WRITE_SWITCH=${DA_WRITE_SWITCH:-.FALSE.}
-export DA_WRITE_INTERVAL=${DA_WRITE_INTERVAL:-5}
-export DA_WRITE_QCW=${DA_WRITE_QCW:-.FALSE.}
-export DA_WRITE_QRN=${DA_WRITE_QRN:-.FALSE.}
-export DA_WRITE_QCI=${DA_WRITE_QCI:-.FALSE.}
-export DA_WRITE_QSN=${DA_WRITE_QSN:-.FALSE.}
-export DA_WRITE_QGR=${DA_WRITE_QGR:-.FALSE.}
-export DA_VAR_SCALING1=${DA_VAR_SCALING1:-1.0}
-export DA_VAR_SCALING2=${DA_VAR_SCALING2:-1.0}
-export DA_VAR_SCALING3=${DA_VAR_SCALING3:-1.0}
-export DA_VAR_SCALING4=${DA_VAR_SCALING4:-1.0}
-export DA_VAR_SCALING5=${DA_VAR_SCALING5:-1.0}
-export DA_LEN_SCALING1=${DA_LEN_SCALING1:-1.0}
-export DA_LEN_SCALING2=${DA_LEN_SCALING2:-1.0}
-export DA_LEN_SCALING3=${DA_LEN_SCALING3:-1.0}
-export DA_LEN_SCALING4=${DA_LEN_SCALING4:-1.0}
-export DA_LEN_SCALING5=${DA_LEN_SCALING5:-1.0}
-export DA_POWER_TRUNCATION=${DA_POWER_TRUNCATION:-1.0}     # Truncation of power spectrum (%age - global).
-export DA_JB_FACTOR=${DA_JB_FACTOR:-1.0}                   # Jb factor.
-export DA_JE_FACTOR=${DA_JE_FACTOR:-1.0}                   # Je factor.
-export DA_DEF_SUB_DOMAIN=${DA_DEF_SUB_DOMAIN:-.FALSE.}
-export DA_X_START_SUB_DOMAIN=${DA_X_START_SUB_DOMAIN:-55.0}
-export DA_Y_START_SUB_DOMAIN=${DA_Y_START_SUB_DOMAIN:-35.0}
-export DA_X_END_SUB_DOMAIN=${DA_X_END_SUB_DOMAIN:-80.0}
-export DA_Y_END_SUB_DOMAIN=${DA_Y_END_SUB_DOMAIN:-60.0}
-export DA_WRITE_OUTER_LOOP=${DA_WRITE_OUTER_LOOP:-.FALSE.}
-export DA_LAT_STATS_OPTION=${DA_LAT_STATS_OPTION:-.FALSE.}
-export DA_AS1=${DA_as1:-0.25, 0.75, 1.5}
-export DA_AS2=${DA_as2:-0.25, 0.75, 1.5}
-export DA_AS3=${DA_as3:-0.25, 0.75, 1.5}
-export DA_AS4=${DA_as4:-0.25, 0.75, 1.5}
-export DA_AS5=${DA_as5:-0.25, 0.75, 1.5}
-export DA_SFC_ASSI_OPTIONS=${DA_SFC_ASSI_OPTIONS:-1}
-export DA_SET_OMB_RAND_FAC=${DA_SET_OMB_RAND_FAC:-1.0}
-export DA_SEED_ARRAY1=${DA_SEED_ARRAY1:-0}
-export DA_SEED_ARRAY2=${DA_SEED_ARRAY2:-0}
-export DA_BALANCE_TYPE=${DA_BALANCE_TYPE:-1}
-export DA_VERT_CORR=${DA_VERT_CORR:-2}
-export DA_VERTICAL_IP=${DA_VERTICAL_IP:-0}
-export DA_VERT_EVALUE=${DA_VERT_EVALUE:-1}
-
-export DA_RTMINIT_PRINT=${DA_RTMINIT_PRINT:-3}
-export DA_RTMINIT_NSENSOR=${DA_RTMINIT_NSENSOR:-2}
-export DA_RTMINIT_PLATFORM=${DA_RTMINIT_PLATFORM:-1,1}
-export DA_RTMINIT_SATID=${DA_RTMINIT_SATID:-15,16}
-export DA_RTMINIT_SENSOR=${DA_RTMINIT_SENSOR:-3,3}
-export DA_USE_KMA1DVAR=${DA_USE_KMA1DVAR:-.FALSE.}
-export DA_LMONITORING=${DA_LMONITORING:-.FALSE.}
-export DA_LREAD_BIASCOEF=${DA_LREAD_BIASCOEF:-.TRUE.}
-export DA_LBIASCORR=${DA_LBIASCORR:-.FALSE.}
-export DA_LRTTOV_SCATT=${DA_LRTTOV_SCATT:-.FALSE.}
-export DA_LWRITE_IV=${DA_LWRITE_IV:-.TRUE.}
-export DA_LWRITE_PROFILE=${DA_LWRITE_PROFILE:-.TRUE.}
-export DA_USE_LANDEM=${DA_USE_LANDEM:-.FALSE.}
-export DA_MW_EMIS_SEA=${DA_MW_EMIS_SEA:-1}
-
-export DA_NUM_PSEUDO=${DA_NUM_PSEUDO:-0}
-export DA_PSEUDO_X=${DA_PSEUDO_X:-165.0}
-export DA_PSEUDO_Y=${DA_PSEUDO_Y:- 65.0}
-export DA_PSEUDO_Z=${DA_PSEUDO_Z:- 15.0}
-export DA_PSEUDO_VAL=${DA_PSEUDO_VAL:-1.0}
-export DA_PSEUDO_ERR=${DA_PSEUDO_ERR:-1.0}
-export DA_PSEUDO_VAR=${DA_PSEUDO_VAR:-u}
 
 export DA_CY=`echo $DA_DATE | cut -c1-4`
 export DA_MM=`echo $DA_DATE | cut -c5-6`
 export DA_DD=`echo $DA_DATE | cut -c7-8`
 export DA_HH=`echo $DA_DATE | cut -c9-10`
-DA_ANALYSIS_DATE=${DA_CY}-${DA_MM}-${DA_DD}_${DA_HH}:00:00.0000
+
+export NL_START_YEAR=$DA_CY
+export NL_START_MONTH=$DA_MM
+export NL_START_DAY=$DA_DD
+export NL_START_HOUR=$DA_HH
+
+export NL_END_YEAR=$DA_CY
+export NL_END_MONTH=$DA_MM
+export NL_END_DAY=$DA_DD
+export NL_END_HOUR=$DA_HH
+
+
+NL_ANALYSIS_DATE=${DA_CY}-${DA_MM}-${DA_DD}_${DA_HH}:00:00.0000
+
+# Default WRF namelist variables:
+export NL_OB_FORMAT=${NL_OB_FORMAT:-2}              # Observation format: 1=BUFR, 2=ASCII "little_r"
 
 #-----------------------------------------------------------------------
 # [2.0] Perform sanity checks:
@@ -268,7 +120,7 @@ cp $DA_BUILD_DIR/wrfvar.exe  wrfvar.exe
 
 ln -sf $DA_FIRST_GUESS	 wrfvar_input
 ln -sf $DA_BACK_ERRORS   fort.34
-ln -sf $DA_OBSERVATIONS	 fort.9${DA_OB_FORMAT}
+ln -sf $DA_OBSERVATIONS	 fort.9${NL_OB_FORMAT}
 
 for FILE in $DAT_DIR/*.inv; do
   if test -f $FILE; then
@@ -307,10 +159,6 @@ for FILE in $DAT_DIR/*.$ENDIAN; do
   fi
 done
 
-# JRB support old code
-ln -sf wrfvar_input wrf_3dvar_input # JRB
-ln -sf namelist.wrfvar namelist.3dvar # JRB
-
 if test -r $DA_SSMI; then
   ln -sf $DA_SSMI	fort.93
   set DA_USE_SSMIRETRIEVALOBS = .TRUE.
@@ -323,305 +171,10 @@ echo "First Guess Input File:      $DA_FIRST_GUESS"
 echo "Background Error Input File: $DA_BACK_ERRORS"
 echo "Observation Input File:      $DA_OBSERVATIONS"
 
-# Create WRF-Var namelist file:
 
-cat > namelist.wrfvar << EOF
-&record1
- MODEL_TYPE       = '$DA_MODEL_TYPE',
- WRITE_INCREMENTS = $DA_WRITE_INCREMENTS,
- GLOBAL           = $DA_GLOBAL,
- PRINT_DETAIL     = $DA_PRINT_DETAIL,
- TRACE_USE        = $DA_TRACE_USE,
- TRACE_UNIT       = $DA_TRACE_UNIT,
- TRACE_PE         = $DA_TRACE_PE,
- TRACE_MEMORY     = $DA_TRACE_MEMORY,
- STDOUT_UNIT      = $DA_STDOUT_UNIT,
- STDERR_UNIT      = $DA_STDERR_UNIT /
+# Create namelist.input file:
 
-&record2
- ANALYSIS_TYPE = '$DA_ANALYSIS_TYPE',
- ANALYSIS_DATE = '$DA_ANALYSIS_DATE',
- ANALYSIS_ACCU = $DA_ANALYSIS_ACCU,
- WRITE_FILTERED_OBS = $DA_WRITE_FILTERED_OBS  /
-
-&record3
- fg_format     = $DA_FG_FORMAT,
- ob_format     = $DA_OB_FORMAT,
- num_fgat_time = $DA_NUM_FGAT_TIME /
-
-&ens_info
- ensdim_alpha     = ${DA_ENSDIM_ALPHA},
- alpha_truncation = ${DA_ALPHA_TRUNCATION},
- alpha_corr_type  = ${DA_ALPHA_CORR_TYPE},
- alpha_corr_scale = ${DA_ALPHA_CORR_SCALE},
- alpha_std_dev    = ${DA_ALPHA_STD_DEV} /
-
-&record4
- PROCESS_OBS      = '$DA_PROCESS_OBS',    
- obs_qc_pointer   = $DA_QC_POINTER,       
- Use_SynopObs     = $DA_USE_SYNOPOBS,     
- Use_ShipsObs     = $DA_USE_SHIPSOBS,     
- Use_MetarObs     = $DA_USE_METAROBS,     
- Use_PilotObs     = $DA_USE_PILOTOBS,     
- Use_SoundObs     = $DA_USE_SOUNDOBS,     
- Use_SatemObs     = $DA_USE_SATEMOBS,     
- Use_GeoAMVObs    = $DA_USE_GEO_AMV,      
- Use_PolarAMVObs  = $DA_USE_POLAR_AMV,    
- Use_AirepObs     = $DA_USE_AIREPOBS,     
- Use_GpspwObs     = $DA_USE_GPSPWOBS,     
- Use_GpsrefObs    = $DA_USE_GPSREFOBS,    
- Use_ProfilerObs  = $DA_USE_PROFILEROBS,  
- Use_BuoyObs      = $DA_USE_BUOYOBS,      
- Use_SsmiRetrievalObs = $DA_USE_SSMIRETRIEVALOBS,
- Use_SsmiTbObs    = $DA_USE_SSMITBOBS,
- use_ssmt1obs     = $DA_USE_SSMT1OBS,
- use_ssmt2obs     = $DA_USE_SSMT2OBS,
- use_qscatobs     = $DA_USE_QSCATOBS,
- use_Hirs2Obs     = $DA_USE_HIRS2OBS,
- use_Hirs3Obs     = $DA_USE_HIRS3OBS,
- use_MsuObs       = $DA_USE_MSUOBS,
- use_AmsuaObs     = $DA_USE_AMSUAOBS,
- use_AmsubObs     = $DA_USE_AMSUBOBS,
- use_AirsObs      = $DA_USE_AIRSOBS,
- use_Eos_AmsuaObs = $DA_USE_EOS_AMSUAOBS,
- use_Eos_RadObs   = $DA_USE_EOS_RADOBS,
- use_HsbObs       = $DA_USE_HSBOBS,
- use_kma1dvar     = $DA_USE_KMA1DVAR,
- use_radarobs     = $DA_USE_RADAROBS,
- Use_Radar_rv     = $DA_USE_RADAR_RV,
- Use_Radar_rf     = $DA_USE_RADAR_RF,
- check_max_iv     = $DA_CHECK_MAX_IV,
- use_obs_errfac   = $DA_USE_OBS_ERRFAC,
- put_rand_seed    = $DA_PUT_RAND_SEED,
- omb_set_rand     = $DA_OMB_SET_RAND,
- omb_add_noise    = $DA_OMB_ADD_NOISE, 
- report_start     = $DA_REPORT_START,
- report_end       = $DA_REPORT_END,
- print_obs_mapping = $DA_PRINT_OBS_MAPPING /
-
-&record5
- TIME_WINDOW    = $DA_TIME_WINDOW,
- /
-
-&record6
- max_ext_its    = $DA_MAX_EXT_ITS,
- EPS            = $DA_EPS,
- NTMAX          = $DA_NTMAX,
- NSAVE          = 4,
- WRITE_SWITCH   = $DA_WRITE_SWITCH,
- WRITE_INTERVAL = $DA_WRITE_INTERVAL /
-
-&record7
- RF_PASSES      = $DA_RF_PASSES,
- VAR_SCALING1   = $DA_VAR_SCALING1,
- VAR_SCALING2   = $DA_VAR_SCALING2,
- VAR_SCALING3   = $DA_VAR_SCALING3,
- VAR_SCALING4   = $DA_VAR_SCALING4,
- VAR_SCALING5   = $DA_VAR_SCALING5,
- LEN_SCALING1   = $DA_LEN_SCALING1,
- LEN_SCALING2   = $DA_LEN_SCALING2,
- LEN_SCALING3   = $DA_LEN_SCALING3,
- LEN_SCALING4   = $DA_LEN_SCALING4,
- LEN_SCALING5   = $DA_LEN_SCALING5,
- power_truncation = $DA_POWER_TRUNCATION,
- jb_factor      = $DA_JB_FACTOR,
- je_factor      = $DA_JE_FACTOR /
-
-&record8
- def_sub_domain     = $DA_DEF_SUB_DOMAIN,
- x_start_sub_domain = $DA_X_START_SUB_DOMAIN,
- y_start_sub_domain = $DA_Y_START_SUB_DOMAIN,
- x_end_sub_domain   = $DA_X_END_SUB_DOMAIN,
- y_end_sub_domain   = $DA_Y_END_SUB_DOMAIN /
-
-&record10
- Testing_WRFVAR  = $DA_TESTING_WRFVAR,
- Test_Transforms = $DA_TEST_TRANSFORMS,
- Test_Statistics = $DA_TEST_STATISTICS,
- Interpolate_Stats = $DA_INTERPOLATE_STATS /
- 
-&record11
- write_outer_loop    = $DA_WRITE_OUTER_LOOP,
- lat_stats_option    = $DA_LAT_STATS_OPTION,
- calculate_cg_cost_fn = $DA_CALCULATE_CG_COST_FN,
- cv_options_hum      = $DA_CV_OPTIONS_HUM,
- check_rh            = $DA_CHECK_RH,
- as1                 = $DA_AS1,
- as2                 = $DA_AS2,
- as3                 = $DA_AS3,
- as4                 = $DA_AS4,
- as5                 = $DA_AS5,
- sfc_assi_options    = $DA_SFC_ASSI_OPTIONS,
- set_omb_rand_fac    = $DA_SET_OMB_RAND_FAC,
- seed_array1         = $DA_SEED_ARRAY1,
- seed_array2         = $DA_SEED_ARRAY2 /
- 
-&record12
- balance_type   = $DA_BALANCE_TYPE /
- 
-&record13
- vert_corr      = $DA_VERT_CORR,
- vertical_ip    = $DA_VERTICAL_IP,
- vert_evalue    = $DA_VERT_EVALUE,
- max_vert_var1  = $DA_MAX_VERT_VAR1,
- max_vert_var2  = $DA_MAX_VERT_VAR2,
- max_vert_var3  = $DA_MAX_VERT_VAR3,
- max_vert_var4  = $DA_MAX_VERT_VAR4,
- max_vert_var5  = $DA_MAX_VERT_VAR5 /
-
-&record14
- rtminit_print       = $DA_RTMINIT_PRINT,
- rtminit_nsensor     = $DA_RTMINIT_NSENSOR,
- rtminit_platform    = $DA_RTMINIT_PLATFORM,
- rtminit_satid       = $DA_RTMINIT_SATID,
- rtminit_sensor      = $DA_RTMINIT_SENSOR,
- lmonitoring         = $DA_LMONITORING,
- lread_biascoef      = $DA_LREAD_BIASCOEF,
- lbiascorr           = $DA_LBIASCORR,
- lrttov_scatt        = $DA_LRTTOV_SCATT,
- lwrite_iv           = $DA_LWRITE_IV,
- lwrite_profile      = $DA_LWRITE_PROFILE,
- use_landem          = $DA_USE_LANDEM,
- mw_emis_sea         = $DA_MW_EMIS_SEA/
- 
-&pseudo_ob_nl
- num_pseudo     = $DA_NUM_PSEUDO, 
- pseudo_x       = $DA_PSEUDO_X,
- pseudo_y       = $DA_PSEUDO_Y,
- pseudo_z       = $DA_PSEUDO_Z,
- pseudo_val     = $DA_PSEUDO_VAL,
- pseudo_err     = $DA_PSEUDO_ERR,
- pseudo_var     = '$DA_PSEUDO_VAR' /
-
-EOF
-
-#Create WRF V2.1 namelist.input file:
-
-cat > namelist.input << EOF
- &time_control
- run_days                            = 0,
- run_hours                           = 12,
- run_minutes                         = 0,
- run_seconds                         = 0,
- start_year                          = $DA_CY, 
- start_month                         = $DA_MM, 
- start_day                           = $DA_DD, 
- start_hour                          = $DA_HH, 
- start_minute                        = 00,
- start_second                        = 00,
- end_year                            = $DA_CY, 
- end_month                           = $DA_MM, 
- end_day                             = $DA_DD, 
- end_hour                            = $DA_HH, 
- end_minute                          = 00,
- end_second                          = 00,
- interval_seconds                    = 21600,
- input_from_file                     = .true.,
- history_interval                    = 180,
- frames_per_outfile                  = 1000,
- restart                             = .false.,
- restart_interval                    = 5000,
- io_form_history                     = 2
- io_form_restart                     = 2
- io_form_input                       = 2
- io_form_boundary                    = 2
- debug_level                         = 10
- /
-
- &domains
- time_step                           = 180,
- time_step_fract_num                 = 0,
- time_step_fract_den                 = 1,
- max_dom                             = 1,
- s_we                                = 1,
- e_we                                = $DA_E_WE, 
- s_sn                                = 1,
- e_sn                                = $DA_E_SN, 
- s_vert                              = 1, 
- e_vert                              = $DA_E_VERT,
- dx                                  = $DA_DX, 
- dy                                  = $DA_DY, 
- grid_id                             = 1,     
- parent_id                           = 0,     
- i_parent_start                      = 0,     
- j_parent_start                      = 0,     
- parent_grid_ratio                   = 1,     
- parent_time_step_ratio              = 1,     
- feedback                            = 1,
- smooth_option                       = 0,
- nproc_x                             = $NPROC_X,
- /
-
- &physics
- mp_physics                          = 3,    
- ra_lw_physics                       = 1,    
- ra_sw_physics                       = 1,    
- radt                                = 10,   
- sf_sfclay_physics                   = 1,    
- sf_surface_physics                  = ${DA_SF_SURFACE_PHYSICS},     
- bl_pbl_physics                      = 1,   
- bldt                                = 0,   
- cu_physics                          = 1,   
- cudt                                = 5,   
- isfflx                              = 1,
- ifsnow                              = 0,
- icloud                              = 1,
- num_soil_layers                     = ${DA_NUM_SOIL_LAYERS},
- surface_input_source                = 1,
- mp_zero_out                         = 0,
- maxiens                             = 1,
- maxens                              = 3,
- maxens2                             = 3,
- maxens3                             = 16,
- ensdim                              = ${DA_ENSDIM_ALPHA},
- /
-
- &dynamics
- dyn_opt                             = 2,
- rk_ord                              = 3,
- w_damping                           = 0,
- diff_opt                            = 0,
- km_opt                              = 1,
- damp_opt                            = 0,
- base_temp                           = 290.,
- zdamp                               = 5000., 
- dampcoef                            = 0.01,  
- khdif                               = 0,     
- kvdif                               = 0,     
- smdiv                               = 0.1,   
- emdiv                               = 0.01,  
- epssm                               = 0.1,   
- non_hydrostatic                     = .true.,
- h_mom_adv_order                     = 5,     
- v_mom_adv_order                     = 3,     
- h_sca_adv_order                     = 5,     
- v_sca_adv_order                     = 3,     
- /
-
- &bdy_control
- spec_bdy_width                      = 5,
- spec_zone                           = 1,
- relax_zone                          = 4,
- specified                           = .true., 
- periodic_x                          = .false.,
- symmetric_xs                        = .false.,
- symmetric_xe                        = .false.,
- open_xs                             = .false.,
- open_xe                             = .false.,
- periodic_y                          = .false.,
- symmetric_ys                        = .false.,
- symmetric_ye                        = .false.,
- open_ys                             = .false.,
- open_ye                             = .false.,
- nested                              = .false.,
- real_data_init_type                 = $DA_FG_FORMAT
-/
- &namelist_quilt
- nio_tasks_per_group = 0,
- nio_groups = 1,
- /
-
-EOF
+. $DA_BUILD_DIR/inc/namelist_script.inc
 
 #-------------------------------------------------------------------
 #Run WRF-Var:
