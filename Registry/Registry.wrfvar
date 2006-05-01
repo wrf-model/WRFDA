@@ -49,6 +49,7 @@ dimspec    s      3     namelist=num_soil_cat     z          soil_cat
 dimspec    p      -     constant=7501             c          microphysics_rstrt_state
 dimspec    w      -     namelist=spec_bdy_width   c          spec_bdy_width
 dimspec    e      3     namelist=ensdim           z          ensemble dimension
+dimspec    m      4     namelist=ensdim_alpha     c          alpha ensemble dimension
 
 ################################################################################
 ################################################################################
@@ -653,7 +654,7 @@ state  logical moved            -       misc        1         -     -
 
 # Time Control
 rconfig   integer run_days                namelist,time_control		1             0       irh   "run_days"              "NUMBER OF DAYS TO RUN"
-rconfig   integer run_hours               namelist,time_control		1             0       irh   "run_hours"             "NUMBER OF HOURS TO RUN"
+rconfig   integer run_hours               namelist,time_control		1             12      irh   "run_hours"             "NUMBER OF HOURS TO RUN"
 rconfig   integer run_minutes             namelist,time_control		1             0       irh   "run_minutes"           "NUMBER OF MINUTES TO RUN"
 rconfig   integer run_seconds             namelist,time_control		1             0       irh   "run_seconds"           "NUMBER OF SECONDS TO RUN"
 rconfig   integer start_year              namelist,time_control 	max_domains    1993    irh   "start_year"            "4 DIGIT YEAR OF START OF MODEL" "YEARS"
@@ -668,8 +669,8 @@ rconfig   integer end_day                 namelist,time_control		max_domains    
 rconfig   integer end_hour                namelist,time_control		max_domains      12    irh   "end_hour"              "2 DIGIT HOUR OF THE DAY OF END OF MODEL, 0-23" "HOURS"
 rconfig   integer end_minute              namelist,time_control		max_domains      00    irh   "end_minute"            "2 DIGIT MINUTE OF THE HOUR OF END OF MODEL, 0-59" "MINUTES"
 rconfig   integer end_second              namelist,time_control		max_domains      00    irh   "end_second"            "2 DIGIT SECOND OF THE MINUTE OF END OF MODEL, 0-59" "SECONDS"
-rconfig   integer interval_seconds        namelist,time_control		1             43200    irh   "interval_seconds"      "SECONDS BETWEEN ANALYSIS AND BOUNDARY PERIODS" "SECONDS"
-rconfig   logical input_from_file         namelist,time_control		max_domains    .false. irh    "input_from_file"      "T/F INPUT FOR THIS DOMAIN FROM A SEPARATE INPUT FILE"  ""
+rconfig   integer interval_seconds        namelist,time_control		1             21600    irh   "interval_seconds"      "SECONDS BETWEEN ANALYSIS AND BOUNDARY PERIODS" "SECONDS"
+rconfig   logical input_from_file         namelist,time_control		max_domains    .true. irh    "input_from_file"      "T/F INPUT FOR THIS DOMAIN FROM A SEPARATE INPUT FILE"  ""
 rconfig   integer fine_input_stream       namelist,time_control		max_domains    0       irh    "fine_input_stream"      "0 THROUGH 5, WHAT INPUT STREAM IS FINE GRID IC FROM"  ""
 rconfig   logical input_from_hires        namelist,time_control		max_domains    .false. irh    "input_from_hires"     "T/F INPUT FOR THIS DOMAIN FROM USGS HI RES TERRAIN"  ""
 rconfig   character rsmas_data_path       namelist,time_control		1              "."     -    "rsmas_data_path"      ""  ""
@@ -1005,7 +1006,7 @@ rconfig   logical write_restart_at_0h     namelist,time_control		1             .
 
 
 # Domains
-rconfig   integer time_step               namelist,domains	1             -       ih   "time_step"     
+rconfig   integer time_step               namelist,domains	1             180     ih   "time_step"     
 rconfig   integer time_step_fract_num     namelist,domains	1             0       ih   "time_step_fract_num"     
 rconfig   integer time_step_fract_den     namelist,domains	1             1       ih   "time_step_fract_den"     
 rconfig   integer max_dom                 namelist,domains	1             1       irh  "max_dom"               ""      ""
@@ -1019,12 +1020,12 @@ rconfig   real    dx                      namelist,domains     max_domains    20
 rconfig   real    dy                      namelist,domains   	max_domains    200     h     "dy"        "Y HORIZONTAL RESOLUTION"   "METERS"
 rconfig   integer grid_id                 namelist,domains	max_domains    1       irh    "id"            ""      ""
 rconfig   integer parent_id               namelist,domains	max_domains    0       h     "parent_id"             ""      ""
-rconfig   integer i_parent_start          namelist,domains	max_domains    1       rh     "i_parent_start"                ""      ""
-rconfig   integer j_parent_start          namelist,domains	max_domains    1       rh     "j_parent_start"                ""      ""
+rconfig   integer i_parent_start          namelist,domains	max_domains    0       rh     "i_parent_start"                ""      ""
+rconfig   integer j_parent_start          namelist,domains	max_domains    0       rh     "j_parent_start"                ""      ""
 rconfig   integer parent_grid_ratio       namelist,domains	max_domains    1       h     "parent_grid_ratio"             ""      ""
 rconfig   integer parent_time_step_ratio  namelist,domains	max_domains    1       h     "parent_time_step_ratio"                ""      ""
 rconfig   integer feedback                namelist,domains	1    1       h     "feedback"          ""      ""
-rconfig   integer smooth_option           namelist,domains	1    2       h     "smooth_option"          ""      ""
+rconfig   integer smooth_option           namelist,domains	1    0       h     "smooth_option"          ""      ""
 rconfig   real    ztop                    namelist,domains	max_domains    15000.  h    "ztop"          ""      ""
 rconfig   integer moad_grid_ratio         namelist,domains	max_domains    1       h     "moad_grid_ratio"               ""      ""
 rconfig   integer moad_time_step_ratio    namelist,domains	max_domains    1       h     "moad_time_step_ratio"          ""      ""
@@ -1032,7 +1033,7 @@ rconfig   integer shw                     namelist,domains	max_domains    2     
 rconfig   integer tile_sz_x               namelist,domains	1             0       -      "tile_sz_x"             ""      ""
 rconfig   integer tile_sz_y               namelist,domains	1             0       -      "tile_sz_y"             ""      ""
 rconfig   integer numtiles                namelist,domains	1             1       -      "numtiles"              ""      ""
-rconfig   integer nproc_x                 namelist,domains	1             -1       -      "nproc_x"              "-1 means not set"      ""
+rconfig   integer nproc_x                 namelist,domains	1             1        -      "nproc_x"              "-1 means not set"      ""
 rconfig   integer nproc_y		  namelist,domains	1             -1       -      "nproc_y"              "-1 means not set"      ""
 rconfig   integer irand                   namelist,domains	1             0       -      "irand"           ""      ""
 rconfig   real    dt                      derived              max_domains    2.      h     "dt"        "TEMPORAL RESOLUTION"      "SECONDS"
@@ -1046,16 +1047,16 @@ rconfig   integer   move_cd_x       namelist,domains    max_moves        0
 rconfig   integer   move_cd_y       namelist,domains    max_moves        0
 
 # Physics
-rconfig   integer     mp_physics          namelist,physics	max_domains    0       rh       "mp_physics"            ""      ""
-rconfig   integer     ra_lw_physics       namelist,physics	max_domains    0       rh       "ra_lw_physics"         ""      ""
-rconfig   integer     ra_sw_physics       namelist,physics	max_domains    0       rh       "ra_sw_physics"         ""      ""
-rconfig   real    radt                    namelist,physics	max_domains    0       h    "RADT"          ""      ""
-rconfig   integer     sf_sfclay_physics   namelist,physics	max_domains    0       rh       "sf_sfclay_physics"             ""      ""
-rconfig   integer     sf_surface_physics  namelist,physics	max_domains    0       rh       "sf_surface_physics"            ""      ""
-rconfig   integer     bl_pbl_physics      namelist,physics	max_domains    0       rh       "bl_pbl_physics"                ""      ""
+rconfig   integer     mp_physics          namelist,physics	max_domains    3       rh       "mp_physics"            ""      ""
+rconfig   integer     ra_lw_physics       namelist,physics	max_domains    1       rh       "ra_lw_physics"         ""      ""
+rconfig   integer     ra_sw_physics       namelist,physics	max_domains    1       rh       "ra_sw_physics"         ""      ""
+rconfig   real    radt                    namelist,physics	max_domains    10      h    "RADT"          ""      ""
+rconfig   integer     sf_sfclay_physics   namelist,physics	max_domains    1       rh       "sf_sfclay_physics"             ""      ""
+rconfig   integer     sf_surface_physics  namelist,physics	max_domains    1       rh       "sf_surface_physics"            ""      ""
+rconfig   integer     bl_pbl_physics      namelist,physics	max_domains    1       rh       "bl_pbl_physics"                ""      ""
 rconfig   real    BLDT                    namelist,physics	max_domains    0       h    "BLDT"          ""      ""
-rconfig   integer     cu_physics          namelist,physics	max_domains    0       rh       "cu_physics"            ""      ""
-rconfig   real    CUDT                    namelist,physics	max_domains    0       h    "CUDT"          ""      ""
+rconfig   integer     cu_physics          namelist,physics	max_domains    1       rh       "cu_physics"            ""      ""
+rconfig   real    CUDT                    namelist,physics	max_domains    5       h    "CUDT"          ""      ""
 rconfig   real    GSMDT                   namelist,physics	max_domains    0       h    "GSMDT"          ""      ""
 rconfig   integer ISFFLX                  namelist,physics 	1             1       irh    "ISFFLX"                        ""      ""
 rconfig   integer IFSNOW                  namelist,physics	1             0       irh    "IFSNOW"                        ""      ""
@@ -1066,7 +1067,7 @@ rconfig   integer maxiens                 namelist,physics	1             1      
 rconfig   integer maxens                  namelist,physics	1             3       irh    "maxens"                    ""      ""
 rconfig   integer maxens2                 namelist,physics	1             3       irh    "maxens2"                    ""      ""
 rconfig   integer maxens3                 namelist,physics	1            16       irh    "maxens3"                    ""      ""
-rconfig   integer ensdim                  namelist,physics	1            144      irh    "ensdim"                    ""      ""
+rconfig   integer ensdim                  namelist,physics	1            3        irh    "ensdim"                    ""      ""
 rconfig   integer     chem_opt            namelist,physics	max_domains    0       rh       "chem_opt"              ""      ""
 rconfig   integer num_land_cat            namelist,physics	1            24       -      "num_land_cat"                  ""      ""
 rconfig   integer num_soil_cat            namelist,physics	1            16       -      "num_soil_cat"                  ""      ""
@@ -1079,26 +1080,26 @@ rconfig   integer co2tf                   namelist,physics	1            0       
 
 # Dynamics
 # dynamics option (see package definitions, below)
-rconfig   integer dyn_opt                 namelist,dynamics	1             1       irh   "dyn_opt"               ""      ""
+rconfig   integer dyn_opt                 namelist,dynamics	1             2       irh   "dyn_opt"               ""      ""
 rconfig   integer rk_ord                  namelist,dynamics	1             3       irh   "rk_order"               ""      ""
 rconfig   integer w_damping               namelist,dynamics	1             0       irh    "w_damping"             ""      ""
 # diff_opt 1=old diffusion, 2=new
-rconfig   integer diff_opt                namelist,dynamics	1             1       irh    "diff_opt"              ""      ""
+rconfig   integer diff_opt                namelist,dynamics	1             0       irh    "diff_opt"              ""      ""
 # km_opt   1=old coefs, 2=tke, 3=Smagorinksy
 rconfig   integer km_opt                  namelist,dynamics	1             1       irh    "km_opt"                ""      ""
-rconfig   integer damp_opt                namelist,dynamics	1             1       irh    "damp_opt"              ""      ""
+rconfig   integer damp_opt                namelist,dynamics	1             0       irh    "damp_opt"              ""      ""
 rconfig   real    zdamp                   namelist,dynamics	max_domains    5000.   h    "zdamp"         ""      ""
-rconfig   real    dampcoef                namelist,dynamics     max_domains    0.2     h    "dampcoef"              ""      ""
+rconfig   real    dampcoef                namelist,dynamics     max_domains    0.01     h    "dampcoef"              ""      ""
 rconfig   real    khdif                   namelist,dynamics	max_domains    0       h    "khdif"         ""      ""
 rconfig   real    kvdif                   namelist,dynamics	max_domains    0       h    "kvdif"         ""      ""
-rconfig   real    smdiv                   namelist,dynamics	max_domains    0.      h    "smdiv"         ""      ""
-rconfig   real    emdiv                   namelist,dynamics	max_domains    0.      h    "emdiv"         ""      ""
-rconfig   real    epssm                   namelist,dynamics	max_domains    .1      h    "epssm"         ""      ""
+rconfig   real    smdiv                   namelist,dynamics	max_domains    0.1     h    "smdiv"         ""      ""
+rconfig   real    emdiv                   namelist,dynamics	max_domains    0.01    h    "emdiv"         ""      ""
+rconfig   real    epssm                   namelist,dynamics	max_domains    0.1     h    "epssm"         ""      ""
 rconfig   logical non_hydrostatic         namelist,dynamics	max_domains  .true.   irh  "non_hydrostatic"    ""   ""
 rconfig   integer time_step_sound         namelist,dynamics	max_domains    0       h     "time_step_sound"               ""      ""
-rconfig   integer     h_mom_adv_order     namelist,dynamics	max_domains    3       rh       "h_mom_adv_order"               ""      ""
+rconfig   integer     h_mom_adv_order     namelist,dynamics	max_domains    5       rh       "h_mom_adv_order"               ""      ""
 rconfig   integer     v_mom_adv_order     namelist,dynamics	max_domains    3       rh       "v_mom_adv_order"               ""      ""
-rconfig   integer     h_sca_adv_order     namelist,dynamics	max_domains    3       rh       "h_sca_adv_order"               ""      ""
+rconfig   integer     h_sca_adv_order     namelist,dynamics	max_domains    5       rh       "h_sca_adv_order"               ""      ""
 rconfig   integer     v_sca_adv_order     namelist,dynamics	max_domains    3       rh       "v_sca_adv_order"               ""      ""
 rconfig   logical top_radiation           namelist,dynamics	max_domains    .false. rh    "top_radiation"         ""      ""
 rconfig   real    mix_cr_len              namelist,dynamics	max_domains    200.    h    "mix_cr_len"            ""      ""
@@ -1118,7 +1119,7 @@ rconfig   real    base_lapse              namelist,dynamics	1              50.  
 rconfig   integer spec_bdy_width          namelist,bdy_control		1             5       irh    "spec_bdy_width"                ""      ""
 rconfig   integer spec_zone               namelist,bdy_control		1             1       irh    "spec_zone"                     ""      ""
 rconfig   integer relax_zone              namelist,bdy_control		1             4       irh    "relax_zone"                    ""      ""
-rconfig   logical specified               namelist,bdy_control	max_domains    .false. rh    "specified"             ""      ""
+rconfig   logical specified               namelist,bdy_control	max_domains    .true.  rh    "specified"             ""      ""
 rconfig   logical periodic_x              namelist,bdy_control	max_domains    .false. rh    "periodic_x"            ""      ""
 rconfig   logical symmetric_xs            namelist,bdy_control	max_domains    .false. rh    "symmetric_xs"          ""      ""
 rconfig   logical symmetric_xe            namelist,bdy_control	max_domains    .false. rh    "symmetric_xe"          ""      ""
@@ -1130,7 +1131,7 @@ rconfig   logical symmetric_ye            namelist,bdy_control	max_domains    .f
 rconfig   logical open_ys                 namelist,bdy_control	max_domains    .false. rh    "open_ys"               ""      ""
 rconfig   logical open_ye                 namelist,bdy_control	max_domains    .false. rh    "open_ye"               ""      ""
 rconfig   logical nested                  namelist,bdy_control	max_domains    .false. rh    "nested"                ""      ""
-rconfig   integer real_data_init_type     namelist,bdy_control		1                 1    irh   "real_data_init_type"   "REAL DATA INITIALIZATION OPTIONS: 1=SI, 2=MM5, 3=GENERIC" "PRE-PROCESSOR TYPES"
+rconfig   integer real_data_init_type     namelist,bdy_control		1                 3    irh   "real_data_init_type"   "REAL DATA INITIALIZATION OPTIONS: 1=SI, 2=MM5, 3=GENERIC" "PRE-PROCESSOR TYPES"
 
 # NAMELIST DERIVED
 rconfig   real    cen_lat                 derived                  max_domains    0       -        "cen_lat"              "center latitude"      "degrees, negative is south"
@@ -1152,7 +1153,188 @@ rconfig   integer simulation_start_hour   derived                  1            
 rconfig   integer simulation_start_minute derived                  1              0       -        "simulation_start_minute" "start of simulation through restarts" "2-digit minute"
 rconfig   integer simulation_start_second derived                  1              0       -        "simulation_start_second" "start of simulation through restarts" "2-digit second"
 
-#
+rconfig   character model_type            namelist,record1         1              "WRF"   -       "model_type"       "model_type"       "TBD"
+rconfig   logical write_increments        namelist,record1         1              .false. -       "write_increments" "write_increments" "T/F"
+rconfig   logical lvar4d                  namelist,record1         1              .false. -       "lvar4d"           "lvar4d"           "T/F"
+rconfig   integer print_detail            namelist,record1         1              0       -       "print_detail"     "print_detail"     "0-500"
+rconfig   logical global                  namelist,record1         1              .false. -       "global"           "global"           "T/F"
+rconfig   integer stdout                  namelist,record1         1              6       -       "stdout"           "stdout"           "1-100"
+rconfig   integer stderr                  namelist,record1         1              0       -       "stderr"           "stderr"           "1-100"
+rconfig   integer trace_unit              namelist,record1         1              99      -       "trace_unit"       "trace_unit"       "1-100"
+rconfig   integer trace_pe                namelist,record1         1              0       -       "trace_pe"         "trace_pe"         "1-100"
+rconfig   logical trace_use               namelist,record1         1              .false. -       "trace_use"        "trace_use"        "T/F"
+rconfig   logical trace_memory            namelist,record1         1              .false. -       "trace_memory"     "trace_memory"     "T/F"
+
+rconfig   character analysis_type         namelist,record2         1              "3D-VAR" -       "TBD"              "TBD"              "3D-PSAS or 3D-VAR"
+rconfig   character analysis_date         namelist,record2         1 "2002-08-03_00:00:00.0000" -  "TBD"              "TBD"              "CCYY-MM-DD_HH:MM:SS.ssss"
+rconfig   integer   analysis_accu         namelist,record2         1              900      -       "TBD"              "TBD"              "TBD"
+rconfig   logical   w_increments          namelist,record2         1              .FALSE.  -       "TBD"              "TBD"              "TBD"
+rconfig   logical   dt_cloud_model        namelist,record2         1              .FALSE.  -       "TBD"              "TBD"              "TBD"
+rconfig   logical   write_qcw             namelist,record2         1              .FALSE.  -       "TBD"              "TBD"              "TBD"
+rconfig   logical   write_qrn             namelist,record2         1              .FALSE.  -       "TBD"              "TBD"              "TBD"
+rconfig   logical   write_qci             namelist,record2         1              .FALSE.  -       "TBD"              "TBD"              "TBD"
+rconfig   logical   write_qsn             namelist,record2         1              .FALSE.  -       "TBD"              "TBD"              "TBD"
+rconfig   logical   write_qgr             namelist,record2         1              .FALSE.  -       "TBD"              "TBD"              "TBD"             
+rconfig   logical   write_filtered_obs    namelist,record2         1              .FALSE.  -       "TBD"              "TBD"              "TBD"             
+
+rconfig   integer   fg_format             namelist,record3         1              1        -       "TBD"              "TBD"                      "1=WRF, 2=MM5" 
+rconfig   integer   ob_format             namelist,record3         1              2        -       "TBD"              "TBD"                       "1=BFR,2=ASCI I"
+rconfig   integer   num_fgat_time         namelist,record3         1              1        -       "TBD"              "number of FGAT time level" "TBD"         
+
+rconfig   character PROCESS_OBS           namelist,record4         1              "YES"    -       "TBD"              "TBD"              "TBD"                  
+rconfig   integer   obs_qc_pointer        namelist,record4         1              0        -       "TBD"              "TBD"              "TBD"                
+rconfig   logical   Use_SynopObs          namelist,record4         1              .TRUE.   -       "TBD"              "TBD"              "TBD"                
+rconfig   logical   Use_ShipsObs          namelist,record4         1              .TRUE.   -       "TBD"              "TBD"              "TBD"                
+rconfig   logical   Use_MetarObs          namelist,record4         1              .TRUE.   -       "TBD"              "TBD"              "TBD"                
+rconfig   logical   Use_SoundObs          namelist,record4         1              .TRUE.   -       "TBD"              "TBD"              "TBD"                
+rconfig   logical   Use_PilotObs          namelist,record4         1              .TRUE.   -       "TBD"              "TBD"              "TBD"               
+rconfig   logical   Use_AirepObs          namelist,record4         1              .TRUE.   -       "TBD"              "TBD"              "TBD"               
+rconfig   logical   Use_GeoAMVObs         namelist,record4         1              .TRUE.   -       "TBD"              "TBD"              "TBD"               
+rconfig   logical   Use_PolarAMVObs       namelist,record4         1              .TRUE.   -       "TBD"              "TBD"              "TBD"               
+rconfig   logical   Use_BogusObs          namelist,record4         1              .FALSE.  -       "TBD"              "TBD"              "TBD"               
+rconfig   logical   Use_BuoyObs           namelist,record4         1              .FALSE.  -       "TBD"              "TBD"              "TBD"               
+rconfig   logical   Use_ProfilerObs       namelist,record4         1              .FALSE.  -       "TBD"              "TBD"              "TBD"               
+rconfig   logical   Use_SatemObs          namelist,record4         1              .FALSE.  -       "TBD"              "TBD"              "TBD"               
+rconfig   logical   Use_GpspwObs          namelist,record4         1              .FALSE.  -       "TBD"              "TBD"              "TBD"               
+rconfig   logical   Use_GpsrefObs         namelist,record4         1              .FALSE.  -       "TBD"              "TBD"              "TBD"               
+rconfig   logical   Use_SsmiRetrievalObs  namelist,record4         1              .FALSE.  -       "TBD"              "TBD"              "TBD"               
+rconfig   logical   Use_SsmiTbObs         namelist,record4         1              .FALSE.  -       "TBD"              "TBD"              "TBD"               
+rconfig   logical   use_ssmt1obs          namelist,record4         1              .FALSE.  -       "TBD"              "TBD"              "TBD"                
+rconfig   logical   use_ssmt2obs          namelist,record4         1              .FALSE.  -       "TBD"              "TBD"              "TBD"                
+rconfig   logical   use_qscatobs          namelist,record4         1              .FALSE.  -       "TBD"              "TBD"              "TBD"                
+rconfig   logical   use_RadarObs          namelist,record4         1              .FALSE.  -       "TBD"              "TBD"              "TBD"                  
+rconfig   logical   use_Radar_rv          namelist,record4         1              .FALSE.  -       "TBD"              "TBD"              "TBD"                  
+rconfig   logical   use_Radar_rf          namelist,record4         1              .FALSE.  -       "TBD"              "TBD"              "TBD"                  
+rconfig   logical   use_hirs2Obs          namelist,record4         1              .FALSE.  -       "TBD"              "TBD"              "TBD"                  
+rconfig   logical   use_hirs3Obs          namelist,record4         1              .FALSE.  -       "TBD"              "TBD"              "TBD"                  
+rconfig   logical   Use_MsuObs            namelist,record4         1              .FALSE.  -       "TBD"              "TBD"              "TBD"                  
+rconfig   logical   Use_AmsuaObs          namelist,record4         1              .FALSE.  -       "TBD"              "TBD"              "TBD"                  
+rconfig   logical   Use_AmsubObs          namelist,record4         1              .FALSE.  -       "TBD"              "TBD"              "TBD"                  
+rconfig   logical   Use_AirsObs           namelist,record4         1              .FALSE.  -       "TBD"              "TBD"              "TBD"                 
+rconfig   logical   Use_Eos_AmsuaObs      namelist,record4         1              .FALSE.  -       "TBD"              "TBD"              "TBD"               
+rconfig   logical   Use_Eos_RadObs        namelist,record4         1              .FALSE.  -       "TBD"              "TBD"              "TBD"                
+rconfig   logical   Use_HsbObs            namelist,record4         1              .FALSE.  -       "TBD"              "TBD"              "TBD"                  
+rconfig   logical   use_kma1dvar          namelist,record4         1              .FALSE.  -       "TBD"              "TBD"
+rconfig   logical   use_radiance          namelist,record4         1              .false.      -   "TBD"              "TBD"              "TBD"      
+rconfig   logical   use_obsgts            namelist,record4         1              .false.      -   "TBD"              "TBD"              "TBD"        
+rconfig   logical   check_max_iv          namelist,record4         1              .TRUE.   -       "TBD"              "TBD"              "TBD"                  
+rconfig   logical   use_obs_errfac        namelist,record4         1              .FALSE.  -       "TBD"              "TBD"              "TBD"                  
+rconfig   logical   put_rand_seed         namelist,record4         1              .FALSE.  -       "TBD"              "TBD"              "TBD"                  
+rconfig   logical   omb_set_rand          namelist,record4         1              .FALSE.  -       "TBD"              "TBD"              "TBD"                  
+rconfig   logical   omb_add_noise         namelist,record4         1              .FALSE.  -       "TBD"              "TBD"              "TBD"                  
+rconfig   integer   max_sound_input       namelist,record4         1              5000     -       "TBD"              "TBD"              "TBD"                  
+rconfig   integer   max_synop_input       namelist,record4         1              50000    -       "TBD"              "TBD"              "TBD"                  
+rconfig   integer   max_geoamv_input      namelist,record4         1              300000   -       "TBD"              "TBD"              "TBD"                  
+rconfig   integer   max_polaramv_input    namelist,record4         1              300000   -       "TBD"              "TBD"              "TBD"                  
+rconfig   integer   max_airep_input       namelist,record4         1              200000   -       "TBD"              "TBD"              "TBD"                  
+rconfig   integer   max_satem_input       namelist,record4         1              50000    -       "TBD"              "TBD"              "TBD"                  
+rconfig   integer   max_pilot_input       namelist,record4         1              30000    -       "TBD"              "TBD"              "TBD"                  
+rconfig   integer   max_Radar_input       namelist,record4         1              10000    -       "TBD"              "TBD"              "TBD"                  
+rconfig   integer   max_metar_input       namelist,record4         1              30000    -       "TBD"              "TBD"              "TBD"                  
+rconfig   integer   max_gpspw_input       namelist,record4         1              4000     -       "TBD"              "TBD"              "TBD"                  
+rconfig   integer   max_ships_input       namelist,record4         1              20000    -       "TBD"              "TBD"              "TBD"                  
+rconfig   integer   max_profiler_input    namelist,record4         1              30000    -       "TBD"              "TBD"              "TBD"                  
+rconfig   integer   max_bogus_input       namelist,record4         1              5000     -       "TBD"              "TBD"              "TBD"                  
+rconfig   integer   max_buoy_input        namelist,record4         1              30000    -       "TBD"              "TBD"              "TBD"                  
+rconfig   integer   max_ssmi_ret_input    namelist,record4         1              30000    -       "TBD"              "TBD"              "TBD"                  
+rconfig   integer   max_ssmi_tb_input     namelist,record4         1              30000    -       "TBD"              "TBD"              "TBD"                  
+rconfig   integer   max_ssmt1_input       namelist,record4         1              30000    -       "TBD"              "TBD"              "TBD"                  
+rconfig   integer   max_ssmt2_input       namelist,record4         1              30000    -       "TBD"              "TBD"              "TBD"                 
+rconfig   integer   max_qscat_input       namelist,record4         1              50000    -       "TBD"              "TBD"              "TBD"                 
+rconfig   integer   max_gpsref_input      namelist,record4         1              800000   -       "TBD"              "TBD"              "TBD"                
+rconfig   integer   report_start          namelist,record4         1              1        -       "TBD"              "TBD"              "TBD"                
+rconfig   integer   report_end            namelist,record4         1              1        -       "TBD"              "TBD"              "TBD"                
+rconfig   logical   print_obs_mapping     namelist,record4         1              .false.  -       "TBD"              "TBD"              "TBD"                  
+
+rconfig   integer   time_window           namelist,record5         1              3.       -       "TBD"              "TBD"              "TBD"                  
+rconfig   logical   print_obs_info        namelist,record5         1              .false.  -       "TBD"              "TBD"              "TBD"                  
+
+rconfig   integer   max_ext_its           namelist,record6         1              1        -       "TBD"              "TBD"              "TBD"                  
+rconfig   real      eps                   namelist,record6         10             0.02     -       "TBD"              "TBD"              "TBD"                  
+rconfig   integer   ntmax                 namelist,record6         1              100      -       "TBD"              "TBD"              "TBD"                 
+rconfig   integer   nsave                 namelist,record6         1              4        -       "TBD"              "TBD"              "TBD"                 
+rconfig   logical   write_switch          namelist,record6         1              .FALSE.  -       "TBD"              "TBD"              "TBD"                
+rconfig   integer   write_interval        namelist,record6         1              5        -       "TBD"              "TBD"              "TBD"                  
+
+rconfig   integer   rf_passes             namelist,record7         1              6        -       "TBD"              "TBD"              "TBD"                  
+rconfig   real      var_scaling1          namelist,record7         1              1.0      -       "TBD"              "TBD"              "TBD"                  
+rconfig   real      var_scaling2          namelist,record7         1              1.0      -       "TBD"              "TBD"              "TBD"                  
+rconfig   real      var_scaling3          namelist,record7         1              1.0      -       "TBD"              "TBD"              "TBD"                 
+rconfig   real      var_scaling4          namelist,record7         1              1.0      -       "TBD"              "TBD"              "TBD"                 
+rconfig   real      var_scaling5          namelist,record7         1              1.0      -       "TBD"              "TBD"              "TBD"                
+rconfig   real      len_scaling1          namelist,record7         1              1.0      -       "TBD"              "TBD"              "TBD"                  
+rconfig   real      len_scaling2          namelist,record7         1              1.0      -       "TBD"              "TBD"              "TBD"                  
+rconfig   real      len_scaling3          namelist,record7         1              1.0      -       "TBD"              "TBD"              "TBD"                  
+rconfig   real      len_scaling4          namelist,record7         1              1.0      -       "TBD"              "TBD"              "TBD"                  
+rconfig   real      len_scaling5          namelist,record7         1              1.0      -       "TBD"              "TBD"              "TBD"                  
+rconfig   real      jb_factor             namelist,record7         1              1.0      -       "TBD"              "TBD"              "TBD"                  
+rconfig   real      je_factor             namelist,record7         1              1.0      -       "TBD"              "TBD"              "TBD"                  
+rconfig   real      power_truncation      namelist,record7         1              1.0      -       "TBD"              "TBD"              "TBD"                  
+
+rconfig   logical   def_sub_domain        namelist,record8         1              .FALSE.  -       "TBD"              "TBD"              "TBD"                       
+rconfig   real      x_start_sub_domain    namelist,record8         1              1.0      -       "TBD"              "TBD"              "TBD"                     
+rconfig   real      y_start_sub_domain    namelist,record8         1              1.0      -       "TBD"              "TBD"              "TBD"                     
+rconfig   real      x_end_sub_domain      namelist,record8         1              1.0e10   -       "TBD"              "TBD"              "TBD"     
+rconfig   real      y_end_sub_domain      namelist,record8         1              1.0e10   -       "TBD"              "TBD"              "TBD"        
+
+rconfig   logical   Testing_wrfvar        namelist,record10        1              .FALSE.  -       "TBD"              "TBD"              "TBD"       
+rconfig   logical   Test_Transforms       namelist,record10        1              .FALSE.  -       "TBD"              "TBD"              "TBD"       
+rconfig   logical   Test_Statistics       namelist,record10        1              .FALSE.  -       "TBD"              "TBD"              "TBD"       
+rconfig   logical   Interpolate_Stats     namelist,record10        1              .TRUE.   -       "TBD"              "TBD"              "TBD"     
+rconfig   logical   testing_dm_exact      namelist,record10        1              .FALSE.  -       "TBD"              "TBD"              "TBD"       
+
+rconfig   integer   cv_options_hum        namelist,record11        1              3            -   "TBD"              "TBD"              "TBD"     
+rconfig   integer   check_rh              namelist,record11        1              1            -   "TBD"              "TBD"              "TBD"     
+rconfig   integer   set_omb_rand_fac      namelist,record11        1              1.0          -   "TBD"              "TBD"              "TBD"     
+rconfig   integer   seed_array1           namelist,record11        1              0            -   "TBD"              "TBD"              "TBD"     
+rconfig   integer   seed_array2           namelist,record11        1              0            -   "TBD"              "TBD"              "TBD"     
+rconfig   integer   sfc_assi_options      namelist,record11        1              1            -   "TBD"              "TBD"              "TBD"     
+rconfig   logical   calculate_cg_cost_fn  namelist,record11        1              .true.       -   "TBD"              "TBD"              "TBD"     
+rconfig   logical   write_outer_loop      namelist,record11        1              .false.      -   "TBD"              "TBD"              "TBD"     
+rconfig   logical   lat_stats_option      namelist,record11        1              .true.       -   "TBD"              "TBD"              "TBD"     
+rconfig   real      as1                   namelist,record11        3              (/0.02,0.5,1.5/) -   "TBD"              "TBD"              "TBD"     
+rconfig   real      as2                   namelist,record11        3              (/0.02,0.5,1.5/) -   "TBD"              "TBD"              "TBD"     
+rconfig   real      as3                   namelist,record11        3              (/0.5,0.5,1.5/)  -   "TBD"              "TBD"              "TBD"     
+rconfig   real      as4                   namelist,record11        3              (/0.5,0.5,1.5/)  -   "TBD"              "TBD"              "TBD"     
+rconfig   real      as5                   namelist,record11        3              (/0.5,0.5,1.5/)  -   "TBD"              "TBD"              "TBD"     
+
+rconfig   integer   balance_type          namelist,record12        1              1            -   "TBD"              "TBD"              "TBD" 
+                                                                                               -   "TBD"              "TBD"              "TBD" 
+rconfig   integer   vert_corr             namelist,record13        1              2            -   "TBD"              "TBD"              "TBD"     
+rconfig   integer   vertical_ip           namelist,record13        1              0            -   "TBD"              "TBD"              "TBD"     
+rconfig   integer   vert_evalue           namelist,record13        1              1            -   "TBD"              "TBD"              "TBD"     
+rconfig   real      max_vert_var1         namelist,record13        1              99.0         -   "TBD"              "TBD"              "TBD"     
+rconfig   real      max_vert_var2         namelist,record13        1              99.0         -   "TBD"              "TBD"              "TBD"     
+rconfig   real      max_vert_var3         namelist,record13        1              99.0         -   "TBD"              "TBD"              "TBD"     
+rconfig   real      max_vert_var4         namelist,record13        1              99.0         -   "TBD"              "TBD"              "TBD" 
+rconfig   real      max_vert_var5         namelist,record13        1              0.0          -   "TBD"              "TBD"              "TBD" 
+
+rconfig   integer   rtminit_print         namelist,record14        1              1            -   "TBD"              "TBD"              "TBD"   
+rconfig   integer   rtminit_nsensor       namelist,record14        1              1            -   "TBD"              "TBD"              "TBD"   
+rconfig   integer   rtminit_platform      namelist,record14        30             -1           -   "TBD"              "TBD"              "TBD"   
+rconfig   integer   rtminit_satid         namelist,record14        30             -1.0         -   "TBD"              "TBD"              "TBD"   
+rconfig   integer   rtminit_sensor        namelist,record14        30             -1.0         -   "TBD"              "TBD"              "TBD"   
+rconfig   logical   lread_biascoef        namelist,record14        1              .false.      -   "TBD"              "TBD"              "TBD"        
+rconfig   logical   lbiascorr             namelist,record14        1              .false.      -   "TBD"              "TBD"              "TBD"        
+rconfig   logical   lrttov_scatt          namelist,record14        1              .false.      -   "TBD"              "TBD"              "TBD"        
+rconfig   logical   lmonitoring           namelist,record14        1              .false.      -   "TBD"              "TBD"              "TBD"       
+rconfig   logical   lwrite_iv             namelist,record14        1              .false.      -   "TBD"              "TBD"              "TBD"        
+rconfig   logical   lwrite_profile        namelist,record14        1              .false.      -   "TBD"              "TBD"              "TBD"       
+
+rconfig   integer   num_pseudo            namelist,pseudo_ob_nl    1              0            -   "TBD"              "TBD"              "TBD"
+rconfig   real      pseudo_x              namelist,pseudo_ob_nl    1              1.0          -   "TBD"              "TBD"              "TBD"   
+rconfig   real      pseudo_y              namelist,pseudo_ob_nl    1              1.0          -   "TBD"              "TBD"              "TBD"   
+rconfig   real      pseudo_z              namelist,pseudo_ob_nl    1              1.0          -   "TBD"              "TBD"              "TBD"  
+rconfig   real      pseudo_val            namelist,pseudo_ob_nl    1              1.0          -   "TBD"              "TBD"              "TBD"     
+rconfig   real      pseudo_err            namelist,pseudo_ob_nl    1              1.0          -   "TBD"              "TBD"              "TBD"     
+rconfig   character pseudo_var            namelist,pseudo_ob_nl    1              "t"          -   "TBD"              "TBD"              "TBD"     
+
+rconfig   integer   ensdim_alpha          namelist,ens_info        1              0            -   "TBD"              "TBD"              "TBD"
+rconfig   integer   alpha_truncation      namelist,ens_info        1              0            -   "TBD"              "TBD"              "TBD"
+rconfig   integer   alpha_corr_type       namelist,ens_info        1              3            -   "TBD"              "TBD"              "TBD"
+rconfig   real      alpha_corr_scale      namelist,ens_info        1              1500.0       -   "TBD"              "TBD"              "km"
+rconfig   real      alpha_std_dev         namelist,ens_info        1              1.0          -   "TBD"              "TBD"              "TBD"
+
 # Single dummy declaration to define a nodyn dyn option
 state integer nodyn_dummy - dyn_nodyn -  -  -  "" "" ""      
 
@@ -1324,7 +1506,7 @@ typedef vp_type real    v2                      ijk      -         1        -   
 typedef vp_type real    v3                      ijk      -         1        -       -
 typedef vp_type real    v4                      ijk      -         1        -       -
 typedef vp_type real    v5                      ijk      -         1        -       -
-typedef vp_type real    alpha                   ije      -         1        -       -
+typedef vp_type real    alpha                   ijm      -         1        -       -
 # END VP_TYPE DEFINITION
 
 # BEGIN EP_TYPE DEFINITION:
@@ -1332,11 +1514,11 @@ typedef vp_type real    alpha                   ije      -         1        -   
 #typedef ep_sub_type character name
 #typedef ep_sub_type integer   nk
 typedef ep_type integer ne
-typedef ep_type real    v1                      ijke     -         1        -       -
-typedef ep_type real    v2                      ijke     -         1        -       -
-typedef ep_type real    v3                      ijke     -         1        -       -
-typedef ep_type real    v4                      ijke     -         1        -       -
-typedef ep_type real    v5                      ijke     -         1        -       -
+typedef ep_type real    v1                      ijkm     -         1        -       -
+typedef ep_type real    v2                      ijkm     -         1        -       -
+typedef ep_type real    v3                      ijkm     -         1        -       -
+typedef ep_type real    v4                      ijkm     -         1        -       -
+typedef ep_type real    v5                      ijkm     -         1        -       -
 # END EP_TYPE DEFINITION
 
 # BEGIN XB_TYPE DEFINITION:
