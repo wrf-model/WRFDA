@@ -36,7 +36,7 @@
 
    !  Definitions of dummy arguments to this routine (generated from Registry).
 # include <em_dummy_decl.inc>
-
+#include <namelist_defines2.inc>
    !  Structure that contains run-time configuration (namelist) data for domain
    TYPE (grid_config_rec_type)              :: config_flags
 

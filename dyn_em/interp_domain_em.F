@@ -16,6 +16,7 @@ SUBROUTINE interp_domain_em_part1 ( grid, ngrid, config_flags ,  &
          USE module_configure
          TYPE(domain), POINTER :: grid , ngrid
 #include <em_dummy_decl.inc>
+#include <namelist_defines2.inc>
 
       INTEGER nlev
       INTEGER i,j,pig,pjg,cm,cn,nig,njg,k
