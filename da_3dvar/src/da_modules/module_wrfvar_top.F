@@ -37,9 +37,7 @@ MODULE module_wrfvar_top
   INTEGER                 :: number_at_same_level
   INTEGER                 :: time_step_begin_restart
 
-  INTEGER :: max_dom , domain_id , fid , oid , idum1 , idum2 , ierr
-  INTEGER :: debug_level
-  LOGICAL :: input_from_file
+  INTEGER :: domain_id , fid , oid , idum1 , idum2 , ierr
 
 #ifdef DM_PARALLEL
   INTEGER                 :: nbytes
@@ -121,10 +119,12 @@ CONTAINS
   CALL initial_config
 #endif
 
-  ! JRB In the long term, trace_use will be defined in namelist.input,
-  ! read above. Until then, initialise it to true here
+  ! Copy namelist variables to DA_Constants
 
-  trace_use = .TRUE.
+#define SOURCE_RECORD model_config_rec%
+#define DEST_RECORD
+
+#include <config_assigns.inc>
 
   IF (trace_use) CALL da_trace_init
   IF (trace_use) CALL da_trace_entry("wrfvar_init")
@@ -141,8 +141,9 @@ CONTAINS
 ! 
 !</DESCRIPTION>
 
-  CALL nl_get_debug_level ( 1, debug_level )
-  CALL set_wrf_debug_level ( debug_level )
+  ! JRB This is the way we will use namelist variables once module_namelists goes
+  ! CALL nl_get_debug_level ( 1, debug_level )
+  ! CALL set_wrf_debug_level ( debug_level )
 
   ! allocated and configure the mother domain
 
@@ -157,7 +158,8 @@ CONTAINS
 ! run option or we are on an acceptable machine.
 !</DESCRIPTION>
 
-  CALL nl_get_max_dom( 1, max_dom )
+  ! JRB This is the way we will use namelist variables once module_namelists goes
+  ! CALL nl_get_max_dom( 1, max_dom )
   IF ( max_dom > 1 ) THEN
 #if ( ! defined(DM_PARALLEL)  &&   ! defined(STUBMPI) )
     CALL wrf_error_fatal3(__FILE__,__LINE__, &
