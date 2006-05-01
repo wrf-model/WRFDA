@@ -25,8 +25,7 @@ PROGRAM netcdf2kma
    TYPE (domain) , POINTER :: keep_grid, grid_ptr, null_domain
    TYPE (grid_config_rec_type)              :: config_flags
 
-   INTEGER :: max_dom , domain_id , fid , oid , idum1 , idum2 , ierr
-   INTEGER :: debug_level
+   INTEGER :: domain_id , fid , oid , idum1 , idum2 , ierr
 
 #ifdef DM_PARALLEL
    INTEGER                 :: nbytes

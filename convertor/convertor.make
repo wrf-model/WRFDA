@@ -5,7 +5,10 @@ CONVERTOR_OBJS	=	module_kma2netcdf_interface.o \
 
 CONVERTOR_MODULES =	module_kma_wave2grid.o \
 		module_wave2grid_kma.o \
-                module_wrf_3dvar_io.o
+                module_wrf_3dvar_io.o \
+                da_tracing.o \
+                da_memory.o \
+                par_util1.o
 
 module_kma_wave2grid.o: \
 		kma_wave2grid/BSSLZ1.inc \

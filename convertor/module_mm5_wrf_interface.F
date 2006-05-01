@@ -55,13 +55,21 @@ SUBROUTINE mm5_wrf_interface(grid, config_flags)
    write (6, '(/,A,/)') ' *** MM5 TO WRF CONVERTOR ***'
 
 !------------------------------------------------------------------------------
-!  Read WRFVAR namelist:
+!  Read namelist.input
 !------------------------------------------------------------------------------
 
-   CALL DA_Read_Namelist
+CALL initial_config
+
+! Copy namelist variables to DA_Constants
+
+#define SOURCE_RECORD model_config_rec%
+#define DEST_RECORD
+
+#include <config_assigns.inc>
+
 
 !------------------------------------------------------------------------------
-!  Initialise 3D-Var parameters:
+!  Initialise wrfvar parameters:
 !------------------------------------------------------------------------------
 
    call da_init_wrfvar(grid, &
