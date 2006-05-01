@@ -1,11 +1,11 @@
-subroutine da_truncate_spectra( max_wave, nw, power_truncation, power, &
+subroutine da_truncate_spectra( max_wave, nw, power_trunc, power, &
    max_wave_trunc )
 
    implicit none
 
    integer, intent(in)  :: max_wave         ! Smallest wave for domain.
    integer, intent(in)  :: nw               ! Dimension of input power spectrum.
-   real, intent(in)     :: power_truncation ! Power truncation (fraction).
+   real, intent(in)     :: power_trunc      ! Power truncation (fraction).
    real, intent(in)     :: power(0:nw)      ! Power spectrum.
    integer, intent(out) :: max_wave_trunc   ! Smallest wave after truncation.
 
@@ -13,7 +13,7 @@ subroutine da_truncate_spectra( max_wave, nw, power_truncation, power, &
    real                 :: truncated_power  ! Truncated power.
    real                 :: cumul_power      ! Cumulative power.
 
-   truncated_power = power_truncation * sum(power(0:nw))
+   truncated_power = power_trunc * sum(power(0:nw))
 
    cumul_power = 0.0
    max_wave_trunc = max_wave

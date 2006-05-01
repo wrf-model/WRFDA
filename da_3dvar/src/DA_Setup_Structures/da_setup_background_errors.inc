@@ -18,6 +18,8 @@ subroutine da_setup_background_errors( xb, xbx, be, xp, &
 
    IF (trace_use) CALL da_trace_entry("da_setup_background_errors")
 
+   be % ne = ensdim_alpha                          ! Size of ensemble.
+
    if ( global ) then
       call da_setup_be_global( ide, jde, kde, be )
    else

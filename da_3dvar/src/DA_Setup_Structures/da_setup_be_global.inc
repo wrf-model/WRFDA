@@ -185,8 +185,6 @@ subroutine da_setup_be_global( ide, jde, kde, be  )
 
    be % v1 % max_wave = maxval(max_wave(1:nk))
    write(UNIT=stdout,FMT='(/4x,3a,i6)')'Horizontal truncation for ', be % v1 % name, ' = ', be % v1 % max_wave
-   allocate( be % v1 % power(0:be % v1 % max_wave,1:nk))
-   be % v1 % power(0:be % v1 % max_wave,1:nk) = power2d(0:be % v1 % max_wave,1:nk)
    be % v1 % power(0,1:nk) = len_scaling1 * be % v1 % power(0,1:nk) 
 
    do k = 1, nk
@@ -281,8 +279,6 @@ subroutine da_setup_be_global( ide, jde, kde, be  )
 !--------------------------------------------------------------
 !  [6] Set up alpha (flow-dependent) control variable "errors": 
 !--------------------------------------------------------------
-
-   be % ne = ensdim_alpha                          ! Size of ensemble.
 
    if ( be % ne > 0 ) then
       be % alpha % mz = be % ne
