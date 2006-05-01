@@ -19,7 +19,7 @@ gen_be : 	gen_be_stage0_wrf	\
 		gen_be_diags_read
 
 GEN_BE_OBJS = $(DA_SRC)/da_gen_be.o $(DA_SRC)/DA_Constants.o $(DA_SRC)/be_spectral.o \
-  $(DA_SRC)/LAPACK.o $(DA_SRC)/BLAS.o ../frame/module_wrf_error.o \
+  $(DA_SRC)/LAPACK.o $(DA_SRC)/BLAS.o ../frame/module_wrf_error.o ../frame/module_driver_constants.o \
   $(DA_SRC)/da_fftpack5.o $(DA_SRC)/da_tracing.o $(DA_SRC)/da_memory.o
 
 include ../configure.wrf

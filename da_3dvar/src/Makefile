@@ -1048,9 +1048,10 @@ DA_Constants.o:		DA_Constants/DA_Constants.F \
 			DA_Constants/da_advance_cymdh.inc \
 			DA_Constants/da_change_date.inc \
 			DA_Constants/DA_Find_FFT_Factors.inc \
-			DA_Constants/DA_Find_FFT_Trig_Funcs.inc
+			DA_Constants/DA_Find_FFT_Trig_Funcs.inc \
+                        ../../frame/module_driver_constants.o 
 			$(RM) $@
-			$(CPP) -I./DA_Constants $(CPPFLAGS_WRFVAR) DA_Constants/DA_Constants.F > DA_Constants.f
+			$(CPP) -I./DA_Constants -I../../inc $(CPPFLAGS_WRFVAR) DA_Constants/DA_Constants.F > DA_Constants.f
 			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) DA_Constants.f
 
 LAPACK.o:		\
