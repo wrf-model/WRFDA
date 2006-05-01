@@ -1,22 +1,22 @@
-subroutine da_legtra ( nj, max_wavenumber, alp_size, m, int_wgts, alp, r_leg, v )
+subroutine da_legtra ( nj, max_wavenumber, alp_size, m, int_wgts, alp, r_leg, v)
 
    implicit none
 
-   integer, intent(in)  :: nj                         ! Number of latitudes.
-   integer, intent(in)  :: max_wavenumber             ! Maximum wavenumber.
-   integer, intent(in)  :: alp_size                   ! Dimension of ALPs.
-   integer, intent(in)  :: m                          ! Zonal wavenumber.
-   real, intent(in)     :: int_wgts(1:nj)             ! Integration weights.
-   real, intent(in)     :: alp(1:alp_size)            ! Associated Legendre Polynomials.
-   complex, intent(in)  :: r_leg(1:nj)                ! Field to transform.
-   complex, intent(out) :: v(m:max_wavenumber)        ! Output spectral coefficient.
+   integer, intent(in)  :: nj                      ! Number of latitudes.
+   integer, intent(in)  :: max_wavenumber          ! Maximum wavenumber.
+   integer, intent(in)  :: alp_size                ! Dimension of ALPs.
+   integer, intent(in)  :: m                       ! Zonal wavenumber.
+   real,    intent(in)  :: int_wgts(1:nj)          ! Integration weights.
+   real,    intent(in)  :: alp(1:alp_size)         ! Associated Legendre Polynomials.
+   complex, intent(in)  :: r_leg(1:nj)             ! Field to transform.
+   complex, intent(out) :: v(m:max_wavenumber)     ! Output spectral coefficient.
 
-   integer              :: l, j, j1                   ! Loop counters.
-   integer              :: index_m, index_j, index    ! Markers.
-   integer              :: sign_switch                ! Defined to make use of symmetry of ALPs.
-   real                 :: eq_coeff                   ! 1 if equator point, 0 otherwise.
-   complex              :: sum_legtra                 ! Summation scalar.
-   complex              :: eq_term                    ! Summation scalar.
+   integer              :: l, j, j1                ! Loop counters.
+   integer              :: index_m, index_j, index ! Markers.
+   integer              :: sign_switch             ! make use of symmetry of ALPs.
+   real                 :: eq_coeff                ! 1 if equator point, 0 otherwise.
+   complex              :: sum_legtra              ! Summation scalar.
+   complex              :: eq_term                 ! Summation scalar.
 
    index_m = m * ( max_wavenumber + 1 - m ) + m * ( m + 1 ) / 2 + 1 - m
 
@@ -36,21 +36,22 @@ subroutine da_legtra ( nj, max_wavenumber, alp_size, m, int_wgts, alp, r_leg, v 
          index_j = ( j - 1 ) * ( max_wavenumber + 1 ) * ( max_wavenumber + 2 ) / 2
          index = index_j + index_m + l
 
-!        Sum first quadrant:
+         ! Sum first quadrant:
          sum_legtra = sum_legtra + int_wgts(j) * r_leg(j) * alp(index)
 
-!        Add second quadrant (use symmetry ALP(-mu)=(-1)^{n+|m|}ALP(mu)):
+         ! Add second quadrant (use symmetry ALP(-mu)=(-1)^{n+|m|}ALP(mu)):
          j1 = nj + 1 - j
-         sum_legtra = sum_legtra + sign_switch * int_wgts(j1) * r_leg(j1) * alp(index)
+         sum_legtra = sum_legtra + sign_switch * int_wgts(j1) * r_leg(j1) * &
+            alp(index)
       end do
      
      if( eq_coeff > 0.0) then
-!     Skip this step for Even lats    ! Syed RH Rizvi
-!     Add equator term (wrong if even nj, but then eq_coeff = 0.0 so OK):
-      j = nj/2 + 1
-      index_j = ( j - 1 ) * ( max_wavenumber + 1 ) * ( max_wavenumber + 2 ) / 2
-      index = index_j + index_m + l
-      eq_term = int_wgts(j) * r_leg(j) * alp(index)
+         ! Skip this step for Even lats    ! Syed RH Rizvi
+         ! Add equator term (wrong if even nj, but then eq_coeff = 0.0 so OK):
+         j = nj/2 + 1
+         index_j = ( j - 1 ) * ( max_wavenumber + 1 ) * (max_wavenumber+2) / 2
+         index = index_j + index_m + l
+         eq_term = int_wgts(j) * r_leg(j) * alp(index)
       end if
 
       v(l) = 0.5 * ( sum_legtra + eq_coeff * eq_term )

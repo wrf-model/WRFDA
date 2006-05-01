@@ -1,20 +1,21 @@
-subroutine da_legtra_inv( jds, jde, jts, jte, max_wavenumber, alp_size, m, alp, v, r_leg )
+subroutine da_legtra_inv( jds, jde, jts, jte, max_wavenumber, alp_size, m, &
+   alp, v, r_leg )
 
    implicit none
 
-   integer, intent(in)  :: jds, jde                   ! Number of latitudes.
-   integer, intent(in)  :: jts, jte                   ! Number of latitudes.
-   integer, intent(in)  :: max_wavenumber             ! Maximum wavenumber.
-   integer, intent(in)  :: alp_size                   ! Dimension of ALPs.
-   integer, intent(in)  :: m                          ! Zonal wavenumber.
-   real, intent(in)     :: alp(1:alp_size)            ! Associated Legendre Polynomials.
+   integer, intent(in)  :: jds, jde            ! Number of latitudes.
+   integer, intent(in)  :: jts, jte            ! Number of latitudes.
+   integer, intent(in)  :: max_wavenumber      ! Maximum wavenumber.
+   integer, intent(in)  :: alp_size            ! Dimension of ALPs.
+   integer, intent(in)  :: m                   ! Zonal wavenumber.
+   real,    intent(in)  :: alp(1:alp_size)     ! Associated Legendre Polynomials
 
-   complex, intent(in)  :: v(m:max_wavenumber)        ! Output spectral coefficient.
-   complex, intent(out) :: r_leg(jts:jte)                ! Field to transform.
+   complex, intent(in)  :: v(m:max_wavenumber) ! Output spectral coefficient.
+   complex, intent(out) :: r_leg(jts:jte)         ! Field to transform.
 
-   integer              :: l, j, js, je               ! Loop counters.
+   integer              :: l, j, js, je        ! Loop counters.
    integer              :: index_m, index_j
-   complex              :: sum_legtra                 ! Summation scalars.
+   complex              :: sum_legtra          ! Summation scalars.
 
    integer              :: jc, iequator
 
@@ -31,7 +32,7 @@ subroutine da_legtra_inv( jds, jde, jts, jte, max_wavenumber, alp_size, m, alp, 
 
       sum_legtra = ( 0.0, 0.0 )
       do l = m, max_wavenumber
-!--------Calculate first quadrant values:
+         ! Calculate first quadrant values:
          sum_legtra = sum_legtra + v(l) * alp(index_j + index_m + l)
       end do
       r_leg(j) = sum_legtra
@@ -44,7 +45,7 @@ subroutine da_legtra_inv( jds, jde, jts, jte, max_wavenumber, alp_size, m, alp, 
 
       sum_legtra = ( 0.0, 0.0 )
       do l = m, max_wavenumber
-!        Calculate second quadrant values:
+         ! Calculate second quadrant values:
          if(mod(l+m,2) == 1) then
             sum_legtra = sum_legtra - v(l) * alp(index_j + index_m + l)
          else

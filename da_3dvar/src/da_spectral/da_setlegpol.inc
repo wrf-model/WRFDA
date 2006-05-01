@@ -2,11 +2,11 @@ subroutine da_setlegpol( nj, max_wavenumber, alp_size, sinlat, coslat, alp )
 
    implicit none
 
-!  Method:
-!  Uses ECMWF recursion relation as opposed to Num Rec. one which can only go
-!  to m about 12 with single precision). However, still use NumRec one for
-!  m = 0 and 1 as ECMWF one requires m-2 for asslegpol of order m.
-!  Reference: Jarraud and Simmons (1990) and Belousov (1962).
+   !  Method:
+   !  Uses ECMWF recursion relation as opposed to Num Rec. one which can only go
+   !  to m about 12 with single precision). However, still use NumRec one for
+   !  m = 0 and 1 as ECMWF one requires m-2 for asslegpol of order m.
+   !  Reference: Jarraud and Simmons (1990) and Belousov (1962).
 
    integer, intent(in)  :: nj                         ! Latitude dimension.
    integer, intent(in)  :: max_wavenumber             ! Maximum zonal wavenumber.
@@ -28,12 +28,12 @@ subroutine da_setlegpol( nj, max_wavenumber, alp_size, sinlat, coslat, alp )
 
    alp(:) = 0.0
 
-!  Compute Associated Legendre polynomials for latitude range:
+   ! Compute Associated Legendre polynomials for latitude range:
 
    do j = 1, ( nj + 1 ) / 2
       index_j = ( j - 1 ) * ( max_wavenumber + 1 ) * ( max_wavenumber + 2 ) / 2
 
-!     Use Num. Rec. recursion relation for m = 0, 1:
+      ! Use Num. Rec. recursion relation for m = 0, 1:
 
       do m = 0, 1
          index_m = m * ( max_wavenumber + 1 - m ) + m * ( m + 1 ) / 2 + 1 - m
@@ -41,8 +41,8 @@ subroutine da_setlegpol( nj, max_wavenumber, alp_size, sinlat, coslat, alp )
             index = index_m + index_j + l
             call da_asslegpol( l, m, sinlat(j), coslat(j), alp(index) )
 
-!           Multiply by normalization constant 
-!           (to ensure 1/2 integral^1_-1 Pml Pml1 = 1 if l = l1):
+            ! Multiply by normalization constant 
+            ! (to ensure 1/2 integral^1_-1 Pml Pml1 = 1 if l = l1):
 
             s = 1.0
             do mm = l-m+1, l+m
@@ -53,19 +53,19 @@ subroutine da_setlegpol( nj, max_wavenumber, alp_size, sinlat, coslat, alp )
       end do
    end do
 
-!  Jarraud recursion relation coefficients:
+   ! Jarraud recursion relation coefficients:
 
    do m = 2, max_wavenumber
       do l = m, max_wavenumber
-            c(l,m) = SQRT ( (REAL(2*l+1)/REAL(2*l-3)) * (REAL(l+m-1)/REAL(l+m)) * &
-                     (REAL(l+m-3)/REAL(l+m-2)) )
-            d(l,m) = SQRT ( (REAL(2*l+1)/real(2*l-1)) * (REAL(l+m-1)/REAL(l+m)) * &
-                     (real(l-m+1)/REAL(l+m-2)) )
-            e(l,m) = SQRT ( (REAL(2*l+1)/REAL(2*l-1)) * (REAL(l-m)  /REAL(l+m)))
+         c(l,m) = SQRT ( (REAL(2*l+1)/REAL(2*l-3)) * (REAL(l+m-1)/REAL(l+m)) * &
+                  (REAL(l+m-3)/REAL(l+m-2)) )
+         d(l,m) = SQRT ( (REAL(2*l+1)/real(2*l-1)) * (REAL(l+m-1)/REAL(l+m)) * &
+                  (real(l-m+1)/REAL(l+m-2)) )
+         e(l,m) = SQRT ( (REAL(2*l+1)/REAL(2*l-1)) * (REAL(l-m)  /REAL(l+m)))
       end do
    end do
 
-!  Use Jarraud recursion relation for m>=2:
+   ! Use Jarraud recursion relation for m>=2:
 
    do j = 1, ( nj + 1 ) / 2
       index_j = ( j - 1 ) * ( max_wavenumber + 1 ) * ( max_wavenumber + 2 ) / 2
@@ -73,7 +73,7 @@ subroutine da_setlegpol( nj, max_wavenumber, alp_size, sinlat, coslat, alp )
       do m = 2, max_wavenumber
          index_m = m * ( max_wavenumber + 1 - m ) + m * ( m + 1 ) / 2 + 1 - m
          m2 = m - 2
-         index_m2 = m2 * ( max_wavenumber + 1 - m2 ) + m2 * ( m2 + 1 ) / 2 + 1 - m2
+         index_m2 = m2 * ( max_wavenumber + 1 - m2 ) + m2 * (m2+1) / 2 + 1 - m2
 
          do l = m, max_wavenumber
             l1 = l - 1
@@ -83,8 +83,8 @@ subroutine da_setlegpol( nj, max_wavenumber, alp_size, sinlat, coslat, alp )
             index_l1m2 = index_j + index_m2 + l1
             index_l1m  = index_j + index_m  + l1
 
-            alp(index) = c(l,m) * alp(index_l2m2) - d(l,m) *  sinlat(j) * alp(index_l1m2) + &
-                         e(l,m) * sinlat(j) * alp(index_l1m)
+            alp(index) = c(l,m) * alp(index_l2m2) - d(l,m) *  sinlat(j) * &
+               alp(index_l1m2) + e(l,m) * sinlat(j) * alp(index_l1m)
          end do
       end do
    end do

@@ -3,11 +3,11 @@ subroutine da_get_reglats( nj, pi, lat, sinlat, coslat, int_wgts )
    implicit none
 
    integer, intent(in)    :: nj             ! Number of latitudes
-   real, intent(in)       :: pi             ! pi
-   real, intent(out)      :: lat(1:nj)      ! Latitude (radians, from south).
-   real, intent(out)      :: sinlat(1:nj)   ! sin(Latitude).
-   real, intent(out)      :: coslat(1:nj)   ! cos(Latitude).
-   real, intent(out)      :: int_wgts(1:nj) ! Legendre Integration weights. 
+   real,    intent(in)    :: pi             ! pi
+   real,    intent(out)   :: lat(1:nj)      ! Latitude (radians, from south).
+   real,    intent(out)   :: sinlat(1:nj)   ! sin(Latitude).
+   real,    intent(out)   :: coslat(1:nj)   ! cos(Latitude).
+   real,    intent(out)   :: int_wgts(1:nj) ! Legendre Integration weights. 
 
    integer                :: j              ! Loop counter.
    real                   :: delta_phi      ! Regular latitude interval.
@@ -20,7 +20,7 @@ subroutine da_get_reglats( nj, pi, lat, sinlat, coslat, int_wgts )
       coslat(j) = cos(lat(j))
       int_wgts(j) = coslat(j) * delta_phi
 
-!     Use symmetry for northern hemisphere:
+      ! Use symmetry for northern hemisphere:
       lat(nj+1-j) = -lat(j)
       sinlat(nj+1-j) = -sinlat(j)
       coslat(nj+1-j) = coslat(j)

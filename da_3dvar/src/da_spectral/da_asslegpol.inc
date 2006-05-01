@@ -4,9 +4,9 @@ subroutine da_asslegpol( l, m, sinlat, coslat, alp )
 
    integer, intent(in)            :: l       ! Legendre wavenumber.
    integer, intent(in)            :: m       ! Fourier wavenumber.
-   real, intent(in)               :: sinlat  ! sin(latitude).
-   real, intent(in)               :: coslat  ! cos(latitude).
-   real, intent(out)              :: alp     ! Associated Legendre Polynomial.
+   real,    intent(in)            :: sinlat  ! sin(latitude).
+   real,    intent(in)            :: coslat  ! cos(latitude).
+   real,    intent(out)           :: alp     ! Associated Legendre Polynomial.
 
    integer                        :: mm, i, loop
    real                           :: half_co
@@ -14,7 +14,7 @@ subroutine da_asslegpol( l, m, sinlat, coslat, alp )
 
    half_co = 0.5 * coslat
 
-!  Calculate ALP:
+   ! Calculate ALP:
 
    if ( l < m ) then
       alp = 0.0
@@ -34,7 +34,8 @@ subroutine da_asslegpol( l, m, sinlat, coslat, alp )
             do loop = m+2,l
                alp2 = alp1
                alp1 = alp
-               alp = (REAL(2*loop-1) * sinlat * alp1 - real(loop-1+m) * alp2) / real(loop-m)
+               alp = (REAL(2*loop-1) * sinlat * alp1 - real(loop-1+m) * alp2) &
+                  / real(loop-m)
             end do
          end if
       end if
