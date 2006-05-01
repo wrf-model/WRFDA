@@ -20,8 +20,7 @@ MODULES =       module_driver_constants.o  \
                 module_io.o                \
                 module_dm.o                \
                 module_quilt_outbuf_ops.o  \
-                module_io_quilt.o          \
-                module_namelists.o
+                module_io_quilt.o
 
 OBJS    =       wrf_num_bytes_between.o    \
                 wrf_shutdown.o             \
@@ -48,7 +47,7 @@ clean:
 	@ echo 'use the clean script'
 
 module_state_description.F : ../Registry/$(REGISTRY)
-		( cd .. ; tools/registry $(ARCHFLAGS) Registry/$(REGISTRY) )
+		( cd .. ; tools/registry $(REGFLAGS) Registry/$(REGISTRY) )
 
 md_calls.inc : md_calls.m4
 	$(M4) md_calls.m4 > md_calls.inc
@@ -99,8 +98,6 @@ module_io_quilt.o: module_state_description.o \
 		module_quilt_outbuf_ops.o 
 
 module_machine.o: module_driver_constants.o
-
-module_namelists.o: module_driver_constants.o
 
 module_nesting.o: module_machine.o \
 		module_driver_constants.o \

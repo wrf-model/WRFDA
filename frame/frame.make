@@ -14,8 +14,7 @@ FRAME_MODULES =       module_driver_constants.o  \
                 module_io.o                \
                 module_dm.o                \
                 module_quilt_outbuf_ops.o  \
-                module_io_quilt.o          \
-                module_namelists.o
+                module_io_quilt.o
 
 FRAME_OBJS    =       wrf_num_bytes_between.o    \
                 wrf_shutdown.o             \
@@ -29,7 +28,7 @@ wrf_num_bytes_between.o :
 	$(CC) -c $(CCFLAGS) wrf_num_bytes_between.c
 
 module_state_description.F : registry ../Registry/$(REGISTRY)
-	./registry $(ARCHFLAGS) ../Registry/$(REGISTRY)
+	./registry $(REGFLAGS) ../Registry/$(REGISTRY)
 	$(LN) inc/*.inc .
 	$(LN) frame/module_state_description.F .
 
@@ -89,8 +88,6 @@ module_io_quilt.o: module_state_description.o \
                 pack_utils.o
 
 module_machine.o: module_driver_constants.o
-
-module_namelists.o: module_driver_constants.o
 
 module_nesting.o: module_machine.o \
 		module_driver_constants.o \
