@@ -972,7 +972,6 @@ CONTAINS
 #include "DA_1D_EigenDecomposition.inc"
 #include "DA_Obs_Sfc_correction.inc"
 #include "DA_Diff_Seconds.inc"
-#include "DA_Read_Namelist.inc"
 #include "da_global_ll_to_xy.inc"
 #include "DA_ll_to_xy.inc"
 #include "Residual.inc"
