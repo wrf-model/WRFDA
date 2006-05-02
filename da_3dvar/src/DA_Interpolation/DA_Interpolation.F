@@ -1,8 +1,8 @@
-MODULE DA_Interpolation
+MODULE da_interpolation
 
-   USE DA_Constants
-   USE DA_Define_Structures
-   USE DA_Tools
+   USE da_constants
+   USE da_define_structures
+   USE da_tools
 
    IMPLICIT NONE
 
@@ -17,5 +17,5 @@ CONTAINS
 #include "Interp_lin_3D.inc"
 #include "Interp_lin_3D_adj.inc"
 
-END MODULE DA_Interpolation
+END MODULE da_interpolation
 
