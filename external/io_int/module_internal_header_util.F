@@ -116,8 +116,8 @@ SUBROUTINE int_gen_write_field_header ( hdrbuf, hdrbufsize, itypesize, ftypesize
 !  DataHandle:  Descriptor for an open data set.  
 !  DomainDesc:  Additional argument that may be used by some packages as a 
 !               package-specific domain descriptor.  
-!  Other items are described in detail in the "WRF I/O and Model Coupling API 
-!  Specification".  
+!  Other items are described in detail in the WRF I/O and Model Coupling API 
+!  Specification.  
 !
 !</PRE>
 !</DESCRIPTION>
@@ -275,8 +275,8 @@ SUBROUTINE int_gen_ofr_header( hdrbuf, hdrbufsize, itypesize, &
 !  FileName:    File name.  
 !  SysDepInfo:  System dependent information used for optional additional 
 !               I/O control information.  
-!  Other items are described in detail in the "WRF I/O and Model Coupling API 
-!  Specification".  
+!  Other items are described in detail in the WRF I/O and Model Coupling API 
+!  Specification.  
 !
 !</PRE>
 !</DESCRIPTION>
@@ -363,8 +363,8 @@ SUBROUTINE int_gen_ofwb_header( hdrbuf, hdrbufsize, itypesize, &
 !  FileName:    File name.  
 !  SysDepInfo:  System dependent information used for optional additional 
 !               I/O control information.  
-!  Other items are described in detail in the "WRF I/O and Model Coupling API 
-!  Specification".  
+!  Other items are described in detail in the WRF I/O and Model Coupling API 
+!  Specification.  
 !
 !</PRE>
 !</DESCRIPTION>
@@ -536,8 +536,8 @@ SUBROUTINE int_gen_ti_header_integer( hdrbuf, hdrbufsize, itypesize, typesize, &
 !  Count:       Number of elements in Data.  
 !  Data:        Data to write to file.  
 !  Element:     Name of the data.  
-!  Other items are described in detail in the "WRF I/O and Model Coupling API 
-!  Specification".  
+!  Other items are described in detail in the WRF I/O and Model Coupling API 
+!  Specification.  
 !
 !</PRE>
 !</DESCRIPTION>
@@ -680,8 +680,8 @@ SUBROUTINE int_gen_ti_header_char( hdrbuf, hdrbufsize, itypesize, &
 !  Data:        Data to write to file.  
 !  VarName:     Variable name.  Used for *_<get|put>_var_ti_char but not for 
 !               *_<get|put>_dom_ti_char.  
-!  Other items are described in detail in the "WRF I/O and Model Coupling API 
-!  Specification".  
+!  Other items are described in detail in the WRF I/O and Model Coupling API 
+!  Specification.  
 !
 !</PRE>
 !</DESCRIPTION>
@@ -770,8 +770,8 @@ SUBROUTINE int_gen_td_header_char( hdrbuf, hdrbufsize, itypesize, &
 !  typesize:    1 (size in bytes of a single CHARACTER).  
 !  Element:     Name of the data.  
 !  Data:        Data to write to file.  
-!  Other items are described in detail in the "WRF I/O and Model Coupling API 
-!  Specification".  
+!  Other items are described in detail in the WRF I/O and Model Coupling API 
+!  Specification.  
 !
 !</PRE>
 !</DESCRIPTION>
@@ -856,8 +856,8 @@ SUBROUTINE int_gen_td_header_integer( hdrbuf, hdrbufsize, itypesize, typesize, &
 !  Element:     Name of the data.  
 !  Count:       Number of elements in Data.  
 !  Data:        Data to write to file.  
-!  Other items are described in detail in the "WRF I/O and Model Coupling API 
-!  Specification".  
+!  Other items are described in detail in the WRF I/O and Model Coupling API 
+!  Specification.  
 !
 !</PRE>
 !</DESCRIPTION>
