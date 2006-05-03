@@ -58,8 +58,6 @@ gen_be_diags : gen_be_diags.o
 gen_be_diags_read : gen_be_diags_read.o
 	$(LD) -o gen_be_diags_read.exe $(LDFLAGS) $(GEN_BE_OBJS) gen_be_diags_read.o  $(EXTRA_LIBS)
 
-
-
 gen_be_stage0_wrf.o: $(GEN_BE_OBJS)
 	$(RM) $@
 	$(FC) -c $(FCFLAGS) -I${NETCDF}/include gen_be_stage0_wrf.F

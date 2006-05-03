@@ -3,8 +3,6 @@
 
 #set echo
 
-setenv WRFVAR_DIR ${HOME}/code_development/WRF_V2.1.2/tmp/wrfvar
-
 if ( ! $?START_DATE )    setenv START_DATE    2003010200 # Starting time of period.
 if ( ! $?END_DATE )      setenv END_DATE      2003012812 # Ending time of period.
 if ( ! $?INTERVAL )      setenv INTERVAL      12         # Period between files (hours).
@@ -19,15 +17,17 @@ if ( ! $?HGT_MAX )       setenv HGT_MAX       20000.0    # Used if BIN_TYPE = 2.
 if ( ! $?BINWIDTH_HGT )  setenv BINWIDTH_HGT  1000.0     # Used if BIN_TYPE = 2.
 if ( ! $?VARIABLE1 )     setenv VARIABLE1     ps_u       # Experiment ID
 if ( ! $?VARIABLE2 )     setenv VARIABLE2     ps         # Experiment ID (normalizing field)
-if ( ! $?EXPT )          setenv EXPT 2004-03.T63         # Experiment ID
 
-if ( ! $?ID )            setenv ID ${BE_METHOD}.bin_type${BIN_TYPE}
-if ( ! $?SRC_DIR )       setenv SRC_DIR ${HOME}/code_development/WRF_V2.1.2
-if ( ! $?WRFVAR_DIR )    setenv WRFVAR_DIR ${SRC_DIR}/wrfvar
+if ( ! $?EXPT )          setenv EXPT noobs
+if ( ! $?ID )            setenv ID gen_be
+if ( ! $?RELEASE )       setenv RELEASE WRF_V2.1.2
+if ( ! $?REL_DIR )       setenv REL_DIR ${HOME}/code_development/${RELEASE}
+if ( ! $?GEN_BE_DIR )    setenv GEN_BE_DIR ${REL_DIR}/wrfvar
+if ( ! $?BUILD_DIR )     setenv BUILD_DIR ${GEN_BE_DIR}/gen_be
 if ( ! $?DATA_DISK )     setenv DATA_DISK /ocotillo1
 if ( ! $?DOMAIN )        setenv DOMAIN con200
-if ( ! $?DAT_DIR )       setenv DAT_DIR ${DATA_DISK}/${user}/data/${DOMAIN}/noobs
-if ( ! $?RUN_DIR )       setenv RUN_DIR ${DAT_DIR}/gen_be
+if ( ! $?DAT_DIR )       setenv DAT_DIR ${DATA_DISK}/${user}/data/${DOMAIN}/${EXPT}
+if ( ! $?RUN_DIR )       setenv RUN_DIR ${DAT_DIR}/$ID
 
 cd ${RUN_DIR}
 
@@ -35,7 +35,7 @@ echo "---------------------------------------------------------------"
 echo "Run gen_be_cov2d."
 echo "---------------------------------------------------------------"
 
-ln -sf ${WRFVAR_DIR}/gen_be/gen_be_cov2d.exe .
+ln -sf ${BUILD_DIR}/gen_be_cov2d.exe .
 
 cat >! gen_be_cov2d_nl.nl << EOF
   &gen_be_cov2d_nl
@@ -58,6 +58,5 @@ cat >! gen_be_cov2d_nl.nl << EOF
 EOF
 
 ./gen_be_cov2d.exe
-#   rm -rf gen_be_stage1.exe
 
 exit(0)

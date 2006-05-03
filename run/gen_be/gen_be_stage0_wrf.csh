@@ -17,13 +17,6 @@
 # Don't change anything below this line.
 #-----------------------------------------------------------------------------------
 
- echo "---------------------------------------------------------------"
- echo "Run Stage 0: Calculate ensemble perturbations from WRF forecasts"
- echo "---------------------------------------------------------------"
-
- set BEGIN_CPU = `date`
- echo "Beginning CPU time: ${BEGIN_CPU}"
-
 #Define environment variables:
  if ( ! $?START_DATE )    setenv START_DATE    2003010200 # Time of first perturbation.
  if ( ! $?END_DATE )      setenv END_DATE      2003012812 # Time of last perturbation.
@@ -32,14 +25,16 @@
  if ( ! $?BE_METHOD )     setenv BE_METHOD     NMC        # NMC-method or Ensemble-Method
  if ( ! $?NE )            setenv NE 1                     # Number of ensemble members (for ENS).
 
+ if ( ! $?EXPT )          setenv EXPT         noobs
+ if ( ! $?ID )            setenv ID           gen_be
  if ( ! $?SRC_DIR )       setenv SRC_DIR      ${HOME}/code_development/WRF_V2.1.2
  if ( ! $?WRFVAR_DIR )    setenv WRFVAR_DIR   ${SRC_DIR}/wrfvar
  if ( ! $?BUILD_DIR )     setenv BUILD_DIR    ${WRFVAR_DIR}/gen_be
  if ( ! $?BIN_DIR )       setenv BIN_DIR      ${WRFVAR_DIR}/tools
  if ( ! $?DATA_DISK )     setenv DATA_DISK    /ocotillo1
  if ( ! $?DOMAIN )        setenv DOMAIN       con200      # Application name.
- if ( ! $?DAT_DIR )       setenv DAT_DIR      ${DATA_DISK}/${USER}/data/${DOMAIN}/noobs
- if ( ! $?RUN_DIR )       setenv RUN_DIR      ${DAT_DIR}/gen_be
+ if ( ! $?DAT_DIR )       setenv DAT_DIR      ${DATA_DISK}/${USER}/data/${DOMAIN}/${EXPT}
+ if ( ! $?RUN_DIR )       setenv RUN_DIR      ${DAT_DIR}/$ID
  if ( ! $?STAGE0_DIR )    setenv STAGE0_DIR   ${RUN_DIR}/stage0
 
  if ( ! -d ${RUN_DIR} )   mkdir ${RUN_DIR}
@@ -69,27 +64,25 @@
    set DD = `echo $FCST_TIME | cut -c7-8`
    set HH = `echo $FCST_TIME | cut -c9-10`
    set FILE_DATE = ${YYYY}-${MM}-${DD}_${HH}:00:00
+   set FILE = ${DAT_DIR}/${DATE}/wrfout_d01_${FILE_DATE}
 
-   set DATE2 = `${BIN_DIR}/advance_cymdh $DATE $INTERVAL`
-
+   set NEXT_DATE = `${BIN_DIR}/advance_cymdh $DATE $INTERVAL`
    if ( $BE_METHOD == NMC ) then
-#     Create filenames for NMC-method input:
-      set FILE1 = ${DAT_DIR}/${DATE}/wrfout_d01_${FILE_DATE}
-      set FILE2 = ${DAT_DIR}/${DATE2}/wrfout_d01_${FILE_DATE}
+      ln -sf $FILE ${FILE}.e001
+      ln -sf ${DAT_DIR}/${NEXT_DATE}/wrfout_d01_${FILE_DATE} ${FILE}.e002
    endif
 
-   ln -fs ${BUILD_DIR}/gen_be_stage0_wrf.exe .
-   ./gen_be_stage0_wrf.exe ${FCST_TIME} $FILE1 $FILE2 >&! gen_be_stage0_wrf.out
-   mv diff ${STAGE0_DIR}/diff.${FILE_DATE}
-   mv gen_be_stage0_wrf.out ${STAGE0_DIR}/gen_be_stage0_wrf.out.${FILE_DATE}
-   rm -rf $TMP_DIR >&! /dev/null
+   ln -fs ${BUILD_DIR}/gen_be_stage0_wrf_ens.exe .
+   ./gen_be_stage0_wrf_ens.exe ${BE_METHOD} ${FCST_TIME} $NE $FILE >&! gen_be_stage0_wrf.${FCST_TIME}.out
 
-   setenv DATE $DATE2
+#  Tidy:
+#   mv pert.${FCST_TIME}* ${STAGE0_DIR}
+#   mv gen_be_stage0_wrf.${FCST_TIME}.out ${STAGE0_DIR}
+#   rm -rf $TMP_DIR >&! /dev/null
+
+   setenv DATE $NEXT_DATE
 
  end     # End loop over dates.
-
- set END_CPU = `date`
- echo "Ending CPU time: ${END_CPU}"
 
  exit(0)
 

@@ -1169,6 +1169,9 @@ da_gen_be.o:	         \
                         DA_Recursive_Filter/DA_Recursive_Filter_1d.inc  \
 			da_gen_be/da_create_bins.inc	\
                         da_gen_be/da_filter_regcoeffs.inc       \
+                        da_gen_be/da_get_field.inc       \
+                        da_gen_be/da_get_height.inc       \
+                        da_gen_be/da_get_trh.inc       \
                         da_gen_be/da_print_be_stats_h_global.inc       \
                         da_gen_be/da_print_be_stats_h_regional.inc       \
                         da_gen_be/da_print_be_stats_p.inc       \
@@ -1176,11 +1179,12 @@ da_gen_be.o:	         \
 			da_gen_be/da_readwrite_be_stage2.inc	\
 			da_gen_be/da_readwrite_be_stage3.inc	\
 			da_gen_be/da_readwrite_be_stage4.inc	\
+			da_gen_be/da_stage0_initialize.inc	\
 			da_gen_be/da_gen_be.F
 			$(CPP) -I./da_gen_be -I./DA_VToX_Transforms -I./DA_Tools \
 			-I./DA_Recursive_Filter \
 			$(CPPFLAGS_WRFVAR) da_gen_be/da_gen_be.F > da_gen_be.f
-			$(FC) -c $(FCFLAGS_WRFVAR) -I../../frame da_gen_be.f
+			$(FC) -c $(FCFLAGS_WRFVAR) -I${NETCDF}/include -I../../frame da_gen_be.f
 
 da_fftpack5.o:	         \
 			DA_Constants.o		\

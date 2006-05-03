@@ -1,35 +1,39 @@
 program gen_be_stage0_wrf
 !
 !---------------------------------------------------------------------- 
-!  Purpose : Create difference field from two input WRF files.
+!  Purpose : To convert EPS output to "standard perturbation fields"
+!  required by the WRF-Var BE covariance generation utility "gen_be".
 !
-!  Input  : Two WRF NETCDF files. 
+!  Input  : WRF EPS forecasts for a specified date (NETCDF format). 
 !
-!  Output : Binary files for use of the gen_be_stage1.
+!  Output : Binary files for use in gen_be_stage1.
 !
 !  Author: Dale Barker (NCAR/MMM)
 !  Please acknowledge author/institute in work that uses this code.
 !
-!  History: 08/19/2005: Created from read_wrf_nc.f.
-!
 !----------------------------------------------------------------------
 
    use da_constants
+   use da_gen_be
    use da_tracing
 
    implicit none
 
    integer, parameter    :: nrange = 50               ! Range to search for efficient FFT.
 
-   character (len=200)   :: input_file1               ! NETCDF input file 1.
-   character (len=200)   :: input_file2               ! NETCDF input file 2.
+   character (len=200)   :: filestub                  ! General filename stub.
+   character (len=200)   :: input_file                ! Input file. 
+   character (len=200)   :: output_file               ! Output file. 
    character (len=10)    :: date                      ! Character date.
    character (len=10)    :: var                       ! Variable to search for.
+   character (len=3)     :: be_method                 ! "NMC" or "ENS".
+   character (len=3)     :: cne                       ! Ensemble size.
+   character (len=3)     :: ce                        ! Member index -> character.
 
-   integer               :: i, j, k                   ! Loop counters.
    integer, external     :: iargc
    integer               :: numarg
-
+   integer               :: ne                        ! Ensemble size.
+   integer               :: i, j, k, member           ! Loop counters.
    integer               :: dim1                      ! Dimensions of grid (T points).
    integer               :: dim1s                     ! Dimensions of grid (vor/psi pts).
    integer               :: dim2                      ! Dimensions of grid (T points).
@@ -39,38 +43,32 @@ program gen_be_stage0_wrf
    integer               :: n1s, n2s                  ! Padded dimensions (n=dim-1+pad).
    integer               :: poisson_method            ! 1=Spectral, 2=SOR.
    integer               :: fft_method                ! For poisson_method=1: 1=FCT, 2=FST.
-   integer               :: ktest                     ! Test level. 
+   integer               :: ktest                     ! Test level.
+   real                  :: member_inv                ! 1 / member.
    real                  :: ds                        ! Grid resolution.
    real                  :: dim12_inv_u               ! 1 / (dim1*dim2).
    real                  :: dim12_inv_v               ! 1 / (dim1*dim2).
    real                  :: dim12_inv                 ! 1 / (dim1*dim2).
-   real                  :: psi_mean                  ! Mean value.
-   real                  :: chi_mean                  ! Mean value.
    logical               :: test_inverse              ! Test conversion by performing inverse.
+   logical               :: remove_mean               ! Remove mean from standard fields.
 
    integer               :: ifax1(1:num_fft_factors)  ! FFT factors.
    integer               :: ifax2(1:num_fft_factors)  ! FFT factors.
    integer               :: ifax1s(1:num_fft_factors) ! FFT factors.
    integer               :: ifax2s(1:num_fft_factors) ! FFT factors.
-   real, allocatable     :: height(:,:,:)             ! Height.
    real, allocatable     :: xlat(:,:)                 ! Latitude of mass points.
    real, allocatable     :: mapfac_m(:,:)             ! Map factor - mass pts.
    real, allocatable     :: mapfac_u(:,:)             ! Map factor - u points.
    real, allocatable     :: mapfac_v(:,:)             ! Map factor - v points.
-   real, allocatable     :: u1(:,:)                   ! u-wind.
-   real, allocatable     :: u2(:,:)                   ! u-wind.
-   real, allocatable     :: v1(:,:)                   ! v-wind.
-   real, allocatable     :: v2(:,:)                   ! v-wind.
+
+   real, allocatable     :: u(:,:)                    ! u-wind.
+   real, allocatable     :: v(:,:)                    ! v-wind.
    real, allocatable     :: div(:,:)                  ! Divergence.
    real, allocatable     :: vor(:,:)                  ! Vorticity.
    real, allocatable     :: psi2d(:,:)                ! Streamfunction copy. 
    real, allocatable     :: chi2d(:,:)                ! Velocity potential copy.
-   real, allocatable     :: temp1(:,:)                ! Temperature.
-   real, allocatable     :: temp2(:,:)                ! Temperature.
-   real, allocatable     :: rh1(:,:)                  ! Relative humidity.
-   real, allocatable     :: rh2(:,:)                  ! Relative humidity.
-   real, allocatable     :: psfc1(:,:)                ! Surface pressure.
-   real, allocatable     :: psfc2(:,:)                ! Surface pressure.
+   real, allocatable     :: temp2d(:,:)               ! Temperature.
+   real, allocatable     :: rh2d(:,:)                 ! Relative humidity.
 
    real, allocatable     :: trigs1(:)                 ! FFT trig functions.
    real, allocatable     :: trigs2(:)                 ! FFT trig functions.
@@ -79,63 +77,89 @@ program gen_be_stage0_wrf
    real, allocatable     :: trigs2s(:)                ! FFT trig functions.
    real, allocatable     :: fft_coeffss(:,:)          ! FFT coefficients.
 
-!  Output difference fields:
+!  Standard fields:
    real, allocatable     :: psi(:,:,:)                ! Streamfunction.
    real, allocatable     :: chi(:,:,:)                ! Velocity Potential.
    real, allocatable     :: temp(:,:,:)               ! Temperature.
    real, allocatable     :: rh(:,:,:)                 ! Relative humidity.
    real, allocatable     :: psfc(:,:)                 ! Surface pressure.
+   real, allocatable     :: height(:,:,:)             ! Height.
+   real, allocatable     :: psi_store(:,:,:)          ! Streamfunction.
+   real, allocatable     :: chi_store(:,:,:)          ! Velocity Potential.
+   real, allocatable     :: temp_store(:,:,:)         ! Temperature.
+   real, allocatable     :: rh_store(:,:,:)           ! Relative humidity.
+   real, allocatable     :: psfc_store(:,:)           ! Surface pressure.
+   real, allocatable     :: height_store(:,:,:)       ! Height.
 
 !---------------------------------------------------------------------------------------------
-   write(6,'(a)')' [1] Initialize information.'
+   write(6,'(/a)')' [1] Initialize information.'
 !---------------------------------------------------------------------------------------------
 
    if (trace_use) call da_trace_init
    if (trace_use) call da_trace_entry("gen_be_stage0_wrf")
 
-   test_inverse = .true.
+   test_inverse = .true. 
    ktest = 1
-   poisson_method = 1
+   poisson_method = 1    
    fft_method = 2
+   remove_mean = .true.
 
    numarg = iargc()
-   if ( numarg /= 3 )then
+   if ( numarg /= 4 )then
       write(UNIT=stdout,FMT='(a)') &
-        "Usage: gen_be_stage0_wrf date <wrf_filename1> <wrf_filename2>. Stop"
+        "Usage: gen_be_stage0_wrf be_method date ne <wrf_file_stub> Stop"
       stop
-   end if 
+   end if
 
-   call getarg( 1, date )
-   call getarg( 2, input_file1 )
-   call getarg( 3, input_file2 )
+   call getarg( 1, be_method )
+   call getarg( 2, date )
+   call getarg( 3, cne )
+   read(cne,'(i3)')ne
+   call getarg( 4, filestub )
 
-   write(6,'(a,a)')' Forecast valid time = ', date
-   write(6,'(a,a)')' Input file 1 = ', input_file1
-   write(6,'(a,a)')' Input file 2 = ', input_file2
-   write(6,*)
+   if ( be_method == "NMC" ) then
+      write(6,'(a,a)')' Computing gen_be NMC-method forecast difference files for date ', date
+      ne = 2                      ! NMC-method uses differences between 2 forecasts.
+      remove_mean = .false.
+   else if ( be_method == "ENS" ) then
+      if ( remove_mean ) then
+         write(6,'(a,a)')' Computing gen_be ensemble perturbation files for date ', date
+      else
+         write(6,'(a,a)')' Computing gen_be ensemble forecast files for date ', date
+      end if
+      write(6,'(a,i4)')' Ensemble Size = ', ne
+   else
+      write(6,'(a,a)')trim(be_method), ' is an invalid value of be_method. Stop'
+      stop
+   end if
+   write(6,'(a,a)')' Input filestub = ', trim(filestub)
+
+!---------------------------------------------------------------------------------------------
+   write(6,'(/a)')' [2] Setup up ancillary fields using 1st member values.' 
+!---------------------------------------------------------------------------------------------
 
    var = "T"
-   call stage0_initialize( input_file1, input_file2, var, dim1, dim2, dim3, ds )
+   input_file = trim(filestub)//'.e001'
+   call da_stage0_initialize( input_file, var, dim1, dim2, dim3, ds )
    dim1s = dim1+1 ! Vorticity/streamfunction array 1 larger.
    dim2s = dim2+1 ! Vorticity/streamfunction array 1 larger.
+   dim12_inv_u = 1.0 / real((dim1+1) * dim2)
+   dim12_inv_v = 1.0 / real(dim1 * (dim2+1))
+   dim12_inv = 1.0 / real(dim1 * dim2)
 
    allocate( xlat(1:dim1,1:dim2) )
    allocate( mapfac_m(1:dim1,1:dim2) )
    allocate( mapfac_u(1:dim1+1,1:dim2) )
    allocate( mapfac_v(1:dim1,1:dim2+1) )
-   allocate( height(1:dim1,1:dim2,1:dim3) )
 
    var = "XLAT"
-   call get_field( input_file1, var, 2, dim1, dim2, 1, 1, xlat )
-
+   call da_get_field( input_file, var, 2, dim1, dim2, 1, 1, xlat )
    var = "MAPFAC_M"
-   call get_field( input_file1, var, 2, dim1, dim2, 1, 1, mapfac_m )
+   call da_get_field( input_file, var, 2, dim1, dim2, 1, 1, mapfac_m )
    var = "MAPFAC_U"
-   call get_field( input_file1, var, 2, dim1+1, dim2, 1, 1, mapfac_u )
+   call da_get_field( input_file, var, 2, dim1+1, dim2, 1, 1, mapfac_u )
    var = "MAPFAC_V"
-   call get_field( input_file1, var, 2, dim1, dim2+1, 1, 1, mapfac_v )
-
-   call get_height( input_file1, dim1, dim2, dim3, height )
+   call da_get_field( input_file, var, 2, dim1, dim2+1, 1, 1, mapfac_v )
 
 !  Initialize FFT coefficients:
 
@@ -153,146 +177,246 @@ program gen_be_stage0_wrf
       call da_fft_initialize2( n1s, n2s, ds, trigs1s, trigs2s, fft_coeffss )
    end if
 
-!  Allocate arrays that will be output:
+!  Allocate arrays in output fields:
    allocate( psi(1:dim1,1:dim2,1:dim3) ) ! Note - interpolated to chi pts for output.
    allocate( chi(1:dim1,1:dim2,1:dim3) )
    allocate( temp(1:dim1,1:dim2,1:dim3) )
    allocate( rh(1:dim1,1:dim2,1:dim3) )
    allocate( psfc(1:dim1,1:dim2) )
+   allocate( height(1:dim1,1:dim2,1:dim3) )
+
+   allocate( psi_store(1:dim1,1:dim2,1:dim3) ) ! Note - interpolated to chi pts for output.
+   allocate( chi_store(1:dim1,1:dim2,1:dim3) )
+   allocate( temp_store(1:dim1,1:dim2,1:dim3) )
+   allocate( rh_store(1:dim1,1:dim2,1:dim3) )
+   allocate( psfc_store(1:dim1,1:dim2) )
+   allocate( height_store(1:dim1,1:dim2,1:dim3) )
+   psi_store = 0.0
+   chi_store = 0.0
+   temp_store = 0.0
+   rh_store = 0.0
+   psfc_store = 0.0
+   height_store = 0.0
 
 !---------------------------------------------------------------------------------------------
-   write(6,'(a)')' [2] Compute streamfunction (psi) and velocity potential (chi).'
+   write(6,'(/a)')' [3] Convert WRF forecast fields to standard fields and output' 
 !---------------------------------------------------------------------------------------------
-   
-   allocate( u1(1:dim1+1,1:dim2) )
-   allocate( u2(1:dim1+1,1:dim2) )
-   allocate( v1(1:dim1,1:dim2+1) )
-   allocate( v2(1:dim1,1:dim2+1) )
+
+   ! Allocate temporary arrays:
+   allocate( u(1:dim1s,1:dim2) )
+   allocate( v(1:dim1,1:dim2s) )
    allocate( vor(1:dim1s,1:dim2s) )
    allocate( div(1:dim1,1:dim2) )
    allocate( psi2d(1:dim1s,1:dim2s) )
    allocate( chi2d(1:dim1,1:dim2) )
+   allocate( temp2d(1:dim1,1:dim2) )
+   allocate( rh2d(1:dim1,1:dim2) )
 
-   dim12_inv_u = 1.0 / real((dim1+1) * dim2)
-   dim12_inv_v = 1.0 / real(dim1 * (dim2+1))
-   dim12_inv = 1.0 / real(dim1 * dim2)
+   do member = 1, ne
 
-   do k = 1, dim3
-!     Read u fields, and create difference u1 = u1 - u2:
-      var = "U"
-      call get_field( input_file1, var, 3, dim1+1, dim2, dim3, k, u1 )
-      call get_field( input_file2, var, 3, dim1+1, dim2, dim3, k, u2 )
-      u1(:,:) = u1(:,:) - u2(:,:)
+      write(UNIT=ce,FMT='(i3)')member
+      if ( member < 10 ) ce = '00'//ce(3:3)
+      if ( member >= 10 .and. member < 100 ) ce = '0'//ce(2:3)
+      input_file = trim(filestub)//'.e'//ce  
 
-!     Read v fields, and create difference v1 = v1 - v2:
-      var = "V"
-      call get_field( input_file1, var, 3, dim1, dim2+1, dim3, k, v1 )
-      call get_field( input_file2, var, 3, dim1, dim2+1, dim3, k, v2 )
-      v1(:,:) = v1(:,:) - v2(:,:)
+      do k = 1, dim3
 
-!     Calculate vorticity (in center of mass grid on WRF's Arakawa C-grid):
-      call da_uv_to_vor_c( dim1, dim2, ds, &
-                           mapfac_m, mapfac_u, mapfac_v, &
-                           u1, v1, vor )
+         ! Read u, v:
+         var = "U"
+         call da_get_field( input_file, var, 3, dim1s, dim2, dim3, k, u )
+         var = "V"
+         call da_get_field( input_file, var, 3, dim1, dim2s, dim3, k, v )
 
-!     Calculate divergence (at mass pts. on WRF's Arakawa C-grid):
+         ! Calculate vorticity (in center of mass grid on WRF's Arakawa C-grid):
+         call da_uv_to_vor_c( dim1, dim2, ds, &
+                              mapfac_m, mapfac_u, mapfac_v, u, v, vor )
 
-      call da_uv_to_div_c( dim1, dim2, ds, &
-                           mapfac_m, mapfac_u, mapfac_v, &
-                           u1, v1, div )
+         ! Calculate divergence (at mass pts. on WRF's Arakawa C-grid):
 
-!     Calculate streamfunction and potential (assumes vor/div converted to Del**2 psi/chi):
-      if ( poisson_method == 1 ) then
-         call da_del2a_to_a( dim1s, dim2s, n1s, n2s, fft_method, ifax1s, ifax2s, &
-                             trigs1s, trigs2s, fft_coeffss, vor, psi2d )
+         call da_uv_to_div_c( dim1, dim2, ds, &
+                              mapfac_m, mapfac_u, mapfac_v, u, v, div )
 
-         call da_del2a_to_a( dim1, dim2, n1, n2, fft_method, ifax1, ifax2, &
-                             trigs1, trigs2, fft_coeffs, div, chi2d )
-      else if ( poisson_method == 2 ) then
-         call da_sor( dim1s, dim2s, ds, vor, psi2d )
-         call da_sor( dim1, dim2, ds, div, chi2d )
-      end if
+         ! Calculate streamfunction and potential 
+         ! Assumes vor/div converted to Del**2 psi/chi):
 
-      if ( test_inverse .and. k == ktest) then
-         call da_test_inverse( dim1, dim2, ds, mapfac_m, mapfac_u, mapfac_v, &
-                               n1, n2, fft_method, ifax1, ifax2, trigs1, trigs2, fft_coeffs, &
-                               n1s, n2s, ifax1s, ifax2s, trigs1s, trigs2s, fft_coeffss, &
-                               u1, v1, psi2d, chi2d )
-      end if
+         if ( poisson_method == 1 ) then
+            call da_del2a_to_a( dim1s, dim2s, n1s, n2s, fft_method, ifax1s, ifax2s, &
+                                trigs1s, trigs2s, fft_coeffss, vor, psi2d )
 
-      chi(:,:,k) = chi2d(:,:)
+            call da_del2a_to_a( dim1, dim2, n1, n2, fft_method, ifax1, ifax2, &
+                                trigs1, trigs2, fft_coeffs, div, chi2d )
+         else if ( poisson_method == 2 ) then
+            call da_sor( dim1s, dim2s, ds, vor, psi2d )
+            call da_sor( dim1, dim2, ds, div, chi2d )
+         end if
 
-!     Interpolate psi to mass pts ready for output:
-      do j = 1, dim2
-         do i = 1, dim1
-            psi(i,j,k) = 0.25 * ( psi2d(i,j) + psi2d(i+1,j) + &
-                                  psi2d(i,j+1) + psi2d(i+1,j+1) )
+         if ( test_inverse .and. k == ktest .and. member == 1 ) then
+            call da_test_inverse( dim1, dim2, ds, mapfac_m, mapfac_u, mapfac_v, &
+                                  n1, n2, fft_method, ifax1, ifax2, trigs1, trigs2, fft_coeffs, &
+                                  n1s, n2s, ifax1s, ifax2s, trigs1s, trigs2s, fft_coeffss, &
+                                  u, v, psi2d, chi2d )
+         end if
+
+!        Interpolate psi to mass pts ready for output:
+         do j = 1, dim2
+            do i = 1, dim1
+               psi(i,j,k) = 0.25 * ( psi2d(i,j) + psi2d(i+1,j) + &
+                                     psi2d(i,j+1) + psi2d(i+1,j+1) )
+            end do
          end do
+         chi(:,:,k) = chi2d(:,:)
+
+!        Read mass fields, and convert to T and rh:
+
+         call da_get_trh( input_file, dim1, dim2, dim3, k, temp2d, rh2d )
+         temp(:,:,k) = temp2d(:,:)
+         rh(:,:,k) = 0.01 * rh2d(:,:) ! *0.01 to conform with WRF-Var units.
+
       end do
+
+      call da_get_height( input_file, dim1, dim2, dim3, height )
+
+!     Finally, extract surface pressure:
+      var = "PSFC"
+      call da_get_field( input_file, var, 2, dim1, dim2, dim3, 1, psfc )
+
+!     Write out ensemble forecasts for this member:
+      output_file = 'tmp.e'//ce  
+      open (gen_be_ounit, file = output_file, form='unformatted')
+      write(gen_be_ounit)date, dim1, dim2, dim3
+      write(gen_be_ounit)psi
+      write(gen_be_ounit)chi
+      write(gen_be_ounit)temp
+      write(gen_be_ounit)rh
+      write(gen_be_ounit)psfc
+      write(gen_be_ounit)height
+      write(gen_be_ounit)xlat
+      close(gen_be_ounit)
+
+!     Optionally calculate accumulating mean:
+      if ( remove_mean ) then
+         member_inv = 1.0 / real(member)
+         psi_store = ( real( member-1 ) * psi_store + psi ) * member_inv
+         chi_store = ( real( member-1 ) * chi_store + chi ) * member_inv
+         temp_store = ( real( member-1 ) * temp_store + temp ) * member_inv
+         rh_store = ( real( member-1 ) * rh_store + rh ) * member_inv
+         psfc_store = ( real( member-1 ) * psfc_store + psfc ) * member_inv
+         height_store = ( real( member-1 ) * height_store + height ) * member_inv
+      end if
+
    end do
 
-   deallocate( u1 )
-   deallocate( u2 )
-   deallocate( v1 )
-   deallocate( v2 )
+   deallocate( u )
+   deallocate( v )
    deallocate( vor )
    deallocate( div )
    deallocate( psi2d )
    deallocate( chi2d )
+   deallocate( temp2d )
+   deallocate( rh2d )
 
 !---------------------------------------------------------------------------------------------
-   write(6,'(a)')' [3] Retrieve T, rh'
+   write(6,'(/a)')' [4] Compute perturbations and output' 
 !---------------------------------------------------------------------------------------------
 
-   allocate( temp1(1:dim1,1:dim2) )
-   allocate( temp2(1:dim1,1:dim2) )
-   allocate( rh1(1:dim1,1:dim2) )
-   allocate( rh2(1:dim1,1:dim2) )
+   if ( be_method == "NMC" ) then
+      write(6,'(/a)')'    Compute perturbation as a difference between two forecasts' 
 
-   do k = 1, dim3
+!     Re-read input forecast standard fields (ne=2 hard-wired above for NMC-method):
+      input_file = 'tmp.e001'
+      open (gen_be_iunit, file = input_file, form='unformatted')
+      read(gen_be_iunit)date, dim1, dim2, dim3
+      read(gen_be_iunit)psi
+      read(gen_be_iunit)chi
+      read(gen_be_iunit)temp
+      read(gen_be_iunit)rh
+      read(gen_be_iunit)psfc
+      read(gen_be_iunit)height
+      read(gen_be_iunit)xlat
+      close(gen_be_iunit)
 
-      call da_get_trh( input_file1, dim1, dim2, dim3, k, temp1, rh1 )
-      call da_get_trh( input_file2, dim1, dim2, dim3, k, temp2, rh2 )
+      input_file = 'tmp.e002'
+      open (gen_be_iunit, file = input_file, form='unformatted')
+      read(gen_be_iunit)date, dim1, dim2, dim3
+      read(gen_be_iunit)psi_store
+      read(gen_be_iunit)chi_store
+      read(gen_be_iunit)temp_store
+      read(gen_be_iunit)rh_store
+      read(gen_be_iunit)psfc_store
+      read(gen_be_iunit)height_store
+      read(gen_be_iunit)xlat
+      close(gen_be_iunit)
 
-      temp(:,:,k) = temp1(:,:) - temp2(:,:)
-      rh(:,:,k) = 0.01 * ( rh1(:,:) - rh2(:,:) ) ! *0.01 to conform with WRF-Var units.
+!     Take forecast difference:
+      psi = psi - psi_store
+      chi = chi - chi_store
+      temp = temp - temp_store
+      rh  = rh - rh_store
+      psfc = psfc - psfc_store
+      height = height - height_store
 
-   end do
+!     Write out NMC-method standard perturbations:
+      output_file = 'pert.'//date(1:10)//'.e001'
+      open (gen_be_ounit, file = output_file, form='unformatted')
+      write(gen_be_ounit)date, dim1, dim2, dim3
+      write(gen_be_ounit)psi
+      write(gen_be_ounit)chi
+      write(gen_be_ounit)temp
+      write(gen_be_ounit)rh
+      write(gen_be_ounit)psfc
+      write(gen_be_ounit)height
+      write(gen_be_ounit)xlat
+      close(gen_be_ounit)
 
-   deallocate( temp1 )
-   deallocate( temp2 )
-   deallocate( rh1 )
-   deallocate( rh2 )
+   else ! be_method = "ENS"
 
-!---------------------------------------------------------------------------------------------
-   write(6,'(a)')' [4] Retrieve surface pressure'
-!---------------------------------------------------------------------------------------------
+      if ( remove_mean ) then
+         write(6,'(/a)')' [4] Convert ensemble of standard fields to perturbations' 
+      else
+         write(6,'(/a)')' [4] WARNING: Outputting ensemble member standard fields in pert files!'
+      end if
 
-   allocate( psfc1(1:dim1,1:dim2) )
-   allocate( psfc2(1:dim1,1:dim2) )
+      do member = 1, ne
+         write(UNIT=ce,FMT='(i3)')member
+         if ( member < 10 ) ce = '00'//ce(3:3)
+         if ( member >= 10 .and. member < 100 ) ce = '0'//ce(2:3)
 
-!  Read surface pressure fields, and create difference u1 = u1 - u2:
-   var = "PSFC"
-   call get_field( input_file1, var, 2, dim1, dim2, dim3, 1, psfc1 )
-   call get_field( input_file2, var, 2, dim1, dim2, dim3, 1, psfc2 )
-   psfc(:,:) = psfc1(:,:) - psfc2(:,:)
+!        Re-read ensemble member standard fields:
+         input_file = 'tmp.e'//ce  
+         open (gen_be_iunit, file = input_file, form='unformatted')
+         read(gen_be_iunit)date, dim1, dim2, dim3
+         read(gen_be_iunit)psi
+         read(gen_be_iunit)chi
+         read(gen_be_iunit)temp
+         read(gen_be_iunit)rh
+         read(gen_be_iunit)psfc
+         read(gen_be_iunit)height
+         read(gen_be_iunit)xlat
+         close(gen_be_iunit)
 
-   deallocate( psfc1 )
-   deallocate( psfc2 )
+         if ( remove_mean ) then
+            psi = psi - psi_store
+            chi = chi - chi_store
+            temp = temp - temp_store
+            rh  = rh - rh_store
+            psfc = psfc - psfc_store
+            height = height - height_store
+         end if
 
-!---------------------------------------------------------------------------------------------
-   write(6,'(a)')' [5] Write out data'
-!---------------------------------------------------------------------------------------------
-
-   open (gen_be_ounit, file = 'diff', form='unformatted')
-   write(gen_be_ounit)date, dim1, dim2, dim3
-   write(gen_be_ounit)psi
-   write(gen_be_ounit)chi
-   write(gen_be_ounit)temp
-   write(gen_be_ounit)rh
-   write(gen_be_ounit)psfc
-   write(gen_be_ounit)height
-   write(gen_be_ounit)xlat
+!        Write out standard perturbations for this member:
+         output_file = 'pert.'//date(1:10)//'.e'//ce  
+         open (gen_be_ounit, file = output_file, form='unformatted')
+         write(gen_be_ounit)date, dim1, dim2, dim3
+         write(gen_be_ounit)psi
+         write(gen_be_ounit)chi
+         write(gen_be_ounit)temp
+         write(gen_be_ounit)rh
+         write(gen_be_ounit)psfc
+         write(gen_be_ounit)height
+         write(gen_be_ounit)xlat
+         close(gen_be_ounit)
+      end do
+   end if
 
    deallocate( psi )
    deallocate( chi )
@@ -301,203 +425,17 @@ program gen_be_stage0_wrf
    deallocate( psfc )
    deallocate( height )
    deallocate( xlat )
+   deallocate( psi_store )
+   deallocate( chi_store )
+   deallocate( temp_store )
+   deallocate( rh_store )
+   deallocate( psfc_store )
+   deallocate( height_store )
 
    if (trace_use) call da_trace_exit("gen_be_stage0_wrf")
    if (trace_use) call da_trace_report
 
 CONTAINS
-
-subroutine get_height( input_file, dim1, dim2, dim3, height )
-    
-!------------------------------------------------------------------------------
-!  PURPOSE: Calculates T, RH from input WRF file.
-!  
-!  NOTE: 
-!  
-!  HISTORY: 08/09/2005 - Creation of F90 version.           Dale Barker
-!------------------------------------------------------------------------------
-   
-   implicit none
-   
-   character (len=200), intent(in) :: input_file       ! NETCDF file nane.
-   integer, intent(in)   :: dim1, dim2, dim3          ! Dimensions.
-   real, intent(out)     :: height(1:dim1,1:dim2,1:dim3) ! Height.
-   
-   character (len=10)    :: var                       ! Variable to search for.
-   integer               :: k                         ! Loop counter.
-   real                  :: gravity_inv               ! 1/gravity.
-   real                  :: phb(1:dim1,1:dim2)        ! Base state geopotential.
-   real                  :: ph(1:dim1,1:dim2)         ! Perturbation geopotential.
-   real                  :: phfull(1:dim1,1:dim2,1:dim3+1)! Geopotential.
-
-   gravity_inv = 1.0 / gravity
-
-   do k = 1, dim3+1
-      var = "PHB"
-      call get_field( input_file, var, 3, dim1, dim2, dim3+1, k, phb )
-      var = "PH"
-      call get_field( input_file, var, 3, dim1, dim2, dim3+1, k, ph )
-
-      phfull(:,:,k) = phb + ph ! Calculate full geopotential on full (w) model levels:
-   end do
-
-   do k = 1, dim3
-      height(:,:,k) = 0.5 * ( phfull(:,:,k+1) + phfull(:,:,k) ) * gravity_inv
-   end do
-
-end subroutine get_height
-
-!------------------------------------------------------------------------------
-
-subroutine da_get_trh( input_file, dim1, dim2, dim3, k, temp, rh  )
-
-!------------------------------------------------------------------------------
-!  PURPOSE: Calculates T, RH from input WRF file.
-!  
-!  NOTE: 
-!
-!  HISTORY: 08/09/2005 - Creation of F90 version.           Dale Barker
-!------------------------------------------------------------------------------
-
-   implicit none
-
-   character (len=200), intent(in) :: input_file       ! NETCDF file nane.
-   integer, intent(in)   :: dim1, dim2, dim3          ! Dimensions.
-   integer, intent(in)   :: k                         ! Model level.
-   real, intent(out)     :: temp(1:dim1,1:dim2)       ! Temperature.
-   real, intent(out)     :: rh(1:dim1,1:dim2)         ! Relative humidity.
-
-   character (len=10)    :: var                       ! Variable to search for. var = "T"
-   integer               :: i, j                      ! Loop counters.
-
-   real                  :: thetap(1:dim1,1:dim2)     ! Perturbation potential temperature.
-   real                  :: pb(1:dim1,1:dim2)         ! Base state pressure.
-   real                  :: pp(1:dim1,1:dim2)         ! Pressure perturbation.
-   real                  :: x(1:dim1,1:dim2)          ! Vapor mixing ratio.
-
-   real                  :: theta                     ! Potential temperature.
-   real                  :: p                         ! Pressure.
-   real                  :: q                         ! Specific humidity.
-   real                  :: t_c                       ! Temp(Celsius).
-   real                  :: es                        ! Saturation vapor pressure.
-   real                  :: qs                        ! Saturation specific humidity.
-
-   var = "T" ! Perturbation potential temperature in WRF.
-   call get_field( input_file, var, 3, dim1, dim2, dim3, k, thetap )
-
-   var = "PB"  ! Base state pressure in WRF.
-   call get_field( input_file, var, 3, dim1, dim2, dim3, k, pb )
-
-   var = "P" ! Perturbation pressure in WRF.
-   call get_field( input_file, var, 3, dim1, dim2, dim3, k, pp )
-
-   var = "QVAPOR"  ! Water vapor mixing ratio.
-   call get_field( input_file, var, 3, dim1, dim2, dim3, k, x )
-
-   do j = 1, dim2
-      do i = 1, dim1
-
-!        Convert p', theta' to T:
-         theta = ts0 + thetap(i,j)                 ! Theta = Theta0 + Thetap
-         p = pb(i,j) + pp(i,j)                     ! p = base p + pert p.
-         temp(i,j) = theta * ( p * ps0_inv )**kappa ! Theta to T.
-
-!        Convert to specific humidity.
-         q = x(i,j) / ( 1.0 + x(i,j) )
-
-!        Calculate relative humidity:
-         t_c = temp(i,j) - t_kelvin
-         es = es_alpha * exp( es_beta * t_c / ( t_c + es_gamma ) )
-         qs = rd_over_rv * es / ( p - rd_over_rv1 * es )
-         rh(i,j) = 100.0 * q / qs
-
-      end do
-   end do
-
-end subroutine da_get_trh
-
-!------------------------------------------------------------------------------
-
-subroutine stage0_initialize( input_file1, input_file2, var, &
-                              dim1, dim2, dim3, ds )
-        
-   implicit none
-
-   include 'netcdf.inc'
-
-   character (len=200), intent(in):: input_file1      ! NETCDF file name.
-   character (len=200), intent(in):: input_file2      ! NETCDF file name.
-   character (len=10), intent(in) :: var              ! Variable to search for.
-   integer, intent(out)           :: dim1             ! Dimensions of field. 
-   integer, intent(out)           :: dim2             ! Dimensions of field. 
-   integer, intent(out)           :: dim3             ! Dimensions of field. 
-   real, intent(out)              :: ds               ! Grid resolution.
-
-   character (len=80)             :: att_name         ! Attribute name.
-   integer                        :: i, att           ! Loop counters.
-   integer                        :: attlen           ! Length of attribute.
-   integer                        :: cdfid1           ! NETCDF file id.
-   integer                        :: cdfid2           ! NETCDF file id.
-   integer                        :: rcode            ! Return code (0=ok).
-   integer                        :: length           ! Length of filename.
-   integer                        :: id_var           ! NETCDF variable ID. 
-   integer                        :: ivtype           ! 4=integer, 5=real, 6=d.p.
-   integer                        :: nvars            !
-   integer                        :: ndims            !
-   integer                        :: natts            ! Number of attributes.
-   integer                        :: unlimdimid       ! Number of attributes.
-
-   integer                        :: dimids(10)       !
-   integer                        :: dims(1:4)        ! Dimensions of field. 
-   real (kind=4), allocatable     :: value_real(:)    ! Real attribute value. 
-   character (len=80)             :: value_chr        ! Character.
-!   integer                        :: nf_open
-!   external                          nf_open
-
-!  Check files exist:
-   length = len_trim(input_file1)
-   rcode = nf_open( input_file1(1:length), NF_NOWRITE, cdfid1 )
-   if ( rcode /= 0) then
-     write(6,*) ' Error opening netcdf file ', input_file1(1:length)
-     stop
-   end if
-
-   length = len_trim(input_file2)
-   rcode = nf_open( input_file2(1:length), NF_NOWRITE, cdfid2 )
-   if ( rcode /= 0) then
-     write(6,*) ' Error opening netcdf file ', input_file2(1:length)
-     stop
-   end if
-
-!  Check variable is in file 1:
-   rcode = nf_inq_varid ( cdfid1, var, id_var )
-   if ( rcode /= 0 ) then
-      write(6,'(2a)')var, ' variable is not in input file. Stop'
-      stop
-   endif
-
-!  Get metadata (time, dimensions, global attributes):
-
-   rcode = nf_inq_var( cdfid1, id_var, var, ivtype, ndims, dimids, natts )
-   do i = 1, ndims
-     rcode = nf_inq_dimlen( cdfid1, dimids(i), dims(i) )
-   enddo
-   dim1 = dims(1)
-   dim2 = dims(2)
-   dim3 = dims(3)
-
-!  Get resolution:
-   att_name = 'DX'  ! Assume dx= dy.
-   rcode = nf_inq_att( cdfid1, nf_global, att_name, ivtype, attlen )
-   allocate( value_real(1:attlen) )
-   rcode = NF_GET_ATT_REAL(cdfid1, nf_global, att_name, value_real )
-   ds = value_real(1) 
-   deallocate( value_real )
-
-   rcode = nf_close( cdfid1 )
-   rcode = nf_close( cdfid2 )
-
-end subroutine stage0_initialize
 
 !------------------------------------------------------------------------------
 
@@ -588,65 +526,6 @@ subroutine da_fft_initialize2( n1, n2, ds, trigs1, trigs2, fft_coeffs )
    call da_find_fft_trig_funcs( n2, trigs2 )
 
 end subroutine da_fft_initialize2
-
-!------------------------------------------------------------------------------
-
-subroutine get_field( input_file, var, field_dims, dim1, dim2, dim3, k, field )
-        
-   implicit none
-
-   include 'netcdf.inc'
-
-   character (len=200), intent(in):: input_file       ! NETCDF file nane.
-   character (len=10), intent(in) :: var              ! Variable to search for.
-   integer, intent(in)            :: field_dims       ! # Dimensions of field. 
-   integer, intent(in)            :: dim1             ! Dimension 1 of field. 
-   integer, intent(in)            :: dim2             ! Dimension 2 of field. 
-   integer, intent(in)            :: dim3             ! Dimension 3 of field. 
-   integer, intent(in)            :: k                ! Vertical index.
-   real, intent(out)              :: field(1:dim1,1:dim2) ! Output field
-
-   integer                        :: cdfid            ! NETCDF file id.
-   integer                        :: rcode            ! Return code (0=ok).
-   integer                        :: length           ! Length of filename.
-   integer                        :: id_var           ! NETCDF variable ID. 
-
-   integer                        :: istart(4)        ! Start value of arrays.
-   integer                        :: iend(4)          ! End value of arrays.
-   real (kind=4), allocatable     :: field2d(:,:)     ! Used if 2D field read. 
-   real (kind=4), allocatable     :: field3d(:,:,:)   ! Used if 3D field read. 
-
-   length = len_trim(input_file)
-   rcode = nf_open( input_file(1:length), NF_NOWRITE, cdfid )
-
-!  Check variable is in file:
-   rcode = nf_inq_varid ( cdfid, var, id_var )
-   if ( rcode /= 0 ) then
-      write(6,'(2a)')var, ' variable is not in input file. Stop'
-      stop
-   endif
-
-   istart = 1
-   iend(1) = dim1
-   iend(2) = dim2
-   iend(4) = 1          ! Single time assumed.
-
-   if ( field_dims == 2 ) then
-      iend(3) = 1
-      allocate ( field2d(1:dim1,1:dim2) )
-      call ncvgt( cdfid, id_var, istart, iend, field2d, rcode )
-      field(:,:) = field2d(:,:)
-      rcode = nf_close( cdfid )
-      deallocate( field2d )
-   else if ( field_dims == 3 ) then
-      iend(3) = dim3
-      allocate ( field3d(1:dim1,1:dim2,1:dim3) )
-      call ncvgt( cdfid, id_var, istart, iend, field3d, rcode )
-      field(:,:) = field3d(:,:,k)
-      deallocate( field3d )
-   end if
-
-end subroutine get_field
 
 !------------------------------------------------------------------------------
 

@@ -1,12 +1,10 @@
 program gen_be_stage1
 !
 !---------------------------------------------------------------------- 
-! Purpose : to remove the binned mean from the difference fields.
+! Purpose : to remove the binned mean from the perturbation fields.
 !
-! Input   : binary files: diff.ccyy-mm-dd_hh:00:00.ce for ENS or
-!                         ...............................
-!                         diff.ccyy-mm-dd_hh:00:00    for NMC.
-!                         ...............................
+! Input   : binary files: "pert.ccyymmddhh.e"ce for ENS or
+!                         "pert.ccyymmddhh.e001" for NMC.
 !
 ! Output : binary files for use of the gen_be_stage2:
 !
@@ -95,6 +93,8 @@ program gen_be_stage1
    read(namelist_unit, gen_be_stage1_nl)
    close(namelist_unit)
 
+   if ( be_method /= "ENS" ) ne = 1
+
    read(start_date(1:10), fmt='(i10)')sdate
    read(end_date(1:10), fmt='(i10)')edate
    write(6,'(4a)')' Computing statistics for dates ', start_date, ' to ', end_date
@@ -114,16 +114,17 @@ program gen_be_stage1
 
          write(6,'(a,a)')'    Processing data for date ', date
 
-         filename = 'diff.'//date(1:4)//'-'//date(5:6)//'-'//date(7:8)//'_'//date(9:10)//':00:00'
-         if (be_method.eq.'ENS') then
-           if (member.lt.10) write(ce,'(I1)') member
-           if (member.ge.10.and.member.lt.100) write(ce,'(I2)') member
-           filename = trim(filename)//'.'//trim(ce)
-           print*,filename
+         filename = 'pert.'//date(1:10)
+         if ( be_method == 'NMC' ) then
+            filename = trim(filename)//'.e001'
+         else
+            write(UNIT=ce,FMT='(i3)')member
+            if ( member < 10 ) ce = '00'//ce(3:3)
+            if ( member >= 10 .and. member < 100 ) ce = '0'//ce(2:3)
+            filename = trim(filename)//'.e'//trim(ce)
          endif
 
          open (iunit, file = trim(dat_dir)//'/'//filename, form='unformatted')
-!         read(iunit)date, ni, nj, nk, dphi
          read(iunit)date, ni, nj, nk
 
          if ( first_time ) then
@@ -240,13 +241,14 @@ program gen_be_stage1
 
          write(6,'(a,a)')'    Removing mean for date ', date
 
-         filename = 'diff.'//date(1:4)//'-'//date(5:6)//'-'//date(7:8)//'_'//date(9:10)//':00:00'
-
-         if (be_method.eq.'ENS') then
-         if (member.lt.10) write(ce,'(I1)') member
-         if (member.ge.10.and.member.lt.100) write(ce,'(I2)') member
-         filename = trim(filename)//'.'//trim(ce)
-         print*,filename
+         filename = 'pert.'//date(1:10)
+         if ( be_method == 'NMC' ) then
+            filename = trim(filename)//'.e001'
+         else
+            write(UNIT=ce,FMT='(i3)')member
+            if ( member < 10 ) ce = '00'//ce(3:3)
+            if ( member >= 10 .and. member < 100 ) ce = '0'//ce(2:3)
+            filename = trim(filename)//'.e'//trim(ce)
          endif
 
          open (iunit, file = trim(dat_dir)//'/'//filename, form='unformatted')

@@ -161,7 +161,8 @@ MODULE DA_Constants
 
    INTEGER, PARAMETER :: cov_unit = 25 ! Covariances unit
    INTEGER, PARAMETER :: be_unit = 34    ! Unit number for be input.
-   INTEGER, PARAMETER :: gen_be_ounit = 30
+   INTEGER, PARAMETER :: gen_be_iunit = 30
+   INTEGER, PARAMETER :: gen_be_ounit = 31
 
    INTEGER, PARAMETER :: sound_diag_unit1 = 36 ! For da_sound/da_obs_diagnostics
    INTEGER, PARAMETER :: sound_diag_unit2 = 37

@@ -30,6 +30,7 @@
 
 if ( ! $?START_DATE )    setenv START_DATE    2003010200 # Time of first perturbation.
 if ( ! $?END_DATE )      setenv END_DATE      2003012812 # Time of last perturbation.
+if ( ! $?FCST_RANGE )    setenv FCST_RANGE    24         # Forecast range of forecast (hours).
 if ( ! $?INTERVAL )      setenv INTERVAL      12         # Period between files (hours).
 if ( ! $?BE_METHOD )     setenv BE_METHOD     NMC        # NMC (NMC-method), ENS (Ensemble-Method).
 if ( ! $?NE )            setenv NE            1          # Number of ensemble members (for ENS).
@@ -55,8 +56,8 @@ if ( ! $?NUM_JOBS )      setenv NUM_JOBS 8               # Number of jobs to run
 if ( ! $?RESOLUTION_KM ) setenv RESOLUTION_KM 200        # Hard-wired for now (only used for regional)
 if ( ! $?TESTING_SPECTRAL ) setenv TESTING_SPECTRAL .false. # True if performing spectral tests.
 
-
-if ( ! $?EXPT )          setenv EXPT 2003-01.test
+if ( ! $?EXPT )          setenv EXPT noobs
+if ( ! $?ID )            setenv ID gen_be
 if ( ! $?ID1 )           setenv ID1 ${BE_METHOD}.bin_type${BIN_TYPE}
 if ( ! $?RELEASE )       setenv RELEASE WRF_V2.1.2
 if ( ! $?REL_DIR )       setenv REL_DIR ${HOME}/code_development/${RELEASE}
@@ -65,8 +66,8 @@ if ( ! $?BUILD_DIR )     setenv BUILD_DIR ${GEN_BE_DIR}/gen_be
 if ( ! $?BIN_DIR )       setenv BIN_DIR   ${GEN_BE_DIR}/tools
 if ( ! $?DATA_DISK )     setenv DATA_DISK /ocotillo1
 if ( ! $?REGION )        setenv REGION con200
-if ( ! $?DAT_DIR )       setenv DAT_DIR ${DATA_DISK}/${USER}/data/${REGION}/noobs
-if ( ! $?RUN_DIR )       setenv RUN_DIR ${DAT_DIR}/gen_be
+if ( ! $?DAT_DIR )       setenv DAT_DIR ${DATA_DISK}/${USER}/data/${REGION}/${EXPT}
+if ( ! $?RUN_DIR )       setenv RUN_DIR ${DAT_DIR}/$ID
 if ( ! $?STAGE0_DIR )    setenv STAGE0_DIR ${RUN_DIR}/stage0
 
 if ( ! -d ${RUN_DIR} )   mkdir ${RUN_DIR}
@@ -108,7 +109,7 @@ if ( $?RUN_GEN_BE_STAGE0 ) then
    set BEGIN_CPU = `date`
    echo "Beginning CPU time: ${BEGIN_CPU}"
 
-   $GEN_BE_DIR/run/gen_be/gen_be_stage0_wrf.csh >& gen_be_stage0_wrf.log
+   $GEN_BE_DIR/run/gen_be/gen_be_stage0_wrf.csh
 
    set RC = $status
    if ( $RC != 0 ) then
