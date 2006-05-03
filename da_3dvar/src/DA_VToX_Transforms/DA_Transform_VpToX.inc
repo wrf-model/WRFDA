@@ -3,9 +3,9 @@ subroutine da_transform_vptox( xb, xbx, vp, xp, xa, be, ep, &
                                ims,ime, jms,jme, kms,kme,   &
                                its,ite, jts,jte, kts,kte )
 
-!--------------------------------------------------------------------------
+!-----------------------------------------------------------------------
 ! Purpose : Physical transform of analysis increment variables.
-!--------------------------------------------------------------------------
+!-----------------------------------------------------------------------
 
    implicit none
    
@@ -22,6 +22,9 @@ subroutine da_transform_vptox( xb, xbx, vp, xp, xa, be, ep, &
    integer, intent(in)  :: its,ite, jts,jte, kts,kte ! tile   dims.
 
    integer              :: n, k, j, k1               ! Loop counters.
+
+   IF (trace_use) CALL da_trace_entry("da_transform_vptox") 
+
 
 !--------------------------------------------------------------------------
 !  [1] Include alpha control variable:
@@ -105,6 +108,9 @@ subroutine da_transform_vptox( xb, xbx, vp, xp, xa, be, ep, &
 !  Pseudo RH --> Specific humidity:
    xa % q(its:ite,jts:jte,kts:kte) = vp%v4(its:ite,jts:jte,kts:kte) * &
                                      xb%qs(its:ite,jts:jte,kts:kte)
+
+   IF (trace_use) CALL da_trace_exit("da_transform_vptox") 
+
  
 end subroutine da_transform_vptox
 

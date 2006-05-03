@@ -1,4 +1,4 @@
-subroutine DA_Transform_VpToX_Adj( xb, xbx, xa, vp, be, ep, xp, &
+subroutine da_transform_vptox_adj( xb, xbx, xa, vp, be, ep, xp, &
                                    ids,ide, jds,jde, kds,kde,  &
                                    ims,ime, jms,jme, kms,kme,  &
                                    its,ite, jts,jte, kts,kte )
@@ -26,11 +26,14 @@ subroutine DA_Transform_VpToX_Adj( xb, xbx, xa, vp, be, ep, xp, &
    vp%v4(its:ite,jts:jte,kts:kte)  = vp%v4(its:ite,jts:jte,kts:kte) + &
                                      xa%q (its:ite,jts:jte,kts:kte) * &
                                      xb%qs(its:ite,jts:jte,kts:kte)
+
+   IF (trace_use) CALL da_trace_entry("da_transform_vptox_adj")
+
                                     
    call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id3)
 
 !  Transform psi and chi to u and v:
-   call DA_PsiChi_To_UV_Adj( xa % u, xa % v, xb % coefx,   &
+   call da_psichi_to_uv_adj( xa % u, xa % v, xb % coefx,   &
                              xb % coefy, vp % v1, vp % v2, &
                              ids,ide, jds,jde, kds,kde,    &
                              ims,ime, jms,jme, kms,kme,    &
@@ -104,5 +107,8 @@ subroutine DA_Transform_VpToX_Adj( xb, xbx, xa, vp, be, ep, xp, &
       end do
    end do
 
-end subroutine DA_Transform_VpToX_Adj
+   IF (trace_use) CALL da_trace_entry("da_transform_vptox_adj")
+
+
+end subroutine da_transform_vptox_adj
 
