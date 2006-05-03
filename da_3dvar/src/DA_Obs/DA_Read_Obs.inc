@@ -584,29 +584,30 @@ loop_level: DO i = 1, platform%info%levels
             ob%sonde_sfc(num_sound)%q = ob%sonde_sfc(num_sound)%u
          endif
 
-         if(nlevels < 1) cycle reports
+         if (nlevels > 0) THEN
 
-         allocate (ob%sound(num_sound)%h (1:nlevels))
-         allocate (ob%sound(num_sound)%p (1:nlevels))
-         allocate (ob%sound(num_sound)%zk(1:nlevels))
-         allocate (ob%sound(num_sound)%u (1:nlevels))
-         allocate (ob%sound(num_sound)%v (1:nlevels))
-         allocate (ob%sound(num_sound)%t (1:nlevels))
-         allocate (ob%sound(num_sound)%q (1:nlevels))
+            allocate (ob%sound(num_sound)%h (1:nlevels))
+            allocate (ob%sound(num_sound)%p (1:nlevels))
+            allocate (ob%sound(num_sound)%zk(1:nlevels))
+            allocate (ob%sound(num_sound)%u (1:nlevels))
+            allocate (ob%sound(num_sound)%v (1:nlevels))
+            allocate (ob%sound(num_sound)%t (1:nlevels))
+            allocate (ob%sound(num_sound)%q (1:nlevels))
 
-         j = 0
-         do i = 1, ob%sound(num_sound)%info%levels
-           if(i == surface_level) cycle
+            j = 0
+            do i = 1, ob%sound(num_sound)%info%levels
+              if(i == surface_level) cycle
 
-           j=j+1
+              j=j+1
 
-           ob%sound(num_sound)%h(j) = platform%each(i)%height
-           ob%sound(num_sound)%p(j) = platform%each(i)%p%inv
-           ob%sound(num_sound)%u(j) = platform%each(i)%u
-           ob%sound(num_sound)%v(j) = platform%each(i)%v
-           ob%sound(num_sound)%t(j) = platform%each(i)%t
-           ob%sound(num_sound)%q(j) = platform%each(i)%q
-         enddo
+              ob%sound(num_sound)%h(j) = platform%each(i)%height
+              ob%sound(num_sound)%p(j) = platform%each(i)%p%inv
+              ob%sound(num_sound)%u(j) = platform%each(i)%u
+              ob%sound(num_sound)%v(j) = platform%each(i)%v
+              ob%sound(num_sound)%t(j) = platform%each(i)%t
+              ob%sound(num_sound)%q(j) = platform%each(i)%q
+            enddo
+         end if
 
          ob%sound(num_sound)%info%levels = nlevels
 
@@ -1114,7 +1115,7 @@ loop_level: DO i = 1, platform%info%levels
                                    - num_gpspw - num_gpsref - num_qscat  &
                                    - num_profiler - num_buoy &
                                    - num_bogus, &
-                                   '  Observations unsaved.'
+                                   '  reports unsaved.'
       write(unit=stdout,FMT=*) ' '
    end if
 
