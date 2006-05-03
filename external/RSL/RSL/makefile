@@ -168,6 +168,9 @@ altix :
 linux :
 	$(MAKE) -f makefile.linux LINUX_MPIHOME=$(LINUX_MPIHOME) $(MAKE_OPTS) all
 
+darwin :
+	$(MAKE) -f makefile.darwin $(MAKE_OPTS) all
+
 sx :
 	$(MAKE) -f makefile.sx $(MAKE_OPTS) all
 
