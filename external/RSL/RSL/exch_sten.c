@@ -413,7 +413,11 @@ fprintf(stderr,"debug posting async recv for %d bytes from %d\n", procrec->unpac
 #if 0
 fprintf(stderr,"pack   base %lu, f90_index %d, sten=%d\n",base,pr->f90_table_index,s) ;
 #endif
+#if 0
+/* this format of pragma upsets the latest Cray compilers, which expect
+comma separated variables. To be on the safe side, skip it */
 #pragma no_cache_alloc bufin bufout
+#endif
       bufin = (int *)(base) + (pr->offset >> 2);
       bufout = (int *)(pbuf) + (pr->curs >> 2);
       inc = pr->stride >> 2;
@@ -488,7 +492,11 @@ fprintf(stderr,"debug sending %d bytes to %d, sten=%d\n", curs, mdest, s ) ;
         {
           int inc, nwrds;
           int *bufin, *bufout;
+#if 0
+/* this format of pragma upsets the latest Cray compilers, which expect
+comma separated variables. To be on the safe side, skip it */
 #pragma no_cache_alloc bufin bufout
+#endif
 
           pr = &procrec->unpack_table[i] ;
 
