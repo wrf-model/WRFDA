@@ -72,8 +72,8 @@
       ln -sf ${DAT_DIR}/${NEXT_DATE}/wrfout_d01_${FILE_DATE} ${FILE}.e002
    endif
 
-   ln -fs ${BUILD_DIR}/gen_be_stage0_wrf_ens.exe .
-   ./gen_be_stage0_wrf_ens.exe ${BE_METHOD} ${FCST_TIME} $NE $FILE >&! gen_be_stage0_wrf.${FCST_TIME}.out
+   ln -fs ${BUILD_DIR}/gen_be_stage0_wrf.exe .
+   ./gen_be_stage0_wrf.exe ${BE_METHOD} ${FCST_TIME} $NE $FILE >&! gen_be_stage0_wrf.${FCST_TIME}.out
 
 #  Tidy:
 #   mv pert.${FCST_TIME}* ${STAGE0_DIR}
