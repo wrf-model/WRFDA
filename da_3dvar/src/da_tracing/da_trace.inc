@@ -71,7 +71,7 @@ SUBROUTINE da_trace( &
    ! Perform the trace if not done too many times before. Only on PE 0
    !-----------------------------------------------------------------------  
 
-   IF (mype == trace_pe) THEN
+   IF (trace_write) THEN
 
       IF (PRESENT(MaxNoCalls)) THEN
          LocalMaxNoCalls = MaxNoCalls
@@ -125,7 +125,7 @@ SUBROUTINE da_trace( &
               "Cannot write to trace file for "//TRIM(Name))
          END IF
       END IF
-   END IF ! mype==trace_pe
+   END IF ! trace_write
 
    RETURN
 

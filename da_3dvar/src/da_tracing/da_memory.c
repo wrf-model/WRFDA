@@ -17,7 +17,8 @@ void da_memory_(
 
   int *memory_used;
 {
-#ifndef MACOS
+
+#if !(defined(vpp) || defined(vpp2) || defined(SUN) || defined(crayx1) || defined(MACOS))
 struct mallinfo result;
 
 result=mallinfo();

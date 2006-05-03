@@ -104,13 +104,7 @@ SUBROUTINE da_trace_exit( &
       TotalSpace = 0
    END IF
 
-   !-----------------------------------------------------------------------
-   ! Print trace of this call :
-   !   only on PE trace_pe,  only if TraceDepth <= trace_max_depth,
-   !   only if this routine has not been traced too often already.
-   !-----------------------------------------------------------------------  
-
-   IF (mype == trace_pe .AND. TraceDepth <= trace_max_depth ) THEN
+   IF (trace_write .AND. TraceDepth <= trace_max_depth ) THEN
 
       IF (PRESENT(MaxNoCalls)) THEN
          LocalMaxNoCalls = MaxNoCalls
@@ -162,7 +156,7 @@ SUBROUTINE da_trace_exit( &
              "Cannot write to trace file for "//TRIM(Name))
        END IF
      END IF
-   END IF ! mype==trace_pe
+   END IF ! trace_write
 
    ! Restore pointer
    Pointer = CalledBy(Pointer)

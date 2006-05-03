@@ -50,6 +50,8 @@ MODULE da_tracing
    CHARACTER (LEN=TraceNameLen) :: TimerNames(MaxNoRoutines) ! Subroutine names
    CHARACTER (LEN=TraceNameLen) :: TraceNames(MaxNoRoutines) ! for timing and tracing
 
+   LOGICAL :: trace_write = .FALSE.
+
 
 CONTAINS
 

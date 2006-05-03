@@ -110,7 +110,9 @@ fi
 # [3.0] Prepare for assimilation:
 #-----------------------------------------------------------------------
 
-ln -s $DA_RTTOV_COEFFS/* .
+if test $DA_RTTOV_COEFFS'.' != '.'; then
+  ln -s $DA_RTTOV_COEFFS/* .
+fi
 
 cp $DA_DIR/run/gribmap.txt .
 cp $DA_DIR/run/LANDUSE.TBL .
@@ -176,6 +178,8 @@ echo "Observation Input File:      $DA_OBSERVATIONS"
 
 . $DA_BUILD_DIR/inc/namelist_script.inc
 
+mkdir trace
+
 #-------------------------------------------------------------------
 #Run WRF-Var:
 #-------------------------------------------------------------------
@@ -229,14 +233,12 @@ if test -f fort.82; then
   cp $PWD/fort.82      $EXP_DIR/grad_fn
 fi
 
-if test -f fort.99; then
-  cp $PWD/fort.99      $EXP_DIR/trace.html
-fi
-
 cp $PWD/namelist.*   $EXP_DIR
 cp $PWD/rsl*         $EXP_DIR
 cp $PWD/wrfvar.out   $EXP_DIR
 cp $PWD/wrfvar.error $EXP_DIR
+
+
 
 echo "WRF-Var completed"
 date

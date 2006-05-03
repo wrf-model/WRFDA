@@ -69,7 +69,7 @@ SUBROUTINE da_trace_report
 
 #ifdef DM_PARALLEL
    CALL proc_sum_int(MasterNoRoutines)
-   ! Only PE knows the result
+   ! Only PE 0 knows the result
 
    CALL MPI_BCAST(MasterTimerNames(1:MaxNoRoutines), &
                   TraceNameLen*MaxNoRoutines, &
@@ -129,10 +129,13 @@ SUBROUTINE da_trace_report
          OverallNoCalls(j)=SUM(MasterNoCalls(:,j))
       END DO
 
+      WRITE(UNIT=trace_unit, FMT='(A,I4,A)') &
+         "</pre><hr><H1>For PE",trace_pe,"</H1>"
+
       ! Output timing information
 
       WRITE(UNIT=trace_unit, &
-         FMT='("</pre><hr><a name=local><h2>Local Timing Summary</h2></a>")')
+         FMT='("<a name=local><h2>Local Timing Summary</h2></a>")')
 
       IF (nproc == 1) THEN
          ! needs changing to work MPP
