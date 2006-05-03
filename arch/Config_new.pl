@@ -150,9 +150,6 @@ while ( <CONFIGURE_PREAMBLE> ) {
 }
 close CONFIGURE_PREAMBLE ;
 
-print "end of configure preamble\n";
-print "@machopts1\n";
-
 open CONFIGURE_DEFAULTS, "< ./arch/configure.defaults_new" 
   or die "Cannot open ./arch/configure.defaults_new for reading" ;
 $latchon = 0 ;
