@@ -1,6 +1,6 @@
 SUBROUTINE DA_Scan_Obs (iunit, ob, xp, filename)
 !-----------------------------------------------------------------------------!
-!  Purpose: Scan 3D-VAR GTS observation file
+!  Purpose: Scan WRFVAR GTS observation file
 !-----------------------------------------------------------------------------!
 !
 ! Modifications:      10/26/2004            Syed RH Rizvi
@@ -92,10 +92,9 @@ SUBROUTINE DA_Scan_Obs (iunit, ob, xp, filename)
            STATUS = 'OLD')
 
       IF (iost /= 0) THEN
-         write(UNIT=stdout, fmt='(/A,I3,3(2X,A)/)') &
-              'ERROR IN OBS INPUT FILE UNIT ',iunit, &
-              'OBS FILENAME:', trim(filename), &
-              'FOR GTS OBSERVATIONS CANNOT BE FOUND OR CANNOT BE OPENED'
+         WRITE(UNIT=errmsg(1),FMT='(A,I3,A)') &
+            "Error",iost,"opening gts obs file "//TRIM(filename)
+         CALL wrf_warning3(__FILE__,__LINE__,errmsg(1))
          RETURN
       ENDIF
    else
@@ -107,9 +106,9 @@ SUBROUTINE DA_Scan_Obs (iunit, ob, xp, filename)
            STATUS = 'OLD')
 
       IF (iost /= 0) THEN
-         write(UNIT=stdout, fmt='(/A,I3,2X,a,i3/A/)') &
-              'ERROR IN OBS INPUT FILE UNIT ',iunit, 'iost=', iost, &
-              'FOR GTS OBSERVATIONS CANNOT BE FOUND OR CANNOT BE OPENED'
+         WRITE(UNIT=errmsg(1),FMT='(A,I3,A,I3)') &
+            "Error",iost,"opening gts obs header on unit",iunit
+         CALL wrf_warning3(__FILE__,__LINE__,errmsg(1))
          RETURN
       ENDIF
 #endif
@@ -149,10 +148,9 @@ SUBROUTINE DA_Scan_Obs (iunit, ob, xp, filename)
       READ (UNIT = iunit, FMT = '(A)', IOSTAT = iost) info_string
 
       IF (iost /= 0) THEN
-         write(UNIT=stdout, fmt='(/a,i3/a/)') &
-              'ERROR READING FILE UNIT:', iunit, &
-              'in read_obs_gts_header.F' 
-
+         WRITE(UNIT=errmsg(1),FMT='(A,I3,A,I3)') &
+            "Error",iost,"reading gts obs header on unit",iunit
+         CALL wrf_warning3(__FILE__,__LINE__,errmsg(1))
          return
       ENDIF
 
@@ -171,9 +169,9 @@ SUBROUTINE DA_Scan_Obs (iunit, ob, xp, filename)
         fmt_name, fmt_each
 
    IF (iost /= 0) THEN
-      write(UNIT=stdout, fmt='(/A,I3,A/)') &
-           ' ERROR IN INPUT FILE UNIT ',iunit, &
-           ' FOR GTS OBSERVATIONS CANNOT BE FOUND OR CANNOT BE OPENED'
+      WRITE(UNIT=errmsg(1),FMT='(A,I3,A,I3)') &
+         "Error",iost,"reading gts obs formats on unit",iunit
+         CALL wrf_warning3(__FILE__,__LINE__,errmsg(1))
       RETURN
    ENDIF
 
@@ -525,7 +523,7 @@ loop_level: DO i = 1, platform%info%levels
 
       write(UNIT=stdout, fmt='(5x,a,i6,a)') &
            'Scan:  ', ob%current_ob_time, ' ob time:', &
-           'Scan:  ', total_obs, ' Total Observations.', &
+           'Scan:  ', total_obs, ' Total reports.', &
            'Scan:  ', num_sound, ' SOUND reports,', &
            'Scan:  ', num_synop, ' SYNOP reports,', &
            'Scan:  ', num_pilot, ' PILOT reports,', &
