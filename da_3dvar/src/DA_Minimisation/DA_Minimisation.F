@@ -29,6 +29,7 @@
       USE DA_Setup_Structures
       use da_qscat
       use da_radiance
+      use module_get_file_names ! for system call on Cray
 
       USE module_wrf_3dvar_io
 
