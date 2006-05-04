@@ -22,6 +22,19 @@
 #define ifxy	   ifxy_
 #endif
 
+#ifdef DOUBLEUNDERSCORE
+#define bort_exit  bort_exit__
+#define bort	   bort__
+#define restd	   restd__
+#define numtbd	   numtbd__
+#define nemtbb	   nemtbb__
+#define wrdesc	   wrdesc__
+#define istdesc	   istdesc__
+#define uptdd	   uptdd__
+#define cadn30	   cadn30__
+#define ifxy	   ifxy__
+#endif
+
 /*
 ** In order to ensure that the C <-> FORTRAN interface works properly (and
 ** portably!), the default size of an "INTEGER" declared in FORTRAN must be 
