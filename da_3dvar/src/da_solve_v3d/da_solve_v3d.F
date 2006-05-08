@@ -25,6 +25,7 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
    USE DA_Minimisation
    USE par_util
    USE da_tracing
+   USE module_get_file_names ! for system interface on Cray
 
 ! Registry generated module
    USE module_state_description
@@ -97,11 +98,38 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
       CALL wrf_get_nproc( nproc )
       IF ( nproc == 1 ) THEN
          testing_dm_exact = .FALSE.
-         IF ( print_detail >= 1 ) THEN
-            WRITE(UNIT=stdout,FMT='(A)') &
-              ' testing_dm_exact overridden to .FALSE. for serial or 1-MPI-task run'
-         ENDIF
+         WRITE(UNIT=stdout,FMT='(A)') &
+           ' testing_dm_exact overridden to .FALSE. for serial or 1-MPI-task run'
       ENDIF
+      ! Only implmenented for Sound and Synop, so switch other types off
+      Use_ShipsObs         = .FALSE.
+      Use_MetarObs         = .FALSE.
+      Use_BogusObs         = .FALSE.
+      Use_PilotObs         = .FALSE.
+      Use_AirepObs         = .FALSE.
+      Use_GeoAMVObs        = .FALSE.
+      Use_PolarAMVObs      = .FALSE.
+      Use_BuoyObs          = .FALSE.
+      Use_ProfilerObs      = .FALSE.
+      Use_SatemObs         = .FALSE.
+      Use_GpspwObs         = .FALSE.
+      Use_GpsrefObs        = .FALSE.
+      Use_SsmiRetrievalObs = .FALSE.
+      Use_SsmiTbObs        = .FALSE.
+      use_ssmt1obs         = .FALSE.
+      use_ssmt2obs         = .FALSE.
+      use_qscatobs         = .FALSE.
+      use_Hirs2Obs         = .FALSE.
+      use_Hirs3Obs         = .FALSE.
+      use_MsuObs           = .FALSE.
+      use_AmsuaObs         = .FALSE.
+      use_AmsubObs         = .FALSE.
+      use_AirsObs          = .FALSE.
+      use_Eos_AmsuaObs     = .FALSE.
+      use_Eos_radObs       = .FALSE.
+      use_HsbObs           = .FALSE.
+      Use_Obsgts           = .FALSE.
+      Use_Radiance         = .FALSE.
    ENDIF
     
    if ( num_pseudo > 0 ) then
