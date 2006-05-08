@@ -234,7 +234,7 @@ SUBROUTINE DA_Scan_Radar (iunit, ob, xp, filename)
 ! 4. PRINT OUT
 ! ============
  
-   if(print_detail > 0) write(UNIT=stdout, fmt='(/5x,a,i6,a)') &
+   if(print_detail_radar) write(UNIT=stdout, fmt='(/5x,a,i6,a)') &
          ' Read:  ', num_Radar, ' Radar reports '
 
    WRITE (unit=stderr,FMT='(/,A,I3,/)') ' END OF UNIT: ',iunit
