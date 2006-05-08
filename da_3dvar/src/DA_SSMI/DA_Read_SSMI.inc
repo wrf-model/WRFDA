@@ -70,7 +70,7 @@ SUBROUTINE DA_Read_SSMI (iunit, ob, xp, filename)
       IF (iost /= 0) THEN
          write(unit=stderr, fmt='(/A,I3,2X,A/)') &
               'ERROR IN INPUT FILE UNIT ',iunit, &
-              'FOR SSMI OBSERVATIONS CANNOT BE FOUND OR CANNOT BE OPENED'
+              'FOR SSMI REPORTS CANNOT BE FOUND OR CANNOT BE OPENED'
          RETURN
       ENDIF
    endif
@@ -334,11 +334,11 @@ head_line_2:  DO
    write(unit=stdout, fmt='(5x,a,i6,a)') &
         'Read:  ', ob % num_ssmi_retrieval , ' SSMI_RETRIEVAL reports,', &
         'Read:  ', ob % num_ssmi_tb ,        ' SSMI_Tb reports,', &
-        'Read:  ', ob % total_obs, ' Total Observations.', &
+        'Read:  ', ob % total_obs, ' Total reports.', &
      'There are ', ob % total_obs                  &
                  - ob % num_ssmi_retrieval         &
                  - ob % num_ssmi_tb,               &
-                '  Observations unsaved.'
+                '  reports unsaved.'
 
    write(unit=stdout, fmt='(/,25x,a)') &
                         '     used   outdomain  max_er_chk   missing' 
