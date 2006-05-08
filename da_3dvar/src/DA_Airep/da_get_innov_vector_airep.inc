@@ -146,7 +146,7 @@ SUBROUTINE da_get_innov_vector_airep ( it, xb, xp, ob, iv )
       endif
     END DO
 
-    if(print_detail > 10) then
+    if(print_detail_airep) then
       write(unit = check_max_iv_unit, FMT ='(A,i5,A)')'For outer iteration ',it, &
         ', Total Rejections for Airep follows:'
       WRITE (UNIT = check_max_iv_unit, FMT = '(/,10(2(A,I6),/))') &
