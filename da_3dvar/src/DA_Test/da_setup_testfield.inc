@@ -62,7 +62,7 @@ subroutine da_setup_testfield( xb, xa, xp, &
    xa%psfc(xp%its:xp%ite, xp%jts:xp%jte) = &
    xa%p   (xp%its:xp%ite, xp%jts:xp%jte, xp%kts)
 
-   if(print_detail > 100) then
+   if(print_detail_testing) then
       write(UNIT=stdout, fmt='(2a,4x,a,i8)') &
          'file:', __FILE__, 'line:', __LINE__
 
