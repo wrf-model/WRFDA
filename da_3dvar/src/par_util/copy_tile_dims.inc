@@ -36,7 +36,7 @@ SUBROUTINE copy_tile_dims( grid, xp, its, ite, jts, jte, kts, kte )
      if(jte > xp%jde) jte = xp%jde
      if(kte > xp%kde) kte = xp%kde
 
-     if ( print_detail > 0) then
+     if ( print_detail_parallel) then
         write(unit=stdout, fmt='(/)')
         write(unit=stdout, fmt='(A,i3,A,5x,3(i3,A,i3,5x))') 'Tile ',ij, &
                 ' size:', its,':',ite, jts,':',jte, kts,':',kte

@@ -146,7 +146,7 @@ SUBROUTINE copy_dims(grid, xp, &
    xp%kps = kps
    xp%kpe = kpe
 
-   if(print_detail > 0) then
+   if(print_detail_parallel) then
       write(unit=stdout, fmt='(2(a, i4, 5x))') &
            'xp%ids =', xp%ids , 'xp%ide =', xp%ide , &
            'xp%jds =', xp%jds , 'xp%jde =', xp%jde , &
