@@ -54,7 +54,7 @@ subroutine da_write_analysis_mm5( ix, jy, kz, xp, xb, xa, it )
 
    integer :: anl_unit, inc_unit
 
-   logical :: print_info, need_write
+   logical :: need_write
 
 !----------------------------------------------------------------------------
 
@@ -79,12 +79,6 @@ subroutine da_write_analysis_mm5( ix, jy, kz, xp, xb, xa, it )
 
    inc_unit = jpout - max_ext_its + it
    anl_unit = jpout+10 - max_ext_its + it
-
-   if(PRINT_DETAIL > 0) then
-      print_info  = .true.
-   else
-      print_info  = .false.
-   endif
 
    seconds = 86400
 
@@ -112,7 +106,7 @@ subroutine da_write_analysis_mm5( ix, jy, kz, xp, xb, xa, it )
              "Error reading big header")
          endif
 
-         if(print_info) &
+         if(print_detail_mm5) &
             call DA_print_big_header(xb_mm5%big_header%bhi, xb_mm5%big_header%bhr, &
                                      xb_mm5%big_header%bhic,xb_mm5%big_header%bhrc)
          big_head_flag = flag
@@ -135,7 +129,7 @@ subroutine da_write_analysis_mm5( ix, jy, kz, xp, xb, xa, it )
              "Error reading subheader")
          endif
 
-         if(print_info) then
+         if(print_detail_mm5) then
             call DA_print_sub_header(xb_mm5%sub_header(nv))
          endif
 
@@ -409,8 +403,6 @@ subroutine da_write_analysis_mm5( ix, jy, kz, xp, xb, xa, it )
 
    IF ( wrf_dm_on_monitor() ) THEN
 
-!     print_info  = .false.
-
 !------------------------------------------------------------------------------      
 !--loop over each variable
 !------------------------------------------------------------------------------
@@ -424,7 +416,7 @@ subroutine da_write_analysis_mm5( ix, jy, kz, xp, xb, xa, it )
          xb_mm5 % sub_header(n) % current_date = ANALYSIS_DATE ! Forecast date
       end if
 
-      if(print_info) then
+      if(print_detail_mm5) then
          call DA_print_sub_header(xb_mm5%sub_header(n))
       endif
 
@@ -575,7 +567,7 @@ subroutine da_write_analysis_mm5( ix, jy, kz, xp, xb, xa, it )
              "Error reading big header")
          endif
 
-         if(print_info) &
+         if(print_detail_mm5) &
             call DA_print_big_header(xb_mm5%big_header%bhi, xb_mm5%big_header%bhr, &
                                      xb_mm5%big_header%bhic,xb_mm5%big_header%bhrc)
       elseif (flag == 1) then
@@ -613,7 +605,7 @@ subroutine da_write_analysis_mm5( ix, jy, kz, xp, xb, xa, it )
              "Error reading subheader")
          endif
 
-         if(print_info) then
+         if(print_detail_mm5) then
             call DA_print_sub_header(xb_mm5%sub_header(nv))
          endif
 
@@ -654,7 +646,7 @@ subroutine da_write_analysis_mm5( ix, jy, kz, xp, xb, xa, it )
             exit ter_loop
          endif
 
-         if(print_info) &
+         if(print_detail_mm5) &
             call DA_print_big_header(xb_mm5%big_header%bhi, xb_mm5%big_header%bhr, &
                                      xb_mm5%big_header%bhic,xb_mm5%big_header%bhrc)
       elseif (flag == 1) then
@@ -676,7 +668,7 @@ subroutine da_write_analysis_mm5( ix, jy, kz, xp, xb, xa, it )
              "Error reading subheader")
          endif
 
-         if(print_info) then
+         if(print_detail_mm5) then
             call DA_print_sub_header(xb_mm5%sub_header(nv))
          endif
 
@@ -702,7 +694,7 @@ subroutine da_write_analysis_mm5( ix, jy, kz, xp, xb, xa, it )
             xb_mm5%sub_header(n) % current_time = 0.0           ! Forecast time=0
             xb_mm5%sub_header(n) % current_date = ANALYSIS_DATE ! Forecast date
 
-            if(print_info) &
+            if(print_detail_mm5) &
                call DA_print_big_header(xb_mm5%big_header%bhi, xb_mm5%big_header%bhr, &
                                         xb_mm5%big_header%bhic,xb_mm5%big_header%bhrc)
 
