@@ -124,7 +124,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xp )
 !----------------------------------------------------------------------------!
 !  Write Synop:
    IF ( iv % num_synop > 0 ) THEN
-    if(print_detail > 1) print*,' writing filtered Obs for synop ',iv%num_synop
+    if(print_detail_f_obs) print*,' writing filtered Obs for synop ',iv%num_synop
 !
 !----------------------------------------------------------------------------!
     DO i = 1, iv % num_synop               
@@ -213,7 +213,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xp )
 !  Write Metar:
 !----------------------------------------------------------------------------!
    IF ( iv % num_metar > 0 ) THEN
-    if(print_detail > 1) print*,' writing filtered Obs for metar ',iv%num_metar
+    if(print_detail_f_obs) print*,' writing filtered Obs for metar ',iv%num_metar
 !
 !----------------------------------------------------------------------------!
     DO i = 1, iv % num_metar               
@@ -302,7 +302,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xp )
 !  Write Ships:
 !----------------------------------------------------------------------------!
    IF ( iv % num_ships > 0 ) THEN
-    if(print_detail > 1) print*,' writing filtered Obs for ships ',iv%num_ships
+    if(print_detail_f_obs) print*,' writing filtered Obs for ships ',iv%num_ships
 !
 !----------------------------------------------------------------------------!
     DO i = 1, iv % num_ships               
@@ -390,7 +390,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xp )
 !  Write Buoy :
 !----------------------------------------------------------------------------!
    IF ( iv % num_buoy  > 0 ) THEN
-    if(print_detail > 1) print*,' writing filtered Obs for buoy  ',iv%num_buoy 
+    if(print_detail_f_obs) print*,' writing filtered Obs for buoy  ',iv%num_buoy 
 !----------------------------------------------------------------------------!
     DO i = 1, iv % num_buoy                
     nlevels = iv%buoy (i)%info%levels
@@ -477,7 +477,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xp )
 !----------------------------------------------------------------------------!
 !  Write Geo. AMVs Obs:
    IF ( iv % num_geoamv > 0 ) THEN
-    if(print_detail > 1) print*,' writing filtered Obs for geoamv ',iv%num_geoamv
+    if(print_detail_f_obs) print*,' writing filtered Obs for geoamv ',iv%num_geoamv
 !
 !----------------------------------------------------------------------------!
     DO i = 1, iv % num_geoamv               
@@ -527,7 +527,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xp )
 !----------------------------------------------------------------------------!
 !  Write Polar AMVs Obs:
    IF ( iv % num_polaramv > 0 ) THEN
-    if(print_detail > 1) print*,' writing filtered Obs for polaramv ',iv%num_polaramv
+    if(print_detail_f_obs) print*,' writing filtered Obs for polaramv ',iv%num_polaramv
 !
 !----------------------------------------------------------------------------!
     DO i = 1, iv % num_polaramv               
@@ -577,7 +577,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xp )
 !----------------------------------------------------------------------------!
 !  Write Sounde 
    IF ( iv % num_sound > 0 ) THEN
-    if(print_detail > 1) print*,' writing filtered Obs for sound  ',iv%num_sound 
+    if(print_detail_f_obs) print*,' writing filtered Obs for sound  ',iv%num_sound 
 !
 !----------------------------------------------------------------------------!
    DO i = 1, iv % num_sound               
@@ -746,7 +746,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xp )
 !----------------------------------------------------------------------------!
 !  Write Airep: 
    IF ( iv % num_airep > 0 ) THEN
-    if(print_detail > 1) print*,' writing filtered Obs for airep  ',iv%num_airep 
+    if(print_detail_f_obs) print*,' writing filtered Obs for airep  ',iv%num_airep 
 !----------------------------------------------------------------------------!
     DO i = 1, iv % num_airep               
      write(ounit, FMT = fmt_info, IOSTAT = iost) &
@@ -803,7 +803,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xp )
 !----------------------------------------------------------------------------!
 !  Write Pilot:
    IF ( iv % num_pilot > 0 ) THEN
-    if(print_detail > 1) print*,' writing filtered Obs for pilot  ',iv%num_pilot 
+    if(print_detail_f_obs) print*,' writing filtered Obs for pilot  ',iv%num_pilot 
 !----------------------------------------------------------------------------!
    DO i = 1, iv % num_pilot               
      write(ounit, FMT = fmt_info, IOSTAT = iost) &
@@ -854,7 +854,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xp )
 ! Note: The Satem ref_p is put in the SLP position in OBSPROC data stream.
 !
    IF ( iv % num_satem > 0 ) THEN
-    if(print_detail > 1) print*,' writing filtered Obs for satem  ',iv%num_satem 
+    if(print_detail_f_obs) print*,' writing filtered Obs for satem  ',iv%num_satem 
 !----------------------------------------------------------------------------!
 !  Write Satem:          
    rewind 193
@@ -899,7 +899,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xp )
 !  Write Qscat: 
    IF ( iv % num_qscat > 0 ) THEN
 !
-    if(print_detail > 1) print*,' writing filtered Obs for qscat  ',iv%num_qscat 
+    if(print_detail_f_obs) print*,' writing filtered Obs for qscat  ',iv%num_qscat 
 !----------------------------------------------------------------------------!
    DO i = 1, iv % num_qscat               
      write(ounit, FMT = fmt_info, IOSTAT = iost) &
@@ -943,7 +943,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xp )
 !----------------------------------------------------------------------------!
 ! Write Profiler: 
    IF ( iv % num_profiler > 0 ) THEN
-    if(print_detail > 1) print*,' writing filtered Obs for profiler  ',iv%num_profiler 
+    if(print_detail_f_obs) print*,' writing filtered Obs for profiler  ',iv%num_profiler 
 !----------------------------------------------------------------------------!
    DO i = 1, iv % num_profiler            
      write(ounit, FMT = fmt_info, IOSTAT = iost)    &
@@ -990,7 +990,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xp )
 !----------------------------------------------------------------------------!
 !  Write SSMI retrieval:
    IF ( iv % num_ssmi_retrieval > 0 ) THEN
-    if(print_detail > 1) print*,' writing filtered Obs for ssmi retrieval  ', iv % num_ssmi_retrieval 
+    if(print_detail_f_obs) print*,' writing filtered Obs for ssmi retrieval  ', iv % num_ssmi_retrieval 
 !----------------------------------------------------------------------------!
     DO i = 1, iv % num_ssmi_retrieval
      write(ounit, FMT = fmt_info, IOSTAT = iost) &
@@ -1008,7 +1008,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xp )
 !----------------------------------------------------------------------------!
 !  [10] Write SSMT1:          
    IF ( iv % num_ssmt1 > 0 ) THEN
-    if(print_detail > 1) print*,' writing filtered Obs for ssmt1 ', iv % num_ssmt1 
+    if(print_detail_f_obs) print*,' writing filtered Obs for ssmt1 ', iv % num_ssmt1 
 !----------------------------------------------------------------------------!
    DO i = 1, iv % num_ssmi_retrieval
      write(ounit, FMT = fmt_info, IOSTAT = iost) &
@@ -1038,7 +1038,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xp )
 !----------------------------------------------------------------------------!
 !  Write SSMT2:          
    IF ( iv % num_ssmt2 > 0 ) THEN
-    if(print_detail > 1) print*,' writing filtered Obs for ssmt2 ', iv % num_ssmt2 
+    if(print_detail_f_obs) print*,' writing filtered Obs for ssmt2 ', iv % num_ssmt2 
 !----------------------------------------------------------------------------!
     DO i = 1, iv % num_ssmi_retrieval
      write(ounit, FMT = fmt_info, IOSTAT = iost) &
@@ -1069,7 +1069,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xp )
 !----------------------------------------------------------------------------!
 !  Write Gpspw:          
    IF ( iv % num_gpspw > 0 ) THEN
-    if(print_detail > 1) print*,' writing filtered Obs for gpspw ', iv % num_gpspw 
+    if(print_detail_f_obs) print*,' writing filtered Obs for gpspw ', iv % num_gpspw 
 !----------------------------------------------------------------------------!
    DO i = 1, iv % num_gpspw
      write(ounit, FMT = fmt_info, IOSTAT = iost) &
@@ -1087,7 +1087,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xp )
 !----------------------------------------------------------------------------!
 !  Write Gps Refractivity:
    IF ( iv % num_gpsref > 0 ) THEN
-    if(print_detail > 1) print*,' writing filtered Obs for gpsref ', iv % num_gpsref
+    if(print_detail_f_obs) print*,' writing filtered Obs for gpsref ', iv % num_gpsref
 !----------------------------------------------------------------------------!
    DO i = 1, iv % num_gpsref
      write(ounit, FMT = fmt_info, IOSTAT = iost) &
