@@ -120,7 +120,7 @@ subroutine da_interpolate_regcoeff( iy, iys, kz, kzs, meanl_stats, &
       end do     
    end do
 
-   if(print_detail > 500) then
+   if(print_detail_regression) then
       call da_array_print( 1, pb_vert_reg_stats(1,:,:), &
          'pb_vert_reg_stats(1,:,:)' )
       call da_array_print( 1, pb_vert_reg(1,:,:), &

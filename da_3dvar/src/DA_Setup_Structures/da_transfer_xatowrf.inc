@@ -163,7 +163,7 @@ SUBROUTINE DA_Transfer_XatoWRF( xbx, grid, &
 !        EVALUATE ALSO THE INCREMENTS OF (1/rho) AND GEOPOTENTIAL
 !------------------------------------------------------------------------------
 
-   if(print_detail > 10) then
+   if(print_detail_xa) then
       write(unit=stdout, fmt='(a, e24.12)') &
         'sum(abs(xa%t(is:ie,js:je,ks:ke)))=', sum(abs(xa%t(is:ie,js:je,ks:ke))), &
         'sum(abs(xa%p(is:ie,js:je,ks:ke)))=', sum(abs(xa%p(is:ie,js:je,ks:ke))), &
@@ -368,8 +368,7 @@ SUBROUTINE DA_Transfer_XatoWRF( xbx, grid, &
       enddo
    endif
 
-   if(print_detail > 10) then
-      if(print_detail > 100) then
+   if(print_detail_xa) then
       write(unit=stdout, fmt='(/5a/)') ' simple variables:'
 
       if(ie == xp%ide) then
@@ -396,7 +395,6 @@ SUBROUTINE DA_Transfer_XatoWRF( xbx, grid, &
             enddo
             write(unit=stdout, fmt=*) ' '
          enddo
-      endif
       endif
 
       write(unit=stdout, fmt='(2(2x, a, e20.12))') &

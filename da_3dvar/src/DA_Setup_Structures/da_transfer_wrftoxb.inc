@@ -114,7 +114,7 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
 !--Convert WRF fields to xb:
 !---------------------------------------------------------------------------
 
-   if(print_detail > 0) then
+   if(print_detail_xb) then
      write(unit=stdout, fmt='(3a, i8)') &
           'file:', __FILE__, ', line:', __LINE__
 
@@ -122,7 +122,7 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
      write(unit=stdout, fmt=*) 'js,je=', js,je
      write(unit=stdout, fmt=*) 'ks,ke=', ks,ke
 
-     if(print_detail > 10) then
+     if(print_detail_xb) then
      write(unit=stdout, fmt='(/5a/)') &
           'lvl         dnw                dn 		rdnw       rdn'
 
@@ -140,7 +140,7 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
      enddo
      endif
 
-     if(print_detail > 100) then
+     if(print_detail_xb) then
      write(unit=stdout, fmt='(/5a/)') &
           'lvl         phb                 ph_2'
 
@@ -247,7 +247,7 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
 
 !---------------------------------------------------------------
 
-   if(print_detail > 0) then
+   if(print_detail_xb) then
    write(unit=stdout, fmt=*) 'is,ie,js,je,ks,ke=', is,ie,js,je,ks,ke
    write(unit=stdout, fmt=*) 'xp%its, xp%ite=', xp%its, xp%ite
    write(unit=stdout, fmt=*) 'xp%jts, xp%jte=', xp%jts, xp%jte
@@ -421,9 +421,9 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
 
    xb%ztop = xb%hf(is,js,ke+1)
 
-   if(print_detail > 0) then
+   if(print_detail_xb) then
      write(unit=stdout, fmt=*) ' '
-     if(print_detail > 10) then
+     if(print_detail_xb) then
      write(unit=stdout, fmt='(/5a/)') &
           'lvl         h                 p                t'
 
@@ -508,7 +508,7 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
 !--Calculate 1/grid box areas:
 !------------------------------------------------------------------------------
 
-   if(print_detail > 0) then
+   if(print_detail_xb) then
        write(unit=stdout, fmt='(/a, e24.16)') &
            'xb % ds=', xb % ds
 
@@ -563,7 +563,7 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
    call DA_TRH_To_TD(xb % rh, xb % t, xb % td, xp)
 #endif
 
-   if(print_detail > 10) then
+   if(print_detail_xb) then
       i=is; j=js; k=ks
 
       write(unit=stdout, fmt=*) 'i,j,k=', i,j,k
@@ -578,7 +578,7 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
 !--Sea level pressure and total precipitable water
 !------------------------------------------------------------------------------
 
-   if(print_detail > 0) then
+   if(print_detail_xb) then
      write(unit=stdout, fmt='(3a, i8)') &
           'file:', __FILE__, ', line:', __LINE__
 
@@ -601,7 +601,7 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
 !--Surface Wind speed
 !------------------------------------------------------------------------------
 
-   if(print_detail > 0) then
+   if(print_detail_xb) then
      write(unit=stdout, fmt='(3a, i8)') &
           'file:', __FILE__, ', line:', __LINE__
 
@@ -625,7 +625,7 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
 !--Brightness temperature SH Chen
 !------------------------------------------------------------------------------
 
-   if(print_detail > 0) then
+   if(print_detail_xb) then
      write(unit=stdout, fmt='(3a, i8)') &
           'file:', __FILE__, ', line:', __LINE__
 
@@ -640,7 +640,7 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
 !--GPS Refractivity linked by Y.-R. Guo 05/28/2004
 !------------------------------------------------------------------------------
 
-   if(print_detail > 0) then
+   if(print_detail_xb) then
      write(unit=stdout, fmt='(3a, i8)') &
           'file:', __FILE__, ', line:', __LINE__
 
@@ -715,7 +715,7 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
      CALL wrf_dm_sum_reals( loc_latc_mean, xbx % latc_mean )
    ENDIF
 
-   if(print_detail > 10) then
+   if(print_detail_xb) then
 !     write(unit=stdout, fmt=*) 'loc_psac_mean  =', loc_psac_mean
       write(unit=stdout, fmt=*) 'xbx % psac_mean=', xbx % psac_mean
 

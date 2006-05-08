@@ -65,7 +65,7 @@ SUBROUTINE DA_Transfer_KMAToXb( xbx, grid, &
    xb % kma_a = grid%kma_a
    xb % kma_b = grid%kma_b
 
-   if(print_detail > 0) then
+   if(print_detail_xb) then
      print *, ' '
      write(UNIT=stdout, fmt='(/a/)') &
           'lvl         kma_a                 kma_b'
@@ -134,7 +134,7 @@ SUBROUTINE DA_Transfer_KMAToXb( xbx, grid, &
 
 #endif
 !---------------------------------------------------------------------------------
-   if(print_detail > 0) then
+   if(print_detail_xb) then
    print *, 'xp%its, xp%ite=', xp%its, xp%ite
    print *, 'xp%jts, xp%jte=', xp%jts, xp%jte
    print *, 'xp%kts, xp%kte=', xp%kts, xp%kte
@@ -305,9 +305,9 @@ SUBROUTINE DA_Transfer_KMAToXb( xbx, grid, &
 !
    xb%ztop = xb%h(is,js,ke)
 
-   if(print_detail > 0) then
+   if(print_detail_xb) then
      print *, ' '
-     if(print_detail > 10) then
+     if(print_detail_xb) then
      write(UNIT=stdout, fmt='(/5a/)') &
           'lvl         h                 p                t'
 
@@ -442,7 +442,7 @@ SUBROUTINE DA_Transfer_KMAToXb( xbx, grid, &
    call DA_TRH_To_TD(xb % rh, xb % t, xb % td, xp)
 #endif
 
-   if(print_detail > 10) then
+   if(print_detail_xb) then
       i=is; j=js; k=ks
 
       print *, 'i,j,k=', i,j,k
@@ -457,7 +457,7 @@ SUBROUTINE DA_Transfer_KMAToXb( xbx, grid, &
 !--Sea level pressure and total precipitable water
 !------------------------------------------------------------------------------
 
-   if(print_detail > 0) then
+   if(print_detail_xb) then
      write(UNIT=stdout, fmt='(3a, i8)') &
           'file:', __FILE__, ', line:', __LINE__
 
@@ -489,7 +489,7 @@ SUBROUTINE DA_Transfer_KMAToXb( xbx, grid, &
 !
 #if 0
 !------------------------------------------------------------------------------
-   if(print_detail > 0) then
+   if(print_detail_xb) then
      write(UNIT=stdout, fmt='(3a, i8)') &
           'file:', __FILE__, ', line:', __LINE__
 
@@ -525,7 +525,7 @@ SUBROUTINE DA_Transfer_KMAToXb( xbx, grid, &
 #if 0
 !------------------------------------------------------------------------------
 
-  if(print_detail > 0) then
+  if(print_detail_xb) then
    write(UNIT=stdout, fmt='(3a, i8)') &
    'file:', __FILE__, ', line:', __LINE__
 

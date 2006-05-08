@@ -101,7 +101,7 @@ SUBROUTINE DA_Setup_FirstGuess_WRF( xbx, grid, &
 
    map_util_project = grid%map_proj
 
-   if(print_detail > 0) then
+   if(print_detail_map) then
       write(unit=stdout, fmt='(a, i6)') &
            'map_proj =', grid%map_proj
 
@@ -137,7 +137,7 @@ SUBROUTINE DA_Setup_FirstGuess_WRF( xbx, grid, &
 
    cone_factor = map_info%cone
 
-   if(print_detail == -1) then
+   if(print_detail_map) then
      
 !-------------------------------------------------------------------------
 ! Check the ll_to_ij:

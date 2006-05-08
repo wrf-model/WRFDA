@@ -192,7 +192,7 @@ SUBROUTINE da_setup_runconstants( xp, xb, xbx)
       xbx%max_wavenumber = xbx%ni/2 -1
       xbx%alp_size = (xbx%nj+ 1)*(xbx%max_wavenumber+1)*(xbx%max_wavenumber+2)/4
 
-      if(print_detail > 0) then
+      if(print_detail_spectral) then
          write(UNIT=stdout, fmt='(a, i6)') &
             'inc   =', xbx%inc   , &
             'ni    =', xbx%ni    , &

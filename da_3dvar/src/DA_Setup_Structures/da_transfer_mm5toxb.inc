@@ -57,7 +57,7 @@ SUBROUTINE DA_Transfer_MM5ToXb( ix, jy, kz, xp, xb_mm5, xb, xbx )
    tlp  = xb_mm5%big_header%bhr(4,5)
    tis0 = xb_mm5%big_header%bhr(5,5)
 
-   if(print_detail > 0) then
+   if(print_detail_xb) then
       do k=ks,ke
          print *, 'xb_mm5%sigmah (', k, ')=', xb_mm5%sigmah (k)
       enddo
