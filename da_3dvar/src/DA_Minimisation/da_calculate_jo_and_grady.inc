@@ -33,7 +33,7 @@
       jo_sound = jo % sound_u + jo % sound_v + &
                  jo % sound_t + jo % sound_q
 
-      if(print_detail > 0) then
+      if(print_detail_grad) then
          write(UNIT=stdout, fmt='(a, e24.12)') &
               'jo_sound =', jo_sound, &
               'jo%sound_u =', jo%sound_u, &
@@ -46,7 +46,7 @@
       jo_sound = jo_sound         + jo % sonde_sfc_u + jo % sonde_sfc_v + &
                  jo % sonde_sfc_t + jo % sonde_sfc_q + jo % sonde_sfc_p
 
-      if(print_detail > 0) then
+      if(print_detail_grad) then
          write(UNIT=stdout, fmt='(a, e24.12)') &
               'jo_sound =', jo_sound, &
               'jo%sonde_sfc_u =', jo%sonde_sfc_u, &
@@ -62,7 +62,7 @@
       jo_synop = jo % synop_u + jo % synop_v + jo % synop_t + &
                  jo % synop_p + jo % synop_q
 
-      if(print_detail > 0) then
+      if(print_detail_grad) then
          write(UNIT=stdout, fmt='(a, e24.12)') &
               'jo_synop =', jo_synop, &
               'jo%synop_u =', jo%synop_u, &
@@ -77,7 +77,7 @@
 
       call da_get_jo_and_grady_geoamv( iv, re, jo, jo_grad_y)
       jo_geoamv = jo % geoamv_u + jo % geoamv_v
-      if(print_detail > 0) then
+      if(print_detail_grad) then
          write(UNIT=stdout, fmt='(a, e24.12)') &
               'jo_geoamv =', jo_geoamv, &
               'jo%geoamv_u =', jo%geoamv_u, &
@@ -88,7 +88,7 @@
 
       call da_get_jo_and_grady_polaramv( iv, re, jo, jo_grad_y)
       jo_polaramv = jo % polaramv_u + jo % polaramv_v
-      if(print_detail > 0) then
+      if(print_detail_grad) then
          write(UNIT=stdout, fmt='(a, e24.12)') &
               'jo_polaramv =', jo_polaramv, &
               'jo%polaramv_u =', jo%polaramv_u, &
@@ -188,7 +188,7 @@
         jo_radiance = 0.
       end if
 
-      if(print_detail > 0) then
+      if(print_detail_grad) then
          write(UNIT=stdout, fmt='(a, e24.12)') &
               'jo_radiance =', jo_radiance
        do i = 1, iv%num_inst
@@ -209,7 +209,7 @@
                    
       jot = jo % total
 
-      if(print_detail > 0) then
+      if(print_detail_grad) then
          write(UNIT=stdout, fmt='(a, e24.12)') &
               'jo % total = ', jot
 
