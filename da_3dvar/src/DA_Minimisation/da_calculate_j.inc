@@ -93,7 +93,7 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
     ELSE
       j % jo % total = wrf_dm_sum_real( jo_partial )
     ENDIF
- 
+
 !-------------------------------------------------------------------------
 !     [2.0] calculate jb:
 !-------------------------------------------------------------------------
@@ -113,6 +113,7 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
 
    j % je = 0.0
    if ( be % ne > 0 ) then
+
       cv_je(1:cv_size_je) = cv(je_start:je_end)
       xhat_je(1:cv_size_je) = xhat(je_start:je_end)
       j % je = 0.5 * da_dot_cv( cv_size_je, cv_size_domain_je, &
@@ -124,6 +125,8 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
 !-------------------------------------------------------------------------
 !     [4.0] calculate total cost function j = jo + jb + je:
 !-------------------------------------------------------------------------
+
+
 
       j % total = j % jb + j % jo % total + j % je
 
@@ -149,7 +152,7 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
 
       call da_deallocate_y( jo_grad_y )
 
-      if( print_detail >= 100) then
+      if( print_detail_grad) then
          write(unit=stderr, fmt='(2a,2(2x,a,i6))') 'file:', __FILE__, 'line:', __LINE__, 'iter=', iter
          write(unit=stderr, fmt='(a, e24.14)') ' in da_calculate_j: cv_jb.cv_jb = ',sum(cv_jb(:) * cv_jb(:))
          write(unit=stderr, fmt='(a, e24.14)') ' in da_calculate_j: cv_je.cv_je = ',sum(cv_je(:) * cv_je(:))
@@ -165,6 +168,8 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
 
       gnorm_jo = da_dot_cv( cv_size, cv_size_domain, j_grad, j_grad, xp, &
                             (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /) )
+
+
 
 !     Add Del_v (Jb)
       j_grad(1:cv_size_jb) =  jb_factor * &
@@ -184,7 +189,7 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
                             cv_je + xhat_je , cv_je + xhat_je, xp, &
                             (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /) )
 
-      if( print_detail >= 100) then
+      if( print_detail_grad) then
          write(unit=stderr, fmt='(2a,2(2x,a,i6))') 'file:', __FILE__, 'line:', __LINE__, 'iter=', iter
          write(unit=stderr, fmt='(a, e24.14)') ' in da_calculate_j: cv_jb.cv_jb = ',&
                                           sum(cv_jb(1:cv_size_jb) * cv_jb(1:cv_size_jb))
