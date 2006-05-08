@@ -2,15 +2,15 @@ subroutine da_ludcmp( n, np, indx, a, d)
 
    implicit none
 
-!  Adapted Numerical Recipes routine to solve the set of n linear equations A.X=B.
-!  Routine takes in to account possibility that B will begin with many zero elements, 
-!  so it is efficient for matrix inversion.
+   ! Adapted Numerical Recipes routine to solve the set of n linear equations 
+   ! A.X=B. Routine takes in to account possibility that B will begin with many 
+   ! zero elements, so it is efficient for matrix inversion.
 
-   integer, intent(in)  :: n              ! Logical size of array.
-   integer, intent(in)  :: np             ! Physical size of array.
-   integer, intent(out) :: indx(1:n)      ! Permutation vector returned by LUDCMP. 
-   real, intent(inout)  :: a(1:np,1:np)   ! LU decomposition of matrix A in A.x=B.
-   real, intent(out)    :: d              ! On input = B, on output = x.
+   integer, intent(in)    :: n           ! Logical size of array.
+   integer, intent(in)    :: np          ! Physical size of array.
+   integer, intent(out)   :: indx(1:n)   ! Permutation vector returned by LUDCMP 
+   real,    intent(inout) :: a(1:np,1:np)! LU decomposition of matrix A in A.x=B
+   real,    intent(out)   :: d           ! On input = B, on output = x.
 
    real, parameter      :: tiny = 1.0e-20
    real                 :: aamax , dum , sum
@@ -25,7 +25,7 @@ subroutine da_ludcmp( n, np, indx, a, d)
          if ( abs(a(i,j)) > aamax ) aamax = abs(a(i,j))
       end do
       if ( aamax == 0.0 ) then
-        CALL wrf_error_fatal3(__FILE__,__LINE__,"Singular matrix")
+         CALL wrf_error_fatal3(__FILE__,__LINE__,"Singular matrix")
       end if
       vv(i) = 1.0 / aamax
    end do
