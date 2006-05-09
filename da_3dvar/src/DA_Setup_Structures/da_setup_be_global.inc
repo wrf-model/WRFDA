@@ -285,7 +285,7 @@ subroutine da_setup_be_global( ide, jde, kde, be  )
       be % alpha % mz = be % ne
       be % alpha % name = 'alpha'
       be % alpha % max_wave = alpha_truncation
-      IF (print_details_be) THEN
+      IF (print_detail_be) THEN
          write(UNIT=stdout,FMT='(4x,3a,i6)')'Horizontal truncation for ', be % alpha % name, ' = ', be % alpha % max_wave
       END IF
       allocate( power(0:be % alpha % max_wave) )
