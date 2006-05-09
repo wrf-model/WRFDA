@@ -69,7 +69,7 @@ SUBROUTINE DA_Allocate_Background_Errors ( jy, kz, l, e, be_eval_loc, &
 
          END IF
  
-         IF (print_details_be) THEN
+         IF (print_detail_be) THEN
             WRITE(UNIT=stdout,FMT='(/A,A)')' j*k Eigenvalues for ', be_sub % name
             CALL DA_Array_Print(2, be_sub % val(1:jy,1:mz), 'j*k Eigenvalues' )
          END IF
@@ -94,7 +94,7 @@ SUBROUTINE DA_Allocate_Background_Errors ( jy, kz, l, e, be_eval_loc, &
 
          END IF
          
-         IF (print_details_be) THEN      
+         IF (print_detail_be) THEN      
             WRITE(UNIT=stdout,FMT='(/A,A)')' k*k Eigenvectors for j = 1', be_sub % name
             CALL DA_Array_Print( 2, be_sub % evec(1,1:kz,1:mz), &
                                  'Eigenvectors for j=1' )
