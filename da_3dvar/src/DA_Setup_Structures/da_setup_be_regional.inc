@@ -339,8 +339,10 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
    CALL DA_Allocate_Background_Errors( jy,  1, be5_eval_glo, be5_evec_glo, be5_eval_loc, &
                                        be5_evec_loc, be % v5 )
 
-   WRITE(UNIT=stdout,FMT='(2x,a,i10)') "b) Finished eigenvector processing! ij=", ij
-   
+   IF (print_details_be) THEN
+      WRITE(UNIT=stdout,FMT='(2x,a,i10)') "b) Finished eigenvector processing! ij=", ij
+   END IF
+
 ! 5.0 Load the scale lengths
 ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -69,7 +69,7 @@ SUBROUTINE DA_Allocate_Background_Errors ( jy, kz, l, e, be_eval_loc, &
 
          END IF
  
-         IF ( Test_Statistics ) THEN
+         IF (print_details_be) THEN
             WRITE(UNIT=stderr,FMT='(/A,A)')' j*k Eigenvalues for ', be_sub % name
             CALL DA_Array_Print(2, be_sub % val(1:jy,1:mz), 'j*k Eigenvalues' )
          END IF
@@ -94,12 +94,12 @@ SUBROUTINE DA_Allocate_Background_Errors ( jy, kz, l, e, be_eval_loc, &
 
          END IF
          
-         IF ( Test_Statistics ) THEN      
-            WRITE(UNIT=stderr,FMT='(/A,A)')' k*k Eigenvectors for j = 1', be_sub % name
+         IF (print_details_be) THEN      
+            WRITE(UNIT=stdout,FMT='(/A,A)')' k*k Eigenvectors for j = 1', be_sub % name
             CALL DA_Array_Print( 2, be_sub % evec(1,1:kz,1:mz), &
                                  'Eigenvectors for j=1' )
          
-            WRITE(UNIT=stderr,FMT='(/A,A)')' k*k Eigenvectors for j = jy', be_sub % name
+            WRITE(UNIT=stdout,FMT='(/A,A)')' k*k Eigenvectors for j = jy', be_sub % name
             CALL DA_Array_Print( 2, be_sub % evec(jy,1:kz,1:mz), &
                                  'Eigenvectors for j=jy' )
          END IF
@@ -110,9 +110,10 @@ SUBROUTINE DA_Allocate_Background_Errors ( jy, kz, l, e, be_eval_loc, &
          be_sub % val_g(1:mz) = l(1:mz)
          be_sub % evec_g(1:kz,1:mz) = e(1:kz,1:mz)
       ELSE IF ( vert_corr == 1 ) THEN
-
-         WRITE(UNIT=stdout,FMT='(A)') &
-            'Change be std dev to variance in NMC code'
+         IF (print_detail_be) THEN
+           WRITE(UNIT=stdout,FMT='(A)') &
+              'Change be std dev to variance in NMC code'
+         END IF
          be_sub % val(1:jy,1:mz) = be_eval_loc(1:jy,1:mz)
 
       END IF

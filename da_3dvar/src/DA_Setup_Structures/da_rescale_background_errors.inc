@@ -2,7 +2,7 @@ SUBROUTINE DA_Rescale_Background_Errors ( ix, jy, var_scaling, len_scaling, &
                                           ds, s, be_sub )
 
 !------------------------------------------------------------------------------
-!  PURPOSE: Rescale 3dvar background errors.
+!  PURPOSE: Rescale wrfvar background errors.
 !
 !  METHOD:  Empirical scaling and inclusion of recursive filter rescaling.
 !
@@ -43,10 +43,10 @@ SUBROUTINE DA_Rescale_Background_Errors ( ix, jy, var_scaling, len_scaling, &
 !     [2.1] Empirical rescaling of lengthscales:
       s(1:mz) = len_scaling * s(1:mz)
    
-      IF ( Test_Statistics ) THEN
-         WRITE(UNIT=stderr,FMT='(a,a)')TRIM(be_sub % name), 'Error Lengthscales (m):'
+      IF (print_detail_be) THEN
+         WRITE(UNIT=stdout,FMT='(a,a)')TRIM(be_sub % name), 'Error Lengthscales (m):'
          do m = 1, mz
-            WRITE(UNIT=stderr,FMT='(a,i4,1pe13.5)')be_sub % name, m, s(m)
+            WRITE(UNIT=stdout,FMT='(a,i4,1pe13.5)')be_sub % name, m, s(m)
          end do
       END IF
       
