@@ -227,7 +227,7 @@ SUBROUTINE DA_Scan_Obs (iunit, ob, xp, filename)
          EXIT reports
       ENDIF
 
-      if(print_detail > 100) then
+      if(print_detail_obs) then
          write(UNIT=stdout, FMT = fmt_info) &
                platform%info%platform,    &
                platform%info%date_char,   &
@@ -517,7 +517,7 @@ loop_level: DO i = 1, platform%info%levels
 !  PRINT OUT
 !  =============
 
-   if(print_detail > 0) then
+   if(print_detail_obs) then
 
       write(UNIT=stdout, fmt='(a)')  ' '
 

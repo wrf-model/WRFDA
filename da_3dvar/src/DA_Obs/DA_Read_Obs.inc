@@ -166,7 +166,7 @@ SUBROUTINE DA_Read_Obs (iunit, ob, xp, filename)
       RETURN
    ENDIF
 
-   if(print_detail > 500) then
+   if(print_detail_obs) then
       write(unit=stdout, fmt='(2a)') &
            'fmt_info=', fmt_info, &
            'fmt_loc =', fmt_loc,  &
@@ -220,7 +220,7 @@ SUBROUTINE DA_Read_Obs (iunit, ob, xp, filename)
          EXIT reports
       ENDIF
 
-      if(print_detail > 500) then
+      if(print_detail_obs) then
          write(unit=stdout, fmt=fmt_info) &
                platform%info%platform,    &
                platform%info%date_char,   &
@@ -285,7 +285,7 @@ loop_level: DO i = 1, platform%info%levels
               platform%each (i)%td,           &
               platform%each (i)%rh
 
-      if(print_detail > 500) then
+      if(print_detail_obs) then
          write(unit=stdout, FMT = '( a, i6)') 'i=', i
          write(unit=stdout, FMT = TRIM (fmt_each)) &
               platform%each (i)%p,            &
@@ -391,7 +391,7 @@ loop_level: DO i = 1, platform%info%levels
 !    global case with >1 MPI tasks due to obs duplication, halo, etc.  
 !    TBH:  20050913
     IF(.not.outside) THEN
-     if( print_detail >= 10 .and. ndup > 1) then
+     if( print_detail_obs .and. ndup > 1) then
          write(unit=stdout, FMT = fmt_info) &
                platform%info%platform,    &
                platform%info%date_char,   &
@@ -989,7 +989,7 @@ loop_level: DO i = 1, platform%info%levels
 
          ob%bogus(num_bogus)%slp    = platform%loc%slp
 
-         if ( print_detail > 0) then
+         if ( print_detail_obs) then
            WRITE(UNIT=stdout,FMT=*) 'nlevels=', nlevels
            WRITE(UNIT=stdout,FMT=*) 'ob % num_bogus,slp', num_bogus,  &
                     ob % bogus ( num_bogus ) % slp
@@ -1081,7 +1081,7 @@ loop_level: DO i = 1, platform%info%levels
 !  PRINT OUT
 !  =============
 
-   if(print_detail > 0) then
+   if(print_detail_obs) then
 
       write(UNIT=stdout, fmt='(/a,i6/)') 'ob%current_ob_time=', ob%current_ob_time
 

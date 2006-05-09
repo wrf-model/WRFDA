@@ -451,7 +451,7 @@ SUBROUTINE DA_Read_BUFR_Obs (iunit, ob, xp, filename)
 !    global case with >1 MPI tasks due to obs duplication, halo, etc.
 !    TBH:  20050913
     IF(.not.outside) THEN
-     if( print_detail >= 10 .and. ndup > 1) then
+     if( print_detail_obs .and. ndup > 1) then
          write(UNIT=stdout, FMT = '(A12,1X,A19,1X,A40,1X,I6,3(F12.3,11X),6X,A5)') &  
                platform%info%platform,    &
                platform%info%date_char,   &
@@ -989,7 +989,7 @@ SUBROUTINE DA_Read_BUFR_Obs (iunit, ob, xp, filename)
 !  PRINT OUT
 !  =============
 
-   if(print_detail > 0) then
+   if(print_detail_obs) then
 
       write(UNIT=stdout, fmt='(/a,i6/)') 'ob%current_ob_time=', ob%current_ob_time
 
