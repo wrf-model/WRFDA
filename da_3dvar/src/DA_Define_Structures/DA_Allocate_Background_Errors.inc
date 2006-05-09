@@ -111,7 +111,8 @@ SUBROUTINE DA_Allocate_Background_Errors ( jy, kz, l, e, be_eval_loc, &
          be_sub % evec_g(1:kz,1:mz) = e(1:kz,1:mz)
       ELSE IF ( vert_corr == 1 ) THEN
 
-         WRITE(UNIT=stdout) 'Change be std dev to variance in NMC code'
+         WRITE(UNIT=stdout,FMT='(A)') &
+            'Change be std dev to variance in NMC code'
          be_sub % val(1:jy,1:mz) = be_eval_loc(1:jy,1:mz)
 
       END IF
