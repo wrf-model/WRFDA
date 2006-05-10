@@ -45,7 +45,9 @@ CONTAINS
 
   ! Initialize the mother domain.
 
-  CALL start_timing
+  IF (print_detail_timing) THEN
+     CALL start_timing
+  END IF
 
   grid%input_from_file = .true.
 
@@ -150,10 +152,11 @@ CONTAINS
 
   CALL close_dataset ( fid , config_flags , "DATASET=INPUT" )
 
-  WRITE ( message , FMT = '("reading wrfvar input for domain ",I8)' ) grid%id
-
-  CALL end_timing ( TRIM(message) )
-
+  if (print_detail_timing) THEN
+     WRITE ( message , FMT = '("reading wrfvar input for domain ",I8)' ) grid%id
+     CALL end_timing ( TRIM(message) )
+  END IF
+  
   IF (trace_use) CALL da_trace_exit("med_initialdata_input_3dvar")
 
   END SUBROUTINE med_initialdata_input_3dvar
@@ -184,7 +187,9 @@ CONTAINS
 
   IF (trace_use) CALL da_trace_entry("med_initialdata_output_3dvar")
 
-  CALL start_timing
+  IF (print_detail_timing) THEN
+     CALL start_timing
+  END IF
 
   if(present(out_filename)) then
      file_name = trim(out_filename)
@@ -215,9 +220,10 @@ CONTAINS
 
   CALL close_dataset ( fid , config_flags, "DATASET=INPUT" )
 
-  WRITE ( message , FMT = '("writing wrfvar output for domain ",I8)' ) grid%id
-
-  CALL end_timing ( TRIM(message) )
+  IF (print_detail_timing) THEN
+     WRITE ( message , FMT = '("writing wrfvar output for domain ",I8)' ) grid%id
+     CALL end_timing ( TRIM(message) )
+  END IF
 
   IF (trace_use) CALL da_trace_exit("med_initialdata_output_3dvar")
 

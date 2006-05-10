@@ -1178,6 +1178,7 @@ rconfig   logical print_detail_spectral   namelist,record1         1            
 rconfig   logical print_detail_testing    namelist,record1         1              .false. -       "print_detail_testing" "print_detail_testing"   "T/F"
 rconfig   logical print_detail_parallel   namelist,record1         1              .false. -       "print_detail_parallel" "print_detail_parallel"   "T/F"
 rconfig   logical print_detail_be         namelist,record1         1              .false. -       "print_detail_be"   "print_detail_be"  "T/F"
+rconfig   logical print_detail_timing     namelist,record1         1              .false. -       "print_detail_timing"   "print_detail_timing"  "T/F"
 rconfig   logical obs_JRB                 namelist,record1         1              .false. -       "obs_JRB"           "obs_JRB"          "T/F"
 
 rconfig   character analysis_type         namelist,record2         1              "3D-VAR" -       "TBD"              "TBD"              "3D-PSAS or 3D-VAR"

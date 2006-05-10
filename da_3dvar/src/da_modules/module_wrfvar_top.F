@@ -91,7 +91,9 @@ CONTAINS
   ! Phase 2 resumes after MPI_INIT() (if it is called)
   CALL init_modules(2)
 
-  CALL start_timing ! end_timing call in wrfvar_finalize
+  IF (print_detail_timing) THEN
+     CALL start_timing ! end_timing call in wrfvar_finalize
+  END IF
 
 !<DESCRIPTION>
 ! The wrf namelist.input file is read and stored in the USE associated
@@ -302,7 +304,9 @@ CONTAINS
 
   CALL wrf_debug (   0 , 'wrfvar: SUCCESS COMPLETE WRFVAR' )
 
-  CALL end_timing ("wrfvar overall") ! start call in wrfvar_init
+  IF (print_detail_timing) THEN
+     CALL end_timing ("wrfvar overall") ! start call in wrfvar_init
+  END IF
 
   IF (trace_use) CALL da_trace_report
 
