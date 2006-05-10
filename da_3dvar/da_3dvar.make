@@ -914,7 +914,8 @@ DA_Constants.o:		DA_Constants.F             \
 			da_advance_cymdh.inc       \
 			da_change_date.inc         \
 			DA_Find_FFT_Factors.inc    \
-			DA_Find_FFT_Trig_Funcs.inc 
+			DA_Find_FFT_Trig_Funcs.inc \
+                        module_driver_constants.o
 
 LAPACK.o:		LAPACK.F   \
 			BLAS.o     \
