@@ -117,9 +117,7 @@ program gen_be_stage3
          write(6,'(5a,i4)')'    Processing data for date ', date, ', variable ', trim(variable), &
                            ' and member ', member
 
-         write(ce,'(i3)')member
-         if ( member < 10 ) ce = '00'//ce(3:3)
-         if ( member >= 10 .and. member < 100 ) ce = '0'//ce(2:3)
+         write(ce,'(i3.3)')member
 
 !        Read Full-fields:
          filename = 'fullflds'//'/'//date(1:10)//'.'//'fullflds'//'.'//trim(be_method)//'.e'//ce
@@ -288,9 +286,7 @@ program gen_be_stage3
             write(6,'(5a,i4)')'    Date = ', date, ', variable ', trim(variable), &
                               ' and member ', member
 
-            write(ce,'(i3)')member
-            if ( member < 10 ) ce = '00'//ce(3:3)
-            if ( member >= 10 .and. member < 100 ) ce = '0'//ce(2:3)
+            write(ce,'(i3.3)')member
 
             filename = trim(variable)//'/'//date(1:10)
             filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce

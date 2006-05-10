@@ -406,9 +406,7 @@ program gen_be_stage1_1dvar
 !        write(6,(2a)) [2] Write fields to file for further processing.
 !---------------------------------------------------------------------------------------------
 
-         write(ce,'(i3)')member
-         if ( member < 10 ) ce = '00'//ce(3:3)
-         if ( member >= 10 .and. member < 100 ) ce = '0'//ce(2:3)
+         write(ce,'(i3.3)')member
 
 !        Write T:
          variable = 't'

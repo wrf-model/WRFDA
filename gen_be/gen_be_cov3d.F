@@ -80,9 +80,7 @@ program gen_be_cov3d
 
       do member = 1, ne
 
-         write(ce,'(i3)')member
-         if ( member < 10 ) ce = '00'//ce(3:3)
-         if ( member >= 10 .and. member < 100 ) ce = '0'//ce(2:3)
+         write(ce,'(i3.3)')member
 
 !        Read first field:
          filename = trim(variable1)//'/'//date(1:10)

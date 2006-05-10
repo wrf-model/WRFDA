@@ -80,9 +80,7 @@ program gen_be_stage4_regional
          write(UNIT=stdout,FMT='(5a,i4)')'    Date = ', date, ', variable ', trim(variable), &
                            ' and member ', member
 
-         write(UNIT=ce,FMT='(i3)')member
-         if ( member < 10 ) ce = '00'//ce(3:3)
-         if ( member >= 10 .and. member < 100 ) ce = '0'//ce(2:3)
+         write(UNIT=ce,FMT='(i3.3)')member
 
 !        Assumes variable directory has been created by script:
          filename = trim(run_dir)//'/'//trim(variable)//'/'//date(1:10)//'.'//trim(variable)

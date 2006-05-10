@@ -214,9 +214,7 @@ program gen_be_stage0_wrf
 
    do member = 1, ne
 
-      write(UNIT=ce,FMT='(i3)')member
-      if ( member < 10 ) ce = '00'//ce(3:3)
-      if ( member >= 10 .and. member < 100 ) ce = '0'//ce(2:3)
+      write(UNIT=ce,FMT='(i3.3)')member
       input_file = trim(filestub)//'.e'//ce  
 
       do k = 1, dim3
@@ -377,9 +375,7 @@ program gen_be_stage0_wrf
       end if
 
       do member = 1, ne
-         write(UNIT=ce,FMT='(i3)')member
-         if ( member < 10 ) ce = '00'//ce(3:3)
-         if ( member >= 10 .and. member < 100 ) ce = '0'//ce(2:3)
+         write(UNIT=ce,FMT='(i3.3)')member
 
 !        Re-read ensemble member standard fields:
          input_file = 'tmp.e'//ce  

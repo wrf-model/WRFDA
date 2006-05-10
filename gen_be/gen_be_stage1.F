@@ -118,9 +118,7 @@ program gen_be_stage1
          if ( be_method == 'NMC' ) then
             filename = trim(filename)//'.e001'
          else
-            write(UNIT=ce,FMT='(i3)')member
-            if ( member < 10 ) ce = '00'//ce(3:3)
-            if ( member >= 10 .and. member < 100 ) ce = '0'//ce(2:3)
+            write(UNIT=ce,FMT='(i3.3)')member
             filename = trim(filename)//'.e'//trim(ce)
          endif
 
@@ -245,9 +243,7 @@ program gen_be_stage1
          if ( be_method == 'NMC' ) then
             filename = trim(filename)//'.e001'
          else
-            write(UNIT=ce,FMT='(i3)')member
-            if ( member < 10 ) ce = '00'//ce(3:3)
-            if ( member >= 10 .and. member < 100 ) ce = '0'//ce(2:3)
+            write(UNIT=ce,FMT='(i3.3)')member
             filename = trim(filename)//'.e'//trim(ce)
          endif
 
@@ -295,9 +291,7 @@ program gen_be_stage1
 !        write(6,(2a)) [2] Write fields to file for further processing.
 !---------------------------------------------------------------------------------------------
 
-         write(ce,'(i3)')member
-         if ( member < 10 ) ce = '00'//ce(3:3)
-         if ( member >= 10 .and. member < 100 ) ce = '0'//ce(2:3)
+         write(ce,'(i3.3)')member
 
 !        Write necessary full-fields:
          variable = 'fullflds'
