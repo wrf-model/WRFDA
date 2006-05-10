@@ -262,6 +262,111 @@ lib_rsl :
 	( cd ../external/RSL/RSL ; make CC="$(CC)" FC="$(FC) -byteswapio" MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) LEARN_BCAST=-DLEARN_BCAST linux )
 
 ###########################################################
+#ARCH Settings for PC Linux x86_64, PGI compiler  (Single-threaded)
+#
+FC              =       pgf90
+F77             =       $(FC)
+CC              =       gcc
+CC_TOOLS        =       gcc
+LD              =       $(FC)
+SFC             =       $(FC)
+CFLAGS          =       
+TRADFLAG        =       -traditional
+FCOPTIM         =       -fast
+FCDEBUG         =       #-g
+FCTYPE          =       -r8
+FCFORM          =       -Mfree
+FCHOST          =       
+FCBUFR          =       
+FCBASE          =       $(FCBUFR) -byteswapio
+FC_FFT_RF       =       $(FCBUFR) -byteswapio
+ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE \
+                        $(WORDSIZE_DEF) \
+                        CONFIGURE_NETCDF_FLAG \
+                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO
+EXTRAMODULES    =       
+PERL            =       perl
+
+LDFLAGS         =
+ENVCOMPDEFS     =       CONFIGURE_COMPILEFLAGS
+
+NETCDFPATH      =       CONFIGURE_NETCDF_PATH
+NETCDF_IO_PATH  =       external/io_netcdf
+NETCDF_LIB	=       CONFIGURE_NETCDF_LIB_PATH
+
+LOCAL_LIBRARIES =       -L/usr/local/ncarg/lib -L/usr/X11R6/lib -L/usr/local/lib \
+			-lncarg -lncarg_gks -lncarg_c -lX11
+
+CPP             =       /lib/cpp $(TRADFLAG)
+DM_1_CPP_FLAGS  =
+DM_2_CPP_FLAGS  =
+POUND_DEF       =       -DLINUX -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
+			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+
+externals : CONFIGURE_WRFIO_NF wrfio_int wrfio_grib1 esmf_time
+	( /bin/cp module_dm_warning module_dm.F ; cat module_dm_stubs.F >> module_dm.F )
+
+###########################################################
+#ARCH Settings for PC Linux x86_64, PGI compiler  (RSL, MPICH, RSL IO)
+#
+DMPARALLEL      =       1
+FC              =       mpif90
+F77             =       $(FC)
+LD              =       $(FC)
+CC              =       mpicc
+CC_TOOLS        =       gcc
+SFC             =       pgf90
+ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE \
+                        -DINTIO -DWRF_RSL_IO -DRSL -DDM_PARALLEL \
+                        $(WORDSIZE_DEF) \
+                        CONFIGURE_NETCDF_FLAG \
+                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO
+CFLAGS          =       -DDM_PARALLEL -DWRF_RSL_IO \
+                        -DMAXDOM_MAKE=$(MAX_DOMAINS) \
+                        -DMAXPROC_MAKE=$(MAX_PROC) \
+                        -I../external/RSL/RSL
+TRADFLAG        =       -traditional
+FCOPTIM         =       #-fast
+FCDEBUG         =       #-g
+FCTYPE          =       -r8
+FCFORM          =       -Mfree
+FCHOST          =
+FCBUFR          =        
+FCBASE          =       $(FCBUFR) -byteswapio
+FC_FFT_RF       =       $(FCBUFR) -byteswapio
+
+EXTRAMODULES    =       
+PERL            =       perl
+
+LDFLAGS         =       -byteswapio
+ENVCOMPDEFS     =       CONFIGURE_COMPILEFLAGS
+
+NETCDFPATH      =       CONFIGURE_NETCDF_PATH
+NETCDF_IO_PATH  =       external/io_netcdf
+NETCDF_LIB	=       CONFIGURE_NETCDF_LIB_PATH
+MPI_LIB		=	-L../external/RSL/RSL -lrsl
+
+LOCAL_LIBRARIES =       -L/usr/local/ncarg/lib -L/usr/X12R6/lib -L/usr/local/lib \
+                        -lncarg -lncarg_gks -lncarg_c -lX11
+
+CPP             =       /lib/cpp $(TRADFLAG)
+DM_1_CPP_FLAGS  =       -I../external/RSL/RSL -C -P `cat ../inc/dm_comm_cpp_flags` \
+			-DNO_RRTM_PHYSICS  -DPGF90
+DM_2_CPP_FLAGS  =       -I../../external/RSL/RSL -C -P `cat ../../inc/dm_comm_cpp_flags`
+POUND_DEF       =       -DLINUX -DNO_RRTM_PHYSICS  \
+			-DNONSTANDARD_SYSTEM -DF90_STANDALONE \
+			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+
+
+externals : CONFIGURE_WRFIO_NF wrfio_int wrfio_grib1 esmf_time lib_rsl
+	( /bin/cp ../tools/gen_comms_warning ../tools/gen_comms.c ; \
+          cat ../external/RSL/gen_comms.c >> ../tools/gen_comms.c ;  \
+          /bin/cp module_dm_warning module_dm.F ; cat ../external/RSL/module_dm.F >> module_dm.F )
+
+lib_rsl :
+	( cd ../external/RSL/RSL ; make CC="$(CC)" FC="$(FC) -byteswapio" MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) LEARN_BCAST=-DLEARN_BCAST linux )
+
+###########################################################
 #ARCH Intel xeon i686 ia32 Xeon Linux, ifort compiler (single-threaded, no nesting)
 #
 FC              =       ifort
