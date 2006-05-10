@@ -1,5 +1,5 @@
 #
-ARCHFLAGS       =       $(ARCHFLAGS1) $(ARCHFLAGS2)
+ARCHFLAGS       =       $(ARCHFLAGS1) $(ARCHFLAGS2) -I$(NETCDF_PATH)/include
 CCFLAGS         =       $(ARCHFLAGS3) $(ARCHFLAGS4)
 REGFLAGS        =       $(ARCHFLAGS)
 LIB             =       -L. -lwrflib -lwrfio_nf -lesmf_time \
