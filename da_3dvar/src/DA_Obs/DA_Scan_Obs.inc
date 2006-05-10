@@ -197,16 +197,6 @@ SUBROUTINE DA_Scan_Obs (iunit, ob, xp, filename)
 
      report = report+1
 
-     ! Restrict to a range of reports, useful for debugging
-
-     IF (report < report_start) THEN
-       CYCLE
-     END IF
-
-     IF (report > report_end) THEN
-       EXIT
-     END IF
-
 !     READ STATION GENERAL INFO
 !     =============================
 
@@ -301,6 +291,16 @@ loop_level: DO i = 1, platform%info%levels
 !             platform%each (i)%rh
 
       ENDDO loop_level
+
+      ! Restrict to a range of reports, useful for debugging
+
+      IF (report < report_start) THEN
+         CYCLE
+      END IF
+
+      IF (report > report_end) THEN
+         EXIT
+      END IF
 
       call DA_ll_to_xy (platform%info, platform%loc,   &
                         xp, outside, inside_halo,outside_all )

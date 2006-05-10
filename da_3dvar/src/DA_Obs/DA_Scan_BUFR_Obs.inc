@@ -160,16 +160,6 @@ SUBROUTINE DA_Scan_BUFR_Obs (iunit, ob, xp, filename)
 
      report = report+1
 
-     ! Restrict to a range of reports, useful for debugging
-
-     IF (report < report_start) THEN
-       CYCLE
-     END IF
-
-     IF (report > report_end) THEN
-       EXIT
-     END IF
-
       call readsb(iunit,iret)
 
       if(iret/=0) then
@@ -205,6 +195,17 @@ SUBROUTINE DA_Scan_BUFR_Obs (iunit, ob, xp, filename)
       if(platform%info%lat <= -89.95 .or. platform%info%lat >= 89.95 ) then
          platform%info%lon = 0.0
       endif
+
+
+      ! Restrict to a range of reports, useful for debugging
+
+      IF (report < report_start) THEN
+         CYCLE
+      END IF
+
+      IF (report > report_end) THEN
+         EXIT
+      END IF
 
       call DA_ll_to_xy (platform%info, platform%loc, &
                        xp, outside, inside_halo )
@@ -384,7 +385,7 @@ SUBROUTINE DA_Scan_BUFR_Obs (iunit, ob, xp, filename)
 !  PRINT OUT
 !  =============
 
-   if(print_detail > 0) then
+   if(print_detail_obs) then
 
       WRITE(UNIT=stdout, fmt='(a)')  ' '
 

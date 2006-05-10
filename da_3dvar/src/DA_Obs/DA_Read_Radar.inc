@@ -96,7 +96,7 @@ SUBROUTINE DA_Read_Radar (iunit, ob, xp, filename)
 
    READ (UNIT=char_total_Radar (15:17),FMT='(I3)', IOSTAT = iost) total_Radar
 
-   if(print_detail > 0) WRITE (UNIT=stderr,FMT='(/,A,I3,/)') ' TOTAL RADAR: ', total_Radar
+   if(print_detail_radar) WRITE (UNIT=stderr,FMT='(/,A,I3,/)') ' TOTAL RADAR: ', total_Radar
 
 !  2.4 SKIP ONE LINE
 !      -------------
@@ -124,11 +124,11 @@ SUBROUTINE DA_Read_Radar (iunit, ob, xp, filename)
 
    READ (UNIT=char_ned (1:5),FMT='(A5)', IOSTAT = iost) platform % stn % platform
 
-   if(print_detail > 0) WRITE (UNIT=stderr,FMT='(A)') 'RADAR Observations information'
+   if(print_detail_radar) WRITE (UNIT=stderr,FMT='(A)') 'RADAR Observations information'
 
    READ (UNIT=char_ned (8:19),FMT='(A12)', IOSTAT = iost) platform % stn % name
 
-   if(print_detail > 0) WRITE (UNIT=stderr,FMT='(A,A5,A,A12)')  &
+   if(print_detail_radar) WRITE (UNIT=stderr,FMT='(A,A5,A,A12)')  &
                         ' Expect: ',platform % stn % platform, &
                         'data at station:', platform % stn % name
 
@@ -138,26 +138,26 @@ SUBROUTINE DA_Read_Radar (iunit, ob, xp, filename)
 
    READ (UNIT=char_ned (40:47),FMT='(F8.1)', IOSTAT = iost) platform % stn % elv
 
-   if(print_detail > 0) WRITE (UNIT=stderr,FMT='(A,2(F8.3,2X),F8.1)')  &
+   if(print_detail_radar) WRITE (UNIT=stderr,FMT='(A,2(F8.3,2X),F8.1)')  &
                         'The station longitude, latutude, and altitude are: ', &
                          platform % stn % lon, &
                          platform % stn % lat, platform % stn % elv
 
    READ (UNIT=char_ned (50:68),FMT='(A19)', IOSTAT = iost) platform % stn % date_char
 
-   if(print_detail > 0) WRITE (UNIT=stderr,FMT='(A,A19)')   &
+   if(print_detail_radar) WRITE (UNIT=stderr,FMT='(A,A19)')   &
                         'The observation time for this data is ',     &
                         platform % stn % date_char
 
    READ (UNIT=char_ned (69:74),FMT='(I6)', IOSTAT = iost) platform % stn % numObs
 
-   if(print_detail > 0) WRITE (UNIT=stderr,FMT='(A,I6)')   &
+   if(print_detail_radar) WRITE (UNIT=stderr,FMT='(A,I6)')   &
                         'Total number of Super-observations is ', &
                         platform % stn % numObs
 
    READ (UNIT=char_ned (75:80),FMT='(I6)', IOSTAT = iost) platform % stn % levels
 
-   if(print_detail > 0) WRITE (UNIT=stderr,FMT='(A,I6)')   &
+   if(print_detail_radar) WRITE (UNIT=stderr,FMT='(A,I6)')   &
                         'Vertical layers for each Super-observation is ', &
                         platform % stn % levels
 
@@ -333,7 +333,7 @@ SUBROUTINE DA_Read_Radar (iunit, ob, xp, filename)
 ! 4. PRINT OUT
 ! ============
  
-  if(print_detail > 0) then
+  if(print_detail_radar) then
 
     write(unit=stdout, fmt='(a)')  ' '
 

@@ -124,16 +124,6 @@ SUBROUTINE DA_Read_BUFR_Obs (iunit, ob, xp, filename)
    reports: do
       report = report+1
 
-      ! Restrict to a range of reports, useful for debugging
-
-      IF (report < report_start) THEN
-        CYCLE
-      END IF
-
-      IF (report > report_end) THEN
-        EXIT
-      END IF
-
       call readsb(iunit,iret)
 
       if(iret/=0) then
@@ -174,12 +164,22 @@ SUBROUTINE DA_Read_BUFR_Obs (iunit, ob, xp, filename)
          platform%info%lon = 0.0
       endif
 
+      ! Restrict to a range of reports, useful for debugging
+
+      IF (report < report_start) THEN
+        CYCLE
+      END IF
+
+      IF (report > report_end) THEN
+        EXIT
+      END IF
+
       call DA_ll_to_xy (platform%info, platform%loc, &
                         xp, outside, inside_halo, outside_all )
 
       if(outside_all) cycle reports
 
-      IF (print_obs_mapping) THEN
+      IF (print_detail_obs) THEN
         ! Simplistic approach, could be improved to get it all done on PE 0
         IF (.NOT. outside) THEN
           WRITE(UNIT=stdout,FMT='(A,I4,A,F8.2,A,F8.2,A,I3,A,2I3)') &

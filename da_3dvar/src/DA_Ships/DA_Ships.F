@@ -1,31 +1,31 @@
-MODULE DA_Ships
+MODULE da_ships
 
-  USE DA_Constants
-  USE DA_Define_Structures
-  USE DA_Interpolation
-  USE DA_Statistics
-  USE DA_Tools
-  USE DA_Physics
-  USE PAR_UTIL
+   USE da_constants
+   USE da_define_structures
+   USE da_interpolation
+   USE da_statistics
+   USE da_tools
+   USE da_physics
+   USE par_util
 
-  ! The "stats_ships_type" is ONLY used locally in DA_Ships:
+   ! The "stats_ships_type" is ONLY used locally in da_ships:
 
-  TYPE residual_ships1_type
-    REAL          :: u                        ! u-wind.
-    REAL          :: v                        ! v-wind.
-    REAL          :: t                        ! temperature
-    REAL          :: p                        ! pressure
-    REAL          :: q                        ! specific humidity
-  END TYPE residual_ships1_type
+   TYPE residual_ships1_type
+      REAL          :: u                        ! u-wind.
+      REAL          :: v                        ! v-wind.
+      REAL          :: t                        ! temperature
+      REAL          :: p                        ! pressure
+      REAL          :: q                        ! specific humidity
+   END TYPE residual_ships1_type
 
-  TYPE maxmin_ships_stats_type
-    TYPE (maxmin_type)         :: u, v, t, p, q
-  END TYPE maxmin_ships_stats_type
+   TYPE maxmin_ships_stats_type
+      TYPE (maxmin_type)         :: u, v, t, p, q
+   END TYPE maxmin_ships_stats_type
 
-  TYPE stats_ships_type
-    TYPE (maxmin_ships_stats_type)  :: maximum, minimum
-    TYPE (residual_ships1_type)     :: average, rms_err
-  END TYPE stats_ships_type
+   TYPE stats_ships_type
+      TYPE (maxmin_ships_stats_type)  :: maximum, minimum
+      TYPE (residual_ships1_type)     :: average, rms_err
+   END TYPE stats_ships_type
 
 CONTAINS
 
@@ -41,5 +41,5 @@ CONTAINS
 #include "DA_Calculate_GradY_Ships.inc"
 
 
-END MODULE DA_Ships
+END MODULE da_ships
 

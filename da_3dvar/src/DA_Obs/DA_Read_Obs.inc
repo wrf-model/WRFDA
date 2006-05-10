@@ -190,16 +190,6 @@ SUBROUTINE DA_Read_Obs (iunit, ob, xp, filename)
 
      report = report+1
 
-     ! Restrict to a range of reports, useful for debugging
-
-     IF (report < report_start) THEN
-       CYCLE
-     END IF
-
-     IF (report > report_end) THEN
-       EXIT
-     END IF
-
 !     READ STATION GENERAL INFO
 !     =============================
 
@@ -248,7 +238,6 @@ SUBROUTINE DA_Read_Obs (iunit, ob, xp, filename)
 !     =========================
 
       READ (iunit, FMT = fmt_loc) platform%loc%slp, platform%loc%pw
-
       total_obs = total_obs + 1
 
 ! == levels < 1 and not GPSPW, go back to reports
@@ -299,6 +288,17 @@ loop_level: DO i = 1, platform%info%levels
               platform%each (i)%rh
       endif
 
+      ! Restrict to a range of reports, useful for debugging
+
+      IF (report < report_start) THEN
+         CYCLE
+      END IF
+
+      IF (report > report_end) THEN
+         EXIT
+      END IF
+
+
 ! Uncomment the following if errors in reported heights (test later):             
 !      if(fm == 97 .or. fm == 96 .or. fm == 42) then
 !         platform%each (i)%height_qc = -5 ! Aircraft heights are not above surface.
@@ -336,7 +336,7 @@ loop_level: DO i = 1, platform%info%levels
          cycle reports
       ENDIF
 
-      IF (print_obs_mapping) THEN
+      IF (print_detail_obs) THEN
         ! Simplistic approach, could be improved to get it all done on PE 0
         IF (.NOT. outside) THEN
           WRITE(UNIT=stdout,FMT='(A,I4,A,F8.2,A,F8.2,A,I3,A,2F8.2)') &

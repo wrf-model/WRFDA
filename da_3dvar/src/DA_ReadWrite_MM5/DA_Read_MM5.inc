@@ -10,8 +10,6 @@ subroutine DA_Read_MM5(input_unit, new, error)
 
    integer :: l, ier, n, i, j, k, nv
 
-   logical :: print_info
-
    real :: sample
 
    real(kind=4), dimension(:,:,:,:), allocatable :: data
@@ -19,9 +17,6 @@ subroutine DA_Read_MM5(input_unit, new, error)
 !---------------------------------------------------------------------------
 !  Read in fields:
 !---------------------------------------------------------------------------
-
-   print_info  = .false.
-!  print_info  = .true.
 
    new%num_of_var = 0
 
@@ -41,7 +36,7 @@ subroutine DA_Read_MM5(input_unit, new, error)
            CALL wrf_error_fatal3(__FILE__,__LINE__,"Error reading big header")
          endif
 
-         if(print_info) &
+         if(print_detail_mm5) &
          call DA_print_big_header(new%big_header%bhi, new%big_header%bhr, &
                                   new%big_header%bhic,new%big_header%bhrc)
       elseif (flag == 1) then
@@ -63,7 +58,7 @@ subroutine DA_Read_MM5(input_unit, new, error)
            CALL wrf_error_fatal3(__FILE__,__LINE__,"Error reading subheader")
          endif
 
-         if(print_info) then
+         if(print_detail_mm5) then
             call DA_print_sub_header(new%sub_header(nv))
          endif
 
@@ -266,7 +261,7 @@ subroutine DA_Read_MM5(input_unit, new, error)
 !               call DA_print_sub_header(new%sub_header(nv))
             endif
 
-            if(print_info) then
+            if(print_detail_mm5) then
                write(UNIT=stdout, fmt='(a,4(i2,a),e24.14)') &
                     'Sample value(', &
                      new%sub_header(nv)%start_index(1),',', &

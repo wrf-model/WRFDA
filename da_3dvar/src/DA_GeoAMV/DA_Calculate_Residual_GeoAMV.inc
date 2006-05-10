@@ -1,14 +1,11 @@
-SUBROUTINE DA_Calculate_Residual_GeoAMV( oi, y, re,                        &
+SUBROUTINE da_calculate_residual_geoamv( oi, y, re,                        &
                                         np_missing, np_bad_data,          &
                                         np_obs_used, np_available )
-!-------------------------------------------------------------------------
-!  HISTORY: 
-!
-!      Created: 03/05/2005                   Syed RH Rizvi   
-!
-!      Purpose: Calculates residual vector for Geo. CMV's
-!               
-!-------------------------------------------------------------------------
+
+   !-------------------------------------------------------------------------
+   ! Purpose: Calculates residual vector for Geo. CMV's
+   !               
+   !-------------------------------------------------------------------------
 
    IMPLICIT NONE
 
@@ -28,22 +25,16 @@ SUBROUTINE DA_Calculate_Residual_GeoAMV( oi, y, re,                        &
       n_obs_bad % v % num = number(0, 0, 0)
 
       DO n=1, oi%num_geoamv
+         if( oi%geoamv(n)%loc%proc_domain_with_halo ) then
+            do k=1, oi%geoamv(n)%info%levels
+               np_available = np_available + 2
 
-       if( oi%geoamv(n)%loc%proc_domain_with_halo ) then
-
-        do k=1, oi%geoamv(n)%info%levels
-
-         np_available = np_available + 2
-
-         re%geoamv(n)%u(k) = residual( n, 0, y%geoamv(n)%u(k), &
-                                      oi%geoamv(n)%u(k), n_obs_bad % u )
-         re%geoamv(n)%v (k)= residual( n, 0, y%geoamv(n)%v(k), &
-                                   oi%geoamv(n)%v(k), n_obs_bad % v )
-                          
-        END DO
-
-       endif
-         
+               re%geoamv(n)%u(k) = residual( n, 0, y%geoamv(n)%u(k), &
+                                          oi%geoamv(n)%u(k), n_obs_bad % u )
+               re%geoamv(n)%v (k)= residual( n, 0, y%geoamv(n)%v(k), &
+                                       oi%geoamv(n)%v(k), n_obs_bad % v )
+            END DO
+         endif        
       END DO
       
       np_missing = np_missing + n_obs_bad % u % num % miss + &
@@ -55,5 +46,5 @@ SUBROUTINE DA_Calculate_Residual_GeoAMV( oi, y, re,                        &
 
    ENDIF
 
-END SUBROUTINE DA_Calculate_Residual_GeoAMV
+END SUBROUTINE da_calculate_residual_geoamv
 
