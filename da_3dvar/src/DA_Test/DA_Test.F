@@ -36,6 +36,12 @@ module DA_Test
    USE module_wrf_error
 
    implicit none
+
+#if ( DWORDSIZE != RWORDSIZE )
+#define TRUE_MPI_REAL     MPI_REAL
+#else
+#define TRUE_MPI_REAL     MPI_REAL8
+#endif
    
    LOGICAL, EXTERNAL :: wrf_dm_on_monitor
 
