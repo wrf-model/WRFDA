@@ -438,6 +438,119 @@ INTEGER :: trace_repeat_body=100        ! Number of times trace body details
 INTEGER :: trace_start_points=0         ! Number of routines to initiate trace (0=all)
 CHARACTER(LEN=200) :: DocumentationURL="http://box.mmm.ucar.edu/people/bray/wrfvar/html"
 
+INTEGER, PARAMETER :: num_ob_indexes = 22
+
+INTEGER, PARAMETER :: sound_index          = 1
+INTEGER, PARAMETER :: synop_index          = 2
+INTEGER, PARAMETER :: pilot_index          = 3
+INTEGER, PARAMETER :: satem_index          = 4
+INTEGER, PARAMETER :: geoamv_index         = 5
+INTEGER, PARAMETER :: polaramv_index       = 6
+INTEGER, PARAMETER :: airep_index          = 7
+INTEGER, PARAMETER :: gpspw_index          = 8
+INTEGER, PARAMETER :: gpsref_index         = 9
+INTEGER, PARAMETER :: metar_index          = 10
+INTEGER, PARAMETER :: ships_index          = 11
+INTEGER, PARAMETER :: ssmi_retrieval_index = 12
+INTEGER, PARAMETER :: ssmi_tb_index        = 13
+INTEGER, PARAMETER :: ssmt1_index          = 14
+INTEGER, PARAMETER :: ssmt2_index          = 15
+INTEGER, PARAMETER :: qscat_index          = 16
+INTEGER, PARAMETER :: profiler_index       = 17
+INTEGER, PARAMETER :: buoy_index           = 18
+INTEGER, PARAMETER :: bogus_index          = 19
+INTEGER, PARAMETER :: pseudo_index         = 20
+INTEGER, PARAMETER :: radar_index          = 21
+INTEGER, PARAMETER :: radiance_index       = 22
+
+CHARACTER(LEN=14), PARAMETER :: obs_names(num_ob_indexes) = (/ &
+   "SOUND         ", &
+   "SYNOP         ", &
+   "PILOT         ", &
+   "SATEM         ", &
+   "Geo AMV       ", &
+   "Polar AMV     ", &
+   "AIREP         ", &
+   "GPSPW         ", &
+   "GPSRF         ", &
+   "METAR         ", &
+   "SHIP          ", &
+   "SSMI_RETRIEVAL", &
+   "SSMI_TB       ", &
+   "SSMT1         ", &
+   "SSMT2         ", &
+   "QSCAT         ", &
+   "Profiler      ", &
+   "Buoy          ", &
+   "Bogus         ", &
+   "Pseudo        ", &
+   "Radar         ", &
+   "Radiance      "  &
+/)
+
+INTEGER, PARAMETER :: max_no_fm = 290
+
+INTEGER, PARAMETER :: num_ob_vars=9
+
+LOGICAL, PARAMETER :: in_report(num_ob_vars,2) = RESHAPE((/&
+  .FALSE.,.FALSE.,.FALSE.,.FALSE.,.FALSE.,.FALSE.,.FALSE.,.FALSE.,.FALSE., & ! sound
+  .TRUE.,.TRUE.,.TRUE.,.TRUE.,.TRUE.,.TRUE.,.FALSE.,.FALSE.,.FALSE./), &
+  (/num_ob_vars,2/))
+
+INTEGER, PARAMETER :: report_h   = 1
+INTEGER, PARAMETER :: report_u   = 2
+INTEGER, PARAMETER :: report_v   = 3
+INTEGER, PARAMETER :: report_t   = 4
+INTEGER, PARAMETER :: report_q   = 5
+INTEGER, PARAMETER :: report_p   = 6
+INTEGER, PARAMETER :: report_rh  = 7
+INTEGER, PARAMETER :: report_slp = 8
+INTEGER, PARAMETER :: report_zk  = 9
+
+LOGICAL :: obs_use(num_ob_indexes) = .FALSE.
+
+
+
+! Special cases
+
+INTEGER, PARAMETER :: fm_satem = 86
+INTEGER, PARAMETER :: fm_amv   = 88
+
+INTEGER, PARAMETER :: fm_index(max_no_fm) = (/ &
+   0,0,0,0,0,0,0,0,0,0,                                & ! 1-10
+   0,Synop_index,Ships_index,0,Metar_index,            & ! 11-15
+   Metar_index,Ships_index,buoy_index,buoy_index,0,    & ! 16-20
+   0,0,0,0,0,0,0,0,0,0,                                & ! 21-30
+   0,pilot_index,pilot_index,pilot_index,sound_index,  & ! 31-35
+   sound_index,sound_index,sound_index,0,0,            & ! 36-40
+   0,airep_index,0,0,0,0,0,0,0,0,                      & ! 41-50
+   0,0,0,0,0,0,0,0,0,0,                                & ! 51-60
+   0,0,0,0,0,0,0,0,0,0,                                & ! 61-70
+   0,0,0,0,0,0,0,0,0,0,                                & ! 71-80
+   0,0,0,0,0,satem_index,0,geoamv_index,0,0,           & ! 81-90
+   0,0,0,0,0,airep_index,airep_index,0,0,0,            & ! 91-100
+   0,0,0,0,0,0,0,0,0,0,                                & ! 101-110
+   gpspw_index,0,0,gpspw_index,0,gpsref_index,0,0,0,0, & ! 111-120
+   ssmt1_index,ssmt2_index,0,0,0,0,0,0,0,0,            & ! 121-130
+   0,profiler_index,0,0,bogus_index,0,0,0,0,0,         & ! 131-140
+   0,0,0,0,0,0,0,0,0,0,                                & ! 141-150
+   0,0,0,0,0,0,0,0,0,0,                                & ! 151-160
+   0,0,0,0,0,0,0,0,0,0,                                & ! 161-170
+   0,0,0,0,0,0,0,0,0,0,                                & ! 171-180
+   0,0,0,0,0,0,0,0,0,0,                                & ! 181-190
+   0,0,0,0,0,0,0,0,0,0,                                & ! 191-200
+   0,0,0,0,0,0,0,0,0,0,                                & ! 201-210
+   0,0,0,0,0,0,0,0,0,0,                                & ! 211-220
+   0,0,0,0,0,0,0,0,0,0,                                & ! 231-230
+   0,0,0,0,0,0,0,0,0,0,                                & ! 231-240
+   0,0,0,0,0,0,0,0,0,0,                                & ! 241-250
+   0,0,0,0,0,0,0,0,0,0,                                & ! 251-260
+   0,0,0,0,0,0,0,0,0,0,                                & ! 261-270
+   0,0,0,0,0,0,0,0,0,0,                                & ! 271-280
+   qscat_index,0,0,0,0,0,0,0,0,0 /)                      ! 281-290
+
+
+
  CONTAINS
 
 #include "da_advance_cymdh.inc"
