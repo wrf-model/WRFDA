@@ -938,6 +938,8 @@ DA_Tools.o:		\
 			LAPACK.o \
 			DA_Define_Structures.o \
 			DA_Tools/DA_Tools.F \
+			DA_Tools/map_utils_defines.inc \
+			DA_Tools/map_utils.inc \
 			DA_Tools/DA_1D_EigenDecomposition.inc \
 			DA_Tools/DA_Diff_Seconds.inc \
 			DA_Tools/DA_Obs_Sfc_correction.inc \

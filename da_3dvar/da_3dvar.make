@@ -822,6 +822,8 @@ DA_Tools.o:		DA_Tools.F                     \
 			DA_Constants.o                 \
 			LAPACK.o                       \
 			DA_Define_Structures.o         \
+                        map_utils_defines.inc          \
+                        map_utils.inc                  \
 			DA_1D_EigenDecomposition.inc   \
 			DA_Diff_Seconds.inc            \
 			DA_Obs_Sfc_correction.inc      \
@@ -915,7 +917,7 @@ DA_Constants.o:		DA_Constants.F             \
 			da_change_date.inc         \
 			DA_Find_FFT_Factors.inc    \
 			DA_Find_FFT_Trig_Funcs.inc \
-                        module_driver_constants.o
+                        module_driver_constants.o 
 
 LAPACK.o:		LAPACK.F   \
 			BLAS.o     \
