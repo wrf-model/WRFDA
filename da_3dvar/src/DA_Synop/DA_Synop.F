@@ -1,37 +1,31 @@
-MODULE DA_Synop
+MODULE da_synop
 
-  USE DA_Constants
-  USE DA_Define_Structures
-  USE DA_Interpolation
-  USE DA_Statistics
-  USE DA_Tools
-  USE DA_Physics
-  USE PAR_UTIL
+   USE da_constants
+   USE da_define_structures
+   USE da_interpolation
+   USE da_statistics
+   USE da_tools
+   USE da_physics
+   USE par_util
 
-  ! The "stats_synop_type" is ONLY used locally in DA_Synop:
+   ! The "stats_synop_type" is ONLY used locally in DA_Synop:
 
-  TYPE residual_synop1_type
-    REAL          :: u                        ! u-wind.
-    REAL          :: v                        ! v-wind.
-    REAL          :: t                        ! temperature
-    REAL          :: p                        ! pressure
-    REAL          :: q                        ! specific humidity
-  END TYPE residual_synop1_type
+   TYPE residual_synop1_type
+      REAL          :: u                        ! u-wind.
+      REAL          :: v                        ! v-wind.
+      REAL          :: t                        ! temperature
+      REAL          :: p                        ! pressure
+      REAL          :: q                        ! specific humidity
+   END TYPE residual_synop1_type
 
-  TYPE maxmin_synop_stats_type
-    TYPE (maxmin_type)         :: u, v, t, p, q
-  END TYPE maxmin_synop_stats_type
+   TYPE maxmin_synop_stats_type
+      TYPE (maxmin_type)         :: u, v, t, p, q
+   END TYPE maxmin_synop_stats_type
 
-  TYPE stats_synop_type
-    TYPE (maxmin_synop_stats_type)  :: maximum, minimum
-    TYPE (residual_synop1_type)     :: average, rms_err
+   TYPE stats_synop_type
+      TYPE (maxmin_synop_stats_type)  :: maximum, minimum
+      TYPE (residual_synop1_type)     :: average, rms_err
   END TYPE stats_synop_type
-
-#if ( DWORDSIZE != RWORDSIZE )
-#define TRUE_MPI_REAL     MPI_REAL
-#else
-#define TRUE_MPI_REAL     MPI_REAL8
-#endif
 
 CONTAINS
 
@@ -47,5 +41,5 @@ CONTAINS
 #include "da_check_max_iv_synop.inc"
 #include "DA_Calculate_GradY_Synop.inc"
 
-END MODULE DA_Synop
+END MODULE da_synop
 
