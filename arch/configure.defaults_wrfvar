@@ -643,14 +643,6 @@ lib_rsl :
 ###########################################################
 #ARCH   crayx1 UNICOS/mp  CRAY X1
 #
-## Use these for X1 cross compiler to build Registry
-##X1_CROSS_COMP = "gcc"
-##X1_CROSS_CFLG = ""
-## Use these for X1 native (trigger) compiler
-X1_CROSS_COMP = "cc"
-X1_CROSS_CFLG = "-hcommand"
-CC_TOOLS        =       $(X1_CROSS_COMP) $(X1_CROSS_CFLG)
-
 SED_FTN		=	sed -f ../arch/cray_csd.sed
 
 OMP             =
@@ -659,100 +651,13 @@ DMPARALLEL      =       1
 SFC             =       ftn
 SCC             =       cc
 FC              =       ftn
-LD              =       $(FC)
 F77             =       $(FC)
-CC              =       cc
-
-ARCHFLAGS3      =       -DWRF_RSL_IO -DRSL \
-                        -DDM_PARALLEL \
-                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO -DINTIO \
-                        -DNORESHAPE -Dcrayx1 
-ARCHFLAGS4      =       -UCRAY \
-                        -I../external/RSL/RSL \
-                        -DMAXDOM_MAKE=$(MAX_DOMAINS) \
-                        -DMAXPROC_MAKE=$(MAX_PROC) \
-			-h gen_private_callee
-TRADFLAG        =
-#FCOPTIM         =     	-Ofp3 -O3
-FCOPTIM         =     	-Ofp2 -O1 -Ogen_private_callee
-#FCOPTIM         =     	-Ofp2 -O0
-FCDEBUG         =       #-g
-#FCTYPE          =       -sinteger32 -e m -sreal64 -dp
-FCTYPE          =       -e m -sreal64 -dp
-FCFORM          =       -f free -N 255
-FCHOST          =   
-FCBASE          =       #-Ovector0 -Ostream0 -Oscalar1
-FCBUFR          =       $(FCBASE)
-FC_FFT_RF       =       $(FCBASE)
-
-EXTRAMODULES    =       
-
-LDFLAGS         =
-MPI_LIB		=	-L../external/RSL/RSL -lrsl
-LOCAL_LIB	=	-L../frame -L../share -L$(DA_VAR) -L$(DA_SRC)
-CONVERTOR_LIB	=	-L../convertor
-LOCAL_LIBRARIES =       #-L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c -lX11
-
-CPP             =       cpp -C -P -Dcrayx1
-#CPP             =       cpp -C -P
-DM_1_CPP_FLAGS	=	-I../external/RSL/RSL -C -P `cat ../inc/dm_comm_cpp_flags`
-DM_2_CPP_FLAGS	=	-I../../external/RSL/RSL -C -P `cat ../../inc/dm_comm_cpp_flags`
-POUND_DEF       =       -DCRAYX1 \
-			-DNONSTANDARD_SYSTEM -DF90_STANDALONE \
-			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
-
-RANLIB          =       echo
-M4              =       m4 -B12000
-
-externals : wrfio_nf wrfio_int wrfio_grib1 esmf_time lib_rsl
-	( /bin/cp ../tools/gen_comms_warning ../tools/gen_comms.c ; \
-          cat ../external/RSL/gen_comms.c >> ../tools/gen_comms.c ; \
-          /bin/cp module_dm_warning module_dm.F ; \
-          cat ../external/RSL/module_dm.F >> module_dm.F )
-
-lib_rsl :
-	( cd ../external/RSL/RSL ; \
-          make CC="$(CC)" \
-	       MAX_DOMAINS=$(MAX_DOMAINS) \
-               MAX_PROC=$(MAX_PROC) \
-               LEARN_BCAST=-DLEARN_BCAST crayx1 )
-
-###########################################################
-#ARCH   crayx1 UNICOS/mp  CRAY X1 (KMA)
-#
-## Use these for X1 cross compiler to build Registry
-X1_CROSS_COMP = "gcc"
-X1_CROSS_CFLG = ""
-## Use these for X1 native (trigger) compiler
-#X1_CROSS_COMP = "cc"
-#X1_CROSS_CFLG = "-hcommand"
-CC_TOOLS        =       $(X1_CROSS_COMP) $(X1_CROSS_CFLG)
-
-SED_FTN		=	sed -f ../arch/cray_csd.sed
-
-OMP             =
-OMPCPP          =
-DMPARALLEL      =       1
-SFC             =       ftn
-SCC             =       cc
-FC              =       ftn
 LD              =       ftn
-F77             =       $(FC)
 CC              =       cc
-
-ARCHFLAGS3      =       -DWRF_RSL_IO -DRSL \
-                        -DDM_PARALLEL \
-                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO -DINTIO \
-                        -DNORESHAPE -Dcrayx1 
-ARCHFLAGS4      =       -UCRAY \
-                        -I../external/RSL/RSL \
-                        -DMAXDOM_MAKE=$(MAX_DOMAINS) \
-                        -DMAXPROC_MAKE=$(MAX_PROC) \
-			-h gen_private_callee
-TRADFLAG        =
-#FCOPTIM         =     	-Ofp3 -O3
-#FCOPTIM         =     	-Ofp2 -O1 -Ogen_private_callee
-FCOPTIM         =     	-Ofp2 -O1
+# Do not use cross-compiler for tools
+CC_TOOLS        =       gcc
+TRADFLAG        =       -traditional-cpp
+FCOPTIM         =     	-Ofp2 -O1 -Ogen_private_callee
 FCDEBUG         =       #-g
 FCTYPE          =       -sinteger32 -e m -sreal64 -dp
 FCFORM          =       -f free -N 255
@@ -761,8 +666,15 @@ FCBASE          =       #-Ovector0 -Ostream0 -Oscalar1
 FCBUFR          =       $(FCBASE)
 FC_FFT_RF       =       $(FCBASE)
 
-EXTRAMODULES    =       
-
+ARCHFLAGS3      =       -DWRF_RSL_IO -DRSL \
+                        -DDM_PARALLEL \
+                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO -DINTIO \
+                        -DNORESHAPE -Dcrayx1 
+ARCHFLAGS4      =       -UCRAY \
+                        -I../external/RSL/RSL \
+                        -DMAXDOM_MAKE=$(MAX_DOMAINS) \
+                        -DMAXPROC_MAKE=$(MAX_PROC) \
+			-h gen_private_callee
 LDFLAGS         =
 MPI_LIB		=	-L../external/RSL/RSL -lrsl
 LOCAL_LIB	=	-L../frame -L../share -L$(DA_VAR) -L$(DA_SRC)
@@ -810,8 +722,7 @@ FCBASE          =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767 \
                         -qflttrap=zerodivide:invalid:enable -qsigtrap=xl__trce
 FCBUFR          =       $(FCBASE)
 FC_FFT_RF       =       $(FCBASE)
-EXTRAMODULES    =
-EXTRAMODULES    =       
+
 ARCHFLAGS3      =       -DINTIO \
                         -DTRIEDNTRUE
 ARCHFLAGS4      =       -DNOUNDERSCORE -DLANDREAD_STUB -DMACOS
