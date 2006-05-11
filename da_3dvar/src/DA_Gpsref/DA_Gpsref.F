@@ -1,34 +1,28 @@
-MODULE DA_Gpsref
+MODULE da_gpsref
 
-   USE DA_Constants
-   USE DA_Define_Structures
-   USE DA_Interpolation
-   USE DA_Statistics
-   USE DA_Tools
-   USE PAR_UTIL
+   USE da_constants
+   USE da_define_structures
+   USE da_interpolation
+   USE da_statistics
+   USE da_tools
+   USE par_util
 
-#if ( DWORDSIZE != RWORDSIZE )
-#define TRUE_MPI_REAL     MPI_REAL
-#else
-#define TRUE_MPI_REAL     MPI_REAL8
-#endif
+   ! The "stats_gpsref_type" is ONLY used locally in DA_Gpsref:
 
-! The "stats_gpsref_type" is ONLY used locally in DA_Gpsref:
-
-  TYPE residual_gpsref1_type
+   TYPE residual_gpsref1_type
       REAL :: ref                   ! GPS Refractivity
       REAL ::   p                   ! Retrieved from GPS Refractivity
       REAL ::   t                   ! Retrieved from GPS Refractivity
       REAL ::   q                   ! Used in GPS Refra. retrieval.
    END TYPE residual_gpsref1_type
- 
-  TYPE maxmin_gpsref_stats_type
-        TYPE (maxmin_type)         :: ref          ! GPS Refractivity
+
+   TYPE maxmin_gpsref_stats_type
+      TYPE (maxmin_type)         :: ref          ! GPS Refractivity
    END TYPE maxmin_gpsref_stats_type
 
    TYPE stats_gpsref_type
-        TYPE (maxmin_gpsref_stats_type)  :: maximum, minimum
-        TYPE (residual_gpsref1_type)     :: average, rms_err
+      TYPE (maxmin_gpsref_stats_type)  :: maximum, minimum
+      TYPE (residual_gpsref1_type)     :: average, rms_err
    END TYPE stats_gpsref_type
 
 CONTAINS
@@ -44,5 +38,5 @@ CONTAINS
 #include "da_check_max_iv_Gpsref.inc"
 #include "da_get_innov_vector_Gpsref.inc"
 
-END MODULE DA_Gpsref
+END MODULE da_gpsref
 
