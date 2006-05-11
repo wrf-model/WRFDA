@@ -217,11 +217,11 @@ DA_Setup_Structures.o:	DA_Setup_Structures.F             \
 
 bufrlib.prm:		bufrlib.PRM
 			$(RM) $@
-			$(CPP) $(CPPFLAGS_BUFR) bufrlib.PRM > bufrlib.prm
+			$(CPP) $(FPPFLAGS_BUFR) bufrlib.PRM > bufrlib.prm
 
 da_bufrlib.o:		da_bufrlib.F bufrlib.prm
 			$(RM) $@
-			$(CPP) $(CPPFLAGS) da_bufrlib.F > da_bufrlib.f
+			$(CPP) $(FPPFLAGS) da_bufrlib.F > da_bufrlib.f
 			$(F77) -c $(F77FLAGS_BUFR) da_bufrlib.f
 
 bort_exit.o:		bort_exit.c
@@ -264,7 +264,8 @@ DA_VToX_Transforms.o:	DA_VToX_Transforms.F              \
 			DA_Get_SPoles.inc                 \
 			DA_Get_AVPoles.inc                \
 			DA_Get_ASPoles.inc                \
-			DA_Vertical_Transform.inc
+			DA_Vertical_Transform.inc         \
+                        DA_Check_EOF_Decomposition.inc
 
 DA_Obs.o:		DA_Obs.F                   \
 			DA_Constants.o             \
@@ -423,7 +424,6 @@ DA_Synop.o:		DA_Synop.F                          \
 			DA_Statistics.o                     \
 			DA_Tools.o                          \
 			DA_Physics.o                        \
-			DA_Synop.F                          \
 			da_check_max_iv_synop.inc           \
 			da_get_innov_vector_synop.inc       \
 			DA_AO_Stats_Synop.inc               \
@@ -931,7 +931,7 @@ LAPACK.o:		LAPACK.F   \
 			dlansy.inc \
 			dlapy2.inc \
 			dsyev.inc
-			$(CPP) $(CPPFLAGS) LAPACK.F > LAPACK.f
+			$(CPP) $(FPPFLAGS) LAPACK.F > LAPACK.f
 			$(F77) -c $(F77FLAGS) LAPACK.f
 
 BLAS.o:	               BLAS.F       \
@@ -952,7 +952,7 @@ BLAS.o:	               BLAS.F       \
 		       lsame.inc    \
 		       xerbla.inc   \
 		       BLAS.F
-			$(CPP) $(CPPFLAGS) BLAS.F > BLAS.f
+			$(CPP) $(FPPFLAGS) BLAS.F > BLAS.f
 			$(F77) -c $(F77FLAGS) BLAS.f
 
 DA_Test.o:	       DA_Test.F                            \
@@ -1057,7 +1057,7 @@ da_fftpack5.o:	        da_fftpack5.F  \
 			rfftf1.inc     \
 			rffti1.inc     \
 			xerfft.inc
-			$(CPP) $(CPPFLAGS) da_fftpack5.F > da_fftpack5.f
+			$(CPP) $(FPPFLAGS) da_fftpack5.F > da_fftpack5.f
 			$(F77) -c $(F77FLAGS) da_fftpack5.f
 
 da_spectral.o:		da_spectral.F               \
