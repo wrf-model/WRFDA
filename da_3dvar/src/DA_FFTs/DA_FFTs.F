@@ -1,24 +1,13 @@
-MODULE DA_FFTs
+MODULE da_ffts
 
-!------------------------------------------------------------------------------
-!  PURPOSE: Routines to perform Fourier transforms.
-!
-!  METHOD:  Varied.
-!
-!  HISTORY: 01/06/2000 - Creation of F90 version.           Dale Barker
-!
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! PURPOSE: Routines to perform Fourier transforms.
+   !---------------------------------------------------------------------------
 
-   USE DA_Define_Structures
-   USE PAR_UTIL
+   USE da_define_structures
+   USE par_util
 
    IMPLICIT NONE
-
-#if ( DWORDSIZE != RWORDSIZE )
-#define TRUE_MPI_REAL     MPI_REAL
-#else
-#define TRUE_MPI_REAL     MPI_REAL8
-#endif
 
    CONTAINS
 
@@ -30,4 +19,4 @@ MODULE DA_FFTs
 #include "DA_Solve_PoissonEqn_FST.inc"
 #include "DA_Solve_PoissonEqn_FST_Adj.inc"
 
-END MODULE DA_FFTs
+END MODULE da_ffts
