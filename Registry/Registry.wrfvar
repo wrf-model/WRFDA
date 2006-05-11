@@ -1540,6 +1540,7 @@ typedef xb_type integer      map
 typedef xb_type real         ptop
 typedef xb_type real         ztop
 typedef xb_type real         ps0
+typedef xb_type real         ts0
 typedef xb_type real         tlp
 typedef xb_type real         tis0
 typedef xb_type real         ds
