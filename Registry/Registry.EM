@@ -1163,6 +1163,11 @@ state integer nodyn_dummy - dyn_nodyn -  -  -  "" "" ""
 
 package   dyn_nodyn    dyn_opt==0                   -             -
 package   dyn_em       dyn_opt==2                   -             -
+package   dyn_em_sn    dyn_opt==102                 -             -
+package   dyn_em_tl    dyn_opt==202                 -             -
+package   dyn_em_ad    dyn_opt==302                 -             -
+package   dyn_em_tst   dyn_opt==402                 -             -
+package   dyn_em_var   dyn_opt==502                 -             -
 
 #package   passivec1     chem_opt==0                  -             
 package   passiveqv     mp_physics==0                -             moist:qv
