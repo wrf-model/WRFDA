@@ -348,7 +348,7 @@ export CONFIG=build/configure.wrf
 
 # new feb 2005.  test whether MPI-2
 if test -e $CONFIG ; then
-  grepresult=`grep 'DMPARALLEL.*=.*1' $CONFIG`
+  grepresult=`grep DM_PARALLEL $CONFIG`
   if [ "$grepresult" != "" ] ; then
     echo testing for MPI_Comm_f2c and MPI_Comm_c2f 
     /bin/rm -f tools/mpi2_test
