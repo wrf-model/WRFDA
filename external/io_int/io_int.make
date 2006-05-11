@@ -11,6 +11,6 @@ libwrfio_int.a:		$(OBJS)
 			$(RANLIB) libwrfio_int.a
 
 io_int.o:       io_int.F90 module_internal_header_util.o
-		$(CPP) $(CPPFLAGS) io_int.F90 | $(M4) $(IO_INT_M4) - > io_int.f
+		$(CPP) $(FPPFLAGS) io_int.F90 | $(M4) $(IO_INT_M4) - > io_int.f
 		$(FC) $(FCFLAGS) -c io_int.f
 

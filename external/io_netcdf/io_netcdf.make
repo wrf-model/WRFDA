@@ -12,13 +12,13 @@ libwrfio_nf.a:		$(IO_NETCDF_OBJS) $(IO_NETCDF_CODE)
 			$(RANLIB) libwrfio_nf.a
 
 wrf_io.o:               wrf_io.F90 $(IO_NETCDF_CODE)
-			$(CPP) $(CPPFLAGS) wrf_io.F90 | $(M4) $(IO_NETCDF_M4FLAGS) - > wrf_io.f
+			$(CPP) $(FPPFLAGS) wrf_io.F90 | $(M4) $(IO_NETCDF_M4FLAGS) - > wrf_io.f
 			$(FC) -c $(FCFLAGS) $(IO_NETCDF_FCFLAGS) wrf_io.f
 
 diffwrf_netcdf.o:       diffwrf_netcdf.F90
-			$(CPP) $(CPPFLAGS) diffwrf_netcdf.F90 > diffwrf_netcdf.f
+			$(CPP) $(FPPFLAGS) diffwrf_netcdf.F90 > diffwrf_netcdf.f
 			$(FC) -c $(FCFLAGS) $(IO_NETCDF_FCFLAGS) diffwrf_netcdf.f
 
 field_routines.o:	field_routines.F90
-			$(CPP) $(CPPFLAGS) field_routines.F90 > field_routines.f
+			$(CPP) $(FPPFLAGS) field_routines.F90 > field_routines.f
 			$(FC) -c $(FCFLAGS) $(IO_NETCDF_FCFLAGS) field_routines.f
