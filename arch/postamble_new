@@ -1,19 +1,20 @@
 #
-ARCHFLAGS       =       $(ARCHFLAGS1) $(ARCHFLAGS2) -I$(NETCDF_PATH)/include
-CCFLAGS         =       $(ARCHFLAGS3) $(ARCHFLAGS4)
-REGFLAGS        =       $(ARCHFLAGS)
-LIB             =       -L. -lwrflib -lwrfio_nf -lesmf_time \
-                        -L$(EXTERNAL)/io_grib1 -lio_grib1 \
-                        $(NETCDF_LIB) $(RTTOV_LIB) $(MPI_LIB) $(EXTRA_LIBS)
+FPPFLAGS        = -C -P $(CPPTRADFLAG) $(INCS) $(FPPFLAGS1) $(FPPFLAGS2) $(COREDEFS) \
+                     $(ENVCOMPDEFS) $(DM_CPP_FLAGS) $(VAR4DPOSS) -I$(NETCDF_PATH)/include
+REGFLAGS        = $(FPPFLAGS1) $(FPPFLAGS2)
+ 
+CCFLAGS        = $(CCFLAGS1) $(CCFLAGS2)
 
-FCFLAGS         = $(FCOPTIM) $(FCBASE) $(FCDEBUG) $(FCTYPE) $(FCFORM) $(FCENDIAN)
+FCFLAGS         = $(FCBASE) $(FCDEBUG) $(FCTYPE) $(FCFORM) $(FCENDIAN) $(FCOPTIM) 
+FCFLAGS_NOOPT   = $(FCBASE) $(FCDEBUG) $(FCTYPE) $(FCFORM) $(FCENDIAN)
 F77FLAGS        = $(FCOPTIM) $(FCBASE) $(FCDEBUG) $(FCTYPE)
 F77FLAGS_BUFR   = $(FCOPTIM) $(FCBASE) $(FCDEBUG) $(FCTYPE) $(FCENDIAN)
 FCFLAGS_FFT_RF  = $(FCFLAGS) $(FC_FFT_RF)
 F77FLAGS_ENDIAN = $(FCTYPE)
 
-CPPFLAGS        =       -C -P $(TRADFLAG) $(INCS) $(ARCHFLAGS) $(COREDEFS) $(ENVCOMPDEFS) \
-                        $(POUND_DEF) $(DM_CPP_FLAGS) $(VAR4DPOSS)
+LIB             =       -L. -lwrflib -lwrfio_nf -lesmf_time \
+                        -L$(EXTERNAL)/io_grib1 -lio_grib1 \
+                        $(NETCDF_LIB) $(RTTOV_LIB) $(MPI_LIB) $(EXTRA_LIBS)
 
 # compile these without high optimization to speed compile
 
@@ -45,9 +46,9 @@ mediation_force_domain.o mediation_feedback_domain.o           \
 module_initialize_real.o module_dm.o start_domain.o :
 	$(RM) $@
 	$(SED_FTN) $*.F > $*.b 
-	$(CPP) $(CPPFLAGS) $*.b  > $*.f
+	$(CPP) $(FPPFLAGS) $*.b  > $*.f
 	$(RM) $*.b
-	$(FC) -c $(FCBASE) $(FCDEBUG) $(FCTYPE) $(FCFORM) $(FCENDIAN) -O0 $*.f
+	$(FC) -c $(FCFLAGS_NOOPT) -O0 $*.f
 
 # Remove implicit rules to ensure our multi-stage process works
 
@@ -55,21 +56,21 @@ module_initialize_real.o module_dm.o start_domain.o :
 
 .F.i :
 	@ $(RM) $@
-	  $(CPP) $(CPPFLAGS) $*.F > $@
+	  $(CPP) $(FPPFLAGS) $*.F > $@
 	@ $(MV) $*.i $(DEVTOP)/pick/$*.f
 	@ $(CP) $*.F $(DEVTOP)/pick
 
 .F90.o : 
 	@ $(RM) $@
 	@ $(SED_FTN) $*.F90 > $*.b 
-	  $(CPP) $(CPPFLAGS) $*.b  > $*.f
+	  $(CPP) $(FPPFLAGS) $*.b  > $*.f
 	@ $(RM) $*.b
 	  $(FC) -c $(FCFLAGS) $*.f
 
 .F.o : 
 	@ $(RM) $@
 	@ $(SED_FTN) $*.F > $*.b
-	  $(CPP) $(CPPFLAGS) $*.b  > $*.f
+	  $(CPP) $(FPPFLAGS) $*.b  > $*.f
 	@ $(RM) $*.b
 	  $(FC) -c $(FCFLAGS) $*.f
 
