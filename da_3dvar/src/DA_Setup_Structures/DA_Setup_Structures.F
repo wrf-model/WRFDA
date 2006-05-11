@@ -1,28 +1,20 @@
-MODULE DA_Setup_Structures
+MODULE da_setup_structures
 
-!------------------------------------------------------------------------------
-!  PURPOSE: Sets up various structures.
-!
-!  METHOD:  Varied.
-!
-!  HISTORY: 01/06/2000 - Creation of F90 version.           Dale Barker
-!           11/15/2004 - Added spectral transform programs  Syed RH Rizvi 
-!              07/2005 - Add radiance module                  Zhiquan Liu
-!
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! PURPOSE: Sets up various structures.
+   !---------------------------------------------------------------------------
 
    use module_state_description
-
-   USE DA_Define_Structures
-   USE DA_Constants
-   USE DA_Grid_Definitions
-   USE DA_Obs
-   USE DA_SSMI
-   USE DA_VToX_Transforms
-   USE DA_Physics
-   USE DA_Tools
+   USE da_define_structures
+   USE da_constants
+   USE da_grid_definitions
+   USE da_obs
+   USE da_ssmi
+   USE da_vtox_transforms
+   USE da_physics
+   USE da_tools
    USE da_h_ops
-   USE DA_ReadWrite_MM5
+   USE da_readwrite_mm5
    USE da_spectral
    use module_wrf_3dvar_io
    use da_radiance
@@ -30,12 +22,6 @@ MODULE DA_Setup_Structures
    use da_tracing
 
    IMPLICIT NONE
-
-#if ( DWORDSIZE != RWORDSIZE )
-#define TRUE_MPI_REAL     MPI_REAL
-#else
-#define TRUE_MPI_REAL     MPI_REAL8
-#endif
 
    CONTAINS
 
@@ -77,4 +63,4 @@ MODULE DA_Setup_Structures
 #include <DA_Get_Bins_Info.inc>
 #include <da_truncate_spectra.inc>
 
-END MODULE DA_Setup_Structures
+END MODULE da_setup_structures
