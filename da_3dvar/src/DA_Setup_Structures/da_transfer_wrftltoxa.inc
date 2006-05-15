@@ -1,16 +1,11 @@
 SUBROUTINE DA_Transfer_WRFTLtoXa( grid, config_flags, filnam, &
-!
 #include <em_dummy_args.inc>
-!
                               )
 
-!------------------------------------------------------------------------------
-!  PURPOSE: Convert WRFTL variables to analysis increments
-!           (inverse of the incremental part of xatowrf)
-!                                                  Hans Huang, 7 March 2005
-!
-!  PARENT_MODULE: DA_Setup_Structures
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! PURPOSE: Convert WRFTL variables to analysis increments
+   !           (inverse of the incremental part of xatowrf)
+   !---------------------------------------------------------------------------
 
    IMPLICIT NONE
    
@@ -135,6 +130,8 @@ IF (trace_use) CALL da_trace_entry("da_transfer_wrftltoxa")
    enddo
    enddo
    enddo
+
+! In the inverse, g_ph information is lost. This should be investigated later!!!
 
 ! ----------------------------------------------------------------------------
 ![5.0] CONVERT FROM C-GRID TO A-GRID
