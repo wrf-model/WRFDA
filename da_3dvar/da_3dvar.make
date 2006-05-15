@@ -125,6 +125,7 @@ da_solve_v3d.o:		DA_Constants.o			\
 
 DA_Minimisation.o:	DA_Minimisation.F             \
                         module_wrf_3dvar_io.o         \
+                        module_get_file_names.o       \
 			DA_Constants.o                \
 			DA_Define_Structures.o        \
 			DA_VToX_Transforms.o          \
