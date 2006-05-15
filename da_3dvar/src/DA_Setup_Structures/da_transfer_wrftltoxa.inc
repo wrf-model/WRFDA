@@ -161,40 +161,6 @@ IF (trace_use) CALL da_trace_entry("da_transfer_wrftltoxa")
    enddo
    enddo
 
-#if 0
-   if ( size(moist,dim=4) >= 4 ) then
-      do k=ks,ke
-      do j=js,je
-      do i=is,ie
-         xa%qcw(i,j,k)=g_moist(i,j,k,p_qcw)
-         xa%qrn(i,j,k)=g_moist(i,j,k,p_qrn)
-      enddo
-      enddo
-      enddo
-   endif
-
-   if ( size(moist,dim=4) >= 6 ) then
-      do k=ks,ke
-      do j=js,je
-      do i=is,ie
-         xa%qci(i,j,k)=g_moist(i,j,k,p_qci)
-         xa%qsn(i,j,k)=g_moist(i,j,k,p_qsn)
-      enddo
-      enddo
-      enddo
-   endif
-
-   if ( size(moist,dim=4) >= 7 ) then
-      do k=ks,ke
-      do j=js,je
-      do i=is,ie
-         xa%qgr(i,j,k)=g_moist(i,j,k,p_qgr) 
-      enddo
-      enddo
-      enddo
-   endif
-#endif
-
 #endif
 
 IF (trace_use) CALL da_trace_exit("da_transfer_wrftltoxa")

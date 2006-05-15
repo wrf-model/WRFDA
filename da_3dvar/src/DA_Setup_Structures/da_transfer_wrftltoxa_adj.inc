@@ -1,16 +1,11 @@
 SUBROUTINE DA_Transfer_WRFTLtoXa_Adj( grid, config_flags, filnam, &
-!
 #include <em_dummy_args.inc>
-!
                               )
 
-!------------------------------------------------------------------------------
-!  PURPOSE: Convert analysis increments into WRFAD increments 
-!           (following xatowrf, but only keep the increments)
-!                                                Hans Huang, 8 March 2005
-!           
-!  PARENT_MODULE: DA_Setup_Structures
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! PURPOSE: Convert analysis increments into WRFAD increments 
+   !          (following xatowrf, but only keep the increments)
+   !---------------------------------------------------------------------------
 
    IMPLICIT NONE
    
@@ -134,40 +129,6 @@ SUBROUTINE DA_Transfer_WRFTLtoXa_Adj( grid, config_flags, filnam, &
       enddo
 
       enddo
-
-#if 0
-      if ( size(moist,dim=4) >= 4 ) then
-      do k=ks,ke
-      do j=js,je
-      do i=is,ie
-         g_moist(i,j,k,p_qcw) =  xa%qcw(i,j,k)
-         g_moist(i,j,k,p_qrn) =  xa%qrn(i,j,k)
-      enddo
-      enddo
-      enddo
-
-      if ( size(moist,dim=4) >= 6 ) then
-      do k=ks,ke
-      do j=js,je
-      do i=is,ie
-         g_moist(i,j,k,p_qci) =  xa%qci(i,j,k)
-         g_moist(i,j,k,p_qsn) =  xa%qsn(i,j,k)
-      enddo
-      enddo
-      enddo
-
-      if ( size(moist,dim=4) >= 7 ) then
-      do k=ks,ke
-      do j=js,je
-      do i=is,ie
-         g_moist(i,j,k,p_qgr) =  xa%qgr(i,j,k)
-      enddo
-      enddo
-      enddo
-      endif
-      endif
-      endif
-#endif
 
 !------------------------------------------------------------------------------
 

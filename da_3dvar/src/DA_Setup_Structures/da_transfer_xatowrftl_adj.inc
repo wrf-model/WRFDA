@@ -1,16 +1,11 @@
 SUBROUTINE DA_Transfer_XatoWRFTL_Adj( grid, config_flags, filnam, &
-!
 #include <em_dummy_args.inc>
-!
                               )
 
-!------------------------------------------------------------------------------
-!  PURPOSE: Convert WRFTL variables to analysis increments
-!           (inverse of the incremental part of xatowrf)
-!                                                  Hans Huang, 7 March 2005
-!
-!  PARENT_MODULE: DA_Setup_Structures
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! PURPOSE: Convert WRFTL variables to analysis increments
+   !           (inverse of the incremental part of xatowrf)
+   !---------------------------------------------------------------------------
 
    IMPLICIT NONE
    
@@ -83,39 +78,6 @@ SUBROUTINE DA_Transfer_XatoWRFTL_Adj( grid, config_flags, filnam, &
 
    enddo
 
-#if 0
-   if ( size(moist,dim=4) >= 4 ) then
-      do k=ks,ke
-      do j=js,je
-      do i=is,ie
-         xa%qcw(i,j,k)=a_moist(i,j,k,p_qcw)
-         xa%qrn(i,j,k)=a_moist(i,j,k,p_qrn)
-      enddo
-      enddo
-      enddo
-   endif
-
-   if ( size(moist,dim=4) >= 6 ) then
-      do k=ks,ke
-      do j=js,je
-      do i=is,ie
-         xa%qci(i,j,k)=a_moist(i,j,k,p_qci)
-         xa%qsn(i,j,k)=a_moist(i,j,k,p_qsn)
-      enddo
-      enddo
-      enddo
-   endif
-
-   if ( size(moist,dim=4) >= 7 ) then
-      do k=ks,ke
-      do j=js,je
-      do i=is,ie
-         xa%qgr(i,j,k)=a_moist(i,j,k,p_qgr) 
-      enddo
-      enddo
-      enddo
-   endif
-#endif
 #endif
 
    IF (trace_use) CALL da_trace_exit("da_transfer_xatowrftl_adj")
