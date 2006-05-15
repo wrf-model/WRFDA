@@ -97,6 +97,7 @@ SUBROUTINE DA_Check_Vp_Errors( vp1, vp2, ne, &
    ELSE
       write(unit=stdout, fmt='(a,1pe10.4)') &
            ' v4 RMS error/RMS field = ', rms_diff/rms_fild
+   END IF
       
 !-------------------------------------------------------------------------
 !  [5.0]: Check v5 differences:

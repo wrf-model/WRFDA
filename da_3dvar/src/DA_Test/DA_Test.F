@@ -34,6 +34,7 @@ module DA_Test
    USE DA_Tools
    use da_qscat
    USE module_wrf_error
+   USE da_minimisation
 
    implicit none
 
@@ -43,15 +44,13 @@ module DA_Test
 #define TRUE_MPI_REAL     MPI_REAL8
 #endif
    
-   LOGICAL, EXTERNAL :: wrf_dm_on_monitor
-
 contains
 
 #include "DA_Check_Balance.inc"
 #include "DA_Check_CvToVv_Adjoint.inc"
 #include "DA_Check_VToX_Adjoint.inc"
 #include "DA_Check_VpToX_Adjoint.inc"
-!#include "DA_Check_Vp_Errors.inc"
+#include "DA_Check_Vp_Errors.inc"
 #include "DA_Check_VvToVp_Adjoint.inc"
 #include "DA_Check_XToVpToX_Errors.inc"
 #include "DA_Check_XToY_Adjoint.inc"
