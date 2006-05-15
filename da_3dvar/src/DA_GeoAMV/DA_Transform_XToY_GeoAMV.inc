@@ -1,4 +1,4 @@
-SUBROUTINE \da_transform_xtoy_geoamv ( xa, iv, xp, y )
+SUBROUTINE da_transform_xtoy_geoamv ( xa, iv, xp, y )
 
    !-------------------------------------------------------------------------
    ! Purpose: X to Y Transform operator for Geo. AMV's
