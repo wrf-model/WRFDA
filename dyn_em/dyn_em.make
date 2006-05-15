@@ -34,6 +34,8 @@ DYN_MODULES =                 		\
 DYN_OBJS    = 		        \
 	init_modules_em.o       \
 	solve_em.o              \
+	solve_em_ad.o           \
+	solve_em_tl.o           \
         start_em.o              \
         shift_domain_em.o       \
         couple_or_uncouple_em.o \
@@ -224,6 +226,52 @@ solve_em.o:     module_small_step_em.o \
 		module_solvedebug_em.o \
                 module_bc_em.o         \
 		module_diffusion_em.o  \
+		module_big_step_utilities_em.o \
+		module_domain.o \
+		module_configure.o  \
+		module_driver_constants.o \
+		module_state_description.o \
+		module_machine.o \
+		module_tiles.o \
+		module_dm.o \
+		module_model_constants.o \
+		module_bc.o \
+		module_radiation_driver.o \
+		module_surface_driver.o \
+		module_cumulus_driver.o \
+		module_microphysics_driver.o \
+		module_microphysics_zero_out.o \
+		module_pbl_driver.o \
+		module_physics_addtendc.o
+
+solve_em_tl.o:  module_small_step_em_tl.o \
+		module_em_tl.o            \
+		module_solvedebug_em.o \
+                module_bc_em_tl.o         \
+		module_diffusion_em_tl.o  \
+		module_big_step_utilities_em.o \
+		module_domain.o \
+		module_configure.o  \
+		module_driver_constants.o \
+		module_state_description.o \
+		module_machine.o \
+		module_tiles.o \
+		module_dm.o \
+		module_model_constants.o \
+		module_bc.o \
+		module_radiation_driver.o \
+		module_surface_driver.o \
+		module_cumulus_driver.o \
+		module_microphysics_driver.o \
+		module_microphysics_zero_out.o \
+		module_pbl_driver.o \
+		module_physics_addtendc.o
+
+solve_em_ad.o:  module_small_step_em_ad.o \
+		module_em_ad.o          \
+		module_solvedebug_em.o \
+                module_bc_em_ad.o         \
+		module_diffusion_em_ad.o  \
 		module_big_step_utilities_em.o \
 		module_domain.o \
 		module_configure.o  \
