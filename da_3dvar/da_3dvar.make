@@ -959,6 +959,7 @@ BLAS.o:	               BLAS.F       \
 
 DA_Test.o:	       DA_Test.F                            \
 			DA_Constants.o                      \
+			DA_Minimisation.o                   \
 			DA_Define_Structures.o              \
 			DA_Physics.o                        \
 			DA_VToX_Transforms.o                \
