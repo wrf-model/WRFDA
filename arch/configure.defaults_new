@@ -457,7 +457,7 @@ FCTYPE          =       -r8
 FCFORM          =       -freeform
 FCENDIAN        =
 FCBASE          =       -64 -mips4
-CCFLAGS         =       -w -64 -mips4 -DUNDERSCORE
+CCFLAGS2        =       -w -64 -mips4 -DUNDERSCORE
 LDFLAGS         =       $(FCBASE)
 
 LOCAL_LIB =       -L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c -lX11
@@ -493,7 +493,7 @@ FCTYPE          =       -r8
 FCFORM          =       -freeform
 FCENDIAN        =
 FCBASE          =       -64 -mips4 -w
-CCFLAGS        =       -w -64 -mips4 \
+CCFLAGS2        =       -w -64 -mips4 \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) \
                         -DMAXPROC_MAKE=$(MAX_PROC) \
                         -I$(RSL_PATH)/RSL \
@@ -570,7 +570,7 @@ LDFLAGS         =	-bmaxstack:256000000 -bmaxdata:2048000000
 FPPFLAGS2       =       -DGRIB1 -DINTIO -DTRIEDNTRUE -DNATIVE_MASSV -DAIX \
 			-DNONSTANDARD_SYSTEM -DF90_STANDALONE \
 			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
-CCFLAGS        =       -DNOUNDERSCORE -DNCARIBM_NOC99
+CCFLAGS2        =       -DNOUNDERSCORE -DNCARIBM_NOC99
 
 LOCAL_LIB	=	-lmass -lmassv
 
@@ -608,7 +608,7 @@ FCBASE          =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767 \
  			-qflttrap=zerodivide:invalid:enable -qsigtrap=xl__trce -C
 FC_FFT_RF       =       $(FCBASE)
 
-CCFLAGS         =       -DNOUNDERSCORE -DNCARIBM_NOC99 \
+CCFLAGS2        =       -DNOUNDERSCORE -DNCARIBM_NOC99 \
 			-I$(RSL_PATH)/RSL \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) \
 			-DMAXPROC_MAKE=$(MAX_PROC)
@@ -661,7 +661,7 @@ FCFORM          =       -f free -N 255
 FCENDIAN        =
 FCBASE          =       #-Ovector0 -Ostream0 -Oscalar1
 FC_FFT_RF       =       $(FCBASE)
-CCFLAGS         =       -UCRAY \
+CCFLAGS2        =       -UCRAY \
                         -I$(RSL_PATH)/RSL \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) \
                         -DMAXPROC_MAKE=$(MAX_PROC) \
@@ -714,7 +714,7 @@ FCFORM          =       -f free -N 255
 FCENDIAN        =
 FCBASE          =       #-Ovector0 -Ostream0 -Oscalar1
 FC_FFT_RF       =       $(FCBASE)
-CCFLAGS         =       -UCRAY -Dcrayx1 \
+CCFLAGS2        =       -UCRAY -Dcrayx1 \
                         -I$(RSL_PATH)/RSL \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) \
                         -DMAXPROC_MAKE=$(MAX_PROC) \
@@ -757,7 +757,7 @@ FCENDIAN        =
 FCBASE          =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767 \
                         -qflttrap=zerodivide:invalid:enable -qsigtrap=xl__trce -C
 FC_FFT_RF       =       $(FCBASE)
-CCFLAGS        =       -DNOUNDERSCORE -DLANDREAD_STUB -DMACOS
+CCFLAGS2        =       -DNOUNDERSCORE -DLANDREAD_STUB -DMACOS
 LDFLAGS         =       -Wl,-stack_size,10000000,-stack_addr,0xc0000000
 
 EXTRA_LIBS      =       -lSystemStubs
