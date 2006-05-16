@@ -418,6 +418,7 @@ subroutine a_rk_tendency( config_flags, rk_step, a_ru_tend, a_rv_tend, a_rw_tend
 &a_u, v, a_v, w, a_w, t, a_t, ph, a_ph, u_old, a_u_old, v_old, a_v_old, w_old, a_w_old, t_old, a_t_old, ph_old, a_ph_old, phb, &
 &t_init, mu, a_mu, mut, a_mut, muu, a_muu, muv, a_muv, mub, al, a_al, alt, a_alt, p, a_p, pb, php, a_php, cqu, a_cqu, cqv, a_cqv, &
 &cqw, a_cqw, u_base, v_base, z_base, msfu, msfv, msft, f, e, sina, cosa, fnm, fnp, rdn, rdnw, dt, rdx, rdy, kvdif, xkmhd, a_xkmhd, &
+dampcoef,zdamp,damp_opt,                         &
 &cf1, cf2, cf3, cfn, cfn1, non_hydrostatic, ids, ide, jds, jde, kde, ims, ime, jms, jme, kms, kme, its, ite, jts, jte, &
 &kts, kte )
 !******************************************************************
@@ -483,6 +484,10 @@ real, intent(inout) :: a_ww(ims:ime,kms:kme,jms:jme)
 real, intent(inout) :: a_xkmhd(ims:ime,kms:kme,jms:jme)
 real, intent(in) :: al(ims:ime,kms:kme,jms:jme)
 real, intent(in) :: alt(ims:ime,kms:kme,jms:jme)
+
+   INTEGER, INTENT( IN ) :: damp_opt
+
+   REAL, INTENT( IN ) :: zdamp, dampcoef
 real cf1
 real cf2
 real cf3

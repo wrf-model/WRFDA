@@ -461,7 +461,9 @@ subroutine g_rk_tendency( config_flags, rk_step, ru_tend, g_ru_tend, rv_tend, g_
 &g_ww, u, g_u, v, g_v, w, g_w, t, g_t, ph, g_ph, u_old, g_u_old, v_old, g_v_old, w_old, g_w_old, t_old, g_t_old, ph_old, g_ph_old, &
 &phb, t_init, mu, g_mu, mut, g_mut, muu, g_muu, muv, g_muv, mub, al, g_al, alt, g_alt, p, g_p, pb, php, g_php, cqu, g_cqu, cqv, &
 &g_cqv, cqw, g_cqw, u_base, v_base, z_base, msfu, msfv, msft, f, e, sina, cosa, fnm, fnp, rdn, rdnw, dt, rdx, rdy, kvdif, xkmhd, &
-&g_xkmhd, cf1, cf2, cf3, cfn, cfn1, non_hydrostatic, ids, ide, jds, jde, kde, ims, ime, jms, jme, kms, kme, its, ite, &
+&g_xkmhd, &
+dampcoef,zdamp,damp_opt,                         &
+cf1, cf2, cf3, cfn, cfn1, non_hydrostatic, ids, ide, jds, jde, kde, ims, ime, jms, jme, kms, kme, its, ite, &
 &jts, jte, kts, kte )
 !******************************************************************
 !******************************************************************
@@ -485,6 +487,11 @@ integer, intent(in) :: kme
 integer, intent(in) :: kms
 real, intent(in) :: al(ims:ime,kms:kme,jms:jme)
 real, intent(in) :: alt(ims:ime,kms:kme,jms:jme)
+
+   INTEGER, INTENT( IN ) :: damp_opt
+
+   REAL, INTENT( IN ) :: zdamp, dampcoef
+
 real cf1
 real cf2
 real cf3

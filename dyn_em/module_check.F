@@ -294,6 +294,7 @@ SUBROUTINE t_rk_tendency ( config_flags, rk_step,                         &
                          msfu, msfv, msft, f, e, sina, cosa,              &
                          fnm, fnp, rdn, rdnw,                             &
                          dt, rdx, rdy, khdif, kvdif, xkmhd,               &
+                         dampcoef,zdamp,damp_opt,                         &
                          cf1, cf2, cf3, cfn, cfn1, n_moist,               &
                          non_hydrostatic,                                 &
                          ids, ide, jds, jde, kds, kde,                    &
@@ -420,6 +421,9 @@ SUBROUTINE t_rk_tendency ( config_flags, rk_step,                         &
                                                                 dt,      &
                                                                 khdif,   &
                                                                 kvdif
+   INTEGER, INTENT( IN ) :: damp_opt
+
+   REAL, INTENT( IN ) :: zdamp, dampcoef
 
    REAL    :: kdift, khdq, kvdq, cfn, cfn1, cf1, cf2, cf3
    INTEGER :: i,j,k
@@ -667,6 +671,7 @@ SUBROUTINE t_rk_tendency ( config_flags, rk_step,                         &
                          msfu, msfv, msft, f, e, sina, cosa,              &
                          fnm, fnp, rdn, rdnw,                             &
                          dt, rdx, rdy, khdif, kvdif, xkmhd,               &
+                         dampcoef,zdamp,damp_opt,                        &
                          cf1, cf2, cf3, cfn, cfn1, n_moist,               &
                          non_hydrostatic,                                 &
                          ids, ide, jds, jde, kds, kde,                    &
@@ -717,7 +722,9 @@ SUBROUTINE t_rk_tendency ( config_flags, rk_step,                         &
 &P_ww, u, P_u, v, P_v, w, P_w, t, P_t, ph, P_ph, u_old, P_u_old, v_old, P_v_old, w_old, P_w_old, t_old, P_t_old, ph_old, P_ph_old, &
 &phb, t_init, mu, P_mu, mut, P_mut, muu, P_muu, muv, P_muv, mub, al, P_al, alt, P_alt, p, P_p, pb, php, P_php, cqu, P_cqu, cqv, &
 &P_cqv, K_cqw, P_cqw, u_base, v_base, z_base, msfu, msfv, msft, f, e, sina, cosa, fnm, fnp, rdn, rdnw, dt, rdx, rdy, kvdif, xkmhd, &
-&P_xkmhd, cf1, cf2, cf3, cfn, cfn1, non_hydrostatic, ids, ide, jds, jde, kde, ims, ime, jms, jme, kms, kme, its, ite, &
+&P_xkmhd, &
+dampcoef,zdamp,damp_opt,                         &
+cf1, cf2, cf3, cfn, cfn1, non_hydrostatic, ids, ide, jds, jde, kde, ims, ime, jms, jme, kms, kme, its, ite, &
 &jts, jte, kts, kte )
 
    SAVE_L=0.
@@ -822,6 +829,7 @@ SUBROUTINE t_rk_tendency ( config_flags, rk_step,                         &
                          msfu, msfv, msft, f, e, sina, cosa,                        &
                          fnm, fnp, rdn, rdnw,                                       &
                          dt, rdx, rdy, khdif, kvdif, P_xkmhd,                         &
+                         dampcoef,zdamp,damp_opt,                        &      
                          cf1, cf2, cf3, cfn, cfn1, n_moist,                         &
                          non_hydrostatic,                                           &
                          ids, ide, jds, jde, kds, kde,                              &
@@ -1006,7 +1014,9 @@ SUBROUTINE t_rk_tendency ( config_flags, rk_step,                         &
 &P_ww, u, P_u, v, P_v, w, P_w, t, P_t, ph, P_ph, u_old, P_u_old, v_old, P_v_old, w_old, P_w_old, t_old, P_t_old, ph_old, P_ph_old, &
 &phb, t_init, mu, P_mu, mut, P_mut, muu, P_muu, muv, P_muv, mub, al, P_al, alt, P_alt, p, P_p, pb, php, P_php, cqu, P_cqu, cqv, &
 &P_cqv, cqw, P_cqw, u_base, v_base, z_base, msfu, msfv, msft, f, e, sina, cosa, fnm, fnp, rdn, rdnw, dt, rdx, rdy, kvdif, xkmhd, &
-&P_xkmhd, cf1, cf2, cf3, cfn, cfn1, non_hydrostatic, ids, ide, jds, jde, kde, ims, ime, jms, jme, kms, kme, its, ite, &
+&P_xkmhd, &
+dampcoef,zdamp,damp_opt,                         &
+cf1, cf2, cf3, cfn, cfn1, non_hydrostatic, ids, ide, jds, jde, kde, ims, ime, jms, jme, kms, kme, its, ite, &
 &jts, jte, kts, kte )
 
    VAL_L=0.
@@ -1087,6 +1097,7 @@ SUBROUTINE t_rk_tendency ( config_flags, rk_step,                         &
 &P_u, v, P_v, w, P_w, t, P_t, ph, P_ph, u_old, P_u_old, v_old, P_v_old, w_old, P_w_old, t_old, P_t_old, ph_old, P_ph_old, phb, &
 &t_init, mu, P_mu, mut, P_mut, muu, P_muu, muv, P_muv, mub, al, P_al, alt, P_alt, p, P_p, pb, php, P_php, cqu, P_cqu, cqv, P_cqv, &
 &K_cqw, P_cqw, u_base, v_base, z_base, msfu, msfv, msft, f, e, sina, cosa, fnm, fnp, rdn, rdnw, dt, rdx, rdy, kvdif, xkmhd, P_xkmhd, &
+dampcoef,zdamp,damp_opt,                         &
 &cf1, cf2, cf3, cfn, cfn1, non_hydrostatic, ids, ide, jds, jde, kde, ims, ime, jms, jme, kms, kme, its, ite, jts, jte, &
 &kts, kte )
 
