@@ -336,7 +336,6 @@ i1       real    g_z_at_w         ikj     dyn_em      1       Z
 i1       real    a_z_at_w         ikj     dyn_em      1       Z 
 state    real    cfn            -       misc      -         -     irh02       "cfn"    "extrapolation constant"  ""
 state    real    cfn1           -       misc      -         -     irh02       "cfn1"   "extrapolation constant"  ""
-state    real    epsts          -       misc      -         -     irh02       "epsts"  "leapfrog time filter constant"  ""
 state    integer step_number    -       misc      -         -     ir        "step_number"  ""
 
 # 2m and 10m output diagnostics

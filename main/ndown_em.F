@@ -403,11 +403,9 @@ print *,'nested_grid%cf3       =', parent_grid%cf3
 
 nested_grid%cfn       = parent_grid%cfn 
 nested_grid%cfn1      = parent_grid%cfn1
-nested_grid%epsts     = parent_grid%epsts
 
 print *,'nested_grid%cfn       =', parent_grid%cfn 
 print *,'nested_grid%cfn1      =', parent_grid%cfn1
-print *,'nested_grid%epsts     =', parent_grid%epsts
 
 #ifdef WRF_CHEM
 nested_grid%chem_opt    = parent_grid%chem_opt
