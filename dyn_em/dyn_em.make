@@ -58,7 +58,22 @@ init_modules_em.o: module_big_step_utilities_em.o
 interp_domain_em.o: module_domain.o \
 		module_configure.o 
 
-module_advect_em.o: module_bc.o \
+module_check.o: module_check.F \
+                module_em_tl.o \
+                module_em_ad.o
+
+module_advect_em.o: module_advect_em.F \
+                module_bc.o \
+		module_model_constants.o \
+		module_wrf_error.o
+
+module_advect_em_ad.o: module_advect_em_ad.F \
+                module_bc_ad.o \
+		module_model_constants.o \
+		module_wrf_error.o
+
+module_advect_em_tl.o: module_advect_em_tl.F \
+                module_bc_tl.o \
 		module_model_constants.o \
 		module_wrf_error.o
 
@@ -112,7 +127,20 @@ module_diffusion_em_tl.o:  module_big_step_utilities_em_tl.o \
 		module_bc_tl.o \
 		module_wrf_error.o
 
-module_em.o:    module_big_step_utilities_em.o module_advect_em.o \
+module_em.o:    module_big_step_utilities_em.o \
+                module_advect_em.o \
+		module_state_description.o \
+		module_model_constants.o 
+
+module_em_ad.o: module_em_ad.F \
+                module_big_step_utilities_em_ad.o \
+                module_advect_em_ad.o \
+		module_state_description.o \
+		module_model_constants.o 
+
+module_em_tl.o: module_em_tl.F \
+                module_big_step_utilities_em_tl.o \
+                module_advect_em_tl.o \
 		module_state_description.o \
 		module_model_constants.o 
 

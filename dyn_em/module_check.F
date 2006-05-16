@@ -295,7 +295,7 @@ SUBROUTINE t_rk_tendency ( config_flags, rk_step,                         &
                          fnm, fnp, rdn, rdnw,                             &
                          dt, rdx, rdy, khdif, kvdif, xkmhd,               &
                          cf1, cf2, cf3, cfn, cfn1, n_moist,               &
-                         non_hydrostatic, leapfrog,                       &
+                         non_hydrostatic,                                 &
                          ids, ide, jds, jde, kds, kde,                    &
                          ims, ime, jms, jme, kms, kme,                    &
                          its, ite, jts, jte, kts, kte                    )
@@ -339,7 +339,7 @@ SUBROUTINE t_rk_tendency ( config_flags, rk_step,                         &
                                             ims, ime, jms, jme, kms, kme, &
                                             its, ite, jts, jte, kts, kte
 
-   LOGICAL ,               INTENT(IN   ) :: non_hydrostatic, leapfrog
+   LOGICAL ,               INTENT(IN   ) :: non_hydrostatic
 
    INTEGER ,               INTENT(IN   ) :: n_moist, rk_step
 
@@ -668,7 +668,7 @@ SUBROUTINE t_rk_tendency ( config_flags, rk_step,                         &
                          fnm, fnp, rdn, rdnw,                             &
                          dt, rdx, rdy, khdif, kvdif, xkmhd,               &
                          cf1, cf2, cf3, cfn, cfn1, n_moist,               &
-                         non_hydrostatic, leapfrog,                       &
+                         non_hydrostatic,                                 &
                          ids, ide, jds, jde, kds, kde,                    &
                          ims, ime, jms, jme, kms, kme,                    &
                          its, ite, jts, jte, kts, kte                    )
@@ -717,7 +717,7 @@ SUBROUTINE t_rk_tendency ( config_flags, rk_step,                         &
 &P_ww, u, P_u, v, P_v, w, P_w, t, P_t, ph, P_ph, u_old, P_u_old, v_old, P_v_old, w_old, P_w_old, t_old, P_t_old, ph_old, P_ph_old, &
 &phb, t_init, mu, P_mu, mut, P_mut, muu, P_muu, muv, P_muv, mub, al, P_al, alt, P_alt, p, P_p, pb, php, P_php, cqu, P_cqu, cqv, &
 &P_cqv, K_cqw, P_cqw, u_base, v_base, z_base, msfu, msfv, msft, f, e, sina, cosa, fnm, fnp, rdn, rdnw, dt, rdx, rdy, kvdif, xkmhd, &
-&P_xkmhd, cf1, cf2, cf3, cfn, cfn1, non_hydrostatic, leapfrog, ids, ide, jds, jde, kde, ims, ime, jms, jme, kms, kme, its, ite, &
+&P_xkmhd, cf1, cf2, cf3, cfn, cfn1, non_hydrostatic, ids, ide, jds, jde, kde, ims, ime, jms, jme, kms, kme, its, ite, &
 &jts, jte, kts, kte )
 
    SAVE_L=0.
@@ -823,7 +823,7 @@ SUBROUTINE t_rk_tendency ( config_flags, rk_step,                         &
                          fnm, fnp, rdn, rdnw,                                       &
                          dt, rdx, rdy, khdif, kvdif, P_xkmhd,                         &
                          cf1, cf2, cf3, cfn, cfn1, n_moist,                         &
-                         non_hydrostatic, leapfrog,                                 &
+                         non_hydrostatic,                                           &
                          ids, ide, jds, jde, kds, kde,                              &
                          ims, ime, jms, jme, kms, kme,                              &
                          its, ite, jts, jte, kts, kte                    )
@@ -1006,7 +1006,7 @@ SUBROUTINE t_rk_tendency ( config_flags, rk_step,                         &
 &P_ww, u, P_u, v, P_v, w, P_w, t, P_t, ph, P_ph, u_old, P_u_old, v_old, P_v_old, w_old, P_w_old, t_old, P_t_old, ph_old, P_ph_old, &
 &phb, t_init, mu, P_mu, mut, P_mut, muu, P_muu, muv, P_muv, mub, al, P_al, alt, P_alt, p, P_p, pb, php, P_php, cqu, P_cqu, cqv, &
 &P_cqv, cqw, P_cqw, u_base, v_base, z_base, msfu, msfv, msft, f, e, sina, cosa, fnm, fnp, rdn, rdnw, dt, rdx, rdy, kvdif, xkmhd, &
-&P_xkmhd, cf1, cf2, cf3, cfn, cfn1, non_hydrostatic, leapfrog, ids, ide, jds, jde, kde, ims, ime, jms, jme, kms, kme, its, ite, &
+&P_xkmhd, cf1, cf2, cf3, cfn, cfn1, non_hydrostatic, ids, ide, jds, jde, kde, ims, ime, jms, jme, kms, kme, its, ite, &
 &jts, jte, kts, kte )
 
    VAL_L=0.
@@ -1087,7 +1087,7 @@ SUBROUTINE t_rk_tendency ( config_flags, rk_step,                         &
 &P_u, v, P_v, w, P_w, t, P_t, ph, P_ph, u_old, P_u_old, v_old, P_v_old, w_old, P_w_old, t_old, P_t_old, ph_old, P_ph_old, phb, &
 &t_init, mu, P_mu, mut, P_mut, muu, P_muu, muv, P_muv, mub, al, P_al, alt, P_alt, p, P_p, pb, php, P_php, cqu, P_cqu, cqv, P_cqv, &
 &K_cqw, P_cqw, u_base, v_base, z_base, msfu, msfv, msft, f, e, sina, cosa, fnm, fnp, rdn, rdnw, dt, rdx, rdy, kvdif, xkmhd, P_xkmhd, &
-&cf1, cf2, cf3, cfn, cfn1, non_hydrostatic, leapfrog, ids, ide, jds, jde, kde, ims, ime, jms, jme, kms, kme, its, ite, jts, jte, &
+&cf1, cf2, cf3, cfn, cfn1, non_hydrostatic, ids, ide, jds, jde, kde, ims, ime, jms, jme, kms, kme, its, ite, jts, jte, &
 &kts, kte )
 
 
@@ -4633,7 +4633,7 @@ SUBROUTINE t_small_step_prep( u_1, u_2, v_1, v_2, w_1, w_2, &
                             ww, ww_save,                  &
                             dnw, c2a, pb, p, alt,         &
                             msfu, msfv, msft,             &
-                            rk_step, leapfrog,            &
+                            rk_step,                      &
                             ids,ide, jds,jde, kds,kde,    &
                             ims,ime, jms,jme, kms,kme,    &
                             its,ite, jts,jte, kts,kte    )
@@ -4697,8 +4697,6 @@ SUBROUTINE t_small_step_prep( u_1, u_2, v_1, v_2, w_1, w_2, &
   REAL, DIMENSION(ims:ime, jms:jme)         , INTENT(  OUT) :: mu_save
 
   REAL, DIMENSION(kms:kme, jms:jme)         , INTENT(IN   ) :: dnw
-
-  LOGICAL, INTENT(IN   ) :: leapfrog
 
 ! local variables
 
@@ -4905,7 +4903,7 @@ SUBROUTINE t_small_step_prep( u_1, u_2, v_1, v_2, w_1, w_2, &
                             ww, ww_save,                  &
                             dnw, c2a, pb, p, alt,         &
                             msfu, msfv, msft,             &
-                            rk_step, leapfrog,            &
+                            rk_step,                      &
                             ids,ide, jds,jde, kds,kde,    &
                             ims,ime, jms,jme, kms,kme,    &
                             its,ite, jts,jte, kts,kte    )
@@ -4964,7 +4962,7 @@ SUBROUTINE t_small_step_prep( u_1, u_2, v_1, v_2, w_1, w_2, &
    CALL g_small_step_prep( K_u_1, P_u_1, K_u_2, P_u_2, K_v_1, P_v_1, K_v_2, P_v_2, K_w_1, P_w_1, K_w_2, P_w_2, K_t_1, P_t_1, K_t_2, P_t_2, K_ph_1,&
 & P_ph_1, K_ph_2, P_ph_2, mub, K_mu_1, P_mu_1, K_mu_2, P_mu_2, K_muu, P_muu, muus, P_muus, K_muv, P_muv, muvs, P_muvs, K_mut, P_mut, muts, &
 &P_muts, mudf, P_mudf, u_save, P_u_save, v_save, P_v_save, w_save, P_w_save, t_save, P_t_save, ph_save, P_ph_save, mu_save, &
-&P_mu_save, ww, P_ww, ww_save, P_ww_save, c2a, P_c2a, pb, p, P_p, alt, P_alt, msfu, msfv, msft, rk_step, leapfrog, ide, jde, kde, &
+&P_mu_save, ww, P_ww, ww_save, P_ww_save, c2a, P_c2a, pb, p, P_p, alt, P_alt, msfu, msfv, msft, rk_step, ide, jde, kde, &
 &ims, ime, jms, jme, kms, kme, its, ite, jts, jte, kts, kte )
 
    SAVE_L=0.
@@ -5065,7 +5063,7 @@ SUBROUTINE t_small_step_prep( u_1, u_2, v_1, v_2, w_1, w_2, &
                             P_ww, P_ww_save,                  &
                             dnw, P_c2a, pb, P_p, P_alt,         &
                             msfu, msfv, msft,             &
-                            rk_step, leapfrog,            &
+                            rk_step,              &
                             ids,ide, jds,jde, kds,kde,    &
                             ims,ime, jms,jme, kms,kme,    &
                             its,ite, jts,jte, kts,kte    )
@@ -5228,7 +5226,7 @@ SUBROUTINE t_small_step_prep( u_1, u_2, v_1, v_2, w_1, w_2, &
    CALL g_small_step_prep( u_1, P_u_1, u_2, P_u_2, v_1, P_v_1, v_2, P_v_2, w_1, P_w_1, w_2, P_w_2, t_1, P_t_1, t_2, P_t_2, ph_1,&
 & P_ph_1, ph_2, P_ph_2, mub, mu_1, P_mu_1, mu_2, P_mu_2, muu, P_muu, muus, P_muus, muv, P_muv, muvs, P_muvs, mut, P_mut, muts, &
 &P_muts, mudf, P_mudf, u_save, P_u_save, v_save, P_v_save, w_save, P_w_save, t_save, P_t_save, ph_save, P_ph_save, mu_save, &
-&P_mu_save, ww, P_ww, ww_save, P_ww_save, c2a, P_c2a, pb, p, P_p, alt, P_alt, msfu, msfv, msft, rk_step, leapfrog, ide, jde, kde, &
+&P_mu_save, ww, P_ww, ww_save, P_ww_save, c2a, P_c2a, pb, p, P_p, alt, P_alt, msfu, msfv, msft, rk_step, ide, jde, kde, &
 &ims, ime, jms, jme, kms, kme, its, ite, jts, jte, kts, kte )
 
    VAL_L=0.
@@ -5296,7 +5294,7 @@ SUBROUTINE t_small_step_prep( u_1, u_2, v_1, v_2, w_1, w_2, &
    CALL a_small_step_prep( K_u_1, P_u_1, K_u_2, P_u_2, K_v_1, P_v_1, K_v_2, P_v_2, K_w_1, P_w_1, K_w_2, P_w_2, K_t_1, P_t_1, K_t_2, P_t_2, &
 &P_ph_1, P_ph_2, mub, K_mu_1, P_mu_1, K_mu_2, P_mu_2, K_muu, P_muu, muus, P_muus, K_muv, P_muv, muvs, P_muvs, K_mut, P_mut, muts, P_muts, &
 &P_mudf, P_u_save, P_v_save, P_w_save, P_t_save, P_ph_save, P_mu_save, P_ww, P_ww_save, P_c2a, pb, p, P_p, alt, P_alt, msfu, msfv, &
-&msft, rk_step, leapfrog, ide, jde, kde, ims, ime, jms, jme, kms, kme, its, ite, jts, jte, kts, kte )
+&msft, rk_step, ide, jde, kde, ims, ime, jms, jme, kms, kme, its, ite, jts, jte, kts, kte )
 
 
    VAL_A=0.
@@ -9425,7 +9423,6 @@ SUBROUTINE t_rk_scalar_tend ( scs, sce, config_flags,    &
                             msfu, msfv, msft,             &
                             rdx, rdy, rdn, rdnw,          &
                             khdif, kvdif, xkmhd,          &
-                            leapfrog,                     &
                             ids, ide, jds, jde, kds, kde, &
                             ims, ime, jms, jme, kms, kme, &
                             its, ite, jts, jte, kts, kte )
@@ -9481,9 +9478,6 @@ SUBROUTINE t_rk_scalar_tend ( scs, sce, config_flags,    &
                                                                   kvdif
 
    REAL ,                                        INTENT(IN   ) :: dt
-
-   LOGICAL, INTENT(IN   ) :: leapfrog
-
 
    ! Local data
 
@@ -9579,7 +9573,6 @@ SUBROUTINE t_rk_scalar_tend ( scs, sce, config_flags,    &
                             msfu, msfv, msft,             &
                             rdx, rdy, rdn, rdnw,          &
                             khdif, kvdif, xkmhd,          &
-                            leapfrog,                     &
                             ids, ide, jds, jde, kds, kde, &
                             ims, ime, jms, jme, kms, kme, &
                             its, ite, jts, jte, kts, kte )
@@ -9609,7 +9602,7 @@ SUBROUTINE t_rk_scalar_tend ( scs, sce, config_flags,    &
 
    CALL g_rk_scalar_tend( scs, sce, config_flags, rk_step, ru, P_ru, rv, P_rv, ww, P_ww, mut, P_mut, alt, P_alt, K_scalar_old, &
 &P_scalar_old, K_scalar, P_scalar, scalar_tends, P_scalar_tends, advect_tend, P_advect_tend, base, moist_step, fnm, fnp, msfu, msfv, &
-&msft, rdx, rdy, rdn, rdnw, kvdif, xkmhd, P_xkmhd, leapfrog, ids, ide, jds, jde, kde, ims, ime, jms, jme, kms, kme, its, ite, jts, &
+&msft, rdx, rdy, rdn, rdnw, kvdif, xkmhd, P_xkmhd, ids, ide, jds, jde, kde, ims, ime, jms, jme, kms, kme, its, ite, jts, &
 &jte, kts, kte )
 
    SAVE_L=0.
@@ -9671,7 +9664,6 @@ SUBROUTINE t_rk_scalar_tend ( scs, sce, config_flags,    &
                             msfu, msfv, msft,             &
                             rdx, rdy, rdn, rdnw,          &
                             khdif, kvdif, P_xkmhd,          &
-                            leapfrog,                     &
                             ids, ide, jds, jde, kds, kde, &
                             ims, ime, jms, jme, kms, kme, &
                             its, ite, jts, jte, kts, kte )
@@ -9758,7 +9750,7 @@ SUBROUTINE t_rk_scalar_tend ( scs, sce, config_flags,    &
 
    CALL g_rk_scalar_tend( scs, sce, config_flags, rk_step, ru, P_ru, rv, P_rv, ww, P_ww, mut, P_mut, alt, P_alt, scalar_old, &
 &P_scalar_old, scalar, P_scalar, scalar_tends, P_scalar_tends, advect_tend, P_advect_tend, base, moist_step, fnm, fnp, msfu, msfv, &
-&msft, rdx, rdy, rdn, rdnw, kvdif, xkmhd, P_xkmhd, leapfrog, ids, ide, jds, jde, kde, ims, ime, jms, jme, kms, kme, its, ite, jts, &
+&msft, rdx, rdy, rdn, rdnw, kvdif, xkmhd, P_xkmhd, ids, ide, jds, jde, kde, ims, ime, jms, jme, kms, kme, its, ite, jts, &
 &jte, kts, kte )
 
    VAL_L=0.
@@ -9800,7 +9792,7 @@ SUBROUTINE t_rk_scalar_tend ( scs, sce, config_flags,    &
 
    CALL a_rk_scalar_tend( scs, sce, config_flags, rk_step, ru, P_ru, rv, P_rv, ww, P_ww, mut, P_mut, alt, P_alt, K_scalar_old, &
 &P_scalar_old, K_scalar, P_scalar, P_scalar_tends, P_advect_tend, base, moist_step, fnm, fnp, msfu, msfv, msft, rdx, rdy, rdn, rdnw, &
-&kvdif, xkmhd, P_xkmhd, leapfrog, ids, ide, jds, jde, kde, ims, ime, jms, jme, kms, kme, its, ite, jts, jte, kts, kte )
+&kvdif, xkmhd, P_xkmhd, ids, ide, jds, jde, kde, ims, ime, jms, jme, kms, kme, its, ite, jts, jte, kts, kte )
 
 
    VAL_A=0.
@@ -10033,7 +10025,7 @@ SUBROUTINE t_rk_update_scalar( scs, sce,                      &
                              advect_tend, msft,             &
                              mu_old, mu_new, mu_base,       &
                              rk_step, dt, spec_zone,        &
-                             epsts, leapfrog, config_flags, &
+                             config_flags,           &
                              ids, ide, jds, jde, kds, kde,  &
                              ims, ime, jms, jme, kms, kme,  &
                              its, ite, jts, jte, kts, kte  )
@@ -10051,7 +10043,7 @@ SUBROUTINE t_rk_update_scalar( scs, sce,                      &
                                              ims, ime, jms, jme, kms, kme, &
                                              its, ite, jts, jte, kts, kte
 
-   REAL,                    INTENT(IN   ) :: dt, epsts
+   REAL,                    INTENT(IN   ) :: dt
 
    REAL, DIMENSION(ims:ime, kms:kme, jms:jme , scs:sce),                &
          INTENT(INOUT)                                  :: scalar_1,  &
@@ -10063,8 +10055,6 @@ SUBROUTINE t_rk_update_scalar( scs, sce,                      &
 
    REAL, DIMENSION(ims:ime, jms:jme  ), INTENT(IN   ) :: mu_base, &
                                                           msft
-
-   LOGICAL, INTENT(IN   ) :: leapfrog
 
    INTEGER :: i,j,k,im
    REAL    :: sc_middle, msfsq
@@ -10141,7 +10131,7 @@ SUBROUTINE t_rk_update_scalar( scs, sce,                      &
                              advect_tend, msft,             &
                              mu_old, mu_new, mu_base,       &
                              rk_step, dt, spec_zone,        &
-                             epsts, leapfrog, config_flags, &
+                             config_flags, &
                              ids, ide, jds, jde, kds, kde,  &
                              ims, ime, jms, jme, kms, kme,  &
                              its, ite, jts, jte, kts, kte  )
@@ -10161,7 +10151,7 @@ SUBROUTINE t_rk_update_scalar( scs, sce,                      &
 !  TCL
 
    CALL g_rk_update_scalar( scs, sce, K_scalar_1, P_scalar_1, K_scalar_2, P_scalar_2, K_sc_tend, P_sc_tend, advect_tend, &
-&P_advect_tend, msft, mu_old, P_mu_old, mu_new, P_mu_new, mu_base, rk_step, dt, spec_zone, epsts, leapfrog, config_flags, ids, ide,&
+&P_advect_tend, msft, mu_old, P_mu_old, mu_new, P_mu_new, mu_base, rk_step, dt, spec_zone, config_flags, ids, ide,&
 & jds, jde, kde, ims, ime, jms, jme, kms, kme, its, ite, jts, jte, kts, kte )
 
    SAVE_L=0.
@@ -10211,7 +10201,7 @@ SUBROUTINE t_rk_update_scalar( scs, sce,                      &
                              P_advect_tend, msft,             &
                              P_mu_old, P_mu_new, mu_base,       &
                              rk_step, dt, spec_zone,        &
-                             epsts, leapfrog, config_flags, &
+                             config_flags, &
                              ids, ide, jds, jde, kds, kde,  &
                              ims, ime, jms, jme, kms, kme,  &
                              its, ite, jts, jte, kts, kte  )
@@ -10289,7 +10279,7 @@ SUBROUTINE t_rk_update_scalar( scs, sce,                      &
 !  TGL
 
    CALL g_rk_update_scalar( scs, sce, scalar_1, P_scalar_1, scalar_2, P_scalar_2, sc_tend, P_sc_tend, advect_tend, &
-&P_advect_tend, msft, mu_old, P_mu_old, mu_new, P_mu_new, mu_base, rk_step, dt, spec_zone, epsts, leapfrog, config_flags, ids, ide,&
+&P_advect_tend, msft, mu_old, P_mu_old, mu_new, P_mu_new, mu_base, rk_step, dt, spec_zone, config_flags, ids, ide,&
 & jds, jde, kde, ims, ime, jms, jme, kms, kme, its, ite, jts, jte, kts, kte )
 
    VAL_L=0.
@@ -10321,7 +10311,7 @@ SUBROUTINE t_rk_update_scalar( scs, sce,                      &
 !  ADJ
 
    CALL a_rk_update_scalar( scs, sce, K_scalar_1, P_scalar_1, K_scalar_2, P_scalar_2, K_sc_tend, P_sc_tend, advect_tend, &
-&P_advect_tend, msft, mu_old, P_mu_old, mu_new, P_mu_new, mu_base, rk_step, dt, spec_zone, epsts, leapfrog, config_flags, ids, ide,&
+&P_advect_tend, msft, mu_old, P_mu_old, mu_new, P_mu_new, mu_base, rk_step, dt, spec_zone, config_flags, ids, ide,&
 & jds, jde, kde, ims, ime, jms, jme, kms, kme, its, ite, jts, jte, kts, kte )
 
    VAL_A=0.

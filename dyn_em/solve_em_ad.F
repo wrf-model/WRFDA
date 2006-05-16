@@ -112,7 +112,6 @@ integer , dimension(grid%sm31:grid%em31,grid%sm33:grid%em31) :: xxxxx , yyyyy , 
 
    INTEGER :: rk_order, iwmax, jwmax, kwmax
    REAL :: dt_rk, dts_rk, dtm, wmax
-   LOGICAL :: leapfrog
    INTEGER :: l,kte,kk
 
 real a_z_at_wh(1+grid%em31-grid%sm31,1+grid%em32-grid%sm32,1+grid%em33-grid%sm33)
@@ -219,15 +218,11 @@ real, DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33,num_
 ! It is a mediation-layer routine -> DM and SM calls are made where 
 ! needed for parallel processing.  
 !
-! solve_em can integrate the equations using 3 time-integration methods
+! solve_em can integrate the equations using 2 time-integration methods
 !      
 !    - 3rd order Runge-Kutta time integration (recommended)
 !      
 !    - 2nd order Runge-Kutta time integration
-!      
-!    - Leapfrog time integration
-!      (note: the leapfrog scheme is not correctly implemented
-!      for most of the physics)
 !
 ! The main sections of solve_em are
 !     
@@ -354,8 +349,6 @@ cfn = grid%cfn
 ! recompute : cfn
 cfn1 = grid%cfn1
 ! recompute : cfn1
-epsts = grid%epsts
-! recompute : epsts
 step_number = grid%step_number
 ! recompute : step_number
 rdx = grid%rdx
@@ -425,14 +418,8 @@ call set_tiles( grid,ids,ide,jds,jde,ips,ipe,jps,jpe )
 ! recompute : grid
 rk_order = config_flags%rk_ord
 ! recompute : rk_order
-leapfrog =  .false. 
-! recompute : leapfrog
 dts = dt/float(time_step_sound)
 ! recompute : dts
-if (rk_ord .eq. 1) then
-  leapfrog =  .true. 
-endif
-! recompute : leapfrog
 runge_kutta_looq: do rk_step = 1, rk_order
   if (rk_order .eq. 1) then
     if (step_number .ne. 1) then
@@ -497,7 +484,7 @@ runge_kutta_looq: do rk_step = 1, rk_order
     call rk_tendency( config_flags,rk_step,ru_tend,rv_tend,rw_tend,ph_tend,t_tend,ru_tendf,rv_tendf,rw_tendf,ph_tendf,t_tendf,&
 &mu_tend,u_save,v_save,w_save,ph_save,t_save,mu_save,rthften,ru,rv,rw,ww,u_2,v_2,w_2,t_2,ph_2,u_1,v_1,w_1,t_1,ph_1,h_diabatic,&
 &phb,t_init,mu_2,mut,muu,muv,mub,al,alt,p,pb,php,cqu,cqv,cqw,u_base,v_base,t_base,qv_base,z_base,msfu,msfv,msft,f,e,sina,cosa,&
-&fnm,fnp,rdn,rdnw,dt,rdx,rdy,khdif,kvdif,xkmhd,cf1,cf2,cf3,cfn,cfn1,num_3d_m,non_hydrostatic,leapfrog,ids,ide,jds,jde,kds,kde,&
+&fnm,fnp,rdn,rdnw,dt,rdx,rdy,khdif,kvdif,xkmhd,cf1,cf2,cf3,cfn,cfn1,num_3d_m,non_hydrostatic,ids,ide,jds,jde,kds,kde,&
 &ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
   end do
   do ij = 1, grid%num_tiles
@@ -517,7 +504,7 @@ runge_kutta_looq: do rk_step = 1, rk_order
   end do
   do ij = 1, grid%num_tiles
     call small_step_prep( u_1,u_2,v_1,v_2,w_1,w_2,t_1,t_2,ph_1,ph_2,mub,mu_1,mu_2,muu,muus,muv,muvs,mut,muts,mudf,u_save,v_save,&
-&w_save,t_save,ph_save,mu_save,ww,ww1,dnw,c2a,pb,p,alt,msfu,msfv,msft,rk_step,leapfrog,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,&
+&w_save,t_save,ph_save,mu_save,ww,ww1,dnw,c2a,pb,p,alt,msfu,msfv,msft,rk_step,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,&
 &kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
     call calc_p_rho( al,p,ph_2,alt,t_2,t_save,c2a,pm1,mu_2,muts,znu,t0,rdnw,dnw,smdiv,non_hydrostatic,0,ids,ide,jds,jde,kds,kde,&
 &ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
@@ -599,7 +586,7 @@ runge_kutta_looq: do rk_step = 1, rk_order
       moist_tile_loop_6: do ij = 1, grid%num_tiles
         call rk_scalar_tend( im,im,config_flags,rk_step,dt_rk,ru_m,rv_m,ww_m,mut,alt,moist_1(ims,kms,jms,im),moist_2(ims,kms,jms,&
 &im),moist_tend(ims,kms,jms,im),advect_tend,rqvften,qv_base, .true. ,fnm,fnp,msfu,msfv,msft,rdx,rdy,rdn,rdnw,khdif,kvdif,&
-&xkmhd,leapfrog,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%&
+&xkmhd,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%&
 &j_end(ij),k_start,k_end )
         if ((config_flags%specified .or. config_flags%nested) .and. rk_step .eq. 1) then
           if (im .eq. p_qv) then
@@ -628,7 +615,7 @@ runge_kutta_looq: do rk_step = 1, rk_order
       end do moist_tile_loop_6
       moist_tile_loop_5: do ij = 1, grid%num_tiles
         call rk_update_scalar( im,im,moist_1(ims,kms,jms,im),moist_2(ims,kms,jms,im),moist_tend(ims,kms,jms,im),advect_tend,msft,&
-&mu_1,mu_2,mub,rk_step,dt_rk,spec_zone,epsts,leapfrog,config_flags,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%&
+&mu_1,mu_2,mub,rk_step,dt_rk,spec_zone,config_flags,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%&
 &i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
       end do moist_tile_loop_5
     end do moist_variable_loor
@@ -790,7 +777,7 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
       call rk_tendency( config_flags,rk_step1,ru_tend,rv_tend,rw_tend,ph_tend,t_tend,ru_tendf,rv_tendf,rw_tendf,ph_tendf,t_tendf,&
 &mu_tend,u_save,v_save,w_save,ph_save,t_save,mu_save,rthften,ru,rv,rw,ww,u_2,v_2,w_2,t_2,ph_2,u_1,v_1,w_1,t_1,ph_1,&
 &h_diabatic,phb,t_init,mu_2,mut,muu,muv,mub,al,alt,p,pb,php,cqu,cqv,cqw,u_base,v_base,t_base,qv_base,z_base,msfu,msfv,msft,f,&
-&e,sina,cosa,fnm,fnp,rdn,rdnw,dt,rdx,rdy,khdif,kvdif,xkmhd,cf1,cf2,cf3,cfn,cfn1,num_3d_m,non_hydrostatic,leapfrog,ids,ide,&
+&e,sina,cosa,fnm,fnp,rdn,rdnw,dt,rdx,rdy,khdif,kvdif,xkmhd,cf1,cf2,cf3,cfn,cfn1,num_3d_m,non_hydrostatic,ids,ide,&
 &jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
     end do
     do ij = 1, grid%num_tiles
@@ -810,7 +797,7 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
     end do
     do ij = 1, grid%num_tiles
       call small_step_prep( u_1,u_2,v_1,v_2,w_1,w_2,t_1,t_2,ph_1,ph_2,mub,mu_1,mu_2,muu,muus,muv,muvs,mut,muts,mudf,u_save,v_save,&
-&w_save,t_save,ph_save,mu_save,ww,ww1,dnw,c2a,pb,p,alt,msfu,msfv,msft,rk_step1,leapfrog,ids,ide,jds,jde,kds,kde,ims,ime,jms,&
+&w_save,t_save,ph_save,mu_save,ww,ww1,dnw,c2a,pb,p,alt,msfu,msfv,msft,rk_step1,ids,ide,jds,jde,kds,kde,ims,ime,jms,&
 &jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
       call calc_p_rho( al,p,ph_2,alt,t_2,t_save,c2a,pm1,mu_2,muts,znu,t0,rdnw,dnw,smdiv,non_hydrostatic,0,ids,ide,jds,jde,kds,kde,&
 &ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
@@ -892,7 +879,7 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
         moist_tile_loop_9d: do ij = 1, grid%num_tiles
           call rk_scalar_tend( im,im,config_flags,rk_step1,dt_rk,ru_m,rv_m,ww_m,mut,alt,moist_1(ims,kms,jms,im),moist_2(ims,kms,&
 &jms,im),moist_tend(ims,kms,jms,im),advect_tend,rqvften,qv_base, .true. ,fnm,fnp,msfu,msfv,msft,rdx,rdy,rdn,rdnw,khdif,&
-&kvdif,xkmhd,leapfrog,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),&
+&kvdif,xkmhd,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),&
 &grid%j_end(ij),k_start,k_end )
           if ((config_flags%specified .or. config_flags%nested) .and. rk_step1 .eq. 1) then
             if (im .eq. p_qv) then
@@ -921,7 +908,7 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
         end do moist_tile_loop_9d
         moist_tile_loop_9c: do ij = 1, grid%num_tiles
           call rk_update_scalar( im,im,moist_1(ims,kms,jms,im),moist_2(ims,kms,jms,im),moist_tend(ims,kms,jms,im),advect_tend,msft,&
-&mu_1,mu_2,mub,rk_step1,dt_rk,spec_zone,epsts,leapfrog,config_flags,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%&
+&mu_1,mu_2,mub,rk_step1,dt_rk,spec_zone,config_flags,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%&
 &i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
         end do moist_tile_loop_9c
       end do moist_variable_loou
@@ -1027,7 +1014,7 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
     call rk_tendency( config_flags,rk_step,ru_tend,rv_tend,rw_tend,ph_tend,t_tend,ru_tendf,rv_tendf,rw_tendf,ph_tendf,t_tendf,&
 &mu_tend,u_save,v_save,w_save,ph_save,t_save,mu_save,rthften,ru,rv,rw,ww,u_2,v_2,w_2,t_2,ph_2,u_1,v_1,w_1,t_1,ph_1,h_diabatic,&
 &phb,t_init,mu_2,mut,muu,muv,mub,al,alt,p,pb,php,cqu,cqv,cqw,u_base,v_base,t_base,qv_base,z_base,msfu,msfv,msft,f,e,sina,cosa,&
-&fnm,fnp,rdn,rdnw,dt,rdx,rdy,khdif,kvdif,xkmhd,cf1,cf2,cf3,cfn,cfn1,num_3d_m,non_hydrostatic,leapfrog,ids,ide,jds,jde,kds,kde,&
+&fnm,fnp,rdn,rdnw,dt,rdx,rdy,khdif,kvdif,xkmhd,cf1,cf2,cf3,cfn,cfn1,num_3d_m,non_hydrostatic,ids,ide,jds,jde,kds,kde,&
 &ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
   end do
 !  recompute : cqw,mu_tend,ph_save,ph_tend,ru_tend,ru_tendf,rv_tend,rv_t
@@ -1050,7 +1037,7 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
 ! recompute : mu_tend,ph_tend,ru_tend,rv_tend,rw_tend,t_tend
   do ij = 1, grid%num_tiles
     call small_step_prep( u_1,u_2,v_1,v_2,w_1,w_2,t_1,t_2,ph_1,ph_2,mub,mu_1,mu_2,muu,muus,muv,muvs,mut,muts,mudf,u_save,v_save,&
-&w_save,t_save,ph_save,mu_save,ww,ww1,dnw,c2a,pb,p,alt,msfu,msfv,msft,rk_step,leapfrog,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,&
+&w_save,t_save,ph_save,mu_save,ww,ww1,dnw,c2a,pb,p,alt,msfu,msfv,msft,rk_step,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,&
 &kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
     call calc_p_rho( al,p,ph_2,alt,t_2,t_save,c2a,pm1,mu_2,muts,znu,t0,rdnw,dnw,smdiv,non_hydrostatic,0,ids,ide,jds,jde,kds,kde,&
 &ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
@@ -1137,7 +1124,7 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
       moist_tile_loop_8: do ij = 1, grid%num_tiles
         call rk_scalar_tend( im,im,config_flags,rk_step,dt_rk,ru_m,rv_m,ww_m,mut,alt,moist_1(ims,kms,jms,im),moist_2(ims,kms,jms,&
 &im),moist_tend(ims,kms,jms,im),advect_tend,rqvften,qv_base, .true. ,fnm,fnp,msfu,msfv,msft,rdx,rdy,rdn,rdnw,khdif,kvdif,&
-&xkmhd,leapfrog,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%&
+&xkmhd,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%&
 &j_end(ij),k_start,k_end )
         if ((config_flags%specified .or. config_flags%nested) .and. rk_step .eq. 1) then
           if (im .eq. p_qv) then
@@ -1166,7 +1153,7 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
       end do moist_tile_loop_8
       moist_tile_loop_7: do ij = 1, grid%num_tiles
         call rk_update_scalar( im,im,moist_1(ims,kms,jms,im),moist_2(ims,kms,jms,im),moist_tend(ims,kms,jms,im),advect_tend,msft,&
-&mu_1,mu_2,mub,rk_step,dt_rk,spec_zone,epsts,leapfrog,config_flags,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%&
+&mu_1,mu_2,mub,rk_step,dt_rk,spec_zone,config_flags,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%&
 &i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
       end do moist_tile_loop_7
     end do moist_variable_loos
@@ -1200,7 +1187,7 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
       moist_tile_loop_9: do ij = 1, grid%num_tiles
         call rk_scalar_tend( im,im,config_flags,rk_step,dt_rk,ru_m,rv_m,ww_m,mut,alt,moist_1(ims,kms,jms,im),moist_2(ims,kms,jms,&
 &im),moist_tend(ims,kms,jms,im),advect_tend,rqvften,qv_base, .true. ,fnm,fnp,msfu,msfv,msft,rdx,rdy,rdn,rdnw,khdif,kvdif,&
-&xkmhd,leapfrog,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%&
+&xkmhd,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%&
 &j_end(ij),k_start,k_end )
         if ((config_flags%specified .or. config_flags%nested) .and. rk_step .eq. 1) then
           if (im .eq. p_qv) then
@@ -1231,7 +1218,7 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
       do ij = 1, grid%num_tiles
         call a_rk_update_scalar( im,im,moist_1(ims,kms,jms,im),a_moist_1(ims,kms,jms,im),moist_2(ims,kms,jms,im),a_moist_2(ims,kms,&
 &jms,im),moist_tend(ims,kms,jms,im),a_moist_tend(ims,kms,jms,im),advect_tend,a_advect_tend,msft,mu_1,a_mu_1,mu_2,a_mu_2,&
-&mub,rk_step,dt_rk,spec_zone,epsts,leapfrog,config_flags,ids,ide,jds,jde,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%&
+&mub,rk_step,dt_rk,spec_zone,config_flags,ids,ide,jds,jde,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%&
 &i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
       end do
       do ij = 1, grid%num_tiles
@@ -1261,7 +1248,7 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
         endif
         call a_rk_scalar_tend( im,im,config_flags,rk_step,ru_m,a_ru_m,rv_m,a_rv_m,ww_m,a_ww_m,mut,a_mut,alt,a_alt,moist_1(ims,kms,&
 &jms,im),a_moist_1(ims,kms,jms,im),moist_2(ims,kms,jms,im),a_moist_2(ims,kms,jms,im),a_moist_tend(ims,kms,jms,im),&
-&a_advect_tend,qv_base, .true. ,fnm,fnp,msfu,msfv,msft,rdx,rdy,rdn,rdnw,kvdif,xkmhd,a_xkmhd,leapfrog,ids,ide,jds,jde,kde,&
+&a_advect_tend,qv_base, .true. ,fnm,fnp,msfu,msfv,msft,rdx,rdy,rdn,rdnw,kvdif,xkmhd,a_xkmhd,ids,ide,jds,jde,kde,&
 &ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
       end do
     end do
@@ -1312,7 +1299,7 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
 ! recompute vars : ru_tendf,rv_tendf,rw_tendf,t_tendf
 !  recdepend vars : al,alt,cb,cf1,cf2,cf3,cfn,cfn1,config_flags,cosa,cqu
 ! ,cqv,cqw,dt,e,f,fnm,fnp,g,grid,ide,ids,ime,ims,jde,jds,jme,jms,k_end,k
-! _start,kde,kme,kms,kvdif,leapfrog,msft,msfu,msfv,mu_1,mu_2,mub,mut,muu
+! _start,kde,kme,kms,kvdif,msft,msfu,msfv,mu_1,mu_2,mub,mut,muu
 ! ,muv,non_hydrostatic,p,pb,ph_1,ph_2,phb,php,pm1,pr,pr,rdn,rdnw,rdx,rdy
 ! ,reradius,rk_step,ru,ru_tendf,rv,rv_tendf,rw,rw_tendf,sina,t_1,t_2,t_i
 ! nit,t_tendf,u_1,u_2,u_base,v_1,v_2,v_base,w_1,w_2,w_alpha,w_beta,ww,xk
@@ -1323,12 +1310,12 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
     call rk_tendency( config_flags,rk_step,ru_tend,rv_tend,rw_tend,ph_tend,t_tend,ru_tendf,rv_tendf,rw_tendf,ph_tendf,t_tendf,&
 &mu_tend,u_save,v_save,w_save,ph_save,t_save,mu_save,rthften,ru,rv,rw,ww,u_2,v_2,w_2,t_2,ph_2,u_1,v_1,w_1,t_1,ph_1,h_diabatic,&
 &phb,t_init,mu_2,mut,muu,muv,mub,al,alt,p,pb,php,cqu,cqv,cqw,u_base,v_base,t_base,qv_base,z_base,msfu,msfv,msft,f,e,sina,cosa,&
-&fnm,fnp,rdn,rdnw,dt,rdx,rdy,khdif,kvdif,xkmhd,cf1,cf2,cf3,cfn,cfn1,num_3d_m,non_hydrostatic,leapfrog,ids,ide,jds,jde,kds,kde,&
+&fnm,fnp,rdn,rdnw,dt,rdx,rdy,khdif,kvdif,xkmhd,cf1,cf2,cf3,cfn,cfn1,num_3d_m,non_hydrostatic,ids,ide,jds,jde,kds,kde,&
 &ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
   end do
 ! recompute vars : cqw
 !  recdepend vars : alt,cpovcv,cqu,cqv,cqw,dnw,grid,ide,ime,ims,jde,jme,
-! jms,k_end,k_start,kde,kme,kms,leapfrog,msft,msfu,msfv,mu_1,mu_2,mub,mu
+! jms,k_end,k_start,kde,kme,kms,msft,msfu,msfv,mu_1,mu_2,mub,mu
 ! t,muu,muv,non_hydrostatic,p,pb,ph_1,ph_2,php,pm1,rdnw,rk_step,smdiv,t0
 ! ,t_1,t_2,u_1,u_2,v_1,v_2,w_1,w_2,ww,znu
 ! recompute pos : DOLOOP_STMT solve_em.f90:2368
@@ -1336,7 +1323,7 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
 ! _save,v_2,v_save,w_2,w_save,ww1
   do ij = 1, grid%num_tiles
     call small_step_prep( u_1,u_2,v_1,v_2,w_1,w_2,t_1,t_2,ph_1,ph_2,mub,mu_1,mu_2,muu,muus,muv,muvs,mut,muts,mudf,u_save,v_save,&
-&w_save,t_save,ph_save,mu_save,ww,ww1,dnw,c2a,pb,p,alt,msfu,msfv,msft,rk_step,leapfrog,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,&
+&w_save,t_save,ph_save,mu_save,ww,ww1,dnw,c2a,pb,p,alt,msfu,msfv,msft,rk_step,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,&
 &kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
     call calc_p_rho( al,p,ph_2,alt,t_2,t_save,c2a,pm1,mu_2,muts,znu,t0,rdnw,dnw,smdiv,non_hydrostatic,0,ids,ide,jds,jde,kds,kde,&
 &ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
@@ -1510,7 +1497,7 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
 ! recompute vars : ph_tendf,ru_tendf,rv_tendf,rw_tendf,t_tendf
 !  recdepend vars : al,alt,cb,cf1,cf2,cf3,cfn,cfn1,config_flags,cosa,cqu
 ! ,cqv,cqw,dt,e,f,fnm,fnp,g,grid,ide,ids,ime,ims,jde,jds,jme,jms,k_end,k
-! _start,kde,kme,kms,kvdif,leapfrog,msft,msfu,msfv,mu_1,mu_2,mub,mut,muu
+! _start,kde,kme,kms,kvdif,msft,msfu,msfv,mu_1,mu_2,mub,mut,muu
 ! ,muv,non_hydrostatic,p,pb,ph_1,ph_2,ph_tendf,phb,php,pm1,pr,pr,rdn,rdn
 ! w,rdx,rdy,reradius,rk_step,ru,ru_tendf,rv,rv_tendf,rw,rw_tendf,sina,t_
 ! 1,t_2,t_init,t_tendf,u_1,u_2,u_base,v_1,v_2,v_base,w_1,w_2,w_alpha,w_b
@@ -1522,7 +1509,7 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
     call rk_tendency( config_flags,rk_step,ru_tend,rv_tend,rw_tend,ph_tend,t_tend,ru_tendf,rv_tendf,rw_tendf,ph_tendf,t_tendf,&
 &mu_tend,u_save,v_save,w_save,ph_save,t_save,mu_save,rthften,ru,rv,rw,ww,u_2,v_2,w_2,t_2,ph_2,u_1,v_1,w_1,t_1,ph_1,h_diabatic,&
 &phb,t_init,mu_2,mut,muu,muv,mub,al,alt,p,pb,php,cqu,cqv,cqw,u_base,v_base,t_base,qv_base,z_base,msfu,msfv,msft,f,e,sina,cosa,&
-&fnm,fnp,rdn,rdnw,dt,rdx,rdy,khdif,kvdif,xkmhd,cf1,cf2,cf3,cfn,cfn1,num_3d_m,non_hydrostatic,leapfrog,ids,ide,jds,jde,kds,kde,&
+&fnm,fnp,rdn,rdnw,dt,rdx,rdy,khdif,kvdif,xkmhd,cf1,cf2,cf3,cfn,cfn1,num_3d_m,non_hydrostatic,ids,ide,jds,jde,kds,kde,&
 &ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
   end do
 !  recompute vars : cqw,mu_tend,ph_save,ph_tend,ru_tend,ru_tendf,rv_tend
@@ -1554,7 +1541,7 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
   end do
 ! recompute vars : mu_tend,ph_tend,ru_tend,rv_tend,rw_tend,t_tend
 !  recdepend vars : alt,cpovcv,cqu,cqv,cqw,dnw,grid,ide,ime,ims,jde,jme,
-! jms,k_end,k_start,kde,kme,kms,leapfrog,msft,msfu,msfv,mu_1,mu_2,mu_ten
+! jms,k_end,k_start,kde,kme,kms,msft,msfu,msfv,mu_1,mu_2,mu_ten
 ! d,mub,mut,muu,muv,non_hydrostatic,p,pb,ph_1,ph_2,ph_tend,php,pm1,rdnw,
 ! rk_step,ru_tend,rv_tend,rw_tend,smdiv,t0,t_1,t_2,t_tend,u_1,u_2,v_1,v_
 ! 2,w_1,w_2,ww,znu
@@ -1563,7 +1550,7 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
 ! w_2,ww1
   do ij = 1, grid%num_tiles
     call small_step_prep( u_1,u_2,v_1,v_2,w_1,w_2,t_1,t_2,ph_1,ph_2,mub,mu_1,mu_2,muu,muus,muv,muvs,mut,muts,mudf,u_save,v_save,&
-&w_save,t_save,ph_save,mu_save,ww,ww1,dnw,c2a,pb,p,alt,msfu,msfv,msft,rk_step,leapfrog,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,&
+&w_save,t_save,ph_save,mu_save,ww,ww1,dnw,c2a,pb,p,alt,msfu,msfv,msft,rk_step,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,&
 &kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
     call calc_p_rho( al,p,ph_2,alt,t_2,t_save,c2a,pm1,mu_2,muts,znu,t0,rdnw,dnw,smdiv,non_hydrostatic,0,ids,ide,jds,jde,kds,kde,&
 &ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
@@ -1599,14 +1586,14 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
     end do
 ! recompute vars : alt,mut,muu,muv,ww
 !  recdepend vars : alt,cpovcv,dnw,grid,ide,ime,ims,jde,jme,jms,k_end,k_
-! start,kde,kme,kms,leapfrog,msft,msfu,msfv,mu_1,mu_2,mub,mut,muu,muv,no
+! start,kde,kme,kms,msft,msfu,msfv,mu_1,mu_2,mub,mut,muu,muv,no
 ! n_hydrostatic,p,pb,ph_1,ph_2,pm1,rdnw,rk_step,smdiv,t0,t_1,t_2,u_1,u_2
 ! ,v_1,v_2,w_1,w_2,ww,znu
 ! recompute pos : DOLOOP_STMT solve_em.f90:2368
 ! recompute vars : al,mu_2,mudf,p,ph_2,pm1,t_2,u_2,v_2,w_2
     do ij = 1, grid%num_tiles
       call small_step_prep( u_1,u_2,v_1,v_2,w_1,w_2,t_1,t_2,ph_1,ph_2,mub,mu_1,mu_2,muu,muus,muv,muvs,mut,muts,mudf,u_save,v_save,&
-&w_save,t_save,ph_save,mu_save,ww,ww1,dnw,c2a,pb,p,alt,msfu,msfv,msft,rk_step,leapfrog,ids,ide,jds,jde,kds,kde,ims,ime,jms,&
+&w_save,t_save,ph_save,mu_save,ww,ww1,dnw,c2a,pb,p,alt,msfu,msfv,msft,rk_step,ids,ide,jds,jde,kds,kde,ims,ime,jms,&
 &jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
       call calc_p_rho( al,p,ph_2,alt,t_2,t_save,c2a,pm1,mu_2,muts,znu,t0,rdnw,dnw,smdiv,non_hydrostatic,0,ids,ide,jds,jde,kds,kde,&
 &ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
@@ -1873,7 +1860,7 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
 ! recompute vars : ru_tendf,rv_tendf,rw_tendf,t_tendf
 !  recdepend vars : al,alt,cb,cf1,cf2,cf3,cfn,cfn1,config_flags,cosa,cqu
 ! ,cqv,cqw,dt,e,f,fnm,fnp,g,grid,ide,ids,ime,ims,jde,jds,jme,jms,k_end,k
-! _start,kde,kme,kms,kvdif,leapfrog,msft,msfu,msfv,mu_1,mu_2,mub,mut,muu
+! _start,kde,kme,kms,kvdif,msft,msfu,msfv,mu_1,mu_2,mub,mut,muu
 ! ,muv,non_hydrostatic,p,pb,ph_1,ph_2,phb,php,pr,pr,rdn,rdnw,rdx,rdy,rer
 ! adius,rk_step,ru,ru_tendf,rv,rv_tendf,rw,rw_tendf,sina,t_1,t_2,t_init,
 ! t_tendf,u_1,u_2,u_base,v_1,v_2,v_base,w_1,w_2,w_alpha,w_beta,ww,xkmhd,
@@ -1884,13 +1871,13 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
     call rk_tendency( config_flags,rk_step,ru_tend,rv_tend,rw_tend,ph_tend,t_tend,ru_tendf,rv_tendf,rw_tendf,ph_tendf,t_tendf,&
 &mu_tend,u_save,v_save,w_save,ph_save,t_save,mu_save,rthften,ru,rv,rw,ww,u_2,v_2,w_2,t_2,ph_2,u_1,v_1,w_1,t_1,ph_1,h_diabatic,&
 &phb,t_init,mu_2,mut,muu,muv,mub,al,alt,p,pb,php,cqu,cqv,cqw,u_base,v_base,t_base,qv_base,z_base,msfu,msfv,msft,f,e,sina,cosa,&
-&fnm,fnp,rdn,rdnw,dt,rdx,rdy,khdif,kvdif,xkmhd,cf1,cf2,cf3,cfn,cfn1,num_3d_m,non_hydrostatic,leapfrog,ids,ide,jds,jde,kds,kde,&
+&fnm,fnp,rdn,rdnw,dt,rdx,rdy,khdif,kvdif,xkmhd,cf1,cf2,cf3,cfn,cfn1,num_3d_m,non_hydrostatic,ids,ide,jds,jde,kds,kde,&
 &ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
   end do
 ! recompute vars : cqw
   do ij = 1, grid%num_tiles
     call small_step_prep( u_1,u_2,v_1,v_2,w_1,w_2,t_1,t_2,ph_1,ph_2,mub,mu_1,mu_2,muu,muus,muv,muvs,mut,muts,mudf,u_save,v_save,&
-&w_save,t_save,ph_save,mu_save,ww,ww1,dnw,c2a,pb,p,alt,msfu,msfv,msft,rk_step,leapfrog,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,&
+&w_save,t_save,ph_save,mu_save,ww,ww1,dnw,c2a,pb,p,alt,msfu,msfv,msft,rk_step,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,&
 &kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
 ! recompute : c2a,mu_2,muts,ph_2,t_2,t_save
     if (non_hydrostatic) then
@@ -1913,7 +1900,7 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
     w_2(:,:,:) = w_2h(:,:,:)
     call a_small_step_prep( u_1,a_u_1,u_2,a_u_2,v_1,a_v_1,v_2,a_v_2,w_1,a_w_1,w_2,a_w_2,t_1,a_t_1,t_2,a_t_2,a_ph_1,a_ph_2,mub,mu_1,&
 &a_mu_1,mu_2,a_mu_2,muu,a_muu,muus,a_muus,muv,a_muv,muvs,a_muvs,mut,a_mut,muts,a_muts,a_mudf,a_u_save,a_v_save,a_w_save,&
-&a_t_save,a_ph_save,a_mu_save,a_ww,a_ww1,a_c2a,pb,p,a_p,alt,a_alt,msfu,msfv,msft,rk_step,leapfrog,ide,jde,kde,ims,ime,jms,jme,&
+&a_t_save,a_ph_save,a_mu_save,a_ww,a_ww1,a_c2a,pb,p,a_p,alt,a_alt,msfu,msfv,msft,rk_step,ide,jde,kde,ims,ime,jms,jme,&
 &kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
   end do
   al(:,:,:) = alh(:,:,:)
@@ -1982,7 +1969,7 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
 &a_t_tendf,a_mu_tend,a_u_save,a_v_save,a_w_save,a_ph_save,a_t_save,ru,a_ru,rv,a_rv,rw,a_rw,ww,a_ww,u_2,a_u_2,v_2,a_v_2,w_2,&
 &a_w_2,t_2,a_t_2,ph_2,a_ph_2,u_1,a_u_1,v_1,a_v_1,w_1,a_w_1,t_1,a_t_1,ph_1,a_ph_1,phb,t_init,mu_2,a_mu_2,mut,a_mut,muu,a_muu,&
 &muv,a_muv,mub,al,a_al,alt,a_alt,p,a_p,pb,php,a_php,cqu,a_cqu,cqv,a_cqv,cqw,a_cqw,u_base,v_base,z_base,msfu,msfv,msft,f,e,sina,&
-&cosa,fnm,fnp,rdn,rdnw,dt,rdx,rdy,kvdif,xkmhd,a_xkmhd,cf1,cf2,cf3,cfn,cfn1,non_hydrostatic,leapfrog,ids,ide,jds,jde,kde,ims,&
+&cosa,fnm,fnp,rdn,rdnw,dt,rdx,rdy,kvdif,xkmhd,a_xkmhd,cf1,cf2,cf3,cfn,cfn1,non_hydrostatic,ids,ide,jds,jde,kde,ims,&
 &ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
   end do
   moist_2(:,:,:,:) = moist_2h(:,:,:,:)

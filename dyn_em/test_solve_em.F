@@ -90,7 +90,6 @@ SUBROUTINE test_solve_em ( grid , config_flags , &
 
    INTEGER :: rk_order, iwmax, jwmax, kwmax
    REAL :: dt_rk, dts_rk, dtm, wmax
-   LOGICAL :: leapfrog
    INTEGER :: l,kte,kk
 
 ! These are used if -DDEREF_KLUDGE is compiled
@@ -294,15 +293,11 @@ real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33
 ! It is a mediation-layer routine -> DM and SM calls are made where
 ! needed for parallel processing.
 !
-! solve_em can integrate the equations using 3 time-integration methods
+! solve_em can integrate the equations using 2 time-integration methods
 !
 !    - 3rd order Runge-Kutta time integration (recommended)
 !
 !    - 2nd order Runge-Kutta time integration
-!
-!    - Leapfrog time integration
-!      (note: the leapfrog scheme is not correctly implemented
-!      for most of the physics)
 !
 ! The main sections of solve_em are
 !

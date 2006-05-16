@@ -247,7 +247,7 @@ end subroutine g_rk_addtend_dry
 
 subroutine g_rk_scalar_tend( scs, sce, config_flags, rk_step, ru, g_ru, rv, g_rv, ww, g_ww, mut, g_mut, alt, g_alt, scalar_old, &
 &g_scalar_old, scalar, g_scalar, scalar_tends, g_scalar_tends, advect_tend, g_advect_tend, base, moist_step, fnm, fnp, msfu, msfv, &
-&msft, rdx, rdy, rdn, rdnw, kvdif, xkmhd, g_xkmhd, leapfrog, ids, ide, jds, jde, kde, ims, ime, jms, jme, kms, kme, its, ite, jts, &
+&msft, rdx, rdy, rdn, rdnw, kvdif, xkmhd, g_xkmhd, ids, ide, jds, jde, kde, ims, ime, jms, jme, kms, kme, its, ite, jts, &
 &jte, kts, kte )
 !******************************************************************
 !******************************************************************
@@ -299,7 +299,6 @@ integer, intent(in) :: kde
 integer, intent(in) :: kte
 integer, intent(in) :: kts
 real, intent(in) :: kvdif
-logical, intent(in) :: leapfrog
 logical, intent(in) :: moist_step
 real, intent(in) :: msft(ims:ime,jms:jme)
 real, intent(in) :: msfu(ims:ime,jms:jme)
@@ -330,18 +329,12 @@ real kvdq
 kvdq = kvdif/prandtl
 scalar_loop: do im = scs, sce
   call g_zero_tend( advect_tend(ims,kms,jms),g_advect_tend(ims,kms,jms),ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
-  if ( .not. leapfrog) then
     call g_advect_scalar( scalar(ims,kms,jms,im),g_scalar(ims,kms,jms,im),scalar(ims,kms,jms,im),g_scalar(ims,kms,jms,im),&
 &advect_tend(ims,kms,jms),g_advect_tend(ims,kms,jms),ru,g_ru,rv,g_rv,ww,g_ww,config_flags,msft,fnm,fnp,rdx,rdy,rdnw,ids,ide,&
 &jds,jde,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
-  else
-    call g_advect_scalar( scalar(ims,kms,jms,im),g_scalar(ims,kms,jms,im),scalar_old(ims,kms,jms,im),g_scalar_old(ims,kms,jms,im),&
-&advect_tend(ims,kms,jms),g_advect_tend(ims,kms,jms),ru,g_ru,rv,g_rv,ww,g_ww,config_flags,msft,fnm,fnp,rdx,rdy,rdnw,ids,ide,&
-&jds,jde,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
-  endif
+
   diff_opt2: if (config_flags%diff_opt .eq. 1) then
     rk_step_2: if (rk_step .eq. 1) then
-      if ( .not. leapfrog) then
         call g_horizontal_diffusion( 'm',scalar(ims,kms,jms,im),g_scalar(ims,kms,jms,im),scalar_tends(ims,kms,jms,im),&
 &g_scalar_tends(ims,kms,jms,im),mut,g_mut,config_flags,msfu,msfv,msft,xkmhd,g_xkmhd,rdx,rdy,ids,ide,jds,jde,kde,ims,ime,&
 &jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
@@ -354,20 +347,7 @@ scalar_loop: do im = scs, sce
 &g_scalar_tends(ims,kms,jms,im),alt,g_alt,mut,g_mut,rdn,rdnw,kvdq,ide,jde,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
           endif
         endif pbl_tesu
-      else
-        call g_horizontal_diffusion( 'm',scalar_old(ims,kms,jms,im),g_scalar_old(ims,kms,jms,im),scalar_tends(ims,kms,jms,im),&
-&g_scalar_tends(ims,kms,jms,im),mut,g_mut,config_flags,msfu,msfv,msft,xkmhd,g_xkmhd,rdx,rdy,ids,ide,jds,jde,kde,ims,ime,&
-&jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
-        pbl_test_lg: if (config_flags%bl_pbl_physics .eq. 0) then
-          if (moist_step .and. im .eq. p_qv) then
-            call g_vertical_diffusion_mp( scalar_old(ims,kms,jms,im),g_scalar_old(ims,kms,jms,im),scalar_tends(ims,kms,jms,im),&
-&g_scalar_tends(ims,kms,jms,im),base,alt,g_alt,mut,g_mut,rdn,rdnw,kvdq,ide,jde,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
-          else
-            call g_vertical_diffusion( 'm',scalar_old(ims,kms,jms,im),g_scalar_old(ims,kms,jms,im),scalar_tends(ims,kms,jms,im),&
-&g_scalar_tends(ims,kms,jms,im),alt,g_alt,mut,g_mut,rdn,rdnw,kvdq,ide,jde,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
-          endif
-        endif pbl_test_lg
-      endif
+
     endif rk_step_2
   endif diff_opt2
 end do scalar_loop
@@ -481,7 +461,7 @@ subroutine g_rk_tendency( config_flags, rk_step, ru_tend, g_ru_tend, rv_tend, g_
 &g_ww, u, g_u, v, g_v, w, g_w, t, g_t, ph, g_ph, u_old, g_u_old, v_old, g_v_old, w_old, g_w_old, t_old, g_t_old, ph_old, g_ph_old, &
 &phb, t_init, mu, g_mu, mut, g_mut, muu, g_muu, muv, g_muv, mub, al, g_al, alt, g_alt, p, g_p, pb, php, g_php, cqu, g_cqu, cqv, &
 &g_cqv, cqw, g_cqw, u_base, v_base, z_base, msfu, msfv, msft, f, e, sina, cosa, fnm, fnp, rdn, rdnw, dt, rdx, rdy, kvdif, xkmhd, &
-&g_xkmhd, cf1, cf2, cf3, cfn, cfn1, non_hydrostatic, leapfrog, ids, ide, jds, jde, kde, ims, ime, jms, jme, kms, kme, its, ite, &
+&g_xkmhd, cf1, cf2, cf3, cfn, cfn1, non_hydrostatic, ids, ide, jds, jde, kde, ims, ime, jms, jme, kms, kme, its, ite, &
 &jts, jte, kts, kte )
 !******************************************************************
 !******************************************************************
@@ -573,7 +553,6 @@ integer, intent(in) :: kde
 integer, intent(in) :: kte
 integer, intent(in) :: kts
 real, intent(in) :: kvdif
-logical, intent(in) :: leapfrog
 real, intent(in) :: msft(ims:ime,jms:jme)
 real, intent(in) :: msfu(ims:ime,jms:jme)
 real, intent(in) :: msfv(ims:ime,jms:jme)
@@ -647,7 +626,6 @@ call g_zero_tend( w_save,g_w_save,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kt
 call g_zero_tend( ph_save,g_ph_save,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
 call g_zero_tend( t_save,g_t_save,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
 call g_zero_tend( mu_tend,g_mu_tend,ims,ime,jms,jme,1,1,its,ite,jts,jte,1,1 )
-if ( .not. leapfrog) then
   call g_advect_u( u,g_u,u,g_u,ru_tend,g_ru_tend,ru,g_ru,rv,g_rv,ww,g_ww,mut,g_mut,config_flags,msfu,fnm,fnp,rdx,rdy,rdnw,ids,ide,&
 &jds,jde,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
   call g_advect_v( v,g_v,v,g_v,rv_tend,g_rv_tend,ru,g_ru,rv,g_rv,ww,g_ww,mut,g_mut,config_flags,msfv,fnm,fnp,rdx,rdy,rdnw,ids,ide,&
@@ -660,20 +638,6 @@ if ( .not. leapfrog) then
 &kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
   call g_rhs_ph( ph_tend,g_ph_tend,u,g_u,v,g_v,ww,g_ww,ph,g_ph,ph,g_ph,phb,w,g_w,mut,g_mut,muu,g_muu,muv,g_muv,fnm,fnp,rdnw,cfn,&
 &cfn1,rdx,rdy,msft,non_hydrostatic,config_flags,ids,ide,jds,jde,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
-else
-  call g_advect_u( u,g_u,u_old,g_u_old,ru_tend,g_ru_tend,ru,g_ru,rv,g_rv,ww,g_ww,mut,g_mut,config_flags,msfu,fnm,fnp,rdx,rdy,rdnw,&
-&ids,ide,jds,jde,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
-  call g_advect_v( v,g_v,v_old,g_v_old,rv_tend,g_rv_tend,ru,g_ru,rv,g_rv,ww,g_ww,mut,g_mut,config_flags,msfv,fnm,fnp,rdx,rdy,rdnw,&
-&ids,ide,jds,jde,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
-  if (non_hydrostatic) then
-    call g_advect_w( w,g_w,w_old,g_w_old,rw_tend,g_rw_tend,ru,g_ru,rv,g_rv,ww,g_ww,config_flags,msft,fnm,fnp,rdx,rdy,rdn,ids,ide,&
-&jds,jde,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
-  endif
-  call g_advect_scalar( t,g_t,t_old,g_t_old,t_tend,g_t_tend,ru,g_ru,rv,g_rv,ww,g_ww,config_flags,msft,fnm,fnp,rdx,rdy,rdnw,ids,ide,&
-&jds,jde,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
-  call g_rhs_ph( ph_tend,g_ph_tend,u,g_u,v,g_v,ww,g_ww,ph,g_ph,ph_old,g_ph_old,phb,w,g_w,mut,g_mut,muu,g_muu,muv,g_muv,fnm,fnp,&
-&rdnw,cfn,cfn1,rdx,rdy,msft,non_hydrostatic,config_flags,ids,ide,jds,jde,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
-endif
 call g_horizontal_pressure_gradient( ru_tend,g_ru_tend,rv_tend,g_rv_tend,ph,g_ph,alt,g_alt,p,g_p,pb,al,g_al,php,g_php,cqu,g_cqu,&
 &cqv,g_cqv,muu,g_muu,muv,g_muv,mu,g_mu,fnm,fnp,rdnw,cf1,cf2,cf3,rdx,rdy,config_flags,non_hydrostatic,ids,ide,jds,jde,kde,ims,ime,&
 &jms,jme,kms,kme,its,ite,jts,jte,kte )
@@ -696,7 +660,6 @@ call g_curvature( ru,g_ru,rv,g_rv,rw,g_rw,u,g_u,v,g_v,ru_tend,g_ru_tend,rv_tend,
 &fnm,fnp,rdx,rdy,ids,ide,jds,jde,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
 forward_steq: if (rk_step .eq. 1) then
   diff_opt2: if (config_flags%diff_opt .eq. 1) then
-    leapfrog_tesu: if ( .not. leapfrog) then
       call g_horizontal_diffusion( 'u',u,g_u,ru_tendf,g_ru_tendf,mut,g_mut,config_flags,msfu,msfv,msft,xkmhd,g_xkmhd,rdx,rdy,ids,&
 &ide,jds,jde,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
       call g_horizontal_diffusion( 'v',v,g_v,rv_tendf,g_rv_tendf,mut,g_mut,config_flags,msfu,msfv,msft,xkmhd,g_xkmhd,rdx,rdy,ids,&
@@ -718,31 +681,7 @@ forward_steq: if (rk_step .eq. 1) then
         call g_vertical_diffusion_3dmp( t,g_t,t_tendf,g_t_tendf,t_init,alt,g_alt,mut,g_mut,rdn,rdnw,kvdq,ide,jde,kde,ims,ime,jms,&
 &jme,kms,kme,its,ite,jts,jte,kts,kte )
       endif pbl_tesu
-    else leapfrog_tesu
-      call g_horizontal_diffusion( 'u',u_old,g_u_old,ru_tendf,g_ru_tendf,mut,g_mut,config_flags,msfu,msfv,msft,xkmhd,g_xkmhd,rdx,&
-&rdy,ids,ide,jds,jde,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
-      call g_horizontal_diffusion( 'v',v_old,g_v_old,rv_tendf,g_rv_tendf,mut,g_mut,config_flags,msfu,msfv,msft,xkmhd,g_xkmhd,rdx,&
-&rdy,ids,ide,jds,jde,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
-      if (non_hydrostatic) then
-        call g_horizontal_diffusion( 'w',w_old,g_w_old,rw_tendf,g_rw_tendf,mut,g_mut,config_flags,msfu,msfv,msft,xkmhd,g_xkmhd,rdx,&
-&rdy,ids,ide,jds,jde,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
-      endif
-      call g_horizontal_diffusion_3dmp( t_old,g_t_old,t_tendf,g_t_tendf,mut,g_mut,config_flags,t_init,msfu,msfv,msft,xkmhd,g_xkmhd,&
-&rdx,rdy,ids,ide,jds,jde,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
-      pbl_test_lg: if (config_flags%bl_pbl_physics .eq. 0) then
-        call g_vertical_diffusion_u( u_old,g_u_old,ru_tendf,g_ru_tendf,config_flags,u_base,alt,g_alt,muu,g_muu,rdn,rdnw,kvdif,ids,&
-&ide,jde,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
-        call g_vertical_diffusion_v( v_old,g_v_old,rv_tendf,g_rv_tendf,config_flags,v_base,alt,g_alt,muv,g_muv,rdn,rdnw,kvdif,ide,&
-&jds,jde,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
-        if (non_hydrostatic) then
-          call g_vertical_diffusion( 'w',w_old,g_w_old,rw_tendf,g_rw_tendf,alt,g_alt,mut,g_mut,rdn,rdnw,kvdif,ide,jde,kde,ims,ime,&
-&jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
-        endif
-        kvdq = 3.*kvdif
-        call g_vertical_diffusion_3dmp( t_old,g_t_old,t_tendf,g_t_tendf,t_init,alt,g_alt,mut,g_mut,rdn,rdnw,kvdq,ide,jde,kde,ims,&
-&ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
-      endif pbl_test_lg
-    endif leapfrog_tesu
+
   endif diff_opt2
 endif forward_steq
 
@@ -750,7 +689,7 @@ end subroutine g_rk_tendency
 
 
 subroutine g_rk_update_scalar( scs, sce, scalar_1, g_scalar_1, scalar_2, g_scalar_2, sc_tend, g_sc_tend, advect_tend, &
-&g_advect_tend, msft, mu_old, g_mu_old, mu_new, g_mu_new, mu_base, rk_step, dt, spec_zone, epsts, leapfrog, config_flags, ids, ide,&
+&g_advect_tend, msft, mu_old, g_mu_old, mu_new, g_mu_new, mu_base, rk_step, dt, spec_zone, config_flags, ids, ide,&
 & jds, jde, kde, ims, ime, jms, jme, kms, kme, its, ite, jts, jte, kts, kte )
 !******************************************************************
 !******************************************************************
@@ -775,7 +714,6 @@ integer, intent(in) :: kms
 real, intent(in) :: advect_tend(ims:ime,kms:kme,jms:jme)
 type (grid_config_rec_type), intent(in) :: config_flags
 real, intent(in) :: dt
-real, intent(in) :: epsts
 real, intent(in) :: g_advect_tend(ims:ime,kms:kme,jms:jme)
 real, intent(in) :: g_mu_new(ims:ime,jms:jme)
 real, intent(in) :: g_mu_old(ims:ime,jms:jme)
@@ -795,7 +733,6 @@ integer, intent(in) :: jts
 integer, intent(in) :: kde
 integer, intent(in) :: kte
 integer, intent(in) :: kts
-logical, intent(in) :: leapfrog
 real, intent(in) :: msft(ims:ime,jms:jme)
 real, intent(in) :: mu_base(ims:ime,jms:jme)
 real, intent(in) :: mu_new(ims:ime,jms:jme)
@@ -863,7 +800,6 @@ if (config_flags%nested .or. config_flags%specified) then
   k_start = kts
   k_end = min(kte,kde-1)
 endif
-if ( .not. leapfrog) then
   if (rk_step .eq. 1) then
     do im = scs, sce
       do j = jts, min(jte,jde-1)
@@ -951,53 +887,7 @@ if ( .not. leapfrog) then
       end do
     end do
   endif
-else
-  do im = scs, sce
-    do j = jts, min(jte,jde-1)
-      do k = kts, min(kte,kde-1)
-        do i = its, min(ite,ide-1)
-          g_tendency(i,k,j) = 0.
-          tendency(i,k,j) = 0.
-        end do
-      end do
-    end do
-    do j = j_start, j_end
-      do k = k_start, k_end
-        do i = i_start, i_end
-          g_tendency(i,k,j) = g_advect_tend(i,k,j)
-          tendency(i,k,j) = advect_tend(i,k,j)
-        end do
-      end do
-    end do
-    do j = j_start_spc, j_end_spc
-      do k = k_start_spc, k_end_spc
-        do i = i_start_spc, i_end_spc
-          g_tendency(i,k,j) = g_sc_tend(i,k,j,im)+g_tendency(i,k,j)
-          tendency(i,k,j) = tendency(i,k,j)+sc_tend(i,k,j,im)
-        end do
-      end do
-    end do
-    do j = jts, min(jte,jde-1)
-      do i = its, min(ite,ide-1)
-        g_muold(i) = g_mu_old(i,j)
-        muold(i) = mu_old(i,j)+mu_base(i,j)
-        g_r_munew(i) = -(g_mu_new(i,j)/((mu_new(i,j)+mu_base(i,j))*(mu_new(i,j)+mu_base(i,j))))
-        r_munew(i) = 1./(mu_new(i,j)+mu_base(i,j))
-      end do
-      do k = kts, min(kte,kde-1)
-        do i = its, min(ite,ide-1)
-          g_sc_middle = g_scalar_2(i,k,j,im)
-          sc_middle = scalar_2(i,k,j,im)
-          g_scalar_2(i,k,j,im) = g_muold(i)*scalar_1(i,k,j,im)*r_munew(i)+g_r_munew(i)*(muold(i)*scalar_1(i,k,j,im)+2*msft(i,j)**2*&
-&dt*tendency(i,k,j))+g_scalar_1(i,k,j,im)*muold(i)*r_munew(i)+2*g_tendency(i,k,j)*msft(i,j)**2*dt*r_munew(i)
-          scalar_2(i,k,j,im) = (muold(i)*scalar_1(i,k,j,im)+msft(i,j)**2*2*dt*tendency(i,k,j))*r_munew(i)
-          g_scalar_1(i,k,j,im) = g_sc_middle*(1+(-2)*epsts)+(g_scalar_1(i,k,j,im)+g_scalar_2(i,k,j,im))*epsts
-          scalar_1(i,k,j,im) = sc_middle+epsts*(scalar_1(i,k,j,im)-2*sc_middle+scalar_2(i,k,j,im))
-        end do
-      end do
-    end do
-  end do
-endif
+
 
 end subroutine g_rk_update_scalar
 

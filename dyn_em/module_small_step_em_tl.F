@@ -1236,7 +1236,7 @@ end subroutine g_small_step_finish
 subroutine g_small_step_prep( u_1, g_u_1, u_2, g_u_2, v_1, g_v_1, v_2, g_v_2, w_1, g_w_1, w_2, g_w_2, t_1, g_t_1, t_2, g_t_2, ph_1,&
 & g_ph_1, ph_2, g_ph_2, mub, mu_1, g_mu_1, mu_2, g_mu_2, muu, g_muu, muus, g_muus, muv, g_muv, muvs, g_muvs, mut, g_mut, muts, &
 &g_muts, mudf, g_mudf, u_save, g_u_save, v_save, g_v_save, w_save, g_w_save, t_save, g_t_save, ph_save, g_ph_save, mu_save, &
-&g_mu_save, ww, g_ww, ww_save, g_ww_save, c2a, g_c2a, pb, p, g_p, alt, g_alt, msfu, msfv, msft, rk_step, leapfrog, ide, jde, kde, &
+&g_mu_save, ww, g_ww, ww_save, g_ww_save, c2a, g_c2a, pb, p, g_p, alt, g_alt, msfu, msfv, msft, rk_step, ide, jde, kde, &
 &ims, ime, jms, jme, kms, kme, its, ite, jts, jte, kts, kte )
 !******************************************************************
 !******************************************************************
@@ -1299,7 +1299,6 @@ integer, intent(in) :: jts
 integer, intent(in) :: kde
 integer, intent(in) :: kte
 integer, intent(in) :: kts
-logical, intent(in) :: leapfrog
 real, intent(inout) :: msft(ims:ime,jms:jme)
 real, intent(inout) :: msfu(ims:ime,jms:jme)
 real, intent(inout) :: msfv(ims:ime,jms:jme)
@@ -1369,7 +1368,7 @@ if (j_end .eq. jde) then
 endif
 
 
-if (rk_step .eq. 1 .and. ( .not. leapfrog)) then
+if (rk_step .eq. 1) then
   do j = j_start, j_end
     do i = i_start, i_end
       g_mu_1(i,j) = g_mu_2(i,j)

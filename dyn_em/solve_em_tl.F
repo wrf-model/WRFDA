@@ -79,7 +79,6 @@ SUBROUTINE solve_em_tl ( grid , config_flags , &
 
    INTEGER :: rk_order, iwmax, jwmax, kwmax
    REAL :: dt_rk, dts_rk, dtm, wmax
-   LOGICAL :: leapfrog
    INTEGER :: l,kte,kk
 
 !--Local variables
@@ -140,15 +139,11 @@ SUBROUTINE solve_em_tl ( grid , config_flags , &
 ! It is a mediation-layer routine -> DM and SM calls are made where 
 ! needed for parallel processing.  
 !
-! solve_em_tl can integrate the equations using 3 time-integration methods
+! solve_em_tl can integrate the equations using 2 time-integration methods
 !      
 !    - 3rd order Runge-Kutta time integration (recommended)
 !      
 !    - 2nd order Runge-Kutta time integration
-!      
-!    - Leapfrog time integration
-!      (note: the leapfrog scheme is not correctly implemented
-!      for most of the physics)
 !
 ! The main sections of solve_em_tl are
 !     
@@ -176,7 +171,7 @@ SUBROUTINE solve_em_tl ( grid , config_flags , &
    return
 
 
-!  set leapfrog or runge-kutta solver (2nd or 3rd order)
+!  set runge-kutta solver (2nd or 3rd order)
 
    dynamics_option = config_flags%rk_ord
 
@@ -282,10 +277,7 @@ SUBROUTINE solve_em_tl ( grid , config_flags , &
 #endif
 
  rk_order = config_flags%rk_ord
- leapfrog = .false.
  dts = dt/float(time_step_sound)
-
- IF(rk_ord == 1) leapfrog = .true.
 
  Runge_Kutta_loop:  DO rk_step = 1, rk_order
 
@@ -293,21 +285,7 @@ SUBROUTINE solve_em_tl ( grid , config_flags , &
    !  each part of the timestep
 
    dtm = dt
-   IF ( rk_order == 1 ) THEN   ! Leapfrog
-
-       IF (step_number /= 1) THEN
-         number_of_small_timesteps = 2*time_step_sound
-         dt_rk = dt
-         dtm = 2*dt
-       ELSE
-         number_of_small_timesteps = time_step_sound
-         dt_rk = dt/2.
-         dtm = dt
-       END IF
-
-       dts_rk = dts
-
-   ELSE IF ( rk_order == 2 ) THEN   ! 2nd order Runge-Kutta timestep
+   IF ( rk_order == 2 ) THEN   ! 2nd order Runge-Kutta timestep
 
        IF ( rk_step == 1) THEN
              dt_rk  = 0.5*dt
@@ -1091,7 +1069,7 @@ BENCH_START(rk_tend_tim)
                          fnm, fnp, rdn, rdnw,                             &
                          dt, rdx, rdy, khdif, kvdif, xkmhd,               &
                          cf1, cf2, cf3, cfn, cfn1, num_3d_m,              &
-                         non_hydrostatic, leapfrog,                       &
+                         non_hydrostatic,                                 &
                          ids, ide, jds, jde, kds, kde,                    &
                          ims, ime, jms, jme, kms, kme,                    &
                          grid%i_start(ij), grid%i_end(ij),                &
@@ -1103,7 +1081,7 @@ BENCH_START(rk_tend_tim)
 &v_save,g_v_save,w_save,g_w_save,ph_save,g_ph_save,t_save,g_t_save,ru,g_ru,rv,g_rv,rw,g_rw,ww,g_ww,u_2,g_u_2,v_2,g_v_2,w_2,&
 &g_w_2,t_2,g_t_2,ph_2,g_ph_2,u_1,g_u_1,v_1,g_v_1,w_1,g_w_1,t_1,g_t_1,ph_1,g_ph_1,phb,t_init,mu_2,g_mu_2,mut,g_mut,muu,g_muu,&
 &muv,g_muv,mub,al,g_al,alt,g_alt,p,g_p,pb,php,g_php,cqu,g_cqu,cqv,g_cqv,cqw,g_cqw,u_base,v_base,z_base,msfu,msfv,msft,f,e,sina,&
-&cosa,fnm,fnp,rdn,rdnw,dt,rdx,rdy,kvdif,xkmhd,g_xkmhd,cf1,cf2,cf3,cfn,cfn1,non_hydrostatic,leapfrog,ids,ide,jds,jde,kde,ims,&
+&cosa,fnm,fnp,rdn,rdnw,dt,rdx,rdy,kvdif,xkmhd,g_xkmhd,cf1,cf2,cf3,cfn,cfn1,non_hydrostatic,ids,ide,jds,jde,kde,ims,&
 &ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
    END DO
    !$OMP END PARALLEL DO
@@ -1237,7 +1215,7 @@ BENCH_START(small_step_prep_tim)
                             ww, ww1,                          &
                             dnw, c2a, pb, p, alt,             &
                             msfu, msfv, msft,                 &
-                            rk_step, leapfrog,                &
+                            rk_step,                          &
                             ids, ide, jds, jde, kds, kde,     &
                             ims, ime, jms, jme, kms, kme,     &
                             grid%i_start(ij), grid%i_end(ij), &
@@ -1257,7 +1235,7 @@ BENCH_START(small_step_prep_tim)
     call g_small_step_prep( u_1,g_u_1,u_2,g_u_2,v_1,g_v_1,v_2,g_v_2,w_1,g_w_1,w_2,g_w_2,t_1,g_t_1,t_2,g_t_2,ph_1,g_ph_1,ph_2,&
 &g_ph_2,mub,mu_1,g_mu_1,mu_2,g_mu_2,muu,g_muu,muus,g_muus,muv,g_muv,muvs,g_muvs,mut,g_mut,muts,g_muts,mudf,g_mudf,u_save,&
 &g_u_save,v_save,g_v_save,w_save,g_w_save,t_save,g_t_save,ph_save,g_ph_save,mu_save,g_mu_save,ww,g_ww,ww1,g_ww1,c2a,g_c2a,pb,p,&
-&g_p,alt,g_alt,msfu,msfv,msft,rk_step,leapfrog,ide,jde,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%&
+&g_p,alt,g_alt,msfu,msfv,msft,rk_step,ide,jde,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%&
 &j_start(ij),grid%j_end(ij),k_start,k_end )
     call g_calc_p_rho( al,g_al,p,g_p,ph_2,g_ph_2,alt,g_alt,t_2,g_t_2,t_save,g_t_save,c2a,g_c2a,pm1,g_pm1,mu_2,g_mu_2,muts,g_muts,&
 &znu,t0,rdnw,dnw,smdiv,non_hydrostatic,0,ide,jde,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),&
@@ -1878,7 +1856,6 @@ BENCH_START(rk_scalar_tend_tim)
                               msfu, msfv, msft,                 &
                               rdx, rdy, rdn, rdnw, khdif,       &
                               kvdif, xkmhd,                     &
-                              leapfrog,                         &
                               ids, ide, jds, jde, kds, kde,     &
                               ims, ime, jms, jme, kms, kme,     &
                               grid%i_start(ij), grid%i_end(ij), &
@@ -1888,7 +1865,7 @@ BENCH_START(rk_scalar_tend_tim)
         call g_rk_scalar_tend( im,im,config_flags,rk_step,ru_m,g_ru_m,rv_m,g_rv_m,ww_m,g_ww_m,mut,g_mut,alt,g_alt,moist_1(ims,kms,&
 &jms,im),g_moist_1(ims,kms,jms,im),moist_2(ims,kms,jms,im),g_moist_2(ims,kms,jms,im),moist_tend(ims,kms,jms,im),&
 &g_moist_tend(ims,kms,jms,im),advect_tend,g_advect_tend,qv_base, .true. ,fnm,fnp,msfu,msfv,msft,rdx,rdy,rdn,rdnw,kvdif,&
-&xkmhd,g_xkmhd,leapfrog,ids,ide,jds,jde,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%&
+&xkmhd,g_xkmhd,ids,ide,jds,jde,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%&
 &j_end(ij),k_start,k_end )
 BENCH_END(rk_scalar_tend_tim)
 
@@ -2108,7 +2085,7 @@ BENCH_START(update_scal_tim)
                               advect_tend, msft,                &
                               mu_1, mu_2, mub,                  &
                               rk_step, dt_rk, spec_zone,        &
-                              epsts, leapfrog,config_flags,     &
+                              config_flags,     &
                               ids, ide, jds, jde, kds, kde,     &
                               ims, ime, jms, jme, kms, kme,     &
                               grid%i_start(ij), grid%i_end(ij), &
@@ -2117,7 +2094,7 @@ BENCH_START(update_scal_tim)
 #endif
         call g_rk_update_scalar( im,im,moist_1(ims,kms,jms,im),g_moist_1(ims,kms,jms,im),moist_2(ims,kms,jms,im),g_moist_2(ims,kms,&
 &jms,im),moist_tend(ims,kms,jms,im),g_moist_tend(ims,kms,jms,im),advect_tend,g_advect_tend,msft,mu_1,g_mu_1,mu_2,g_mu_2,&
-&mub,rk_step,dt_rk,spec_zone,epsts,leapfrog,config_flags,ids,ide,jds,jde,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%&
+&mub,rk_step,dt_rk,spec_zone,config_flags,ids,ide,jds,jde,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%&
 &i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
 BENCH_END(update_scal_tim)
 
@@ -2179,7 +2156,6 @@ BENCH_START(tke_adv_tim)
                            msfu, msfv, msft,                 &
                            rdx, rdy, rdn, rdnw, khdif,       &
                            kvdif, xkmhd,                     &
-                           leapfrog,                         &
                            ids, ide, jds, jde, kds, kde,     &
                            ims, ime, jms, jme, kms, kme,     &
                            grid%i_start(ij), grid%i_end(ij), &
@@ -2202,7 +2178,7 @@ BENCH_START(tke_adv_tim)
                             advect_tend,msft,                 &
                             mu_1, mu_2, mub,                  &
                             rk_step, dt_rk, spec_zone,        &
-                            epsts, leapfrog,config_flags,     &
+                            config_flags,     &
                             ids, ide, jds, jde, kds, kde,     &
                             ims, ime, jms, jme, kms, kme,     &
                             grid%i_start(ij), grid%i_end(ij), &
@@ -2260,7 +2236,6 @@ BENCH_END(tke_adv_tim)
                              msfu, msfv, msft,                 &
                              rdx, rdy, rdn, rdnw,              &
                              khdif, kvdif, xkmhd,              &
-                             leapfrog,                         &
                              ids, ide, jds, jde, kds, kde,     &
                              ims, ime, jms, jme, kms, kme,     &
                              grid%i_start(ij), grid%i_end(ij), &
@@ -2284,7 +2259,7 @@ BENCH_END(tke_adv_tim)
                               advect_tend, msft,                &
                               mu_1, mu_2, mub,                  &
                               rk_step, dt_rk, spec_zone,        &
-                              epsts, leapfrog,config_flags,     &
+                              config_flags,     &
                               ids, ide, jds, jde, kds, kde,     &
                               ims, ime, jms, jme, kms, kme,     &
                               grid%i_start(ij), grid%i_end(ij), &
@@ -2701,38 +2676,6 @@ BENCH_END(moist_phys_end_tim)
      END IF
 
    END DO scalar_tile_loop_2
-
-
-   if(dyn_opt == DYN_EM) then
-   IF (leapfrog ) THEN
-
-    ! do time filter and switch for the dry variables
-
-   !$OMP PARALLEL DO   &
-   !$OMP PRIVATE ( ij )
-
-    DO ij = 1 , grid%num_tiles
-
-BENCH_START(time_filt_tim)
-      call time_filter( u_1, u_2, u_save,                 &
-                        v_1, v_2, v_save,                 &
-                        w_1, w_2, w_save,                 &
-                        t_1, t_2, t_save,                 &
-                        ph_1, ph_2, ph_save,              &
-                        mu_1, mu_2, mu_save,              &
-                        epsts,                            &
-                        ids, ide, jds, jde, kds, kde,     &
-                        ims, ime, jms, jme, kms, kme,     &
-                        grid%i_start(ij), grid%i_end(ij), &
-                        grid%j_start(ij), grid%j_end(ij), &
-                        k_start    , k_end               )
-BENCH_END(time_filt_tim)
-
-    ENDDO
-   !$OMP END PARALLEL DO
-
-    END IF
-    endif
 
    !  We're finished except for boundary condition (and patch) update
 
