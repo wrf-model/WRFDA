@@ -44,7 +44,9 @@ use module_em
 implicit none
 
 contains
-subroutine a_init_zero_tendency( a_ru_tendf, a_rv_tendf, a_rw_tendf, a_ph_tendf, a_t_tendf, a_moist_tendf, n_moist, ims, ime, jms, &
+subroutine a_init_zero_tendency( a_ru_tendf, a_rv_tendf, a_rw_tendf, a_ph_tendf, a_t_tendf, &
+a_tke_tendf, a_moist_tendf, a_chem_tendf, a_scalar_tendf, &
+n_moist, n_chem,n_scalar, ims, ime, jms, &
 &jme, kms, kme, its, ite, jts, jte, kts, kte )
 !******************************************************************
 !******************************************************************
@@ -66,13 +68,16 @@ integer, intent(in) :: jme
 integer, intent(in) :: jms
 integer, intent(in) :: kme
 integer, intent(in) :: kms
-integer, intent(in) :: n_moist
+integer, intent(in) :: n_moist, n_chem,n_scalar
 real, intent(inout) :: a_moist_tendf(ims:ime,kms:kme,jms:jme,n_moist)
+real, intent(inout) :: a_chem_tendf(ims:ime,kms:kme,jms:jme,n_chem)
+real, intent(inout) :: a_scalar_tendf(ims:ime,kms:kme,jms:jme,n_scalar)
 real, intent(inout) :: a_ph_tendf(ims:ime,kms:kme,jms:jme)
 real, intent(inout) :: a_ru_tendf(ims:ime,kms:kme,jms:jme)
 real, intent(inout) :: a_rv_tendf(ims:ime,kms:kme,jms:jme)
 real, intent(inout) :: a_rw_tendf(ims:ime,kms:kme,jms:jme)
 real, intent(inout) :: a_t_tendf(ims:ime,kms:kme,jms:jme)
+real, intent(inout) :: a_tke_tendf(ims:ime,kms:kme,jms:jme)
 integer, intent(in) :: ite
 integer, intent(in) :: its
 integer, intent(in) :: jte
@@ -212,8 +217,8 @@ end do
 end subroutine a_rk_addtend_dry
 
 
-subroutine a_rk_scalar_tend( scs, sce, config_flags, rk_step, ru, a_ru, rv, a_rv, ww, a_ww, mut, a_mut, alt, a_alt, scalar_old, &
-&a_scalar_old, scalar, a_scalar, a_scalar_tends, a_advect_tend, base, moist_step, fnm, fnp, msfu, msfv, msft, rdx, rdy, rdn, rdnw, &
+subroutine a_rk_scalar_tend( scs, sce, config_flags, rk_step, ru, a_ru, rv, a_rv, ww, a_ww, mut, a_mut, alt, a_alt, &
+scalar, a_scalar, a_scalar_tends, a_advect_tend, base, moist_step, fnm, fnp, msfu, msfv, msft, rdx, rdy, rdn, rdnw, &
 &kvdif, xkmhd, a_xkmhd, ids, ide, jds, jde, kde, ims, ime, jms, jme, kms, kme, its, ite, jts, jte, kts, kte )
 !******************************************************************
 !******************************************************************
@@ -243,7 +248,6 @@ real, intent(inout) :: a_rv(ims:ime,kms:kme,jms:jme)
 integer, intent(in) :: sce
 integer, intent(in) :: scs
 real, intent(inout) :: a_scalar(ims:ime,kms:kme,jms:jme,scs:sce)
-real, intent(inout) :: a_scalar_old(ims:ime,kms:kme,jms:jme,scs:sce)
 real, intent(inout) :: a_scalar_tends(ims:ime,kms:kme,jms:jme,scs:sce)
 real, intent(inout) :: a_ww(ims:ime,kms:kme,jms:jme)
 real, intent(inout) :: a_xkmhd(ims:ime,kms:kme,jms:jme)
@@ -277,7 +281,6 @@ integer, intent(in) :: rk_step
 real, intent(in) :: ru(ims:ime,kms:kme,jms:jme)
 real, intent(in) :: rv(ims:ime,kms:kme,jms:jme)
 real, intent(inout) :: scalar(ims:ime,kms:kme,jms:jme,scs:sce)
-real, intent(inout) :: scalar_old(ims:ime,kms:kme,jms:jme,scs:sce)
 real, intent(in) :: ww(ims:ime,kms:kme,jms:jme)
 real, intent(in) :: xkmhd(ims:ime,kms:kme,jms:jme)
 
