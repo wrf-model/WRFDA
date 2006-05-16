@@ -44,7 +44,8 @@ use module_em
 implicit none
 
 contains
-subroutine a_init_zero_tendency( a_ru_tendf, a_rv_tendf, a_rw_tendf, a_ph_tendf, a_t_tendf, &
+subroutine a_init_zero_tendency( a_ru_tendf, a_rv_tendf, a_rw_tendf, &
+a_ph_tendf, a_t_tendf, &
 a_tke_tendf, a_moist_tendf, a_chem_tendf, a_scalar_tendf, &
 n_moist, n_chem,n_scalar, ims, ime, jms, &
 &jme, kms, kme, its, ite, jts, jte, kts, kte )

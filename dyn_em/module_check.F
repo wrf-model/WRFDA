@@ -1781,8 +1781,8 @@ END SUBROUTINE t_rk_step_prep
 
 SUBROUTINE t_init_zero_tendency(ru_tendf, rv_tendf, rw_tendf, ph_tendf,  &
                               t_tendf,  tke_tendf,                     &
-                              moist_tendf,chem_tendf,                  &
-                              n_moist,n_chem,rk_step,                  &
+                              moist_tendf,chem_tendf,scalar_tendf,      &
+                              n_moist,n_chem,n_scalar,rk_step,          &
                               ids, ide, jds, jde, kds, kde,            &
                               ims, ime, jms, jme, kms, kme,            &
                               its, ite, jts, jte, kts, kte             )
@@ -1792,7 +1792,7 @@ SUBROUTINE t_init_zero_tendency(ru_tendf, rv_tendf, rw_tendf, ph_tendf,  &
                                     ims, ime, jms, jme, kms, kme, &
                                     its, ite, jts, jte, kts, kte
 
-   INTEGER ,       INTENT(IN   ) :: n_moist,n_chem,rk_step
+   INTEGER ,       INTENT(IN   ) :: n_moist,n_chem,n_scalar,rk_step
 
    REAL , DIMENSION( ims:ime , kms:kme, jms:jme  ) , INTENT(INOUT) ::  &
                                                              ru_tendf, &
@@ -1807,6 +1807,9 @@ SUBROUTINE t_init_zero_tendency(ru_tendf, rv_tendf, rw_tendf, ph_tendf,  &
 
    REAL , DIMENSION(ims:ime, kms:kme, jms:jme, n_chem ),INTENT(INOUT)::&
                                                           chem_tendf
+
+   REAL , DIMENSION(ims:ime, kms:kme, jms:jme, n_scalar ),INTENT(INOUT)::&
+                                                          scalar_tendf
 
 ! LOCAL VARS
 
@@ -1826,7 +1829,8 @@ SUBROUTINE t_init_zero_tendency(ru_tendf, rv_tendf, rw_tendf, ph_tendf,  &
                                                              P_rv_tendf, &
                                                              P_rw_tendf, &
                                                              P_ph_tendf, &
-                                                             P_t_tendf
+                                                             P_t_tendf, &
+                                                             P_tke_tendf
    REAL , DIMENSION( ims:ime , kms:kme, jms:jme  )        :: B_ru_tendf, &
                                                              B_rv_tendf, &
                                                              B_rw_tendf, &
@@ -1842,6 +1846,16 @@ SUBROUTINE t_init_zero_tendency(ru_tendf, rv_tendf, rw_tendf, ph_tendf,  &
                                                             P_moist_tendf, &
                                                             B_moist_tendf, &
                                                             K_moist_tendf
+
+   REAL , DIMENSION(ims:ime, kms:kme, jms:jme, n_chem)  :: S_chem_tendf, &
+                                                            P_chem_tendf, &
+                                                            B_chem_tendf, &
+                                                            K_chem_tendf
+
+   REAL , DIMENSION(ims:ime, kms:kme, jms:jme, n_scalar)  :: S_scalar_tendf, &
+                                                            P_scalar_tendf, &
+                                                            B_scalar_tendf, &
+                                                            K_scalar_tendf
 
    REAL :: SAVE_L, COEF, ALPHA, FACTOR, VAL_N, VAL_L, VAL_A
    INTEGER :: NT
@@ -1890,8 +1904,8 @@ SUBROUTINE t_init_zero_tendency(ru_tendf, rv_tendf, rw_tendf, ph_tendf,  &
 
    CALL init_zero_tendency(ru_tendf, rv_tendf, rw_tendf, ph_tendf,  &
                               t_tendf,  tke_tendf,                     &
-                              moist_tendf,chem_tendf,                  &
-                              n_moist,n_chem,rk_step,                  &
+                              moist_tendf,chem_tendf,scalar_tendf,     &
+                              n_moist,n_chem,n_scalar,rk_step,         &
                               ids, ide, jds, jde, kds, kde,            &
                               ims, ime, jms, jme, kms, kme,            &
                               its, ite, jts, jte, kts, kte             )
@@ -1919,7 +1933,9 @@ SUBROUTINE t_init_zero_tendency(ru_tendf, rv_tendf, rw_tendf, ph_tendf,  &
 
 !  TGL
    CALL g_init_zero_tendency( ru_tendf, P_ru_tendf, rv_tendf, P_rv_tendf, rw_tendf, P_rw_tendf, ph_tendf, P_ph_tendf, t_tendf, &
-&P_t_tendf, moist_tendf, P_moist_tendf, n_moist, ims, ime, jms, jme, kms, kme, its, ite, jts, jte, kts, kte )
+&P_t_tendf, moist_tendf, P_moist_tendf, &
+chem_tendf, P_chem_tendf, scalar_tendf, P_scalar_tendf,n_moist, n_chem, n_scalar, &
+ims, ime, jms, jme, kms, kme, its, ite, jts, jte, kts, kte )
 
    SAVE_L=0.
    do i=ims,ime
@@ -1971,8 +1987,8 @@ SUBROUTINE t_init_zero_tendency(ru_tendf, rv_tendf, rw_tendf, ph_tendf,  &
 
    CALL init_zero_tendency(P_ru_tendf, P_rv_tendf, P_rw_tendf, P_ph_tendf,  &
                               P_t_tendf,  tke_tendf,                     &
-                              P_moist_tendf,chem_tendf,                  &
-                              n_moist,n_chem,rk_step,                  &
+                              P_moist_tendf,P_chem_tendf,p_scalar_tendf,        &
+                              n_moist,n_chem,n_scalar,rk_step,                  &
                               ids, ide, jds, jde, kds, kde,            &
                               ims, ime, jms, jme, kms, kme,            &
                               its, ite, jts, jte, kts, kte             )
@@ -2052,7 +2068,9 @@ SUBROUTINE t_init_zero_tendency(ru_tendf, rv_tendf, rw_tendf, ph_tendf,  &
 
 !  TGL
    CALL g_init_zero_tendency( ru_tendf, P_ru_tendf, rv_tendf, P_rv_tendf, rw_tendf, P_rw_tendf, ph_tendf, P_ph_tendf, t_tendf, &
-&P_t_tendf, moist_tendf, P_moist_tendf, n_moist, ims, ime, jms, jme, kms, kme, its, ite, jts, jte, kts, kte )
+&P_t_tendf, moist_tendf, P_moist_tendf, chem_tendf, P_chem_tendf,scalar_tendf, P_scalar_tendf, &
+n_moist, n_chem, n_scalar, &
+ims, ime, jms, jme, kms, kme, its, ite, jts, jte, kts, kte )
 
    VAL_L=0.
    do i=ims,ime
@@ -2078,7 +2096,9 @@ SUBROUTINE t_init_zero_tendency(ru_tendf, rv_tendf, rw_tendf, ph_tendf,  &
 
 !  ADJ
 
-   CALL a_init_zero_tendency( P_ru_tendf, P_rv_tendf, P_rw_tendf, P_ph_tendf, P_t_tendf, P_moist_tendf, n_moist, ims, ime, jms, &
+   CALL a_init_zero_tendency( P_ru_tendf, P_rv_tendf, P_rw_tendf, P_ph_tendf, P_t_tendf, p_tke_tendf, &
+P_moist_tendf, &
+     P_chem_tendf,P_scalar_tendf, n_moist, n_chem, n_scalar, ims, ime, jms, &
 &jme, kms, kme, its, ite, jts, jte, kts, kte )
 
    VAL_A=0.
@@ -8839,6 +8859,7 @@ SUBROUTINE t_small_step_finish( u_2, u_1, v_2, v_1, w_2, w_1,    &
                               msfu, msfv, msft,                &
                               h_diabatic,                      &
                               number_of_small_timesteps,dts,   &
+                              rk_step, rk_order,               &
                               ids,ide, jds,jde, kds,kde,       &
                               ims,ime, jms,jme, kms,kme,       &
                               its,ite, jts,jte, kts,kte       )
@@ -8853,6 +8874,7 @@ SUBROUTINE t_small_step_finish( u_2, u_1, v_2, v_1, w_2, w_1,    &
   INTEGER,                  INTENT(IN   ) :: ims,ime, jms,jme, kms,kme
   INTEGER,                  INTENT(IN   ) :: its,ite, jts,jte, kts,kte
   INTEGER,                  INTENT(IN   ) :: number_of_small_timesteps
+  INTEGER,                  INTENT(IN   ) :: rk_step, rk_order
   REAL,                     INTENT(IN   ) :: dts
 
   REAL,   DIMENSION(ims:ime, kms:kme, jms:jme), INTENT(IN   ) :: u_1, &
@@ -9027,6 +9049,7 @@ SUBROUTINE t_small_step_finish( u_2, u_1, v_2, v_1, w_2, w_1,    &
                               msfu, msfv, msft,                &
                               h_diabatic,                      &
                               number_of_small_timesteps,dts,   &
+                              rk_step, rk_order,               &
                               ids,ide, jds,jde, kds,kde,       &
                               ims,ime, jms,jme, kms,kme,       &
                               its,ite, jts,jte, kts,kte       )
@@ -9136,6 +9159,7 @@ SUBROUTINE t_small_step_finish( u_2, u_1, v_2, v_1, w_2, w_1,    &
                               msfu, msfv, msft,                &
                               h_diabatic,                      &
                               number_of_small_timesteps,dts,   &
+                              rk_step, rk_order,               &
                               ids,ide, jds,jde, kds,kde,       &
                               ims,ime, jms,jme, kms,kme,       &
                               its,ite, jts,jte, kts,kte       )
@@ -9427,7 +9451,7 @@ END SUBROUTINE t_small_step_finish
 SUBROUTINE t_rk_scalar_tend ( scs, sce, config_flags,    &
                             rk_step, dt,                  &
                             ru, rv, ww, mut, alt,         &
-                            scalar_old, scalar,           &
+                            scalar,           &
                             scalar_tends, advect_tend,    &
                             RQVFTEN,                      &
                             base, moist_step, fnm, fnp,   &
@@ -9454,8 +9478,7 @@ SUBROUTINE t_rk_scalar_tend ( scs, sce, config_flags,    &
    LOGICAL , INTENT(IN   ) :: moist_step
 
    REAL, DIMENSION(ims:ime, kms:kme, jms:jme , scs:sce ),                &
-                                         INTENT(INOUT)  :: scalar,     &
-                                                           scalar_old
+                                         INTENT(INOUT)  :: scalar
 
    REAL, DIMENSION(ims:ime, kms:kme, jms:jme , scs:sce ),                      &
                                          INTENT(  OUT)  :: scalar_tends
@@ -9522,8 +9545,8 @@ SUBROUTINE t_rk_scalar_tend ( scs, sce, config_flags,    &
 
 !  INOUT variables
 
-   REAL, DIMENSION(ims:ime, kms:kme, jms:jme , scs:sce )  :: S_scalar, S_scalar_old,P_scalar, P_scalar_old
-   REAL, DIMENSION(ims:ime, kms:kme, jms:jme , scs:sce )  :: K_scalar, K_scalar_old,B_scalar, B_scalar_old
+   REAL, DIMENSION(ims:ime, kms:kme, jms:jme , scs:sce )  :: S_scalar, P_scalar
+   REAL, DIMENSION(ims:ime, kms:kme, jms:jme , scs:sce )  :: K_scalar, B_scalar
 
 !  OUT variables
 
@@ -9560,13 +9583,10 @@ SUBROUTINE t_rk_scalar_tend ( scs, sce, config_flags,    &
    do j=jms,jme
    do h=scs,sce
       S_scalar(i,k,j,h)=scalar(i,k,j,h)
-      S_scalar_old(i,k,j,h)=scalar_old(i,k,j,h)
 
       P_scalar(i,k,j,h)=scalar(i,k,j,h)
-      P_scalar_old(i,k,j,h)=scalar_old(i,k,j,h)
 
       K_scalar(i,k,j,h)=scalar(i,k,j,h)
-      K_scalar_old(i,k,j,h)=scalar_old(i,k,j,h)
    enddo
    enddo
    enddo
@@ -9577,7 +9597,7 @@ SUBROUTINE t_rk_scalar_tend ( scs, sce, config_flags,    &
    CALL rk_scalar_tend ( scs, sce, config_flags,    &
                             rk_step, dt,                  &
                             ru, rv, ww, mut, alt,         &
-                            scalar_old, scalar,           &
+                            scalar,           &
                             scalar_tends, advect_tend,    &
                             RQVFTEN,                      &
                             base, moist_step, fnm, fnp,   &
@@ -9603,7 +9623,6 @@ SUBROUTINE t_rk_scalar_tend ( scs, sce, config_flags,    &
    do j=jms,jme
    do h=scs,sce
       B_scalar(i,k,j,h)=scalar(i,k,j,h)
-      B_scalar_old(i,k,j,h)=scalar_old(i,k,j,h)
    enddo
    enddo
    enddo
@@ -9611,8 +9630,8 @@ SUBROUTINE t_rk_scalar_tend ( scs, sce, config_flags,    &
 
 !  TCL
 
-   CALL g_rk_scalar_tend( scs, sce, config_flags, rk_step, ru, P_ru, rv, P_rv, ww, P_ww, mut, P_mut, alt, P_alt, K_scalar_old, &
-&P_scalar_old, K_scalar, P_scalar, scalar_tends, P_scalar_tends, advect_tend, P_advect_tend, base, moist_step, fnm, fnp, msfu, msfv, &
+   CALL g_rk_scalar_tend( scs, sce, config_flags, rk_step, ru, P_ru, rv, P_rv, ww, P_ww, mut, P_mut, alt, P_alt, &
+&K_scalar, P_scalar, scalar_tends, P_scalar_tends, advect_tend, P_advect_tend, base, moist_step, fnm, fnp, msfu, msfv, &
 &msft, rdx, rdy, rdn, rdnw, kvdif, xkmhd, P_xkmhd, ids, ide, jds, jde, kde, ims, ime, jms, jme, kms, kme, its, ite, jts, &
 &jte, kts, kte )
 
@@ -9631,8 +9650,7 @@ SUBROUTINE t_rk_scalar_tend ( scs, sce, config_flags,    &
    do k=kms,kme
    do j=jms,jme
    do h=scs,sce
-      SAVE_L=SAVE_L + P_scalar(i,k,j,h)*P_scalar(i,k,j,h)            &
-                    + P_scalar_old(i,k,j,h)*P_scalar_old(i,k,j,h)
+      SAVE_L=SAVE_L + P_scalar(i,k,j,h)*P_scalar(i,k,j,h)
    enddo
    enddo
    enddo
@@ -9659,7 +9677,6 @@ SUBROUTINE t_rk_scalar_tend ( scs, sce, config_flags,    &
    do j=jms,jme
    do h=scs,sce
       P_scalar(i,k,j,h)=FACTOR*S_scalar(i,k,j,h)
-      P_scalar_old(i,k,j,h)=FACTOR*S_scalar_old(i,k,j,h)
    enddo
    enddo
    enddo
@@ -9668,7 +9685,7 @@ SUBROUTINE t_rk_scalar_tend ( scs, sce, config_flags,    &
    CALL rk_scalar_tend ( scs, sce, config_flags,    &
                             rk_step, dt,                  &
                             P_ru, P_rv, P_ww, P_mut, P_alt,         &
-                            P_scalar_old, P_scalar,           &
+                            P_scalar,           &
                             P_scalar_tends, P_advect_tend,    &
                             RQVFTEN,                      &
                             base, moist_step, fnm, fnp,   &
@@ -9694,8 +9711,7 @@ SUBROUTINE t_rk_scalar_tend ( scs, sce, config_flags,    &
    do k=kms,kme
    do j=jms,jme
    do h=scs,sce
-      VAL_N=VAL_N+(P_scalar(i,k,j,h) -B_scalar(i,k,j,h))*(P_scalar(i,k,j,h) -B_scalar(i,k,j,h))               &
-                 +(P_scalar_old(i,k,j,h) -B_scalar_old(i,k,j,h))*(P_scalar_old(i,k,j,h) -B_scalar_old(i,k,j,h))
+      VAL_N=VAL_N+(P_scalar(i,k,j,h) -B_scalar(i,k,j,h))*(P_scalar(i,k,j,h) -B_scalar(i,k,j,h))
    enddo
    enddo
    enddo
@@ -9742,16 +9758,12 @@ SUBROUTINE t_rk_scalar_tend ( scs, sce, config_flags,    &
    do j=jms,jme
    do h=scs,sce
       scalar(i,k,j,h)=S_scalar(i,k,j,h)
-      scalar_old(i,k,j,h)=S_scalar_old(i,k,j,h)
 
       P_scalar(i,k,j,h)=FACTOR*S_scalar(i,k,j,h)
-      P_scalar_old(i,k,j,h)=FACTOR*S_scalar_old(i,k,j,h)
 
       B_scalar(i,k,j,h)=P_scalar(i,k,j,h)
-      B_scalar_old(i,k,j,h)=P_scalar_old(i,k,j,h)
 
       K_scalar(i,k,j,h)=scalar(i,k,j,h)
-      K_scalar_old(i,k,j,h)=scalar_old(i,k,j,h)
    enddo
    enddo
    enddo
@@ -9759,8 +9771,8 @@ SUBROUTINE t_rk_scalar_tend ( scs, sce, config_flags,    &
 
 !  TGL
 
-   CALL g_rk_scalar_tend( scs, sce, config_flags, rk_step, ru, P_ru, rv, P_rv, ww, P_ww, mut, P_mut, alt, P_alt, scalar_old, &
-&P_scalar_old, scalar, P_scalar, scalar_tends, P_scalar_tends, advect_tend, P_advect_tend, base, moist_step, fnm, fnp, msfu, msfv, &
+   CALL g_rk_scalar_tend( scs, sce, config_flags, rk_step, ru, P_ru, rv, P_rv, ww, P_ww, mut, P_mut, alt, P_alt, &
+&scalar, P_scalar, scalar_tends, P_scalar_tends, advect_tend, P_advect_tend, base, moist_step, fnm, fnp, msfu, msfv, &
 &msft, rdx, rdy, rdn, rdnw, kvdif, xkmhd, P_xkmhd, ids, ide, jds, jde, kde, ims, ime, jms, jme, kms, kme, its, ite, jts, &
 &jte, kts, kte )
 
@@ -9779,8 +9791,7 @@ SUBROUTINE t_rk_scalar_tend ( scs, sce, config_flags,    &
    do k=kms,kme
    do j=jms,jme
    do h=scs,sce
-      VAL_L=VAL_L + P_scalar(i,k,j,h)*P_scalar(i,k,j,h)            &
-                    + P_scalar_old(i,k,j,h)*P_scalar_old(i,k,j,h)
+      VAL_L=VAL_L + P_scalar(i,k,j,h)*P_scalar(i,k,j,h)
    enddo
    enddo
    enddo
@@ -9801,8 +9812,8 @@ SUBROUTINE t_rk_scalar_tend ( scs, sce, config_flags,    &
 
 !  ADJ
 
-   CALL a_rk_scalar_tend( scs, sce, config_flags, rk_step, ru, P_ru, rv, P_rv, ww, P_ww, mut, P_mut, alt, P_alt, K_scalar_old, &
-&P_scalar_old, K_scalar, P_scalar, P_scalar_tends, P_advect_tend, base, moist_step, fnm, fnp, msfu, msfv, msft, rdx, rdy, rdn, rdnw, &
+   CALL a_rk_scalar_tend( scs, sce, config_flags, rk_step, ru, P_ru, rv, P_rv, ww, P_ww, mut, P_mut, alt, P_alt, &
+&K_scalar, P_scalar, P_scalar_tends, P_advect_tend, base, moist_step, fnm, fnp, msfu, msfv, msft, rdx, rdy, rdn, rdnw, &
 &kvdif, xkmhd, P_xkmhd, ids, ide, jds, jde, kde, ims, ime, jms, jme, kms, kme, its, ite, jts, jte, kts, kte )
 
 
@@ -9823,8 +9834,7 @@ SUBROUTINE t_rk_scalar_tend ( scs, sce, config_flags,    &
    do k=kms,kme
    do j=jms,jme
    do h=scs,sce
-      VAL_A=VAL_A +P_scalar(i,k,j,h)*B_scalar(i,k,j,h)   &
-                  +P_scalar_old(i,k,j,h)*B_scalar_old(i,k,j,h)
+      VAL_A=VAL_A +P_scalar(i,k,j,h)*B_scalar(i,k,j,h)
    enddo
    enddo
    enddo
@@ -9853,7 +9863,6 @@ SUBROUTINE t_rk_scalar_tend ( scs, sce, config_flags,    &
    do j=jms,jme
    do h=scs,sce
       scalar(i,k,j,h)=S_scalar(i,k,j,h)
-      scalar_old(i,k,j,h)=S_scalar_old(i,k,j,h)
    enddo
    enddo
    enddo
