@@ -79,75 +79,164 @@ state    real  LU_MASK          ij      misc        1         -     i3h1     "LU
 # Velocities
 #
 # U Vel
-state    real   u              ijkb     dyn_em      2         X     \
-     i01rhusdf=(bdy_interp:dt)       "U"                      "x-wind component"   "m s-1"
+state    real   u              ijkb    dyn_em      2         X      i01rh03usdf=(bdy_interp:dt)     "U"                      "x-wind component"   "m s-1"
+state    real   a_u            ijkb    dyn_em      2         X      i01rh03usdf=(bdy_interp:dt)     "A_U"                    "x-wind component"   "m s-1"
+state    real   g_u            ijkb    dyn_em      2         X      i01rh03usdf=(bdy_interp:dt)     "G_U"                    "x-wind component"   "m s-1"
 state    real   ru             ijk     dyn_em      1         X      -        "MU_U"        "mu-coupled u"   "Pa m s-1"
+state    real   a_ru           ijk     dyn_em      1         X      -        "A_MU_U"        "mu-coupled u"   "Pa m s-1"
+state    real   g_ru           ijk     dyn_em      1         X      -        "G_MU_U"        "mu-coupled u"   "Pa m s-1"
 state    real   ru_m           ijk     dyn_em      1         X      -        "ru_m"        ""   ""
+state    real   a_ru_m         ijk     dyn_em      1         X      -        "a_ru_m"        ""   ""
+state    real   g_ru_m         ijk     dyn_em      1         X      -        "g_ru_m"        ""   ""
 state    real   ru_tend        ijk     dyn_em      1         X      -        "ru_tend"        ""   ""                                   
+state    real   a_ru_tend      ijk     dyn_em      1         X      -        "a_ru_tend"        ""   ""                                   
+state    real   g_ru_tend      ijk     dyn_em      1         X      -        "g_ru_tend"        ""   ""                                   
 i1       real   ru_tendf       ijk     dyn_em      1         X                                          
+i1       real   a_ru_tendf     ijk     dyn_em      1         X                                          
+i1       real   g_ru_tendf     ijk     dyn_em      1         X                                          
 state    real   u_save         ijk     dyn_em      1         X      -        "u_save"
+state    real   a_u_save       ijk     dyn_em      1         X      -        "a_u_save"
+state    real   g_u_save       ijk     dyn_em      1         X      -        "g_u_save"
 #                                               
 # V Vel
-state    real   v              ijkb     dyn_em      2         Y     \
-     i01rhusdf=(bdy_interp:dt)        "V"                     "y-wind component"   "m s-1"
+state    real   v              ijkb    dyn_em      2         Y     i01rh03usdf=(bdy_interp:dt)      "V"                     "y-wind component"   "m s-1"
+state    real   a_v            ijkb    dyn_em      2         Y     i01rh03usdf=(bdy_interp:dt)      "A_V"                     "y-wind component"   "m s-1"
+state    real   g_v            ijkb    dyn_em      2         Y     i01rh03usdf=(bdy_interp:dt)      "G_V"                     "y-wind component"   "m s-1"
 state    real   rv             ijk     dyn_em      1         Y      -        "MU_V"        "mu-coupled v"   "Pa m s-1"
+state    real   a_rv           ijk     dyn_em      1         Y      -        "MU_V"        "mu-coupled v"   "Pa m s-1"
+state    real   g_rv           ijk     dyn_em      1         Y      -        "MU_V"        "mu-coupled v"   "Pa m s-1"
 state    real   rv_m           ijk     dyn_em      1         Y      -        "rv_m"
+state    real   a_rv_m         ijk     dyn_em      1         Y      -        "rv_m"
+state    real   g_rv_m         ijk     dyn_em      1         Y      -        "rv_m"
 state    real   rv_tend        ijk     dyn_em      1         Y      -        "rv_tend"
+state    real   a_rv_tend      ijk     dyn_em      1         Y      -        "rv_tend"
+state    real   g_rv_tend      ijk     dyn_em      1         Y      -        "rv_tend"
 i1       real   rv_tendf       ijk     dyn_em      1         Y                                          
+i1       real   a_rv_tendf     ijk     dyn_em      1         Y                                          
+i1       real   g_rv_tendf     ijk     dyn_em      1         Y                                          
 state    real   v_save         ijk     dyn_em      1         Y      -        "v_save"                   
+state    real   a_v_save       ijk     dyn_em      1         Y      -        "v_save"                   
+state    real   g_v_save       ijk     dyn_em      1         Y      -        "v_save"                   
 #                                               
 # Vertical Vel                                          
-state    real   w              ijkb     dyn_em      2         Z     \
-        irhusdf=(bdy_interp:dt)  "w"                          "z-wind component"   "m s-1"
+state    real   w              ijkb    dyn_em      2         Z     irh03usdf=(bdy_interp:dt)  "w"                          "z-wind component"   "m s-1"
+state    real   a_w            ijkb    dyn_em      2         Z     irh03usdf=(bdy_interp:dt)  "a_w"                        "z-wind component"   "m s-1"
+state    real   g_w            ijkb    dyn_em      2         Z     irh03usdf=(bdy_interp:dt)  "g_w"                        "z-wind component"   "m s-1"
 state    real   ww             ijk     dyn_em      1         Z      r         "ww"   "mu-coupled eta-dot"    "Pa s-1"
+state    real   a_ww           ijk     dyn_em      1         Z      r         "a_ww"   "mu-coupled eta-dot"    "Pa s-1"
+state    real   g_ww           ijk     dyn_em      1         Z      r         "g_ww"   "mu-coupled eta-dot"    "Pa s-1"
 state    real   rw             ijk     dyn_em      1         Z      -         "rw"   "mu-coupled w"          "Pa m s-1"
+state    real   a_rw           ijk     dyn_em      1         Z      -         "a_rw"   "mu-coupled w"          "Pa m s-1"
+state    real   g_rw           ijk     dyn_em      1         Z      -         "g_rw"   "mu-coupled w"          "Pa m s-1"
 i1       real   ww1            ijk     dyn_em      1         Z                                          
+i1       real   a_ww1          ijk     dyn_em      1         Z                                          
+i1       real   g_ww1          ijk     dyn_em      1         Z                                          
 i1       real   ww_m           ijk     dyn_em      1         Z                                          
+i1       real   a_ww_m         ijk     dyn_em      1         Z                                          
+i1       real   g_ww_m         ijk     dyn_em      1         Z                                          
 i1       real   wwp            ijk     dyn_em      1         Z                                          
 i1       real   rw_tend        ijk     dyn_em      1         Z                                          
+i1       real   a_rw_tend      ijk     dyn_em      1         Z                                          
+i1       real   g_rw_tend      ijk     dyn_em      1         Z                                          
 i1       real   rw_tendf       ijk     dyn_em      1         Z                                          
+i1       real   a_rw_tendf     ijk     dyn_em      1         Z                                          
+i1       real   g_rw_tendf     ijk     dyn_em      1         Z                                          
 i1       real   w_save         ijk     dyn_em      1         Z                                          
+i1       real   a_w_save       ijk     dyn_em      1         Z                                          
+i1       real   g_w_save       ijk     dyn_em      1         Z                                          
 
 # Geopotential
 state    real   ph             ijkb     dyn_em      2         Z     \
-       irhusdf=(bdy_interp:dt)   "ph"   "perturbation geopotential"  "m2 s-2"
+       irh03usdf=(bdy_interp:dt)   "ph"   "perturbation geopotential"  "m2 s-2"
+state    real   a_ph           ijkb     dyn_em      2         Z     \
+       irh03usdf=(bdy_interp:dt)   "a_ph"   "perturbation geopotential"  "m2 s-2"
+state    real   g_ph           ijkb     dyn_em      2         Z     \
+       irh03usdf=(bdy_interp:dt)   "g_ph"   "perturbation geopotential"  "m2 s-2"
 state    real   phb            ijk     dyn_em      1         Z     irhdus "phb"  "base-state geopotential"  "m2 s-2"
+state    real   a_phb          ijk     dyn_em      1         Z     irhdus "a_phb"  "base-state geopotential"  "m2 s-2"
+state    real   g_phb          ijk     dyn_em      1         Z     irhdus "g_phb"  "base-state geopotential"  "m2 s-2"
 state    real   phb_fine       ijk     dyn_em      1         Z      -     "phb_fine"  "for nesting, temp holding interpolated coarse grid phb"  "m2 s-2"
 state    real   ph0            ijk     dyn_em      1         Z      r     "ph0"  "initial geopotential"     "m2 s-2"
 state    real   php            ijk     dyn_em      1         Z      r     "php"  "geopotential"             "m2 s-2"
+state    real   a_php          ijk     dyn_em      1         Z      r     "a_php"  "geopotential"             "m2 s-2"
+state    real   g_php          ijk     dyn_em      1         Z      r     "g_php"  "geopotential"             "m2 s-2"
 i1       real   ph_tend        ijk     dyn_em      1         Z 
+i1       real   a_ph_tend      ijk     dyn_em      1         Z 
+i1       real   g_ph_tend      ijk     dyn_em      1         Z 
 i1       real   ph_tendf       ijk     dyn_em      1         Z 
+i1       real   a_ph_tendf     ijk     dyn_em      1         Z 
+i1       real   g_ph_tendf     ijk     dyn_em      1         Z 
 i1       real   ph_save        ijk     dyn_em      1         Z 
+i1       real   a_ph_save      ijk     dyn_em      1         Z 
+i1       real   g_ph_save      ijk     dyn_em      1         Z 
 
 # Potential Temperature
 state    real   t              ijkb     dyn_em      2         -     \
-       i01rhusdf=(bdy_interp:dt)   "t"      "perturbation potential temperature (theta-t0)" "K"
+       i01rh03usdf=(bdy_interp:dt)   "t"      "perturbation potential temperature (theta-t0)" "K"
+state    real   a_t            ijkb     dyn_em      2         -     \
+       i01rh03usdf=(bdy_interp:dt)   "a_t"      "perturbation potential temperature (theta-t0)" "K"
+state    real   g_t            ijkb     dyn_em      2         -     \
+       i01rh03usdf=(bdy_interp:dt)   "g_t"      "perturbation potential temperature (theta-t0)" "K"
 
 state    real   t_init         ijk     dyn_em      1         -      r        "t_init" "initial potential temperature" "K"
 i1       real   t_tend         ijk     dyn_em      1         -  
+i1       real   a_t_tend       ijk     dyn_em      1         -  
+i1       real   g_t_tend       ijk     dyn_em      1         -  
 i1       real   t_tendf        ijk     dyn_em      1         -  
+i1       real   a_t_tendf      ijk     dyn_em      1         -  
+i1       real   g_t_tendf      ijk     dyn_em      1         -  
 state    real   tp             ijk     dyn_em      2         -  
 i1       real   t_2save        ijk     dyn_em      1         -   
+i1       real   a_t_2save      ijk     dyn_em      1         -   
+i1       real   g_t_2save      ijk     dyn_em      1         -   
 state    real   t_save         ijk     dyn_em      1         -               "t_save"
+state    real   a_t_save       ijk     dyn_em      1         -               "a_t_save"
+state    real   g_t_save       ijk     dyn_em      1         -               "g_t_save"
 #                                               
 
 
 # Mass
 state    real   mu              ijb     dyn_em      2         -     \
-     irhusdf=(bdy_interp:dt)   "mu"  "perturbation dry air mass in column" "Pa"
+     irh03usdf=(bdy_interp:dt)   "mu"  "perturbation dry air mass in column" "Pa"
+state    real   a_mu            ijb     dyn_em      2         -     \
+     irh03usdf=(bdy_interp:dt)   "a_mu"  "perturbation dry air mass in column" "Pa"
+state    real   g_mu            ijb     dyn_em      2         -     \
+     irh03usdf=(bdy_interp:dt)   "g_mu"  "perturbation dry air mass in column" "Pa"
 state    real   mub             ij     dyn_em      1         -     irhdus       "mub" "base state dry air mass in column" "Pa"
+state    real   a_mub           ij     dyn_em      1         -     irhdus       "a_mub" "base state dry air mass in column" "Pa"
+state    real   g_mub           ij     dyn_em      1         -     irhdus       "g_mub" "base state dry air mass in column" "Pa"
 state    real   mub_fine        ij     dyn_em      1         -      -           "mub_fine" "nest temp, holds interpolated coarse grid mub" "Pa"
 state    real   mu0             ij     dyn_em      1         -     i01rdu       "mu0" "initial dry mass in column" "Pa"
 state    real   mudf            ij     dyn_em      1         -      -           "mudf" "" ""
+state    real   a_mudf          ij     dyn_em      1         -      -           "a_mudf" "" ""
+state    real   g_mudf          ij     dyn_em      1         -      -           "g_mudf" "" ""
 state    real   muu             ij     dyn_em      1          -                 "muu"
+state    real   a_muu           ij     dyn_em      1          -                 "a_muu"
+state    real   g_muu           ij     dyn_em      1          -                 "g_muu"
 i1       real   muus            ij     dyn_em      1          -     
+i1       real   a_muus          ij     dyn_em      1          -     
+i1       real   g_muus          ij     dyn_em      1          -     
 state    real   muv             ij     dyn_em      1          -                 "muv"
+state    real   a_muv           ij     dyn_em      1          -                 "a_muv"
+state    real   g_muv           ij     dyn_em      1          -                 "g_muv"
 i1       real   muvs            ij     dyn_em      1          -     
+i1       real   a_muvs          ij     dyn_em      1          -     
+i1       real   g_muvs          ij     dyn_em      1          -     
 state    real   mut             ij     dyn_em      1          -                 "mut"
+state    real   a_mut           ij     dyn_em      1          -                 "a_mut"
+state    real   g_mut           ij     dyn_em      1          -                 "g_mut"
 state    real   muts            ij     dyn_em      1          -                 "muts"
+state    real   a_muts          ij     dyn_em      1          -                 "a_muts"
+state    real   g_muts          ij     dyn_em      1          -                 "g_muts"
 i1       real   muave           ij     dyn_em      1          -     
+i1       real   a_muave         ij     dyn_em      1          -     
+i1       real   g_muave         ij     dyn_em      1          -     
 i1       real   mu_save         ij     dyn_em      1          -     
+i1       real   a_mu_save       ij     dyn_em      1          -     
+i1       real   g_mu_save       ij     dyn_em      1          -     
 i1       real   mu_tend         ij     dyn_em      1          -     
+i1       real   a_mu_tend       ij     dyn_em      1          -     
+i1       real   g_mu_tend       ij     dyn_em      1          -     
 
 #diagnostic for looking at nest position in output. A mungy version of terrain height.
 state    real   nest_pos        ij     misc        1   -   hu=(mark_domain)  "NEST_POS"
@@ -161,8 +250,14 @@ i1       real   tke_tend       ijk     dyn_em      1         -
 
 # Pressure and Density
 state    real   p              ijk     dyn_em      1         -      rh03      "p"           "perturbation pressure"         "Pa"
+state    real   a_p            ijk     dyn_em      1         -      rh03      "a_p"         "perturbation pressure"         "Pa"
+state    real   g_p            ijk     dyn_em      1         -      rh03      "g_p"         "perturbation pressure"         "Pa"
 state    real   al             ijk     dyn_em      1         -      r         "al"          "inverse perturbation density"  "m3 kg-1"
+state    real   a_al           ijk     dyn_em      1         -      r         "a_al"        "inverse perturbation density"  "m3 kg-1"
+state    real   g_al           ijk     dyn_em      1         -      r         "g_al"        "inverse perturbation density"  "m3 kg-1"
 state    real   alt            ijk     dyn_em      1         -      r         "alt"         "inverse density"               "m3 kg-1"
+state    real   a_alt          ijk     dyn_em      1         -      r         "a_alt"       "inverse density"               "m3 kg-1"
+state    real   g_alt          ijk     dyn_em      1         -      r         "g_alt"       "inverse density"               "m3 kg-1"
 state    real   alb            ijk     dyn_em      1         -      rdus      "alb"         "inverse base density"          "m3 kg-1"
 state    real   zx             ijk     dyn_em      1         X      -         " "  " "  " "    
 state    real   zy             ijk     dyn_em      1         Y      -         " "  " "  " "   
@@ -174,16 +269,38 @@ state    real   pb             ijk     dyn_em      1         -      rhdus     "p
 # Other dyn                                             
 #                                               
 i1       real   advect_tend    ijk     dyn_em      1         -                                          
+i1       real   a_advect_tend  ijk     dyn_em      1         -                                          
+i1       real   g_advect_tend  ijk     dyn_em      1         -                                          
 i1       real   alpha          ijk     dyn_em      1         -                                                  
+i1       real   a_alpha        ijk     dyn_em      1         -                                                  
+i1       real   g_alpha        ijk     dyn_em      1         -                                                  
 i1       real   a              ijk     dyn_em      1         -                                                  
+i1       real   a_a            ijk     dyn_em      1         -                                                  
+i1       real   g_a            ijk     dyn_em      1         -                                                  
 i1       real   gamma          ijk     dyn_em      1         -                                                  
+i1       real   a_gamma        ijk     dyn_em      1         -                                                  
+i1       real   g_gamma        ijk     dyn_em      1         -                                                  
 i1       real   c2a            ijk     dyn_em      1         -     -
+i1       real   a_c2a          ijk     dyn_em      1         -     -
+i1       real   g_c2a          ijk     dyn_em      1         -     -
 i1       real   rho            ijk     dyn_em      1         -     -
+i1       real   a_rho          ijk     dyn_em      1         -     -
+i1       real   g_rho          ijk     dyn_em      1         -     -
 i1       real   phm            ijk     dyn_em      1         -     -
+i1       real   a_phm          ijk     dyn_em      1         -     -
+i1       real   g_phm          ijk     dyn_em      1         -     -
 i1       real   cqu            ijk     dyn_em      1         -     -
+i1       real   a_cqu          ijk     dyn_em      1         -     -
+i1       real   g_cqu          ijk     dyn_em      1         -     -
 i1       real   cqv            ijk     dyn_em      1         -     -
+i1       real   a_cqv          ijk     dyn_em      1         -     -
+i1       real   g_cqv          ijk     dyn_em      1         -     -
 i1       real   cqw            ijk     dyn_em      1         -     -
+i1       real   a_cqw          ijk     dyn_em      1         -     -
+i1       real   g_cqw          ijk     dyn_em      1         -     -
 i1       real   pm1            ijk     dyn_em      1         -     -
+i1       real   a_pm1          ijk     dyn_em      1         -     -
+i1       real   g_pm1          ijk     dyn_em      1         -     -
 i1       real   sr             ij      dyn_em      1         -     -   # dummy array for microphysics driver
 
 state    real    fnm            k       dyn_em      1         -     irh       "fnm"  "upper weight for vertical stretching"  ""
@@ -196,8 +313,12 @@ state    real    znu            k       dyn_em      1         -     irh       "z
 state    real    znw            k       dyn_em      1         Z     i01rh03   "znw"  "eta values on full (w) levels"  ""
 state    real    t_base         k       dyn_em      1         -     ir        "t_base"               "BASE STATET T IN IDEALIZED CASES"         "K"      
 state    real    z              ijk     dyn_em      1         Z     -         " " " " " "
+state    real    a_z            ijk     dyn_em      1         Z     -         " " " " " "
+state    real    g_z            ijk     dyn_em      1         Z     -         " " " " " "
 i1       real    mu_3d          ijk     dyn_em      1         -                                          
 i1       real    z_at_w         ijk     dyn_em      1         Z 
+i1       real    a_z_at_w       ijk     dyn_em      1         Z 
+i1       real    g_z_at_w       ijk     dyn_em      1         Z 
 state    real    cfn            -       misc      -         -     irh       "cfn"    "extrapolation constant"  ""
 state    real    cfn1           -       misc      -         -     irh       "cfn1"   "extrapolation constant"  ""
 state    integer step_number    -       misc      -         -     ir        "step_number"  ""
@@ -580,15 +701,35 @@ state    real  tbpvs_state       p      misc        1         -      r        "T
 state    real  tbpvs0_state      p      misc        1         -      r        "TBPVS0_STATE"          "STATE FOR ETAMPNEW MICROPHYSICS"
 
 i1       real  th_phy          ijk      misc        1         -                                          
+i1       real  a_th_phy        ijk      misc        1         -                                          
+i1       real  g_th_phy        ijk      misc        1         -                                          
 i1       real  pi_phy          ijk      misc        1         -                                          
+i1       real  a_pi_phy        ijk      misc        1         -                                          
+i1       real  g_pi_phy        ijk      misc        1         -                                          
 i1       real  p_phy           ijk      misc        1         -                                          
+i1       real  a_p_phy         ijk      misc        1         -                                          
+i1       real  g_p_phy         ijk      misc        1         -                                          
 i1       real  t_phy           ijk      misc        1         -                                          
+i1       real  a_t_phy         ijk      misc        1         -                                          
+i1       real  g_t_phy         ijk      misc        1         -                                          
 i1       real  u_phy           ijk      misc        1         -                                          
+i1       real  a_u_phy         ijk      misc        1         -                                          
+i1       real  g_u_phy         ijk      misc        1         -                                          
 i1       real  v_phy           ijk      misc        1         -                                          
+i1       real  a_v_phy         ijk      misc        1         -                                          
+i1       real  g_v_phy         ijk      misc        1         -                                          
 i1       real  dz8w            ijk      misc        1         Z                                          
+i1       real  a_dz8w          ijk      misc        1         Z                                          
+i1       real  g_dz8w          ijk      misc        1         Z                                          
 i1       real  p8w             ijk      misc        1         Z                                          
+i1       real  a_p8w           ijk      misc        1         Z                                          
+i1       real  g_p8w           ijk      misc        1         Z                                          
 i1       real  t8w             ijk      misc        1         Z                                          
+i1       real  a_t8w           ijk      misc        1         Z                                          
+i1       real  g_t8w           ijk      misc        1         Z                                          
 i1       real  rho_phy         ijk      misc        1         -                                          
+i1       real  a_rho_phy       ijk      misc        1         -                                          
+i1       real  g_rho_phy       ijk      misc        1         -                                          
 i1    logical  CU_ACT_FLAG     ij       misc        1         -
 
                                                 
@@ -631,6 +772,8 @@ state   real  defor23          ijk      misc        1         z     -         "d
 state   real   xkmv            ijk      misc        1         -     -         "xkmv"                  "VERTICAL EDDY VISCOSITY"     "m2 s-1"      
 state   real   xkmh            ijk      misc        1         -     -         "xkmh"                  "HORIZONTAL EDDY VISCOSITY"   "m2 s-1"      
 state   real   xkmhd           ijk      misc        1         -     -         "xkmhd"                 "VERTICAL EDDY DIFFUSIVITY OF HEAT (FOR UPPER DAMPING LAYER)"     "m2 s-1"      
+state   real   a_xkmhd         ijk      misc        1         -     -         "a_xkmhd"               "VERTICAL EDDY DIFFUSIVITY OF HEAT (FOR UPPER DAMPING LAYER)"     "m2 s-1"      
+state   real   g_xkmhd         ijk      misc        1         -     -         "g_xkmhd"               "VERTICAL EDDY DIFFUSIVITY OF HEAT (FOR UPPER DAMPING LAYER)"     "m2 s-1"      
 state   real   xkhv            ijk      misc        1         -     -         "xkhv"                  "VERTICAL EDDY DIFFUSIVITY OF HEAT"                               "m2 s-1"      
 state   real   xkhh            ijk      misc        1         -     -         "xkhh"                  "HORIZONTAL EDDY DIFFUSIVITY OF HEAT"                             "m2 s-1"      
 state   real    div            ijk      misc        1         -     -         "div"                   "DIVERGENCE"                                                      "s-1"
