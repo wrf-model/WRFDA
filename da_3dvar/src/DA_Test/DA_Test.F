@@ -33,17 +33,23 @@ module DA_Test
    USE DA_Setup_Structures
    USE DA_Tools
    use da_qscat
+   USE DA_Grid_Definitions
+   USE DA_Physics
+   use module_wrf_3dvar_io
    USE module_wrf_error
    USE da_minimisation
 
    implicit none
 
+#ifdef DM_PARALLEL
+INCLUDE 'mpif.h'          
 #if ( DWORDSIZE != RWORDSIZE )
 #define TRUE_MPI_REAL     MPI_REAL
 #else
 #define TRUE_MPI_REAL     MPI_REAL8
 #endif
-   
+#endif
+
 contains
 
 #include "DA_Check_Balance.inc"
@@ -83,5 +89,9 @@ contains
 #include "da_setup_testfield.inc"
 #include "check_sfc_assi.inc"
 #include "set_tst_trnsf_fld.inc"
+#include "DA_Check_VToY_Adjoint.inc"
+#include "da_get_y_lhs_value.inc"
+
+#include "da_check_xtow_adjoint.inc"
 
 end module DA_Test
