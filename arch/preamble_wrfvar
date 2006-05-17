@@ -5,7 +5,6 @@
 # System properties
 
 SHELL           =       /bin/sh
-REGISTRY        =       Registry
 
 #Macros, these should be generic for all machines
 
@@ -30,6 +29,7 @@ RTTOV_LIB   = CONFIGURE_RTTOV_LIB
 ENVCOMPDEFS = CONFIGURE_COMPILEFLAGS
 ARCHFLAGS1  = CONFIGURE_NETCDF_FLAG CONFIGURE_RTTOV_FLAG
 WRFIO       = CONFIGURE_WRFIO_NF wrfio_int wrfio_grib1
+REGISTRY    = CONFIGURE_REGISTRY
 
 # Short cuts to directories
 

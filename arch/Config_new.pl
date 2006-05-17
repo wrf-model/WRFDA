@@ -3,6 +3,7 @@
 # Configuration script for WRF code
 
 $sw_devtop = `pwd` ;
+$sw_registry_path = "" ;
 $sw_perl_path = perl ;
 $sw_netcdf_path = "" ;
 $sw_phdf5_path=""; 

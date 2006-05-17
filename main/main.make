@@ -1,5 +1,7 @@
 # MAIN
 
+wrfplus : wrf
+
 var : wrfvar
 
 wrfvar : arch $(VAR_LIBS) wrfvar.o libwrfvar.a

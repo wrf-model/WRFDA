@@ -3,6 +3,7 @@
 # Configuration script for WRF VAR code
 
 $sw_devtop = `pwd` ;
+$sw_registry_path = "" ;
 $sw_perl_path = perl ;
 $sw_netcdf_path = "" ;
 $sw_phdf5_path=""; 
@@ -16,6 +17,9 @@ $sw_mach = "ARCH" ;         # ARCH will match any
 # Transfer arguments to local variables
 
 while ( substr( $ARGV[0], 0, 1 ) eq "-" ) {
+  if ( substr( $ARGV[0], 1, 9 ) eq "registry=" ) {
+    $sw_registry = substr( $ARGV[0], 10 ) ;
+  }
   if ( substr( $ARGV[0], 1, 5 ) eq "perl=" ) {
     $sw_perl_path = substr( $ARGV[0], 6 ) ;
   }
@@ -110,6 +114,7 @@ while ( <CONFIGURE_PREAMBLE> ) {
   $_ =~ s/CONFIGURE_RTTOV_PATH/$sw_rttov_path/g ;
   $_ =~ s/CONFIGURE_LDFLAGS/$sw_ldflags/g ;
   $_ =~ s/CONFIGURE_COMPILEFLAGS/$sw_compileflags/g ;
+  $_ =~ s/CONFIGURE_REGISTRY/$sw_registry/g ;
   if ( $sw_netcdf_path ) { 
     $_ =~ s/CONFIGURE_WRFIO_NF/wrfio_nf/g ;
     $_ =~ s:CONFIGURE_NETCDF_FLAG:-DNETCDF: ;

@@ -6,12 +6,19 @@ echo option = $option
 
 if [ "$option" = "wrf" ] ; then
     echo "configure wrf"
+    REGISTRY=Registry.EM
 elif [ "$option" = "var" ] ; then
     echo "configure var"
+    REGISTRY=Registry.wrfvar
+elif [ "$option" = "wrfvar" ] ; then
+    echo "configure wrfvar"
+    REGISTRY=Registry.wrfvar
 elif [ "$option" = "wrfplus" ] ; then
     echo "configure wrf for 4dvar"
+    REGISTRY=Registry.EM_4DVAR
 elif [ "$option" = "be" ] ; then
     echo "configure for be"
+    REGISTRY=Registry.wrfvar
 else
    echo "Please type : <configure wrf> to compile wrf,"
    echo "    or type : <configure var> to compile var."
@@ -339,10 +346,10 @@ fi
 if test -n "$PERL" ; then
   echo option = $option
 
-  if [ "$option" = "var" -o "$option" = "be" ] ; then
+  if [ "$option" = "var" -o "$option" = "be" -o "$option" = "wrfplus" ] ; then
      echo "configure for wrfvar"
      $PERL arch/Config_wrfvar.pl -perl=$PERL -netcdf=$NETCDF -phdf5=$PHDF5 -rttov=$RTTOV -os=$os -mach=$mach -ldflags=$ldflags \
-       -compileflags=$compileflags
+       -compileflags=$compileflags -registry=$REGISTRY
      echo "configure for var/be"
   else
      echo "configure for wrf"
