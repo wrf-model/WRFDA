@@ -72,45 +72,6 @@ SUBROUTINE calc_dpsdt ( itimestep, dt, psfc, psfcm, cn, &
 
 END SUBROUTINE calc_dpsdt
 
-SUBROUTINE calc_q_conv_3d ( moist_1, moist_2, dt,          &
-                                q_convergence,                 &
-                                n_moist,                       &
-                                ids, ide, jds, jde, kds, kde,  &
-                                ims, ime, jms, jme, kms, kme,  &
-                                its, ite, jts, jte, kts, kte   )
-
-  IMPLICIT NONE
-
-  INTEGER ,          INTENT(IN   ) :: ids, ide, jds, jde, kds, kde, &
-                                      ims, ime, jms, jme, kms, kme, &
-                                      its, ite, jts, jte, kts, kte  
-  INTEGER ,          INTENT(IN   ) :: n_moist
-  REAL    ,          INTENT(IN   ) :: dt
-  REAL    , DIMENSION( ims:ime, kms:kme, jms:jme, n_moist ), &
-                     INTENT(   IN) :: moist_1,moist_2
-  REAL    , DIMENSION( ims:ime, kms:kme, jms:jme          ), &
-                     INTENT(  OUT) :: q_convergence
-
-  integer :: i, j, k, itf, jtf, ktf
-
-  itf=MIN(ite,ide-1)
-  jtf=MIN(jte,jde-1)
-  ktf=MIN(kte,kde-1)
-
-  DO j=jts,jtf
-  DO k=kts,ktf
-  DO i=its,itf
-! assign convergence = qv to test the allocation
-!     q_convergence(i,k,j) = moist_1(i,k,j,2)
-! assume convergence = tendency (unit: (g/kg)/3h)
-     q_convergence(i,k,j) = (moist_2(i,k,j,2)-moist_1(i,k,j,2))/dt &
-                            *1000. * 3.*3600.
-  ENDDO
-  ENDDO
-  ENDDO
-  
-END SUBROUTINE calc_q_conv_3d
-
 SUBROUTINE calc_q_conv_2d ( moist_2, u_2, v_2,             &
                             dt, dx, q_conv_2d,             &
                             n_moist,                       &

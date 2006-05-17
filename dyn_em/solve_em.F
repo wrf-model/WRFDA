@@ -36,6 +36,9 @@ SUBROUTINE solve_em ( grid , config_flags , &
    USE module_input_chem_data
    USE module_chem_utilities
 #endif
+#ifdef WRFPLUS_TESTING
+   USE module_check
+#endif
 
    IMPLICIT NONE
 
@@ -328,7 +331,28 @@ BENCH_START(step_prep_tim)
    !$OMP PARALLEL DO   &
    !$OMP PRIVATE ( ij )
 
-   DO ij = 1 , grid%num_tiles
+   DO ij = 1 , grid%num_tiles 
+
+#ifdef WRFPLUS_TESTING
+     print*,'TEST_rk_step_prep = ',TEST_rk_step_prep
+     if (TEST_rk_step_prep) &
+       CALL t_rk_step_prep  ( config_flags, rk_step,            &
+                           u_2, v_2, w_2, t_2, ph_2, mu_2,   &
+                           moist,                          &
+                           ru, rv, rw, ww, php, alt, muu, muv,   &
+                           mub, mut, phb, pb, p, al, alb,    &
+                           cqu, cqv, cqw,                    &
+                           msfu, msfv, msft,                 &
+                           fnm, fnp, dnw, rdx, rdy,          &
+                           num_3d_m,                         &
+                           ids, ide, jds, jde, kds, kde,     &
+                           ims, ime, jms, jme, kms, kme,     &
+                           grid%i_start(ij), grid%i_end(ij), &
+                           grid%j_start(ij), grid%j_end(ij), &
+                           k_start, k_end                   )
+
+     print*,'rk_step_prep zzma01'
+#endif
 
       CALL rk_step_prep  ( config_flags, rk_step,            &
                            u_2, v_2, w_2, t_2, ph_2, mu_2,   &
@@ -433,6 +457,19 @@ BENCH_START(init_zero_tend_tim)
      DO ij = 1 , grid%num_tiles
 
         CALL wrf_debug ( 200 , ' call init_zero_tendency' )
+#ifdef WRFPLUS_TESTING
+        print*,'TEST_init_zero_tendency = ',TEST_init_zero_tendency
+        if(TEST_init_zero_tendency) &
+        CALL t_init_zero_tendency ( ru_tendf, rv_tendf, rw_tendf,     &
+                                  ph_tendf, t_tendf, tke_tend,      &
+                                  moist_tend,chem_tend,scalar_tend,    &
+                                  num_3d_m,num_3d_c,num_3d_s,rk_step,        &
+                                  ids, ide, jds, jde, kds, kde,     &
+                                  ims, ime, jms, jme, kms, kme,     &
+                                  grid%i_start(ij), grid%i_end(ij), &
+                                  grid%j_start(ij), grid%j_end(ij), &
+                                  k_start, k_end                   )
+#endif
         CALL init_zero_tendency ( ru_tendf, rv_tendf, rw_tendf,     &
                                   ph_tendf, t_tendf, tke_tend,      &
                                   moist_tend,chem_tend,scalar_tend, &
@@ -474,6 +511,28 @@ BENCH_START(phy_prep_tim)
       DO ij = 1 , grid%num_tiles
 
           CALL wrf_debug ( 200 , ' call phy_prep' )
+#ifdef WRFPLUS_TESTING
+          print*,' TEST_phy_prep = ',TEST_phy_prep
+          if(TEST_phy_prep) &
+          CALL t_phy_prep ( config_flags,                           &
+                         mut, u_2, v_2, p, pb, alt,              &
+                         ph_2, phb, t_2, tsk, moist, num_3d_m, &
+                         mu_3d, rho,                             &
+                         th_phy, p_phy, pi_phy, u_phy, v_phy,    &
+                         p8w, t_phy, t8w, z, z_at_w,             &
+                         dz8w, fnm, fnp,                         &
+                         RTHRATEN,                               &
+                         RTHBLTEN, RUBLTEN, RVBLTEN,             &
+                         RQVBLTEN, RQCBLTEN, RQIBLTEN,           &
+                         RTHCUTEN, RQVCUTEN, RQCCUTEN,           &
+                         RQRCUTEN, RQICUTEN, RQSCUTEN,           &
+                         RTHFTEN,  RQVFTEN,                      &
+                         ids, ide, jds, jde, kds, kde,           &
+                         ims, ime, jms, jme, kms, kme,           &
+                         grid%i_start(ij), grid%i_end(ij),       &
+                         grid%j_start(ij), grid%j_end(ij),       &
+                         k_start, k_end                         )
+#endif
          CALL phy_prep ( config_flags,                           &
                          mut, u_2, v_2, p, pb, alt,              &
                          ph_2, phb, t_2, tsk, moist, num_3d_m,   &
@@ -845,6 +904,25 @@ BENCH_START(calc_tke_tim)
        DO ij = 1 , grid%num_tiles
 
           CALL wrf_debug ( 200 , ' call calculate_km_kh' )
+#ifdef WRFPLUS_TESTING
+          print*,'TEST_calculate_km_kh = ',TEST_calculate_km_kh
+          if(TEST_calculate_km_kh) &
+          CALL t_calculate_km_kh( config_flags,dt,dampcoef,zdamp,damp_opt,     &
+                                xkmh,xkmhd,xkmv,xkhh,xkhv,BN2,               &
+                                khdif,kvdif,div,                             &
+                                defor11,defor22,defor33,defor12,             &
+                                defor13,defor23,                             &
+                                tke_2(ims,kms,jms),p8w,t8w,th_phy,           &
+                                t_phy,p_phy,moist,dn,dnw,                  &
+                                dx,dy,rdz,rdzw,mix_cr_len,num_3d_m,          &
+                                cf1, cf2, cf3, warm_rain,                    &
+                                kh_tke_upper_bound, kv_tke_upper_bound,      &
+                                ids,ide, jds,jde, kds,kde,                   &
+                                ims,ime, jms,jme, kms,kme,                   &
+                                grid%i_start(ij), grid%i_end(ij),            &
+                                grid%j_start(ij), grid%j_end(ij),            &
+                                k_start    , k_end                          )
+#endif
           CALL calculate_km_kh( config_flags,dt,dampcoef,zdamp,damp_opt,     &
                                 xkmh,xkmhd,xkmv,xkhh,xkhv,BN2,               &
                                 khdif,kvdif,div,                             &
@@ -1067,7 +1145,34 @@ BENCH_START(rk_tend_tim)
    DO ij = 1 , grid%num_tiles
 
       CALL wrf_debug ( 200 , ' call rk_tendency' )
-      CALL rk_tendency ( config_flags, rk_step,                           &
+#ifdef WRFPLUS_TESTING
+      print*,'TEST_rk_tendency = ',TEST_rk_tendency
+      if(TEST_rk_tendency) &
+      CALL t_rk_tendency ( config_flags, rk_step,                           &
+                         ru_tend, rv_tend, rw_tend, ph_tend, t_tend,      &
+                         ru_tendf, rv_tendf, rw_tendf, ph_tendf, t_tendf, &
+                         mu_tend, u_save, v_save, w_save, ph_save,        &
+                         t_save, mu_save, RTHFTEN,                        &
+                         ru, rv, rw, ww,                                  &
+                         u_2, v_2, w_2, t_2, ph_2,                        &
+                         u_1, v_1, w_1, t_1, ph_1,                        &
+                         h_diabatic, phb, t_init,                         &
+                         mu_2, mut, muu, muv, mub,                        &
+                         al, alt, p, pb, php, cqu, cqv, cqw,              &
+                         u_base, v_base, t_base, qv_base, z_base,         &
+                         msfu, msfv, msft, f, e, sina, cosa,              &
+                         fnm, fnp, rdn, rdnw,                             &
+                         dt, rdx, rdy, khdif, kvdif, xkmhd,               &
+                         dampcoef,zdamp,damp_opt,                         &
+                         cf1, cf2, cf3, cfn, cfn1, num_3d_m,              &
+                         non_hydrostatic,                                 &
+                         ids, ide, jds, jde, kds, kde,                    &
+                         ims, ime, jms, jme, kms, kme,                    &
+                         grid%i_start(ij), grid%i_end(ij),                &
+                         grid%j_start(ij), grid%j_end(ij),                &
+                         k_start, k_end                                  ) 
+#endif
+     CALL rk_tendency ( config_flags, rk_step,                           &
                          ru_tend, rv_tend, rw_tend, ph_tend, t_tend,      &
                          ru_tendf, rv_tendf, rw_tendf, ph_tendf, t_tendf, &
                          mu_tend, u_save, v_save, w_save, ph_save,        &
@@ -1090,7 +1195,22 @@ BENCH_START(rk_tend_tim)
                          grid%i_start(ij), grid%i_end(ij),                &
                          grid%j_start(ij), grid%j_end(ij),                &
                          k_start, k_end                                  )
+
+#ifdef WRFPLUS_TESTING
+    if(TEST_advect_scalar) &
+    CALL t_advect_scalar ( t_2, t_2, t_tend, ru, rv, ww,   &
+                         mut, config_flags,            &
+                         msfu, msfv, msft, fnm, fnp,   &
+                         rdx, rdy, rdnw,               &
+                         ids, ide, jds, jde, kds, kde, &
+                         ims, ime, jms, jme, kms, kme, &
+                         grid%i_start(ij), grid%i_end(ij),                &
+                         grid%j_start(ij), grid%j_end(ij),                &
+                         k_start, k_end                                  )
+
+#endif
    END DO
+
    !$OMP END PARALLEL DO
 BENCH_END(rk_tend_tim)
 
@@ -1101,6 +1221,28 @@ BENCH_START(relax_bdy_dry_tim)
 
      IF( (config_flags%specified .or. config_flags%nested) .and. rk_step == 1 ) THEN 
 
+#ifdef WRFPLUS_TESTING
+       print*,'TEST_relax_bdy_dry = ',TEST_relax_bdy_dry
+       if(TEST_relax_bdy_dry) &
+       CALL t_relax_bdy_dry ( config_flags,                                &
+                            u_save, v_save, ph_save, t_save,             &
+                            w_save, mu_tend,                             &
+                            ru, rv, ph_2, t_2,                           &
+                            w_2, mu_2, mut,                              &
+                            u_b, v_b, ph_b, t_b, w_b,                    &
+                            mu_b,                                        &
+                            u_bt, v_bt, ph_bt, t_bt,                     &
+                            w_bt, mu_bt,                                 &
+                            spec_bdy_width, spec_zone, relax_zone,       &
+                            dtbc, fcx, gcx,             &
+                            ijds, ijde,                 &
+                            ids,ide, jds,jde, kds,kde,  &
+                            ims,ime, jms,jme, kms,kme,  &
+                            ips,ipe, jps,jpe, kps,kpe,  &
+                            grid%i_start(ij), grid%i_end(ij),            &
+                            grid%j_start(ij), grid%j_end(ij),            &
+                            k_start, k_end                              )
+#endif
        CALL relax_bdy_dry ( config_flags,                                &
                             u_save, v_save, ph_save, t_save,             &
                             w_save, mu_tend,                             & 
@@ -1122,6 +1264,19 @@ BENCH_START(relax_bdy_dry_tim)
 
 
      ENDIF
+#ifdef WRFPLUS_TESTING
+     if(TEST_rk_addtend_dry) &
+     CALL t_rk_addtend_dry( ru_tend,  rv_tend,  rw_tend,  ph_tend,  t_tend,  &
+                          ru_tendf, rv_tendf, rw_tendf, ph_tendf, t_tendf, &
+                          u_save, v_save, w_save, ph_save, t_save, rk_step,&
+                          h_diabatic, mut, msft, msfu, msfv,               &
+                          ids,ide, jds,jde, kds,kde,                       &
+                          ims,ime, jms,jme, kms,kme,                       &
+                          ips,ipe, jps,jpe, kps,kpe,                       &
+                          grid%i_start(ij), grid%i_end(ij),                &
+                          grid%j_start(ij), grid%j_end(ij),                &
+                          k_start, k_end                                  )
+#endif
 
      CALL rk_addtend_dry( ru_tend,  rv_tend,  rw_tend,  ph_tend,  t_tend,  &
                           ru_tendf, rv_tendf, rw_tendf, ph_tendf, t_tendf, &
@@ -1135,6 +1290,25 @@ BENCH_START(relax_bdy_dry_tim)
                           k_start, k_end                                  )
 
      IF( config_flags%specified .or. config_flags%nested ) THEN 
+#ifdef WRFVAR_TESTING
+       if(TEST_spec_bdy_dry) THEN
+         CALL t_spec_bdy_dry ( config_flags,                                    &
+                           ru_tend, rv_tend, ph_tend, t_tend,               &
+                           rw_tend, mu_tend,                                &
+                           u_b, v_b, ph_b, t_b,                             &
+                           w_b, mu_b,                                       &
+                           u_bt, v_bt, ph_bt, t_bt,                         &
+                           w_bt, mu_bt,                                     &
+                           spec_bdy_width, spec_zone,                       &
+                           ijds, ijde,                 & ! min/max(id,jd)
+                           ids,ide, jds,jde, kds,kde,  & ! domain dims
+                           ims,ime, jms,jme, kms,kme,  & ! memory dims
+                           ips,ipe, jps,jpe, kps,kpe,  & ! patch  dims
+                           grid%i_start(ij), grid%i_end(ij),                &
+                           grid%j_start(ij), grid%j_end(ij),                &
+                           k_start, k_end                                  )
+       END IF
+#endif
        CALL spec_bdy_dry ( config_flags,                                    &
                            ru_tend, rv_tend, ph_tend, t_tend,               &
                            rw_tend, mu_tend,                                &
@@ -1195,6 +1369,27 @@ BENCH_START(small_step_prep_tim)
 
       CALL wrf_debug ( 200 , ' call calc_coef_w' )
 
+#ifdef WRFVAR_TESTING
+      if(TEST_small_step_prep) THEN
+        CALL t_small_step_prep( u_1,u_2,v_1,v_2,w_1,w_2,          &
+                            t_1,t_2,ph_1,ph_2,                &
+                            mub, mu_1, mu_2,                  &
+                            muu, muus, muv, muvs,             &
+                            mut, muts, mudf,                  & 
+                            u_save, v_save, w_save,           & 
+                            t_save, ph_save, mu_save,         &
+                            ww, ww1,                          &
+                            dnw, c2a, pb, p, alt,             &
+                            msfu, msfv, msft,                 &
+                            rk_step,                          &
+                            ids, ide, jds, jde, kds, kde,     &
+                            ims, ime, jms, jme, kms, kme,     &
+                            grid%i_start(ij), grid%i_end(ij), &
+                            grid%j_start(ij), grid%j_end(ij), &
+                            k_start    , k_end               )
+      END IF
+#endif
+
       CALL small_step_prep( u_1,u_2,v_1,v_2,w_1,w_2,          &
                             t_1,t_2,ph_1,ph_2,                &
                             mub, mu_1, mu_2,                  &
@@ -1211,6 +1406,21 @@ BENCH_START(small_step_prep_tim)
                             grid%i_start(ij), grid%i_end(ij), &
                             grid%j_start(ij), grid%j_end(ij), &
                             k_start    , k_end               )
+#ifdef WRFVAR_TESTING
+      if(TEST_calc_p_rho) THEN
+      CALL t_calc_p_rho( al, p, ph_2,                      &
+                       alt, t_2, t_save, c2a, pm1,       &
+                       mu_2, muts, znu, t0,              &
+                       rdnw, dnw, smdiv,                 &
+                       non_hydrostatic, 0,               &
+                       ids, ide, jds, jde, kds, kde,     &
+                       ims, ime, jms, jme, kms, kme,     &
+                       grid%i_start(ij), grid%i_end(ij), &
+                       grid%j_start(ij), grid%j_end(ij), &
+                       k_start    , k_end               )
+      END IF
+#endif
+
       CALL calc_p_rho( al, p, ph_2,                      &
                        alt, t_2, t_save, c2a, pm1,       &
                        mu_2, muts, znu, t0,              &
@@ -1223,6 +1433,20 @@ BENCH_START(small_step_prep_tim)
                        k_start    , k_end               )
 
       IF (non_hydrostatic)                                &
+#ifdef WRFVAR_TESTING 
+      if(non_hydrostatic .and. TEST_calc_coef_w) THEN
+        CALL t_calc_coef_w( a,alpha,gamma,                  &
+                        mut, cqw,                         &
+                        rdn, rdnw, c2a,                   &
+                        dts_rk, g, epssm,                 &
+                        ids, ide, jds, jde, kds, kde,     &
+                        ims, ime, jms, jme, kms, kme,     &
+                        grid%i_start(ij), grid%i_end(ij), &
+                       grid%j_start(ij), grid%j_end(ij), &
+                        k_start    , k_end               )
+      END IF
+#endif
+
       CALL calc_coef_w( a,alpha,gamma,                    &
                         mut, cqw,                         &
                         rdn, rdnw, c2a,                   &
@@ -1376,7 +1600,25 @@ BENCH_END(set_phys_bc2_tim)
       DO ij = 1 , grid%num_tiles
 
 BENCH_START(advance_uv_tim)
-         CALL advance_uv ( u_2, ru_tend, v_2, rv_tend,       &
+#ifdef WRFVAR_TESTING
+         if(TEST_advance_uv) THEN
+           CALL t_advance_uv ( u_2, ru_tend, v_2, rv_tend,       &
+                           p, pb,                            &
+                           ph_2, php, alt, al, mu_2,         &
+                           muu, cqu, muv, cqv, mudf,         &
+                           rdx, rdy, dts_rk,                 &
+                           cf1, cf2, cf3, fnm, fnp,          &
+                           emdiv,                            &
+                           rdnw, config_flags,spec_zone,     &
+                           non_hydrostatic,                  &
+                           ids, ide, jds, jde, kds, kde,     &
+                           ims, ime, jms, jme, kms, kme,     &
+                           grid%i_start(ij), grid%i_end(ij), &
+                           grid%j_start(ij), grid%j_end(ij), &
+                           k_start    , k_end               ) 
+        END IF
+#endif
+        CALL advance_uv ( u_2, ru_tend, v_2, rv_tend,       &
                            p, pb,                            &
                            ph_2, php, alt, al, mu_2,         &
                            muu, cqu, muv, cqv, mudf,         &
@@ -1394,6 +1636,19 @@ BENCH_END(advance_uv_tim)
 
 BENCH_START(spec_bdy_uv_tim)
          IF( config_flags%specified .or. config_flags%nested ) THEN
+#ifdef WRFVAR_TESTING
+           if(TEST_spec_bdyupdate) THEN
+             CALL t_spec_bdyupdate(u_2, ru_tend, dts_rk,      &
+                               'u'         , config_flags, &
+                               spec_zone,                  &
+                               ids,ide, jds,jde, kds,kde,  & ! domain dims
+                               ims,ime, jms,jme, kms,kme,  & ! memory dims
+                               ips,ipe, jps,jpe, kps,kpe,  & ! patch  dims
+                               grid%i_start(ij), grid%i_end(ij),         &
+                               grid%j_start(ij), grid%j_end(ij),         &
+                               k_start    , k_end             )
+           END IF
+#endif
            CALL spec_bdyupdate(u_2, ru_tend, dts_rk,      &
                                'u'         , config_flags, &
                                spec_zone,                  &
@@ -1441,6 +1696,24 @@ BENCH_END(spec_bdy_uv_tim)
 
         !  advance the mass in the column, theta, and calculate ww
 
+#ifdef WRFVAR_TESTING
+        if(TEST_advance_mu_t) THEN
+          CALL t_advance_mu_t( ww, ww1, u_2, u_save, v_2, v_save, &
+                           mu_2, mut, muave, muts, muu, muv,  &
+                           mudf, ru_m, rv_m, ww_m,            &
+                           t_2, t_save, t_2save, t_tend,      &
+                           mu_tend,                           &
+                           rdx, rdy, dts_rk, epssm,           &
+                           dnw, fnm, fnp, rdnw,               &
+                           msfu, msfv, msft,                  &
+                           iteration, config_flags,           &
+                           ids, ide, jds, jde, kds, kde,      &
+                           ims, ime, jms, jme, kms, kme,      &
+                           grid%i_start(ij), grid%i_end(ij),  &
+                           grid%j_start(ij), grid%j_end(ij),  &
+                           k_start    , k_end                )
+        END IF
+#endif
 BENCH_START(advance_mu_t_tim)
         CALL advance_mu_t( ww, ww1, u_2, u_save, v_2, v_save, &
                            mu_2, mut, muave, muts, muu, muv,  &
@@ -1498,6 +1771,21 @@ BENCH_END(spec_bdy_t_tim)
          ! in the scalar advection (flux divergence).  Using
          ! time averaged values gives us exact scalar conservation.
 
+#ifdef WRFPLUS_TESTING
+         if(TEST_sumflux) THEN
+           CALL t_sumflux ( u_2, v_2, ww,                         &
+                        u_save, v_save, ww1,                  &
+                        muu, muv,                             &
+                        ru_m, rv_m, ww_m, epssm,              &
+                        msfu, msfv,                           &
+                        iteration, number_of_small_timesteps, &
+                        ids, ide, jds, jde, kds, kde,         &
+                        ims, ime, jms, jme, kms, kme,         &
+                        grid%i_start(ij), grid%i_end(ij),     &
+                        grid%j_start(ij), grid%j_end(ij),     &
+                        k_start    , k_end                   )
+         END IF
+#endif
 BENCH_START(sumflux_tim)
          CALL sumflux ( u_2, v_2, ww,                         &
                         u_save, v_save, ww1,                  &
@@ -1518,6 +1806,25 @@ BENCH_END(sumflux_tim)
 
 BENCH_START(advance_w_tim)
         IF ( non_hydrostatic ) THEN
+#ifdef WRFPLUS_TESTING
+          if(TEST_advance_w) THEN
+            CALL t_advance_w( w_2, rw_tend, ww, u_2, v_2,       &
+                          mu_2, mut, muave, muts,           &
+                          t_2save, t_2, t_save,             &
+                          ph_2, ph_save, phb, ph_tend,      &
+                          ht, c2a, cqw, alt, alb,           &
+                          a, alpha, gamma,                  &
+                          rdx, rdy, dts_rk, t0, epssm,      &
+                          dnw, fnm, fnp, rdnw, rdn,         &
+                          cf1, cf2, cf3, msft,              &
+                          config_flags,                     &
+                          ids,ide, jds,jde, kds,kde,        & ! domain dims
+                          ims,ime, jms,jme, kms,kme,        & ! memory dims
+                          grid%i_start(ij), grid%i_end(ij), &
+                          grid%j_start(ij), grid%j_end(ij), &
+                          k_start    , k_end               )
+          END IF
+#endif
           CALL advance_w( w_2, rw_tend, ww, u_2, v_2,       &
                           mu_2, mut, muave, muts,           &
                           t_2save, t_2, t_save,             &
@@ -1540,6 +1847,19 @@ BENCH_END(advance_w_tim)
 
 BENCH_START(spec_bdynhyd_tim)
            IF (non_hydrostatic)  THEN
+#ifdef WRFPLUS_TESTING
+             if(TEST_spec_bdyupdate_ph) THEN
+               CALL t_spec_bdyupdate_ph( ph_save, ph_2, ph_tend, mu_tend, muts, dts_rk, &
+                                     'h'         , config_flags, &
+                                     spec_zone,                  &
+                                     ids,ide, jds,jde, kds,kde,  & ! domain dims
+                                     ims,ime, jms,jme, kms,kme,  & ! memory dims
+                                     ips,ipe, jps,jpe, kps,kpe,  & ! patch  dims
+                                     grid%i_start(ij), grid%i_end(ij),         &
+                                     grid%j_start(ij), grid%j_end(ij),         &
+                                     k_start    , k_end             )
+             END IF
+#endif
              CALL spec_bdyupdate_ph( ph_save, ph_2, ph_tend, mu_tend, muts, dts_rk, &
                                      'h'         , config_flags, &
                                      spec_zone,                  &
@@ -1681,6 +2001,17 @@ BENCH_END(phys_bc_tim)
       ! change time-perturbation variables back to 
       ! full perturbation variables.
       ! first get updated mu at u and v points
+#ifdef WRFPLUS_TESTING
+      if(TEST_calc_mu_uv_1) THEN
+        CALL t_calc_mu_uv_1 ( config_flags,                     &
+                          muts, muus, muvs,                 &
+                          ids, ide, jds, jde, kds, kde,     &
+                          ims, ime, jms, jme, kms, kme,     &
+                          grid%i_start(ij), grid%i_end(ij), &
+                          grid%j_start(ij), grid%j_end(ij), &
+                          k_start    , k_end               )
+      END IF
+#endif
 
 BENCH_START(calc_mu_uv_tim)
       CALL calc_mu_uv_1 ( config_flags,                     &
@@ -1691,6 +2022,25 @@ BENCH_START(calc_mu_uv_tim)
                           grid%j_start(ij), grid%j_end(ij), &
                           k_start    , k_end               )
 BENCH_END(calc_mu_uv_tim)
+#ifdef WRFPLUS_TESTING
+      if(TEST_small_step_finish) THEN
+        CALL t_small_step_finish( u_2, u_1, v_2, v_1, w_2, w_1,     &
+                              t_2, t_1, ph_2, ph_1, ww, ww1,    &
+                              mu_2, mu_1,                       &
+                              mut, muts, muu, muus, muv, muvs,  &
+                              u_save, v_save, w_save,           &
+                              t_save, ph_save, mu_save,         &
+                              msfu, msfv, msft,                 &
+                              h_diabatic,                       &
+                              number_of_small_timesteps,dts_rk, &
+                              rk_step, rk_order,                &
+                              ids, ide, jds, jde, kds, kde,     &
+                              ims, ime, jms, jme, kms, kme,     &
+                              grid%i_start(ij), grid%i_end(ij), &
+                              grid%j_start(ij), grid%j_end(ij), &
+                              k_start    , k_end               )
+      END IF
+#endif
 BENCH_START(small_step_finish_tim)
       CALL small_step_finish( u_2, u_1, v_2, v_1, w_2, w_1,     &
                               t_2, t_1, ph_2, ph_1, ww, ww1,    &
@@ -1750,6 +2100,26 @@ BENCH_END(small_step_finish_tim)
 
        CALL wrf_debug ( 200 , ' call rk_scalar_tend' )
 
+#ifdef WRFPLUS_TESTING
+       if(TEST_rk_scalar_tend) THEN
+         CALL t_rk_scalar_tend (  im, im, config_flags,             &
+                              rk_step, dt_rk,                   &
+                              ru_m, rv_m, ww_m,                 &
+                              mut, alt,                         &
+                              moist(ims,kms,jms,im),          &
+                              moist_tend(ims,kms,jms,im),       &
+                              advect_tend,RQVFTEN,              &
+                              qv_base, .true., fnm, fnp,        &
+                              msfu, msfv, msft,                 &
+                              rdx, rdy, rdn, rdnw, khdif,       &
+                              kvdif, xkmhd,                     &
+                              ids, ide, jds, jde, kds, kde,     &
+                              ims, ime, jms, jme, kms, kme,     &
+                              grid%i_start(ij), grid%i_end(ij), &
+                              grid%j_start(ij), grid%j_end(ij), &
+                              k_start    , k_end               )
+       END IF
+#endif
 BENCH_START(rk_scalar_tend_tim)
        CALL rk_scalar_tend (  im, im, config_flags,             &
                               rk_step, dt_rk,                   &
@@ -1786,6 +2156,21 @@ BENCH_START(rlx_bdy_scalar_tim)
                                     grid%j_start(ij), grid%j_end(ij),      &
                                     k_start, k_end                        )
 
+#ifdef WRFPLUS_TESTING
+         if(TEST_spec_bdy_scalar) THEN
+           CALL t_spec_bdy_scalar  ( moist_tend(ims,kms,jms,im),                &
+                                    moist_b(1,1,1,1,im),                     &
+                                    moist_bt(1,1,1,1,im),                    &
+                                 spec_bdy_width, spec_zone,                 &
+                                 ijds, ijde,                 & ! min/max(id,jd)
+                                 ids,ide, jds,jde, kds,kde,  & ! domain dims
+                                 ims,ime, jms,jme, kms,kme,  & ! memory dims
+                                 ips,ipe, jps,jpe, kps,kpe,  & ! patch  dims
+                                 grid%i_start(ij), grid%i_end(ij),          &
+                                 grid%j_start(ij), grid%j_end(ij),          &
+                                 k_start, k_end                               )
+            END IF
+#endif
             CALL spec_bdy_scalar  ( moist_tend(ims,kms,jms,im),                &
                                     moist_b(1,1,1,1,im),                     &
                                     moist_bt(1,1,1,1,im),                    &
@@ -1811,6 +2196,23 @@ BENCH_END(rlx_bdy_scalar_tim)
 
        CALL wrf_debug ( 200 , ' call rk_update_scalar' )
 
+#ifdef WRFPLUS_TESTING
+       if(TEST_rk_update_scalar) THEN
+         CALL t_rk_update_scalar( im, im,                           &
+                              moist_old(ims,kms,jms,im),          &
+                              moist(ims,kms,jms,im),          &
+                              moist_tend(ims,kms,jms,im),       &
+                              advect_tend, msft,                &
+                              mu_1, mu_2, mub,                  &
+                              rk_step, dt_rk, spec_zone,        &
+                              config_flags,              &
+                              ids, ide, jds, jde, kds, kde,     &
+                              ims, ime, jms, jme, kms, kme,     &
+                              grid%i_start(ij), grid%i_end(ij), &
+                              grid%j_start(ij), grid%j_end(ij), &
+                              k_start    , k_end               )
+       END IF
+#endif
 BENCH_START(update_scal_tim)
        CALL rk_update_scalar( im, im,                           &
                               moist_old(ims,kms,jms,im),        &
@@ -1896,6 +2298,7 @@ BENCH_START(tke_adv_tim)
    tke_tile_loop_2: DO ij = 1 , grid%num_tiles
 
      CALL wrf_debug ( 200 , ' call rk_update_scalar' )
+
      CALL rk_update_scalar( 1, 1,                             &
                             tke_1(ims,kms,jms),               &
                             tke_2(ims,kms,jms),               &
@@ -2138,6 +2541,20 @@ BENCH_END(tke_adv_tim)
    !$OMP PRIVATE ( ij )
    DO ij = 1 , grid%num_tiles
 
+#ifdef WRFPLUS_TESTING
+     if(TEST_calc_p_rho_phi) THEN
+       CALL t_calc_p_rho_phi( moist, num_3d_m,                &
+                          al, alb, mu_2, muts,              &
+                          ph_2, p, pb, t_2,                 &
+                          p0, t0, znu, dnw, rdnw,           &
+                          rdn, non_hydrostatic,             &
+                          ids, ide, jds, jde, kds, kde,     &
+                          ims, ime, jms, jme, kms, kme,     &
+                          grid%i_start(ij), grid%i_end(ij), &
+                          grid%j_start(ij), grid%j_end(ij), &
+                          k_start    , k_end               )
+     END IF
+#endif
 BENCH_START(calc_p_rho_tim)
 
      CALL calc_p_rho_phi( moist, num_3d_m,                &
@@ -2227,6 +2644,18 @@ BENCH_START(bc_end_tim)
 
 BENCH_START(diag_w_tim)
      IF (.not. non_hydrostatic) THEN
+#ifdef WRFPLUS_TESTING
+     if(TEST_diagnose_w) THEN
+       CALL t_diagnose_w( ph_tend, ph_2, ph_1, w_2, muts, dt_rk,  &
+                      u_2, v_2, ht,                           &
+                      cf1, cf2, cf3, rdx, rdy, msft,          &
+                      ids, ide, jds, jde, kds, kde,           &
+                      ims, ime, jms, jme, kms, kme,           &
+                      grid%i_start(ij), grid%i_end(ij),       &
+                      grid%j_start(ij), grid%j_end(ij),       &
+                      k_start    , k_end                     )
+      END IF
+#endif
      CALL diagnose_w( ph_tend, ph_2, ph_1, w_2, muts, dt_rk,  &
                       u_2, v_2, ht,                           &
                       cf1, cf2, cf3, rdx, rdy, msft,          &
@@ -2757,6 +3186,37 @@ BENCH_END(bc_2d_tim)
        CALL wrf_error_fatal(TRIM(wrf_err_message))
      ENDIF
    endif
+#endif
+
+#ifdef WRFPLUS_TESTING
+
+! add diagnoses. hans_xyh huang.
+
+   DO ij = 1 , grid%num_tiles
+
+     call calc_dpsdt ( itimestep, dt, psfc, psfcm, 'ps', &
+                       avg_abs_dpsdt, dpsdt,             &
+                       ids, ide, jds, jde,               &
+                       ims, ime, jms, jme,               &
+                       grid%i_start(ij), grid%i_end(ij), &
+                       grid%j_start(ij), grid%j_end(ij)  )
+     call calc_dpsdt ( itimestep, dt, mu_2, mu_1, 'mu',  &
+                       avg_abs_dmudt, dmudt,             &
+                       ids, ide, jds, jde,               &
+                       ims, ime, jms, jme,               &
+                       grid%i_start(ij), grid%i_end(ij), &
+                       grid%j_start(ij), grid%j_end(ij)  )
+
+     call calc_q_conv_2d ( moist, u_2, v_2,                &
+                           dt, DX, q_conve_2d,               &
+                           num_3d_m,                         &
+                           ids, ide, jds, jde, kds, kde,     &
+                           ims, ime, jms, jme, kms, kme,     &
+                           grid%i_start(ij), grid%i_end(ij), &
+                           grid%j_start(ij), grid%j_end(ij), &
+                           k_start, k_end                    )
+
+   ENDDO
 #endif
 
    CALL wrf_debug ( 200 , ' call end of solve_em' )
