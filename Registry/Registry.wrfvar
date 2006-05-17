@@ -351,6 +351,19 @@ state   real    cf3            -        misc      -         -     irh       "cf3
 state   integer number_at_same_level    -        -          -         -     -        "number_at_same_level"  ""         ""      
 state   integer itimestep      -        -          -         -     rh         "itimestep"             ""         ""      
 
+# for noise diagnoses
+
+state    real   dpsdt           ij     misc      1          -     h        "dpsdt" "surface pressure tendency" "hPa/3h"
+state    real   dmudt           ij     misc      1          -     h        "dmudt" "mu tendency" "hPa/3h"
+state    real   psfcm           ij     misc      1          -     h        "psfcm" "surface pressure at previous step" "Pa"
+state    real   avg_abs_dpsdt   -      misc      -          -     h        "avg_abs_dpsdt" "average absolute surface pressure (psfc) tendency" "hPa/3h"
+state    real   avg_abs_dmudt   -      misc      -          -     h        "avg_abs_dmudt" "average absolute mu tendency" "hPa/3h"
+
+# for moisture convergences
+
+state    real   q_conve_3d      ikj    misc      1          -     h         "q_conve_3d" "Water vapour convergence (3d)"   "(g/kg)/3h"
+state    real   q_conve_2d      ij     misc      1          -     h         "q_conve_2d" "Water vapour convergence (2d)"   "(g/kg)/s"
+
 # Output file descriptor for a domain                                           
 state   integer oid            -        -          -         -     -         "oid"                   ""         ""      
 state   integer auxhist1_oid   -        -          -         -     -         "auxhist1_oid"          ""         ""
