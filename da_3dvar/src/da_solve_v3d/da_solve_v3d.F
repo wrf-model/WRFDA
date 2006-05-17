@@ -263,9 +263,34 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
    allocate( xhat(1:cv_size) )
    call da_initialize_cv( cv_size, cvt )
    call da_initialize_cv( cv_size, xhat )
-
+      
    call da_zero_vp_type( vv )
    call da_zero_vp_type( vp )
+
+   if ( test_transforms .or. Testing_WRFVAR ) then
+      CALL da_get_innov_vector( it, ob, iv, &
+                                grid , config_flags , &
+#include <em_dummy_args.inc>
+                 )
+
+
+      call da_allocate_y( iv, re )
+      call da_allocate_y( iv, y )
+
+      allocate( cvt(1:cv_size) )
+      allocate( xhat(1:cv_size) )
+      call da_initialize_cv( cv_size, cvt )
+      call da_initialize_cv( cv_size, xhat )
+
+
+      call da_check( xb, xbx, be, iv, cv1d, &
+                     xa, vv, vp, xp, ob, y, &
+                     ids, ide, jds, jde, kds, kde, &
+                     ims, ime, jms, jme, kms, kme, &
+                     its, ite, jts, jte, kts, kte )
+      call da_zero_vp_type( vv )
+      call da_zero_vp_type( vp )
+   endif
 
 !------------------------------------------------------------------------------
 !  [8] Outerloop
@@ -288,6 +313,15 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
 #include <em_dummy_args.inc>
                  )
 
+
+      if ( test_transforms ) then
+         call da_check( cv_size, grid, config_flags, xb, xbx, be, ep, iv, &
+                        xa, vv, vp, xp, ob, y, &
+                        ids, ide, jds, jde, kds, kde, &
+                        ims, ime, jms, jme, kms, kme, &
+                        its, ite, jts, jte, kts, kte )
+      end if
+
       if ( testing_wrfvar ) then
          call da_check( cv_size, xb, xbx, be, ep, iv, &
                         xa, vv, vp, xp, ob, y, &
@@ -309,13 +343,19 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
       call da_allocate_y( iv, y )
 
       CALL DA_Minimise_CG( grid, config_flags,                  &
-                           it, be % cv % size, &
+                           it, be % cv % size, & 
                            ob, xb, xbx, be, ep, iv, &
                            j_grad_norm_target, xhat, cvt, &
                            xa, vv, vp, xp, re, y, j,    &
                            ids, ide, jds, jde, kds, kde,        &
                            ims, ime, jms, jme, kms, kme,        &
                            its, ite, jts, jte, kts, kte         )
+
+!------------------------------------------------------------------------------
+!   For first outer loop write filtered obs when ntmax = 0
+!   if(it == 1 .and. ntmax == 0) &
+!    CALL da_write_filtered_obs(gts_iunit, filtered_obs_iunit, ob, iv)
+
 
 !     [8.5] Update latest analysis solution:
 
