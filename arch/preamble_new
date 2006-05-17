@@ -46,7 +46,7 @@ PHDF5_LIB  = -L$(EXTERNAL)/io_phdf5 -lwrfio_phdf5 -L$(PHDF5_PATH)/lib -lhdf5_for
 #### Note to add a core, this has to be added to.
 
 # Does not work yet
-# VAR4DPOSS=-DVAR4DPOSS
+VAR4DPOSS=-DVAR4DPOSS
 
 COREDEFS = -DEM_CORE=1        \
            -DDA_CORE=1        \
