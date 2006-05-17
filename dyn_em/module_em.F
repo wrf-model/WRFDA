@@ -433,11 +433,13 @@ SUBROUTINE rk_tendency ( config_flags, rk_step,                           &
                   ims, ime, jms, jme, kms, kme,   &
                   its, ite, jts, jte, kts, kte   )
 
+  IF(config_flags%w_damping.eq.1)THEN
   CALL w_damp   ( rw_tend, ww, w, mut, rdnw, dt,    &
                     config_flags%w_damping,         &
                     ids, ide, jds, jde, kds, kde,   &
                     ims, ime, jms, jme, kms, kme,   &
                     its, ite, jts, jte, kts, kte   )
+  END IF
 
   IF(config_flags%pert_coriolis) THEN
 
@@ -776,6 +778,7 @@ SUBROUTINE rk_scalar_tend ( scs, sce, config_flags,    &
                               ims, ime, jms, jme, kms, kme,  &
                               its, ite, jts, jte, kts, kte  )
 
+
      IF( config_flags%cu_physics == GDSCHEME .and. moist_step .and. ( im == P_QV) ) THEN
 
         CALL set_tend( RQVFTEN, advect_tend, msft,     &
@@ -787,6 +790,8 @@ SUBROUTINE rk_scalar_tend ( scs, sce, config_flags,    &
      diff_opt1 : IF (config_flags%diff_opt .eq. 1) THEN
 
        rk_step_1: IF( rk_step == 1 ) THEN
+
+
 
 
        CALL horizontal_diffusion ( 'm', scalar(ims,kms,jms,im),            &
@@ -822,6 +827,9 @@ SUBROUTINE rk_scalar_tend ( scs, sce, config_flags,    &
          END IF
 
       ENDIF pbl_test
+
+
+
 
     ENDIF rk_step_1
 
@@ -912,6 +920,7 @@ SUBROUTINE rk_update_scalar( scs, sce,                      &
       k_start = kts
       k_end   = min( kte, kde-1 )
     ENDIF
+
 
     IF ( rk_step == 1 ) THEN
 
