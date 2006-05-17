@@ -33,7 +33,7 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
    IMPLICIT NONE
 
 #ifdef DM_PARALLEL 
-   INCLUDE 'mpif.h'
+!   INCLUDE 'mpif.h'
 #endif
 
    TYPE(domain),                intent(inout) :: grid
@@ -283,7 +283,7 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
       call da_initialize_cv( cv_size, xhat )
 
 
-      call da_check( xb, xbx, be, iv, cv1d, &
+      call da_check( cv_size, xb, xbx, be, ep, iv, &
                      xa, vv, vp, xp, ob, y, &
                      ids, ide, jds, jde, kds, kde, &
                      ims, ime, jms, jme, kms, kme, &
@@ -315,7 +315,7 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
 
 
       if ( test_transforms ) then
-         call da_check( cv_size, grid, config_flags, xb, xbx, be, ep, iv, &
+         call da_check( cv_size, xb, xbx, be, ep, iv, &
                         xa, vv, vp, xp, ob, y, &
                         ids, ide, jds, jde, kds, kde, &
                         ims, ime, jms, jme, kms, kme, &
