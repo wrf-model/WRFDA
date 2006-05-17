@@ -301,8 +301,9 @@ RECURSIVE SUBROUTINE integrate_ad ( grid, nl_date_string, nl_date_index, ad_date
       endif
 !-----end check adjoint input
 
-!JRB      CALL ESMF_TimeIntervalPrint(grid%domain_clock%TimeStep, 'DEBUG:  integrate_ad.', rc)
-!JRB      CALL print_a_timeinterval(grid%domain_clock%TimeStep)
+      CALL ESMF_TimeIntervalPrint(grid%domain_clock%clockint%TimeStep, 'DEBUG:  integrate_ad.', rc)
+      CALL print_a_timeinterval(grid%domain_clock%clockint%TimeStep)
+
       DO WHILE ( grid%current_time .GT. grid%start_subtime )
          IF ( wrf_dm_on_monitor() ) THEN
            CALL start_timing
@@ -479,6 +480,8 @@ RECURSIVE SUBROUTINE integrate_ad ( grid, nl_date_string, nl_date_index, ad_date
 !--------end check adjoint input
 !          CALL med_last_solve_ad_io ( grid , config_flags )
          call med_filter_out ( grid , config_flags )
+!--------Force output last gradient.
+         call med_hist_out ( grid , 0 , config_flags )
       ELSE
         IF ( ESMF_ClockIsStartTime(grid%domain_clock , rc=rc) .OR. &
              ESMF_ClockIsStartTime(grid%parents(1)%ptr%domain_clock , rc=rc ) ) THEN
