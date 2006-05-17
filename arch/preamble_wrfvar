@@ -64,7 +64,7 @@ NETCDF_LIB = -L$(EXTERNAL)/io_netcdf -lwrfio_nf -L$(NETCDFPATH)/lib -lnetcdf
 PHDF5_LIB  = -L\$(EXTERNAL)/io_phdf5 -lwrfio_phdf5 -L$(PHDF5PATH)/lib -lhdf5_fortran -lhdf5 -lm -lz -L$(PHDF5PATH)/lib -lsz
 LIBINCLUDE = -I. -I$(INC) -I$(IOAPI_SHARE)
 
-ARCHFLAGS2      = $(WORDSIZE_DEF) -DLIMIT_ARGS
+ARCHFLAGS2      = $(WORDSIZE_DEF) -DLIMIT_ARGS -DWRFPLUS_TESTING
 
 #### Get core settings from environment (set in compile script)
 #### Note to add a core, this has to be added to.
