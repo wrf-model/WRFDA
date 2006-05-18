@@ -298,7 +298,7 @@ FPPFLAGS2       =       -DTRIEDNTRUE -DONLY_WRFMODEL_IO
 FPPFLAGS_BUFR   =       -C -P  $(CPPTRADFLAG) -DLINUX -Dlinux
 FCOPTIM         =       
 FCDEBUG         =       #-g
-FCFORM          =       -ffree-form
+FCFORM          =       -ffree-form  -ffree-line-length-huge
 FCENDIAN        =
 FCBASE          =       -cpp -Wno=101,139,155,158 -fno-second-underscore -ftrace=full
 FCTYPE          =       -r8
@@ -336,7 +336,7 @@ DM_CPP_FLAGS    =       -I$(RSL_PATH)/RSL `cat inc/dm_comm_cpp_flags`
 FPPFLAGS_BUFR   =       -C -P $(CPPTRADFLAG) -DLINUX -Dlinux
 FCOPTIM         =      
 FCDEBUG         =       #-g
-FCFORM          =       -ffree-form
+FCFORM          =       -ffree-form  -ffree-line-length-huge
 FCENDIAN        =
 FCBASE          =       -cpp -Wno=101,139,155,158 -fno-second-underscore -ftrace=full
 FCTYPE          =       -r8
@@ -832,7 +832,7 @@ FPPFLAGS2      =       -DINTIO -DTRIEDNTRUE -DMACOS \
 FCOPTIM         =       
 FCDEBUG         =       #-g
 FCTYPE          =       -r8
-FCFORM          =       -ffree-form
+FCFORM          =       -ffree-form -ffree-line-length-huge
 FCENDIAN        =
 FCBASE          =       -cpp -Wno=101,139,155,158 -fno-second-underscore -ftrace=full
 
@@ -867,7 +867,7 @@ DM_CPP_FLAGS    =       -I$(RSL_PATH)/RSL `cat inc/dm_comm_cpp_flags`
 FCOPTIM         =       
 FCDEBUG         =       #-g
 FCTYPE          =       -r8
-FCFORM          =       -ffree-form
+FCFORM          =       -ffree-form  -ffree-line-length-huge
 FCENDIAN        =
 FCBASE          =       -cpp -Wno=101,139,155,158 -fno-second-underscore -ftrace=full
 

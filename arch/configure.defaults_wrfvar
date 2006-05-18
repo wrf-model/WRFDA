@@ -280,7 +280,7 @@ TRADFLAG        =       -traditional
 FCOPTIM         =       
 FCDEBUG         =       #-g
 FCTYPE          =       -r8
-FCFORM          =       -ffree-form
+FCFORM          =       -ffree-form -ffree-line-length-huge
 FCHOST          =       
 FCBUFR          =       -cpp -Wno=101,139,155,158 -fno-second-underscore -ftrace=full
 FCBASE          =       $(FCBUFR)
@@ -787,7 +787,7 @@ TRADFLAG        =
 FCOPTIM         =       -O0
 FCDEBUG         =       #-g
 FCTYPE          =       -r8
-FCFORM          =       -ffree-form
+FCFORM          =       -ffree-form -ffree-line-length-huge
 FCBASE          =       -cpp -Wno=101,139,155,158 -fno-second-underscore -ftrace=full
 FCBUFR          =       $(FCBASE)
 FC_FFT_RF       =       $(FCBASE)
