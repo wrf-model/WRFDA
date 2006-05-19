@@ -513,7 +513,10 @@ loop_level: DO i = 1, platform%info%levels
             ob%sonde_sfc(num_sound)%q = ob%sonde_sfc(num_sound)%u
          endif
 
-         if(nlevels < 1) cycle reports
+         if(nlevels < 1) then
+              ob%sound(num_sound)%info%levels = 0
+              cycle reports
+         endif
 
          allocate (ob%sound(num_sound)%h (1:nlevels))
          allocate (ob%sound(num_sound)%p (1:nlevels))
@@ -786,7 +789,6 @@ loop_level: DO i = 1, platform%info%levels
            ob%profiler(num_profiler)%v(i) = platform%each(i)%v
          enddo
 
-#if 0
 !     else if(index(platform%info%source, 'TCBGS') > 0) then
 
          CASE (135) ;
@@ -837,7 +839,6 @@ loop_level: DO i = 1, platform%info%levels
             write(*,fmt='(2(a,i4))') 'ob%num_bogus=',num_bogus, &
                                      'nlevels=',nlevels
          end if
-#endif
 
          CASE (18,19) ;             ! bouy
 

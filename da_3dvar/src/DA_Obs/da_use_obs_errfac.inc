@@ -311,7 +311,7 @@ SUBROUTINE da_use_obs_errfac( iv )
    IF ( iv % num_bogus > 0 ) THEN
 
       call da_read_errfac( 'bogus', iv % bogus_ef_u, iv % bogus_ef_v, &
-                           iv % bogus_ef_slp, d1, d2 )
+                           iv % bogus_ef_t, iv % bogus_ef_q, iv % bogus_ef_slp )
 
       DO n = 1, iv % num_bogus
          DO k = 1, iv % bogus(n) % info % levels
@@ -319,6 +319,10 @@ SUBROUTINE da_use_obs_errfac( iv )
                                            iv % bogus_ef_u
             iv % bogus(n) % v(k) % error = iv % bogus(n) % v(k) % error * &
                                            iv % bogus_ef_v
+            iv % bogus(n) % t(k) % error = iv % bogus(n) % t(k) % error * &
+                                           iv % bogus_ef_t
+            iv % bogus(n) % q(k) % error = iv % bogus(n) % q(k) % error * &
+                                           iv % bogus_ef_q
 
          END DO
 

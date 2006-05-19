@@ -53,6 +53,8 @@ SUBROUTINE DA_Deallocate_Y( y )
       do n = 1, y % num_bogus
          DEALLOCATE (y % bogus(n)%u)
          DEALLOCATE (y % bogus(n)%v)
+         DEALLOCATE (y % bogus(n)%t)
+         DEALLOCATE (y % bogus(n)%q)
       enddo
      DEALLOCATE (y % bogus)
    endif

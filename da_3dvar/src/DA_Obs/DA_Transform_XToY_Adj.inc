@@ -126,9 +126,7 @@ SUBROUTINE DA_Transform_XToY_Adj( xb, iv, xp, jo_grad_y, jo_grad_x )
 !  [19.0] TC bogus observation operator y = H(x):
 !------------------------------------------------------------------------------
 
-#if 0
    call da_transform_xtoy_Bogus_adj ( xb, iv, xp, jo_grad_y, jo_grad_x )
-#endif
 
 !------------------------------------------------------------------------------
 END SUBROUTINE DA_Transform_XToY_Adj

@@ -69,10 +69,13 @@ SUBROUTINE DA_Deallocate_Observations ( ob )
 
    IF ( ob % num_bogus > 0 ) then
       do n = 1, ob % num_bogus
+         deallocate (ob % bogus ( n ) % h )
          deallocate (ob % bogus ( n ) % p )
          deallocate (ob % bogus ( n ) % zk)
          deallocate (ob % bogus ( n ) % u )
          deallocate (ob % bogus ( n ) % v )
+         deallocate (ob % bogus ( n ) % t )
+         deallocate (ob % bogus ( n ) % q )
       enddo
 
       DEALLOCATE (ob % bogus)

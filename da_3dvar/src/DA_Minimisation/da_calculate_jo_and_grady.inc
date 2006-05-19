@@ -167,7 +167,9 @@
 !     TC bogus:
 
       call da_calculate_jo_and_grady_bogus ( iv, re, jo, jo_grad_y)
-      jo_bogus = jo % bogus_u + jo % bogus_v + jo % bogus_slp
+      jo_bogus = jo % bogus_u + jo % bogus_v + jo % bogus_slp + &
+                  jo % bogus_t + jo % bogus_q
+
       
 !     Buoy: 
 

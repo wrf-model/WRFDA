@@ -26,13 +26,16 @@ SUBROUTINE da_transform_xtoy_bogus (xa, xb, iv, xp, y )
    
    IF ( iv%num_bogus > 0 ) THEN
 
-      do n=1, iv % num_bogus
+!xyh      do n=1, iv % num_bogus
+      do n=iv%ob_numb(iv%current_ob_time-1)%bogus+1,iv%ob_numb(iv%current_ob_time)%bogus
 
        if(iv%bogus(n)%loc%proc_domain_with_halo) then
 
-         y%bogus(n)%slp  = 0.0
-         y%bogus(n)%u(:) = 0.0
-         y%bogus(n)%v(:) = 0.0
+!xyh         y%bogus(n)%slp  = 0.0
+!xyh         y%bogus(n)%u(:) = 0.0
+!xyh         y%bogus(n)%v(:) = 0.0
+!xyh         y%bogus(n)%t(:) = 0.0
+!xyh         y%bogus(n)%q(:) = 0.0
 
          num_levs = iv % bogus(n) % info % levels
 
@@ -84,11 +87,19 @@ SUBROUTINE da_transform_xtoy_bogus (xa, xb, iv, xp, y )
                             y%bogus(n)%u, num_levs, iv%bogus(n)%zk, num_levs)
          call Interp_lin_3D(xa % v, xp, i, j, dx, dy, dxm, dym, &
                             y%bogus(n)%v, num_levs, iv%bogus(n)%zk, num_levs)
+         call Interp_lin_3D(xa % t, xp, i, j, dx, dy, dxm, dym, &
+                            y%bogus(n)%t, num_levs, iv%bogus(n)%zk, num_levs)
+         call Interp_lin_3D(xa % q, xp, i, j, dx, dy, dxm, dym, &
+                            y%bogus(n)%q, num_levs, iv%bogus(n)%zk, num_levs)
 #else
          call Interp_lin_3D(xa % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                             y%bogus(n)%u(1), num_levs, iv%bogus(n)%zk(1), num_levs)
          call Interp_lin_3D(xa % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                             y%bogus(n)%v(1), num_levs, iv%bogus(n)%zk(1), num_levs)
+         call Interp_lin_3D(xa % t(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+                            y%bogus(n)%t(1), num_levs, iv%bogus(n)%zk(1), num_levs)
+         call Interp_lin_3D(xa % q(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+                            y%bogus(n)%q(1), num_levs, iv%bogus(n)%zk(1), num_levs)
 #endif
 
        end if

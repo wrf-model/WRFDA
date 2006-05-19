@@ -299,7 +299,6 @@ SUBROUTINE da_random_omb_all( iv, ob )
       END DO
    ENDIF
 
-#if 0
 !  [2.16] Transfer TC bogus obs:
 
    IF ( iv % num_bogus > 0 ) THEN
@@ -319,6 +318,5 @@ SUBROUTINE da_random_omb_all( iv, ob )
                              iv % bogus(n) % slp % qc, iv % bogus(n) % slp % inv )
       END DO
    ENDIF
-#endif
 
 END SUBROUTINE da_random_omb_all

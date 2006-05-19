@@ -13,11 +13,13 @@ MODULE DA_Bogus
    TYPE residual_bogus1_type
       REAL          :: u                        ! u-wind.
       REAL          :: v                        ! v-wind.
+      REAL          :: t                        ! temperature
+      REAL          :: q                        ! specific humidity
       REAL          :: slp                      ! sea level pressure (hPa)
    END TYPE residual_bogus1_type
 
    TYPE maxmin_bogus_stats_type
-        TYPE (maxmin_type)         :: u, v, slp 
+        TYPE (maxmin_type)         :: u, v, t, q, slp 
    END TYPE maxmin_bogus_stats_type
 
    TYPE stats_bogus_type

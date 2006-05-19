@@ -439,16 +439,20 @@ SUBROUTINE da_add_noise_to_ob( iv, ob )
 !           Add random perturbation:
             call da_add_noise( iv % bogus(n) % u(k), ob % bogus(n) % u(k), z1)
             call da_add_noise( iv % bogus(n) % v(k), ob % bogus(n) % v(k), z2)
+            call da_add_noise( iv % bogus(n) % t(k), ob % bogus(n) % t(k), z3)
+            call da_add_noise( iv % bogus(n) % q(k), ob % bogus(n) % q(k), z4)
 
 !           Write out data:
             write(rand_unit,'(2i8,10e15.7)')n, k, &
                                iv % bogus(n) % u(k) % error, z1, &
-                               iv % bogus(n) % v(k) % error, z2
+                               iv % bogus(n) % v(k) % error, z2, &
+                               iv % bogus(n) % t(k) % error, z3, &
+                               iv % bogus(n) % q(k) % error, z4
          END DO
 
-         call da_add_noise( iv % bogus(n) % slp, ob % bogus(n) % slp, z3 )
+         call da_add_noise( iv % bogus(n) % slp, ob % bogus(n) % slp, z5 )
          write(rand_unit,'(2i8,10e15.7)')n, 1, &
-                                  iv % bogus(n) % slp % error, z3
+                                  iv % bogus(n) % slp % error, z5
 
       END DO
    ENDIF

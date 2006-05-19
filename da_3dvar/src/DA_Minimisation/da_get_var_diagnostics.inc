@@ -55,8 +55,9 @@ subroutine da_get_var_diagnostics ( iv, j )
                          j % jo % airep_t, dum1, dum2, dum3, dum4 )
       call da_sum_reals( 2, j % jo % pilot_u, j % jo % pilot_v, dum1, dum2,   &
                                                              dum3, dum4, dum5 )
-      call da_sum_reals( 3, j % jo % bogus_u, j % jo % bogus_v, &
-                            j % jo % bogus_slp, dum1, dum2, dum3, dum4 )
+      call da_sum_reals( 5, j % jo % bogus_u, j % jo % bogus_v, &
+                            j % jo % bogus_t, j % jo % bogus_q, &
+                            j % jo % bogus_slp, dum1, dum2 )
       call da_sum_reals( 2, j % jo % ssmir_speed, j % jo % ssmir_tpw, &
                          dum1, dum2, dum3, dum4, dum5 )
       call da_sum_reals( 7, j % jo % ssmi_tb19v, j % jo % ssmi_tb19h, &
@@ -250,8 +251,9 @@ subroutine da_get_var_diagnostics ( iv, j )
                                   iv % num_bogus_glo, num_bogus_tot, &
                                   j % jo % bogus_u, iv % bogus_ef_u, &
                                   j % jo % bogus_v, iv % bogus_ef_v, &
-                                  j % jo % bogus_slp, iv % bogus_ef_slp, &
-                                  0.0, 1.0, 0.0, 1.0
+                                  j % jo % bogus_t, iv % bogus_ef_t, &
+                                  j % jo % bogus_q, iv % bogus_ef_q, &
+                                  j % jo % bogus_slp, iv % bogus_ef_slp
          end if
 
          if ( iv % num_pilot_glo > 0 ) then

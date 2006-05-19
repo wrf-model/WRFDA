@@ -345,11 +345,14 @@ MODULE DA_Define_Structures
       TYPE (info_type)        :: info
       TYPE (model_loc_type)   :: loc
 
-      REAL                  , pointer :: p        (:) ! Height in m
+      REAL                  , pointer :: h        (:) ! Height in m
+      REAL                  , pointer :: p        (:) ! pressure.
       REAL                  , pointer :: zk       (:) ! k-coordinates
 
       TYPE (field_type)     , pointer :: u        (:) ! u-wind.
       TYPE (field_type)     , pointer :: v        (:) ! v-wind.
+      TYPE (field_type)     , pointer :: t        (:) ! temperature.
+      TYPE (field_type)     , pointer :: q        (:) ! q.
       TYPE (field_type)               :: slp          ! sea level pressure.
    END TYPE bogus_type
 
@@ -595,7 +598,7 @@ MODULE DA_Define_Structures
       real    :: profiler_ef_u, profiler_ef_v
       real    :: buoy_ef_u, buoy_ef_v, buoy_ef_t, buoy_ef_p, buoy_ef_q
       real    :: Radar_ef_rv, Radar_ef_rf
-      real    :: bogus_ef_u, bogus_ef_v, bogus_ef_slp
+      real    :: bogus_ef_u, bogus_ef_v, bogus_ef_t, bogus_ef_p, bogus_ef_q, bogus_ef_slp
 
       TYPE (sound_type)         , pointer :: sound(:)
       TYPE (synop_type)         , pointer :: sonde_sfc(:)
@@ -733,6 +736,8 @@ MODULE DA_Define_Structures
    TYPE residual_bogus_type
       REAL, POINTER :: u(:)                     ! u-wind.
       REAL, POINTER :: v(:)                     ! v-wind.
+      REAL, POINTER :: t(:)                     ! temperature.
+      REAL, POINTER :: q(:)                     ! specific humidity.
       REAL          :: slp                      ! sea-level pressure.
    END TYPE residual_bogus_type
 
@@ -856,7 +861,7 @@ MODULE DA_Define_Structures
       real                :: profiler_u, profiler_v
       real                :: buoy_u, buoy_v, buoy_t, buoy_p, buoy_q
       real                :: Radar_rv, Radar_rf
-      real                :: bogus_u, bogus_v, bogus_slp
+      real                :: bogus_u, bogus_v, bogus_t, bogus_q, bogus_slp
    end type jo_type
 
    type j_type

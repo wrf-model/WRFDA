@@ -394,6 +394,8 @@ CONTAINS
 
       CASE(PROJ_MERC)
         CALL llij_merc(lat,lon,proj,i,j)
+        i = i + proj%knowni - 1.0
+        j = j + proj%knownj - 1.0
 
       CASE(PROJ_PS)
         CALL llij_ps(lat,lon,proj,i,j)
@@ -437,6 +439,8 @@ CONTAINS
         CALL ijll_latlon(i, j, proj, lat, lon)
 
       CASE (PROJ_MERC)
+        i = ii - proj%knowni + 1.0
+        j = jj - proj%knownj + 1.0
         CALL ijll_merc(i, j, proj, lat, lon)
 
       CASE (PROJ_PS)

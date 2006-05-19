@@ -408,6 +408,8 @@ MODULE DA_Constants
                     max_error_rv             = 5, &
                     max_error_rf             = 5, &
                     max_error_buv            = 500, &
+                    max_error_bt             = 500, &
+                    max_error_bq             = 500, &
                     max_error_slp            = 500
 
 !  Define various ways for bad data to be flagged.  
@@ -470,7 +472,7 @@ MODULE DA_Constants
                            max_pilot = 30000,  &   ! Maximum Number of PILOT obs.
                            max_metar = 30000,  &   ! Maximum Number of METAR obs.
                            max_gpspw = 4000,   &   ! Maximum Number of GPSPW obs.
-                           max_gpsref= 5000,   &   ! Maximum Number of GPSRef obs.
+                           max_gpsref= 800000, &   ! Maximum Number of GPSRef obs.
                            max_ships = 20000,  &   ! Maximum Number of SHIP obs.
                            max_ssmi_retrieval = 30000, & ! Maximum Number of SSMI_retrieval obs.
                            max_ssmi_tb        = 30000, & ! Maximum Number of SSMI_tb obs.

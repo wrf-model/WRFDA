@@ -298,8 +298,10 @@ SUBROUTINE da_write_y( iv, y )
          DO k = 1, iv % bogus(n) % info % levels
             call da_check_missing(iv%bogus(n)%u(k)%qc, y%bogus(n)%u(k), f2)
             call da_check_missing(iv%bogus(n)%v(k)%qc, y%bogus(n)%v(k), f3)
+            call da_check_missing(iv%bogus(n)%t(k)%qc, y%bogus(n)%t(k), f4)
+            call da_check_missing(iv%bogus(n)%q(k)%qc, y%bogus(n)%q(k), f5)
 
-            write(unit,'(2i8,10e15.7)')n, k, f2, f3
+            write(unit,'(2i8,10e15.7)')n, k, f2, f3, f4, f5
          END DO
       END DO
    ENDIF

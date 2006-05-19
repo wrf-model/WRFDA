@@ -143,7 +143,7 @@ SUBROUTINE DA_Transfer_XatoWRF( xbx, grid, &
    if ( check_rh == 2 ) THEN
 !     Shu-Hua~s TPW conservation:
       CALL da_check_rh( xb, xa, xp )
-   else
+   else  if ( check_rh == 1 ) then
 !     Simple resetting to max/min values:
       call da_check_rh_simple( xb, xa, xp )
    end if

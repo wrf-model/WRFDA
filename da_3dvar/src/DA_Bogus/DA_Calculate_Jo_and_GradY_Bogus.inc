@@ -11,6 +11,8 @@ SUBROUTINE DA_Calculate_Jo_and_GradY_Bogus( iv, re, jo, jo_grad_y )
 
    jo%Bogus_u   = 0.0
    jo%Bogus_v   = 0.0
+   jo%Bogus_t   = 0.0
+   jo%Bogus_q   = 0.0
    jo%Bogus_slp = 0.0
 
    IF ( iv%num_Bogus > 0 ) THEN
@@ -30,6 +32,12 @@ SUBROUTINE DA_Calculate_Jo_and_GradY_Bogus( iv, re, jo, jo_grad_y )
             jo_grad_y%Bogus(n)%v(k) = -re%Bogus(n)%v(k) / &
                                       ( iv%Bogus(n)%v(k)%error * &
                                         iv%Bogus(n)%v(k)%error )
+            jo_grad_y%Bogus(n)%t(k) = -re%Bogus(n)%t(k) / &
+                                      ( iv%Bogus(n)%t(k)%error * &
+                                        iv%Bogus(n)%t(k)%error )
+            jo_grad_y%Bogus(n)%q(k) = -re%Bogus(n)%q(k) / &
+                                      ( iv%Bogus(n)%q(k)%error * &
+                                        iv%Bogus(n)%q(k)%error )
          end do
 
        end if
@@ -45,6 +53,10 @@ SUBROUTINE DA_Calculate_Jo_and_GradY_Bogus( iv, re, jo, jo_grad_y )
                          re%Bogus(n)%u(k) * jo_grad_y%Bogus(n)%u(k)
             jo%Bogus_v = jo%Bogus_v - &
                          re%Bogus(n)%v(k) * jo_grad_y%Bogus(n)%v(k)
+            jo%Bogus_t = jo%Bogus_t - &
+                         re%Bogus(n)%t(k) * jo_grad_y%Bogus(n)%t(k)
+            jo%Bogus_q = jo%Bogus_q - &
+                         re%Bogus(n)%q(k) * jo_grad_y%Bogus(n)%q(k)
          enddo
      
        end if 
@@ -54,6 +66,8 @@ SUBROUTINE DA_Calculate_Jo_and_GradY_Bogus( iv, re, jo, jo_grad_y )
       jo % bogus_slp = 0.5 * jo % bogus_slp
       jo % bogus_u = 0.5 * jo % bogus_u
       jo % bogus_v = 0.5 * jo % bogus_v
+      jo % bogus_t = 0.5 * jo % bogus_t
+      jo % bogus_q = 0.5 * jo % bogus_q
 
    END IF
 
