@@ -3426,7 +3426,11 @@ SUBROUTINE wrf_dm_bcast_bytes ( buf , size )
    USE module_dm
    IMPLICIT NONE
    INTEGER size
+#ifndef NEC
    INTEGER*1 BUF(size)
+#else
+   CHARACTER*1 BUF(size)
+#endif
 ! <DESCRIPTION>
 ! Collective operation. Given a buffer and a size in bytes on task zero, broadcast and return that buffer on all tasks.
 !
@@ -4497,6 +4501,7 @@ END
       INTEGER       ::          nids, nide, njds, njde, nkds, nkde,    &
                                 nims, nime, njms, njme, nkms, nkme,    &
                                 nips, nipe, njps, njpe, nkps, nkpe
+      REAL          :: nest_influence
       LOGICAL, EXTERNAL  :: em_cd_feedback_mask
 
 #ifdef DEREF_KLUDGE
@@ -4514,6 +4519,8 @@ END
 #      include <em_data_calls.inc>
 #endif
 
+      nest_influence = 1.
+
       CALL get_ijk_from_grid (  grid ,                   &
                                 cids, cide, cjds, cjde, ckds, ckde,    &
                                 cims, cime, cjms, cjme, ckms, ckme,    &
@@ -4529,6 +4536,7 @@ END
 
       CALL rsl_merge_msgs
 
+#define NEST_INFLUENCE(A,B) A = B
 #  include "em_nest_feedbackup_unpack.inc"
 
       ! smooth coarse grid 
@@ -4640,22 +4648,4 @@ END
    END SUBROUTINE wrf_gatherv_double
 
 #endif
-
-LOGICAL FUNCTION em_cd_feedback_mask( pig, ips_save, ipe_save , pjg, jps_save, jpe_save, xstag, ystag )
-   INTEGER, INTENT(IN) :: pig, ips_save, ipe_save , pjg, jps_save, jpe_save
-   LOGICAL, INTENT(IN) :: xstag, ystag
-
-   INTEGER ioff, joff
-
-   ioff = 0 ; joff = 0
-   IF ( xstag  ) ioff = 1
-   IF ( ystag  ) joff = 1
-
-   em_cd_feedback_mask = ( pig .ge. ips_save+1        .and.      &
-                           pjg .ge. jps_save+1        .and.      &
-                           pig .le. ipe_save-1  +ioff .and.      &
-                           pjg .le. jpe_save-1  +joff           )
-
-
-END FUNCTION em_cd_feedback_mask
 
