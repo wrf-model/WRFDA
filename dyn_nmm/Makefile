@@ -14,13 +14,16 @@ MODULES =                 		\
         module_IGWAVE_ADJUST.o         	\
         module_NONHY_DYNAM.o         	\
         module_PHYSICS_CALLS.o       	\
-        module_MPP.o                    \
         module_MPPINIT.o        	\
         module_TIMERS.o                 \
         module_ZEROX.o                  \
         module_si_io_nmm.o              \
         module_initialize_real.o        \
+        module_PRECIP_ADJUST.o          \
 	$(CASE_MODULE)
+
+# moved into share/Makefile
+#        module_MPP.o              	\
 
 #        module_INDX.o                   \
 
@@ -34,6 +37,7 @@ OBJS    = 		          	\
 	solve_nmm.o         		\
 	RDTEMP.o    			\
 	BUCKETS.o 			\
+        DSTRB.o                         \
 	CLTEND.o
 
 
@@ -55,13 +59,13 @@ solve_nmm.o:   module_BC_NMM.o \
                module_BNDRY_COND.o module_PHYSICS_CALLS.o \
                module_CTLBLK.o
 
-module_ADVECTION.o: module_MPP.o module_INDX.o
+module_ADVECTION.o: ../share/module_MPP.o module_INDX.o
 
-module_MPPINIT.o: module_MPP.o 
+module_MPPINIT.o: ../share/module_MPP.o 
 
-module_DIFFUSION_NMM.o: module_MPP.o module_INDX.o
+module_DIFFUSION_NMM.o: ../share/module_MPP.o module_INDX.o
 
-module_IGWAVE_ADJUST.o: module_MPP.o module_INDX.o module_ZEROX.o module_TIMERS.o
+module_IGWAVE_ADJUST.o: ../share/module_MPP.o module_INDX.o module_ZEROX.o module_TIMERS.o
 
 module_PHYSICS_CALLS.o: \
 		../frame/module_domain.o		\
@@ -79,5 +83,7 @@ module_PHYSICS_CALLS.o: \
 		../phys/module_cumulus_driver.o  \
 		../phys/module_mp_etanew.o  \
 		../phys/module_microphysics_driver.o
+
+module_initialize_real.o: ../share/module_model_constants.o
 
 # DO NOT DELETE

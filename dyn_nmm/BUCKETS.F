@@ -3,13 +3,15 @@
 !NCEP_MESO:MODEL_LAYER: ACCUMULATION BUCKETS
 !
 !-----------------------------------------------------------------------
-      SUBROUTINE BUCKETS(NTSD,NPREC,NSRFC,NRDSW,NRDLW,NHEAT,NPHS        &
+      SUBROUTINE BUCKETS(NTSD,NPREC,NSRFC,NRDSW,NRDLW,NCLOD,NHEAT,NPHS  &
      &                  ,ACPREC,CUPREC,ACSNOW,ACSNOM,SSROFF,BGROFF      &
      &                  ,SFCEVP,POTEVP,SFCSHX,SFCLHX,SUBSHX,SNOPCX      &
      &                  ,SFCUVX,POTFLX                                  &
      &                  ,ARDSW,ASWIN,ASWOUT,ASWTOA                      &
      &                  ,ARDLW,ALWIN,ALWOUT,ALWTOA                      &
+     &                  ,ACFRST,NCFRST,ACFRCV,NCFRCV                    &
      &                  ,AVCNVC,AVRAIN,TCUCN,TRAIN                      &
+     &                  ,ASRFC                                          &
      &                  ,IDS,IDE,JDS,JDE,KDS,KDE                        &
      &                  ,IMS,IME,JMS,JME,KMS,KME                        &
      &                  ,ITS,ITE,JTS,JTE,KTS,KTE)
@@ -61,15 +63,17 @@
 !*** ARGUMENTS
 !-----------------------------------------------------------------------
 !
-      INTEGER,INTENT(IN) :: NHEAT,NPHS,NPREC,NRDLW,NRDSW,NSRFC,NTSD     &
+      INTEGER,INTENT(IN) :: NCLOD,NHEAT,NPHS,NPREC,NRDLW,NRDSW          &
+                           ,NSRFC,NTSD                                  &
                            ,IDS,IDE,JDS,JDE,KDS,KDE                     &
                            ,IMS,IME,JMS,JME,KMS,KME                     &
                            ,ITS,ITE,JTS,JTE,KTS,KTE 
 !
-      REAL,INTENT(OUT) :: ARDLW,ARDSW,AVCNVC,AVRAIN
+      REAL,INTENT(OUT) :: ARDLW,ARDSW,ASRFC,AVCNVC,AVRAIN
 !
       REAL,DIMENSION(IMS:IME,JMS:JME),INTENT(OUT) :: ACPREC,ACSNOM      &
      &                                              ,ACSNOW,ALWIN       &
+     &                                              ,ACFRST,ACFRCV      &
      &                                              ,ALWOUT,ALWTOA      &
      &                                              ,ASWIN,ASWOUT       &
      &                                              ,ASWTOA,BGROFF      &
@@ -79,6 +83,8 @@
      &                                              ,SFCUVX,SNOPCX      &
      &                                              ,SSROFF,SUBSHX
 !
+      INTEGER,DIMENSION(IMS:IME,JMS:JME),INTENT(OUT) :: NCFRST,NCFRCV
+!
       REAL,DIMENSION(IMS:IME,KMS:KME,JMS:JME),INTENT(OUT) :: TCUCN      &
      &                                                      ,TRAIN
 !
@@ -87,6 +93,8 @@
 !-----------------------------------------------------------------------
 !
       INTEGER :: I,J,K
+      LOGICAL  WRF_DM_ON_MONITOR
+      EXTERNAL WRF_DM_ON_MONITOR
 !
 !-----------------------------------------------------------------------
 !***********************************************************************
@@ -95,6 +103,7 @@
 !***  TOTAL AND CONVECTIVE PRECIPITATION ARRAYS.
 !***  TOTAL SNOW AND SNOW MELT ARRAYS.
 !***  STORM SURFACE AND BASE GROUND RUN OFF ARRAYS.
+!***  EVAPORATION ARRAYS.
 !
 !     IF(MOD(NTSD,NPREC)<NPHS)THEN
       IF(MOD(NTSD,NPREC)==0)THEN
@@ -106,22 +115,24 @@
           ACSNOM(I,J)=0.
           SSROFF(I,J)=0.
           BGROFF(I,J)=0.
+          SFCEVP(I,J)=0.
+          POTEVP(I,J)=0.
         ENDDO
         ENDDO
 !
+        IF ( WRF_DM_ON_MONITOR() ) THEN
         CALL WRF_MESSAGE('ZEROED OUT PRECIP/RUNOFF ARRAYS')
+        ENDIF
 !
       ENDIF
 !
-!***  EVAPORATION ARRAYS.
 !***  SFC FLUX ARRAYS.
 !
 !     IF(MOD(NTSD,NSRFC)<NPHS)THEN
       IF(MOD(NTSD,NSRFC)==0)THEN
+        ASRFC=0.
         DO J=JTS,JTE
         DO I=ITS,ITE
-          SFCEVP(I,J)=0.
-          POTEVP(I,J)=0.
           SFCSHX(I,J)=0.
           SFCLHX(I,J)=0.
           SUBSHX(I,J)=0.
@@ -131,7 +142,9 @@
         ENDDO
         ENDDO
 !
+        IF ( WRF_DM_ON_MONITOR() ) THEN
         CALL WRF_MESSAGE('ZEROED OUT SFC EVAP/FLUX ARRAYS')
+        ENDIF
 !
       ENDIF
 !
@@ -148,7 +161,9 @@
         ENDDO
         ENDDO
 !
+        IF ( WRF_DM_ON_MONITOR() ) THEN
         CALL WRF_MESSAGE('ZEROED OUT ACCUMULATED SHORTWAVE FLUX ARRAYS')
+        ENDIF
 !
       ENDIF
 !
@@ -165,7 +180,33 @@
         ENDDO
         ENDDO
 !
+        IF ( WRF_DM_ON_MONITOR() ) THEN
         CALL WRF_MESSAGE('ZEROED OUT ACCUMULATED LONGWAVE FLUX ARRAYS')
+        ENDIF
+!
+      ENDIF
+!
+!***  TIME-AVERAGED CLOUD FRACTION ARRAYS.
+!
+!     IF(MOD(NTSD,NCLOD)<NPHS)THEN
+      IF(MOD(NTSD,NCLOD)==0)THEN
+!***
+  !--- Ferrier 11/2/05:  Right now no accumulator variable is used (e.g.,
+  !    "ACLOD"), but instead the 2D arrays NCFRST & NCFRCV are used.  These
+  !    can be removed later when time's available to streamline the code.
+!***
+        DO J=JTS,JTE
+        DO I=ITS,ITE
+          ACFRCV(I,J)=0.
+          ACFRST(I,J)=0.
+          NCFRCV(I,J)=0
+          NCFRST(I,J)=0
+        ENDDO
+        ENDDO
+!
+        IF ( WRF_DM_ON_MONITOR() ) THEN
+        CALL WRF_MESSAGE('ZEROED OUT ACCUMULATED CLOUD FRACTION ARRAYS')
+        ENDIF
 !
       ENDIF
 !
@@ -173,8 +214,6 @@
 !
 !     IF(MOD(NTSD,NHEAT)<NPHS)THEN
       IF(MOD(NTSD,NHEAT)==0)THEN
-      write(0,*)' buckets ntsd=',ntsd,' nheat=',nheat
-      write(0,*)' zeroing train and tcucn'
         AVCNVC=0.
         AVRAIN=0.
 !
@@ -187,7 +226,9 @@
         ENDDO
         ENDDO
 !
+        IF ( WRF_DM_ON_MONITOR() ) THEN
         CALL WRF_MESSAGE('ZEROED OUT ACCUMULATED LATENT HEATING ARRAYS')
+        ENDIF
 !
       ENDIF
 !-----------------------------------------------------------------------

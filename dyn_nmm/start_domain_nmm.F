@@ -74,12 +74,12 @@
       INTEGER,DIMENSION(3) :: LPTOP
 !
       REAL :: ADDL,APELM,APELMNW,APEM1,CAPA,CLOGES,DPLM,DZLM,EPS,ESE   &
-     &       ,FAC1,FAC2,PDIF,PLM,PM1,PSFCK,PSS,PSUM,QLM,RANG,RCOS1      &
-     &       ,RCOS2,RSIN1,SLPM,TERM1,THLM,TIME,TLM,TSFCK,ULM,VLM
+     &       ,FAC1,FAC2,PDIF,PLM,PM1,PSFCK,PSS,PSUM,QLM,RANG           &
+     &       ,SLPM,TERM1,THLM,TIME,TLM,TSFCK,ULM,VLM
 !
 !!!   REAL :: BLDT,CWML,EXNSFC,G_INV,PLYR,PSFC,ROG,SFCZ,THSIJ,TL
       REAL :: CWML,EXNSFC,G_INV,PLYR,PSURF,ROG,SFCZ,THSIJ,TL
-      REAL :: TSTART,TEND,TPREC,THEAT,TCLOD,TRDSW,TRDLW,TSRFC
+      REAL :: TEND
 
 !
 !!!   REAL,ALLOCATABLE,DIMENSION(:,:) :: RAINBL,RAINNC,RAINNC           &
@@ -105,15 +105,14 @@
 !state    real   TSLB           ilj       dyn_em      1         Z     irh
 !state    real   ZS              l        dyn_em      -         Z     ir 
       REAL,ALLOCATABLE,DIMENSION(:) :: DZS,ZS
-      REAL,ALLOCATABLE,DIMENSION(:,:,:) :: CLDFRA                       &
-     &                                  ,RQCBLTEN,RQIBLTEN              &
-     &                                  ,RQVBLTEN,RTHBLTEN              &
-     &                                  ,RUBLTEN,RVBLTEN                &
-     &                                  ,RQCCUTEN,RQICUTEN,RQRCUTEN     &
-     &                                  ,RQSCUTEN,RQVCUTEN,RTHCUTEN     &
-     &                                  ,RTHRATEN                       &
-     &                                  ,RTHRATENLW,RTHRATENSW          &
-     &                                  ,TSLB
+      REAL,ALLOCATABLE,DIMENSION(:,:,:) :: RQCBLTEN,RQIBLTEN            &
+     &                                    ,RQVBLTEN,RTHBLTEN            &
+     &                                    ,RUBLTEN,RVBLTEN              &
+     &                                    ,RQCCUTEN,RQICUTEN,RQRCUTEN   &
+     &                                    ,RQSCUTEN,RQVCUTEN,RTHCUTEN   &
+     &                                    ,RTHRATEN                     &
+     &                                    ,RTHRATENLW,RTHRATENSW        &
+     &                                    ,TSLB
       REAL,ALLOCATABLE,DIMENSION(:,:) :: EMISS,GLW,GSW,HFX              &
      &                                  ,MAVAIL,NCA                     &
      &                                  ,QFX,RAINBL,RAINC,RAINNC        &
@@ -121,13 +120,13 @@
      &                                  ,SNOWC,THC,TMN,TSFC             &
      &                                  ,XLAND,XLAT,XLONG
 
-      REAL,ALLOCATABLE,DIMENSION(:,:) :: Z0_DUM
+      REAL,ALLOCATABLE,DIMENSION(:,:) :: Z0_DUM, ALBEDO_DUM
 !
 !!!   REAL,ALLOCATABLE,DIMENSION(:,:,:) :: W0AVG,ZINT,ZMID
 #if 0
       REAL,ALLOCATABLE,DIMENSION(:,:,:) :: W0AVG
 #endif
-      LOGICAL :: E_BDY,N_BDY,S_BDY,W_BDY,WARM_RAIN
+      LOGICAL :: E_BDY,N_BDY,S_BDY,W_BDY,WARM_RAIN,ADV_MOIST_COND
       integer :: jam,retval
       character(20) :: seeout="hi08.t00z.nhbmeso"
       real :: dummyx(791)
@@ -275,7 +274,8 @@
 !
 #ifdef DM_PARALLEL
 
-        call wrf_get_myproc(myproc)
+      CALL WRF_GET_MYPROC(MYPROC)
+      MYPE=MYPROC
 
 #  include <HALO_NMM_INIT_1.inc>
 #  include <HALO_NMM_INIT_2.inc>
@@ -346,7 +346,6 @@
       IFE=MIN(IPE,IDE-1)
 !
       IF(.NOT.RESTRT)THEN
-       call wrf_get_myproc(mype)
         DO J=JFS,JFE
         DO I=IFS,IFE
           LLMH=LMH(I,J)
@@ -387,11 +386,11 @@
           APEM1=(1.E5/PM1)**CAPA
 
         IF (NMM_TSK(I,J) .ge. 200.) THEN ! have a specific skin temp, use it
-               THS(I,J)=NMM_TSK(I,J)*(1.+P608*Q(I,KOFF+1,J))*APEM1
-               TSFCK=NMM_TSK(I,J)*(1.+P608*Q(I,KOFF+1,J))
+               THS(I,J)=NMM_TSK(I,J)*APEM1
+               TSFCK=NMM_TSK(I,J)
 	ELSE ! use lowest layer as a proxy
-          THS(I,J)=T(I,KOFF+1,J)*(1.+P608*Q(I,KOFF+1,J))*APEM1
-          TSFCK=T(I,KOFF+1,J)*(1.+P608*Q(I,KOFF+1,J))
+          THS(I,J)=T(I,KOFF+1,J)*APEM1
+          TSFCK=T(I,KOFF+1,J)
 	ENDIF
 
 	if (I .eq. IFE/2 .and. J .eq. JFE/2) then
@@ -433,6 +432,10 @@
 !***
 !***  INITIALIZE CLOUD FIELDS
 !***
+      IF (MAXVAL(CWM) .gt. 0. .and. MAXVAL(CWM) .lt. 1.) then
+        write(0,*) 'appear to have CWM values...do not zero'
+      ELSE
+        write(0,*) 'zeroing CWM'
         DO J=JFS,JFE
           DO K=KPS,KPE
           DO I=IFS,IFE
@@ -440,6 +443,7 @@
           ENDDO
           ENDDO
         ENDDO
+      ENDIF
 !***
 !***  INITIALIZE ACCUMULATOR ARRAYS TO ZERO.
 !***
@@ -495,6 +499,12 @@
 !***  THE LOWEST MODEL LAYER.  IN THE LOWEST TWO ATMOSPHERIC
 !***  ETA LAYERS SET TKE TO A SMALL VALUE (Q2INI).
 !***
+!***EROGERS: add check for realistic values of q2
+!
+      IF (MAXVAL(Q2) .gt. epsq2 .and. MAXVAL(Q2) .lt. 200.) then
+        write(0,*) 'appear to have Q2 values...do not zero'
+      ELSE
+        write(0,*) 'zeroing Q2'
         DO J=JFS,JFE
         DO K=KPS,KPE-1
         DO I=IFS,IFE
@@ -511,6 +521,7 @@
           Q2(I,LLMH-1,J)= HBM2(I,J)*Q2INI
         ENDDO
         ENDDO
+      ENDIF
 !***  
 !***  PAD ABOVE GROUND SPECIFIC HUMIDITY IF IT IS TOO SMALL.
 !***  INITIALIZE LATENT HEATING ACCUMULATION ARRAYS.
@@ -532,12 +543,6 @@
         CALL wrf_message('INIT:  INITIALIZED ARRAYS FOR CLEAN START')
       ENDIF ! <--- (not restart)
 
-
-!
-!----------------------------------------------------------------------
-!***  INITIALIZE PHYSICS VARIABLES IF STARTING THIS RUN FROM SCRATCH.
-!----------------------------------------------------------------------
-!
       IF(NEST)THEN
         DO J=JFS,JFE
         DO I=IFS,IFE
@@ -555,213 +560,46 @@
         ENDDO
       ENDIF
 !
-      IF(.NOT.RESTRT)THEN
-        DO J=JFS,JFE
-        DO I=IFS,IFE
-          LLMH=LMH(I,J)
-          KOFF=KPE-1-LLMH
-          PDSL(I,J)  =PD(I,J)*RES(I,J)
-          PREC(I,J)  =0.
-          ACPREC(I,J)=0.
-          CUPREC(I,J)=0.
-!          Z0(I,J)    =SM(I,J)*Z0SEA+(1.-SM(I,J))*                      &
-!                      (FIS(I,J)*FCM+Z0LAND+Z0(I,J))
-          QS(I,J)    =0.
-          AKMS(I,J)  =0.
-          AKHS(I,J)  =0.
-          TWBS(I,J)  =0.
-          QWBS(I,J)  =0.
-          CLDEFI(I,J)=1.
-!!!!          HTOP(I,J)  =REAL(LLMH)
-!!!!          HBOT(I,J)  =REAL(LLMH)
-          HTOP(I,J)  =REAL(KTS)
-          HBOT(I,J)  =REAL(KTE)
-!***
-!***  AT THIS POINT, WE MUST CALCULATE THE INITIAL POTENTIAL TEMPERATURE
-!***  OF THE SURFACE AND OF THE SUBGROUND.
-!***  EXTRAPOLATE DOWN FOR INITIAL SURFACE POTENTIAL TEMPERATURE.
-!***  ALSO DO THE SHELTER PRESSURE.
-!***
-          PM1=AETA1(KOFF+1)*PDTOP+AETA2(KOFF+1)*PDSL(I,J)+PT
-          APEM1=(1.E5/PM1)**CAPA
-        IF (NMM_TSK(I,J) .ge. 200.) THEN ! have a specific skin temp, use it
-               THS(I,J)=NMM_TSK(I,J)*(1.+P608*Q(I,KOFF+1,J))*APEM1
-               TSFCK=NMM_TSK(I,J)*(1.+P608*Q(I,KOFF+1,J))
-	ELSE ! use lowest layer as a proxy
-          THS(I,J)=T(I,KOFF+1,J)*(1.+P608*Q(I,KOFF+1,J))*APEM1
-          TSFCK=T(I,KOFF+1,J)*(1.+P608*Q(I,KOFF+1,J))
-	ENDIF
-!!!!!          THS(I,J)=T(I,KOFF+1,J)*(1.+P608*Q(I,KOFF+1,J))*APEM1
-!               THS(I,J)=NMM_TSK(I,J)*(1.+P608*Q(I,KOFF+1,J))*APEM1
-!!          TSFCK=T(I,KOFF+1,J)*(1.+P608*Q(I,KOFF+1,J))
-!               TSFCK=NMM_TSK(I,J)*(1.+P608*Q(I,KOFF+1,J))
-
-          PSFCK=PD(I,J)+PDTOP+PT
-!
-          IF(SM(I,J).LT.0.5) THEN
-            QS(I,J)=PQ0/PSFCK*EXP(A2*(TSFCK-A3)/(TSFCK-A4))
-          ELSEIF(SM(I,J).GT.0.5) THEN
-!reinstated below 1020
-            THS(I,J)=SST(I,J)*(1.E5/(PD(I,J)+PDTOP+PT))**CAPA
-          ENDIF
-
-	IF (THS(I,J) .lt. 200) then
-	write(6,*) 'bad THS in start_domain_nmm: ', I,J,THS(I,J)
-	endif
-!
-          TERM1=-0.068283/T(I,KOFF+1,J)
-          PSHLTR(I,J)=(PD(I,J)+PDTOP+PT)*EXP(TERM1)
-!
-          USTAR(I,J)=0.1
-          THZ0(I,J)=THS(I,J)
-          QZ0(I,J)=QS(I,J)
-          UZ0(I,J)=0.
-          VZ0(I,J)=0.
-! 
-        ENDDO
-        ENDDO
-!***
-!***  INITIALIZE CLOUD FIELDS
-!***
-        DO J=JFS,JFE
-          DO K=KPS,KPE
-          DO I=IFS,IFE
-            CWM(I,K,J)=0.
-          ENDDO
-          ENDDO
-        ENDDO
-!***
-!***  INITIALIZE ACCUMULATOR ARRAYS TO ZERO.
-!***
-        ARDSW=0.0
-        ARDLW=0.0
-        ASRFC=0.0
-        AVRAIN=0.0
-        AVCNVC=0.0
-!
-        DO J=JFS,JFE
-        DO I=IFS,IFE
-          ACFRCV(I,J)=0.
-          NCFRCV(I,J)=0
-          ACFRST(I,J)=0.
-          NCFRST(I,J)=0
-          ACSNOW(I,J)=0.
-          ACSNOM(I,J)=0.
-          SSROFF(I,J)=0.
-          BGROFF(I,J)=0.
-          ALWIN(I,J) =0.
-          ALWOUT(I,J)=0.
-          ALWTOA(I,J)=0.
-          ASWIN(I,J) =0.
-          ASWOUT(I,J)=0.
-          ASWTOA(I,J)=0.
-          SFCSHX(I,J)=0.
-          SFCLHX(I,J)=0.
-          SUBSHX(I,J)=0.
-          SNOPCX(I,J)=0.
-          SFCUVX(I,J)=0.
-          SFCEVP(I,J)=0.
-          POTEVP(I,J)=0.
-          POTFLX(I,J)=0.
-        ENDDO
-        ENDDO
-!***
-!***  INITIALIZE SATURATION SPECIFIC HUMIDITY OVER THE WATER.
-!***
-        EPS=R_D/R_V
-!
-        DO J=JFS,JFE
-        DO I=IFS,IFE
-          IF(SM(I,J).GT.0.5)THEN
-            CLOGES =-CM1/SST(I,J)-CM2*ALOG10(SST(I,J))+CM3
-            ESE    = 10.**(CLOGES+2.)
-            QS(I,J)= SM(I,J)*EPS*ESE/(PD(I,J)+PDTOP+PT-ESE*(1.-EPS))
-          ENDIF
-        ENDDO
-        ENDDO
-!***  
-!***  INITIALIZE TURBULENT KINETIC ENERGY (TKE) TO A SMALL
-!***  VALUE (EPSQ2) ABOVE GROUND.  SET TKE TO ZERO IN THE
-!***  THE LOWEST MODEL LAYER.  IN THE LOWEST TWO ATMOSPHERIC
-!***  ETA LAYERS SET TKE TO A SMALL VALUE (Q2INI).
-!***
-        DO J=JFS,JFE
-        DO K=KPS,KPE-1
-        DO I=IFS,IFE
-!!!tlb    Q2(I,K,J)=HTM(I,K+1,J)*HBM2(I,J)*EPSQ2
-          Q2(I,K+1,J)=HTM(I,K,J)*HBM2(I,J)*EPSQ2
-        ENDDO
-        ENDDO
-        ENDDO
-!
-        DO J=JFS,JFE
-        DO I=IFS,IFE
-          Q2(I,KPS,J)    = 0.
-          LLMH          = LMH(I,J)
-          Q2(I,KOFF+2,J)= HBM2(I,J)*Q2INI
-          Q2(I,KOFF+3,J)= HBM2(I,J)*Q2INI
-        ENDDO
-        ENDDO
-!***  
-!***  PAD ABOVE GROUND SPECIFIC HUMIDITY IF IT IS TOO SMALL.
-!***  INITIALIZE LATENT HEATING ACCUMULATION ARRAYS.
-!***
-        DO J=JFS,JFE
-        DO K=KPS,KPE
-        DO I=IFS,IFE
-          IF(Q(I,K,J).LT.EPSQ)Q(I,K,J)=EPSQ*HTM(I,K,J)
-          TRAIN(I,K,J)=0.
-          TCUCN(I,K,J)=0.
-        ENDDO
-        ENDDO
-        ENDDO
-!
-!----------------------------------------------------------------------
-!***  END OF SCRATCH START INITIALIZATION BLOCK.
-!----------------------------------------------------------------------
-!
-        CALL wrf_message('INIT:  INITIALIZED ARRAYS FOR CLEAN START')
-      ENDIF
-!
 !----------------------------------------------------------------------
 !***  RESTART INITIALIZING.  CHECK TO SEE IF WE NEED TO ZERO
 !***  ACCUMULATION ARRAYS.
 !----------------------------------------------------------------------
 
-      TSPH=3600./DT ! needed?
-      NPHS0=NPHS
+      TSPH=3600./GRID%DT ! needed?
+      NPHS0=GRID%NPHS
 
-!!!!  How do we pass in this TSTART information in reality???
+      IF(MYPE==0)THEN
+        write(0,*)' start_nmm TSTART=',grid%tstart
+        write(0,*)' start_nmm TPREC=',grid%tprec
+        write(0,*)' start_nmm THEAT=',grid%theat
+        write(0,*)' start_nmm TCLOD=',grid%tclod
+        write(0,*)' start_nmm TRDSW=',grid%trdsw
+        write(0,*)' start_nmm TRDLW=',grid%trdlw
+        write(0,*)' start_nmm TSRFC=',grid%tsrfc
+        write(0,*)' start_nmm PCPFLG=',grid%pcpflg
+      ENDIF
 
-      TSTART=00.0
-      TPREC=06.0
-      THEAT=06.0
-      TCLOD=06.0
-      TRDSW=03.0
-      TRDLW=03.0
-      TSRFC=03.0
-
-      NSTART = INT(TSTART*TSPH+0.5)
-
-      NTSD = NSTART  ! (this NTSD value not honored by integrate)
+      NSTART = INT(grid%TSTART*TSPH+0.5)
+!
+      NTSD = NSTART
 
 
 !! want non-zero values for NPREC, NHEAT type vars to avoid problems
 !! with mod statements below.
 
-      NPREC  = INT(TPREC *TSPH+0.5)
-      NHEAT  = INT(THEAT *TSPH+0.5)
-      NCLOD  = INT(TCLOD *TSPH+0.5)
-      NRDSW  = INT(TRDSW *TSPH+0.5)
-      NRDLW  = INT(TRDLW *TSPH+0.5)
-      NSRFC  = INT(TSRFC *TSPH+0.5)
+      NPREC  = INT(grid%TPREC *TSPH+0.5)
+      NHEAT  = INT(grid%THEAT *TSPH+0.5)
+      NCLOD  = INT(grid%TCLOD *TSPH+0.5)
+      NRDSW  = INT(grid%TRDSW *TSPH+0.5)
+      NRDLW  = INT(grid%TRDLW *TSPH+0.5)
+      NSRFC  = INT(grid%TSRFC *TSPH+0.5)
 
       IF(RESTRT)THEN
 !
 !***
 !***    AVERAGE CLOUD AMOUNT ARRAY
 !***
-        IF(MOD(NTSD,NCLOD).LT.NPHS)THEN
+        IF(MOD(NTSD,NCLOD).LT.GRID%NPHS)THEN
           CALL wrf_message('  ZERO AVG CLD AMT ARRAY')
           DO J=JFS,JFE
           DO I=IFS,IFE
@@ -775,7 +613,7 @@
 !***  
 !***     GRID-SCALE AND CONVECTIVE LATENT HEATING ARRAYS.
 !***  
-        IF(MOD(NTSD,NHEAT).LT.NCNVC)THEN
+        IF(MOD(NTSD,NHEAT).LT.GRID%NCNVC)THEN
           CALL wrf_message('  ZERO ACCUM LATENT HEATING ARRAYS')
 !
           AVRAIN=0.
@@ -815,7 +653,7 @@
 !***  TOTAL SNOW AND SNOW MELT ARRAYS.
 !***  STORM SURFACE AND BASE GROUND RUN OFF ARRAYS.
 !     
-        IF(MOD(NTSD,NPREC).LT.NPHS)THEN
+        IF(MOD(NTSD,NPREC).LT.GRID%NPHS)THEN
           CALL wrf_message('  ZERO ACCUM PRECIP ARRAYS')
           DO J=JFS,JFE
           DO I=IFS,IFE
@@ -831,7 +669,7 @@
 !***  
 !***  LONG WAVE RADIATION ARRAYS.
 !***  
-        IF(MOD(NTSD,NRDLW).LT.NPHS)THEN
+        IF(MOD(NTSD,NRDLW).LT.GRID%NPHS)THEN
           CALL wrf_message('  ZERO ACCUM LW RADTN ARRAYS')
           ARDLW=0.
           DO J=JFS,JFE
@@ -845,7 +683,7 @@
 !***  
 !***  SHORT WAVE RADIATION ARRAYS.
 !***  
-        IF(MOD(NTSD,NRDSW).LT.NPHS)THEN
+        IF(MOD(NTSD,NRDSW).LT.GRID%NPHS)THEN
           CALL wrf_message('  ZERO ACCUM SW RADTN ARRAYS')
           ARDSW=0.
           DO J=JFS,JFE
@@ -859,7 +697,7 @@
 !***  
 !***  SURFACE SENSIBLE AND LATENT HEAT FLUX ARRAYS.
 !***  
-        IF(MOD(NTSD,NSRFC).LT.NPHS)THEN
+        IF(MOD(NTSD,NSRFC).LT.GRID%NPHS)THEN
           CALL wrf_message('  ZERO ACCUM SFC FLUX ARRAYS')
           ASRFC=0.
           DO J=JFS,JFE
@@ -1243,7 +1081,7 @@
               SSROFF(I,J)=0.0
               BGROFF(I,J)=0.0
               CMC(I,J)=0.0
-              DO NS=1,NSOIL
+              DO NS=1,GRID%NSOIL
                 SMC(I,NS,J)=1.0
 !               SH2O(I,NS,J)=0.05
                 SH2O(I,NS,J)=1.0
@@ -1265,7 +1103,7 @@
             SNOPCX(I,J)=0.0
             CMC(I,J)=0.0
             SNO(I,J)=0.0
-            DO NS=1,NSOIL
+            DO NS=1,GRID%NSOIL
               SMC(I,NS,J)=1.0
               STC(I,NS,J)=273.16
 !             SH2O(I,NS,J)=0.05
@@ -1348,7 +1186,7 @@
 !***  CALL ZENITH SIMPLY TO GET THE DAY OF THE YEAR FOR
 !***  THE SETUP OF THE OZONE DATA
 !***
-      TIME=(NTSD-1)*DT
+      TIME=(NTSD-1)*GRID%DT
 !
 !!!   CALL ZENITH(TIME,DAYI,HOUR)
 !
@@ -1399,26 +1237,37 @@
           V10(I,J)=VLM
         ENDIF
 !
-        FAC1=2./DZLM
-        FAC2=(DZLM-2.)/DZLM
-        IF(DZLM.LE.2.)THEN
-          FAC1=1.
-          FAC2=0.
-        ENDIF
+!        FAC1=2./DZLM
+!        FAC2=(DZLM-2.)/DZLM
+!        IF(DZLM.LE.2.)THEN
+!          FAC1=1.
+!          FAC2=0.
+!        ENDIF
 !
         IF(.NOT.RESTRT.OR.NEST)THEN
-!mp          TSHLTR(I,J)=FAC2*THS(I,J)+FAC1*THLM
-          TSHLTR(I,J)=0.2*THS(I,J)+0.8*THLM
-!mp          QSHLTR(I,J)=FAC2*QS(I,J)+FAC1*QLM
-          QSHLTR(I,J)=0.2*QS(I,J)+0.8*QLM
+
+	IF ( (THLM-THS(I,J)) .gt. 2.0) THEN  ! weight differently in different scenarios
+	 FAC1=0.3
+         FAC2=0.7
+        ELSE
+         FAC1=0.8
+         FAC2=0.2
+        ENDIF
+
+          TSHLTR(I,J)=FAC2*THS(I,J)+FAC1*THLM
+!          TSHLTR(I,J)=0.2*THS(I,J)+0.8*THLM
+          QSHLTR(I,J)=FAC2*QS(I,J)+FAC1*QLM
+!          QSHLTR(I,J)=0.2*QS(I,J)+0.8*QLM
         ENDIF
 !***
 !***  NEED TO CONVERT TO THETA IF IS THE RESTART CASE
 !***  AS CHKOUT.f WILL CONVERT TO TEMPERATURE
 !***
-        IF(RESTRT)THEN
-          TSHLTR(I,J)=TSHLTR(I,J)*APELMNW
-        ENDIF
+!EROGERS: COMMENT OUT IN WRF-NMM
+!***
+!       IF(RESTRT)THEN
+!         TSHLTR(I,J)=TSHLTR(I,J)*APELMNW
+!       ENDIF
       ENDDO
       ENDDO
 !
@@ -1426,15 +1275,17 @@
 !***  INITIALIZE TAU-1 VALUES FOR ADAMS-BASHFORTH 
 !----------------------------------------------------------------------
 !
-      DO J=jfs,jfe
-        DO K=KPS,KPE
-        DO I=ifs,ife
-          TOLD(I,K,J)=T(I,K,J)   ! T AT TAU-1
-          UOLD(I,K,J)=U(I,K,J)   ! U AT TAU-1
-          VOLD(I,K,J)=V(I,K,J)   ! V AT TAU-1
+      IF(.NOT.RESTRT)THEN
+        DO J=jfs,jfe
+          DO K=KPS,KPE
+          DO I=ifs,ife
+            TOLD(I,K,J)=T(I,K,J)   ! T AT TAU-1
+            UOLD(I,K,J)=U(I,K,J)   ! U AT TAU-1
+            VOLD(I,K,J)=V(I,K,J)   ! V AT TAU-1
+          ENDDO
+          ENDDO
         ENDDO
-        ENDDO
-      ENDDO
+      ENDIF
 !
 !----------------------------------------------------------------------
 !***  INITIALIZE NONHYDROSTATIC QUANTITIES
@@ -1452,7 +1303,7 @@
       ENDDO
 	ENDIF
 !***
-      IF(SIGMA.EQ.1)THEN
+      IF(GRID%SIGMA.EQ.1)THEN
         DO J=jfs,jfe
         DO I=ifs,ife
           PDSL(I,J)=PD(I,J)
@@ -1597,9 +1448,9 @@
       ALLOCATE(XLAT(IMS:IME,JMS:JME),STAT=I)    ; XLAT     = 0.
       ALLOCATE(XLONG(IMS:IME,JMS:JME),STAT=I)   ; XLONG    = 0.
       ALLOCATE(Z0_DUM(IMS:IME,JMS:JME),STAT=I)  ; Z0_DUM   = 0.
+      ALLOCATE(ALBEDO_DUM(IMS:IME,JMS:JME),STAT=I)  ; ALBEDO_DUM   = 0.
 
       ALLOCATE(DZS(KMS:KME),STAT=I)                         ; DZS = 0.
-      ALLOCATE(CLDFRA(IMS:IME,KMS:KME, JMS:JME),STAT=I)     ; CLDFRA = 0.
       ALLOCATE(RQCBLTEN(IMS:IME,KMS:KME,JMS:JME),STAT=I)    ; RQCBLTEN = 0.
       ALLOCATE(RQIBLTEN(IMS:IME,KMS:KME,JMS:JME),STAT=I)    ; RQIBLTEN = 0.
       ALLOCATE(RQVBLTEN(IMS:IME,KMS:KME,JMS:JME),STAT=I)    ; RQVBLTEN =  0.
@@ -1621,13 +1472,12 @@
 #endif
 !-----------------------------------------------------------------------
 !jm added set of g_inv
-      write(0,*)' start nrads=',nrads,' nradl=',nradl,' nphs=',nphs,' ncnvc=',ncnvc
       G_INV=1./G
       ROG=R_D*G_INV
-      RADT=NRADS*DT/60.
-      BLDT=NPHS*DT/60.
-      CUDT=NCNVC*DT/60.
-      GSMDT=NPHS*DT/60.
+      GRID%RADT=GRID%NRADS*GRID%DT/60.
+      GRID%BLDT=GRID%NPHS*GRID%DT/60.
+      GRID%CUDT=GRID%NCNVC*GRID%DT/60.
+      GRID%GSMDT=GRID%NPHS*GRID%DT/60.
 !
       DO J=MYJS,MYJE
       DO I=MYIS,MYIE
@@ -1641,18 +1491,18 @@
      &        +THS(I,J)*(2.-SM(I,J))
         TSFC(I,J)=THSIJ/EXNSFC
 !
-        DO K=KTS,KTE-1
-          PLYR=(PINT(I,K,J)+PINT(I,K+1,J))*0.5
-          TL=T(I,K,J)
-          CWML=CWM(I,K,J)
+!        DO K=KTS,KTE-1
+!         PLYR=(PINT(I,K,J)+PINT(I,K+1,J))*0.5
+!         TL=T(I,K,J)
+!         CWML=CWM(I,K,J)
 !!!       ZINT(I,K+1,J)=ZINT(I,K,J)+TL/PLYR                             &
 !!!  &                  *(DETA1(K)*PDTOP+DETA2(K)*PDSL(I,J))*ROG        &
 !!!  &                  *(Q(I,K,J)*P608-CWML+1.)
-        ENDDO
+!        ENDDO
 !
-        DO K=KTS,KTE
+!        DO K=KTS,KTE
 !!!       ZMID(I,K,J)=0.5*(ZINT(I,K,J)+ZINT(I,K+1,J))
-        ENDDO
+!        ENDDO
       ENDDO
       ENDDO
 !
@@ -1683,14 +1533,20 @@
 
        LU_INDEX=IVGTYP
 
+         IF (.NOT. RESTRT) THEN
       DO J=MYJS,MYJE
       DO I=MYIS,MYIE
-	Z0_DUM(I,J)=Z0(I,J) ! hold topography component
+	Z0_DUM(I,J)=Z0(I,J) ! hold
+        ALBEDO_DUM(I,J)=ALBEDO(I,J) ! Save albedos
       ENDDO
       ENDDO
+         ENDIF
 
-      CALL PHY_INIT(GRID,GRID%ID,CONFIG_FLAGS,DT,sfull,smid             &
-     &             ,PT,TSFC,RADT,BLDT,CUDT,GSMDT                        &
+! Several arguments are RCONFIG entries in Registry.NMM. Registry no longer
+! includes these as dummy arguments or declares them.  Access them from 
+! GRID.  JM 20050819
+      CALL PHY_INIT(GRID,GRID%ID,CONFIG_FLAGS,GRID%DT,sfull,smid        &
+     &             ,PT,TSFC,GRID%RADT,GRID%BLDT,GRID%CUDT,GRID%GSMDT    &
      &             ,RTHCUTEN, RQVCUTEN, RQRCUTEN                        &
      &             ,RQCCUTEN, RQSCUTEN, RQICUTEN                        &
      &             ,RUBLTEN,RVBLTEN,RTHBLTEN                            &
@@ -1698,22 +1554,24 @@
      &             ,RTHRATEN,RTHRATENLW,RTHRATENSW                      &
      &             ,STEPBL,STEPRA,STEPCU                                &
      &             ,W0AVG, RAINNC, RAINC, RAINCV, RAINNCV               &
-     &             ,NCA                                                 &
+     &             ,NCA,GRID%SWRAD_SCAT                                 &
      &             ,CLDEFI,LOWLYR                                       &
      &             ,MASS_FLUX                                           &
      &             ,RTHFTEN, RQVFTEN                                    &
      &             ,CLDFRA,GLW,GSW,EMISS,LU_INDEX                       &
-     &             ,XLAT,XLONG,ALBEDO,ALBBCK,GMT,JULYR,JULDAY           &
+     &             ,XLAT,XLONG,ALBEDO,ALBBCK                            &
+     &             ,GRID%GMT,GRID%JULYR,GRID%JULDAY                     &
      &             ,TMN,XLAND,ZNT,Z0,USTAR,MOL,PBLH,TKE_MYJ             &
      &             ,EXCH_H,THC,SNOWC,MAVAIL,HFX,QFX,RAINBL              &
-     &             ,TSLB,ZS,DZS,num_soil_layers,warm_rain               &
+     &             ,TSLB,ZS,DZS,GRID%num_soil_layers,warm_rain          &
+     &             ,adv_moist_cond                                      &
      &             ,APR_GR,APR_W,APR_MC,APR_ST,APR_AS                   &
      &             ,APR_CAPMA,APR_CAPME,APR_CAPMI                       &
      &             ,XICE,VEGFRA,SNOW,CANWAT,SMSTAV                      &
      &             ,SMSTOT, SFCRUNOFF,UDRUNOFF,GRDFLX,ACSNOW            &
      &             ,ACSNOM,IVGTYP,ISLTYP,SFCEVP,SMOIS                   &
      &             ,SH2O, SNOWH, SMFR3D                                 &  ! temporary
-     &             ,DX,DY,F_ICE_PHY,F_RAIN_PHY,F_RIMEF_PHY              &
+     &             ,GRID%DX,GRID%DY,F_ICE_PHY,F_RAIN_PHY,F_RIMEF_PHY    &
      &             ,MP_RESTART_STATE,TBPVS_STATE,TBPVS0_STATE           &
      &             ,.TRUE.,.FALSE.                                      &
      &             ,ids, ide, jds, jde, kds, kde                        &
@@ -1721,11 +1579,64 @@
      &             ,its, ite, jts, jte, kts, kte)
 !-----------------------------------------------------------------------
 !
+!mp replace F*_PHY with values defined in module_initialize_real.F?
+
+	IF (.NOT. RESTRT) THEN
+        IF (maxval(F_ICE) .gt. 0.) THEN
+        write(0,*) 'F_ICE > 0'
+         do J=JMS,JME
+         do K=KMS,KME
+         do I=IMS,IME
+          F_ICE_PHY(I,K,J)=F_ICE(I,K,J)
+         enddo
+         enddo
+         enddo
+        ENDIF
+
+        IF (maxval(F_RAIN) .gt. 0.) THEN
+        write(0,*) 'F_RAIN > 0'
+         do J=JMS,JME
+         do K=KMS,KME
+         do I=IMS,IME
+          F_RAIN_PHY(I,K,J)=F_ICE(I,K,J)
+         enddo
+         enddo
+         enddo
+        ENDIF
+
+        IF (maxval(F_RIMEF) .gt. 0.) THEN
+        write(0,*) 'F_RIMEF > 0'
+         do J=JMS,JME
+         do K=KMS,KME
+         do I=IMS,IME
+          F_RIMEF_PHY(I,K,J)=F_RIMEF(I,K,J)
+         enddo
+         enddo
+         enddo
+        ENDIF
+	ENDIF
+
+!mp
+        IF (.NOT. RESTRT) THEN
       DO J=JMS,JME
       DO I=IMS,IME
-	Z0(I,J)=Z0_DUM(I,J)+0.5*Z0(I,J) ! add 1/2 of veg Z0 component, 
+        Z0(I,J)=Z0_DUM(I,J)+0.5*Z0(I,J) ! add 1/2 of veg Z0 component,
                                         ! expecting this code to be called
                                         ! both by real and by the model.
+      ENDDO
+      ENDDO
+  !-- Replace albedos if original albedos are nonzero
+      IF(MAXVAL(ALBEDO_DUM)>0.)THEN
+        DO J=JMS,JME
+        DO I=IMS,IME
+          ALBEDO(I,J)=ALBEDO_DUM(I,J)
+        ENDDO
+        ENDDO
+      ENDIF
+        ENDIF
+
+      DO J=JMS,JME
+      DO I=IMS,IME
         APREC(I,J)=RAINNC(I,J)*1.E-3
         CUPREC(I,J)=RAINCV(I,J)*1.E-3
       ENDDO
@@ -1733,7 +1644,6 @@
 !
       DEALLOCATE(SFULL)
       DEALLOCATE(SMID)
-      DEALLOCATE(CLDFRA)
       DEALLOCATE(DZS)
       DEALLOCATE(EMISS)
       DEALLOCATE(GLW)
