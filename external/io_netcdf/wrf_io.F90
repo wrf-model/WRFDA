@@ -50,19 +50,7 @@ module wrf_data
   character (8)          , parameter      :: NO_NAME          = 'NULL'
   character (DateStrLen) , parameter      :: ZeroDate = '0000-00-00-00:00:00'
 
-!BEGINIOFLAGS
-      integer, parameter  :: WRF_FILE_NOT_OPENED                  = 100
-      integer, parameter  :: WRF_FILE_OPENED_NOT_COMMITTED        = 101
-      integer, parameter  :: WRF_FILE_OPENED_FOR_WRITE            = 102
-      integer, parameter  :: WRF_FILE_OPENED_FOR_READ             = 103
-      integer, parameter  :: WRF_REAL                             = 104
-      integer, parameter  :: WRF_DOUBLE               = 105
-      integer, parameter  :: WRF_INTEGER                          = 106
-      integer, parameter  :: WRF_LOGICAL                          = 107
-      integer, parameter  :: WRF_COMPLEX                          = 108
-      integer, parameter  :: WRF_DOUBLE_COMPLEX                   = 109
-      integer, parameter  :: WRF_FILE_OPENED_FOR_UPDATE           = 110
-!ENDIOFLAGS
+  include 'wrf_io_flags.h'
 
   character (256)                         :: msg
   logical                                 :: WrfIOnotInitialized = .true.
@@ -439,8 +427,10 @@ subroutine GetDim(MemoryOrder,NDim,Status)
       NDim = 3
     case ('xy','yx','xs','xe','ys','ye')
       NDim = 2
-    case ('z','c','0')
+    case ('z','c')
       NDim = 1
+    case ('0')  ! NDim=0 for scalars.  TBH:  20060502
+      NDim = 0
     case default
       print *, 'memory order = ',MemOrd,'  ',MemoryOrder
       Status = WRF_WARN_BAD_MEMORYORDER
@@ -461,6 +451,7 @@ subroutine GetIndices(NDim,Start,End,i1,i2,j1,j2,k1,k2)
   j2=1
   k1=1
   k2=1
+  if(NDim == 0) return  ! NDim=0 for scalars.  TBH:  20060502
   i1 = Start(1)
   i2 = End  (1)
   if(NDim == 1) return
@@ -490,7 +481,7 @@ subroutine ExtOrder(MemoryOrder,Vector,Status)
     case ('xyz','xsz','xez','ysz','yez','xy','xs','xe','ys','ye','z','c')
       continue
     case ('0')
-      Vector(1) = 1
+      continue  ! NDim=0 for scalars.  TBH:  20060502
     case ('xzy')
       Vector(2) = temp(3)
       Vector(3) = temp(2)
@@ -537,7 +528,7 @@ subroutine ExtOrderStr(MemoryOrder,Vector,ROVector,Status)
     case ('xyz','xsz','xez','ysz','yez','xy','xs','xe','ys','ye','z','c')
       continue
     case ('0')
-      ROVector(1) = 'ext_scalar'
+      continue  ! NDim=0 for scalars.  TBH:  20060502
     case ('xzy')
       ROVector(2) = Vector(3)
       ROVector(3) = Vector(2)
@@ -2517,6 +2508,7 @@ subroutine ext_ncd_read_field(DataHandle,DateStr,Var,Field,FieldType,Comm,  &
   integer ,dimension(*)         ,intent(in)    :: PatchStart,  PatchEnd
   integer                       ,intent(out)   :: Status
   character (3)                                :: MemoryOrder
+  character (NF_MAX_NAME)                      :: dimname
   type(wrf_data_handle)         ,pointer       :: DH
   integer                                      :: NDim
   integer                                      :: NCID
@@ -2655,6 +2647,20 @@ subroutine ext_ncd_read_field(DataHandle,DateStr,Var,Field,FieldType,Comm,  &
       call wrf_debug ( WARN , TRIM(msg))
       return
     endif
+    ! NDim=0 for scalars.  Handle read of old NDim=1 files.  TBH:  20060502
+    IF ( ( NDim == 0 ) .AND. ( StoredDim == 2 ) ) THEN
+      stat = NF_INQ_DIMNAME(NCID,VDimIDs(1),dimname)
+      call netcdf_err(stat,Status)
+      if(Status /= WRF_NO_ERR) then
+        write(msg,*) 'NetCDF error in ',__FILE__,', line', __LINE__ 
+        call wrf_debug ( WARN , TRIM(msg))
+        return
+      endif
+      IF ( dimname(1:10) == 'ext_scalar' ) THEN
+        NDim = 1
+        Length(1) = 1
+      ENDIF
+    ENDIF
     if(StoredDim /= NDim+1) then
       Status = WRF_ERR_FATAL_BAD_VARIABLE_DIM
       write(msg,*) 'Fatal error BAD VARIABLE DIMENSION in ext_ncd_read_field ',TRIM(Var),TRIM(DateStr)
@@ -2985,6 +2991,8 @@ subroutine ext_ncd_end_of_frame(DataHandle, Status)
   return
 end subroutine ext_ncd_end_of_frame
 
+! NOTE:  For scalar variables NDim is set to zero and DomainStart and 
+! NOTE:  DomainEnd are left unmodified.  
 subroutine ext_ncd_get_var_info(DataHandle,Name,NDim,MemoryOrder,Stagger,DomainStart,DomainEnd,WrfType,Status)
   use wrf_data
   use ext_ncd_support_routines
