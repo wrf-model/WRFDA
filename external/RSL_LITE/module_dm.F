@@ -14,10 +14,10 @@ MODULE module_dm
    INTEGER, PARAMETER :: max_halo_width = 5
 #endif
 
-   INTEGER :: ips_save, ipe_save, jps_save, jpe_save
+   INTEGER :: ips_save, ipe_save, jps_save, jpe_save, itrace
 
    INTEGER ntasks, ntasks_y, ntasks_x, mytask, mytask_x, mytask_y
-   INTEGER local_communicator, local_iocommunicator
+   INTEGER local_communicator, local_communicator_periodic, local_iocommunicator
    LOGICAL :: dm_debug_flag = .FALSE.
 
    INTERFACE wrf_dm_maxval
@@ -68,11 +68,17 @@ CONTAINS
    SUBROUTINE wrf_dm_initialize
       IMPLICIT NONE
       INCLUDE 'mpif.h'
-      INTEGER :: local_comm, ierr
+      INTEGER :: local_comm, local_comm2, new_local_comm, group, newgroup, p, p1, ierr
+      INTEGER, ALLOCATABLE, DIMENSION(:) :: ranks
+      INTEGER, DIMENSION(2) :: dims, coords
+      LOGICAL, DIMENSION(2) :: isperiodic
+      LOGICAL :: reorder_mesh
+
       CALL wrf_get_dm_communicator ( local_comm )
       CALL mpi_comm_size( local_comm, ntasks, ierr )
       CALL nl_get_nproc_x ( 1, ntasks_x )
       CALL nl_get_nproc_y ( 1, ntasks_y )
+      CALL nl_get_reorder_mesh( 1, reorder_mesh )
 
 ! check if user has specified in the namelist
       IF ( ntasks_x .GT. 0 .OR. ntasks_y .GT. 0 ) THEN
@@ -98,10 +104,46 @@ CONTAINS
       CALL wrf_message( wrf_err_message )
 
       CALL mpi_comm_rank( local_comm, mytask, ierr )
-      mytask_x = mod( mytask , ntasks_x )
-      mytask_y = mytask / ntasks_x
+! extra code to reorder the communicator 20051212jm
+      IF ( reorder_mesh ) THEN
+write(0,*)'reordering mesh'
+        ALLOCATE (ranks(ntasks))
+        CALL mpi_comm_dup ( local_comm , local_comm2, ierr )
+        CALL mpi_comm_group ( local_comm2, group, ierr )
+        DO p1=1,ntasks
+          p = p1 - 1
+          ranks(p1) = mod( p , ntasks_x ) * ntasks_y + p / ntasks_x  
+        ENDDO
+        CALL mpi_group_incl( group, ntasks, ranks, newgroup, ierr )
+        DEALLOCATE (ranks)
+        CALL mpi_comm_create( local_comm2, newgroup, new_local_comm , ierr )
+      ELSE
+        new_local_comm = local_comm
+      ENDIF
+! end extra code to reorder the communicator 20051212jm
+      dims(1) = ntasks_y  ! rows
+      dims(2) = ntasks_x  ! columns
+      isperiodic(1) = .false.
+      isperiodic(2) = .false.
+      CALL mpi_cart_create( new_local_comm, 2, dims, isperiodic, .false., local_communicator, ierr )
+      dims(1) = ntasks_y  ! rows
+      dims(2) = ntasks_x  ! columns
+      isperiodic(1) = .true.
+      isperiodic(2) = .true.
+      CALL mpi_cart_create( new_local_comm, 2, dims, isperiodic, .false., local_communicator_periodic, ierr )
+! debug
+      CALL mpi_comm_rank( local_communicator_periodic, mytask, ierr )
+      CALL mpi_cart_coords( local_communicator_periodic, mytask, 2, coords, ierr )
+        write(0,*)'periodic coords ',mytask, coords
+
+      CALL mpi_comm_rank( local_communicator, mytask, ierr )
+      CALL mpi_cart_coords( local_communicator, mytask, 2, coords, ierr )
+        write(0,*)'non periodic coords ',mytask, coords
+      mytask_x = coords(2)   ! col task (x)
+      mytask_y = coords(1)   ! row task (y)
       CALL nl_set_nproc_x ( 1, ntasks_x )
       CALL nl_set_nproc_y ( 1, ntasks_y )
+      CALL wrf_set_dm_communicator ( local_communicator )
       RETURN
    END SUBROUTINE wrf_dm_initialize
 
@@ -263,11 +305,16 @@ CONTAINS
                       c_ips, c_ipe, c_jps, c_jpe, c_kps, c_kpe )
 #else
 
+! At such time as NMM nesting is able to use RSL_LITE (would require
+! a number of other mods to this file for that to happen), this should
+! be updated along the lines of what's done in compute_memory_dims_rsl_lite
+! below. See note dated 20051020.  JM
+
          c_ips = -1
          nj = ( c_jds - j_parent_start ) * parent_grid_ratio + 1 + 1 ;
          DO i = c_ids, c_ide
             ni = ( i - i_parent_start ) * parent_grid_ratio + 1 + 1 ;
-            CALL task_for_point ( ni, nj, ids, ide, jds, jde, ntasks_x, ntasks_y, Px, Py, P )
+            CALL task_for_point ( ni, nj, ids, ide, jds, jde, ntasks_x, ntasks_y, Px, Py )
             IF ( Px .EQ. mytask_x ) THEN
                c_ipe = i
                IF ( c_ips .EQ. -1 ) c_ips = i
@@ -278,7 +325,7 @@ CONTAINS
          ni = ( c_ids - i_parent_start ) * parent_grid_ratio + 1 + 1 ;
          DO j = c_jds, c_jde
             nj = ( j - j_parent_start ) * parent_grid_ratio + 1 + 1 ;
-            CALL task_for_point ( ni, nj, ids, ide, jds, jde, ntasks_x, ntasks_y, Px, Py, P )
+            CALL task_for_point ( ni, nj, ids, ide, jds, jde, ntasks_x, ntasks_y, Px, Py )
             IF ( Py .EQ. mytask_y ) THEN
                c_jpe = j
                IF ( c_jps .EQ. -1 ) c_jps = j
@@ -446,11 +493,13 @@ CONTAINS
         INTEGER, INTENT(OUT)    ::  ims, ime, jms, jme, kms, kme
 
         INTEGER idim, jdim, kdim, rem, a, b
+        INTEGER Px, Py, P, i, j
 
         idim = ide-ids+1 - (2*shw)
         jdim = jde-jds+1 - (2*shw)
         kdim = kde-kds+1
 
+#if 0
         rem = mod(idim,ntasks_x)
         a = ( idim / ntasks_x + 1 ) * min( rem, mytask_x )
         b = ( idim / ntasks_x     ) * max( 0, mytask_x - rem )
@@ -466,6 +515,55 @@ CONTAINS
         a = ( jdim / ntasks_y + 1 ) * min( rem, mytask_y+1 )
         b = ( jdim / ntasks_y     ) * max( 0, mytask_y+1 - rem )
         jpe = a + b + shw + jds-1
+#else
+# if ( ! NMM_CORE == 1 )
+        ips = -1
+        j = jds ;
+        DO i = ids, ide
+           CALL task_for_point ( i, j, ids, ide, jds, jde, ntasks_x, ntasks_y, Px, Py )
+           IF ( Px .EQ. mytask_x ) THEN
+              ipe = i
+              IF ( ips .EQ. -1 ) ips = i
+           ENDIF
+        ENDDO
+
+        jps = -1
+        i = ids ;
+        DO j = jds, jde
+           CALL task_for_point ( i, j, ids, ide, jds, jde, ntasks_x, ntasks_y, Px, Py )
+           IF ( Py .EQ. mytask_y ) THEN
+              jpe = j
+              IF ( jps .EQ. -1 ) jps = j
+           ENDIF
+        ENDDO
+# else
+
+! In case of NMM CORE, the domain only ever runs from ids..ide-1 and jds..jde-1 so
+! adjust decomposition to reflect.  20051020 JM
+
+        ips = -1
+        j = jds ;
+        DO i = ids, ide-1
+           CALL task_for_point ( i, j, ids, ide-1, jds, jde-1, ntasks_x, ntasks_y, Px, Py )
+           IF ( Px .EQ. mytask_x ) THEN
+              ipe = i
+              IF ( Px .EQ. ntasks_x-1 ) ipe = ipe + 1
+              IF ( ips .EQ. -1 ) ips = i
+           ENDIF
+        ENDDO
+
+        jps = -1
+        i = ids ;
+        DO j = jds, jde-1
+           CALL task_for_point ( i, j, ids, ide-1, jds, jde-1, ntasks_x, ntasks_y, Px, Py )
+           IF ( Py .EQ. mytask_y ) THEN
+              jpe = j
+              IF ( Py .EQ. ntasks_y-1 ) jpe = jpe + 1
+              IF ( jps .EQ. -1 ) jps = j
+           ENDIF
+        ENDDO
+# endif
+#endif
 
 ! extend the patch dimensions out shw along edges of domain
         IF ( mytask_x .EQ. 0 ) THEN
@@ -492,12 +590,32 @@ CONTAINS
 
   END SUBROUTINE compute_memory_dims_rsl_lite
 
+! internal, used below for switching the argument to MPI calls
+! if reals are being autopromoted to doubles in the build of WRF
+   INTEGER function getrealmpitype()
+#ifndef STUBMPI
+      IMPLICIT NONE
+      INCLUDE 'mpif.h'
+      INTEGER rtypesize, dtypesize, ierr
+      CALL mpi_type_size ( MPI_REAL, rtypesize, ierr )
+      CALL mpi_type_size ( MPI_DOUBLE_PRECISION, dtypesize, ierr )
+      IF ( RWORDSIZE .EQ. rtypesize ) THEN
+        getrealmpitype = MPI_REAL
+      ELSE IF ( RWORDSIZE .EQ. dtypesize ) THEN
+        getrealmpitype = MPI_DOUBLE_PRECISION
+      ELSE
+        CALL wrf_error_fatal ( 'RWORDSIZE or DWORDSIZE does not match any MPI type' )
+      ENDIF
+#endif
+      RETURN
+   END FUNCTION getrealmpitype
+
    REAL FUNCTION wrf_dm_max_real ( inval )
       IMPLICIT NONE
       INCLUDE 'mpif.h'
       REAL inval, retval
       INTEGER ierr
-      CALL mpi_allreduce ( inval, retval , 1, MPI_REAL, MPI_MAX, local_communicator, ierr )
+      CALL mpi_allreduce ( inval, retval , 1, getrealmpitype(), MPI_MAX, local_communicator, ierr )
       wrf_dm_max_real = retval
    END FUNCTION wrf_dm_max_real
 
@@ -506,7 +624,7 @@ CONTAINS
       INCLUDE 'mpif.h'
       REAL inval, retval
       INTEGER ierr
-      CALL mpi_allreduce ( inval, retval , 1, MPI_REAL, MPI_MIN, local_communicator, ierr )
+      CALL mpi_allreduce ( inval, retval , 1, getrealmpitype(), MPI_MIN, local_communicator, ierr )
       wrf_dm_min_real = retval
    END FUNCTION wrf_dm_min_real
 
@@ -515,18 +633,9 @@ CONTAINS
       INCLUDE 'mpif.h'
       REAL inval, retval
       INTEGER ierr
-      CALL mpi_allreduce ( inval, retval , 1, MPI_REAL, MPI_SUM, local_communicator, ierr )
+      CALL mpi_allreduce ( inval, retval , 1, getrealmpitype(), MPI_SUM, local_communicator, ierr )
       wrf_dm_sum_real = retval
    END FUNCTION wrf_dm_sum_real
-
-   SUBROUTINE wrf_dm_sum_reals ( inval, retval )
-      IMPLICIT NONE
-      INCLUDE 'mpif.h'
-      REAL, INTENT(IN   ) :: inval(:)
-      REAL, INTENT(  OUT) :: retval(:)
-      INTEGER ierr
-      CALL mpi_allreduce ( inval, retval , SIZE(inval), MPI_REAL, MPI_SUM, mpi_comm_local, ierr )
-   END SUBROUTINE wrf_dm_sum_reals
 
    INTEGER FUNCTION wrf_dm_sum_integer ( inval )
       IMPLICIT NONE
@@ -536,15 +645,6 @@ CONTAINS
       CALL mpi_allreduce ( inval, retval , 1, MPI_INTEGER, MPI_SUM, local_communicator, ierr )
       wrf_dm_sum_integer = retval
    END FUNCTION wrf_dm_sum_integer
-
-   SUBROUTINE wrf_dm_sum_integers ( inval, retval )
-      IMPLICIT NONE
-      INCLUDE 'mpif.h'
-      INTEGER, INTENT(IN   ) :: inval(:)
-      INTEGER, INTENT(  OUT) :: retval(:)
-      INTEGER ierr
-      CALL mpi_allreduce ( inval, retval , SIZE(inval), MPI_INTEGER, MPI_SUM, mpi_comm_local, ierr )
-   END SUBROUTINE wrf_dm_sum_integers
 
    SUBROUTINE wrf_dm_maxval_real ( val, idex, jdex )
       IMPLICIT NONE
@@ -557,7 +657,7 @@ CONTAINS
 
       dex(1) = idex ; dex(2) = jdex
       CALL mpi_allgather ( dex, 2, MPI_INTEGER, dex_all , 2, MPI_INTEGER, local_communicator, ierr )
-      CALL mpi_allgather ( val, 1, MPI_REAL, val_all , 1, MPI_REAL, local_communicator, ierr )
+      CALL mpi_allgather ( val, 1, getrealmpitype(), val_all , 1, getrealmpitype(), local_communicator, ierr )
       val = val_all(1)
       idex = dex_all(1,1) ; jdex = dex_all(2,1)
       DO i = 2, ntasks
@@ -568,7 +668,6 @@ CONTAINS
         ENDIF
       ENDDO
    END SUBROUTINE wrf_dm_maxval_real
-
 
    SUBROUTINE wrf_dm_maxval_doubleprecision ( val, idex, jdex )
       IMPLICIT NONE
@@ -593,7 +692,6 @@ CONTAINS
       ENDDO
    END SUBROUTINE wrf_dm_maxval_doubleprecision
 
-
    SUBROUTINE wrf_dm_maxval_integer ( val, idex, jdex )
       IMPLICIT NONE
       INCLUDE 'mpif.h'
@@ -616,7 +714,6 @@ CONTAINS
         ENDIF
       ENDDO
    END SUBROUTINE wrf_dm_maxval_integer
-
 
    SUBROUTINE init_module_dm
       IMPLICIT NONE
@@ -694,7 +791,6 @@ SUBROUTINE wrf_dm_patch_domain ( id  , domdesc , parent_id , parent_domdesc , &
                            sd3 , ed3 , sp3 , ep3 , sm3 , em3 , &
                            bdx , bdy )
 
-
    RETURN
 END SUBROUTINE wrf_dm_patch_domain
 
@@ -745,7 +841,11 @@ SUBROUTINE wrf_dm_bcast_bytes ( buf , size )
    IMPLICIT NONE
    INCLUDE 'mpif.h'
    INTEGER size
+#ifndef NEC
    INTEGER*1 BUF(size)
+#else
+   CHARACTER*1 BUF(size)
+#endif
    CALL BYTE_BCAST ( buf , size, local_communicator )
    RETURN
 END SUBROUTINE wrf_dm_bcast_bytes
@@ -876,7 +976,11 @@ END
    LOGICAL FUNCTION wrf_dm_on_monitor()
       USE module_dm
       IMPLICIT NONE
-      wrf_dm_on_monitor = mytask .EQ. 0
+      INCLUDE 'mpif.h'
+      INTEGER tsk, ierr, mpi_comm_local
+      CALL wrf_get_dm_communicator( mpi_comm_local )
+      CALL mpi_comm_rank ( mpi_comm_local, tsk , ierr )
+      wrf_dm_on_monitor = tsk .EQ. 0
       RETURN
    END FUNCTION wrf_dm_on_monitor
 
@@ -1837,6 +1941,7 @@ integer myproc
 #include <em_dummy_decl.inc>
       INTEGER nlev, msize
       INTEGER i,j,pig,pjg,cm,cn,nig,njg,retval,k
+      INTEGER iparstrt,jparstrt,sw
       TYPE (grid_config_rec_type)            :: config_flags
       REAL xv(500)
       INTEGER       ::          cids, cide, cjds, cjde, ckds, ckde,    &
@@ -1873,11 +1978,11 @@ integer myproc
                                 nips, nipe, njps, njpe, nkps, nkpe    )
 
       CALL nl_get_parent_grid_ratio ( ngrid%id, pgr )
-      CALL nl_get_i_parent_start ( intermediate_grid%id, i_parent_start )
-      CALL nl_get_j_parent_start ( intermediate_grid%id, j_parent_start )
-      CALL nl_get_shw            ( intermediate_grid%id, shw )
-      icoord =    i_parent_start - shw
-      jcoord =    j_parent_start - shw
+      CALL nl_get_i_parent_start ( intermediate_grid%id, iparstrt )
+      CALL nl_get_j_parent_start ( intermediate_grid%id, jparstrt )
+      CALL nl_get_shw            ( intermediate_grid%id, sw )
+      icoord =    iparstrt - sw
+      jcoord =    jparstrt - sw
       idim_cd = iide - iids + 1
       jdim_cd = ijde - ijds + 1
 
@@ -2159,8 +2264,9 @@ integer myproc
                                 ips, ipe, jps, jpe, kps, kpe
       INTEGER icoord, jcoord, idim_cd, jdim_cd
       INTEGER local_comm, myproc, nproc
+      INTEGER iparstrt, jparstrt, sw
+      REAL    nest_influence
 
-      TYPE(WRF_UTIL_Time)        :: CurrTime
       character*256 :: timestr
       integer ierr
 
@@ -2189,9 +2295,9 @@ integer myproc
 ! registry routine that accompanies RSL_LITE but, just as it's sometimes easier to put up a road
 ! sign that says "DIP" than fix the dip,  at this point it was easier just to write this comment. JM
 !
+      nest_influence = 1.
 
-      CALL WRF_UTIL_ClockGet( grid%domain_clock, CurrTime=CurrTime, rc=ierr )
-      CALL wrf_timetoa ( CurrTime, timestr )
+      CALL domain_clock_get( grid, current_timestr=timestr )
 
       CALL get_ijk_from_grid (  intermediate_grid ,                   &
                                 cids, cide, cjds, cjde, ckds, ckde,    &
@@ -2202,11 +2308,11 @@ integer myproc
                                 nims, nime, njms, njme, nkms, nkme,    &
                                 nips, nipe, njps, njpe, nkps, nkpe    )
 
-      CALL nl_get_i_parent_start ( intermediate_grid%id, i_parent_start )
-      CALL nl_get_j_parent_start ( intermediate_grid%id, j_parent_start )
-      CALL nl_get_shw            ( intermediate_grid%id, shw )
-      icoord =    i_parent_start - shw
-      jcoord =    j_parent_start - shw
+      CALL nl_get_i_parent_start ( intermediate_grid%id, iparstrt )
+      CALL nl_get_j_parent_start ( intermediate_grid%id, jparstrt )
+      CALL nl_get_shw            ( intermediate_grid%id, sw )
+      icoord =    iparstrt - sw
+      jcoord =    jparstrt - sw
       idim_cd = cide - cids + 1
       jdim_cd = cjde - cjds + 1
 
@@ -2220,6 +2326,7 @@ integer myproc
 
       CALL rsl_lite_merge_msgs( myproc, nproc, local_comm )
 
+#define NEST_INFLUENCE(A,B) A = B
 #  include "em_nest_feedbackup_unpack.inc"
 
       ! smooth coarse grid
@@ -2233,6 +2340,11 @@ integer myproc
                                 ips, ipe, jps, jpe, kps, kpe    )
 
 #  include "HALO_EM_INTERP_UP.inc"
+
+      CALL get_ijk_from_grid (  grid ,                   &
+                                cids, cide, cjds, cjde, ckds, ckde,    &
+                                cims, cime, cjms, cjme, ckms, ckme,    &
+                                cips, cipe, cjps, cjpe, ckps, ckpe    )
 
 #  include "em_nest_feedbackup_smooth.inc"
 
@@ -2252,6 +2364,7 @@ integer myproc
                                 root                        , &    ! root
                                 communicator                , &    ! communicator
                                 ierr )
+   USE module_dm
    IMPLICIT NONE
    INCLUDE 'mpif.h'
    INTEGER field_ofst, glob_ofst
@@ -2261,11 +2374,11 @@ integer myproc
 
            CALL mpi_gatherv( Field( field_ofst ),      &    ! sendbuf
                             my_count ,                       &    ! sendcount
-                            MPI_REAL         ,               &    ! sendtype
+                            getrealmpitype() ,               &    ! sendtype
                             globbuf( glob_ofst ) ,                 &    ! recvbuf
                             counts                         , &    ! recvcounts
                             displs                         , &    ! displs
-                            MPI_REAL                       , &    ! recvtype
+                            getrealmpitype()               , &    ! recvtype
                             root                           , &    ! root
                             communicator                   , &    ! communicator
                             ierr )
@@ -2280,6 +2393,7 @@ integer myproc
                                 root                        , &    ! root
                                 communicator                , &    ! communicator
                                 ierr )
+   USE module_dm
    IMPLICIT NONE
    INCLUDE 'mpif.h'
    INTEGER field_ofst, glob_ofst
@@ -2293,7 +2407,7 @@ integer myproc
                             globbuf( glob_ofst ) ,                 &    ! recvbuf
                             counts                         , &    ! recvcounts
                             displs                         , &    ! displs
-                            MPI_REAL                       , &    ! recvtype
+                            MPI_DOUBLE_PRECISION                       , &    ! recvtype
                             root                           , &    ! root
                             communicator                   , &    ! communicator
                             ierr )
