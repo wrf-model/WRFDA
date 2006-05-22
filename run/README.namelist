@@ -1,5 +1,9 @@
 Description of namelist variables
 ---------------------------------
+ 
+For WRF-NMM users, please see Chapter 5 of the WRF-NMM User's Guide for 
+information on NMM specific settings (http://www.dtcenter.org/wrf-nmm/users)
+
 
  Note: variables followed by (max_dom) indicate that this variable needs to
        be defined for the nests when max_dom > 1.
@@ -20,6 +24,7 @@ Description of namelist variables
  start_second (max_dom)              = 00,	; two digit second of starting time
                                                   Note: the start time is used to name the first wrfout file.
                                                   It also controls the start time for nest domains, and the time to restart
+ tstart (max_dom)                    = 00,	; FOR NMM: starting hour of the forecast
  end_year (max_dom)                  = 2001,	; four digit year of ending time
  end_month (max_dom)                 = 06,	; two digit month of ending time
  end_day (max_dom)                   = 12,	; two digit day of ending time
@@ -38,6 +43,9 @@ Description of namelist variables
  interval_seconds                    = 10800,	; time interval between incoming real data, which will be the interval
                                                   between the lateral boundary condition file
  input_from_file (max_dom)           = T,       ; whether nested run will have input files for domains other than 1
+ fine_input_stream (max_dom)         = 0,       ; field selection from nest input for its initialization
+                                                  0: all fields are used; 2: only static and time-varying, masked land 
+                                                  surface fields are used.
  history_interval (max_dom)          = 60,  	; history output file interval in minutes
  frames_per_outfile (max_dom)        = 1, 	; output times per history output file, used to split output files 
                                                   into smaller pieces
@@ -49,6 +57,11 @@ Description of namelist variables
  io_form_boundary                    = 2,       ; netCDF format
                                      = 4,       ; PHD5 format
                                      = 5,       ; GRIB1 format
+ frames_per_emissfile                = 12,  ; Number of times in each chemistry emission file.
+ io_style_emiss                      = 1,   ; Style to use for the chemistry emission files.
+                                                ; 0 = Do not read emissions from files.
+                                                ; 1 = Cycle between two 12 hour files (set frames_per_emissfile=12)
+                                                ; 2 = Dated files with length set by frames_per_emissfile
  debug_level                         = 0, 	; 50,100,200,300 values give increasing prints
 
 Other output options:
@@ -101,7 +114,6 @@ Additional ones when running WRFVAR:
  dy (max_dom)                        = 10000,	; grid length in y direction, unit in meters
  ztop (max_dom)                      = 19000.	; used in mass model for idealized cases
  grid_id (max_dom)                   = 1,	; domain identifier
- level (max_dom)                     = 1,	; nesting level
  parent_id (max_dom)                 = 0,       ; id of the parent domain
  i_parent_start (max_dom)            = 0,       ; starting LLC I-indices from the parent domain
  j_parent_start (max_dom)            = 0,       ; starting LLC J-indices from the parent domain
@@ -114,8 +126,8 @@ Additional ones when running WRFVAR:
  smooth_option                       = 0        ; smoothing option for parent domain, used only with feedback
                                                   option on. 0: no smoothing; 1: 1-2-1 smoothing; 2: smoothing-desmoothing
                                      
-Namelist variables for controling the prototype moving nest: 
-                   Note moving nest needs to be activated at the compile time by adding -DMOVE_NESTS
+Namelist variables for controling the specified moving nest: 
+                   Note that this moving nest option needs to be activated at the compile time by adding -DMOVE_NESTS
                    to the ARCHFLAGS. The maximum number of moves, max_moves, is set to 50 
                    but can be modified in source code file frame/module_driver_constants.F.
  num_moves                           = 4        ; total number of moves
@@ -127,6 +139,15 @@ Namelist variables for controling the prototype moving nest:
                                                   negative is to move in decreasing i and j direction.
                                                   0 means no move. The limitation now is to move only 1 grid cell
                                                   at each move.
+
+Namelist variables for controling the automatic moving nest: 
+                   Note that this moving nest option needs to be activated at the compile time by adding -DMOVE_NESTS
+                   and -DVORTEX_CENTER to the ARCHFLAGS. This option uses an mid-level vortex following algorthm to
+                   determine the nest move. This option is experimental.
+ vortex_interval                     = 15       ; how often the new vortex position is computed
+ max_vortex_speed                    = 40       ; used to compute the search radius for the new vortex position
+ corral_dist                         = 8        ; how many coarse grid cells the moving nest is allowed to get
+                                                  near the mother domain boundary
 
  &physics
 
@@ -228,6 +249,14 @@ Namelist variables for controling the prototype moving nest:
                                                 but is overridden by namelist value; cudt will be
                                                 computed from this.
 
+ tprec (max_dom)                     = FOR NMM: number of hours in precipitation bucket
+ theat (max_dom)                     = FOR NMM: number of hours in latent heating bucket
+ tclod (max_dom)                     = FOR NMM: number of hours in cloud fraction average
+ trdsw (max_dom)                     = FOR NMM: number of hours in short wave buckets
+ trdlw (max_dom)                     = FOR NMM: number of hours in long wave buckets
+ tsrfc (max_dom)                     = FOR NMM: number of hours in surface flux buckets
+ pcpflg (max_dom)                    = FOR NMM: logical switch for precipitation assimilation
+
  isfflx                              = 1,	; heat and moisture fluxes from the surface
                                                   (only works for sf_sfclay_physics = 1)
                                                   1 = with fluxes from the surface
@@ -240,6 +269,7 @@ Namelist variables for controling the prototype moving nest:
                                                   (only works for ra_sw_physics = 1 and ra_lw_physics = 1)
                                                   1 = with cloud effect
                                                   0 = without cloud effect
+ swrad_scat                          = 1.       ; scattering tuning parameter (default 1. is 1.e-5 m2/kg)
  surface_input_source                = 1,	; where landuse and soil category data come from:
                                                   1 = SI/gridgen
                                                   2 = GRIB data from another model (only possible
@@ -261,10 +291,10 @@ Namelist variables for controling the prototype moving nest:
                                                 ; and Noah scheme, set to land point, permanent ice, set temps
                                                 ; from 3 m to surface, and set smois and sh2o
  sst_update                          = 0        ; time-varying sea-surface temp (0=no, 1=yes). If selected real 
-                                                ; puts SST in wrflowinp_d01 file, and wrf updates SST from it
+                                                ; puts SST and VEGFRA in wrflowinp_d01 file, and wrf updates these from it
                                                 ; at same interval as boundary file. To read this, the time-control
                                                 ; namelist must include  auxinput5_interval,  auxinput5_end_h, and
-                                                   auxinput5_inname = "wrflowinp_d01"
+                                                ; auxinput5_inname = "wrflowinp_d<domain>"
 
 
  &dynamics
@@ -315,6 +345,8 @@ Namelist variables for controling the prototype moving nest:
  mix_full_fields(max_dom)            = .true.,  ; used with diff_opt = 2; value of ".true." is recommended, except for
                                                   highly idealized numerical tests; damp_opt must not be 1 if ".true."
                                                   is chosen. .false. means subtract 1-d base-state profile before mixing
+ tke_drag_coefficient(max_dom)       = 0.,      ; surface drag coefficient (Cd, dimensionless) for diff_opt=2 only
+ tke_heat_flux(max_dom)              = 0.,      ; surface thermal flux (H/(rho*cp), K m/s) for diff_opt=2 only
  h_mom_adv_order (max_dom)           = 5,       ; horizontal momentum advection order (5=5th, etc.)
  v_mom_adv_order (max_dom)           = 3,       ; vertical momentum advection order
  h_sca_adv_order (max_dom)           = 5,       ; horizontal scalar advection order
@@ -325,7 +357,7 @@ Namelist variables for controling the prototype moving nest:
                                                   best to use even numbers)
 
 
- &bc_control
+ &bdy_control
  spec_bdy_width                      = 5,       ; total number of rows for specified boundary value nudging
  spec_zone                           = 1,       ; number of points in specified zone (spec b.c. option)
  relax_zone                          = 4,       ; number of points in relaxation zone (spec b.c. option)
