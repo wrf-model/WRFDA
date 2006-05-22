@@ -8,6 +8,10 @@
 $sw_perl_path = perl ;
 $sw_netcdf_path = "" ;
 $sw_phdf5_path=""; 
+$sw_jasperlib_path=""; 
+$sw_jasperinc_path=""; 
+$sw_esmflib_path="";
+$sw_esmfinc_path="";
 $sw_ldflags=""; 
 $sw_compileflags=""; 
 $WRFCHEM = 0 ;
@@ -60,6 +64,40 @@ while ( substr( $ARGV[0], 0, 1 ) eq "-" )
   }
   shift @ARGV ;
  }
+
+# The jasper library is required to build Grib2 I/O.  User must set 
+# environment variables JASPERLIB and JASPERINC to paths to library and 
+# include files to enable this feature prior to running configure.  
+ if ( $ENV{JASPERLIB} && $ENV{JASPERINC} )
+   {
+   printf "Configuring to use jasper library to build Grib2 I/O...\n" ;
+   printf("  \$JASPERLIB = %s\n",$ENV{JASPERLIB});
+   printf("  \$JASPERINC = %s\n",$ENV{JASPERINC});
+   $sw_jasperlib_path = $ENV{JASPERLIB}; 
+   $sw_jasperinc_path = $ENV{JASPERINC}; 
+   }
+ else
+   {
+   printf "\$JASPERLIB or \$JASPERINC not found in environment, configuring to build without grib2 I/O...\n" ;
+   }
+
+# A separately-installed ESMF library is required to build the ESMF 
+# implementation of WRF IOAPI in external/io_esmf.  This is needed 
+# to couple WRF with other ESMF components.  User must set environment 
+# variables ESMFLIB and ESMFINC to paths ESMF to library and include 
+# files to enable this feature prior to running configure.
+ if ( $ENV{ESMFLIB} && $ENV{ESMFINC} )
+   {
+   printf "Configuring to use ESMF library to build WRF...\n" ;
+   printf "WARNING-WARNING-WARNING-WARNING-WARNING-WARNING-WARNING-WARNING\n" ;
+   printf "WARNING:  THIS IS AN EXPERIMENTAL CONFIGURATION\n" ;
+   printf "WARNING:  IT DOES NOT WORK WITH NESTING\n" ;
+   printf "WARNING-WARNING-WARNING-WARNING-WARNING-WARNING-WARNING-WARNING\n" ;
+   printf("  \$ESMFLIB = %s\n",$ENV{ESMFLIB});
+   printf("  \$ESMFINC = %s\n",$ENV{ESMFINC});
+   $sw_esmflib_path = $ENV{ESMFLIB};
+   $sw_esmfinc_path = $ENV{ESMFINC};
+   }
 
 # parse the configure.wrf file
 
@@ -142,6 +180,33 @@ while ( <CONFIGURE_DEFAULTS> )
 	$_ =~ s:CONFIGURE_PHDF5_FLAG::g ;
 	$_ =~ s:CONFIGURE_PHDF5_LIB_PATH::g ;
 	 }
+
+    if ( $sw_jasperlib_path && $sw_jasperinc_path ) 
+      { $_ =~ s/CONFIGURE_WRFIO_GRIB2/wrfio_grib2/g ;
+        $_ =~ s:CONFIGURE_GRIB2_FLAG:-DGRIB2:g ;
+        $_ =~ s:CONFIGURE_GRIB2_INC:-I$sw_jasperinc_path:g ;
+        $_ =~ s:CONFIGURE_GRIB2_LIB:-L../external/io_grib2 -lio_grib2 -L$sw_jasperlib_path -ljasper:g ;
+      }
+    else                   
+      { $_ =~ s/CONFIGURE_WRFIO_GRIB2//g ;
+        $_ =~ s:CONFIGURE_GRIB2_FLAG::g ;
+        $_ =~ s:CONFIGURE_GRIB2_INC::g ;
+        $_ =~ s:CONFIGURE_GRIB2_LIB::g ;
+      }
+
+
+    # ESMF substitutions in configure.defaults
+    if ( $sw_esmflib_path && $sw_esmfinc_path )
+      {
+      $_ =~ s:ESMFIOLIB:-L$sw_esmflib_path -lesmf -L../external/io_esmf -lwrfio_esmf \$\(ESMF_LIB_FLAGS\):g ;
+      $_ =~ s:ESMFIOEXTLIB:-L$sw_esmflib_path -lesmf -L../../external/io_esmf -lwrfio_esmf \$\(ESMF_LIB_FLAGS\):g ;
+      }
+    else
+      {
+      $_ =~ s:ESMFIOLIB:-L../external/esmf_time_f90 -lesmf_time:g ;
+      $_ =~ s:ESMFIOEXTLIB:-L../../external/esmf_time_f90 -lesmf_time:g ;
+      }
+
     @machopts = ( @machopts, $_ ) ;
     if ( substr( $_, 0, 10 ) eq "ENVCOMPDEF" )
     {
@@ -177,7 +242,33 @@ close CONFIGURE_DEFAULTS ;
 
 open CONFIGURE_WRF, "> configure.wrf" or die "cannot append configure.wrf" ;
 open ARCH_PREAMBLE, "< arch/preamble" or die "cannot open arch/preamble" ;
-while ( <ARCH_PREAMBLE> ) { print CONFIGURE_WRF } ;
+my @preamble;
+# apply substitutions to the preamble...
+while ( <ARCH_PREAMBLE> )
+  {
+  # ESMF substitutions in preamble
+  if ( $sw_esmflib_path && $sw_esmfinc_path )
+    {
+    $_ =~ s/ESMFCOUPLING/1/g ;
+    $_ =~ s:ESMFMODDEPENDENCE:../external/io_esmf/module_utility.o:g ;
+    $_ =~ s:ESMFMODINC:-I$sw_esmfinc_path -I../main:g ;
+    $_ =~ s:ESMFIOINC:-I../external/io_esmf:g ;
+    $_ =~ s:ESMFIODEFS:-DESMFIO:g ;
+    $_ =~ s:ESMFTARGET:wrfio_esmf:g ;
+    }
+  else
+    {
+    $_ =~ s/ESMFCOUPLING/0/g ;
+    $_ =~ s:ESMFMODDEPENDENCE:../external/esmf_time_f90/module_utility.o:g ;
+    $_ =~ s:ESMFMODINC::g ;
+    $_ =~ s:ESMFIOINC:-I../external/esmf_time_f90:g ;
+    $_ =~ s:ESMFIODEFS::g ;
+    $_ =~ s:ESMFTARGET:esmf_time:g ;
+    }
+  @preamble = ( @preamble, $_ ) ;
+  }
+close ARCH_PREAMBLE ;
+print CONFIGURE_WRF @preamble  ;
 close ARCH_PREAMBLE ;
 printf CONFIGURE_WRF "# Settings for %s", $optstr[$optchoice] ;
 print CONFIGURE_WRF @machopts  ;
