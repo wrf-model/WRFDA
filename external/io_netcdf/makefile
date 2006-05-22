@@ -25,9 +25,9 @@ wrf_io.o:               wrf_io.F90 $(CODE)
 diffwrf:                diffwrf.F90
 			$(CPP1) diffwrf.F90 > diffwrf.f
 			$(FC) -c $(FFLAGS) diffwrf.f
-			@if [ -f ../../frame/module_wrf_error.o ] ; then \
-			echo "diffwrf is being built now. "; \
-			  $(FC) $(FFLAGS) $(LDFLAGS) -o diffwrf diffwrf.o $(OBJSL) $(LIBS) ../../frame/module_wrf_error.o ;\
+			@if [ \( -f ../../frame/module_wrf_error.o \) -a \( -f $(ESMF_MOD_DEPENDENCE) \) ] ; then \
+			echo "diffwrf io_netcdf is being built now. "; \
+			  $(FC) $(FFLAGS) $(LDFLAGS) -o diffwrf diffwrf.o $(OBJSL) $(LIBS) ../../frame/module_wrf_error.o $(ESMF_IO_LIB_EXT) ;\
                         else \
 			  echo "***************************************************************************** " ; \
 			  echo "*** Rerun compile to make diffwrf in external/io_netcdf directory         *** " ; \
