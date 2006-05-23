@@ -160,8 +160,8 @@ print *,TRIM(eligible_file_name(loop))
 
       IMPLICIT NONE
 
-      INTEGER :: length_of_char
-      CHARACTER (LEN=length_of_char) :: command
+      INTEGER, INTENT(IN) :: length_of_char
+      CHARACTER (LEN=length_of_char), INTENT(INOUT) :: command
       INTEGER :: loop
 
       DO loop = 1 , length_of_char

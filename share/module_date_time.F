@@ -670,7 +670,7 @@ CONTAINS
    
       IMPLICIT NONE
    
-      INTEGER :: year
+      INTEGER, INTENT(IN) :: year
       INTEGER :: num_days
    
       num_days = 28 ! By default, February has 28 days ...
