@@ -303,7 +303,7 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
 !     [8.1] Calculate nonlinear model trajectory 
 
       if (lvar4d) then
-         call system("runvar4dnl.csh")
+         call system("runvar4dnl.bsh")
       endif
 
 !     [8.2] Calculate innovation vector (O-B):
