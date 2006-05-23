@@ -58,8 +58,9 @@ PROGRAM real_data
               end_hour ,   end_minute ,   end_second
    INTEGER :: interval_seconds , real_data_init_type
    INTEGER :: time_loop_max , time_loop, rc
-   TYPE(WRF_UTIL_TimeInterval) :: time_interval
    REAL    :: t1,t2
+
+#include "version_decl"
 
    INTERFACE
      SUBROUTINE Setup_Timekeeping( grid )
@@ -70,7 +71,7 @@ PROGRAM real_data
 
    !  Define the name of this program (program_name defined in module_domain)
 
-   program_name = "REAL_NMM V2.0 PREPROCESSOR"
+   program_name = "REAL_NMM " // TRIM(release_version) // " PREPROCESSOR"
 
 #ifdef DM_PARALLEL
    CALL disable_quilting
@@ -87,7 +88,7 @@ PROGRAM real_data
 
 !!!!   CALL init_modules
    CALL init_modules(1)   ! Phase 1 returns after MPI_INIT() (if it is called)
-   CALL WRF_UTIL_Initialize( defaultCalendar=WRF_UTIL_CAL_GREGORIAN, rc=rc )
+   CALL WRFU_Initialize( defaultCalendar=WRFU_CAL_GREGORIAN, rc=rc )
    CALL init_modules(2)   ! Phase 2 resumes after MPI_INIT() (if it is called)
 
    !  The configuration switches mostly come from the NAMELIST input.
@@ -124,10 +125,8 @@ PROGRAM real_data
 
 #include "deref_kludge.h"
    CALL Setup_Timekeeping ( grid )
-   CALL WRF_UTIL_TimeIntervalSet ( time_interval ,  &
-             S=model_config_rec%interval_seconds,rc=rc )
-   CALL WRF_UTIL_ClockSet ( grid%domain_clock , timeStep=time_interval , rc=rc )
-
+   CALL domain_clock_set( grid, &
+                          time_step_seconds=model_config_rec%interval_seconds )
    CALL wrf_debug ( 100 , 'real_nmm: calling set_scalar_indices_from_config ' )
    CALL set_scalar_indices_from_config ( grid%id , idum1, idum2 )
 
@@ -167,6 +166,8 @@ PROGRAM real_data
     CALL wrf_dm_shutdown
 #endif
 	write(0,*) 'done done'
+
+   CALL WRFU_Finalize( rc=rc )
 
 END PROGRAM real_data
 
@@ -240,6 +241,7 @@ SUBROUTINE med_sidata_input ( grid , config_flags )
                             model_config_rec%interval_seconds      , &
                             model_config_rec%real_data_init_type   , &
                             start_date_char , end_date_char , time_loop_max )
+
 
 	write(0,*) 'return si_start_and_end'
 
@@ -405,6 +407,8 @@ SUBROUTINE med_sidata_input ( grid , config_flags )
       CALL geth_newdate ( current_date_char , start_date_char , &
                           loop * model_config_rec%interval_seconds )
       current_date =  current_date_char // '.0000'
+
+      CALL domain_clock_set( grid, current_date(1:19) )
 
 	write(0,*) 'current_date= ', current_date
 
@@ -847,7 +851,7 @@ character *24 :: temp24 , temp24b
 ! what's this do?
 !         grid%write_metadata = .true.
 !         grid%write_metadata = .false.
-         CALL WRF_UTIL_ClockAdvance( grid%domain_clock, rc=rc )
+         CALL domain_clockadvance( grid )
       END IF
 
       write(0,*)' assemble_ouput loop=',loop,' point 2'
@@ -1059,6 +1063,9 @@ character *24 :: temp24 , temp24b
       CALL geth_newdate ( temp19 , temp24b(1:19) , &
                          (loop-2) * model_config_rec%interval_seconds )
       current_date = temp19 //  '.0000'
+       CALL domain_clock_set( grid, current_date(1:19) )
+ print *,'LBC valid between these times ',current_date, ' ',start_date
+
       CALL output_boundary ( id, grid , config_flags , ierr )
       current_date = temp24
       start_date = temp24b

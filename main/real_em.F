@@ -20,17 +20,31 @@ PROGRAM real_data
 
    IMPLICIT NONE
 
+#ifdef WRF_CHEM
+  ! interface
+   INTERFACE
+     ! mediation-supplied 
+     SUBROUTINE med_read_wrf_chem_bioemiss ( grid , config_flags)
+       USE module_domain
+       TYPE (domain) grid
+       TYPE (grid_config_rec_type) config_flags
+     END SUBROUTINE med_read_wrf_chem_bioemiss
+   END INTERFACE
+#endif
+
    REAL    :: time , bdyfrq
 
    INTEGER :: loop , levels_to_process , debug_level
 
 
    TYPE(domain) , POINTER :: null_domain
-   TYPE(domain) , POINTER :: grid
+   TYPE(domain) , POINTER :: grid , another_grid
+   TYPE(domain) , POINTER :: grid_ptr , grid_ptr2
    TYPE (grid_config_rec_type)              :: config_flags
    INTEGER                :: number_at_same_level
 
-   INTEGER :: max_dom, domain_id
+   INTEGER :: max_dom, domain_id , grid_id , parent_id , parent_id1 , id
+   INTEGER :: e_we , e_sn , i_parent_start , j_parent_start
    INTEGER :: idum1, idum2 
 #ifdef DM_PARALLEL
    INTEGER                 :: nbytes
@@ -38,6 +52,7 @@ PROGRAM real_data
    INTEGER                 :: configbuf( configbuflen )
    LOGICAL , EXTERNAL      :: wrf_dm_on_monitor
 #endif
+   LOGICAL found_the_id
 
    INTEGER :: ids , ide , jds , jde , kds , kde
    INTEGER :: ims , ime , jms , jme , kms , kme
@@ -51,7 +66,6 @@ PROGRAM real_data
    INTEGER ::   end_year ,   end_month ,   end_day ,   end_hour ,   end_minute ,   end_second
    INTEGER :: interval_seconds , real_data_init_type
    INTEGER :: time_loop_max , time_loop
-   TYPE(WRF_UTIL_TimeInterval) :: time_interval
 real::t1,t2
    INTERFACE
      SUBROUTINE Setup_Timekeeping( grid )
@@ -60,12 +74,14 @@ real::t1,t2
      END SUBROUTINE Setup_Timekeeping
    END INTERFACE
 
+#include "version_decl"
+
    !  Define the name of this program (program_name defined in module_domain)
 
    ! NOTE: share/input_wrf.F tests first 7 chars of this name to decide 
    ! whether to read P_TOP as metadata from the SI (yes, if .eq. REAL_EM)
 
-   program_name = "REAL_EM V2.0.3.1 PREPROCESSOR"
+   program_name = "REAL_EM " // TRIM(release_version) // " PREPROCESSOR"
 
 #ifdef DM_PARALLEL
    CALL disable_quilting
@@ -78,7 +94,7 @@ real::t1,t2
 
    CALL       wrf_debug ( 100 , 'real_em: calling init_modules ' )
    CALL init_modules(1)   ! Phase 1 returns after MPI_INIT() (if it is called)
-   CALL WRF_UTIL_Initialize( defaultCalendar=WRF_UTIL_CAL_GREGORIAN, rc=rc )
+   CALL WRFU_Initialize( defaultCalendar=WRFU_CAL_GREGORIAN, rc=rc )
    CALL init_modules(2)   ! Phase 2 resumes after MPI_INIT() (if it is called)
 
    !  The configuration switches mostly come from the NAMELIST input.
@@ -110,46 +126,104 @@ real::t1,t2
                                      kid        = -1            )
 
    grid => head_grid
+   CALL nl_get_max_dom ( 1 , max_dom )
 
-   CALL Setup_Timekeeping ( grid )
-   CALL wrf_clockprint ( 150, grid%domain_clock, &
-                         'DEBUG real:  grid%domain_clock after Setup_Timekeeping,' )
-   CALL WRF_UTIL_TimeIntervalSet ( time_interval , S=model_config_rec%interval_seconds, rc=rc )
-   CALL WRF_UTIL_ClockSet ( grid%domain_clock , timeStep=time_interval , rc=rc )
-   CALL wrf_check_error( WRF_UTIL_SUCCESS, rc, &
-                         'WRF_UTIL_ClockSet(grid%domain_clock) FAILED', &
-                         __FILE__ , &
-                         __LINE__  )
-   CALL wrf_clockprint ( 150, grid%domain_clock, &
-                         'DEBUG real:  grid%domain_clock after timeStep set,' )
+   IF ( model_config_rec%interval_seconds .LE. 0 ) THEN
+     CALL wrf_error_fatal( 'namelist value for interval_seconds must be > 0')
+   ENDIF
+
+   all_domains : DO domain_id = 1 , max_dom
+
+      IF ( ( model_config_rec%input_from_file(domain_id) ) .OR. &
+           ( domain_id .EQ. 1 ) ) THEN
+
+         IF ( domain_id .GT. 1 ) THEN
+            CALL nl_get_grid_id        ( domain_id, grid_id        )
+            CALL nl_get_parent_id      ( domain_id, parent_id      )
+            CALL nl_get_e_we           ( domain_id, e_we           )
+            CALL nl_get_e_sn           ( domain_id, e_sn           )
+            CALL nl_get_i_parent_start ( domain_id, i_parent_start )
+            CALL nl_get_j_parent_start ( domain_id, j_parent_start )
+            WRITE (message,FMT='(A,2I3,2I4,2I3)') &
+            'new allocated  domain: id, par id, dims i/j, start i/j =', &
+            grid_id, parent_id, e_we, e_sn, i_parent_start, j_parent_start
+
+            CALL wrf_debug ( 100 , message )
+            CALL nl_get_grid_id        ( parent_id, grid_id        )
+            CALL nl_get_parent_id      ( parent_id, parent_id1     )
+            CALL nl_get_e_we           ( parent_id, e_we           )
+            CALL nl_get_e_sn           ( parent_id, e_sn           )
+            CALL nl_get_i_parent_start ( parent_id, i_parent_start )
+            CALL nl_get_j_parent_start ( parent_id, j_parent_start )
+            WRITE (message,FMT='(A,2I3,2I4,2I3)') &
+            'parent domain: id, par id, dims i/j, start i/j =', &
+            grid_id, parent_id1, e_we, e_sn, i_parent_start, j_parent_start
+            CALL wrf_debug ( 100 , message )
+
+            CALL nl_get_grid_id        ( domain_id, grid_id        )
+            CALL nl_get_parent_id      ( domain_id, parent_id      )
+            CALL nl_get_e_we           ( domain_id, e_we           )
+            CALL nl_get_e_sn           ( domain_id, e_sn           )
+            CALL nl_get_i_parent_start ( domain_id, i_parent_start )
+            CALL nl_get_j_parent_start ( domain_id, j_parent_start )
+            grid_ptr2 => head_grid
+            found_the_id = .FALSE.
+            CALL find_my_parent ( grid_ptr2 , grid_ptr , parent_id , found_the_id )
+            IF ( found_the_id ) THEN
+               CALL alloc_and_configure_domain ( domain_id  = domain_id    , &
+                                                 grid       = another_grid , &
+                                                 parent     = grid_ptr     , &
+                                                 kid        = 1            )
+               grid => another_grid
+            ELSE
+              CALL wrf_error_fatal( 'real_em.F: Could not find the parent domain')
+            END IF
+         END IF
+
+         CALL Setup_Timekeeping ( grid )
+         CALL set_current_grid_ptr( grid )
+         CALL domain_clockprint ( 150, grid, &
+                'DEBUG real:  clock after Setup_Timekeeping,' )
+         CALL domain_clock_set( grid, &
+                                time_step_seconds=model_config_rec%interval_seconds )
+         CALL domain_clockprint ( 150, grid, &
+                'DEBUG real:  clock after timeStep set,' )
 
 
-   CALL       wrf_debug ( 100 , 'real_em: calling set_scalar_indices_from_config ' )
-   CALL set_scalar_indices_from_config ( grid%id , idum1, idum2 )
+         CALL       wrf_debug ( 100 , 'real_em: calling set_scalar_indices_from_config ' )
+         CALL set_scalar_indices_from_config ( grid%id , idum1, idum2 )
 
-   CALL       wrf_debug ( 100 , 'real_em: calling model_to_grid_config_rec ' )
-   CALL model_to_grid_config_rec ( grid%id , model_config_rec , config_flags )
+         CALL       wrf_debug ( 100 , 'real_em: calling model_to_grid_config_rec ' )
+         CALL model_to_grid_config_rec ( grid%id , model_config_rec , config_flags )
 
-   !  Initialize the WRF IO: open files, init file handles, etc.
+         !  Initialize the WRF IO: open files, init file handles, etc.
 
-   CALL       wrf_debug ( 100 , 'real_em: calling init_wrfio' )
-   CALL init_wrfio
+         CALL       wrf_debug ( 100 , 'real_em: calling init_wrfio' )
+         CALL init_wrfio
 
-   !  Some of the configuration values may have been modified from the initial READ
-   !  of the NAMELIST, so we re-broadcast the configuration records.
+         !  Some of the configuration values may have been modified from the initial READ
+         !  of the NAMELIST, so we re-broadcast the configuration records.
 
 #ifdef DM_PARALLEL
-   CALL       wrf_debug ( 100 , 'real_em: re-broadcast the configuration records' )
-   CALL get_config_as_buffer( configbuf, configbuflen, nbytes )
-   CALL wrf_dm_bcast_bytes( configbuf, nbytes )
-   CALL set_config_as_buffer( configbuf, configbuflen )
+         CALL       wrf_debug ( 100 , 'real_em: re-broadcast the configuration records' )
+         CALL get_config_as_buffer( configbuf, configbuflen, nbytes )
+         CALL wrf_dm_bcast_bytes( configbuf, nbytes )
+         CALL set_config_as_buffer( configbuf, configbuflen )
 #endif
 
-   !   No looping in this layer.  
+         !   No looping in this layer.  
 
-   CALL       wrf_debug ( 100 , 'calling med_sidata_input' )
-   CALL med_sidata_input ( grid , config_flags )
-   CALL       wrf_debug ( 100 , 'backfrom med_sidata_input' )
+         CALL       wrf_debug ( 100 , 'calling med_sidata_input' )
+         CALL med_sidata_input ( grid , config_flags )
+         CALL       wrf_debug ( 100 , 'backfrom med_sidata_input' )
+
+      ELSE 
+         CYCLE all_domains
+      END IF
+
+   END DO all_domains
+
+   CALL set_current_grid_ptr( head_grid )
 
    !  We are done.
 
@@ -157,7 +231,7 @@ real::t1,t2
 
    CALL wrf_shutdown
 
-   CALL WRF_UTIL_Finalize( rc=rc )
+   CALL WRFU_Finalize( rc=rc )
 
 END PROGRAM real_data
 
@@ -226,20 +300,16 @@ real::t1,t2
                                    start_date_char , end_date_char , time_loop_max )
 
    !  Override stop time with value computed above.  
-   CALL wrf_atotime( end_date_char, grid%stop_time )
-   CALL WRF_UTIL_ClockSet ( grid%domain_clock , StopTime=grid%stop_time, rc=rc )
-   CALL wrf_check_error( WRF_UTIL_SUCCESS, rc, &
-                         'WRF_UTIL_ClockSet(grid%domain_clock) FAILED', &
-                         __FILE__ , &
-                         __LINE__  )
+   CALL domain_clock_set( grid, stop_timestr=end_date_char )
+
    ! TBH:  for now, turn off stop time and let it run data-driven
-   CALL WRF_UTIL_ClockStopTimeDisable( grid%domain_clock, rc=rc ) 
-   CALL wrf_check_error( WRF_UTIL_SUCCESS, rc, &
-                         'WRF_UTIL_ClockStopTimeDisable(grid%domain_clock) FAILED', &
+   CALL WRFU_ClockStopTimeDisable( grid%domain_clock, rc=rc ) 
+   CALL wrf_check_error( WRFU_SUCCESS, rc, &
+                         'WRFU_ClockStopTimeDisable(grid%domain_clock) FAILED', &
                          __FILE__ , &
                          __LINE__  )
-   CALL wrf_clockprint ( 150, grid%domain_clock, &
-                         'DEBUG med_sidata_input:  grid%domain_clock after stopTime set,' )
+   CALL domain_clockprint ( 150, grid, &
+          'DEBUG med_sidata_input:  clock after stopTime set,' )
 
    !  Here we define the initial time to process, for later use by the code.
    
@@ -253,9 +323,13 @@ real::t1,t2
 
    DO loop = 1 , time_loop_max
 
+      IF ( ( grid%id .GT. 1 ) .AND. ( loop .GT. 1 ) ) EXIT
+
+      print *,' '
       print *,'-----------------------------------------------------------------------------'
       print *,' '
-      print '(A,A,A,I2,A,I2)' , ' Current date being processed: ',current_date, ', which is loop #',loop,' out of ',time_loop_max
+      print '(A,I2,A,A,A,I2,A,I2)' , &
+      ' Domain ',grid%id,': Current date being processed: ',current_date, ', which is loop #',loop,' out of ',time_loop_max
 
       !  After current_date has been set, fill in the julgmt stuff.
 
@@ -286,6 +360,7 @@ real::t1,t2
 
       !  Possible optional SI input.  This sets flags used by init_domain.
       IF ( loop .EQ. 1 ) THEN
+         already_been_here = .FALSE.
          CALL       wrf_debug ( 100 , 'med_sidata_input: calling init_module_optional_si_input' )
          CALL init_module_optional_si_input ( grid , config_flags )
       END IF
@@ -308,10 +383,7 @@ real::t1,t2
 
 #ifdef WRF_CHEM
       IF ( loop == 1 ) THEN
-         IF ( ( grid%chem_opt .EQ. RADM2     ) .OR. &
-              ( grid%chem_opt .EQ. RADM2SORG ) .OR. &
-              ( grid%chem_opt .EQ. RACM      ) .OR. &
-              ( grid%chem_opt .EQ. RACMSORG  ) ) THEN
+         IF( grid%chem_opt > 0 ) then
            ! Read the chemistry data from a previous wrf forecast (wrfout file)
            IF(grid%chem_in_opt == 1 ) THEN
               message = 'INITIALIZING CHEMISTRY WITH OLD SIMULATION'
@@ -352,19 +424,14 @@ real::t1,t2
 
       CALL geth_newdate ( current_date_char , start_date_char , loop * model_config_rec%interval_seconds )
       current_date =  current_date_char // '.0000'
-      CALL wrf_atotime( current_date(1:19), grid%current_time )
-      CALL wrf_clockprint ( 150, grid%domain_clock, &
-                            'DEBUG med_sidata_input:  grid%domain_clock before currTime set,' )
+      CALL domain_clockprint ( 150, grid, &
+             'DEBUG med_sidata_input:  clock before current_date set,' )
       WRITE (wrf_err_message,*) &
         'DEBUG med_sidata_input:  before currTime set, current_date = ',TRIM(current_date)
       CALL wrf_debug ( 150 , wrf_err_message )
-      CALL WRF_UTIL_ClockSet(grid%domain_clock, currTime=grid%current_time, rc=rc)
-      CALL wrf_check_error( WRF_UTIL_SUCCESS, rc, &
-                            'WRF_UTIL_ClockSet(grid%domain_clock) FAILED', &
-                            __FILE__ , &
-                            __LINE__  )
-      CALL wrf_clockprint ( 150, grid%domain_clock, &
-                            'DEBUG med_sidata_input:  grid%domain_clock after currTime set,' )
+      CALL domain_clock_set( grid, current_date(1:19) )
+      CALL domain_clockprint ( 150, grid, &
+             'DEBUG med_sidata_input:  clock after current_date set,' )
 if (loop.ne.time_loop_max )then
 print *,'set clock to ',current_date(1:19)
 endif
@@ -497,6 +564,19 @@ print *,'spec_bdy_width, interval_seconds, loop=',spec_bdy_width , interval_seco
       !  This is the space needed to save the current 3d data for use in computing
       !  the lateral boundary tendencies.
 
+      IF ( ALLOCATED ( ubdy3dtemp1 ) ) DEALLOCATE ( ubdy3dtemp1 )
+      IF ( ALLOCATED ( vbdy3dtemp1 ) ) DEALLOCATE ( vbdy3dtemp1 )
+      IF ( ALLOCATED ( tbdy3dtemp1 ) ) DEALLOCATE ( tbdy3dtemp1 )
+      IF ( ALLOCATED ( pbdy3dtemp1 ) ) DEALLOCATE ( pbdy3dtemp1 )
+      IF ( ALLOCATED ( qbdy3dtemp1 ) ) DEALLOCATE ( qbdy3dtemp1 )
+      IF ( ALLOCATED ( mbdy2dtemp1 ) ) DEALLOCATE ( mbdy2dtemp1 )
+      IF ( ALLOCATED ( ubdy3dtemp2 ) ) DEALLOCATE ( ubdy3dtemp2 )
+      IF ( ALLOCATED ( vbdy3dtemp2 ) ) DEALLOCATE ( vbdy3dtemp2 )
+      IF ( ALLOCATED ( tbdy3dtemp2 ) ) DEALLOCATE ( tbdy3dtemp2 )
+      IF ( ALLOCATED ( pbdy3dtemp2 ) ) DEALLOCATE ( pbdy3dtemp2 )
+      IF ( ALLOCATED ( qbdy3dtemp2 ) ) DEALLOCATE ( qbdy3dtemp2 )
+      IF ( ALLOCATED ( mbdy2dtemp2 ) ) DEALLOCATE ( mbdy2dtemp2 )
+
       ALLOCATE ( ubdy3dtemp1(ims:ime,kms:kme,jms:jme) )
       ALLOCATE ( vbdy3dtemp1(ims:ime,kms:kme,jms:jme) )
       ALLOCATE ( tbdy3dtemp1(ims:ime,kms:kme,jms:jme) )
@@ -596,10 +676,10 @@ print *,'spec_bdy_width, interval_seconds, loop=',spec_bdy_width , interval_seco
                CALL wrf_error_fatal( 'real: error opening wrfbdy for writing' )
          ENDIF
       ELSE
-         IF ( .NOT. WRF_UTIL_ClockIsStopTime(grid%domain_clock ,rc=rc) ) THEN
-            CALL WRF_UTIL_ClockAdvance( grid%domain_clock, rc=rc )
-            CALL wrf_clockprint ( 150, grid%domain_clock, &
-                                  'DEBUG assemble_output:  grid%domain_clock after ClockAdvance,' )
+         IF ( .NOT. domain_clockisstoptime(grid) ) THEN
+            CALL domain_clockadvance( grid )
+            CALL domain_clockprint ( 150, grid, &
+                   'DEBUG assemble_output:  clock after ClockAdvance,' )
          ENDIF
       END IF
 
@@ -665,55 +745,40 @@ print *,'spec_bdy_width, interval_seconds, loop=',spec_bdy_width , interval_seco
       !  that the starting time in the attributes is the second time period.  Why you may ask.  I
       !  agree, why indeed.
 
-      CALL wrf_atotime( current_date(1:19), grid%current_time )
-      CALL wrf_clockprint ( 150, grid%domain_clock, &
-                            'DEBUG assemble_output:  grid%domain_clock before 1st currTime set,' )
+      CALL domain_clockprint ( 150, grid, &
+             'DEBUG assemble_output:  clock before 1st current_date set,' )
       WRITE (wrf_err_message,*) &
         'DEBUG assemble_output:  before 1st currTime set, current_date = ',TRIM(current_date)
       CALL wrf_debug ( 150 , wrf_err_message )
-      CALL WRF_UTIL_ClockSet(grid%domain_clock, currTime=grid%current_time, rc=rc)
-      CALL wrf_check_error( WRF_UTIL_SUCCESS, rc, &
-                            'WRF_UTIL_ClockSet(grid%domain_clock) FAILED', &
-                            __FILE__ , &
-                            __LINE__  )
-      CALL wrf_clockprint ( 150, grid%domain_clock, &
-                            'DEBUG assemble_output:  grid%domain_clock after 1st currTime set,' )
+      CALL domain_clock_set( grid, current_date(1:19) )
+      CALL domain_clockprint ( 150, grid, &
+             'DEBUG assemble_output:  clock after 1st current_date set,' )
 
       temp24= current_date
       temp24b=start_date
       start_date = current_date
       CALL geth_newdate ( temp19 , temp24b(1:19) , (loop-2) * model_config_rec%interval_seconds )
       current_date = temp19 //  '.0000'
-      CALL wrf_atotime( current_date(1:19), grid%current_time )
-      CALL wrf_clockprint ( 150, grid%domain_clock, &
-                            'DEBUG assemble_output:  grid%domain_clock before 2nd currTime set,' )
+      CALL domain_clockprint ( 150, grid, &
+             'DEBUG assemble_output:  clock before 2nd current_date set,' )
       WRITE (wrf_err_message,*) &
         'DEBUG assemble_output:  before 2nd currTime set, current_date = ',TRIM(current_date)
       CALL wrf_debug ( 150 , wrf_err_message )
-      CALL WRF_UTIL_ClockSet(grid%domain_clock, currTime=grid%current_time, rc=rc)
-      CALL wrf_check_error( WRF_UTIL_SUCCESS, rc, &
-                            'WRF_UTIL_ClockSet(grid%domain_clock) FAILED', &
-                            __FILE__ , &
-                            __LINE__  )
-      CALL wrf_clockprint ( 150, grid%domain_clock, &
-                            'DEBUG assemble_output:  grid%domain_clock after 2nd currTime set,' )
+      CALL domain_clock_set( grid, current_date(1:19) )
+      CALL domain_clockprint ( 150, grid, &
+             'DEBUG assemble_output:  clock after 2nd current_date set,' )
 print *,'LBC valid between these times ',current_date, ' ',start_date
       CALL output_boundary ( id, grid , config_flags , ierr )
       current_date = temp24
       start_date = temp24b
-      CALL wrf_atotime( current_date(1:19), grid%current_time )
-      CALL wrf_clockprint ( 150, grid%domain_clock, &
-                            'DEBUG assemble_output:  grid%domain_clock before 3rd currTime set,' )
+      CALL domain_clockprint ( 150, grid, &
+             'DEBUG assemble_output:  clock before 3rd current_date set,' )
       WRITE (wrf_err_message,*) &
         'DEBUG assemble_output:  before 3rd currTime set, current_date = ',TRIM(current_date)
       CALL wrf_debug ( 150 , wrf_err_message )
-      CALL WRF_UTIL_ClockSet(grid%domain_clock, currTime=grid%current_time, rc=rc)
-      CALL wrf_check_error( WRF_UTIL_SUCCESS, rc, &
-                            'WRF_UTIL_ClockSet(grid%domain_clock) FAILED', &
-                            __FILE__ , &
-                            __LINE__  )
-      CALL wrf_clockprint ( 150, grid%domain_clock, &
-                            'DEBUG assemble_output:  grid%domain_clock after 3rd currTime set,' )
+      CALL domain_clock_set( grid, current_date(1:19) )
+      CALL domain_clockprint ( 150, grid, &
+             'DEBUG assemble_output:  clock after 3rd current_date set,' )
 
       !  OK, for all of the loops, we output the initialzation data, which would allow us to
       !  start the model at any of the available analysis time periods.

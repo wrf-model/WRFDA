@@ -28,6 +28,8 @@ PROGRAM ideal
    TYPE(domain) , POINTER :: keep_grid, grid_ptr, null_domain, grid
    TYPE(domain)           :: dummy
    TYPE (grid_config_rec_type)              :: config_flags
+   TYPE (WRFU_Time) startTime, stopTime, currentTime
+   TYPE (WRFU_TimeInterval) stepTime
 
    INTEGER :: max_dom , domain_id , fid , oid , idum1 , idum2 , ierr
    INTEGER :: debug_level, rc
@@ -42,6 +44,8 @@ PROGRAM ideal
      END SUBROUTINE med_initialdata_output 
    END INTERFACE
 
+#include "version_decl"
+
 
 #ifdef DM_PARALLEL
    INTEGER                 :: nbytes
@@ -54,12 +58,12 @@ PROGRAM ideal
 
    !  Define the name of this program (program_name defined in module_domain)
 
-   program_name = "IDEAL V2.0.3.1 PREPROCESSOR"
+   program_name = "IDEAL " // TRIM(release_version) // " PREPROCESSOR"
 
    !  Get the NAMELIST data for input.
 
    CALL init_modules(1)   ! Phase 1 returns after MPI_INIT() (if it is called)
-   CALL WRF_UTIL_Initialize( defaultCalendar=WRF_UTIL_CAL_GREGORIAN, rc=rc )
+   CALL WRFU_Initialize( defaultCalendar=WRFU_CAL_GREGORIAN, rc=rc )
    CALL init_modules(2)   ! Phase 2 resumes after MPI_INIT() (if it is called)
 
 #ifdef DM_PARALLEL
@@ -93,17 +97,17 @@ PROGRAM ideal
    ! TBH:  are explicit replacements for old default initializations...  They 
    ! TBH:  are needed to ensure that time manager calls do not fail due to 
    ! TBH:  uninitialized clock.  Clean this up later...  
-   CALL WRF_UTIL_TimeSet(grid%start_time, YY=1, MM=1, DD=1, H=0, M=0, S=0, rc=rc)
-   grid%stop_time    = grid%start_time
-   grid%current_time = grid%start_time
+   CALL WRFU_TimeSet(startTime, YY=1, MM=1, DD=1, H=0, M=0, S=0, rc=rc)
+   stopTime = startTime
+   currentTime = startTime
    ! TBH:  Bogus time step value -- clock is never advanced...  
-   CALL WRF_UTIL_TimeIntervalSet(grid%step_time, S=180, rc=rc)
-   grid%domain_clock = WRF_UTIL_ClockCreate( TimeStep= grid%step_time,  &
-                                             StartTime=grid%start_time, &
-                                             StopTime= grid%stop_time,  &
-                                             rc=rc )
-   CALL wrf_check_error( WRF_UTIL_SUCCESS, rc, &
-                         'grid%domain_clock = WRF_UTIL_ClockCreate() FAILED', &
+   CALL WRFU_TimeIntervalSet(stepTime, S=180, rc=rc)
+   grid%domain_clock = WRFU_ClockCreate( TimeStep= stepTime,  &
+                                         StartTime=startTime, &
+                                         StopTime= stopTime,  &
+                                         rc=rc )
+   CALL wrf_check_error( WRFU_SUCCESS, rc, &
+                         'grid%domain_clock = WRFU_ClockCreate() FAILED', &
                          __FILE__ , &
                          __LINE__  )
    CALL       wrf_debug ( 100 , 'wrf: calling model_to_grid_config_rec ' )
@@ -118,19 +122,14 @@ PROGRAM ideal
            config_flags%start_hour, &
            config_flags%start_minute, &
            config_flags%start_second 
-   CALL wrf_atotime( current_date(1:19), grid%current_time )
-   CALL wrf_clockprint ( 150, grid%domain_clock, &
-                            'DEBUG assemble_output:  grid%domain_clock before 1st currTime set,' )
+   CALL domain_clockprint ( 150, grid, &
+          'DEBUG assemble_output:  clock before 1st currTime set,' )
    WRITE (wrf_err_message,*) &
         'DEBUG assemble_output:  before 1st currTime set, current_date = ',TRIM(current_date)
    CALL wrf_debug ( 150 , wrf_err_message )
-   CALL WRF_UTIL_ClockSet(grid%domain_clock, currTime=grid%current_time, rc=rc)
-   CALL wrf_check_error( WRF_UTIL_SUCCESS, rc, &
-                            'WRF_UTIL_ClockSet(grid%domain_clock) FAILED', &
-                            __FILE__ , &
-                            __LINE__  )
-   CALL wrf_clockprint ( 150, grid%domain_clock, &
-                            'DEBUG assemble_output:  grid%domain_clock after 1st currTime set,' )
+   CALL domain_clock_set( grid, current_timestr=current_date(1:19) )
+   CALL domain_clockprint ( 150, grid, &
+          'DEBUG assemble_output:  clock after 1st currTime set,' )
 
    CALL       wrf_debug ( 100 , 'wrf: calling init_wrfio' )
    CALL init_wrfio
@@ -147,7 +146,7 @@ PROGRAM ideal
    CALL med_shutdown_io ( head_grid , config_flags )
    CALL wrf_shutdown
 
-   CALL WRF_UTIL_Finalize( rc=rc )
+   CALL WRFU_Finalize( rc=rc )
 
 END PROGRAM ideal
 
