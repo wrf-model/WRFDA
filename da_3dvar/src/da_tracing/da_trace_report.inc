@@ -377,7 +377,9 @@ SUBROUTINE da_trace_report
       END IF
    END IF
 
-   CLOSE(trace_unit)
+   IF (trace_write .AND. trace_unit /= 0) THEN
+      CLOSE(trace_unit)
+   END IF
 
    IF (mype == 0) THEN
       DEALLOCATE(index)

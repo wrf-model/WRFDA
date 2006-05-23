@@ -30,7 +30,7 @@ SUBROUTINE da_trace_init
    ! Open trace output file. 
    !-----------------------------------------------------------------
 
-   IF (trace_write) THEN
+   IF (trace_write .AND. trace_unit /= 0) THEN
       WRITE(UNIT=TraceFile,FMT='(A,I0,A)') &
         "trace/",mype,".html"
       OPEN ( &
