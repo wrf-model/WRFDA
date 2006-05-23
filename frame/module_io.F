@@ -177,7 +177,7 @@ SUBROUTINE wrf_open_for_write_begin( FileName , Comm_compute, Comm_io, SysDepInf
   USE module_state_description
   IMPLICIT NONE
 #include <wrf_io_flags.h>
-  CHARACTER*(*) :: FileName
+  CHARACTER*(*), INTENT(IN)   :: FileName
   INTEGER ,       INTENT(IN)  :: Comm_compute , Comm_io
   CHARACTER*(*), INTENT(INOUT):: SysDepInfo
   INTEGER ,       INTENT(OUT) :: DataHandle
@@ -478,11 +478,11 @@ SUBROUTINE wrf_open_for_read_begin( FileName , Comm_compute, Comm_io, SysDepInfo
   USE module_state_description
   IMPLICIT NONE
 #include <wrf_io_flags.h>
-  CHARACTER*(*) :: FileName
-  INTEGER ,       INTENT(IN)  :: Comm_compute , Comm_io
-  CHARACTER*(*) :: SysDepInfo
-  INTEGER ,       INTENT(OUT) :: DataHandle
-  INTEGER ,       INTENT(OUT) :: Status
+  CHARACTER*(*), INTENT(IN)   :: FileName
+  INTEGER ,      INTENT(IN)   :: Comm_compute , Comm_io
+  CHARACTER*(*), INTENT(IN)   :: SysDepInfo
+  INTEGER ,      INTENT(OUT)  :: DataHandle
+  INTEGER ,      INTENT(OUT)  :: Status
   
   CHARACTER*128               :: DataSet
   INTEGER                     :: io_form
@@ -729,9 +729,9 @@ SUBROUTINE wrf_open_for_read ( FileName , Comm_compute, Comm_io, SysDepInfo, &
 !</DESCRIPTION>
   USE module_state_description
   IMPLICIT NONE
-  CHARACTER*(*) :: FileName
+  CHARACTER*(*),  INTENT(IN)  :: FileName
   INTEGER ,       INTENT(IN)  :: Comm_compute , Comm_io
-  CHARACTER*(*) :: SysDepInfo
+  CHARACTER*(*),  INTENT(IN)  :: SysDepInfo
   INTEGER ,       INTENT(OUT) :: DataHandle
   INTEGER ,       INTENT(OUT) :: Status
 
@@ -901,7 +901,7 @@ SUBROUTINE wrf_inquire_opened ( DataHandle, FileName , FileStatus, Status )
   USE module_state_description
   IMPLICIT NONE
   INTEGER ,       INTENT(IN)  :: DataHandle
-  CHARACTER*(*) :: FileName
+  CHARACTER*(*),  INTENT(IN)  :: FileName
   INTEGER ,       INTENT(OUT) :: FileStatus
   INTEGER ,       INTENT(OUT) :: Status
   LOGICAL                     :: for_out
@@ -987,7 +987,7 @@ SUBROUTINE wrf_inquire_filename ( DataHandle, FileName , FileStatus, Status )
   USE module_state_description
   IMPLICIT NONE
   INTEGER ,       INTENT(IN)  :: DataHandle
-  CHARACTER*(*) :: FileName
+  CHARACTER*(*),  INTENT(OUT)  :: FileName
   INTEGER ,       INTENT(OUT) :: FileStatus
   INTEGER ,       INTENT(OUT) :: Status
 #include <wrf_status_codes.h>
@@ -1228,7 +1228,7 @@ SUBROUTINE wrf_get_next_time ( DataHandle, DateStr, Status )
   USE module_state_description
   IMPLICIT NONE
   INTEGER ,       INTENT(IN)  :: DataHandle
-  CHARACTER*(*) :: DateStr
+  CHARACTER*(*),  INTENT(OUT) :: DateStr
   INTEGER ,       INTENT(OUT) :: Status
 #include <wrf_status_codes.h>
 
@@ -1326,7 +1326,7 @@ SUBROUTINE wrf_get_previous_time ( DataHandle, DateStr, Status )
   USE module_state_description
   IMPLICIT NONE
   INTEGER ,       INTENT(IN)  :: DataHandle
-  CHARACTER*(*) :: DateStr
+  CHARACTER*(*),  INTENT(OUT) :: DateStr
   INTEGER ,       INTENT(OUT) :: Status
 #include <wrf_status_codes.h>
 
@@ -1417,7 +1417,7 @@ SUBROUTINE wrf_set_time ( DataHandle, DateStr, Status )
   USE module_state_description
   IMPLICIT NONE
   INTEGER ,       INTENT(IN)  :: DataHandle
-  CHARACTER*(*) :: DateStr
+  CHARACTER*(*), INTENT(IN)   :: DateStr
   INTEGER ,       INTENT(OUT) :: Status
 #include <wrf_status_codes.h>
 
@@ -1496,7 +1496,7 @@ SUBROUTINE wrf_get_next_var ( DataHandle, VarName, Status )
   USE module_state_description
   IMPLICIT NONE
   INTEGER ,       INTENT(IN)  :: DataHandle
-  CHARACTER*(*) :: VarName
+  CHARACTER*(*),  INTENT(OUT) :: VarName
   INTEGER ,       INTENT(OUT) :: Status
 #include <wrf_status_codes.h>
 
@@ -1885,6 +1885,7 @@ SUBROUTINE wrf_read_field ( DataHandle , DateStr , VarName , Field , FieldType ,
 #include <wrf_status_codes.h>
 #include <wrf_io_flags.h>
   INTEGER, ALLOCATABLE        :: ICAST(:)
+  LOGICAL perturb_input
   IF ( FieldType .EQ. WRF_LOGICAL ) THEN
     ALLOCATE(ICAST((MemoryEnd(1)-MemoryStart(1)+1)*(MemoryEnd(2)-MemoryStart(2)+1)*(MemoryEnd(3)-MemoryStart(3)+1)))
 
@@ -1905,6 +1906,12 @@ SUBROUTINE wrf_read_field ( DataHandle , DateStr , VarName , Field , FieldType ,
                            MemoryStart , MemoryEnd ,                                    &
                            PatchStart , PatchEnd ,                                      &
                            Status )
+    CALL nl_get_perturb_input( 1, perturb_input )
+    IF ( perturb_input .AND. FieldType .EQ. WRF_REAL .AND. TRIM(MemoryOrder) .EQ. 'XZY' ) THEN
+       CALL perturb_real ( Field, DomainStart, DomainEnd,        &
+                                  MemoryStart, MemoryEnd,        &
+                                  PatchStart, PatchEnd )
+    ENDIF
   ENDIF
 END SUBROUTINE wrf_read_field
 
