@@ -50,7 +50,7 @@ subroutine DA_Transform_VToY_Adj( cv_size, be, ep, cv, iv, vp, vv, xa, xb, xbx, 
                                  )
          enddo
 
-         call system("runvar4dad.csh")
+         call system("runvar4dad.bsh")
          filnam = 'gr00'
          call DA_Transfer_XatoWRFTL_Adj( grid, config_flags, filnam, &
 #include <em_actual_args.inc>

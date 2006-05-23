@@ -47,7 +47,7 @@ subroutine DA_Transform_VToY( cv_size, be, ep, cv, iv, vp, vv, xa, xb, xbx, xp, 
 #include <em_actual_args.inc>
                                  )
 
-         call system("runvar4dtl.csh")
+         call system("runvar4dtl.bsh")
 
          do nobwin=1, num_fgat_time
             iv%current_ob_time = nobwin
