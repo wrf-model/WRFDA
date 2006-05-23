@@ -145,28 +145,28 @@ END MODULE module_machine
 
 SUBROUTINE wrf_sizeof_integer( retval )
   IMPLICIT NONE
-  INTEGER retval
+  INTEGER, INTENT(OUT) :: retval
   retval = IWORDSIZE ! defined by CPP
   RETURN
 END SUBROUTINE wrf_sizeof_integer
 
 SUBROUTINE wrf_sizeof_real( retval )
   IMPLICIT NONE
-  INTEGER retval
+  INTEGER, INTENT(OUT) ::  retval
   retval = RWORDSIZE ! defined by CPP
   RETURN
 END SUBROUTINE wrf_sizeof_real
 
 SUBROUTINE wrf_sizeof_doubleprecision( retval )
   IMPLICIT NONE
-  INTEGER retval
+  INTEGER, INTENT(OUT) ::  retval
   retval = DWORDSIZE ! defined by CPP
   RETURN
 END SUBROUTINE wrf_sizeof_doubleprecision
 
 SUBROUTINE wrf_sizeof_logical( retval )
   IMPLICIT NONE
-  INTEGER retval
+  INTEGER, INTENT(OUT) ::  retval
   retval = LWORDSIZE ! defined by CPP
   RETURN
 END SUBROUTINE wrf_sizeof_logical
