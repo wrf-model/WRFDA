@@ -1,7 +1,5 @@
 # MAIN
 
-wrfplus : wrf
-
 var : wrfvar
 
 wrfvar : arch $(VAR_LIBS) wrfvar.o libwrfvar.a
@@ -9,6 +7,9 @@ wrfvar : arch $(VAR_LIBS) wrfvar.o libwrfvar.a
 
 wrf : arch wrf.o $(WRF_LIBS)
 	$(LD) -o wrf.exe $(LDFLAGS) wrf.o $(LIB)
+
+wrfplus : arch wrf.o $(WRF_LIBS)
+	$(LD) -o wrfplus.exe $(LDFLAGS) wrf.o $(LIB)
 
 kma2netcdf :  arch $(LIBS) $(CONVERTOR_MODULES) $(CONVERTOR_OBJS) kma2netcdf.o
 	$(LD) -o kma2netcdf.exe $(LDFLAGS) kma2netcdf.o libwrflib.a \
