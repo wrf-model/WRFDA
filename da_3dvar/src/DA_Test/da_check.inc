@@ -45,7 +45,7 @@ subroutine da_check( cv_size, xb, xbx, be, ep, iv, &
 
 !  v_to_vv adjoint test:
 
-   call da_check_cvtovv_adjoint( cv_size, xb, xbx, xp, be, cvtest, vv, &
+   call da_check_cvtovv_adjoint( cv_size, xb, xbx,xp, be, cvtest, vv, &
                                  ids, ide, jds, jde, kds, kde,      &
                                  ims, ime, jms, jme, kms, kme,      &
                                  its, ite, jts, jte, kts, kte )
@@ -54,7 +54,7 @@ subroutine da_check( cv_size, xb, xbx, be, ep, iv, &
 !  vv_to_vp adjoint test:
 !-------------------------------------------------------------------------
 
-   call da_check_vvtovp_adjoint( be % ne, xb, xbx, be, vv, vp, &
+   call da_check_vvtovp_adjoint( be % ne, xb, be, vv, vp, &
                                  ids,ide, jds,jde, kds,kde, &
                                  ims,ime, jms,jme, kms,kme, &
                                  its,ite, jts,jte, kts,kte )

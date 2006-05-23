@@ -1,4 +1,4 @@
-SUBROUTINE DA_Check_VvToVp_Adjoint( ne, xb, xbx,  be, vv, vp, &
+SUBROUTINE DA_Check_VvToVp_Adjoint( ne, xb, be, vv, vp, &
                                     ids,ide, jds,jde, kds,kde, &
                                     ims,ime, jms,jme, kms,kme, &
                                     its,ite, jts,jte, kts,kte )
@@ -13,7 +13,6 @@ SUBROUTINE DA_Check_VvToVp_Adjoint( ne, xb, xbx,  be, vv, vp, &
 
    integer, intent(in)               :: ne    ! Ensemble size.
    type (xb_type), intent(in)        :: xb    ! first guess (local).
-   type (xbx_type),intent(in)        :: xbx   ! Header & non-gridded vars.
    type (be_type), intent(in)        :: be    ! background error structure.
    type (vp_type), intent(inout)     :: vv    ! CV(i,j,m).
    type (vp_type), intent(inout)     :: vp    ! CV(i,j,k)
