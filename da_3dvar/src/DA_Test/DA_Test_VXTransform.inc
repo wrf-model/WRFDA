@@ -231,7 +231,7 @@ SUBROUTINE DA_Test_VXTransform( xb, xbx, xp, be, &
 !-------------------------------------------------------------------------
 !  [5.0] Perform Vv -> Vp adjoint test: 
 !-------------------------------------------------------------------------
-   call DA_Check_VvToVp_Adjoint( xb, xbx, xp, be, vp, vv, &
+   call DA_Check_VvToVp_Adjoint( xb, xp, be, vp, vv, &
                                  ids,ide, jds,jde, kds,kde, &
                                  ims,ime, jms,jme, kms,kme, &
                                  its,ite, jts,jte, kts,kte )
