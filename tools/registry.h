@@ -2,7 +2,7 @@
 #define NAMELEN 8092
 #define MAXDIMS 21
 #define MAX_DYNCORES 50   /* ha ha, just kidding */
-#define MAX_ARGLINE 128
+#define MAX_ARGLINE 128   /* welp, 175 means lines longer than 130 chars, which is a Fortran no no */
 #define MAX_TYPEDEFS 50   /* typedef history -ajb */
 
 /* defines of system commands */
