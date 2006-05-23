@@ -28,7 +28,6 @@ SUBROUTINE DA_Check_VToX_Adjoint( cv_size, xb, xbx, be, ep, cv1, vv, vp, xp, xa,
    integer, intent(in)                :: its,ite, jts,jte, kts,kte ! tile   dims.
 
    real                               :: cv2(1:cv_size)    ! control variable (local).
-   INTEGER                        :: k           ! Loop counter.
    REAL                           :: adj_par_lhs ! < x, x >
    REAL                           :: adj_par_rhs ! < x, x >
    REAL                           :: adj_sum_lhs ! < x, x >

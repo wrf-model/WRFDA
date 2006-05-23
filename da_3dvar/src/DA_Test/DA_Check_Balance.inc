@@ -16,7 +16,7 @@ SUBROUTINE DA_Check_Balance( phi, phi_u )
    INTEGER                      :: iy              ! Size of 1st dimension.
    INTEGER                      :: jx              ! Size of 2nd dimension.
    INTEGER                      :: kz              ! Size of 3rd dimension.
-   INTEGER                      :: i, j, k         ! Loop counters
+   INTEGER                      :: i, k            ! Loop counters
    REAL                         :: corr_coef       ! Correlation coefficient.
    REAL                         :: accurac         ! Accuracy.
    REAL, ALLOCATABLE            :: phi_b1(:)       ! 1D balanced phi.

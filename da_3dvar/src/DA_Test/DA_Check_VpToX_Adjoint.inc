@@ -25,7 +25,6 @@ SUBROUTINE DA_Check_VpToX_Adjoint( ne, xb, xbx, be, ep, xp, vp, xa, &
    integer, intent(in)              :: ims,ime, jms,jme, kms,kme ! memory dims.
    integer, intent(in)              :: its,ite, jts,jte, kts,kte ! tile   dims
 
-   INTEGER                          :: k           ! Loop counter.
    REAL                             :: adj_par_lhs ! < x, x >
    REAL                             :: adj_par_rhs ! < v_adj, v >
    REAL                             :: adj_sum_lhs ! < x, x >
