@@ -92,6 +92,4 @@ contains
 #include "DA_Check_VToY_Adjoint.inc"
 #include "da_get_y_lhs_value.inc"
 
-#include "da_check_xtow_adjoint.inc"
-
 end module DA_Test
