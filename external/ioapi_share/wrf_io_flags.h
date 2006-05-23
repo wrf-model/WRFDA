@@ -7,7 +7,7 @@
 #else      
       integer, parameter  :: WRF_REAL                             = 105
 #endif      
-      integer, parameter  :: WRF_DOUBLE                           = 105
+      integer, parameter  :: WRF_DOUBLE                           = 111
       integer, parameter  :: WRF_INTEGER                          = 106
       integer, parameter  :: WRF_LOGICAL                          = 107
       integer, parameter  :: WRF_COMPLEX                          = 108
