@@ -98,7 +98,7 @@ gen_args1 ( FILE * fp , char * outstr , char * structname , char * corename ,
       {
         /* if this is a core-specific variable, prepend the name of the core to */
         /* the variable at the driver level */
-        if (!strcmp( corename , p->use+4 ) && sw==ACTUAL)
+        if ( (!strncmp("dyn_",p->use,4)&&!strcmp(corename,p->use+4)) && sw==ACTUAL)
           sprintf(fname,"%s_%s",corename,field_name(t4,p,(p->ntl>1)?tag:0)) ;
         else
           strcpy(fname,field_name(t4,p,(p->ntl>1)?tag:0)) ;

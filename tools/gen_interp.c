@@ -145,8 +145,8 @@ gen_nest_interp1 ( FILE * fp , node_t * node, char * corename , char * fourdname
     {
       if ((!strncmp( p->use, "dyn_", 4) && !strcmp(p->use+4,corename)) || strncmp( p->use, "dyn_", 4))
       {
-
-        if (!strncmp( p->use, "dyn_", 4))   sprintf(core,"%s_",corename,vname) ;
+        if ( (!strncmp("dyn_",p->use,4)&&!strcmp(corename,p->use+4)) )
+          sprintf(core,"%s_",corename,vname) ;
         else                                sprintf(core,"") ;
 
         if ( p->ntl > 1 ) { sprintf(tag,"_2") ; sprintf(tag2,"_%d", use_nest_time_level) ; }
