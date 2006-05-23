@@ -46,6 +46,7 @@ BENCH_DECL(rlx_bdy_scalar_tim)
 BENCH_DECL(update_scal_tim)
 BENCH_DECL(flow_depbdy_tim)
 BENCH_DECL(tke_adv_tim)
+BENCH_DECL(chem_adv_tim)
 BENCH_DECL(calc_p_rho_tim)
 BENCH_DECL(diag_w_tim)
 BENCH_DECL(bc_end_tim)
@@ -55,6 +56,8 @@ BENCH_DECL(micro_driver_tim)
 BENCH_DECL(moist_phys_end_tim)
 BENCH_DECL(time_filt_tim)
 BENCH_DECL(bc_2d_tim)
+BENCH_DECL(microswap_1)
+BENCH_DECL(microswap_2)
 #else
 #define SOLVE_START
 #define SOLVE_END
