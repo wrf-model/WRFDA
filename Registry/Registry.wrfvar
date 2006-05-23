@@ -403,24 +403,36 @@ state    integer imask_xystag         ij      misc     1     XY
 # dry code will will still link properly)                                               
 #                                               
 state   real    -              ijkftb   moist       1         -     -    -
-state   real    qv             ijkftb   moist       1         -     \
-   i01rhusdf=(bdy_interp:dt)  "QVAPOR"           "Water vapor mixing ratio"      "kg kg-1"
-state   real    qc             ijkftb   moist       1         -     \
-   i01rhusdf=(bdy_interp:dt)  "QCLOUD"           "Cloud water mixing ratio"      "kg kg-1"
-state   real    qr             ijkftb   moist       1         -     \
-   i01rhusdf=(bdy_interp:dt)  "QRAIN"            "Rain water mixing ratio"       "kg kg-1"
-state   real    qi             ijkftb   moist       1         -     \
-   i01rhusdf=(bdy_interp:dt)  "QICE"             "Ice mixing ratio"              "kg kg-1"
-state   real    qs             ijkftb   moist       1         -     \
-   i01rhusdf=(bdy_interp:dt)  "QSNOW"            "Snow mixing ratio"             "kg kg-1"
-state   real    qg             ijkftb   moist       1         -     \
-   i01rhusdf=(bdy_interp:dt)  "QGRAUP"           "Graupel mixing ratio"          "kg kg-1"
+state   real    -              ijkftb   a_moist     1         -     -    -
+state   real    -              ijkftb   g_moist     1         -     -    -
+state   real    qv             ijkftb   moist       1         -     i01rhusdf=(bdy_interp:dt)  "QVAPOR"           "Water vapor mixing ratio"      "kg kg-1"
+state   real    a_qv           ijkftb   a_moist     1         -     i01rhusdf=(bdy_interp:dt)  "A_QVAPOR"           "Water vapor mixing ratio"      "kg kg-1"
+state   real    g_qv           ijkftb   g_moist     1         -     i01rhusdf=(bdy_interp:dt)  "G_QVAPOR"           "Water vapor mixing ratio"      "kg kg-1"
+state   real    qc             ijkftb   moist       1         -     i01rhusdf=(bdy_interp:dt)  "QCLOUD"           "Cloud water mixing ratio"      "kg kg-1"
+state   real    a_qc           ijkftb   a_moist     1         -     i01rhusdf=(bdy_interp:dt)  "A_QCLOUD"           "Cloud water mixing ratio"      "kg kg-1"
+state   real    g_qc           ijkftb   g_moist     1         -     i01rhusdf=(bdy_interp:dt)  "G_QCLOUD"           "Cloud water mixing ratio"      "kg kg-1"
+state   real    qr             ijkftb   moist       1         -     i01rhusdf=(bdy_interp:dt)  "QRAIN"            "Rain water mixing ratio"       "kg kg-1"
+state   real    a_qr           ijkftb   a_moist     1         -     i01rhusdf=(bdy_interp:dt)  "A_QRAIN"            "Rain water mixing ratio"       "kg kg-1"
+state   real    g_qr           ijkftb   g_moist     1         -     i01rhusdf=(bdy_interp:dt)  "G_QRAIN"            "Rain water mixing ratio"       "kg kg-1"
+state   real    qi             ijkftb   moist       1         -     i01rhusdf=(bdy_interp:dt)  "QICE"             "Ice mixing ratio"              "kg kg-1"
+state   real    a_qi           ijkftb   a_moist     1         -     i01rhusdf=(bdy_interp:dt)  "A_QICE"             "Ice mixing ratio"              "kg kg-1"
+state   real    g_qi           ijkftb   g_moist     1         -     i01rhusdf=(bdy_interp:dt)  "G_QICE"             "Ice mixing ratio"              "kg kg-1"
+state   real    qs             ijkftb   moist       1         -     i01rhusdf=(bdy_interp:dt)  "QSNOW"            "Snow mixing ratio"             "kg kg-1"
+state   real    a_qs           ijkftb   a_moist     1         -     i01rhusdf=(bdy_interp:dt)  "A_QSNOW"            "Snow mixing ratio"             "kg kg-1"
+state   real    g_qs           ijkftb   g_moist     1         -     i01rhusdf=(bdy_interp:dt)  "G_QSNOW"            "Snow mixing ratio"             "kg kg-1"
+state   real    qg             ijkftb   moist       1         -     i01rhusdf=(bdy_interp:dt)  "QGRAUP"           "Graupel mixing ratio"          "kg kg-1"
+state   real    a_qg           ijkftb   a_moist     1         -     i01rhusdf=(bdy_interp:dt)  "A_QGRAUP"           "Graupel mixing ratio"          "kg kg-1"
+state   real    g_qg           ijkftb   g_moist     1         -     i01rhusdf=(bdy_interp:dt)  "G_QGRAUP"           "Graupel mixing ratio"          "kg kg-1"
 
 # Chem Scalars
-state   real    -              ijkft   chem        1         -     -    -                                       
+state   real    -              ijkftb  chem        1         -     -    -                                       
+state   real    -              ijkftb  a_chem      1         -     -    -                                       
+state   real    -              ijkftb  g_chem      1         -     -    -                                       
 
 # Other Scalars
 state   real    -              ijkftb  scalar      1         -     -    -                                       
+state   real    -              ijkft   a_scalar    1         -     -    -                                       
+state   real    -              ijkft   g_scalar    1         -     -    -                                       
 state   real    qni            ijkftb  scalar      1         -     \
    i01rhusdf=(bdy_interp:dt)    "QNICE"         "Ice Number concentration" "# kg(-1)"
 
@@ -1200,6 +1212,12 @@ rconfig   integer   move_id         namelist,domains    max_moves        0
 rconfig   integer   move_interval   namelist,domains    max_moves        999999999
 rconfig   integer   move_cd_x       namelist,domains    max_moves        0
 rconfig   integer   move_cd_y       namelist,domains    max_moves        0
+rconfig   logical   swap_x          namelist,domains    max_domains    .false. rh    "swap_x"            ""      ""
+rconfig   logical   swap_y          namelist,domains    max_domains    .false. rh    "swap_y"            ""      ""
+rconfig   logical   cycle_x         namelist,domains    max_domains    .false. rh    "cycle_x"            ""      ""
+rconfig   logical   cycle_y         namelist,domains    max_domains    .false. rh    "cycle_y"            ""      ""
+rconfig   logical   reorder_mesh    namelist,domains    1              .false. rh    "reorder_mesh"       ""      ""
+rconfig   logical   perturb_input   namelist,domains    1              .false. h     "" "" ""
 rconfig   logical TEST_rk_step_prep       namelist,domains          1      .false. -     "TEST_rk_step_prep"           ""      ""
 rconfig   logical TEST_init_zero_tendency namelist,domains          1      .false. -     "TEST_init_zero_tendency"     ""      ""
 rconfig   logical TEST_phy_prep           namelist,domains          1      .false. -     "TEST_phy_prep"               ""      ""
@@ -1660,9 +1678,6 @@ period    PERIOD_BDY_EM_INIT dyn_em 3:u_1,u_2,v_1,v_2,w_1,w_2,t_1,t_2,ph_1,ph_2,
 period    PERIOD_BDY_EM_MOIST dyn_em 3:moist
 period    PERIOD_BDY_EM_CHEM dyn_em 3:chem
 period    PERIOD_BDY_EM_SCALAR dyn_em 3:scalar
-period    PERIOD_BDY_EM_MOIST2 dyn_em 3:moist
-period    PERIOD_BDY_EM_CHEM2 dyn_em 3:chem
-period    PERIOD_BDY_EM_SCALAR2 dyn_em 3:scalar
 period    PERIOD_BDY_EM_A dyn_em 2:ru,rv,rw,ww,php,alt,p,muu,muv,mut,ph_2
 period    PERIOD_BDY_EM_A1  dyn_em 3:rdzw,rdz,z,zx,zy
 period    PERIOD_BDY_EM_PHY_BC dyn_em 2:rublten,rvblten,xkmh,xkmhd,xkmv,xkhh,xkhv,div,defor11,defor22,defor12,defor13,defor23,defor33,tke_2
