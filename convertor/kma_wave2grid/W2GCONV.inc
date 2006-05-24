@@ -1,6 +1,19 @@
-      SUBROUTINE  W2GCONV(ETPG,PS,GTMP,GU,GV,GSPH)
+      SUBROUTINE W2GCONV(ht, psfc, t, u, v, q, A, B,
+     C          ims , jms, kms, ime , jme, kme, 
+     C          ids , jds, kds, ide , jde, kde, 
+     C          its , jts, kts, ite , jte, kte  )
+      
+         INTEGER ims , jms, kms, ime , jme, kme,  
+     C           ids , jds, kds, ide , jde, kde, 
+     C           its , jts, kts, ite , jte, kte  
+      
+      INTEGER  kst 
+      DIMENSION A(kms:kme+1), B(kms:kme+1)
+      DIMENSION ht(ims:ime,jms:jme), psfc(ims:ime,jms:jme)
+      DIMENSION t(ims:ime,jms:jme,kms:kme),q(ims:ime,jms:jme,kms:kme)
+      DIMENSION u(ims:ime,jms:jme,kms:kme),v(ims:ime,jms:jme,kms:kme)
+C
       DIMENSION ID(5)
-      DIMENSION A(KMAX),B(KMAX)
       DIMENSION LAG(MEND1,NEND1)
       DIMENSION IFAX(10),TRIGS(IMAX)
       DIMENSION PNM (MNWAV,JOUTHF),DPNM(MNWAV,JOUTHF),
@@ -9,29 +22,17 @@ C
       DIMENSION QDAT1(KMX2,MNWAV),QDAT2(KMX2,MNWAV),
      1          QPHIS(   2,MNWAV)
 C
-      DIMENSION EDAT1(IMX *JOUT*KLMAX),EDAT2(IMX *JOUT*KLMAX),
-     1          EWRK (IMX *JOUT*KLMAX),GU   (IOUT*JOUT*KLMAX),
-     2          GV   (IOUT*JOUT*KLMAX),GTMP (IOUT*JOUT*KLMAX),
-     3          GSPH (IOUT*JOUT*KLMAX),GOMG (IOUT*JOUT*KLMAX),
-     4          GPHI (IOUT*JOUT*KLMAX),GDIV (IOUT*JOUT*KLMAX),
-     5          ETPG (IOUT*JOUT),
-     6          PS   (IOUT*JOUT),PSX (IOUT*JOUT),PSY (IOUT*JOUT)
-      DIMENSION GUS  (IMAXG,JMAXG)   ,GVS  (IMAXG,JMAXG),
-     1          GTS  (IMAXG,JMAXG)   ,GTDS (IMAXG,JMAXG),
-     2          GRRR (IMAXG,JMAXG)
-      DIMENSION WK   (IOUT*KMAX*12)  ,WL   (IOUT*LMAX*2)
-      DIMENSION PWRKS(IOUT*JOUT),IDA (IOUT*JOUT)
+CrizviDIMENSION       PS   (IOUT*JOUT),PSX (IOUT*JOUT),PSY (IOUT*JOUT)
+      DIMENSION IDA (IOUT*JOUT)
+      DIMENSION EDAT1(IMX *JOUT*KLMAX),EDAT2(IMX *JOUT*KLMAX)
+      DIMENSION TMP(IOUT*JOUT)
+      DIMENSION TMP1(IOUT*JOUT*KLMAX),TMP2(IOUT*JOUT*KLMAX)
 C
-      DIMENSION PWRK (IOUT*JOUT*LMAX)
-C
-      REAL*8 GAUL(JMAXG),GAUW(JMAXG)
+Crizvi      REAL*8 GAUL(JMAXG),GAUW(JMAXG)
       REAL*8 PPNM(MNWAV),HHNM(MNWAV)
 C
-      EQUIVALENCE (EWRK,PWRK)
 C
       DIMENSION KTOUT(82)
-	  REAL,    POINTER :: TS12(:,:,:)
-	  INTEGER, POINTER :: KTTS(:)
 C
       DATA IT,JT,BS,FM/4,4,0.0,1.0E10/
       DATA ER,GASR,GRAV,GAMMA/6371.E03,287.04,9.8,5.0E-3/
@@ -52,6 +53,15 @@ C
 C------------------------------------------------------------------
 C Check parameters
 C------------------------------------------------------------------
+
+      IF( IOUT /= (ide-ids+1) .or. JOUT /= (jde-jds+1) .or.
+     C   KLMAX /= (kte-kts+1) ) then
+         print*,' In W2GCONV IOUT,JOUT, KLMAX  = ',
+     C                     IOUT,JOUT, KLMAX  
+         print*,' Dims mismatch '                  
+        stop
+        end if 
+
 	  IF (IGRD.NE.IOUT.OR.JGRD.NE.JOUT) THEN
 		WRITE(*,*)'OUT GRID DOES NOT MATCH'
 	  	WRITE(*,*)'IOUT=',IOUT,'JOUT=',JOUT
@@ -73,11 +83,6 @@ C------------------------------------------------------------------
 C Init variables
 C------------------------------------------------------------------
 	  NNMAX=12/MINKTI+1
-	  ALLOCATE(KTTS(0:NNMAX))
-	  ALLOCATE(TS12(IOUT,JOUT,0:NNMAX))
-      DO N=0,NNMAX
-     	 KTTS(N)=-999
-	  END DO
 C------------------------------------------------------------------
 C CHECK DATE    SURFACE DATA FILE
 C------------------------------------------------------------------
@@ -85,8 +90,7 @@ C------------------------------------------------------------------
       JO=JOUT
       IJOUT=IOUT*JOUT
       IJMAX=IMAX*JOUT
-      IJKOUT=IOUT*JOUT*KMAX
-      IJLOUT=IOUT*JOUT*LMAX
+      IJKOUT=IOUT*JOUT*KLMAX
       GINV  =1./GRAV
 C-----------------------------------------------------------------------
       CALL SETARY(LAG,MEND1,NEND1,JEND1)
@@ -132,23 +136,67 @@ C-----------------------------------------------------------------------
 C
           CALL REOWV
      1     (QDAT1,QPHIS,MEND1,NEND1,JEND1,MNWAV,KMX2,2,0,0,2,LAG)
+!shc-rizvi start
+          print*,' Doing Wave to grid transform for Topo'
+          CALL W2G
+     I     (MEND1,NEND1,JEND1,MNWAV,IMAX,JOUT,IMX,JOUTHF,   1,
+     I      IFAX ,TRIGS,PNM  ,QPHIS,
+     O      EDAT1,
+     W      EDAT2)
+!shc-rizvi end
+C
         ELSE
+          READ(IWVHST,END=1033) ID,KT,ISTP,FSEC,NREC,
+     1                 KM,(A(K),K=1,KM),(B(K),K=1,KM)
+         if( IOUT /= (ide-ids+1) .or. JOUT /= (jde-jds+1) .or.
+     C   KLMAX /= (kte-kts+1) ) then
+         print*,' In W2GCONV IOUT,JOUT, KLMAX  = ',
+     C                     IOUT,JOUT, KLMAX  
+         print*,' Dims mismatch '                  
+         stop
+         endif
+          IF(KT.EQ.-1.OR.KT.EQ.0) THEN
+            READ(IWVHST) (QDAT2(KKK,1),KKK=1,2*MNWAV),
+     1                  (QDAT1(KKK,1),KKK=1,2*MNWAV)
+Crizvi            CALL REOWV
+Crizvi     1      (QDAT1,QPHIS,MEND1,NEND1,JEND1,MNWAV,KMX2,2,0,0,2,LAG)
+!shc-rizvi start
+            print*,' Doing Wave to grid transform for Topo'
+            CALL W2G
+     I       (MEND1,NEND1,JEND1,MNWAV,IMAX,JOUT,IMX,JOUTHF,   1,
+     I        IFAX ,TRIGS,PNM  ,QDAT1,
+     O        EDAT1,
+     W        EDAT2)
+!shc-rizvi end
+            READ(IWVHST)
+            READ(IWVHST)
+            READ(IWVHST)
+            READ(IWVHST)
+            GO TO 1033
+          ELSE
+            READ(IWVHST)
+            READ(IWVHST)
+            READ(IWVHST)
+            READ(IWVHST)
+            READ(IWVHST)
+          END IF
         END IF
+1033      CONTINUE
+
+        REWIND(IWVHST)
 C
-        CALL W2G
-     I   (MEND1,NEND1,JEND1,MNWAV,IMAX,JOUT,IMX,JOUTHF,   1,
-     I    IFAX ,TRIGS,PNM  ,QPHIS,
-     O    EDAT1,
-     W    EWRK)
-C
-        CALL CUT(ETPG,IOUT,JOUT,   1,EDAT1,IMAX,INTVL)
+        CALL CUT(TMP, IOUT,JOUT,   1,EDAT1,IMAX,INTVL)
         DO 160 IJ=1,IJOUT
-        ETPG(IJ)=GINV*ETPG(IJ)
+        TMP(IJ) =GINV*TMP(IJ) 
   160   CONTINUE
         IF(IDEBUG.GE.1) THEN
-          CALL GOUT(ETPG,IDA,IO,JO,1,1,IO,JO,IT,JT,BS,FM,'PHIS',1)
+          CALL GOUT(TMP,IDA,IO,JO,1,1,IO,JO,IT,JT,BS,FM,'PHIS',1)
         END IF
-
+C        write(989,'(10f10.3)') (ETPG(IJ),IJ=1,IJOUT)
+       call reorder_for_wrf(TMP,ht,IOUT,JOUT, 1,
+     C          ims , jms, 1, ime , jme, 1, 
+     C          ids , jds, 1, ide , jde, 1,
+     C          its , jts, 1, ite , jte, 1)
 C
 C#######################################################################
 C  +++ READ IN HISTORY FILE +++
@@ -168,7 +216,6 @@ C
 C
  2000 CONTINUE
 C
-
       IF(KTOUT(ICOUNT).EQ.999.AND.KTOUT(1).NE.-999) GOTO 1001
       READ(IWVHST) ID,KT,ISTP,FSEC,NREC,                       
      1                      KM,(A(K),K=1,KM),(B(K),K=1,KM)              
@@ -196,33 +243,43 @@ C---------------------------------------------------------------------
       	WRITE(96,*) ID,KT,'qdat1'
 C...IPXY=1;OUTPUT IS PS,D(PS)/DX,-D(PS)/DY
       	IPXY=1
+       print*,' Doing Wave to grid transform for Psfc'
         CALL W2GPXY
      I (MEND1,NEND1,JEND1,MNWAV,IMAX,JOUT,IMX,JOUTHF,
      I  IFAX ,TRIGS,PNM  ,DPNM ,IPXY,IPSL,QDAT1,
      O  EDAT1,
-     W  EWRK)
-        CALL CUT(PS  ,IOUT,JOUT,1,EDAT1(        1),IMAX,INTVL)
-        CALL CUT(PSX ,IOUT,JOUT,1,EDAT1(  IJMAX+1),IMAX,INTVL)
-        CALL CUT(PSY ,IOUT,JOUT,1,EDAT1(2*IJMAX+1),IMAX,INTVL)
+     W  EDAT2)
+        CALL CUT(TMP ,IOUT,JOUT,1,EDAT1(        1),IMAX,INTVL)
+Crizvi        CALL CUT(PSX ,IOUT,JOUT,1,EDAT1(  IJMAX+1),IMAX,INTVL)
+Crizvi        CALL CUT(PSY ,IOUT,JOUT,1,EDAT1(2*IJMAX+1),IMAX,INTVL)
         IF(IDEBUG.GE.1) THEN
-          CALL GOUT(PS ,IDA,IO,JO,1,1,IO,JO,IT,JT,BS,FM,'PSFC',1)
+          CALL GOUT(TMP,IDA,IO,JO,1,1,IO,JO,IT,JT,BS,FM,'PSFC',1)
 !         CALL GOUT(PSX,IDA,IO,JO,1,1,IO,JO,IT,JT,BS,FM,'DPSX',1)
 !         CALL GOUT(PSY,IDA,IO,JO,1,1,IO,JO,IT,JT,BS,FM,'DPSY',1)
         END IF
+       call reorder_for_wrf(TMP, psfc,IOUT,JOUT, 1,
+     C          ims , jms, 1, ime , jme, 1, 
+     C          ids , jds, 1, ide , jde, 1,
+     C          its , jts, 1, ite , jte, 1)
 C---------------------------------------------------------------------
 C...TEMPERATURE
 C---------------------------------------------------------------------
         READ (IWVHST) QDAT1
+       print*,' Doing Wave to grid transform for Temperature'
         CALL W2G
      I (MEND1,NEND1,JEND1,MNWAV,IMAX,JOUT,IMX,JOUTHF,KMAX,
      I  IFAX ,TRIGS,PNM  ,QDAT1,
      O  EDAT1,
-     W  EWRK)
-        CALL CUT(GTMP,IOUT,JOUT,KMAX,EDAT1,IMAX,INTVL)
+     W  EDAT2)
+        CALL CUT(TMP1,IOUT,JOUT,KMAX,EDAT1,IMAX,INTVL)
         IF(IDEBUG.GE.1) THEN
            K=KMAX
-          CALL GOUT(GTMP,IDA,IO,JO,1,1,IO,JO,IT,JT,BS,FM,'ETMP',K)
+          CALL GOUT(TMP1,IDA,IO,JO,1,1,IO,JO,IT,JT,BS,FM,'ETMP',K)
         END IF
+       call reorder_for_wrf(TMP1, t, IOUT,JOUT, KLMAX,
+     C          ims , jms, kms, ime , jme, kme, 
+     C          ids , jds, kds, ide , jde, kde,
+     C          its , jts, kts, ite , jte, kte )
 C----------------------------------------------------------------------
 C... VORTICITY & DIVERGENCE
 C----------------------------------------------------------------------
@@ -230,41 +287,50 @@ C...VORTICITY
         READ(IWVHST)  QDAT1
 C...DIVERGENCE
         READ(IWVHST)  QDAT2
-        CALL W2G
-     I (MEND1,NEND1,JEND1,MNWAV,IMAX,JOUT,IMX,JOUTHF,KMAX,
-     I  IFAX ,TRIGS,PNM  ,QDAT2,
-     O  EDAT1,
-     W  EWRK)
-        CALL CUT(GDIV,IOUT,JOUT,KMAX,EDAT1,IMAX,INTVL)
-        IF(IDEBUG.GE.5) THEN
-          K=IDEBUG
-          CALL GOUT(GDIV,IDA,IO,JO,1,1,IO,JO,IT,JT,BS,FM,'EDIV',K)
-        END IF
+       print*,' Doing Wave to grid transform for Wind'
         CALL W2GUV
      I (MEND1,NEND1,JEND1 ,MNWAV,IMAX,JOUT,IMX  ,JOUTHF,KMAX,
      I  IFAX ,TRIGS,ESINCL,ER   ,PNM ,DPNM,QDAT1,QDAT2 ,
      O  EDAT1,EDAT2,
-     W  EWRK)
-        CALL CUT(GU  ,IOUT,JOUT,KMAX,EDAT1,IMAX,INTVL)
-        CALL CUT(GV  ,IOUT,JOUT,KMAX,EDAT2,IMAX,INTVL)
+     W  TMP2)
+        CALL CUT(TMP1,IOUT,JOUT,KMAX,EDAT1,IMAX,INTVL)
+        CALL CUT(TMP2,IOUT,JOUT,KMAX,EDAT2,IMAX,INTVL)
         IF(IDEBUG.GE.1) THEN
           K=KMAX
-          CALL GOUT(GU,IDA,IO,JO,1,1,IO,JO,IT,JT,BS,FM,'EU  ',K)
-          CALL GOUT(GV,IDA,IO,JO,1,1,IO,JO,IT,JT,BS,FM,'EV  ',K)
+          CALL GOUT(TMP1,IDA,IO,JO,1,1,IO,JO,IT,JT,BS,FM,'EU  ',K)
+          CALL GOUT(TMP2,IDA,IO,JO,1,1,IO,JO,IT,JT,BS,FM,'EV  ',K)
         END IF
+C
+       call reorder_for_wrf(TMP1, U ,IOUT,JOUT, KLMAX,
+     C          ims , jms, kms, ime , jme, kme, 
+     C          ids , jds, kds, ide , jde, kde,
+     C          its , jts, kts, ite , jte, kte )
+       call reorder_for_wrf(TMP2, V ,IOUT,JOUT, KLMAX,
+     C          ims , jms, kms, ime , jme, kme, 
+     C          ids , jds, kds, ide , jde, kde,
+     C          its , jts, kts, ite , jte, kte )
 C----------------------------------------------------------------------
 C...SPECIFIC HUMIDITY
 C----------------------------------------------------------------------
         READ(IWVHST)  QDAT1
+       print*,' Doing Wave to grid transform for Moisture'
         CALL W2G
      I (MEND1,NEND1,JEND1,MNWAV,IMAX,JOUT,IMX,JOUTHF,KMAX,
      I  IFAX ,TRIGS,PNM  ,QDAT1,
      O  EDAT1,
-     W  EWRK)
-        CALL CUT(GSPH,IOUT,JOUT,KMAX,EDAT1,IMAX,INTVL)
+     W  EDAT2)
+        CALL CUT(TMP1,IOUT,JOUT,KMAX,EDAT1,IMAX,INTVL)
+C rizvi fix negative humidity to 0.000001
+        CALL FIX_NEG_MOIST(TMP1,IOUT,JOUT,KMAX)
+c---------------------------------------------------------------
+       call reorder_for_wrf(TMP1,  Q,IOUT,JOUT, KLMAX,
+     C          ims , jms, kms, ime , jme, kme, 
+     C          ids , jds, kds, ide , jde, kde,
+     C          its , jts, kts, ite , jte, kte )
+c---------------------------------------------------------------
         IF(IDEBUG.GE.1) THEN
           K=KMAX
-          CALL GOUT(GSPH,IDA,IO,JO,1,1,IO,JO,IT,JT,BS,FM,'ESPH',K)
+          CALL GOUT(TMP1,IDA,IO,JO,1,1,IO,JO,IT,JT,BS,FM,'ESPH',K)
         END IF
       ELSE
         READ(IWVHST)                                                    
@@ -275,10 +341,152 @@ C----------------------------------------------------------------------
         GO TO 2000                                                      
       END IF
 C
-      write(96,*)'kt, ktpart=',kt, ktpart
 C
       GO TO 2000
 C
  1001 CONTINUE
       RETURN
-      END SUBROUTINE  W2GCONV
+      END SUBROUTINE W2GCONV
+
+      SUBROUTINE FIX_NEG_MOIST(X,N1,N2,N3)      
+C---------------------------------------------------------
+C This fixes less than 0.00000 input array to 0.000001            
+C              Syed RH Rizvi    08/24/2004
+C---------------------------------------------------------
+      DIMENSION X(N1,N2,N3) 
+      DO K = 1,N3
+        DO J= 1,N2
+         DO I = 1, N1
+C          IF(X(I,J,K) < 0) X(I,J,K) = 0.
+          IF(X(I,J,K) < 0.000001) X(I,J,K) = 0.000001
+         END DO
+        END DO
+      END DO
+      RETURN
+      END SUBROUTINE FIX_NEG_MOIST     
+
+      SUBROUTINE reorder_for_wrf_2d(kma, X, n1,n2 ,
+     C          ims , jms,  ime , jme,  
+     C          ids , jds,  ide , jde,  
+     C          its , jts,  ite , jte   )
+
+      IMPLICIT NONE
+      INTEGER,intent(in) ::
+     C           ims , jms,  ime , jme,   
+     C           ids , jds,  ide , jde,  
+     C           its , jts,  ite , jte  
+      integer, intent(in)        :: n1,n2                    
+      real, intent(in)           :: kma(n1*n2)
+      real, intent(  out)        :: X(ims:ime,jms:jme)
+      real, dimension(1:n1,1:n2) :: wrf
+      real                            :: tmp(n1,n2)
+      integer                         :: i,j,ist
+
+C
+        ist = 1
+        do j=1,n2
+        do i=1,n1
+        tmp(i,j) = kma(ist)
+        ist = ist + 1
+        end do
+        end do
+C        
+         do j= 1,n2
+          wrf(1:n1,j) = tmp(1:n1,n2-j+1)
+         end do 
+C
+         do j =  jts, jte
+         X(its:ite,j) = wrf(its:ite,j)
+         end do
+       
+      RETURN
+      END SUBROUTINE reorder_for_wrf_2d
+      SUBROUTINE reorder_for_wrf_3d(kma, X, n1,n2,n3, 
+     C          ims , jms, kms, ime , jme, kme, 
+     C          ids , jds, kds, ide , jde, kde, 
+     C          its , jts, kts, ite , jte, kte  )
+
+      IMPLICIT NONE
+      INTEGER,intent(in) ::
+     C           ims , jms, kms, ime , jme, kme,  
+     C           ids , jds, kds, ide , jde, kde, 
+     C           its , jts, kts, ite , jte, kte  
+      integer, intent(in)        :: n1,n2,n3                    
+      real, intent(in)           :: kma(n1*n2*n3)
+      real, intent(OUT)          :: X(ims:ime,jms:jme,kms:kme)
+      real, dimension(1:n1,1:n2,1:n3) :: wrf
+      real                            :: tmp(n1,n2,n3)
+      integer                         :: i,j,k,ist
+
+C
+        ist = 1
+        do k=1,n3
+        do j=1,n2
+        do i=1,n1
+        tmp(i,j,k) = kma(ist)
+        ist = ist + 1
+        end do
+        end do
+        end do
+C        
+        do k =1,n3
+         do j= 1,n2
+          wrf(1:n1,j,k) = tmp(1:n1,n2-j+1,k)
+         end do 
+        end do 
+C
+        do k=kts,kte
+         do j =  jts, jte
+         X(its:ite,j,k) = wrf(its:ite,j,k)
+         end do
+        end do
+C
+      RETURN
+      END SUBROUTINE reorder_for_wrf_3d
+
+      SUBROUTINE reorder_for_wrf(kma, wrf, n1,n2,n3, 
+     C          ims , jms, kms, ime , jme, kme, 
+     C          ids , jds, kds, ide , jde, kde, 
+     C          its , jts, kts, ite , jte, kte  )
+      IMPLICIT NONE
+      INTEGER,intent(in) ::
+     C           ims , jms, kms, ime , jme, kme,  
+     C           ids , jds, kds, ide , jde, kde, 
+     C           its , jts, kts, ite , jte, kte  
+      integer, intent(in)        :: n1,n2,n3                    
+      real, intent(in)           :: kma(n1*n2*n3)
+      real, intent(OUT)          :: wrf(ims:ime,jms:jme,kms:kme)
+      real                       :: XWRF(ims:ime,jms:jme,kms:kme)
+      real                       :: tmp(n1,n2,n3), xtmp(n1,n2,n3)
+      integer                    :: i,j,k, half
+C
+       tmp(1:n1,1:n2,1:n3) = 
+     & RESHAPE( kma(1:n1*n2*n3),(/n1,n2,n3/) )
+C        
+        do k =1,n3
+         do j= 1,n2
+          xtmp(1:n1,j,k) = tmp(1:n1,n2-j+1,k)
+         end do 
+        end do 
+C
+        do k=kts,kte
+         do j =  jts, jte
+         XWRF(its:ite,j,k) = xtmp(its:ite,j,k)
+         end do
+        end do
+C
+        half = (ite-its+1)/2
+        do k=kts,kte
+          do j= jts,jte
+            do i=its,ite
+             if( i <= half)then
+              WRF(half+i,j,k) = XWRF(i,j,k)
+             else
+              WRF(i-half,j,k) = XWRF(i,j,k)
+             end if
+            end do
+          end do
+        end do
+C
+       RETURN
+      END SUBROUTINE reorder_for_wrf

@@ -4,7 +4,7 @@ SUBROUTINE da_print_stats_pseudo( stats_unit, nu, nv, nt, np, nq, pseudo )
 
    INTEGER,           intent(in)    :: stats_unit
    INTEGER,           intent(inout) :: nu, nv, nt, np, nq
-   TYPE (stats_type), intent(in)    :: pseudo
+   TYPE (stats_pseudo_type), intent(in):: pseudo
 
    write(unit=stats_unit, fmt='(6a/)') &
         '   var             ', &

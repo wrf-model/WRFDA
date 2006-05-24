@@ -4,6 +4,8 @@ SUBROUTINE DA_Scan_Radar (iunit, ob, xp, filename)
 !  Scan the Radar observation file
 !  History: 13 Sept. 2004, Update,   Jianfeng Gu
 !  History: Multi Radar Obs., 29 Sept. 2004,  Jianfeng Gu
+!           Finalized on February 03, 2005, Qingnong Xiao
+!
 !-----------------------------------------------------------------------------!
 
    implicit none
@@ -23,6 +25,8 @@ SUBROUTINE DA_Scan_Radar (iunit, ob, xp, filename)
    CHARACTER (LEN = 120)         :: char_ned
 
    LOGICAL                       :: outside, inside_halo
+   INTEGER                        ::n_dup, ndup
+
 
 ! -------------------------------------------------------------------
 !--default value.
@@ -74,26 +78,25 @@ SUBROUTINE DA_Scan_Radar (iunit, ob, xp, filename)
 ! 2.1 READ FIRST LINE
 !     ---------------
 
-!  READ (iunit, FMT = '(A)', IOSTAT = iost) char_total_Radar
+   READ (iunit, FMT = '(A)', IOSTAT = iost) char_total_Radar
 
 ! 2.2 PROCESS ERROR
 !     -------------
 
-!  IF (iost /= 0) THEN
-!      WRITE (0,'(/A,i3/)') ' ERROR READING FILE UNIT:', iunit
-!      STOP         ' in read_Radar_header.F'
-!  ENDIF
+   IF (iost /= 0) THEN
+       WRITE (0,'(/A,i3/)') ' ERROR READING FILE UNIT:', iunit
+       STOP         ' in read_Radar_header.F'
+   ENDIF
 
 ! 2.3 TOTAL RADAR NUMBER
 !     ------------------
 
-!  READ (char_total_Radar (15:17), '(I3)', IOSTAT = iost) total_Radar
-   total_Radar = 1
+   READ (char_total_Radar (15:17), '(I3)', IOSTAT = iost) total_Radar
 
 !  2.4 SKIP ONE LINES
 !      --------------
 
-!  READ (iunit, FMT = '(A)', IOSTAT = iost)
+   READ (iunit, FMT = '(A)', IOSTAT = iost)
 
 !----------------------------------------------------------------------------!
 ! 3. READ RADAR DATA
@@ -104,7 +107,7 @@ SUBROUTINE DA_Scan_Radar (iunit, ob, xp, filename)
 !  3.1 SKIP ONE BLANK LINES
 !  ------------------------
 
-!  READ (iunit, FMT = '(A)', IOSTAT = iost)
+   READ (iunit, FMT = '(A)', IOSTAT = iost)
 
 !  3.2 READ HEADER
 !  ---------------
@@ -115,8 +118,6 @@ SUBROUTINE DA_Scan_Radar (iunit, ob, xp, filename)
 !      -----------------------
 
    READ (char_ned (69:74), '(I6)', IOSTAT = iost) platform % stn % numObs
-
-   max_Radar_input = platform % stn % numObs
 
 !----------------------------------------------------------------------------!
 !  3.4 SKIP TWO LINES
@@ -129,7 +130,7 @@ SUBROUTINE DA_Scan_Radar (iunit, ob, xp, filename)
 !  3.5 LOOP OVER RECORDS
 !  ---------------------
 
-   reports: DO j = 1, max_Radar_input
+   reports: DO j = 1, platform % stn % numObs
 
 !     3.5.1 READ STATION GENERAL INFO
 !     -------------------------------
@@ -189,6 +190,13 @@ SUBROUTINE DA_Scan_Radar (iunit, ob, xp, filename)
 
       endif
 
+!    Loop over duplicating obs for global
+   n_dup = 1
+   if(global .and. &
+     (platform%loc%i == xp%ids .or. platform%loc%i == xp%ide))n_dup= 2
+!
+   DO ndup = 1, n_dup
+
 
       SELECT CASE ( fm )
  
@@ -213,6 +221,7 @@ SUBROUTINE DA_Scan_Radar (iunit, ob, xp, filename)
                'platform % info % levels=', platform % info % levels
 
       END SELECT
+    ENDDO        !  loop over duplicate
 
     ENDDO reports
 
@@ -224,7 +233,7 @@ SUBROUTINE DA_Scan_Radar (iunit, ob, xp, filename)
 ! 4. PRINT OUT
 ! ============
  
-   write(unit=*, fmt='(/5x,a,i6,a)') &
+   if(print_detail > 0) write(unit=*, fmt='(/5x,a,i6,a)') &
          ' Read:  ', num_Radar, ' Radar reports '
 
    WRITE (0,'(/,A,I3,/)') ' END OF UNIT: ',iunit

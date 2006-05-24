@@ -1,20 +1,25 @@
       subroutine da_calculate_jo_and_grady( iv, re, jot, jo, jo_grad_y)
 
       implicit none
+!----------------------------------------------------------------------------
+!       03/04/2005 - AMV's from Geostationary and       Syed  RH  Rizvi
+!                    Polar orbiting satellite are
+!                    seperated & used as profile
+!                    Initialised contribution of all obs in Jo
+!
+!-------------------------------------------------------------------------
       
       type (ob_type), intent(IN)   :: iv          ! Innovation vector (O-B).
       type (y_type), intent(IN)    :: re          ! Residual vector (O-A).
       real, intent(OUT)            :: jot         ! Obs cost function.
       type (jo_type), intent(OUT)  :: jo          ! Obs cost function.
       type (y_type), intent(OUT)   :: jo_grad_y   ! Grad_y(Jo)
-
-      real                         :: jo_sound, jo_synop, jo_satob, &
+      real                         :: jo_sound, jo_synop, jo_geoamv, jo_polaramv, &
                                       jo_airep, jo_pilot, jo_satem, &
                                       jo_metar, jo_ships, jo_gpspw, &
                                       jo_ssmi , jo_ssmt1, jo_ssmt2, &
                                       jo_pseudo, jo_qscat, jo_buoy, &
-                                      jo_profiler, jo_Radar, jo_gpsref
-                                      
+                                      jo_profiler, jo_Radar, jo_gpsref, jo_bogus
 !-------------------------------------------------------------------------
 !     [1.0] Compute components of Grad_y(Jo):
 !-------------------------------------------------------------------------
@@ -34,7 +39,7 @@
               'jo%sound_q =', jo%sound_q
       endif
 
-      call da_calculate_jo_and_grady_Sonde_sfc( iv, re, jo, jo_grad_y)
+      call da_get_jo_and_grady_Sonde_sfc( iv, re, jo, jo_grad_y)
       jo_sound = jo_sound         + jo % sonde_sfc_u + jo % sonde_sfc_v + &
                  jo % sonde_sfc_t + jo % sonde_sfc_q + jo % sonde_sfc_p
 
@@ -64,10 +69,28 @@
               'jo%synop_q =', jo%synop_q
       endif
                  
-!     Satellite wind track
 
-      call da_calculate_jo_and_grady_Satob( iv, re, jo, jo_grad_y)
-      jo_satob = jo % satob_u + jo % satob_v
+!     Geostationary Satellite AMVs:
+
+      call da_calculate_jo_and_grady_geoamv( iv, re, jo, jo_grad_y)
+      jo_geoamv = jo % geoamv_u + jo % geoamv_v
+      if(print_detail > 0) then
+         write(unit=*, fmt='(a, e24.12)') &
+              'jo_geoamv =', jo_geoamv, &
+              'jo%geoamv_u =', jo%geoamv_u, &
+              'jo%geoamv_v =', jo%geoamv_v
+      end if
+
+!     Polar orbitting Satellite AMVs:
+
+      call da_calculate_jo_and_grady_polaramv( iv, re, jo, jo_grad_y)
+      jo_polaramv = jo % polaramv_u + jo % polaramv_v
+      if(print_detail > 0) then
+         write(unit=*, fmt='(a, e24.12)') &
+              'jo_polaramv =', jo_polaramv, &
+              'jo%polaramv_u =', jo%polaramv_u, &
+              'jo%polaramv_v =', jo%polaramv_v
+      end if
 
 !     Airep
 
@@ -138,8 +161,15 @@
 
 !     Profiler:
 
-      call da_calculate_jo_and_grady_Profiler (iv, re, jo, jo_grad_y)
+      call da_get_jo_and_grady_Profiler (iv, re, jo, jo_grad_y)
       jo_profiler = jo % profiler_u + jo % profiler_v
+
+!     TC bogus:
+
+      call da_calculate_jo_and_grady_bogus ( iv, re, jo, jo_grad_y)
+      jo_bogus = jo % bogus_u + jo % bogus_v + jo % bogus_slp + &
+                  jo % bogus_t + jo % bogus_q
+
       
 !     Buoy: 
 
@@ -151,11 +181,11 @@
 !     [2.0] Jo = 1/2 * (yo-y)**2/ob_err_variance:
 !-------------------------------------------------------------------------
 
-      jo % total = jo_sound + jo_satob + jo_synop + jo_satem + &
+      jo % total = jo_sound + jo_geoamv + jo_polaramv + jo_synop + jo_satem + &
                    jo_pilot + jo_airep + jo_metar + jo_ships + &
                    jo_gpspw + jo_ssmi + jo_ssmt1 + jo_ssmt2 + &
                    jo_pseudo + jo_qscat + jo_profiler + jo_buoy + &
-                   jo_Radar + jo_gpsref
+                   jo_Radar + jo_gpsref + jo_bogus
                    
       jot = jo % total
 
@@ -165,7 +195,8 @@
 
          write(unit=*, fmt='(a, e24.12)') &
               'jo_sound =', jo_sound, &
-              'jo_satob =', jo_satob, &
+              'jo_geoamv =', jo_geoamv, &
+              'jo_polaramv =', jo_polaramv, &
               'jo_synop =', jo_synop, &
               'jo_satem =', jo_satem, &
               'jo_pilot =', jo_pilot, &
@@ -181,7 +212,8 @@
               'jo_profil=', jo_profiler, &
               'jo_buoy  =', jo_buoy, &
               'jo_Radar =', jo_Radar, &
-              'jo_gpsref =', jo_gpsref
+              'jo_gpsref =', jo_gpsref, &
+              'jo_bogus =', jo_bogus
       endif
                    
       end subroutine da_calculate_jo_and_grady

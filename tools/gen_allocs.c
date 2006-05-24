@@ -41,7 +41,7 @@ int
 gen_alloc2 ( FILE * fp , char * structname , char * corename , node_t * node )
 {
   node_t * p ;
-  int tag ;
+  int var, tag ;
   char post[NAMELEN] ;
   char fname[NAMELEN] ;
   char x[NAMELEN] ;
@@ -60,30 +60,57 @@ gen_alloc2 ( FILE * fp , char * structname , char * corename , node_t * node )
     {
       if ( p->node_kind & FOURD ) { sprintf(post,",num_%s)",field_name(t4,p,0)) ; }
       else                        { sprintf(post,")") ; }
-      for ( tag = 1 ; tag <= p->ntl ; tag++ )
+/*Wei's change for 4dvar*/
+      for ( var = 0 ; var < p->var_numb ; var++ )
       {
-        /* if this is a core-specific variable, prepend the name of the core to   */
-        /* the variable at the driver level                                       */
-        if (!strcmp( corename , p->use+4 ))
-          sprintf(fname,"%s_%s",corename,field_name(t4,p,(p->ntl>1)?tag:0)) ;
-        else
-          strcpy(fname,field_name(t4,p,(p->ntl>1)?tag:0)) ;
+      /*
+       *if(p->var_numb > 1)
+       *{
+       *  printf("Processing var: <%s> for <%c> in file: <%s>, line: <%d>\n", p->name, p->var_name[var], __FILE__, __LINE__);
+       *}
+       */
+
+        for ( tag = 1 ; tag <= p->ntl ; tag++ )
+        {
+          /* if this is a core-specific variable, prepend the name of the core to   */
+          /* the variable at the driver level                                       */
+          if (!strcmp( corename , p->use+4 ))
+          { 
+            if(var)
+              sprintf(fname,"%s_%c_%s",corename,p->var_name[var],field_name(t4,p,(p->ntl>1)?tag:0)) ;
+            else
+              sprintf(fname,"%s_%s",corename,field_name(t4,p,(p->ntl>1)?tag:0)) ;
+          }
+          else
+          {
+            if(var)
+              sprintf(fname,"%c_%s",p->var_name[var],field_name(t4,p,(p->ntl>1)?tag:0)) ;
+            else
+              strcpy(fname,field_name(t4,p,(p->ntl>1)?tag:0)) ;
+          }
+
+        /*
+         *if(p->var_numb > 1)
+         *{
+         *  printf("fname: <%s> in file: <%s>, line: <%d>\n", fname, __FILE__, __LINE__);
+         *}
+         */
 
 /* check for errors in memory allocation */
 
-       fprintf(fp, "ALLOCATE(%s%s%s,STAT=ierr)\n if (ierr.ne.0) then\n CALL wrf_error_fatal ( &\n'frame/module_domain.f: Failed to allocate %s%s%s. ')\n endif\n", structname, fname,dimension_with_ranges( "", "(", t2, p, post, "model_config_rec%"), structname, fname,dimension_with_ranges( "", "(", t2, p, post, "model_config_rec%")); 
+          fprintf(fp, "ALLOCATE(%s%s%s,STAT=ierr)\n if (ierr.ne.0) then\n CALL wrf_error_fatal ( &\n'frame/module_domain.f: Failed to allocate %s%s%s. ')\n endif\n", structname, fname,dimension_with_ranges( "", "(", t2, p, post, "model_config_rec%"), structname, fname,dimension_with_ranges( "", "(", t2, p, post, "model_config_rec%")); 
 
-       fprintf(fp, "  IF ( setinitval ) %s%s=", structname , fname);
-       if( p->type != NULL  &&   (!strcmp( p->type->name , "real" ) 
-                               || !strcmp( p->type->name , "doubleprecision") ) )   {
-       /* if a real */
-         fprintf(fp, "initial_data_value\n");
-       } else if ( !strcmp( p->type->name , "logical" ) ) {
-         fprintf(fp, ".FALSE.\n");
-       } else if ( !strcmp( p->type->name , "integer" ) ) {
-         fprintf(fp, "0\n");
-       }
-
+          fprintf(fp, "  IF ( setinitval .EQ. 1 .OR. setinitval .EQ. 3 ) %s%s=", structname , fname);
+          if( p->type != NULL  &&   (!strcmp( p->type->name , "real" ) 
+                                 || !strcmp( p->type->name , "doubleprecision") ) )   {
+          /* if a real */
+            fprintf(fp, "initial_data_value\n");
+          } else if ( !strcmp( p->type->name , "logical" ) ) {
+            fprintf(fp, ".FALSE.\n");
+          } else if ( !strcmp( p->type->name , "integer" ) ) {
+            fprintf(fp, "0\n");
+          }
+        }
       }
     }
     if ( p->type != NULL )
@@ -107,15 +134,15 @@ gen_alloc2 ( FILE * fp , char * structname , char * corename , node_t * node )
           }
           if( !strcmp( p->type->name , "real" ) || 
               !strcmp( p->type->name , "doubleprecision" )  ) { /* if a real */
-            fprintf(fp, "IF ( setinitval ) %s%s=initial_data_value\n",
+            fprintf(fp, "IF ( setinitval .EQ. 3 ) %s%s=initial_data_value\n",
                         structname ,
                         fname ) ;
 	  } else if ( !strcmp( p->type->name , "integer" ) ) {
-            fprintf(fp, "IF ( setinitval ) %s%s=0\n",
+            fprintf(fp, "IF ( setinitval .EQ. 3 ) %s%s=0\n",
                         structname ,
                         fname ) ;
           } else if ( !strcmp( p->type->name , "logical" ) ) {
-            fprintf(fp, "IF ( setinitval ) %s%s=.FALSE.\n",
+            fprintf(fp, "IF ( setinitval .EQ. 3 ) %s%s=.FALSE.\n",
                         structname ,
                         fname ) ;
           }

@@ -100,6 +100,8 @@ SUBROUTINE DA_Obs_Sfc_correction(sfc_obs, xb )
             endif
          endif
          sfc_obs % p % inv = psfc
+! YRG: to allow assimlate the Psfc from mslp:
+         sfc_obs % p % qc  = 0
       endif
 
       if(sfc_obs % p % inv < 1.0) then

@@ -55,9 +55,8 @@ module wrf_data
       integer, parameter  :: WRF_FILE_OPENED_NOT_COMMITTED        = 101
       integer, parameter  :: WRF_FILE_OPENED_FOR_WRITE            = 102
       integer, parameter  :: WRF_FILE_OPENED_FOR_READ             = 103
-      integer, parameter  :: WRF_REAL4                            = 104
-      integer, parameter  :: WRF_REAL8                            = 105
-      integer, parameter  :: WRF_DOUBLE                           = 105
+      integer, parameter  :: WRF_REAL                             = 104
+      integer, parameter  :: WRF_DOUBLE               = 105
       integer, parameter  :: WRF_INTEGER                          = 106
       integer, parameter  :: WRF_LOGICAL                          = 107
       integer, parameter  :: WRF_COMPLEX                          = 108
@@ -211,6 +210,94 @@ subroutine allocHandle(DataHandle,DH,Comm,Status)
   DH%first_operation  = .TRUE.
   Status = WRF_NO_ERR
 end subroutine allocHandle
+
+subroutine deallocHandle(DataHandle, Status)
+  use wrf_data
+  include 'wrf_status_codes.h'
+  integer              ,intent(in) :: DataHandle
+  integer              ,intent(out) :: Status
+  type(wrf_data_handle),pointer     :: DH
+  integer                           :: i
+  integer                           :: stat
+
+  IF ( DataHandle .GE. 1 .AND. DataHandle .LE. WrfDataHandleMax ) THEN
+    if(.NOT. WrfDataHandles(DataHandle)%Free) then
+      DH => WrfDataHandles(DataHandle)
+      deallocate(DH%Times, STAT=stat)
+      if(stat/= 0) then
+        Status = WRF_ERR_FATAL_DEALLOCATION_ERR
+        write(msg,*) 'Fatal DEALLOCATION ERROR in ',__FILE__,', line', __LINE__
+        call wrf_debug ( FATAL , msg)
+        return
+      endif
+      deallocate(DH%DimLengths, STAT=stat)
+      if(stat/= 0) then
+        Status = WRF_ERR_FATAL_DEALLOCATION_ERR
+        write(msg,*) 'Fatal DEALLOCATION ERROR in ',__FILE__,', line', __LINE__
+        call wrf_debug ( FATAL , msg)
+        return
+      endif
+      deallocate(DH%DimIDs, STAT=stat)
+      if(stat/= 0) then
+        Status = WRF_ERR_FATAL_DEALLOCATION_ERR
+        write(msg,*) 'Fatal DEALLOCATION ERROR in ',__FILE__,', line', __LINE__
+        call wrf_debug ( FATAL , msg)
+        return
+      endif
+      deallocate(DH%DimNames, STAT=stat)
+      if(stat/= 0) then
+        Status = WRF_ERR_FATAL_DEALLOCATION_ERR
+        write(msg,*) 'Fatal ALLOCATION ERROR in ',__FILE__,', line', __LINE__
+        call wrf_debug ( FATAL , msg)
+        return
+      endif
+      deallocate(DH%MDVarIDs, STAT=stat)
+      if(stat/= 0) then
+        Status = WRF_ERR_FATAL_DEALLOCATION_ERR
+        write(msg,*) 'Fatal DEALLOCATION ERROR in ',__FILE__,', line', __LINE__
+        call wrf_debug ( FATAL , msg)
+        return
+      endif
+      deallocate(DH%MDVarDimLens, STAT=stat)
+      if(stat/= 0) then
+        Status = WRF_ERR_FATAL_DEALLOCATION_ERR
+        write(msg,*) 'Fatal DEALLOCATION ERROR in ',__FILE__,', line', __LINE__
+        call wrf_debug ( FATAL , msg)
+        return
+      endif
+      deallocate(DH%MDVarNames, STAT=stat)
+      if(stat/= 0) then
+        Status = WRF_ERR_FATAL_DEALLOCATION_ERR
+        write(msg,*) 'Fatal DEALLOCATION ERROR in ',__FILE__,', line', __LINE__
+        call wrf_debug ( FATAL , msg)
+        return
+      endif
+      deallocate(DH%VarIDs, STAT=stat)
+      if(stat/= 0) then
+        Status = WRF_ERR_FATAL_DEALLOCATION_ERR
+        write(msg,*) 'Fatal DEALLOCATION ERROR in ',__FILE__,', line', __LINE__
+        call wrf_debug ( FATAL , msg)
+        return
+      endif
+      deallocate(DH%VarDimLens, STAT=stat)
+      if(stat/= 0) then
+        Status = WRF_ERR_FATAL_DEALLOCATION_ERR
+        write(msg,*) 'Fatal DEALLOCATION ERROR in ',__FILE__,', line', __LINE__
+        call wrf_debug ( FATAL , msg)
+        return
+      endif
+      deallocate(DH%VarNames, STAT=stat)
+      if(stat/= 0) then
+        Status = WRF_ERR_FATAL_DEALLOCATION_ERR
+        write(msg,*) 'Fatal DEALLOCATION ERROR in ',__FILE__,', line', __LINE__
+        call wrf_debug ( FATAL , msg)
+        return
+      endif
+      DH%Free      =.TRUE.
+    endif
+  ENDIF
+  Status = WRF_NO_ERR
+end subroutine deallocHandle
 
 subroutine GetDH(DataHandle,DH,Status)
   use wrf_data
@@ -570,9 +657,9 @@ VCount(:) = 1
   VStart(NDim+1) = TimeIndex
   VCount(NDim+1) = 1
   select case (FieldType)
-    case (WRF_REAL4)
+    case (WRF_REAL)
       call ext_ncd_RealFieldIO    (IO,NCID,VarID,VStart,VCount,XField,Status)
-    case (WRF_REAL8)
+    case (WRF_DOUBLE)
       call ext_ncd_DoubleFieldIO  (IO,NCID,VarID,VStart,VCount,XField,Status)
     case (WRF_INTEGER)
       call ext_ncd_IntFieldIO     (IO,NCID,VarID,VStart,VCount,XField,Status)
@@ -1242,6 +1329,7 @@ subroutine ext_ncd_ioclose(DataHandle, Status)
     call wrf_debug ( FATAL , TRIM(msg))
     return
   endif
+
   stat = NF_CLOSE(DH%NCID)
   call netcdf_err(stat,Status)
   if(Status /= WRF_NO_ERR) then
@@ -1249,6 +1337,7 @@ subroutine ext_ncd_ioclose(DataHandle, Status)
     call wrf_debug ( WARN , TRIM(msg))
     return
   endif
+  CALL deallocHandle( DataHandle, Status )
   DH%Free=.true.
   return
 end subroutine ext_ncd_ioclose
@@ -1443,6 +1532,7 @@ end subroutine ext_ncd_inquiry
 
 subroutine ext_ncd_ioexit(Status)
   use wrf_data
+  use ext_ncd_support_routines
   implicit none
   include 'wrf_status_codes.h'
   include 'netcdf.inc'
@@ -1458,80 +1548,7 @@ subroutine ext_ncd_ioexit(Status)
     return
   endif
   do i=1,WrfDataHandleMax
-    if(.not.WrfDataHandles(i)%Free) then
-      DH => WrfDataHandles(i)
-      deallocate(DH%Times, STAT=stat)
-      if(stat/= 0) then
-        Status = WRF_ERR_FATAL_DEALLOCATION_ERR
-        write(msg,*) 'Fatal DEALLOCATION ERROR in ',__FILE__,', line', __LINE__
-        call wrf_debug ( FATAL , TRIM(msg))
-        return
-      endif
-      deallocate(DH%DimLengths, STAT=stat)
-      if(stat/= 0) then
-        Status = WRF_ERR_FATAL_DEALLOCATION_ERR
-        write(msg,*) 'Fatal DEALLOCATION ERROR in ',__FILE__,', line', __LINE__
-        call wrf_debug ( FATAL , TRIM(msg))
-        return
-      endif
-      deallocate(DH%DimIDs, STAT=stat)
-      if(stat/= 0) then
-        Status = WRF_ERR_FATAL_DEALLOCATION_ERR
-        write(msg,*) 'Fatal DEALLOCATION ERROR in ',__FILE__,', line', __LINE__
-        call wrf_debug ( FATAL , TRIM(msg))
-        return
-      endif
-      deallocate(DH%DimNames, STAT=stat)
-      if(stat/= 0) then
-        Status = WRF_ERR_FATAL_DEALLOCATION_ERR
-        write(msg,*) 'Fatal DEALLOCATION ERROR in ',__FILE__,', line', __LINE__
-        call wrf_debug ( FATAL , TRIM(msg))
-        return
-      endif
-      deallocate(DH%MDVarIDs, STAT=stat)
-      if(stat/= 0) then
-        Status = WRF_ERR_FATAL_DEALLOCATION_ERR
-        write(msg,*) 'Fatal DEALLOCATION ERROR in ',__FILE__,', line', __LINE__
-        call wrf_debug ( FATAL , TRIM(msg))
-        return
-      endif
-      deallocate(DH%MDVarDimLens, STAT=stat)
-      if(stat/= 0) then
-        Status = WRF_ERR_FATAL_DEALLOCATION_ERR
-        write(msg,*) 'Fatal DEALLOCATION ERROR in ',__FILE__,', line', __LINE__
-        call wrf_debug ( FATAL , TRIM(msg))
-        return
-      endif
-      deallocate(DH%MDVarNames, STAT=stat)
-      if(stat/= 0) then
-        Status = WRF_ERR_FATAL_DEALLOCATION_ERR
-        write(msg,*) 'Fatal DEALLOCATION ERROR in ',__FILE__,', line', __LINE__
-        call wrf_debug ( FATAL , TRIM(msg))
-        return
-      endif
-      deallocate(DH%VarIDs, STAT=stat)
-      if(stat/= 0) then
-        Status = WRF_ERR_FATAL_DEALLOCATION_ERR
-        write(msg,*) 'Fatal DEALLOCATION ERROR in ',__FILE__,', line', __LINE__
-        call wrf_debug ( FATAL , TRIM(msg))
-        return
-      endif
-      deallocate(DH%VarDimLens, STAT=stat)
-      if(stat/= 0) then
-        Status = WRF_ERR_FATAL_DEALLOCATION_ERR
-        write(msg,*) 'Fatal DEALLOCATION ERROR in ',__FILE__,', line', __LINE__
-        call wrf_debug ( FATAL , TRIM(msg))
-        return
-      endif
-      deallocate(DH%VarNames, STAT=stat)
-      if(stat/= 0) then
-        Status = WRF_ERR_FATAL_DEALLOCATION_ERR
-        write(msg,*) 'Fatal DEALLOCATION ERROR in ',__FILE__,', line', __LINE__
-        call wrf_debug ( FATAL , TRIM(msg))
-        return
-      endif
-      exit
-    endif
+    CALL deallocHandle( i , stat ) 
   enddo
   return
 end subroutine ext_ncd_ioexit
@@ -1564,7 +1581,7 @@ subroutine ext_ncd_get_dom_ti_integer(DataHandle,Element,Data,Count,OutCount,Sta
 #include "ext_ncd_get_dom_ti.code"
 end subroutine ext_ncd_get_dom_ti_integer
 
-subroutine ext_ncd_get_dom_ti_real8(DataHandle,Element,Data,Count,OutCount,Status)
+subroutine ext_ncd_get_dom_ti_double(DataHandle,Element,Data,Count,OutCount,Status)
 #undef ROUTINE_TYPE 
 #undef TYPE_DATA 
 #undef TYPE_BUFFER
@@ -1578,7 +1595,7 @@ subroutine ext_ncd_get_dom_ti_real8(DataHandle,Element,Data,Count,OutCount,Statu
 #define NF_ROUTINE NF_GET_ATT_DOUBLE
 #define COPY   Data(1:min(Len,Count)) = Buffer(1:min(Len,Count))
 #include "ext_ncd_get_dom_ti.code"
-end subroutine ext_ncd_get_dom_ti_real8
+end subroutine ext_ncd_get_dom_ti_double
 
 subroutine ext_ncd_get_dom_ti_logical(DataHandle,Element,Data,Count,OutCount,Status)
 #undef ROUTINE_TYPE 
@@ -1644,7 +1661,7 @@ subroutine ext_ncd_put_dom_ti_integer(DataHandle,Element,Data,Count,Status)
 #include "ext_ncd_put_dom_ti.code"
 end subroutine ext_ncd_put_dom_ti_integer
 
-subroutine ext_ncd_put_dom_ti_real8(DataHandle,Element,Data,Count,Status)
+subroutine ext_ncd_put_dom_ti_double(DataHandle,Element,Data,Count,Status)
 #undef ROUTINE_TYPE 
 #undef TYPE_DATA
 #undef TYPE_COUNT
@@ -1657,7 +1674,7 @@ subroutine ext_ncd_put_dom_ti_real8(DataHandle,Element,Data,Count,Status)
 #define NF_ROUTINE NF_PUT_ATT_DOUBLE
 #define ARGS NF_DOUBLE,Count,Data
 #include "ext_ncd_put_dom_ti.code"
-end subroutine ext_ncd_put_dom_ti_real8
+end subroutine ext_ncd_put_dom_ti_double
 
 subroutine ext_ncd_put_dom_ti_logical(DataHandle,Element,Data,Count,Status)
 #undef ROUTINE_TYPE 
@@ -1723,7 +1740,7 @@ subroutine ext_ncd_put_var_td_real(DataHandle,Element,DateStr,Var,Data,Count,Sta
 #include "ext_ncd_put_var_td.code"
 end subroutine ext_ncd_put_var_td_real
 
-subroutine ext_ncd_put_var_ti_real8(DataHandle,Element,Var,Data,Count,Status)
+subroutine ext_ncd_put_var_ti_double(DataHandle,Element,Var,Data,Count,Status)
 #undef ROUTINE_TYPE
 #undef TYPE_DATA
 #undef TYPE_COUNT
@@ -1736,9 +1753,9 @@ subroutine ext_ncd_put_var_ti_real8(DataHandle,Element,Var,Data,Count,Status)
 #define NF_ROUTINE NF_PUT_ATT_DOUBLE
 #define ARGS NF_DOUBLE,Count,Data
 #include "ext_ncd_put_var_ti.code"
-end subroutine ext_ncd_put_var_ti_real8
+end subroutine ext_ncd_put_var_ti_double
 
-subroutine ext_ncd_put_var_td_real8(DataHandle,Element,DateStr,Var,Data,Count,Status)
+subroutine ext_ncd_put_var_td_double(DataHandle,Element,DateStr,Var,Data,Count,Status)
 #undef ROUTINE_TYPE
 #undef TYPE_DATA
 #undef TYPE_COUNT
@@ -1755,7 +1772,7 @@ subroutine ext_ncd_put_var_td_real8(DataHandle,Element,DateStr,Var,Data,Count,St
 #define LENGTH Count
 #define ARG 
 #include "ext_ncd_put_var_td.code"
-end subroutine ext_ncd_put_var_td_real8
+end subroutine ext_ncd_put_var_td_double
 
 subroutine ext_ncd_put_var_ti_integer(DataHandle,Element,Var,Data,Count,Status)
 #undef ROUTINE_TYPE
@@ -1902,7 +1919,7 @@ subroutine ext_ncd_get_var_td_real(DataHandle,Element,DateStr,Var,Data,Count,Out
 #include "ext_ncd_get_var_td.code"
 end subroutine ext_ncd_get_var_td_real
 
-subroutine ext_ncd_get_var_ti_real8(DataHandle,Element,Var,Data,Count,OutCount,Status)
+subroutine ext_ncd_get_var_ti_double(DataHandle,Element,Var,Data,Count,OutCount,Status)
 #undef ROUTINE_TYPE
 #undef TYPE_DATA
 #undef TYPE_BUFFER
@@ -1920,9 +1937,9 @@ subroutine ext_ncd_get_var_ti_real8(DataHandle,Element,Var,Data,Count,OutCount,S
 #define NF_ROUTINE NF_GET_ATT_DOUBLE
 #define COPY   Data(1:min(XLen,Count)) = Buffer(1:min(XLen,Count))
 #include "ext_ncd_get_var_ti.code"
-end subroutine ext_ncd_get_var_ti_real8
+end subroutine ext_ncd_get_var_ti_double
 
-subroutine ext_ncd_get_var_td_real8(DataHandle,Element,DateStr,Var,Data,Count,OutCount,Status)
+subroutine ext_ncd_get_var_td_double(DataHandle,Element,DateStr,Var,Data,Count,OutCount,Status)
 #undef ROUTINE_TYPE
 #undef TYPE_DATA
 #undef TYPE_BUFFER
@@ -1942,7 +1959,7 @@ subroutine ext_ncd_get_var_td_real8(DataHandle,Element,DateStr,Var,Data,Count,Ou
 #define LENGTH min(Count,Len1)
 #define COPY   Data(1:min(Len1,Count)) = Buffer(1:min(Len1,Count))
 #include "ext_ncd_get_var_td.code"
-end subroutine ext_ncd_get_var_td_real8
+end subroutine ext_ncd_get_var_td_double
 
 subroutine ext_ncd_get_var_ti_integer(DataHandle,Element,Var,Data,Count,OutCount,Status)
 #undef ROUTINE_TYPE
@@ -2098,7 +2115,7 @@ subroutine ext_ncd_put_dom_td_integer(DataHandle,Element,DateStr,Data,Count,Stat
   return
 end subroutine ext_ncd_put_dom_td_integer
 
-subroutine ext_ncd_put_dom_td_real8(DataHandle,Element,DateStr,Data,Count,Status)
+subroutine ext_ncd_put_dom_td_double(DataHandle,Element,DateStr,Data,Count,Status)
   integer               ,intent(in)     :: DataHandle
   character*(*)         ,intent(in)     :: Element
   character*(*)         ,intent(in)     :: DateStr
@@ -2106,10 +2123,10 @@ subroutine ext_ncd_put_dom_td_real8(DataHandle,Element,DateStr,Data,Count,Status
   integer               ,intent(in)     :: Count
   integer               ,intent(out)    :: Status
 
-  call ext_ncd_put_var_td_real8(DataHandle,Element,DateStr, &
+  call ext_ncd_put_var_td_double(DataHandle,Element,DateStr, &
        'E_X_T_D_O_M_A_I_N_M_E_T_A_DATA_'   ,Data,Count,Status)
   return
-end subroutine ext_ncd_put_dom_td_real8
+end subroutine ext_ncd_put_dom_td_double
 
 subroutine ext_ncd_put_dom_td_logical(DataHandle,Element,DateStr,Data,Count,Status)
   integer               ,intent(in)     :: DataHandle
@@ -2162,7 +2179,7 @@ subroutine ext_ncd_get_dom_td_integer(DataHandle,Element,DateStr,Data,Count,OutC
   return
 end subroutine ext_ncd_get_dom_td_integer
 
-subroutine ext_ncd_get_dom_td_real8(DataHandle,Element,DateStr,Data,Count,OutCount,Status)
+subroutine ext_ncd_get_dom_td_double(DataHandle,Element,DateStr,Data,Count,OutCount,Status)
   integer               ,intent(in)     :: DataHandle
   character*(*)         ,intent(in)     :: Element
   character*(*)         ,intent(in)     :: DateStr
@@ -2170,10 +2187,10 @@ subroutine ext_ncd_get_dom_td_real8(DataHandle,Element,DateStr,Data,Count,OutCou
   integer               ,intent(in)     :: Count
   integer               ,intent(out)    :: OutCount
   integer               ,intent(out)    :: Status
-  call ext_ncd_get_var_td_real8(DataHandle,Element,DateStr,          &
+  call ext_ncd_get_var_td_double(DataHandle,Element,DateStr,          &
        'E_X_T_D_O_M_A_I_N_M_E_T_A_DATA_'   ,Data,Count,OutCount,Status)
   return
-end subroutine ext_ncd_get_dom_td_real8
+end subroutine ext_ncd_get_dom_td_double
 
 subroutine ext_ncd_get_dom_td_logical(DataHandle,Element,DateStr,Data,Count,OutCount,Status)
   integer               ,intent(in)     :: DataHandle
@@ -2369,9 +2386,9 @@ subroutine ext_ncd_write_field(DataHandle,DateStr,Var,Field,FieldType,Comm, &
     enddo
     VDimIDs(NDim+1) = DH%DimUnlimID
     select case (FieldType)
-      case (WRF_REAL4)
+      case (WRF_REAL)
         XType = NF_FLOAT
-      case (WRF_REAL8)
+      case (WRF_DOUBLE)
         Xtype = NF_DOUBLE
       case (WRF_INTEGER)
         XType = NF_INT
@@ -2442,7 +2459,7 @@ subroutine ext_ncd_write_field(DataHandle,DateStr,Var,Field,FieldType,Comm, &
     call GetIndices(NDim,StoredStart,Length   ,x1,x2,y1,y2,z1,z2)
     call GetIndices(NDim,PatchStart, PatchEnd ,i1,i2,j1,j2,k1,k2)
     di=1
-    if(FieldType == WRF_REAL8) di=2
+    if(FieldType == WRF_DOUBLE) di=2
     allocate(XField(di,x1:x2,y1:y2,z1:z2), STAT=stat)
     if(stat/= 0) then
       Status = WRF_ERR_FATAL_ALLOCATION_ERROR
@@ -2594,8 +2611,8 @@ subroutine ext_ncd_read_field(DataHandle,DateStr,Var,Field,FieldType,Comm,  &
     endif
 ! allow coercion between double and single prec real
 !jm    if(FieldType /= Ftype) then
-    if( (FieldType == WRF_REAL4 .OR. FieldType == WRF_REAL8) ) then
-      if ( .NOT. (Ftype     == WRF_REAL4 .OR. Ftype     == WRF_REAL8 ))  then
+    if( (FieldType == WRF_REAL .OR. FieldType == WRF_DOUBLE) ) then
+      if ( .NOT. (Ftype     == WRF_REAL .OR. Ftype     == WRF_DOUBLE ))  then
         Status = WRF_WARN_TYPE_MISMATCH
         write(msg,*) 'Warning TYPE MISMATCH in ',__FILE__,', line', __LINE__
         call wrf_debug ( WARN , TRIM(msg))
@@ -2608,13 +2625,13 @@ subroutine ext_ncd_read_field(DataHandle,DateStr,Var,Field,FieldType,Comm,  &
       return
     endif      
     select case (FieldType)
-      case (WRF_REAL4)
+      case (WRF_REAL)
 ! allow coercion between double and single prec real
         if(.NOT. (XType == NF_FLOAT .OR. XType == NF_DOUBLE) )  then
           Status = WRF_WARN_TYPE_MISMATCH
           write(msg,*) 'Warning REAL TYPE MISMATCH in ',__FILE__,', line', __LINE__
         endif
-      case (WRF_REAL8)
+      case (WRF_DOUBLE)
 ! allow coercion between double and single prec real
         if(.NOT. (XType == NF_FLOAT .OR. XType == NF_DOUBLE) )  then
           Status = WRF_WARN_TYPE_MISMATCH
@@ -2680,7 +2697,7 @@ subroutine ext_ncd_read_field(DataHandle,DateStr,Var,Field,FieldType,Comm,  &
     call GetIndices(NDim,PatchStart,PatchEnd,i1,i2,j1,j2,k1,k2)
 
     di=1
-    if(FieldType == WRF_REAL8) di=2
+    if(FieldType == WRF_DOUBLE) di=2
     allocate(XField(di,x1:x2,y1:y2,z1:z2), STAT=stat)
     if(stat/= 0) then
       Status = WRF_ERR_FATAL_ALLOCATION_ERROR
@@ -3056,14 +3073,14 @@ subroutine ext_ncd_get_var_info(DataHandle,Name,NDim,MemoryOrder,Stagger,DomainS
           return
         endif
       case (NF_FLOAT)
-        if(WrfType /= WRF_REAL4) then
+        if(WrfType /= WRF_REAL) then
           Status = WRF_WARN_BAD_DATA_TYPE
           write(msg,*) 'Warning BAD DATA TYPE in ',__FILE__,', line', __LINE__ 
           call wrf_debug ( WARN , TRIM(msg))
           return
         endif
       case (NF_DOUBLE)
-        if(WrfType /= WRF_REAL8) then
+        if(WrfType /= WRF_DOUBLE) then
           Status = WRF_WARN_BAD_DATA_TYPE
           write(msg,*) 'Warning BAD DATA TYPE in ',__FILE__,', line', __LINE__ 
           call wrf_debug ( WARN , TRIM(msg))

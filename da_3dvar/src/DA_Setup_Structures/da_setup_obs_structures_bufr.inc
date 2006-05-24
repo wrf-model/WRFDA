@@ -31,7 +31,7 @@ SUBROUTINE da_setup_obs_structures_bufr( xp, ob, iv )
    real,dimension(8,255) :: drf,obs,qms,oes
 
    integer   :: cat,zqm,pqm,qqm,tqm,wqm,pwq,landsea,ncount
-   integer   :: nme,nar,nsh,nst,levs,nairep,nships,nsatob,nmetar,nso,nsy
+   integer   :: nme,nar,nsh,nst,levs,nairep,nships,ngeoamv,npolaramv,nmetar,nso,nsy
    integer   :: i,k,nsound,iy,iret,idate,noqc,nsynop,kx
    integer   :: id,im,ih,nmrecs,nmdisc,nmindm
 
@@ -57,10 +57,10 @@ SUBROUTINE da_setup_obs_structures_bufr( xp, ob, iv )
    nmetar=0
    nsynop=0
    nships=0
-   nairep=0
-   nsatob=0
-
    nmrecs=0
+   ngeoamv=0
+   npolaramv=0
+
    nmdisc=0
    nmindm=0
 
@@ -142,8 +142,8 @@ SUBROUTINE da_setup_obs_structures_bufr( xp, ob, iv )
             nmetar=nmetar+1
          CASE (180, 182, 280, 282) ;		! Ships
             nships=nships+1
-         CASE (242:246, 252:253, 255) ;		! Satob
-            nsatob=nsatob+1
+         CASE (242:246, 252:253, 255) ;         ! Geo. CMVs
+            ngeoamv= ngeoamv+1
          CASE (120, 132, 220, 223, 232) ;	! Sound
             nsound=nsound+1
          CASE (130:131, 133, 230:231, 233) ;	! Airep
@@ -166,7 +166,7 @@ SUBROUTINE da_setup_obs_structures_bufr( xp, ob, iv )
         'iv%num_metar=', nmetar, &
         'iv%num_ships=', nships, &
         'iv%num_airep=', nairep, &
-        'iv%num_satob=', nsatob, &
+        'iv%num_geoamv=', ngeoamv, &
         'Discarded ob=', nmdisc
 
    if (.not.Use_SynopObs ) nsynop=0
@@ -174,7 +174,9 @@ SUBROUTINE da_setup_obs_structures_bufr( xp, ob, iv )
    if (.not.Use_SoundObs ) nsound=0
    if (.not.Use_ShipsObs ) nships=0
    if (.not.Use_AirepObs ) nairep=0
-   if (.not.Use_satobObs ) nsatob=0
+   if (.not.Use_geoamvObs ) ngeoamv=0
+   if (.not.Use_polaramvObs ) npolaramv=0
+
 
    iv % num_pilot = 0              
    iv % num_satem = 0              
@@ -190,7 +192,9 @@ SUBROUTINE da_setup_obs_structures_bufr( xp, ob, iv )
    iv%num_metar=nmetar
    iv%num_ships=nships
    iv%num_airep=nairep
-   iv%num_satob=nsatob
+   iv%num_geoamv=ngeoamv
+   iv%num_polaramv=npolaramv
+
 
    if(iv%num_sound > 0) then
       ALLOCATE (iv % sound(1:iv%num_sound))
@@ -203,8 +207,10 @@ SUBROUTINE da_setup_obs_structures_bufr( xp, ob, iv )
       ALLOCATE (iv % metar(1:iv%num_metar))
    if(iv%num_airep > 0) &
       ALLOCATE (iv % airep(1:iv%num_airep))
-   if(iv%num_satob > 0) &
-      ALLOCATE (iv % satob(1:iv%num_satob))
+   if(iv%num_geoamv > 0) &
+      ALLOCATE (iv % geoamv(1:iv%num_geoamv))
+   if(iv%num_polaramv > 0) &
+      ALLOCATE (iv % polaramv(1:iv%num_polaramv))
    if(iv%num_ships > 0) &
       ALLOCATE (iv % ships(1:iv%num_ships))
 
@@ -563,18 +569,23 @@ SUBROUTINE da_setup_obs_structures_bufr( xp, ob, iv )
             iv % metar ( nme ) % q = platform % each(1) % q
             iv % metar ( nme ) % zk= platform % each(1) % zk
      
-         CASE (242:246, 252:253, 255) ;      ! Satob
-            if (.not.Use_satobObs) cycle buffer_loop
+
+         CASE (242:246, 252:253, 255) ;         ! Geo. CMVs
+            if (.not.Use_geoamvObs) cycle buffer_loop
             platform  % info % platform ='FM-088 SATOB'
             nst=nst+1
-            iv % satob (nst) % info = platform % info
-            iv % satob (nst) % loc  = platform % loc
+            iv % geoamv (nst) % info = platform % info
+            iv % geoamv (nst) % loc  = platform % loc
 
-            iv % satob (nst) % h  = platform % each(1) % height 
-            iv % satob (nst) % p  = platform % each(1) % p % inv
-            iv % satob (nst) % u  = platform % each(1) % u
-            iv % satob (nst) % v  = platform % each(1) % v
-            iv % satob (nst) % zk = platform % each(1) % zk
+            levs= iv % geoamv ( nst ) % info % levels
+
+            do i = 1, levs
+            iv % geoamv (nst) % p(k)  = platform % each(i) % p % inv
+            iv % geoamv (nst) % u(k)  = platform % each(i) % u
+            iv % geoamv (nst) % v(k)  = platform % each(i) % v
+            iv % geoamv (nst) % zk(k) = platform % each(i) % zk
+            end do
+
 
          CASE (150, 152, 283) ;			! SPSSMI
             cycle buffer_loop
@@ -665,7 +676,9 @@ SUBROUTINE da_setup_obs_structures_bufr( xp, ob, iv )
    iv%num_sound=nso
    iv%num_ships=nsh
    iv%num_airep=nar
-   iv%num_satob=nst
+   iv%num_geoamv=nst
+   iv%num_polaramv=nst
+
 
    write(6,*)'obs no with bufr=',nsy,nso,nsh,nar,nst,nme
 
@@ -678,8 +691,9 @@ SUBROUTINE da_setup_obs_structures_bufr( xp, ob, iv )
         'Read:  ', iv % num_sound, ' SOUND reports,', &
         'Read:  ', iv % num_synop, ' SYNOP reports,', &
         'Read:  ', iv % num_pilot, ' PILOT reports,', &
+        'Read:  ', iv % num_geoamv,' Geo. AMVs reports,', &
+        'Read:  ', iv % num_polaramv,' Polat AMVs reports,', &
         'Read:  ', iv % num_satem, ' SATEM reports,', &
-        'Read:  ', iv % num_satob, ' SATOB reports,', &
         'Read:  ', iv % num_airep, ' AIREP reports,', &
         'Read:  ', iv % num_gpspw, ' GPSPW reports,', &
         'Read:  ', iv % num_metar, ' METAR reports,', &
@@ -688,8 +702,8 @@ SUBROUTINE da_setup_obs_structures_bufr( xp, ob, iv )
         'Read:  ', iv % num_ssmi_tb       , ' SSMI_TB       reports,', &
         'Read:  ', iv % total_obs, ' Total Observations.', &
      'There are ', iv % total_obs - iv % num_sound - iv % num_synop &
+                 - iv % num_geoamv - iv%num_polaramv - iv % num_airep &
                  - iv % num_pilot - iv % num_satem &
-                 - iv % num_satob - iv % num_airep &
                  - iv % num_metar - iv % num_ships &
                  - iv % num_ssmi_retrieval  &
                  - iv % num_ssmi_tb        &
