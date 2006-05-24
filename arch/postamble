@@ -1,31 +1,20 @@
 #
 #	Macros, these should be generic for all machines
 
-LN	=	ln -sf
+LN		=	ln -sf
 MAKE	=	make -i -r
-RM	= 	rm -f
+RM		= 	rm -f
+MV  	=   mv
 
 #	There is probably no reason to modify these rules
-
-
-.F.i:
-	$(RM) $@
-	$(CPP) -I../inc $(CPPFLAGS) $*.F > $@
-	mv $*.i $(DEVTOP)/pick/$*.f
-	cp $*.F $(DEVTOP)/pick
 
 .F.o:
 	$(RM) $@
 	$(SED_FTN) $*.F > $*.b 
-	$(CPP) -I../inc $(CPPFLAGS) $*.b  > $*.f
-	$(RM) $*.b
-	$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) $*.f
-
-.F.f:
-	$(RM) $@
-	$(SED_FTN) $*.F > $*.b 
-	$(CPP) -I../inc $(CPPFLAGS) $*.b  > $@
-	$(RM) $*.b
+	$(CPP) -I../inc $(CPPFLAGS) $*.b  > tmp.f
+	$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) tmp.f
+	$(MV) tmp.o $*.o
+	$(RM) $*.b tmp.f
 
 .f.o:
 	$(RM) $@
@@ -34,4 +23,5 @@ RM	= 	rm -f
 .c.o:
 	$(RM) $@
 	$(CC) -c $(CFLAGS) $*.c
+
 

@@ -1,4 +1,4 @@
-LIB				=       $(NETCDF_LIB) $(MPI_LIB) $(LOCAL_LIB) $(WRF_LIB)
+LIB				=       $(NETCDF_LIB) $(MPI_LIB) $(LOCAL_LIB) $(WRF_LIB) -L/usr/lib -lSystemStubs
 EXTRAMODULES    =
 FCBASEOPTS      =       -w $(FCTYPE) $(FCBASE) $(FCFORM) $(FCHOST) $(FCDEBUG) -I.
 FC_FFT_RF_OPTS  =       $(FCTYPE) $(FC_FFT_RF) $(FCFORM) $(FCHOST) $(FCDEBUG) -I.
