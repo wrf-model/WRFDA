@@ -13,7 +13,6 @@ include gen_be.make
 include convertor.make
 include tools.make
 include esmf_time_f90.make
-include esmf_wrapper.make
 include io_int.make
 include io_netcdf.make
 include io_grib1.make
