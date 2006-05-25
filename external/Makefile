@@ -7,8 +7,6 @@ superclean :
 	( cd io_mcel ;  make superclean )
 	( cd io_phdf5 ; make superclean )
 	( cd io_grib1 ; make clean )
-	( cd io_grib_share ; make clean )
-	( cd io_grib2 ; make clean )
 	( cd io_esmf ;  make superclean )
 	( cd ioapi_share ;  make superclean )
 	( cd RSL/RSL ; make superclean )
