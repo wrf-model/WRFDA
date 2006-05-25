@@ -9,7 +9,7 @@ SHELL           =       /bin/sh
 # Macros, these should be generic for all machines
 
 LN      = ln -sf
-MAKE    = make -i -r
+#MAKE    = make -i -r
 RM      = /bin/rm -f
 MV      = /bin/mv -f
 CP      = /bin/cp -f

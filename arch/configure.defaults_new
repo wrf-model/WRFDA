@@ -52,7 +52,7 @@ MPI_LIB		=	-L$(RSL_PATH)/RSL -lrsl
 arch : $(RSL_PATH)/module_dm.F $(RSL_PATH)/gen_comms.c
 	$(LN) $(RSL_PATH)/module_dm.F .
 	$(LN) $(RSL_PATH)/gen_comms.c .
-	( cd $(RSL_PATH)/RSL ; make CC="$(CC)" FC="$(FC) $(FCENDIAN)" MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) LEARN_BCAST=-DLEARN_BCAST linux )
+	( cd $(RSL_PATH)/RSL ; $(MAKE) CC="$(CC)" FC="$(FC) $(FCENDIAN)" MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) LEARN_BCAST=-DLEARN_BCAST linux )
 
 
 ###########################################################
@@ -129,7 +129,7 @@ arch : module_dm_stubs.F
 	$(LN) $(RSL_PATH)/module_dm.F .
 	$(LN) $(RSL_PATH)/gen_comms.c .
 	( cd $(RSL_PATH)/RSL ; \
-          make CC="$(CC)" FC="$(FC)" MAX_DOMAINS=$(MAX_DOMAINS) \
+          $(MAKE) CC="$(CC)" FC="$(FC)" MAX_DOMAINS=$(MAX_DOMAINS) \
                                  MAX_PROC=$(MAX_PROC) \
                                  LEARN_BCAST=-DLEARN_BCAST alpha )
 
@@ -245,7 +245,7 @@ MPI_LIB		=	-L$(RSL_PATH)/RSL -lrsl
 arch : $(RSL_PATH)/module_dm.F $(RSL_PATH)/gen_comms.c
 	$(LN) $(RSL_PATH)/module_dm.F .
 	$(LN) $(RSL_PATH)/gen_comms.c .
-	( cd $(RSL_PATH)/RSL ; make CC="$(CC)" FC="$(FC) $(FCENDIAN)" MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) LEARN_BCAST=-DLEARN_BCAST linux )
+	( cd $(RSL_PATH)/RSL ; $(MAKE) CC="$(CC)" FC="$(FC) $(FCENDIAN)" MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) LEARN_BCAST=-DLEARN_BCAST linux )
 
 ###########################################################
 #ARCH Intel xeon i686 ia32 Xeon Linux, ifort compiler (single-threaded, no nesting)
@@ -353,7 +353,7 @@ MPI_LIB		=	-L$(RSL_PATH)/RSL -lrsl
 arch : $(RSL_PATH)/module_dm.F $(RSL_PATH)/gen_comms.c
 	$(LN) $(RSL_PATH)/module_dm.F .
 	$(LN) $(RSL_PATH)/gen_comms.c .
-	( cd $(RSL_PATH)/RSL ; make CC="$(CC)" FC="$(FC) $(FCBASE)" MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) LEARN_BCAST=-DLEARN_BCAST linux )
+	( cd $(RSL_PATH)/RSL ; $(MAKE) CC="$(CC)" FC="$(FC) $(FCBASE)" MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) LEARN_BCAST=-DLEARN_BCAST linux )
 
 ###########################################################
 #ARCH Settings for PC Linux x86_64, PGI compiler  (Single-threaded)
@@ -431,7 +431,7 @@ MPI_LIB		=	-L$(RSL_PATH)/RSL -lrsl
 arch : $(RSL_PATH)/module_dm.F $(RSL_PATH)/gen_comms.c
 	$(LN) $(RSL_PATH)/module_dm.F .
 	$(LN) $(RSL_PATH)/gen_comms.c .
-	( cd $(RSL_PATH)/RSL ; make CC="$(CC)" FC="$(FC) $(FCENDIAN)" MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) LEARN_BCAST=-DLEARN_BCAST linux )
+	( cd $(RSL_PATH)/RSL ; $(MAKE) CC="$(CC)" FC="$(FC) $(FCENDIAN)" MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) LEARN_BCAST=-DLEARN_BCAST linux )
 
 ###########################################################
 #ARCH Settings for PC Linux x86_64, Pathscale compiler  (Single-threaded)
@@ -507,7 +507,7 @@ MPI_LIB		=	-L$(RSL_PATH)/RSL -lrsl
 arch : $(RSL_PATH)/module_dm.F $(RSL_PATH)/gen_comms.c
 	$(LN) $(RSL_PATH)/module_dm.F .
 	$(LN) $(RSL_PATH)/gen_comms.c .
-	( cd $(RSL_PATH)/RSL ; make CC="$(CC)" FC="$(FC) $(FCENDIAN)" MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) LEARN_BCAST=-DLEARN_BCAST linux )
+	( cd $(RSL_PATH)/RSL ; $(MAKE) CC="$(CC)" FC="$(FC) $(FCENDIAN)" MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) LEARN_BCAST=-DLEARN_BCAST linux )
 
 ###########################################################
 
@@ -584,7 +584,7 @@ arch : $(RSL_PATH)/module_dm.F $(RSL_PATH)/gen_comms.c
 	$(LN) $(RSL_PATH)/module_dm.F .
 	$(LN) $(RSL_PATH)/gen_comms.c .
 	( cd $(RSL_PATH)/RSL ; \
-          make CC=$(CC) FC=$(FC) MAX_DOMAINS=$(MAX_DOMAINS) \
+          $(MAKE) CC=$(CC) FC=$(FC) MAX_DOMAINS=$(MAX_DOMAINS) \
                                  MAX_PROC=$(MAX_PROC) \
                                  LEARN_BCAST=-DLEARN_BCAST o2k )
 
@@ -699,7 +699,7 @@ MPI_LIB		=	-L$(RSL_PATH)/RSL -lrsl
 arch : $(RSL_PATH)/module_dm.F $(RSL_PATH)/gen_comms.c
 	$(LN) $(RSL_PATH)/module_dm.F .
 	$(LN) $(RSL_PATH)/gen_comms.c .
-	( cd $(RSL_PATH)/RSL ; make MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) LEARN_BCAST=-DLEARN_BCAST sp2 )
+	( cd $(RSL_PATH)/RSL ; $(MAKE) MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) LEARN_BCAST=-DLEARN_BCAST sp2 )
 
 ###########################################################
 #ARCH   crayx1 UNICOS/mp  CRAY X1
@@ -751,7 +751,7 @@ MPI_LIB		=	-L$(RSL_PATH)/RSL -lrsl
 arch : $(RSL_PATH)/module_dm.F $(RSL_PATH)/gen_comms.c
 	$(LN) $(RSL_PATH)/module_dm.F .
 	$(LN) $(RSL_PATH)/gen_comms.c .
-	( cd $(RSL_PATH)/RSL ; make CC="$(CC)" \
+	( cd $(RSL_PATH)/RSL ; $(MAKE) CC="$(CC)" \
 	       MAX_DOMAINS=$(MAX_DOMAINS) \
                MAX_PROC=$(MAX_PROC) \
                LEARN_BCAST=-DLEARN_BCAST crayx1 )
@@ -804,7 +804,7 @@ MPI_LIB		=	-L$(RSL_PATH)/RSL -lrsl
 arch : $(RSL_PATH)/module_dm.F $(RSL_PATH)/gen_comms.c
 	$(LN) $(RSL_PATH)/module_dm.F .
 	$(LN) $(RSL_PATH)/gen_comms.c .
-	( cd $(RSL_PATH)/RSL ; make CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)"  \
+	( cd $(RSL_PATH)/RSL ; $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)"  \
                MAX_DOMAINS=$(MAX_DOMAINS) \
                MAX_PROC=$(MAX_PROC) \
                LEARN_BCAST=-DLEARN_BCAST crayx1 )
@@ -888,7 +888,7 @@ EXTRA_LIBS      =       -lSystemStubs
 arch : $(RSL_PATH)/module_dm.F $(RSL_PATH)/gen_comms.c
 	$(LN) $(RSL_PATH)/module_dm.F .
 	$(LN) $(RSL_PATH)/gen_comms.c .
-	( cd $(RSL_PATH)/RSL ; make CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) LEARN_BCAST=-DLEARN_BCAST darwin )
+	( cd $(RSL_PATH)/RSL ; $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) LEARN_BCAST=-DLEARN_BCAST darwin )
 
 ###########################################################
 #ARCH Darwin		(g95 single-threaded, no nesting, for G4/5)
@@ -963,7 +963,7 @@ EXTRA_LIBS      =       -lSystemStubs
 arch : $(RSL_PATH)/module_dm.F $(RSL_PATH)/gen_comms.c
 	$(LN) $(RSL_PATH)/module_dm.F .
 	$(LN) $(RSL_PATH)/gen_comms.c .
-	( cd $(RSL_PATH)/RSL ; make CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) LEARN_BCAST=-DLEARN_BCAST darwin )
+	( cd $(RSL_PATH)/RSL ; $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) LEARN_BCAST=-DLEARN_BCAST darwin )
 
 ###########################################################
 #ARCH  NULL
