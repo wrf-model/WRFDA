@@ -8,7 +8,7 @@ rm -rf *.F90 *.F *.f *.inc *.int *.c *.h *.make *.m4 *.code \
 rm -rf convert_tool kma_wave2grid wave2grid_kma mm5_wrf wrf_mm5
 
 for DIR in dyn_$SOLVER main share frame phys convertor tools \
-  external/esmf_time_f90 external/esmf_wrapper external/io_int \
+  external/esmf_time_f90 external/io_int \
   external/ioapi_share inc gen_be \
   external/io_netcdf external/io_grib1 da_3dvar da_3dvar/src/*; do
   NAME=`basename $DIR`
@@ -17,6 +17,8 @@ for DIR in dyn_$SOLVER main share frame phys convertor tools \
     ../$DIR/*.int ../$DIR/*.csh .
 #  echo include $DIR.make >> Makefile1
 done
+
+ln -fs ../inc/version_decl .
 
 ln -fs ../da_3dvar/src/da_bufrlib/bufrlib.PRM .
 ln -fs ../arch/*.sed .
