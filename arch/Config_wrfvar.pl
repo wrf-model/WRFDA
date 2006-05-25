@@ -196,7 +196,7 @@ while ( <CONFIGURE_PREAMBLE> ) {
     $_ =~ s:CONFIGURE_ESMF_IO_LIB:-L$sw_esmflib_path -lesmf -L../external/io_esmf -lwrfio_esmf \$\(ESMF_LIB_FLAGS\):g ;
     $_ =~ s:CONFIGURE_ESMF_IO_EXT_LIB:-L$sw_esmflib_path -lesmf -lwrfio_esmf \$\(ESMF_LIB_FLAGS\):g ;
     $_ =~ s:CONFIGURE_ESMF_COUPLING:1:g ;
-    $_ =~ s:CONFIGURE_ESMF_MOD_DEPENDENCE:module_utility.o:g ;
+    $_ =~ s:CONFIGURE_ESMF_MOD_DEPENDENCE:../external/io_esmf/module_utility.o:g ;
     $_ =~ s:CONFIGURE_ESMF_MOD_INC:-I$sw_esmfinc_path -I../main:g ;
     $_ =~ s:CONFIGURE_ESMF_IO_INC:-I../external/io_esmf:g ;
     $_ =~ s:CONFIGURE_ESMF_IO_DEFS:-DESMFIO:g ;
@@ -205,7 +205,7 @@ while ( <CONFIGURE_PREAMBLE> ) {
     $_ =~ s:CONFIGURE_ESMF_IO_LIB: -lesmf_time:g ;
     $_ =~ s:CONFIGURE_ESMF_IO_EXT_LIB: -lesmf_time:g ;
     $_ =~ s:CONFIGURE_ESMF_COUPLING:0:g ;
-    $_ =~ s:CONFIGURE_ESMF_MOD_DEPENDENCE:module_utility.o:g ;
+    $_ =~ s:CONFIGURE_ESMF_MOD_DEPENDENCE:../external/esmf_time_f90/module_utility.o:g ;
     $_ =~ s:CONFIGURE_ESMF_MOD_INC::g ;
     $_ =~ s:CONFIGURE_ESMF_IO_INC:-I../external/esmf_time_f90:g ;
     $_ =~ s:CONFIGURE_ESMF_IO_DEFS::g ;
