@@ -1,5 +1,7 @@
 SHARE_MODULES =                       \
 	module_bc.o	        \
+        module_bc_ad.o                  \
+        module_bc_tl.o                  \
 	module_bc_time_utilities.o	\
 	module_io_wrf.o	        \
 	module_date_time.o	\
@@ -71,6 +73,12 @@ solve_interface.o: solve_em.int module_domain.o module_configure.o \
 start_domain: start_domain_em.int module_domain.o module_configure.o
 
 module_bc.o: module_configure.o module_state_description.o \
+		module_wrf_error.o
+
+module_bc_ad.o: module_configure.o module_state_description.o \
+		module_wrf_error.o
+
+module_bc_tl.o: module_configure.o module_state_description.o \
 		module_wrf_error.o
 
 module_bc_time_utilities.o: $(ESMF_MOD_DEPENDENCE)

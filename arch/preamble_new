@@ -31,10 +31,22 @@ PHDF5_PATH  = CONFIGURE_PHDF5_PATH
 RTTOV_PATH  = CONFIGURE_RTTOV_PATH
 RTTOV_LIB   = CONFIGURE_RTTOV_LIB
 ENVCOMPDEFS = CONFIGURE_COMPILEFLAGS
+DA_CORE     = CONFIGURE_DA_CORE
+EM_CORE     = CONFIGURE_EM_CORE
+NMM_CORE    = CONFIGURE_NMM_CORE
+COAMPS_CORE = CONFIGURE_COAMPS_CORE
+EXP_CORE    = CONFIGURE_EXP_CORE
 FPPFLAGS1   = CONFIGURE_NETCDF_FLAG CONFIGURE_RTTOV_FLAG $(WORDSIZE_DEF) \
-              -DLIMIT_ARGS -DWRFPLUS_TESTING
+              -DLIMIT_ARGS -DWRFPLUS_TESTING -DPROMOTE_FLOAT
 WRFIO       = CONFIGURE_WRFIO_NF wrfio_int wrfio_grib1
 INCS        = -I. -I./inc CONFIGURE_RTTOV_INC
+# switch to use separately installed ESMF library for coupling:  1==true
+ESMF_COUPLING       = CONFIGURE_ESMF_COUPLING
+ESMF_MOD_DEPENDENCE = CONFIGURE_ESMF_MOD_DEPENDENCE
+ESMF_MOD_INC        = CONFIGURE_ESMF_MOD_INC
+ESMF_IO_INC         = CONFIGURE_ESMF_IO_INC
+ESMF_IO_DEFS        = CONFIGURE_ESMF_IO_DEFS
+ESMF_TARGET         = CONFIGURE_ESMF_TARGET
 
 # Short cuts to directories
 
@@ -45,14 +57,13 @@ PHDF5_LIB  = -L$(EXTERNAL)/io_phdf5 -lwrfio_phdf5 -L$(PHDF5_PATH)/lib -lhdf5_for
 #### Get core settings from environment (set in compile script)
 #### Note to add a core, this has to be added to.
 
-# Does not work yet
 VAR4DPOSS=-DVAR4DPOSS
 
-COREDEFS = -DEM_CORE=1        \
-           -DDA_CORE=1        \
-           -DNMM_CORE=0       \
-           -DEXP_CORE=0       \
-           -DCOAMPS_CORE=0    \
+COREDEFS = -DEM_CORE=$(EM_CORE)         \
+           -DDA_CORE=$(DA_CORE)         \
+           -DNMM_CORE=$(NMM_CORE)       \
+           -DCOAMPS_CORE=$(COAMPS_CORE) \
+           -DEXP_CORE=$(EXP_CORE)       \
            -DNMM_MAX_DIM=1250
 
 SOLVER=em
@@ -60,6 +71,7 @@ SOLVER=em
 #### For wrfvar, always use RWORDSIZE 8
 
 RWORDSIZE	=	8
+
 DWORDSIZE	=	8
 WORDSIZE_DEF	=	-DIWORDSIZE=4 -DDWORDSIZE=$(DWORDSIZE) -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4
 
@@ -73,10 +85,6 @@ MAX_PROC	=	1024
 #### DM buffer length for the configuration flags.
 
 CONFIG_BUF_LEN	=	8192
-
-#### Default ESMF dependence for embedded ESMF time manager ####
-ESMFCOUPLING        = 0
-ESMF_MOD_DEPENDENCE = module_utility.o ESMF_Mod_Wrapper.o ESMF_Indirection.o
 
 # defaults for occasional architecture specific settings
 

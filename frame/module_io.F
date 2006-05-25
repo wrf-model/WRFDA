@@ -1907,7 +1907,7 @@ SUBROUTINE wrf_read_field ( DataHandle , DateStr , VarName , Field , FieldType ,
                            PatchStart , PatchEnd ,                                      &
                            Status )
     CALL nl_get_perturb_input( 1, perturb_input )
-    IF ( perturb_input .AND. FieldType .EQ. WRF_REAL .AND. TRIM(MemoryOrder) .EQ. 'XZY' ) THEN
+    IF ( perturb_input .AND. FieldType .EQ. WRF_FLOAT .AND. TRIM(MemoryOrder) .EQ. 'XZY' ) THEN
        CALL perturb_real ( Field, DomainStart, DomainEnd,        &
                                   MemoryStart, MemoryEnd,        &
                                   PatchStart, PatchEnd )
@@ -2484,7 +2484,7 @@ SUBROUTINE collect_fld_and_call_pkg (    fcn, donotcollect_arg,                 
                PatchStart , PatchEnd ,                                      &
                Status )
 
-  ELSE IF ( FieldType .EQ. WRF_REAL ) THEN
+  ELSE IF ( FieldType .EQ. WRF_FLOAT ) THEN
 
      CALL collect_real_and_call_pkg ( fcn,                                        &
                Hndl , DateStr , VarName , Field , FieldType , Comm , IOComm , &
@@ -2852,7 +2852,7 @@ include "mpif.h"
            DomainStart(1), DomainEnd(1), DomainStart(2), DomainEnd(2), DomainStart(3), DomainEnd(3), &
            MemoryStart(1), MemoryEnd(1), MemoryStart(2), MemoryEnd(2), MemoryStart(3), MemoryEnd(3), &
            PatchStart(1) , PatchEnd(1) , PatchStart(2) , PatchEnd(2) , PatchStart(3) , PatchEnd(3) )
-      ELSE IF ( FieldType .EQ. WRF_REAL ) THEN
+      ELSE IF ( FieldType .EQ. WRF_FLOAT ) THEN
         CALL wrf_patch_to_global_real ( Field  , globbuf , DomainDesc, Stagger, MemOrd ,             &
            DomainStart(1), DomainEnd(1), DomainStart(2), DomainEnd(2), DomainStart(3), DomainEnd(3), &
            MemoryStart(1), MemoryEnd(1), MemoryStart(2), MemoryEnd(2), MemoryStart(3), MemoryEnd(3), &
@@ -2907,7 +2907,7 @@ include "mpif.h"
                              communicator                   , &    ! communicator
                              ierr )
 
-           ELSE IF ( FieldType .EQ. WRF_REAL ) THEN
+           ELSE IF ( FieldType .EQ. WRF_FLOAT ) THEN
 
              CALL wrf_gatherv_real ( Field, PatchStart(1)+idx , &
                              my_count ,                       &    ! sendcount
@@ -2967,7 +2967,7 @@ include "mpif.h"
                              communicator                   , &    ! communicator
                              ierr )
 
-           ELSE IF ( FieldType .EQ. WRF_REAL ) THEN
+           ELSE IF ( FieldType .EQ. WRF_FLOAT ) THEN
 
              CALL wrf_gatherv_real ( Field, PatchStart(1)+idx , &
                              my_count ,                       &    ! sendcount
@@ -3030,7 +3030,7 @@ include "mpif.h"
                              communicator                   , &    ! communicator
                              ierr )
 
-           ELSE IF ( FieldType .EQ. WRF_REAL ) THEN
+           ELSE IF ( FieldType .EQ. WRF_FLOAT ) THEN
 
              CALL wrf_gatherv_real( Field, PatchStart(1)+idx ,      &    ! sendbuf
                              my_count                       , &    ! sendcount
@@ -3091,7 +3091,7 @@ include "mpif.h"
                              communicator                   , &    ! communicator
                              ierr )
 
-           ELSE IF ( FieldType .EQ. WRF_REAL ) THEN
+           ELSE IF ( FieldType .EQ. WRF_FLOAT ) THEN
 
              CALL wrf_gatherv_real( Field, PatchStart(1)+idx ,      &    ! sendbuf
                              my_count                       , &    ! sendcount
@@ -3203,7 +3203,7 @@ SUBROUTINE call_pkg_and_dist (       fcn, donotdist_arg, update_arg,            
                PatchStart , PatchEnd ,                                      &
                Status )
 
-  ELSE IF (FieldType .EQ. WRF_REAL) THEN
+  ELSE IF (FieldType .EQ. WRF_FLOAT) THEN
 
      CALL call_pkg_and_dist_real ( fcn, update_arg,                            &
                Hndl , DateStr , VarName , Field , FieldType , Comm , IOComm , &
@@ -3569,7 +3569,7 @@ SUBROUTINE call_pkg_and_dist_generic (   fcn, globbuf , update_arg ,            
                DomainStart(1), DomainEnd(1), DomainStart(2), DomainEnd(2), DomainStart(3), DomainEnd(3), &
                MemoryStart(1), MemoryEnd(1), MemoryStart(2), MemoryEnd(2), MemoryStart(3), MemoryEnd(3), &
                PatchStart(1) , PatchEnd(1) , PatchStart(2) , PatchEnd(2) , PatchStart(3) , PatchEnd(3) )
-          ELSE IF (  FieldType .EQ. WRF_REAL ) THEN
+          ELSE IF (  FieldType .EQ. WRF_FLOAT ) THEN
             CALL wrf_patch_to_global_real ( Field  , globbuf , DomainDesc, Stagger, MemOrd ,             &
                DomainStart(1), DomainEnd(1), DomainStart(2), DomainEnd(2), DomainStart(3), DomainEnd(3), &
                MemoryStart(1), MemoryEnd(1), MemoryStart(2), MemoryEnd(2), MemoryStart(3), MemoryEnd(3), &
@@ -3617,7 +3617,7 @@ SUBROUTINE call_pkg_and_dist_generic (   fcn, globbuf , update_arg ,            
            PatchStart(1) , PatchEnd(1) , PatchStart(2) , PatchEnd(2) , 1            , 1   )
       END SELECT
 
-    ELSE IF ( FieldType .EQ. WRF_REAL ) THEN
+    ELSE IF ( FieldType .EQ. WRF_FLOAT ) THEN
 
       SELECT CASE (MemOrd)
       CASE ( 'xzy','xyz','yxz','zxy' )
@@ -3676,7 +3676,7 @@ SUBROUTINE call_pkg_and_dist_generic (   fcn, globbuf , update_arg ,            
     memsize = (MemoryEnd(1)-MemoryStart(1)+1)*(MemoryEnd(2)-MemoryStart(2)+1)*(MemoryEnd(3)-MemoryStart(3)+1)
     IF ( FieldType .EQ. WRF_DOUBLE ) THEN 
       CALL wrf_dm_bcast_bytes( Field , DWORDSIZE*memsize )
-    ELSE IF ( FieldType .EQ. WRF_REAL) THEN
+    ELSE IF ( FieldType .EQ. WRF_FLOAT) THEN
       CALL wrf_dm_bcast_bytes( Field , RWORDSIZE*memsize )
     ELSE IF ( FieldType .EQ. WRF_INTEGER ) THEN
       CALL wrf_dm_bcast_bytes( Field , IWORDSIZE*memsize )

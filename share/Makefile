@@ -6,6 +6,8 @@ RM      =       rm -f
 
 MODULES =                       \
 	module_bc.o	        \
+	module_bc_ad.o	        \
+	module_bc_tl.o	        \
 	module_bc_time_utilities.o	\
 	module_io_wrf.o	        \
 	module_date_time.o	\
@@ -59,7 +61,8 @@ OBJS    = 		\
         wrf_auxinput5in.o               \
         wrf_bdyin.o             	\
         wrf_histin.o            	\
-        wrf_restartin.o
+        wrf_restartin.o                 \
+        landread.o
 
 NMM_MODULES = 
 
@@ -84,6 +87,10 @@ clean:
 
 # DEPENDENCIES : only dependencies after this line (don't remove the word DEPENDENCIES)
 
+module_wrf_esmf_super.o : frame/module_integrate_ad.o \
+                          frame/module_integrate_tl.o \
+                          frame/module_integrate_tst.o
+
 solve_interface.o: solve_em.int ../frame/module_domain.o ../frame/module_configure.o \
 		../frame/module_timing.o ../frame/module_driver_constants.o \
 		../frame/module_wrf_error.o
@@ -91,6 +98,12 @@ solve_interface.o: solve_em.int ../frame/module_domain.o ../frame/module_configu
 start_domain: start_domain_em.int ../frame/module_domain.o ../frame/module_configure.o
 
 module_bc.o: ../frame/module_configure.o ../frame/module_state_description.o \
+		../frame/module_wrf_error.o
+
+module_bc_ad.o: ../frame/module_configure.o ../frame/module_state_description.o \
+		../frame/module_wrf_error.o
+
+module_bc_bl.o: ../frame/module_configure.o ../frame/module_state_description.o \
 		../frame/module_wrf_error.o
 
 module_bc_time_utilities.o: $(ESMF_MOD_DEPENDENCE)

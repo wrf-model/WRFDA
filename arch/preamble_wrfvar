@@ -27,9 +27,18 @@ PHDF5PATH   = CONFIGURE_PHDF5_PATH
 RTTOVPATH   = CONFIGURE_RTTOV_PATH
 RTTOV_LIB   = CONFIGURE_RTTOV_LIB
 ENVCOMPDEFS = CONFIGURE_COMPILEFLAGS
+DA_CORE     = CONFIGURE_DA_CORE
+EM_CORE     = CONFIGURE_EM_CORE
 ARCHFLAGS1  = CONFIGURE_NETCDF_FLAG CONFIGURE_RTTOV_FLAG
 WRFIO       = CONFIGURE_WRFIO_NF wrfio_int wrfio_grib1
 REGISTRY    = CONFIGURE_REGISTRY
+# switch to use separately installed ESMF library for coupling:  1==true
+ESMF_COUPLING       = CONFIGURE_ESMF_COUPLING
+ESMF_MOD_DEPENDENCE = CONFIGURE_ESMF_MOD_DEPENDENCE
+ESMF_MOD_INC        = CONFIGURE_ESMF_MOD_INC
+ESMF_IO_INC         = CONFIGURE_ESMF_IO_INC
+ESMF_IO_DEFS        = CONFIGURE_ESMF_IO_DEFS
+ESMF_TARGET         = CONFIGURE_ESMF_TARGET
 
 # Short cuts to directories
 
@@ -64,20 +73,20 @@ NETCDF_LIB = -L$(EXTERNAL)/io_netcdf -lwrfio_nf -L$(NETCDFPATH)/lib -lnetcdf
 PHDF5_LIB  = -L\$(EXTERNAL)/io_phdf5 -lwrfio_phdf5 -L$(PHDF5PATH)/lib -lhdf5_fortran -lhdf5 -lm -lz -L$(PHDF5PATH)/lib -lsz
 LIBINCLUDE = -I. -I$(INC) -I$(IOAPI_SHARE)
 
-ARCHFLAGS2      = $(WORDSIZE_DEF) -DLIMIT_ARGS -DWRFPLUS_TESTING
+ARCHFLAGS2      = $(WORDSIZE_DEF) -DLIMIT_ARGS -DWRFPLUS_TESTING -DPROMOTE_FLOAT
 
 #### Get core settings from environment (set in compile script)
 #### Note to add a core, this has to be added to.
 NETCDF_IO_PATH  =       external/io_netcdf
 
-# Does not work yet
-#VAR4DPOSS=-DVAR4DPOSS
+VAR4DPOSS=-DVAR4DPOSS
 
-COREDEFS = -DEM_CORE=$(WRF_EM_CORE) \
-           -DNMM_CORE=$(WRF_NMM_CORE) -DNMM_MAX_DIM=1250 \
-	   -DCOAMPS_CORE=$(WRF_COAMPS_CORE) \
-           -DEXP_CORE=$(WRF_EXP_CORE) \
-           -DDA_CORE=$(WRF_DA_CORE)
+COREDEFS = -DEM_CORE=$(EM_CORE)       \
+           -DDA_CORE=$(DA_CORE)        \
+           -DNMM_CORE=0       \
+           -DEXP_CORE=0       \
+           -DCOAMPS_CORE=0    \
+           -DNMM_MAX_DIM=1250
 
 #### For wrfvar, always use RWORDSIZE 8
 
@@ -103,9 +112,6 @@ CONFIG_BUF_LEN	=	8192
 
 #### Default sed command and script for Fortran source files ####
 SED_FTN = sed -f ../arch/standard.sed
-
-#### Default ESMF dependence for embedded ESMF time manager ####
-ESMF_MOD_DEPENDENCE = ../external/esmf_time_f90/ESMF_Mod.o
 
 WRF_LIB		=	-L../external/io_int -lwrfio_int \
 			-L../external/io_grib1 -lio_grib1 \

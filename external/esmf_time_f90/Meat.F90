@@ -75,7 +75,7 @@ END SUBROUTINE normalize_time
 FUNCTION nfeb ( year ) RESULT (num_days)
       ! Compute the number of days in February for the given year
       IMPLICIT NONE
-      INTEGER :: year
+      INTEGER, INTENT(IN) :: year
       INTEGER :: num_days
       num_days = 28 ! By default, February has 28 days ...
       IF (MOD(year,4).eq.0) THEN
@@ -971,7 +971,7 @@ END SUBROUTINE c_esmc_timewrite
 SUBROUTINE print_a_time( time )
    use ESMF_basemod
    use ESMF_Timemod
-   type(ESMF_Time) time
+   type(ESMF_Time), INTENT(IN) :: time
    character*128 :: s
    integer rc
    CALL ESMFold_TimeGetString( time, s, rc )
@@ -983,7 +983,7 @@ END SUBROUTINE print_a_time
 SUBROUTINE print_a_timeinterval( time )
    use ESMF_basemod
    use ESMF_TimeIntervalmod
-   type(ESMF_TimeInterval) time
+   type(ESMF_TimeInterval), INTENT(IN) :: time
    character*128 :: s
    integer rc
    CALL ESMFold_TimeIntervalGetString( time, s, rc )

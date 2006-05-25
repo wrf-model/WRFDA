@@ -14,7 +14,7 @@ RECURSIVE SUBROUTINE integrate_tl ( grid, nl_date_string, nl_date_index )
    USE module_nesting
    USE module_configure
    USE module_timing
-   USE WRF_ESMF_MOD
+   USE esmf_mod
 
    IMPLICIT NONE
 

@@ -2,6 +2,9 @@
 
 FRAME_MODULES =       module_driver_constants.o  \
                 module_domain.o            \
+                module_domain1.o            \
+                module_domain2.o            \
+                module_domain3.o            \
                 module_integrate.o         \
                 module_timing.o            \
                 module_configure.o         \
@@ -30,6 +33,7 @@ wrf_num_bytes_between.o :
 module_state_description.F : registry ../Registry/$(REGISTRY)
 	./registry $(REGFLAGS) ../Registry/$(REGISTRY)
 	$(LN) inc/*.inc .
+	$(LN) $(PWD)/inc/namelist_script.inc ../main
 	$(LN) frame/module_state_description.F .
 
 md_calls.inc : md_calls.m4
@@ -50,12 +54,21 @@ module_dm.o: module_machine.o module_state_description.o module_wrf_error.o \
 		module_timing.o \
 		module_configure.o 
 
-module_domain.o: module_driver_constants.o \
+module_domain.o: module_domain1.o \
+                 module_domain2.o \
+                 module_domain3.o 
+
+module_domain1.o: module_driver_constants.o \
 		module_configure.o \
 		module_machine.o  \
 		module_state_description.o \
                 module_wrf_error.o \
 		$(ESMF_MOD_DEPENDENCE)
+
+module_domain2.o: module_domain1.o \
+                  module_domain3.o
+
+module_domain3.o: module_domain1.o
 
 module_driver_constants.o: \
 		module_state_description.o \
@@ -70,6 +83,22 @@ module_integrate.o: module_domain.o \
 		$(ESMF_MOD_DEPENDENCE)
 
 module_integrate_ad.o: module_domain.o \
+		module_timing.o \
+		module_driver_constants.o \
+		module_state_description.o \
+		module_nesting.o \
+		module_configure.o \
+		$(ESMF_MOD_DEPENDENCE)
+
+module_integrate_tl.o: module_domain.o \
+		module_timing.o \
+		module_driver_constants.o \
+		module_state_description.o \
+		module_nesting.o \
+		module_configure.o \
+		$(ESMF_MOD_DEPENDENCE)
+
+module_integrate_tst.o: module_domain.o \
 		module_timing.o \
 		module_driver_constants.o \
 		module_state_description.o \

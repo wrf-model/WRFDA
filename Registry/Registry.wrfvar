@@ -1408,7 +1408,7 @@ rconfig   logical   Use_PolarAMVObs       namelist,record4         1            
 rconfig   logical   Use_BogusObs          namelist,record4         1              .FALSE.  -       "TBD"              "TBD"              "TBD"               
 rconfig   logical   Use_BuoyObs           namelist,record4         1              .FALSE.  -       "TBD"              "TBD"              "TBD"               
 rconfig   logical   Use_ProfilerObs       namelist,record4         1              .FALSE.  -       "TBD"              "TBD"              "TBD"               
-rconfig   logical   Use_SatemObs          namelist,record4         1              .FALSE.  -       "TBD"              "TBD"              "TBD"               
+rconfig   logical   Use_SatemObs          namelist,record4         1              .TRUE.   -       "TBD"              "TBD"              "TBD"               
 rconfig   logical   Use_GpspwObs          namelist,record4         1              .FALSE.  -       "TBD"              "TBD"              "TBD"               
 rconfig   logical   Use_GpsrefObs         namelist,record4         1              .FALSE.  -       "TBD"              "TBD"              "TBD"               
 rconfig   logical   Use_SsmiRetrievalObs  namelist,record4         1              .FALSE.  -       "TBD"              "TBD"              "TBD"               

@@ -12,8 +12,8 @@ F77FLAGS_BUFR   = $(FCOPTIM) $(FCBASE) $(FCDEBUG) $(FCTYPE) $(FCENDIAN)
 FCFLAGS_FFT_RF  = $(FCFLAGS) $(FC_FFT_RF)
 F77FLAGS_ENDIAN = $(FCTYPE)
 
-LIB             =       -L. -lwrflib -lwrfio_nf -lesmf_time \
-                        -L$(EXTERNAL)/io_grib1 -lio_grib1 \
+LIB             =       $(NETCDF_LIB) -L. -lwrflib -lwrfio_nf -lesmf_time \
+                        -L$(EXTERNAL)/io_grib1 -lio_grib1 $(LOCAL_LIB) \
                         $(NETCDF_LIB) $(RTTOV_LIB) $(MPI_LIB) $(EXTRA_LIBS)
 
 # compile these without high optimization to speed compile

@@ -1063,9 +1063,9 @@ MODULE module_wrf_quilt
                     WRITE(*,*)'>>> ',TRIM(DateStr), ' ', TRIM(VarName), ' ', TRIM(MemoryOrder), ' ', &
                          (PatchEnd(1)-PatchStart(1)+1)*(PatchEnd(2)-PatchStart(2)+1)*(PatchEnd(3)-PatchStart(3)+1)
 
-                    IF ( FieldType .EQ. WRF_REAL .OR. FieldType .EQ. WRF_DOUBLE)  THEN
+                    IF ( FieldType .EQ. WRF_FLOAT .OR. FieldType .EQ. WRF_DOUBLE)  THEN
                       ! Note that the WRF_DOUBLE branch of this IF statement must come first since 
-                      ! WRF_REAL is set equal to WRF_DOUBLE during autopromotion builds.  
+                      ! WRF_FLOAT is set equal to WRF_DOUBLE during autopromotion builds.  
                       IF ( FieldType .EQ. WRF_DOUBLE)  THEN
 ! this branch has not been tested TBH: 20050406
                         CALL mpi_type_size( MPI_DOUBLE_PRECISION, ftypesize, ierr )
@@ -3192,10 +3192,10 @@ SUBROUTINE wrf_quilt_write_field ( DataHandle , DateStr , VarName , Field , Fiel
 
   CALL mpi_type_size( MPI_INTEGER, inttypesize, ierr )
   ! Note that the WRF_DOUBLE branch of this IF statement must come first since 
-  ! WRF_REAL is set equal to WRF_DOUBLE during autopromotion builds.  
+  ! WRF_FLOAT is set equal to WRF_DOUBLE during autopromotion builds.  
   IF ( FieldType .EQ. WRF_DOUBLE ) THEN
     CALL mpi_type_size( MPI_DOUBLE_PRECISION, typesize, ierr )
-  ELSE IF ( FieldType .EQ. WRF_REAL ) THEN
+  ELSE IF ( FieldType .EQ. WRF_FLOAT ) THEN
     CALL mpi_type_size( MPI_REAL, typesize, ierr )
   ELSE IF ( FieldType .EQ. WRF_INTEGER ) THEN
     CALL mpi_type_size( MPI_INTEGER, typesize, ierr )

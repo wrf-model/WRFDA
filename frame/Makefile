@@ -8,7 +8,13 @@ RM      =       rm -f
 
 MODULES =       module_driver_constants.o  \
                 module_domain.o            \
+                module_domain1.o           \
+                module_domain2.o           \
+                module_domain3.o           \
                 module_integrate.o         \
+                module_integrate_ad.o      \
+                module_integrate_tl.o      \
+                module_integrate_tst.o     \
                 module_timing.o            \
                 module_configure.o         \
                 module_tiles.o             \
@@ -69,12 +75,21 @@ module_dm.o: module_machine.o module_state_description.o module_wrf_error.o \
 
 module_dm_stubs.F: module_domain.o
 
-module_domain.o: module_driver_constants.o \
+module_domain.o: module_domain1.o \
+                 module_domain2.o \
+                 module_domain3.o 
+
+module_domain1.o: module_driver_constants.o \
 		module_configure.o \
 		module_machine.o  \
 		module_state_description.o \
                 module_wrf_error.o \
 		$(ESMF_MOD_DEPENDENCE)
+
+module_domain2.o: module_domain1.o \
+                  module_domain3.o
+
+module_domain3.o: module_domain1.o
 
 module_driver_constants.o: \
 		module_state_description.o \
@@ -87,6 +102,31 @@ module_integrate.o: module_domain.o \
 		module_nesting.o \
 		module_configure.o \
 		$(ESMF_MOD_DEPENDENCE)
+
+module_integrate_ad.o: module_domain.o \
+		module_timing.o \
+		module_driver_constants.o \
+		module_state_description.o \
+		module_nesting.o \
+		module_configure.o \
+		$(ESMF_MOD_DEPENDENCE)
+
+module_integrate_tl.o: module_domain.o \
+		module_timing.o \
+		module_driver_constants.o \
+		module_state_description.o \
+		module_nesting.o \
+		module_configure.o \
+		$(ESMF_MOD_DEPENDENCE)
+
+module_integrate_tst.o: module_domain.o \
+		module_timing.o \
+		module_driver_constants.o \
+		module_state_description.o \
+		module_nesting.o \
+		module_configure.o \
+		$(ESMF_MOD_DEPENDENCE)
+
 
 module_io.o : md_calls.inc \
 		module_state_description.o \

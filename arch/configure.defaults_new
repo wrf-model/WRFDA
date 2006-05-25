@@ -434,6 +434,83 @@ arch : $(RSL_PATH)/module_dm.F $(RSL_PATH)/gen_comms.c
 	( cd $(RSL_PATH)/RSL ; make CC="$(CC)" FC="$(FC) $(FCENDIAN)" MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) LEARN_BCAST=-DLEARN_BCAST linux )
 
 ###########################################################
+#ARCH Settings for PC Linux x86_64, Pathscale compiler  (Single-threaded)
+#
+FC              =       pathf90
+F77             =       $(FC)
+SFC             =       $(FC)
+CC              =       gcc
+CC_TOOLS        =       $(CC)
+LD              =       $(FC)
+
+CPPTRADFLAG     =       -traditional
+FPPFLAGS2      =        -DTRIEDNTRUE -DONLY_WRFMODEL_IO \
+                        -DLINUX -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
+			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+FPPFLAGS_BUFR   =       -C -P $(CPPTRADFLAG) -DLINUX -Dlinux -DPATHSCALE
+FCOPTIM         =       #-fastsse
+FCDEBUG         =       #-g
+FCTYPE          =       -r8
+FCFORM          =       -freeform -fno-second-underscore
+FCENDIAN        =       
+FCBASE          =       
+CCFLAGS_BUFR    =       -DUNDERSCORE
+LDFLAGS         =       $(FCENDIAN)
+
+LOCAL_LIB       =       -L/usr/local/ncarg/lib -L/usr/X11R6/lib -L/usr/local/lib \
+			-lncarg -lncarg_gks -lncarg_c
+
+arch :  module_dm_stubs.F gen_comms.stub
+	$(LN) module_dm_stubs.F module_dm.F
+	$(LN) gen_comms.stub gen_comms.c 
+
+
+###########################################################
+#ARCH Settings for PC Linux x86_64, Pathscale compiler  (RSL, MPICH, RSL IO)
+#
+FC              =       mpif90
+F77             =       $(FC)
+SFC             =       pathf90
+CC              =       mpicc
+CC_TOOLS        =       gcc
+LD              =       $(FC)
+
+RSL_PATH        =       $(DEVTOP)/external/RSL
+
+CPPTRADFLAG     =       -traditional
+DM_CPP_FLAGS    =       -I$(RSL_PATH)/RSL `cat inc/dm_comm_cpp_flags`
+FPPFLAGS2       =       -DINTIO -DWRF_RSL_IO -DRSL -DDM_PARALLEL \
+                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO \
+                        -DLINUX -DNO_RRTM_PHYSICS  \
+			-DNONSTANDARD_SYSTEM -DF90_STANDALONE \
+			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+FPPFLAGS_BUFR   =       -C -P $(CPPTRADFLAG) -DLINUX -Dlinux -DPATHSCALE
+FCOPTIM         =       #-fastsse
+FCDEBUG         =       #-g
+FCTYPE          =       -r8
+FCFORM          =       -freeform -fno-second-underscore
+FCENDIAN        =       
+FCBASE          =       
+
+CCFLAGS2        =       -DMAXDOM_MAKE=$(MAX_DOMAINS) \
+                        -DMAXPROC_MAKE=$(MAX_PROC) \
+                        -I$(RSL_PATH)/RSL
+
+LDFLAGS         =       $(FCENDIAN)
+
+CCFLAGS_BUFR    =       -DUNDERSCORE
+
+LOCAL_LIB       =       -L/usr/local/ncarg/lib -L/usr/X12R6/lib -L/usr/local/lib \
+                        -lncarg -lncarg_gks -lncarg_c 
+MPI_LIB		=	-L$(RSL_PATH)/RSL -lrsl
+
+arch : $(RSL_PATH)/module_dm.F $(RSL_PATH)/gen_comms.c
+	$(LN) $(RSL_PATH)/module_dm.F .
+	$(LN) $(RSL_PATH)/gen_comms.c .
+	( cd $(RSL_PATH)/RSL ; make CC="$(CC)" FC="$(FC) $(FCENDIAN)" MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) LEARN_BCAST=-DLEARN_BCAST linux )
+
+###########################################################
+
 #ARCH       SGI 64 bit machine IRIX64     (single-threaded)
 #
 
@@ -644,7 +721,7 @@ RSL_PATH        =       $(DEVTOP)/external/RSL
 FPPFLAGS2       =       -DWRF_RSL_IO -DRSL \
                         -DDM_PARALLEL \
                         -DTRIEDNTRUE -DONLY_WRFMODEL_IO -DINTIO \
-                        -DNORESHAPE -Dcrayx1 -DCRAYX1 \
+                        -DNORESHAPE -Dcrayx1 \
 			-DNONSTANDARD_SYSTEM -DF90_STANDALONE \
 			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 DM_CPP_FLAGS	=	-I$(RSL_PATH)/RSL `cat inc/dm_comm_cpp_flags`
@@ -701,7 +778,7 @@ CPPTRADFLAG     =       -traditional-cpp
 FPPFLAGS 2      =       -DWRF_RSL_IO -DRSL \
                         -DDM_PARALLEL \
                         -DTRIEDNTRUE -DONLY_WRFMODEL_IO -DINTIO \
-                        -DNORESHAPE -Dcrayx1 -DCRAYX1 \
+                        -DNORESHAPE -Dcrayx1 \
 			-DNONSTANDARD_SYSTEM -DF90_STANDALONE \
 			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 DM_CPP_FLAGS	=	-I$(RSL_PATH)/RSL `cat inc/dm_comm_cpp_flags`

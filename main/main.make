@@ -25,6 +25,14 @@ $(SOLVER) : arch $(SOLVER).o
 $(SOLVER)_wrf : arch wrf.o
 	$(LD) -o wrf.exe $(LDFLAGS) wrf.o libwrflib.a $(LIB)
 
+$(SOLVER)_wrfplus : arch wrfplus.o
+	$(LD) -o wrfplus.exe $(LDFLAGS) wrf.o libwrflib.a $(LIB)
+
+$(SOLVER)_wrf_ESMFApp : wrf_ESMFMod.o wrf_ESMFApp.o wrf_SST_ESMF.o
+	$(RANLIB) libwrflib.a
+	$(LD) -o wrf_ESMFApp.exe $(LDFLAGS) wrf_ESMFApp.o wrf_ESMFMod.o libwrflib.a $(LIB)
+	$(LD) -o wrf_SST_ESMF.exe $(LDFLAGS) wrf_SST_ESMF.o wrf_ESMFMod.o libwrflib.a $(LIB)
+
 $(SOLVER)_ideal : arch module_initialize ideal.o
 	$(LD) -o ideal.exe $(LDFLAGS) ideal.o module_initialize_$(IDEAL_CASE).o libwrflib.a $(LIB)
 

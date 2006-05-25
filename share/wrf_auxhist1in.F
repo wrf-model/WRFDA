@@ -21,6 +21,7 @@ SUBROUTINE wrf_auxhist1in ( fid , grid , config_flags , switch , ierr )
             ims , ime , jms , jme , kms , kme , &
             ips , ipe , jps , jpe , kps , kpe
 
+    INTEGER       itrace
     INTEGER       iname(9)
     INTEGER       iordering(3)
     INTEGER       icurrent_date(24)
@@ -37,8 +38,6 @@ SUBROUTINE wrf_auxhist1in ( fid , grid , config_flags , switch , ierr )
     INTEGER       IBDY, NAMELEN
     LOGICAL wrf_dm_on_monitor
     EXTERNAL wrf_dm_on_monitor
-    Type(WRF_UTIL_Time)    time, oldtime, newtime
-    Type(WRF_UTIL_TimeInterval)    timetonext
     CHARACTER*19  new_date
     CHARACTER*24  base_date
     INTEGER idt

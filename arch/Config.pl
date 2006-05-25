@@ -66,37 +66,37 @@ while ( substr( $ARGV[0], 0, 1 ) eq "-" )
  }
 
 # The jasper library is required to build Grib2 I/O.  User must set 
-# environment variables JASPERLIB and JASPERINC to paths to library and 
+# environment variables JASPER_LIB and JASPER_INC to paths to library and 
 # include files to enable this feature prior to running configure.  
- if ( $ENV{JASPERLIB} && $ENV{JASPERINC} )
+ if ( $ENV{JASPER_LIB} && $ENV{JASPER_INC} )
    {
    printf "Configuring to use jasper library to build Grib2 I/O...\n" ;
-   printf("  \$JASPERLIB = %s\n",$ENV{JASPERLIB});
-   printf("  \$JASPERINC = %s\n",$ENV{JASPERINC});
-   $sw_jasperlib_path = $ENV{JASPERLIB}; 
-   $sw_jasperinc_path = $ENV{JASPERINC}; 
+   printf("  \$JASPER_LIB = %s\n",$ENV{JASPER_LIB});
+   printf("  \$JASPER_INC = %s\n",$ENV{JASPER_INC});
+   $sw_jasperlib_path = $ENV{JASPER_LIB}; 
+   $sw_jasperinc_path = $ENV{JASPER_INC}; 
    }
  else
    {
-   printf "\$JASPERLIB or \$JASPERINC not found in environment, configuring to build without grib2 I/O...\n" ;
+   printf "\$JASPER_LIB or \$JASPER_INC not found in environment, configuring to build without grib2 I/O...\n" ;
    }
 
 # A separately-installed ESMF library is required to build the ESMF 
 # implementation of WRF IOAPI in external/io_esmf.  This is needed 
 # to couple WRF with other ESMF components.  User must set environment 
-# variables ESMFLIB and ESMFINC to paths ESMF to library and include 
+# variables ESMF_LIB and ESMF_INC to paths ESMF to library and include 
 # files to enable this feature prior to running configure.
- if ( $ENV{ESMFLIB} && $ENV{ESMFINC} )
+ if ( $ENV{ESMF_LIB} && $ENV{ESMF_INC} )
    {
    printf "Configuring to use ESMF library to build WRF...\n" ;
    printf "WARNING-WARNING-WARNING-WARNING-WARNING-WARNING-WARNING-WARNING\n" ;
    printf "WARNING:  THIS IS AN EXPERIMENTAL CONFIGURATION\n" ;
    printf "WARNING:  IT DOES NOT WORK WITH NESTING\n" ;
    printf "WARNING-WARNING-WARNING-WARNING-WARNING-WARNING-WARNING-WARNING\n" ;
-   printf("  \$ESMFLIB = %s\n",$ENV{ESMFLIB});
-   printf("  \$ESMFINC = %s\n",$ENV{ESMFINC});
-   $sw_esmflib_path = $ENV{ESMFLIB};
-   $sw_esmfinc_path = $ENV{ESMFINC};
+   printf("  \$ESMF_LIB = %s\n",$ENV{ESMF_LIB});
+   printf("  \$ESMF_INC = %s\n",$ENV{ESMF_INC});
+   $sw_esmflib_path = $ENV{ESMF_LIB};
+   $sw_esmfinc_path = $ENV{ESMF_INC};
    }
 
 # parse the configure.wrf file

@@ -5,6 +5,7 @@ module read_util_module
 #endif
 
 ! this bit is for wrfvar which writes double-precision output
+#include "wrf_io_flags.h"
 #if ( RWORDSIZE == DWORDSIZE )
 #define WRF_REAL WRF_DOUBLE
 #endif

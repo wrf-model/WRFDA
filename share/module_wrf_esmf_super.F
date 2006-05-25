@@ -5,7 +5,6 @@ MODULE module_wrf_esmf_super
 !<DESCRIPTION>
 ! This module defines wrf_init(), wrf_run(), and wrf_finalize() routines for 
 ! use by ESMF superstructure.  
-! Note that WRF_ESMF_MOD is USEd by module_domain.  
 !</DESCRIPTION>
 
    USE module_machine

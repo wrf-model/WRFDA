@@ -1,27 +1,41 @@
 #!/bin/sh
 
+export DA_CORE=0
+export EM_CORE=0
+export NMM_CORE=0
+export COAMPS_CORE=0
+export EXP_CORE=0
+
 option=$1
 
 echo option = $option
 
 if [ "$option" = "wrf" ] ; then
-    echo "configure wrf"
     REGISTRY=Registry.EM
-elif [ "$option" = "var" ] ; then
-    echo "configure var"
-    REGISTRY=Registry.wrfvar
+    EM_CORE=1
+elif [ "$option" = "wrf_em" ] ; then
+    REGISTRY=Registry.EM
+    EM_CORE=1
+elif [ "$option" = "wrf_em_chem" ] ; then
+    REGISTRY=Registry.NMM
+    EM_CORE=1
+elif [ "$option" = "wrf_nmm" ] ; then
+    NMM_CORE=1
+    REGISTRY=Registry.NMM
 elif [ "$option" = "wrfvar" ] ; then
-    echo "configure wrfvar"
     REGISTRY=Registry.wrfvar
+    DA_CORE=1
+    EM_CORE=1
 elif [ "$option" = "wrfplus" ] ; then
-    echo "configure wrf for 4dvar"
     REGISTRY=Registry.EM_4DVAR
+    EM_CORE=1
 elif [ "$option" = "be" ] ; then
-    echo "configure for be"
     REGISTRY=Registry.wrfvar
+    DA_CORE=1
+    EM_CORE=1
 else
-   echo "Please type : <configure wrf> to compile wrf,"
-   echo "    or type : <configure var> to compile var."
+   echo "Please type : <configure wrf|wrf_em|wrf_em_chem|wrf_nmm> to compile wrf,"
+   echo "    or type : <configure wrfvar> to compile wrfvar."
    echo "    or type : <configure wrfplus> to compile wrf for 4dvar."
    echo "    or type : <configure be> to compile be."
    exit
@@ -346,7 +360,8 @@ fi
 if test -n "$PERL" ; then
   echo option = $option
   $PERL arch/Config_new.pl -perl=$PERL -netcdf=$NETCDF -phdf5=$PHDF5 -rttov=$RTTOV -os=$os -mach=$mach -ldflags=$ldflags \
-     -compileflags=$compileflags -registry=$REGISTRY
+     -compileflags=$compileflags -registry=$REGISTRY -da_core=$DA_CORE -em_core=$EM_CORE -nmm_core=$NMM_CORE \
+     -coamps_core=$COAMPS_CORE -exp_core=$EXP_CORE
 
   cp build/configure.wrf .
 fi
@@ -366,6 +381,25 @@ if test -e $CONFIG ; then
     else
       echo "  " MPI_Comm_f2c and MPI_Comm_c2f are not supported
     fi
+  fi
+fi
+
+if test $NMM_CORE == 1; then
+  grep -q DM_PARALLEL $CONFIG
+  if test $status == 1; then
+    echo NMM_CORE must be configured for DM parallel
+    echo Please rerun the configure script and chose a DM parallel option
+    exit 3
+  fi
+  # integrity check for a kludge where a hard coded value in the 
+  # registry must match the same value in arch/preamble
+  set registryvalue=`grep 'dimspec.* q ' Registry/$REGISTRY | sed -e 's/..*constant=//' -e 's/ ..*$//'`
+  set preamblevalue=`grep 'DNMM_MAX_DIM=.*' arch/preamble | sed -e 's/..*-DNMM_MAX_DIM=//' -e 's/ ..*$//'`
+  if ( $registryvalue != $preamblevalue ) then
+    echo "Harded coded value of dimspec q in Registry ($registryvalue) does not"
+    echo "equal the hard coded value of NMM_MAX_DIM in arch/preamble ($preamblevalue)"
+    echo "Please fix and try again."
+    exit 2
   fi
 fi
 

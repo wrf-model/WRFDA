@@ -22,6 +22,7 @@ export DA_DATE=${DA_DATE:-2003010112}       # Analysis date.
 export RELEASE=${RELEASE:-WRF_V2.1.2}
 export REL_DIR=${REL_DIR:-$HOME/code_development/$RELEASE}
 export DA_DIR=${DA_DIR:-$REL_DIR/wrfvar}
+export WRFPLUS_DIR=${WRFPLUS_DIR:-$REL_DIR/wrfplus}
 export DA_BUILD_DIR=${DA_BUILD_DIR:-$DA_DIR/main}
 export DA_ID=${DA_ID:-wrfvar}
 export HOSTS=${HOSTS:-$PWD/hosts}
@@ -41,6 +42,7 @@ mkdir -p ${RUN_DIR}
 cd $RUN_DIR
 
 export DA_FIRST_GUESS=${DA_FIRST_GUESS:-$CS_DIR/$DA_DATE/wrfinput_d01}    # wrfvar "first guess" input.
+export DA_BOUNDARIES=${DA_BOUNDARIES:-$CS_DIR/$DA_DATE/wrfbdy_d01}    # wrfvar boundaries input.
 export DA_OBSERVATIONS=${DA_OBSERVATIONS:-$OB_DIR/$DA_DATE/ob.ascii} # wrfvar observation input.
 export DA_BACK_ERRORS=${DA_BACK_ERRORS:-$BE_DIR/gen_be.NMC.dat} # wrfvar background errors.
 export DA_SSMI=${DA_SSMI:-$OB_DIR/$DA_DATE/ssmi.dat}               # SSM/I radiances (ignore if not using).
@@ -57,6 +59,7 @@ export RTTOV=${RTTOV:-$HOME/rttov/rttov85}                            # RTTOV
 export NUM_PROCS=${NUM_PROCS:-1}               # Number of processors to run on.
 
 export NL_GLOBAL=${NL_GLOBAL:-.FALSE.}
+export NL_LVAR4D=${NL_LVAR4D:-.FALSE.}
 
 export NPROC_X=${NPROC_X:-0}                        # Regional, always set NPROC_X to 0, Global, always 1
 if test $NL_GLOBAL == ".TRUE."; then
@@ -118,9 +121,15 @@ cp $DA_DIR/run/gribmap.txt .
 cp $DA_DIR/run/LANDUSE.TBL .
 cp $DA_DIR/run/gmao_airs_bufr.tbl .
 cp $DA_BUILD_DIR/wrfvar.exe  wrfvar.exe
-
+if test $NL_LVAR4D == .TRUE.; then
+  cp $WRFPLUS_BUILD_DIR/wrfplus.exe  wrfplus.exe
+  ln -s $DA_DIR/run/*sh .
+  export PATH=$DA_DIR/run:$PATH
+fi
 
 ln -sf $DA_FIRST_GUESS	 wrfvar_input
+ln -sf $DA_BOUNDARIES 	 wrfbdy_001
+ln -sf $DA_FIRST_GUESS	 wrfinput_d01
 ln -sf $DA_BACK_ERRORS   fort.34
 ln -sf $DA_OBSERVATIONS	 fort.9${NL_OB_FORMAT}
 
@@ -176,7 +185,34 @@ echo "Observation Input File:      $DA_OBSERVATIONS"
 
 # Create namelist.input file:
 
-. $DA_BUILD_DIR/inc/namelist_script.inc
+
+if test $NL_LVAR4D == .TRUE.; then
+   export NL_AUXHIST2_INNAME='auxhist2_d<domain>_<date>'
+
+   export NL_DYN_OPT=2
+   export NL_INPUT_OUTNAME='wrfvar_input_d<domain>_<date>'
+   . $WRFPLUS_BUILD_DIR/inc/namelist_script.inc
+   mv namelist.input namelist.var4dnl
+
+
+   export NL_DYN_OPT=202
+   export NL_INPUT_OUTNAME='wrfvar_input_d<domain>_<date>'
+   export NL_AUXINPUT3_INNAME='auxinput3_d<domain>_<date>'
+   . $WRFPLUS_BUILD_DIR/inc/namelist_script.inc
+   mv namelist.input namelist.var4dad
+
+
+   export NL_DYN_OPT=202
+   export NL_INPUT_OUTNAME='tl<date>'
+   export NL_AUXHIST3_OUTNAME='auxhist3_d<domain>_<date>'
+   . $WRFPLUS_BUILD_DIR/namelist_script.inc
+   mv namelist.input namelist.var4dtl
+   export NL_DYN_OPT=2
+fi
+
+. $DA_BUILD_DIR/namelist_script.inc
+
+
 
 mkdir trace
 
@@ -197,9 +233,11 @@ if test $PLATFORM == "Linux"; then
   fi
 fi
 
+cp $HOSTS hosts
+
 if test $PLATFORM == "Darwin"; then
   if test $NUM_PROCS -gt 1; then
-    mpirun -v -np $NUM_PROCS -machinefile $HOSTS ./wrfvar.exe
+    mpirun -v -np $NUM_PROCS -machinefile hosts ./wrfvar.exe
     ln -fs rsl.out.0000   wrfvar.out
     ln -fs rsl.error.0000 wrfvar.error
   else
@@ -233,10 +271,10 @@ if test -f fort.82; then
   cp $PWD/fort.82      $EXP_DIR/grad_fn
 fi
 
-cp $PWD/namelist.*   $EXP_DIR
-cp $PWD/rsl*         $EXP_DIR
-cp $PWD/wrfvar.out   $EXP_DIR
-cp $PWD/wrfvar.error $EXP_DIR
+cp $PWD/namelist.* $EXP_DIR
+cp $PWD/rsl*       $EXP_DIR
+cp $PWD/wrf*.out   $EXP_DIR
+cp $PWD/wrf.error  $EXP_DIR
 
 
 

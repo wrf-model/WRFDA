@@ -1,7 +1,7 @@
 SUBROUTINE Setup_date_string ( grid, date_string, adantn )
    USE module_domain
    USE module_configure
-   USE WRF_ESMF_MOD
+   USE esmf_mod
    IMPLICIT NONE
    TYPE(domain), POINTER :: grid
    character(len=19), dimension(1000), intent(out) :: date_string

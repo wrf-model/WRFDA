@@ -12,6 +12,7 @@ INCLUDE_MODULES =       -I$(DA_VAR) -I$(DA_SRC) \
 			-I../external/io_netcdf -I../external/io_int \
                         -I../external/esmf_time_f90 \
                         -I../frame -I../share -I../phys -I../inc
+MODULE_DIRS = $(INCLUDE_MODULES)
 
 CPPFLAGS        =       $(LIBINCLUDE) -C -P $(ARCHFLAGS) $(ENVCOMPDEFS) \
 			$(DM_1_CPP_FLAGS) $(COREDEFS) $(POUND_DEF) $(VAR4DPOSS)

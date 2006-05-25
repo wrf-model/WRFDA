@@ -14,7 +14,7 @@ RECURSIVE SUBROUTINE integrate_tst ( grid )
    USE module_nesting
    USE module_configure
    USE module_timing
-   USE WRF_ESMF_MOD
+   USE esmf_mod
 
    IMPLICIT NONE
 
@@ -43,9 +43,8 @@ RECURSIVE SUBROUTINE integrate_tst ( grid )
 ! (<a href="setup_timekeeping.html">setup_timekeeping</a>) at the time
 ! that the domain is initialized.
 ! The lower-level time library and the type declarations for the times
-! and time intervals used are defined in external/esmf_time_f90, or, if 
-! WRF_ESMF_MOD is defined during build, a site-specific installation of the 
-! ESMF library is used.  Note that arithmetic and comparison is performed 
+! and time intervals used are defined in external/esmf_time_f90.
+!  Note that arithmetic and comparison is performed 
 ! on these data types using F90 operator overloading, also defined in that 
 ! library.
 ! 

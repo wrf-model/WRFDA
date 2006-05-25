@@ -56,17 +56,17 @@ SED_FTN = sed -f ../arch/standard.sed
 #### ESMF switches                 ####
 #### These are set up by Config.pl ####
 # switch to use separately installed ESMF library for coupling:  1==true
-ESMF_COUPLING       = ESMFCOUPLING
+ESMF_COUPLING       = ESMF_COUPLING
 # select dependences on module_utility.o
-ESMF_MOD_DEPENDENCE = ESMFMODDEPENDENCE
+ESMF_MOD_DEPENDENCE = ESMF_MOD_DEPENDENCE
 # select -I options for separately installed ESMF library, if present
-ESMF_MOD_INC        = ESMFMODINC
+ESMF_MOD_INC        = ESMF_MOD_INC
 # select -I options for external/io_esmf vs. external/esmf_time_f90
-ESMF_IO_INC         = ESMFIOINC
+ESMF_IO_INC         = ESMF_IO_INC
 # select cpp token for external/io_esmf vs. external/esmf_time_f90
-ESMF_IO_DEFS        = ESMFIODEFS
+ESMF_IO_DEFS        = ESMF_IO_DEFS
 # select build target for external/io_esmf vs. external/esmf_time_f90
-ESMF_TARGET         = ESMFTARGET
+ESMF_TARGET         = ESMF_TARGET
 
 ##############################################################################
 

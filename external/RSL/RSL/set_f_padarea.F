@@ -58,7 +58,7 @@ C
       subroutine rsl_f_set_padarea( newpad )
       implicit none
       include 'rsl.inc'
-      integer newpad
+      integer, INTENT(OUT) :: newpad
 
       rsl_padarea = newpad 
 

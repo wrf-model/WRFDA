@@ -40,11 +40,11 @@
       use ESMF_BaseMod
 
       ! inherit from base time class
-      use ESMF_BaseTimeMod, only : ESMF_BaseTime
+      use ESMF_BaseTimeMod
 
       ! associated derived types
       use ESMF_FractionMod, only : ESMF_Fraction
-      use ESMF_CalendarMod, only : ESMF_Calendar
+      use ESMF_CalendarMod
 
       implicit none
 !
@@ -57,10 +57,7 @@
 !     ! F90 class type to match C++ TimeInterval class in size only;
 !     !  all dereferencing within class is performed by C++ implementation
 
-!     ! Equivalent sequence and kind to C++:
-
       type ESMF_TimeInterval
-      sequence                           ! match C++ storage order
 #ifndef F90_STANDALONE
       private                            !   (members opaque on F90 side)
         type(ESMF_BaseTime) :: basetime  ! inherit base class
