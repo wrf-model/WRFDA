@@ -33,6 +33,8 @@ SUBROUTINE da_transform_xtoy_sound ( xa, iv, xp, y )
 
         k = iv % sound(n) % info % levels
 
+        if ( k < 1 ) cycle
+
         ! [1.2] Interpolate horizontally:
 #ifndef DEREF_KLUDGE
         call Interp_lin_3D(xa % u, xp, i, j, dx, dy, dxm, dym, &
