@@ -46,7 +46,6 @@ OBJS    = 		        \
 	solve_em_tl.o           \
         start_em.o              \
         shift_domain_em.o       \
-        couple_or_uncouple_em.o \
         nest_init_utils.o	\
         interp_domain_em.o
  
@@ -62,14 +61,6 @@ clean:
 	@ echo 'use the clean script'
 
 # DEPENDENCIES : only dependencies after this line (don't remove the word DEPENDENCIES)
-
-couple_or_uncouple_em.o: ../frame/module_domain.o \
-		../frame/module_configure.o \
-		../frame/module_driver_constants.o \
-		../frame/module_machine.o \
-		../frame/module_tiles.o \
-		../frame/module_dm.o \
-		../frame/module_state_description.o
 
 init_modules_em.o: module_big_step_utilities_em.o
 

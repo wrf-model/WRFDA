@@ -41,20 +41,11 @@ DYN_OBJS    = 		        \
 	solve_em_tl.o           \
         start_em.o              \
         shift_domain_em.o       \
-        couple_or_uncouple_em.o \
         nest_init_utils.o	\
         interp_domain_em.o
  
 
 # DEPENDENCIES : only dependencies after this line (don't remove the word DEPENDENCIES)
-
-couple_or_uncouple_em.o: module_domain.o \
-		module_configure.o \
-		module_driver_constants.o \
-		module_machine.o \
-		module_tiles.o \
-		module_dm.o \
-		module_state_description.o
 
 init_modules_em.o: module_big_step_utilities_em.o
 

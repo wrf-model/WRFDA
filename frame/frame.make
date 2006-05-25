@@ -22,6 +22,7 @@ FRAME_MODULES =       module_driver_constants.o  \
 FRAME_OBJS    =       wrf_num_bytes_between.o    \
                 wrf_shutdown.o             \
                 libmassv.o                 \
+                couple_or_uncouple_em.o \
                 collect_on_comm.o
 
 #compile as a .o but do not link into the main library
@@ -42,6 +43,14 @@ md_calls.inc : md_calls.m4
 
 # DEPENDENCIES : only dependencies after this line (don't remove the word DEPENDENCIES)
 
+
+couple_or_uncouple_em.o: module_domain.o \
+		module_configure.o \
+		module_driver_constants.o \
+		module_machine.o \
+		module_tiles.o \
+		module_dm.o \
+		module_state_description.o
 
 module_configure.o: \
 		module_state_description.o \
