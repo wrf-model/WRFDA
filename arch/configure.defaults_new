@@ -457,7 +457,7 @@ FCBASE          =
 CCFLAGS_BUFR    =       -DUNDERSCORE
 LDFLAGS         =       $(FCENDIAN)
 
-LOCAL_LIB       =       -L/usr/local/ncarg/lib -L/usr/X11R6/lib -L/usr/local/lib \
+LOCAL_LIB       =       -L/usr/local/ncarg/lib -L/usr/local/lib \
 			-lncarg -lncarg_gks -lncarg_c
 
 arch :  module_dm_stubs.F gen_comms.stub
@@ -500,7 +500,7 @@ LDFLAGS         =       $(FCENDIAN)
 
 CCFLAGS_BUFR    =       -DUNDERSCORE
 
-LOCAL_LIB       =       -L/usr/local/ncarg/lib -L/usr/X12R6/lib -L/usr/local/lib \
+LOCAL_LIB       =       -L/usr/local/ncarg/lib -L/usr/local/lib \
                         -lncarg -lncarg_gks -lncarg_c 
 MPI_LIB		=	-L$(RSL_PATH)/RSL -lrsl
 
