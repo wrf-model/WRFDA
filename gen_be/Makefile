@@ -24,7 +24,7 @@ GEN_BE_OBJS = $(DA_SRC)/da_gen_be.o $(DA_SRC)/DA_Constants.o $(DA_SRC)/be_spectr
 
 include ../configure.wrf
 
-GEN_BE_LIBS = -L$(NETCDF)/lib -lnetcdf
+GEN_BE_LIBS = -L$(NETCDF)/lib -lnetcdf $(EXTRA_LIBS)
 gen_be_stage0_wrf : gen_be_stage0_wrf.o
 	$(LD) -o gen_be_stage0_wrf.exe $(LDFLAGS) $(GEN_BE_OBJS) gen_be_stage0_wrf.o ${GEN_BE_LIBS}
 
