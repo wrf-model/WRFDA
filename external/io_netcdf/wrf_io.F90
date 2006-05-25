@@ -52,11 +52,6 @@ module wrf_data
 
 #include "wrf_io_flags.h"
 
-
-! This bit is for backwards compatibility with old variants of these flags 
-! that are still being used in io_grib1 and io_phdf5.  It should be removed!  
-      integer, parameter  :: WRF_FILE_OPENED_AND_COMMITTED        = 102
-
   character (256)                         :: msg
   logical                                 :: WrfIOnotInitialized = .true.
 
