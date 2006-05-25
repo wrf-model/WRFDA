@@ -3992,9 +3992,12 @@ SUBROUTINE t_rk_addtend_dry ( ru_tend, rv_tend, rw_tend, ph_tend, t_tend,      &
 
 !  TCL
 
-   CALL g_rk_addtend_dry( K_ru_tend, P_ru_tend, K_rv_tend, P_rv_tend, K_rw_tend, P_rw_tend, K_ph_tend, P_ph_tend, K_t_tend, P_t_tend, &
-&K_ru_tendf, P_ru_tendf, K_rv_tendf, P_rv_tendf, K_rw_tendf, P_rw_tendf, K_ph_tendf, P_ph_tendf, K_t_tendf, P_t_tendf, u_save, P_u_save, &
-&v_save, P_v_save, w_save, P_w_save, ph_save, P_ph_save, t_save, P_t_save, rk_step, h_diabatic, mut, P_mut, msft, msfu, msfv, ide, &
+   CALL g_rk_addtend_dry( K_ru_tend, P_ru_tend, K_rv_tend, P_rv_tend, &
+K_rw_tend, P_rw_tend, K_ph_tend, P_ph_tend, K_t_tend, P_t_tend, &
+&K_ru_tendf, P_ru_tendf, K_rv_tendf, P_rv_tendf, K_rw_tendf, P_rw_tendf, &
+K_ph_tendf, P_ph_tendf, K_t_tendf, P_t_tendf, u_save, P_u_save, &
+&v_save, P_v_save, w_save, P_w_save, ph_save, P_ph_save, t_save, &
+P_t_save, rk_step, h_diabatic, mut, P_mut, msft, msfu, msfv, ide, &
 &jde, ims, ime, jms, jme, kms, kme, its, ite, jts, jte, kts, kte )
 
    SAVE_L=0.

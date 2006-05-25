@@ -13,17 +13,20 @@ MODULES =                 		\
 	module_diffusion_em_ad.o	\
 	module_diffusion_em_tl.o	\
 	module_small_step_em.o 		\
+	module_small_step_em_tl.o	\
+	module_small_step_em_ad.o	\
         module_big_step_utilities_em.o  \
         module_big_step_utilities_em_ad.o  \
         module_big_step_utilities_em_tl.o  \
         module_em.o         		\
-        module_bc_em_ad.o               \
-        module_bc_em_tl.o               \
-        module_bc_ad.o                  \
-        module_bc_tl.o                  \
+        module_em_tl.o         		\
+        module_em_ad.o       		\
         module_solvedebug_em.o    	\
         module_bc_em.o                  \
+        module_bc_em_ad.o               \
+        module_bc_em_tl.o               \
         module_init_utilities.o         \
+        module_check.o                  \
 	$(CASE_MODULE)
 
 # possible CASE_MODULE settings
@@ -73,7 +76,20 @@ init_modules_em.o: module_big_step_utilities_em.o
 interp_domain_em.o: ../frame/module_domain.o \
 		../frame/module_configure.o 
 
+module_check.o: module_em_tl.o \
+                module_em_ad.o \
+                module_small_step_em_ad.o \
+                module_small_step_em_tl.o
+
 module_advect_em.o: ../share/module_bc.o \
+		../share/module_model_constants.o \
+		../frame/module_wrf_error.o
+
+module_advect_em_ad.o: ../share/module_bc_ad.o \
+		../share/module_model_constants.o \
+		../frame/module_wrf_error.o
+
+module_advect_em_tl.o: ../share/module_bc_tl.o \
 		../share/module_model_constants.o \
 		../frame/module_wrf_error.o
 
@@ -247,6 +263,7 @@ start_em.o: module_bc_em.o \
 
 solve_em.o:     module_small_step_em.o \
 		module_em.o            \
+		module_check.o         \
 		module_solvedebug_em.o \
                 module_bc_em.o         \
 		module_diffusion_em.o  \

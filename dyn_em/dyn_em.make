@@ -20,8 +20,6 @@ DYN_MODULES =                 		\
         module_bc_em.o                  \
         module_bc_em_ad.o               \
         module_bc_em_tl.o               \
-        module_bc_ad.o                  \
-        module_bc_tl.o                  \
         module_init_utilities.o         \
         module_check.o                  \
 	$(CASE_MODULE)
@@ -75,12 +73,12 @@ module_advect_em.o: module_advect_em.F \
 		module_wrf_error.o
 
 module_advect_em_ad.o: module_advect_em_ad.F \
-                module_bc_ad.o \
+                module_bc.o \
 		module_model_constants.o \
 		module_wrf_error.o
 
 module_advect_em_tl.o: module_advect_em_tl.F \
-                module_bc_tl.o \
+                module_bc.o \
 		module_model_constants.o \
 		module_wrf_error.o
 

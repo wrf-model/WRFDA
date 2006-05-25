@@ -58,7 +58,7 @@
 
    CHARACTER*80 :: message
 
-   REAL        :: p00, t00, a, p_surf, pd_surf
+   REAL        :: p00, t00, base_lapse_local, p_surf, pd_surf
 
    REAL :: qvf1, qvf2, qvf
    REAL :: MPDT
@@ -310,7 +310,7 @@
 
       CALL nl_get_base_pres  ( 1 , p00 )
       CALL nl_get_base_temp  ( 1 , t00 )
-      CALL nl_get_base_lapse ( 1 , a   )
+      CALL nl_get_base_lapse ( 1 , base_lapse_local   )
 
       !  Base state potential temperature and inverse density (alpha = 1/rho) from
       !  the half eta levels and the base-profile surface pressure.  Compute 1/rho
@@ -323,11 +323,12 @@
             !  the hand full of constants: p00 (sea level pressure, Pa), t00 (sea level
             !  temperature, K), and A (temperature difference, from 1000 mb to 300 mb, K).
 
-            p_surf = p00 * EXP ( -t00/a + ( (t00/a)**2 - 2.*g*ht(i,j)/a/r_d ) **0.5 )
+            p_surf = p00 * EXP ( -t00/base_lapse_local + ( (t00/base_lapse_local)**2 - &
+              2.*g*ht(i,j)/base_lapse_local/r_d ) **0.5 )
 
             DO k = 1, kte-1
                pb(i,k,j) = znu(k)*(p_surf - p_top) + p_top
-               t_init(i,k,j) = (t00 + A*LOG(pb(i,k,j)/p00))*(p00/pb(i,k,j))**(r_d/cp) - t0
+               t_init(i,k,j) = (t00 + base_lapse_local*LOG(pb(i,k,j)/p00))*(p00/pb(i,k,j))**(r_d/cp) - t0
                alb(i,k,j) = (r_d/p1000mb)*(t_init(i,k,j)+t0)*(pb(i,k,j)/p1000mb)**cvpm
             END DO
 
