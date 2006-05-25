@@ -86,7 +86,9 @@ wrfplus : framework_only
 	  ( cd run ; /bin/rm -f wrf_SST_ESMF.exe ; ln -s ../main/wrf_SST_ESMF.exe . ) ; \
 	fi
 
-var : 
+var : wrfvar
+
+wrfvar : 
 	/bin/rm -f main/libwrflib.a
 	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" ext
 	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" toolsdir
