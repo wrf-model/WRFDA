@@ -1117,6 +1117,7 @@ DA_Test.o:	\
 			da_pseudo.o \
 			DA_Profiler.o \
 			DA_Buoy.o  \
+			DA_Minimisation.o	\
 			DA_Setup_Structures.o	\
 			DA_Tools.o \
 			da_qscat.o \

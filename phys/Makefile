@@ -32,7 +32,6 @@ MODULES = \
 	module_sf_gfs.o \
 	module_sf_slab.o  \
 	module_sf_noahlsm.o  \
-	module_sf_lsm_nmm.o  \
 	module_sf_ruclsm.o \
 	module_sf_sfcdiags.o \
 	module_sf_myjsfc.o \
@@ -51,7 +50,7 @@ MODULES = \
   
 OBJS    =
 
-NMM_MODULES =  
+NMM_MODULES =  module_sf_lsm_nmm.o
 
 LIBTARGET    =  physics
 TARGETDIR    =  ./
@@ -105,8 +104,7 @@ module_ra_rrtm.o: ../frame/module_wrf_error.o \
 
 module_mp_lin.o : ../frame/module_wrf_error.o
 
-module_sf_lsm_nmm.o: ../share/module_model_constants.o \
-		../share/module_MPP.o
+module_sf_lsm_nmm.o: ../share/module_model_constants.o
 
 module_sf_myjsfc.o: ../share/module_model_constants.o 
 
@@ -157,8 +155,7 @@ module_physics_init.o : \
 		../frame/module_wrf_error.o \
 		../frame/module_dm.o \
 		../share/module_model_constants.o \
-		../share/module_date_time.o  \
-		module_sf_lsm_nmm.o	
+		../share/module_date_time.o
 
 module_microphysics_driver.o: \
                 module_mp_kessler.o module_mp_lin.o \
@@ -210,7 +207,6 @@ module_surface_driver.o: \
 		module_sf_sfcdiags.o		\
 		../frame/module_state_description.o \
 		../frame/module_configure.o \
-		../share/module_model_constants.o  \
- 		module_sf_lsm_nmm.o
+		../share/module_model_constants.o
 
 # DO NOT DELETE
