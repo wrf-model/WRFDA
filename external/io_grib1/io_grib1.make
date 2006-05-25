@@ -7,13 +7,13 @@ IO_GRIB1_CPPFLAGS = -C -P
 IO_GRIB1_INCLUDEDIRS  = -I. -I../external/io_grib1/grib1_util -I../external/io_grib1/MEL_grib1
 
 wgrib :
-	( cd ../external/io_grib1/WGRIB ; make CC="$(CC) $(CCFLAGS)" )
+	( cd ../external/io_grib1/WGRIB ; $(MAKE) CC="$(CC) $(CCFLAGS)" )
 	$(LN) ../external/io_grib1/WGRIB/wgrib .
 
 libio_grib1.a:	$(IO_GRIB1_OBJS)
 	$(AR) cruv ../external/io_grib1/libio_grib1.a $(IO_GRIB1_OBJS)
-	( cd ../external/io_grib1/MEL_grib1;  make CC="$(CC) $(CCFLAGS)" archive )
-	( cd ../external/io_grib1/grib1_util; make CC="$(CC) $(CCFLAGS)" archive )
+	( cd ../external/io_grib1/MEL_grib1;  $(MAKE) CC="$(CC) $(CCFLAGS)" archive )
+	( cd ../external/io_grib1/grib1_util; $(MAKE) CC="$(CC) $(CCFLAGS)" archive )
 	$(RANLIB) ../external/io_grib1/libio_grib1.a
 
 io_grib1.o:     io_grib1.F 

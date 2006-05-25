@@ -47,12 +47,16 @@ DYN_OBJS    = 		        \
 
 # DEPENDENCIES : only dependencies after this line (don't remove the word DEPENDENCIES)
 
+shift_domain_em.o : module_domain.o
+
 init_modules_em.o: module_big_step_utilities_em.o
 
 interp_domain_em.o: module_domain.o \
 		module_configure.o 
 
 module_check.o: module_check.F \
+                module_diffusion_em_ad.o \
+                module_diffusion_em_tl.o \
                 module_em_tl.o \
                 module_em_ad.o \
                 module_small_step_em_ad.o \

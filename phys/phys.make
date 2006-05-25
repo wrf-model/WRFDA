@@ -45,6 +45,10 @@ PHYS_MODULES = \
   
 # DEPENDENCIES : only dependencies after this line (don't remove the word DEPENDENCIES)
 
+
+
+module_mp_thompson.o: module_wrf_error.o
+
 module_bl_myjpbl.o: module_model_constants.o
 
 module_bl_gfs.o: module_gfs_machine.o \
@@ -64,6 +68,7 @@ module_gfs_funcphys.o: module_gfs_machine.o \
 		       module_gfs_physcons.o
 
 module_cu_sas.o: module_gfs_machine.o \
+		 module_configure.o \
 		 module_gfs_funcphys.o \
 		 module_gfs_physcons.o
 
@@ -77,7 +82,8 @@ module_mp_lin.o : module_wrf_error.o
 module_sf_lsm_nmm.o: module_model_constants.o \
 		module_MPP.o
 
-module_sf_myjsfc.o: module_model_constants.o 
+module_sf_myjsfc.o: module_model_constants.o \
+		module_dm.o
 
 module_sf_gfs.o: module_gfs_machine.o \
 		 module_gfs_funcphys.o \
@@ -138,6 +144,9 @@ module_microphysics_driver.o: \
 		module_wrf_error.o \
 		module_configure.o \
 		module_model_constants.o 
+
+module_microphysics_zero_out.o: \
+		module_configure.o
 
 module_cumulus_driver.o: \
                 module_cu_kf.o \

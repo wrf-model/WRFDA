@@ -16,7 +16,7 @@ Test1 : Test1.F90 libesmf_time.a
 
 ESMF_Alarm.o : ESMF_BaseTime.o ESMF_Time.o ESMF_TimeInterval.o
 ESMF_BaseTime.o : ESMF_Base.o
-ESMF_Clock.o : ESMF_BaseTime.o ESMF_Time.o ESMF_TimeInterval.o
+ESMF_Clock.o : ESMF_BaseTime.o ESMF_Time.o ESMF_TimeInterval.o ESMF_Alarm.o
 ESMF_AlarmClock.o : ESMF_Alarm.o ESMF_Clock.o
 ESMF_Time.o : ESMF_BaseTime.o ESMF_TimeInterval.o
 ESMF_Base.o :

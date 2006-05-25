@@ -19,6 +19,7 @@ diffwrf_netcdf.o:       diffwrf_netcdf.F90
 			$(CPP) $(FPPFLAGS) diffwrf_netcdf.F90 > diffwrf_netcdf.f
 			$(FC) -c $(FCFLAGS) $(IO_NETCDF_FCFLAGS) diffwrf_netcdf.f
 
-field_routines.o:	field_routines.F90
+field_routines.o:	field_routines.F90 \
+                        wrf_io.o
 			$(CPP) $(FPPFLAGS) field_routines.F90 > field_routines.f
 			$(FC) -c $(FCFLAGS) $(IO_NETCDF_FCFLAGS) field_routines.f

@@ -60,7 +60,9 @@ SHARE_OBJS    = 		\
 
 # DEPENDENCIES : only dependencies after this line (don't remove the word DEPENDENCIES)
 
-#module_wrf_top.o :
+module_wrf_top.o : module_machine.o module_domain.o module_integrate.o
+
+mediation_nest_move.o : module_domain.o module_io_domain.o
 
 module_wrf_esmf_super.o : module_integrate_ad.o \
                           module_integrate_tl.o \
@@ -70,16 +72,16 @@ solve_interface.o: solve_em.int module_domain.o module_configure.o \
 		module_timing.o module_driver_constants.o \
 		module_wrf_error.o
 
-start_domain: start_domain_em.int module_domain.o module_configure.o
+start_domain.o: start_domain_em.int module_domain.o module_configure.o
 
 module_bc.o: module_configure.o module_state_description.o \
 		module_wrf_error.o
 
 module_bc_ad.o: module_configure.o module_state_description.o \
-		module_wrf_error.o
+		module_wrf_error.o module_bc.o
 
 module_bc_tl.o: module_configure.o module_state_description.o \
-		module_wrf_error.o
+		module_wrf_error.o module_bc.o
 
 module_bc_time_utilities.o: $(ESMF_MOD_DEPENDENCE)
 

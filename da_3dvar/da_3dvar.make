@@ -104,7 +104,8 @@ par_util.o:		par_util.F                     \
 
 par_util1.o:		par_util1.F                     \
 			proc_sum_int.inc               \
-			proc_sum_real.inc
+			proc_sum_real.inc \
+                        module_wrf_error.o
 
 module_wrf_3dvar_interface.o : module_wrf_3dvar_interface.F \
                         module_domain.o                     \
@@ -383,6 +384,7 @@ DA_PolarAMV.o:		\
 			da_get_innov_vector_polaramv.inc
 
 DA_Satem.o:		DA_Satem.F                          \
+			DA_Physics.o                        \
 			DA_Constants.o                      \
 			par_util.o                          \
 			DA_Define_Structures.o              \
@@ -437,6 +439,7 @@ DA_Synop.o:		DA_Synop.F                          \
 			DA_Transform_XToY_Synop_Adj.inc
 
 DA_Sound.o:		DA_Sound.F                          \
+			DA_Physics.o                        \
 			DA_Constants.o                      \
 			par_util.o                          \
 			DA_Define_Structures.o              \
@@ -728,7 +731,8 @@ da_c_mat.o:		da_c_mat.F                          \
 			pmat1.inc                           \
 			pmat2.inc                           \
 			powmat.inc                          \
-			set_vops.inc
+			set_vops.inc                        \
+                        DA_Constants.o
 
 DA_Dynamics.o:		DA_Dynamics.F                       \
 			DA_Constants.o                      \
@@ -851,6 +855,7 @@ DA_Tools.o:		DA_Tools.F                     \
 
 DA_Recursive_Filter.o:	DA_Recursive_Filter.F          \
 			DA_Constants.o                 \
+			DA_Define_Structures.o         \
                         da_perform_2drf.inc            \
 			DA_Calculate_RF_Factors.inc    \
 			DA_RF_Turning_Conditions.inc   \
@@ -954,7 +959,7 @@ BLAS.o:	               BLAS.F       \
 		       dtrmv.inc    \
 		       lsame.inc    \
 		       xerbla.inc   \
-		       BLAS.F
+		       module_wrf_error.o
 			$(CPP) $(FPPFLAGS) BLAS.F > BLAS.f
 			$(F77) -c $(F77FLAGS) BLAS.f
 
