@@ -384,9 +384,9 @@ if test -e $CONFIG ; then
   fi
 fi
 
-if test $NMM_CORE == 1; then
+if test $NMM_CORE = 1; then
   grep -q DM_PARALLEL $CONFIG
-  if test $status == 1; then
+  if test $status = 1; then
     echo NMM_CORE must be configured for DM parallel
     echo Please rerun the configure script and chose a DM parallel option
     exit 3
