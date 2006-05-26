@@ -12,7 +12,7 @@ AR      = ar
 
 .SUFFIXES:      .F90 .F .f .o .code
 
-all : libwrfio_int.a diffwrf
+all : libwrfio_int.a diffwrf_int
 
 libwrfio_int.a:		$(OBJS)
 			/bin/rm -f libwrfio_int.a
@@ -50,4 +50,4 @@ diffwrf_int:            diffwrf_int.F ../../frame/pack_utils.o ../../frame/modul
 			@echo "Diffwrf will be built later on in this compile. No need to rerun compile. "
 
 superclean:
-			/bin/rm -f *.f *.o *.mod libwrfio_int.a diffwrf 
+			/bin/rm -f *.f *.o *.mod libwrfio_int.a diffwrf_int

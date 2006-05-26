@@ -180,7 +180,7 @@ externals : $(WRFIO) esmf_time
 #
 DMPARALLEL      =       1
 FC              =       mpif90
-FFC             =       pgFFC
+FFC             =       pgf90
 SFC             =       pgf90
 LD              =       $(FC)
 CC              =       mpicc
@@ -363,7 +363,7 @@ externals : $(WRFIO) esmf_time
 #ARCH Settings for PC Linux x86_64, PGI compiler  (Single-threaded)
 #
 FC              =       pgf90
-FFC             =       pgFFC
+FFC             =       pgf90
 CC              =       gcc
 CC_TOOLS        =       gcc
 LD              =       $(FC)
@@ -403,7 +403,7 @@ externals : $(WRFIO) esmf_time
 #
 DMPARALLEL      =       1
 FC              =       mpif90
-FFC             =       pgFFC
+FFC             =       pgf90
 SFC             =       pgf90
 LD              =       $(FC)
 CC              =       mpicc

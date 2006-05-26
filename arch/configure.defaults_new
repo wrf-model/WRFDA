@@ -5,7 +5,7 @@
 CPP             =
 CPPFLAGS        =
 FC              =       mpif90
-FFC             =       pgFFC
+FFC             =       pgf90
 SFC             =       pgf90
 CC              =       mpicc
 CC_TOOLS        =       gcc
