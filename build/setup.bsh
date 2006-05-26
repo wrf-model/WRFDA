@@ -2,11 +2,6 @@
 
 export SOLVER=${SOLVER:-em}
 
-rm -rf *.F90 *.F *.f *.inc *.int *.c *.h *.make *.m4 *.code \
-  bufrlib.PRM *.sed registry gen_comms.stub inc/* \
-
-rm -rf convert_tool kma_wave2grid wave2grid_kma mm5_wrf wrf_mm5
-
 for DIR in dyn_$SOLVER main share frame phys convertor tools \
   external/esmf_time_f90 external/io_int \
   external/ioapi_share inc gen_be \
@@ -29,5 +24,3 @@ ln -fs ../convertor/kma_wave2grid .
 ln -fs ../convertor/wave2grid_kma .
 ln -fs ../convertor/mm5_wrf .
 ln -fs ../convertor/wrf_mm5 .
-
-make clean
