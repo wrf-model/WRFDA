@@ -23,7 +23,12 @@ export RELEASE=${RELEASE:-WRF_V2.1.2}
 export REL_DIR=${REL_DIR:-$HOME/code_development/$RELEASE}
 export DA_DIR=${DA_DIR:-$REL_DIR/wrfvar}
 export WRFPLUS_DIR=${WRFPLUS_DIR:-$REL_DIR/wrfplus}
-export DA_BUILD_DIR=${DA_BUILD_DIR:-$DA_DIR/main}
+export DA_BUILD_TYPE=${DA_BUILD_TYPE:-old}
+if test $DA_BUILD_TYPE = new; then
+  export DA_BUILD_DIR=${DA_BUILD_DIR:-$DA_DIR/build}
+else
+  export DA_BUILD_DIR=${DA_BUILD_DIR:-$DA_DIR/main}
+fi
 export DA_ID=${DA_ID:-wrfvar}
 export HOSTS=${HOSTS:-$PWD/hosts}
 export REGION=${REGION:-con200}
