@@ -4,7 +4,7 @@ export FULL=${FULL:-false}
 # Need a cleaner mapping between compiler and configure options.
 # Assuming option 2 is pgi mpi is a hack
 
-export ID=${ID:-daily}
+export ID=${ID:-trunk}
 export REGIONS=${REGIONS:-kma_t63}
 export TARGETS=${TARGETS:-wrfvar wrfplus be}
 ###########
@@ -19,6 +19,7 @@ for COMPILER in $COMPILERS; do
   . ~/setup_$COMPILER
 
   for TARGET in $TARGETS; do
+    echo "Compiling $ID/$TARGET with $COMPILER"
     cd ~bray/${ID}_mpi_$COMPILER/$TARGET
     if $FULL; then ./clean -a >/dev/null 2>&1; fi
     cvs -q update >/dev/null 2>&1
@@ -32,6 +33,8 @@ for COMPILER in $COMPILERS; do
   done
 
   cd ~bray/data/$REGION
+
+  echo "Testing $ID/$TARGET with $COMPILER on $REGION"
 
   export BUILD=${ID}_mpi_$COMPILER
   #export DA_BUILD_TYPE=old
