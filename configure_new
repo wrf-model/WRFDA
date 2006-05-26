@@ -362,8 +362,6 @@ if test -n "$PERL" ; then
   $PERL arch/Config_new.pl -perl=$PERL -netcdf=$NETCDF -phdf5=$PHDF5 -rttov=$RTTOV -os=$os -mach=$mach -ldflags=$ldflags \
      -compileflags=$compileflags -registry=$REGISTRY -da_core=$DA_CORE -em_core=$EM_CORE -nmm_core=$NMM_CORE \
      -coamps_core=$COAMPS_CORE -exp_core=$EXP_CORE
-
-  cp build/configure.wrf .
 fi
 
 export CONFIG=build/configure.wrf

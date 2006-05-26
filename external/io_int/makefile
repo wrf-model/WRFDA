@@ -34,13 +34,13 @@ module_internal_header_util.o :
 			$(FC) $(FFLAGS) -I. -c module_internal_header_util.f
 			/bin/rm -f module_internal_header_util.b
 
-diffwrf:                diffwrf.F ../../frame/pack_utils.o ../../frame/module_machine.o ../../frame/module_wrf_error.o libwrfio_int.a
+diffwrf_int:            diffwrf_int.F ../../frame/pack_utils.o ../../frame/module_machine.o ../../frame/module_wrf_error.o libwrfio_int.a
 			if [ -f ../../frame/pack_utils.o ] ; then \
-			  mv diffwrf.F diffwrf.F90    ; \
-			  $(CPP1) $(CPPFLAGS) diffwrf.F90 > diffwrf.f  ; \
-			  $(SFC) -c $(FFLAGS) -I../ioapi_share diffwrf.f    ; \
-			  mv diffwrf.F90 diffwrf.F ; \
-			  $(SFC) $(FFLAGS) $(LDFLAGS) -o diffwrf diffwrf.o $(OBJSL) \
+			  mv diffwrf_int.F diffwrf_int.F90    ; \
+			  $(CPP1) $(CPPFLAGS) diffwrf_int.F90 > diffwrf_int.f  ; \
+			  $(SFC) -c $(FFLAGS) -I../ioapi_share diffwrf_int.f    ; \
+			  mv diffwrf_int.F90 diffwrf_int.F ; \
+			  $(SFC) $(FFLAGS) $(LDFLAGS) -o diffwrf_int diffwrf_int.o $(OBJSL) \
                             ../../frame/pack_utils.o ../../frame/module_internal_header_util.o \
                             ../../frame/module_driver_constants.o \
 			    ../../frame/module_machine.o ../../frame/module_wrf_error.o ; \

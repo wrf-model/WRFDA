@@ -22,12 +22,13 @@ wrf_io.o:               wrf_io.F90 $(CODE)
 			$(CPP1) wrf_io.F90 | $(M4) - > wrf_io.f
 			$(FC) $(FFLAGS) -c wrf_io.f
 
-diffwrf:                diffwrf.F90
-			$(CPP1) diffwrf.F90 > diffwrf.f
-			$(FC) -c $(FFLAGS) diffwrf.f
+diffwrf_netcdf:         diffwrf_netcdf.F90
+			$(CPP1) diffwrf_netcdf.F90 > diffwrf_netcdf.f
+			$(FC) -c $(FFLAGS) diffwrf_netcdf.f
 			@if [ \( -f ../../frame/module_wrf_error.o \) -a \( -f $(ESMF_MOD_DEPENDENCE) \) ] ; then \
-			echo "diffwrf io_netcdf is being built now. "; \
-			  $(FC) $(FFLAGS) $(LDFLAGS) -o diffwrf diffwrf.o $(OBJSL) $(LIBS) ../../frame/module_wrf_error.o $(ESMF_IO_LIB_EXT) ;\
+			echo "diffwrf_netcdf is being built now. "; \
+			  $(FC) $(FFLAGS) $(LDFLAGS) -o diffwrf_netcdf diffwrf_netcdf.o \
+                          $(OBJSL) $(LIBS) ../../frame/module_wrf_error.o $(ESMF_IO_LIB_EXT) ;\
                         else \
 			  echo "***************************************************************************** " ; \
 			  echo "*** Rerun compile to make diffwrf in external/io_netcdf directory         *** " ; \

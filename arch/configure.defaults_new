@@ -5,7 +5,7 @@
 CPP             =
 CPPFLAGS        =
 FC              =       mpif90
-F77             =       $(FC)
+F77             =       pgf77
 SFC             =       pgf90
 CC              =       mpicc
 CC_TOOLS        =       gcc
@@ -94,8 +94,8 @@ arch :  module_dm_stubs.F gen_comms.stub
 #
 M4              =       m4 -B 12000
 FC              =       mpif90
-F77             =       $(FC)
-SFC             =       $(FC)
+F77             =       f90
+SFC             =       f90
 CC              =       mpicc
 CC_TOOLS        =       cc
 LD              =       $(FC)
@@ -948,7 +948,7 @@ FCFORM          =       -ffree-form  -ffree-line-length-huge
 FCENDIAN        =
 FCBASE          =       -cpp -Wno=101,139,155,158 -fno-second-underscore -ftrace=full
 
-FCFLAGS_RSL     =       $(FCBASE) -ffixed-form
+FCFLAGS_RSL     =       $(FCBASE) -ffixed-form -fno-second-underscore
 
 CCFLAGS2        =       -DMAXDOM_MAKE=$(MAX_DOMAINS) \
                         -DMAXPROC_MAKE=$(MAX_PROC) \

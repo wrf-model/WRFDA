@@ -62,7 +62,8 @@ OBJS    = 		\
         wrf_bdyin.o             	\
         wrf_histin.o            	\
         wrf_restartin.o                 \
-        landread.o
+        landread.o                      \
+        couple_or_uncouple_em.o
 
 NMM_MODULES = 
 
@@ -86,6 +87,15 @@ clean:
 
 
 # DEPENDENCIES : only dependencies after this line (don't remove the word DEPENDENCIES)
+
+couple_or_uncouple_em.o: ../frame/module_domain.o \
+		../frame/module_configure.o \
+		../frame/module_driver_constants.o \
+		../frame/module_machine.o \
+		../frame/module_tiles.o \
+		../frame/module_dm.o \
+		module_bc.o \
+		../frame/module_state_description.o
 
 module_wrf_esmf_super.o : frame/module_integrate_ad.o \
                           frame/module_integrate_tl.o \

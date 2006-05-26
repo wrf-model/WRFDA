@@ -7,26 +7,26 @@ RM      =       rm -f
 
 MODULES =                 		\
         module_advect_em.o   		\
-        module_advect_em_ad.o  		\
-        module_advect_em_tl.o  		\
 	module_diffusion_em.o  		\
-	module_diffusion_em_ad.o	\
-	module_diffusion_em_tl.o	\
 	module_small_step_em.o 		\
-	module_small_step_em_tl.o	\
-	module_small_step_em_ad.o	\
         module_big_step_utilities_em.o  \
-        module_big_step_utilities_em_ad.o  \
-        module_big_step_utilities_em_tl.o  \
         module_em.o         		\
-        module_em_tl.o         		\
-        module_em_ad.o       		\
         module_solvedebug_em.o    	\
         module_bc_em.o                  \
-        module_bc_em_ad.o               \
-        module_bc_em_tl.o               \
         module_init_utilities.o         \
         module_check.o                  \
+        module_em_tl.o         		\
+        module_em_ad.o       		\
+        module_advect_em_ad.o  		\
+        module_advect_em_tl.o  		\
+        module_bc_em_ad.o               \
+        module_bc_em_tl.o               \
+	module_diffusion_em_ad.o	\
+	module_diffusion_em_tl.o	\
+	module_small_step_em_tl.o	\
+	module_small_step_em_ad.o	\
+        module_big_step_utilities_em_ad.o  \
+        module_big_step_utilities_em_tl.o  \
 	$(CASE_MODULE)
 
 # possible CASE_MODULE settings
@@ -42,12 +42,12 @@ MODULES =                 		\
 OBJS    = 		        \
 	init_modules_em.o       \
 	solve_em.o              \
-	solve_em_ad.o           \
-	solve_em_tl.o           \
         start_em.o              \
         shift_domain_em.o       \
         nest_init_utils.o	\
-        interp_domain_em.o
+        interp_domain_em.o      \
+	solve_em_ad.o           \
+	solve_em_tl.o           \
  
 
 LIBTARGET    =  dyn_em

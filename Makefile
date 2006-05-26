@@ -88,12 +88,7 @@ wrfplus : framework_only
 
 var : wrfvar
 
-wrfvar : 
-	/bin/rm -f main/libwrflib.a
-	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" ext
-	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" toolsdir
-	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" REGISTRY="Registry" framework
-	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" shared
+wrfvar : framework_only
 	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" wrfvar_src
 	( cd main ; $(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" wrfvar )
 
@@ -105,11 +100,7 @@ pure_var :
 	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" wrfvar_interface
 	( cd main ; $(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" wrfvar )
 
-k2n : 
-	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" ext
-	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" toolsdir
-	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" REGISTRY="Registry" framework
-	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" shared
+k2n : framework_only
 	$(MAKE) MODULE_DIRS="$(ALL_MODULES)" physics
 	$(MAKE) MODULE_DIRS="$(ALL_MODULES)" em_core
 	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" wrfvar_io
@@ -118,11 +109,7 @@ k2n :
           /bin/rm -f kma2netcdf.exe ; \
 	  $(MAKE) MODULE_DIRS="$(DA_CONVERTOR_MODULES)" kma2netcdf )
 
-n2k : 
-	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" ext
-	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" toolsdir
-	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" REGISTRY="Registry" framework
-	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" shared
+n2k : framework_only
 	$(MAKE) MODULE_DIRS="$(ALL_MODULES)" physics
 	$(MAKE) MODULE_DIRS="$(ALL_MODULES)" em_core
 	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" wrfvar_io
@@ -145,11 +132,7 @@ be :
 
 ### 3.a.  rules to build the framework and then the experimental core
 
-exp_wrf : configcheck
-	$(MAKE) MODULE_DIRS="$(ALL_MODULES)" ext
-	$(MAKE) MODULE_DIRS="$(ALL_MODULES)" toolsdir
-	$(MAKE) MODULE_DIRS="$(ALL_MODULES)" framework
-	$(MAKE) MODULE_DIRS="$(ALL_MODULES)" shared
+exp_wrf : framework_only
 	( cd main ; $(MAKE) MODULE_DIRS="$(ALL_MODULES)" SOLVER=exp exp_wrf )
 
 
@@ -381,8 +364,8 @@ ext :
 framework :
 	@ echo '--------------------------------------'
 	( cd frame ; $(MAKE) framework; \
-	cd ../external/io_netcdf ; make NETCDFPATH="$(NETCDFPATH)" FC="$(SFC) $(FCBASEOPTS)" RANLIB="$(RANLIB)" CPP="$(CPP) $(LIBINCLUDE)" LDFLAGS="$(LDFLAGS)" ESMF_IO_LIB_EXT="$(ESMF_IO_LIB_EXT)" ESMF_MOD_DEPENDENCE="../$(ESMF_MOD_DEPENDENCE)" diffwrf; \
-	cd ../io_int ; $(MAKE) SFC="$(SFC) $(FCBASEOPTS)" FC="$(SFC) $(FCBASEOPTS)" RANLIB="$(RANLIB)" CPP="$(CPP)" ESMF_IO_LIB_EXT="$(ESMF_IO_LIB_EXT)" ESMF_MOD_DEPENDENCE="../$(ESMF_MOD_DEPENDENCE)" diffwrf ; cd ../../frame )
+	cd ../external/io_netcdf ; make NETCDFPATH="$(NETCDFPATH)" FC="$(SFC) $(FCBASEOPTS)" RANLIB="$(RANLIB)" CPP="$(CPP) $(LIBINCLUDE)" LDFLAGS="$(LDFLAGS)" ESMF_IO_LIB_EXT="$(ESMF_IO_LIB_EXT)" ESMF_MOD_DEPENDENCE="../$(ESMF_MOD_DEPENDENCE)" diffwrf_netcdf; \
+	cd ../io_int ; $(MAKE) SFC="$(SFC) $(FCBASEOPTS)" FC="$(SFC) $(FCBASEOPTS)" RANLIB="$(RANLIB)" CPP="$(CPP)" ESMF_IO_LIB_EXT="$(ESMF_IO_LIB_EXT)" ESMF_MOD_DEPENDENCE="../$(ESMF_MOD_DEPENDENCE)" diffwrf_int ; cd ../../frame )
 
 shared :
 	@ echo '--------------------------------------'

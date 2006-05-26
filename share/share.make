@@ -56,7 +56,8 @@ SHARE_OBJS    = 		\
         wrf_auxinput5in.o               \
         wrf_bdyin.o             	\
         wrf_histin.o            	\
-        wrf_restartin.o
+        wrf_restartin.o                 \
+        couple_or_uncouple_em.o
 
 # DEPENDENCIES : only dependencies after this line (don't remove the word DEPENDENCIES)
 
