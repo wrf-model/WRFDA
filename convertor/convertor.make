@@ -59,7 +59,7 @@ module_kma_wave2grid.o: \
 		kma_wave2grid/ZNME2PXX.inc \
 		kma_wave2grid/module_kma_wave2grid.F
 		$(CPP) -I./kma_wave2grid $(CPPFLAGS) kma_wave2grid/module_kma_wave2grid.F > module_kma_wave2grid.f
-		$(F77) -c -I./kma_wave2grid $(F77FLAGS) module_kma_wave2grid.f
+		$(FC) -c -I./kma_wave2grid $(FIXEDFLAGS) module_kma_wave2grid.f
 
 module_wave2grid_kma.o: \
 		wave2grid_kma/BSSLZ1.inc \
@@ -96,7 +96,7 @@ module_wave2grid_kma.o: \
 		wave2grid_kma/RELHUM.inc       \
 		wave2grid_kma/module_wave2grid_kma.F
 		$(CPP) -I./wave2grid_kma $(CPPFLAGS) wave2grid_kma/module_wave2grid_kma.F > module_wave2grid_kma.f
-		$(F77) -c -I./wave2grid_kma $(F77FLAGS) module_wave2grid_kma.f
+		$(FC) -c -I./wave2grid_kma $(FIXEDFLAGS) module_wave2grid_kma.f
 
 # DEPENDENCIES : only dependencies after this line (don't remove the word DEPENDENCIES)
 

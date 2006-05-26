@@ -91,7 +91,7 @@ bufr_little_endian_convert:	\
 
 grabbufr:		$(OBJ_FOR_ALL)		\
 			grabbufr.f90
-			$(FC) -c $(F77FLAGS_BUFR) grabbufr.f90
+			$(FFC) -c $(FIXEDFLAGS_BUFR) grabbufr.f90
 
 ###########################################################################################
 

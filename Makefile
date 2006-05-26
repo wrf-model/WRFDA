@@ -426,7 +426,7 @@ esmf_time_f90_only :
 bufr_little_endian :
 	@ echo '--------------------------------------'
 	( cd tools ; $(MAKE) CC="$(CC_TOOLS)" DA_SRC="$(DA_SRC)" \
-            FC="$(FC)" F77FLAGS_ENDIAN="$(F77FLAGS_ENDIAN)" bufr_little_endian.exe)
+            FC="$(FC)" FIXEDFLAGS_ENDIAN="$(FIXEDFLAGS_ENDIAN)" bufr_little_endian.exe)
 
 clean :
 		@ echo 'Use the clean script'

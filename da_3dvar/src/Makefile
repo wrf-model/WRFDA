@@ -106,14 +106,14 @@ par_util.o:		DA_Define_Structures.o		\
 			par_util/par_util.F
 			$(RM) $@
 			$(CPP) -I./par_util $(CPPFLAGS_WRFVAR) par_util/par_util.F > par_util.f
-			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) par_util.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) par_util.f
 
 par_util1.o:		par_util/proc_sum_int.inc		\
 			par_util/proc_sum_real.inc \
 			par_util/par_util1.F
 			$(RM) $@
 			$(CPP) -I./par_util $(CPPFLAGS_WRFVAR) par_util/par_util1.F > par_util1.f
-			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) par_util1.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) par_util1.f
 
 da_solve_v3d.o:		DA_Constants.o			\
 			DA_Define_Structures.o		\
@@ -126,7 +126,7 @@ da_solve_v3d.o:		DA_Constants.o			\
 			da_solve_v3d/da_solve_v3d.F
 			$(RM) $@
 			$(CPP) -I./da_solve_v3d $(CPPFLAGS_WRFVAR) da_solve_v3d/da_solve_v3d.F > da_solve_v3d.f
-			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) da_solve_v3d.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_solve_v3d.f
 
 DA_Minimisation.o:	\
 			module_wrf_3dvar_io.o \
@@ -169,7 +169,7 @@ DA_Minimisation.o:	\
 			DA_Minimisation/DA_Minimise_CG.inc
 			$(RM) $@
 			$(CPP) -I./DA_Minimisation $(CPPFLAGS_WRFVAR) DA_Minimisation/DA_Minimisation.F > DA_Minimisation.f
-			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) DA_Minimisation.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) DA_Minimisation.f
 
 DA_Setup_Structures.o:	\
 			DA_Define_Structures.o \
@@ -225,7 +225,7 @@ DA_Setup_Structures.o:	\
 			DA_Setup_Structures/da_write_increments.inc
 			$(RM) $@
 			$(CPP) -I./DA_Setup_Structures $(CPPFLAGS_WRFVAR) DA_Setup_Structures/DA_Setup_Structures.F > DA_Setup_Structures.f
-			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) DA_Setup_Structures.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) DA_Setup_Structures.f
 
 bufrlib.prm:		da_bufrlib/bufrlib.PRM
 			$(RM) $@
@@ -234,7 +234,7 @@ bufrlib.prm:		da_bufrlib/bufrlib.PRM
 da_bufrlib.o:		da_bufrlib/da_bufrlib.F bufrlib.prm
 			$(RM) $@
 			$(CPP) $(CPPFLAGS) da_bufrlib/da_bufrlib.F > da_bufrlib.f
-			$(F77) -c $(F77FLAGS_BUFR) $(MODULE_DIRS) da_bufrlib.f
+			$(FFC) -c $(FIXEDFLAGS_BUFR) $(MODULE_DIRS) da_bufrlib.f
 
 bort_exit.o:		da_bufrlib/bort_exit.c
 			$(RM) $@
@@ -282,7 +282,7 @@ DA_VToX_Transforms.o:	\
 			DA_VToX_Transforms/DA_Vertical_Transform.inc
 			$(RM) $@
 			$(CPP) -I./DA_VToX_Transforms $(CPPFLAGS_WRFVAR) DA_VToX_Transforms/DA_VToX_Transforms.F > DA_VToX_Transforms.f
-			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) DA_VToX_Transforms.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) DA_VToX_Transforms.f
 
 DA_Obs.o:		\
 			DA_Constants.o \
@@ -333,7 +333,7 @@ DA_Obs.o:		\
                         DA_Obs/da_deallocate_obs.inc
 			$(RM) $@
 			$(CPP) -I./DA_Obs $(CPPFLAGS_WRFVAR) DA_Obs/DA_Obs.F > DA_Obs.f
-			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) DA_Obs.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) DA_Obs.f
 
 da_pseudo.o:		\
 			DA_Constants.o \
@@ -353,7 +353,7 @@ da_pseudo.o:		\
 			da_pseudo/da_transform_xtoy_pseudo_adj.inc
 			$(RM) $@
 			$(CPP) -I./da_pseudo $(CPPFLAGS_WRFVAR) da_pseudo/da_pseudo.F > da_pseudo.f
-			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) da_pseudo.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_pseudo.f
 
 DA_Metar.o:		\
 			DA_Constants.o \
@@ -375,7 +375,7 @@ DA_Metar.o:		\
 			DA_Metar/da_get_innov_vector_metar.inc
 			$(RM) $@
 			$(CPP) -I./DA_Metar $(CPPFLAGS_WRFVAR) DA_Metar/DA_Metar.F > DA_Metar.f
-			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) DA_Metar.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) DA_Metar.f
 
 DA_GeoAMV.o:		\
 			DA_Constants.o \
@@ -396,7 +396,7 @@ DA_GeoAMV.o:		\
 			DA_GeoAMV/da_get_innov_vector_geoamv.inc
 			$(RM) $@
 			$(CPP) -I./DA_GeoAMV $(CPPFLAGS_WRFVAR) DA_GeoAMV/DA_GeoAMV.F > DA_GeoAMV.f
-			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) DA_GeoAMV.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) DA_GeoAMV.f
 
 DA_PolarAMV.o:		\
 			DA_Constants.o \
@@ -417,7 +417,7 @@ DA_PolarAMV.o:		\
 			DA_PolarAMV/da_get_innov_vector_polaramv.inc
 			$(RM) $@
 			$(CPP) -I./DA_PolarAMV $(CPPFLAGS_WRFVAR) DA_PolarAMV/DA_PolarAMV.F > DA_PolarAMV.f
-			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) DA_PolarAMV.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) DA_PolarAMV.f
 
 DA_Satem.o:		\
 			DA_Constants.o \
@@ -438,7 +438,7 @@ DA_Satem.o:		\
 			DA_Satem/da_get_innov_vector_satem.inc
 			$(RM) $@
 			$(CPP) -I./DA_Satem $(CPPFLAGS_WRFVAR) DA_Satem/DA_Satem.F > DA_Satem.f
-			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) DA_Satem.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) DA_Satem.f
 
 DA_Ships.o:		\
 			DA_Constants.o \
@@ -460,7 +460,7 @@ DA_Ships.o:		\
 			DA_Ships/da_get_innov_vector_ships.inc
 			$(RM) $@
 			$(CPP) -I./DA_Ships $(CPPFLAGS_WRFVAR) DA_Ships/DA_Ships.F > DA_Ships.f
-			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) DA_Ships.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) DA_Ships.f
 
 DA_Synop.o:		\
 			DA_Constants.o \
@@ -483,7 +483,7 @@ DA_Synop.o:		\
 			DA_Synop/DA_Transform_XToY_Synop_Adj.inc
 			$(RM) $@
 			$(CPP) -I./DA_Synop $(CPPFLAGS_WRFVAR) DA_Synop/DA_Synop.F > DA_Synop.f
-			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) DA_Synop.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) DA_Synop.f
 
 DA_Sound.o:		\
 			DA_Constants.o \
@@ -517,7 +517,7 @@ DA_Sound.o:		\
 			DA_Sound/DA_Sound.F
 			$(RM) $@
 			$(CPP) -I./DA_Sound $(CPPFLAGS_WRFVAR) DA_Sound/DA_Sound.F > DA_Sound.f
-			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) DA_Sound.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) DA_Sound.f
 
 DA_Airep.o:		\
 			DA_Constants.o \
@@ -538,7 +538,7 @@ DA_Airep.o:		\
 			DA_Airep/da_get_innov_vector_airep.inc
 			$(RM) $@
 			$(CPP) -I./DA_Airep $(CPPFLAGS_WRFVAR) DA_Airep/DA_Airep.F > DA_Airep.f
-			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) DA_Airep.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) DA_Airep.f
 
 DA_Pilot.o:		\
 			DA_Constants.o \
@@ -559,7 +559,7 @@ DA_Pilot.o:		\
 			DA_Pilot/da_get_innov_vector_pilot.inc
 			$(RM) $@
 			$(CPP) -I./DA_Pilot $(CPPFLAGS_WRFVAR) DA_Pilot/DA_Pilot.F > DA_Pilot.f
-			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) DA_Pilot.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) DA_Pilot.f
 
 DA_Bogus.o:		\
 			DA_Constants.o \
@@ -581,7 +581,7 @@ DA_Bogus.o:		\
 			DA_Bogus/da_get_innov_vector_bogus.inc
 			$(RM) $@
 			$(CPP) -I./DA_Bogus $(CPPFLAGS_WRFVAR) DA_Bogus/DA_Bogus.F > DA_Bogus.f
-			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) DA_Bogus.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) DA_Bogus.f
 
 DA_Radar.o:		\
 			DA_Constants.o \
@@ -610,7 +610,7 @@ DA_Radar.o:		\
 			DA_Radar/da_max_error_qc_Radar.inc
 			$(RM) $@
 			$(CPP) -I./DA_Radar $(CPPFLAGS_WRFVAR) DA_Radar/DA_Radar.F > DA_Radar.f
-			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) DA_Radar.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) DA_Radar.f
 
 DA_Gpspw.o:		\
 			DA_Constants.o \
@@ -632,7 +632,7 @@ DA_Gpspw.o:		\
 			DA_Gpspw/DA_Transform_XToY_Gpspw_Adj.inc
 			$(RM) $@
 			$(CPP) -I./DA_Gpspw $(CPPFLAGS_WRFVAR) DA_Gpspw/DA_Gpspw.F > DA_Gpspw.f
-			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) DA_Gpspw.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) DA_Gpspw.f
 
 DA_Gpsref.o:		\
 			DA_Constants.o \
@@ -654,7 +654,7 @@ DA_Gpsref.o:		\
 			DA_Gpsref/da_get_innov_vector_Gpsref.inc
 			$(RM) $@
 			$(CPP) -I./DA_Gpsref $(CPPFLAGS_WRFVAR) DA_Gpsref/DA_Gpsref.F > DA_Gpsref.f
-			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) DA_Gpsref.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) DA_Gpsref.f
 
 DA_SSMI.o:		\
 			DA_Constants.o \
@@ -724,7 +724,7 @@ DA_SSMI.o:		\
 			DA_SSMI/da_transform_xtoy_ssmt2_adj.inc
 			$(RM) $@
 			$(CPP) -I./DA_SSMI $(CPPFLAGS_WRFVAR) DA_SSMI/DA_SSMI.F > DA_SSMI.f
-			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) DA_SSMI.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) DA_SSMI.f
 
 da_qscat.o:		\
 			DA_Constants.o \
@@ -745,7 +745,7 @@ da_qscat.o:		\
 			da_qscat/da_transform_xtoy_qscat_adj.inc
 			$(RM) $@
 			$(CPP) -I./da_qscat $(CPPFLAGS_WRFVAR) da_qscat/da_qscat.F > da_qscat.f
-			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) da_qscat.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_qscat.f
 DA_Profiler.o:		\
 			DA_Constants.o \
 			par_util.o \
@@ -765,7 +765,7 @@ DA_Profiler.o:		\
 			DA_Profiler/da_get_innov_vector_profiler.inc
 			$(RM) $@
 			$(CPP) -I./DA_Profiler $(CPPFLAGS_WRFVAR) DA_Profiler/DA_Profiler.F > DA_Profiler.f
-			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) DA_Profiler.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) DA_Profiler.f
 
 
 DA_Buoy.o:		\
@@ -788,7 +788,7 @@ DA_Buoy.o:		\
 			DA_Buoy/da_get_innov_vector_buoy.inc
 			$(RM) $@
 			$(CPP) -I./DA_Buoy $(CPPFLAGS_WRFVAR) DA_Buoy/DA_Buoy.F > DA_Buoy.f
-			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) DA_Buoy.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) DA_Buoy.f
 
 DA_ReadWrite_MM5.o:	\
 	                DA_Constants.o \
@@ -805,7 +805,7 @@ DA_ReadWrite_MM5.o:	\
 			DA_ReadWrite_MM5/DA_Write_Analysis_MM5.inc
 			$(RM) $@
 			$(CPP) -I./DA_ReadWrite_MM5 $(CPPFLAGS_WRFVAR) DA_ReadWrite_MM5/DA_ReadWrite_MM5.F > DA_ReadWrite_MM5.f
-			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) DA_ReadWrite_MM5.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) DA_ReadWrite_MM5.f
 
 da_h_ops.o:		\
 			da_c_mat.o \
@@ -818,7 +818,7 @@ da_h_ops.o:		\
 			da_h_ops/da_h_ops.F
 			$(RM) $@
 			$(CPP) -I./da_h_ops $(CPPFLAGS_WRFVAR) da_h_ops/da_h_ops.F > da_h_ops.f
-			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) da_h_ops.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_h_ops.f
 
 
 da_c_mat.o:		\
@@ -831,7 +831,7 @@ da_c_mat.o:		\
 			da_c_mat/set_vops.inc
 			$(RM) $@
 			$(CPP) -I./da_c_mat $(CPPFLAGS_WRFVAR) da_c_mat/da_c_mat.F > da_c_mat.f
-			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) da_c_mat.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_c_mat.f
 
 DA_Dynamics.o:		\
 			DA_Constants.o \
@@ -860,7 +860,7 @@ DA_Dynamics.o:		\
 			DA_Dynamics/DA_UV_To_Vorticity.inc
 			$(RM) $@
 			$(CPP) -I./DA_Dynamics $(CPPFLAGS_WRFVAR) DA_Dynamics/DA_Dynamics.F > DA_Dynamics.f
-			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) DA_Dynamics.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) DA_Dynamics.f
 
 DA_Physics.o:		\
 			DA_Constants.o \
@@ -916,7 +916,7 @@ DA_Physics.o:		\
 			DA_Physics/DA_Moist_Phys_Lin.inc
 			$(RM) $@
 			$(CPP) -I./DA_Physics $(CPPFLAGS_WRFVAR) DA_Physics/DA_Physics.F > DA_Physics.f
-			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) DA_Physics.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) DA_Physics.f
 
 DA_FFTs.o:		\
 			DA_Define_Structures.o \
@@ -965,7 +965,7 @@ DA_Tools.o:		\
 			DA_Tools/xyll.inc    
 			$(RM) $@
 			$(CPP) -I./DA_Tools $(CPPFLAGS_WRFVAR) DA_Tools/DA_Tools.F > DA_Tools.f
-			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) DA_Tools.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) DA_Tools.f
 
 DA_Recursive_Filter.o:	\
 			DA_Constants.o \
@@ -979,7 +979,7 @@ DA_Recursive_Filter.o:	\
 			DA_Recursive_Filter/DA_Transform_Through_RF_Adj.inc
 			$(RM) $@
 			$(CPP) -I./DA_Recursive_Filter $(CPPFLAGS_WRFVAR) DA_Recursive_Filter/DA_Recursive_Filter.F > DA_Recursive_Filter.f
-			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) DA_Recursive_Filter.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) DA_Recursive_Filter.f
 
 DA_Interpolation.o:	\
 			DA_Constants.o \
@@ -996,7 +996,7 @@ DA_Interpolation.o:	\
 			DA_Interpolation/Interp_lin_3D_adj.inc
 			$(RM) $@
 			$(CPP) -I./DA_Interpolation $(CPPFLAGS_WRFVAR) DA_Interpolation/DA_Interpolation.F > DA_Interpolation.f
-			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) DA_Interpolation.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) DA_Interpolation.f
 
 DA_Grid_Definitions.o:	\
 			DA_Constants.o \
@@ -1008,7 +1008,7 @@ DA_Grid_Definitions.o:	\
 			DA_Grid_Definitions/set_map_para.inc
 			$(RM) $@
 			$(CPP) -I./DA_Grid_Definitions $(CPPFLAGS_WRFVAR) DA_Grid_Definitions/DA_Grid_Definitions.F > DA_Grid_Definitions.f
-			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) DA_Grid_Definitions.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) DA_Grid_Definitions.f
 
 DA_Statistics.o:	\
 			DA_Define_Structures.o \
@@ -1022,7 +1022,7 @@ DA_Statistics.o:	\
 			DA_Statistics/Stats_Calculate.inc
 			$(RM) $@
 			$(CPP) -I./DA_Statistics $(CPPFLAGS_WRFVAR) DA_Statistics/DA_Statistics.F > DA_Statistics.f
-			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) DA_Statistics.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) DA_Statistics.f
 
 DA_Define_Structures.o:	\
 			DA_Constants.o \
@@ -1043,7 +1043,7 @@ DA_Define_Structures.o:	\
 			DA_Define_Structures/DA_Zero_Y.inc    
 			$(RM) $@
 			$(CPP) -I./DA_Define_Structures $(CPPFLAGS_WRFVAR) DA_Define_Structures/DA_Define_Structures.F > DA_Define_Structures.f
-			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) DA_Define_Structures.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) DA_Define_Structures.f
 
 DA_Constants.o:		DA_Constants/DA_Constants.F \
 			DA_Constants/DA_Array_Print.inc \
@@ -1054,7 +1054,7 @@ DA_Constants.o:		DA_Constants/DA_Constants.F \
                         ../../frame/module_driver_constants.o 
 			$(RM) $@
 			$(CPP) -I./DA_Constants -I../../inc $(CPPFLAGS_WRFVAR) DA_Constants/DA_Constants.F > DA_Constants.f
-			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) DA_Constants.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) DA_Constants.f
 
 LAPACK.o:		\
 			BLAS.o \
@@ -1072,7 +1072,7 @@ LAPACK.o:		\
 			LAPACK/dlapy2.inc \
 			LAPACK/dsyev.inc
 			$(CPP) -I./LAPACK $(CPPFLAGS_WRFVAR) LAPACK/LAPACK.F > LAPACK.f
-			$(F77) -c -I./LAPACK $(F77FLAGS_WRFVAR) $(MODULE_DIRS) LAPACK.f
+			$(FFC) -c -I./LAPACK $(FIXEDFLAGS_WRFVAR) $(MODULE_DIRS) LAPACK.f
 
 BLAS.o:	         \
 			BLAS/daxpy.inc	\
@@ -1093,7 +1093,7 @@ BLAS.o:	         \
 			BLAS/xerbla.inc \
 			BLAS/BLAS.F
 			$(CPP) -I./BLAS $(CPPFLAGS_WRFVAR) BLAS/BLAS.F > BLAS.f
-			$(F77) -c -I./BLAS $(F77FLAGS_WRFVAR) $(MODULE_DIRS) BLAS.f
+			$(FFC) -c -I./BLAS $(FIXEDLAGS_WRFVAR) $(MODULE_DIRS) BLAS.f
 
 DA_Test.o:	\
 			DA_Constants.o \
@@ -1158,7 +1158,7 @@ DA_Test.o:	\
 			DA_Test/set_tst_trnsf_fld.inc
 			$(RM) $@
 			$(CPP) -I./DA_Test $(CPPFLAGS_WRFVAR) DA_Test/DA_Test.F > DA_Test.f
-			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) DA_Test.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) DA_Test.f
 
 da_gen_be.o:	         \
 			DA_Constants.o			\
@@ -1187,7 +1187,7 @@ da_gen_be.o:	         \
 			$(CPP) -I./da_gen_be -I./DA_VToX_Transforms -I./DA_Tools \
 			-I./DA_Recursive_Filter \
 			$(CPPFLAGS_WRFVAR) da_gen_be/da_gen_be.F > da_gen_be.f
-			$(FC) -c $(FCFLAGS_WRFVAR) -I${NETCDF}/include -I../../frame da_gen_be.f
+			$(FC) -c $(FCFLAGS) -I${NETCDF}/include -I../../frame da_gen_be.f
 
 da_fftpack5.o:	         \
 			DA_Constants.o		\
@@ -1210,7 +1210,7 @@ da_fftpack5.o:	         \
 			da_fftpack5/xerfft.inc	\
 			da_fftpack5/da_fftpack5.F
 			$(CPP) -I./da_fftpack5 $(CPPFLAGS_WRFVAR) da_fftpack5/da_fftpack5.F > da_fftpack5.f
-			$(F77) -c $(F77FLAGS_WRFVAR) $(MODULE_DIRS) da_fftpack5.f
+			$(FFC) -c $(FIXEDFLAGS_WRFVAR) $(MODULE_DIRS) da_fftpack5.f
 
 da_spectral.o:		\
 			DA_Constants.o				\
@@ -1234,30 +1234,30 @@ da_spectral.o:		\
 			da_spectral/da_apply_power.inc		\
 			da_spectral/da_spectral.F
 			$(CPP) -I./da_spectral $(CPPFLAGS_WRFVAR) da_spectral/da_spectral.F > da_spectral.f
-			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) da_spectral.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_spectral.f
 
 
 module_wrf_3dvar_interface.o : da_modules/module_wrf_3dvar_interface.F \
                                da_tracing.o
 			$(CPP) -I./da_modules $(CPPFLAGS_WRFVAR) da_modules/module_wrf_3dvar_interface.F > module_wrf_3dvar_interface.f
-			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) module_wrf_3dvar_interface.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) module_wrf_3dvar_interface.f
 
 module_wrf_3dvar_io.o : da_modules/module_wrf_3dvar_io.F \
                         da_tracing.o
 			$(CPP) -I./da_modules $(CPPFLAGS_WRFVAR) da_modules/module_wrf_3dvar_io.F > module_wrf_3dvar_io.f
-			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) module_wrf_3dvar_io.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) module_wrf_3dvar_io.f
 
 module_wrfvar_top.o : da_modules/module_wrfvar_top.F \
                       module_wrf_3dvar_interface.o \
                       da_tracing.o
 			$(CPP) -I./da_modules $(CPPFLAGS_WRFVAR) da_modules/module_wrfvar_top.F > module_wrfvar_top.f
-			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) module_wrfvar_top.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) module_wrfvar_top.f
 
 module_wrfvar_esmf_super.o : da_modules/module_wrfvar_esmf_super.F \
                              module_wrf_3dvar_io.o \
                              module_wrf_3dvar_interface.o
 			$(CPP) -I./da_modules $(CPPFLAGS_WRFVAR) da_modules/module_wrfvar_esmf_super.F > module_wrfvar_esmf_super.f
-			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) module_wrfvar_esmf_super.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) module_wrfvar_esmf_super.f
 
 da_tracing.o:           da_tracing/da_tracing.F           \
                         da_tracing/da_trace_init.inc      \
@@ -1271,7 +1271,7 @@ da_tracing.o:           da_tracing/da_tracing.F           \
                         da_memory.o                       \
                         par_util1.o
 			$(CPP) -I./da_tracing $(CPPFLAGS_WRFVAR) da_tracing/da_tracing.F > da_tracing.f
-			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) da_tracing.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_tracing.f
 
 be_spectral.o:		\
 			DA_Constants.o				\
@@ -1290,7 +1290,7 @@ be_spectral.o:		\
 			da_spectral/da_apply_power.inc		\
 			da_spectral/be_spectral.F
 			$(CPP) -I./da_spectral $(CPPFLAGS_WRFVAR) da_spectral/be_spectral.F > be_spectral.f
-			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) be_spectral.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) be_spectral.f
 
 da_radiance.o:		DA_Constants.o          \
 			DA_Define_Structures.o  \
@@ -1333,41 +1333,41 @@ da_radiance.o:		DA_Constants.o          \
 			da_radiance/da_radiance.F
 			$(RM) $@
 			$(CPP) -I./da_radiance -I$(RTTOV)/src $(CPPFLAGS_WRFVAR) da_radiance/da_radiance.F > da_radiance.f
-			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) da_radiance.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_radiance.f
 
 rttov_const.o:		parkind1.o	\
 			da_radiance/rttov_const.F
 			$(RM) $@
 			$(CPP) -I./da_radiance -I$(RTTOV)/src $(CPPFLAGS_WRFVAR) da_radiance/rttov_const.F > rttov_const.f
-			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) rttov_const.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) rttov_const.f
 
 rttov_global.o:		parkind1.o	\
 			rttov_const.o	\
 			da_radiance/rttov_global.F
 			$(RM) $@
 			$(CPP) -I./da_radiance -I$(RTTOV)/src $(CPPFLAGS_WRFVAR) da_radiance/rttov_global.F > rttov_global.f
-			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) rttov_global.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) rttov_global.f
 
 rttov_types.o:		parkind1.o	\
 			rttov_const.o	\
 			da_radiance/rttov_types.F
 			$(CPP) -I./da_radiance -I$(RTTOV)/src $(CPPFLAGS_WRFVAR) da_radiance/rttov_types.F > rttov_types.f
-			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) rttov_types.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) rttov_types.f
 
 parkind1.o:		\
 			da_radiance/parkind1.F
 			$(CPP) -I./da_radiance -I$(RTTOV)/src $(CPPFLAGS_WRFVAR) da_radiance/parkind1.F > parkind1.f
-			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) parkind1.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) parkind1.f
 
 gsi_kinds.o:		\
 			da_radiance/gsi_kinds.F
 			$(CPP) -I./da_radiance -I$(RTTOV)/src $(CPPFLAGS_WRFVAR) da_radiance/gsi_kinds.F > gsi_kinds.f
-			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) gsi_kinds.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) gsi_kinds.f
 
 gsi_constants.o:	gsi_kinds.o      \
 			da_radiance/gsi_constants.F
 			$(CPP) -I./da_radiance -I$(RTTOV)/src $(CPPFLAGS_WRFVAR) da_radiance/gsi_constants.F > gsi_constants.f
-			$(FC) -c $(FCFLAGS_WRFVAR) $(MODULE_DIRS) gsi_constants.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) gsi_constants.f
 
 ##############################################################################
 

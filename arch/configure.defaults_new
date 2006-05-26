@@ -5,7 +5,7 @@
 CPP             =
 CPPFLAGS        =
 FC              =       mpif90
-F77             =       pgf77
+FFC             =       pgFFC
 SFC             =       pgf90
 CC              =       mpicc
 CC_TOOLS        =       gcc
@@ -60,7 +60,7 @@ arch : $(RSL_PATH)/module_dm.F $(RSL_PATH)/gen_comms.c
 #
 M4              =       m4 -B 12000
 FC              =       f90
-F77             =       $(FC)
+FFC             =       $(FC)
 SFC             =       $(FC)
 CC              =       cc
 CC_TOOLS        =       $(FC)
@@ -94,7 +94,7 @@ arch :  module_dm_stubs.F gen_comms.stub
 #
 M4              =       m4 -B 12000
 FC              =       mpif90
-F77             =       f90
+FFC             =       f90
 SFC             =       f90
 CC              =       mpicc
 CC_TOOLS        =       cc
@@ -138,7 +138,7 @@ arch : module_dm_stubs.F
 #
 M4              =       m4 -B 12000
 FC              =       f90
-F77             =       $(FC)
+FFC             =       $(FC)
 SFC             =       $(FC)
 CC              =       cc
 CC_TOOLS        =       $(CC)
@@ -171,7 +171,7 @@ arch :  module_dm_stubs.F gen_comms.stub
 #ARCH Settings for PC Linux i486 i586 i686, PGI compiler  (Single-threaded)
 #
 FC              =       pgf90
-F77             =       $(FC)
+FFC             =       $(FC)
 SFC             =       $(FC)
 CC              =       gcc
 CC_TOOLS        =       $(CC)
@@ -206,7 +206,7 @@ arch :  module_dm_stubs.F gen_comms.stub
 #ARCH Settings for PC Linux i486 i586 i686, PGI compiler  (RSL, MPICH, RSL IO)
 #
 FC              =       mpif90
-F77             =       $(FC)
+FFC             =       $(FC)
 SFC             =       pgf90
 CC              =       mpicc
 CC_TOOLS        =       gcc
@@ -248,44 +248,10 @@ arch : $(RSL_PATH)/module_dm.F $(RSL_PATH)/gen_comms.c
 	( cd $(RSL_PATH)/RSL ; $(MAKE) CC="$(CC)" FC="$(FC) $(FCENDIAN)" MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) LEARN_BCAST=-DLEARN_BCAST linux )
 
 ###########################################################
-#ARCH Intel xeon i686 ia32 Xeon Linux, ifort compiler (single-threaded, no nesting)
-#
-
-M4              =       m4 -B12000
-FC              =       ifort
-F77             =       $(FC)
-SFC             =       $(FC)
-CC              =       icc
-CC_TOOLS        =       gcc
-LD              =       $(FC)
-
-CPPTRADFLAG     =       -traditional
-FPPFLAGS2       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE \
-                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO \
-                        -DNO_RRTM_PHYSICS -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
-			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
-FPPFLAGS_BUFR   =       -C -P $(CPPTRADFLAG) -DLINUX -Dlinux
-FCOPTIM         =       -O3 -xW
-FCDEBUG         =       #-g
-FCFORM          =       -FR -cm -w
-FCENDIAN        =       -convert big_endian
-FCBASE          =       
-FCTYPE          =       -r8
-
-CCFLAGS_BUFR    =       -DUNDERSCORE
-
-LOCAL_LIB       =       -L/usr/local/ncarg/lib -L/usr/X11R6/lib -L/usr/local/lib \
-			-lncarg -lncarg_gks -lncarg_c -lX11
-
-arch :  module_dm_stubs.F gen_comms.stub
-	$(LN) module_dm_stubs.F module_dm.F
-	$(LN) gen_comms.stub gen_comms.c 
-
-###########################################################
 #ARCH Settings for PC Linux i486 i586 i686, g95 compiler  (Single-threaded)
 #
 FC              =       g95
-F77             =       $(FC)
+FFC             =       $(FC)
 SFC             =       $(FC)
 CC              =       gcc
 CC_TOOLS        =       gcc
@@ -317,7 +283,7 @@ arch :  module_dm_stubs.F gen_comms.stub
 #ARCH Settings for PC Linux i486 i586 i686, g95 compiler  (RSL, MPICH, RSL IO)
 #
 FC              =       mpif90
-F77             =       $(FC)
+FFC             =       $(FC)
 SFC             =       g95
 CC              =       mpicc
 CC_TOOLS        =       gcc
@@ -356,10 +322,44 @@ arch : $(RSL_PATH)/module_dm.F $(RSL_PATH)/gen_comms.c
 	( cd $(RSL_PATH)/RSL ; $(MAKE) CC="$(CC)" FC="$(FC) $(FCBASE)" MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) LEARN_BCAST=-DLEARN_BCAST linux )
 
 ###########################################################
+#ARCH Intel xeon i686 ia32 Xeon Linux, ifort compiler (single-threaded, no nesting)
+#
+
+M4              =       m4 -B12000
+FC              =       ifort
+FFC             =       $(FC)
+SFC             =       $(FC)
+CC              =       icc
+CC_TOOLS        =       gcc
+LD              =       $(FC)
+
+CPPTRADFLAG     =       -traditional
+FPPFLAGS2       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE \
+                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO \
+                        -DNO_RRTM_PHYSICS -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
+			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+FPPFLAGS_BUFR   =       -C -P $(CPPTRADFLAG) -DLINUX -Dlinux
+FCOPTIM         =       -O3 -xW
+FCDEBUG         =       #-g
+FCFORM          =       -FR -cm -w
+FCENDIAN        =       -convert big_endian
+FCBASE          =       
+FCTYPE          =       -r8
+
+CCFLAGS_BUFR    =       -DUNDERSCORE
+
+LOCAL_LIB       =       -L/usr/local/ncarg/lib -L/usr/X11R6/lib -L/usr/local/lib \
+			-lncarg -lncarg_gks -lncarg_c -lX11
+
+arch :  module_dm_stubs.F gen_comms.stub
+	$(LN) module_dm_stubs.F module_dm.F
+	$(LN) gen_comms.stub gen_comms.c 
+
+###########################################################
 #ARCH Settings for PC Linux x86_64, PGI compiler  (Single-threaded)
 #
 FC              =       pgf90
-F77             =       $(FC)
+FFC             =       $(FC)
 SFC             =       $(FC)
 CC              =       gcc
 CC_TOOLS        =       $(CC)
@@ -392,7 +392,7 @@ arch :  module_dm_stubs.F gen_comms.stub
 #ARCH Settings for PC Linux x86_64, PGI compiler  (RSL, MPICH, RSL IO)
 #
 FC              =       mpif90
-F77             =       $(FC)
+FFC             =       $(FC)
 SFC             =       pgf90
 CC              =       mpicc
 CC_TOOLS        =       gcc
@@ -437,7 +437,7 @@ arch : $(RSL_PATH)/module_dm.F $(RSL_PATH)/gen_comms.c
 #ARCH Settings for PC Linux x86_64, Pathscale compiler  (Single-threaded)
 #
 FC              =       pathf90
-F77             =       $(FC)
+FFC             =       $(FC)
 SFC             =       $(FC)
 CC              =       gcc
 CC_TOOLS        =       $(CC)
@@ -469,7 +469,7 @@ arch :  module_dm_stubs.F gen_comms.stub
 #ARCH Settings for PC Linux x86_64, Pathscale compiler  (RSL, MPICH, RSL IO)
 #
 FC              =       mpif90
-F77             =       $(FC)
+FFC             =       $(FC)
 SFC             =       pathf90
 CC              =       mpicc
 CC_TOOLS        =       gcc
@@ -516,7 +516,7 @@ arch : $(RSL_PATH)/module_dm.F $(RSL_PATH)/gen_comms.c
 
 M4              =       m4 -B12000
 FC              =       f90
-F77             =       $(FC)
+FFC             =       $(FC)
 SFC             =       $(FC)
 CC              =       cc
 CC_TOOLS        =       $(CC)
@@ -549,7 +549,7 @@ arch :  module_dm_stubs.F gen_comms.stub
 LIBINCLUDE	=	/tea2/huangwei/mpich-1.2.4/include
 M4              =       m4 -B12000
 FC              =       mpif90
-F77             =       $(FC)
+FFC             =       $(FC)
 SFC             =       $(FC)
 CC              =       mpicc
 CC_TOOLS        =       cc
@@ -594,7 +594,7 @@ arch : $(RSL_PATH)/module_dm.F $(RSL_PATH)/gen_comms.c
 CPP             =       /usr/lib0/cpp
 M4              =       m4 -B12000
 FC              =       f90
-F77             =       $(FC)
+FFC             =       $(FC)
 SFC             =       $(FC)
 CC              =       cc
 CC_TOOLS        =       cc
@@ -628,7 +628,7 @@ arch :  module_dm_stubs.F gen_comms.stub
 #
 M4              =       m4 -B12000
 FC              =       xlf90_r
-F77             =       xlf_r
+FFC             =       xlf_r
 SFC             =       $(FC)
 CC              =       cc_r
 CC_TOOLS        =       cc
@@ -660,7 +660,7 @@ arch :  module_dm_stubs.F gen_comms.stub
 #
 M4              =       m4 -B12000
 FC              =       mpxlf90_r
-F77             =       mpxlf_r
+FFC             =       mpxlf_r
 SFC             =       xlf90_r
 CC              =       mpcc_r
 CC_TOOLS        =       cc
@@ -708,7 +708,7 @@ SED_FTN		=	sed -f ../arch/cray_csd.sed
 M4              =       m4 -B12000
 FC              =       ftn
 SFC             =       ftn
-F77             =       $(FC)
+FFC             =       $(FC)
 CC              =       cc
 SCC             =       cc
 # Do not use cross-compiler for tools
@@ -763,7 +763,7 @@ arch : $(RSL_PATH)/module_dm.F $(RSL_PATH)/gen_comms.c
 SED_FTN		=	sed -f cray_csd.sed
 M4              =       m4 -B12000
 FC              =       ftn
-F77             =       $(FC)
+FFC             =       $(FC)
 SFC             =       $(FC)
 CC              =       cc
 SCC             =       $(CC)
@@ -814,7 +814,7 @@ arch : $(RSL_PATH)/module_dm.F $(RSL_PATH)/gen_comms.c
 #
 M4              =       m4 -B12000
 FC              =       xlf90_r
-F77             =       xlf_r
+FFC             =       xlf_r
 SFC             =       $(FC)
 CC              =       cc
 CC_TOOLS        =       $(CC)
@@ -849,7 +849,7 @@ arch :  module_dm_stubs.F gen_comms.stub
 CPP             =       /usr/bin/cpp
 M4              =       m4 -B12000
 FC              =       mpif90
-F77             =       xlf_r
+FFC             =       xlf_r
 SFC             =       xlf90_r
 CC              =       mpicc
 CC_TOOLS        =       cc
@@ -896,7 +896,7 @@ arch : $(RSL_PATH)/module_dm.F $(RSL_PATH)/gen_comms.c
 CPP             =       /usr/bin/cpp
 M4              =       m4 -B12000
 FC              =       g95
-F77             =       $(FC)
+FFC             =       $(FC)
 SFC             =       $(FC)
 CC              =       cc
 CC_TOOLS        =       cc
@@ -928,7 +928,7 @@ arch :  module_dm_stubs.F gen_comms.stub
 CPP             =       /usr/bin/cpp
 M4              =       m4 -B12000
 FC              =       mpif90
-F77             =       $(FC)
+FFC             =       $(FC)
 SFC             =       g95
 LD              =       $(FC)
 CC              =       mpicc

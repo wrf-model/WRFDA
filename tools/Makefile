@@ -35,7 +35,7 @@ bufr_little_endian.exe : bufr_little_endian.o
 
 bufr_little_endian.o : $(DA_SRC)/bort_exit.o $(DA_SRC)/restd.o $(DA_SRC)/wrdesc.o $(DA_SRC)/da_bufrlib.o
 			$(CPP) $(CPPFLAGS) bufr_little_endian.F > bufr_little_endian.f
-			$(FC) -c $(F77FLAGS_ENDIAN) bufr_little_endian.f
+			$(FC) -c $(FIXEDFLAGS_ENDIAN) bufr_little_endian.f
 
 
 # regenerate this list with "makedepend -Y *.c"

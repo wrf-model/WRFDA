@@ -224,7 +224,7 @@ bufrlib.prm:		bufrlib.PRM
 da_bufrlib.o:		da_bufrlib.F bufrlib.prm
 			$(RM) $@
 			$(CPP) $(FPPFLAGS) da_bufrlib.F > da_bufrlib.f
-			$(F77) -c $(F77FLAGS_BUFR) da_bufrlib.f
+			$(FFC) -c $(FIXEDFLAGS_BUFR) da_bufrlib.f
 
 bort_exit.o:		bort_exit.c
 			$(RM) $@
@@ -940,7 +940,7 @@ LAPACK.o:		LAPACK.F   \
 			dlapy2.inc \
 			dsyev.inc
 			$(CPP) $(FPPFLAGS) LAPACK.F > LAPACK.f
-			$(F77) -c $(F77FLAGS) LAPACK.f
+			$(FFC) -c $(FIXEDFLAGS) LAPACK.f
 
 BLAS.o:	               BLAS.F       \
 		       daxpy.inc    \
@@ -961,7 +961,7 @@ BLAS.o:	               BLAS.F       \
 		       xerbla.inc   \
 		       module_wrf_error.o
 			$(CPP) $(FPPFLAGS) BLAS.F > BLAS.f
-			$(F77) -c $(F77FLAGS) BLAS.f
+			$(FFC) -c $(FIXEDFLAGS) BLAS.f
 
 DA_Test.o:	       DA_Test.F                            \
 			DA_Constants.o                      \
@@ -1067,7 +1067,7 @@ da_fftpack5.o:	        da_fftpack5.F  \
 			rffti1.inc     \
 			xerfft.inc
 			$(CPP) $(FPPFLAGS) da_fftpack5.F > da_fftpack5.f
-			$(F77) -c $(F77FLAGS) da_fftpack5.f
+			$(FFC) -c $(FIXEDFLAGS) da_fftpack5.f
 
 da_spectral.o:		da_spectral.F               \
 			DA_Constants.o		    \

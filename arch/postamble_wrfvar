@@ -7,7 +7,7 @@ EXTRAMODULES    =
 FCBASEOPTS      =       $(FCTYPE) $(FCBASE) $(FCFORM) $(FCHOST) $(FCDEBUG) -I.
 FC_FFT_RF_OPTS  =       $(FCTYPE) $(FC_FFT_RF) $(FCFORM) $(FCHOST) $(FCDEBUG) -I.
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS) $(OMP)
-F77FLAGS_ENDIAN =       $(FCTYPE)
+FIXEDFLAGS_ENDIAN =     $(FCTYPE)
 INCLUDE_MODULES =       -I$(DA_VAR) -I$(DA_SRC) \
 			-I../external/io_netcdf -I../external/io_int \
                         -I../external/esmf_time_f90 \
@@ -22,11 +22,10 @@ INC_MOD_WRFVAR   =       -I../../$(NETCDF_IO_PATH) \
                         -I../../external/io_int \
                         -I../../external/esmf_time_f90 \
                         -I../../frame -I../../share -I../../inc
-FCFLAGS_WRFVAR   =       $(FCOPTIM) $(FCBASEOPTS)
-FCFLAGS_FFT_RF  =       $(FCOPTIM) $(FC_FFT_RF_OPTS)
-F77FLAGS_BUFR   =       $(FCTYPE) $(FCBUFR) $(FCHOST) $(FCDEBUG) -I.
-F77FLAGS_WRFVAR  =       $(FCTYPE) $(FCBASE) $(FCHOST) $(FCDEBUG) -I.
-CPPFLAGS_WRFVAR  =       $(DM_2_CPP_FLAGS) \
+FCFLAGS_FFT_RF    =     $(FCOPTIM) $(FC_FFT_RF_OPTS)
+FIXEDFLAGS_BUFR   =     $(FCTYPE) $(FCBUFR) $(FCHOST) $(FCDEBUG) -I.
+FIXEDFLAGS_WRFVAR =     $(FCTYPE) $(FCBASE) $(FCHOST) $(FCDEBUG) -I.
+CPPFLAGS_WRFVAR  =      $(DM_2_CPP_FLAGS) \
                         $(LIBINCLUDE) -C -P $(ARCHFLAGS) $(POUND_DEF) $(VAR4DPOSS)
 FUFLAGS         =       $(FCOPTIM) $(FCBASE) $(FCFORM) $(FCDEBUG)
 

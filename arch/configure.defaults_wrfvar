@@ -5,7 +5,7 @@ OMP             =
 OMPCPP          =
 FC              =       f90
 SFC             =       $(FC)
-F77             =       $(FC)
+FFC             =       $(FC)
 LD              =       $(FC)
 CC              =       cc
 CC_TOOLS        =       cc
@@ -48,7 +48,7 @@ DMPARALLEL      =       1
 OMP             =
 OMPCPP          =
 FC              =       mpif90
-F77             =       f90
+FFC             =       f90
 SFC             =       f90
 LD              =       $(FC)
 CC              =       mpicc
@@ -101,7 +101,7 @@ lib_rsl :
 OMP             =
 OMPCPP          =
 FC              =       f90
-F77             =       $(FC)
+FFC             =       $(FC)
 LD              =       $(FC)
 CC              =       cc
 CC_TOOLS        =       cc
@@ -140,7 +140,7 @@ externals : $(WRFIO) esmf_time
 #ARCH Settings for PC Linux i486 i586 i686, PGI compiler  (Single-threaded)
 #
 FC              =       pgf90
-F77             =       $(FC)
+FFC             =       $(FC)
 SFC             =       $(FC)
 CC              =       gcc
 CC_TOOLS        =       gcc
@@ -180,7 +180,7 @@ externals : $(WRFIO) esmf_time
 #
 DMPARALLEL      =       1
 FC              =       mpif90
-F77             =       pgf77
+FFC             =       pgFFC
 SFC             =       pgf90
 LD              =       $(FC)
 CC              =       mpicc
@@ -230,49 +230,10 @@ lib_rsl :
 	( cd ../external/RSL/RSL ; make CC="$(CC)" FC="$(FC) -byteswapio" MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) LEARN_BCAST=-DLEARN_BCAST linux )
 
 ###########################################################
-#ARCH Intel xeon i686 ia32 Xeon Linux, ifort compiler (single-threaded, no nesting)
-#
-FC              =       ifort
-F77             =       $(FC)
-CC              =       icc
-CC_TOOLS        =       gcc
-SFC             =       $(FC)
-LD              =       $(FC)
-TRADFLAG        =       -traditional
-FCOPTIM         =       -O3 -xW
-FCDEBUG         =       #-g
-FCTYPE          =       -r8
-FCFORM          =       -FR -cm -w
-FCHOST          =       
-FCBUFR          =       
-FCBASE          =       $(FCBUFR) -convert big_endian
-FC_FFT_RF       =       $(FCBUFR) -convert big_endian
-ARCHFLAGS3      =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE \
-                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO 
-EXTRAMODULES    =       
-
-LDFLAGS         =
-
-LOCAL_LIBRARIES =       -L/usr/local/ncarg/lib -L/usr/X11R6/lib -L/usr/local/lib \
-			-lncarg -lncarg_gks -lncarg_c -lX11
-
-CPP             =       /lib/cpp $(TRADFLAG)
-DM_1_CPP_FLAGS  =
-DM_2_CPP_FLAGS  =
-POUND_DEF       =       -DNO_RRTM_PHYSICS -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
-			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
-M4              =       m4 -B12000
-
-externals : $(WRFIO) esmf_time
-	( /bin/cp ../tools/gen_comms_warning ../tools/gen_comms.c ; \
-	cat ../external/RSL/gen_comms.c >> ../tools/gen_comms.c ; \
-	/bin/cp module_dm_warning module_dm.F ; cat module_dm_stubs.F >> module_dm.F )
-
-###########################################################
 #ARCH Settings for PC Linux i486 i586 i686, g95 compiler  (Single-threaded)
 #
 FC              =       g95
-F77             =       $(FC)
+FFC             =       $(FC)
 CC              =       gcc
 CC_TOOLS        =       gcc
 LD              =       $(FC)
@@ -311,7 +272,7 @@ externals : $(WRFIO) esmf_time
 #
 DMPARALLEL      =       1
 FC              =       mpif90
-F77             =       g95
+FFC             =       g95
 SFC             =       g95
 LD              =       $(FC)
 CC              =       mpicc
@@ -360,10 +321,49 @@ lib_rsl :
 	( cd ../external/RSL/RSL ; make CC="$(CC)" FC="$(FC)" MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) LEARN_BCAST=-DLEARN_BCAST linux )
 
 ###########################################################
+#ARCH Intel xeon i686 ia32 Xeon Linux, ifort compiler (single-threaded, no nesting)
+#
+FC              =       ifort
+FFC             =       $(FC)
+CC              =       icc
+CC_TOOLS        =       gcc
+SFC             =       $(FC)
+LD              =       $(FC)
+TRADFLAG        =       -traditional
+FCOPTIM         =       -O3 -xW
+FCDEBUG         =       #-g
+FCTYPE          =       -r8
+FCFORM          =       -FR -cm -w
+FCHOST          =       
+FCBUFR          =       
+FCBASE          =       $(FCBUFR) -convert big_endian
+FC_FFT_RF       =       $(FCBUFR) -convert big_endian
+ARCHFLAGS3      =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE \
+                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO 
+EXTRAMODULES    =       
+
+LDFLAGS         =
+
+LOCAL_LIBRARIES =       -L/usr/local/ncarg/lib -L/usr/X11R6/lib -L/usr/local/lib \
+			-lncarg -lncarg_gks -lncarg_c -lX11
+
+CPP             =       /lib/cpp $(TRADFLAG)
+DM_1_CPP_FLAGS  =
+DM_2_CPP_FLAGS  =
+POUND_DEF       =       -DNO_RRTM_PHYSICS -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
+			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+M4              =       m4 -B12000
+
+externals : $(WRFIO) esmf_time
+	( /bin/cp ../tools/gen_comms_warning ../tools/gen_comms.c ; \
+	cat ../external/RSL/gen_comms.c >> ../tools/gen_comms.c ; \
+	/bin/cp module_dm_warning module_dm.F ; cat module_dm_stubs.F >> module_dm.F )
+
+###########################################################
 #ARCH Settings for PC Linux x86_64, PGI compiler  (Single-threaded)
 #
 FC              =       pgf90
-F77             =       pgf77
+FFC             =       pgFFC
 CC              =       gcc
 CC_TOOLS        =       gcc
 LD              =       $(FC)
@@ -403,7 +403,7 @@ externals : $(WRFIO) esmf_time
 #
 DMPARALLEL      =       1
 FC              =       mpif90
-F77             =       pgf77
+FFC             =       pgFFC
 SFC             =       pgf90
 LD              =       $(FC)
 CC              =       mpicc
@@ -456,7 +456,7 @@ lib_rsl :
 #ARCH Settings for PC Linux x86_64, Pathscale compiler  (Single-threaded)
 #
 FC              =       pathf90
-F77             =       $(FC)
+FFC             =       $(FC)
 CC              =       gcc
 CC_TOOLS        =       gcc
 LD              =       $(FC)
@@ -496,7 +496,7 @@ externals : $(WRFIO) esmf_time
 #
 DMPARALLEL      =       1
 FC              =       mpif90
-F77             =       pathf90
+FFC             =       pathf90
 SFC             =       pathf90
 LD              =       $(FC)
 CC              =       mpicc
@@ -552,7 +552,7 @@ lib_rsl :
 OMP             =
 OMPCPP          =
 FC              =       f90
-F77             =       $(FC)
+FFC             =       $(FC)
 LD              =       $(FC)
 CC              =       cc
 CC_TOOLS        =       cc
@@ -599,7 +599,7 @@ OMP             =
 OMPCPP          =
 LIBINCLUDE	=	/tea2/huangwei/mpich-1.2.4/include
 FC              =       mpif90
-F77             =       $(FC)
+FFC             =       $(FC)
 LD              =       $(FC)
 CC              =       mpicc
 CC_TOOLS        =       cc
@@ -656,7 +656,7 @@ lib_rsl :
 OMP             =
 OMPCPP          =
 FC              =       f90
-F77             =       $(FC)
+FFC             =       $(FC)
 LD              =       $(FC)
 CC              =       cc
 CC_TOOLS        =       cc
@@ -704,7 +704,7 @@ externals : wrfio_int wrfio_grib1
 #ARCH   AIX             (single-threaded, no nesting)
 #
 FC              =       xlf90_r
-F77             =       xlf_r
+FFC             =       xlf_r
 LD              =       $(FC)
 CC              =       cc_r
 CC_TOOLS        =       cc
@@ -742,7 +742,7 @@ externals : $(WRFIO) esmf_time
 #
 DMPARALLEL      =       1
 FC              =       mpxlf90_r
-F77             =       mpxlf_r
+FFC             =       mpxlf_r
 SFC             =       xlf90_r
 LD              =       $(FC)
 CC              =       mpcc_r
@@ -799,7 +799,7 @@ DMPARALLEL      =       1
 SFC             =       ftn
 SCC             =       cc
 FC              =       ftn
-F77             =       $(FC)
+FFC             =       $(FC)
 LD              =       ftn
 CC              =       cc
 # Do not use cross-compiler for tools
@@ -856,7 +856,7 @@ lib_rsl :
 #ARCH Darwin		(xlf single-threaded, no nesting, for G5)
 #
 FC              =       xlf90_r
-F77             =       xlf_r
+FFC             =       xlf_r
 LD              =       xlf90_r
 CC              =       cc
 CC_TOOLS        =       cc
@@ -891,7 +891,7 @@ externals : $(WRFIO) esmf_time
 #ARCH Darwin		(xlf single-threaded, no nesting, for G4)
 #
 FC              =       xlf90_r
-F77             =       xlf_r
+FFC             =       xlf_r
 LD              =       xlf90_r
 CC              =       cc
 CC_TOOLS        =       cc
@@ -927,7 +927,7 @@ externals : $(WRFIO) esmf_time
 #ARCH Darwin		(g95 single-threaded, no nesting, for G4/G5)
 #
 FC              =       g95
-F77             =       g95
+FFC             =       g95
 LD              =       g95
 CC              =       cc
 CC_TOOLS        =       cc
@@ -964,7 +964,7 @@ externals : $(WRFIO) esmf_time
 #
 DMPARALLEL      =       1
 FC              =       mpif90
-F77             =       $(FC)
+FFC             =       $(FC)
 SFC             =       g95
 LD              =       $(FC)
 CC              =       mpicc
