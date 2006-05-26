@@ -1,5 +1,4 @@
 #!/bin/bash
-set -x
 export FULL=${FULL:-false}
 
 # Need a cleaner mapping between compiler and configure options.
@@ -7,7 +6,7 @@ export FULL=${FULL:-false}
 
 export ID=${ID:-daily}
 export REGIONS=${REGIONS:-kma_t63}
-
+export TARGETS=${TARGETS:-wrfvar wrfplus be}
 ###########
 # Compiling
 ###########
@@ -19,27 +18,18 @@ for COMPILER in $COMPILERS; do
 
   . ~/setup_$COMPILER
 
-  cd ~bray/${ID}_mpi_$COMPILER/wrfvar
-  if $FULL; then ./clean -a >/dev/null 2>&1; fi
-  cvs -q update >/dev/null 2>&1
-  echo $OPTION | ./configure wrfvar >/dev/null 2>&1
-  ./compile wrfvar > compile.out 2>&1
-  echo $OPTION | ./configure_new wrfvar >/dev/null 2>&1
-  cd build
-  ./setup.bsh
-  if $FULL; then make clean; fi
-  make -r wrfvar > compile.out 2>&1
-
-  cd ~bray/${ID}_mpi_$COMPILER/wrfplus
-  if $FULL; then ./clean -a >/dev/null 2>&1; fi
-  cvs -q update >/dev/null 2>&1
-  echo $OPTION | ./configure wrfplus >/dev/null 2>&1
-  ./compile wrfplus > compile.out 2>&1
-  echo $OPTION | ./configure_new wrfplus >/dev/null 2>&1
-  cd build
-  ./setup.bsh
-  if $FULL; then make clean; fi
-  make -r wrfplus > compile.out 2>&1
+  for TARGET in $TARGETS; do
+    cd ~bray/${ID}_mpi_$COMPILER/$TARGET
+    if $FULL; then ./clean -a >/dev/null 2>&1; fi
+    cvs -q update >/dev/null 2>&1
+    echo $OPTION | ./configure $TARGET >/dev/null 2>&1
+    ./compile wrfvar > compile.out 2>&1
+    echo $OPTION | ./configure_new $TARGET >/dev/null 2>&1
+    cd build
+    ./setup.bsh
+    if $FULL; then make clean; fi
+    make -r $TARGET > compile.out 2>&1
+  done
 
   cd ~bray/data/$REGION
 
