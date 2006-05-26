@@ -1,5 +1,3 @@
-! $Id$
-!
 ! Earth System Modeling Framework
 ! Copyright 2002-2003, University Corporation for Atmospheric Research,
 ! Massachusetts Institute of Technology, Geophysical Fluid Dynamics
@@ -130,11 +128,6 @@
       public ESMF_ClockValidate
       public ESMF_ClockPrint
 !EOPI
-
-!------------------------------------------------------------------------------
-! The following line turns the CVS identifier string into a printable variable.
-      character(*), parameter, private :: version = &
-      '$Id$'
 
 !==============================================================================
 

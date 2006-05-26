@@ -1,5 +1,3 @@
-! $Id$
-!
 ! Earth System Modeling Framework
 ! Copyright 2002-2003, University Corporation for Atmospheric Research,
 ! Massachusetts Institute of Technology, Geophysical Fluid Dynamics
@@ -54,11 +52,6 @@
 
 ! !PUBLIC MEMBER FUNCTIONS:
       public ESMF_AlarmCreate
-
-!------------------------------------------------------------------------------
-! The following line turns the CVS identifier string into a printable variable.
-      character(*), parameter, private :: version = &
-      '$Id$'
 
 !==============================================================================
 
