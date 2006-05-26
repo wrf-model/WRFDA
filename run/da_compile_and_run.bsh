@@ -1,0 +1,49 @@
+#!/bin/bash
+
+export FULL=${FULL:-false}
+export COMPILERS=${COMPILERS:-pgi}
+export ID=${ID:-daily}
+export REGIONS=${REGIONS:-kma_t63}
+
+###########
+# Compiling
+###########
+
+for COMPILER in $COMPILERS; do
+
+  . ~/setup_$COMPILER
+
+  cd ~bray/${ID}_mpi_$COMPILER/wrfvar
+  if $FULL; then ./clean -a >/dev/null 2>&1; fi
+  cvs -q update >/dev/null 2>&1
+  echo 1 | ./configure wrfvar >/dev/null 2>&1
+  ./compile wrfvar > compile.out 2>&1
+  echo 1 | ./configure_new wrfvar >/dev/null 2>&1
+  cd build
+  ./setup.bsh
+  if $FULL; then make clean; fi
+  make -r wrfvar > compile.out 2>&1
+
+  cd ~bray/${ID}_mpi_$COMPILER/wrfplus
+  if $FULL; then ./clean -a >/dev/null 2>&1; fi
+  cvs -q update >/dev/null 2>&1
+  echo 2 | ./configure wrfplus >/dev/null 2>&1
+  ./compile wrfplus > compile.out 2>&1
+  echo 2 | ./configure_new wrfplus >/dev/null 2>&1
+  cd build
+  ./setup.bsh
+  if $FULL; then make clean; fi
+  make -r wrfplus > compile.out 2>&1
+
+  cd ~bray/data/$REGION
+
+  export BUILD=${ID}_mpi_$COMPILER
+  #export DA_BUILD_TYPE=old
+  #./test.bsh > ${ID}_mpi_$COMPILER_old.out 2>&1
+  export DA_BUILD_TYPE=new
+  ./test.bsh > ${ID}_mpi_$COMPILER_new.out 2>&1
+
+done
+
+
+
