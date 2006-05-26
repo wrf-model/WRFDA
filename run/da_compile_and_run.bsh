@@ -1,7 +1,10 @@
 #!/bin/bash
-
+set -x
 export FULL=${FULL:-false}
-export COMPILERS=${COMPILERS:-pgi}
+
+# Need a cleaner mapping between compiler and configure options.
+# Assuming option 2 is pgi mpi is a hack
+
 export ID=${ID:-daily}
 export REGIONS=${REGIONS:-kma_t63}
 
@@ -9,16 +12,19 @@ export REGIONS=${REGIONS:-kma_t63}
 # Compiling
 ###########
 
+let COUNT=1
+
 for COMPILER in $COMPILERS; do
+  OPTION=${OPTIONS[$COUNT]}
 
   . ~/setup_$COMPILER
 
   cd ~bray/${ID}_mpi_$COMPILER/wrfvar
   if $FULL; then ./clean -a >/dev/null 2>&1; fi
   cvs -q update >/dev/null 2>&1
-  echo 1 | ./configure wrfvar >/dev/null 2>&1
+  echo $OPTION | ./configure wrfvar >/dev/null 2>&1
   ./compile wrfvar > compile.out 2>&1
-  echo 1 | ./configure_new wrfvar >/dev/null 2>&1
+  echo $OPTION | ./configure_new wrfvar >/dev/null 2>&1
   cd build
   ./setup.bsh
   if $FULL; then make clean; fi
@@ -27,9 +33,9 @@ for COMPILER in $COMPILERS; do
   cd ~bray/${ID}_mpi_$COMPILER/wrfplus
   if $FULL; then ./clean -a >/dev/null 2>&1; fi
   cvs -q update >/dev/null 2>&1
-  echo 2 | ./configure wrfplus >/dev/null 2>&1
+  echo $OPTION | ./configure wrfplus >/dev/null 2>&1
   ./compile wrfplus > compile.out 2>&1
-  echo 2 | ./configure_new wrfplus >/dev/null 2>&1
+  echo $OPTION | ./configure_new wrfplus >/dev/null 2>&1
   cd build
   ./setup.bsh
   if $FULL; then make clean; fi
@@ -42,6 +48,8 @@ for COMPILER in $COMPILERS; do
   #./test.bsh > ${ID}_mpi_$COMPILER_old.out 2>&1
   export DA_BUILD_TYPE=new
   ./test.bsh > ${ID}_mpi_$COMPILER_new.out 2>&1
+
+  let COUNT=$COUNT+1
 
 done
 
