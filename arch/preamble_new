@@ -40,7 +40,7 @@ FPPFLAGS1   = CONFIGURE_NETCDF_FLAG CONFIGURE_RTTOV_FLAG $(WORDSIZE_DEF) \
               -DLIMIT_ARGS -DWRFPLUS_TESTING -DPROMOTE_FLOAT
 WRFIO       = CONFIGURE_WRFIO_NF wrfio_int wrfio_grib1
 INCS        = -I. -I./inc CONFIGURE_RTTOV_INC
-INC_PATH    = $(DEVTOP)/inc
+INC         = $(DEVTOP)/inc
 
 # switch to use separately installed ESMF library for coupling:  1==true
 ESMF_COUPLING       = CONFIGURE_ESMF_COUPLING

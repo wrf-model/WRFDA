@@ -53,7 +53,7 @@ MPI_LIB		=	-L$(RSL_PATH)/RSL -lrsl
 arch : $(RSL_PATH)/module_dm.F $(RSL_PATH)/gen_comms.c
 	$(LN) $(RSL_PATH)/module_dm.F .
 	$(LN) $(RSL_PATH)/gen_comms.c .
-	( cd $(RSL_PATH)/RSL ; 
+	( cd $(RSL_PATH)/RSL ; \
           $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
             $(FCENDIAN)" MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
             LEARN_BCAST=-DLEARN_BCAST linux )
@@ -262,7 +262,7 @@ MPI_LIB		=	-L$(RSL_PATH)/RSL -lrsl
 arch : $(RSL_PATH)/module_dm.F $(RSL_PATH)/gen_comms.c
 	$(LN) $(RSL_PATH)/module_dm.F .
 	$(LN) $(RSL_PATH)/gen_comms.c .
-	( cd $(RSL_PATH)/RSL ; 
+	( cd $(RSL_PATH)/RSL ; \
           $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
             $(FCENDIAN)" MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
             LEARN_BCAST=-DLEARN_BCAST linux )
