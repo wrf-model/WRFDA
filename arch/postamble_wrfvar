@@ -13,7 +13,7 @@ INCLUDE_MODULES =       -I$(DA_VAR) -I$(DA_SRC) \
 MODULE_DIRS = $(INCLUDE_MODULES)
 
 CPPFLAGS        =       $(TRADFLAG) $(LIBINCLUDE) -C -P $(ARCHFLAGS) $(ENVCOMPDEFS) \
-			$(DM_1_CPP_FLAGS) $(COREDEFS) $(VAR4DPOSS)
+			$(DM_CPP_FLAGS) $(COREDEFS) $(VAR4DPOSS)
 
 INC_MOD_WRFVAR   =       -I../../$(NETCDF_IO_PATH) \
 			-I$(DA_VAR) -I$(DA_SRC) \
@@ -35,14 +35,12 @@ wrfio_nf :
 
 wrfio_int : 
 	( cd ../external/io_int ; \
-        make CC="$(CC)" CPP="$(CPP) $(CPPFLAGS)" \
-	RANLIB="$(RANLIB)" \
-	FC="$(FC)" FCFLAGS="$(FCDEBUG) $(FCFREE) $(FCBASE)" all )
+        make CPP="$(CPP) $(CPPFLAGS)" RANLIB="$(RANLIB)" \
+	CC="$(CC)" FC="$(FC)" FCFLAGS="$(FCDEBUG) $(FCFREE) $(FCBASE)" all )
 
 wrfio_grib1 :
 	( cd ../external/io_grib1 ; \
-        make CPP="$(CPP) CPPFLAGS="$(CPPFLAGS)"\
-	RANLIB="$(RANLIB)" \
+        make CPP="$(CPP)" CPPFLAGS="$(CPPFLAGS)" RANLIB="$(RANLIB)" \
 	CC="$(CC)" CFLAGS="$(CFLAGS)" \
 	FC="$(FC)" FCFLAGS="$(FCDEBUG) $(LIBINCLUDE) $(FCFREE) $(FCBASE)" )
 
