@@ -1093,7 +1093,7 @@ BLAS.o:	         \
 			BLAS/xerbla.inc \
 			BLAS/BLAS.F
 			$(CPP) -I./BLAS $(CPPFLAGS_WRFVAR) BLAS/BLAS.F > BLAS.f
-			$(FFC) -c -I./BLAS $(FIXEDLAGS_WRFVAR) $(MODULE_DIRS) BLAS.f
+			$(FFC) -c -I./BLAS $(FIXEDFLAGS_WRFVAR) $(MODULE_DIRS) BLAS.f
 
 DA_Test.o:	\
 			DA_Constants.o \

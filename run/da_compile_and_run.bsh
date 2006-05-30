@@ -24,7 +24,7 @@ for COMPILER in $COMPILERS; do
     if $FULL; then ./clean -a >/dev/null 2>&1; fi
     cvs -q update >/dev/null 2>&1
     echo $OPTION | ./configure $TARGET >/dev/null 2>&1
-    ./compile wrfvar > compile.out 2>&1
+    ./compile $TARGET > compile.out 2>&1
     echo $OPTION | ./configure_new $TARGET >/dev/null 2>&1
     cd build
     ./setup.bsh
