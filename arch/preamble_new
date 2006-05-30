@@ -90,7 +90,6 @@ CONFIG_BUF_LEN	=	8192
 
 SED_FTN         = sed -f standard.sed
 FCHOST          =
-CPPTRADFLAG     =
 OMP             =
 OMPCPP          =
 RSL_PATH        =            

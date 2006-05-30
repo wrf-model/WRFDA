@@ -29,7 +29,8 @@ RTTOV_LIB   = CONFIGURE_RTTOV_LIB
 ENVCOMPDEFS = CONFIGURE_COMPILEFLAGS
 DA_CORE     = CONFIGURE_DA_CORE
 EM_CORE     = CONFIGURE_EM_CORE
-ARCHFLAGS1  = CONFIGURE_NETCDF_FLAG CONFIGURE_RTTOV_FLAG
+FPPFLAGS1   = CONFIGURE_NETCDF_FLAG CONFIGURE_RTTOV_FLAG \
+                $(WORDSIZE_DEF) -DLIMIT_ARGS -DWRFPLUS_TESTING -DPROMOTE_FLOAT
 WRFIO       = CONFIGURE_WRFIO_NF wrfio_int wrfio_grib1
 REGISTRY    = CONFIGURE_REGISTRY
 # switch to use separately installed ESMF library for coupling:  1==true
@@ -72,8 +73,6 @@ IOAPI_SHARE   = $(EXTERNAL)/ioapi_share
 NETCDF_LIB = -L$(EXTERNAL)/io_netcdf -lwrfio_nf -L$(NETCDFPATH)/lib -lnetcdf
 PHDF5_LIB  = -L\$(EXTERNAL)/io_phdf5 -lwrfio_phdf5 -L$(PHDF5PATH)/lib -lhdf5_fortran -lhdf5 -lm -lz -L$(PHDF5PATH)/lib -lsz
 LIBINCLUDE = -I. -I$(INC) -I$(IOAPI_SHARE)
-
-ARCHFLAGS2      = $(WORDSIZE_DEF) -DLIMIT_ARGS -DWRFPLUS_TESTING -DPROMOTE_FLOAT
 
 #### Get core settings from environment (set in compile script)
 #### Note to add a core, this has to be added to.

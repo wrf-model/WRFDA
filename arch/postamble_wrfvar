@@ -1,58 +1,56 @@
 #
-ARCHFLAGS       =       $(ARCHFLAGS1) $(ARCHFLAGS2) $(ARCHFLAGS3) -I$(NETCDFPATH)/include 
+ARCHFLAGS       =       $(FPPFLAGS1) $(FPPFLAGS2) -I$(NETCDFPATH)/include 
 REGFLAGS        =       $(ARCHFLAGS)
-CFLAGS          =       $(ARCHFLAGS) $(ARCHFLAGS4)
+CFLAGS          =       $(CCFLAGS1) $(CCFLAGS2)
 LIB		=	$(NETCDF_LIB) $(RTTOV_LIB) $(MPI_LIB) $(LOCAL_LIB) $(WRF_LIB) $(EXTRA_LIBS)
 EXTRAMODULES    =
-FCBASEOPTS      =       $(FCTYPE) $(FCBASE) $(FCFORM) $(FCHOST) $(FCDEBUG) -I.
-FC_FFT_RF_OPTS  =       $(FCTYPE) $(FC_FFT_RF) $(FCFORM) $(FCHOST) $(FCDEBUG) -I.
+FCBASEOPTS      =       $(FCTYPE) $(FCBASE) $(FCFREE) $(FCHOST) $(FCDEBUG) $(FCENDIAN) -I.
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS) $(OMP)
-FIXEDFLAGS_ENDIAN =     $(FCTYPE)
 INCLUDE_MODULES =       -I$(DA_VAR) -I$(DA_SRC) \
 			-I../external/io_netcdf -I../external/io_int \
                         -I../external/esmf_time_f90 \
                         -I../frame -I../share -I../phys -I../inc
 MODULE_DIRS = $(INCLUDE_MODULES)
 
-CPPFLAGS        =       $(LIBINCLUDE) -C -P $(ARCHFLAGS) $(ENVCOMPDEFS) \
-			$(DM_1_CPP_FLAGS) $(COREDEFS) $(POUND_DEF) $(VAR4DPOSS)
+CPPFLAGS        =       $(TRADFLAG) $(LIBINCLUDE) -C -P $(ARCHFLAGS) $(ENVCOMPDEFS) \
+			$(DM_1_CPP_FLAGS) $(COREDEFS) $(VAR4DPOSS)
 
 INC_MOD_WRFVAR   =       -I../../$(NETCDF_IO_PATH) \
 			-I$(DA_VAR) -I$(DA_SRC) \
                         -I../../external/io_int \
                         -I../../external/esmf_time_f90 \
                         -I../../frame -I../../share -I../../inc
-FCFLAGS_FFT_RF    =     $(FCOPTIM) $(FC_FFT_RF_OPTS)
-FIXEDFLAGS_BUFR   =     $(FCTYPE) $(FCBUFR) $(FCHOST) $(FCDEBUG) -I.
-FIXEDFLAGS_WRFVAR =     $(FCTYPE) $(FCBASE) $(FCHOST) $(FCDEBUG) -I.
-CPPFLAGS_WRFVAR  =      $(DM_2_CPP_FLAGS) \
-                        $(LIBINCLUDE) -C -P $(ARCHFLAGS) $(POUND_DEF) $(VAR4DPOSS)
-FUFLAGS         =       $(FCOPTIM) $(FCBASE) $(FCFORM) $(FCDEBUG)
+FIXEDFLAGS_ENDIAN =     $(FCTYPE)
+FIXEDFLAGS_BUFR   =     $(FCTYPE) $(FCBASE) $(FCHOST) $(FCDEBUG) -I.
+FIXEDFLAGS_WRFVAR =     $(FCTYPE) $(FCBASE) $(FCHOST) $(FCDEBUG) $(FCENDIAN) -I.
+CPPFLAGS_WRFVAR   =     $(DM_2_CPP_FLAGS) \
+                        $(LIBINCLUDE) -C -P $(ARCHFLAGS) $(VAR4DPOSS)
+FUFLAGS           =     $(FCOPTIM) $(FCBASE) $(FCFREE) $(FCDEBUG)
 
 wrfio_nf : 
 	( cd ../external/io_netcdf ; \
-        make NETCDFPATH=$(NETCDFPATH) CPP="$(CPP)" \
+        make NETCDFPATH=$(NETCDFPATH) CPP="$(CPP)" CPPFLAGS="$(CPPFLAGS)" \
 	RANLIB="$(RANLIB)" \
-	FC="$(FC)" FCFLAGS="$(FCDEBUG) $(FCFORM) $(FCBASE) -w" TRADFLAG="$(TRADFLAG)" )
+	FC="$(FC)" FCFLAGS="$(FCDEBUG) $(FCFREE) $(FCBASE) -w" TRADFLAG="$(TRADFLAG)" )
 
 wrfio_int : 
 	( cd ../external/io_int ; \
-        make CC="$(CC)" CPP="$(CPP)" \
+        make CC="$(CC)" CPP="$(CPP) $(CPPFLAGS)" \
 	RANLIB="$(RANLIB)" \
-	FC="$(FC)" FCFLAGS="$(FCDEBUG) $(FCFORM) $(FCBASE)" all )
+	FC="$(FC)" FCFLAGS="$(FCDEBUG) $(FCFREE) $(FCBASE)" all )
 
 wrfio_grib1 :
 	( cd ../external/io_grib1 ; \
-        make CPP="$(CPP)" CPPFLAGS="$(CPPFLAGS)"\
+        make CPP="$(CPP) CPPFLAGS="$(CPPFLAGS)"\
 	RANLIB="$(RANLIB)" \
 	CC="$(CC)" CFLAGS="$(CFLAGS)" \
-	FC="$(FC)" FCFLAGS="$(FCDEBUG) $(LIBINCLUDE) $(FCFORM) $(FCBASE)" )
+	FC="$(FC)" FCFLAGS="$(FCDEBUG) $(LIBINCLUDE) $(FCFREE) $(FCBASE)" )
 
 esmf_time : 
 	( cd ../external/esmf_time_f90 ; \
 	make FC="$(FC) $(FCFLAGS)" \
 	RANLIB="$(RANLIB)" \
-	CPP="$(CPP) -I../../inc -I. $(POUND_DEF)" )
+	CPP="$(CPP) $(CPPFLAGS) -I../../inc -I. $(ARCHFLAGS)" )
 
 # compile these without high optimization to speed compile
 

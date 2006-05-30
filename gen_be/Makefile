@@ -68,7 +68,7 @@ gen_be_diags_read : gen_be_diags_read.o
 
 gen_be_stage0_wrf.o: 
 	$(RM) $@
-	$(FC) -c ${FCFORM} $(FCBASE) ${FCTYPE} ${MODULE_DIRS} -I${NETCDF}/include gen_be_stage0_wrf.F
+	$(FC) -c ${FCFREE} $(FCBASE) ${FCTYPE} ${MODULE_DIRS} -I${NETCDF}/include gen_be_stage0_wrf.F
 
 clean: 
 	@ echo 'use the clean script'
