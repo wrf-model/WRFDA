@@ -32,17 +32,26 @@ for COMPILER in $COMPILERS; do
     make -r $TARGET > compile.out 2>&1
   done
 
-  cd ~bray/data/$REGION
+  for REGION in $REGIONS; do
 
-  echo "Testing $ID/$TARGET with $COMPILER on $REGION"
+    cd ~bray/data/$REGION
 
-  export BUILD=${ID}_mpi_$COMPILER
-  #export DA_BUILD_TYPE=old
-  #./test.bsh > ${ID}_mpi_$COMPILER_old.out 2>&1
-  export DA_BUILD_TYPE=new
-  ./test.bsh > ${ID}_mpi_$COMPILER_new.out 2>&1
+    echo "Testing $ID/$TARGET with $COMPILER on $REGION"
 
-  let COUNT=$COUNT+1
+    export BUILD=${ID}_mpi_$COMPILER
+    if test $TARGET = be; then
+      #export DA_BUILD_TYPE=old
+      ./gen_be.bsh > ${ID}_mpi_$COMPILER_old.out 2>&1
+      export DA_BUILD_TYPE=new
+      ./gen_be.bsh > ${ID}_mpi_$COMPILER_new.out 2>&1
+    else
+      #export DA_BUILD_TYPE=old
+      #./test.bsh > ${ID}_mpi_$COMPILER_old.out 2>&1
+      export DA_BUILD_TYPE=new
+      ./test.bsh > ${ID}_mpi_$COMPILER_new.out 2>&1
+    fi
+    let COUNT=$COUNT+1
+  done
 
 done
 

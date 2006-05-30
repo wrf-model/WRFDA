@@ -13,6 +13,8 @@ for DIR in dyn_$SOLVER main share frame phys convertor tools \
 #  echo include $DIR.make >> Makefile1
 done
 
+cp -r ../external/RSL .
+
 ln -fs ../inc/version_decl .
 
 ln -fs ../da_3dvar/src/da_bufrlib/bufrlib.PRM .

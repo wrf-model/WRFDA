@@ -33,7 +33,7 @@ clean :
 	@ $(RM) *.exe *.o *.mod *.b *.a *.f inc/*.inc frame/*.F registry \
           Registry_tmp* module_state_description.F \
           '*.F90' '*.F' '*.f' '*.inc' '*.int' '*.c' '*.h' '*.make' '*.m4' \
-          '*.code' '*.sed'
+          '*.code' '*.sed' RSL/RSL/*.a RSL/RSL/*.o
 
 superclean : clean
 	@ $(RM) *.F90 *.F *.f *.inc *.int *.c *.h *.m4 *.code \
