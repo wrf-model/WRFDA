@@ -65,7 +65,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#if !(defined(vpp) || defined(vpp2) || defined(SUN) || defined(crayx1) || defined(MACOS))
 #include <malloc.h>
+#endif
 #ifdef T3D
 #include <errno.h>
 #endif
