@@ -586,7 +586,7 @@ LOCAL_LIBRARIES = -L/usr/local/ncarg/lib -L/usr/local/lib \
 externals : $(WRFIO) esmf_time lib_rsl
 	( /bin/cp ../tools/gen_comms_warning ../tools/gen_comms.c ; \
           cat $(RSL_PATH)/gen_comms.c >> ../tools/gen_comms.c ;  \
-          /bin/cp module_dm_warning module_dm.F ; 
+          /bin/cp module_dm_warning module_dm.F ; \
           cat $(RSL_PATH)/module_dm.F >> module_dm.F )
 
 lib_rsl :
