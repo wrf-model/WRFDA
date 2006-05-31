@@ -1000,6 +1000,7 @@ externals : $(WRFIO) esmf_time
 ###########################################################
 #ARCH Darwin           (g95 parallel for G4/G5 (RSL, MPICH, RSL IO)
 #
+CPP             = /usr/bin/cpp  -C -P -xassembler-with-cpp
 FC              = mpif90
 FFC             = $(FC)
 SFC             = g95
@@ -1042,7 +1043,7 @@ externals : $(WRFIO) esmf_time lib_rsl
           cat $(RSL_PATH)/module_dm.F >> module_dm.F )
 
 lib_rsl :
-	( cd $(RSL_PATH)/RSL ; 
+	( cd $(RSL_PATH)/RSL ; \
           make  CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) 
             LEARN_BCAST=-DLEARN_BCAST linux )
