@@ -8,13 +8,15 @@ SHELL           =       /bin/sh
 
 #Macros, these should be generic for all machines
 
-LN      =       ln -sf
-MAKE    =       make -i -r
-RM      =       /bin/rm -f
-MV      =       /bin/mv -f
-CP      =       /bin/cp -f
-AR      =       ar ru
-M4      =       m4 -B12000
+LN      = ln -sf
+MAKE    = make -i -r
+RM      = /bin/rm -f
+MV      = /bin/mv -f
+CP      = /bin/cp -f
+AR      = ar ru
+M4      = m4 -B12000
+RANLIB	= ranlib
+CPP     = /lib/cpp
 
 .SUFFIXES: .F .i .o .f .c
 
