@@ -26,8 +26,12 @@ export WRFPLUS_DIR=${WRFPLUS_DIR:-$REL_DIR/wrfplus}
 export DA_BUILD_TYPE=${DA_BUILD_TYPE:-old}
 if test $DA_BUILD_TYPE = new; then
   export DA_BUILD_DIR=${DA_BUILD_DIR:-$DA_DIR/build}
+  export DA_INC_DIR=${DA_INC_DIR:-$DA_DIR/build/inc}
+  export WRFPLUS_INC_DIR=${WRFPLUS_INC_DIR:-$WRFPLUS_DIR/build/inc}
 else
   export DA_BUILD_DIR=${DA_BUILD_DIR:-$DA_DIR/main}
+  export DA_INC_DIR=${DA_INC_DIR:-$DA_DIR/inc}
+  export WRFPLUS_INC_DIR=${WRFPLUS_INC_DIR:-$WRFPLUS_DIR/inc}
 fi
 export DA_ID=${DA_ID:-wrfvar}
 export HOSTS=${HOSTS:-$PWD/hosts}
@@ -196,26 +200,26 @@ if test $NL_LVAR4D == .TRUE.; then
 
    export NL_DYN_OPT=2
    export NL_INPUT_OUTNAME='wrfvar_input_d<domain>_<date>'
-   . $WRFPLUS_BUILD_DIR/inc/namelist_script.inc
+   . $WRFPLUS_INC_DIR/namelist_script.inc
    mv namelist.input namelist.var4dnl
 
 
    export NL_DYN_OPT=202
    export NL_INPUT_OUTNAME='wrfvar_input_d<domain>_<date>'
    export NL_AUXINPUT3_INNAME='auxinput3_d<domain>_<date>'
-   . $WRFPLUS_BUILD_DIR/inc/namelist_script.inc
+   . $WRFPLUS_INC_DIR/namelist_script.inc
    mv namelist.input namelist.var4dad
 
 
    export NL_DYN_OPT=202
    export NL_INPUT_OUTNAME='tl<date>'
    export NL_AUXHIST3_OUTNAME='auxhist3_d<domain>_<date>'
-   . $WRFPLUS_BUILD_DIR/namelist_script.inc
+   . $WRFPLUS_INC_DIR/namelist_script.inc
    mv namelist.input namelist.var4dtl
    export NL_DYN_OPT=2
 fi
 
-. $DA_BUILD_DIR/namelist_script.inc
+. $DA_INC_DIR/namelist_script.inc
 
 
 
