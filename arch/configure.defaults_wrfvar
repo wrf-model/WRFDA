@@ -1015,6 +1015,7 @@ FPPFLAGS2       = -DINTIO -DWRF_RSL_IO -DRSL -DDM_PARALLEL \
 		    -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
 		    -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
                     -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+DM_CPP_FLAGS	= -I$(RSL_PATH)/RSL -C -P `cat $(INC)/dm_comm_cpp_flags`
 CPPFLAGS_BUFR   = -C -P
 
 FCOPTIM         = 
@@ -1046,7 +1047,7 @@ lib_rsl :
 	( cd $(RSL_PATH)/RSL ; \
           make  CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
-            LEARN_BCAST=-DLEARN_BCAST linux )
+            LEARN_BCAST=-DLEARN_BCAST darwin )
 
 
 ###########################################################
