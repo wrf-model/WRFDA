@@ -1,5 +1,7 @@
 #!/bin/bash
 export FULL=${FULL:-false}
+export COMPILE=${COMPILE:-true}
+export RUN=${RUN:-true}
 
 # Need a cleaner mapping between compiler and configure options.
 # Assuming option 2 is pgi mpi is a hack
@@ -7,52 +9,70 @@ export FULL=${FULL:-false}
 export ID=${ID:-trunk}
 export REGIONS=${REGIONS:-kma_t63}
 export TARGETS=${TARGETS:-wrfvar wrfplus be}
+export CONFIGS=${CONFIGS:-mpi}
+export NPROCS=${NPROCS:-1 4}
+
 ###########
 # Compiling
 ###########
 
 let COUNT=1
 
-for COMPILER in $COMPILERS; do
-  OPTION=${OPTIONS[$COUNT]}
+for CONFIG in $CONFIGS; do
 
-  . ~/setup_$COMPILER
+  if test $CONFIG = mpi && test $TARGET = be; then
+    echo "Skipping mpi be"
+  else
+    for COMPILER in $COMPILERS; do
+      if $COMPILE; then
+        OPTION=${OPTIONS[$COUNT]}
 
-  for TARGET in $TARGETS; do
-    echo "Compiling $ID/$TARGET with $COMPILER"
-    cd ~bray/${ID}_mpi_$COMPILER/$TARGET
-    if $FULL; then ./clean -a >/dev/null 2>&1; fi
-    cvs -q update >/dev/null 2>&1
-    echo $OPTION | ./configure $TARGET >/dev/null 2>&1
-    ./compile $TARGET > compile.out 2>&1
-    echo $OPTION | ./configure_new $TARGET >/dev/null 2>&1
-    cd build
-    ./setup.bsh
-    if $FULL; then make clean; fi
-    make -r $TARGET > compile.out 2>&1
-  done
+        . ~/setup_$COMPILER
 
-  for REGION in $REGIONS; do
+        for TARGET in $TARGETS; do
+          echo "Compiling $ID/$TARGET with $COMPILER"
+          cd ~bray/${ID}_$CONFIG_$COMPILER/$TARGET
+          if $FULL; then ./clean -a >/dev/null 2>&1; fi
+          cvs -q update >/dev/null 2>&1
+          echo $OPTION | ./configure $TARGET >/dev/null 2>&1
+          ./compile $TARGET > compile.out 2>&1
+          echo $OPTION | ./configure_new $TARGET >/dev/null 2>&1
+          cd build
+          ./setup.bsh
+          if $FULL; then make clean; fi
+          make -r $TARGET > compile.out 2>&1
+        done
+        let COUNT=$COUNT+1
+      fi
 
-    cd ~bray/data/$REGION
+      if $RUN; then
+        for REGION in $REGIONS; do
+          for NUM_PROCS in $NPROCS; do
+            if test $CONFIG = ser && test $NUM_PROCS != 1; then
+              echo "Skipping parallel runs of serial code"
+            else
+              cd ~bray/data/$REGION
 
-    echo "Testing $ID/$TARGET with $COMPILER on $REGION"
+              echo "Testing $ID/$TARGET with $COMPILER on $REGION"
 
-    export BUILD=${ID}_mpi_$COMPILER
-    if test $TARGET = be; then
-      #export DA_BUILD_TYPE=old
-      ./gen_be.bsh > ${ID}_mpi_$COMPILER_old.out 2>&1
-      export DA_BUILD_TYPE=new
-      ./gen_be.bsh > ${ID}_mpi_$COMPILER_new.out 2>&1
-    else
-      #export DA_BUILD_TYPE=old
-      #./test.bsh > ${ID}_mpi_$COMPILER_old.out 2>&1
-      export DA_BUILD_TYPE=new
-      ./test.bsh > ${ID}_mpi_$COMPILER_new.out 2>&1
-    fi
-    let COUNT=$COUNT+1
-  done
-
+              export BUILD=${ID}_mpi_$COMPILER
+              if test $TARGET = be; then
+                #export DA_BUILD_TYPE=old
+                ./gen_be.bsh > ${ID}_${CONFIG}_$COMPILER_old.out 2>&1
+                export DA_BUILD_TYPE=new
+                ./gen_be.bsh > ${ID}_${CONFIG}_$COMPILER_new.out 2>&1
+              else
+                #export DA_BUILD_TYPE=old
+                #./test.bsh > ${ID}_${CONFIG}_$COMPILER_old.out 2>&1
+                export DA_BUILD_TYPE=new
+                ./test.bsh > ${ID}_${CONFIG}_$COMPILER_new.out 2>&1
+              fi
+            fi
+          done
+        done
+      fi
+    done
+  fi
 done
 
 
