@@ -513,15 +513,14 @@ CC              = gcc
 CC_TOOLS        = gcc
 LD              = $(FC)
 
-TRADFLAG        = -traditional
-FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE \
-                    -DTRIEDNTRUE -DONLY_WRFMODEL_IO \
+TRADFLAG        = -traditional-cpp
+FPPFLAGS2       = -DTRIEDNTRUE -DONLY_WRFMODEL_IO \
                     -DLINUX -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
 		    -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
                     -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 CPPFLAGS_BUFR   = -C -P -DLINUX -Dlinux  -DPATHSCALE
 
-FCOPTIM         = -fastsse
+FCOPTIM         = 
 FCDEBUG         = #-g
 FCTYPE          = -r8
 FCFREE          = -freeform -fno-second-underscore
@@ -550,9 +549,8 @@ CC              = mpicc
 CC_TOOLS        = gcc
 LD              = $(FC)
 
-TRADFLAG        = -traditional
-FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE \
-                    -DINTIO -DWRF_RSL_IO -DRSL -DDM_PARALLEL \
+TRADFLAG        = -traditional-cpp
+FPPFLAGS2       = -DINTIO -DWRF_RSL_IO -DRSL -DDM_PARALLEL \
                     -DTRIEDNTRUE -DONLY_WRFMODEL_IO \
                     -DLINUX -DNO_RRTM_PHYSICS  \
 		    -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
@@ -562,14 +560,14 @@ DM_CPP_FLAGS    = -I$(RSL_PATH)/RSL -C -P `cat $(INC)/dm_comm_cpp_flags` \
 		    -DNO_RRTM_PHYSICS  -DPGF90
 CPPFLAGS_BUFR   = -C -P -DLINUX -Dlinux -DPATHSCALE
 
-FCOPTIM         = -fastsse
+FCOPTIM         =
 FCDEBUG         = #-g
 FCTYPE          = -r8
 FCFREE          = -freeform -fno-second-underscore
 FCHOST          =
 FCBASE          = 
 FCENDIAN        = -byteswapio
-FCFLAGS_RSL     = $(FCENDIAN)
+FCFLAGS_RSL     = $(FCENDIAN) -fno-second-underscore
 
 CCFLAGS2        = -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) \
                   -I$(RSL_PATH)/RSL
@@ -1025,7 +1023,7 @@ FCFREE          = -ffree-form -ffree-line-length-huge
 FCHOST          =
 FCBASE          = -cpp -Wno=101,139,155,158 -fno-second-underscore -ftrace=full
 FCENDIAN        =
-FCFLAGS_RSL     = $(FCENDIAN)
+FCFLAGS_RSL     = $(FCENDIAN) -fno-second-underscore
 
 CCFLAGS2        = -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) \
                     -I$(RSL_PATH)/RSL -DLANDREAD_STUB -DMACOS

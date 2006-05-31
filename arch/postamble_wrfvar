@@ -49,7 +49,7 @@ esmf_time :
 	( cd ../external/esmf_time_f90 ; \
 	make FC="$(FC) $(FCFLAGS)" \
 	RANLIB="$(RANLIB)" \
-	CPP="$(CPP) -I../../inc -I. $(ARCHFLAGS)" )
+	CPP="$(CPP) -I../../inc -I. $(ARCHFLAGS) $(TRADFLAG)" )
 
 # compile these without high optimization to speed compile
 

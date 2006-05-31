@@ -242,11 +242,9 @@ if test $PLATFORM == "Linux"; then
   fi
 fi
 
-cp $HOSTS hosts
-
 if test $PLATFORM == "Darwin"; then
   if test $NUM_PROCS -gt 1; then
-    mpirun -v -np $NUM_PROCS -machinefile hosts ./wrfvar.exe
+    mpirun -v -np $NUM_PROCS -machinefile $HOSTS ./wrfvar.exe
     ln -fs rsl.out.0000   wrfvar.out
     ln -fs rsl.error.0000 wrfvar.error
   else
