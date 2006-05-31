@@ -69,6 +69,14 @@ interp_domain_em.o: ../frame/module_domain.o \
 
 module_check.o: module_em_tl.o \
                 module_em_ad.o \
+                module_bc_em_ad.o \
+                module_bc_em_tl.o \
+                module_diffusion_em_ad.o \
+                module_diffusion_em_tl.o \
+                module_advect_em_ad.o \
+                module_advect_em_tl.o \
+                module_big_step_utilities_em_ad.o \
+                module_big_step_utilities_em_tl.o \
                 module_small_step_em_ad.o \
                 module_small_step_em_tl.o
 

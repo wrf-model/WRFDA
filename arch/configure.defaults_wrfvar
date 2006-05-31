@@ -261,7 +261,7 @@ CCFLAGS2        = -DMAXDOM_MAKE=$(MAX_DOMAINS) \
                   -DMAXPROC_MAKE=$(MAX_PROC) \
                   -I$(RSL_PATH)/RSL
 CCFLAGS_BUFR    = -DUNDERSCORE
-CCFLAGS_RSL     = $(FCENDIAN)
+CCFLAGS_RSL     = 
 
 LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)
 
@@ -824,7 +824,7 @@ externals :	$(WRFIO) esmf_time lib_rsl
 
 lib_rsl :
 	( cd $(RSL_PATH)/RSL ; \
-          make CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
+          make CC="mpcc $(CCFLAGS_RSL)" FC="mpxlf $(FCFLAGS_RSL)" \
           MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
           LEARN_BCAST=-DLEARN_BCAST sp2 )
 
@@ -865,7 +865,7 @@ FCFLAGS_RSL     = $(FCENDIAN)
 CCFLAGS2        = -UCRAY -I$(RSL_PATH)/RSL \
                     -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) \
 	  	  -h gen_private_callee
-CCFLAGS_RSL     = $(FCENDIAN)
+CCFLAGS_RSL     = 
 
 LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)
 
@@ -1045,7 +1045,7 @@ externals : $(WRFIO) esmf_time lib_rsl
 lib_rsl :
 	( cd $(RSL_PATH)/RSL ; \
           make  CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
-            MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) 
+            MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
             LEARN_BCAST=-DLEARN_BCAST linux )
 
 

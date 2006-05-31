@@ -931,7 +931,7 @@ DA_FFTs.o:		\
 			DA_FFTs/DA_Solve_PoissonEqn_FST_Adj.inc
 			$(RM) $@
 			$(CPP) -I./DA_FFTs $(CPPFLAGS_WRFVAR) DA_FFTs/DA_FFTs.F > DA_FFTs.f
-			$(FC) -c $(FCFLAGS_FFT_RF) $(MODULE_DIRS) DA_FFTs.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) DA_FFTs.f
 
 DA_Tools.o:		\
 			DA_Constants.o \
