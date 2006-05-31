@@ -1025,10 +1025,12 @@ FCFREE          = -ffree-form -ffree-line-length-huge
 FCHOST          =
 FCBASE          = -cpp -Wno=101,139,155,158 -fno-second-underscore -ftrace=full
 FCENDIAN        =
+FCFLAGS_RSL     = $(FCENDIAN)
 
 CCFLAGS2        = -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) \
                     -I$(RSL_PATH)/RSL -DLANDREAD_STUB -DMACOS
 CCFLAGS_BUFR    = -DUNDERSCORE
+CCFLAGS_RSL     = -DMACOS
 
 LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)  
    
