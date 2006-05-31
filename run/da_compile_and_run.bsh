@@ -30,8 +30,8 @@ for CONFIG in $CONFIGS; do
         . ~/setup_$COMPILER
 
         for TARGET in $TARGETS; do
-          echo "Compiling $ID/$TARGET with $COMPILER"
-          cd ~bray/${ID}_$CONFIG_$COMPILER/$TARGET
+          echo "Compiling ${ID}_${CONFIG}_${COMPILER}/$TARGET"
+          cd ~bray/${ID}_${CONFIG}_$COMPILER/$TARGET
           if $FULL; then ./clean -a >/dev/null 2>&1; fi
           cvs -q update >/dev/null 2>&1
           echo $OPTION | ./configure $TARGET >/dev/null 2>&1
