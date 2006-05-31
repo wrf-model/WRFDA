@@ -60,8 +60,8 @@ C
                I = I+2
                FI = FI+1.
                ARG = FI*ARGLD
-	       WA(I-1) = DCOS(ARG)
-	       WA(I) = DSIN(ARG)
+               WA(I-1) = DCOS(ARG)
+               WA(I) = DSIN(ARG)
   108       CONTINUE
             IS = IS+IDO
   109    CONTINUE

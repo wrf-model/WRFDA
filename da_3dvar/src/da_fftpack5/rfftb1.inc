@@ -30,13 +30,13 @@ C
       CH(1) = C(1,1)
       CH(N) = C(1,N)
       DO 118 J=2,NL,2
-	 CH(J) = HALF*C(1,J)
-	 CH(J+1) = HALFM*C(1,J+1)
+         CH(J) = HALF*C(1,J)
+         CH(J+1) = HALFM*C(1,J+1)
   118 CONTINUE
       GO TO 124
   120 DO 122 J=2,NL,2
-	 C(1,J) = HALF*C(1,J)
-	 C(1,J+1) = HALFM*C(1,J+1)
+         C(1,J) = HALF*C(1,J)
+         C(1,J+1) = HALFM*C(1,J+1)
   122 CONTINUE
   124 L1 = 1
       IW = 1
@@ -56,7 +56,7 @@ C
          GO TO 115
   103    IF (IP .NE. 2) GO TO 106
          IF (NA .NE. 0) GO TO 104
-	 CALL R1F2KB (IDO,L1,C,IN,CH,1,WA(IW))
+         CALL R1F2KB (IDO,L1,C,IN,CH,1,WA(IW))
          GO TO 105
   104    CALL R1F2KB (IDO,L1,CH,1,C,IN,WA(IW))
   105    NA = 1-NA
@@ -65,7 +65,7 @@ C
          IX2 = IW+IDO
          IF (NA .NE. 0) GO TO 107
 C rav    CALL RIF3KB (IDO,L1,C,IN,CH,1,WA(IW),WA(IX2))
-	 CALL R1F3KB (IDO,L1,C,IN,CH,1,WA(IW),WA(IX2))
+         CALL R1F3KB (IDO,L1,C,IN,CH,1,WA(IW),WA(IX2))
          GO TO 108
   107    CALL R1F3KB (IDO,L1,CH,1,C,IN,WA(IW),WA(IX2))
   108    NA = 1-NA
@@ -84,7 +84,7 @@ C rav    CALL RIF3KB (IDO,L1,C,IN,CH,1,WA(IW),WA(IX2))
          GO TO 115
   112    IF (NA .NE. 0) GO TO 113
 C rav    CALL RIFGKB (IDO,IP,L1,IDL1,C,C,C,IN,CH,CH,1,WA(IW))
-	 CALL R1FGKB (IDO,IP,L1,IDL1,C,C,C,IN,CH,CH,1,WA(IW))
+         CALL R1FGKB (IDO,IP,L1,IDL1,C,C,C,IN,CH,CH,1,WA(IW))
          GO TO 114
 C rav 113    CALL RIFGKB (IDO,IP,L1,IDL1,CH,CH,CH,1,C,C,IN,WA(IW))
   113    CALL R1FGKB (IDO,IP,L1,IDL1,CH,CH,CH,1,C,C,IN,WA(IW))
