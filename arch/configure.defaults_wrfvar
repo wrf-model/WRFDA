@@ -523,9 +523,9 @@ CPPFLAGS_BUFR   = -C -P -DLINUX -Dlinux  -DPATHSCALE
 FCOPTIM         = 
 FCDEBUG         = #-g
 FCTYPE          = -r8
-FCFREE          = -freeform -fno-second-underscore
+FCFREE          = -freeform
 FCHOST          = 
-FCBASE          = 
+FCBASE          = -fno-second-underscore
 FCENDIAN        = -byteswapio
 
 CCFLAGS_BUFR    = -DUNDERSCORE
@@ -563,11 +563,11 @@ CPPFLAGS_BUFR   = -C -P -DLINUX -Dlinux -DPATHSCALE
 FCOPTIM         =
 FCDEBUG         = #-g
 FCTYPE          = -r8
-FCFREE          = -freeform -fno-second-underscore
+FCFREE          = -freeform
 FCHOST          =
-FCBASE          = 
+FCBASE          = -fno-second-underscore
 FCENDIAN        = -byteswapio
-FCFLAGS_RSL     = $(FCENDIAN) -fno-second-underscore
+FCFLAGS_RSL     = $(FCENDIAN) $(FCBASE)
 
 CCFLAGS2        = -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) \
                   -I$(RSL_PATH)/RSL
