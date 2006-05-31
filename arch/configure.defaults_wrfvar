@@ -11,10 +11,6 @@ CC              = mpicc
 CC_TOOLS        = cc
 LD              = $(FC)
 
-# Paths
-
-RSL_PATH        = $(DEVTOP)/external/RSL
-
 # Flags (preprocessor, fortran, c, loader)
 
 TRADFLAG        =
