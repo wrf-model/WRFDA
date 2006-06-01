@@ -283,10 +283,10 @@ CC_TOOLS        = gcc
 LD              = $(FC)
 
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DTRIEDNTRUE -DONLY_WRFMODEL_IO 
+FPPFLAGS2       = -DTRIEDNTRUE -DONLY_WRFMODEL_IO \
                     -DLINUX -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
 		    -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
-                    -DMAX_DOMAINS_F=$(MAX_DOMAINS
+                    -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 FPPFLAGS_BUFR   = -C -P  $(TRADFLAG) -DLINUX -Dlinux
 
 FCOPTIM         = 
