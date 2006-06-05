@@ -147,13 +147,13 @@ SUBROUTINE da_trace_entry( &
             WRITE (UNIT=trace_unit, &
                FMT='(A,"&gt; <a href=",A,"/",A,".html>",A,"</a>",I11)', &
                IOSTAT=IOStatus) &
-               pad(1:TraceDepth*TraceIndentAmount),TRIM(DocumentationURL), &
+               pad(1:TraceDepth*TraceIndentAmount),TRIM(Documentation_url), &
                TRIM(Name),TRIM(Name), TotalSpace
          ELSE
             WRITE (UNIT=trace_unit, &
                FMT='(A,"&gt; <a href=",A,"/",A,".html>",A,"</a>")', &
                IOSTAT=IOStatus) &
-               pad(1:TraceDepth*TraceIndentAmount),TRIM(DocumentationURL), &
+               pad(1:TraceDepth*TraceIndentAmount),TRIM(Documentation_url), &
                TRIM(Name),TRIM(Name)
          END IF
          IF (IOStatus /= 0) THEN

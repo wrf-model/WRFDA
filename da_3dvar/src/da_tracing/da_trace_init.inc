@@ -93,7 +93,8 @@ SUBROUTINE da_trace_init
       WRITE (UNIT=trace_unit,FMT='(A)') "<li><a href=#memory>Memory usage</a>"
       WRITE (UNIT=trace_unit,FMT='(A)') "</ul>"
       WRITE (UNIT=trace_unit,FMT='(A)') "Links are to documentation set"
-      WRITE (UNIT=trace_unit,FMT='(A)') "<a href=",TRIM(DocumentationURL),">",TRIM(DocumentationURL),"</a>"
+      WRITE (UNIT=trace_unit,FMT='(A)') "<a href=",TRIM(Documentation_url), &
+         ">",TRIM(Documentation_url),"</a>"
       WRITE (UNIT=trace_unit,FMT='(A)') ", <strong>NOT</strong> to exact code under test.<p>"
       WRITE (UNIT=trace_unit,FMT='(A)') "<a name=tree><h2>Calling Tree</h2></a><pre>"
    END IF

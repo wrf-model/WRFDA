@@ -84,12 +84,16 @@ SUBROUTINE da_trace( &
       IF (NoCallsBody(Pointer) <= LocalMaxNoCalls) THEN
          IF (trace_memory) THEN
              WRITE (UNIT=trace_unit, &
-                FMT='(A, "| <a href=",A,"/",A,".html>",A,"</a>",I11,A)', IOSTAT=IOStatus) &
-                pad(1:TraceDepth*TraceIndentAmount),TRIM(DocumentationURL),TRIM(Name), &
-                TRIM(Name), TotalSpace, Change
+                FMT='(A, "| <a href=",A,"/",A,".html>",A,"</a>",I11,A)', &
+                IOSTAT=IOStatus) &
+                pad(1:TraceDepth*TraceIndentAmount),TRIM(Documentation_url), &
+                TRIM(Name), TRIM(Name), TotalSpace, Change
          ELSE
-            WRITE (UNIT=trace_unit, FMT='(A, "| <a href=",A,"/",A,".html>",A,"</a>")', IOSTAT=IOStatus) &
-               pad(1:TraceDepth*TraceIndentAmount),TRIM(DocumentationURL),TRIM(Name), TRIM(Name)
+            WRITE (UNIT=trace_unit, &
+               FMT='(A, "| <a href=",A,"/",A,".html>",A,"</a>")', &
+               IOSTAT=IOStatus) &
+               pad(1:TraceDepth*TraceIndentAmount),TRIM(Documentation_url), &
+               TRIM(Name), TRIM(Name)
          END IF
          IF (IOStatus /= 0) THEN
             CALL wrf_error_fatal3(__FILE__,__LINE__, &

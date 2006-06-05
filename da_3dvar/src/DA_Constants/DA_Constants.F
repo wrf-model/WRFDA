@@ -198,6 +198,7 @@ MODULE DA_Constants
    INTEGER, PARAMETER :: Radar_iunit = 94     ! Unit number for Radar input.
    INTEGER, PARAMETER :: airs_table_unit = 95 ! AIRS bufr table input
    INTEGER, PARAMETER :: rtm_error_unit = 99  ! RTTOV error unit
+! Tracing to unit 100
    INTEGER, PARAMETER :: rtm_info_unit = 109  ! Radiance info file
    INTEGER, PARAMETER :: rtm_bias_unit = 110  ! Radiance bias file
    INTEGER, PARAMETER :: filtered_obs_iunit  = 192  ! Unit number for writing filtered obs
@@ -436,7 +437,6 @@ INTEGER :: trace_repeat_head=100        ! Number of times trace header details
 INTEGER :: trace_repeat_body=100        ! Number of times trace body details
                                         ! can be PRINTed
 INTEGER :: trace_start_points=0         ! Number of routines to initiate trace (0=all)
-CHARACTER(LEN=200) :: DocumentationURL="http://box.mmm.ucar.edu/people/bray/wrfvar/html"
 
 INTEGER, PARAMETER :: num_ob_indexes = 22
 

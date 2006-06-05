@@ -197,7 +197,7 @@ SUBROUTINE da_trace_report
 
          WRITE (UNIT=trace_unit, FMT='(7A)') &
             "<TR><TD><a href=", &
-            TRIM(DocumentationURL), &
+            TRIM(Documentation_url), &
             "/", &
             TRIM(MasterTimerNames(Pointer)), & ! Subroutine name
             ".html>", &
@@ -301,11 +301,11 @@ SUBROUTINE da_trace_report
 
          WRITE (UNIT=trace_unit, FMT='(7A)') &
             "<TR><TD><a href=", &
-            TRIM(DocumentationURL), &
+            TRIM(Documentation_url), &
             "/", &
-            TRIM(MasterTimerNames(Pointer)), &                  ! Subroutine name
+            TRIM(MasterTimerNames(Pointer)), &    ! Subroutine name
             ".html>", &
-            TRIM(MasterTimerNames(Pointer)), &                  ! Subroutine name
+            TRIM(MasterTimerNames(Pointer)), &    ! Subroutine name
             "</a>"
          WRITE (UNIT=trace_unit, &
             FMT='("<TD>",F10.1,2("<TD>",F10.2,"<TD>",F10.1,2("<TD>",F10.1," on",I3)),"<TD>",F5.2)') &
@@ -370,7 +370,7 @@ SUBROUTINE da_trace_report
             Pointer=index(loop1)
             WRITE (UNIT=trace_unit, &
                FMT='("<TR><TD><a href=",A,"/",A,".html>",A,"</a><TD>",I10,"<TD>",I10,"<TD>",I10)') &
-               TRIM(DocumentationURL),TRIM(TimerNames(Pointer)),TRIM(TimerNames(Pointer)), &
+               TRIM(Documentation_url),TRIM(TimerNames(Pointer)),TRIM(TimerNames(Pointer)), &
                MAXVAL(MasterMaxHeap(:,Pointer)),SUM(MasterMaxHeap(:,Pointer)),SUM(MasterMaxHeap(:,Pointer))/nproc
          END DO
          WRITE (UNIT=trace_unit,FMT='("</table></body></html>")')
