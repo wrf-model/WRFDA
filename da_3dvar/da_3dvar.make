@@ -54,9 +54,9 @@ DA_OBJS        =	da_solve_v3d.o		\
 			gsi_kinds.o		\
 			gsi_constants.o		\
 			BLAS.o                  \
-                        module_wrf_3dvar_io.o \
-                        module_wrf_3dvar_interface.o	\
-	   		module_wrfvar_top.o
+                        da_wrfvar_io.o      \
+                        da_wrfvar_interface.o	\
+	   		da_wrfvar_top.o
 
 libwrfvar.a : $(DA_OBJS)
 	$(AR) ru libwrfvar.a $(DA_OBJS)
@@ -64,14 +64,22 @@ libwrfvar.a : $(DA_OBJS)
 
 ##########################################################################
 
-wrfvar.o : module_wrfvar_top.o
+wrfvar.o : da_wrfvar_top.o
 
-module_wrfvar_top.o : module_wrf_3dvar_interface.o \
+da_wrfvar_top.o: da_wrfvar_interface.o \
                       module_integrate.o \
-                      module_wrf_3dvar_io.o
+                      da_wrfvar_io.o
 
-module_wrf_3dvar_io.o : module_io_domain.o  \
-                        da_tracing.o
+da_wrfvar_esmf_super.o: da_wrfvar_esmf_super.f90 \
+                             da_wrfvar_init.inc \
+                             da_wrfvar_run.inc \
+                             da_wrfvar_finalize.inc
+
+da_wrfvar_io.o: da_wrfvar_io.f90 \
+                 da_med_initialdata_input.inc \
+                 da_med_initialdata_output.inc \
+                 module_io_domain.o  \
+                 da_tracing.o
 
 generic_boilerplate.inc: generic_boilerplate.m4
 			$(RM) generic_boilerplate.inc
@@ -107,7 +115,8 @@ par_util1.o:		par_util1.F                     \
 			proc_sum_real.inc \
                         module_wrf_error.o
 
-module_wrf_3dvar_interface.o : module_wrf_3dvar_interface.F \
+da_wrfvar_interface.o:  da_wrfvar_interface.f90 \
+                        da_wrfvar_interface.inc \
                         module_domain.o                     \
                         module_tiles.o                      \
                         module_dm.o                         \
@@ -125,7 +134,7 @@ da_solve_v3d.o:		DA_Constants.o			\
 			da_solve_v3d.F
 
 DA_Minimisation.o:	DA_Minimisation.F             \
-                        module_wrf_3dvar_io.o         \
+                        da_wrfvar_io.o                \
                         module_get_file_names.o       \
 			DA_Constants.o                \
 			DA_Define_Structures.o        \
@@ -166,7 +175,7 @@ DA_Minimisation.o:	DA_Minimisation.F             \
 			DA_Minimise_CG.inc
 
 DA_Setup_Structures.o:	DA_Setup_Structures.F             \
-                        module_wrf_3dvar_io.o             \
+                        da_wrfvar_io.o                    \
 			DA_Define_Structures.o            \
 			DA_Constants.o                    \
 			DA_Grid_Definitions.o             \
@@ -176,6 +185,7 @@ DA_Setup_Structures.o:	DA_Setup_Structures.F             \
 			DA_Physics.o                      \
 			da_h_ops.o                        \
 	                da_bufrlib.o                      \
+	                da_wrfvar_io.o                    \
 	                bort_exit.o                       \
 	                restd.o                           \
 	                wrdesc.o                          \
@@ -851,6 +861,7 @@ DA_Tools.o:		DA_Tools.F                     \
 			DA_Set_Boundary_Xb.inc         \
 			get_2d_sum.inc                 \
 			get_3d_sum.inc                 \
+                        da_oi.inc                      \
 			xyll.inc  
 
 DA_Recursive_Filter.o:	DA_Recursive_Filter.F          \
