@@ -304,7 +304,8 @@ FCDEBUG         = #-g
 FCTYPE          = -r8
 FCFREE          = -ffree-form -ffree-line-length-huge
 FCHOST          = 
-FCBASE          = -cpp -Wno=101,139,155,158 -fno-second-underscore -ftrace=full
+FCBASE          = -cpp -Wno=101,139,155,158 -fno-second-underscore \
+                  -ftrace=full -finteger=-9999 -freal=nan -C
 FCENDIAN        =
 
 CCFLAGS_BUFR    = -DUNDERSCORE
@@ -344,7 +345,8 @@ FCDEBUG         = #-g
 FCTYPE          = -r8
 FCFREE          = -ffree-form -ffree-line-length-huge
 FCHOST          =
-FCBASE          = -cpp -Wno=101,139,155,158 -fno-second-underscore -ftrace=full
+FCBASE          = -cpp -Wno=101,139,155,158 -fno-second-underscore \
+                    -ftrace=full -finteger=-9999 -freal=nan -C
 FCENDIAN        =
 FCFLAGS_RSL     = $(FCBASE) -ffixed-form -fno-second-underscore
 
@@ -530,7 +532,7 @@ FCENDIAN        = -byteswapio
 
 CCFLAGS_BUFR    = -DUNDERSCORE
 
-LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)
+LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN) -convert big_endian
 
 LOCAL_LIBRARIES = -L/usr/local/ncarg/lib -L/usr/local/lib \
 		  -lncarg -lncarg_gks -lncarg_c
@@ -574,7 +576,7 @@ CCFLAGS2        = -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) \
 CCFLAGS_BUFR    = -DUNDERSCORE
 CCFLAGS_RSL     = 
 
-LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)
+LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN) -convert big_endian
 
 MPI_LIB		= -L$(RSL_PATH)/RSL -lrsl
 
@@ -980,7 +982,8 @@ FCOPTIM         = -O0
 FCDEBUG         = #-g
 FCTYPE          = -r8
 FCFREE          = -ffree-form -ffree-line-length-huge
-FCBASE          = -cpp -Wno=101,139,155,158 -fno-second-underscore -ftrace=full
+FCBASE          = -cpp -Wno=101,139,155,158 -fno-second-underscore \
+                    -ftrace=full -finteger=-9999 -freal=nan -C
 FCENDIAN        =
 
 CCFLAGS2        = -DLANDREAD_STUB -DMACOS
@@ -1021,7 +1024,8 @@ FCDEBUG         = #-g
 FCTYPE          = -r8
 FCFREE          = -ffree-form -ffree-line-length-huge
 FCHOST          =
-FCBASE          = -cpp -Wno=101,139,155,158 -fno-second-underscore -ftrace=full
+FCBASE          = -cpp -Wno=101,139,155,158 -fno-second-underscore \
+                    -ftrace=full -finteger=-9999 -freal=nan -C
 FCENDIAN        =
 FCFLAGS_RSL     = $(FCENDIAN) -fno-second-underscore
 

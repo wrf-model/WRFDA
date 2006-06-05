@@ -293,7 +293,8 @@ FCOPTIM         =
 FCDEBUG         = #-g
 FCFREE          = -ffree-form  -ffree-line-length-huge
 FCENDIAN        =
-FCBASE          = -cpp -Wno=101,139,155,158 -fno-second-underscore -ftrace=full
+FCBASE          = -cpp -Wno=101,139,155,158 -fno-second-underscore \
+                    -ftrace=full -finteger=-9999 -freal=nan -C
 FCTYPE          = -r8
 
 CCFLAGS_BUFR    = -DUNDERSCORE
@@ -335,7 +336,8 @@ FCOPTIM         =
 FCDEBUG         = #-g
 FCFREE          = -ffree-form  -ffree-line-length-huge
 FCENDIAN        =
-FCBASE          = -cpp -Wno=101,139,155,158 -fno-second-underscore -ftrace=full
+FCBASE          = -cpp -Wno=101,139,155,158 -fno-second-underscore \
+                    -ftrace=full -finteger=-9999 -freal=nan -C
 FCTYPE          = -r8
 FCFLAGS_RSL     = $(FCENDIAN) -ffixed-form -fno-second-underscore
 
@@ -508,15 +510,15 @@ FPPFLAGS_BUFR   = -C -P $(TRADFLAG) -DLINUX -Dlinux -DPATHSCALE
 FCOPTIM         = #-fastsse
 FCDEBUG         = #-g
 FCTYPE          = -r8
-FCFREE          = -freeform -fno-second-underscore
-FCENDIAN        = 
-FCBASE          = 
-FCFLAGS_RSL     = $(FCENDIAN) -fno-second-underscore
+FCFREE          = -freeform
+FCENDIAN        = -byteswapio
+FCBASE          =  -fno-second-underscore
+FCFLAGS_RSL     = $(FCENDIAN) $(FCBASE)
 
 CCFLAGS_BUFR    = -DUNDERSCORE
 CCFLAGS_RSL     =
 
-LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)
+LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN) -convert big_endian
 
 LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/local/lib \
 		    -lncarg -lncarg_gks -lncarg_c
@@ -550,10 +552,10 @@ FPPFLAGS_BUFR   = -C -P $(TRADFLAG) -DLINUX -Dlinux -DPATHSCALE
 FCOPTIM         = #-fastsse
 FCDEBUG         = #-g
 FCTYPE          = -r8
-FCFREE          = -freeform -fno-second-underscore
-FCENDIAN        = 
-FCBASE          = 
-FCFLAGS_RSL     = $(FCENDIAN) -fno-second-underscore
+FCFREE          = -freeform
+FCENDIAN        = -byteswapio
+FCBASE          = -fno-second-underscore
+FCFLAGS_RSL     = $(FCENDIAN) $(FCBASE)
 
 CCFLAGS2        = -DMAXDOM_MAKE=$(MAX_DOMAINS) \
                   -DMAXPROC_MAKE=$(MAX_PROC) \
@@ -561,7 +563,7 @@ CCFLAGS2        = -DMAXDOM_MAKE=$(MAX_DOMAINS) \
 CCFLAGS_RSL     = 
 CCFLAGS_BUFR    = -DUNDERSCORE
 
-LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)
+LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN) -convert big_endian
 
 LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/local/lib \
                   -lncarg -lncarg_gks -lncarg_c 
@@ -1027,7 +1029,8 @@ FCDEBUG         = #-g
 FCTYPE          = -r8
 FCFREE          = -ffree-form -ffree-line-length-huge
 FCENDIAN        =
-FCBASE          = -cpp -Wno=101,139,155,158 -fno-second-underscore -ftrace=full
+FCBASE          = -cpp -Wno=101,139,155,158 -fno-second-underscore \
+                    -ftrace=full -finteger=-9999 -freal=nan -C
 FCFLAGS_RSL     = $(FCENDIAN) -fno-second-underscore
 
 CCFLAGS2        = -DLANDREAD_STUB -DMACOS
@@ -1069,7 +1072,8 @@ FCDEBUG         = #-g
 FCTYPE          = -r8
 FCFREE          = -ffree-form  -ffree-line-length-huge
 FCENDIAN        =
-FCBASE          = -cpp -Wno=101,139,155,158 -fno-second-underscore -ftrace=full
+FCBASE          = -cpp -Wno=101,139,155,158 -fno-second-underscore \
+                  -ftrace=full -finteger=-9999 -freal=nan -C
 FCFLAGS_RSL     = $(FCENDIAN) -ffixed-form -fno-second-underscore
 
 CCFLAGS2        = -DMAXDOM_MAKE=$(MAX_DOMAINS) \
