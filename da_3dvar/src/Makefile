@@ -57,9 +57,9 @@ OBJS_FOR_ALL =		da_solve_v3d.o		\
 			gsi_kinds.o		\
 			gsi_constants.o		\
 			BLAS.o                  \
-                        module_wrfvar_top.o     \
-                        module_wrf_3dvar_interface.o \
-                        module_wrf_3dvar_io.o
+                        da_wrfvar_top.o     \
+                        da_wrfvar_interface.o \
+                        da_wrfvar_io.o
 
 include ../../configure.wrf
 
@@ -129,7 +129,7 @@ da_solve_v3d.o:		DA_Constants.o			\
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_solve_v3d.f
 
 DA_Minimisation.o:	\
-			module_wrf_3dvar_io.o \
+			da_wrfvar_io.o \
 			DA_Constants.o \
 			DA_Define_Structures.o \
 			DA_VToX_Transforms.o \
@@ -187,7 +187,7 @@ DA_Setup_Structures.o:	\
 	                DA_ReadWrite_MM5.o \
 	                da_spectral.o \
 			da_radiance.o \
-                        module_wrf_3dvar_io.o \
+                        da_wrfvar_io.o \
 			DA_Setup_Structures/DA_Setup_Structures.F \
 			DA_Setup_Structures/da_add_increments.inc \
 			DA_Setup_Structures/DA_Add_PBL_And_SFC_Info.inc \
@@ -962,6 +962,7 @@ DA_Tools.o:		\
 			DA_Tools/DA_Set_Boundary_Xb.inc \
 			DA_Tools/get_2d_sum.inc \
 			DA_Tools/get_3d_sum.inc \
+			DA_Tools/da_oi.inc \
 			DA_Tools/xyll.inc    
 			$(RM) $@
 			$(CPP) -I./DA_Tools $(CPPFLAGS) DA_Tools/DA_Tools.F > DA_Tools.f
@@ -1237,27 +1238,33 @@ da_spectral.o:		\
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_spectral.f
 
 
-module_wrf_3dvar_interface.o : da_modules/module_wrf_3dvar_interface.F \
-                               da_tracing.o
-			$(CPP) -I./da_modules $(CPPFLAGS) da_modules/module_wrf_3dvar_interface.F > module_wrf_3dvar_interface.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) module_wrf_3dvar_interface.f
+da_wrfvar_interface.o : da_modules/da_wrfvar_interface.f90 \
+                            da_modules/da_wrfvar_interface.inc \
+                            da_tracing.o
+			$(CPP) -I./da_modules $(CPPFLAGS) da_modules/da_wrfvar_interface.f90 > da_wrfvar_interface.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_wrfvar_interface.f
 
-module_wrf_3dvar_io.o : da_modules/module_wrf_3dvar_io.F \
+da_wrfvar_io.o : da_modules/da_wrfvar_io.f90 \
+                     da_modules/da_med_initialdata_input.inc \
+                     da_modules/da_med_initialdata_output.inc \
                         da_tracing.o
-			$(CPP) -I./da_modules $(CPPFLAGS) da_modules/module_wrf_3dvar_io.F > module_wrf_3dvar_io.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) module_wrf_3dvar_io.f
+			$(CPP) -I./da_modules $(CPPFLAGS) da_modules/da_wrfvar_io.f90 > da_wrfvar_io.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_wrfvar_io.f
 
-module_wrfvar_top.o : da_modules/module_wrfvar_top.F \
-                      module_wrf_3dvar_interface.o \
+da_wrfvar_top.o : da_modules/da_wrfvar_top.f90 \
+                      da_wrfvar_interface.o \
                       da_tracing.o
-			$(CPP) -I./da_modules $(CPPFLAGS) da_modules/module_wrfvar_top.F > module_wrfvar_top.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) module_wrfvar_top.f
+			$(CPP) -I./da_modules $(CPPFLAGS) da_modules/da_wrfvar_top.f90 > da_wrfvar_top.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_wrfvar_top.f
 
-module_wrfvar_esmf_super.o : da_modules/module_wrfvar_esmf_super.F \
-                             module_wrf_3dvar_io.o \
-                             module_wrf_3dvar_interface.o
-			$(CPP) -I./da_modules $(CPPFLAGS) da_modules/module_wrfvar_esmf_super.F > module_wrfvar_esmf_super.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) module_wrfvar_esmf_super.f
+da_wrfvar_esmf_super.o : da_modules/da_wrfvar_esmf_super.f90 \
+                             da_modules/da_wrfvar_init.inc \
+                             da_modules/da_wrfvar_run.inc \
+                             da_modules/da_wrfvar_finalize.inc \
+                             da_wrfvar_io.o \
+                             da_wrfvar_interface.o
+			$(CPP) -I./da_modules $(CPPFLAGS) da_modules/da_wrfvar_esmf_super.f90 > da_wrfvar_esmf_super.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_wrfvar_esmf_super.f
 
 da_tracing.o:           da_tracing/da_tracing.F           \
                         da_tracing/da_trace_init.inc      \
