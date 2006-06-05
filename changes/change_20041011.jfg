@@ -1,0 +1,582 @@
+Change Log for update to WRF 3DVAR code
+---------------------------------------
+
+Author: 	Jianfeng Gu
+Reviewer: 	Qingnong Xiao, Wei Huang
+Date: 		10/11/04
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+1. Develop the one-dimensional cloud model parameterization 
+   code for calculating time step used in mocrophysics 
+   parameterization. (Jianfeng, Qingnong)
+
+   The vertical component of the equation of motion
+   following a rising parcel of air is
+
+       dw^2/2     g(Tvc-Tve)
+      ------- = ------------- - gQt - mu*w^2
+         dz      Tve(1+alpha)
+
+      delt=dz/w
+
+   where Tvc (K) is cloud virtual temperature 
+     and Tve is environment virtual temperature,
+         Qt (kg/kg) is the total water.
+
+   Reference
+     Anthes R. A., 1977: A Cumulus Parameterization Scheme
+       Utilizing a One-Dimensional Cloud Model.
+       Mon. Wea. Rev., 105,270-286.
+ 
+2. Update of qcw and qrn increments using mocrophysics 
+   parameterization and Doppler reflectivity assimilation. 
+   (Jianfeng, Qingnong) 
+
+3. Develop the recursive filter code for smoothing q, qcw and qrn fields
+   and figure out the parallel problems for radar assimilation code.
+   (Wei, Jianfeng, Qingnong) 
+
+4. Add the qcw and qrn in MM5 background fields and their output. 
+   (Jianfeng, Qingnong)
+ 
+    
+Expected Differences
+--------------------
+
+Accuracy: 	Impact on Doppler Radar reflectivity assimilation.
+                See the testing results below.
+
+CPU/memory:	CPU time the memory will be increased with more 
+                capability of wrf3dvar code, but not significant. 
+
+Test results (run on what machines?)
+------------------------------------------------------
+
+      Tests with KMA case at 2002083100UTC on DEC machine
+                
+
+      *********** Doppler Radar reflectivity assimilation:
+                  
+                > Adjoint Test:
+
+                 ==> VpToX_Adjoint:
+                     Whole  Domain: < x, x >       =   1.62035104103244E+13
+                     Whole  Domain: < vp_adj, vp > =   1.62035104103236E+13
+                    
+                 ==> VToX_Adjoint:
+                     Whole  Domain: < x, x >     =   1.30792445481260E+19
+                     Whole  Domain: < v_adj, v > =   1.30792445481267E+19 
+                  
+                 ==> xtoy_adjoint on single processor:
+                     Whole Domain < y, y     > =   3.72894813244429E+01
+                     Whole Domain < x, x_adj > =   3.72894813244430E+01
+
+                 ==> xtoy_adjoint on 4 processors:
+                     Tile < y, y     > =   4.40068414655277E+00
+                     Tile < x, x_adj > =   4.40068414655276E+00
+                     Whole Domain < y, y     > =   3.72894813244430E+01
+                     Whole Domain < x, x_adj > =   3.72894813244429E+01
+
+
+                > Assimilation run iterations:
+                  
+                   ==> Single processor:
+
+        56      7.30781910D+02      9.65696438D-05
+ ----------------------------------------------------------
+  Inner iteration stopped after   56 iterations
+   Final cost function :  2.27526759D+05 and Gradient:  7.30781910D+02
+
+
+                   ==> 4-processors:
+
+        63      6.27055372D+02      1.18813878D-03
+ ----------------------------------------------------------
+  Inner iteration stopped after   63 iterations
+   Final cost function :  2.25251848D+05 and Gradient:  6.27055372D+02
+
+
+Files removed:
+--------------
+wrf3dvar/da_3dvar/src/DA_Obs/DA_Read_Radar_Info.inc
+wrf3dvar/da_3dvar/src/DA_Obs/h_to_zk.inc
+
+Files added:
+------------
+wrf3dvar/da_3dvar/changes/change_20041011.jfg
+
+wrf3dvar/da_3dvar/src/DA_Physics/DA_Moist_Phys_Adj.inc
+wrf3dvar/da_3dvar/src/DA_Physics/DA_Moist_Phys_Lin.inc
+wrf3dvar/da_3dvar/src/DA_Physics/da_accre.inc
+wrf3dvar/da_3dvar/src/DA_Physics/da_accre_adj.inc
+wrf3dvar/da_3dvar/src/DA_Physics/da_accre_lin.inc
+wrf3dvar/da_3dvar/src/DA_Physics/da_autoc.inc
+wrf3dvar/da_3dvar/src/DA_Physics/da_autoc_adj.inc
+wrf3dvar/da_3dvar/src/DA_Physics/da_autoc_lin.inc
+wrf3dvar/da_3dvar/src/DA_Physics/da_condens_adj.inc
+wrf3dvar/da_3dvar/src/DA_Physics/da_condens_lin.inc
+wrf3dvar/da_3dvar/src/DA_Physics/da_evapo.inc
+wrf3dvar/da_3dvar/src/DA_Physics/da_evapo_adj.inc
+wrf3dvar/da_3dvar/src/DA_Physics/da_evapo_lin.inc
+wrf3dvar/da_3dvar/src/DA_Physics/da_filter.inc
+wrf3dvar/da_3dvar/src/DA_Physics/da_filter_adj.inc
+wrf3dvar/da_3dvar/src/DA_Physics/da_wdt.inc
+
+wrf3dvar/da_3dvar/src/DA_Radar/da_max_error_qc_Radar.inc
+wrf3dvar/da_3dvar/src/DA_Radar/da_reflectivity.inc
+wrf3dvar/da_3dvar/src/DA_Radar/da_reflectivity_Adj.inc
+wrf3dvar/da_3dvar/src/DA_Radar/da_reflectivity_Lin.inc
+
+wrf3dvar/da_3dvar/src/DA_Setup_Structures/da_cloud_model.inc
+
+Files modified:
+---------------
+wrf3dvar/Registry/Registry_3dvar 
+wrf3dvar/run/DA_Run_3DVAR.csh
+wrf3dvar/da_3dvar/src/Makefile 
+wrf3dvar/da_3dvar/src/DA_Constants/DA_Constants.F 
+
+wrf3dvar/da_3dvar/src/DA_Define_Structures/DA_Allocate_MM5_Model.inc
+wrf3dvar/da_3dvar/src/DA_Define_Structures/DA_Deallocate_MM5_Model.inc
+wrf3dvar/da_3dvar/src/DA_Define_Structures/DA_Define_Structures.F 
+wrf3dvar/da_3dvar/src/DA_Define_Structures/DA_Zero_X.inc 
+ 
+wrf3dvar/da_3dvar/src/DA_Dynamics/DA_UV_To_Divergence.inc
+wrf3dvar/da_3dvar/src/DA_Dynamics/DA_UV_To_Divergence_Adj.inc
+ 
+wrf3dvar/da_3dvar/src/DA_Obs/DA_Read_Radar.inc
+wrf3dvar/da_3dvar/src/DA_Obs/DA_Scan_Radar.inc
+
+wrf3dvar/da_3dvar/src/DA_Physics/DA_Physics.F 
+ 
+wrf3dvar/da_3dvar/src/DA_Radar/DA_AO_Stats_Radar.inc
+wrf3dvar/da_3dvar/src/DA_Radar/DA_Calculate_GradY_Radar.inc
+wrf3dvar/da_3dvar/src/DA_Radar/DA_Calculate_Jo_and_GradY_Radar.inc
+wrf3dvar/da_3dvar/src/DA_Radar/DA_Calculate_Residual_Radar.inc
+wrf3dvar/da_3dvar/src/DA_Radar/DA_OI_Stats_Radar.inc
+wrf3dvar/da_3dvar/src/DA_Radar/DA_Print_Stats_Radar.inc
+wrf3dvar/da_3dvar/src/DA_Radar/DA_Radar.F
+wrf3dvar/da_3dvar/src/DA_Radar/DA_Transform_XToY_Radar.inc
+wrf3dvar/da_3dvar/src/DA_Radar/DA_Transform_XToY_Radar_Adj.inc
+wrf3dvar/da_3dvar/src/DA_Radar/da_check_max_iv_Radar.inc
+wrf3dvar/da_3dvar/src/DA_Radar/da_get_innov_vector_Radar.inc
+ 
+wrf3dvar/da_3dvar/src/DA_DA_ReadWrite_MM5/DA_Read_MM5.inc
+wrf3dvar/da_3dvar/src/DA_DA_ReadWrite_MM5/DA_Write_Analysis_MM5.inc
+ 
+wrf3dvar/da_3dvar/src/DA_Setup_Structures/DA_Setup_Structures.F 
+wrf3dvar/da_3dvar/src/DA_Setup_Structures/da_transfer_mm5toxb.inc
+wrf3dvar/da_3dvar/src/DA_Setup_Structures/da_transfer_wrftoxb.inc
+wrf3dvar/da_3dvar/src/DA_Setup_Structures/da_transfer_xatowrf.inc 
+
+wrf3dvar/da_3dvar/src/DA_Test/DA_Check_VToX_Adjoint.inc 
+wrf3dvar/da_3dvar/src/DA_Test/DA_Check_VpToX_Adjoint.inc
+wrf3dvar/da_3dvar/src/DA_Test/DA_Check_XToVpToX_Errors.inc
+wrf3dvar/da_3dvar/src/DA_Test/DA_Check_XToY_Adjoint.inc 
+wrf3dvar/da_3dvar/src/DA_Test/DA_Test_VXTransform.inc
+wrf3dvar/da_3dvar/src/DA_Test/DA_Transform_XToVp.inc
+wrf3dvar/da_3dvar/src/DA_Test/da_setup_testfield.inc 
+
+wrf3dvar/da_3dvar/src/DA_Tools/DA_Read_Namelist.inc 
+
+wrf3dvar/da_3dvar/src/DA_VToX_Transforms/DA_Transform_VpToX.inc
+wrf3dvar/da_3dvar/src/DA_VToX_Transforms/DA_Transform_VpToX_Adj.inc
+wrf3dvar/da_3dvar/src/DA_VToX_Transforms/da_transform_vtox.inc
+wrf3dvar/da_3dvar/src/DA_VToX_Transforms/da_transform_vtox_adj.inc
+
+wrf3dvar/da_3dvar/src/da_solve_v3d/da_solve_v3d.F 
+wrf3dvar/da_3dvar/src/da_solve_v3d/da_init_3dvar.inc
+
+M run/DA_Run_3DVAR.csh
+
+Minor-tag:
+---------
+
+radar_in_wrf3dvar
+
+Below are added by Wei Huang (Oct. 19)
+
+1. Bug fix:
+
+  a. adjoint code bug fix:
+     DA_W_Adjustment_Adj.inc
+     DA_UVPRho_To_W_Adj.inc
+
+  b. MPI initialization bug fix
+     (need to broadcast hydrometers when use MM5 as first guess)
+     mm5_struct_bcast.inc
+
+  c. Print format bug fix (not related to radar)
+     da_get_innov_vector_gpspw.inc
+
+  
+Test with WRF input:
+
+Cape:
+
+1pe:
+
+  Starting Cost function:  2.64200993D+05 Gradient=  1.39596160D+03
+ ----------------------------------------------------------
+
+   Iter     CG_Gradient           Step
+ 
+    1      9.27726509D+02      1.55486649D-03
+    2      1.53276883D+03      1.04738896D-02
+    3      1.19381479D+03      2.95129101D-03
+    4      9.07535602D+02      3.83261429D-03
+    5      7.87238042D+02      3.44722949D-03
+    6      6.01660566D+02      5.82040039D-03
+    7      6.51255379D+02      2.28263098D-02
+    8      5.19818980D+02      8.25922431D-03
+    9      3.65503960D+02      8.62199156D-03
+   10      4.05900901D+02      2.25131175D-02
+   11      2.89187422D+02      1.60603356D-02
+   12      2.06796192D+02      1.70514841D-02
+   13      2.06773589D+02      1.95795221D-02
+   14      2.29586197D+02      3.06956695D-02
+   15      1.65211221D+02      1.05247720D-02
+   16      2.23164108D+02      1.17254697D-02
+   17      1.75614036D+02      1.89601525D-03
+   18      1.50330761D+02      1.12461224D-02
+   19      1.35500442D+02      1.86905198D-02
+   20      1.72705649D+02      3.60167630D-03
+   21      1.01232036D+02      6.85508368D-03
+   22      1.64328205D+02      2.32143847D-02
+   23      1.14500199D+02      2.67097085D-03
+   24      8.16181840D+01      1.52565976D-02
+   25      5.60841803D+01      1.90658763D-02
+   26      4.55177670D+01      2.71355567D-02
+   27      4.30843515D+01      3.06385434D-02
+   28      3.17183737D+01      2.66310475D-02
+   29      3.62533670D+01      2.44337934D-02
+   30      3.09689917D+01      5.52093058D-03
+   31      6.44943499D+01      7.01150183D-03
+   32      2.06119862D+01      4.08045935D-03
+   33      1.58078847D+01      2.61485737D-02
+   34      1.80637863D+01      3.08903154D-02
+   35      1.73324793D+01      2.45079379D-03
+   36      2.03812600D+01      1.41930462D-02
+   37      8.88690307D+00      5.74977736D-03
+ ----------------------------------------------------------
+    Final cost function J  =    235631.876542073     
+Timing for Time elapsed in 3dvar:  791.99200 elapsed seconds.
+
+4pe:
+
+  Starting Cost function:  2.64200993D+05 Gradient=  1.39596160D+03
+ ----------------------------------------------------------
+
+   Iter     CG_Gradient           Step
+ 
+    1      9.27726509D+02      1.55486649D-03
+    2      1.53276883D+03      1.04738896D-02
+    3      1.19381479D+03      2.95129101D-03
+    4      9.07535602D+02      3.83261429D-03
+    5      7.87238042D+02      3.44722949D-03
+    6      6.01660566D+02      5.82040039D-03
+    7      6.51255379D+02      2.28263098D-02
+    8      5.19818980D+02      8.25922431D-03
+    9      3.65503960D+02      8.62199156D-03
+   10      4.05900901D+02      2.25131175D-02
+   11      2.89187422D+02      1.60603356D-02
+   12      2.06796192D+02      1.70514841D-02
+   13      2.06773579D+02      1.95795222D-02
+   14      2.29578771D+02      3.06957597D-02
+   15      1.64384550D+02      1.05311968D-02
+   16      1.52567465D+02      1.31319634D-02
+   17      2.97601651D+02      8.17410041D-03
+   18      1.53980720D+02      2.45215572D-03
+   19      1.20728645D+02      1.79694475D-02
+   20      2.16686968D+02      7.37911488D-03
+   21      1.01814552D+02      3.37541514D-03
+   22      1.07448846D+02      2.59258512D-02
+   23      1.83208356D+02      8.95281670D-03
+   24      8.27036049D+01      4.10661529D-03
+   25      5.60870768D+01      1.85214668D-02
+   26      4.55177338D+01      2.71325816D-02
+   27      4.30813139D+01      3.06390333D-02
+   28      3.14806953D+01      2.66613402D-02
+   29      2.46097135D+01      2.74939133D-02
+   30      3.04734986D+01      3.85767237D-02
+   31      3.58920216D+01      3.12602991D-03
+   32      3.17025586D+01      3.91764395D-03
+   33      1.60300029D+01      8.02045563D-03
+   34      1.32715433D+01      3.07295433D-02
+ ----------------------------------------------------------
+    Final cost function J  =    235635.500292716     
+Timing for Time elapsed in 3dvar:  351.69260 elapsed seconds.
+  
+Bluesky:
+
+1pe:
+  Starting Cost function:  5.48947863D+05 Gradient=  2.38743645D+03
+ ----------------------------------------------------------
+
+   Iter     CG_Gradient           Step
+ 
+    1      1.98407723D+03      3.09290220D-03
+    2      1.70794559D+03      4.27674410D-03
+    3      1.34537812D+03      5.02479943D-03
+    4      1.50144878D+03      3.92813387D-03
+    5      1.10136320D+03      8.00204400D-03
+    6      1.28002998D+03      1.27987315D-02
+    7      7.84979283D+02      5.56669196D-03
+    8      8.51568911D+02      1.89140091D-02
+    9      5.83910863D+02      1.38877915D-02
+   10      6.25336277D+02      1.51773714D-02
+   11      4.74249875D+02      1.50220542D-02
+   12      4.30004591D+02      1.36028406D-02
+   13      2.98905183D+02      2.36301936D-02
+   14      2.89933392D+02      2.21216940D-02
+   15      2.50495360D+02      2.99113523D-02
+   16      2.05516388D+02      2.37676642D-02
+   17      4.79611866D+02      1.91272201D-02
+   18      1.92584321D+02      2.33655101D-03
+   19      1.44403552D+02      1.68735190D-02
+   20      2.92111903D+02      1.03758896D-02
+   21      1.31807452D+02      4.68054931D-03
+   22      1.16979377D+02      2.42593568D-02
+   23      7.81554920D+01      2.68460057D-02
+   24      8.58610616D+01      3.76296872D-02
+   25      1.00212027D+02      7.57027443D-03
+   26      5.44395016D+01      1.14600148D-02
+   27      8.38583712D+01      2.38186866D-02
+   28      4.87770036D+01      5.05015658D-03
+   29      3.71141014D+01      2.72634214D-02
+   30      2.94167513D+01      3.35206621D-02
+   31      3.05223764D+01      3.16424404D-02
+   32      3.06045661D+01      2.73884315D-03
+   33      2.01663074D+01      1.76358676D-02
+ ----------------------------------------------------------
+    Final cost function J  =  474376.092710831494
+Timing for Time elapsed in 3dvar: 1021.86000 elapsed seconds.
+
+4pe:
+  Starting Cost function:  5.48947863D+05 Gradient=  2.38743645D+03
+ ----------------------------------------------------------
+
+   Iter     CG_Gradient           Step
+ 
+    1      1.98407723D+03      3.09290220D-03
+    2      1.70794559D+03      4.27674410D-03
+    3      1.34537812D+03      5.02479943D-03
+    4      1.50144878D+03      3.92813387D-03
+    5      1.10136320D+03      8.00204400D-03
+    6      1.28002998D+03      1.27987315D-02
+    7      7.84979283D+02      5.56669196D-03
+    8      8.51568911D+02      1.89140091D-02
+    9      5.83910863D+02      1.38877915D-02
+   10      6.25336277D+02      1.51773714D-02
+   11      4.74249875D+02      1.50220542D-02
+   12      4.30004591D+02      1.36028406D-02
+   13      2.98905183D+02      2.36301936D-02
+   14      2.89933378D+02      2.21216942D-02
+   15      2.50487986D+02      2.99114154D-02
+   16      2.02954208D+02      2.37921425D-02
+   17      2.35771890D+02      2.95295454D-02
+   18      2.77282952D+02      3.54162330D-03
+   19      1.37655784D+02      7.28151833D-03
+   20      1.34844624D+02      2.94429202D-02
+   21      2.65317276D+02      1.58155079D-02
+   22      1.21206766D+02      2.69949366D-03
+   23      7.80753761D+01      2.48966287D-02
+   24      7.28632827D+01      3.87446497D-02
+   25      8.82178826D+01      2.48849479D-02
+   26      6.11309471D+01      4.56545955D-03
+   27      4.94571868D+01      2.36364173D-02
+   28      7.75727857D+01      1.47205918D-02
+   29      3.77545155D+01      7.25867252D-03
+   30      2.94061232D+01      3.22813403D-02
+   31      2.25040268D+01      3.23416668D-02
+ ----------------------------------------------------------
+    Final cost function J  =  474385.334450111026
+Timing for Time elapsed in 3dvar:  271.73000 elapsed seconds.
+
+
+Test with MM5 as first guess:
+
+Cape:
+
+1pe:
+  Starting Cost function:  5.48947863D+05 Gradient=  2.38743645D+03
+ ----------------------------------------------------------
+
+   Iter     CG_Gradient           Step
+ 
+    1      1.98407723D+03      3.09290220D-03
+    2      1.70794559D+03      4.27674410D-03
+    3      1.34537812D+03      5.02479943D-03
+    4      1.50144878D+03      3.92813387D-03
+    5      1.10136320D+03      8.00204400D-03
+    6      1.28002998D+03      1.27987315D-02
+    7      7.84979283D+02      5.56669196D-03
+    8      8.51568911D+02      1.89140091D-02
+    9      5.83910863D+02      1.38877915D-02
+   10      6.25336277D+02      1.51773714D-02
+   11      4.74249875D+02      1.50220542D-02
+   12      4.30004591D+02      1.36028406D-02
+   13      2.98905183D+02      2.36301936D-02
+   14      2.89933379D+02      2.21216942D-02
+   15      2.50488813D+02      2.99114082D-02
+   16      2.03238291D+02      2.37894214D-02
+   17      3.13277906D+02      2.78339037D-02
+   18      2.20066632D+02      2.16611393D-03
+   19      1.53330859D+02      1.24621899D-02
+   20      2.46743164D+02      6.17667115D-03
+   21      1.31069268D+02      7.78979925D-03
+   22      1.16976306D+02      2.45520613D-02
+   23      7.80682539D+01      2.68503221D-02
+   24      7.23774302D+01      3.87861577D-02
+   25      5.76053508D+01      2.80888306D-02
+   26      9.31759273D+01      1.59166238D-02
+   27      4.81560780D+01      6.60027705D-03
+   28      6.86798762D+01      2.46776425D-02
+   29      4.04443333D+01      4.59060001D-03
+   30      2.94371327D+01      2.77074341D-02
+   31      3.27839359D+01      3.13609710D-02
+   32      2.87452979D+01      2.40935575D-03
+   33      1.98668372D+01      2.02128960D-02
+ ----------------------------------------------------------
+    Final cost function J  =    474376.083741162     
+Timing for Time elapsed in 3dvar:  725.01640 elapsed seconds.
+
+4pe:
+
+  Starting Cost function:  5.48947863D+05 Gradient=  2.38743645D+03
+ ----------------------------------------------------------
+
+   Iter     CG_Gradient           Step
+ 
+    1      1.98407723D+03      3.09290220D-03
+    2      1.70794559D+03      4.27674410D-03
+    3      1.34537812D+03      5.02479943D-03
+    4      1.50144878D+03      3.92813387D-03
+    5      1.10136320D+03      8.00204400D-03
+    6      1.28002998D+03      1.27987315D-02
+    7      7.84979283D+02      5.56669196D-03
+    8      8.51568911D+02      1.89140091D-02
+    9      5.83910863D+02      1.38877915D-02
+   10      6.25336277D+02      1.51773714D-02
+   11      4.74249875D+02      1.50220542D-02
+   12      4.30004591D+02      1.36028406D-02
+   13      2.98905183D+02      2.36301936D-02
+   14      2.89933378D+02      2.21216942D-02
+   15      2.50488209D+02      2.99114135D-02
+   16      2.03029945D+02      2.37914140D-02
+   17      2.60607399D+02      2.90586783D-02
+   18      2.48674642D+02      2.75770711D-03
+   19      1.44241125D+02      9.46070763D-03
+   20      2.94811360D+02      1.06816646D-02
+   21      1.31880634D+02      4.52323727D-03
+   22      1.16978831D+02      2.42307042D-02
+   23      7.80681365D+01      2.68490969D-02
+   24      7.23582563D+01      3.87877071D-02
+   25      5.58123169D+01      2.82252392D-02
+   26      8.95780805D+01      2.29520199D-02
+   27      4.94343759D+01      4.76162674D-03
+   28      4.15636931D+01      2.80169070D-02
+   29      6.20427417D+01      1.22588850D-02
+   30      2.97064802D+01      8.93365362D-03
+   31      2.26042992D+01      3.16163295D-02
+ ----------------------------------------------------------
+    Final cost function J  =    474385.337359161     
+Timing for Time elapsed in 3dvar:  315.87870 elapsed seconds.
+  
+Bluesky:
+
+1pe:
+  Starting Cost function:  2.64200993D+05 Gradient=  1.39596160D+03
+ ----------------------------------------------------------
+
+   Iter     CG_Gradient           Step
+ 
+    1      9.27726509D+02      1.55486649D-03
+    2      1.53276883D+03      1.04738896D-02
+    3      1.19381479D+03      2.95129101D-03
+    4      9.07535602D+02      3.83261429D-03
+    5      7.87238042D+02      3.44722949D-03
+    6      6.01660566D+02      5.82040039D-03
+    7      6.51255379D+02      2.28263098D-02
+    8      5.19818980D+02      8.25922431D-03
+    9      3.65503960D+02      8.62199156D-03
+   10      4.05900901D+02      2.25131175D-02
+   11      2.89187422D+02      1.60603356D-02
+   12      2.06796194D+02      1.70514841D-02
+   13      2.06774357D+02      1.95795133D-02
+   14      2.30141347D+02      3.06889216D-02
+   15      2.13964498D+02      1.00674135D-02
+   16      2.14636374D+02      2.30314440D-03
+   17      1.48120339D+02      6.95047255D-03
+   18      1.51154337D+02      1.62720205D-02
+   19      2.41439986D+02      1.57027799D-02
+   20      1.18925818D+02      1.80385494D-03
+   21      1.01044822D+02      1.62180766D-02
+   22      1.76754529D+02      2.22551960D-02
+   23      1.10710639D+02      2.60385347D-03
+   24      8.15999407D+01      1.64502455D-02
+   25      5.60841331D+01      1.90752099D-02
+   26      4.55178300D+01      2.71355992D-02
+   27      4.30905437D+01      3.06376958D-02
+   28      3.32489204D+01      2.65389855D-02
+   29      7.29953374D+01      8.86296116D-03
+   30      3.81143425D+01      2.96045282D-03
+   31      2.84295672D+01      5.26019988D-03
+   32      2.05246692D+01      2.78043121D-02
+   33      1.58062160D+01      2.63905514D-02
+   34      2.04054334D+01      3.05603188D-02
+   35      1.53789463D+01      1.97168638D-03
+   36      1.21439733D+01      2.49473529D-02
+ ----------------------------------------------------------
+    Final cost function J  =  235632.283564582234
+Timing for Time elapsed in 3dvar: 1108.35000 elapsed seconds.
+
+4pe:
+  Starting Cost function:  2.64200993D+05 Gradient=  1.39596160D+03
+ ----------------------------------------------------------
+
+   Iter     CG_Gradient           Step
+
+    1      9.27726509D+02      1.55486649D-03
+    2      1.53276883D+03      1.04738896D-02
+    3      1.19381479D+03      2.95129101D-03
+    4      9.07535602D+02      3.83261429D-03
+    5      7.87238042D+02      3.44722949D-03
+    6      6.01660566D+02      5.82040039D-03
+    7      6.51255379D+02      2.28263098D-02
+    8      5.19818980D+02      8.25922431D-03
+    9      3.65503960D+02      8.62199156D-03
+   10      4.05900901D+02      2.25131175D-02
+   11      2.89187422D+02      1.60603356D-02
+   12      2.06796192D+02      1.70514841D-02
+   13      2.06773582D+02      1.95795222D-02
+   14      2.29581500D+02      3.06957265D-02
+   15      1.64689163D+02      1.05288342D-02
+   16      1.86145877D+02      1.25733449D-02
+   17      2.06001485D+02      2.55196437D-03
+   18      1.50537119D+02      7.81807056D-03
+   19      1.23257899D+02      1.88181948D-02
+   20      2.07123591D+02      6.10035338D-03
+   21      1.01426179D+02      4.05706531D-03
+   22      1.12416946D+02      2.59484524D-02
+   23      1.68192585D+02      6.34436532D-03
+   24      8.21546155D+01      5.75462541D-03
+   25      5.60856026D+01      1.87941589D-02
+   26      4.55177311D+01      2.71340976D-02
+   27      4.30813336D+01      3.06390343D-02
+   28      3.14822522D+01      2.66611431D-02
+   29      2.47340626D+01      2.74709911D-02
+   30      4.04630613D+01      3.41125322D-02
+   31      3.80071532D+01      2.80419321D-03
+   32      2.60688138D+01      2.57713656D-03
+   33      1.58507132D+01      1.49954506D-02
+   34      1.42000240D+01      3.13903002D-02
+   35      2.53302260D+01      5.99989787D-03
+   36      1.93058153D+01      6.42363821D-03
+   37      9.03215275D+00      5.24948935D-03
+ ----------------------------------------------------------
+    Final cost function J  =  235631.871580577892
+Timing for Time elapsed in 3dvar:  321.09000 elapsed seconds.
+

@@ -1,0 +1,69 @@
+Change Log for update to WRF 3DVAR code
+---------------------------------------
+
+Author: 	Wei
+Reviewer: 	Rizvi
+Date: 		08/30/04
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Add capability of using MM5 as first guess, and output
+MM5 analysis.
+
+Expected Differences
+--------------------
+
+Accuracy: 	WRF 3DVAR: Results unchanged.
+		MM5 3DVAR: 0 iteration analysis bit-compatable with fg.
+CPU/memory:	Memory increases if use MM5 (mainly temporary allocate/deallocate).
+
+Test results (run on what machines?)
+------------------------------------------------------
+
+Typhoon Sam. On "pecan2" (DEC).
+
+Files removed:
+--------------
+
+ da_3dvar/src/DA_Minimisation/DA_Add_PBL_And_SFC_Info.inc
+ da_3dvar/src/DA_Minimisation/da_add_increments.inc
+ da_3dvar/src/DA_Setup_Structures/da_write_analysis.inc
+
+Files added:
+------------
+
+ da_3dvar/src/DA_Setup_Structures/DA_Add_PBL_And_SFC_Info.inc
+ da_3dvar/src/DA_Setup_Structures/DA_Transfer_XatoAnalysis.inc
+ da_3dvar/src/DA_Setup_Structures/da_add_increments.inc
+
+Files modified:
+---------------
+
+ da_3dvar/src/Makefile
+ da_3dvar/src/DA_Minimisation/DA_Minimisation.F
+ da_3dvar/src/DA_ReadWrite_MM5/DA_Write_Analysis_MM5.inc
+ da_3dvar/src/DA_SSMI/DA_Transform_XToTb.inc
+ da_3dvar/src/DA_Setup_Structures/DA_Setup_Structures.F
+ da_3dvar/src/DA_Setup_Structures/da_interpolate_stats.inc
+ da_3dvar/src/DA_Setup_Structures/da_setup_background_errors2.inc
+ da_3dvar/src/DA_Setup_Structures/da_setup_firstguess.inc
+ da_3dvar/src/DA_Setup_Structures/da_setup_firstguess_mm5.inc
+ da_3dvar/src/DA_Setup_Structures/da_transfer_mm5toxb.inc
+ da_3dvar/src/DA_Setup_Structures/da_transfer_wrftoxb.inc
+ da_3dvar/src/da_solve_v3d/da_solve_v3d.F
+
+New fix:
+
+ DA_Dynamics/DA_Balance_Equation_Adj.inc
+ DA_Setup_Structures/da_setup_background_errors2.inc
+ DA_VToX_Transforms/DA_Transform_VpToX.inc
+ DA_VToX_Transforms/DA_Transform_VpToX_Adj.inc
+ DA_VToX_Transforms/da_transform_vtox.inc
+ DA_VToX_Transforms/da_transform_vtox_adj.inc
+
+Minor-tag:
+
+mm5_as_fg
+
+

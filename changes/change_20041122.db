@@ -1,0 +1,68 @@
+Change Log for update to WRF 3DVAR code
+---------------------------------------
+
+Author: 	Dale Barker
+Reviewer: 	Wei Huang
+Date: 		11/22/04
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Include new "gen_be" background error calculation utility.
+
+Expected Differences
+--------------------
+
+No impact on 3D-Var (run separately as a utility program).
+
+New gen_be utility is run standalone using scripts available 
+in run/gen_be. Included in the WRF framework as it uses routines 
+in existing modules (e.g DA_Tools, DA_VToX_Transforms).
+
+Test results (run on what machines?)
+------------------------------------------------------
+
+1) KMA T63 statistics. Mac G5 (original standalone code), Dec-Alpha:
+
+Results to come (Dale).
+
+2) KMA T63 statistics. Dec-Alpha, Cray X1 (in framework):
+
+Results to come (Wei).
+
+Files removed:
+--------------
+
+None.
+
+Files added:
+------------
+
+New directories/modules:
+da_3dvar/src/da_fftpack5
+da_3dvar/src/da_gen_be
+da_3dvar/src/da_spectral
+main/gen_be
+run/gen_be
+
+New files:
+da_3dvar/changes/change_20041122.db
+da_3dvar/src/DA_Constants/da_advance_cymdh.inc
+da_3dvar/src/DA_Constants/da_change_date.inc
+da_3dvar/src/DA_Tools/da_eof_decomposition.inc
+da_3dvar/src/DA_Tools/da_eof_decomposition_test.inc
+da_3dvar/src/DA_Tools/da_lubksb.inc
+da_3dvar/src/DA_Tools/da_ludcmp.inc
+
+Files modified:
+---------------
+
+M Makefile
+M da_3dvar/src/Makefile
+M da_3dvar/src/DA_Constants/DA_Constants.F
+M da_3dvar/src/DA_Tools/DA_Tools.F
+
+Minor-tag:
+
+cvs -r tag gen_be_code
+

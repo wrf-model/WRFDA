@@ -1,0 +1,43 @@
+Change Log for update to WRF 3DVAR code
+---------------------------------------
+
+Author: 	Wei, YR
+Reviewer: 	YR, Wei
+Date: 		05/27/04
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+1. Bug fix CV 3 single-multiple processors difference.
+   (Found by YR, fixed by Wei)
+2. Qscat.
+   (Found by Shuhua, fixed by YR, Dale)
+3. Obs. position.
+   (Found by YR, fixed by YR, Wei)
+
+Expected Differences
+--------------------
+
+Accuracy: 	have impacts on final results.
+CPU/memory:	No change
+
+Test results (run on what machines?)
+------------------------------------------------------
+
+Files removed:
+--------------
+
+ da_3dvar/src/DA_Setup_Structures/da_setup_background_errors3.inc
+ da_3dvar/src/da_qscat/da_get_innov_vector_qscat.inc
+ da_3dvar/src/da_setup_firstguess_wrf.inc
+
+Files added:
+------------
+
+Files modified:
+---------------
+
+Minor-tag:
+
+version_2_0_2
+

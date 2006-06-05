@@ -1,0 +1,66 @@
+Change Log for update to WRF 3DVAR code
+---------------------------------------
+
+Author: 	Yong-Run Guo
+Reviewer: 	
+Date: 		09/23/05
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+1, Bugs fix for conversion between lat/lon and (X,y) with Mercator projection
+
+2, Skip over the "call DA_Transform_XToTb( xb )" if  Use_SsmiTbObs = .FALSE.
+   because it has difficulties with CWB/NFS-WRFinput.
+
+Expected Differences
+--------------------
+
+Accuracy:       
+
+Case: Hurrican Rita case 2005-09-22_00:00:00
+
+The testing results for conversion between lat/lon and (X,Y):
+
+Setting up MERCATOR map...
+
+Check the map_set correctness::::::::::::::::::::::::
+
+
+Center: latc,lonc,x,y, Xc, Yc:    30.004   -87.995   230.000   175.500   230.000   175.500
+
+
+Center: X, Y, latc, lonc, phic, xlonc:   230.000   175.500    30.004   -87.995    30.004   -87.995
+
+
+Low-left: lat,lon,x,y,xp%ids,xp%jds:     9.682  -116.536     1.000     1.000     1     1
+
+
+Upper-right: lat,lon,x,y,xp%ide,xp%jde:    46.890   -59.464   458.914   349.934   459   350
+
+
+grid%cen_lon  , grid%cen_lat     : -0.879946060181E+02  0.300035476685E+02
+grid%stand_lon, grid%moad_cen_lat: -0.880000000000E+02  0.300035476685E+02
+## Compute the coarse_ix, coarse_jy, start_x, and start_y: ##
+Dimension of MOAD: ix, jy:  476  367  parent_x, parent_y:   9.0   9.0
+
+Please check if the domain's central point (x,y) is correct:
+grid%cen_lat,grid%cen_lon,x,y:      30.004     -87.995     230.050     175.500
+
+
+Files added:
+------------
+
+da_3dvar/changes/change_20050923.yrg
+
+Files modified:
+---------------
+
+M da_3dvar/src/DA_Setup_Structures/da_setup_firstguess_wrf.inc
+M da_3dvar/src/DA_Setup_Structures/da_transfer_wrftoxb.inc
+M da_3dvar/src/DA_Tools/DA_Tools.F
+
+Minor-tag:
+---------
+
+

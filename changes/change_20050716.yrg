@@ -1,0 +1,146 @@
+Change Log for update to WRF 3DVAR code
+---------------------------------------
+
+Author: 	Hui-Chuan Lin
+Reviewer: 	Yong-Run Guo
+Date: 		07/16/05
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+To introduce the capability of assimilating the Global bogus data
+from CWB Global model.
+
+Note:
+1) The variables are U, V, T, Q, and SLP. Because the Typhoon bogus
+   code can only assimilate the U, V, and SLP, two more observation
+   variables: T and Q are added.
+
+2) For Typhoon bogus, only U, V, and SLP are assimilated even if the
+   T is available. Using the "info%platform" to distinguish Typhoon 
+   bogus data and Global bogus data: 
+
+   Typhoon bogus: "FM-135 TCBOG"
+   Global bogus : "FM-135 BOGUS"
+
+Expected Differences
+--------------------
+
+Accuracy:       not affect 3dvar results other than Global bogus data
+                assimilation 	
+
+CPU/memory:	minor increase CPU and memory
+
+Test results (run on what machines?)
+------------------------------------------------------
+
+PC Linux (palm)
+
+CWB Dujuan case at 2003083012Z with cv_options=5:
+
+DAProg_3DVAR.statistics:
+
+ Diagnostics of OI for Bogus
+
+   var             u (m/s)     n    k    v (m/s)     n    k    t (K)       n    k    q (kg/kg)   n    k    slp (pa)    n    k
+
+  Number:             1358                  1358                  1358                  1358                     0
+ Minimum(n,k):     -19.5360   87    2    -16.4512   79    2     -7.7989   78   11 -0.7323E-02  109    2 888888.0000    0    0
+ Maximum(n,k):      16.0903   42   12     15.0318   86    2      3.6374   40    5  0.4608E-02   75    1-888888.0000    0    0
+ Average     :       0.0284               -0.0311               -0.1998           -0.2821E-03                0.0000
+    RMSE     :       3.6812                3.1903                1.3997            0.1555E-02                0.0000
+
+ Diagnostics of AO for Bogus
+
+   var             u (m/s)     n    k    v (m/s)     n    k    t (K)       n    k    q (kg/kg)   n    k    slp (pa)    n    k
+
+  Number:             1358                  1358                  1358                  1358                     0
+ Minimum(n,k):      -6.0299   93    2     -6.9142   75    9     -3.5959   38    2 -0.6016E-02  109    2 888888.0000    0    0
+ Maximum(n,k):       6.4308   79    9      7.6604   71   10      2.7616   40    5  0.4619E-02   75    1-888888.0000    0    0
+ Average     :       0.0860                0.0162               -0.1457           -0.1767E-03                0.0000
+    RMSE     :       1.3553                1.2765                0.8581            0.1319E-02                0.0000
+
+wrfavr.out
+
+  Starting outer iteration :   1
+  Original gradient is  3.32156471D+02
+  For this outer iteration Gradient target is  3.32156471D+00
+  Starting Cost function:  5.03203379D+03 Gradient=  3.32156471D+02
+ ----------------------------------------------------------
+
+   Iter      Gradient             Step
+
+    1      2.15813846D+02      1.73227891D-02
+    2      1.82036423D+02      1.72766836D-02
+    3      1.54386649D+02      2.11868582D-02
+    4      1.36125230D+02      1.86131084D-02
+    5      1.30161119D+02      2.50254882D-02
+    6      1.13102749D+02      1.64028946D-02
+    7      9.88678897D+01      2.08137982D-02
+    8      7.58514493D+01      2.19179532D-02
+    9      7.26112597D+01      2.12067258D-02
+   10      5.61159716D+01      2.00652880D-02
+   11      4.87365955D+01      1.58031015D-02
+   12      3.61407147D+01      2.21701001D-02
+   13      3.02532350D+01      2.68381011D-02
+   14      2.52742209D+01      2.58887958D-02
+   15      2.11542718D+01      2.48008351D-02
+   16      1.85850664D+01      2.25833906D-02
+   17      1.60596184D+01      2.58771540D-02
+   18      1.33565208D+01      2.59744268D-02
+   19      1.07997741D+01      2.62515318D-02
+   20      8.93624388D+00      2.73506894D-02
+   21      7.16431044D+00      2.67004429D-02
+   22      6.71592601D+00      2.95970595D-02
+   23      4.98130878D+00      2.28929443D-02
+   24      3.91954803D+00      2.93579385D-02
+   25      3.59197191D+00      2.97424134D-02
+   26      3.05106569D+00      2.33753937D-02
+ ----------------------------------------------------------
+  Inner iteration stopped after   26 iterations
+   Final cost function :  2.26787916D+03 and Gradient:  3.05106569D+00
+ ----------------------------------------------------------
+
+    Final cost function J  =     2267.879157723370    
+
+ 
+Files added:
+------------
+
+None
+
+Files modified:
+---------------
+M da_3dvar/src/DA_Bogus/DA_AO_Stats_Bogus.inc
+M da_3dvar/src/DA_Bogus/DA_Bogus.F
+M da_3dvar/src/DA_Bogus/DA_Calculate_GradY_Bogus.inc
+M da_3dvar/src/DA_Bogus/DA_Calculate_Jo_and_GradY_Bogus.inc
+M da_3dvar/src/DA_Bogus/DA_Calculate_Residual_Bogus.inc
+M da_3dvar/src/DA_Bogus/DA_OI_Stats_Bogus.inc
+M da_3dvar/src/DA_Bogus/DA_Print_Stats_Bogus.inc
+M da_3dvar/src/DA_Bogus/DA_Transform_XToY_Bogus.inc
+M da_3dvar/src/DA_Bogus/DA_Transform_XToY_Bogus_Adj.inc
+M da_3dvar/src/DA_Bogus/da_check_max_iv_bogus.inc
+M da_3dvar/src/DA_Bogus/da_get_innov_vector_bogus.inc
+M da_3dvar/src/DA_Constants/DA_Constants.F
+M da_3dvar/src/DA_Define_Structures/DA_Allocate_Y.inc
+M da_3dvar/src/DA_Define_Structures/DA_Deallocate_Observations.inc
+M da_3dvar/src/DA_Define_Structures/DA_Deallocate_Y.inc
+M da_3dvar/src/DA_Define_Structures/DA_Define_Structures.F
+M da_3dvar/src/DA_Define_Structures/DA_Zero_Y.inc
+M da_3dvar/src/DA_Minimisation/da_calculate_jo_and_grady.inc
+M da_3dvar/src/DA_Minimisation/da_get_var_diagnostics.inc
+M da_3dvar/src/DA_Obs/DA_Read_Obs.inc
+M da_3dvar/src/DA_Obs/da_add_noise_to_ob.inc
+M da_3dvar/src/DA_Obs/da_fill_obs_structures.inc
+M da_3dvar/src/DA_Obs/da_random_omb_all.inc
+M da_3dvar/src/DA_Obs/da_use_obs_errfac.inc
+M da_3dvar/src/DA_Obs/da_write_obs.inc
+M da_3dvar/src/DA_Obs/da_write_y.inc
+M da_3dvar/src/DA_Test/DA_Check_XToY_Adjoint_Bogus.inc
+M da_3dvar/utl/plot_gen_be_nmc.csh
+
+Minor-tag:
+---------
+
+

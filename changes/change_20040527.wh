@@ -1,0 +1,68 @@
+Change Log for update to WRF 3DVAR code
+---------------------------------------
+
+Author: 	Wei
+Reviewer: 	YR 
+Date: 		05/27/04
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+1. Bug fix for wrf vertical dimension check.
+2. Replace GPS Refractivity code with our own.
+
+Expected Differences
+--------------------
+
+Accuracy: 	Bit-reproducible
+CPU/memory:	No change
+
+Test results (run on what machines?)
+------------------------------------------------------
+
+Ihop.
+
+Files removed:
+--------------
+
+ da_3dvar/src/DA_Gpsref/da_check_max_iv_gpsref.inc
+ da_3dvar/src/DA_Gpsref/da_get_innov_vector_gpsref.inc
+ da_3dvar/src/DA_Physics/DA_Transform_XToGPSREF.inc
+ da_3dvar/src/DA_Physics/DA_Transform_XToGPSREF_Adj.inc
+ da_3dvar/src/DA_Physics/DA_Transform_XToGPSREF_Lin.inc
+
+Files added:
+------------
+
+ da_3dvar/src/DA_Physics/DA_Transform_XToGPSRef_Lin.inc
+ da_3dvar/src/DA_Physics/DA_Transform_XToGPSRef.inc
+ da_3dvar/src/DA_Physics/DA_Transform_XToGPSRef_Adj.inc
+ da_3dvar/src/DA_Gpsref/DA_Calculate_GradY_Gpsref.inc
+ da_3dvar/src/DA_Gpsref/da_check_max_iv_Gpsref.inc
+ da_3dvar/src/DA_Gpsref/da_get_innov_vector_Gpsref.inc
+
+Files modified:
+---------------
+
+ Makefile
+ Registry/Registry_3dvar
+ da_3dvar/src/Makefile
+ da_3dvar/src/DA_Constants/DA_Constants.F
+ da_3dvar/src/DA_Define_Structures/DA_Define_Structures.F
+ da_3dvar/src/DA_Gpsref/DA_AO_Stats_Gpsref.inc
+ da_3dvar/src/DA_Gpsref/DA_Calculate_Jo_and_GradY_Gpsref.inc
+ da_3dvar/src/DA_Gpsref/DA_Calculate_Residual_Gpsref.inc
+ da_3dvar/src/DA_Gpsref/DA_Gpsref.F
+ da_3dvar/src/DA_Gpsref/DA_OI_Stats_Gpsref.inc
+ da_3dvar/src/DA_Gpsref/DA_Print_Stats_Gpsref.inc
+ da_3dvar/src/DA_Gpsref/DA_Transform_XToY_Gpsref.inc
+ da_3dvar/src/DA_Gpsref/DA_Transform_XToY_Gpsref_Adj.inc
+ da_3dvar/src/DA_Minimisation/DA_Minimisation.F
+ da_3dvar/src/DA_Obs/DA_Obs.F
+ da_3dvar/src/DA_Test/DA_Test.F
+
+
+Minor-tag:
+
+version_2_0_1
+

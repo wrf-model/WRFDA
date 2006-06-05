@@ -1,0 +1,73 @@
+Change Log for update to WRF 3DVAR code
+---------------------------------------
+
+Author: 	Shu-Hua Chen
+Reviewer: 	YR
+Date: 		04/14/04
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Update SSMI to WRF3DVAR.
+
+
+Expected Differences
+--------------------
+
+Accuracy: 	Only impact on SSMI.
+CPU/memory:	No
+
+Test results (run on what machines?)
+------------------------------------------------------
+
+T4b.
+
+Files removed:
+--------------
+
+None
+
+Files added:
+------------
+
+Non
+
+Files modified:
+---------------
+
+ da_3dvar/src/DA_Minimisation/DA_Add_PBL_And_SFC_Info.inc
+ da_3dvar/src/DA_Minimisation/DA_CG_Minimise.inc
+ da_3dvar/src/DA_Minimisation/da_calculate_j.inc
+ da_3dvar/src/DA_Minimisation/da_get_var_diagnostics.inc
+ da_3dvar/src/DA_Minimisation/da_sum_reals.inc
+ da_3dvar/src/DA_Obs/da_add_noise_to_ob.inc
+ da_3dvar/src/DA_Obs/da_write_obs.inc
+ da_3dvar/src/DA_Obs/da_write_y.inc
+ da_3dvar/src/DA_Physics/DA_TPQ_To_RH_Lin.inc
+ da_3dvar/src/DA_Physics/DA_TP_To_Qs.inc
+ da_3dvar/src/DA_SSMI/DA_AO_Stats_SSMI_Tb.inc
+ da_3dvar/src/DA_SSMI/DA_Cal_Residual_SSMI_Tb.inc
+ da_3dvar/src/DA_SSMI/DA_Read_SSMI.inc
+ da_3dvar/src/DA_SSMI/DA_Read_SSMI_Info.inc
+ da_3dvar/src/DA_SSMI/DA_SSMI.F
+ da_3dvar/src/DA_SSMI/DA_Transform_XToTb.inc
+ da_3dvar/src/DA_SSMI/DA_Transform_XToTb_Adj.inc
+ da_3dvar/src/DA_SSMI/DA_Transform_XToTb_Lin.inc
+ da_3dvar/src/DA_SSMI/DA_Transform_XToY_SSMI_Tb.inc
+ da_3dvar/src/DA_SSMI/DA_Transform_XToY_SSMI_Tb_Adj.inc
+ da_3dvar/src/DA_SSMI/da_check_max_iv_ssmi_tb.inc
+ da_3dvar/src/DA_SSMI/da_get_innov_vector_ssmi_tb.inc
+ da_3dvar/src/DA_Setup_Structures/da_setup_obs_structures_mm5.inc
+ da_3dvar/src/DA_Setup_Structures/da_transfer_wrftoxb.inc
+ da_3dvar/src/DA_Test/DA_Check_XToY_Adjoint.inc
+ da_3dvar/src/DA_Test/DA_Check_XToY_Adjoint_SSMI_Rv.inc
+ da_3dvar/src/DA_Test/DA_Check_XToY_Adjoint_SSMI_Tb.inc
+ da_3dvar/src/DA_Test/da_check_xtoy_adjoint_ssmt1.inc
+ da_3dvar/src/DA_Test/da_check_xtoy_adjoint_ssmt2.inc
+ da_3dvar/src/da_solve_v3d/da_solve_v3d.F
+
+
+Minor-tag:
+
+beta_version_2
+
