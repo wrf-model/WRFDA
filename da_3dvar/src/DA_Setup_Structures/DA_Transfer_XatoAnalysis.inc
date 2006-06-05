@@ -13,7 +13,7 @@ subroutine DA_Transfer_XatoAnalysis( it, xbx, grid, config_flags ,&
 !  PARENT_MODULE: DA_Setup_Structures
 !------------------------------------------------------------------------------
 
-   USE module_wrf_3dvar_io
+   USE da_wrfvar_io
 
    IMPLICIT NONE
 
@@ -50,7 +50,7 @@ subroutine DA_Transfer_XatoAnalysis( it, xbx, grid, config_flags ,&
 
       if(it < max_ext_its) then
          if(lvar4d) then
-            CALL med_initialdata_output_3dvar( grid , config_flags )
+            CALL da_med_initialdata_output( grid , config_flags )
          endif
 
          call DA_Transfer_WRFToXb( xbx, grid, &

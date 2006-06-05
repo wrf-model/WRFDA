@@ -16,7 +16,7 @@ MODULE da_setup_structures
    USE da_h_ops
    USE da_readwrite_mm5
    USE da_spectral
-   use module_wrf_3dvar_io
+   use da_wrfvar_io
    use da_radiance
    USE module_wrf_error
    use da_tracing
@@ -26,7 +26,7 @@ MODULE da_setup_structures
    CONTAINS
 
 #include <da_add_increments.inc>
-#include <DA_Add_PBL_And_SFC_Info.inc>
+#include <da_add_pbl_and_sfc_info.inc>
 #include <da_get_vertical_truncation.inc>
 #include <da_interpolate_regcoeff.inc>
 #include <da_interpolate_stats.inc>
@@ -55,12 +55,12 @@ MODULE da_setup_structures
 #include <da_transfer_wrftltoxa_adj.inc>
 #include <da_transfer_xatowrftl.inc>
 #include <da_transfer_xatowrftl_adj.inc>
-#include <DA_Transfer_XatoAnalysis.inc>
+#include <da_transfer_xatoanalysis.inc>
 #include <da_write_interpolated_be.inc>
 #include <da_cloud_model.inc>
 #include <da_write_increments.inc>
-#include <DA_Write_KMA_Increments.inc>
-#include <DA_Get_Bins_Info.inc>
+#include <da_write_kma_increments.inc>
+#include <da_get_bins_info.inc>
 #include <da_truncate_spectra.inc>
 
 END MODULE da_setup_structures

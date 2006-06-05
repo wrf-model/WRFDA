@@ -224,7 +224,7 @@ SUBROUTINE DA_Transfer_WRFTLtoXa_Adj( grid, config_flags, filnam, &
    grid%dyn_opt = DYN_EM_TL
    call nl_set_dyn_opt ( 1 , DYN_EM_TL )
 
-   call med_initialdata_output_3dvar( grid , config_flags, filnam )
+   call da_med_initialdata_output( grid , config_flags, filnam )
 
    grid%dyn_opt = ndynopt
    call nl_set_dyn_opt ( 1 , DYN_EM )
