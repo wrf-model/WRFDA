@@ -4,7 +4,7 @@
 ! Utility subroutines for parallel WRFVAR.
 !---------------------------------------------------------------------------
 
-MODULE par_util1
+MODULE da_par_util1
 
    USE module_wrf_error
 
@@ -26,7 +26,7 @@ MODULE par_util1
 
    CONTAINS
 
-#include <proc_sum_int.inc>
-#include <proc_sum_real.inc>
+#include <da_proc_sum_int.inc>
+#include <da_proc_sum_real.inc>
 
-END MODULE par_util1
+END MODULE da_par_util1
