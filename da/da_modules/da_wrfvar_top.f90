@@ -22,7 +22,6 @@ MODULE da_wrfvar_top
 #endif
 
    USE da_wrfvar_io
-   USE da_wrfvar_interface
 
    USE da_constants
 
@@ -59,8 +58,9 @@ MODULE da_wrfvar_top
 
 CONTAINS
 
-#include "da_wrfvar_init"
-#include "da_wrfvar_run"
-#include "da_wrfvar_finalize"
+#include "da_wrfvar_init.inc"
+#include "da_wrfvar_run.inc"
+#include "da_wrfvar_finalize.inc"
+#include "da_wrfvar_interface.inc"
 
 END MODULE da_wrfvar_top

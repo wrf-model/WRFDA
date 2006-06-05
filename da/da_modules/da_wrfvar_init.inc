@@ -30,7 +30,7 @@ SUBROUTINE da_wrfvar_init( gcomp, importState, exportState, clock, rc )
    !
    !</DESCRIPTION>
 
-   program_name = version//" (COMPATIBLE WITH "//wrf_version//") MODEL"
+   program_name = wrfvar_version//" (COMPATIBLE WITH "//wrf_version//") MODEL"
 
    !  Get the NAMELIST data for input.
 

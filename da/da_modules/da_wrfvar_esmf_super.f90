@@ -24,8 +24,7 @@ MODULE da_wrfvar_esmf_super
    USE module_dm
 #endif
 
-   USE da_module_wrfvar_io
-   USE da_module_wrfvar_interface
+   USE da_wrfvar_io
 
    USE da_constants
 
@@ -66,6 +65,7 @@ CONTAINS
 #include "da_wrfvar_init.inc"
 #include "da_wrfvar_run.inc"
 #include "da_wrfvar_finalize.inc"
+#include "da_wrfvar_interface.inc"
 
 END MODULE da_wrfvar_esmf_super
 
