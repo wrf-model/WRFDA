@@ -1,4 +1,4 @@
-subroutine interp_obs_lin_2d_adj(fm2d, xp, i, j, dx, dy, dxm, dym, fo2d, z)
+subroutine da_interp_obs_lin_2d_adj(fm2d, xp, i, j, dx, dy, dxm, dym, fo2d, z)
 
    implicit none
 
@@ -13,7 +13,7 @@ subroutine interp_obs_lin_2d_adj(fm2d, xp, i, j, dx, dy, dxm, dym, fo2d, z)
    real                                 :: dz, dzm
    real, dimension(xp%kms:xp%kme)       :: fmz
 
-   call togrid(z, xp%kts, xp%kte, k, dz, dzm)
+   call da_togrid(z, xp%kts, xp%kte, k, dz, dzm)
 
    fmz(k)   = dzm*fo2d
    fmz(k+1) = dz *fo2d
@@ -25,5 +25,5 @@ subroutine interp_obs_lin_2d_adj(fm2d, xp, i, j, dx, dy, dxm, dym, fo2d, z)
       fm2d(i+1,j+1,kk) = dy *dx * fmz(kk) + fm2d(i+1,j+1,kk)
    enddo
 
-end subroutine interp_obs_lin_2d_adj
+end subroutine da_interp_obs_lin_2d_adj
 

@@ -1,4 +1,4 @@
-subroutine interp_lin_3d(fm3d, xp, &
+subroutine da_interp_lin_3d(fm3d, xp, &
                          i, j, dx, dy, dxm, dym, &
                          fo3d, ml, zk, nl)
 
@@ -26,10 +26,10 @@ subroutine interp_lin_3d(fm3d, xp, &
 
    do kk = 1, nl
       if(zk(kk) > 0.0) then
-         call togrid(zk(kk), xp%kts, xp%kte, k, dz, dzm)
+         call da_togrid(zk(kk), xp%kts, xp%kte, k, dz, dzm)
          fo3d(kk) = dzm*fmz(k) + dz*fmz(k+1)
       endif
    enddo
 
-end subroutine interp_lin_3d
+end subroutine da_interp_lin_3d
 

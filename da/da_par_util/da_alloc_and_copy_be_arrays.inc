@@ -1,4 +1,4 @@
-SUBROUTINE alloc_and_copy_be_arrays( vg , v, jts,jte, kts,kte )
+SUBROUTINE da_alloc_and_copy_be_arrays( vg , v, jts,jte, kts,kte )
 
   TYPE (be_subtype), INTENT(inout) :: vg       ! Global backgrd error struct.
   TYPE (be_subtype), INTENT(inout) :: v        ! Local backgrd error struct.
@@ -27,5 +27,5 @@ SUBROUTINE alloc_and_copy_be_arrays( vg , v, jts,jte, kts,kte )
          DEALLOCATE ( vg % rf_alpha )
       end if
 
-END SUBROUTINE alloc_and_copy_be_arrays 
+END SUBROUTINE da_alloc_and_copy_be_arrays 
 

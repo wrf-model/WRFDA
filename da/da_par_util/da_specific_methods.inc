@@ -3,14 +3,9 @@
 !------------------------------------------------------------------------------
 ! PURPOSE:  Free objects created by to_global_sound().  
 !
-! METHOD:   Simple bookeeping.  
-!
-!  HISTORY:
-!           09/22/2005 - Creation.                          Tom Henderson
-!
-! PARENT_MODULE: par_util
+! METHOD:   Simple bookeeping.
 !------------------------------------------------------------------------------
-  SUBROUTINE free_global_sound( iv_glob, re_glob, jo_grad_y_glob )
+  SUBROUTINE da_free_global_sound( iv_glob, re_glob, jo_grad_y_glob )
 
     IMPLICIT NONE
 
@@ -32,21 +27,16 @@
     ENDDO
     DEALLOCATE( jo_grad_y_glob%sound )
     RETURN
-  END SUBROUTINE free_global_sound
+  END SUBROUTINE da_free_global_sound
 
 
 
 !------------------------------------------------------------------------------
 ! PURPOSE:  Free objects created by to_global_sonde_sfc().  
 !
-! METHOD:   Simple bookeeping.  
-!
-!  HISTORY:
-!           10/10/2005 - Creation.                          Tom Henderson
-!
-! PARENT_MODULE: par_util
+! METHOD:   Simple bookeeping. 
 !------------------------------------------------------------------------------
-  SUBROUTINE free_global_sonde_sfc( iv_glob, re_glob, jo_grad_y_glob )
+  SUBROUTINE da_free_global_sonde_sfc( iv_glob, re_glob, jo_grad_y_glob )
 
     IMPLICIT NONE
 
@@ -60,21 +50,16 @@
     DEALLOCATE( re_glob%sonde_sfc )
     DEALLOCATE( jo_grad_y_glob%sonde_sfc )
     RETURN
-  END SUBROUTINE free_global_sonde_sfc
+  END SUBROUTINE da_free_global_sonde_sfc
 
 
 
 !------------------------------------------------------------------------------
 ! PURPOSE:  Free objects created by to_global_synop().  
 !
-! METHOD:   Simple bookeeping.  
-!
-!  HISTORY:
-!           10/10/2005 - Creation.                          Tom Henderson
-!
-! PARENT_MODULE: par_util
+! METHOD:   Simple bookeeping.
 !------------------------------------------------------------------------------
-  SUBROUTINE free_global_synop( iv_glob, re_glob, jo_grad_y_glob )
+  SUBROUTINE da_free_global_synop( iv_glob, re_glob, jo_grad_y_glob )
 
     IMPLICIT NONE
 
@@ -88,5 +73,5 @@
     DEALLOCATE( re_glob%synop )
     DEALLOCATE( jo_grad_y_glob%synop )
     RETURN
-  END SUBROUTINE free_global_synop
+  END SUBROUTINE da_free_global_synop
 

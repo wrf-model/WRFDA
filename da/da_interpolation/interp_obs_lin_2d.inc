@@ -1,4 +1,4 @@
-subroutine interp_obs_lin_2d(fm2d, xp, i, j, dx, dy, dxm, dym, fo2d, z)
+subroutine da_interp_obs_lin_2d(fm2d, xp, i, j, dx, dy, dxm, dym, fo2d, z)
 
    implicit none
 
@@ -14,7 +14,7 @@ subroutine interp_obs_lin_2d(fm2d, xp, i, j, dx, dy, dxm, dym, fo2d, z)
    real                               :: dz, dzm
    real, dimension(xp%kms:xp%kme)     :: fmz
 
-   call toGrid(z, xp%kts, xp%kte, k, dz, dzm)
+   call da_toGrid(z, xp%kts, xp%kte, k, dz, dzm)
 
    do kk = k,k+1 
       fmz(kk) = dym*(dxm*fm2d(i,j  ,kk) + dx*fm2d(i+1,j  ,kk)) &
@@ -23,5 +23,5 @@ subroutine interp_obs_lin_2d(fm2d, xp, i, j, dx, dy, dxm, dym, fo2d, z)
 
    fo2d = dzm*fmz(k) + dz*fmz(k+1)
 
-end subroutine interp_obs_lin_2d
+end subroutine da_interp_obs_lin_2d
 

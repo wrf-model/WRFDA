@@ -1,5 +1,5 @@
 
-SUBROUTINE mm5_struct_bcast( x_mm5 )
+SUBROUTINE da_mm5_struct_bcast( x_mm5 )
 
 !------------------------------------------------------------------------------
 !  PURPOSE: Broadcast (the necessary parts of) the MM5 model structure 
@@ -129,5 +129,5 @@ SUBROUTINE mm5_struct_bcast( x_mm5 )
    END IF
 
    RETURN
-END SUBROUTINE mm5_struct_bcast
+END SUBROUTINE da_mm5_struct_bcast
 

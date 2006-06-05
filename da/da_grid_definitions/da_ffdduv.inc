@@ -1,4 +1,4 @@
-SUBROUTINE ffdduv (F,D,U,V,YLON,ID)
+SUBROUTINE da_ffdduv (F,D,U,V,YLON,ID)
 
    !----------------------------------------------------------------------------
    ! When ID =  1
@@ -118,4 +118,4 @@ SUBROUTINE ffdduv (F,D,U,V,YLON,ID)
 
    END SELECT
 
-END SUBROUTINE ffdduv
+END SUBROUTINE da_ffdduv

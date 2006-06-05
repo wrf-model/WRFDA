@@ -1,4 +1,4 @@
-subroutine to_zk(obs_v, mdl_v, xp, v_interp_optn, zk)
+subroutine da_to_zk(obs_v, mdl_v, xp, v_interp_optn, zk)
 
    implicit none
 
@@ -32,5 +32,5 @@ subroutine to_zk(obs_v, mdl_v, xp, v_interp_optn, zk)
       enddo
    endif
 
-end subroutine to_zk
+end subroutine da_to_zk
 

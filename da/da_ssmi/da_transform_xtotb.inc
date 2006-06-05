@@ -379,7 +379,7 @@ END SUBROUTINE DA_Transform_XToTb
       mu = 1.0/cos(theta*0.0174533)
 ! get water vapor optical depth
 !=====
-      CALL cal_sigma_v(ifreq,p0,wv,hwv,ta,gamma,sigv)
+      CALL da_cal_sigma_v(ifreq,p0,wv,hwv,ta,gamma,sigv)
 ! otbar = one over "mean" temperature
       otbar = 1.0/(ta - gamma*zeta(ifreq))
 ! sigo = dry air optical depth
@@ -480,7 +480,7 @@ END SUBROUTINE DA_Transform_XToTb
 ! Return value:  SIGMA_V = total water vapor optical depth (Nepers)
 !
 !
-      subroutine cal_sigma_v(ifreq,p0,wv,hwv,ta,gamma,sigma_v)
+      subroutine da_cal_sigma_v(ifreq,p0,wv,hwv,ta,gamma,sigma_v)
       integer ifreq
       real sigma_v,p0,wv,hwv,ta,gamma
 !
@@ -569,7 +569,7 @@ END SUBROUTINE DA_Transform_XToTb
       endif
       sigma_v = sigv*wvc
 
-      end subroutine cal_sigma_v
+      end subroutine da_cal_sigma_v
 !
 !******************************************
 !

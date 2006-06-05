@@ -1,4 +1,4 @@
-subroutine cv_to_vv ( cv_size, rcv, xp, mzs, vv )
+subroutine da_cv_to_vv ( cv_size, rcv, xp, mzs, vv )
 
 !------------------------------------------------------------------------------
 !  PURPOSE: Fill (local) vv arrays from 1D (local) cv array.
@@ -82,5 +82,5 @@ subroutine cv_to_vv ( cv_size, rcv, xp, mzs, vv )
       vv % alpha(is:ie,js:je,1:mz) = RESHAPE( rcv(cv_s:cv_e),(/ix, jy, mz/) )
    end if
 
-end subroutine cv_to_vv
+end subroutine da_cv_to_vv
 

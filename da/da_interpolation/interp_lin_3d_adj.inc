@@ -1,4 +1,4 @@
-subroutine interp_lin_3d_adj(fm3d, xp, &
+subroutine da_interp_lin_3d_adj(fm3d, xp, &
                              i, j, dx, dy, dxm, dym, &
                              fo3d, ml, zk, nl)
 
@@ -36,5 +36,5 @@ subroutine interp_lin_3d_adj(fm3d, xp, &
    fm3d(i+1,j+1,xp%kts:xp%kte) = dy *dx *fmz(xp%kts:xp%kte) &
                                + fm3d(i+1,j+1,xp%kts:xp%kte)
 
-end subroutine interp_lin_3d_adj
+end subroutine da_interp_lin_3d_adj
 

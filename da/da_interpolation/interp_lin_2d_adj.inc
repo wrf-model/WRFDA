@@ -1,4 +1,4 @@
-subroutine interp_lin_2d_adj(fm2d, is, ie, js, je,&
+subroutine da_interp_lin_2d_adj(fm2d, is, ie, js, je,&
                              i, j, dx, dy, dxm, dym, &
                              fo2d)
 
@@ -16,5 +16,5 @@ subroutine interp_lin_2d_adj(fm2d, is, ie, js, je,&
    fm2d(i  ,j+1) = dy *dxm* fo2d + fm2d(i  ,j+1)
    fm2d(i+1,j+1) = dy *dx * fo2d + fm2d(i+1,j+1)
 
-end subroutine interp_lin_2d_adj
+end subroutine da_interp_lin_2d_adj
 

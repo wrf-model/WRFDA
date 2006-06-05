@@ -1,6 +1,6 @@
 DA_OBJS        =	da_solve_v3d.o		\
-			par_util.o              \
-			par_util1.o             \
+			da_par_util.o           \
+			da_par_util1.o          \
 			da_setup_structures.o	\
 			da_minimisation.o	\
 			da_vtox_transforms.o	\
@@ -34,14 +34,9 @@ DA_OBJS        =	da_solve_v3d.o		\
 			da_grid_definitions.o	\
 			da_statistics.o		\
 			da_define_structures.o	\
-	                da_bufrlib.o 		\
-	                bort_exit.o 		\
-	                restd.o 		\
-	                wrdesc.o 		\
 			da_h_ops.o		\
 			da_c_mat.o		\
 			da_constants.o		\
-			lapack.o		\
 			da_spectral.o           \
 			da_radiance.o		\
                         da_tracing.o            \
@@ -52,7 +47,6 @@ DA_OBJS        =	da_solve_v3d.o		\
 			parkind1.o	        \
 			gsi_kinds.o		\
 			gsi_constants.o		\
-			blas.o                  \
                         da_wrfvar_io.o      \
                         da_wrfvar_interface.o	\
 	   		da_wrfvar_top.o
@@ -83,34 +77,34 @@ generic_boilerplate.inc: generic_boilerplate.m4
 			$(RM) generic_boilerplate.inc
 			$(M4) generic_boilerplate.m4 > generic_boilerplate.inc
 
-par_util.o:		par_util.f90                   \
-			alloc_and_copy_be_arrays.inc   \
-			be_local_copy.inc              \
-			copy_dims.inc                  \
-			copy_tile_dims.inc             \
-			cv_to_vv.inc                   \
-			local_to_global.inc            \
-			mm5_struct_bcast.inc           \
-			pack_count_obs.inc             \
-			proc_maxmin_combine.inc        \
-			proc_stats_combine.inc         \
-			proc_sum_count_obs.inc         \
-			transpose.inc                  \
-			unpack_count_obs.inc           \
-			vv_to_cv.inc                   \
-			wrf_dm_interface.inc           \
-			cv_to_global.inc               \
-			generic_typedefs.inc           \
-			generic_methods.inc            \
-			specific_methods.inc           \
-			generic_boilerplate.inc        \
-			y_facade_to_global.inc         \
-                        da_define_structures.o	       \
+da_par_util.o:		da_par_util.f90                   \
+			da_alloc_and_copy_be_arrays.inc   \
+			da_be_local_copy.inc              \
+			da_copy_dims.inc                  \
+			da_copy_tile_dims.inc             \
+			da_cv_to_vv.inc                   \
+			da_local_to_global.inc            \
+			da_mm5_struct_bcast.inc           \
+			da_pack_count_obs.inc             \
+			da_proc_maxmin_combine.inc        \
+			da_proc_stats_combine.inc         \
+			da_proc_sum_count_obs.inc         \
+			da_transpose.inc                  \
+			da_unpack_count_obs.inc           \
+			da_vv_to_cv.inc                   \
+			da_wrf_dm_interface.inc           \
+			da_cv_to_global.inc               \
+			da_generic_typedefs.inc           \
+			da_generic_methods.inc            \
+			da_specific_methods.inc           \
+			da_generic_boilerplate.inc        \
+			da_y_facade_to_global.inc         \
+                        da_define_structures.o	          \
 			da_constants.o
 
-par_util1.o:		par_util1.f90                  \
-			proc_sum_int.inc               \
-			proc_sum_real.inc \
+da_par_util1.o:		da_par_util1.f90                  \
+			da_proc_sum_int.inc               \
+			da_proc_sum_real.inc \
                         module_wrf_error.o
 
 da_wrfvar_interface.o : da_wrfvar_interface.f90 \
@@ -224,30 +218,9 @@ da_setup_structures.o:	da_setup_structures.f90           \
 			da_write_increments.inc           \
                         da_setup_cv.inc
 
-bufrlib.prm:		bufrlib.PRM
-			$(RM) $@
-			$(CPP) $(FPPFLAGS_BUFR) bufrlib.PRM > bufrlib.prm
-
-da_bufrlib.o:		da_bufrlib.F bufrlib.prm
-			$(RM) $@
-			$(CPP) $(FPPFLAGS) da_bufrlib.f90 > da_bufrlib.f
-			$(FFC) -c $(FIXEDFLAGS_BUFR) da_bufrlib.f
-
-bort_exit.o:		bort_exit.c
-			$(RM) $@
-			$(CC) -c $(CCFLAGS_BUFR) bort_exit.c
-
-restd.o:		restd.c
-			$(RM) $@
-			$(CC) -c $(CCFLAGS_BUFR) restd.c
-
-wrdesc.o:		wrdesc.c
-			$(RM) $@
-			$(CC) -c $(CCFLAGS_BUFR) wrdesc.c
-
 da_vtox_transforms.o:	da_vtox_transforms.f90            \
                         module_tiles.o                    \
-			par_util.o                        \
+			da_par_util.o                     \
 			da_define_structures.o            \
 			da_tools.o                        \
 			da_recursive_filter.o             \
@@ -298,7 +271,7 @@ da_obs.o:		da_obs.f90                 \
 			da_radiance.o              \
 			da_profiler.o              \
 			da_buoy.o                  \
-			par_util.o                 \
+			da_par_util.o              \
 	                da_obs_proc_station.inc    \
 			da_read_obs.inc            \
 			da_scan_obs.inc            \
@@ -323,7 +296,7 @@ da_obs.o:		da_obs.f90                 \
 
 da_pseudo.o:		da_pseudo.f90                    \
 			da_constants.o                   \
-			par_util.o                       \
+			da_par_util.o                    \
 			da_define_structures.o           \
 			da_interpolation.o               \
 			da_statistics.o                  \
@@ -339,7 +312,7 @@ da_pseudo.o:		da_pseudo.f90                    \
 
 da_metar.o:		da_metar.f90                        \
 			da_constants.o                      \
-			par_util.o                          \
+			da_par_util.o                       \
 			da_define_structures.o              \
 			da_interpolation.o                  \
 			da_statistics.o                     \
@@ -357,7 +330,7 @@ da_metar.o:		da_metar.f90                        \
 
 da_geoamv.o:		da_geoamv.f90                    \
 			da_constants.o                   \
-			par_util.o                       \
+			da_par_util.o                    \
 			da_define_structures.o           \
 			da_interpolation.o               \
 			da_statistics.o                  \
@@ -374,12 +347,12 @@ da_geoamv.o:		da_geoamv.f90                    \
 
 da_polaramv.o:		\
 			da_constants.o \
-			par_util.o \
+			da_par_util.o \
 			da_define_structures.o \
 			da_interpolation.o \
 			da_statistics.o \
 			da_tools.o \
-			da_polaramv.f                      \
+			da_polaramv.f90                    \
 			da_ao_stats_polaramv.inc           \
 			da_get_jo_and_grady_polaramv.inc   \
 			da_calculate_residual_polaramv.inc \
@@ -393,7 +366,7 @@ da_polaramv.o:		\
 da_satem.o:		da_satem.f90                        \
 			da_physics.o                        \
 			da_constants.o                      \
-			par_util.o                          \
+			da_par_util.o                       \
 			da_define_structures.o              \
 			da_interpolation.o                  \
 			da_statistics.o                     \
@@ -410,7 +383,7 @@ da_satem.o:		da_satem.f90                        \
 
 da_ships.o:		da_ships.f90                        \
 			da_constants.o                      \
-			par_util.o                          \
+			da_par_util.o                       \
 			da_define_structures.o              \
 			da_interpolation.o                  \
 			da_statistics.o                     \
@@ -428,7 +401,7 @@ da_ships.o:		da_ships.f90                        \
 
 da_synop.o:		da_synop.f90                        \
 			da_constants.o                      \
-			par_util.o                          \
+			da_par_util.o                       \
 			da_define_structures.o              \
 			da_interpolation.o                  \
 			da_statistics.o                     \
@@ -438,7 +411,7 @@ da_synop.o:		da_synop.f90                        \
 			da_get_innov_vector_synop.inc       \
 			da_ao_stats_synop.inc               \
 			da_calculate_jo_and_grady_synop.inc \
-			compute_jo_synop_uvtq.inc           \
+			da_compute_jo_synop_uvtq.inc        \
 			da_calculate_residual_synop.inc     \
 			da_oi_stats_synop.inc               \
 			da_print_stats_synop.inc            \
@@ -448,14 +421,14 @@ da_synop.o:		da_synop.f90                        \
 da_sound.o:		da_sound.f90                        \
 			da_physics.o                        \
 			da_constants.o                      \
-			par_util.o                          \
+			da_par_util.o                       \
 			da_define_structures.o              \
 			da_interpolation.o                  \
 			da_statistics.o                     \
 			da_tools.o                          \
 			da_ao_stats_sound.inc               \
 			da_calculate_jo_and_grady_sound.inc \
-			compute_jo_sound_uvtq.inc           \
+			da_compute_jo_sound_uvtq.inc        \
 			da_calculate_residual_sound.inc     \
 			da_oi_stats_sound.inc               \
 			da_print_stats_sound.inc            \
@@ -466,7 +439,7 @@ da_sound.o:		da_sound.f90                        \
 			da_obs_diagnostics.inc              \
 			da_ao_stats_sonde_sfc.inc           \
 			da_get_jo_and_grady_sonde_sfc.inc   \
-			compute_jo_sonde_sfc_uvtq.inc       \
+			da_compute_jo_sonde_sfc_uvtq.inc    \
 			da_calculate_residual_sonde_sfc.inc \
 			da_oi_stats_sonde_sfc.inc           \
 			da_print_stats_sonde_sfc.inc        \
@@ -478,7 +451,7 @@ da_sound.o:		da_sound.f90                        \
 
 da_airep.o:		da_airep.f90                        \
 			da_constants.o                      \
-			par_util.o                          \
+			da_par_util.o                       \
 			da_define_structures.o              \
 			da_interpolation.o                  \
 			da_statistics.o                     \
@@ -495,7 +468,7 @@ da_airep.o:		da_airep.f90                        \
 
 da_pilot.o:		da_pilot.f90                        \
 			da_constants.o                      \
-			par_util.o                          \
+			da_par_util.o                       \
 			da_define_structures.o              \
 			da_interpolation.o                  \
 			da_statistics.o                     \
@@ -512,7 +485,7 @@ da_pilot.o:		da_pilot.f90                        \
 
 da_bogus.o:		da_bogus.f90                        \
 			da_constants.o                      \
-			par_util.o                          \
+			da_par_util.o                       \
 			da_define_structures.o              \
 			da_interpolation.o                  \
 			da_statistics.o                     \
@@ -522,7 +495,7 @@ da_bogus.o:		da_bogus.f90                        \
 			da_calculate_jo_and_grady_bogus.inc \
 			da_calculate_residual_bogus.inc     \
 			da_oi_stats_bogus.inc               \
-			DA_Print_Stats_Bogus.inc            \
+			da_print_stats_bogus.inc            \
 			da_transform_xtoy_bogus.inc         \
 			da_transform_xtoy_bogus_adj.inc     \
 			da_check_max_iv_bogus.inc           \
@@ -530,7 +503,7 @@ da_bogus.o:		da_bogus.f90                        \
 
 da_radar.o:		da_radar.f90                        \
 			da_constants.o                      \
-			par_util.o                          \
+			da_par_util.o                       \
 			da_define_structures.o              \
 			da_interpolation.o                  \
 			da_statistics.o                     \
@@ -555,7 +528,7 @@ da_radar.o:		da_radar.f90                        \
 
 da_gpspw.o:		da_gpspw.f90                        \
 			da_constants.o                      \
-			par_util.o                          \
+			da_par_util.o                       \
 			da_define_structures.o              \
 			da_interpolation.o                  \
 			da_statistics.o                     \
@@ -573,7 +546,7 @@ da_gpspw.o:		da_gpspw.f90                        \
 
 da_gpsref.o:		da_gpsref.f90                       \
 			da_constants.o                      \
-			par_util.o                          \
+			da_par_util.o                       \
 			da_define_structures.o              \
 			da_interpolation.o                  \
 			da_statistics.o                     \
@@ -591,7 +564,7 @@ da_gpsref.o:		da_gpsref.f90                       \
 
 da_ssmi.o:		da_ssmi.f90                         \
 			da_constants.o                      \
-			par_util.o                          \
+			da_par_util.o                       \
 			da_define_structures.o              \
 			da_interpolation.o                  \
 			da_grid_definitions.o               \
@@ -613,7 +586,7 @@ da_ssmi.o:		da_ssmi.f90                         \
 			da_oi_stats_ssmi_rv.inc             \
 			da_oi_stats_ssmi_tb.inc             \
 			da_transform_xtospeed.inc           \
-			DA_Transform_XToSpeed_Lin.inc       \
+			da_transform_xtospeed_lin.inc       \
 			da_transform_xtospeed_adj.inc       \
 			da_transform_xtoseasfcwind.inc      \
 			da_transform_xtoseasfcwind_lin.inc  \
@@ -630,7 +603,7 @@ da_ssmi.o:		da_ssmi.f90                         \
 			da_transform_xtozrhoq.inc           \
 			da_transform_xtozrhoq_lin.inc       \
 			da_transform_xtozrhoq_adj.inc       \
-			cal_sigma_v.inc                     \
+			da_cal_sigma_v.inc                     \
 			da_cal_jo_and_grady_ssmt1.inc       \
 			da_cal_jo_and_grady_ssmt2.inc       \
 			da_cal_residual_ssmt1.inc           \
@@ -661,7 +634,7 @@ da_qscat.o:		da_qscat.f90                        \
 			da_interpolation.o                  \
 			da_statistics.o                     \
 			da_tools.o                          \
-			par_util.o                          \
+			da_par_util.o                       \
 			da_calculate_jo_and_grady_qscat.inc \
 			da_calculate_residual_qscat.inc     \
 			da_check_max_iv_qscat.inc           \
@@ -674,7 +647,7 @@ da_qscat.o:		da_qscat.f90                        \
 
 da_profiler.o:		da_profiler.f90                     \
 			da_constants.o                      \
-			par_util.o                          \
+			da_par_util.o                       \
 			da_define_structures.o              \
 			da_interpolation.o                  \
 			da_statistics.o                     \
@@ -692,7 +665,7 @@ da_profiler.o:		da_profiler.f90                     \
 
 da_buoy.o:		da_buoy.f90                         \
 			da_constants.o                      \
-			par_util.o                          \
+			da_par_util.o                       \
 			da_define_structures.o              \
 			da_interpolation.o                  \
 			da_statistics.o                     \
@@ -712,7 +685,7 @@ da_readwrite_mm5.o:	da_readwrite_mm5.f90                \
 	                da_constants.o                      \
 			da_define_structures.o              \
 			da_grid_definitions.o               \
-			par_util.o                          \
+			da_par_util.o                       \
 			da_h_ops.o                          \
 			da_crs_to_dot.inc                   \
 			da_cleanrows.inc                    \
@@ -802,7 +775,7 @@ da_physics.o:		da_physics.f90                      \
 	                da_check_rh_simple.inc              \
 	                da_e_qv_from_rh.inc                 \
 	                da_get_q_error.inc                  \
-			roughness_from_lanu.inc             \
+			da_roughness_from_lanu.inc          \
 			da_sfc_wtq.inc                      \
 			da_sfc_wtq_lin.inc                  \
 			da_sfc_wtq_adj.inc                  \
@@ -819,7 +792,7 @@ da_physics.o:		da_physics.f90                      \
 
 da_ffts.o:		da_ffts.f90                         \
 			da_define_structures.o              \
-			par_util.o                          \
+			da_par_util.o                       \
 			da_fast_cosine_transform.inc        \
 			da_fast_sine_transform.inc          \
 			da_qpassm.inc                       \
@@ -833,32 +806,32 @@ da_tools.o:		da_tools.f90                   \
 			da_constants.o                 \
 			lapack.o                       \
 			da_define_structures.o         \
-                        map_utils_defines.inc          \
-                        map_utils.inc                  \
+                        da_map_utils_defines.inc       \
+                        da_map_utils.inc               \
 			da_1d_eigendecomposition.inc   \
 			da_diff_seconds.inc            \
 			da_obs_sfc_correction.inc      \
 			da_global_ll_to_xy.inc         \
 			da_ll_to_xy.inc                \
-			residual.inc                   \
+			da_residual.inc                \
 			da_add_noise.inc               \
 			da_eof_decomposition.inc       \
 			da_eof_decomposition_test.inc  \
 			da_max_error_qc.inc            \
 			da_random_omb.inc              \
 			da_random_seed.inc             \
-			gaus_noise.inc                 \
-			llxy.inc                       \
-			open_afile.inc                 \
-			smooth_anl.inc                 \
-			togrid.inc                     \
-			unifva.inc                     \
+			da_gaus_noise.inc              \
+			da_llxy.inc                    \
+			da_openfile.inc                \
+			da_smooth_anl.inc              \
+			da_togrid.inc                  \
+			da_unifva.inc                  \
 			da_set_boundary_xa.inc         \
 			da_set_boundary_xb.inc         \
-			get_2d_sum.inc                 \
-			get_3d_sum.inc                 \
+			da_get_2d_sum.inc              \
+			da_get_3d_sum.inc              \
                         da_oi.inc                      \
-			xyll.inc  
+			da_xyll.inc  
 
 da_recursive_filter.o:	da_recursive_filter.f90        \
 			da_constants.o                 \
@@ -876,26 +849,26 @@ da_interpolation.o:	da_interpolation.f90      \
 			da_define_structures.o    \
 			da_grid_definitions.o     \
 			da_tools.o                \
-			to_zk.inc                 \
-			interp_obs_lin_2d.inc     \
-			interp_obs_lin_2d_adj.inc \
-			interp_lin_2d.inc         \
-			interp_lin_2d_adj.inc     \
-			interp_lin_3d.inc         \
-			interp_lin_3d_adj.inc
+			da_to_zk.inc                 \
+			da_interp_obs_lin_2d.inc     \
+			da_interp_obs_lin_2d_adj.inc \
+			da_interp_lin_2d.inc         \
+			da_interp_lin_2d_adj.inc     \
+			da_interp_lin_3d.inc         \
+			da_interp_lin_3d_adj.inc
 
 da_grid_definitions.o:	da_grid_definitions.f90\
 			da_constants.o         \
                         da_define_structures.o \
 			da_ref_height.inc      \
 			da_ref_pres.inc        \
-			earth_2_model_wind.inc \
-			ffdduv.inc             \
-			set_map_para.inc
+			da_earth_2_model_wind.inc \
+			da_ffdduv.inc             \
+			da_set_map_para.inc
 
 da_statistics.o:	da_statistics.f90          \
 			da_define_structures.o     \
-	                par_util.o                 \
+	                da_par_util.o              \
 			da_analysis_stats.inc      \
 			da_correlation_coeff1d.inc \
 			da_correlation_coeff2d.inc \
@@ -1095,7 +1068,7 @@ da_spectral.o:		da_spectral.f90             \
 			da_legtra_inv_adj.inc       \
 			da_apply_power.inc
 
-be_spectral.o:		be_spectral.f90             \
+be_spectral.o:		da_be_spectral.f90          \
 			da_constants.o	            \
 			da_fftpack5.o		    \
 			da_asslegpol.inc            \
@@ -1117,7 +1090,7 @@ da_radiance.o:		da_radiance.f90                   \
 			da_interpolation.o                \
 			da_statistics.o                   \
 			da_tools.o	                  \
-			par_util.o		          \
+			da_par_util.o		          \
 			rttov_const.o	                  \
 			rttov_types.o                     \
 			gsi_kinds.o	                  \
@@ -1162,7 +1135,7 @@ da_tracing.o:           da_tracing.f90                    \
                         da_constants.o                    \
                         da_memory.o                       \
                         module_wrf_error.o                \
-                        par_util1.o
+                        da_par_util.o
 
 rttov_const.o:		parkind1.o	\
 			rttov_const.f

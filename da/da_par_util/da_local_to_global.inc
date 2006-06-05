@@ -1,5 +1,5 @@
 
-SUBROUTINE local_to_global(xp, x, xg, dim)
+SUBROUTINE da_local_to_global(xp, x, xg, dim)
 
 !------------------------------------------------------------------------------
 !  PURPOSE: Make xg global-grid array by gathering the subdomain arrays x from 
@@ -34,5 +34,5 @@ SUBROUTINE local_to_global(xp, x, xg, dim)
      CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
    end if
 
-END SUBROUTINE local_to_global
+END SUBROUTINE da_local_to_global
 

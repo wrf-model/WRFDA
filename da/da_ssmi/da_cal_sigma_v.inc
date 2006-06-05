@@ -1,4 +1,4 @@
-      subroutine cal_sigma_v(ifreq,p0,wv,hwv,ta,gamma,sigma_v)
+      subroutine da_cal_sigma_v(ifreq,p0,wv,hwv,ta,gamma,sigma_v)
       integer ifreq
       real sigma_v,p0,wv,hwv,ta,gamma
 !
@@ -87,5 +87,5 @@
       endif
       sigma_v = sigv*wvc
 
-      end subroutine cal_sigma_v
+      end subroutine da_cal_sigma_v
 

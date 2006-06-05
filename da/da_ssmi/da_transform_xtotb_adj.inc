@@ -1452,7 +1452,7 @@ END SUBROUTINE ADJ_spemiss
 ! get water vapor optical depth
 !=====
 
-      CALL cal_sigma_v(ifreq,p0,wv,hwv,ta,gamma,sigv)
+      CALL da_cal_sigma_v(ifreq,p0,wv,hwv,ta,gamma,sigv)
 
 ! otbar = one over "mean" temperature
 

@@ -1,4 +1,4 @@
-SUBROUTINE earth_2_model_wind(eu,ev,mu,mv,lon)
+SUBROUTINE da_earth_2_model_wind(eu,ev,mu,mv,lon)
 
    !---------------------------------------------------------------------------
    ! Convert earth wind to model wind.
@@ -45,5 +45,5 @@ SUBROUTINE earth_2_model_wind(eu,ev,mu,mv,lon)
    mu = ev*SIN(ANG) + eu*COS(ANG)
    mv = ev*COS(ANG) - eu*SIN(ANG)
 
-END SUBROUTINE earth_2_model_wind
+END SUBROUTINE da_earth_2_model_wind
 

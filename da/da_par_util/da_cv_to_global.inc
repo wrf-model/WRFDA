@@ -1,5 +1,5 @@
 
-      SUBROUTINE cv_to_global( cv_size, cv_size_global, x, xp, mzs, xg )
+      SUBROUTINE da_cv_to_global( cv_size, cv_size_global, x, xp, mzs, xg )
 !
 !     Gathers local cv-array x into domain cv-array xg(:).  
 !     Global cv-array xg will only be valid on the "monitor" task.  
@@ -45,7 +45,7 @@
         ALLOCATE( vv_x%v5(xp%ims:xp%ime,xp%jms:xp%jme,mzs(5)) )
         ALLOCATE( vv_x%alpha(xp%ims:xp%ime,xp%jms:xp%jme,mzs(6)) )
 
-        CALL cv_to_vv ( cv_size, x, xp, mzs, vv_x )
+        CALL da_cv_to_vv ( cv_size, x, xp, mzs, vv_x )
 
         IF ( wrf_dm_on_monitor() ) THEN
           ! allocate vv_xg
@@ -115,7 +115,7 @@
           xpg%kds = xp%kds; xpg%kde = xp%kde
           xpg%kms = xp%kds; xpg%kme = xp%kde
           xpg%kts = xp%kds; xpg%kte = xp%kde
-          CALL vv_to_cv( vv_xg, xpg, mzs, cv_size_global, xg )
+          CALL da_vv_to_cv( vv_xg, xpg, mzs, cv_size_global, xg )
         ENDIF
 
         ! deallocate vv_xg
@@ -123,11 +123,11 @@
 
 #endif
 
-      END SUBROUTINE cv_to_global
+      END SUBROUTINE da_cv_to_global
 
 
 
-SUBROUTINE wv_patch_to_global_3d( vlocal, vglobal,         &
+SUBROUTINE da_wv_patch_to_global_3d( vlocal, vglobal,         &
                                   domdesc, mz,             &
                                   ids, ide, jds, jde, kds, &
                                   ims, ime, jms, jme, kms, &
@@ -168,11 +168,11 @@ SUBROUTINE wv_patch_to_global_3d( vlocal, vglobal,         &
   ENDIF
 #endif
 
-END SUBROUTINE wv_patch_to_global_3d
+END SUBROUTINE da_wv_patch_to_global_3d
 
 
 
-SUBROUTINE wv_patch_to_global_2d( vlocal, vglobal,    &
+SUBROUTINE da_wv_patch_to_global_2d( vlocal, vglobal,    &
                                   domdesc,            &
                                   ids, ide, jds, jde, &
                                   ims, ime, jms, jme, &
@@ -203,7 +203,7 @@ SUBROUTINE wv_patch_to_global_2d( vlocal, vglobal,    &
             vglobal3d( ids:ide, jds:jde, 1 ) )
   ! get rid of copies later
   vlocal3d(:,:,1) = vlocal(:,:)
-  CALL wv_patch_to_global_3d( vlocal3d, vglobal3d,     &
+  CALL da_wv_patch_to_global_3d( vlocal3d, vglobal3d,     &
                               domdesc, mz,             &
                               ids, ide, jds, jde, kds, &
                               ims, ime, jms, jme, kms, &
@@ -214,5 +214,5 @@ SUBROUTINE wv_patch_to_global_2d( vlocal, vglobal,    &
   DEALLOCATE( vlocal3d, vglobal3d )
 #endif
 
-END SUBROUTINE wv_patch_to_global_2d
+END SUBROUTINE da_wv_patch_to_global_2d
 

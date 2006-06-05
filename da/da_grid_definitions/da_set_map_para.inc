@@ -1,4 +1,4 @@
-SUBROUTINE set_map_para
+SUBROUTINE da_set_map_para
 
    IMPLICIT NONE
 
@@ -44,4 +44,4 @@ SUBROUTINE set_map_para
       YCNTR  = - C2*LOG(CELL)  
    END IF 
 
-END SUBROUTINE set_map_para
+END SUBROUTINE da_set_map_para

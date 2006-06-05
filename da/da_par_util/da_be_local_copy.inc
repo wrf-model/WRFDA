@@ -1,5 +1,5 @@
 
-SUBROUTINE be_local_copy( be_g, be, jts, jte, kts,kte )
+SUBROUTINE da_be_local_copy( be_g, be, jts, jte, kts,kte )
 
 !------------------------------------------------------------------------------
 !  PURPOSE: Make local copy of be_type gridded arrays from global copy. Note
@@ -15,11 +15,11 @@ SUBROUTINE be_local_copy( be_g, be, jts, jte, kts,kte )
    be % pb_vert_reg(jts:jte,kts:kte,kts:kte) = be_g % pb_vert_reg(jts:jte,kts:kte,kts:kte)
    DEALLOCATE ( be_g % pb_vert_reg )
 
-   call alloc_and_copy_be_arrays( be_g % v1 , be % v1, jts,jte, kts,kte )
-   call alloc_and_copy_be_arrays( be_g % v2 , be % v2, jts,jte, kts,kte )
-   call alloc_and_copy_be_arrays( be_g % v3 , be % v3, jts,jte, kts,kte )
-   call alloc_and_copy_be_arrays( be_g % v4 , be % v4, jts,jte, kts,kte )
-   call alloc_and_copy_be_arrays( be_g % v5 , be % v5, jts,jte, kts,kte )
+   call da_alloc_and_copy_be_arrays( be_g % v1 , be % v1, jts,jte, kts,kte )
+   call da_alloc_and_copy_be_arrays( be_g % v2 , be % v2, jts,jte, kts,kte )
+   call da_alloc_and_copy_be_arrays( be_g % v3 , be % v3, jts,jte, kts,kte )
+   call da_alloc_and_copy_be_arrays( be_g % v4 , be % v4, jts,jte, kts,kte )
+   call da_alloc_and_copy_be_arrays( be_g % v5 , be % v5, jts,jte, kts,kte )
 
-END SUBROUTINE be_local_copy
+END SUBROUTINE da_be_local_copy
 

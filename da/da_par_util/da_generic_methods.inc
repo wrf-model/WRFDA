@@ -1,17 +1,12 @@
 
 
-SUBROUTINE residual_generic_set_info( res_generic, proc_domain, &
+SUBROUTINE da_residual_generic_set_info( res_generic, proc_domain, &
                                       obs_global_index )
 
 !------------------------------------------------------------------------------
 ! PURPOSE:  Eliminate redundant code for many obs types.  
 !
-! METHOD:   Set common fields in res_generic.  
-!
-!  HISTORY:
-!           09/22/2005 - Creation.                          Tom Henderson
-!
-! PARENT_MODULE: par_util
+! METHOD:   Set common fields in res_generic.
 !------------------------------------------------------------------------------
    IMPLICIT NONE
 
@@ -21,20 +16,15 @@ SUBROUTINE residual_generic_set_info( res_generic, proc_domain, &
 
    res_generic%proc_domain = proc_domain
    res_generic%obs_global_index = obs_global_index
-END SUBROUTINE residual_generic_set_info
+END SUBROUTINE da_residual_generic_set_info
 
 
 
-SUBROUTINE residual_sound_create_template( template )
+SUBROUTINE da_residual_sound_create_template( template )
 
 !------------------------------------------------------------------------------
 ! PURPOSE:  Return storage template for specific type stored as 
-!           residual_generic_type.  
-!
-!  HISTORY:
-!           09/22/2005 - Creation.                          Tom Henderson
-!
-! PARENT_MODULE: par_util
+!           residual_generic_type.
 !------------------------------------------------------------------------------
    IMPLICIT NONE
 
@@ -44,12 +34,12 @@ SUBROUTINE residual_sound_create_template( template )
    template%lbnd = 1
    template%ubnd = 4
 
-END SUBROUTINE residual_sound_create_template
+END SUBROUTINE da_residual_sound_create_template
 
 
 
 
-SUBROUTINE residual_sound_to_generic( res_specific, iv_num_levels, &
+SUBROUTINE da_residual_sound_to_generic( res_specific, iv_num_levels, &
                                       res_generic )
 
 !------------------------------------------------------------------------------
@@ -61,12 +51,7 @@ SUBROUTINE residual_sound_to_generic( res_specific, iv_num_levels, &
 !           allocates memory for res_generic.  The caller must ensure that 
 !           memory is deallocated later.  
 !           iv_num_levels is used as a sanity check and is ignored for 
-!           generic types that do not contain vector data.  
-!
-!  HISTORY:
-!           09/22/2005 - Creation.                          Tom Henderson
-!
-! PARENT_MODULE: par_util
+!           generic types that do not contain vector data. 
 !------------------------------------------------------------------------------
    IMPLICIT NONE
 
@@ -77,7 +62,7 @@ SUBROUTINE residual_sound_to_generic( res_specific, iv_num_levels, &
    TYPE (residual_template_type) :: template
    INTEGER :: n
 
-   CALL residual_sound_create_template( template )
+   CALL da_residual_sound_create_template( template )
    ALLOCATE( res_generic%values(template%lbnd:template%ubnd) )
    ! only vector data for this type
    ! store references to vector data
@@ -96,23 +81,18 @@ SUBROUTINE residual_sound_to_generic( res_specific, iv_num_levels, &
      ENDIF
    ENDDO
 
-END SUBROUTINE residual_sound_to_generic
+END SUBROUTINE da_residual_sound_to_generic
 
 
 
-SUBROUTINE residual_sound_from_generic( res_generic, res_specific )
+SUBROUTINE da_residual_sound_from_generic( res_generic, res_specific )
 
 !------------------------------------------------------------------------------
 ! PURPOSE:  Eliminate redundant code for many obs types.  
 !
 ! METHOD:   Generic type res_generic is translated to specific type 
 !           res_specific.  Pointer manipulation is used for vector data, no 
-!           vector data is copied.  Scalar data is copied.  
-!
-!  HISTORY:
-!           09/22/2005 - Creation.                          Tom Henderson
-!
-! PARENT_MODULE: par_util
+!           vector data is copied.  Scalar data is copied. 
 !------------------------------------------------------------------------------
    IMPLICIT NONE
 
@@ -126,20 +106,15 @@ SUBROUTINE residual_sound_from_generic( res_generic, res_specific )
    res_specific%t => res_generic%values(3)%ptr
    res_specific%q => res_generic%values(4)%ptr
 
-END SUBROUTINE residual_sound_from_generic
+END SUBROUTINE da_residual_sound_from_generic
 
 
 
-SUBROUTINE residual_synop_create_template( template )
+SUBROUTINE da_residual_synop_create_template( template )
 
 !------------------------------------------------------------------------------
 ! PURPOSE:  Return storage template for specific type stored as 
 !           residual_generic_type.  
-!
-!  HISTORY:
-!           09/22/2005 - Creation.                          Tom Henderson
-!
-! PARENT_MODULE: par_util
 !------------------------------------------------------------------------------
    IMPLICIT NONE
 
@@ -149,12 +124,12 @@ SUBROUTINE residual_synop_create_template( template )
    template%lbnd = 0
    template%ubnd = 0
 
-END SUBROUTINE residual_synop_create_template
+END SUBROUTINE da_residual_synop_create_template
 
 
 
 
-SUBROUTINE residual_synop_to_generic( res_specific, iv_num_levels, &
+SUBROUTINE da_residual_synop_to_generic( res_specific, iv_num_levels, &
                                       res_generic )
 
 !------------------------------------------------------------------------------
@@ -166,12 +141,7 @@ SUBROUTINE residual_synop_to_generic( res_specific, iv_num_levels, &
 !           allocates memory for res_generic.  The caller must ensure that 
 !           memory is deallocated later.  
 !           iv_num_levels is used as a sanity check and is ignored for 
-!           generic types that do not contain vector data.  
-!
-!  HISTORY:
-!           09/22/2005 - Creation.                          Tom Henderson
-!
-! PARENT_MODULE: par_util
+!           generic types that do not contain vector data.
 !------------------------------------------------------------------------------
    IMPLICIT NONE
 
@@ -192,24 +162,19 @@ SUBROUTINE residual_synop_to_generic( res_specific, iv_num_levels, &
    res_generic%values(0)%ptr(4) = res_specific%p
    res_generic%values(0)%ptr(5) = res_specific%q
 
-END SUBROUTINE residual_synop_to_generic
+END SUBROUTINE da_residual_synop_to_generic
 
 
 
 
-SUBROUTINE residual_synop_from_generic( res_generic, res_specific )
+SUBROUTINE da_residual_synop_from_generic( res_generic, res_specific )
 
 !------------------------------------------------------------------------------
 ! PURPOSE:  Eliminate redundant code for many obs types.  
 !
 ! METHOD:   Generic type res_generic is translated to specific type 
 !           res_specific.  Pointer manipulation is used for vector data, no 
-!           vector data is copied.  Scalar data is copied.  
-!
-!  HISTORY:
-!           09/22/2005 - Creation.                          Tom Henderson
-!
-! PARENT_MODULE: par_util
+!           vector data is copied.  Scalar data is copied.
 !------------------------------------------------------------------------------
    IMPLICIT NONE
 
@@ -224,12 +189,12 @@ SUBROUTINE residual_synop_from_generic( res_generic, res_specific )
    res_specific%p = res_generic%values(0)%ptr(4)
    res_specific%q = res_generic%values(0)%ptr(5)
 
-END SUBROUTINE residual_synop_from_generic
+END SUBROUTINE da_residual_synop_from_generic
 
 
 
 
-SUBROUTINE y_facade_create( slice, num_obs, num_obs_glo, template )
+SUBROUTINE da_y_facade_create( slice, num_obs, num_obs_glo, template )
 
 !------------------------------------------------------------------------------
 ! PURPOSE:  Create a y_facade_type containing specified number of 
@@ -242,10 +207,6 @@ SUBROUTINE y_facade_create( slice, num_obs, num_obs_glo, template )
 !           residual_generic_type objects will be allocated but no values 
 !           will be copied into them.  
 !
-!  HISTORY:
-!           10/03/2005 - Creation.                          Tom Henderson
-!
-! PARENT_MODULE: par_util
 !------------------------------------------------------------------------------
    IMPLICIT NONE
 
@@ -260,15 +221,15 @@ SUBROUTINE y_facade_create( slice, num_obs, num_obs_glo, template )
    slice%num_obs_glo = num_obs_glo
    ALLOCATE( slice%obs(slice%num_obs) )
    DO n=1, slice%num_obs
-     CALL residual_generic_create( slice%obs(n), template=template )
+     CALL da_residual_generic_create( slice%obs(n), template=template )
    ENDDO
 
-END SUBROUTINE y_facade_create
+END SUBROUTINE da_y_facade_create
 
 
 
 
-SUBROUTINE residual_generic_create( res_generic, template )
+SUBROUTINE da_residual_generic_create( res_generic, template )
 !------------------------------------------------------------------------------
 ! PURPOSE:  Create a residual_generic_type object.  This must be called 
 !           before any other operation is performed on a 
@@ -289,7 +250,7 @@ SUBROUTINE residual_generic_create( res_generic, template )
 !  HISTORY:
 !           09/23/2005 - Creation.                          Tom Henderson
 !
-! PARENT_MODULE: par_util
+! PARENT_MODULE: da_par_util
 !------------------------------------------------------------------------------
    IMPLICIT NONE
 
@@ -305,12 +266,12 @@ SUBROUTINE residual_generic_create( res_generic, template )
        NULLIFY( res_generic%values(i)%ptr )
      ENDDO
    ENDIF
-END SUBROUTINE residual_generic_create
+END SUBROUTINE da_residual_generic_create
 
 
 
 
-SUBROUTINE residual_generic_alloc_and_set( res_generic, val_index, values )
+SUBROUTINE da_residual_generic_alloc_and_set( res_generic, val_index, values )
 ! TODO:  replace this with a full-blown copy-constructor!  
 !------------------------------------------------------------------------------
 ! PURPOSE:  Allocates and initializes one of the values (either scalar or 
@@ -328,7 +289,7 @@ SUBROUTINE residual_generic_alloc_and_set( res_generic, val_index, values )
 !  HISTORY:
 !           09/23/2005 - Creation.                          Tom Henderson
 !
-! PARENT_MODULE: par_util
+! PARENT_MODULE: da_par_util
 !------------------------------------------------------------------------------
    IMPLICIT NONE
 
@@ -344,12 +305,12 @@ SUBROUTINE residual_generic_alloc_and_set( res_generic, val_index, values )
    ENDIF
    ALLOCATE( res_generic%values(val_index)%ptr(SIZE(values)) )
    res_generic%values(val_index)%ptr(:) = values(:)
-END SUBROUTINE residual_generic_alloc_and_set
+END SUBROUTINE da_residual_generic_alloc_and_set
 
 
 
 
-LOGICAL FUNCTION residual_generic_has_vector( res_generic )
+LOGICAL FUNCTION da_residual_generic_has_vector( res_generic )
 !------------------------------------------------------------------------------
 ! PURPOSE:  Returns .TRUE. iff res_generic stores vector values.  
 !
@@ -358,7 +319,7 @@ LOGICAL FUNCTION residual_generic_has_vector( res_generic )
 !  HISTORY:
 !           09/23/2005 - Creation.                          Tom Henderson
 !
-! PARENT_MODULE: par_util
+! PARENT_MODULE: da_par_util
 !------------------------------------------------------------------------------
    IMPLICIT NONE
    TYPE (residual_generic_type), INTENT(IN) :: res_generic  ! generic type
@@ -367,7 +328,7 @@ END FUNCTION residual_generic_has_vector
 
 
 
-LOGICAL FUNCTION residual_generic_has_scalar( res_generic )
+LOGICAL FUNCTION da_residual_generic_has_scalar( res_generic )
 !------------------------------------------------------------------------------
 ! PURPOSE:  Returns .TRUE. iff res_generic stores scalar values.  
 !
@@ -376,7 +337,7 @@ LOGICAL FUNCTION residual_generic_has_scalar( res_generic )
 !  HISTORY:
 !           09/23/2005 - Creation.                          Tom Henderson
 !
-! PARENT_MODULE: par_util
+! PARENT_MODULE:da_ par_util
 !------------------------------------------------------------------------------
    IMPLICIT NONE
    TYPE (residual_generic_type), INTENT(IN) :: res_generic  ! generic type
@@ -385,7 +346,7 @@ END FUNCTION residual_generic_has_scalar
 
 
 
-SUBROUTINE residual_generic_free( res_generic )
+SUBROUTINE da_residual_generic_free( res_generic )
 !------------------------------------------------------------------------------
 ! PURPOSE:  Free memory for residual_generic_type object.  
 !
@@ -397,7 +358,7 @@ SUBROUTINE residual_generic_free( res_generic )
 !  HISTORY:
 !           09/23/2005 - Creation.                          Tom Henderson
 !
-! PARENT_MODULE: par_util
+! PARENT_MODULE: da_par_util
 !------------------------------------------------------------------------------
    IMPLICIT NONE
 
@@ -418,11 +379,11 @@ SUBROUTINE residual_generic_free( res_generic )
    IF ( oktofreevalues ) THEN
      DEALLOCATE( res_generic%values )
    ENDIF
-END SUBROUTINE residual_generic_free
+END SUBROUTINE da_residual_generic_free
 
 
 
-SUBROUTINE y_facade_free( slice )
+SUBROUTINE da_y_facade_free( slice )
 !------------------------------------------------------------------------------
 ! PURPOSE:  Free memory for y_facade_type object.  
 !
@@ -431,7 +392,7 @@ SUBROUTINE y_facade_free( slice )
 !  HISTORY:
 !           09/23/2005 - Creation.                          Tom Henderson
 !
-! PARENT_MODULE: par_util
+! PARENT_MODULE: da_par_util
 !------------------------------------------------------------------------------
    IMPLICIT NONE
 
@@ -440,10 +401,10 @@ SUBROUTINE y_facade_free( slice )
    INTEGER :: n
    IF ( ASSOCIATED( slice%obs ) ) THEN
      DO n=1, SIZE(slice%obs)
-       CALL residual_generic_free( slice%obs(n) )
+       CALL da_residual_generic_free( slice%obs(n) )
      ENDDO
      DEALLOCATE( slice%obs )
    ENDIF
-END SUBROUTINE y_facade_free
+END SUBROUTINE da_y_facade_free
 
 
