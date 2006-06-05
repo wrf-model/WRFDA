@@ -18,7 +18,7 @@ M4      = m4 -B12000
 RANLIB	= ranlib
 CPP     = /lib/cpp
 
-.SUFFIXES: .F .i .o .f .c
+.SUFFIXES: .f90 .i .o .f .c
 
 # Substituted by Config_wrfvar.pl
 
@@ -48,7 +48,7 @@ ESMF_TARGET         = CONFIGURE_ESMF_TARGET
 ARCH      = $(DEVTOP)/arch
 CHEM      = $(DEVTOP)/chem
 CONVERTOR = $(DEVTOP)/convertor
-DA_VAR    = $(DEVTOP)/da_3dvar
+DA_VAR    = $(DEVTOP)/da
 DA_BE     = $(DEVTOP)/da_be
 DYN_EM    = $(DEVTOP)/dyn_em
 DYN_EXP   = $(DEVTOP)/dyn_exp

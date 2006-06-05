@@ -32,7 +32,7 @@ CONTAINS
 #include "da_set_randomcv.inc"
 #include "da_gaus_noise.inc"
 #include "da_llxy.inc"
-#include "da_open_afile.inc"
+#include "da_openfile.inc"
 #include "da_smooth_anl.inc"
 #include "da_togrid.inc"
 #include "da_unifva.inc"

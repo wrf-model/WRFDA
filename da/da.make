@@ -73,9 +73,9 @@ da_wrfvar_io.o : module_io_domain.o  \
                      da_med_initialdata_output.inc \
                      da_tracing.o
 
-generic_boilerplate.inc: generic_boilerplate.m4
-			$(RM) generic_boilerplate.inc
-			$(M4) generic_boilerplate.m4 > generic_boilerplate.inc
+da_generic_boilerplate.inc: da_generic_boilerplate.m4
+			$(RM) da_generic_boilerplate.inc
+			$(M4) da_generic_boilerplate.m4 > da_generic_boilerplate.inc
 
 da_par_util.o:		da_par_util.f90                   \
 			da_alloc_and_copy_be_arrays.inc   \
@@ -121,7 +121,7 @@ da_solve_v3d.o:		da_constants.o			\
 			da_test.o			\
 			da_tools.o			\
 			da_minimisation.o		\
-			par_util.o			\
+			da_par_util.o			\
 			da_init_wrfvar.inc              \
 			da_solve_v3d.f90
 
@@ -176,7 +176,7 @@ da_setup_structures.o:	da_setup_structures.f90           \
 			da_vtox_transforms.o              \
 			da_physics.o                      \
 			da_h_ops.o                        \
-	                da_bufrlib.o                      \
+	                bufrlib.o                         \
 	                bort_exit.o                       \
 	                restd.o                           \
 	                wrdesc.o                          \
@@ -874,7 +874,7 @@ da_statistics.o:	da_statistics.f90          \
 			da_correlation_coeff2d.inc \
 			da_data_distribution.inc   \
 			da_print_stats.inc         \
-			stats_calculate.inc
+			da_stats_calculate.inc
 
 da_define_structures.o:	da_define_structures.f90            \
 			da_constants.o                      \
@@ -903,44 +903,6 @@ da_constants.o:		da_constants.f90           \
 			da_find_fft_factors.inc    \
 			da_find_fft_trig_funcs.inc \
                         module_driver_constants.o 
-
-lapack.o:		lapack.f90 \
-			blas.o     \
-			dlae2.inc  \
-			dlaev2.inc \
-			dlamc1.inc \
-			dlamc2.inc \
-			dlamc3.inc \
-			dlamc4.inc \
-			dlamc5.inc \
-			dlamch.inc \
-			dlanst.inc \
-			dlansy.inc \
-			dlapy2.inc \
-			dsyev.inc
-			$(CPP) $(FPPFLAGS) lapack.f90 > lapack.f
-			$(FFC) -c $(FIXEDFLAGS) lapack.f
-
-blas.o:	               blas.f90     \
-		       daxpy.inc    \
-		       dcopy.inc    \
-		       ddot.inc     \
-		       dgemm.inc    \
-		       dgemv.inc    \
-		       dger.inc     \
-		       dnrm2.inc    \
-		       dscal.inc    \
-		       dswap.inc    \
-		       dsymv.inc    \
-		       dsyr2.inc    \
-		       dsyr2k.inc   \
-		       dtrmm.inc    \
-		       dtrmv.inc    \
-		       lsame.inc    \
-		       xerbla.inc   \
-		       module_wrf_error.o
-			$(CPP) $(FPPFLAGS) blas.f90 > blas.f
-			$(FFC) -c $(FIXEDFLAGS) blas.f
 
 da_test.o:	       da_test.f90                          \
 			da_constants.o                      \

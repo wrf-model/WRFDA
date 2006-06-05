@@ -20,7 +20,7 @@ advance_cymdh : advance_cymdh.o
 
 bufr_little_endian.exe : bufr_little_endian.o
 			$(RM) $@
-			$(FC) -o bufr_little_endian.exe bufr_little_endian.o da_bufrlib.o \
+			$(FC) -o bufr_little_endian.exe bufr_little_endian.o bufrlib.o \
                           bort_exit.o restd.o wrdesc.o
 
 bufr_little_endian.o : bort_exit.o restd.o wrdesc.o da_bufrlib.o

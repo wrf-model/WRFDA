@@ -4,14 +4,13 @@ set nonomatch
 
 
 foreach dir ( frame chem share dyn_em dyn_exp dyn_nmm phys main tools )
-( cd $dir ; echo $dir ; /bin/rm -f core wrf *.f *.exe *.kmo *.mod *.o *.inc *.F90 *.a .*.m *.lst \
+( cd $dir ; echo $dir ; /bin/rm -f core wrf *.f *.exe *.kmo *.mod *.o *.inc *.f90 *.a .*.m *.lst \
                       db_* Warnings module_state_description.F module_dm.F gmeta \
                       wrfdata whatiread rsl.* show_domain* )
 end
 
-( cd da_3dvar ; /bin/rm -f *.f *.o *.mod mpif.h *.stb .*.m *.lst )
-( cd da_3dvar/src ; /bin/rm -f *.f *.o *.mod *.stb .*.m *.lst bufrlib.prm \
-  par_util/generic_boilerplate.inc )
+( cd da ; /bin/rm -f *.f *.o *.mod *.stb .*.m *.lst bufrlib.prm \
+  da_par_util/da_generic_boilerplate.inc )
 ( cd external/RSL/RSL ; /bin/rm -f *.lst LAST_MADE* )
 ( cd external/io_int ; /bin/rm -f *.f *.mod diffwrf)
 ( cd convertor ; /bin/rm -f *.f *.o *.mod *.exe *.stb .*.m *.lst )
@@ -47,7 +46,7 @@ if ( "$1" == '-a' ) then
   ( cd run ; /bin/rm -f gm* out* fort* ideal* )
   ( cd test/exp_real ; /bin/rm -f gm* out* fort* real* )
   ( /bin/rm -f main/mpif.h main/*.stb )
-  ( /bin/rm -f da_3dvar/src/mpif.h )
+  ( /bin/rm -f da/mpif.h )
   ( /bin/rm -f external/io_netcdf/mpif.h )
   ( /bin/rm -fr ./netcdf_links )
   ( /bin/rm -f core *.out 1 )

@@ -63,18 +63,18 @@ REAL FUNCTION da_gaus_noise (KDUM)
    IF (NISET.EQ.0) THEN
 
 1000  CONTINUE
-      ZV1   = 2.*UNIFVA (KDUM) - 1.
-      ZV2   = 2.*UNIFVA (KDUM) - 1.
+      ZV1   = 2.*DA_UNIFVA (KDUM) - 1.
+      ZV2   = 2.*DA_UNIFVA (KDUM) - 1.
       ZRSQ  = ZV1**2 + ZV2**2
           
       IF ( (ZRSQ.GE.1.).OR.(ZRSQ.EQ.0.) ) GO TO 1000
 
       ZFAC  = SQRT(-2.*LOG(ZRSQ)/ZRSQ)
       GSET  = ZV1*ZFAC
-      GAUS_NOISE = ZV2*ZFAC
+      DA_GAUS_NOISE = ZV2*ZFAC
       NISET = 1
    ELSE
-      GAUS_NOISE = gset
+      DA_GAUS_NOISE = gset
       NISET = 0
    ENDIF
       
