@@ -1,4 +1,4 @@
-subroutine roughness_from_lanu(ltbl, mminlu, date_mm5, xp, lanu, rough)
+subroutine da_roughness_from_lanu(ltbl, mminlu, date_mm5, xp, lanu, rough)
 
   implicit none
 
@@ -19,7 +19,7 @@ subroutine roughness_from_lanu(ltbl, mminlu, date_mm5, xp, lanu, rough)
   logical                               :: exist
 
   read(UNIT=date_mm5,FMT='(I4,1x,I2,1X,I2)') year, month, day
-  call Julian_DAY(year,month,day,Julday, 1)
+  call julian_day(year,month,day,Julday, 1)
   Isn = 1
   IF(JULDAY < 105 .OR. JULDAY > 288) Isn=2
  
@@ -79,9 +79,9 @@ subroutine roughness_from_lanu(ltbl, mminlu, date_mm5, xp, lanu, rough)
    enddo
    enddo
 
-end subroutine roughness_from_lanu
+end subroutine da_roughness_from_lanu
 
-SUBROUTINE Julian_DAY(NY,NM,ND,JD,METHOD)   
+SUBROUTINE da_julian_day(NY,NM,ND,JD,METHOD)   
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC        
 !                                  C        
 !   METHOD = 1: INPUT ---- NY, NM, ND.  OUTPUT ---- JD                 C        
@@ -122,5 +122,5 @@ SUBROUTINE Julian_DAY(NY,NM,ND,JD,METHOD)
       ENDDO NYEAR                           
    END IF                                
 
-END subroutine Julian_DAY
+END subroutine da_julian_day
 
