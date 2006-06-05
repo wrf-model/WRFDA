@@ -14,7 +14,7 @@ PROGRAM netcdf2kma
    USE module_dm
 #endif
 
-   USE module_wrf_3dvar_io
+   USE da_wrfvar_io
    USE module_netcdf2kma_interface
    USE module_wave2grid_kma
 
@@ -107,7 +107,7 @@ PROGRAM netcdf2kma
 
 
 !-- read input in netcdf format
-     CALL med_initialdata_input_3dvar( head_grid , config_flags )  
+     CALL da_med_initialdata_input( head_grid , config_flags )  
 
 !--write in grid-array in kma-ascii format
 

@@ -14,7 +14,7 @@ PROGRAM kma2netcdf
    USE module_dm
 #endif
 
-   USE module_wrf_3dvar_io
+   USE da_wrfvar_io
    USE module_kma2netcdf_interface
    USE module_kma_wave2grid
 
@@ -115,7 +115,7 @@ PROGRAM kma2netcdf
    CALL wrf_debug ( 100 , 'kma2netcdf: back from kma2netcdf_interface ' )
 
 !--output 3dvar analysis
-   CALL med_initialdata_output_3dvar( head_grid , config_flags )  
+   CALL da_med_initialdata_output( head_grid , config_flags )  
 
    CALL wrf_debug ( 100 , 'kma2netcdf: back from med_initialdata_output' )
 

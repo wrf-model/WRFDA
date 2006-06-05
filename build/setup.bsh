@@ -4,10 +4,12 @@ export SOLVER=${SOLVER:-em}
 
 for DIR in dyn_$SOLVER main share frame phys convertor tools \
   external/esmf_time_f90 external/io_int \
+  external/fftpack external/lapack external/blas external/lapack \
+  external/bufr_ncep_nco external/fftpack5 \
   external/ioapi_share inc gen_be \
-  external/io_netcdf external/io_grib1 da_3dvar da_3dvar/src/*; do
+  external/io_netcdf external/io_grib1 da da/*; do
   NAME=`basename $DIR`
-  ln -fs ../$DIR/$NAME.make ../$DIR/*.F90 ../$DIR/*.F ../$DIR/*.inc \
+  ln -fs ../$DIR/$NAME.make ../$DIR/*.f90 ../$DIR/*.f ../$DIR/*.inc \
     ../$DIR/*.c ../$DIR/*.h ../$DIR/*.m4 ../$DIR/*.code ../$DIR/*.bsh \
     ../$DIR/*.int ../$DIR/*.csh .
 #  echo include $DIR.make >> Makefile1
@@ -17,7 +19,7 @@ cp -r ../external/RSL .
 
 ln -fs ../inc/version_decl .
 
-ln -fs ../da_3dvar/src/da_bufrlib/bufrlib.prm .
+ln -fs ../external/bufr_ncep_nco/bufrlib.param .
 ln -fs ../arch/*.sed .
 ln -fs ../tools/gen_comms.stub .
 

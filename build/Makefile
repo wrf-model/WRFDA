@@ -17,6 +17,10 @@ include io_int.make
 include io_netcdf.make
 include io_grib1.make
 include ioapi_share.make
+include bufr_ncep_nco.make
+include lapack.make
+include blas.make
+include fftpack5.make
 include main.make
 
 WRF_OBJS=$(SHARE_OBJS) $(FRAME_OBJS) $(PHYS_OBJS) $(DYN_OBJS) \
@@ -31,7 +35,7 @@ libwrflib.a : $(WRF_MODULES) $(WRF_OBJS)
 
 clean :
 	@ $(RM) *.exe *.o *.mod *.b *.a *.f inc/*.inc frame/*.f90 registry \
-          Registry_tmp* module_state_description.F \
+          Registry_tmp* module_state_description.f90 \
           '*.f90' '*.f' '*.inc' '*.int' '*.c' '*.h' '*.make' '*.m4' \
           '*.code' '*.sed' RSL/RSL/*.a RSL/RSL/*.o
 

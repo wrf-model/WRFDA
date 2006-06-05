@@ -118,7 +118,7 @@ n2k : framework_only
           /bin/rm -f netcdf2kma.exe ; \
 	  $(MAKE) MODULE_DIRS="$(DA_CONVERTOR_MODULES)" netcdf2kma )
 
-BE_OBJS = da_gen_be.o DA_Constants.o be_spectral.o LAPACK.o BLAS.o da_fftpack5.o
+BE_OBJS = da_gen_be.o DA_Constants.o be_spectral.o lapack.o blas.o fftpack5.o
 BE_MODULES1 = -I../../frame
 BE_MODULES2 = -I../da -I../frame
 be : 
@@ -387,16 +387,16 @@ da_constants :
 	( cd da; $(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES_2)" da_constants.o )
 
 blas : 
-	( cd external/blas ; $(MAKE) )
+	( cd external/blas ; $(MAKE) blas.o )
 	
 lapack : blas
-	( cd external/lapack ; $(MAKE) )
+	( cd external/lapack ; $(MAKE) lapack.o )
 	
 fftpack5 : da_constants
-	( cd external/fftpack5 ; $(MAKE) )
+	( cd external/fftpack5 ; $(MAKE) fftpack5.o )
 	
 bufr_ncep_nco : 
-	( cd external/bufr_ncep_nco ; $(MAKE) )
+	( cd external/bufr_ncep_nco ; $(MAKE) bufrlib.o )
 	
 wrfvar_src : bufr_ncep_nco fftpack5 lapack blas
 	@ echo '--------------------------------------'
