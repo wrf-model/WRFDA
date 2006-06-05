@@ -29,17 +29,17 @@ MODULE da_ships
 
 CONTAINS
 
-#include "DA_AO_Stats_Ships.inc"
-#include "DA_Calculate_Jo_and_GradY_Ships.inc"
-#include "DA_Calculate_Residual_Ships.inc"
-#include "DA_OI_Stats_Ships.inc"
-#include "DA_Print_Stats_Ships.inc"
-#include "DA_Transform_XToY_Ships.inc"
-#include "DA_Transform_XToY_Ships_Adj.inc"
+#include "da_ao_stats_ships.inc"
+#include "da_calculate_jo_and_grady_ships.inc"
+#include "da_calculate_residual_ships.inc"
+#include "da_oi_stats_ships.inc"
+#include "da_print_stats_ships.inc"
+#include "da_transform_xtoy_ships.inc"
+#include "da_transform_xtoy_ships_adj.inc"
 #include "da_check_max_iv_ships.inc"
 #include "da_get_innov_vector_ships.inc"
-#include "DA_Calculate_GradY_Ships.inc"
+#include "da_calculate_grady_ships.inc"
 
 
-END MODULE da_ships
+end module da_ships
 
