@@ -10,7 +10,7 @@ MODULE da_recursive_filter
 
    use da_constants
    use da_define_structures
-   use par_util
+   use da_par_util
    use module_wrf_error
 
    IMPLICIT NONE

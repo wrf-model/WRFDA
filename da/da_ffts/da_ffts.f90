@@ -5,7 +5,7 @@ MODULE da_ffts
    !---------------------------------------------------------------------------
 
    USE da_define_structures
-   USE par_util
+   USE da_par_util
 
    IMPLICIT NONE
 

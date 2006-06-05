@@ -20,7 +20,7 @@ module da_obs
    use da_qscat
    use da_profiler
    use da_buoy 
-   use par_util
+   use da_par_util
    use da_tools
    use da_tracing
    use da_radiance

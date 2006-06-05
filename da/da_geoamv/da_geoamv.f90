@@ -5,7 +5,7 @@ MODULE da_geoamv
    USE da_interpolation
    USE da_statistics
    USE da_tools
-   USE par_util
+   USE da_par_util
 
    ! The "stats_geoamv_type" is ONLY used locally in DA_GeoAMV:
 

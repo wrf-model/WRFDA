@@ -6,7 +6,7 @@ MODULE da_gpspw
    USE da_statistics
    USE da_physics
    USE da_tools
-   USE par_util
+   USE da_par_util
 
    ! The "stats_gpspw_type" is ONLY used locally in DA_Gpspw:
 

@@ -6,7 +6,7 @@ MODULE da_sound
    USE da_statistics
    USE da_tools
    USE da_physics
-   USE par_util
+   USE da_par_util
 
    ! The "stats_sound_type" is ONLY used locally in DA_Sound:
 
@@ -49,7 +49,7 @@ CONTAINS
 
 #include "da_ao_stats_sound.inc"
 #include "da_calculate_jo_and_grady_sound.inc"
-#include "compute_jo_sound_uvtq.inc"
+#include "da_compute_jo_sound_uvtq.inc"
 #include "da_calculate_residual_sound.inc"
 #include "da_oi_stats_sound.inc"
 #include "da_print_stats_sound.inc"
@@ -62,7 +62,7 @@ CONTAINS
 
 #include "da_ao_stats_sonde_sfc.inc"
 #include "da_get_jo_and_grady_sonde_sfc.inc"
-#include "compute_jo_sonde_sfc_uvtq.inc"
+#include "da_compute_jo_sonde_sfc_uvtq.inc"
 #include "da_calculate_residual_sonde_sfc.inc"
 #include "da_oi_stats_sonde_sfc.inc"
 #include "da_print_stats_sonde_sfc.inc"

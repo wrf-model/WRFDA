@@ -14,7 +14,7 @@ module da_radiance
    use da_statistics
    use da_tools
 !   use da_obs
-   use par_util
+   use da_par_util
    USE module_wrf_error
 
    use rttov_const,  only : &

@@ -6,7 +6,7 @@ MODULE da_ships
    USE da_statistics
    USE da_tools
    USE da_physics
-   USE par_util
+   USE da_par_util
 
    ! The "stats_ships_type" is ONLY used locally in da_ships:
 

@@ -5,7 +5,7 @@ MODULE da_statistics
    !---------------------------------------------------------------------------
    
    USE da_define_structures
-   USE par_util
+   USE da_par_util
    
    IMPLICIT NONE
    
@@ -15,7 +15,7 @@ MODULE da_statistics
 #include "da_correlation_coeff1d.inc"
 #include "da_correlation_coeff2d.inc"
 #include "da_data_distribution.inc"
-#include "stats_calculate.inc"
+#include "da_stats_calculate.inc"
 
 END MODULE da_statistics
 

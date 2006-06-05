@@ -7,7 +7,7 @@ MODULE da_ssmi
    USE da_grid_definitions
    USE da_physics
    USE da_tools
-   USE par_util
+   USE da_par_util
    USE module_wrf_error
 
    ! The "stats_ssmi_rv_type" is ONLY used locally in DA_Ssmi_Rv:
@@ -42,38 +42,38 @@ MODULE da_ssmi
 
 CONTAINS
 
-#include "DA_AO_Stats_SSMI.inc"
-#include "DA_AO_Stats_SSMI_Rv.inc"
-#include "DA_AO_Stats_SSMI_Tb.inc"
-#include "DA_Read_SSMI.inc"
-#include "DA_Scan_SSMI.inc"
-#include "DA_Cal_Jo_and_GradY_SSMI.inc"
-#include "DA_Cal_Jo_and_GradY_SSMI_Rv.inc"
-#include "DA_Cal_Jo_and_GradY_SSMI_Tb.inc"
-#include "DA_Cal_Residual_SSMI.inc"
-#include "DA_Cal_Residual_SSMI_Rv.inc"
-#include "DA_Cal_Residual_SSMI_Tb.inc"
-#include "DA_OI_Stats_SSMI.inc"
-#include "DA_OI_Stats_SSMI_Rv.inc"
-#include "DA_OI_Stats_SSMI_Tb.inc"
-#include "DA_Transform_XToSpeed.inc"
-#include "DA_Transform_XToSpeed_Lin.inc"
-#include "DA_Transform_XToSpeed_Adj.inc"
-#include "DA_Transform_XToSeaSfcWind.inc"
-#include "DA_Transform_XToSeaSfcWind_Lin.inc"
-#include "DA_Transform_XToSeaSfcWind_Adj.inc"
-#include "DA_Transform_XToTb.inc"
-#include "DA_Transform_XToTb_Lin.inc"
-#include "DA_Transform_XToTb_Adj.inc"
-#include "DA_Transform_XToY_SSMI.inc"
-#include "DA_Transform_XToY_SSMI_Adj.inc"
-#include "DA_Transform_XToY_SSMI_Rv.inc"
-#include "DA_Transform_XToY_SSMI_Rv_Adj.inc"
-#include "DA_Transform_XToY_SSMI_Tb.inc"
-#include "DA_Transform_XToY_SSMI_Tb_Adj.inc"
-#include "DA_Transform_XToZRhoQ.inc"
-#include "DA_Transform_XToZRhoQ_Lin.inc"
-#include "DA_Transform_XToZRhoQ_Adj.inc"
+#include "da_ao_stats_ssmi.inc"
+#include "da_ao_stats_ssmi_rv.inc"
+#include "da_ao_stats_ssmi_tb.inc"
+#include "da_read_ssmi.inc"
+#include "da_scan_ssmi.inc"
+#include "da_cal_jo_and_grady_ssmi.inc"
+#include "da_cal_jo_and_grady_ssmi_rv.inc"
+#include "da_cal_jo_and_grady_ssmi_tb.inc"
+#include "da_cal_residual_ssmi.inc"
+#include "da_cal_residual_ssmi_rv.inc"
+#include "da_cal_residual_ssmi_tb.inc"
+#include "da_oi_stats_ssmi.inc"
+#include "da_oi_stats_ssmi_rv.inc"
+#include "da_oi_stats_ssmi_tb.inc"
+#include "da_transform_xtospeed.inc"
+#include "da_transform_xtospeed_lin.inc"
+#include "da_transform_xtospeed_adj.inc"
+#include "da_transform_xtoseasfcwind.inc"
+#include "da_transform_xtoseasfcwind_lin.inc"
+#include "da_transform_xtoseasfcwind_adj.inc"
+#include "da_transform_xtotb.inc"
+#include "da_transform_xtotb_lin.inc"
+#include "da_transform_xtotb_adj.inc"
+#include "da_transform_xtoy_ssmi.inc"
+#include "da_transform_xtoy_ssmi_adj.inc"
+#include "da_transform_xtoy_ssmi_rv.inc"
+#include "da_transform_xtoy_ssmi_rv_adj.inc"
+#include "da_transform_xtoy_ssmi_tb.inc"
+#include "da_transform_xtoy_ssmi_tb_adj.inc"
+#include "da_transform_xtozrhoq.inc"
+#include "da_transform_xtozrhoq_lin.inc"
+#include "da_transform_xtozrhoq_adj.inc"
 #include "da_cal_jo_and_grady_ssmt1.inc"
 #include "da_cal_jo_and_grady_ssmt2.inc"
 #include "da_cal_residual_ssmt1.inc"
@@ -97,9 +97,9 @@ CONTAINS
 #include "da_transform_xtoy_ssmt1_adj.inc"
 #include "da_transform_xtoy_ssmt2.inc"
 #include "da_transform_xtoy_ssmt2_adj.inc"
-#include "DA_Calculate_GradY_SSMI.inc"
-#include "DA_Calculate_GradY_SSMT1.inc"
-#include "DA_Calculate_GradY_SSMT2.inc"
+#include "da_calculate_grady_ssmi.inc"
+#include "da_calculate_grady_ssmt1.inc"
+#include "da_calculate_grady_ssmt2.inc"
    
-END MODULE da_ssmi
+end module da_ssmi
 

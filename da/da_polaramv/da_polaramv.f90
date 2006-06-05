@@ -5,7 +5,7 @@ module da_polaramv
    use da_interpolation
    use da_statistics
    use da_tools
-   use par_util
+   use da_par_util
 
 ! The "stats_polaramv_type" is ONLY used locally in DA_PolarAMV:
 

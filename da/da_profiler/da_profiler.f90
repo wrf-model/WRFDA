@@ -1,11 +1,11 @@
-MODULE DA_Profiler
+module da_profiler
 
-   USE DA_Constants
-   USE DA_Define_Structures
-   USE DA_Interpolation
-   USE DA_Statistics
-   USE DA_Tools
-   USE PAR_UTIL
+   use da_constants
+   use da_define_structures
+   use da_interpolation
+   use da_statistics
+   use da_tools
+   use da_par_util
 
 ! The "stats_profiler_type" is ONLY used locally in DA_Profiler:
 
@@ -25,17 +25,17 @@ MODULE DA_Profiler
 
 CONTAINS
 
-#include "DA_AO_Stats_Profiler.inc"
-#include "DA_Get_Jo_and_GradY_Profiler.inc"
-#include "DA_Calculate_Residual_Profiler.inc"
-#include "DA_OI_Stats_Profiler.inc"
-#include "DA_Print_Stats_Profiler.inc"
-#include "DA_Transform_XToY_Profiler.inc"
-#include "DA_Transform_XToY_Profiler_Adj.inc"
+#include "da_ao_stats_profiler.inc"
+#include "da_get_jo_and_grady_profiler.inc"
+#include "da_calculate_residual_profiler.inc"
+#include "da_oi_stats_profiler.inc"
+#include "da_print_stats_profiler.inc"
+#include "da_transform_xtoy_profiler.inc"
+#include "da_transform_xtoy_profiler_adj.inc"
 #include "da_check_max_iv_profiler.inc"
 #include "da_get_innov_vector_profiler.inc"
-#include "DA_Calculate_GradY_Profiler.inc"
+#include "da_calculate_grady_profiler.inc"
 
 
-END MODULE DA_Profiler
+end module da_profiler
 

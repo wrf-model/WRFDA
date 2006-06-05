@@ -24,7 +24,7 @@ MODULE da_vtox_transforms
    USE da_dynamics
    USE da_physics
    USE da_constants
-   USE par_util
+   USE da_par_util
    USE da_ssmi
    USE da_spectral
    USE da_fftpack5

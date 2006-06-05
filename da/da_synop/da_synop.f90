@@ -6,7 +6,7 @@ MODULE da_synop
    USE da_statistics
    USE da_tools
    USE da_physics
-   USE par_util
+   USE da_par_util
 
    ! The "stats_synop_type" is ONLY used locally in DA_Synop:
 
@@ -31,7 +31,7 @@ CONTAINS
 
 #include "da_ao_stats_synop.inc"
 #include "da_calculate_jo_and_grady_synop.inc"
-#include "compute_jo_synop_uvtq.inc"
+#include "da_compute_jo_synop_uvtq.inc"
 #include "da_calculate_residual_synop.inc"
 #include "da_oi_stats_synop.inc"
 #include "da_print_stats_synop.inc"

@@ -5,7 +5,7 @@ module da_readwrite_mm5
    USE da_grid_definitions
    USE da_tools
    USE da_h_ops
-   USE par_util
+   USE da_par_util
    use module_wrf_error
 
    implicit none

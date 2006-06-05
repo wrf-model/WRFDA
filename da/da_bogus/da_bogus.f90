@@ -1,12 +1,12 @@
-MODULE DA_Bogus
+module da_bogus
 
-  USE DA_Constants
-  USE DA_Define_Structures
-  USE DA_Interpolation
-  USE DA_Statistics
-  USE DA_Tools
-  USE DA_Physics
-  USE PAR_UTIL
+  use da_constants
+  use da_define_structures
+  use da_interpolation
+  use da_statistics
+  use da_tools
+  use da_physics
+  use da_par_util
 
   ! The "stats_bogus_type" is ONLY used locally in DA_Bogus:
 
@@ -29,16 +29,16 @@ MODULE DA_Bogus
 
 CONTAINS
 
-#include "DA_AO_Stats_Bogus.inc"
-#include "DA_Calculate_Jo_and_GradY_Bogus.inc"
-#include "DA_Calculate_Residual_Bogus.inc"
-#include "DA_OI_Stats_Bogus.inc"
-#include "DA_Print_Stats_Bogus.inc"
-#include "DA_Transform_XToY_Bogus.inc"
-#include "DA_Transform_XToY_Bogus_Adj.inc"
+#include "da_ao_stats_bogus.inc"
+#include "da_calculate_jo_and_grady_bogus.inc"
+#include "da_calculate_residual_bogus.inc"
+#include "da_oi_stats_bogus.inc"
+#include "da_print_stats_bogus.inc"
+#include "da_transform_xtoy_bogus.inc"
+#include "da_transform_xtoy_bogus_adj.inc"
 #include "da_check_max_iv_bogus.inc"
 #include "da_get_innov_vector_bogus.inc"
-#include "DA_Calculate_GradY_Bogus.inc"
+#include "da_calculate_grady_bogus.inc"
 
-END MODULE DA_Bogus
+end module da_bogus
 
