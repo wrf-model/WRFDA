@@ -1,4 +1,4 @@
-subroutine get_3d_sum(var, name, &
+subroutine da_get_3d_sum(var, name, &
                       ids, ide, jds, jde, kds, kde, &
                       ims, ime, jms, jme, kms, kme, &
                       its, ite, jts, jte, kts, kte)
@@ -20,5 +20,5 @@ subroutine get_3d_sum(var, name, &
    write(unit=stderr, fmt='(3a, e24.14)') &
         'Square sum of <', trim(name), '>=', total
 
-end subroutine get_3d_sum
+end subroutine da_get_3d_sum
 

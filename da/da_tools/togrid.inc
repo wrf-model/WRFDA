@@ -1,4 +1,4 @@
-subroutine toGrid (x, ib, ie, i, dx, dxm)
+subroutine da_toGrid (x, ib, ie, i, dx, dxm)
    
 !  Transfer obs. x to grid i and calculate its
 !  distance to grid i and i+1
@@ -21,5 +21,5 @@ subroutine toGrid (x, ib, ie, i, dx, dxm)
    dx = x - real(i)
    dxm= 1.0 - dx
 
-end subroutine toGrid
+end subroutine da_toGrid
 

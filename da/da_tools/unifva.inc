@@ -1,4 +1,4 @@
-REAL FUNCTION UNIFVA (KDUM) 
+REAL FUNCTION DA_UNIFVA (KDUM) 
 
 !-----------------------------------------------------------------------
  
@@ -62,4 +62,4 @@ REAL FUNCTION UNIFVA (KDUM)
    NIV(IJJ) = KDUM
    UNIFVA   = MIN( PPAM*NIY , PPRNMX )
 
-END FUNCTION UNIFVA
+END FUNCTION DA_UNIFVA

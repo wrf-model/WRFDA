@@ -1,4 +1,4 @@
-REAL FUNCTION gaus_noise (KDUM)
+REAL FUNCTION da_gaus_noise (KDUM)
 
 !---------------------------------------------------------------------
 !
@@ -80,5 +80,5 @@ REAL FUNCTION gaus_noise (KDUM)
       
    RETURN
 
-END FUNCTION gaus_noise
+END FUNCTION da_gaus_noise
 

@@ -1,4 +1,4 @@
-subroutine llxy (xlati,xloni,x,y)
+subroutine da_llxy (xlati,xloni,x,y)
 !------------------------------------------------------------------------------!
 !
 !                 ROUTINE LLXY
@@ -111,5 +111,5 @@ subroutine llxy (xlati,xloni,x,y)
 
    x = (x - start_x)*ratio + 0.5
    y = (y - start_y)*ratio + 0.5
-end subroutine llxy
+end subroutine da_llxy
 
