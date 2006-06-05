@@ -1,11 +1,11 @@
-MODULE da_gpsref
+module da_gpsref
 
-   USE da_constants
-   USE da_define_structures
-   USE da_interpolation
-   USE da_statistics
-   USE da_tools
-   USE par_util
+   use da_constants
+   use da_define_structures
+   use da_interpolation
+   use da_statistics
+   use da_tools
+   use par_util
 
    ! The "stats_gpsref_type" is ONLY used locally in DA_Gpsref:
 
@@ -27,16 +27,16 @@ MODULE da_gpsref
 
 CONTAINS
 
-#include "DA_AO_Stats_Gpsref.inc"
-#include "DA_Calculate_GradY_Gpsref.inc"
-#include "DA_Get_Jo_and_GradY_Gpsref.inc"
-#include "DA_Calculate_Residual_Gpsref.inc"
-#include "DA_OI_Stats_Gpsref.inc"
-#include "DA_Print_Stats_Gpsref.inc"
-#include "DA_Transform_XToY_Gpsref.inc"
-#include "DA_Transform_XToY_Gpsref_Adj.inc"
-#include "da_check_max_iv_Gpsref.inc"
-#include "da_get_innov_vector_Gpsref.inc"
+#include "da_ao_stats_gpsref.inc"
+#include "da_calculate_grady_gpsref.inc"
+#include "da_get_jo_and_grady_gpsref.inc"
+#include "da_calculate_residual_gpsref.inc"
+#include "da_oi_stats_gpsref.inc"
+#include "da_print_stats_gpsref.inc"
+#include "da_transform_xtoy_gpsref.inc"
+#include "da_transform_xtoy_gpsref_adj.inc"
+#include "da_check_max_iv_gpsref.inc"
+#include "da_get_innov_vector_gpsref.inc"
 
-END MODULE da_gpsref
+end module da_gpsref
 

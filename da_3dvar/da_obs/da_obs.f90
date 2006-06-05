@@ -1,42 +1,42 @@
-MODULE DA_Obs
+module da_obs
 
-   USE DA_Constants
-   USE DA_Define_Structures
-   USE DA_Airep
-   USE DA_gpspw
-   USE DA_gpsref
-   USE DA_Metar
-   USE DA_Pilot
-   USE DA_Radar
-   USE DA_ssmi
-   USE DA_Satem
-   USE DA_GeoAMV
-   USE DA_PolarAMV
-   USE DA_Ships
-   USE DA_Synop
-   USE DA_Sound
-   USE DA_Bogus
-   USE da_pseudo
-   USE da_qscat
-   USE DA_Profiler
-   USE DA_Buoy 
-   USE par_util
-   USE DA_Tools
-   USE da_tracing
-   USE da_radiance
-   USE module_wrf_error
+   use da_constants
+   use da_define_structures
+   use da_airep
+   use da_gpspw
+   use da_gpsref
+   use da_metar
+   use da_pilot
+   use da_radar
+   use da_ssmi
+   use da_satem
+   use da_geoamv
+   use da_polaramv
+   use da_ships
+   use da_synop
+   use da_sound
+   use da_bogus
+   use da_pseudo
+   use da_qscat
+   use da_profiler
+   use da_buoy 
+   use par_util
+   use da_tools
+   use da_tracing
+   use da_radiance
+   use module_wrf_error
 
    IMPLICIT NONE
 
 CONTAINS
 
-#include "DA_Obs_Proc_Station.inc"
-#include "DA_Read_Obs.inc"
-#include "DA_Scan_Obs.inc"
-#include "DA_Read_Radar.inc"
-#include "DA_Scan_Radar.inc"
-#include "DA_Transform_XToY.inc"
-#include "DA_Transform_XToY_Adj.inc"
+#include "da_obs_proc_station.inc"
+#include "da_read_obs.inc"
+#include "da_scan_obs.inc"
+#include "da_read_radar.inc"
+#include "da_scan_radar.inc"
+#include "da_transform_xtoy.inc"
+#include "da_transform_xtoy_adj.inc"
 #include "da_add_noise_to_ob.inc"
 #include "da_check_missing.inc"
 #include "da_fill_obs_structures.inc"
@@ -48,9 +48,9 @@ CONTAINS
 #include "da_write_obs.inc"
 #include "da_write_filtered_obs.inc"
 #include "da_write_y.inc"
-#include "DA_Read_BUFR_Obs.inc"
-#include "DA_Scan_BUFR_Obs.inc"
-#include "DA_Count_Filtered_Obs.inc"
+#include "da_read_bufr_obs.inc"
+#include "da_scan_bufr_obs.inc"
+#include "da_count_filtered_obs.inc"
 #include "da_deallocate_obs.inc"
 
-END MODULE DA_Obs
+end module da_obs

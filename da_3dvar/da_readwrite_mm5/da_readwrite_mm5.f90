@@ -12,11 +12,11 @@ module da_readwrite_mm5
 
 CONTAINS
 
-#include "DA_Read_MM5.inc"
-#include "DA_Write_Analysis_MM5.inc"
-#include "DA_cleanrows.inc"
-#include "DA_crs_to_dot.inc"
-#include "DA_print_big_header.inc"
-#include "DA_print_sub_header.inc"
+#include "da_read_mm5.inc"
+#include "da_write_analysis_mm5.inc"
+#include "da_cleanrows.inc"
+#include "da_crs_to_dot.inc"
+#include "da_print_big_header.inc"
+#include "da_print_sub_header.inc"
 
 end module da_readwrite_mm5

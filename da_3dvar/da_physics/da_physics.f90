@@ -4,57 +4,57 @@ MODULE da_physics
    !  PURPOSE: Contains routines to calculate physical quantities.
    !---------------------------------------------------------------------------
 
-   USE da_constants
-   USE da_define_structures
-   USE da_grid_definitions
-   USE da_interpolation
-   USE da_dynamics
-   USE module_wrf_error
+   use da_constants
+   use da_define_structures
+   use da_grid_definitions
+   use da_interpolation
+   use da_dynamics
+   use module_wrf_error
 
    IMPLICIT NONE
 
    CONTAINS
 
-#include "DA_PRho_To_T_Adj.inc"
-#include "DA_PRho_To_T_Lin.inc"
-#include "DA_UVPRho_To_W_Lin.inc"
-#include "DA_UVPRho_To_W_Adj.inc"
-#include "DA_PT_To_Rho_Adj.inc"
-#include "DA_PT_To_Rho_Lin.inc"
-#include "DA_TPQ_To_RH.inc"
-#include "DA_TPQ_To_RH_Lin.inc"
-#include "DA_TPRH_To_Q_Adj.inc"
-#include "DA_TPRH_To_Q_Lin.inc"
-#include "DA_TP_To_Qs.inc"
-#include "DA_TP_To_Qs_Adj.inc"
-#include "DA_TP_To_Qs_Lin.inc"
-#include "DA_TRH_To_TD.inc"
-#include "DA_TPQ_To_SLP.inc"
-#include "DA_TPQ_To_SLP_Lin.inc"
-#include "DA_TPQ_To_SLP_Adj.inc"
-#include "DA_TPQ_To_Thickness.inc"
-#include "DA_Transform_XToTPW.inc"
-#include "DA_Transform_XToTPW_Adj.inc"
-#include "DA_Transform_XToGPSRef.inc"
-#include "DA_Transform_XToGPSRef_Adj.inc"
-#include "DA_Transform_XToGPSRef_Lin.inc"
+#include "da_prho_to_t_adj.inc"
+#include "da_prho_to_t_lin.inc"
+#include "da_uvprho_to_w_lin.inc"
+#include "da_uvprho_to_w_adj.inc"
+#include "da_pt_to_rho_adj.inc"
+#include "da_pt_to_rho_lin.inc"
+#include "da_tpq_to_rh.inc"
+#include "da_tpq_to_rh_lin.inc"
+#include "da_tprh_to_q_adj.inc"
+#include "da_tprh_to_q_lin.inc"
+#include "da_tp_to_qs.inc"
+#include "da_tp_to_qs_adj.inc"
+#include "da_tp_to_qs_lin.inc"
+#include "da_trh_to_td.inc"
+#include "da_tpq_to_slp.inc"
+#include "da_tpq_to_slp_lin.inc"
+#include "da_tpq_to_slp_adj.inc"
+#include "da_tpq_to_thickness.inc"
+#include "da_transform_xtotpw.inc"
+#include "da_transform_xtotpw_adj.inc"
+#include "da_transform_xtogpsref.inc"
+#include "da_transform_xtogpsref_adj.inc"
+#include "da_transform_xtogpsref_lin.inc"
 #include "da_check_rh.inc"
 #include "da_check_rh_simple.inc"
 #include "da_e_qv_from_rh.inc"
 #include "da_get_q_error.inc"
 #include "roughness_from_lanu.inc"
 #include "da_sfc_wtq.inc"
-#include "da_sfc_wtq_Lin.inc"
-#include "da_sfc_wtq_Adj.inc"
-#include "DA_Transform_XToPsfc.inc"
-#include "DA_Transform_XToPsfc_Adj.inc"
-#include "DA_Transform_XToWTQ.inc"
-#include "DA_Transform_XToWTQ_Adj.inc"
+#include "da_sfc_wtq_lin.inc"
+#include "da_sfc_wtq_adj.inc"
+#include "da_transform_xtopsfc.inc"
+#include "da_transform_xtopsfc_adj.inc"
+#include "da_transform_xtowtq.inc"
+#include "da_transform_xtowtq_adj.inc"
 #include "da_sfc_pre.inc"
-#include "da_sfc_pre_Lin.inc"
-#include "da_sfc_pre_Adj.inc"
-#include "DA_Moist_Phys_Adj.inc"
-#include "DA_Moist_Phys_Lin.inc"
+#include "da_sfc_pre_lin.inc"
+#include "da_sfc_pre_adj.inc"
+#include "da_moist_phys_adj.inc"
+#include "da_moist_phys_lin.inc"
 #include "da_accre.inc"
 #include "da_accre_adj.inc"
 #include "da_accre_lin.inc"

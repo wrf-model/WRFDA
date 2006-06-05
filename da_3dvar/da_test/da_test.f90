@@ -1,4 +1,4 @@
-module DA_Test
+module da_test
 
 !------------------------------------------------------------------------------
 !     PURPOSE: Collection of routines associated with minimisation.
@@ -8,36 +8,36 @@ module DA_Test
 !     HISTORY: 01/07/2000 - Creation.              Dale Barker
 !------------------------------------------------------------------------------
 
-   USE DA_Constants
-   USE DA_Define_Structures
-   USE DA_Physics
-   USE DA_VToX_Transforms
-   USE DA_Obs
-   USE DA_Airep
-   USE DA_Gpspw
-   USE DA_Gpsref
-   USE DA_Metar
-   USE DA_Pilot
-   USE DA_Radar
-   USE DA_SSMI
-   USE DA_Satem
-   USE DA_GeoAMV
-   USE DA_PolarAMV
-   USE DA_Ships
-   USE DA_Sound
-   USE DA_Synop
-   USE da_pseudo
-   USE DA_Profiler
-   USE DA_Buoy 
-   USE DA_Bogus 
-   USE DA_Setup_Structures
-   USE DA_Tools
+   use da_constants
+   use da_define_structures
+   use da_physics
+   use da_vtox_transforms
+   use da_obs
+   use da_airep
+   use da_gpspw
+   use da_gpsref
+   use da_metar
+   use da_pilot
+   use da_radar
+   use da_ssmi
+   use da_satem
+   use da_geoamv
+   use da_polaramv
+   use da_ships
+   use da_sound
+   use da_synop
+   use da_pseudo
+   use da_profiler
+   use da_buoy 
+   use da_bogus 
+   use da_setup_structures
+   use da_tools
    use da_qscat
-   USE DA_Grid_Definitions
-   USE DA_Physics
+   use da_grid_definitions
+   use da_physics
    use module_wrf_3dvar_io
-   USE module_wrf_error
-   USE da_minimisation
+   use module_wrf_error
+   use da_minimisation
 
    implicit none
 
@@ -52,44 +52,44 @@ INCLUDE 'mpif.h'
 
 contains
 
-#include "DA_Check_Balance.inc"
-#include "DA_Check_CvToVv_Adjoint.inc"
-#include "DA_Check_VToX_Adjoint.inc"
-#include "DA_Check_VpToX_Adjoint.inc"
-#include "DA_Check_Vp_Errors.inc"
-#include "DA_Check_VvToVp_Adjoint.inc"
-#include "DA_Check_XToVpToX_Errors.inc"
-#include "DA_Check_XToY_Adjoint.inc"
-#include "DA_Check_XToY_Adjoint_Airep.inc"
-#include "DA_Check_XToY_Adjoint_Gpspw.inc"
-#include "DA_Check_XToY_Adjoint_Gpsref.inc"
-#include "DA_Check_XToY_Adjoint_Metar.inc"
-#include "DA_Check_XToY_Adjoint_Pilot.inc"
-#include "DA_Check_XToY_Adjoint_SSMI.inc"
-#include "DA_Check_XToY_Adjoint_SSMI_Rv.inc"
-#include "DA_Check_XToY_Adjoint_SSMI_Tb.inc"
-#include "DA_Check_XToY_Adjoint_Satem.inc"
-#include "DA_Check_XToY_Adjoint_GeoAMV.inc"
-#include "DA_Check_XToY_Adjoint_PolarAMV.inc"
-#include "DA_Check_XToY_Adjoint_Ships.inc"
-#include "DA_Check_XToY_Adjoint_Radar.inc"
-#include "DA_Check_XToY_Adjoint_Bogus.inc"
-#include "DA_Check_XToY_Adjoint_Sound.inc"
-#include "DA_Check_XToY_Adjoint_Sonde_sfc.inc"
-#include "DA_Check_XToY_Adjoint_Synop.inc"
-!#include "DA_Test_VXTransform.inc"
-#include "DA_Transform_XToVp.inc"
+#include "da_check_balance.inc"
+#include "da_check_cvtovv_adjoint.inc"
+#include "da_check_vtox_adjoint.inc"
+#include "da_check_vptox_adjoint.inc"
+#include "da_check_vp_errors.inc"
+#include "da_check_vvtovp_adjoint.inc"
+#include "da_check_xtovptox_errors.inc"
+#include "da_check_xtoy_adjoint.inc"
+#include "da_check_xtoy_adjoint_airep.inc"
+#include "da_check_xtoy_adjoint_gpspw.inc"
+#include "da_check_xtoy_adjoint_gpsref.inc"
+#include "da_check_xtoy_adjoint_metar.inc"
+#include "da_check_xtoy_adjoint_pilot.inc"
+#include "da_check_xtoy_adjoint_ssmi.inc"
+#include "da_check_xtoy_adjoint_ssmi_rv.inc"
+#include "da_check_xtoy_adjoint_ssmi_tb.inc"
+#include "da_check_xtoy_adjoint_satem.inc"
+#include "da_check_xtoy_adjoint_geoamv.inc"
+#include "da_check_xtoy_adjoint_polaramv.inc"
+#include "da_check_xtoy_adjoint_ships.inc"
+#include "da_check_xtoy_adjoint_radar.inc"
+#include "da_check_xtoy_adjoint_bogus.inc"
+#include "da_check_xtoy_adjoint_sound.inc"
+#include "da_check_xtoy_adjoint_sonde_sfc.inc"
+#include "da_check_xtoy_adjoint_synop.inc"
+!#include "da_test_vxtransform.inc"
+#include "da_transform_xtovp.inc"
 #include "da_check.inc"
 #include "da_check_xtoy_adjoint_pseudo.inc"
 #include "da_check_xtoy_adjoint_qscat.inc"
 #include "da_check_xtoy_adjoint_ssmt1.inc"
 #include "da_check_xtoy_adjoint_ssmt2.inc"
-#include "DA_Check_XToY_Adjoint_Profiler.inc"
-#include "DA_Check_XToY_Adjoint_Buoy.inc"
+#include "da_check_xtoy_adjoint_profiler.inc"
+#include "da_check_xtoy_adjoint_buoy.inc"
 #include "da_setup_testfield.inc"
 #include "check_sfc_assi.inc"
 #include "set_tst_trnsf_fld.inc"
-#include "DA_Check_VToY_Adjoint.inc"
+#include "da_check_vtoy_adjoint.inc"
 #include "da_get_y_lhs_value.inc"
 
-end module DA_Test
+end module da_test

@@ -11,11 +11,11 @@ MODULE da_statistics
    
    CONTAINS
    
-#include "DA_Analysis_Stats.inc"
-#include "DA_Correlation_Coeff1d.inc"
-#include "DA_Correlation_Coeff2d.inc"
-#include "DA_Data_Distribution.inc"
-#include "Stats_Calculate.inc"
+#include "da_analysis_stats.inc"
+#include "da_correlation_coeff1d.inc"
+#include "da_correlation_coeff2d.inc"
+#include "da_data_distribution.inc"
+#include "stats_calculate.inc"
 
 END MODULE da_statistics
 

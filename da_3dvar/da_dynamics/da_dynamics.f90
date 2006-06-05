@@ -16,24 +16,24 @@ MODULE da_dynamics
 
    CONTAINS
 
-#include "DA_Balance_CycloTerm.inc"
-#include "DA_Balance_CycloTerm_Adj.inc"
-#include "DA_Balance_CycloTerm_Lin.inc"
-#include "DA_Balance_Equation_Adj.inc"
-#include "DA_Balance_Equation_Lin.inc"
-!include "DA_Balance_GeoTerm.inc"
-#include "DA_Balance_GeoTerm_Adj.inc"
-#include "DA_Balance_GeoTerm_Lin.inc"
-#include "DA_HydrostaticP_To_Rho_Adj.inc"
-#include "DA_HydrostaticP_To_Rho_Lin.inc"
-#include "DA_PsiChi_To_UV.inc"
-#include "DA_PsiChi_To_UV_Adj.inc"
-#include "DA_UV_To_Divergence.inc"
-#include "DA_UV_To_Divergence_Adj.inc"
-#include "DA_W_Adjustment_Lin.inc"
-#include "DA_W_Adjustment_Adj.inc"
-#include "DA_UV_To_Vorticity.inc"
-#include "DA_WZ_BASE.inc"           
+#include "da_balance_cycloterm.inc"
+#include "da_balance_cycloterm_adj.inc"
+#include "da_balance_cycloterm_lin.inc"
+#include "da_balance_equation_adj.inc"
+#include "da_balance_equation_lin.inc"
+!include "da_balance_geoterm.inc"
+#include "da_balance_geoterm_adj.inc"
+#include "da_balance_geoterm_lin.inc"
+#include "da_hydrostaticp_to_rho_adj.inc"
+#include "da_hydrostaticp_to_rho_lin.inc"
+#include "da_psichi_to_uv.inc"
+#include "da_psichi_to_uv_adj.inc"
+#include "da_uv_to_divergence.inc"
+#include "da_uv_to_divergence_adj.inc"
+#include "da_w_adjustment_lin.inc"
+#include "da_w_adjustment_adj.inc"
+#include "da_uv_to_vorticity.inc"
+#include "da_wz_base.inc"           
 
-END MODULE da_dynamics
+end module da_dynamics
 

@@ -1,11 +1,11 @@
-MODULE DA_Pilot
+MODULE da_pilot
 
-  USE DA_Constants
-  USE DA_Define_Structures
-  USE DA_Interpolation
-  USE DA_Statistics
-  USE DA_Tools
-  USE PAR_UTIL
+  use da_constants
+  use da_define_structures
+  use da_interpolation
+  use da_statistics
+  use da_tools
+  use par_util
 
   ! The "stats_pilot_type" is ONLY used locally in DA_Pilot:
 
@@ -25,16 +25,16 @@ MODULE DA_Pilot
 
 CONTAINS
 
-#include "DA_AO_Stats_Pilot.inc"
-#include "DA_Calculate_Jo_and_GradY_Pilot.inc"
-#include "DA_Calculate_Residual_Pilot.inc"
-#include "DA_OI_Stats_Pilot.inc"
-#include "DA_Print_Stats_Pilot.inc"
-#include "DA_Transform_XToY_Pilot.inc"
-#include "DA_Transform_XToY_Pilot_Adj.inc"
+#include "da_ao_stats_pilot.inc"
+#include "da_calculate_jo_and_grady_pilot.inc"
+#include "da_calculate_residual_pilot.inc"
+#include "da_oi_stats_pilot.inc"
+#include "da_print_stats_pilot.inc"
+#include "da_transform_xtoy_pilot.inc"
+#include "da_transform_xtoy_pilot_adj.inc"
 #include "da_check_max_iv_pilot.inc"
 #include "da_get_innov_vector_pilot.inc"
-#include "DA_Calculate_GradY_Pilot.inc"
+#include "da_calculate_grady_pilot.inc"
 
-END MODULE DA_Pilot
+end module da_pilot
 

@@ -12,7 +12,7 @@ gen_module_state_description ( char * dirname )
 {
   FILE * fp ;
   char  fname[NAMELEN] ;
-  char * fn = "module_state_description.F" ;
+  char * fn = "module_state_description.f90" ;
 
   strcpy( fname, fn ) ;
   if ( strlen(dirname) > 0 ) { sprintf(fname,"%s/%s",dirname,fn) ; }

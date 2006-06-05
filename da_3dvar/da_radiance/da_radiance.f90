@@ -8,13 +8,13 @@ module da_radiance
 !
 !------------------------------------------------------------------------------
 
-   USE DA_Constants
-   USE DA_Define_Structures
-   USE DA_Interpolation
-   USE DA_Statistics
-   USE DA_Tools
-!   USE DA_Obs
-   USE PAR_UTIL
+   use da_constants
+   use da_define_structures
+   use da_interpolation
+   use da_statistics
+   use da_tools
+!   use da_obs
+   use par_util
    USE module_wrf_error
 
    use rttov_const,  only : &

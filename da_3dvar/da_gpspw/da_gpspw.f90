@@ -25,17 +25,17 @@ MODULE da_gpspw
 
 CONTAINS
 
-#include "DA_AO_Stats_Gpspw.inc"
-#include "DA_Calculate_Jo_and_GradY_Gpspw.inc"
-#include "DA_Calculate_Residual_Gpspw.inc"
-#include "DA_OI_Stats_Gpspw.inc"
-#include "DA_Print_Stats_Gpspw.inc"
-#include "DA_Transform_XToY_Gpspw.inc"
-#include "DA_Transform_XToY_Gpspw_Adj.inc"
+#include "da_ao_stats_gpspw.inc"
+#include "da_calculate_jo_and_grady_gpspw.inc"
+#include "da_calculate_residual_gpspw.inc"
+#include "da_oi_stats_gpspw.inc"
+#include "da_print_stats_gpspw.inc"
+#include "da_transform_xtoy_gpspw.inc"
+#include "da_transform_xtoy_gpspw_adj.inc"
 #include "da_check_max_iv_gpspw.inc"
 #include "da_get_innov_vector_gpspw.inc"
-#include "DA_Calculate_GradY_Gpspw.inc"
+#include "da_calculate_grady_gpspw.inc"
 
 
-END MODULE da_gpspw
+end module da_gpspw
 

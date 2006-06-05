@@ -4,12 +4,12 @@
 ! DA_Define_Structures code to define WRFVAR structures.
 !---------------------------------------------------------------------------
 
-MODULE DA_Define_Structures
+module da_define_structures
 
-    USE module_domain   ! for typedefs (vp_type, xb_type, xpose_type)
-    USE module_dm       ! for rsl definitions
-    USE da_tracing
-    USE module_wrf_error
+    use module_domain   ! for typedefs (vp_type, xb_type, xpose_type)
+    use module_dm       ! for rsl definitions
+    use da_tracing
+    use module_wrf_error
 
 !------------------------------------------------------------------------------
 !  PURPOSE: Collection of routines to define and allocate structures.
@@ -26,7 +26,7 @@ MODULE DA_Define_Structures
 !              07/2005 - Add radiance related data structure    Zhiquan Liu
 !------------------------------------------------------------------------------
 
-   USE DA_Constants
+   use da_constants
 
    IMPLICIT NONE
    
@@ -995,19 +995,19 @@ MODULE DA_Define_Structures
 
 CONTAINS
 
-#include "DA_Allocate_Background_Errors.inc"
-#include "DA_Allocate_MM5_Model.inc"
-#include "DA_Allocate_Observations.inc"
-#include "DA_Allocate_Y.inc"
-#include "DA_Deallocate_Background_Errors.inc"
-#include "DA_Deallocate_MM5_Model.inc"
-#include "DA_Deallocate_Observations.inc"
-#include "DA_Deallocate_Y.inc"
-#include "DA_Zero_X.inc"
-!#include "DA_Zero_Y.inc"
-#include "DA_Zero_vp_type.inc"
+#include "da_allocate_background_errors.inc"
+#include "da_allocate_mm5_model.inc"
+#include "da_allocate_observations.inc"
+#include "da_allocate_y.inc"
+#include "da_deallocate_background_errors.inc"
+#include "da_deallocate_mm5_model.inc"
+#include "da_deallocate_observations.inc"
+#include "da_deallocate_y.inc"
+#include "da_zero_x.inc"
+!#include "da_zero_y.inc"
+#include "da_zero_vp_type.inc"
 #include "da_initialize_cv.inc"
 #include "da_gauss_noise.inc"
 
-END MODULE DA_Define_Structures
+end module da_define_structures
 

@@ -6,32 +6,32 @@
 !     METHOD:  Straightforward definitions.
 !------------------------------------------------------------------------------
 
-      USE DA_Constants
-      USE DA_Define_Structures
-      USE DA_VToX_Transforms
-      USE DA_Obs
-      USE DA_Metar
-      USE DA_GeoAMV
-      USE DA_PolarAMV
-      USE DA_Ships
-      USE DA_Synop
-      USE DA_Sound
-      USE DA_Airep
-      USE DA_Pilot
-      USE DA_Gpspw
-      USE DA_Gpsref
-      USE DA_SSMI
-      USE DA_Satem
-      USE da_pseudo
-      USE DA_Bogus
-      USE DA_Profiler
-      USE DA_Buoy 
-      USE DA_Setup_Structures
+      use da_constants
+      use da_define_structures
+      use da_vtox_transforms
+      use da_obs
+      use da_metar
+      use da_geoamv
+      use da_polaramv
+      use da_ships
+      use da_synop
+      use da_sound
+      use da_airep
+      use da_pilot
+      use da_gpspw
+      use da_gpsref
+      use da_ssmi
+      use da_satem
+      use da_pseudo
+      use da_bogus
+      use da_profiler
+      use da_buoy 
+      use da_setup_structures
       use da_qscat
       use da_radiance
-      use module_get_file_names ! for system call on Cray
+      use module_get_file_names ! for system call on cray
 
-      USE module_wrf_3dvar_io
+      use da_wrfvar_io
 
       implicit none
 
@@ -67,10 +67,10 @@
 #include <da_dot.inc>
 #include <da_dot_cv.inc>
 #include <da_write_diagnostics.inc>
-#include <DA_Minimise_CG.inc>
-#include "DA_Calculate_GradY.inc"
-#include "DA_Transform_VToY.inc"
-#include "DA_Transform_VToY_Adj.inc"
+#include <da_minimise_cg.inc>
+#include "da_calculate_grady.inc"
+#include "da_transform_vtoy.inc"
+#include "da_transform_vtoy_adj.inc"
 
 
       end module da_minimisation

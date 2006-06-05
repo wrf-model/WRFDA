@@ -1,13 +1,13 @@
-MODULE DA_Metar
+module da_metar
 
-  USE DA_Constants
-  USE DA_Define_Structures
-  USE DA_Interpolation
-  USE DA_Statistics
-  USE DA_Tools
-  USE DA_Physics
-  USE PAR_UTIL
-  USE da_tracing
+  use da_constants
+  use da_define_structures
+  use da_interpolation
+  use da_statistics
+  use da_tools
+  use da_physics
+  use par_util
+  use da_tracing
 
   ! The "stats_metar_type" is ONLY used locally in DA_Metar:
 
@@ -30,17 +30,17 @@ MODULE DA_Metar
 
 CONTAINS
 
-#include "DA_AO_Stats_Metar.inc"
-#include "DA_Calculate_Jo_and_GradY_Metar.inc"
-#include "DA_Calculate_Residual_Metar.inc"
-#include "DA_OI_Stats_Metar.inc"
-#include "DA_Print_Stats_Metar.inc"
-#include "DA_Transform_XToY_Metar.inc"
-#include "DA_Transform_XToY_Metar_Adj.inc"
+#include "da_ao_stats_metar.inc"
+#include "da_calculate_jo_and_grady_metar.inc"
+#include "da_calculate_residual_metar.inc"
+#include "da_oi_stats_metar.inc"
+#include "da_print_stats_metar.inc"
+#include "da_transform_xtoy_metar.inc"
+#include "da_transform_xtoy_metar_adj.inc"
 #include "da_check_max_iv_metar.inc"
 #include "da_get_innov_vector_metar.inc"
-#include "DA_Calculate_GradY_Metar.inc"
+#include "da_calculate_grady_metar.inc"
 
 
-END MODULE DA_Metar
+end module da_metar
 

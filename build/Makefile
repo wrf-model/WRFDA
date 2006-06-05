@@ -30,12 +30,12 @@ libwrflib.a : $(WRF_MODULES) $(WRF_OBJS)
 	$(RANLIB) libwrflib.a
 
 clean :
-	@ $(RM) *.exe *.o *.mod *.b *.a *.f inc/*.inc frame/*.F registry \
+	@ $(RM) *.exe *.o *.mod *.b *.a *.f inc/*.inc frame/*.f90 registry \
           Registry_tmp* module_state_description.F \
-          '*.F90' '*.F' '*.f' '*.inc' '*.int' '*.c' '*.h' '*.make' '*.m4' \
+          '*.f90' '*.f' '*.inc' '*.int' '*.c' '*.h' '*.make' '*.m4' \
           '*.code' '*.sed' RSL/RSL/*.a RSL/RSL/*.o
 
 superclean : clean
-	@ $(RM) *.F90 *.F *.f *.inc *.int *.c *.h *.m4 *.code \
-          bufrlib.PRM *.sed registry gen_comms.stub inc/* \
+	@ $(RM) *.f90 *.f *.inc *.int *.c *.h *.m4 *.code \
+          bufrlib.param *.sed registry gen_comms.stub inc/* \
           convert_tool kma_wave2grid wave2grid_kma mm5_wrf wrf_mm5

@@ -1,4 +1,4 @@
-MODULE DA_Constants
+module da_constants
 
 !-----------------------------------------------------------------------------
 !  PURPOSE: Common reference point for constants.
@@ -554,11 +554,11 @@ INTEGER, PARAMETER :: fm_index(max_no_fm) = (/ &
  CONTAINS
 
 #include "da_advance_cymdh.inc"
-#include "DA_Array_Print.inc"
+#include "da_array_print.inc"
 #include "da_change_date.inc"
-#include "DA_Find_FFT_Factors.inc"
-#include "DA_Find_FFT_Trig_Funcs.inc"
-#include "DA_gamma.inc"
+#include "da_find_fft_factors.inc"
+#include "da_find_fft_trig_funcs.inc"
+#include "da_gamma.inc"
 
-end module DA_Constants
+end module da_constants
 

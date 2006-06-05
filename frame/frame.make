@@ -30,11 +30,11 @@ FRAME_SPECIAL_OBJS =       module_internal_header_util.o pack_utils.o
 wrf_num_bytes_between.o :
 	$(CC) -c $(CCFLAGS) wrf_num_bytes_between.c
 
-module_state_description.F : registry ../Registry/$(REGISTRY)
+module_state_description.f90 : registry ../Registry/$(REGISTRY)
 	./registry $(REGFLAGS) ../Registry/$(REGISTRY)
 	$(LN) inc/*.inc .
 	$(LN) $(PWD)/inc/namelist_script.inc ../main
-	$(LN) frame/module_state_description.F .
+	$(LN) frame/module_state_description.f90 .
 
 md_calls.inc : md_calls.m4
 	$(M4) md_calls.m4 > md_calls.inc
@@ -134,6 +134,8 @@ module_tiles.o: module_domain.o \
 module_timing.o: \
 		module_state_description.o \
                 module_wrf_error.o
+ 
+module_state_description.o: module_state_description.f90
 
 module_wrf_error.o: \
 		wrf_shutdown.o \

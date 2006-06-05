@@ -1,11 +1,11 @@
-MODULE DA_PolarAMV
+module da_polaramv
 
-   USE DA_Constants
-   USE DA_Define_Structures
-   USE DA_Interpolation
-   USE DA_Statistics
-   USE DA_Tools
-   USE PAR_UTIL
+   use da_constants
+   use da_define_structures
+   use da_interpolation
+   use da_statistics
+   use da_tools
+   use par_util
 
 ! The "stats_polaramv_type" is ONLY used locally in DA_PolarAMV:
 
@@ -26,16 +26,16 @@ MODULE DA_PolarAMV
 
 CONTAINS
 
-#include "DA_AO_Stats_PolarAMV.inc"
-#include "DA_Get_Jo_and_GradY_PolarAMV.inc"
-#include "DA_Calculate_Residual_PolarAMV.inc"
-#include "DA_OI_Stats_PolarAMV.inc"
-#include "DA_Print_Stats_PolarAMV.inc"
-#include "DA_Transform_XToY_PolarAMV.inc"
-#include "DA_Transform_XToY_PolarAMV_Adj.inc"
+#include "da_ao_stats_polaramv.inc"
+#include "da_get_jo_and_grady_polaramv.inc"
+#include "da_calculate_residual_polaramv.inc"
+#include "da_oi_stats_polaramv.inc"
+#include "da_print_stats_polaramv.inc"
+#include "da_transform_xtoy_polaramv.inc"
+#include "da_transform_xtoy_polaramv_adj.inc"
 #include "da_check_max_iv_polaramv.inc"
 #include "da_get_innov_vector_polaramv.inc"
-#include "DA_Calculate_GradY_PolarAMV.inc"
+#include "da_calculate_grady_polaramv.inc"
 
-END MODULE DA_PolarAMV     
+end module da_polaramv     
 

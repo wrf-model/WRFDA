@@ -1,12 +1,12 @@
-MODULE DA_Buoy 
+module da_buoy 
 
-  USE DA_Constants
-  USE DA_Define_Structures
-  USE DA_Interpolation
-  USE DA_Statistics
-  USE DA_Tools
-  USE DA_Physics
-  USE PAR_UTIL
+  use da_constants
+  use da_define_structures
+  use da_interpolation
+  use da_statistics
+  use da_tools
+  use da_physics
+  use par_util
 
   ! The "stats_buoy_type" is ONLY used locally in DA_Buoy:
 
@@ -29,17 +29,17 @@ MODULE DA_Buoy
 
 CONTAINS
 
-#include "DA_AO_Stats_Buoy.inc"
-#include "DA_Calculate_Jo_and_GradY_Buoy.inc"
-#include "DA_Calculate_Residual_Buoy.inc"
-#include "DA_OI_Stats_Buoy.inc"
-#include "DA_Print_Stats_Buoy.inc"
-#include "DA_Transform_XToY_Buoy.inc"
-#include "DA_Transform_XToY_Buoy_Adj.inc"
+#include "da_ao_stats_buoy.inc"
+#include "da_calculate_jo_and_grady_buoy.inc"
+#include "da_calculate_residual_buoy.inc"
+#include "da_oi_stats_buoy.inc"
+#include "da_print_stats_buoy.inc"
+#include "da_transform_xtoy_buoy.inc"
+#include "da_transform_xtoy_buoy_adj.inc"
 #include "da_check_max_iv_buoy.inc"
 #include "da_get_innov_vector_buoy.inc"
-#include "DA_Calculate_GradY_Buoy.inc"
+#include "da_calculate_grady_buoy.inc"
 
 
-END MODULE DA_Buoy 
+end module da_buoy 
 

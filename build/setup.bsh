@@ -17,7 +17,7 @@ cp -r ../external/RSL .
 
 ln -fs ../inc/version_decl .
 
-ln -fs ../da_3dvar/src/da_bufrlib/bufrlib.PRM .
+ln -fs ../da_3dvar/src/da_bufrlib/bufrlib.prm .
 ln -fs ../arch/*.sed .
 ln -fs ../tools/gen_comms.stub .
 

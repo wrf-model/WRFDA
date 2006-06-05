@@ -1,4 +1,4 @@
-MODULE DA_Recursive_Filter
+MODULE da_recursive_filter
 
 !------------------------------------------------------------------------------
 !  PURPOSE: Jim Pursers recursive filter routines.
@@ -8,22 +8,22 @@ MODULE DA_Recursive_Filter
 !  HISTORY: 01/07/2000 - Creation of F90 version.           Dale Barker
 !------------------------------------------------------------------------------
 
-   USE DA_Constants
-   USE DA_Define_Structures
-   USE PAR_UTIL
-   USE module_wrf_error
+   use da_constants
+   use da_define_structures
+   use par_util
+   use module_wrf_error
 
    IMPLICIT NONE
 
    CONTAINS
 
 #include "da_perform_2drf.inc"
-#include "DA_Calculate_RF_Factors.inc"
-#include "DA_RF_Turning_Conditions.inc"
-#include "DA_Recursive_Filter_1d.inc"
-#include "DA_Recursive_Filter_1d_Adj.inc"
-#include "DA_Transform_Through_RF.inc"
-#include "DA_Transform_Through_RF_Adj.inc"
+#include "da_calculate_rf_factors.inc"
+#include "da_rf_turning_conditions.inc"
+#include "da_recursive_filter_1d.inc"
+#include "da_recursive_filter_1d_adj.inc"
+#include "da_transform_through_rf.inc"
+#include "da_transform_through_rf_adj.inc"
 
-END MODULE DA_Recursive_Filter
+end module da_recursive_filter
 

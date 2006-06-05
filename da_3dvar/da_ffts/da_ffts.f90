@@ -11,12 +11,12 @@ MODULE da_ffts
 
    CONTAINS
 
-#include "DA_Fast_Cosine_Transform.inc"
-#include "DA_Fast_Sine_Transform.inc"
-#include "DA_QPASSM.inc"
-#include "DA_Solve_PoissonEqn_FCT.inc"
-#include "DA_Solve_PoissonEqn_FCT_Adj.inc"
-#include "DA_Solve_PoissonEqn_FST.inc"
-#include "DA_Solve_PoissonEqn_FST_Adj.inc"
+#include "da_fast_cosine_transform.inc"
+#include "da_fast_sine_transform.inc"
+#include "da_qpassm.inc"
+#include "da_solve_poissoneqn_fct.inc"
+#include "da_solve_poissoneqn_fct_adj.inc"
+#include "da_solve_poissoneqn_fst.inc"
+#include "da_solve_poissoneqn_fst_adj.inc"
 
-END MODULE da_ffts
+end module da_ffts

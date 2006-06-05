@@ -25,16 +25,16 @@ MODULE da_geoamv
 
 CONTAINS
 
-#include "DA_AO_Stats_GeoAMV.inc"
-#include "DA_Get_Jo_and_GradY_GeoAMV.inc"
-#include "DA_Calculate_Residual_GeoAMV.inc"
-#include "DA_OI_Stats_GeoAMV.inc"
-#include "DA_Print_Stats_GeoAMV.inc"
-#include "DA_Transform_XToY_GeoAMV.inc"
-#include "DA_Transform_XToY_GeoAMV_Adj.inc"
+#include "da_ao_stats_geoamv.inc"
+#include "da_get_jo_and_grady_geoamv.inc"
+#include "da_calculate_residual_geoamv.inc"
+#include "da_oi_stats_geoamv.inc"
+#include "da_print_stats_geoamv.inc"
+#include "da_transform_xtoy_geoamv.inc"
+#include "da_transform_xtoy_geoamv_adj.inc"
 #include "da_check_max_iv_geoamv.inc"
 #include "da_get_innov_vector_geoamv.inc"
-#include "DA_Calculate_GradY_GeoAMV.inc"
+#include "da_calculate_grady_geoamv.inc"
 
-END MODULE da_geoamv     
+end module da_geoamv     
 

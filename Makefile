@@ -120,12 +120,12 @@ n2k : framework_only
 
 BE_OBJS = da_gen_be.o DA_Constants.o be_spectral.o LAPACK.o BLAS.o da_fftpack5.o
 BE_MODULES1 = -I../../frame
-BE_MODULES2 = -I../da_3dvar/src -I../frame
+BE_MODULES2 = -I../da -I../frame
 be : 
 	( cd tools; $(MAKE) FC="$(FC)" FCFLAGS="$(FCFLAGS)" advance_cymdh registry )
 	( cd frame; $(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" externals \
           module_wrf_error.o module_state_description.o module_driver_constants.o )
-	( cd da_3dvar/src; $(MAKE) MODULE_DIRS="$(BE_MODULES1)" $(BE_OBJS) da_gen_be.o )
+	( cd da; $(MAKE) MODULE_DIRS="$(BE_MODULES1)" $(BE_OBJS) da_gen_be.o )
 	( cd gen_be ; \
 	/bin/rm -f *.exe ; \
 	$(MAKE) MODULE_DIRS="$(BE_MODULES2)" gen_be )
@@ -383,9 +383,24 @@ em_core :
 	@ echo '--------------------------------------'
 	( cd dyn_em ; $(MAKE) )
 
-wrfvar_src :
+da_constants :
+	( cd da; $(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES_2)" da_constants.o )
+
+blas : 
+	( cd external/blas ; $(MAKE) )
+	
+lapack : blas
+	( cd external/lapack ; $(MAKE) )
+	
+fftpack5 : da_constants
+	( cd external/fftpack5 ; $(MAKE) )
+	
+bufr_ncep_nco : 
+	( cd external/bufr_ncep_nco ; $(MAKE) )
+	
+wrfvar_src : bufr_ncep_nco fftpack5 lapack blas
 	@ echo '--------------------------------------'
-	( cd da_3dvar/src; $(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES_2)" wrfvar )
+	( cd da; $(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES_2)" wrfvar )
 
 convertor_drivers :
 	@ echo '--------------------------------------'
