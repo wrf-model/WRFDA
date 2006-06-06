@@ -1028,7 +1028,7 @@ da_tracing.o:           da_tracing.f90                    \
                         da_constants.o                    \
                         da_memory.o                       \
                         module_wrf_error.o                \
-                        da_par_util.o
+                        da_par_util1.o
 
 rttov_const.o:		parkind1.o	\
 			rttov_const.f90

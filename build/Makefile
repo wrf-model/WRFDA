@@ -40,6 +40,6 @@ clean :
           '*.code' '*.sed' RSL/RSL/*.a RSL/RSL/*.o
 
 superclean : clean
-	@ $(RM) *.f90 *.f *.inc *.int *.c *.h *.m4 *.code \
+	@ $(RM) *.f90 *.F *.f *.inc *.int *.c *.h *.m4 *.code *.make \
           bufrlib.param *.sed registry gen_comms.stub inc/* \
-          convert_tool kma_wave2grid wave2grid_kma mm5_wrf wrf_mm5
+          convert_tool kma_wave2grid wave2grid_kma *.csh version_decl

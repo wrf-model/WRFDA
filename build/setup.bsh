@@ -9,7 +9,7 @@ for DIR in dyn_$SOLVER main share frame phys convertor tools \
   external/ioapi_share inc gen_be \
   external/io_netcdf external/io_grib1 da da/*; do
   NAME=`basename $DIR`
-  ln -fs ../$DIR/$NAME.make ../$DIR/*.f90 ../$DIR/*.f ../$DIR/*.inc \
+  ln -fs ../$DIR/$NAME.make ../$DIR/*.f90 ../$DIR/*.F ../$DIR/*.f../$DIR/*.inc \
     ../$DIR/*.c ../$DIR/*.h ../$DIR/*.m4 ../$DIR/*.code ../$DIR/*.bsh \
     ../$DIR/*.int ../$DIR/*.csh .
 #  echo include $DIR.make >> Makefile1

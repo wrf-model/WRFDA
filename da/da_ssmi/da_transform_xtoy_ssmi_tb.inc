@@ -1,5 +1,5 @@
 !============================================================================
-SUBROUTINE DA_Transform_XToY_SSMI_Tb( xb, oi, xa, xp, y )
+SUBROUTINE da_transform_xtoy_ssmi_tb( xb, oi, xa, xp, y )
 !----------------------------------------------------------------------------
    IMPLICIT NONE
 !----------------------------------------------------------------------------
@@ -157,19 +157,19 @@ SUBROUTINE DA_Transform_XToY_SSMI_Tb( xb, oi, xa, xp, y )
 !         xb%landmask(i,j+1) .eq. 0 .and. xb%landmask(i+1,j+1) .eq. 0       &
 !         ) then ! only calculate over water
 
-         call Interp_lin_2D(xa%tb19v, xb%ims, xb%ime, xb%jms, xb%jme, &
+         call da_interp_lin_2d(xa%tb19v, xb%ims, xb%ime, xb%jms, xb%jme, &
                             i, j, dx, dy, dxm, dym, y%ssmi_tb(n)%tb19v)
-         call Interp_lin_2D(xa%tb19h, xb%ims, xb%ime, xb%jms, xb%jme, &
+         call da_interp_lin_2d(xa%tb19h, xb%ims, xb%ime, xb%jms, xb%jme, &
                             i, j, dx, dy, dxm, dym, y%ssmi_tb(n)%tb19h)
-         call Interp_lin_2D(xa%tb22v, xb%ims, xb%ime, xb%jms, xb%jme, &
+         call da_interp_lin_2d(xa%tb22v, xb%ims, xb%ime, xb%jms, xb%jme, &
                             i, j, dx, dy, dxm, dym, y%ssmi_tb(n)%tb22v)
-         call Interp_lin_2D(xa%tb37v, xb%ims, xb%ime, xb%jms, xb%jme, &
+         call da_interp_lin_2d(xa%tb37v, xb%ims, xb%ime, xb%jms, xb%jme, &
                             i, j, dx, dy, dxm, dym, y%ssmi_tb(n)%tb37v)
-         call Interp_lin_2D(xa%tb37h, xb%ims, xb%ime, xb%jms, xb%jme, &
+         call da_interp_lin_2d(xa%tb37h, xb%ims, xb%ime, xb%jms, xb%jme, &
                             i, j, dx, dy, dxm, dym, y%ssmi_tb(n)%tb37h)
-         call Interp_lin_2D(xa%tb85v, xb%ims, xb%ime, xb%jms, xb%jme, &
+         call da_interp_lin_2d(xa%tb85v, xb%ims, xb%ime, xb%jms, xb%jme, &
                             i, j, dx, dy, dxm, dym, y%ssmi_tb(n)%tb85v)
-         call Interp_lin_2D(xa%tb85h, xb%ims, xb%ime, xb%jms, xb%jme, &
+         call da_interp_lin_2d(xa%tb85h, xb%ims, xb%ime, xb%jms, xb%jme, &
                             i, j, dx, dy, dxm, dym, y%ssmi_tb(n)%tb85h)
 !     endif
 #else
@@ -177,19 +177,19 @@ SUBROUTINE DA_Transform_XToY_SSMI_Tb( xb, oi, xa, xp, y )
 !         xb%landmask(i,j+1) .eq. 0 .and. xb%landmask(i+1,j+1) .eq. 0       &
 !         ) then ! only calculate over water
 
-         call Interp_lin_2D(xa%tb19v(xb%ims,xb%jms), xb%ims, xb%ime, xb%jms, xb%jme, &
+         call da_interp_lin_2d(xa%tb19v(xb%ims,xb%jms), xb%ims, xb%ime, xb%jms, xb%jme, &
                             i, j, dx, dy, dxm, dym, y%ssmi_tb(n)%tb19v)
-         call Interp_lin_2D(xa%tb19h(xb%ims,xb%jms), xb%ims, xb%ime, xb%jms, xb%jme, &
+         call da_interp_lin_2d(xa%tb19h(xb%ims,xb%jms), xb%ims, xb%ime, xb%jms, xb%jme, &
                             i, j, dx, dy, dxm, dym, y%ssmi_tb(n)%tb19h)
-         call Interp_lin_2D(xa%tb22v(xb%ims,xb%jms), xb%ims, xb%ime, xb%jms, xb%jme, &
+         call da_interp_lin_2d(xa%tb22v(xb%ims,xb%jms), xb%ims, xb%ime, xb%jms, xb%jme, &
                             i, j, dx, dy, dxm, dym, y%ssmi_tb(n)%tb22v)
-         call Interp_lin_2D(xa%tb37v(xb%ims,xb%jms), xb%ims, xb%ime, xb%jms, xb%jme, &
+         call da_interp_lin_2d(xa%tb37v(xb%ims,xb%jms), xb%ims, xb%ime, xb%jms, xb%jme, &
                             i, j, dx, dy, dxm, dym, y%ssmi_tb(n)%tb37v)
-         call Interp_lin_2D(xa%tb37h(xb%ims,xb%jms), xb%ims, xb%ime, xb%jms, xb%jme, &
+         call da_interp_lin_2d(xa%tb37h(xb%ims,xb%jms), xb%ims, xb%ime, xb%jms, xb%jme, &
                             i, j, dx, dy, dxm, dym, y%ssmi_tb(n)%tb37h)
-         call Interp_lin_2D(xa%tb85v(xb%ims,xb%jms), xb%ims, xb%ime, xb%jms, xb%jme, &
+         call da_interp_lin_2d(xa%tb85v(xb%ims,xb%jms), xb%ims, xb%ime, xb%jms, xb%jme, &
                             i, j, dx, dy, dxm, dym, y%ssmi_tb(n)%tb85v)
-         call Interp_lin_2D(xa%tb85h(xb%ims,xb%jms), xb%ims, xb%ime, xb%jms, xb%jme, &
+         call da_interp_lin_2d(xa%tb85h(xb%ims,xb%jms), xb%ims, xb%ime, xb%jms, xb%jme, &
                             i, j, dx, dy, dxm, dym, y%ssmi_tb(n)%tb85h)
 !     endif
 #endif
@@ -228,5 +228,5 @@ SUBROUTINE DA_Transform_XToY_SSMI_Tb( xb, oi, xa, xp, y )
 
 !  end do
 
-END SUBROUTINE DA_Transform_XToY_SSMI_Tb
+END SUBROUTINE da_transform_xtoy_ssmi_tb
 
