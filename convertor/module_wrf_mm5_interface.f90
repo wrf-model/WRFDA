@@ -2,14 +2,14 @@ MODULE module_wrf_mm5_interface
 
 !--Driver layer modules
    USE module_domain
-   USE module_configure
-   USE module_driver_constants
+   use module_configure
+   use module_driver_constants
 
-   USE DA_Constants
-   USE DA_Define_Structures
-   USE DA_Setup_Structures
-   USE DA_Tools
-   USE par_util
+   use da_constants
+   use da_define_structures
+   use da_setup_structures
+   use da_tools
+   use da_par_util
 
    use da_solve_v3d
    use module_wrf_mm5
@@ -97,7 +97,7 @@ CALL initial_config
 !  [3.0] Set up first guess field (xb):
 !------------------------------------------------------------------------------
 
-   CALL DA_Setup_FirstGuess( xbx, grid, &
+   CALL da_setup_firstguess( xbx, grid, &
 #include <em_actual_args.inc>
                            )
 

@@ -5,11 +5,11 @@ MODULE module_mm5_wrf_interface
    USE module_configure
    USE module_driver_constants
 
-   USE DA_Constants
-   USE DA_Define_Structures
-   USE DA_Setup_Structures
-   USE DA_Tools
-   USE par_util
+   use da_constants
+   use da_define_structures
+   use da_setup_structures
+   use da_tools
+   use da_par_util
 
    use da_solve_v3d
    use module_mm5_wrf
@@ -83,7 +83,7 @@ CALL initial_config
 !  Set up first guess field (xb):
 !------------------------------------------------------------------------------
 
-   CALL DA_Setup_mm5(grid%xb, xbx, grid%xp)
+   CALL da_setup_mm5(grid%xb, xbx, grid%xp)
 
    call da_interp_sigma2eta(grid%xb)
 

@@ -1,4 +1,4 @@
-SUBROUTINE DA_Solve_PoissonEqn_FST_Adj( xb, xbx, xp, b, del2b, &
+SUBROUTINE da_solve_poissoneqn_fst_adj( xb, xbx, xp, b, del2b, &
                                     ids,ide, jds,jde, kds,kde, &
                                     ims,ime, jms,jme, kms,kme, &
                                     its,ite, jts,jte, kts,kte )
@@ -93,7 +93,7 @@ SUBROUTINE DA_Solve_PoissonEqn_FST_Adj( xb, xbx, xp, b, del2b, &
          enddo
       enddo
 
-      CALL DA_Fast_Sine_Transform( Forward_FFT, vector_inc, vector_jump, &
+      CALL da_fast_sine_transform( Forward_FFT, vector_inc, vector_jump, &
                                    num_vectors, vector_size, &
                                    xbx % fft_factors_x, xbx % trig_functs_x, &
                                    work_1d(1), work_area )
@@ -156,7 +156,7 @@ SUBROUTINE DA_Solve_PoissonEqn_FST_Adj( xb, xbx, xp, b, del2b, &
       enddo
       enddo
 
-      CALL DA_Fast_Sine_Transform( Forward_FFT, vector_inc, vector_jump, &
+      CALL da_fast_sine_transform( Forward_FFT, vector_inc, vector_jump, &
                                    num_vectors, vector_size, &
                                    xbx % fft_factors_y, xbx % trig_functs_y, &
                                    work_1d(1), work_area )
@@ -180,7 +180,7 @@ SUBROUTINE DA_Solve_PoissonEqn_FST_Adj( xb, xbx, xp, b, del2b, &
 
 !     Reform gridpt. b using inverse double FST in i.
 
-      CALL DA_Fast_Sine_Transform( Inverse_FFT, vector_inc, vector_jump, &
+      CALL da_fast_sine_transform( Inverse_FFT, vector_inc, vector_jump, &
                                    num_vectors, vector_size, &
                                    xbx % fft_factors_y, xbx % trig_functs_y, &
                                    work_1d(1), work_area )
@@ -238,7 +238,7 @@ SUBROUTINE DA_Solve_PoissonEqn_FST_Adj( xb, xbx, xp, b, del2b, &
          enddo
       enddo
 
-      CALL DA_Fast_Sine_Transform( Inverse_FFT, vector_inc, vector_jump, &
+      CALL da_fast_sine_transform( Inverse_FFT, vector_inc, vector_jump, &
                                    num_vectors, vector_size, &
                                    xbx % fft_factors_x, xbx % trig_functs_x, &
                                    work_1d(1), work_area )
@@ -269,5 +269,5 @@ SUBROUTINE DA_Solve_PoissonEqn_FST_Adj( xb, xbx, xp, b, del2b, &
 
    if(ALLOCATED( work_1d )) DEALLOCATE( work_1d )
 
-END SUBROUTINE DA_Solve_PoissonEqn_FST_Adj
+END SUBROUTINE da_solve_poissoneqn_fst_adj
 

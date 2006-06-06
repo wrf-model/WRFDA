@@ -28,7 +28,7 @@ SUBROUTINE da_filter_adj(var, xp)
 
 !--Apply (i',j',k -> i',j,k') transpose ( v1z -> v1y ).
 
-   call transpose_z2y ( xp )
+   call da_transpose_z2y ( xp )
 
 !--Perform y-direction filter:
 
@@ -54,7 +54,7 @@ SUBROUTINE da_filter_adj(var, xp)
 
 !--Apply (i',j,k' -> i,j',k') transpose (v1y -> v1x).
 
-   call transpose_y2x ( xp )
+   call da_transpose_y2x ( xp )
 
 !--Perform x-direction filter:
 
@@ -80,7 +80,7 @@ SUBROUTINE da_filter_adj(var, xp)
 
 !--Apply (i,j',k' -> i',j',k) transpose ( v1x -> v1z ).
 
-   call transpose_x2z ( xp )
+   call da_transpose_x2z ( xp )
 
 !------------------------------------------------------------------------------
 

@@ -1,6 +1,6 @@
 
 !============================================================================
-SUBROUTINE DA_Transform_XToY_SSMI_Tb_Adj( xb, oi, xp, jo_grad_y, jo_grad_x )
+SUBROUTINE da_transform_xtoy_ssmi_tb_adj( xb, oi, xp, jo_grad_y, jo_grad_x )
 !----------------------------------------------------------------------------
    IMPLICIT NONE
 !----------------------------------------------------------------------------
@@ -51,40 +51,40 @@ SUBROUTINE DA_Transform_XToY_SSMI_Tb_Adj( xb, oi, xp, jo_grad_y, jo_grad_x )
          dym = oi%ssmi_tb(n)%loc%dym
 
 #ifndef DEREF_KLUDGE
-         call Interp_lin_2D_adj(jo_grad_x%tb19v, xb%ims, xb%ime, xb%jms, xb%jme, &
+         call da_interp_lin_2d_adj(jo_grad_x%tb19v, xb%ims, xb%ime, xb%jms, xb%jme, &
                                 i, j, dx, dy, dxm, dym, jo_grad_y%ssmi_tb(n)%tb19v)
-         call Interp_lin_2D_adj(jo_grad_x%tb19h, xb%ims, xb%ime, xb%jms, xb%jme, &
+         call da_interp_lin_2d_adj(jo_grad_x%tb19h, xb%ims, xb%ime, xb%jms, xb%jme, &
                                 i, j, dx, dy, dxm, dym, jo_grad_y%ssmi_tb(n)%tb19h)
-         call Interp_lin_2D_adj(jo_grad_x%tb22v, xb%ims, xb%ime, xb%jms, xb%jme, &
+         call da_interp_lin_2d_adj(jo_grad_x%tb22v, xb%ims, xb%ime, xb%jms, xb%jme, &
                                 i, j, dx, dy, dxm, dym, jo_grad_y%ssmi_tb(n)%tb22v)
-         call Interp_lin_2D_adj(jo_grad_x%tb37v, xb%ims, xb%ime, xb%jms, xb%jme, &
+         call da_interp_lin_2d_adj(jo_grad_x%tb37v, xb%ims, xb%ime, xb%jms, xb%jme, &
                                 i, j, dx, dy, dxm, dym, jo_grad_y%ssmi_tb(n)%tb37v)
-         call Interp_lin_2D_adj(jo_grad_x%tb37h, xb%ims, xb%ime, xb%jms, xb%jme, &
+         call da_interp_lin_2d_adj(jo_grad_x%tb37h, xb%ims, xb%ime, xb%jms, xb%jme, &
                                 i, j, dx, dy, dxm, dym, jo_grad_y%ssmi_tb(n)%tb37h)
-         call Interp_lin_2D_adj(jo_grad_x%tb85v, xb%ims, xb%ime, xb%jms, xb%jme, &
+         call da_interp_lin_2d_adj(jo_grad_x%tb85v, xb%ims, xb%ime, xb%jms, xb%jme, &
                                 i, j, dx, dy, dxm, dym, jo_grad_y%ssmi_tb(n)%tb85v)
-         call Interp_lin_2D_adj(jo_grad_x%tb85h, xb%ims, xb%ime, xb%jms, xb%jme, &
+         call da_interp_lin_2d_adj(jo_grad_x%tb85h, xb%ims, xb%ime, xb%jms, xb%jme, &
                                 i, j, dx, dy, dxm, dym, jo_grad_y%ssmi_tb(n)%tb85h)
 #else
-         call Interp_lin_2D_adj(jo_grad_x%tb19v(xb%ims,xb%jms), &
+         call da_interp_lin_2d_adj(jo_grad_x%tb19v(xb%ims,xb%jms), &
                                 xb%ims, xb%ime, xb%jms, xb%jme, &
                                 i, j, dx, dy, dxm, dym, jo_grad_y%ssmi_tb(n)%tb19v)
-         call Interp_lin_2D_adj(jo_grad_x%tb19h(xb%ims,xb%jms), &
+         call da_interp_lin_2d_adj(jo_grad_x%tb19h(xb%ims,xb%jms), &
                                 xb%ims, xb%ime, xb%jms, xb%jme, &
                                 i, j, dx, dy, dxm, dym, jo_grad_y%ssmi_tb(n)%tb19h)
-         call Interp_lin_2D_adj(jo_grad_x%tb22v(xb%ims,xb%jms), &
+         call da_interp_lin_2d_adj(jo_grad_x%tb22v(xb%ims,xb%jms), &
                                 xb%ims, xb%ime, xb%jms, xb%jme, &
                                 i, j, dx, dy, dxm, dym, jo_grad_y%ssmi_tb(n)%tb22v)
-         call Interp_lin_2D_adj(jo_grad_x%tb37v(xb%ims,xb%jms), &
+         call da_interp_lin_2d_adj(jo_grad_x%tb37v(xb%ims,xb%jms), &
                                 xb%ims, xb%ime, xb%jms, xb%jme, &
                                 i, j, dx, dy, dxm, dym, jo_grad_y%ssmi_tb(n)%tb37v)
-         call Interp_lin_2D_adj(jo_grad_x%tb37h(xb%ims,xb%jms), &
+         call da_interp_lin_2d_adj(jo_grad_x%tb37h(xb%ims,xb%jms), &
                                 xb%ims, xb%ime, xb%jms, xb%jme, &
                                 i, j, dx, dy, dxm, dym, jo_grad_y%ssmi_tb(n)%tb37h)
-         call Interp_lin_2D_adj(jo_grad_x%tb85v(xb%ims,xb%jms), &
+         call da_interp_lin_2d_adj(jo_grad_x%tb85v(xb%ims,xb%jms), &
                                 xb%ims, xb%ime, xb%jms, xb%jme, &
                                 i, j, dx, dy, dxm, dym, jo_grad_y%ssmi_tb(n)%tb85v)
-         call Interp_lin_2D_adj(jo_grad_x%tb85h(xb%ims,xb%jms), &
+         call da_interp_lin_2d_adj(jo_grad_x%tb85h(xb%ims,xb%jms), &
                                 xb%ims, xb%ime, xb%jms, xb%jme, &
                                 i, j, dx, dy, dxm, dym, jo_grad_y%ssmi_tb(n)%tb85h)
 #endif
@@ -92,5 +92,5 @@ SUBROUTINE DA_Transform_XToY_SSMI_Tb_Adj( xb, oi, xp, jo_grad_y, jo_grad_x )
 
    end do
 
-END SUBROUTINE DA_Transform_XToY_SSMI_Tb_Adj
+END SUBROUTINE da_transform_xtoy_ssmi_tb_adj
 

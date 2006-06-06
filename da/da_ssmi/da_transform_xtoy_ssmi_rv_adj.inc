@@ -1,5 +1,5 @@
 !============================================================================
-SUBROUTINE DA_Transform_XToY_SSMI_Rv_Adj( xb, oi, jo_grad_y, jo_grad_x )
+SUBROUTINE da_transform_xtoy_ssmi_rv_adj( xb, oi, jo_grad_y, jo_grad_x )
 !----------------------------------------------------------------------------
    IMPLICIT NONE
 !----------------------------------------------------------------------------
@@ -26,16 +26,16 @@ SUBROUTINE DA_Transform_XToY_SSMI_Rv_Adj( xb, oi, jo_grad_y, jo_grad_x )
          dxm = oi%ssmi_retrieval(n)%loc%dxm
          dym = oi%ssmi_retrieval(n)%loc%dym
 
-#ifndef DEREF_KLUDGE
-         call Interp_lin_2D_adj(jo_grad_x%tpw, xb%ims, xb%ime, xb%jms, xb%jme, &
+#ifndef DEREF_kludge
+         call da_interp_lin_2d_adj(jo_grad_x%tpw, xb%ims, xb%ime, xb%jms, xb%jme, &
                                 i, j, dx, dy, dxm, dym, jo_grad_y%ssmi_retrieval(n)%tpw)
-         call Interp_lin_2D_adj(jo_grad_x%speed, xb%ims, xb%ime, xb%jms, xb%jme, &
+         call da_interp_lin_2d_adj(jo_grad_x%speed, xb%ims, xb%ime, xb%jms, xb%jme, &
                                 i, j, dx, dy, dxm, dym, jo_grad_y%ssmi_retrieval(n)%speed)
 #else
-         call Interp_lin_2D_adj(jo_grad_x%tpw(xb%ims,xb%jms), &
+         call da_interp_lin_2d_adj(jo_grad_x%tpw(xb%ims,xb%jms), &
                                 xb%ims, xb%ime, xb%jms, xb%jme, &
                                 i, j, dx, dy, dxm, dym, jo_grad_y%ssmi_retrieval(n)%tpw)
-         call Interp_lin_2D_adj(jo_grad_x%speed(xb%ims,xb%jms), &
+         call da_interp_lin_2d_adj(jo_grad_x%speed(xb%ims,xb%jms), &
                                 xb%ims, xb%ime, xb%jms, xb%jme, &
                                 i, j, dx, dy, dxm, dym, jo_grad_y%ssmi_retrieval(n)%speed)
 #endif
@@ -44,5 +44,5 @@ SUBROUTINE DA_Transform_XToY_SSMI_Rv_Adj( xb, oi, jo_grad_y, jo_grad_x )
 
    end do
 
-END SUBROUTINE DA_Transform_XToY_SSMI_Rv_Adj
+END SUBROUTINE da_transform_xtoy_ssmi_rv_adj
 

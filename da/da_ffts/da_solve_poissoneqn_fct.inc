@@ -1,4 +1,4 @@
-SUBROUTINE DA_Solve_PoissonEqn_FCT( xb, xbx, del2b, b, xp)
+SUBROUTINE da_solve_poissoneqn_fct( xb, xbx, del2b, b, xp)
 
 !------------------------------------------------------------------------------
 !  PURPOSE: Solve Del**2 B = A for B with zero gradient boundary conditions.
@@ -99,7 +99,7 @@ SUBROUTINE DA_Solve_PoissonEqn_FCT( xb, xbx, del2b, b, xp)
             work_1d(ij) = 0.0
          enddo
       enddo
-      CALL DA_Fast_Cosine_Transform( Forward_FFT, vector_inc, vector_jump, &
+      CALL da_fast_cosine_transform( Forward_FFT, vector_inc, vector_jump, &
                                      num_vectors, vector_size, &
                                      xbx%fft_factors_x, xbx%trig_functs_x, &
                                      work_1d(1), work_area )
@@ -190,7 +190,7 @@ SUBROUTINE DA_Solve_PoissonEqn_FCT( xb, xbx, del2b, b, xp)
 
 !     [2.3] Reform gridpt. b using inverse double FST in i.
 
-      CALL DA_Fast_Cosine_Transform( Inverse_FFT, vector_inc, vector_jump, &
+      CALL da_fast_cosine_transform( Inverse_FFT, vector_inc, vector_jump, &
                                      num_vectors, vector_size, &
                                    xbx % fft_factors_y, xbx % trig_functs_y, &
                                    work_1d(1), work_area )
@@ -249,7 +249,7 @@ SUBROUTINE DA_Solve_PoissonEqn_FCT( xb, xbx, del2b, b, xp)
          enddo
       enddo
 
-      CALL DA_Fast_Cosine_Transform( Inverse_FFT, vector_inc, vector_jump, &
+      CALL da_fast_cosine_transform( Inverse_FFT, vector_inc, vector_jump, &
                                      num_vectors, vector_size, &
                                      xbx % fft_factors_x, xbx % trig_functs_x, &
                                      work_1d(1), work_area )
@@ -293,5 +293,5 @@ enddo
 
    if(ALLOCATED( work_1d )) DEALLOCATE( work_1d )
 
-END SUBROUTINE DA_Solve_PoissonEqn_FCT
+END SUBROUTINE da_solve_poissoneqn_fct
 

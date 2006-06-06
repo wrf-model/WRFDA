@@ -15,7 +15,7 @@ subroutine da_sum_reals( n, val1, val2, val3, val4, val5, val6, val7 )
    if ( n > 5 ) val(6) = val6
    if ( n > 6 ) val(7) = val7
 
-   call proc_sum_real( 7, val )
+   call da_proc_sum_real( 7, val )
 
    val1 = val(1)
    val2 = val(2)
