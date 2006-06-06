@@ -64,6 +64,10 @@ SHARE     = $(DEVTOP)/share
 TEST      = $(DEVTOP)/test
 TOOLS     = $(DEVTOP)/tools
 
+LAPACK        = $(EXTERNAL)/lapack
+FFTPACK5      = $(EXTERNAL)/fftpack5
+BLAS          = $(EXTERNAL)/blas
+BUFR_NCEP_NCO = $(EXTERNAL)/bufr_ncep_nco
 IO_GRIB1      = $(EXTERNAL)/io_grib1
 IO_INT        = $(EXTERNAL)/io_int
 ESMF_TIME_F90 = $(EXTERNAL)/esmf_time_f90
@@ -111,13 +115,13 @@ CONVERTOR_LIB	=
 CONFIG_BUF_LEN	=	8192
 
 #### Default sed command and script for Fortran source files ####
-SED_FTN = sed -f ../arch/standard.sed
+SED_FTN = sed -f $(ARCH)/standard.sed
 
-WRF_LIB		=	-L../external/io_int -lwrfio_int \
-			-L../external/io_grib1 -lio_grib1 \
-			-L../external/esmf_time_f90 -lesmf_time \
-			../frame/module_internal_header_util.o \
-			../frame/pack_utils.o
+WRF_LIB		=	-L$(IO_INT) -lwrfio_int \
+			-L$(IO_GRIB1) -lio_grib1 \
+			-L$(ESMF_TIME_F90) -lesmf_time \
+			$(FRAME)/module_internal_header_util.o \
+			$(FRAME)/pack_utils.o
 
 #### Architecture specific settings ####
 

@@ -47,7 +47,7 @@ OBJS_FOR_ALL =		da_solve_v3d.o		\
 			parkind1.o	        \
 			gsi_kinds.o		\
 			gsi_constants.o		\
-                        da_wrfvar_top.o     \
+                        da_wrfvar_top.o         \
                         da_wrfvar_io.o
 
 include ../configure.wrf
@@ -66,7 +66,6 @@ links :
 ##########################################################################
 
 clean:
-#	@ echo 'use the clean script
 	$(RM) *.o *.mod *.f *.stb *.out core *~ mpif.h da_generic_boilerplate.inc
 
 da_generic_boilerplate.inc:	da_generic_boilerplate.m4
@@ -220,7 +219,7 @@ da_memory.o:		da_memory.c
 			$(RM) $@
 			$(CC) -c $(CFLAGS) da_memory.c
 
-da_vtox_transforms.o:	\
+da_vtox_transforms.o:	da_vtox_transforms.f90 \
 			da_par_util.o \
 			da_define_structures.o \
 			da_tools.o \
@@ -231,7 +230,6 @@ da_vtox_transforms.o:	\
 			fftpack5.o \
 			da_spectral.o \
 			da_ssmi.o \
-			da_vtox_transforms.f \
 			da_transform_vtovv.inc \
 			da_transform_vtovv_adj.inc \
 			da_transform_vtovv_global.inc \
@@ -252,7 +250,7 @@ da_vtox_transforms.o:	\
 			$(CPP) $(CPPFLAGS) da_vtox_transforms.f90 > da_vtox_transforms.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_vtox_transforms.f
 
-da_obs.o:		\
+da_obs.o:		da_obs.f90 \
 			da_constants.o \
 			da_define_structures.o \
 			da_airep.o \
@@ -276,7 +274,6 @@ da_obs.o:		\
 			da_buoy.o  \
                         da_tracing.o \
 			da_par_util.o \
-			da_obs.f \
 	                da_obs_proc_station.inc \
 			da_read_obs.inc \
 			da_scan_obs.inc \
@@ -303,14 +300,13 @@ da_obs.o:		\
 			$(CPP) $(CPPFLAGS) da_obs.f90 > da_obs.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_obs.f
 
-da_pseudo.o:		\
+da_pseudo.o:		da_pseudo.f90 \
 			da_constants.o \
 			da_par_util.o \
 			da_define_structures.o \
 			da_interpolation.o \
 			da_statistics.o \
 			da_tools.o \
-			da_pseudo.f90 \
 			da_cal_jo_and_grady_pseudo.inc \
 			da_calculate_residual_pseudo.inc \
 			da_get_innov_vector_pseudo.inc \
@@ -323,7 +319,7 @@ da_pseudo.o:		\
 			$(CPP) $(CPPFLAGS) da_pseudo.f90 > da_pseudo.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_pseudo.f
 
-da_metar.o:		\
+da_metar.o:		da_metar.f90 \
 			da_constants.o \
 			da_par_util.o \
 			da_define_structures.o \
@@ -331,7 +327,6 @@ da_metar.o:		\
 			da_statistics.o \
 			da_tools.o \
 			da_physics.o \
-			da_metar.f90 \
 			da_ao_stats_metar.inc \
 			da_calculate_jo_and_grady_metar.inc \
 			da_calculate_residual_metar.inc \
@@ -345,14 +340,13 @@ da_metar.o:		\
 			$(CPP) $(CPPFLAGS) da_metar.f > da_metar.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_metar.f
 
-da_geoamv.o:		\
+da_geoamv.o:		da_geoamv.f90 \
 			da_constants.o \
 			da_par_util.o \
 			da_define_structures.o \
 			da_interpolation.o \
 			da_statistics.o \
 			da_tools.o \
-			da_geoamv.f90 \
 			da_ao_stats_geoamv.inc \
 			da_get_jo_and_grady_geoamv.inc \
 			da_calculate_residual_geoamv.inc \
@@ -366,14 +360,13 @@ da_geoamv.o:		\
 			$(CPP) $(CPPFLAGS) da_geoamv.f > da_geoamv.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_geoamv.f
 
-da_polaramv.o:		\
+da_polaramv.o:		da_polaramv.f90 \
 			da_constants.o \
 			da_par_util.o \
 			da_define_structures.o \
 			da_interpolation.o \
 			da_statistics.o \
 			da_tools.o \
-			da_polaramv.f90 \
 			da_ao_stats_polaramv.inc \
 			da_get_jo_and_grady_polaramv.inc \
 			da_calculate_residual_polaramv.inc \
@@ -387,14 +380,13 @@ da_polaramv.o:		\
 			$(CPP) $(CPPFLAGS) da_polaramv.f90 > da_polaramv.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_polaramv.f
 
-da_satem.o:		\
+da_satem.o:		da_satem.f90 \
 			da_constants.o \
 			da_par_util.o \
 			da_define_structures.o \
 			da_interpolation.o \
 			da_statistics.o \
 			da_tools.o \
-			da_satem.f90 \
 			da_ao_stats_satem.inc \
 			da_calculate_jo_and_grady_satem.inc \
 			da_calculate_residual_satem.inc \
@@ -408,7 +400,7 @@ da_satem.o:		\
 			$(CPP) $(CPPFLAGS) da_satem.f90 > da_satem.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_satem.f
 
-da_ships.o:		\
+da_ships.o:		da_ships.f90 \
 			da_constants.o \
 			da_par_util.o \
 			da_define_structures.o \
@@ -416,7 +408,6 @@ da_ships.o:		\
 			da_statistics.o \
 			da_tools.o \
 			da_physics.o \
-			da_ships.f90 \
 			da_ao_stats_ships.inc \
 			da_calculate_jo_and_grady_ships.inc \
 			da_calculate_residual_ships.inc \
@@ -430,7 +421,7 @@ da_ships.o:		\
 			$(CPP) $(CPPFLAGS) da_ships.f90 > da_ships.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_ships.f
 
-da_synop.o:		\
+da_synop.o:		da_synop.f90 \
 			da_constants.o \
 			da_par_util.o \
 			da_define_structures.o \
@@ -438,7 +429,6 @@ da_synop.o:		\
 			da_statistics.o \
 			da_tools.o \
 			da_physics.o \
-			da_synop.f90 \
 			da_check_max_iv_synop.inc \
 			da_get_innov_vector_synop.inc \
 			da_ao_stats_synop.inc \
@@ -453,7 +443,7 @@ da_synop.o:		\
 			$(CPP) $(CPPFLAGS) da_synop.f90 > da_synop.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_synop.f
 
-da_sound.o:		\
+da_sound.o:		da_sound.f90 \
 			da_constants.o \
 			da_par_util.o \
 			da_define_structures.o \
@@ -481,20 +471,18 @@ da_sound.o:		\
 			da_transform_xtoy_sonde_sfc_adj.inc \
 			da_get_innov_vector_sonde_sfc.inc \
 			da_check_max_iv_sonde_sfc.inc \
-			da_calculate_grady_sonde_sfc.inc \
-			da_sound.f90
+			da_calculate_grady_sonde_sfc.inc
 			$(RM) $@
 			$(CPP) $(CPPFLAGS) da_sound.f90 > da_sound.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_sound.f
 
-da_airep.o:		\
+da_airep.o:		da_airep.f90 \
 			da_constants.o \
 			da_par_util.o \
 			da_define_structures.o \
 			da_interpolation.o \
 			da_statistics.o \
 			da_tools.o \
-			da_airep.f90 \
 			da_ao_stats_airep.inc \
 			da_calculate_jo_and_grady_airep.inc \
 			da_calculate_residual_airep.inc \
@@ -508,14 +496,13 @@ da_airep.o:		\
 			$(CPP) $(CPPFLAGS) da_airep.f90 > da_airep.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_airep.f
 
-da_pilot.o:		\
+da_pilot.o:		da_pilot.f90 \
 			da_constants.o \
 			da_par_util.o \
 			da_define_structures.o \
 			da_interpolation.o \
 			da_statistics.o \
 			da_tools.o \
-			da_pilot.f90 \
 			da_ao_stats_pilot.inc \
 			da_calculate_jo_and_grady_pilot.inc \
 			da_calculate_residual_pilot.inc \
@@ -529,7 +516,7 @@ da_pilot.o:		\
 			$(CPP) $(CPPFLAGS) da_pilot.f90 > da_pilot.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_pilot.f
 
-da_bogus.o:		\
+da_bogus.o:		da_bogus.f90 \
 			da_constants.o \
 			da_par_util.o \
 			da_define_structures.o \
@@ -537,7 +524,6 @@ da_bogus.o:		\
 			da_statistics.o \
 			da_tools.o \
 			da_physics.o \
-			da_bogus.f90 \
 			da_ao_stats_bogus.inc \
 			da_calculate_jo_and_grady_bogus.inc \
 			da_calculate_residual_bogus.inc \
@@ -551,14 +537,13 @@ da_bogus.o:		\
 			$(CPP) $(CPPFLAGS) da_bogus.f90 > da_bogus.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_bogus.f
 
-da_radar.o:		\
+da_radar.o:		da_radar.f90 \
 			da_constants.o \
 			da_par_util.o \
 			da_define_structures.o \
 			da_interpolation.o \
 			da_statistics.o \
 			da_tools.o \
-			da_radar.f90 \
 			da_ao_stats_radar.inc \
 			da_calculate_grady_radar.inc \
 			da_calculate_jo_and_grady_radar.inc \
@@ -580,7 +565,7 @@ da_radar.o:		\
 			$(CPP) $(CPPFLAGS) da_radar.f90 > da_radar.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_radar.f
 
-da_gpspw.o:		\
+da_gpspw.o:		da_gpspw.f90 \
 			da_constants.o \
 			da_par_util.o \
 			da_define_structures.o \
@@ -588,7 +573,6 @@ da_gpspw.o:		\
 			da_statistics.o \
 			da_physics.o \
 			da_tools.o \
-			da_gpspw.f90 \
 			da_ao_stats_gpspw.inc \
 			da_calculate_jo_and_grady_gpspw.inc \
 			da_calculate_residual_gpspw.inc \
@@ -602,14 +586,13 @@ da_gpspw.o:		\
 			$(CPP) $(CPPFLAGS) da_gpspw.f90 > da_gpspw.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_gpspw.f
 
-da_gpsref.o:		\
+da_gpsref.o:		da_gpsref.f90 \
 			da_constants.o \
 			da_par_util.o \
 			da_define_structures.o \
 			da_interpolation.o \
 			da_statistics.o \
 			da_tools.o \
-			da_gpsref.f90 \
 			da_ao_stats_gpsref.inc \
 			da_calculate_grady_gpsref.inc \
 			da_get_jo_and_grady_gpsref.inc \
@@ -624,7 +607,7 @@ da_gpsref.o:		\
 			$(CPP) $(CPPFLAGS) da_gpsref.f90 > da_gpsref.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_gpsref.f
 
-da_ssmi.o:		\
+da_ssmi.o:		da_ssmi.f90 \
 			da_constants.o \
 			da_par_util.o \
 			da_define_structures.o \
@@ -633,7 +616,6 @@ da_ssmi.o:		\
 			da_physics.o \
 			da_statistics.o \
 			da_tools.o \
-			da_ssmi.f90 \
 			da_ao_stats_ssmi.inc \
 			da_ao_stats_ssmi_rv.inc \
 			da_ao_stats_ssmi_tb.inc \
@@ -694,14 +676,13 @@ da_ssmi.o:		\
 			$(CPP) $(CPPFLAGS) da_ssmi.f > da_ssmi.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_ssmi.f
 
-da_qscat.o:		\
+da_qscat.o:		da_qscat.f90 \
 			da_constants.o \
 			da_define_structures.o \
 			da_interpolation.o \
 			da_statistics.o \
 			da_tools.o \
 			da_par_util.o \
-			da_qscat.f90 \
 			da_calculate_jo_and_grady_qscat.inc \
 			da_calculate_residual_qscat.inc \
 			da_check_max_iv_qscat.inc \
@@ -715,7 +696,8 @@ da_qscat.o:		\
 			$(CPP) $(CPPFLAGS) da_qscat.f90 > da_qscat.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_qscat.f
 
-da_profiler.o:		\
+da_profiler.o:		
+			da_profiler.f90 \
 			da_constants.o \
 			da_par_util.o \
 			da_define_structures.o \
@@ -858,7 +840,6 @@ da_ffts.o:		\
 
 da_tools.o:		\
 			da_constants.o \
-			../external/lapack/lapack.o \
 			da_define_structures.o \
 			da_tools.f90 \
 			da_map_utils_defines.inc \
@@ -948,10 +929,9 @@ da_statistics.o:	\
 			$(CPP) $(CPPFLAGS) da_statistics.f90 > da_statistics.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_statistics.f90
 
-da_define_structures.o:	\
+da_define_structures.o:	da_define_structures.f90 \
 			da_constants.o \
                         da_tracing.o \
-			da_define_structures.f90 \
 			da_allocate_background_errors.inc \
 			da_allocate_observations.inc \
 			da_allocate_y.inc \
@@ -978,7 +958,7 @@ da_constants.o:		da_constants.f90 \
 			$(CPP) -I../inc $(CPPFLAGS) da_constants.f90 > da_constants.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_constants.f
 
-da_test.o:	\
+da_test.o:		da_test.f90 \
 			da_constants.o \
 			da_define_structures.o \
 			da_physics.o \
@@ -1004,7 +984,6 @@ da_test.o:	\
 			da_setup_structures.o	\
 			da_tools.o \
 			da_qscat.o \
-			da_test.f90 \
 			da_check_balance.inc \
 			da_check_cvtovv_adjoint.inc \
 			da_check_vtox_adjoint.inc \
@@ -1045,8 +1024,6 @@ da_test.o:	\
 
 da_gen_be.o:	         \
 			da_constants.o			\
-			../external/lapack/lapack.o			\
-			../external/blas/blas.o				\
                         da_tracing.o                    \
 			da_transform_vptovv.inc	\
 			da_eof_decomposition.inc       \

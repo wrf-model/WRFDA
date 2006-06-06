@@ -1,5 +1,4 @@
-# Makefile for WRF-VAR Program and its applications
-# Lower level Makefile
+include ../../configure.wrf
 
 BUFR_OBJS =		bufrlib.o 		\
 	                bort_exit.o 		\
@@ -7,11 +6,11 @@ BUFR_OBJS =		bufrlib.o 		\
 	                wrdesc.o
 
 
-bufrlib.param:		bufrlib.prm
+bufrlib.prm:		bufrlib.param
 			$(RM) $@
-			$(CPP) $(CPPFLAGS_BUFR) bufrlib.prm > bufrlib.param
+			$(CPP) $(CPPFLAGS_BUFR) bufrlib.param > bufrlib.prm
 
-bufrlib.o:		bufrlib.f90 bufrlib.param
+bufrlib.o:		bufrlib.f90 bufrlib.prm
 			$(RM) $@
 			$(CPP) $(CPPFLAGS) bufrlib.f90 > bufrlib.f
 			$(FFC) -c $(FIXEDFLAGS_BUFR) $(MODULE_DIRS) bufrlib.f

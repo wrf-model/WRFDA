@@ -3,7 +3,7 @@ FFTPACK_OBJS =	da_fftpack5.o
 include ../../configure.wrf
 
 fftpack5.o:	         \
-			../da/da_constants.o		\
+			$(DA)/da_constants.o		\
 			r1f2kb.inc  \
 			r1f2kf.inc  \
 			r1f3kb.inc  \

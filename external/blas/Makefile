@@ -1,9 +1,8 @@
-BLAS_OBJS =	BLAS.o 
-
 include ../../configure.wrf
 
+BLAS_OBJS =	blas.o 
 
-BLAS.o:	         \
+blas.o:	         \
 			daxpy.inc  \
 			dcopy.inc  \
 			ddot.inc   \

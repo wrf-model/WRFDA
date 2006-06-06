@@ -1,10 +1,9 @@
-LAPACK_OBJS = lapack.o
-
 include ../../configure.wrf
 
-LAPACK.o:		\
+LAPACK_OBJS = lapack.o
+
+lapack.o:		lapack.f90 \
 			../blas/blas.o \
-			lapack.f90 \
 			dlae2.inc \
 			dlaev2.inc \
 			dlamc1.inc \

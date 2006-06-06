@@ -9,51 +9,55 @@ FCBASEOPTS        = $(FCTYPE) $(FCBASE) $(FCFREE) $(FCHOST) $(FCDEBUG) \
                       $(FCENDIAN) -I.
 FCFLAGS           = $(FCOPTIM) $(FCBASEOPTS) $(OMP)
 INCLUDE_MODULES   = -I$(DA) \
-		      -I../external/io_netcdf -I../external/io_int \
-                      -I../external/esmf_time_f90 \
-                      -I../frame -I../share -I../phys -I../inc
+		      -I$(IO_NETCDF) -I$(IO_INT) \
+                      -I$(ESMF_TIME_F90) \
+                      -I$(LAPACK) \
+                      -I$(FFTPACK5) \
+                      -I$(BLAS) \
+                      -I$(BUFR_NCEP_NCO) \
+                      -I$(FRAME) -I$(SHARE) -I$(PHYS) -I$(INC)
 MODULE_DIRS       = $(INCLUDE_MODULES)
 
 CPPFLAGS          = $(TRADFLAG) $(LIBINCLUDE) -C -P $(ARCHFLAGS) \
                       $(ENVCOMPDEFS) \
 		      $(DM_CPP_FLAGS) $(COREDEFS) $(VAR4DPOSS)
 
-INC_MOD_WRFVAR    = -I../$(NETCDF_IO_PATH) \
+INC_MOD_WRFVAR    = -I$(NETCDF_IO_PATH) \
 		      -I$(DA) \
-                      -I../external/lapack \
-                      -I../external/fftpack5 \
-                      -I../external/blas \
-                      -I../external/bufr_ncep_nco \
-                      -I../external/io_int \
-                      -I../external/esmf_time_f90 \
-                      -I../frame -I../share -I../inc
+                      -I$(LAPACK) \
+                      -I$(FFTPACK5) \
+                      -I$(BLAS) \
+                      -I$(BUFR_NCEP_NCO) \
+		      -I$(IO_INT) \
+                      -I$(ESMF_TIME_F90) \
+                      -I$(FRAME) -I$(SHARE) -I$(INC)
 FIXEDFLAGS_ENDIAN = $(FCTYPE)
 FIXEDFLAGS_BUFR   = $(FCTYPE) $(FCBASE) $(FCHOST) $(FCDEBUG) -I.
 FIXEDFLAGS_WRFVAR = $(FCTYPE) $(FCBASE) $(FCHOST) $(FCDEBUG) $(FCENDIAN) -I.
 FUFLAGS           = $(FCOPTIM) $(FCBASE) $(FCFREE) $(FCDEBUG)
 
 wrfio_nf : 
-	( cd ../external/io_netcdf ; \
+	( cd $(IO_NETCDF) ; \
         make NETCDFPATH=$(NETCDFPATH) CPP="$(CPP)" CPPFLAGS="$(CPPFLAGS)" \
 	RANLIB="$(RANLIB)" FC="$(FC)" \
         FCFLAGS="$(FCDEBUG) $(FCFREE) $(FCBASE) -w" TRADFLAG="$(TRADFLAG)" )
 
 wrfio_int : 
-	( cd ../external/io_int ; \
+	( cd $(IO_INT) ; \
         make CPP="$(CPP)" RANLIB="$(RANLIB)" \
 	CC="$(CC)" FC="$(FC)" FCFLAGS="$(FCDEBUG) $(FCFREE) $(FCBASE)" all )
 
 wrfio_grib1 :
-	( cd ../external/io_grib1 ; \
+	( cd $(IO_GRIB1) ; \
         make CPP="$(CPP)" CPPFLAGS="$(CPPFLAGS)" RANLIB="$(RANLIB)" \
 	CC="$(CC)" CFLAGS="$(CFLAGS)" \
 	FC="$(FC)" FCFLAGS="$(FCDEBUG) $(LIBINCLUDE) $(FCFREE) $(FCBASE)" )
 
 esmf_time : 
-	( cd ../external/esmf_time_f90 ; \
+	( cd $(ESMF_TIME_F90) ; \
 	make FC="$(FC) $(FCFLAGS)" \
 	RANLIB="$(RANLIB)" \
-	CPP="$(CPP) -I../inc -I. $(ARCHFLAGS) $(TRADFLAG)" )
+	CPP="$(CPP) -I$(INC) -I. $(ARCHFLAGS) $(TRADFLAG)" )
 
 # compile these without high optimization to speed compile
 
