@@ -58,8 +58,5 @@ gen_be_diags : gen_be_diags.o
 gen_be_diags_read : gen_be_diags_read.o
 	$(LD) -o gen_be_diags_read.exe $(LDFLAGS) $(GEN_BE_OBJS) gen_be_diags_read.o -L$(NETCDF)/lib -lnetcdf $(EXTRA_LIBS)
 
-gen_be_stage0_wrf.o: $(GEN_BE_OBJS)
-	$(LD) -o gen_be_stage0_wrf.exe $(LDFLAGS) $(GEN_BE_OBJS) gen_be_stage0_wrf.o -L$(NETCDF)/lib -lnetcdf $(EXTRA_LIBS)
-
 # DEPENDENCIES : only dependencies after this line (don't remove the word DEPENDENCIES)
 

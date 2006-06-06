@@ -369,9 +369,9 @@ program gen_be_stage0_wrf
    else ! be_method = "ENS"
 
       if ( remove_mean ) then
-         write(6,'(/a)')' [4] Convert ensemble of standard fields to perturbations' 
+         write(6,'(/a)') "[4] Convert ensemble of standard fields to perturbations"
       else
-         write(6,'(/a)')' [4] WARNING: Outputting ensemble member standard fields in pert files!'
+         write(6,'(/a)') "[4] WARNING: Outputting ensemble member standard fields in pert files!"
       end if
 
       do member = 1, ne

@@ -184,7 +184,7 @@ wrf.o: \
         ../share/module_wrf_top.o \
 	$(ESMF_MOD_DEPENDENCE) $(EXTRAMODULES)
 
-wrfvar.o: $(DA_VAR)/da_wrfvar_top.o
+wrfvar.o: $(DA)/da_wrfvar_top.o
 
 wrf_ESMFMod.o:  ../share/module_wrf_top.o
 

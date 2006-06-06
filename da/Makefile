@@ -58,9 +58,9 @@ wrfvar :	links $(OBJS_FOR_ALL)
 		$(AR) ../main/libwrflib.a $(OBJS_FOR_ALL)
 
 links :
-        $(LN) */*.inc .
-        $(LN) */*.f90 .
-        $(LN) */*.c .
+	$(LN) */*.inc .
+	$(LN) */*.f90 .
+	$(LN) */*.c .
 
 
 ##########################################################################
@@ -1001,9 +1001,9 @@ da_constants.o:		da_constants.f90 \
 			da_change_date.inc \
 			da_find_fft_factors.inc \
 			da_find_fft_trig_funcs.inc \
-                        ../../frame/module_driver_constants.o 
+                        ../frame/module_driver_constants.o 
 			$(RM) $@
-			$(CPP) -I../../inc $(CPPFLAGS) da_constants.f90 > da_constants.f
+			$(CPP) -I../inc $(CPPFLAGS) da_constants.f90 > da_constants.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_constants.f
 
 da_test.o:	\
@@ -1096,7 +1096,7 @@ da_gen_be.o:	         \
 			da_stage0_initialize.inc      \
 			da_gen_be.f90
 			$(CPP) $(CPPFLAGS) da_gen_be.f90 > da_gen_be.f
-			$(FC) -c $(FCFLAGS) -I${NETCDF}/include -I../../frame da_gen_be.f
+			$(FC) -c $(FCFLAGS) -I${NETCDF}/include -I../frame da_gen_be.f
 
 da_spectral.o:		\
 			da_constants.o				\
