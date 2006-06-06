@@ -1,7 +1,7 @@
-MODULE da_c_mat
+MODULE c_mat
 
 USE module_wrf_error
-USE DA_Constants
+USE da_constants
 
 IMPLICIT NONE
 
@@ -205,5 +205,5 @@ CONTAINS
 #include <powmat.inc>
 #include <set_vops.inc>
 
-END MODULE da_c_mat
+END MODULE c_mat
 

@@ -1,4 +1,4 @@
-SUBROUTINE DA_AO_Stats_Airep( stats_unit, oi, re )
+SUBROUTINE da_ao_stats_airep( stats_unit, oi, re )
 
   IMPLICIT NONE
 
@@ -34,15 +34,15 @@ SUBROUTINE DA_AO_Stats_Airep( stats_unit, oi, re )
       if( oi%airep(n)%loc%proc_domain ) then
 
         do k=1, oi%Airep(n)%info%levels
-          CALL da_Stats_Calculate( n, k, oi%Airep(n)%u(k)%qc,  & 
+          CALL da_stats_calculate( n, k, oi%Airep(n)%u(k)%qc,  & 
                                 re%Airep(n)%u(k), nu, &
-                                Airep%minimum%u, Airep%maximum%u, &
-                                Airep%average%u, Airep%rms_err%u )
-          CALL da_Stats_Calculate( n, k, oi%Airep(n)%v(k)%qc,  & 
+                                airep%minimum%u, Airep%maximum%u, &
+                                airep%average%u, Airep%rms_err%u )
+          CALL da_stats_calculate( n, k, oi%Airep(n)%v(k)%qc,  & 
                                 re%Airep(n)%v(k), nv, &
-                                Airep%minimum%v, Airep%maximum%v, &
-                                Airep%average%v, Airep%rms_err%v )
-          CALL da_Stats_Calculate( n, k, oi%Airep(n)%t(k)%qc,  & 
+                                airep%minimum%v, Airep%maximum%v, &
+                                airep%average%v, Airep%rms_err%v )
+          CALL da_stats_calculate( n, k, oi%Airep(n)%t(k)%qc,  & 
                                 re%Airep(n)%t(k), nt, &
                                  Airep%minimum%t, Airep%maximum%t, &
                                  Airep%average%t, Airep%rms_err%t )
@@ -73,8 +73,8 @@ SUBROUTINE DA_AO_Stats_Airep( stats_unit, oi, re )
   IF ( wrf_dm_on_monitor() ) THEN
     IF ( nu /= 0 .or. nv /= 0 .or. nt /= 0 ) THEN
       write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for Airep'
-      call DA_Print_Stats_Airep(stats_unit, nu, nv, nt, Airep)
+      call da_print_stats_airep(stats_unit, nu, nv, nt, Airep)
     END IF
   END IF
 
-END SUBROUTINE DA_AO_Stats_Airep
+END SUBROUTINE da_ao_stats_airep

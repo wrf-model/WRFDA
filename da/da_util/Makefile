@@ -87,7 +87,7 @@ tune:			tune.o
 
 bufr_little_endian_convert:	\
 			$(OBJ_bufr_convert)
-			$(FC) -o $@.exe $(OBJ_bufr_convert) $(DA_SRC)/da_bufrlib.o
+			$(FC) -o $@.exe $(OBJ_bufr_convert) $(EXTERNAL)/bufr_ncep_nco/bufrlib.o
 
 grabbufr:		$(OBJ_FOR_ALL)		\
 			grabbufr.f90

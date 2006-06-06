@@ -1,6 +1,6 @@
-MODULE da_h_ops
+MODULE h_ops
 
-USE da_c_mat
+USE c_mat
 USE module_wrf_error
 
 IMPLICIT NONE
@@ -19,5 +19,5 @@ CONTAINS
 !include <hops3i.inc>
 !include <hops3j.inc>
 
-END MODULE da_h_ops
+END MODULE h_ops
 

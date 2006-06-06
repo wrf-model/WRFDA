@@ -106,6 +106,7 @@ da_par_util.o:		da_par_util.f90                   \
 			da_generic_boilerplate.inc        \
 			da_y_facade_to_global.inc         \
                         da_define_structures.o	          \
+                        da_par_util1.o                    \
 			da_constants.o
 
 da_par_util1.o:		da_par_util1.f90                  \

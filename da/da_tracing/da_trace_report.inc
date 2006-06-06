@@ -349,7 +349,7 @@ SUBROUTINE da_trace_report
 #ifdef DM_PARALLEL
       DO i=0,nproc-1
          DO j=1,MaxNoRoutines
-            CALL proc_sum_int(MasterMaxHeap(i,j))
+            CALL da_proc_sum_int(MasterMaxHeap(i,j))
          END DO
       END DO
 #endif
