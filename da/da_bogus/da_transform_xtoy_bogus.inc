@@ -70,29 +70,29 @@ SUBROUTINE da_transform_xtoy_bogus (xa, xb, iv, xp, y )
         psfc_loc9 = dym*(dxm*xa%psfc(i,j)   + dx*xa%psfc(i+1,j)) &
                    + dy *(dxm*xa%psfc(i,j+1) + dx*xa%psfc(i+1,j+1))
 
-        call DA_TPQ_To_SLP_lin (model_t, model_q, model_p_c,    &
+        call da_tpq_to_slp_lin (model_t, model_q, model_p_c,    &
                                terr_loc, psfc_loc,   &
                                model_t9, model_q9,  &
                                model_p_c9, psfc_loc9, y%bogus(n)%slp, xp) 
 
         ! [1.4] Interpolate horizontally from dot points:
 #ifndef DEREF_KLUDGE
-        call Interp_lin_3D(xa % u, xp, i, j, dx, dy, dxm, dym, &
+        call da_interp_lin_3d(xa % u, xp, i, j, dx, dy, dxm, dym, &
                            y%bogus(n)%u, num_levs, iv%bogus(n)%zk, num_levs)
-        call Interp_lin_3D(xa % v, xp, i, j, dx, dy, dxm, dym, &
+        call da_interp_lin_3d(xa % v, xp, i, j, dx, dy, dxm, dym, &
                            y%bogus(n)%v, num_levs, iv%bogus(n)%zk, num_levs)
-        call Interp_lin_3D(xa % t, xp, i, j, dx, dy, dxm, dym, &
+        call da_interp_lin_3d(xa % t, xp, i, j, dx, dy, dxm, dym, &
                            y%bogus(n)%t, num_levs, iv%bogus(n)%zk, num_levs)
-        call Interp_lin_3D(xa % q, xp, i, j, dx, dy, dxm, dym, &
+        call da_interp_lin_3d(xa % q, xp, i, j, dx, dy, dxm, dym, &
                            y%bogus(n)%q, num_levs, iv%bogus(n)%zk, num_levs)
 #else
-        call Interp_lin_3D(xa % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+        call da_interp_lin_3d(xa % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                            y%bogus(n)%u(1), num_levs, iv%bogus(n)%zk(1), num_levs)
-        call Interp_lin_3D(xa % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+        call da_interp_lin_3d(xa % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                            y%bogus(n)%v(1), num_levs, iv%bogus(n)%zk(1), num_levs)
-        call Interp_lin_3D(xa % t(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+        call da_interp_lin_3d(xa % t(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                            y%bogus(n)%t(1), num_levs, iv%bogus(n)%zk(1), num_levs)
-        call Interp_lin_3D(xa % q(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+        call da_interp_lin_3d(xa % q(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                            y%bogus(n)%q(1), num_levs, iv%bogus(n)%zk(1), num_levs)
 #endif
 

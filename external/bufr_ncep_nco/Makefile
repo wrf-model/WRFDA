@@ -1,0 +1,34 @@
+# Makefile for WRF-VAR Program and its applications
+# Lower level Makefile
+
+BUFR_OBJS =		bufrlib.o 		\
+	                bort_exit.o 		\
+	                restd.o 		\
+	                wrdesc.o
+
+
+bufrlib.param:		bufrlib.prm
+			$(RM) $@
+			$(CPP) $(CPPFLAGS_BUFR) bufrlib.prm > bufrlib.param
+
+bufrlib.o:		bufrlib.f90 bufrlib.param
+			$(RM) $@
+			$(CPP) $(CPPFLAGS) bufrlib.f90 > bufrlib.f
+			$(FFC) -c $(FIXEDFLAGS_BUFR) $(MODULE_DIRS) bufrlib.f
+
+bort_exit.o:		bort_exit.c
+			$(RM) $@
+			$(CC) -c $(CCFLAGS_BUFR) bort_exit.c
+
+restd.o:		restd.c
+			$(RM) $@
+			$(CC) -c $(CCFLAGS_BUFR) restd.c
+
+wrdesc.o:		wrdesc.c
+			$(RM) $@
+			$(CC) -c $(CCFLAGS_BUFR) wrdesc.c
+
+
+##############################################################################
+
+# DEPENDENCIES : only dependencies after this line (don't remove the word DEPENDENCIES)

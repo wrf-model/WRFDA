@@ -8,7 +8,7 @@ EXTRAMODULES      =
 FCBASEOPTS        = $(FCTYPE) $(FCBASE) $(FCFREE) $(FCHOST) $(FCDEBUG) \
                       $(FCENDIAN) -I.
 FCFLAGS           = $(FCOPTIM) $(FCBASEOPTS) $(OMP)
-INCLUDE_MODULES   = -I$(DA_VAR) -I$(DA_SRC) \
+INCLUDE_MODULES   = -I$(DA) \
 		      -I../external/io_netcdf -I../external/io_int \
                       -I../external/esmf_time_f90 \
                       -I../frame -I../share -I../phys -I../inc
@@ -18,11 +18,11 @@ CPPFLAGS          = $(TRADFLAG) $(LIBINCLUDE) -C -P $(ARCHFLAGS) \
                       $(ENVCOMPDEFS) \
 		      $(DM_CPP_FLAGS) $(COREDEFS) $(VAR4DPOSS)
 
-INC_MOD_WRFVAR    = -I../../$(NETCDF_IO_PATH) \
-		      -I$(DA_VAR) -I$(DA_SRC) \
-                      -I../../external/io_int \
-                      -I../../external/esmf_time_f90 \
-                      -I../../frame -I../../share -I../../inc
+INC_MOD_WRFVAR    = -I../$(NETCDF_IO_PATH) \
+		      -I$(DA) \
+                      -I../external/io_int \
+                      -I../external/esmf_time_f90 \
+                      -I../frame -I../share -I../inc
 FIXEDFLAGS_ENDIAN = $(FCTYPE)
 FIXEDFLAGS_BUFR   = $(FCTYPE) $(FCBASE) $(FCHOST) $(FCDEBUG) -I.
 FIXEDFLAGS_WRFVAR = $(FCTYPE) $(FCBASE) $(FCHOST) $(FCDEBUG) $(FCENDIAN) -I.
@@ -49,28 +49,28 @@ esmf_time :
 	( cd ../external/esmf_time_f90 ; \
 	make FC="$(FC) $(FCFLAGS)" \
 	RANLIB="$(RANLIB)" \
-	CPP="$(CPP) -I../../inc -I. $(ARCHFLAGS) $(TRADFLAG)" )
+	CPP="$(CPP) -I../inc -I. $(ARCHFLAGS) $(TRADFLAG)" )
 
 # compile these without high optimization to speed compile
 
-module_io_mm5.o : module_io_mm5.f90
-module_si_io.o : module_si_io.f90
-module_io_wrf.o : module_io_wrf.f90
-module_start.o : module_start.f90
-module_initialize.o : module_initialize.f90
-module_initialize_b_wave.o : module_initialize_b_wave.f90
-module_initialize_hill2d_x.o : module_initialize_hill2d_x.f90
-module_initialize_quarter_ss.o : module_initialize_quarter_ss.f90
-module_initialize_squall2d_x.o : module_initialize_squall2d_x.f90
-module_initialize_squall2d_y.o : module_initialize_squall2d_y.f90
-module_initialize_real.o : module_initialize_real.f90
-module_dm.o : module_dm.f90
-start_domain.o : start_domain.f90
-module_domain.o : module_domain.f90
-module_configure.o : module_configure.f90
-mediation_interp_domain.o : mediation_interp_domain.f90
-mediation_force_domain.o : mediation_force_domain.f90
-mediation_feedback_domain.o : mediation_feedback_domain.f90
+module_io_mm5.o : module_io_mm5.F
+module_si_io.o : module_si_io.F
+module_io_wrf.o : module_io_wrf.F
+module_start.o : module_start.F
+module_initialize.o : module_initialize.F
+module_initialize_b_wave.o : module_initialize_b_wave.F
+module_initialize_hill2d_x.o : module_initialize_hill2d_x.F
+module_initialize_quarter_ss.o : module_initialize_quarter_ss.F
+module_initialize_squall2d_x.o : module_initialize_squall2d_x.F
+module_initialize_squall2d_y.o : module_initialize_squall2d_y.F
+module_initialize_real.o : module_initialize_real.F
+module_dm.o : module_dm.F
+start_domain.o : start_domain.F
+module_domain.o : module_domain.F
+module_configure.o : module_configure.F
+mediation_interp_domain.o : mediation_interp_domain.F
+mediation_force_domain.o : mediation_force_domain.F
+mediation_feedback_domain.o : mediation_feedback_domain.F
 
 module_io_mm5.o module_si_io.o module_io_wrf.o module_domain.o \
 module_start.o module_initialize.o module_initialize_b_wave.o  \
@@ -80,7 +80,7 @@ module_configure.o mediation_interp_domain.o                   \
 mediation_force_domain.o mediation_feedback_domain.o           \
 module_initialize_real.o module_dm.o start_domain.o :
 	$(RM) $@
-	$(SED_FTN) $*.f90 > $*.b 
+	$(SED_FTN) $*.F > $*.b 
 	$(CPP) $(CPPFLAGS) $*.b  > $*.f
 	$(RM) $*.b
 	$(FC) -c $(FCBASEOPTS) $(MODULE_DIRS) -O0 $*.f
@@ -90,6 +90,13 @@ module_initialize_real.o module_dm.o start_domain.o :
 .f90.o:
 	@ $(RM) $@
 	@ $(SED_FTN) $*.f90 > $*.b
+	  $(CPP) $(CPPFLAGS) $*.b  > $*.f
+	@ $(RM) $*.b
+	  $(FC) -c $(FCFLAGS) $(MODULE_DIRS) $*.f
+
+.F.o:
+	@ $(RM) $@
+	@ $(SED_FTN) $*.F > $*.b
 	  $(CPP) $(CPPFLAGS) $*.b  > $*.f
 	@ $(RM) $*.b
 	  $(FC) -c $(FCFLAGS) $(MODULE_DIRS) $*.f

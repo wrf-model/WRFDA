@@ -33,23 +33,23 @@ Subroutine da_transform_xtoy_airep ( xa, iv, xp, y )
 
         ![1.2] Interpolate horizontally:
 #ifndef DEREF_KLUDGE
-        call Interp_lin_3D(xa % u, xp, i, j, dx, dy, dxm, dym, &
+        call da_interp_lin_3d(xa % u, xp, i, j, dx, dy, dxm, dym, &
                            y%airep(n)%u, k, iv%airep(n)%zk, k)
 
-        call Interp_lin_3D(xa % v, xp, i, j, dx, dy, dxm, dym, &
+        call da_interp_lin_3d(xa % v, xp, i, j, dx, dy, dxm, dym, &
                            y%airep(n)%v, k, iv%airep(n)%zk, k)
 
-        call Interp_lin_3D(xa % t, xp, i, j, dx, dy, dxm, dym, &
+        call da_interp_lin_3d(xa % t, xp, i, j, dx, dy, dxm, dym, &
                            y%airep(n)%t, k, iv%airep(n)%zk, k)
 
 #else
-        call Interp_lin_3D(xa % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+        call da_interp_lin_3d(xa % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                            y%airep(n)%u(1), k, iv%airep(n)%zk(1), k)
 
-        call Interp_lin_3D(xa % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+        call da_interp_lin_3d(xa % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                            y%airep(n)%v(1), k, iv%airep(n)%zk(1), k)
 
-        call Interp_lin_3D(xa % t(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+        call da_interp_lin_3d(xa % t(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                            y%airep(n)%t(1), k, iv%airep(n)%zk(1), k)
 
 #endif

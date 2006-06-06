@@ -1,4 +1,4 @@
-SUBROUTINE DA_Transform_XToY_PolarAMV ( xa, iv, xp, y )
+SUBROUTINE da_transform_xtoy_polaramv ( xa, iv, xp, y )
 !-------------------------------------------------------------------------
 !  HISTORY: 
 !
@@ -43,14 +43,14 @@ SUBROUTINE DA_Transform_XToY_PolarAMV ( xa, iv, xp, y )
 !   Interpolate horizontally:
 
 #ifndef DEREF_KLUDGE
-         call Interp_lin_3D(xa % u, xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_lin_3d(xa % u, xp, i, j, dx, dy, dxm, dym, &
                             y%polaramv(n)%u, k, iv%polaramv(n)%zk, k)
-         call Interp_lin_3D(xa % v, xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_lin_3d(xa % v, xp, i, j, dx, dy, dxm, dym, &
                             y%polaramv(n)%v, k, iv%polaramv(n)%zk, k)
 #else
-         call Interp_lin_3D(xa % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_lin_3d(xa % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                             y%polaramv(n)%u(1), k, iv%polaramv(n)%zk(1), k)
-         call Interp_lin_3D(xa % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_lin_3d(xa % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                             y%polaramv(n)%v(1), k, iv%polaramv(n)%zk(1), k)
 #endif
 
@@ -60,4 +60,4 @@ SUBROUTINE DA_Transform_XToY_PolarAMV ( xa, iv, xp, y )
 
    ENDIF
 
-END SUBROUTINE DA_Transform_XToY_PolarAMV
+END SUBROUTINE da_transform_xtoy_polaramv

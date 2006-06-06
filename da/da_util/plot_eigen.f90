@@ -1,4 +1,4 @@
-program plot_eigen
+program da_plot_eigen
 
    use color_table
    use record_header
@@ -33,7 +33,7 @@ program plot_eigen
 
    call opngks
 
-   call setup_color_table
+   call da_setup_color_table
 
    do
       read(input_unit, iostat=ier) flag
@@ -52,19 +52,19 @@ program plot_eigen
          kz=big_header%bhi(12,5)
 
          if(print_info) then
-            call print_big_header(big_header%bhi, big_header%bhr, &
+            call da_print_big_header(big_header%bhi, big_header%bhr, &
                                   big_header%bhic,big_header%bhrc)
          end if
 
-         call allocate_eigen(psi, iy, kz)
-         call allocate_eigen(chi, iy, kz)
-         call allocate_eigen(p_u, iy, kz)
-         call allocate_eigen(  u, iy, kz)
-         call allocate_eigen(  v, iy, kz)
-         call allocate_eigen(  t, iy, kz)
-         call allocate_eigen(  q, iy, kz)
-         call allocate_eigen(  p, iy, kz)
-         call allocate_eigen(  w, iy, kz+1)
+         call da_allocate_eigen(psi, iy, kz)
+         call da_allocate_eigen(chi, iy, kz)
+         call da_allocate_eigen(p_u, iy, kz)
+         call da_allocate_eigen(  u, iy, kz)
+         call da_allocate_eigen(  v, iy, kz)
+         call da_allocate_eigen(  t, iy, kz)
+         call da_allocate_eigen(  q, iy, kz)
+         call da_allocate_eigen(  p, iy, kz)
+         call da_allocate_eigen(  w, iy, kz+1)
 
       elseif (flag == 1) then
          read(input_unit,iostat=ier) &
@@ -87,7 +87,7 @@ program plot_eigen
          read(input_unit) data
 
          if(print_info) then
-            call print_sub_header(sub_header)
+            call da_print_sub_header(sub_header)
             write(unit=*, fmt='(a,e24.14)') &
                  'Sample value:', data(1,1,1,1)
          end if
@@ -159,15 +159,15 @@ program plot_eigen
 
    enddo
 
-   call eigen_plot('PSI', psi)
-   call eigen_plot('CHI', chi)
-   call eigen_plot('P_U', p_u)
+   call da_eigen_plot('PSI', psi)
+   call da_eigen_plot('CHI', chi)
+   call da_eigen_plot('P_U', p_u)
 
    call close_gks
 
 CONTAINS
 
-   subroutine allocate_eigen(eigen_var, iy, kz)
+   subroutine da_allocate_eigen(eigen_var, iy, kz)
 
       implicit none
 
@@ -182,9 +182,9 @@ CONTAINS
       eigen_var%g_vec = 0.0
       eigen_var%l_val = 0.0
 
-   end subroutine allocate_eigen
+   end subroutine da_allocate_eigen
 
-   subroutine norm_min_max(xmin, xmax, magnitude)
+   subroutine da_norm_min_max(xmin, xmax, magnitude)
 
       implicit none
 
@@ -222,9 +222,9 @@ CONTAINS
       xmin = -100.0
       xmax =  100.0
 
-   end subroutine norm_min_max
+   end subroutine da_norm_min_max
 
-   subroutine eigen_plot(vn, ev)
+   subroutine da_eigen_plot(vn, ev)
 
       implicit none
 
@@ -271,7 +271,7 @@ CONTAINS
       xmin = minval(x(1:kz))
       xmax = maxval(x(1:kz))
    
-      call norm_min_max(xmin, xmax, magnitude)
+      call da_norm_min_max(xmin, xmax, magnitude)
    
       fct = 10.0**magnitude
     
@@ -282,7 +282,7 @@ CONTAINS
    
       mn = 0
    
-      call line_plot(x_title, y_title, &
+      call da_line_plot(x_title, y_title, &
                      x,y,kz,mn,xb,xe,yb,ye,3, &
                      mmx, mnx, mmy, mny, &
                      red, 2000, thick_dash, magnitude)
@@ -301,7 +301,7 @@ CONTAINS
       xmin = minval(x(1:kz))
       xmax = maxval(x(1:kz))
    
-      call norm_min_max(xmin, xmax, magnitude)
+      call da_norm_min_max(xmin, xmax, magnitude)
    
       fct = 10.0**magnitude
    
@@ -317,7 +317,7 @@ CONTAINS
             x(k) = ev%g_vec(kz+1-k,mn)*fct
          end do
    
-         call line_plot(x_title, y_title, &
+         call da_line_plot(x_title, y_title, &
                         x,y,kz,mn,xb,xe,yb,ye,plot_type, &
                         mmx, mnx, mmy, mny, &
                         line_color, 6000-1000*mn, thick_dash, magnitude)
@@ -329,9 +329,9 @@ CONTAINS
    
       call frame
    
-   end subroutine eigen_plot
+   end subroutine da_eigen_plot
    
-   subroutine line_plot(x_title, y_title, &
+   subroutine da_line_plot(x_title, y_title, &
                         z,y,n,mn,xb,xe,yb,ye,plot_type, &
                         mmx, mix, mmy, iy, &
                         color, width, line_pattern, magnitude)
@@ -413,6 +413,6 @@ CONTAINS
       call pwrity(xfb-0.075,0.5,trim(y_title),ly,24,90,0)
       call pwrity(0.5,yfb-0.075,       title, lx,24, 0,0)
    
-   end subroutine line_plot
+   end subroutine da_line_plot
    
-end program plot_eigen
+end program da_plot_eigen

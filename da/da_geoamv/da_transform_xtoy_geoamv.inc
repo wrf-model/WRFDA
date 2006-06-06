@@ -35,14 +35,14 @@ SUBROUTINE da_transform_xtoy_geoamv ( xa, iv, xp, y )
             ! Interpolate horizontally:
 
 #ifndef DEREF_KLUDGE
-            call interp_lin_3d(xa % u, xp, i, j, dx, dy, dxm, dym, &
+            call da_interp_lin_3d(xa % u, xp, i, j, dx, dy, dxm, dym, &
                                y%geoamv(n)%u, k, iv%geoamv(n)%zk, k)
-            call interp_lin_3d(xa % v, xp, i, j, dx, dy, dxm, dym, &
+            call da_interp_lin_3d(xa % v, xp, i, j, dx, dy, dxm, dym, &
                            y%geoamv(n)%v, k, iv%geoamv(n)%zk, k)
 #else
-            call interp_lin_3d(xa % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, &
+            call da_interp_lin_3d(xa % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, &
                dxm, dym, y%geoamv(n)%u(1), k, iv%geoamv(n)%zk(1), k)
-            call interp_lin_3d(xa % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, &
+            call da_interp_lin_3d(xa % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, &
                dxm, dym, y%geoamv(n)%v(1), k, iv%geoamv(n)%zk(1), k)
 #endif
          endif

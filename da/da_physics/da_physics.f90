@@ -42,7 +42,7 @@ MODULE da_physics
 #include "da_check_rh_simple.inc"
 #include "da_e_qv_from_rh.inc"
 #include "da_get_q_error.inc"
-#include "roughness_from_lanu.inc"
+#include "da_roughness_from_lanu.inc"
 #include "da_sfc_wtq.inc"
 #include "da_sfc_wtq_lin.inc"
 #include "da_sfc_wtq_adj.inc"

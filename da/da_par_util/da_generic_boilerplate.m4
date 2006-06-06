@@ -156,7 +156,7 @@ define( macro_to_global,
 
     ! create global versions of generic objects from process-local objects
     ! and destroy process-local generic objects
-    CALL residual_$2_create_template( template )  ! use template in case 
+    CALL da_residual_$2_create_template( template )  ! use template in case 
                                                      ! some tasks have no obs
     CALL da_y_facade_to_global( re_slice,        template, re_glob_slice )
     CALL da_y_facade_to_global( jo_grad_y_slice, template, jo_grad_y_glob_slice )

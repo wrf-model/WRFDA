@@ -870,7 +870,7 @@ CCFLAGS_RSL     =
 LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)
 
 MPI_LIB		= -L$(RSL_PATH)/RSL -lrsl
-LOCAL_LIB	= -L../frame -L../share -L$(DA_VAR) -L$(DA_SRC)
+LOCAL_LIB	= -L../frame -L../share -L$(DA)
 CONVERTOR_LIB	= -L../convertor
 LOCAL_LIBRARIES = #-L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c -lX11
 

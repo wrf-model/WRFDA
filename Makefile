@@ -118,7 +118,7 @@ n2k : framework_only
           /bin/rm -f netcdf2kma.exe ; \
 	  $(MAKE) MODULE_DIRS="$(DA_CONVERTOR_MODULES)" netcdf2kma )
 
-BE_OBJS = da_gen_be.o DA_Constants.o be_spectral.o lapack.o blas.o fftpack5.o
+BE_OBJS = da_gen_be.o da_constants.o da_be_spectral.o lapack.o blas.o fftpack5.o
 BE_MODULES1 = -I../../frame
 BE_MODULES2 = -I../da -I../frame
 be : 
@@ -440,7 +440,7 @@ esmf_time_f90_only :
 
 bufr_little_endian :
 	@ echo '--------------------------------------'
-	( cd tools ; $(MAKE) CC="$(CC_TOOLS)" DA_SRC="$(DA_SRC)" \
+	( cd tools ; $(MAKE) CC="$(CC_TOOLS)" DA="$(DA)" \
             FC="$(FC)" FIXEDFLAGS_ENDIAN="$(FIXEDFLAGS_ENDIAN)" bufr_little_endian.exe)
 
 clean :

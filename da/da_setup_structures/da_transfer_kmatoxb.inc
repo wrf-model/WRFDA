@@ -1,4 +1,4 @@
-SUBROUTINE DA_Transfer_KMAToXb( xbx, grid, &
+SUBROUTINE da_transfer_kmatoxb( xbx, grid, &
 !
 #include <em_dummy_args.inc>
 !
@@ -6,11 +6,6 @@ SUBROUTINE DA_Transfer_KMAToXb( xbx, grid, &
 
 !------------------------------------------------------------------------------
 !  PURPOSE: Transfers fields from KMA to first guess (xb) structure.
-!
-!  HISTORY:   08/06/2004	                 Syed RH Rizvi
-!             2005/12/08   Add RTTOV variables   Zhiquan Liu 
-!
-!  PARENT_MODULE: DA_Setup_Structures
 !------------------------------------------------------------------------------
 
    IMPLICIT NONE
@@ -120,12 +115,12 @@ SUBROUTINE DA_Transfer_KMAToXb( xbx, grid, &
 !  Fix wind at Poles
 !---------------------------------------------------------------------------------
 #ifndef DEREF_KLUDGE
-    call DA_Get_VPoles(xb%u,xb%v,xb%lon,          &
+    call da_get_vpoles(xb%u,xb%v,xb%lon,          &
        xp%ids,xp%ide,xp%jds,xp%jde,xp%kds,xp%kde, &
        xp%ims,xp%ime,xp%jms,xp%jme,xp%kms,xp%kme, &
        xp%its,xp%ite,xp%jts,xp%jte,xp%kts,xp%kte  )
 #else
-    call DA_Get_VPoles(xb%u(xp%ims,xp%jms,xb%kms),&
+    call da_get_vpoles(xb%u(xp%ims,xp%jms,xb%kms),&
                        xb%v(xp%ims,xp%jms,xb%kms),&
                        xb%lon(xp%ims,xp%jms),     &
        xp%ids,xp%ide,xp%jds,xp%jde,xp%kds,xp%kde, &
@@ -361,7 +356,7 @@ SUBROUTINE DA_Transfer_KMAToXb( xbx, grid, &
 !
   xbx % mminlu = 'USGS'
 !------------------------------------------------------------------------------
-  call roughness_from_lanu(19, xbx % mminlu, current_date, xp, &
+  call da_roughness_from_lanu(19, xbx % mminlu, current_date, xp, &
 #ifdef DEREF_KLUDGE
                             xb % lanu(xp%ims,xp%jms), xb % rough(xp%ims,xp%jms))
 #else
@@ -424,7 +419,7 @@ SUBROUTINE DA_Transfer_KMAToXb( xbx, grid, &
    do j=js,je
    do k=ks,ke
    do i=is,ie
-      call DA_TPQ_To_RH( xb % t(i,j,k), xb % p(i,j,k), xb % q(i,j,k), &
+      call da_tpq_to_rh( xb % t(i,j,k), xb % p(i,j,k), xb % q(i,j,k), &
                          xb %es(i,j,k), xb %qs(i,j,k), xb %rh(i,j,k) )
    end do
    end do
@@ -435,11 +430,11 @@ SUBROUTINE DA_Transfer_KMAToXb( xbx, grid, &
 !------------------------------------------------------------------------------
 
 #ifdef DEREF_KLUDGE
-   call DA_TRH_To_TD(xb % rh(xp%ims,xp%jms,xp%kms), &
+   call da_trh_to_td(xb % rh(xp%ims,xp%jms,xp%kms), &
                      xb %  t(xp%ims,xp%jms,xp%kms), &
                      xb % td(xp%ims,xp%jms,xp%kms), xp)
 #else
-   call DA_TRH_To_TD(xb % rh, xb % t, xb % td, xp)
+   call da_trh_to_td(xb % rh, xb % t, xb % td, xp)
 #endif
 
    if(print_detail_xb) then
@@ -472,7 +467,7 @@ SUBROUTINE DA_Transfer_KMAToXb( xbx, grid, &
 ! for calculating roughness length if sea level pressure is desired
 !
 #if 0
-   call DA_WRF_TPQ_2_SLP ( xb )
+   call da_wrf_tpq_2_slp ( xb )
 !------------------------------------------------------------------------------
 !
 #endif
@@ -533,7 +528,7 @@ SUBROUTINE DA_Transfer_KMAToXb( xbx, grid, &
          'Brightness temperature'
  endif
 !
-  call DA_Transform_XToTb( xa )
+  call da_transform_xtotb( xa )
 !------------------------------------------------------------------------------
 !
 #endif
@@ -582,5 +577,5 @@ SUBROUTINE DA_Transfer_KMAToXb( xbx, grid, &
 
 
 
-END SUBROUTINE DA_Transfer_KMAToXb
+END SUBROUTINE da_transfer_kmatoxb
 

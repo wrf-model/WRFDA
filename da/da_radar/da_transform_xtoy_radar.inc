@@ -1,4 +1,4 @@
-SUBROUTINE da_transform_xtoy_Radar ( xa, xb, iv, xp, y )
+SUBROUTINE da_transform_xtoy_radar ( xa, xb, iv, xp, y )
 
 !---------------------------------------------------------------------
 !  This subroutine is to calculate the Doppler radial velocity and 
@@ -64,34 +64,34 @@ SUBROUTINE da_transform_xtoy_Radar ( xa, xb, iv, xp, y )
 
 !        [1.4] Interpolate horizontally from dot points:
 #ifndef DEREF_KLUDGE
-         call Interp_lin_3D(xa % u, xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_lin_3d(xa % u, xp, i, j, dx, dy, dxm, dym, &
                             model_u, num_levs, iv%Radar(n)%zk, &
                             num_levs)
-         call Interp_lin_3D(xa % v, xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_lin_3d(xa % v, xp, i, j, dx, dy, dxm, dym, &
                             model_v, num_levs, iv%Radar(n)%zk, &
                             num_levs)
-         call Interp_lin_3D(xa % qrn, xp, &
+         call da_interp_lin_3d(xa % qrn, xp, &
                             i, j, dx, dy, dxm, dym, &
                             model_qrn, num_levs, iv%Radar(n)%zk, &
                             num_levs)
-         call Interp_lin_3D(xa%wh, xp,   &
+         call da_interp_lin_3d(xa%wh, xp,   &
                             i, j, dx, dy, dxm, dym, &
                             model_w, num_levs, iv%Radar(n)%zk, &
                             num_levs )
 #else
-         call Interp_lin_3D(xa % u(xp%ims,xp%jms,xp%kms), xp, &
+         call da_interp_lin_3d(xa % u(xp%ims,xp%jms,xp%kms), xp, &
                             i, j, dx, dy, dxm, dym, &
                             model_u(1), num_levs, iv%Radar(n)%zk(1), &
                             num_levs)
-         call Interp_lin_3D(xa % v(xp%ims,xp%jms,xp%kms), xp, &
+         call da_interp_lin_3d(xa % v(xp%ims,xp%jms,xp%kms), xp, &
                             i, j, dx, dy, dxm, dym, &
                             model_v(1), num_levs, iv%Radar(n)%zk(1), &
                             num_levs)
-         call Interp_lin_3D(xa % qrn(xp%ims,xp%jms,xp%kms), xp, &
+         call da_interp_lin_3d(xa % qrn(xp%ims,xp%jms,xp%kms), xp, &
                             i, j, dx, dy, dxm, dym, &
                             model_qrn(1), num_levs, iv%Radar(n)%zk(1), &
                             num_levs)
-         call Interp_lin_3D(xa%wh(xp%ims,xp%jms,xp%kms), xp,   &
+         call da_interp_lin_3d(xa%wh(xp%ims,xp%jms,xp%kms), xp,   &
                             i, j, dx, dy, dxm, dym, &
                             model_w(1), num_levs, iv%Radar(n)%zk(1), &
                             num_levs )
@@ -116,7 +116,7 @@ SUBROUTINE da_transform_xtoy_Radar ( xa, xb, iv, xp, y )
 
                zr=iv%Radar(n)%height(k) - iv%Radar(n)%stn_loc%elv
 
-               call da_radial_velocity_Lin(y%Radar(n)%rv(k), model_p(k), &
+               call da_radial_velocity_lin(y%Radar(n)%rv(k), model_p(k), &
                     model_u(k), model_v(k), model_w(k), model_qrn(k),    &
                     model_ps, xr, yr, zr, model_qrnb(k) )
 
@@ -127,7 +127,7 @@ SUBROUTINE da_transform_xtoy_Radar ( xa, xb, iv, xp, y )
 
              IF ( iv % Radar(n) % rf(k) % qc >= obs_qc_pointer ) THEN
 
-               call da_reflectivity_Lin( y%Radar(n)%rf(k), &
+               call da_reflectivity_lin( y%Radar(n)%rf(k), &
                     model_rho(k), model_qrn(k), model_rhob(k), model_qrnb(k) )
              ENDIF
             ENDIF
@@ -142,5 +142,5 @@ SUBROUTINE da_transform_xtoy_Radar ( xa, xb, iv, xp, y )
 
    ENDIF
 
-END SUBROUTINE da_transform_xtoy_Radar 
+END SUBROUTINE da_transform_xtoy_radar 
 

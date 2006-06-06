@@ -1,5 +1,4 @@
-
-program plot_reg_coeff
+program da_plot_gen_be
 !--------------------------------------------------------------------------!
 ! Purpose: 1) Compute ratio of chi_b, temp_b and ps_b explained by psi to  !
 !             its full fields, and plot the global and local figures of    !
@@ -123,7 +122,7 @@ program plot_reg_coeff
 ! ------------------
 
    call opngks
-   call setup_color_table
+   call da_setup_color_table
 
 ! 2.0 Read namelist
 ! -----------------
@@ -489,7 +488,7 @@ program plot_reg_coeff
 
 ! 6.1 Surface pressure and chi, Temp globally explained by psi
 
-      call Balance_ratio_plot (ps_loc, chi_global, temp_global, nj, nk, main_title1)
+      call da_balance_ratio_plot (ps_loc, chi_global, temp_global, nj, nk, main_title1)
 
 ! 6.2 chi and Temp expalined by psi locally
 
@@ -541,7 +540,7 @@ program plot_reg_coeff
 ! --------------------------------------------------------------------------
 1000 continue
 
-   call allocate_gen_be(cv, ni, nj, nk)
+   call da_allocate_gen_be(cv, ni, nj, nk)
 
    do n = 1,5
  
@@ -567,10 +566,10 @@ program plot_reg_coeff
        if (cvv == 'rh')     CVV = 'RH'
 
 ! .. Global eigenvectors:
-       call eigen_plot(cvv, cv, main_title1)
+       call da_eigen_plot(cvv, cv, main_title1)
 
 ! .. local eigenvalues:
-       call eigen_plot2(cvv, cv, main_title1, 99) 
+       call da_eigen_plot2(cvv, cv, main_title1, 99) 
 
      else
 
@@ -586,7 +585,7 @@ program plot_reg_coeff
          ps_var(j) = cv%l_val(1,j)
        enddo
 
-       call Covariance_plot (cvv, ps_var, nj, main_title1)
+       call da_covariance_plot (cvv, ps_var, nj, main_title1)
 
       endif
 
@@ -614,7 +613,7 @@ program plot_reg_coeff
      if (cvv == 't_u')    CVV = 'T_U'
      if (cvv == 'rh')     CVV = 'RH'
 
-     call scale_plot(cvv, cv, main_title1, resolution_km)
+     call da_scale_plot(cvv, cv, main_title1, resolution_km)
 
 
    enddo
@@ -627,7 +626,7 @@ program plot_reg_coeff
 
 contains
 
-  subroutine setup_color_table
+  subroutine da_setup_color_table
 
    implicit none
 
@@ -644,9 +643,9 @@ contains
    call gscr(1, 10, 1.00, 1.00, 0.00) ! Yellow
    call gscr(1, 11, 0.60, 0.60, 0.60) ! Gray
 
-  end subroutine setup_color_table
+  end subroutine da_setup_color_table
 
-  subroutine allocate_gen_be(be, ix, jy, kz)
+  subroutine da_allocate_gen_be(be, ix, jy, kz)
 
       implicit none
 
@@ -669,7 +668,7 @@ contains
       be%l_vec = 0.0
       be%sl    = 0.0
 
-   end subroutine allocate_gen_be
+   end subroutine da_allocate_gen_be
 
    subroutine da_advance_cymdh( start_date, dh, end_date )
 
@@ -999,7 +998,7 @@ contains
 
    end subroutine da_create_bins
 
-   subroutine eigen_plot(vn, ev, main_title)
+   subroutine da_eigen_plot(vn, ev, main_title)
 
       implicit none
 
@@ -1069,7 +1068,7 @@ contains
       xmin = minval(x(1:kz))
       xmax = maxval(x(1:kz))
    
-      call norm_min_max(xmin, xmax, magnitude)
+      call da_norm_min_max(xmin, xmax, magnitude)
    
       fct = 10.0**magnitude
     
@@ -1081,7 +1080,7 @@ contains
    
       mn = 0
    
-      call line_plot(x_title, y_title, main_title,  &
+      call da_line_plot(x_title, y_title, main_title,  &
                      x,y,kz,mn,xb,xe,yb,ye,3, &
                      mmx, mnx, mmy, mny, &
                      red, 3500, thick_dash, magnitude,0)
@@ -1102,7 +1101,7 @@ contains
       xmin = minval(x(1:kz))
       xmax = maxval(x(1:kz))
    
-      call norm_min_max(xmin, xmax, magnitude)
+      call da_norm_min_max(xmin, xmax, magnitude)
    
       fct = 10.0**magnitude
    
@@ -1119,7 +1118,7 @@ contains
            x(k) = ev%g_vec(k,mn)*10.0**magnitude
          end do
 
-         call line_plot(x_title, y_title, main_title,  &
+         call da_line_plot(x_title, y_title, main_title,  &
                         x,y,kz,mn,xb,xe,yb,ye,plot_type, &
                         mmx, mnx, mmy, mny, &
                         line_color, 6000-1000*mn, thick_dash, magnitude,0)
@@ -1132,9 +1131,9 @@ contains
    
       call frame
 
-   end subroutine  eigen_plot
+   end subroutine  da_eigen_plot
  
-   subroutine eigen_plot2 (vn, ev, main_title, iopt)
+   subroutine da_eigen_plot2 (vn, ev, main_title, iopt)
       implicit none
 
       integer, parameter :: solid_line = 65535, & ! PATTERN = 1111111111111111
@@ -1211,7 +1210,7 @@ contains
       ymin = minval(y(1:ix))
       ymax = maxval(y(1:ix))
 
-      call norm_min_max(ymin, ymax, magnitude)
+      call da_norm_min_max(ymin, ymax, magnitude)
 
       fct = 10.0**magnitude
 
@@ -1249,7 +1248,7 @@ contains
         if (iopt.eq.98) y(j) = ev%power(j,mn)*10.0**magnitude
        
          end do
-         call line_plot(x_title, y_title, main_title,  &
+         call da_line_plot(x_title, y_title, main_title,  &
                         x,y,ix,mn,xb,xe,yb,ye,plot_type, &
                         mmx, mnx, mmy, mny, &
                         line_color, 6000-1000*mn, thick_dash, magnitude,2)
@@ -1262,9 +1261,9 @@ contains
 
       call frame
 
-   end subroutine eigen_plot2
+   end subroutine da_eigen_plot2
 
-   subroutine scale_plot(vn, ev, main_title, dist)
+   subroutine da_scale_plot(vn, ev, main_title, dist)
 
       implicit none
 
@@ -1330,7 +1329,7 @@ contains
       xmin = minval(x(1:kz))
       xmax = maxval(x(1:kz))
   
-      call norm_min_max(xmin, xmax, magnitude)
+      call da_norm_min_max(xmin, xmax, magnitude)
 
       fct = 10.0**magnitude
       x(1:kz)  = fct * x(1:kz) 
@@ -1342,7 +1341,7 @@ contains
   
       y_title   = 'VERTICAL MODE'
  
-      call line_plot(x_title, y_title, main_title,  &
+      call da_line_plot(x_title, y_title, main_title,  &
                      x,y,kz,mn,xb,xe,yb,ye, 1, &
                      mmx, mnx, mmy, mny, &
                      red, 3500, thick_dash, magnitude,0)
@@ -1350,9 +1349,9 @@ contains
 
 !-----------------------------------------------------   
    
-   end subroutine scale_plot
+   end subroutine da_scale_plot
 
-   subroutine line_plot(x_title, y_title, main_title,  &
+   subroutine da_line_plot(x_title, y_title, main_title,  &
                         z,y,n,mn,xb,xe,yb,ye,plot_type, &
                         mmx, mix, mmy, iy, &
                         color, width, line_pattern, magnitude,iopt)
@@ -1480,9 +1479,9 @@ contains
          call pwrity(xe-15.0, ye-mn*1.5+0.5, title(1:7),7,10,0,0)
       endif
    
-   end subroutine line_plot
+   end subroutine da_line_plot
   
-   subroutine norm_min_max(xmin, xmax, magnitude)
+   subroutine da_norm_min_max(xmin, xmax, magnitude)
 
       implicit none
 
@@ -1520,9 +1519,9 @@ contains
       xmin = -100.0
       xmax =  100.0
 
-   end subroutine norm_min_max
+   end subroutine da_norm_min_max
 
-   subroutine Balance_ratio_plot (ps, chi, temp, nj, nk,main_title)
+   subroutine da_balance_ratio_plot (ps, chi, temp, nj, nk,main_title)
 
       implicit none
 
@@ -1590,7 +1589,7 @@ contains
            y(j) = ps(j) * 10.0**magnitude
          end do
 
-         call line_plot(x_title, y_title, main_title,  &
+         call da_line_plot(x_title, y_title, main_title,  &
                         x,y,nj, mn,xb,xe,yb,ye,plot_type, &
                         mmx, mnx, mmy, mny, &
                         red, 3500, thick_dash, magnitude, 2)
@@ -1623,7 +1622,7 @@ contains
            x(k) = chi(k) * 10.0**magnitude
          end do
 
-         call line_plot(x_title, y_title, main_title,  &
+         call da_line_plot(x_title, y_title, main_title,  &
                         x,y,nk, mn,xb,xe,yb,ye,plot_type, &
                         mmx, mnx, mmy, mny, &
                         blue, 3500, thick_dash, magnitude, 0)
@@ -1632,16 +1631,16 @@ contains
            x(k) = temp(k) * 10.0**magnitude
          end do
 
-         call line_plot(x_title, y_title, main_title,  &
+         call da_line_plot(x_title, y_title, main_title,  &
                         x,y,nk, mn,xb,xe,yb,ye,plot_type, &
                         mmx, mnx, mmy, mny, &
                         red, 3500, thick_dash, magnitude, 0)
 
          call frame
 
-   end subroutine Balance_ratio_plot
+   end subroutine da_balance_ratio_plot
 
-   subroutine Covariance_plot (vn, ps, nj, main_title)
+   subroutine da_covariance_plot (vn, ps, nj, main_title)
 
       implicit none
 
@@ -1692,13 +1691,13 @@ contains
            y(j) = ps(j) * 10.0**magnitude
          end do
 
-         call line_plot(x_title, y_title, main_title,  &
+         call da_line_plot(x_title, y_title, main_title,  &
                         x,y,nj, 0, 0.0, xe, 0.0, 4.0, 1, &
                         mmx, 5, 4, 5, &
                         red, 3500, thick_dash, magnitude, 2)
 
          call frame
 
-  end subroutine Covariance_plot
+  end subroutine da_covariance_plot
 
-end program plot_reg_coeff
+end program da_plot_gen_be

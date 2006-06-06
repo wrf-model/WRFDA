@@ -156,11 +156,11 @@ SUBROUTINE da_obs_sfc_correction(sfc_obs, xb )
        
                IF (abs(to - missing_r) < 1.0) then
 
-                  correc = MO_CORRECTION( ho, po, tm, qo, uo, vo, &
+                  correc = da_mo_correction( ho, po, tm, qo, uo, vo, &
                                           hm, pm, tm, qm, um ,vm, roughness )
                ELSE
 
-                  correc = MO_CORRECTION( ho, po, to, qo, uo, vo, &
+                  correc = da_mo_correction( ho, po, to, qo, uo, vo, &
                                           hm, pm, tm, qm, um ,vm, roughness )
 
                ENDIF

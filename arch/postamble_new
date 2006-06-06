@@ -17,24 +17,24 @@ LIB             =       $(NETCDF_LIB) -L. -lwrflib -lwrfio_nf -lesmf_time \
 
 # compile these without high optimization to speed compile
 
-module_io_mm5.o : module_io_mm5.f90
-module_si_io.o : module_si_io.f90
-module_io_wrf.o : module_io_wrf.f90
-module_start.o : module_start.f90
-module_initialize.o : module_initialize.f90
-module_initialize_b_wave.o : module_initialize_b_wave.f90
-module_initialize_hill2d_x.o : module_initialize_hill2d_x.f90
-module_initialize_quarter_ss.o : module_initialize_quarter_ss.f90
-module_initialize_squall2d_x.o : module_initialize_squall2d_x.f90
-module_initialize_squall2d_y.o : module_initialize_squall2d_y.f90
-module_initialize_real.o : module_initialize_real.f90
-module_dm.o : module_dm.f90
-start_domain.o : start_domain.f90
-module_domain.o : module_domain.f90
-module_configure.o : module_configure.f90
-mediation_interp_domain.o : mediation_interp_domain.f90
-mediation_force_domain.o : mediation_force_domain.f90
-mediation_feedback_domain.o : mediation_feedback_domain.f90
+module_io_mm5.o : module_io_mm5.F
+module_si_io.o : module_si_io.F
+module_io_wrf.o : module_io_wrf.F
+module_start.o : module_start.F
+module_initialize.o : module_initialize.F
+module_initialize_b_wave.o : module_initialize_b_wave.F
+module_initialize_hill2d_x.o : module_initialize_hill2d_x.F
+module_initialize_quarter_ss.o : module_initialize_quarter_ss.F
+module_initialize_squall2d_x.o : module_initialize_squall2d_x.F
+module_initialize_squall2d_y.o : module_initialize_squall2d_y.F
+module_initialize_real.o : module_initialize_real.F
+module_dm.o : module_dm.F
+start_domain.o : start_domain.F
+module_domain.o : module_domain.F
+module_configure.o : module_configure.F
+mediation_interp_domain.o : mediation_interp_domain.F
+mediation_force_domain.o : mediation_force_domain.F
+mediation_feedback_domain.o : mediation_feedback_domain.F
 
 module_io_mm5.o module_si_io.o module_io_wrf.o module_domain.o \
 module_start.o module_initialize.o module_initialize_b_wave.o  \
@@ -44,7 +44,7 @@ module_configure.o mediation_interp_domain.o                   \
 mediation_force_domain.o mediation_feedback_domain.o           \
 module_initialize_real.o module_dm.o start_domain.o :
 	$(RM) $@
-	$(SED_FTN) $*.f90 > $*.b 
+	$(SED_FTN) $*.F > $*.b 
 	$(CPP) $(FPPFLAGS) $*.b  > $*.f
 	$(RM) $*.b
 	$(FC) -c $(FCFLAGS_NOOPT) -O0 $*.f
@@ -56,6 +56,13 @@ module_initialize_real.o module_dm.o start_domain.o :
 .f90.o : 
 	@ $(RM) $@
 	@ $(SED_FTN) $*.f90 > $*.b
+	  $(CPP) $(FPPFLAGS) $*.b  > $*.f
+	@ $(RM) $*.b
+	  $(FC) -c $(FCFLAGS) $*.f
+
+.F.o : 
+	@ $(RM) $@
+	@ $(SED_FTN) $*.F > $*.b
 	  $(CPP) $(FPPFLAGS) $*.b  > $*.f
 	@ $(RM) $*.b
 	  $(FC) -c $(FCFLAGS) $*.f

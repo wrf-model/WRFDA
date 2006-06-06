@@ -81,7 +81,7 @@ SUBROUTINE da_add_pbl_and_sfc_info( xp, xb, xbx )
    ! [5.0] Calculate Roughness length 
    !---------------------------------------------------------------------------
 
-   call roughness_from_lanu(19, xbx%mminlu, ANALYSIS_DATE(1:19), &
+   call da_roughness_from_lanu(19, xbx%mminlu, ANALYSIS_DATE(1:19), &
                             xp, xb%lanu, xb%rough)
 
    !---------------------------------------------------------------------------

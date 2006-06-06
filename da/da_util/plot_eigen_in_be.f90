@@ -1,4 +1,4 @@
-program plot_eigen_scale
+program da_plot_eigen_in_be
 
    implicit none
 
@@ -60,7 +60,7 @@ program plot_eigen_scale
 !
    call opngks
 
-   call setup_color_table
+   call da_setup_color_table
 
 !
    open(unit=5, file='namelist.title', status='old')
@@ -76,7 +76,7 @@ program plot_eigen_scale
 !-----------------------------------------------------
         ix=im; jy=jm ; kz=km
  
-        call allocate_eigen(cv, ix,jy, kz)
+        call da_allocate_eigen(cv, ix,jy, kz)
 
 !read : cv
         open(11,file=infile, form='unformatted',status='old')
@@ -94,9 +94,9 @@ program plot_eigen_scale
         close(11)
 
 ! ---------------------------------------------------------------
-   call eigen_plot(cvv, cv, main_title1,km_resolution)
+   call da_eigen_plot(cvv, cv, main_title1,km_resolution)
 
-   call eigen_plot2(cvv, cv, main_title1,km_resolution,99) !local_eigenvalue
+   call da_eigen_plot2(cvv, cv, main_title1,km_resolution,99) !local_eigenvalue
 
    if (scale_length) then
    filename=trim(cvv)//'/'//'sl_print.'//trim(cvv)
@@ -110,7 +110,7 @@ program plot_eigen_scale
         enddo
         close(11)
  
-   call scale_plot(cvv, cv, main_title1, km_resolution) 
+   call da_scale_plot(cvv, cv, main_title1, km_resolution) 
 
    endif
 
@@ -140,7 +140,7 @@ program plot_eigen_scale
    close(11)
 
    
-   call eigen_plot2(cvv, cv, main_title1,km_resolution,98)
+   call da_eigen_plot2(cvv, cv, main_title1,km_resolution,98)
 
    endif
     
@@ -148,7 +148,7 @@ program plot_eigen_scale
 
 CONTAINS
 
-   subroutine allocate_eigen(eigen_var, ix, jy, kz)
+   subroutine da_allocate_eigen(eigen_var, ix, jy, kz)
 
       implicit none
 
@@ -171,9 +171,9 @@ CONTAINS
       eigen_var%l_vec = 0.0
       eigen_var%sl    = 0.0
 
-   end subroutine allocate_eigen
+   end subroutine da_allocate_eigen
 
-   subroutine norm_min_max(xmin, xmax, magnitude)
+   subroutine da_norm_min_max(xmin, xmax, magnitude)
 
       implicit none
 
@@ -211,9 +211,9 @@ CONTAINS
       xmin = -100.0
       xmax =  100.0
 
-   end subroutine norm_min_max
+   end subroutine da_norm_min_max
 
-   subroutine eigen_plot(vn, ev, main_title, dist)
+   subroutine da_eigen_plot(vn, ev, main_title, dist)
 
       implicit none
 
@@ -283,7 +283,7 @@ CONTAINS
       xmin = minval(x(1:kz))
       xmax = maxval(x(1:kz))
    
-      call norm_min_max(xmin, xmax, magnitude)
+      call da_norm_min_max(xmin, xmax, magnitude)
    
       fct = 10.0**magnitude
     
@@ -295,7 +295,7 @@ CONTAINS
    
       mn = 0
    
-      call line_plot(x_title, y_title, main_title,  &
+      call da_line_plot(x_title, y_title, main_title,  &
                      x,y,kz,mn,xb,xe,yb,ye,3, &
                      mmx, mnx, mmy, mny, &
                      red, 3500, thick_dash, magnitude,0)
@@ -315,7 +315,7 @@ CONTAINS
       xmin = minval(x(1:kz))
       xmax = maxval(x(1:kz))
    
-      call norm_min_max(xmin, xmax, magnitude)
+      call da_norm_min_max(xmin, xmax, magnitude)
    
       fct = 10.0**magnitude
    
@@ -332,7 +332,7 @@ CONTAINS
         x(k) = ev%g_vec(k,mn)*10.0**magnitude
 
          end do
-         call line_plot(x_title, y_title, main_title,  &
+         call da_line_plot(x_title, y_title, main_title,  &
                         x,y,kz,mn,xb,xe,yb,ye,plot_type, &
                         mmx, mnx, mmy, mny, &
                         line_color, 6000-1000*mn, thick_dash, magnitude,0)
@@ -364,7 +364,7 @@ CONTAINS
       xmin = minval(x(1:kz))
       xmax = maxval(x(1:kz))
   
-      call norm_min_max(xmin, xmax, magnitude)
+      call da_norm_min_max(xmin, xmax, magnitude)
    print*,vn,' --> scale length min, mx and magnitude =',xmin,xmax,magnitude
 
 ! Scaled to be in unit of 100 KM     
@@ -384,7 +384,7 @@ CONTAINS
   
       y_title   = 'VERTICAL MODE'
  
-      call line_plot(x_title, y_title, main_title,  &
+      call da_line_plot(x_title, y_title, main_title,  &
                      x,y,kz,mn,xb,xe,yb,ye, 1, &
                      mmx, mnx, mmy, mny, &
                      red, 3500, thick_dash, magnitude,0)
@@ -393,9 +393,9 @@ CONTAINS
       endif
 !-----------------------------------------------------   
    
-   end subroutine eigen_plot
+   end subroutine da_eigen_plot
 
-   subroutine eigen_plot2 (vn, ev, main_title, dist, iopt)
+   subroutine da_eigen_plot2 (vn, ev, main_title, dist, iopt)
       implicit none
 
       integer, parameter :: solid_line = 65535, & ! PATTERN = 1111111111111111
@@ -473,7 +473,7 @@ CONTAINS
       ymin = minval(y(1:ix))
       ymax = maxval(y(1:ix))
 
-      call norm_min_max(ymin, ymax, magnitude)
+      call da_norm_min_max(ymin, ymax, magnitude)
 
       fct = 10.0**magnitude
 
@@ -511,7 +511,7 @@ CONTAINS
         if (iopt.eq.98) y(j) = ev%power(j,mn)*10.0**magnitude
        
          end do
-         call line_plot(x_title, y_title, main_title,  &
+         call da_line_plot(x_title, y_title, main_title,  &
                         x,y,ix,mn,xb,xe,yb,ye,plot_type, &
                         mmx, mnx, mmy, mny, &
                         line_color, 6000-1000*mn, thick_dash, magnitude,2)
@@ -524,9 +524,9 @@ CONTAINS
 
       call frame
 
-   end subroutine eigen_plot2
+   end subroutine da_eigen_plot2
    
-   subroutine line_plot(x_title, y_title, main_title,  &
+   subroutine da_line_plot(x_title, y_title, main_title,  &
                         z,y,n,mn,xb,xe,yb,ye,plot_type, &
                         mmx, mix, mmy, iy, &
                         color, width, line_pattern, magnitude,iopt)
@@ -654,9 +654,9 @@ CONTAINS
          call pwrity(xe-15.0, ye-mn*1.5+0.5, title(1:7),7,10,0,0)
       endif
    
-   end subroutine line_plot
+   end subroutine da_line_plot
   
-subroutine setup_color_table
+subroutine da_setup_color_table
 
    implicit none
 
@@ -673,9 +673,9 @@ subroutine setup_color_table
    call gscr(1, 10, 1.00, 1.00, 0.00) ! Yellow
    call gscr(1, 11, 0.60, 0.60, 0.60) ! Gray
 
-end subroutine setup_color_table
+end subroutine da_setup_color_table
 
-   subroutine scale_plot(vn, ev, main_title, dist)
+   subroutine da_scale_plot(vn, ev, main_title, dist)
 
    implicit none
    integer, parameter :: solid_line = 65535, & ! PATTERN = 1111111111111111
@@ -745,7 +745,7 @@ end subroutine setup_color_table
       xmin = minval(x(1:kz))
       xmax = maxval(x(1:kz))
 
-      call norm_min_max(xmin, xmax, magnitude)
+      call da_norm_min_max(xmin, xmax, magnitude)
    print*,vn,' --> scale length min, mx and magnitude =',xmin,xmax,magnitude
 ! Scaled to be in unit of 100 KM
 !      magnitude = -2
@@ -760,7 +760,7 @@ end subroutine setup_color_table
 
       y_title   = 'VERTICAL MODE'
 
-      call line_plot(x_title, y_title, main_title,  &
+      call da_line_plot(x_title, y_title, main_title,  &
                      x,y,kz,mn,xb,xe,yb,ye, 1, &
                      mmx, mnx, mmy, mny, &
                      red, 3500, thick_dash, magnitude,0)
@@ -770,7 +770,7 @@ end subroutine setup_color_table
       endif
 !-----------------------------------------------------
 
-end subroutine scale_plot
+end subroutine da_scale_plot
 
 
-end program plot_eigen_scale
+end program da_plot_eigen_in_be

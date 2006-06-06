@@ -167,9 +167,9 @@
 
 !        [1.2] Interpolate horizontally to ob:
 
-         call da_Interp_lin_3D( xb%t, xp, i, j, dx, dy, dxm, dym, &      ! temperature
+         call da_interp_lin_3d( xb%t, xp, i, j, dx, dy, dxm, dym, &      ! temperature
                               model_t, max_ob_levels, zk, num_levs )
-         call da_Interp_lin_3D( xb%q, xp, i, j, dx, dy, dxm, dym, &      ! specific humidity
+         call da_interp_lin_3d( xb%q, xp, i, j, dx, dy, dxm, dym, &      ! specific humidity
                               model_q, max_ob_levels, zk, num_levs )
 
          do k=1, num_levs
@@ -193,40 +193,40 @@
 
          end do
 
-         call da_Interp_lin_2D( xb % u10, xp%ims, xp%ime, xp%jms, xp%jme, &
+         call da_interp_lin_2d( xb % u10, xp%ims, xp%ime, xp%jms, xp%jme, &
                              i, j, dx, dy, dxm, dym, &
                              model_u10(1) )
-         call da_Interp_lin_2D( xb % v10, xp%ims, xp%ime, xp%jms, xp%jme, &
+         call da_interp_lin_2d( xb % v10, xp%ims, xp%ime, xp%jms, xp%jme, &
                              i, j, dx, dy, dxm, dym, &
                              model_v10(1) )
-         call da_Interp_lin_2D( xb % t2, xp%ims, xp%ime, xp%jms, xp%jme, &
+         call da_interp_lin_2d( xb % t2, xp%ims, xp%ime, xp%jms, xp%jme, &
                              i, j, dx, dy, dxm, dym, &
                              model_t2m )
-         call da_Interp_lin_2D( xb % q2, xp%ims, xp%ime, xp%jms, xp%jme, &
+         call da_interp_lin_2d( xb % q2, xp%ims, xp%ime, xp%jms, xp%jme, &
                              i, j, dx, dy, dxm, dym, &
                              model_q2m )
-         call da_Interp_lin_2D( xb % psfc, xp%ims, xp%ime, xp%jms, xp%jme, &
+         call da_interp_lin_2d( xb % psfc, xp%ims, xp%ime, xp%jms, xp%jme, &
                              i, j, dx, dy, dxm, dym, &
                              model_psfc )
-         call da_Interp_lin_2D( xb % tsk, xp%ims, xp%ime, xp%jms, xp%jme, &
+         call da_interp_lin_2d( xb % tsk, xp%ims, xp%ime, xp%jms, xp%jme, &
                              i, j, dx, dy, dxm, dym, &
                              model_ts(1) )
-         call Interp_lin_2D( xb % terr, xp%ims, xp%ime, xp%jms, xp%jme, &
+         call da_interp_lin_2d( xb % terr, xp%ims, xp%ime, xp%jms, xp%jme, &
                              i, j, dx, dy, dxm, dym, &
                              model_elv )
 
 ! variables for emissivity calculations
 !---------------------------------------- 
-         call da_Interp_lin_2D( xb % smois, xp%ims, xp%ime, xp%jms, xp%jme, &
+         call da_interp_lin_2d( xb % smois, xp%ims, xp%ime, xp%jms, xp%jme, &
                              i, j, dx, dy, dxm, dym, &
                              model_smois(1) )
-         call da_Interp_lin_2D( xb % tslb, xp%ims, xp%ime, xp%jms, xp%jme, &
+         call da_interp_lin_2d( xb % tslb, xp%ims, xp%ime, xp%jms, xp%jme, &
                              i, j, dx, dy, dxm, dym, &
                              model_tslb(1) )
-         call da_Interp_lin_2D( xb % snowh, xp%ims, xp%ime, xp%jms, xp%jme, &
+         call da_interp_lin_2d( xb % snowh, xp%ims, xp%ime, xp%jms, xp%jme, &
                              i, j, dx, dy, dxm, dym, &
                              model_snowh(1) )
-         call da_Interp_lin_2D( xb % vegfra, xp%ims, xp%ime, xp%jms, xp%jme, &
+         call da_interp_lin_2d( xb % vegfra, xp%ims, xp%ime, xp%jms, xp%jme, &
                              i, j, dx, dy, dxm, dym, &
                              model_vegfra(1) )
 
@@ -246,25 +246,25 @@
 ! variables for calculation of cloud affected radiance
 !-------------------------------------------------------
        do k=xp%kts,xp%kte
-         call da_Interp_lin_2D( xb%t(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
+         call da_interp_lin_2d( xb%t(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
                              i, j, dx, dy, dxm, dym, &      ! temperature at model level
                              model_tm(k) )
-         call da_Interp_lin_2D( xb%q(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
+         call da_interp_lin_2d( xb%q(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
                              i, j, dx, dy, dxm, dym, &      ! temperature at model level
                              model_qm(k) )
-         call da_Interp_lin_2D( xb%qrn(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
+         call da_interp_lin_2d( xb%qrn(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
                              i, j, dx, dy, dxm, dym, &      ! rain
                              model_qrn(k) )
-         call da_Interp_lin_2D( xb%qcw(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
+         call da_interp_lin_2d( xb%qcw(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
                              i, j, dx, dy, dxm, dym, &      ! cloud water
                              model_qcw(k) )
-         call da_Interp_lin_2D( xb%qci(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
+         call da_interp_lin_2d( xb%qci(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
                              i, j, dx, dy, dxm, dym, &      ! cloud ice
                              model_qci(k) )
-         call da_Interp_lin_2D( xb%qsn(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
+         call da_interp_lin_2d( xb%qsn(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
                              i, j, dx, dy, dxm, dym, &      ! snow
                              model_qsn(k) )
-         call da_Interp_lin_2D( xb%qgr(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
+         call da_interp_lin_2d( xb%qgr(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
                              i, j, dx, dy, dxm, dym, &      ! granpul
                              model_qgr(k) )
 

@@ -48,8 +48,7 @@ ESMF_TARGET         = CONFIGURE_ESMF_TARGET
 ARCH      = $(DEVTOP)/arch
 CHEM      = $(DEVTOP)/chem
 CONVERTOR = $(DEVTOP)/convertor
-DA_VAR    = $(DEVTOP)/da
-DA_BE     = $(DEVTOP)/da_be
+DA        = $(DEVTOP)/da
 DYN_EM    = $(DEVTOP)/dyn_em
 DYN_EXP   = $(DEVTOP)/dyn_exp
 DYN_NMM   = $(DEVTOP)/dyn_nmm
@@ -65,7 +64,6 @@ SHARE     = $(DEVTOP)/share
 TEST      = $(DEVTOP)/test
 TOOLS     = $(DEVTOP)/tools
 
-DA_SRC        = $(DA_VAR)/src
 IO_GRIB1      = $(EXTERNAL)/io_grib1
 IO_INT        = $(EXTERNAL)/io_int
 ESMF_TIME_F90 = $(EXTERNAL)/esmf_time_f90

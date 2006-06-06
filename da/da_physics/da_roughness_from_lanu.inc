@@ -19,7 +19,7 @@ subroutine da_roughness_from_lanu(ltbl, mminlu, date_mm5, xp, lanu, rough)
   logical                               :: exist
 
   read(UNIT=date_mm5,FMT='(I4,1x,I2,1X,I2)') year, month, day
-  call julian_day(year,month,day,Julday, 1)
+  call da_julian_day(year,month,day,Julday, 1)
   Isn = 1
   IF(JULDAY < 105 .OR. JULDAY > 288) Isn=2
  

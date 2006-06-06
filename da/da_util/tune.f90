@@ -1,4 +1,4 @@
-program tune
+program da_tune
 
    implicit none
 
@@ -1559,4 +1559,4 @@ end subroutine da_get_j
 
 !--------------------------------------------------------------------------
 
-end program tune
+end program da_tune

@@ -1,4 +1,4 @@
-SUBROUTINE check_sfc_assi( xb, xa, iv, xp, y, &
+SUBROUTINE da_check_sfc_assi( xb, xa, iv, xp, y, &
                            ids,ide, jds,jde, kds,kde, &
                            ims,ime, jms,jme, kms,kme, &
                            its,ite, jts,jte, kts,kte )
@@ -73,7 +73,7 @@ SUBROUTINE check_sfc_assi( xb, xa, iv, xp, y, &
 
 !-------------------------------------------------------------------------
 
-   call DA_Transform_XToWTQ ( xp, xb, xa )
+   call da_transform_xtowtq ( xp, xb, xa )
 
 !--Exchange XA(SURFACE) halo region.
    CALL wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id6)
@@ -85,7 +85,7 @@ SUBROUTINE check_sfc_assi( xb, xa, iv, xp, y, &
 
    do n=1, iv%num_synop
       if(iv%synop(n)%loc%proc_domain_with_halo) then
-         CALL DA_Transform_XToPsfc( xb, xa, xp, iv%synop(n), y%synop(n) )
+         CALL da_transform_xtopsfc( xb, xa, xp, iv%synop(n), y%synop(n) )
 
 
          pertile_lhs = pertile_lhs &
@@ -110,15 +110,15 @@ SUBROUTINE check_sfc_assi( xb, xa, iv, xp, y, &
 !     [5.0] Perform adjoint operation:
 !-------------------------------------------------------------------------
 
-   call DA_Zero_X( xa )
+   call da_zero_x( xa )
 
    DO n=1, iv%num_synop
       if(iv%synop(n)%loc%proc_domain_with_halo) then
-         CALL DA_Transform_XToPsfc_Adj(xb,xp,iv%synop(n),y%synop(n),xa)
+         CALL da_transform_xtopsfc_adj(xb,xp,iv%synop(n),y%synop(n),xa)
       endif
    ENDDO
 
-   call DA_Transform_XToWTQ_adj ( xp, xb, xa )
+   call da_transform_xtowtq_adj ( xp, xb, xa )
    
    pertile_rhs = sum( xa%u(ims:ime, jms:jme, kms:kme) * xa2_u(ims:ime, jms:jme, kms:kme) ) + &
                  sum( xa%v(ims:ime, jms:jme, kms:kme) * xa2_v(ims:ime, jms:jme, kms:kme) ) + &
@@ -172,9 +172,9 @@ PRINT *,'TEST_COVERAGE_check_sfc_assi_A:  adj_ttl_lhs,adj_ttl_rhs = ', adj_ttl_l
    CALL wrf_shutdown
    stop 'In file: __FILE__'
    
-END SUBROUTINE check_sfc_assi
+END SUBROUTINE da_check_sfc_assi
 
-SUBROUTINE check_psfc( xb, xa, iv, xp, y, &
+SUBROUTINE da_check_psfc( xb, xa, iv, xp, y, &
                        ids,ide, jds,jde, kds,kde, &
                        ims,ime, jms,jme, kms,kme, &
                        its,ite, jts,jte, kts,kte )
@@ -236,7 +236,7 @@ SUBROUTINE check_psfc( xb, xa, iv, xp, y, &
 
    do n=1, iv%num_synop
       if(iv%synop(n)%loc%proc_domain_with_halo) then
-         CALL DA_Transform_XToPsfc( xb, xa, xp, iv%synop(n), y%synop(n) )
+         CALL da_transform_xtopsfc( xb, xa, xp, iv%synop(n), y%synop(n) )
          pertile_lhs = pertile_lhs &
                      + y%synop(n)%u * y%synop(n)%u &
                      + y%synop(n)%v * y%synop(n)%v &
@@ -268,7 +268,7 @@ SUBROUTINE check_psfc( xb, xa, iv, xp, y, &
    
    DO n=1, iv%num_synop
       if(iv%synop(n)%loc%proc_domain_with_halo) then
-         CALL DA_Transform_XToPsfc_Adj(xb,xp,iv%synop(n),y%synop(n),xa)
+         CALL da_transform_xtopsfc_adj(xb,xp,iv%synop(n),y%synop(n),xa)
       endif
    ENDDO
 
@@ -311,5 +311,5 @@ PRINT *,'TEST_COVERAGE_check_sfc_assi_B:  adj_ttl_lhs,adj_ttl_rhs = ', adj_ttl_l
    xa%t2  (ims:ime, jms:jme) = xa2_t2  (ims:ime, jms:jme)
    xa%q2  (ims:ime, jms:jme) = xa2_q2  (ims:ime, jms:jme)
 
-END SUBROUTINE check_psfc
+END SUBROUTINE da_check_psfc
 

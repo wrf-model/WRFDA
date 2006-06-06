@@ -109,9 +109,9 @@ SUBROUTINE da_transform_xtoy_rad ( xa, iv, xp, y )
 
 !        [1.2] Interpolate horizontally to ob:
 
-         call Interp_lin_3D( xa%t, xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_lin_3d( xa%t, xp, i, j, dx, dy, dxm, dym, &
                               model_t, max_ob_levels, zk, num_levs )
-         call Interp_lin_3D( xa%q, xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_lin_3d( xa%q, xp, i, j, dx, dy, dxm, dym, &
                               model_q, max_ob_levels, zk, num_levs )
 
          do k=1, num_levs
@@ -133,7 +133,7 @@ SUBROUTINE da_transform_xtoy_rad ( xa, iv, xp, y )
          end do
 
 
-         call Interp_lin_2D( xa % psfc, xp%ims, xp%ime, xp%jms, xp%jme, &
+         call da_interp_lin_2d( xa % psfc, xp%ims, xp%ime, xp%jms, xp%jme, &
                              i, j, dx, dy, dxm, dym, &
                              model_psfc )
 

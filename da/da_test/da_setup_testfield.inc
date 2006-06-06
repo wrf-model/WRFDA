@@ -35,23 +35,23 @@ subroutine da_setup_testfield( xb, xa, xp, &
    ! [2.1] test wind, temperature, pressure, and humidity.
 
 #ifndef DEREF_KLUDGE
-   call set_tst_trnsf_fld(xp, xa%u, xb%u, typical_u_rms)
-   call set_tst_trnsf_fld(xp, xa%v, xb%v, typical_v_rms)
-   call set_tst_trnsf_fld(xp, xa%w, xb%w, typical_w_rms)
-   call set_tst_trnsf_fld(xp, xa%t, xb%t, typical_t_rms)
-   call set_tst_trnsf_fld(xp, xa%p, xb%p, typical_p_rms)
-   call set_tst_trnsf_fld(xp, xa%q, xb%q, typical_q_rms)
-   call set_tst_trnsf_fld(xp, xa%qcw, xb%qcw, typical_qcw_rms)
-   call set_tst_trnsf_fld(xp, xa%qrn, xb%qrn, typical_qrn_rms)
+   call da_set_tst_trnsf_fld(xp, xa%u, xb%u, typical_u_rms)
+   call da_set_tst_trnsf_fld(xp, xa%v, xb%v, typical_v_rms)
+   call da_set_tst_trnsf_fld(xp, xa%w, xb%w, typical_w_rms)
+   call da_set_tst_trnsf_fld(xp, xa%t, xb%t, typical_t_rms)
+   call da_set_tst_trnsf_fld(xp, xa%p, xb%p, typical_p_rms)
+   call da_set_tst_trnsf_fld(xp, xa%q, xb%q, typical_q_rms)
+   call da_set_tst_trnsf_fld(xp, xa%qcw, xb%qcw, typical_qcw_rms)
+   call da_set_tst_trnsf_fld(xp, xa%qrn, xb%qrn, typical_qrn_rms)
 #else
-   call set_tst_trnsf_fld(xp, xa%u(ims,jms,kms), xb%u(ims,jms,kms), typical_u_rms)
-   call set_tst_trnsf_fld(xp, xa%v(ims,jms,kms), xb%v(ims,jms,kms), typical_v_rms)
-   call set_tst_trnsf_fld(xp, xa%w(ims,jms,kms), xb%w(ims,jms,kms), typical_w_rms)
-   call set_tst_trnsf_fld(xp, xa%t(ims,jms,kms), xb%t(ims,jms,kms), typical_t_rms)
-   call set_tst_trnsf_fld(xp, xa%p(ims,jms,kms), xb%p(ims,jms,kms), typical_p_rms)
-   call set_tst_trnsf_fld(xp, xa%q(ims,jms,kms), xb%q(ims,jms,kms), typical_q_rms)
-   call set_tst_trnsf_fld(xp, xa%qcw(ims,jms,kms), xb%qcw(ims,jms,kms), typical_qcw_rms)
-   call set_tst_trnsf_fld(xp, xa%qrn(ims,jms,kms), xb%qrn(ims,jms,kms), typical_qrn_rms)
+   call da_set_tst_trnsf_fld(xp, xa%u(ims,jms,kms), xb%u(ims,jms,kms), typical_u_rms)
+   call da_set_tst_trnsf_fld(xp, xa%v(ims,jms,kms), xb%v(ims,jms,kms), typical_v_rms)
+   call da_set_tst_trnsf_fld(xp, xa%w(ims,jms,kms), xb%w(ims,jms,kms), typical_w_rms)
+   call da_set_tst_trnsf_fld(xp, xa%t(ims,jms,kms), xb%t(ims,jms,kms), typical_t_rms)
+   call da_set_tst_trnsf_fld(xp, xa%p(ims,jms,kms), xb%p(ims,jms,kms), typical_p_rms)
+   call da_set_tst_trnsf_fld(xp, xa%q(ims,jms,kms), xb%q(ims,jms,kms), typical_q_rms)
+   call da_set_tst_trnsf_fld(xp, xa%qcw(ims,jms,kms), xb%qcw(ims,jms,kms), typical_qcw_rms)
+   call da_set_tst_trnsf_fld(xp, xa%qrn(ims,jms,kms), xb%qrn(ims,jms,kms), typical_qrn_rms)
 
 #endif
 
@@ -91,15 +91,15 @@ subroutine da_setup_testfield( xb, xa, xp, &
         Use_SsmiTbObs .or. Use_SsmiRetrievalObs ) then
 
       !-----Now do something for PW
-      call DA_Transform_XToTPW( xa, xb )
+      call da_transform_xtotpw( xa, xb )
 
       !--------GPS Refractivity:
       if ( use_GpsrefObs ) &
-         call da_transform_XTogpsref_lin(xa, xb, xp)
+         call da_transform_xtogpsref_lin(xa, xb, xp)
 
       if ( use_ssmt1obs .or. use_ssmt2obs .or. &
            Use_SsmiTbObs .or. Use_SsmiRetrievalObs ) then
-         call DA_Transform_XToSeaSfcWind_Lin( xa, xb )
+         call da_transform_xtoseasfcwind_lin( xa, xb )
       endif
 
       !-----Exchange XA halo region.

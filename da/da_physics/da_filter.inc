@@ -72,7 +72,7 @@ SUBROUTINE da_filter(var, xp)
 
 !--Apply (i',j,k' -> i',j',k) transpose ( v1y -> v1z ).
 
-   call transpose_y2z ( xp )
+   call da_transpose_y2z ( xp )
 
 !------------------------------------------------------------------------------
 
