@@ -1,4 +1,4 @@
-SUBROUTINE vv_to_cv(vv, xp, mzs, cv_size, rcv )
+SUBROUTINE da_vv_to_cv(vv, xp, mzs, cv_size, rcv )
 
 !------------------------------------------------------------------------------
 !  PURPOSE: Fill (local) 1D cv array from 3D (local) vv arrays.
@@ -148,5 +148,5 @@ SUBROUTINE vv_to_cv(vv, xp, mzs, cv_size, rcv )
 #endif
    end if
 
-END SUBROUTINE vv_to_cv
+END SUBROUTINE da_vv_to_cv
 

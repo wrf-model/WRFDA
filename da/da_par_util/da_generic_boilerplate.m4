@@ -21,7 +21,7 @@ SUBROUTINE da_y_type_extract_$1( iv, re, slice )
 !
 ! METHOD:   Extract all $1 obs from y and place them in generic 
 !           object slice.  
-!           Call y_facade_free() to deallocate memory allocated here.
+!           Call da_y_facade_free() to deallocate memory allocated here.
 !------------------------------------------------------------------------------
    IMPLICIT NONE
 
@@ -73,7 +73,7 @@ SUBROUTINE da_y_type_insert_$1_global( slice_glob, re_glob )
      CALL da_residual_$2_from_generic( slice_glob%obs(n), re_glob%$1(n) )
    ENDDO
    re_glob%$3 = slice_glob%num_obs  ! duplication!
-   CALL y_facade_free( slice_glob )
+   CALL da_y_facade_free( slice_glob )
 
 END SUBROUTINE da_y_type_insert_$1_global ')
 

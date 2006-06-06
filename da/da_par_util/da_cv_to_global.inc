@@ -160,7 +160,7 @@ SUBROUTINE da_wv_patch_to_global_3d( vlocal, vglobal,         &
     kde = kds + mz - 1
     kme = kde
     kpe = kde
-    CALL da_wrf_patch_to_global_real ( vlocal, vglobal, domdesc,      &
+    CALL wrf_patch_to_global_real ( vlocal, vglobal, domdesc,      &
                                     TRIM(stagger), TRIM(ordering), &
                                     ids, ide, jds, jde, kds, kde,  &
                                     ims, ime, jms, jme, kms, kme,  &

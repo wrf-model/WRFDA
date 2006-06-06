@@ -60,44 +60,44 @@ SUBROUTINE DA_Write_Increment ( xp, xb, xa, q_cgrid, mu_cgrid, ph_cgrid )
       ALLOCATE (   ph_global (1:ix+1,1:jy+1,1:kz+1) )
       ALLOCATE ( psfc_global (1:ix+1,1:jy+1) )
       ALLOCATE (   mu_global (1:ix+1,1:jy+1) )
-      call local_to_global( xp, xa % p, gbuf, 3 ) 
+      call da_local_to_global( xp, xa % p, gbuf, 3 ) 
       IF ( wrf_dm_on_monitor() ) THEN 
         p_global(1:ix,1:jy,1:kz) = gbuf(1:ix,1:jy,1:kz) 
       END IF 
-      call local_to_global( xp, xa % t, gbuf, 3 ) 
+      call da_local_to_global( xp, xa % t, gbuf, 3 ) 
       IF ( wrf_dm_on_monitor() ) THEN 
         t_global(1:ix,1:jy,1:kz) = gbuf(1:ix,1:jy,1:kz) 
       END IF 
-      call local_to_global( xp, q_cgrid, gbuf, 3 ) 
+      call da_local_to_global( xp, q_cgrid, gbuf, 3 ) 
       IF ( wrf_dm_on_monitor() ) THEN 
         q_global(1:ix,1:jy,1:kz) = gbuf(1:ix,1:jy,1:kz) 
       END IF 
-      call local_to_global( xp, xa % u, gbuf, 3 ) 
+      call da_local_to_global( xp, xa % u, gbuf, 3 ) 
       IF ( wrf_dm_on_monitor() ) THEN 
         u_global(1:ix,1:jy,1:kz) = gbuf(1:ix,1:jy,1:kz) 
       END IF 
-      call local_to_global( xp, xa % v, gbuf, 3 ) 
+      call da_local_to_global( xp, xa % v, gbuf, 3 ) 
       IF ( wrf_dm_on_monitor() ) THEN 
         v_global(1:ix,1:jy,1:kz) = gbuf(1:ix,1:jy,1:kz) 
       END IF
 
 ! One more level for w and ph:
       xp%kde = xp%kde+1
-      call local_to_global( xp, xa % w, wgbuf, 3 ) 
+      call da_local_to_global( xp, xa % w, wgbuf, 3 ) 
       IF ( wrf_dm_on_monitor() ) THEN 
         w_global(1:ix,1:jy,1:kz+1) = wgbuf(1:ix,1:jy,1:kz+1) 
       END IF 
-      call local_to_global( xp, ph_cgrid, wgbuf, 3 ) 
+      call da_local_to_global( xp, ph_cgrid, wgbuf, 3 ) 
       IF ( wrf_dm_on_monitor() ) THEN 
         ph_global(1:ix,1:jy,1:kz+1) = wgbuf(1:ix,1:jy,1:kz+1) 
       END IF 
       xp%kde = xp%kde-1
 ! 
-      call local_to_global( xp, xa % psfc, gbuf_2d, 2 ) 
+      call da_local_to_global( xp, xa % psfc, gbuf_2d, 2 ) 
       IF ( wrf_dm_on_monitor() ) THEN 
         psfc_global(1:ix,1:jy) = gbuf_2d(1:ix,1:jy) 
       END IF 
-      call local_to_global( xp, mu_cgrid, gbuf_2d, 2 ) 
+      call da_local_to_global( xp, mu_cgrid, gbuf_2d, 2 ) 
       IF ( wrf_dm_on_monitor() ) THEN 
         mu_global(1:ix,1:jy) = gbuf_2d(1:ix,1:jy) 
       END IF 
@@ -115,43 +115,43 @@ SUBROUTINE DA_Write_Increment ( xp, xb, xa, q_cgrid, mu_cgrid, ph_cgrid )
       ALLOCATE (       cori_global (1:ix+1,1:jy+1) )
       ALLOCATE (   landmask_global (1:ix+1,1:jy+1) )
 
-      call local_to_global( xp, xb%psac, gbuf_2d, 2 ) 
+      call da_local_to_global( xp, xb%psac, gbuf_2d, 2 ) 
       IF ( wrf_dm_on_monitor() ) THEN 
         psac_global(1:ix,1:jy) = gbuf_2d(1:ix,1:jy) 
       END IF
-      call local_to_global( xp, xb%tgrn, gbuf_2d, 2 ) 
+      call da_local_to_global( xp, xb%tgrn, gbuf_2d, 2 ) 
       IF ( wrf_dm_on_monitor() ) THEN 
         tgrn_global(1:ix,1:jy) = gbuf_2d(1:ix,1:jy) 
       END IF
-      call local_to_global( xp, xb%terr, gbuf_2d, 2 ) 
+      call da_local_to_global( xp, xb%terr, gbuf_2d, 2 ) 
       IF ( wrf_dm_on_monitor() ) THEN 
         terr_global(1:ix,1:jy) = gbuf_2d(1:ix,1:jy) 
       END IF
-      call local_to_global( xp, xb%snow, gbuf_2d, 2 ) 
+      call da_local_to_global( xp, xb%snow, gbuf_2d, 2 ) 
       IF ( wrf_dm_on_monitor() ) THEN 
         snow_global(1:ix,1:jy) = gbuf_2d(1:ix,1:jy) 
       END IF
-      call local_to_global( xp, xb%lat , gbuf_2d, 2 ) 
+      call da_local_to_global( xp, xb%lat , gbuf_2d, 2 ) 
       IF ( wrf_dm_on_monitor() ) THEN 
          lat_global(1:ix,1:jy) = gbuf_2d(1:ix,1:jy) 
       END IF
-      call local_to_global( xp, xb%lon , gbuf_2d, 2 ) 
+      call da_local_to_global( xp, xb%lon , gbuf_2d, 2 ) 
       IF ( wrf_dm_on_monitor() ) THEN 
          lon_global(1:ix,1:jy) = gbuf_2d(1:ix,1:jy) 
       END IF
-      call local_to_global( xp, xb%lanu, gbuf_2d, 2 ) 
+      call da_local_to_global( xp, xb%lanu, gbuf_2d, 2 ) 
       IF ( wrf_dm_on_monitor() ) THEN 
         lanu_global(1:ix,1:jy) = gbuf_2d(1:ix,1:jy) 
       END IF
-      call local_to_global( xp, xb%map_factor, gbuf_2d, 2 ) 
+      call da_local_to_global( xp, xb%map_factor, gbuf_2d, 2 ) 
       IF ( wrf_dm_on_monitor() ) THEN 
         map_factor_global(1:ix,1:jy) = gbuf_2d(1:ix,1:jy) 
       END IF
-      call local_to_global( xp, xb%cori, gbuf_2dd, 2 ) 
+      call da_local_to_global( xp, xb%cori, gbuf_2dd, 2 ) 
       IF ( wrf_dm_on_monitor() ) THEN 
         cori_global(1:ix+1,1:jy+1) = gbuf_2dd(1:ix+1,1:jy+1) 
       END IF
-      call local_to_global( xp, xb%landmask, gbuf_2d, 2 ) 
+      call da_local_to_global( xp, xb%landmask, gbuf_2d, 2 ) 
       IF ( wrf_dm_on_monitor() ) THEN 
         landmask_global(1:ix,1:jy) = gbuf_2d(1:ix,1:jy) 
       END IF

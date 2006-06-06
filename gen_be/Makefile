@@ -18,9 +18,10 @@ gen_be : 	gen_be_stage0_wrf	\
 		gen_be_diags		\
 		gen_be_diags_read
 
-GEN_BE_OBJS = $(DA_SRC)/da_gen_be.o $(DA_SRC)/DA_Constants.o $(DA_SRC)/be_spectral.o \
-  $(DA_SRC)/LAPACK.o $(DA_SRC)/BLAS.o ../frame/module_wrf_error.o ../frame/module_driver_constants.o \
-  $(DA_SRC)/da_fftpack5.o $(DA_SRC)/da_tracing.o $(DA_SRC)/da_memory.o
+GEN_BE_OBJS = $(DA)/da_gen_be.o $(DA)/da_constants.o $(DA)/da_be_spectral.o \
+  $(EXTERNAL)/lapack/lapack.o $(EXTERNAL)/blas/blas.o ../frame/module_wrf_error.o \
+  ../frame/module_driver_constants.o \
+  $(EXTERNAL)/fftpack5/fftpack5.o $(DA)/da_tracing.o $(DA)/da_memory.o
 
 include ../configure.wrf
 
@@ -68,7 +69,7 @@ gen_be_diags_read : gen_be_diags_read.o
 
 gen_be_stage0_wrf.o: 
 	$(RM) $@
-	$(FC) -c ${FCFREE} $(FCBASE) ${FCTYPE} ${MODULE_DIRS} -I${NETCDF}/include gen_be_stage0_wrf.F
+	$(FC) -c ${FCFREE} $(FCBASE) ${FCTYPE} ${MODULE_DIRS} -I${NETCDF}/include gen_be_stage0_wrf.f90
 
 clean: 
 	@ echo 'use the clean script'

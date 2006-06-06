@@ -68,7 +68,7 @@ SUBROUTINE da_trace_report
    END IF
 
 #ifdef DM_PARALLEL
-   CALL proc_sum_int(MasterNoRoutines)
+   CALL da_proc_sum_int(MasterNoRoutines)
    ! Only PE 0 knows the result
 
    CALL MPI_BCAST(MasterTimerNames(1:MaxNoRoutines), &
@@ -102,10 +102,10 @@ SUBROUTINE da_trace_report
 
 #ifdef DM_PARALLEL
    DO i=0,nproc-1
-      CALL proc_sum_real(MaxNoRoutines,MasterElapsedTime(i,:))
-      CALL proc_sum_real(MaxNoRoutines,MasterCPUTime(i,:))
-      CALL proc_sum_real(MaxNoRoutines,MasterElapsedTimeLocal(i,:))
-      CALL proc_sum_real(MaxNoRoutines,MasterCPUTimeLocal(i,:))
+      CALL da_proc_sum_real(MaxNoRoutines,MasterElapsedTime(i,:))
+      CALL da_proc_sum_real(MaxNoRoutines,MasterCPUTime(i,:))
+      CALL da_proc_sum_real(MaxNoRoutines,MasterElapsedTimeLocal(i,:))
+      CALL da_proc_sum_real(MaxNoRoutines,MasterCPUTimeLocal(i,:))
    END DO
 #endif
 

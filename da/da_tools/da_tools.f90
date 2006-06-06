@@ -37,6 +37,7 @@ CONTAINS
 #include "da_togrid.inc"
 #include "da_unifva.inc"
 #include "da_xyll.inc"
+#include "da_oi.inc"
 
 #include "da_eof_decomposition_test.inc"
 #include "da_eof_decomposition.inc"

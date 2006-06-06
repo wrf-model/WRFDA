@@ -3,7 +3,7 @@
 
 PROGRAM wrfvar
 
-   USE module_wrfvar_esmf_super
+   USE da_wrfvar_esmf_super
 
 !<DESCRIPTION>
 ! Main program of WRF model.  Responsible for starting up the model, reading in (and

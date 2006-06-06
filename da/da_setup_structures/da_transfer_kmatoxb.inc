@@ -552,7 +552,7 @@ SUBROUTINE DA_Transfer_KMAToXb( xbx, grid, &
    ! testing.  This will always be .FALSE. for a serial or 1-process MPI run.  
    IF ( testing_dm_exact ) THEN
       ALLOCATE( arrayglobal( xp%ids:xp%ide, xp%jds:xp%jde ) )
-      CALL wv_patch_to_global( xb%lat, arrayglobal, xp%domdesc, &
+      CALL da_wv_patch_to_global( xb%lat, arrayglobal, xp%domdesc, &
                                xp%ids, xp%ide, xp%jds, xp%jde,  &
                                xp%ims, xp%ime, xp%jms, xp%jme,  &
                                xp%its, xp%ite, xp%jts, xp%jte )

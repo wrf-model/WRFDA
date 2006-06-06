@@ -31,28 +31,28 @@ SUBROUTINE da_transform_xtoy_metar_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
 
           ! [1.2] Interpolate horizontally:
 #ifndef DEREF_KLUDGE
-          call Interp_Obs_lin_2D_adj(jo_grad_x % u, xp, i, j, dx, dy, dxm, dym, &
+          call da_interp_obs_lin_2d_adj(jo_grad_x % u, xp, i, j, dx, dy, dxm, dym, &
                                      jo_grad_y%metar(n)%u, iv%metar(n)%zk)
-          call Interp_Obs_lin_2D_adj(jo_grad_x % v, xp, i, j, dx, dy, dxm, dym, &
+          call da_interp_obs_lin_2d_adj(jo_grad_x % v, xp, i, j, dx, dy, dxm, dym, &
                                      jo_grad_y%metar(n)%v, iv%metar(n)%zk)
-          call Interp_Obs_lin_2D_adj(jo_grad_x % t, xp, i, j, dx, dy, dxm, dym, &
+          call da_interp_obs_lin_2d_adj(jo_grad_x % t, xp, i, j, dx, dy, dxm, dym, &
                                      jo_grad_y%metar(n)%t, iv%metar(n)%zk)
-          call Interp_Obs_lin_2D_adj(jo_grad_x % q, xp, i, j, dx, dy, dxm, dym, &
+          call da_interp_obs_lin_2d_adj(jo_grad_x % q, xp, i, j, dx, dy, dxm, dym, &
                                      jo_grad_y%metar(n)%q, iv%metar(n)%zk)
 
-          call Interp_lin_2D_adj(jo_grad_x % psfc, xp%ims, xp%ime, xp%jms, xp%jme, &
+          call da_interp_lin_2d_adj(jo_grad_x % psfc, xp%ims, xp%ime, xp%jms, xp%jme, &
                                  i, j, dx, dy, dxm, dym, jo_grad_y%metar(n)%p)
 #else
-          call Interp_Obs_lin_2D_adj(jo_grad_x % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+          call da_interp_obs_lin_2d_adj(jo_grad_x % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                                      jo_grad_y%metar(n)%u, iv%metar(n)%zk)
-          call Interp_Obs_lin_2D_adj(jo_grad_x % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+          call da_interp_obs_lin_2d_adj(jo_grad_x % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                                      jo_grad_y%metar(n)%v, iv%metar(n)%zk)
-          call Interp_Obs_lin_2D_adj(jo_grad_x % t(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+          call da_interp_obs_lin_2d_adj(jo_grad_x % t(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                                      jo_grad_y%metar(n)%t, iv%metar(n)%zk)
-          call Interp_Obs_lin_2D_adj(jo_grad_x % q(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+          call da_interp_obs_lin_2d_adj(jo_grad_x % q(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                                      jo_grad_y%metar(n)%q, iv%metar(n)%zk)
 
-          call Interp_lin_2D_adj(jo_grad_x % psfc(xp%ims,xp%jms), xp%ims, xp%ime, xp%jms, xp%jme, &
+          call da_interp_lin_2d_adj(jo_grad_x % psfc(xp%ims,xp%jms), xp%ims, xp%ime, xp%jms, xp%jme, &
                                  i, j, dx, dy, dxm, dym, jo_grad_y%metar(n)%p)
 #endif
         endif

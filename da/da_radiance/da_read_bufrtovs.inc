@@ -196,7 +196,7 @@ subroutine da_read_bufrtovs (obstype, iv, xp, lnbufr, infile)
 
 !  1.0     Read header record and data record
 !------------------------------------------------------------
-        call da_ufbint(lnbufr,bfr1bhdr,n1bhdr,1,iret,hdr1b)
+        call ufbint(lnbufr,bfr1bhdr,n1bhdr,1,iret,hdr1b)
         call ufbrep(lnbufr,data1b8,1,nchanl,iret,'TMBR')
 !      call ufbrep(lnbufr,data1b8,1,1,iret,'BEARAZ')
       

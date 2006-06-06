@@ -69,7 +69,7 @@ SUBROUTINE DA_AO_Stats_SSMI_Tb ( stats_unit, oi, re )
                                ssmi_tb%minimum%tb37v,  ssmi_tb%maximum%tb37v,&
                                ssmi_tb%average%tb37v,  ssmi_tb%rms_err%tb37v)
 
-        CALL  Stats_Calculate( n, 0, oi%ssmi_tb(n)%tb37h%qc, &
+        CALL  da_Stats_Calculate( n, 0, oi%ssmi_tb(n)%tb37h%qc, &
                                re%ssmi_tb(n)%tb37h, ntb37h,  &
                                ssmi_tb%minimum%tb37h,  ssmi_tb%maximum%tb37h,&
                                ssmi_tb%average%tb37h,  ssmi_tb%rms_err%tb37h)

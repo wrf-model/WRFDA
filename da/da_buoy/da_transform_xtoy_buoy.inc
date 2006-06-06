@@ -36,29 +36,29 @@ SUBROUTINE DA_Transform_XToY_Buoy ( xa, xb, iv, xp, y )
 
           ! [1.2] Interpolate horizontally:
 #ifndef DEREF_KLUDGE
-          call Interp_Obs_lin_2D(xa % u, xp, i, j, dx, dy, dxm, dym, &
+          call da_interp_obs_lin_2d(xa % u, xp, i, j, dx, dy, dxm, dym, &
                                 y%buoy(n)%u, iv%buoy(n)%zk)
-          call Interp_Obs_lin_2D(xa % v, xp, i, j, dx, dy, dxm, dym, &
+          call da_interp_obs_lin_2d(xa % v, xp, i, j, dx, dy, dxm, dym, &
                                 y%buoy(n)%v, iv%buoy(n)%zk)
-          call Interp_Obs_lin_2D(xa % t, xp, i, j, dx, dy, dxm, dym, &
+          call da_interp_obs_lin_2d(xa % t, xp, i, j, dx, dy, dxm, dym, &
                                 y%buoy(n)%t, iv%buoy(n)%zk)
-          call Interp_Obs_lin_2D(xa % q, xp, i, j, dx, dy, dxm, dym, &
+          call da_interp_obs_lin_2d(xa % q, xp, i, j, dx, dy, dxm, dym, &
                                 y%buoy(n)%q, iv%buoy(n)%zk)
 
-          call Interp_lin_2D(xa % psfc, xp%ims, xp%ime, xp%jms, xp%jme, &
+          call da_interp_lin_2d(xa % psfc, xp%ims, xp%ime, xp%jms, xp%jme, &
                             i, j, dx, dy, dxm, dym, &
                             y%buoy(n)%p)
 #else
-          call Interp_Obs_lin_2D(xa % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+          call da_interp_obs_lin_2d(xa % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                                 y%buoy(n)%u, iv%buoy(n)%zk)
-          call Interp_Obs_lin_2D(xa % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+          call da_interp_obs_lin_2d(xa % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                                 y%buoy(n)%v, iv%buoy(n)%zk)
-          call Interp_Obs_lin_2D(xa % t(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+          call da_interp_obs_lin_2d(xa % t(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                                 y%buoy(n)%t, iv%buoy(n)%zk)
-          call Interp_Obs_lin_2D(xa % q(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+          call da_interp_obs_lin_2d(xa % q(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                                 y%buoy(n)%q, iv%buoy(n)%zk)
 
-          call Interp_lin_2D(xa % psfc(xp%ims,xp%jms), xp%ims, xp%ime, xp%jms, xp%jme, &
+          call da_interp_lin_2d(xa % psfc(xp%ims,xp%jms), xp%ims, xp%ime, xp%jms, xp%jme, &
                             i, j, dx, dy, dxm, dym, y%buoy(n)%p)
 #endif
         endif

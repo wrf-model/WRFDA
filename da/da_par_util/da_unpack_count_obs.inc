@@ -1,4 +1,4 @@
-SUBROUTINE unpack_count_obs ( num_obs, offset, value )
+SUBROUTINE da_unpack_count_obs ( num_obs, offset, value )
 
 !------------------------------------------------------------------------------
 !  PURPOSE: Unpack the 4 integer values starting at value(offset) into the
@@ -16,5 +16,5 @@ SUBROUTINE unpack_count_obs ( num_obs, offset, value )
    num_obs % num_missing      = value(offset+3)
    offset = offset + 4
 
-END SUBROUTINE unpack_count_obs
+END SUBROUTINE da_unpack_count_obs
 

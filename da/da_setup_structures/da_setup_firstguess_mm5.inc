@@ -92,7 +92,7 @@ SUBROUTINE DA_Setup_FirstGuess_MM5( xb, xbx, xp)
       end do
    ENDIF
 
-   call mm5_struct_bcast( xb_mm5 )
+   call da_mm5_struct_bcast( xb_mm5 )
  
 !---------------------------------------------------------------------------
 !  [2.0] Copy header info:

@@ -9,10 +9,10 @@ module da_gen_be
 !------------------------------------------------------------------------------
 
    use da_constants
-   use LAPACK
-   use BLAS
-   USE module_wrf_error
-   USE da_tracing
+   use lapack
+   use blas
+   use module_wrf_error
+   use da_tracing
 
    implicit none
 
@@ -33,11 +33,11 @@ contains
 #include "da_stage0_initialize.inc"
 
 !Files from other modules:
-#include "DA_Transform_VpToVv.inc"
+#include "da_transform_vptovv.inc"
 #include "da_eof_decomposition.inc"
 #include "da_eof_decomposition_test.inc"
 #include "da_perform_2drf.inc"
-#include "DA_Recursive_Filter_1d.inc"
+#include "da_recursive_filter_1d.inc"
 
 end module da_gen_be
 

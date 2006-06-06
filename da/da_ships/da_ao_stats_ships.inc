@@ -63,7 +63,7 @@ SUBROUTINE da_ao_stats_ships( stats_unit, oi, re )
 
    ! Do inter-processor communication to gather statistics.
    call da_proc_sum_int( nu )
-   call da proc_sum_int( nv )
+   call da_proc_sum_int( nv )
    call da_proc_sum_int( nt )
    call da_proc_sum_int( np )
    call da_proc_sum_int( nq )

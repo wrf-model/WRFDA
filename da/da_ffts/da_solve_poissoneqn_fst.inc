@@ -65,7 +65,7 @@ SUBROUTINE DA_Solve_PoissonEqn_FST( xb, xbx, xp, del2b, b,          &
 
 !  [2.1] Apply (i',j',k -> i,j',k') transpose (v1z -> v1x).
 
-   call transpose_z2x ( xp )
+   call da_transpose_z2x ( xp )
 
 !  [2.2] Set up FFT parameters:
    
@@ -215,8 +215,8 @@ SUBROUTINE DA_Solve_PoissonEqn_FST( xb, xbx, xp, del2b, b,          &
 
 !  Apply (i',j,k' -> i,j',k') transpose ( v1y -> v1x ).
 
-   call transpose_y2x ( xp )
-   call transpose_y2x_v2 ( xp )
+   call da_transpose_y2x ( xp )
+   call da_transpose_y2x_v2 ( xp )
 
 !  Set up FFT parameters:
    
@@ -265,7 +265,7 @@ SUBROUTINE DA_Solve_PoissonEqn_FST( xb, xbx, xp, del2b, b,          &
 
 !  Apply (i,j',k') -> i',j',k ) transpose to restore v1z.
 
-   call transpose_x2z ( xp )
+   call da_transpose_x2z ( xp )
 
 !------------------------------------------------------------------------------
 !  [5.0] Tidy up:

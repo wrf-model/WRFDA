@@ -10,7 +10,7 @@
 !           storage order.  Memory for global objects is allocated here.  
 !           Global objects are minimally allocated to save memory.  
 !           Memory must be deallocated by the caller via a call to 
-!           y_facade_free().  
+!           da_y_facade_free().  
 !           Memory for local object re_slice is deallocated here.  Do not 
 !           use re_slice after this call.  
 !           The "template" argument is needed because some tasks may not 
@@ -148,7 +148,7 @@
 !  3) Refactor below...  
 !  4) Optimize performance.  
 ! At the moment this refactoring is relatively low-priority since 
-! y_facade_to_global() is already well-encapsulated and peformance is not 
+! da_y_facade_to_global() is already well-encapsulated and peformance is not 
 ! (yet) a concern for testing.  
      ! Loop over vector and scalar elements
      DO i=template%lbnd,template%ubnd

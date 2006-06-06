@@ -3,7 +3,7 @@
 
 PROGRAM wrfvar
 
-  USE module_wrfvar_top
+  USE da_wrfvar_top
 
 !<DESCRIPTION>
 ! Main program of WRFVAR.  Responsible for starting up, reading in (and
@@ -18,13 +18,13 @@ PROGRAM wrfvar
   IMPLICIT NONE
 
   !--Initialize WRFVAR
-  CALL wrfvar_init
+  CALL da_wrfvar_init
 
   !--WRFVAR Calls integrate().  
-  CALL wrfvar_run
+  CALL da_wrfvar_run
 
   !--WRFVAR clean-up.  This calls MPI_FINALIZE() for DM parallel runs.  
-  CALL wrfvar_finalize
+  CALL da_wrfvar_finalize
 
 END PROGRAM wrfvar
 

@@ -16,8 +16,8 @@ be :		arch                    \
 		gen_be_diags_read       \
                 advance_cymdh
 
-GEN_BE_OBJS = da_gen_be.o DA_Constants.o be_spectral.o LAPACK.o BLAS.o module_wrf_error.o \
-  da_fftpack5.o da_tracing.o da_memory.o
+GEN_BE_OBJS = da_gen_be.o da_constants.o da_be_spectral.o lapack.o blas.o module_wrf_error.o \
+  fftpack5.o da_tracing.o da_memory.o
 
 gen_be_stage0_wrf : gen_be_stage0_wrf.o
 	$(LD) -o gen_be_stage0_wrf.exe $(LDFLAGS) $(GEN_BE_OBJS)  gen_be_stage0_wrf.o -L$(NETCDF)/lib -lnetcdf $(EXTRA_LIBS)
@@ -60,7 +60,7 @@ gen_be_diags_read : gen_be_diags_read.o
 
 gen_be_stage0_wrf.o: $(GEN_BE_OBJS)
 	$(RM) $@
-	$(FC) -c $(FCFLAGS) -I${NETCDF}/include gen_be_stage0_wrf.F
+	$(FC) -c $(FCFLAGS) -I${NETCDF}/include gen_be_stage0_wrf.f90
 
 # DEPENDENCIES : only dependencies after this line (don't remove the word DEPENDENCIES)
 

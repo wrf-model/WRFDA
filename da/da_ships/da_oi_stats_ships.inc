@@ -68,7 +68,7 @@ SUBROUTINE DA_OI_Stats_Ships ( stats_unit, oi )
   call da_proc_sum_int( nv )
   call da_proc_sum_int( nt )
   call da_proc_sum_int( np )
-  call proc_sum_int( nq )
+  call da_proc_sum_int( nq )
 
   call da_proc_stats_combine(Ships%average%u, Ships%rms_err%u, &
                           Ships%minimum%u%value, Ships%maximum%u%value, &

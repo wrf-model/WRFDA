@@ -29,14 +29,14 @@ subroutine da_transform_xtoy_qscat_adj( iv, xp, jo_grad_y, jo_grad_x )
 
 !        [1.2] Interpolate horizontally:
 #ifndef DEREF_KLUDGE
-         call Interp_Obs_lin_2D_adj(jo_grad_x % u, xp, i, j, dx, dy, dxm, dym, &
+         call da_Interp_Obs_lin_2D_adj(jo_grad_x % u, xp, i, j, dx, dy, dxm, dym, &
                                     jo_grad_y%qscat(n)%u, iv%qscat(n)%zk)
-         call Interp_Obs_lin_2D_adj(jo_grad_x % v, xp, i, j, dx, dy, dxm, dym, &
+         call da_Interp_Obs_lin_2D_adj(jo_grad_x % v, xp, i, j, dx, dy, dxm, dym, &
                                     jo_grad_y%qscat(n)%v, iv%qscat(n)%zk)
 #else
-         call Interp_Obs_lin_2D_adj(jo_grad_x % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+         call da_Interp_Obs_lin_2D_adj(jo_grad_x % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                                     jo_grad_y%qscat(n)%u, iv%qscat(n)%zk)
-         call Interp_Obs_lin_2D_adj(jo_grad_x % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+         call da_Interp_Obs_lin_2D_adj(jo_grad_x % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                                     jo_grad_y%qscat(n)%v, iv%qscat(n)%zk)
 #endif
        endif

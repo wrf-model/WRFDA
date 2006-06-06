@@ -265,7 +265,7 @@ subroutine da_write_analysis_mm5( ix, jy, kz, xp, xb, xa, it )
 !------------------------------------------------------------------------------
 
 !  Collect U component of wind increments into global buffer.
-   call local_to_global( xp, xa % u, gbuf, 3 ) 
+   call da_local_to_global( xp, xa % u, gbuf, 3 ) 
    call wrf_dm_bcast_real( gbuf, size3d )
 
 !  Convert increments (global 2D) B-grid buffer and store into (local) u_bgrid.
@@ -275,7 +275,7 @@ subroutine da_write_analysis_mm5( ix, jy, kz, xp, xb, xa, it )
    end do
 
 ! Gather u_bgrid across processors into global buffer.
-   call local_to_global( xp, u_bgrid, gbuf, 3 ) 
+   call da_local_to_global( xp, u_bgrid, gbuf, 3 ) 
 
    IF ( wrf_dm_on_monitor() ) THEN
 
@@ -297,7 +297,7 @@ subroutine da_write_analysis_mm5( ix, jy, kz, xp, xb, xa, it )
    END IF   !end if(wrf_dm_on_monitor())
 
 !  Collect V component of wind increments into global buffer.
-   call local_to_global( xp, xa % v, gbuf, 3 )
+   call da_local_to_global( xp, xa % v, gbuf, 3 )
    call wrf_dm_bcast_real( gbuf, size3d )
   
 !  Convert increments (global 2D) B-grid buffer and store into (local) v_bgrid.
@@ -307,7 +307,7 @@ subroutine da_write_analysis_mm5( ix, jy, kz, xp, xb, xa, it )
    end do
 
 ! Gather v_bgrid across processors into global buffer.
-   call local_to_global( xp, v_bgrid, gbuf, 3 )
+   call da_local_to_global( xp, v_bgrid, gbuf, 3 )
 
    IF ( wrf_dm_on_monitor() ) THEN
 
@@ -333,33 +333,33 @@ subroutine da_write_analysis_mm5( ix, jy, kz, xp, xb, xa, it )
 !------------------------------------------------------------------------------
 
 !w
-     call local_to_global( xp, xa % w, gbuf, 3 )
+     call da_local_to_global( xp, xa % w, gbuf, 3 )
      IF ( wrf_dm_on_monitor() ) THEN
        w_global(1:ix,1:jy,1:kz) = gbuf(1:ix,1:jy,1:kz)
 !      w_global(1:ix,1:jy,1:kz+1) = gbuf(1:ix,1:jy,1:kz+1)
      END IF
 
 !t
-     call local_to_global( xp, xa % t, gbuf, 3 )
+     call da_local_to_global( xp, xa % t, gbuf, 3 )
      IF ( wrf_dm_on_monitor() ) THEN
        t_global(1:ix,1:jy,1:kz) = gbuf(1:ix,1:jy,1:kz)
        tgglobal (1:ix,1:jy)  = gbuf(1:ix,1:jy,kz)
      END IF
 
-     call local_to_global( xp, xa % p, gbuf, 3 )
+     call da_local_to_global( xp, xa % p, gbuf, 3 )
      IF ( wrf_dm_on_monitor() ) THEN
        p_global(1:ix,1:jy,1:kz) = gbuf(1:ix,1:jy,1:kz)
      END IF
 
 !q
-     call local_to_global( xp, xa % q, gbuf, 3 )
+     call da_local_to_global( xp, xa % q, gbuf, 3 )
      IF ( wrf_dm_on_monitor() ) THEN
        q_global(1:ix,1:jy,1:kz) = gbuf(1:ix,1:jy,1:kz)
      END IF
 
 !qcw
      if ( write_qcw ) then
-     call local_to_global( xp, xa % qcw, gbuf, 3 )
+     call da_local_to_global( xp, xa % qcw, gbuf, 3 )
      IF ( wrf_dm_on_monitor() ) THEN
        qcw_global(1:ix,1:jy,1:kz) = gbuf(1:ix,1:jy,1:kz)
      END IF
@@ -367,7 +367,7 @@ subroutine da_write_analysis_mm5( ix, jy, kz, xp, xb, xa, it )
 
 !qrn
      if ( write_qrn ) then
-     call local_to_global( xp, xa % qrn, gbuf, 3 )
+     call da_local_to_global( xp, xa % qrn, gbuf, 3 )
      IF ( wrf_dm_on_monitor() ) THEN
        qrn_global(1:ix,1:jy,1:kz) = gbuf(1:ix,1:jy,1:kz)
      END IF
@@ -375,7 +375,7 @@ subroutine da_write_analysis_mm5( ix, jy, kz, xp, xb, xa, it )
 
 !qci
      if ( write_qci ) then
-     call local_to_global( xp, xa % qci, gbuf, 3 )
+     call da_local_to_global( xp, xa % qci, gbuf, 3 )
      IF ( wrf_dm_on_monitor() ) THEN
        qci_global(1:ix,1:jy,1:kz) = gbuf(1:ix,1:jy,1:kz)
      END IF
@@ -383,7 +383,7 @@ subroutine da_write_analysis_mm5( ix, jy, kz, xp, xb, xa, it )
 
 !qsn
      if ( write_qsn ) then
-     call local_to_global( xp, xa % qsn, gbuf, 3 )
+     call da_local_to_global( xp, xa % qsn, gbuf, 3 )
      IF ( wrf_dm_on_monitor() ) THEN
        qsn_global(1:ix,1:jy,1:kz) = gbuf(1:ix,1:jy,1:kz)
      END IF
@@ -391,7 +391,7 @@ subroutine da_write_analysis_mm5( ix, jy, kz, xp, xb, xa, it )
 
 !qgr
      if ( write_qgr ) then
-     call local_to_global( xp, xa % qgr, gbuf, 3 )
+     call da_local_to_global( xp, xa % qgr, gbuf, 3 )
      IF ( wrf_dm_on_monitor() ) THEN
        qgr_global(1:ix,1:jy,1:kz) = gbuf(1:ix,1:jy,1:kz)
      END IF

@@ -32,4 +32,4 @@
 #   include <r1f5kf.inc>          
 #   include <r1fgkf.inc>   
        
-      end module da_fftpack5
+      end module fftpack5

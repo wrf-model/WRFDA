@@ -147,7 +147,7 @@ SUBROUTINE DA_Setup_FirstGuess_WRF( xbx, grid, &
        "Check the map_set correctness::::::::::::::::::::::::"
 
 !    Domain center:
-     call  da_latlon_to_ij(map_info, grid%cen_lat, grid%cen_lon, start_x, start_y)
+     call  latlon_to_ij(map_info, grid%cen_lat, grid%cen_lon, start_x, start_y)
      WRITE(UNIT=stdout,FMT='(/"Center: latc,lonc,x,y, Xc, Yc:",6f10.3/)') &
                  grid%cen_lat, grid%cen_lon, start_x, start_y, &
                  real(xp%ide-xp%ids+2)/2., real(xp%jde-xp%jds+2)/2.

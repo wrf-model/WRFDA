@@ -47,32 +47,32 @@ SUBROUTINE DA_Write_KMA_Increments(xp, xb, xa)
       ALLOCATE (    q_g (1:ix,1:jy,1:kz) )
       ALLOCATE (    p_g (1:ix,1:jy,1:kz) )
 
-      call local_to_global( xp, xa % psfc, gbuf_2d, 2 ) 
+      call da_local_to_global( xp, xa % psfc, gbuf_2d, 2 ) 
       IF ( wrf_dm_on_monitor() ) THEN 
         psfc_g(1:ix,1:jy) = gbuf_2d(1:ix,1:jy) 
       END IF 
 
-      call local_to_global( xp, xa % u, gbuf, 3 ) 
+      call da_local_to_global( xp, xa % u, gbuf, 3 ) 
       IF ( wrf_dm_on_monitor() ) THEN 
         u_g(1:ix,1:jy,1:kz) = gbuf(1:ix,1:jy,1:kz) 
       END IF 
 
-      call local_to_global( xp, xa % v, gbuf, 3 ) 
+      call da_local_to_global( xp, xa % v, gbuf, 3 ) 
       IF ( wrf_dm_on_monitor() ) THEN 
         v_g(1:ix,1:jy,1:kz) = gbuf(1:ix,1:jy,1:kz) 
       END IF 
 
-      call local_to_global( xp, xa % t, gbuf, 3 ) 
+      call da_local_to_global( xp, xa % t, gbuf, 3 ) 
       IF ( wrf_dm_on_monitor() ) THEN 
         t_g(1:ix,1:jy,1:kz) = gbuf(1:ix,1:jy,1:kz) 
       END IF 
 
-      call local_to_global( xp, xa % q, gbuf, 3 ) 
+      call da_local_to_global( xp, xa % q, gbuf, 3 ) 
       IF ( wrf_dm_on_monitor() ) THEN 
         q_g(1:ix,1:jy,1:kz) = gbuf(1:ix,1:jy,1:kz) 
       END IF 
 
-      call local_to_global( xp, xa % p, gbuf, 3 ) 
+      call da_local_to_global( xp, xa % p, gbuf, 3 ) 
       IF ( wrf_dm_on_monitor() ) THEN 
         p_g(1:ix,1:jy,1:kz) = gbuf(1:ix,1:jy,1:kz) 
       END IF 

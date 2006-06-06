@@ -41,8 +41,8 @@ real function da_dot_cv( cv_size, cv_size_domain, x, y, xp, mzs )
          allocate( yg(1:cv_size_domain) )
       ENDIF
 
-      call cv_to_global( cv_size, cv_size_domain, x, xp, mzs, xg )
-      call cv_to_global( cv_size, cv_size_domain, x, xp, mzs, yg )
+      call da_cv_to_global( cv_size, cv_size_domain, x, xp, mzs, xg )
+      call da_cv_to_global( cv_size, cv_size_domain, x, xp, mzs, yg )
 
       IF ( wrf_dm_on_monitor() ) THEN
          dtemp1 = da_dot( cv_size_domain, xg, yg )

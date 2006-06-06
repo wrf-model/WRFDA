@@ -50,8 +50,10 @@ DA_OBJS        =	da_solve_v3d.o		\
                         da_wrfvar_io.o      \
 	   		da_wrfvar_top.o
 
-libwrfvar.a : $(DA_OBJS)
-	$(AR) ru libwrfvar.a $(DA_OBJS)
+libwrfvar.a : $(DA_OBJS) $(LAPACK_OBJS) $(FFTPACK_OBJS) $(BUFR_OBJS) \
+              $(BLAS_OBJS)
+	$(AR) ru libwrfvar.a $(DA_OBJS) $(LAPACK_OBJS) $(FFTPACK_OBJS) \
+              $(BUFR_OBJS) $(BLAS_OBJS)
 	$(RANLIB) libwrfvar.a
 
 ##########################################################################
