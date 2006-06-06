@@ -45,32 +45,32 @@ SUBROUTINE da_transform_xtoy_bogus_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
         ! [1.1] Adjoint feedback from Y to X for u and v:
 
 #ifndef DEREF_KLUDGE
-        call Interp_lin_3D_adj(jo_grad_x % u, xp, i, j, dx, dy, dxm, dym, &
+        call da_interp_lin_3d_adj(jo_grad_x % u, xp, i, j, dx, dy, dxm, dym, &
                                jo_grad_y%bogus(n)%u, num_levs,            &
                                iv%bogus(n)%zk, num_levs)
-        call Interp_lin_3D_adj(jo_grad_x % v, xp, i, j, dx, dy, dxm, dym, &
+        call da_interp_lin_3d_adj(jo_grad_x % v, xp, i, j, dx, dy, dxm, dym, &
                                jo_grad_y%bogus(n)%v, num_levs,            &
                                iv%bogus(n)%zk, num_levs)
-        call Interp_lin_3D_adj(jo_grad_x % t, xp, i, j, dx, dy, dxm, dym, &
+        call da_interp_lin_3d_adj(jo_grad_x % t, xp, i, j, dx, dy, dxm, dym, &
                                jo_grad_y%bogus(n)%t, num_levs,            &
                                iv%bogus(n)%zk, num_levs)
-        call Interp_lin_3D_adj(jo_grad_x % q, xp, i, j, dx, dy, dxm, dym, &
+        call da_interp_lin_3d_adj(jo_grad_x % q, xp, i, j, dx, dy, dxm, dym, &
                                jo_grad_y%bogus(n)%q, num_levs,            &
                                iv%bogus(n)%zk, num_levs)
 #else
-        call Interp_lin_3D_adj(jo_grad_x % u(xp%ims,xp%jms,xp%kms), &
+        call da_interp_lin_3d_adj(jo_grad_x % u(xp%ims,xp%jms,xp%kms), &
                                xp, i, j, dx, dy, dxm, dym, &
                                jo_grad_y%bogus(n)%u(1), num_levs, &
                                iv%bogus(n)%zk(1), num_levs)
-        call Interp_lin_3D_adj(jo_grad_x % v(xp%ims,xp%jms,xp%kms), &
+        call da_interp_lin_3d_adj(jo_grad_x % v(xp%ims,xp%jms,xp%kms), &
                                xp, i, j, dx, dy, dxm, dym, &
                                jo_grad_y%bogus(n)%v(1), num_levs, &
                                iv%bogus(n)%zk(1), num_levs)
-        call Interp_lin_3D_adj(jo_grad_x % t(xp%ims,xp%jms,xp%kms), &
+        call da_interp_lin_3d_adj(jo_grad_x % t(xp%ims,xp%jms,xp%kms), &
                                xp, i, j, dx, dy, dxm, dym, &
                                jo_grad_y%bogus(n)%t(1), num_levs, &
                                iv%bogus(n)%zk(1), num_levs)
-        call Interp_lin_3D_adj(jo_grad_x % q(xp%ims,xp%jms,xp%kms), &
+        call da_interp_lin_3d_adj(jo_grad_x % q(xp%ims,xp%jms,xp%kms), &
                                xp, i, j, dx, dy, dxm, dym, &
                                jo_grad_y%bogus(n)%q(1), num_levs, &
                                iv%bogus(n)%zk(1), num_levs)
@@ -97,7 +97,7 @@ SUBROUTINE da_transform_xtoy_bogus_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
         ! 1.2.2 Compute the feedback from SLP to p, t, q, and psfc 
         !       at the observed location:
 
-        call DA_TPQ_To_SLP_Adj(model_t, model_q ,model_p_c,    &
+        call da_tpq_to_slp_adj(model_t, model_q ,model_p_c,    &
                               terr_loc,  psfc_loc,   &
                               tt, qq, pp, ppsfc,     &
                               jo_grad_y%bogus(n)%slp, xp)  

@@ -60,7 +60,7 @@ subroutine DA_Transform_Through_RF( mz, grid_box_area, rf_alpha, val,&
 !  [2.1] Apply (i',j',k -> i,j',k') (xp % v1z -> xp % v1x)
 !--------convert from vertical column to x-stripe
 
-   call transpose_z2x ( xp )
+   call da_transpose_z2x ( xp )
 
 !  [2.2] Apply 1D filter in x direction:
 
@@ -104,7 +104,7 @@ subroutine DA_Transform_Through_RF( mz, grid_box_area, rf_alpha, val,&
 !  [4.1] Apply (i',j,k' -> i',j',k ) (xp % v1y -> xp % v1z)
 !--------convert from y-stripe to vertical column.
    
-   call transpose_y2z ( xp )
+   call da_transpose_y2z ( xp )
 
 !  [4.2] Transform filtered field to dimensional space:
 

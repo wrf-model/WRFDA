@@ -26,15 +26,18 @@ advance_cymdh : advance_cymdh.o
 	$(FC) -o advance_cymdh advance_cymdh.o
 
 advance_cymdh.o : advance_cymdh.F
-	$(FC) -c $(FCFLAGS) -o advance_cymdh.o advance_cymdh.F
+	$(FC) -c $(FCFLAGS) -o advance_cymdh.o advance_cymdh.f90
 
 bufr_little_endian.exe : bufr_little_endian.o
 			$(RM) $@
-			$(FC) -o bufr_little_endian.exe bufr_little_endian.o $(DA_SRC)/da_bufrlib.o \
-                          $(DA_SRC)/bort_exit.o $(DA_SRC)/restd.o $(DA_SRC)/wrdesc.o
+			$(FC) -o bufr_little_endian.exe bufr_little_endian.o \
+                          $(EXTERNAL)/bufr_ncep_nco/bufrlib.o \
+                          $(EXTERNAL)/bufr_ncep_nco/bort_exit.o \
+                          $(EXTERNAL)/bufr_ncep_nco/restd.o \
+                          $(EXTERNAL)/bufr_ncep_nco/wrdesc.o
 
-bufr_little_endian.o : $(DA_SRC)/bort_exit.o $(DA_SRC)/restd.o $(DA_SRC)/wrdesc.o $(DA_SRC)/da_bufrlib.o
-			$(CPP) $(CPPFLAGS) bufr_little_endian.F > bufr_little_endian.f
+bufr_little_endian.o : $(DA)/bort_exit.o $(DA)/restd.o $(DA)/wrdesc.o $(EXTERNAL)/bufr_ncep_nco/bufrlib.o
+			$(CPP) $(CPPFLAGS) bufr_little_endian.f90 > bufr_little_endian.f
 			$(FC) -c $(FIXEDFLAGS_ENDIAN) bufr_little_endian.f
 
 

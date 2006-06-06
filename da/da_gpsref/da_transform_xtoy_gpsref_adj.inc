@@ -1,4 +1,4 @@
-SUBROUTINE DA_TRANSFORM_XTOY_GPSRef_ADJ( iv, xp, jo_grad_y, jo_grad_x, xb)
+SUBROUTINE da_transform_xtoy_gpsref_adj( iv, xp, jo_grad_y, jo_grad_x, xb)
 
    IMPLICIT NONE
 
@@ -30,11 +30,11 @@ SUBROUTINE DA_TRANSFORM_XTOY_GPSRef_ADJ( iv, xp, jo_grad_y, jo_grad_x, xb)
          dym = iv%gpsref(n)%loc%dym
 
 #ifndef DEREF_KLUDGE
-         call Interp_lin_3D_adj(jo_grad_x %ref, xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_lin_3d_adj(jo_grad_x %ref, xp, i, j, dx, dy, dxm, dym, &
                                 jo_grad_y%gpsref(n)%ref, num_levs, &
                                 iv%gpsref(n)%zk, num_levs)
 #else
-         call Interp_lin_3D_adj(jo_grad_x %ref(xp%ims,xp%jms,xp%kms), xp, &
+         call da_interp_lin_3d_adj(jo_grad_x %ref(xp%ims,xp%jms,xp%kms), xp, &
                                 i, j, dx, dy, dxm, dym, &
                                 jo_grad_y%gpsref(n)%ref(1), num_levs, &
                                 iv%gpsref(n)%zk(1), num_levs)
@@ -44,5 +44,5 @@ SUBROUTINE DA_TRANSFORM_XTOY_GPSRef_ADJ( iv, xp, jo_grad_y, jo_grad_x, xb)
 
    ENDDO
 
-END SUBROUTINE DA_TRANSFORM_XTOY_GPSRef_ADJ
+END SUBROUTINE da_transform_xtoy_gpsref_adj
 

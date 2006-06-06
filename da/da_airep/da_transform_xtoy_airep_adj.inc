@@ -29,18 +29,18 @@ SUBROUTINE da_transform_xtoy_airep_adj( iv, xp, jo_grad_y, jo_grad_x )
 
         ! [1.2] Interpolate horizontally:
 #ifndef DEREF_KLUDGE
-        call Interp_lin_3D_adj(jo_grad_x % u, xp, i, j, dx, dy, dxm, dym, &
+        call da_interp_lin_3d_adj(jo_grad_x % u, xp, i, j, dx, dy, dxm, dym, &
                                jo_grad_y%airep(n)%u, k, iv%airep(n)%zk, k)
-        call Interp_lin_3D_adj(jo_grad_x % v, xp, i, j, dx, dy, dxm, dym, &
+        call da_interp_lin_3d_adj(jo_grad_x % v, xp, i, j, dx, dy, dxm, dym, &
                                jo_grad_y%airep(n)%v, k, iv%airep(n)%zk, k)
-        call Interp_lin_3D_adj(jo_grad_x % t, xp, i, j, dx, dy, dxm, dym, &
+        call da_interp_lin_3d_adj(jo_grad_x % t, xp, i, j, dx, dy, dxm, dym, &
                                jo_grad_y%airep(n)%t, k, iv%airep(n)%zk, k)
 #else
-        call Interp_lin_3D_adj(jo_grad_x % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+        call da_interp_lin_3d_adj(jo_grad_x % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                                jo_grad_y%airep(n)%u(1), k, iv%airep(n)%zk(1), k)
-        call Interp_lin_3D_adj(jo_grad_x % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+        call da_interp_lin_3d_adj(jo_grad_x % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                                jo_grad_y%airep(n)%v(1), k, iv%airep(n)%zk(1), k)
-        call Interp_lin_3D_adj(jo_grad_x % t(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+        call da_interp_lin_3d_adj(jo_grad_x % t(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                                jo_grad_y%airep(n)%t(1), k, iv%airep(n)%zk(1), k)
 #endif
       endif

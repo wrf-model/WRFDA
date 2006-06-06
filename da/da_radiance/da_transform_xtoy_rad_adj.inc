@@ -162,13 +162,13 @@ SUBROUTINE da_transform_xtoy_rad_adj ( iv, xp, jo_grad_y, jo_grad_x )
 !
 !        [4.3] Interpolate horizontally from ob to grid:
 !
-         call Interp_lin_3D_adj( jo_grad_x%t, xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_lin_3d_adj( jo_grad_x%t, xp, i, j, dx, dy, dxm, dym, &
                               con_vars_ad(nprofiles)% t, max_ob_levels, zk, num_levs )
                               
-         call Interp_lin_3D_adj( jo_grad_x%q, xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_lin_3d_adj( jo_grad_x%q, xp, i, j, dx, dy, dxm, dym, &
                               con_vars_ad(nprofiles)% q, max_ob_levels, zk, num_levs )
                               
-         call Interp_lin_2D_adj(jo_grad_x% psfc, xp%ims, xp%ime, xp%jms, xp%jme, &
+         call da_interp_lin_2d_adj(jo_grad_x% psfc, xp%ims, xp%ime, xp%jms, xp%jme, &
                              i, j, dx, dy, dxm, dym, con_vars_ad(nprofiles)% ps)
 
 

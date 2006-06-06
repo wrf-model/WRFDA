@@ -78,7 +78,7 @@ SUBROUTINE da_transform_xtoy_Radar_Adj( xb, iv, xp, jo_grad_y, jo_grad_x )
              
               IF ( iv % Radar(n) % rf(k) % qc >= obs_qc_pointer ) THEN
 
-                call da_reflectivity_Adj( jo_grad_y%Radar(n)%rf(k), &
+                call da_reflectivity_adj( jo_grad_y%Radar(n)%rf(k), &
                      model_rho(k), model_qrn(k), model_rhob(k), model_qrnb(k) )
 
               ENDIF
@@ -90,7 +90,7 @@ SUBROUTINE da_transform_xtoy_Radar_Adj( xb, iv, xp, jo_grad_y, jo_grad_x )
 
                 zr=iv%Radar(n)%height(k) - iv%Radar(n)%stn_loc%elv
 
-                call da_radial_velocity_Adj( jo_grad_y%Radar(n)%rv(k), &
+                call da_radial_velocity_adj( jo_grad_y%Radar(n)%rv(k), &
                      model_p(k), model_u(k), model_v(k), model_w(k),  &
                      model_qrn(k), model_ps, xr, yr, zr, model_qrnb(k) )
 
@@ -108,29 +108,29 @@ SUBROUTINE da_transform_xtoy_Radar_Adj( xb, iv, xp, jo_grad_y, jo_grad_x )
 !        [1.6] Interpolate horizontally from crs points:
 
 #ifndef DEREF_KLUDGE
-         call Interp_Lin_3D_Adj(jo_grad_x % wh, xp,   &
+         call da_interp_lin_3d_adj(jo_grad_x % wh, xp,   &
                             i, j, dx, dy, dxm, dym, &
                             model_w, num_levs, iv%Radar(n)%zk, &
                             num_levs )
-         call Interp_lin_3D_Adj(jo_grad_x % qrn, xp, &
+         call da_interp_lin_3d_adj(jo_grad_x % qrn, xp, &
                             i, j, dx, dy, dxm, dym, &
                             model_qrn, num_levs, iv%Radar(n)%zk, &
                             num_levs)
-         call Interp_Lin_3D_Adj(jo_grad_x % v, xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_lin_3d_adj(jo_grad_x % v, xp, i, j, dx, dy, dxm, dym, &
                              model_v, num_levs, iv%Radar(n)%zk, num_levs)
-         call Interp_Lin_3D_Adj(jo_grad_x % u, xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_lin_3d_adj(jo_grad_x % u, xp, i, j, dx, dy, dxm, dym, &
                              model_u, num_levs, iv%Radar(n)%zk, num_levs)
 #else
-         call Interp_Lin_3D_Adj(jo_grad_x % wh(xp%ims,xp%jms,xp%kms), xp,  &
+         call da_interp_lin_3d_adj(jo_grad_x % wh(xp%ims,xp%jms,xp%kms), xp,  &
                                 i, j, dx, dy, dxm, dym, model_w(1), &
                                 num_levs, iv%Radar(n)%zk(1), num_levs )
-         call Interp_Lin_3D_Adj(jo_grad_x%qrn(xp%ims,xp%jms,xp%kms), & 
+         call da_interp_lin_3d_adj(jo_grad_x%qrn(xp%ims,xp%jms,xp%kms), & 
                                 xp, i, j, dx, dy, dxm, dym, model_qrn(1), &
                                 num_levs, iv%Radar(n)%zk(1), num_levs )
-         call Interp_Lin_3D_Adj(jo_grad_x % v(xp%ims,xp%jms,xp%kms), xp, &
+         call da_interp_lin_3d_adj(jo_grad_x % v(xp%ims,xp%jms,xp%kms), xp, &
                              i, j, dx, dy, dxm, dym, &
                              model_v(1), num_levs, iv%Radar(n)%zk(1), num_levs)
-         call Interp_Lin_3D_Adj(jo_grad_x % u(xp%ims,xp%jms,xp%kms), xp, &
+         call da_interp_lin_3d_adj(jo_grad_x % u(xp%ims,xp%jms,xp%kms), xp, &
                              i, j, dx, dy, dxm, dym, &
                              model_u(1), num_levs, iv%Radar(n)%zk(1), num_levs)
 #endif

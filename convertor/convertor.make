@@ -57,8 +57,8 @@ module_kma_wave2grid.o: \
 		kma_wave2grid/WAVMAG.inc \
 		kma_wave2grid/WEIHT2.inc \
 		kma_wave2grid/ZNME2PXX.inc \
-		kma_wave2grid/module_kma_wave2grid.F
-		$(CPP) -I./kma_wave2grid $(CPPFLAGS) kma_wave2grid/module_kma_wave2grid.F > module_kma_wave2grid.f
+		kma_wave2grid/module_kma_wave2grid.f90
+		$(CPP) -I./kma_wave2grid $(CPPFLAGS) kma_wave2grid/module_kma_wave2grid.f90 > module_kma_wave2grid.f
 		$(FC) -c -I./kma_wave2grid $(FIXEDFLAGS) module_kma_wave2grid.f
 
 module_wave2grid_kma.o: \
@@ -94,8 +94,8 @@ module_wave2grid_kma.o: \
 		wave2grid_kma/PREGSM1.inc \
 		wave2grid_kma/Einc_to_Ganl.inc \
 		wave2grid_kma/RELHUM.inc       \
-		wave2grid_kma/module_wave2grid_kma.F
-		$(CPP) -I./wave2grid_kma $(CPPFLAGS) wave2grid_kma/module_wave2grid_kma.F > module_wave2grid_kma.f
+		wave2grid_kma/module_wave2grid_kma.f90
+		$(CPP) -I./wave2grid_kma $(CPPFLAGS) wave2grid_kma/module_wave2grid_kma.f90 > module_wave2grid_kma.f
 		$(FC) -c -I./wave2grid_kma $(FIXEDFLAGS) module_wave2grid_kma.f
 
 # DEPENDENCIES : only dependencies after this line (don't remove the word DEPENDENCIES)

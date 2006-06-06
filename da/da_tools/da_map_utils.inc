@@ -77,7 +77,7 @@ END SUBROUTINE da_map_init
         "Set true latitude 1 for all projections!")
     ENDIF
    
-    CALL map_init(proj) 
+    CALL da_map_init(proj) 
     proj%code  = proj_code
     proj%lat1 = lat1
     proj%lon1 = lon1
@@ -102,7 +102,7 @@ END SUBROUTINE da_map_init
         IF (print_detail_map) THEN
            WRITE(UNIT=stdout,FMT='(A)') 'Setting up POLAR STEREOGRAPHIC map...'
         END IF
-        CALL set_ps(proj)
+        CALL da_set_ps(proj)
 
       CASE(PROJ_LC)
         IF (print_detail_map) THEN
@@ -115,13 +115,13 @@ END SUBROUTINE da_map_init
            END IF
           proj%truelat2=proj%truelat1
         ENDIF
-        CALL set_lc(proj)
+        CALL da_set_lc(proj)
    
       CASE (PROJ_MERC)
         IF (print_detail_map) THEN
            WRITE(UNIT=stdout,FMT='(A)') 'Setting up MERCATOR map...'
         END IF
-        CALL set_merc(proj)
+        CALL da_set_merc(proj)
    
       CASE (PROJ_LATLON)
         IF (print_detail_map) THEN
@@ -157,18 +157,18 @@ END SUBROUTINE da_map_init
     SELECT CASE(proj%code)
  
       CASE(PROJ_LATLON)
-        CALL llij_latlon(lat,lon,proj,i,j)
+        CALL da_llij_latlon(lat,lon,proj,i,j)
 
       CASE(PROJ_MERC)
-        CALL llij_merc(lat,lon,proj,i,j)
+        CALL da_llij_merc(lat,lon,proj,i,j)
         i = i + proj%knowni - 1.0
         j = j + proj%knownj - 1.0
 
       CASE(PROJ_PS)
-        CALL llij_ps(lat,lon,proj,i,j)
+        CALL da_llij_ps(lat,lon,proj,i,j)
       
       CASE(PROJ_LC)
-        CALL llij_lc(lat,lon,proj,i,j)
+        CALL da_llij_lc(lat,lon,proj,i,j)
         i = i + proj%knowni - 1.0
         j = j + proj%knownj - 1.0
 
@@ -204,21 +204,21 @@ END SUBROUTINE da_map_init
     SELECT CASE (proj%code)
 
       CASE (PROJ_LATLON)
-        CALL ijll_latlon(i, j, proj, lat, lon)
+        CALL da_ijll_latlon(i, j, proj, lat, lon)
 
       CASE (PROJ_MERC)
         i = ii - proj%knowni + 1.0
         j = jj - proj%knownj + 1.0
-        CALL ijll_merc(i, j, proj, lat, lon)
+        CALL da_ijll_merc(i, j, proj, lat, lon)
 
       CASE (PROJ_PS)
-        CALL ijll_ps(i, j, proj, lat, lon)
+        CALL da_ijll_ps(i, j, proj, lat, lon)
 
       CASE (PROJ_LC)
 
         i = ii - proj%knowni + 1.0
         j = jj - proj%knownj + 1.0
-        CALL ijll_lc(i, j, proj, lat, lon)
+        CALL da_ijll_lc(i, j, proj, lat, lon)
 
       CASE DEFAULT
         WRITE(UNIT=errmsg(1),FMT='(A,I2)') &
@@ -388,7 +388,7 @@ END SUBROUTINE da_map_init
     REAL                               :: ctl1r
 
     ! Compute cone factor
-    CALL lc_cone(proj%truelat1, proj%truelat2, proj%cone)
+    CALL da_lc_cone(proj%truelat1, proj%truelat2, proj%cone)
     IF (print_detail_map) THEN
        PRINT '(A,F8.6)', 'Computed cone factor: ', proj%cone
     END IF

@@ -1,4 +1,4 @@
-SUBROUTINE DA_Transform_XToY_PolarAMV_Adj ( iv, xp, jo_grad_y, jo_grad_x )
+SUBROUTINE da_transform_xtoy_polaramv_adj ( iv, xp, jo_grad_y, jo_grad_x )
 
 !-------------------------------------------------------------------------
 !  HISTORY:
@@ -39,14 +39,14 @@ SUBROUTINE DA_Transform_XToY_PolarAMV_Adj ( iv, xp, jo_grad_y, jo_grad_x )
          dxm = iv%polaramv(n)%loc%dxm
 
 #ifndef DEREF_KLUDGE
-         call Interp_lin_3D_adj(jo_grad_x % u, xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_lin_3d_adj(jo_grad_x % u, xp, i, j, dx, dy, dxm, dym, &
                                 jo_grad_y%polaramv(n)%u, k, iv%polaramv(n)%zk, k)
-         call Interp_lin_3D_adj(jo_grad_x % v, xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_lin_3d_adj(jo_grad_x % v, xp, i, j, dx, dy, dxm, dym, &
                                 jo_grad_y%polaramv(n)%v, k, iv%polaramv(n)%zk, k)
 #else
-         call Interp_lin_3D_adj(jo_grad_x % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_lin_3d_adj(jo_grad_x % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                                 jo_grad_y%polaramv(n)%u(1), k, iv%polaramv(n)%zk(1), k)
-         call Interp_lin_3D_adj(jo_grad_x % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_lin_3d_adj(jo_grad_x % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                                 jo_grad_y%polaramv(n)%v(1), k, iv%polaramv(n)%zk(1), k)
 #endif
        endif
@@ -55,4 +55,4 @@ SUBROUTINE DA_Transform_XToY_PolarAMV_Adj ( iv, xp, jo_grad_y, jo_grad_x )
 
    END IF
 
-END SUBROUTINE DA_Transform_XToY_PolarAMV_Adj
+END SUBROUTINE da_transform_xtoy_polaramv_adj

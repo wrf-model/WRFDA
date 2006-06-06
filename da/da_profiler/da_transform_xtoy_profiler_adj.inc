@@ -33,14 +33,14 @@ SUBROUTINE da_transform_xtoy_profiler_adj( iv, xp, jo_grad_y, jo_grad_x )
          dxm = iv%profiler(n)%loc%dxm
 
 #ifndef DEREF_KLUDGE
-         call Interp_lin_3D_adj(jo_grad_x % u, xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_lin_3d_adj(jo_grad_x % u, xp, i, j, dx, dy, dxm, dym, &
                                 jo_grad_y%profiler(n)%u, k, iv%profiler(n)%zk, k)
-         call Interp_lin_3D_adj(jo_grad_x % v, xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_lin_3d_adj(jo_grad_x % v, xp, i, j, dx, dy, dxm, dym, &
                                 jo_grad_y%profiler(n)%v, k, iv%profiler(n)%zk, k)
 #else
-         call Interp_lin_3D_adj(jo_grad_x % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_lin_3d_adj(jo_grad_x % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                                 jo_grad_y%profiler(n)%u(1), k, iv%profiler(n)%zk(1), k)
-         call Interp_lin_3D_adj(jo_grad_x % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_lin_3d_adj(jo_grad_x % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                                 jo_grad_y%profiler(n)%v(1), k, iv%profiler(n)%zk(1), k)
 #endif
        endif

@@ -66,16 +66,16 @@ SUBROUTINE da_analysis_stats ( stats_unit, xp, xa )
          'q     i    j          '
    END IF
 
-   call maxmin_in_field(xa%u(is:ie,js:je,ks:ke), max_u, min_u)
-   call proc_maxmin_combine(kdim, max_u, min_u)
-   call maxmin_in_field(xa%v(is:ie,js:je,ks:ke), max_v, min_v)
-   call proc_maxmin_combine(kdim, max_v, min_v)
-   call maxmin_in_field(xa%t(is:ie,js:je,ks:ke), max_t, min_t)
-   call proc_maxmin_combine(kdim, max_t, min_t)
-   call maxmin_in_field(xa%p(is:ie,js:je,ks:ke), max_p, min_p)
-   call proc_maxmin_combine(kdim, max_p, min_p)
-   call maxmin_in_field(xa%q(is:ie,js:je,ks:ke), max_q, min_q)
-   call proc_maxmin_combine(kdim, max_q, min_q)
+   call da_maxmin_in_field(xa%u(is:ie,js:je,ks:ke), max_u, min_u)
+   call da_proc_maxmin_combine(kdim, max_u, min_u)
+   call da_maxmin_in_field(xa%v(is:ie,js:je,ks:ke), max_v, min_v)
+   call da_proc_maxmin_combine(kdim, max_v, min_v)
+   call da_maxmin_in_field(xa%t(is:ie,js:je,ks:ke), max_t, min_t)
+   call da_proc_maxmin_combine(kdim, max_t, min_t)
+   call da_maxmin_in_field(xa%p(is:ie,js:je,ks:ke), max_p, min_p)
+   call da_proc_maxmin_combine(kdim, max_p, min_p)
+   call da_maxmin_in_field(xa%q(is:ie,js:je,ks:ke), max_q, min_q)
+   call da_proc_maxmin_combine(kdim, max_q, min_q)
 
    um = 999999.0
    vm = 999999.0
@@ -150,11 +150,11 @@ SUBROUTINE da_analysis_stats ( stats_unit, xp, xa )
       qv(k) = sum(xa%q(is:ie,js:je,k))
    end do
 
-   call proc_sum_real ( kdim, uv )
-   call proc_sum_real ( kdim, vv )
-   call proc_sum_real ( kdim, tv )
-   call proc_sum_real ( kdim, pv )
-   call proc_sum_real ( kdim, qv )
+   call da_proc_sum_real ( kdim, uv )
+   call da_proc_sum_real ( kdim, vv )
+   call da_proc_sum_real ( kdim, tv )
+   call da_proc_sum_real ( kdim, pv )
+   call da_proc_sum_real ( kdim, qv )
 
    IF ( wrf_dm_on_monitor() ) THEN
       do k = ks, ke
@@ -203,11 +203,11 @@ SUBROUTINE da_analysis_stats ( stats_unit, xp, xa )
       enddo
    end do
 
-   call proc_sum_real ( kdim, uv )
-   call proc_sum_real ( kdim, vv )
-   call proc_sum_real ( kdim, tv )
-   call proc_sum_real ( kdim, pv )
-   call proc_sum_real ( kdim, qv )
+   call da_proc_sum_real ( kdim, uv )
+   call da_proc_sum_real ( kdim, vv )
+   call da_proc_sum_real ( kdim, tv )
+   call da_proc_sum_real ( kdim, pv )
+   call da_proc_sum_real ( kdim, qv )
 
    IF ( wrf_dm_on_monitor() ) THEN
       do k = ks, ke
@@ -234,7 +234,7 @@ SUBROUTINE da_analysis_stats ( stats_unit, xp, xa )
 
 CONTAINS
 
-   subroutine maxmin_in_field(field, max, min)
+   subroutine da_maxmin_in_field(field, max, min)
 
       REAL                  :: field(is:ie,js:je,ks:ke)
 
@@ -259,6 +259,6 @@ CONTAINS
          end do
       end do
 
-   end subroutine maxmin_in_field
+   end subroutine da_maxmin_in_field
    
 END SUBROUTINE da_analysis_stats
