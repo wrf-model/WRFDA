@@ -31,121 +31,11 @@ module da_define_structures
    IMPLICIT NONE
    
 !-----------------------------------------------------------------------------
-!  [1.0] MM5 model structure definition:
-!-----------------------------------------------------------------------------
-
-   type big_record_header
-      integer(kind=4)                   :: header_flag
-      integer(kind=4), dimension(50,20) :: bhi
-      real(kind=4),    dimension(20,20) :: bhr
-      character(80),   dimension(50,20) :: bhic
-      character(80),   dimension(20,20) :: bhrc
-   end type big_record_header
-
-   type sub_record_header
-      integer(kind=4)   :: ndim
-
-      integer(kind=4), dimension(4) :: start_index, end_index
-
-      real(kind=4)      :: current_time
-
-      character(len= 4) :: staggering, ordering
-      character(len= 8) :: char_date
-      character(len= 9) :: name
-      character(len=24) :: current_date
-      character(len=25) :: units
-      character(len=46) :: description
-   end type sub_record_header
-
-   TYPE mm5_model_type
-      integer :: num_of_var
-
-      TYPE (big_record_header)                             :: big_header
-
-      TYPE (sub_record_header), dimension(max_num_of_var)  :: sub_header
-
-!     Variables held on grid:
-      REAL, POINTER    :: u(:,:,:)
-      REAL, POINTER    :: v(:,:,:)
-      REAL, POINTER    :: t(:,:,:)
-      REAL, POINTER    :: q(:,:,:)
-      REAL, POINTER    :: pp_c(:,:,:)
-      REAL, POINTER    :: w(:,:,:)
-
-      REAL, POINTER    :: qcw(:,:,:)
-      REAL, POINTER    :: qrn(:,:,:)
-      REAL, POINTER    :: qci(:,:,:)
-      REAL, POINTER    :: qsn(:,:,:)
-      REAL, POINTER    :: qgr(:,:,:)
-
-      REAL, POINTER    :: psi(:,:,:)
-      REAL, POINTER    :: chi(:,:,:)
-      REAL, POINTER    :: blnc_p(:,:,:)
-      REAL, POINTER    :: rh(:,:,:)
-
-      REAL, POINTER    :: psac(:,:)
-      REAL, POINTER    :: cori(:,:)
-      REAL, POINTER    :: latc(:,:)
-      REAL, POINTER    :: lonc(:,:)
-      REAL, POINTER    :: latd(:,:)
-      REAL, POINTER    :: lond(:,:)
-      REAL, POINTER    :: msfc(:,:)
-      REAL, POINTER    :: msfd(:,:)
-      REAL, POINTER    :: tgrn(:,:)
-      REAL, POINTER    :: terr(:,:)
-      REAL, POINTER    :: lanu(:,:)
-      REAL, POINTER    :: snow(:,:)
-      REAL, POINTER    :: landmask(:,:)
-      REAL, POINTER    :: sigmah(:)
-      REAL, POINTER    :: psad(:,:)
-
-      REAL, POINTER    ::      t_eval_glo(:)
-      REAL, POINTER    ::      q_eval_glo(:)
-      REAL, POINTER    ::    psi_eval_glo(:)
-      REAL, POINTER    ::    chi_eval_glo(:)
-      REAL, POINTER    :: blnc_p_eval_glo(:)
-      REAL, POINTER    ::     rh_eval_glo(:)
-
-      REAL, POINTER    ::      t_evec_glo(:,:)
-      REAL, POINTER    ::      q_evec_glo(:,:)
-      REAL, POINTER    ::    psi_evec_glo(:,:)
-      REAL, POINTER    ::    chi_evec_glo(:,:)
-      REAL, POINTER    :: blnc_p_evec_glo(:,:)
-      REAL, POINTER    ::     rh_evec_glo(:,:)
-
-      REAL, POINTER    ::      t_eval_loc(:,:)
-      REAL, POINTER    ::      q_eval_loc(:,:)
-      REAL, POINTER    ::    psi_eval_loc(:,:)
-      REAL, POINTER    ::    chi_eval_loc(:,:)
-      REAL, POINTER    :: blnc_p_eval_loc(:,:)
-      REAL, POINTER    ::     rh_eval_loc(:,:)
-
-      REAL, POINTER    ::      t_evec_loc(:,:,:)
-      REAL, POINTER    ::      q_evec_loc(:,:,:)
-      REAL, POINTER    ::    psi_evec_loc(:,:,:)
-      REAL, POINTER    ::    chi_evec_loc(:,:,:)
-      REAL, POINTER    :: blnc_p_evec_loc(:,:,:)
-      REAL, POINTER    ::     rh_evec_loc(:,:,:)
-
-      REAL, POINTER    ::      t_sl(:)
-      REAL, POINTER    ::      q_sl(:)
-      REAL, POINTER    ::    psi_sl(:)
-      REAL, POINTER    ::    chi_sl(:)
-      REAL, POINTER    :: blnc_p_sl(:)
-      REAL, POINTER    ::     rh_sl(:)
-
-      REAL, POINTER    :: pb_vert_reg(:,:,:)
-
-   END TYPE mm5_model_type
-
-!-----------------------------------------------------------------------------
 !  [2.0] Background field structure definition:
 !-----------------------------------------------------------------------------
 
 !ajb Extracted non-grid variables from xb_type  
    TYPE xbx_type
-      TYPE (big_record_header)                             :: big_header
-      TYPE (sub_record_header), dimension(max_num_of_var)  :: sub_header
 
       CHARACTER (len=4):: mminlu
 
@@ -996,11 +886,9 @@ module da_define_structures
 CONTAINS
 
 #include "da_allocate_background_errors.inc"
-#include "da_allocate_mm5_model.inc"
 #include "da_allocate_observations.inc"
 #include "da_allocate_y.inc"
 #include "da_deallocate_background_errors.inc"
-#include "da_deallocate_mm5_model.inc"
 #include "da_deallocate_observations.inc"
 #include "da_deallocate_y.inc"
 #include "da_zero_x.inc"

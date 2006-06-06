@@ -23,7 +23,6 @@ DA_OBJS        =	da_solve_v3d.o		\
 			da_pseudo.o		\
 			da_profiler.o		\
 			da_buoy.o   		\
-			da_readwrite_mm5.o	\
 			da_dynamics.o		\
 			da_physics.o		\
 			da_ffts.o		\
@@ -34,8 +33,6 @@ DA_OBJS        =	da_solve_v3d.o		\
 			da_grid_definitions.o	\
 			da_statistics.o		\
 			da_define_structures.o	\
-			da_h_ops.o		\
-			da_c_mat.o		\
 			da_constants.o		\
 			da_spectral.o           \
 			da_radiance.o		\
@@ -60,18 +57,18 @@ libwrfvar.a : $(DA_OBJS) $(LAPACK_OBJS) $(FFTPACK_OBJS) $(BUFR_OBJS) \
 
 wrfvar.o : da_wrfvar_top.o
 
-da_wrfvar_top.o : da_wrfvar_top.f90 \
-                  da_wrfvar_init.inc \
-                  da_wrfvar_run.inc \
-                  da_wrfvar_finalize.inc \
+da_wrfvar_top.o : da_wrfvar_top.f90       \
+                  da_wrfvar_init.inc      \
+                  da_wrfvar_run.inc       \
+                  da_wrfvar_finalize.inc  \
                   da_wrfvar_interface.inc \
-                  module_integrate.o \
+                  module_integrate.o      \
                   da_wrfvar_io.o
 
-da_wrfvar_esmf_super.o : da_wrfvar_esmf_super.f90 \
-                             da_esmf_init.inc \
-                             da_esmf_run.inc \
-                             da_esmf_finalize.inc \
+da_wrfvar_esmf_super.o : da_wrfvar_esmf_super.f90    \
+                             da_esmf_init.inc        \
+                             da_esmf_run.inc         \
+                             da_esmf_finalize.inc    \
                              da_wrfvar_interface.inc
 
 da_wrfvar_io.o : module_io_domain.o  \
@@ -90,7 +87,6 @@ da_par_util.o:		da_par_util.f90                   \
 			da_copy_tile_dims.inc             \
 			da_cv_to_vv.inc                   \
 			da_local_to_global.inc            \
-			da_mm5_struct_bcast.inc           \
 			da_pack_count_obs.inc             \
 			da_proc_maxmin_combine.inc        \
 			da_proc_stats_combine.inc         \
@@ -111,7 +107,7 @@ da_par_util.o:		da_par_util.f90                   \
 
 da_par_util1.o:		da_par_util1.f90                  \
 			da_proc_sum_int.inc               \
-			da_proc_sum_real.inc \
+			da_proc_sum_real.inc              \
                         module_wrf_error.o
 
 da_solve_v3d.o:		da_constants.o			\
@@ -174,12 +170,10 @@ da_setup_structures.o:	da_setup_structures.f90           \
 			da_ssmi.o                         \
 			da_vtox_transforms.o              \
 			da_physics.o                      \
-			da_h_ops.o                        \
 	                bufrlib.o                         \
 	                bort_exit.o                       \
 	                restd.o                           \
 	                wrdesc.o                          \
-	                da_readwrite_mm5.o                \
 	                da_spectral.o                     \
 			da_radiance.o                     \
 			da_add_increments.inc             \
@@ -188,14 +182,12 @@ da_setup_structures.o:	da_setup_structures.f90           \
 			da_get_vertical_truncation.inc    \
 			da_interpolate_regcoeff.inc       \
 			da_interpolate_stats.inc          \
-			da_write_interpolated_be.inc      \
 			da_rescale_background_errors.inc  \
 			da_setup_background_errors.inc    \
 			da_get_bins_info.inc              \
 			da_setup_be_global.inc            \
 			da_setup_be_regional.inc          \
 			da_setup_firstguess.inc           \
-			da_setup_firstguess_mm5.inc       \
 			da_setup_firstguess_wrf.inc       \
 			da_setup_firstguess_kma.inc       \
 			da_setup_obs_structures.inc       \
@@ -203,7 +195,6 @@ da_setup_structures.o:	da_setup_structures.f90           \
 			da_setup_obs_structures_bufr.inc  \
 			da_setup_obs_interp_wts.inc       \
 			da_setup_runconstants.inc         \
-			da_transfer_mm5toxb.inc           \
 			da_transfer_wrftoxb.inc           \
 			da_transfer_kmatoxb.inc           \
 			da_transfer_xatowrf.inc           \
@@ -226,7 +217,7 @@ da_vtox_transforms.o:	da_vtox_transforms.f90            \
 			da_constants.o                    \
 			da_dynamics.o                     \
 			da_physics.o                      \
-			fftpack5.o                     \
+			fftpack5.o                        \
 			da_spectral.o                     \
 			da_ssmi.o                         \
                         da_tracing.o                      \
@@ -344,14 +335,13 @@ da_geoamv.o:		da_geoamv.f90                    \
 			da_check_max_iv_geoamv.inc       \
 			da_get_innov_vector_geoamv.inc
 
-da_polaramv.o:		\
-			da_constants.o \
-			da_par_util.o \
-			da_define_structures.o \
-			da_interpolation.o \
-			da_statistics.o \
-			da_tools.o \
-			da_polaramv.f90                    \
+da_polaramv.o:		da_polaramv.f90                    \
+			da_constants.o                     \
+			da_par_util.o                      \
+			da_define_structures.o             \
+			da_interpolation.o                 \
+			da_statistics.o                    \
+			da_tools.o                         \
 			da_ao_stats_polaramv.inc           \
 			da_get_jo_and_grady_polaramv.inc   \
 			da_calculate_residual_polaramv.inc \
@@ -602,7 +592,7 @@ da_ssmi.o:		da_ssmi.f90                         \
 			da_transform_xtozrhoq.inc           \
 			da_transform_xtozrhoq_lin.inc       \
 			da_transform_xtozrhoq_adj.inc       \
-			da_cal_sigma_v.inc                     \
+			da_cal_sigma_v.inc                  \
 			da_cal_jo_and_grady_ssmt1.inc       \
 			da_cal_jo_and_grady_ssmt2.inc       \
 			da_cal_residual_ssmt1.inc           \
@@ -661,7 +651,6 @@ da_profiler.o:		da_profiler.f90                     \
 			da_check_max_iv_profiler.inc        \
 			da_get_innov_vector_profiler.inc
 
-
 da_buoy.o:		da_buoy.f90                         \
 			da_constants.o                      \
 			da_par_util.o                       \
@@ -679,38 +668,6 @@ da_buoy.o:		da_buoy.f90                         \
 			da_transform_xtoy_buoy_adj.inc      \
 			da_check_max_iv_buoy.inc            \
 			da_get_innov_vector_buoy.inc
-
-da_readwrite_mm5.o:	da_readwrite_mm5.f90                \
-	                da_constants.o                      \
-			da_define_structures.o              \
-			da_grid_definitions.o               \
-			da_par_util.o                       \
-			da_h_ops.o                          \
-			da_crs_to_dot.inc                   \
-			da_cleanrows.inc                    \
-			da_print_big_header.inc             \
-			da_print_sub_header.inc             \
-			da_read_mm5.inc                     \
-			da_write_analysis_mm5.inc
-
-da_h_ops.o:		da_h_ops.f90                        \
-			da_c_mat.o                          \
-			a2b.inc                             \
-			a2c.inc                             \
-			b2a.inc                             \
-			c2a.inc                             \
-			graph.inc                           \
-			hops2.inc
-
-
-da_c_mat.o:		da_c_mat.f90                        \
-			cpt_constd.inc                      \
-			cpt_consts.inc                      \
-			pmat1.inc                           \
-			pmat2.inc                           \
-			powmat.inc                          \
-			set_vops.inc                        \
-                        da_constants.o
 
 da_dynamics.o:		da_dynamics.f90                     \
 			da_constants.o                      \
@@ -879,11 +836,9 @@ da_define_structures.o:	da_define_structures.f90            \
 			da_constants.o                      \
                         da_tracing.o                        \
 			da_allocate_background_errors.inc   \
-			da_allocate_mm5_model.inc           \
 			da_allocate_observations.inc        \
 			da_allocate_y.inc                   \
 			da_deallocate_background_errors.inc \
-			da_deallocate_mm5_model.inc         \
 			da_deallocate_observations.inc      \
 			da_deallocate_y.inc                 \
 			da_zero_x.inc                       \
@@ -963,7 +918,7 @@ da_test.o:	       da_test.f90                          \
 			da_check_xtoy_adjoint_ssmt1.inc     \
 			da_check_xtoy_adjoint_ssmt2.inc     \
 			da_setup_testfield.inc              \
-			set_tst_trnsf_fld.inc
+			da_set_tst_trnsf_fld.inc
 
 da_gen_be.o:		da_gen_be.f90                    \
                         module_wrf_error.o               \

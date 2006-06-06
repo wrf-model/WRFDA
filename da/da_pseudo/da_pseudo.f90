@@ -36,7 +36,7 @@ CONTAINS
 #include <da_print_stats_pseudo.inc>
 #include <da_transform_xtoy_pseudo.inc>
 #include <da_transform_xtoy_pseudo_adj.inc>
-#include "DA_Calculate_GradY_Pseudo.inc"
+#include <da_calculate_grady_pseudo.inc>
 
 END MODULE da_pseudo
 

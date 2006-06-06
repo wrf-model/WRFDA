@@ -1,4 +1,4 @@
-SUBROUTINE DA_Test_VToY_Transform(grid, config_flags, vp, vv, &
+SUBROUTINE da_test_vtoy_transform(grid, config_flags, vp, vv, &
                                   xb, xbx, xp, be, xa, iv, y,&
                                   ids,ide, jds,jde, kds,kde, &
                                   ims,ime, jms,jme, kms,kme, &
@@ -48,7 +48,7 @@ SUBROUTINE DA_Test_VToY_Transform(grid, config_flags, vp, vv, &
 !-------------------------------------------------------------------------
 
    write(unit=*, fmt='(/a/a)') &
-        '       DA_Test_VToY_Transform:',&
+        '       da_test_vtoy_transform:',&
         '---------------------------------------'
 
 
@@ -57,11 +57,11 @@ SUBROUTINE DA_Test_VToY_Transform(grid, config_flags, vp, vv, &
 
    cv_2(1:cv_size) = cv(1:cv_size)
 
-   call DA_zero_x(xa)
+   call da_zero_x(xa)
    call da_zero_vp_type(vp)
    call da_zero_vp_type(vv)
 
-   call DA_Transform_VToY(be, cv, iv, vp, vv, xa, xb, xbx, xp, y, &
+   call da_transform_vtoy(be, cv, iv, vp, vv, xa, xb, xbx, xp, y, &
                              ids, ide, jds, jde, kds, kde,  &
                              ims, ime, jms, jme, kms, kme,  &
                              its, ite, jts, jte, kts, kte,  &
@@ -82,7 +82,7 @@ SUBROUTINE DA_Test_VToY_Transform(grid, config_flags, vp, vv, &
 !   call da_zero_vp_type(vv)
 !   call da_zero_x(xa)      
 !
-   call DA_Transform_VToY_Adj(be, cv, iv, vp, vv, xa, xb, xbx, xp, y, &
+   call da_transform_vtoy_adj(be, cv, iv, vp, vv, xa, xb, xbx, xp, y, &
                                  ids, ide, jds, jde, kds, kde,     &
                                  ims, ime, jms, jme, kms, kme,     &
                                  its, ite, jts, jte, kts, kte,     &
@@ -115,4 +115,4 @@ SUBROUTINE DA_Test_VToY_Transform(grid, config_flags, vp, vv, &
 #endif
 
 
-END SUBROUTINE DA_Test_VToY_Transform
+END SUBROUTINE da_test_vtoy_transform

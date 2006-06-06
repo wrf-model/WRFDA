@@ -1,4 +1,4 @@
-subroutine DA_Transform_VvToVp( evec, eval, vertical_wgt, &
+subroutine da_transform_vvtovp( evec, eval, vertical_wgt, &
                                 vv, vp, mz, &
                                 ids,ide, jds,jde, kds,kde,  &
                                 ims,ime, jms,jme, kms,kme,  &
@@ -62,5 +62,5 @@ subroutine DA_Transform_VvToVp( evec, eval, vertical_wgt, &
 
    IF (trace_use) CALL da_trace_exit("da_transform_vvtovp")
 
-END subroutine DA_Transform_VvToVp
+END subroutine da_transform_vvtovp
 

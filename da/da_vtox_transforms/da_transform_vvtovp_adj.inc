@@ -1,4 +1,4 @@
-SUBROUTINE DA_Transform_VvToVp_Adj( evec, eval, vertical_wgt, &
+SUBROUTINE da_transform_vvtovp_adj( evec, eval, vertical_wgt, &
                                     vp, vv, mz, &
                                     ids,ide, jds,jde, kds,kde,  &
                                     ims,ime, jms,jme, kms,kme,  &
@@ -6,11 +6,6 @@ SUBROUTINE DA_Transform_VvToVp_Adj( evec, eval, vertical_wgt, &
 
 !------------------------------------------------------------------------------
 !  PURPOSE: Adjoint of DA_Transform_VvToVp.
-!
-!  METHOD:  Standard adjoint coding.
-!
-!  HISTORY: 06/06/2000 - Creation of F90 version.           Dale Barker
-!           09/18/2003 - Modified for WRF.                  Wei Huang
 !------------------------------------------------------------------------------
 
    implicit none
@@ -63,5 +58,5 @@ SUBROUTINE DA_Transform_VvToVp_Adj( evec, eval, vertical_wgt, &
   IF (trace_use) CALL da_trace_exit("da_transform_vvtovp_adj")
 
 
-END SUBROUTINE DA_Transform_VvToVp_Adj
+END SUBROUTINE da_transform_vvtovp_adj
 

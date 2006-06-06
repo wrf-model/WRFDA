@@ -60,9 +60,6 @@ subroutine DA_Transfer_XatoAnalysis( it, xbx, grid, config_flags ,&
    else if(fg_format == 2) then
       if(it < max_ext_its) then
          call da_add_increments(it, xp, xa, xb, xbx)
-      else
-         call da_write_analysis_mm5(xb%mix, xb%mjy, xb%mkz, &
-                                    xp, xb, xa, it)
       endif
    else if(fg_format == 3) then
       call DA_Transfer_XatoKMA( xbx, grid, &

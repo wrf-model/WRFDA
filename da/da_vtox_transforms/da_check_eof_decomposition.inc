@@ -54,7 +54,7 @@ SUBROUTINE da_check_eof_decomposition( be_eigenval, be_eigenvec, name )
 
    ! [2.1] Print out global eigenvectors:
 
-   WRITE(UNIT=stdout,FMT='(3A)') ' DA_Check_EOF_Decomposition:', &
+   WRITE(UNIT=stdout,FMT='(3A)') ' da_check_eof_decomposition:', &
                    ' Domain eigenvectors for ', trim(name)
 
    WRITE(UNIT=stdout,FMT='(50i13)')( m, m=1,kz)

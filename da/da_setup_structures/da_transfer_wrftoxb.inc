@@ -1,4 +1,4 @@
-SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
+SUBROUTINE da_transfer_wrftoxb( xbx, grid, &
 !
 #include <em_dummy_args.inc>
 !
@@ -76,11 +76,6 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
    xb % mix = xp % ide - xp % ids + 1
    xb % mjy = xp % jde - xp % jds + 1
    xb % mkz = xp % kde - xp % kds + 1
-
-   xbx%big_header%bhi(5,5) = grid%start_year
-   xbx%big_header%bhi(6,5) = grid%start_month
-   xbx%big_header%bhi(7,5) = grid%start_day
-   xbx%big_header%bhi(8,5) = grid%start_hour
 
 !---------------------------------------------------------------------------
 !--WRF-specific fields:
@@ -497,7 +492,7 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
 
    xbx % mminlu = 'USGS'
 
-   call roughness_from_lanu(19, xbx % mminlu, current_date, xp, &
+   call da_roughness_from_lanu(19, xbx % mminlu, current_date, xp, &
 #ifdef DEREF_KLUDGE
                             xb % lanu(xp%ims,xp%jms), xb % rough(xp%ims,xp%jms))
 #else
@@ -545,7 +540,7 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
    do j=js,je
    do k=ks,ke
    do i=is,ie
-      call DA_TPQ_To_RH( xb % t(i,j,k), xb % p(i,j,k), xb % q(i,j,k), &
+      call da_tpq_to_rh( xb % t(i,j,k), xb % p(i,j,k), xb % q(i,j,k), &
                          xb %es(i,j,k), xb %qs(i,j,k), xb %rh(i,j,k) )
    end do
    end do
@@ -556,11 +551,11 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
 !------------------------------------------------------------------------------
 
 #ifdef DEREF_KLUDGE
-   call DA_TRH_To_TD(xb % rh(xp%ims,xp%jms,xp%kms), &
+   call da_trh_to_td(xb % rh(xp%ims,xp%jms,xp%kms), &
                      xb %  t(xp%ims,xp%jms,xp%kms), &
                      xb % td(xp%ims,xp%jms,xp%kms), xp)
 #else
-   call DA_TRH_To_TD(xb % rh, xb % t, xb % td, xp)
+   call da_trh_to_td(xb % rh, xb % t, xb % td, xp)
 #endif
 
    if(print_detail_xb) then
@@ -586,11 +581,11 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
           'Sea level pressure and total precipitable water'
    endif
 
-   call DA_WRF_TPQ_2_SLP ( xb )
+   call da_wrf_tpq_2_slp ( xb )
 
 !  do j = js,je
 !  do i = is,ie
-!     call DA_TPQ_To_SLP( xb%t(i,j,:), xb%q(i,j,:), xb%p(i,j,:), xb%terr(i,j), &
+!     call da_tpq_to_slp( xb%t(i,j,:), xb%q(i,j,:), xb%p(i,j,:), xb%terr(i,j), &
 !                        xb%psfc(i,j), xb%slp(i,j), xp )
 !  end do
 !  end do
@@ -634,7 +629,7 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
    endif
 
    if ( Use_SsmiTbObs)   &
-   call DA_Transform_XToTb( xb )
+   call da_transform_xtotb( xb )
 
 !------------------------------------------------------------------------------
 !--GPS Refractivity linked by Y.-R. Guo 05/28/2004
@@ -648,7 +643,7 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
           'GPS Refractivity'
    endif
 
-   call da_transform_XTogpsref(xb, xp)
+   call da_transform_xtogpsref(xb, xp)
 
 !------------------------------------------------------------------------------
 !--Ground-based GPS ZTD must follow the GPS Refractivity calculation. YRG 04/05/05
@@ -730,7 +725,7 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
      do j = xp%jts, xp%jte
      do i = xp%its, xp%ite
 
-       CALL DA_CLOUD_MODEL ( xb%t(I,J,:),   xb%p(I,J,:), xb%q(I,J,:), xb%qcw(I,J,:),  &
+       CALL da_cloud_model ( xb%t(I,J,:),   xb%p(I,J,:), xb%q(I,J,:), xb%qcw(I,J,:),  &
                              xb%qrn(I,J,:), xb%h(I,J,:), xb%hf(I,J,:),                &
                              DDT, xp%kts, xp%kte  )
 
@@ -746,5 +741,5 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
    IF (trace_use) CALL da_trace_exit("da_transfer_wrftoxb")
 
 
-END SUBROUTINE DA_Transfer_WRFToXb
+END SUBROUTINE da_transfer_wrftoxb
 

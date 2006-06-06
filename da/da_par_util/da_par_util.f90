@@ -54,7 +54,6 @@ MODULE da_par_util
 #ifdef DM_PARALLEL
 
 #include <da_local_to_global.inc>
-#include <da_mm5_struct_bcast.inc>
 #include <da_proc_sum_count_obs.inc>
 #include <da_proc_stats_combine.inc>
 #include <da_proc_maxmin_combine.inc>

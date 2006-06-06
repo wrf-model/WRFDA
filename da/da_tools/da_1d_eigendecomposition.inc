@@ -47,7 +47,7 @@ subroutine da_1d_eigendecomposition( bx, e, l )
    
    if ( info /= 0 ) then
       WRITE(UNIT=errmsg(1),FMT='(A,I4,A)') &
-         ' DA_Perform_EigenDecomposition: info = ', &
+         ' da_1d_eigendecomposition: info = ', &
          info,' - error in decomposition.'
       CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
    end if

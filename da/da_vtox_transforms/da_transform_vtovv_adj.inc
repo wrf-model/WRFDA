@@ -1,4 +1,4 @@
-   subroutine DA_Transform_VToVv_Adj( cv_size, xb, be, cv, vv, xp, &
+   subroutine da_transform_vtovv_adj( cv_size, xb, be, cv, vv, xp, &
                                       ids,ide, jds,jde, kds,kde,  &
                                       ims,ime, jms,jme, kms,kme,  &
                                       its,ite, jts,jte, kts,kte )
@@ -27,7 +27,7 @@
 
    mz = be % v1 % mz
    IF ( mz > 0 ) then
-      CALL DA_Transform_Through_RF_Adj( mz, xb % grid_box_area, be % v1 % rf_alpha,&
+      CALL da_transform_through_rf_adj( mz, xb % grid_box_area, be % v1 % rf_alpha,&
                                     be % v1 % val, xp, vv % v1, &
                                     ids,ide, jds,jde, kds,kde,  &
                                     ims,ime, jms,jme, kms,kme,  &
@@ -38,7 +38,7 @@
 
    mz = be % v2 % mz
    IF ( mz > 0 ) then
-      CALL DA_Transform_Through_RF_Adj( mz, xb % grid_box_area, be % v2 % rf_alpha,&
+      CALL da_transform_through_rf_adj( mz, xb % grid_box_area, be % v2 % rf_alpha,&
                                     be % v2 % val, xp, vv % v2, &
                                     ids,ide, jds,jde, kds,kde,  &
                                     ims,ime, jms,jme, kms,kme,  &
@@ -49,7 +49,7 @@
 
    mz = be % v3 % mz
    IF ( mz > 0 ) then
-      CALL DA_Transform_Through_RF_Adj( mz, xb % grid_box_area, be % v3 % rf_alpha,&
+      CALL da_transform_through_rf_adj( mz, xb % grid_box_area, be % v3 % rf_alpha,&
                                     be % v3 % val, xp, vv % v3, &
                                     ids,ide, jds,jde, kds,kde,  &
                                     ims,ime, jms,jme, kms,kme,  &
@@ -60,7 +60,7 @@
       
    mz = be % v4 % mz
    IF ( mz > 0 ) then
-      CALL DA_Transform_Through_RF_Adj( mz, xb % grid_box_area, be % v4 % rf_alpha,&
+      CALL da_transform_through_rf_adj( mz, xb % grid_box_area, be % v4 % rf_alpha,&
                                     be % v4 % val, xp, vv % v4, &
                                     ids,ide, jds,jde, kds,kde,  &
                                     ims,ime, jms,jme, kms,kme,  &
@@ -71,7 +71,7 @@
 
    mz = be % v5 % mz
    IF ( mz > 0 ) then
-      CALL DA_Transform_Through_RF_Adj( mz, xb % grid_box_area, be % v5 % rf_alpha,&
+      CALL da_transform_through_rf_adj( mz, xb % grid_box_area, be % v5 % rf_alpha,&
                                     be % v5 % val, xp, vv % v5, &
                                     ids,ide, jds,jde, kds,kde,  &
                                     ims,ime, jms,jme, kms,kme,  &
@@ -82,7 +82,7 @@
 
    mz = be % alpha % mz
    IF ( mz > 0 ) then
-      CALL DA_Transform_Through_RF_adj( mz, xb % grid_box_area, be % alpha % rf_alpha,&
+      CALL da_transform_through_rf_adj( mz, xb % grid_box_area, be % alpha % rf_alpha,&
                                         be % alpha % val, xp, vv % alpha, &
                                         ids,ide, jds,jde, kds,kde,  &
                                         ims,ime, jms,jme, kms,kme,  &
@@ -100,5 +100,5 @@
    IF (trace_use) CALL da_trace_exit("da_transform_vtovv_adj")
 
 
-END subroutine DA_Transform_VToVv_Adj
+END subroutine da_transform_vtovv_adj
 

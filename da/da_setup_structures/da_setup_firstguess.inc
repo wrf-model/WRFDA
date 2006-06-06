@@ -58,12 +58,6 @@ SUBROUTINE DA_Setup_FirstGuess( xbx, grid, &
 #include <em_dummy_args.inc>
 !
                                  )
-
-   else if ( fg_format == 2 ) then
-
-!-----First guess is an MM5 format file:
-      call da_setup_firstguess_mm5(xb, xbx, xp)
-
    else if ( fg_format == 3 ) then
 
 !  First guess is an KMA format file:

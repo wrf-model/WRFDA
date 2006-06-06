@@ -39,8 +39,6 @@ OBJS_FOR_ALL =		da_solve_v3d.o		\
 			da_grid_definitions.o	\
 			da_statistics.o		\
 			da_define_structures.o	\
-			da_h_ops.o		\
-			da_c_mat.o		\
 			da_constants.o		\
 			da_spectral.o           \
 			da_radiance.o		\
@@ -56,8 +54,14 @@ OBJS_FOR_ALL =		da_solve_v3d.o		\
 include ../configure.wrf
 
 TARGETDIR    =  ../..
-wrfvar :		$(OBJS_FOR_ALL)
+wrfvar :	links $(OBJS_FOR_ALL)
 		$(AR) ../main/libwrflib.a $(OBJS_FOR_ALL)
+
+links :
+        $(LN) */*.inc .
+        $(LN) */*.f90 .
+        $(LN) */*.c .
+
 
 ##########################################################################
 
@@ -171,7 +175,6 @@ da_setup_structures.o:	\
 			da_ssmi.o \
 			da_vtox_transforms.o \
 			da_physics.o \
-			da_h_ops.o \
 	                ../external/bufr_ncep_nco/bufrlib.o \
 	                ../external/bufr_ncep_nco/bort_exit.o \
 	                ../external/bufr_ncep_nco/restd.o \
@@ -767,7 +770,6 @@ da_readwrite_mm5.o:	\
 			da_define_structures.o \
 			da_grid_definitions.o \
 			da_par_util.o \
-			da_h_ops.o \
 			da_readwrite_mm5.f90 \
 			da_crs_to_dot.inc \
 			da_cleanrows.inc \
@@ -779,31 +781,6 @@ da_readwrite_mm5.o:	\
 			$(CPP) $(CPPFLAGS) da_readwrite_mm5.f90 > da_readwrite_mm5.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_readwrite_mm5.f
 
-da_h_ops.o:		\
-			da_c_mat.o \
-			a2b.inc \
-			a2c.inc \
-			b2a.inc \
-			c2a.inc \
-			graph.inc \
-			hops2.inc \
-			da_h_ops.f90
-			$(RM) $@
-			$(CPP) $(CPPFLAGS) da_h_ops.f90 > da_h_ops.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_h_ops.f
-
-
-da_c_mat.o:		\
-			da_c_mat.f90 \
-			cpt_constd.inc \
-			cpt_consts.inc \
-			pmat1.inc \
-			pmat2.inc \
-			powmat.inc \
-			set_vops.inc
-			$(RM) $@
-			$(CPP) $(CPPFLAGS) da_c_mat.f90 > da_c_mat.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_c_mat.f
 
 da_dynamics.o:		\
 			da_constants.o \

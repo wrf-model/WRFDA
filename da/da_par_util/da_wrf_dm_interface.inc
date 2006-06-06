@@ -35,13 +35,6 @@ SUBROUTINE da_local_to_global(xp, x, xg, dim)
 
 END SUBROUTINE da_local_to_global
 
-SUBROUTINE da_mm5_struct_bcast( x_mm5 )
-
-   TYPE (mm5_model_type), INTENT(INOUT)   :: x_mm5  ! MM5 model structure.
-
-   RETURN
-END SUBROUTINE da_mm5_struct_bcast
-
 SUBROUTINE da_proc_sum_count_obs ( count_obs )
 
 !------------------------------------------------------------------------------

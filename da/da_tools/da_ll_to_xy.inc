@@ -1,4 +1,4 @@
-SUBROUTINE DA_ll_to_xy (info, loc, xp, &
+SUBROUTINE da_ll_to_xy (info, loc, xp, &
                         outside, inside_halo, outside_all)
 
 !  This routine convert the (lat, lon) into (x,y) coordinates
@@ -32,8 +32,8 @@ SUBROUTINE DA_ll_to_xy (info, loc, xp, &
       CALL da_llxy (info%lat, info%lon, loc%x, loc%y)
    endif
 
-   call da_toGrid (loc%x, xp%its-2, xp%ite+2, loc%i, loc%dx, loc%dxm)
-   call da_toGrid (loc%y, xp%jts-2, xp%jte+2, loc%j, loc%dy, loc%dym)
+   call da_togrid (loc%x, xp%its-2, xp%ite+2, loc%i, loc%dx, loc%dxm)
+   call da_togrid (loc%y, xp%jts-2, xp%jte+2, loc%j, loc%dy, loc%dym)
 
    ! refactor to remove this ugly duplication later
    IF ( PRESENT( outside_all ) ) THEN
@@ -95,5 +95,5 @@ SUBROUTINE DA_ll_to_xy (info, loc, xp, &
       endif
    endif
 
-END SUBROUTINE DA_ll_to_xy
+END SUBROUTINE da_ll_to_xy
 

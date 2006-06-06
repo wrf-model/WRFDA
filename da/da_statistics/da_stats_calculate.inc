@@ -1,4 +1,4 @@
-SUBROUTINE Stats_Calculate( n, k, qc_flag, x, nn, &
+SUBROUTINE da_stats_calculate( n, k, qc_flag, x, nn, &
                             minimum, maximum, &
                             average, rms_err )
 
@@ -29,6 +29,6 @@ SUBROUTINE Stats_Calculate( n, k, qc_flag, x, nn, &
       rms_err = rms_err + x * x
    END IF
 
-END SUBROUTINE Stats_Calculate
+END SUBROUTINE da_stats_calculate
 
 

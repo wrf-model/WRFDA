@@ -1,4 +1,4 @@
-SUBROUTINE DA_Check_XToY_Adjoint_SSMI_Tb ( oi, y, adjtest_lhs, pertile_lhs )
+SUBROUTINE da_check_xtoy_adjoint_ssmi_tb ( oi, y, adjtest_lhs, pertile_lhs )
 !----------------------------------------------------------------------------
    IMPLICIT NONE
 !----------------------------------------------------------------------------
@@ -49,5 +49,5 @@ SUBROUTINE DA_Check_XToY_Adjoint_SSMI_Tb ( oi, y, adjtest_lhs, pertile_lhs )
    end do
   ENDIF
 
-END SUBROUTINE DA_Check_XToY_Adjoint_SSMI_Tb
+END SUBROUTINE da_check_xtoy_adjoint_ssmi_tb
 

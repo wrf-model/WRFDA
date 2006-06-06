@@ -133,7 +133,7 @@ subroutine da_transform_vtox( cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa, &
    enddo
    enddo
 
-   call DA_PT_To_Rho_Lin( xb, xa, xp )
+   call da_pt_to_rho_lin( xb, xa, xp )
  
 ! If Testing_3DVAR = .TRUE., not "XToY" transform needed to do here (YRG):
 !
@@ -142,7 +142,7 @@ subroutine da_transform_vtox( cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa, &
    CALL wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id4)
 
    if (sfc_assi_options == 2) then
-      call DA_Transform_XToWTQ ( xp, xb, xa )
+      call da_transform_xtowtq ( xp, xb, xa )
 !-----Exchange XA (surface variable) halo region.
       CALL wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id6)
    endif
@@ -151,11 +151,11 @@ subroutine da_transform_vtox( cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa, &
         Use_SsmiTbObs .or. Use_SsmiRetrievalObs .or. Use_GpsrefObs) then
 
 !-----Now do something for PW
-      call DA_Transform_XToTPW( xa, xb )
+      call da_transform_xtotpw( xa, xb )
 
 !--------GPS Refractivity:
          if ( use_GpsrefObs ) &
-         call da_transform_XTogpsref_lin(xa, xb, xp)
+         call da_transform_xtogpsref_lin(xa, xb, xp)
 
       if ( use_ssmt1obs .or. use_ssmt2obs .or. &
            Use_SsmiTbObs .or. Use_SsmiRetrievalObs ) then
@@ -163,7 +163,7 @@ subroutine da_transform_vtox( cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa, &
             CALL wrf_error_fatal3(__FILE__,__LINE__, &
             "xb%speed is not available, see da_transfer_kmatoxb.inc")
          end if
-         call DA_Transform_XToSeaSfcWind_Lin( xa, xb )
+         call da_transform_xtoseasfcwind_lin( xa, xb )
       endif
       if ( Use_SsmiTbObs ) call DA_Transform_XToTb_Lin (xa, xb)
 
@@ -177,7 +177,7 @@ subroutine da_transform_vtox( cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa, &
 
    if ( Use_RadarObs ) then
 
-        CALL DA_UVPRho_To_W_Lin( xb, xa, xp,                 &
+        CALL da_uvprho_to_w_lin( xb, xa, xp,                 &
                                  ids,ide, jds,jde, kds,kde,  &
                                  ims,ime, jms,jme, kms,kme,  &
                                  its,ite, jts,jte, kts,kte )
@@ -198,51 +198,51 @@ subroutine da_transform_vtox( cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa, &
 !---------------------------------------------------------------
    if( global )  then   
 #ifndef DEREF_KLUDGE
-    call DA_Get_VPoles(xa%u,xa%v,xb%lon, &
+    call da_get_vpoles(xa%u,xa%v,xb%lon, &
           ids, ide, jds, jde, kds, kde,  &
           ims, ime, jms, jme, kms, kme,  &
           its, ite, jts, jte, kts, kte   )
-    call DA_Get_SPoles(xa%t,             &
+    call da_get_spoles(xa%t,             &
           ids, ide, jds, jde, kds, kde,  &
           ims, ime, jms, jme, kms, kme,  &
           its, ite, jts, jte, kts, kte   )
-    call DA_Get_SPoles(xa%p,             &
+    call da_get_spoles(xa%p,             &
           ids, ide, jds, jde, kds, kde,  &
           ims, ime, jms, jme, kms, kme,  &
           its, ite, jts, jte, kts, kte   )
-    call DA_Get_SPoles(xa%q,             &
+    call da_get_spoles(xa%q,             &
           ids, ide, jds, jde, kds, kde,  &
           ims, ime, jms, jme, kms, kme,  &
           its, ite, jts, jte, kts, kte   )
-    call DA_Get_SPoles(xa%psfc,          &
+    call da_get_spoles(xa%psfc,          &
           ids, ide, jds, jde,   1,   1,  &
           ims, ime, jms, jme,   1,   1,  &
           its, ite, jts, jte,   1,   1   )
 #else
-    call DA_Get_VPoles(xa%u(ims,jms,kms),          &
+    call da_get_vpoles(xa%u(ims,jms,kms),          &
                        xa%v(ims,jms,kms),          &
                        xb%lon(ims,jms),            &
                     ids, ide, jds, jde, kds, kde,  &
                     ims, ime, jms, jme, kms, kme,  &
                     its, ite, jts, jte, kts, kte   )
-    call DA_Get_SPoles(xa%t(ims,jms,kms),          &
+    call da_get_spoles(xa%t(ims,jms,kms),          &
                     ids, ide, jds, jde, kds, kde,  &
                     ims, ime, jms, jme, kms, kme,  &
                     its, ite, jts, jte, kts, kte   )
-    call DA_Get_SPoles(xa%p(ims,jms,kms),          &
+    call da_get_spoles(xa%p(ims,jms,kms),          &
                     ids, ide, jds, jde, kds, kde,  &
                     ims, ime, jms, jme, kms, kme,  &
                     its, ite, jts, jte, kts, kte   )
-    call DA_Get_SPoles(xa%q(ims,jms,kms),          &
+    call da_get_spoles(xa%q(ims,jms,kms),          &
                     ids, ide, jds, jde, kds, kde,  &
                     ims, ime, jms, jme, kms, kme,  &
                     its, ite, jts, jte, kts, kte   )
-    call DA_Get_SPoles(xa%psfc(ims,jms),           &
+    call da_get_spoles(xa%psfc(ims,jms),           &
                     ids, ide, jds, jde,   1,   1,  &
                     ims, ime, jms, jme,   1,   1,  &
                     its, ite, jts, jte,   1,   1   )
 #endif
-    call DA_Set_Boundary_Xa(xa, xb)
+    call da_set_boundary_xa(xa, xb)
    end if   
 
   IF (trace_use) CALL da_trace_exit("da_transform_vtox")

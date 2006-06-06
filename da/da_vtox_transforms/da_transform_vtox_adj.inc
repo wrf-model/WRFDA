@@ -36,46 +36,46 @@ subroutine da_transform_vtox_adj( cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv, 
    if( global ) then     
 !  Poles treatment for global 3DVAR
 #ifndef DEREF_KLUDGE
-    call DA_Get_AVPoles(xa%u,xa%v,xb%lon,&
+    call da_get_avpoles(xa%u,xa%v,xb%lon,&
           ids, ide, jds, jde, kds, kde,  &
           ims, ime, jms, jme, kms, kme,  &
           its, ite, jts, jte, kts, kte   )
-    call DA_Get_ASPoles(xa%t,            &
+    call da_get_aspoles(xa%t,            &
           ids, ide, jds, jde, kds, kde,  &
           ims, ime, jms, jme, kms, kme,  &
           its, ite, jts, jte, kts, kte   )
-    call DA_Get_ASPoles(xa%p,            &
+    call da_get_aspoles(xa%p,            &
           ids, ide, jds, jde, kds, kde,  &
           ims, ime, jms, jme, kms, kme,  &
           its, ite, jts, jte, kts, kte   )
-    call DA_Get_ASPoles(xa%q,            &
+    call da_get_aspoles(xa%q,            &
           ids, ide, jds, jde, kds, kde,  &
           ims, ime, jms, jme, kms, kme,  &
           its, ite, jts, jte, kts, kte   )
-    call DA_Get_ASPoles(xa%psfc,         &
+    call da_get_aspoles(xa%psfc,         &
           ids, ide, jds, jde,   1,   1,  &
           ims, ime, jms, jme,   1,   1,  &
           its, ite, jts, jte,   1,   1   )
 #else
-    call DA_Get_AVPoles(xa%u(ims,jms,kms),         &
+    call da_get_avpoles(xa%u(ims,jms,kms),         &
                         xa%v(ims,jms,kms),         &
                         xb%lon(ims,jms),           &
                     ids, ide, jds, jde, kds, kde,  &
                     ims, ime, jms, jme, kms, kme,  &
                     its, ite, jts, jte, kts, kte   )
-    call DA_Get_ASPoles(xa%t(ims,jms,kms),         &
+    call da_get_aspoles(xa%t(ims,jms,kms),         &
                     ids, ide, jds, jde, kds, kde,  &
                     ims, ime, jms, jme, kms, kme,  &
                     its, ite, jts, jte, kts, kte   )
-    call DA_Get_ASPoles(xa%p(ims,jms,kms),         &
+    call da_get_aspoles(xa%p(ims,jms,kms),         &
                     ids, ide, jds, jde, kds, kde,  &
                     ims, ime, jms, jme, kms, kme,  &
                     its, ite, jts, jte, kts, kte   )
-    call DA_Get_ASPoles(xa%q(ims,jms,kms),         &
+    call da_get_aspoles(xa%q(ims,jms,kms),         &
                     ids, ide, jds, jde, kds, kde,  &
                     ims, ime, jms, jme, kms, kme,  &
                     its, ite, jts, jte, kts, kte   )
-    call DA_Get_ASPoles(xa%psfc(ims,jms),          &
+    call da_get_aspoles(xa%psfc(ims,jms),          &
                     ids, ide, jds, jde,   1,   1,  &
                     ims, ime, jms, jme,   1,   1,  &
                     its, ite, jts, jte,   1,   1   )
@@ -95,7 +95,7 @@ subroutine da_transform_vtox_adj( cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv, 
         enddo
         enddo
 
-       CALL DA_UVPRho_To_W_Adj( xb, xa, xp,                 &
+       call da_uvprho_to_w_adj( xb, xa, xp,                 &
                                 ids,ide, jds,jde, kds,kde,  &
                                 ims,ime, jms,jme, kms,kme,  &
                                 its,ite, jts,jte, kts,kte)
@@ -110,7 +110,7 @@ subroutine da_transform_vtox_adj( cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv, 
       if ( use_ssmt1obs .or. use_ssmt2obs .or. Use_GpspwObs .or. &
            Use_SsmiTbObs .or. Use_SsmiRetrievalObs .or. use_GpsrefObs) then
 
-         if ( use_ssmiTbobs) call DA_Transform_XToTb_Adj( xa, xb)
+         if ( use_ssmiTbobs) call da_transform_xtotb_adj( xa, xb)
 
          if ( use_ssmt1obs .or. use_ssmt2obs .or. &
               Use_SsmiTbObs .or. Use_SsmiRetrievalObs ) then
@@ -118,24 +118,24 @@ subroutine da_transform_vtox_adj( cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv, 
             CALL wrf_error_fatal3(__FILE__,__LINE__, &
             "xb%speed is not available, see da_transfer_kmatoxb.inc")
          end if
-            call DA_Transform_XToSeaSfcWind_Adj( xa, xb )
+            call da_transform_xtoseasfcwind_adj( xa, xb )
          endif
 
 !--------GPS Refractivity:
          if ( use_GpsrefObs ) &
-            call da_transform_XTogpsref_adj(xa, xb, xp)
+            call da_transform_xtogpsref_adj(xa, xb, xp)
 
 !--------Now for PW.
-         call DA_Transform_XToTPW_ADJ( xa, xb )
+         call da_transform_xtotpw_adj( xa, xb )
 
       end if
 
-      if (sfc_assi_options == 2) call DA_Transform_XToWTQ_adj( xp, xb, xa )
+      if (sfc_assi_options == 2) call da_transform_xtowtq_adj( xp, xb, xa )
 
    endif
 !-------------------------------------------------------------------------
  
-  call DA_PT_To_Rho_Adj( xb, xa )
+  call da_pt_to_rho_adj( xb, xa )
    do j=xb%jts,xb%jte
    do i=xb%its,xb%ite
      if (fg_format == 1) then
@@ -185,14 +185,14 @@ subroutine da_transform_vtox_adj( cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv, 
    enddo
 
  if( global ) then     
-   call DA_Set_Boundary_Xa(xa, xb)
+   call da_set_boundary_xa(xa, xb)
  endif
 
 !-------------------------------------------------------------------------
 !  [3.0]: Perform x = u_p vp transform::
 !-------------------------------------------------------------------------
 
-   call DA_Zero_vp_type ( vp )
+   call da_zero_vp_type ( vp )
    call da_transform_vptox_adj( xb, xbx, xa, vp, be, ep, xp, &
                                 ids,ide, jds,jde, kds,kde,  &
                                 ims,ime, jms,jme, kms,kme,  &
@@ -202,7 +202,7 @@ subroutine da_transform_vtox_adj( cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv, 
 !  [2.0]: Perform vp = u_v vv transform:
 !-------------------------------------------------------------------------
 
-   call DA_Zero_vp_type ( vv )
+   call da_zero_vp_type ( vv )
 
 !  Uv for alpha is a null transform:
    if ( be % ne > 0 ) then
@@ -210,7 +210,7 @@ subroutine da_transform_vtox_adj( cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv, 
    end if
 
    if ( vert_corr == 2 ) then      
-      call DA_Vertical_Transform( 'u_adj', be, &
+      call da_vertical_transform( 'u_adj', be, &
 #ifndef DEREF_KLUDGE
                                   xb % vertical_inner_product, &
 #else
@@ -233,7 +233,7 @@ subroutine da_transform_vtox_adj( cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv, 
 !-------------------------------------------------------------------------
 
    if ( global ) then
-      call DA_Transform_VToVv_Global_Adj( cv_size, xb, xbx, be, cv, vv, &
+      call da_transform_vtovv_global_adj( cv_size, xb, xbx, be, cv, vv, &
                                           ids,ide, jds,jde, kds,kde,  &
                                           ims,ime, jms,jme, kms,kme,  &
                                           its,ite, jts,jte, kts,kte )

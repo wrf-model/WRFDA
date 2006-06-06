@@ -1,4 +1,4 @@
-subroutine DA_Transform_VToVv_Global_Adj ( cv_size, xb, xbx, be, cv, vv, &
+subroutine da_transform_vtovv_global_adj ( cv_size, xb, xbx, be, cv, vv, &
                                            ids, ide, jds, jde, kds, kde, &
                                            ims, ime, jms, jme, kms, kme, &
                                            its, ite, jts, jte, kts, kte )
@@ -117,5 +117,5 @@ subroutine DA_Transform_VToVv_Global_Adj ( cv_size, xb, xbx, be, cv, vv, &
   IF (trace_use) CALL da_trace_exit("da_transform_vtovv_global_adj")
 
 
-end subroutine DA_Transform_VToVv_Global_Adj
+end subroutine da_transform_vtovv_global_adj
 

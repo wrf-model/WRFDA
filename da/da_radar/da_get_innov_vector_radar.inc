@@ -94,42 +94,42 @@ SUBROUTINE da_get_innov_vector_Radar ( it, xb, xp, ob, iv )
 
 #ifndef DEREF_KLUDGE
 
-         call Interp_lin_3D(xb % p, xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_lin_3d(xb % p, xp, i, j, dx, dy, dxm, dym, &
                             model_p, max_ob_levels, iv%Radar(n)%zk, num_levs )
 
-         call Interp_lin_3D(xb % u, xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_lin_3d(xb % u, xp, i, j, dx, dy, dxm, dym, &
                             model_u, max_ob_levels, iv%Radar(n)%zk, num_levs )
 
-         call Interp_lin_3D(xb % v, xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_lin_3d(xb % v, xp, i, j, dx, dy, dxm, dym, &
                             model_v, max_ob_levels, iv%Radar(n)%zk, num_levs )
 
-         call Interp_lin_3D(xb % wh, xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_lin_3d(xb % wh, xp, i, j, dx, dy, dxm, dym, &
                             model_w, max_ob_levels, iv%Radar(n)%zk, num_levs )
 
-         call Interp_lin_3D(xb % rho, xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_lin_3d(xb % rho, xp, i, j, dx, dy, dxm, dym, &
                             model_rho, max_ob_levels, iv%Radar(n)%zk, num_levs )
 
-         call Interp_lin_3D(xb % qrn, xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_lin_3d(xb % qrn, xp, i, j, dx, dy, dxm, dym, &
                             model_qrn, max_ob_levels, iv%Radar(n)%zk, num_levs )
 
 #else
 
-         call Interp_lin_3D(xb%p(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_lin_3d(xb%p(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                              model_p(1), max_ob_levels, iv%Radar(n)%zk(1), num_levs )
 
-         call Interp_lin_3D(xb%u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_lin_3d(xb%u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                              model_u(1), max_ob_levels, iv%Radar(n)%zk(1), num_levs )
 
-         call Interp_lin_3D(xb%v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_lin_3d(xb%v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                              model_v(1), max_ob_levels, iv%Radar(n)%zk(1), num_levs )
 
-         call Interp_lin_3D(xb%wh(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_lin_3d(xb%wh(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                              model_w(1), max_ob_levels, iv%Radar(n)%zk(1), num_levs )
 
-         call Interp_lin_3D(xb%rho(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_lin_3d(xb%rho(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                              model_rho(1), max_ob_levels, iv%Radar(n)%zk(1), num_levs )
 
-         call Interp_lin_3D(xb%qrn(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_lin_3d(xb%qrn(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                              model_qrn(1), max_ob_levels, iv%Radar(n)%zk(1), num_levs )
 
 #endif
@@ -152,7 +152,7 @@ SUBROUTINE da_get_innov_vector_Radar ( it, xb, xp, ob, iv )
 ! [3.0] Calculate rv, rf at OBS location and initialise components of innovation vector:
          
          if(fg_format == 1) then
-            call latlon_to_ij(map_info, &
+            call da_latlon_to_ij(map_info, &
                               iv%Radar(n)%stn_loc%lat, iv%Radar(n)%stn_loc%lon, &
                               iv%Radar(n)%stn_loc%x,   iv%Radar(n)%stn_loc%y )
          else
@@ -213,7 +213,7 @@ SUBROUTINE da_get_innov_vector_Radar ( it, xb, xp, ob, iv )
 !------------------------------------------------------------------------
 
       IF (check_max_iv )   & 
-      CALL da_check_max_iv_Radar(it, iv % Radar(n), irv, irf, irvf, irff )
+      CALL da_check_max_iv_radar(it, iv % Radar(n), irv, irf, irvf, irff )
 
        endif
             
@@ -233,5 +233,5 @@ SUBROUTINE da_get_innov_vector_Radar ( it, xb, xp, ob, iv )
      ENDIF
 
 
-END SUBROUTINE da_get_innov_vector_Radar
+END SUBROUTINE da_get_innov_vector_radar
 

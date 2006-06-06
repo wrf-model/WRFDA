@@ -1,4 +1,4 @@
-SUBROUTINE DA_SET_BOUNDARY_3D(var, &
+SUBROUTINE da_set_boundary_3d(var, &
                               ids, ide, jds, jde, kds, kde, &
                               ims, ime, jms, jme, kms, kme, &
                               its, ite, jts, jte, kts, kte)
@@ -27,5 +27,5 @@ SUBROUTINE DA_SET_BOUNDARY_3D(var, &
       enddo
    enddo
 
-END SUBROUTINE DA_Set_Boundary_3d
+END SUBROUTINE da_set_boundary_3d
 

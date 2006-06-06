@@ -1,4 +1,4 @@
-SUBROUTINE DA_Transform_XToVp( xb, xbx, xa, xp, vp, be, ep, &
+SUBROUTINE da_transform_xtovp( xb, xbx, xa, xp, vp, be, ep, &
                                ids,ide, jds,jde, kds,kde,  &
                                ims,ime, jms,jme, kms,kme,  &
                                its,ite, jts,jte, kts,kte )
@@ -35,7 +35,7 @@ SUBROUTINE DA_Transform_XToVp( xb, xbx, xa, xp, vp, be, ep, &
 !  [1.0] Perform transform v = U^{-1} x
 !-------------------------------------------------------------------      
 
-   call DA_Zero_vp_type ( vp )
+   call da_zero_vp_type ( vp )
 
 !  [2.2] Transform u, v to streamfunction via vorticity:
 
@@ -43,9 +43,9 @@ SUBROUTINE DA_Transform_XToVp( xb, xbx, xa, xp, vp, be, ep, &
    CALL wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id3)
 
 #ifndef DEREF_KLUDGE
-   CALL DA_UV_To_Vorticity( xb, xa % u, xa % v, vor, &
+   CALL da_uv_to_vorticity( xb, xa % u, xa % v, vor, &
 #else
-   CALL DA_UV_To_Vorticity( xb, xa % u(ims,jms,kms), &
+   call da_uv_to_vorticity( xb, xa % u(ims,jms,kms), &
                             xa % v(ims,jms,kms), &
                             vor(ims,jms,kms), &
 #endif
@@ -69,15 +69,15 @@ SUBROUTINE DA_Transform_XToVp( xb, xbx, xa, xp, vp, be, ep, &
 
 !  Calculate psi:
   print*,' calling Solve_PoissonEquation for Psi'
-   CALL DA_Solve_PoissonEqn_FCT(xb, xbx, vor, vp%v1, xp)
+   CALL da_solve_poissoneqn_fct(xb, xbx, vor, vp%v1, xp)
 
 !  [2.3] Transform u, v to velocity potential via divergence:
 
   print*,' calling UV_To_Divergence'
 #ifndef DEREF_KLUDGE
-   CALL DA_UV_To_Divergence(xb, xa % u, xa % v, div, &
+   CALL da_uv_to_divergence(xb, xa % u, xa % v, div, &
 #else
-   CALL DA_UV_To_Divergence(xb, xa % u(ims,jms,kms), &
+   call da_uv_to_divergence(xb, xa % u(ims,jms,kms), &
                                 xa % v(ims,jms,kms), &
                             div(ims,jms,kms), &
 #endif
@@ -100,7 +100,7 @@ SUBROUTINE DA_Transform_XToVp( xb, xbx, xa, xp, vp, be, ep, &
 !  Calculate chi:
 
   print*,' calling Solve_PoissonEquation for Chi'
-   CALL DA_Solve_PoissonEqn_FCT(xb, xbx, div, vp%v2, xp)
+   CALL da_solve_poissoneqn_fct(xb, xbx, div, vp%v2, xp)
 
 !  [2.4] Transform chi to chi_u:
   print*,' calculating chi_u'                         
@@ -136,4 +136,4 @@ SUBROUTINE DA_Transform_XToVp( xb, xbx, xa, xp, vp, be, ep, &
      end do
      end do
 
-END SUBROUTINE DA_Transform_XToVp
+END SUBROUTINE da_transform_xtovp

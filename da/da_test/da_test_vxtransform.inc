@@ -1,4 +1,4 @@
-SUBROUTINE DA_Test_VXTransform( xb, xbx, xp, be, &
+SUBROUTINE da_test_vxtransform( xb, xbx, xp, be, &
                                 xa, vv, vp, &
                                 ids,ide, jds,jde, kds,kde, &
                                 ims,ime, jms,jme, kms,kme, &
@@ -56,7 +56,7 @@ SUBROUTINE DA_Test_VXTransform( xb, xbx, xp, be, &
    call da_zero_vp_type(vv1)
 
    write(UNIT=stdout, fmt='(/a/)') &
-        'DA_TestVXTransform:'
+        'da_testvxtransform:'
 
    write(UNIT=stdout, fmt='(/a/)') &
         '---------------------------------------'
@@ -120,7 +120,7 @@ SUBROUTINE DA_Test_VXTransform( xb, xbx, xp, be, &
 !-------------------------------------------------------------------------
 !  [1.0]: Perform VvToVpToVv test:                        
 !-------------------------------------------------------------------------
-!   call DA_Transform_XToVp( xb, xbx, xa, xp, vp, be, &
+!   call da_transform_xtovp( xb, xbx, xa, xp, vp, be, &
 !                           ids,ide, jds,jde, kds,kde, &
 !                           ims,ime, jms,jme, kms,kme, &
 !                           its,ite, jts,jte, kts,kte )
@@ -148,9 +148,9 @@ SUBROUTINE DA_Test_VXTransform( xb, xbx, xp, be, &
    end if
 !-------------------------------------------------------------------------
    write(UNIT=stdout, fmt='(/a/)') &
-        'DA_Check_VvToVpToVv_Errors'
+        'da_check_vvtovptovv_errors'
 
-   call DA_Check_Vp_Errors( vv1, vv, kz_vv, its,ite, jts,jte, kts,kte )
+   call da_check_vp_errors( vv1, vv, kz_vv, its,ite, jts,jte, kts,kte )
 
 !-------------------------------------------------------------------------
 !  [2.0]: Perform VpToVvToVp test:                        
@@ -180,13 +180,13 @@ SUBROUTINE DA_Test_VXTransform( xb, xbx, xp, be, &
 !  Check inverse errors:
 
    write(UNIT=stdout, fmt='(/a/)') &
-        'DA_Check_VpToVvToVp_Errors'
+        'da_check_vptovvtovp_errors'
 
-   call DA_Check_Vp_Errors( vp1, vp, kz_vv, its,ite, jts,jte, kts,kte )
+   call da_check_vp_errors( vp1, vp, kz_vv, its,ite, jts,jte, kts,kte )
 !-------------------------------------------------------------------------
 !  [3.0] Check_CvToVv_Adjoint:
 !-------------------------------------------------------------------------
-   call DA_Check_CvToVv_Adjoint( xb, xbx, xp, be, cv, vv, &
+   call da_check_cvtovv_adjoint( xb, xbx, xp, be, cv, vv, &
                                ids, ide, jds, jde, kds, kde,      &
                                ims, ime, jms, jme, kms, kme,      &
                                its, ite, jts, jte, kts, kte )
@@ -205,9 +205,9 @@ SUBROUTINE DA_Test_VXTransform( xb, xbx, xp, be, &
 !  [4.1] Test XToVpToX differences:
 
      write(UNIT=stdout, fmt='(/a/)') &
-          'DA_Check_XToVpToX_Errors'
+          'da_check_xtovptox_errors'
    
-     CALL DA_Check_XToVpToX_Errors( xa, xa2_u, xa2_v, xa2_w, xa2_t, &
+     CALL da_check_xtovptox_errors( xa, xa2_u, xa2_v, xa2_w, xa2_t, &
                                  xa2_p, xa2_q, xa2_rh, xa2_rho, &
                                  xa2_qt, xa2_qcw, xa2_qrn, &
                                  ids,ide, jds,jde, kds,kde, &
@@ -216,7 +216,7 @@ SUBROUTINE DA_Test_VXTransform( xb, xbx, xp, be, &
 
 !  [4.2] Perform v_{p} = U_{p}^{-1} x transform (again):
 
-     call DA_Transform_XToVp( xb, xbx, xa, xp, vv, be, &
+     call da_transform_xtovp( xb, xbx, xa, xp, vv, be, &
                             ids,ide, jds,jde, kds,kde, &
                             ims,ime, jms,jme, kms,kme, &
                             its,ite, jts,jte, kts,kte )
@@ -224,21 +224,21 @@ SUBROUTINE DA_Test_VXTransform( xb, xbx, xp, be, &
 !  [2.4] Check inverse errors:
 
      write(UNIT=stdout, fmt='(/a/)') &
-          'DA_Check_VpToXToVp_Errors'
+          'da_check_vptoxtovp_errors'
 
-     call DA_Check_Vp_Errors( vp, vv, kz_vp, its,ite, jts,jte, kts,kte )
+     call da_check_vp_errors( vp, vv, kz_vp, its,ite, jts,jte, kts,kte )
    end if
 !-------------------------------------------------------------------------
 !  [5.0] Perform Vv -> Vp adjoint test: 
 !-------------------------------------------------------------------------
-   call DA_Check_VvToVp_Adjoint( xb, xp, be, vp, vv, &
+   call da_check_vvtovp_adjoint( xb, xp, be, vp, vv, &
                                  ids,ide, jds,jde, kds,kde, &
                                  ims,ime, jms,jme, kms,kme, &
                                  its,ite, jts,jte, kts,kte )
 !-------------------------------------------------------------------------
 !  [6.0] Perform Vp -> X  adjoint tests: 
 !-------------------------------------------------------------------------
-   call DA_Check_VpToX_Adjoint( xb, xbx, be, xa, xp, vp, &
+   call da_check_vptox_adjoint( xb, xbx, be, xa, xp, vp, &
                                ids, ide, jds, jde, kds, kde,    &
                                ims, ime, jms, jme, kms, kme,    &
                                its, ite, jts, jte, kts, kte )
@@ -248,7 +248,7 @@ SUBROUTINE DA_Test_VXTransform( xb, xbx, xp, be, &
 !-------------------------------------------------------------------------
 !  [7.0]: Perform adjoint test on complete transform: <x,x> = <v_adj,v>
 !-------------------------------------------------------------------------
-   call DA_Check_VToX_Adjoint( xb, xbx, be, cv, vv, vp, xp, xa, &
+   call da_check_vtox_adjoint( xb, xbx, be, cv, vv, vp, xp, xa, &
                                ids, ide, jds, jde, kds, kde,      &
                                ims, ime, jms, jme, kms, kme,      &
                                its, ite, jts, jte, kts, kte )
@@ -280,5 +280,5 @@ SUBROUTINE DA_Test_VXTransform( xb, xbx, xp, be, &
  DEALLOCATE (vv1 % v4)
  DEALLOCATE (vv1 % v5)
 
-END SUBROUTINE DA_Test_VXTransform
+END SUBROUTINE da_test_vxtransform
 

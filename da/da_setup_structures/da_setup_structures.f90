@@ -14,7 +14,6 @@ MODULE da_setup_structures
    USE da_physics
    USE da_tools
    USE da_h_ops
-   USE da_readwrite_mm5
    USE da_spectral
    use da_wrfvar_io
    use da_radiance
@@ -37,7 +36,6 @@ MODULE da_setup_structures
 #include <da_setup_cv.inc>
 #include <da_chgvres.inc>
 #include <da_setup_firstguess.inc>
-#include <da_setup_firstguess_mm5.inc>
 #include <da_setup_firstguess_wrf.inc>
 #include <da_setup_firstguess_kma.inc>
 #include <da_setup_flow_predictors.inc>
@@ -46,7 +44,6 @@ MODULE da_setup_structures
 #include <da_setup_obs_structures_bufr.inc>
 #include <da_setup_obs_interp_wts.inc>
 #include <da_setup_runconstants.inc>
-#include <da_transfer_mm5toxb.inc>
 #include <da_transfer_wrftoxb.inc>
 #include <da_transfer_kmatoxb.inc>
 #include <da_transfer_xatowrf.inc>
@@ -56,7 +53,6 @@ MODULE da_setup_structures
 #include <da_transfer_xatowrftl.inc>
 #include <da_transfer_xatowrftl_adj.inc>
 #include <da_transfer_xatoanalysis.inc>
-#include <da_write_interpolated_be.inc>
 #include <da_cloud_model.inc>
 #include <da_write_increments.inc>
 #include <da_write_kma_increments.inc>

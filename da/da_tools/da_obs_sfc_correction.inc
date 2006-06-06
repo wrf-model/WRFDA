@@ -1,4 +1,4 @@
-SUBROUTINE DA_Obs_Sfc_correction(sfc_obs, xb )
+SUBROUTINE da_obs_sfc_correction(sfc_obs, xb )
 
 !--------------------------------------------------------------------!
 ! This subroutine is used to correct the surface measurements (wind, !
@@ -92,10 +92,10 @@ SUBROUTINE DA_Obs_Sfc_correction(sfc_obs, xb )
          psfc = missing_r
          if (abs(ho - missing_r) > 1.) then
             if (abs(to - missing_r) > 1.) then
-               CALL sfcprs (xb%kts, xb%kte, pressure, t_mdl, q_mdl, &
+               CALL da_sfcprs (xb%kts, xb%kte, pressure, t_mdl, q_mdl, &
                             height, psfc, mslp, ho, to)
             else
-               CALL sfcprs (xb%kts, xb%kte, pressure, t_mdl, q_mdl, &
+               CALL da_sfcprs (xb%kts, xb%kte, pressure, t_mdl, q_mdl, &
                             height, psfc, mslp, ho)
             endif
          endif
@@ -189,11 +189,11 @@ SUBROUTINE DA_Obs_Sfc_correction(sfc_obs, xb )
 
              if (abs(to  - missing_r) > 1. .and. &
                  abs(qo - missing_r) > 1.) then
-                 CALL intpsfc_prs (val, ho, po, hm, pm, tm, qm, to, qo)
+                 CALL da_intpsfc_prs (val, ho, po, hm, pm, tm, qm, to, qo)
              else if (abs(to  - missing_r) > 1.) then
-                 CALL intpsfc_prs (val, ho, po, hm, pm, tm, qm, to)
+                 CALL da_intpsfc_prs (val, ho, po, hm, pm, tm, qm, to)
              else
-                 CALL intpsfc_prs (val, ho, po, hm, pm, tm, qm)
+                 CALL da_intpsfc_prs (val, ho, po, hm, pm, tm, qm)
              endif
 
              !  Replace any previous pressure qc by the surface correction
@@ -210,7 +210,7 @@ SUBROUTINE DA_Obs_Sfc_correction(sfc_obs, xb )
 
                !  Correct data
 
-               CALL intpsfc_tem (val, ho, po, to, height, pressure, t_mdl, xb%kts, xb%kte)
+               CALL da_intpsfc_tem (val, ho, po, to, height, pressure, t_mdl, xb%kts, xb%kte)
 
                sfc_obs % t % inv = val
 
@@ -232,9 +232,9 @@ SUBROUTINE DA_Obs_Sfc_correction(sfc_obs, xb )
 
       ENDIF
 
-END  SUBROUTINE DA_Obs_Sfc_correction
+END  SUBROUTINE da_obs_sfc_correction
 
-SUBROUTINE INTPSFC_PRS (val, ho, po, hm, pm, tm, qm, to, qo)
+SUBROUTINE da_intpsfc_prs (val, ho, po, hm, pm, tm, qm, to, qo)
 !------------------------------------------------------------------------------!
 !
 ! Correct pressure between two levels. 
@@ -289,9 +289,9 @@ SUBROUTINE INTPSFC_PRS (val, ho, po, hm, pm, tm, qm, to, qo)
 
       val = po * exp (-arg)
 
-END SUBROUTINE INTPSFC_PRS
+END SUBROUTINE da_intpsfc_prs
 
-SUBROUTINE INTPSFC_TEM (val, ho, po, to, height, pressure, temp, kts, kte)
+SUBROUTINE da_intpsfc_tem (val, ho, po, to, height, pressure, temp, kts, kte)
 !------------------------------------------------------------------------------!
 !
 ! Correct temperature between two levels.
@@ -442,9 +442,9 @@ SUBROUTINE INTPSFC_TEM (val, ho, po, to, height, pressure, temp, kts, kte)
 
       val  = th_sfc * (prs_mb (kts) / 1000.)**rcp
 
-END SUBROUTINE INTPSFC_TEM
+END SUBROUTINE da_intpsfc_tem
 
-FUNCTION MO_CORRECTION (ho, po, to, qo, uo, vo, &
+FUNCTION da_mo_correction (ho, po, to, qo, uo, vo, &
                         hm, pm, tm, qm, um ,vm, &
                         roughness)   RESULT (correc)
 !------------------------------------------------------------------------------!
@@ -640,9 +640,9 @@ FUNCTION MO_CORRECTION (ho, po, to, qo, uo, vo, &
 
       ENDIF
 
-END FUNCTION MO_CORRECTION
+END FUNCTION da_mo_correction
 
-   SUBROUTINE sfcprs (kts, kte, p, t, q, height, psfc, pslv, h_obs, t_obs)
+   SUBROUTINE da_sfcprs (kts, kte, p, t, q, height, psfc, pslv, h_obs, t_obs)
    
    ! Purpose: to compute the pressure at obs height (psfc) from the sea
    !          level pressure (pslv), obs height (h_obs), temperature
@@ -815,5 +815,5 @@ END FUNCTION MO_CORRECTION
 
       IF ( ABS ( h_obs ) < 0.1 ) psfc = pslv
 
-   END SUBROUTINE sfcprs
+   END SUBROUTINE da_sfcprs
 

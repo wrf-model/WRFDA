@@ -16,7 +16,6 @@ all:			to_be_file		\
 			scale_length		\
 			write_sl_2_be		\
 			update_bc		\
-			convert_to_mm5v3        \
 			generate_difference	\
 			bufr_little_endian_convert	\
 			daprog_diagnostics	\
@@ -44,8 +43,6 @@ OBJ_write_sl_2_be	=	write_sl_2_be.o
 
 OBJ_update_bc		=	update_bc.o
 
-OBJ_convert_to_mm5v3	=	convert_to_mm5v3.o
-
 OBJ_generate_difference =	generate_difference.o
 
 OBJ_bufr_convert	=	grabbufr.o
@@ -69,9 +66,6 @@ write_sl_2_be:		$(OBJ_FOR_ALL) $(OBJ_write_sl_2_be)
 
 update_bc:		$(OBJ_FOR_ALL) $(OBJ_update_bc)
 			$(FC) -o $@.exe $(OBJ_FOR_ALL) $(OBJ_update_bc) $(LDUTILS)
-
-convert_to_mm5v3:	$(OBJ_FOR_ALL) $(OBJ_convert_to_mm5v3)
-			$(FC) -o $@.exe $(OBJ_FOR_ALL) $(OBJ_convert_to_mm5v3) $(LDUTILS)
 
 generate_difference:	$(OBJ_FOR_ALL) $(OBJ_generate_difference)
 			$(FC) -o $@.exe $(OBJ_FOR_ALL) $(OBJ_generate_difference) $(LDUTILS)
@@ -156,12 +150,6 @@ update_bc.o:		$(OBJ_FOR_ALL)			\
 			$(FC) -c $(FUFLAGS) update_bc.f
 			$(RM) update_bc.f
 
-convert_to_mm5v3.o:	$(OBJ_FOR_ALL)			\
-			convert_to_mm5v3.f90
-			cp convert_to_mm5v3.f90 convert_to_mm5v3.f
-			$(FC) -c $(FUFLAGS) convert_to_mm5v3.f
-			$(RM) convert_to_mm5v3.f
-
 generate_difference.o:	$(OBJ_FOR_ALL)			\
 			generate_difference.f90
 			cp generate_difference.f90 generate_difference.f
@@ -182,9 +170,6 @@ module_define.o:	Utl_Define/module_define.f90
 Utl_IO.o:		module_define.o			\
 			Utl_IO/cleanRows.inc		\
 			Utl_IO/crs_2_dot.inc		\
-			Utl_IO/read_mm5_ic.inc		\
-			Utl_IO/print_big_header.inc	\
-			Utl_IO/print_sub_header.inc	\
 			Utl_IO/Utl_IO.f90
 			cp Utl_IO/Utl_IO.f90 Utl_IO/Utl_IO.f
 			$(FC) -c -I./Utl_IO $(FUFLAGS) Utl_IO/Utl_IO.f
