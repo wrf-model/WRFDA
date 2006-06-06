@@ -5,7 +5,7 @@ set nonomatch
 
 foreach dir ( frame chem share dyn_em dyn_exp dyn_nmm phys main tools )
 ( cd $dir ; echo $dir ; /bin/rm -f core wrf *.f *.exe *.kmo *.mod *.o *.inc *.f90 *.a .*.m *.lst \
-                      db_* Warnings module_state_description.F module_dm.F gmeta \
+                      db_* Warnings module_state_description.f90 module_dm.F gmeta \
                       wrfdata whatiread rsl.* show_domain* )
 end
 

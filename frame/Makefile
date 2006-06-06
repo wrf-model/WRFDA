@@ -50,7 +50,7 @@ wrf_num_bytes_between.o :
 clean:
 	@ echo 'use the clean script'
 
-module_state_description.F : ../Registry/$(REGISTRY)
+module_state_description.f90 : ../Registry/$(REGISTRY)
 		( cd .. ; tools/registry $(REGFLAGS) Registry/$(REGISTRY) )
 
 md_calls.inc : md_calls.m4
@@ -58,6 +58,8 @@ md_calls.inc : md_calls.m4
 
 
 # DEPENDENCIES : only dependencies after this line (don't remove the word DEPENDENCIES)
+
+module_state_description.o : module_state_description.f90
 
 module_configure.o: \
 		module_state_description.o \

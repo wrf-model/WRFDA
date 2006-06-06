@@ -1,6 +1,6 @@
 LAPACK_OBJS        =	lapack.o
 
-LAPACK.o:		lapack.f90 \
+lapack.o:		lapack.f90 \
 			blas.o     \
 			dlae2.inc  \
 			dlaev2.inc \
