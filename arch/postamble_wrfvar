@@ -20,6 +20,10 @@ CPPFLAGS          = $(TRADFLAG) $(LIBINCLUDE) -C -P $(ARCHFLAGS) \
 
 INC_MOD_WRFVAR    = -I../$(NETCDF_IO_PATH) \
 		      -I$(DA) \
+                      -I../external/lapack \
+                      -I../external/fftpack5 \
+                      -I../external/blas \
+                      -I../external/bufr_ncep_nco \
                       -I../external/io_int \
                       -I../external/esmf_time_f90 \
                       -I../frame -I../share -I../inc

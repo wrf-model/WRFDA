@@ -28,7 +28,6 @@ OBJS_FOR_ALL =		da_solve_v3d.o		\
 			da_pseudo.o		\
 			da_profiler.o		\
 			da_buoy.o   		\
-			da_readwrite_mm5.o	\
 			da_dynamics.o		\
 			da_physics.o		\
 			da_ffts.o		\
@@ -61,6 +60,7 @@ links :
 	$(LN) */*.inc .
 	$(LN) */*.f90 .
 	$(LN) */*.c .
+	$(LN) */*.m4 .
 
 
 ##########################################################################
@@ -73,16 +73,16 @@ da_generic_boilerplate.inc:	da_generic_boilerplate.m4
 			$(RM) da_generic_boilerplate.inc
 			$(M4) da_generic_boilerplate.m4 > da_generic_boilerplate.inc
 
-da_par_util.o:		da_define_structures.o		\
-			da_constants.o			\
-                        da_par_util1.o                      \
+da_par_util.o:		da_par_util.f90                   \
+                        da_define_structures.o		  \
+			da_constants.o			  \
+                        da_par_util1.o                    \
 			da_alloc_and_copy_be_arrays.inc   \
 			da_be_local_copy.inc              \
 			da_copy_dims.inc                  \
 			da_copy_tile_dims.inc             \
 			da_cv_to_vv.inc                   \
 			da_local_to_global.inc            \
-			da_mm5_struct_bcast.inc           \
 			da_pack_count_obs.inc             \
 			da_proc_maxmin_combine.inc        \
 			da_proc_stats_combine.inc         \
@@ -97,9 +97,8 @@ da_par_util.o:		da_define_structures.o		\
 			da_generic_typedefs.inc           \
 			da_generic_methods.inc            \
 			da_specific_methods.inc           \
-			da_generic_boilerplate.inc                \
-			da_y_facade_to_global.inc         \
-			da_par_util.f90
+			da_generic_boilerplate.inc        \
+			da_y_facade_to_global.inc
 			$(RM) $@
 			$(CPP) $(CPPFLAGS) da_par_util.f90 > da_par_util.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_par_util.f
@@ -124,7 +123,7 @@ da_solve_v3d.o:		da_constants.o			\
 			$(CPP) $(CPPFLAGS) da_solve_v3d.f90 > da_solve_v3d.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_solve_v3d.f
 
-DA_Minimisation.o:	\
+DA_Minimisation.o:	da_minimisation.f90 \
 			da_wrfvar_io.o \
 			da_constants.o \
 			da_define_structures.o \
@@ -150,7 +149,6 @@ DA_Minimisation.o:	\
 			da_buoy.o  \
 			da_setup_structures.o		\
 			da_radiance.o \
-			da_minimisation.f \
 			da_calculate_j.inc \
 			da_calculate_jo_and_grady.inc \
 			da_calculate_residual.inc \
@@ -167,7 +165,7 @@ DA_Minimisation.o:	\
 			$(CPP) $(CPPFLAGS) da_minimisation.f90 > da_minimisation.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_minimisation.f
 
-da_setup_structures.o:	\
+da_setup_structures.o:	da_setup_structures.f90 \
 			da_define_structures.o \
 			da_constants.o \
 			da_grid_definitions.o \
@@ -179,11 +177,9 @@ da_setup_structures.o:	\
 	                ../external/bufr_ncep_nco/bort_exit.o \
 	                ../external/bufr_ncep_nco/restd.o \
 	                ../external/bufr_ncep_nco/wrdesc.o \
-	                da_readwrite_mm5.o \
 	                da_spectral.o \
 			da_radiance.o \
                         da_wrfvar_io.o \
-			da_setup_structures.f \
 			da_add_increments.inc \
 			da_add_pbl_and_sfc_info.inc \
 			da_chgvres.inc \
@@ -197,7 +193,6 @@ da_setup_structures.o:	\
 			da_setup_be_regional.inc \
 			da_get_bins_info.inc            \
 			da_setup_firstguess.inc \
-			da_setup_firstguess_mm5.inc \
 			da_setup_firstguess_wrf.inc \
 			da_setup_firstguess_kma.inc \
                         da_setup_flow_predictors.inc \
@@ -206,7 +201,6 @@ da_setup_structures.o:	\
 			da_setup_obs_structures_bufr.inc \
 			da_setup_obs_interp_wts.inc \
 			da_setup_runconstants.inc \
-			da_transfer_mm5toxb.inc \
 			da_transfer_wrftoxb.inc \
 			da_transfer_kmatoxb.inc \
 			da_transfer_xatowrf.inc \
@@ -743,7 +737,7 @@ da_profiler.o:		\
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_profiler.f
 
 
-da_buoy.o:		\
+da_buoy.o:		da_buoy.f90 \
 			da_constants.o \
 			da_par_util.o \
 			da_define_structures.o \
@@ -751,7 +745,6 @@ da_buoy.o:		\
 			da_statistics.o \
 			da_tools.o \
 			da_physics.o \
-			da_buoy.f90 \
 			da_ao_stats_buoy.inc \
 			da_calculate_jo_and_grady_buoy.inc \
 			da_calculate_residual_buoy.inc \
@@ -765,30 +758,12 @@ da_buoy.o:		\
 			$(CPP) $(CPPFLAGS) da_buoy.f90 > da_buoy.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_buoy.f
 
-da_readwrite_mm5.o:	\
-	                da_constants.o \
-			da_define_structures.o \
-			da_grid_definitions.o \
-			da_par_util.o \
-			da_readwrite_mm5.f90 \
-			da_crs_to_dot.inc \
-			da_cleanrows.inc \
-			da_print_big_header.inc \
-			da_print_sub_header.inc \
-			da_read_mm5.inc \
-			da_write_analysis_mm5.inc
-			$(RM) $@
-			$(CPP) $(CPPFLAGS) da_readwrite_mm5.f90 > da_readwrite_mm5.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_readwrite_mm5.f
-
-
-da_dynamics.o:		\
+da_dynamics.o:		da_dynamics.f90 \
 			da_constants.o \
 			da_define_structures.o \
 			da_statistics.o \
 			da_ffts.o \
 			da_interpolation.o \
-			da_dynamics.f90 \
 			da_balance_cycloterm.inc \
 			da_balance_cycloterm_adj.inc \
 			da_balance_cycloterm_lin.inc \
@@ -811,13 +786,12 @@ da_dynamics.o:		\
 			$(CPP) $(CPPFLAGS) da_dynamics.f90 > da_dynamics.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_dynamics.f
 
-da_physics.o:		\
+da_physics.o:		da_physics.f90 \
 			da_constants.o \
 			da_define_structures.o \
 			da_grid_definitions.o \
 			da_interpolation.o \
 			da_dynamics.o      \
-			da_physics.f90 \
 			da_uvprho_to_w_adj.inc \
 			da_uvprho_to_w_lin.inc \
 			da_prho_to_t_adj.inc \
@@ -979,11 +953,9 @@ da_define_structures.o:	\
                         da_tracing.o \
 			da_define_structures.f90 \
 			da_allocate_background_errors.inc \
-			da_allocate_mm5_model.inc \
 			da_allocate_observations.inc \
 			da_allocate_y.inc \
 			da_deallocate_background_errors.inc \
-			da_deallocate_mm5_model.inc \
 			da_deallocate_observations.inc \
 			da_deallocate_y.inc \
 			da_zero_x.inc \
@@ -1135,6 +1107,7 @@ da_wrfvar_top.o : da_wrfvar_top.f90 \
                              da_wrfvar_run.inc \
                              da_wrfvar_finalize.inc \
                              da_wrfvar_interface.inc \
+                  da_wrfvar_io.o \
                       da_tracing.o
 			$(CPP) $(CPPFLAGS) da_wrfvar_top.f90 > da_wrfvar_top.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_wrfvar_top.f
@@ -1181,7 +1154,8 @@ be_spectral.o:		\
 			$(CPP) $(CPPFLAGS) da_be_spectral.f90 > da_be_spectral.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_be_spectral.f
 
-da_radiance.o:		da_constants.o          \
+da_radiance.o:		da_radiance.f90 \
+                        da_constants.o          \
 			da_define_structures.o  \
 			da_interpolation.o \
 			da_statistics.o \
@@ -1250,7 +1224,7 @@ parkind1.o:		\
 
 gsi_kinds.o:		\
 			gsi_kinds.f90
-			$(CPP)-I$(RTTOV)/src $(CPPFLAGS) gsi_kinds.90 > gsi_kinds.f
+			$(CPP)-I$(RTTOV)/src $(CPPFLAGS) gsi_kinds.f90 > gsi_kinds.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) gsi_kinds.f
 
 gsi_constants.o:	gsi_kinds.o      \
