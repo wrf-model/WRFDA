@@ -38,21 +38,16 @@ SUBROUTINE da_med_initialdata_input (grid, config_flags, in_date, in_filename)
       file_name = 'wrfvar_input'
    END IF
 
- call da_oi(__FILE__,__LINE__)
-
    CALL ext_ncd_open_for_read( trim(file_name), 0, 0, "", fid, ierr)
 
- call da_oi(__FILE__,__LINE__)
    IF (ierr /= 0) THEN
       write(unit=errmsg(1), fmt='(2a)') &
          'Netcdf error opening file:', trim(file_name)
       CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
    endif
- call da_oi(__FILE__,__LINE__)
 
    CALL ext_ncd_get_next_time( fid, current_date, Status )
 
- call da_oi(__FILE__,__LINE__)
    if (present(in_date)) then
       !-----Set start_date to current_date.
       read(in_date(1:19), fmt='(i4, 5(a1, i2))') &
@@ -88,14 +83,12 @@ SUBROUTINE da_med_initialdata_input (grid, config_flags, in_date, in_filename)
            grid%start_minute,char, &
            grid%start_second
    endif
- call da_oi(__FILE__,__LINE__)
 
    call geth_julgmt(julyr, julday, gmt)
    CALL nl_set_gmt (grid%id, gmt)
    CALL nl_set_julyr (grid%id, julyr)
    CALL nl_set_julday (grid%id, julday)
 
- call da_oi(__FILE__,__LINE__)
    CALL nl_set_iswater (grid%id, grid%iswater )
    CALL nl_set_cen_lat ( grid%id , grid%cen_lat )
    CALL nl_set_cen_lon ( grid%id , grid%cen_lon )
@@ -105,7 +98,6 @@ SUBROUTINE da_med_initialdata_input (grid, config_flags, in_date, in_filename)
    CALL nl_set_stand_lon ( grid%id , grid%stand_lon )
    CALL nl_set_map_proj ( grid%id , grid%map_proj )
 
- call da_oi(__FILE__,__LINE__)
    start_date=current_date
 
    call geth_julgmt(julyr, julday, gmt)
@@ -113,7 +105,6 @@ SUBROUTINE da_med_initialdata_input (grid, config_flags, in_date, in_filename)
    config_flags%julyr = julyr
    config_flags%julday = julday
 
- call da_oi(__FILE__,__LINE__)
    call ext_ncd_ioclose(fid, ierr)
 
    CALL wrf_debug ( 100 , __FILE__//': calling open_r_dataset for wrfvar input' )
@@ -134,7 +125,6 @@ SUBROUTINE da_med_initialdata_input (grid, config_flags, in_date, in_filename)
          CALL ext_ncd_get_next_time( fid, current_date, Status )
       enddo
    endif
- call da_oi(__FILE__,__LINE__)
 
    CALL wrf_debug ( 100 , __FILE__//': calling input_model_input' )
    CALL input_model_input ( fid ,   grid , config_flags , ierr )
@@ -142,13 +132,11 @@ SUBROUTINE da_med_initialdata_input (grid, config_flags, in_date, in_filename)
 
    CALL close_dataset ( fid , config_flags , "DATASET=INPUT" )
 
- call da_oi(__FILE__,__LINE__)
    if (print_detail_timing) THEN
       WRITE ( message , FMT = '("reading wrfvar input for domain ",I8)' ) &
          grid%id
       CALL end_timing ( TRIM(message) )
    END IF
- call da_oi(__FILE__,__LINE__)
 
    IF (trace_use) CALL da_trace_exit("da_med_initialdata_input")
 

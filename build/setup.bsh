@@ -4,7 +4,7 @@ export SOLVER=${SOLVER:-em}
 
 for DIR in dyn_$SOLVER main share frame phys convertor tools \
   external/esmf_time_f90 external/io_int \
-  external/fftpack external/lapack external/blas external/lapack \
+  external/lapack external/blas external/lapack \
   external/bufr_ncep_nco external/fftpack5 \
   external/ioapi_share inc gen_be \
   external/io_netcdf external/io_grib1 da da/*; do
@@ -26,5 +26,3 @@ ln -fs ../tools/gen_comms.stub .
 ln -fs ../convertor/convert_tool .
 ln -fs ../convertor/kma_wave2grid .
 ln -fs ../convertor/wave2grid_kma .
-ln -fs ../convertor/mm5_wrf .
-ln -fs ../convertor/wrf_mm5 .

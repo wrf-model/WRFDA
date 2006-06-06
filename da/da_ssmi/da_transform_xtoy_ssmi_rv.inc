@@ -1,5 +1,5 @@
 !============================================================================
-SUBROUTINE DA_Transform_XToY_SSMI_Rv( xb, oi, xa, y )
+SUBROUTINE da_transform_xtoy_ssmi_rv( xb, oi, xa, y )
 !----------------------------------------------------------------------------
    IMPLICIT NONE
 !----------------------------------------------------------------------------
@@ -30,18 +30,18 @@ SUBROUTINE DA_Transform_XToY_SSMI_Rv( xb, oi, xa, y )
 !--------Interpolating from 4 grid points to obs location
 
 #ifndef DEREF_KLUDGE
-         call Interp_lin_2D(xa%tpw, xb%ims, xb%ime, xb%jms, xb%jme, &
+         call da_interp_lin_2d(xa%tpw, xb%ims, xb%ime, xb%jms, xb%jme, &
                             i, j, dx, dy, dxm, dym, y%ssmi_retrieval(n)%tpw)
-         call Interp_lin_2D(xa%speed, xb%ims, xb%ime, xb%jms, xb%jme, &
+         call da_interp_lin_2d(xa%speed, xb%ims, xb%ime, xb%jms, xb%jme, &
                             i, j, dx, dy, dxm, dym, y%ssmi_retrieval(n)%speed)
 #else
-         call Interp_lin_2D(xa%tpw(xb%ims,xb%jms), xb%ims, xb%ime, xb%jms, xb%jme, &
+         call da_interp_lin_2d(xa%tpw(xb%ims,xb%jms), xb%ims, xb%ime, xb%jms, xb%jme, &
                             i, j, dx, dy, dxm, dym, y%ssmi_retrieval(n)%tpw)
-         call Interp_lin_2D(xa%speed(xb%ims,xb%jms), xb%ims, xb%ime, xb%jms, xb%jme, &
+         call da_interp_lin_2d(xa%speed(xb%ims,xb%jms), xb%ims, xb%ime, xb%jms, xb%jme, &
                             i, j, dx, dy, dxm, dym, y%ssmi_retrieval(n)%speed)
 #endif
       endif
    end do
 
-END SUBROUTINE DA_Transform_XToY_SSMI_Rv
+END SUBROUTINE da_transform_xtoy_ssmi_rv
 

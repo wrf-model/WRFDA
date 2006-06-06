@@ -94,6 +94,13 @@ module_initialize_real.o module_dm.o start_domain.o :
 	@ $(RM) $*.b
 	  $(FC) -c $(FCFLAGS) $(MODULE_DIRS) $*.f
 
+.F90.o:
+	@ $(RM) $@
+	@ $(SED_FTN) $*.F90 > $*.b
+	  $(CPP) $(CPPFLAGS) $*.b  > $*.f
+	@ $(RM) $*.b
+	  $(FC) -c $(FCFLAGS) $(MODULE_DIRS) $*.f
+
 .F.o:
 	@ $(RM) $@
 	@ $(SED_FTN) $*.F > $*.b

@@ -1,4 +1,4 @@
-SUBROUTINE DA_Transform_XToPsfc( xb, xa, xp, synop, y_synop )
+SUBROUTINE da_transform_xtopsfc( xb, xa, xp, synop, y_synop )
 
    TYPE (x_type),     INTENT(IN) :: xa       ! gridded analysis increment.
    TYPE (xb_type),    INTENT(IN) :: xb       ! first guess state.
@@ -29,30 +29,30 @@ SUBROUTINE DA_Transform_XToPsfc( xb, xa, xp, synop, y_synop )
 ! 2.0 Surface assimilation approach 2 (2-m t and q, 10-m u and v)
 
 #ifndef DEREF_KLUDGE
-   call Interp_lin_2D(xa%u10, xp%ims, xp%ime, xp%jms, xp%jme, &
+   call da_interp_lin_2d(xa%u10, xp%ims, xp%ime, xp%jms, xp%jme, &
                       i, j, dx, dy, dxm, dym, y_synop%u)
-   call Interp_lin_2D(xa%v10, xp%ims, xp%ime, xp%jms, xp%jme, &
+   call da_interp_lin_2d(xa%v10, xp%ims, xp%ime, xp%jms, xp%jme, &
                       i, j, dx, dy, dxm, dym, y_synop%v)
-   call Interp_lin_2D(xa%psfc, xp%ims, xp%ime, xp%jms, xp%jme, &
+   call da_interp_lin_2d(xa%psfc, xp%ims, xp%ime, xp%jms, xp%jme, &
                       i, j, dx, dy, dxm, dym, psm_prime)
-   call Interp_lin_2D(xa%t2, xp%ims, xp%ime, xp%jms, xp%jme, &
+   call da_interp_lin_2d(xa%t2, xp%ims, xp%ime, xp%jms, xp%jme, &
                       i, j, dx, dy, dxm, dym, y_synop%t)
-   call Interp_lin_2D(xa%q2, xp%ims, xp%ime, xp%jms, xp%jme, &
+   call da_interp_lin_2d(xa%q2, xp%ims, xp%ime, xp%jms, xp%jme, &
                       i, j, dx, dy, dxm, dym, y_synop%q)
 #else
-   call Interp_lin_2D(xa%u10(xp%ims,xp%jms), &
+   call da_interp_lin_2d(xa%u10(xp%ims,xp%jms), &
                       xp%ims, xp%ime, xp%jms, xp%jme, &
                       i, j, dx, dy, dxm, dym, y_synop%u)
-   call Interp_lin_2D(xa%v10(xp%ims,xp%jms), &
+   call da_interp_lin_2d(xa%v10(xp%ims,xp%jms), &
                       xp%ims, xp%ime, xp%jms, xp%jme, &
                       i, j, dx, dy, dxm, dym, y_synop%v)
-   call Interp_lin_2D(xa%psfc(xp%ims,xp%jms), &
+   call da_interp_lin_2d(xa%psfc(xp%ims,xp%jms), &
                       xp%ims, xp%ime, xp%jms, xp%jme, &
                       i, j, dx, dy, dxm, dym, psm_prime)
-   call Interp_lin_2D(xa%t2(xp%ims,xp%jms), &
+   call da_interp_lin_2d(xa%t2(xp%ims,xp%jms), &
                       xp%ims, xp%ime, xp%jms, xp%jme, &
                       i, j, dx, dy, dxm, dym, y_synop%t)
-   call Interp_lin_2D(xa%q2(xp%ims,xp%jms), &
+   call da_interp_lin_2d(xa%q2(xp%ims,xp%jms), &
                       xp%ims, xp%ime, xp%jms, xp%jme, &
                       i, j, dx, dy, dxm, dym, y_synop%q)
 #endif
@@ -73,25 +73,25 @@ SUBROUTINE DA_Transform_XToPsfc( xb, xa, xp, synop, y_synop )
 ! 3.2 model background surface p, t, q, h at observed site:
 
 #ifndef DEREF_KLUDGE
-   call Interp_lin_2D(xb%terr, xp%ims, xp%ime, xp%jms, xp%jme, &
+   call da_interp_lin_2d(xb%terr, xp%ims, xp%ime, xp%jms, xp%jme, &
                        i, j, dx, dy, dxm, dym, hsm)
-   call Interp_lin_2D(xb%t2, xp%ims, xp%ime, xp%jms, xp%jme, &
+   call da_interp_lin_2d(xb%t2, xp%ims, xp%ime, xp%jms, xp%jme, &
                        i, j, dx, dy, dxm, dym, tsm)
-   call Interp_lin_2D(xb%q2, xp%ims, xp%ime, xp%jms, xp%jme, &
+   call da_interp_lin_2d(xb%q2, xp%ims, xp%ime, xp%jms, xp%jme, &
                        i, j, dx, dy, dxm, dym, qsm)
-   call Interp_lin_2D(xb%psfc, xp%ims, xp%ime, xp%jms, xp%jme, &
+   call da_interp_lin_2d(xb%psfc, xp%ims, xp%ime, xp%jms, xp%jme, &
                        i, j, dx, dy, dxm, dym, psm)
 #else
-   call Interp_lin_2D(xb%terr(xp%ims,xp%jms), &
+   call da_interp_lin_2d(xb%terr(xp%ims,xp%jms), &
                       xp%ims, xp%ime, xp%jms, xp%jme, &
                       i, j, dx, dy, dxm, dym, hsm)
-   call Interp_lin_2D(xb%t2(xp%ims,xp%jms), &
+   call da_interp_lin_2d(xb%t2(xp%ims,xp%jms), &
                       xp%ims, xp%ime, xp%jms, xp%jme, &
                       i, j, dx, dy, dxm, dym, tsm)
-   call Interp_lin_2D(xb%q2(xp%ims,xp%jms), &
+   call da_interp_lin_2d(xb%q2(xp%ims,xp%jms), &
                       xp%ims, xp%ime, xp%jms, xp%jme, &
                       i, j, dx, dy, dxm, dym, qsm)
-   call Interp_lin_2D(xb%psfc(xp%ims,xp%jms), &
+   call da_interp_lin_2d(xb%psfc(xp%ims,xp%jms), &
                       xp%ims, xp%ime, xp%jms, xp%jme, &
                       i, j, dx, dy, dxm, dym, psm)
 #endif
@@ -128,5 +128,5 @@ SUBROUTINE DA_Transform_XToPsfc( xb, xa, xp, synop, y_synop )
                          psm, tsm, qsm, hsm, synop%h)
     endif
 
-END SUBROUTINE DA_Transform_XToPsfc
+END SUBROUTINE da_transform_xtopsfc
 
