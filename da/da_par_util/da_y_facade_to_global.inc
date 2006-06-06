@@ -18,13 +18,8 @@
 !
 ! PERFORMANCE NOTE:   This implementation is NOT very efficient.  Speed it 
 !                     up if testing is too slow.  
-!
-! HISTORY:
-!           09/22/2005 - Creation.                          Tom Henderson
-!
-! PARENT_MODULE: par_util
 !------------------------------------------------------------------------------
-  SUBROUTINE y_facade_to_global( re_slice, template, re_glob_slice )
+  SUBROUTINE da_y_facade_to_global( re_slice, template, re_glob_slice )
 
     IMPLICIT NONE
 
@@ -132,7 +127,7 @@
   
      ! Create re_glob_slice and populate with residual_generic_type objects 
      ! allocated to match template.  
-     CALL y_facade_create( re_glob_slice, num_obs_all, num_obs_all, &
+     CALL da_y_facade_create( re_glob_slice, num_obs_all, num_obs_all, &
                            template=template )
 
 ! NOTE:  This i loop should be inside the n loops.  
@@ -227,7 +222,7 @@
          ! note that we only collected obs someone owns
          re_glob_slice%obs(n)%proc_domain = .TRUE.
          re_glob_slice%obs(n)%obs_global_index = obs_global_index_all(serial_n)
-         CALL residual_generic_alloc_and_set( re_glob_slice%obs(n), i, &
+         CALL da_residual_generic_alloc_and_set( re_glob_slice%obs(n), i, &
                 re_vals_all(buf_idx:(buf_idx+serial_numvals-1)) )
        END DO
        ! deallocate communication buffers, etc.
@@ -236,7 +231,7 @@
 
      ENDDO  ! end of i loop
 
-     CALL y_facade_free( re_slice )
+     CALL da_y_facade_free( re_slice )
 
      DEALLOCATE( num_values_all, obs_global_index_all, &
                  obs_global_index_inv, obs_start_all )
@@ -247,5 +242,5 @@
     CALL wrf_error_fatal ( 'ASSERTION ERROR y_facade_to_global:  may only be called for a distributed memory parallel run' )
 #endif
     RETURN
-  END SUBROUTINE y_facade_to_global
+  END SUBROUTINE da_y_facade_to_global
 

@@ -32,22 +32,22 @@ SUBROUTINE DA_OI_Stats_Sound ( stats_unit, oi )
       if( oi%sound(n)%loc%proc_domain ) then
         do k=1, oi%sound(n)%info%levels
 
-          CALL Stats_Calculate( oi%Sound(n)%loc%obs_global_index, &
+          CALL da_Stats_Calculate( oi%Sound(n)%loc%obs_global_index, &
                               k, oi%Sound(n)%u(k)%qc, &
                               oi%Sound(n)%u(k)%inv, nu, &
                               Sound%minimum%u, Sound%maximum%u, &
                               Sound%average%u, Sound%rms_err%u)
-          CALL Stats_Calculate( oi%Sound(n)%loc%obs_global_index, &
+          CALL da_Stats_Calculate( oi%Sound(n)%loc%obs_global_index, &
                               k, oi%Sound(n)%v(k)%qc, &
                               oi%Sound(n)%v(k)%inv, nv, &
                               Sound%minimum%v, Sound%maximum%v, &
                               Sound%average%v, Sound%rms_err%v)
-          CALL Stats_Calculate( oi%Sound(n)%loc%obs_global_index, &
+          CALL da_Stats_Calculate( oi%Sound(n)%loc%obs_global_index, &
                               k, oi%Sound(n)%t(k)%qc, &
                               oi%Sound(n)%t(k)%inv, nt, &
                               Sound%minimum%t, Sound%maximum%t, &
                               Sound%average%t, Sound%rms_err%t)
-          CALL Stats_Calculate( oi%Sound(n)%loc%obs_global_index, &
+          CALL da_Stats_Calculate( oi%Sound(n)%loc%obs_global_index, &
                               k, oi%Sound(n)%q(k)%qc, &
                               oi%Sound(n)%q(k)%inv, nq, &
                               Sound%minimum%q, Sound%maximum%q, &
@@ -58,24 +58,24 @@ SUBROUTINE DA_OI_Stats_Sound ( stats_unit, oi )
   END IF
 
   ! Do inter-processor communication to gather statistics.
-  call proc_sum_int( nu )
-  call proc_sum_int( nv )
-  call proc_sum_int( nt )
-  call proc_sum_int( nq )
+  call da_proc_sum_int( nu )
+  call da_proc_sum_int( nv )
+  call da_proc_sum_int( nt )
+  call da_proc_sum_int( nq )
 
-  call proc_stats_combine(Sound%average%u, Sound%rms_err%u, &
+  call da_proc_stats_combine(Sound%average%u, Sound%rms_err%u, &
                           Sound%minimum%u%value, Sound%maximum%u%value, &
                           Sound%minimum%u%n, Sound%maximum%u%n, &
                           Sound%minimum%u%l, Sound%maximum%u%l )
-  call proc_stats_combine(Sound%average%v, Sound%rms_err%v, &
+  call da_proc_stats_combine(Sound%average%v, Sound%rms_err%v, &
                           Sound%minimum%v%value, Sound%maximum%v%value, &
                           Sound%minimum%v%n, Sound%maximum%v%n, &
                           Sound%minimum%v%l, Sound%maximum%v%l )
-  call proc_stats_combine(Sound%average%t, Sound%rms_err%t, &
+  call da_proc_stats_combine(Sound%average%t, Sound%rms_err%t, &
                           Sound%minimum%t%value, Sound%maximum%t%value, &
                           Sound%minimum%t%n, Sound%maximum%t%n, &
                           Sound%minimum%t%l, Sound%maximum%t%l )
-  call proc_stats_combine(Sound%average%q, Sound%rms_err%q, &
+  call da_proc_stats_combine(Sound%average%q, Sound%rms_err%q, &
                           Sound%minimum%q%value, Sound%maximum%q%value, &
                           Sound%minimum%q%n, Sound%maximum%q%n, &
                           Sound%minimum%q%l, Sound%maximum%q%l )

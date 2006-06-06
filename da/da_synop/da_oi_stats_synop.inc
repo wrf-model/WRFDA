@@ -33,28 +33,28 @@ SUBROUTINE DA_OI_Stats_Synop ( stats_unit, oi )
   IF ( oi%num_synop > 0 ) THEN
     DO n=1, oi%num_synop
       if( oi%synop(n)%loc%proc_domain ) then
-        CALL Stats_Calculate( oi%Synop(n)%loc%obs_global_index, &
+        CALL da_Stats_Calculate( oi%Synop(n)%loc%obs_global_index, &
                               0, oi%synop(n)%u%qc, &
                               oi%synop(n)%u%inv, nu, &
                               synop%minimum%u, synop%maximum%u, &
                               synop%average%u, synop%rms_err%u)
-        CALL Stats_Calculate( oi%Synop(n)%loc%obs_global_index, &
+        CALL da_Stats_Calculate( oi%Synop(n)%loc%obs_global_index, &
                               0, oi%synop(n)%v%qc, &
                               oi%synop(n)%v%inv, nv, &
                               synop%minimum%v, synop%maximum%v, &
                               synop%average%v, synop%rms_err%v)
-        CALL Stats_Calculate( oi%Synop(n)%loc%obs_global_index, &
+        CALL da_Stats_Calculate( oi%Synop(n)%loc%obs_global_index, &
                               0, oi%synop(n)%t%qc, &
                               oi%synop(n)%t%inv, nt, &
                               synop%minimum%t, synop%maximum%t, &
                               synop%average%t, synop%rms_err%t)
-        CALL Stats_Calculate( oi%Synop(n)%loc%obs_global_index, &
+        CALL da_Stats_Calculate( oi%Synop(n)%loc%obs_global_index, &
                               0, oi%synop(n)%p%qc, &
                               oi%synop(n)%p%inv, np, &
                               synop%minimum%p, synop%maximum%p, &
                               synop%average%p, synop%rms_err%p)
 
-        CALL Stats_Calculate( oi%Synop(n)%loc%obs_global_index, &
+        CALL da_Stats_Calculate( oi%Synop(n)%loc%obs_global_index, &
                               0, oi%synop(n)%q%qc, &
                               oi%synop(n)%q%inv, nq, &
                               synop%minimum%q, synop%maximum%q, &
@@ -65,33 +65,33 @@ SUBROUTINE DA_OI_Stats_Synop ( stats_unit, oi )
   END IF
 
   ! Do inter-processor communication to gather statistics.
-  call proc_sum_int( nu )
-  call proc_sum_int( nv )
-  call proc_sum_int( nt )
-  call proc_sum_int( np )
-  call proc_sum_int( nq )
+  call da_proc_sum_int( nu )
+  call da_proc_sum_int( nv )
+  call da_proc_sum_int( nt )
+  call da_proc_sum_int( np )
+  call da_proc_sum_int( nq )
 
-  call proc_stats_combine(Synop%average%u, Synop%rms_err%u, &
+  call da_proc_stats_combine(Synop%average%u, Synop%rms_err%u, &
                           Synop%minimum%u%value, Synop%maximum%u%value, &
                           Synop%minimum%u%n, Synop%maximum%u%n, &
                           Synop%minimum%u%l, Synop%maximum%u%l )
 
-  call proc_stats_combine(Synop%average%v, Synop%rms_err%v, &
+  call da_proc_stats_combine(Synop%average%v, Synop%rms_err%v, &
                           Synop%minimum%v%value, Synop%maximum%v%value, &
                           Synop%minimum%v%n, Synop%maximum%v%n, &
                           Synop%minimum%v%l, Synop%maximum%v%l )
 
-  call proc_stats_combine(Synop%average%t, Synop%rms_err%t, &
+  call da_proc_stats_combine(Synop%average%t, Synop%rms_err%t, &
                           Synop%minimum%t%value, Synop%maximum%t%value, &
                           Synop%minimum%t%n, Synop%maximum%t%n, &
                           Synop%minimum%t%l, Synop%maximum%t%l )
 
-  call proc_stats_combine(Synop%average%p, Synop%rms_err%p, &
+  call da_proc_stats_combine(Synop%average%p, Synop%rms_err%p, &
                           Synop%minimum%p%value, Synop%maximum%p%value, &
                           Synop%minimum%p%n, Synop%maximum%p%n, &
                           Synop%minimum%p%l, Synop%maximum%p%l )
 
-  call proc_stats_combine(Synop%average%q, Synop%rms_err%q, &
+  call da_proc_stats_combine(Synop%average%q, Synop%rms_err%q, &
                           Synop%minimum%q%value, Synop%maximum%q%value, &
                           Synop%minimum%q%n, Synop%maximum%q%n, &
                           Synop%minimum%q%l, Synop%maximum%q%l )

@@ -26,7 +26,7 @@ SUBROUTINE DA_OI_Stats_SSMI_Rv( stats_unit, oi )
 
       if( oi%ssmi_retrieval(n)%loc%proc_domain ) then
 
-        CALL Stats_Calculate( oi%ssmi_retrieval(n)%loc%obs_global_index, &
+        CALL da_Stats_Calculate( oi%ssmi_retrieval(n)%loc%obs_global_index, &
                               0, oi%ssmi_retrieval(n)%tpw%qc, &
                               oi%ssmi_retrieval(n)%tpw%inv, ntpw, &
                               ssmi_retrieval%minimum%tpw, &
@@ -34,7 +34,7 @@ SUBROUTINE DA_OI_Stats_SSMI_Rv( stats_unit, oi )
                               ssmi_retrieval%average%tpw, &
                               ssmi_retrieval%rms_err%tpw )
 
-        CALL Stats_Calculate( oi%ssmi_retrieval(n)%loc%obs_global_index, &
+        CALL da_Stats_Calculate( oi%ssmi_retrieval(n)%loc%obs_global_index, &
                               0, oi%ssmi_retrieval(n)%speed%qc, &
                               oi%ssmi_retrieval(n)%speed%inv, nspeed, &
                               ssmi_retrieval%minimum%speed, &
@@ -49,15 +49,15 @@ SUBROUTINE DA_OI_Stats_SSMI_Rv( stats_unit, oi )
    END IF
 
 ! Do inter-processor communication to gather statistics.
-   call proc_sum_int( ntpw )
-   call proc_sum_int( nspeed )
+   call da_proc_sum_int( ntpw )
+   call da_proc_sum_int( nspeed )
 
-   call proc_stats_combine(ssmi_retrieval%average%tpw, ssmi_retrieval%rms_err%tpw, &
+   call da_proc_stats_combine(ssmi_retrieval%average%tpw, ssmi_retrieval%rms_err%tpw, &
               ssmi_retrieval%minimum%tpw%value, ssmi_retrieval%maximum%tpw%value, &
               ssmi_retrieval%minimum%tpw%n, ssmi_retrieval%maximum%tpw%n, &
               ssmi_retrieval%minimum%tpw%l, ssmi_retrieval%maximum%tpw%l )
 
-   call proc_stats_combine(ssmi_retrieval%average%speed, ssmi_retrieval%rms_err%speed, &
+   call da_proc_stats_combine(ssmi_retrieval%average%speed, ssmi_retrieval%rms_err%speed, &
               ssmi_retrieval%minimum%speed%value, ssmi_retrieval%maximum%speed%value, &
               ssmi_retrieval%minimum%speed%n, ssmi_retrieval%maximum%speed%n, &
               ssmi_retrieval%minimum%speed%l, ssmi_retrieval%maximum%speed%l )

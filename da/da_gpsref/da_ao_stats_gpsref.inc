@@ -33,7 +33,7 @@ SUBROUTINE DA_AO_Stats_GPSRef( stats_unit, oi, re )
       if( oi%gpsref(n)%loc%proc_domain ) then
 
          do k=1, oi%gpsref(n)%info%levels
-            CALL Stats_Calculate( n, k, oi%GPSRef(n)%ref(k)%qc, & 
+            CALL da_Stats_Calculate( n, k, oi%GPSRef(n)%ref(k)%qc, & 
                           re%gpsref(n)%ref(k), ngpsref, &
                           GPSRef%minimum%ref, GPSRef%maximum%ref, &
                           GPSRef%average%ref, GPSRef%rms_err%ref )
@@ -80,10 +80,10 @@ PRINT *,'TEST_COVERAGE_DA_AO_Stats_Gpsref:  sigma_b_0 = ', sigma_b_0
 
 !--Do inter-processor communication to gather statistics.
 
-   call proc_sum_int( ngpsref )
+   call da_proc_sum_int( ngpsref )
    num_gpsref_tot = ngpsref
     
-   call proc_stats_combine(GPSRef%average%ref, GPSRef%rms_err%ref, &
+   call da_proc_stats_combine(GPSRef%average%ref, GPSRef%rms_err%ref, &
              GPSRef%minimum%ref%value, GPSRef%maximum%ref%value, &
              GPSRef%minimum%ref%n, GPSRef%maximum%ref%n, &
              GPSRef%minimum%ref%l, GPSRef%maximum%ref%l )

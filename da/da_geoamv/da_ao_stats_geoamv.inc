@@ -32,11 +32,11 @@ SUBROUTINE da_ao_stats_geoamv( stats_unit, oi, re )
       DO n=1, oi%num_geoamv
          if( oi%geoamv(n)%loc%proc_domain ) then
             DO k=1, oi%geoamv(n)%info%levels
-               CALL stats_calculate( n, 0, oi%geoamv(n)%u(k)%qc, & 
+               CALL da_stats_calculate( n, 0, oi%geoamv(n)%u(k)%qc, & 
                                    re%geoamv(n)%u(k), nu, & 
                                    geoamv%minimum%u, geoamv%maximum%u, &
                                    geoamv%average%u, geoamv%rms_err%u )
-               CALL stats_calculate( n, 0, oi%geoamv(n)%v(k)%qc, & 
+               CALL da_stats_calculate( n, 0, oi%geoamv(n)%v(k)%qc, & 
                                    re%geoamv(n)%v(k), nv, & 
                                    geoamv%minimum%v, geoamv%maximum%v, &
                                    geoamv%average%v, geoamv%rms_err%v )
@@ -47,15 +47,15 @@ SUBROUTINE da_ao_stats_geoamv( stats_unit, oi, re )
    END IF
 
    ! Do inter-processor communication to gather statistics.
-   call proc_sum_int( nu )
-   call proc_sum_int( nv )
+   call da_proc_sum_int( nu )
+   call da_proc_sum_int( nv )
    num_geoamv_tot = nu + nv
 
-   call proc_stats_combine(geoamv%average%u, geoamv%rms_err%u, &
+   call da_proc_stats_combine(geoamv%average%u, geoamv%rms_err%u, &
                            geoamv%minimum%u%value, geoamv%maximum%u%value, &
                            geoamv%minimum%u%n, geoamv%maximum%u%n, &
                            geoamv%minimum%u%l, geoamv%maximum%u%l )
-   call proc_stats_combine(geoamv%average%v, geoamv%rms_err%v, &
+   call da_proc_stats_combine(geoamv%average%v, geoamv%rms_err%v, &
                            geoamv%minimum%v%value, geoamv%maximum%v%value, &
                            geoamv%minimum%v%n, geoamv%maximum%v%n, &
                            geoamv%minimum%v%l, geoamv%maximum%v%l )

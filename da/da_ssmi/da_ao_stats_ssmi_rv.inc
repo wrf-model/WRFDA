@@ -28,12 +28,12 @@ SUBROUTINE DA_AO_Stats_SSMI_Rv( stats_unit, oi, re )
   
       if( oi%ssmi_retrieval(n)%loc%proc_domain ) then
   
-        CALL  Stats_Calculate( n, 0, oi%ssmi_retrieval(n)%tpw%qc, &
+        CALL  da_Stats_Calculate( n, 0, oi%ssmi_retrieval(n)%tpw%qc, &
                                re%ssmi_retrieval(n)%tpw, ntpw,  &
                     ssmi_retrieval%minimum%tpw,  ssmi_retrieval%maximum%tpw,&
                     ssmi_retrieval%average%tpw,  ssmi_retrieval%rms_err%tpw)
 
-        CALL  Stats_Calculate( n, 0, oi%ssmi_retrieval(n)%Speed%qc, &
+        CALL  da_Stats_Calculate( n, 0, oi%ssmi_retrieval(n)%Speed%qc, &
                                re%ssmi_retrieval(n)%Speed,    nspeed,  &
                     ssmi_retrieval%minimum%Speed,  ssmi_retrieval%maximum%Speed,&
                     ssmi_retrieval%average%Speed,  ssmi_retrieval%rms_err%Speed)
@@ -45,16 +45,16 @@ SUBROUTINE DA_AO_Stats_SSMI_Rv( stats_unit, oi, re )
    END IF
 
 ! Do inter-processor communication to gather statistics.
-   call proc_sum_int( ntpw )
-   call proc_sum_int( nspeed )
+   call da_proc_sum_int( ntpw )
+   call da_proc_sum_int( nspeed )
    num_ssmi_rv_tot = ntpw + nspeed
    
-   call proc_stats_combine(ssmi_retrieval%average%tpw, ssmi_retrieval%rms_err%tpw, &
+   call da_proc_stats_combine(ssmi_retrieval%average%tpw, ssmi_retrieval%rms_err%tpw, &
               ssmi_retrieval%minimum%tpw%value, ssmi_retrieval%maximum%tpw%value, &
               ssmi_retrieval%minimum%tpw%n, ssmi_retrieval%maximum%tpw%n, &
               ssmi_retrieval%minimum%tpw%l, ssmi_retrieval%maximum%tpw%l )
 
-   call proc_stats_combine(ssmi_retrieval%average%speed, ssmi_retrieval%rms_err%speed, &
+   call da_proc_stats_combine(ssmi_retrieval%average%speed, ssmi_retrieval%rms_err%speed, &
               ssmi_retrieval%minimum%speed%value, ssmi_retrieval%maximum%speed%value, &
               ssmi_retrieval%minimum%speed%n, ssmi_retrieval%maximum%speed%n, &
               ssmi_retrieval%minimum%speed%l, ssmi_retrieval%maximum%speed%l )

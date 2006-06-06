@@ -36,23 +36,23 @@ SUBROUTINE da_ob_stats_pseudo ( stats_unit, oi )
 
        if( oi%pseudo(n)%loc%proc_domain ) then
 
-         CALL Stats_Calculate( n, 0, oi%pseudo(n)%u%qc, & 
+         CALL da_Stats_Calculate( n, 0, oi%pseudo(n)%u%qc, & 
                                oi%pseudo(n)%u%inv, nu, & 
                                pseudo%minimum%u, pseudo%maximum%u, &
                                pseudo%average%u, pseudo%rms_err%u )
-         CALL Stats_Calculate( n, 0, oi%pseudo(n)%v%qc, & 
+         CALL da_Stats_Calculate( n, 0, oi%pseudo(n)%v%qc, & 
                                oi%pseudo(n)%v%inv, nv, & 
                                pseudo%minimum%v, pseudo%maximum%v, &
                                pseudo%average%v, pseudo%rms_err%v )
-         CALL Stats_Calculate( n, 0, oi%pseudo(n)%t%qc, & 
+         CALL da_Stats_Calculate( n, 0, oi%pseudo(n)%t%qc, & 
                                oi%pseudo(n)%t%inv, nt, & 
                                pseudo%minimum%t, pseudo%maximum%t, &
                                pseudo%average%t, pseudo%rms_err%t )
-         CALL Stats_Calculate( n, 0, oi%pseudo(n)%p%qc, & 
+         CALL da_Stats_Calculate( n, 0, oi%pseudo(n)%p%qc, & 
                                oi%pseudo(n)%p%inv, np, & 
                                pseudo%minimum%p, pseudo%maximum%p, &
                                pseudo%average%p, pseudo%rms_err%p )
-         CALL Stats_Calculate( n, 0, oi%pseudo(n)%q%qc, & 
+         CALL da_Stats_Calculate( n, 0, oi%pseudo(n)%q%qc, & 
                                oi%pseudo(n)%q%inv, nq, & 
                                pseudo%minimum%q, pseudo%maximum%q, &
                                pseudo%average%q, pseudo%rms_err%q )
@@ -64,29 +64,29 @@ SUBROUTINE da_ob_stats_pseudo ( stats_unit, oi )
    END IF
 
 ! Do inter-processor communication to gather statistics.
-   call proc_sum_int( nu )
-   call proc_sum_int( nv )
-   call proc_sum_int( nt )
-   call proc_sum_int( np )
-   call proc_sum_int( nq )
+   call da_proc_sum_int( nu )
+   call da_proc_sum_int( nv )
+   call da_proc_sum_int( nt )
+   call da_proc_sum_int( np )
+   call da_proc_sum_int( nq )
    
-   call proc_stats_combine(Pseudo%average%u, Pseudo%rms_err%u, &
+   call da_proc_stats_combine(Pseudo%average%u, Pseudo%rms_err%u, &
                            Pseudo%minimum%u%value, Pseudo%maximum%u%value, &
                            Pseudo%minimum%u%n, Pseudo%maximum%u%n, &
                            Pseudo%minimum%u%l, Pseudo%maximum%u%l )
-   call proc_stats_combine(Pseudo%average%v, Pseudo%rms_err%v, &
+   call da_proc_stats_combine(Pseudo%average%v, Pseudo%rms_err%v, &
                            Pseudo%minimum%v%value, Pseudo%maximum%v%value, &
                            Pseudo%minimum%v%n, Pseudo%maximum%v%n, &
                            Pseudo%minimum%v%l, Pseudo%maximum%v%l )
-   call proc_stats_combine(Pseudo%average%t, Pseudo%rms_err%t, &
+   call da_proc_stats_combine(Pseudo%average%t, Pseudo%rms_err%t, &
                            Pseudo%minimum%t%value, Pseudo%maximum%t%value, &
                            Pseudo%minimum%t%n, Pseudo%maximum%t%n, &
                            Pseudo%minimum%t%l, Pseudo%maximum%t%l )
-   call proc_stats_combine(Pseudo%average%p, Pseudo%rms_err%p, &
+   call da_proc_stats_combine(Pseudo%average%p, Pseudo%rms_err%p, &
                            Pseudo%minimum%p%value, Pseudo%maximum%p%value, &
                            Pseudo%minimum%p%n, Pseudo%maximum%p%n, &
                            Pseudo%minimum%p%l, Pseudo%maximum%p%l )
-   call proc_stats_combine(Pseudo%average%q, Pseudo%rms_err%q, &
+   call da_proc_stats_combine(Pseudo%average%q, Pseudo%rms_err%q, &
                            Pseudo%minimum%q%value, Pseudo%maximum%q%value, &
                            Pseudo%minimum%q%n, Pseudo%maximum%q%n, &
                            Pseudo%minimum%q%l, Pseudo%maximum%q%l )

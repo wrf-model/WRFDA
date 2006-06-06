@@ -117,7 +117,7 @@ SUBROUTINE DA_Setup_FirstGuess_MM5( xb, xbx, xp)
    
    CALL Set_Map_Para ! set up the map background parameters
 
-   CALL llxy( PHIC,XLONC,X,Y )
+   CALL da_llxy( PHIC,XLONC,X,Y )
 !   WRITE(UNIT=stderr,FMT='(''PHIC,XLONC,X,Y:'',4F10.2)') PHIC,XLONC,X,Y
 
 !---------------------------------------------------------------------------

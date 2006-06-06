@@ -85,9 +85,9 @@ SUBROUTINE da_get_innov_vector_sound ( it, xb, xp, ob, iv )
         iv%sound(n)%zk(k)=missing_r
 
         IF ( iv%sound(n)%p(k) > 1.0 ) THEN
-          call to_zk(iv%sound(n)%p(k), v_p, xp, v_interp_p, iv%sound(n)%zk(k))
+          call da_to_zk(iv%sound(n)%p(k), v_p, xp, v_interp_p, iv%sound(n)%zk(k))
         ELSE IF ( iv%sound(n)%h(k) > 0.0 ) THEN
-          call to_zk(iv%sound(n)%h(k), v_h, xp, v_interp_h, iv%sound(n)%zk(k))
+          call da_to_zk(iv%sound(n)%h(k), v_h, xp, v_interp_h, iv%sound(n)%zk(k))
         ENDIF
 
         if (iv%sound(n)%zk(k) < 0.0) then
@@ -101,25 +101,25 @@ SUBROUTINE da_get_innov_vector_sound ( it, xb, xp, ob, iv )
       ! [1.2] Interpolate horizontally to ob:
 
 #ifndef DEREF_KLUDGE
-      call Interp_lin_3D( xb%u, xp, i, j, dx, dy, dxm, dym, &
+      call da_Interp_lin_3D( xb%u, xp, i, j, dx, dy, dxm, dym, &
                            model_u, max_ob_levels, iv%sound(n)%zk, num_levs )
-      call Interp_lin_3D( xb%v, xp, i, j, dx, dy, dxm, dym, &
+      call da_Interp_lin_3D( xb%v, xp, i, j, dx, dy, dxm, dym, &
                            model_v, max_ob_levels, iv%sound(n)%zk, num_levs )
-      call Interp_lin_3D( xb%t, xp, i, j, dx, dy, dxm, dym, &
+      call da_Interp_lin_3D( xb%t, xp, i, j, dx, dy, dxm, dym, &
                            model_t, max_ob_levels, iv%sound(n)%zk, num_levs )
-      call Interp_lin_3D( xb%q, xp, i, j, dx, dy, dxm, dym, &
+      call da_Interp_lin_3D( xb%q, xp, i, j, dx, dy, dxm, dym, &
                            model_q, max_ob_levels, iv%sound(n)%zk, num_levs )
 
       ! call Interp_lin_3D( xb%h, xp, i, j, dx, dy, dxm, dym, &
       !   model_h, max_ob_levels, iv%sound(n)%zk, num_levs )
 #else
-      call Interp_lin_3D( xb%u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+      call da_Interp_lin_3D( xb%u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                            model_u(1), max_ob_levels, iv%sound(n)%zk(1), num_levs )
-      call Interp_lin_3D( xb%v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+      call da_Interp_lin_3D( xb%v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                            model_v(1), max_ob_levels, iv%sound(n)%zk(1), num_levs )
-      call Interp_lin_3D( xb%t(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+      call da_Interp_lin_3D( xb%t(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                            model_t(1), max_ob_levels, iv%sound(n)%zk(1), num_levs )
-      call Interp_lin_3D( xb%q(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+      call da_Interp_lin_3D( xb%q(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                            model_q(1), max_ob_levels, iv%sound(n)%zk(1), num_levs )
 
       ! call Interp_lin_3D( xb%h(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &

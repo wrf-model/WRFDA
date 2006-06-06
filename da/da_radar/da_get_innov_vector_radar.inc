@@ -75,7 +75,7 @@ SUBROUTINE da_get_innov_vector_Radar ( it, xb, xp, ob, iv )
 
          do k=1, num_levs
 
-            call to_zk(iv%Radar(n)%height(k), v_h, xp, v_interp_h, iv%Radar(n)%zk(k))
+            call da_to_zk(iv%Radar(n)%height(k), v_h, xp, v_interp_h, iv%Radar(n)%zk(k))
 
             if ( iv%Radar(n)%zk(k) < 1.0 ) then
 
@@ -156,7 +156,7 @@ SUBROUTINE da_get_innov_vector_Radar ( it, xb, xp, ob, iv )
                               iv%Radar(n)%stn_loc%lat, iv%Radar(n)%stn_loc%lon, &
                               iv%Radar(n)%stn_loc%x,   iv%Radar(n)%stn_loc%y )
          else
-            CALL llxy ( iv%Radar(n)%stn_loc%lat, iv%Radar(n)%stn_loc%lon, &
+            CALL da_llxy ( iv%Radar(n)%stn_loc%lat, iv%Radar(n)%stn_loc%lon, &
                         iv%Radar(n)%stn_loc%x,   iv%Radar(n)%stn_loc%y )
          endif
 

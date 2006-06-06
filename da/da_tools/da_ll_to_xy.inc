@@ -23,17 +23,17 @@ SUBROUTINE DA_ll_to_xy (info, loc, xp, &
 !  get the (x, y) coordinates
 
    if(fg_format == 1) then
-      CALL latlon_to_ij(map_info, info%lat, info%lon, loc%x, loc%y)
+      CALL da_latlon_to_ij(map_info, info%lat, info%lon, loc%x, loc%y)
 !  else if(fg_format == 2) then
 !     CALL llxy (info%lat, info%lon, loc%x, loc%y)
    else if(fg_format == 3) then
       CALL da_global_ll_to_xy (info%lat, info%lon, loc%x, loc%y)
    else
-      CALL llxy (info%lat, info%lon, loc%x, loc%y)
+      CALL da_llxy (info%lat, info%lon, loc%x, loc%y)
    endif
 
-   call toGrid (loc%x, xp%its-2, xp%ite+2, loc%i, loc%dx, loc%dxm)
-   call toGrid (loc%y, xp%jts-2, xp%jte+2, loc%j, loc%dy, loc%dym)
+   call da_toGrid (loc%x, xp%its-2, xp%ite+2, loc%i, loc%dx, loc%dxm)
+   call da_toGrid (loc%y, xp%jts-2, xp%jte+2, loc%j, loc%dy, loc%dym)
 
    ! refactor to remove this ugly duplication later
    IF ( PRESENT( outside_all ) ) THEN

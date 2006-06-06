@@ -147,7 +147,7 @@ SUBROUTINE da_get_innov_vector_gpsref ( it, xb, xp, ob, iv )
          do k=1, num_levs
             iv%gpsref(n)%zk(k)=missing_r
             if ( iv%gpsref(n)%h(k) > 0.0 ) &
-               call to_zk(iv%gpsref(n)%h(k), v_h, xp, v_interp_h, iv%gpsref(n)%zk(k))
+               call da_to_zk(iv%gpsref(n)%h(k), v_h, xp, v_interp_h, iv%gpsref(n)%zk(k))
             if(iv%gpsref(n)%zk(k) < 0.0) iv%gpsref(n)%ref(k)%qc = missing
          enddo
 
@@ -158,10 +158,10 @@ SUBROUTINE da_get_innov_vector_gpsref ( it, xb, xp, ob, iv )
        endif
          
 #ifndef DEREF_KLUDGE
-         call Interp_lin_3D( xb%ref, xp, i, j, dx, dy, dxm, dym, &
+         call da_Interp_lin_3D( xb%ref, xp, i, j, dx, dy, dxm, dym, &
                              model_ref, max_ob_levels, iv%gpsref(n)%zk, num_levs )
 #else
-         call Interp_lin_3D( xb%ref(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+         call da_Interp_lin_3D( xb%ref(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                              model_ref(1), max_ob_levels, iv%gpsref(n)%zk(1), num_levs )
 #endif
 

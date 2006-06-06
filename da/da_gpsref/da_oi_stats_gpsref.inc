@@ -28,7 +28,7 @@ SUBROUTINE DA_OI_Stats_GPSRef ( stats_unit, oi )
       if( oi%gpsref(n)%loc%proc_domain ) then
          do k=1, oi%gpsref(n)%info%levels
 
-            CALL Stats_Calculate( oi%GPSRef(n)%loc%obs_global_index, &
+            CALL da_Stats_Calculate( oi%GPSRef(n)%loc%obs_global_index, &
                           k, oi%GPSRef(n)%ref(k)%qc, &
                           oi%GPSRef(n)%ref(k)%inv, ngpsref, &
                           GPSRef%minimum%ref, GPSRef%maximum%ref, &
@@ -39,9 +39,9 @@ SUBROUTINE DA_OI_Stats_GPSRef ( stats_unit, oi )
 
 !--Do inter-processor communication to gather statistics.
 
-   call proc_sum_int( ngpsref )
+   call da_proc_sum_int( ngpsref )
    
-   call proc_stats_combine(GPSRef%average%ref, GPSRef%rms_err%ref, &
+   call da_proc_stats_combine(GPSRef%average%ref, GPSRef%rms_err%ref, &
              GPSRef%minimum%ref%value, GPSRef%maximum%ref%value, &
              GPSRef%minimum%ref%n, GPSRef%maximum%ref%n, &
              GPSRef%minimum%ref%l, GPSRef%maximum%ref%l )

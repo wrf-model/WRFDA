@@ -126,8 +126,8 @@ SUBROUTINE DA_Solve_PoissonEqn_FCT( xb, xbx, del2b, b, xp)
 
 !  [3.1] Apply (i,j',k' -> i',j,k') transpose ( v1x -> v1y ).
 
-   call transpose_x2y ( xp )
-   call transpose_x2y_v2 ( xp )
+   call da_transpose_x2y ( xp )
+   call da_transpose_x2y_v2 ( xp )
 
 !  [3.2] Set up FFT parameters:
 

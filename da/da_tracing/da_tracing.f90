@@ -2,7 +2,7 @@ MODULE da_tracing
 
    USE DA_Constants
    USE module_wrf_error
-   USE par_util1
+   USE da_par_util1
 
 
    INTEGER, PARAMETER :: TraceIndentAmount      = 2   ! default indent

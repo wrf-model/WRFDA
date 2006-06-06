@@ -51,7 +51,7 @@ SUBROUTINE da_omb_stats_rad ( stats_unit, iv )
 
       if( iv%instid(i)%rad(n)%loc%proc_domain ) then
 
-         CALL Stats_Calculate( n,k,iv%instid(i)%rad(n)%tb(k)%qc, &
+         CALL da_Stats_Calculate( n,k,iv%instid(i)%rad(n)%tb(k)%qc, &
                                iv%instid(i)%rad(n)%tb(k)%inv, rad(i)%ichan(k)%num, &
                                rad(i)%ichan(k)%minimum, rad(i)%ichan(k)%maximum, &
                                rad(i)%ichan(k)%ave, rad(i)%ichan(k)%rms)
@@ -68,13 +68,13 @@ SUBROUTINE da_omb_stats_rad ( stats_unit, iv )
 !  IF ( iv%instid(i)%num_rad < 1 ) cycle
   do k=1, iv%instid(i)%nchan               !! loop for channels
 ! Do inter-processor communication to gather statistics.
-   call proc_sum_int ( rad(i)%ichan(k)%num )
+   call da_proc_sum_int ( rad(i)%ichan(k)%num )
 !   print *,   rad(i)%ichan(k)%num, rad(i)%ichan(k)%ave, &
 !              rad(i)%ichan(k)%rms, rad(i)%ichan(k)%minimum%value, &
 !              rad(i)%ichan(k)%maximum%value, &
 !            rad(i)%ichan(k)%minimum%n, rad(i)%ichan(k)%maximum%n, &
 !            rad(i)%ichan(k)%minimum%l, rad(i)%ichan(k)%maximum%l
-   call proc_stats_combine(rad(i)%ichan(k)%ave, rad(i)%ichan(k)%rms, &
+   call da_proc_stats_combine(rad(i)%ichan(k)%ave, rad(i)%ichan(k)%rms, &
                            rad(i)%ichan(k)%minimum%value, rad(i)%ichan(k)%maximum%value, &
                            rad(i)%ichan(k)%minimum%n, rad(i)%ichan(k)%maximum%n, &
                            rad(i)%ichan(k)%minimum%l, rad(i)%ichan(k)%maximum%l )

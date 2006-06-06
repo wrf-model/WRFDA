@@ -25,12 +25,12 @@ SUBROUTINE DA_OI_Stats_Pilot ( stats_unit, oi )
     DO n=1, oi%num_Pilot
       if( oi%pilot(n)%loc%proc_domain ) then
         do k=1, oi%Pilot(n)%info%levels
-          CALL Stats_Calculate( oi%Pilot(n)%loc%obs_global_index, &
+          CALL da_Stats_Calculate( oi%Pilot(n)%loc%obs_global_index, &
                               k, oi%Pilot(n)%u(k)%qc,  &
                               oi%Pilot(n)%u(k)%inv, nu, &
                               Pilot%minimum%u, Pilot%maximum%u, &
                               Pilot%average%u, Pilot%rms_err%u)
-          CALL Stats_Calculate( oi%Pilot(n)%loc%obs_global_index, &
+          CALL da_Stats_Calculate( oi%Pilot(n)%loc%obs_global_index, &
                               k, oi%Pilot(n)%v(k)%qc, &
                               oi%Pilot(n)%v(k)%inv, nv, &
                               Pilot%minimum%v, Pilot%maximum%v, &
@@ -41,14 +41,14 @@ SUBROUTINE DA_OI_Stats_Pilot ( stats_unit, oi )
   END IF
 
   ! Do inter-processor communication to gather statistics.
-  call proc_sum_int( nu )
-  call proc_sum_int( nv )
+  call da_proc_sum_int( nu )
+  call da_proc_sum_int( nv )
 
-  call proc_stats_combine(Pilot%average%u, Pilot%rms_err%u, &
+  call da_proc_stats_combine(Pilot%average%u, Pilot%rms_err%u, &
                           Pilot%minimum%u%value, Pilot%maximum%u%value, &
                           Pilot%minimum%u%n, Pilot%maximum%u%n, &
                           Pilot%minimum%u%l, Pilot%maximum%u%l )
-  call proc_stats_combine(Pilot%average%v, Pilot%rms_err%v, &
+  call da_proc_stats_combine(Pilot%average%v, Pilot%rms_err%v, &
                           Pilot%minimum%v%value, Pilot%maximum%v%value, &
                           Pilot%minimum%v%n, Pilot%maximum%v%n, &
                           Pilot%minimum%v%l, Pilot%maximum%v%l )

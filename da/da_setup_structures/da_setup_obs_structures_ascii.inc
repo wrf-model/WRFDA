@@ -96,7 +96,8 @@ SUBROUTINE da_setup_obs_structures_ascii( xp, ob, iv )
       enddo
    else
       iv%current_ob_time = 1
-      call da_scan_obs(gts_iunit, iv, xp)
+      filename="ob.ascii"
+      call da_scan_obs(gts_iunit, iv, xp, filename)
 
       !-----------------------------------------------------------------------
       ! read header of ssmi observation file
@@ -231,8 +232,9 @@ SUBROUTINE da_setup_obs_structures_ascii( xp, ob, iv )
       enddo
    else
       iv%current_ob_time = 1
+      filename="ob.ascii"
 
-      call da_read_obs(gts_iunit, iv, xp)
+      call da_read_obs(gts_iunit, iv, xp, filename)
 
       if(Use_SsmiRetrievalObs .or. Use_SsmiTbObs) then
          ! read ssmi observation file

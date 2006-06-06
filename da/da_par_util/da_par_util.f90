@@ -4,7 +4,7 @@
 ! Utility subroutines for parallel WRFVAR.
 !---------------------------------------------------------------------------
 
-MODULE par_util
+MODULE da_par_util
 
    !---------------------------------------------------------------------------
    ! PURPOSE: Routines for local-to-global and global-to-local grid operations.
@@ -14,7 +14,7 @@ MODULE par_util
 
    USE da_define_structures   ! For xb_, cv_, xp_, be_, x_type definitions.
    USE da_constants           
-   USE par_util1
+   USE da_par_util1
    USE module_wrf_error
     
    IMPLICIT NONE
@@ -27,43 +27,43 @@ MODULE par_util
 #define TRUE_RSL_REAL     RSL_DOUBLE
 #endif
 
-#include <generic_typedefs.inc>
+#include <da_generic_typedefs.inc>
 
-   INTERFACE wv_patch_to_global
-      MODULE PROCEDURE wv_patch_to_global_2d
-      MODULE PROCEDURE wv_patch_to_global_3d
+   INTERFACE da_wv_patch_to_global
+      MODULE PROCEDURE da_wv_patch_to_global_2d
+      MODULE PROCEDURE da_wv_patch_to_global_3d
    END INTERFACE
 
    CONTAINS
 
-#include <cv_to_vv.inc>
-#include <vv_to_cv.inc>
-#include <alloc_and_copy_be_arrays.inc>
-#include <be_local_copy.inc>
-#include <copy_dims.inc>
-#include <copy_tile_dims.inc>
-#include <pack_count_obs.inc>
-#include <unpack_count_obs.inc>
-#include <transpose.inc>
-#include <cv_to_global.inc>
-#include <generic_methods.inc>
-#include <specific_methods.inc>
-#include <generic_boilerplate.inc>
-#include <y_facade_to_global.inc>
+#include <da_cv_to_vv.inc>
+#include <da_vv_to_cv.inc>
+#include <da_alloc_and_copy_be_arrays.inc>
+#include <da_be_local_copy.inc>
+#include <da_copy_dims.inc>
+#include <da_copy_tile_dims.inc>
+#include <da_pack_count_obs.inc>
+#include <da_unpack_count_obs.inc>
+#include <da_transpose.inc>
+#include <da_cv_to_global.inc>
+#include <da_generic_methods.inc>
+#include <da_specific_methods.inc>
+#include <da_generic_boilerplate.inc>
+#include <da_y_facade_to_global.inc>
 
 #ifdef DM_PARALLEL
 
-#include <local_to_global.inc>
-#include <mm5_struct_bcast.inc>
-#include <proc_sum_count_obs.inc>
-#include <proc_stats_combine.inc>
-#include <proc_maxmin_combine.inc>
+#include <da_local_to_global.inc>
+#include <da_mm5_struct_bcast.inc>
+#include <da_proc_sum_count_obs.inc>
+#include <da_proc_stats_combine.inc>
+#include <da_proc_maxmin_combine.inc>
 
 #else
 
-#include <wrf_dm_interface.inc>
+#include <da_wrf_dm_interface.inc>
 
 #endif
 
-END MODULE par_util
+END MODULE da_par_util
 

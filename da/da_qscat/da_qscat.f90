@@ -1,11 +1,11 @@
 module da_qscat
 
-   USE DA_Constants
-   USE DA_Define_Structures
-   USE DA_Interpolation
-   USE DA_Statistics
-   USE DA_Tools
-   USE PAR_UTIL
+   use da_constants
+   use da_define_structures
+   use da_interpolation
+   use da_statistics
+   use da_tools
+   use da_par_util
 
 ! The "stats_qscat_type" is ONLY used locally in DA_Qscat:
 

@@ -30,7 +30,7 @@ SUBROUTINE DA_Read_Obs (iunit, ob, xp, filename)
    TYPE (xpose_type), INTENT(IN)    :: xp    ! Domain decomposition vars.
    TYPE (ob_type),    INTENT(inout) :: ob
 
-   CHARACTER(*), INTENT(in), OPTIONAL :: filename
+   CHARACTER(*), INTENT(in)         :: filename
 
    CHARACTER (LEN =  10)        :: fmt_name
 
@@ -99,37 +99,19 @@ SUBROUTINE DA_Read_Obs (iunit, ob, xp, filename)
 !  OPEN FILE
 !  ---------
 
-   if(present(filename)) then
-      OPEN(UNIT   = iunit,     &
-           FILE   = trim(filename), &
-           FORM   = 'FORMATTED',  &
-           ACCESS = 'SEQUENTIAL', &
-           IOSTAT =  iost,     &
-           STATUS = 'OLD')
+   OPEN(UNIT   = iunit,     &
+        FILE   = trim(filename), &
+        FORM   = 'FORMATTED',  &
+        ACCESS = 'SEQUENTIAL', &
+        IOSTAT =  iost,     &
+        STATUS = 'OLD')
 
-      IF (iost /= 0) THEN
-         write(unit=stdout, fmt='(/A,I3,3(2X,A)/)') &
-              'ERROR IN OBS INPUT FILE UNIT ',iunit, &
-              'OBS FILENAME:', trim(filename), &
-              'FOR GTS OBSERVATIONS CANNOT BE FOUND OR CANNOT BE OPENED'
-         RETURN
-      ENDIF
-   else
-#ifndef crayx1
-      OPEN(UNIT   = iunit,     &
-           FORM   = 'FORMATTED',  &
-           ACCESS = 'SEQUENTIAL', &
-           IOSTAT =  iost,     &
-           STATUS = 'OLD')
-
-      IF (iost /= 0) THEN
-         write(unit=stdout, fmt='(/A,I3,2X,a,i3/A/)') &
-              'ERROR IN OBS INPUT FILE UNIT ',iunit, 'iost=', iost, &
-              'FOR GTS OBSERVATIONS CANNOT BE FOUND OR CANNOT BE OPENED'
-         RETURN
-      ENDIF
-#endif
-   endif
+   IF (iost /= 0) THEN
+      WRITE(UNIT=errmsg(1),FMT='(A,I5,A)') &
+         "Error",iost,"opening gts obs file "//TRIM(filename)
+      CALL wrf_warning3(__FILE__,__LINE__,errmsg(1))
+      RETURN
+   ENDIF
 
 !  READ HEADER
 !  ===========

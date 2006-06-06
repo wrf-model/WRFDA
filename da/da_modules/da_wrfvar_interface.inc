@@ -25,7 +25,7 @@ SUBROUTINE da_wrfvar_interface ( grid, config_flags )
       USE da_test
       USE da_tools
       USE da_minimisation
-      USE par_util
+      USE da_par_util
 
       !--Input data.
 

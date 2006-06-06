@@ -29,11 +29,11 @@ subroutine da_oa_stats_qscat( stats_unit, oi, re )
 
        if( oi%qscat(n)%loc%proc_domain ) then
 
-         CALL Stats_Calculate( n, 0, oi%qscat(n)%u%qc, & 
+         CALL da_Stats_Calculate( n, 0, oi%qscat(n)%u%qc, & 
                                re%qscat(n)%u, nu, & 
                                qscat%minimum%u, qscat%maximum%u, &
                                qscat%average%u, qscat%rms_err%u )
-         CALL Stats_Calculate( n, 0, oi%qscat(n)%v%qc, & 
+         CALL da_Stats_Calculate( n, 0, oi%qscat(n)%v%qc, & 
                                re%qscat(n)%v, nv, & 
                                qscat%minimum%v, qscat%maximum%v, &
                                qscat%average%v, qscat%rms_err%v )
@@ -45,15 +45,15 @@ subroutine da_oa_stats_qscat( stats_unit, oi, re )
    END IF
 
 ! Do inter-processor communication to gather statistics.
-   call proc_sum_int( nu )
-   call proc_sum_int( nv )
+   call da_proc_sum_int( nu )
+   call da_proc_sum_int( nv )
    num_qscat_tot = nu + nv
    
-   call proc_stats_combine(qscat%average%u, qscat%rms_err%u, &
+   call da_proc_stats_combine(qscat%average%u, qscat%rms_err%u, &
                            qscat%minimum%u%value, qscat%maximum%u%value, &
                            qscat%minimum%u%n, qscat%maximum%u%n, &
                            qscat%minimum%u%l, qscat%maximum%u%l )
-   call proc_stats_combine(qscat%average%v, qscat%rms_err%v, &
+   call da_proc_stats_combine(qscat%average%v, qscat%rms_err%v, &
                            qscat%minimum%v%value, qscat%maximum%v%value, &
                            qscat%minimum%v%n, qscat%maximum%v%n, &
                            qscat%minimum%v%l, qscat%maximum%v%l )

@@ -1,4 +1,4 @@
-SUBROUTINE local_to_global(xp, x, xg, dim)
+SUBROUTINE da_local_to_global(xp, x, xg, dim)
 
 !------------------------------------------------------------------------------
 !  PURPOSE: Make xg global-grid array by gathering the subdomain arrays x from
@@ -33,16 +33,16 @@ SUBROUTINE local_to_global(xp, x, xg, dim)
      CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
    end if
 
-END SUBROUTINE local_to_global
+END SUBROUTINE da_local_to_global
 
-SUBROUTINE mm5_struct_bcast( x_mm5 )
+SUBROUTINE da_mm5_struct_bcast( x_mm5 )
 
    TYPE (mm5_model_type), INTENT(INOUT)   :: x_mm5  ! MM5 model structure.
 
    RETURN
-END SUBROUTINE mm5_struct_bcast
+END SUBROUTINE da_mm5_struct_bcast
 
-SUBROUTINE proc_sum_count_obs ( count_obs )
+SUBROUTINE da_proc_sum_count_obs ( count_obs )
 
 !------------------------------------------------------------------------------
 !  PURPOSE: Do MPI sum operation across processors to get the global sum of
@@ -60,9 +60,9 @@ SUBROUTINE proc_sum_count_obs ( count_obs )
    TYPE (count_obs_type), INTENT(INOUT)     :: count_obs
 
    RETURN
-END SUBROUTINE proc_sum_count_obs
+END SUBROUTINE da_proc_sum_count_obs
 
-SUBROUTINE proc_stats_combine( proc_ave, proc_err, proc_min, proc_max, &
+SUBROUTINE da_proc_stats_combine( proc_ave, proc_err, proc_min, proc_max, &
                                nobs_min, nobs_max, klev_min, klev_max )
 
 !------------------------------------------------------------------------------
@@ -83,9 +83,9 @@ SUBROUTINE proc_stats_combine( proc_ave, proc_err, proc_min, proc_max, &
    INTEGER,   INTENT(INOUT)      :: klev_max       ! Level of maximum.
 
    RETURN
-END SUBROUTINE proc_stats_combine
+END SUBROUTINE da_proc_stats_combine
 
-SUBROUTINE proc_maxmin_combine( n, max, min )
+SUBROUTINE da_proc_maxmin_combine( n, max, min )
 
 !------------------------------------------------------------------------------
 !  PURPOSE: Do MPI reduction operations across processors to get the minimum
@@ -103,9 +103,9 @@ SUBROUTINE proc_maxmin_combine( n, max, min )
    TYPE (maxmin_field_type), INTENT(INOUT)  :: min(n)  ! Min values over proc.
 
    RETURN
-END SUBROUTINE proc_maxmin_combine
+END SUBROUTINE da_proc_maxmin_combine
 
-SUBROUTINE proc_diagnostics_collect(num_sound, iv, re )
+SUBROUTINE da_proc_diagnostics_collect(num_sound, iv, re )
 
 !------------------------------------------------------------------------------
 !  PURPOSE: Do MPI reduction operations across processors to get values needed
@@ -120,5 +120,5 @@ SUBROUTINE proc_diagnostics_collect(num_sound, iv, re )
    type (residual_sound_type), intent(inout) :: re(:)
 
    RETURN
-END SUBROUTINE proc_diagnostics_collect
+END SUBROUTINE da_proc_diagnostics_collect
 

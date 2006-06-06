@@ -70,32 +70,32 @@
         ! gather to global data structures
         ! it is possible to gather straight into a globally-sized cv-array
         ! TODO:  add this optimization later
-        CALL wv_patch_to_global( vv_x%v1, vv_xg%v1,       &
+        CALL da_wv_patch_to_global( vv_x%v1, vv_xg%v1,       &
                                  xp%domdesc, mzs(1),    &
                                  ids, ide, jds, jde, kds, &
                                  ims, ime, jms, jme, kms, &
                                  ips, ipe, jps, jpe, kps )
-        CALL wv_patch_to_global( vv_x%v2, vv_xg%v2,       &
+        CALL da_wv_patch_to_global( vv_x%v2, vv_xg%v2,       &
                                  xp%domdesc, mzs(2),    &
                                  ids, ide, jds, jde, kds, &
                                  ims, ime, jms, jme, kms, &
                                  ips, ipe, jps, jpe, kps )
-        CALL wv_patch_to_global( vv_x%v3, vv_xg%v3,       &
+        CALL da_wv_patch_to_global( vv_x%v3, vv_xg%v3,       &
                                  xp%domdesc, mzs(3),    &
                                  ids, ide, jds, jde, kds, &
                                  ims, ime, jms, jme, kms, &
                                  ips, ipe, jps, jpe, kps )
-        CALL wv_patch_to_global( vv_x%v4, vv_xg%v4,       &
+        CALL da_wv_patch_to_global( vv_x%v4, vv_xg%v4,       &
                                  xp%domdesc, mzs(4),    &
                                  ids, ide, jds, jde, kds, &
                                  ims, ime, jms, jme, kms, &
                                  ips, ipe, jps, jpe, kps )
-        CALL wv_patch_to_global( vv_x%v5, vv_xg%v5,       &
+        CALL da_wv_patch_to_global( vv_x%v5, vv_xg%v5,       &
                                  xp%domdesc, mzs(5), &
                                  ids, ide, jds, jde, kds, &
                                  ims, ime, jms, jme, kms, &
                                  ips, ipe, jps, jpe, kps )
-        CALL wv_patch_to_global( vv_x%alpha, vv_xg%alpha,       &
+        CALL da_wv_patch_to_global( vv_x%alpha, vv_xg%alpha,       &
                                  xp%domdesc, mzs(6),    &
                                  ids, ide, jds, jde, kds, &
                                  ims, ime, jms, jme, kms, &
@@ -160,7 +160,7 @@ SUBROUTINE da_wv_patch_to_global_3d( vlocal, vglobal,         &
     kde = kds + mz - 1
     kme = kde
     kpe = kde
-    CALL wrf_patch_to_global_real ( vlocal, vglobal, domdesc,      &
+    CALL da_wrf_patch_to_global_real ( vlocal, vglobal, domdesc,      &
                                     TRIM(stagger), TRIM(ordering), &
                                     ids, ide, jds, jde, kds, kde,  &
                                     ims, ime, jms, jme, kms, kme,  &

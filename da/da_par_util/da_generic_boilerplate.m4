@@ -14,19 +14,14 @@
 define( macro_y_type_extract, 
 `!--- $1 $2 $3
 
-SUBROUTINE y_type_extract_$1( iv, re, slice )
+SUBROUTINE da_y_type_extract_$1( iv, re, slice )
 
 !------------------------------------------------------------------------------
 ! PURPOSE:  Eliminate redundant code for many obs types.  
 !
 ! METHOD:   Extract all $1 obs from y and place them in generic 
 !           object slice.  
-!           Call y_facade_free() to deallocate memory allocated here.  
-!
-!  HISTORY:
-!           10/03/2005 - Creation.                          Tom Henderson
-!
-! PARENT_MODULE: par_util
+!           Call y_facade_free() to deallocate memory allocated here.
 !------------------------------------------------------------------------------
    IMPLICIT NONE
 
@@ -36,16 +31,16 @@ SUBROUTINE y_type_extract_$1( iv, re, slice )
    ! Local declarations
    INTEGER :: n
 
-   CALL y_facade_create( slice, iv%$3, iv%$3_glo )
+   CALL da_y_facade_create( slice, iv%$3, iv%$3_glo )
    DO n=1, slice%num_obs
-     CALL residual_generic_set_info( slice%obs(n),                     &
+     CALL da_residual_generic_set_info( slice%obs(n),                     &
                                      iv%$1(n)%loc%proc_domain,      &
                                      iv%$1(n)%loc%obs_global_index )
-     CALL residual_$2_to_generic( re%$1(n), iv%$1(n)%info%levels, &
+     CALL da_residual_$2_to_generic( re%$1(n), iv%$1(n)%info%levels, &
                                      slice%obs(n) )
    ENDDO
 
-END SUBROUTINE y_type_extract_$1 ' )
+END SUBROUTINE da_y_type_extract_$1 ' )
 
 
 
@@ -53,7 +48,7 @@ END SUBROUTINE y_type_extract_$1 ' )
 define( macro_y_type_insert_global, 
 `!--- $1 $2 $3
 
-SUBROUTINE y_type_insert_$1_global( slice_glob, re_glob )
+SUBROUTINE da_y_type_insert_$1_global( slice_glob, re_glob )
 
 !------------------------------------------------------------------------------
 ! PURPOSE:  Eliminate redundant code for many obs types.  
@@ -63,11 +58,6 @@ SUBROUTINE y_type_insert_$1_global( slice_glob, re_glob )
 !           allocated minimally.  Caller must deallocate.  
 !           Memory for global object slice_glob is deallocated here.  
 !           Do not use slice_glob after this call.
-!
-!  HISTORY:
-!           10/03/2005 - Creation.                          Tom Henderson
-!
-! PARENT_MODULE: par_util
 !------------------------------------------------------------------------------
    IMPLICIT NONE
 
@@ -80,12 +70,12 @@ SUBROUTINE y_type_insert_$1_global( slice_glob, re_glob )
    ! deallocation is done in free_global_$1()
    ALLOCATE( re_glob%$1(slice_glob%num_obs) )
    DO n=1, slice_glob%num_obs
-     CALL residual_$2_from_generic( slice_glob%obs(n), re_glob%$1(n) )
+     CALL da_residual_$2_from_generic( slice_glob%obs(n), re_glob%$1(n) )
    ENDDO
    re_glob%$3 = slice_glob%num_obs  ! duplication!
    CALL y_facade_free( slice_glob )
 
-END SUBROUTINE y_type_insert_$1_global ')
+END SUBROUTINE da_y_type_insert_$1_global ')
 
 
 
@@ -93,7 +83,7 @@ END SUBROUTINE y_type_insert_$1_global ')
 define( macro_iv_type_insert_global, 
 `!--- $1 $2 $3
 
-SUBROUTINE iv_type_insert_$1_global( slice_glob, iv_glob )
+SUBROUTINE da_iv_type_insert_$1_global( slice_glob, iv_glob )
 
 !------------------------------------------------------------------------------
 ! PURPOSE:  Eliminate redundant code for many obs types.  
@@ -101,11 +91,6 @@ SUBROUTINE iv_type_insert_$1_global( slice_glob, iv_glob )
 ! METHOD:   Insert meta-data from generic object slice_glob into 
 !           globally-scoped ob_type iv_glob.  iv_glob is 
 !           allocated minimally.  Caller must deallocate.  
-!
-!  HISTORY:
-!           10/03/2005 - Creation.                          Tom Henderson
-!
-! PARENT_MODULE: par_util
 !------------------------------------------------------------------------------
    IMPLICIT NONE
 
@@ -123,12 +108,12 @@ SUBROUTINE iv_type_insert_$1_global( slice_glob, iv_glob )
      iv_glob%$1(n)%loc%proc_domain = slice_glob%obs(n)%proc_domain
      iv_glob%$1(n)%loc%obs_global_index = &
                                         slice_glob%obs(n)%obs_global_index
-     IF ( residual_generic_has_vector( slice_glob%obs(n) ) ) THEN
+     IF ( da_residual_generic_has_vector( slice_glob%obs(n) ) ) THEN
        iv_glob%$1(n)%info%levels = SIZE(slice_glob%obs(n)%values(1)%ptr)
      ENDIF
    ENDDO
 
-END SUBROUTINE iv_type_insert_$1_global ' )
+END SUBROUTINE da_iv_type_insert_$1_global ' )
 
 
 define( macro_to_global, 
@@ -145,13 +130,8 @@ define( macro_to_global,
 !           storage order.  Memory for global objects is allocated here.  
 !           Global objects are minimally allocated to save memory.  
 !           Memory is deallocated in free_global_$1().  
-!
-! HISTORY:
-!           10/10/2005 - Creation.                          Tom Henderson
-!
-! PARENT_MODULE: par_util
 !------------------------------------------------------------------------------
-  SUBROUTINE to_global_$1( iv,      re,      jo_grad_y, &
+  SUBROUTINE da_to_global_$1( iv,      re,      jo_grad_y, &
                                   iv_glob, re_glob, jo_grad_y_glob )
 
     IMPLICIT NONE
@@ -171,29 +151,29 @@ define( macro_to_global,
     TYPE (residual_template_type) :: template  ! allocation info
 
     ! create process-local generic objects from specific objects
-    CALL y_type_extract_$1( iv, re,        re_slice )
-    CALL y_type_extract_$1( iv, jo_grad_y, jo_grad_y_slice )
+    CALL da_y_type_extract_$1( iv, re,        re_slice )
+    CALL da_y_type_extract_$1( iv, jo_grad_y, jo_grad_y_slice )
 
     ! create global versions of generic objects from process-local objects
     ! and destroy process-local generic objects
     CALL residual_$2_create_template( template )  ! use template in case 
                                                      ! some tasks have no obs
-    CALL y_facade_to_global( re_slice,        template, re_glob_slice )
-    CALL y_facade_to_global( jo_grad_y_slice, template, jo_grad_y_glob_slice )
+    CALL da_y_facade_to_global( re_slice,        template, re_glob_slice )
+    CALL da_y_facade_to_global( jo_grad_y_slice, template, jo_grad_y_glob_slice )
 
     ! create global versions of specific objects
     ! and destroy global versions of generic objects
     ! iv first
-    CALL iv_type_insert_$1_global( re_glob_slice, iv_glob )
+    CALL da_iv_type_insert_$1_global( re_glob_slice, iv_glob )
     ! then y_types
-    CALL y_type_insert_$1_global( re_glob_slice,        re_glob )
-    CALL y_type_insert_$1_global( jo_grad_y_glob_slice, jo_grad_y_glob )
+    CALL da_y_type_insert_$1_global( re_glob_slice,        re_glob )
+    CALL da_y_type_insert_$1_global( jo_grad_y_glob_slice, jo_grad_y_glob )
     ! global versions of specific objects are destroyed in 
     ! free_global_$1()
 
     RETURN
 
-  END SUBROUTINE to_global_$1 ' )
+  END SUBROUTINE da_to_global_$1 ' )
 
 
 

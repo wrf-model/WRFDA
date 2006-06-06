@@ -46,7 +46,7 @@ SUBROUTINE da_get_innov_vector( it, ob, iv, &
 
       if(num_fgat_time > 1) then
          write(UNIT=filename(1:10), fmt='(a, i2.2)') 'fgat_fg.', n
-         call med_initialdata_input_3dvar ( grid , config_flags, in_filename=filename )
+         call da_med_initialdata_input ( grid , config_flags, in_filename=filename )
          call DA_Setup_FirstGuess( xbx, grid, &
 #include <em_dummy_args.inc>
                            )
@@ -164,7 +164,7 @@ SUBROUTINE da_get_innov_vector( it, ob, iv, &
 !--------------------------------------------------------------------------- 
 
    if(num_fgat_time > 1) then
-      call med_initialdata_input_3dvar ( grid , config_flags )
+      call da_med_initialdata_input ( grid , config_flags )
       call DA_Setup_FirstGuess( xbx, grid, &
 #include <em_dummy_args.inc>
                               )

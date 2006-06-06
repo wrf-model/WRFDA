@@ -71,9 +71,9 @@ SUBROUTINE da_get_innov_vector_airep ( it, xb, xp, ob, iv )
         do k=1, iv % airep(n) % info % levels
           iv%airep(n)%zk(k)=missing_r
           IF ( iv % airep(n) % p(k) > 1.0 ) THEN
-            call to_zk(iv % airep(n) % p(k), v_p, xp, v_interp_p, iv%airep(n)%zk(k))
+            call da_to_zk(iv % airep(n) % p(k), v_p, xp, v_interp_p, iv%airep(n)%zk(k))
           ELSE IF ( iv % airep(n) % h(k) > 0.0 ) THEN
-            call to_zk(iv % airep(n) % h(k), v_h, xp, v_interp_h, iv%airep(n)%zk(k))
+            call da_to_zk(iv % airep(n) % h(k), v_h, xp, v_interp_h, iv%airep(n)%zk(k))
           ENDIF
 
           if(iv%airep(n)%zk(k) < 0.0) then
@@ -87,23 +87,23 @@ SUBROUTINE da_get_innov_vector_airep ( it, xb, xp, ob, iv )
 
         ! [1.2] Interpolate horizontally:
 #ifndef DEREF_KLUDGE
-        call Interp_lin_3D( xb % u, xp, i, j, dx, dy, dxm, dym, &
+        call da_interp_lin_3d( xb % u, xp, i, j, dx, dy, dxm, dym, &
                              model_u, max_ob_levels, iv%airep(n)%zk, num_levs)
                     
-        call Interp_lin_3D( xb % v, xp, i, j, dx, dy, dxm, dym, &
+        call da_interp_lin_3d( xb % v, xp, i, j, dx, dy, dxm, dym, &
                              model_v, max_ob_levels, iv%airep(n)%zk, num_levs)
                     
-        call Interp_lin_3D( xb % t, xp, i, j, dx, dy, dxm, dym, &
+        call da_interp_lin_3d( xb % t, xp, i, j, dx, dy, dxm, dym, &
                              model_t, max_ob_levels, iv%airep(n)%zk, num_levs)
                     
 #else
-        call Interp_lin_3D( xb % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+        call da_interp_lin_3d( xb % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                              model_u(1), max_ob_levels, iv%airep(n)%zk(1), num_levs)
                     
-        call Interp_lin_3D( xb % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+        call da_interp_lin_3d( xb % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                              model_v(1), max_ob_levels, iv%airep(n)%zk(1), num_levs)
                     
-        call Interp_lin_3D( xb % t(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+        call da_interp_lin_3d( xb % t(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                              model_t(1), max_ob_levels, iv%airep(n)%zk(1), num_levs)
 #endif
 

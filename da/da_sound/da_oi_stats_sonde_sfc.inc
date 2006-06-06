@@ -34,28 +34,28 @@ SUBROUTINE DA_OI_Stats_Sonde_sfc ( stats_unit, oi )
 
   DO n=1, oi%num_sound
     if (oi%sonde_sfc(n)%loc%proc_domain ) then
-      CALL Stats_Calculate( oi%sonde_sfc(n)%loc%obs_global_index, &
+      CALL da_Stats_Calculate( oi%sonde_sfc(n)%loc%obs_global_index, &
                               0, oi%sonde_sfc(n)%u%qc, &
                               oi%sonde_sfc(n)%u%inv, nu, &
                               sonde_sfc%minimum%u, sonde_sfc%maximum%u, &
                               sonde_sfc%average%u, sonde_sfc%rms_err%u)
-      CALL Stats_Calculate( oi%sonde_sfc(n)%loc%obs_global_index, &
+      CALL da_Stats_Calculate( oi%sonde_sfc(n)%loc%obs_global_index, &
                               0, oi%sonde_sfc(n)%v%qc, &
                               oi%sonde_sfc(n)%v%inv, nv, &
                               sonde_sfc%minimum%v, sonde_sfc%maximum%v, &
                               sonde_sfc%average%v, sonde_sfc%rms_err%v)
-      CALL Stats_Calculate( oi%sonde_sfc(n)%loc%obs_global_index, &
+      CALL da_Stats_Calculate( oi%sonde_sfc(n)%loc%obs_global_index, &
                               0, oi%sonde_sfc(n)%t%qc, &
                               oi%sonde_sfc(n)%t%inv, nt, &
                               sonde_sfc%minimum%t, sonde_sfc%maximum%t, &
                               sonde_sfc%average%t, sonde_sfc%rms_err%t)
-      CALL Stats_Calculate( oi%sonde_sfc(n)%loc%obs_global_index, &
+      CALL da_Stats_Calculate( oi%sonde_sfc(n)%loc%obs_global_index, &
                               0, oi%sonde_sfc(n)%p%qc, &
                               oi%sonde_sfc(n)%p%inv, np, &
                               sonde_sfc%minimum%p, sonde_sfc%maximum%p, &
                               sonde_sfc%average%p, sonde_sfc%rms_err%p)
 
-      CALL Stats_Calculate( oi%sonde_sfc(n)%loc%obs_global_index, &
+      CALL da_Stats_Calculate( oi%sonde_sfc(n)%loc%obs_global_index, &
                               0, oi%sonde_sfc(n)%q%qc, &
                               oi%sonde_sfc(n)%q%inv, nq, &
                               sonde_sfc%minimum%q, sonde_sfc%maximum%q, &
@@ -64,33 +64,33 @@ SUBROUTINE DA_OI_Stats_Sonde_sfc ( stats_unit, oi )
   END DO
 
   ! Do inter-processor communication to gather statistics.
-  call proc_sum_int( nu )
-  call proc_sum_int( nv )
-  call proc_sum_int( nt )
-  call proc_sum_int( np )
-  call proc_sum_int( nq )
+  call da_proc_sum_int( nu )
+  call da_proc_sum_int( nv )
+  call da_proc_sum_int( nt )
+  call da_proc_sum_int( np )
+  call da_proc_sum_int( nq )
 
-  call proc_stats_combine(Sonde_sfc%average%u, Sonde_sfc%rms_err%u, &
+  call da_proc_stats_combine(Sonde_sfc%average%u, Sonde_sfc%rms_err%u, &
                           Sonde_sfc%minimum%u%value, Sonde_sfc%maximum%u%value, &
                           Sonde_sfc%minimum%u%n, Sonde_sfc%maximum%u%n, &
                           Sonde_sfc%minimum%u%l, Sonde_sfc%maximum%u%l )
 
-  call proc_stats_combine(Sonde_sfc%average%v, Sonde_sfc%rms_err%v, &
+  call da_proc_stats_combine(Sonde_sfc%average%v, Sonde_sfc%rms_err%v, &
                           Sonde_sfc%minimum%v%value, Sonde_sfc%maximum%v%value, &
                           Sonde_sfc%minimum%v%n, Sonde_sfc%maximum%v%n, &
                           Sonde_sfc%minimum%v%l, Sonde_sfc%maximum%v%l )
 
-  call proc_stats_combine(Sonde_sfc%average%t, Sonde_sfc%rms_err%t, &
+  call da_proc_stats_combine(Sonde_sfc%average%t, Sonde_sfc%rms_err%t, &
                           Sonde_sfc%minimum%t%value, Sonde_sfc%maximum%t%value, &
                           Sonde_sfc%minimum%t%n, Sonde_sfc%maximum%t%n, &
                           Sonde_sfc%minimum%t%l, Sonde_sfc%maximum%t%l )
 
-  call proc_stats_combine(Sonde_sfc%average%p, Sonde_sfc%rms_err%p, &
+  call da_proc_stats_combine(Sonde_sfc%average%p, Sonde_sfc%rms_err%p, &
                           Sonde_sfc%minimum%p%value, Sonde_sfc%maximum%p%value, &
                           Sonde_sfc%minimum%p%n, Sonde_sfc%maximum%p%n, &
                           Sonde_sfc%minimum%p%l, Sonde_sfc%maximum%p%l )
 
-  call proc_stats_combine(Sonde_sfc%average%q, Sonde_sfc%rms_err%q, &
+  call da_proc_stats_combine(Sonde_sfc%average%q, Sonde_sfc%rms_err%q, &
                           Sonde_sfc%minimum%q%value, Sonde_sfc%maximum%q%value, &
                           Sonde_sfc%minimum%q%n, Sonde_sfc%maximum%q%n, &
                           Sonde_sfc%minimum%q%l, Sonde_sfc%maximum%q%l )

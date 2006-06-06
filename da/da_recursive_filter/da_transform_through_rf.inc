@@ -81,7 +81,7 @@ subroutine DA_Transform_Through_RF( mz, grid_box_area, rf_alpha, val,&
 !  [3.1] Apply (i, j' ,k' -> i', j ,k') (xp % v1x -> xp % v1y)
 !--------convert from vertical column to y-stripe
 
-   call transpose_x2y ( xp )
+   call da_transpose_x2y ( xp )
 
 !  [3.2] Apply 1D filter in y direction:
 

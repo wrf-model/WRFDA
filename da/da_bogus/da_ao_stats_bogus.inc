@@ -35,25 +35,25 @@ SUBROUTINE DA_AO_Stats_Bogus( stats_unit, oi, re )
   IF ( oi%num_Bogus > 0 ) THEN
     DO n=1, oi%num_Bogus
       if( oi%bogus(n)%loc%proc_domain ) then
-        CALL Stats_Calculate( n, 0, oi%Bogus(n)%slp%qc,  &
+        CALL da_Stats_Calculate( n, 0, oi%Bogus(n)%slp%qc,  &
                               re%Bogus(n)%slp, nslp,     &
                               Bogus%minimum%slp, Bogus%maximum%slp,  &
                               Bogus%average%slp, Bogus%rms_err%slp )
 
         do k=1, oi%bogus(n)%info%levels
-          CALL Stats_Calculate( n, k, oi%Bogus(n)%u(k)%qc, & 
+          CALL da_Stats_Calculate( n, k, oi%Bogus(n)%u(k)%qc, & 
                                   re%Bogus(n)%u(k), nu, &
                                   Bogus%minimum%u, Bogus%maximum%u, &
                                   Bogus%average%u, Bogus%rms_err%u )
-          CALL Stats_Calculate( n, k, oi%Bogus(n)%v(k)%qc, & 
+          CALL da_Stats_Calculate( n, k, oi%Bogus(n)%v(k)%qc, & 
                                   re%Bogus(n)%v(k), nv, &
                                   Bogus%minimum%v, Bogus%maximum%v, &
                                   Bogus%average%v, Bogus%rms_err%v )
-          CALL Stats_Calculate( n, k, oi%Bogus(n)%t(k)%qc, & 
+          CALL da_Stats_Calculate( n, k, oi%Bogus(n)%t(k)%qc, & 
                                   re%Bogus(n)%t(k), nt, &
                                   Bogus%minimum%t, Bogus%maximum%t, &
                                   Bogus%average%t, Bogus%rms_err%t )
-          CALL Stats_Calculate( n, k, oi%Bogus(n)%q(k)%qc, & 
+          CALL da_Stats_Calculate( n, k, oi%Bogus(n)%q(k)%qc, & 
                                   re%Bogus(n)%q(k), nq, &
                                   Bogus%minimum%q, Bogus%maximum%q, &
                                   Bogus%average%q, Bogus%rms_err%q )
@@ -63,30 +63,30 @@ SUBROUTINE DA_AO_Stats_Bogus( stats_unit, oi, re )
   ENDIF
 
   ! Do inter-processor communication to gather statistics.
-  call proc_sum_int( nu )
-  call proc_sum_int( nv )
-  call proc_sum_int( nt )
-  call proc_sum_int( nq )
-  call proc_sum_int( nslp )
+  call da_proc_sum_int( nu )
+  call da_proc_sum_int( nv )
+  call da_proc_sum_int( nt )
+  call da_proc_sum_int( nq )
+  call da_proc_sum_int( nslp )
   num_bogus_tot = nu + nv + nt + nq + nslp 
 
-  call proc_stats_combine(Bogus%average%u, Bogus%rms_err%u, &
+  call da_proc_stats_combine(Bogus%average%u, Bogus%rms_err%u, &
                           Bogus%minimum%u%value, Bogus%maximum%u%value, &
                           Bogus%minimum%u%n, Bogus%maximum%u%n, &
                           Bogus%minimum%u%l, Bogus%maximum%u%l )
-  call proc_stats_combine(Bogus%average%v, Bogus%rms_err%v, &
+  call da_proc_stats_combine(Bogus%average%v, Bogus%rms_err%v, &
                           Bogus%minimum%v%value, Bogus%maximum%v%value, &
                           Bogus%minimum%v%n, Bogus%maximum%v%n, &
                           Bogus%minimum%v%l, Bogus%maximum%v%l )
-  call proc_stats_combine(Bogus%average%t, Bogus%rms_err%t, &
+  call da_proc_stats_combine(Bogus%average%t, Bogus%rms_err%t, &
                           Bogus%minimum%t%value, Bogus%maximum%t%value, &
                           Bogus%minimum%t%n, Bogus%maximum%t%n, &
                           Bogus%minimum%t%l, Bogus%maximum%t%l )
-  call proc_stats_combine(Bogus%average%q, Bogus%rms_err%q, &
+  call da_proc_stats_combine(Bogus%average%q, Bogus%rms_err%q, &
                           Bogus%minimum%q%value, Bogus%maximum%q%value, &
                           Bogus%minimum%q%n, Bogus%maximum%q%n, &
                           Bogus%minimum%q%l, Bogus%maximum%q%l )
-  call proc_stats_combine(Bogus%average%slp, Bogus%rms_err%slp, &
+  call da_proc_stats_combine(Bogus%average%slp, Bogus%rms_err%slp, &
                           Bogus%minimum%slp%value, Bogus%maximum%slp%value, &
                           Bogus%minimum%slp%n, Bogus%maximum%slp%n, &
                           Bogus%minimum%slp%l, Bogus%maximum%slp%l )

@@ -30,7 +30,7 @@ subroutine da_oa_stats_ssmt1( stats_unit, iv, re )
 
             do k=1, iv%ssmt1(n)%info%levels
 
-               CALL Stats_Calculate( n, k, iv%ssmt1(n)%t(k)%qc, & 
+               CALL da_Stats_Calculate( n, k, iv%ssmt1(n)%t(k)%qc, & 
                                      re%ssmt1(n)%t(k), nt, &
                                      minimum, maximum, &
                                      average, rms_err)
@@ -41,10 +41,10 @@ subroutine da_oa_stats_ssmt1( stats_unit, iv, re )
    END IF
 
 ! Do inter-processor communication to gather statistics.
-   call proc_sum_int( nt )
+   call da_proc_sum_int( nt )
    num_ssmt1_tot = nt
 
-   call proc_stats_combine(average, rms_err, &
+   call da_proc_stats_combine(average, rms_err, &
                            minimum%value, maximum%value, &
                            minimum%n, maximum%n, &
                            minimum%l, maximum%l )

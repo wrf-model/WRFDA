@@ -27,7 +27,7 @@ MODULE da_vtox_transforms
    USE da_par_util
    USE da_ssmi
    USE da_spectral
-   USE da_fftpack5
+   USE fftpack5
 
    IMPLICIT NONE
 

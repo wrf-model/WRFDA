@@ -62,9 +62,9 @@ MODULE da_wrfvar_esmf_super
 
 CONTAINS
 
-#include "da_wrfvar_init.inc"
-#include "da_wrfvar_run.inc"
-#include "da_wrfvar_finalize.inc"
+#include "da_esmf_init.inc"
+#include "da_esmf_run.inc"
+#include "da_esmf_finalize.inc"
 #include "da_wrfvar_interface.inc"
 
 END MODULE da_wrfvar_esmf_super

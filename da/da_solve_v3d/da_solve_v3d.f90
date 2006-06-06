@@ -17,15 +17,15 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
 ! Model layer modules
    USE module_model_constants
 
-   USE DA_Constants
-   USE DA_Define_Structures
-   USE DA_Setup_Structures
-   USE DA_Test
-   USE DA_Tools
-   USE DA_Minimisation
-   USE par_util
-   USE da_tracing
-   USE module_get_file_names ! for system interface on Cray
+   use da_constants
+   use da_define_structures
+   use da_setup_structures
+   use da_test
+   use da_tools
+   use da_minimisation
+   use da_par_util
+   use da_tracing
+   use module_get_file_names ! for system interface on cray
 
 ! Registry generated module
    USE module_state_description

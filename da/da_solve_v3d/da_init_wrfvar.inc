@@ -28,7 +28,7 @@ SUBROUTINE da_init_wrfvar( grid, xp, xb, &
 
 !--De-reference dimension information stored in the grid data structure.
 
-   call copy_dims( grid, xp, &
+   call da_copy_dims( grid, xp, &
                    ids, ide, jds, jde, kds, kde, &
                    ims, ime, jms, jme, kms, kme, &
                    ips, ipe, jps, jpe, kps, kpe  )
@@ -37,7 +37,7 @@ SUBROUTINE da_init_wrfvar( grid, xp, xb, &
 
    CALL set_tiles ( grid , ids , ide , jds , jde , ips , ipe , jps , jpe )
 
-   call copy_tile_dims( grid, xp, its, ite, jts, jte, kts, kte )
+   call da_copy_tile_dims( grid, xp, its, ite, jts, jte, kts, kte )
 
 !**********************************************************************
 

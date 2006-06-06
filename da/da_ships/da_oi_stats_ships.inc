@@ -33,27 +33,27 @@ SUBROUTINE DA_OI_Stats_Ships ( stats_unit, oi )
   IF ( oi%num_ships > 0 ) THEN
     DO n=1, oi%num_ships
       if( oi%ships(n)%loc%proc_domain ) then
-        CALL Stats_Calculate( oi%ships(n)%loc%obs_global_index, &
+        CALL da_Stats_Calculate( oi%ships(n)%loc%obs_global_index, &
                               0, oi%ships(n)%u%qc, &
                               oi%ships(n)%u%inv, nu, &
                               ships%minimum%u, ships%maximum%u, &
                               ships%average%u, ships%rms_err%u)
-        CALL Stats_Calculate( oi%ships(n)%loc%obs_global_index, &
+        CALL da_Stats_Calculate( oi%ships(n)%loc%obs_global_index, &
                               0, oi%ships(n)%v%qc, &
                               oi%ships(n)%v%inv, nv, &
                               ships%minimum%v, ships%maximum%v, &
                               ships%average%v, ships%rms_err%v)
-        CALL Stats_Calculate( oi%ships(n)%loc%obs_global_index, &
+        CALL da_Stats_Calculate( oi%ships(n)%loc%obs_global_index, &
                               0, oi%ships(n)%t%qc, &
                               oi%ships(n)%t%inv, nt, &
                               ships%minimum%t, ships%maximum%t, &
                               ships%average%t, ships%rms_err%t)
-        CALL Stats_Calculate( oi%ships(n)%loc%obs_global_index, &
+        CALL da_Stats_Calculate( oi%ships(n)%loc%obs_global_index, &
                               0, oi%ships(n)%p%qc, &
                               oi%ships(n)%p%inv, np, &
                               ships%minimum%p, ships%maximum%p, &
                               ships%average%p, ships%rms_err%p)
-        CALL Stats_Calculate( oi%ships(n)%loc%obs_global_index, &
+        CALL da_Stats_Calculate( oi%ships(n)%loc%obs_global_index, &
                               0, oi%ships(n)%q%qc, &
                               oi%ships(n)%q%inv, nq, &
                               ships%minimum%q, ships%maximum%q, &
@@ -64,29 +64,29 @@ SUBROUTINE DA_OI_Stats_Ships ( stats_unit, oi )
   END IF
 
   ! Do inter-processor communication to gather statistics.
-  call proc_sum_int( nu )
-  call proc_sum_int( nv )
-  call proc_sum_int( nt )
-  call proc_sum_int( np )
+  call da_proc_sum_int( nu )
+  call da_proc_sum_int( nv )
+  call da_proc_sum_int( nt )
+  call da_proc_sum_int( np )
   call proc_sum_int( nq )
 
-  call proc_stats_combine(Ships%average%u, Ships%rms_err%u, &
+  call da_proc_stats_combine(Ships%average%u, Ships%rms_err%u, &
                           Ships%minimum%u%value, Ships%maximum%u%value, &
                           Ships%minimum%u%n, Ships%maximum%u%n, &
                           Ships%minimum%u%l, Ships%maximum%u%l )
-  call proc_stats_combine(Ships%average%v, Ships%rms_err%v, &
+  call da_proc_stats_combine(Ships%average%v, Ships%rms_err%v, &
                           Ships%minimum%v%value, Ships%maximum%v%value, &
                           Ships%minimum%v%n, Ships%maximum%v%n, &
                           Ships%minimum%v%l, Ships%maximum%v%l )
-  call proc_stats_combine(Ships%average%t, Ships%rms_err%t, &
+  call da_proc_stats_combine(Ships%average%t, Ships%rms_err%t, &
                           Ships%minimum%t%value, Ships%maximum%t%value, &
                           Ships%minimum%t%n, Ships%maximum%t%n, &
                           Ships%minimum%t%l, Ships%maximum%t%l )
-  call proc_stats_combine(Ships%average%p, Ships%rms_err%p, &
+  call da_proc_stats_combine(Ships%average%p, Ships%rms_err%p, &
                           Ships%minimum%p%value, Ships%maximum%p%value, &
                           Ships%minimum%p%n, Ships%maximum%p%n, &
                           Ships%minimum%p%l, Ships%maximum%p%l )
-  call proc_stats_combine(Ships%average%q, Ships%rms_err%q, &
+  call da_proc_stats_combine(Ships%average%q, Ships%rms_err%q, &
                           Ships%minimum%q%value, Ships%maximum%q%value, &
                           Ships%minimum%q%n, Ships%maximum%q%n, &
                           Ships%minimum%q%l, Ships%maximum%q%l )

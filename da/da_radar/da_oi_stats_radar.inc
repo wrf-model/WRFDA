@@ -30,7 +30,7 @@ SUBROUTINE DA_OI_Stats_Radar ( stats_unit, oi )
       do k=1, oi%Radar(n)%info%levels
          
          IF ( USE_Radar_rv ) THEN
-         CALL Stats_Calculate( oi%Radar(n)%loc%obs_global_index, &
+         CALL da_Stats_Calculate( oi%Radar(n)%loc%obs_global_index, &
                                k, oi%Radar(n)%rv(k)%qc, &
                                oi%Radar(n)%rv(k)%inv, nrv, &
                                Radar%minimum%rv, Radar%maximum%rv, &
@@ -38,7 +38,7 @@ SUBROUTINE DA_OI_Stats_Radar ( stats_unit, oi )
         ENDIF
 
          IF ( USE_Radar_rf ) THEN
-         CALL Stats_Calculate( oi%Radar(n)%loc%obs_global_index, &
+         CALL da_Stats_Calculate( oi%Radar(n)%loc%obs_global_index, &
                                k, oi%Radar(n)%rf(k)%qc, &
                                oi%Radar(n)%rf(k)%inv, nrf, &
                                Radar%minimum%rf, Radar%maximum%rf, &
@@ -54,16 +54,16 @@ SUBROUTINE DA_OI_Stats_Radar ( stats_unit, oi )
 ! Do inter-processor communication to gather statistics.
 
    IF ( USE_Radar_rv ) THEN
-     call proc_sum_int( nrv )
-     call proc_stats_combine(Radar%average%rv, Radar%rms_err%rv, &
+     call da_proc_sum_int( nrv )
+     call da_proc_stats_combine(Radar%average%rv, Radar%rms_err%rv, &
                              Radar%minimum%rv%value, Radar%maximum%rv%value, &
                              Radar%minimum%rv%n, Radar%maximum%rv%n, &
                              Radar%minimum%rv%l, Radar%maximum%rv%l )
    ENDIF
    
    IF ( USE_Radar_rf ) THEN
-     call proc_sum_int( nrf )
-     call proc_stats_combine(Radar%average%rf, Radar%rms_err%rf, &
+     call da_proc_sum_int( nrf )
+     call da_proc_stats_combine(Radar%average%rf, Radar%rms_err%rf, &
                              Radar%minimum%rf%value, Radar%maximum%rf%value, &
                              Radar%minimum%rf%n, Radar%maximum%rf%n, &
                              Radar%minimum%rf%l, Radar%maximum%rf%l )

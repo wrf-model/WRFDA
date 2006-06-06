@@ -1,4 +1,4 @@
-SUBROUTINE DA_Get_Jo_and_GradY_Sonde_sfc( iv, re, jo, jo_grad_y )
+SUBROUTINE da_get_jo_and_grady_sonde_sfc( iv, re, jo, jo_grad_y )
 
   IMPLICIT NONE
 
@@ -47,15 +47,15 @@ SUBROUTINE DA_Get_Jo_and_GradY_Sonde_sfc( iv, re, jo, jo_grad_y )
   ! testing.  This will always be .FALSE. for a serial run.
   IF ( testing_dm_exact ) THEN
     ! collect all obs in serial order and allocate global objects
-    CALL to_global_sonde_sfc( iv,      re,      jo_grad_y, &
+    CALL da_to_global_sonde_sfc( iv,      re,      jo_grad_y, &
                           iv_glob, re_glob, jo_grad_y_glob )
     ! perform remaining computations
-    CALL compute_jo_sonde_sfc_uvtq( iv_glob, re_glob, jo_grad_y_glob, jo )
+    CALL da_compute_jo_sonde_sfc_uvtq( iv_glob, re_glob, jo_grad_y_glob, jo )
     ! free global objects
-    CALL free_global_sonde_sfc( iv_glob, re_glob, jo_grad_y_glob )
+    CALL da_free_global_sonde_sfc( iv_glob, re_glob, jo_grad_y_glob )
   ELSE
     ! perform remaining computations
-    CALL compute_jo_sonde_sfc_uvtq( iv, re, jo_grad_y, jo )
+    CALL da_compute_jo_sonde_sfc_uvtq( iv, re, jo_grad_y, jo )
   ENDIF
 
   jo % sonde_sfc_u = 0.5 * jo % sonde_sfc_u
@@ -66,4 +66,4 @@ SUBROUTINE DA_Get_Jo_and_GradY_Sonde_sfc( iv, re, jo, jo_grad_y )
 
   RETURN
 
-END SUBROUTINE DA_Get_Jo_and_GradY_Sonde_sfc
+END SUBROUTINE da_get_jo_and_grady_sonde_sfc

@@ -66,7 +66,7 @@ SUBROUTINE da_get_innov_vector_polaramv( it, xb, xp, ob, iv )
 
             IF ( iv % polaramv(n) % p(k) > 1.0 ) THEN
 
-               call to_zk(iv % polaramv(n) % p(k), v_p, xp, v_interp_p, iv%polaramv(n)%zk(k))
+               call da_to_zk(iv % polaramv(n) % p(k), v_p, xp, v_interp_p, iv%polaramv(n)%zk(k))
             ENDIF
 
             if(iv%polaramv(n)%zk(k) < 0.0) then
@@ -76,14 +76,14 @@ SUBROUTINE da_get_innov_vector_polaramv( it, xb, xp, ob, iv )
          enddo
 
 #ifndef DEREF_KLUDGE
-         call Interp_lin_3D( xb % u, xp, i, j, dx, dy, dxm, dym, &
+         call da_Interp_lin_3D( xb % u, xp, i, j, dx, dy, dxm, dym, &
                              model_u, max_ob_levels, iv%polaramv(n)%zk, num_levs )
-         call Interp_lin_3D( xb % v, xp, i, j, dx, dy, dxm, dym, &
+         call da_Interp_lin_3D( xb % v, xp, i, j, dx, dy, dxm, dym, &
                              model_v, max_ob_levels, iv%polaramv(n)%zk, num_levs )
 #else
-         call Interp_lin_3D( xb % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+         call da_Interp_lin_3D( xb % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                              model_u(1), max_ob_levels, iv%polaramv(n)%zk(1), num_levs )
-         call Interp_lin_3D( xb % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+         call da_Interp_lin_3D( xb % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                              model_v(1), max_ob_levels, iv%polaramv(n)%zk(1), num_levs )
 #endif
 

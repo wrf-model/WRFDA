@@ -21,7 +21,7 @@ SUBROUTINE DA_OI_Stats_Gpspw ( stats_unit, oi )
   IF ( oi%num_Gpspw > 0 ) THEN
     DO n=1, oi%num_Gpspw
       if( oi%gpspw(n)%loc%proc_domain ) then
-        CALL Stats_Calculate( oi%Gpspw(n)%loc%obs_global_index, &
+        CALL da_Stats_Calculate( oi%Gpspw(n)%loc%obs_global_index, &
                               0, oi%gpspw(n)%tpw%qc, &
                              oi%gpspw(n)%tpw%inv, ntpw, &
                              gpspw%minimum%tpw  , gpspw%maximum%tpw, &
@@ -33,9 +33,9 @@ SUBROUTINE DA_OI_Stats_Gpspw ( stats_unit, oi )
 
   !--Do inter-processor communication to gather statistics.
 
-  call proc_sum_int( ntpw )
+  call da_proc_sum_int( ntpw )
 
-  call proc_stats_combine(Gpspw%average%tpw, Gpspw%rms_err%tpw, &
+  call da_proc_stats_combine(Gpspw%average%tpw, Gpspw%rms_err%tpw, &
                           Gpspw%minimum%tpw%value, Gpspw%maximum%tpw%value, &
                           Gpspw%minimum%tpw%n, Gpspw%maximum%tpw%n, &
                           Gpspw%minimum%tpw%l, Gpspw%maximum%tpw%l )

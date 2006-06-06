@@ -151,7 +151,7 @@ SUBROUTINE da_residual_synop_to_generic( res_specific, iv_num_levels, &
    ! Local declarations
    TYPE (residual_template_type) :: template
 
-   CALL residual_synop_create_template( template )
+   CALL da_residual_synop_create_template( template )
    ALLOCATE( res_generic%values(template%lbnd:template%ubnd) )
    ! only scalar data for this type
    ALLOCATE( res_generic%values(0)%ptr(5) )
@@ -323,26 +323,19 @@ LOGICAL FUNCTION da_residual_generic_has_vector( res_generic )
 !------------------------------------------------------------------------------
    IMPLICIT NONE
    TYPE (residual_generic_type), INTENT(IN) :: res_generic  ! generic type
-   residual_generic_has_vector = ( UBOUND(res_generic%values,1) > 0 )
-END FUNCTION residual_generic_has_vector
+   da_residual_generic_has_vector = ( UBOUND(res_generic%values,1) > 0 )
+END FUNCTION da_residual_generic_has_vector
 
 
 
 LOGICAL FUNCTION da_residual_generic_has_scalar( res_generic )
 !------------------------------------------------------------------------------
-! PURPOSE:  Returns .TRUE. iff res_generic stores scalar values.  
-!
-! METHOD:   Trivial.  
-!
-!  HISTORY:
-!           09/23/2005 - Creation.                          Tom Henderson
-!
-! PARENT_MODULE:da_ par_util
+! PURPOSE:  Returns .TRUE. iff res_generic stores scalar values. 
 !------------------------------------------------------------------------------
    IMPLICIT NONE
    TYPE (residual_generic_type), INTENT(IN) :: res_generic  ! generic type
-   residual_generic_has_scalar = ( LBOUND(res_generic%values,1) == 0 )
-END FUNCTION residual_generic_has_scalar
+   da_residual_generic_has_scalar = ( LBOUND(res_generic%values,1) == 0 )
+END FUNCTION da_residual_generic_has_scalar
 
 
 
@@ -354,11 +347,6 @@ SUBROUTINE da_residual_generic_free( res_generic )
 !           by others and are not deallocated.  
 !           This will fail if called for a residual_generic_type object that 
 !           has never been created.  
-!
-!  HISTORY:
-!           09/23/2005 - Creation.                          Tom Henderson
-!
-! PARENT_MODULE: da_par_util
 !------------------------------------------------------------------------------
    IMPLICIT NONE
 
@@ -368,12 +356,12 @@ SUBROUTINE da_residual_generic_free( res_generic )
    INTEGER :: i
 
    oktofreevalues = .FALSE.
-   IF ( residual_generic_has_scalar( res_generic) ) THEN
+   IF ( da_residual_generic_has_scalar( res_generic) ) THEN
      ! free scalar memory
      DEALLOCATE( res_generic%values(0)%ptr )
      oktofreevalues = .TRUE.
    ENDIF
-   IF ( residual_generic_has_vector( res_generic) ) THEN
+   IF ( da_residual_generic_has_vector( res_generic) ) THEN
      oktofreevalues = .TRUE.
    ENDIF
    IF ( oktofreevalues ) THEN
@@ -387,12 +375,7 @@ SUBROUTINE da_y_facade_free( slice )
 !------------------------------------------------------------------------------
 ! PURPOSE:  Free memory for y_facade_type object.  
 !
-! METHOD:   Brute force.  May want to make this smarter...  
-!
-!  HISTORY:
-!           09/23/2005 - Creation.                          Tom Henderson
-!
-! PARENT_MODULE: da_par_util
+! METHOD:   Brute force.  May want to make this smarter... 
 !------------------------------------------------------------------------------
    IMPLICIT NONE
 

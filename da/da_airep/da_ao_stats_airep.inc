@@ -34,15 +34,15 @@ SUBROUTINE DA_AO_Stats_Airep( stats_unit, oi, re )
       if( oi%airep(n)%loc%proc_domain ) then
 
         do k=1, oi%Airep(n)%info%levels
-          CALL Stats_Calculate( n, k, oi%Airep(n)%u(k)%qc,  & 
+          CALL da_Stats_Calculate( n, k, oi%Airep(n)%u(k)%qc,  & 
                                 re%Airep(n)%u(k), nu, &
                                 Airep%minimum%u, Airep%maximum%u, &
                                 Airep%average%u, Airep%rms_err%u )
-          CALL Stats_Calculate( n, k, oi%Airep(n)%v(k)%qc,  & 
+          CALL da_Stats_Calculate( n, k, oi%Airep(n)%v(k)%qc,  & 
                                 re%Airep(n)%v(k), nv, &
                                 Airep%minimum%v, Airep%maximum%v, &
                                 Airep%average%v, Airep%rms_err%v )
-          CALL Stats_Calculate( n, k, oi%Airep(n)%t(k)%qc,  & 
+          CALL da_Stats_Calculate( n, k, oi%Airep(n)%t(k)%qc,  & 
                                 re%Airep(n)%t(k), nt, &
                                  Airep%minimum%t, Airep%maximum%t, &
                                  Airep%average%t, Airep%rms_err%t )
@@ -52,20 +52,20 @@ SUBROUTINE DA_AO_Stats_Airep( stats_unit, oi, re )
   END IF
 
   ! Do inter-processor communication to gather statistics.
-  call proc_sum_int( nu )
-  call proc_sum_int( nv )
-  call proc_sum_int( nt )
+  call da_proc_sum_int( nu )
+  call da_proc_sum_int( nv )
+  call da_proc_sum_int( nt )
   num_airep_tot = nu + nv + nt
 
-  call proc_stats_combine(Airep%average%u, Airep%rms_err%u, &
+  call da_proc_stats_combine(Airep%average%u, Airep%rms_err%u, &
                           Airep%minimum%u%value, Airep%maximum%u%value, &
                           Airep%minimum%u%n, Airep%maximum%u%n, &
                           Airep%minimum%u%l, Airep%maximum%u%l )
-  call proc_stats_combine(Airep%average%v, Airep%rms_err%v, &
+  call da_proc_stats_combine(Airep%average%v, Airep%rms_err%v, &
                           Airep%minimum%v%value, Airep%maximum%v%value, &
                           Airep%minimum%v%n, Airep%maximum%v%n, &
                           Airep%minimum%v%l, Airep%maximum%v%l )
-  call proc_stats_combine(Airep%average%t, Airep%rms_err%t, &
+  call da_proc_stats_combine(Airep%average%t, Airep%rms_err%t, &
                           Airep%minimum%t%value, Airep%maximum%t%value, &
                           Airep%minimum%t%n, Airep%maximum%t%n, &
                           Airep%minimum%t%l, Airep%maximum%t%l )

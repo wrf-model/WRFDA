@@ -48,7 +48,6 @@ DA_OBJS        =	da_solve_v3d.o		\
 			gsi_kinds.o		\
 			gsi_constants.o		\
                         da_wrfvar_io.o      \
-                        da_wrfvar_interface.o	\
 	   		da_wrfvar_top.o
 
 libwrfvar.a : $(DA_OBJS)
@@ -59,14 +58,19 @@ libwrfvar.a : $(DA_OBJS)
 
 wrfvar.o : da_wrfvar_top.o
 
-da_wrfvar_top.o : da_wrfvar_interface.o \
-                      module_integrate.o \
-                      da_wrfvar_io.o
+da_wrfvar_top.o : da_wrfvar_top.f90 \
+                  da_wrfvar_init.inc \
+                  da_wrfvar_run.inc \
+                  da_wrfvar_finalize.inc \
+                  da_wrfvar_interface.inc \
+                  module_integrate.o \
+                  da_wrfvar_io.o
 
 da_wrfvar_esmf_super.o : da_wrfvar_esmf_super.f90 \
-                             da_wrfvar_init.inc \
-                             da_wrfvar_run.inc \
-                             da_wrfvar_finalize.inc
+                             da_esmf_init.inc \
+                             da_esmf_run.inc \
+                             da_esmf_finalize.inc \
+                             da_wrfvar_interface.inc
 
 da_wrfvar_io.o : module_io_domain.o  \
                      da_med_initialdata_input.inc \
@@ -106,14 +110,6 @@ da_par_util1.o:		da_par_util1.f90                  \
 			da_proc_sum_int.inc               \
 			da_proc_sum_real.inc \
                         module_wrf_error.o
-
-da_wrfvar_interface.o : da_wrfvar_interface.f90 \
-                        da_wrfvar_interface.inc \
-                        module_domain.o                     \
-                        module_tiles.o                      \
-                        module_dm.o                         \
-                        module_model_constants.o            \
-                        da_solve_v3d.o
 
 da_solve_v3d.o:		da_constants.o			\
 			da_define_structures.o		\
@@ -227,7 +223,7 @@ da_vtox_transforms.o:	da_vtox_transforms.f90            \
 			da_constants.o                    \
 			da_dynamics.o                     \
 			da_physics.o                      \
-			da_fftpack5.o                     \
+			fftpack5.o                     \
 			da_spectral.o                     \
 			da_ssmi.o                         \
                         da_tracing.o                      \
@@ -930,7 +926,6 @@ da_test.o:	       da_test.f90                          \
 			da_setup_structures.o	            \
 			da_tools.o                          \
 			da_qscat.o                          \
-			da_test.f                           \
 			da_check_balance.inc                \
 			da_check_cvtovv_adjoint.inc         \
 			da_check_vtox_adjoint.inc           \
@@ -988,32 +983,10 @@ da_gen_be.o:		da_gen_be.f90                    \
 			da_readwrite_be_stage3.inc       \
 			da_readwrite_be_stage4.inc
 
-da_fftpack5.o:	        da_fftpack5.f90\
-			da_constants.o \
-			r1f2kb.inc     \
-			r1f2kf.inc     \
-			r1f3kb.inc     \
-			r1f3kf.inc     \
-			r1f4kb.inc     \
-			r1f4kf.inc     \
-			r1f5kb.inc     \
-			r1f5kf.inc     \
-			r1fgkb.inc     \
-			r1fgkf.inc     \
-			rfft1b.inc     \
-			rfft1f.inc     \
-			rfft1i.inc     \
-			rfftb1.inc     \
-			rfftf1.inc     \
-			rffti1.inc     \
-			xerfft.inc
-			$(CPP) $(FPPFLAGS) da_fftpack5.f90 > da_fftpack5.f
-			$(FFC) -c $(FIXEDFLAGS) da_fftpack5.f
-
 da_spectral.o:		da_spectral.f90             \
 			da_constants.o		    \
 			da_define_structures.o	    \
-			da_fftpack5.o		    \
+			fftpack5.o		    \
 			da_asslegpol.inc            \
 			da_calc_power.inc           \
 			da_get_gausslats.inc        \
@@ -1030,9 +1003,9 @@ da_spectral.o:		da_spectral.f90             \
 			da_legtra_inv_adj.inc       \
 			da_apply_power.inc
 
-be_spectral.o:		da_be_spectral.f90          \
+da_be_spectral.o:	da_be_spectral.f90          \
 			da_constants.o	            \
-			da_fftpack5.o		    \
+			fftpack5.o		    \
 			da_asslegpol.inc            \
 			da_calc_power.inc           \
 			da_get_gausslats.inc        \
@@ -1100,18 +1073,18 @@ da_tracing.o:           da_tracing.f90                    \
                         da_par_util.o
 
 rttov_const.o:		parkind1.o	\
-			rttov_const.f
+			rttov_const.f90
 
 rttov_global.o:		parkind1.o	\
 			rttov_const.o	\
-			rttov_global.f
+			rttov_global.f90
 
 rttov_types.o:		parkind1.o	\
 			rttov_const.o	\
-			rttov_types.f
+			rttov_types.f90
 
 gsi_constants.o:	gsi_kinds.o      \
-			gsi_constants.f
+			gsi_constants.f90
 
 ##############################################################################
 

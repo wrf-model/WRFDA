@@ -128,7 +128,7 @@ SUBROUTINE DA_Setup_FirstGuess_WRF( xbx, grid, &
       map_util_project = PROJ_MERC
    endif
 
-   call map_set(map_util_project,grid%cen_lat,grid%cen_lon,   &
+   call da_map_set(map_util_project,grid%cen_lat,grid%cen_lon,   &
                 real(xp%ide-xp%ids+2)/2., real(xp%jde-xp%jds+2)/2., &
                 grid%dx,grid%stand_lon,grid%truelat1,grid%truelat2,map_info)
 
@@ -147,7 +147,7 @@ SUBROUTINE DA_Setup_FirstGuess_WRF( xbx, grid, &
        "Check the map_set correctness::::::::::::::::::::::::"
 
 !    Domain center:
-     call  latlon_to_ij(map_info, grid%cen_lat, grid%cen_lon, start_x, start_y)
+     call  da_latlon_to_ij(map_info, grid%cen_lat, grid%cen_lon, start_x, start_y)
      WRITE(UNIT=stdout,FMT='(/"Center: latc,lonc,x,y, Xc, Yc:",6f10.3/)') &
                  grid%cen_lat, grid%cen_lon, start_x, start_y, &
                  real(xp%ide-xp%ids+2)/2., real(xp%jde-xp%jds+2)/2.
@@ -222,7 +222,7 @@ SUBROUTINE DA_Setup_FirstGuess_WRF( xbx, grid, &
 
 !   CALL llxy( PHIC,XLONC,X,Y )
 
-   CALL llxy(grid%cen_lat,grid%cen_lon,x,y)
+   CALL da_llxy(grid%cen_lat,grid%cen_lon,x,y)
    WRITE(UNIT=stdout,FMT='(/a)')"Please check if the domain's central point (x,y) is correct:"
    WRITE(UNIT=stdout,FMT='(a,4f12.3/)') 'grid%cen_lat,grid%cen_lon,x,y:', &
                          grid%cen_lat,grid%cen_lon,x,y

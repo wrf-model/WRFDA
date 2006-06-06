@@ -60,7 +60,7 @@ SUBROUTINE da_get_innov_vector_geoamv( it, xb, xp, ob, iv )
                iv%geoamv(n)%zk(k)=missing_r
 
                IF ( iv % geoamv(n) % p(k) > 1.0 ) THEN
-                  call to_zk(iv % geoamv(n) % p(k), v_p, xp, v_interp_p, iv%geoamv(n)%zk(k))
+                  call da_to_zk(iv % geoamv(n) % p(k), v_p, xp, v_interp_p, iv%geoamv(n)%zk(k))
                ENDIF
 
                if (iv%geoamv(n)%zk(k) < 0.0) then
@@ -70,15 +70,15 @@ SUBROUTINE da_get_innov_vector_geoamv( it, xb, xp, ob, iv )
             enddo
 
 #ifndef DEREF_KLUDGE
-            call interp_lin_3d( xb % u, xp, i, j, dx, dy, dxm, dym, &
+            call da_interp_lin_3d( xb % u, xp, i, j, dx, dy, dxm, dym, &
                                 model_u, max_ob_levels,iv%geoamv(n)%zk,num_levs)
-            call interp_lin_3d( xb % v, xp, i, j, dx, dy, dxm, dym, &
+            call da_interp_lin_3d( xb % v, xp, i, j, dx, dy, dxm, dym, &
                                 model_v, max_ob_levels,iv%geoamv(n)%zk,num_levs)
 #else
-            call interp_lin_3d( xb % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, &
+            call da_interp_lin_3d( xb % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, &
                                 dy, dxm, dym, model_u(1), max_ob_levels, &
                                 iv%geoamv(n)%zk(1), num_levs )
-            call interp_lin_3d( xb % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, &
+            call da_interp_lin_3d( xb % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, &
                                 dy, dxm, dym, model_v(1), max_ob_levels, &
                                 iv%geoamv(n)%zk(1), num_levs )
 #endif

@@ -32,7 +32,7 @@ SUBROUTINE DA_AO_Stats_Satem( stats_unit, oi, re )
     DO n=1, oi%num_Satem
       if( oi%satem(n)%loc%proc_domain ) then
         do k=1, oi%satem(n)%info%levels
-          CALL Stats_Calculate( n, k, oi%Satem(n)%thickness(k)%qc, & 
+          CALL da_Stats_Calculate( n, k, oi%Satem(n)%thickness(k)%qc, & 
                          re%satem(n)%thickness(k), nthickness, &
                          Satem%minimum%thickness, Satem%maximum%thickness, &
                          Satem%average%thickness, Satem%rms_err%thickness )
@@ -42,10 +42,10 @@ SUBROUTINE DA_AO_Stats_Satem( stats_unit, oi, re )
   END IF
 
   ! Do inter-processor communication to gather statistics.
-  call proc_sum_int( nthickness )
+  call da_proc_sum_int( nthickness )
   num_satem_tot = nthickness
 
-  call proc_stats_combine(Satem%average%thickness, Satem%rms_err%thickness, &
+  call da_proc_stats_combine(Satem%average%thickness, Satem%rms_err%thickness, &
             Satem%minimum%thickness%value, Satem%maximum%thickness%value, &
             Satem%minimum%thickness%n, Satem%maximum%thickness%n, &
             Satem%minimum%thickness%l, Satem%maximum%thickness%l )

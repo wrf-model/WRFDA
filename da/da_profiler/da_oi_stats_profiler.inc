@@ -28,12 +28,12 @@ SUBROUTINE DA_OI_Stats_Profiler ( stats_unit, oi )
       if( oi%profiler(n)%loc%proc_domain ) then
 
        do k=1, oi%Profiler(n)%info%levels
-         CALL Stats_Calculate( oi%Profiler(n)%loc%obs_global_index, &
+         CALL da_Stats_Calculate( oi%Profiler(n)%loc%obs_global_index, &
                                k, oi%Profiler(n)%u(k)%qc,  &
                                oi%Profiler(n)%u(k)%inv, nu, &
                                Profiler%minimum%u, Profiler%maximum%u, &
                                Profiler%average%u, Profiler%rms_err%u)
-         CALL Stats_Calculate( oi%Profiler(n)%loc%obs_global_index, &
+         CALL da_Stats_Calculate( oi%Profiler(n)%loc%obs_global_index, &
                                k, oi%Profiler(n)%v(k)%qc, &
                                oi%Profiler(n)%v(k)%inv, nv, &
                                Profiler%minimum%v, Profiler%maximum%v, &
@@ -45,14 +45,14 @@ SUBROUTINE DA_OI_Stats_Profiler ( stats_unit, oi )
    END IF
 
 ! Do inter-processor communication to gather statistics.
-   call proc_sum_int( nu )
-   call proc_sum_int( nv )
+   call da_proc_sum_int( nu )
+   call da_proc_sum_int( nv )
    
-   call proc_stats_combine(Profiler%average%u, Profiler%rms_err%u, &
+   call da_proc_stats_combine(Profiler%average%u, Profiler%rms_err%u, &
                            Profiler%minimum%u%value, Profiler%maximum%u%value, &
                            Profiler%minimum%u%n, Profiler%maximum%u%n, &
                            Profiler%minimum%u%l, Profiler%maximum%u%l )
-   call proc_stats_combine(Profiler%average%v, Profiler%rms_err%v, &
+   call da_proc_stats_combine(Profiler%average%v, Profiler%rms_err%v, &
                            Profiler%minimum%v%value, Profiler%maximum%v%value, &
                            Profiler%minimum%v%n, Profiler%maximum%v%n, &
                            Profiler%minimum%v%l, Profiler%maximum%v%l )

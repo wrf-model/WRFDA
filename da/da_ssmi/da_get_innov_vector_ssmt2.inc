@@ -56,9 +56,9 @@ SUBROUTINE da_get_innov_vector_ssmt2( it, xb, xp, ob, iv )
             zk=missing_r
 
             IF ( iv % ssmt2(n) % h(k) > 0.0 ) THEN
-               call to_zk(iv % ssmt2(n) % h(k), v_h, xp, v_interp_h, zk)
+               call da_to_zk(iv % ssmt2(n) % h(k), v_h, xp, v_interp_h, zk)
             ELSE IF ( iv % ssmt2(n) % p(k) > 1.0 ) THEN
-               call to_zk(iv % ssmt2(n) % p(k), v_p, xp, v_interp_p, zk)
+               call da_to_zk(iv % ssmt2(n) % p(k), v_p, xp, v_interp_p, zk)
             ENDIF
 
             if(zk > 0.0) then
@@ -78,10 +78,10 @@ SUBROUTINE da_get_innov_vector_ssmt2( it, xb, xp, ob, iv )
 !        [1.2] Interpolate horizontally to ob:
 
 #ifndef DEREF_KLUDGE
-         call Interp_lin_3D( xb % rh, xp, i, j, dx, dy, dxm, dym, &
+         call da_Interp_lin_3D( xb % rh, xp, i, j, dx, dy, dxm, dym, &
                              model_rh, max_ob_levels, iv%ssmt2(n)%zk, num_levs )
 #else
-         call Interp_lin_3D( xb % rh(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+         call da_Interp_lin_3D( xb % rh(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                              model_rh, max_ob_levels, iv%ssmt2(n)%zk, num_levs )
 #endif
 

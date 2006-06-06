@@ -45,7 +45,7 @@ subroutine da_get_innov_vector_qscat ( it, xb, xp, ob, iv )
          zk=missing_r
 
          IF ( iv % qscat(n) % h > missing_r) THEN
-            call to_zk(iv % qscat(n) % h, v_h, xp, v_interp_h, zk)
+            call da_to_zk(iv % qscat(n) % h, v_h, xp, v_interp_h, zk)
             if(zk < 1.0) then
                zk = 1.0
             endif
@@ -67,14 +67,14 @@ subroutine da_get_innov_vector_qscat ( it, xb, xp, ob, iv )
 
 !        [1.2] Interpolate horizontally:
 #ifndef DEREF_KLUDGE
-         call Interp_Obs_lin_2D( xb % u, xp, i, j, dx, dy, dxm, dym, &
+         call da_Interp_Obs_lin_2D( xb % u, xp, i, j, dx, dy, dxm, dym, &
                                  model_u, iv%qscat(n)%zk)
-         call Interp_Obs_lin_2D( xb % v, xp, i, j, dx, dy, dxm, dym, &
+         call da_Interp_Obs_lin_2D( xb % v, xp, i, j, dx, dy, dxm, dym, &
                                  model_v, iv%qscat(n)%zk)
 #else
-         call Interp_Obs_lin_2D( xb % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+         call da_Interp_Obs_lin_2D( xb % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                                         model_u, iv%qscat(n)%zk)
-         call Interp_Obs_lin_2D( xb % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+         call da_Interp_Obs_lin_2D( xb % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                                         model_v, iv%qscat(n)%zk)
 #endif
 

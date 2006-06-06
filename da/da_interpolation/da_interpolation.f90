@@ -8,14 +8,14 @@ MODULE da_interpolation
 
 CONTAINS
 
-#include "to_zk.inc"
+#include "da_to_zk.inc"
 
-#include "Interp_Obs_lin_2D.inc"
-#include "Interp_Obs_lin_2D_adj.inc"
-#include "Interp_lin_2D.inc"
-#include "Interp_lin_2D_adj.inc"
-#include "Interp_lin_3D.inc"
-#include "Interp_lin_3D_adj.inc"
+#include "da_interp_obs_lin_2d.inc"
+#include "da_interp_obs_lin_2d_adj.inc"
+#include "da_interp_lin_2d.inc"
+#include "da_interp_lin_2d_adj.inc"
+#include "da_interp_lin_3d.inc"
+#include "da_interp_lin_3d_adj.inc"
 
 END MODULE da_interpolation
 

@@ -24,7 +24,7 @@ subroutine DA_Transform_VToVv( cv_size, xb, be, cv, vv, xp, &
 !  [1.0] Fill vv arrays from 1-dimensional cv array.
 !-------------------------------------------------------------------------
 
-   call cv_to_vv( cv_size, cv, xp, &
+   call da_cv_to_vv( cv_size, cv, xp, &
                   (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%ne /), &
                   vv )
 

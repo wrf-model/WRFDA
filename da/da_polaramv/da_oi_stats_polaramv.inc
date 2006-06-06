@@ -35,13 +35,13 @@ SUBROUTINE DA_OI_Stats_PolarAMV( stats_unit, oi )
        if( oi%polaramv(n)%loc%proc_domain ) then
        do k=1, oi%polaramv(n)%info%levels
 
-         CALL Stats_Calculate( oi%polaramv(n)%loc%obs_global_index, &
+         CALL da_Stats_Calculate( oi%polaramv(n)%loc%obs_global_index, &
                                0, oi%polaramv(n)%u(k)%qc, &
                                oi%polaramv(n)%u(k)%inv, nu, &
                                polaramv%minimum%u, polaramv%maximum%u, &
                                polaramv%average%u, polaramv%rms_err%u )
 
-         CALL Stats_Calculate( oi%polaramv(n)%loc%obs_global_index, &
+         CALL da_Stats_Calculate( oi%polaramv(n)%loc%obs_global_index, &
                                0, oi%polaramv(n)%v(k)%qc, &
                                oi%polaramv(n)%v(k)%inv, nv, &
                                polaramv%minimum%v, polaramv%maximum%v, &
@@ -56,13 +56,13 @@ SUBROUTINE DA_OI_Stats_PolarAMV( stats_unit, oi )
    END IF
 
 ! Do inter-processor communication to gather statistics.
-   call proc_sum_int( nu )
-   call proc_sum_int( nv )
-   call proc_stats_combine(polaramv%average%u, polaramv%rms_err%u, &
+   call da_proc_sum_int( nu )
+   call da_proc_sum_int( nv )
+   call da_proc_stats_combine(polaramv%average%u, polaramv%rms_err%u, &
                            polaramv%minimum%u%value, polaramv%maximum%u%value, &
                            polaramv%minimum%u%n, polaramv%maximum%u%n, &
                            polaramv%minimum%u%l, polaramv%maximum%u%l )
-   call proc_stats_combine(polaramv%average%v, polaramv%rms_err%v, &
+   call da_proc_stats_combine(polaramv%average%v, polaramv%rms_err%v, &
                            polaramv%minimum%v%value, polaramv%maximum%v%value, &
                            polaramv%minimum%v%n, polaramv%maximum%v%n, &
                            polaramv%minimum%v%l, polaramv%maximum%v%l )
