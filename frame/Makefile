@@ -35,7 +35,7 @@ framework :  $(MODULES) $(OBJS) $(SPECIAL)
 		$(AR) ../main/libwrflib.a $(MODULES) $(OBJS)
 		$(RANLIB) ../main/libwrflib.a
 
-rsl_src :
+module_dm.F :
 	@ $(LN) $(RSL)/module_dm.F .
 
 wrf_num_bytes_between.o :
@@ -62,7 +62,8 @@ module_configure.o: \
                 module_wrf_error.o \
 		module_driver_constants.o 
 
-module_dm.o: module_machine.o module_state_description.o module_wrf_error.o \
+module_dm.o: module_dm.F \
+        module_machine.o module_state_description.o module_wrf_error.o \
 		module_domain.o \
 		module_driver_constants.o \
 		module_timing.o \

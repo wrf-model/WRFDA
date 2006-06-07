@@ -11,6 +11,8 @@ CC              = mpicc
 CC_TOOLS        = cc
 LD              = $(FC)
 
+RSL             = $(EXTERNAL)/RSL
+
 # Flags (preprocessor, fortran, c, loader)
 
 TRADFLAG        =
@@ -46,7 +48,7 @@ LOCAL_LIBRARIES = -L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c -lX11
 # Architecture
 
 
-externals : wrfio_nf wrfio_int wrfio_grib1 esmf_time rsl_src
+externals : wrfio_nf wrfio_int wrfio_grib1 esmf_time
 	( cd $(RSL)/RSL ; \
           make CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
@@ -89,7 +91,7 @@ NETCDF_IO_PATH  = external/io_netcdf
 
 LOCAL_LIBRARIES = -L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c -lX11
 
-externals : $(WRFIO) esmf_time rsl_src
+externals : $(WRFIO) esmf_time
 
 ###########################################################
 #ARCH       Compaq OSF1 alpha DM       (RSL, MPICH, RSL IO)
@@ -102,6 +104,8 @@ SFC             = f90
 CC              = mpicc
 CC_TOOLS        = cc
 LD              = $(FC)
+
+RSL             = $(EXTERNAL)/RSL
 
 TRADFLAG        =
 FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DINTIO \
@@ -132,7 +136,7 @@ MPI_LIB		= -L$(RSL)/RSL -lrsl
 
 LOCAL_LIBRARIES = -L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c -lX11
 
-externals : wrfio_nf wrfio_int wrfio_grib1 esmf_time rsl_src
+externals : wrfio_nf wrfio_int wrfio_grib1 esmf_time 
 	( cd $(RSL)/RSL ; \
           make CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
@@ -170,7 +174,7 @@ LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)
 LOCAL_LIBRARIES = -L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c -lX11
 
 
-externals : $(WRFIO) esmf_time rsl_src
+externals : $(WRFIO) esmf_time 
 
 ###########################################################
 #ARCH Settings for PC Linux i486 i586 i686, PGI compiler  (Single-threaded)
@@ -205,7 +209,7 @@ LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)
 LOCAL_LIBRARIES = -L/usr/local/ncarg/lib -L/usr/X11R6/lib -L/usr/local/lib \
 	            -lncarg -lncarg_gks -lncarg_c -lX11
 
-externals : $(WRFIO) esmf_time rsl_src
+externals : $(WRFIO) esmf_time 
 
 ###########################################################
 #ARCH Settings for PC Linux i486 i586 i686, PGI compiler  (RSL, MPICH, RSL IO)
@@ -216,6 +220,8 @@ SFC             = pgf90
 LD              = $(FC)
 CC              = mpicc
 CC_TOOLS        = gcc
+
+RSL             = $(EXTERNAL)/RSL
 
 TRADFLAG        = -traditional
 FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE \
@@ -251,7 +257,7 @@ MPI_LIB		= -L$(RSL)/RSL -lrsl
 LOCAL_LIBRARIES = -L/usr/local/ncarg/lib -L/usr/X12R6/lib -L/usr/local/lib \
                     -lncarg -lncarg_gks -lncarg_c -lX11 
 
-externals : $(WRFIO) esmf_time rsl_src
+externals : $(WRFIO) esmf_time 
 	( cd $(RSL)/RSL ; \
           make CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
@@ -290,7 +296,7 @@ LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)
 LOCAL_LIBRARIES = -L/usr/local/ncarg/lib -L/usr/X11R6/lib -L/usr/local/lib \
 		  -lncarg -lncarg_gks -lncarg_c -lX11
 
-externals : $(WRFIO) esmf_time rsl_src
+externals : $(WRFIO) esmf_time 
 
 ###########################################################
 #ARCH Settings for PC Linux i486 i586 i686, g95 compiler  (RSL, MPICH, RSL IO)
@@ -301,6 +307,8 @@ SFC             = g95
 CC              = mpicc
 CC_TOOLS        = gcc
 LD              = $(FC)
+
+RSL             = $(EXTERNAL)/RSL
 
 TRADFLAG        = -traditional
 FPPFLAGS2       = -DINTIO -DWRF_RSL_IO -DRSL -DDM_PARALLEL \
@@ -336,7 +344,7 @@ MPI_LIB		= -L$(RSL)/RSL -lrsl
 LOCAL_LIBRARIES = -L/usr/local/ncarg/lib -L/usr/X12R6/lib -L/usr/local/lib \
                   -lncarg -lncarg_gks -lncarg_c -lX11 
 
-externals : $(WRFIO) esmf_time rsl_src
+externals : $(WRFIO) esmf_time 
 	( cd $(RSL)/RSL ; \
           make CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
@@ -373,7 +381,7 @@ LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)
 LOCAL_LIBRARIES = -L/usr/local/ncarg/lib -L/usr/X11R6/lib -L/usr/local/lib \
 		    -lncarg -lncarg_gks -lncarg_c -lX11
 
-externals : $(WRFIO) esmf_time rsl_src
+externals : $(WRFIO) esmf_time 
 
 ###########################################################
 #ARCH Settings for PC Linux x86_64, PGI compiler  (Single-threaded)
@@ -408,7 +416,7 @@ LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)
 LOCAL_LIBRARIES = -L/usr/local/ncarg/lib -L/usr/X11R6/lib -L/usr/local/lib \
 		    -lncarg -lncarg_gks -lncarg_c -lX11
 
-externals : $(WRFIO) esmf_time rsl_src
+externals : $(WRFIO) esmf_time 
 
 ###########################################################
 #ARCH Settings for PC Linux x86_64, PGI compiler  (RSL, MPICH, RSL IO)
@@ -419,6 +427,8 @@ SFC             = pgf90
 CC              = mpicc
 CC_TOOLS        = gcc
 LD              = $(FC)
+
+RSL             = $(EXTERNAL)/RSL
 
 TRADFLAG        = -traditional
 FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE \
@@ -454,7 +464,7 @@ MPI_LIB		= -L$(RSL)/RSL -lrsl
 LOCAL_LIBRARIES = -L/usr/local/ncarg/lib -L/usr/X12R6/lib -L/usr/local/lib \
                   -lncarg -lncarg_gks -lncarg_c -lX11 
 
-externals : $(WRFIO) esmf_time rsl_src
+externals : $(WRFIO) esmf_time 
 	( cd $(RSL)/RSL ; \
           make CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
@@ -492,7 +502,7 @@ LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN) -convert big_endian
 LOCAL_LIBRARIES = -L/usr/local/ncarg/lib -L/usr/local/lib \
 		  -lncarg -lncarg_gks -lncarg_c
 
-externals : $(WRFIO) esmf_time rsl_src
+externals : $(WRFIO) esmf_time 
 
 ###########################################################
 #ARCH Settings for PC Linux x86_64, Pathscale compiler  (RSL, MPICH, RSL IO)
@@ -503,6 +513,8 @@ SFC             = pathf90
 CC              = mpicc
 CC_TOOLS        = gcc
 LD              = $(FC)
+
+RSL             = $(EXTERNAL)/RSL
 
 TRADFLAG        = -traditional-cpp
 FPPFLAGS2       = -DINTIO -DWRF_RSL_IO -DRSL -DDM_PARALLEL \
@@ -536,7 +548,7 @@ MPI_LIB		= -L$(RSL)/RSL -lrsl
 LOCAL_LIBRARIES = -L/usr/local/ncarg/lib -L/usr/local/lib \
                     -lncarg -lncarg_gks -lncarg_c
 
-externals : $(WRFIO) esmf_time rsl_src
+externals : $(WRFIO) esmf_time 
 	( cd $(RSL)/RSL ; \
           make CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
@@ -578,7 +590,7 @@ LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN) -64 -mips4
 
 LOCAL_LIBRARIES = -L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c -lX11
 
-externals : $(WRFIO) esmf_time rsl_src
+externals : $(WRFIO) esmf_time 
 
 ###########################################################
 #ARCH   SGI O2K DM IRIX64            (RSL, RSL_IO, SGI-MPI)
@@ -591,6 +603,8 @@ CC              = mpicc
 CC_TOOLS        = cc
 RANLIB          = echo
 LD              = $(FC)
+
+RSL             = $(EXTERNAL)/RSL
 
 TRADFLAG        =
 FPPFLAGS2       = -DINTIO \
@@ -622,7 +636,7 @@ MPI_LIB		= -L$(RSL)/RSL -lrsl -lmpi
 
 LOCAL_LIBRARIES = -L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c -lX11
 
-externals : wrfio_nf wrfio_int wrfio_grib1 esmf_time rsl_src
+externals : wrfio_nf wrfio_int wrfio_grib1 esmf_time 
 	( cd $(RSL)/RSL ; \
           make CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
@@ -668,7 +682,7 @@ MPI_LIB		=
 
 LOCAL_LIBRARIES =       
 
-externals : wrfio_int wrfio_grib1 rsl_src
+externals : wrfio_int wrfio_grib1 
 
 ###########################################################
 #ARCH   AIX             (single-threaded, no nesting)
@@ -721,6 +735,8 @@ SCC             = cc_r
 CC_TOOLS        = cc
 LD              = $(FC)
 
+RSL             = $(EXTERNAL)/RSL
+
 TRADFLAG        =
 FPPFLAGS2       = -DWRF_RSL_IO -DRSL -DDM_PARALLEL \
 	  	    -DTRIEDNTRUE -DGRIB1 -DINTIO \
@@ -753,7 +769,7 @@ LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN) \
 MPI_LIB		= -L$(RSL)/RSL -lrsl
 LOCAL_LIB	= -lmass -lmassv
 
-externals :	$(WRFIO) esmf_time rsl_src
+externals :	$(WRFIO) esmf_time 
 	( cd $(RSL)/RSL ; \
           make CC="mpcc $(CCFLAGS_RSL)" FC="mpxlf $(FCFLAGS_RSL)" \
           MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
@@ -774,6 +790,8 @@ CC              = cc
 CC_TOOLS        = gcc
 RANLIB          = echo
 LD              = ftn
+
+RSL             = $(EXTERNAL)/RSL
 
 TRADFLAG        = -traditional-cpp
 FPPFLAGS2       = -DWRF_RSL_IO -DRSL -DDM_PARALLEL \
@@ -805,7 +823,7 @@ LOCAL_LIB	= -L$(FRAME) -L$(SHARE) -L$(DA)
 CONVERTOR_LIB	= -L$(CONVERTOR)
 LOCAL_LIBRARIES = #-L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c -lX11
 
-externals : wrfio_nf wrfio_int wrfio_grib1 esmf_time rsl_src
+externals : wrfio_nf wrfio_int wrfio_grib1 esmf_time 
 	( cd $(RSL)/RSL ; \
           make  CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
@@ -844,7 +862,7 @@ LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN) \
 
 EXTRA_LIBS      = -lSystemStubs
 
-externals : $(WRFIO) esmf_time rsl_src
+externals : $(WRFIO) esmf_time 
 
 ###########################################################
 #ARCH Darwin		(xlf single-threaded, no nesting, for G4)
@@ -880,7 +898,7 @@ LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN) \
 
 EXTRA_LIBS      = -lSystemStubs
 
-externals : $(WRFIO) esmf_time rsl_src
+externals : $(WRFIO) esmf_time 
 
 ###########################################################
 #ARCH Darwin		(g95 single-threaded, no nesting, for G4/G5)
@@ -915,7 +933,7 @@ LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN) \
 
 EXTRA_LIBS      = -lSystemStubs
 
-externals : $(WRFIO) esmf_time rsl_src
+externals : $(WRFIO) esmf_time 
 
 ###########################################################
 #ARCH Darwin           (g95 parallel for G4/G5 (RSL, MPICH, RSL IO)
@@ -927,6 +945,8 @@ SFC             = g95
 CC              = mpicc
 CC_TOOLS        = gcc
 LD              = $(FC)
+
+RSL             = $(EXTERNAL)/RSL
 
 TRADFLAG        = -traditional
 FPPFLAGS2       = -DINTIO -DWRF_RSL_IO -DRSL -DDM_PARALLEL \
@@ -960,7 +980,7 @@ MPI_LIB		= -L$(RSL)/RSL -lrsl
 LOCAL_LIBRARIES = -L/usr/local/ncarg/lib -L/usr/local/lib \
                     -lncarg -lncarg_gks -lncarg_c 
 
-externals : $(WRFIO) esmf_time rsl_src
+externals : $(WRFIO) esmf_time 
 	( cd $(RSL)/RSL ; \
           make  CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \

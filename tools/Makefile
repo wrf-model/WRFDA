@@ -6,13 +6,13 @@ TOOLS_OBJ = registry.o my_strtok.o reg_parse.o data.o type.o misc.o \
       gen_model_data_ord.o gen_interp.o gen_comms.o gen_scalar_derefs.o
 
 registry : $(TOOLS_OBJ)
-	$(CC) -o registry $(DEBUG) $(LDFLAGS) $(TOOLS_OBJ)
+	$(CC) -o registry $(TOOLS_OBJ)
 
-rsl_src :
+gen_comms.c :
 	@ $(LN) $(RSL)/gen_comms.c .
 
 clean:
-	@ $(RM) $(TOOLS_OBJ) gen_comms.c
+	@ $(RM) *.o *.f 
 
 superclean : clean
 	@ $(RM) registry gen_comms.c fseeko_test fseeko64_test
