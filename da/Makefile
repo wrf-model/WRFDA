@@ -1019,7 +1019,7 @@ da_test.o:		da_test.f90 \
 			da_check_xtoy_adjoint_ssmt1.inc \
 			da_check_xtoy_adjoint_ssmt2.inc \
 			da_setup_testfield.inc \
-			set_tst_trnsf_fld.inc
+			da_set_tst_trnsf_fld.inc
 			$(RM) $@
 			$(CPP) $(CPPFLAGS) da_test.f90 > da_test.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_test.f
