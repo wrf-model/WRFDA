@@ -32,10 +32,11 @@ links :
 	@ $(LN) $(CONVERTOR)/kma_wave2grid .
 	@ $(LN) $(CONVERTOR)/wave2grid_kma .
 	@ $(LN) $(ESMF_TIME_F90)/*.F90 .
+	@ $(CP) -r $(EXTERNAL)/RSL .
+	@ $(LN) RSL/*.F .
+	@ $(LN) RSL/*.c .
 	@ $(LN) RSL/RSL/*.c .
 	@ $(LN) RSL/RSL/*.h .
-	@ $(LN) RSL/RSL/*.F .
-	@ $(CP) -r $(EXTERNAL)/RSL .
 
 WRF_LIBS = libwrflib.a libwrfio_nf.a libio_grib1.a libesmf_time.a
 
