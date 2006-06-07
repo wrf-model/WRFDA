@@ -29,14 +29,13 @@ for CONFIG in $CONFIGS; do
       for TARGET in $TARGETS; do
         echo "Compiling ${ID}_${CONFIG}_${COMPILER}/$TARGET"
         cd ~bray/${ID}_${CONFIG}_$COMPILER/$TARGET
-        if $FULL; then ./clean -a >/dev/null 2>&1; fi
-        cvs -q update >/dev/null 2>&1
+        if $FULL; then make superclean -a >/dev/null 2>&1; fi
+        svn update >/dev/null 2>&1
         echo $OPTION | ./configure $TARGET >/dev/null 2>&1
         ./compile $TARGET > compile.out 2>&1
         echo $OPTION | ./configure_new $TARGET >/dev/null 2>&1
         cd build
-        ./setup.bsh
-        if $FULL; then make clean; fi
+        if $FULL; then make superclean; fi
         make -r $TARGET > compile.out 2>&1
       done
       let COUNT=$COUNT+1
