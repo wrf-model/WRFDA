@@ -57,7 +57,7 @@ module_initialize_real.o module_dm.o start_domain.o :
 .f90.o : 
 	@ $(RM) $@
 	@ $(SED_FTN) $*.f90 > $*.b
-	  $(CPP) $(FPPFLAGS) $*.b  > $*.f
+	@ $(CPP) $(FPPFLAGS) $*.b  > $*.f
 	@ $(RM) $*.b
 	  $(FC) -c $(FCFLAGS) $*.f
 

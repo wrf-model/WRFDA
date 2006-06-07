@@ -88,10 +88,10 @@ module_initialize_squall2d_x.o module_initialize_squall2d_y.o  \
 module_configure.o mediation_interp_domain.o                   \
 mediation_force_domain.o mediation_feedback_domain.o           \
 module_initialize_real.o module_dm.o start_domain.o :
-	$(RM) $@
-	$(SED_FTN) $*.F > $*.b 
+	@ $(RM) $@
+	@ $(SED_FTN) $*.F > $*.b 
 	$(CPP) $(CPPFLAGS) $*.b  > $*.f
-	$(RM) $*.b
+	@ $(RM) $*.b
 	$(FC) -c $(FCBASEOPTS) $(MODULE_DIRS) -O0 $*.f
 
 #There is probably no reason to modify these rules
@@ -99,8 +99,9 @@ module_initialize_real.o module_dm.o start_domain.o :
 .f90.o:
 	@ $(RM) $@
 	@ $(SED_FTN) $*.f90 > $*.b
-	  $(CPP) $(CPPFLAGS) $*.b  > $*.f
+	@ $(CPP) $(CPPFLAGS) $*.b  > $*.f
 	@ $(RM) $*.b
+	@ echo $(FC) -c $(FCFLAGS) $*.f
 	  $(FC) -c $(FCFLAGS) $(MODULE_DIRS) $*.f
 
 .F90.o:
