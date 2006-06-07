@@ -27,7 +27,6 @@ links :
 	@ $(LN) $(BUFR_NCEP_NCO)/bufrlib.param .
 	@ $(LN) $(IO_NETCDF)/*.code .
 	@ $(LN) $(ARCH)/*.sed .
-	@ $(LN) $(TOOLS)/gen_comms.stub .
 	@ $(LN) $(CONVERTOR)/convert_tool .
 	@ $(LN) $(CONVERTOR)/kma_wave2grid .
 	@ $(LN) $(CONVERTOR)/wave2grid_kma .
@@ -78,6 +77,6 @@ clean :
 
 superclean : clean
 	@ $(RM) *.f90 *.F90 *.F *.inc *.int *.c *.h *.m4 *.code *.make \
-          bufrlib.param *.sed registry gen_comms.stub \
+          bufrlib.param *.sed registry \
           convert_tool kma_wave2grid wave2grid_kma *.csh version_decl \
           RSL *.bsh *.csh
