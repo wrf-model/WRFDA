@@ -49,7 +49,7 @@ for CONFIG in $CONFIGS; do
           else
             cd ~bray/data/$REGION
             export BUILD=${ID}_${CONFIG}_${COMPILER}
-            echo "Testing $(BUILD} $TARGET on $REGION"
+            echo "Testing $BUILD $TARGET on $REGION"
             if test $TARGET = be; then
               export DA_BUILD_TYPE=old
               #./gen_be.bsh > ${ID}_${CONFIG}_${COMPILER}_old.out 2>&1
