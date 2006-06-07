@@ -1,13 +1,12 @@
 include ../../configure.wrf
 
-all : $(BUFR_OBJS)
-	$(AR) libbufr.a $(BUFR_OBJS)
-
 BUFR_OBJS =		bufrlib.o 		\
 	                bort_exit.o 		\
 	                restd.o 		\
 	                wrdesc.o
 
+all : $(BUFR_OBJS)
+	$(AR) libbufr.a $(BUFR_OBJS)
 
 bufrlib.prm:		bufrlib.param
 			$(RM) $@

@@ -1,5 +1,8 @@
 BLAS_OBJS        =	blas.o
 
+libblas.a : $(BLAS_OBJS)
+	$(AR) libblas.a $(BLAS_OBJS)
+
 blas.o:	               blas.f90      \
 		       daxpy.inc    \
 		       dcopy.inc    \

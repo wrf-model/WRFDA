@@ -47,10 +47,9 @@ DA_OBJS        =	da_solve_v3d.o		\
                         da_wrfvar_io.o      \
 	   		da_wrfvar_top.o
 
-libwrfvar.a : $(DA_OBJS) $(LAPACK_OBJS) $(FFTPACK_OBJS) $(BUFR_OBJS) \
+libwrfvar.a : $(DA_OBJS) $(LAPACK_OBJS) $(FFTPACK5_OBJS) $(BUFR_OBJS) \
               $(BLAS_OBJS)
-	$(AR) ru libwrfvar.a $(DA_OBJS) $(LAPACK_OBJS) $(FFTPACK_OBJS) \
-              $(BUFR_OBJS) $(BLAS_OBJS)
+	$(AR) ru libwrfvar.a
 	$(RANLIB) libwrfvar.a
 
 ##########################################################################
@@ -170,10 +169,7 @@ da_setup_structures.o:	da_setup_structures.f90           \
 			da_ssmi.o                         \
 			da_vtox_transforms.o              \
 			da_physics.o                      \
-	                bufrlib.o                         \
-	                bort_exit.o                       \
-	                restd.o                           \
-	                wrdesc.o                          \
+	                libbufr.a                         \
 	                da_spectral.o                     \
 			da_radiance.o                     \
 			da_add_increments.inc             \
@@ -217,7 +213,7 @@ da_vtox_transforms.o:	da_vtox_transforms.f90            \
 			da_constants.o                    \
 			da_dynamics.o                     \
 			da_physics.o                      \
-			fftpack5.o                        \
+			libfftpack5.a                        \
 			da_spectral.o                     \
 			da_ssmi.o                         \
                         da_tracing.o                      \
@@ -760,7 +756,7 @@ da_ffts.o:		da_ffts.f90                         \
 da_tools.o:		da_tools.f90                   \
                         module_bc.o                    \
 			da_constants.o                 \
-			lapack.o                       \
+			liblapack.a                       \
 			da_define_structures.o         \
                         da_map_utils_defines.inc       \
                         da_map_utils.inc               \
@@ -923,8 +919,8 @@ da_test.o:	       da_test.f90                          \
 da_gen_be.o:		da_gen_be.f90                    \
                         module_wrf_error.o               \
                         da_constants.o			 \
-			lapack.o			 \
-			blas.o				 \
+			liblapack.a			 \
+			libblas.a				 \
                         da_tracing.o                     \
 			da_transform_vptovv.inc	         \
 			da_eof_decomposition.inc         \
@@ -944,7 +940,7 @@ da_gen_be.o:		da_gen_be.f90                    \
 da_spectral.o:		da_spectral.f90             \
 			da_constants.o		    \
 			da_define_structures.o	    \
-			fftpack5.o		    \
+			libfftpack5.a		    \
 			da_asslegpol.inc            \
 			da_calc_power.inc           \
 			da_get_gausslats.inc        \
@@ -963,7 +959,7 @@ da_spectral.o:		da_spectral.f90             \
 
 da_be_spectral.o:	da_be_spectral.f90          \
 			da_constants.o	            \
-			fftpack5.o		    \
+			libfftpack5.a		    \
 			da_asslegpol.inc            \
 			da_calc_power.inc           \
 			da_get_gausslats.inc        \

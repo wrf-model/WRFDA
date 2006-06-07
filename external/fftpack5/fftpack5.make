@@ -1,4 +1,7 @@
-FFTPACK_OBJS        =	fftpack5.o
+FFTPACK5_OBJS        =	fftpack5.o
+
+libfftpack5.a : $(FFTPACK5_OBJS)
+	$(AR) libfftpack5.a $(FFTPACK5_OBJS)
 
 fftpack5.o:	        fftpack5.f90  \
 			da_constants.o \

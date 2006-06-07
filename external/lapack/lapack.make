@@ -1,5 +1,8 @@
 LAPACK_OBJS        =	lapack.o
 
+liblapack.a : $(LAPACK_OBJS)
+	$(AR) liblapack.a $(LAPACK_OBJS)
+
 lapack.o:		lapack.f90 \
 			blas.o     \
 			dlae2.inc  \

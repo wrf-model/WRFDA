@@ -3,6 +3,8 @@ BUFR_OBJS        =	bufrlib.o 		\
 	                restd.o 		\
 	                wrdesc.o
 
+libbufr.a : $(BUFR_OBJS)
+	$(AR) libbufr.a $(BUFR_OBJS)
 
 
 bufrlib.prm:		bufrlib.param
