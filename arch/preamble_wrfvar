@@ -77,6 +77,10 @@ RSL           = $(EXTERNAL)/RSL_stubs
 
 NETCDF_LIB = -L$(EXTERNAL)/io_netcdf -lwrfio_nf -L$(NETCDFPATH)/lib -lnetcdf
 PHDF5_LIB  = -L\$(EXTERNAL)/io_phdf5 -lwrfio_phdf5 -L$(PHDF5PATH)/lib -lhdf5_fortran -lhdf5 -lm -lz -L$(PHDF5PATH)/lib -lsz
+LAPACK_LIB = -L$(LAPACK) -llapack
+BLAS_LIB = -L$(LAPACK) -lblas
+BUFR_LIB = -L$(BUFR_NCEP_NCO) -lbufr
+FFTPACK5_LIB = -L$(FFTPACK5) -lfftpack5
 LIBINCLUDE = -I. -I$(INC) -I$(IOAPI_SHARE)
 
 #### Get core settings from environment (set in compile script)

@@ -3,9 +3,10 @@ include ../../configure.wrf
 LAPACK_OBJS = lapack.o
 
 all : $(LAPACK_OBJS)
+	$(AR) ru liblapack.a $(LAPACK_OBJS)
 
 lapack.o:		lapack.f90 \
-			../blas/blas.o \
+			$(BLAS)/blas.o \
 			dlae2.inc \
 			dlaev2.inc \
 			dlamc1.inc \

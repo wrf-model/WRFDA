@@ -3,8 +3,9 @@ include ../../configure.wrf
 BLAS_OBJS =	blas.o 
 
 all : $(BLAS_OBJS)
+	$(AR) ru libblas.a $(BLAS_OBJS)
 
-blas.o:	         \
+blas.o:	         blas.f90 \
 			daxpy.inc  \
 			dcopy.inc  \
 			ddot.inc   \
@@ -20,8 +21,7 @@ blas.o:	         \
 			dtrmm.inc  \
 			dtrmv.inc  \
 			lsame.inc  \
-			xerbla.inc \
-			blas.f90
+			xerbla.inc
 			$(CPP) $(CPPFLAGS) blas.f90 > blas.f
 			$(FFC) -c $(FIXEDFLAGS_WRFVAR) $(MODULE_DIRS) blas.f
 
