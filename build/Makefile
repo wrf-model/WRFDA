@@ -12,6 +12,7 @@ links :
 	@ $(LN) $(DA)/*/*.inc .
 	@ $(LN) $(DA)/*/*.c .
 	@ $(LN) $(DA)/*/*sh .
+	@ $(LN) $(DA)/*/*m4 .
 	@ $(LN) $(EXTERNAL)/*/*.make .
 	@ $(LN) $(EXTERNAL)/*/*.f90 .
 	@ $(LN) $(EXTERNAL)/*/*.F90 .
@@ -31,6 +32,9 @@ links :
 	@ $(LN) $(CONVERTOR)/kma_wave2grid .
 	@ $(LN) $(CONVERTOR)/wave2grid_kma .
 	@ $(LN) $(ESMF_TIME_F90)/*.F90 .
+	@ $(LN) RSL/RSL/*.c .
+	@ $(LN) RSL/RSL/*.h .
+	@ $(LN) RSL/RSL/*.F .
 	@ $(CP) -r $(EXTERNAL)/RSL .
 
 WRF_LIBS = libwrflib.a libwrfio_nf.a libio_grib1.a libesmf_time.a
@@ -68,7 +72,7 @@ libwrflib.a : $(WRF_MODULES) $(WRF_OBJS)
 
 clean :
 	@ $(RM) *.exe *.o *.mod *.b *.a *.f inc/*.inc frame/*.f90 registry \
-          Registry_tmp* module_state_description.f90 \
+          Registry_tmp* module_state_description.f90 bufrlib.prm \
           RSL/RSL/*.a RSL/RSL/*.o
 
 superclean : clean
