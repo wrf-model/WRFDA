@@ -190,7 +190,6 @@ da_setup_structures.o:	da_setup_structures.f90 \
 			da_get_vertical_truncation.inc \
 			da_interpolate_regcoeff.inc \
 			da_interpolate_stats.inc \
-			da_write_interpolated_be.inc \
 			da_rescale_background_errors.inc \
 			da_setup_background_errors.inc \
 			da_setup_be_global.inc \
