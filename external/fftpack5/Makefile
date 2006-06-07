@@ -25,6 +25,11 @@ fftpack5.o:	         \
 			$(CPP) $(CPPFLAGS) fftpack5.f90 > fftpack5.f
 			$(FFC) -c $(FIXEDFLAGS_WRFVAR) $(MODULE_DIRS) fftpack5.f
 
+clean :
+	$(RM) $(FFTPACK_OBJS)
+
+superclean : clean
+
 ##############################################################################
 
 # DEPENDENCIES : only dependencies after this line (don't remove the word DEPENDENCIES)

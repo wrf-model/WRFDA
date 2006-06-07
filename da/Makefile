@@ -1,5 +1,6 @@
 # Makefile for WRF-VAR Program and its applications
-# Lower level Makefile
+
+include ../configure.wrf
 
 OBJS_FOR_ALL =		da_solve_v3d.o		\
                         da_memory.o             \
@@ -50,8 +51,6 @@ OBJS_FOR_ALL =		da_solve_v3d.o		\
                         da_wrfvar_top.o         \
                         da_wrfvar_io.o
 
-include ../configure.wrf
-
 TARGETDIR    =  ../..
 wrfvar :	links $(OBJS_FOR_ALL)
 		$(AR) ../main/libwrflib.a $(OBJS_FOR_ALL)
@@ -66,7 +65,12 @@ links :
 ##########################################################################
 
 clean:
-	$(RM) *.o *.mod *.f *.stb *.out core *~ mpif.h da_generic_boilerplate.inc
+	@ $(RM) *.o *.mod *.f *.stb *.out core *~ mpif.h da_generic_boilerplate.inc
+
+superclean : clean
+	@ $(RM) mpif.h
+	@ $(RM) *.inc
+	@ $(RM) *.f90 *.c *.m4
 
 da_generic_boilerplate.inc:	da_generic_boilerplate.m4
 			$(RM) da_generic_boilerplate.inc

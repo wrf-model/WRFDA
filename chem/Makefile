@@ -1,9 +1,4 @@
-#
-
-LN      =       ln -sf
-MAKE    =       make -i -r
-RM      =       rm -f
-
+include ../configure.wrf
 
 MODULES =                           \
   module_chem_utilities.o           \
@@ -60,12 +55,10 @@ TARGETDIR    =  ./
 $(LIBTARGET) :  $(MODULES) $(OBJS)
 		$(AR) ../main/libwrflib.a $(MODULES) $(OBJS)
 
-include ../configure.wrf
-
-CPP = cpp
-
 clean:
-	@ echo 'use the clean script'
+	@ $(RM) *.o *.f
+
+superclean : clean
 
 # DEPENDENCIES : only dependencies after this line (don't remove the word DEPENDENCIES)
 

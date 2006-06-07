@@ -27,8 +27,11 @@ $(TARGET) : $(OBJS)
 	$(CPP) -C -P -DESMF_COUPLING $*.F90 > $*.f
 	$(FC) -c -g -I../ioapi_share $*.f
 
-superclean: 
-	/bin/rm -f *.f *.o $(TARGET) *.mod
+clean :
+	@ $(RM) *.f *.o *.mod
+
+superclean: clean
+	@ $(RM) $TARGET
 
 # DEPENDENCIES : only dependencies after this line 
 

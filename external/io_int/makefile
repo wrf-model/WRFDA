@@ -49,5 +49,8 @@ diffwrf_int:            diffwrf_int.F ../../frame/pack_utils.o ../../frame/modul
 ../../frame/pack_utils.o ../../frame/internal_header_util.o ../../frame/module_machine.o ../../frame/module_wrf_error.o :
 			@echo "Diffwrf will be built later on in this compile. No need to rerun compile. "
 
-superclean:
-			/bin/rm -f *.f *.o *.mod libwrfio_int.a diffwrf_int
+clean :
+	@ $(RM) *.o *.f *.mod
+
+superclean: clean
+	$(RM) *.a diffwrf_int

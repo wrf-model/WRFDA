@@ -26,8 +26,11 @@ Test1 : Test1.F90 libesmf_time.a
 	$(CPP) -C -P -I. -DF90_STANDALONE $*.F90 > $*.f
 	$(FC) -c -g $*.f
 
-superclean: 
-	/bin/rm -f *.f *.o libesmf_time.a *.mod Test1
+clean :
+	@ $(RM) *.f *.o *.mod
+
+superclean: clean
+	@ $(RM) libesmf_time.a Test1
 
 # DEPENDENCIES : only dependencies after this line 
 

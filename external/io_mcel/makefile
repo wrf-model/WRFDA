@@ -23,8 +23,11 @@ libwrfio_mcel.a:		$(OBJS)
 			$(CPP) $*.F90 | $(M4) - > $*.f
 			$(FC) $(FFLAGS) -I../ioapi_share -c $*.f
 
-superclean:
-			/bin/rm -f *.f *.o libwrfio_mcel.a
+clean :
+	@ $(RM) *.o *.f *.mod
+
+superclean: clean
+	@ $(RM) *.a
 
 # DEPENDENCIES : only dependencies after this line (don't remove the word DEPENDENCIES)
 

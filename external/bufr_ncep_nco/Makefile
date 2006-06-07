@@ -27,6 +27,11 @@ wrdesc.o:		wrdesc.c
 			$(RM) $@
 			$(CC) -c $(CCFLAGS_BUFR) wrdesc.c
 
+clean :
+	$(RM) $(BUFR_OBJS)
+
+superclean : clean
+
 
 ##############################################################################
 

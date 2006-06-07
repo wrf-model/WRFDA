@@ -21,4 +21,7 @@ wgrib: $(obj)
 	$(CC) -o wgrib $(obj) -lm
 
 clean:	
-	/bin/rm -f $(obj) wgrib
+	@ /bin/rm -f $(obj) wgrib
+
+superclean : clean
+

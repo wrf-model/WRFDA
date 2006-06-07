@@ -1,5 +1,7 @@
 #	Top level Makefile for wrf system
 
+include ./configure.wrf
+
 LN      =       ln -s
 MAKE    =       make -i -r
 MV	=	/bin/mv
@@ -7,8 +9,6 @@ RM      =       /bin/rm -f
 
 deflt :
 		@ echo Please compile the code using ./compile
-
-include ./configure.wrf
 
 EM_MODULE_DIR = -I../dyn_em
 EM_MODULES =  $(EM_MODULE_DIR)
@@ -444,6 +444,29 @@ bufr_little_endian :
             FC="$(FC)" FIXEDFLAGS_ENDIAN="$(FIXEDFLAGS_ENDIAN)" bufr_little_endian.exe)
 
 clean :
-		@ echo 'Use the clean script'
+	@ ( cd chem; make clean )
+	@ ( cd da; make clean )
+	@ ( cd dyn_em; make clean )
+	@ ( cd dyn_exp; make clean )
+	@ ( cd dyn_nmm; make clean )
+	@ ( cd external; make clean )
+	@ ( cd frame; make clean )
+	@ ( cd main; make clean )
+	@ ( cd phys; make clean )
+	@ ( cd share; make clean )
+	@ ( cd tools; make clean )
+
+superclean : clean
+	@ ( cd chem; make superclean )
+	@ ( cd da; make superclean )
+	@ ( cd dyn_em; make superclean )
+	@ ( cd dyn_exp; make superclean )
+	@ ( cd dyn_nmm; make superclean )
+	@ ( cd external; make superclean )
+	@ ( cd frame; make superclean )
+	@ ( cd main; make superclean )
+	@ ( cd phys; make superclean )
+	@ ( cd share; make superclean )
+	@ ( cd tools; make superclean )
 
 # DO NOT DELETE

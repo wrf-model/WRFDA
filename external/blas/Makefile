@@ -23,6 +23,11 @@ blas.o:	         \
 			$(CPP) $(CPPFLAGS) blas.f90 > blas.f
 			$(FFC) -c $(FIXEDFLAGS_WRFVAR) $(MODULE_DIRS) blas.f
 
+clean :
+	@ $(RM) *.o *.f *.mod
+
+superclean : clean
+
 ##############################################################################
 
 # DEPENDENCIES : only dependencies after this line (don't remove the word DEPENDENCIES)

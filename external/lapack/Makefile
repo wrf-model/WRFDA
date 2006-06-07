@@ -19,6 +19,12 @@ lapack.o:		lapack.f90 \
 			$(CPP) $(CPPFLAGS) lapack.f90 > lapack.f
 			$(FFC) -c $(FIXEDFLAGS_WRFVAR) $(MODULE_DIRS) lapack.f
 
+clean :
+	@ $(RM) *.o *.f *.mod
+
+superclean : clean
+        
+
 ##############################################################################
 
 # DEPENDENCIES : only dependencies after this line (don't remove the word DEPENDENCIES)

@@ -1,9 +1,4 @@
-#
-
-LN      =       ln -sf
-MAKE    =       make -i -r
-RM      =       rm -f
-
+include ../configure.wrf
 
 MODULES =                 		\
         module_ADVECTION.o         	\
@@ -46,10 +41,10 @@ TARGETDIR    =  ./
 $(LIBTARGET) :  $(MODULES) $(OBJS)
 		$(AR) ../main/libwrflib.a $(MODULES) $(OBJS)
 
-include ../configure.wrf
-
 clean:
-	@ echo 'use the clean script'
+	@ $(RM) *.f *.o
+
+superclean : clean
 
 # DEPENDENCIES : only dependencies after this line (don't remove the word DEPENDENCIES)
 

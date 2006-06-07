@@ -107,6 +107,7 @@ MINITAR = $(CORE_MINITAR)
 
 .SUFFIXES: .o .c
 MAKE = make -r
+RM = /bin/rm -f
 
 help :
 	@ echo "Must specify target (see makefile)."
@@ -202,8 +203,11 @@ manclean :
 	/bin/rm -fr man
 	cd docs ; make manclean
 
-superclean : 
-	/bin/rm -f *.o librsl.a rsl.inc
+clean :
+	@ $(RM) *.o
+
+superclean : clean
+	@ $(RM) *.a rsl.inc
 
 ###
 

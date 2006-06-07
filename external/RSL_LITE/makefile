@@ -43,7 +43,7 @@ f_pack.o:	        f_pack.F
 			$(FC) $(FFLAGS) -c f_pack.F
 
 clean : 
-			/bin/rm -f *.f *.o
+			@ /bin/rm -f *.f *.o
 
 superclean : clean
-			/bin/rm -f *.a
+			@ /bin/rm -f *.a

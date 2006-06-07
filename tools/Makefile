@@ -1,28 +1,24 @@
-.SUFFIXES: .c .o
+include ../configure.wrf
 
-CC = cc
-CFLAGS = #-ansi
-LDFLAGS =
-DEBUG = -g 
-OBJ = registry.o my_strtok.o reg_parse.o data.o type.o misc.o \
+TOOLS_OBJ = registry.o my_strtok.o reg_parse.o data.o type.o misc.o \
       gen_defs.o gen_allocs.o gen_mod_state_descr.o gen_scalar_indices.o \
       gen_args.o gen_config.o sym.o symtab_gen.o gen_wrf_io.o \
       gen_model_data_ord.o gen_interp.o gen_comms.o gen_scalar_derefs.o
 
-registry : $(OBJ)
-	$(CC) -o registry $(DEBUG) $(LDFLAGS) $(OBJ)
-
-.c.o :
-	$(CC) $(CFLAGS) -c $(DEBUG) $<
+registry : $(TOOLS_OBJ)
+	$(CC) -o registry $(DEBUG) $(LDFLAGS) $(TOOLS_OBJ)
 
 clean:
-	/bin/rm -f $(OBJ) gen_comms.c
+	@ $(RM) $(TOOLS_OBJ) gen_comms.c
+
+superclean : clean
+	@ $(RM) registry gen_comms.c fseeko_test fseeko64_test
 
 gen_comms.c : gen_comms.stub
-	/bin/cp gen_comms.stub gen_comms.c
+	$(CP) gen_comms.stub gen_comms.c
 
 advance_cymdh : advance_cymdh.o 
-	/bin/rm -f $@
+	$(RM) $@
 	$(FC) -o advance_cymdh advance_cymdh.o
 
 advance_cymdh.o : advance_cymdh.F

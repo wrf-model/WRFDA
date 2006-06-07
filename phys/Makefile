@@ -1,9 +1,4 @@
-#
-
-LN      =       ln -sf
-MAKE    =       make -i -r
-RM      =       rm -f
-
+include ../configure.wrf
 
 MODULES = \
 	module_bl_ysu.o \
@@ -64,14 +59,14 @@ $(LIBTARGET) :
                   $(AR) ../main/libwrflib.a $(MODULES) $(OBJS)             ; \
                 fi
 
-include ../configure.wrf
-
 nmm_contrib : $(NMM_OBJS) $(NMM_MODULES) $(MODULES) $(OBJS)
 
 non_nmm : $(MODULES) $(OBJS)
 
 clean:
-	@ echo 'use the clean script'
+	@ $(RM) *.o *.f
+
+superclean : clean
 
 # DEPENDENCIES : only dependencies after this line (don't remove the word DEPENDENCIES)
 

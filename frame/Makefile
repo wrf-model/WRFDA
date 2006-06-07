@@ -1,10 +1,4 @@
-#
-
-LN      =       ln -sf
-MAKE    =       make -i -r
-RM      =       rm -f
-
-
+include ../configure.wrf
 
 MODULES =       module_driver_constants.o  \
                 module_domain.o            \
@@ -37,8 +31,6 @@ OBJS    =       wrf_num_bytes_between.o    \
 SPECIAL =       module_internal_header_util.o pack_utils.o
    
 
-include ../configure.wrf
-
 framework :  $(MODULES) $(OBJS) $(SPECIAL)
 		$(AR) ../main/libwrflib.a $(MODULES) $(OBJS)
 		$(RANLIB) ../main/libwrflib.a
@@ -48,7 +40,9 @@ wrf_num_bytes_between.o :
 	$(CC) -c $(CFLAGS) wrf_num_bytes_between.c
 
 clean:
-	@ echo 'use the clean script'
+	@ $(RM) *.o *.f
+
+superclean : clean
 
 module_state_description.f90 : ../Registry/$(REGISTRY)
 		( cd .. ; tools/registry $(REGFLAGS) Registry/$(REGISTRY) )

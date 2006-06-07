@@ -1,16 +1,10 @@
-#
-
-LN      =       ln -sf
-MAKE    =       make -i -r
-RM      =       rm -f
+include ../configure.wrf
 
 MODULES = 
 
 OBJS    =
 
 LIBPATHS = 
-
-include ../configure.wrf
 
 wrfvar : wrfvar.o
 	$(RANLIB) libwrflib.a
@@ -78,7 +72,10 @@ module_initialize :
 # end of regtest changes
 
 clean:
-	@ echo 'use the clean script'
+	@ $(RM) *.o *.f
+
+superclean : clean
+	@ $(RM) mpif.h *.stb
 
 # DEPENDENCIES : only dependencies after this line (don't remove the word DEPENDENCIES)
 

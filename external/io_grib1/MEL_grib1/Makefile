@@ -99,6 +99,9 @@ HDRS =	gribfuncs.h \
 #
 include ../build/library_rules.mk
 
+superclean : clean
+	rm -rf *.a
+
 #
 #  Compile dependencies.  These are appended to this file by make depend. 
 #
