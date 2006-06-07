@@ -73,7 +73,7 @@ IO_INT        = $(EXTERNAL)/io_int
 ESMF_TIME_F90 = $(EXTERNAL)/esmf_time_f90
 IO_NETCDF     = $(EXTERNAL)/io_netcdf
 IOAPI_SHARE   = $(EXTERNAL)/ioapi_share
-RSL_PATH      = $(EXTERNAL)/RSL
+RSL           = $(EXTERNAL)/RSL_stubs
 
 NETCDF_LIB = -L$(EXTERNAL)/io_netcdf -lwrfio_nf -L$(NETCDFPATH)/lib -lnetcdf
 PHDF5_LIB  = -L\$(EXTERNAL)/io_phdf5 -lwrfio_phdf5 -L$(PHDF5PATH)/lib -lhdf5_fortran -lhdf5 -lm -lz -L$(PHDF5PATH)/lib -lsz

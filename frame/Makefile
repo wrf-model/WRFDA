@@ -35,6 +35,8 @@ framework :  $(MODULES) $(OBJS) $(SPECIAL)
 		$(AR) ../main/libwrflib.a $(MODULES) $(OBJS)
 		$(RANLIB) ../main/libwrflib.a
 
+rsl_src :
+	@ $(LN) $(RSL)/module_dm.F .
 
 wrf_num_bytes_between.o :
 	$(CC) -c $(CFLAGS) wrf_num_bytes_between.c

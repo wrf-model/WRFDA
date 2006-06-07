@@ -8,14 +8,14 @@ TOOLS_OBJ = registry.o my_strtok.o reg_parse.o data.o type.o misc.o \
 registry : $(TOOLS_OBJ)
 	$(CC) -o registry $(DEBUG) $(LDFLAGS) $(TOOLS_OBJ)
 
+rsl_src :
+	@ $(LN) $(RSL)/gen_comms.c .
+
 clean:
 	@ $(RM) $(TOOLS_OBJ) gen_comms.c
 
 superclean : clean
 	@ $(RM) registry gen_comms.c fseeko_test fseeko64_test
-
-gen_comms.c : gen_comms.stub
-	$(CP) gen_comms.stub gen_comms.c
 
 advance_cymdh : advance_cymdh.o 
 	$(RM) $@

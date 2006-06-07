@@ -80,7 +80,6 @@ IO_INT        = $(EXTERNAL)/io_int
 ESMF_TIME_F90 = $(EXTERNAL)/esmf_time_f90
 IO_NETCDF     = $(EXTERNAL)/io_netcdf
 IOAPI_SHARE   = $(EXTERNAL)/ioapi_share
-RSL_PATH      = $(EXTERNAL)/RSL
 
 PHDF5_LIB  = -L$(EXTERNAL)/io_phdf5 -lwrfio_phdf5 -L$(PHDF5_PATH)/lib -lhdf5_fortran -lhdf5 -lm -lz -L$(PHDF5PATH)/lib -lsz
 
@@ -118,11 +117,11 @@ CONFIG_BUF_LEN	=	8192
 
 # defaults for occasional architecture specific settings
 
+RSL             = $(EXTERNAL)/RSL_stubs
 SED_FTN         = sed -f standard.sed
 FCHOST          =
 OMP             =
 OMPCPP          =
-RSL_PATH        =            
 MPI_LIB		=
 DM_CPP_FLAGS	=
 #### Architecture specific settings ####
