@@ -127,6 +127,7 @@ da_solve_v3d.o:		da_constants.o			\
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_solve_v3d.f
 
 da_minimisation.o:	da_minimisation.f90 \
+                        $(FFTPACK5)/fftpack5.o \
 			da_wrfvar_io.o \
 			da_constants.o \
 			da_define_structures.o \
@@ -176,10 +177,10 @@ da_setup_structures.o:	da_setup_structures.f90 \
 			da_ssmi.o \
 			da_vtox_transforms.o \
 			da_physics.o \
-	                ../external/bufr_ncep_nco/bufrlib.o \
-	                ../external/bufr_ncep_nco/bort_exit.o \
-	                ../external/bufr_ncep_nco/restd.o \
-	                ../external/bufr_ncep_nco/wrdesc.o \
+	                $(BUFR_NCEP_NCO)/bufrlib.o \
+	                $(BUFR_NCEP_NCO)/bort_exit.o \
+	                $(BUFR_NCEP_NCO)/restd.o \
+	                $(BUFR_NCEP_NCO)/wrdesc.o \
 	                da_spectral.o \
 			da_radiance.o \
                         da_wrfvar_io.o \
@@ -231,7 +232,7 @@ da_vtox_transforms.o:	da_vtox_transforms.f90 \
 			da_constants.o \
 			da_dynamics.o \
 			da_physics.o \
-			fftpack5.o \
+			$(FFTPACK5)/fftpack5.o \
 			da_spectral.o \
 			da_ssmi.o \
 			da_transform_vtovv.inc \
@@ -955,7 +956,7 @@ da_constants.o:		da_constants.f90 \
 			da_change_date.inc \
 			da_find_fft_factors.inc \
 			da_find_fft_trig_funcs.inc \
-                        ../frame/module_driver_constants.o 
+                        $(FRAME)/module_driver_constants.o 
 			$(RM) $@
 			$(CPP) -I../inc $(CPPFLAGS) da_constants.f90 > da_constants.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_constants.f
@@ -1051,7 +1052,7 @@ da_gen_be.o:	        da_gen_be.f90 \
 da_spectral.o:		da_spectral.f90             \
 			da_constants.o		    \
 			da_define_structures.o	    \
-			fftpack5.o	            \
+			$(FFTPACK5)/fftpack5.o      \
 			da_asslegpol.inc            \
 			da_calc_power.inc           \
 			da_calc_power_spectrum.inc  \
@@ -1112,9 +1113,9 @@ da_tracing.o:           da_tracing.f90           \
 			$(CPP) $(CPPFLAGS) da_tracing.f90 > da_tracing.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_tracing.f
 
-be_spectral.o:		\
-			da_constants.o				\
-			fftpack5.o			        \
+be_spectral.o:		da_be_spectral.f90          \
+			da_constants.o	            \
+			$(FFTPACK5)/fftpack5.o      \
 			da_asslegpol.inc            \
 			da_calc_power.inc           \
 			da_get_gausslats.inc        \
@@ -1169,8 +1170,7 @@ da_radiance.o:		da_radiance.f90 \
 			iceem_amsu.inc \
 			landem.inc \
 			snwem_amsu.inc \
-			seaem.inc \
-			da_radiance.f90
+			seaem.inc
 			$(RM) $@
 			$(CPP) -I$(RTTOV)/src $(CPPFLAGS) da_radiance.f90 > da_radiance.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_radiance.f

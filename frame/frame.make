@@ -141,4 +141,6 @@ module_wrf_error.o: \
 		wrf_shutdown.o \
 		$(ESMF_MOD_DEPENDENCE)
 
+wrf_shutdown.o : wrf_shutdown.F
+
 # DO NOT DELETE
