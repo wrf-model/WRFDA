@@ -35,10 +35,9 @@ OBJS    = 		          	\
         DSTRB.o                         \
 	CLTEND.o
 
+all : dyn_nmm
 
-LIBTARGET    =  dyn_nmm
-TARGETDIR    =  ./
-$(LIBTARGET) :  $(MODULES) $(OBJS)
+dyn_nmm  :  $(MODULES) $(OBJS)
 		$(AR) ../main/libwrflib.a $(MODULES) $(OBJS)
 
 clean:

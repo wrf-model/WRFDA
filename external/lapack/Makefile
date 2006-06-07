@@ -2,6 +2,8 @@ include ../../configure.wrf
 
 LAPACK_OBJS = lapack.o
 
+all : $(LAPACK_OBJS)
+
 lapack.o:		lapack.f90 \
 			../blas/blas.o \
 			dlae2.inc \

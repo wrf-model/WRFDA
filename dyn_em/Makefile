@@ -45,9 +45,9 @@ OBJS    = 		        \
 	solve_em_tl.o           \
  
 
-LIBTARGET    =  dyn_em
-TARGETDIR    =  ./
-$(LIBTARGET) :  $(MODULES) $(OBJS)
+all : dyn_em
+
+dyn_em :  $(MODULES) $(OBJS)
 		$(AR) ../main/libwrflib.a $(MODULES) $(OBJS)
 
 clean:

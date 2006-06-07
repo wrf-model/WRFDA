@@ -364,19 +364,19 @@ framework :
 
 shared :
 	@ echo '--------------------------------------'
-	( cd share ; $(MAKE) )
+	( cd share ; $(MAKE) all )
 
 chemics :
 	@ echo '--------------------------------------'
-	( cd chem ; $(MAKE) )
+	( cd chem ; $(MAKE) all )
 
 physics :
 	@ echo '--------------------------------------'
-	( cd phys ; $(MAKE) )
+	( cd phys ; $(MAKE) all )
 
 em_core :
 	@ echo '--------------------------------------'
-	( cd dyn_em ; $(MAKE) )
+	( cd dyn_em ; $(MAKE) all )
 
 da_links :
 	( cd da; $(MAKE) links )
@@ -385,13 +385,13 @@ da_constants : da_links
 	( cd da; $(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES_2)" da_constants.o )
 
 blas : 
-	( cd external/blas ; $(MAKE) blas.o )
+	( cd external/blas ; $(MAKE) all )
 	
 lapack : blas
-	( cd external/lapack ; $(MAKE) lapack.o )
+	( cd external/lapack ; $(MAKE) all )
 	
 fftpack5 : da_constants
-	( cd external/fftpack5 ; $(MAKE) fftpack5.o )
+	( cd external/fftpack5 ; $(MAKE) all )
 	
 bufr_ncep_nco : 
 	( cd external/bufr_ncep_nco ; $(MAKE) bufrlib.o )

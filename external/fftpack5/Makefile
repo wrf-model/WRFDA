@@ -1,6 +1,8 @@
+include ../../configure.wrf
+
 FFTPACK_OBJS =	da_fftpack5.o
 
-include ../../configure.wrf
+all : $(FFTPACK_OBJS)
 
 fftpack5.o:	         \
 			$(DA)/da_constants.o		\

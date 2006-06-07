@@ -63,10 +63,9 @@ OBJS    = 		\
 
 NMM_MODULES = 
 
+all : shared
 
-LIBTARGET    =  shared
-TARGETDIR    =  ./
-$(LIBTARGET) :  $(MODULES) $(OBJS)
+shared :  $(MODULES) $(OBJS)
 		if [ $(WRF_NMM_CORE) -eq 1 ] ; then \
                   $(MAKE) nmm_contrib                                      ; \
                   $(AR) ../main/libwrflib.a $(MODULES) $(OBJS) $(NMM_OBJS) $(NMM_MODULES) ; \

@@ -49,10 +49,9 @@ OBJS    =                           \
         dry_dep_driver.o            \
         aerosol_driver.o 
 
+all : chemics
 
-LIBTARGET    =  chemics
-TARGETDIR    =  ./
-$(LIBTARGET) :  $(MODULES) $(OBJS)
+chemics :  $(MODULES) $(OBJS)
 		$(AR) ../main/libwrflib.a $(MODULES) $(OBJS)
 
 clean:

@@ -47,10 +47,9 @@ OBJS    =
 
 NMM_MODULES =  module_sf_lsm_nmm.o
 
-LIBTARGET    =  physics
-TARGETDIR    =  ./
+all : physics
 
-$(LIBTARGET) :
+physics : 
 		if [ $(WRF_NMM_CORE) -eq 1 ] ; then \
                   $(MAKE) nmm_contrib                                      ; \
                   $(AR) ../main/libwrflib.a $(MODULES) $(OBJS) $(NMM_OBJS) $(NMM_MODULES) ; \
