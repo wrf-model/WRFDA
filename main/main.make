@@ -2,13 +2,13 @@
 
 var : wrfvar
 
-wrfvar : arch links.done $(VAR_LIBS) wrfvar.o libwrfvar.a
+wrfvar : arch links $(VAR_LIBS) wrfvar.o libwrfvar.a
 	$(LD) -o wrfvar.exe $(LDFLAGS) wrfvar.o -lwrfvar $(LIB)
 
-wrf : arch links.done wrf.o $(WRF_LIBS)
+wrf : arch links wrf.o $(WRF_LIBS)
 	$(LD) -o wrf.exe $(LDFLAGS) wrf.o $(LIB)
 
-wrfplus : arch wrf.o $(WRF_LIBS)
+wrfplus : arch links wrf.o $(WRF_LIBS)
 	$(LD) -o wrfplus.exe $(LDFLAGS) wrf.o $(LIB)
 
 kma2netcdf :  arch $(LIBS) $(CONVERTOR_MODULES) $(CONVERTOR_OBJS) kma2netcdf.o

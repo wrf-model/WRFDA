@@ -1,6 +1,6 @@
 include configure.wrf
 
-links : superclean
+links : links.done
 	@ $(LN) ../*/*.make .
 	@ $(LN) ../*/*.f90 .
 	@ $(LN) ../*/*.F90 .
@@ -33,6 +33,7 @@ links : superclean
 	@ $(LN) $(CONVERTOR)/convert_tool .
 	@ $(LN) $(CONVERTOR)/kma_wave2grid .
 	@ $(LN) $(CONVERTOR)/wave2grid_kma .
+	@ $(LN) $(ESMF_TIME_F90)/*.F90 .
 	@ $(CP) -r $(EXTERNAL)/RSL .
 	touch links.done
 
