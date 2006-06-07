@@ -3,7 +3,7 @@ include ../../configure.wrf
 FFTPACK5_OBJS =	fftpack5.o
 
 all : $(FFTPACK5_OBJS)
-	$(AR) ru libfftpack5.a $(FFTPACK5_OBJS)
+	$(AR) libfftpack5.a $(FFTPACK5_OBJS)
 
 fftpack5.o:	         \
 			$(DA)/da_constants.o		\

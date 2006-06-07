@@ -3,7 +3,7 @@ include ../../configure.wrf
 LAPACK_OBJS = lapack.o
 
 all : $(LAPACK_OBJS)
-	$(AR) ru liblapack.a $(LAPACK_OBJS)
+	$(AR) liblapack.a $(LAPACK_OBJS)
 
 lapack.o:		lapack.f90 \
 			$(BLAS)/blas.o \

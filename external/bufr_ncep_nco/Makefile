@@ -1,7 +1,7 @@
 include ../../configure.wrf
 
 all : $(BUFR_OBJS)
-	$(AR) ru libbufr.a $(BUFR_OBJS)
+	$(AR) libbufr.a $(BUFR_OBJS)
 
 BUFR_OBJS =		bufrlib.o 		\
 	                bort_exit.o 		\

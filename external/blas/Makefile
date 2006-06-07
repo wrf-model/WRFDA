@@ -3,7 +3,7 @@ include ../../configure.wrf
 BLAS_OBJS =	blas.o 
 
 all : $(BLAS_OBJS)
-	$(AR) ru libblas.a $(BLAS_OBJS)
+	$(AR) libblas.a $(BLAS_OBJS)
 
 blas.o:	         blas.f90 \
 			daxpy.inc  \
