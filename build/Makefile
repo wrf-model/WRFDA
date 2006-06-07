@@ -1,20 +1,17 @@
 include configure.wrf
 
-links : links.done
+links : 
 	@ $(LN) ../*/*.make .
 	@ $(LN) ../*/*.f90 .
-	@ $(LN) ../*/*.F90 .
 	@ $(LN) ../*/*.inc .
 	@ $(LN) ../*/*.F .
 	@ $(LN) ../*/*.c .
 	@ $(LN) ../*/*.h .
 	@ $(LN) ../*/*sh .
-	@ $(LN) */*.make .
-	@ $(LN) */*.f90 .
-	@ $(LN) */*.inc .
-	@ $(LN) */*.c .
-	@ $(LN) */*.h .
-	@ $(LN) */*sh .
+	@ $(LN) $(DA)/*/*.f90 .
+	@ $(LN) $(DA)/*/*.inc .
+	@ $(LN) $(DA)/*/*.c .
+	@ $(LN) $(DA)/*/*sh .
 	@ $(LN) $(EXTERNAL)/*/*.make .
 	@ $(LN) $(EXTERNAL)/*/*.f90 .
 	@ $(LN) $(EXTERNAL)/*/*.F90 .
@@ -35,7 +32,6 @@ links : links.done
 	@ $(LN) $(CONVERTOR)/wave2grid_kma .
 	@ $(LN) $(ESMF_TIME_F90)/*.F90 .
 	@ $(CP) -r $(EXTERNAL)/RSL .
-	touch links.done
 
 WRF_LIBS = libwrflib.a libwrfio_nf.a libio_grib1.a libesmf_time.a
 
