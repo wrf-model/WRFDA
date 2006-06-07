@@ -218,7 +218,7 @@ SUBROUTINE DA_Setup_FirstGuess_WRF( xbx, grid, &
 
    endif
 
-   CALL set_map_para ! set up the map background parameters
+   CALL da_set_map_para ! set up the map background parameters
 
 !   CALL llxy( PHIC,XLONC,X,Y )
 

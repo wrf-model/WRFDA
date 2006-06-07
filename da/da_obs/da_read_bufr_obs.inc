@@ -1,4 +1,4 @@
-SUBROUTINE DA_Read_BUFR_Obs (iunit, ob, xp, filename)
+SUBROUTINE da_read_bufr_obs (iunit, ob, xp, filename)
 !-----------------------------------------------------------------------------!
 !  Purpose: Read BUFR observation file for input to wrfvar
 !-----------------------------------------------------------------------------!
@@ -174,7 +174,7 @@ SUBROUTINE DA_Read_BUFR_Obs (iunit, ob, xp, filename)
         EXIT
       END IF
 
-      call DA_ll_to_xy (platform%info, platform%loc, &
+      call da_ll_to_xy (platform%info, platform%loc, &
                         xp, outside, inside_halo, outside_all )
 
       if(outside_all) cycle reports
@@ -357,7 +357,7 @@ SUBROUTINE DA_Read_BUFR_Obs (iunit, ob, xp, filename)
             platform % each (k) % v % error =woe
 
 !-----------Convert earth wind to model wind.
-            call earth_2_model_wind(obs(5,k), obs(6,k), &
+            call da_earth_2_model_wind(obs(5,k), obs(6,k), &
                  platform % each (k) % u % inv, &
                  platform % each (k) % v % inv, &
                  platform%info%lon )
@@ -1083,4 +1083,4 @@ SUBROUTINE DA_Read_BUFR_Obs (iunit, ob, xp, filename)
 
       CALL wrf_error_fatal3(__FILE__,__LINE__,"Obs mismatch")
    endif
-END SUBROUTINE DA_Read_BUFR_Obs
+END SUBROUTINE da_read_bufr_obs

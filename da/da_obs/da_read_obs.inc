@@ -292,7 +292,7 @@ loop_level: DO i = 1, platform%info%levels
        if (platform%each (i)%speed%qc /= missing_data .and. &
            platform%each (i)%v%qc /= missing_data) then
 
-           call FFDDUV (platform%each (i)%speed%inv, &
+           call da_ffdduv (platform%each (i)%speed%inv, &
                         platform%each (i)%v%inv,     &
                         U_comp, V_comp, platform%info%lon, 1)
            platform%each (i)%u = platform%each (i)%speed

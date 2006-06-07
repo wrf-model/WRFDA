@@ -13,7 +13,6 @@ MODULE da_setup_structures
    USE da_vtox_transforms
    USE da_physics
    USE da_tools
-   USE da_h_ops
    USE da_spectral
    use da_wrfvar_io
    use da_radiance

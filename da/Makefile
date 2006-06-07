@@ -122,7 +122,7 @@ da_solve_v3d.o:		da_constants.o			\
 			$(CPP) $(CPPFLAGS) da_solve_v3d.f90 > da_solve_v3d.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_solve_v3d.f
 
-DA_Minimisation.o:	da_minimisation.f90 \
+da_minimisation.o:	da_minimisation.f90 \
 			da_wrfvar_io.o \
 			da_constants.o \
 			da_define_structures.o \
