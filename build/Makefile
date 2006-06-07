@@ -1,27 +1,63 @@
 include configure.wrf
 
+links : superclean
+	@ $(LN) ../*/*.make .
+	@ $(LN) ../*/*.f90 .
+	@ $(LN) ../*/*.F90 .
+	@ $(LN) ../*/*.inc .
+	@ $(LN) ../*/*.F .
+	@ $(LN) ../*/*.c .
+	@ $(LN) ../*/*.h .
+	@ $(LN) ../*/*sh .
+	@ $(LN) */*.make .
+	@ $(LN) */*.f90 .
+	@ $(LN) */*.inc .
+	@ $(LN) */*.c .
+	@ $(LN) */*.h .
+	@ $(LN) */*sh .
+	@ $(LN) $(EXTERNAL)/*/*.make .
+	@ $(LN) $(EXTERNAL)/*/*.f90 .
+	@ $(LN) $(EXTERNAL)/*/*.F90 .
+	@ $(LN) $(EXTERNAL)/*/*.inc .
+	@ $(LN) $(EXTERNAL)/*/*.F .
+	@ $(LN) $(EXTERNAL)/*/*.c .
+	@ $(LN) $(EXTERNAL)/*/*.h .
+	@ $(LN) $(EXTERNAL)/*/*sh ..
+	@ $(LN) $(INC)/version_decl .
+	@ $(LN) $(FRAME)/md_calls.m4 .
+	@ $(LN) $(SHARE)/*.int .
+	@ $(LN) $(BUFR_NCEP_NCO)/bufrlib.param .
+	@ $(LN) $(IO_NETCDF)/*.code .
+	@ $(LN) $(ARCH)/*.sed .
+	@ $(LN) $(TOOLS)/gen_comms.stub .
+	@ $(LN) $(CONVERTOR)/convert_tool .
+	@ $(LN) $(CONVERTOR)/kma_wave2grid .
+	@ $(LN) $(CONVERTOR)/wave2grid_kma .
+	@ $(CP) -r $(EXTERNAL)/RSL .
+	touch links.done
+
 WRF_LIBS = libwrflib.a libwrfio_nf.a libio_grib1.a libesmf_time.a
 
 VAR_LIBS = ${WRF_LIBS} libwrfvar.a
 
-include dyn_$(SOLVER).make
-include share.make
-include frame.make
-include phys.make
-include da.make
-include gen_be.make
-include convertor.make
-include tools.make
-include esmf_time_f90.make
-include io_int.make
-include io_netcdf.make
-include io_grib1.make
-include ioapi_share.make
-include bufr_ncep_nco.make
-include lapack.make
-include blas.make
-include fftpack5.make
-include main.make
+include ../dyn_$(SOLVER)/dyn_$(SOLVER).make
+include $(SHARE)/share.make
+include $(FRAME)/frame.make
+include $(PHYS)/phys.make
+include $(DA)/da.make
+include $(GEN_BE)/gen_be.make
+include $(CONVERTOR)/convertor.make
+include $(TOOLS)/tools.make
+include $(ESMF_TIME_F90)/esmf_time_f90.make
+include $(IO_INT)/io_int.make
+include $(IO_NETCDF)/io_netcdf.make
+include $(IO_GRIB1)/io_grib1.make
+include $(IOAPI_SHARE)/ioapi_share.make
+include $(BUFR_NCEP_NCO)/bufr_ncep_nco.make
+include $(LAPACK)/lapack.make
+include $(BLAS)/blas.make
+include $(FFTPACK5)/fftpack5.make
+include $(MAIN)/main.make
 
 WRF_OBJS=$(SHARE_OBJS) $(FRAME_OBJS) $(PHYS_OBJS) $(DYN_OBJS) \
   $(ESMF_TIME_F90_OBJS) $(IO_INT_OBJS) $(IO_NETCDF_OBJS) \
@@ -36,10 +72,10 @@ libwrflib.a : $(WRF_MODULES) $(WRF_OBJS)
 clean :
 	@ $(RM) *.exe *.o *.mod *.b *.a *.f inc/*.inc frame/*.f90 registry \
           Registry_tmp* module_state_description.f90 \
-          '*.f90' '*.f' '*.inc' '*.int' '*.c' '*.h' '*.make' '*.m4' \
-          '*.code' '*.sed' RSL/RSL/*.a RSL/RSL/*.o
+          RSL/RSL/*.a RSL/RSL/*.o
 
 superclean : clean
-	@ $(RM) *.f90 *.F *.f *.inc *.int *.c *.h *.m4 *.code *.make \
-          bufrlib.param *.sed registry gen_comms.stub inc/* \
-          convert_tool kma_wave2grid wave2grid_kma *.csh version_decl
+	@ $(RM) *.f90 *.F90 *.F *.inc *.int *.c *.h *.m4 *.code *.make \
+          bufrlib.param *.sed registry gen_comms.stub \
+          convert_tool kma_wave2grid wave2grid_kma *.csh version_decl \
+          RSL *.bsh *.csh

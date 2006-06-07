@@ -52,7 +52,7 @@ OBJS_FOR_ALL =		da_solve_v3d.o		\
                         da_wrfvar_io.o
 
 TARGETDIR    =  ../..
-wrfvar :	links $(OBJS_FOR_ALL)
+wrfvar :	$(OBJS_FOR_ALL)
 		$(AR) ../main/libwrflib.a $(OBJS_FOR_ALL)
 
 links :

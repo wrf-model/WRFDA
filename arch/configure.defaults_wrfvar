@@ -47,9 +47,9 @@ LOCAL_LIBRARIES = -L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c -lX11
 
 
 externals : wrfio_nf wrfio_int wrfio_grib1 esmf_time lib_rsl
-	( /bin/cp ../tools/gen_comms_warning ../tools/gen_comms.c ; \
-          cat $(RSL_PATH)/gen_comms.c >> ../tools/gen_comms.c ; \
-          /bin/cp module_dm_warning module_dm.F ; \
+	( $(CP) $(TOOLS)/gen_comms_warning $(TOOLS)/gen_comms.c ; \
+          cat $(RSL_PATH)/gen_comms.c >> $(TOOLS)/gen_comms.c ; \
+          $(CP) $(FRAME)/module_dm_warning module_dm.F ; \
           cat $(RSL_PATH)/module_dm.F >> module_dm.F )
 
 lib_rsl :
@@ -96,7 +96,7 @@ NETCDF_IO_PATH  = external/io_netcdf
 LOCAL_LIBRARIES = -L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c -lX11
 
 externals : $(WRFIO) esmf_time
-	( /bin/cp module_dm_warning module_dm.F ; \
+	( $(CP) $(FRAME)/module_dm_warning module_dm.F ; \
           cat module_dm_stubs.F >> module_dm.F )
 
 ###########################################################
@@ -142,9 +142,9 @@ LOCAL_LIBRARIES = -L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c -lX11
 
 
 externals : wrfio_nf wrfio_int wrfio_grib1 esmf_time lib_rsl
-	( /bin/cp ../tools/gen_comms_warning ../tools/gen_comms.c ; \
-          cat $(RSL_PATH)/gen_comms.c >> ../tools/gen_comms.c ; \
-          /bin/cp module_dm_warning module_dm.F ; \
+	( $(CP) $(TOOLS)/gen_comms_warning $(TOOLS)/gen_comms.c ; \
+          cat $(RSL_PATH)/gen_comms.c >> $(TOOLS)/gen_comms.c ; \
+          $(CP) $(FRAME)/module_dm_warning module_dm.F ; \
           cat $(RSL_PATH)/module_dm.F >> module_dm.F )
 
 lib_rsl :
@@ -186,7 +186,7 @@ LOCAL_LIBRARIES = -L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c -lX11
 
 
 externals : $(WRFIO) esmf_time
-	( /bin/cp module_dm_warning module_dm.F ; \
+	( $(CP) $(FRAME)/module_dm_warning module_dm.F ; \
           cat module_dm_stubs.F >> module_dm.F )
 
 ###########################################################
@@ -223,7 +223,7 @@ LOCAL_LIBRARIES = -L/usr/local/ncarg/lib -L/usr/X11R6/lib -L/usr/local/lib \
 	            -lncarg -lncarg_gks -lncarg_c -lX11
 
 externals : $(WRFIO) esmf_time
-	( /bin/cp module_dm_warning module_dm.F ; \
+	( $(CP) $(FRAME)/module_dm_warning module_dm.F ; \
           cat module_dm_stubs.F >> module_dm.F )
 
 ###########################################################
@@ -271,9 +271,9 @@ LOCAL_LIBRARIES = -L/usr/local/ncarg/lib -L/usr/X12R6/lib -L/usr/local/lib \
                     -lncarg -lncarg_gks -lncarg_c -lX11 
 
 externals : $(WRFIO) esmf_time lib_rsl
-	( /bin/cp ../tools/gen_comms_warning ../tools/gen_comms.c ; \
-          cat $(RSL_PATH)/gen_comms.c >> ../tools/gen_comms.c ;  \
-          /bin/cp module_dm_warning module_dm.F ; \
+	( $(CP) $(TOOLS)/gen_comms_warning $(TOOLS)/gen_comms.c ; \
+          cat $(RSL_PATH)/gen_comms.c >> $(TOOLS)/gen_comms.c ;  \
+          $(CP) $(FRAME)/module_dm_warning module_dm.F ; \
           cat $(RSL_PATH)/module_dm.F >> module_dm.F )
 
 lib_rsl :
@@ -316,7 +316,7 @@ LOCAL_LIBRARIES = -L/usr/local/ncarg/lib -L/usr/X11R6/lib -L/usr/local/lib \
 		  -lncarg -lncarg_gks -lncarg_c -lX11
 
 externals : $(WRFIO) esmf_time
-	( /bin/cp module_dm_warning module_dm.F ; \
+	( $(CP) $(FRAME)/module_dm_warning module_dm.F ; \
           cat module_dm_stubs.F >> module_dm.F )
 
 ###########################################################
@@ -364,9 +364,9 @@ LOCAL_LIBRARIES = -L/usr/local/ncarg/lib -L/usr/X12R6/lib -L/usr/local/lib \
                   -lncarg -lncarg_gks -lncarg_c -lX11 
 
 externals : $(WRFIO) esmf_time lib_rsl
-	( /bin/cp ../tools/gen_comms_warning ../tools/gen_comms.c ; \
-          cat $(RSL_PATH)/gen_comms.c >> ../tools/gen_comms.c ;  \
-          /bin/cp module_dm_warning module_dm.F ; \
+	( $(CP) $(TOOLS)/gen_comms_warning $(TOOLS)/gen_comms.c ; \
+          cat $(RSL_PATH)/gen_comms.c >> $(TOOLS)/gen_comms.c ;  \
+          $(CP) $(FRAME)/module_dm_warning module_dm.F ; \
           cat $(RSL_PATH)/module_dm.F >> module_dm.F )
 
 lib_rsl :
@@ -407,9 +407,9 @@ LOCAL_LIBRARIES = -L/usr/local/ncarg/lib -L/usr/X11R6/lib -L/usr/local/lib \
 		    -lncarg -lncarg_gks -lncarg_c -lX11
 
 externals : $(WRFIO) esmf_time
-	( /bin/cp ../tools/gen_comms_warning ../tools/gen_comms.c ; \
-	  cat $(RSL_PATH)/gen_comms.c >> ../tools/gen_comms.c ; \
-	  /bin/cp module_dm_warning module_dm.F ; \
+	( $(CP) $(TOOLS)/gen_comms_warning $(TOOLS)/gen_comms.c ; \
+	  cat $(RSL_PATH)/gen_comms.c >> $(TOOLS)/gen_comms.c ; \
+	  $(CP) $(FRAME)/module_dm_warning module_dm.F ; \
           cat module_dm_stubs.F >> module_dm.F )
 
 ###########################################################
@@ -446,7 +446,7 @@ LOCAL_LIBRARIES = -L/usr/local/ncarg/lib -L/usr/X11R6/lib -L/usr/local/lib \
 		    -lncarg -lncarg_gks -lncarg_c -lX11
 
 externals : $(WRFIO) esmf_time
-	( /bin/cp module_dm_warning module_dm.F ; \
+	( $(CP) $(FRAME)/module_dm_warning module_dm.F ; \
           cat module_dm_stubs.F >> module_dm.F )
 
 ###########################################################
@@ -494,9 +494,9 @@ LOCAL_LIBRARIES = -L/usr/local/ncarg/lib -L/usr/X12R6/lib -L/usr/local/lib \
                   -lncarg -lncarg_gks -lncarg_c -lX11 
 
 externals : $(WRFIO) esmf_time lib_rsl
-	( /bin/cp ../tools/gen_comms_warning ../tools/gen_comms.c ; \
-          cat $(RSL_PATH)/gen_comms.c >> ../tools/gen_comms.c ;  \
-          /bin/cp module_dm_warning module_dm.F ; \
+	( $(CP) $(TOOLS)/gen_comms_warning $(TOOLS)/gen_comms.c ; \
+          cat $(RSL_PATH)/gen_comms.c >> $(TOOLS)/gen_comms.c ;  \
+          $(CP) $(FRAME)/module_dm_warning module_dm.F ; \
           cat $(RSL_PATH)/module_dm.F >> module_dm.F )
 
 lib_rsl :
@@ -538,7 +538,7 @@ LOCAL_LIBRARIES = -L/usr/local/ncarg/lib -L/usr/local/lib \
 		  -lncarg -lncarg_gks -lncarg_c
 
 externals : $(WRFIO) esmf_time
-	( /bin/cp module_dm_warning module_dm.F ; \
+	( $(CP) $(FRAME)/module_dm_warning module_dm.F ; \
           cat module_dm_stubs.F >> module_dm.F )
 
 ###########################################################
@@ -584,9 +584,9 @@ LOCAL_LIBRARIES = -L/usr/local/ncarg/lib -L/usr/local/lib \
                     -lncarg -lncarg_gks -lncarg_c
 
 externals : $(WRFIO) esmf_time lib_rsl
-	( /bin/cp ../tools/gen_comms_warning ../tools/gen_comms.c ; \
-          cat $(RSL_PATH)/gen_comms.c >> ../tools/gen_comms.c ;  \
-          /bin/cp module_dm_warning module_dm.F ; \
+	( $(CP) $(TOOLS)/gen_comms_warning $(TOOLS)/gen_comms.c ; \
+          cat $(RSL_PATH)/gen_comms.c >> $(TOOLS)/gen_comms.c ;  \
+          $(CP) $(FRAME)/module_dm_warning module_dm.F ; \
           cat $(RSL_PATH)/module_dm.F >> module_dm.F )
 
 lib_rsl :
@@ -632,7 +632,7 @@ LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN) -64 -mips4
 LOCAL_LIBRARIES = -L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c -lX11
 
 externals : $(WRFIO) esmf_time
-	( /bin/cp module_dm_warning module_dm.F ; \
+	( $(CP) $(FRAME)/module_dm_warning module_dm.F ; \
           cat module_dm_stubs.F >> module_dm.F )
 
 ###########################################################
@@ -678,9 +678,9 @@ MPI_LIB		= -L$(RSL_PATH)/RSL -lrsl -lmpi
 LOCAL_LIBRARIES = -L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c -lX11
 
 externals : wrfio_nf wrfio_int wrfio_grib1 esmf_time lib_rsl
-	( /bin/cp ../tools/gen_comms_warning ../tools/gen_comms.c ; \
-          cat $(RSL_PATH)/gen_comms.c >> ../tools/gen_comms.c ; \
-          /bin/cp module_dm_warning module_dm.F ; \
+	( $(CP) $(TOOLS)/gen_comms_warning $(TOOLS)/gen_comms.c ; \
+          cat $(RSL_PATH)/gen_comms.c >> $(TOOLS)/gen_comms.c ; \
+          $(CP) $(FRAME)/module_dm_warning module_dm.F ; \
           cat $(RSL_PATH)/module_dm.F >> module_dm.F )
 
 lib_rsl :
@@ -730,7 +730,7 @@ MPI_LIB		=
 LOCAL_LIBRARIES =       
 
 externals : wrfio_int wrfio_grib1
-	( /bin/cp module_dm_warning module_dm.F ; \
+	( $(CP) $(FRAME)/module_dm_warning module_dm.F ; \
           cat module_dm_stubs.F >> module_dm.F )
 
 ###########################################################
@@ -769,7 +769,7 @@ LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN) \
 LOCAL_LIB	= -lmass -lmassv
 
 externals : $(WRFIO) esmf_time
-	( /bin/cp module_dm_warning module_dm.F ; \
+	( $(CP) $(FRAME)/module_dm_warning module_dm.F ; \
           cat module_dm_stubs.F >> module_dm.F )
 
 ###########################################################
@@ -817,9 +817,9 @@ MPI_LIB		= -L$(RSL_PATH)/RSL -lrsl
 LOCAL_LIB	= -lmass -lmassv
 
 externals :	$(WRFIO) esmf_time lib_rsl
-	( /bin/cp ../tools/gen_comms_warning ../tools/gen_comms.c ; \
-	  cat $(RSL_PATH)/gen_comms.c >> ../tools/gen_comms.c ; \
-	  /bin/cp module_dm_warning module_dm.F ; \
+	( $(CP) $(TOOLS)/gen_comms_warning $(TOOLS)/gen_comms.c ; \
+	  cat $(RSL_PATH)/gen_comms.c >> $(TOOLS)/gen_comms.c ; \
+	  $(CP) $(FRAME)/module_dm_warning module_dm.F ; \
   	  cat $(RSL_PATH)/module_dm.F >> module_dm.F )
 
 lib_rsl :
@@ -831,7 +831,7 @@ lib_rsl :
 ###########################################################
 #ARCH   crayx1 UNICOS/mp  CRAY X1
 #
-SED_FTN		= sed -f ../arch/cray_csd.sed
+SED_FTN		= sed -f $(ARCH)/cray_csd.sed
 CPP             = cpp -C -P -Dcrayx1
 M4              = m4 -B12000
 SFC             = ftn
@@ -870,14 +870,14 @@ CCFLAGS_RSL     =
 LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)
 
 MPI_LIB		= -L$(RSL_PATH)/RSL -lrsl
-LOCAL_LIB	= -L../frame -L../share -L$(DA)
-CONVERTOR_LIB	= -L../convertor
+LOCAL_LIB	= -L$(FRAME) -L$(SHARE) -L$(DA)
+CONVERTOR_LIB	= -L$(CONVERTOR)
 LOCAL_LIBRARIES = #-L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c -lX11
 
 externals : wrfio_nf wrfio_int wrfio_grib1 esmf_time lib_rsl
-	( /bin/cp ../tools/gen_comms_warning ../tools/gen_comms.c ; \
-          cat $(RSL_PATH)/gen_comms.c >> ../tools/gen_comms.c ; \
-          /bin/cp module_dm_warning module_dm.F ; \
+	( $(CP) $(TOOLS)/gen_comms_warning $(TOOLS)/gen_comms.c ; \
+          cat $(RSL_PATH)/gen_comms.c >> $(TOOLS)/gen_comms.c ; \
+          $(CP) $(FRAME)/module_dm_warning module_dm.F ; \
           cat $(RSL_PATH)/module_dm.F >> module_dm.F )
 
 lib_rsl :
@@ -920,7 +920,7 @@ LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN) \
 EXTRA_LIBS      = -lSystemStubs
 
 externals : $(WRFIO) esmf_time
-	( /bin/cp module_dm_warning module_dm.F ; \
+	( $(CP) $(FRAME)/module_dm_warning module_dm.F ; \
           cat module_dm_stubs.F >> module_dm.F )
 
 ###########################################################
@@ -958,7 +958,7 @@ LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN) \
 EXTRA_LIBS      = -lSystemStubs
 
 externals : $(WRFIO) esmf_time
-	( /bin/cp module_dm_warning module_dm.F ; \
+	( $(CP) $(FRAME)/module_dm_warning module_dm.F ; \
           cat module_dm_stubs.F >> module_dm.F )
 
 ###########################################################
@@ -995,7 +995,7 @@ LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN) \
 EXTRA_LIBS      = -lSystemStubs
 
 externals : $(WRFIO) esmf_time
-	( /bin/cp module_dm_warning module_dm.F ; \
+	( $(CP) $(FRAME)/module_dm_warning module_dm.F ; \
           cat module_dm_stubs.F >> module_dm.F )
 
 ###########################################################
@@ -1042,9 +1042,9 @@ LOCAL_LIBRARIES = -L/usr/local/ncarg/lib -L/usr/local/lib \
                     -lncarg -lncarg_gks -lncarg_c 
 
 externals : $(WRFIO) esmf_time lib_rsl
-	( /bin/cp ../tools/gen_comms_warning ../tools/gen_comms.c ; \
-          cat $(RSL_PATH)/gen_comms.c >> ../tools/gen_comms.c ;  \
-          /bin/cp module_dm_warning module_dm.F ; \
+	( $(CP) $(TOOLS)/gen_comms_warning $(TOOLS)/gen_comms.c ; \
+          cat $(RSL_PATH)/gen_comms.c >> $(TOOLS)/gen_comms.c ;  \
+          $(CP) $(FRAME)/module_dm_warning module_dm.F ; \
           cat $(RSL_PATH)/module_dm.F >> module_dm.F )
 
 lib_rsl :

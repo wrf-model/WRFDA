@@ -2,10 +2,10 @@
 
 var : wrfvar
 
-wrfvar : arch $(VAR_LIBS) wrfvar.o libwrfvar.a
+wrfvar : arch links.done $(VAR_LIBS) wrfvar.o libwrfvar.a
 	$(LD) -o wrfvar.exe $(LDFLAGS) wrfvar.o -lwrfvar $(LIB)
 
-wrf : arch wrf.o $(WRF_LIBS)
+wrf : arch links.done wrf.o $(WRF_LIBS)
 	$(LD) -o wrf.exe $(LDFLAGS) wrf.o $(LIB)
 
 wrfplus : arch wrf.o $(WRF_LIBS)

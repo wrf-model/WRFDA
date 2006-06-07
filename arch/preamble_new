@@ -52,7 +52,35 @@ ESMF_TARGET         = CONFIGURE_ESMF_TARGET
 
 # Short cuts to directories
 
+ARCH      = $(DEVTOP)/arch
+CHEM      = $(DEVTOP)/chem
+CONVERTOR = $(DEVTOP)/convertor
+DA        = $(DEVTOP)/da
+DYN_EM    = $(DEVTOP)/dyn_em
+DYN_EXP   = $(DEVTOP)/dyn_exp
+DYN_NMM   = $(DEVTOP)/dyn_nmm
 EXTERNAL  = $(DEVTOP)/external
+FRAME     = $(DEVTOP)/frame
+GEN_BE    = $(DEVTOP)/gen_be
+INC       = $(DEVTOP)/inc
+MAIN      = $(DEVTOP)/main
+PHYS      = $(DEVTOP)/phys
+RUN       = $(DEVTOP)/run
+SCRIPTS   = $(DEVTOP)/scripts
+SHARE     = $(DEVTOP)/share
+TEST      = $(DEVTOP)/test
+TOOLS     = $(DEVTOP)/tools
+
+LAPACK        = $(EXTERNAL)/lapack
+FFTPACK5      = $(EXTERNAL)/fftpack5
+BLAS          = $(EXTERNAL)/blas
+BUFR_NCEP_NCO = $(EXTERNAL)/bufr_ncep_nco
+IO_GRIB1      = $(EXTERNAL)/io_grib1
+IO_INT        = $(EXTERNAL)/io_int
+ESMF_TIME_F90 = $(EXTERNAL)/esmf_time_f90
+IO_NETCDF     = $(EXTERNAL)/io_netcdf
+IOAPI_SHARE   = $(EXTERNAL)/ioapi_share
+RSL_PATH      = $(EXTERNAL)/RSL
 
 PHDF5_LIB  = -L$(EXTERNAL)/io_phdf5 -lwrfio_phdf5 -L$(PHDF5_PATH)/lib -lhdf5_fortran -lhdf5 -lm -lz -L$(PHDF5PATH)/lib -lsz
 
