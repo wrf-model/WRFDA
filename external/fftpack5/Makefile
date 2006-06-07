@@ -1,6 +1,6 @@
 include ../../configure.wrf
 
-FFTPACK_OBJS =	da_fftpack5.o
+FFTPACK_OBJS =	fftpack5.o
 
 all : $(FFTPACK_OBJS)
 

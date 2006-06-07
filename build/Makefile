@@ -23,6 +23,7 @@ links :
 	@ $(LN) $(EXTERNAL)/*/*sh ..
 	@ $(LN) $(INC)/version_decl .
 	@ $(LN) $(FRAME)/md_calls.m4 .
+	@ $(LN) $(FRAME)/collect_on_comm.c .
 	@ $(LN) $(SHARE)/*.int .
 	@ $(LN) $(BUFR_NCEP_NCO)/bufrlib.param .
 	@ $(LN) $(IO_NETCDF)/*.code .

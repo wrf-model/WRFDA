@@ -14,7 +14,7 @@
 define( macro_y_type_extract, 
 `!--- $1 $2 $3
 
-SUBROUTINE da_y_type_extract_$1( iv, re, slice )
+SUBROUTINE da_y_type_ex_$1( iv, re, slice )
 
 !------------------------------------------------------------------------------
 ! PURPOSE:  Eliminate redundant code for many obs types.  
@@ -40,7 +40,7 @@ SUBROUTINE da_y_type_extract_$1( iv, re, slice )
                                      slice%obs(n) )
    ENDDO
 
-END SUBROUTINE da_y_type_extract_$1 ' )
+END SUBROUTINE da_y_type_ex_$1 ' )
 
 
 
@@ -48,7 +48,7 @@ END SUBROUTINE da_y_type_extract_$1 ' )
 define( macro_y_type_insert_global, 
 `!--- $1 $2 $3
 
-SUBROUTINE da_y_type_insert_$1_global( slice_glob, re_glob )
+SUBROUTINE da_y_type_ins_$1_global( slice_glob, re_glob )
 
 !------------------------------------------------------------------------------
 ! PURPOSE:  Eliminate redundant code for many obs types.  
@@ -75,7 +75,7 @@ SUBROUTINE da_y_type_insert_$1_global( slice_glob, re_glob )
    re_glob%$3 = slice_glob%num_obs  ! duplication!
    CALL da_y_facade_free( slice_glob )
 
-END SUBROUTINE da_y_type_insert_$1_global ')
+END SUBROUTINE da_y_type_ins_$1_global ')
 
 
 
@@ -83,7 +83,7 @@ END SUBROUTINE da_y_type_insert_$1_global ')
 define( macro_iv_type_insert_global, 
 `!--- $1 $2 $3
 
-SUBROUTINE da_iv_type_insert_$1_global( slice_glob, iv_glob )
+SUBROUTINE da_iv_type_ins_$1_global( slice_glob, iv_glob )
 
 !------------------------------------------------------------------------------
 ! PURPOSE:  Eliminate redundant code for many obs types.  
@@ -113,7 +113,7 @@ SUBROUTINE da_iv_type_insert_$1_global( slice_glob, iv_glob )
      ENDIF
    ENDDO
 
-END SUBROUTINE da_iv_type_insert_$1_global ' )
+END SUBROUTINE da_iv_type_ins_$1_global ' )
 
 
 define( macro_to_global, 
@@ -151,8 +151,8 @@ define( macro_to_global,
     TYPE (residual_template_type) :: template  ! allocation info
 
     ! create process-local generic objects from specific objects
-    CALL da_y_type_extract_$1( iv, re,        re_slice )
-    CALL da_y_type_extract_$1( iv, jo_grad_y, jo_grad_y_slice )
+    CALL da_y_type_ex_$1( iv, re,        re_slice )
+    CALL da_y_type_ex_$1( iv, jo_grad_y, jo_grad_y_slice )
 
     ! create global versions of generic objects from process-local objects
     ! and destroy process-local generic objects
@@ -164,10 +164,10 @@ define( macro_to_global,
     ! create global versions of specific objects
     ! and destroy global versions of generic objects
     ! iv first
-    CALL da_iv_type_insert_$1_global( re_glob_slice, iv_glob )
+    CALL da_iv_type_ins_$1_global( re_glob_slice, iv_glob )
     ! then y_types
-    CALL da_y_type_insert_$1_global( re_glob_slice,        re_glob )
-    CALL da_y_type_insert_$1_global( jo_grad_y_glob_slice, jo_grad_y_glob )
+    CALL da_y_type_ins_$1_global( re_glob_slice,        re_glob )
+    CALL da_y_type_ins_$1_global( jo_grad_y_glob_slice, jo_grad_y_glob )
     ! global versions of specific objects are destroyed in 
     ! free_global_$1()
 

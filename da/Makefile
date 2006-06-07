@@ -341,7 +341,7 @@ da_metar.o:		da_metar.f90 \
 			da_check_max_iv_metar.inc \
 			da_get_innov_vector_metar.inc
 			$(RM) $@
-			$(CPP) $(CPPFLAGS) da_metar.f > da_metar.f
+			$(CPP) $(CPPFLAGS) da_metar.f90 > da_metar.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_metar.f
 
 da_geoamv.o:		da_geoamv.f90 \
@@ -361,7 +361,7 @@ da_geoamv.o:		da_geoamv.f90 \
 			da_check_max_iv_geoamv.inc \
 			da_get_innov_vector_geoamv.inc
 			$(RM) $@
-			$(CPP) $(CPPFLAGS) da_geoamv.f > da_geoamv.f
+			$(CPP) $(CPPFLAGS) da_geoamv.f90 > da_geoamv.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_geoamv.f
 
 da_polaramv.o:		da_polaramv.f90 \
@@ -677,7 +677,7 @@ da_ssmi.o:		da_ssmi.f90 \
 			da_transform_xtoy_ssmt2.inc \
 			da_transform_xtoy_ssmt2_adj.inc
 			$(RM) $@
-			$(CPP) $(CPPFLAGS) da_ssmi.f > da_ssmi.f
+			$(CPP) $(CPPFLAGS) da_ssmi.f90 > da_ssmi.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_ssmi.f
 
 da_qscat.o:		da_qscat.f90 \
@@ -1175,37 +1175,35 @@ da_radiance.o:		da_radiance.f90 \
 			$(CPP) -I$(RTTOV)/src $(CPPFLAGS) da_radiance.f90 > da_radiance.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_radiance.f
 
-rttov_const.o:		parkind1.o	\
-			rttov_const.f90
+rttov_const.o:		rttov_const.f90 \
+                        parkind1.o
 			$(RM) $@
 			$(CPP) -I$(RTTOV)/src $(CPPFLAGS) rttov_const.f90 > rttov_const.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) rttov_const.f
 
-rttov_global.o:		parkind1.o	\
-			rttov_const.o	\
-			rttov_global.f90
+rttov_global.o:		rttov_global.f90 \
+                        parkind1.o	\
+			rttov_const.o
 			$(RM) $@
 			$(CPP) -I$(RTTOV)/src $(CPPFLAGS) rttov_global.f90 > rttov_global.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) rttov_global.f
 
-rttov_types.o:		parkind1.o	\
-			rttov_const.o	\
-			rttov_types.f90
+rttov_types.o:		rttov_types.f90 \
+                        parkind1.o	\
+			rttov_const.o
 			$(CPP) -I$(RTTOV)/src $(CPPFLAGS) rttov_types.f90 > rttov_types.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) rttov_types.f
 
-parkind1.o:		\
-			parkind1.f90
+parkind1.o:		parkind1.f90
 			$(CPP) -I$(RTTOV)/src $(CPPFLAGS) parkind1.f90 > parkind1.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) parkind1.f
 
-gsi_kinds.o:		\
-			gsi_kinds.f90
-			$(CPP)-I$(RTTOV)/src $(CPPFLAGS) gsi_kinds.f90 > gsi_kinds.f
+gsi_kinds.o:		gsi_kinds.f90
+			$(CPP) -I$(RTTOV)/src $(CPPFLAGS) gsi_kinds.f90 > gsi_kinds.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) gsi_kinds.f
 
-gsi_constants.o:	gsi_kinds.o      \
-			gsi_constants.f90
+gsi_constants.o:	gsi_constants.f90 \
+                        gsi_kinds.o
 			$(CPP) -I$(RTTOV)/src $(CPPFLAGS) gsi_constants.f90 > gsi_constants.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) gsi_constants.f
 
