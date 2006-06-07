@@ -222,7 +222,7 @@
          ! note that we only collected obs someone owns
          re_glob_slice%obs(n)%proc_domain = .TRUE.
          re_glob_slice%obs(n)%obs_global_index = obs_global_index_all(serial_n)
-         CALL da_residual_generic_alloc_and_set( re_glob_slice%obs(n), i, &
+         CALL da_res_generic_alloc_and_set( re_glob_slice%obs(n), i, &
                 re_vals_all(buf_idx:(buf_idx+serial_numvals-1)) )
        END DO
        ! deallocate communication buffers, etc.

@@ -700,8 +700,7 @@ da_qscat.o:		da_qscat.f90 \
 			$(CPP) $(CPPFLAGS) da_qscat.f90 > da_qscat.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_qscat.f
 
-da_profiler.o:		
-			da_profiler.f90 \
+da_profiler.o:		da_profiler.f90 \
 			da_constants.o \
 			da_par_util.o \
 			da_define_structures.o \
@@ -919,10 +918,9 @@ da_grid_definitions.o:	\
 			$(CPP) $(CPPFLAGS) da_grid_definitions.f90 > da_grid_definitions.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_grid_definitions.f
 
-da_statistics.o:	\
+da_statistics.o:	da_statistics.f90 \
 			da_define_structures.o \
 	                da_par_util.o \
-			da_statistics.f90 \
 			da_analysis_stats.inc \
 			da_correlation_coeff1d.inc \
 			da_correlation_coeff2d.inc \
@@ -931,7 +929,7 @@ da_statistics.o:	\
 			da_stats_calculate.inc
 			$(RM) $@
 			$(CPP) $(CPPFLAGS) da_statistics.f90 > da_statistics.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_statistics.f90
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_statistics.f
 
 da_define_structures.o:	da_define_structures.f90 \
 			da_constants.o \
@@ -1026,7 +1024,7 @@ da_test.o:		da_test.f90 \
 			$(CPP) $(CPPFLAGS) da_test.f90 > da_test.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_test.f
 
-da_gen_be.o:	         \
+da_gen_be.o:	        da_gen_be.f90 \
 			da_constants.o			\
                         da_tracing.o                    \
 			da_transform_vptovv.inc	\
@@ -1046,15 +1044,14 @@ da_gen_be.o:	         \
 			da_readwrite_be_stage2.inc    \
 			da_readwrite_be_stage3.inc    \
 			da_readwrite_be_stage4.inc    \
-			da_stage0_initialize.inc      \
-			da_gen_be.f90
+			da_stage0_initialize.inc 
 			$(CPP) $(CPPFLAGS) da_gen_be.f90 > da_gen_be.f
 			$(FC) -c $(FCFLAGS) -I${NETCDF}/include -I../frame da_gen_be.f
 
-da_spectral.o:		\
-			da_constants.o				\
-			da_define_structures.o			\
-			fftpack5.o			        \
+da_spectral.o:		da_spectral.f90             \
+			da_constants.o		    \
+			da_define_structures.o	    \
+			fftpack5.o	            \
 			da_asslegpol.inc            \
 			da_calc_power.inc           \
 			da_calc_power_spectrum.inc  \
@@ -1070,8 +1067,7 @@ da_spectral.o:		\
 			da_vv_to_v_spectral.inc     \
 			da_v_to_vv_spectral_adj.inc \
 			da_legtra_inv_adj.inc       \
-			da_apply_power.inc          \
-			da_spectral.f90
+			da_apply_power.inc
 			$(CPP) $(CPPFLAGS) da_spectral.f90 > da_spectral.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_spectral.f
 

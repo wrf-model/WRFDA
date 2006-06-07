@@ -33,10 +33,10 @@ SUBROUTINE da_y_type_extract_$1( iv, re, slice )
 
    CALL da_y_facade_create( slice, iv%$3, iv%$3_glo )
    DO n=1, slice%num_obs
-     CALL da_residual_generic_set_info( slice%obs(n),                     &
+     CALL da_res_generic_set_info( slice%obs(n),                     &
                                      iv%$1(n)%loc%proc_domain,      &
                                      iv%$1(n)%loc%obs_global_index )
-     CALL da_residual_$2_to_generic( re%$1(n), iv%$1(n)%info%levels, &
+     CALL da_res_$2_to_generic( re%$1(n), iv%$1(n)%info%levels, &
                                      slice%obs(n) )
    ENDDO
 
@@ -70,7 +70,7 @@ SUBROUTINE da_y_type_insert_$1_global( slice_glob, re_glob )
    ! deallocation is done in free_global_$1()
    ALLOCATE( re_glob%$1(slice_glob%num_obs) )
    DO n=1, slice_glob%num_obs
-     CALL da_residual_$2_from_generic( slice_glob%obs(n), re_glob%$1(n) )
+     CALL da_res_$2_from_generic( slice_glob%obs(n), re_glob%$1(n) )
    ENDDO
    re_glob%$3 = slice_glob%num_obs  ! duplication!
    CALL da_y_facade_free( slice_glob )
@@ -108,7 +108,7 @@ SUBROUTINE da_iv_type_insert_$1_global( slice_glob, iv_glob )
      iv_glob%$1(n)%loc%proc_domain = slice_glob%obs(n)%proc_domain
      iv_glob%$1(n)%loc%obs_global_index = &
                                         slice_glob%obs(n)%obs_global_index
-     IF ( da_residual_generic_has_vector( slice_glob%obs(n) ) ) THEN
+     IF ( da_res_generic_has_vector( slice_glob%obs(n) ) ) THEN
        iv_glob%$1(n)%info%levels = SIZE(slice_glob%obs(n)%values(1)%ptr)
      ENDIF
    ENDDO
@@ -156,7 +156,7 @@ define( macro_to_global,
 
     ! create global versions of generic objects from process-local objects
     ! and destroy process-local generic objects
-    CALL da_residual_$2_create_template( template )  ! use template in case 
+    CALL da_res_$2_create_template( template )  ! use template in case 
                                                      ! some tasks have no obs
     CALL da_y_facade_to_global( re_slice,        template, re_glob_slice )
     CALL da_y_facade_to_global( jo_grad_y_slice, template, jo_grad_y_glob_slice )
