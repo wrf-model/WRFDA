@@ -222,8 +222,9 @@ SUBROUTINE da_trace_report
       END DO
 
       WRITE (UNIT=trace_unit, &
-         FMT='("<TR><TD><B>Total</B>",I4,"<TD></TD><TD><B>",F8.1,"</B><TD></TD><TD></TD><TD></TD>&
-            &<TD><B>",F8.1,"</B><TD></TD><TD></TD><TD></TD>")') &
+         FMT='("<TR><TD><B>Total</B>",I4,"<TD></TD><TD><B>",F8.1, &
+           "</B><TD></TD><TD></TD><TD></TD><TD><B>",F8.1, &
+           "</B><TD></TD><TD></TD><TD></TD>")') &
          MasterNoRoutines, TotalElapsedTime/REAL(CountRate), &
          TotalCPUTime(1)
       IF (TotalElapsedTime > 0.0) THEN
@@ -326,8 +327,9 @@ SUBROUTINE da_trace_report
       END DO
 
       WRITE (UNIT=trace_unit, &
-         FMT='("<TR><TD><B>Total</B>",I4,"</TD><TD><TD><B>",F8.1,"</B><TD></TD><TD></TD><TD></TD>&
-            &<TD><B>",F8.1,"</B><TD></TD><TD></TD><TD></TD>")') &
+         FMT='("<TR><TD><B>Total</B>",I4,"</TD><TD><TD><B>",F8.1, &
+            "</B><TD></TD><TD></TD><TD></TD><TD><B>", &
+            F8.1,"</B><TD></TD><TD></TD><TD></TD>")') &
          MasterNoRoutines, TotalElapsedTime/REAL(CountRate), &
          TotalCPUTime(1)
       IF (TotalElapsedTime > 0.0) THEN
