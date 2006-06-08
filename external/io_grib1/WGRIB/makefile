@@ -1,13 +1,6 @@
-.IGNORE:
+include ../../../configure.wrf
 
-.SUFFIXES: .c .o
-
-CC=cc
-
-.c.o:
-	$(CC) -c -O2 $<
-
-obj=wgrib_main.o seekgrib.o ibm2flt.o readgrib.o intpower.o cnames.o BDSunpk.o \
+WGRID_OBJ=wgrib_main.o seekgrib.o ibm2flt.o readgrib.o intpower.o cnames.o BDSunpk.o \
   flt2ieee.o wrtieee.o levels.o PDStimes.o missing.o  \
   nceptable_reanal.o nceptable_opn.o ensemble.o \
   ombtable.o ec_ext.o gribtable.o gds_grid.o PDS_date.o ectable_128.o \
@@ -16,12 +9,17 @@ obj=wgrib_main.o seekgrib.o ibm2flt.o readgrib.o intpower.o cnames.o BDSunpk.o \
   dwdtable_002.o dwdtable_201.o dwdtable_202.o dwdtable_203.o \
   cptectable_254.o nceptab_130.o nceptab_131.o
 
+all: wgrib
 
-wgrib: $(obj)
-	$(CC) -o wgrib $(obj) -lm
+archive: wgrib
+
+wgrib: $(WGRIB_OBJ)
+	$(CC) -o wgrib $(WGRIB_OBJ) -lm
+	( cd .. ; $(RM) wgrib ; $(LN) WGRIB/wgrib wgrib ; cd WGRIB )
 
 clean:	
-	@ /bin/rm -f $(obj) wgrib
+	@ $(RM) $(WGRIB_OBJ) wgrib
+	@ ( cd .. ; $(RM) wgrib ; cd WGRIB )
 
 superclean : clean
 
