@@ -66,7 +66,7 @@ SUBROUTINE da_wrfvar_interface ( grid, config_flags )
 #endif
 
    CALL solve_v3d ( grid , config_flags , &
-#include <em_actual_args.inc>
+#include "em_actual_args.inc"
     )
 
    CALL da_trace_exit("da_wrfvar_interface")

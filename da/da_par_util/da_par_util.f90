@@ -27,7 +27,7 @@ MODULE da_par_util
 #define TRUE_RSL_REAL     RSL_DOUBLE
 #endif
 
-#include <da_generic_typedefs.inc>
+#include "da_generic_typedefs.inc"
 
    INTERFACE da_wv_patch_to_global
       MODULE PROCEDURE da_wv_patch_to_global_2d

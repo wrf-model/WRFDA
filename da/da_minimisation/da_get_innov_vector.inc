@@ -1,6 +1,6 @@
 SUBROUTINE da_get_innov_vector( it, ob, iv, &
                                 grid, config_flags, &
-#include <em_dummy_args.inc>
+#include "em_dummy_args.inc"
                  )
 
 
@@ -22,7 +22,7 @@ SUBROUTINE da_get_innov_vector( it, ob, iv, &
    TYPE (grid_config_rec_type)   :: config_flags
 
 !--Definitions of dummy arguments to solve
-#include <em_dummy_decl.inc>
+#include "em_dummy_decl.inc"
 
    TYPE(xbx_type)     :: xbx          ! Header & non-gridded vars.
 
@@ -47,8 +47,8 @@ SUBROUTINE da_get_innov_vector( it, ob, iv, &
       if(num_fgat_time > 1) then
          write(UNIT=filename(1:10), fmt='(a, i2.2)') 'fgat_fg.', n
          call da_med_initialdata_input ( grid , config_flags, in_filename=filename )
-         call DA_Setup_FirstGuess( xbx, grid, &
-#include <em_dummy_args.inc>
+         call da_setup_firstguess( xbx, grid, &
+#include "em_dummy_args.inc"
                            )
       endif
 
@@ -165,8 +165,8 @@ SUBROUTINE da_get_innov_vector( it, ob, iv, &
 
    if(num_fgat_time > 1) then
       call da_med_initialdata_input ( grid , config_flags )
-      call DA_Setup_FirstGuess( xbx, grid, &
-#include <em_dummy_args.inc>
+      call da_setup_firstguess( xbx, grid, &
+#include "em_dummy_args.inc"
                               )
    endif
 

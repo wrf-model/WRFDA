@@ -1,6 +1,6 @@
-SUBROUTINE DA_Setup_FirstGuess_KMA( xbx, grid, &
+SUBROUTINE da_setup_firstguess_kma( xbx, grid, &
 !
-#include <em_dummy_args.inc>
+#include "em_dummy_args.inc"
 !
                               )
 
@@ -21,7 +21,7 @@ SUBROUTINE DA_Setup_FirstGuess_KMA( xbx, grid, &
    TYPE(domain) , TARGET               :: grid
 
 !  Definitions of dummy arguments to solve
-#include <em_dummy_decl.inc>
+#include "em_dummy_decl.inc"
 !---------------------------------------------------------------------------
 
    integer           :: i, j
@@ -99,13 +99,13 @@ SUBROUTINE DA_Setup_FirstGuess_KMA( xbx, grid, &
    xbx % alp_size = (xbx%nj+1)*(max_wavenumber+1)*(max_wavenumber+2)/4
 !---------------------------------------------------------------
 
-   CALL DA_Transfer_KMAToXb( xbx, grid, &
+   CALL da_transfer_kmatoxb( xbx, grid, &
  
-#include <em_dummy_args.inc>
+#include "em_dummy_args.inc"
                              )
 
 
    IF (trace_use) CALL da_trace_exit("da_setup_firstguess_kma")
 
-END SUBROUTINE DA_Setup_FirstGuess_KMA
+END SUBROUTINE da_setup_firstguess_kma
 
