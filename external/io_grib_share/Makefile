@@ -10,12 +10,12 @@
 #
 # Specity location for Makefiles that are included.
 #
-INCLUDEDIRS = -I. -I.. -I../grib1_util
-BUILD_DIR = ../build
+INCLUDEDIRS = -I.
+BUILD_DIR = $(BUILD_DIR_PRE)./build
 #
 # Specify directory that output library is to be put in.
 #
-LIB_DEST = ..
+LIB_DEST = .
 #
 #  SPECIFY local include directories used during compilation of source code. 
 #
@@ -24,6 +24,10 @@ LIB_DEST = ..
 #
 C_INCLUDES   = -I.
 CXX_INCLUDES = -I.
+F_INCLUDES   = -I.
+ARFLAGS      = cruv
+
+FORMAT = $(FREE)
 
 #
 #  SPECIFY any subdirectories containing libraries that may be dynamically
@@ -46,57 +50,26 @@ SUB_DIRS =
 #  1. Be careful about whitespace after the last character in the LIB_NAME.
 #     These spaces will generate an error when the library is made.
 #
-LIB_NAME = MEL_grib1
+LIB_NAME = io_grib_share
+SYS_DEFINES =
 DEP_LIBS = 
-OBJS =  FTP_getfile.o \
-	apply_bitmap.o \
-	display_gribhdr.o \
-	gbyte.o \
-	grib_dec.o \
-	grib_enc.o \
-	grib_seek.o \
-	gribgetbds.o \
-	gribgetbms.o \
-	gribgetgds.o \
-	gribgetpds.o \
-	gribhdr2file.o \
-	gribputbds.o \
-	gribputgds.o \
-	gribputpds.o \
-	hdr_print.o \
-	init_dec_struct.o \
-	init_enc_struct.o \
-	init_gribhdr.o \
-	init_struct.o \
-	ld_dec_lookup.o \
-	ld_enc_input.o \
-	ld_enc_lookup.o \
-	ld_grib_origctrs.o \
-	make_default_grbfn.o \
-	make_grib_log.o \
-	map_lvl.o \
-	map_parm.o \
-	pack_spatial.o \
-	prt_inp_struct.o \
-	upd_child_errmsg.o \
-	prt_badmsg.o \
-	swap.o\
-	grib_uthin.o
+OBJS =  \
+	io_grib_share.o \
+	get_region_center.o \
+	gridnav.o \
+	open_file.o
 
-# 
-# List the header files that should be installed.
 #
-HDRS =	gribfuncs.h \
-	grib.h \
-	input.h
-
-.c.o:
-	$(CC) -c $(CFLAGS) $(INCLUDEDIRS) $(DEBUG) $*.c
+#  List of subdirectories to which to pass make commands.
+#
+LIB_DIRS = 
+EXE_DIRS =
+SUB_DIRS = $(LIB_DIRS) $(EXE_DIRS)
 
 #
 #  Include the boilerplate rules for building library modules.
 #
-include ../build/library_rules.mk
+include $(BUILD_DIR)/library_rules.mk
 
 #
 #  Compile dependencies.  These are appended to this file by make depend. 
