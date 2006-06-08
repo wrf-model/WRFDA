@@ -56,10 +56,10 @@ program gen_be_stage4_regional
 
    read(start_date(1:10), fmt='(i10)')sdate
    read(end_date(1:10), fmt='(i10)')edate
-   write(UNIT=stdout,FMT='(4a)')' Computing error correlation scales for dates ', start_date, ' to ', end_date
-   write(UNIT=stdout,FMT='(a,i8,a)')' Interval between dates = ', interval, 'hours.'
-   write(UNIT=stdout,FMT='(a,i8)')' Number of ensemble members at each time = ', ne
-   write(UNIT=stdout,FMT='(a,i8)')' Stride over which to jump points in correlation calculation = ', stride
+   write(UNIT=6,FMT='(4a)')' Computing error correlation scales for dates ', start_date, ' to ', end_date
+   write(UNIT=6,FMT='(a,i8,a)')' Interval between dates = ', interval, 'hours.'
+   write(UNIT=6,FMT='(a,i8)')' Number of ensemble members at each time = ', ne
+   write(UNIT=6,FMT='(a,i8)')' Stride over which to jump points in correlation calculation = ', stride
 
    date = start_date
    cdate = sdate
@@ -77,7 +77,7 @@ program gen_be_stage4_regional
    do while ( cdate <= edate )
       do member = 1, ne
 
-         write(UNIT=stdout,FMT='(5a,i4)')'    Date = ', date, ', variable ', trim(variable), &
+         write(UNIT=6,FMT='(5a,i4)')'    Date = ', date, ', variable ', trim(variable), &
                            ' and member ', member
 
          write(UNIT=ce,FMT='(i3.3)')member
@@ -117,7 +117,7 @@ program gen_be_stage4_regional
    end do
 
 !---------------------------------------------------------------------------------------------
-   write(UNIT=stdout,FMT='(a)')' [3] Compute fit of correlation to a straight line.'
+   write(UNIT=6,FMT='(a)')' [3] Compute fit of correlation to a straight line.'
 !---------------------------------------------------------------------------------------------
 
    filename = 'sl_print.'//trim(variable)//'.'//ck
@@ -243,7 +243,7 @@ subroutine make_scale_length( variable, ck, ounit, nn, nr, cov )
 !  cov(r) = cov(0) * exp(-r**2 / 8)
 !  Dale Barker: 17th May 2005.
 
-   use da_constants, ONLY : stdout
+   use da_constants, ONLY : 6
 
    implicit none
 
@@ -271,12 +271,12 @@ subroutine make_scale_length( variable, ck, ounit, nn, nr, cov )
 
    yr_cutoff = 3.0                                   ! Value taken from Yong-Run's experiments!
    corr_min = exp( -0.125 * yr_cutoff * yr_cutoff )  ! yr_cutoff = sqrt(8 ln corr_min)
-   write(UNIT=stdout,FMT='(a,1pe15.5)')' Fit Gaussian curve to data for correlations >= ', corr_min
+   write(UNIT=6,FMT='(a,1pe15.5)')' Fit Gaussian curve to data for correlations >= ', corr_min
 
-   write(UNIT=stdout,FMT='(5a)')'  n  ', ' nr(n) ', ' d(n) ', ' cov(n) ', ' yr(n)  '
+   write(UNIT=6,FMT='(5a)')'  n  ', ' nr(n) ', ' d(n) ', ' cov(n) ', ' yr(n)  '
    n = 0
    nrr(n) = real(nr(n))
-   write(UNIT=stdout,FMT='(i6,4e13.5)') n, nrr(n), d(0), cov(n), yr(n)
+   write(UNIT=6,FMT='(i6,4e13.5)') n, nrr(n), d(0), cov(n), yr(n)
 
    do d2 = 1, nn
 
@@ -287,7 +287,7 @@ subroutine make_scale_length( variable, ck, ounit, nn, nr, cov )
          yr(n) = sqrt( 8.0 * log(cov(0) / cov(d2)) )
          nrr(n) = real(nr(d2))
          d(n) = sqrt(real(d2))                  ! Distance
-         write(UNIT=stdout,FMT='(i6,4e13.5)') n, nrr(n), d(n), cov(d2), yr(n)
+         write(UNIT=6,FMT='(i6,4e13.5)') n, nrr(n), d(n), cov(d2), yr(n)
        end if
    end do
    nmax = n
@@ -314,7 +314,7 @@ subroutine make_scale_length( variable, ck, ounit, nn, nr, cov )
    coeff2 = 0.0
 
    do n = 1, nmax
-      WRITE(UNIT=stdout,FMT='("n, nrr, d, yr:",i3,3e15.6)') n, nrr(n), d(n), yr(n)
+      WRITE(UNIT=6,FMT='("n, nrr, d, yr:",i3,3e15.6)') n, nrr(n), d(n), yr(n)
       coeff1 = coeff1 + nrr(n) * d(n) * yr(n)
       coeff2 = coeff2 + nrr(n) * d(n) * d(n)
    end do
@@ -334,7 +334,7 @@ subroutine make_scale_length( variable, ck, ounit, nn, nr, cov )
 
    endif
 
-   write(UNIT=stdout,FMT='(/3a,3e30.8/)') trim(variable), ' scale-length at mode:', ck, ml, sl
+   write(UNIT=6,FMT='(/3a,3e30.8/)') trim(variable), ' scale-length at mode:', ck, ml, sl
 
    write(UNIT=ounit,FMT='(a,2e20.8)') ck, ml, sl
 

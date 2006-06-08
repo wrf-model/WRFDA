@@ -106,7 +106,7 @@ program gen_be_stage0_wrf
 
    numarg = iargc()
    if ( numarg /= 4 )then
-      write(UNIT=stdout,FMT='(a)') &
+      write(UNIT=6,FMT='(a)') &
         "Usage: gen_be_stage0_wrf be_method date ne <wrf_file_stub> Stop"
       stop
    end if

@@ -76,9 +76,9 @@
    ./gen_be_stage0_wrf.exe ${BE_METHOD} ${FCST_TIME} $NE $FILE >&! gen_be_stage0_wrf.${FCST_TIME}.out
 
 #  Tidy:
-#   mv pert.${FCST_TIME}* ${STAGE0_DIR}
-#   mv gen_be_stage0_wrf.${FCST_TIME}.out ${STAGE0_DIR}
-#   rm -rf $TMP_DIR >&! /dev/null
+   mv pert.${FCST_TIME}* ${STAGE0_DIR}
+   mv gen_be_stage0_wrf.${FCST_TIME}.out ${STAGE0_DIR}
+   rm -rf $TMP_DIR >&! /dev/null
 
    setenv DATE $NEXT_DATE
 

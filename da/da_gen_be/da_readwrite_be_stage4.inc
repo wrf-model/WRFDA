@@ -56,10 +56,10 @@ if (uh_method .eq. 'power') then
       if ( first_time ) then
         if ( .not. data_on_levels ) then
           if ( use_global_eofs ) then
-            write(UNIT=stdout,FMT='(a)') &
+            write(UNIT=6,FMT='(a)') &
               ' Power spectra calculated for 2D field projected onto global EOFs.'
           else
-            write(UNIT=stdout,FMT='(a)') &
+            write(UNIT=6,FMT='(a)') &
               ' Power spectra calculated for 2D field projected onto local EOFs.'
           end if
         end if

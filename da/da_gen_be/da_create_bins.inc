@@ -87,29 +87,29 @@ subroutine da_create_bins( ni, nj, nk, bin_type, num_bins, num_bins2d, &
    else if ( bin_type == 2 ) then    ! Global latitude/height bins:
 
 !     Setup latitude bins:
-      write(UNIT=stdout,FMT='(/a,f12.5)')'   Minimum latitude = ', lat_min
-      write(UNIT=stdout,FMT='(a,f12.5)')'    Maximum latitude = ', lat_max
-      write(UNIT=stdout,FMT='(a,f12.5)')'    Latitude bin width = ', binwidth_lat
+      write(UNIT=6,FMT='(/a,f12.5)')'   Minimum latitude = ', lat_min
+      write(UNIT=6,FMT='(a,f12.5)')'    Maximum latitude = ', lat_max
+      write(UNIT=6,FMT='(a,f12.5)')'    Latitude bin width = ', binwidth_lat
       num_bins_lat = nint( ( lat_max - lat_min ) / binwidth_lat)
-      write(UNIT=stdout,FMT='(a,i8)')   '    Number of latitude bins = ', num_bins_lat
+      write(UNIT=6,FMT='(a,i8)')   '    Number of latitude bins = ', num_bins_lat
    
       allocate( binstart_lat(1:num_bins_lat) )
       do b = 1, num_bins_lat ! Assume south to north (as in WRF).
          binstart_lat(b) = lat_min + real(b-1) * binwidth_lat
-!         write(UNIT=stdout,FMT='(i4,f15.5)')b, binstart_lat(b)
+!         write(UNIT=6,FMT='(i4,f15.5)')b, binstart_lat(b)
       end do
 
 !     Setup height bins:
-      write(UNIT=stdout,FMT='(/a,f12.5)')'    Minimum height = ', hgt_min
-      write(UNIT=stdout,FMT='(a,f12.5)')'    Maximum height = ', hgt_max
-      write(UNIT=stdout,FMT='(a,f12.5)')'    Height bin width = ', binwidth_hgt
+      write(UNIT=6,FMT='(/a,f12.5)')'    Minimum height = ', hgt_min
+      write(UNIT=6,FMT='(a,f12.5)')'    Maximum height = ', hgt_max
+      write(UNIT=6,FMT='(a,f12.5)')'    Height bin width = ', binwidth_hgt
       num_bins_hgt = nint( ( hgt_max - hgt_min ) / binwidth_hgt)
-      write(UNIT=stdout,FMT='(a,i8)')'    Number of height bins = ', num_bins_hgt
+      write(UNIT=6,FMT='(a,i8)')'    Number of height bins = ', num_bins_hgt
 
       allocate( binstart_hgt(1:num_bins_hgt) )
       do b = 1, num_bins_hgt
          binstart_hgt(b) = hgt_min + real(b-1) * binwidth_hgt
-!         write(UNIT=stdout,FMT='(i4,f15.5)')b, binstart_hgt(b)
+!         write(UNIT=6,FMT='(i4,f15.5)')b, binstart_hgt(b)
       end do
 
       num_bins = num_bins_lat * num_bins_hgt
@@ -158,16 +158,16 @@ subroutine da_create_bins( ni, nj, nk, bin_type, num_bins, num_bins2d, &
    else if ( bin_type == 3 ) then    ! Latitude/nk bins:
 
 !     Setup latitude bins:
-      write(UNIT=stdout,FMT='(/a,f12.5)')'   Minimum latitude = ', lat_min
-      write(UNIT=stdout,FMT='(a,f12.5)')'    Maximum latitude = ', lat_max
-      write(UNIT=stdout,FMT='(a,f12.5)')'    Latitude bin width = ', binwidth_lat
+      write(UNIT=6,FMT='(/a,f12.5)')'   Minimum latitude = ', lat_min
+      write(UNIT=6,FMT='(a,f12.5)')'    Maximum latitude = ', lat_max
+      write(UNIT=6,FMT='(a,f12.5)')'    Latitude bin width = ', binwidth_lat
       num_bins_lat = nint( ( lat_max - lat_min ) / binwidth_lat)
-      write(UNIT=stdout,FMT='(a,i8)')   '    Number of latitude bins = ', num_bins_lat
+      write(UNIT=6,FMT='(a,i8)')   '    Number of latitude bins = ', num_bins_lat
    
       allocate( binstart_lat(1:num_bins_lat) )
       do b = 1, num_bins_lat ! Assume south to north (as in WRF).
          binstart_lat(b) = lat_min + real(b-1) * binwidth_lat
-!         write(UNIT=stdout,FMT='(i4,f15.5)')b, binstart_lat(b)
+!         write(UNIT=6,FMT='(i4,f15.5)')b, binstart_lat(b)
       end do
 
       num_bins = num_bins_lat * nk
@@ -202,7 +202,7 @@ subroutine da_create_bins( ni, nj, nk, bin_type, num_bins, num_bins2d, &
    else if ( bin_type == 4 ) then    ! binwidth_lat/nk bins:
 
 !     Setup horizontal bins:
-      write(UNIT=stdout,FMT='(/a,f12.5)')'   Number of grid-cells to average over = ', binwidth_lat
+      write(UNIT=6,FMT='(/a,f12.5)')'   Number of grid-cells to average over = ', binwidth_lat
 !     Use binwidth_lat, but actually an integer number of points.
  
       num_bins_j = int( real(nj) / real(binwidth_lat) )

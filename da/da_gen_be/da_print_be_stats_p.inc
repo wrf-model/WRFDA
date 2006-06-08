@@ -32,7 +32,7 @@ subroutine da_print_be_stats_p( outunit, ni, nj, nk, num_bins, num_bins2d, bin, 
 
    integer             :: k1, k2, i, k, j, b, number      ! Loop counters.
 
-   write(UNIT=stdout,FMT='(a,i5)')' psi/chi regression coefficient in unit ', outunit
+   write(UNIT=6,FMT='(a,i5)')' psi/chi regression coefficient in unit ', outunit
 
    open(UNIT=outunit)
    write(UNIT=outunit,FMT='(a,i5)')' psi/chi regression coefficient in unit ', outunit
@@ -54,7 +54,7 @@ subroutine da_print_be_stats_p( outunit, ni, nj, nk, num_bins, num_bins2d, bin, 
 
    outunit = outunit + 1
 
-   write(UNIT=stdout,FMT='(a,i5)')' psi/ps  regression coefficient in unit ', outunit
+   write(UNIT=6,FMT='(a,i5)')' psi/ps  regression coefficient in unit ', outunit
 
    open(UNIT=outunit)
    write(UNIT=outunit,FMT='(a,i5)')' psi/ps  regression coefficient in unit ', outunit
@@ -74,7 +74,7 @@ subroutine da_print_be_stats_p( outunit, ni, nj, nk, num_bins, num_bins2d, bin, 
 
    outunit = outunit + 1
 
-   write(UNIT=stdout,FMT='(a,i5)')' psi/T   regression coefficient in unit ', outunit
+   write(UNIT=6,FMT='(a,i5)')' psi/T   regression coefficient in unit ', outunit
 
    open(UNIT=outunit)
    write(UNIT=outunit,FMT='(a,i5)')' psi/T   regression coefficient in unit ', outunit
@@ -95,7 +95,7 @@ subroutine da_print_be_stats_p( outunit, ni, nj, nk, num_bins, num_bins2d, bin, 
    enddo
    close(UNIT=outunit)
 
-   write(UNIT=stdout,FMT=*) ' '
+   write(UNIT=6,FMT=*) ' '
 
    outunit = outunit + 1
 
