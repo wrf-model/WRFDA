@@ -17,7 +17,7 @@ MODULE module_wrf_error
     SUBROUTINE wrf_error_fatal3_strs( file_str, line, strs )
       CHARACTER(LEN=*), INTENT(IN) :: file_str
       INTEGER ,         INTENT(IN) :: line
-      CHARACTER(LEN=100), INTENT(IN) :: strs(:)
+      CHARACTER(LEN=*), INTENT(IN) :: strs(:)
     END SUBROUTINE wrf_error_fatal3_strs
   END INTERFACE wrf_error_fatal3
 
@@ -31,7 +31,7 @@ MODULE module_wrf_error
     SUBROUTINE wrf_warning3_strs( file_str, line, strs )
       CHARACTER(LEN=*), INTENT(IN) :: file_str
       INTEGER,          INTENT(IN) :: line
-      CHARACTER(LEN=100), INTENT(IN) :: strs(:)
+      CHARACTER(LEN=*), INTENT(IN) :: strs(:)
     END SUBROUTINE wrf_warning3_strs
   END INTERFACE wrf_warning3
 
@@ -41,7 +41,7 @@ MODULE module_wrf_error
     END SUBROUTINE wrf_message_str
 
     SUBROUTINE wrf_message_strs(strs)
-      CHARACTER(LEN=100), INTENT(IN) :: strs(:)
+      CHARACTER(LEN=*), INTENT(IN) :: strs(:)
     END SUBROUTINE wrf_message_strs
   END INTERFACE wrf_message
 
@@ -51,7 +51,7 @@ MODULE module_wrf_error
     END SUBROUTINE wrf_message2_str
 
     SUBROUTINE wrf_message2_strs(strs)
-      CHARACTER(LEN=100), INTENT(IN) :: strs(:)
+      CHARACTER(LEN=*), INTENT(IN) :: strs(:)
     END SUBROUTINE wrf_message2_strs
   END INTERFACE wrf_message2
 
@@ -101,7 +101,7 @@ END SUBROUTINE wrf_debug
 SUBROUTINE wrf_message_strs(strs)
   USE module_utility
   IMPLICIT NONE
-  CHARACTER(LEN=100), INTENT(IN) :: strs(:)
+  CHARACTER(LEN=*), INTENT(IN) :: strs(:)
   INTEGER :: i
 #if defined( DM_PARALLEL ) && ! defined( STUBMPI)
   DO I=1,SIZE(strs) 
@@ -140,7 +140,7 @@ END SUBROUTINE wrf_message_str
 SUBROUTINE wrf_message2_strs(strs )
   USE module_utility
   IMPLICIT NONE
-  CHARACTER(LEN=100), INTENT(IN) :: strs(:)
+  CHARACTER(LEN=*), INTENT(IN) :: strs(:)
   INTEGER :: i
   DO I=1,SIZE(strs) 
     write(0,*) strs(i)
@@ -174,7 +174,7 @@ SUBROUTINE wrf_error_fatal3_strs( file_str, line, strs )
   IMPLICIT NONE
   CHARACTER(LEN=*), INTENT(IN) :: file_str
   INTEGER ,         INTENT(IN) :: line  ! only print file and line if line > 0
-  CHARACTER(LEN=100), INTENT(IN) :: strs(:)
+  CHARACTER(LEN=*), INTENT(IN) :: strs(:)
   CHARACTER*256 :: line_str
 
   write(line_str,'(i6)') line
@@ -260,7 +260,7 @@ SUBROUTINE wrf_warning3_strs( file_str, line, strs )
   IMPLICIT NONE
   CHARACTER(LEN=*), INTENT(IN) :: file_str
   INTEGER,          INTENT(IN) :: line
-  CHARACTER(LEN=100), INTENT(IN) :: strs(:)
+  CHARACTER(LEN=*), INTENT(IN) :: strs(:)
   CHARACTER*256 :: line_str
 
   write(line_str,'(i6)') line

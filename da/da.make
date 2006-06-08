@@ -61,6 +61,7 @@ da_wrfvar_top.o : da_wrfvar_top.f90       \
                   da_wrfvar_finalize.inc  \
                   da_wrfvar_interface.inc \
                   module_integrate.o      \
+                  module_dm.o             \
                   da_wrfvar_io.o
 
 da_wrfvar_esmf_super.o : da_wrfvar_esmf_super.f90    \
