@@ -17,7 +17,7 @@ VAR_LIB             =       $(NETCDF_LIB) -L. -lwrflib -lwrfio_nf -lesmf_time \
                         $(NETCDF_LIB) $(RTTOV_LIB) $(MPI_LIB) $(EXTRA_LIBS)
 
 WRF_LIB             =       $(NETCDF_LIB) -L. -lwrflib -lwrfio_nf -lesmf_time \
-                        -L$(EXTERNAL)/io_grib1 -lio_grib1 $(LOCAL_LIB)
+                        -L$(EXTERNAL)/io_grib1 -lio_grib1 $(LOCAL_LIB) \
                         $(NETCDF_LIB) $(MPI_LIB) $(EXTRA_LIBS)
 
 GEN_BE_LIB          =       $(NETCDF_LIB) $(EXTRA_LIBS)
