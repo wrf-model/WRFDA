@@ -8,17 +8,11 @@ MODULE module_wrf_error
   INTEGER            :: msgcount
 
   INTERFACE wrf_error_fatal3
-!    SUBROUTINE wrf_error_fatal3_str( file_str, line, str)
-!      CHARACTER(LEN=*)  :: file_str
-!      INTEGER          :: line
-!      CHARACTER(LEN=*) :: str
-!    END SUBROUTINE wrf_error_fatal3_str
-
-    SUBROUTINE wrf_error_fatal3( file_str, line, str)
+    SUBROUTINE wrf_error_fatal3_str( file_str, line, str)
       CHARACTER(LEN=*), INTENT(IN) :: file_str
       INTEGER ,         INTENT(IN) :: line
       CHARACTER(LEN=*), INTENT(IN) :: str
-    END SUBROUTINE wrf_error_fatal3
+    END SUBROUTINE wrf_error_fatal3_str
 
     SUBROUTINE wrf_error_fatal3_strs( file_str, line, strs )
       CHARACTER(LEN=*), INTENT(IN) :: file_str
@@ -28,11 +22,11 @@ MODULE module_wrf_error
   END INTERFACE wrf_error_fatal3
 
   INTERFACE wrf_warning3
-    SUBROUTINE wrf_warning3( file_str, line, str)
+    SUBROUTINE wrf_warning3_str( file_str, line, str)
       CHARACTER(LEN=*), INTENT(IN) :: file_str
       INTEGER,          INTENT(IN) :: line
       CHARACTER(LEN=*), INTENT(IN) :: str
-    END SUBROUTINE wrf_warning3
+    END SUBROUTINE wrf_warning3_str
 
     SUBROUTINE wrf_warning3_strs( file_str, line, strs )
       CHARACTER(LEN=*), INTENT(IN) :: file_str
@@ -42,13 +36,9 @@ MODULE module_wrf_error
   END INTERFACE wrf_warning3
 
   INTERFACE wrf_message
-!    SUBROUTINE wrf_message_str(str)
-!      CHARACTER(LEN=*) :: str
-!    END SUBROUTINE wrf_message_str
-
-    SUBROUTINE wrf_message(str)
+    SUBROUTINE wrf_message_str(str)
       CHARACTER(LEN=*), INTENT(IN) :: str
-    END SUBROUTINE wrf_message
+    END SUBROUTINE wrf_message_str
 
     SUBROUTINE wrf_message_strs(strs)
       CHARACTER(LEN=*), INTENT(IN) :: strs(:)
@@ -56,13 +46,9 @@ MODULE module_wrf_error
   END INTERFACE wrf_message
 
   INTERFACE wrf_message2
-!    SUBROUTINE wrf_message2_str(str)
-!      CHARACTER(LEN=*) :: str
-!    END SUBROUTINE wrf_message2_str
-
-    SUBROUTINE wrf_message2(str)
+    SUBROUTINE wrf_message2_str(str)
       CHARACTER(LEN=*), INTENT(IN) :: str
-    END SUBROUTINE wrf_message2
+    END SUBROUTINE wrf_message2_str
 
     SUBROUTINE wrf_message2_strs(strs)
       CHARACTER(LEN=*), INTENT(IN) :: strs(:)
@@ -133,7 +119,7 @@ SUBROUTINE wrf_message_strs(strs)
 #endif
 END SUBROUTINE wrf_message_strs
 
-SUBROUTINE wrf_message( str)
+SUBROUTINE wrf_message_str( str)
   USE module_utility
   IMPLICIT NONE
   CHARACTER(LEN=*), INTENT(IN) :: str
@@ -148,7 +134,7 @@ SUBROUTINE wrf_message( str)
     CALL WRF_UTIL_LogWrite( str, WRF_UTIL_LOG_INFO )
   ENDIF
 #endif
-END SUBROUTINE wrf_message
+END SUBROUTINE wrf_message_str
 
 ! intentionally write to stderr only
 SUBROUTINE wrf_message2_strs(strs )
@@ -169,7 +155,7 @@ SUBROUTINE wrf_message2_strs(strs )
 #endif
 END SUBROUTINE wrf_message2_strs
 
-SUBROUTINE wrf_message2(str)
+SUBROUTINE wrf_message2_str(str)
   USE module_utility
   IMPLICIT NONE
   CHARACTER(LEN=*), INTENT(IN) :: str
@@ -181,7 +167,7 @@ SUBROUTINE wrf_message2(str)
     CALL WRF_UTIL_LogWrite( str, WRF_UTIL_LOG_INFO )
   ENDIF
 #endif
-END SUBROUTINE wrf_message2
+END SUBROUTINE wrf_message2_str
 
 SUBROUTINE wrf_error_fatal3_strs( file_str, line, strs )
   IMPLICIT NONE
@@ -192,21 +178,21 @@ SUBROUTINE wrf_error_fatal3_strs( file_str, line, strs )
 
   write(line_str,'(i6)') line
 #if defined( DM_PARALLEL ) && ! defined( STUBMPI )
-  CALL wrf_message( '-------------- FATAL CALLED ---------------' )
+  CALL wrf_message_str( '-------------- FATAL CALLED ---------------' )
   ! only print file and line if line is positive
   IF ( line > 0 ) THEN
-    CALL wrf_message( 'FATAL CALLED FROM FILE:  '//file_str//'  LINE:  '//TRIM(line_str) )
+    CALL wrf_message_str( 'FATAL CALLED FROM FILE:  '//file_str//'  LINE:  '//TRIM(line_str) )
   ENDIF
   CALL wrf_message_strs(strs)
-  CALL wrf_message( '-------------------------------------------' )
+  CALL wrf_message_str( '-------------------------------------------' )
 #else
-  CALL wrf_message2( '-------------- FATAL CALLED ---------------' )
+  CALL wrf_message2_str( '-------------- FATAL CALLED ---------------' )
   ! only print file and line if line is positive
   IF ( line > 0 ) THEN
-    CALL wrf_message( 'FATAL CALLED FROM FILE:  '//file_str//'  LINE:  '//TRIM(line_str) )
+    CALL wrf_message_str( 'FATAL CALLED FROM FILE:  '//file_str//'  LINE:  '//TRIM(line_str) )
   ENDIF
   CALL wrf_message2_strs( strs )
-  CALL wrf_message2( '-------------------------------------------' )
+  CALL wrf_message2_str( '-------------------------------------------' )
 #endif
   CALL wrf_abort
 END SUBROUTINE wrf_error_fatal3_strs
@@ -220,21 +206,21 @@ SUBROUTINE wrf_error_fatal3( file_str, line,str )
 
   write(line_str,'(i6)') line
 #if defined( DM_PARALLEL ) && ! defined( STUBMPI )
-  CALL wrf_message( '-------------- FATAL CALLED ---------------' )
+  CALL wrf_message_str( '-------------- FATAL CALLED ---------------' )
   ! only print file and line if line is positive
   IF ( line > 0 ) THEN
-    CALL wrf_message( 'FATAL CALLED FROM FILE:  '//file_str//'  LINE:  '//TRIM(line_str) )
+    CALL wrf_message_str( 'FATAL CALLED FROM FILE:  '//file_str//'  LINE:  '//TRIM(line_str) )
   ENDIF
-  CALL wrf_message(str)
-  CALL wrf_message( '-------------------------------------------' )
+  CALL wrf_message_str(str)
+  CALL wrf_message_str( '-------------------------------------------' )
 #else
-  CALL wrf_message2( '-------------- FATAL CALLED ---------------' )
+  CALL wrf_message2_str( '-------------- FATAL CALLED ---------------' )
   ! only print file and line if line is positive
   IF ( line > 0 ) THEN
-    CALL wrf_message( 'FATAL CALLED FROM FILE:  '//file_str//'  LINE:  '//TRIM(line_str) )
+    CALL wrf_message_str( 'FATAL CALLED FROM FILE:  '//file_str//'  LINE:  '//TRIM(line_str) )
   ENDIF
-  CALL wrf_message2( str )
-  CALL wrf_message2( '-------------------------------------------' )
+  CALL wrf_message2_str( str )
+  CALL wrf_message2_str( '-------------------------------------------' )
 #endif
   CALL wrf_abort
 END SUBROUTINE wrf_error_fatal3
@@ -248,21 +234,21 @@ SUBROUTINE wrf_warning3( file_str, line, str )
 
   write(line_str,'(i6)') line
 #if defined( DM_PARALLEL ) && ! defined( STUBMPI )
-  CALL wrf_message( '-------------- WARNING      ---------------' )
+  CALL wrf_message_str( '-------------- WARNING      ---------------' )
   ! only print file and line if line is positive
   IF ( line > 0 ) THEN
-    CALL wrf_message( 'WARNING FROM FILE:  '//file_str//'  LINE:  '//TRIM(line_str) )
+    CALL wrf_message_str( 'WARNING FROM FILE:  '//file_str//'  LINE:  '//TRIM(line_str) )
   ENDIF
-  CALL wrf_message( str )
-  CALL wrf_message( '-------------------------------------------' )
+  CALL wrf_message_str( str )
+  CALL wrf_message_str( '-------------------------------------------' )
 #else
-  CALL wrf_message2( '-------------- WARNING ---------------' )
+  CALL wrf_message2_str( '-------------- WARNING ---------------' )
   ! only print file and line if line is positive
   IF ( line > 0 ) THEN
-    CALL wrf_message( 'WARNING FROM FILE:  '//file_str//'  LINE:  '//TRIM(line_str) )
+    CALL wrf_message_str( 'WARNING FROM FILE:  '//file_str//'  LINE:  '//TRIM(line_str) )
   ENDIF
-  CALL wrf_message2(str )
-  CALL wrf_message2( '-------------------------------------------' )
+  CALL wrf_message2_str(str )
+  CALL wrf_message2_str( '-------------------------------------------' )
 #endif
 END SUBROUTINE wrf_warning3
 
@@ -275,28 +261,28 @@ SUBROUTINE wrf_warning3_strs( file_str, line, strs )
 
   write(line_str,'(i6)') line
 #if defined( DM_PARALLEL ) && ! defined( STUBMPI )
-  CALL wrf_message( '-------------- WARNING      ---------------' )
+  CALL wrf_message_str( '-------------- WARNING      ---------------' )
   ! only print file and line if line is positive
   IF ( line > 0 ) THEN
-    CALL wrf_message( 'WARNING FROM FILE:  '//file_str//'  LINE:  '//TRIM(line_str) )
+    CALL wrf_message_str( 'WARNING FROM FILE:  '//file_str//'  LINE:  '//TRIM(line_str) )
   ENDIF
   CALL wrf_message_strs( strs )
-  CALL wrf_message( '-------------------------------------------' )
+  CALL wrf_message_str( '-------------------------------------------' )
 #else
-  CALL wrf_message2( '-------------- WARNING ---------------' )
+  CALL wrf_message2_str( '-------------- WARNING ---------------' )
   ! only print file and line if line is positive
   IF ( line > 0 ) THEN
-    CALL wrf_message( 'WARNING FROM FILE:  '//file_str//'  LINE:  '//TRIM(line_str) )
+    CALL wrf_message_str( 'WARNING FROM FILE:  '//file_str//'  LINE:  '//TRIM(line_str) )
   ENDIF
   CALL wrf_message2_strs(strs )
-  CALL wrf_message2( '-------------------------------------------' )
+  CALL wrf_message2_str( '-------------------------------------------' )
 #endif
 END SUBROUTINE wrf_warning3_strs
 
 SUBROUTINE wrf_error_fatal( str)
   IMPLICIT NONE
   CHARACTER(LEN=*) :: str
-  CALL wrf_error_fatal3 ( ' ', 0, str)
+  CALL wrf_error_fatal3_str ( ' ', 0, str)
 END SUBROUTINE wrf_error_fatal
 
 ! Check to see if expected value == actual value
