@@ -7,28 +7,36 @@
 
 .SUFFIXES:      .c .o
 
+#
 # Specity location for Makefiles that are included.
 #
-BUILD_DIR = ../../io_grib_share/build
-INCLUDEDIRS = -I. -I.. -I ../MEL_grib1
+INCLUDEDIRS = -I.
+BUILD_DIR = $(BUILD_DIR_PRE)../io_grib_share/build
 #
 # Specify directory that output library is to be put in.
 #
-LIB_DEST = ..
+LIB_DEST = .
 #
 #  SPECIFY local include directories used during compilation of source code. 
 #
 #    CXX_INCLUDES is for C++ files
 #    C_INCLUDES is for C files
 #
-C_INCLUDES   = -I. -I../MEL_grib1
-CXX_INCLUDES = -I. -I../MEL_grib1
-ARFLAGS      = ruv
+C_INCLUDES   = -I.
+CXX_INCLUDES = -I.
+F_INCLUDES   = -I. -Ig2lib -Ibacio-1.3 -I../io_grib_share
+ARFLAGS      = cruv
+
+FORMAT = $(FREE)
+
 #
-#  SPECIFY any subdirectories containing libraries that may be dynamically
-#          linked by this library.
+#  List of subdirectories to which to pass make commands.
 #
-SUB_DIRS =
+LIB_DIRS = \
+	bacio-1.3 \
+	g2lib
+EXE_DIRS =
+SUB_DIRS = $(LIB_DIRS) $(EXE_DIRS)
 
 #
 #  SPECIFY information for building a library:
@@ -45,20 +53,18 @@ SUB_DIRS =
 #  1. Be careful about whitespace after the last character in the LIB_NAME.
 #     These spaces will generate an error when the library is made.
 #
-UNIT_TEST = test_rg
-LIB_NAME = io_grib1
-DEP_LIBS =  -L$(LIB_DEST) -lMEL_grib1
-OBJS =  alloc_2d.o \
-	read_grib.o \
-	write_grib.o
+LIB_NAME = io_grib2
+SYS_DEFINES =
+DEP_LIBS = 
+OBJS =  \
+	grib2tbls_types.o \
+	io_grib2.o \
+	read_grib2map.o
 
 #
 #  Include the boilerplate rules for building library modules.
 #
 include $(BUILD_DIR)/library_rules.mk
-
-superclean : clean
-	@ rm -rf *.a
 
 #
 #  Compile dependencies.  These are appended to this file by make depend. 
