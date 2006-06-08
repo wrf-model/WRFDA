@@ -243,8 +243,6 @@ subroutine make_scale_length( variable, ck, ounit, nn, nr, cov )
 !  cov(r) = cov(0) * exp(-r**2 / 8)
 !  Dale Barker: 17th May 2005.
 
-   use da_constants, ONLY : 6
-
    implicit none
 
    character*10, intent(in):: variable               ! Variable name

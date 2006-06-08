@@ -61,6 +61,8 @@ program gen_be_stage3
                                  testing_eofs, use_global_eofs, data_on_levels, &
                                  expt, dat_dir
 
+    stdout = 6
+
 
    if (trace_use) call da_trace_init
    if (trace_use) call da_trace_entry("gen_be_stage3")

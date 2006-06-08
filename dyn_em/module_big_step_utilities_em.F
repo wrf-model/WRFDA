@@ -1041,7 +1041,7 @@ SUBROUTINE calc_p_rho_phi ( moist, n_moist,                &
 ! equation.
 !
 !</DESCRIPTION>
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
 
   itf=MIN(ite,ide-1)
   jtf=MIN(jte,jde-1)
@@ -1050,17 +1050,17 @@ call wrf_oi(__FILE__,__LINE__)
 #ifndef INTELMKL
   cpovcv_v = cpovcv
 #endif
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
 
   IF (non_hydrostatic) THEN
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
 
       IF (n_moist >= PARAM_FIRST_SCALAR ) THEN 
-call wrf_oi(__FILE__,__LINE__) 
+call da_oi(__FILE__,__LINE__) 
 
         DO j=jts,jtf
         DO k=kts,ktf
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
         DO i=its,itf
           qvf = 1.+rvovrd*moist(i,k,j,P_QV)
           al(i,k,j)=-1./muts(i,j)*(alb(i,k,j)*mu(i,j)  &
@@ -1068,7 +1068,7 @@ call wrf_oi(__FILE__,__LINE__)
           temp(i)=(r_d*(t0+t(i,k,j))*qvf)/                 &
                         (p0*(al(i,k,j)+alb(i,k,j)))
         ENDDO
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
 #ifdef INTELMKL
         CALL VPOWX ( itf-its+1, temp(its), cpovcv, p(its,k,j) )
 #else
@@ -1077,16 +1077,16 @@ write (0,*) "p(its,k,j), temp(its), cpovcv_v(its), itf-its+1", &
   p(its,k,j), temp(its), cpovcv_v(its), itf-its+1
         CALL VPOW  ( p(its,k,j), temp(its), cpovcv_v(its), itf-its+1 )
 #endif
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
         DO i=its,itf
            p(i,k,j)= p(i,k,j)*p0-pb(i,k,j)
         ENDDO
         ENDDO
         ENDDO
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
 
       ELSE
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
 
         DO j=jts,jtf
         DO k=kts,ktf
@@ -1101,17 +1101,17 @@ call wrf_oi(__FILE__,__LINE__)
         ENDDO
 
       END IF
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
 
    ELSE
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
 
 !  hydrostatic pressure, al, and ph1 calc; WCS, 5 sept 2001
 
 
       IF (n_moist >= PARAM_FIRST_SCALAR ) THEN  
 
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
         DO j=jts,jtf
 
           k=ktf          ! top layer
@@ -1164,10 +1164,10 @@ call wrf_oi(__FILE__,__LINE__)
 
         ENDDO
 
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
       ELSE
 
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
         DO j=jts,jtf
 
           k=ktf          ! top layer
@@ -1213,13 +1213,13 @@ call wrf_oi(__FILE__,__LINE__)
           ENDDO
 
         ENDDO
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
 
      END IF
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
 
    END IF
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
 
 END SUBROUTINE calc_p_rho_phi
 

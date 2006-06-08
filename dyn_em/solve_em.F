@@ -2119,7 +2119,7 @@ BENCH_END(small_step_finish_tim)
                               k_start    , k_end               )
        END IF
 #endif
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
 write(0,*) "JRB problem here"
 BENCH_START(rk_scalar_tend_tim)
        CALL rk_scalar_tend (  im, im, config_flags,             &
@@ -2138,14 +2138,14 @@ BENCH_START(rk_scalar_tend_tim)
                               grid%i_start(ij), grid%i_end(ij), &
                               grid%j_start(ij), grid%j_end(ij), &
                               k_start    , k_end               )
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
 BENCH_END(rk_scalar_tend_tim)
 
 BENCH_START(rlx_bdy_scalar_tim)
      IF( ( config_flags%specified .or. config_flags%nested ) .and. rk_step == 1 ) THEN 
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
          IF ( im .EQ. P_QV .OR. config_flags%nested ) THEN
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
             CALL relax_bdy_scalar ( moist_tend(ims,kms,jms,im),            & 
                                     moist(ims,kms,jms,im),  mut,         &
                                     moist_b(1,1,1,1,im),                   &
@@ -2159,11 +2159,11 @@ call wrf_oi(__FILE__,__LINE__)
                                     grid%i_start(ij), grid%i_end(ij),      &
                                     grid%j_start(ij), grid%j_end(ij),      &
                                     k_start, k_end                        )
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
 
 #ifdef WRFPLUS_TESTING
          if(TEST_spec_bdy_scalar) THEN
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
            CALL t_spec_bdy_scalar  ( moist_tend(ims,kms,jms,im),                &
                                     moist_b(1,1,1,1,im),                     &
                                     moist_bt(1,1,1,1,im),                    &
@@ -2175,11 +2175,11 @@ call wrf_oi(__FILE__,__LINE__)
                                  grid%i_start(ij), grid%i_end(ij),          &
                                  grid%j_start(ij), grid%j_end(ij),          &
                                  k_start, k_end                               )
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
             END IF
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
 #endif
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
             CALL spec_bdy_scalar  ( moist_tend(ims,kms,jms,im),                &
                                     moist_b(1,1,1,1,im),                     &
                                     moist_bt(1,1,1,1,im),                    &
@@ -2192,14 +2192,14 @@ call wrf_oi(__FILE__,__LINE__)
                                     grid%j_start(ij), grid%j_end(ij),          &
                                     k_start, k_end                               )
           ENDIF
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
      ENDIF
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
 BENCH_END(rlx_bdy_scalar_tim)
 
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
    ENDDO moist_tile_loop_1
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
    !$OMP END PARALLEL DO
 
    !$OMP PARALLEL DO   &
@@ -2226,7 +2226,7 @@ call wrf_oi(__FILE__,__LINE__)
                               k_start    , k_end               )
        END IF
 #endif
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
 BENCH_START(update_scal_tim)
        CALL rk_update_scalar( im, im,                           &
                               moist_old(ims,kms,jms,im),        &
@@ -2241,15 +2241,15 @@ BENCH_START(update_scal_tim)
                               grid%i_start(ij), grid%i_end(ij), &
                               grid%j_start(ij), grid%j_end(ij), &
                               k_start    , k_end               )
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
 BENCH_END(update_scal_tim)
 
 BENCH_START(flow_depbdy_tim)
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
        IF( config_flags%specified ) THEN
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
          IF(im .ne. P_QV)THEN
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
            CALL flow_dep_bdy  (  moist(ims,kms,jms,im),                     &
                                ru_m, rv_m, config_flags, &
                                spec_zone,                  &
@@ -2259,48 +2259,48 @@ call wrf_oi(__FILE__,__LINE__)
                                grid%i_start(ij), grid%i_end(ij),                      &
                                grid%j_start(ij), grid%j_end(ij),                      &
                                k_start, k_end                               )
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
          ENDIF
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
        ENDIF
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
 BENCH_END(flow_depbdy_tim)
 
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
    ENDDO moist_tile_loop_2
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
    !$OMP END PARALLEL DO
 
    ENDDO moist_variable_loop
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
 
  ENDIF moist_scalar_advance
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
 
 BENCH_START(tke_adv_tim)
  TKE_advance: IF (km_opt .eq. 2) then
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
 
 #ifdef DM_PARALLEL
       IF      ( h_mom_adv_order <= 4 ) THEN
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
 #       include "HALO_EM_TKE_ADVECT_3.inc"
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
       ELSE IF ( h_mom_adv_order <= 6 ) THEN
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
 #       include "HALO_EM_TKE_ADVECT_5.inc"
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
       ELSE
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
         WRITE(wrf_err_message,*)'solve_em: invalid h_mom_adv_order = ',h_mom_adv_order
         CALL wrf_error_fatal(TRIM(wrf_err_message))
       ENDIF
 #endif
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
 
    !$OMP PARALLEL DO   &
    !$OMP PRIVATE ( ij )
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
 
    tke_tile_loop_1: DO ij = 1 , grid%num_tiles
 
@@ -2323,7 +2323,7 @@ call wrf_oi(__FILE__,__LINE__)
                            k_start    , k_end               )
 
    ENDDO tke_tile_loop_1
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
    !$OMP END PARALLEL DO
 
    !$OMP PARALLEL DO   &
@@ -2371,26 +2371,26 @@ call wrf_oi(__FILE__,__LINE__)
    !$OMP END PARALLEL DO
 
    END IF TKE_advance
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
 BENCH_END(tke_adv_tim)
 
 !  next the chemical species
 
 
   chem_scalar_advance: IF (num_3d_c >= PARAM_FIRST_SCALAR)  THEN
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
 
    chem_variable_loop: do ic = PARAM_FIRST_SCALAR, num_3d_c
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
 
    !$OMP PARALLEL DO   &
    !$OMP PRIVATE ( ij )
 
    chem_tile_loop_1: DO ij = 1 , grid%num_tiles
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
 
        CALL wrf_debug ( 200 , ' call rk_scalar_tend' )
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
        CALL rk_scalar_tend ( ic, ic, config_flags,                  &
                              rk_step, dt_rk,                   &
                              ru_m, rv_m, ww_m,                 &
@@ -2407,10 +2407,10 @@ call wrf_oi(__FILE__,__LINE__)
                              grid%i_start(ij), grid%i_end(ij), &
                              grid%j_start(ij), grid%j_end(ij), &
                              k_start    , k_end               )
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
 
    ENDDO chem_tile_loop_1
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
 
    !$OMP END PARALLEL DO
 
@@ -2419,10 +2419,10 @@ call wrf_oi(__FILE__,__LINE__)
    !$OMP PRIVATE ( ij )
 
    chem_tile_loop_2: DO ij = 1 , grid%num_tiles
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
 
        CALL wrf_debug ( 200 , ' call rk_update_scalar' )
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
        CALL rk_update_scalar( ic, ic,                           &
                               chem_old(ims,kms,jms,ic),         &  ! was chem_1
                               chem(ims,kms,jms,ic),             &
@@ -2436,7 +2436,7 @@ call wrf_oi(__FILE__,__LINE__)
                               grid%i_start(ij), grid%i_end(ij), &
                               grid%j_start(ij), grid%j_end(ij), &
                               k_start    , k_end               )
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
 
 
        IF( config_flags%specified ) THEN
@@ -2464,18 +2464,18 @@ call wrf_oi(__FILE__,__LINE__)
                                 k_start, k_end                    )
 #endif
        ENDIF
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
 
 
    ENDDO chem_tile_loop_2
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
    !$OMP END PARALLEL DO
 
    ENDDO chem_variable_loop
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
 
  ENDIF chem_scalar_advance
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
 
 !  next the other scalar species
   other_scalar_advance: IF (num_3d_s >= PARAM_FIRST_SCALAR)  THEN
@@ -2539,7 +2539,7 @@ call wrf_oi(__FILE__,__LINE__)
      ENDIF ! b.c test for chem nested boundary condition
 
    ENDDO scalar_tile_loop_1
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
    !$OMP END PARALLEL DO
 
 
@@ -2583,7 +2583,7 @@ call wrf_oi(__FILE__,__LINE__)
    ENDDO scalar_variable_loop
 
  ENDIF other_scalar_advance
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
 
  !  update the pressure and density at the new time level
 
@@ -2606,7 +2606,7 @@ call wrf_oi(__FILE__,__LINE__)
      END IF
 #endif
 BENCH_START(calc_p_rho_tim)
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
 
      CALL calc_p_rho_phi( moist, num_3d_m,                &
                           al, alb, mu_2, muts,              &
@@ -2618,19 +2618,19 @@ call wrf_oi(__FILE__,__LINE__)
                           grid%i_start(ij), grid%i_end(ij), &
                           grid%j_start(ij), grid%j_end(ij), &
                           k_start    , k_end               )
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
 
 BENCH_END(calc_p_rho_tim)
 
    ENDDO
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
    !$OMP END PARALLEL DO
 
 !  Reset the boundary conditions if there is another corrector step.
 !  (rk_step < rk_order), else we'll handle it at the end of everything
 !  (after the split physics, before exiting the timestep).
 
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
    rk_step_1_check: IF ( rk_step < rk_order ) THEN
 
 !-----------------------------------------------------------
@@ -2661,7 +2661,7 @@ call wrf_oi(__FILE__,__LINE__)
 ! moist               x
 ! chem                x
 !scalar               x
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
 
 #ifdef DM_PARALLEL
    IF      ( h_mom_adv_order <= 4 ) THEN
@@ -2677,7 +2677,7 @@ call wrf_oi(__FILE__,__LINE__)
 #  include "PERIOD_BDY_EM_CHEM.inc"
 #  include "PERIOD_BDY_EM_SCALAR.inc"
 #endif
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
 
 BENCH_START(bc_end_tim)
    !$OMP PARALLEL DO   &
@@ -2721,7 +2721,7 @@ BENCH_START(diag_w_tim)
                       grid%j_start(ij), grid%j_end(ij),       &
                       k_start    , k_end                     )
      ENDIF
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
 BENCH_END(diag_w_tim)
 
       IF (num_3d_m >= PARAM_FIRST_SCALAR) THEN
@@ -2785,7 +2785,7 @@ BENCH_END(diag_w_tim)
     END DO tile_bc_loop_1
    !$OMP END PARALLEL DO
 BENCH_END(bc_end_tim)
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
 
 
 #ifdef DM_PARALLEL
@@ -2865,7 +2865,7 @@ call wrf_oi(__FILE__,__LINE__)
 #endif
 
    ENDIF rk_step_1_check
-call wrf_oi(__FILE__,__LINE__)
+call da_oi(__FILE__,__LINE__)
 
 
 !**********************************************************

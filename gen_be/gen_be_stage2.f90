@@ -66,6 +66,8 @@ program gen_be_stage2
    namelist / gen_be_stage2_nl / start_date, end_date, interval, &
                                  be_method, ne, testing_eofs, expt, dat_dir
 
+   stdout = 6
+
 !---------------------------------------------------------------------------------------------
    write(6,'(a)')' [1] Initialize namelist variables and other scalars.'
 !---------------------------------------------------------------------------------------------

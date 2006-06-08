@@ -21,17 +21,17 @@ CONTAINS
 SUBROUTINE wrf_mm5_interface(grid, config_flags)
 
 !--Driver layer modules
-   USE module_domain
-   USE module_configure
-   USE module_driver_constants
+   use module_domain
+   use module_configure
+   use module_driver_constants
 
-   USE DA_Constants
-   USE DA_Define_Structures
-   USE DA_Setup_Structures
-   USE DA_Test
-   USE DA_Tools
-   USE DA_Minimisation
-   USE par_util
+   use da_constants
+   use da_define_structures
+   use da_setup_structures
+   use da_test
+   use da_tools
+   use da_minimisation
+   use da_par_util
 
    IMPLICIT NONE
 
