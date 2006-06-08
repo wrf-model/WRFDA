@@ -8,63 +8,67 @@ LIBPATHS =
 
 wrfvar : wrfvar.o
 	$(RANLIB) libwrflib.a
-	$(LD) -o wrfvar.exe $(LDFLAGS) wrfvar.o libwrflib.a $(LIB)
+	$(LD) -o wrfvar.exe $(LDFLAGS) wrfvar.o libwrflib.a $(VAR_LIB)
 
 kma2netcdf : kma2netcdf.o
 	$(RANLIB) libwrflib.a
-	$(LD) -o kma2netcdf.exe $(LDFLAGS) kma2netcdf.o libwrflib.a $(LIB) -L../convertor
+	$(LD) -o kma2netcdf.exe $(LDFLAGS) kma2netcdf.o libwrflib.a $(VAR_LIB) -L../convertor
 
 netcdf2kma : netcdf2kma.o
 	$(RANLIB) libwrflib.a
-	$(LD) -o netcdf2kma.exe $(LDFLAGS) netcdf2kma.o libwrflib.a $(LIB) -L../convertor 
+	$(LD) -o netcdf2kma.exe $(LDFLAGS) netcdf2kma.o libwrflib.a $(VAR_LIB) -L../convertor 
 
 $(SOLVER) : $(SOLVER).o
 	$(RANLIB) libwrflib.a
-	$(LD) -o $(SOLVER).exe $(LDFLAGS) $(SOLVER).o libwrflib.a $(LIB)
+	$(LD) -o $(SOLVER).exe $(LDFLAGS) $(SOLVER).o libwrflib.a $(WRF_LIB)
 
 $(SOLVER)_wrf : wrf.o
 	$(RANLIB) libwrflib.a
-	$(LD) -o wrf.exe $(LDFLAGS) wrf.o libwrflib.a $(LIB)
+	$(LD) -o wrf.exe $(LDFLAGS) wrf.o libwrflib.a $(WRF_LIB)
 
 $(SOLVER)_wrfplus : wrf.o
 	$(RANLIB) libwrflib.a
-	$(LD) -o wrfplus.exe $(LDFLAGS) wrf.o module_wrf_top.o libwrflib.a $(LIB)
+	$(LD) -o wrfplus.exe $(LDFLAGS) wrf.o module_wrf_top.o libwrflib.a $(WRF_LIB)
 
 $(SOLVER)_wrf_ESMFApp : wrf_ESMFMod.o wrf_ESMFApp.o wrf_SST_ESMF.o
 	$(RANLIB) libwrflib.a
-	$(LD) -o wrf_ESMFApp.exe $(LDFLAGS) wrf_ESMFApp.o wrf_ESMFMod.o libwrflib.a $(LIB)
-	$(LD) -o wrf_SST_ESMF.exe $(LDFLAGS) wrf_SST_ESMF.o wrf_ESMFMod.o libwrflib.a $(LIB)
+	$(LD) -o wrf_ESMFApp.exe $(LDFLAGS) wrf_ESMFApp.o wrf_ESMFMod.o libwrflib.a $(WRF_LIB)
+	$(LD) -o wrf_SST_ESMF.exe $(LDFLAGS) wrf_SST_ESMF.o wrf_ESMFMod.o libwrflib.a $(WRF_LIB)
 
 $(SOLVER)_ideal : module_initialize ideal.o
 	$(RANLIB) libwrflib.a
-	$(LD) -o ideal.exe $(LDFLAGS) ideal.o ../dyn_$(SOLVER)/module_initialize_$(IDEAL_CASE).o libwrflib.a $(LIB)
+	$(LD) -o ideal.exe $(LDFLAGS) ideal.o ../dyn_$(SOLVER)/module_initialize_$(IDEAL_CASE).o libwrflib.a $(WRF_LIB)
 
 $(SOLVER)_real : module_initialize real_$(SOLVER).o ndown_$(SOLVER).o nup_$(SOLVER).o
-	$(RANLIB) libwrflib.a
-	$(LD) -o real.exe $(LDFLAGS) real_$(SOLVER).o ../dyn_$(SOLVER)/module_initialize_$(IDEAL_CASE).o libwrflib.a $(LIB)
-	$(LD) -o ndown.exe $(LDFLAGS) ndown_$(SOLVER).o  ../dyn_$(SOLVER)/module_initialize_$(IDEAL_CASE).o libwrflib.a $(LIB)
-	$(LD) -o nup.exe $(LDFLAGS) nup_$(SOLVER).o  ../dyn_$(SOLVER)/module_initialize_$(IDEAL_CASE).o libwrflib.a $(LIB)
+	$(RANWRF_LIB) libwrflib.a
+	$(LD) -o real.exe $(LDFLAGS) real_$(SOLVER).o ../dyn_$(SOLVER)/module_initialize_$(IDEAL_CASE).o libwrflib.a $(WRF_LIB)
+	$(LD) -o ndown.exe $(LDFLAGS) ndown_$(SOLVER).o  ../dyn_$(SOLVER)/module_initialize_$(IDEAL_CASE).o libwrflib.a $(WRF_LIB)
+	$(LD) -o nup.exe $(LDFLAGS) nup_$(SOLVER).o  ../dyn_$(SOLVER)/module_initialize_$(IDEAL_CASE).o libwrflib.a $(WRF_LIB)
 
 convert_em : convert_em.o
-	$(RANLIB) libwrflib.a
-	$(LD) -o convert_em.exe $(LDFLAGS) convert_em.o libwrflib.a $(LIB)
+	$(RANWRF_LIB) libwrflib.a
+	$(LD) -o convert_em.exe $(LDFLAGS) convert_em.o libwrflib.a $(WRF_LIB)
 
 convert_nmm : convert_nmm.o
-	$(RANLIB) libwrflib.a
-	$(FC) -o convert_nmm.exe $(LDFLAGS) convert_nmm.o libwrflib.a $(LIB)
+	$(RANWRF_LIB) libwrflib.a
+	$(FC) -o convert_nmm.exe $(LDFLAGS) convert_nmm.o libwrflib.a $(WRF_LIB)
 
 real_nmm : real_nmm.o
 	( cd ../dyn_nmm ;  $(MAKE) module_initialize_real.o )
-	$(RANLIB) libwrflib.a
-	$(FC) -o real_nmm.exe $(LDFLAGS) real_nmm.o ../dyn_nmm/module_initialize_real.o ../share/module_optional_si_input.o ../share/input_wrf.o ../share/module_io_domain.o libwrflib.a $(LIB)
+	$(RANWRF_LIB) libwrflib.a
+	$(FC) -o real_nmm.exe $(LDFLAGS) real_nmm.o \
+          $(DYN_NMM)/module_initialize_real.o \
+          $(SHARE)/module_optional_si_input.o \
+          $(SHARE)/input_wrf.o \
+          $(SHARE)/module_io_domain.o libwrflib.a $(WRF_LIB)
 
 module_initialize :
 	( cd ../dyn_$(SOLVER) ;  $(MAKE) module_initialize_$(IDEAL_CASE).o )
 
 ## prevent real being compiled for OMP -- only for regtesting
 #$(SOLVER)_real : module_initialize real_$(SOLVER).o
-#	$(RANLIB) libwrflib.a
-#	if [ -z "$(OMP)" ] ; then $(FC) -o real.exe $(LDFLAGS) real_$(SOLVER).o ../dyn_$(SOLVER)/module_initialize_$(IDEAL_CASE).o libwrflib.a $(LIB) ; fi
+#	$(RANWRF_LIB) libwrflib.a
+#	if [ -z "$(OMP)" ] ; then $(FC) -o real.exe $(LDFLAGS) real_$(SOLVER).o ../dyn_$(SOLVER)/module_initialize_$(IDEAL_CASE).o libwrflib.a $(WRF_LIB) ; fi
 #
 ## prevent module_initialize being compiled for OMP --remove after IBM debugging
 #module_initialize :

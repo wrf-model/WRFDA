@@ -38,10 +38,6 @@ links :
 	@ $(LN) $(RSL)/RSL/*.c .
 	@ $(LN) $(RSL)/RSL/*.h .
 
-WRF_LIBS = libwrflib.a libwrfio_nf.a libio_grib1.a libesmf_time.a
-
-VAR_LIBS = ${WRF_LIBS} libwrfvar.a
-
 include ../dyn_$(SOLVER)/dyn_$(SOLVER).make
 include $(SHARE)/share.make
 include $(FRAME)/frame.make
