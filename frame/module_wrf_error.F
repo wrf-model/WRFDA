@@ -197,7 +197,7 @@ SUBROUTINE wrf_error_fatal3_strs( file_str, line, strs )
   IF ( line > 0 ) THEN
     CALL wrf_message( 'FATAL CALLED FROM FILE:  '//file_str//'  LINE:  '//TRIM(line_str) )
   ENDIF
-  CALL wrf_message(strs)
+  CALL wrf_message_strs(strs)
   CALL wrf_message( '-------------------------------------------' )
 #else
   CALL wrf_message2( '-------------- FATAL CALLED ---------------' )
@@ -205,7 +205,7 @@ SUBROUTINE wrf_error_fatal3_strs( file_str, line, strs )
   IF ( line > 0 ) THEN
     CALL wrf_message( 'FATAL CALLED FROM FILE:  '//file_str//'  LINE:  '//TRIM(line_str) )
   ENDIF
-  CALL wrf_message2( strs )
+  CALL wrf_message2_strs( strs )
   CALL wrf_message2( '-------------------------------------------' )
 #endif
   CALL wrf_abort
@@ -241,7 +241,7 @@ END SUBROUTINE wrf_error_fatal3
 
 SUBROUTINE wrf_warning3( file_str, line, str )
   IMPLICIT NONE
-  CHARACTER(LEN=*), INTENT(IN) file_str
+  CHARACTER(LEN=*), INTENT(IN) :: file_str
   INTEGER,          INTENT(IN) :: line
   CHARACTER(LEN=*), INTENT(IN) :: str
   CHARACTER*256 :: line_str
@@ -280,7 +280,7 @@ SUBROUTINE wrf_warning3_strs( file_str, line, strs )
   IF ( line > 0 ) THEN
     CALL wrf_message( 'WARNING FROM FILE:  '//file_str//'  LINE:  '//TRIM(line_str) )
   ENDIF
-  CALL wrf_message( strs )
+  CALL wrf_message_strs( strs )
   CALL wrf_message( '-------------------------------------------' )
 #else
   CALL wrf_message2( '-------------- WARNING ---------------' )
@@ -288,7 +288,7 @@ SUBROUTINE wrf_warning3_strs( file_str, line, strs )
   IF ( line > 0 ) THEN
     CALL wrf_message( 'WARNING FROM FILE:  '//file_str//'  LINE:  '//TRIM(line_str) )
   ENDIF
-  CALL wrf_message2(strs )
+  CALL wrf_message2_strs(strs )
   CALL wrf_message2( '-------------------------------------------' )
 #endif
 END SUBROUTINE wrf_warning3_strs
