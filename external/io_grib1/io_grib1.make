@@ -11,7 +11,7 @@ wgrib :
 	$(LN) ../external/io_grib1/WGRIB/wgrib .
 
 libio_grib1.a:	$(IO_GRIB1_OBJS)
-	$(AR) cruv ../external/io_grib1/libio_grib1.a $(IO_GRIB1_OBJS)
+	$(AR) ../external/io_grib1/libio_grib1.a $(IO_GRIB1_OBJS)
 	( cd ../external/io_grib1/MEL_grib1;  $(MAKE) CC="$(CC) $(CCFLAGS)" archive )
 	( cd ../external/io_grib1/grib1_util; $(MAKE) CC="$(CC) $(CCFLAGS)" archive )
 	$(RANLIB) ../external/io_grib1/libio_grib1.a

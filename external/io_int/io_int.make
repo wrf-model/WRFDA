@@ -7,7 +7,7 @@ IO_INT_M4   = -Uinclude -Uindex -Ulen
 
 libwrfio_int.a:		$(OBJS)
 			$(RM) libwrfio_int.a
-			$(AR) cr libwrfio_int.a $(IO_INT_OBJS)
+			$(AR) libwrfio_int.a $(IO_INT_OBJS)
 			$(RANLIB) libwrfio_int.a
 
 io_int.o:       io_int.F90 module_internal_header_util.o

@@ -5,7 +5,7 @@ ESMF_TIME_F90_OBJS = ESMF_Alarm.o ESMF_BaseTime.o ESMF_Clock.o ESMF_Time.o \
 	module_utility.o ESMF_AlarmClock.o
 
 libesmf_time.a : $(ESMF_TIME_F90_OBJS)
-	$(AR) ru libesmf_time.a $(ESMF_TIME_F90_OBJS)
+	$(AR) libesmf_time.a $(ESMF_TIME_F90_OBJS)
 	$(RANLIB) libesmf_time.a
 
 Test1 : Test1.F90 libesmf_time.a

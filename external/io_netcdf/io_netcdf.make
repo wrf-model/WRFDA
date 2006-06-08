@@ -8,7 +8,7 @@ IO_NETCDF_M4FLAGS = -Uinclude -Uindex -Ulen
 
 libwrfio_nf.a:		$(IO_NETCDF_OBJS) $(IO_NETCDF_CODE)
 			$(RM) libwrfio_nf.a
-			$(AR) cr libwrfio_nf.a $(IO_NETCDF_OBJS)
+			$(AR) libwrfio_nf.a $(IO_NETCDF_OBJS)
 			$(RANLIB) libwrfio_nf.a
 
 wrf_io.o:               wrf_io.F90 $(IO_NETCDF_CODE)
