@@ -1,6 +1,6 @@
 include ../configure.wrf
 
-MODULES =       module_internal_header.o   \
+MODULES =       module_internal_header_util.o   \
                 module_driver_constants.o  \
                 module_domain.o            \
                 module_domain1.o           \
