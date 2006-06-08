@@ -20,8 +20,7 @@ FRAME_MODULES =  module_internal_header_util.o \
                 module_quilt_outbuf_ops.o  \
                 module_io_quilt.o
 
-FRAME_OBJS    = pack_utils.o \
-                wrf_num_bytes_between.o    \
+FRAME_OBJS    = wrf_num_bytes_between.o    \
                 wrf_shutdown.o             \
                 libmassv.o                 \
                 collect_on_comm.o

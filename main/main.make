@@ -2,13 +2,13 @@
 
 var : wrfvar
 
-wrfvar : arch links liblapack.a libblas.a libbufr.a libfftpack5.a wrfvar.o libwrfvar.a
-	$(LD) -o wrfvar.exe $(LDFLAGS) wrfvar.o -lwrfvar $(VAR_LIB)
+wrfvar : arch links wrfvar.o pack_utils.o liblapack.a libblas.a libbufr.a libfftpack5.a libwrfvar.a
+	$(LD) -o wrfvar.exe $(LDFLAGS) wrfvar.o pack_utils.o -lwrfvar $(VAR_LIB)
 
-wrf : arch links wrf.o libwrflib.a libwrfio_nf.a libio_grib1.a libesmf_time.a
+wrf : arch links wrf.o  pack_utils.o libwrflib.a libwrfio_nf.a libio_grib1.a libesmf_time.a
 	$(LD) -o wrf.exe $(LDFLAGS) wrf.o $(WRF_LIB)
 
-wrfplus : arch links wrf.o libwrflib.a libwrfio_nf.a libio_grib1.a libesmf_time.a
+wrfplus : arch links wrf.o pack_utils.o libwrflib.a libwrfio_nf.a libio_grib1.a libesmf_time.a
 	$(LD) -o wrfplus.exe $(LDFLAGS) wrf.o $(WRF_LIB)
 
 kma2netcdf :  arch $(LIBS) $(CONVERTOR_MODULES) $(CONVERTOR_OBJS) kma2netcdf.o
