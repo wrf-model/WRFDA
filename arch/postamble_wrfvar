@@ -8,7 +8,7 @@ VAR_LIB		  = $(NETCDF_LIB) $(RTTOV_LIB) $(MPI_LIB) $(LOCAL_LIB) \
                       $(LAPACK_LIB) $(BLAS_LIB) $(BUFR_LIB) \
                       $(FFTPACK5_LIB) $(EXTRA_LIBS)
 
-WRF_LIB		  = $(NETCDF_LIB) $(MPI_LIB) $(LOCAL_LIB) $(IO_INT_LIB) \  
+WRF_LIB		  = $(NETCDF_LIB) $(MPI_LIB) $(LOCAL_LIB) $(IO_INT_LIB) \
                       $(IO_GRIB_LIB) $(ESMF_TIME_LIB) $(EXTRA_LIBS)
 
 GEN_BE_LIB        = $(NETCDF_LIB) $(EXTRA_LIBS)
