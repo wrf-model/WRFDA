@@ -1,3 +1,4 @@
+!
 ! Earth System Modeling Framework
 ! Copyright 2002-2003, University Corporation for Atmospheric Research,
 ! Massachusetts Institute of Technology, Geophysical Fluid Dynamics
@@ -13,7 +14,7 @@
 !
 !==============================================================================
 !
-! This file contains the AlarmCreae method.
+! This file contains the AlarmCreate method.
 !
 !------------------------------------------------------------------------------
 ! INCLUDES

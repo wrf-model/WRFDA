@@ -1,6 +1,6 @@
 include configure.wrf
 
-links : 
+links :
 	@ $(LN) ../*/*.make .
 	@ $(LN) ../*/*.f90 .
 	@ $(LN) ../*/*.inc .
@@ -37,6 +37,7 @@ links :
 	@ $(LN) $(RSL)/RSL/*.c .
 	@ $(LN) $(RSL)/RSL/*.h .
 	@ $(LN) $(FRAME)/collect_on_comm.c .
+	@ touch links
 
 include ../dyn_$(SOLVER)/dyn_$(SOLVER).make
 include $(SHARE)/share.make

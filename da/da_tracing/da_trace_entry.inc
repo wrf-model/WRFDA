@@ -63,7 +63,7 @@ SUBROUTINE da_trace_entry( &
          END DO
       END IF
       IF (.NOT. TraceActive) THEN
-         ! didn't want to start trace, so leave
+         ! did not want to start trace, so leave
          RETURN
       END IF
    END IF

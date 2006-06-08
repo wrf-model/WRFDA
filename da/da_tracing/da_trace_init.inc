@@ -78,7 +78,7 @@ SUBROUTINE da_trace_init
 
    CALL CPU_TIME(BaseCPUTime)
 
-   ! start trace output here so memory calculations aren't distorted
+   ! start trace output here so memory calculations are not distorted
    ! by IO buffer being grabbed later
 
    TraceDepth = 0
