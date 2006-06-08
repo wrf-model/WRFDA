@@ -23,7 +23,6 @@ links :
 	@ $(LN) $(EXTERNAL)/*/*sh ..
 	@ $(LN) $(INC)/version_decl .
 	@ $(LN) $(FRAME)/md_calls.m4 .
-	@ $(LN) $(FRAME)/collect_on_comm.c .
 	@ $(LN) $(SHARE)/*.int .
 	@ $(LN) $(BUFR_NCEP_NCO)/bufrlib.param .
 	@ $(LN) $(IO_NETCDF)/*.code .
@@ -37,6 +36,7 @@ links :
 	@ $(LN) $(RSL)/*.c .
 	@ $(LN) $(RSL)/RSL/*.c .
 	@ $(LN) $(RSL)/RSL/*.h .
+	@ $(LN) $(FRAME)/collect_on_comm.c .
 
 include ../dyn_$(SOLVER)/dyn_$(SOLVER).make
 include $(SHARE)/share.make
