@@ -1,6 +1,6 @@
 SUBROUTINE da_transfer_wrftoxb( xbx, grid, &
 !
-#include <em_dummy_args.inc>
+#include "em_dummy_args.inc"
 !
                               )
 
@@ -26,7 +26,7 @@ SUBROUTINE da_transfer_wrftoxb( xbx, grid, &
 
 !  Definitions of dummy arguments to solve
 
-#include <em_dummy_decl.inc>
+#include "em_dummy_decl.inc"
 
 !---------------------------------------------------------------------------
 

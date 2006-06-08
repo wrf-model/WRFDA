@@ -26,7 +26,7 @@ MODULE da_par_util1
 
    CONTAINS
 
-#include <da_proc_sum_int.inc>
-#include <da_proc_sum_real.inc>
+#include "da_proc_sum_int.inc"
+#include "da_proc_sum_real.inc"
 
 END MODULE da_par_util1

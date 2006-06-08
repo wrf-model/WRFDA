@@ -64,7 +64,7 @@ SUBROUTINE da_wrfvar_init( no_init1 )
 #define SOURCE_RECORD model_config_rec%
 #define DEST_RECORD
 
-#include <config_assigns.inc>
+#include "config_assigns.inc"
 
   IF (trace_use) CALL da_trace_init
   IF (trace_use) CALL da_trace_entry("da_wrfvar_init")

@@ -28,15 +28,15 @@ MODULE da_pseudo
 
 CONTAINS
 
-#include <da_cal_jo_and_grady_pseudo.inc>
-#include <da_calculate_residual_pseudo.inc>
-#include <da_get_innov_vector_pseudo.inc>
-#include <da_oa_stats_pseudo.inc>
-#include <da_ob_stats_pseudo.inc>
-#include <da_print_stats_pseudo.inc>
-#include <da_transform_xtoy_pseudo.inc>
-#include <da_transform_xtoy_pseudo_adj.inc>
-#include <da_calculate_grady_pseudo.inc>
+#include "da_cal_jo_and_grady_pseudo.inc"
+#include "da_calculate_residual_pseudo.inc"
+#include "da_get_innov_vector_pseudo.inc"
+#include "da_oa_stats_pseudo.inc"
+#include "da_ob_stats_pseudo.inc"
+#include "da_print_stats_pseudo.inc"
+#include "da_transform_xtoy_pseudo.inc"
+#include "da_transform_xtoy_pseudo_adj.inc"
+#include "da_calculate_grady_pseudo.inc"
 
 END MODULE da_pseudo
 

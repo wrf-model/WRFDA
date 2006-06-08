@@ -1,4 +1,4 @@
-subroutine DA_Transform_VToY_Adj( cv_size, be, ep, cv, iv, vp, vv, xa, xb, xbx, xp, y, &
+subroutine da_transform_vtoy_adj( cv_size, be, ep, cv, iv, vp, vv, xa, xb, xbx, xp, y, &
                                   ids, ide, jds, jde, kds, kde,     &
                                   ims, ime, jms, jme, kms, kme,     &
                                   its, ite, jts, jte, kts, kte,     &
@@ -40,24 +40,24 @@ subroutine DA_Transform_VToY_Adj( cv_size, be, ep, cv, iv, vp, vv, xa, xb, xbx, 
 
          do nobwin=num_fgat_time,1,-1
             iv%current_ob_time = nobwin
-            call DA_zero_x(xa)
+            call da_zero_x(xa)
             call da_transform_xtoy_adj( xb, iv, xp, y, xa )
             write(UNIT=filnam,FMT='(a2,i2.2)') 'af',nobwin-1
             write(unit=stdout, fmt='(2a,2x,a,i6)') 'file:', __FILE__, 'line:', __LINE__
 
-            call DA_Transfer_WRFTLtoXa_Adj( grid, config_flags, filnam, &
-#include <em_actual_args.inc>
+            call da_transfer_wrftltoxa_adj( grid, config_flags, filnam, &
+#include "em_actual_args.inc"
                                  )
          enddo
 
          call system("runvar4dad.bsh")
          filnam = 'gr00'
-         call DA_Transfer_XatoWRFTL_Adj( grid, config_flags, filnam, &
-#include <em_actual_args.inc>
+         call da_transfer_xatowrftl_adj( grid, config_flags, filnam, &
+#include "em_actual_args.inc"
                                  )
       else  ! lvar4d
 
-         call DA_zero_x(xa)
+         call da_zero_x(xa)
          call da_transform_xtoy_adj( xb, iv, xp, y, xa )
 
       endif ! lvar4d
@@ -69,5 +69,5 @@ subroutine DA_Transform_VToY_Adj( cv_size, be, ep, cv, iv, vp, vv, xa, xb, xbx, 
                                   ims, ime, jms, jme, kms, kme,       &
                                   its, ite, jts, jte, kts, kte )
 
-end subroutine DA_Transform_VToY_Adj
+end subroutine da_transform_vtoy_adj
 

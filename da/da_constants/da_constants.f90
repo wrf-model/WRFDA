@@ -14,7 +14,7 @@ module da_constants
 
    IMPLICIT NONE
 
-#include <namelist_defines.inc>
+#include "namelist_defines.inc"
 
 !------------------------------------------------------------------------------
 !  [1.0] Physical parameter constants (all NIST standard values):

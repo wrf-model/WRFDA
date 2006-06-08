@@ -1,5 +1,5 @@
-subroutine DA_Transfer_XatoAnalysis( it, xbx, grid, config_flags ,&
-#include <em_dummy_args.inc>
+subroutine da_transfer_xatoanalysis( it, xbx, grid, config_flags ,&
+#include "em_dummy_args.inc"
                            )
 
 !------------------------------------------------------------------------------
@@ -24,7 +24,7 @@ subroutine DA_Transfer_XatoAnalysis( it, xbx, grid, config_flags ,&
    TYPE (grid_config_rec_type), intent(inout) :: config_flags
 
 !--Definitions of dummy arguments
-#include <em_dummy_decl.inc>
+#include "em_dummy_decl.inc"
 
    character*4 filnam
 
@@ -38,14 +38,14 @@ subroutine DA_Transfer_XatoAnalysis( it, xbx, grid, config_flags ,&
 #ifdef VAR4DPOSS
       if (write_increments) then
          write(UNIT=filnam,FMT='(a3,i1)') 'inc',it
-         call DA_Transfer_XatoWRFTL( grid, config_flags, filnam, &
-#include <em_dummy_args.inc>
+         call da_transfer_xatowrftl( grid, config_flags, filnam, &
+#include "em_dummy_args.inc"
                                  )
       endif
 #endif
 
-      call DA_Transfer_XatoWRF( xbx, grid, &
-#include <em_dummy_args.inc>
+      call da_transfer_xatowrf( xbx, grid, &
+#include "em_dummy_args.inc"
                            )
 
       if(it < max_ext_its) then
@@ -53,8 +53,8 @@ subroutine DA_Transfer_XatoAnalysis( it, xbx, grid, config_flags ,&
             CALL da_med_initialdata_output( grid , config_flags )
          endif
 
-         call DA_Transfer_WRFToXb( xbx, grid, &
-#include <em_dummy_args.inc>
+         call da_transfer_wrftoxb( xbx, grid, &
+#include "em_dummy_args.inc"
                           )
       endif
    else if(fg_format == 2) then
@@ -62,12 +62,12 @@ subroutine DA_Transfer_XatoAnalysis( it, xbx, grid, config_flags ,&
          call da_add_increments(it, xp, xa, xb, xbx)
       endif
    else if(fg_format == 3) then
-      call DA_Transfer_XatoKMA( xbx, grid, &
-#include <em_dummy_args.inc>
+      call da_transfer_xatokma( xbx, grid, &
+#include "em_dummy_args.inc"
                            )
       if(it < max_ext_its) then
-         CALL DA_Transfer_KMAToXb( xbx, grid, &
-#include <em_dummy_args.inc>
+         CALL da_transfer_kmatoxb( xbx, grid, &
+#include "em_dummy_args.inc"
                            )
       end if
    end if
@@ -75,5 +75,5 @@ subroutine DA_Transfer_XatoAnalysis( it, xbx, grid, config_flags ,&
    IF (trace_use) CALL da_trace_exit("da_transfer_xatoanalysis")
 
 
-end subroutine DA_Transfer_XatoAnalysis
+end subroutine da_transfer_xatoanalysis
 

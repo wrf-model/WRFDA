@@ -57,7 +57,7 @@ SUBROUTINE da_init_wrfvar( grid, xp, xb, &
 
 #ifdef DM_PARALLEL
 #define REGISTER_I1
-#include <em_data_calls.inc>
+#include "em_data_calls.inc"
 ! XPOSE_V1
   IF ( grid%comms( XPOSE_V1 ) == invalid_message_value ) THEN
     CALL wrf_debug ( 50 , 'setting up xpose XPOSE_V1' )
@@ -102,20 +102,20 @@ SUBROUTINE da_init_wrfvar( grid, xp, xb, &
 !ij xa%u             x
 !ij xa%v             x
 !--------------------------------------------------------------
-#include <HALO_INIT.inc>
-#include <HALO_PSICHI_UV.inc>
-#include <HALO_BAL_EQN_ADJ.inc>
-#include <HALO_PSICHI_UV_ADJ.inc>
-#include <HALO_XA.inc>
-#include <HALO_XB.inc>
-#include <HALO_SFC_XA.inc>
-#include <HALO_SFC_XB.inc>
-#include <HALO_SSMI_XA.inc>
-#include <HALO_SSMI_XB.inc>
-#include <HALO_RADAR_XB.inc>
-#include <HALO_RADAR_XB.inc>
-#include <HALO_2D_WORK.inc>
-#include <HALO_RADAR_XA_W.inc>
+#include "HALO_INIT.inc"
+#include "HALO_PSICHI_UV.inc"
+#include "HALO_BAL_EQN_ADJ.inc"
+#include "HALO_PSICHI_UV_ADJ.inc"
+#include "HALO_XA.inc"
+#include "HALO_XB.inc"
+#include "HALO_SFC_XA.inc"
+#include "HALO_SFC_XB.inc"
+#include "HALO_SSMI_XA.inc"
+#include "HALO_SSMI_XB.inc"
+#include "HALO_RADAR_XB.inc"
+#include "HALO_RADAR_XB.inc"
+#include "HALO_2D_WORK.inc"
+#include "HALO_RADAR_XA_W.inc"
 
 ! Copy domain and transpose descriptors.
 

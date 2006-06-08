@@ -57,17 +57,17 @@
 
       contains
       
-#include <da_calculate_j.inc>
-#include <da_calculate_jo_and_grady.inc>
-#include <da_calculate_residual.inc>
-#include <da_get_var_diagnostics.inc>
-#include <da_get_innov_vector.inc>
-#include <da_minimisation_warning.inc>
-#include <da_sum_reals.inc>
-#include <da_dot.inc>
-#include <da_dot_cv.inc>
-#include <da_write_diagnostics.inc>
-#include <da_minimise_cg.inc>
+#include "da_calculate_j.inc"
+#include "da_calculate_jo_and_grady.inc"
+#include "da_calculate_residual.inc"
+#include "da_get_var_diagnostics.inc"
+#include "da_get_innov_vector.inc"
+#include "da_minimisation_warning.inc"
+#include "da_sum_reals.inc"
+#include "da_dot.inc"
+#include "da_dot_cv.inc"
+#include "da_write_diagnostics.inc"
+#include "da_minimise_cg.inc"
 #include "da_calculate_grady.inc"
 #include "da_transform_vtoy.inc"
 #include "da_transform_vtoy_adj.inc"

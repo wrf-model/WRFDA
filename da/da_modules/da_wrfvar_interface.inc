@@ -5,7 +5,7 @@ SUBROUTINE da_wrfvar_interface ( grid, config_flags )
 #ifndef DEREF_KLUDGE
    INTERFACE
       SUBROUTINE solve_v3d ( grid , config_flags , &
-#include <em_dummy_args.inc>
+#include "em_dummy_args.inc"
       )
 
       ! Driver layer modules
@@ -32,7 +32,7 @@ SUBROUTINE da_wrfvar_interface ( grid, config_flags )
       TYPE(domain),                INTENT(INOUT) :: grid
       TYPE (grid_config_rec_type), INTENT(INOUT) :: config_flags
 
-#include <em_dummy_decl.inc>
+#include "em_dummy_decl.inc"
 
       END SUBROUTINE solve_v3d
    END INTERFACE

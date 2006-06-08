@@ -1,8 +1,8 @@
 MODULE da_tracing
 
-   USE DA_Constants
-   USE module_wrf_error
-   USE da_par_util1
+   use da_constants
+   use module_wrf_error
+   use da_par_util1
 
 
    INTEGER, PARAMETER :: TraceIndentAmount      = 2   ! default indent
@@ -55,13 +55,13 @@ MODULE da_tracing
 
 CONTAINS
 
-#include <da_trace_init.inc>
-#include <da_trace_entry.inc>
-#include <da_trace.inc>
-#include <da_trace_exit.inc>
-#include <da_trace_int_sort.inc>
-#include <da_trace_real_sort.inc>
-#include <da_trace_report.inc>
+#include "da_trace_init.inc"
+#include "da_trace_entry.inc"
+#include "da_trace.inc"
+#include "da_trace_exit.inc"
+#include "da_trace_int_sort.inc"
+#include "da_trace_real_sort.inc"
+#include "da_trace_report.inc"
 
 
 END module da_tracing

@@ -1,5 +1,5 @@
-SUBROUTINE DA_Transfer_XatoWRFTL( grid, config_flags, filnam, &
-#include <em_dummy_args.inc>
+SUBROUTINE da_transfer_xatowrftl( grid, config_flags, filnam, &
+#include "em_dummy_args.inc"
                               )
 
    !---------------------------------------------------------------------------
@@ -16,7 +16,7 @@ SUBROUTINE DA_Transfer_XatoWRFTL( grid, config_flags, filnam, &
 
 !  Definitions of dummy arguments to solve
 
-#include <em_dummy_decl.inc>
+#include "em_dummy_decl.inc"
 
    integer :: i, j, k, n
    integer :: is, ie, js, je, ks, ke
@@ -261,5 +261,5 @@ SUBROUTINE DA_Transfer_XatoWRFTL( grid, config_flags, filnam, &
 
    IF (trace_use) CALL da_trace_exit("da_transfer_xatowrftl")
 
-END SUBROUTINE DA_Transfer_XatoWRFTL
+END SUBROUTINE da_transfer_xatowrftl
 

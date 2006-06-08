@@ -2,7 +2,7 @@
 !
 
 SUBROUTINE solve_v3d ( grid , config_flags , &
-#include <em_dummy_args.inc>
+#include "em_dummy_args.inc"
                  )
 
 
@@ -33,14 +33,14 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
    IMPLICIT NONE
 
 #ifdef DM_PARALLEL 
-!   INCLUDE 'mpif.h'
+#include <mpif.h>
 #endif
 
    TYPE(domain),                intent(inout) :: grid
    TYPE (grid_config_rec_type), intent(inout) :: config_flags
 
    !  Definitions of dummy arguments to solve
-#include <em_dummy_decl.inc>
+#include "em_dummy_decl.inc"
 
    TYPE (xbx_type)              :: xbx         ! For header & non-grid arrays.
    TYPE (be_type)               :: be          ! Background error structure.
@@ -229,21 +229,21 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
 !  [3.0] Set up first guess field (xb):
 !------------------------------------------------------------------------------
 
-   CALL DA_Setup_FirstGuess( xbx, grid, &
-#include <em_dummy_args.inc>
+   CALL da_setup_firstguess( xbx, grid, &
+#include "em_dummy_args.inc"
                            )
 
 !------------------------------------------------------------------------------
 !  [4.0] Set up observations (ob):
 !------------------------------------------------------------------------------
 
-   call DA_Setup_Obs_Structures( xp, ob, iv )
+   call da_setup_obs_structures( xp, ob, iv )
 
 !------------------------------------------------------------------------------
 !  [5.0] Set up background errors (be):
 !------------------------------------------------------------------------------
 
-   call DA_Setup_Background_Errors( xb, xbx, be, xp, &
+   call da_setup_background_errors( xb, xbx, be, xp, &
                                     its, ite, jts, jte, kts, kte, &
                                     ids, ide, jds, jde, kds, kde )
    cv_size = be % cv % size
@@ -270,7 +270,7 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
    if ( test_transforms .or. Testing_WRFVAR ) then
       CALL da_get_innov_vector( it, ob, iv, &
                                 grid , config_flags , &
-#include <em_dummy_args.inc>
+#include "em_dummy_args.inc"
                  )
 
 
@@ -310,7 +310,7 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
 
       CALL da_get_innov_vector( it, ob, iv, &
                                 grid , config_flags , &
-#include <em_dummy_args.inc>
+#include "em_dummy_args.inc"
                  )
 
 
@@ -342,7 +342,7 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
       call da_allocate_y( iv, re )
       call da_allocate_y( iv, y )
 
-      CALL DA_Minimise_CG( grid, config_flags,                  &
+      CALL da_minimise_cg( grid, config_flags,                  &
                            it, be % cv % size, & 
                            ob, xb, xbx, be, ep, iv, &
                            j_grad_norm_target, xhat, cvt, &
@@ -369,7 +369,7 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
 
      if (W_INCREMENTS .and. .not.use_RadarObs) then
 
-         CALL DA_UVPRho_To_W_Lin( xb, xa, xp,                 &
+         CALL da_uvprho_to_w_lin( xb, xa, xp,                 &
                                   ids,ide, jds,jde, kds,kde,  &
                                   ims,ime, jms,jme, kms,kme,  &
                                   its,ite, jts,jte, kts, kte )
@@ -380,14 +380,14 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
 
 !     [8.7] Write out diagnostics
 
-      CALL DA_Write_Diagnostics( ob, iv, re, y, xp, xa, j )
+      CALL da_write_diagnostics( ob, iv, re, y, xp, xa, j )
 
 !------------------------------------------------------------------------------
 !  [8.0] Output WRFVAR analysis and analysis increments:
 !------------------------------------------------------------------------------
 
-      call DA_Transfer_XatoAnalysis( it, xbx, grid, config_flags ,&
-#include <em_dummy_args.inc>
+      call da_transfer_xatoanalysis( it, xbx, grid, config_flags ,&
+#include "em_dummy_args.inc"
                            )
    END DO
 

@@ -1,6 +1,6 @@
 SUBROUTINE da_transfer_kmatoxb( xbx, grid, &
 !
-#include <em_dummy_args.inc>
+#include "em_dummy_args.inc"
 !
                               )
 
@@ -16,7 +16,7 @@ SUBROUTINE da_transfer_kmatoxb( xbx, grid, &
 
 !  Definitions of dummy arguments to solve
 
-#include <em_dummy_decl.inc>
+#include "em_dummy_decl.inc"
 
 !---------------------------------------------------------------------------
    integer :: i, j, k, n

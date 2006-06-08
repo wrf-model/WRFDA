@@ -36,31 +36,31 @@ MODULE da_par_util
 
    CONTAINS
 
-#include <da_cv_to_vv.inc>
-#include <da_vv_to_cv.inc>
-#include <da_alloc_and_copy_be_arrays.inc>
-#include <da_be_local_copy.inc>
-#include <da_copy_dims.inc>
-#include <da_copy_tile_dims.inc>
-#include <da_pack_count_obs.inc>
-#include <da_unpack_count_obs.inc>
-#include <da_transpose.inc>
-#include <da_cv_to_global.inc>
-#include <da_generic_methods.inc>
-#include <da_specific_methods.inc>
-#include <da_generic_boilerplate.inc>
-#include <da_y_facade_to_global.inc>
+#include "da_cv_to_vv.inc"
+#include "da_vv_to_cv.inc"
+#include "da_alloc_and_copy_be_arrays.inc"
+#include "da_be_local_copy.inc"
+#include "da_copy_dims.inc"
+#include "da_copy_tile_dims.inc"
+#include "da_pack_count_obs.inc"
+#include "da_unpack_count_obs.inc"
+#include "da_transpose.inc"
+#include "da_cv_to_global.inc"
+#include "da_generic_methods.inc"
+#include "da_specific_methods.inc"
+#include "da_generic_boilerplate.inc"
+#include "da_y_facade_to_global.inc"
 
 #ifdef DM_PARALLEL
 
-#include <da_local_to_global.inc>
-#include <da_proc_sum_count_obs.inc>
-#include <da_proc_stats_combine.inc>
-#include <da_proc_maxmin_combine.inc>
+#include "da_local_to_global.inc"
+#include "da_proc_sum_count_obs.inc"
+#include "da_proc_stats_combine.inc"
+#include "da_proc_maxmin_combine.inc"
 
 #else
 
-#include <da_wrf_dm_interface.inc>
+#include "da_wrf_dm_interface.inc"
 
 #endif
 

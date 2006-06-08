@@ -1,5 +1,5 @@
-SUBROUTINE DA_Transfer_WRFTLtoXa_Adj( grid, config_flags, filnam, &
-#include <em_dummy_args.inc>
+SUBROUTINE da_transfer_wrftltoxa_adj( grid, config_flags, filnam, &
+#include "em_dummy_args.inc"
                               )
 
    !---------------------------------------------------------------------------
@@ -16,7 +16,7 @@ SUBROUTINE DA_Transfer_WRFTLtoXa_Adj( grid, config_flags, filnam, &
 
 !  Definitions of dummy arguments to solve
 
-#include <em_dummy_decl.inc>
+#include "em_dummy_decl.inc"
 
    integer :: i, j, k, n, ndynopt
    integer :: is, ie, js, je, ks, ke
@@ -234,5 +234,5 @@ SUBROUTINE DA_Transfer_WRFTLtoXa_Adj( grid, config_flags, filnam, &
 IF (trace_use) CALL da_trace_exit("da_transfer_wrftltoxa_adj")
 
 
-END SUBROUTINE DA_Transfer_WRFTLtoXa_Adj
+END SUBROUTINE da_transfer_wrftltoxa_adj
 

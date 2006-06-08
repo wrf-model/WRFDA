@@ -1,6 +1,6 @@
-SUBROUTINE DA_Transfer_XatoWRF( xbx, grid, &
+SUBROUTINE da_transfer_xatowrf( xbx, grid, &
 !
-#include <em_dummy_args.inc>
+#include "em_dummy_args.inc"
 !
                               )
 
@@ -23,7 +23,7 @@ SUBROUTINE DA_Transfer_XatoWRF( xbx, grid, &
 
 !  Definitions of dummy arguments to solve
 
-#include <em_dummy_decl.inc>
+#include "em_dummy_decl.inc"
 
 !---------------------------------------------------------------------------
 
@@ -239,7 +239,7 @@ SUBROUTINE DA_Transfer_XatoWRF( xbx, grid, &
 
       WRITE(UNIT=stdout,FMT='(/"WRITE OUT INCREMENT FOR PLOTTING......")')
 
-      call DA_Write_Increment ( xp, xb, xa, q_cgrid, mu_cgrid, ph_cgrid )
+      call da_write_increment ( xp, xb, xa, q_cgrid, mu_cgrid, ph_cgrid )
 
    endif
 ! ----------------------------------------------------------------------------
@@ -423,5 +423,5 @@ SUBROUTINE DA_Transfer_XatoWRF( xbx, grid, &
    IF (trace_use) CALL da_trace_exit("da_transfer_xatowrf")
 
 
-END SUBROUTINE DA_Transfer_XatoWRF
+END SUBROUTINE da_transfer_xatowrf
 

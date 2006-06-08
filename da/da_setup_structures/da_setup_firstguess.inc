@@ -1,6 +1,6 @@
-SUBROUTINE DA_Setup_FirstGuess( xbx, grid, &
+SUBROUTINE da_setup_firstguess( xbx, grid, &
 !
-#include <em_dummy_args.inc>
+#include "em_dummy_args.inc"
 !
                               )
 
@@ -26,7 +26,7 @@ SUBROUTINE DA_Setup_FirstGuess( xbx, grid, &
    TYPE(domain) , TARGET        :: grid
 
 !  Definitions of dummy arguments to solve
-#include <em_dummy_decl.inc>
+#include "em_dummy_decl.inc"
    integer :: is, ie, js, je
    real    :: ddx , ddy    
 
@@ -55,7 +55,7 @@ SUBROUTINE DA_Setup_FirstGuess( xbx, grid, &
 
      call da_setup_firstguess_wrf( xbx, grid, &
 !
-#include <em_dummy_args.inc>
+#include "em_dummy_args.inc"
 !
                                  )
    else if ( fg_format == 3 ) then
@@ -64,7 +64,7 @@ SUBROUTINE DA_Setup_FirstGuess( xbx, grid, &
 
      call da_setup_firstguess_kma( xbx, grid, &
 !
-#include <em_dummy_args.inc>
+#include "em_dummy_args.inc"
 !
                                  )
    end if
@@ -110,10 +110,10 @@ SUBROUTINE DA_Setup_FirstGuess( xbx, grid, &
 
 !  [2.1] Set up fast Fourier & Legendre transform constants:
 
-   CALL DA_Setup_RunConstants( xp, xb, xbx)
+   CALL da_setup_runconstants( xp, xb, xbx)
 
    IF (trace_use) CALL da_trace_exit("da_setup_firstguess")
 
 
-END SUBROUTINE DA_Setup_FirstGuess
+END SUBROUTINE da_setup_firstguess
 

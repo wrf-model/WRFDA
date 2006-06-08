@@ -1,6 +1,6 @@
-SUBROUTINE DA_Transfer_XatoKMA( xbx, grid, &
+SUBROUTINE da_transfer_xatokma( xbx, grid, &
 !
-#include <em_dummy_args.inc>
+#include "em_dummy_args.inc"
 !
                               )
 !------------------------------------------------------------------------------
@@ -19,7 +19,7 @@ SUBROUTINE DA_Transfer_XatoKMA( xbx, grid, &
 
 !  Definitions of dummy arguments to solve
 
-#include <em_dummy_decl.inc>
+#include "em_dummy_decl.inc"
 
 !---------------------------------------------------------------------------
    integer :: i, j, k, n
@@ -93,4 +93,4 @@ SUBROUTINE DA_Transfer_XatoKMA( xbx, grid, &
    IF (trace_use) CALL da_trace_exit("da_transfer_xatokma")
 
 
-END SUBROUTINE DA_Transfer_XatoKMA
+END SUBROUTINE da_transfer_xatokma

@@ -1,6 +1,6 @@
-SUBROUTINE DA_Setup_FirstGuess_WRF( xbx, grid, &
+SUBROUTINE da_setup_firstguess_wrf( xbx, grid, &
 !
-#include <em_dummy_args.inc>
+#include "em_dummy_args.inc"
 !
                               )
 
@@ -21,7 +21,7 @@ SUBROUTINE DA_Setup_FirstGuess_WRF( xbx, grid, &
    TYPE(domain) , TARGET               :: grid
 
 !  Definitions of dummy arguments to solve
-#include <em_dummy_decl.inc>
+#include "em_dummy_decl.inc"
 !---------------------------------------------------------------------------
 
    INTEGER           :: ier    ! error index
@@ -245,12 +245,12 @@ SUBROUTINE DA_Setup_FirstGuess_WRF( xbx, grid, &
    
    CALL da_transfer_wrftoxb( xbx, grid, &
  
-#include <em_dummy_args.inc>
+#include "em_dummy_args.inc"
 
                            )
 
    IF (trace_use) CALL da_trace_exit("da_setup_firstguess_wrf")
 
 
-END SUBROUTINE DA_Setup_FirstGuess_WRF
+END SUBROUTINE da_setup_firstguess_wrf
 

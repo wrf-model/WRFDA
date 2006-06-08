@@ -1,5 +1,5 @@
-SUBROUTINE DA_Transfer_WRFTLtoXa( grid, config_flags, filnam, &
-#include <em_dummy_args.inc>
+SUBROUTINE da_transfer_wrftltoxa( grid, config_flags, filnam, &
+#include "em_dummy_args.inc"
                               )
 
    !---------------------------------------------------------------------------
@@ -16,7 +16,7 @@ SUBROUTINE DA_Transfer_WRFTLtoXa( grid, config_flags, filnam, &
 
 !  Definitions of dummy arguments to solve
 
-#include <em_dummy_decl.inc>
+#include "em_dummy_decl.inc:
 
 !  Local variables
 
@@ -179,5 +179,5 @@ IF (trace_use) CALL da_trace_entry("da_transfer_wrftltoxa")
 
 IF (trace_use) CALL da_trace_exit("da_transfer_wrftltoxa")
 
-END SUBROUTINE DA_Transfer_WRFTLtoXa
+END SUBROUTINE da_transfer_wrftltoxa
 
