@@ -184,7 +184,7 @@ SUBROUTINE wrf_error_fatal3_strs( file_str, line, strs )
   IF ( line > 0 ) THEN
     CALL wrf_message_str( 'FATAL CALLED FROM FILE:  '//file_str//'  LINE:  '//TRIM(line_str) )
   ENDIF
-  CALL w, (strs)
+  CALL wrf_message_strs(strs)
   CALL wrf_message_str( '-------------------------------------------' )
 #else
   CALL wrf_message2_str( '-------------- FATAL CALLED ---------------' )
