@@ -75,12 +75,19 @@ IO_NETCDF     = $(EXTERNAL)/io_netcdf
 IOAPI_SHARE   = $(EXTERNAL)/ioapi_share
 RSL           = $(EXTERNAL)/RSL_stubs
 
-NETCDF_LIB = -L$(EXTERNAL)/io_netcdf -lwrfio_nf -L$(NETCDFPATH)/lib -lnetcdf
-PHDF5_LIB  = -L\$(EXTERNAL)/io_phdf5 -lwrfio_phdf5 -L$(PHDF5PATH)/lib -lhdf5_fortran -lhdf5 -lm -lz -L$(PHDF5PATH)/lib -lsz
-LAPACK_LIB = -L$(LAPACK) -llapack
-BLAS_LIB = -L$(BLAS) -lblas
-BUFR_LIB = -L$(BUFR_NCEP_NCO) -lbufr
-FFTPACK5_LIB = -L$(FFTPACK5) -lfftpack5
+NETCDF_LIB    = -L$(EXTERNAL)/io_netcdf -lwrfio_nf -L$(NETCDFPATH)/lib -lnetcdf
+PHDF5_LIB     = -L$(EXTERNAL)/io_phdf5 -lwrfio_phdf5 -L$(PHDF5PATH)/lib -lhdf5_fortran -lhdf5 -lm -lz -L$(PHDF5PATH)/lib -lsz
+LAPACK_LIB    = -L$(LAPACK) -llapack
+BLAS_LIB      = -L$(BLAS) -lblas
+BUFR_LIB      = -L$(BUFR_NCEP_NCO) -lbufr
+FFTPACK5_LIB  = -L$(FFTPACK5) -lfftpack5
+IO_INT_LIB    = -L$(IO_INT) -lwrfio_int
+IO_GRIB_LIB   = -L$(IO_GRIB1) -lio_grib1
+ESMF_TIME_LIB = -L$(ESMF_TIME_F90) -lesmf_time
+
+#			$(FRAME)/module_internal_header_util.o \
+#			$(FRAME)/pack_utils.o
+
 LIBINCLUDE = -I. -I$(INC) -I$(IOAPI_SHARE)
 
 #### Get core settings from environment (set in compile script)
@@ -120,12 +127,6 @@ CONFIG_BUF_LEN	=	8192
 
 #### Default sed command and script for Fortran source files ####
 SED_FTN = sed -f $(ARCH)/standard.sed
-
-WRF_LIB		=	-L$(IO_INT) -lwrfio_int \
-			-L$(IO_GRIB1) -lio_grib1 \
-			-L$(ESMF_TIME_F90) -lesmf_time \
-			$(FRAME)/module_internal_header_util.o \
-			$(FRAME)/pack_utils.o
 
 #### Architecture specific settings ####
 
