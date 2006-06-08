@@ -394,7 +394,7 @@ fftpack5 : da_constants
 	( cd external/fftpack5 ; $(MAKE) all )
 	
 bufr_ncep_nco : 
-	( cd external/bufr_ncep_nco ; $(MAKE) bufrlib.o )
+	( cd external/bufr_ncep_nco ; $(MAKE) all )
 	
 wrfvar_src : bufr_ncep_nco fftpack5 lapack blas
 	@ echo '--------------------------------------'
