@@ -64,7 +64,7 @@ WRF_OBJS=$(SHARE_OBJS) $(FRAME_OBJS) $(PHYS_OBJS) $(DYN_OBJS) \
 WRF_MODULES=$(SHARE_MODULES) $(FRAME_MODULES) $(PHYS_MODULES) $(DYN_MODULES)
 
 libwrflib.a : $(WRF_MODULES) $(WRF_OBJS)
-	$(AR) ru libwrflib.a $(WRF_MODULES) $(WRF_OBJS)
+	$(AR) libwrflib.a $(WRF_MODULES) $(WRF_OBJS)
 	$(RANLIB) libwrflib.a
 
 clean :
