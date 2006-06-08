@@ -1,6 +1,7 @@
 # FRAME
 
-FRAME_MODULES =       module_driver_constants.o  \
+FRAME_MODULES =  module_internal_header_util.o \
+                 module_driver_constants.o  \
                 module_domain.o            \
                 module_domain1.o            \
                 module_domain2.o            \
@@ -19,13 +20,14 @@ FRAME_MODULES =       module_driver_constants.o  \
                 module_quilt_outbuf_ops.o  \
                 module_io_quilt.o
 
-FRAME_OBJS    =       wrf_num_bytes_between.o    \
+FRAME_OBJS    = pack_utils.o \
+                wrf_num_bytes_between.o    \
                 wrf_shutdown.o             \
                 libmassv.o                 \
                 collect_on_comm.o
 
 #compile as a .o but do not link into the main library
-FRAME_SPECIAL_OBJS =       module_internal_header_util.o pack_utils.o
+#FRAME_SPECIAL_OBJS =       module_internal_header_util.o pack_utils.o
    
 wrf_num_bytes_between.o :
 	$(CC) -c $(CCFLAGS) wrf_num_bytes_between.c

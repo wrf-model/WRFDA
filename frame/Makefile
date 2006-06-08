@@ -1,6 +1,7 @@
 include ../configure.wrf
 
-MODULES =       module_driver_constants.o  \
+MODULES =       module_internal_header.o   \
+                module_driver_constants.o  \
                 module_domain.o            \
                 module_domain1.o           \
                 module_domain2.o           \
@@ -22,7 +23,8 @@ MODULES =       module_driver_constants.o  \
                 module_quilt_outbuf_ops.o  \
                 module_io_quilt.o
 
-OBJS    =       wrf_num_bytes_between.o    \
+OBJS    =       pack_utils.o               \
+                wrf_num_bytes_between.o    \
                 wrf_shutdown.o             \
                 libmassv.o                 \
                 collect_on_comm.o
