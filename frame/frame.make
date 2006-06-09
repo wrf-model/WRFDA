@@ -46,7 +46,7 @@ md_calls.inc : md_calls.m4
 module_configure.o: \
 		module_state_description.o \
                 module_wrf_error.o \
-		module_driver_constants.o 
+		module_driver_constants.o
 
 module_dm.o: module_machine.o module_state_description.o module_wrf_error.o \
 		module_domain.o \

@@ -114,7 +114,7 @@ SUBROUTINE da_wrfvar_init( no_init1 )
 ! globally accessible pointer to TYPE(domain), head_grid, defined in
 ! frame/module_domain.F.  The parent is null and the child index is given
 ! as negative, signifying none.  Afterwards, because the call to
-! alloc_and_configure_domain may modify the model's configuration data
+! alloc_and_configure_domain may modify the model configuration data
 ! stored in model_config_rec, the configuration information is again
 ! repacked into a buffer, broadcast, and unpacked on each task (for
 ! DM_PARALLEL compiles). The call to <a

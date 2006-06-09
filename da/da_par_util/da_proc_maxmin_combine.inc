@@ -12,7 +12,7 @@ SUBROUTINE da_proc_maxmin_combine( n, max, min )
 !------------------------------------------------------------------------------
 
 #ifdef DM_PARALLEL
-   INCLUDE 'mpif.h'
+#include <mpif.h>
 #endif
 
 

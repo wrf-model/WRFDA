@@ -3,7 +3,7 @@
 
 SUBROUTINE med_read_nmm ( grid , config_flags , ntsd, dt_from_file, tstart_from_file, tend_from_file, &
 !
-#include <nmm_dummy_args.inc>
+#include "nmm_dummy_args.inc"
 !
      )
   ! Driver layer
@@ -22,7 +22,7 @@ SUBROUTINE med_read_nmm ( grid , config_flags , ntsd, dt_from_file, tstart_from_
    TYPE(domain)                               :: grid
    TYPE (grid_config_rec_type) , INTENT(IN)   :: config_flags
 
-#include <nmm_dummy_decl.inc>
+#include "nmm_dummy_decl.inc"
 
 !----------------------------------------------------------------------
   ! Local
@@ -105,9 +105,9 @@ SUBROUTINE med_read_nmm ( grid , config_flags , ntsd, dt_from_file, tstart_from_
 !----------------------------------------------------------------------
 #include "deref_kludge.h"
 #define COPY_IN
-#include <nmm_scalar_derefs.inc>
+#include "nmm_scalar_derefs.inc"
 #ifdef DM_PARALLEL
-#    include <nmm_data_calls.inc>
+#    include "nmm_data_calls.inc"
 #endif
 
 !
@@ -634,7 +634,7 @@ SUBROUTINE med_read_nmm ( grid , config_flags , ntsd, dt_from_file, tstart_from_
 !!!!!!!!!!!!!!!!!!!!!!!!!!
 ENTRY med_read_nmm_bdy ( grid , config_flags , ntsd , dt_from_file, tstart_from_file, tend_from_file, &
 !
-#include <nmm_dummy_args.inc>
+#include "nmm_dummy_args.inc"
 !
      )
 !!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -963,7 +963,7 @@ ENTRY med_read_nmm_bdy ( grid , config_flags , ntsd , dt_from_file, tstart_from_
       CALL wrf_debug ( 100 , 'nmm: returnomatic' )
 
 #define COPY_OUT
-#include <nmm_scalar_derefs.inc>
+#include "nmm_scalar_derefs.inc"
 
    RETURN
 END SUBROUTINE med_read_nmm

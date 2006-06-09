@@ -14,7 +14,7 @@
    IMPLICIT NONE
    
 #ifdef DM_PARALLEL
-   INCLUDE 'mpif.h'
+#include <mpif.h>
 #endif
 
 !#include "rttov_q2v.interface"

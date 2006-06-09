@@ -9,7 +9,7 @@ SUBROUTINE da_proc_sum_int ( value )
 !------------------------------------------------------------------------------
 
 #ifdef DM_PARALLEL
-   INCLUDE 'mpif.h'
+#include <mpif.h>
 #endif
 
    INTEGER,   INTENT(INOUT)      :: value     ! Value on processor.

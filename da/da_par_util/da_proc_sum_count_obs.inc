@@ -20,7 +20,7 @@ SUBROUTINE da_proc_sum_count_obs ( count_obs )
 !-------------------------------------------------------------------------------
 
 #ifdef DM_PARALLEL
-   INCLUDE 'mpif.h'
+#include <mpif.h>
 #endif
    
    integer, parameter:: numvals = 100

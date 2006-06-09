@@ -61,6 +61,10 @@ da_wrfvar_top.o : da_wrfvar_top.f90         \
                   da_wrfvar_finalize.inc    \
                   da_wrfvar_interface.inc   \
                   da_setup_structures.o     \
+                  da_test.o                 \
+                  da_par_util.o             \
+                  da_tools.o                \
+                  da_minimisation.o         \
                   module_integrate.o        \
                   module_timing.o           \
                   module_wrf_error.o        \
@@ -106,7 +110,6 @@ da_par_util.o:		da_par_util.f90                   \
 			da_cv_to_global.inc               \
 			da_generic_typedefs.inc           \
 			da_generic_methods.inc            \
-			da_specific_methods.inc           \
 			da_generic_boilerplate.inc        \
 			da_y_facade_to_global.inc         \
                         da_define_structures.o	          \

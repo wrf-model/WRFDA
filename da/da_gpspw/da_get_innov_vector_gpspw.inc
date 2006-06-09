@@ -8,7 +8,7 @@ SUBROUTINE da_get_innov_vector_gpspw ( it, xb, xp, ob, iv )
   IMPLICIT NONE
 
   !-----
-  !    INCLUDE 'mpif.h'
+  !#include <mpif.h>
   !-----
 
   INTEGER, INTENT(IN)           :: it      ! External iteration.

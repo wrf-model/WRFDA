@@ -9,7 +9,7 @@ SUBROUTINE da_proc_diagnostics_collect(num_sound, iv, re )
 !------------------------------------------------------------------------------
 
 #ifdef DM_PARALLEL
-   INCLUDE 'mpif.h'
+#include <mpif.h>
 #endif
 
    integer, intent(in)                       :: num_sound

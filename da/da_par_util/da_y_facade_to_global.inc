@@ -32,7 +32,7 @@
     ! Local declarations
     LOGICAL, EXTERNAL            :: wrf_dm_on_monitor
 #ifdef DM_PARALLEL
-    INCLUDE 'mpif.h'
+#include <mpif.h>
     INTEGER                      :: n, k, serial_n, serial_numvals
     INTEGER                      :: communicator
     INTEGER                      :: nproc

@@ -3,7 +3,7 @@ SUBROUTINE da_trace_report
    IMPLICIT NONE
 
 #ifdef DM_PARALLEL
-   INCLUDE "mpif.h"
+#include <mpif.h>
 #endif
 
    INTEGER :: Loop1                        ! loop counter

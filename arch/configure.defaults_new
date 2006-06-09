@@ -770,7 +770,7 @@ LD              = $(FC)
 
 RSL             = $(EXTERNAL)/RSL
 
-TRADFLAG        =
+TRADFLAG        = -traditional-cpp
 FPPFLAGS2       = -DWRF_RSL_IO -DRSL \
                     -DDM_PARALLEL \
                     -DTRIEDNTRUE -DONLY_WRFMODEL_IO -DINTIO \

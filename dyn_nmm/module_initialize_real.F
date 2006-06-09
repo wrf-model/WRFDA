@@ -61,7 +61,7 @@ CONTAINS
 
         CALL init_domain_nmm (grid, &
 !
-#include <nmm_actual_args.inc>
+#include "nmm_actual_args.inc"
 !
       )
 
@@ -76,7 +76,7 @@ CONTAINS
 !---------------------------------------------------------------------
    SUBROUTINE init_domain_nmm ( grid, &
 !
-# include <nmm_dummy_args.inc>
+# include "nmm_dummy_args.inc"
 !
    )
 
@@ -88,7 +88,7 @@ CONTAINS
 !     TYPE (domain), POINTER :: grid
       TYPE (domain)          :: grid
 
-# include <nmm_dummy_decl.inc>
+# include "nmm_dummy_decl.inc"
 
       TYPE (grid_config_rec_type)              :: config_flags
 
@@ -202,9 +202,9 @@ CONTAINS
         if (ALLOCATED(TG_ALT)) DEALLOCATE(TG_ALT)
 
 #define COPY_IN
-#include <nmm_scalar_derefs.inc>
+#include "nmm_scalar_derefs.inc"
 #ifdef DM_PARALLEL
-#    include <nmm_data_calls.inc>
+#    include "nmm_data_calls.inc"
 #endif
 
       SELECT CASE ( model_data_order )
@@ -1468,7 +1468,7 @@ CONTAINS
 !==================================================================================
 
 #define COPY_OUT
-#include <nmm_scalar_derefs.inc>
+#include "nmm_scalar_derefs.inc"
       RETURN
 
    END SUBROUTINE init_domain_nmm

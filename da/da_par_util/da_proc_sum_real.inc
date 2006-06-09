@@ -10,7 +10,7 @@ SUBROUTINE da_proc_sum_real ( n, value )
 !------------------------------------------------------------------------------
 
 #ifdef DM_PARALLEL
-   INCLUDE 'mpif.h'
+#include <mpif.h>
 #endif
 
 
