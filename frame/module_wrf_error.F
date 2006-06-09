@@ -7,12 +7,6 @@ MODULE module_wrf_error
   CHARACTER(LEN=256) :: errmsg(100)
   INTEGER            :: msgcountl
 
-  INTERFACE 
-    SUBROUTINE wrf_messages(strs)
-       CHARACTER(LEN=*), INTENT(IN) :: strs(:)
-    END SUBROUTINE wrf_messages
-  END INTERFACE
-
 CONTAINS
 
   LOGICAL FUNCTION wrf_at_debug_level ( level )
@@ -21,8 +15,6 @@ CONTAINS
     wrf_at_debug_level = ( level .LE. wrf_debug_level )
     RETURN
   END FUNCTION wrf_at_debug_level
-
-END MODULE module_wrf_error
 
 SUBROUTINE init_module_wrf_error
 END SUBROUTINE init_module_wrf_error
@@ -289,5 +281,7 @@ SUBROUTINE wrf_check_error( expected, actual, str, file_str, line )
     CALL wrf_error_fatal3 ( file_str, line, str_with_rc )
   ENDIF
 END SUBROUTINE wrf_check_error
+
+END MODULE module_wrf_error
 
 
