@@ -89,7 +89,7 @@ SUBROUTINE da_get_innov_vector_buoy ( it, xb, xp, ob, iv )
           if (abs(hd) <= Max_StHeight_Diff) THEN
             if(iv % buoy(n) % h < v_h(xp%kts)) then
               iv%buoy(n)%zk = 1.0+1.0e-6
-              CALL DA_Obs_Sfc_correction(iv%buoy(n), xb)
+              CALL da_obs_sfc_correction(iv%buoy(n), xb)
 
               ! To keep the original "ob" with no change for multiple outer-loops use:
 

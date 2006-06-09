@@ -1,4 +1,4 @@
-SUBROUTINE DA_OI_Stats_Pilot ( stats_unit, oi )
+SUBROUTINE da_oi_stats_pilot ( stats_unit, oi )
 
   IMPLICIT NONE
 
@@ -25,12 +25,12 @@ SUBROUTINE DA_OI_Stats_Pilot ( stats_unit, oi )
     DO n=1, oi%num_Pilot
       if( oi%pilot(n)%loc%proc_domain ) then
         do k=1, oi%Pilot(n)%info%levels
-          CALL da_Stats_Calculate( oi%Pilot(n)%loc%obs_global_index, &
-                              k, oi%Pilot(n)%u(k)%qc,  &
-                              oi%Pilot(n)%u(k)%inv, nu, &
-                              Pilot%minimum%u, Pilot%maximum%u, &
-                              Pilot%average%u, Pilot%rms_err%u)
-          CALL da_Stats_Calculate( oi%Pilot(n)%loc%obs_global_index, &
+          CALL da_stats_calculate( oi%Pilot(n)%loc%obs_global_index, &
+                              k, oi%pilot(n)%u(k)%qc,  &
+                              oi%pilot(n)%u(k)%inv, nu, &
+                              pilot%minimum%u, Pilot%maximum%u, &
+                              pilot%average%u, Pilot%rms_err%u)
+          CALL da_stats_calculate( oi%Pilot(n)%loc%obs_global_index, &
                               k, oi%Pilot(n)%v(k)%qc, &
                               oi%Pilot(n)%v(k)%inv, nv, &
                               Pilot%minimum%v, Pilot%maximum%v, &
@@ -56,9 +56,9 @@ SUBROUTINE DA_OI_Stats_Pilot ( stats_unit, oi )
   IF ( wrf_dm_on_monitor() ) THEN
     IF (nu /= 0 .or. nv /= 0 ) THEN
       write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of OI for Pilot'
-      CALL DA_Print_Stats_Pilot( stats_unit, nu, nv, Pilot )
+      CALL da_print_stats_pilot( stats_unit, nu, nv, Pilot )
     END IF
   END IF
 
-END SUBROUTINE DA_OI_Stats_Pilot
+END SUBROUTINE da_oi_stats_pilot
 

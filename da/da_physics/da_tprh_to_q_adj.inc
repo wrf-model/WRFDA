@@ -1,7 +1,7 @@
-SUBROUTINE DA_TPRH_To_Q_Adj( xb, xp, xa )
+SUBROUTINE da_tprh_to_q_adj( xb, xp, xa )
 
 !------------------------------------------------------------------------------
-!  PURPOSE: Adjoint of DA_TPRH_To_Q_Adj.
+!  PURPOSE: Adjoint of da_tprh_to_q_adj.
 !
 !  METHOD: Standard adjoint coding.
 !
@@ -62,11 +62,11 @@ SUBROUTINE DA_TPRH_To_Q_Adj( xb, xp, xa )
 !  [2.0] Calculate saturation specific humidity ratio qs~/qs:
 !------------------------------------------------------------------------------
 
-   CALL DA_TP_To_Qs_Adj( xb, xp, xa, qs_prime_over_qs )
+   CALL da_tp_to_qs_adj( xb, xp, xa, qs_prime_over_qs )
 
-END SUBROUTINE DA_TPRH_To_Q_Adj
+END SUBROUTINE da_tprh_to_q_adj
 
-SUBROUTINE DA_TPRH_To_Q_Adj1( t, p, es, q, rh, &
+SUBROUTINE da_tprh_to_q_adj1( t, p, es, q, rh, &
                               t_prime, p_prime, rh_prime, q_prime )
 
 !------------------------------------------------------------------------------
@@ -105,11 +105,11 @@ SUBROUTINE DA_TPRH_To_Q_Adj1( t, p, es, q, rh, &
 !  [1.0] Calculate saturation specific humidity ratio qs~/qs:
 !------------------------------------------------------------------------------
 
-  CALL DA_TP_To_Qs_Adj1( t, p, es, t_prime, p_prime, qs_prime_over_qs )
+  CALL da_tp_to_qs_adj1( t, p, es, t_prime, p_prime, qs_prime_over_qs )
 
-END SUBROUTINE DA_TPRH_To_Q_Adj1
+END SUBROUTINE da_tprh_to_q_adj1
 
-!SUBROUTINE DA_TPRH_To_Q_Adj( t, p, es, q, rh, &
+!SUBROUTINE da_tprh_to_q_adj( t, p, es, q, rh, &
 !                             t_prime, p_prime, rh_prime, q_prime, n )
 
 !------------------------------------------------------------------------------
@@ -152,7 +152,7 @@ END SUBROUTINE DA_TPRH_To_Q_Adj1
 !  [1.0] Calculate saturation specific humidity ratio qs~/qs:
 !------------------------------------------------------------------------------
 
-!   CALL DA_TP_To_Qs_Adj( t, p, es, t_prime, p_prime, qs_prime_over_qs, n )
+!   CALL da_tp_to_qs_adj( t, p, es, t_prime, p_prime, qs_prime_over_qs, n )
 
-!END SUBROUTINE DA_TPRH_To_Q_Adj
+!END SUBROUTINE da_tprh_to_q_adj
 

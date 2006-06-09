@@ -18,7 +18,7 @@ subroutine da_get_q_error( p, t, q, t_error, rh_error, q_error )
 
 !     Calculate rh:
 
-      CALL DA_TP_To_Qs( t, p, es, qs )
+      CALL da_tp_to_qs( t, p, es, qs )
 
       rh = 100.0 * q / qs
       IF ( rh > 100.0 ) rh = 100.0

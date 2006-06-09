@@ -70,7 +70,7 @@ SUBROUTINE da_calculate_rf_factors( rf_lengthscale, rf_alpha, rf_scale_factor )
 !      WRITE(UNIT=stderr,FMT='(A,f15.5)')' RF Scaling Factor = ', 1.0 / field_out(0)
 !      field_out1(-n:n) = field_in(-n:n)
 !      DO pass = 1, rf_passes
-!         CALL DA_Recursive_Filter_1D( pass, rf_alpha(k), field_out1, 2*n+1 )
+!         CALL da_recursive_filter_1d( pass, rf_alpha(k), field_out1, 2*n+1 )
 !      END DO
          
 !      do nn = -n, n

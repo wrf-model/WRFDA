@@ -1,4 +1,4 @@
-Subroutine DA_Fast_Sine_Transform  & ! in
+Subroutine da_fast_sine_transform  & ! in
  ( ISIGN,              & ! in
    INC,                & ! in
    JUMP,               & ! in
@@ -162,10 +162,10 @@ Implicit none
       LA=LA/IFAC
       IERR=-1
       IF (IGO.EQ.+1) THEN
-        CALL DA_QPASSM(WORK,WORK(IFAC*LA+1),A(IA),A(LA*INC+IA), &
+        CALL da_qpassm(WORK,WORK(IFAC*LA+1),A(IA),A(LA*INC+IA), &
                     TRIGS,1,INC,NX,JUMP,NVEX,N,IFAC,LA,IERR)
       ELSE IF (IGO.EQ.-1) THEN
-        CALL DA_QPASSM(A(IA),A(IFAC*LA*INC+IA),WORK,WORK(LA+1), &
+        CALL da_qpassm(A(IA),A(IFAC*LA*INC+IA),WORK,WORK(LA+1), &
                     TRIGS,INC,1,JUMP,NX,NVEX,N,IFAC,LA,IERR)
       ENDIF
       IF (IERR.NE.0) GO TO 500
@@ -225,7 +225,7 @@ Implicit none
       RETURN
 
 
-End subroutine DA_Fast_Sine_Transform
+End subroutine da_fast_sine_transform
 
 
 

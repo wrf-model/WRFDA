@@ -1,4 +1,4 @@
- SUBROUTINE DA_TPQ_To_RH( t, p, q, es, qs, rh )
+ SUBROUTINE da_tpq_to_rh( t, p, q, es, qs, rh )
 
 !------------------------------------------------------------------------------
 !  PURPOSE: Convert T/p/q to relative humidity rh.
@@ -18,7 +18,7 @@
 !  [1.0] Calculate saturation specific humidity:
 !------------------------------------------------------------------------------
 
-   CALL DA_TP_To_Qs( t, p, es, qs )
+   CALL da_tp_to_qs( t, p, es, qs )
    
 !------------------------------------------------------------------------------
 !  [2.0] Calculate relative humidity:
@@ -26,5 +26,5 @@
 
    rh = 100.0 * q / qs
 
-END SUBROUTINE DA_TPQ_To_RH
+END SUBROUTINE da_tpq_to_rh
 

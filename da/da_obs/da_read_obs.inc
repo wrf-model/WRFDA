@@ -1,4 +1,4 @@
-SUBROUTINE DA_Read_Obs (iunit, ob, xp, filename)
+SUBROUTINE da_read_obs (iunit, ob, xp, filename)
 !-----------------------------------------------------------------------------!
 !  Purpose: Read the header of a MM5 3D-VAR 2.0 GTS observation file
 !
@@ -310,7 +310,7 @@ loop_level: DO i = 1, platform%info%levels
 
       ENDDO loop_level
 
-      call DA_ll_to_xy (platform%info, platform%loc,   &
+      call da_ll_to_xy (platform%info, platform%loc,   &
                         xp, outside, inside_halo, outside_all )
 
 
@@ -361,7 +361,7 @@ loop_level: DO i = 1, platform%info%levels
          endif
       endif
 
-      CALL DA_Obs_Proc_Station(platform)
+      CALL da_obs_proc_station(platform)
 
       nlevels = platform%info%levels
 !    Loop over duplicating obs for global
@@ -1170,4 +1170,4 @@ loop_level: DO i = 1, platform%info%levels
 
    IF (trace_use) CALL da_trace_exit("da_read_obs")
 
-END SUBROUTINE DA_Read_Obs
+END SUBROUTINE da_read_obs

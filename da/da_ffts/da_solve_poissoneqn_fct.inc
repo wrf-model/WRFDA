@@ -167,7 +167,7 @@ SUBROUTINE da_solve_poissoneqn_fct( xb, xbx, del2b, b, xp)
       enddo
       enddo
 
-      CALL DA_Fast_Cosine_Transform( Forward_FFT, vector_inc, vector_jump, &
+      CALL da_fast_cosine_transform( Forward_FFT, vector_inc, vector_jump, &
                                    num_vectors, vector_size, &
                                    xbx % fft_factors_y, xbx % trig_functs_y, &
                                    work_1d(1), work_area )

@@ -1,4 +1,4 @@
-SUBROUTINE DA_TPRH_To_Q_Lin( xb, xp, xa )
+SUBROUTINE da_tprh_to_q_lin( xb, xp, xa )
 
 !------------------------------------------------------------------------------
 !  PURPOSE: Convert T/pressure/rh to specific humidity increments.
@@ -32,7 +32,7 @@ SUBROUTINE DA_TPRH_To_Q_Lin( xb, xp, xa )
 !  [1.0] Calculate saturation specific humidity ratio qs~/qs:
 !------------------------------------------------------------------------------
 
-   CALL DA_TP_To_Qs_Lin( xb, xp, xa, qs_prime_over_qs )
+   CALL da_tp_to_qs_lin( xb, xp, xa, qs_prime_over_qs )
    
 !------------------------------------------------------------------------------
 !  [2.0] Calculate specific humidity increment:
@@ -43,9 +43,9 @@ SUBROUTINE DA_TPRH_To_Q_Lin( xb, xp, xa )
                                  xb % rh(is:ie,js:je,ks:ke) + &
                                  qs_prime_over_qs(is:ie,js:je,ks:ke) )
 
-END SUBROUTINE DA_TPRH_To_Q_Lin
+END SUBROUTINE da_tprh_to_q_lin
 
-SUBROUTINE DA_TPRH_To_Q_Lin1( t, p, es, q, rh, &
+SUBROUTINE da_tprh_to_q_lin1( t, p, es, q, rh, &
                               t_prime, p_prime, rh_prime, q_prime )
 
 !------------------------------------------------------------------------------
@@ -74,7 +74,7 @@ SUBROUTINE DA_TPRH_To_Q_Lin1( t, p, es, q, rh, &
 !  [1.0] Calculate saturation specific humidity ratio qs~/qs:
 !------------------------------------------------------------------------------
 
-   CALL DA_TP_To_Qs_Lin1( t, p, es, t_prime, p_prime, qs_prime_over_qs )
+   CALL da_tp_to_qs_lin1( t, p, es, t_prime, p_prime, qs_prime_over_qs )
    
 !------------------------------------------------------------------------------
 !  [2.0] Calculate specific humidity increment:
@@ -82,4 +82,4 @@ SUBROUTINE DA_TPRH_To_Q_Lin1( t, p, es, q, rh, &
 
    q_prime = q * ( rh_prime / rh + qs_prime_over_qs )
 
-END SUBROUTINE DA_TPRH_To_Q_Lin1
+END SUBROUTINE da_tprh_to_q_lin1

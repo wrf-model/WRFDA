@@ -46,7 +46,7 @@
 !       such that the the coeff of wave0 is NOT the mean.
 !
 !---------------------------------------------------------------------
-Subroutine DA_Fast_Cosine_Transform & ! in
+Subroutine da_fast_cosine_transform & ! in
  ( ISIGN,                & ! in
    INC,                  & ! in
    JUMP,                 & ! in
@@ -174,10 +174,10 @@ CHARACTER (LEN=*), PARAMETER :: RoutineName = "Var_FFT551"
       LA=LA/IFAC
       IERR=-1
       IF (IGO.EQ.+1) THEN
-        CALL DA_QPASSM(WORK,WORK(IFAC*LA+1),A(IA),A(IA+LA*INC), &
+        CALL da_qpassm(WORK,WORK(IFAC*LA+1),A(IA),A(IA+LA*INC), &
                     TRIGS,1,INC,NX,JUMP,NVEX,N,IFAC,LA,IERR)
       ELSE IF (IGO.EQ.-1) THEN
-        CALL DA_QPASSM(A(IA),A(IA+IFAC*LA*INC),WORK,WORK(LA+1), &
+        CALL da_qpassm(A(IA),A(IA+IFAC*LA*INC),WORK,WORK(LA+1), &
                     TRIGS,INC,1,JUMP,NX,NVEX,N,IFAC,LA,IERR)
       ENDIF
       IF (IERR.NE.0) GO TO 500
@@ -240,6 +240,6 @@ CHARACTER (LEN=*), PARAMETER :: RoutineName = "Var_FFT551"
   570 CONTINUE
 
       RETURN
-      END SUBROUTINE DA_Fast_Cosine_Transform
+      END SUBROUTINE da_fast_cosine_transform
 
 

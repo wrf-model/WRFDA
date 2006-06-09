@@ -60,7 +60,7 @@ SUBROUTINE da_transform_xtoy_metar_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
     else if (sfc_assi_options == 2) then
       do n=iv%ob_numb(iv%current_ob_time-1)%metar + 1, iv%ob_numb(iv%current_ob_time)%metar
         if(iv%metar(n)%loc%proc_domain_with_halo) then
-          CALL DA_Transform_XToPsfc_Adj(xb,xp,iv%metar(n), &
+          CALL da_transform_xtopsfc_adj(xb,xp,iv%metar(n), &
                                             jo_grad_y%metar(n),jo_grad_x)
         endif
       ENDDO

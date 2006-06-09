@@ -1,4 +1,4 @@
-SUBROUTINE DA_UVPRho_To_W_Adj( xb, xa, xp,                 &
+SUBROUTINE da_uvprho_to_w_adj( xb, xa, xp,                 &
                                ids,ide, jds,jde, kds,kde,  &
                                ims,ime, jms,jme, kms,kme,  &
                                its,ite, jts,jte, kts,kte)
@@ -102,7 +102,7 @@ SUBROUTINE DA_UVPRho_To_W_Adj( xb, xa, xp,                 &
    ENDDO
    ENDDO
 
-   CALL DA_UV_To_Divergence_Adj(xp, xb, URHO,VRHO, DIV, &
+   CALL da_uv_to_divergence_adj(xp, xb, URHO,VRHO, DIV, &
                                 ids,ide, jds,jde, kds,kde,         &
                                 ims,ime, jms,jme, kms,kme,         &
                                 its,ite, jts,jte, kts,kte )
@@ -145,7 +145,7 @@ SUBROUTINE DA_UVPRho_To_W_Adj( xb, xa, xp,                 &
    ENDDO
    ENDDO
 
-   CALL DA_UV_To_Divergence_Adj(xp, xb, URHO,VRHO, DIV, &
+   CALL da_uv_to_divergence_adj(xp, xb, URHO,VRHO, DIV, &
                                 ids,ide, jds,jde, kds,kde,         &
                                 ims,ime, jms,jme, kms,kme,         &
                                 its,ite, jts,jte, kts,kte )
@@ -164,7 +164,7 @@ SUBROUTINE DA_UVPRho_To_W_Adj( xb, xa, xp,                 &
 
 ! Term 2.2: Divergence term from basic wind
 
-   CALL DA_UV_To_Divergence(xb, xb%u,xb%v, DIV, &
+   CALL da_uv_to_divergence(xb, xb%u,xb%v, DIV, &
                             ids,ide, jds,jde, kds,kde,         &
                             ims,ime, jms,jme, kms,kme,         &
                             its,ite, jts,jte, kts,kte )
@@ -187,7 +187,7 @@ SUBROUTINE DA_UVPRho_To_W_Adj( xb, xa, xp,                 &
    ENDDO
    ENDDO
 
-   CALL DA_UV_To_Divergence_adj(xp, xb, xa%u,xa%v, DIV, &
+   CALL da_uv_to_divergence_adj(xp, xb, xa%u,xa%v, DIV, &
                                 ids,ide, jds,jde, kds,kde,         &
                                 ims,ime, jms,jme, kms,kme,         &
                                 its,ite, jts,jte, kts,kte )
@@ -300,4 +300,4 @@ SUBROUTINE DA_UVPRho_To_W_Adj( xb, xa, xp,                 &
 
     WZ(:,:,:) = 0.0
 
-END SUBROUTINE DA_UVPRho_To_W_Adj
+END SUBROUTINE da_uvprho_to_w_adj

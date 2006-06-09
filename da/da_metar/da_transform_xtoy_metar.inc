@@ -68,7 +68,7 @@ SUBROUTINE da_transform_xtoy_metar ( xa, xb, iv, xp, y )
       ! [2.0] Surface assimilation approach 2
       do n=iv%ob_numb(iv%current_ob_time-1)%metar + 1, iv%ob_numb(iv%current_ob_time)%metar
         if(iv%metar(n)%loc%proc_domain_with_halo) then
-          CALL DA_Transform_XToPsfc(xb,xa,xp,iv%metar(n),y%metar(n))
+          CALL da_transform_xtopsfc(xb,xa,xp,iv%metar(n),y%metar(n))
         endif
       end do
     endif

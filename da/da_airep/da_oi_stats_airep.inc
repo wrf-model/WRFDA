@@ -1,4 +1,4 @@
-SUBROUTINE DA_OI_Stats_Airep ( stats_unit, oi )
+SUBROUTINE da_oi_stats_airep ( stats_unit, oi )
 
   IMPLICIT NONE
 
@@ -28,17 +28,17 @@ SUBROUTINE DA_OI_Stats_Airep ( stats_unit, oi )
     DO n=1, oi%num_Airep
       if( oi%airep(n)%loc%proc_domain ) then
         do k=1, oi%Airep(n)%info%levels
-          CALL da_Stats_Calculate( oi%Airep(n)%loc%obs_global_index, &
-                              k, oi%Airep(n)%u(k)%qc, &
-                              oi%Airep(n)%u(k)%inv, nu, &
-                              Airep%minimum%u, Airep%maximum%u, &
-                              Airep%average%u, Airep%rms_err%u)
-          CALL da_Stats_Calculate( oi%Airep(n)%loc%obs_global_index, &
-                              k, oi%Airep(n)%v(k)%qc, &
-                              oi%Airep(n)%v(k)%inv, nv, &
-                              Airep%minimum%v, Airep%maximum%v, &
-                              Airep%average%v, Airep%rms_err%v)
-          CALL da_Stats_Calculate( oi%Airep(n)%loc%obs_global_index, &
+          CALL da_stats_calculate( oi%airep(n)%loc%obs_global_index, &
+                              k, oi%airep(n)%u(k)%qc, &
+                              oi%airep(n)%u(k)%inv, nu, &
+                              airep%minimum%u, airep%maximum%u, &
+                              airep%average%u, airep%rms_err%u)
+          CALL da_stats_calculate( oi%airep(n)%loc%obs_global_index, &
+                              k, oi%airep(n)%v(k)%qc, &
+                              oi%airep(n)%v(k)%inv, nv, &
+                              airep%minimum%v, airep%maximum%v, &
+                              airep%average%v, airep%rms_err%v)
+          CALL da_stats_calculate( oi%airep(n)%loc%obs_global_index, &
                               k, oi%Airep(n)%t(k)%qc, &
                               oi%Airep(n)%t(k)%inv, nt, &
                               Airep%minimum%t, Airep%maximum%t, &
@@ -69,8 +69,8 @@ SUBROUTINE DA_OI_Stats_Airep ( stats_unit, oi )
   IF ( wrf_dm_on_monitor() ) THEN
     IF (nu /= 0 .or. nv /= 0 .or. nt /= 0 ) THEN
       write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of OI for Airep'
-      CALL DA_Print_Stats_Airep( stats_unit, nu, nv, nt, Airep )
+      CALL da_print_stats_airep( stats_unit, nu, nv, nt, Airep )
     END IF
   END IF
 
-END SUBROUTINE DA_OI_Stats_Airep
+END SUBROUTINE da_oi_stats_airep

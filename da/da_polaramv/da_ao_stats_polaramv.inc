@@ -1,4 +1,4 @@
-SUBROUTINE DA_AO_Stats_PolarAMV( stats_unit, oi, re )
+SUBROUTINE da_ao_stats_polaramv( stats_unit, oi, re )
 !-------------------------------------------------------------------------
 !  HISTORY:
 !
@@ -38,11 +38,11 @@ SUBROUTINE DA_AO_Stats_PolarAMV( stats_unit, oi, re )
        if( oi%polaramv(n)%loc%proc_domain ) then
 
        DO k=1, oi%polaramv(n)%info%levels
-         CALL da_Stats_Calculate( n, 0, oi%polaramv(n)%u(k)%qc, & 
+         CALL da_stats_calculate( n, 0, oi%polaramv(n)%u(k)%qc, & 
                                re%polaramv(n)%u(k), nu, & 
                                polaramv%minimum%u, polaramv%maximum%u, &
                                polaramv%average%u, polaramv%rms_err%u )
-         CALL da_Stats_Calculate( n, 0, oi%polaramv(n)%v(k)%qc, & 
+         CALL da_stats_calculate( n, 0, oi%polaramv(n)%v(k)%qc, & 
                                re%polaramv(n)%v(k), nv, & 
                                polaramv%minimum%v, polaramv%maximum%v, &
                                polaramv%average%v, polaramv%rms_err%v )
@@ -75,10 +75,10 @@ SUBROUTINE DA_AO_Stats_PolarAMV( stats_unit, oi, re )
    
      write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for Polaramv'
    
-     CALL DA_Print_Stats_Polaramv( stats_unit, nu, nv, polaramv )
+     CALL da_print_stats_polaramv( stats_unit, nu, nv, polaramv )
    
     END IF
    
    END IF
 
-END SUBROUTINE DA_AO_Stats_PolarAMV  
+END SUBROUTINE da_ao_stats_polaramv  

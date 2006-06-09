@@ -23,7 +23,7 @@ SUBROUTINE da_fill_obs_structures( iv, ob )
 !  [1.0] Allocate innovation vector and observation structures:
 !---------------------------------------------------------------------------
 
-   CALL DA_Allocate_Y( iv, ob )
+   CALL da_allocate_y( iv, ob )
 
 !----------------------------------------------------------------------
 !  [2.0] Transfer observations:

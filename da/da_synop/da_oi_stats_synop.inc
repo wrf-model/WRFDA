@@ -104,15 +104,15 @@ SUBROUTINE da_oi_stats_synop ( stats_unit, oi )
       ! min_val = -50.0
       ! max_val = 50.0
       ! bin_width = 1.0
-      ! CALL DA_Data_Distribution( 'synop u ', oi%num_synop, min_val, max_val, &
+      ! CALL da_data_distribution( 'synop u ', oi%num_synop, min_val, max_val, &
       !                            bin_width, oi%synop(:)%u%inv )
-      ! CALL DA_Data_Distribution( 'synop v ', oi%num_synop, min_val, max_val, &
+      ! CALL da_data_distribution( 'synop v ', oi%num_synop, min_val, max_val, &
       !                            bin_width, oi%synop(:)%v%inv )
-      ! CALL DA_Data_Distribution( 'synop t ', oi%num_synop, min_val, max_val, &
+      ! CALL da_data_distribution( 'synop t ', oi%num_synop, min_val, max_val, &
       !                            bin_width, oi%synop(:)%t%inv )
-      ! CALL DA_Data_Distribution( 'synop p ', oi%num_synop, -1000.0, 1000.0, &
+      ! CALL da_data_distribution( 'synop p ', oi%num_synop, -1000.0, 1000.0, &
       !                            50.0, oi%synop(:)%p%inv )
-      ! CALL DA_Data_Distribution( 'synop q ', oi%num_synop, -0.03, 0.03, &
+      ! CALL da_data_distribution( 'synop q ', oi%num_synop, -0.03, 0.03, &
       !                               0.001, oi%synop(:)%q%inv )
     END IF
   END IF
