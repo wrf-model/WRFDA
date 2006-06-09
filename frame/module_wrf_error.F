@@ -16,6 +16,8 @@ CONTAINS
     RETURN
   END FUNCTION wrf_at_debug_level
 
+END MODULE module_wrf_error
+
 SUBROUTINE init_module_wrf_error
 END SUBROUTINE init_module_wrf_error
 
@@ -208,8 +210,6 @@ SUBROUTINE wrf_check_error( expected, actual, str, file_str, line )
     CALL wrf_error_fatal3 ( file_str, line, str_with_rc )
   ENDIF
 END SUBROUTINE wrf_check_error
-
-END MODULE module_wrf_error
 
 
 
