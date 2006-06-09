@@ -20,7 +20,7 @@
 *  CMACH   (input) CHARACTER*1
 *          Specifies the value to be returned by DLAMCH:
 *          = 'E' or 'e',   DLAMCH := eps
-*          = 'S' or 's ,   DLAMCH := sfmin
+*          = 'S' or 's' ,   DLAMCH := sfmin
 *          = 'B' or 'b',   DLAMCH := base
 *          = 'P' or 'p',   DLAMCH := eps*base
 *          = 'N' or 'n',   DLAMCH := t

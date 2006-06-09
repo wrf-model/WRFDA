@@ -2945,7 +2945,7 @@ messages(120)=  s5e5
 ! 
 ! </DESCRIPTION>
 #ifndef STUBMPI
-      INCLUDE 'mpif.h'
+#include <mpif.h>'
       LOGICAL mpi_inited
       CALL mpi_initialized( mpi_inited, ierr )
       IF ( .NOT. mpi_inited ) THEN
@@ -2970,7 +2970,7 @@ messages(120)=  s5e5
    INTEGER function getrealmpitype()
 #ifndef STUBMPI
       IMPLICIT NONE
-      INCLUDE 'mpif.h'
+#include <mpif.h>'
       INTEGER rtypesize, dtypesize, ierr
       CALL mpi_type_size ( MPI_REAL, rtypesize, ierr )
       CALL mpi_type_size ( MPI_DOUBLE_PRECISION, dtypesize, ierr )
@@ -2995,7 +2995,7 @@ messages(120)=  s5e5
 !
 ! </DESCRIPTION>
 #ifndef STUBMPI
-      INCLUDE 'mpif.h'
+#include <mpif.h>'
       CALL mpi_allreduce ( inval, retval , 1, getrealmpitype() , MPI_MAX, mpi_comm_local, ierr )
       wrf_dm_max_real = retval
 #else
@@ -3014,7 +3014,7 @@ messages(120)=  s5e5
 !
 ! </DESCRIPTION>
 #ifndef STUBMPI
-      INCLUDE 'mpif.h'
+#include <mpif.h>'
       CALL mpi_allreduce ( inval, retval , 1, getrealmpitype() , MPI_MIN, mpi_comm_local, ierr )
       wrf_dm_min_real = retval
 #else
@@ -3033,7 +3033,7 @@ messages(120)=  s5e5
 !
 ! </DESCRIPTION>
 #ifndef STUBMPI
-      INCLUDE 'mpif.h'
+#include <mpif.h>'
       CALL mpi_allreduce ( inval, retval , 1, getrealmpitype() , MPI_SUM, mpi_comm_local, ierr )
       wrf_dm_sum_real = retval
 #else
@@ -3053,7 +3053,7 @@ messages(120)=  s5e5
 !
 ! </DESCRIPTION>
 #ifndef STUBMPI
-      INCLUDE 'mpif.h'
+#include <mpif.h>'
       CALL mpi_allreduce ( inval, retval , SIZE(inval), getrealmpitype() , MPI_SUM, mpi_comm_local, ierr )
 #else
       retval = inval
@@ -3069,7 +3069,7 @@ messages(120)=  s5e5
 !
 ! </DESCRIPTION>
 #ifndef STUBMPI
-      INCLUDE 'mpif.h'
+#include <mpif.h>'
       CALL mpi_allreduce ( inval, retval , 1, MPI_INTEGER, MPI_SUM, mpi_comm_local, ierr )
       wrf_dm_sum_integer = retval
 #else
@@ -3089,7 +3089,7 @@ messages(120)=  s5e5
 !
 ! </DESCRIPTION>
 #ifndef STUBMPI
-      INCLUDE 'mpif.h'
+#include <mpif.h>'
       CALL mpi_allreduce ( inval, retval , SIZE(inval), MPI_INTEGER, MPI_SUM, mpi_comm_local, ierr )
 #else
       retval = inval
@@ -3110,7 +3110,7 @@ messages(120)=  s5e5
 ! </DESCRIPTION>
       INTEGER i, comm
 #ifndef STUBMPI
-      INCLUDE 'mpif.h'
+#include <mpif.h>'
 
       CALL wrf_get_dm_communicator ( comm )
       dex(1) = idex ; dex(2) = jdex
@@ -3141,7 +3141,7 @@ messages(120)=  s5e5
 ! </DESCRIPTION>
       INTEGER i, comm
 #ifndef STUBMPI
-      INCLUDE 'mpif.h'
+#include <mpif.h>'
 
       CALL wrf_get_dm_communicator ( comm )
       dex(1) = idex ; dex(2) = jdex
@@ -3172,7 +3172,7 @@ messages(120)=  s5e5
 ! </DESCRIPTION>
       INTEGER i, comm
 #ifndef STUBMPI
-      INCLUDE 'mpif.h'
+#include <mpif.h>'
 
       CALL wrf_get_dm_communicator ( comm )
       dex(1) = idex ; dex(2) = jdex
@@ -3203,7 +3203,7 @@ messages(120)=  s5e5
 ! </DESCRIPTION>
       INTEGER i, comm
 #ifndef STUBMPI
-      INCLUDE 'mpif.h'
+#include <mpif.h>'
 
       CALL wrf_get_dm_communicator ( comm )
       dex(1) = idex ; dex(2) = jdex
@@ -3235,7 +3235,7 @@ messages(120)=  s5e5
 ! </DESCRIPTION>
       INTEGER i, comm
 #ifndef STUBMPI
-      INCLUDE 'mpif.h'
+#include <mpif.h>'
 
       CALL wrf_get_dm_communicator ( comm )
       dex(1) = idex ; dex(2) = jdex
@@ -3266,7 +3266,7 @@ messages(120)=  s5e5
 ! </DESCRIPTION>
       INTEGER i, comm
 #ifndef STUBMPI
-      INCLUDE 'mpif.h'
+#include <mpif.h>'
 
       CALL wrf_get_dm_communicator ( comm )
       dex(1) = idex ; dex(2) = jdex
@@ -3363,7 +3363,7 @@ SUBROUTINE wrf_termio_dup
 !
 ! </DESCRIPTION>
 #ifndef STUBMPI
-  INCLUDE 'mpif.h'
+#include <mpif.h>
   CALL mpi_comm_size(MPI_COMM_WORLD, ntasks, ierr )
   CALL mpi_comm_rank(MPI_COMM_WORLD, mytask, ierr )
 #else
@@ -3680,7 +3680,7 @@ END
 !
 ! </DESCRIPTION>
 #ifndef STUBMPI
-      INCLUDE 'mpif.h'
+#include <mpif.h>'
       CALL mpi_abort(MPI_COMM_WORLD,1,ierr)
 #else
       STOP
@@ -4570,7 +4570,7 @@ END
                                 ierr )
    USE module_dm
    IMPLICIT NONE
-   INCLUDE 'mpif.h'
+#include <mpif.h>
    INTEGER field_ofst, glob_ofst
    INTEGER my_count, communicator, root, ierr
    INTEGER , DIMENSION(*) :: counts, displs
@@ -4599,7 +4599,7 @@ END
                                 ierr )
    USE module_dm
    IMPLICIT NONE
-   INCLUDE 'mpif.h'
+#include <mpif.h>
    INTEGER field_ofst, glob_ofst
    INTEGER my_count, communicator, root, ierr
    INTEGER , DIMENSION(*) :: counts, displs
@@ -4628,7 +4628,7 @@ END
                                 ierr )
    USE module_dm
    IMPLICIT NONE
-   INCLUDE 'mpif.h'
+#include <mpif.h>
    INTEGER field_ofst, glob_ofst
    INTEGER my_count, communicator, root, ierr
    INTEGER , DIMENSION(*) :: counts, displs

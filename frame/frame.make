@@ -43,36 +43,12 @@ md_calls.inc : md_calls.m4
 
 # DEPENDENCIES : only dependencies after this line (don't remove the word DEPENDENCIES)
 
-module_configure.o: \
-		module_state_description.o \
-                module_wrf_error.o \
-		module_driver_constants.o
-
-module_dm.o: module_machine.o module_state_description.o module_wrf_error.o \
-		module_domain.o \
-		module_driver_constants.o \
-		module_timing.o \
-		module_configure.o 
-
-module_domain.o: module_domain1.o \
-                 module_domain2.o \
-                 module_domain3.o 
-
 module_domain1.o: module_driver_constants.o \
 		module_configure.o \
 		module_machine.o  \
 		module_state_description.o \
                 module_wrf_error.o \
 		$(ESMF_MOD_DEPENDENCE)
-
-module_domain2.o: module_domain1.o \
-                  module_domain3.o
-
-module_domain3.o: module_domain1.o
-
-module_driver_constants.o: \
-		module_state_description.o \
-                module_wrf_error.o
 
 module_integrate.o: module_domain.o \
 		module_timing.o \
@@ -106,42 +82,14 @@ module_integrate_tst.o: module_domain.o \
 		module_configure.o \
 		$(ESMF_MOD_DEPENDENCE)
 
-module_io.o : md_calls.inc \
-		module_state_description.o \
-		module_configure.o  \
-		module_driver_constants.o 
-
-module_io_quilt.o: module_state_description.o \
-		module_internal_header_util.o \
-		module_quilt_outbuf_ops.o \
-                pack_utils.o
-
-module_machine.o: module_driver_constants.o
-
 module_nesting.o: module_machine.o \
 		module_driver_constants.o \
 		module_configure.o \
 		$(ESMF_MOD_DEPENDENCE) \
 		module_domain.o 
 
-module_quilt_outbuf_ops.o: module_state_description.o
-
-module_tiles.o: module_domain.o \
-		module_driver_constants.o \
-		module_machine.o  \
-		module_configure.o  \
-                module_wrf_error.o
- 
-module_timing.o: \
-		module_state_description.o \
-                module_wrf_error.o
- 
-module_state_description.o: module_state_description.f90
-
 module_wrf_error.o: \
 		wrf_shutdown.o \
 		$(ESMF_MOD_DEPENDENCE)
-
-wrf_shutdown.o : wrf_shutdown.F
 
 # DO NOT DELETE

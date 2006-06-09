@@ -39,6 +39,8 @@ links :
 	@ $(LN) $(FRAME)/collect_on_comm.c .
 	@ touch links
 
+# Manual rules specified first take precedence
+
 include ../dyn_$(SOLVER)/dyn_$(SOLVER).make
 include $(SHARE)/share.make
 include $(FRAME)/frame.make
@@ -57,6 +59,11 @@ include $(LAPACK)/lapack.make
 include $(BLAS)/blas.make
 include $(FFTPACK5)/fftpack5.make
 include $(MAIN)/main.make
+
+include .depend
+
+depend .depend :
+	~/makedepf90/makedepf90-2.8.6/makedepf90 *.F *.f90 > .depend
 
 WRF_OBJS=$(SHARE_OBJS) $(FRAME_OBJS) $(PHYS_OBJS) $(DYN_OBJS) \
   $(ESMF_TIME_F90_OBJS) $(IO_INT_OBJS) $(IO_NETCDF_OBJS) \
@@ -77,4 +84,4 @@ superclean : clean
 	@ $(RM) *.f90 *.F90 *.F *.inc *.int *.c *.h *.m4 *.code *.make \
           bufrlib.param *.sed registry links \
           convert_tool kma_wave2grid wave2grid_kma *.csh version_decl \
-          RSL *.bsh *.csh
+          RSL *.bsh *.csh .depend

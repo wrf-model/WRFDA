@@ -11549,7 +11549,7 @@ C-----------------------------------------------------------------------
       ENDIF
 
 C     CALL SUBROUTINE WRDLEN TO INITIALIZE SOME IMPORTANT INFORMATION
-C     ABOUT THE LOCAL MACHINE, JUST IN CASE SUBROUTINE OPENBF HASN'T
+C     ABOUT THE LOCAL MACHINE, JUST IN CASE SUBROUTINE OPENBF HAS NOT
 C     BEEN CALLED YET.
 
       CALL WRDLEN
@@ -11577,11 +11577,11 @@ C SUBPROGRAM:    PAD
 C   PRGMMR: WOOLLEN          ORG: NP20       DATE: 1994-01-06
 C
 C ABSTRACT: THIS SUBROUTINE FIRST PACKS THE VALUE FOR THE NUMBER OF
-C   BITS BEING "PADDED" (WE'LL GET TO THAT LATER), STARTING WITH BIT
+C   BITS BEING "PADDED" (WE WILL GET TO THAT LATER), STARTING WITH BIT
 C   IBIT+1 AND USING EIGHT BITS IN THE PACKED ARRAY IBAY (WHICH
 C   REPRESENTS A SUBSET PACKED INTO IBIT BITS).  THEN, STARTING WITH
 C   IBIT+9, IT PACKS ZEROES (I.E., "PADS") TO THE SPECIFIED BIT
-C   BOUNDARY (IPADB).  (NOTE: IT'S THE NUMBER OF BITS PADDED HERE THAT
+C   BOUNDARY (IPADB).  (NOTE: IT IS THE NUMBER OF BITS PADDED HERE THAT
 C   WAS PACKED IN BITS IBIT+1 THROUGH IBIT+8 - THIS IS ACTUALLY A
 C   DELAYED REPLICATION FACTOR).  IPADB MUST BE A MULTIPLE OF EIGHT AND
 C   REPRESENTS THE BIT BOUNDARY ON WHICH THE PACKED SUBSET IN IBAY
@@ -11904,7 +11904,7 @@ C----------------------------------------------------------------------
       NCON = 0
       NNOD = 0
 
-C  PARSE OUT STRING PIECES(S) (UTG's or MNEMONICS)
+C  PARSE OUT STRING PIECES(S) (UTGs or MNEMONICS)
 C  -----------------------------------------------
 
       CALL PARSEQ(UST,UTG,MAXUSR,NTOT)
@@ -12226,7 +12226,7 @@ C        i.e. (if this tag does not contain any condition characters)
 C                 .AND.
 C             ((either the file is open for input) .OR.
 C              (the tag consists of 'NUL') .OR.
-C              (we aren't being "picky"))
+C              (we are not being "picky"))
          NOD = 0
          GOTO 100
       ELSE
@@ -13416,7 +13416,7 @@ C PROGRAM HISTORY LOG:
 C 1994-01-06  J. WOOLLEN -- ORIGINAL AUTHOR
 C 1995-06-28  J. WOOLLEN -- INCREASED THE SIZE OF INTERNAL BUFR TABLE
 C                           ARRAYS IN ORDER TO HANDLE BIGGER FILES
-C 1996-12-17  J. WOOLLEN -- FIXED FOR SOME MVS COMPILER'S TREATMENT OF
+C 1996-12-17  J. WOOLLEN -- FIXED FOR SOME MVS COMPILERs TREATMENT OF
 C                           INTERNAL READS (INCREASES PORTABILITY)
 C 1998-07-08  J. WOOLLEN -- REPLACED CALL TO CRAY LIBRARY ROUTINE
 C                           "ABORT" WITH CALL TO NEW INTERNAL BUFRLIB
@@ -14550,7 +14550,7 @@ c  .... unpacked value is a NUMBER
 C  SPECIAL TREATMENT FOR UNPACKED CHARACTERS
 C  -----------------------------------------
 
-c  .... DK: Why couldn't this be done in the DO-LOOP above?
+c  .... DK: Why could not this be done in the DO-LOOP above?
       DO N=1,NVAL(LUN)
       NODE = INV(N,LUN)
       IF(ITP(NODE).EQ.3) THEN
@@ -16462,7 +16462,7 @@ C        Note that the next code line checks that we are not trying to
 C        replicate a Table B mnemonic (which is currently not allowed).
 C        The logic works because, for replicated mnemonics, IREP = I =
 C        (the index within REPS(*,*) of the symbol associated with the
-C        type of replication in question (e.g. "{, "<", etc.))
+C        type of replication in question (e.g. "{", "<", etc.))
 
          IF(TAB.EQ.'B' .AND. IREP.NE.0) GOTO 908
          IF(ATAG(1:1).EQ.'.') THEN
@@ -16479,7 +16479,7 @@ c  .... get NEMA from IDN
             CALL NEMTAB(LUN,NEMB,JDN,TAB,IRET)
             CALL RSVFVM(NEMA,NEMB)
             IF(NEMA.NE.ATAG) GOTO 909
-c  .... DK: I don't think the next test can ever be satisfied
+c  .... DK: I do not think the next test can ever be satisfied
 c  ....     should probably be IF(N.EQ.NTAG ) GOTO 910
             IF(N.GT.NTAG ) GOTO 910
             IF(TAB.NE.'B') GOTO 911
@@ -17312,7 +17312,7 @@ C     determine NUM, which, owing to the fact that the input string STR
 C     cannot contain any leading blanks, is equal to the number of
 C     digits to be decoded from the beginning of STR.
 c  .... DK: Should we have a contingency for NUM returned as -1? (guess
-c           it can't ever happen, right)
+c           it ca not ever happen, right)
 
       CALL STRSUC(STR,STR2,NUM)
 
@@ -19624,7 +19624,7 @@ C       I.E., BRACKETED BY "{" AND "}" OR "[" AND "]" FOR 8-BIT DELAYED
 C       REPLICATION, OR BRACKETED BY "(" AND ")" FOR 16-BIT DELAYED
 C       REPLICATION.  {NOTE: THIS WILL NOT WORK FOR SEQUENCES WITH
 C       1-BIT DELAYED REPLICATION (BRACKETED BY "<" AND ">"), STANDARD
-C       REPLICATION (BRACKETED BY "'s), OR NO REPLICATION (NO
+C       REPLICATION (BRACKETED BY "''"s), OR NO REPLICATION (NO
 C       BRACKETING SYMBOLS).}
 C       
 C       FOR EXAMPLE:
@@ -20514,7 +20514,7 @@ C  -------------------------------------------
       IF(IRET.NE.0) GOTO 900
       IF(JREP+NMSUB(MUNIT).GE.IREP) THEN
          CALL RDMEMS(IREP-JREP,IRET)
-c  .... DK: I don't think the below error could ever happen(??)
+c  .... DK: I do not think the below error could ever happen(??)
          IF(IRET.NE.0) GOTO 900
          GOTO 100
       ELSE
@@ -20522,7 +20522,7 @@ c  .... DK: I don't think the below error could ever happen(??)
          IMSG = IMSG+1
       ENDIF
       ENDDO
-c  .... DK: I don't think the below error could ever happen(??)
+c  .... DK: I do not think the below error could ever happen(??)
       GOTO 900
 
 C  EXITS
@@ -20635,7 +20635,7 @@ C  --------------------------------
       IF(IM.EQ.0) GOTO 902
       IF(INODE(LUN).NE.INV(1,LUN)) GOTO 903
 
-C  .... DK: Why check, isn't IO always 1 here?
+C  .... DK: Why check, is not IO always 1 here?
       IO = MIN(MAX(0,IL),1)
 
       IF(I1.LE.0) THEN
@@ -22342,7 +22342,7 @@ C                MUST BE AT LEAST AS LARGE AS LATTER)
 C     I2       - INTEGER:
 C                  - IF BUFR FILE OPEN FOR INPUT:  LENGTH OF SECOND
 C                    DIMENSION OF USR
-C                  - IF BUFR FILE OPEN FOR OUTPUT: NUMBER OF "LEVELS
+C                  - IF BUFR FILE OPEN FOR OUTPUT: NUMBER OF LEVELS
 C                    OF DATA VALUES TO BE WRITTEN TO DATA SUBSET
 C                    (MAXIMUM VALUE IS 255)
 C     STR      - CHARACTER*(*): STRING ....
@@ -23760,7 +23760,7 @@ C-----------------------------------------------------------------------
 C-----------------------------------------------------------------------
 
 C     CALL SUBROUTINE WRDLEN TO INITIALIZE SOME IMPORTANT INFORMATION
-C     ABOUT THE LOCAL MACHINE, JUST IN CASE SUBROUTINE OPENBF HASN'T
+C     ABOUT THE LOCAL MACHINE, JUST IN CASE SUBROUTINE OPENBF HAS NOT
 C     BEEN CALLED YET.
 
       CALL WRDLEN
@@ -23889,7 +23889,7 @@ C SUBPROGRAM:    UPTDD
 C   PRGMMR: WOOLLEN          ORG: NP20       DATE: 1994-01-06
 C
 C ABSTRACT: THIS SUBROUTINE RETURNS THE BIT-WISE REPRESENTATION OF THE
-C   FXY VALUE CORRESPONDING TO, SEQUENTIALLY, A PARTICULAR (IENT'th)
+C   FXY VALUE CORRESPONDING TO, SEQUENTIALLY, A PARTICULAR (IENTth)
 C   "CHILD" MNEMONIC OF A TABLE D SEQUENCE ("PARENT") MNEMONIC.
 C
 C PROGRAM HISTORY LOG:
@@ -23933,7 +23933,7 @@ C       IRET = a count of the total number of child mnemonics within
 C              TABD(ID,LUN)
 C    ELSE
 C       IRET = the bit-wise representation of the FXY value
-C              corresponding to the IENT'th child mnemonic of
+C              corresponding to the IENTth child mnemonic of
 C              TABD(ID,LUN)
 C    END IF
 C

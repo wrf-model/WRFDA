@@ -140,8 +140,8 @@
          IF( ( LRND ) .AND. ( C.EQ.A ) )
      $      LRND = .FALSE.
 *
-*        Try and decide whether rounding is done in the  IEEE  'round to
-*        nearest' style. B/2 is half a unit in the last place of the two
+*        Try and decide whether rounding is done in the  IEEE  round to
+*        nearest style. B/2 is half a unit in the last place of the two
 *        numbers A and SAVEC. Furthermore, A is even, i.e. has last  bit
 *        zero, and SAVEC is odd. Thus adding B/2 to A should not  change
 *        A, but adding B/2 to SAVEC should change SAVEC.

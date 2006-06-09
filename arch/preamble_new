@@ -39,7 +39,7 @@ EXP_CORE    = CONFIGURE_EXP_CORE
 FPPFLAGS1   = CONFIGURE_NETCDF_FLAG CONFIGURE_RTTOV_FLAG $(WORDSIZE_DEF) \
               -DLIMIT_ARGS -DWRFPLUS_TESTING -DPROMOTE_FLOAT
 WRFIO       = CONFIGURE_WRFIO_NF wrfio_int wrfio_grib1
-INCS        = -I. -I./inc CONFIGURE_RTTOV_INC
+INCS        = -I. -I./inc CONFIGURE_RTTOV_INC -I$(MPICH)/include
 INC         = $(DEVTOP)/inc
 
 # switch to use separately installed ESMF library for coupling:  1==true

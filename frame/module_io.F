@@ -2775,7 +2775,7 @@ SUBROUTINE collect_generic_and_call_pkg ( fcn, globbuf,                         
   IMPLICIT NONE
 #include "wrf_io_flags.h"
 #if defined( DM_PARALLEL ) && ! defined(STUBMPI)
-include <mpif.h>
+#include <mpif.h>
 #endif
   EXTERNAL fcn
   REAL , DIMENSION(*) , INTENT(INOUT) :: globbuf

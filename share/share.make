@@ -61,38 +61,8 @@ SHARE_OBJS    = 		\
 
 # DEPENDENCIES : only dependencies after this line (don't remove the word DEPENDENCIES)
 
-couple_or_uncouple_em.o : module_tiles.o
-
-module_wrf_top.o : module_machine.o module_domain.o module_integrate.o
-
-mediation_nest_move.o : module_domain.o module_io_domain.o
-
-module_wrf_esmf_super.o : module_integrate_ad.o \
-                          module_integrate_tl.o \
-                          module_integrate_tst.o
-
-solve_interface.o: solve_em.int module_domain.o module_configure.o \
-		module_timing.o module_driver_constants.o \
-		module_wrf_error.o
-
-start_domain.o: start_domain_em.int module_domain.o module_configure.o
-
-module_bc.o: module_configure.o module_state_description.o \
-		module_wrf_error.o
-
-module_bc_ad.o: module_configure.o module_state_description.o \
-		module_wrf_error.o module_bc.o
-
-module_bc_tl.o: module_configure.o module_state_description.o \
-		module_wrf_error.o module_bc.o
 
 module_bc_time_utilities.o: $(ESMF_MOD_DEPENDENCE)
-
-module_get_file_names.o:  module_dm.o
-
-module_io_domain.o: module_io_wrf.o module_date_time.o module_io.o  \
-		module_domain.o module_configure.o \
-		module_state_description.o
 
 module_io_wrf.o: module_date_time.o module_bc_time_utilities.o \
 		module_wrf_error.o module_domain.o \
@@ -110,37 +80,9 @@ input_wrf.o:    module_io.o module_wrf_error.o \
                 module_configure.o module_io_wrf.o  \
 		$(ESMF_MOD_DEPENDENCE)
 
-wrf_ext_write_field.o : module_io.o module_wrf_error.o \
-                module_domain.o module_timing.o
-
-wrf_ext_read_field.o : module_io.o module_wrf_error.o \
-                module_domain.o module_timing.o
-
-module_date_time.o: module_wrf_error.o module_configure.o
-
-module_soil_pre.o: module_date_time.o module_state_description.o
-
-module_optional_si_input.o: module_io_wrf.o module_io_domain.o \
-		module_domain.o module_configure.o
-
 mediation_wrfmain.o: module_domain.o module_configure.o \
 		module_timing.o $(ESMF_MOD_DEPENDENCE) \
 		module_bc_time_utilities.o module_io_domain.o
-
-init_modules.o: module_configure.o module_driver_constants.o \
-		module_domain.o module_machine.o \
-		module_nesting.o module_timing.o \
-		module_tiles.o module_io.o \
-		module_io_quilt.o module_dm.o \
-		io_int.o \
-		 module_io_wrf.o module_bc.o module_model_constants.o 
-
-interp_fcn.o: module_timing.o module_state_description.o module_configure.o \
-		module_wrf_error.o
-
-mediation_feedback_domain.o: module_domain.o module_configure.o
-
-mediation_force_domain.o: module_domain.o module_configure.o
 
 mediation_integrate.o: module_domain.o module_configure.o \
 			module_timing.o \
@@ -149,74 +91,7 @@ mediation_integrate.o: module_domain.o module_configure.o \
 			module_compute_geop.o                         \
 			module_io_domain.o
 
-
-mediation_interp_domain.o: module_domain.o module_configure.o \
-			module_timing.o
-
-#mediation_conv_emissions.o: module_domain.o module_configure.o \
-#			ESMF_Mod.o \
-#			module_date_time.o module_bc_time_utilities.o \
-#			module_io_domain.o
-
 set_timekeeping.o: module_domain.o module_configure.o \
                    $(ESMF_MOD_DEPENDENCE)
-
-wrf_inputout.o                  : module_domain.o \
-				module_configure.o module_io.o module_io_wrf.o module_bc_time_utilities.o 
-wrf_auxinput1out.o              : module_domain.o \
-                                module_configure.o module_io.o module_io_wrf.o module_bc_time_utilities.o
-wrf_auxinput2out.o              : module_domain.o \
-                                module_configure.o module_io.o module_io_wrf.o module_bc_time_utilities.o
-wrf_auxinput3out.o              : module_domain.o \
-                                module_configure.o module_io.o module_io_wrf.o module_bc_time_utilities.o
-wrf_auxinput4out.o              : module_domain.o \
-                                module_configure.o module_io.o module_io_wrf.o module_bc_time_utilities.o
-wrf_auxinput5out.o              : module_domain.o \
-                                module_configure.o module_io.o module_io_wrf.o module_bc_time_utilities.o
-wrf_histout.o                   : module_domain.o \
-                                module_configure.o module_io.o module_io_wrf.o module_bc_time_utilities.o
-wrf_auxhist1out.o               : module_domain.o \
-                                module_configure.o module_io.o module_io_wrf.o module_bc_time_utilities.o
-wrf_auxhist2out.o               : module_domain.o \
-                                module_configure.o module_io.o module_io_wrf.o module_bc_time_utilities.o
-wrf_auxhist3out.o               : module_domain.o \
-                                module_configure.o module_io.o module_io_wrf.o module_bc_time_utilities.o
-wrf_auxhist4out.o               : module_domain.o \
-                                module_configure.o module_io.o module_io_wrf.o module_bc_time_utilities.o
-wrf_auxhist5out.o               : module_domain.o \
-                                module_configure.o module_io.o module_io_wrf.o module_bc_time_utilities.o
-wrf_restartout.o                : module_domain.o \
-                                module_configure.o module_io.o module_io_wrf.o module_bc_time_utilities.o
-wrf_bdyout.o                    : module_domain.o \
-                                module_configure.o module_io.o module_io_wrf.o module_bc_time_utilities.o
-wrf_inputin.o                   : module_domain.o \
-                                module_configure.o module_io.o module_io_wrf.o module_bc_time_utilities.o
-wrf_auxhist1in.o                : module_domain.o \
-                                module_configure.o module_io.o module_io_wrf.o module_bc_time_utilities.o
-wrf_auxhist2in.o                : module_domain.o \
-                                module_configure.o module_io.o module_io_wrf.o module_bc_time_utilities.o
-wrf_auxhist3in.o                : module_domain.o \
-                                module_configure.o module_io.o module_io_wrf.o module_bc_time_utilities.o
-wrf_auxhist4in.o                : module_domain.o \
-                                module_configure.o module_io.o module_io_wrf.o module_bc_time_utilities.o
-wrf_auxhist5in.o                : module_domain.o \
-                                module_configure.o module_io.o module_io_wrf.o module_bc_time_utilities.o
-wrf_auxinput1in.o               : module_domain.o \
-                                module_configure.o module_io.o module_io_wrf.o module_bc_time_utilities.o
-wrf_auxinput2in.o               : module_domain.o \
-                                module_configure.o module_io.o module_io_wrf.o module_bc_time_utilities.o
-wrf_auxinput3in.o               : module_domain.o \
-                                module_configure.o module_io.o module_io_wrf.o module_bc_time_utilities.o
-wrf_auxinput4in.o               : module_domain.o \
-                                module_configure.o module_io.o module_io_wrf.o module_bc_time_utilities.o
-wrf_auxinput5in.o               : module_domain.o \
-                                module_configure.o module_io.o module_io_wrf.o module_bc_time_utilities.o
-wrf_bdyin.o                     : module_domain.o \
-                                module_configure.o module_io.o module_io_wrf.o module_bc_time_utilities.o
-wrf_histin.o                    : module_domain.o \
-                                module_configure.o module_io.o module_io_wrf.o module_bc_time_utilities.o
-wrf_restartin.o                 : module_domain.o \
-                                module_configure.o module_io.o module_io_wrf.o module_bc_time_utilities.o
-
 
 # DO NOT DELETE
