@@ -21,7 +21,6 @@ END SUBROUTINE init_module_wrf_error
 
 
 SUBROUTINE set_wrf_debug_level ( level )
-  USE module_wrf_error
   IMPLICIT NONE
   INTEGER , INTENT(IN) :: level
   wrf_debug_level = level
@@ -29,7 +28,6 @@ SUBROUTINE set_wrf_debug_level ( level )
 END SUBROUTINE set_wrf_debug_level
 
 SUBROUTINE get_wrf_debug_level ( level )
-  USE module_wrf_error
   IMPLICIT NONE
   INTEGER , INTENT(OUT) :: level
   level = wrf_debug_level
