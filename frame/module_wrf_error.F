@@ -46,77 +46,6 @@ SUBROUTINE wrf_debug( level , str )
   RETURN
 END SUBROUTINE wrf_debug
 
-SUBROUTINE wrf_messages(strs)
-  USE module_utility
-  IMPLICIT NONE
-  CHARACTER(LEN=*), INTENT(IN) :: strs(:)
-  INTEGER :: i
-#if defined( DM_PARALLEL ) && ! defined( STUBMPI)
-  DO I=1,SIZE(strs) 
-    write(6,*) strs(i)
-    write(0,*) strs(i)
-  END DO
-#endif
-!TBH:  work around deficiencies in build-automation
-#ifdef USE_LOGERR
-  IF ( WRF_UTIL_IsInitialized() ) THEN
-    DO I=1,SIZE(strs) 
-      CALL WRF_UTIL_LogWrite( strs(i), WRF_UTIL_LOG_INFO )
-    END DO
-  ENDIF
-#endif
-END SUBROUTINE wrf_messages
-
-SUBROUTINE wrf_message( str)
-  USE module_utility
-  IMPLICIT NONE
-  CHARACTER(LEN=*), INTENT(IN) :: str
-  INTEGER :: i
-#if defined( DM_PARALLEL ) && ! defined( STUBMPI)
-   write(6,*) str
-     write(0,*) str
-#endif
-!TBH:  work around deficiencies in build-automation
-#ifdef USE_LOGERR
-  IF ( WRF_UTIL_IsInitialized() ) THEN
-    CALL WRF_UTIL_LogWrite( str, WRF_UTIL_LOG_INFO )
-  ENDIF
-#endif
-END SUBROUTINE wrf_message
-
-! intentionally write to stderr only
-SUBROUTINE wrf_messages2(strs )
-  USE module_utility
-  IMPLICIT NONE
-  CHARACTER(LEN=*), INTENT(IN) :: strs(:)
-  INTEGER :: i
-  DO I=1,SIZE(strs) 
-    write(0,*) strs(i)
-  END DO
-!TBH:  work around deficiencies in build-automation
-#ifdef USE_LOGERR
-  IF ( WRF_UTIL_IsInitialized() ) THEN
-     DO I=1,SIZE(strs) 
-      CALL WRF_UTIL_LogWrite( strs(i), WRF_UTIL_LOG_INFO )
-    END DO
-  ENDIF
-#endif
-END SUBROUTINE wrf_messages2
-
-SUBROUTINE wrf_message2(str)
-  USE module_utility
-  IMPLICIT NONE
-  CHARACTER(LEN=*), INTENT(IN) :: str
-  INTEGER :: i
-   write(0,*) str
-!TBH:  work around deficiencies in build-automation
-#ifdef USE_LOGERR
-  IF ( WRF_UTIL_IsInitialized() ) THEN
-    CALL WRF_UTIL_LogWrite( str, WRF_UTIL_LOG_INFO )
-  ENDIF
-#endif
-END SUBROUTINE wrf_message2
-
 SUBROUTINE wrf_error( file_str, line, str )
   IMPLICIT NONE
   CHARACTER(LEN=*), INTENT(IN) :: file_str
@@ -283,3 +212,75 @@ END SUBROUTINE wrf_check_error
 END MODULE module_wrf_error
 
 
+
+
+SUBROUTINE wrf_messages(strs)
+  USE module_utility
+  IMPLICIT NONE
+  CHARACTER(LEN=*), INTENT(IN) :: strs(:)
+  INTEGER :: i
+#if defined( DM_PARALLEL ) && ! defined( STUBMPI)
+  DO I=1,SIZE(strs) 
+    write(6,*) strs(i)
+    write(0,*) strs(i)
+  END DO
+#endif
+!TBH:  work around deficiencies in build-automation
+#ifdef USE_LOGERR
+  IF ( WRF_UTIL_IsInitialized() ) THEN
+    DO I=1,SIZE(strs) 
+      CALL WRF_UTIL_LogWrite( strs(i), WRF_UTIL_LOG_INFO )
+    END DO
+  ENDIF
+#endif
+END SUBROUTINE wrf_messages
+
+SUBROUTINE wrf_message( str)
+  USE module_utility
+  IMPLICIT NONE
+  CHARACTER(LEN=*), INTENT(IN) :: str
+  INTEGER :: i
+#if defined( DM_PARALLEL ) && ! defined( STUBMPI)
+   write(6,*) str
+     write(0,*) str
+#endif
+!TBH:  work around deficiencies in build-automation
+#ifdef USE_LOGERR
+  IF ( WRF_UTIL_IsInitialized() ) THEN
+    CALL WRF_UTIL_LogWrite( str, WRF_UTIL_LOG_INFO )
+  ENDIF
+#endif
+END SUBROUTINE wrf_message
+
+! intentionally write to stderr only
+SUBROUTINE wrf_messages2(strs )
+  USE module_utility
+  IMPLICIT NONE
+  CHARACTER(LEN=*), INTENT(IN) :: strs(:)
+  INTEGER :: i
+  DO I=1,SIZE(strs) 
+    write(0,*) strs(i)
+  END DO
+!TBH:  work around deficiencies in build-automation
+#ifdef USE_LOGERR
+  IF ( WRF_UTIL_IsInitialized() ) THEN
+     DO I=1,SIZE(strs) 
+      CALL WRF_UTIL_LogWrite( strs(i), WRF_UTIL_LOG_INFO )
+    END DO
+  ENDIF
+#endif
+END SUBROUTINE wrf_messages2
+
+SUBROUTINE wrf_message2(str)
+  USE module_utility
+  IMPLICIT NONE
+  CHARACTER(LEN=*), INTENT(IN) :: str
+  INTEGER :: i
+   write(0,*) str
+!TBH:  work around deficiencies in build-automation
+#ifdef USE_LOGERR
+  IF ( WRF_UTIL_IsInitialized() ) THEN
+    CALL WRF_UTIL_LogWrite( str, WRF_UTIL_LOG_INFO )
+  ENDIF
+#endif
+END SUBROUTINE wrf_message2
