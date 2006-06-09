@@ -1,6 +1,7 @@
 !WRF:PACKAGE:NODM
 !
 MODULE module_dm
+   USE module_wrf_error
 
   CONTAINS
    SUBROUTINE init_module_dm

@@ -730,6 +730,7 @@ END MODULE module_date_time
    ! ISO is "YYYY-MM-DDThh:mm:ss" while WRF is "YYYY-MM-DD_hh:mm:ss".  
    SUBROUTINE wrf_atotime ( str, time )
       USE module_utility
+      USE module_wrf_error
       CHARACTER (LEN=*), INTENT( IN) :: str
       TYPE(WRF_UTIL_Time),   INTENT(OUT) :: time
       INTEGER yr, mm, dd, h, m, s, ms
@@ -764,6 +765,7 @@ END MODULE module_date_time
    ! ISO is "YYYY-MM-DDThh:mm:ss" while WRF is "YYYY-MM-DD_hh:mm:ss".  
    SUBROUTINE wrf_timetoa ( time, str )
       USE module_utility
+      USE module_wrf_error
       TYPE(WRF_UTIL_Time),   INTENT( IN) :: time
       CHARACTER (LEN=*), INTENT(OUT) :: str
       INTEGER rc
@@ -789,6 +791,7 @@ END MODULE module_date_time
    ! pre_str.  
    SUBROUTINE wrf_clockprint ( level, clock, pre_str )
       USE module_utility
+      USE module_wrf_error
       INTEGER,           INTENT( IN) :: level
       TYPE(WRF_UTIL_Clock),  INTENT( IN) :: clock
       CHARACTER (LEN=*), INTENT( IN) :: pre_str

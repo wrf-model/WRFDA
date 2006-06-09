@@ -3,6 +3,8 @@
 
 MODULE module_timing
 
+   USE module_wrf_error
+
    INTEGER, PARAMETER, PRIVATE :: cnmax = 30
    INTEGER, PRIVATE, DIMENSION(cnmax) :: count_int1 , count_rate_int1 , count_max_int1
    INTEGER, PRIVATE, DIMENSION(cnmax) :: count_int2 , count_rate_int2 , count_max_int2
