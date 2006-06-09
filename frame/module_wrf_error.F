@@ -125,7 +125,7 @@ SUBROUTINE wrf_error( file_str, line, str )
   IMPLICIT NONE
   CHARACTER(LEN=*), INTENT(IN) :: file_str
   INTEGER ,         INTENT(IN) :: line  ! only print file and line if line > 0
-  CHARACTER(LEN=*), INTENT(IN) :: strs(:)
+  CHARACTER(LEN=*), INTENT(IN) :: str
   CHARACTER*256 :: line_str
 
   write(line_str,'(i6)') line
