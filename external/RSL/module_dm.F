@@ -3380,7 +3380,7 @@ SUBROUTINE wrf_get_myproc( myproc )
 ! Pass back the task number (usually MPI rank) on this process.
 !
 ! </DESCRIPTION>
-# include <rsl.inc>
+#include "rsl.inc"
   INTEGER myproc
   myproc = rsl_myproc
   RETURN
@@ -3388,7 +3388,7 @@ END SUBROUTINE wrf_get_myproc
 
 SUBROUTINE wrf_get_nproc( nproc )
   IMPLICIT NONE
-# include <rsl.inc>
+#include "rsl.inc"
   INTEGER nproc
 ! <DESCRIPTION>
 ! Pass back the number of distributed-memory tasks.
@@ -3400,7 +3400,7 @@ END SUBROUTINE wrf_get_nproc
 
 SUBROUTINE wrf_get_nprocx( nprocx )
   IMPLICIT NONE
-# include <rsl.inc>
+#include "rsl.inc"
   INTEGER nprocx
 ! <DESCRIPTION>
 ! Pass back the number of distributed-memory tasks decomposing the X dimension of the domain.
@@ -3412,7 +3412,7 @@ END SUBROUTINE wrf_get_nprocx
 
 SUBROUTINE wrf_get_nprocy( nprocy )
   IMPLICIT NONE
-# include <rsl.inc>
+#include "rsl.inc"
   INTEGER nprocy
 ! <DESCRIPTION>
 ! Pass back the number of distributed-memory tasks decomposing the Y dimension of the domain.
@@ -3578,7 +3578,7 @@ SUBROUTINE wrf_dm_boundary ( domdesc , comms , period_id , &
    IMPLICIT NONE
    INTEGER domdesc , comms(*) , period_id
    LOGICAL , INTENT(IN)      :: periodic_x, periodic_y
-# include <rsl.inc>
+#include "rsl.inc"
 
    IF ( periodic_x ) THEN
      CALL rsl_exch_period ( domdesc , comms( period_id ) , RSL_M )
@@ -3636,7 +3636,7 @@ SUBROUTINE write_68( grid, v , s , &
           ims, ime, jms, jme, kms, kme, &
           its, ite, jts, jte, kts, kte
   REAL, DIMENSION( ims:ime , kms:kme, jms:jme ) :: v
-# include <rsl.inc>
+#include "rsl.inc"
 
   INTEGER i,j,k
 
@@ -3688,7 +3688,7 @@ END
    END SUBROUTINE wrf_abort
 
    SUBROUTINE wrf_dm_shutdown
-# include <rsl.inc>
+#include "rsl.inc"
 ! <DESCRIPTION>
 ! Shutdown (gracefully) the underlying comm layer.
 !

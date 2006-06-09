@@ -908,7 +908,7 @@ SUBROUTINE wrf_inquire_opened ( DataHandle, FileName , FileStatus, Status )
   INTEGER, EXTERNAL           :: use_package
   LOGICAL, EXTERNAL           :: wrf_dm_on_monitor, multi_files, use_output_servers
 #include "wrf_io_flags.h"
-#include <wrf_status_codes.h>
+#include "wrf_status_codes.h"
 
   INTEGER io_form , Hndl
 
@@ -990,7 +990,7 @@ SUBROUTINE wrf_inquire_filename ( DataHandle, FileName , FileStatus, Status )
   CHARACTER*(*),  INTENT(OUT)  :: FileName
   INTEGER ,       INTENT(OUT) :: FileStatus
   INTEGER ,       INTENT(OUT) :: Status
-#include <wrf_status_codes.h>
+#include "wrf_status_codes.h"
   INTEGER, EXTERNAL           :: use_package
   LOGICAL, EXTERNAL           :: wrf_dm_on_monitor, multi_files, use_output_servers
   LOGICAL                     :: for_out
@@ -1071,7 +1071,7 @@ SUBROUTINE wrf_iosync ( DataHandle, Status )
   IMPLICIT NONE
   INTEGER ,       INTENT(IN)  :: DataHandle
   INTEGER ,       INTENT(OUT) :: Status
-#include <wrf_status_codes.h>
+#include "wrf_status_codes.h"
   INTEGER, EXTERNAL           :: use_package
   LOGICAL, EXTERNAL           :: wrf_dm_on_monitor, multi_files, use_output_servers
   LOGICAL                     :: for_out
@@ -1144,7 +1144,7 @@ SUBROUTINE wrf_ioclose ( DataHandle, Status )
   IMPLICIT NONE
   INTEGER ,       INTENT(IN)  :: DataHandle
   INTEGER ,       INTENT(OUT) :: Status
-#include <wrf_status_codes.h>
+#include "wrf_status_codes.h"
   INTEGER, EXTERNAL           :: use_package
   LOGICAL, EXTERNAL           :: wrf_dm_on_monitor, multi_files, use_output_servers
   INTEGER io_form , Hndl
@@ -1230,7 +1230,7 @@ SUBROUTINE wrf_get_next_time ( DataHandle, DateStr, Status )
   INTEGER ,       INTENT(IN)  :: DataHandle
   CHARACTER*(*),  INTENT(OUT) :: DateStr
   INTEGER ,       INTENT(OUT) :: Status
-#include <wrf_status_codes.h>
+#include "wrf_status_codes.h"
 
   INTEGER, EXTERNAL           :: use_package
   LOGICAL, EXTERNAL           :: wrf_dm_on_monitor, multi_files, use_output_servers
@@ -1328,7 +1328,7 @@ SUBROUTINE wrf_get_previous_time ( DataHandle, DateStr, Status )
   INTEGER ,       INTENT(IN)  :: DataHandle
   CHARACTER*(*),  INTENT(OUT) :: DateStr
   INTEGER ,       INTENT(OUT) :: Status
-#include <wrf_status_codes.h>
+#include "wrf_status_codes.h"
 
   INTEGER, EXTERNAL           :: use_package
   LOGICAL, EXTERNAL           :: wrf_dm_on_monitor, multi_files, use_output_servers
@@ -1419,7 +1419,7 @@ SUBROUTINE wrf_set_time ( DataHandle, DateStr, Status )
   INTEGER ,       INTENT(IN)  :: DataHandle
   CHARACTER*(*), INTENT(IN)   :: DateStr
   INTEGER ,       INTENT(OUT) :: Status
-#include <wrf_status_codes.h>
+#include "wrf_status_codes.h"
 
   INTEGER, EXTERNAL           :: use_package
   LOGICAL, EXTERNAL           :: wrf_dm_on_monitor, multi_files, use_output_servers
@@ -1498,7 +1498,7 @@ SUBROUTINE wrf_get_next_var ( DataHandle, VarName, Status )
   INTEGER ,       INTENT(IN)  :: DataHandle
   CHARACTER*(*),  INTENT(OUT) :: VarName
   INTEGER ,       INTENT(OUT) :: Status
-#include <wrf_status_codes.h>
+#include "wrf_status_codes.h"
 
   INTEGER, EXTERNAL           :: use_package
   LOGICAL, EXTERNAL           :: wrf_dm_on_monitor, multi_files, use_output_servers
@@ -1579,7 +1579,7 @@ SUBROUTINE wrf_get_var_info ( DataHandle , VarName , NDim , MemoryOrder , Stagge
   CHARACTER*(*)         ,INTENT(OUT)    :: Stagger
   INTEGER ,dimension(*) ,INTENT(OUT)    :: DomainStart, DomainEnd
   INTEGER               ,INTENT(OUT)    :: Status
-#include <wrf_status_codes.h>
+#include "wrf_status_codes.h"
   INTEGER io_form , Hndl
   LOGICAL                     :: for_out
   INTEGER, EXTERNAL           :: use_package
@@ -1882,7 +1882,7 @@ SUBROUTINE wrf_read_field ( DataHandle , DateStr , VarName , Field , FieldType ,
   INTEGER ,dimension(*)         ,INTENT(IN)    :: MemoryStart, MemoryEnd
   INTEGER ,dimension(*)         ,INTENT(IN)    :: PatchStart,  PatchEnd
   INTEGER                       ,INTENT(OUT)   :: Status
-#include <wrf_status_codes.h>
+#include "wrf_status_codes.h"
 #include "wrf_io_flags.h"
   INTEGER, ALLOCATABLE        :: ICAST(:)
   LOGICAL perturb_input
@@ -1948,7 +1948,7 @@ SUBROUTINE wrf_read_field1 ( DataHandle , DateStr , VarName , Field , FieldType 
   INTEGER ,dimension(*)         ,INTENT(IN)    :: MemoryStart, MemoryEnd
   INTEGER ,dimension(*)         ,INTENT(IN)    :: PatchStart,  PatchEnd
   INTEGER                       ,INTENT(OUT)   :: Status
-#include <wrf_status_codes.h>
+#include "wrf_status_codes.h"
   INTEGER io_form , Hndl
   LOGICAL                     :: for_out
   INTEGER, EXTERNAL           :: use_package
@@ -2124,7 +2124,7 @@ SUBROUTINE wrf_write_field ( DataHandle , DateStr , VarName , Field , FieldType 
   INTEGER ,dimension(*)         ,INTENT(IN)    :: MemoryStart, MemoryEnd
   INTEGER ,dimension(*)         ,INTENT(IN)    :: PatchStart,  PatchEnd
   INTEGER                       ,INTENT(OUT)   :: Status
-#include <wrf_status_codes.h>
+#include "wrf_status_codes.h"
 #include "wrf_io_flags.h"
   INTEGER, ALLOCATABLE        :: ICAST(:)
   IF ( FieldType .EQ. WRF_LOGICAL ) THEN
@@ -2186,7 +2186,7 @@ SUBROUTINE wrf_write_field1 ( DataHandle , DateStr , VarName , Field , FieldType
   INTEGER ,dimension(*)         ,INTENT(IN)    :: MemoryStart, MemoryEnd
   INTEGER ,dimension(*)         ,INTENT(IN)    :: PatchStart,  PatchEnd
   INTEGER                       ,INTENT(OUT)   :: Status
-#include <wrf_status_codes.h>
+#include "wrf_status_codes.h"
   INTEGER io_form , Hndl
   LOGICAL                     :: for_out
   INTEGER, EXTERNAL           :: use_package
