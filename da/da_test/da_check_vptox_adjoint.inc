@@ -1,4 +1,4 @@
-SUBROUTINE DA_Check_VpToX_Adjoint( ne, xb, xbx, be, ep, xp, vp, xa, &
+SUBROUTINE da_check_vptox_adjoint( ne, xb, xbx, be, ep, xp, vp, xa, &
                                    ids, ide, jds, jde, kds, kde, &
                                    ims, ime, jms, jme, kms, kme, &
                                    its, ite, jts, jte, kts, kte )
@@ -42,12 +42,12 @@ SUBROUTINE DA_Check_VpToX_Adjoint( ne, xb, xbx, be, ep, xp, vp, xa, &
 
    write(unit=*, fmt='(/a/)') 'da_check_vptox_adjoint: Test Results:'
 
-   CALL DA_Zero_X( xa )
+   CALL da_zero_x( xa )
 
    vp2_v1(:,:,:) = vp % v1(:,:,:)
    vp2_v2(:,:,:) = vp % v2(:,:,:)
 
-   CALL DA_PsiChi_To_UV(vp % v1, vp % v2, xb % coefx, &
+   CALL da_psichi_to_uv(vp % v1, vp % v2, xb % coefx, &
                         xb % coefy , xa % u, xa % v, &
                         ids,ide, jds,jde, kds,kde, &
                         ims,ime, jms,jme, kms,kme, &
@@ -62,7 +62,7 @@ SUBROUTINE DA_Check_VpToX_Adjoint( ne, xb, xbx, be, ep, xp, vp, xa, &
    vp%v1(:,:,:)=0.
    vp%v2(:,:,:)=0.
 
-   CALL DA_PsiChi_To_UV_Adj( xa % u, xa % v, xb % coefx,   &
+   CALL da_psichi_to_uv_adj( xa % u, xa % v, xb % coefx,   &
                              xb % coefy, vp % v1, vp % v2, &
                              ids,ide, jds,jde, kds,kde,    &
                              ims,ime, jms,jme, kms,kme,    &
@@ -90,7 +90,7 @@ PRINT *,'TEST_COVERAGE_DA_Check_VpToX_Adjoint A:  adj_sum_lhs,adj_sum_rhs = ', a
 
 !-------------------------------------------------------------------------
 
-   CALL DA_Zero_X( xa )
+   CALL da_zero_x( xa )
 
    vp2_v1(:,:,:) = vp % v1(:,:,:)
    vp2_v2(:,:,:) = vp % v2(:,:,:)
@@ -188,7 +188,7 @@ PRINT *,'TEST_COVERAGE_DA_Check_VpToX_Adjoint A:  adj_sum_lhs,adj_sum_rhs = ', a
 !  [5.0] Perform adjoint operation:
 !-------------------------------------------------------------------------
 
-   call DA_Zero_vp_type ( vp )
+   call da_zero_vp_type ( vp )
 
    call da_transform_vptox_adj( xb, xbx, xa, vp, be, ep, xp, &
                                 ids,ide, jds,jde, kds,kde,   &
@@ -214,7 +214,7 @@ PRINT *,'TEST_COVERAGE_DA_Check_VpToX_Adjoint A:  adj_sum_lhs,adj_sum_rhs = ', a
 
    adj_sum_lhs = wrf_dm_sum_real( adj_par_lhs )
    adj_sum_rhs = wrf_dm_sum_real( adj_par_rhs )
-PRINT *,'TEST_COVERAGE_DA_Check_VpToX_Adjoint B:  adj_sum_lhs,adj_sum_rhs = ', adj_sum_lhs,adj_sum_rhs
+PRINT *,'TEST_COVERAGE_da_check_vptox_adjoint B:  adj_sum_lhs,adj_sum_rhs = ', adj_sum_lhs,adj_sum_rhs
 
    IF ( wrf_dm_on_monitor() ) THEN
       write(UNIT=stdout, fmt='(/)')
@@ -231,7 +231,7 @@ PRINT *,'TEST_COVERAGE_DA_Check_VpToX_Adjoint B:  adj_sum_lhs,adj_sum_rhs = ', a
    if ( be % ne > 0 ) vp % alpha(:,:,:) = vp2_alpha(:,:,:)
 
    write(UNIT=stdout, fmt='(/a/)') &
-        'End of DA_Check_VpToX_Adjoint.'
+        'End of da_check_vptox_adjoint.'
       
-END SUBROUTINE DA_Check_VpToX_Adjoint
+END SUBROUTINE da_check_vptox_adjoint
 

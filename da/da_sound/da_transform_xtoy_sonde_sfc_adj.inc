@@ -29,29 +29,29 @@ SUBROUTINE da_transform_xtoy_sonde_sfc_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
           dym = iv%sonde_sfc(n)%loc%dym
 
           ! [1.2] Interpolate horizontally:
-#ifndef DEREF_KLUDGE
-          call da_Interp_Obs_lin_2D_adj(jo_grad_x % u, xp, i, j, dx, dy, dxm, dym, &
+#ifndef DEREF_kludge
+          call da_interp_obs_lin_2d_adj(jo_grad_x % u, xp, i, j, dx, dy, dxm, dym, &
                           jo_grad_y%sonde_sfc(n)%u, iv%sonde_sfc(n)%zk)
-          call da_Interp_Obs_lin_2D_adj(jo_grad_x % v, xp, i, j, dx, dy, dxm, dym, &
+          call da_interp_obs_lin_2d_adj(jo_grad_x % v, xp, i, j, dx, dy, dxm, dym, &
                           jo_grad_y%sonde_sfc(n)%v, iv%sonde_sfc(n)%zk)
-          call da_Interp_Obs_lin_2D_adj(jo_grad_x % t, xp, i, j, dx, dy, dxm, dym, &
+          call da_interp_obs_lin_2d_adj(jo_grad_x % t, xp, i, j, dx, dy, dxm, dym, &
                           jo_grad_y%sonde_sfc(n)%t, iv%sonde_sfc(n)%zk)
-          call da_Interp_Obs_lin_2D_adj(jo_grad_x % q, xp, i, j, dx, dy, dxm, dym, &
+          call da_interp_obs_lin_2d_adj(jo_grad_x % q, xp, i, j, dx, dy, dxm, dym, &
                           jo_grad_y%sonde_sfc(n)%q, iv%sonde_sfc(n)%zk)
 
-          call da_Interp_lin_2D_adj(jo_grad_x % psfc, xp%ims, xp%ime, xp%jms, xp%jme, &
+          call da_interp_lin_2d_adj(jo_grad_x % psfc, xp%ims, xp%ime, xp%jms, xp%jme, &
                                  i, j, dx, dy, dxm, dym, jo_grad_y%sonde_sfc(n)%p)
 #else
-          call da_Interp_Obs_lin_2D_adj(jo_grad_x % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+          call da_interp_obs_lin_2d_adj(jo_grad_x % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                                      jo_grad_y%sonde_sfc(n)%u, iv%sonde_sfc(n)%zk)
-          call da_Interp_Obs_lin_2D_adj(jo_grad_x % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+          call da_interp_obs_lin_2d_adj(jo_grad_x % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                                      jo_grad_y%sonde_sfc(n)%v, iv%sonde_sfc(n)%zk)
-          call da_Interp_Obs_lin_2D_adj(jo_grad_x % t(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+          call da_interp_obs_lin_2d_adj(jo_grad_x % t(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                                      jo_grad_y%sonde_sfc(n)%t, iv%sonde_sfc(n)%zk)
-          call da_Interp_Obs_lin_2D_adj(jo_grad_x % q(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+          call da_interp_obs_lin_2d_adj(jo_grad_x % q(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                                      jo_grad_y%sonde_sfc(n)%q, iv%sonde_sfc(n)%zk)
 
-          call da_Interp_lin_2D_adj(jo_grad_x % psfc(xp%ims,xp%jms), &
+          call da_interp_lin_2d_adj(jo_grad_x % psfc(xp%ims,xp%jms), &
                                  xp%ims, xp%ime, xp%jms, xp%jme, &
                                  i, j, dx, dy, dxm, dym, jo_grad_y%sonde_sfc(n)%p)
 #endif
@@ -60,7 +60,7 @@ SUBROUTINE da_transform_xtoy_sonde_sfc_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
     else if (sfc_assi_options == 2) then
       do n=iv%ob_numb(iv%current_ob_time-1)%sound + 1, iv%ob_numb(iv%current_ob_time)%sound
         if(iv%sonde_sfc(n)%loc%proc_domain_with_halo) then
-          CALL DA_Transform_XToPsfc_Adj(xb,xp,iv%sonde_sfc(n), &
+          CALL da_transform_xtopsfc_adj(xb,xp,iv%sonde_sfc(n), &
                                           jo_grad_y%sonde_sfc(n),jo_grad_x)
         endif
       ENDDO

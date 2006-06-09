@@ -46,7 +46,7 @@ SUBROUTINE da_oma_stats_rad ( stats_unit, iv, re )
 
       if( iv%instid(i)%rad(n)%loc%proc_domain ) then
 
-         CALL da_Stats_Calculate( n,k,iv%instid(i)%rad(n)%tb(k)%qc, &
+         CALL da_stats_calculate( n,k,iv%instid(i)%rad(n)%tb(k)%qc, &
                                re%instid(i)%rad(n)%tb(k), rad(i)%ichan(k)%num, &
                                rad(i)%ichan(k)%minimum, rad(i)%ichan(k)%maximum, &
                                rad(i)%ichan(k)%ave, rad(i)%ichan(k)%rms)
@@ -75,7 +75,7 @@ SUBROUTINE da_oma_stats_rad ( stats_unit, iv, re )
 
    IF ( wrf_dm_on_monitor() ) THEN
      write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of OMA for Radiance '//iv%instid(i)%rttovid_string 
-     CALL DA_Print_Stats_Rad( stats_unit, iv%instid(i)%nchan, rad(i) )
+     CALL da_print_stats_rad( stats_unit, iv%instid(i)%nchan, rad(i) )
    END IF
 
   end do                         !  end loop for sensor

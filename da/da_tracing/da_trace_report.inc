@@ -56,8 +56,8 @@ SUBROUTINE da_trace_report
    CALL SYSTEM_CLOCK( &
       COUNT_RATE=CountRate)
 
-   ! Ensure the lists from each PE match. Use the routine list from the traced PE as the
-   ! master copy
+   ! Ensure the lists from each PE match. Use the routine list from the 
+   ! traced PE as the master copy
 
    MasterTimerNames(:)=TimerNames(:)
 
@@ -222,11 +222,11 @@ SUBROUTINE da_trace_report
       END DO
 
       WRITE (UNIT=trace_unit, &
-         FMT='("<TR><TD><B>Total</B>",I4,"<TD></TD><TD><B>",F8.1, &
-           "</B><TD></TD><TD></TD><TD></TD><TD><B>",F8.1, &
-           "</B><TD></TD><TD></TD><TD></TD>")') &
-         MasterNoRoutines, TotalElapsedTime/REAL(CountRate), &
-         TotalCPUTime(1)
+         FMT='(A,I4,A,F8.1,A,F8.1,A)') &
+         "<TR><TD><B>Total</B>",MasterNoRoutines, "<TD></TD><TD><B>", &
+         TotalElapsedTime/REAL(CountRate), &
+         "</B><TD></TD><TD></TD><TD></TD><TD><B>" &
+         TotalCPUTime(1),"</B><TD></TD><TD></TD><TD></TD>"
       IF (TotalElapsedTime > 0.0) THEN
          WRITE (UNIT=trace_unit, FMT='("<TD><B>",F8.1,"</B>")') &
             (TotalCPUTime(1))/(TotalElapsedTime/REAL(CountRate))
@@ -287,8 +287,8 @@ SUBROUTINE da_trace_report
             SpeedUp = 0.0
          END IF
 
-         ! This horrible solution as MINLOC does not take a DIM argument, so SUM
-         ! is needed to convert the array to an integer
+         ! This horrible solution as MINLOC does not take a DIM argument, so 
+         ! SUM is needed to convert the array to an integer
 
          MinElapsedPos = SUM(MINLOC(MasterElapsedTime(:,Pointer)))-1
          MaxElapsedPos = SUM(MAXLOC(MasterElapsedTime(:,Pointer)))-1
@@ -327,11 +327,11 @@ SUBROUTINE da_trace_report
       END DO
 
       WRITE (UNIT=trace_unit, &
-         FMT='("<TR><TD><B>Total</B>",I4,"</TD><TD><TD><B>",F8.1, &
-            "</B><TD></TD><TD></TD><TD></TD><TD><B>", &
-            F8.1,"</B><TD></TD><TD></TD><TD></TD>")') &
-         MasterNoRoutines, TotalElapsedTime/REAL(CountRate), &
-         TotalCPUTime(1)
+         FMT='(A,I4,A,F8.1,A,F8.1,A)') &
+         "<TR><TD><B>Total</B>",MasterNoRoutines, "</TD><TD><TD><B>", &
+         TotalElapsedTime/REAL(CountRate), &
+         "</B><TD></TD><TD></TD><TD></TD><TD><B>",TotalCPUTime(1), &
+         "</B><TD></TD><TD></TD><TD></TD>"
       IF (TotalElapsedTime > 0.0) THEN
          WRITE (UNIT=trace_unit, FMT='("<TD><B>",F8.1,"</B>")') &
             TotalCPUTime(1)/(TotalElapsedTime/REAL(CountRate))
@@ -342,9 +342,9 @@ SUBROUTINE da_trace_report
 
    END IF ! mype==0
 
-   !===================================================================================
+   !============================================================================
    ! Sort subroutines into memory use order by max memory on one PE
-   !===================================================================================
+   !============================================================================
 
    IF (trace_memory) THEN
 
@@ -373,7 +373,8 @@ SUBROUTINE da_trace_report
             WRITE (UNIT=trace_unit, &
                FMT='("<TR><TD><a href=",A,"/",A,".html>",A,"</a><TD>",I10,"<TD>",I10,"<TD>",I10)') &
                TRIM(Documentation_url),TRIM(TimerNames(Pointer)),TRIM(TimerNames(Pointer)), &
-               MAXVAL(MasterMaxHeap(:,Pointer)),SUM(MasterMaxHeap(:,Pointer)),SUM(MasterMaxHeap(:,Pointer))/nproc
+               MAXVAL(MasterMaxHeap(:,Pointer)),SUM(MasterMaxHeap(:,Pointer)), &
+               SUM(MasterMaxHeap(:,Pointer))/nproc
          END DO
          WRITE (UNIT=trace_unit,FMT='("</table></body></html>")')
       END IF

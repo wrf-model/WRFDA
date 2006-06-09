@@ -1,4 +1,4 @@
-SUBROUTINE DA_OI_Stats_Satem ( stats_unit, oi )
+SUBROUTINE da_oi_stats_satem ( stats_unit, oi )
 
   IMPLICIT NONE
 
@@ -22,7 +22,7 @@ SUBROUTINE DA_OI_Stats_Satem ( stats_unit, oi )
     DO n=1, oi%num_Satem
       if( oi%satem(n)%loc%proc_domain ) then
         do k=1, oi%satem(n)%info%levels
-          CALL da_Stats_Calculate( oi%Satem(n)%loc%obs_global_index, &
+          CALL da_stats_calculate( oi%Satem(n)%loc%obs_global_index, &
                          k, oi%Satem(n)%thickness(k)%qc, &
                          oi%Satem(n)%thickness(k)%inv, nthickness, &
                          Satem%minimum%thickness, Satem%maximum%thickness, &
@@ -43,9 +43,9 @@ SUBROUTINE DA_OI_Stats_Satem ( stats_unit, oi )
   IF ( wrf_dm_on_monitor() ) THEN
     IF (nthickness /= 0 ) THEN
       write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of OI for Satem'
-      CALL DA_Print_Stats_Satem( stats_unit, nthickness, Satem )
+      CALL da_print_stats_satem( stats_unit, nthickness, Satem )
     END IF
   END IF
 
-END SUBROUTINE DA_OI_Stats_Satem
+END SUBROUTINE da_oi_stats_satem
 

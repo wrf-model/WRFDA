@@ -1,4 +1,4 @@
-SUBROUTINE DA_Transform_XToY_Synop ( xa, xb, iv, xp, y )
+SUBROUTINE da_transform_xtoy_synop ( xa, xb, iv, xp, y )
 
   IMPLICIT NONE
 
@@ -36,28 +36,28 @@ SUBROUTINE DA_Transform_XToY_Synop ( xa, xb, iv, xp, y )
 
           ! [1.2] Interpolate horizontally:
 #ifndef DEREF_KLUDGE
-          call da_Interp_Obs_lin_2D(xa % u, xp, i, j, dx, dy, dxm, dym, &
+          call da_interp_obs_lin_2d(xa % u, xp, i, j, dx, dy, dxm, dym, &
                                  y%synop(n)%u, iv%synop(n)%zk)
-          call da_Interp_Obs_lin_2D(xa % v, xp, i, j, dx, dy, dxm, dym, &
+          call da_interp_obs_lin_2d(xa % v, xp, i, j, dx, dy, dxm, dym, &
                                  y%synop(n)%v, iv%synop(n)%zk)
-          call da_Interp_Obs_lin_2D(xa % t, xp, i, j, dx, dy, dxm, dym, &
+          call da_interp_obs_lin_2d(xa % t, xp, i, j, dx, dy, dxm, dym, &
                                  y%synop(n)%t, iv%synop(n)%zk)
-          call da_Interp_Obs_lin_2D(xa % q, xp, i, j, dx, dy, dxm, dym, &
+          call da_interp_obs_lin_2d(xa % q, xp, i, j, dx, dy, dxm, dym, &
                                  y%synop(n)%q, iv%synop(n)%zk)
 
-          call da_Interp_lin_2D(xa % psfc, xp%ims, xp%ime, xp%jms, xp%jme, &
+          call da_interp_lin_2d(xa % psfc, xp%ims, xp%ime, xp%jms, xp%jme, &
                              i, j, dx, dy, dxm, dym, y%synop(n)%p)
 #else
-          call da_Interp_Obs_lin_2D(xa % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+          call da_interp_obs_lin_2d(xa % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                                  y%synop(n)%u, iv%synop(n)%zk)
-          call da_Interp_Obs_lin_2D(xa % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+          call da_interp_obs_lin_2d(xa % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                                  y%synop(n)%v, iv%synop(n)%zk)
-          call da_Interp_Obs_lin_2D(xa % t(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+          call da_interp_obs_lin_2d(xa % t(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                                  y%synop(n)%t, iv%synop(n)%zk)
-          call da_Interp_Obs_lin_2D(xa % q(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+          call da_interp_obs_lin_2d(xa % q(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                                  y%synop(n)%q, iv%synop(n)%zk)
 
-          call da_Interp_lin_2D(xa % psfc(xp%ims,xp%jms), xp%ims, xp%ime, xp%jms, xp%jme, &
+          call da_interp_lin_2d(xa % psfc(xp%ims,xp%jms), xp%ims, xp%ime, xp%jms, xp%jme, &
                              i, j, dx, dy, dxm, dym, y%synop(n)%p)
 #endif
 
@@ -66,11 +66,11 @@ SUBROUTINE DA_Transform_XToY_Synop ( xa, xb, iv, xp, y )
     else if (sfc_assi_options == 2) then
       do n=iv%ob_numb(iv%current_ob_time-1)%synop + 1, iv%ob_numb(iv%current_ob_time)%synop
         if(iv%synop(n)%loc%proc_domain_with_halo) then
-          CALL DA_Transform_XToPsfc( xb, xa, xp, iv%synop(n), y%synop(n) )
+          CALL da_transform_xtopsfc( xb, xa, xp, iv%synop(n), y%synop(n) )
         endif
       enddo
     endif
   ENDIF
 
-END SUBROUTINE DA_Transform_XToY_Synop
+END SUBROUTINE da_transform_xtoy_synop
 

@@ -1,4 +1,4 @@
-SUBROUTINE DA_Calculate_RF_Factors( rf_lengthscale, rf_alpha, rf_scale_factor )
+SUBROUTINE da_calculate_rf_factors( rf_lengthscale, rf_alpha, rf_scale_factor )
 
 !------------------------------------------------------------------------------
 !  PURPOSE: Calculate:
@@ -57,11 +57,11 @@ SUBROUTINE DA_Calculate_RF_Factors( rf_lengthscale, rf_alpha, rf_scale_factor )
       field_out(-n:n) = field_in(-n:n)
 
       DO pass = 1, rf_passes / 2
-         CALL DA_Recursive_Filter_1D_Adj( pass, rf_alpha(k), field_out, 2*n+1 )
+         CALL da_recursive_filter_1d_adj( pass, rf_alpha(k), field_out, 2*n+1 )
       END DO
 
       DO pass = 1, rf_passes / 2
-         CALL DA_Recursive_Filter_1D( pass, rf_alpha(k), field_out, 2*n+1 )
+         CALL da_recursive_filter_1d( pass, rf_alpha(k), field_out, 2*n+1 )
       END DO
 
       rf_scale_factor(k) = 1.0 / field_out(0)
@@ -82,5 +82,5 @@ SUBROUTINE DA_Calculate_RF_Factors( rf_lengthscale, rf_alpha, rf_scale_factor )
 
    END DO ! End loop over k
    
-END SUBROUTINE DA_Calculate_RF_Factors
+END SUBROUTINE da_calculate_rf_factors
       

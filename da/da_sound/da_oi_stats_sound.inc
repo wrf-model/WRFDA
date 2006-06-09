@@ -1,4 +1,4 @@
-SUBROUTINE DA_OI_Stats_Sound ( stats_unit, oi )
+SUBROUTINE da_oi_stats_sound ( stats_unit, oi )
 
   IMPLICIT NONE
 
@@ -32,22 +32,22 @@ SUBROUTINE DA_OI_Stats_Sound ( stats_unit, oi )
       if( oi%sound(n)%loc%proc_domain ) then
         do k=1, oi%sound(n)%info%levels
 
-          CALL da_Stats_Calculate( oi%Sound(n)%loc%obs_global_index, &
+          CALl da_stats_calculate( oi%Sound(n)%loc%obs_global_index, &
                               k, oi%Sound(n)%u(k)%qc, &
-                              oi%Sound(n)%u(k)%inv, nu, &
-                              Sound%minimum%u, Sound%maximum%u, &
-                              Sound%average%u, Sound%rms_err%u)
-          CALL da_Stats_Calculate( oi%Sound(n)%loc%obs_global_index, &
+                              oi%sound(n)%u(k)%inv, nu, &
+                              sound%minimum%u, Sound%maximum%u, &
+                              sound%average%u, Sound%rms_err%u)
+          CALl da_stats_calculate( oi%Sound(n)%loc%obs_global_index, &
                               k, oi%Sound(n)%v(k)%qc, &
-                              oi%Sound(n)%v(k)%inv, nv, &
-                              Sound%minimum%v, Sound%maximum%v, &
-                              Sound%average%v, Sound%rms_err%v)
-          CALL da_Stats_Calculate( oi%Sound(n)%loc%obs_global_index, &
+                              oi%sound(n)%v(k)%inv, nv, &
+                              sound%minimum%v, Sound%maximum%v, &
+                              sound%average%v, Sound%rms_err%v)
+          CALl da_stats_calculate( oi%Sound(n)%loc%obs_global_index, &
                               k, oi%Sound(n)%t(k)%qc, &
-                              oi%Sound(n)%t(k)%inv, nt, &
-                              Sound%minimum%t, Sound%maximum%t, &
-                              Sound%average%t, Sound%rms_err%t)
-          CALL da_Stats_Calculate( oi%Sound(n)%loc%obs_global_index, &
+                              oi%sound(n)%t(k)%inv, nt, &
+                              sound%minimum%t, Sound%maximum%t, &
+                              sound%average%t, Sound%rms_err%t)
+          CALl da_stats_calculate( oi%Sound(n)%loc%obs_global_index, &
                               k, oi%Sound(n)%q(k)%qc, &
                               oi%Sound(n)%q(k)%inv, nq, &
                               Sound%minimum%q, Sound%maximum%q, &
@@ -83,9 +83,9 @@ SUBROUTINE DA_OI_Stats_Sound ( stats_unit, oi )
   IF ( wrf_dm_on_monitor() ) THEN
     IF (nu /= 0 .or. nv /= 0 .or. nt /= 0 .or. nq /= 0) THEN
       write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of OI for Sound'
-      CALL DA_Print_Stats_Sound( stats_unit, nu, nv, nt, nq, Sound )
+      CALL da_print_stats_sound( stats_unit, nu, nv, nt, nq, Sound )
     END IF
   END IF
 
-END SUBROUTINE DA_OI_Stats_Sound
+END SUBROUTINE da_oi_stats_sound
 

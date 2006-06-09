@@ -92,7 +92,7 @@ SUBROUTINE da_get_innov_vector_sonde_sfc ( it, xb, xp, ob, iv )
           if (abs(hd) <= Max_StHeight_Diff) THEN
             if (iv % sonde_sfc(n) % h < v_h(xp%kts)) then
               iv%sonde_sfc(n)%zk = 1.0+1.0e-6
-              CALL DA_Obs_Sfc_correction(iv%sonde_sfc(n), xb)
+              CALL da_obs_sfc_correction(iv%sonde_sfc(n), xb)
 
               ! To keep the original "ob" with no change for multiple outer-loops use:
 
@@ -135,24 +135,24 @@ SUBROUTINE da_get_innov_vector_sonde_sfc ( it, xb, xp, ob, iv )
         else
           !------------[1.2] Interpolate horizontally:
 #ifndef DEREF_KLUDGE
-          call da_Interp_Obs_lin_2D( xb % u, xp, i, j, dx, dy, dxm, dym, &
+          call da_interp_obs_lin_2d( xb % u, xp, i, j, dx, dy, dxm, dym, &
                                   model_u, iv%sonde_sfc(n)%zk)
-          call da_Interp_Obs_lin_2D( xb % v, xp, i, j, dx, dy, dxm, dym, &
+          call da_interp_obs_lin_2d( xb % v, xp, i, j, dx, dy, dxm, dym, &
                                   model_v, iv%sonde_sfc(n)%zk)
-          call da_Interp_Obs_lin_2D( xb % t, xp, i, j, dx, dy, dxm, dym, &
+          call da_interp_obs_lin_2d( xb % t, xp, i, j, dx, dy, dxm, dym, &
                                   model_t, iv%sonde_sfc(n)%zk)
-          call da_Interp_Obs_lin_2D( xb % q, xp, i, j, dx, dy, dxm, dym, &
+          call da_interp_obs_lin_2d( xb % q, xp, i, j, dx, dy, dxm, dym, &
                                   model_q, iv%sonde_sfc(n)%zk)
-          call da_Interp_Obs_lin_2D( xb % p, xp, i, j, dx, dy, dxm, dym, &
+          call da_interp_obs_lin_2d( xb % p, xp, i, j, dx, dy, dxm, dym, &
                                   model_p, iv%sonde_sfc(n)%zk)
 #else
-          call da_Interp_Obs_lin_2D( xb % u(xp%ims,xp%jms,xb%kms), xp, i, j, dx, dy, dxm, dym, &
+          call da_interp_obs_lin_2d( xb % u(xp%ims,xp%jms,xb%kms), xp, i, j, dx, dy, dxm, dym, &
                                   model_u, iv%sonde_sfc(n)%zk)
-          call da_Interp_Obs_lin_2D( xb % v(xp%ims,xp%jms,xb%kms), xp, i, j, dx, dy, dxm, dym, &
+          call da_interp_obs_lin_2d( xb % v(xp%ims,xp%jms,xb%kms), xp, i, j, dx, dy, dxm, dym, &
                                   model_v, iv%sonde_sfc(n)%zk)
-          call da_Interp_Obs_lin_2D( xb % t(xp%ims,xp%jms,xb%kms), xp, i, j, dx, dy, dxm, dym, &
+          call da_interp_obs_lin_2d( xb % t(xp%ims,xp%jms,xb%kms), xp, i, j, dx, dy, dxm, dym, &
                                   model_t, iv%sonde_sfc(n)%zk)
-          call da_Interp_Obs_lin_2D( xb % q(xp%ims,xp%jms,xb%kms), xp, i, j, dx, dy, dxm, dym, &
+          call da_interp_obs_lin_2d( xb % q(xp%ims,xp%jms,xb%kms), xp, i, j, dx, dy, dxm, dym, &
                                   model_q, iv%sonde_sfc(n)%zk)
           call da_Interp_Obs_lin_2D( xb % p(xp%ims,xp%jms,xb%kms), xp, i, j, dx, dy, dxm, dym, &
                                   model_p, iv%sonde_sfc(n)%zk)
@@ -165,19 +165,19 @@ SUBROUTINE da_get_innov_vector_sonde_sfc ( it, xb, xp, ob, iv )
 
         !------- 1.2.1 Surface assimilation approach 2 (10-m u, v, 2-m t, q, and sfc_p)
 
-        call da_Interp_lin_2D( xb % u10, xp%ims, xp%ime, xp%jms, xp%jme, &
+        call da_interp_lin_2d( xb % u10, xp%ims, xp%ime, xp%jms, xp%jme, &
                             i, j, dx, dy, dxm, dym, &
                             model_u )
-        call da_Interp_lin_2D( xb % v10, xp%ims, xp%ime, xp%jms, xp%jme, &
+        call da_interp_lin_2d( xb % v10, xp%ims, xp%ime, xp%jms, xp%jme, &
                             i, j, dx, dy, dxm, dym, &
                             model_v )
-        call da_Interp_lin_2D( xb % t2, xp%ims, xp%ime, xp%jms, xp%jme, &
+        call da_interp_lin_2d( xb % t2, xp%ims, xp%ime, xp%jms, xp%jme, &
                             i, j, dx, dy, dxm, dym, &
                             model_t )
-        call da_Interp_lin_2D( xb % q2, xp%ims, xp%ime, xp%jms, xp%jme, &
+        call da_interp_lin_2d( xb % q2, xp%ims, xp%ime, xp%jms, xp%jme, &
                             i, j, dx, dy, dxm, dym, &
                             model_q )
-        call da_Interp_lin_2D( xb % psfc, xp%ims, xp%ime, xp%jms, xp%jme, &
+        call da_interp_lin_2d( xb % psfc, xp%ims, xp%ime, xp%jms, xp%jme, &
                             i, j, dx, dy, dxm, dym, &
                             model_p )
 
@@ -185,7 +185,7 @@ SUBROUTINE da_get_innov_vector_sonde_sfc ( it, xb, xp, ob, iv )
 
           !.......... model surface p, t, q, h at observed site:
 
-          call da_Interp_lin_2D( xb % terr, xp%ims, xp%ime, xp%jms, xp%jme, &
+          call da_interp_lin_2d( xb % terr, xp%ims, xp%ime, xp%jms, xp%jme, &
                             i, j, dx, dy, dxm, dym, &
                             hsm )
 

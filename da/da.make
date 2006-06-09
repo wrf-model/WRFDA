@@ -65,6 +65,7 @@ da_wrfvar_top.o : da_wrfvar_top.f90         \
                   module_wrf_error.o        \
                   module_configure.o        \
                   module_dm.o               \
+                  module_model_constants.o  \
                   module_driver_constants.o \
                   module_domain.o           \
                   module_machine.o          \

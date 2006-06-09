@@ -28,7 +28,7 @@ subroutine da_ob_stats_ssmt1 ( stats_unit, iv )
 
             do k=1, iv%ssmt1(n)%info%levels
     
-               CALL da_Stats_Calculate( n, k, iv%ssmt1(n)%t(k)%qc, &
+               CALL da_stats_calculate( n, k, iv%ssmt1(n)%t(k)%qc, &
                                      iv%ssmt1(n)%t(k)%inv, nt, &
                                      minimum, maximum, &
                                      average, rms_err)
@@ -52,7 +52,7 @@ subroutine da_ob_stats_ssmt1 ( stats_unit, iv )
    
       write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of O-B for SSMT1'
    
-      CALL DA_Print_Stats_ssmt1( stats_unit, nt, minimum, maximum, &
+      CALL da_print_stats_ssmt1( stats_unit, nt, minimum, maximum, &
                                  average, rms_err )
    
      END IF

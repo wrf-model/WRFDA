@@ -29,28 +29,28 @@ SUBROUTINE da_transform_xtoy_synop_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
 
           ! [1.2] Interpolate horizontally:
 #ifndef DEREF_KLUDGE
-          call da_Interp_Obs_lin_2D_adj(jo_grad_x % u, xp, i, j, dx, dy, dxm, dym, &
+          call da_interp_obs_lin_2d_adj(jo_grad_x % u, xp, i, j, dx, dy, dxm, dym, &
                           jo_grad_y%synop(n)%u, iv%synop(n)%zk)
-          call da_Interp_Obs_lin_2D_adj(jo_grad_x % v, xp, i, j, dx, dy, dxm, dym, &
+          call da_interp_obs_lin_2d_adj(jo_grad_x % v, xp, i, j, dx, dy, dxm, dym, &
                           jo_grad_y%synop(n)%v, iv%synop(n)%zk)
-          call da_Interp_Obs_lin_2D_adj(jo_grad_x % t, xp, i, j, dx, dy, dxm, dym, &
+          call da_interp_obs_lin_2d_adj(jo_grad_x % t, xp, i, j, dx, dy, dxm, dym, &
                           jo_grad_y%synop(n)%t, iv%synop(n)%zk)
-          call da_Interp_Obs_lin_2D_adj(jo_grad_x % q, xp, i, j, dx, dy, dxm, dym, &
+          call da_interp_obs_lin_2d_adj(jo_grad_x % q, xp, i, j, dx, dy, dxm, dym, &
                           jo_grad_y%synop(n)%q, iv%synop(n)%zk)
 
-          call da_Interp_lin_2D_adj(jo_grad_x % psfc, xp%ims, xp%ime, xp%jms, xp%jme, &
+          call da_interp_lin_2d_adj(jo_grad_x % psfc, xp%ims, xp%ime, xp%jms, xp%jme, &
                                  i, j, dx, dy, dxm, dym, jo_grad_y%synop(n)%p)
 #else
-          call da_Interp_Obs_lin_2D_adj(jo_grad_x % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+          call da_interp_obs_lin_2d_adj(jo_grad_x % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                                      jo_grad_y%synop(n)%u, iv%synop(n)%zk)
-          call da_Interp_Obs_lin_2D_adj(jo_grad_x % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+          call da_interp_obs_lin_2d_adj(jo_grad_x % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                                      jo_grad_y%synop(n)%v, iv%synop(n)%zk)
-          call da_Interp_Obs_lin_2D_adj(jo_grad_x % t(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+          call da_interp_obs_lin_2d_adj(jo_grad_x % t(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                                      jo_grad_y%synop(n)%t, iv%synop(n)%zk)
-          call da_Interp_Obs_lin_2D_adj(jo_grad_x % q(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+          call da_interp_obs_lin_2d_adj(jo_grad_x % q(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                                      jo_grad_y%synop(n)%q, iv%synop(n)%zk)
 
-          call da_Interp_lin_2D_adj(jo_grad_x % psfc(xp%ims,xp%jms), &
+          call da_interp_lin_2d_adj(jo_grad_x % psfc(xp%ims,xp%jms), &
                                  xp%ims, xp%ime, xp%jms, xp%jme, &
                                  i, j, dx, dy, dxm, dym, jo_grad_y%synop(n)%p)
 #endif
@@ -59,7 +59,7 @@ SUBROUTINE da_transform_xtoy_synop_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
     else if (sfc_assi_options == 2) then
       do n=iv%ob_numb(iv%current_ob_time-1)%synop + 1, iv%ob_numb(iv%current_ob_time)%synop
         if(iv%synop(n)%loc%proc_domain_with_halo) then
-          CALL DA_Transform_XToPsfc_Adj(xb,xp,iv%synop(n), &
+          CALL da_transform_xtopsfc_adj(xb,xp,iv%synop(n), &
                                             jo_grad_y%synop(n),jo_grad_x)
         endif
       ENDDO

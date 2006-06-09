@@ -1,4 +1,4 @@
-SUBROUTINE DA_Check_XToY_Adjoint_SSMI( oi, y, adjtest_lhs, pertile_lhs )
+SUBROUTINE da_check_xtoy_adjoint_ssmi( oi, y, adjtest_lhs, pertile_lhs )
 
    IMPLICIT NONE
 
@@ -8,13 +8,13 @@ SUBROUTINE DA_Check_XToY_Adjoint_SSMI( oi, y, adjtest_lhs, pertile_lhs )
 
    IF ( oi%num_ssmi_tb > 0 ) THEN
 
-      CALL DA_Check_XToY_Adjoint_SSMI_Tb ( oi, y, adjtest_lhs, pertile_lhs )
+      CALL da_check_xtoy_adjoint_ssmi_tb ( oi, y, adjtest_lhs, pertile_lhs )
 
    ELSE IF ( oi%num_ssmi_retrieval > 0) THEN
 
-      CALL DA_Check_XToY_Adjoint_SSMI_Rv( oi, y, adjtest_lhs, pertile_lhs )
+      CALL da_check_xtoy_adjoint_ssmi_rv( oi, y, adjtest_lhs, pertile_lhs )
 
    ENDIF
 
-END SUBROUTINE DA_Check_XToY_Adjoint_SSMI
+END SUBROUTINE da_check_xtoy_adjoint_ssmi
 

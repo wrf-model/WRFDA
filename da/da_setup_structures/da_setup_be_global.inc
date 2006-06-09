@@ -268,13 +268,13 @@ subroutine da_setup_be_global( ide, jde, kde, be  )
 !--------------------------------------------------------------
 
  IF ( test_statistics ) THEN
-    CALL DA_Check_EOF_Decomposition( be%v1%val_g(:), be%v1%evec_g(:,:),&
+    CALL da_check_eof_decomposition( be%v1%val_g(:), be%v1%evec_g(:,:),&
                                      be%v1%name)
-    CALL DA_Check_EOF_Decomposition( be%v2%val_g(:), be%v2%evec_g(:,:),&
+    CALL da_check_eof_decomposition( be%v2%val_g(:), be%v2%evec_g(:,:),&
                                      be%v2%name)
-    CALL DA_Check_EOF_Decomposition( be%v3%val_g(:), be%v3%evec_g(:,:),&
+    CALL da_check_eof_decomposition( be%v3%val_g(:), be%v3%evec_g(:,:),&
                                      be%v3%name)
-    CALL DA_Check_EOF_Decomposition( be%v4%val_g(:), be%v4%evec_g(:,:),&
+    CALL da_check_eof_decomposition( be%v4%val_g(:), be%v4%evec_g(:,:),&
                                      be%v4%name)
  END IF
 

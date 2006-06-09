@@ -1,4 +1,4 @@
-SUBROUTINE DA_Transform_XToY_SSMI ( xb, oi, xa, xp, y )
+SUBROUTINE da_transform_xtoy_ssmi ( xb, oi, xa, xp, y )
 
    IMPLICIT NONE
 
@@ -10,13 +10,13 @@ SUBROUTINE DA_Transform_XToY_SSMI ( xb, oi, xa, xp, y )
 
    IF ( oi%num_ssmi_tb > 0 ) THEN
 
-      CALL DA_Transform_XToY_SSMI_Tb ( xb, oi, xa, xp, y )
+      CALL da_transform_xtoy_ssmi_tb ( xb, oi, xa, xp, y )
 
    ELSE IF ( oi%num_ssmi_retrieval > 0) THEN
 
-      CALL DA_Transform_XToY_SSMI_Rv ( xb, oi, xa, y )
+      CALL da_transform_xtoy_ssmi_rv ( xb, oi, xa, y )
 
    ENDIF
 
-END SUBROUTINE DA_Transform_XToY_SSMI
+END SUBROUTINE da_transform_xtoy_ssmi
 

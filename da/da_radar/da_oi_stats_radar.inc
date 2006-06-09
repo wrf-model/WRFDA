@@ -1,4 +1,4 @@
-SUBROUTINE DA_OI_Stats_Radar ( stats_unit, oi )
+SUBROUTINE da_oi_stats_radar ( stats_unit, oi )
 
    IMPLICIT NONE
 
@@ -30,7 +30,7 @@ SUBROUTINE DA_OI_Stats_Radar ( stats_unit, oi )
       do k=1, oi%Radar(n)%info%levels
          
          IF ( USE_Radar_rv ) THEN
-         CALL da_Stats_Calculate( oi%Radar(n)%loc%obs_global_index, &
+         CALL da_stats_calculate( oi%Radar(n)%loc%obs_global_index, &
                                k, oi%Radar(n)%rv(k)%qc, &
                                oi%Radar(n)%rv(k)%inv, nrv, &
                                Radar%minimum%rv, Radar%maximum%rv, &
@@ -38,7 +38,7 @@ SUBROUTINE DA_OI_Stats_Radar ( stats_unit, oi )
         ENDIF
 
          IF ( USE_Radar_rf ) THEN
-         CALL da_Stats_Calculate( oi%Radar(n)%loc%obs_global_index, &
+         CALL da_stats_calculate( oi%Radar(n)%loc%obs_global_index, &
                                k, oi%Radar(n)%rf(k)%qc, &
                                oi%Radar(n)%rf(k)%inv, nrf, &
                                Radar%minimum%rf, Radar%maximum%rf, &
@@ -75,10 +75,10 @@ SUBROUTINE DA_OI_Stats_Radar ( stats_unit, oi )
 
          write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of OI for Radar'
 
-         CALL DA_Print_Stats_Radar( stats_unit, nrv, nrf, Radar )
+         CALL da_print_stats_radar( stats_unit, nrv, nrf, Radar )
 
       END IF
 
    END IF
 
-END SUBROUTINE DA_OI_Stats_Radar
+END SUBROUTINE da_oi_stats_radar

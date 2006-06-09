@@ -16,7 +16,7 @@ SUBROUTINE da_transfer_wrftltoxa( grid, config_flags, filnam, &
 
 !  Definitions of dummy arguments to solve
 
-#include "em_dummy_decl.inc:
+#include "em_dummy_decl.inc"
 
 !  Local variables
 

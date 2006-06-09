@@ -1,4 +1,4 @@
-SUBROUTINE DA_OI_Stats_Profiler ( stats_unit, oi )
+SUBROUTINE da_oi_stats_profiler ( stats_unit, oi )
 
    IMPLICIT NONE
 
@@ -28,14 +28,14 @@ SUBROUTINE DA_OI_Stats_Profiler ( stats_unit, oi )
       if( oi%profiler(n)%loc%proc_domain ) then
 
        do k=1, oi%Profiler(n)%info%levels
-         CALL da_Stats_Calculate( oi%Profiler(n)%loc%obs_global_index, &
-                               k, oi%Profiler(n)%u(k)%qc,  &
-                               oi%Profiler(n)%u(k)%inv, nu, &
-                               Profiler%minimum%u, Profiler%maximum%u, &
-                               Profiler%average%u, Profiler%rms_err%u)
-         CALL da_Stats_Calculate( oi%Profiler(n)%loc%obs_global_index, &
-                               k, oi%Profiler(n)%v(k)%qc, &
-                               oi%Profiler(n)%v(k)%inv, nv, &
+         CALL da_stats_calculate( oi%profiler(n)%loc%obs_global_index, &
+                               k, oi%profiler(n)%u(k)%qc,  &
+                               oi%profiler(n)%u(k)%inv, nu, &
+                               profiler%minimum%u, Profiler%maximum%u, &
+                               profiler%average%u, Profiler%rms_err%u)
+         CALL da_stats_calculate( oi%profiler(n)%loc%obs_global_index, &
+                               k, oi%profiler(n)%v(k)%qc, &
+                               oi%profiler(n)%v(k)%inv, nv, &
                                Profiler%minimum%v, Profiler%maximum%v, &
                                Profiler%average%v, Profiler%rms_err%v)
        end do
@@ -63,11 +63,11 @@ SUBROUTINE DA_OI_Stats_Profiler ( stats_unit, oi )
    
       write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of OI for Profiler'
    
-      CALL DA_Print_Stats_Profiler( stats_unit, nu, nv, Profiler )
+      CALL da_print_stats_profiler( stats_unit, nu, nv, Profiler )
    
     END IF
    
    END IF
 
-END SUBROUTINE DA_OI_Stats_Profiler
+END SUBROUTINE da_oi_stats_profiler
 

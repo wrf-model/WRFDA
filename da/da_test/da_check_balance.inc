@@ -1,4 +1,4 @@
-SUBROUTINE DA_Check_Balance( phi, phi_u )
+SUBROUTINE da_check_balance( phi, phi_u )
 
 !------------------------------------------------------------------------------
 !  PURPOSE: Compare balanced mass (phi_b - function of wind) and actual phi.
@@ -60,14 +60,14 @@ SUBROUTINE DA_Check_Balance( phi, phi_u )
 
          phi_b1(2:jx-1) = phi(i,2:jx-1,k) - phi_u(i,2:jx-1,k)
             
-         CALL DA_Correlation_Coeff1d( phi_b1(2:jx-1), phi(i,2:jx-1,k), &
+         CALL da_correlation_coeff1d( phi_b1(2:jx-1), phi(i,2:jx-1,k), &
                                       corr_coeff(k,i), accuracy(k,i) )
      
 !        write(58,*) corr_coeff(k,i), accuracy(k,i)
       end do
          
       phi_b2(2:iy-1,2:jx-1) = phi(2:iy-1,2:jx-1,k) - phi_u(2:iy-1,2:jx-1,k)
-      CALL DA_Correlation_Coeff2d( phi_b2(2:iy-1,2:jx-1), &
+      CALL da_correlation_coeff2d( phi_b2(2:iy-1,2:jx-1), &
                                    phi(2:iy-1,2:jx-1,k), &
                                    corr_coef, accurac )
 
@@ -85,5 +85,5 @@ SUBROUTINE DA_Check_Balance( phi, phi_u )
    DEALLOCATE(corr_coeff)
    DEALLOCATE(accuracy)
 
-END SUBROUTINE DA_Check_Balance
+END SUBROUTINE da_check_balance
 

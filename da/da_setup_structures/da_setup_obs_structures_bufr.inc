@@ -86,7 +86,7 @@ SUBROUTINE da_setup_obs_structures_bufr( xp, ob, iv )
          write(filename(1:10), fmt='(a, i2.2)') 'fgat_ob.', n
 
 !--------scan PREPBUFR OBSERVATION FILE
-         call DA_Scan_BUFR_Obs (bufr_iunit, iv, xp, filename)
+         call da_scan_bufr_obs (bufr_iunit, iv, xp, filename)
 
 !
 !         if(Use_RadarObs) then
@@ -97,7 +97,7 @@ SUBROUTINE da_setup_obs_structures_bufr( xp, ob, iv )
       enddo
    else
       iv%current_ob_time = 1
-      call DA_Scan_BUFR_Obs(bufr_iunit, iv, xp)
+      call da_scan_bufr_obs(bufr_iunit, iv, xp)
 
 !-----scan MAIN BODY OF Radar OBSERVATION FILE
 !      if(Use_RadarObs) &
@@ -152,7 +152,7 @@ SUBROUTINE da_setup_obs_structures_bufr( xp, ob, iv )
 !   Allocate the ob based on inputed number of obs:
 !-----------------------------------------------------------------------------
 
-   CALL DA_Allocate_Observations ( iv )
+   CALL da_allocate_observations ( iv )
 
 !-----------------------------------------------------------------------------
 
@@ -189,7 +189,7 @@ SUBROUTINE da_setup_obs_structures_bufr( xp, ob, iv )
          write(filename(1:10), fmt='(a, i2.2)') 'fgat_ob.', n
 
 !--------Read PREPBUFR OBSERVATION FILE
-         call DA_Read_BUFR_Obs (bufr_iunit, iv, xp, filename)
+         call da_read_bufr_obs (bufr_iunit, iv, xp, filename)
 
 !         if(Use_RadarObs) then
 !!-----------Read Radar OBSERVATION FILE
@@ -201,7 +201,7 @@ SUBROUTINE da_setup_obs_structures_bufr( xp, ob, iv )
 
       iv%current_ob_time = 1
 
-      call DA_Read_BUFR_Obs(bufr_iunit, iv, xp)
+      call da_read_bufr_obs(bufr_iunit, iv, xp)
 
 !      if(Use_RadarObs) then
 !!--------Read Radar OBSERVATION FILE

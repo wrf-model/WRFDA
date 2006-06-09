@@ -27,11 +27,11 @@ subroutine da_ob_stats_qscat ( stats_unit, oi )
 
        if( oi%qscat(n)%loc%proc_domain ) then
 
-         CALL da_Stats_Calculate( n, 0, oi%qscat(n)%u%qc, &
+         CALL da_stats_calculate( n, 0, oi%qscat(n)%u%qc, &
                                oi%qscat(n)%u%inv, nu, &
                                qscat%minimum%u, qscat%maximum%u, &
                                qscat%average%u, qscat%rms_err%u)
-         CALL da_Stats_Calculate( n, 0, oi%qscat(n)%v%qc, &
+         CALL da_stats_calculate( n, 0, oi%qscat(n)%v%qc, &
                                oi%qscat(n)%v%inv, nv, &
                                qscat%minimum%v, qscat%maximum%v, &
                                qscat%average%v, qscat%rms_err%v)
@@ -61,7 +61,7 @@ subroutine da_ob_stats_qscat ( stats_unit, oi )
    
       write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of OI for qscat'
    
-      CALL DA_Print_Stats_qscat( stats_unit, nu, nv, qscat )
+      CALL da_print_stats_qscat( stats_unit, nu, nv, qscat )
    
     END IF
    

@@ -88,7 +88,7 @@ SUBROUTINE da_setup_obs_structures( xp, ob, iv )
        ! [1.1] BUFR observation input file:
        IF (iv%num_pseudo > 0) THEN
          CALL wrf_message('Pseudo test only.')
-         CALL DA_Allocate_Y( iv, ob )
+         CALL da_allocate_y( iv, ob )
          CALL da_setup_pseudo_obs( iv, ob )
          iv%pseudo(1)%loc%i=int(iv%pseudo(1)%loc%x)
          iv%pseudo(1)%loc%j=int(iv%pseudo(1)%loc%y)
