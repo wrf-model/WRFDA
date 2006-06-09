@@ -225,8 +225,8 @@ SUBROUTINE da_trace_report
          FMT='(A,I4,A,F8.1,A,F8.1,A)') &
          "<TR><TD><B>Total</B>",MasterNoRoutines, "<TD></TD><TD><B>", &
          TotalElapsedTime/REAL(CountRate), &
-         "</B><TD></TD><TD></TD><TD></TD><TD><B>" &
-         TotalCPUTime(1),"</B><TD></TD><TD></TD><TD></TD>"
+         "</B><TD></TD><TD></TD><TD></TD><TD><B>", &
+         TotalCPUTime(1),"</B><TD></TD><TD></TD><TD></TD>",
       IF (TotalElapsedTime > 0.0) THEN
          WRITE (UNIT=trace_unit, FMT='("<TD><B>",F8.1,"</B>")') &
             (TotalCPUTime(1))/(TotalElapsedTime/REAL(CountRate))
