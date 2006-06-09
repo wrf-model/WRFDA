@@ -61,6 +61,8 @@ SHARE_OBJS    = 		\
 
 # DEPENDENCIES : only dependencies after this line (don't remove the word DEPENDENCIES)
 
+couple_or_uncouple_em.o : module_tiles.o
+
 module_wrf_top.o : module_machine.o module_domain.o module_integrate.o
 
 mediation_nest_move.o : module_domain.o module_io_domain.o

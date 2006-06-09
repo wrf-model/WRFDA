@@ -1,6 +1,7 @@
 MODULE module_sf_noahlsm
  
   USE module_model_constants
+  USE module_wrf_error
 
   INTEGER, PARAMETER   :: NSOLD=20
 !   REAL, PARAMETER    :: CP = 1004.5

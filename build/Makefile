@@ -75,6 +75,6 @@ clean :
 
 superclean : clean
 	@ $(RM) *.f90 *.F90 *.F *.inc *.int *.c *.h *.m4 *.code *.make \
-          bufrlib.param *.sed registry \
+          bufrlib.param *.sed registry links \
           convert_tool kma_wave2grid wave2grid_kma *.csh version_decl \
           RSL *.bsh *.csh

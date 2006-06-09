@@ -55,13 +55,20 @@ libwrfvar.a : $(DA_OBJS)
 
 wrfvar.o : da_wrfvar_top.o
 
-da_wrfvar_top.o : da_wrfvar_top.f90       \
-                  da_wrfvar_init.inc      \
-                  da_wrfvar_run.inc       \
-                  da_wrfvar_finalize.inc  \
-                  da_wrfvar_interface.inc \
-                  module_integrate.o      \
-                  module_dm.o             \
+da_wrfvar_top.o : da_wrfvar_top.f90         \
+                  da_wrfvar_init.inc        \
+                  da_wrfvar_run.inc         \
+                  da_wrfvar_finalize.inc    \
+                  da_wrfvar_interface.inc   \
+                  module_integrate.o        \
+                  module_timing.o           \
+                  module_wrf_error.o        \
+                  module_configure.o        \
+                  module_dm.o               \
+                  module_driver_constants.o \
+                  module_domain.o           \
+                  module_machine.o          \
+                  module_tiles.o            \
                   da_wrfvar_io.o
 
 da_wrfvar_esmf_super.o : da_wrfvar_esmf_super.f90    \
