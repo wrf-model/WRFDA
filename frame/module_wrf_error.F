@@ -16,6 +16,12 @@ CONTAINS
     RETURN
   END FUNCTION wrf_at_debug_level
 
+  INTERFACE 
+    SUBROUTINE wrf_messages(strs)
+       CHARACTER(LEN=*), INTENT(IN) :: strs(:)
+    SUBROUTINE wrf_messages
+  END INTERFACE
+
 END MODULE module_wrf_error
 
 SUBROUTINE init_module_wrf_error
