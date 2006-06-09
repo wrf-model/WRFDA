@@ -5,7 +5,13 @@ MODULE module_wrf_error
   INTEGER           :: wrf_debug_level = 0
   CHARACTER*256     :: wrf_err_message
   CHARACTER(LEN=256) :: errmsg(100)
-  INTEGER            :: msgcount
+  INTEGER            :: msgcountl
+
+  INTERFACE 
+    SUBROUTINE wrf_messages(strs)
+       CHARACTER(LEN=*), INTENT(IN) :: strs(:)
+    SUBROUTINE wrf_messages
+  END INTERFACE
 
 CONTAINS
 
@@ -15,12 +21,6 @@ CONTAINS
     wrf_at_debug_level = ( level .LE. wrf_debug_level )
     RETURN
   END FUNCTION wrf_at_debug_level
-
-  INTERFACE 
-    SUBROUTINE wrf_messages(strs)
-       CHARACTER(LEN=*), INTENT(IN) :: strs(:)
-    SUBROUTINE wrf_messages
-  END INTERFACE
 
 END MODULE module_wrf_error
 
