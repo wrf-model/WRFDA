@@ -590,7 +590,7 @@ SUBROUTINE da_transfer_wrftoxb( xbx, grid, &
 !  end do
 !  end do
 
-   call INTEGRAT_dZ( xb )
+   call da_integrat_dz( xb )
 
 !------------------------------------------------------------------------------
 !--Surface Wind speed

@@ -1,4 +1,4 @@
-SUBROUTINE DA_Read_SSMI_Info (iunit, ob, xb, xbx)
+SUBROUTINE da_read_ssmi_info (iunit, ob, xb, xbx)
 
 !-----------------------------------------------------------------------------!
 ! Read the header of a MM5 3D-VAR 3.0 GTS observation file
@@ -163,17 +163,17 @@ head_line_2:  DO
   ! Model domains definition
     
       CASE ('NESTIX') ;
-           CALL read_integer_array(nestix, maxnes, 8, 9)
+           CALL da_read_ssmi_integer_array(nestix, maxnes, 8, 9)
       CASE ('NESTJX') ; 
-           CALL read_integer_array(nestjx, maxnes, 8, 9)
+           CALL da_read_ssmi_integer_array(nestjx, maxnes, 8, 9)
       CASE ('NUMC  ') ; 
-           CALL read_integer_array(numnc , maxnes, 8, 9)
+           CALL da_read_ssmi_integer_array(numnc , maxnes, 8, 9)
       CASE ('DIS   ') ; 
-           CALL read_real_array   (dis   , maxnes, 8, 9)
+           CALL da_read_ssmi_real_array   (dis   , maxnes, 8, 9)
       CASE ('NESTI ') ; 
-           CALL read_integer_array(nesti , maxnes, 8, 9)
+           CALL da_read_ssmi_integer_array(nesti , maxnes, 8, 9)
       CASE ('NESTJ ') ; 
-           CALL read_integer_array(nestj , maxnes, 8, 9)
+           CALL da_read_ssmi_integer_array(nestj , maxnes, 8, 9)
      END SELECT
 
      READ (UNIT = iunit, FMT = '(A)', IOSTAT = iost) char_ned
@@ -185,30 +185,7 @@ head_line_2:  DO
 
 CONTAINS
 
-subroutine read_integer_array(aa,nn,i0,i_step)
+#include "da_read_ssmi_integer_array.inc"
+#include "da_read_ssmi_real_array.inc"
 
-  integer,                 intent(in) :: nn, i0, i_step
-  integer,  dimension(:), intent(out) :: aa
-
-  integer     :: i, ii
-
-  do i = 1, nn
-    ii = i_step*(i-1) + i0
-    READ (UNIT=char_ned (ii:ii+8),FMT='((I7,2X))') aa(i)
-  enddo
-end subroutine read_integer_array
-
-subroutine read_real_array(aa,nn,i0,i_step)
-
-  integer,                 intent(in) :: nn, i0, i_step
-  real   ,  dimension(:), intent(out) :: aa
-
-  integer     :: i, ii
-
-  do i = 1, nn
-    ii = i_step*(i-1) + i0
-    READ (UNIT=char_ned (ii:ii+8),FMT='((f7.2,2X))') aa(i)
-  enddo
-end subroutine read_real_array
-
-END SUBROUTINE DA_Read_SSMI_Info
+END SUBROUTINE da_read_ssmi_info

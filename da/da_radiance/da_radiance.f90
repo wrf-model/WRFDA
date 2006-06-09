@@ -196,9 +196,13 @@ CONTAINS
 #include "gsi_emiss.inc"
 #include "emiss_ssmi.inc"
 #include "iceem_amsu.inc"
+#include "siem_ats.inc"
+#include "siem_bts.inc"
+#include "siem_interpolate.inc"
 #include "landem.inc"
 #include "snwem_amsu.inc"
 #include "seaem.inc"
+#include "ossmem.inc"
 
 end module da_radiance
 

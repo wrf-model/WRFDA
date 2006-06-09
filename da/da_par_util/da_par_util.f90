@@ -46,8 +46,12 @@ MODULE da_par_util
 #include "da_unpack_count_obs.inc"
 #include "da_transpose.inc"
 #include "da_cv_to_global.inc"
+#include "da_wv_patch_to_global_2d.inc"
+#include "da_wv_patch_to_global_3d.inc"
 #include "da_generic_methods.inc"
-#include "da_specific_methods.inc"
+#include "da_free_global_sonde_sfc.inc"
+#include "da_free_global_sound.inc"
+#include "da_free_global_synop.inc"
 #include "da_generic_boilerplate.inc"
 #include "da_y_facade_to_global.inc"
 

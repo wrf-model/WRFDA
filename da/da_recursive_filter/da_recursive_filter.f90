@@ -19,7 +19,6 @@ MODULE da_recursive_filter
 
 #include "da_perform_2drf.inc"
 #include "da_calculate_rf_factors.inc"
-#include "da_rf_turning_conditions.inc"
 #include "da_recursive_filter_1d.inc"
 #include "da_recursive_filter_1d_adj.inc"
 #include "da_transform_through_rf.inc"

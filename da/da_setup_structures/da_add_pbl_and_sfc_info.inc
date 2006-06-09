@@ -75,7 +75,7 @@ SUBROUTINE da_add_pbl_and_sfc_info( xp, xb, xbx )
    !    end do
    ! end do
 
-   CALL integrat_dz(xb)
+   CALL da_integrat_dz(xb)
 
    !---------------------------------------------------------------------------
    ! [5.0] Calculate Roughness length 

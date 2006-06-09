@@ -60,7 +60,7 @@ da_wrfvar_top.o : da_wrfvar_top.f90         \
                   da_wrfvar_run.inc         \
                   da_wrfvar_finalize.inc    \
                   da_wrfvar_interface.inc   \
-                  da_define_structures.o    \
+                  da_setup_structures.o     \
                   module_integrate.o        \
                   module_timing.o           \
                   module_wrf_error.o        \
@@ -799,7 +799,6 @@ da_recursive_filter.o:	da_recursive_filter.f90        \
 			da_define_structures.o         \
                         da_perform_2drf.inc            \
 			da_calculate_rf_factors.inc    \
-			da_rf_turning_conditions.inc   \
 			da_recursive_filter_1d.inc     \
 			da_recursive_filter_1d_adj.inc \
 			da_transform_through_rf.inc    \

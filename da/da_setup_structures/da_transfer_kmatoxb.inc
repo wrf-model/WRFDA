@@ -472,7 +472,7 @@ SUBROUTINE da_transfer_kmatoxb( xbx, grid, &
 !
 #endif
 !------------------------------------------------------------------------------
-   call INTEGRAT_dZ( xb )
+   call da_integrat_dz( xb )
 !------------------------------------------------------------------------------
 !  Syed RH Rizvi
 ! 

@@ -88,6 +88,7 @@ contains
 #include "da_check_xtoy_adjoint_buoy.inc"
 #include "da_setup_testfield.inc"
 #include "da_check_sfc_assi.inc"
+#include "da_check_psfc.inc"
 #include "da_set_tst_trnsf_fld.inc"
 #include "da_check_vtoy_adjoint.inc"
 #include "da_get_y_lhs_value.inc"
