@@ -7,20 +7,6 @@ MODULE module_wrf_error
   CHARACTER(LEN=256) :: errmsg(100)
   INTEGER            :: msgcount
 
-  INTERFACE wrf_error_fatal3
-    SUBROUTINE wrf_error_fatal3_str( file_str, line, str)
-      CHARACTER(LEN=*), INTENT(IN) :: file_str
-      INTEGER ,         INTENT(IN) :: line
-      CHARACTER(LEN=*), INTENT(IN) :: str
-    END SUBROUTINE wrf_error_fatal3_str
-
-    SUBROUTINE wrf_error_fatal3_strs( file_str, line, strs )
-      CHARACTER(LEN=*), INTENT(IN) :: file_str
-      INTEGER ,         INTENT(IN) :: line
-      CHARACTER(LEN=*), INTENT(IN) :: strs(:)
-    END SUBROUTINE wrf_error_fatal3_strs
-  END INTERFACE wrf_error_fatal3
-
 CONTAINS
 
   LOGICAL FUNCTION wrf_at_debug_level ( level )
@@ -135,7 +121,35 @@ SUBROUTINE wrf_message2(str)
 #endif
 END SUBROUTINE wrf_message2
 
-SUBROUTINE wrf_error_fatal3_strs( file_str, line, strs )
+SUBROUTINE wrf_error( file_str, line, str )
+  IMPLICIT NONE
+  CHARACTER(LEN=*), INTENT(IN) :: file_str
+  INTEGER ,         INTENT(IN) :: line  ! only print file and line if line > 0
+  CHARACTER(LEN=*), INTENT(IN) :: strs(:)
+  CHARACTER*256 :: line_str
+
+  write(line_str,'(i6)') line
+#if defined( DM_PARALLEL ) && ! defined( STUBMPI )
+  CALL wrf_message( '-------------- FATAL CALLED ---------------' )
+  ! only print file and line if line is positive
+  IF ( line > 0 ) THEN
+    CALL wrf_message( 'FATAL CALLED FROM FILE:  '//file_str//'  LINE:  '//TRIM(line_str) )
+  ENDIF
+  CALL wrf_message(str)
+  CALL wrf_message( '-------------------------------------------' )
+#else
+  CALL wrf_message2( '-------------- FATAL CALLED ---------------' )
+  ! only print file and line if line is positive
+  IF ( line > 0 ) THEN
+    CALL wrf_message2( 'FATAL CALLED FROM FILE:  '//file_str//'  LINE:  '//TRIM(line_str) )
+  ENDIF
+  CALL wrf_message2( str )
+  CALL wrf_message2( '-------------------------------------------' )
+#endif
+  CALL wrf_abort
+END SUBROUTINE wrf_error
+
+SUBROUTINE wrf_errors( file_str, line, strs )
   IMPLICIT NONE
   CHARACTER(LEN=*), INTENT(IN) :: file_str
   INTEGER ,         INTENT(IN) :: line  ! only print file and line if line > 0
@@ -161,7 +175,7 @@ SUBROUTINE wrf_error_fatal3_strs( file_str, line, strs )
   CALL wrf_message2( '-------------------------------------------' )
 #endif
   CALL wrf_abort
-END SUBROUTINE wrf_error_fatal3_strs
+END SUBROUTINE wrf_errors
 
 SUBROUTINE wrf_error_fatal3( file_str, line,str )
   IMPLICIT NONE
@@ -248,7 +262,7 @@ END SUBROUTINE wrf_warnings3
 SUBROUTINE wrf_error_fatal( str)
   IMPLICIT NONE
   CHARACTER(LEN=*) :: str
-  CALL wrf_error_fatal3_str ( ' ', 0, str)
+  CALL wrf_error_fatal3 ( ' ', 0, str)
 END SUBROUTINE wrf_error_fatal
 
 ! Check to see if expected value == actual value

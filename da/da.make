@@ -60,6 +60,7 @@ da_wrfvar_top.o : da_wrfvar_top.f90         \
                   da_wrfvar_run.inc         \
                   da_wrfvar_finalize.inc    \
                   da_wrfvar_interface.inc   \
+                  da_define_structures.o    \
                   module_integrate.o        \
                   module_timing.o           \
                   module_wrf_error.o        \
