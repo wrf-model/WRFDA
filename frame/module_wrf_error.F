@@ -10,7 +10,7 @@ MODULE module_wrf_error
   INTERFACE 
     SUBROUTINE wrf_messages(strs)
        CHARACTER(LEN=*), INTENT(IN) :: strs(:)
-    SUBROUTINE wrf_messages
+    END SUBROUTINE wrf_messages
   END INTERFACE
 
 CONTAINS
