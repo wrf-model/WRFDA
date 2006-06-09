@@ -136,7 +136,6 @@ SUBROUTINE wrf_message2(str)
 END SUBROUTINE wrf_message2
 
 SUBROUTINE wrf_error_fatal3_strs( file_str, line, strs )
-  USE module_wrf_error, ONLY : wrf_message_strs, wrf_message_str
   IMPLICIT NONE
   CHARACTER(LEN=*), INTENT(IN) :: file_str
   INTEGER ,         INTENT(IN) :: line  ! only print file and line if line > 0
@@ -165,7 +164,6 @@ SUBROUTINE wrf_error_fatal3_strs( file_str, line, strs )
 END SUBROUTINE wrf_error_fatal3_strs
 
 SUBROUTINE wrf_error_fatal3( file_str, line,str )
-  USE module_wrf_error, ONLY : wrf_message_str
   IMPLICIT NONE
   CHARACTER(LEN=*), INTENT(IN) :: file_str
   INTEGER ,         INTENT(IN) :: line  ! only print file and line if line > 0
@@ -194,7 +192,6 @@ SUBROUTINE wrf_error_fatal3( file_str, line,str )
 END SUBROUTINE wrf_error_fatal3
 
 SUBROUTINE wrf_warning3( file_str, line, str )
-  USE module_wrf_error, ONLY : wrf_message_str
   IMPLICIT NONE
   CHARACTER(LEN=*), INTENT(IN) :: file_str
   INTEGER,          INTENT(IN) :: line
@@ -222,7 +219,6 @@ SUBROUTINE wrf_warning3( file_str, line, str )
 END SUBROUTINE wrf_warning3
 
 SUBROUTINE wrf_warnings3( file_str, line, strs )
-  USE module_wrf_error, ONLY : wrf_message_strs, wrf_message_str
   IMPLICIT NONE
   CHARACTER(LEN=*), INTENT(IN) :: file_str
   INTEGER,          INTENT(IN) :: line
