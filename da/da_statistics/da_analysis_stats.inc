@@ -234,6 +234,6 @@ SUBROUTINE da_analysis_stats ( stats_unit, xp, xa )
 
 CONTAINS
 
-#include "da_maxmin_in_field"
+#include "da_maxmin_in_field.inc"
    
 END SUBROUTINE da_analysis_stats

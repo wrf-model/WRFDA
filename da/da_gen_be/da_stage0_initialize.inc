@@ -2,7 +2,7 @@ subroutine da_stage0_initialize( input_file, var, dim1, dim2, dim3, ds )
 
    implicit none
 
-#include "netcdf.inc"
+#include <netcdf.inc>
 
    character (len=200), intent(in):: input_file       ! NETCDF file name.
    character (len=10), intent(in) :: var              ! Variable to search for.

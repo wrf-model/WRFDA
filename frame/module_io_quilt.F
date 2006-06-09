@@ -1559,7 +1559,7 @@ SUBROUTINE wrf_quilt_inquire_opened ( DataHandle, FileName , FileStatus, Status 
 #if defined( DM_PARALLEL ) && !defined( STUBMPI )
   USE module_wrf_quilt
   IMPLICIT NONE
-#include <wrf_io_flags.h>
+#include "wrf_io_flags.h"
   INTEGER ,       INTENT(IN)  :: DataHandle
   CHARACTER *(*), INTENT(IN)  :: FileName
   INTEGER ,       INTENT(OUT) :: FileStatus
@@ -1597,7 +1597,7 @@ SUBROUTINE wrf_quilt_inquire_filename ( DataHandle, FileName , FileStatus, Statu
 #if defined( DM_PARALLEL ) && !defined( STUBMPI )
   USE module_wrf_quilt
   IMPLICIT NONE
-#include <wrf_io_flags.h>
+#include "wrf_io_flags.h"
   INTEGER ,       INTENT(IN)  :: DataHandle
   CHARACTER *(*), INTENT(OUT) :: FileName
   INTEGER ,       INTENT(OUT) :: FileStatus
@@ -3150,7 +3150,7 @@ SUBROUTINE wrf_quilt_write_field ( DataHandle , DateStr , VarName , Field , Fiel
   USE module_wrf_quilt
   IMPLICIT NONE
 #include <mpif.h>
-#include <wrf_io_flags.h>
+#include "wrf_io_flags.h"
   INTEGER ,       INTENT(IN)    :: DataHandle 
   CHARACTER*(*) , INTENT(IN)    :: DateStr
   CHARACTER*(*) , INTENT(IN)    :: VarName

@@ -37,8 +37,8 @@ subroutine ext_ncd_RealFieldIO(IO,NCID,VarID,VStart,VCount,Data,Status)
   use wrf_data
   use ext_ncd_support_routines
   implicit none
-  include 'wrf_status_codes.h'
-  include 'netcdf.inc'
+#include "wrf_status_codes.h"
+#include <netcdf.inc>
   character (*)               ,intent(in)    :: IO
   integer                     ,intent(in)    :: NCID
   integer                     ,intent(in)    :: VarID
@@ -65,8 +65,8 @@ subroutine ext_ncd_DoubleFieldIO(IO,NCID,VarID,VStart,VCount,Data,Status)
   use wrf_data
   use ext_ncd_support_routines
   implicit none
-  include 'wrf_status_codes.h'
-  include 'netcdf.inc'
+#include "wrf_status_codes.h"
+#include <netcdf.inc>
   character (*)               ,intent(in)    :: IO
   integer                     ,intent(in)    :: NCID
   integer                     ,intent(in)    :: VarID
@@ -93,8 +93,8 @@ subroutine ext_ncd_IntFieldIO(IO,NCID,VarID,VStart,VCount,Data,Status)
   use wrf_data
   use ext_ncd_support_routines
   implicit none
-  include 'wrf_status_codes.h'
-  include 'netcdf.inc'
+#include "wrf_status_codes.h"
+#include <netcdf.inc>
   character (*)               ,intent(in)    :: IO
   integer                     ,intent(in)    :: NCID
   integer                     ,intent(in)    :: VarID
@@ -121,8 +121,8 @@ subroutine ext_ncd_LogicalFieldIO(IO,NCID,VarID,VStart,VCount,Data,Status)
   use wrf_data
   use ext_ncd_support_routines
   implicit none
-  include 'wrf_status_codes.h'
-  include 'netcdf.inc'
+#include "wrf_status_codes.h"
+#include <netcdf.inc>
   character (*)                                   ,intent(in)    :: IO
   integer                                         ,intent(in)    :: NCID
   integer                                         ,intent(in)    :: VarID

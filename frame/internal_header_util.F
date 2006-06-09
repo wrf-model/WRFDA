@@ -14,7 +14,7 @@ SUBROUTINE int_gen_write_field_header ( hdrbuf, hdrbufsize, itypesize, ftypesize
                                         MemoryStart , MemoryEnd ,                                    &
                                         PatchStart , PatchEnd )
   IMPLICIT NONE
-  INCLUDE 'intio_tags.h'
+#include "intio_tags.h"
   INTEGER, INTENT(INOUT) ::  hdrbuf(*)
   INTEGER, INTENT(INOUT) ::  hdrbufsize
   INTEGER, INTENT(INOUT)   ::  itypesize, ftypesize
@@ -77,7 +77,7 @@ SUBROUTINE int_get_write_field_header ( hdrbuf, hdrbufsize, itypesize, ftypesize
                                         MemoryStart , MemoryEnd ,                                    &
                                         PatchStart , PatchEnd )
   IMPLICIT NONE
-  INCLUDE 'intio_tags.h'
+#include "intio_tags.h"
   INTEGER, INTENT(INOUT) ::  hdrbuf(*)
   INTEGER, INTENT(OUT)   ::  hdrbufsize
   INTEGER, INTENT(INOUT)   ::  itypesize, ftypesize
@@ -138,7 +138,7 @@ END SUBROUTINE int_get_write_field_header
 SUBROUTINE int_gen_ofr_header( hdrbuf, hdrbufsize, itypesize, &
                                 FileName, SysDepInfo, DataHandle )
   IMPLICIT NONE
-  INCLUDE 'intio_tags.h'
+#include "intio_tags.h"
   INTEGER, INTENT(INOUT) ::  hdrbuf(*)
   INTEGER, INTENT(OUT)   ::  hdrbufsize
   INTEGER, INTENT(INOUT)   ::  itypesize
@@ -162,7 +162,7 @@ END SUBROUTINE int_gen_ofr_header
 SUBROUTINE int_get_ofr_header( hdrbuf, hdrbufsize, itypesize, &
                                 FileName, SysDepInfo, DataHandle )
   IMPLICIT NONE
-  INCLUDE 'intio_tags.h'
+#include "intio_tags.h"
   INTEGER, INTENT(INOUT) ::  hdrbuf(*)
   INTEGER, INTENT(OUT)   ::  hdrbufsize
   INTEGER, INTENT(INOUT)   ::  itypesize
@@ -189,7 +189,7 @@ END SUBROUTINE int_get_ofr_header
 SUBROUTINE int_gen_ofwb_header( hdrbuf, hdrbufsize, itypesize, &
 				FileName, SysDepInfo, io_form, DataHandle )
   IMPLICIT NONE
-  INCLUDE 'intio_tags.h'
+#include "intio_tags.h"
   INTEGER, INTENT(INOUT) ::  hdrbuf(*)
   INTEGER, INTENT(OUT)   ::  hdrbufsize
   INTEGER, INTENT(INOUT)   ::  itypesize
@@ -215,7 +215,7 @@ END SUBROUTINE int_gen_ofwb_header
 SUBROUTINE int_get_ofwb_header( hdrbuf, hdrbufsize, itypesize, &
 				FileName, SysDepInfo, io_form, DataHandle )
   IMPLICIT NONE
-  INCLUDE 'intio_tags.h'
+#include "intio_tags.h"
   INTEGER, INTENT(INOUT) ::  hdrbuf(*)
   INTEGER, INTENT(OUT)   ::  hdrbufsize
   INTEGER, INTENT(INOUT)   ::  itypesize
@@ -244,7 +244,7 @@ END SUBROUTINE int_get_ofwb_header
 SUBROUTINE int_gen_handle_header( hdrbuf, hdrbufsize, itypesize, &
                                 DataHandle , code )
   IMPLICIT NONE
-  INCLUDE 'intio_tags.h'
+#include "intio_tags.h"
   INTEGER, INTENT(INOUT) ::  hdrbuf(*)
   INTEGER, INTENT(OUT)   ::  hdrbufsize
   INTEGER, INTENT(INOUT)   ::  itypesize
@@ -264,7 +264,7 @@ END SUBROUTINE int_gen_handle_header
 SUBROUTINE int_get_handle_header( hdrbuf, hdrbufsize, itypesize, &
                                 DataHandle , code )
   IMPLICIT NONE
-  INCLUDE 'intio_tags.h'
+#include "intio_tags.h"
   INTEGER, INTENT(INOUT) ::  hdrbuf(*)
   INTEGER, INTENT(OUT)   ::  hdrbufsize
   INTEGER, INTENT(INOUT)   ::  itypesize
@@ -284,7 +284,7 @@ END SUBROUTINE int_get_handle_header
 SUBROUTINE int_gen_ti_header( hdrbuf, hdrbufsize, itypesize, typesize, &
                               DataHandle, Element, Data, Count, code )
   IMPLICIT NONE
-  INCLUDE 'intio_tags.h'
+#include "intio_tags.h"
   INTEGER, INTENT(INOUT)       ::  hdrbuf(*)
   INTEGER, INTENT(OUT)         ::  hdrbufsize
   INTEGER, INTENT(IN)          ::  itypesize, typesize
@@ -306,7 +306,7 @@ END SUBROUTINE int_gen_ti_header
 SUBROUTINE int_get_ti_header( hdrbuf, hdrbufsize, itypesize, typesize, &
                               DataHandle, Element, Data, Count, code )
   IMPLICIT NONE
-  INCLUDE 'intio_tags.h'
+#include "intio_tags.h"
   INTEGER, INTENT(INOUT)       ::  hdrbuf(*)
   INTEGER, INTENT(OUT)         ::  hdrbufsize
   INTEGER, INTENT(IN)          ::  itypesize, typesize
@@ -330,7 +330,7 @@ END SUBROUTINE int_get_ti_header
 SUBROUTINE int_gen_ti_header_char( hdrbuf, hdrbufsize, itypesize, &
                               DataHandle, Element, VarName, Data, code )
   IMPLICIT NONE
-  INCLUDE 'intio_tags.h'
+#include "intio_tags.h"
   INTEGER, INTENT(INOUT)       ::  hdrbuf(*)
   INTEGER, INTENT(OUT)         ::  hdrbufsize
   INTEGER, INTENT(IN)          ::  itypesize
@@ -355,7 +355,7 @@ END SUBROUTINE int_gen_ti_header_char
 SUBROUTINE int_get_ti_header_char( hdrbuf, hdrbufsize, itypesize, &
                               DataHandle, Element, VarName, Data, code )
   IMPLICIT NONE
-  INCLUDE 'intio_tags.h'
+#include "intio_tags.h"
   INTEGER, INTENT(INOUT)       ::  hdrbuf(*)
   INTEGER, INTENT(OUT)         ::  hdrbufsize
   INTEGER, INTENT(IN)          ::  itypesize
@@ -383,7 +383,7 @@ END SUBROUTINE int_get_ti_header_char
 SUBROUTINE int_gen_td_header( hdrbuf, hdrbufsize, itypesize, typesize, &
                               DataHandle, DateStr, Element, Data, Count, code )
   IMPLICIT NONE
-  INCLUDE 'intio_tags.h'
+#include "intio_tags.h"
   INTEGER, INTENT(INOUT)       ::  hdrbuf(*)
   INTEGER, INTENT(OUT)         ::  hdrbufsize
   INTEGER, INTENT(IN)          ::  itypesize, typesize
@@ -407,7 +407,7 @@ END SUBROUTINE int_gen_td_header
 SUBROUTINE int_get_td_header( hdrbuf, hdrbufsize, itypesize, typesize, &
                               DataHandle, DateStr, Element, Data, Count, code )
   IMPLICIT NONE
-  INCLUDE 'intio_tags.h'
+#include "intio_tags.h"
   INTEGER, INTENT(INOUT)       ::  hdrbuf(*)
   INTEGER, INTENT(OUT)         ::  hdrbufsize
   INTEGER, INTENT(IN)          ::  itypesize, typesize
@@ -431,7 +431,7 @@ END SUBROUTINE int_get_td_header
 
 SUBROUTINE int_gen_noop_header ( hdrbuf, hdrbufsize, itypesize )
   IMPLICIT NONE
-  INCLUDE 'intio_tags.h'
+#include "intio_tags.h"
   INTEGER, INTENT(INOUT) ::  hdrbuf(*)
   INTEGER, INTENT(OUT)   ::  hdrbufsize
   INTEGER, INTENT(INOUT)   ::  itypesize
@@ -448,7 +448,7 @@ END SUBROUTINE int_gen_noop_header
 
 SUBROUTINE int_get_noop_header( hdrbuf, hdrbufsize, itypesize )
   IMPLICIT NONE
-  INCLUDE 'intio_tags.h'
+#include "intio_tags.h"
   INTEGER, INTENT(INOUT) ::  hdrbuf(*)
   INTEGER, INTENT(OUT)   ::  hdrbufsize
   INTEGER, INTENT(INOUT)   ::  itypesize

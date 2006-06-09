@@ -7,7 +7,7 @@ MODULE module_dm
    USE module_state_description
    USE module_wrf_error
 
-#include <rsl.inc>
+#include "rsl.inc"
 
    INTEGER msg_z, msg_x, msg_y
    INTEGER msg,messages(168)
@@ -3760,7 +3760,7 @@ END
                                        MS1,ME1,MS2,ME2,MS3,ME3,&
                                        PS1,PE1,PS2,PE2,PS3,PE3 )
        IMPLICIT NONE
-#include <rsl.inc>
+#include "rsl.inc"
        INTEGER                         DS1,DE1,DS2,DE2,DS3,DE3,&
                                        MS1,ME1,MS2,ME2,MS3,ME3,&
                                        PS1,PE1,PS2,PE2,PS3,PE3
@@ -3787,7 +3787,7 @@ END
                                        MS1,ME1,MS2,ME2,MS3,ME3,&
                                        PS1,PE1,PS2,PE2,PS3,PE3 )
        IMPLICIT NONE
-#include <rsl.inc>
+#include "rsl.inc"
        INTEGER                         DS1,DE1,DS2,DE2,DS3,DE3,&
                                        MS1,ME1,MS2,ME2,MS3,ME3,&
                                        PS1,PE1,PS2,PE2,PS3,PE3
@@ -3815,7 +3815,7 @@ END
                                        MS1,ME1,MS2,ME2,MS3,ME3,&
                                        PS1,PE1,PS2,PE2,PS3,PE3 )
        IMPLICIT NONE
-#include <rsl.inc>
+#include "rsl.inc"
        INTEGER                         DS1,DE1,DS2,DE2,DS3,DE3,&
                                        MS1,ME1,MS2,ME2,MS3,ME3,&
                                        PS1,PE1,PS2,PE2,PS3,PE3
@@ -3842,7 +3842,7 @@ END
                                        MS1,ME1,MS2,ME2,MS3,ME3,&
                                        PS1,PE1,PS2,PE2,PS3,PE3 )
        IMPLICIT NONE
-#include <rsl.inc>
+#include "rsl.inc"
        INTEGER                         DS1,DE1,DS2,DE2,DS3,DE3,&
                                        MS1,ME1,MS2,ME2,MS3,ME3,&
                                        PS1,PE1,PS2,PE2,PS3,PE3
@@ -3876,7 +3876,7 @@ END
        USE module_timing
        USE module_wrf_error
        IMPLICIT NONE
-#include <rsl.inc>
+#include "rsl.inc"
        INTEGER                         DS1a,DE1a,DS2a,DE2a,DS3a,DE3a,&
                                        MS1a,ME1a,MS2a,ME2a,MS3a,ME3a,&
                                        PS1a,PE1a,PS2a,PE2a,PS3a,PE3A 
@@ -3963,7 +3963,7 @@ END
                                        MS1,ME1,MS2,ME2,MS3,ME3,&
                                        PS1,PE1,PS2,PE2,PS3,PE3 )
        IMPLICIT NONE
-#include <rsl.inc>
+#include "rsl.inc"
        INTEGER                         DS1,DE1,DS2,DE2,DS3,DE3,&
                                        MS1,ME1,MS2,ME2,MS3,ME3,&
                                        PS1,PE1,PS2,PE2,PS3,PE3
@@ -3989,7 +3989,7 @@ END
                                        MS1,ME1,MS2,ME2,MS3,ME3,&
                                        PS1,PE1,PS2,PE2,PS3,PE3 )
        IMPLICIT NONE
-#include <rsl.inc>
+#include "rsl.inc"
        INTEGER                         DS1,DE1,DS2,DE2,DS3,DE3,&
                                        MS1,ME1,MS2,ME2,MS3,ME3,&
                                        PS1,PE1,PS2,PE2,PS3,PE3
@@ -4016,7 +4016,7 @@ END
                                        MS1,ME1,MS2,ME2,MS3,ME3,&
                                        PS1,PE1,PS2,PE2,PS3,PE3 )
        IMPLICIT NONE
-#include <rsl.inc>
+#include "rsl.inc"
        INTEGER                         DS1,DE1,DS2,DE2,DS3,DE3,&
                                        MS1,ME1,MS2,ME2,MS3,ME3,&
                                        PS1,PE1,PS2,PE2,PS3,PE3
@@ -4042,7 +4042,7 @@ END
                                        MS1,ME1,MS2,ME2,MS3,ME3,&
                                        PS1,PE1,PS2,PE2,PS3,PE3 )
        IMPLICIT NONE
-#include <rsl.inc>
+#include "rsl.inc"
        INTEGER                         DS1,DE1,DS2,DE2,DS3,DE3,&
                                        MS1,ME1,MS2,ME2,MS3,ME3,&
                                        PS1,PE1,PS2,PE2,PS3,PE3
@@ -4073,7 +4073,7 @@ END
                                        PS1a,PE1a,PS2a,PE2a,PS3a,PE3a )
        USE module_driver_constants
        IMPLICIT NONE
-#include <rsl.inc>
+#include "rsl.inc"
        INTEGER                         DS1a,DE1a,DS2a,DE2a,DS3a,DE3a,&
                                        MS1a,ME1a,MS2a,ME2a,MS3a,ME3a,&
                                        PS1a,PE1a,PS2a,PE2a,PS3a,PE3A 
@@ -4160,9 +4160,9 @@ END
 !
       TYPE(domain), POINTER :: grid          ! name of the grid being dereferenced (must be "grid")
       TYPE(domain), POINTER :: ngrid
-#include <em_dummy_decl.inc>
-#include <namelist_defines2.inc>
-#include <em_i1_decl.inc>
+#include "em_dummy_decl.inc"
+#include "namelist_defines2.inc"
+#include "em_i1_decl.inc"
       INTEGER nlev, msize
       INTEGER i,j,pig,pjg,cm,cn,nig,njg,retval,k
       TYPE (grid_config_rec_type)            :: config_flags
@@ -4186,10 +4186,10 @@ END
 #include "deref_kludge.h"
 
 #define COPY_IN
-#include <em_scalar_derefs.inc>
+#include "em_scalar_derefs.inc"
 #ifdef DM_PARALLEL
 #    define REGISTER_I1
-#      include <em_data_calls.inc>
+#      include "em_data_calls.inc"
 #endif
 
       CALL get_ijk_from_grid (  grid ,                   &
@@ -4211,7 +4211,7 @@ END
 #  include "em_nest_forcedown_interp.inc"
 
 #define COPY_OUT
-#include <em_scalar_derefs.inc>
+#include "em_scalar_derefs.inc"
       RETURN
    END SUBROUTINE force_domain_em_part2
 
@@ -4232,8 +4232,8 @@ END
       TYPE(domain), POINTER :: grid          ! name of the grid being dereferenced (must be "grid")
       TYPE(domain), POINTER :: intermediate_grid
       TYPE(domain), POINTER :: ngrid
-#include <em_dummy_decl.inc>
-#include <namelist_defines2.inc>
+#include "em_dummy_decl.inc"
+#include "namelist_defines2.inc"
       INTEGER nlev, msize
       INTEGER i,j,pig,pjg,cm,cn,nig,njg,retval,k
       TYPE (grid_config_rec_type)            :: config_flags
@@ -4246,7 +4246,7 @@ END
                                 nips, nipe, njps, njpe, nkps, nkpe
 
 #define COPY_IN
-#include <em_scalar_derefs.inc>
+#include "em_scalar_derefs.inc"
 !
 
       CALL get_ijk_from_grid (  grid ,                   &
@@ -4265,7 +4265,7 @@ END
       CALL rsl_bcast_msgs
 
 #define COPY_OUT
-#include <em_scalar_derefs.inc>
+#include "em_scalar_derefs.inc"
       RETURN
    END SUBROUTINE interp_domain_em_part1
 
@@ -4280,9 +4280,9 @@ END
 !
       TYPE(domain), POINTER :: grid          ! name of the grid being dereferenced (must be "grid")
       TYPE(domain), POINTER :: ngrid
-#include <em_dummy_decl.inc>
-#include <namelist_defines2.inc>
-#include <em_i1_decl.inc>
+#include "em_dummy_decl.inc"
+#include "namelist_defines2.inc"
+#include "em_i1_decl.inc"
       INTEGER nlev, msize
       INTEGER i,j,pig,pjg,cm,cn,nig,njg,retval,k
       TYPE (grid_config_rec_type)            :: config_flags
@@ -4303,10 +4303,10 @@ END
 #include "deref_kludge.h"
 
 #define COPY_IN
-#include <em_scalar_derefs.inc>
+#include "em_scalar_derefs.inc"
 #ifdef DM_PARALLEL
 #    define REGISTER_I1
-#      include <em_data_calls.inc>
+#      include "em_data_calls.inc"
 #endif
       CALL get_ijk_from_grid (  grid ,                   &
                                 cids, cide, cjds, cjde, ckds, ckde,    &
@@ -4327,7 +4327,7 @@ END
 #  include "em_nest_interpdown_interp.inc"
 
 #define COPY_OUT
-#include <em_scalar_derefs.inc>
+#include "em_scalar_derefs.inc"
       RETURN
    END SUBROUTINE interp_domain_em_part2
 
@@ -4354,8 +4354,8 @@ END
       TYPE (grid_config_rec_type) :: config_flags ! configureation flags, has vertical dim of 
                                                   ! soil temp, moisture, etc., has vertical dim
                                                   ! of soil categories
-#include <em_dummy_decl.inc>
-#include <namelist_defines2.inc>
+#include "em_dummy_decl.inc"
+#include "namelist_defines2.inc"
 
 #ifdef DEREF_KLUDGE
 !  see http://www.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm
@@ -4366,10 +4366,10 @@ END
 #include "deref_kludge.h"
 
 #define COPY_IN
-#include <em_scalar_derefs.inc>
+#include "em_scalar_derefs.inc"
 
 #ifdef DM_PARALLEL
-#      include <em_data_calls.inc>
+#      include "em_data_calls.inc"
 #endif
 
 #ifdef DM_PARALLEL
@@ -4377,7 +4377,7 @@ END
 #endif
 
 #define COPY_OUT
-#include <em_scalar_derefs.inc>
+#include "em_scalar_derefs.inc"
 
    END SUBROUTINE feedback_nest_prep
 
@@ -4392,8 +4392,8 @@ END
 !
       TYPE(domain), POINTER :: grid          ! name of the grid being dereferenced (must be "grid")
       TYPE(domain), POINTER :: ngrid
-#include <em_dummy_decl.inc>
-#include <namelist_defines2.inc>
+#include "em_dummy_decl.inc"
+#include "namelist_defines2.inc"
       INTEGER nlev, msize
       INTEGER i,j,pig,pjg,cm,cn,nig,njg,retval,k
       TYPE(domain), POINTER :: xgrid
@@ -4418,7 +4418,7 @@ END
 !
              TYPE (grid_config_rec_type)            :: config_flags
              TYPE(domain), TARGET                   :: grid
-#include <em_dummy_decl.inc>
+#include "em_dummy_decl.inc"
           END SUBROUTINE feedback_nest_prep
 
       END INTERFACE
@@ -4433,7 +4433,7 @@ END
 #include "deref_kludge.h"
 
 #define COPY_IN
-#include <em_scalar_derefs.inc>
+#include "em_scalar_derefs.inc"
 
       CALL get_ijk_from_grid (  grid ,                   &
                                 cids, cide, cjds, cjde, ckds, ckde,    &
@@ -4470,7 +4470,7 @@ END
 #  include "em_nest_feedbackup_interp.inc"
 
 #define COPY_OUT
-#include <em_scalar_derefs.inc>
+#include "em_scalar_derefs.inc"
       RETURN
    END SUBROUTINE feedback_domain_em_part1
 
@@ -4488,9 +4488,9 @@ END
       TYPE(domain), POINTER :: grid          ! name of the grid being dereferenced (must be "grid")
       TYPE(domain), POINTER :: intermediate_grid
       TYPE(domain), POINTER :: ngrid
-#include <em_dummy_decl.inc>
-#include <namelist_defines2.inc>
-#include <em_i1_decl.inc>
+#include "em_dummy_decl.inc"
+#include "namelist_defines2.inc"
+#include "em_i1_decl.inc"
       INTEGER nlev, msize
       INTEGER i,j,pig,pjg,cm,cn,nig,njg,retval,k
       TYPE (grid_config_rec_type)            :: config_flags
@@ -4513,10 +4513,10 @@ END
 #include "deref_kludge.h"
 
 #define COPY_IN
-#include <em_scalar_derefs.inc>
+#include "em_scalar_derefs.inc"
 #ifdef DM_PARALLEL
 #    define REGISTER_I1
-#      include <em_data_calls.inc>
+#      include "em_data_calls.inc"
 #endif
 
       nest_influence = 1.
@@ -4550,7 +4550,7 @@ END
 #  include "em_nest_feedbackup_smooth.inc"
 
 #define COPY_OUT
-#include <em_scalar_derefs.inc>
+#include "em_scalar_derefs.inc"
       RETURN
    END SUBROUTINE feedback_domain_em_part2
 

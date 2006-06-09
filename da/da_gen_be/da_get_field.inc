@@ -2,7 +2,7 @@ subroutine da_get_field( input_file, var, field_dims, dim1, dim2, dim3, k, field
 
    implicit none
 
-#include "netcdf.inc"
+#include <netcdf.inc>
    
    character (len=200), intent(in):: input_file       ! NETCDF file nane.
    character (len=10), intent(in) :: var              ! Variable to search for.

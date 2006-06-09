@@ -1071,7 +1071,7 @@ SUBROUTINE med_latbound_in ( grid , config_flags )
 
    IMPLICIT NONE
 
-#include <wrf_status_codes.h>
+#include "wrf_status_codes.h"
 
   ! Arguments
    TYPE(domain)                               :: grid
@@ -1087,7 +1087,7 @@ SUBROUTINE med_latbound_in ( grid , config_flags )
    Type (WRF_UTIL_Time )                      :: time, btime
    Type (WRF_UTIL_Time )                      :: current_time
 
-#include <wrf_io_flags.h>
+#include "wrf_io_flags.h"
 
    CALL wrf_debug ( 1 , 'in med_latbound_in' )
 
@@ -1253,7 +1253,7 @@ SUBROUTINE med_read_wrf_chem_emiss ( grid , config_flags )
    CHARACTER (LEN=256)                    :: message, current_date_char, date_string
    CHARACTER (LEN=80)                     :: inpname
 
-#include <wrf_io_flags.h>
+#include "wrf_io_flags.h"
 
      CALL model_to_grid_config_rec ( grid%id , model_config_rec , config_flags )
 
@@ -1367,7 +1367,7 @@ SUBROUTINE med_read_wrf_chem_bioemiss ( grid , config_flags )
    CHARACTER (LEN=256)                    :: message, current_date_char, date_string
    CHARACTER (LEN=80)                     :: inpname
 
-#include <wrf_io_flags.h>
+#include "wrf_io_flags.h"
     IF ( grid%id .EQ. 1 ) THEN
 
       CALL WRF_UTIL_ClockGet( grid%domain_clock, CurrTime=grid%current_time, rc=ierr )

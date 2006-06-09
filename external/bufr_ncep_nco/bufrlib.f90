@@ -225,7 +225,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /BITBUF/ MAXBYT,IBIT,IBAY(MXMSGLD4),MBYT(NFILES),
      .                MBAY(MXMSGLD4,NFILES)
@@ -723,7 +723,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /TABABD/ NTBA(0:NFILES),NTBB(0:NFILES),NTBD(0:NFILES),
      .                MTAB(MAXTBA,NFILES),IDNA(MAXTBA,NFILES,2),
@@ -978,7 +978,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /MSGCWD/ NMSG(NFILES),NSUB(NFILES),MSUB(NFILES),
      .                INODE(NFILES),IDATE(NFILES)
@@ -1222,7 +1222,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /NULBFR/ NULL(NFILES)
 
@@ -1328,7 +1328,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /BITBUF/ MAXBYT,IBIT,IBAY(MXMSGLD4),MBYT(NFILES),
      .                MBAY(MXMSGLD4,NFILES)
@@ -1490,7 +1490,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /MSGSTD/ CSMF
 
@@ -1853,7 +1853,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /USRINT/ NVAL(NFILES),INV(MAXJL,NFILES),VAL(MAXJL,NFILES)
       COMMON /USRSTR/ NNOD,NCON,NODS(20),NODC(10),IVLS(10),KONS(10)
@@ -1954,7 +1954,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       DIMENSION   MBAY(MXMSGLD4)
 
@@ -2060,7 +2060,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /MSGCWD/ NMSG(NFILES),NSUB(NFILES),MSUB(NFILES),
      .                INODE(NFILES),IDATE(NFILES)
@@ -2209,7 +2209,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /MSGCWD/ NMSG(NFILES),NSUB(NFILES),MSUB(NFILES),
      .                INODE(NFILES),IDATE(NFILES)
@@ -2351,7 +2351,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /MSGCWD/ NMSG(NFILES),NSUB(NFILES),MSUB(NFILES),
      .                INODE(NFILES),IDATE(NFILES)
@@ -2488,7 +2488,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /MSGMEM/ MUNIT,MLAST,MSGP(0:MAXMSG),MSGS(MAXMEM)
       COMMON /MSGCWD/ NMSG(NFILES),NSUB(NFILES),MSUB(NFILES),
@@ -2621,7 +2621,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /MSGPTR/ NBY0,NBY1,NBY2,NBY3,NBY4,NBY5
       COMMON /MSGCWD/ NMSG(NFILES),NSUB(NFILES),MSUB(NFILES),
@@ -2761,7 +2761,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /QUIET / IPRT
 
@@ -2997,7 +2997,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /TABLES/ MAXTAB,NTAB,TAG(MAXJL),TYP(MAXJL),KNT(MAXJL),
      .                JUMP(MAXJL),LINK(MAXJL),JMPB(MAXJL),
@@ -3090,7 +3090,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /TABLES/ MAXTAB,NTAB,TAG(MAXJL),TYP(MAXJL),KNT(MAXJL),
      .                JUMP(MAXJL),LINK(MAXJL),JMPB(MAXJL),
@@ -3210,7 +3210,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /QUIET / IPRT
 
@@ -3340,7 +3340,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /REPTAB/ IDNR(5,2),TYPS(5,2),REPS(5,2),LENS(5)
       COMMON /TABABD/ NTBA(0:NFILES),NTBB(0:NFILES),NTBD(0:NFILES),
@@ -3671,7 +3671,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /PADESC/ IBCT,IPD1,IPD2,IPD3,IPD4
       COMMON /REPTAB/ IDNR(5,2),TYPS(5,2),REPS(5,2),LENS(5)
@@ -3838,7 +3838,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /DXTAB / MAXDX,IDXV,NXSTR(10),LDXA(10),LDXB(10),LDXD(10),
      .                LD30(10),DXSTR(10)
@@ -4006,7 +4006,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /TABABD/ NTBA(0:NFILES),NTBB(0:NFILES),NTBD(0:NFILES),
      .                MTAB(MAXTBA,NFILES),IDNA(MAXTBA,NFILES,2),
@@ -4137,7 +4137,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /TABABD/ NTBA(0:NFILES),NTBB(0:NFILES),NTBD(0:NFILES),
      .                MTAB(MAXTBA,NFILES),IDNA(MAXTBA,NFILES,2),
@@ -4510,7 +4510,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /USRINT/ NVAL(NFILES),INV(MAXJL,NFILES),VAL(MAXJL,NFILES)
 
@@ -4859,7 +4859,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /MSGCWD/ NMSG(NFILES),NSUB(NFILES),MSUB(NFILES),
      .                INODE(NFILES),IDATE(NFILES)
@@ -5071,7 +5071,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /TABLES/ MAXTAB,NTAB,TAG(MAXJL),TYP(MAXJL),KNT(MAXJL),
      .                JUMP(MAXJL),LINK(MAXJL),JMPB(MAXJL),
@@ -5152,7 +5152,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /USRINT/ NVAL(NFILES),INV(MAXJL,NFILES),VAL(MAXJL,NFILES)
       COMMON /USRSTR/ NNOD,NCON,NODS(20),NODC(10),IVLS(10),KONS(10)
@@ -5248,7 +5248,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /MRGCOM/ NRPL,NMRG,NAMB,NTOT
       COMMON /USRINT/ NVAL(NFILES),INV(MAXJL,NFILES),VAL(MAXJL,NFILES)
@@ -5416,7 +5416,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /TABLES/ MAXTAB,NTAB,TAG(MAXJL),TYP(MAXJL),KNT(MAXJL),
      .                JUMP(MAXJL),LINK(MAXJL),JMPB(MAXJL),
@@ -5510,7 +5510,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /USRINT/ NVAL(NFILES),INV(MAXJL,NFILES),VAL(MAXJL,NFILES)
       COMMON /QUIET/  IPRT
@@ -6453,7 +6453,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /BITBUF/ MAXBYT,IBIT,IBAY(MXMSGLD4),MBYT(NFILES),
      .                MBAY(MXMSGLD4,NFILES)
@@ -6533,7 +6533,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /BITBUF/ MAXBYT,IBIT,IBAY(MXMSGLD4),MBYT(NFILES),
      .                MBAY(MXMSGLD4,NFILES)
@@ -6905,7 +6905,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /MSGCWD/ NMSG(NFILES),NSUB(NFILES),MSUB(NFILES),
      .                INODE(NFILES),IDATE(NFILES)
@@ -7003,7 +7003,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /MSGCWD/ NMSG(NFILES),NSUB(NFILES),MSUB(NFILES),
      .                INODE(NFILES),IDATE(NFILES)
@@ -7096,7 +7096,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /MSGCWD/ NMSG(NFILES),NSUB(NFILES),MSUB(NFILES),
      .                INODE(NFILES),IDATE(NFILES)
@@ -7207,7 +7207,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /QUIET/  IPRT
       COMMON /STBFR/  IOLUN(NFILES),IOMSG(NFILES)
@@ -7491,7 +7491,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /BITBUF/ MAXBYT,IBIT,IBAY(MXMSGLD4),MBYT(NFILES),
      .                MBAY(MXMSGLD4,NFILES)
@@ -7619,7 +7619,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /BITBUF/ MAXBYT,IBIT,IBAY(MXMSGLD4),MBYT(NFILES),
      .                MBAY(MXMSGLD4,NFILES)
@@ -7783,7 +7783,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       DIMENSION    MBAY(MXMSGLD4)
 
@@ -7872,7 +7872,7 @@ C   LANGUAGE: FORTRAN 77
 C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /BITBUF/ MAXBYT,IBIT,IBAY(MXMSGLD4),MBYT(NFILES),
      .                MBAY(MXMSGLD4,NFILES)
@@ -8090,7 +8090,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /PADESC/ IBCT,IPD1,IPD2,IPD3,IPD4
       COMMON /MSGPTR/ NBY0,NBY1,NBY2,NBY3,NBY4,NBY5
@@ -8296,7 +8296,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /MSGPTR/ NBY0,NBY1,NBY2,NBY3,NBY4,NBY5
       COMMON /MSGCWD/ NMSG(NFILES),NSUB(NFILES),MSUB(NFILES),
@@ -8453,7 +8453,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       PARAMETER (MXCOD=15)
 
@@ -8704,7 +8704,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       CHARACTER*128 BORT_STR
       DIMENSION     IB1(*),IB2(*),NVAL(MXIMB)
@@ -8893,7 +8893,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /TABABD/ NTBA(0:NFILES),NTBB(0:NFILES),NTBD(0:NFILES),
      .                MTAB(MAXTBA,NFILES),IDNA(MAXTBA,NFILES,2),
@@ -9032,7 +9032,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /TABABD/ NTBA(0:NFILES),NTBB(0:NFILES),NTBD(0:NFILES),
      .                MTAB(MAXTBA,NFILES),IDNA(MAXTBA,NFILES,2),
@@ -9126,7 +9126,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /TABABD/ NTBA(0:NFILES),NTBB(0:NFILES),NTBD(0:NFILES),
      .                MTAB(MAXTBA,NFILES),IDNA(MAXTBA,NFILES,2),
@@ -9227,7 +9227,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /TABABD/ NTBA(0:NFILES),NTBB(0:NFILES),NTBD(0:NFILES),
      .                MTAB(MAXTBA,NFILES),IDNA(MAXTBA,NFILES,2),
@@ -9393,7 +9393,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /TABABD/ NTBA(0:NFILES),NTBB(0:NFILES),NTBD(0:NFILES),
      .                MTAB(MAXTBA,NFILES),IDNA(MAXTBA,NFILES,2),
@@ -9603,7 +9603,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /TABABD/ NTBA(0:NFILES),NTBB(0:NFILES),NTBD(0:NFILES),
      .                MTAB(MAXTBA,NFILES),IDNA(MAXTBA,NFILES,2),
@@ -9772,7 +9772,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /TABABD/ NTBA(0:NFILES),NTBB(0:NFILES),NTBD(0:NFILES),
      .                MTAB(MAXTBA,NFILES),IDNA(MAXTBA,NFILES,2),
@@ -9875,7 +9875,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /USRINT/ NVAL(NFILES),INV(MAXJL,NFILES),VAL(MAXJL,NFILES)
 
@@ -9972,7 +9972,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /USRINT/ NVAL(NFILES),INV(MAXJL,NFILES),VAL(MAXJL,NFILES)
 
@@ -10121,7 +10121,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /MSGCWD/ NMSG(NFILES),NSUB(NFILES),MSUB(NFILES),
      .                INODE(NFILES),IDATE(NFILES)
@@ -10441,7 +10441,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
 C     Note that the values within the COMMON /REPTAB/ arrays were
 C     initialized within subroutine BFRINI.
@@ -10602,7 +10602,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /TABABD/ NTBA(0:NFILES),NTBB(0:NFILES),NTBD(0:NFILES),
      .                MTAB(MAXTBA,NFILES),IDNA(MAXTBA,NFILES,2),
@@ -10708,7 +10708,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /USRINT/ NVAL(NFILES),INV(MAXJL,NFILES),VAL(MAXJL,NFILES)
       COMMON /QUIET / IPRT
@@ -10805,7 +10805,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /USRINT/ NVAL(NFILES),INV(MAXJL,NFILES),VAL(MAXJL,NFILES)
 
@@ -10873,7 +10873,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /USRINT/ NVAL(NFILES),INV(MAXJL,NFILES),VAL(MAXJL,NFILES)
 
@@ -11020,7 +11020,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /MSGCWD/ NMSG(NFILES),NSUB(NFILES),MSUB(NFILES),
      .                INODE(NFILES),IDATE(NFILES)
@@ -11321,7 +11321,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /MSGCWD/ NMSG(NFILES),NSUB(NFILES),MSUB(NFILES),
      .                INODE(NFILES),IDATE(NFILES)
@@ -11429,7 +11429,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /MSGCWD/ NMSG(NFILES),NSUB(NFILES),MSUB(NFILES),
      .                INODE(NFILES),IDATE(NFILES)
@@ -12133,7 +12133,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /MSGCWD/ NMSG(NFILES),NSUB(NFILES),MSUB(NFILES),
      .                INODE(NFILES),IDATE(NFILES)
@@ -12697,7 +12697,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /TABABD/ NTBA(0:NFILES),NTBB(0:NFILES),NTBD(0:NFILES),
      .                MTAB(MAXTBA,NFILES),IDNA(MAXTBA,NFILES,2),
@@ -12849,7 +12849,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /S01CM/  NS01V,CMNEM(MXS01V),IVMNEM(MXS01V)
 
@@ -13087,7 +13087,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       DIMENSION   MBAY(MXMSGLD4)
 
@@ -13162,7 +13162,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       DIMENSION   MBAY(MXMSGLD4)
 
@@ -13263,7 +13263,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       PARAMETER (MAXRCR=100)
 
@@ -13461,7 +13461,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /TABABD/ NTBA(0:NFILES),NTBB(0:NFILES),NTBD(0:NFILES),
      .                MTAB(MAXTBA,NFILES),IDNA(MAXTBA,NFILES,2),
@@ -13729,7 +13729,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /BITBUF/ MAXBYT,IBIT,IBAY(MXMSGLD4),MBYT(NFILES),
      .                MBAY(MXMSGLD4,NFILES)
@@ -13929,7 +13929,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /MSGCWD/ NMSG(NFILES),NSUB(NFILES),MSUB(NFILES),
      .                INODE(NFILES),IDATE(NFILES)
@@ -14072,7 +14072,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       CHARACTER*128 BORT_STR
 
@@ -14213,7 +14213,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /MSGCWD/ NMSG(NFILES),NSUB(NFILES),MSUB(NFILES),
      .                INODE(NFILES),IDATE(NFILES)
@@ -14312,7 +14312,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       DIMENSION   MESG(*)
 
@@ -14484,7 +14484,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /BITBUF/ MAXBYT,IBIT,IBAY(MXMSGLD4),MBYT(NFILES),
      .                MBAY(MXMSGLD4,NFILES)
@@ -14657,7 +14657,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /TABABD/ NTBA(0:NFILES),NTBB(0:NFILES),NTBD(0:NFILES),
      .                MTAB(MAXTBA,NFILES),IDNA(MAXTBA,NFILES,2),
@@ -15089,7 +15089,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /BITBUF/ MAXBYT,IBIT,IBAY(MXMSGLD4),MBYT(NFILES),
      .                MBAY(MXMSGLD4,NFILES)
@@ -15381,7 +15381,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /BITBUF/ MAXBYT,IBIT,IBAY(MXMSGLD4),MBYT(NFILES),
      .                MBAY(MXMSGLD4,NFILES)
@@ -15562,7 +15562,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /MSGCWD/ NMSG(NFILES),NSUB(NFILES),MSUB(NFILES),
      .                INODE(NFILES),IDATE(NFILES)
@@ -15716,7 +15716,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /MSGCWD/ NMSG(NFILES),NSUB(NFILES),MSUB(NFILES),
      .                INODE(NFILES),IDATE(NFILES)
@@ -15846,7 +15846,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /MSGCWD/ NMSG(NFILES),NSUB(NFILES),MSUB(NFILES),
      .                INODE(NFILES),IDATE(NFILES)
@@ -15952,7 +15952,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /MSGCWD/ NMSG(NFILES),NSUB(NFILES),MSUB(NFILES),
      .                INODE(NFILES),IDATE(NFILES)
@@ -16086,7 +16086,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /MSGCWD/ NMSG(NFILES),NSUB(NFILES),MSUB(NFILES),
      .                INODE(NFILES),IDATE(NFILES)
@@ -16665,7 +16665,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /STBFR/ IOLUN(NFILES),IOMSG(NFILES)
 
@@ -16856,7 +16856,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       DIMENSION ICD(MAXNC)
 
@@ -17089,7 +17089,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /STCACH/ MSTR,NSTR,LSTR,LUNS(MXS,2),USRS(MXS),ICON(52,MXS)
       CHARACTER*80 USRS
@@ -17165,7 +17165,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       PARAMETER (JCONS=52)
 
@@ -17489,7 +17489,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /MSGPTR/ NBY0,NBY1,NBY2,NBY3,NBY4,NBY5
       COMMON /MSGCWD/ NMSG(NFILES),NSUB(NFILES),MSUB(NFILES),
@@ -17616,7 +17616,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
 C     Note that the values within the COMMON /REPTAB/ arrays were
 C     initialized within subroutine BFRINI.
@@ -17897,7 +17897,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /TABLES/ MAXTAB,NTAB,TAG(MAXJL),TYP(MAXJL),KNT(MAXJL),
      .                JUMP(MAXJL),LINK(MAXJL),JMPB(MAXJL),
@@ -18148,7 +18148,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /USRINT/ NVAL(NFILES),INV(MAXJL,NFILES),VAL(MAXJL,NFILES)
       COMMON /USRSTR/ NNOD,NCON,NODS(20),NODC(10),IVLS(10),KONS(10)
@@ -18253,7 +18253,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /MSGCWD/ NMSG(NFILES),NSUB(NFILES),MSUB(NFILES),
      .                INODE(NFILES),IDATE(NFILES)
@@ -18328,7 +18328,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /MSGCWD/ NMSG(NFILES),NSUB(NFILES),MSUB(NFILES),
      .                INODE(NFILES),IDATE(NFILES)
@@ -18435,7 +18435,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /TABLES/ MAXTAB,NTAB,TAG(MAXJL),TYP(MAXJL),KNT(MAXJL),
      .                JUMP(MAXJL),LINK(MAXJL),JMPB(MAXJL),
@@ -18644,7 +18644,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /MSGCWD/ NMSG(NFILES),NSUB(NFILES),MSUB(NFILES),
      .                INODE(NFILES),IDATE(NFILES)
@@ -18903,7 +18903,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /MSGCWD/ NMSG(NFILES),NSUB(NFILES),MSUB(NFILES),
      .                INODE(NFILES),IDATE(NFILES)
@@ -19134,7 +19134,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /MSGCWD/ NMSG(NFILES),NSUB(NFILES),MSUB(NFILES),
      .                INODE(NFILES),IDATE(NFILES)
@@ -19362,7 +19362,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /MSGCWD/ NMSG(NFILES),NSUB(NFILES),MSUB(NFILES),
      .                INODE(NFILES),IDATE(NFILES)
@@ -19812,7 +19812,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /MSGCWD/ NMSG(NFILES),NSUB(NFILES),MSUB(NFILES),
      .                INODE(NFILES),IDATE(NFILES)
@@ -20027,7 +20027,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /MSGCWD/ NMSG(NFILES),NSUB(NFILES),MSUB(NFILES),
      .                INODE(NFILES),IDATE(NFILES)
@@ -20206,7 +20206,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /MSGMEM/ MUNIT,MLAST,MSGP(0:MAXMSG),MSGS(MAXMEM)
 
@@ -20384,7 +20384,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /MSGMEM/ MUNIT,MLAST,MSGP(0:MAXMSG),MSGS(MAXMEM)
       COMMON /MSGCWD/ NMSG(NFILES),NSUB(NFILES),MSUB(NFILES),
@@ -20492,7 +20492,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /MSGMEM/ MUNIT,MLAST,MSGP(0:MAXMSG),MSGS(MAXMEM)
 
@@ -20607,7 +20607,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /MSGCWD/ NMSG(NFILES),NSUB(NFILES),MSUB(NFILES),
      .                INODE(NFILES),IDATE(NFILES)
@@ -20770,7 +20770,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /MSGCWD/ NMSG(NFILES),NSUB(NFILES),MSUB(NFILES),
      .                INODE(NFILES),IDATE(NFILES)
@@ -21155,7 +21155,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /MSGCWD/ NMSG(NFILES),NSUB(NFILES),MSUB(NFILES),
      .                INODE(NFILES),IDATE(NFILES)
@@ -21376,7 +21376,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /MSGMEM/ MUNIT,MLAST,MSGP(0:MAXMSG),MSGS(MAXMEM)
       COMMON /MSGCWD/ NMSG(NFILES),NSUB(NFILES),MSUB(NFILES),
@@ -21520,7 +21520,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /USRINT/ NVAL(NFILES),INV(MAXJL,NFILES),VAL(MAXJL,NFILES)
       COMMON /USRSTR/ NNOD,NCON,NODS(20),NODC(10),IVLS(10),KONS(10)
@@ -21671,7 +21671,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /TABLES/ MAXTAB,NTAB,TAG(MAXJL),TYP(MAXJL),KNT(MAXJL),
      .                JUMP(MAXJL),LINK(MAXJL),JMPB(MAXJL),
@@ -21913,7 +21913,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       PARAMETER (MTAG=10)
 
@@ -22226,7 +22226,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /USRINT/ NVAL(NFILES),INV(MAXJL,NFILES),VAL(MAXJL,NFILES)
       COMMON /USRSTR/ NNOD,NCON,NODS(20),NODC(10),IVLS(10),KONS(10)
@@ -22375,7 +22375,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /MSGCWD/ NMSG(NFILES),NSUB(NFILES),MSUB(NFILES),
      .                INODE(NFILES),IDATE(NFILES)
@@ -22628,7 +22628,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /MSGCWD/ NMSG(NFILES),NSUB(NFILES),MSUB(NFILES),
      .                INODE(NFILES),IDATE(NFILES)
@@ -23085,7 +23085,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /MSGMEM/ MUNIT,MLAST,MSGP(0:MAXMSG),MSGS(MAXMEM)
       COMMON /MSGCWD/ NMSG(NFILES),NSUB(NFILES),MSUB(NFILES),
@@ -23329,7 +23329,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /MSGCWD/ NMSG(NFILES),NSUB(NFILES),MSUB(NFILES),
      .                INODE(NFILES),IDATE(NFILES)
@@ -23819,7 +23819,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /TABABD/ NTBA(0:NFILES),NTBB(0:NFILES),NTBD(0:NFILES),
      .                MTAB(MAXTBA,NFILES),IDNA(MAXTBA,NFILES,2),
@@ -23949,7 +23949,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /TABABD/ NTBA(0:NFILES),NTBB(0:NFILES),NTBD(0:NFILES),
      .                MTAB(MAXTBA,NFILES),IDNA(MAXTBA,NFILES,2),
@@ -24055,7 +24055,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /MSGCWD/ NMSG(NFILES),NSUB(NFILES),MSUB(NFILES),
      .                INODE(NFILES),IDATE(NFILES)
@@ -24408,7 +24408,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
  
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
  
       COMMON /MAXCMP/ MAXCMB,MAXROW,MAXCOL,NCMSGS,NCSUBS,NCBYTS
       COMMON /MSGCWD/ NMSG(NFILES),NSUB(NFILES),MSUB(NFILES),
@@ -25461,7 +25461,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /TABABD/ NTBA(0:NFILES),NTBB(0:NFILES),NTBD(0:NFILES),
      .                MTAB(MAXTBA,NFILES),IDNA(MAXTBA,NFILES,2),
@@ -25620,7 +25620,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /BITBUF/ MAXBYT,IBIT,IBAY(MXMSGLD4),MBYT(NFILES),
      .                MBAY(MXMSGLD4,NFILES)
@@ -25832,7 +25832,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /BUFRMG/ MSGLEN,MSGTXT(MXMSGLD4)
       COMMON /MSGCMP/ CCMF
@@ -26055,7 +26055,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /BITBUF/ MAXBYT,IBIT,IBAY(MXMSGLD4),MBYT(NFILES),
      .                MBAY(MXMSGLD4,NFILES)
@@ -26179,7 +26179,7 @@ C   MACHINE:  PORTABLE TO ALL PLATFORMS
 C
 C$$$
 
-      INCLUDE 'bufrlib.prm'
+#include "bufrlib.prm"
 
       COMMON /STBFR/ IOLUN(NFILES),IOMSG(NFILES)
 

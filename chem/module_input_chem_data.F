@@ -1876,7 +1876,7 @@ SUBROUTINE med_read_bin_chem_emiss ( grid , config_flags ,intime, itime_max)
               ips, ipe, jps, jpe, kps, kpe
 
 
-#include <wrf_io_flags.h>
+#include "wrf_io_flags.h"
 
    write(message, '(A,A)') 'call read emissions', intime
    call wrf_message( TRIM( message ) )
