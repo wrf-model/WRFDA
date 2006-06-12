@@ -24,7 +24,6 @@ DYN_MODULES =                 		\
         module_solvedebug_em.o    	\
         module_bc_em.o                  \
         module_init_utilities.o         \
-        module_check.o                  \
 	$(CASE_MODULE)
 
 # possible CASE_MODULE settings

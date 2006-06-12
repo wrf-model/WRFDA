@@ -2,56 +2,55 @@
 
 var : wrfvar
 
-wrfvar : arch links wrfvar.o pack_utils.o liblapack.a libblas.a libbufr.a libfftpack5.a libwrfvar.a
-	$(LD) -o wrfvar.exe $(LDFLAGS) wrfvar.o -lwrfvar $(VAR_LIB) pack_utils.o
+wrfvar  : arch links $(WRFVAR_LIBS) wrfvar.o pack_utils.o
+	$(LD) -o wrfvar.exe $(LDFLAGS) wrfvar.o $(WRFVAR_LIB) pack_utils.o
 
-wrf : arch links wrf.o  pack_utils.o libwrflib.a libwrfio_nf.a libio_grib1.a libesmf_time.a
+wrf     : arch links $(WRF_LIBS) pack_utils.o wrf.o
 	$(LD) -o wrf.exe $(LDFLAGS) wrf.o $(WRF_LIB) pack_utils.o
 
-wrfplus : arch links wrf.o pack_utils.o libwrflib.a libwrfplus.a libwrfio_nf.a libio_grib1.a libesmf_time.a
-	$(LD) -o wrfplus.exe $(LDFLAGS) wrf.o $(WRF_LIB) pack_utils.o
+wrfplus : arch links $(WRFPLUS_LIBS) pack_utils.o wrf.o
+	$(LD) -o wrfplus.exe $(LDFLAGS) wrf.o $(WRFPLUS_LIB) pack_utils.o
 
-kma2netcdf :  arch $(LIBS) $(CONVERTOR_MODULES) $(CONVERTOR_OBJS) kma2netcdf.o
-	$(LD) -o kma2netcdf.exe $(LDFLAGS) kma2netcdf.o libwrflib.a \
-          $(CONVERTOR_MODULES) $(CONVERTOR_OBJS) $(VAR_LIB)
+kma2netcdf :  arch $(WRFVAR_LIBS) $(CONVERTOR_MODULES) $(CONVERTOR_OBJS) kma2netcdf.o
+	$(LD) -o kma2netcdf.exe $(LDFLAGS) kma2netcdf.o \
+          $(CONVERTOR_MODULES) $(CONVERTOR_OBJS) $(WRFVAR_LIB)
 
-netcdf2kma : arch $(LIBS) $(CONVERTOR_MODULES) $(CONVERTOR_OBJS) netcdf2kma.o
-	$(LD) -o netcdf2kma.exe $(LDFLAGS) netcdf2kma.o libwrflib.a \
-           $(CONVERTOR_MODULES) $(CONVERTOR_OBJS) $(VAR_LIB)
+netcdf2kma : arch $(WRFVAR_LIBS) $(CONVERTOR_MODULES) $(CONVERTOR_OBJS) netcdf2kma.o
+	$(LD) -o netcdf2kma.exe $(LDFLAGS) netcdf2kma.o \
+           $(CONVERTOR_MODULES) $(CONVERTOR_OBJS) $(WRFVAR_LIB)
 
-$(SOLVER) : arch $(SOLVER).o
+$(SOLVER) : arch $(WRF_LIBS) $(SOLVER).o
 	$(LD) -o $(SOLVER).exe $(LDFLAGS) $(SOLVER).o libwrflib.a $(WRF_LIB)
 
-$(SOLVER)_wrf : arch wrf.o
-	$(LD) -o wrf.exe $(LDFLAGS) wrf.o libwrflib.a $(WRF_LIB)
+$(SOLVER)_wrf : arch $(WRF_LIBS) wrf.o
+	$(LD) -o wrf.exe $(LDFLAGS) wrf.o $(WRF_LIB)
 
-$(SOLVER)_wrfplus : arch wrfplus.o
-	$(LD) -o wrfplus.exe $(LDFLAGS) wrf.o libwrflib.a $(WRF_LIB)
+$(SOLVER)_wrfplus : arch $(WRFPLUS_LIBS) wrfplus.o
+	$(LD) -o wrfplus.exe $(LDFLAGS) wrf.o $(WRFPLUS_LIB)
 
-$(SOLVER)_wrf_ESMFApp : wrf_ESMFMod.o wrf_ESMFApp.o wrf_SST_ESMF.o
-	$(RANLIB) libwrflib.a
-	$(LD) -o wrf_ESMFApp.exe $(LDFLAGS) wrf_ESMFApp.o wrf_ESMFMod.o libwrflib.a $(WRF_LIB)
-	$(LD) -o wrf_SST_ESMF.exe $(LDFLAGS) wrf_SST_ESMF.o wrf_ESMFMod.o libwrflib.a $(WRF_LIB)
+$(SOLVER)_wrf_ESMFApp : $(WRF_LIBS) wrf_ESMFMod.o wrf_ESMFApp.o wrf_SST_ESMF.o
+	$(LD) -o wrf_ESMFApp.exe $(LDFLAGS) wrf_ESMFApp.o wrf_ESMFMod.o $(WRF_LIB)
+	$(LD) -o wrf_SST_ESMF.exe $(LDFLAGS) wrf_SST_ESMF.o wrf_ESMFMod.o $(WRF_LIB)
 
-$(SOLVER)_ideal : arch module_initialize ideal.o
-	$(LD) -o ideal.exe $(LDFLAGS) ideal.o module_initialize_$(IDEAL_CASE).o libwrflib.a $(WRF_LIB)
+$(SOLVER)_ideal : arch $(WRF_LIBS) module_initialize ideal.o
+	$(LD) -o ideal.exe $(LDFLAGS) ideal.o module_initialize_$(IDEAL_CASE).o $(WRF_LIB)
 
-$(SOLVER)_real : arch module_initialize real_$(SOLVER).o ndown_$(SOLVER).o
-	$(LD) -o real.exe $(LDFLAGS) real_$(SOLVER).o module_initialize_$(IDEAL_CASE).o libwrflib.a $(WRF_LIB)
-	$(LD) -o ndown.exe $(LDFLAGS) ndown_$(SOLVER).o  module_initialize_$(IDEAL_CASE).o libwrflib.a $(WRF_LIB)
+$(SOLVER)_real : arch $(WRF_LIBS) module_initialize real_$(SOLVER).o ndown_$(SOLVER).o
+	$(LD) -o real.exe $(LDFLAGS) real_$(SOLVER).o module_initialize_$(IDEAL_CASE).o $(WRF_LIB)
+	$(LD) -o ndown.exe $(LDFLAGS) ndown_$(SOLVER).o  module_initialize_$(IDEAL_CASE).o $(WRF_LIB)
 
-convert_bioemiss : arch convert_bioemiss.o
+convert_bioemiss : arch $(WRF_LIBS) convert_bioemiss.o
 	$(FC) -o convert_bioemiss.exe $(LDFLAGS) convert_bioemiss.o libwrflib.a $(WRF_LIB)
 
-convert_emiss : arch convert_emiss.o
+convert_emiss : arch $(WRF_LIBS) convert_emiss.o
 	$(FC) -o convert_emiss.exe $(LDFLAGS) convert_emiss.o libwrflib.a $(WRF_LIB)
 
-real_nmm : arch real_nmm.o module_initialize_real.o \
+real_nmm : arch $(WRF_LIBS) real_nmm.o module_initialize_real.o \
           module_optional_si_input.o input_wrf.o module_io_domain.o
 	$(FC) -o real_nmm.exe $(LDFLAGS) real_nmm.o module_initialize_real.o \
           module_optional_si_input.o input_wrf.o module_io_domain.o $(WRF_LIB)
 
-convert_nmm : arch convert_nmm.o
+convert_nmm : arch $(WRF_LIBS) convert_nmm.o
 	$(FC) -o convert_nmm.exe $(LDFLAGS) convert_nmm.o $(WRF_LIB)
 
 module_initialize : module_initialize_$(IDEAL_CASE).o
@@ -59,10 +58,10 @@ module_initialize : module_initialize_$(IDEAL_CASE).o
 
 diffwrf : diffwrf_netcdf.exe diffwrf_int.exe
 
-diffwrf_netcdf.exe : diffwrf_netcdf.o $( LIBS)
+diffwrf_netcdf.exe : $(WRF_LIBS) diffwrf_netcdf.o
 	$(FC) $(LDFLAGS) -o diffwrf_netcdf.exe diffwrf_netcdf.o $(WRF_LIB)
 
-diffwrf_int.exe : diffwrf_int.o $( LIBS)
+diffwrf_int.exe : $(WRF_LIBS) diffwrf_int.o
 	$(FC) $(LDFLAGS) -o diffwrf_int.exe diffwrf_int.o $(WRF_LIB)
 
 #############################################################################################################################

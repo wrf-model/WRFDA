@@ -75,7 +75,8 @@ WRFPLUS_OBJS=$(SHARE_OBJS_WRFPLUS) $(DYN_OBJS_WRFPLUS)
 
 WRFPLUS_MODULES=$(SHARE_MODULES_WRFPLUS) $(DYN_MODULES_WRFPLUS)
 
-libwrflib.a : $(WRF_MODULES) $(WRF_OBJS)
+libwrflib.a : module_state_description.f90 md_calls.inc $(WRF_MODULES) \
+                $(WRF_OBJS)
 	$(AR) libwrflib.a $(WRF_MODULES) $(WRF_OBJS)
 	$(RANLIB) libwrflib.a
 

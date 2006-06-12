@@ -12,12 +12,27 @@ FIXEDFLAGS        = $(FCOPTIM) $(FCBASE) $(FCDEBUG) $(FCTYPE)
 FIXEDFLAGS_BUFR   = $(FCOPTIM) $(FCBASE) $(FCDEBUG) $(FCTYPE) $(FCENDIAN)
 FIXEDFLAGS_ENDIAN = $(FCTYPE)
 
-VAR_LIB    = $(NETCDF_LIB) -L. -lwrflib -lwrfio_nf -lesmf_time \
+WRFVAR_LIBS  = libwrflib.a libwrfio_nf.a libesmf_time.a libio_grib1.a \
+                 libblas.a liblapack.a libbufr.a libfftpack5.a libwrfvar.a
+
+GEN_BE_LIBS  = libwrflib.a libwrfio_nf.a libesmf_time.a libio_grib1.a \
+                 libblas.a liblapack.alibfftpack5.a 
+
+WRF_LIBS     = libwrflib.a libwrfio_nf.a libesmf_time.a libio_grib1.a
+
+WRFPLUS_LIBS = libwrflib.a libwrfplus.a libwrfio_nf.a libesmf_time.a libio_grib1.a
+
+
+WRFVAR_LIB = $(NETCDF_LIB) -L. -lwrflib -lwrfio_nf -lesmf_time \
                -L$(EXTERNAL)/io_grib1 -lio_grib1 $(LOCAL_LIB) \
                $(BLAS_LIB) $(LAPACK_LIB) $(BUFR_LIB) $(FFTPACK5_LIB) \
                $(NETCDF_LIB) $(RTTOV_LIB) $(MPI_LIB) $(EXTRA_LIBS)
 
 WRF_LIB    = $(NETCDF_LIB) -L. -lwrflib -lwrfio_nf -lesmf_time \
+              -L$(EXTERNAL)/io_grib1 -lio_grib1 $(LOCAL_LIB) \
+              $(NETCDF_LIB) $(MPI_LIB) $(EXTRA_LIBS)
+
+WRFPLUS_LIB    = $(NETCDF_LIB) -L. -lwrflib -lwrfplus -lwrfio_nf -lesmf_time \
               -L$(EXTERNAL)/io_grib1 -lio_grib1 $(LOCAL_LIB) \
               $(NETCDF_LIB) $(MPI_LIB) $(EXTRA_LIBS)
 
@@ -66,7 +81,7 @@ module_initialize_real.o module_dm.o start_domain.o :
 .f90.o : 
 	@ $(RM) $@
 	@ $(SED_FTN) $*.f90 > $*.b
-	@ $(CPP) $(CPPFLAGS) $(FPPFLAGS)$*.b  > $*.f
+	@ $(CPP) $(CPPFLAGS) $(FPPFLAGS) $*.b  > $*.f
 	@ $(RM) $*.b
 	  $(FC) -c $(FCFLAGS) $*.f
 
