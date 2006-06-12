@@ -9,11 +9,11 @@ libbufr.a : $(BUFR_OBJS)
 
 bufrlib.prm:		bufrlib.param
 			$(RM) $@
-			$(CPP) $(FPPFLAGS_BUFR) bufrlib.param > bufrlib.prm
+			$(CPP) $(CPPFLAGS) $(FPPFLAGS_BUFR) bufrlib.param > bufrlib.prm
 
 bufrlib.o:		bufrlib.f90 bufrlib.prm
 			$(RM) $@
-			$(CPP) $(FPPFLAGS) bufrlib.f90 > bufrlib.f
+			$(CPP) $(CPPFLAGS) $(FPPFLAGS) bufrlib.f90 > bufrlib.f
 			$(FFC) -c $(FIXEDFLAGS_BUFR) bufrlib.f
 
 bort_exit.o:		bort_exit.c

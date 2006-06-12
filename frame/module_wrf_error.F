@@ -46,8 +46,6 @@ CONTAINS
     RETURN
   END SUBROUTINE wrf_debug
 
-END MODULE module_wrf_error
-
 SUBROUTINE wrf_error( file_str, line, str )
   IMPLICIT NONE
   CHARACTER(LEN=*), INTENT(IN) :: file_str
@@ -292,3 +290,5 @@ SUBROUTINE wrf_message2(str)
   ENDIF
 #endif
 END SUBROUTINE wrf_message2
+
+END MODULE module_wrf_error

@@ -22,7 +22,7 @@ fftpack5.o:	        fftpack5.f90  \
 			rfftf1.inc     \
 			rffti1.inc     \
 			xerfft.inc
-			$(CPP) $(FPPFLAGS) fftpack5.f90 > fftpack5.f
+			$(CPP) $(CPPFLAGS) $(FPPFLAGS) fftpack5.f90 > fftpack5.f
 			$(FFC) -c $(FIXEDFLAGS) fftpack5.f
 
 ##############################################################################

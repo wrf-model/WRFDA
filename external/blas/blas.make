@@ -21,7 +21,7 @@ blas.o:	               blas.f90      \
 		       lsame.inc    \
 		       xerbla.inc   \
 		       module_wrf_error.o
-			$(CPP) $(FPPFLAGS) blas.f90 > blas.f
+			$(CPP) $(CPPFLAGS) $(FPPFLAGS) blas.f90 > blas.f
 			$(FFC) -c $(FIXEDFLAGS) blas.f
 
 ##############################################################################
