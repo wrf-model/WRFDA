@@ -62,7 +62,7 @@ include $(MAIN)/main.make
 
 include .depend
 
-depend .depend :
+depend .depend : links module_state_description.f90 md_calls.inc 
 	makedepf90 $(FPPFLAGS) *.F *.f90 *.F90 > .depend
 
 WRF_OBJS=$(SHARE_OBJS) $(FRAME_OBJS) $(PHYS_OBJS) $(DYN_OBJS) \
@@ -75,7 +75,7 @@ WRFPLUS_OBJS=$(SHARE_OBJS_WRFPLUS) $(DYN_OBJS_WRFPLUS)
 
 WRFPLUS_MODULES=$(SHARE_MODULES_WRFPLUS) $(DYN_MODULES_WRFPLUS)
 
-libwrflib.a : module_state_description.f90 md_calls.inc $(WRF_MODULES) \
+libwrflib.a : $(WRF_MODULES) \
                 $(WRF_OBJS)
 	$(AR) libwrflib.a $(WRF_MODULES) $(WRF_OBJS)
 	$(RANLIB) libwrflib.a

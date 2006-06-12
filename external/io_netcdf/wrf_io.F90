@@ -767,7 +767,7 @@ end subroutine reorder
 ! returned.  
 LOGICAL FUNCTION ncd_ok_to_put_dom_ti( DataHandle )
     USE wrf_data
-  #include "wrf_status_codes.h"
+#include "wrf_status_codes.h"
     INTEGER, INTENT(IN) :: DataHandle 
     CHARACTER*80 :: fname
     INTEGER :: filestate
@@ -793,7 +793,7 @@ END FUNCTION ncd_ok_to_put_dom_ti
 ! returned.  
 LOGICAL FUNCTION ncd_ok_to_get_dom_ti( DataHandle )
     USE wrf_data
-  #include "wrf_status_codes.h"
+#include "wrf_status_codes.h"
     INTEGER, INTENT(IN) :: DataHandle 
     CHARACTER*80 :: fname
     INTEGER :: filestate
@@ -817,7 +817,7 @@ END FUNCTION ncd_ok_to_get_dom_ti
 ! referenced by DataHandle.  If DataHandle is invalid, .FALSE. is returned.  
 LOGICAL FUNCTION ncd_is_first_operation( DataHandle )
     USE wrf_data
-  #include "wrf_status_codes.h"
+#include "wrf_status_codes.h"
     INTEGER, INTENT(IN) :: DataHandle 
     TYPE(wrf_data_handle) ,POINTER :: DH
     INTEGER :: Status
