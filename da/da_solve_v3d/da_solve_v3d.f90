@@ -200,7 +200,7 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
          WRITE (UNIT=errmsg(1),FMT='(A,I3)') &
            'Invalid vertical_ip = ', &
            vertical_ip
-         CALL wrf_warning3(__FILE__,__LINE__,errmsg(1:1))
+         CALL wrf_warning(__FILE__,__LINE__,errmsg(1:1))
       END IF
    END IF
 

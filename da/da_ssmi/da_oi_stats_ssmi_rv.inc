@@ -1,4 +1,4 @@
-SUBROUTINE DA_OI_Stats_SSMI_Rv( stats_unit, oi )
+SUBROUTINE da_oi_stats_ssmi_rv( stats_unit, oi )
 
    IMPLICIT NONE
 
@@ -26,7 +26,7 @@ SUBROUTINE DA_OI_Stats_SSMI_Rv( stats_unit, oi )
 
       if( oi%ssmi_retrieval(n)%loc%proc_domain ) then
 
-        CALL da_Stats_Calculate( oi%ssmi_retrieval(n)%loc%obs_global_index, &
+        CALL da_stats_calculate( oi%ssmi_retrieval(n)%loc%obs_global_index, &
                               0, oi%ssmi_retrieval(n)%tpw%qc, &
                               oi%ssmi_retrieval(n)%tpw%inv, ntpw, &
                               ssmi_retrieval%minimum%tpw, &
@@ -34,7 +34,7 @@ SUBROUTINE DA_OI_Stats_SSMI_Rv( stats_unit, oi )
                               ssmi_retrieval%average%tpw, &
                               ssmi_retrieval%rms_err%tpw )
 
-        CALL da_Stats_Calculate( oi%ssmi_retrieval(n)%loc%obs_global_index, &
+        CALL da_stats_calculate( oi%ssmi_retrieval(n)%loc%obs_global_index, &
                               0, oi%ssmi_retrieval(n)%speed%qc, &
                               oi%ssmi_retrieval(n)%speed%inv, nspeed, &
                               ssmi_retrieval%minimum%speed, &
@@ -95,5 +95,5 @@ SUBROUTINE DA_OI_Stats_SSMI_Rv( stats_unit, oi )
 
    END IF
 
-END SUBROUTINE DA_OI_Stats_SSMI_Rv
+END SUBROUTINE da_oi_stats_ssmi_rv
 

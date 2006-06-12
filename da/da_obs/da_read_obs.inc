@@ -109,7 +109,7 @@ SUBROUTINE da_read_obs (iunit, ob, xp, filename)
    IF (iost /= 0) THEN
       WRITE(UNIT=errmsg(1),FMT='(A,I5,A)') &
          "Error",iost,"opening gts obs file "//TRIM(filename)
-      CALL wrf_warning3(__FILE__,__LINE__,errmsg(1:1))
+      CALL wrf_warning(__FILE__,__LINE__,errmsg(1:1))
       RETURN
    ENDIF
 
@@ -351,7 +351,7 @@ loop_level: DO i = 1, platform%info%levels
              platform%info%lon,         &
              platform%info%elv,         &
              platform%info%id
-         CALL wrf_warning3(__FILE__,__LINE__,errmsg(1:2))
+         CALL wrf_warnings(__FILE__,__LINE__,errmsg(1:2))
 
          platform%info%levels = nlevels
       else if( nlevels < 1) then
@@ -1017,7 +1017,7 @@ loop_level: DO i = 1, platform%info%levels
                'platform%info%platform=', platform%info%platform
             write(unit=errmsg(3), fmt='(a, i3)') &
                'platform%info%levels=', platform%info%levels
-            CALL wrf_warning3(__FILE__,__LINE__,errmsg(1:3))
+            CALL wrf_warnings(__FILE__,__LINE__,errmsg(1:3))
 
       END SELECT
 

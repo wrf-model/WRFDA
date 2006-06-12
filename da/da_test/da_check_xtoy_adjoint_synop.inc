@@ -1,4 +1,4 @@
-SUBROUTINE DA_Check_XToY_Adjoint_Synop( oi, y, adjtest_lhs, pertile_lhs )
+SUBROUTINE da_check_xtoy_adjoint_synop( oi, y, adjtest_lhs, pertile_lhs )
 
    IMPLICIT NONE
 
@@ -60,5 +60,5 @@ SUBROUTINE DA_Check_XToY_Adjoint_Synop( oi, y, adjtest_lhs, pertile_lhs )
       endif
    ENDDO
 
-END SUBROUTINE DA_Check_XToY_Adjoint_Synop
+END SUBROUTINE da_check_xtoy_adjoint_synop
 

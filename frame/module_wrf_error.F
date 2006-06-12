@@ -90,7 +90,7 @@ SUBROUTINE wrf_errors( file_str, line, strs )
   CALL wrf_abort
 END SUBROUTINE wrf_errors
 
-SUBROUTINE wrf_warning3( file_str, line, str )
+SUBROUTINE wrf_warning( file_str, line, str )
   IMPLICIT NONE
   CHARACTER(LEN=*), INTENT(IN) :: file_str
   INTEGER,          INTENT(IN) :: line
@@ -115,9 +115,9 @@ SUBROUTINE wrf_warning3( file_str, line, str )
   CALL wrf_message2(str )
   CALL wrf_message2( '-------------------------------------------' )
 #endif
-END SUBROUTINE wrf_warning3
+END SUBROUTINE wrf_warning
 
-SUBROUTINE wrf_warnings3( file_str, line, strs )
+SUBROUTINE wrf_warnings( file_str, line, strs )
   IMPLICIT NONE
   CHARACTER(LEN=*), INTENT(IN) :: file_str
   INTEGER,          INTENT(IN) :: line
@@ -142,7 +142,7 @@ SUBROUTINE wrf_warnings3( file_str, line, strs )
   CALL wrf_messages2(strs )
   CALL wrf_message2( '-------------------------------------------' )
 #endif
-END SUBROUTINE wrf_warnings3
+END SUBROUTINE wrf_warnings
 
 ! Check to see if expected value == actual value
 ! If not, print message and exit.  
