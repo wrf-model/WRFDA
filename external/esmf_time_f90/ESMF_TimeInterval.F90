@@ -58,8 +58,10 @@
 
       type ESMF_TimeInterval
         type(ESMF_BaseTime) :: basetime  ! inherit base class
-        integer(ESMF_IKIND_I8) :: YY     ! calendar interval number of years
-        integer(ESMF_IKIND_I8) :: MO     ! calendar interval number of months
+        logical                :: instant  ! false for instant, true for interval
+        integer                :: YR     ! calendar interval number of days
+        integer                :: MM     ! calendar interval number of days
+        integer                :: DD     ! calendar interval number of days
       end type
 
 !------------------------------------------------------------------------------
