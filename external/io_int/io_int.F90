@@ -982,6 +982,7 @@ END SUBROUTINE ext_int_put_dom_td_real
 
 !--- get_dom_td_double
 SUBROUTINE ext_int_get_dom_td_double ( DataHandle,Element, DateStr,  Data, Count, Outcount, Status )
+  USE module_wrf_error
   IMPLICIT NONE
   INTEGER ,       INTENT(IN)  :: DataHandle
   CHARACTER*(*) :: Element
@@ -996,6 +997,7 @@ END SUBROUTINE ext_int_get_dom_td_double
 
 !--- put_dom_td_double
 SUBROUTINE ext_int_put_dom_td_double ( DataHandle,Element, DateStr,  Data, Count,  Status )
+  USE module_wrf_error
   IMPLICIT NONE
   INTEGER ,       INTENT(IN)  :: DataHandle
   CHARACTER*(*) :: Element
@@ -1148,6 +1150,7 @@ END SUBROUTINE ext_int_put_var_ti_real
 
 !--- get_var_ti_double
 SUBROUTINE ext_int_get_var_ti_double ( DataHandle,Element,  Varname, Data, Count, Outcount, Status )
+  USE module_wrf_error
   IMPLICIT NONE
   INTEGER ,       INTENT(IN)  :: DataHandle
   CHARACTER*(*) :: Element
@@ -1162,6 +1165,7 @@ END SUBROUTINE ext_int_get_var_ti_double
 
 !--- put_var_ti_double
 SUBROUTINE ext_int_put_var_ti_double ( DataHandle,Element,  Varname, Data, Count,  Status )
+  USE module_wrf_error
   IMPLICIT NONE
   INTEGER ,       INTENT(IN)  :: DataHandle
   CHARACTER*(*) :: Element
@@ -1300,6 +1304,7 @@ END SUBROUTINE ext_int_put_var_td_real
 
 !--- get_var_td_double
 SUBROUTINE ext_int_get_var_td_double ( DataHandle,Element,  DateStr,Varname, Data, Count, Outcount, Status )
+  USE module_wrf_error
   IMPLICIT NONE
   INTEGER ,       INTENT(IN)  :: DataHandle
   CHARACTER*(*) :: Element
@@ -1315,6 +1320,7 @@ END SUBROUTINE ext_int_get_var_td_double
 
 !--- put_var_td_double
 SUBROUTINE ext_int_put_var_td_double ( DataHandle,Element,  DateStr,Varname, Data, Count,  Status )
+  USE module_wrf_error
   IMPLICIT NONE
   INTEGER ,       INTENT(IN)  :: DataHandle
   CHARACTER*(*) :: Element
@@ -1413,6 +1419,7 @@ SUBROUTINE ext_int_read_field ( DataHandle , DateStr , VarName , Field , FieldTy
                             PatchStart , PatchEnd ,                                      &
                             Status )
   USE module_ext_internal
+  USE module_wrf_error
   IMPLICIT NONE
 #include "wrf_io_flags.h"
 #include "intio_tags.h"

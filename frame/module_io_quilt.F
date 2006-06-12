@@ -57,6 +57,7 @@ MODULE module_wrf_quilt
 !</PRE>
 !</DESCRIPTION>
   USE module_internal_header_util
+  USE module_wrf_error
 
   INTEGER, PARAMETER :: int_num_handles = 99
   LOGICAL, DIMENSION(int_num_handles) :: okay_to_write, int_handle_in_use, okay_to_commit
@@ -1414,6 +1415,7 @@ SUBROUTINE wrf_quilt_open_for_write_begin( FileName , Comm_compute, Comm_io, Sys
 ! This routine is called only by client (compute) tasks.  
 !</PRE>
 !</DESCRIPTION>
+  USE module_wrf_error
 #if defined( DM_PARALLEL ) && !defined( STUBMPI )
   USE module_wrf_quilt
   IMPLICIT NONE
@@ -1480,6 +1482,7 @@ SUBROUTINE wrf_quilt_open_for_write_commit( DataHandle , Status )
 ! This routine is called only by client (compute) tasks.  
 !</PRE>
 !</DESCRIPTION>
+  USE module_wrf_error
 #if defined( DM_PARALLEL ) && !defined( STUBMPI )
   USE module_wrf_quilt
   IMPLICIT NONE
@@ -1532,6 +1535,7 @@ SUBROUTINE wrf_quilt_open_for_read ( FileName , Comm_compute, Comm_io, SysDepInf
 ! This is not yet supported.
 !</PRE>
 !</DESCRIPTION>
+  USE module_wrf_error
 #if defined( DM_PARALLEL ) && !defined( STUBMPI )
   IMPLICIT NONE
   CHARACTER *(*), INTENT(IN)  :: FileName
@@ -1556,6 +1560,7 @@ SUBROUTINE wrf_quilt_inquire_opened ( DataHandle, FileName , FileStatus, Status 
 ! This routine is called only by client (compute) tasks.  
 !</PRE>
 !</DESCRIPTION>
+  USE module_wrf_error
 #if defined( DM_PARALLEL ) && !defined( STUBMPI )
   USE module_wrf_quilt
   IMPLICIT NONE
@@ -1594,6 +1599,7 @@ SUBROUTINE wrf_quilt_inquire_filename ( DataHandle, FileName , FileStatus, Statu
 ! This routine is called only by client (compute) tasks.  
 !</PRE>
 !</DESCRIPTION>
+  USE module_wrf_error
 #if defined( DM_PARALLEL ) && !defined( STUBMPI )
   USE module_wrf_quilt
   IMPLICIT NONE
@@ -1645,6 +1651,7 @@ SUBROUTINE wrf_quilt_iosync ( DataHandle, Status )
 ! This routine is called only by client (compute) tasks.  
 !</PRE>
 !</DESCRIPTION>
+  USE module_wrf_error
 #if  defined( DM_PARALLEL ) && ! defined (STUBMPI) 
   USE module_wrf_quilt
   IMPLICIT NONE
@@ -1708,6 +1715,7 @@ SUBROUTINE wrf_quilt_ioclose ( DataHandle, Status )
 ! This routine is called only by client (compute) tasks.  
 !</PRE>
 !</DESCRIPTION>
+  USE module_wrf_error
 #if defined( DM_PARALLEL ) && ! defined( STUBMPI) 
   USE module_wrf_quilt
   IMPLICIT NONE
@@ -1769,6 +1777,7 @@ SUBROUTINE wrf_quilt_ioexit( Status )
 ! This routine is called only by client (compute) tasks.  
 !</PRE>
 !</DESCRIPTION>
+  USE module_wrf_error
 #if defined( DM_PARALLEL ) && ! defined (STUBMPI ) 
   USE module_wrf_quilt
   IMPLICIT NONE
@@ -1849,6 +1858,7 @@ SUBROUTINE wrf_quilt_set_time ( DataHandle, Data,  Status )
 ! This routine is called only by client (compute) tasks.  
 !</PRE>
 !</DESCRIPTION>
+  USE module_wrf_error
 #if defined( DM_PARALLEL ) && !defined( STUBMPI )
   USE module_wrf_quilt
   IMPLICIT NONE
@@ -1920,6 +1930,7 @@ SUBROUTINE wrf_quilt_get_dom_ti_real ( DataHandle,Element,   Data, Count, Outcou
 ! This is not yet supported.
 !</PRE>
 !</DESCRIPTION>
+  USE module_wrf_error
 #if defined( DM_PARALLEL ) && !defined( STUBMPI )
   IMPLICIT NONE
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -1944,6 +1955,7 @@ SUBROUTINE wrf_quilt_put_dom_ti_real ( DataHandle,Element,   Data, Count,  Statu
 ! This routine is called only by client (compute) tasks.  
 !</PRE>
 !</DESCRIPTION>
+  USE module_wrf_error
 #if defined( DM_PARALLEL ) && !defined( STUBMPI )
   USE module_wrf_quilt
   IMPLICIT NONE
@@ -2008,6 +2020,7 @@ SUBROUTINE wrf_quilt_get_dom_ti_double ( DataHandle,Element,   Data, Count, Outc
 ! This is not yet supported.
 !</PRE>
 !</DESCRIPTION>
+  USE module_wrf_error
 #if defined( DM_PARALLEL ) && !defined( STUBMPI )
   IMPLICIT NONE
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -2034,6 +2047,7 @@ SUBROUTINE wrf_quilt_put_dom_ti_double ( DataHandle,Element,   Data, Count,  Sta
 ! This is not yet supported.
 !</PRE>
 !</DESCRIPTION>
+  USE module_wrf_error
 #if defined( DM_PARALLEL ) && !defined( STUBMPI )
   IMPLICIT NONE
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -2060,6 +2074,7 @@ SUBROUTINE wrf_quilt_get_dom_ti_integer ( DataHandle,Element,   Data, Count, Out
 ! This is not yet supported.
 !</PRE>
 !</DESCRIPTION>
+  USE module_wrf_error
 #if defined( DM_PARALLEL ) && !defined( STUBMPI )
   IMPLICIT NONE
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -2084,6 +2099,7 @@ SUBROUTINE wrf_quilt_put_dom_ti_integer ( DataHandle,Element,   Data, Count,  St
 ! This routine is called only by client (compute) tasks.  
 !</PRE>
 !</DESCRIPTION>
+  USE module_wrf_error
 #if defined( DM_PARALLEL ) && !defined( STUBMPI )
   USE module_wrf_quilt
   IMPLICIT NONE
@@ -2149,6 +2165,7 @@ SUBROUTINE wrf_quilt_get_dom_ti_logical ( DataHandle,Element,   Data, Count, Out
 ! This is not yet supported.
 !</PRE>
 !</DESCRIPTION>
+  USE module_wrf_error
 #if defined( DM_PARALLEL ) && !defined( STUBMPI )
   IMPLICIT NONE
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -2175,6 +2192,7 @@ SUBROUTINE wrf_quilt_put_dom_ti_logical ( DataHandle,Element,   Data, Count,  St
 ! This is not yet supported.
 !</PRE>
 !</DESCRIPTION>
+  USE module_wrf_error
 #if defined( DM_PARALLEL ) && !defined( STUBMPI )
   IMPLICIT NONE
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -2200,6 +2218,7 @@ SUBROUTINE wrf_quilt_get_dom_ti_char ( DataHandle,Element,   Data,  Status )
 ! This is not yet supported.
 !</PRE>
 !</DESCRIPTION>
+  USE module_wrf_error
 #if defined( DM_PARALLEL ) && !defined( STUBMPI )
   IMPLICIT NONE
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -2222,6 +2241,7 @@ SUBROUTINE wrf_quilt_put_dom_ti_char ( DataHandle, Element,  Data,  Status )
 ! This routine is called only by client (compute) tasks.  
 !</PRE>
 !</DESCRIPTION>
+  USE module_wrf_error
 #if defined( DM_PARALLEL ) && !defined( STUBMPI )
   USE module_wrf_quilt
   IMPLICIT NONE
@@ -2331,6 +2351,7 @@ SUBROUTINE wrf_quilt_get_dom_td_double ( DataHandle,Element, DateStr,  Data, Cou
 ! This is not yet supported.
 !</PRE>
 !</DESCRIPTION>
+  USE module_wrf_error
 #if defined( DM_PARALLEL ) && !defined( STUBMPI )
   IMPLICIT NONE
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -2358,6 +2379,7 @@ SUBROUTINE wrf_quilt_put_dom_td_double ( DataHandle,Element, DateStr,  Data, Cou
 ! This is not yet supported.
 !</PRE>
 !</DESCRIPTION>
+  USE module_wrf_error
 #if defined( DM_PARALLEL ) && !defined( STUBMPI )
   IMPLICIT NONE
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -2589,6 +2611,7 @@ SUBROUTINE wrf_quilt_get_var_ti_double ( DataHandle,Element,  Varname, Data, Cou
 ! This is not yet supported.
 !</PRE>
 !</DESCRIPTION>
+  USE module_wrf_error
 #if defined( DM_PARALLEL ) && !defined( STUBMPI )
   IMPLICIT NONE
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -2616,6 +2639,7 @@ SUBROUTINE wrf_quilt_put_var_ti_double ( DataHandle,Element,  Varname, Data, Cou
 ! This is not yet supported.
 !</PRE>
 !</DESCRIPTION>
+  USE module_wrf_error
 #if defined( DM_PARALLEL ) && !defined( STUBMPI )
   IMPLICIT NONE
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -2769,6 +2793,7 @@ SUBROUTINE wrf_quilt_put_var_ti_char ( DataHandle,Element,  Varname, Data,  Stat
 !</PRE>
 !</DESCRIPTION>
 
+  USE module_wrf_error
 #if defined( DM_PARALLEL ) && !defined( STUBMPI )
   USE module_wrf_quilt
   IMPLICIT NONE
@@ -2882,6 +2907,7 @@ SUBROUTINE wrf_quilt_get_var_td_double ( DataHandle,Element,  DateStr,Varname, D
 ! This is not yet supported.
 !</PRE>
 !</DESCRIPTION>
+  USE module_wrf_error
 #if defined( DM_PARALLEL ) && !defined( STUBMPI )
   IMPLICIT NONE
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -2910,6 +2936,7 @@ SUBROUTINE wrf_quilt_put_var_td_double ( DataHandle,Element,  DateStr,Varname, D
 ! This is not yet supported.
 !</PRE>
 !</DESCRIPTION>
+  USE module_wrf_error
 #if defined( DM_PARALLEL ) && !defined( STUBMPI )
   IMPLICIT NONE
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -3145,6 +3172,7 @@ SUBROUTINE wrf_quilt_write_field ( DataHandle , DateStr , VarName , Field , Fiel
 ! This routine is called only by client (compute) tasks.  
 !</PRE>
 !</DESCRIPTION>
+  USE module_wrf_error
 #if defined( DM_PARALLEL ) && !defined( STUBMPI )
   USE module_state_description
   USE module_wrf_quilt

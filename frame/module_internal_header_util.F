@@ -31,6 +31,8 @@ MODULE module_internal_header_util
 !</PRE>
 !</DESCRIPTION>
 
+  USE module_wrf_error
+
 INTERFACE int_get_ti_header
    MODULE PROCEDURE int_get_ti_header_integer, int_get_ti_header_real
 END INTERFACE
@@ -191,6 +193,7 @@ SUBROUTINE int_get_write_field_header ( hdrbuf, hdrbufsize, itypesize, ftypesize
 ! a description of a "write field" header.  
 !</PRE>
 !</DESCRIPTION>
+  USE module_wrf_error
   IMPLICIT NONE
 #include "intio_tags.h"
   INTEGER,       INTENT(INOUT)  ::  hdrbuf(*)
@@ -1012,6 +1015,7 @@ SUBROUTINE int_get_noop_header( hdrbuf, hdrbufsize, itypesize )
 ! a description of a "no-operation" header.  
 !</PRE>
 !</DESCRIPTION>
+  USE module_wrf_error
   IMPLICIT NONE
 #include "intio_tags.h"
   INTEGER, INTENT(INOUT) ::  hdrbuf(*)

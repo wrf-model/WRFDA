@@ -3841,6 +3841,7 @@ END
                                        DS1,DE1,DS2,DE2,DS3,DE3,&
                                        MS1,ME1,MS2,ME2,MS3,ME3,&
                                        PS1,PE1,PS2,PE2,PS3,PE3 )
+       USE module_wrf_error
        IMPLICIT NONE
 #include "rsl.inc"
        INTEGER                         DS1,DE1,DS2,DE2,DS3,DE3,&
@@ -4041,6 +4042,7 @@ END
                                        DS1,DE1,DS2,DE2,DS3,DE3,&
                                        MS1,ME1,MS2,ME2,MS3,ME3,&
                                        PS1,PE1,PS2,PE2,PS3,PE3 )
+       USE module_wrf_error
        IMPLICIT NONE
 #include "rsl.inc"
        INTEGER                         DS1,DE1,DS2,DE2,DS3,DE3,&

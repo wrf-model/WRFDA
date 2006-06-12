@@ -41,7 +41,7 @@ links :
 
 # Manual rules specified first take precedence
 
-include ../dyn_$(SOLVER)/dyn_$(SOLVER).make
+include $(DYNAMICS)/dyn_$(SOLVER).make
 include $(SHARE)/share.make
 include $(FRAME)/frame.make
 include $(PHYS)/phys.make
@@ -60,11 +60,11 @@ include $(BLAS)/blas.make
 include $(FFTPACK5)/fftpack5.make
 include $(MAIN)/main.make
 
-include depend.inc
-
-depend depend.inc : links module_state_description.f90 md_calls.inc \
+depend depend.txt : links module_state_description.f90 md_calls.inc \
                       da_generic_boilerplate.inc
-	makedepf90 $(FPPFLAGS) *.F *.f90 *.F90 > depend.inc 2>/dev/null
+	makedepf90 $(FPPFLAGS) *.F *.f90 *.F90 > depend.txt 2>/dev/null
+
+include depend.txt
 
 WRF_OBJS=$(SHARE_OBJS) $(FRAME_OBJS) $(PHYS_OBJS) $(DYN_OBJS) \
   $(ESMF_TIME_F90_OBJS) $(IO_INT_OBJS) $(IO_NETCDF_OBJS) \

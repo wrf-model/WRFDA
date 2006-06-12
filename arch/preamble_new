@@ -50,15 +50,15 @@ ESMF_IO_INC         = CONFIGURE_ESMF_IO_INC
 ESMF_IO_DEFS        = CONFIGURE_ESMF_IO_DEFS
 ESMF_TARGET         = CONFIGURE_ESMF_TARGET
 
+SOLVER=em
+
 # Short cuts to directories
 
 ARCH      = $(DEVTOP)/arch
 CHEM      = $(DEVTOP)/chem
 CONVERTOR = $(DEVTOP)/convertor
 DA        = $(DEVTOP)/da
-DYN_EM    = $(DEVTOP)/dyn_em
-DYN_EXP   = $(DEVTOP)/dyn_exp
-DYN_NMM   = $(DEVTOP)/dyn_nmm
+DYNAMICS  = $(DEVTOP)/dyn_$(SOLVER)
 EXTERNAL  = $(DEVTOP)/external
 FRAME     = $(DEVTOP)/frame
 GEN_BE    = $(DEVTOP)/gen_be
@@ -99,8 +99,6 @@ COREDEFS = -DEM_CORE=$(EM_CORE)         \
            -DCOAMPS_CORE=$(COAMPS_CORE) \
            -DEXP_CORE=$(EXP_CORE)       \
            -DNMM_MAX_DIM=1250
-
-SOLVER=em
 
 #### For wrfvar, always use RWORDSIZE 8
 
