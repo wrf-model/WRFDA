@@ -215,7 +215,9 @@ END SUBROUTINE wrf_check_error
 
 
 SUBROUTINE wrf_messages(strs)
+#ifdef USE_LOGERR
   USE module_utility
+#endif
   IMPLICIT NONE
   CHARACTER(LEN=*), INTENT(IN) :: strs(:)
   INTEGER :: i
@@ -236,7 +238,9 @@ SUBROUTINE wrf_messages(strs)
 END SUBROUTINE wrf_messages
 
 SUBROUTINE wrf_message( str)
+#ifdef USE_LOGERR
   USE module_utility
+#endif
   IMPLICIT NONE
   CHARACTER(LEN=*), INTENT(IN) :: str
   INTEGER :: i
@@ -254,7 +258,9 @@ END SUBROUTINE wrf_message
 
 ! intentionally write to stderr only
 SUBROUTINE wrf_messages2(strs )
+#ifdef USE_LOGERR
   USE module_utility
+#endif
   IMPLICIT NONE
   CHARACTER(LEN=*), INTENT(IN) :: strs(:)
   INTEGER :: i
@@ -272,7 +278,9 @@ SUBROUTINE wrf_messages2(strs )
 END SUBROUTINE wrf_messages2
 
 SUBROUTINE wrf_message2(str)
+#ifdef USE_LOGERR
   USE module_utility
+#endif
   IMPLICIT NONE
   CHARACTER(LEN=*), INTENT(IN) :: str
   INTEGER :: i

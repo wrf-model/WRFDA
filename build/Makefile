@@ -63,7 +63,7 @@ include $(MAIN)/main.make
 include .depend
 
 depend .depend :
-	~/makedepf90/makedepf90-2.8.6/makedepf90 *.F *.f90 > .depend
+	makedepf90 *.F *.f90 *.F90 > .depend
 
 WRF_OBJS=$(SHARE_OBJS) $(FRAME_OBJS) $(PHYS_OBJS) $(DYN_OBJS) \
   $(ESMF_TIME_F90_OBJS) $(IO_INT_OBJS) $(IO_NETCDF_OBJS) \

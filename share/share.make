@@ -61,37 +61,4 @@ SHARE_OBJS    = 		\
 
 # DEPENDENCIES : only dependencies after this line (don't remove the word DEPENDENCIES)
 
-
-module_bc_time_utilities.o: $(ESMF_MOD_DEPENDENCE)
-
-module_io_wrf.o: module_date_time.o module_bc_time_utilities.o \
-		module_wrf_error.o module_domain.o \
-		module_state_description.o module_configure.o \
-		module_io.o module_timing.o \
-		$(ESMF_MOD_DEPENDENCE)
-
-output_wrf.o:   module_io.o module_wrf_error.o \
-                module_domain.o module_state_description.o \
-                module_configure.o module_io_wrf.o  \
-		$(ESMF_MOD_DEPENDENCE)
-
-input_wrf.o:    module_io.o module_wrf_error.o \
-                module_domain.o module_state_description.o \
-                module_configure.o module_io_wrf.o  \
-		$(ESMF_MOD_DEPENDENCE)
-
-mediation_wrfmain.o: module_domain.o module_configure.o \
-		module_timing.o $(ESMF_MOD_DEPENDENCE) \
-		module_bc_time_utilities.o module_io_domain.o
-
-mediation_integrate.o: module_domain.o module_configure.o \
-			module_timing.o \
-			$(ESMF_MOD_DEPENDENCE) \
-			module_date_time.o module_bc_time_utilities.o \
-			module_compute_geop.o                         \
-			module_io_domain.o
-
-set_timekeeping.o: module_domain.o module_configure.o \
-                   $(ESMF_MOD_DEPENDENCE)
-
 # DO NOT DELETE

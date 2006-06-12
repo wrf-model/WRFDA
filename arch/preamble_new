@@ -128,6 +128,7 @@ FCHOST          =
 OMP             =
 OMPCPP          =
 MPI_LIB		=
-DM_CPP_FLAGS	=
+DM_CPPFLAGS	=
+DM_FPPFLAGS	=
 #### Architecture specific settings ####
 

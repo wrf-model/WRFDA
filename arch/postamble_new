@@ -1,6 +1,7 @@
 #
-FPPFLAGS        = -C -P $(TRADFLAG) $(INCS) $(FPPFLAGS1) $(FPPFLAGS2) $(COREDEFS) \
-                     $(ENVCOMPDEFS) $(DM_CPP_FLAGS) $(VAR4DPOSS) -I$(NETCDF_PATH)/include
+FPPFLAGS        = $(FPPFLAGS1) $(FPPFLAGS2) $(COREDEFS) \
+                     $(ENVCOMPDEFS) $(DM_FPPFLAGS) $(VAR4DPOSS)
+CPPFLAGS        = -C -P $(TRADFLAG) $(INCS) $(DM_CPPFLAGS) -I$(NETCDF_PATH)/include
 REGFLAGS        = $(FPPFLAGS1) $(FPPFLAGS2)
  
 CCFLAGS        = $(CCFLAGS1) $(CCFLAGS2)
@@ -54,7 +55,7 @@ mediation_force_domain.o mediation_feedback_domain.o           \
 module_initialize_real.o module_dm.o start_domain.o :
 	$(RM) $@
 	$(SED_FTN) $*.F > $*.b 
-	$(CPP) $(FPPFLAGS) $*.b  > $*.f
+	$(CPP) $(CPPFLAGS) $(FPPFLAGS) $*.b  > $*.f
 	$(RM) $*.b
 	$(FC) -c $(FCFLAGS_NOOPT) -O0 $*.f
 
@@ -65,21 +66,21 @@ module_initialize_real.o module_dm.o start_domain.o :
 .f90.o : 
 	@ $(RM) $@
 	@ $(SED_FTN) $*.f90 > $*.b
-	@ $(CPP) $(FPPFLAGS) $*.b  > $*.f
+	@ $(CPP) $(CPPFLAGS) $(FPPFLAGS)$*.b  > $*.f
 	@ $(RM) $*.b
 	  $(FC) -c $(FCFLAGS) $*.f
 
 .F90.o : 
 	@ $(RM) $@
 	@ $(SED_FTN) $*.F90 > $*.b
-	  $(CPP) $(FPPFLAGS) $*.b  > $*.f
+	  $(CPP) $(CPPFLAGS) $(FPPFLAGS) $*.b  > $*.f
 	@ $(RM) $*.b
 	  $(FC) -c $(FCFLAGS) $*.f
 
 .F.o : 
 	@ $(RM) $@
 	@ $(SED_FTN) $*.F > $*.b
-	  $(CPP) $(FPPFLAGS) $*.b  > $*.f
+	  $(CPP) $(CPPFLAGS) $(FPPFLAGS) $*.b  > $*.f
 	@ $(RM) $*.b
 	  $(FC) -c $(FCFLAGS) $*.f
 
