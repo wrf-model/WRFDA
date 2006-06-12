@@ -20,9 +20,9 @@ RSL             = $(EXTERNAL)/RSL
 TRADFLAG        = -traditional
 FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE \
                     -DINTIO \
-                    -DTRIEDNTRUE -DONLY_WRFMODEL_IO \
+                     -DONLY_WRFMODEL_IO \
                     -DLINUX -DNO_RRTM_PHYSICS  \
-		    -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
+		    -DNONSTANDARD_SYSTEM \
 		    -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
                     -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 DM_CPPFLAGS     = -I$(RSL)/RSL
@@ -71,9 +71,9 @@ LD              = $(FC)
 
 TRADFLAG        =
 FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DINTIO \
-                    -DTRIEDNTRUE -DONLY_WRFMODEL_IO  \
+                     -DONLY_WRFMODEL_IO  \
                     -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) \
-                    -DDEC_ALPHA -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
+                    -DDEC_ALPHA -DNONSTANDARD_SYSTEM \
 	   	    -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
                     -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 
@@ -107,9 +107,9 @@ RSL             = $(EXTERNAL)/RSL
 
 TRADFLAG        =
 FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DINTIO \
-                    -DTRIEDNTRUE -DONLY_WRFMODEL_IO  \
+                     -DONLY_WRFMODEL_IO  \
                     -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) \
-                    -DDEC_ALPHA -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
+                    -DDEC_ALPHA -DNONSTANDARD_SYSTEM \
                     -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
                     -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 DM_CPPFLAGS     = -I$(RSL)/RSL
@@ -153,9 +153,9 @@ LD              = $(FC)
 
 TRADFLAG        =
 FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DINTIO \
-                    -DTRIEDNTRUE -DONLY_WRFMODEL_IO  \
+                     -DONLY_WRFMODEL_IO  \
                     -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) \
-                    -DDEC_ALPHA -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
+                    -DDEC_ALPHA -DNONSTANDARD_SYSTEM \
                     -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
                     -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 
@@ -186,8 +186,8 @@ LD              = $(FC)
 
 TRADFLAG        = -traditional
 FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE \
-                    -DTRIEDNTRUE -DONLY_WRFMODEL_IO \
-                    -DLINUX -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
+                     -DONLY_WRFMODEL_IO \
+                    -DLINUX -DNONSTANDARD_SYSTEM \
 		    -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
                     -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 FPPFLAGS_BUFR   = -C -P $(TRADFLAG) -DLINUX -Dlinux
@@ -225,9 +225,9 @@ RSL        = $(EXTERNAL)/RSL
 TRADFLAG        = -traditional
 FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE \
                     -DINTIO \
-                    -DTRIEDNTRUE -DONLY_WRFMODEL_IO \
+                     -DONLY_WRFMODEL_IO \
                     -DLINUX -DNO_RRTM_PHYSICS  \
-		    -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
+		    -DNONSTANDARD_SYSTEM \
 	  	    -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
                     -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 FPPFLAGS_BUFR   = -C -P $(TRADFLAG) -DLINUX -Dlinux
@@ -271,8 +271,8 @@ CC_TOOLS        = gcc
 LD              = $(FC)
 
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DTRIEDNTRUE -DONLY_WRFMODEL_IO \
-                    -DLINUX -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
+FPPFLAGS2       =  -DONLY_WRFMODEL_IO \
+                    -DLINUX -DNONSTANDARD_SYSTEM \
 		    -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
                     -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 FPPFLAGS_BUFR   = -C -P  $(TRADFLAG) -DLINUX -Dlinux
@@ -309,9 +309,9 @@ RSL             = $(EXTERNAL)/RSL
 
 TRADFLAG        = -traditional
 FPPFLAGS2       = -DINTIO \
-                    -DTRIEDNTRUE -DONLY_WRFMODEL_IO \
+                     -DONLY_WRFMODEL_IO \
                     -DLINUX -DNO_RRTM_PHYSICS  \
-		    -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
+		    -DNONSTANDARD_SYSTEM \
 		    -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
                     -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 DM_CPPFLAGS     = -I$(RSL)/RSL
@@ -359,8 +359,8 @@ LD              = $(FC)
 
 TRADFLAG        = -traditional
 FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE \
-                    -DTRIEDNTRUE -DONLY_WRFMODEL_IO \
-                    -DNO_RRTM_PHYSICS -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
+                     -DONLY_WRFMODEL_IO \
+                    -DNO_RRTM_PHYSICS -DNONSTANDARD_SYSTEM \
 		    -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
                     -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 FPPFLAGS_BUFR   = -C -P $(TRADFLAG) -DLINUX -Dlinux
@@ -393,8 +393,8 @@ LD              = $(FC)
 
 TRADFLAG        = -traditional
 FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE \
-                    -DTRIEDNTRUE -DONLY_WRFMODEL_IO \
-                    -DLINUX -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
+                     -DONLY_WRFMODEL_IO \
+                    -DLINUX -DNONSTANDARD_SYSTEM \
 		    -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
                     -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 FPPFLAGS_BUFR   = -C -P $(TRADFLAG) -DLINUX -Dlinux
@@ -431,9 +431,9 @@ RSL             = $(EXTERNAL)/RSL
 TRADFLAG        = -traditional
 FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE  \
                     -DINTIO \
-                    -DTRIEDNTRUE -DONLY_WRFMODEL_IO \
+                     -DONLY_WRFMODEL_IO \
                     -DLINUX -DNO_RRTM_PHYSICS   \
-  		    -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
+  		    -DNONSTANDARD_SYSTEM \
 		    -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
                     -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 DM_CPPFLAGS     = -I$(RSL)/RSL
@@ -477,8 +477,8 @@ CC_TOOLS        = $(CC)
 LD              = $(FC)
 
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DTRIEDNTRUE -DONLY_WRFMODEL_IO \
-                    -DLINUX -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
+FPPFLAGS2       =  -DONLY_WRFMODEL_IO \
+                    -DLINUX -DNONSTANDARD_SYSTEM \
 		    -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
                     -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 FPPFLAGS_BUFR   = -C -P $(TRADFLAG) -DLINUX -Dlinux -DPATHSCALE
@@ -515,9 +515,9 @@ RSL             = ./$(EXTERNAL)/RSL
 
 TRADFLAG        = -traditional
 FPPFLAGS2       = -DINTIO \
-                    -DTRIEDNTRUE -DONLY_WRFMODEL_IO \
+                     -DONLY_WRFMODEL_IO \
                     -DLINUX -DNO_RRTM_PHYSICS  \
-		    -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
+		    -DNONSTANDARD_SYSTEM \
 		    -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DWRF_RSL_IO -DRSL -DDM_PARALLEL
@@ -565,9 +565,9 @@ LD              = $(FC)
 
 TRADFLAG        =
 FPPFLAGS2       = -DINTIO \
-                    -DTRIEDNTRUE -DONLY_WRFMODEL_IO \
+                     -DONLY_WRFMODEL_IO \
                     -DNORESHAPE -DIRIX \
-		    -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
+		    -DNONSTANDARD_SYSTEM \
 		    -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
                     -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 
@@ -605,8 +605,8 @@ RSL             = $(EXTERNAL)/RSL
 
 TRADFLAG        =
 FPPFLAGS2       = -DINTIO \
-                    -DTRIEDNTRUE -DONLY_WRFMODEL_IO -DIRIX \
-		    -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
+                     -DONLY_WRFMODEL_IO -DIRIX \
+		    -DNONSTANDARD_SYSTEM \
 		    -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
                     -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 DM_CPPFLAGS     = -I$(RSL)/RSL
@@ -653,10 +653,10 @@ MAX_PROC        = 256
 
 TRADFLAG        =
 FPPFLAGS2       = -DINTIO  \
-                    -DTRIEDNTRUE -DONLY_WRFMODEL_IO \
+                     -DONLY_WRFMODEL_IO \
                     -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) \
 		    -DMPI -I$(MPIINCDIR) -DNEC \
-		    -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
+		    -DNONSTANDARD_SYSTEM \
 		    -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
                     -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 FCOPTIM         =
@@ -684,8 +684,8 @@ CC_TOOLS        = cc
 LD              = $(FC)
 
 TRADFLAG        =
-FPPFLAGS2       = -DGRIB1 -DINTIO -DTRIEDNTRUE -DNATIVE_MASSV -DAIX \
-		    -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
+FPPFLAGS2       = -DGRIB1 -DINTIO  -DNATIVE_MASSV -DAIX \
+		    -DNONSTANDARD_SYSTEM \
 		    -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
                     -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 
@@ -721,10 +721,10 @@ LD              = $(FC)
 RSL             = $(EXTERNAL)/RSL
 
 TRADFLAG        =
-FPPFLAGS2       = -DTRIEDNTRUE -DGRIB1 -DINTIO \
+FPPFLAGS2       =  -DGRIB1 -DINTIO \
 		    -DNATIVE_MASSV \
 		    -DNORESHAPE -DAIX \
-		    -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
+		    -DNONSTANDARD_SYSTEM \
 		    -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
                     -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 DM_CPPFLAGS     = -I$(RSL)/RSL
@@ -776,9 +776,9 @@ LD              = $(FC)
 RSL             = $(EXTERNAL)/RSL
 
 TRADFLAG        = -traditional-cpp
-FPPFLAGS2       = -DTRIEDNTRUE -DONLY_WRFMODEL_IO -DINTIO \
+FPPFLAGS2       =  -DONLY_WRFMODEL_IO -DINTIO \
                     -DNORESHAPE -Dcrayx1 \
-		    -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
+		    -DNONSTANDARD_SYSTEM \
 		    -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
                     -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 DM_CPPFLAGS     = -I$(RSL)/RSL
@@ -834,9 +834,9 @@ LD              = $(FC)
 RSL             = $(EXTERNAL)/RSL
 
 TRADFLAG        = -traditional-cpp
-FPPFLAGS2       = -DTRIEDNTRUE -DONLY_WRFMODEL_IO -DINTIO \
+FPPFLAGS2       =  -DONLY_WRFMODEL_IO -DINTIO \
                     -DNORESHAPE -Dcrayx1 \
- 		    -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
+ 		    -DNONSTANDARD_SYSTEM \
 		    -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
                     -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 DM_CPPFLAGS     = -I$(RSL)/RSL
@@ -883,8 +883,8 @@ LD              = $(FC)
 
 TRADFLAG        =
 FPPFLAGS2       = -DINTIO \
-                    -DTRIEDNTRUE -DMACOS \
-		    -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
+                     -DMACOS \
+		    -DNONSTANDARD_SYSTEM \
 		    -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
                     -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 FPPFLAGS_BUFR   = -C -P $(TRADFLAG)
@@ -922,8 +922,8 @@ RSL             = $(EXTERNAL)/RSL
 
 TRADFLAG        =
 FPPFLAGS2       = -DINTIO \
-                    -DTRIEDNTRUE -DMACOS \
-		    -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
+                     -DMACOS \
+		    -DNONSTANDARD_SYSTEM \
 		    -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
                     -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 DM_CPPFLAGS     = -I$(RSL)/RSL
@@ -972,8 +972,8 @@ CC_TOOLS        = cc
 LD              = $(FC)
 
 TRADFLAG        =
-FPPFLAGS2       = -DINTIO -DTRIEDNTRUE -DMACOS \
-		    -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
+FPPFLAGS2       = -DINTIO  -DMACOS \
+		    -DNONSTANDARD_SYSTEM \
 		    -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
                     -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 
@@ -1012,8 +1012,8 @@ RSL             = $(EXTERNAL)/RSL
 
 TRADFLAG        =
 FPPFLAGS2       = -DINTIO \
-                     -DTRIEDNTRUE  -DMACOS \
-		     -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
+                       -DMACOS \
+		     -DNONSTANDARD_SYSTEM \
 		     -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
                      -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 DM_CPPFLAGS     = -I$(RSL)/RSL

@@ -61,7 +61,7 @@ include $(FFTPACK5)/fftpack5.make
 include $(MAIN)/main.make
 
 depend depend.txt : links module_state_description.f90 md_calls.inc \
-                      da_generic_boilerplate.inc
+                      inc/da_generic_boilerplate.inc
 	makedepf90 $(FPPFLAGS) *.F *.f90 *.F90 > depend.txt 2>/dev/null
 
 include depend.txt

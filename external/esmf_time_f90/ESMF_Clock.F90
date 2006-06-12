@@ -1,3 +1,4 @@
+!
 ! Earth System Modeling Framework
 ! Copyright 2002-2003, University Corporation for Atmospheric Research,
 ! Massachusetts Institute of Technology, Geophysical Fluid Dynamics
@@ -38,6 +39,7 @@
 
       ! associated derived types
       use ESMF_TimeIntervalMod   ! , only : ESMF_TimeInterval
+                                 !          ESMF_TimeIntervalIsPositive
       use ESMF_TimeMod           ! , only : ESMF_Time
       use ESMF_AlarmMod,        only : ESMF_Alarm
       USE module_wrf_error
@@ -55,9 +57,6 @@
 
 ! internals for ESMF_Clock
       type ESMF_ClockInt
-#ifndef F90_STANDALONE
-      private
-#endif
         type(ESMF_TimeInterval) :: TimeStep
         type(ESMF_Time)  :: StartTime
         type(ESMF_Time)  :: StopTime

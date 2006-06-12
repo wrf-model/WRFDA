@@ -1,3 +1,4 @@
+!
 ! Earth System Modeling Framework
 ! Copyright 2002-2003, University Corporation for Atmospheric Research,
 ! Massachusetts Institute of Technology, Geophysical Fluid Dynamics
@@ -41,7 +42,8 @@
       use ESMF_BaseMod
 
       ! associated derived types
-      use ESMF_TimeIntervalMod, only : ESMF_TimeInterval
+      use ESMF_TimeIntervalMod, only : ESMF_TimeInterval, &
+                                       ESMF_TimeIntervalAbsValue
       use ESMF_TimeMod,         only : ESMF_Time
 
       implicit none
@@ -57,9 +59,6 @@
 
 ! internals for ESMF_Alarm
       type ESMF_AlarmInt
-#ifndef F90_STANDALONE
-      private
-#endif
         type(ESMF_TimeInterval) :: RingInterval
         type(ESMF_Time)  :: RingTime
         type(ESMF_Time)  :: PrevRingTime
@@ -74,10 +73,10 @@
       end type
 
 ! Actual public type:  this bit allows easy mimic of "deep" ESMF_AlarmCreate
-! in ESMF 2.1.0+.  Note that ESMF_AlarmCreate is in a separae module to avoid 
+! in ESMF 2.1.0+.  Note that ESMF_AlarmCreate is in a separate module to avoid 
 ! cyclic dependence.  
 ! NOTE:  DO NOT ADD NON-POINTER STATE TO THIS DATA TYPE.  It emulates ESMF 
-!        shallow-copy-masquerading-as-reference-copy.  
+!        shallow-copy-masquerading-as-reference-copy insanity.  
       type ESMF_Alarm
         type(ESMF_AlarmInt), pointer :: alarmint
       end type

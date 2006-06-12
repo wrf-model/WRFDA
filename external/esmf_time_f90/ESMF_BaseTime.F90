@@ -1,3 +1,4 @@
+!
 ! Earth System Modeling Framework
 ! Copyright 2002-2003, University Corporation for Atmospheric Research,
 ! Massachusetts Institute of Technology, Geophysical Fluid Dynamics
@@ -47,21 +48,11 @@
 !     ! Base class type to match C++ BaseTime class in size only;
 !     !  all dereferencing within class is performed by C++ implementation
 
-!     ! Equivalent sequence and kind to C++:
-
       type ESMF_BaseTime
-      sequence                        ! for C++ interoperability
-#ifndef F90_STANDALONE
-      private
-        integer(ESMF_IKIND_I8) :: S   ! whole seconds
-#else
         integer                :: S   ! whole seconds
-#endif
         integer                :: Sn  ! fractional seconds, numerator
         integer                :: Sd  ! fractional seconds, denominator
-#ifdef F90_STANDALONE
         integer                :: MS  ! milliseconds
-#endif
         integer                :: pad1  ! to match halem C++ <vtbl> long[4]*
         integer                :: pad2  ! to match halem C++ <vtbl> long[6]*
       end type

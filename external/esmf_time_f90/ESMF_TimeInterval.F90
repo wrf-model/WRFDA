@@ -1,3 +1,4 @@
+!
 ! Earth System Modeling Framework
 ! Copyright 2002-2003, University Corporation for Atmospheric Research,
 ! Massachusetts Institute of Technology, Geophysical Fluid Dynamics
@@ -56,18 +57,9 @@
 !     !  all dereferencing within class is performed by C++ implementation
 
       type ESMF_TimeInterval
-#ifndef F90_STANDALONE
-      private                            !   (members opaque on F90 side)
         type(ESMF_BaseTime) :: basetime  ! inherit base class
         integer(ESMF_IKIND_I8) :: YY     ! calendar interval number of years
         integer(ESMF_IKIND_I8) :: MO     ! calendar interval number of months
-#else
-        type(ESMF_BaseTime) :: basetime  ! inherit base class
-        logical                :: instant  ! false for instant, true for interval
-        integer                :: YR     ! calendar interval number of days
-        integer                :: MM     ! calendar interval number of days
-        integer                :: DD     ! calendar interval number of days
-#endif
       end type
 
 !------------------------------------------------------------------------------
@@ -535,7 +527,6 @@
                                   d_, h_, m_, s_, ms_, us_, ns_, &
                                   Sn, Sd, rc)
 
-#ifdef F90_STANDALONE
       timeinterval%instant = .false.
       timeinterval%YR = 0
       IF ( PRESENT( YY ) ) THEN
@@ -601,8 +592,6 @@
       ENDIF
 
       rc = ESMF_SUCCESS
-#endif
-
 
       end subroutine ESMF_TimeIntervalSet
 
@@ -635,7 +624,6 @@
 !     TMG1.5.9
 !EOP
 
-#ifdef F90_STANDALONE
       write(TimeString,'(I5.5"_"I2.2":"I2.2":"I2.2)') &
              timeinterval%basetime%S / (3600 * 24) , &
              mod( timeinterval%basetime%S / 3600 , 24 ) , &
@@ -646,9 +634,6 @@
 
 
       rc = ESMF_SUCCESS
-#else
-      call c_ESMC_TimeIntervalGetString(timeinterval, TimeString, rc)
-#endif
 
       end subroutine ESMFold_TimeIntervalGetString
 

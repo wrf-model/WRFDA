@@ -76,7 +76,7 @@ SUBROUTINE da_intpsfc_tem (val, ho, po, to, height, pressure, temp, kts, kte)
             WRITE (UNIT=errmsg(2),FMT='(A,I2,A,F10.3)') ' P (',k_200mb,') = ',prs_mb (k_200mb) 
             WRITE (UNIT=errmsg(3),FMT='(A,I2,A,F10.3)') ' P (',k_100mb,') = ',prs_mb (k_100mb) 
             WRITE (UNIT=errmsg(4),FMT='(A,F10.3)')      ' P_SFC  = ',         prs_mb (kts) 
-            CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1:4))
+            CALL wrf_errors(__FILE__,__LINE__,errmsg(1:4))
        ENDIF
 
 

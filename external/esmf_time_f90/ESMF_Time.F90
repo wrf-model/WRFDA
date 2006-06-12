@@ -54,31 +54,16 @@
 !     ! F90 class type to match C++ Time class in size only;
 !     !  all dereferencing within class is performed by C++ implementation
 
-!     ! Equivalent sequence and kind to C++:
-
-#ifdef F90_STANDALONE
      type ESMF_Time
-       sequence
        type(ESMF_BaseTime) :: basetime           ! inherit base class
        logical :: instant           ! true for time instant, false for interval
        integer :: YR
        integer :: MM
        integer :: DD
        type(ESMF_Calendar), pointer :: calendar  ! associated calendar
-     end type
-#else
-     type ESMF_Time
-     sequence                           ! match C++ storage order
-     private                            !   (members opaque on F90 side)
-       type(ESMF_BaseTime) :: basetime           ! inherit base class
-       type(ESMF_Calendar), pointer :: calendar  ! associated calendar
-       integer :: YR
-       integer :: MM
-       integer :: DD
        integer :: timezone                       ! local timezone
        integer :: pad                            ! to satisfy halem compiler
      end type
-#endif
 
 
 !------------------------------------------------------------------------------
@@ -440,7 +425,6 @@
 !     TMG2.1, TMG2.5.1, TMG2.5.6
 !EOP
 
-#ifdef F90_STANDALONE
       ierr = ESMF_SUCCESS
 
       IF ( PRESENT( YY ) ) THEN
@@ -486,7 +470,6 @@
       IF ( PRESENT( rc ) ) THEN
         rc = ierr
       ENDIF
-#endif
 
       end subroutine ESMF_TimeGet
 
@@ -598,7 +581,6 @@
 !     TMGn.n.n
 !EOP
 
-#ifdef F90_STANDALONE
       time%instant = .true.
       time%YR = 0
       IF ( PRESENT( YY ) ) THEN
@@ -650,7 +632,6 @@
       IF ( PRESENT( rc ) ) THEN
         rc = ESMF_SUCCESS
       ENDIF
-#endif
 
       end subroutine ESMF_TimeSet
 
@@ -919,7 +900,6 @@
 !     TMG2.4.7
 !EOP
 
-#ifdef F90_STANDALONE
 
       write(TimeString,'(I4.4"-"I2.2"-"I2.2"_"I2.2":"I2.2":"I2.2)') &
              time%YR,time%MM,time%DD, &
@@ -928,9 +908,6 @@
              mod( time%basetime%S  , 60 )
 
       rc = ESMF_SUCCESS
-#else
-      call c_ESMC_TimeGetString(time, TimeString, rc)
-#endif
 
       end subroutine ESMFold_TimeGetString
 

@@ -51,7 +51,7 @@ libwrfvar.a : $(DA_OBJS)
 	$(AR) libwrfvar.a $(DA_OBJS)
 	$(RANLIB) libwrfvar.a
 
-da_generic_boilerplate.inc: da_generic_boilerplate.m4
-			$(RM) da_generic_boilerplate.inc
-			$(M4) da_generic_boilerplate.m4 > da_generic_boilerplate.inc
+inc/da_generic_boilerplate.inc: da_generic_boilerplate.m4
+	@ $(RM) inc/da_generic_boilerplate.inc
+	  $(M4) da_generic_boilerplate.m4 > inc/da_generic_boilerplate.inc
 
