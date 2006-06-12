@@ -156,7 +156,6 @@ module_timing.o: \
                 module_wrf_error.o
 
 module_wrf_error.o: \
-		wrf_shutdown.o \
-		$(ESMF_MOD_DEPENDENCE)
+		wrf_shutdown.o
 
 # DO NOT DELETE

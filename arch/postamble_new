@@ -15,15 +15,14 @@ FIXEDFLAGS_ENDIAN = $(FCTYPE)
 WRFVAR_LIBS  = libwrflib.a libwrfio_nf.a libesmf_time.a libio_grib1.a \
                  libblas.a liblapack.a libbufr.a libfftpack5.a libwrfvar.a
 
-GEN_BE_LIBS  = libwrflib.a libwrfio_nf.a libesmf_time.a libio_grib1.a \
-                 libblas.a liblapack.alibfftpack5.a 
+GEN_BE_LIBS  = libblas.a liblapack.a libfftpack5.a 
 
 WRF_LIBS     = libwrflib.a libwrfio_nf.a libesmf_time.a libio_grib1.a
 
 WRFPLUS_LIBS = libwrflib.a libwrfplus.a libwrfio_nf.a libesmf_time.a libio_grib1.a
 
 
-WRFVAR_LIB = $(NETCDF_LIB) -L. -lwrflib -lwrfvar -lwrfio_nf -lesmf_time \
+WRFVAR_LIB = $(NETCDF_LIB) -L. -lwrfvar -lwrflib -lwrfio_nf -lesmf_time \
                -L$(EXTERNAL)/io_grib1 -lio_grib1 $(LOCAL_LIB) \
                $(BLAS_LIB) $(LAPACK_LIB) $(BUFR_LIB) $(FFTPACK5_LIB) \
                $(NETCDF_LIB) $(RTTOV_LIB) $(MPI_LIB) $(EXTRA_LIBS)

@@ -1,6 +1,6 @@
 #makefile to build io_grib1 that does GriB i/o
 
-OBJSL   = io_grib1.o gribmap.o gridnav.o open_file.o grib1_routines.o trim.o
+OBJSL   = io_grib1.o gribmap.o grib1_routines.o trim.o
 OBJS    = $(OBJSL)
 LIBS    = -lm
 M4      = m4 -Uinclude -Uindex -Ulen
