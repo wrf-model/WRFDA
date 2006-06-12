@@ -20,6 +20,8 @@ CPP     = /lib/cpp
 
 .SUFFIXES: .f90 .F90 .F .i .o .f .c
 
+SOLVER=em
+
 # Substituted by Config_wrfvar.pl
 
 DEVTOP      = CONFIGURE_DEVTOP
@@ -49,9 +51,10 @@ ARCH      = $(DEVTOP)/arch
 CHEM      = $(DEVTOP)/chem
 CONVERTOR = $(DEVTOP)/convertor
 DA        = $(DEVTOP)/da
+DYNAMICS  = $(DEVTOP)/dyn_$(SOLVER)
 DYN_EM    = $(DEVTOP)/dyn_em
-DYN_EXP   = $(DEVTOP)/dyn_exp
 DYN_NMM   = $(DEVTOP)/dyn_nmm
+DYN_EXP   = $(DEVTOP)/dyn_exp
 EXTERNAL  = $(DEVTOP)/external
 FRAME     = $(DEVTOP)/frame
 GEN_BE    = $(DEVTOP)/gen_be

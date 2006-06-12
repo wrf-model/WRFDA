@@ -118,8 +118,8 @@ BE_MODULES1 = -I$(FRAME)
 BE_MODULES2 = -I$(DA) -I$(FRAME)
 be : 
 	( cd tools; $(MAKE) FC="$(FC)" FCFLAGS="$(FCFLAGS)" advance_cymdh registry )
-	( cd frame; $(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" externals \
-          module_wrf_error.o module_state_description.o module_driver_constants.o )
+	( cd frame; $(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" module_wrf_error.o externals \
+          module_state_description.o module_driver_constants.o )
 	( cd da; $(MAKE) MODULE_DIRS="$(BE_MODULES1)" $(BE_OBJS) da_gen_be.o )
 	( cd gen_be ; \
 	$(RM) *.exe ; \
@@ -354,7 +354,7 @@ nmm_real : nmm_wrf
 
 ext :
 	@ echo '--------------------------------------'
-	( cd frame ; $(MAKE) externals )
+	( cd frame ; $(MAKE) module_wrf_error.o externals )
 
 framework :
 	@ echo '--------------------------------------'

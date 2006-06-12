@@ -37,13 +37,13 @@ $(SOLVER)_wrf_ESMFApp : wrf_ESMFMod.o wrf_ESMFApp.o wrf_SST_ESMF.o
 
 $(SOLVER)_ideal : module_initialize ideal.o
 	$(RANLIB) libwrflib.a
-	$(LD) -o ideal.exe $(LDFLAGS) ideal.o ../dyn_$(SOLVER)/module_initialize_$(IDEAL_CASE).o libwrflib.a $(WRF_LIB)
+	$(LD) -o ideal.exe $(LDFLAGS) ideal.o $(DYNAMICS)/module_initialize_$(IDEAL_CASE).o libwrflib.a $(WRF_LIB)
 
 $(SOLVER)_real : module_initialize real_$(SOLVER).o ndown_$(SOLVER).o nup_$(SOLVER).o
 	$(RANWRF_LIB) libwrflib.a
-	$(LD) -o real.exe $(LDFLAGS) real_$(SOLVER).o ../dyn_$(SOLVER)/module_initialize_$(IDEAL_CASE).o libwrflib.a $(WRF_LIB)
-	$(LD) -o ndown.exe $(LDFLAGS) ndown_$(SOLVER).o  ../dyn_$(SOLVER)/module_initialize_$(IDEAL_CASE).o libwrflib.a $(WRF_LIB)
-	$(LD) -o nup.exe $(LDFLAGS) nup_$(SOLVER).o  ../dyn_$(SOLVER)/module_initialize_$(IDEAL_CASE).o libwrflib.a $(WRF_LIB)
+	$(LD) -o real.exe $(LDFLAGS) real_$(SOLVER).o $(DYNAMICS)/module_initialize_$(IDEAL_CASE).o libwrflib.a $(WRF_LIB)
+	$(LD) -o ndown.exe $(LDFLAGS) ndown_$(SOLVER).o  $(DYNAMICS)/module_initialize_$(IDEAL_CASE).o libwrflib.a $(WRF_LIB)
+	$(LD) -o nup.exe $(LDFLAGS) nup_$(SOLVER).o  $(DYNAMICS)/module_initialize_$(IDEAL_CASE).o libwrflib.a $(WRF_LIB)
 
 convert_em : convert_em.o
 	$(RANWRF_LIB) libwrflib.a
@@ -63,16 +63,16 @@ real_nmm : real_nmm.o
           $(SHARE)/module_io_domain.o libwrflib.a $(WRF_LIB)
 
 module_initialize :
-	( cd ../dyn_$(SOLVER) ;  $(MAKE) module_initialize_$(IDEAL_CASE).o )
+	( cd $(DYNAMICS) ;  $(MAKE) module_initialize_$(IDEAL_CASE).o )
 
 ## prevent real being compiled for OMP -- only for regtesting
 #$(SOLVER)_real : module_initialize real_$(SOLVER).o
 #	$(RANWRF_LIB) libwrflib.a
-#	if [ -z "$(OMP)" ] ; then $(FC) -o real.exe $(LDFLAGS) real_$(SOLVER).o ../dyn_$(SOLVER)/module_initialize_$(IDEAL_CASE).o libwrflib.a $(WRF_LIB) ; fi
+#	if [ -z "$(OMP)" ] ; then $(FC) -o real.exe $(LDFLAGS) real_$(SOLVER).o $(DYNAMICS)/module_initialize_$(IDEAL_CASE).o libwrflib.a $(WRF_LIB) ; fi
 #
 ## prevent module_initialize being compiled for OMP --remove after IBM debugging
 #module_initialize :
-#	if [ -z "$(OMP)" ] ; then ( cd ../dyn_$(SOLVER) ;  $(MAKE) module_initialize_$(IDEAL_CASE).o ) ; fi
+#	if [ -z "$(OMP)" ] ; then ( cd $(DYNAMICS) ;  $(MAKE) module_initialize_$(IDEAL_CASE).o ) ; fi
 # end of regtest changes
 
 clean:
@@ -115,7 +115,7 @@ ideal.o: \
 	../frame/module_dm.o \
 	../share/module_wrf_esmf_super.o \
 	../share/module_io_domain.o \
-	../dyn_$(SOLVER)/$(CASE_MODULE) \
+	$(DYNAMICS)/$(CASE_MODULE) \
 	$(ESMF_MOD_DEPENDENCE) $(EXTRAMODULES)
 
 ndown_em.o: \
