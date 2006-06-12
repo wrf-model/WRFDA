@@ -32,7 +32,7 @@ subroutine da_truncate_spectra( max_wave, nw, power_trunc, power, &
          'Maximum grid wavenumber =  ', max_wave
       write(unit=errmsg(3),FMT='(a,i8)') &
          'Truncating to wavenumber = ', max_wave_trunc
-      CALL wrf_warnings(__FILE__,__LINE__,errmsg(1:3))
+      CALL wrf_warning(__FILE__,__LINE__,errmsg(1:3))
       max_wave_trunc = max_wave
    end if
 

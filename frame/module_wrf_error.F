@@ -90,34 +90,7 @@ SUBROUTINE wrf_errors( file_str, line, strs )
   CALL wrf_abort
 END SUBROUTINE wrf_errors
 
-SUBROUTINE wrf_warning( file_str, line, str )
-  IMPLICIT NONE
-  CHARACTER(LEN=*), INTENT(IN) :: file_str
-  INTEGER,          INTENT(IN) :: line
-  CHARACTER(LEN=*), INTENT(IN) :: str
-  CHARACTER*256 :: line_str
-
-  write(line_str,'(i6)') line
-#if defined( DM_PARALLEL ) && ! defined( STUBMPI )
-  CALL wrf_message( '-------------- WARNING      ---------------' )
-  ! only print file and line if line is positive
-  IF ( line > 0 ) THEN
-    CALL wrf_message( 'WARNING FROM FILE:  '//file_str//'  LINE:  '//TRIM(line_str) )
-  ENDIF
-  CALL wrf_message( str )
-  CALL wrf_message( '-------------------------------------------' )
-#else
-  CALL wrf_message2( '-------------- WARNING ---------------' )
-  ! only print file and line if line is positive
-  IF ( line > 0 ) THEN
-    CALL wrf_message2( 'WARNING FROM FILE:  '//file_str//'  LINE:  '//TRIM(line_str) )
-  ENDIF
-  CALL wrf_message2(str )
-  CALL wrf_message2( '-------------------------------------------' )
-#endif
-END SUBROUTINE wrf_warning
-
-SUBROUTINE wrf_warnings( file_str, line, strs )
+SUBROUTINE wrf_warning( file_str, line, strs )
   IMPLICIT NONE
   CHARACTER(LEN=*), INTENT(IN) :: file_str
   INTEGER,          INTENT(IN) :: line
@@ -142,7 +115,7 @@ SUBROUTINE wrf_warnings( file_str, line, strs )
   CALL wrf_messages2(strs )
   CALL wrf_message2( '-------------------------------------------' )
 #endif
-END SUBROUTINE wrf_warnings
+END SUBROUTINE wrf_warning
 
 ! Check to see if expected value == actual value
 ! If not, print message and exit.  
