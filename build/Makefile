@@ -63,7 +63,7 @@ include $(MAIN)/main.make
 include .depend
 
 depend .depend :
-	makedepf90 *.F *.f90 *.F90 > .depend
+	makedepf90 $(FPPFLAGS) *.F *.f90 *.F90 > .depend
 
 WRF_OBJS=$(SHARE_OBJS) $(FRAME_OBJS) $(PHYS_OBJS) $(DYN_OBJS) \
   $(ESMF_TIME_F90_OBJS) $(IO_INT_OBJS) $(IO_NETCDF_OBJS) \
@@ -71,9 +71,17 @@ WRF_OBJS=$(SHARE_OBJS) $(FRAME_OBJS) $(PHYS_OBJS) $(DYN_OBJS) \
 
 WRF_MODULES=$(SHARE_MODULES) $(FRAME_MODULES) $(PHYS_MODULES) $(DYN_MODULES)
 
+WRFPLUS_OBJS=$(SHARE_OBJS_WRFPLUS) $(DYN_OBJS_WRFPLUS)
+
+WRFPLUS_MODULES=$(SHARE_MODULES_WRFPLUS) $(DYN_MODULES_WRFPLUS)
+
 libwrflib.a : $(WRF_MODULES) $(WRF_OBJS)
 	$(AR) libwrflib.a $(WRF_MODULES) $(WRF_OBJS)
 	$(RANLIB) libwrflib.a
+
+libwrfplus.a : $(WRFPLUS_MODULES_WRFPLUS) $(WRFPLUS_OBJS)
+	$(AR) libwrfplus.a $(WRFPLUS_MODULES) $(WRFPLUS_OBJS)
+	$(RANLIB) libwrfplus.a
 
 clean :
 	@ $(RM) *.exe *.o *.mod *.b *.a *.f inc/*.inc frame/*.f90 registry \

@@ -8,7 +8,7 @@ wrfvar : arch links wrfvar.o pack_utils.o liblapack.a libblas.a libbufr.a libfft
 wrf : arch links wrf.o  pack_utils.o libwrflib.a libwrfio_nf.a libio_grib1.a libesmf_time.a
 	$(LD) -o wrf.exe $(LDFLAGS) wrf.o $(WRF_LIB) pack_utils.o
 
-wrfplus : arch links wrf.o pack_utils.o libwrflib.a libwrfio_nf.a libio_grib1.a libesmf_time.a
+wrfplus : arch links wrf.o pack_utils.o libwrflib.a libwrfplus.a libwrfio_nf.a libio_grib1.a libesmf_time.a
 	$(LD) -o wrfplus.exe $(LDFLAGS) wrf.o $(WRF_LIB) pack_utils.o
 
 kma2netcdf :  arch $(LIBS) $(CONVERTOR_MODULES) $(CONVERTOR_OBJS) kma2netcdf.o

@@ -1,7 +1,5 @@
 SHARE_MODULES =                       \
 	module_bc.o	        \
-        module_bc_ad.o                  \
-        module_bc_tl.o                  \
 	module_bc_time_utilities.o	\
 	module_io_wrf.o	        \
 	module_date_time.o	\
@@ -11,6 +9,10 @@ SHARE_MODULES =                       \
 	module_optional_si_input.o	\
 	module_compute_geop.o           \
 	module_soil_pre.o
+
+SHARE_MODULES_WRFPLUS =                       \
+        module_bc_ad.o                  \
+        module_bc_tl.o
 
 SHARE_OBJS    = 		\
 	mediation_integrate.o		\
@@ -58,6 +60,8 @@ SHARE_OBJS    = 		\
         wrf_histin.o            	\
         wrf_restartin.o                 \
         couple_or_uncouple_em.o
+
+SHARE_OBJS_WRFPLUS =
 
 # DEPENDENCIES : only dependencies after this line (don't remove the word DEPENDENCIES)
 

@@ -1,25 +1,28 @@
 # DYN_EM
 
-DYN_MODULES =                 		\
-        module_advect_em.o   		\
+DYN_MODULES_WRFPLUS =         		\
         module_advect_em_ad.o  		\
         module_advect_em_tl.o  		\
-	module_diffusion_em.o  		\
 	module_diffusion_em_ad.o	\
 	module_diffusion_em_tl.o	\
-	module_small_step_em.o 		\
 	module_small_step_em_ad.o 	\
 	module_small_step_em_tl.o 	\
-        module_big_step_utilities_em.o  \
         module_big_step_utilities_em_ad.o  \
         module_big_step_utilities_em_tl.o  \
-        module_em.o         		\
         module_em_ad.o         		\
         module_em_tl.o         		\
-        module_solvedebug_em.o    	\
-        module_bc_em.o                  \
         module_bc_em_ad.o               \
         module_bc_em_tl.o               \
+        module_check.o
+
+DYN_MODULES =                 		\
+        module_advect_em.o   		\
+	module_diffusion_em.o  		\
+	module_small_step_em.o 		\
+        module_big_step_utilities_em.o  \
+        module_em.o         		\
+        module_solvedebug_em.o    	\
+        module_bc_em.o                  \
         module_init_utilities.o         \
         module_check.o                  \
 	$(CASE_MODULE)
@@ -34,11 +37,13 @@ DYN_MODULES =                 		\
 #	module_initialize_squall2d_x.o  \
 #	module_initialize_squall2d_y.o 
 
+DYN_OBJS_WRFPLUS = 	        \
+	solve_em_ad.o           \
+	solve_em_tl.o
+
 DYN_OBJS    = 		        \
 	init_modules_em.o       \
 	solve_em.o              \
-	solve_em_ad.o           \
-	solve_em_tl.o           \
         start_em.o              \
         shift_domain_em.o       \
         nest_init_utils.o	\
