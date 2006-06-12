@@ -19,14 +19,14 @@ RSL             = $(EXTERNAL)/RSL
 
 TRADFLAG        = -traditional
 FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE \
-                    -DINTIO -DWRF_RSL_IO -DRSL -DDM_PARALLEL \
+                    -DINTIO \
                     -DTRIEDNTRUE -DONLY_WRFMODEL_IO \
-                = -DLINUX -DNO_RRTM_PHYSICS  \
+                    -DLINUX -DNO_RRTM_PHYSICS  \
 		    -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
 		    -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
                     -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 DM_CPPFLAGS     = -I$(RSL)/RSL
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags`
+DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DWRF_RSL_IO -DRSL -DDM_PARALLEL
 FPPFLAGS_BUFR   = -C -P $(TRADFLAG) -DLINUX -Dlinux
 
 FCOPTIM         = #-fast
@@ -107,14 +107,13 @@ RSL             = $(EXTERNAL)/RSL
 
 TRADFLAG        =
 FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DINTIO \
-                    -DWRF_RSL_IO -DDM_PARALLEL -DRSL \
                     -DTRIEDNTRUE -DONLY_WRFMODEL_IO  \
                     -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) \
                     -DDEC_ALPHA -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
                     -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
                     -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 DM_CPPFLAGS     = -I$(RSL)/RSL
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags`
+DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DWRF_RSL_IO -DRSL -DDM_PARALLEL
 
 #FCOPTIM        = -fast -O2 -Olimit 2000
 FCOPTIM         = -fast -O2
@@ -225,7 +224,7 @@ RSL        = $(EXTERNAL)/RSL
 
 TRADFLAG        = -traditional
 FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE \
-                    -DINTIO -DWRF_RSL_IO -DRSL -DDM_PARALLEL \
+                    -DINTIO \
                     -DTRIEDNTRUE -DONLY_WRFMODEL_IO \
                     -DLINUX -DNO_RRTM_PHYSICS  \
 		    -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
@@ -233,7 +232,7 @@ FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE \
                     -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 FPPFLAGS_BUFR   = -C -P $(TRADFLAG) -DLINUX -Dlinux
 DM_CPPFLAGS     = -I$(RSL)/RSL
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags`
+DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DWRF_RSL_IO -DRSL -DDM_PARALLEL
 
 FCOPTIM         = #-fast
 FCDEBUG         = #-g
@@ -309,14 +308,14 @@ RSL             = $(EXTERNAL)/RSL
 
 
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DINTIO -DWRF_RSL_IO -DRSL -DDM_PARALLEL \
+FPPFLAGS2       = -DINTIO \
                     -DTRIEDNTRUE -DONLY_WRFMODEL_IO \
                     -DLINUX -DNO_RRTM_PHYSICS  \
 		    -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
 		    -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
                     -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 DM_CPPFLAGS     = -I$(RSL)/RSL
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags`
+DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DWRF_RSL_IO -DRSL -DDM_PARALLEL
 FPPFLAGS_BUFR   = -C -P $(TRADFLAG) -DLINUX -Dlinux
 
 FCOPTIM         =
@@ -431,14 +430,14 @@ RSL             = $(EXTERNAL)/RSL
 
 TRADFLAG        = -traditional
 FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE  \
-                    -DINTIO -DWRF_RSL_IO -DRSL -DDM_PARALLEL \
+                    -DINTIO \
                     -DTRIEDNTRUE -DONLY_WRFMODEL_IO \
                     -DLINUX -DNO_RRTM_PHYSICS   \
   		    -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
 		    -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
                     -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 DM_CPPFLAGS     = -I$(RSL)/RSL
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags`
+DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DWRF_RSL_IO -DRSL -DDM_PARALLEL
 FPPFLAGS_BUFR   = -C -P $(TRADFLAG) -DLINUX -Dlinux
 
 FCOPTIM         = #-fastsse
@@ -515,13 +514,13 @@ LD              = $(FC)
 RSL             = ./$(EXTERNAL)/RSL
 
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DINTIO -DWRF_RSL_IO -DRSL -DDM_PARALLEL \
+FPPFLAGS2       = -DINTIO \
                     -DTRIEDNTRUE -DONLY_WRFMODEL_IO \
                     -DLINUX -DNO_RRTM_PHYSICS  \
 		    -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
 		    -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 DM_CPPFLAGS     = -I$(RSL)/RSL
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags`
+DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DWRF_RSL_IO -DRSL -DDM_PARALLEL
 FPPFLAGS_BUFR   = -C -P $(TRADFLAG) -DLINUX -Dlinux -DPATHSCALE
 
 FCOPTIM         = #-fastsse
@@ -606,13 +605,12 @@ RSL             = $(EXTERNAL)/RSL
 
 TRADFLAG        =
 FPPFLAGS2       = -DINTIO \
-                    -DWRF_RSL_IO -DDM_PARALLEL -DRSL \
                     -DTRIEDNTRUE -DONLY_WRFMODEL_IO -DIRIX \
 		    -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
 		    -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
                     -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 DM_CPPFLAGS     = -I$(RSL)/RSL
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags`
+DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DWRF_RSL_IO -DRSL -DDM_PARALLEL
 FCOPTIM         = -O3 -OPT:roundoff=3:IEEE_arithmetic=3
 FCDEBUG         = #-g
 FCTYPE          = -r8
@@ -723,15 +721,14 @@ LD              = $(FC)
 RSL             = $(EXTERNAL)/RSL
 
 TRADFLAG        =
-FPPFLAGS2       = -DWRF_RSL_IO -DRSL -DDM_PARALLEL \
-		    -DTRIEDNTRUE -DGRIB1 -DINTIO \
+FPPFLAGS2       = -DTRIEDNTRUE -DGRIB1 -DINTIO \
 		    -DNATIVE_MASSV \
 		    -DNORESHAPE -DAIX \
 		    -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
 		    -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
                     -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 DM_CPPFLAGS     = -I$(RSL)/RSL
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags`
+DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DWRF_RSL_IO -DRSL -DDM_PARALLEL
 
 FCOPTIM         = -O0 -qarch=auto
 FCDEBUG         = #-g -qfullpath
@@ -779,15 +776,13 @@ LD              = $(FC)
 RSL             = $(EXTERNAL)/RSL
 
 TRADFLAG        = -traditional-cpp
-FPPFLAGS2       = -DWRF_RSL_IO -DRSL \
-                    -DDM_PARALLEL \
-                    -DTRIEDNTRUE -DONLY_WRFMODEL_IO -DINTIO \
+FPPFLAGS2       = -DTRIEDNTRUE -DONLY_WRFMODEL_IO -DINTIO \
                     -DNORESHAPE -Dcrayx1 \
 		    -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
 		    -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
                     -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 DM_CPPFLAGS     = -I$(RSL)/RSL
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags`
+DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DWRF_RSL_IO -DRSL -DDM_PARALLEL
 
 #FCOPTIM        = -Ofp3 -O3
 # needed for OpenMP
@@ -839,15 +834,13 @@ LD              = $(FC)
 RSL             = $(EXTERNAL)/RSL
 
 TRADFLAG        = -traditional-cpp
-FPPFLAGS2       = -DWRF_RSL_IO -DRSL \
-                    -DDM_PARALLEL \
-                    -DTRIEDNTRUE -DONLY_WRFMODEL_IO -DINTIO \
+FPPFLAGS2       = -DTRIEDNTRUE -DONLY_WRFMODEL_IO -DINTIO \
                     -DNORESHAPE -Dcrayx1 \
  		    -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
 		    -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
                     -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 DM_CPPFLAGS     = -I$(RSL)/RSL
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags`
+DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DWRF_RSL_IO -DRSL -DDM_PARALLEL
 
 #FCOPTIM        = -Ofp3 -O3
 FCOPTIM         = -Ofp2 -O1 -Ogen_private_callee
@@ -928,14 +921,13 @@ LD              = $(FC)
 RSL             = $(EXTERNAL)/RSL
 
 TRADFLAG        =
-FPPFLAGS2       = -DWRF_RSL_IO -DRSL -DDM_PARALLEL \
-                    -DINTIO \
+FPPFLAGS2       = -DINTIO \
                     -DTRIEDNTRUE -DMACOS \
 		    -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
 		    -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
                     -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 DM_CPPFLAGS     = -I$(RSL)/RSL
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags`
+DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DWRF_RSL_IO -DRSL -DDM_PARALLEL
 FPPFLAGS_BUFR   = -C -P $(TRADFLAG)
 
 FCOPTIM         = -O0 -qarch=auto
@@ -1019,13 +1011,13 @@ CC_TOOLS        = cc
 RSL             = $(EXTERNAL)/RSL
 
 TRADFLAG        =
-FPPFLAGS2       = -DINTIO -DWRF_RSL_IO -DRSL -DDM_PARALLEL \
+FPPFLAGS2       = -DINTIO \
                      -DTRIEDNTRUE  -DMACOS \
 		     -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
 		     -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
                      -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 DM_CPPFLAGS     = -I$(RSL)/RSL
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags`
+DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DWRF_RSL_IO -DRSL -DDM_PARALLEL
 
 FCOPTIM         = 
 FCDEBUG         = #-g

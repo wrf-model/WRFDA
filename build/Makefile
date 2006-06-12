@@ -60,10 +60,11 @@ include $(BLAS)/blas.make
 include $(FFTPACK5)/fftpack5.make
 include $(MAIN)/main.make
 
-include .depend
+include depend.inc
 
-depend .depend : links module_state_description.f90 md_calls.inc 
-	makedepf90 $(FPPFLAGS) *.F *.f90 *.F90 > .depend
+depend depend.inc : links module_state_description.f90 md_calls.inc \
+                      da_generic_boilerplate.inc
+	makedepf90 $(FPPFLAGS) *.F *.f90 *.F90 > depend.inc 2>/dev/null
 
 WRF_OBJS=$(SHARE_OBJS) $(FRAME_OBJS) $(PHYS_OBJS) $(DYN_OBJS) \
   $(ESMF_TIME_F90_OBJS) $(IO_INT_OBJS) $(IO_NETCDF_OBJS) \
@@ -93,4 +94,4 @@ superclean : clean
 	@ $(RM) *.f90 *.F90 *.F *.inc *.int *.c *.h *.m4 *.code *.make \
           bufrlib.param *.sed registry links \
           convert_tool kma_wave2grid wave2grid_kma *.csh version_decl \
-          RSL *.bsh *.csh .depend
+          RSL *.bsh *.csh

@@ -68,11 +68,11 @@ module_initialize_squall2d_x.o module_initialize_squall2d_y.o  \
 module_configure.o mediation_interp_domain.o                   \
 mediation_force_domain.o mediation_feedback_domain.o           \
 module_initialize_real.o module_dm.o start_domain.o :
-	$(RM) $@
-	$(SED_FTN) $*.F > $*.b 
-	$(CPP) $(CPPFLAGS) $(FPPFLAGS) $*.b  > $*.f
-	$(RM) $*.b
-	$(FC) -c $(FCFLAGS_NOOPT) -O0 $*.f
+	@ $(RM) $@
+	@ $(SED_FTN) $*.F > $*.b 
+	  $(CPP) $(CPPFLAGS) $(FPPFLAGS) $*.b  > $*.f
+	@ $(RM) $*.b
+	  $(FC) -c $(FCFLAGS_NOOPT) -O0 $*.f
 
 # Remove implicit rules to ensure our multi-stage process works
 
@@ -81,7 +81,7 @@ module_initialize_real.o module_dm.o start_domain.o :
 .f90.o : 
 	@ $(RM) $@
 	@ $(SED_FTN) $*.f90 > $*.b
-	@ $(CPP) $(CPPFLAGS) $(FPPFLAGS) $*.b  > $*.f
+	  $(CPP) $(CPPFLAGS) $(FPPFLAGS) $*.b  > $*.f
 	@ $(RM) $*.b
 	  $(FC) -c $(FCFLAGS) $*.f
 
