@@ -1,4 +1,4 @@
-SUBROUTINE SFC_WTQ ( psfc, tg, ps, ts, qs, us, vs, ps2, ts2, qs2, &
+SUBROUTINE da_sfc_wtq ( psfc, tg, ps, ts, qs, us, vs, ps2, ts2, qs2, &
                      hs, roughness, xland, &
                      u10, v10, t2, q2, regime) 
 !-----------------------------------------------------------------------------!
@@ -135,7 +135,7 @@ SUBROUTINE SFC_WTQ ( psfc, tg, ps, ts, qs, us, vs, ps2, ts2, qs2, &
 ! 2.3 Convert ground virtual temperature assuming it's saturated
 !     ----------------------------------------------------------
 
-      call DA_TP_To_Qs( tg, psfc, eg, qg )
+      call da_tp_to_qs( tg, psfc, eg, qg )
       tvg  = tg * (1. + 0.608 * qg)
 
 ! 3.  Compute the potential temperature
@@ -363,4 +363,4 @@ SUBROUTINE SFC_WTQ ( psfc, tg, ps, ts, qs, us, vs, ps2, ts2, qs2, &
       t2 = ( thg + ( ths - thg )*psit2/psit)*((psfc/100.)/1000.)**rcp
       q2 = qg + (qs - qg)*psiq2/psiq 
 
-END SUBROUTINE SFC_WTQ
+END SUBROUTINE da_sfc_wtq

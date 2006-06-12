@@ -1,4 +1,4 @@
-Subroutine DA_Transform_XToWTQ ( xp, xb, xa )
+Subroutine da_transform_xtowtq ( xp, xb, xa )
 
    IMPLICIT NONE
 
@@ -22,7 +22,7 @@ Subroutine DA_Transform_XToWTQ ( xp, xb, xa )
    do i=xp%its, xp%ite
       xa%tgrn(i,j) = 0.0
 
-      call sfc_wtq_Lin(xb%psfc(i,j), xb%tgrn(i,j), &
+      call da_sfc_wtq_lin(xb%psfc(i,j), xb%tgrn(i,j), &
                        xb%p(i,j,kz), xb%t(i,j,kz), xb%q(i,j,kz), &
                        xb%u(i,j,kz), xb%v(i,j,kz), &
                        xb%regime(i,j), &
@@ -35,5 +35,5 @@ Subroutine DA_Transform_XToWTQ ( xp, xb, xa )
    enddo
    enddo
 
-END Subroutine DA_Transform_XToWTQ
+END Subroutine da_transform_xtowtq
  

@@ -1,4 +1,4 @@
-Subroutine DA_Transform_XToWTQ_adj ( xp, xb, jo_grad_x )
+Subroutine da_transform_xtowtq_adj ( xp, xb, jo_grad_x )
 
    IMPLICIT NONE
 
@@ -41,7 +41,7 @@ Subroutine DA_Transform_XToWTQ_adj ( xp, xb, jo_grad_x )
    do j=js, je
    do i=is, ie
       jo_grad_x%tgrn(i,j)=0.0
-      call sfc_wtq_Adj(xb%psfc(i,j), xb%tgrn(i,j), &
+      call da_sfc_wtq_adj(xb%psfc(i,j), xb%tgrn(i,j), &
                        xb%p(i,j,kz), xb%t(i,j,kz), xb%q(i,j,kz), &
                        xb%u(i,j,kz), xb%v(i,j,kz), &
                        xb%regime(i,j),  &
@@ -57,5 +57,5 @@ Subroutine DA_Transform_XToWTQ_adj ( xp, xb, jo_grad_x )
     
    enddo
 
-END Subroutine DA_Transform_XToWTQ_adj
+END Subroutine da_transform_xtowtq_adj
 

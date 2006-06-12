@@ -1,4 +1,4 @@
-SUBROUTINE DA_AO_Stats_Buoy( stats_unit, oi, re )
+SUBROUTINE da_ao_stats_buoy( stats_unit, oi, re )
 
   IMPLICIT NONE
 
@@ -35,23 +35,23 @@ SUBROUTINE DA_AO_Stats_Buoy( stats_unit, oi, re )
   IF ( oi%num_Buoy > 0 ) THEN
     DO n=1, oi%num_Buoy
       if( oi%Buoy(n)%loc%proc_domain ) then
-        CALL da_Stats_Calculate( n, 0, oi%Buoy(n)%u%qc, & 
+        CALL da_stats_calculate( n, 0, oi%Buoy(n)%u%qc, & 
                               re%Buoy(n)%u, nu, & 
-                              Buoy%minimum%u, Buoy%maximum%u, &
-                              Buoy%average%u, Buoy%rms_err%u )
-        CALL da_Stats_Calculate( n, 0, oi%Buoy(n)%v%qc, & 
+                              buoy%minimum%u, Buoy%maximum%u, &
+                              buoy%average%u, Buoy%rms_err%u )
+        CALL da_stats_calculate( n, 0, oi%Buoy(n)%v%qc, & 
                               re%Buoy(n)%v, nv, & 
-                              Buoy%minimum%v, Buoy%maximum%v, &
-                              Buoy%average%v, Buoy%rms_err%v )
-        CALL da_Stats_Calculate( n, 0, oi%Buoy(n)%t%qc, & 
+                              buoy%minimum%v, Buoy%maximum%v, &
+                              buoy%average%v, Buoy%rms_err%v )
+        CALL da_stats_calculate( n, 0, oi%Buoy(n)%t%qc, & 
                               re%Buoy(n)%t, nt, & 
-                              Buoy%minimum%t, Buoy%maximum%t, &
-                              Buoy%average%t, Buoy%rms_err%t )
-        CALL da_Stats_Calculate( n, 0, oi%Buoy(n)%p%qc, & 
+                              buoy%minimum%t, Buoy%maximum%t, &
+                              buoy%average%t, Buoy%rms_err%t )
+        CALL da_stats_calculate( n, 0, oi%Buoy(n)%p%qc, & 
                               re%Buoy(n)%p, np, & 
-                              Buoy%minimum%p, Buoy%maximum%p, &
-                              Buoy%average%p, Buoy%rms_err%p )
-        CALL da_Stats_Calculate( n, 0, oi%Buoy(n)%q%qc, & 
+                              buoy%minimum%p, Buoy%maximum%p, &
+                              buoy%average%p, Buoy%rms_err%p )
+        CALL da_stats_calculate( n, 0, oi%Buoy(n)%q%qc, & 
                               re%Buoy(n)%q, nq, & 
                               Buoy%minimum%q, Buoy%maximum%q, &
                               Buoy%average%q, Buoy%rms_err%q )
@@ -92,8 +92,8 @@ SUBROUTINE DA_AO_Stats_Buoy( stats_unit, oi, re )
   IF ( wrf_dm_on_monitor() ) THEN
     IF ( nu /= 0 .or. nv /= 0 .or. nt /= 0 .or. np /= 0 .or. nq /= 0 ) THEN
       write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for Buoy'
-      call DA_Print_Stats_Buoy(stats_unit, nu, nv, nt, np, nq, Buoy)
+      call da_print_stats_buoy(stats_unit, nu, nv, nt, np, nq, Buoy)
     END IF
   END IF
 
-END SUBROUTINE DA_AO_Stats_Buoy
+END SUBROUTINE da_ao_stats_buoy

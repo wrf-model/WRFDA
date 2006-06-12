@@ -1,4 +1,4 @@
-SUBROUTINE DA_Scan_Obs (iunit, ob, xp, filename)
+SUBROUTINE da_scan_obs (iunit, ob, xp, filename)
 !-----------------------------------------------------------------------------!
 !  Purpose: Scan WRFVAR GTS observation file
 !-----------------------------------------------------------------------------!
@@ -285,7 +285,7 @@ loop_level: DO i = 1, platform%info%levels
          EXIT
       END IF
 
-      call DA_ll_to_xy (platform%info, platform%loc,   &
+      call da_ll_to_xy (platform%info, platform%loc,   &
                         xp, outside, inside_halo,outside_all )
 
       IF(outside) THEN
@@ -531,5 +531,5 @@ loop_level: DO i = 1, platform%info%levels
 
    end if
 
-END SUBROUTINE DA_Scan_Obs
+END SUBROUTINE da_scan_obs
 

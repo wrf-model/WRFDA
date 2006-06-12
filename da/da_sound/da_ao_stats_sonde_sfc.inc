@@ -1,4 +1,4 @@
-SUBROUTINE DA_AO_Stats_Sonde_sfc( stats_unit, oi, re )
+SUBROUTINE da_ao_stats_sonde_sfc( stats_unit, oi, re )
 
   IMPLICIT NONE
 
@@ -34,23 +34,23 @@ SUBROUTINE DA_AO_Stats_Sonde_sfc( stats_unit, oi, re )
   IF ( oi%num_sound > 0 ) THEN
     DO n=1, oi%num_sound
       if( oi%sonde_sfc(n)%loc%proc_domain ) then
-        CALL da_Stats_Calculate( n, 0, oi%sonde_sfc(n)%u%qc,  & 
+        CALL da_stats_calculate( n, 0, oi%sonde_sfc(n)%u%qc,  & 
                               re%sonde_sfc(n)%u, nu, & 
                               sonde_sfc%minimum%u, sonde_sfc%maximum%u, &
                               sonde_sfc%average%u, sonde_sfc%rms_err%u )
-        CALL da_Stats_Calculate( n, 0, oi%sonde_sfc(n)%v%qc,  & 
+        CALL da_stats_calculate( n, 0, oi%sonde_sfc(n)%v%qc,  & 
                               re%sonde_sfc(n)%v, nv, & 
                               sonde_sfc%minimum%v, sonde_sfc%maximum%v, &
                               sonde_sfc%average%v, sonde_sfc%rms_err%v )
-        CALL da_Stats_Calculate( n, 0, oi%sonde_sfc(n)%t%qc,  & 
+        CALL da_stats_calculate( n, 0, oi%sonde_sfc(n)%t%qc,  & 
                               re%sonde_sfc(n)%t, nt, & 
                               sonde_sfc%minimum%t, sonde_sfc%maximum%t, &
                               sonde_sfc%average%t, sonde_sfc%rms_err%t )
-        CALL da_Stats_Calculate( n, 0, oi%sonde_sfc(n)%p%qc,  & 
+        CALL da_stats_calculate( n, 0, oi%sonde_sfc(n)%p%qc,  & 
                               re%sonde_sfc(n)%p, np, & 
                               sonde_sfc%minimum%p, sonde_sfc%maximum%p, &
                               sonde_sfc%average%p, sonde_sfc%rms_err%p )
-        CALL da_Stats_Calculate( n, 0, oi%sonde_sfc(n)%q%qc,  & 
+        CALL da_stats_calculate( n, 0, oi%sonde_sfc(n)%q%qc,  & 
                               re%sonde_sfc(n)%q, nq, & 
                               sonde_sfc%minimum%q, sonde_sfc%maximum%q, &
                               sonde_sfc%average%q, sonde_sfc%rms_err%q )
@@ -91,11 +91,11 @@ SUBROUTINE DA_AO_Stats_Sonde_sfc( stats_unit, oi, re )
   IF ( wrf_dm_on_monitor() ) THEN
     IF ( nu /= 0 .or. nv /= 0 .or. nt /= 0 .or. np /= 0 .or. nq /= 0 ) THEN
       write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for sonde_sfc'
-      call DA_Print_Stats_Sonde_sfc(stats_unit, nu, nv, nt, np, nq, sonde_sfc)
+      call da_print_stats_sonde_sfc(stats_unit, nu, nv, nt, np, nq, sonde_sfc)
     END IF
   END IF
 
-END SUBROUTINE DA_AO_Stats_Sonde_sfc
+END SUBROUTINE da_ao_stats_sonde_sfc
 
 
 

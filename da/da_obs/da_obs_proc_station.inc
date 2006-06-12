@@ -1,4 +1,4 @@
-  SUBROUTINE DA_Obs_Proc_Station(obs)
+  SUBROUTINE da_obs_proc_station(obs)
 
 ! Processing obs data read in at a station:
 !
@@ -26,7 +26,7 @@ loop_levels: DO i = 1, obs % info % levels
          if (abs(po -  missing_r) > 1. .and. abs(to -  missing_r) > 1. .and. &
              abs(rho-  missing_r) > 1.) then
 
-             call DA_TP_To_Qs(to, po, es, qs )
+             call da_tp_to_qs(to, po, es, qs )
 
              if (rho > 100.) then
                qvo = qs
@@ -46,5 +46,5 @@ loop_levels: DO i = 1, obs % info % levels
 
    enddo loop_levels
 
-END SUBROUTINE DA_Obs_Proc_Station
+END SUBROUTINE da_obs_proc_station
 

@@ -104,7 +104,7 @@ subroutine da_read_kma1dvar (inst,iv, ob, xp, inunit, infile)
 
         info%lat  =  rlat
         info%lon  =  rlon
-        call DA_ll_to_xy (info, loc, xp, outside, inside_halo )
+        call da_ll_to_xy (info, loc, xp, outside, inside_halo )
         if (outside) cycle
 
         info%elv = srf_height

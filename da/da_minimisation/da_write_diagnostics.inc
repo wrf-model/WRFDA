@@ -1,4 +1,4 @@
-      subroutine DA_Write_Diagnostics( ob, iv, re, y, xp, xa, j )
+      subroutine da_write_diagnostics( ob, iv, re, y, xp, xa, j )
 !---- -------------------------------------------------------------------------
 !  PURPOSE: Output data assimilation diagnostics.
 !
@@ -36,55 +36,55 @@
    
 !  [1.1] Sondes:
 
-      call DA_OI_Stats_Sound ( stats_unit, iv )
+      call da_oi_stats_sound ( stats_unit, iv )
 
-      call DA_OI_Stats_Sonde_sfc ( stats_unit, iv )
+      call da_oi_stats_sonde_sfc ( stats_unit, iv )
 
 !  [1.2] Surface:
 
-      call DA_OI_Stats_Synop ( stats_unit, iv )
+      call da_oi_stats_synop ( stats_unit, iv )
  
 !  [1.3.1] Geostationary Satellite Cloud track winds:
 
-      call DA_OI_Stats_GeoAMV ( stats_unit, iv )
+      call da_oi_stats_geoamv ( stats_unit, iv )
 
 
 !  [1.3.2] Polar Satellite Cloud track winds:
 
-      call DA_OI_Stats_PolarAMV ( stats_unit, iv )
+      call da_oi_stats_polaramv ( stats_unit, iv )
 
 
 !  [1.4] Aireps:
 
-      call DA_OI_Stats_Airep ( stats_unit, iv )
+      call da_oi_stats_airep ( stats_unit, iv )
 
 !  [1.5] Pilot:
 
-      call DA_OI_Stats_Pilot ( stats_unit, iv )
+      call da_oi_stats_pilot ( stats_unit, iv )
 
 !  [1.6] Metar:
 
-      call DA_OI_Stats_Metar ( stats_unit, iv )
+      call da_oi_stats_metar ( stats_unit, iv )
 
 !  [1.7] Ships:
 
-      call DA_OI_Stats_Ships ( stats_unit, iv )
+      call da_oi_stats_ships ( stats_unit, iv )
 
 !  [1.8] GPSPW:
 
-      call DA_OI_Stats_Gpspw ( stats_unit, iv )
+      call da_oi_stats_gpspw ( stats_unit, iv )
 
 !  [1.9] GPSPW:
 
-      call DA_OI_Stats_Gpsref ( stats_unit, iv )
+      call da_oi_stats_gpsref ( stats_unit, iv )
 
 !  [1.10] SSMI:
 
-      call DA_OI_Stats_SSMI ( stats_unit, iv )
+      call da_oi_stats_ssmi ( stats_unit, iv )
 
 !  [1.11] SATEMs:
 
-      call  DA_OI_Stats_Satem ( stats_unit, iv )
+      call  da_oi_stats_satem ( stats_unit, iv )
 
 !  [1.12] Pseudo obs:
 
@@ -104,24 +104,24 @@
 
 !  [1.16] Profiler:
 
-      call DA_OI_Stats_Profiler ( stats_unit, iv )
+      call da_oi_stats_profiler ( stats_unit, iv )
 
 !  [1.17] Buoy:  
 
-      call DA_OI_Stats_Buoy ( stats_unit, iv )
+      call da_oi_stats_buoy ( stats_unit, iv )
 
 !  [1.18] Radar: 
 
-      call DA_OI_Stats_Radar ( stats_unit, iv )
+      call da_oi_stats_radar ( stats_unit, iv )
 
 !  [1.19] TC bogus:
 
-      call DA_OI_Stats_bogus ( stats_unit, iv )
+      call da_oi_stats_bogus ( stats_unit, iv )
 
 !  [1.20] Radiance:
 
 !      print *, 'iv%num_inst = ', iv%num_inst
-      call DA_OMB_Stats_Rad ( stats_unit, iv )
+      call da_omb_stats_rad ( stats_unit, iv )
 
 
 !---- -------------------------------------------------------------------------
@@ -131,55 +131,55 @@
 !  [2.1] Sondes:
 
       num_sound_tot = 0
-      call DA_AO_Stats_Sound ( stats_unit, iv, re )
-      call DA_AO_Stats_Sonde_sfc ( stats_unit, iv, re )
+      call da_ao_stats_sound ( stats_unit, iv, re )
+      call da_ao_stats_sonde_sfc ( stats_unit, iv, re )
 
 !  [2.2] Surface:
 
-      call DA_AO_Stats_Synop ( stats_unit, iv, re )
+      call da_ao_stats_synop ( stats_unit, iv, re )
 
 !  [2.3.1] Geostationary Satellite Cloud track winds:
 
-      call DA_AO_Stats_GeoAMV ( stats_unit, iv, re )
+      call da_ao_stats_geoamv ( stats_unit, iv, re )
 
 
 !  [2.3.2] Polar Satellite Cloud track winds:
 
-      call DA_AO_Stats_PolarAMV ( stats_unit, iv, re )
+      call da_ao_stats_polaramv ( stats_unit, iv, re )
 
 
 
 !  [2.4] Aireps:
 
-      call DA_AO_Stats_Airep ( stats_unit, iv, re )
+      call da_ao_stats_airep ( stats_unit, iv, re )
 
 !  [2.5] Pilot:
 
-      call DA_AO_Stats_Pilot ( stats_unit, iv, re )
+      call da_ao_stats_pilot ( stats_unit, iv, re )
 
 !  [2.6] Metar:
 
-      call DA_AO_Stats_Metar ( stats_unit, iv, re )
+      call da_ao_stats_metar ( stats_unit, iv, re )
 
 !  [2.7] Ships:
 
-      call DA_AO_Stats_Ships ( stats_unit, iv, re )
+      call da_ao_stats_ships ( stats_unit, iv, re )
 
 !  [2.8] GPSPW:
 
-      call DA_AO_Stats_Gpspw ( stats_unit, iv, re )
+      call da_ao_stats_gpspw ( stats_unit, iv, re )
 
 !  [2.9] GPSRF:
 
-      call DA_AO_Stats_Gpsref ( stats_unit, iv, re )
+      call da_ao_stats_gpsref ( stats_unit, iv, re )
 
 !  [2.10] SSMI:
 
-      call DA_AO_Stats_SSMI ( stats_unit, iv, re )
+      call da_ao_stats_ssmi ( stats_unit, iv, re )
 
 !  [2.11] SATEMs:
 
-      call DA_AO_Stats_Satem ( stats_unit, iv, re )
+      call da_ao_stats_satem ( stats_unit, iv, re )
    
 !  [2.12] Pseudo obs:
 
@@ -199,29 +199,29 @@
 
 !  [2.16] Profiler
 
-      call DA_AO_Stats_Profiler ( stats_unit, iv, re )
+      call da_ao_stats_profiler ( stats_unit, iv, re )
 
 !  [2.17] Buoy: 
 
-      call DA_AO_Stats_Buoy ( stats_unit, iv, re )
+      call da_ao_stats_buoy ( stats_unit, iv, re )
 
 !  [2.18] Radar:
 
-      call DA_AO_Stats_Radar ( stats_unit, iv, re )
+      call da_ao_stats_radar ( stats_unit, iv, re )
 
 !  [2.19] TC bogus:
 
-      call DA_AO_Stats_Bogus ( stats_unit, iv, re )
+      call da_ao_stats_bogus ( stats_unit, iv, re )
 
 !  [2.20] Radiance:
 
-      call DA_OMA_Stats_Rad ( stats_unit, iv, re )
+      call da_oma_stats_rad ( stats_unit, iv, re )
 
 !---- -------------------------------------------------------------------------
 !  [3.0] Calculate analysis increment (A-B) statistics:
 !------------------------------------------------------------------------------
 
-      call DA_Analysis_Stats ( stats_unit, xp, xa )
+      call da_analysis_stats ( stats_unit, xp, xa )
                     
 !---- -------------------------------------------------------------------------
 !  [4.0] Write VAR diagnostic :
@@ -241,4 +241,4 @@
    IF (trace_use) CALL da_trace_exit("da_write_diagnostics")
 
  
-   end subroutine DA_Write_Diagnostics
+   end subroutine da_write_diagnostics

@@ -1,4 +1,4 @@
-SUBROUTINE sfc_wtq_lin(psfc, tg, ps, ts, qs, us, vs, regime,           &
+SUBROUTINE da_sfc_wtq_lin(psfc, tg, ps, ts, qs, us, vs, regime,           &
                        psfc_prime,tg_prime,ps_prime,ts_prime,qs_prime, &
                        us_prime,vs_prime, hs,roughness,xland,          &
                        u10_prime,v10_prime,t2_prime,q2_prime) 
@@ -144,8 +144,8 @@ SUBROUTINE sfc_wtq_lin(psfc, tg, ps, ts, qs, us, vs, regime,           &
 !     temperature
 !     ----------------------------------------------------------------
 
-      call DA_TP_To_Qs( tg, psfc, eg, qg )
-      call DA_TP_To_Qs_Lin1( tg, psfc, eg, tg_prime, psfc_prime, qg_prime )
+      call da_tp_to_qs( tg, psfc, eg, qg )
+      call da_tp_to_qs_lin1( tg, psfc, eg, tg_prime, psfc_prime, qg_prime )
 
       qg_prime = qg_prime * qg
 
@@ -527,4 +527,4 @@ SUBROUTINE sfc_wtq_lin(psfc, tg, ps, ts, qs, us, vs, regime,           &
       q2_prime = (1.0-psiq2/psiq) * qg_prime + psiq2/psiq * qs_prime + &
                  (qs -qg)*(psiq2/psiq) * (psiq2_prime/psiq2 - psiq_prime/psiq)
 
-END SUBROUTINE sfc_wtq_lin
+END SUBROUTINE da_sfc_wtq_lin

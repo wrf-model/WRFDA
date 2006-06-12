@@ -398,7 +398,7 @@ SUBROUTINE da_transfer_kmatoxb( xbx, grid, &
 #if 0
 !------------------------------------------------------------------------------
 
-      call sfc_wtq(xb%psfc(i,j), xb%tgrn(i,j), &
+      call da_sfc_wtq(xb%psfc(i,j), xb%tgrn(i,j), &
                    xb%p(i,j,ks), xb%t(i,j,ks), xb%q(i,j,ks), &
                    xb%u(i,j,ks), xb%v(i,j,ks), &
                    xb%p(i,j,ks+1), xb%t(i,j,ks+1), xb%q(i,j,ks+1), &

@@ -1,4 +1,4 @@
-SUBROUTINE DA_AO_Stats_Profiler( stats_unit, oi, re )
+SUBROUTINE da_ao_stats_profiler( stats_unit, oi, re )
 
    IMPLICIT NONE
 
@@ -30,11 +30,11 @@ SUBROUTINE DA_AO_Stats_Profiler( stats_unit, oi, re )
       if( oi%profiler(n)%loc%proc_domain ) then
 
        do k=1, oi%Profiler(n)%info%levels
-         CALL da_Stats_Calculate( n, k, oi%Profiler(n)%u(k)%qc, & 
+         CALL da_stats_calculate( n, k, oi%Profiler(n)%u(k)%qc, & 
                                re%Profiler(n)%u(k), nu, & 
-                               Profiler%minimum%u, Profiler%maximum%u, &
-                               Profiler%average%u, Profiler%rms_err%u )
-         CALL da_Stats_Calculate( n, k, oi%Profiler(n)%v(k)%qc, & 
+                               profiler%minimum%u, Profiler%maximum%u, &
+                               profiler%average%u, Profiler%rms_err%u )
+         CALL da_stats_calculate( n, k, oi%Profiler(n)%v(k)%qc, & 
                                re%Profiler(n)%v(k), nv, & 
                                Profiler%minimum%v, Profiler%maximum%v, &
                                Profiler%average%v, Profiler%rms_err%v )
@@ -64,11 +64,11 @@ SUBROUTINE DA_AO_Stats_Profiler( stats_unit, oi, re )
    
       write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for Profiler'
    
-      call DA_Print_Stats_Profiler(stats_unit, nu, nv, Profiler)
+      call da_print_stats_profiler(stats_unit, nu, nv, Profiler)
    
     END IF
    
    END IF
 
-END SUBROUTINE DA_AO_Stats_Profiler
+END SUBROUTINE da_ao_stats_profiler
 

@@ -73,7 +73,7 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
       call da_allocate_y (iv, re)
 !
       if ( iter > 0 ) &
-         call DA_Transform_VToY( cv_size, be, ep, xhat, iv, vp, vv, xa, xb, xbx, xp, y, &
+         call da_transform_vtoy( cv_size, be, ep, xhat, iv, vp, vv, xa, xb, xbx, xp, y, &
                                  ids, ide, jds, jde, kds, kde,             &
                                  ims, ime, jms, jme, kms, kme,             &
                                  its, ite, jts, jte, kts, kte,             &
@@ -144,7 +144,7 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
 !     [5.0] calculate grad_v (jo):
 !-------------------------------------------------------------------------
 
-      call DA_Transform_VToY_Adj( cv_size, be, ep, j_grad, iv, vp, vv, xa, xb, xbx, xp, jo_grad_y, &
+      call da_transform_vtoy_adj( cv_size, be, ep, j_grad, iv, vp, vv, xa, xb, xbx, xp, jo_grad_y, &
                                   ids, ide, jds, jde, kds, kde,     &
                                   ims, ime, jms, jme, kms, kme,     &
                                   its, ite, jts, jte, kts, kte,     &

@@ -70,7 +70,7 @@ SUBROUTINE da_add_pbl_and_sfc_info( xp, xb, xbx )
 
    ! do j = js,je
    !    do i = is,ie
-   !       call DA_TPQ_To_SLP( xb%t(i,j,:), xb%q(i,j,:), xb%p(i,j,:), xb%terr(i,j), &
+   !       call da_tpq_to_slp( xb%t(i,j,:), xb%q(i,j,:), xb%p(i,j,:), xb%terr(i,j), &
    !                        xb%psfc(i,j), xb%slp(i,j), xp )
    !    end do
    ! end do
@@ -118,7 +118,7 @@ SUBROUTINE da_add_pbl_and_sfc_info( xp, xb, xbx )
                zrhom=zrhom+(xb%hf(i,j,k+1)-xb%hf(i,j,k))*xb%h(i,j,k)*xb%q(i,j,k)*xb%rho(i,j,k)
             END DO
 
-            !  call DA_Transform_XToZRhoQ(xb, i, j, xb%h(i,j,:), xb%hf(i,j,:), zrhom)
+            !  call da_transform_xtozrhoq(xb, i, j, xb%h(i,j,:), xb%hf(i,j,:), zrhom)
 
             htpw  = zrhom/tpw/1000.
 
@@ -140,7 +140,7 @@ SUBROUTINE da_add_pbl_and_sfc_info( xp, xb, xbx )
 
    do j=js,je
       do i=is,ie
-         call sfc_wtq(xb%psfc(i,j), xb%tgrn(i,j), &
+         call da_sfc_wtq(xb%psfc(i,j), xb%tgrn(i,j), &
                       xb%p(i,j,1), xb%t(i,j,1), xb%q(i,j,1), &
                       xb%u(i,j,1), xb%v(i,j,1), &
                       xb%p(i,j,2), xb%t(i,j,2), xb%q(i,j,2), &

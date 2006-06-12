@@ -23,69 +23,69 @@
 
 !     for radiosonde:
 
-      call da_calculate_residual_Sound( iv, y, re, np_missing, np_bad_data, &
+      call da_calculate_residual_sound( iv, y, re, np_missing, np_bad_data, &
                                         np_obs_used, np_available )
 
-      call da_calculate_residual_Sonde_sfc( iv, y, re, np_missing, np_bad_data, &
+      call da_calculate_residual_sonde_sfc( iv, y, re, np_missing, np_bad_data, &
                                             np_obs_used, np_available )
 
 !     for surface
 
-      call da_calculate_residual_Synop( iv, y, re, np_missing, np_bad_data, &
+      call da_calculate_residual_synop( iv, y, re, np_missing, np_bad_data, &
                                         np_obs_used, np_available )
 
 !     for Geo. Satellite AMVs :
 
-      call da_calculate_residual_GeoAMV( iv, y, re, np_missing, np_bad_data, &
+      call da_calculate_residual_geoamv( iv, y, re, np_missing, np_bad_data, &
                                         np_obs_used, np_available )
 
 !     for Polar Satellite AMVs :
 
-      call da_calculate_residual_PolarAMV( iv, y, re, np_missing, np_bad_data, &
+      call da_calculate_residual_polaramv( iv, y, re, np_missing, np_bad_data, &
                                         np_obs_used, np_available )
 
 !     for airep:
 
-      call da_calculate_residual_Airep( iv, y, re, np_missing, np_bad_data, &
+      call da_calculate_residual_airep( iv, y, re, np_missing, np_bad_data, &
                                         np_obs_used, np_available )
 
 !     for metar
 
-      call da_calculate_residual_Metar( iv, y, re, np_missing, np_bad_data, &
+      call da_calculate_residual_metar( iv, y, re, np_missing, np_bad_data, &
                                         np_obs_used, np_available )
 
 !     for ships
 
-      call da_calculate_residual_Ships( iv, y, re, np_missing, np_bad_data, & 
+      call da_calculate_residual_ships( iv, y, re, np_missing, np_bad_data, & 
                                         np_obs_used, np_available )
 
 !  GPSPW:
 
-      call da_calculate_residual_Gpspw( iv, y, re, np_missing, np_bad_data, &
+      call da_calculate_residual_gpspw( iv, y, re, np_missing, np_bad_data, &
                                         np_obs_used, np_available ) 
 
 !  GPSRF:
 
-      call da_calculate_residual_Gpsref( iv, y, re, np_missing, np_bad_data, &
+      call da_calculate_residual_gpsref( iv, y, re, np_missing, np_bad_data, &
                                         np_obs_used, np_available ) 
 
 !     for SSMI
 
-      call DA_Cal_Residual_SSMI( iv, y, re, np_missing, np_bad_data, &
+      call da_cal_residual_ssmi( iv, y, re, np_missing, np_bad_data, &
                                  np_obs_used, np_available )
 !     for SSMT1
 
-      call DA_Cal_Residual_ssmt1( iv, y, re, np_missing, np_bad_data, &
+      call da_cal_residual_ssmt1( iv, y, re, np_missing, np_bad_data, &
                                   np_obs_used, np_available )
 
 !     for SSMT2
 
-      call DA_Cal_Residual_ssmt2( iv, y, re, np_missing, np_bad_data, &
+      call da_cal_residual_ssmt2( iv, y, re, np_missing, np_bad_data, &
                                   np_obs_used, np_available )
                                  
 !     for pilot
 
-      call da_calculate_residual_Pilot( iv, y, re, np_missing, np_bad_data, &
+      call da_calculate_residual_pilot( iv, y, re, np_missing, np_bad_data, &
                                         np_obs_used, np_available )
 
 !     for TC bogus
@@ -95,12 +95,12 @@
 
 !     for Satem
 
-      call da_calculate_residual_Satem( iv, y, re, np_missing, np_bad_data, &
+      call da_calculate_residual_satem( iv, y, re, np_missing, np_bad_data, &
                                         np_obs_used, np_available )
 
 !    Pseudo-obs
 
-      call da_calculate_residual_Pseudo( iv, y, re, &
+      call da_calculate_residual_pseudo( iv, y, re, &
                                          np_missing, np_bad_data, &
                                          np_obs_used, np_available )
 !    Quikscat scatterometer:
@@ -111,19 +111,19 @@
 
 !    for Radar
 
-      call da_calculate_residual_Radar( iv, y, re, &
+      call da_calculate_residual_radar( iv, y, re, &
                                         np_missing, np_bad_data, &
                                         np_obs_used, np_available )
 
 
 !     for profiler
 
-      call da_calculate_residual_Profiler( iv, y, re, np_missing, np_bad_data, &
+      call da_calculate_residual_profiler( iv, y, re, np_missing, np_bad_data, &
                                         np_obs_used, np_available )
 
 !     for buoy   
 
-      call da_calculate_residual_Buoy( iv, y, re, np_missing, np_bad_data, & 
+      call da_calculate_residual_buoy( iv, y, re, np_missing, np_bad_data, & 
                                         np_obs_used, np_available )
 
 !     for radiance

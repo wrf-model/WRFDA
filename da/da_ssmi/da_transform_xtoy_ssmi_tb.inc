@@ -40,7 +40,7 @@ SUBROUTINE da_transform_xtoy_ssmi_tb( xb, oi, xa, xp, y )
 
 !!total precipitable water in cm
 
-!  call DA_Transform_XToTPW( xa, xb)
+!  call da_transform_xtotpw( xa, xb)
 
 !  do j=1,mjy-1
 !  do i=1,mix-1
@@ -94,8 +94,8 @@ SUBROUTINE da_transform_xtoy_ssmi_tb( xb, oi, xa, xp, y )
 
 !!Column height weighted moisture density on the grid locally 
 
-!     call DA_Transform_XToZRhoQ(xb, i, j, zh, zf, zrhom)
-!     call DA_Transform_XToZRhoQ_Lin(xb, xa, i, j, zh, zf, TGL_zrhom)
+!     call da_transform_xtozrhoq(xb, i, j, zh, zf, zrhom)
+!     call da_transform_xtozrhoq_lin(xb, xa, i, j, zh, zf, TGL_zrhom)
 
 !!Column moisture density on the grid locally
 
@@ -109,7 +109,7 @@ SUBROUTINE da_transform_xtoy_ssmi_tb( xb, oi, xa, xp, y )
 !  do j=1,mjy-1
 !  do i=1,mix-1
 
-!     call TGL_tb(1,53.,psfc(i,j),ta(i,j),gamma(i,j),sst(i,j),tpw(i,j),  &
+!     call tgl_tb(1,53.,psfc(i,j),ta(i,j),gamma(i,j),sst(i,j),tpw(i,j),  &
 !                 htpw(i,j),speed(i,j),alw(i,j),zcld(i,j),               &
 !                 xb%tb19v(i,j),xb%tb19h(i,j),                           &
 !                 TGL_psfc(i,j),TGL_ta(i,j),TGL_gamma(i,j),TGL_sst(i,j), &

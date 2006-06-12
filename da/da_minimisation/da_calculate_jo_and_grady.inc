@@ -29,7 +29,7 @@
 
 !     Radiosonde
 
-      call da_calculate_jo_and_grady_Sound( iv, re, jo, jo_grad_y)
+      call da_calculate_jo_and_grady_sound( iv, re, jo, jo_grad_y)
       jo_sound = jo % sound_u + jo % sound_v + &
                  jo % sound_t + jo % sound_q
 
@@ -42,7 +42,7 @@
               'jo%sound_q =', jo%sound_q
       endif
 
-      call da_get_jo_and_grady_Sonde_sfc( iv, re, jo, jo_grad_y)
+      call da_get_jo_and_grady_sonde_sfc( iv, re, jo, jo_grad_y)
       jo_sound = jo_sound         + jo % sonde_sfc_u + jo % sonde_sfc_v + &
                  jo % sonde_sfc_t + jo % sonde_sfc_q + jo % sonde_sfc_p
 
@@ -58,7 +58,7 @@
 
 !     Surface
 
-      call da_calculate_jo_and_grady_Synop( iv, re, jo, jo_grad_y)
+      call da_calculate_jo_and_grady_synop( iv, re, jo, jo_grad_y)
       jo_synop = jo % synop_u + jo % synop_v + jo % synop_t + &
                  jo % synop_p + jo % synop_q
 
@@ -97,39 +97,39 @@
 
 !     Airep
 
-      call da_calculate_jo_and_grady_Airep( iv, re, jo, jo_grad_y)
+      call da_calculate_jo_and_grady_airep( iv, re, jo, jo_grad_y)
       jo_airep = jo % airep_u + jo % airep_v + jo % airep_t
 
 !     Pilot
 
-      call da_calculate_jo_and_grady_Pilot( iv, re, jo, jo_grad_y)
+      call da_calculate_jo_and_grady_pilot( iv, re, jo, jo_grad_y)
       jo_pilot = jo % pilot_u + jo % pilot_v
       
 !     Satem
 
-      call da_calculate_jo_and_grady_Satem( iv, re, jo, jo_grad_y)
+      call da_calculate_jo_and_grady_satem( iv, re, jo, jo_grad_y)
       jo_satem = jo % satem_thickness
 
 !     Metar:
 
-      call da_calculate_jo_and_grady_Metar( iv, re, jo, jo_grad_y)
+      call da_calculate_jo_and_grady_metar( iv, re, jo, jo_grad_y)
       jo_metar = jo % metar_u + jo % metar_v + jo % metar_t + &
                  jo % metar_p + jo % metar_q
 
 !     Ships:
 
-      call da_calculate_jo_and_grady_Ships( iv, re, jo, jo_grad_y)
+      call da_calculate_jo_and_grady_ships( iv, re, jo, jo_grad_y)
       jo_ships = jo % ships_u + jo % ships_v + jo % ships_t + &
                  jo % ships_p + jo % ships_q
 
 !     GPSPW:
 
-      call da_calculate_jo_and_grady_Gpspw( iv, re, jo, jo_grad_y)
+      call da_calculate_jo_and_grady_gpspw( iv, re, jo, jo_grad_y)
       jo_gpspw = jo % gpspw_tpw
 
 !     GPSRF:
 
-      call da_get_jo_and_grady_Gpsref( iv, re, jo, jo_grad_y)
+      call da_get_jo_and_grady_gpsref( iv, re, jo, jo_grad_y)
       jo_gpsref = jo % gpsref_ref
 
 !     SSMI:
@@ -148,7 +148,7 @@
 
 !     Radar obs:
 
-      call DA_Calculate_Jo_and_GradY_Radar( iv, re, jo, jo_grad_y)
+      call da_calculate_jo_and_grady_radar( iv, re, jo, jo_grad_y)
       jo_Radar = jo % Radar_rv + jo % Radar_rf
 
 !     Pseudo obs:
@@ -164,7 +164,7 @@
 
 !     Profiler:
 
-      call da_get_jo_and_grady_Profiler (iv, re, jo, jo_grad_y)
+      call da_get_jo_and_grady_profiler (iv, re, jo, jo_grad_y)
       jo_profiler = jo % profiler_u + jo % profiler_v
 
 !     TC bogus:
@@ -175,7 +175,7 @@
       
 !     Buoy: 
 
-      call da_calculate_jo_and_grady_Buoy ( iv, re, jo, jo_grad_y)
+      call da_calculate_jo_and_grady_buoy ( iv, re, jo, jo_grad_y)
       jo_buoy = jo % buoy_u + jo % buoy_v + jo % buoy_t + &
                 jo % buoy_p + jo % buoy_q
 

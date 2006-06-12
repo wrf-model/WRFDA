@@ -70,7 +70,7 @@ SUBROUTINE da_transfer_xatokma( xbx, grid, &
        xb%psfc(i,j) = xb%psfc(i,j) + xa%psfc(i,j)
    enddo
    enddo
- if(write_increments) call DA_Write_KMA_Increments(xp, xb, xa)
+ if(write_increments) call da_write_kma_increments(xp, xb, xa)
 
    do j=js,je
       do i=is,ie

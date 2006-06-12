@@ -1,6 +1,6 @@
 
 !============================================================================
-SUBROUTINE DA_Transform_XToTb_Adj (xa, xb)
+SUBROUTINE da_transform_xtotb_adj (xa, xb)
 !----------------------------------------------------------------------------
    IMPLICIT NONE
 !----------------------------------------------------------------------------
@@ -72,7 +72,7 @@ SUBROUTINE DA_Transform_XToTb_Adj (xa, xb)
          zrhom=zrhom+(xb%hf(i,j,k+1)-xb%hf(i,j,k))*xb%h(i,j,k)*xb%q(i,j,k)*xb%rho(i,j,k)
       END DO
 
-!     call DA_Transform_XToZRhoQ(xb, i, j, zh, zf, zrhom)
+!     call da_transform_xtozrhoq(xb, i, j, zh, zf, zrhom)
 
       htpw    = zrhom/tpw/1000.
 
@@ -106,7 +106,7 @@ SUBROUTINE DA_Transform_XToTb_Adj (xa, xb)
 !                 ADJ_tpw,ADJ_htpw,ADJ_speed,ADJ_alw,        &
 !                 ADJ_zcld,xa%tb19v(i,j),xa%tb19h(i,j)
 
-      call ADJ_tb(1,53.,psfc,ta,gamma,xb%tgrn(i,j),tpw,      &
+      call da_adj_tb(1,53.,psfc,ta,gamma,xb%tgrn(i,j),tpw,      &
                   htpw,xb%speed(i,j),alw,zcld,               &
                   xb%tb19v(i,j),xb%tb19h(i,j),               &
                   ADJ_psfc,ADJ_ta,ADJ_gamma,ADJ_sst,         &
@@ -130,7 +130,7 @@ SUBROUTINE DA_Transform_XToTb_Adj (xa, xb)
 !        print *, '1. i,j,ADJ_tpw,ADJ_htpw=', i,j,ADJ_tpw,ADJ_htpw
 !     endif
 
-      call ADJ_tb(2,53.,psfc,ta,gamma,xb%tgrn(i,j),tpw,      &
+      call da_adj_tb(2,53.,psfc,ta,gamma,xb%tgrn(i,j),tpw,      &
                   htpw,xb%speed(i,j),alw,zcld,               &
                   xb%tb22v(i,j),dum1,                        &
                   ADJ_psfc,ADJ_ta,ADJ_gamma,ADJ_sst,         &
@@ -141,7 +141,7 @@ SUBROUTINE DA_Transform_XToTb_Adj (xa, xb)
 !        print *, '2. i,j,ADJ_tpw,ADJ_htpw=', i,j,ADJ_tpw,ADJ_htpw
 !     endif
 
-      call ADJ_tb(3,53.,psfc,ta,gamma,xb%tgrn(i,j),tpw,      &
+      call da_adj_tb(3,53.,psfc,ta,gamma,xb%tgrn(i,j),tpw,      &
                   htpw,xb%speed(i,j),alw,zcld,               &
                   xb%tb37v(i,j),xb%tb37h(i,j),               &
                   ADJ_psfc,ADJ_ta,ADJ_gamma,ADJ_sst,         &
@@ -152,7 +152,7 @@ SUBROUTINE DA_Transform_XToTb_Adj (xa, xb)
 !        print *, '3. i,j,ADJ_tpw,ADJ_htpw=', i,j,ADJ_tpw,ADJ_htpw
 !     endif
 
-      call ADJ_tb(4,53.,psfc,ta,gamma,xb%tgrn(i,j),tpw,      &
+      call da_adj_tb(4,53.,psfc,ta,gamma,xb%tgrn(i,j),tpw,      &
                   htpw,xb%speed(i,j),alw,zcld,               &
                   xb%tb85v(i,j),xb%tb85h(i,j),               &
                   ADJ_psfc,ADJ_ta,ADJ_gamma,ADJ_sst,         &
@@ -171,7 +171,7 @@ SUBROUTINE DA_Transform_XToTb_Adj (xa, xb)
          xa%q(i,j,k)   = (xb%hf(i,j,k+1)-xb%hf(i,j,k))*xb%h(i,j,k)*ADJ_zrhom*xb%rho(i,j,k) + xa%q(i,j,k)
       END DO
 
-!     call DA_Transform_XToZRhoQ_Adj(xb,xa,i,j,zh,zf,ADJ_zrhom)
+!     call da_transform_xtozrhoq_adj(xb,xa,i,j,zh,zf,ADJ_zrhom)
 
       ADJ_alw = 0.
 
@@ -190,10 +190,10 @@ SUBROUTINE DA_Transform_XToTb_Adj (xa, xb)
    enddo
    enddo
 
-END SUBROUTINE DA_Transform_XToTb_Adj
+END SUBROUTINE da_transform_xtotb_adj
 
 !============================================================================
-SUBROUTINE ADJ_tb(ifreq,theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld,            &
+subroutine da_adj_tb(ifreq,theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld,            &
                   tbv,tbh,                                                  &
                   ADJ_p0,ADJ_ta,ADJ_gamma,ADJ_sst,ADJ_wv,                   &
                   ADJ_hwv,ADJ_u,ADJ_alw,ADJ_zcld,ADJ_tbv,ADJ_tbh            )
@@ -370,7 +370,7 @@ SUBROUTINE ADJ_tb(ifreq,theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld,            &
       ADJ_dum = 0.
       dum     = 0.
       ADJ_effangh = 0.
-      call ADJ_tbatmos(ifreq,effangh,p0,wv,hwv,ta,gamma,alw,    &
+      call da_adj_tbatmos(ifreq,effangh,p0,wv,hwv,ta,gamma,alw,    &
                        zcld,dum,tbdnh,dum,                      &
                        ADJ_effangh,ADJ_p0,ADJ_wv,ADJ_hwv,       &
                        ADJ_ta,ADJ_gamma,ADJ_alw,ADJ_zcld,       &
@@ -382,7 +382,7 @@ SUBROUTINE ADJ_tb(ifreq,theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld,            &
 !                 ADJ_hwv,ADJ_u,ADJ_alw,ADJ_zcld,ADJ_tbv,ADJ_tbh            
 
       ADJ_effangv = 0.
-      call ADJ_tbatmos(ifreq,effangv,p0,wv,hwv,ta,gamma,alw,    &
+      call da_adj_tbatmos(ifreq,effangv,p0,wv,hwv,ta,gamma,alw,    &
                        zcld,dum,tbdnv,dum,                      &
                        ADJ_effangv,ADJ_p0,ADJ_wv,ADJ_hwv,       &
                        ADJ_ta,ADJ_gamma,ADJ_alw,ADJ_zcld,       & 
@@ -393,10 +393,10 @@ SUBROUTINE ADJ_tb(ifreq,theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld,            &
 !    print*,'ifreq 3',ADJ_p0,ADJ_ta,ADJ_gamma,ADJ_sst,ADJ_wv,  &
 !                 ADJ_hwv,ADJ_u,ADJ_alw,ADJ_zcld,ADJ_tbv,ADJ_tbh            
 
-      call ADJ_effang(ifreq,theta,gx2,sigma,effangv,effangh,    &
+      call da_adj_effang(ifreq,theta,gx2,sigma,effangv,effangh,    &
                       ADJ_gx2,ADJ_sigma,ADJ_effangv,ADJ_effangh )
 
-      call ADJ_roughem(ifreq,gx2,sst,theta,remv,remh,         &
+      call da_adj_roughem(ifreq,gx2,sst,theta,remv,remh,         &
                        ADJ_gx2,ADJ_sst,ADJ_remv,ADJ_remh      )
 
       ADJ_tauatm = - costhet*ADJ_sigma/tauatm + ADJ_tauatm
@@ -405,7 +405,7 @@ SUBROUTINE ADJ_tb(ifreq,theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld,            &
 !     print*,'ifreq 4',ADJ_p0,ADJ_ta,ADJ_gamma,ADJ_sst,ADJ_wv,  &
 !                 ADJ_hwv,ADJ_u,ADJ_alw,ADJ_zcld,ADJ_tbv,ADJ_tbh            
 
-      call ADJ_tbatmos(ifreq,theta,p0,wv,hwv,ta,gamma,alw,zcld, &
+      call da_adj_tbatmos(ifreq,theta,p0,wv,hwv,ta,gamma,alw,zcld, &
                        tbup,tbdn,tauatm,                        &
                        ADJ_theta,ADJ_p0,ADJ_wv,ADJ_hwv,ADJ_ta,ADJ_gamma,  &
                        ADJ_alw,ADJ_zcld,ADJ_tbup,ADJ_tbdn,      &
@@ -419,10 +419,10 @@ SUBROUTINE ADJ_tb(ifreq,theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld,            &
 !                 ADJ_hwv,ADJ_u,ADJ_alw,ADJ_zcld,ADJ_tbv,ADJ_tbh            
 !!! end
 
- end SUBROUTINE ADJ_tb
+ end subroutine da_adj_tb
 
 !============================================================================
-SUBROUTINE ADJ_cal_sigma_v(ifreq,p0,wv,hwv,ta,gamma,sigv,                   &
+subroutine da_adj_cal_sigma_v(ifreq,p0,wv,hwv,ta,gamma,sigv,                   &
                            ADJ_p0,ADJ_wv,ADJ_hwv,ADJ_ta,ADJ_gamma,ADJ_sigma_v)
 ! ---------------------------------------------------------------------------
 IMPLICIT NONE
@@ -692,10 +692,10 @@ IMPLICIT NONE
 
       ADJ_wv  = ADJ_wvc*wvcor(ifreq) + ADJ_wv
 
-END SUBROUTINE ADJ_cal_sigma_v
+END subroutine da_adj_cal_sigma_v
 
 !====================================================================
-SUBROUTINE ADJ_effht(ho,hv,sigo,sigv,mu,zcld,hdn,hup,hdninf,hupinf, &
+subroutine da_adj_effht(ho,hv,sigo,sigv,mu,zcld,hdn,hup,hdninf,hupinf, &
                      ADJ_ho,ADJ_hv,ADJ_sigo,ADJ_sigv,ADJ_mu,        &
                      ADJ_zcld,ADJ_hdn,ADJ_hup,ADJ_hdninf,ADJ_hupinf )
 !--------------------------------------------------------------------
@@ -1157,10 +1157,10 @@ IMPLICIT NONE
 
 !! end !!
 
-END SUBROUTINE ADJ_effht
+END subroutine da_adj_effht
 
 !============================================================================
-SUBROUTINE ADJ_epsalt(f,t,ssw,epsr,epsi,                                    &
+subroutine da_adj_epsalt(f,t,ssw,epsr,epsi,                                    &
                       ADJ_t, ADJ_epsr, ADJ_epsi                             )
 ! ---------------------------------------------------------------------------
 IMPLICIT NONE
@@ -1268,10 +1268,10 @@ IMPLICIT NONE
 !!! end
 
 
-END SUBROUTINE ADJ_epsalt
+END subroutine da_adj_epsalt
 
 !---------------------------------------------------------------------------
-SUBROUTINE ADJ_spemiss(f,tk,theta,ssw,ev,eh,                               &
+subroutine da_adj_spemiss(f,tk,theta,ssw,ev,eh,                               &
                        ADJ_tk,ADJ_ev,ADJ_eh                                )
 !---------------------------------------------------------------------------
 IMPLICIT NONE
@@ -1363,15 +1363,15 @@ IMPLICIT NONE
       ADJ_epsr    =  real(ADJ_eps)
       ADJ_epsi    =  -aimag(ADJ_eps) 
       ADJ_tc      =  0.
-      CALL ADJ_epsalt(f,tc,ssw,epsr,epsi,ADJ_tc, ADJ_epsr, ADJ_epsi  )
+      call da_adj_epsalt(f,tc,ssw,epsr,epsi,ADJ_tc, ADJ_epsr, ADJ_epsi  )
 
       ADJ_tk      =  ADJ_tc + ADJ_tk
 
 
-END SUBROUTINE ADJ_spemiss
+END subroutine da_adj_spemiss
 
 !==================================================================
- SUBROUTINE ADJ_tbatmos(ifreq,theta,p0,wv,hwv,ta,gamma,lw,zcld,   &
+ subroutine da_adj_tbatmos(ifreq,theta,p0,wv,hwv,ta,gamma,lw,zcld,   &
                         tbup,tbdn,tauatm,                         &
                         ADJ_theta,ADJ_p0,ADJ_wv,ADJ_hwv,ADJ_ta,ADJ_gamma,   &
                         ADJ_lw,ADJ_zcld,ADJ_tbup,ADJ_tbdn,        &
@@ -1617,7 +1617,7 @@ END SUBROUTINE ADJ_spemiss
        ADJ_sigo = ADJ_sig + ADJ_sigo
        ADJ_sigv = ADJ_sig + ADJ_sigv
 
-       CALL ADJ_effht(ho,hv,sigo,sigv,mu,zcld,hdn,hup,        &
+       call da_adj_effht(ho,hv,sigo,sigv,mu,zcld,hdn,hup,        &
                       hdninf,hupinf,                          &
                       ADJ_ho,ADJ_hv,ADJ_sigo,ADJ_sigv,ADJ_mu, &
                       ADJ_zcld,ADJ_hdn,ADJ_hup,ADJ_hdninf,    &
@@ -1655,17 +1655,17 @@ END SUBROUTINE ADJ_spemiss
        ADJ_ta    = - otbar*otbar*ADJ_otbar + ADJ_ta
        ADJ_gamma =   otbar*otbar*ADJ_otbar*zeta(ifreq) + ADJ_gamma
 
-       CALL ADJ_cal_sigma_v(ifreq,p0,wv,hwv,ta,gamma,sigv,   &
+       call da_adj_cal_sigma_v(ifreq,p0,wv,hwv,ta,gamma,sigv,   &
                             ADJ_p0,ADJ_wv,ADJ_hwv,ADJ_ta,    &
                             ADJ_gamma,ADJ_sigv               )
 
        ADJ_theta = mu*mu*0.0174533*ADJ_mu*sin(theta*0.0174533) + ADJ_theta
 
 !
-END SUBROUTINE ADJ_tbatmos
+END subroutine da_adj_tbatmos
 
 !=================================================================
-SUBROUTINE ADJ_effang(ifreq,theta,gx2,sigma,effangv,effangh,     &
+subroutine da_adj_effang(ifreq,theta,gx2,sigma,effangv,effangh,     &
                       ADJ_gx2,ADJ_sigma,ADJ_effangv,ADJ_effangh  )
 ! ----------------------------------------------------------------
   IMPLICIT NONE
@@ -2115,10 +2115,10 @@ SUBROUTINE ADJ_effang(ifreq,theta,gx2,sigma,effangv,effangh,     &
       endif
 
 
-END SUBROUTINE ADJ_effang
+END subroutine da_adj_effang
 
 !=================================================================
-SUBROUTINE ADJ_roughem(ifreq,gx2,tk,theta,remv,remh,             &
+subroutine da_adj_roughem(ifreq,gx2,tk,theta,remv,remh,             &
                        ADJ_gx2,ADJ_tk,ADJ_remv,ADJ_remh          )
 ! ----------------------------------------------------------------
 IMPLICIT NONE
@@ -2195,7 +2195,7 @@ IMPLICIT NONE
       remv = remv_save
       remh = remh_save
 
-      CALL ADJ_spemiss(f(ifreq),tk,theta,ssw,semv,semh,  &
+      call da_adj_spemiss(f(ifreq),tk,theta,ssw,semv,semh,  &
                        ADJ_tk,ADJ_semv,ADJ_semh           )
 
  
@@ -2259,4 +2259,4 @@ IMPLICIT NONE
       ADJ_gx2= 0.5*ADJ_g     + ADJ_gx2
       ADJ_tk = ADJ_tp/273.0  + ADJ_tk
  
-END SUBROUTINE ADJ_roughem
+END subroutine da_adj_roughem

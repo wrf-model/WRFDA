@@ -1,4 +1,4 @@
-SUBROUTINE DA_AO_Stats_Metar( stats_unit, oi, re )
+SUBROUTINE da_ao_stats_metar( stats_unit, oi, re )
 
   IMPLICIT NONE
 
@@ -38,23 +38,23 @@ SUBROUTINE DA_AO_Stats_Metar( stats_unit, oi, re )
   IF ( oi%num_metar > 0 ) THEN
     DO n=1, oi%num_metar
       if( oi%metar(n)%loc%proc_domain ) then
-        CALL da_Stats_Calculate( n, 0, oi%metar(n)%u%qc, & 
+        CALL da_stats_calculate( n, 0, oi%metar(n)%u%qc, & 
                               re%metar(n)%u, nu, &
                               metar%minimum%u, metar%maximum%u, &
                               metar%average%u, metar%rms_err%u )
-        CALL da_Stats_Calculate( n, 0, oi%metar(n)%v%qc, & 
+        CALL da_stats_calculate( n, 0, oi%metar(n)%v%qc, & 
                               re%metar(n)%v, nv, &
                               metar%minimum%v, metar%maximum%v, &
                               metar%average%v, metar%rms_err%v )
-        CALL da_Stats_Calculate( n, 0, oi%metar(n)%t%qc, & 
+        CALL da_stats_calculate( n, 0, oi%metar(n)%t%qc, & 
                               re%metar(n)%t, nt, &
                               metar%minimum%t, metar%maximum%t, &
                               metar%average%t, metar%rms_err%t )
-        CALL da_Stats_Calculate( n, 0, oi%metar(n)%p%qc, & 
+        CALL da_stats_calculate( n, 0, oi%metar(n)%p%qc, & 
                               re%metar(n)%p, np, &
                               metar%minimum%p, metar%maximum%p, &
                               metar%average%p, metar%rms_err%p )
-        CALL da_Stats_Calculate( n, 0, oi%metar(n)%q%qc, & 
+        CALL da_stats_calculate( n, 0, oi%metar(n)%q%qc, & 
                               re%metar(n)%q, nq, &
                               metar%minimum%q, metar%maximum%q, &
                               metar%average%q, metar%rms_err%q )
@@ -95,12 +95,12 @@ SUBROUTINE DA_AO_Stats_Metar( stats_unit, oi, re )
   IF ( wrf_dm_on_monitor() ) THEN
     IF ( nu /= 0 .or. nv /= 0 .or. nt /= 0 .or. np /= 0 .or. nq /= 0 ) THEN
       write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for metar'
-      call DA_Print_Stats_Metar(stats_unit, nu, nv, nt, np, nq, metar)
+      call da_print_stats_metar(stats_unit, nu, nv, nt, np, nq, metar)
     END IF
   END IF
 
   IF (trace_use) CALL da_trace_exit("da_ao_stats_metar")
 
 
-END SUBROUTINE DA_AO_Stats_Metar
+END SUBROUTINE da_ao_stats_metar
 

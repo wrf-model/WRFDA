@@ -165,7 +165,7 @@ subroutine da_transform_vtox( cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa, &
          end if
          call da_transform_xtoseasfcwind_lin( xa, xb )
       endif
-      if ( Use_SsmiTbObs ) call DA_Transform_XToTb_Lin (xa, xb)
+      if ( Use_SsmiTbObs ) call da_transform_xtotb_lin (xa, xb)
 
 !-----Exchange XA halo region.
       CALL wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id8)

@@ -523,7 +523,7 @@ SUBROUTINE da_transfer_wrftoxb( xbx, grid, &
 !-----Calculate surface variable(wind, moisture, temperature)
 !-----sfc variables: 10-m wind, and 2-m T, Q, at cross points
 
-      call sfc_wtq(xb%psfc(i,j), xb%tgrn(i,j), &
+      call da_sfc_wtq(xb%psfc(i,j), xb%tgrn(i,j), &
                    xb%p(i,j,ks), xb%t(i,j,ks), xb%q(i,j,ks), &
                    xb%u(i,j,ks), xb%v(i,j,ks), &
                    xb%p(i,j,ks+1), xb%t(i,j,ks+1), xb%q(i,j,ks+1), &
@@ -649,7 +649,7 @@ SUBROUTINE da_transfer_wrftoxb( xbx, grid, &
 !--Ground-based GPS ZTD must follow the GPS Refractivity calculation. YRG 04/05/05
 !------------------------------------------------------------------------------
 
-!  if (Use_GpsztdObs) call DA_Transform_XToZTD( xb )
+!  if (Use_GpsztdObs) call da_transform_xtoztd( xb )
 
 !------------------------------------------------------------------------------
 !--Calculate means for later use in setting up background errors.

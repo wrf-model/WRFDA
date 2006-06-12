@@ -92,7 +92,7 @@ SUBROUTINE da_setup_obs_structures_bufr( xp, ob, iv )
 !         if(Use_RadarObs) then
 !!-----------scan Radar OBSERVATION FILE
 !            write(filename(1:10), fmt='(a, i2.2)') 'radarob.', n
-!            call DA_Scan_BUFR_Radar(Radar_iunit-1, iv, xp, filename)
+!            call da_scan_bufr_radar(Radar_iunit-1, iv, xp, filename)
 !         endif
       enddo
    else
@@ -101,7 +101,7 @@ SUBROUTINE da_setup_obs_structures_bufr( xp, ob, iv )
 
 !-----scan MAIN BODY OF Radar OBSERVATION FILE
 !      if(Use_RadarObs) &
-!      call DA_Scan_BUFR_Radar(Radar_iunit-1, iv, xp)
+!      call da_scan_bufr_radar(Radar_iunit-1, iv, xp)
    endif
 !--------------------------------------------------------------------
 !--Safety guard.
@@ -194,7 +194,7 @@ SUBROUTINE da_setup_obs_structures_bufr( xp, ob, iv )
 !         if(Use_RadarObs) then
 !!-----------Read Radar OBSERVATION FILE
 !            write(filename(1:10), fmt='(a, i2.2)') 'radarob.', n
-!            call DA_Read_BUFR_Radar(Radar_iunit, iv, xp, filename)
+!            call da_read_bufr_radar(Radar_iunit, iv, xp, filename)
 !         endif
       enddo
    else
@@ -205,7 +205,7 @@ SUBROUTINE da_setup_obs_structures_bufr( xp, ob, iv )
 
 !      if(Use_RadarObs) then
 !!--------Read Radar OBSERVATION FILE
-!         call DA_Read_BUFR_Radar(Radar_iunit, iv, xp)
+!         call da_read_bufr_radar(Radar_iunit, iv, xp)
 !      endif
    endif
 

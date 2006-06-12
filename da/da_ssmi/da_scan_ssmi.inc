@@ -1,4 +1,4 @@
-SUBROUTINE DA_Scan_SSMI (iunit, ob, xp, filename)
+SUBROUTINE da_scan_ssmi (iunit, ob, xp, filename)
 
 !-----------------------------------------------------------------------------!
 ! Read the header of a MM5 3D-VAR 2.0 GTS observation file
@@ -198,7 +198,7 @@ head_line_2:  DO
 !-----Compute the model horizontal coordinate x, y
 !-----Check if obs is wihin horizontal domain
 
-      call DA_ll_to_xy (info, loc, xp, outside, inside_halo)
+      call da_ll_to_xy (info, loc, xp, outside, inside_halo)
 
       IF ( outside ) CYCLE reports
 
@@ -266,5 +266,5 @@ head_line_2:  DO
    ob%ob_numb(ob%current_ob_time)%ssmi_retrieval = ob%num_ssmi_retrieval
    ob%ob_numb(ob%current_ob_time)%ssmi_tb        = ob%num_ssmi_tb
 
-END SUBROUTINE DA_Scan_SSMI
+END SUBROUTINE da_scan_ssmi
 

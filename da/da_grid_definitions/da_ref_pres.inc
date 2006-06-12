@@ -13,7 +13,7 @@ subroutine da_ref_pres(height, ref_pres)
 
    real :: aa, bb, cc, hh, htop, ziso, p0iso
 
-   call DA_Ref_height(ptop, htop)
+   call da_ref_height(ptop, htop)
 
    bb = rovg * ts0
    aa = rovg * tlp * 0.5

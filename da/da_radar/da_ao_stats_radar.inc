@@ -1,4 +1,4 @@
-SUBROUTINE DA_AO_Stats_Radar( stats_unit, oi, re )
+SUBROUTINE da_ao_stats_radar( stats_unit, oi, re )
 
    IMPLICIT NONE
 
@@ -32,14 +32,14 @@ SUBROUTINE DA_AO_Stats_Radar( stats_unit, oi, re )
       do k=1, oi%Radar(n)%info%levels
 
          IF ( USE_Radar_rv ) THEN
-         CALL da_Stats_Calculate( n, k, oi%Radar(n)%rv(k)%qc, & 
+         CALL da_stats_calculate( n, k, oi%Radar(n)%rv(k)%qc, & 
                                re%Radar(n)%rv(k), nrv, & 
                                Radar%minimum%rv, Radar%maximum%rv, &
                                Radar%average%rv, Radar%rms_err%rv )
          ENDIF
 
          IF ( USE_Radar_rf ) THEN
-         CALL da_Stats_Calculate( n, k, oi%Radar(n)%rf(k)%qc, & 
+         CALL da_stats_calculate( n, k, oi%Radar(n)%rf(k)%qc, & 
                                re%Radar(n)%rf(k), nrf, & 
                                Radar%minimum%rf, Radar%maximum%rf, &
                                Radar%average%rf, Radar%rms_err%rf )
@@ -76,10 +76,10 @@ SUBROUTINE DA_AO_Stats_Radar( stats_unit, oi, re )
   
          write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for Radar'
 
-         call DA_Print_Stats_Radar(stats_unit, nrv, nrf, Radar)
+         call da_print_stats_radar(stats_unit, nrv, nrf, Radar)
 
       END IF
 
    END IF
 
-END SUBROUTINE DA_AO_Stats_Radar
+END SUBROUTINE da_ao_stats_radar

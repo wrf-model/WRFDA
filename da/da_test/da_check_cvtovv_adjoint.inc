@@ -1,4 +1,4 @@
-SUBROUTINE DA_Check_CvToVv_Adjoint( cv_size, xb, xbx, xp, be, cv, vv, &
+SUBROUTINE da_check_cvtovv_adjoint( cv_size, xb, xbx, xp, be, cv, vv, &
                                     ids,ide, jds,jde, kds,kde, &
                                     ims,ime, jms,jme, kms,kme, &
                                     its,ite, jts,jte, kts,kte )
@@ -40,7 +40,7 @@ SUBROUTINE DA_Check_CvToVv_Adjoint( cv_size, xb, xbx, xp, be, cv, vv, &
 !-------------------------------------------------------------------------
 
    if ( global ) then
-      call DA_Transform_VToVv_Global( cv_size, xb, xbx, be, cv, vv, &
+      call da_transform_vtovv_global( cv_size, xb, xbx, be, cv, vv, &
                                       ids, ide, jds, jde, kds, kde, &
                                       ims, ime, jms, jme, kms, kme, &
                                       its, ite, jts, jte, kts, kte )
@@ -70,12 +70,12 @@ SUBROUTINE DA_Check_CvToVv_Adjoint( cv_size, xb, xbx, xp, be, cv, vv, &
 !-------------------------------------------------------------------------
 
    if ( global ) then
-       call DA_Transform_VToVv_Global_Adj( cv_size, xb, xbx, be, cv2, vv, &
+       call da_transform_vtovv_global_adj( cv_size, xb, xbx, be, cv2, vv, &
                                            ids, ide, jds, jde, kds, kde, &
                                            ims, ime, jms, jme, kms, kme, &
                                            its, ite, jts, jte, kts, kte )
    else
-      call DA_Transform_VToVv_Adj( cv_size, xb, be, cv2, vv, xp, &
+      call da_transform_vtovv_adj( cv_size, xb, be, cv2, vv, xp, &
                                    ids,ide, jds,jde, kds,kde,  &
                                    ims,ime, jms,jme, kms,kme,  &
                                    its,ite, jts,jte, kts,kte )
@@ -114,4 +114,4 @@ SUBROUTINE DA_Check_CvToVv_Adjoint( cv_size, xb, xbx, xp, be, cv, vv, &
    write(unit=stdout, fmt='(/a/)') &
         'DA_Check_CvToVv_Adjoint: Test Finished.'
 
-END SUBROUTINE DA_Check_CvToVv_Adjoint
+END SUBROUTINE da_check_cvtovv_adjoint

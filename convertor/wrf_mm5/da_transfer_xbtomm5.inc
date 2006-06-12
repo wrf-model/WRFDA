@@ -93,7 +93,7 @@ subroutine da_transfer_xbtomm5( xp, xb )
          endif
 
          if(print_info) &
-            call DA_print_big_header(xb_mm5%big_header%bhi, xb_mm5%big_header%bhr, &
+            call da_print_big_header(xb_mm5%big_header%bhi, xb_mm5%big_header%bhr, &
                                      xb_mm5%big_header%bhic,xb_mm5%big_header%bhrc)
          big_head_flag = flag
       elseif (flag == 1) then
@@ -116,7 +116,7 @@ subroutine da_transfer_xbtomm5( xp, xb )
          endif
 
          if(print_info) then
-            call DA_print_sub_header(xb_mm5%sub_header(nv))
+            call da_print_sub_header(xb_mm5%sub_header(nv))
          endif
 
          index = xb_mm5 % big_header % bhi(1,1)
@@ -402,7 +402,7 @@ subroutine da_transfer_xbtomm5( xp, xb )
       end if
 
       if(print_info) then
-         call DA_print_sub_header(xb_mm5%sub_header(n))
+         call da_print_sub_header(xb_mm5%sub_header(n))
       endif
 
       write(anl_unit) flag
@@ -478,7 +478,7 @@ subroutine da_transfer_xbtomm5( xp, xb )
          endif
 
          if(print_info) &
-            call DA_print_big_header(xb_mm5%big_header%bhi, xb_mm5%big_header%bhr, &
+            call da_print_big_header(xb_mm5%big_header%bhi, xb_mm5%big_header%bhr, &
                                      xb_mm5%big_header%bhic,xb_mm5%big_header%bhrc)
       elseif (flag == 1) then
 
@@ -516,7 +516,7 @@ subroutine da_transfer_xbtomm5( xp, xb )
          endif
 
          if(print_info) then
-            call DA_print_sub_header(xb_mm5%sub_header(nv))
+            call da_print_sub_header(xb_mm5%sub_header(nv))
          endif
 
       elseif (flag == 2) then
@@ -553,7 +553,7 @@ subroutine da_transfer_xbtomm5( xp, xb )
          endif
 
          if(print_info) &
-            call DA_print_big_header(xb_mm5%big_header%bhi, xb_mm5%big_header%bhr, &
+            call da_print_big_header(xb_mm5%big_header%bhi, xb_mm5%big_header%bhr, &
                                      xb_mm5%big_header%bhic,xb_mm5%big_header%bhrc)
       elseif (flag == 1) then
 
@@ -575,7 +575,7 @@ subroutine da_transfer_xbtomm5( xp, xb )
          endif
 
          if(print_info) then
-            call DA_print_sub_header(xb_mm5%sub_header(nv))
+            call da_print_sub_header(xb_mm5%sub_header(nv))
          endif
 
          allocate(data(xb_mm5%sub_header(nv)%start_index(1):xb_mm5%sub_header(nv)%end_index(1), &
@@ -601,7 +601,7 @@ subroutine da_transfer_xbtomm5( xp, xb )
             xb_mm5%sub_header(n) % current_date = ANALYSIS_DATE ! Forecast date
 
             if(print_info) &
-               call DA_print_big_header(xb_mm5%big_header%bhi, xb_mm5%big_header%bhr, &
+               call da_print_big_header(xb_mm5%big_header%bhi, xb_mm5%big_header%bhr, &
                                         xb_mm5%big_header%bhic,xb_mm5%big_header%bhrc)
 
             write(anl_unit) flag

@@ -73,13 +73,13 @@ subroutine da_interp_eta2sigma(xb)
          pf = xb%psac(i,j)*sigmaf(k) + xb%ptop
          ph = xb%psac(i,j)*sigmah(k) + xb%ptop
 
-         call DA_Ref_height(pf, fe(k))
-         call DA_Ref_height(ph, he(k))
+         call da_ref_height(pf, fe(k))
+         call da_ref_height(ph, he(k))
       enddo
 
       pf = xb%psac(i,j)*sigmaf(kep1) + xb%ptop
 
-      call DA_Ref_height(pf, fe(kep1))
+      call da_ref_height(pf, fe(kep1))
 
       if(print_detail > 0) then
          if(i == is .and. j == js) then

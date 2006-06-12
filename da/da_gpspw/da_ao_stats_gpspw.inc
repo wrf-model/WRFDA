@@ -1,4 +1,4 @@
-SUBROUTINE DA_AO_Stats_Gpspw( stats_unit, oi, re )
+SUBROUTINE da_ao_stats_gpspw( stats_unit, oi, re )
 
   IMPLICIT NONE
 
@@ -26,7 +26,7 @@ SUBROUTINE DA_AO_Stats_Gpspw( stats_unit, oi, re )
   IF ( oi%num_Gpspw > 0 ) THEN
     DO n=1, oi%num_Gpspw
       if( oi%gpspw(n)%loc%proc_domain ) then
-        CALL  da_Stats_Calculate( n, 0, oi%gpspw(n)%tpw%qc, &
+        CALL  da_stats_calculate( n, 0, oi%gpspw(n)%tpw%qc, &
                               re%gpspw(n)%tpw, ntpw,   &
                               gpspw%minimum%tpw,  gpspw%maximum%tpw, &
                               gpspw%average%tpw,  gpspw%rms_err%tpw)
@@ -76,9 +76,9 @@ SUBROUTINE DA_AO_Stats_Gpspw( stats_unit, oi, re )
   IF ( wrf_dm_on_monitor() ) THEN
     IF ( ntpw /= 0) THEN
       write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for Gpspw'
-      call DA_Print_Stats_Gpspw(stats_unit, ntpw, Gpspw)
+      call da_print_stats_gpspw(stats_unit, ntpw, Gpspw)
     END IF
   END IF
 
-END SUBROUTINE DA_AO_Stats_Gpspw
+END SUBROUTINE da_ao_stats_gpspw
 

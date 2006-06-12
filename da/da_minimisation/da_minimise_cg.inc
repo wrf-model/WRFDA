@@ -1,4 +1,4 @@
-subroutine DA_Minimise_CG( grid, config_flags,            &
+subroutine da_minimise_cg( grid, config_flags,            &
                            it, cv_size, ob, xb, xbx, be, ep, iv, &
                            j_grad_norm_target, xhat, cv, &
                            xa, vv, vp, xp, re, y, j,  &
@@ -120,7 +120,7 @@ subroutine DA_Minimise_CG( grid, config_flags,            &
 !-------------------------------------------------------------------------
       fhat = phat
 
-         call DA_Transform_VToY( cv_size, be, ep, fhat, iv, vp, vv, xa, xb, xbx, xp, y,         &
+         call da_transform_vtoy( cv_size, be, ep, fhat, iv, vp, vv, xa, xb, xbx, xp, y,         &
                                  ids, ide, jds, jde, kds, kde,                     &
                                  ims, ime, jms, jme, kms, kme,                     &
                                  its, ite, jts, jte, kts, kte,                     &
@@ -128,7 +128,7 @@ subroutine DA_Minimise_CG( grid, config_flags,            &
 
          call da_calculate_grady( iv, y , jo_grad_y)
 
-         call DA_Transform_VToY_Adj( cv_size, be, ep, fhat, iv, vp, vv, xa, xb, xbx, xp, jo_grad_y, &
+         call da_transform_vtoy_adj( cv_size, be, ep, fhat, iv, vp, vv, xa, xb, xbx, xp, jo_grad_y, &
                                      ids, ide, jds, jde, kds, kde,                     &
                                      ims, ime, jms, jme, kms, kme,                     &
                                      its, ite, jts, jte, kts, kte,                     &
@@ -220,5 +220,5 @@ subroutine DA_Minimise_CG( grid, config_flags,            &
 
       IF (trace_use) CALL da_trace_exit("da_minimise_cg")
 
-      end subroutine DA_Minimise_CG
+      end subroutine da_minimise_cg
 

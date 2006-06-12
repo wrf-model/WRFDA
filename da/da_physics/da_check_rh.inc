@@ -62,11 +62,11 @@
 ! modify xa%rh
                xa%rh(i,j,k) = maximum_rh - xb%rh(i,j,k)
 
-               call DA_TP_To_Qs( xb%t(i,j,k)+xa%t(i,j,k), xb%p(i,j,k)+xa%p(i,j,k), &
+               call da_tp_to_qs( xb%t(i,j,k)+xa%t(i,j,k), xb%p(i,j,k)+xa%p(i,j,k), &
                                  es, x_qs(k))
 
 ! calculate xa%q
-               call DA_TPRH_To_Q_Lin1( xb%t(i,j,k), xb%p(i,j,k), xb%es(i,j,k),      &
+               call da_tprh_to_q_lin1( xb%t(i,j,k), xb%p(i,j,k), xb%es(i,j,k),      &
                                  xb%q(i,j,k), xb%rh(i,j,k),  xa%t(i,j,k) ,           &
                                  xa%p(i,j,k), xa%rh(i,j,k), xa%q(i,j,k) )
 
@@ -78,10 +78,10 @@
             if ( rhtol(k) .lt. minimum_rh ) then
                oldrha           = xa%rh(i,j,k)
                xa%rh(i,j,k)     = minimum_rh - xb%rh(i,j,k)
-               call DA_TP_To_Qs( xb%t(i,j,k)+xa%t(i,j,k), xb%p(i,j,k)+xa%p(i,j,k), &
+               call da_tp_to_qs( xb%t(i,j,k)+xa%t(i,j,k), xb%p(i,j,k)+xa%p(i,j,k), &
                                  es, x_qs(k) )
 
-               call DA_TPRH_To_Q_Lin1( xb%t(i,j,k), xb%p(i,j,k), xb%es(i,j,k),      &
+               call da_tprh_to_q_lin1( xb%t(i,j,k), xb%p(i,j,k), xb%es(i,j,k),      &
                                  xb%q(i,j,k), xb%rh(i,j,k),  xa%t(i,j,k),            &
                                  xa%p(i,j,k), xa%rh(i,j,k), xa%q(i,j,k) )
 
@@ -95,7 +95,7 @@
          if ( tol_adjust_moist .gt. 0. ) then
             DO k=ks,ke
                if ( rhtol(k) .lt. upper_modify_rh .and. imod(k) .eq. 0) then
-                  call DA_TP_To_Qs( xb%t(i,j,k)+xa%t(i,j,k), &
+                  call da_tp_to_qs( xb%t(i,j,k)+xa%t(i,j,k), &
                                     xb%p(i,j,k)+xa%p(i,j,k),es,x_qs(k))
 
                   each_moist   = rhtol(k)*x_qs(k)* &
@@ -109,7 +109,7 @@
          if ( tol_adjust_moist .lt. 0. ) then
             DO k=ks,ke
                if ( rhtol(k) .gt. lower_modify_rh .and. imod(k) .eq. 0) then
-                  call DA_TP_To_Qs( xb%t(i,j,k)+xa%t(i,j,k), &
+                  call da_tp_to_qs( xb%t(i,j,k)+xa%t(i,j,k), &
                                     xb%p(i,j,k)+xa%p(i,j,k), es, x_qs(k) )
 
                   each_moist   = rhtol(k)*x_qs(k)* &
@@ -125,7 +125,7 @@
            DO k=ks,ke
              if ( imod(k) .eq. 1) then
                xa%rh(i,j,k) = xa%rh(i,j,k)+(xb%rh(i,j,k)+xa%rh(i,j,k))*weight
-               call DA_TPRH_To_Q_Lin1( xb%t(i,j,k), xb%p(i,j,k), xb%es(i,j,k),  &
+               call da_tprh_to_q_lin1( xb%t(i,j,k), xb%p(i,j,k), xb%es(i,j,k),  &
                                       xb%q(i,j,k), xb%rh(i,j,k),  xa%t(i,j,k) , &
                                       xa%p(i,j,k), xa%rh(i,j,k), xa%q(i,j,k) )
 

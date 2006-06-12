@@ -1,4 +1,4 @@
-subroutine DA_Transform_Through_RF( mz, grid_box_area, rf_alpha, val,&
+subroutine da_transform_through_rf( mz, grid_box_area, rf_alpha, val,&
                                     xp, field, &
                                     ids,ide, jds,jde, kds,kde,  &
                                     ims,ime, jms,jme, kms,kme,  &
@@ -68,7 +68,7 @@ subroutine DA_Transform_Through_RF( mz, grid_box_area, rf_alpha, val,&
    do m = xp%ktsx, min(xp%ktex,mz)
       do j = xp%jtsx, xp%jtex
          do pass = 1, rf_passes_over_two
-            call DA_Recursive_Filter_1D( pass, rf_alpha(m), &
+            call da_recursive_filter_1d( pass, rf_alpha(m), &
                         xp % v1x(xp%itsx:xp%itex,j,m), n )
          end do
       end do
@@ -90,7 +90,7 @@ subroutine DA_Transform_Through_RF( mz, grid_box_area, rf_alpha, val,&
       do i = xp%itsy, xp%itey
          val_j(xp%jtsy:xp%jtey) = xp%v1y(i,xp%jtsy:xp%jtey,m)
          do pass = 1, rf_passes_over_two
-            call DA_Recursive_Filter_1D( pass, rf_alpha(m), &
+            call da_recursive_filter_1d( pass, rf_alpha(m), &
                                          val_j, n )
          end do
          xp % v1y(i,xp%jtsy:xp%jtey,m) = val_j(xp%jtsy:xp%jtey)
@@ -126,5 +126,5 @@ subroutine DA_Transform_Through_RF( mz, grid_box_area, rf_alpha, val,&
       end do
    END IF
 
-end subroutine DA_Transform_Through_RF
+end subroutine da_transform_through_rf
 
