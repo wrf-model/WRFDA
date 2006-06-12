@@ -24,7 +24,7 @@ SUBROUTINE da_wrfvar_init( no_init1 )
   IF ( .NOT. PRESENT( no_init1 ) ) THEN
     CALL init_modules(1)
     ! Initialize utilities (time manager, etc.)
-    CALL WRF_UTIL_Initialize( defaultCalendar=WRF_UTIL_CAL_GREGORIAN )
+    CALL wrf_util_initialize( defaultCalendar=WRF_UTIL_CAL_GREGORIAN )
   ENDIF
   ! Phase 2 resumes after MPI_INIT() (if it is called)
   CALL init_modules(2)
@@ -102,7 +102,7 @@ SUBROUTINE da_wrfvar_init( no_init1 )
   ! CALL nl_get_max_dom( 1, max_dom )
   IF ( max_dom > 1 ) THEN
 #if ( ! defined(DM_PARALLEL)  &&   ! defined(STUBMPI) )
-    CALL wrf_error_fatal3(__FILE__,__LINE__, &
+    CALL wrf_error(__FILE__,__LINE__, &
       'nesting requires either an MPI build or use of the -DSTUBMPI option' ) 
 #endif
   END IF

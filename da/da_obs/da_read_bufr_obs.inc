@@ -115,7 +115,7 @@ SUBROUTINE da_read_bufr_obs (iunit, ob, xp, filename)
            'return code from readmg:', iret, &
            'Reach the end of obs unit: ', iunit
 
-      CALL wrf_error_fatal3(__FILE__,__LINE__, &
+      CALL wrf_error(__FILE__,__LINE__, &
         "No BUFR observations")
    end if
 !------------------------------------------------------------------------------
@@ -901,7 +901,7 @@ SUBROUTINE da_read_bufr_obs (iunit, ob, xp, filename)
          if( num_bogus > max_bogus_input) then
            WRITE(UNIT=errmsg(1),FMT='(A,I6,A,I6)') &
              'Bogus #=', num_bogus, ' > max_bogus_input=', max_bogus_input
-           CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
+           CALL wrf_error(__FILE__,__LINE__,errmsg(1))
          endif
 
          ob%bogus(num_bogus)%info = platform%info
@@ -1081,6 +1081,6 @@ SUBROUTINE da_read_bufr_obs (iunit, ob, xp, filename)
            'ob%ob_numb(ob%current_ob_time)%profiler=', ob%ob_numb(ob%current_ob_time)%profiler, &
            'ob%num_profiler=', ob%num_profiler
 
-      CALL wrf_error_fatal3(__FILE__,__LINE__,"Obs mismatch")
+      CALL wrf_error(__FILE__,__LINE__,"Obs mismatch")
    endif
 END SUBROUTINE da_read_bufr_obs

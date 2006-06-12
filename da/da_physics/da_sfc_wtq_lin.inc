@@ -1,4 +1,4 @@
-SUBROUTINE sfc_wtq_Lin(psfc, tg, ps, ts, qs, us, vs, regime,           &
+SUBROUTINE sfc_wtq_lin(psfc, tg, ps, ts, qs, us, vs, regime,           &
                        psfc_prime,tg_prime,ps_prime,ts_prime,qs_prime, &
                        us_prime,vs_prime, hs,roughness,xland,          &
                        u10_prime,v10_prime,t2_prime,q2_prime) 
@@ -484,7 +484,7 @@ SUBROUTINE sfc_wtq_Lin(psfc, tg, ps, ts, qs, us, vs, regime,           &
        CASE DEFAULT;
          WRITE(UNIT=errmsg(1),FMT='(A,I2,A)') &
            "Regime=",iregime," is invalid."
-         CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
+         CALL wrf_error(__FILE__,__LINE__,errmsg(1))
 
       END SELECT
 
@@ -527,4 +527,4 @@ SUBROUTINE sfc_wtq_Lin(psfc, tg, ps, ts, qs, us, vs, regime,           &
       q2_prime = (1.0-psiq2/psiq) * qg_prime + psiq2/psiq * qs_prime + &
                  (qs -qg)*(psiq2/psiq) * (psiq2_prime/psiq2 - psiq_prime/psiq)
 
-END SUBROUTINE sfc_wtq_Lin
+END SUBROUTINE sfc_wtq_lin

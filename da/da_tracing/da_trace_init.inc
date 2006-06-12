@@ -41,7 +41,7 @@ SUBROUTINE da_trace_init
          IOSTAT=IOStatus)    ! O:
    
       IF (IOStatus /= 0) THEN
-         CALL wrf_error_fatal3(__FILE__,__LINE__, &
+         CALL wrf_error(__FILE__,__LINE__, &
             "Cannot open trace file "//TraceFile)
       END IF
    END IF

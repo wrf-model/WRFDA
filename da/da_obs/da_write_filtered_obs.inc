@@ -92,7 +92,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xp )
       IF (iost /= 0) THEN
          write(unit=errmsg(1), fmt='(/a,i3)') &
             'ERROR READING FILE UNIT:', iunit
-         CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))   
+         CALL wrf_error(__FILE__,__LINE__,errmsg(1))   
       ENDIF
 
       if (blank(1:6) == 'EACH  ') EXIT
@@ -116,7 +116,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xp )
       write(unit=errmsg(1), fmt='(/A,I3,A/)') &
            ' ERROR IN INPUT FILE UNIT ',iunit, &
            ' FOR GTS OBSERVATIONS CANNOT BE FOUND OR CANNOT BE OPENED'
-      CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
+      CALL wrf_error(__FILE__,__LINE__,errmsg(1))
    ENDIF
 !----------------------------------------------------------------------------!
     READ (iunit, FMT = '(A80)') blank
@@ -175,7 +175,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xp )
           abs(iv%synop(i)%q%error - missing_r ) > 1. .and.  &
           abs(ob%synop(i)%t       - missing_r ) > 1. .and.  &
           abs(ob%synop(i)%p       - missing_r ) > 1.    ) then 
-         call DA_TP_To_Qs(ob%synop(i)%t, ob%synop(i)%p, es, qs )
+         call da_tp_to_qs(ob%synop(i)%t, ob%synop(i)%p, es, qs )
          rh = (ob%synop(i)%q/qs ) * 100.
        rh_qc = iv%synop(i)%q%qc
       else
@@ -264,7 +264,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xp )
           abs(iv%metar(i)%q%error - missing_r ) > 1. .and.  &
           abs(ob%metar(i)%t       - missing_r ) > 1. .and.  &
           abs(ob%metar(i)%p       - missing_r ) > 1.    ) then 
-         call DA_TP_To_Qs(ob%metar(i)%t, ob%metar(i)%p, es, qs )
+         call da_tp_to_qs(ob%metar(i)%t, ob%metar(i)%p, es, qs )
          rh = (ob%metar(i)%q/qs ) * 100.
        rh_qc = iv%metar(i)%q%qc
       else
@@ -353,7 +353,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xp )
           abs(iv%ships(i)%q%error - missing_r ) > 1. .and.  &
           abs(ob%ships(i)%t       - missing_r ) > 1. .and.  &
           abs(ob%ships(i)%p       - missing_r ) > 1.    ) then 
-         call DA_TP_To_Qs(ob%ships(i)%t, ob%ships(i)%p, es, qs )
+         call da_tp_to_qs(ob%ships(i)%t, ob%ships(i)%p, es, qs )
          rh = (ob%ships(i)%q/qs ) * 100.
        rh_qc = iv%ships(i)%q%qc
       else
@@ -440,7 +440,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xp )
           abs(iv%buoy (i)%q%error - missing_r ) > 1. .and.  &
           abs(ob%buoy (i)%t       - missing_r ) > 1. .and.  &
           abs(ob%buoy (i)%p       - missing_r ) > 1.    ) then 
-         call DA_TP_To_Qs(ob%buoy (i)%t, ob%buoy (i)%p, es, qs )
+         call da_tp_to_qs(ob%buoy (i)%t, ob%buoy (i)%p, es, qs )
          rh = (ob%buoy (i)%q/qs ) * 100.
        rh_qc = iv%buoy (i)%q%qc
       else
@@ -608,7 +608,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xp )
             iv%sound(i)%info%lon,         &
             iv%sound(i)%info%elv,         &
             iv%sound(i)%info%id
-       CALL wrf_error_fatal3(__FILE__,__LINE__, errmsg(1:5))
+       CALL wrf_errors(__FILE__,__LINE__, errmsg(1:5))
      end if
      write(ounit, FMT = fmt_info, IOSTAT = iost) &
                    iv%sound(i)%info%platform,    &
@@ -653,7 +653,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xp )
           abs(iv%sonde_sfc(i)%q%error - missing_r ) > 1. .and.  &
           abs(ob%sonde_sfc(i)%t       - missing_r ) > 1. .and.  &
           abs(ob%sonde_sfc(i)%p       - missing_r ) > 1.    ) then 
-         call DA_TP_To_Qs(ob%sonde_sfc(i)%t, ob%sonde_sfc(i)%p, es, qs )
+         call da_tp_to_qs(ob%sonde_sfc(i)%t, ob%sonde_sfc(i)%p, es, qs )
          rh = (ob%sonde_sfc(i)%q/qs ) * 100.
        rh_qc = iv%sonde_sfc(i)%q%qc
       else
@@ -713,7 +713,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xp )
           abs(iv%sound(i)%q(n)%error - missing_r ) > 1. .and.  &
           abs(ob%sound(i)%t(n)       - missing_r ) > 1. .and.  &
           abs(iv%sound(i)%p(n)       - missing_r ) > 1.    ) then 
-         call DA_TP_To_Qs(ob%sound(i)%t(n), iv%sound(i)%p(n), es, qs )
+         call da_tp_to_qs(ob%sound(i)%t(n), iv%sound(i)%p(n), es, qs )
          rh = (ob%sound(i)%q(n)/qs ) * 100.
        rh_qc = iv%sound(i)%q(n)%qc
       else
@@ -876,7 +876,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xp )
      if( n1 /= i  .or. n2 /= n) then
        WRITE(UNIT=errmsg(1),FMT='(A,4I5)') &
          "mismatch in reading thickness errors from unit 193 ",i,n1,n,n2
-       CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
+       CALL wrf_error(__FILE__,__LINE__,errmsg(1))
      end if
        thick_qc = iv%satem(i)%thickness(n)%qc
        if( iv%satem(i)%thickness(n)%qc < obs_qc_pointer) thick_qc = missing_data
@@ -1113,7 +1113,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xp )
           abs(iv%gpsref(i)%q(n)%error - missing_r ) > 1. .and.  &
           abs(ob%gpsref(i)%t(n)       - missing_r ) > 1. .and.  &
           abs(ob%gpsref(i)%p(n)       - missing_r ) > 1.    ) then 
-         call DA_TP_To_Qs(ob%gpsref(i)%t(n), ob%gpsref(i)%p(n), es, qs )
+         call da_tp_to_qs(ob%gpsref(i)%t(n), ob%gpsref(i)%p(n), es, qs )
          rh = (ob%gpsref(i)%q(n)/qs ) * 100.
        rh_qc = iv%gpsref(i)%q(n)%qc
       else
@@ -1159,7 +1159,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xp )
    IF ( iv % num_ssmi_tb > 0 ) &     
    print*,'Warning ------>  Currently SSMI brightness temperature info is not written'
    rewind ounit
-   call DA_Count_Filtered_Obs(ounit, xp)
+   call da_count_filtered_obs(ounit, xp)
    close (ounit)
 !--------------------------------------------------------------------------
 

@@ -149,7 +149,7 @@ subroutine da_read_bufrtovs (obstype, iv, xp, lnbufr, infile)
   open(unit=lnbufr,file=trim(infile),form='unformatted', &
        iostat = iost, status = 'old')
   if (iost /= 0) then
-    CALL wrf_error_fatal3(__FILE__,__LINE__, &
+    CALL wrf_error(__FILE__,__LINE__, &
       "Cannot open file "//TRIM(infile))
   end if
 
@@ -209,7 +209,7 @@ subroutine da_read_bufrtovs (obstype, iv, xp, lnbufr, infile)
 
         info%lat  =  bfr1bhdr(9)  ! rlat
         info%lon  =  bfr1bhdr(10) ! rlon
-        call DA_ll_to_xy (info, loc, xp, outside, inside_halo )
+        call da_ll_to_xy (info, loc, xp, outside, inside_halo )
         if (outside) cycle
 
 !  3.0     Extract other informations
@@ -303,7 +303,7 @@ subroutine da_read_bufrtovs (obstype, iv, xp, lnbufr, infile)
    size = size + 1
    allocate ( p%next, stat=error)   ! add next data
    if (error /= 0 ) then
-     CALL wrf_error_fatal3(__FILE__,__LINE__, &
+     CALL wrf_error(__FILE__,__LINE__, &
        "Cannot allocate radiance structure")
    end if
 
@@ -330,7 +330,7 @@ subroutine da_read_bufrtovs (obstype, iv, xp, lnbufr, infile)
         i, iv%instid(i)%rttovid_string, iv%instid(i)%num_rad
       allocate( iv%instid(i)%rad(1:iv%instid(i)%num_rad), stat = error )
       If( error /= 0 ) Then
-        CALL wrf_error_fatal3(__FILE__,__LINE__, &
+        CALL wrf_error(__FILE__,__LINE__, &
           & "mem allocation error to iv%instid(i)%rad")
       End If
   end do
@@ -357,7 +357,7 @@ subroutine da_read_bufrtovs (obstype, iv, xp, lnbufr, infile)
 !   iv%instid(inst)%rad(nread(inst))%solazi
    allocate ( iv%instid(inst)%rad(nread(inst))%tb(1:nchanl), stat = error  )
      IF (error /= 0) THEN
-       CALL wrf_error_fatal3(__FILE__,__LINE__, &
+       CALL wrf_error(__FILE__,__LINE__, &
          & "mem allocation error to iv%instid(inst)%rad(nread(inst))%tb")
      END IF
    iv%instid(inst)%rad(nread(inst))%tb(1:nchanl)%inv = p%rad%tb(1:nchanl)%inv

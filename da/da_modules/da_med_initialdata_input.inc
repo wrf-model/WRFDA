@@ -43,7 +43,7 @@ SUBROUTINE da_med_initialdata_input (grid, config_flags, in_date, in_filename)
    IF (ierr /= 0) THEN
       write(unit=errmsg(1), fmt='(2a)') &
          'Netcdf error opening file:', trim(file_name)
-      CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
+      CALL wrf_error(__FILE__,__LINE__,errmsg(1))
    endif
 
    CALL ext_ncd_get_next_time( fid, current_date, Status )

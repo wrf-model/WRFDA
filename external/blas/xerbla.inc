@@ -38,7 +38,7 @@
 *
       WRITE(UNIT=errmsg(1), FMT = 9999 )SRNAME, INFO
 *
-      CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
+      CALL wrf_error(__FILE__,__LINE__,errmsg(1))
 *
  9999 FORMAT( ' ** On entry to ', A6, ' parameter number ', I2, ' had ',
      $      'an illegal value' )

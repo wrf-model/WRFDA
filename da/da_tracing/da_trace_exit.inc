@@ -129,7 +129,7 @@ SUBROUTINE da_trace_exit( &
               TRIM(Name),TRIM(Name)
        END IF
        IF (IOStatus /= 0) THEN
-           CALL wrf_error_fatal3(__FILE__,__LINE__, &
+           CALL wrf_error(__FILE__,__LINE__, &
              "Cannot write to trace file for "//TRIM(Name))
        END IF
 
@@ -137,7 +137,7 @@ SUBROUTINE da_trace_exit( &
            WRITE (UNIT=trace_unit, FMT='(A," ",A)', IOSTAT=IOStatus) &
              pad(1:TraceDepth*TraceIndentAmount),TRIM(Message)
          IF (IOStatus .NE. 0) THEN
-           CALL wrf_error_fatal3(__FILE__,__LINE__, &
+           CALL wrf_error(__FILE__,__LINE__, &
              "Cannot write to trace file for "//TRIM(Name))
          END IF
        END IF
@@ -147,7 +147,7 @@ SUBROUTINE da_trace_exit( &
              WRITE (UNIT=trace_unit, FMT='(A," ",A)', IOSTAT=IOStatus) &
                pad(1:TraceDepth*TraceIndentAmount),TRIM(Messages(Loop))
            IF (IOStatus .NE. 0) THEN
-           CALL wrf_error_fatal3(__FILE__,__LINE__, &
+           CALL wrf_error(__FILE__,__LINE__, &
              "Cannot write to trace file for "//TRIM(Name))
            END IF
          END DO ! Loop
@@ -158,7 +158,7 @@ SUBROUTINE da_trace_exit( &
          WRITE(UNIT=trace_unit,FMT='(A,"  Called enough, going quiet")',IOSTAT=IOStatus)&
            pad(1:TraceDepth*TraceIndentAmount)
        IF (IOStatus .NE. 0) THEN
-           CALL wrf_error_fatal3(__FILE__,__LINE__, &
+           CALL wrf_error(__FILE__,__LINE__, &
              "Cannot write to trace file for "//TRIM(Name))
        END IF
      END IF

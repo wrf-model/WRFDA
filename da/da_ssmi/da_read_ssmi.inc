@@ -1,4 +1,4 @@
-SUBROUTINE DA_Read_SSMI (iunit, ob, xp, filename)
+SUBROUTINE da_read_ssmi (iunit, ob, xp, filename)
 
 !-----------------------------------------------------------------------------!
 ! Read the header of a MM5 3D-VAR 2.0 GTS observation file
@@ -212,7 +212,7 @@ head_line_2:  DO
 !-----Compute the model horizontal coordinate x, y
 !-----Check if obs is wihin horizontal domain
 
-      call DA_ll_to_xy (info, loc, xp, outside, inside_halo)
+      call da_ll_to_xy (info, loc, xp, outside, inside_halo)
 
       IF ( outside ) CYCLE reports
 
@@ -351,7 +351,7 @@ head_line_2:  DO
 
    write(unit=stdout, fmt='(/,5x,a,i6/)') '** Rain contaminated SSMI_Tb =', irain
 
-END SUBROUTINE DA_Read_SSMI
+END SUBROUTINE da_read_ssmi
 
 !-------------------------------------------------------
 SUBROUTINE filter(tb19v, tb19h, tb22v, tb37v,          &
@@ -412,7 +412,7 @@ REAL                    :: theta,tc,wv,u,alw19,alw37,alw85
 
      if (ipass1 .eq. 1) then
 
-         CALL PettyAlgos(tb,theta,tc,sst,dsst,          &
+         CALL pettyalgos(tb,theta,tc,sst,dsst,          &
                          wv,u,alw19,alw37,alw85,iprecip, xlat)
 
          if (wv    .gt. -999. .and. u     .gt. -999. .and. &
@@ -554,7 +554,7 @@ END SUBROUTINE filter
 ! sophisticated algorithm than the ones provided here.
 !******************************************************************
 
-      subroutine PettyAlgos(tb,theta,tc,sst,dsst, &
+      subroutine pettyalgos(tb,theta,tc,sst,dsst, &
            wv,u,alw19,alw37,alw85,iprecip,xlat)
 !
       real tb(7),theta,tc,wv,u,alw19,alw37,alw85,xlat
@@ -563,20 +563,20 @@ END SUBROUTINE filter
 
 ! get water vapor
 !     print*,'tb=',tb
-      call PettyVapor(tb,wv)
+      call pettyvapor(tb,wv)
 !     print*,'wv=',wv
 
 ! get surface wind speed
-      call PettyWind(tb,theta,sst,dsst,u)
+      call pettywind(tb,theta,sst,dsst,u)
 
 ! get column cloud liquid water, using 3 different algorithms
-      call PettyLWP(tb,theta,1,tc,alw19,iprecip,xlat)
-      call PettyLWP(tb,theta,2,tc,alw37,iprecip,xlat)
-      call PettyLWP(tb,theta,3,tc,alw85,iprecip,xlat)
+      call pettylwp(tb,theta,1,tc,alw19,iprecip,xlat)
+      call pettylwp(tb,theta,2,tc,alw37,iprecip,xlat)
+      call pettylwp(tb,theta,3,tc,alw85,iprecip,xlat)
       if (alw19 .eq. BAD .or. alw19 .eq. BAD .or. alw85 .eq. BAD) iprecip=1
 !     if (iprecip .eq. 1) print*,'iprecip B=',iprecip,'alw=',alw19,alw37,alw85
 
-      end subroutine PettyAlgos
+      end subroutine pettyalgos
 
 
 !********************************************************************
@@ -594,7 +594,7 @@ END SUBROUTINE filter
 ! Output:   alw  ---- column water vapor (mm)
 !           iprecip --- set to 1 if precipitation flag invoked, else 0
 ! 
-      subroutine PettyLWP(tb,theta,ifreq,tc,alw,iprecip,xlat)
+      subroutine pettylwp(tb,theta,ifreq,tc,alw,iprecip,xlat)
       real tb(7),theta,alw,tc,xlat
       integer ifreq,iprecip
       parameter (BAD = -1000.0)
@@ -622,7 +622,7 @@ END SUBROUTINE filter
 !
 ! estimate the clear-sky polarization difference for the scene
 
-      call ClearPol(tb,theta,ifreq,pclr,iprecip)
+      call clearpol(tb,theta,ifreq,pclr,iprecip)
 
 ! if value of Tc is invalid, then set to reasonable intermediate value
       if (tc .lt. -20.0 .or. tc .gt. 40.0) then
@@ -1133,7 +1133,7 @@ END SUBROUTINE filter
          enddo
          u = u + coeff2(7)*(theta-53.0)
       else
-        CALL wrf_error_fatal3(__FILE__,__LINE__,"Invalid algorithm ID")
+        CALL wrf_error(__FILE__,__LINE__,"Invalid algorithm ID")
       endif
 
       end subroutine ualg

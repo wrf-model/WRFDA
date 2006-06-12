@@ -65,7 +65,7 @@ subroutine da_rtm_tl( inst, nchanl, nprofiles, con_vars, aux_vars, &
     If( Any(alloc_status /= 0) ) Then
       WRITE(UNIT=errmsg(1),FMT='(A,I5)') &
         "mem allocation error to for profiles",n
-      call wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
+      call wrf_error(__FILE__,__LINE__,errmsg(1))
     End If
 
     profiles(n) % ozone_data = .false.
@@ -106,7 +106,7 @@ subroutine da_rtm_tl( inst, nchanl, nprofiles, con_vars, aux_vars, &
     If( Any(alloc_status /= 0) ) Then
       WRITE(UNIT=errmsg(1),FMT='(A,I5)') &
         "mem allocation error to for profiles_tl",n
-      call wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
+      call wrf_error(__FILE__,__LINE__,errmsg(1))
     End If
 
     profiles_tl(n) % ozone_data = .false.
@@ -202,7 +202,7 @@ subroutine da_rtm_tl( inst, nchanl, nprofiles, con_vars, aux_vars, &
   Allocate( radiance_tl % clear_out( nbtout ) ,stat= alloc_status(124))
 
   If( Any(alloc_status /= 0) ) Then
-    CALL wrf_error_fatal3(__FILE__,__LINE__, &
+    CALL wrf_error(__FILE__,__LINE__, &
       "mem allocation error prior to rttov_tl")
   End If
 
@@ -286,7 +286,7 @@ subroutine da_rtm_tl( inst, nchanl, nprofiles, con_vars, aux_vars, &
      write (errmsg(26),*) 'profiles_tl%q           = ', profiles_tl(1)%q 
      write (errmsg(27),*) 'emissivity_tl           = ', emissivity_tl    
      write (errmsg(28),*) 'radiance_tl             = ', radiance_tl%out_clear
-     CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1:28)) 
+     CALL wrf_errors(__FILE__,__LINE__,errmsg(1:28)) 
  endif
  
   nc = nbtout / nprofiles
@@ -360,7 +360,7 @@ subroutine da_rtm_tl( inst, nchanl, nprofiles, con_vars, aux_vars, &
 
 
   If( Any(alloc_status /= 0) ) Then
-    CALL wrf_error_fatal3(__FILE__,__LINE__, &
+    CALL wrf_error(__FILE__,__LINE__, &
       "mem deallocation error")
   End If
 

@@ -114,7 +114,7 @@ SUBROUTINE da_ffdduv (F,D,U,V,YLON,ID)
 
       CASE DEFAULT
          WRITE(UNIT=errmsg(1),FMT='(A,I2)') ' UNKNOWN OPTION ',ID
-         CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
+         CALL wrf_error(__FILE__,__LINE__,errmsg(1))
 
    END SELECT
 

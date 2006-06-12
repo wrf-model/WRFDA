@@ -57,7 +57,7 @@ SUBROUTINE da_wrf_tpq_2_slp ( xb )
          WRITE(UNIT=errmsg(1),FMT='(A,F11.3,A)') &
               'ERROR FINDING PRESSURE LEVEL ',PCONST,' MB ABOVE THE SURFACE'
          WRITE(UNIT=errmsg(2),FMT='(A,F11.3,2X,A,F11.3)') 'PL=',PL,'  PSFC=',xb%psfc(i,j)
-         CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1:2))                                               
+         CALL wrf_error(__FILE__,__LINE__,errmsg(1:2))                                               
       END IF                                                         
 
 ! ... GET TEMPERATURE AT PL (TL), EXTRAPOLATE T AT SURFACE (TS)     

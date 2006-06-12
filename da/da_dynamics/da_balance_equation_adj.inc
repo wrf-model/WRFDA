@@ -54,7 +54,7 @@ subroutine da_balance_equation_adj( xb, xbx, xp, phi_b, u, v, &
       coefy(is:ie,js:je) = coefx(is:ie,js:je)
    else
       WRITE (UNIT=errmsg(1),FMT='(A,I3)') ' Wrong FG_FORMAT = ',fg_format
-      CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
+      CALL wrf_error(__FILE__,__LINE__,errmsg(1))
    end if
 
    ! [1.1] Multiplicative coefficent for conversion RHS->Del**2 phi_b/M**2:

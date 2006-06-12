@@ -362,7 +362,7 @@ subroutine gsi_emiss(inst,knchpf,kprof,kchan,knchan,indexn,zasat,zlsat,&
   else
     WRITE(UNIT=errmsg(1), FMT='(A,I5)') &
       "ILLEGAL surface emissivity type",itype
-    CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
+    CALL wrf_error(__FILE__,__LINE__,errmsg(1))
   end if   !IR or MW
   
 

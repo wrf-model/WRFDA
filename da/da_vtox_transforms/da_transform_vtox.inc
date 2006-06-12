@@ -160,7 +160,7 @@ subroutine da_transform_vtox( cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa, &
       if ( use_ssmt1obs .or. use_ssmt2obs .or. &
            Use_SsmiTbObs .or. Use_SsmiRetrievalObs ) then
          if( global ) then
-            CALL wrf_error_fatal3(__FILE__,__LINE__, &
+            CALL wrf_error(__FILE__,__LINE__, &
             "xb%speed is not available, see da_transfer_kmatoxb.inc")
          end if
          call da_transform_xtoseasfcwind_lin( xa, xb )

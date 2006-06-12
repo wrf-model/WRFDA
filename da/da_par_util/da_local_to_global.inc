@@ -31,7 +31,7 @@ SUBROUTINE da_local_to_global(xp, x, xg, dim)
    else
      WRITE(UNIT=errmsg(1),FMT='(A,I5,A)') &
        "dim=",dim,"must be 2 or 3"
-     CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
+     CALL wrf_error(__FILE__,__LINE__,errmsg(1))
    end if
 
 END SUBROUTINE da_local_to_global

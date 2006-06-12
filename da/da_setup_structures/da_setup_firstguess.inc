@@ -87,7 +87,7 @@ SUBROUTINE da_setup_firstguess( xbx, grid, &
    else
      WRITE(UNIT=errmsg(1),FMT='(A,I5)') &
        "Wrong choice for fg_format = ",fg_format
-     CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
+     CALL wrf_error(__FILE__,__LINE__,errmsg(1))
    end if
 
    CALL wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id0)

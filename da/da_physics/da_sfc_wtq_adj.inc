@@ -1,4 +1,4 @@
-SUBROUTINE sfc_wtq_Adj (psfc, tg, ps, ts, qs, us, vs, regime,& 
+SUBROUTINE sfc_wtq_adj (psfc, tg, ps, ts, qs, us, vs, regime,& 
                        psfc_prime, tg_prime, ps_prime, ts_prime, qs_prime, &
                        us_prime, vs_prime,  hs, roughness, xland,          & 
                        u10_prime, v10_prime, t2_prime, q2_prime) 
@@ -182,7 +182,7 @@ SUBROUTINE sfc_wtq_Adj (psfc, tg, ps, ts, qs, us, vs, regime,&
 
 ! 2.2 Convert ground virtual temperature assuming it's saturated
 !     ----------------------------------------------------------
-      call DA_TP_To_Qs( tg, psfc, eg, qg )
+      call da_tp_to_qs( tg, psfc, eg, qg )
       tvg  = tg * (1. + 0.608 * qg)
 
 ! 3.  Compute the potential temperature and virtual potential temperature
@@ -450,7 +450,7 @@ SUBROUTINE sfc_wtq_Adj (psfc, tg, ps, ts, qs, us, vs, regime,&
        CASE DEFAULT;
          WRITE(UNIT=errmsg(1),FMT='(A,I2,A)') &
           "Regime=",iregime," is invalid."
-         CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
+         CALL wrf_error(__FILE__,__LINE__,errmsg(1))
 
       END SELECT
 !
@@ -762,7 +762,7 @@ SUBROUTINE sfc_wtq_Adj (psfc, tg, ps, ts, qs, us, vs, regime,&
        CASE DEFAULT;
          WRITE(UNIT=errmsg(1),FMT='(A,I2,A)') &
           "Regime=",iregime," is invalid."
-         CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
+         CALL wrf_error(__FILE__,__LINE__,errmsg(1))
 
       END SELECT
  
@@ -846,7 +846,7 @@ SUBROUTINE sfc_wtq_Adj (psfc, tg, ps, ts, qs, us, vs, regime,&
       tvg_prime = 0.
       
       qg_prime = qg_prime * qg
-      call DA_TP_To_Qs_Adj1( tg, psfc, eg, tg_prime, psfc_prime, qg_prime )
+      call da_tp_to_qs_adj1( tg, psfc, eg, tg_prime, psfc_prime, qg_prime )
 
 ! 2.1 Compute Virtual temperature on the lowest half sigma level
 !     ---------------------------------------------------------
@@ -854,4 +854,4 @@ SUBROUTINE sfc_wtq_Adj (psfc, tg, ps, ts, qs, us, vs, regime,&
       ts_prime = ts_prime + tvs_prime  * (1. + 0.608 * qs)
       qs_prime = qs_prime + tvs_prime *  0.608 * ts
       tvs_prime = 0.
-END SUBROUTINE sfc_wtq_Adj
+END SUBROUTINE sfc_wtq_adj

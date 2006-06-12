@@ -99,7 +99,7 @@ SUBROUTINE da_trace_entry( &
    IF (NewRoutine) THEN
       ! New subroutine entered
       IF( NoRoutines >= MaxNoRoutines )THEN ! too many to trace
-          CALL wrf_error_fatal3(__FILE__,__LINE__, &
+          CALL wrf_error(__FILE__,__LINE__, &
              "Too many routines. Not timing " // Name)
 
          !All the timings etc are put instead to the calling routine,
@@ -157,7 +157,7 @@ SUBROUTINE da_trace_entry( &
                TRIM(Name),TRIM(Name)
          END IF
          IF (IOStatus /= 0) THEN
-            CALL wrf_error_fatal3(__FILE__,__LINE__, &
+            CALL wrf_error(__FILE__,__LINE__, &
                "Cannot write to trace file for "//TRIM(Name))
          END IF
 
@@ -165,7 +165,7 @@ SUBROUTINE da_trace_entry( &
             WRITE (UNIT=trace_unit, FMT='(A," ",A)', IOSTAT=IOStatus) &
                pad(1:TraceDepth*TraceIndentAmount),TRIM(Message)
             IF (IOStatus .NE. 0) THEN
-               CALL wrf_error_fatal3(__FILE__,__LINE__, &
+               CALL wrf_error(__FILE__,__LINE__, &
                   "Cannot write to trace file for "//TRIM(Name))
             END IF
          END IF
@@ -175,7 +175,7 @@ SUBROUTINE da_trace_entry( &
                WRITE (UNIT=trace_unit, FMT='(A," ",A)', IOSTAT=IOStatus) &
                   pad(1:TraceDepth*TraceIndentAmount),TRIM(Messages(Loop))
                IF (IOStatus .NE. 0) THEN
-                  CALL wrf_error_fatal3(__FILE__,__LINE__, &
+                  CALL wrf_error(__FILE__,__LINE__, &
                      "Cannot write to trace file for "//TRIM(Name))
                END IF
             END DO ! Loop

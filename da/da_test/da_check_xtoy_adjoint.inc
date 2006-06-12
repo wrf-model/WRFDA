@@ -83,12 +83,12 @@ SUBROUTINE DA_Check_XToY_Adjoint( xb, xa, iv, xp, y, &
 
 !-------------------------------------------------------------------------
 
-   call DA_PT_To_Rho_Lin( xb, xa, xp )
+   call da_pt_to_rho_lin( xb, xa, xp )
 
 !-------------------------------------------------------------------------
 
    if (sfc_assi_options == 2) then
-      call DA_Transform_XToWTQ ( xp, xb, xa )
+      call da_transform_xtowtq ( xp, xb, xa )
 !-----Exchange XA (surface variable: u10, v10, t2, q2) halo region.
       CALL wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id6)
    endif
@@ -98,22 +98,22 @@ SUBROUTINE DA_Check_XToY_Adjoint( xb, xa, iv, xp, y, &
         Use_SsmiTbObs .or. Use_SsmiRetrievalObs ) then
 
 !-----Now do something for PW
-      call DA_Transform_XToTPW( xa, xb )
+      call da_transform_xtotpw( xa, xb )
 
 !--------GPS Refractivity:
       if ( use_gpsrefobs ) &
-        call da_transform_XTogpsref_lin(xa, xb, xp)
+        call da_transform_xtogpsref_lin(xa, xb, xp)
 
       if ( use_ssmt1obs .or. use_ssmt2obs .or. &
            Use_SsmiTbObs .or. Use_SsmiRetrievalObs ) then
          if( global ) then
-           CALL wrf_error_fatal3(__FILE__,__LINE__, &
+           CALL wrf_error(__FILE__,__LINE__, &
              "xb%speed is not available, see da_transfer_kmatoxb.inc")
          end if
-         call DA_Transform_XToSeaSfcWind_Lin( xa, xb )
+         call da_transform_xtoseasfcwind_lin( xa, xb )
       endif
 
-      if ( Use_SsmiTbObs) call DA_Transform_XToTb_Lin (xa, xb)
+      if ( Use_SsmiTbObs) call da_transform_xtotb_lin (xa, xb)
 
 !-----Exchange XA halo region.
       CALL wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id8)
@@ -123,7 +123,7 @@ SUBROUTINE DA_Check_XToY_Adjoint( xb, xa, iv, xp, y, &
 !  [2.0] Perform y = Hx transform:
 !-------------------------------------------------------------------------
    
-   call DA_Transform_XToY( xb, iv, xa, xp, y )
+   call da_transform_xtoy( xb, iv, xa, xp, y )
 
 !-------------------------------------------------------------------------
 !  [3.0] Calculate LHS of adjoint test equation and
@@ -134,44 +134,44 @@ SUBROUTINE DA_Check_XToY_Adjoint( xb, xa, iv, xp, y, &
    pertile_lhs = 0.0
 
    if( Use_SoundObs ) then
-       call da_check_xtoy_adjoint_Sound( iv, y, partial_lhs, pertile_lhs )
-       call da_check_xtoy_adjoint_Sonde_sfc( iv, y, partial_lhs, pertile_lhs )
+       call da_check_xtoy_adjoint_sound( iv, y, partial_lhs, pertile_lhs )
+       call da_check_xtoy_adjoint_sonde_sfc( iv, y, partial_lhs, pertile_lhs )
    endif
    if( Use_SynopObs ) &
-   call da_check_xtoy_adjoint_Synop( iv, y, partial_lhs, pertile_lhs )
+   call da_check_xtoy_adjoint_synop( iv, y, partial_lhs, pertile_lhs )
 
    if( Use_GeoAMVObs ) &
-   call da_check_xtoy_adjoint_GeoAMV( iv, y, partial_lhs, pertile_lhs )
+   call da_check_xtoy_adjoint_geoamv( iv, y, partial_lhs, pertile_lhs )
 
    if( Use_PolarAMVObs ) &
-   call da_check_xtoy_adjoint_PolarAMV( iv, y, partial_lhs, pertile_lhs )
+   call da_check_xtoy_adjoint_polaramv( iv, y, partial_lhs, pertile_lhs )
 
    if( Use_AirepObs ) &
-   call da_check_xtoy_adjoint_Airep( iv, y, partial_lhs, pertile_lhs )
+   call da_check_xtoy_adjoint_airep( iv, y, partial_lhs, pertile_lhs )
 
    if( Use_PilotObs ) &
-   call da_check_xtoy_adjoint_Pilot( iv, y, partial_lhs, pertile_lhs )
+   call da_check_xtoy_adjoint_pilot( iv, y, partial_lhs, pertile_lhs )
 
    if( Use_RadarObs ) &
-   call da_check_xtoy_adjoint_Radar( iv, y, partial_lhs, pertile_lhs )
+   call da_check_xtoy_adjoint_radar( iv, y, partial_lhs, pertile_lhs )
 
    if( Use_SatemObs ) &
-   call da_check_xtoy_adjoint_Satem( iv, y, partial_lhs, pertile_lhs )
+   call da_check_xtoy_adjoint_satem( iv, y, partial_lhs, pertile_lhs )
 
    if( Use_MetarObs ) &
-   call da_check_xtoy_adjoint_Metar( iv, y, partial_lhs, pertile_lhs )
+   call da_check_xtoy_adjoint_metar( iv, y, partial_lhs, pertile_lhs )
  
    if( Use_ShipsObs ) &
-   call da_check_xtoy_adjoint_Ships( iv, y, partial_lhs, pertile_lhs )
+   call da_check_xtoy_adjoint_ships( iv, y, partial_lhs, pertile_lhs )
 
    if( Use_GpspwObs ) &
-   call da_check_xtoy_adjoint_Gpspw( iv, y, partial_lhs, pertile_lhs )
+   call da_check_xtoy_adjoint_gpspw( iv, y, partial_lhs, pertile_lhs )
 
    if ( use_GpsrefObs ) &
-   call da_check_xtoy_adjoint_Gpsref( iv, y, partial_lhs, pertile_lhs )
+   call da_check_xtoy_adjoint_gpsref( iv, y, partial_lhs, pertile_lhs )
    
    if( Use_SsmiTbObs .or. Use_SsmiRetrievalObs ) &
-   call da_check_xtoy_adjoint_SSMI ( iv, y, partial_lhs, pertile_lhs )
+   call da_check_xtoy_adjoint_ssmi ( iv, y, partial_lhs, pertile_lhs )
 
    if( use_ssmt1obs ) &
    call da_check_xtoy_adjoint_ssmt1( iv, y, partial_lhs, pertile_lhs )
@@ -183,21 +183,21 @@ SUBROUTINE DA_Check_XToY_Adjoint( xb, xa, iv, xp, y, &
    call da_check_xtoy_adjoint_qscat( iv, y, partial_lhs, pertile_lhs )
 
    if( Use_ProfilerObs ) &
-   call da_check_xtoy_adjoint_Profiler( iv, y, partial_lhs, pertile_lhs )
+   call da_check_xtoy_adjoint_profiler( iv, y, partial_lhs, pertile_lhs )
 
    if( Use_BuoyObs ) &
-   call da_check_xtoy_adjoint_Buoy( iv, y, partial_lhs, pertile_lhs )
+   call da_check_xtoy_adjoint_buoy( iv, y, partial_lhs, pertile_lhs )
 
    if( Use_BogusObs ) &
-   call da_check_xtoy_adjoint_Bogus( iv, y, partial_lhs, pertile_lhs )
+   call da_check_xtoy_adjoint_bogus( iv, y, partial_lhs, pertile_lhs )
 
 !-------------------------------------------------------------------------
 !     [5.0] Perform adjoint operation:
 !-------------------------------------------------------------------------
 
-   call DA_Zero_X( xa )
+   call da_zero_x( xa )
    
-   call DA_Transform_XToY_Adj( xb, iv, xp, y, xa )
+   call da_transform_xtoy_adj( xb, iv, xp, y, xa )
 
 !-------------------------------------------------------------------------
 
@@ -205,33 +205,33 @@ SUBROUTINE DA_Check_XToY_Adjoint( xb, xa, iv, xp, y, &
         use_GpsrefObs .or.                                    &
         Use_SsmiTbObs .or. Use_SsmiRetrievalObs ) then
 
-      if ( Use_SsmiTbObs) call DA_Transform_XToTb_Adj (xa, xb)
+      if ( Use_SsmiTbObs) call da_transform_xtotb_adj (xa, xb)
 
 !-----for PW
-      call DA_Transform_XToTPW_Adj( xa, xb )
+      call da_transform_xtotpw_adj( xa, xb )
 
 !-----GPS Refractivity:
       if ( use_GpsrefObs ) &
-      call da_transform_XTogpsref_adj(xa, xb, xp)
+      call da_transform_xtogpsref_adj(xa, xb, xp)
 
       if ( use_ssmt1obs .or. use_ssmt2obs .or. &
            Use_SsmiTbObs .or. Use_SsmiRetrievalObs ) then
          if( global ) then
-           CALL wrf_error_fatal3(__FILE__,__LINE__, &
+           CALL wrf_error(__FILE__,__LINE__, &
              "xb%speed is not available, see da_transfer_kmatoxb.inc")
          end if
-         call DA_Transform_XToSeaSfcWind_Adj( xa, xb )
+         call da_transform_xtoseasfcwind_adj( xa, xb )
       endif
    endif
 
 !--Now do something for surface variables
    if (sfc_assi_options == 2) then
-      call DA_Transform_XToWTQ_adj ( xp, xb, xa )
+      call da_transform_xtowtq_adj ( xp, xb, xa )
    endif
 
 !-------------------------------------------------------------------------
 
-   call DA_PT_To_Rho_Adj( xb, xa )
+   call da_pt_to_rho_adj( xb, xa )
 
 !-------------------------------------------------------------------------
 
@@ -280,4 +280,4 @@ SUBROUTINE DA_Check_XToY_Adjoint( xb, xa, iv, xp, y, &
       write(UNIT=stdout, fmt='(A,1pe22.14)') ' Whole Domain < x, x_adj > = ', adj_ttl_rhs
    ENDIF
    
-END SUBROUTINE DA_Check_XToY_Adjoint
+END SUBROUTINE da_check_xtoy_adjoint

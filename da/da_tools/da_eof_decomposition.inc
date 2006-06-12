@@ -34,7 +34,7 @@ subroutine da_eof_decomposition( kz, bx, e, l )
    if ( info /= 0 ) then
       write(UNIT=errmsg(1),FMT='(A,I4)') &
          "Error in decomposition, info = ", info
-      CALL wrf_error_fatal3(__FILE__,__LINE__,errmsg(1))
+      CALL wrf_error(__FILE__,__LINE__,errmsg(1))
    end if
    
    !--Swap order of eigenvalues, vectors so 1st is one with most variance:
