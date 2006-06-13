@@ -97,7 +97,8 @@ SUBROUTINE da_setup_obs_structures_bufr( xp, ob, iv )
       enddo
    else
       iv%current_ob_time = 1
-      call da_scan_bufr_obs(bufr_iunit, iv, xp)
+      filename="ob.bufr"
+      call da_scan_bufr_obs(bufr_iunit, iv, xp, filename)
 
 !-----scan MAIN BODY OF Radar OBSERVATION FILE
 !      if(Use_RadarObs) &
@@ -201,7 +202,8 @@ SUBROUTINE da_setup_obs_structures_bufr( xp, ob, iv )
 
       iv%current_ob_time = 1
 
-      call da_read_bufr_obs(bufr_iunit, iv, xp)
+      filename="ob.bufr"
+      call da_read_bufr_obs(bufr_iunit, iv, xp,filename)
 
 !      if(Use_RadarObs) then
 !!--------Read Radar OBSERVATION FILE

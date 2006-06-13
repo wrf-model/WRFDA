@@ -140,7 +140,11 @@ ln -sf $DA_FIRST_GUESS	 wrfvar_input
 ln -sf $DA_BOUNDARIES 	 wrfbdy_001
 ln -sf $DA_FIRST_GUESS	 wrfinput_d01
 ln -sf $DA_BACK_ERRORS   fort.34
-ln -sf $DA_OBSERVATIONS	 fort.9${NL_OB_FORMAT}
+if test $NL_OB_FORMAT == 1; then
+  ln -sf $DA_OBSERVATIONS ob.bufr
+else
+  ln -sf $DA_OBSERVATIONS ob.ascii
+fi
 
 for FILE in $DAT_DIR/*.inv; do
   if test -f $FILE; then
