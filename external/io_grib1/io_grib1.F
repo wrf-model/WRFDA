@@ -97,7 +97,6 @@ subroutine ext_gr1_ioinit(SysDepInfo,Status)
   integer ,intent(out) :: Status
   integer :: i
   integer :: size, istat
-  CHARACTER (LEN=300) :: wrf_err_message
 
   call wrf_debug ( DEBUG , 'Entering ext_gr1_ioinit')
 
@@ -3158,6 +3157,8 @@ END FUNCTION ndfeb
 
 SUBROUTINE geth_idts (ndate, odate, idts)
 
+  USE module_wrf_error
+
   IMPLICIT NONE
 
   !  From 2 input mdates ('YYYY-MM-DD HH:MM:SS.ffff'), 
@@ -3195,7 +3196,6 @@ SUBROUTINE geth_idts (ndate, odate, idts)
   INTEGER :: mday(12), i, newdys, olddys
   LOGICAL :: npass, opass
   INTEGER :: isign
-  CHARACTER (LEN=300) :: wrf_err_message
   INTEGER :: ndfeb
 
   IF (odate.GT.ndate) THEN
