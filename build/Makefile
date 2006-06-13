@@ -31,7 +31,7 @@ links :
 	@ $(LN) $(CONVERTOR)/kma_wave2grid .
 	@ $(LN) $(CONVERTOR)/wave2grid_kma .
 	@ $(LN) $(ESMF_TIME_F90)/*.F90 .
-	@ $(CP) -r $(RSL) RSL
+	@ $(LN) $(RSL) .
 	@ $(LN) $(RSL)/*.F .
 	@ $(LN) $(RSL)/*.c .
 	@ $(LN) $(RSL)/RSL/*.c .
@@ -62,7 +62,7 @@ include $(MAIN)/main.make
 
 depend depend.txt : links module_state_description.f90 md_calls.inc \
                       inc/da_generic_boilerplate.inc
-	makedepf90 $(FPPFLAGS) *.F *.f90 *.F90 > depend.txt 2>/dev/null
+	~bray/bin/makedepf90 $(FPPFLAGS) *.F *.f90 *.F90 > depend.txt 2>/dev/null
 
 include depend.txt
 

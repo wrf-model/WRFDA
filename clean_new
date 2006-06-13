@@ -1,0 +1,10 @@
+#!/bin/csh -f
+
+cd build
+
+if ( "$1" == '-a' ) then
+  make superclean
+else
+  make clean
+endif
+
