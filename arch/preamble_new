@@ -91,14 +91,13 @@ FFTPACK5_LIB  = -lfftpack5
 #### Get core settings from environment (set in compile script)
 #### Note to add a core, this has to be added to.
 
-VAR4DPOSS=-DVAR4DPOSS
-
 COREDEFS = -DEM_CORE=$(EM_CORE)         \
            -DDA_CORE=$(DA_CORE)         \
            -DNMM_CORE=$(NMM_CORE)       \
            -DCOAMPS_CORE=$(COAMPS_CORE) \
            -DEXP_CORE=$(EXP_CORE)       \
-           -DNMM_MAX_DIM=1250
+           -DNMM_MAX_DIM=1250           \
+           -DWRFPLUS
 
 #### For wrfvar, always use RWORDSIZE 8
 

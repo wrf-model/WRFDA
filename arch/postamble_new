@@ -1,6 +1,6 @@
 #
 FPPFLAGS        = $(FPPFLAGS1) $(FPPFLAGS2) $(COREDEFS) \
-                     $(ENVCOMPDEFS) $(DM_FPPFLAGS) $(VAR4DPOSS)
+                     $(ENVCOMPDEFS) $(DM_FPPFLAGS)
 CPPFLAGS        = -C -P $(TRADFLAG) $(INCS) $(DM_CPPFLAGS) -I$(NETCDF_PATH)/include
 REGFLAGS        = $(FPPFLAGS1) $(FPPFLAGS2)
  

@@ -29,7 +29,7 @@ MODULE_DIRS       = $(INCLUDE_MODULES)
 
 CPPFLAGS          = $(TRADFLAG) $(LIBINCLUDE) -C -P $(ARCHFLAGS) \
                       $(ENVCOMPDEFS) \
-		      $(DM_CPP_FLAGS) $(COREDEFS) $(VAR4DPOSS)
+		      $(DM_CPP_FLAGS) $(COREDEFS)
 
 INC_MOD_WRFVAR    = -I$(NETCDF_IO_PATH) \
 		      -I$(DA) \
