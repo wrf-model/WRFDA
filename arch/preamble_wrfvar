@@ -20,7 +20,7 @@ CPP     = /lib/cpp
 
 .SUFFIXES: .f90 .F90 .F .i .o .f .c
 
-# Substituted by Config_new.pl
+# Substituted by Config_wrfvar.pl
 
 DEVTOP      = CONFIGURE_DEVTOP
 PERL        = CONFIGURE_PERL_PATH

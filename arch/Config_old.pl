@@ -191,7 +191,7 @@ while ( <CONFIGURE_PREAMBLE> ) {
       $_ =~ s:CONFIGURE_GRIB2_LIB::g ;
     }
 
-  # ESMF substitutions in configure.defaults_new
+  # ESMF substitutions in configure.defaults_old
   if ( $sw_esmflib_path && $sw_esmfinc_path ) {
     $_ =~ s:CONFIGURE_ESMF_IO_LIB:-L$sw_esmflib_path -lesmf -L../external/io_esmf -lwrfio_esmf \$\(ESMF_LIB_FLAGS\):g ;
     $_ =~ s:CONFIGURE_ESMF_IO_EXT_LIB:-L$sw_esmflib_path -lesmf -lwrfio_esmf \$\(ESMF_LIB_FLAGS\):g ;
