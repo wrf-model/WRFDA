@@ -29,9 +29,9 @@ SUBROUTINE da_calculate_residual_geoamv( oi, y, re,                        &
             do k=1, oi%geoamv(n)%info%levels
                np_available = np_available + 2
 
-               re%geoamv(n)%u(k) = residual( n, 0, y%geoamv(n)%u(k), &
+               re%geoamv(n)%u(k) = da_residual( n, 0, y%geoamv(n)%u(k), &
                                           oi%geoamv(n)%u(k), n_obs_bad % u )
-               re%geoamv(n)%v (k)= residual( n, 0, y%geoamv(n)%v(k), &
+               re%geoamv(n)%v (k)= da_residual( n, 0, y%geoamv(n)%v(k), &
                                        oi%geoamv(n)%v(k), n_obs_bad % v )
             END DO
          endif        

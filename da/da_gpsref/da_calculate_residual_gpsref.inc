@@ -1,4 +1,4 @@
-SUBROUTINE DA_Calculate_Residual_GPSRef( oi, y, re,               &
+SUBROUTINE da_calculate_residual_gpsref( oi, y, re,               &
                                         np_missing, np_bad_data,  &
                                         np_obs_used, np_available )
 ! -------------------------------------------------------------------------
@@ -29,7 +29,7 @@ SUBROUTINE DA_Calculate_Residual_GPSRef( oi, y, re,               &
 
          do k=1, oi%gpsref(n)%info%levels
             np_available = np_available + 1
-            re%GPSRef(n)%ref(k) = residual( n, k, y%GPSRef(n)%ref(k), &
+            re%GPSRef(n)%ref(k) = da_residual( n, k, y%GPSRef(n)%ref(k), &
                                   oi%GPSRef(n)%ref(k), n_obs_bad%gpsref )
          end do
 
@@ -41,5 +41,5 @@ SUBROUTINE DA_Calculate_Residual_GPSRef( oi, y, re,               &
    np_bad_data = np_bad_data + n_obs_bad % gpsref % num % bad
    np_obs_used = np_obs_used + n_obs_bad % gpsref % num % use
    
-END SUBROUTINE DA_Calculate_Residual_GPSRef
+END SUBROUTINE da_calculate_residual_gpsref
 

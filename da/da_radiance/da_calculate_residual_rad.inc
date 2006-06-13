@@ -38,7 +38,7 @@ SUBROUTINE da_calculate_residual_rad( iv, y, re,                 &
 
          np_available = np_available + iv%instid(i)%nchan
 
-         re%instid(i)%rad(n)%tb(k) = residual( n, k, y%instid(i)%rad(n)%tb(k), &
+         re%instid(i)%rad(n)%tb(k) = da_residual( n, k, y%instid(i)%rad(n)%tb(k), &
                                       iv%instid(i)%rad(n)%tb(k), n_obs_bad % rad )
       end do
 

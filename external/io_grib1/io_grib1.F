@@ -15,6 +15,7 @@
 
 
 module data_info
+  USE module_wrf_error
 
 !*
 !* This module will hold data internal to this I/O implementation.  

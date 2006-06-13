@@ -1,4 +1,4 @@
-SUBROUTINE DA_Calculate_Residual_Sound( oi, y, re,                        &
+SUBROUTINE da_calculate_residual_sound( oi, y, re,                        &
                                         np_missing, np_bad_data,          &
                                         np_obs_used, np_available )
 
@@ -25,13 +25,13 @@ SUBROUTINE DA_Calculate_Residual_Sound( oi, y, re,                        &
         do k=1, oi%sound(n)%info%levels
           np_available = np_available + 4
 
-          re%Sound(n)%u(k) = residual( n, k, y%Sound(n)%u(k), &
+          re%Sound(n)%u(k) = da_residual( n, k, y%Sound(n)%u(k), &
                                      oi%Sound(n)%u(k), n_obs_bad % u )
-          re%Sound(n)%v(k) = residual( n, k, y%Sound(n)%v(k), &
+          re%Sound(n)%v(k) = da_residual( n, k, y%Sound(n)%v(k), &
                                      oi%Sound(n)%v(k), n_obs_bad % v )
-          re%Sound(n)%t(k) = residual( n, k, y%Sound(n)%t(k), &
+          re%Sound(n)%t(k) = da_residual( n, k, y%Sound(n)%t(k), &
                                      oi%Sound(n)%t(k), n_obs_bad % t )
-          re%Sound(n)%q(k) = residual( n, k, y%Sound(n)%q(k), &
+          re%Sound(n)%q(k) = da_residual( n, k, y%Sound(n)%q(k), &
                                      oi%Sound(n)%q(k), n_obs_bad % q )
         end do
       endif
@@ -49,5 +49,5 @@ SUBROUTINE DA_Calculate_Residual_Sound( oi, y, re,                        &
 
   ENDIF
 
-END SUBROUTINE DA_Calculate_Residual_Sound
+END SUBROUTINE da_calculate_residual_sound
 

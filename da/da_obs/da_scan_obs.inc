@@ -92,7 +92,7 @@ SUBROUTINE da_scan_obs (iunit, ob, xp, filename)
 
    IF (iost /= 0) THEN
       WRITE(UNIT=errmsg(1),FMT='(A,I5,A)') &
-         "Error",iost,"opening gts obs file "//TRIM(filename)
+         "Error",iost," opening gts obs file "//TRIM(filename)
       CALL wrf_warning(__FILE__,__LINE__,errmsg(1:1))
       RETURN
    ENDIF

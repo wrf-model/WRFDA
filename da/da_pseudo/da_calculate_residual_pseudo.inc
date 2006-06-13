@@ -28,15 +28,15 @@ SUBROUTINE da_calculate_residual_pseudo( oi, y, re,                        &
 
          np_available = np_available + 5
 
-         re%pseudo(n)%u = residual( n, 0, y%pseudo(n)%u, &
+         re%pseudo(n)%u = da_residual( n, 0, y%pseudo(n)%u, &
                                       oi%pseudo(n)%u, n_obs_bad % u )
-         re%pseudo(n)%v = residual( n, 0, y%pseudo(n)%v, &
+         re%pseudo(n)%v = da_residual( n, 0, y%pseudo(n)%v, &
                                    oi%pseudo(n)%v, n_obs_bad % v )
-         re%pseudo(n)%t = residual( n, 0, y%pseudo(n)%t, &
+         re%pseudo(n)%t = da_residual( n, 0, y%pseudo(n)%t, &
                                       oi%pseudo(n)%t, n_obs_bad % t )
-         re%pseudo(n)%p = residual( n, 0, y%pseudo(n)%p, &
+         re%pseudo(n)%p = da_residual( n, 0, y%pseudo(n)%p, &
                                       oi%pseudo(n)%p, n_obs_bad % p )
-         re%pseudo(n)%q = residual( n, 0, y%pseudo(n)%q, &
+         re%pseudo(n)%q = da_residual( n, 0, y%pseudo(n)%q, &
                                       oi%pseudo(n)%q, n_obs_bad % q )
        endif
 

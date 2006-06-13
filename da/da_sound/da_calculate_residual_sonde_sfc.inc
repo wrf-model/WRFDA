@@ -1,4 +1,4 @@
-SUBROUTINE DA_Calculate_Residual_Sonde_sfc( oi, y, re,                        &
+SUBROUTINE da_calculate_residual_sonde_sfc( oi, y, re,                        &
                                         np_missing, np_bad_data,          &
                                         np_obs_used, np_available )
 
@@ -27,15 +27,15 @@ SUBROUTINE DA_Calculate_Residual_Sonde_sfc( oi, y, re,                        &
     if (oi%sonde_sfc(n)%loc%proc_domain_with_halo ) then
       np_available = np_available + 5
 
-      re%sonde_sfc(n)%u = residual( n, 0, y%sonde_sfc(n)%u, &
+      re%sonde_sfc(n)%u = da_residual( n, 0, y%sonde_sfc(n)%u, &
                                     oi%sonde_sfc(n)%u, n_obs_bad % u )
-      re%sonde_sfc(n)%v = residual( n, 0, y%sonde_sfc(n)%v, &
+      re%sonde_sfc(n)%v = da_residual( n, 0, y%sonde_sfc(n)%v, &
                                  oi%sonde_sfc(n)%v, n_obs_bad % v )
-      re%sonde_sfc(n)%t = residual( n, 0, y%sonde_sfc(n)%t, &
+      re%sonde_sfc(n)%t = da_residual( n, 0, y%sonde_sfc(n)%t, &
                                  oi%sonde_sfc(n)%t, n_obs_bad % t )
-      re%sonde_sfc(n)%p = residual( n, 0, y%sonde_sfc(n)%p, &
+      re%sonde_sfc(n)%p = da_residual( n, 0, y%sonde_sfc(n)%p, &
                                  oi%sonde_sfc(n)%p, n_obs_bad % p )
-      re%sonde_sfc(n)%q = residual( n, 0, y%sonde_sfc(n)%q, &
+      re%sonde_sfc(n)%q = da_residual( n, 0, y%sonde_sfc(n)%q, &
                                  oi%sonde_sfc(n)%q, n_obs_bad % q )
     endif
 
@@ -51,5 +51,5 @@ SUBROUTINE DA_Calculate_Residual_Sonde_sfc( oi, y, re,                        &
                 n_obs_bad % v % num % use + n_obs_bad % t % num % use + &
                 n_obs_bad % p % num % use + n_obs_bad % q % num % use
 
-END SUBROUTINE DA_Calculate_Residual_Sonde_sfc
+END SUBROUTINE da_calculate_residual_sonde_sfc
 

@@ -1,4 +1,4 @@
-SUBROUTINE DA_Calculate_Residual_Metar( oi, y, re,                        &
+SUBROUTINE da_calculate_residual_metar( oi, y, re,                        &
                                         np_missing, np_bad_data,          &
                                         np_obs_used, np_available )
 
@@ -27,15 +27,15 @@ SUBROUTINE DA_Calculate_Residual_Metar( oi, y, re,                        &
       if( oi%metar(n)%loc%proc_domain_with_halo ) then
         np_available = np_available + 5
 
-        re%metar(n)%u = residual( n, 0, y%metar(n)%u, &
+        re%metar(n)%u = da_residual( n, 0, y%metar(n)%u, &
                                      oi%metar(n)%u, n_obs_bad % u )
-        re%metar(n)%v = residual( n, 0, y%metar(n)%v, &
+        re%metar(n)%v = da_residual( n, 0, y%metar(n)%v, &
                                   oi%metar(n)%v, n_obs_bad % v )
-        re%metar(n)%t = residual( n, 0, y%metar(n)%t, &
+        re%metar(n)%t = da_residual( n, 0, y%metar(n)%t, &
                                   oi%metar(n)%t, n_obs_bad % t )
-        re%metar(n)%p = residual( n, 0, y%metar(n)%p, &
+        re%metar(n)%p = da_residual( n, 0, y%metar(n)%p, &
                                   oi%metar(n)%p, n_obs_bad % p )
-        re%metar(n)%q = residual( n, 0, y%metar(n)%q, &
+        re%metar(n)%q = da_residual( n, 0, y%metar(n)%q, &
                                   oi%metar(n)%q, n_obs_bad % q )
       endif
     END DO
@@ -54,5 +54,5 @@ SUBROUTINE DA_Calculate_Residual_Metar( oi, y, re,                        &
 
   IF (trace_use) CALL da_trace_exit("da_calculate_residual_metar")
 
-END SUBROUTINE DA_Calculate_Residual_Metar
+END SUBROUTINE da_calculate_residual_metar
 

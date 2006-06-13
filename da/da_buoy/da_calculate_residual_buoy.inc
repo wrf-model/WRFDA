@@ -1,4 +1,4 @@
-SUBROUTINE DA_Calculate_Residual_Buoy( oi, y, re,                        &
+SUBROUTINE da_calculate_residual_buoy( oi, y, re,                        &
                                         np_missing, np_bad_data,          &
                                         np_obs_used, np_available )
 
@@ -26,15 +26,15 @@ SUBROUTINE DA_Calculate_Residual_Buoy( oi, y, re,                        &
 
         np_available = np_available + 5
 
-        re%buoy(n)%u = residual( n, 0, y%buoy(n)%u, &
+        re%buoy(n)%u = da_residual( n, 0, y%buoy(n)%u, &
                                      oi%buoy(n)%u, n_obs_bad % u )
-        re%buoy(n)%v = residual( n, 0, y%buoy(n)%v, &
+        re%buoy(n)%v = da_residual( n, 0, y%buoy(n)%v, &
                                   oi%buoy(n)%v, n_obs_bad % v )
-        re%buoy(n)%t = residual( n, 0, y%buoy(n)%t, &
+        re%buoy(n)%t = da_residual( n, 0, y%buoy(n)%t, &
                                   oi%buoy(n)%t, n_obs_bad % t )
-        re%buoy(n)%p = residual( n, 0, y%buoy(n)%p, &
+        re%buoy(n)%p = da_residual( n, 0, y%buoy(n)%p, &
                                   oi%buoy(n)%p, n_obs_bad % p )
-        re%buoy(n)%q = residual( n, 0, y%buoy(n)%q, &
+        re%buoy(n)%q = da_residual( n, 0, y%buoy(n)%q, &
                                   oi%buoy(n)%q, n_obs_bad % q )
       endif
     END DO
@@ -51,4 +51,4 @@ SUBROUTINE DA_Calculate_Residual_Buoy( oi, y, re,                        &
 
   ENDIF
 
-END SUBROUTINE DA_Calculate_Residual_Buoy
+END SUBROUTINE da_calculate_residual_buoy

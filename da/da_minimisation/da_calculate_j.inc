@@ -8,10 +8,6 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
 
 !------------------------------------------------------------------------------
 ! PURPOSE: Initialises the Y-array
-!
-! PARENT_MODULE: DA_DA_Minimisation  
-!
-!      08/2005  - replace da_zero_y by da_allocate_y     Zhiquan Liu
 !------------------------------------------------------------------------------
 
       implicit none

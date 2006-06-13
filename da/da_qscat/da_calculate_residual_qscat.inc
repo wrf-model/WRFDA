@@ -25,9 +25,9 @@ subroutine da_calculate_residual_qscat( oi, y, re,                        &
 
          np_available = np_available + 2
 
-         re%qscat(n)%u = residual( n, 0, y%qscat(n)%u, &
+         re%qscat(n)%u = da_residual( n, 0, y%qscat(n)%u, &
                                       oi%qscat(n)%u, n_obs_bad % u )
-         re%qscat(n)%v = residual( n, 0, y%qscat(n)%v, &
+         re%qscat(n)%v = da_residual( n, 0, y%qscat(n)%v, &
                                    oi%qscat(n)%v, n_obs_bad % v )
        endif
 

@@ -1,4 +1,4 @@
-SUBROUTINE DA_Cal_Residual_SSMI_Rv( oi, y, re, &
+SUBROUTINE da_cal_residual_ssmi_rv( oi, y, re, &
                                                   np_missing, np_bad_data, &
                                                   np_obs_used, np_available )
 
@@ -23,9 +23,9 @@ SUBROUTINE DA_Cal_Residual_SSMI_Rv( oi, y, re, &
 
       np_available = np_available + 2
 
-      re%ssmi_retrieval(n)%Speed = residual(n, 0, y%ssmi_retrieval(n)%Speed, &
+      re%ssmi_retrieval(n)%Speed = da_residual(n, 0, y%ssmi_retrieval(n)%Speed, &
                                oi%ssmi_retrieval(n)%Speed, n_obs_bad % Speed )
-      re%ssmi_retrieval(n)%tpw   = residual(n, 0, y%ssmi_retrieval(n)%tpw,   &
+      re%ssmi_retrieval(n)%tpw   = da_residual(n, 0, y%ssmi_retrieval(n)%tpw,   &
                                oi%ssmi_retrieval(n)%tpw, n_obs_bad % q       )
     endif
 
@@ -38,5 +38,5 @@ SUBROUTINE DA_Cal_Residual_SSMI_Rv( oi, y, re, &
    np_obs_used = np_obs_used + n_obs_bad % Speed % num % use    &
                              + n_obs_bad % q % num % use
 
-END SUBROUTINE DA_Cal_Residual_SSMI_Rv
+END SUBROUTINE da_cal_residual_ssmi_rv
 

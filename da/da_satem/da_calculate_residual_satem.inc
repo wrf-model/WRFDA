@@ -1,4 +1,4 @@
-SUBROUTINE DA_Calculate_Residual_Satem( oi, y, re,                        &
+SUBROUTINE da_calculate_residual_satem( oi, y, re,                        &
                                         np_missing, np_bad_data,          &
                                         np_obs_used, np_available )
 
@@ -21,7 +21,7 @@ SUBROUTINE DA_Calculate_Residual_Satem( oi, y, re,                        &
       if( oi%satem(n)%loc%proc_domain_with_halo ) then
         do k=1, oi%satem(n)%info%levels
           np_available = np_available + 1
-          re%Satem(n)%thickness(k) = residual( n, k, y%Satem(n)%thickness(k), &
+          re%Satem(n)%thickness(k) = da_residual( n, k, y%Satem(n)%thickness(k), &
                              oi%Satem(n)%thickness(k), n_obs_bad % thickness )
         end do
       endif
@@ -33,5 +33,5 @@ SUBROUTINE DA_Calculate_Residual_Satem( oi, y, re,                        &
 
   ENDIF
 
-END SUBROUTINE DA_Calculate_Residual_Satem
+END SUBROUTINE da_calculate_residual_satem
 

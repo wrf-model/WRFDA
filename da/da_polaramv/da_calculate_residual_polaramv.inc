@@ -1,4 +1,4 @@
-SUBROUTINE DA_Calculate_Residual_PolarAMV( oi, y, re,                        &
+SUBROUTINE da_calculate_residual_polaramv( oi, y, re,                        &
                                         np_missing, np_bad_data,          &
                                         np_obs_used, np_available )
 !-------------------------------------------------------------------------
@@ -35,9 +35,9 @@ SUBROUTINE DA_Calculate_Residual_PolarAMV( oi, y, re,                        &
 
          np_available = np_available + 2
 
-         re%polaramv(n)%u(k) = residual( n, 0, y%polaramv(n)%u(k), &
+         re%polaramv(n)%u(k) = da_residual( n, 0, y%polaramv(n)%u(k), &
                                       oi%polaramv(n)%u(k), n_obs_bad % u )
-         re%polaramv(n)%v (k)= residual( n, 0, y%polaramv(n)%v(k), &
+         re%polaramv(n)%v (k)= da_residual( n, 0, y%polaramv(n)%v(k), &
                                    oi%polaramv(n)%v(k), n_obs_bad % v )
                           
         END DO
@@ -55,5 +55,5 @@ SUBROUTINE DA_Calculate_Residual_PolarAMV( oi, y, re,                        &
 
    ENDIF
 
-END SUBROUTINE DA_Calculate_Residual_PolarAMV
+END SUBROUTINE da_calculate_residual_polaramv
 

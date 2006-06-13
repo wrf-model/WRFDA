@@ -1,4 +1,4 @@
-SUBROUTINE DA_Calculate_Residual_Gpspw( oi, y, re,                        &
+SUBROUTINE da_calculate_residual_gpspw( oi, y, re,                        &
                                         np_missing, np_bad_data,          &
                                         np_obs_used, np_available )
 
@@ -19,7 +19,7 @@ SUBROUTINE DA_Calculate_Residual_Gpspw( oi, y, re,                        &
     DO n=1, oi%num_Gpspw
       if( oi%gpspw(n)%loc%proc_domain_with_halo ) then
         np_available = np_available + 1
-        re%gpspw(n)%tpw = residual(n, 0, y%gpspw(n)%tpw, &
+        re%gpspw(n)%tpw = da_residual(n, 0, y%gpspw(n)%tpw, &
           oi%gpspw(n)%tpw, n_obs_bad % q )
       endif
     END DO
@@ -30,5 +30,5 @@ SUBROUTINE DA_Calculate_Residual_Gpspw( oi, y, re,                        &
 
   ENDIF
 
-END SUBROUTINE DA_Calculate_Residual_Gpspw
+END SUBROUTINE da_calculate_residual_gpspw
 

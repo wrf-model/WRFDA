@@ -1,4 +1,4 @@
-SUBROUTINE DA_Calculate_Residual_Radar( oi, y, re,                        &
+SUBROUTINE da_calculate_residual_radar( oi, y, re,                        &
                                         np_missing, np_bad_data,          &
                                         np_obs_used, np_available )
 
@@ -29,7 +29,7 @@ SUBROUTINE DA_Calculate_Residual_Radar( oi, y, re,                        &
 
           np_available = np_available + 1
 
-          re%Radar(n)%rv(k) = residual( n, k, y%Radar(n)%rv(k), &
+          re%Radar(n)%rv(k) = da_residual( n, k, y%Radar(n)%rv(k), &
                                         oi%Radar(n)%rv(k), n_obs_bad % rv )
         ENDIF
 
@@ -37,7 +37,7 @@ SUBROUTINE DA_Calculate_Residual_Radar( oi, y, re,                        &
 
           np_available = np_available + 1
 
-          re%Radar(n)%rf(k) = residual( n, k, y%Radar(n)%rf(k), &
+          re%Radar(n)%rf(k) = da_residual( n, k, y%Radar(n)%rf(k), &
                                         oi%Radar(n)%rf(k), n_obs_bad % rf )
         ENDIF
 
@@ -55,4 +55,4 @@ SUBROUTINE DA_Calculate_Residual_Radar( oi, y, re,                        &
                                 + n_obs_bad % rf % num % use
    ENDIF
 
-END SUBROUTINE DA_Calculate_Residual_Radar
+END SUBROUTINE da_calculate_residual_radar

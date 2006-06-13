@@ -1,4 +1,4 @@
-      function residual(n, k, yy, ox, n_bad) result (rr)
+      function da_residual(n, k, yy, ox, n_bad) result (rr)
 
       implicit none
 
@@ -22,5 +22,5 @@
 !             n_bad % num % miss = n_bad % num % miss + 1
 !           endif
         endif
-      end function residual
+      end function da_residual
 

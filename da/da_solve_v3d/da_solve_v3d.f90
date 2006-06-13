@@ -32,10 +32,6 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
 
    IMPLICIT NONE
 
-#ifdef DM_PARALLEL 
-#include <mpif.h>
-#endif
-
    TYPE(domain),                intent(inout) :: grid
    TYPE (grid_config_rec_type), intent(inout) :: config_flags
 

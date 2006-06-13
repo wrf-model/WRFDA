@@ -22,7 +22,7 @@ subroutine da_cal_residual_ssmt1( iv, y, re,                        &
          do k=1, iv%ssmt1(n)%info%levels
             np_available = np_available + 1
 
-            re%ssmt1(n)%t(k) = residual( n, k, y%ssmt1(n)%t(k), &
+            re%ssmt1(n)%t(k) = da_residual( n, k, y%ssmt1(n)%t(k), &
                                          iv%ssmt1(n)%t(k), n_obs_bad % t )
          end do
       end do
