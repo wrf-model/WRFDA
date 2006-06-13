@@ -3,7 +3,6 @@ include configure.wrf
 links :
 	@ $(LN) ../*/*.make .
 	@ $(LN) ../*/*.f90 .
-	@ $(LN) ../*/*.inc .
 	@ $(LN) ../*/*.F .
 	@ $(LN) ../*/*.c .
 	@ $(LN) ../*/*.h .
@@ -37,7 +36,6 @@ links :
 	@ $(LN) $(RSL)/RSL/*.c .
 	@ $(LN) $(RSL)/RSL/*.h .
 	@ $(LN) $(FRAME)/collect_on_comm.c .
-	@ touch links
 
 # Manual rules specified first take precedence
 
@@ -92,6 +90,6 @@ clean :
 
 superclean : clean
 	@ $(RM) *.f90 *.F90 *.F *.inc *.int *.c *.h *.m4 *.code *.make \
-          bufrlib.param *.sed registry links \
+          bufrlib.param *.sed registry \
           convert_tool kma_wave2grid wave2grid_kma *.csh version_decl \
           RSL *.bsh *.csh

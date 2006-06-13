@@ -366,7 +366,7 @@ fi
 
 export CONFIG=configure.wrf
 
-ln -s $PWD/$CONFIG build
+ln -fs $PWD/$CONFIG build
 
 # new feb 2005.  test whether MPI-2
 if test -e $CONFIG ; then

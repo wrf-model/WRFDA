@@ -160,6 +160,7 @@ SUBROUTINE ext_gr1_open_for_read_begin ( FileName , Comm_compute, Comm_io, &
      SysDepInfo, DataHandle , Status )
 
   USE data_info
+  USE module_wrf_error
   IMPLICIT NONE
 #include "wrf_status_codes.h"
 #include "wrf_io_flags.h"
@@ -515,6 +516,7 @@ SUBROUTINE ext_gr1_write_field( DataHandle , DateStr , VarName , &
      Status )
 
   USE data_info
+  USE module_wrf_error
   IMPLICIT NONE
 #include "wrf_status_codes.h"
 #include "wrf_io_flags.h"
@@ -1195,6 +1197,7 @@ SUBROUTINE ext_gr1_get_var_info ( DataHandle , VarName , NDim , &
      MemoryOrder , Stagger , DomainStart , DomainEnd , WrfType, Status )
 
   USE data_info
+  USE module_wrf_error
   IMPLICIT NONE
 #include "wrf_status_codes.h"
   integer               ,intent(in)     :: DataHandle
@@ -1511,6 +1514,7 @@ SUBROUTINE ext_gr1_get_var_ti_char ( DataHandle,Element,  Varname, Data,  &
      Status )
 
   USE data_info
+  USE module_wrf_error
   IMPLICIT NONE
 #include "wrf_status_codes.h"
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -1548,6 +1552,7 @@ SUBROUTINE ext_gr1_put_var_ti_real ( DataHandle,Element,  Varname, Data, &
      Count,  Status )
 
   USE data_info
+  USE module_wrf_error
   IMPLICIT NONE
 #include "wrf_status_codes.h"
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -1579,6 +1584,7 @@ END SUBROUTINE ext_gr1_put_var_ti_real
 SUBROUTINE ext_gr1_put_var_ti_double ( DataHandle,Element,  Varname, Data, &
      Count,  Status )
   USE data_info
+  USE module_wrf_error
   IMPLICIT NONE
 #include "wrf_status_codes.h"
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -3456,6 +3462,7 @@ END SUBROUTINE build_string
 
 SUBROUTINE get_dims(MemoryOrder, Start, End, ndim, x_start, x_end, y_start, &
      y_end, z_start, z_end)
+  USE module_wrf_error
   IMPLICIT NONE
   CHARACTER (LEN=*)    ,INTENT(IN)    :: MemoryOrder
   INTEGER              ,INTENT(OUT)   :: ndim,x_start,x_end,y_start
@@ -3536,7 +3543,7 @@ END SUBROUTINE get_dims
 !*****************************************************************************
 
 SUBROUTINE get_dimvals(MemoryOrder,x,y,z,dims)
-
+  USE module_wrf_error
   IMPLICIT NONE
   CHARACTER (LEN=*)    ,INTENT(IN)    :: MemoryOrder
   INTEGER              ,INTENT(IN)    :: x,y,z
@@ -3695,6 +3702,7 @@ end SUBROUTINE get_levels
 
 
 SUBROUTINE FILL_ETA_LEVELS(fileindex, FileFd, grib_tables, VarName, eta_levels)
+  USE module_wrf_error
   IMPLICIT NONE
 
   CHARACTER (len=*) :: fileindex
@@ -3804,5 +3812,5 @@ SUBROUTINE Transpose(MemoryOrder, di, FieldType, Field, &
 ! endif
   
 
-end SUBROUTINE
+end SUBROUTINE Transpose
 
