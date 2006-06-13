@@ -35,9 +35,6 @@ SUBROUTINE da_transfer_xatowrftl_adj( grid, config_flags, filnam, &
 
    IF (trace_use) CALL da_trace_entry("da_transfer_xatowrftl_adj")
 
-
-#ifdef VAR4DPOSS
-
    is=xp%its
    ie=xp%ite
    js=xp%jts
@@ -245,8 +242,6 @@ SUBROUTINE da_transfer_xatowrftl_adj( grid, config_flags, filnam, &
    enddo
    enddo
    enddo
-
-#endif  
 
    IF (trace_use) CALL da_trace_exit("da_transfer_xatowrftl_adj")
 

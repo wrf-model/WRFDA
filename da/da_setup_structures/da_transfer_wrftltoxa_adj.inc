@@ -26,9 +26,6 @@ SUBROUTINE da_transfer_wrftltoxa_adj( grid, config_flags, filnam, &
 
    IF (trace_use) CALL da_trace_entry("da_transfer_wrftltoxa_adj")
 
-
-#ifdef VAR4DPOSS
-
 !---------------------------------------------------------------------------
 
    is=xp%its
@@ -228,8 +225,6 @@ SUBROUTINE da_transfer_wrftltoxa_adj( grid, config_flags, filnam, &
 
    grid%dyn_opt = ndynopt
    call nl_set_dyn_opt ( 1 , DYN_EM )
-
-#endif  
 
 IF (trace_use) CALL da_trace_exit("da_transfer_wrftltoxa_adj")
 

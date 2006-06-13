@@ -4,7 +4,7 @@ include ../../configure.wrf
 
 OBJSL   = io_int.o 
 OBJS    = $(OBJSL)
-FFLAGS  = $(FCFLAGS)
+FFLAGS  = $(FCFLAGS)  -I../../frame
 LIBS    = 
 CPP1    = $(CPP) $(TRADFLAG)
 M4      = m4 -Uinclude -Uindex -Ulen

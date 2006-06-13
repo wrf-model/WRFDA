@@ -35,14 +35,12 @@ subroutine da_transfer_xatoanalysis( it, xbx, grid, config_flags ,&
 !------------------------------------------------------------------------------      
 
    if(fg_format == 1) then
-#ifdef VAR4DPOSS
       if (write_increments) then
          write(UNIT=filnam,FMT='(a3,i1)') 'inc',it
          call da_transfer_xatowrftl( grid, config_flags, filnam, &
 #include "em_dummy_args.inc"
                                  )
       endif
-#endif
 
       call da_transfer_xatowrf( xbx, grid, &
 #include "em_dummy_args.inc"

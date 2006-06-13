@@ -31,8 +31,6 @@ SUBROUTINE da_transfer_wrftltoxa( grid, config_flags, filnam, &
 IF (trace_use) CALL da_trace_entry("da_transfer_wrftltoxa")
 
 
-#ifdef VAR4DPOSS
-
 !------------------------------------------------------------------------------
 !  [0.0] INPUT
 !------------------------------------------------------------------------------
@@ -173,8 +171,6 @@ IF (trace_use) CALL da_trace_entry("da_transfer_wrftltoxa")
       enddo
       enddo
    endif
-#endif
-
 #endif
 
 IF (trace_use) CALL da_trace_exit("da_transfer_wrftltoxa")
