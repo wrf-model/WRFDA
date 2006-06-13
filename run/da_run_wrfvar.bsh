@@ -188,6 +188,24 @@ if test -r $DA_SSMI; then
   set DA_USE_SSMIRETRIEVALOBS = .TRUE.
 fi
 
+HTML=$EXP_DIR/index.html
+
+DATE=`date`
+
+cat > $HTML << EOF
+<HTML><HEAD><TITLE>$EXPT</TITLE></HEAD><BODY>
+<H1>$EXPT</H1>
+
+<PRE>
+Started: $DATE
+Experiment directory:        $EXP_DIR
+Run directory:               $RUN_DIR
+Build directory:             $DA_BUILD_DIR
+First Guess Input File:      $DA_FIRST_GUESS
+Background Error Input File: $DA_BACK_ERRORS
+Observation Input File:      $DA_OBSERVATIONS
+EOF
+
 echo "Experiment directory:        $EXP_DIR"
 echo "Run directory:               $RUN_DIR"
 echo "Build directory:             $DA_BUILD_DIR"
@@ -235,58 +253,111 @@ mkdir trace
 
 if test $PLATFORM == "Linux"; then
   if test $NUM_PROCS -gt 1; then
-    mpirun -v -np $NUM_PROCS -nolocal -machinefile $HOSTS ./wrfvar.exe
-    ln -fs rsl.out.0000 wrfvar.out
-    ln -fs rsl.error.0000 wrfvar.error
+    mpirun -v -np $NUM_PROCS -nolocal -machinefile $HOSTS ./wrfvar.exe > wrfvar.out 2>wrfvar.error
+    RC=$?
   else
-#    mpirun -v -np 1 ./wrfvar.exe > /dev/null #Assumes compile in DM mode.
-#    ln -fs rsl.out.0000   wrfvar.out
-#    ln -fs rsl.error.0000 wrfvar.error
+    # mpirun -v -np 1 ./wrfvar.exe > /dev/null #Assumes compile in DM mode.
     ./wrfvar.exe > wrfvar.out 2>wrfvar.error
+    RC=$?
   fi
 fi
 
 if test $PLATFORM == "Darwin"; then
   if test $NUM_PROCS -gt 1; then
-    mpirun -v -np $NUM_PROCS -all-local -machinefile $HOSTS ./wrfvar.exe
-    ln -fs rsl.out.0000   wrfvar.out
-    ln -fs rsl.error.0000 wrfvar.error
+    mpirun -v -np $NUM_PROCS -all-local -machinefile $HOSTS ./wrfvar.exe > wrfvar.out 2>wrfvar.error
+    RC=$?
   else
     ./wrfvar.exe > wrfvar.out 2>wrfvar.error
+    RC=$?
   fi
 fi
 
 #DEC:
 #./wrfvar.exe > wrfvar.out 2>wrfvar.error
+#RC=$?
 
 if test $PLATFORM == "AIX"; then
   #IBM (llsubmit):
   #poe ./wrfvar.exe
   #mpirun -np ${NUM_PROCS} ./wrfvar.exe
   ./wrfvar.exe > wrfvar.out 2>wrfvar.error
+  RC=$?
 fi
 
-if test -f fort.9; then
-  cp $PWD/fort.9      $EXP_DIR/namelist.output
+DATE=`date`
+
+cd $EXP_DIR
+
+if test -f $RUN_DIR/fort.9; then
+  cp $RUN_DIR/fort.9 namelist.output
 fi
 
-if test -f fort.12; then
-  cp $PWD/fort.12      $EXP_DIR/statistics
+if test -f $RUN_DIR/fort.12; then
+  cp $RUN_DIR/fort.12 statistics
 fi
 
-if test -f fort.81; then 
-  cp $PWD/fort.81      $EXP_DIR/cost_fn
+if test -f $RUN_DIR/fort.81; then 
+  cp $RUN_DIR/fort.81 cost_fn
 fi
 
-if test -f fort.82; then
-  cp $PWD/fort.82      $EXP_DIR/grad_fn
+if test -f $RUN_DIR/fort.82; then
+  cp $RUN_DIR/fort.82 grad_fn
 fi
 
-cp $PWD/namelist.* $EXP_DIR
-cp $PWD/rsl*       $EXP_DIR
-cp $PWD/wrf*.out   $EXP_DIR
-cp $PWD/wrf*.error $EXP_DIR
+if test -d $RUN_DIR/trace; then
+  mv $RUN_DIR/trace .
+fi
 
+cp $RUN_DIR/namelist.* .
+
+mkdir rsl
+cp $RUN_DIR/rsl* rsl
+cd rsl
+for FILE in rsl*; do
+  echo "<HTML><HEAD><TITLE>$FILE</TITLE></HEAD>" > $FILE.html
+  echo "<H1>$FILE</H1><PRE>" >> $FILE.html
+  cat $FILE >> $FILE.html
+  echo "</PRE></BODY></HTML>" >> $FILE.html
+  rm $FILE
+done
+cd $EXP_DIR
+  
+if test -f $RUN_DIR/wrfvar.out; then
+  echo "<HTML><HEAD><TITLE>stdout</TITLE></HEAD>" > stdout.html
+  echo "<H1>stdout</H1><PRE>" >> stdout.html
+  cat $RUN_DIR/wrfvar.out >> stdout.html
+  echo "</PRE></BODY></HTML>" >> stdout.html
+fi
+
+if test -f $RUN_DIR/wrfvar.error; then
+  echo "<HTML><HEAD><TITLE>stderr</TITLE></HEAD>" > stderr.html
+  echo "<H1>stderr</H1><PRE>" >> stderr.html
+  cat $RUN_DIR/wrfvar.error >> stderr.html
+  echo "</PRE></BODY></HTML>" >> stderr.html
+fi
+
+cat >> $HTML << EOF
+<A HREF="namelist.input">Namelist Input</a>
+<A HREF="namelist.output">Namelist Output</a>
+<A HREF="stdout.html">Stdout</a>
+<A HREF="stderr.html">Stderr</a>
+<A HREF="rsl/rsl.out.0000.html">rsl.out.0000</a>
+<A HREF="rsl/rsl.error.0000.html">rsl.error.0000</a>
+<A HREF="rsl">Other RSL output</a>
+<A HREF="trace/0.html">PE 0 Trace</a>
+<A HREF="trace">Other tracing</a>
+<A HREF="cost_fn">Cost Function</a>
+<A HREF="grad_fn">Gradient Function</a>
+<A HREF="statistics">Statistics</a>
+</PRE>
+</BODY></HTML>
+EOF
+
+if test $RC == 0; then
+  echo "passed on $DATE" >> $HTML
+else
+  echo "failed on $DATE with error $RC" >> $HTML
+fi
 
 
 echo "WRF-Var completed"

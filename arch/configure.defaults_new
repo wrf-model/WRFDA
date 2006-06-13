@@ -18,13 +18,8 @@ RSL             = $(EXTERNAL)/RSL
 # Flags (preprocessor, fortran, c, loader)
 
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE \
-                    -DINTIO \
-                     -DONLY_WRFMODEL_IO \
-                    -DLINUX -DNO_RRTM_PHYSICS  \
-		    -DNONSTANDARD_SYSTEM \
-		    -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
-                    -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DLINUX -DNONSTANDARD_SYSTEM
+                    
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DWRF_RSL_IO -DRSL -DDM_PARALLEL
 FPPFLAGS_BUFR   = -C -P $(TRADFLAG) -DLINUX -Dlinux
@@ -37,8 +32,7 @@ FCENDIAN        = -byteswapio
 FCBASE          = -Ktrap=fp -tp p6 -C
 FCFLAGS_RSL     = $(FCENDIAN)
 
-CCFLAGS2        = -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) \
-                  -I$(RSL)/RSL
+CCFLAGS2        = -I$(RSL)/RSL
 CCFLAGS_BUFR    = -DUNDERSCORE
 CCFLAGS_RSL     = 
 
@@ -70,12 +64,7 @@ CC_TOOLS        = $(FC)
 LD              = $(FC)
 
 TRADFLAG        =
-FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DINTIO \
-                     -DONLY_WRFMODEL_IO  \
-                    -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) \
-                    -DDEC_ALPHA -DNONSTANDARD_SYSTEM \
-	   	    -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
-                    -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DDEC_ALPHA -DNONSTANDARD_SYSTEM                    
 
 #FCOPTIM        = -fast -O2 -Olimit 2000
 FCOPTIM         = #-fast -O2
@@ -106,12 +95,8 @@ LD              = $(FC)
 RSL             = $(EXTERNAL)/RSL
 
 TRADFLAG        =
-FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DINTIO \
-                     -DONLY_WRFMODEL_IO  \
-                    -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) \
-                    -DDEC_ALPHA -DNONSTANDARD_SYSTEM \
-                    -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
-                    -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DDEC_ALPHA -DNONSTANDARD_SYSTEM
+                    
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DWRF_RSL_IO -DRSL -DDM_PARALLEL
 
@@ -152,12 +137,8 @@ CC_TOOLS        = $(CC)
 LD              = $(FC)
 
 TRADFLAG        =
-FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DINTIO \
-                     -DONLY_WRFMODEL_IO  \
-                    -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) \
-                    -DDEC_ALPHA -DNONSTANDARD_SYSTEM \
-                    -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
-                    -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DDEC_ALPHA -DNONSTANDARD_SYSTEM
+                   
 
 #FCOPTIM        = -fast -O2 -Olimit 2000
 FCOPTIM         = -O0
@@ -185,11 +166,8 @@ CC_TOOLS        = $(CC)
 LD              = $(FC)
 
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE \
-                     -DONLY_WRFMODEL_IO \
-                    -DLINUX -DNONSTANDARD_SYSTEM \
-		    -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
-                    -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DLINUX -DNONSTANDARD_SYSTEM
+                    
 FPPFLAGS_BUFR   = -C -P $(TRADFLAG) -DLINUX -Dlinux
 
 FCOPTIM         = #-fast
@@ -220,16 +198,11 @@ CC              = mpicc
 CC_TOOLS        = gcc
 LD              = $(FC)
 
-RSL        = $(EXTERNAL)/RSL
+RSL             = $(EXTERNAL)/RSL
 
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE \
-                    -DINTIO \
-                     -DONLY_WRFMODEL_IO \
-                    -DLINUX -DNO_RRTM_PHYSICS  \
-		    -DNONSTANDARD_SYSTEM \
-	  	    -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
-                    -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DLINUX -DNONSTANDARD_SYSTEM
+                    
 FPPFLAGS_BUFR   = -C -P $(TRADFLAG) -DLINUX -Dlinux
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DWRF_RSL_IO -DRSL -DDM_PARALLEL
@@ -242,8 +215,7 @@ FCENDIAN        = -byteswapio
 FCBASE          = -Ktrap=fp -tp p6 -C
 FCFLAGS_RSL     = $(FCENDIAN)
 
-CCFLAGS2        = -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) \
-                    -I$(RSL)/RSL
+CCFLAGS2        = -I$(RSL)/RSL
 CCFLAGS_BUFR    = -DUNDERSCORE
 CCFLAGS_RSL     = 
 
@@ -271,10 +243,8 @@ CC_TOOLS        = gcc
 LD              = $(FC)
 
 TRADFLAG        = -traditional
-FPPFLAGS2       =  -DONLY_WRFMODEL_IO \
-                    -DLINUX -DNONSTANDARD_SYSTEM \
-		    -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
-                    -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM
+                    
 FPPFLAGS_BUFR   = -C -P  $(TRADFLAG) -DLINUX -Dlinux
 
 FCOPTIM         = 
@@ -308,12 +278,8 @@ RSL             = $(EXTERNAL)/RSL
 
 
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DINTIO \
-                     -DONLY_WRFMODEL_IO \
-                    -DLINUX -DNO_RRTM_PHYSICS  \
-		    -DNONSTANDARD_SYSTEM \
-		    -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
-                    -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM 
+                    
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DWRF_RSL_IO -DRSL -DDM_PARALLEL
 FPPFLAGS_BUFR   = -C -P $(TRADFLAG) -DLINUX -Dlinux
@@ -327,9 +293,7 @@ FCBASE          = -cpp -Wno=101,139,155,158 -fno-second-underscore \
 FCTYPE          = -r8
 FCFLAGS_RSL     = $(FCENDIAN) -ffixed-form -fno-second-underscore
 
-CCFLAGS2        = -DMAXDOM_MAKE=$(MAX_DOMAINS) \
-                    -DMAXPROC_MAKE=$(MAX_PROC) \
-                    -I$(RSL)/RSL
+CCFLAGS2        = -I$(RSL)/RSL
 CCFLAGS_BUFR    = -DUNDERSCORE
 CCFLAGS_RSL     = 
 
@@ -358,11 +322,8 @@ CC_TOOLS        = gcc
 LD              = $(FC)
 
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE \
-                     -DONLY_WRFMODEL_IO \
-                    -DNO_RRTM_PHYSICS -DNONSTANDARD_SYSTEM \
-		    -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
-                    -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DNONSTANDARD_SYSTEM 
+                    
 FPPFLAGS_BUFR   = -C -P $(TRADFLAG) -DLINUX -Dlinux
 
 FCOPTIM         = -O3 -xW
@@ -392,11 +353,8 @@ CC_TOOLS        = $(CC)
 LD              = $(FC)
 
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE \
-                     -DONLY_WRFMODEL_IO \
-                    -DLINUX -DNONSTANDARD_SYSTEM \
-		    -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
-                    -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DLINUX -DNONSTANDARD_SYSTEM
+                    
 FPPFLAGS_BUFR   = -C -P $(TRADFLAG) -DLINUX -Dlinux
 
 FCOPTIM         = #-fastsse
@@ -429,13 +387,8 @@ LD              = $(FC)
 RSL             = $(EXTERNAL)/RSL
 
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE  \
-                    -DINTIO \
-                     -DONLY_WRFMODEL_IO \
-                    -DLINUX -DNO_RRTM_PHYSICS   \
-  		    -DNONSTANDARD_SYSTEM \
-		    -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
-                    -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DLINUX -DNONSTANDARD_SYSTEM
+                    
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DWRF_RSL_IO -DRSL -DDM_PARALLEL
 FPPFLAGS_BUFR   = -C -P $(TRADFLAG) -DLINUX -Dlinux
@@ -448,9 +401,7 @@ FCENDIAN        = -byteswapio
 FCBASE          = -C
 FCFLAGS_RSL     = $(FCENDIAN)
 
-CCFLAGS2        = -DMAXDOM_MAKE=$(MAX_DOMAINS) \
-                    -DMAXPROC_MAKE=$(MAX_PROC) \
-                    -I$(RSL)/RSL
+CCFLAGS2        = -I$(RSL)/RSL
 CCFLAGS_RSL     = 
 CCFLAGS_BUFR    = -DUNDERSCORE
 
@@ -477,10 +428,8 @@ CC_TOOLS        = $(CC)
 LD              = $(FC)
 
 TRADFLAG        = -traditional
-FPPFLAGS2       =  -DONLY_WRFMODEL_IO \
-                    -DLINUX -DNONSTANDARD_SYSTEM \
-		    -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
-                    -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM
+                    
 FPPFLAGS_BUFR   = -C -P $(TRADFLAG) -DLINUX -Dlinux -DPATHSCALE
 
 FCOPTIM         = #-fastsse
@@ -514,11 +463,8 @@ LD              = $(FC)
 RSL             = ./$(EXTERNAL)/RSL
 
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DINTIO \
-                     -DONLY_WRFMODEL_IO \
-                    -DLINUX -DNO_RRTM_PHYSICS  \
-		    -DNONSTANDARD_SYSTEM \
-		    -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM
+		     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DWRF_RSL_IO -DRSL -DDM_PARALLEL
 FPPFLAGS_BUFR   = -C -P $(TRADFLAG) -DLINUX -Dlinux -DPATHSCALE
@@ -531,9 +477,7 @@ FCENDIAN        = -byteswapio
 FCBASE          = -fno-second-underscore
 FCFLAGS_RSL     = $(FCENDIAN) $(FCBASE)
 
-CCFLAGS2        = -DMAXDOM_MAKE=$(MAX_DOMAINS) \
-                  -DMAXPROC_MAKE=$(MAX_PROC) \
-                  -I$(RSL)/RSL
+CCFLAGS2        = -I$(RSL)/RSL
 CCFLAGS_RSL     = 
 CCFLAGS_BUFR    = -DUNDERSCORE
 
@@ -564,12 +508,7 @@ RANLIB          = echo
 LD              = $(FC)
 
 TRADFLAG        =
-FPPFLAGS2       = -DINTIO \
-                     -DONLY_WRFMODEL_IO \
-                    -DNORESHAPE -DIRIX \
-		    -DNONSTANDARD_SYSTEM \
-		    -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
-                    -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+FPPFLAGS2       = -DNORESHAPE -DIRIX -DNONSTANDARD_SYSTEM                    
 
 FCOPTIM         = -O2
 FCDEBUG         = #-g
@@ -604,11 +543,8 @@ LD              = $(FC)
 RSL             = $(EXTERNAL)/RSL
 
 TRADFLAG        =
-FPPFLAGS2       = -DINTIO \
-                     -DONLY_WRFMODEL_IO -DIRIX \
-		    -DNONSTANDARD_SYSTEM \
-		    -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
-                    -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+FPPFLAGS2       = -DIRIX -DNONSTANDARD_SYSTEM
+                    
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DWRF_RSL_IO -DRSL -DDM_PARALLEL
 FCOPTIM         = -O3 -OPT:roundoff=3:IEEE_arithmetic=3
@@ -619,10 +555,7 @@ FCENDIAN        =
 FCBASE          = -64 -mips4 -w
 FCFLAGS_RSL     = $(FCENDIAN)
 
-CCFLAGS2        = -w -64 -mips4 \
-                    -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) \
-                    -I$(RSL)/RSL \
-	  	    -I/tea2/huangwei/mpich-1.2.4/include
+CCFLAGS2        = -w -64 -mips4 -I$(RSL)/RSL -I/tea2/huangwei/mpich-1.2.4/include
 CCFLAGS_RSL     =
 
 LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)
@@ -652,13 +585,8 @@ LD              = $(FC)
 MAX_PROC        = 256
 
 TRADFLAG        =
-FPPFLAGS2       = -DINTIO  \
-                     -DONLY_WRFMODEL_IO \
-                    -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) \
-		    -DMPI -I$(MPIINCDIR) -DNEC \
-		    -DNONSTANDARD_SYSTEM \
-		    -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
-                    -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+FPPFLAGS2       = -DMPI -I$(MPIINCDIR) -DNEC -DNONSTANDARD_SYSTEM
+                    
 FCOPTIM         =
 FCDEBUG         =
 FCTYPE          =
@@ -684,10 +612,7 @@ CC_TOOLS        = cc
 LD              = $(FC)
 
 TRADFLAG        =
-FPPFLAGS2       = -DGRIB1 -DINTIO  -DNATIVE_MASSV -DAIX \
-		    -DNONSTANDARD_SYSTEM \
-		    -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
-                    -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+FPPFLAGS2       = -DGRIB1 -DNATIVE_MASSV -DAIX -DNONSTANDARD_SYSTEM                    
 
 FCOPTIM         = -O0 -qarch=auto
 FCDEBUG         = #-g -qfullpath
@@ -721,12 +646,8 @@ LD              = $(FC)
 RSL             = $(EXTERNAL)/RSL
 
 TRADFLAG        =
-FPPFLAGS2       =  -DGRIB1 -DINTIO \
-		    -DNATIVE_MASSV \
-		    -DNORESHAPE -DAIX \
-		    -DNONSTANDARD_SYSTEM \
-		    -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
-                    -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+FPPFLAGS2       = -DGRIB1 -DNATIVE_MASSV -DNORESHAPE -DAIX -DNONSTANDARD_SYSTEM
+                    
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DWRF_RSL_IO -DRSL -DDM_PARALLEL
 
@@ -739,10 +660,7 @@ FCBASE          = -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767 \
  		    -qflttrap=zerodivide:invalid:enable -qsigtrap=xl__trce -C
 FCFLAGS_RSL     = $(FCENDIAN)
 
-CCFLAGS2        = -DNOUNDERSCORE -DNCARIBM_NOC99 \
-		    -I$(RSL)/RSL \
-                    -DMAXDOM_MAKE=$(MAX_DOMAINS) \
-		    -DMAXPROC_MAKE=$(MAX_PROC)
+CCFLAGS2        = -DNOUNDERSCORE -DNCARIBM_NOC99 -I$(RSL)/RSL
 CCFLAGS_BUFR    = -DNOUNDERSCORE
 CCFLAGS_RSL     =
 
@@ -776,11 +694,8 @@ LD              = $(FC)
 RSL             = $(EXTERNAL)/RSL
 
 TRADFLAG        = -traditional-cpp
-FPPFLAGS2       =  -DONLY_WRFMODEL_IO -DINTIO \
-                    -DNORESHAPE -Dcrayx1 \
-		    -DNONSTANDARD_SYSTEM \
-		    -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
-                    -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+FPPFLAGS2       = -DNORESHAPE -Dcrayx1 -DNONSTANDARD_SYSTEM
+                    
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DWRF_RSL_IO -DRSL -DDM_PARALLEL
 
@@ -796,11 +711,7 @@ FCENDIAN        =
 FCBASE          = #-Ovector0 -Ostream0 -Oscalar1
 FCFLAGS_RSL     = $(FCENDIAN)
 
-CCFLAGS2        = -UCRAY \
-                    -I$(RSL)/RSL \
-                    -DMAXDOM_MAKE=$(MAX_DOMAINS) \
-                    -DMAXPROC_MAKE=$(MAX_PROC) \
-		    -h gen_private_callee
+CCFLAGS2        = -UCRAY -I$(RSL)/RSL -h gen_private_callee
 CCFLAGS_BUFR    = -DUNDERSCORE
 CCFLAGS_RSL     =
 
@@ -834,11 +745,8 @@ LD              = $(FC)
 RSL             = $(EXTERNAL)/RSL
 
 TRADFLAG        = -traditional-cpp
-FPPFLAGS2       =  -DONLY_WRFMODEL_IO -DINTIO \
-                    -DNORESHAPE -Dcrayx1 \
- 		    -DNONSTANDARD_SYSTEM \
-		    -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
-                    -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+FPPFLAGS2       = -DNORESHAPE -Dcrayx1 -DNONSTANDARD_SYSTEM
+                    
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DWRF_RSL_IO -DRSL -DDM_PARALLEL
 
@@ -852,10 +760,7 @@ FCENDIAN        =
 FCBASE          = #-Ovector0 -Ostream0 -Oscalar1
 FCFLAGS_RSL     = $(FCENDIAN)
 
-CCFLAGS2        = -UCRAY -Dcrayx1 \
-                    -I$(RSL)/RSL \
-                    -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) \
-  		    -h gen_private_callee
+CCFLAGS2        = -UCRAY -Dcrayx1 -I$(RSL)/RSL -h gen_private_callee
 CCFLAGS_RSL     = -Dcrayx1
 
 LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)
@@ -882,11 +787,8 @@ CPP             = /usr/bin/cpp
 LD              = $(FC)
 
 TRADFLAG        =
-FPPFLAGS2       = -DINTIO \
-                     -DMACOS \
-		    -DNONSTANDARD_SYSTEM \
-		    -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
-                    -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+FPPFLAGS2       = -DMACOS -DNONSTANDARD_SYSTEM
+                    
 FPPFLAGS_BUFR   = -C -P $(TRADFLAG)
 
 FCOPTIM         = -O0 -qarch=auto
@@ -921,11 +823,8 @@ LD              = $(FC)
 RSL             = $(EXTERNAL)/RSL
 
 TRADFLAG        =
-FPPFLAGS2       = -DINTIO \
-                     -DMACOS \
-		    -DNONSTANDARD_SYSTEM \
-		    -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
-                    -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+FPPFLAGS2       = -DMACOS -DNONSTANDARD_SYSTEM
+                    
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DWRF_RSL_IO -DRSL -DDM_PARALLEL
 FPPFLAGS_BUFR   = -C -P $(TRADFLAG)
@@ -942,9 +841,7 @@ FCFLAGS_RSL     = -qfixed $(FCENDIAN)
 # Avoid problems with missing _vsprintf$LDBLStub, _vprintf$LDBLStub, 
 # _sscanf$LDBLStub on Mac by defining them away. They ought to be in 
 # -lSystemStubs but aren't
-CCFLAGS2        = -DNOUNDERSCORE -DLANDREAD_STUB -DMACOS \
-		    -I$(RSL)/RSL \
-                    -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC)
+CCFLAGS2        = -DNOUNDERSCORE -DLANDREAD_STUB -DMACOS -I$(RSL)/RSL
 CCFLAGS_RSL     = -DMACOS -DNOUNDERSCORE -I/usr/include/sys
 
 LDFLAGS         =  $(FCBASE) $(FCOPTIM) $(FCENDIAN) \
@@ -972,10 +869,7 @@ CC_TOOLS        = cc
 LD              = $(FC)
 
 TRADFLAG        =
-FPPFLAGS2       = -DINTIO  -DMACOS \
-		    -DNONSTANDARD_SYSTEM \
-		    -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
-                    -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+FPPFLAGS2       = -DMACOS -DNONSTANDARD_SYSTEM                     
 
 FCOPTIM         = 
 FCDEBUG         = #-g
@@ -1007,15 +901,12 @@ SFC             = g95
 LD              = $(FC)
 CC              = mpicc
 CC_TOOLS        = cc
-
+a
 RSL             = $(EXTERNAL)/RSL
 
 TRADFLAG        =
-FPPFLAGS2       = -DINTIO \
-                       -DMACOS \
-		     -DNONSTANDARD_SYSTEM \
-		     -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
-                     -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+FPPFLAGS2       = -DMACOS -DNONSTANDARD_SYSTEM		      \
+                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DWRF_RSL_IO -DRSL -DDM_PARALLEL
 
@@ -1028,10 +919,7 @@ FCBASE          = -cpp -Wno=101,139,155,158 -fno-second-underscore \
                   -ftrace=full -finteger=-9999 -freal=nan -C
 FCFLAGS_RSL     = $(FCENDIAN) -ffixed-form -fno-second-underscore
 
-CCFLAGS2        = -DMAXDOM_MAKE=$(MAX_DOMAINS) \
-                    -DMAXPROC_MAKE=$(MAX_PROC) \
-                    -I$(RSL)/RSL \
-                    -DLANDREAD_STUB -DMACOS
+CCFLAGS2        = -I$(RSL)/RSL -DLANDREAD_STUB -DMACOS
 CCFLAGS_BUFR    = -DUNDERSCORE
 CCFLAGS_RSL     = -DMACOS -I/usr/include/sys
 
