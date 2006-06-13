@@ -901,7 +901,7 @@ SFC             = g95
 LD              = $(FC)
 CC              = mpicc
 CC_TOOLS        = cc
-a
+
 RSL             = $(EXTERNAL)/RSL
 
 TRADFLAG        =
