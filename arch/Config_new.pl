@@ -116,7 +116,7 @@ while ( substr( $ARGV[0], 0, 1 ) eq "-" ) {
    $sw_esmfinc_path = $ENV{ESMF_INC};
    }
 
-# parse the configure.defaults_wrfvar file
+# parse the configure.defaults_new file
 
 $validresponse = 0 ;
 
@@ -127,8 +127,8 @@ until ( $validresponse ) {
   printf "Choose single-threaded options for be.\n\n" ;
 
   $opt = 1 ;
-  open CONFIGURE_DEFAULTS, "< ./arch/configure.defaults_wrfvar" 
-      or die "Cannot open ./arch/configure.defaults_wrfvar for reading" ;
+  open CONFIGURE_DEFAULTS, "< ./arch/configure.defaults_new" 
+      or die "Cannot open ./arch/configure.defaults_new for reading" ;
   while ( <CONFIGURE_DEFAULTS> ) {
     if ( substr( $_, 0, 5 ) eq "#ARCH" && 
        ( index( $_, $sw_os ) >= 0 ) && ( index( $_, $sw_mach ) >= 0 ) ) {
@@ -160,8 +160,8 @@ printf "------------------------------------------------------------------------
 $optchoice = $response ;
 
 
-open CONFIGURE_PREAMBLE, "< ./arch/preamble_wrfvar" 
-  or die "Cannot open ./arch/preamble_wrfvar for reading" ;
+open CONFIGURE_PREAMBLE, "< ./arch/preamble_new" 
+  or die "Cannot open ./arch/preamble_new for reading" ;
 $latchon = 0 ;
 while ( <CONFIGURE_PREAMBLE> ) {
 
@@ -209,7 +209,7 @@ while ( <CONFIGURE_PREAMBLE> ) {
       $_ =~ s:CONFIGURE_GRIB2_LIB::g ;
     }
 
-  # ESMF substitutions in configure.defaults_wrfvar
+  # ESMF substitutions in configure.defaults_new
   if ( $sw_esmflib_path && $sw_esmfinc_path ) {
     $_ =~ s:CONFIGURE_ESMF_IO_LIB:-L$sw_esmflib_path -lesmf -L../external/io_esmf -lwrfio_esmf \$\(ESMF_LIB_FLAGS\):g ;
     $_ =~ s:CONFIGURE_ESMF_IO_EXT_LIB:-L$sw_esmflib_path -lesmf -lwrfio_esmf \$\(ESMF_LIB_FLAGS\):g ;
@@ -250,8 +250,8 @@ while ( <CONFIGURE_PREAMBLE> ) {
 }
 close CONFIGURE_PREAMBLE ;
 
-open CONFIGURE_DEFAULTS, "< ./arch/configure.defaults_wrfvar" 
-  or die "Cannot open ./arch/configure.defaults_wrfvar for reading" ;
+open CONFIGURE_DEFAULTS, "< ./arch/configure.defaults_new" 
+  or die "Cannot open ./arch/configure.defaults_new for reading" ;
 $latchon = 0 ;
 while ( <CONFIGURE_DEFAULTS> ) {
   if ( substr( $_, 0, 5 ) eq "#ARCH" && $latchon == 1 ) {
@@ -278,7 +278,7 @@ printf "\nYou have chosen: %s",$optstr[$optchoice] ;
 printf "The options for this platform have been written to the file configure.wrf\n" ;
 printf "If you wish to change settings, please edit that file.\n" ;
 printf "If you wish to change the default options, edit the file:\n\n" ;
-printf "     arch/configure.defaults_wrfvar\n" ;
+printf "     arch/configure.defaults_new\n" ;
 printf "\n" ;
 
 open CONFIGURE_WRF, "> configure.wrf" 
@@ -293,7 +293,7 @@ print CONFIGURE_WRF "# Ordinarily, it is necessary to run configure once, when t
 print CONFIGURE_WRF "# first installed.\n";
 print CONFIGURE_WRF "#\n";
 print CONFIGURE_WRF "# To permanently change options, change the settings for your platform\n";
-print CONFIGURE_WRF "# in the file arch/configure.defaults_wrfvar then rerun configure.\n";
+print CONFIGURE_WRF "# in the file arch/configure.defaults_new then rerun configure.\n";
 print CONFIGURE_WRF "#\n";
 # add preamble
 print CONFIGURE_WRF @machopts1  ;
@@ -309,8 +309,8 @@ print CONFIGURE_WRF "#Postamble\n";
 print CONFIGURE_WRF "#--------------------------------------------------------\n";
 
 
-open ARCH_POSTAMBLE, "< arch/postamble_wrfvar" 
-  or die "cannot open arch/postamble_wrfvar" ;
+open ARCH_POSTAMBLE, "< arch/postamble_new" 
+  or die "cannot open arch/postamble_new" ;
 
 while ( <ARCH_POSTAMBLE> ) { 
   print CONFIGURE_WRF

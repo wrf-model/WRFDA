@@ -344,7 +344,7 @@ if [ "$os" = "AIX" ] ; then
 fi
 
 # compile options that come from the environment, such as chemistry
-# the "!" is removed by Config_wrfvar.pl
+# the "!" is removed by Config_new.pl
 if [ -n "$WRF_CHEM" ] ; then
   if [ $WRF_CHEM = 1 ] ; then
     echo building WRF with chemistry option
@@ -359,12 +359,14 @@ fi
 # Found perl, so proceed with configuration
 if test -n "$PERL" ; then
   echo option = $option
-  $PERL arch/Config_wrfvar.pl -perl=$PERL -netcdf=$NETCDF -phdf5=$PHDF5 -rttov=$RTTOV -os=$os -mach=$mach -ldflags=$ldflags \
+  $PERL arch/Config_new.pl -perl=$PERL -netcdf=$NETCDF -phdf5=$PHDF5 -rttov=$RTTOV -os=$os -mach=$mach -ldflags=$ldflags \
      -compileflags=$compileflags -registry=$REGISTRY -da_core=$DA_CORE -em_core=$EM_CORE -nmm_core=$NMM_CORE \
      -coamps_core=$COAMPS_CORE -exp_core=$EXP_CORE
 fi
 
-export CONFIG=build/configure.wrf
+export CONFIG=configure.wrf
+
+ln -s $PWD/$CONFIG build
 
 # new feb 2005.  test whether MPI-2
 if test -e $CONFIG ; then
@@ -390,12 +392,12 @@ if test $NMM_CORE = 1; then
     exit 3
   fi
   # integrity check for a kludge where a hard coded value in the 
-  # registry must match the same value in arch/preamble
+  # registry must match the same value in arch/preamble_new
   set registryvalue=`grep 'dimspec.* q ' Registry/$REGISTRY | sed -e 's/..*constant=//' -e 's/ ..*$//'`
   set preamblevalue=`grep 'DNMM_MAX_DIM=.*' arch/preamble | sed -e 's/..*-DNMM_MAX_DIM=//' -e 's/ ..*$//'`
   if ( $registryvalue != $preamblevalue ) then
     echo "Harded coded value of dimspec q in Registry ($registryvalue) does not"
-    echo "equal the hard coded value of NMM_MAX_DIM in arch/preamble ($preamblevalue)"
+    echo "equal the hard coded value of NMM_MAX_DIM in arch/preamble_new ($preamblevalue)"
     echo "Please fix and try again."
     exit 2
   fi

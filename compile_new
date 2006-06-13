@@ -9,7 +9,7 @@ setenv WRF_DA_CORE 0
 
 if ( !  -e configure.wrf  ) then
   echo "You need to configure the code first."
-  echo "Please do configure and then compile."
+  echo "Please do ./configure_new and then ./compile_new."
   exit 1
 endif
 
@@ -38,13 +38,13 @@ end
 
 if( $compare_wrf != 1 ) then
   echo "You need to compile corresponding to your configure option."
-  echo "Type <compile wrf> to compile WRF model only"
-  echo "Type <compile em_real> to compile WRF model and real"
-  echo "Type <compile var> to compile wrfvar (and WRF frame)"
-  echo "Type <compile pure_var> to compile wrfvar only (assume WRF frame has compiled)"
-  echo "Type <compile be> to compile be"
-  echo "Type <compile k2n> to compile convertor for converting KMA data to NetCDF data format"
-  echo "Type <compile n2k> to compile convertor for converting NetCDF data to KMA data format"
+  echo "Type <compile_new wrf> to compile WRF model only"
+  echo "Type <compile_new em_real> to compile WRF model and real"
+  echo "Type <compile_new var> to compile wrfvar (and WRF frame)"
+  echo "Type <compile_new pure_var> to compile wrfvar only (assume WRF frame has compiled)"
+  echo "Type <compile_new be> to compile be"
+  echo "Type <compile_new k2n> to compile convertor for converting KMA data to NetCDF data format"
+  echo "Type <compile_new n2k> to compile convertor for converting NetCDF data to KMA data format"
 
   exit 2
 endif
