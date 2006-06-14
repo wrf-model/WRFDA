@@ -740,6 +740,48 @@ arch :
             LEARN_BCAST=-DLEARN_BCAST sp2 )
 
 ###########################################################
+#ARCH	AIX DM-Parallel          (RSL_LITE, IBM-MPI, supports nesting)
+#
+M4              = m4 -B12000
+FC              = mpxlf90_r
+FFC             = mpxlf_r
+SFC             = xlf90_r
+CC              = mpcc_r
+CC_TOOLS        = cc
+SCC             = cc_r
+LD              = $(FC)
+
+TRADFLAG        =
+FPPFLAGS2       = -DGRIB1 -DNATIVE_MASSV -DNORESHAPE -DAIX -DNONSTANDARD_SYSTEM
+                    
+DM_CPPFLAGS     = -I$(RSL_LITE)
+DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL_LITE -DDM_PARALLEL
+
+FCOPTIM         = -O0 -qarch=auto
+FCDEBUG         = #-g -qfullpath
+FCTYPE          = -qrealsize=8
+FCFREE          = -qfree=f90
+FCENDIAN        =
+FCBASE          = -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767 \
+ 		    -qflttrap=zerodivide:invalid:enable -qsigtrap=xl__trce -C
+FCFLAGS_RSL     = $(FCENDIAN)
+
+CCFLAGS2        = -DNOUNDERSCORE -DNCARIBM_NOC99 -I$(RSL_LITE)
+CCFLAGS_BUFR    = -DNOUNDERSCORE
+CCFLAGS_RSL     =
+
+LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN) \
+                    -bmaxstack:256000000 -bmaxdata:2048000000
+
+LOCAL_LIB	= -lmass -lmassv
+MPI_LIBS	= librsl_lite.a
+MPI_LIB		= -lrsl
+
+arch : 
+	$(LN) $(RSL_LITE)/*.c .
+	$(LN) $(RSL_LITE)/*.F .
+
+###########################################################
 #ARCH   crayx1 UNICOS/mp  CRAY X1
 
 SED_FTN		= sed -f ../arch/cray_csd.sed

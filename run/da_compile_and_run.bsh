@@ -29,10 +29,7 @@ for CONFIG in $CONFIGS; do
       for TARGET in $TARGETS; do
         echo "Compiling ${ID}_${CONFIG}_${COMPILER}/$TARGET"
         cd ~bray/${ID}_${CONFIG}_$COMPILER/$TARGET
-        if $FULL; then make superclean -a >/dev/null 2>&1; fi
         svn update >/dev/null 2>&1
-        echo $OPTION | ./configure $TARGET >/dev/null 2>&1
-        ./compile $TARGET > compile.out 2>&1
         echo $OPTION | ./configure_new $TARGET >/dev/null 2>&1
         cd build
         if $FULL; then make superclean; fi
@@ -51,15 +48,9 @@ for CONFIG in $CONFIGS; do
             export BUILD=${ID}_${CONFIG}_${COMPILER}
             echo "Testing $BUILD $TARGET on $REGION"
             if test $TARGET = be; then
-              export DA_BUILD_TYPE=old
-              #./gen_be.bsh > ${ID}_${CONFIG}_${COMPILER}_old.out 2>&1
-              export DA_BUILD_TYPE=new
-              ./gen_be.bsh > ${ID}_${CONFIG}_${COMPILER}_new.out 2>&1
+              ./gen_be.bsh > ${ID}_${CONFIG}_${COMPILER}.out 2>&1
             else
-              export DA_BUILD_TYPE=old
-              #./test.bsh > ${ID}_${CONFIG}_${COMPILER}_old.out 2>&1
-              export DA_BUILD_TYPE=new
-              ./test.bsh > ${ID}_${CONFIG}_${COMPILER}_new.out 2>&1
+              ./test.bsh > ${ID}_${CONFIG}_${COMPILER}.out 2>&1
             fi
           fi
         done
@@ -68,7 +59,6 @@ for CONFIG in $CONFIGS; do
   done
 done
 
-ls -lrt ~bray/*/*/main/*.exe
 ls -lrt ~bray/*/*/build/*.exe
 ls -lrt ~bray/data/*/*/cost_fn
 

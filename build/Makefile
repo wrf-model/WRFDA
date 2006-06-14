@@ -1,6 +1,6 @@
 include configure.wrf
 
-links :
+links : collect_on_comm.c
 	@ $(LN) ../*/*.make .
 	@ $(LN) ../*/*.f90 .
 	@ $(LN) ../*/*.F .
