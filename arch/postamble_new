@@ -13,13 +13,15 @@ FIXEDFLAGS_BUFR   = $(FCOPTIM) $(FCBASE) $(FCDEBUG) $(FCTYPE) $(FCENDIAN)
 FIXEDFLAGS_ENDIAN = $(FCTYPE)
 
 WRFVAR_LIBS  = libwrflib.a libwrfio_nf.a libesmf_time.a libio_grib1.a \
-                 libblas.a liblapack.a libblas.a libbufr.a libfftpack5.a libwrfvar.a
+                 libblas.a liblapack.a libblas.a libbufr.a libfftpack5.a \
+                 libwrfvar.a $(MPI_LIBS)
 
 GEN_BE_LIBS  = libblas.a liblapack.a libfftpack5.a 
 
-WRF_LIBS     = libwrflib.a libwrfio_nf.a libesmf_time.a libio_grib1.a
+WRF_LIBS     = libwrflib.a libwrfio_nf.a libesmf_time.a libio_grib1.a $(MPI_LIBS)
 
-WRFPLUS_LIBS = libwrflib.a libwrfplus.a libwrfio_nf.a libesmf_time.a libio_grib1.a
+WRFPLUS_LIBS = libwrflib.a libwrfplus.a libwrfio_nf.a libesmf_time.a \
+               libio_grib1.a $(MPI_LIBS)
 
 
 WRFVAR_LIB = $(NETCDF_LIB) -L. -lwrfvar -lwrflib -lwrfio_nf -lesmf_time \

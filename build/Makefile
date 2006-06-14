@@ -30,11 +30,11 @@ links :
 	@ $(LN) $(CONVERTOR)/kma_wave2grid .
 	@ $(LN) $(CONVERTOR)/wave2grid_kma .
 	@ $(LN) $(ESMF_TIME_F90)/*.F90 .
-	@ $(LN) $(RSL) .
-	@ $(LN) $(RSL)/*.F .
-	@ $(LN) $(RSL)/*.c .
 	@ $(LN) $(RSL)/RSL/*.c .
 	@ $(LN) $(RSL)/RSL/*.h .
+	@ $(LN) $(RSL)/*.F .
+	@ $(LN) $(RSL)/*.c .
+	@ $(LN) $(RSL)/*.h .
 	@ $(LN) $(FRAME)/collect_on_comm.c .
 
 # Manual rules specified first take precedence
@@ -56,6 +56,7 @@ include $(BUFR_NCEP_NCO)/bufr_ncep_nco.make
 include $(LAPACK)/lapack.make
 include $(BLAS)/blas.make
 include $(FFTPACK5)/fftpack5.make
+include $(RSL_LITE)/RSL_LITE.make
 include $(MAIN)/main.make
 
 depend depend.txt : links module_state_description.f90 md_calls.inc \

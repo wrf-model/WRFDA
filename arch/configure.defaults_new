@@ -21,7 +21,7 @@ TRADFLAG        = -traditional
 FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DLINUX -DNONSTANDARD_SYSTEM
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DWRF_RSL_IO -DRSL -DDM_PARALLEL
+DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
 FPPFLAGS_BUFR   = -C -P $(TRADFLAG) -DLINUX -Dlinux
 
 FCOPTIM         = #-fast
@@ -98,7 +98,7 @@ TRADFLAG        =
 FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DDEC_ALPHA -DNONSTANDARD_SYSTEM
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DWRF_RSL_IO -DRSL -DDM_PARALLEL
+DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
 
 #FCOPTIM        = -fast -O2 -Olimit 2000
 FCOPTIM         = -fast -O2
@@ -205,7 +205,7 @@ FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DLINUX -DNONSTANDARD_SYSTEM
                     
 FPPFLAGS_BUFR   = -C -P $(TRADFLAG) -DLINUX -Dlinux
 DM_CPPFLAGS     = -I$(RSL)/RSL
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DWRF_RSL_IO -DRSL -DDM_PARALLEL
+DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
 
 FCOPTIM         = #-fast
 FCDEBUG         = #-g
@@ -281,7 +281,7 @@ TRADFLAG        = -traditional
 FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM 
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DWRF_RSL_IO -DRSL -DDM_PARALLEL
+DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
 FPPFLAGS_BUFR   = -C -P $(TRADFLAG) -DLINUX -Dlinux
 
 FCOPTIM         =
@@ -390,7 +390,7 @@ TRADFLAG        = -traditional
 FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DLINUX -DNONSTANDARD_SYSTEM
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DWRF_RSL_IO -DRSL -DDM_PARALLEL
+DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
 FPPFLAGS_BUFR   = -C -P $(TRADFLAG) -DLINUX -Dlinux
 
 FCOPTIM         = #-fastsse
@@ -466,7 +466,7 @@ TRADFLAG        = -traditional
 FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM
 		     
 DM_CPPFLAGS     = -I$(RSL)/RSL
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DWRF_RSL_IO -DRSL -DDM_PARALLEL
+DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
 FPPFLAGS_BUFR   = -C -P $(TRADFLAG) -DLINUX -Dlinux -DPATHSCALE
 
 FCOPTIM         = #-fastsse
@@ -546,7 +546,7 @@ TRADFLAG        =
 FPPFLAGS2       = -DIRIX -DNONSTANDARD_SYSTEM
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DWRF_RSL_IO -DRSL -DDM_PARALLEL
+DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
 FCOPTIM         = -O3 -OPT:roundoff=3:IEEE_arithmetic=3
 FCDEBUG         = #-g
 FCTYPE          = -r8
@@ -649,7 +649,7 @@ TRADFLAG        =
 FPPFLAGS2       = -DGRIB1 -DNATIVE_MASSV -DNORESHAPE -DAIX -DNONSTANDARD_SYSTEM
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DWRF_RSL_IO -DRSL -DDM_PARALLEL
+DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
 
 FCOPTIM         = -O0 -qarch=auto
 FCDEBUG         = #-g -qfullpath
@@ -697,7 +697,7 @@ TRADFLAG        = -traditional-cpp
 FPPFLAGS2       = -DNORESHAPE -Dcrayx1 -DNONSTANDARD_SYSTEM
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DWRF_RSL_IO -DRSL -DDM_PARALLEL
+DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
 
 #FCOPTIM        = -Ofp3 -O3
 # needed for OpenMP
@@ -748,7 +748,7 @@ TRADFLAG        = -traditional-cpp
 FPPFLAGS2       = -DNORESHAPE -Dcrayx1 -DNONSTANDARD_SYSTEM
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DWRF_RSL_IO -DRSL -DDM_PARALLEL
+DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
 
 #FCOPTIM        = -Ofp3 -O3
 FCOPTIM         = -Ofp2 -O1 -Ogen_private_callee
@@ -826,7 +826,7 @@ TRADFLAG        =
 FPPFLAGS2       = -DMACOS -DNONSTANDARD_SYSTEM
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DWRF_RSL_IO -DRSL -DDM_PARALLEL
+DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
 FPPFLAGS_BUFR   = -C -P $(TRADFLAG)
 
 FCOPTIM         = -O0 -qarch=auto
@@ -908,7 +908,7 @@ TRADFLAG        =
 FPPFLAGS2       = -DMACOS -DNONSTANDARD_SYSTEM		      \
                      
 DM_CPPFLAGS     = -I$(RSL)/RSL
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DWRF_RSL_IO -DRSL -DDM_PARALLEL
+DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
 
 FCOPTIM         = 
 FCDEBUG         = #-g
@@ -930,6 +930,51 @@ EXTRA_LIBS      = -lSystemStubs
 
 arch : 
 	( cd $(RSL)/RSL ; \
+          $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
+            MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
+            LEARN_BCAST=-DLEARN_BCAST darwin )
+
+###########################################################
+#ARCH Darwin		(g95 parallel for G4/5 (RSL_LITE, MPICH, RSL IO)
+#
+CPP             = /usr/bin/cpp
+M4              = m4 -B12000
+FC              = mpif90
+FFC             = $(FC)
+SFC             = g95
+LD              = $(FC)
+CC              = mpicc
+CC_TOOLS        = cc
+
+RSL             = $(EXTERNAL)/RSL_LITE
+
+TRADFLAG        =
+FPPFLAGS2       = -DMACOS -DNONSTANDARD_SYSTEM		      \
+                     
+DM_CPPFLAGS     = -I$(RSL)
+DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL_LITE -DDM_PARALLEL
+
+FCOPTIM         = 
+FCDEBUG         = #-g
+FCTYPE          = -r8
+FCFREE          = -ffree-form  -ffree-line-length-huge
+FCENDIAN        =
+FCBASE          = -cpp -Wno=101,139,155,158 -fno-second-underscore \
+                  -ftrace=full -finteger=-9999 -freal=nan -C
+FCFLAGS_RSL     = $(FCENDIAN) -ffixed-form -fno-second-underscore
+
+CCFLAGS2        = -I$(RSL) -DLANDREAD_STUB -DMACOS
+CCFLAGS_BUFR    = -DUNDERSCORE
+CCFLAGS_RSL     = -DMACOS -I/usr/include/sys
+
+LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN) 
+
+MPI_LIBS	= librsl_lite.a
+MPI_LIB		= -L$(RSL) -lrsl_lite
+EXTRA_LIBS      = -lSystemStubs
+
+arch : 
+	( cd $(RSL) ; \
           $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
             LEARN_BCAST=-DLEARN_BCAST darwin )
