@@ -1,6 +1,6 @@
 # MAIN
 
-setup : arch links depend
+setup : links arch depend
 
 var : wrfvar
 

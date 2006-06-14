@@ -11,10 +11,6 @@ CC              = mpicc
 CC_TOOLS        = gcc
 LD              = $(FC)
 
-# Paths
-
-RSL             = $(EXTERNAL)/RSL
-
 # Flags (preprocessor, fortran, c, loader)
 
 TRADFLAG        = -traditional
@@ -91,8 +87,6 @@ SFC             = f90
 CC              = mpicc
 CC_TOOLS        = cc
 LD              = $(FC)
-
-RSL             = $(EXTERNAL)/RSL
 
 TRADFLAG        =
 FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DDEC_ALPHA -DNONSTANDARD_SYSTEM
@@ -274,9 +268,6 @@ CC              = mpicc
 CC_TOOLS        = gcc
 LD              = $(FC)
 
-RSL             = $(EXTERNAL)/RSL
-
-
 TRADFLAG        = -traditional
 FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM 
                     
@@ -308,6 +299,48 @@ arch :
           $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
             LEARN_BCAST=-DLEARN_BCAST linux )
+
+###########################################################
+#ARCH Settings for PC Linux i486 i586 i686, g95 compiler  (RSL_LITE, MPICH, RSL IO)
+#
+FC              = mpif90
+FFC             = $(FC)
+SFC             = g95
+CC              = mpicc
+CC_TOOLS        = gcc
+LD              = $(FC)
+
+
+TRADFLAG        = -traditional
+FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM 
+                    
+DM_CPPFLAGS     = -I$(RSL_LITE)
+DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL_LITE -DDM_PARALLEL
+FPPFLAGS_BUFR   = -C -P $(TRADFLAG) -DLINUX -Dlinux
+
+FCOPTIM         =
+FCDEBUG         = #-g
+FCFREE          = -ffree-form  -ffree-line-length-huge
+FCENDIAN        =
+FCBASE          = -cpp -Wno=101,139,155,158 -fno-second-underscore \
+                    -ftrace=full -finteger=-9999 -freal=nan -C
+FCTYPE          = -r8
+FCFLAGS_RSL     = $(FCENDIAN) -ffixed-form -fno-second-underscore
+
+CCFLAGS2        = -I$(RSL_LITE)
+CCFLAGS_BUFR    = -DUNDERSCORE
+CCFLAGS_RSL     = 
+
+LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)
+
+LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/X12R6/lib -L/usr/local/lib \
+                    -lncarg -lncarg_gks -lncarg_c -lX11 
+MPI_LIBS	= librsl_lite.a 
+MPI_LIB		= -L$(RSL_LITE) -lrsl_lite
+
+arch : 
+	$(LN) $(RSL_LITE)/*.c .
+	$(LN) $(RSL_LITE)/*.F .
 
 ###########################################################
 #ARCH Intel xeon i686 ia32 Xeon Linux, ifort compiler (single-threaded, no nesting)
@@ -384,8 +417,6 @@ CC              = mpicc
 CC_TOOLS        = gcc
 LD              = $(FC)
 
-RSL             = $(EXTERNAL)/RSL
-
 TRADFLAG        = -traditional
 FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DLINUX -DNONSTANDARD_SYSTEM
                     
@@ -459,8 +490,6 @@ SFC             = pathf90
 CC              = mpicc
 CC_TOOLS        = gcc
 LD              = $(FC)
-
-RSL             = ./$(EXTERNAL)/RSL
 
 TRADFLAG        = -traditional
 FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM
@@ -539,8 +568,6 @@ CC              = mpicc
 CC_TOOLS        = cc
 RANLIB          = echo
 LD              = $(FC)
-
-RSL             = $(EXTERNAL)/RSL
 
 TRADFLAG        =
 FPPFLAGS2       = -DIRIX -DNONSTANDARD_SYSTEM
@@ -643,8 +670,6 @@ CC_TOOLS        = cc
 SCC             = cc_r
 LD              = $(FC)
 
-RSL             = $(EXTERNAL)/RSL
-
 TRADFLAG        =
 FPPFLAGS2       = -DGRIB1 -DNATIVE_MASSV -DNORESHAPE -DAIX -DNONSTANDARD_SYSTEM
                     
@@ -690,8 +715,6 @@ SCC             = cc
 CC_TOOLS        = gcc
 RANLIB          = echo
 LD              = $(FC)
-
-RSL             = $(EXTERNAL)/RSL
 
 TRADFLAG        = -traditional-cpp
 FPPFLAGS2       = -DNORESHAPE -Dcrayx1 -DNONSTANDARD_SYSTEM
@@ -741,8 +764,6 @@ SCC             = $(CC)
 CC_TOOLS        = gcc
 RANLIB          = echo
 LD              = $(FC)
-
-RSL             = $(EXTERNAL)/RSL
 
 TRADFLAG        = -traditional-cpp
 FPPFLAGS2       = -DNORESHAPE -Dcrayx1 -DNONSTANDARD_SYSTEM
@@ -819,8 +840,6 @@ SFC             = xlf90_r
 CC              = mpicc
 CC_TOOLS        = cc
 LD              = $(FC)
-
-RSL             = $(EXTERNAL)/RSL
 
 TRADFLAG        =
 FPPFLAGS2       = -DMACOS -DNONSTANDARD_SYSTEM
@@ -902,8 +921,6 @@ LD              = $(FC)
 CC              = mpicc
 CC_TOOLS        = cc
 
-RSL             = $(EXTERNAL)/RSL
-
 TRADFLAG        =
 FPPFLAGS2       = -DMACOS -DNONSTANDARD_SYSTEM		      \
                      
@@ -946,12 +963,10 @@ LD              = $(FC)
 CC              = mpicc
 CC_TOOLS        = cc
 
-RSL             = $(EXTERNAL)/RSL_LITE
-
 TRADFLAG        =
 FPPFLAGS2       = -DMACOS -DNONSTANDARD_SYSTEM		      \
                      
-DM_CPPFLAGS     = -I$(RSL)
+DM_CPPFLAGS     = -I$(RSL_LITE)
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL_LITE -DDM_PARALLEL
 
 FCOPTIM         = 
@@ -963,7 +978,7 @@ FCBASE          = -cpp -Wno=101,139,155,158 -fno-second-underscore \
                   -ftrace=full -finteger=-9999 -freal=nan -C
 FCFLAGS_RSL     = $(FCENDIAN) -ffixed-form -fno-second-underscore
 
-CCFLAGS2        = -I$(RSL) -DLANDREAD_STUB -DMACOS
+CCFLAGS2        = -I$(RSL_LITE) -DLANDREAD_STUB -DMACOS
 CCFLAGS_BUFR    = -DUNDERSCORE
 CCFLAGS_RSL     = -DMACOS -I/usr/include/sys
 
@@ -974,10 +989,8 @@ MPI_LIB		= -L$(RSL) -lrsl_lite
 EXTRA_LIBS      = -lSystemStubs
 
 arch : 
-	( cd $(RSL) ; \
-          $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
-            MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
-            LEARN_BCAST=-DLEARN_BCAST darwin )
+	$(LN) $(RSL_LITE)/*.c .
+	$(LN) $(RSL_LITE)/*.F .
 
 ###########################################################
 #ARCH  NULL

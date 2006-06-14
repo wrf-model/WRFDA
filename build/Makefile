@@ -30,11 +30,6 @@ links :
 	@ $(LN) $(CONVERTOR)/kma_wave2grid .
 	@ $(LN) $(CONVERTOR)/wave2grid_kma .
 	@ $(LN) $(ESMF_TIME_F90)/*.F90 .
-	@ $(LN) $(RSL)/RSL/*.c .
-	@ $(LN) $(RSL)/RSL/*.h .
-	@ $(LN) $(RSL)/*.F .
-	@ $(LN) $(RSL)/*.c .
-	@ $(LN) $(RSL)/*.h .
 	@ $(LN) $(FRAME)/collect_on_comm.c .
 
 # Manual rules specified first take precedence
@@ -59,7 +54,7 @@ include $(FFTPACK5)/fftpack5.make
 include $(RSL_LITE)/RSL_LITE.make
 include $(MAIN)/main.make
 
-depend depend.txt : links module_state_description.f90 md_calls.inc \
+depend : links module_state_description.f90 md_calls.inc \
                       inc/da_generic_boilerplate.inc
 	~bray/bin/makedepf90 $(FPPFLAGS) *.F *.f90 *.F90 > depend.txt 2>/dev/null
 
@@ -87,10 +82,10 @@ libwrfplus.a : $(WRFPLUS_MODULES_WRFPLUS) $(WRFPLUS_OBJS)
 clean :
 	@ $(RM) *.exe *.o *.mod *.b *.a *.f inc/*.inc frame/*.f90 registry \
           Registry_tmp* module_state_description.f90 bufrlib.prm \
-          RSL/RSL/*.a RSL/RSL/*.o
+          $(RSL)/RSL/*.a $(RSL)/RSL/*.o
 
 superclean : clean
 	@ $(RM) *.f90 *.F90 *.F *.inc *.int *.c *.h *.m4 *.code *.make \
           bufrlib.param *.sed registry \
           convert_tool kma_wave2grid wave2grid_kma *.csh version_decl \
-          RSL *.bsh *.csh
+          *.bsh *.csh
