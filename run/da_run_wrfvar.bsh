@@ -335,17 +335,17 @@ if test -f $RUN_DIR/wrfvar.error; then
 fi
 
 cat >> $HTML << EOF
-<A HREF="namelist.input">Namelist Input</a>
-<A HREF="namelist.output">Namelist Output</a>
+<A HREF="namelist.input">Namelist input</a>
+<A HREF="namelist.output">Namelist output</a>
 <A HREF="stdout.html">Stdout</a>
 <A HREF="stderr.html">Stderr</a>
 <A HREF="rsl/rsl.out.0000.html">rsl.out.0000</a>
 <A HREF="rsl/rsl.error.0000.html">rsl.error.0000</a>
 <A HREF="rsl">Other RSL output</a>
-<A HREF="trace/0.html">PE 0 Trace</a>
+<A HREF="trace/0.html">PE 0 trace</a>
 <A HREF="trace">Other tracing</a>
-<A HREF="cost_fn">Cost Function</a>
-<A HREF="grad_fn">Gradient Function</a>
+<A HREF="cost_fn">Cost function</a>
+<A HREF="grad_fn">Gradient function</a>
 <A HREF="statistics">Statistics</a>
 </PRE>
 </BODY></HTML>

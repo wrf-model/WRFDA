@@ -20,6 +20,8 @@ CPP     = /lib/cpp
 
 .SUFFIXES: .f90 .F90 .F .i .o .f .c
 
+SVNDEF = -DSVN_REV='"$(shell svnversion -n .)"'
+
 # Substituted by Config_new.pl
 
 DEVTOP      = CONFIGURE_DEVTOP
@@ -40,7 +42,8 @@ FPPFLAGS1   = CONFIGURE_NETCDF_FLAG CONFIGURE_RTTOV_FLAG $(WORDSIZE_DEF) \
               -DLIMIT_ARGS -DWRFPLUS_TESTING -DPROMOTE_FLOAT -DINTIO \
 	      -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DONLY_WRFMODEL_IO \
               -DMAX_DOMAINS_F=$(MAX_DOMAINS) \
-              -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC)
+              -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) \
+              $(SVNDEF)
 CCFLAGS1    = DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC)
 WRFIO       = CONFIGURE_WRFIO_NF wrfio_int wrfio_grib1
 INCS        = -I. -I./inc CONFIGURE_RTTOV_INC -I$(MPICH)/include

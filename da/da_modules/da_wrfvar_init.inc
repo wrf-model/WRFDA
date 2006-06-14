@@ -124,6 +124,7 @@ SUBROUTINE da_wrfvar_init( no_init1 )
 ! 
 !</DESCRIPTION>
   CALL       wrf_message ( program_name )
+  CALL       wrf_message ( "Subversion "//subversion_version)
   CALL       wrf_debug ( 100 , 'wrf: calling alloc_and_configure_domain ' )
   CALL alloc_and_configure_domain ( domain_id  = 1 ,                  &
                                     grid       = head_grid ,          &

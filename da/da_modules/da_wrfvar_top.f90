@@ -47,6 +47,7 @@ MODULE da_wrfvar_top
 
    CHARACTER (LEN=80)      :: rstname
    CHARACTER (LEN=80)      :: message
+   CHARACTER (LEN=40)      :: subversion_version=SVN_REV
 
    INTERFACE 
       SUBROUTINE setup_timekeeping( grid )
