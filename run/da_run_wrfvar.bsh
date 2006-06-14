@@ -2,6 +2,8 @@
 
 PLATFORM=`uname`
 
+SVN_REV=`svnversion -n $0`
+
 export MP_SHARED_MEMORY=yes
 
 echo ""
@@ -193,6 +195,7 @@ cat > $HTML << EOF
 Started: $DATE
 Experiment directory:        $EXP_DIR
 Run directory:               $RUN_DIR
+Subversion revision:         $SVN_REV
 Build directory:             $DA_BUILD_DIR
 First Guess Input File:      $DA_FIRST_GUESS
 Background Error Input File: $DA_BACK_ERRORS
@@ -202,6 +205,7 @@ EOF
 echo "Experiment directory:        $EXP_DIR"
 echo "Run directory:               $RUN_DIR"
 echo "Build directory:             $DA_BUILD_DIR"
+echo "Subversion revision:         $SVN_REV"
 echo "First Guess Input File:      $DA_FIRST_GUESS"
 echo "Background Error Input File: $DA_BACK_ERRORS"
 echo "Observation Input File:      $DA_OBSERVATIONS"
