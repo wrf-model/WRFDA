@@ -2,7 +2,8 @@
 
 PLATFORM=`uname`
 
-SVN_REV=`svnversion -n $0`
+DIR=`dirname $0`
+SVN_REV=`svnversion -n $DIR`
 
 export MP_SHARED_MEMORY=yes
 
