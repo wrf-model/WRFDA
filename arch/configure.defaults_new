@@ -133,7 +133,6 @@ LD              = $(FC)
 TRADFLAG        =
 FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DDEC_ALPHA -DNONSTANDARD_SYSTEM
                    
-
 #FCOPTIM        = -fast -O2 -Olimit 2000
 FCOPTIM         = -O0
 FCDEBUG         = #-g
@@ -192,8 +191,6 @@ CC              = mpicc
 CC_TOOLS        = gcc
 LD              = $(FC)
 
-RSL             = $(EXTERNAL)/RSL
-
 TRADFLAG        = -traditional
 FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DLINUX -DNONSTANDARD_SYSTEM
                     
@@ -225,6 +222,47 @@ arch :
           $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
             LEARN_BCAST=-DLEARN_BCAST linux )
+
+###########################################################
+#ARCH Settings for PC Linux i486 i586 i686, PGI compiler  (RSL_LITE, MPICH, RSL IO)
+#
+FC              = mpif90
+FFC             = $(FC)
+SFC             = pgf90
+CC              = mpicc
+CC_TOOLS        = gcc
+LD              = $(FC)
+
+TRADFLAG        = -traditional
+FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DLINUX -DNONSTANDARD_SYSTEM
+                    
+FPPFLAGS_BUFR   = -C -P $(TRADFLAG) -DLINUX -Dlinux
+DM_CPPFLAGS     = -I$(RSL_LITE)
+DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL_LITE -DDM_PARALLEL
+
+FCOPTIM         = #-fast
+FCDEBUG         = #-g
+FCTYPE          = -r8
+FCFREE          = -Mfree
+FCENDIAN        = -byteswapio
+FCBASE          = -Ktrap=fp -tp p6 -C
+FCFLAGS_RSL     = $(FCENDIAN)
+
+CCFLAGS2        = -I$(RSL_LITE)
+CCFLAGS_BUFR    = -DUNDERSCORE
+CCFLAGS_RSL     = 
+
+LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)
+
+LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/X12R6/lib -L/usr/local/lib \
+                    -lncarg -lncarg_gks -lncarg_c -lX11 
+MPI_LIBS	= librsl_lite.a
+MPI_LIB		= -lrsl
+
+
+arch : 
+	$(LN) $(RSL_LITE)/*.c .
+	$(LN) $(RSL_LITE)/*.F .
 
 ###########################################################
 #ARCH Settings for PC Linux i486 i586 i686, g95 compiler  (Single-threaded)
@@ -336,7 +374,7 @@ LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)
 LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/X12R6/lib -L/usr/local/lib \
                     -lncarg -lncarg_gks -lncarg_c -lX11 
 MPI_LIBS	= librsl_lite.a 
-MPI_LIB		= -L$(RSL_LITE) -lrsl_lite
+MPI_LIB		= -lrsl_lite
 
 arch : 
 	$(LN) $(RSL_LITE)/*.c .
@@ -985,7 +1023,7 @@ CCFLAGS_RSL     = -DMACOS -I/usr/include/sys
 LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN) 
 
 MPI_LIBS	= librsl_lite.a
-MPI_LIB		= -L$(RSL) -lrsl_lite
+MPI_LIB		= -lrsl_lite
 EXTRA_LIBS      = -lSystemStubs
 
 arch : 
