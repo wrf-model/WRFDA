@@ -48,9 +48,9 @@ for CONFIG in $CONFIGS; do
             export BUILD=${ID}_${CONFIG}_${COMPILER}
             echo "Testing $BUILD $TARGET on $REGION"
             if test $TARGET = be; then
-              ./gen_be.bsh > ${ID}_${CONFIG}_${COMPILER}.out 2>&1
+              ./gen_be.bsh
             else
-              ./test.bsh > ${ID}_${CONFIG}_${COMPILER}.out 2>&1
+              ./test.bsh
             fi
           fi
         done
