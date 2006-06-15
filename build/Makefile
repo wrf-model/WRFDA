@@ -2,6 +2,7 @@ include configure.wrf
 
 links : 
 	@ $(LN) $(CHEM)/* .
+	@ $(LN) $(DYN_NMM)/* .
 	@ $(LN) $(DYNAMICS)/* .
 	@ $(LN) $(PHYS)/* .
 	@ $(LN) $(INC)/* .

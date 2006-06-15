@@ -207,7 +207,7 @@ SUBROUTINE da_setup_firstguess_wrf( xbx, grid, &
       WRITE(UNIT=errmsg(4),FMT='(a,2i5,2x,a,2f6.1)') &
             'Dimension of MOAD: ix, jy:',coarse_ix, coarse_jy, &
             'parent_x, parent_y:', start_x, start_y
-      CALL wrf_messages(errmsg(1:4)
+      CALL wrf_messages(errmsg(1:4))
    endif
 
    CALL da_set_map_para ! set up the map background parameters

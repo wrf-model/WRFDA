@@ -42,7 +42,10 @@ MPI_LIB		= -L$(RSL)/RSL -lrsl
 
 # Architecture
 
-arch : ( cd $(RSL)/RSL ; \
+arch : 
+	$(LN) $(RSL)/*.c .
+	$(LN) $(RSL)/*.F .
+	( cd $(RSL)/RSL ; \
           $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
             LEARN_BCAST=-DLEARN_BCAST linux )
@@ -114,6 +117,8 @@ LOCAL_LIB       = -L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c -lX11
 MPI_LIB		= -L$(RSL)/RSL -lrsl
 
 arch : 
+	$(LN) $(RSL)/*.c .
+	$(LN) $(RSL)/*.F .
 	( cd $(RSL)/RSL ; \
           $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
@@ -218,6 +223,8 @@ MPI_LIB		= -L$(RSL)/RSL -lrsl
 
 
 arch : 
+	$(LN) $(RSL)/*.c .
+	$(LN) $(RSL)/*.F .
 	( cd $(RSL)/RSL ; \
           $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
@@ -333,6 +340,8 @@ LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/X12R6/lib -L/usr/local/lib \
 MPI_LIB		= -L$(RSL)/RSL -lrsl
 
 arch : 
+	$(LN) $(RSL)/*.c .
+	$(LN) $(RSL)/*.F .
 	( cd $(RSL)/RSL ; \
           $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
@@ -481,6 +490,8 @@ LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/X12R6/lib -L/usr/local/lib \
 MPI_LIB		= -L$(RSL)/RSL -lrsl
 
 arch : 
+	$(LN) $(RSL)/*.c .
+	$(LN) $(RSL)/*.F .
 	( cd $(RSL)/RSL ; \
           $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
@@ -555,6 +566,8 @@ LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/local/lib \
 MPI_LIB		= -L$(RSL)/RSL -lrsl
 
 arch : 
+	$(LN) $(RSL)/*.c .
+	$(LN) $(RSL)/*.F .
 	( cd $(RSL)/RSL ; \
           $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
           MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
@@ -629,6 +642,8 @@ LOCAL_LIB       = -L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c -lX11
 MPI_LIB		= -L$(RSL)/RSL -lrsl -lmpi
 
 arch : 
+	$(LN) $(RSL)/*.c .
+	$(LN) $(RSL)/*.F .
 	( cd $(RSL)/RSL ; \
           $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
@@ -734,6 +749,8 @@ LOCAL_LIB	= -lmass -lmassv
 MPI_LIB		= -L$(RSL)/RSL -lrsl
 
 arch : 
+	$(LN) $(RSL)/*.c .
+	$(LN) $(RSL)/*.F .
 	( cd $(RSL)/RSL ; \
           $(MAKE) CC="mpcc $(CCFLAGS_RSL)" FC="mpxlf $(FCFLAGS_RSL)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
@@ -824,6 +841,8 @@ LOCAL_LIB       = #-L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c -lX11
 MPI_LIB		= -L$(RSL)/RSL -lrsl
 
 arch : 
+	$(LN) $(RSL)/*.c .
+	$(LN) $(RSL)/*.F .
 	( cd $(RSL)/RSL ; \
           $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
 	     MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
@@ -870,6 +889,8 @@ LOCAL_LIB       = #-L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c -lX11
 MPI_LIB		= -L$(RSL)/RSL -lrsl
 
 arch : 
+	$(LN) $(RSL)/*.c .
+	$(LN) $(RSL)/*.F .
 	( cd $(RSL)/RSL ; \
           $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)"  \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
@@ -950,6 +971,8 @@ MPI_LIB		= -L$(RSL)/RSL -lrsl
 EXTRA_LIBS      = -lSystemStubs
 
 arch : 
+	$(LN) $(RSL)/*.c .
+	$(LN) $(RSL)/*.F .
 	( cd $(RSL)/RSL ; \
           $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
              MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
@@ -1026,6 +1049,8 @@ MPI_LIB		= -L$(RSL)/RSL -lrsl
 EXTRA_LIBS      = -lSystemStubs
 
 arch : 
+	$(LN) $(RSL)/*.c .
+	$(LN) $(RSL)/*.F .
 	( cd $(RSL)/RSL ; \
           $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \

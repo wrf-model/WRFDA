@@ -10,7 +10,7 @@ wrfvar  : setup $(WRFVAR_LIBS) wrfvar.o pack_utils.o
 wrf     : setup $(WRF_LIBS) pack_utils.o wrf.o
 	$(LD) -o wrf.exe $(LDFLAGS) wrf.o $(WRF_LIB) pack_utils.o
 
-wrfplus : arch links $(WRFPLUS_LIBS) pack_utils.o wrf.o
+wrfplus : setup $(WRFPLUS_LIBS) pack_utils.o wrf.o
 	$(LD) -o wrfplus.exe $(LDFLAGS) wrf.o $(WRFPLUS_LIB) pack_utils.o
 
 kma2netcdf :  setup $(WRFVAR_LIBS) $(CONVERTOR_MODULES) $(CONVERTOR_OBJS) kma2netcdf.o
