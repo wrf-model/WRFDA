@@ -54,9 +54,10 @@ SUBROUTINE da_setup_firstguess_kma( xbx, grid, &
    delt_lat = 180.0/real(grid%e_sn - grid%s_sn - 1)
    delt_lon = 360.0/real(grid%e_we - grid%s_we)
 
-! JRB hack
-  xlonc= 0.0
-! JRB
+   phic        = 0.0
+   xlonc       = 0.0
+   cone_factor = 0.0
+
 
    do j = js,je
       do i = is,ie
