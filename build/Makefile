@@ -1,17 +1,15 @@
 include configure.wrf
 
-links : collect_on_comm.c
-	@ $(LN) ../*/*.make .
-	@ $(LN) ../*/*.f90 .
-	@ $(LN) ../*/*.F .
-	@ $(LN) ../*/*.c .
-	@ $(LN) ../*/*.h .
-	@ $(LN) ../*/*sh .
-	@ $(LN) $(DA)/*/*.f90 .
-	@ $(LN) $(DA)/*/*.inc .
-	@ $(LN) $(DA)/*/*.c .
-	@ $(LN) $(DA)/*/*sh .
-	@ $(LN) $(DA)/*/*m4 .
+links : 
+	@ $(LN) $(CHEM)/* .
+	@ $(LN) $(DYNAMICS)/* .
+	@ $(LN) $(PHYS)/* .
+	@ $(LN) $(INC)/* .
+	@ $(LN) $(SHARE)/* .
+	@ $(LN) $(FRAME)/* .
+	@ $(LN) $(MAIN)/* .
+	@ $(LN) $(TOOLS)/* .
+	@ $(LN) $(DA)/*/* .
 	@ $(LN) $(EXTERNAL)/*/*.make .
 	@ $(LN) $(EXTERNAL)/*/*.f90 .
 	@ $(LN) $(EXTERNAL)/*/*.F90 .
@@ -20,9 +18,6 @@ links : collect_on_comm.c
 	@ $(LN) $(EXTERNAL)/*/*.c .
 	@ $(LN) $(EXTERNAL)/*/*.h .
 	@ $(LN) $(EXTERNAL)/*/*sh ..
-	@ $(LN) $(INC)/version_decl .
-	@ $(LN) $(FRAME)/md_calls.m4 .
-	@ $(LN) $(SHARE)/*.int .
 	@ $(LN) $(BUFR_NCEP_NCO)/bufrlib.param .
 	@ $(LN) $(IO_NETCDF)/*.code .
 	@ $(LN) $(ARCH)/*.sed .
@@ -30,7 +25,7 @@ links : collect_on_comm.c
 	@ $(LN) $(CONVERTOR)/kma_wave2grid .
 	@ $(LN) $(CONVERTOR)/wave2grid_kma .
 	@ $(LN) $(ESMF_TIME_F90)/*.F90 .
-	@ $(LN) $(FRAME)/collect_on_comm.c .
+
 
 # Manual rules specified first take precedence
 
