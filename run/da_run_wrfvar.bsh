@@ -351,12 +351,16 @@ cat >> $HTML << EOF
 </BODY></HTML>
 EOF
 
+ls -l $EXP_DIR/cost_fn >> $HTML
+ls -l $EXP_DIR/cost_fn
+
 if test $RC == 0; then
   echo "passed on $DATE" >> $HTML
+  echo "passed on $DATE"
 else
   echo "failed on $DATE with error $RC" >> $HTML
+  echo "failed on $DATE with error $RC"
 fi
-
 
 echo "WRF-Var completed"
 date

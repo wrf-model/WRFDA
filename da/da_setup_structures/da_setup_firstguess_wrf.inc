@@ -48,7 +48,7 @@ SUBROUTINE da_setup_firstguess_wrf( xbx, grid, &
       WRITE(UNIT=errmsg(2),FMT='(A,I6,A,I6)') &
          "diff=",seconds,"   ANALYSIS_ACCU=",ANALYSIS_ACCU
       errmsg(3)="=======> Wrong xb time found???"
-      CALL wrf_warnings(__FILE__,__LINE__,errmsg(1:3))
+      CALL wrf_warning(__FILE__,__LINE__,errmsg(1:3))
    endif
 
    !------------------------------------------------------------------------
@@ -219,7 +219,7 @@ SUBROUTINE da_setup_firstguess_wrf( xbx, grid, &
       "Please check if the domain's central point (x,y) is correct:"
    WRITE(UNIT=errmsg(2),FMT='(a,4f12.3/)') 'grid%cen_lat,grid%cen_lon,x,y:', &
                          grid%cen_lat,grid%cen_lon,x,y
-   CALL wrf_warnings(__FILE__,__LINE__,errmsg(1:2)) 
+   CALL wrf_warning(__FILE__,__LINE__,errmsg(1:2)) 
 
    !--------------------------------------------------------------------------
    ! [3.0] Interpolate WRF C-grid winds to p points of WRFVAR grid (interpolate 
