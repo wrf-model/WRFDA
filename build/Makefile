@@ -9,7 +9,13 @@ links :
 	@ $(LN) $(SHARE)/* .
 	@ $(LN) $(FRAME)/* .
 	@ $(LN) $(MAIN)/* .
-	@ $(LN) $(TOOLS)/* .
+	@ $(LN) $(TOOLS)/*.make .
+	@ $(LN) $(TOOLS)/*.f90 .
+	@ $(LN) $(TOOLS)/*.F90 .
+	@ $(LN) $(TOOLS)/*.inc .
+	@ $(LN) $(TOOLS)/*.F .
+	@ $(LN) $(TOOLS)/*.c .
+	@ $(LN) $(TOOLS)/*.h .
 	@ $(LN) $(DA)/*/* .
 	@ $(LN) $(EXTERNAL)/*/*.make .
 	@ $(LN) $(EXTERNAL)/*/*.f90 .
@@ -84,4 +90,6 @@ superclean : clean
 	@ $(RM) *.f90 *.F90 *.F *.inc *.int *.c *.h *.m4 *.code *.make \
           bufrlib.param *.sed registry \
           convert_tool kma_wave2grid wave2grid_kma *.csh version_decl \
-          *.bsh *.csh
+          *.bsh *.csh Utl* macros_utl module_dm_warning rsl_cpp_flags \
+          scl_plotting_routines
+
