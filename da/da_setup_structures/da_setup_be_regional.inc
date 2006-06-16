@@ -56,6 +56,7 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
    REAL, ALLOCATABLE           :: be3_rf_lengthscale(:) ! RF lengthscale.
    REAL, ALLOCATABLE           :: be4_rf_lengthscale(:) ! RF lengthscale.
    REAL, ALLOCATABLE           :: be5_rf_lengthscale(:)
+   REAL, ALLOCATABLE           :: alpha_rf_lengthscale(:)
 
 !------------------------------------------------------------------------------
 !
@@ -447,6 +448,35 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
 
    deallocate( bin )
    deallocate( bin2d )
+
+   if ( be % ne > 0 ) then
+      be % alpha % mz = be % ne
+      be % alpha % name = 'alpha'
+
+      ALLOCATE ( be5_eval_loc (1:1,1:num_bins2d) )
+      ALLOCATE ( be5_eval_glo(1:1) )
+      ALLOCATE ( be5_evec_loc(1:1,1:1,1:num_bins2d) )
+      ALLOCATE ( be5_evec_glo(1:1,1:1) )
+
+!     Transfer the alpha variance to be % alpha:
+      allocate( be % alpha % val(1:jy,1:be % ne) )
+      allocate( be % alpha % evec(1:jy,1:kz,1:be % ne) )
+      allocate( be % alpha % rf_alpha(1:be % ne) )
+
+      be % alpha % val(1:jy,1:be % ne) = alpha_std_dev
+      be % alpha % evec(1:jy,1:kz,1:be % ne) = 1.0
+      be % alpha % rf_alpha(1:be % ne) = 1.0 
+
+!     Include alpha lengthscale info:
+      allocate ( alpha_rf_lengthscale(1:be % ne) )
+      alpha_rf_lengthscale(:) = 1000.0 * alpha_corr_scale ! Convert km to m.
+
+      call da_rescale_background_errors( ix, jy, 1.0, 1.0, &
+                                         xb % ds, alpha_rf_lengthscale, be % alpha )
+   else
+      be % alpha % mz = 0
+   end if
+
 
    IF (trace_use) CALL da_trace_exit("da_setup_be_regional")
 
