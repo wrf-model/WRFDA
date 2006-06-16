@@ -23,9 +23,11 @@ foreach a ( $argv )
 
     if ( "$a" == "wrf" ) then
       set compare_wrf = 1
+    else if ( "$a" == "wrfplus" ) then
+      set compare_wrf = 1
     else if ( "$a" == "em_real" ) then
       set compare_wrf = 1
-    else if ( "$a" == "var" || "$a" == "pure_var" || "$a" == "k2n" || "$a" == "n2k" ) then
+    else if ( "$a" == "var" || "$a" == "wrfvar" || "$a" == "k2n" || "$a" == "n2k" ) then
       set compare_wrf = 1
       set compare_var = 1
     else if ( "$a" == "be" ) then
@@ -38,10 +40,10 @@ end
 
 if( $compare_wrf != 1 ) then
   echo "You need to compile corresponding to your configure option."
-  echo "Type <compile_new wrf> to compile WRF model only"
+  echo "Type <compile_new wrf> to compile WRF model"
+  echo "Type <compile_new wrfplus> to compile 4D-VAR WRF model"
   echo "Type <compile_new em_real> to compile WRF model and real"
-  echo "Type <compile_new var> to compile wrfvar (and WRF frame)"
-  echo "Type <compile_new pure_var> to compile wrfvar only (assume WRF frame has compiled)"
+  echo "Type <compile_new wrfvar> to compile wrfvar (and WRF frame)"
   echo "Type <compile_new be> to compile be"
   echo "Type <compile_new k2n> to compile convertor for converting KMA data to NetCDF data format"
   echo "Type <compile_new n2k> to compile convertor for converting NetCDF data to KMA data format"
