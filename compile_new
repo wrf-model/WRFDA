@@ -137,6 +137,7 @@ else
   echo "."
   echo " "
 
+  cd build
   make -r setup
   make -r $arglist A2DCASE="$A2DCASE"
 
