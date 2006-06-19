@@ -18,7 +18,6 @@
       integer   :: imod(xp%kts:xp%kte)
       real      :: rhtol(xp%kts:xp%kte)
       real      :: x_qs(xp%kts:xp%kte)
-      real      :: oldq(xp%kts:xp%kte)
       real      :: dz(xp%kts:xp%kte)
 
       integer :: is,ie, js,je, ks,ke, i, j, k
@@ -45,7 +44,6 @@
          imod(1)           = 0
          x_qs(1)           = 0.
          rhtol(1)          = xb%rh(i,j,1)+xa%rh(i,j,1)
-         oldq (1)          = xa%q(i,j,1)
 
          DO k=ks+1,ke
             dz(k)=xb%hf(i,j,k-1)-xb%hf(i,j,k)
@@ -53,7 +51,6 @@
             imod(k)           = 0
             x_qs(k)           = 0.
             rhtol(k)          = xb%rh(i,j,k)+xa%rh(i,j,k)
-            oldq (k)          = xa%q(i,j,k)
          ENDDO
 
          DO k=ks,ke

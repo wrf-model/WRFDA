@@ -1,4 +1,4 @@
-SUBROUTINE DA_Transform_XToY_Gpspw ( xb, iv, xa, xp, y )
+SUBROUTINE da_transform_xtoy_gpspw ( xb, iv, xa, xp, y )
 
   !----------------------------------------------------------------
   !  HISTORY
@@ -33,7 +33,6 @@ SUBROUTINE DA_Transform_XToY_Gpspw ( xb, iv, xa, xp, y )
   REAL,DIMENSION(xp%kts:xp%kte):: model_z    ! model z at GPS site [m]
   REAL,DIMENSION(xp%kts:xp%kte):: model_rho  ! model rho at GPS site [kg/m^3]
   REAL,DIMENSION(xp%kts:xp%kte):: model_dq   ! model dq at GPS site [kg/kg]
-  REAL,DIMENSION(xp%kts:xp%kte):: model_dz   ! model dz at GPS site [m]
   REAL,DIMENSION(xp%kts:xp%kte):: model_drho ! model drho at GPS site [kg/m^3]
 
   IF ( iv%num_Gpspw > 0 ) THEN
@@ -121,5 +120,5 @@ SUBROUTINE DA_Transform_XToY_Gpspw ( xb, iv, xa, xp, y )
     end do
   ENDIF
 
-END SUBROUTINE DA_Transform_XToY_Gpspw
+END SUBROUTINE da_transform_xtoy_gpspw
 

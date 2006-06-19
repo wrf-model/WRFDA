@@ -1,4 +1,4 @@
-SUBROUTINE DA_Moist_Phys_Adj( xb, xa, xp,    &
+SUBROUTINE da_moist_phys_adj( xb, xa, xp,    &
                 ids,ide, jds,jde, kds,kde,  &
                 ims,ime, jms,jme, kms,kme,  &
                 its,ite, jts,jte, kts,kte )
@@ -38,7 +38,7 @@ SUBROUTINE DA_Moist_Phys_Adj( xb, xa, xp,    &
    real, dimension(kms:kme)                   :: DT
    real, dimension(kms:kme)                   :: QVT,QCT,QRT,TTT
    real, dimension(kms:kme)                   :: QVT9,QCT9,QRT9,TTT9
-   real, dimension(kms:kme) :: SCR2,SCR3,SCR4,SCR5,SCR6,SCR7,SCR8
+   real, dimension(kms:kme) :: SCR2,SCR3,SCR4,SCR5,SCR6,SCR7
    real, dimension(kms:kme) :: DUM11,DUM21,DUM31,DUM41
    real, dimension(kms:kme) :: PRA,PRC,PRD,PRE
    real, dimension(kms:kme) :: SCR31,SCR41,SCR42,SCR71
@@ -392,4 +392,4 @@ SUBROUTINE DA_Moist_Phys_Adj( xb, xa, xp,    &
    ENDDO
    ENDDO
 
-END SUBROUTINE DA_Moist_Phys_Adj
+END SUBROUTINE da_moist_phys_adj

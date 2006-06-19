@@ -1,4 +1,4 @@
-subroutine Tv_profile(xp, xb, i, j, dx, dxm, dy, dym, pre_ma, tv_ma)
+subroutine da_tv_profile(xp, xb, i, j, dx, dxm, dy, dym, pre_ma, tv_ma)
 
 !  This subroutine calculates virtual temperature (tv_ma) on each level
 !  (pre_ma, pressure at the level) at the observed location (i,j). 
@@ -34,10 +34,10 @@ subroutine Tv_profile(xp, xb, i, j, dx, dxm, dy, dym, pre_ma, tv_ma)
    tv_ma (ks:ke) = dym* ( dxm * tv_m (1,1,ks:ke) + dx * tv_m (2,1,ks:ke) ) + &
                    dy * ( dxm * tv_m (1,2,ks:ke) + dx * tv_m (2,2,ks:ke) )
 
-end subroutine Tv_profile
+end subroutine da_tv_profile
 
 
-subroutine find_layer(layer,tv,pre,pre_ma,tv_ma,ks,ke)
+subroutine da_find_layer(layer,tv,pre,pre_ma,tv_ma,ks,ke)
 
 !  This routine is to find the vertical location in the Tv profile given
 !  a specific pressure and vertically interpolate Tv to that height.
@@ -51,7 +51,7 @@ subroutine find_layer(layer,tv,pre,pre_ma,tv_ma,ks,ke)
    integer                    :: layer
    real, dimension(ks-1:ke+1) :: pre_ma, tv_ma
    real                       :: pre, tv
-   real                       :: alpha, coef1, coef2
+   real                       :: alpha
 
    if ( pre >= pre_ma(ks) ) then
 
@@ -80,10 +80,10 @@ subroutine find_layer(layer,tv,pre,pre_ma,tv_ma,ks,ke)
       enddo
    endif
  
-end subroutine find_layer
+end subroutine da_find_layer
 
 
-subroutine thickness(pre_ma,tv_ma,ks,ke,tv1,tv2,layer1,layer2,pre1,pre2,thk)
+subroutine da_thickness(pre_ma,tv_ma,ks,ke,tv1,tv2,layer1,layer2,pre1,pre2,thk)
 
 !  This routine calculates the thickness between two layers 
 !  using vertical integration of virtual temperatures.
@@ -120,10 +120,10 @@ subroutine thickness(pre_ma,tv_ma,ks,ke,tv1,tv2,layer1,layer2,pre1,pre2,thk)
                log(p_tmp(k-1)/p_tmp(k+1))
    enddo
 
-end subroutine thickness
+end subroutine da_thickness
 
 
-subroutine TGL_Tv_profile(xp,xa,xb,i,j,dx,dxm,dy,dym,             &
+subroutine da_tgl_tv_profile(xp,xa,xb,i,j,dx,dxm,dy,dym,             &
            pre_ma,tv_ma,TGL_pre_ma,TGL_tv_ma)
 
 !  This is the tangent-linear routine for Tv_profile
@@ -163,10 +163,10 @@ subroutine TGL_Tv_profile(xp,xa,xb,i,j,dx,dxm,dy,dym,             &
    tv_ma (ks:ke) = dym* ( dxm * tv_m (1,1,ks:ke) + dx * tv_m (2,1,ks:ke) ) + &
                    dy * ( dxm * tv_m (1,2,ks:ke) + dx * tv_m (2,2,ks:ke) )
  
-end subroutine TGL_Tv_profile
+end subroutine da_tgl_tv_profile
 
 
-subroutine TGL_find_layer(layer,tv,pre,pre_ma,tv_ma,ks,ke,     &
+subroutine da_tgl_find_layer(layer,tv,pre,pre_ma,tv_ma,ks,ke,     &
                           TGL_tv,TGL_pre_ma,TGL_tv_ma)
 
 !  This is the tangent-linear routine for find_layer
@@ -242,10 +242,10 @@ subroutine TGL_find_layer(layer,tv,pre,pre_ma,tv_ma,ks,ke,     &
 
    endif
  
-end subroutine TGL_find_layer
+end subroutine da_tgl_find_layer
 
 
-subroutine TGL_thickness(pre_ma,tv_ma,ks,ke,tv1,tv2,layer1,layer2,pre1,pre2,   &
+subroutine da_tgl_thickness(pre_ma,tv_ma,ks,ke,tv1,tv2,layer1,layer2,pre1,pre2,   &
                          TGL_pre_ma,TGL_tv_ma,TGL_tv1,TGL_tv2,TGL_thk)
 
 !  This is the tangent-linear routine for thickness
@@ -259,7 +259,6 @@ subroutine TGL_thickness(pre_ma,tv_ma,ks,ke,tv1,tv2,layer1,layer2,pre1,pre2,   &
    real                     :: tv1,tv2
    real                     :: TGL_tv1,TGL_tv2
    real                     :: pre1,pre2
-   real                     :: thk
    real                     :: TGL_thk
 
    TGL_thk = TGL_tv1*log(pre_ma(layer1-1)/pre1) +          &
@@ -287,10 +286,10 @@ subroutine TGL_thickness(pre_ma,tv_ma,ks,ke,tv1,tv2,layer1,layer2,pre1,pre2,   &
                 TGL_p_tmp(k+1)*tv_ma(k)/p_tmp(k+1)     )
    enddo
 
-end subroutine TGL_thickness
+end subroutine da_tgl_thickness
 
 
-subroutine ADJ_Tv_profile(xp,jo_grad_x,xb,i,j,dx,dxm,dy,dym,    &
+subroutine da_adj_tv_profile(xp,jo_grad_x,xb,i,j,dx,dxm,dy,dym,    &
               pre_ma,tv_ma,ADJ_pre_ma,ADJ_tv_ma)
 
 !  This is the adjoint routine for Tv_profile
@@ -305,7 +304,7 @@ subroutine ADJ_Tv_profile(xp,jo_grad_x,xb,i,j,dx,dxm,dy,dym,    &
    REAL                           :: dy, dym   ! Interpolation weights.
 
    integer                        :: ii,jj,ks,ke
-   real, dimension(2,2,xp%kts:xp%kte)    :: tv_m,ADJ_tv_m
+   real, dimension(2,2,xp%kts:xp%kte)    :: ADJ_tv_m
    REAL, DIMENSION(xp%kts-1:xp%kte+1)    :: pre_ma,tv_ma
    REAL, DIMENSION(xp%kts-1:xp%kte+1)    :: ADJ_pre_ma,ADJ_tv_ma
 
@@ -331,10 +330,10 @@ subroutine ADJ_Tv_profile(xp,jo_grad_x,xb,i,j,dx,dxm,dy,dym,    &
    enddo
    enddo
 
-end subroutine ADJ_Tv_profile
+end subroutine da_adj_tv_profile
 
 
-subroutine ADJ_find_layer(layer,tv,pre,pre_ma,tv_ma,ks,ke,     &
+subroutine da_adj_find_layer(layer,tv,pre,pre_ma,tv_ma,ks,ke,     &
                           ADJ_tv,ADJ_pre_ma,ADJ_tv_ma)
 
 !  This is the adjoint routine for find_layer
@@ -408,10 +407,10 @@ subroutine ADJ_find_layer(layer,tv,pre,pre_ma,tv_ma,ks,ke,     &
    endif
    ADJ_tv           = 0.
  
-end subroutine ADJ_find_layer
+end subroutine da_adj_find_layer
 
 
-subroutine ADJ_thickness(pre_ma,tv_ma,ks,ke,tv1,tv2,layer1,layer2,pre1,pre2,   &
+subroutine da_adj_thickness(pre_ma,tv_ma,ks,ke,tv1,tv2,layer1,layer2,pre1,pre2,   &
                          ADJ_pre_ma,ADJ_tv_ma,ADJ_tv1,ADJ_tv2,ADJ_thk)
 
 !  This is the adjoint routine for thickness
@@ -425,7 +424,6 @@ subroutine ADJ_thickness(pre_ma,tv_ma,ks,ke,tv1,tv2,layer1,layer2,pre1,pre2,   &
    real                     :: tv1,tv2
    real                     :: ADJ_tv1,ADJ_tv2
    real                     :: pre1,pre2
-   real                     :: thk
    real                     :: ADJ_thk
 
 !  p_tmp and ADJ_p_tmp are temporary (local) variables
@@ -458,5 +456,5 @@ subroutine ADJ_thickness(pre_ma,tv_ma,ks,ke,tv1,tv2,layer1,layer2,pre1,pre2,   &
                           ADJ_thk*tv1/pre_ma(layer1-1)
    ADJ_tv1 = ADJ_tv1 + ADJ_thk*log(pre_ma(layer1-1)/pre1)
 
-end subroutine ADJ_thickness
+end subroutine da_adj_thickness
 

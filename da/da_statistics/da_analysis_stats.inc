@@ -11,13 +11,11 @@ SUBROUTINE da_analysis_stats ( stats_unit, xp, xa )
    TYPE (x_type),     INTENT (in) :: xa         ! gridded analysis increments.
    
    INTEGER :: i, j, k
-   INTEGER :: ij, ijk       ! 2D and 3D subdomain sizes.
    INTEGER :: ij_g, ijk_g   ! ij, ijk for global domain. 
    integer :: is, ie        ! i range of processor subdomain.
    integer :: js, je        ! j range of processor subdomain.
    integer :: ks, ke, kdim  ! k range 
 
-   REAL    :: rij, rijk          ! On local domain.
    REAL    :: um, vm, tm, pm, qm ! On local domain.
    REAL    :: rij_g, rijk_g      ! On global domain.
 
@@ -41,15 +39,11 @@ SUBROUTINE da_analysis_stats ( stats_unit, xp, xa )
    ks = xp%kts
    ke = xp%kte
 
-   ij  = (ie-is+1) * (je-js+1)
    kdim = ke-ks+1
-   ijk = ij*kdim
 
    ij_g = mix * mjy
    ijk_g = ij_g * mkz
    
-   rij  = 1.0/real(ij)
-   rijk = 1.0/real(ijk)
    rij_g  = 1.0/real(ij_g)
    rijk_g = 1.0/real(ijk_g)
   

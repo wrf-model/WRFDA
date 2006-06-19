@@ -12,6 +12,11 @@ subroutine da_get_3d_sum(var, name, &
 
    real :: partial, total
 
+   ! JRB Use variables to stop compiler complaining
+   IF (ids == 1 .OR. ide == 1 .OR. jds == 1 .OR. jde == 1 .OR. &
+       kds == 1 .OR. kde == 1) THEN
+   END IF
+
    partial = SUM(var(its:ite,jts:jte,kts:kte)*var(its:ite,jts:jte,kts:kte))
 
    total = wrf_dm_sum_real( partial )

@@ -20,8 +20,6 @@
 !
 !$$$
     implicit none
-    logical regional
-    real(r_kind) reradius,g,r_d,r_v,cliq_wrf
 
 !   Trigonometric constants
     pi      = acos(-one)

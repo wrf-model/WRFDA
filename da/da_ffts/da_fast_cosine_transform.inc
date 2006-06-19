@@ -83,9 +83,8 @@ Subroutine da_fast_cosine_transform & ! in
  Integer                  :: K, IC, J, LA, IGO, JA,JB,IA,IB
  Integer                  :: IFAC,IERR,ISTART
 
- Real                     :: CO,S, t1,t2,si,scale, vectorlength
-
-CHARACTER (LEN=*), PARAMETER :: RoutineName = "Var_FFT551"
+ Real                     :: CO,S, t1,t2,si,scale
+ Integer                  :: vectorlength
 
       VectorLength = LOT
       NFAX=IFAX(1)

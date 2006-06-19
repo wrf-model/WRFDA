@@ -7,7 +7,7 @@ SUBROUTINE da_trace_int_sort( &
 
    INTEGER, INTENT(IN)          :: n      ! The number of items to be sorted. 
    INTEGER, INTENT(IN)          :: key(:)
-   INTEGER, TARGET, INTENT(OUT) :: index(:)
+   INTEGER, INTENT(OUT) :: index(:)
 
    INTEGER :: head       ! heaps are tree structures: head and child refer
    INTEGER :: child      ! to related items within the tree 

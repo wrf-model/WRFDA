@@ -15,7 +15,6 @@ SUBROUTINE da_wz_base(xb,WZ_b,                       &
 
    integer                       :: is, ie       ! 1st dim. end points.
    integer                       :: js, je       ! 2nd dim. end points.
-   integer                       :: ks, ke       ! 3rd dim. end points.
 
    integer                       :: I,J,K
 

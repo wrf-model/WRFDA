@@ -21,6 +21,13 @@ subroutine da_setup_testfield( xb, xa, xp, &
 
    integer :: i, j
 
+   ! JRB Stop compiler whinging
+
+   IF (kms==0 .OR. ite==0 .OR. ime==0 .OR. ide==0 .OR. ids==0 .OR. kde==0 .OR. &
+       its==0 .OR. ims==0 .OR. jds==0 .OR. jde==0 .OR. jts==0 .OR. jme==0 .OR. &
+       jte==0 .OR. jms==0 .OR. kds==0 .OR. kme==0 .OR. kts==0 .OR. kte==0) THEN
+   END IF
+
    !-------------------------------------------------------------------------
    ! [1.0]: initialise:
    !-------------------------------------------------------------------------
@@ -80,11 +87,11 @@ subroutine da_setup_testfield( xb, xa, xp, &
    endif
 
    !--Exchange XA halo region.
-   CALL wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id4)
+   call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id4)
 
    if (sfc_assi_options == 2) then
       !-----Exchange XA (surface variable) halo region.
-      CALL wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id6)
+      call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id6)
    endif
 
    if ( use_ssmt1obs .or. use_ssmt2obs .or. Use_GpspwObs .or. &
@@ -103,7 +110,7 @@ subroutine da_setup_testfield( xb, xa, xp, &
       endif
 
       !-----Exchange XA halo region.
-      CALL wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id8)
+      call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id8)
    endif
 
    write(UNIT=stdout, fmt='(/a/)') &

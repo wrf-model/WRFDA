@@ -20,9 +20,10 @@ SUBROUTINE da_tpq_to_slp_adj ( T, Q, P, TERR, PSFC, &
   REAL,                intent(in)               :: TERR, PSFC
   REAL, dimension(xp%kms:xp%kme), intent(in)    :: T, Q, P
   REAL, dimension(xp%kms:xp%kme)                :: T9, Q9, P9
-  REAL                                          :: SLP, SLP9, PSFC9
+  ! REAL                                          :: SLP
+  REAL                                          :: SLP9, PSFC9
 
-  INTEGER              :: I, J, K, KLO, KHI
+  INTEGER              :: K, KLO, KHI
   REAL                 :: PL, T0, TS, XTERM,    &
                           TLO, THI, TL
   REAL                 :: PL9,T09,TS9,TLO9,THI9,TL9,COEF1,COEF2

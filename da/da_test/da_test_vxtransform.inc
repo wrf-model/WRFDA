@@ -4,14 +4,14 @@ SUBROUTINE da_test_vxtransform( xb, xbx, xp, be, &
                                 ims,ime, jms,jme, kms,kme, &
                                 its,ite, jts,jte, kts,kte )
 
-!------------------------------------------------------------------------------
-!  PURPOSE: Perform inverse/adjoint tests on control variable transform.
-!
-!  METHOD:  1) Test inverse and adjoint of physical variable transform.
-!           2) Test inverse and adjoint of vertical transform.
-!           3) Perform adjoint test on complete transform: <x,x> = <v_adj,v>.
-!
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! PURPOSE: Perform inverse/adjoint tests on control variable transform.
+   !
+   ! METHOD:  1) Test inverse and adjoint of physical variable transform.
+   !          2) Test inverse and adjoint of vertical transform.
+   !          3) Perform adjoint test on complete transform: <x,x> = <v_adj,v>.
+   !
+   !---------------------------------------------------------------------------
 
    IMPLICIT NONE
 
@@ -32,25 +32,26 @@ SUBROUTINE da_test_vxtransform( xb, xbx, xp, be, &
    integer            :: i   
    TYPE (vp_type)                    :: vp1, vv1    ! Test CV structure.
    real, dimension(ims:ime, jms:jme) :: field
-!-------------------------------------------------------------------------
+
 
    real, dimension(ims:ime, jms:jme, kms:kme) :: xa2_u, xa2_v, xa2_t, &
                                                  xa2_p, xa2_q, xa2_rh, xa2_rho, &
                                                  xa2_qt, xa2_qcw, xa2_qrn
    real, dimension(ims:ime, jms:jme, kms:kme) :: xa2_w
 
-!-------------------------------------------------------------------------
- ALLOCATE (vp1 % v1(ims:ime,jms:jme,kms:kme))
- ALLOCATE (vp1 % v2(ims:ime,jms:jme,kms:kme))
- ALLOCATE (vp1 % v3(ims:ime,jms:jme,kms:kme))
- ALLOCATE (vp1 % v4(ims:ime,jms:jme,kms:kme))
- ALLOCATE (vp1 % v5(ims:ime,jms:jme,kms:kme))
+   IF (trace_use) call da_trace_entry("da_test_vxtransform")
 
- ALLOCATE (vv1 % v1(ims:ime,jms:jme,1:kz_vv(1)))
- ALLOCATE (vv1 % v2(ims:ime,jms:jte,1:kz_vv(2)))
- ALLOCATE (vv1 % v3(ims:ime,jms:jme,1:kz_vv(3)))
- ALLOCATE (vv1 % v4(ims:ime,jms:jme,1:kz_vv(4)))
- ALLOCATE (vv1 % v5(ims:ime,jms:jme,1:kz_vv(5)))
+   ALLOCATE (vp1 % v1(ims:ime,jms:jme,kms:kme))
+   ALLOCATE (vp1 % v2(ims:ime,jms:jme,kms:kme))
+   ALLOCATE (vp1 % v3(ims:ime,jms:jme,kms:kme))
+   ALLOCATE (vp1 % v4(ims:ime,jms:jme,kms:kme))
+   ALLOCATE (vp1 % v5(ims:ime,jms:jme,kms:kme))
+
+   ALLOCATE (vv1 % v1(ims:ime,jms:jme,1:kz_vv(1)))
+   ALLOCATE (vv1 % v2(ims:ime,jms:jte,1:kz_vv(2)))
+   ALLOCATE (vv1 % v3(ims:ime,jms:jme,1:kz_vv(3)))
+   ALLOCATE (vv1 % v4(ims:ime,jms:jme,1:kz_vv(4)))
+   ALLOCATE (vv1 % v5(ims:ime,jms:jme,1:kz_vv(5)))
 
    call da_zero_vp_type(vp1)
    call da_zero_vp_type(vv1)
@@ -60,7 +61,8 @@ SUBROUTINE da_test_vxtransform( xb, xbx, xp, be, &
 
    write(UNIT=stdout, fmt='(/a/)') &
         '---------------------------------------'
-!--Make cv all constant value 1.0
+
+   ! Make cv all constant value 1.0
 
    call random_number(cv(:))
    cv(:) = cv(:) - 0.5
@@ -84,9 +86,8 @@ SUBROUTINE da_test_vxtransform( xb, xbx, xp, be, &
                           ims, ime, jms, jme, kms, kme, &
                           its, ite, jts, jte, kts, kte )
 
-!-------------------------------------------------------------------------
-! Store xa, Vv & Vp for inverse test
-!-------------------------------------------------------------------------
+   ! Store xa, Vv & Vp for inverse test
+
    xa2_u(ims:ime,jms:jme,:) = xa % u(ims:ime,jms:jme,:)
    xa2_v(ims:ime,jms:jme,:) = xa % v(ims:ime,jms:jme,:)
    xa2_w(ims:ime,jms:jme,:) = xa % w(ims:ime,jms:jme,:)
@@ -95,7 +96,6 @@ SUBROUTINE da_test_vxtransform( xb, xbx, xp, be, &
    xa2_q(ims:ime,jms:jme,:) = xa % q(ims:ime,jms:jme,:)
    xa2_rho(ims:ime,jms:jme,:) = xa % rho(ims:ime,jms:jme,:)
 
-!------------------------------------------------------------
    IF ( cv_options_hum == 2 ) THEN
       xa2_rh(ims:ime,jms:jme,:) = xa % rh(ims:ime,jms:jme,:)
    END IF
@@ -104,31 +104,29 @@ SUBROUTINE da_test_vxtransform( xb, xbx, xp, be, &
       xa2_qcw(ims:ime,jms:jme,:) = xa % qcw(ims:ime,jms:jme,:)
       xa2_qrn(ims:ime,jms:jme,:) = xa % qrn(ims:ime,jms:jme,:)
    END IF
-!------------------------------------------------------------
 
-      vv1 % v1(its:ite,jts:jte,1:kz_vv(1)) = vv % v1(its:ite,jts:jte,1:kz_vv(1))
-      vv1 % v2(its:ite,jts:jte,1:kz_vv(2)) = vv % v2(its:ite,jts:jte,1:kz_vv(2))
-      vv1 % v3(its:ite,jts:jte,1:kz_vv(3)) = vv % v3(its:ite,jts:jte,1:kz_vv(3))
-      vv1 % v4(its:ite,jts:jte,1:kz_vv(4)) = vv % v4(its:ite,jts:jte,1:kz_vv(4))
-      vv1 % v5(its:ite,jts:jte,1:kz_vv(5)) = vv % v5(its:ite,jts:jte,1:kz_vv(5))
+   vv1 % v1(its:ite,jts:jte,1:kz_vv(1)) = vv % v1(its:ite,jts:jte,1:kz_vv(1))
+   vv1 % v2(its:ite,jts:jte,1:kz_vv(2)) = vv % v2(its:ite,jts:jte,1:kz_vv(2))
+   vv1 % v3(its:ite,jts:jte,1:kz_vv(3)) = vv % v3(its:ite,jts:jte,1:kz_vv(3))
+   vv1 % v4(its:ite,jts:jte,1:kz_vv(4)) = vv % v4(its:ite,jts:jte,1:kz_vv(4))
+   vv1 % v5(its:ite,jts:jte,1:kz_vv(5)) = vv % v5(its:ite,jts:jte,1:kz_vv(5))
 
-      vp1 % v1(its:ite,jts:jte,1:kz_vp(1)) = vp % v1(its:ite,jts:jte,1:kz_vp(1))
-      vp1 % v2(its:ite,jts:jte,1:kz_vp(2)) = vp % v2(its:ite,jts:jte,1:kz_vp(2))
-      vp1 % v3(its:ite,jts:jte,1:kz_vp(3)) = vp % v3(its:ite,jts:jte,1:kz_vp(3))
-      vp1 % v4(its:ite,jts:jte,1:kz_vp(4)) = vp % v4(its:ite,jts:jte,1:kz_vp(4))
-      vp1 % v5(its:ite,jts:jte,1:kz_vp(5)) = vp % v5(its:ite,jts:jte,1:kz_vp(5))
-!-------------------------------------------------------------------------
-!  [1.0]: Perform VvToVpToVv test:                        
-!-------------------------------------------------------------------------
-!   call da_transform_xtovp( xb, xbx, xa, xp, vp, be, &
-!                           ids,ide, jds,jde, kds,kde, &
-!                           ims,ime, jms,jme, kms,kme, &
-!                           its,ite, jts,jte, kts,kte )
+   vp1 % v1(its:ite,jts:jte,1:kz_vp(1)) = vp % v1(its:ite,jts:jte,1:kz_vp(1))
+   vp1 % v2(its:ite,jts:jte,1:kz_vp(2)) = vp % v2(its:ite,jts:jte,1:kz_vp(2))
+   vp1 % v3(its:ite,jts:jte,1:kz_vp(3)) = vp % v3(its:ite,jts:jte,1:kz_vp(3))
+   vp1 % v4(its:ite,jts:jte,1:kz_vp(4)) = vp % v4(its:ite,jts:jte,1:kz_vp(4))
+   vp1 % v5(its:ite,jts:jte,1:kz_vp(5)) = vp % v5(its:ite,jts:jte,1:kz_vp(5))
 
-!-------------------------------------------------------------------------
+   !----------------------------------------------------------------------
+   ! [1.0]: Perform VvToVpToVv test:                        
+   !----------------------------------------------------------------------
+   ! call da_transform_xtovp( xb, xbx, xa, xp, vp, be, &
+   !                        ids,ide, jds,jde, kds,kde, &
+   !                        ims,ime, jms,jme, kms,kme, &
+   !                        its,ite, jts,jte, kts,kte )
+
    if ( vert_corr == 2 ) then
-!  perform vv = u_v^{-1} vp transform:
-!-------------------------------------------------------------------------
+      ! perform vv = u_v^{-1} vp transform:
       call da_vertical_transform( 'u_inv', be, &
 #ifndef DEREF_KLUDGE
                             xb % vertical_inner_product, &
@@ -146,17 +144,18 @@ SUBROUTINE da_test_vxtransform( xb, xbx, xp, be, &
       vv % v4(its:ite,jts:jte,1:kz_vv(4)) = vp % v4(its:ite,jts:jte,1:kz_vp(4))
       vv % v5(its:ite,jts:jte,1:kz_vv(5)) = vp % v5(its:ite,jts:jte,1:kz_vp(5))
    end if
-!-------------------------------------------------------------------------
+
+
    write(UNIT=stdout, fmt='(/a/)') &
         'da_check_vvtovptovv_errors'
 
    call da_check_vp_errors( vv1, vv, kz_vv, its,ite, jts,jte, kts,kte )
 
-!-------------------------------------------------------------------------
-!  [2.0]: Perform VpToVvToVp test:                        
-!-------------------------------------------------------------------------
+   !----------------------------------------------------------------------
+   ! [2.0]: Perform VpToVvToVp test:                        
+   !----------------------------------------------------------------------
    if ( vert_corr == 2 ) then
-!  perform vp = u_v (vv) transform:
+      ! perform vp = u_v (vv) transform:
       call da_vertical_transform( 'u', be, &
 #ifndef DEREF_KLUDGE
                             xb % vertical_inner_product, &
@@ -176,109 +175,122 @@ SUBROUTINE da_test_vxtransform( xb, xbx, xp, be, &
       vp % v5(its:ite,jts:jte,1:kz_vv(5)) = vv % v5(its:ite,jts:jte,1:kz_vv(5))
 
    end if
-!-------------------------------------------------------------------------
-!  Check inverse errors:
+
+   ! Check inverse errors:
 
    write(UNIT=stdout, fmt='(/a/)') &
         'da_check_vptovvtovp_errors'
 
    call da_check_vp_errors( vp1, vp, kz_vv, its,ite, jts,jte, kts,kte )
-!-------------------------------------------------------------------------
-!  [3.0] Check_CvToVv_Adjoint:
-!-------------------------------------------------------------------------
+
+   !----------------------------------------------------------------------
+   ! [3.0] Check_CvToVv_Adjoint:
+   !----------------------------------------------------------------------
    call da_check_cvtovv_adjoint( xb, xbx, xp, be, cv, vv, &
                                ids, ide, jds, jde, kds, kde,      &
                                ims, ime, jms, jme, kms, kme,      &
                                its, ite, jts, jte, kts, kte )
-!-------------------------------------------------------------------------
-!  [4.0] Test inverse physical variable transform:
-!  Note: Currently these test are developed for regional only
-!-------------------------------------------------------------------------
+  
+   !----------------------------------------------------------------------
+   ! [4.0] Test inverse physical variable transform:
+   ! Note: Currently these test are developed for regional only
+   !----------------------------------------------------------------------
 
    if( .not. global ) then
-     call da_zero_x(xa)
-     call da_transform_vptox( xb, xbx, vp, xp, xa, be,    &
+      call da_zero_x(xa)
+      call da_transform_vptox( xb, xbx, vp, xp, xa, be,    &
                               ids,ide, jds,jde, kds,kde,  &
                               ims,ime, jms,jme, kms,kme,  &
                               its,ite, jts,jte, kts,kte )
 
-!  [4.1] Test XToVpToX differences:
+      ! [4.1] Test XToVpToX differences:
 
-     write(UNIT=stdout, fmt='(/a/)') &
-          'da_check_xtovptox_errors'
+      write(UNIT=stdout, fmt='(/a/)') &
+         'da_check_xtovptox_errors'
    
-     CALL da_check_xtovptox_errors( xa, xa2_u, xa2_v, xa2_w, xa2_t, &
-                                 xa2_p, xa2_q, xa2_rh, xa2_rho, &
+      call da_check_xtovptox_errors( xa, xa2_u, xa2_v, xa2_w, xa2_t, &
+                                 xa2_p, xa2_q,  xa2_rho, &
                                  xa2_qt, xa2_qcw, xa2_qrn, &
                                  ids,ide, jds,jde, kds,kde, &
                                  ims,ime, jms,jme, kms,kme, &
                                  its,ite, jts,jte, kts,kte )
 
-!  [4.2] Perform v_{p} = U_{p}^{-1} x transform (again):
+      ! [4.2] Perform v_{p} = U_{p}^{-1} x transform (again):
 
-     call da_transform_xtovp( xb, xbx, xa, xp, vv, be, &
+      call da_transform_xtovp( xb, xbx, xa, xp, vv, be, &
                             ids,ide, jds,jde, kds,kde, &
                             ims,ime, jms,jme, kms,kme, &
                             its,ite, jts,jte, kts,kte )
       
-!  [2.4] Check inverse errors:
+      ! [2.4] Check inverse errors:
 
-     write(UNIT=stdout, fmt='(/a/)') &
-          'da_check_vptoxtovp_errors'
+      write(UNIT=stdout, fmt='(/a/)') &
+         'da_check_vptoxtovp_errors'
 
-     call da_check_vp_errors( vp, vv, kz_vp, its,ite, jts,jte, kts,kte )
+      call da_check_vp_errors( vp, vv, kz_vp, its,ite, jts,jte, kts,kte )
    end if
-!-------------------------------------------------------------------------
-!  [5.0] Perform Vv -> Vp adjoint test: 
-!-------------------------------------------------------------------------
+
+   !----------------------------------------------------------------------
+   ! [5.0] Perform Vv -> Vp adjoint test: 
+   !----------------------------------------------------------------------
+
    call da_check_vvtovp_adjoint( xb, xp, be, vp, vv, &
                                  ids,ide, jds,jde, kds,kde, &
                                  ims,ime, jms,jme, kms,kme, &
                                  its,ite, jts,jte, kts,kte )
-!-------------------------------------------------------------------------
-!  [6.0] Perform Vp -> X  adjoint tests: 
-!-------------------------------------------------------------------------
+
+   !----------------------------------------------------------------------
+   ! [6.0] Perform Vp -> X  adjoint tests: 
+   !----------------------------------------------------------------------
+
    call da_check_vptox_adjoint( xb, xbx, be, xa, xp, vp, &
                                ids, ide, jds, jde, kds, kde,    &
                                ims, ime, jms, jme, kms, kme,    &
                                its, ite, jts, jte, kts, kte )
 
 #endif
-1111     continue
-!-------------------------------------------------------------------------
-!  [7.0]: Perform adjoint test on complete transform: <x,x> = <v_adj,v>
-!-------------------------------------------------------------------------
+1111 continue
+
+   !----------------------------------------------------------------------
+   ! [7.0]: Perform adjoint test on complete transform: <x,x> = <v_adj,v>
+   !----------------------------------------------------------------------
+
    call da_check_vtox_adjoint( xb, xbx, be, cv, vv, vp, xp, xa, &
                                ids, ide, jds, jde, kds, kde,      &
                                ims, ime, jms, jme, kms, kme,      &
                                its, ite, jts, jte, kts, kte )
-!-------------------------------------------------------------------------
-!  [8.0]: Perform Spectral transform tests for Global                    
-!-------------------------------------------------------------------------
-    if (global) then   
+
+   !----------------------------------------------------------------------
+   ! [8.0]: Perform Spectral transform tests for Global                    
+   !----------------------------------------------------------------------
+
+   if (global) then   
 #ifdef DM_PARALLEL
-  print*,' Inverse tests for spectral transforms will not be done as it is MPP run'
+    print*, &
+       ' Inverse tests for spectral transforms will not be done as it is MPP run'
 #else
-    call random_number(field(:,:) )
-    field(:,:) = field(:,:) - 0.5
-    call da_test_spectral(xbx, field, &
+      call random_number(field(:,:) )
+      field(:,:) = field(:,:) - 0.5
+      call da_test_spectral(xbx, field, &
                           ids, ide, jds, jde, &
                           ims, ime, jms, jme, &
                           its, ite, jts, jte )
 #endif
    endif
-!-------------------------------------------------------------------------
- DEALLOCATE (vp1 % v1)
- DEALLOCATE (vp1 % v2)
- DEALLOCATE (vp1 % v3)
- DEALLOCATE (vp1 % v4)
- DEALLOCATE (vp1 % v5)
 
- DEALLOCATE (vv1 % v1)
- DEALLOCATE (vv1 % v2)
- DEALLOCATE (vv1 % v3)
- DEALLOCATE (vv1 % v4)
- DEALLOCATE (vv1 % v5)
+   DEALLOCATE (vp1 % v1)
+   DEALLOCATE (vp1 % v2)
+   DEALLOCATE (vp1 % v3)
+   DEALLOCATE (vp1 % v4)
+   DEALLOCATE (vp1 % v5)
 
-END SUBROUTINE da_test_vxtransform
+   DEALLOCATE (vv1 % v1)
+   DEALLOCATE (vv1 % v2)
+   DEALLOCATE (vv1 % v3)
+   DEALLOCATE (vv1 % v4)
+   DEALLOCATE (vv1 % v5)
+
+   IF (trace_use) call da_trace_exit("da_test_vxtransform") 
+
+end subroutine da_test_vxtransform
 

@@ -20,7 +20,7 @@ SUBROUTINE da_tpq_to_slp ( T, Q, P, TERR, PSFC, SLP, xp )
   REAL, dimension(xp%kms:xp%kme), intent(in)    :: T, Q, P
   REAL,                intent(inout)            :: SLP
 
-  INTEGER              :: I, J, K, KLO, KHI
+  INTEGER              :: K, KLO, KHI
   REAL                 :: PL, T0, TS, XTERM,    &
                           TLO, THI, TL
                                                

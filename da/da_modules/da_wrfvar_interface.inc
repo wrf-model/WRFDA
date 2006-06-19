@@ -1,10 +1,10 @@
-SUBROUTINE da_wrfvar_interface ( grid, config_flags ) 
+subroutine da_wrfvar_interface ( grid, config_flags ) 
 
    IMPLICIT NONE
 
 #ifndef DEREF_KLUDGE
    INTERFACE
-      SUBROUTINE solve_v3d ( grid , config_flags , &
+      subroutine da_solve_v3d ( grid , config_flags , &
 #include "em_dummy_args.inc"
       )
 
@@ -34,7 +34,7 @@ SUBROUTINE da_wrfvar_interface ( grid, config_flags )
 
 #include "em_dummy_decl.inc"
 
-      END SUBROUTINE solve_v3d
+      end subroutine da_solve_v3d
    END INTERFACE
 #endif
 
@@ -46,13 +46,13 @@ SUBROUTINE da_wrfvar_interface ( grid, config_flags )
    INTEGER     :: sm31 , em31 , sm32 , em32 , sm33 , em33
 #endif
 
-   CALL da_trace_entry("da_wrfvar_interface")
+   call da_trace_entry("da_wrfvar_interface")
 
-   ! CALL mediation_setup_step ( grid , config_flags , 1 , 1 , 1 )
+   ! call mediation_setup_step ( grid , config_flags , 1 , 1 , 1 )
 
-   CALL set_scalar_indices_from_config ( grid%id , idum1 , idum2 )
+   call set_scalar_indices_from_config ( grid%id , idum1 , idum2 )
 
-   CALL model_to_grid_config_rec ( grid%id , model_config_rec , config_flags )
+   call model_to_grid_config_rec ( grid%id , model_config_rec , config_flags )
 
    grid%itimestep = 1
 
@@ -65,10 +65,10 @@ SUBROUTINE da_wrfvar_interface ( grid, config_flags )
    em33             = grid%em33
 #endif
 
-   CALL solve_v3d ( grid , config_flags , &
+   call da_solve_v3d ( grid , config_flags , &
 #include "em_actual_args.inc"
     )
 
-   CALL da_trace_exit("da_wrfvar_interface")
+   call da_trace_exit("da_wrfvar_interface")
 
-END SUBROUTINE da_wrfvar_interface
+end subroutine da_wrfvar_interface

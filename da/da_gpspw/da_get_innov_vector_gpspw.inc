@@ -32,13 +32,13 @@ SUBROUTINE da_get_innov_vector_gpspw ( it, xb, xp, ob, iv )
   REAL,DIMENSION(xp%kts:xp%kte):: model_q ! model q at GPS site [kg/kg]
   REAL,DIMENSION(xp%kts:xp%kte):: model_z ! model z at GPS site [m]
   REAL,DIMENSION(xp%kts:xp%kte):: model_rho ! model rho at GPS site [kg/m^3]
-  INTEGER                      :: myrank, ierr, unit_gps
+  !INTEGER                      :: myrank, ierr, unit_gps
 
   LOGICAL, EXTERNAL :: wrf_dm_on_monitor
 
   ! call MPI_COMM_RANK( MPI_COMM_WORLD, myrank, ierr )
-  myrank=0
-  unit_gps = myrank + 140
+  ! myrank=0
+  ! unit_gps = myrank + 140
   !---------------------------------------------------------------------------
 
   !

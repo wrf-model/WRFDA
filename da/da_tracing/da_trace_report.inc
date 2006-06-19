@@ -12,7 +12,6 @@ SUBROUTINE da_trace_report
    INTEGER :: j
    INTEGER :: CountRate
    INTEGER :: MasterNoRoutines
-   INTEGER :: info
    INTEGER :: istat
    INTEGER :: temp
    INTEGER :: MinElapsedPos

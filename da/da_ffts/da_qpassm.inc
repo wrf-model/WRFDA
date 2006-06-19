@@ -21,15 +21,13 @@
 !C
 !C-----------------------------------------------------------------------
 !C
-     SUBROUTINE DA_QPASSM(A,B,C,D,TRIGS,INC1,INC2,INC3,INC4,LOT,N,IFAC,LA,IERR)
+     SUBROUTINE da_qpassm(A,B,C,D,TRIGS,INC1,INC2,INC3,INC4,LOT,N,IFAC,LA,IERR)
 
       INTEGER :: inc1, inc2, inc3, inc4, lot, n, ifac, la, ierr
 
       REAL  :: a, b, c, d, trigs
       DIMENSION A(*),B(*),C(*),D(*),TRIGS(N)
-! Local named constants
- CHARACTER (LEN=*), PARAMETER :: RoutineName = "Var_QPASSM"
-!
+
       REAL  :: SIN36, SIN72, QRT5, SIN60
       DATA SIN36/0.587785252292473/,SIN72/0.951056516295154/, &
           QRT5/0.559016994374947/,SIN60/0.866025403784437/
@@ -38,7 +36,7 @@
       REAL    :: sin45, zsin36, zsin72, zqrt5, zsin60, zsin45, z
       REAL    :: a0, a1, a2, a3, a4, a5, a6, a10, a11, a20, a21
       REAL    :: b0, b1, b2, b3, b4, b5, b6, b10, b11, b20, b21
-      REAL    :: c0, c1, c2, c3, c4, c5
+      REAL    :: c1, c2, c3, c4, c5
       INTEGER :: i, ijk, l, k, kb, m, iink, jink, ijump, kstop
       INTEGER :: ibad, igo, ia, ie, je, ibase, jbase, ja, jb, j, ic
       INTEGER :: if, jf, kf, ib, jc, kc, id, jd, kd, ke, ig, ih
@@ -758,4 +756,4 @@
       IERR=IBAD
 
       RETURN
-      END SUBROUTINE DA_QPASSM
+      END SUBROUTINE da_qpassm

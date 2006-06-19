@@ -57,7 +57,7 @@ SUBROUTINE da_proc_stats_combine( proc_ave, proc_err, proc_min, proc_max, &
 
    if( myrank .eq. root ) then
      proc_min = out(1)
-     proc_id = out(2)
+     proc_id = INT(out(2))
    end if
    call wrf_dm_bcast_integer ( proc_id, 1 )
 
@@ -80,7 +80,7 @@ SUBROUTINE da_proc_stats_combine( proc_ave, proc_err, proc_min, proc_max, &
 
    if( myrank .eq. root ) then
      proc_max = out(1)
-     proc_id = out(2)
+     proc_id = INT(out(2))
    end if
 
    call wrf_dm_bcast_integer ( proc_id, 1 )

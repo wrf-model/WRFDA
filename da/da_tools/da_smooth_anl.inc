@@ -13,7 +13,7 @@ SUBROUTINE da_smooth_anl(SLAB,IMX,JMX,KX,NPASS,ICRSDOT)
    
    REAL, ALLOCATABLE                  :: SLABNEW(:,:)
    REAL                               :: XNU(1:2)
-   INTEGER                            :: iost, ie, je, k 
+   INTEGER                            :: ie, je, k 
    INTEGER                            :: loop, n, i, j
    
    ALLOCATE (SLABNEW(IMX,JMX))

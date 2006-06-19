@@ -131,22 +131,22 @@ subroutine da_setup_be_global( ide, jde, kde, be  )
 
       if ( nrec == 1 ) then
          be % v1 % name = variable               
-         call da_get_bins_info( ni, nj, nk, num_bins2d, bin2d, evec_g, eval_g, &
+         call da_get_bins_info( nj, nk, bin2d, evec_g, eval_g, &
                                 evec_loc, eval_loc, max_vert_var1, var_scaling1, be%v1)
 
       else if( nrec == 2 ) then
          be % v2 % name = variable               
-         call da_get_bins_info( ni, nj, nk, num_bins2d, bin2d, evec_g, eval_g, &
+         call da_get_bins_info( nj, nk, bin2d, evec_g, eval_g, &
                                 evec_loc, eval_loc, max_vert_var2, var_scaling2, be%v2)
 
       else if ( nrec == 3 ) then
          be % v3 % name = variable               
-         call da_get_bins_info( ni, nj, nk, num_bins2d, bin2d, evec_g, eval_g, &
+         call da_get_bins_info( nj, nk, bin2d, evec_g, eval_g, &
                                 evec_loc, eval_loc, max_vert_var3, var_scaling3, be%v3)
 
       else if ( nrec == 4) then
          be % v4 % name = variable               
-         call da_get_bins_info( ni, nj, nk, num_bins2d, bin2d, evec_g, eval_g, &
+         call da_get_bins_info( nj, nk, bin2d, evec_g, eval_g, &
                                 evec_loc, eval_loc, max_vert_var4, var_scaling4, be%v4)
 
       end if 

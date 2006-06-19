@@ -1,10 +1,8 @@
-SUBROUTINE da_check_psfc( xb, xa, iv, xp, y, &
+subroutine da_check_psfc( xb, xa, iv, xp, y, &
                        ids,ide, jds,jde, kds,kde, &
                        ims,ime, jms,jme, kms,kme, &
                        its,ite, jts,jte, kts,kte )
-   
-!------------------------------------------------------------------------------
-   
+     
    implicit none
    
    type (xb_type), intent(in)        :: xb    ! first guess (local).
@@ -17,8 +15,6 @@ SUBROUTINE da_check_psfc( xb, xa, iv, xp, y, &
    integer, intent(in)               :: ims,ime, jms,jme, kms,kme ! memory dims.
    integer, intent(in)               :: its,ite, jts,jte, kts,kte ! tile   dims.
 
-!-------------------------------------------------------------------------
-
    REAL                           :: adj_ttl_lhs   ! < y, y >
    REAL                           :: adj_ttl_rhs   ! < x, x_adj >
 
@@ -28,39 +24,38 @@ SUBROUTINE da_check_psfc( xb, xa, iv, xp, y, &
    REAL                           :: pertile_lhs   ! < y, y >
    REAL                           :: pertile_rhs   ! < x, x_adj >
 
-!-------------------------------------------------------------------------
-
    INTEGER                        :: n
 
-!-------------------------------------------------------------------------
- 
    real, dimension(ims:ime, jms:jme) :: xa2_u10, xa2_v10, xa2_t2, &
-                                        xa2_q2, xa2_tgrn, xa2_psfc
+                                        xa2_q2, xa2_psfc
 
-!-------------------------------------------------------------------------
+   IF (trace_use) call da_trace_entry("da_check_psfc")
+
+   ! JRB Stop compiler whinging
+   IF (ids == 0 .OR. ide == 0 .OR. kme == 0 .OR. jde == 0 .OR. jds == 0 .OR. &
+      kde == 0 .OR. kds == 0 .OR. kte == 0 .OR. kms == 0) THEN
+   END IF
    
    write(UNIT=stdout, fmt='(/3a,i6/a)') &
         'File: ', __FILE__, ', line:', __LINE__, &
         'Adjoint Test Results:'
 
-!-------------------------------------------------------------------------
-!--save input
+   !--save input
 
    xa2_psfc(ims:ime, jms:jme) = xa%p   (ims:ime, jms:jme, kts)
-   xa2_tgrn(ims:ime, jms:jme) = xa%tgrn(ims:ime, jms:jme)
    xa2_u10 (ims:ime, jms:jme) = xa%u10 (ims:ime, jms:jme)
    xa2_v10 (ims:ime, jms:jme) = xa%v10 (ims:ime, jms:jme)
    xa2_t2  (ims:ime, jms:jme) = xa%t2  (ims:ime, jms:jme)
    xa2_q2  (ims:ime, jms:jme) = xa%q2  (ims:ime, jms:jme)
 
-!-------------------------------------------------------------------------
+   !----------------------------------------------------------------------
 
    partial_lhs = 0.0
    pertile_lhs = 0.0
 
    do n=1, iv%num_synop
       if(iv%synop(n)%loc%proc_domain_with_halo) then
-         CALL da_transform_xtopsfc( xb, xa, xp, iv%synop(n), y%synop(n) )
+         call da_transform_xtopsfc( xb, xa, xp, iv%synop(n), y%synop(n) )
          pertile_lhs = pertile_lhs &
                      + y%synop(n)%u * y%synop(n)%u &
                      + y%synop(n)%v * y%synop(n)%v &
@@ -79,9 +74,9 @@ SUBROUTINE da_check_psfc( xb, xa, iv, xp, y, &
       endif
    enddo
 
-!-------------------------------------------------------------------------
-!     [5.0] Perform adjivnt operation:
-!-------------------------------------------------------------------------
+   !-------------------------------------------------------------------------
+   ! [5.0] Perform adjivnt operation:
+   !-------------------------------------------------------------------------
 
    xa%psfc(ims:ime, jms:jme) = 0.0
    xa%tgrn(ims:ime, jms:jme) = 0.0
@@ -92,7 +87,7 @@ SUBROUTINE da_check_psfc( xb, xa, iv, xp, y, &
    
    DO n=1, iv%num_synop
       if(iv%synop(n)%loc%proc_domain_with_halo) then
-         CALL da_transform_xtopsfc_adj(xb,xp,iv%synop(n),y%synop(n),xa)
+         call da_transform_xtopsfc_adj(xb,xp,iv%synop(n),y%synop(n),xa)
       endif
    ENDDO
 
@@ -108,13 +103,13 @@ SUBROUTINE da_check_psfc( xb, xa, iv, xp, y, &
                + sum( xa%q2  (its:ite, jts:jte) * xa2_q2  (its:ite, jts:jte) ) &
                + sum( xa%psfc(its:ite, jts:jte) * xa2_psfc(its:ite, jts:jte) )
    
-!---- --------------------------------------------------------------------
-!     [6.0] Calculate RHS of adjivnt test equation:
-!-------------------------------------------------------------------------
+   !----------------------------------------------------------------------
+   ! [6.0] Calculate RHS of adjivnt test equation:
+   !----------------------------------------------------------------------
 
-!---- --------------------------------------------------------------------
-!     [7.0] Print output:
-!-------------------------------------------------------------------------
+   !----------------------------------------------------------------------
+   ! [7.0] Print output:
+   !----------------------------------------------------------------------
    
    write(UNIT=stdout, fmt='(A,1pe22.14)') &
         ' Tile < y, y     > = ', pertile_lhs, &
@@ -122,18 +117,20 @@ SUBROUTINE da_check_psfc( xb, xa, iv, xp, y, &
 
    adj_ttl_lhs = wrf_dm_sum_real( partial_lhs )
    adj_ttl_rhs = wrf_dm_sum_real( partial_rhs )
-PRINT *,'TEST_COVERAGE_check_sfc_assi_B:  adj_ttl_lhs,adj_ttl_rhs = ', adj_ttl_lhs,adj_ttl_rhs
+   PRINT *,'TEST_COVERAGE_check_sfc_assi_B:  adj_ttl_lhs,adj_ttl_rhs = ', adj_ttl_lhs,adj_ttl_rhs
    IF ( wrf_dm_on_monitor() ) THEN
       write(UNIT=stdout, fmt='(A,1pe22.14)') ' Whole Domain < y, y     > = ', adj_ttl_lhs
       write(UNIT=stdout, fmt='(A,1pe22.14)') ' Whole Domain < x, x_adj > = ', adj_ttl_rhs
    ENDIF
 
-!--recover
+   ! recover
    xa%psfc(ims:ime, jms:jme) = xa2_psfc(ims:ime, jms:jme)
    xa%u10 (ims:ime, jms:jme) = xa2_u10 (ims:ime, jms:jme)
    xa%v10 (ims:ime, jms:jme) = xa2_v10 (ims:ime, jms:jme)
    xa%t2  (ims:ime, jms:jme) = xa2_t2  (ims:ime, jms:jme)
    xa%q2  (ims:ime, jms:jme) = xa2_q2  (ims:ime, jms:jme)
 
-END SUBROUTINE da_check_psfc
+   IF (trace_use) call da_trace_exit("da_check_psfc")
+
+END subroutine da_check_psfc
 

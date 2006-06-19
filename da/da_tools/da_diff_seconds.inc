@@ -9,27 +9,25 @@ real function da_diff_seconds(date_char_1, date_char_2)
    integer                :: i, year, diff_days
    integer                :: start_year, end_year
    integer, dimension(12) :: mmday
-
-   character(len=1)       :: dash, underscore, colon
-  
+ 
    real                   :: s_1, s_2
   
    mmday=(/31,28,31,30,31,30,31,31,30,31,30,31/)
   
-   read(date_char_1(1:19), fmt='(i4,a,4(i2,a),i2)') &
-        ccyy_1, dash, &
-          mo_1, dash, &
-          dd_1, underscore, &
-          hh_1, colon, &
-          mi_1, colon, &
+   read(date_char_1(1:19), fmt='(i4,1x,4(i2,1x),i2)') &
+        ccyy_1, &
+          mo_1, &
+          dd_1, &
+          hh_1, &
+          mi_1, &
           ss_1
   
-   read(date_char_2(1:19), fmt='(i4,a,4(i2,a),i2)') &
-        ccyy_2, dash, &
-          mo_2, dash, &
-          dd_2, underscore, &
-          hh_2, colon, &
-          mi_2, colon, &
+   read(date_char_2(1:19), fmt='(i4,1x,4(i2,1x),i2)') &
+        ccyy_2, &
+          mo_2, &
+          dd_2, &
+          hh_2, &
+          mi_2, &
           ss_2
 
    if(ccyy_2 >= ccyy_1) then

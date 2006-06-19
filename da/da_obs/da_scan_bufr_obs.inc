@@ -15,8 +15,7 @@ SUBROUTINE da_scan_bufr_obs (iunit, ob, xp, filename)
    CHARACTER(*),   INTENT (in), OPTIONAL :: filename
 
    TYPE (multi_level_type)      :: platform
-   LOGICAL                      :: inside_halo, outside, cycle_report
-   REAL                         :: height_error
+   LOGICAL                      :: inside_halo, outside
    INTEGER                      :: total_obs, &
                                    num_sound, &
                                    num_synop, &
@@ -29,12 +28,11 @@ SUBROUTINE da_scan_bufr_obs (iunit, ob, xp, filename)
                                    num_ships, &
                                    num_gpspw, &
                                    num_gpsref, &
-                                   num_ssmi_retrieval, &
-                                   num_ssmi_tb      , &
                                    num_ssmt1, &
                                    num_ssmt2, &
-                                   num_pseudo, num_qscat, &
+                                   num_qscat, &
                                    num_profiler, num_buoy, num_bogus
+   ! INTEGER                      :: ssmi_tb, num_ssmi_retrieval
    character(len=40) :: hdstr
    character(len=10) :: date
    character(len=8 ) :: subset
@@ -101,11 +99,10 @@ SUBROUTINE da_scan_bufr_obs (iunit, ob, xp, filename)
    num_ships = 0
    num_gpspw = 0
    num_gpsref = 0
-   num_ssmi_retrieval = 0
-   num_ssmi_tb       = 0
+   ! num_ssmi_retrieval = 0
+   ! num_ssmi_tb       = 0
    num_ssmt1 = 0
    num_ssmt2 = 0
-   num_pseudo = 0
    num_qscat = 0
    num_profiler = 0
    num_buoy = 0

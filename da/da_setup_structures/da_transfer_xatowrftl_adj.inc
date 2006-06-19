@@ -9,7 +9,7 @@ SUBROUTINE da_transfer_xatowrftl_adj( grid, config_flags, filnam, &
 
    IMPLICIT NONE
    
-   type(domain) ,   TARGET                   :: grid
+   type(domain)                              :: grid
    type(grid_config_rec_type), intent(inout) :: config_flags
 
    character*4 filnam

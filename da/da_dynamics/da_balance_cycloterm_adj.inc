@@ -33,11 +33,15 @@ subroutine da_balance_cycloterm_adj( rho, ub, vb, u, v, coefx,   &
    integer              :: i, j                         ! Loop counters.
    integer              :: is, ie                       ! 1st dim. end points.
    integer              :: js, je                       ! 2nd dim. end points.
-   integer              :: ks, ke                       ! 3rd dim. end points.
    real                 :: data(ims:ime,jms:jme)        ! Work array.
 
    real                 :: var, varb, uar
-   
+
+   ! JRB Stop compiler whinging
+   IF (kts == 0 .OR. kde ==0 .OR. kte == 0 .OR. kme == 0 .OR. kms == 0 &
+      .OR. kds == 0) THEN
+   END IF
+
    !---------------------------------------------------------------------------
    ! [1.0] Initialise:
    !---------------------------------------------------------------------------

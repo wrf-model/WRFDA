@@ -19,7 +19,7 @@ SUBROUTINE da_sfc_wtq ( psfc, tg, ps, ts, qs, us, vs, ps2, ts2, qs2, &
 !  Input Variables:
 ! 
 !   psfc, tg               : surface pressure and ground temperature
-!   ps, ts, qs, us, vs, hs : model variable at lowlest half sigma leve1
+!   ps, ts, qs, us, vs, hs : model variable at lowlest half sigma level
 !   ps2, ts2, qs2          : model variables at the second lowest half 
 !                            sigma level
 !
@@ -38,7 +38,7 @@ SUBROUTINE da_sfc_wtq ( psfc, tg, ps, ts, qs, us, vs, ps2, ts2, qs2, &
 !
 !-----------------------------------------------------------------------------!
 !  
-!                      psim  : mechanical psi at lowlest sigma leve1
+!                      psim  : mechanical psi at lowlest sigma level
 !                      psim2 : mechanical psi at 2m 
 !                      psimz : mechanical psi at 10m 
 !
@@ -75,15 +75,14 @@ SUBROUTINE da_sfc_wtq ( psfc, tg, ps, ts, qs, us, vs, ps2, ts2, qs2, &
 ! Working variables
 
       REAL :: Vc2, Va2, V2 
-      REAL :: rib, rr, rz, r2, rcp, xx, yy, cc
+      REAL :: rib, rcp, xx, yy, cc
       REAL :: psiw, psiz, mol, ust, hol, holz, hol2
       REAL :: psim, psimz, psim2, psih, psihz, psih2
-      REAL :: psit, psitz, psit2, psiq, psiqz, psiq2
+      REAL :: psit, psit2, psiq, psiq2
       REAL :: gzsoz0, gz10oz0, gz2oz0
-      REAL :: eg, qg, tvg, tvs, tvs2, tv 
+      REAL :: eg, qg, tvg, tvs, tvs2
       REAL :: ths, thg, thvs, thvg, thvs2
-      REAL :: dz, arg, e1, zq0, z0
-      INTEGER :: k, nn, nz, n2
+      REAL :: zq0, z0
 
       REAL, PARAMETER :: ka = 2.4E-5
 

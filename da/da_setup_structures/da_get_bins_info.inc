@@ -1,4 +1,4 @@
-subroutine da_get_bins_info(ni, nj, nk, num_bins2d, bin2d, evec_g, eval_g,&
+subroutine da_get_bins_info(nj, nk, bin2d, evec_g, eval_g,&
                   evec_loc, eval_loc, max_vert_var, var_scaling, be_sub)
 
    !---------------------------------------------------------------------------
@@ -8,8 +8,7 @@ subroutine da_get_bins_info(ni, nj, nk, num_bins2d, bin2d, evec_g, eval_g,&
 
    IMPLICIT NONE
 
-   integer, intent(in)    :: ni, nj, nk       ! W-E, S-N and Vert. Dims 
-   integer, intent(in)    :: num_bins2d       ! Number of bins For 2D fields
+   integer, intent(in)    :: nj, nk       ! W-E, S-N and Vert. Dims 
    integer, intent(in)    :: bin2d(:,:)       ! Bin assigned to each 2D
    real,    intent(in)    :: evec_g(:,:)      ! Global Eig. vectors 
    real,    intent(in)    :: eval_g(:)        ! Global Eig. values  

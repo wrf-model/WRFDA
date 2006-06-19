@@ -26,7 +26,6 @@ SUBROUTINE da_uv_to_divergence( xb, u, v, div, &
    integer            :: i, j, k                      ! Loop counters.
    integer            :: is, ie                       ! 1st dim. end points.
    integer            :: js, je                       ! 2nd dim. end points.
-   integer            :: ks, ke                       ! 3rd dim. end points.
    real               :: one_third                    ! 1/3.
 
    real               :: coeff, inv_2ds

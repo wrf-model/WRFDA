@@ -10,13 +10,10 @@ SUBROUTINE da_med_initialdata_output ( grid , config_flags, out_filename )
 
    !--Local
 
-   INTEGER                :: time_step_begin_restart
    INTEGER                :: fid , ierr
    CHARACTER (LEN=80)     :: message
    CHARACTER (LEN=80)     :: file_name
 
-   INTEGER                :: current_day,current_hour,current_month,current_year
-   CHARACTER (LEN=1)      :: single_char 
    INTEGER :: julyr, julday
    REAL    :: gmt
 

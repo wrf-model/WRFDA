@@ -26,7 +26,6 @@ SUBROUTINE da_trace( &
    INTEGER           :: TotalSpace
    INTEGER           :: LocalMaxNoCalls
    CHARACTER(LEN=25) :: Change
-   CHARACTER(LEN=80) :: ErrMess(1)
 
    !-----------------------------------------------------------------------
    ! Start of code

@@ -1,4 +1,4 @@
-SUBROUTINE DA_Moist_Phys_Lin( xb, xa, xp,  &
+SUBROUTINE da_moist_phys_lin( xb, xa, xp,  &
                 ids,ide, jds,jde, kds,kde,  &
                 ims,ime, jms,jme, kms,kme,  &
                 its,ite, jts,jte, kts,kte )
@@ -38,14 +38,14 @@ SUBROUTINE DA_Moist_Phys_Lin( xb, xa, xp,  &
    real, dimension(kms:kme)                   :: DT
    real, dimension(kms:kme)                   :: QVT,QCT,QRT,TTT
    real, dimension(kms:kme)                   :: QVT9,QCT9,QRT9,TTT9
-   real, dimension(kms:kme) :: SCR2,SCR3,SCR4,SCR5,SCR6,SCR7,SCR8
+   real, dimension(kms:kme) :: SCR2,SCR3,SCR4,SCR5,SCR6,SCR7
    real, dimension(kms:kme) :: DUM11,DUM21,DUM31,DUM41
    real, dimension(kms:kme) :: PRA,PRC,PRD,PRE
    real, dimension(kms:kme) :: SCR31,SCR41,SCR42,SCR71
    real, dimension(kms:kme) :: DUM111,DUM112,DUM113,DUM211,DUM411
    real, dimension(kms:kme) :: PRA1,PRC1,PRE1
 
-   real, dimension(kms:kme) :: SCR29,SCR39,SCR49,SCR59,SCR69,SCR79,SCR89
+   real, dimension(kms:kme) :: SCR29,SCR39,SCR49,SCR59,SCR69,SCR79
    real, dimension(kms:kme) :: DUM119,DUM219,DUM319,DUM419
    real, dimension(kms:kme) :: PRA9,PRC9,PRD9,PRE9
    real, dimension(kms:kme) :: SCR319,SCR419,SCR429,SCR719
@@ -305,4 +305,4 @@ SUBROUTINE DA_Moist_Phys_Lin( xb, xa, xp,  &
       ENDDO
    ENDDO
 
-END SUBROUTINE DA_Moist_Phys_Lin
+END SUBROUTINE da_moist_phys_lin

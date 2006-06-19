@@ -11,7 +11,7 @@ subroutine da_roughness_from_lanu(ltbl, mminlu, date_mm5, xp, lanu, rough)
 
   integer                               :: LS, LC, LI, LUCATS, LUSEAS, &
                                            LUMATCH, year, month, day,  &
-                                           julday, Ict, Isn, io_error, &
+                                           julday, Isn, io_error, &
                                            m1, m2, n1, n2 
   real                                  :: albd, slmo, sfem
   real(kind=4), dimension(50,2)         :: sfz0
@@ -47,6 +47,9 @@ subroutine da_roughness_from_lanu(ltbl, mminlu, date_mm5, xp, lanu, rough)
          DO LC=1,LUCATS 
             IF(LUTYPE == MMINLU)THEN 
                READ (UNIT=ltbl,FMT=*) LI, ALBD, SLMO, SFEM, SFZ0(LC,LS)
+               ! JRB stop compiler whinge
+               IF (ALBD == 0.0 .OR. SFEM == 0.0 .OR. SLMO == 0.0) THEN
+               END IF
                IF(LC /= LI) THEN
                  CALL wrf_error(__FILE__,__LINE__, &
                    "MISSING LANDUSE: LC")

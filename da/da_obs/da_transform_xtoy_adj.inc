@@ -1,4 +1,4 @@
-SUBROUTINE DA_Transform_XToY_Adj( xb, iv, xp, jo_grad_y, jo_grad_x )
+SUBROUTINE da_transform_xtoy_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
    
 !      07/2005 - Add radiance part        Zhiquan Liu
 !-----------------------------------------------------
@@ -10,8 +10,6 @@ SUBROUTINE DA_Transform_XToY_Adj( xb, iv, xp, jo_grad_y, jo_grad_x )
    type (y_type), intent(inout)      :: jo_grad_y   ! grad_y(jo)
    type (x_type), intent(inout)      :: jo_grad_x   ! grad_x(jo)
 
-   integer :: i, j
-
    if (trace_use) CALL da_trace_entry("da_transform_xtoy_adj")
 
    
@@ -19,14 +17,14 @@ SUBROUTINE DA_Transform_XToY_Adj( xb, iv, xp, jo_grad_y, jo_grad_x )
 !  [1.0] Radiosonde observation operator y = H(x):
 !-----------------------------------------------------------------------------
 
-   call da_transform_xtoy_Sound_Adj ( iv, xp, jo_grad_y, jo_grad_x )
-   call da_transform_xtoy_Sonde_sfc_Adj ( xb, iv, xp, jo_grad_y, jo_grad_x )
+   call da_transform_xtoy_sound_adj ( iv, xp, jo_grad_y, jo_grad_x )
+   call da_transform_xtoy_sonde_sfc_adj ( xb, iv, xp, jo_grad_y, jo_grad_x )
 
 !------------------------------------------------------------------------------
 !  [2.0] Surface observation operator y = H(x):
 !------------------------------------------------------------------------------
 
-   call da_transform_xtoy_Synop_Adj ( xb, iv, xp, jo_grad_y, jo_grad_x )
+   call da_transform_xtoy_synop_adj ( xb, iv, xp, jo_grad_y, jo_grad_x )
 
 
 !------------------------------------------------------------------------------
@@ -34,45 +32,45 @@ SUBROUTINE DA_Transform_XToY_Adj( xb, iv, xp, jo_grad_y, jo_grad_x )
 !------------------------------------------------------------------------------
 
 !  Geostationary Satellite
-   call da_transform_xtoy_GeoAMV_Adj ( iv, xp, jo_grad_y, jo_grad_x )
+   call da_transform_xtoy_geoamv_adj ( iv, xp, jo_grad_y, jo_grad_x )
 !  Polar orbitting Satellite
-   call da_transform_xtoy_PolarAMV_Adj ( iv, xp, jo_grad_y, jo_grad_x )
+   call da_transform_xtoy_polaramv_adj ( iv, xp, jo_grad_y, jo_grad_x )
 
 !------------------------------------------------------------------------------
 !  [4.0] Aircraft observation operator y = H(x):
 !------------------------------------------------------------------------------
 
-   call da_transform_xtoy_Airep_Adj ( iv, xp, jo_grad_y, jo_grad_x )
+   call da_transform_xtoy_airep_adj ( iv, xp, jo_grad_y, jo_grad_x )
 
 !------------------------------------------------------------------------------
 !  [5.0] Metar observation operator y = H(x):
 !------------------------------------------------------------------------------
 
-   call da_transform_xtoy_Metar_Adj ( xb, iv, xp, jo_grad_y, jo_grad_x )
+   call da_transform_xtoy_metar_adj ( xb, iv, xp, jo_grad_y, jo_grad_x )
 
 !------------------------------------------------------------------------------
 !  [6.0] Ship observation operator y = H(x):
 !------------------------------------------------------------------------------
 
-   call da_transform_xtoy_Ships_Adj ( xb, iv, xp, jo_grad_y, jo_grad_x )
+   call da_transform_xtoy_ships_adj ( xb, iv, xp, jo_grad_y, jo_grad_x )
 
 !------------------------------------------------------------------------------
 !  [7.0] GPS TPW/ZTD observation operator y = H(x):
 !------------------------------------------------------------------------------
 
-   call da_transform_xtoy_Gpspw_Adj ( xb, iv, xp, jo_grad_y, jo_grad_x )
+   call da_transform_xtoy_gpspw_adj ( xb, iv, xp, jo_grad_y, jo_grad_x )
 
 !------------------------------------------------------------------------------
 !  [8.0] SSMI observation operator y = H(x):
 !------------------------------------------------------------------------------
 
-   call da_transform_xtoy_SSMI_Adj ( xb, iv, xp, jo_grad_y, jo_grad_x )
+   call da_transform_xtoy_ssmi_adj ( xb, iv, xp, jo_grad_y, jo_grad_x )
 
 !------------------------------------------------------------------------------
 !  [9.0] Pilot observation operator y = H(x):
 !------------------------------------------------------------------------------
 
-   call da_transform_xtoy_Pilot_Adj ( iv, xp, jo_grad_y, jo_grad_x )
+   call da_transform_xtoy_pilot_adj ( iv, xp, jo_grad_y, jo_grad_x )
 
 !------------------------------------------------------------------------------
 !  [10.0] Pseudo obs observation operator y = H(x):
@@ -84,7 +82,7 @@ SUBROUTINE DA_Transform_XToY_Adj( xb, iv, xp, jo_grad_y, jo_grad_x )
 !  [11.0] Satem observation operator y = H(x):
 !------------------------------------------------------------------------------
 
-   call da_transform_xtoy_Satem_Adj ( iv, xp, jo_grad_y, jo_grad_x, xb )
+   call da_transform_xtoy_satem_adj ( iv, xp, jo_grad_y, jo_grad_x, xb )
 
 !------------------------------------------------------------------------------
 !  [12.0] SSM/T1 observation operator y = H(x):
@@ -119,19 +117,19 @@ SUBROUTINE DA_Transform_XToY_Adj( xb, iv, xp, jo_grad_y, jo_grad_x )
 !  [17.0] GPS Refractivity observation operator y = H(x):
 !------------------------------------------------------------------------------
 
-   call da_transform_xtoy_Gpsref_Adj( iv, xp, jo_grad_y, jo_grad_x, xb)
+   call da_transform_xtoy_gpsref_adj( iv, xp, jo_grad_y, jo_grad_x, xb)
 
 !------------------------------------------------------------------------------
 !  [18.0] Radar observation operator y = H(x):
 !------------------------------------------------------------------------------
 
-   call da_transform_xtoy_Radar_adj ( xb, iv, xp, jo_grad_y, jo_grad_x )
+   call da_transform_xtoy_radar_adj ( xb, iv, xp, jo_grad_y, jo_grad_x )
 
 !------------------------------------------------------------------------------
 !  [19.0] TC bogus observation operator y = H(x):
 !------------------------------------------------------------------------------
 
-   call da_transform_xtoy_Bogus_adj ( xb, iv, xp, jo_grad_y, jo_grad_x )
+   call da_transform_xtoy_bogus_adj ( xb, iv, xp, jo_grad_y, jo_grad_x )
 
 !------------------------------------------------------------------------------
 !  [20.0] Radiance observation operator y = H(x):
@@ -144,5 +142,5 @@ SUBROUTINE DA_Transform_XToY_Adj( xb, iv, xp, jo_grad_y, jo_grad_x )
    if (trace_use) CALL da_trace_exit("da_transform_xtoy_adj")
 
 
-END SUBROUTINE DA_Transform_XToY_Adj
+END SUBROUTINE da_transform_xtoy_adj
 

@@ -7,7 +7,6 @@ subroutine da_check_rh_simple( xb, xa, xp )
    type (xpose_type), intent(in)  :: xp      ! Domain decomposition vars.
 
    integer                        :: i, j, k ! Loop counters.
-   real                           :: rh_new  ! Modified rh.
    real                           :: q_new   ! Modified rh.
    real                           :: es      ! Dummy output.
    real                           :: t_new, p_new

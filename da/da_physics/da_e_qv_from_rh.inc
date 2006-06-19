@@ -1,4 +1,4 @@
-     FUNCTION da_E_QV_FROM_RH (RH, T_K, RH0, T_K0, P_PA0) RESULT (QV_KG)
+     FUNCTION da_e_qv_from_rh (RH, T_K, RH0, T_K0, P_PA0) RESULT (QV_KG)
 !!!--------------------------------------------------------------------------
 !!!
 !!!                       FUNCTION F_QV_FROM_RH
@@ -54,7 +54,7 @@
 
       REAL T_K , RH , QV_KG
       REAL P_PA0, T_K0, RH0
-      REAL P_MB , ES , QS , W_KG
+      REAL ES , QS
       REAL P_MB0, ES0, QS0, QV_KG0
 !------------------------------------------------------------------------------C
 
@@ -86,6 +86,6 @@
 
       RETURN
 
-      END FUNCTION da_E_QV_FROM_RH
+      END FUNCTION da_e_qv_from_rh
 
 

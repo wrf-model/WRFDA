@@ -19,8 +19,11 @@ SUBROUTINE da_intpsfc_tem (val, ho, po, to, height, pressure, temp, kts, kte)
       REAL, DIMENSION (kts:kte), INTENT (in) :: height, pressure, temp
 
       REAL, DIMENSION (kts:kte) :: prs_mb
-      REAL    :: dth_12, dth_21, dth_sfc, dth_obs
-      REAL    :: dhe_12, dhe_21, dhe_sfc1, dhe_obs1, dhe_sfc2, dhe_obs2
+! JRB
+!      REAL    :: dth_12, dth_21, dth_sfc, dth_obs
+!     REAL    :: dhe_12, dhe_21, dhe_sfc1, dhe_obs1, dhe_sfc2, dhe_obs2
+      REAL    :: dth_21, dth_sfc, dth_obs
+      REAL    :: dhe_12, dhe_sfc1, dhe_obs1, dhe_sfc2, dhe_obs2
       REAL    :: th_100mb, th_200mb, th_obs, th_sfc
       REAL    :: th_obs_int, th_sfc_int
       REAL    :: pdif, rcp
@@ -106,12 +109,14 @@ SUBROUTINE da_intpsfc_tem (val, ho, po, to, height, pressure, temp, kts, kte)
 !     -------------------------------
     
       dth_21 = th_100mb - th_200mb
-      dth_12 = th_200mb - th_100mb
+! JRB never used
+!      dth_12 = th_200mb - th_100mb
 
-! 3.1 Heigth increments
+! 3.1 Height increments
 !     ----------------
     
-      dhe_21   = height (k_100mb )- height (k_200mb)
+! JRB never used
+!      dhe_21   = height (k_100mb )- height (k_200mb)
       dhe_sfc1 = height (k_100mb )- height (kts)
       dhe_obs1 = height (k_100mb )- ho
 

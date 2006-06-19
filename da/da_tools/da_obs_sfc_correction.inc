@@ -22,9 +22,8 @@ SUBROUTINE da_obs_sfc_correction(sfc_obs, xb )
 
    REAL                                  :: roughness, psfc, &
                                             mslp, dx, dxm, dy, dym,    &
-                                            ho, po, to, qo, uo, vo,   &
-                                            hm, pm, tm, qm, um, vm, correc, val, &
-                                            es, qs
+                                            ho, po, to, qo,   &
+                                            hm, pm, tm, qm, um, vm, correc, val
 
    INTEGER                               :: i, j, k
 
@@ -82,8 +81,6 @@ SUBROUTINE da_obs_sfc_correction(sfc_obs, xb )
       po   = sfc_obs % p % inv 
       to   = sfc_obs % t % inv
       qo   = sfc_obs % q % inv
-      uo   = sfc_obs % u % inv
-      vo   = sfc_obs % v % inv
 
 ! 3.1 Compute the surface OBS pressure from mean sea level pressure
  
@@ -156,11 +153,11 @@ SUBROUTINE da_obs_sfc_correction(sfc_obs, xb )
        
                IF (abs(to - missing_r) < 1.0) then
 
-                  correc = da_mo_correction( ho, po, tm, qo, uo, vo, &
+                  correc = da_mo_correction( ho, po, tm, qo, &
                                           hm, pm, tm, qm, um ,vm, roughness )
                ELSE
 
-                  correc = da_mo_correction( ho, po, to, qo, uo, vo, &
+                  correc = da_mo_correction( ho, po, to, qo, &
                                           hm, pm, tm, qm, um ,vm, roughness )
 
                ENDIF
@@ -189,11 +186,11 @@ SUBROUTINE da_obs_sfc_correction(sfc_obs, xb )
 
              if (abs(to  - missing_r) > 1. .and. &
                  abs(qo - missing_r) > 1.) then
-                 CALL da_intpsfc_prs (val, ho, po, hm, pm, tm, qm, to, qo)
+                 CALL da_intpsfc_prs (val, ho, po, hm, tm, qm, to, qo)
              else if (abs(to  - missing_r) > 1.) then
-                 CALL da_intpsfc_prs (val, ho, po, hm, pm, tm, qm, to)
+                 CALL da_intpsfc_prs (val, ho, po, hm, tm, qm, to)
              else
-                 CALL da_intpsfc_prs (val, ho, po, hm, pm, tm, qm)
+                 CALL da_intpsfc_prs (val, ho, po, hm, tm, qm)
              endif
 
              !  Replace any previous pressure qc by the surface correction

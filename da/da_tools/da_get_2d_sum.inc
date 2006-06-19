@@ -12,6 +12,10 @@ subroutine da_get_2d_sum(var, name, &
 
    real :: partial, total
 
+   ! JRB Use variables to stop compiler complaining
+   IF (ids == 1 .OR. ide == 1 .OR. jds == 1 .OR. jde == 1) THEN
+   END IF
+
    partial = SUM(var(its:ite,jts:jte)*var(its:ite,jts:jte))
 
    total = wrf_dm_sum_real( partial )

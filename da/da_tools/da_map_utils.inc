@@ -705,7 +705,6 @@ END SUBROUTINE da_map_init
 
     REAL                         :: deltalat
     REAL                         :: deltalon
-    REAL                         :: lon360
     REAL                         :: latinc
     REAL                         :: loninc
 

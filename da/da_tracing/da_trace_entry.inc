@@ -31,7 +31,6 @@ SUBROUTINE da_trace_entry( &
    REAL              :: temp1
    REAL              :: temp2
    LOGICAL           :: NewRoutine
-   CHARACTER(LEN=80) :: ErrMess(1)
 
    !-----------------------------------------------------------------------
    ! Start of code

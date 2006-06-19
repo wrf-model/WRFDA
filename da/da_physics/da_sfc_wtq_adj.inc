@@ -13,7 +13,7 @@ SUBROUTINE da_sfc_wtq_adj (psfc, tg, ps, ts, qs, us, vs, regime,&
 !  Input Variables(basic state):
 ! 
 !   psfc, tg               : surface pressure and ground temperature
-!   ps, ts, qs, us, vs, hs : model variable at lowlest half sigma leve1
+!   ps, ts, qs, us, vs, hs : model variable at lowlest half sigma level
 !   regime                 : PBL regime
 !
 !  Input Variables(pertubation):
@@ -36,7 +36,7 @@ SUBROUTINE da_sfc_wtq_adj (psfc, tg, ps, ts, qs, us, vs, regime,&
 !
 !-----------------------------------------------------------------------------!
 !  
-!                      psim  : mechanical psi at lowlest sigma leve1
+!                      psim  : mechanical psi at lowlest sigma level
 !                      psim2 : mechanical psi at 2m 
 !                      psimz : mechanical psi at 10m 
 !
@@ -73,16 +73,15 @@ SUBROUTINE da_sfc_wtq_adj (psfc, tg, ps, ts, qs, us, vs, regime,&
 ! Working variables
 
       REAL :: Vc2, Va2, V2 
-      REAL :: rib, rr, rz, r2, rcp, xx, yy, cc, Pi
+      REAL :: rib, rcp, xx, yy, cc, Pi
       REAL :: psiw, psiz, mol, ust, hol, holz, hol2
       REAL :: psim, psimz, psim2, psih, psihz, psih2
-      REAL :: psit, psitz, psit2, psiq, psiqz, psiq2
+      REAL :: psit,  psit2, psiq, psiq2
       REAL :: gzsoz0, gz10oz0, gz2oz0
-      REAL :: eg, qg, tvg, tvs, tv 
+      REAL :: eg, qg, tvg, tvs
       REAL :: ths, thg, thvs, thvg
-      REAL :: dz, arg, e1, zq0, z0
+      REAL :: zq0, z0
       REAL :: ust_s, hol_s, psim_s, psim2_s, psimz_s, psih_s, psih2_s, psihz_s
-      INTEGER :: k, nn, nz, n2
 
       REAL :: Vc2_prime, Va2_prime, V2_prime
       REAL :: rib_prime, xx_prime, yy_prime
@@ -90,9 +89,9 @@ SUBROUTINE da_sfc_wtq_adj (psfc, tg, ps, ts, qs, us, vs, regime,&
               hol_prime, holz_prime, hol2_prime
       REAL :: psim_prime, psimz_prime, psim2_prime, &
               psih_prime, psihz_prime, psih2_prime
-      REAL :: psit_prime, psitz_prime, psit2_prime, &
-              psiq_prime, psiqz_prime, psiq2_prime
-      REAL :: eg_prime, qg_prime, tvg_prime, tvs_prime, tv_prime
+      REAL :: psit_prime, psit2_prime, &
+              psiq_prime, psiq2_prime
+      REAL :: qg_prime, tvg_prime, tvs_prime
       REAL :: ths_prime, thg_prime, thvs_prime, thvg_prime
 
       REAL, PARAMETER :: ka = 2.4E-5

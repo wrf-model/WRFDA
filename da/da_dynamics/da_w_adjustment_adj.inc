@@ -22,7 +22,7 @@ SUBROUTINE da_w_adjustment_adj(xb,WZ_a,                      &
 
    integer :: I,J,K
 
-   real, dimension(ims:ime,jms:jme,kms:kme)   :: URHO, VRHO, WZ_b
+   real, dimension(ims:ime,jms:jme,kms:kme)   :: WZ_b
 
    real :: EBXL1,EBXL2
    real :: EBXL19,EBXL29

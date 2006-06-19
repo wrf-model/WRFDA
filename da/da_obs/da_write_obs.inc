@@ -17,7 +17,6 @@ SUBROUTINE da_write_obs( ob, iv, re )
    type (y_type), intent(inout)  :: re      ! residual vector.
       
    integer                       :: n, k
-   real                          :: f1, f2, f3, f4, f5
    logical, external             :: wrf_dm_on_monitor 
 
   if (trace_use) CALL da_trace_entry("da_write_obs")

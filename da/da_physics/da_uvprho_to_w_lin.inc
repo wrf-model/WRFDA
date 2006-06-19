@@ -24,7 +24,6 @@ SUBROUTINE da_uvprho_to_w_lin( xb, xa, xp,                 &
 
    integer                       :: is, ie       ! 1st dim. end points.
    integer                       :: js, je       ! 2nd dim. end points.
-   integer                       :: ks, ke       ! 3rd dim. end points.
 
    integer                       :: ids,ide, jds,jde, kds,kde
    integer                       :: ims,ime, jms,jme, kms,kme

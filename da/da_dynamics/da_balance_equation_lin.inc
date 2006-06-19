@@ -29,7 +29,6 @@ SUBROUTINE da_balance_equation_lin( xb, xbx, xp, u, v, phi_b,   &
    integer              :: i, j, k                ! Loop counters.
    integer              :: is, ie                 ! 1st dim. end points.
    integer              :: js, je                 ! 2nd dim. end points.
-   integer              :: ks, ke                 ! 3rd dim. end points.
 
    real, dimension(ims:ime,jms:jme) :: coefx, &   ! Multiplicative coefficient.
                                        coefy, &   ! Multiplicative coefficient.
@@ -121,7 +120,7 @@ SUBROUTINE da_balance_equation_lin( xb, xbx, xp, u, v, phi_b,   &
    !  [3.0] Solve Del**2 phi_b = RHS for phi_b:
    !------------------------------------------------------------------------------
 
-   CALL da_solve_poissoneqn_fst( xb, xbx, xp, del2phi_b, phi_b,  &
+   CALL da_solve_poissoneqn_fst( xbx, xp, del2phi_b, phi_b,  &
                                  ids,ide, jds,jde, kds,kde,      &
                                  ims,ime, jms,jme, kms,kme,      &
                                  its,ite, jts,jte, kts,kte ) 

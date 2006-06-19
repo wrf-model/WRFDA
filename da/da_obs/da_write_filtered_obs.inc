@@ -37,14 +37,13 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xp )
    CHARACTER (LEN =  10)        :: info_fmt_name,srfc_fmt_name,each_fmt_name
    CHARACTER (LEN =  80)        :: blank                                         
    CHARACTER (LEN = 160)        :: fmt_info, fmt_loc, fmt_each
-   INTEGER                      :: i, j, iost, nlevels, fm
-   TYPE (multi_level_type)      :: platform
+   INTEGER                      :: i, iost, nlevels
 
-   integer                       :: n1, n2, n, k, zero , ships_elv_qual
+   integer                       :: n1, n2, n, zero
    real                          :: es, qs, speed, dir, rh, rh_error, uu, vv
    real                          :: xmiss, height, height_error, pr_error, slp_error
-   real                          :: thick1, thick, thick_error,dir_error,speed_error
-   real                          :: td, td_error , elv_error,ships_elv, ships_pr_error
+   real                          :: thick, thick_error,dir_error,speed_error
+   real                          :: td, td_error , elv_error,ships_pr_error
 !----------------------------------------------------------------------------!
    real                          :: slp_inv,speed_err,dir_err, p,p_err
    real                          :: t, t_err,ref, ref_err
@@ -76,8 +75,6 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xp )
    elv_error = 6.0
    dir_error = 5.0
    dir_err   = 5.0
-   ships_elv = 0.0
-   ships_elv_qual = 0 
 
 !----------------------------------------------------------------------------!
 !----------------------------------------------------------------------------!

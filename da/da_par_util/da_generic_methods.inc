@@ -151,6 +151,10 @@ SUBROUTINE da_res_synop_to_generic( res_specific, iv_num_levels, &
    ! Local declarations
    TYPE (residual_template_type) :: template
 
+   ! Use to avoid compiler warning
+   IF  (iv_num_levels==0) THEN
+   END IF
+
    CALL da_res_synop_create_template( template )
    ALLOCATE( res_generic%values(template%lbnd:template%ubnd) )
    ! only scalar data for this type
@@ -296,8 +300,6 @@ SUBROUTINE da_res_generic_alloc_and_set( res_generic, val_index, values )
    TYPE (residual_generic_type), INTENT(INOUT) :: res_generic  ! generic type
    INTEGER,                      INTENT(IN   ) :: val_index    ! which value
    REAL,                         INTENT(IN   ) :: values(:)    ! values
-   ! Local declarations
-   INTEGER :: i
 
    IF ( ( val_index < LBOUND(res_generic%values,1) ) .OR. &
         ( val_index > UBOUND(res_generic%values,1) ) ) THEN
@@ -353,7 +355,6 @@ SUBROUTINE da_res_generic_free( res_generic )
    TYPE (residual_generic_type), INTENT(INOUT) :: res_generic  ! generic type
    ! Local declarations
    LOGICAL :: oktofreevalues
-   INTEGER :: i
 
    oktofreevalues = .FALSE.
    IF ( da_res_generic_has_scalar( res_generic) ) THEN

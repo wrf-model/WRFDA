@@ -1,4 +1,4 @@
-FUNCTION da_mo_correction (ho, po, to, qo, uo, vo, &
+FUNCTION da_mo_correction (ho, po, to, qo, &
                         hm, pm, tm, qm, um ,vm, &
                         roughness)   RESULT (correc)
 !------------------------------------------------------------------------------!
@@ -14,7 +14,7 @@ FUNCTION da_mo_correction (ho, po, to, qo, uo, vo, &
 
       IMPLICIT NONE
 
-      REAL, INTENT (in)                :: ho, po, to, qo, uo, vo
+      REAL, INTENT (in)                :: ho, po, to, qo
       REAL, INTENT (in)                :: hm, pm, tm, qm, um, vm
       REAL, INTENT (in)                :: roughness
 
@@ -22,8 +22,8 @@ FUNCTION da_mo_correction (ho, po, to, qo, uo, vo, &
 
       REAL :: thm , tho, tvm, tvo, thvm, thvo, rcp
       REAL :: za, Vc2, Va2, V2 
-      REAL :: hdif, rib, rll, hll, zint
-      LOGICAL :: correction
+! JRB      REAL :: hdif, rib, rll, hll, zint
+      REAL :: hdif, rib, hll, zint
 
       !  Height difference (in m) above wich correction is applied
 
@@ -58,6 +58,8 @@ FUNCTION da_mo_correction (ho, po, to, qo, uo, vo, &
            RETURN
 
       ENDIF
+
+      IF (trace_use) call da_trace_entry("da_mo_correction")
 
 ! 1.3 Compute the roughness length based upon season and land use 
 !     -----------------------------------------------------------
@@ -140,7 +142,8 @@ FUNCTION da_mo_correction (ho, po, to, qo, uo, vo, &
 
       hll = rib * LOG (za/zint)
 
-      rll = za / hll
+! JRB is this right?
+!      rll = za / hll
 
 ! 5.4 Ratio PBL height/Monin Obukov length: za/rll
 !     ------------------------------------
@@ -193,5 +196,7 @@ FUNCTION da_mo_correction (ho, po, to, qo, uo, vo, &
          ENDIF
 
       ENDIF
+
+   IF (trace_use) call da_trace_exit("da_mo_correction")
 
 END FUNCTION da_mo_correction

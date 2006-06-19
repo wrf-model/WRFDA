@@ -83,7 +83,8 @@ Implicit none
  Integer                  :: K,JA,JB,IA,IB,IGO,LA,J
  Integer                  :: IFAC,IERR,ISTART
 
- Real                     :: SI,T1,T2,SCALE, vectorlength
+ Real                     :: SI,T1,T2,SCALE
+ Integer                  :: vectorlength
  Real                     :: WORK(DIM)     ! size (n+1)*min(lot,VectorLength)
      
       VectorLength = LOT

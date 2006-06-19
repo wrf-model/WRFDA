@@ -7,7 +7,6 @@ SUBROUTINE da_free_global_synop( iv_glob, re_glob, jo_grad_y_glob )
     TYPE (y_type),  INTENT(INOUT) :: re_glob        ! residual vector
     TYPE (y_type),  INTENT(INOUT) :: jo_grad_y_glob ! Grad_y(Jo)
     ! Local declarations
-    INTEGER :: n
     DEALLOCATE( iv_glob%synop )
     DEALLOCATE( re_glob%synop )
     DEALLOCATE( jo_grad_y_glob%synop )

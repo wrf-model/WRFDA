@@ -1,4 +1,4 @@
-SUBROUTINE DA_Transform_XToY_Gpspw_Adj( xb, oi, xp, jo_grad_y, jo_grad_x )
+SUBROUTINE da_transform_xtoy_gpspw_adj( xb, oi, xp, jo_grad_y, jo_grad_x )
 
   !----------------------------------------------------------------
   !  HISTORY
@@ -32,7 +32,6 @@ SUBROUTINE DA_Transform_XToY_Gpspw_Adj( xb, oi, xp, jo_grad_y, jo_grad_x )
   REAL,DIMENSION(xp%kts:xp%kte):: model_z   ! model z at GPS site [m]
   REAL,DIMENSION(xp%kts:xp%kte):: model_rho ! model rho at GPS site [kg/m^3]
   REAL,DIMENSION(xp%kts:xp%kte):: model_dq   ! model dq at GPS site [kg/kg]
-  REAL,DIMENSION(xp%kts:xp%kte):: model_dz   ! model dz at GPS site [m]
   REAL,DIMENSION(xp%kts:xp%kte):: model_drho ! model drho at GPS site [kg/m^3]
 
   IF ( oi%num_Gpspw > 0 ) THEN
@@ -111,7 +110,7 @@ SUBROUTINE DA_Transform_XToY_Gpspw_Adj( xb, oi, xp, jo_grad_y, jo_grad_x )
             end if 
 
             ! No feedback to x%hf was considered here (Refer to comments in
-            ! DA_Transform_XToY_Gpspw.inc).       Y.-R. Guo  07/15/2002
+            ! da_transform_xtoy_gpspw.inc).       Y.-R. Guo  07/15/2002
             !......................................................................... 
 
             jo_grad_x%q(i,j,k)       = jo_grad_x%q(i,j,k)       + dym*dxm*model_dq(k)
@@ -129,4 +128,4 @@ SUBROUTINE DA_Transform_XToY_Gpspw_Adj( xb, oi, xp, jo_grad_y, jo_grad_x )
     end do
   ENDIF
 
-END SUBROUTINE DA_Transform_XToY_Gpspw_Adj
+END SUBROUTINE da_transform_xtoy_gpspw_adj

@@ -1,20 +1,20 @@
 !MEDIATION_LAYER:SOLVE_V3D
 !
 
-SUBROUTINE solve_v3d ( grid , config_flags , &
+SUBROUTINE da_solve_v3d ( grid , config_flags , &
 #include "em_dummy_args.inc"
                  )
 
 
-! Driver layer modules
+   ! Driver layer modules
    USE module_domain
    USE module_configure
    USE module_driver_constants
    USE module_machine
    USE module_tiles
    USE module_dm
-! Mediation layer modules
-! Model layer modules
+   ! Mediation layer modules
+   ! Model layer modules
    USE module_model_constants
 
    use da_constants
@@ -27,7 +27,7 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
    use da_tracing
    use module_get_file_names ! for system interface on cray
 
-! Registry generated module
+   ! Registry generated module
    USE module_state_description
 
    IMPLICIT NONE
@@ -35,7 +35,7 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
    TYPE(domain),                intent(inout) :: grid
    TYPE (grid_config_rec_type), intent(inout) :: config_flags
 
-   !  Definitions of dummy arguments to solve
+   ! Definitions of dummy arguments to solve
 #include "em_dummy_decl.inc"
 
    TYPE (xbx_type)              :: xbx         ! For header & non-grid arrays.
@@ -57,11 +57,9 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
    real                         :: j_grad_norm_target ! TArget j norm.
    integer                      :: iost
 
-   IF (trace_use) CALL da_trace_entry("solve_v3d")
+   IF (trace_use) call da_trace_entry("da_solve_v3d")
 
-!------------------------------------------------------------------------------
-
-   CALL wrf_message("***  VARIATIONAL ANALYSIS ***")
+   call wrf_message("***  VARIATIONAL ANALYSIS ***")
 
    ! Things that used to be done in da_read_namelist
 
@@ -91,7 +89,7 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
    ! not a source of bugs.  Runtime will be much longer.  This option is 
    ! automatically overridden to .false. for serial or 1-MPI-task runs.  
    IF ( testing_dm_exact ) THEN
-      CALL wrf_get_nproc( nproc )
+      call wrf_get_nproc( nproc )
       IF ( nproc == 1 ) THEN
          testing_dm_exact = .FALSE.
          WRITE(UNIT=stdout,FMT='(A)') &
@@ -129,7 +127,7 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
    ENDIF
     
    if ( num_pseudo > 0 ) then
-      CALL wrf_message("Single OBS Test:: Turn off all the OBS switches ***")
+      call wrf_message("Single OBS Test:: Turn off all the OBS switches ***")
       Use_SynopObs         = .FALSE.
       Use_ShipsObs         = .FALSE.
       Use_MetarObs         = .FALSE.
@@ -165,13 +163,13 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
    IF ( cv_options_hum < 1 .OR. cv_options_hum > 3 ) THEN
       WRITE(UNIT=errmsg(1),FMT='(A,I3)') &
          'Invalid cv_options_hum = ', cv_options_hum
-      CALL wrf_error_fatal(errmsg(1))
+      call wrf_error_fatal(errmsg(1))
    END IF
 
    IF ( sfc_assi_options < 1 .OR. sfc_assi_options > 2 ) THEN
       WRITE(UNIT=errmsg(1),FMT='(A,I3)') &
          'Invalid sfc_assi_option = ', sfc_assi_options
-      CALL wrf_error_fatal(errmsg(1))
+      call wrf_error_fatal(errmsg(1))
    END IF
 
    IF (Use_SsmiRetrievalObs .OR. Use_SsmiTbObs) THEN
@@ -196,7 +194,7 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
          WRITE (UNIT=errmsg(1),FMT='(A,I3)') &
            'Invalid vertical_ip = ', &
            vertical_ip
-         CALL wrf_warning(__FILE__,__LINE__,errmsg(1:1))
+         call wrf_warning(__FILE__,__LINE__,errmsg(1:1))
       END IF
    END IF
 
@@ -212,48 +210,50 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
       write(UNIT=stdout)' Resetting ntmax = 0 for analysis_type = randomcv' 
    end if
 
-!------------------------------------------------------------------------------
-!  [2.0] Initialise 3D-Var parameters:
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! [2.0] Initialise 3D-Var parameters:
+   !---------------------------------------------------------------------------
 
    call da_init_wrfvar( grid, xp, xb, &
                        ids, ide, jds, jde, kds, kde, &
                        ims, ime, jms, jme, kms, kme, &
                        its, ite, jts, jte, kts, kte )
 
-!------------------------------------------------------------------------------
-!  [3.0] Set up first guess field (xb):
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! [3.0] Set up first guess field (xb):
+   !---------------------------------------------------------------------------
 
-   CALL da_setup_firstguess( xbx, grid, &
+   call da_setup_firstguess( xbx, grid, &
 #include "em_dummy_args.inc"
                            )
 
-!------------------------------------------------------------------------------
-!  [4.0] Set up observations (ob):
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! [4.0] Set up observations (ob):
+   !---------------------------------------------------------------------------
 
    call da_setup_obs_structures( xp, ob, iv )
 
-!------------------------------------------------------------------------------
-!  [5.0] Set up background errors (be):
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! [5.0] Set up background errors (be):
+   !---------------------------------------------------------------------------
 
    call da_setup_background_errors( xb, xbx, be, xp, &
                                     its, ite, jts, jte, kts, kte, &
                                     ids, ide, jds, jde, kds, kde )
    cv_size = be % cv % size
 
-!------------------------------------------------------------------------------
-!  [6.0] Set up ensemble perturbation input:
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! [6.0] Set up ensemble perturbation input:
+   !---------------------------------------------------------------------------
 
    ep % ne = be % ne
-   if ( be % ne > 0 ) call da_setup_flow_predictors( ide, jde, kde, be % ne, ep )
+   if ( be % ne > 0 ) THEN
+      call da_setup_flow_predictors( ide, jde, kde, be % ne, ep )
+   end if
 
-!------------------------------------------------------------------------------
-!  [7.0] Setup control variable (cv):
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! [7.0] Setup control variable (cv):
+   !---------------------------------------------------------------------------
 
    allocate( cvt(1:cv_size) )
    allocate( xhat(1:cv_size) )
@@ -264,11 +264,10 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
    call da_zero_vp_type( vp )
 
    if ( test_transforms .or. Testing_WRFVAR ) then
-      CALL da_get_innov_vector( it, ob, iv, &
+      call da_get_innov_vector( it, ob, iv, &
                                 grid , config_flags , &
 #include "em_dummy_args.inc"
                  )
-
 
       call da_allocate_y( iv, re )
       call da_allocate_y( iv, y )
@@ -277,7 +276,6 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
       allocate( xhat(1:cv_size) )
       call da_initialize_cv( cv_size, cvt )
       call da_initialize_cv( cv_size, xhat )
-
 
       call da_check( cv_size, xb, xbx, be, ep, iv, &
                      xa, vv, vp, xp, ob, y, &
@@ -288,27 +286,26 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
       call da_zero_vp_type( vp )
    endif
 
-!------------------------------------------------------------------------------
-!  [8] Outerloop
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! [8] Outerloop
+   !---------------------------------------------------------------------------
 
    j_grad_norm_target = 1.0
 
    DO it = 1, max_ext_its
 
-!     [8.1] Calculate nonlinear model trajectory 
+      ! [8.1] Calculate nonlinear model trajectory 
 
       if (lvar4d) then
          call system("runvar4dnl.bsh")
       endif
 
-!     [8.2] Calculate innovation vector (O-B):
+      ! [8.2] Calculate innovation vector (O-B):
 
-      CALL da_get_innov_vector( it, ob, iv, &
+      call da_get_innov_vector( it, ob, iv, &
                                 grid , config_flags , &
 #include "em_dummy_args.inc"
                  )
-
 
       if ( test_transforms ) then
          call da_check( cv_size, xb, xbx, be, ep, iv, &
@@ -326,46 +323,47 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
                         its, ite, jts, jte, kts, kte )
       end if
 
-!     Write "clean" QCed observations if requested:
-      if ( write_filtered_obs .and. it == 1 ) call da_write_filtered_obs( ob, iv, xp )
+      ! Write "clean" QCed observations if requested:
+      if ( write_filtered_obs .and. it == 1 ) THEN
+         call da_write_filtered_obs( ob, iv, xp )
+      END IF
 
       if (lmonitoring) call wrf_shutdown
 
-!     [8.3] Interpolate x_g to low resolution grid
+      ! [8.3] Interpolate x_g to low resolution grid
 
-!     [8.4] Minimize cost function:
+      ! [8.4] Minimize cost function:
 
       call da_allocate_y( iv, re )
       call da_allocate_y( iv, y )
 
-      CALL da_minimise_cg( grid, config_flags,                  &
+      call da_minimise_cg( grid, config_flags,                  &
                            it, be % cv % size, & 
-                           ob, xb, xbx, be, ep, iv, &
+                           xb, xbx, be, ep, iv, &
                            j_grad_norm_target, xhat, cvt, &
                            xa, vv, vp, xp, re, y, j,    &
                            ids, ide, jds, jde, kds, kde,        &
                            ims, ime, jms, jme, kms, kme,        &
                            its, ite, jts, jte, kts, kte         )
 
-!------------------------------------------------------------------------------
-!   For first outer loop write filtered obs when ntmax = 0
-!   if(it == 1 .and. ntmax == 0) &
-!    CALL da_write_filtered_obs(gts_iunit, filtered_obs_iunit, ob, iv)
+      !------------------------------------------------------------------------
+      ! For first outer loop write filtered obs when ntmax = 0 
+      ! if(it == 1 .and. ntmax == 0) &
+      ! call da_write_filtered_obs(gts_iunit, filtered_obs_iunit, ob, iv)
 
-
-!     [8.5] Update latest analysis solution:
+      ! [8.5] Update latest analysis solution:
 
       call da_transform_vtox( cv_size, xb, xbx, be, ep, xhat, vv, vp, xp, xa,  &
                               ids, ide, jds, jde, kds, kde,             &
                               ims, ime, jms, jme, kms, kme,             &
                               its, ite, jts, jte, kts, kte )
 
-!     [8.6] Only when use_RadarObs = .false. and W_INCREMENTS =.true.,
-!           the W_increment need to be diagnosed:
+      ! [8.6] Only when use_RadarObs = .false. and W_INCREMENTS =.true.,
+      !       the W_increment need to be diagnosed:
 
-     if (W_INCREMENTS .and. .not.use_RadarObs) then
+      if (W_INCREMENTS .and. .not.use_RadarObs) then
 
-         CALL da_uvprho_to_w_lin( xb, xa, xp,                 &
+         call da_uvprho_to_w_lin( xb, xa, xp,                 &
                                   ids,ide, jds,jde, kds,kde,  &
                                   ims,ime, jms,jme, kms,kme,  &
                                   its,ite, jts,jte, kts, kte )
@@ -374,22 +372,22 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
 
       endif
 
-!     [8.7] Write out diagnostics
+      ! [8.7] Write out diagnostics
 
-      CALL da_write_diagnostics( ob, iv, re, y, xp, xa, j )
+      call da_write_diagnostics( ob, iv, re, y, xp, xa, j )
 
-!------------------------------------------------------------------------------
-!  [8.0] Output WRFVAR analysis and analysis increments:
-!------------------------------------------------------------------------------
+      !------------------------------------------------------------------------
+      ! [8.0] Output WRFVAR analysis and analysis increments:
+      !------------------------------------------------------------------------
 
       call da_transfer_xatoanalysis( it, xbx, grid, config_flags ,&
 #include "em_dummy_args.inc"
                            )
    END DO
 
-!------------------------------------------------------------------------------
-!  [9.0] Tidy up:
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! [9.0] Tidy up:
+   !---------------------------------------------------------------------------
 
    deallocate ( cvt )
    deallocate ( xhat )
@@ -397,15 +395,15 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
    call da_deallocate_y( re )
    call da_deallocate_y( y )
 
-   CALL wrf_message("*** WRF-Var completed successfully ***")
+   call wrf_message("*** WRF-Var completed successfully ***")
 
-   CALL wrf_debug ( 200 , ' call end of solve_v3d' )
+   call wrf_debug ( 200 , ' call end of solve_v3d' )
 
-   IF (trace_use) CALL da_trace_exit("solve_v3d")
+   IF (trace_use) call da_trace_exit("da_solve_v3d")
 
 CONTAINS
 
 #include "da_init_wrfvar.inc"
 
-END SUBROUTINE solve_v3d
+end subroutine da_solve_v3d
 

@@ -69,7 +69,6 @@ SUBROUTINE da_read_obs (iunit, ob, xp, filename)
                                    num_profiler, num_buoy, num_bogus
 
    INTEGER                        :: ndup, n, report
-   LOGICAL                        :: surface_sound
 
 !--------------------------------------------------------------------
 

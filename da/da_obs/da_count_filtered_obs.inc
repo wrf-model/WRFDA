@@ -14,7 +14,7 @@ SUBROUTINE da_count_filtered_obs (iunit, xp)
    CHARACTER (LEN = 160)        :: fmt_info,    &
                                    fmt_loc, & 
                                    fmt_each
-   INTEGER                      :: i, j, iost, fm
+   INTEGER                      :: i, iost, fm
    TYPE (multi_level_type)      :: platform
    LOGICAL                      :: inside_halo
    LOGICAL                      :: outside
@@ -37,8 +37,7 @@ SUBROUTINE da_count_filtered_obs (iunit, xp)
                                    num_ssmt1, &
                                    num_ssmt2, &
                                    num_satem, &
-                                   num_bogus, &
-                                   num_pseudo
+                                   num_bogus
 
    INTEGER                        :: ounit     
    CHARACTER (LEN =  80)          :: blank
@@ -61,7 +60,6 @@ SUBROUTINE da_count_filtered_obs (iunit, xp)
    num_gpsref = 0
    num_ssmt1 = 0
    num_ssmt2 = 0
-   num_pseudo = 0
    num_qscat = 0
    num_profiler = 0
    num_buoy = 0

@@ -5,9 +5,7 @@ SUBROUTINE da_init_wrfvar( grid, xp, xb, &
 
    IMPLICIT NONE
 
-!  Input data.
-
-   TYPE(domain) , TARGET            :: grid
+   TYPE(domain)              :: grid
 
    TYPE (xpose_type),INTENT(INOUT)  :: xp      ! Transpose variables.
    TYPE (xb_type), INTENT(INOUT)    :: xb      ! Background state
@@ -18,90 +16,75 @@ SUBROUTINE da_init_wrfvar( grid, xp, xb, &
 
    INTEGER :: ii
 
-   INTEGER :: sm31,sm32,sm33,sm31x,sm32x,sm33x,sm31y,sm32y,sm33y
-
 !if ( DWORDSIZE != RWORDSIZE )
 #define TRUE_MSG_XPOSE add_msg_xpose_real
 !else
 !define TRUE_MSG_XPOSE add_msg_xpose_doubleprecision
 !endif
 
-!--De-reference dimension information stored in the grid data structure.
+   ! De-reference dimension information stored in the grid data structure.
 
    call da_copy_dims( grid, xp, &
                    ids, ide, jds, jde, kds, kde, &
                    ims, ime, jms, jme, kms, kme, &
                    ips, ipe, jps, jpe, kps, kpe  )
 
-!--Compute these starting and stopping locations for each tile and number of tiles.
+   ! Compute these starting and stopping locations for each tile and number 
+   ! of tiles.
 
-   CALL set_tiles ( grid , ids , ide , jds , jde , ips , ipe , jps , jpe )
+   call set_tiles ( grid , ids , ide , jds , jde , ips , ipe , jps , jpe )
 
    call da_copy_tile_dims( grid, xp, its, ite, jts, jte, kts, kte )
 
-!**********************************************************************
-
-   sm31             = grid%sm31
-   sm32             = grid%sm32
-   sm33             = grid%sm33
-   sm31x            = grid%sm31x
-   sm32x            = grid%sm32x
-   sm33x            = grid%sm33x
-   sm31y            = grid%sm31y
-   sm32y            = grid%sm32y
-   sm33y            = grid%sm33y
-
-!**********************************************************************
-
-!--Register xpose arrays and build messages for processor communication.
+   ! Register xpose arrays and build messages for processor communication.
 
 #ifdef DM_PARALLEL
 #define REGISTER_I1
 #include "em_data_calls.inc"
-! XPOSE_V1
-  IF ( grid%comms( XPOSE_V1 ) == invalid_message_value ) THEN
-    CALL wrf_debug ( 50 , 'setting up xpose XPOSE_V1' )
-    CALL setup_xpose_rsl( grid )
-    CALL reset_msgs_xpose
+   ! XPOSE_V1
+   IF ( grid%comms( XPOSE_V1 ) == invalid_message_value ) THEN
+      call wrf_debug ( 50 , 'setting up xpose XPOSE_V1' )
+      call setup_xpose_rsl( grid )
+      call reset_msgs_xpose
 #ifndef DEREF_KLUDGE
-    CALL TRUE_MSG_XPOSE ( xp%v1z, xp%v1x, xp%v1y, 3 )
+      call TRUE_MSG_XPOSE ( xp%v1z, xp%v1x, xp%v1y, 3 )
 #else
-    CALL TRUE_MSG_XPOSE ( xp%v1z(ims,jms,kms), &
+      call TRUE_MSG_XPOSE ( xp%v1z(ims,jms,kms), &
                          xp%v1x(xp%imsx,xp%jmsx,xp%kmsx), &
                          xp%v1y(xp%imsy,xp%jmsy,xp%kmsy), 3 )
 #endif
-    CALL define_xpose ( grid%domdesc , grid%comms ( XPOSE_V1 ) )
-  ENDIF
+      call define_xpose ( grid%domdesc , grid%comms ( XPOSE_V1 ) )
+   ENDIF
 
-! XPOSE_V2
-  IF ( grid%comms( XPOSE_V2 ) == invalid_message_value ) THEN
-    CALL wrf_debug ( 50 , 'setting up xpose XPOSE_V2' )
-    CALL setup_xpose_rsl( grid )
-    CALL reset_msgs_xpose
+   ! XPOSE_V2
+   IF ( grid%comms( XPOSE_V2 ) == invalid_message_value ) THEN
+      call wrf_debug ( 50 , 'setting up xpose XPOSE_V2' )
+      call setup_xpose_rsl( grid )
+      call reset_msgs_xpose
 #ifndef DEREF_KLUDGE
-    CALL TRUE_MSG_XPOSE ( xp%v2z, xp%v2x, xp%v2y, 3 )
+      call TRUE_MSG_XPOSE ( xp%v2z, xp%v2x, xp%v2y, 3 )
 #else
-    CALL TRUE_MSG_XPOSE ( xp%v2z(ims,jms,kms), &
+      call TRUE_MSG_XPOSE ( xp%v2z(ims,jms,kms), &
                          xp%v2x(xp%imsx,xp%jmsx,xp%kmsx), &
                          xp%v2y(xp%imsy,xp%jmsy,xp%kmsy), 3 )
 #endif
-    CALL define_xpose ( grid%domdesc , grid%comms ( XPOSE_V2 ) )
-  ENDIF
+      call define_xpose ( grid%domdesc , grid%comms ( XPOSE_V2 ) )
+   ENDIF
 
-! Define halo region communication.
-!-----------------------------------------------------------------------
-!  Stencils for patch communications
-!                           * * * * *
-!         *        * * *    * * * * *
-!       * + *      * + *    * * + * *
-!         *        * * *    * * * * *
-!                           * * * * *
-!ij vp%v1            x
-!ij xb%cori          x
-!ij xb%rho           x
-!ij xa%u             x
-!ij xa%v             x
-!--------------------------------------------------------------
+   ! Define halo region communication.
+   !-----------------------------------------------------------------------
+   !  Stencils for patch communications
+   !                           * * * * *
+   !         *        * * *    * * * * *
+   !       * + *      * + *    * * + * *
+   !         *        * * *    * * * * *
+   !                           * * * * *
+   !ij vp%v1            x
+   !ij xb%cori          x
+   !ij xb%rho           x
+   !ij xa%u             x
+   !ij xa%v             x
+   !--------------------------------------------------------------
 #include "HALO_INIT.inc"
 #include "HALO_PSICHI_UV.inc"
 #include "HALO_BAL_EQN_ADJ.inc"
@@ -117,14 +100,14 @@ SUBROUTINE da_init_wrfvar( grid, xp, xb, &
 #include "HALO_2D_WORK.inc"
 #include "HALO_RADAR_XA_W.inc"
 
-! Copy domain and transpose descriptors.
+   ! Copy domain and transpose descriptors.
 
    xp%domdesc = grid%domdesc
    do ii = 1, max_comms
      xp%comms(ii) = grid%comms(ii)
    enddo
 
-!--Copy halo and transpose IDs.
+   ! Copy halo and transpose IDs.
 
    xp%halo_id0 = HALO_INIT
    xp%halo_id1 = HALO_PSICHI_UV
@@ -145,7 +128,7 @@ SUBROUTINE da_init_wrfvar( grid, xp, xb, &
    xp%xpose_id2 = XPOSE_V2
 #endif
 
-!  Fill background scalars:
+   ! Fill background scalars:
 
    xb%ids = xp%ids 
    xb%ide = xp%ide

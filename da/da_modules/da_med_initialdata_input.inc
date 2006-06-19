@@ -12,10 +12,9 @@ SUBROUTINE da_med_initialdata_input (grid, config_flags, in_date, in_filename)
 
    !--Local
 
-   INTEGER                 :: fid , ierr , status, n, nsave, previous_status
-   CHARACTER (LEN=80)      :: file_name, previous_time_string
+   INTEGER                 :: fid , ierr , status, n, nsave
+   CHARACTER (LEN=80)      :: file_name
    CHARACTER (LEN=80)      :: message
-   CHARACTER (LEN= 1)      :: char
 
    INTEGER :: julyr, julday
    REAL    :: gmt
@@ -50,12 +49,12 @@ SUBROUTINE da_med_initialdata_input (grid, config_flags, in_date, in_filename)
 
    if (present(in_date)) then
       !-----Set start_date to current_date.
-      read(in_date(1:19), fmt='(i4, 5(a1, i2))') &
-         grid%start_year,  char, &
-         grid%start_month, char, &
-         grid%start_day,   char, &
-         grid%start_hour,  char, &
-         grid%start_minute,char, &
+      read(in_date(1:19), fmt='(i4, 5(a1, 2x))') &
+         grid%start_year,   &
+         grid%start_month,  &
+         grid%start_day,    &
+         grid%start_hour,   &
+         grid%start_minute, &
          grid%start_second 
 
       nsave = -1
@@ -75,12 +74,12 @@ SUBROUTINE da_med_initialdata_input (grid, config_flags, in_date, in_filename)
       endif
    else
       !-----Set start_date to current_date.
-      read(current_date(1:19), fmt='(i4, 5(a1, i2))') &
-           grid%start_year,  char, &
-           grid%start_month, char, &
-           grid%start_day,   char, &
-           grid%start_hour,  char, &
-           grid%start_minute,char, &
+      read(current_date(1:19), fmt='(i4, 5(a1, 2x))') &
+           grid%start_year,  &
+           grid%start_month, &
+           grid%start_day,   &
+           grid%start_hour,  &
+           grid%start_minute,&
            grid%start_second
    endif
 

@@ -1,4 +1,4 @@
-SUBROUTINE da_solve_poissoneqn_fst_adj( xb, xbx, xp, b, del2b, &
+SUBROUTINE da_solve_poissoneqn_fst_adj(xbx, xp, b, del2b, &
                                     ids,ide, jds,jde, kds,kde, &
                                     ims,ime, jms,jme, kms,kme, &
                                     its,ite, jts,jte, kts,kte )
@@ -19,7 +19,6 @@ SUBROUTINE da_solve_poissoneqn_fst_adj( xb, xbx, xp, b, del2b, &
 
    IMPLICIT NONE
    
-   TYPE (xb_type), INTENT(IN) :: xb            ! First guess structure.
    TYPE (xbx_type),INTENT(IN) :: xbx           ! Header & non-gridded vars.
    TYPE (xpose_type),INTENT(INOUT)  :: xp      ! Dimensions and xpose buffers. 
    INTEGER   , INTENT(IN)     :: ids,ide, jds,jde, kds,kde   ! domain dims.
@@ -39,6 +38,12 @@ SUBROUTINE da_solve_poissoneqn_fst_adj( xb, xbx, xp, b, del2b, &
    INTEGER                  :: i, j, k, n, ij  ! loop counter
 
    REAL, ALLOCATABLE        :: work_1d(:)    ! FFT work array for x dir.
+
+   ! JRB use all variables to stop compiler whinge
+
+   IF (ide == 0 .OR. ids == 0 .OR. jds == 0 .OR. jde == 0 .OR. kde == 0 .OR. &
+       kds == 0) THEN
+   END IF
 
 !------------------------------------------------------------------------------
 !  [1.0] Initialise:

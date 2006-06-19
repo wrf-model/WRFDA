@@ -22,9 +22,9 @@
         TYPE (vp_type) :: vv_x    ! Grdipt/EOF cv_array (local)
         TYPE (vp_type) :: vv_xg   ! Grdipt/EOF cv_array (global)
         TYPE (xpose_type) :: xpg  ! global dimensions
-        INTEGER :: ids, ide, jds, jde, kds, kde, &
-                   ims, ime, jms, jme, kms, kme, &
-                   ips, ipe, jps, jpe, kps, kpe
+        INTEGER :: ids, ide, jds, jde, kds, &
+                   ims, ime, jms, jme, kms, &
+                   ips, ipe, jps, jpe, kps
         LOGICAL, EXTERNAL :: wrf_dm_on_monitor
 
         !

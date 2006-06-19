@@ -29,7 +29,6 @@ SUBROUTINE da_trace_exit( &
    REAL                            :: temp1
    REAL                            :: temp2
    CHARACTER(LEN=25)               :: Change
-   CHARACTER(LEN=80)               :: ErrMess(1)
 
    !======================================================================
    ! Start of code

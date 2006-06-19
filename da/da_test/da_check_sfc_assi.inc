@@ -1,4 +1,4 @@
-SUBROUTINE da_check_sfc_assi( xb, xa, iv, xp, y, &
+subroutine da_check_sfc_assi( xb, xa, iv, xp, y, &
                            ids,ide, jds,jde, kds,kde, &
                            ims,ime, jms,jme, kms,kme, &
                            its,ite, jts,jte, kts,kte )
@@ -15,8 +15,6 @@ SUBROUTINE da_check_sfc_assi( xb, xa, iv, xp, y, &
    integer, intent(in)              :: ims,ime, jms,jme, kms,kme ! memory dims.
    integer, intent(in)              :: its,ite, jts,jte, kts,kte ! tile   dims.
 
-!-------------------------------------------------------------------------
-
    REAL                           :: adj_ttl_lhs   ! < y, y >
    REAL                           :: adj_ttl_rhs   ! < x, x_adj >
 
@@ -26,11 +24,7 @@ SUBROUTINE da_check_sfc_assi( xb, xa, iv, xp, y, &
    REAL                           :: pertile_lhs   ! < y, y >
    REAL                           :: pertile_rhs   ! < x, x_adj >
 
-!-------------------------------------------------------------------------
-
-   INTEGER                        :: kz, n
-
-!-------------------------------------------------------------------------
+   INTEGER                        :: n
 
    real, dimension(ims:ime, jms:jme, kms:kme) :: xa2_u, xa2_v, xa2_t, &
                                                  xa2_p, xa2_q
@@ -38,12 +32,18 @@ SUBROUTINE da_check_sfc_assi( xb, xa, iv, xp, y, &
    real, dimension(ims:ime, jms:jme)          :: xa2_u10, xa2_v10, xa2_t2, &
                                                  xa2_q2, xa2_tgrn, xa2_psfc
 
-!-------------------------------------------------------------------------
-   
-   CALL wrf_message("check_sfc_assi: Adjoint Test Results:")
-   
-!-------------------------------------------------------------------------
-   
+
+   IF (trace_use) call da_trace_entry("da_check_sfc_assi")
+
+   ! JRB stop compiler whinging
+
+   IF (ids == 0 .OR. ide ==0 .OR. jde == 0 .OR. jds == 0 .OR. &
+      kde == 0 .OR. kds == 0 .OR. kms == 0 .OR. ime == 0 .OR. &
+      its == 0 ) THEN
+   END IF
+  
+   call wrf_message("check_sfc_assi: Adjoint Test Results:")
+    
    xa2_u(ims:ime, jms:jme, kms:kme) = xa%u(ims:ime, jms:jme, kms:kme)
    xa2_v(ims:ime, jms:jme, kms:kme) = xa%v(ims:ime, jms:jme, kms:kme)
    xa2_t(ims:ime, jms:jme, kms:kme) = xa%t(ims:ime, jms:jme, kms:kme)
@@ -57,35 +57,26 @@ SUBROUTINE da_check_sfc_assi( xb, xa, iv, xp, y, &
    xa2_t2  (ims:ime, jms:jme) = xa%t2  (ims:ime, jms:jme)
    xa2_q2  (ims:ime, jms:jme) = xa%q2  (ims:ime, jms:jme)
 
-!-------------------------------------------------------------------------
+   ! call check_psfc( xb, xa, iv, xp, y, &
+   !                  ids,ide, jds,jde, kds,kde, &
+   !                  ims,ime, jms,jme, kms,kme, &
+   !                  its,ite, jts,jte, kts,kte )
 
-   kz = xb%mkz
-
-!-------------------------------------------------------------------------
-
-!     call check_psfc( xb, xa, iv, xp, y, &
-!                      ids,ide, jds,jde, kds,kde, &
-!                      ims,ime, jms,jme, kms,kme, &
-!                      its,ite, jts,jte, kts,kte )
-
-!     CALL wrf_shutdown
-!     stop 'check_psfc'
-
-!-------------------------------------------------------------------------
+   ! CALL wrf_shutdown
+   ! stop 'check_psfc'
 
    call da_transform_xtowtq ( xp, xb, xa )
 
-!--Exchange XA(SURFACE) halo region.
-   CALL wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id6)
+   ! Exchange XA(SURFACE) halo region.
+   call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id6)
 
-!-------------------------------------------------------------------------
 
    partial_lhs = 0.0
    pertile_lhs = 0.0
 
    do n=1, iv%num_synop
       if(iv%synop(n)%loc%proc_domain_with_halo) then
-         CALL da_transform_xtopsfc( xb, xa, xp, iv%synop(n), y%synop(n) )
+         call da_transform_xtopsfc( xb, xa, xp, iv%synop(n), y%synop(n) )
 
 
          pertile_lhs = pertile_lhs &
@@ -106,15 +97,15 @@ SUBROUTINE da_check_sfc_assi( xb, xa, iv, xp, y, &
       endif
    enddo
 
-!-------------------------------------------------------------------------
-!     [5.0] Perform adjoint operation:
-!-------------------------------------------------------------------------
+   !----------------------------------------------------------------------
+   ! [5.0] Perform adjoint operation:
+   !----------------------------------------------------------------------
 
    call da_zero_x( xa )
 
    DO n=1, iv%num_synop
       if(iv%synop(n)%loc%proc_domain_with_halo) then
-         CALL da_transform_xtopsfc_adj(xb,xp,iv%synop(n),y%synop(n),xa)
+         call da_transform_xtopsfc_adj(xb,xp,iv%synop(n),y%synop(n),xa)
       endif
    ENDDO
 
@@ -148,14 +139,13 @@ SUBROUTINE da_check_sfc_assi( xb, xa, iv, xp, y, &
 
    adj_ttl_lhs = wrf_dm_sum_real( partial_lhs )
    adj_ttl_rhs = wrf_dm_sum_real( partial_rhs )
-PRINT *,'TEST_COVERAGE_check_sfc_assi_A:  adj_ttl_lhs,adj_ttl_rhs = ', adj_ttl_lhs,adj_ttl_rhs
+   PRINT *,'TEST_COVERAGE_check_sfc_assi_A:  adj_ttl_lhs,adj_ttl_rhs = ', adj_ttl_lhs,adj_ttl_rhs
    IF ( wrf_dm_on_monitor() ) THEN
       write(UNIT=stdout, fmt='(A,1pe22.14)') ' Whole Domain < y, y     > = ', adj_ttl_lhs
       write(UNIT=stdout, fmt='(A,1pe22.14)') ' Whole Domain < x, x_adj > = ', adj_ttl_rhs
    ENDIF
 
-!-------------------------------------------------------------------------
-!--recover xa
+   ! recover xa
    xa%u(ims:ime, jms:jme, kms:kme) = xa2_u(ims:ime, jms:jme, kms:kme)
    xa%v(ims:ime, jms:jme, kms:kme) = xa2_v(ims:ime, jms:jme, kms:kme)
    xa%t(ims:ime, jms:jme, kms:kme) = xa2_t(ims:ime, jms:jme, kms:kme)
@@ -171,5 +161,7 @@ PRINT *,'TEST_COVERAGE_check_sfc_assi_A:  adj_ttl_lhs,adj_ttl_rhs = ', adj_ttl_l
 
    CALL wrf_shutdown
    stop 'In file: __FILE__'
+
+   IF (trace_use) call da_trace_exit("da_check_sfc_assi")
    
-END SUBROUTINE da_check_sfc_assi
+END subroutine da_check_sfc_assi

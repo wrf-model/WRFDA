@@ -16,7 +16,7 @@ SUBROUTINE da_condens_lin(DT,SCR31,SCR42,SCR71,DUM31,PRD,  &
 
    real, dimension(kts:kte)  :: DUM114,DUM115,DUM212,DUM213,  &
                                 SCR61,SCR8,QVT,QCT,QRT,TTT
-   real, dimension(kts:kte)  :: DUM1149,DUM1159,DUM2129,DUM2139,SCR619,SCR89
+   real, dimension(kts:kte)  :: DUM1149,DUM2129,DUM2139,SCR619,SCR89
    real, dimension(kts:kte)  :: QVT9,QCT9,QRT9,TTT9
    real, dimension(kts:kte)  :: TMP
 
@@ -57,7 +57,6 @@ SUBROUTINE da_condens_lin(DT,SCR31,SCR42,SCR71,DUM31,PRD,  &
          SCR8(K)=(SCR42(K)-PRC5(K))/(1.+DUM212(K)*PRC5(K)/  &
                  (SCR71(K)*SCR71(K)))
 
-         DUM1159(K)=SCR319(K)+SCR89(K)
          DUM115(K)=SCR31(K)+SCR8(K)
          IF(DUM115(K) >= 0.)THEN
             SCR619(K)=SCR89(K)/DT(k)

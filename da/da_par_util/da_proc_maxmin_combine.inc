@@ -50,7 +50,7 @@ SUBROUTINE da_proc_maxmin_combine( n, max, min )
    if( myrank .eq. root ) then
      do i = 1, n
        min(i)%value = out(1,i)
-       proc_id(i) = out(2,i)
+       proc_id(i) = INT(out(2,i))
      end do
    end if
 
@@ -84,7 +84,7 @@ SUBROUTINE da_proc_maxmin_combine( n, max, min )
    if( myrank .eq. root ) then
      do i = 1, n
        max(i)%value = out(1,i)
-       proc_id(i) = out(2,i)
+       proc_id(i) = INT(out(2,i))
      end do
    end if
 

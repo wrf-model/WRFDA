@@ -15,7 +15,7 @@ SUBROUTINE da_condens_adj(DT,SCR31,SCR42,SCR71,DUM31,PRD,  &
 
    real, dimension(kts:kte)  :: DUM114,DUM115,DUM212,DUM213,PRC5,  &
                                 SCR61,SCR8,QVT,QCT,QRT,TTT
-   real, dimension(kts:kte)  :: DUM1149,DUM1159,DUM2129,DUM2139,PRC59,  &
+   real, dimension(kts:kte)  :: DUM1149,DUM2129,DUM2139,PRC59,  &
                                 SCR619,SCR89
    real, dimension(kts:kte)  :: QVT9,QCT9,QRT9,TTT9
    real, dimension(kts:kte)  :: TMP

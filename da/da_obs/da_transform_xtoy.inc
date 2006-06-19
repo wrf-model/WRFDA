@@ -1,7 +1,5 @@
 SUBROUTINE da_transform_xtoy( xb, iv, xa, xp, y )
-   
-!      08/2005 - Add radiance part                  Zhiquan Liu
-!------------------------------------------------------------------
+
    implicit none
    
    type (xb_type), intent(in)    :: xb       ! first guess state.
@@ -10,67 +8,65 @@ SUBROUTINE da_transform_xtoy( xb, iv, xa, xp, y )
    type (xpose_type), intent(in) :: xp       ! Domain decomposition vars.
    type (y_type), intent(inout)  :: y        ! y = h (xa)
 
-   integer :: i, j
-
    if (trace_use) CALL da_trace_entry("da_transform_xtoy")
    
 !-----------------------------------------------------------------------------
 !  [1.0] Radiosonde observation operator y = H(x):
 !-----------------------------------------------------------------------------
   
-   call da_transform_xtoy_Sound ( xa, iv, xp, y ) 
-   call da_transform_xtoy_Sonde_sfc ( xa, xb, iv, xp, y ) 
+   call da_transform_xtoy_sound ( xa, iv, xp, y ) 
+   call da_transform_xtoy_sonde_sfc ( xa, xb, iv, xp, y ) 
 
 !------------------------------------------------------------------------------
 !  [2.0] Surface observation operator y = H(x):
 !------------------------------------------------------------------------------
 
-   call da_transform_xtoy_Synop ( xa, xb, iv, xp, y )
+   call da_transform_xtoy_synop ( xa, xb, iv, xp, y )
 
 !------------------------------------------------------------------------------
 !  [3.0] Cloud track wind observation operator y = H(x):
 !------------------------------------------------------------------------------
 !  Geostationary Satellite
-   call da_transform_xtoy_GeoAMV( xa, iv, xp, y )
+   call da_transform_xtoy_geoamv( xa, iv, xp, y )
 !  Polar orbitting Satellite
-   call da_transform_xtoy_PolarAMV( xa, iv, xp, y )
+   call da_transform_xtoy_polaramv( xa, iv, xp, y )
 
 
 !------------------------------------------------------------------------------
 !  [4.0] Aircraft observation operator y = H(x):
 !------------------------------------------------------------------------------
    
-   call da_transform_xtoy_Airep ( xa, iv, xp, y )
+   call da_transform_xtoy_airep ( xa, iv, xp, y )
 
 !------------------------------------------------------------------------------
 !  [5.0] Metar observation operator y = H(x):
 !------------------------------------------------------------------------------
 
-   call da_transform_xtoy_Metar ( xa, xb, iv, xp, y )
+   call da_transform_xtoy_metar ( xa, xb, iv, xp, y )
 
 !------------------------------------------------------------------------------
 !  [6.0] Ship observation operator y = H(x):
 !------------------------------------------------------------------------------
 
-   call da_transform_xtoy_Ships ( xa, xb, iv, xp, y )
+   call da_transform_xtoy_ships ( xa, xb, iv, xp, y )
 
 !------------------------------------------------------------------------------
 !  [7.0] GPS TPW/ZTD observation operator y = H(x):
 !------------------------------------------------------------------------------
 
-   call da_transform_xtoy_Gpspw ( xb, iv, xa, xp, y )
+   call da_transform_xtoy_gpspw ( xb, iv, xa, xp, y )
 
 !------------------------------------------------------------------------------
 !  [8.0] SSMI observation operator y = H(x):
 !------------------------------------------------------------------------------
 
-   call da_transform_xtoy_SSMI ( xb, iv, xa, xp, y )
+   call da_transform_xtoy_ssmi ( xb, iv, xa, xp, y )
 
 !------------------------------------------------------------------------------
 !  [9.0] Pilot observation operator y = H(x):
 !------------------------------------------------------------------------------
   
-   call da_transform_xtoy_Pilot ( xa, iv, xp, y )
+   call da_transform_xtoy_pilot ( xa, iv, xp, y )
 
 !------------------------------------------------------------------------------
 !  [10.0] Pseudo obs observation operator y = H(x):
@@ -82,7 +78,7 @@ SUBROUTINE da_transform_xtoy( xb, iv, xa, xp, y )
 !  [11.0] Satem observation operator y = H(x):
 !------------------------------------------------------------------------------
    
-   call da_transform_xtoy_Satem ( xa, xb, iv, xp, y )
+   call da_transform_xtoy_satem ( xa, xb, iv, xp, y )
 
 !------------------------------------------------------------------------------
 !  [12.0] SSM/T1 observation operator y = H(x):
@@ -118,19 +114,19 @@ SUBROUTINE da_transform_xtoy( xb, iv, xa, xp, y )
 !  [17.0] GPS Refractivity observation operator y = H(x):
 !------------------------------------------------------------------------------
 
-   call da_transform_xtoy_Gpsref ( xa, xb, iv, xp, y )
+   call da_transform_xtoy_gpsref ( xa, xb, iv, xp, y )
 
 !------------------------------------------------------------------------------
 !  [18.0] Radar observation operator y = H(x):
 !------------------------------------------------------------------------------
 
-   call da_transform_xtoy_Radar ( xa, xb, iv, xp, y )
+   call da_transform_xtoy_radar ( xa, xb, iv, xp, y )
 
 !------------------------------------------------------------------------------
 !  [19.0] TC bogus observation operator y = H(x):
 !------------------------------------------------------------------------------
 
-   call da_transform_xtoy_Bogus ( xa, xb, iv, xp, y )
+   call da_transform_xtoy_bogus ( xa, xb, iv, xp, y )
 
 !------------------------------------------------------------------------------
 !  [20.0] Radiance observation operator y = H(x):

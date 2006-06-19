@@ -17,7 +17,7 @@ SUBROUTINE da_check_vtoy_adjoint(cv_size,grid, config_flags, vp, vv, &
 
    INTEGER, INTENT(IN)                  :: cv_size
    type(grid_config_rec_type), intent(inout) :: config_flags
-   type(domain) ,   TARGET              :: grid 
+   type(domain)                   :: grid 
 
    type (vp_type),    intent(inout)     :: vv    ! Grdipt/EOF CV.
    type (vp_type),    intent(inout)     :: vp    ! Grdipt/level CV.
@@ -40,7 +40,6 @@ SUBROUTINE da_check_vtoy_adjoint(cv_size,grid, config_flags, vp, vv, &
    real, dimension(1:cv_size)        :: cv          ! Test control variable.
    real, dimension(1:cv_size)        :: cv_2
 
-   real, dimension(ims:ime, jms:jme) :: field
 !-------------------------------------------------------------------------
    integer                        :: ierror        ! MPI error code.
 

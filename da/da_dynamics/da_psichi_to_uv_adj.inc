@@ -29,7 +29,6 @@ subroutine da_psichi_to_uv_adj( u, v, coefx, coefy, psi, chi, &
    real, intent(in)   :: coefy(ims:ime,jms:jme)       ! Multiplicative coeff.
    
    integer            :: i, j, k                      ! Loop counters.
-   integer            :: ips, ipe                     ! 1st dim. end points.
    integer            :: is, ie                       ! 1st dim. end points.
    integer            :: js, je                       ! 2nd dim. end points.
 

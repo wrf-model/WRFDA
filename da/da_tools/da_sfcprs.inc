@@ -36,8 +36,6 @@ SUBROUTINE da_sfcprs (kts, kte, p, t, q, height, psfc, pslv, h_obs, t_obs)
       REAL                        :: GAMMA78, GAMMA57  
       REAL                        :: HT    
       REAL                        :: P1 
-      REAL                        :: P57
-      REAL                        :: P78
       REAL                        :: T1       
       REAL                        :: T500       
       REAL                        :: T700    

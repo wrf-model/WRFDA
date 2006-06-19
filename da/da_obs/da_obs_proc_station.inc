@@ -9,14 +9,13 @@
                               
    TYPE (multi_level_type), intent(inout) :: obs
 
-   REAL :: po, to, ho, rho, es, qs, qvo
+   REAL :: po, to, rho, es, qs, qvo
    INTEGER :: i
 
 !-----------------------------------------------------------------------------
 
 loop_levels: DO i = 1, obs % info % levels
 
-      ho   = obs % each(i) % height
       po   = obs % each(i) % p  % inv
       to   = obs % each(i) % t  % inv
       rho  = obs % each(i) % rh  % inv

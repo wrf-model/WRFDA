@@ -16,6 +16,10 @@ SUBROUTINE da_set_boundary_3d(var, &
 
    integer :: n, j, k
 
+   ! JRB use variables to stop compiler whinge
+   IF (kds == 1 .OR. jds == 1 .OR. jde == 1 .OR. kde == 1) THEN
+   END IF
+
    if((its /= ids) .or. (ite /= ide)) return
 
    do k=kts, kte

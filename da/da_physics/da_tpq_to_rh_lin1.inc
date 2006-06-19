@@ -1,4 +1,4 @@
-SUBROUTINE da_tpq_to_rh_lin1( t, p, es, q, rh, &
+SUBROUTINE da_tpq_to_rh_lin1( t, p, es, rh, &
                               t_prime, p_prime, q_prime, rh_prime )
 
 !------------------------------------------------------------------------------
@@ -21,7 +21,6 @@ SUBROUTINE da_tpq_to_rh_lin1( t, p, es, q, rh, &
    REAL, INTENT(IN)              :: t        ! Temperature.
    REAL, INTENT(IN)              :: p        ! Pressure.
    REAL, INTENT(IN)              :: es       ! Saturation vapour pressure.
-   REAL, INTENT(IN)              :: q        ! Specific humidity.
    REAL, INTENT(IN)              :: rh       ! Relative Humidity.
    REAL, INTENT(IN)              :: t_prime  ! Temperature increment.
    REAL, INTENT(IN)              :: p_prime  ! Pressure increment.

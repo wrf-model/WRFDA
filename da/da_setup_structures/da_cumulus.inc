@@ -11,7 +11,7 @@ SUBROUTINE da_cumulus ( ZCB, TCB, QCB, PCB, PK, TE,                &
    real, intent(OUT)                        :: PCT, ZCT
 
    integer   :: k, IA, L, NCB
-   real      :: G, CP, R, HL, A, B, EM, ET, P
+   real      :: G, CP, R, HL, EM, ET, P
    real      :: TLL, QLL, PLL, ZLL, TBAR, PBAR, QBAR
    real      :: DP, DZ, DDT, DT
 
@@ -19,8 +19,6 @@ SUBROUTINE da_cumulus ( ZCB, TCB, QCB, PCB, PK, TE,                &
       CP=1004.
       R=2000./7.
       HL=2.49E06
-      A=17.27
-      B=35.86
       DT=0.1
       IA=1000
 

@@ -1,4 +1,4 @@
-SUBROUTINE da_solve_poissoneqn_fct( xb, xbx, del2b, b, xp)
+SUBROUTINE da_solve_poissoneqn_fct(xbx, del2b, b, xp)
 
 !------------------------------------------------------------------------------
 !  PURPOSE: Solve Del**2 B = A for B with zero gradient boundary conditions.
@@ -14,7 +14,6 @@ SUBROUTINE da_solve_poissoneqn_fct( xb, xbx, del2b, b, xp)
 
    IMPLICIT NONE
    
-   TYPE (xb_type),    INTENT(IN)    :: xb      ! First guess structure.
    TYPE (xbx_type),   INTENT(IN)    :: xbx     ! Header & non-gridded vars.
    TYPE (xpose_type), INTENT(INOUT) :: xp      ! Dimensions and xpose buffers.
 

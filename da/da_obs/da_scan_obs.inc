@@ -27,7 +27,7 @@ SUBROUTINE da_scan_obs (iunit, ob, xp, filename)
                                    fmt_loc, & 
                                    fmt_each
 
-   INTEGER                      :: i, j, iost, fm, report
+   INTEGER                      :: i, iost, fm, report
 
    TYPE (multi_level_type)      :: platform
 
@@ -49,12 +49,12 @@ SUBROUTINE da_scan_obs (iunit, ob, xp, filename)
                                    num_ships, &
                                    num_gpspw, &
                                    num_gpsref, &
-                                   num_ssmi_retrieval, &
-                                   num_ssmi_tb      , &
                                    num_ssmt1, &
                                    num_ssmt2, &
-                                   num_pseudo, num_qscat, &
+                                   num_qscat, &
                                    num_profiler, num_buoy, num_bogus
+   !INTEGER                      :: num_ssmi_retrieval, &
+   !                                num_ssmi_tb
 
    INTEGER                        :: ndup, n
 
@@ -111,11 +111,10 @@ SUBROUTINE da_scan_obs (iunit, ob, xp, filename)
    num_ships = 0
    num_gpspw = 0
    num_gpsref = 0
-   num_ssmi_retrieval = 0
-   num_ssmi_tb       = 0   
+   ! num_ssmi_retrieval = 0
+    ! num_ssmi_tb       = 0   
    num_ssmt1 = 0
    num_ssmt2 = 0
-   num_pseudo = 0
    num_qscat = 0
    num_profiler = 0
    num_buoy = 0
@@ -260,6 +259,10 @@ loop_level: DO i = 1, platform%info%levels
               platform%each (i)%t,            &
               platform%each (i)%td,           &
               platform%each (i)%rh
+
+       ! JRB stop compiler whinging
+       IF (height_error == 0) THEN
+       END IF
 
 !      write(UNIT=stdout, FMT = '( a, i6)') 'i=', i
 !      write(UNIT=stdout, FMT = TRIM (fmt_each)) &

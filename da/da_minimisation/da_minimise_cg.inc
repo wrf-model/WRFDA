@@ -1,5 +1,5 @@
 subroutine da_minimise_cg( grid, config_flags,            &
-                           it, cv_size, ob, xb, xbx, be, ep, iv, &
+                           it, cv_size, xb, xbx, be, ep, iv, &
                            j_grad_norm_target, xhat, cv, &
                            xa, vv, vp, xp, re, y, j,  &
                            ids, ide, jds, jde, kds, kde,  &
@@ -17,7 +17,6 @@ subroutine da_minimise_cg( grid, config_flags,            &
 
       integer, intent(in)               :: it    ! external iteration.
       integer, intent(in)               :: cv_size          ! Total cv size
-      type (y_type), intent(in)         :: ob    ! Observation structure.
       type (xb_type), intent(in)        :: xb    ! first guess (local).
       type (xbx_type),intent(in)        :: xbx   ! Header & non-gridded vars.
       type (be_type), intent(in)        :: be    ! background error structure.
@@ -42,7 +41,6 @@ subroutine da_minimise_cg( grid, config_flags,            &
       type(grid_config_rec_type), intent(inout) :: config_flags
 
       integer                           :: iter            
-      real                              :: j_grad_norm ! target gradient norm.
       real                              :: j_grad(1:cv_size)      ! grad_v j (local-grid)
       real                              :: fhat(1:cv_size)        ! cv copy.
       real                              :: ghat(1:cv_size)        ! cv copy.
@@ -52,7 +50,7 @@ subroutine da_minimise_cg( grid, config_flags,            &
 
       type (y_type)                     :: jo_grad_y        ! Grad_y(Jo)
 
-      integer                           :: nobwin,ndynopt
+      integer                           :: ndynopt
 
       IF (trace_use) CALL da_trace_entry("da_minimise_cg")
 

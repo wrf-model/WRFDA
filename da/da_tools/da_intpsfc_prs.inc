@@ -1,4 +1,4 @@
-SUBROUTINE da_intpsfc_prs (val, ho, po, hm, pm, tm, qm, to, qo)
+SUBROUTINE da_intpsfc_prs (val, ho, po, hm, tm, qm, to, qo)
 !------------------------------------------------------------------------------!
 !
 ! Correct pressure between two levels. 
@@ -21,7 +21,7 @@ SUBROUTINE da_intpsfc_prs (val, ho, po, hm, pm, tm, qm, to, qo)
       REAL, INTENT (out)   :: val
       REAL, INTENT (in)    :: ho, po
       REAL, INTENT (in), OPTIONAL :: to, qo
-      REAL, INTENT (in)    :: hm, pm, tm, qm    
+      REAL, INTENT (in)    :: hm, tm, qm    
       REAL                 :: tvo, tvm, tv, dz, arg
 
 !------------------------------------------------------------------------------!
