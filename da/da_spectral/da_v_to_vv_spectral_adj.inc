@@ -4,9 +4,9 @@ subroutine da_v_to_vv_spectral_adj( max_wavenumber, sizec, lenr, lenwrk, lensav,
                                     ims, ime, jms, jme, &
                                     its, ite, jts, jte )
 
-!-------------------------------------------------------------------------
-!  Performs Adjoint of spectral to grid transformation on a sphere.
-!-------------------------------------------------------------------------
+   !----------------------------------------------------------------------
+   ! Performs Adjoint of spectral to grid transformation on a sphere.
+   !----------------------------------------------------------------------
 
    implicit none
 
@@ -39,40 +39,43 @@ subroutine da_v_to_vv_spectral_adj( max_wavenumber, sizec, lenr, lenwrk, lensav,
    complex             :: ccv(1:sizec)               ! Spectral modes.
    complex             :: ccv_local(1:sizec)         ! Spectral modes.
 
+   IF (trace_use) CALL da_trace_entry("da_v_to_vv_spectral_adj")
+
 #ifdef DM_PARALLEL
 #include <mpif.h>
 #endif
 
-!-------------------------------------------------------------------------
-!  [1] Perform Adjoint of inverse Fourier decomposition in E-W direction:
-!-------------------------------------------------------------------------
+   !----------------------------------------------------------------------
+   ! [1] Perform Adjoint of inverse Fourier decomposition in E-W direction:
+   !----------------------------------------------------------------------
 
    v_fou = 0.
    do j = jts, jte
       r_fou(its:ite) = field(its:ite,j) 
       call rfft1f( ide, inc, r_fou, lenr, wsave, lensav, work, lenwrk, ier )
 
-!-------------------------------------------------------------------------
-!  Adjust the output for adjoint test
-!-------------------------------------------------------------------------
-       r_fou      =  real(ite)/2. * r_fou
-       r_fou(its) =  r_fou(its)   * 2.0       
+      !----------------------------------------------------------------------
+      ! Adjust the output for adjoint test
+      !----------------------------------------------------------------------
+      r_fou      =  real(ite)/2. * r_fou
+      r_fou(its) =  r_fou(its)   * 2.0       
 
-!      if(.not. odd_longitudes) r_fou(ite) = 2.0*r_fou(ite)   
-!------make r_fou(ide) zero as there is no power computed for this wavenumber
-       r_fou(ite) = 0.
+      ! if(.not. odd_longitudes) r_fou(ite) = 2.0*r_fou(ite)   
+      ! make r_fou(ide) zero as there is no power computed for this wavenumber
+      r_fou(ite) = 0.
 
-       v_fou(j,0) = CMPLX( r_fou(its), r_fou(ite) )
+      v_fou(j,0) = CMPLX( r_fou(its), r_fou(ite) )
 
-       do m = 1, max_wavenumber
-          index_r = 2 * m
-          index_c = 2 * m + 1
-          v_fou(j,m)  = v_fou(j,m) + cmplx(r_fou(index_r),r_fou(index_c))
-       end do
+      do m = 1, max_wavenumber
+         index_r = 2 * m
+         index_c = 2 * m + 1
+         v_fou(j,m)  = v_fou(j,m) + cmplx(r_fou(index_r),r_fou(index_c))
+      end do
    end do
-!-------------------------------------------------------------------------
-!  [2] Perform adjoint of inverse Legendre decomposition in N-S direction:
-!-------------------------------------------------------------------------
+
+   !----------------------------------------------------------------------
+   ! [2] Perform adjoint of inverse Legendre decomposition in N-S direction:
+   !----------------------------------------------------------------------
 
    do m = 0, max_wavenumber
       index_start = m * ( max_wavenumber + 1 - m ) + m * ( m + 1 ) / 2 + 1
@@ -93,16 +96,18 @@ subroutine da_v_to_vv_spectral_adj( max_wavenumber, sizec, lenr, lenwrk, lensav,
 #endif
    end do
 
-!-------------------------------------------------------------------------
-! [2] Apply Power spectrum
-!-------------------------------------------------------------------------
+   !----------------------------------------------------------------------
+   ! [2] Apply Power spectrum
+   !-------------------------------------------------------------------------
 
    if( .not. test_transforms ) call da_apply_power(power, max_wavenumber, ccv, sizec)
 
-    do n = 1, sizec
-       rcv(2*n - 1 ) = real ( ccv(n) )
-       rcv(2*n     ) = aimag( ccv(n) )
-    end do 
+   do n = 1, sizec
+      rcv(2*n - 1 ) = real ( ccv(n) )
+      rcv(2*n     ) = aimag( ccv(n) )
+   end do 
+
+   IF (trace_use) CALL da_trace_exit("da_v_to_vv_spectral_adj")
 
 end subroutine da_v_to_vv_spectral_adj
 

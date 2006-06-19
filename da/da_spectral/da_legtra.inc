@@ -30,7 +30,7 @@ subroutine da_legtra ( nj, max_wavenumber, alp_size, m, int_wgts, alp, r_leg, v)
    do l = m, max_wavenumber
 
       sign_switch = (-1)**( l + m )
-      sum_legtra = ( 0.0, 0.0 )
+      sum_legtra = zero_complex
 
       do j = 1, nj / 2
          index_j = ( j - 1 ) * ( max_wavenumber + 1 ) * ( max_wavenumber + 2 ) / 2

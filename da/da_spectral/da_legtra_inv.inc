@@ -30,7 +30,7 @@ subroutine da_legtra_inv( jds, jde, jts, jte, max_wavenumber, alp_size, m, &
    do j = jts, je
       index_j = ( j - 1 ) * ( max_wavenumber + 1 ) * ( max_wavenumber + 2 ) / 2
 
-      sum_legtra = ( 0.0, 0.0 )
+      sum_legtra = zero_complex
       do l = m, max_wavenumber
          ! Calculate first quadrant values:
          sum_legtra = sum_legtra + v(l) * alp(index_j + index_m + l)
@@ -43,7 +43,7 @@ subroutine da_legtra_inv( jds, jde, jts, jte, max_wavenumber, alp_size, m, &
    do j = js, jte
       index_j = ( jds+jde - j - 1 ) * ( max_wavenumber + 1 ) * ( max_wavenumber + 2 ) / 2
 
-      sum_legtra = ( 0.0, 0.0 )
+      sum_legtra = zero_complex
       do l = m, max_wavenumber
          ! Calculate second quadrant values:
          if(mod(l+m,2) == 1) then
