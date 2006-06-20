@@ -4,7 +4,7 @@ setup : links arch depend
 
 var : wrfvar
 
-wrfvar  : setup $(WRFVAR_LIBS) wrfvar.o pack_utils.o
+wrfvar  : setup advance_cymdh $(WRFVAR_LIBS) wrfvar.o pack_utils.o
 	$(LD) -o wrfvar.exe $(LDFLAGS) wrfvar.o $(WRFVAR_LIB) pack_utils.o
 
 wrf     : setup $(WRF_LIBS) pack_utils.o wrf.o
