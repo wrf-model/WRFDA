@@ -55,10 +55,10 @@ export DA_SSMI=${DA_SSMI:-$OB_DIR/$DA_DATE/ssmi.dat}               # SSM/I radia
 export DA_RADAR=${DA_RADAR:-$OB_DIR/$DA_DATE/radar.dat}            # Radar data (ignore if not using).
 
 # DA_FG01_DATE=$DA_DATE
-# DA_FG02_DATE=`$BIN_DIR/advance_cymdh $DA_FG01 1`
-# DA_FG03_DATE=`$BIN_DIR/advance_cymdh $DA_FG01 2`
-# DA_FG04_DATE=`$BIN_DIR/advance_cymdh $DA_FG01 3`
-# export DA_FG01=${DA_FG01:-$OB_DIR
+# DA_FG02_DATE=`$DA_BUILD_DIR/advance_cymdh $DA_FG01 1`
+# DA_FG03_DATE=`$DA_BUILD_DIR/advance_cymdh $DA_FG01 2`
+# DA_FG04_DATE=`$DA_BUILD_DIR/advance_cymdh $DA_FG01 3`
+# export DA_FG01=${DA_FG01:-$OB_DIR}
 
 export RTTOV=${RTTOV:-$HOME/rttov/rttov85}                            # RTTOV
 
@@ -66,6 +66,7 @@ export NUM_PROCS=${NUM_PROCS:-1}               # Number of processors to run on.
 
 export NL_GLOBAL=${NL_GLOBAL:-.FALSE.}
 export NL_LVAR4D=${NL_LVAR4D:-.FALSE.}
+export NL_RUN_HOURS=${NL_RUN_HOURS:-1}
 
 export NPROC_X=${NPROC_X:-0}                        # Regional, always set NPROC_X to 0, Global, always 1
 if test $NL_GLOBAL == ".TRUE."; then
@@ -82,13 +83,19 @@ export NL_START_MONTH=$DA_MM
 export NL_START_DAY=$DA_DD
 export NL_START_HOUR=$DA_HH
 
+export NL_ANALYSIS_DATE=${DA_CY}-${DA_MM}-${DA_DD}_${DA_HH}:00:00.0000
+
+export DA_END_DATE=`$DA_BUILD_DIR/advance_cymdh $DA_DATE $NL_RUN_HOURS`
+
+export DA_CY=`echo $DA_END_DATE | cut -c1-4`
+export DA_MM=`echo $DA_END_DATE | cut -c5-6`
+export DA_DD=`echo $DA_END_DATE | cut -c7-8`
+export DA_HH=`echo $DA_END_DATE | cut -c9-10`
+
 export NL_END_YEAR=$DA_CY
 export NL_END_MONTH=$DA_MM
 export NL_END_DAY=$DA_DD
 export NL_END_HOUR=$DA_HH
-
-
-export NL_ANALYSIS_DATE=${DA_CY}-${DA_MM}-${DA_DD}_${DA_HH}:00:00.0000
 
 # Default WRF namelist variables:
 export NL_OB_FORMAT=${NL_OB_FORMAT:-2}              # Observation format: 1=BUFR, 2=ASCII "little_r"
@@ -134,7 +141,7 @@ if test $NL_LVAR4D == .TRUE.; then
 fi
 
 ln -sf $DA_FIRST_GUESS	 wrfvar_input
-ln -sf $DA_BOUNDARIES 	 wrfbdy_001
+ln -sf $DA_BOUNDARIES 	 wrfbdy_d01
 ln -sf $DA_FIRST_GUESS	 wrfinput_d01
 ln -sf $DA_BACK_ERRORS   fort.34
 if test $NL_OB_FORMAT == 1; then
@@ -202,6 +209,8 @@ Subversion revision:         $SVN_REV
 First Guess Input File:      $DA_FIRST_GUESS
 Background Error Input File: $DA_BACK_ERRORS
 Observation Input File:      $DA_OBSERVATIONS
+Start date:                  $DA_DATE
+End date:                    $DA_END_DATE
 EOF
 
 echo "Experiment directory:        $EXP_DIR"
@@ -211,6 +220,8 @@ echo "Subversion revision:         $SVN_REV"
 echo "First Guess Input File:      $DA_FIRST_GUESS"
 echo "Background Error Input File: $DA_BACK_ERRORS"
 echo "Observation Input File:      $DA_OBSERVATIONS"
+echo "Start date:                  $DA_DATE"
+echo "End date:                    $DA_END_DATE"
 
 
 # Create namelist.input file:
