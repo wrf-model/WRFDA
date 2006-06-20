@@ -31,7 +31,7 @@ subroutine da_legtra_inv_adj( jds, jde, jts, jte, max_wavenumber, alp_size, &
    je = min(jc+iequator, jte)
 
    do l = m, max_wavenumber
-      sum_legtra = zero_complex
+      sum_legtra = da_zero_complex
 
       do j = js, jte
          index_j = ( jds+jde - j - 1 ) * ( max_wavenumber + 1 ) * &

@@ -39,11 +39,11 @@ subroutine da_v_to_vv_spectral_adj( max_wavenumber, sizec, lenr, lenwrk, lensav,
    complex             :: ccv(1:sizec)               ! Spectral modes.
    complex             :: ccv_local(1:sizec)         ! Spectral modes.
 
-   IF (trace_use) CALL da_trace_entry("da_v_to_vv_spectral_adj")
-
 #ifdef DM_PARALLEL
 #include <mpif.h>
 #endif
+
+   IF (trace_use) CALL da_trace_entry("da_v_to_vv_spectral_adj")
 
    !----------------------------------------------------------------------
    ! [1] Perform Adjoint of inverse Fourier decomposition in E-W direction:

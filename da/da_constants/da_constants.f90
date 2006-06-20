@@ -70,13 +70,13 @@ module da_constants
 !  GPS Refractivity constant  
    real, parameter    :: coeff = 3.73e5 / 77.6
 
-#if RWORDSIZE=8
-   complex, parameter :: zero = 0D0
+#if RWORDSIZE==8
+   real, parameter :: da_zero = 0D0
 #else
-   complex, parameter :: zero = 0.0
+   real, parameter :: da_zero = 0.0
 #endif
 
-complex, parameter :: zero_complex = (zero,zero)
+complex, parameter :: da_zero_complex = (da_zero,da_zero)
    
 !------------------------------------------------------------------------------
 !  [2.0] WRF-Var parameter constants:
