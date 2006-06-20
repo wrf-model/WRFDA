@@ -181,7 +181,7 @@ done
 
 if test -r $DA_SSMI; then
   ln -sf $DA_SSMI	fort.93
-  set DA_USE_SSMIRETRIEVALOBS = .TRUE.
+  set NL_USE_SSMIRETRIEVALOBS = .TRUE.
 fi
 
 HTML=$EXP_DIR/index.html
@@ -196,8 +196,8 @@ cat > $HTML << EOF
 Started: $DATE
 Experiment directory:        $EXP_DIR
 Run directory:               $RUN_DIR
+Release directory:           $REL_DIR
 Subversion revision:         $SVN_REV
-Build directory:             $DA_BUILD_DIR
 First Guess Input File:      $DA_FIRST_GUESS
 Background Error Input File: $DA_BACK_ERRORS
 Observation Input File:      $DA_OBSERVATIONS
@@ -205,7 +205,7 @@ EOF
 
 echo "Experiment directory:        $EXP_DIR"
 echo "Run directory:               $RUN_DIR"
-echo "Build directory:             $DA_BUILD_DIR"
+echo "Release directory:           $REL_DIR"
 echo "Subversion revision:         $SVN_REV"
 echo "First Guess Input File:      $DA_FIRST_GUESS"
 echo "Background Error Input File: $DA_BACK_ERRORS"
