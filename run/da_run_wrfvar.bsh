@@ -88,7 +88,7 @@ export NL_END_DAY=$DA_DD
 export NL_END_HOUR=$DA_HH
 
 
-NL_ANALYSIS_DATE=${DA_CY}-${DA_MM}-${DA_DD}_${DA_HH}:00:00.0000
+export NL_ANALYSIS_DATE=${DA_CY}-${DA_MM}-${DA_DD}_${DA_HH}:00:00.0000
 
 # Default WRF namelist variables:
 export NL_OB_FORMAT=${NL_OB_FORMAT:-2}              # Observation format: 1=BUFR, 2=ASCII "little_r"

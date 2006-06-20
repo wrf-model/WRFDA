@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Called from DA_Minimisation inside WRFVAR. The script is only temporary until we can
-# couple the models through memory rather than files
+# Called from da_minimisation inside WRFVAR. The script is only temporary 
+# until we can couple the models through memory rather than files
 
 # VAR produces tl00 used as input wrfinput_d01
 
