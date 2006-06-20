@@ -1,5 +1,8 @@
 #!/bin/bash
 
+export RELEASE=${RELEASE:-WRF_V2.1.2}
+export REL_DIR=${REL_DIR:-$HOME/code_development/$RELEASE}
+export DA_DIR=${DA_DIR:-$REL_DIR/wrfvar}
 export REGION=${REGION:-con200}
 export EXPT=${EXPT:-test}
 export DAT_DIR=${DAT_DIR:-/data7/da/bray/data}
