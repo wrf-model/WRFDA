@@ -1,4 +1,4 @@
-SUBROUTINE DA_Check_XToY_Adjoint_Satem( oi, y, adjtest_lhs, pertile_lhs )
+subroutine DA_Check_XToY_Adjoint_Satem( oi, y, adjtest_lhs, pertile_lhs )
 
    IMPLICIT NONE
 
@@ -34,5 +34,5 @@ SUBROUTINE DA_Check_XToY_Adjoint_Satem( oi, y, adjtest_lhs, pertile_lhs )
 
    ENDIF
 
-END SUBROUTINE DA_Check_XToY_Adjoint_Satem
+end subroutine DA_Check_XToY_Adjoint_Satem
 

@@ -1,4 +1,4 @@
-SUBROUTINE DA_PT_To_Rho_Lin( xb, xa, xp )
+subroutine DA_PT_To_Rho_Lin( xb, xa, xp )
  
 !------------------------------------------------------------------------------
 !  PURPOSE: Calculates density increments from pressure/temperature increments.
@@ -40,5 +40,5 @@ SUBROUTINE DA_PT_To_Rho_Lin( xb, xa, xp )
                                  xa % t(is:ie,js:je,ks:ke) / &
                                  xb % t(is:ie,js:je,ks:ke) )                       
 
-END SUBROUTINE DA_PT_To_Rho_Lin
+end subroutine DA_PT_To_Rho_Lin
 

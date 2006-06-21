@@ -1,4 +1,4 @@
-SUBROUTINE da_get_innov_vector_synop ( it, xb, xp, ob, iv )
+subroutine da_get_innov_vector_synop ( it, xb, xp, ob, iv )
 
   !-------------------------------------------------------------------------
   !
@@ -91,7 +91,7 @@ SUBROUTINE da_get_innov_vector_synop ( it, xb, xp, ob, iv )
           if (abs(hd) <= Max_StHeight_Diff) THEN
             if (iv % synop(n) % h < v_h(xp%kts)) then
               iv%synop(n)%zk = 1.0+1.0e-6
-              CALL da_obs_sfc_correction(iv%synop(n), xb)
+              call da_obs_sfc_correction(iv%synop(n), xb)
 
               ! To keep the original "ob" with no change for multiple outer-loops use:
               ! ob%synop(n)%p = iv%synop(n)%p%inv
@@ -254,7 +254,7 @@ SUBROUTINE da_get_innov_vector_synop ( it, xb, xp, ob, iv )
       !-----------------------------------------------------------------------
 
       IF ( check_max_iv ) THEN
-        CALL da_check_max_iv_synop(it, iv % synop(n), &
+        call da_check_max_iv_synop(it, iv % synop(n), &
                        itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf )
       END IF
     endif  ! domain_with_halo
@@ -272,5 +272,5 @@ SUBROUTINE da_get_innov_vector_synop ( it, xb, xp, ob, iv )
     'Finally Total Synop rejections ',ituf+itvvf+itpf+ittf+itqvf,' on ',&
                                       itu +itvv +itp +itt +itqv
 
-END SUBROUTINE da_get_innov_vector_synop
+end subroutine da_get_innov_vector_synop
 

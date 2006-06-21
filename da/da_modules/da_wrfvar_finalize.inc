@@ -1,4 +1,4 @@
-SUBROUTINE da_wrfvar_finalize( no_shutdown )
+subroutine da_wrfvar_finalize( no_shutdown )
 !<DESCRIPTION>
 !     WRF finalize routine.
 !</DESCRIPTION>
@@ -7,24 +7,24 @@ SUBROUTINE da_wrfvar_finalize( no_shutdown )
   !--output wrfvar analysis
 
   IF((config_flags%real_data_init_type == 1) .or. (config_flags%real_data_init_type == 3)) THEN
-    CALL da_med_initialdata_output( head_grid , config_flags )
+    call da_med_initialdata_output( head_grid , config_flags )
 
-    CALL med_shutdown_io ( head_grid , config_flags )
-    CALL       wrf_debug ( 100 , 'wrf: back from med_shutdown_io' )
+    call med_shutdown_io ( head_grid , config_flags )
+    call       wrf_debug ( 100 , 'wrf: back from med_shutdown_io' )
   END IF
 
-  CALL wrf_debug (   0 , 'wrfvar: SUCCESS COMPLETE WRFVAR' )
+  call wrf_debug (   0 , 'wrfvar: SUCCESS COMPLETE WRFVAR' )
 
   IF (print_detail_timing) THEN
-     CALL end_timing ("wrfvar overall") ! start call in wrfvar_init
+     call end_timing ("wrfvar overall") ! start call in wrfvar_init
   END IF
 
-  IF (trace_use) CALL da_trace_report
+  IF (trace_use) call da_trace_report
 
   IF ( .NOT. PRESENT( no_shutdown ) ) THEN
     ! Finalize time manager
-    CALL WRF_UTIL_Finalize
-    CALL wrf_shutdown
+    call WRF_UTIL_Finalize
+    call wrf_shutdown
   END IF
 
-  END SUBROUTINE da_wrfvar_finalize
+  end subroutine da_wrfvar_finalize

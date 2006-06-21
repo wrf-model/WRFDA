@@ -1,4 +1,4 @@
-SUBROUTINE DA_Find_FFT_Trig_Funcs( n, trig_functs )
+subroutine DA_Find_FFT_Trig_Funcs( n, trig_functs )
 
 !------------------------------------------------------------------------------
 !  PURPOSE: Set up constants required for Fourier, sine and cosine transforms.
@@ -50,4 +50,4 @@ SUBROUTINE DA_Find_FFT_Trig_Funcs( n, trig_functs )
       trig_functs(N+K)=SIN(ANGLE)
    END DO
 
-END SUBROUTINE DA_Find_FFT_Trig_Funcs
+end subroutine DA_Find_FFT_Trig_Funcs

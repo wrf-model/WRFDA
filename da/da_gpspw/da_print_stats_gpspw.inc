@@ -1,4 +1,4 @@
-SUBROUTINE DA_Print_Stats_Gpspw( stats_unit, ntpw, Gpspw )
+subroutine DA_Print_Stats_Gpspw( stats_unit, ntpw, Gpspw )
 
   IMPLICIT NONE
 
@@ -21,5 +21,5 @@ SUBROUTINE DA_Print_Stats_Gpspw( stats_unit, ntpw, Gpspw )
       '    RMSE   : ', sqrt(gpspw%rms_err%tpw/real(ntpw))
   endif
 
-END SUBROUTINE DA_Print_Stats_Gpspw
+end subroutine DA_Print_Stats_Gpspw
 

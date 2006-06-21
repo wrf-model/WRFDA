@@ -1,4 +1,4 @@
-SUBROUTINE DA_Calculate_GradY_SSMT1( iv, re, jo_grad_y )
+subroutine DA_Calculate_GradY_SSMT1( iv, re, jo_grad_y )
 !-------------------------------------------------------------------------
 !  HISTORY: 
 !
@@ -32,5 +32,5 @@ SUBROUTINE DA_Calculate_GradY_SSMT1( iv, re, jo_grad_y )
 
    END IF
 
-END SUBROUTINE DA_Calculate_GradY_SSMT1
+end subroutine DA_Calculate_GradY_SSMT1
 

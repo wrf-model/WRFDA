@@ -1,4 +1,4 @@
-SUBROUTINE da_write_obs( ob, iv, re )
+subroutine da_write_obs( ob, iv, re )
 !----------------------------------------------------------------------------   
 !  History:
 !  Purpose: Writes out components of iv=O-B structure.
@@ -19,7 +19,7 @@ SUBROUTINE da_write_obs( ob, iv, re )
    integer                       :: n, k
    logical, external             :: wrf_dm_on_monitor 
 
-  if (trace_use) CALL da_trace_entry("da_write_obs")
+  if (trace_use) call da_trace_entry("da_write_obs")
 
 
   if ( wrf_dm_on_monitor() ) then
@@ -390,8 +390,8 @@ SUBROUTINE da_write_obs( ob, iv, re )
 
    end if
 
-  if (trace_use) CALL da_trace_exit("da_write_obs")
+  if (trace_use) call da_trace_exit("da_write_obs")
 
    
-END SUBROUTINE da_write_obs
+end subroutine da_write_obs
 

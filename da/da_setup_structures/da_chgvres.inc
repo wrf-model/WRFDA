@@ -1,4 +1,4 @@
-SUBROUTINE da_chgvres(nlath,nsig,kz,sigmah,sigma_avn,&
+subroutine da_chgvres(nlath,nsig,kz,sigmah,sigma_avn,&
  corz_avn,cord_avn,corh_avn,corq_avn,hwll_avn,vztdq_avn,agv_avn,bv_avn,wgv_avn,&
  corz_kz, cord_kz, corh_kz, corq_kz, hwll_kz, vztdq_kz, agv_kz, bv_kz, wgv_kz)
 
@@ -25,7 +25,7 @@ SUBROUTINE da_chgvres(nlath,nsig,kz,sigmah,sigma_avn,&
    real agv_avn(0:nlath*2+1,1:nsig,1:nsig)
    real bv_avn(0:nlath*2+1,1:nsig),wgv_avn(0:nlath*2+1,1:nsig)
 
-   IF (trace_use) CALL da_trace_entry("da_chgvres")
+   IF (trace_use) call da_trace_entry("da_chgvres")
 
 
    if(kz==nsig)then
@@ -135,8 +135,8 @@ SUBROUTINE da_chgvres(nlath,nsig,kz,sigmah,sigma_avn,&
      enddo
   enddo
 
-   IF (trace_use) CALL da_trace_exit("da_chgvres")
+   IF (trace_use) call da_trace_exit("da_chgvres")
 
 
-END SUBROUTINE da_chgvres
+end subroutine da_chgvres
 

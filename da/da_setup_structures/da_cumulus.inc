@@ -1,4 +1,4 @@
-SUBROUTINE da_cumulus ( ZCB, TCB, QCB, PCB, PK, TE,                &
+subroutine da_cumulus ( ZCB, TCB, QCB, PCB, PK, TE,                &
                      Z, T, Q, LCB, LCT, PCT, ZCT, kts, kte )
 
    implicit none
@@ -70,7 +70,7 @@ SUBROUTINE da_cumulus ( ZCB, TCB, QCB, PCB, PK, TE,                &
 
       T(L)=TLL-(K*DT)
 
-      CALL da_qfrmrh( P, T(L), 100., Q(L) )
+      call da_qfrmrh( P, T(L), 100., Q(L) )
 
       TBAR=0.5*(T(L)+TLL)
       QBAR=0.5*(Q(L)+QLL)
@@ -116,4 +116,4 @@ SUBROUTINE da_cumulus ( ZCB, TCB, QCB, PCB, PK, TE,                &
       PCB=PK(LCB)
       ZCB=Z(LCB)
 
-END SUBROUTINE da_cumulus
+end subroutine da_cumulus

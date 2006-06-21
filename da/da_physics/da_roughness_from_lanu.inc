@@ -29,7 +29,7 @@ subroutine da_roughness_from_lanu(ltbl, mminlu, date_mm5, xp, lanu, rough)
     OPEN (UNIT = ltbl, FILE = 'LANDUSE.TBL', FORM='formatted', &
                      ACTION = 'read', IOSTAT = io_error )
   else
-    CALL wrf_error(__FILE__,__LINE__,&
+    call wrf_error(__FILE__,__LINE__,&
       "Cannot open file LANDUSE.TBL for conversion of roughness")
   endif
 
@@ -51,7 +51,7 @@ subroutine da_roughness_from_lanu(ltbl, mminlu, date_mm5, xp, lanu, rough)
                IF (ALBD == 0.0 .OR. SFEM == 0.0 .OR. SLMO == 0.0) THEN
                END IF
                IF(LC /= LI) THEN
-                 CALL wrf_error(__FILE__,__LINE__, &
+                 call wrf_error(__FILE__,__LINE__, &
                    "MISSING LANDUSE: LC")
                END IF
             ELSE 
@@ -64,7 +64,7 @@ subroutine da_roughness_from_lanu(ltbl, mminlu, date_mm5, xp, lanu, rough)
    close (UNIT=ltbl)
 
    IF(LUMATCH == 0)THEN
-    CALL wrf_error(__FILE__,__LINE__,&
+    call wrf_error(__FILE__,__LINE__,&
       "LANDUSE IN INPUT FILE DOES NOT MATCH LUTABLE")
    ENDIF   
 

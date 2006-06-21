@@ -1,4 +1,4 @@
-SUBROUTINE da_transform_xtoy_profiler ( xa, iv, xp, y )
+subroutine da_transform_xtoy_profiler ( xa, iv, xp, y )
 
    IMPLICIT NONE
 
@@ -52,5 +52,5 @@ SUBROUTINE da_transform_xtoy_profiler ( xa, iv, xp, y )
 
    ENDIF
 
-END SUBROUTINE da_transform_xtoy_profiler 
+end subroutine da_transform_xtoy_profiler 
 

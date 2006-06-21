@@ -1,4 +1,4 @@
-SUBROUTINE da_accre_adj(DT,SCR2,SCR3,SCR7,PRAC,BVT3,PRA,  &
+subroutine da_accre_adj(DT,SCR2,SCR3,SCR7,PRAC,BVT3,PRA,  &
                   SCR29,SCR79,PRA9,kts,kte)
 
 !  Accretion (Collection)
@@ -22,4 +22,4 @@ SUBROUTINE da_accre_adj(DT,SCR2,SCR3,SCR7,PRAC,BVT3,PRA,  &
 
    ENDDO
 
-END SUBROUTINE da_accre_adj
+end subroutine da_accre_adj

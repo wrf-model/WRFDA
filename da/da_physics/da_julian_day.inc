@@ -1,4 +1,4 @@
-SUBROUTINE da_julian_day(NY,NM,ND,JD,METHOD)   
+subroutine da_julian_day(NY,NM,ND,JD,METHOD)   
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC        
 !                                  C        
 !   METHOD = 1: INPUT ---- NY, NM, ND.  OUTPUT ---- JD                 C        

@@ -1,4 +1,4 @@
-SUBROUTINE da_sfc_pre (psfcm, psm, tsm, qsm, hsm, ho, to, qvo)
+subroutine da_sfc_pre (psfcm, psm, tsm, qsm, hsm, ho, to, qvo)
 !-----------------------------------------------------------------------------!
 !
 ! Correct pressure between two levels. 
@@ -58,5 +58,5 @@ SUBROUTINE da_sfc_pre (psfcm, psm, tsm, qsm, hsm, ho, to, qvo)
 
       psfcm = psm * exp (arg)
 
-END SUBROUTINE da_sfc_pre
+end subroutine da_sfc_pre
 

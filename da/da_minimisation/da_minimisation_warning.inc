@@ -37,7 +37,7 @@
  105  format (/' IFLAG= ',I2,/' RELATIVE WIDTH OF THE INTERVAL OF', &
                ' UNCERTAINTY IN THE LINE SEARCH'/ &
                'IS OF THE ORDER OF MACHINE ROUNDOFF.')
- 110  format (/' IFLAG= ',I2,/' NUMBER OF CALLS TO FUNCTION IN THE', &
+ 110  format (/' IFLAG= ',I2,/' NUMBER OF callS TO FUNCTION IN THE', &
                ' LINE SEARCH HAS REACHED 20.')
  115  format (/' IFLAG= ',I2,/' THE STEP IN THE LINE SEARCH IS', &
                ' TOO SMALL.')

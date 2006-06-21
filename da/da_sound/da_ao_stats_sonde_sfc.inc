@@ -1,4 +1,4 @@
-SUBROUTINE da_ao_stats_sonde_sfc( stats_unit, oi, re )
+subroutine da_ao_stats_sonde_sfc( stats_unit, oi, re )
 
   IMPLICIT NONE
 
@@ -34,23 +34,23 @@ SUBROUTINE da_ao_stats_sonde_sfc( stats_unit, oi, re )
   IF ( oi%num_sound > 0 ) THEN
     DO n=1, oi%num_sound
       if( oi%sonde_sfc(n)%loc%proc_domain ) then
-        CALL da_stats_calculate( n, 0, oi%sonde_sfc(n)%u%qc,  & 
+        call da_stats_calculate( n, 0, oi%sonde_sfc(n)%u%qc,  & 
                               re%sonde_sfc(n)%u, nu, & 
                               sonde_sfc%minimum%u, sonde_sfc%maximum%u, &
                               sonde_sfc%average%u, sonde_sfc%rms_err%u )
-        CALL da_stats_calculate( n, 0, oi%sonde_sfc(n)%v%qc,  & 
+        call da_stats_calculate( n, 0, oi%sonde_sfc(n)%v%qc,  & 
                               re%sonde_sfc(n)%v, nv, & 
                               sonde_sfc%minimum%v, sonde_sfc%maximum%v, &
                               sonde_sfc%average%v, sonde_sfc%rms_err%v )
-        CALL da_stats_calculate( n, 0, oi%sonde_sfc(n)%t%qc,  & 
+        call da_stats_calculate( n, 0, oi%sonde_sfc(n)%t%qc,  & 
                               re%sonde_sfc(n)%t, nt, & 
                               sonde_sfc%minimum%t, sonde_sfc%maximum%t, &
                               sonde_sfc%average%t, sonde_sfc%rms_err%t )
-        CALL da_stats_calculate( n, 0, oi%sonde_sfc(n)%p%qc,  & 
+        call da_stats_calculate( n, 0, oi%sonde_sfc(n)%p%qc,  & 
                               re%sonde_sfc(n)%p, np, & 
                               sonde_sfc%minimum%p, sonde_sfc%maximum%p, &
                               sonde_sfc%average%p, sonde_sfc%rms_err%p )
-        CALL da_stats_calculate( n, 0, oi%sonde_sfc(n)%q%qc,  & 
+        call da_stats_calculate( n, 0, oi%sonde_sfc(n)%q%qc,  & 
                               re%sonde_sfc(n)%q, nq, & 
                               sonde_sfc%minimum%q, sonde_sfc%maximum%q, &
                               sonde_sfc%average%q, sonde_sfc%rms_err%q )
@@ -95,7 +95,7 @@ SUBROUTINE da_ao_stats_sonde_sfc( stats_unit, oi, re )
     END IF
   END IF
 
-END SUBROUTINE da_ao_stats_sonde_sfc
+end subroutine da_ao_stats_sonde_sfc
 
 
 

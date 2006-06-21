@@ -1,4 +1,4 @@
-SUBROUTINE da_proc_maxmin_combine( n, max, min )
+subroutine da_proc_maxmin_combine( n, max, min )
 
 !------------------------------------------------------------------------------
 !  PURPOSE: Do MPI reduction operations across processors to get the minimum
@@ -110,5 +110,5 @@ SUBROUTINE da_proc_maxmin_combine( n, max, min )
    RETURN
 #endif
 
-END SUBROUTINE da_proc_maxmin_combine
+end subroutine da_proc_maxmin_combine
 

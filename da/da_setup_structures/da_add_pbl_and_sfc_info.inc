@@ -1,4 +1,4 @@
-SUBROUTINE da_add_pbl_and_sfc_info( xp, xb, xbx )
+subroutine da_add_pbl_and_sfc_info( xp, xb, xbx )
 
    !------------------------------------------------------------------------------
    !  PURPOSE: Updates PBL and Surface parameters information for background field 
@@ -19,7 +19,7 @@ SUBROUTINE da_add_pbl_and_sfc_info( xp, xb, xbx )
    REAL                               :: tpw,alw,zrhom,htpw
    REAL                               :: dum1
 
-   IF (trace_use) CALL da_trace_entry("da_add_pbl_and_sfc_info")
+   IF (trace_use) call da_trace_entry("da_add_pbl_and_sfc_info")
 
    ! Set xb array range indices for processor subdomain.
    is = xp%its
@@ -75,7 +75,7 @@ SUBROUTINE da_add_pbl_and_sfc_info( xp, xb, xbx )
    !    end do
    ! end do
 
-   CALL da_integrat_dz(xb)
+   call da_integrat_dz(xb)
 
    !---------------------------------------------------------------------------
    ! [5.0] Calculate Roughness length 
@@ -90,7 +90,7 @@ SUBROUTINE da_add_pbl_and_sfc_info( xp, xb, xbx )
 
    do j=js,je
       do i=is,ie
-         CALL da_transform_xtoseasfcwind( xb%u(i,j,ks),xb%v(i,j,ks), &
+         call da_transform_xtoseasfcwind( xb%u(i,j,ks),xb%v(i,j,ks), &
                                        xb%speed(i,j),xb%h(i,j,ks)  )
       enddo
    enddo
@@ -150,6 +150,6 @@ SUBROUTINE da_add_pbl_and_sfc_info( xp, xb, xbx )
       enddo
    enddo
 
-   IF (trace_use) CALL da_trace_exit("da_add_pbl_and_sfc_info")
+   IF (trace_use) call da_trace_exit("da_add_pbl_and_sfc_info")
 
-END SUBROUTINE da_add_pbl_and_sfc_info
+end subroutine da_add_pbl_and_sfc_info

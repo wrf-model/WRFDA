@@ -1,8 +1,8 @@
-SUBROUTINE DA_Transform_XToSeaSfcWind_Adj( xa, xb )
+subroutine da_transform_xtoseasfcwind_adj( xa, xb )
 
-!------------------------------------------------------------------------------!
-!  Convert (U-V in m/s) components into wind speed (Speed in m/s)
-!------------------------------------------------------------------------------!
+   !-------------------------------------------------------------------------
+   ! Convert (U-V in m/s) components into wind speed (Speed in m/s)
+   !-------------------------------------------------------------------------
 
    IMPLICIT NONE
 
@@ -12,12 +12,10 @@ SUBROUTINE DA_Transform_XToSeaSfcWind_Adj( xa, xb )
    real :: const, rgh_fac, var
    integer :: i, j, k, is, js, ie, je
 
-!------------------------------------------------------------------------------!
+   if (trace_use) call da_trace_entry("da_transform_xtoseasfcwind_adj")
 
    const = log(10./0.0001)
    k = xb%kts
-
-!------------------------------------------------------------------------
 
    is = xb%its
    js = xb%jts
@@ -39,18 +37,19 @@ SUBROUTINE DA_Transform_XToSeaSfcWind_Adj( xa, xb )
       if ( je > xb%jde ) je = xb%jde
    endif
 
-!------------------------------------------------------------------------
 
    do j=js, je
-   do i=is, ie
-      rgh_fac = const/log(xb%h(i,j,k)/0.0001) ! roughness = 0.0001
+      do i=is, ie
+         rgh_fac = const/log(xb%h(i,j,k)/0.0001) ! roughness = 0.0001
 
-      var = rgh_fac*rgh_fac/xb%speed(i,j)
+         var = rgh_fac*rgh_fac/xb%speed(i,j)
 
-      xa%u(i,j,k)=xa%u(i,j,k)+var*xa%speed(i,j)*xb%u(i,j,k)
-      xa%v(i,j,k)=xa%v(i,j,k)+var*xa%speed(i,j)*xb%v(i,j,k)
+         xa%u(i,j,k)=xa%u(i,j,k)+var*xa%speed(i,j)*xb%u(i,j,k)
+         xa%v(i,j,k)=xa%v(i,j,k)+var*xa%speed(i,j)*xb%v(i,j,k)
+      enddo
    enddo
-   enddo
 
-END SUBROUTINE DA_Transform_XToSeaSfcWind_Adj
+   if (trace_use) call da_trace_exit("da_transform_xtoseasfcwind_adj")
+
+end subroutine da_transform_xtoseasfcwind_adj
 

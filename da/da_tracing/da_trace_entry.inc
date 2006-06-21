@@ -1,6 +1,6 @@
 ! Trace entry point to subroutine
 
-SUBROUTINE da_trace_entry( &
+subroutine da_trace_entry( &
    Name, &                       ! in
    Message, &                    ! in, optional
    Messages, &                   ! in, optional
@@ -38,9 +38,9 @@ SUBROUTINE da_trace_entry( &
 
    ! Stop the clock
 
-   CALL CPU_TIME(CPUTime1)
+   call CPU_TIME(CPUTime1)
 
-   CALL SYSTEM_CLOCK( &
+   call SYSTEM_CLOCK( &
       COUNT=Count)
 
    !-----------------------------------------------------------------------
@@ -98,7 +98,7 @@ SUBROUTINE da_trace_entry( &
    IF (NewRoutine) THEN
       ! New subroutine entered
       IF( NoRoutines >= MaxNoRoutines )THEN ! too many to trace
-          CALL wrf_error(__FILE__,__LINE__, &
+          call wrf_error(__FILE__,__LINE__, &
              "Too many routines. Not timing " // Name)
 
          !All the timings etc are put instead to the calling routine,
@@ -122,7 +122,7 @@ SUBROUTINE da_trace_entry( &
    CalledBy(Pointer)=OldPointer
 
    IF (trace_memory) THEN
-      CALL da_memory( &
+      call da_memory( &
          TotalSpace)
       EntryHeap(Pointer) = TotalSpace
       LastSpace = TotalSpace
@@ -156,7 +156,7 @@ SUBROUTINE da_trace_entry( &
                TRIM(Name),TRIM(Name)
          END IF
          IF (IOStatus /= 0) THEN
-            CALL wrf_error(__FILE__,__LINE__, &
+            call wrf_error(__FILE__,__LINE__, &
                "Cannot write to trace file for "//TRIM(Name))
          END IF
 
@@ -164,7 +164,7 @@ SUBROUTINE da_trace_entry( &
             WRITE (UNIT=trace_unit, FMT='(A," ",A)', IOSTAT=IOStatus) &
                pad(1:TraceDepth*TraceIndentAmount),TRIM(Message)
             IF (IOStatus .NE. 0) THEN
-               CALL wrf_error(__FILE__,__LINE__, &
+               call wrf_error(__FILE__,__LINE__, &
                   "Cannot write to trace file for "//TRIM(Name))
             END IF
          END IF
@@ -174,7 +174,7 @@ SUBROUTINE da_trace_entry( &
                WRITE (UNIT=trace_unit, FMT='(A," ",A)', IOSTAT=IOStatus) &
                   pad(1:TraceDepth*TraceIndentAmount),TRIM(Messages(Loop))
                IF (IOStatus .NE. 0) THEN
-                  CALL wrf_error(__FILE__,__LINE__, &
+                  call wrf_error(__FILE__,__LINE__, &
                      "Cannot write to trace file for "//TRIM(Name))
                END IF
             END DO ! Loop
@@ -185,10 +185,10 @@ SUBROUTINE da_trace_entry( &
 
    TraceDepth=TraceDepth+1
 
-   CALL SYSTEM_CLOCK( &
+   call SYSTEM_CLOCK( &
       COUNT=Count)
 
-   CALL CPU_TIME(CPUTime1)
+   call CPU_TIME(CPUTime1)
 
    ! set the start elapsed and CPU time both locally and generally
 
@@ -198,7 +198,7 @@ SUBROUTINE da_trace_entry( &
    CPUTimeStart(Pointer) = CPUTime1
    CPUTimeLocalStart     = CPUTime1
 
-   ! CALL FLUSH(trace_unit)
+   ! call FLUSH(trace_unit)
 
    RETURN
-END SUBROUTINE da_trace_entry
+end subroutine da_trace_entry

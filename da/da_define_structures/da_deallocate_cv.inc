@@ -1,4 +1,4 @@
-SUBROUTINE da_deallocate_cv( cv )
+subroutine da_deallocate_cv( cv )
 
 !------------------------------------------------------------------------------
 !  PURPOSE: Allocate components of control variable.
@@ -14,7 +14,7 @@ SUBROUTINE da_deallocate_cv( cv )
 
    TYPE (cv_type), INTENT(INOUT)        :: cv     ! Control variable structure.
 
-   IF (trace_use) CALL da_trace_entry("da_deallocate_cv")
+   IF (trace_use) call da_trace_entry("da_deallocate_cv")
 
    
 !------------------------------------------------------------------------------
@@ -23,7 +23,7 @@ SUBROUTINE da_deallocate_cv( cv )
 
    DEALLOCATE ( cv % array )
 
-   IF (trace_use) CALL da_trace_exit("da_deallocate_cv")
+   IF (trace_use) call da_trace_exit("da_deallocate_cv")
    
-END SUBROUTINE da_deallocate_cv
+end subroutine da_deallocate_cv
 

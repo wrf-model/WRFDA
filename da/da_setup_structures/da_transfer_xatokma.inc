@@ -1,4 +1,4 @@
-SUBROUTINE da_transfer_xatokma( xbx, grid, &
+subroutine da_transfer_xatokma( xbx, grid, &
 !
 #include "em_dummy_args.inc"
 !
@@ -27,7 +27,7 @@ SUBROUTINE da_transfer_xatokma( xbx, grid, &
    real    :: sdmd, s1md
    real    :: PU, PD, coeff
 
-   IF (trace_use) CALL da_trace_entry("da_transfer_xatokma")
+   IF (trace_use) call da_trace_entry("da_transfer_xatokma")
 
 !---------------------------------------------------------------------------
 !--SET ARRAY RANGE INDICES FOR PROCESSOR SUBDOMAIN.
@@ -90,7 +90,7 @@ SUBROUTINE da_transfer_xatokma( xbx, grid, &
       enddo
    enddo
 
-   IF (trace_use) CALL da_trace_exit("da_transfer_xatokma")
+   IF (trace_use) call da_trace_exit("da_transfer_xatokma")
 
 
-END SUBROUTINE da_transfer_xatokma
+end subroutine da_transfer_xatokma

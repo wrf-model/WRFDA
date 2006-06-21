@@ -1,4 +1,4 @@
-SUBROUTINE da_trace_report
+subroutine da_trace_report
 
    IMPLICIT NONE
 
@@ -44,15 +44,15 @@ SUBROUTINE da_trace_report
    ! start of code
    !==========================================================================
 
-   CALL SYSTEM_CLOCK (COUNT=temp)
+   call SYSTEM_CLOCK (COUNT=temp)
 
    TotalElapsedTime=temp-BaseElapsedTime ! on PE 0
 
-   CALL CPU_TIME(TempCpuTime)
+   call CPU_TIME(TempCpuTime)
 
    TotalCPUTime(1) = TempCpuTime - BaseCPUTime
 
-   CALL SYSTEM_CLOCK( &
+   call SYSTEM_CLOCK( &
       COUNT_RATE=CountRate)
 
    ! Ensure the lists from each PE match. Use the routine list from the 
@@ -67,14 +67,14 @@ SUBROUTINE da_trace_report
    END IF
 
 #ifdef DM_PARALLEL
-   CALL da_proc_sum_int(MasterNoRoutines)
+   call da_proc_sum_int(MasterNoRoutines)
    ! Only PE 0 knows the result
 
-   CALL MPI_BCAST(MasterTimerNames(1:MaxNoRoutines), &
+   call MPI_BCAST(MasterTimerNames(1:MaxNoRoutines), &
                   TraceNameLen*MaxNoRoutines, &
                   MPI_CHARACTER,trace_pe, MPI_COMM_WORLD,istat)
 
-!   CALL GC_CBCAST(1001,TraceNameLen*MasterNoRoutines,0,nproc,istat, &
+!   call GC_CBCAST(1001,TraceNameLen*MasterNoRoutines,0,nproc,istat, &
 !      MasterTimerNames(1:MasterNoRoutines))  
 #endif
 
@@ -101,10 +101,10 @@ SUBROUTINE da_trace_report
 
 #ifdef DM_PARALLEL
    DO i=0,nproc-1
-      CALL da_proc_sum_real(MaxNoRoutines,MasterElapsedTime(i,:))
-      CALL da_proc_sum_real(MaxNoRoutines,MasterCPUTime(i,:))
-      CALL da_proc_sum_real(MaxNoRoutines,MasterElapsedTimeLocal(i,:))
-      CALL da_proc_sum_real(MaxNoRoutines,MasterCPUTimeLocal(i,:))
+      call da_proc_sum_real(MaxNoRoutines,MasterElapsedTime(i,:))
+      call da_proc_sum_real(MaxNoRoutines,MasterCPUTime(i,:))
+      call da_proc_sum_real(MaxNoRoutines,MasterElapsedTimeLocal(i,:))
+      call da_proc_sum_real(MaxNoRoutines,MasterCPUTimeLocal(i,:))
    END DO
 #endif
 
@@ -120,7 +120,7 @@ SUBROUTINE da_trace_report
 
       ALLOCATE (Index(MasterNoRoutines))
 
-      CALL da_trace_real_sort(rtemp1,MasterNoRoutines,index)
+      call da_trace_real_sort(rtemp1,MasterNoRoutines,index)
 
       DO j=1,MasterNoRoutines
          OverallElapsedTime(j)=SUM(MasterElapsedTimeLocal(:,j))
@@ -242,7 +242,7 @@ SUBROUTINE da_trace_report
         rtemp1(j)=SUM(MasterElapsedTime(:,j))
       END DO
 
-      CALL da_trace_real_sort(rtemp1,MasterNoRoutines,index)
+      call da_trace_real_sort(rtemp1,MasterNoRoutines,index)
 
       DO j=1,MasterNoRoutines
          OverallElapsedTime(j)=SUM(MasterElapsedTime(:,j))
@@ -350,7 +350,7 @@ SUBROUTINE da_trace_report
 #ifdef DM_PARALLEL
       DO i=0,nproc-1
          DO j=1,MaxNoRoutines
-            CALL da_proc_sum_int(MasterMaxHeap(i,j))
+            call da_proc_sum_int(MasterMaxHeap(i,j))
          END DO
       END DO
 #endif
@@ -360,7 +360,7 @@ SUBROUTINE da_trace_report
             itemp1(j)=MAXVAL(MasterMaxHeap(:,j))
          END DO
 
-         CALL da_trace_int_sort(itemp1,MasterNoRoutines,index)
+         call da_trace_int_sort(itemp1,MasterNoRoutines,index)
 
          WRITE (UNIT=trace_unit,FMT='("<hr><a name=memory><h2>Maximum memory usage for routines</h2></a>")')
          WRITE (UNIT=trace_unit,FMT='("<TABLE BORDER>")')
@@ -387,4 +387,4 @@ SUBROUTINE da_trace_report
       DEALLOCATE(index)
    END IF
 
-END SUBROUTINE da_trace_report
+end subroutine da_trace_report

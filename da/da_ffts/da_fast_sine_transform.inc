@@ -163,10 +163,10 @@ Implicit none
       LA=LA/IFAC
       IERR=-1
       IF (IGO.EQ.+1) THEN
-        CALL da_qpassm(WORK,WORK(IFAC*LA+1),A(IA),A(LA*INC+IA), &
+        call da_qpassm(WORK,WORK(IFAC*LA+1),A(IA),A(LA*INC+IA), &
                     TRIGS,1,INC,NX,JUMP,NVEX,N,IFAC,LA,IERR)
       ELSE IF (IGO.EQ.-1) THEN
-        CALL da_qpassm(A(IA),A(IFAC*LA*INC+IA),WORK,WORK(LA+1), &
+        call da_qpassm(A(IA),A(IFAC*LA*INC+IA),WORK,WORK(LA+1), &
                     TRIGS,INC,1,JUMP,NX,NVEX,N,IFAC,LA,IERR)
       ENDIF
       IF (IERR.NE.0) GO TO 500

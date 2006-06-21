@@ -1,4 +1,4 @@
-SUBROUTINE da_transfer_xatowrf( xbx, grid, &
+subroutine da_transfer_xatowrf( xbx, grid, &
 !
 #include "em_dummy_args.inc"
 !
@@ -47,7 +47,7 @@ SUBROUTINE da_transfer_xatowrf( xbx, grid, &
    REAL    :: t_full  , p_full, rho_full, q_full, ph_full , ph_xb_hd, &
               qvf1, qvf2, qvf1_b, qvf2_b
 
-   IF (trace_use) CALL da_trace_entry("da_transfer_xatowrf")
+   IF (trace_use) call da_trace_entry("da_transfer_xatowrf")
 
 !---------------------------------------------------------------------------
 !--SET ARRAY RANGE INDICES FOR PROCESSOR SUBDOMAIN.
@@ -144,7 +144,7 @@ SUBROUTINE da_transfer_xatowrf( xbx, grid, &
 
    if ( check_rh == 2 ) THEN
 !     Shu-Hua~s TPW conservation:
-      CALL da_check_rh( xb, xa, xp )
+      call da_check_rh( xb, xa, xp )
    else if ( check_rh == 1 ) then
 !     Simple resetting to max/min values:
       call da_check_rh_simple( xb, xa, xp )
@@ -420,8 +420,8 @@ SUBROUTINE da_transfer_xatowrf( xbx, grid, &
      enddo
    endif
 
-   IF (trace_use) CALL da_trace_exit("da_transfer_xatowrf")
+   IF (trace_use) call da_trace_exit("da_transfer_xatowrf")
 
 
-END SUBROUTINE da_transfer_xatowrf
+end subroutine da_transfer_xatowrf
 

@@ -1,4 +1,4 @@
-SUBROUTINE da_print_stats_pseudo( stats_unit, nu, nv, nt, np, nq, pseudo )
+subroutine da_print_stats_pseudo( stats_unit, nu, nv, nt, np, nq, pseudo )
 
    implicit none
 
@@ -38,4 +38,4 @@ SUBROUTINE da_print_stats_pseudo( stats_unit, nu, nv, nt, np, nq, pseudo )
                       sqrt(pseudo%rms_err%p/real(np)), &
                       sqrt(pseudo%rms_err%q/real(nq))
 
-END SUBROUTINE da_print_stats_pseudo
+end subroutine da_print_stats_pseudo

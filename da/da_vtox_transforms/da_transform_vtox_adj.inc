@@ -27,7 +27,7 @@ subroutine da_transform_vtox_adj( cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv, 
    real, dimension(xb%kms:xb%kme) :: p, mr_a, mr_b
    real    :: PU, PD, coeff
 
-  IF (trace_use) CALL da_trace_entry("da_transform_vtox_adj")
+  IF (trace_use) call da_trace_entry("da_transform_vtox_adj")
 
 
 !-------------------------------------------------------------------------
@@ -115,7 +115,7 @@ subroutine da_transform_vtox_adj( cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv, 
          if ( use_ssmt1obs .or. use_ssmt2obs .or. &
               Use_SsmiTbObs .or. Use_SsmiRetrievalObs ) then
          if ( global) then
-            CALL wrf_error(__FILE__,__LINE__, &
+            call wrf_error(__FILE__,__LINE__, &
             "xb%speed is not available, see da_transfer_kmatoxb.inc")
          end if
             call da_transform_xtoseasfcwind_adj( xa, xb )
@@ -244,7 +244,7 @@ subroutine da_transform_vtox_adj( cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv, 
                                    its,ite, jts,jte, kts,kte )
    end if
 
-  IF (trace_use) CALL da_trace_exit("da_transform_vtox_adj")
+  IF (trace_use) call da_trace_exit("da_transform_vtox_adj")
 
 
 end subroutine da_transform_vtox_adj

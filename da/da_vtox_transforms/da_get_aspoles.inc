@@ -1,4 +1,4 @@
-SUBROUTINE da_get_aspoles(x,              &
+subroutine da_get_aspoles(x,              &
           ids, ide, jds, jde, kds, kde,  &
           ims, ime, jms, jme, kms, kme,  &
           its, ite, jts, jte, kts, kte   )
@@ -39,5 +39,5 @@ SUBROUTINE da_get_aspoles(x,              &
       endif
    end do
 
-END SUBROUTINE da_get_aspoles
+end subroutine da_get_aspoles
 

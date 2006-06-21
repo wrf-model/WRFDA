@@ -1,4 +1,4 @@
-SUBROUTINE da_autoc_adj(DT,SCR2,PRC,SCR29,PRC9,kts,kte)
+subroutine da_autoc_adj(DT,SCR2,PRC,SCR29,PRC9,kts,kte)
 
 !  Auto-conversion
 
@@ -19,4 +19,4 @@ SUBROUTINE da_autoc_adj(DT,SCR2,PRC,SCR29,PRC9,kts,kte)
 
    ENDDO
 
-END SUBROUTINE da_autoc_adj
+end subroutine da_autoc_adj

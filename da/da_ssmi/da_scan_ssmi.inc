@@ -1,4 +1,4 @@
-SUBROUTINE da_scan_ssmi (iunit, ob, xp, filename)
+subroutine da_scan_ssmi (iunit, ob, xp, filename)
 
 !-----------------------------------------------------------------------------!
 ! Read the header of a MM5 3D-VAR 2.0 GTS observation file
@@ -232,7 +232,7 @@ head_line_2:  DO
 
                ipass = .false.
                iprecip = 0
-                CALL filter(tb19v%inv, tb19h%inv, tb22v%inv, tb37v%inv, &
+                call filter(tb19v%inv, tb19h%inv, tb22v%inv, tb37v%inv, &
                             tb37h%inv, tb85v%inv, tb85h%inv, ipass, iprecip, &
                             info%lat)
                if (iprecip == 1) then
@@ -266,5 +266,5 @@ head_line_2:  DO
    ob%ob_numb(ob%current_ob_time)%ssmi_retrieval = ob%num_ssmi_retrieval
    ob%ob_numb(ob%current_ob_time)%ssmi_tb        = ob%num_ssmi_tb
 
-END SUBROUTINE da_scan_ssmi
+end subroutine da_scan_ssmi
 

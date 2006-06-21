@@ -17,7 +17,7 @@
 
    integer                          :: mz   ! Vertical truncation.
 
-   IF (trace_use) CALL da_trace_entry("da_transform_vtovv_adj")
+   IF (trace_use) call da_trace_entry("da_transform_vtovv_adj")
 
 !-------------------------------------------------------------------------
 !  [2.0] Perform VToVV Transform:
@@ -27,7 +27,7 @@
 
    mz = be % v1 % mz
    IF ( mz > 0 ) then
-      CALL da_transform_through_rf_adj( mz, xb % grid_box_area, be % v1 % rf_alpha,&
+      call da_transform_through_rf_adj( mz, xb % grid_box_area, be % v1 % rf_alpha,&
                                     be % v1 % val, xp, vv % v1, &
                                     ids,ide, jds,jde, kds,kde,  &
                                     ims,ime, jms,jme, kms,kme,  &
@@ -38,7 +38,7 @@
 
    mz = be % v2 % mz
    IF ( mz > 0 ) then
-      CALL da_transform_through_rf_adj( mz, xb % grid_box_area, be % v2 % rf_alpha,&
+      call da_transform_through_rf_adj( mz, xb % grid_box_area, be % v2 % rf_alpha,&
                                     be % v2 % val, xp, vv % v2, &
                                     ids,ide, jds,jde, kds,kde,  &
                                     ims,ime, jms,jme, kms,kme,  &
@@ -49,7 +49,7 @@
 
    mz = be % v3 % mz
    IF ( mz > 0 ) then
-      CALL da_transform_through_rf_adj( mz, xb % grid_box_area, be % v3 % rf_alpha,&
+      call da_transform_through_rf_adj( mz, xb % grid_box_area, be % v3 % rf_alpha,&
                                     be % v3 % val, xp, vv % v3, &
                                     ids,ide, jds,jde, kds,kde,  &
                                     ims,ime, jms,jme, kms,kme,  &
@@ -60,7 +60,7 @@
       
    mz = be % v4 % mz
    IF ( mz > 0 ) then
-      CALL da_transform_through_rf_adj( mz, xb % grid_box_area, be % v4 % rf_alpha,&
+      call da_transform_through_rf_adj( mz, xb % grid_box_area, be % v4 % rf_alpha,&
                                     be % v4 % val, xp, vv % v4, &
                                     ids,ide, jds,jde, kds,kde,  &
                                     ims,ime, jms,jme, kms,kme,  &
@@ -71,7 +71,7 @@
 
    mz = be % v5 % mz
    IF ( mz > 0 ) then
-      CALL da_transform_through_rf_adj( mz, xb % grid_box_area, be % v5 % rf_alpha,&
+      call da_transform_through_rf_adj( mz, xb % grid_box_area, be % v5 % rf_alpha,&
                                     be % v5 % val, xp, vv % v5, &
                                     ids,ide, jds,jde, kds,kde,  &
                                     ims,ime, jms,jme, kms,kme,  &
@@ -82,7 +82,7 @@
 
    mz = be % alpha % mz
    IF ( mz > 0 ) then
-      CALL da_transform_through_rf_adj( mz, xb % grid_box_area, be % alpha % rf_alpha,&
+      call da_transform_through_rf_adj( mz, xb % grid_box_area, be % alpha % rf_alpha,&
                                         be % alpha % val, xp, vv % alpha, &
                                         ids,ide, jds,jde, kds,kde,  &
                                         ims,ime, jms,jme, kms,kme,  &
@@ -97,7 +97,7 @@
                   (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%ne /), &
                   cv_size, cv )
 
-   IF (trace_use) CALL da_trace_exit("da_transform_vtovv_adj")
+   IF (trace_use) call da_trace_exit("da_transform_vtovv_adj")
 
 
 END subroutine da_transform_vtovv_adj

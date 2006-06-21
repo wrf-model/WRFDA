@@ -1,4 +1,4 @@
-SUBROUTINE da_print_stats_geoamv( stats_unit, nu, nv, geoamv )
+subroutine da_print_stats_geoamv( stats_unit, nu, nv, geoamv )
 
    implicit none
 
@@ -24,5 +24,5 @@ SUBROUTINE da_print_stats_geoamv( stats_unit, nu, nv, geoamv )
       '    RMSE     : ', sqrt(geoamv%rms_err%u/real(nu)), &
                          sqrt(geoamv%rms_err%v/real(nv))
 
-END SUBROUTINE da_print_stats_geoamv
+end subroutine da_print_stats_geoamv
 

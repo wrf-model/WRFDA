@@ -1,4 +1,4 @@
-SUBROUTINE da_oi_stats_ssmi ( stats_unit, oi )
+subroutine da_oi_stats_ssmi ( stats_unit, oi )
 
    IMPLICIT NONE
 
@@ -12,12 +12,12 @@ SUBROUTINE da_oi_stats_ssmi ( stats_unit, oi )
 
    IF ( num_ssmi_tb .gt. 0 ) THEN
 
-           CALL da_oi_stats_ssmi_tb ( stats_unit, oi )
+           call da_oi_stats_ssmi_tb ( stats_unit, oi )
 
    ELSE IF ( num_ssmi_retrieval .gt. 0) THEN
 
-           CALL da_oi_stats_ssmi_rv ( stats_unit, oi )
+           call da_oi_stats_ssmi_rv ( stats_unit, oi )
 
    ENDIF
 
-END SUBROUTINE da_oi_stats_ssmi
+end subroutine da_oi_stats_ssmi

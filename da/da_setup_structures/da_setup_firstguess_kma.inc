@@ -1,4 +1,4 @@
-SUBROUTINE da_setup_firstguess_kma( xbx, grid, &
+subroutine da_setup_firstguess_kma( xbx, grid, &
 #include "em_dummy_args.inc"
                               )
 
@@ -18,7 +18,7 @@ SUBROUTINE da_setup_firstguess_kma( xbx, grid, &
    integer           :: is, ie, js, je, ks, ke
    integer           :: max_wavenumber
 
-   IF (trace_use) CALL da_trace_entry("da_setup_firstguess_kma")
+   IF (trace_use) call da_trace_entry("da_setup_firstguess_kma")
 
    is = xp % its
    ie = xp % ite
@@ -88,11 +88,11 @@ SUBROUTINE da_setup_firstguess_kma( xbx, grid, &
    max_wavenumber = xbx%ni/2-1
    xbx % alp_size = (xbx%nj+1)*(max_wavenumber+1)*(max_wavenumber+2)/4
 
-   CALL da_transfer_kmatoxb( xbx, grid, &
+   call da_transfer_kmatoxb( xbx, grid, &
 #include "em_dummy_args.inc"
                              )
 
-   IF (trace_use) CALL da_trace_exit("da_setup_firstguess_kma")
+   IF (trace_use) call da_trace_exit("da_setup_firstguess_kma")
 
-END SUBROUTINE da_setup_firstguess_kma
+end subroutine da_setup_firstguess_kma
 

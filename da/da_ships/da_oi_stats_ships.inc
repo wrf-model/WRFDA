@@ -1,4 +1,4 @@
-SUBROUTINE da_oi_stats_ships ( stats_unit, oi )
+subroutine da_oi_stats_ships ( stats_unit, oi )
 
   IMPLICIT NONE
 
@@ -33,27 +33,27 @@ SUBROUTINE da_oi_stats_ships ( stats_unit, oi )
   IF ( oi%num_ships > 0 ) THEN
     DO n=1, oi%num_ships
       if( oi%ships(n)%loc%proc_domain ) then
-        CALL da_stats_calculate( oi%ships(n)%loc%obs_global_index, &
+        call da_stats_calculate( oi%ships(n)%loc%obs_global_index, &
                               0, oi%ships(n)%u%qc, &
                               oi%ships(n)%u%inv, nu, &
                               ships%minimum%u, ships%maximum%u, &
                               ships%average%u, ships%rms_err%u)
-        CALL da_stats_calculate( oi%ships(n)%loc%obs_global_index, &
+        call da_stats_calculate( oi%ships(n)%loc%obs_global_index, &
                               0, oi%ships(n)%v%qc, &
                               oi%ships(n)%v%inv, nv, &
                               ships%minimum%v, ships%maximum%v, &
                               ships%average%v, ships%rms_err%v)
-        CALL da_stats_calculate( oi%ships(n)%loc%obs_global_index, &
+        call da_stats_calculate( oi%ships(n)%loc%obs_global_index, &
                               0, oi%ships(n)%t%qc, &
                               oi%ships(n)%t%inv, nt, &
                               ships%minimum%t, ships%maximum%t, &
                               ships%average%t, ships%rms_err%t)
-        CALL da_stats_calculate( oi%ships(n)%loc%obs_global_index, &
+        call da_stats_calculate( oi%ships(n)%loc%obs_global_index, &
                               0, oi%ships(n)%p%qc, &
                               oi%ships(n)%p%inv, np, &
                               ships%minimum%p, ships%maximum%p, &
                               ships%average%p, ships%rms_err%p)
-        CALL da_stats_calculate( oi%ships(n)%loc%obs_global_index, &
+        call da_stats_calculate( oi%ships(n)%loc%obs_global_index, &
                               0, oi%ships(n)%q%qc, &
                               oi%ships(n)%q%inv, nq, &
                               ships%minimum%q, ships%maximum%q, &
@@ -94,8 +94,8 @@ SUBROUTINE da_oi_stats_ships ( stats_unit, oi )
   IF ( wrf_dm_on_monitor() ) THEN
     IF (nu /= 0 .or. nv /= 0 .or. nt /= 0 .or. np /= 0 .or. nq /= 0 ) THEN
       write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of OI for ships'
-      CALL da_print_stats_ships( stats_unit, nu, nv, nt, np, nq, ships )
+      call da_print_stats_ships( stats_unit, nu, nv, nt, np, nq, ships )
     END IF
   END IF
 
-END SUBROUTINE da_oi_stats_ships
+end subroutine da_oi_stats_ships

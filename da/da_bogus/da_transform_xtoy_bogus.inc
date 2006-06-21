@@ -1,4 +1,4 @@
-SUBROUTINE da_transform_xtoy_bogus (xa, xb, iv, xp, y )
+subroutine da_transform_xtoy_bogus (xa, xb, iv, xp, y )
 
   !---------------------------------------------------------------------
   !  This subroutine is the linearized bogus observation operators.
@@ -100,5 +100,5 @@ SUBROUTINE da_transform_xtoy_bogus (xa, xb, iv, xp, y )
     end do
   ENDIF
 
-END SUBROUTINE da_transform_xtoy_bogus
+end subroutine da_transform_xtoy_bogus
 

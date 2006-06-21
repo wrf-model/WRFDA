@@ -1,4 +1,4 @@
-SUBROUTINE DA_Calculate_GradY_PolarAMV( iv, re, jo_grad_y )
+subroutine DA_Calculate_GradY_PolarAMV( iv, re, jo_grad_y )
 !-------------------------------------------------------------------------
 !  HISTORY: 
 !
@@ -42,4 +42,4 @@ SUBROUTINE DA_Calculate_GradY_PolarAMV( iv, re, jo_grad_y )
 
    END IF
 
-END SUBROUTINE DA_Calculate_GradY_PolarAMV
+end subroutine DA_Calculate_GradY_PolarAMV

@@ -1,4 +1,4 @@
-SUBROUTINE DA_Mini_Info_print(print_unit, oi_each, re_each, gr_each, k)
+subroutine DA_Mini_Info_print(print_unit, oi_each, re_each, gr_each, k)
 
    implicit none
 
@@ -19,5 +19,5 @@ SUBROUTINE DA_Mini_Info_print(print_unit, oi_each, re_each, gr_each, k)
         ' grad ', k, &
         gr_each%u, gr_each%v, gr_each%t, gr_each%p, gr_each%q
 
-END SUBROUTINE DA_Mini_Info_print
+end subroutine DA_Mini_Info_print
 

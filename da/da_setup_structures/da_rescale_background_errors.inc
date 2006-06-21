@@ -1,4 +1,4 @@
-SUBROUTINE da_rescale_background_errors ( ix, jy, var_scaling, len_scaling, &
+subroutine da_rescale_background_errors ( ix, jy, var_scaling, len_scaling, &
                                           ds, s, be_sub )
 
 !------------------------------------------------------------------------------
@@ -25,7 +25,7 @@ SUBROUTINE da_rescale_background_errors ( ix, jy, var_scaling, len_scaling, &
    INTEGER                          :: m
    REAL, ALLOCATABLE                :: rf_scale_factor(:)! RF rescaling.
 
-   IF (trace_use) CALL da_trace_entry("da_rescale_background_errors")
+   IF (trace_use) call da_trace_entry("da_rescale_background_errors")
 
    
 !-----------------------------------------------------------------------------
@@ -60,7 +60,7 @@ SUBROUTINE da_rescale_background_errors ( ix, jy, var_scaling, len_scaling, &
 
       ALLOCATE( rf_scale_factor(1:mz) )
 
-      CALL da_calculate_rf_factors( s(:), be_sub % rf_alpha(:), &
+      call da_calculate_rf_factors( s(:), be_sub % rf_alpha(:), &
                                     rf_scale_factor(:) )
 
       DO m = 1, mz
@@ -71,8 +71,8 @@ SUBROUTINE da_rescale_background_errors ( ix, jy, var_scaling, len_scaling, &
 
    END IF
 
-   IF (trace_use) CALL da_trace_exit("da_rescale_background_errors")
+   IF (trace_use) call da_trace_exit("da_rescale_background_errors")
 
 
-END SUBROUTINE da_rescale_background_errors
+end subroutine da_rescale_background_errors
 

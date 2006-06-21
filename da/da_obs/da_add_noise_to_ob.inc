@@ -1,4 +1,4 @@
-SUBROUTINE da_add_noise_to_ob( iv, ob )
+subroutine da_add_noise_to_ob( iv, ob )
 !----------------------------------------------------------------------------   
 !  History:
 !
@@ -457,4 +457,4 @@ SUBROUTINE da_add_noise_to_ob( iv, ob )
       END DO
    ENDIF
 
-END SUBROUTINE da_add_noise_to_ob
+end subroutine da_add_noise_to_ob

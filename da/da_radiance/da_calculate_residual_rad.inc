@@ -1,4 +1,4 @@
-SUBROUTINE da_calculate_residual_rad( iv, y, re,                 &
+subroutine da_calculate_residual_rad( iv, y, re,                 &
                                         np_missing, np_bad_data, &
                                         np_obs_used, np_available )
 !------------------------------------------------------------------------------
@@ -52,5 +52,5 @@ SUBROUTINE da_calculate_residual_rad( iv, y, re,                 &
       np_bad_data = np_bad_data + n_obs_bad % rad % num % bad
       np_obs_used = np_obs_used + n_obs_bad % rad % num % use 
    
-END SUBROUTINE da_calculate_residual_rad
+end subroutine da_calculate_residual_rad
 

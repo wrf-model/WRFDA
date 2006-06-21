@@ -1,4 +1,4 @@
-SUBROUTINE DA_Get_Jo_and_GradY_Gpsref( iv, re, jo, jo_grad_y )
+subroutine DA_Get_Jo_and_GradY_Gpsref( iv, re, jo, jo_grad_y )
 
 ! ------------------------------------------------------------------------
 !  Called by DA_Minimisation/da_calculate_jo_and_grady.inc
@@ -48,5 +48,5 @@ SUBROUTINE DA_Get_Jo_and_GradY_Gpsref( iv, re, jo, jo_grad_y )
       
    END IF
 
-END SUBROUTINE DA_Get_Jo_and_GradY_Gpsref
+end subroutine DA_Get_Jo_and_GradY_Gpsref
 

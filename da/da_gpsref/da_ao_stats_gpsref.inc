@@ -1,4 +1,4 @@
-SUBROUTINE da_ao_stats_gpsref( stats_unit, oi, re )
+subroutine da_ao_stats_gpsref( stats_unit, oi, re )
 
 ! ----------------------------------------------------------------------
 !  Called by DA_Minimisation/da_write_diagnostics.inc.
@@ -33,7 +33,7 @@ SUBROUTINE da_ao_stats_gpsref( stats_unit, oi, re )
       if( oi%gpsref(n)%loc%proc_domain ) then
 
          do k=1, oi%gpsref(n)%info%levels
-            CALL da_stats_calculate( n, k, oi%GPSRef(n)%ref(k)%qc, & 
+            call da_stats_calculate( n, k, oi%GPSRef(n)%ref(k)%qc, & 
                           re%gpsref(n)%ref(k), ngpsref, &
                           GPSRef%minimum%ref, GPSRef%maximum%ref, &
                           GPSRef%average%ref, GPSRef%rms_err%ref )
@@ -96,5 +96,5 @@ PRINT *,'TEST_COVERAGE_DA_AO_Stats_Gpsref:  sigma_b_0 = ', sigma_b_0
       endif
    END IF
 
-END SUBROUTINE da_ao_stats_gpsref
+end subroutine da_ao_stats_gpsref
 

@@ -1,5 +1,5 @@
 !
-SUBROUTINE da_qc_amsub ( inst, nchan, tb_ob, rad )
+subroutine da_qc_amsub ( inst, nchan, tb_ob, rad )
 !------------------------------------------------------------------------------
 !  PURPOSE: perform quality control for amsub data.
 !
@@ -93,4 +93,4 @@ SUBROUTINE da_qc_amsub ( inst, nchan, tb_ob, rad )
 
    return
 
-END SUBROUTINE da_qc_amsub
+end subroutine da_qc_amsub

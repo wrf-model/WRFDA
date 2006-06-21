@@ -1,4 +1,4 @@
-SUBROUTINE da_evapo(DT,SCR3,SCR5,SCR7,DUM111,DUM41,QV,  &
+subroutine da_evapo(DT,SCR3,SCR5,SCR7,DUM111,DUM41,QV,  &
                  PREC1,PREC2,PRE,kts,kte)
 
 !  Rainwater evaporation
@@ -25,5 +25,5 @@ SUBROUTINE da_evapo(DT,SCR3,SCR5,SCR7,DUM111,DUM41,QV,  &
 
    ENDDO
 
-END SUBROUTINE da_evapo
+end subroutine da_evapo
 

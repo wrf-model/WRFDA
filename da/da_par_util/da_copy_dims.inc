@@ -1,4 +1,4 @@
-SUBROUTINE da_copy_dims(grid, xp, &
+subroutine da_copy_dims(grid, xp, &
                      ids, ide, jds, jde, kds, kde, &
                      ims, ime, jms, jme, kms, kme, &
                      ips, ipe, jps, jpe, kps, kpe )
@@ -189,5 +189,5 @@ SUBROUTINE da_copy_dims(grid, xp, &
            'xp%kpsy =', xp%kpsy, 'xp%kpey=', xp%kpey
    endif
 
-END SUBROUTINE da_copy_dims
+end subroutine da_copy_dims
 

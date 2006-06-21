@@ -1,4 +1,4 @@
-SUBROUTINE da_ao_stats_metar( stats_unit, oi, re )
+subroutine da_ao_stats_metar( stats_unit, oi, re )
 
   IMPLICIT NONE
 
@@ -12,7 +12,7 @@ SUBROUTINE da_ao_stats_metar( stats_unit, oi, re )
 
   LOGICAL, EXTERNAL :: wrf_dm_on_monitor
 
-  IF (trace_use) CALL da_trace_entry("da_ao_stats_metar")
+  IF (trace_use) call da_trace_entry("da_ao_stats_metar")
 
 
   nu = 0
@@ -38,23 +38,23 @@ SUBROUTINE da_ao_stats_metar( stats_unit, oi, re )
   IF ( oi%num_metar > 0 ) THEN
     DO n=1, oi%num_metar
       if( oi%metar(n)%loc%proc_domain ) then
-        CALL da_stats_calculate( n, 0, oi%metar(n)%u%qc, & 
+        call da_stats_calculate( n, 0, oi%metar(n)%u%qc, & 
                               re%metar(n)%u, nu, &
                               metar%minimum%u, metar%maximum%u, &
                               metar%average%u, metar%rms_err%u )
-        CALL da_stats_calculate( n, 0, oi%metar(n)%v%qc, & 
+        call da_stats_calculate( n, 0, oi%metar(n)%v%qc, & 
                               re%metar(n)%v, nv, &
                               metar%minimum%v, metar%maximum%v, &
                               metar%average%v, metar%rms_err%v )
-        CALL da_stats_calculate( n, 0, oi%metar(n)%t%qc, & 
+        call da_stats_calculate( n, 0, oi%metar(n)%t%qc, & 
                               re%metar(n)%t, nt, &
                               metar%minimum%t, metar%maximum%t, &
                               metar%average%t, metar%rms_err%t )
-        CALL da_stats_calculate( n, 0, oi%metar(n)%p%qc, & 
+        call da_stats_calculate( n, 0, oi%metar(n)%p%qc, & 
                               re%metar(n)%p, np, &
                               metar%minimum%p, metar%maximum%p, &
                               metar%average%p, metar%rms_err%p )
-        CALL da_stats_calculate( n, 0, oi%metar(n)%q%qc, & 
+        call da_stats_calculate( n, 0, oi%metar(n)%q%qc, & 
                               re%metar(n)%q, nq, &
                               metar%minimum%q, metar%maximum%q, &
                               metar%average%q, metar%rms_err%q )
@@ -99,8 +99,8 @@ SUBROUTINE da_ao_stats_metar( stats_unit, oi, re )
     END IF
   END IF
 
-  IF (trace_use) CALL da_trace_exit("da_ao_stats_metar")
+  IF (trace_use) call da_trace_exit("da_ao_stats_metar")
 
 
-END SUBROUTINE da_ao_stats_metar
+end subroutine da_ao_stats_metar
 

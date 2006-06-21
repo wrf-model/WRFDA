@@ -6,7 +6,7 @@ subroutine da_calculate_grady( iv, re, jo_grad_y)
    type (y_type),  intent(INOUT) :: re          ! Residual vector (O-A).
    type (y_type),  intent(OUT)   :: jo_grad_y   ! Grad_y(Jo)
 
-   IF (trace_use) CALL da_trace_entry("da_calculate_grady")
+   IF (trace_use) call da_trace_entry("da_calculate_grady")
 
    !----------------------------------------------------------------------
    ! [1.0] Compute components of Grad_y(Jo):
@@ -97,7 +97,7 @@ subroutine da_calculate_grady( iv, re, jo_grad_y)
 
    call da_calculate_grady_rad( iv, re, jo_grad_y)
 
-   IF (trace_use) CALL da_trace_exit("da_calculate_grady")
+   IF (trace_use) call da_trace_exit("da_calculate_grady")
 
 end subroutine da_calculate_grady
 

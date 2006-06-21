@@ -1,4 +1,4 @@
-SUBROUTINE da_sfc_pre_lin (psfcm_prime, psm_prime, tsm_prime, qsm_prime, &
+subroutine da_sfc_pre_lin (psfcm_prime, psm_prime, tsm_prime, qsm_prime, &
                                         psm, tsm, qsm, hsm, ho, to, qvo)
 !-----------------------------------------------------------------------------!
 !
@@ -73,5 +73,5 @@ SUBROUTINE da_sfc_pre_lin (psfcm_prime, psm_prime, tsm_prime, qsm_prime, &
 
       psfcm_prime = exp(arg) *(psm_prime + psm * arg_prime)
 
-END SUBROUTINE da_sfc_pre_lin
+end subroutine da_sfc_pre_lin
 

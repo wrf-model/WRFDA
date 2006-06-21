@@ -1,4 +1,4 @@
-SUBROUTINE DA_Calculate_GradY_Metar( iv, re, jo_grad_y )
+subroutine DA_Calculate_GradY_Metar( iv, re, jo_grad_y )
 
   !-------------------------------------------------------------------------
   !  HISTORY: 
@@ -17,7 +17,7 @@ SUBROUTINE DA_Calculate_GradY_Metar( iv, re, jo_grad_y )
 
   INTEGER                      :: n
 
-  IF (trace_use) CALL da_trace_entry("da_calculate_grady_metar")
+  IF (trace_use) call da_trace_entry("da_calculate_grady_metar")
 
   IF ( iv%num_metar > 0 ) THEN
     DO n=1, iv%num_metar
@@ -42,9 +42,9 @@ SUBROUTINE DA_Calculate_GradY_Metar( iv, re, jo_grad_y )
     END DO
   END IF
 
-  IF (trace_use) CALL da_trace_exit("da_calculate_grady_metar")
+  IF (trace_use) call da_trace_exit("da_calculate_grady_metar")
      
-END SUBROUTINE DA_Calculate_GradY_Metar
+end subroutine DA_Calculate_GradY_Metar
 
 
 

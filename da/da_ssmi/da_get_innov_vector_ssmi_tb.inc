@@ -1,4 +1,4 @@
-SUBROUTINE da_get_innov_vector_ssmi_tb ( it, xb, xp, ob, iv )
+subroutine da_get_innov_vector_ssmi_tb ( it, xb, xp, ob, iv )
 
    IMPLICIT NONE
 
@@ -140,7 +140,7 @@ SUBROUTINE da_get_innov_vector_ssmi_tb ( it, xb, xp, ob, iv )
 !     Perform optional maximum error check:
 !------------------------------------------------------------------------
 
-      IF ( check_max_iv ) CALL da_check_max_iv_ssmi_tb(it, iv % ssmi_tb (n), &
+      IF ( check_max_iv ) call da_check_max_iv_ssmi_tb(it, iv % ssmi_tb (n), &
                                    itb19v, itb19vf, itb19h, itb19hf, &
                                    itb22v, itb22vf,                  &
                                    itb37v, itb37vf, itb37h, itb37hf, &
@@ -163,5 +163,5 @@ SUBROUTINE da_get_innov_vector_ssmi_tb ( it, xb, xp, ob, iv )
 
    ENDIF
 
-END SUBROUTINE da_get_innov_vector_ssmi_tb
+end subroutine da_get_innov_vector_ssmi_tb
 

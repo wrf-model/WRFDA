@@ -1,4 +1,4 @@
-SUBROUTINE da_transform_xtoy_sound ( xa, iv, xp, y )
+subroutine da_transform_xtoy_sound ( xa, iv, xp, y )
 
   IMPLICIT NONE
 
@@ -59,5 +59,5 @@ SUBROUTINE da_transform_xtoy_sound ( xa, iv, xp, y )
     end do
   ENDIF
 
-END SUBROUTINE da_transform_xtoy_sound
+end subroutine da_transform_xtoy_sound
 

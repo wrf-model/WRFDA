@@ -1,4 +1,4 @@
-SUBROUTINE da_ao_stats_ships( stats_unit, oi, re )
+subroutine da_ao_stats_ships( stats_unit, oi, re )
 
    IMPLICIT NONE
 
@@ -36,23 +36,23 @@ SUBROUTINE da_ao_stats_ships( stats_unit, oi, re )
       DO n=1, oi%num_ships
          if( oi%ships(n)%loc%proc_domain ) then
 
-            CALL da_stats_calculate( n, 0, oi%ships(n)%u%qc, & 
+            call da_stats_calculate( n, 0, oi%ships(n)%u%qc, & 
                                   re%ships(n)%u, nu, & 
                                   ships%minimum%u, ships%maximum%u, &
                                   ships%average%u, ships%rms_err%u )
-            CALL da_stats_calculate( n, 0, oi%ships(n)%v%qc, & 
+            call da_stats_calculate( n, 0, oi%ships(n)%v%qc, & 
                                   re%ships(n)%v, nv, & 
                                   ships%minimum%v, ships%maximum%v, &
                                   ships%average%v, ships%rms_err%v )
-            CALL da_stats_calculate( n, 0, oi%ships(n)%t%qc, & 
+            call da_stats_calculate( n, 0, oi%ships(n)%t%qc, & 
                                   re%ships(n)%t, nt, & 
                                   ships%minimum%t, ships%maximum%t, &
                                   ships%average%t, ships%rms_err%t )
-            CALL da_stats_calculate( n, 0, oi%ships(n)%p%qc, & 
+            call da_stats_calculate( n, 0, oi%ships(n)%p%qc, & 
                                   re%ships(n)%p, np, & 
                                   ships%minimum%p, ships%maximum%p, &
                                   ships%average%p, ships%rms_err%p )
-            CALL da_stats_calculate( n, 0, oi%ships(n)%q%qc, & 
+            call da_stats_calculate( n, 0, oi%ships(n)%q%qc, & 
                                   re%ships(n)%q, nq, & 
                                   ships%minimum%q, ships%maximum%q, &
                                   ships%average%q, ships%rms_err%q )
@@ -97,4 +97,4 @@ SUBROUTINE da_ao_stats_ships( stats_unit, oi, re )
       END IF
    END IF
 
-END SUBROUTINE da_ao_stats_ships
+end subroutine da_ao_stats_ships

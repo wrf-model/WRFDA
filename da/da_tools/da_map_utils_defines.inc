@@ -121,7 +121,7 @@
    !   2.  Declare the projection information structure as type(proj_info):
    !         TYPE(proj_info) :: proj
    !   3.  Populate your structure by calling the map_set routine:
-   !         CALL map_set(code,lat1,lon1,knowni,knownj,dx,stdlon,truelat1,truelat2,proj)
+   !         call map_set(code,lat1,lon1,knowni,knownj,dx,stdlon,truelat1,truelat2,proj)
    !       where:
    !         code (input) = one of PROJ_LATLON, PROJ_MERC, PROJ_LC, or PROJ_PS
    !         lat1 (input) = Latitude of grid origin point (i,j)=(1,1) 

@@ -1,4 +1,4 @@
-SUBROUTINE da_free_global_sonde_sfc( iv_glob, re_glob, jo_grad_y_glob )
+subroutine da_free_global_sonde_sfc( iv_glob, re_glob, jo_grad_y_glob )
 
     IMPLICIT NONE
 
@@ -11,4 +11,4 @@ SUBROUTINE da_free_global_sonde_sfc( iv_glob, re_glob, jo_grad_y_glob )
     DEALLOCATE( re_glob%sonde_sfc )
     DEALLOCATE( jo_grad_y_glob%sonde_sfc )
     RETURN
-END SUBROUTINE da_free_global_sonde_sfc
+end subroutine da_free_global_sonde_sfc

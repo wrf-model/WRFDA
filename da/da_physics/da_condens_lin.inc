@@ -1,4 +1,4 @@
-SUBROUTINE da_condens_lin(DT,SCR31,SCR42,SCR71,DUM31,PRD,  &
+subroutine da_condens_lin(DT,SCR31,SCR42,SCR71,DUM31,PRD,  &
                    QVT,QCT,QRT,TTT,P_B,T_B,QV_B,QCW_B,QRN_B,  &
                    SCR319,SCR429,SCR719,DUM319,PRD9,  &
                    QVT9,QCT9,QRT9,TTT9,P_A,T_A,QV_A,QCW_A,QRN_A,kts,kte)
@@ -84,4 +84,4 @@ SUBROUTINE da_condens_lin(DT,SCR31,SCR42,SCR71,DUM31,PRD,  &
 
       ENDDO
 
-END SUBROUTINE da_condens_lin
+end subroutine da_condens_lin

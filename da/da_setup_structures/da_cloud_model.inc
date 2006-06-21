@@ -1,4 +1,4 @@
-SUBROUTINE da_cloud_model ( TB, PB, QB, QCWB, QRNB, ZB, ZFB, DT, kts, kte )
+subroutine da_cloud_model ( TB, PB, QB, QCWB, QRNB, ZB, ZFB, DT, kts, kte )
 
 !-----------------------------------------------------------------
 ! PURPOSE: Calculate DT (=dz/w) using cumulus parameterization 
@@ -26,7 +26,7 @@ SUBROUTINE da_cloud_model ( TB, PB, QB, QCWB, QRNB, ZB, ZFB, DT, kts, kte )
    real                       :: G, ALPHA, RC, MU, XX, YY
    real, dimension(kts:kte+1) :: W0, W
 
-   IF (trace_use) CALL da_trace_entry("da_cloud_model")
+   IF (trace_use) call da_trace_entry("da_cloud_model")
 
    G=9.81
    ALPHA=0.5
@@ -47,13 +47,13 @@ SUBROUTINE da_cloud_model ( TB, PB, QB, QCWB, QRNB, ZB, ZFB, DT, kts, kte )
    Z0 = ZB(kts)
    T0 = MAX(TB(kts),303.)
 
-   CALL da_qfrmrh ( P0, T0, 95., Q0 )
+   call da_qfrmrh ( P0, T0, 95., Q0 )
 
-   CALL da_lcl ( P0, Z0, T0, Q0, PLCL, ZLCL, TLCL, QLCL )
+   call da_lcl ( P0, Z0, T0, Q0, PLCL, ZLCL, TLCL, QLCL )
 
-   CALL da_qfrmrh ( PLCL, TLCL, 95., QLCL )
+   call da_qfrmrh ( PLCL, TLCL, 95., QLCL )
 
-   CALL da_cumulus ( ZLCL, TLCL, QLCL, PLCL, PP, TB,            &
+   call da_cumulus ( ZLCL, TLCL, QLCL, PLCL, PP, TB,            &
                   ZC, TC, QC, KCB, KCT, PCT, ZCT, kts, kte )
 
    DO k = KCB, KCT
@@ -89,8 +89,8 @@ SUBROUTINE da_cloud_model ( TB, PB, QB, QCWB, QRNB, ZB, ZFB, DT, kts, kte )
      ENDIF
    ENDDO
 
-   IF (trace_use) CALL da_trace_exit("da_cloud_model")
+   IF (trace_use) call da_trace_exit("da_cloud_model")
 
 
 
-END SUBROUTINE da_cloud_model
+end subroutine da_cloud_model

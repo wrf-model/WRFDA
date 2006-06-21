@@ -29,7 +29,7 @@ subroutine da_transform_vvtovp( evec, eval, vertical_wgt, &
    integer               :: i, j, k, m                 ! Loop counters.
    real                  :: temp
 
-  IF (trace_use) CALL da_trace_entry("da_transform_vvtovp")
+  IF (trace_use) call da_trace_entry("da_transform_vvtovp")
 
 
 !-------------------------------------------------------------------
@@ -60,7 +60,7 @@ subroutine da_transform_vvtovp( evec, eval, vertical_wgt, &
                            
    END IF
 
-   IF (trace_use) CALL da_trace_exit("da_transform_vvtovp")
+   IF (trace_use) call da_trace_exit("da_transform_vvtovp")
 
 END subroutine da_transform_vvtovp
 

@@ -1,4 +1,4 @@
-SUBROUTINE DA_Calculate_Jo_and_GradY_Synop( iv, re, jo, jo_grad_y )
+subroutine DA_Calculate_Jo_and_GradY_Synop( iv, re, jo, jo_grad_y )
 
   IMPLICIT NONE
 
@@ -48,15 +48,15 @@ SUBROUTINE DA_Calculate_Jo_and_GradY_Synop( iv, re, jo, jo_grad_y )
   ! testing.  This will always be .FALSE. for a serial run.
   IF ( testing_dm_exact ) THEN
     ! collect all obs in serial order and allocate global objects
-    CALL da_to_global_synop( iv,      re,      jo_grad_y, &
+    call da_to_global_synop( iv,      re,      jo_grad_y, &
                           iv_glob, re_glob, jo_grad_y_glob )
     ! perform remaining computations
-    CALL da_compute_jo_synop_uvtq( iv_glob, re_glob, jo_grad_y_glob, jo )
+    call da_compute_jo_synop_uvtq( iv_glob, re_glob, jo_grad_y_glob, jo )
     ! free global objects
-    CALL da_free_global_synop( iv_glob, re_glob, jo_grad_y_glob )
+    call da_free_global_synop( iv_glob, re_glob, jo_grad_y_glob )
   ELSE
     ! perform remaining computations
-    CALL da_compute_jo_synop_uvtq( iv, re, jo_grad_y, jo )
+    call da_compute_jo_synop_uvtq( iv, re, jo_grad_y, jo )
   ENDIF
 
   jo % synop_u = 0.5 * jo % synop_u
@@ -67,6 +67,6 @@ SUBROUTINE DA_Calculate_Jo_and_GradY_Synop( iv, re, jo, jo_grad_y )
 
   RETURN
 
-END SUBROUTINE DA_Calculate_Jo_and_GradY_Synop
+end subroutine DA_Calculate_Jo_and_GradY_Synop
 
 

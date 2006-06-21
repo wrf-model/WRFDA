@@ -1,4 +1,4 @@
-SUBROUTINE da_transform_xtoy_ssmi_adj ( xb, oi, xp, jo_grad_y, jo_grad_x )
+subroutine da_transform_xtoy_ssmi_adj ( xb, oi, xp, jo_grad_y, jo_grad_x )
 
    IMPLICIT NONE
 
@@ -10,13 +10,13 @@ SUBROUTINE da_transform_xtoy_ssmi_adj ( xb, oi, xp, jo_grad_y, jo_grad_x )
 
    IF ( oi%num_ssmi_tb > 0 ) THEN
 
-      CALL da_transform_xtoy_ssmi_tb_adj (xb, oi, xp, jo_grad_y, jo_grad_x)
+      call da_transform_xtoy_ssmi_tb_adj (xb, oi, xp, jo_grad_y, jo_grad_x)
 
    ELSE IF ( oi%num_ssmi_retrieval > 0) THEN
 
-      CALL da_transform_xtoy_ssmi_rv_adj (xb, oi, jo_grad_y, jo_grad_x )
+      call da_transform_xtoy_ssmi_rv_adj (xb, oi, jo_grad_y, jo_grad_x )
 
    ENDIF
 
-END SUBROUTINE da_transform_xtoy_ssmi_adj
+end subroutine da_transform_xtoy_ssmi_adj
 

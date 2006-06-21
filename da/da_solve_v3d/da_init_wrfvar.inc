@@ -1,4 +1,4 @@
-SUBROUTINE da_init_wrfvar( grid, xp, xb, &
+subroutine da_init_wrfvar( grid, xp, xb, &
                           ids, ide, jds, jde, kds, kde, &
                           ims, ime, jms, jme, kms, kme, &
                           ips, ipe, jps, jpe, kps, kpe )
@@ -151,5 +151,5 @@ SUBROUTINE da_init_wrfvar( grid, xp, xb, &
    xb%kts = xp%kts
    xb%kte = xp%kte 
 
-END SUBROUTINE da_init_wrfvar
+end subroutine da_init_wrfvar
 

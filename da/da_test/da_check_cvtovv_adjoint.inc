@@ -1,4 +1,4 @@
-SUBROUTINE da_check_cvtovv_adjoint( cv_size, xb, xbx, xp, be, cv, vv, &
+subroutine da_check_cvtovv_adjoint( cv_size, xb, xbx, xp, be, cv, vv, &
                                     ids,ide, jds,jde, kds,kde, &
                                     ims,ime, jms,jme, kms,kme, &
                                     its,ite, jts,jte, kts,kte )
@@ -114,4 +114,4 @@ SUBROUTINE da_check_cvtovv_adjoint( cv_size, xb, xbx, xp, be, cv, vv, &
    write(unit=stdout, fmt='(/a/)') &
         'DA_Check_CvToVv_Adjoint: Test Finished.'
 
-END SUBROUTINE da_check_cvtovv_adjoint
+end subroutine da_check_cvtovv_adjoint

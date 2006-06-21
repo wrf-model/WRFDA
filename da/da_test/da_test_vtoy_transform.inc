@@ -1,4 +1,4 @@
-SUBROUTINE da_test_vtoy_transform(grid, config_flags, vp, vv, &
+subroutine da_test_vtoy_transform(grid, config_flags, vp, vv, &
                                   xb, xbx, xp, be, xa, iv, y,&
                                   ids,ide, jds,jde, kds,kde, &
                                   ims,ime, jms,jme, kms,kme, &
@@ -115,4 +115,4 @@ SUBROUTINE da_test_vtoy_transform(grid, config_flags, vp, vv, &
 #endif
 
 
-END SUBROUTINE da_test_vtoy_transform
+end subroutine da_test_vtoy_transform

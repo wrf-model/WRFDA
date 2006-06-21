@@ -1,4 +1,4 @@
-SUBROUTINE da_get_innov_vector_buoy ( it, xb, xp, ob, iv )
+subroutine da_get_innov_vector_buoy ( it, xb, xp, ob, iv )
 
   !-------------------------------------------------------------------------
   !
@@ -89,7 +89,7 @@ SUBROUTINE da_get_innov_vector_buoy ( it, xb, xp, ob, iv )
           if (abs(hd) <= Max_StHeight_Diff) THEN
             if(iv % buoy(n) % h < v_h(xp%kts)) then
               iv%buoy(n)%zk = 1.0+1.0e-6
-              CALL da_obs_sfc_correction(iv%buoy(n), xb)
+              call da_obs_sfc_correction(iv%buoy(n), xb)
 
               ! To keep the original "ob" with no change for multiple outer-loops use:
 
@@ -252,7 +252,7 @@ SUBROUTINE da_get_innov_vector_buoy ( it, xb, xp, ob, iv )
       !-----------------------------------------------------------------------
 
       IF ( check_max_iv ) THEN
-        CALL da_check_max_iv_buoy(it, iv % buoy(n), &
+        call da_check_max_iv_buoy(it, iv % buoy(n), &
           itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf )
       END IF
 
@@ -272,5 +272,5 @@ SUBROUTINE da_get_innov_vector_buoy ( it, xb, xp, ob, iv )
     'Finally Total Buoy rejections ',ituf+itvvf+itpf+ittf+itqvf,' on ',&
                                        itu +itvv +itp +itt +itqv
 
-END SUBROUTINE da_get_innov_vector_buoy
+end subroutine da_get_innov_vector_buoy
 

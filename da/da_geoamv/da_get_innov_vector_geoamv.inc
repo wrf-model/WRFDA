@@ -1,4 +1,4 @@
-SUBROUTINE da_get_innov_vector_geoamv( it, xb, xp, ob, iv )
+subroutine da_get_innov_vector_geoamv( it, xb, xp, ob, iv )
 
    !-------------------------------------------------------------------------
    ! Purpose: Calculates innovation vector does QC for  Geo. AMV's
@@ -102,7 +102,7 @@ SUBROUTINE da_get_innov_vector_geoamv( it, xb, xp, ob, iv )
             !------------------------------------------------------------------------
 
             IF ( check_max_iv ) THEN
-              CALL da_check_max_iv_geoamv(it, iv % geoamv(n),itu,ituf,itvv,itvvf)
+              call da_check_max_iv_geoamv(it, iv % geoamv(n),itu,ituf,itvv,itvvf)
             END IF
           end if
       END DO
@@ -115,5 +115,5 @@ SUBROUTINE da_get_innov_vector_geoamv( it, xb, xp, ob, iv )
          'Finally Total Geo. AMVs rejections ',ituf+itvvf,' on ',itu+itvv
    ENDIF
 
-END SUBROUTINE da_get_innov_vector_geoamv
+end subroutine da_get_innov_vector_geoamv
 

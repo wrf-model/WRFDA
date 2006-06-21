@@ -1,4 +1,4 @@
-SUBROUTINE DA_Print_Stats_Sonde_sfc( stats_unit, nu, nv, nt, np, nq, sonde_sfc )
+subroutine DA_Print_Stats_Sonde_sfc( stats_unit, nu, nv, nt, np, nq, sonde_sfc )
 
   IMPLICIT NONE
 
@@ -38,5 +38,5 @@ SUBROUTINE DA_Print_Stats_Sonde_sfc( stats_unit, nu, nv, nt, np, nq, sonde_sfc )
                        sqrt(sonde_sfc%rms_err%p/real(np)), &
                        sqrt(sonde_sfc%rms_err%q/real(nq))
 
-END SUBROUTINE DA_Print_Stats_Sonde_sfc
+end subroutine DA_Print_Stats_Sonde_sfc
 

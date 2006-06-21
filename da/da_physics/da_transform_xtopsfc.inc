@@ -1,4 +1,4 @@
-SUBROUTINE da_transform_xtopsfc( xb, xa, xp, synop, y_synop )
+subroutine da_transform_xtopsfc( xb, xa, xp, synop, y_synop )
 
    TYPE (x_type),     INTENT(IN) :: xa       ! gridded analysis increment.
    TYPE (xb_type),    INTENT(IN) :: xb       ! first guess state.
@@ -128,5 +128,5 @@ SUBROUTINE da_transform_xtopsfc( xb, xa, xp, synop, y_synop )
                          psm, tsm, qsm, hsm, synop%h)
     endif
 
-END SUBROUTINE da_transform_xtopsfc
+end subroutine da_transform_xtopsfc
 

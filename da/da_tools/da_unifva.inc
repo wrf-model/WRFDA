@@ -1,20 +1,19 @@
-REAL FUNCTION DA_UNIFVA (KDUM) 
+real function da_unifva (kdum) 
 
-!-----------------------------------------------------------------------
- 
-!  PURPOSE :
-!  -------
-!  Minimal random number generator of Park and Miller with 
-!  Bays-Durham shuffle and added safeguards.
-!  Returns a uniform random deviate between 0.0. and 1.0 (exclusive 
-!  of the endpoint values). Call with kdum a negative integer to 
-!  initialize; thereafter, do not alter kdum between successive 
-!  deviates in sequence. rnmx should approximate the largest 
-!  floating value less than 1. 
- 
-!  See descripiton of function 'ran1', pg. 271.
-   
-!-----------------------------------------------------------------------
+   !--------------------------------------------------------------------
+   !  PURPOSE :
+   !  -------
+   !  Minimal random number generator of Park and Miller with 
+   !  Bays-Durham shuffle and added safeguards.
+   !  Returns a uniform random deviate between 0.0. and 1.0 (exclusive 
+   !  of the endpoint values). Call with kdum a negative integer to 
+   !  initialize; thereafter, do not alter kdum between successive 
+   !  deviates in sequence. rnmx should approximate the largest 
+   !  floating value less than 1. 
+   !
+   !  See descripiton of function 'ran1', pg. 271.
+   !
+   !--------------------------------------------------------------------
  
    IMPLICIT NONE
  
@@ -34,8 +33,8 @@ REAL FUNCTION DA_UNIFVA (KDUM)
    SAVE NIV,NIY
    DATA NIV /JPNTAB*0/, NIY /0/
 
-!  BEGIN MAIN
-!  ----------
+   ! BEGIN MAIN
+   ! ----------
 
    IF ( (KDUM.LE.0).OR.(NIY.EQ.0) ) THEN
       KDUM = MAX( -KDUM , 1 )
@@ -62,4 +61,4 @@ REAL FUNCTION DA_UNIFVA (KDUM)
    NIV(IJJ) = KDUM
    DA_UNIFVA   = MIN( PPAM*NIY , PPRNMX )
 
-END FUNCTION DA_UNIFVA
+end function da_unifva

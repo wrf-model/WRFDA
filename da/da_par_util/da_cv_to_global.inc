@@ -1,5 +1,5 @@
 
-      SUBROUTINE da_cv_to_global( cv_size, cv_size_global, x, xp, mzs, xg )
+      subroutine da_cv_to_global( cv_size, cv_size_global, x, xp, mzs, xg )
 !
 !     Gathers local cv-array x into domain cv-array xg(:).  
 !     Global cv-array xg will only be valid on the "monitor" task.  
@@ -45,7 +45,7 @@
         ALLOCATE( vv_x%v5(xp%ims:xp%ime,xp%jms:xp%jme,mzs(5)) )
         ALLOCATE( vv_x%alpha(xp%ims:xp%ime,xp%jms:xp%jme,mzs(6)) )
 
-        CALL da_cv_to_vv ( cv_size, x, xp, mzs, vv_x )
+        call da_cv_to_vv ( cv_size, x, xp, mzs, vv_x )
 
         IF ( wrf_dm_on_monitor() ) THEN
           ! allocate vv_xg
@@ -70,32 +70,32 @@
         ! gather to global data structures
         ! it is possible to gather straight into a globally-sized cv-array
         ! TODO:  add this optimization later
-        CALL da_wv_patch_to_global( vv_x%v1, vv_xg%v1,       &
+        call da_wv_patch_to_global( vv_x%v1, vv_xg%v1,       &
                                  xp%domdesc, mzs(1),    &
                                  ids, ide, jds, jde, kds, &
                                  ims, ime, jms, jme, kms, &
                                  ips, ipe, jps, jpe, kps )
-        CALL da_wv_patch_to_global( vv_x%v2, vv_xg%v2,       &
+        call da_wv_patch_to_global( vv_x%v2, vv_xg%v2,       &
                                  xp%domdesc, mzs(2),    &
                                  ids, ide, jds, jde, kds, &
                                  ims, ime, jms, jme, kms, &
                                  ips, ipe, jps, jpe, kps )
-        CALL da_wv_patch_to_global( vv_x%v3, vv_xg%v3,       &
+        call da_wv_patch_to_global( vv_x%v3, vv_xg%v3,       &
                                  xp%domdesc, mzs(3),    &
                                  ids, ide, jds, jde, kds, &
                                  ims, ime, jms, jme, kms, &
                                  ips, ipe, jps, jpe, kps )
-        CALL da_wv_patch_to_global( vv_x%v4, vv_xg%v4,       &
+        call da_wv_patch_to_global( vv_x%v4, vv_xg%v4,       &
                                  xp%domdesc, mzs(4),    &
                                  ids, ide, jds, jde, kds, &
                                  ims, ime, jms, jme, kms, &
                                  ips, ipe, jps, jpe, kps )
-        CALL da_wv_patch_to_global( vv_x%v5, vv_xg%v5,       &
+        call da_wv_patch_to_global( vv_x%v5, vv_xg%v5,       &
                                  xp%domdesc, mzs(5), &
                                  ids, ide, jds, jde, kds, &
                                  ims, ime, jms, jme, kms, &
                                  ips, ipe, jps, jpe, kps )
-        CALL da_wv_patch_to_global( vv_x%alpha, vv_xg%alpha,       &
+        call da_wv_patch_to_global( vv_x%alpha, vv_xg%alpha,       &
                                  xp%domdesc, mzs(6),    &
                                  ids, ide, jds, jde, kds, &
                                  ims, ime, jms, jme, kms, &
@@ -115,7 +115,7 @@
           xpg%kds = xp%kds; xpg%kde = xp%kde
           xpg%kms = xp%kds; xpg%kme = xp%kde
           xpg%kts = xp%kds; xpg%kte = xp%kde
-          CALL da_vv_to_cv( vv_xg, xpg, mzs, cv_size_global, xg )
+          call da_vv_to_cv( vv_xg, xpg, mzs, cv_size_global, xg )
         ENDIF
 
         ! deallocate vv_xg
@@ -123,5 +123,5 @@
 
 #endif
 
-      END SUBROUTINE da_cv_to_global
+      end subroutine da_cv_to_global
 

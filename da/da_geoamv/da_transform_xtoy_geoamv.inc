@@ -1,4 +1,4 @@
-SUBROUTINE da_transform_xtoy_geoamv ( xa, iv, xp, y )
+subroutine da_transform_xtoy_geoamv ( xa, iv, xp, y )
 
    !-------------------------------------------------------------------------
    ! Purpose: X to Y Transform operator for Geo. AMV's
@@ -49,5 +49,5 @@ SUBROUTINE da_transform_xtoy_geoamv ( xa, iv, xp, y )
       end do
    ENDIF
 
-END SUBROUTINE da_transform_xtoy_geoamv
+end subroutine da_transform_xtoy_geoamv
 

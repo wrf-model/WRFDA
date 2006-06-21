@@ -1,4 +1,4 @@
-SUBROUTINE da_balance_geoterm_nl( xb, k, u, v, term_x, term_y ) 
+subroutine da_balance_geoterm_nl( xb, k, u, v, term_x, term_y ) 
  
    !---------------------------------------------------------------------------
    !  PURPOSE: Calculates nonlinear geostrophic term in balance equation.
@@ -40,5 +40,5 @@ SUBROUTINE da_balance_geoterm_nl( xb, k, u, v, term_x, term_y )
                                           *xb%  u(xb%its:xb%ite, xb%jts:xb%jte, k) &
                                           *xb%cori(xb%its:xb%ite, xb%jts:xb%jte)
 
-END SUBROUTINE da_balance_geoterm_nl
+end subroutine da_balance_geoterm_nl
 

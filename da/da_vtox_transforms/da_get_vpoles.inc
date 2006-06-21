@@ -1,4 +1,4 @@
-SUBROUTINE da_get_vpoles(u,v,lon,        &
+subroutine da_get_vpoles(u,v,lon,        &
           ids, ide, jds, jde, kds, kde,  &
           ims, ime, jms, jme, kms, kme,  &
           its, ite, jts, jte, kts, kte   )
@@ -67,6 +67,6 @@ SUBROUTINE da_get_vpoles(u,v,lon,        &
       end if
    end do
 
-END SUBROUTINE da_get_vpoles
+end subroutine da_get_vpoles
 
 

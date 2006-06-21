@@ -1,4 +1,4 @@
-SUBROUTINE DA_Find_FFT_Factors( n, n_ok, fft_factors )
+subroutine DA_Find_FFT_Factors( n, n_ok, fft_factors )
 
 !------------------------------------------------------------------------------
 !  PURPOSE: Calculates prime factors of input number.
@@ -75,4 +75,4 @@ SUBROUTINE DA_Find_FFT_Factors( n, n_ok, fft_factors )
       
 9  CONTINUE
 
-END SUBROUTINE DA_Find_FFT_Factors
+end subroutine DA_Find_FFT_Factors

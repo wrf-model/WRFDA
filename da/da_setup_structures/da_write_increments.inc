@@ -1,4 +1,4 @@
-SUBROUTINE DA_Write_Increment ( xp, xb, xa, q_cgrid, mu_cgrid, ph_cgrid )
+subroutine DA_Write_Increment ( xp, xb, xa, q_cgrid, mu_cgrid, ph_cgrid )
 
    IMPLICIT NONE
 
@@ -39,7 +39,7 @@ SUBROUTINE DA_Write_Increment ( xp, xb, xa, q_cgrid, mu_cgrid, ph_cgrid )
 !
 !                                        Yong-Run Guo 07/20/2004
 
-   IF (trace_use) CALL da_trace_entry("da_write_increment")
+   IF (trace_use) call da_trace_entry("da_write_increment")
 
 
 ! .. Dimension of the domain:
@@ -233,7 +233,7 @@ SUBROUTINE DA_Write_Increment ( xp, xb, xa, q_cgrid, mu_cgrid, ph_cgrid )
 
       endif
 
-   IF (trace_use) CALL da_trace_exit("da_write_increment")
+   IF (trace_use) call da_trace_exit("da_write_increment")
 
 
-END SUBROUTINE DA_Write_Increment 
+end subroutine DA_Write_Increment 

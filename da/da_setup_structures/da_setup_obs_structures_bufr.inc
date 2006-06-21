@@ -1,4 +1,4 @@
-SUBROUTINE da_setup_obs_structures_bufr( xp, ob, iv )
+subroutine da_setup_obs_structures_bufr( xp, ob, iv )
 
 !------------------------------------------------------------------------------
 ! PURPOSE: Define, allocate and read observation structure.
@@ -19,7 +19,7 @@ SUBROUTINE da_setup_obs_structures_bufr( xp, ob, iv )
    CHARACTER(len=120)           :: filename
    integer                      :: n   
 
-   IF (trace_use) CALL da_trace_entry("da_setup_obs_structures_bufr")
+   IF (trace_use) call da_trace_entry("da_setup_obs_structures_bufr")
 
 !-----------------------------------------------------------------------------
 !  [0.0] Initialize the counters.
@@ -153,7 +153,7 @@ SUBROUTINE da_setup_obs_structures_bufr( xp, ob, iv )
 !   Allocate the ob based on inputed number of obs:
 !-----------------------------------------------------------------------------
 
-   CALL da_allocate_observations ( iv )
+   call da_allocate_observations ( iv )
 
 !-----------------------------------------------------------------------------
 
@@ -215,11 +215,11 @@ SUBROUTINE da_setup_obs_structures_bufr( xp, ob, iv )
 !  [3.0] Calculate innovation vector (O-B) and create (smaller) ob structure:
 !-----------------------------------------------------------------------------
 
-   CALL da_fill_obs_structures( iv, ob )
+   call da_fill_obs_structures( iv, ob )
 
    iv%current_ob_time = 1
 
-   IF (trace_use) CALL da_trace_exit("da_setup_obs_structures_bufr")
+   IF (trace_use) call da_trace_exit("da_setup_obs_structures_bufr")
 
-END SUBROUTINE da_setup_obs_structures_bufr
+end subroutine da_setup_obs_structures_bufr
 

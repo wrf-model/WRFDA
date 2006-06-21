@@ -68,7 +68,7 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
    real, allocatable           :: regcoeff3(:,:,:)
    real                        :: avg,avg2,avg3
 
-   IF (trace_use) CALL da_trace_entry("da_setup_be_regional")
+   IF (trace_use) call da_trace_entry("da_setup_be_regional")
 
    write (UNIT=stdout,FMT='(A)') ' -------------------------------------------------------'
    write (UNIT=stdout,FMT='(A)') ' [3.0] Set up background errors for regional application'
@@ -287,18 +287,18 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
 ! 3.1 Perform checks on eigenvectors:
 
       IF ( test_statistics ) THEN
-         CALL da_check_eof_decomposition( be1_eval_glo(:), be1_evec_glo(:,:), be % v1 % name)
-         CALL da_check_eof_decomposition( be2_eval_glo(:), be2_evec_glo(:,:), be % v2 % name)
-         CALL da_check_eof_decomposition( be3_eval_glo(:), be3_evec_glo(:,:), be % v3 % name)
-         CALL da_check_eof_decomposition( be4_eval_glo(:), be4_evec_glo(:,:), be % v4 % name)
+         call da_check_eof_decomposition( be1_eval_glo(:), be1_evec_glo(:,:), be % v1 % name)
+         call da_check_eof_decomposition( be2_eval_glo(:), be2_evec_glo(:,:), be % v2 % name)
+         call da_check_eof_decomposition( be3_eval_glo(:), be3_evec_glo(:,:), be % v3 % name)
+         call da_check_eof_decomposition( be4_eval_glo(:), be4_evec_glo(:,:), be % v4 % name)
       END IF
 
 ! 3.2 Truncate in vertical:
 
-      CALL da_get_vertical_truncation( max_vert_var1, be1_eval_glo(:), be % v1 )
-      CALL da_get_vertical_truncation( max_vert_var2, be2_eval_glo(:), be % v2 )
-      CALL da_get_vertical_truncation( max_vert_var3, be3_eval_glo(:), be % v3 )
-      CALL da_get_vertical_truncation( max_vert_var4, be4_eval_glo(:), be % v4 )
+      call da_get_vertical_truncation( max_vert_var1, be1_eval_glo(:), be % v1 )
+      call da_get_vertical_truncation( max_vert_var2, be2_eval_glo(:), be % v2 )
+      call da_get_vertical_truncation( max_vert_var3, be3_eval_glo(:), be % v3 )
+      call da_get_vertical_truncation( max_vert_var4, be4_eval_glo(:), be % v4 )
 
       be % v5 % mz = 1
 
@@ -326,18 +326,18 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
 
 ! 4.2 Transfer errors to error structure:
 
-   CALL da_allocate_background_errors( jy, kz, be1_eval_glo, be1_evec_glo, be1_eval_loc, &
+   call da_allocate_background_errors( jy, kz, be1_eval_glo, be1_evec_glo, be1_eval_loc, &
                                        be1_evec_loc, be % v1 )
-   CALL da_allocate_background_errors( jy, kz, be2_eval_glo, be2_evec_glo, be2_eval_loc, &
+   call da_allocate_background_errors( jy, kz, be2_eval_glo, be2_evec_glo, be2_eval_loc, &
                                        be2_evec_loc, be % v2 )
-   CALL da_allocate_background_errors( jy, kz, be3_eval_glo, be3_evec_glo, be3_eval_loc, &
+   call da_allocate_background_errors( jy, kz, be3_eval_glo, be3_evec_glo, be3_eval_loc, &
                                        be3_evec_loc, be % v3 )
-   CALL da_allocate_background_errors( jy, kz, be4_eval_glo, be4_evec_glo, be4_eval_loc, &
+   call da_allocate_background_errors( jy, kz, be4_eval_glo, be4_evec_glo, be4_eval_loc, &
                                        be4_evec_loc, be % v4 )
 
 ! 4.2.1 transfer the ps_u variance to be % v5:
 
-   CALL da_allocate_background_errors( jy,  1, be5_eval_glo, be5_evec_glo, be5_eval_loc, &
+   call da_allocate_background_errors( jy,  1, be5_eval_glo, be5_evec_glo, be5_eval_loc, &
                                        be5_evec_loc, be % v5 )
 
    IF (print_detail_be) THEN
@@ -388,13 +388,13 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
 
     IF ( test_statistics ) THEN
 
-      CALL da_check_eof_decomposition( be%v1%val_g(:), be%v1%evec_g(:,:),&
+      call da_check_eof_decomposition( be%v1%val_g(:), be%v1%evec_g(:,:),&
                                      be%v1%name)
-      CALL da_check_eof_decomposition( be%v2%val_g(:), be%v2%evec_g(:,:),&
+      call da_check_eof_decomposition( be%v2%val_g(:), be%v2%evec_g(:,:),&
                                      be%v2%name)
-      CALL da_check_eof_decomposition( be%v3%val_g(:), be%v3%evec_g(:,:),&
+      call da_check_eof_decomposition( be%v3%val_g(:), be%v3%evec_g(:,:),&
                                      be%v3%name)
-      CALL da_check_eof_decomposition( be%v4%val_g(:), be%v4%evec_g(:,:),&
+      call da_check_eof_decomposition( be%v4%val_g(:), be%v4%evec_g(:,:),&
                                      be%v4%name)
     END IF
 
@@ -405,15 +405,15 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
 ! 7.0 Apply empirical and recursive filter rescaling factor:
 ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-   CALL da_rescale_background_errors( ix, jy, var_scaling1, len_scaling1, &
+   call da_rescale_background_errors( ix, jy, var_scaling1, len_scaling1, &
                                       xb % ds, be1_rf_lengthscale, be % v1 )
-   CALL da_rescale_background_errors( ix, jy, var_scaling2, len_scaling2, &
+   call da_rescale_background_errors( ix, jy, var_scaling2, len_scaling2, &
                                       xb % ds, be2_rf_lengthscale, be % v2 )
-   CALL da_rescale_background_errors( ix, jy, var_scaling3, len_scaling3, &
+   call da_rescale_background_errors( ix, jy, var_scaling3, len_scaling3, &
                                       xb % ds, be3_rf_lengthscale, be % v3 )
-   CALL da_rescale_background_errors( ix, jy, var_scaling4, len_scaling4, &
+   call da_rescale_background_errors( ix, jy, var_scaling4, len_scaling4, &
                                       xb % ds, be4_rf_lengthscale, be % v4 )
-   CALL da_rescale_background_errors( ix, jy, var_scaling5, len_scaling5, &
+   call da_rescale_background_errors( ix, jy, var_scaling5, len_scaling5, &
                                       xb % ds, be5_rf_lengthscale, be % v5 )
 
 ! 8.0 Deallocate input model state:
@@ -478,7 +478,7 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
    end if
 
 
-   IF (trace_use) CALL da_trace_exit("da_setup_be_regional")
+   IF (trace_use) call da_trace_exit("da_setup_be_regional")
 
 
 end subroutine da_setup_be_regional

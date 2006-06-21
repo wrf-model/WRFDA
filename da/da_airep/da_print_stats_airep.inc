@@ -1,4 +1,4 @@
-SUBROUTINE DA_Print_Stats_Airep( stats_unit, nu, nv, nt, Airep )
+subroutine DA_Print_Stats_Airep( stats_unit, nu, nv, nt, Airep )
 
   IMPLICIT NONE
 
@@ -30,5 +30,5 @@ SUBROUTINE DA_Print_Stats_Airep( stats_unit, nu, nv, nt, Airep )
                       sqrt(Airep%rms_err%v/real(nv)), &
                       sqrt(Airep%rms_err%t/real(nt))
 
-END SUBROUTINE DA_Print_Stats_Airep
+end subroutine DA_Print_Stats_Airep
 

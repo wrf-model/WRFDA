@@ -1,13 +1,9 @@
-SUBROUTINE DA_Write_KMA_Increments(xp, xb, xa)
+subroutine da_write_kma_increments(xp, xb, xa)
 
-!------------------------------------------------------------------------------
-!  PURPOSE: Gathers KMA analysis increments and writes 
-!           on i"anl_inc_unit" unit  
-!
-!  HISTORY: 11/10/2004   Syed RH Rizvi
-!
-!  PARENT_MODULE: DA_Setup_Structures
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! PURPOSE: Gathers KMA analysis increments and writes 
+   !           on i"anl_inc_unit" unit 
+   !---------------------------------------------------------------------------
 
    IMPLICIT NONE
 
@@ -15,7 +11,7 @@ SUBROUTINE DA_Write_KMA_Increments(xp, xb, xa)
    TYPE(x_type)                                :: xa
    TYPE(xpose_type)                            :: xp
 
-! .. Arrays for write out increments:
+   ! Arrays for write out increments:
    integer                                     :: ix, jy, kz
    real, dimension(1:xb%mix,1:xb%mjy)          :: gbuf_2d
    real, dimension(1:xb%mix,1:xb%mjy,1:xb%mkz) :: gbuf
@@ -26,64 +22,63 @@ SUBROUTINE DA_Write_KMA_Increments(xp, xb, xa)
    LOGICAL, EXTERNAL :: wrf_dm_on_monitor
 
    integer                                     :: i, j, k
-! ---------------------------------------------------------------------------
 
-   IF (trace_use) CALL da_trace_entry("da_write_kma_increments")
+   IF (trace_use) call da_trace_entry("da_write_kma_increments")
 
 
-! .. Dimension of the domain:
-      ix = xb%mix
-      jy = xb%mjy
-      kz = xb%mkz
+   ! Dimension of the domain:
+   ix = xb%mix
+   jy = xb%mjy
+   kz = xb%mkz
 
 #ifdef DM_PARALLEL
  
-! .. 3-d and 2-d increments:
+   ! 3-d and 2-d increments:
 
-      ALLOCATE ( psfc_g (1:ix,1:jy) )
-      ALLOCATE (    u_g (1:ix,1:jy,1:kz) )
-      ALLOCATE (    v_g (1:ix,1:jy,1:kz) )
-      ALLOCATE (    t_g (1:ix,1:jy,1:kz) )
-      ALLOCATE (    q_g (1:ix,1:jy,1:kz) )
-      ALLOCATE (    p_g (1:ix,1:jy,1:kz) )
+   ALLOCATE ( psfc_g (1:ix,1:jy) )
+   ALLOCATE (    u_g (1:ix,1:jy,1:kz) )
+   ALLOCATE (    v_g (1:ix,1:jy,1:kz) )
+   ALLOCATE (    t_g (1:ix,1:jy,1:kz) )
+   ALLOCATE (    q_g (1:ix,1:jy,1:kz) )
+   ALLOCATE (    p_g (1:ix,1:jy,1:kz) )
 
-      call da_local_to_global( xp, xa % psfc, gbuf_2d, 2 ) 
-      IF ( wrf_dm_on_monitor() ) THEN 
-        psfc_g(1:ix,1:jy) = gbuf_2d(1:ix,1:jy) 
-      END IF 
+   call da_local_to_global( xp, xa % psfc, gbuf_2d, 2 ) 
+   IF ( wrf_dm_on_monitor() ) THEN 
+     psfc_g(1:ix,1:jy) = gbuf_2d(1:ix,1:jy) 
+   END IF 
 
-      call da_local_to_global( xp, xa % u, gbuf, 3 ) 
-      IF ( wrf_dm_on_monitor() ) THEN 
-        u_g(1:ix,1:jy,1:kz) = gbuf(1:ix,1:jy,1:kz) 
-      END IF 
+   call da_local_to_global( xp, xa % u, gbuf, 3 ) 
+   IF ( wrf_dm_on_monitor() ) THEN 
+     u_g(1:ix,1:jy,1:kz) = gbuf(1:ix,1:jy,1:kz) 
+   END IF 
 
-      call da_local_to_global( xp, xa % v, gbuf, 3 ) 
-      IF ( wrf_dm_on_monitor() ) THEN 
-        v_g(1:ix,1:jy,1:kz) = gbuf(1:ix,1:jy,1:kz) 
-      END IF 
+   call da_local_to_global( xp, xa % v, gbuf, 3 ) 
+   IF ( wrf_dm_on_monitor() ) THEN 
+     v_g(1:ix,1:jy,1:kz) = gbuf(1:ix,1:jy,1:kz) 
+   END IF 
 
-      call da_local_to_global( xp, xa % t, gbuf, 3 ) 
-      IF ( wrf_dm_on_monitor() ) THEN 
-        t_g(1:ix,1:jy,1:kz) = gbuf(1:ix,1:jy,1:kz) 
-      END IF 
+   call da_local_to_global( xp, xa % t, gbuf, 3 ) 
+   IF ( wrf_dm_on_monitor() ) THEN 
+     t_g(1:ix,1:jy,1:kz) = gbuf(1:ix,1:jy,1:kz) 
+   END IF 
 
-      call da_local_to_global( xp, xa % q, gbuf, 3 ) 
-      IF ( wrf_dm_on_monitor() ) THEN 
-        q_g(1:ix,1:jy,1:kz) = gbuf(1:ix,1:jy,1:kz) 
-      END IF 
+   call da_local_to_global( xp, xa % q, gbuf, 3 ) 
+   IF ( wrf_dm_on_monitor() ) THEN 
+     q_g(1:ix,1:jy,1:kz) = gbuf(1:ix,1:jy,1:kz) 
+   END IF 
 
-      call da_local_to_global( xp, xa % p, gbuf, 3 ) 
-      IF ( wrf_dm_on_monitor() ) THEN 
-        p_g(1:ix,1:jy,1:kz) = gbuf(1:ix,1:jy,1:kz) 
-      END IF 
+   call da_local_to_global( xp, xa % p, gbuf, 3 ) 
+   IF ( wrf_dm_on_monitor() ) THEN 
+     p_g(1:ix,1:jy,1:kz) = gbuf(1:ix,1:jy,1:kz) 
+   END IF 
 #endif
 
- if ( wrf_dm_on_monitor() ) then
+if ( wrf_dm_on_monitor() ) then
 
 #ifdef DM_PARALLEL
 
-!  3d- and 2d-increments:
-!
+   ! 3d- and 2d-increments:
+
    write(anl_inc_unit) &
    ((psfc_g(i,j),i=xb%ids,xb%ide),j=xb%jds,xb%jde)
    write(anl_inc_unit) &
@@ -97,7 +92,6 @@ SUBROUTINE DA_Write_KMA_Increments(xp, xb, xa)
    write(anl_inc_unit) &
    (((p_g(i,j,k),i=xb%ids,xb%ide),j=xb%ids,xb%jde),k=xb%kds,xb%kde)
 
-!
    write(UNIT=stdout,FMT='(10e15.7)') & 
    ((psfc_g(i,j),i=xb%ids,xb%ide),j=xb%jds,xb%jde)
    write(UNIT=stdout,FMT='(10e15.7)') &
@@ -113,8 +107,8 @@ SUBROUTINE DA_Write_KMA_Increments(xp, xb, xa)
 
 #else
 
-!  3d- and 2d-increments:
-!
+   ! 3d- and 2d-increments:
+
    write(anl_inc_unit) &
    ((xa%psfc(i,j),i=xb%ids,xb%ide),j=xb%jds,xb%jde)
    write(anl_inc_unit) &
@@ -127,7 +121,7 @@ SUBROUTINE DA_Write_KMA_Increments(xp, xb, xa)
    (((xa%q(i,j,k),i=xb%ids,xb%ide),j=xb%jds,xb%jde),k=xb%kds,xb%kde)
    write(anl_inc_unit) &
    (((xa%p(i,j,k),i=xb%ids,xb%ide),j=xb%jds,xb%jde),k=xb%kds,xb%kde)
-!
+
    write(UNIT=stdout,FMT='(10e15.7)') &
    ((xa%psfc(i,j),i=xb%ids,xb%ide),j=xb%jds,xb%jde)
    write(UNIT=stdout,FMT='(10e15.7)') &
@@ -142,9 +136,9 @@ SUBROUTINE DA_Write_KMA_Increments(xp, xb, xa)
    (((xa%p(i,j,k),i=xb%ids,xb%ide),j=xb%jds,xb%jde),k=xb%kds,xb%kde)
 #endif
 
- end if
+end if
 
 
-   IF (trace_use) CALL da_trace_exit("da_write_kma_increments")
+   IF (trace_use) call da_trace_exit("da_write_kma_increments")
 
-END SUBROUTINE DA_Write_KMA_Increments 
+end subroutine da_write_kma_increments 

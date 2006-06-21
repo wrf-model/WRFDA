@@ -1,4 +1,4 @@
-SUBROUTINE da_correlation_coeff1d( field1, field2, corr_coeff, &
+subroutine da_correlation_coeff1d( field1, field2, corr_coeff, &
                                    rel_acc )
    
    !---- -------------------------------------------------------------------------
@@ -60,4 +60,4 @@ SUBROUTINE da_correlation_coeff1d( field1, field2, corr_coeff, &
    deallocate( data1 )
    deallocate( data2 )
    
-END SUBROUTINE da_correlation_coeff1d
+end subroutine da_correlation_coeff1d

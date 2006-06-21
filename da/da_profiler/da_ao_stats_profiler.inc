@@ -1,4 +1,4 @@
-SUBROUTINE da_ao_stats_profiler( stats_unit, oi, re )
+subroutine da_ao_stats_profiler( stats_unit, oi, re )
 
    IMPLICIT NONE
 
@@ -30,11 +30,11 @@ SUBROUTINE da_ao_stats_profiler( stats_unit, oi, re )
       if( oi%profiler(n)%loc%proc_domain ) then
 
        do k=1, oi%Profiler(n)%info%levels
-         CALL da_stats_calculate( n, k, oi%Profiler(n)%u(k)%qc, & 
+         call da_stats_calculate( n, k, oi%Profiler(n)%u(k)%qc, & 
                                re%Profiler(n)%u(k), nu, & 
                                profiler%minimum%u, Profiler%maximum%u, &
                                profiler%average%u, Profiler%rms_err%u )
-         CALL da_stats_calculate( n, k, oi%Profiler(n)%v(k)%qc, & 
+         call da_stats_calculate( n, k, oi%Profiler(n)%v(k)%qc, & 
                                re%Profiler(n)%v(k), nv, & 
                                Profiler%minimum%v, Profiler%maximum%v, &
                                Profiler%average%v, Profiler%rms_err%v )
@@ -70,5 +70,5 @@ SUBROUTINE da_ao_stats_profiler( stats_unit, oi, re )
    
    END IF
 
-END SUBROUTINE da_ao_stats_profiler
+end subroutine da_ao_stats_profiler
 

@@ -1,4 +1,4 @@
-SUBROUTINE da_xyll(XX,YY,XLAT,XLON)
+subroutine da_xyll(XX,YY,XLAT,XLON)
 !               
 !   PURPOSE      : CALCULATES THE LATITUDES AND LONGITUDES FROM THE
 !                  (X,Y) LOCATION (DOT) IN THE MESOSCALE GRIDS.
@@ -83,5 +83,5 @@ SUBROUTINE da_xyll(XX,YY,XLAT,XLON)
       XLAT = 2.*(CONV*ATAN(CELL))-90.0 
    ENDIF  
 
-END SUBROUTINE da_xyll
+end subroutine da_xyll
 

@@ -1,4 +1,4 @@
-SUBROUTINE da_ao_stats_pilot( stats_unit, oi, re )
+subroutine da_ao_stats_pilot( stats_unit, oi, re )
 
   IMPLICIT NONE
 
@@ -27,11 +27,11 @@ SUBROUTINE da_ao_stats_pilot( stats_unit, oi, re )
     DO n=1, oi%num_Pilot
       if( oi%pilot(n)%loc%proc_domain ) then
         do k=1, oi%Pilot(n)%info%levels
-          CALL da_stats_calculate( n, k, oi%Pilot(n)%u(k)%qc, & 
+          call da_stats_calculate( n, k, oi%Pilot(n)%u(k)%qc, & 
                               re%pilot(n)%u(k), nu, & 
                               pilot%minimum%u, Pilot%maximum%u, &
                               pilot%average%u, Pilot%rms_err%u )
-          CALL da_stats_calculate( n, k, oi%Pilot(n)%v(k)%qc, & 
+          call da_stats_calculate( n, k, oi%Pilot(n)%v(k)%qc, & 
                               re%Pilot(n)%v(k), nv, & 
                               Pilot%minimum%v, Pilot%maximum%v, &
                               Pilot%average%v, Pilot%rms_err%v )
@@ -61,5 +61,5 @@ SUBROUTINE da_ao_stats_pilot( stats_unit, oi, re )
     END IF
   END IF
 
-END SUBROUTINE da_ao_stats_pilot
+end subroutine da_ao_stats_pilot
 

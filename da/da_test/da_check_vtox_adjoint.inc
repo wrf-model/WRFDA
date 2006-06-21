@@ -1,4 +1,4 @@
-SUBROUTINE DA_Check_VToX_Adjoint( cv_size, xb, xbx, be, ep, cv1, vv, vp, xp, xa, &
+subroutine DA_Check_VToX_Adjoint( cv_size, xb, xbx, be, ep, cv1, vv, vp, xp, xa, &
                                   ids, ide, jds, jde, kds, kde,      &
                                   ims, ime, jms, jme, kms, kme,      &
                                   its, ite, jts, jte, kts, kte )
@@ -151,5 +151,5 @@ PRINT *,'TEST_COVERAGE_DA_Check_VToX_Adjoint:  adj_sum_lhs,adj_sum_rhs = ', adj_
 
    write(UNIT=stdout, fmt='(/a/)') 'DA_Check_VToX_Adjoint: Finished'
 
-END SUBROUTINE DA_Check_VToX_Adjoint
+end subroutine DA_Check_VToX_Adjoint
 

@@ -1,4 +1,4 @@
-SUBROUTINE da_proc_sum_count_obs ( count_obs )
+subroutine da_proc_sum_count_obs ( count_obs )
 
 !------------------------------------------------------------------------------
 !  PURPOSE: Do MPI sum operation across processors to get the global sum of
@@ -93,5 +93,5 @@ SUBROUTINE da_proc_sum_count_obs ( count_obs )
 #endif
 
    RETURN
-END SUBROUTINE da_proc_sum_count_obs
+end subroutine da_proc_sum_count_obs
 

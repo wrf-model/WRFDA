@@ -1,6 +1,6 @@
 
 !============================================================================
-SUBROUTINE da_oi_stats_ssmi_tb ( stats_unit, oi )
+subroutine da_oi_stats_ssmi_tb ( stats_unit, oi )
 !----------------------------------------------------------------------------
    IMPLICIT NONE
 !----------------------------------------------------------------------------
@@ -50,37 +50,37 @@ SUBROUTINE da_oi_stats_ssmi_tb ( stats_unit, oi )
 
       if( oi%ssmi_tb(n)%loc%proc_domain ) then
 
-        CALL da_stats_calculate( oi%ssmi_tb(n)%loc%obs_global_index, &
+        call da_stats_calculate( oi%ssmi_tb(n)%loc%obs_global_index, &
                               0, oi%ssmi_tb(n)%tb19v%qc, & 
                               oi%ssmi_tb(n)%tb19v%inv, ntb19v, &
                               ssmi_tb%minimum%tb19v, ssmi_tb%maximum%tb19v,  &
                               ssmi_tb%average%tb19v, ssmi_tb%rms_err%tb19v)
-        CALL da_stats_calculate( oi%ssmi_tb(n)%loc%obs_global_index, &
+        call da_stats_calculate( oi%ssmi_tb(n)%loc%obs_global_index, &
                               0, oi%ssmi_tb(n)%tb19h%qc, & 
                               oi%ssmi_tb(n)%tb19h%inv, ntb19h, &
                               ssmi_tb%minimum%tb19h, ssmi_tb%maximum%tb19h, &
                               ssmi_tb%average%tb19h, ssmi_tb%rms_err%tb19h)
-        CALL da_stats_calculate( oi%ssmi_tb(n)%loc%obs_global_index, &
+        call da_stats_calculate( oi%ssmi_tb(n)%loc%obs_global_index, &
                               0, oi%ssmi_tb(n)%tb22v%qc, & 
                               oi%ssmi_tb(n)%tb22v%inv, ntb22v, &
                               ssmi_tb%minimum%tb22v, ssmi_tb%maximum%tb22v,  &
                               ssmi_tb%average%tb22v, ssmi_tb%rms_err%tb22v)
-        CALL da_stats_calculate( oi%ssmi_tb(n)%loc%obs_global_index, &
+        call da_stats_calculate( oi%ssmi_tb(n)%loc%obs_global_index, &
                               0, oi%ssmi_tb(n)%tb37v%qc, & 
                               oi%ssmi_tb(n)%tb37v%inv, ntb37v, &
                               ssmi_tb%minimum%tb37v, ssmi_tb%maximum%tb37v,  &
                               ssmi_tb%average%tb37v, ssmi_tb%rms_err%tb37v)
-        CALL da_stats_calculate( oi%ssmi_tb(n)%loc%obs_global_index, &
+        call da_stats_calculate( oi%ssmi_tb(n)%loc%obs_global_index, &
                               0, oi%ssmi_tb(n)%tb37h%qc, & 
                               oi%ssmi_tb(n)%tb37h%inv, ntb37h, &
                               ssmi_tb%minimum%tb37h, ssmi_tb%maximum%tb37h, &
                               ssmi_tb%average%tb37h, ssmi_tb%rms_err%tb37h)
-        CALL da_stats_calculate( oi%ssmi_tb(n)%loc%obs_global_index, &
+        call da_stats_calculate( oi%ssmi_tb(n)%loc%obs_global_index, &
                               0, oi%ssmi_tb(n)%tb85v%qc, & 
                               oi%ssmi_tb(n)%tb85v%inv, ntb85v, &
                               ssmi_tb%minimum%tb85v, ssmi_tb%maximum%tb85v,  &
                               ssmi_tb%average%tb85v, ssmi_tb%rms_err%tb85v)
-        CALL da_stats_calculate( oi%ssmi_tb(n)%loc%obs_global_index, &
+        call da_stats_calculate( oi%ssmi_tb(n)%loc%obs_global_index, &
                               0, oi%ssmi_tb(n)%tb85h%qc, & 
                               oi%ssmi_tb(n)%tb85h%inv, ntb85h, &
                               ssmi_tb%minimum%tb85h, ssmi_tb%maximum%tb85h, &
@@ -244,6 +244,6 @@ SUBROUTINE da_oi_stats_ssmi_tb ( stats_unit, oi )
 
    ENDIF
 
-END SUBROUTINE da_oi_stats_ssmi_tb
+end subroutine da_oi_stats_ssmi_tb
 
 

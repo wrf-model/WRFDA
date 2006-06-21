@@ -1,5 +1,5 @@
 !DECK FFT551
-!     SUBROUTINE 'FFT551' - MULTIPLE FAST COSINE TRANSFORM
+!     subroutine 'FFT551' - MULTIPLE FAST COSINE TRANSFORM
 !
 !     AUTHOR: CLIVE TEMPERTON, MAY 1988
 !     [ALL-FORTRAN VERSION: C.T., OCTOBER 1995]
@@ -173,10 +173,10 @@ Subroutine da_fast_cosine_transform & ! in
       LA=LA/IFAC
       IERR=-1
       IF (IGO.EQ.+1) THEN
-        CALL da_qpassm(WORK,WORK(IFAC*LA+1),A(IA),A(IA+LA*INC), &
+        call da_qpassm(WORK,WORK(IFAC*LA+1),A(IA),A(IA+LA*INC), &
                     TRIGS,1,INC,NX,JUMP,NVEX,N,IFAC,LA,IERR)
       ELSE IF (IGO.EQ.-1) THEN
-        CALL da_qpassm(A(IA),A(IA+IFAC*LA*INC),WORK,WORK(LA+1), &
+        call da_qpassm(A(IA),A(IA+IFAC*LA*INC),WORK,WORK(LA+1), &
                     TRIGS,INC,1,JUMP,NX,NVEX,N,IFAC,LA,IERR)
       ENDIF
       IF (IERR.NE.0) GO TO 500
@@ -239,6 +239,6 @@ Subroutine da_fast_cosine_transform & ! in
   570 CONTINUE
 
       RETURN
-      END SUBROUTINE da_fast_cosine_transform
+      end subroutine da_fast_cosine_transform
 
 

@@ -1,10 +1,10 @@
-SUBROUTINE da_zero_x ( x )
+subroutine da_zero_x ( x )
 
    IMPLICIT NONE
 
    TYPE (x_type), INTENT(OUT)        :: x      ! Analysis incrs structure.
 
-   IF (trace_use) CALL da_trace_entry("da_zero_x")
+   IF (trace_use) call da_trace_entry("da_zero_x")
 
    x % u(:,:,:) = 0.0
    x % v(:,:,:) = 0.0
@@ -41,6 +41,6 @@ SUBROUTINE da_zero_x ( x )
    x % tb85v(:,:) = 0.0
    x % tb85h(:,:) = 0.0
 
-   IF (trace_use) CALL da_trace_exit("da_zero_x")
+   IF (trace_use) call da_trace_exit("da_zero_x")
 
-END SUBROUTINE da_zero_x
+end subroutine da_zero_x

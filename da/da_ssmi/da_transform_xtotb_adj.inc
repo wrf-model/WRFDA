@@ -1,6 +1,6 @@
 
 !============================================================================
-SUBROUTINE da_transform_xtotb_adj (xa, xb)
+subroutine da_transform_xtotb_adj (xa, xb)
 !----------------------------------------------------------------------------
    IMPLICIT NONE
 !----------------------------------------------------------------------------
@@ -190,7 +190,7 @@ SUBROUTINE da_transform_xtotb_adj (xa, xb)
    enddo
    enddo
 
-END SUBROUTINE da_transform_xtotb_adj
+end subroutine da_transform_xtotb_adj
 
 !============================================================================
 subroutine da_adj_tb(ifreq,theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld,            &
@@ -1452,7 +1452,7 @@ END subroutine da_adj_spemiss
 ! get water vapor optical depth
 !=====
 
-      CALL da_cal_sigma_v(ifreq,p0,wv,hwv,ta,gamma,sigv)
+      call da_cal_sigma_v(ifreq,p0,wv,hwv,ta,gamma,sigv)
 
 ! otbar = one over "mean" temperature
 
@@ -1481,7 +1481,7 @@ END subroutine da_adj_spemiss
 ! get effective emission heights for layer 1 and total atmosphere
 
 
-      CALL effht(ho,hv,sigo,sigv,mu,zcld,hdn,hup, &
+      call effht(ho,hv,sigo,sigv,mu,zcld,hdn,hup, &
                  hdninf,hupinf)
 
 ! atmospheric transmittances in layer one and two, and combined
@@ -2181,7 +2181,7 @@ IMPLICIT NONE
       endif
 
       ssw=36.5
-      CALL spemiss(f(ifreq),tk,theta,ssw,semv,semh)
+      call spemiss(f(ifreq),tk,theta,ssw,semv,semh)
 
       remv_save = remv
       remh_save = remh

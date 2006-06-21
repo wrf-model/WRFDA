@@ -1,4 +1,4 @@
-SUBROUTINE da_transform_xtoy_gpspw_adj( xb, oi, xp, jo_grad_y, jo_grad_x )
+subroutine da_transform_xtoy_gpspw_adj( xb, oi, xp, jo_grad_y, jo_grad_x )
 
   !----------------------------------------------------------------
   !  HISTORY
@@ -128,4 +128,4 @@ SUBROUTINE da_transform_xtoy_gpspw_adj( xb, oi, xp, jo_grad_y, jo_grad_x )
     end do
   ENDIF
 
-END SUBROUTINE da_transform_xtoy_gpspw_adj
+end subroutine da_transform_xtoy_gpspw_adj

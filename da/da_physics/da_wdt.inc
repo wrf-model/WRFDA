@@ -1,4 +1,4 @@
-SUBROUTINE da_wdt(H,W,TERR,DT,kts,kte)
+subroutine da_wdt(H,W,TERR,DT,kts,kte)
 
 !  Calculate DT
 
@@ -26,5 +26,5 @@ SUBROUTINE da_wdt(H,W,TERR,DT,kts,kte)
    endif
 
 
-END SUBROUTINE da_wdt
+end subroutine da_wdt
 

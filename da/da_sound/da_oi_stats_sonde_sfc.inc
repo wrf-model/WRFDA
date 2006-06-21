@@ -1,4 +1,4 @@
-SUBROUTINE da_oi_stats_sonde_sfc ( stats_unit, oi )
+subroutine da_oi_stats_sonde_sfc ( stats_unit, oi )
 
   IMPLICIT NONE
 
@@ -34,28 +34,28 @@ SUBROUTINE da_oi_stats_sonde_sfc ( stats_unit, oi )
 
   DO n=1, oi%num_sound
     if (oi%sonde_sfc(n)%loc%proc_domain ) then
-      CALL da_stats_calculate( oi%sonde_sfc(n)%loc%obs_global_index, &
+      call da_stats_calculate( oi%sonde_sfc(n)%loc%obs_global_index, &
                               0, oi%sonde_sfc(n)%u%qc, &
                               oi%sonde_sfc(n)%u%inv, nu, &
                               sonde_sfc%minimum%u, sonde_sfc%maximum%u, &
                               sonde_sfc%average%u, sonde_sfc%rms_err%u)
-      CALL da_stats_calculate( oi%sonde_sfc(n)%loc%obs_global_index, &
+      call da_stats_calculate( oi%sonde_sfc(n)%loc%obs_global_index, &
                               0, oi%sonde_sfc(n)%v%qc, &
                               oi%sonde_sfc(n)%v%inv, nv, &
                               sonde_sfc%minimum%v, sonde_sfc%maximum%v, &
                               sonde_sfc%average%v, sonde_sfc%rms_err%v)
-      CALL da_stats_calculate( oi%sonde_sfc(n)%loc%obs_global_index, &
+      call da_stats_calculate( oi%sonde_sfc(n)%loc%obs_global_index, &
                               0, oi%sonde_sfc(n)%t%qc, &
                               oi%sonde_sfc(n)%t%inv, nt, &
                               sonde_sfc%minimum%t, sonde_sfc%maximum%t, &
                               sonde_sfc%average%t, sonde_sfc%rms_err%t)
-      CALL da_stats_calculate( oi%sonde_sfc(n)%loc%obs_global_index, &
+      call da_stats_calculate( oi%sonde_sfc(n)%loc%obs_global_index, &
                               0, oi%sonde_sfc(n)%p%qc, &
                               oi%sonde_sfc(n)%p%inv, np, &
                               sonde_sfc%minimum%p, sonde_sfc%maximum%p, &
                               sonde_sfc%average%p, sonde_sfc%rms_err%p)
 
-      CALL da_stats_calculate( oi%sonde_sfc(n)%loc%obs_global_index, &
+      call da_stats_calculate( oi%sonde_sfc(n)%loc%obs_global_index, &
                               0, oi%sonde_sfc(n)%q%qc, &
                               oi%sonde_sfc(n)%q%inv, nq, &
                               sonde_sfc%minimum%q, sonde_sfc%maximum%q, &
@@ -98,9 +98,9 @@ SUBROUTINE da_oi_stats_sonde_sfc ( stats_unit, oi )
   IF ( wrf_dm_on_monitor() ) THEN
     IF (nu /= 0 .or. nv /= 0 .or. nt /= 0 .or. np /= 0 .or. nq /= 0 ) THEN
       write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of OI for sonde_sfc'
-      CALL da_print_stats_sonde_sfc( stats_unit, nu, nv, nt, np, nq, sonde_sfc )
+      call da_print_stats_sonde_sfc( stats_unit, nu, nv, nt, np, nq, sonde_sfc )
     END IF
   END IF
    
-END SUBROUTINE da_oi_stats_sonde_sfc
+end subroutine da_oi_stats_sonde_sfc
 

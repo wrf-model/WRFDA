@@ -1,7 +1,7 @@
 
 ! This subroutine ensures that exactly the same code is used for both 
 ! serial and parallel computations when testing_dm_bitwise_exact is set.  
-SUBROUTINE da_compute_jo_sound_uvtq( iv, re, jo_grad_y, jo )
+subroutine da_compute_jo_sound_uvtq( iv, re, jo_grad_y, jo )
 
   TYPE (ob_type), INTENT(IN   ) :: iv         ! Innovation vector.
   TYPE (y_type),  INTENT(IN   ) :: re         ! Residual vector.
@@ -24,4 +24,4 @@ SUBROUTINE da_compute_jo_sound_uvtq( iv, re, jo_grad_y, jo )
     ENDIF
   END DO
 
-END SUBROUTINE da_compute_jo_sound_uvtq
+end subroutine da_compute_jo_sound_uvtq

@@ -1,4 +1,4 @@
-SUBROUTINE da_check_max_iv_buoy(it, buoy, &
+subroutine da_check_max_iv_buoy(it, buoy, &
   itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf )
 
   !-------------------------------------------------------------------------------
@@ -49,29 +49,29 @@ SUBROUTINE da_check_max_iv_buoy(it, buoy, &
   failed = .FALSE.
 
   ! U-wind
-  CALL da_max_error_qc(it, buoy % info, buoy % u, &
+  call da_max_error_qc(it, buoy % info, buoy % u, &
     max_error_uv, itu, ituf, check_max_iv_unit, 'U    ', &
     failed, check_max_iv_print)
 
   ! V-wind
-  CALL da_max_error_qc (it, buoy % info, buoy % v,&
+  call da_max_error_qc (it, buoy % info, buoy % v,&
     max_error_uv, itvv, itvvf, check_max_iv_unit, 'V    ', &
     failed, check_max_iv_print)                           
 
   ! Pressure
-  CALL da_max_error_qc (it, buoy % info, buoy % p,&
+  call da_max_error_qc (it, buoy % info, buoy % p,&
     max_error_p, itp, itpf, check_max_iv_unit, 'Press', &
     failed, check_max_iv_print)         
 
   ! Temperature
-  CALL da_max_error_qc (it, buoy % info, buoy % t,&
+  call da_max_error_qc (it, buoy % info, buoy % t,&
     max_error_t, itt, ittf, check_max_iv_unit, 'TEMP ', &
     failed, check_max_iv_print)
 
   ! Mixing ratio, same ratio as relative humidity
 
-  CALL da_max_error_qc (it, buoy % info, buoy % q, &
+  call da_max_error_qc (it, buoy % info, buoy % q, &
     max_error_q, itqv, itqvf, check_max_iv_unit, 'QV   ', &
     failed, check_max_iv_print)
 
-END SUBROUTINE da_check_max_iv_Buoy
+end subroutine da_check_max_iv_Buoy

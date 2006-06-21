@@ -1,4 +1,4 @@
-SUBROUTINE da_get_innov_vector_bogus ( it, xb, xp, ob, iv )
+subroutine da_get_innov_vector_bogus ( it, xb, xp, ob, iv )
 
   !------------------------------------------------------------------------------
   !  This subroutine is to calculate the innovations for the bogus data.
@@ -163,7 +163,7 @@ SUBROUTINE da_get_innov_vector_bogus ( it, xb, xp, ob, iv )
       !------------------------------------------------------------------------
 
       IF ( check_max_iv ) THEN
-        CALL da_check_max_iv_bogus(it, iv % bogus(n), &
+        call da_check_max_iv_bogus(it, iv % bogus(n), &
           itu,ituf,itvv,itvvf,itt,ittf,itqv,itqvf,itslp,itslpf)
       END IF
     endif
@@ -181,5 +181,5 @@ SUBROUTINE da_get_innov_vector_bogus ( it, xb, xp, ob, iv )
     'Finally Total Bogus rejections ',ituf+itvvf+ittf+itqvf+itslpf,' on ', &
                                       itu +itvv +itt +itqv +itslp
 
-END SUBROUTINE da_get_innov_vector_bogus
+end subroutine da_get_innov_vector_bogus
 

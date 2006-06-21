@@ -1,4 +1,4 @@
-SUBROUTINE da_ao_stats_bogus( stats_unit, oi, re )
+subroutine da_ao_stats_bogus( stats_unit, oi, re )
 
   IMPLICIT NONE
 
@@ -35,25 +35,25 @@ SUBROUTINE da_ao_stats_bogus( stats_unit, oi, re )
   IF ( oi%num_Bogus > 0 ) THEN
     DO n=1, oi%num_Bogus
       if( oi%bogus(n)%loc%proc_domain ) then
-        CALL da_stats_calculate( n, 0, oi%Bogus(n)%slp%qc,  &
+        call da_stats_calculate( n, 0, oi%Bogus(n)%slp%qc,  &
                               re%Bogus(n)%slp, nslp,     &
                               Bogus%minimum%slp, Bogus%maximum%slp,  &
                               Bogus%average%slp, Bogus%rms_err%slp )
 
         do k=1, oi%bogus(n)%info%levels
-          CALL da_stats_calculate( n, k, oi%Bogus(n)%u(k)%qc, & 
+          call da_stats_calculate( n, k, oi%Bogus(n)%u(k)%qc, & 
                                   re%bogus(n)%u(k), nu, &
                                   bogus%minimum%u, Bogus%maximum%u, &
                                   bogus%average%u, Bogus%rms_err%u )
-          CALL da_stats_calculate( n, k, oi%Bogus(n)%v(k)%qc, & 
+          call da_stats_calculate( n, k, oi%Bogus(n)%v(k)%qc, & 
                                   re%bogus(n)%v(k), nv, &
                                   bogus%minimum%v, Bogus%maximum%v, &
                                   bogus%average%v, Bogus%rms_err%v )
-          CALL da_stats_calculate( n, k, oi%Bogus(n)%t(k)%qc, & 
+          call da_stats_calculate( n, k, oi%Bogus(n)%t(k)%qc, & 
                                   re%bogus(n)%t(k), nt, &
                                   bogus%minimum%t, Bogus%maximum%t, &
                                   bogus%average%t, Bogus%rms_err%t )
-          CALL da_stats_calculate( n, k, oi%Bogus(n)%q(k)%qc, & 
+          call da_stats_calculate( n, k, oi%Bogus(n)%q(k)%qc, & 
                                   re%Bogus(n)%q(k), nq, &
                                   Bogus%minimum%q, Bogus%maximum%q, &
                                   Bogus%average%q, Bogus%rms_err%q )
@@ -98,4 +98,4 @@ SUBROUTINE da_ao_stats_bogus( stats_unit, oi, re )
     END IF
   END IF
 
-END SUBROUTINE da_ao_stats_bogus
+end subroutine da_ao_stats_bogus

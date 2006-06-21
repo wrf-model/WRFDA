@@ -1,4 +1,4 @@
-SUBROUTINE da_ao_stats_airep( stats_unit, oi, re )
+subroutine da_ao_stats_airep( stats_unit, oi, re )
 
   IMPLICIT NONE
 
@@ -34,15 +34,15 @@ SUBROUTINE da_ao_stats_airep( stats_unit, oi, re )
       if( oi%airep(n)%loc%proc_domain ) then
 
         do k=1, oi%Airep(n)%info%levels
-          CALL da_stats_calculate( n, k, oi%Airep(n)%u(k)%qc,  & 
+          call da_stats_calculate( n, k, oi%Airep(n)%u(k)%qc,  & 
                                 re%Airep(n)%u(k), nu, &
                                 airep%minimum%u, Airep%maximum%u, &
                                 airep%average%u, Airep%rms_err%u )
-          CALL da_stats_calculate( n, k, oi%Airep(n)%v(k)%qc,  & 
+          call da_stats_calculate( n, k, oi%Airep(n)%v(k)%qc,  & 
                                 re%Airep(n)%v(k), nv, &
                                 airep%minimum%v, Airep%maximum%v, &
                                 airep%average%v, Airep%rms_err%v )
-          CALL da_stats_calculate( n, k, oi%Airep(n)%t(k)%qc,  & 
+          call da_stats_calculate( n, k, oi%Airep(n)%t(k)%qc,  & 
                                 re%Airep(n)%t(k), nt, &
                                  Airep%minimum%t, Airep%maximum%t, &
                                  Airep%average%t, Airep%rms_err%t )
@@ -77,4 +77,4 @@ SUBROUTINE da_ao_stats_airep( stats_unit, oi, re )
     END IF
   END IF
 
-END SUBROUTINE da_ao_stats_airep
+end subroutine da_ao_stats_airep

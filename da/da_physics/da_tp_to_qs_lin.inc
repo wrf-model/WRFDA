@@ -1,4 +1,4 @@
-SUBROUTINE da_tp_to_qs_lin( xb, xp, xa, qs_prime_over_qs )
+subroutine da_tp_to_qs_lin( xb, xp, xa, qs_prime_over_qs )
 
 !------------------------------------------------------------------------------
 !  PURPOSE: Convert es/p/es_prime to saturation specific humidity increment.
@@ -56,4 +56,4 @@ SUBROUTINE da_tp_to_qs_lin( xb, xp, xa, qs_prime_over_qs )
       end do
    end do
 
-END SUBROUTINE da_tp_to_qs_lin
+end subroutine da_tp_to_qs_lin

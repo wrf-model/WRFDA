@@ -1,4 +1,4 @@
-SUBROUTINE DA_Transform_XToSeaSfcWind(U,V,Speed,zhmkz)
+subroutine DA_Transform_XToSeaSfcWind(U,V,Speed,zhmkz)
 
 !------------------------------------------------------------------------------!
 ! Convert (U-V in m/s) components into wind speed (Speed in m/s)
@@ -15,5 +15,5 @@ SUBROUTINE DA_Transform_XToSeaSfcWind(U,V,Speed,zhmkz)
       vsfc   = V*log(10./0.0001)/log(zhmkz/0.0001) ! roughness = 0.0001
       speed  = sqrt(usfc*usfc + vsfc*vsfc)
 
-END SUBROUTINE DA_Transform_XToSeaSfcWind
+end subroutine DA_Transform_XToSeaSfcWind
 

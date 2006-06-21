@@ -1,4 +1,4 @@
-SUBROUTINE da_intpsfc_prs (val, ho, po, hm, tm, qm, to, qo)
+subroutine da_intpsfc_prs (val, ho, po, hm, tm, qm, to, qo)
 !------------------------------------------------------------------------------!
 !
 ! Correct pressure between two levels. 
@@ -53,4 +53,4 @@ SUBROUTINE da_intpsfc_prs (val, ho, po, hm, tm, qm, to, qo)
 
       val = po * exp (-arg)
 
-END SUBROUTINE da_intpsfc_prs
+end subroutine da_intpsfc_prs

@@ -1,4 +1,4 @@
-SUBROUTINE da_calculate_residual_gpsref( oi, y, re,               &
+subroutine da_calculate_residual_gpsref( oi, y, re,               &
                                         np_missing, np_bad_data,  &
                                         np_obs_used, np_available )
 ! -------------------------------------------------------------------------
@@ -41,5 +41,5 @@ SUBROUTINE da_calculate_residual_gpsref( oi, y, re,               &
    np_bad_data = np_bad_data + n_obs_bad % gpsref % num % bad
    np_obs_used = np_obs_used + n_obs_bad % gpsref % num % use
    
-END SUBROUTINE da_calculate_residual_gpsref
+end subroutine da_calculate_residual_gpsref
 

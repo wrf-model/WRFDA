@@ -1,4 +1,4 @@
-SUBROUTINE da_transform_vptovv( evec, eval, vertical_wgt, &
+subroutine da_transform_vptovv( evec, eval, vertical_wgt, &
                                 vp, vv, mz, &
                                 ids,ide, jds,jde, kds,kde,  &
                                 ims,ime, jms,jme, kms,kme,  &
@@ -28,7 +28,7 @@ SUBROUTINE da_transform_vptovv( evec, eval, vertical_wgt, &
    INTEGER               :: i, j, m                    ! Loop counters.
    REAL                  :: ETVp                       ! E(k,m)^{T}*vp(i,j,k)
 
-   IF (trace_use) CALL da_trace_entry("da_transform_vptovv")
+   IF (trace_use) call da_trace_entry("da_transform_vptovv")
    
 !-------------------------------------------------------------------
 !  [1.0] Apply inner-product weighting if vertical_ip > 0:
@@ -52,7 +52,7 @@ SUBROUTINE da_transform_vptovv( evec, eval, vertical_wgt, &
       end do
    end do
 
-   IF (trace_use) CALL da_trace_exit("da_transform_vptovv")
+   IF (trace_use) call da_trace_exit("da_transform_vptovv")
 
-END SUBROUTINE da_transform_vptovv
+end subroutine da_transform_vptovv
 

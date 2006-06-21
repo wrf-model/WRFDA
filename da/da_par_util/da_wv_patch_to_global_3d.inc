@@ -1,4 +1,4 @@
-SUBROUTINE da_wv_patch_to_global_3d( vlocal, vglobal,         &
+subroutine da_wv_patch_to_global_3d( vlocal, vglobal,         &
                                   domdesc, mz,             &
                                   ids, ide, jds, jde, kds, &
                                   ims, ime, jms, jme, kms, &
@@ -31,7 +31,7 @@ SUBROUTINE da_wv_patch_to_global_3d( vlocal, vglobal,         &
     kde = kds + mz - 1
     kme = kde
     kpe = kde
-    CALL wrf_patch_to_global_real ( vlocal, vglobal, domdesc,      &
+    call wrf_patch_to_global_real ( vlocal, vglobal, domdesc,      &
                                     TRIM(stagger), TRIM(ordering), &
                                     ids, ide, jds, jde, kds, kde,  &
                                     ims, ime, jms, jme, kms, kme,  &
@@ -39,4 +39,4 @@ SUBROUTINE da_wv_patch_to_global_3d( vlocal, vglobal,         &
   ENDIF
 #endif
 
-END SUBROUTINE da_wv_patch_to_global_3d
+end subroutine da_wv_patch_to_global_3d

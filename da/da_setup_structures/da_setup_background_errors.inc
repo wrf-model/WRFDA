@@ -16,7 +16,7 @@ subroutine da_setup_background_errors( xb, xbx, be, xp, &
    integer, intent(in)         :: its, ite, jts, jte, kts, kte ! Tile dimensions.
    integer, intent(in)         :: ids, ide, jds, jde, kds, kde ! Tile dimensions.
 
-   IF (trace_use) CALL da_trace_entry("da_setup_background_errors")
+   IF (trace_use) call da_trace_entry("da_setup_background_errors")
 
    be % ne = ensdim_alpha                          ! Size of ensemble.
 
@@ -29,7 +29,7 @@ subroutine da_setup_background_errors( xb, xbx, be, xp, &
    call da_setup_cv( its, ite, jts, jte, &
                      ids, ide, jds, jde, be )
 
-   IF (trace_use) CALL da_trace_exit("da_setup_background_errors")
+   IF (trace_use) call da_trace_exit("da_setup_background_errors")
 
 end subroutine da_setup_background_errors
 

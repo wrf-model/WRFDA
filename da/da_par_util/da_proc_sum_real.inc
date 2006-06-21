@@ -1,4 +1,4 @@
-SUBROUTINE da_proc_sum_real ( n, value )
+subroutine da_proc_sum_real ( n, value )
 
 !------------------------------------------------------------------------------
 !  PURPOSE: Do MPI reduction operation across processors to sum a real vector.  
@@ -38,5 +38,5 @@ SUBROUTINE da_proc_sum_real ( n, value )
 #endif
 
    RETURN
-END SUBROUTINE da_proc_sum_real
+end subroutine da_proc_sum_real
 

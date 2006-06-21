@@ -1,4 +1,4 @@
-SUBROUTINE da_check_vptox_adjoint( ne, xb, xbx, be, ep, xp, vp, xa, &
+subroutine da_check_vptox_adjoint( ne, xb, xbx, be, ep, xp, vp, xa, &
                                    ids, ide, jds, jde, kds, kde, &
                                    ims, ime, jms, jme, kms, kme, &
                                    its, ite, jts, jte, kts, kte )
@@ -42,12 +42,12 @@ SUBROUTINE da_check_vptox_adjoint( ne, xb, xbx, be, ep, xp, vp, xa, &
 
    write(unit=*, fmt='(/a/)') 'da_check_vptox_adjoint: Test Results:'
 
-   CALL da_zero_x( xa )
+   call da_zero_x( xa )
 
    vp2_v1(:,:,:) = vp % v1(:,:,:)
    vp2_v2(:,:,:) = vp % v2(:,:,:)
 
-   CALL da_psichi_to_uv(vp % v1, vp % v2, xb % coefx, &
+   call da_psichi_to_uv(vp % v1, vp % v2, xb % coefx, &
                         xb % coefy , xa % u, xa % v, &
                         ids,ide, jds,jde, kds,kde, &
                         ims,ime, jms,jme, kms,kme, &
@@ -62,7 +62,7 @@ SUBROUTINE da_check_vptox_adjoint( ne, xb, xbx, be, ep, xp, vp, xa, &
    vp%v1(:,:,:)=0.
    vp%v2(:,:,:)=0.
 
-   CALL da_psichi_to_uv_adj( xa % u, xa % v, xb % coefx,   &
+   call da_psichi_to_uv_adj( xa % u, xa % v, xb % coefx,   &
                              xb % coefy, vp % v1, vp % v2, &
                              ids,ide, jds,jde, kds,kde,    &
                              ims,ime, jms,jme, kms,kme,    &
@@ -90,7 +90,7 @@ PRINT *,'TEST_COVERAGE_DA_Check_VpToX_Adjoint A:  adj_sum_lhs,adj_sum_rhs = ', a
 
 !-------------------------------------------------------------------------
 
-   CALL da_zero_x( xa )
+   call da_zero_x( xa )
 
    vp2_v1(:,:,:) = vp % v1(:,:,:)
    vp2_v2(:,:,:) = vp % v2(:,:,:)
@@ -233,5 +233,5 @@ PRINT *,'TEST_COVERAGE_da_check_vptox_adjoint B:  adj_sum_lhs,adj_sum_rhs = ', a
    write(UNIT=stdout, fmt='(/a/)') &
         'End of da_check_vptox_adjoint.'
       
-END SUBROUTINE da_check_vptox_adjoint
+end subroutine da_check_vptox_adjoint
 

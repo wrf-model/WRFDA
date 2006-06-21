@@ -1,4 +1,4 @@
-SUBROUTINE da_transform_xtoy_gpspw ( xb, iv, xa, xp, y )
+subroutine da_transform_xtoy_gpspw ( xb, iv, xa, xp, y )
 
   !----------------------------------------------------------------
   !  HISTORY
@@ -120,5 +120,5 @@ SUBROUTINE da_transform_xtoy_gpspw ( xb, iv, xa, xp, y )
     end do
   ENDIF
 
-END SUBROUTINE da_transform_xtoy_gpspw
+end subroutine da_transform_xtoy_gpspw
 

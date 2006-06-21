@@ -1,4 +1,4 @@
-SUBROUTINE DA_Print_Stats_Satem( stats_unit, nthickness, Satem )
+subroutine DA_Print_Stats_Satem( stats_unit, nthickness, Satem )
 
   IMPLICIT NONE
 
@@ -21,5 +21,5 @@ SUBROUTINE DA_Print_Stats_Satem( stats_unit, nthickness, Satem )
     ' Average     : ', Satem%average%thickness/real(nthickness),    &
     '    RMSE     : ', sqrt(Satem%rms_err%thickness/real(nthickness))
 
-END SUBROUTINE DA_Print_Stats_Satem
+end subroutine DA_Print_Stats_Satem
 

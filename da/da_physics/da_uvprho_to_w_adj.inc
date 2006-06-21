@@ -1,4 +1,4 @@
-SUBROUTINE da_uvprho_to_w_adj( xb, xa, xp,                 &
+subroutine da_uvprho_to_w_adj( xb, xa, xp,                 &
                                ids,ide, jds,jde, kds,kde,  &
                                ims,ime, jms,jme, kms,kme,  &
                                its,ite, jts,jte, kts,kte)
@@ -56,7 +56,7 @@ SUBROUTINE da_uvprho_to_w_adj( xb, xa, xp,                 &
    ENDDO
    ENDDO
 
-   CALL da_w_adjustment_adj(xb,WZ,                     &
+   call da_w_adjustment_adj(xb,WZ,                     &
                 ids,ide, jds,jde, kds,kde, &
                 ims,ime, jms,jme, kms,kme, &
                 its,ite, jts,jte, kts,kte )
@@ -102,7 +102,7 @@ SUBROUTINE da_uvprho_to_w_adj( xb, xa, xp,                 &
    ENDDO
    ENDDO
 
-   CALL da_uv_to_divergence_adj(xp, xb, URHO,VRHO, DIV, &
+   call da_uv_to_divergence_adj(xp, xb, URHO,VRHO, DIV, &
                                 ids,ide, jds,jde, kds,kde,         &
                                 ims,ime, jms,jme, kms,kme,         &
                                 its,ite, jts,jte, kts,kte )
@@ -145,7 +145,7 @@ SUBROUTINE da_uvprho_to_w_adj( xb, xa, xp,                 &
    ENDDO
    ENDDO
 
-   CALL da_uv_to_divergence_adj(xp, xb, URHO,VRHO, DIV, &
+   call da_uv_to_divergence_adj(xp, xb, URHO,VRHO, DIV, &
                                 ids,ide, jds,jde, kds,kde,         &
                                 ims,ime, jms,jme, kms,kme,         &
                                 its,ite, jts,jte, kts,kte )
@@ -164,7 +164,7 @@ SUBROUTINE da_uvprho_to_w_adj( xb, xa, xp,                 &
 
 ! Term 2.2: Divergence term from basic wind
 
-   CALL da_uv_to_divergence(xb, xb%u,xb%v, DIV, &
+   call da_uv_to_divergence(xb, xb%u,xb%v, DIV, &
                             ids,ide, jds,jde, kds,kde,         &
                             ims,ime, jms,jme, kms,kme,         &
                             its,ite, jts,jte, kts,kte )
@@ -187,7 +187,7 @@ SUBROUTINE da_uvprho_to_w_adj( xb, xa, xp,                 &
    ENDDO
    ENDDO
 
-   CALL da_uv_to_divergence_adj(xp, xb, xa%u,xa%v, DIV, &
+   call da_uv_to_divergence_adj(xp, xb, xa%u,xa%v, DIV, &
                                 ids,ide, jds,jde, kds,kde,         &
                                 ims,ime, jms,jme, kms,kme,         &
                                 its,ite, jts,jte, kts,kte )
@@ -300,4 +300,4 @@ SUBROUTINE da_uvprho_to_w_adj( xb, xa, xp,                 &
 
     WZ(:,:,:) = 0.0
 
-END SUBROUTINE da_uvprho_to_w_adj
+end subroutine da_uvprho_to_w_adj

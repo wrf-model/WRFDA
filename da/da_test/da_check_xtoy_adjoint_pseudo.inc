@@ -1,4 +1,4 @@
-SUBROUTINE da_check_xtoy_adjoint_pseudo( oi, y, adjtest_lhs, pertile_lhs )
+subroutine da_check_xtoy_adjoint_pseudo( oi, y, adjtest_lhs, pertile_lhs )
 
    IMPLICIT NONE
 
@@ -36,4 +36,4 @@ SUBROUTINE da_check_xtoy_adjoint_pseudo( oi, y, adjtest_lhs, pertile_lhs )
    ENDDO
    ENDIF
 
-END SUBROUTINE da_check_xtoy_adjoint_pseudo
+end subroutine da_check_xtoy_adjoint_pseudo

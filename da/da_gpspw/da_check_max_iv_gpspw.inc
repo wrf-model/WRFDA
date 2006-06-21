@@ -1,4 +1,4 @@
-SUBROUTINE da_check_max_iv_gpspw(it, gpspw, ittpw,ittpwf)
+subroutine da_check_max_iv_gpspw(it, gpspw, ittpw,ittpwf)
 
   !-------------------------------------------------------------------------
   !
@@ -34,8 +34,8 @@ SUBROUTINE da_check_max_iv_gpspw(it, gpspw, ittpw,ittpwf)
   failed = .FALSE.
 
   ! TPW:
-  CALL da_max_error_qc(it, gpspw % info, gpspw % tpw, max_error_pw, ittpw, &
+  call da_max_error_qc(it, gpspw % info, gpspw % tpw, max_error_pw, ittpw, &
     ittpwf, check_max_iv_unit, 'TPW  ', failed, check_max_iv_print)
 
-END SUBROUTINE da_check_max_iv_gpspw
+end subroutine da_check_max_iv_gpspw
 

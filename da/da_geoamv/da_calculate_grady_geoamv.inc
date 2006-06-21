@@ -1,4 +1,4 @@
-SUBROUTINE da_calculate_grady_geoamv( iv, re, jo_grad_y )
+subroutine da_calculate_grady_geoamv( iv, re, jo_grad_y )
 
    !-------------------------------------------------------------------------
    ! Purpose: Calculates Gradient of Geo. CMVs Obs.
@@ -32,4 +32,4 @@ SUBROUTINE da_calculate_grady_geoamv( iv, re, jo_grad_y )
       END DO
    END IF
 
-END SUBROUTINE da_calculate_grady_geoamv
+end subroutine da_calculate_grady_geoamv

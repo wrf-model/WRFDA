@@ -28,7 +28,7 @@ subroutine da_transfer_xatoanalysis( it, xbx, grid, config_flags ,&
 
    character*4 filnam
 
-   IF (trace_use) CALL da_trace_entry("da_transfer_xatoanalysis")
+   IF (trace_use) call da_trace_entry("da_transfer_xatoanalysis")
 
 !------------------------------------------------------------------------------      
 !  Write out analysis in differing formats:
@@ -48,7 +48,7 @@ subroutine da_transfer_xatoanalysis( it, xbx, grid, config_flags ,&
 
       if(it < max_ext_its) then
          if(lvar4d) then
-            CALL da_med_initialdata_output( grid , config_flags )
+            call da_med_initialdata_output( grid , config_flags )
          endif
 
          call da_transfer_wrftoxb( xbx, grid, &
@@ -64,13 +64,13 @@ subroutine da_transfer_xatoanalysis( it, xbx, grid, config_flags ,&
 #include "em_dummy_args.inc"
                            )
       if(it < max_ext_its) then
-         CALL da_transfer_kmatoxb( xbx, grid, &
+         call da_transfer_kmatoxb( xbx, grid, &
 #include "em_dummy_args.inc"
                            )
       end if
    end if
 
-   IF (trace_use) CALL da_trace_exit("da_transfer_xatoanalysis")
+   IF (trace_use) call da_trace_exit("da_transfer_xatoanalysis")
 
 
 end subroutine da_transfer_xatoanalysis

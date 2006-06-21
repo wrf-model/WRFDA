@@ -1,4 +1,4 @@
-SUBROUTINE da_transform_xtoy_gpsref_adj( iv, xp, jo_grad_y, jo_grad_x, xb)
+subroutine da_transform_xtoy_gpsref_adj( iv, xp, jo_grad_y, jo_grad_x)
 
    IMPLICIT NONE
 
@@ -6,7 +6,6 @@ SUBROUTINE da_transform_xtoy_gpsref_adj( iv, xp, jo_grad_y, jo_grad_x, xb)
    TYPE (xpose_type), INTENT(IN) :: xp          ! Domain decomposition vars.
    TYPE (y_type) , INTENT(IN)    :: jo_grad_y   ! grad_y(jo)
    TYPE (x_type) , INTENT(INOUT) :: jo_grad_x   ! grad_x(jo)
-   TYPE (xb_type),  INTENT(IN)   :: xb          ! first guess state.
 
    INTEGER                       :: n        ! Loop counter.
    INTEGER                       :: i, j     ! Index dimension.
@@ -16,7 +15,8 @@ SUBROUTINE da_transform_xtoy_gpsref_adj( iv, xp, jo_grad_y, jo_grad_x, xb)
 
    IF ( iv%num_gpsref < 1 ) return
 
-   do n=iv%ob_numb(iv%current_ob_time-1)%gpsref + 1, iv%ob_numb(iv%current_ob_time)%gpsref
+   do n=iv%ob_numb(iv%current_ob_time-1)%gpsref + 1, &
+      iv%ob_numb(iv%current_ob_time)%gpsref
 
       if(iv%gpsref(n)%loc%proc_domain_with_halo) then
 
@@ -41,8 +41,7 @@ SUBROUTINE da_transform_xtoy_gpsref_adj( iv, xp, jo_grad_y, jo_grad_x, xb)
 #endif
 
       endif
-
    ENDDO
 
-END SUBROUTINE da_transform_xtoy_gpsref_adj
+end subroutine da_transform_xtoy_gpsref_adj
 

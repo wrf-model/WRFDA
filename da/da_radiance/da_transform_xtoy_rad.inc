@@ -1,4 +1,4 @@
-SUBROUTINE da_transform_xtoy_rad ( xa, iv, xp, y )
+subroutine da_transform_xtoy_rad ( xa, iv, xp, y )
 !------------------------------------------------------------------------------
 !  PURPOSE: transform from analysis increment to 
 !                          pertubation radiance.
@@ -50,7 +50,7 @@ SUBROUTINE da_transform_xtoy_rad ( xa, iv, xp, y )
    type(aux_vars_type),  pointer  :: aux_vars(:), aux_vars_tl(:)
 
 #if !defined(RTTOV)
-    CALL wrf_error(__FILE__,__LINE__, &
+    call wrf_error(__FILE__,__LINE__, &
       "Must compile with $RTTOV option for radiances")
 #else
 
@@ -73,7 +73,7 @@ SUBROUTINE da_transform_xtoy_rad ( xa, iv, xp, y )
      allocate (aux_vars(nprofiles), stat= alloc_status(6) )
      allocate (aux_vars_tl(nprofiles), stat= alloc_status(7) )
      if ( any(alloc_status /= 0) ) then
-       CALL wrf_error(__FILE__,__LINE__, &
+       call wrf_error(__FILE__,__LINE__, &
          "Canot allocate memory to con_vars")
      end if
 
@@ -220,5 +220,5 @@ SUBROUTINE da_transform_xtoy_rad ( xa, iv, xp, y )
 
  return
  
-END SUBROUTINE da_transform_xtoy_rad
+end subroutine da_transform_xtoy_rad
 

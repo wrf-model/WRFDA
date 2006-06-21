@@ -1,4 +1,4 @@
-SUBROUTINE DA_Calculate_GradY_SSMI( oi, re, jo_grad_y )
+subroutine DA_Calculate_GradY_SSMI( oi, re, jo_grad_y )
 !-------------------------------------------------------------------------
 !  HISTORY: 
 !
@@ -80,4 +80,4 @@ SUBROUTINE DA_Calculate_GradY_SSMI( oi, re, jo_grad_y )
    
    ENDIF
 
-END SUBROUTINE DA_Calculate_GradY_SSMI
+end subroutine DA_Calculate_GradY_SSMI

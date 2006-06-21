@@ -1,4 +1,4 @@
-SUBROUTINE da_solve_poissoneqn_fct_adj(xbx, b, del2b, xp)
+subroutine da_solve_poissoneqn_fct_adj(xbx, b, del2b, xp)
 
 !------------------------------------------------------------------------------
 !  PURPOSE: Solve Del**2 B = A for B with zero gradient boundary conditions.
@@ -61,7 +61,7 @@ SUBROUTINE da_solve_poissoneqn_fct_adj(xbx, b, del2b, xp)
       local_mean(k) = SUM(b(xp%its:xp%ite,xp%jts:xp%jte,k))*rij
    enddo
 
-   CALL wrf_dm_sum_reals ( local_mean, global_mean )
+   call wrf_dm_sum_reals ( local_mean, global_mean )
 do k=xp%kts,xp%kte
 PRINT *,'TEST_COVERAGE_DA_Solve_PoissonEqn_FCT_Adj:  global_mean(',k,') = ', global_mean(k)
 enddo
@@ -109,7 +109,7 @@ enddo
          enddo
       enddo
 
-      CALL da_fast_cosine_transform( Forward_FFT, vector_inc, vector_jump, &
+      call da_fast_cosine_transform( Forward_FFT, vector_inc, vector_jump, &
                                      num_vectors, vector_size, &
                                      xbx % fft_factors_x, xbx % trig_functs_x, &
                                      work_1d(1), work_area )
@@ -172,7 +172,7 @@ enddo
       enddo
       enddo
 
-      CALL da_fast_cosine_transform( Forward_FFT, vector_inc, vector_jump, &
+      call da_fast_cosine_transform( Forward_FFT, vector_inc, vector_jump, &
                                    num_vectors, vector_size, &
                                    xbx % fft_factors_y, xbx % trig_functs_y, &
                                    work_1d(1), work_area )
@@ -196,7 +196,7 @@ enddo
 
 !     Reform gridpt. b using inverse double FST in i.
 
-      CALL da_fast_cosine_transform( Inverse_FFT, vector_inc, vector_jump, &
+      call da_fast_cosine_transform( Inverse_FFT, vector_inc, vector_jump, &
                                    num_vectors, vector_size, &
                                    xbx % fft_factors_y, xbx % trig_functs_y, &
                                    work_1d(1), work_area )
@@ -254,7 +254,7 @@ enddo
          enddo
       enddo
 
-      CALL da_fast_cosine_transform( Inverse_FFT, vector_inc, vector_jump, &
+      call da_fast_cosine_transform( Inverse_FFT, vector_inc, vector_jump, &
                                    num_vectors, vector_size, &
                                    xbx % fft_factors_x, xbx % trig_functs_x, &
                                    work_1d(1), work_area )
@@ -288,5 +288,5 @@ enddo
 
    if(ALLOCATED( work_1d )) DEALLOCATE( work_1d )
 
-END SUBROUTINE da_solve_poissoneqn_fct_adj
+end subroutine da_solve_poissoneqn_fct_adj
 

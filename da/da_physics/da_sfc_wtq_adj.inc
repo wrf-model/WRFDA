@@ -1,4 +1,4 @@
-SUBROUTINE da_sfc_wtq_adj (psfc, tg, ps, ts, qs, us, vs, regime,& 
+subroutine da_sfc_wtq_adj (psfc, tg, ps, ts, qs, us, vs, regime,& 
                        psfc_prime, tg_prime, ps_prime, ts_prime, qs_prime, &
                        us_prime, vs_prime,  hs, roughness, xland,          & 
                        u10_prime, v10_prime, t2_prime, q2_prime) 
@@ -449,7 +449,7 @@ SUBROUTINE da_sfc_wtq_adj (psfc, tg, ps, ts, qs, us, vs, regime,&
        CASE DEFAULT;
          WRITE(UNIT=errmsg(1),FMT='(A,I2,A)') &
           "Regime=",iregime," is invalid."
-         CALL wrf_error(__FILE__,__LINE__,errmsg(1))
+         call wrf_error(__FILE__,__LINE__,errmsg(1))
 
       END SELECT
 !
@@ -761,7 +761,7 @@ SUBROUTINE da_sfc_wtq_adj (psfc, tg, ps, ts, qs, us, vs, regime,&
        CASE DEFAULT;
          WRITE(UNIT=errmsg(1),FMT='(A,I2,A)') &
           "Regime=",iregime," is invalid."
-         CALL wrf_error(__FILE__,__LINE__,errmsg(1))
+         call wrf_error(__FILE__,__LINE__,errmsg(1))
 
       END SELECT
  
@@ -853,4 +853,4 @@ SUBROUTINE da_sfc_wtq_adj (psfc, tg, ps, ts, qs, us, vs, regime,&
       ts_prime = ts_prime + tvs_prime  * (1. + 0.608 * qs)
       qs_prime = qs_prime + tvs_prime *  0.608 * ts
       tvs_prime = 0.
-END SUBROUTINE da_sfc_wtq_adj
+end subroutine da_sfc_wtq_adj

@@ -1,4 +1,4 @@
-SUBROUTINE da_ao_stats_gpspw( stats_unit, oi, re )
+subroutine da_ao_stats_gpspw( stats_unit, oi, re )
 
   IMPLICIT NONE
 
@@ -26,7 +26,7 @@ SUBROUTINE da_ao_stats_gpspw( stats_unit, oi, re )
   IF ( oi%num_Gpspw > 0 ) THEN
     DO n=1, oi%num_Gpspw
       if( oi%gpspw(n)%loc%proc_domain ) then
-        CALL  da_stats_calculate( n, 0, oi%gpspw(n)%tpw%qc, &
+        call  da_stats_calculate( n, 0, oi%gpspw(n)%tpw%qc, &
                               re%gpspw(n)%tpw, ntpw,   &
                               gpspw%minimum%tpw,  gpspw%maximum%tpw, &
                               gpspw%average%tpw,  gpspw%rms_err%tpw)
@@ -80,5 +80,5 @@ SUBROUTINE da_ao_stats_gpspw( stats_unit, oi, re )
     END IF
   END IF
 
-END SUBROUTINE da_ao_stats_gpspw
+end subroutine da_ao_stats_gpspw
 

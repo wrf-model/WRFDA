@@ -1,4 +1,4 @@
-SUBROUTINE da_integrat_dz( xb )
+subroutine da_integrat_dz( xb )
 
 !------------------------------------------------------------------------------
 !  Non-linear PW forward operator.
@@ -41,5 +41,5 @@ SUBROUTINE da_integrat_dz( xb )
    enddo
    enddo
 
-END SUBROUTINE da_integrat_dz
+end subroutine da_integrat_dz
 

@@ -1,4 +1,4 @@
-SUBROUTINE da_proc_sum_int ( value )
+subroutine da_proc_sum_int ( value )
 
 !------------------------------------------------------------------------------
 !  PURPOSE: Do MPI sum operation across processors to get the global sum of
@@ -34,5 +34,5 @@ SUBROUTINE da_proc_sum_int ( value )
    IF ( myrank .eq. root ) value = sum
 #endif
 
-END SUBROUTINE da_proc_sum_int
+end subroutine da_proc_sum_int
 

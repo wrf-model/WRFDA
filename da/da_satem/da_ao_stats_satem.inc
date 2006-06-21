@@ -1,4 +1,4 @@
-SUBROUTINE da_ao_stats_satem( stats_unit, oi, re )
+subroutine da_ao_stats_satem( stats_unit, oi, re )
 
   IMPLICIT NONE
 
@@ -32,7 +32,7 @@ SUBROUTINE da_ao_stats_satem( stats_unit, oi, re )
     DO n=1, oi%num_Satem
       if( oi%satem(n)%loc%proc_domain ) then
         do k=1, oi%satem(n)%info%levels
-          CALL da_stats_calculate( n, k, oi%Satem(n)%thickness(k)%qc, & 
+          call da_stats_calculate( n, k, oi%Satem(n)%thickness(k)%qc, & 
                          re%satem(n)%thickness(k), nthickness, &
                          Satem%minimum%thickness, Satem%maximum%thickness, &
                          Satem%average%thickness, Satem%rms_err%thickness )
@@ -57,5 +57,5 @@ SUBROUTINE da_ao_stats_satem( stats_unit, oi, re )
     END IF
   END IF
 
-END SUBROUTINE da_ao_stats_satem
+end subroutine da_ao_stats_satem
 

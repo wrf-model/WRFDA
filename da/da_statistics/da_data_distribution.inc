@@ -1,4 +1,4 @@
-SUBROUTINE da_data_distribution( ob_name, num_obs, min_val, max_val, &
+subroutine da_data_distribution( ob_name, num_obs, min_val, max_val, &
                                  bin_width, ob )
    
    !---------------------------------------------------------------------------
@@ -86,4 +86,4 @@ SUBROUTINE da_data_distribution( ob_name, num_obs, min_val, max_val, &
    DEALLOCATE( bin_min )
    DEALLOCATE( num_in_bin )
 
-END SUBROUTINE da_data_distribution
+end subroutine da_data_distribution

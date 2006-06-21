@@ -1,4 +1,4 @@
-SUBROUTINE da_count_filtered_obs (iunit, xp)
+subroutine da_count_filtered_obs (iunit, xp)
 !-----------------------------------------------------------------------------!
 !  Purpose: Scans intermediate Filtered Obs file, 
 !           counts various obs type and writes final filtered Obs 
@@ -405,4 +405,4 @@ loop_level: DO i = 1, platform%info%levels
      first_time = .false.
      go to 1000
 !-------------------------------------------------------------------------------
-END SUBROUTINE da_count_filtered_obs 
+end subroutine da_count_filtered_obs 

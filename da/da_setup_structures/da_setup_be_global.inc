@@ -42,10 +42,10 @@ subroutine da_setup_be_global( ide, jde, kde, be  )
    real, allocatable           :: power(:)               ! Temporary power spectrum.
    real, allocatable           :: power2d(:,:)           ! Temporary power spectrum.
 
-   IF (trace_use) CALL da_trace_entry("da_setup_be_global")
+   IF (trace_use) call da_trace_entry("da_setup_be_global")
 
 
-   CALL wrf_message("[3.0] Set up background errors (be) for global WRF-Var")
+   call wrf_message("[3.0] Set up background errors (be) for global WRF-Var")
 
    be % max_wave = ide / 2 - 1
 
@@ -67,7 +67,7 @@ subroutine da_setup_be_global( ide, jde, kde, be  )
    read(be_unit, err = 100)bin2d(1:ni,1:nj)
 
    if( ni /= ide .or. nj /= jde .or. nk /= kde ) THEN
-     CALL wrf_error(__FILE__,__LINE__, &
+     call wrf_error(__FILE__,__LINE__, &
        "Cannot generate BE at this resolution")
    END IF
 
@@ -268,13 +268,13 @@ subroutine da_setup_be_global( ide, jde, kde, be  )
 !--------------------------------------------------------------
 
  IF ( test_statistics ) THEN
-    CALL da_check_eof_decomposition( be%v1%val_g(:), be%v1%evec_g(:,:),&
+    call da_check_eof_decomposition( be%v1%val_g(:), be%v1%evec_g(:,:),&
                                      be%v1%name)
-    CALL da_check_eof_decomposition( be%v2%val_g(:), be%v2%evec_g(:,:),&
+    call da_check_eof_decomposition( be%v2%val_g(:), be%v2%evec_g(:,:),&
                                      be%v2%name)
-    CALL da_check_eof_decomposition( be%v3%val_g(:), be%v3%evec_g(:,:),&
+    call da_check_eof_decomposition( be%v3%val_g(:), be%v3%evec_g(:,:),&
                                      be%v3%name)
-    CALL da_check_eof_decomposition( be%v4%val_g(:), be%v4%evec_g(:,:),&
+    call da_check_eof_decomposition( be%v4%val_g(:), be%v4%evec_g(:,:),&
                                      be%v4%name)
  END IF
 
@@ -302,15 +302,15 @@ subroutine da_setup_be_global( ide, jde, kde, be  )
 
    close(be_unit)
 
-   IF (trace_use) CALL da_trace_exit("da_setup_be_global")
+   IF (trace_use) call da_trace_exit("da_setup_be_global")
 
    return
 
 99  write(UNIT=errmsg(1),FMT='(a, i5)')' Unexpected end on BE-unit = ',be_unit
-    CALL wrf_error(__FILE__,__LINE__,errmsg(1))
+    call wrf_error(__FILE__,__LINE__,errmsg(1))
 
 100 write(UNIT=errmsg(1),FMT='(a, i5)')' Read error on BE-unit = ',be_unit
-    CALL wrf_error(__FILE__,__LINE__,errmsg(1))
+    call wrf_error(__FILE__,__LINE__,errmsg(1))
 
 ! JRB daft having these here
 

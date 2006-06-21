@@ -1,4 +1,4 @@
-SUBROUTINE da_calculate_residual_sonde_sfc( oi, y, re,                        &
+subroutine da_calculate_residual_sonde_sfc( oi, y, re,                        &
                                         np_missing, np_bad_data,          &
                                         np_obs_used, np_available )
 
@@ -51,5 +51,5 @@ SUBROUTINE da_calculate_residual_sonde_sfc( oi, y, re,                        &
                 n_obs_bad % v % num % use + n_obs_bad % t % num % use + &
                 n_obs_bad % p % num % use + n_obs_bad % q % num % use
 
-END SUBROUTINE da_calculate_residual_sonde_sfc
+end subroutine da_calculate_residual_sonde_sfc
 

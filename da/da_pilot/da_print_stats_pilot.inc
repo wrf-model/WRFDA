@@ -1,4 +1,4 @@
-SUBROUTINE DA_Print_Stats_Pilot( stats_unit, nu, nv, Pilot )
+subroutine DA_Print_Stats_Pilot( stats_unit, nu, nv, Pilot )
 
   IMPLICIT NONE
 
@@ -24,5 +24,5 @@ SUBROUTINE DA_Print_Stats_Pilot( stats_unit, nu, nv, Pilot )
     '    RMSE     : ', sqrt(Pilot%rms_err%u/real(nu)), &
                        sqrt(Pilot%rms_err%v/real(nv))
 
-END SUBROUTINE DA_Print_Stats_Pilot
+end subroutine DA_Print_Stats_Pilot
 

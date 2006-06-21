@@ -1,4 +1,4 @@
-SUBROUTINE da_transform_vvtovp_adj( evec, eval, vertical_wgt, &
+subroutine da_transform_vvtovp_adj( evec, eval, vertical_wgt, &
                                     vp, vv, mz, &
                                     ids,ide, jds,jde, kds,kde,  &
                                     ims,ime, jms,jme, kms,kme,  &
@@ -24,7 +24,7 @@ SUBROUTINE da_transform_vvtovp_adj( evec, eval, vertical_wgt, &
    INTEGER               :: i, j, m, k                 ! Loop counters.
    REAL                  :: temp
 
-  IF (trace_use) CALL da_trace_entry("da_transform_vvtovp_adj")
+  IF (trace_use) call da_trace_entry("da_transform_vvtovp_adj")
 
 
 !-------------------------------------------------------------------
@@ -55,8 +55,8 @@ SUBROUTINE da_transform_vvtovp_adj( evec, eval, vertical_wgt, &
       END DO
    END DO
 
-  IF (trace_use) CALL da_trace_exit("da_transform_vvtovp_adj")
+  IF (trace_use) call da_trace_exit("da_transform_vvtovp_adj")
 
 
-END SUBROUTINE da_transform_vvtovp_adj
+end subroutine da_transform_vvtovp_adj
 

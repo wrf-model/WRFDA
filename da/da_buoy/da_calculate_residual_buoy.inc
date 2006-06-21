@@ -1,4 +1,4 @@
-SUBROUTINE da_calculate_residual_buoy( oi, y, re,                        &
+subroutine da_calculate_residual_buoy( oi, y, re,                        &
                                         np_missing, np_bad_data,          &
                                         np_obs_used, np_available )
 
@@ -51,4 +51,4 @@ SUBROUTINE da_calculate_residual_buoy( oi, y, re,                        &
 
   ENDIF
 
-END SUBROUTINE da_calculate_residual_buoy
+end subroutine da_calculate_residual_buoy

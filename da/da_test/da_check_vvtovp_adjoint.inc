@@ -1,4 +1,4 @@
-SUBROUTINE DA_Check_VvToVp_Adjoint( ne, xb, be, vv, vp, &
+subroutine DA_Check_VvToVp_Adjoint( ne, xb, be, vv, vp, &
                                     ids,ide, jds,jde, kds,kde, &
                                     ims,ime, jms,jme, kms,kme, &
                                     its,ite, jts,jte, kts,kte )
@@ -156,5 +156,5 @@ PRINT *,'TEST_COVERAGE_DA_Check_VvToVp_Adjoint:  adj_sum_lhs,adj_sum_rhs = ', ad
 
    write(UNIT=stdout, fmt='(/a/)') 'DA_Check_VvToVp_Adjoint: Test Finished.'
 
-END SUBROUTINE DA_Check_VvToVp_Adjoint
+end subroutine DA_Check_VvToVp_Adjoint
 

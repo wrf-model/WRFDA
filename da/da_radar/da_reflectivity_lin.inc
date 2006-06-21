@@ -1,9 +1,9 @@
-SUBROUTINE da_reflectivity_Lin( rf, rho, qrn, rho9, qrn9 )
+subroutine da_reflectivity_lin( rf, qrn, qrn9 )
 
    implicit none
 
-   real, intent(in)  :: rho, qrn
-   real, intent(in)  :: rho9, qrn9
+   real, intent(in)  :: qrn
+   real, intent(in)  :: qrn9
    real, intent(out) :: rf
 
    REAL, PARAMETER   :: leh1=43.1
@@ -11,4 +11,4 @@ SUBROUTINE da_reflectivity_Lin( rf, rho, qrn, rho9, qrn9 )
 
    rf = leh2 * qrn /(qrn9*alog(10.)) 
 
-END SUBROUTINE da_reflectivity_Lin
+end subroutine da_reflectivity_lin

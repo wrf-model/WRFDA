@@ -1,4 +1,4 @@
-SUBROUTINE da_setup_bufrtovs_structures( xp, ob, iv )
+subroutine da_setup_bufrtovs_structures( xp, ob, iv )
 
 !------------------------------------------------------------------------------
 ! PURPOSE: Define, allocate and read of tovs raidance observation structure.
@@ -174,7 +174,7 @@ SUBROUTINE da_setup_bufrtovs_structures( xp, ob, iv )
 !  [3.0] create (smaller) ob structure:
 !-----------------------------------------------------------------------------
 
-!   CALL da_fill_obs_structures( iv, ob )   ! problem of cross 'use' with da_obs
+!   call da_fill_obs_structures( iv, ob )   ! problem of cross 'use' with da_obs
 
  if (.not. use_kma1dvar) then
 
@@ -183,13 +183,13 @@ SUBROUTINE da_setup_bufrtovs_structures( xp, ob, iv )
       if (ob % instid(i) % num_rad < 1) cycle
       allocate ( ob % instid(i) % rad(1:ob % instid(i)%num_rad), stat = alloc_status )
       If( alloc_status /= 0 ) Then
-        CALL wrf_error(__FILE__,__LINE__, &
+        call wrf_error(__FILE__,__LINE__, &
           "mem allocation error to ob%instid(n)%rad")
       End If
       do j = 1, ob % instid(i) % num_rad
         allocate ( ob % instid(i) % rad(j) % tb(1:ob % instid(i) % nchan), stat = alloc_status )
         If( alloc_status /= 0 ) Then
-        CALL wrf_error(__FILE__,__LINE__, &
+        call wrf_error(__FILE__,__LINE__, &
           "mem allocation error to ob%instid(n)%ichan")
         End If
         ob % instid(i) % rad(j)% tb(:) = &
@@ -217,7 +217,7 @@ if ( lprinttovs ) then
 #endif
   open(UNIT=innov_vector_unit,file=trim(filename),form='formatted',iostat=ios)
   if( ios /= 0 ) Then
-    CALL wrf_error(__FILE__,__LINE__, &
+    call wrf_error(__FILE__,__LINE__, &
       "Cannot open output file "//TRIM(filename))
   Endif
     write(UNIT=innov_vector_unit,FMT='(a,a,i7,a,i5,a,20i3)') trim(iv%instid(n)%rttovid_string), &
@@ -244,5 +244,5 @@ end if
 
  return
 
-END SUBROUTINE da_setup_bufrtovs_structures
+end subroutine da_setup_bufrtovs_structures
 

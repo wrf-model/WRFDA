@@ -1,4 +1,4 @@
-SUBROUTINE da_tp_to_qs_lin1( t, p, es, t_prime, p_prime, &
+subroutine da_tp_to_qs_lin1( t, p, es, t_prime, p_prime, &
                              qs_prime_over_qs )
 
 !------------------------------------------------------------------------------
@@ -41,4 +41,4 @@ SUBROUTINE da_tp_to_qs_lin1( t, p, es, t_prime, p_prime, &
    qs_prime_over_qs = ( p * es_prime_over_es - p_prime ) / &
                       ( p - rd_over_rv1 * es )
 
-END SUBROUTINE da_tp_to_qs_lin1
+end subroutine da_tp_to_qs_lin1

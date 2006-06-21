@@ -1,4 +1,4 @@
-SUBROUTINE DA_Print_Stats_Radar( stats_unit, nrv, nrf, Radar )
+subroutine DA_Print_Stats_Radar( stats_unit, nrv, nrf, Radar )
 
    IMPLICIT NONE
 
@@ -22,5 +22,5 @@ SUBROUTINE DA_Print_Stats_Radar( stats_unit, nrv, nrf, Radar )
         ' Average     : ', Radar%average%rv/real(nrv), Radar%average%rf/real(nrf), &
         '    RMSE     : ', sqrt(Radar%rms_err%rv/real(nrv)), sqrt(Radar%rms_err%rf/real(nrf))
 
-END SUBROUTINE DA_Print_Stats_Radar
+end subroutine DA_Print_Stats_Radar
 

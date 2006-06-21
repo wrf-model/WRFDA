@@ -1,4 +1,4 @@
-SUBROUTINE da_transform_xtoy_buoy_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
+subroutine da_transform_xtoy_buoy_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
 
   IMPLICIT NONE
 
@@ -59,11 +59,11 @@ SUBROUTINE da_transform_xtoy_buoy_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
     else if (sfc_assi_options == 2) then
       do n=iv%ob_numb(iv%current_ob_time-1)%buoy + 1, iv%ob_numb(iv%current_ob_time)%buoy
         if (iv%buoy(n)%loc%proc_domain_with_halo) then
-          CALL da_transform_xtopsfc_adj(xb,xp,iv%buoy(n), jo_grad_y%buoy(n),jo_grad_x)
+          call da_transform_xtopsfc_adj(xb,xp,iv%buoy(n), jo_grad_y%buoy(n),jo_grad_x)
         endif
       ENDDO
     endif
   END IF
 
-END SUBROUTINE da_transform_xtoy_buoy_adj
+end subroutine da_transform_xtoy_buoy_adj
 

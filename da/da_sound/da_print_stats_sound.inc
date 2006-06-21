@@ -1,4 +1,4 @@
-SUBROUTINE DA_Print_Stats_Sound( stats_unit, nu, nv, nt, nq, Sound )
+subroutine DA_Print_Stats_Sound( stats_unit, nu, nv, nt, nq, Sound )
 
   IMPLICIT NONE
 
@@ -36,5 +36,5 @@ SUBROUTINE DA_Print_Stats_Sound( stats_unit, nu, nv, nt, nq, Sound )
                        sqrt(Sound%rms_err%t/real(nt)), &
                        sqrt(Sound%rms_err%q/real(nq))
 
-END SUBROUTINE DA_Print_Stats_Sound
+end subroutine DA_Print_Stats_Sound
 

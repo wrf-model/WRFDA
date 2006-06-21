@@ -1,4 +1,4 @@
-SUBROUTINE da_write_filtered_obs( ob, iv, xp )
+subroutine da_write_filtered_obs( ob, iv, xp )
 !----------------------------------------------------------------------------   
 !  History:
 !  Purpose: Writes filtered observations by WRFVAR
@@ -53,7 +53,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xp )
    INTEGER                       :: iunit, ounit
 !----------------------------------------------------------------------------!
 
-   if (trace_use) CALL da_trace_entry("da_write_filtered_obs")
+   if (trace_use) call da_trace_entry("da_write_filtered_obs")
 
    iunit = gts_iunit
    ounit = filtered_obs_iunit - 10
@@ -89,7 +89,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xp )
       IF (iost /= 0) THEN
          write(unit=errmsg(1), fmt='(/a,i3)') &
             'ERROR READING FILE UNIT:', iunit
-         CALL wrf_error(__FILE__,__LINE__,errmsg(1))   
+         call wrf_error(__FILE__,__LINE__,errmsg(1))   
       ENDIF
 
       if (blank(1:6) == 'EACH  ') EXIT
@@ -113,7 +113,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xp )
       write(unit=errmsg(1), fmt='(/A,I3,A/)') &
            ' ERROR IN INPUT FILE UNIT ',iunit, &
            ' FOR GTS OBSERVATIONS CANNOT BE FOUND OR CANNOT BE OPENED'
-      CALL wrf_error(__FILE__,__LINE__,errmsg(1))
+      call wrf_error(__FILE__,__LINE__,errmsg(1))
    ENDIF
 !----------------------------------------------------------------------------!
     READ (iunit, FMT = '(A80)') blank
@@ -605,7 +605,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xp )
             iv%sound(i)%info%lon,         &
             iv%sound(i)%info%elv,         &
             iv%sound(i)%info%id
-       CALL wrf_errors(__FILE__,__LINE__, errmsg(1:5))
+       call wrf_errors(__FILE__,__LINE__, errmsg(1:5))
      end if
      write(ounit, FMT = fmt_info, IOSTAT = iost) &
                    iv%sound(i)%info%platform,    &
@@ -873,7 +873,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xp )
      if( n1 /= i  .or. n2 /= n) then
        WRITE(UNIT=errmsg(1),FMT='(A,4I5)') &
          "mismatch in reading thickness errors from unit 193 ",i,n1,n,n2
-       CALL wrf_error(__FILE__,__LINE__,errmsg(1))
+       call wrf_error(__FILE__,__LINE__,errmsg(1))
      end if
        thick_qc = iv%satem(i)%thickness(n)%qc
        if( iv%satem(i)%thickness(n)%qc < obs_qc_pointer) thick_qc = missing_data
@@ -1160,6 +1160,6 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xp )
    close (ounit)
 !--------------------------------------------------------------------------
 
-   if (trace_use) CALL da_trace_exit("da_write_filtered_obs")
+   if (trace_use) call da_trace_exit("da_write_filtered_obs")
 
-END SUBROUTINE da_write_filtered_obs
+end subroutine da_write_filtered_obs

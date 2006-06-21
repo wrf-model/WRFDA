@@ -1,4 +1,4 @@
-SUBROUTINE da_transform_xtoy_pilot ( xa, iv, xp, y )
+subroutine da_transform_xtoy_pilot ( xa, iv, xp, y )
 
   IMPLICIT NONE
 
@@ -48,5 +48,5 @@ SUBROUTINE da_transform_xtoy_pilot ( xa, iv, xp, y )
     end do
   ENDIF
 
-END SUBROUTINE da_transform_xtoy_pilot 
+end subroutine da_transform_xtoy_pilot 
 

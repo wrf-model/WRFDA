@@ -1,5 +1,5 @@
 !============================================================================
-SUBROUTINE da_transform_xtoy_ssmi_rv( xb, oi, xa, y )
+subroutine da_transform_xtoy_ssmi_rv( xb, oi, xa, y )
 !----------------------------------------------------------------------------
    IMPLICIT NONE
 !----------------------------------------------------------------------------
@@ -43,5 +43,5 @@ SUBROUTINE da_transform_xtoy_ssmi_rv( xb, oi, xa, y )
       endif
    end do
 
-END SUBROUTINE da_transform_xtoy_ssmi_rv
+end subroutine da_transform_xtoy_ssmi_rv
 

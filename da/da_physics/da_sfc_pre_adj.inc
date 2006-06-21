@@ -1,4 +1,4 @@
-SUBROUTINE da_sfc_pre_adj (psfcm_prime, psm_prime, tsm_prime, qsm_prime, &
+subroutine da_sfc_pre_adj (psfcm_prime, psm_prime, tsm_prime, qsm_prime, &
                                         psm, tsm, qsm, hsm, ho, to, qvo)
 !-----------------------------------------------------------------------------!
 !
@@ -103,5 +103,5 @@ SUBROUTINE da_sfc_pre_adj (psfcm_prime, psm_prime, tsm_prime, qsm_prime, &
       tsm_prime = tvsm_prime * (1. + 0.608 * qsm) + tsm_prime
       qsm_prime = tvsm_prime * tsm * 0.608 + qsm_prime
 
-END SUBROUTINE da_sfc_pre_adj
+end subroutine da_sfc_pre_adj
 

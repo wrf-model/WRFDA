@@ -1,4 +1,4 @@
-SUBROUTINE da_transform_xtoy_profiler_adj( iv, xp, jo_grad_y, jo_grad_x )
+subroutine da_transform_xtoy_profiler_adj( iv, xp, jo_grad_y, jo_grad_x )
 
    IMPLICIT NONE
 
@@ -49,5 +49,5 @@ SUBROUTINE da_transform_xtoy_profiler_adj( iv, xp, jo_grad_y, jo_grad_x )
    
    END IF
 
-END SUBROUTINE da_transform_xtoy_profiler_adj
+end subroutine da_transform_xtoy_profiler_adj
 

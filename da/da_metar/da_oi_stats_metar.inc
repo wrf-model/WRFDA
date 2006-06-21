@@ -1,4 +1,4 @@
-SUBROUTINE da_oi_stats_metar ( stats_unit, oi )
+subroutine da_oi_stats_metar ( stats_unit, oi )
 
   IMPLICIT NONE
 
@@ -11,7 +11,7 @@ SUBROUTINE da_oi_stats_metar ( stats_unit, oi )
 
   LOGICAL, EXTERNAL :: wrf_dm_on_monitor
 
-  IF (trace_use) CALL da_trace_entry("da_oi_stats_metar")
+  IF (trace_use) call da_trace_entry("da_oi_stats_metar")
 
   nu = 0
   nv = 0
@@ -36,27 +36,27 @@ SUBROUTINE da_oi_stats_metar ( stats_unit, oi )
     DO n=1, oi%num_metar
       if( oi%metar(n)%loc%proc_domain ) then
 
-        CALL da_stats_calculate( oi%metar(n)%loc%obs_global_index, &
+        call da_stats_calculate( oi%metar(n)%loc%obs_global_index, &
                               0, oi%metar(n)%u%qc, &
                               oi%metar(n)%u%inv, nu, &
                               metar%minimum%u, metar%maximum%u, &
                               metar%average%u, metar%rms_err%u )
-        CALL da_stats_calculate( oi%metar(n)%loc%obs_global_index, &
+        call da_stats_calculate( oi%metar(n)%loc%obs_global_index, &
                               0, oi%metar(n)%v%qc, &
                               oi%metar(n)%v%inv, nv, &
                               metar%minimum%v, metar%maximum%v, &
                               metar%average%v, metar%rms_err%v)
-        CALL da_stats_calculate( oi%metar(n)%loc%obs_global_index, &
+        call da_stats_calculate( oi%metar(n)%loc%obs_global_index, &
                               0, oi%metar(n)%t%qc, &
                               oi%metar(n)%t%inv, nt, &
                               metar%minimum%t, metar%maximum%t, &
                               metar%average%t, metar%rms_err%t)
-        CALL da_stats_calculate( oi%metar(n)%loc%obs_global_index, &
+        call da_stats_calculate( oi%metar(n)%loc%obs_global_index, &
                               0, oi%metar(n)%p%qc, &
                               oi%metar(n)%p%inv, np, &
                               metar%minimum%p, metar%maximum%p, &
                               metar%average%p, metar%rms_err%p)
-        CALL da_stats_calculate( oi%metar(n)%loc%obs_global_index, &
+        call da_stats_calculate( oi%metar(n)%loc%obs_global_index, &
                               0, oi%metar(n)%q%qc, &
                               oi%metar(n)%q%inv, nq, &
                               metar%minimum%q, metar%maximum%q, &
@@ -98,11 +98,11 @@ SUBROUTINE da_oi_stats_metar ( stats_unit, oi )
   IF ( wrf_dm_on_monitor() ) THEN
     IF (nu /= 0 .or. nv /= 0 .or. nt /= 0 .or. np /= 0 .or. nq /= 0 ) THEN
       write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of OI for metar'
-      CALL da_print_stats_metar( stats_unit, nu, nv, nt, np, nq, metar )
+      call da_print_stats_metar( stats_unit, nu, nv, nt, np, nq, metar )
     END IF
   END IF
 
-  IF (trace_use) CALL da_trace_exit("da_oi_stats_metar")
+  IF (trace_use) call da_trace_exit("da_oi_stats_metar")
 
-END SUBROUTINE da_oi_stats_metar
+end subroutine da_oi_stats_metar
 

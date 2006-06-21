@@ -1,4 +1,4 @@
-SUBROUTINE da_omb_stats_rad ( stats_unit, iv )
+subroutine da_omb_stats_rad ( stats_unit, iv )
 !------------------------------------------------------------------------------
 !  PURPOSE: Calculate statistics of obs minus background for radiance data.
 !
@@ -51,7 +51,7 @@ SUBROUTINE da_omb_stats_rad ( stats_unit, iv )
 
       if( iv%instid(i)%rad(n)%loc%proc_domain ) then
 
-         CALL da_stats_calculate( n,k,iv%instid(i)%rad(n)%tb(k)%qc, &
+         call da_stats_calculate( n,k,iv%instid(i)%rad(n)%tb(k)%qc, &
                                iv%instid(i)%rad(n)%tb(k)%inv, rad(i)%ichan(k)%num, &
                                rad(i)%ichan(k)%minimum, rad(i)%ichan(k)%maximum, &
                                rad(i)%ichan(k)%ave, rad(i)%ichan(k)%rms)
@@ -84,7 +84,7 @@ SUBROUTINE da_omb_stats_rad ( stats_unit, iv )
 
    IF ( wrf_dm_on_monitor() ) THEN
      write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of OMB for Radiance '//iv%instid(i)%rttovid_string 
-     CALL da_print_stats_rad( stats_unit, iv%instid(i)%nchan, rad(i) )
+     call da_print_stats_rad( stats_unit, iv%instid(i)%nchan, rad(i) )
    END IF
 
   end do                         !  end loop for sensor
@@ -96,4 +96,4 @@ SUBROUTINE da_omb_stats_rad ( stats_unit, iv )
 
     Deallocate ( rad )
 
-END SUBROUTINE da_omb_stats_rad
+end subroutine da_omb_stats_rad

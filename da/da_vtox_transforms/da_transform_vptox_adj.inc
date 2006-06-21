@@ -27,7 +27,7 @@ subroutine da_transform_vptox_adj( xb, xbx, xa, vp, be, ep, xp, &
                                      xa%q (its:ite,jts:jte,kts:kte) * &
                                      xb%qs(its:ite,jts:jte,kts:kte)
 
-   IF (trace_use) CALL da_trace_entry("da_transform_vptox_adj")
+   IF (trace_use) call da_trace_entry("da_transform_vptox_adj")
 
                                     
    call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id3)
@@ -107,7 +107,7 @@ subroutine da_transform_vptox_adj( xb, xbx, xa, vp, be, ep, xp, &
       end do
    end do
 
-   IF (trace_use) CALL da_trace_entry("da_transform_vptox_adj")
+   IF (trace_use) call da_trace_entry("da_transform_vptox_adj")
 
 
 end subroutine da_transform_vptox_adj

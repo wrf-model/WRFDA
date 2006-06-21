@@ -1,4 +1,4 @@
-SUBROUTINE da_analysis_stats ( stats_unit, xp, xa )
+subroutine da_analysis_stats ( stats_unit, xp, xa )
    
    !------------------------------------------------------------------------
    ! PURPOSE: Calculate min, max, mean and RMS of input 1d field.
@@ -230,4 +230,4 @@ CONTAINS
 
 #include "da_maxmin_in_field.inc"
    
-END SUBROUTINE da_analysis_stats
+end subroutine da_analysis_stats

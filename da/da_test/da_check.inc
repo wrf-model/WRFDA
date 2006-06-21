@@ -41,7 +41,7 @@ subroutine da_check( cv_size, xb, xbx, be, ep, iv, &
 !  [2] Perform vtox adjoint tests:
 !------------------------------------------------------------------------------------
 
-   CALL wrf_message("Performing vtox adjoint tests")
+   call wrf_message("Performing vtox adjoint tests")
 
 !  v_to_vv adjoint test:
 
@@ -130,7 +130,7 @@ subroutine da_check( cv_size, xb, xbx, be, ep, iv, &
 
    end if
 
-   CALL wrf_shutdown
+   call wrf_shutdown
    stop 'in da_check'
 
 end subroutine da_check

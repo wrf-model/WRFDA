@@ -1,4 +1,4 @@
-SUBROUTINE da_solve_poissoneqn_fst( xbx, xp, del2b, b,          &
+subroutine da_solve_poissoneqn_fst( xbx, xp, del2b, b,          &
                                     ids,ide, jds,jde, kds,kde,      &
                                     ims,ime, jms,jme, kms,kme,      &
                                     its,ite, jts,jte, kts,kte )
@@ -101,7 +101,7 @@ SUBROUTINE da_solve_poissoneqn_fst( xbx, xp, del2b, b,          &
          enddo
       enddo
 
-      CALL da_fast_sine_transform( Forward_FFT, vector_inc, vector_jump, &
+      call da_fast_sine_transform( Forward_FFT, vector_inc, vector_jump, &
                                    num_vectors, vector_size, &
                                    xbx % fft_factors_x, xbx % trig_functs_x, &
                                    work_1d(1), work_area )
@@ -168,7 +168,7 @@ SUBROUTINE da_solve_poissoneqn_fst( xbx, xp, del2b, b,          &
       enddo
       enddo
 
-      CALL da_fast_sine_transform( Forward_FFT, vector_inc, vector_jump, &
+      call da_fast_sine_transform( Forward_FFT, vector_inc, vector_jump, &
                                    num_vectors, vector_size, &
                                    xbx % fft_factors_y, xbx % trig_functs_y, &
                                    work_1d(1), work_area )
@@ -192,7 +192,7 @@ SUBROUTINE da_solve_poissoneqn_fst( xbx, xp, del2b, b,          &
 
 !     [2.3] Reform gridpt. b using inverse double FST in i.
 
-      CALL da_fast_sine_transform( Inverse_FFT, vector_inc, vector_jump, &
+      call da_fast_sine_transform( Inverse_FFT, vector_inc, vector_jump, &
                                    num_vectors, vector_size, &
                                    xbx % fft_factors_y, xbx % trig_functs_y, &
                                    work_1d(1), work_area )
@@ -251,7 +251,7 @@ SUBROUTINE da_solve_poissoneqn_fst( xbx, xp, del2b, b,          &
          enddo
       enddo
 
-      CALL da_fast_sine_transform( Inverse_FFT, vector_inc, vector_jump, &
+      call da_fast_sine_transform( Inverse_FFT, vector_inc, vector_jump, &
                                    num_vectors, vector_size, &
                                    xbx % fft_factors_x, xbx % trig_functs_x, &
                                    work_1d(1), work_area )
@@ -280,5 +280,5 @@ SUBROUTINE da_solve_poissoneqn_fst( xbx, xp, del2b, b,          &
 
    b(its:ite,jts:jte,kts:kte) = xp%v1z(its:ite,jts:jte,kts:kte)
 
-END SUBROUTINE da_solve_poissoneqn_fst
+end subroutine da_solve_poissoneqn_fst
 

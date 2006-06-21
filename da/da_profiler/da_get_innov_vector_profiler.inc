@@ -1,4 +1,4 @@
-SUBROUTINE da_get_innov_vector_profiler ( it, xb, xp, ob, iv )
+subroutine da_get_innov_vector_profiler ( it, xb, xp, ob, iv )
 !-------------------------------------------------------------------------
 !
 !  History:
@@ -123,7 +123,7 @@ SUBROUTINE da_get_innov_vector_profiler ( it, xb, xp, ob, iv )
 !------------------------------------------------------------------------
 
          IF ( check_max_iv )   &  
-         CALL da_check_max_iv_profiler(it, iv % profiler(n), &
+         call da_check_max_iv_profiler(it, iv % profiler(n), &
                  itu,ituf,itvv,itvvf)
             
        endif
@@ -139,5 +139,5 @@ SUBROUTINE da_get_innov_vector_profiler ( it, xb, xp, ob, iv )
 
    ENDIF
 
-END SUBROUTINE da_get_innov_vector_profiler
+end subroutine da_get_innov_vector_profiler
 

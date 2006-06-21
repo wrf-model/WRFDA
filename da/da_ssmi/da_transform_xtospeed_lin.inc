@@ -1,5 +1,5 @@
 
-SUBROUTINE DA_Transform_XToSpeed_Lin(TGL_speed,U,V,TGL_u,TGL_v)
+subroutine DA_Transform_XToSpeed_Lin(TGL_speed,U,V,TGL_u,TGL_v)
 
 !------------------------------------------------------------------------------!
 ! Convert (U-V in m/s) components into wind speed (Speed in m/s)
@@ -17,6 +17,6 @@ SUBROUTINE DA_Transform_XToSpeed_Lin(TGL_speed,U,V,TGL_u,TGL_v)
 
     TGL_speed = (U*TGL_u + V*TGL_v)/speed
 
-END SUBROUTINE DA_Transform_XToSpeed_Lin
+end subroutine DA_Transform_XToSpeed_Lin
 
 

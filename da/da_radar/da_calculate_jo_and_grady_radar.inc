@@ -1,4 +1,4 @@
-SUBROUTINE DA_Calculate_Jo_and_GradY_Radar( iv, re, jo, jo_grad_y )
+subroutine DA_Calculate_Jo_and_GradY_Radar( iv, re, jo, jo_grad_y )
 
    IMPLICIT NONE
 
@@ -61,5 +61,5 @@ SUBROUTINE DA_Calculate_Jo_and_GradY_Radar( iv, re, jo, jo_grad_y )
    jo % Radar_rf = 0.5 * jo % Radar_rf
 
 
-END SUBROUTINE DA_Calculate_Jo_and_GradY_Radar
+end subroutine DA_Calculate_Jo_and_GradY_Radar
 

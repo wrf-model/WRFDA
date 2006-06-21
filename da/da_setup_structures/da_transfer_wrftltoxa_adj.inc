@@ -1,4 +1,4 @@
-SUBROUTINE da_transfer_wrftltoxa_adj( grid, config_flags, filnam, &
+subroutine da_transfer_wrftltoxa_adj( grid, config_flags, filnam, &
 #include "em_dummy_args.inc"
                               )
 
@@ -24,7 +24,7 @@ SUBROUTINE da_transfer_wrftltoxa_adj( grid, config_flags, filnam, &
    real    :: sdmd, s1md, qvf1, qvf2, qvf1_b, qvf2_b
    real, dimension(xp%ims:xp%ime,xp%jms:xp%jme,xp%kms:xp%kme) :: g_press
 
-   IF (trace_use) CALL da_trace_entry("da_transfer_wrftltoxa_adj")
+   IF (trace_use) call da_trace_entry("da_transfer_wrftltoxa_adj")
 
 !---------------------------------------------------------------------------
 
@@ -226,8 +226,8 @@ SUBROUTINE da_transfer_wrftltoxa_adj( grid, config_flags, filnam, &
    grid%dyn_opt = ndynopt
    call nl_set_dyn_opt ( 1 , DYN_EM )
 
-IF (trace_use) CALL da_trace_exit("da_transfer_wrftltoxa_adj")
+IF (trace_use) call da_trace_exit("da_transfer_wrftltoxa_adj")
 
 
-END SUBROUTINE da_transfer_wrftltoxa_adj
+end subroutine da_transfer_wrftltoxa_adj
 

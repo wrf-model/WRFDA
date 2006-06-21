@@ -1,4 +1,4 @@
-SUBROUTINE da_setup_pseudo_obs( iv, ob )
+subroutine da_setup_pseudo_obs( iv, ob )
 
 !-------------------------------------------------------------------------
 !  Purpose: Sets up pseudo ob part of observation structure.
@@ -11,7 +11,7 @@ SUBROUTINE da_setup_pseudo_obs( iv, ob )
 
    integer                       :: n    ! Loop counters.
 
-  IF (trace_use) CALL da_trace_entry("da_setup_pseudo_obs")
+  IF (trace_use) call da_trace_entry("da_setup_pseudo_obs")
 
 
 
@@ -94,9 +94,9 @@ SUBROUTINE da_setup_pseudo_obs( iv, ob )
       end do
    end if
 
-   IF (trace_use) CALL da_trace_exit("da_setup_pseudo_obs")
+   IF (trace_use) call da_trace_exit("da_setup_pseudo_obs")
 
-END SUBROUTINE da_setup_pseudo_obs
+end subroutine da_setup_pseudo_obs
 
 
 

@@ -1,6 +1,6 @@
 ! General trace within a subroutine
 
-SUBROUTINE da_trace( &
+subroutine da_trace( &
    Name,     &           ! in
    Message,  &           ! in, optional
    Messages,  &          ! in, optional
@@ -51,7 +51,7 @@ SUBROUTINE da_trace( &
    Change = ""
 
    IF (trace_memory) THEN
-      CALL da_memory( &
+      call da_memory( &
          TotalSpace)
       IF (LastSpace < TotalSpace) THEN
          WRITE(Change,"(A9,I12)")", bigger", TotalSpace - LastSpace
@@ -95,7 +95,7 @@ SUBROUTINE da_trace( &
                TRIM(Name), TRIM(Name)
          END IF
          IF (IOStatus /= 0) THEN
-            CALL wrf_error(__FILE__,__LINE__, &
+            call wrf_error(__FILE__,__LINE__, &
                "Cannot write to trace file for "//TRIM(Name))
          END IF
 
@@ -103,7 +103,7 @@ SUBROUTINE da_trace( &
             WRITE (UNIT=trace_unit, FMT='(A," ",A)', IOSTAT=IOStatus) &
                pad(1:TraceDepth*TraceIndentAmount),TRIM(Message)
             IF (IOStatus .NE. 0) THEN
-               CALL wrf_error(__FILE__,__LINE__, &
+               call wrf_error(__FILE__,__LINE__, &
                   "Cannot write to trace file for "//TRIM(Name))
             END IF
          END IF
@@ -113,7 +113,7 @@ SUBROUTINE da_trace( &
                WRITE (UNIT=trace_unit, FMT='(A," ",A)', IOSTAT=IOStatus) &
                   pad(1:TraceDepth*TraceIndentAmount),TRIM(Messages(Loop))
                IF (IOStatus .NE. 0) THEN
-                  CALL wrf_error(__FILE__,__LINE__, &
+                  call wrf_error(__FILE__,__LINE__, &
                      "Cannot write to trace file for "//TRIM(Name))
                END IF
             END DO ! Loop
@@ -124,7 +124,7 @@ SUBROUTINE da_trace( &
          WRITE (UNIT=trace_unit, FMT='(A,"  Called enough, going quiet")', IOSTAT=IOStatus) &
             pad(1:TraceDepth*TraceIndentAmount)
          IF (IOStatus .NE. 0) THEN
-            CALL wrf_error(__FILE__,__LINE__, &
+            call wrf_error(__FILE__,__LINE__, &
               "Cannot write to trace file for "//TRIM(Name))
          END IF
       END IF
@@ -132,4 +132,4 @@ SUBROUTINE da_trace( &
 
    RETURN
 
-END SUBROUTINE da_trace
+end subroutine da_trace

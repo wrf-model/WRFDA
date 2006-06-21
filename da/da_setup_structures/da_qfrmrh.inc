@@ -1,4 +1,4 @@
-SUBROUTINE da_qfrmrh ( P, T, RH, Q )
+subroutine da_qfrmrh ( P, T, RH, Q )
 
    implicit none
 
@@ -15,4 +15,4 @@ SUBROUTINE da_qfrmrh ( P, T, RH, Q )
       QS=0.622*E/(P-0.378*E)
       Q=QS*RH/100.
 
-END SUBROUTINE da_qfrmrh
+end subroutine da_qfrmrh

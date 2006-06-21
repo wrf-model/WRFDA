@@ -62,7 +62,7 @@ subroutine da_check_sfc_assi( xb, xa, iv, xp, y, &
    !                  ims,ime, jms,jme, kms,kme, &
    !                  its,ite, jts,jte, kts,kte )
 
-   ! CALL wrf_shutdown
+   ! call wrf_shutdown
    ! stop 'check_psfc'
 
    call da_transform_xtowtq ( xp, xb, xa )
@@ -159,7 +159,7 @@ subroutine da_check_sfc_assi( xb, xa, iv, xp, y, &
    xa%t2  (ims:ime, jms:jme) = xa2_t2  (ims:ime, jms:jme)
    xa%q2  (ims:ime, jms:jme) = xa2_q2  (ims:ime, jms:jme)
 
-   CALL wrf_shutdown
+   call wrf_shutdown
    stop 'In file: __FILE__'
 
    IF (trace_use) call da_trace_exit("da_check_sfc_assi")

@@ -1,4 +1,4 @@
-SUBROUTINE da_wrfvar_finalize( gcomp, importState, exportState, clock, rc )
+subroutine da_wrfvar_finalize( gcomp, importState, exportState, clock, rc )
 
    TYPE(ESMF_GridComp), INTENT(INOUT) :: gcomp
    TYPE(ESMF_State),    INTENT(INOUT) :: importState, exportState
@@ -21,16 +21,16 @@ SUBROUTINE da_wrfvar_finalize( gcomp, importState, exportState, clock, rc )
 
    IF ((config_flags%real_data_init_type == 1) .OR. &
        (config_flags%real_data_init_type == 3)) THEN
-      CALL da_med_initialdata_output( head_grid , config_flags )
+      call da_med_initialdata_output( head_grid , config_flags )
 
-      CALL med_shutdown_io ( head_grid , config_flags )
-      CALL wrf_debug ( 100 , 'wrf: back from med_shutdown_io' )
+      call med_shutdown_io ( head_grid , config_flags )
+      call wrf_debug ( 100 , 'wrf: back from med_shutdown_io' )
    END IF
 
-   CALL wrf_debug (   0 , 'wrfvar: SUCCESS COMPLETE WRFVAR' )
-   CALL wrf_shutdown
+   call wrf_debug (   0 , 'wrfvar: SUCCESS COMPLETE WRFVAR' )
+   call wrf_shutdown
 
    ! return success status
    rc = ESMF_SUCCESS
 
-END SUBROUTINE da_wrfvar_finalize
+end subroutine da_wrfvar_finalize

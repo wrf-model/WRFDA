@@ -30,7 +30,7 @@ subroutine da_oa_stats_ssmt1( stats_unit, iv, re )
 
             do k=1, iv%ssmt1(n)%info%levels
 
-               CALL da_stats_calculate( n, k, iv%ssmt1(n)%t(k)%qc, & 
+               call da_stats_calculate( n, k, iv%ssmt1(n)%t(k)%qc, & 
                                      re%ssmt1(n)%t(k), nt, &
                                      minimum, maximum, &
                                      average, rms_err)

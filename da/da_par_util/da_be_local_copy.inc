@@ -1,5 +1,5 @@
 
-SUBROUTINE da_be_local_copy( be_g, be, jts, jte, kts,kte )
+subroutine da_be_local_copy( be_g, be, jts, jte, kts,kte )
 
 !------------------------------------------------------------------------------
 !  PURPOSE: Make local copy of be_type gridded arrays from global copy. Note
@@ -21,5 +21,5 @@ SUBROUTINE da_be_local_copy( be_g, be, jts, jte, kts,kte )
    call da_alloc_and_copy_be_arrays( be_g % v4 , be % v4, jts,jte, kts,kte )
    call da_alloc_and_copy_be_arrays( be_g % v5 , be % v5, jts,jte, kts,kte )
 
-END SUBROUTINE da_be_local_copy
+end subroutine da_be_local_copy
 

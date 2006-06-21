@@ -17,7 +17,7 @@ subroutine da_vertical_transform( string, be, vertical_wgt, vv, vp, &
 
    integer :: k_end
 
-   IF (trace_use) CALL da_trace_entry("da_vertical_transform")
+   IF (trace_use) call da_trace_entry("da_vertical_transform")
 
 
    select case( string )
@@ -29,7 +29,7 @@ subroutine da_vertical_transform( string, be, vertical_wgt, vv, vp, &
 !------------------------------------------------------------------- 
 
       IF ( be % v1 % mz > 0 ) THEN
-         CALL da_transform_vvtovp( &
+         call da_transform_vvtovp( &
 #ifndef DEREF_KLUDGE
                                    be % v1 % evec, &
                                    be % v1 % val, &
@@ -50,7 +50,7 @@ subroutine da_vertical_transform( string, be, vertical_wgt, vv, vp, &
       END IF
 
       IF ( be % v2 % mz > 0 ) THEN
-         CALL da_transform_vvtovp( &
+         call da_transform_vvtovp( &
 #ifndef DEREF_KLUDGE
                                    be % v2 % evec, &
                                    be % v2 % val, &
@@ -71,7 +71,7 @@ subroutine da_vertical_transform( string, be, vertical_wgt, vv, vp, &
       END IF
 
       IF ( be % v3 % mz > 0 ) THEN
-         CALL da_transform_vvtovp( & 
+         call da_transform_vvtovp( & 
 #ifndef DEREF_KLUDGE
                                    be % v3 % evec, &
                                    be % v3 % val, &
@@ -92,7 +92,7 @@ subroutine da_vertical_transform( string, be, vertical_wgt, vv, vp, &
       END IF
 
       IF ( be % v4 % mz > 0 ) THEN
-         CALL da_transform_vvtovp( &
+         call da_transform_vvtovp( &
 #ifndef DEREF_KLUDGE
                                    be % v4 % evec, &
                                    be % v4 % val, &
@@ -127,7 +127,7 @@ subroutine da_vertical_transform( string, be, vertical_wgt, vv, vp, &
 !------------------------------------------------------------------- 
 
       IF ( be % v1 % mz > 0 ) THEN
-         CALL da_transform_vptovv( &
+         call da_transform_vptovv( &
 #ifndef DEREF_KLUDGE
                                    be % v1 % evec, &
                                    be % v1 % val, &
@@ -146,7 +146,7 @@ subroutine da_vertical_transform( string, be, vertical_wgt, vv, vp, &
       END IF
 
       IF ( be % v2 % mz > 0 ) THEN
-         CALL da_transform_vptovv( &
+         call da_transform_vptovv( &
 #ifndef DEREF_KLUDGE
                                    be % v2 % evec, &
                                    be % v2 % val, &
@@ -165,7 +165,7 @@ subroutine da_vertical_transform( string, be, vertical_wgt, vv, vp, &
       END IF
 
       IF ( be % v3 % mz > 0 ) THEN
-         CALL da_transform_vptovv( &
+         call da_transform_vptovv( &
 #ifndef DEREF_KLUDGE
                                    be % v3 % evec, &
                                    be % v3 % val, &
@@ -184,7 +184,7 @@ subroutine da_vertical_transform( string, be, vertical_wgt, vv, vp, &
       END IF
 
       IF ( be % v4 % mz > 0 ) THEN
-         CALL da_transform_vptovv( &
+         call da_transform_vptovv( &
 #ifndef DEREF_KLUDGE
                                    be % v4 % evec, &
                                    be % v4 % val, &
@@ -217,7 +217,7 @@ subroutine da_vertical_transform( string, be, vertical_wgt, vv, vp, &
 !------------------------------------------------------------------- 
 
       IF ( be % v1 % mz > 0 ) THEN
-         CALL da_transform_vvtovp_adj( &
+         call da_transform_vvtovp_adj( &
 #ifndef DEREF_KLUDGE
                                        be % v1 % evec, &
                                        be % v1 % val, &
@@ -237,7 +237,7 @@ subroutine da_vertical_transform( string, be, vertical_wgt, vv, vp, &
       END IF
 
       IF ( be % v2 % mz > 0 ) THEN
-         CALL da_transform_vvtovp_adj( &
+         call da_transform_vvtovp_adj( &
 #ifndef DEREF_KLUDGE
                                        be % v2 % evec, &
                                        be % v2 % val, &
@@ -257,7 +257,7 @@ subroutine da_vertical_transform( string, be, vertical_wgt, vv, vp, &
       END IF
 
       IF ( be % v3 % mz > 0 ) THEN
-         CALL da_transform_vvtovp_adj( &
+         call da_transform_vvtovp_adj( &
 #ifndef DEREF_KLUDGE
                                        be % v3 % evec, &
                                        be % v3 % val, &
@@ -277,7 +277,7 @@ subroutine da_vertical_transform( string, be, vertical_wgt, vv, vp, &
       END IF
 
       IF ( be % v4 % mz > 0 ) THEN
-         CALL da_transform_vvtovp_adj( &
+         call da_transform_vvtovp_adj( &
 #ifndef DEREF_KLUDGE
                                        be % v4 % evec, &
                                        be % v4 % val, &
@@ -306,12 +306,12 @@ subroutine da_vertical_transform( string, be, vertical_wgt, vv, vp, &
 
    case default;
    
-      CALL wrf_error(__FILE__,__LINE__, &
+      call wrf_error(__FILE__,__LINE__, &
                             "Invalid da_vertical_transform option "//TRIM(string))
 
    end select
 
-   IF (trace_use) CALL da_trace_exit("da_vertical_transform")
+   IF (trace_use) call da_trace_exit("da_vertical_transform")
 
 END subroutine da_vertical_transform
 

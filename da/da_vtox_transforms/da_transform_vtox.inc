@@ -30,7 +30,7 @@ subroutine da_transform_vtox( cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa, &
    real, dimension(xb%kms:xb%kme) :: p, mr_a, mr_b
    real    :: PU, PD, coeff
 
-  IF (trace_use) CALL da_trace_entry("da_transform_vtox")
+  IF (trace_use) call da_trace_entry("da_transform_vtox")
 
 
    call da_zero_x ( xa )
@@ -139,12 +139,12 @@ subroutine da_transform_vtox( cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa, &
 !
    if (.not.testing_wrfvar) then
 !--Exchange XA halo region.
-   CALL wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id4)
+   call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id4)
 
    if (sfc_assi_options == 2) then
       call da_transform_xtowtq ( xp, xb, xa )
 !-----Exchange XA (surface variable) halo region.
-      CALL wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id6)
+      call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id6)
    endif
 
    if ( use_ssmt1obs .or. use_ssmt2obs .or. Use_GpspwObs .or. &
@@ -160,7 +160,7 @@ subroutine da_transform_vtox( cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa, &
       if ( use_ssmt1obs .or. use_ssmt2obs .or. &
            Use_SsmiTbObs .or. Use_SsmiRetrievalObs ) then
          if( global ) then
-            CALL wrf_error(__FILE__,__LINE__, &
+            call wrf_error(__FILE__,__LINE__, &
             "xb%speed is not available, see da_transfer_kmatoxb.inc")
          end if
          call da_transform_xtoseasfcwind_lin( xa, xb )
@@ -168,7 +168,7 @@ subroutine da_transform_vtox( cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa, &
       if ( Use_SsmiTbObs ) call da_transform_xtotb_lin (xa, xb)
 
 !-----Exchange XA halo region.
-      CALL wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id8)
+      call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id8)
    endif
 
    endif
@@ -177,7 +177,7 @@ subroutine da_transform_vtox( cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa, &
 
    if ( Use_RadarObs ) then
 
-        CALL da_uvprho_to_w_lin( xb, xa, xp,                 &
+        call da_uvprho_to_w_lin( xb, xa, xp,                 &
                                  ids,ide, jds,jde, kds,kde,  &
                                  ims,ime, jms,jme, kms,kme,  &
                                  its,ite, jts,jte, kts,kte )
@@ -190,7 +190,7 @@ subroutine da_transform_vtox( cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa, &
          enddo
          enddo
 
-         CALL wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id13)
+         call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id13)
 
    endif
 !---------------------------------------------------------------
@@ -245,7 +245,7 @@ subroutine da_transform_vtox( cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa, &
     call da_set_boundary_xa(xa, xb)
    end if   
 
-  IF (trace_use) CALL da_trace_exit("da_transform_vtox")
+  IF (trace_use) call da_trace_exit("da_transform_vtox")
 
 
 end subroutine da_transform_vtox

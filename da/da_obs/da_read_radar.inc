@@ -1,4 +1,4 @@
-SUBROUTINE da_read_radar (iunit, ob, xp, filename)
+subroutine da_read_radar (iunit, ob, xp, filename)
 
 !----------------------------------------------------------------------------------------!
 ! Read the Radar observation file
@@ -32,7 +32,7 @@ SUBROUTINE da_read_radar (iunit, ob, xp, filename)
    INTEGER                       :: total_obs, num_Radar, total_Radar
    INTEGER                        ::n_dup, ndup
 
-   if (trace_use) CALL da_trace_entry("da_read_radar")
+   if (trace_use) call da_trace_entry("da_read_radar")
 
 
 ! -------------------------------------------------------------------
@@ -87,7 +87,7 @@ SUBROUTINE da_read_radar (iunit, ob, xp, filename)
 !      -------------
 
    IF (iost /= 0) THEN
-     CALL wrf_error(__FILE__,__LINE__, &
+     call wrf_error(__FILE__,__LINE__, &
        "Cannot read radar file")
    ENDIF
 
@@ -269,7 +269,7 @@ SUBROUTINE da_read_radar (iunit, ob, xp, filename)
           if( num_Radar > max_Radar ) then
             WRITE(UNIT=errmsg(1),FMT='(A,I6,A,I6)') &
               "Radar #= ",ob % num_Radar, " > max_Radar = ", max_Radar
-            CALL wrf_error(__FILE__,__LINE__,errmsg(1))
+            call wrf_error(__FILE__,__LINE__,errmsg(1))
           endif
 
           ob % Radar ( num_Radar ) % stn_loc % lon = platform % stn % lon
@@ -349,12 +349,12 @@ SUBROUTINE da_read_radar (iunit, ob, xp, filename)
         'Radar obs mismatch ob%ob_numb(ob%current_ob_time)%Radar=', &
         ob%ob_numb(ob%current_ob_time)%Radar, &
         'ob%num_Radar=', ob%num_Radar
-      CALL wrf_error(__FILE__,__LINE__,errmsg(1))
+      call wrf_error(__FILE__,__LINE__,errmsg(1))
     endif
 !----------------------------------------------------------------------------!
 
-   if (trace_use) CALL da_trace_exit("da_read_radar")
+   if (trace_use) call da_trace_exit("da_read_radar")
 
 
-END SUBROUTINE da_read_radar
+end subroutine da_read_radar
 

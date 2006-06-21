@@ -1,4 +1,4 @@
-SUBROUTINE da_setup_firstguess( xbx, grid, &
+subroutine da_setup_firstguess( xbx, grid, &
 !
 #include "em_dummy_args.inc"
 !
@@ -30,7 +30,7 @@ SUBROUTINE da_setup_firstguess( xbx, grid, &
    integer :: is, ie, js, je
    real    :: ddx , ddy    
 
-    IF (trace_use) CALL da_trace_entry("da_setup_firstguess")
+    IF (trace_use) call da_trace_entry("da_setup_firstguess")
 
 
    write(unit=stdout, fmt='(/a)') &
@@ -87,10 +87,10 @@ SUBROUTINE da_setup_firstguess( xbx, grid, &
    else
      WRITE(UNIT=errmsg(1),FMT='(A,I5)') &
        "Wrong choice for fg_format = ",fg_format
-     CALL wrf_error(__FILE__,__LINE__,errmsg(1))
+     call wrf_error(__FILE__,__LINE__,errmsg(1))
    end if
 
-   CALL wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id0)
+   call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id0)
    periodic_x = grid%periodic_x
 
    if( global ) then     
@@ -110,10 +110,10 @@ SUBROUTINE da_setup_firstguess( xbx, grid, &
 
 !  [2.1] Set up fast Fourier & Legendre transform constants:
 
-   CALL da_setup_runconstants( xp, xb, xbx)
+   call da_setup_runconstants( xp, xb, xbx)
 
-   IF (trace_use) CALL da_trace_exit("da_setup_firstguess")
+   IF (trace_use) call da_trace_exit("da_setup_firstguess")
 
 
-END SUBROUTINE da_setup_firstguess
+end subroutine da_setup_firstguess
 

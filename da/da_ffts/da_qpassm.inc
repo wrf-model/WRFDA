@@ -1,4 +1,4 @@
-!C     SUBROUTINE 'Var_QPASSM' - PERFORMS ONE PASS THROUGH DATA AS PART!C     OF MULTIPLE REAL FFT (FOURIER ANALYSIS) ROUTINE
+!C     subroutine 'Var_QPASSM' - PERFORMS ONE PASS THROUGH DATA AS PART!C     OF MULTIPLE REAL FFT (FOURIER ANALYSIS) ROUTINE
 !C
 !C     A IS FIRST REAL INPUT VECTOR
 !C         EQUIVALENCE B(1) WITH A(IFAC*LA*INC1+1)
@@ -21,7 +21,7 @@
 !C
 !C-----------------------------------------------------------------------
 !C
-     SUBROUTINE da_qpassm(A,B,C,D,TRIGS,INC1,INC2,INC3,INC4,LOT,N,IFAC,LA,IERR)
+     subroutine da_qpassm(A,B,C,D,TRIGS,INC1,INC2,INC3,INC4,LOT,N,IFAC,LA,IERR)
 
       INTEGER :: inc1, inc2, inc3, inc4, lot, n, ifac, la, ierr
 
@@ -756,4 +756,4 @@
       IERR=IBAD
 
       RETURN
-      END SUBROUTINE da_qpassm
+      end subroutine da_qpassm

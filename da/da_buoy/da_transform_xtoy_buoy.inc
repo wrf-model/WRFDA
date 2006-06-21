@@ -1,4 +1,4 @@
-SUBROUTINE da_transform_xtoy_buoy ( xa, xb, iv, xp, y )
+subroutine da_transform_xtoy_buoy ( xa, xb, iv, xp, y )
 
   IMPLICIT NONE
 
@@ -67,11 +67,11 @@ SUBROUTINE da_transform_xtoy_buoy ( xa, xb, iv, xp, y )
       ! [2.0] Surface assimilation approach 2
       do n=iv%ob_numb(iv%current_ob_time-1)%buoy + 1, iv%ob_numb(iv%current_ob_time)%buoy
         if(iv%buoy(n)%loc%proc_domain_with_halo) then
-          CALL da_transform_xtopsfc(xb,xa,xp,iv%buoy(n),y%buoy(n))
+          call da_transform_xtopsfc(xb,xa,xp,iv%buoy(n),y%buoy(n))
         endif
       end do
     endif
   ENDIF
 
-END SUBROUTINE da_transform_xtoy_buoy
+end subroutine da_transform_xtoy_buoy
 

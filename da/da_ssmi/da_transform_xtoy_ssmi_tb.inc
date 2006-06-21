@@ -1,5 +1,5 @@
 !============================================================================
-SUBROUTINE da_transform_xtoy_ssmi_tb( xb, oi, xa, xp, y )
+subroutine da_transform_xtoy_ssmi_tb( xb, oi, xa, xp, y )
 !----------------------------------------------------------------------------
    IMPLICIT NONE
 !----------------------------------------------------------------------------
@@ -228,5 +228,5 @@ SUBROUTINE da_transform_xtoy_ssmi_tb( xb, oi, xa, xp, y )
 
 !  end do
 
-END SUBROUTINE da_transform_xtoy_ssmi_tb
+end subroutine da_transform_xtoy_ssmi_tb
 

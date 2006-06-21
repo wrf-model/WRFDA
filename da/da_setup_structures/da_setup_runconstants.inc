@@ -1,4 +1,4 @@
-SUBROUTINE da_setup_runconstants( xp, xb, xbx)
+subroutine da_setup_runconstants( xp, xb, xbx)
 
    !---------------------------------------------------------------------------
    !  PURPOSE: Define constants used.
@@ -28,7 +28,7 @@ SUBROUTINE da_setup_runconstants( xp, xb, xbx)
    REAL                     :: cos_coeff_ny  ! Multiplicative coefficients.
    real                     :: delta_phi 
 
-   IF (trace_use) CALL da_trace_entry("da_setup_runconstants")
+   IF (trace_use) call da_trace_entry("da_setup_runconstants")
 
    !---------------------------------------------------------------------------
    ! [1.0] Calculate padded grid-size required for efficient FFTs and factors:
@@ -41,7 +41,7 @@ SUBROUTINE da_setup_runconstants( xp, xb, xbx)
    ALLOCATE( xbx % fft_factors_x(num_fft_factors) )
 
    DO n = nx, nx+nrange
-      CALL da_find_fft_factors(n, found_magic, xbx % fft_factors_x )
+      call da_find_fft_factors(n, found_magic, xbx % fft_factors_x )
 
       IF ( found_magic ) THEN
          IF ( mod(n, 2) == 0 ) THEN
@@ -53,13 +53,13 @@ SUBROUTINE da_setup_runconstants( xp, xb, xbx)
    END DO
 
    IF ( .NOT. found_magic ) THEN
-     CALL wrf_error(__FILE__,__LINE__, &
+     call wrf_error(__FILE__,__LINE__, &
        "No factor found")
    END IF
 
    ALLOCATE( xbx % trig_functs_x(1:3*fft_size_i) )  
 
-   CALL da_find_fft_trig_funcs( fft_size_i, xbx % trig_functs_x(:) )
+   call da_find_fft_trig_funcs( fft_size_i, xbx % trig_functs_x(:) )
 
    ! [1.2] In y direction:
 
@@ -68,7 +68,7 @@ SUBROUTINE da_setup_runconstants( xp, xb, xbx)
    ALLOCATE( xbx % fft_factors_y(num_fft_factors) )
 
    DO n = ny, ny+nrange
-      CALL da_find_fft_factors(n, found_magic, xbx % fft_factors_y )
+      call da_find_fft_factors(n, found_magic, xbx % fft_factors_y )
 
       IF ( found_magic ) THEN
          IF ( mod(n, 2) == 0 ) THEN
@@ -80,13 +80,13 @@ SUBROUTINE da_setup_runconstants( xp, xb, xbx)
    END DO
       
    IF ( .NOT. found_magic ) THEN
-     CALL wrf_error(__FILE__,__LINE__, &
+     call wrf_error(__FILE__,__LINE__, &
        "No factor found")
    END IF
 
    ALLOCATE( xbx % trig_functs_y(1:3*fft_size_j) )  
 
-   CALL da_find_fft_trig_funcs( fft_size_j, xbx % trig_functs_y(:) )
+   call da_find_fft_trig_funcs( fft_size_j, xbx % trig_functs_y(:) )
 
    !-----Multiplicative coefficent for solution of spectral Poission eqn:
 
@@ -146,7 +146,7 @@ SUBROUTINE da_setup_runconstants( xp, xb, xbx)
       write(UNIT=errmsg(2), fmt='(2x,a,i4)') &
          '(xp%ide-xp%ids+1) = ', (xp%ide-xp%ids+1), &
          'xbx%fft_pad_i = ', xbx%fft_pad_i
-      CALL wrf_errors (__FILE__,__LINE__,errmsg(1:2))
+      call wrf_errors (__FILE__,__LINE__,errmsg(1:2))
    else
       xbx%pad_inc = (xp%ide-xp%ids+1)/xbx%fft_pad_i
    endif
@@ -221,6 +221,6 @@ SUBROUTINE da_setup_runconstants( xp, xb, xbx)
 
    END IF
 
-   IF (trace_use) CALL da_trace_exit("da_setup_runconstants")
+   IF (trace_use) call da_trace_exit("da_setup_runconstants")
    
-END SUBROUTINE da_setup_runconstants
+end subroutine da_setup_runconstants

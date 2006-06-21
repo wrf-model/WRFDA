@@ -1,4 +1,4 @@
-SUBROUTINE da_proc_stats_combine( proc_ave, proc_err, proc_min, proc_max, &
+subroutine da_proc_stats_combine( proc_ave, proc_err, proc_min, proc_max, &
                                nobs_min, nobs_max, klev_min, klev_max )
 
 !------------------------------------------------------------------------------
@@ -98,5 +98,5 @@ SUBROUTINE da_proc_stats_combine( proc_ave, proc_err, proc_min, proc_max, &
    RETURN
 #endif
 
-END SUBROUTINE da_proc_stats_combine
+end subroutine da_proc_stats_combine
 

@@ -1,4 +1,4 @@
-SUBROUTINE da_read_bufr_obs (iunit, ob, xp, filename)
+subroutine da_read_bufr_obs (iunit, ob, xp, filename)
 !-----------------------------------------------------------------------------!
 !  Purpose: Read BUFR observation file for input to wrfvar
 !-----------------------------------------------------------------------------!
@@ -112,7 +112,7 @@ SUBROUTINE da_read_bufr_obs (iunit, ob, xp, filename)
            'return code from readmg:', iret, &
            'Reach the end of obs unit: ', iunit
 
-      CALL wrf_error(__FILE__,__LINE__, &
+      call wrf_error(__FILE__,__LINE__, &
         "No BUFR observations")
    end if
 !------------------------------------------------------------------------------
@@ -433,7 +433,7 @@ SUBROUTINE da_read_bufr_obs (iunit, ob, xp, filename)
 !  if rh, temp and pr all available computes Qs otherwise sets Qs= missing
 !  if rh > 100 sets q = qs otherwise q = rh*Qs/100. 
 ! Note: Currently da_obs_proc_station is active only for ob_format=2 (Ascii)
-!      CALL da_obs_proc_station(platform)
+!      call da_obs_proc_station(platform)
 !---------------------------------------------------------------------------
 !    Loop over duplicating obs for global
      ndup = 1
@@ -894,7 +894,7 @@ SUBROUTINE da_read_bufr_obs (iunit, ob, xp, filename)
          if( num_bogus > max_bogus_input) then
            WRITE(UNIT=errmsg(1),FMT='(A,I6,A,I6)') &
              'Bogus #=', num_bogus, ' > max_bogus_input=', max_bogus_input
-           CALL wrf_error(__FILE__,__LINE__,errmsg(1))
+           call wrf_error(__FILE__,__LINE__,errmsg(1))
          endif
 
          ob%bogus(num_bogus)%info = platform%info
@@ -1074,6 +1074,6 @@ SUBROUTINE da_read_bufr_obs (iunit, ob, xp, filename)
            'ob%ob_numb(ob%current_ob_time)%profiler=', ob%ob_numb(ob%current_ob_time)%profiler, &
            'ob%num_profiler=', ob%num_profiler
 
-      CALL wrf_error(__FILE__,__LINE__,"Obs mismatch")
+      call wrf_error(__FILE__,__LINE__,"Obs mismatch")
    endif
-END SUBROUTINE da_read_bufr_obs
+end subroutine da_read_bufr_obs

@@ -1,4 +1,4 @@
-SUBROUTINE da_get_innov_vector_gpsref ( it, xb, xp, ob, iv )
+subroutine da_get_innov_vector_gpsref ( it, xb, xp, ob, iv )
 
 ! ------------------------------------------------------------------------
 !  Called by DA_Obs/da_get_innov_vector.inc
@@ -193,7 +193,7 @@ SUBROUTINE da_get_innov_vector_gpsref ( it, xb, xp, ob, iv )
 ! ----------------
 
        IF ( check_max_iv ) &
-         CALL da_check_max_iv_gpsref(it, iv%gpsref(n), pref, fref )
+         call da_check_max_iv_gpsref(it, iv%gpsref(n), pref, fref )
 
 !
 ! Quality check 2: Error percentage check.
@@ -311,5 +311,5 @@ SUBROUTINE da_get_innov_vector_gpsref ( it, xb, xp, ob, iv )
         'Number of failed gpsrefes observations:', &
                    fref, ' on ',pref
 
-END SUBROUTINE da_get_innov_vector_gpsref
+end subroutine da_get_innov_vector_gpsref
 

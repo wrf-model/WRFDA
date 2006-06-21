@@ -1,4 +1,4 @@
-SUBROUTINE da_transfer_kmatoxb( xbx, grid, &
+subroutine da_transfer_kmatoxb( xbx, grid, &
 !
 #include "em_dummy_args.inc"
 !
@@ -36,7 +36,7 @@ SUBROUTINE da_transfer_kmatoxb( xbx, grid, &
 
    REAL, ALLOCATABLE :: arrayglobal(:,:) 
 
-   IF (trace_use) CALL da_trace_entry("da_transfer_kmatoxb")
+   IF (trace_use) call da_trace_entry("da_transfer_kmatoxb")
 
 
 !---------------------------------------------------------------------------
@@ -547,7 +547,7 @@ SUBROUTINE da_transfer_kmatoxb( xbx, grid, &
    ! testing.  This will always be .FALSE. for a serial or 1-process MPI run.  
    IF ( testing_dm_exact ) THEN
       ALLOCATE( arrayglobal( xp%ids:xp%ide, xp%jds:xp%jde ) )
-      CALL da_wv_patch_to_global( xb%lat, arrayglobal, xp%domdesc, &
+      call da_wv_patch_to_global( xb%lat, arrayglobal, xp%domdesc, &
                                xp%ids, xp%ide, xp%jds, xp%jde,  &
                                xp%ims, xp%ime, xp%jms, xp%jme,  &
                                xp%its, xp%ite, xp%jts, xp%jte )
@@ -556,13 +556,13 @@ SUBROUTINE da_transfer_kmatoxb( xbx, grid, &
       enddo
       DEALLOCATE( arrayglobal )
       ! Broadcast result from monitor to other tasks.
-      CALL wrf_dm_bcast_real( loc_latc_mean, (xp%jde-xp%jds+1) )
+      call wrf_dm_bcast_real( loc_latc_mean, (xp%jde-xp%jds+1) )
       xbx % latc_mean = loc_latc_mean
    ELSE
       do j=js,je
          loc_latc_mean(j) = tmpvar*SUM( xb % lat(is:ie, j) )
       enddo
-      CALL wrf_dm_sum_reals ( loc_latc_mean, xbx % latc_mean )
+      call wrf_dm_sum_reals ( loc_latc_mean, xbx % latc_mean )
    ENDIF
 
 !------------------------------------------------------------------------------
@@ -573,9 +573,9 @@ SUBROUTINE da_transfer_kmatoxb( xbx, grid, &
 !     end do
 !   end do
 
-   IF (trace_use) CALL da_trace_exit("da_transfer_kmatoxb")
+   IF (trace_use) call da_trace_exit("da_transfer_kmatoxb")
 
 
 
-END SUBROUTINE da_transfer_kmatoxb
+end subroutine da_transfer_kmatoxb
 

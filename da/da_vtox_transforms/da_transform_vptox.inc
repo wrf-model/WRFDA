@@ -23,7 +23,7 @@ subroutine da_transform_vptox( xb, xbx, vp, xp, xa, be, ep, &
 
    integer              :: n, k, j, k1               ! Loop counters.
 
-   IF (trace_use) CALL da_trace_entry("da_transform_vptox") 
+   IF (trace_use) call da_trace_entry("da_transform_vptox") 
 
 
 !--------------------------------------------------------------------------
@@ -95,7 +95,7 @@ subroutine da_transform_vptox( xb, xbx, vp, xp, xa, be, ep, &
 !--------------------------------------------------------------------------
 
 !  Communicate halo region.
-   CALL wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id1)
+   call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id1)
 
 !  Psi and chi to u and v:
 
@@ -109,7 +109,7 @@ subroutine da_transform_vptox( xb, xbx, vp, xp, xa, be, ep, &
    xa % q(its:ite,jts:jte,kts:kte) = vp%v4(its:ite,jts:jte,kts:kte) * &
                                      xb%qs(its:ite,jts:jte,kts:kte)
 
-   IF (trace_use) CALL da_trace_exit("da_transform_vptox") 
+   IF (trace_use) call da_trace_exit("da_transform_vptox") 
 
  
 end subroutine da_transform_vptox

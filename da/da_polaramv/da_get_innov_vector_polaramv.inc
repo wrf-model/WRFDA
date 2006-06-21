@@ -1,4 +1,4 @@
-SUBROUTINE da_get_innov_vector_polaramv( it, xb, xp, ob, iv )
+subroutine da_get_innov_vector_polaramv( it, xb, xp, ob, iv )
 !-------------------------------------------------------------------------
 !
 !  History:
@@ -115,7 +115,7 @@ SUBROUTINE da_get_innov_vector_polaramv( it, xb, xp, ob, iv )
 !  Perform optional maximum error check:
 !------------------------------------------------------------------------
 
-        IF ( check_max_iv ) CALL da_check_max_iv_polaramv(it, iv % polaramv(n), &
+        IF ( check_max_iv ) call da_check_max_iv_polaramv(it, iv % polaramv(n), &
                                 itu,ituf,itvv,itvvf)
 
        endif
@@ -129,5 +129,5 @@ SUBROUTINE da_get_innov_vector_polaramv( it, xb, xp, ob, iv )
       'Finally Total Polar AMVs rejections ',ituf+itvvf,' on ',itu+itvv
    ENDIF
 
-END SUBROUTINE da_get_innov_vector_polaramv
+end subroutine da_get_innov_vector_polaramv
 

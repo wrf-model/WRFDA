@@ -1,4 +1,4 @@
-SUBROUTINE da_transform_xtoy_ships ( xa, xb, iv, xp, y )
+subroutine da_transform_xtoy_ships ( xa, xb, iv, xp, y )
 
    IMPLICIT NONE
 
@@ -70,11 +70,11 @@ SUBROUTINE da_transform_xtoy_ships ( xa, xb, iv, xp, y )
           ! [2.0] Surface assimilation approach 2
           do n=iv%ob_numb(iv%current_ob_time-1)%ships + 1, iv%ob_numb(iv%current_ob_time)%ships
              if(iv%ships(n)%loc%proc_domain_with_halo) then
-                CALL da_transform_xtopsfc(xb,xa,xp,iv%ships(n),y%ships(n))
+                call da_transform_xtopsfc(xb,xa,xp,iv%ships(n),y%ships(n))
             endif
          end do
       endif
    ENDIF
 
-END SUBROUTINE da_transform_xtoy_ships
+end subroutine da_transform_xtoy_ships
 

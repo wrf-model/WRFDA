@@ -1,4 +1,4 @@
-SUBROUTINE da_calculate_jo_and_grady_ships( iv, re, jo, jo_grad_y )
+subroutine da_calculate_jo_and_grady_ships( iv, re, jo, jo_grad_y )
 
    IMPLICIT NONE
 
@@ -47,7 +47,7 @@ SUBROUTINE da_calculate_jo_and_grady_ships( iv, re, jo, jo_grad_y )
       jo % ships_q = 0.5 * jo % ships_q
    END IF
      
-END SUBROUTINE da_calculate_jo_and_grady_ships
+end subroutine da_calculate_jo_and_grady_ships
 
 
 

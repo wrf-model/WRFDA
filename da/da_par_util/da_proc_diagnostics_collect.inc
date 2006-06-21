@@ -1,4 +1,4 @@
-SUBROUTINE da_proc_diagnostics_collect(num_sound, iv, re )
+subroutine da_proc_diagnostics_collect(num_sound, iv, re )
 
 !------------------------------------------------------------------------------
 !  PURPOSE: Do MPI reduction operations across processors to get values needed
@@ -190,5 +190,5 @@ SUBROUTINE da_proc_diagnostics_collect(num_sound, iv, re )
    RETURN
 #endif
 
-END SUBROUTINE da_proc_diagnostics_collect
+end subroutine da_proc_diagnostics_collect
 

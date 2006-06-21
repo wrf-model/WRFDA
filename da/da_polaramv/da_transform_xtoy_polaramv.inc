@@ -1,4 +1,4 @@
-SUBROUTINE da_transform_xtoy_polaramv ( xa, iv, xp, y )
+subroutine da_transform_xtoy_polaramv ( xa, iv, xp, y )
 !-------------------------------------------------------------------------
 !  HISTORY: 
 !
@@ -60,4 +60,4 @@ SUBROUTINE da_transform_xtoy_polaramv ( xa, iv, xp, y )
 
    ENDIF
 
-END SUBROUTINE da_transform_xtoy_polaramv
+end subroutine da_transform_xtoy_polaramv

@@ -1,4 +1,4 @@
-SUBROUTINE da_radial_velocity_Adj(rv,p,u,v,w,qrn,ps0,x,y,z,qrn9)
+subroutine da_radial_velocity_Adj(rv,p,u,v,w,qrn,ps0,x,y,z,qrn9)
 
    implicit none
 
@@ -24,4 +24,4 @@ SUBROUTINE da_radial_velocity_Adj(rv,p,u,v,w,qrn,ps0,x,y,z,qrn9)
       qrn = qrn + vt*0.675*alpha*qrn9**(-0.875)
    end if
 
-END SUBROUTINE da_radial_velocity_Adj
+end subroutine da_radial_velocity_Adj

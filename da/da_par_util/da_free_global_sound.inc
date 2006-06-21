@@ -1,4 +1,4 @@
-SUBROUTINE da_free_global_sound( iv_glob, re_glob, jo_grad_y_glob )
+subroutine da_free_global_sound( iv_glob, re_glob, jo_grad_y_glob )
 
     IMPLICIT NONE
 
@@ -20,4 +20,4 @@ SUBROUTINE da_free_global_sound( iv_glob, re_glob, jo_grad_y_glob )
     ENDDO
     DEALLOCATE( jo_grad_y_glob%sound )
     RETURN
-END SUBROUTINE da_free_global_sound
+end subroutine da_free_global_sound

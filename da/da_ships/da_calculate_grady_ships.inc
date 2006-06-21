@@ -1,4 +1,4 @@
-SUBROUTINE da_calculate_grady_ships( iv, re, jo_grad_y )
+subroutine da_calculate_grady_ships( iv, re, jo_grad_y )
 
    !-------------------------------------------------------------------------
    ! Purpose: Applies obs inverse on re-vector
@@ -35,7 +35,7 @@ SUBROUTINE da_calculate_grady_ships( iv, re, jo_grad_y )
       END DO
    END IF
      
-END SUBROUTINE da_calculate_grady_ships
+end subroutine da_calculate_grady_ships
 
 
 

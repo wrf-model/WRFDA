@@ -8,7 +8,7 @@ subroutine da_get_var_diagnostics ( iv, j )
 
    LOGICAL, EXTERNAL :: wrf_dm_on_monitor     ! For statistics output.
 
-   IF (trace_use) CALL da_trace_entry("da_get_var_diagnostics")
+   IF (trace_use) call da_trace_entry("da_get_var_diagnostics")
 
    !-----------------------------------------------------------------------------
    ! [1.0] Sum up Jo across processors:
@@ -261,6 +261,6 @@ subroutine da_get_var_diagnostics ( iv, j )
       end if
    end if
 
-   IF (trace_use) CALL da_trace_exit("da_get_var_diagnostics")
+   IF (trace_use) call da_trace_exit("da_get_var_diagnostics")
       
 end subroutine da_get_var_diagnostics

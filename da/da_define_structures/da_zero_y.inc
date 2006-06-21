@@ -1,4 +1,4 @@
-SUBROUTINE da_zero_y( iv, y )
+subroutine da_zero_y( iv, y )
 
    !---------------------------------------------------------------------------
    ! PURPOSE: Initialises the Y-array
@@ -12,7 +12,7 @@ SUBROUTINE da_zero_y( iv, y )
    INTEGER                               :: n       ! Loop counter.
    INTEGER                               :: nlevels ! Number of levels.
 
-   IF (trace_use) CALL da_trace_entry("da_zero_y")
+   IF (trace_use) call da_trace_entry("da_zero_y")
 
    !---------------------------------------------------------------------------
    ! [1.0] Copy number of observations:
@@ -254,6 +254,6 @@ SUBROUTINE da_zero_y( iv, y )
       end do
    END IF
 
-   IF (trace_use) CALL da_trace_exit("da_zero_y")
+   IF (trace_use) call da_trace_exit("da_zero_y")
 
-END SUBROUTINE da_zero_y        
+end subroutine da_zero_y        

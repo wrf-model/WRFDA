@@ -83,7 +83,7 @@ subroutine da_get_innov_vector_satem ( it, xb, xp, ob, iv )
             !------------------------------------------------------------------------
 
             IF ( check_max_iv ) THEN
-              CALL da_check_max_iv_satem(it, iv % satem(n), ithickness,ithicknessf )
+              call da_check_max_iv_satem(it, iv % satem(n), ithickness,ithicknessf )
             END IF
 
             !------------------------------------------------------------------------

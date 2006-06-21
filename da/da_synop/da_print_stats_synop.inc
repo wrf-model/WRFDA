@@ -1,4 +1,4 @@
-SUBROUTINE DA_Print_Stats_Synop( stats_unit, nu, nv, nt, np, nq, synop )
+subroutine DA_Print_Stats_Synop( stats_unit, nu, nv, nt, np, nq, synop )
 
   IMPLICIT NONE
 
@@ -38,5 +38,5 @@ SUBROUTINE DA_Print_Stats_Synop( stats_unit, nu, nv, nt, np, nq, synop )
                        sqrt(synop%rms_err%p/real(np)), &
                        sqrt(synop%rms_err%q/real(nq))
 
-END SUBROUTINE DA_Print_Stats_Synop
+end subroutine DA_Print_Stats_Synop
 

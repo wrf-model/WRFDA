@@ -1,4 +1,4 @@
-SUBROUTINE da_get_innov_vector_metar ( it, xb, xp, ob, iv )
+subroutine da_get_innov_vector_metar ( it, xb, xp, ob, iv )
 
   !-------------------------------------------------------------------------
   !
@@ -36,14 +36,13 @@ SUBROUTINE da_get_innov_vector_metar ( it, xb, xp, ob, iv )
   REAL                         :: model_t  ! Model value t at oblocation.
   REAL                         :: model_p  ! Model value p at oblocation.
   REAL                         :: model_q  ! Model value q at oblocation.
-  REAL                         :: model_h  ! Model value h at oblocation.
 
   REAL, DIMENSION(xp%kms:xp%kme) :: v_h      ! Model value h at ob hor. location.
   REAL, DIMENSION(xp%kms:xp%kme) :: v_p      ! Model value p at ob hor. location.
 
   REAL :: hd, psfcm
 
-  REAL :: tsm , qsm , psm , hsm , ho, to, qo
+  REAL :: hsm , ho, to, qo
 
   INTEGER :: itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf
 
@@ -51,7 +50,7 @@ SUBROUTINE da_get_innov_vector_metar ( it, xb, xp, ob, iv )
 
   if ( iv % num_metar < 1 ) return
 
-  IF (trace_use) CALL da_trace_entry("da_get_innov_vector_metar")
+  IF (trace_use) call da_trace_entry("da_get_innov_vector_metar")
 
   !-------------------------------------------------------------------------
 
@@ -92,7 +91,7 @@ SUBROUTINE da_get_innov_vector_metar ( it, xb, xp, ob, iv )
             if (iv % metar(n) % h < v_h(xp%kts)) then
               iv%metar(n)%zk = 1.0+1.0e-6
 
-              CALL da_obs_sfc_correction(iv%metar(n), xb)
+              call da_obs_sfc_correction(iv%metar(n), xb)
 
               ! To keep the original "ob" with no change for multiple 
               ! outer-loops use:
@@ -258,7 +257,7 @@ SUBROUTINE da_get_innov_vector_metar ( it, xb, xp, ob, iv )
       !-----------------------------------------------------------------------
 
       IF ( check_max_iv ) THEN
-        CALL da_check_max_iv_metar(it, iv % metar(n), &
+        call da_check_max_iv_metar(it, iv % metar(n), &
                      itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf )
       END IF
     endif  ! domain_with_halo
@@ -276,7 +275,7 @@ SUBROUTINE da_get_innov_vector_metar ( it, xb, xp, ob, iv )
     'Finally Total Metar rejections ',ituf+itvvf+itpf+ittf+itqvf,' on ',&
                                       itu +itvv +itp +itt +itqv
 
-  IF (trace_use) CALL da_trace_exit("da_get_innov_vector_metar")
+  IF (trace_use) call da_trace_exit("da_get_innov_vector_metar")
 
-END SUBROUTINE da_get_innov_vector_metar
+end subroutine da_get_innov_vector_metar
 

@@ -1,4 +1,4 @@
-  SUBROUTINE da_obs_proc_station(obs)
+  subroutine da_obs_proc_station(obs)
 
 ! Processing obs data read in at a station:
 !
@@ -45,5 +45,5 @@ loop_levels: DO i = 1, obs % info % levels
 
    enddo loop_levels
 
-END SUBROUTINE da_obs_proc_station
+end subroutine da_obs_proc_station
 

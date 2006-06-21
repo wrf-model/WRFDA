@@ -1,4 +1,4 @@
-SUBROUTINE DA_Cal_Jo_and_GradY_SSMI_Tb( oi, re, jo, jo_grad_y )
+subroutine DA_Cal_Jo_and_GradY_SSMI_Tb( oi, re, jo, jo_grad_y )
 
    IMPLICIT NONE
 
@@ -86,4 +86,4 @@ SUBROUTINE DA_Cal_Jo_and_GradY_SSMI_Tb( oi, re, jo, jo_grad_y )
    jo % ssmi_tb85h = 0.5 * jo % ssmi_tb85h
    jo % ssmi_tb85v = 0.5 * jo % ssmi_tb85v
 
-END SUBROUTINE DA_Cal_Jo_and_GradY_SSMI_Tb
+end subroutine DA_Cal_Jo_and_GradY_SSMI_Tb

@@ -1,4 +1,4 @@
-SUBROUTINE da_reflectivity( rf, rho, qrn )
+subroutine da_reflectivity( rf, rho, qrn )
 
    implicit none
 
@@ -10,4 +10,4 @@ SUBROUTINE da_reflectivity( rf, rho, qrn )
 
    rf = leh1 + leh2 * ALOG10( rho * qrn * 1.E+3 )
 
-END SUBROUTINE da_reflectivity
+end subroutine da_reflectivity

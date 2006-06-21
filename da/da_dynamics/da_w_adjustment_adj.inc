@@ -1,4 +1,4 @@
-SUBROUTINE da_w_adjustment_adj(xb,WZ_a,                      &
+subroutine da_w_adjustment_adj(xb,WZ_a,                      &
                       ids,ide, jds,jde, kds,kde, &
                       ims,ime, jms,jme, kms,kme, &
                       its,ite, jts,jte, kts,kte )
@@ -27,7 +27,7 @@ SUBROUTINE da_w_adjustment_adj(xb,WZ_a,                      &
    real :: EBXL1,EBXL2
    real :: EBXL19,EBXL29
 
-   CALL da_wz_base(xb,WZ_b,                    &
+   call da_wz_base(xb,WZ_b,                    &
                 ids,ide, jds,jde, kds,kde,  &
                 ims,ime, jms,jme, kms,kme,  &
                 its,ite, jts,jte, kts,kte )
@@ -61,4 +61,4 @@ SUBROUTINE da_w_adjustment_adj(xb,WZ_a,                      &
       ENDDO
    ENDDO
 
-END SUBROUTINE da_w_adjustment_adj
+end subroutine da_w_adjustment_adj

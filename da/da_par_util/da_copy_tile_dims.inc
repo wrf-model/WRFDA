@@ -1,4 +1,4 @@
-SUBROUTINE da_copy_tile_dims( grid, xp, its, ite, jts, jte, kts, kte )
+subroutine da_copy_tile_dims( grid, xp, its, ite, jts, jte, kts, kte )
 
 !------------------------------------------------------------------------------
 !  PURPOSE: Copy tile dimensions from grid structure.
@@ -43,5 +43,5 @@ SUBROUTINE da_copy_tile_dims( grid, xp, its, ite, jts, jte, kts, kte )
      end if
    END DO
 
-END SUBROUTINE da_copy_tile_dims
+end subroutine da_copy_tile_dims
 

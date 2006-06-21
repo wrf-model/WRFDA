@@ -1,4 +1,4 @@
-SUBROUTINE DA_Print_Stats_PolarAMV( stats_unit, nu, nv, polaramv )
+subroutine DA_Print_Stats_PolarAMV( stats_unit, nu, nv, polaramv )
 
    implicit none
 
@@ -24,5 +24,5 @@ SUBROUTINE DA_Print_Stats_PolarAMV( stats_unit, nu, nv, polaramv )
         '    RMSE     : ', sqrt(polaramv%rms_err%u/real(nu)), &
                       sqrt(polaramv%rms_err%v/real(nv))
 
-END SUBROUTINE DA_Print_Stats_PolarAMV
+end subroutine DA_Print_Stats_PolarAMV
 

@@ -1,4 +1,4 @@
-SUBROUTINE DA_Print_Stats_Profiler( stats_unit, nu, nv, Profiler )
+subroutine DA_Print_Stats_Profiler( stats_unit, nu, nv, Profiler )
 
    IMPLICIT NONE
 
@@ -24,5 +24,5 @@ SUBROUTINE DA_Print_Stats_Profiler( stats_unit, nu, nv, Profiler )
         '    RMSE     : ', sqrt(Profiler%rms_err%u/real(nu)), &
                       sqrt(Profiler%rms_err%v/real(nv))
 
-END SUBROUTINE DA_Print_Stats_Profiler
+end subroutine DA_Print_Stats_Profiler
 

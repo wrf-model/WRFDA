@@ -1,4 +1,4 @@
-SUBROUTINE da_print_stats(stats_unit, nu, nv, nt, np, nq, sound)
+subroutine da_print_stats(stats_unit, nu, nv, nt, np, nq, sound)
 
    implicit none
 
@@ -38,5 +38,5 @@ SUBROUTINE da_print_stats(stats_unit, nu, nv, nt, np, nq, sound)
                          sqrt(sound%rms_err%p/real(np)), &
                          sqrt(sound%rms_err%q/real(nq))
 
-END SUBROUTINE da_print_stats
+end subroutine da_print_stats
 

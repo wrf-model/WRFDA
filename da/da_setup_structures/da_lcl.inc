@@ -1,4 +1,4 @@
-SUBROUTINE da_lcl( P0, Z0, T0, Q0, PLCL, ZLCL, TLCL, QLCL )
+subroutine da_lcl( P0, Z0, T0, Q0, PLCL, ZLCL, TLCL, QLCL )
 
    implicit none
 
@@ -15,7 +15,7 @@ SUBROUTINE da_lcl( P0, Z0, T0, Q0, PLCL, ZLCL, TLCL, QLCL )
 
     TLCL=T0*((PLCL/P0)**0.286)
 
-    CALL da_qfrmrh( PLCL, TLCL, 100., QS )
+    call da_qfrmrh( PLCL, TLCL, 100., QS )
 
     EPS=QS-Q0
 
@@ -41,4 +41,4 @@ SUBROUTINE da_lcl( P0, Z0, T0, Q0, PLCL, ZLCL, TLCL, QLCL )
   ENDDO reports
 
 
-END SUBROUTINE da_lcl
+end subroutine da_lcl

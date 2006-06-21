@@ -1,4 +1,4 @@
-SUBROUTINE da_tp_to_qs1( xb, xp, es, qs)
+subroutine da_tp_to_qs1( xb, xp, es, qs)
 
 !------------------------------------------------------------------------------
 !  PURPOSE: Convert T/p to saturation specific humidity.
@@ -59,5 +59,5 @@ SUBROUTINE da_tp_to_qs1( xb, xp, es, qs)
       end do
    end do
 
-END SUBROUTINE da_tp_to_qs1
+end subroutine da_tp_to_qs1
 

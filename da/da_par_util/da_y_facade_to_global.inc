@@ -19,7 +19,7 @@
 ! PERFORMANCE NOTE:   This implementation is NOT very efficient.  Speed it 
 !                     up if testing is too slow.  
 !------------------------------------------------------------------------------
-  SUBROUTINE da_y_facade_to_global( re_slice, template, re_glob_slice )
+  subroutine da_y_facade_to_global( re_slice, template, re_glob_slice )
 
     IMPLICIT NONE
 
@@ -70,23 +70,23 @@
      ENDDO
      DO n=1, num_obs_send
        IF ( obs_global_index(n) < 0 ) THEN
-         CALL wrf_error_fatal ( &
+         call wrf_error_fatal ( &
            'ASSERTION ERROR:  bad local value of obs_global_index' )
        ENDIF
      END DO
      ! exchange num_obs_send and obs_global_index
-     CALL wrf_get_dm_communicator ( communicator )
-     CALL wrf_get_nproc( nproc )
+     call wrf_get_dm_communicator ( communicator )
+     call wrf_get_nproc( nproc )
      ALLOCATE( num_obs_send_all(0:nproc-1),     &
                num_send_buf_all(0:nproc-1),     &
                recv_counts(0:nproc-1),          &
                recv_displs(0:nproc-1) )
      ! gather num_obs_send
-     CALL MPI_ALLGATHER( num_obs_send, 1, MPI_INTEGER, num_obs_send_all, 1, &
+     call MPI_ALLGATHER( num_obs_send, 1, MPI_INTEGER, num_obs_send_all, 1, &
                          MPI_INTEGER, communicator, ierr )
      num_obs_all = SUM( num_obs_send_all )
      IF ( num_obs_all /= re_slice%num_obs_glo ) THEN
-       CALL wrf_error_fatal ( &
+       call wrf_error_fatal ( &
          'ASSERTION ERROR:  inconsistent count of sound obs' )
      ENDIF
      ! set up to gather obs_global_index
@@ -100,7 +100,7 @@
                obs_global_index_inv(num_obs_all), &
                obs_start_all(num_obs_all) )
      ! gather obs_global_index
-     CALL MPI_ALLGATHERV( obs_global_index, num_obs_send, MPI_INTEGER,    &
+     call MPI_ALLGATHERV( obs_global_index, num_obs_send, MPI_INTEGER,    &
                           obs_global_index_all, recv_counts, recv_displs, &
                           MPI_INTEGER, communicator, ierr )
      ! invert obs_global_index_all
@@ -109,25 +109,25 @@
      DO n=1, num_obs_all
        IF ( ( obs_global_index_all(n) <  1 ) .OR. &
             ( obs_global_index_all(n) > SIZE(obs_global_index_inv) ) ) THEN
-         CALL wrf_error_fatal ( &
+         call wrf_error_fatal ( &
            'ASSERTION ERROR:  obs_global_index_all(n) out of range' )
        ENDIF
        IF ( obs_global_index_inv(obs_global_index_all(n)) /= -1 ) THEN
-         CALL wrf_error_fatal ( &
+         call wrf_error_fatal ( &
            'ASSERTION ERROR:  obs owned by more than one task' )
        ENDIF
        obs_global_index_inv(obs_global_index_all(n)) = n
      ENDDO
      DO n=1, num_obs_all
        IF ( obs_global_index_inv(obs_global_index_all(n)) == -1 ) THEN
-         CALL wrf_error_fatal ( &
+         call wrf_error_fatal ( &
            'ASSERTION ERROR:  obs not owned by any task' )
        ENDIF
      ENDDO
   
      ! Create re_glob_slice and populate with residual_generic_type objects 
      ! allocated to match template.  
-     CALL da_y_facade_create( re_glob_slice, num_obs_all, num_obs_all, &
+     call da_y_facade_create( re_glob_slice, num_obs_all, num_obs_all, &
                            template=template )
 
 ! NOTE:  This i loop should be inside the n loops.  
@@ -166,7 +166,7 @@
          ENDIF
        ENDDO
        ! gather num_send_buf_lcl
-       CALL MPI_ALLGATHER( num_send_buf_lcl, 1, MPI_INTEGER, &
+       call MPI_ALLGATHER( num_send_buf_lcl, 1, MPI_INTEGER, &
                            num_send_buf_all, 1,              &
                            MPI_INTEGER, communicator, ierr )
        ! gather num_values
@@ -176,7 +176,7 @@
          recv_displs(proc) = recv_displs(proc-1) + recv_counts(proc-1)
        ENDDO
        ! num_values
-       CALL MPI_ALLGATHERV( num_values, num_obs_send, MPI_INTEGER,    &
+       call MPI_ALLGATHERV( num_values, num_obs_send, MPI_INTEGER,    &
                             num_values_all, recv_counts, recv_displs, &
                             MPI_INTEGER, communicator, ierr )
        ! set up to gather local arrays
@@ -204,12 +204,12 @@
          ENDIF
        END DO
        IF ( buf_idx /= num_send_buf_lcl ) THEN
-         CALL wrf_error_fatal ( 'ASSERTION ERROR:  buf_idx /= num_send_buf_lcl' )
+         call wrf_error_fatal ( 'ASSERTION ERROR:  buf_idx /= num_send_buf_lcl' )
        ENDIF
        ! allocate receive buffer
        ALLOCATE( re_vals_all(num_recv_all) )
        ! finally, actually gather the values
-       CALL MPI_ALLGATHERV( re_vals_lcl, num_send_buf_lcl, TRUE_MPI_REAL,   &
+       call MPI_ALLGATHERV( re_vals_lcl, num_send_buf_lcl, TRUE_MPI_REAL,   &
                             re_vals_all, recv_counts, recv_displs, &
                             TRUE_MPI_REAL, communicator, ierr )
        ! initialize re_glob_slice
@@ -222,7 +222,7 @@
          ! note that we only collected obs someone owns
          re_glob_slice%obs(n)%proc_domain = .TRUE.
          re_glob_slice%obs(n)%obs_global_index = obs_global_index_all(serial_n)
-         CALL da_res_generic_alloc_and_set( re_glob_slice%obs(n), i, &
+         call da_res_generic_alloc_and_set( re_glob_slice%obs(n), i, &
                 re_vals_all(buf_idx:(buf_idx+serial_numvals-1)) )
        END DO
        ! deallocate communication buffers, etc.
@@ -231,7 +231,7 @@
 
      ENDDO  ! end of i loop
 
-     CALL da_y_facade_free( re_slice )
+     call da_y_facade_free( re_slice )
 
      DEALLOCATE( num_values_all, obs_global_index_all, &
                  obs_global_index_inv, obs_start_all )
@@ -239,8 +239,8 @@
                  recv_counts, recv_displs )
 
 #else
-    CALL wrf_error_fatal ( 'ASSERTION ERROR y_facade_to_global:  may only be called for a distributed memory parallel run' )
+    call wrf_error_fatal ( 'ASSERTION ERROR y_facade_to_global:  may only be called for a distributed memory parallel run' )
 #endif
     RETURN
-  END SUBROUTINE da_y_facade_to_global
+  end subroutine da_y_facade_to_global
 

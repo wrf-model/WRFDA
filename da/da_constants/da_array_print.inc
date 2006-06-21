@@ -1,4 +1,4 @@
-SUBROUTINE da_array_print(direction, a, ch)
+subroutine da_array_print(direction, a, ch)
 
    IMPLICIT NONE
 
@@ -48,5 +48,5 @@ SUBROUTINE da_array_print(direction, a, ch)
       end do
    endif
 
-END SUBROUTINE da_array_print
+end subroutine da_array_print
 

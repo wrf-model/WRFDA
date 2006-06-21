@@ -1,4 +1,4 @@
-SUBROUTINE da_moist_phys_lin( xb, xa, xp,  &
+subroutine da_moist_phys_lin( xb, xa, xp,  &
                 ids,ide, jds,jde, kds,kde,  &
                 ims,ime, jms,jme, kms,kme,  &
                 its,ite, jts,jte, kts,kte )
@@ -92,7 +92,7 @@ SUBROUTINE da_moist_phys_lin( xb, xa, xp,  &
          DT(k) = xb%delt(i,j,k)
        ENDDO
      else
-      CALL da_wdt(xb%h(I,J,:),xb%w(I,J,:),xb%terr(I,J),DT,kts,kte)
+      call da_wdt(xb%h(I,J,:),xb%w(I,J,:),xb%terr(I,J),DT,kts,kte)
      endif
 
       DO K=kts,kte
@@ -196,12 +196,12 @@ SUBROUTINE da_moist_phys_lin( xb, xa, xp,  &
          DUM111(K)=PRC1(K)**.3333/PRE1(K)**.5
       ENDDO
 
-      CALL da_autoc_lin(DT,SCR2,PRC,SCR29,PRC9,kts,kte)
+      call da_autoc_lin(DT,SCR2,PRC,SCR29,PRC9,kts,kte)
 
-      CALL da_accre_lin(DT,SCR2,SCR3,SCR7,PRAC,BVT3,PRA,  &
+      call da_accre_lin(DT,SCR2,SCR3,SCR7,PRAC,BVT3,PRA,  &
                   SCR29,SCR79,PRA9,kts,kte)
 
-      CALL da_evapo_lin(DT,SCR3,SCR5,SCR7,DUM111,DUM41,xb%q(I,J,:),  &
+      call da_evapo_lin(DT,SCR3,SCR5,SCR7,DUM111,DUM41,xb%q(I,J,:),  &
                  PREC1,PREC2,PRE,  &
                  SCR39,SCR59,SCR79,DUM1119,DUM419,xa%q(I,J,:),PRE9,kts,kte)
 
@@ -265,7 +265,7 @@ SUBROUTINE da_moist_phys_lin( xb, xa, xp,  &
          SCR71(K)=xb%t(I,J,K)+TTT(K)*DT(k)
       ENDDO
 
-      CALL da_condens_lin(DT,SCR31,SCR42,SCR71,DUM31,PRD,         &
+      call da_condens_lin(DT,SCR31,SCR42,SCR71,DUM31,PRD,         &
                           QVT,QCT,QRT,TTT,                        &
                           xb%p(I,J,:),xb%t(I,J,:),xb%q(I,J,:),    &
                           xb%qcw(I,J,:),xb%qrn(I,J,:),            &
@@ -305,4 +305,4 @@ SUBROUTINE da_moist_phys_lin( xb, xa, xp,  &
       ENDDO
    ENDDO
 
-END SUBROUTINE da_moist_phys_lin
+end subroutine da_moist_phys_lin

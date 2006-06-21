@@ -1,4 +1,4 @@
-SUBROUTINE da_get_vertical_truncation( max_vert_var, eigenval, be_sub )
+subroutine da_get_vertical_truncation( max_vert_var, eigenval, be_sub )
 
    !---------------------------------------------------------------------------
    !  PURPOSE: Calculate vertical mode truncation from explained variance.
@@ -18,7 +18,7 @@ SUBROUTINE da_get_vertical_truncation( max_vert_var, eigenval, be_sub )
    REAL                             :: cum_variance    ! Cumulative variance.
    CHARACTER (LEN = 6)              :: name            ! Variable name.
 
-   IF (trace_use) CALL da_trace_entry("da_get_vertical_truncation")
+   IF (trace_use) call da_trace_entry("da_get_vertical_truncation")
 
 
    !---------------------------------------------------------------------------
@@ -76,6 +76,6 @@ SUBROUTINE da_get_vertical_truncation( max_vert_var, eigenval, be_sub )
       ' = ', be_sub % mz, '(', &
       max_vert_var, '%)'
 
-   IF (trace_use) CALL da_trace_exit("da_get_vertical_truncation")
+   IF (trace_use) call da_trace_exit("da_get_vertical_truncation")
                                        
-END SUBROUTINE da_get_vertical_truncation
+end subroutine da_get_vertical_truncation

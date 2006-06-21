@@ -1,4 +1,4 @@
-SUBROUTINE da_get_spoles(x,              &
+subroutine da_get_spoles(x,              &
           ids, ide, jds, jde, kds, kde,  &
           ims, ime, jms, jme, kms, kme,  &
           its, ite, jts, jte, kts, kte   )
@@ -34,5 +34,5 @@ SUBROUTINE da_get_spoles(x,              &
       if (jte == jde) x(its:ite,jte,k) = tmps
    end do
 
-END SUBROUTINE da_get_spoles
+end subroutine da_get_spoles
 

@@ -1,4 +1,4 @@
-SUBROUTINE da_oi_stats_bogus ( stats_unit, oi )
+subroutine da_oi_stats_bogus ( stats_unit, oi )
 
   IMPLICIT NONE
 
@@ -33,28 +33,28 @@ SUBROUTINE da_oi_stats_bogus ( stats_unit, oi )
     DO n=1, oi%num_Bogus
       if( oi%bogus(n)%loc%proc_domain ) then
         do k=1, oi%bogus(n)%info%levels
-          CALL da_stats_calculate( oi%bogus(n)%loc%obs_global_index, &
+          call da_stats_calculate( oi%bogus(n)%loc%obs_global_index, &
                               k, oi%bogus(n)%u(k)%qc, &
                               oi%bogus(n)%u(k)%inv, nu, &
                               bogus%minimum%u, Bogus%maximum%u, &
                               bogus%average%u, Bogus%rms_err%u)
-          CALL da_stats_calculate( oi%bogus(n)%loc%obs_global_index, &
+          call da_stats_calculate( oi%bogus(n)%loc%obs_global_index, &
                               k, oi%bogus(n)%v(k)%qc, &
                               oi%bogus(n)%v(k)%inv, nv, &
                               bogus%minimum%v, Bogus%maximum%v, &
                               bogus%average%v, Bogus%rms_err%v)
-          CALL da_stats_calculate( oi%bogus(n)%loc%obs_global_index, &
+          call da_stats_calculate( oi%bogus(n)%loc%obs_global_index, &
                               k, oi%bogus(n)%t(k)%qc, &
                               oi%bogus(n)%t(k)%inv, nt, &
                               bogus%minimum%t, Bogus%maximum%t, &
                               bogus%average%t, Bogus%rms_err%t)
-          CALL da_stats_calculate( oi%bogus(n)%loc%obs_global_index, &
+          call da_stats_calculate( oi%bogus(n)%loc%obs_global_index, &
                               k, oi%bogus(n)%q(k)%qc, &
                               oi%bogus(n)%q(k)%inv, nq, &
                               bogus%minimum%q, Bogus%maximum%q, &
                               bogus%average%q, Bogus%rms_err%q)
         end do
-        CALL da_stats_calculate(  oi%bogus(n)%loc%obs_global_index, &
+        call da_stats_calculate(  oi%bogus(n)%loc%obs_global_index, &
                            0, oi%bogus(n)%slp%qc, &
                            oi%Bogus(n)%slp%inv, nslp,  &
                            Bogus%minimum%slp, Bogus%maximum%slp, &
@@ -94,8 +94,8 @@ SUBROUTINE da_oi_stats_bogus ( stats_unit, oi )
   IF ( wrf_dm_on_monitor() ) THEN
     IF (nu /= 0 .or. nv /= 0 .or. nt /= 0 .or. nq /= 0 .or. nslp /= 0 ) THEN
       write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of OI for Bogus'
-      CALL da_print_stats_bogus( stats_unit, nu, nv, nt, nq, nslp, Bogus )
+      call da_print_stats_bogus( stats_unit, nu, nv, nt, nq, nslp, Bogus )
     END IF
   END IF
 
-END SUBROUTINE da_oi_stats_bogus
+end subroutine da_oi_stats_bogus

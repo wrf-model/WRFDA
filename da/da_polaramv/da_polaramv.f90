@@ -7,7 +7,7 @@ module da_polaramv
    use da_tools
    use da_par_util
 
-! The "stats_polaramv_type" is ONLY used locally in DA_PolarAMV:
+   ! The "stats_polaramv_type" is ONLY used locally in DA_PolarAMV:
 
    TYPE residual_polaramv1_type
       REAL          :: u                        ! u-wind.

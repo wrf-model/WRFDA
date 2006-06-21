@@ -1,11 +1,4 @@
-SUBROUTINE da_get_innov_vector_Radar ( it, xb, xp, ob, iv )
-
-!------------------------------------------------------------------------------
-!  History: radial velocity on April 2004  Jianfeng Gu
-!  History: reflectivity    on July  2004  Jianfeng Gu
-!  History: update, September 2004  Jianfeng Gu
-!  History: multi Radar Obs., 29 September 2004  Jianfeng Gu
-!------------------------------------------------------------------------------
+subroutine da_get_innov_vector_radar ( it, xb, xp, ob, iv )
 
    IMPLICIT NONE
 
@@ -35,7 +28,7 @@ SUBROUTINE da_get_innov_vector_Radar ( it, xb, xp, ob, iv )
 
    REAL                           :: model_ps
 
-   REAL                           :: xr,yr,zr,zdiff_bottom
+   REAL                           :: xr,yr,zr
    INTEGER                        :: irv, irvf
    INTEGER                        :: irf, irff
 
@@ -45,8 +38,7 @@ SUBROUTINE da_get_innov_vector_Radar ( it, xb, xp, ob, iv )
    irv = 0; irvf = 0; irf = 0; irff = 0
 
    DO n=iv%ob_numb(iv%current_ob_time-1)%radar + 1, iv%ob_numb(iv%current_ob_time)%radar
-
-       if(iv%Radar(n)%loc%proc_domain_with_halo) then
+      if(iv%Radar(n)%loc%proc_domain_with_halo) then
 
          num_levs = iv % Radar(n) % info % levels
 
@@ -59,7 +51,7 @@ SUBROUTINE da_get_innov_vector_Radar ( it, xb, xp, ob, iv )
          model_rho(:) = 0.0
          model_qrn(:) = 0.0
       
-! [1.0] Get horizontal interpolation weights:
+         ! [1.0] Get horizontal interpolation weights:
 
          i = iv%Radar(n)%loc%i
          j = iv%Radar(n)%loc%j
@@ -74,23 +66,17 @@ SUBROUTINE da_get_innov_vector_Radar ( it, xb, xp, ob, iv )
          enddo
 
          do k=1, num_levs
-
             call da_to_zk(iv%Radar(n)%height(k), v_h, xp, v_interp_h, iv%Radar(n)%zk(k))
 
             if ( iv%Radar(n)%zk(k) < 1.0 ) then
-
                iv%Radar(n)%height_qc(k) = below_model_surface
-
             else if ( iv%Radar(n)%zk(k) > mkz ) then
-
                iv%Radar(n)%height_qc(k) = above_model_lid
-
             endif
-
          enddo
 
 
-! [2.0] Interpolate horizontally to ob points:
+         ! [2.0] Interpolate horizontally to ob points:
 
 #ifndef DEREF_KLUDGE
 
@@ -114,27 +100,27 @@ SUBROUTINE da_get_innov_vector_Radar ( it, xb, xp, ob, iv )
 
 #else
 
-         call da_interp_lin_3d(xb%p(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
-                             model_p(1), max_ob_levels, iv%Radar(n)%zk(1), num_levs )
+         call da_interp_lin_3d(xb%p(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, &
+            dxm, dym, model_p(1), max_ob_levels, iv%Radar(n)%zk(1), num_levs )
 
-         call da_interp_lin_3d(xb%u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
-                             model_u(1), max_ob_levels, iv%Radar(n)%zk(1), num_levs )
+         call da_interp_lin_3d(xb%u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, &
+            dxm, dym, model_u(1), max_ob_levels, iv%Radar(n)%zk(1), num_levs )
 
-         call da_interp_lin_3d(xb%v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
-                             model_v(1), max_ob_levels, iv%Radar(n)%zk(1), num_levs )
+         call da_interp_lin_3d(xb%v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, &
+            dxm, dym, model_v(1), max_ob_levels, iv%Radar(n)%zk(1), num_levs )
 
-         call da_interp_lin_3d(xb%wh(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
-                             model_w(1), max_ob_levels, iv%Radar(n)%zk(1), num_levs )
+         call da_interp_lin_3d(xb%wh(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, &
+            dxm, dym, model_w(1), max_ob_levels, iv%Radar(n)%zk(1), num_levs )
 
-         call da_interp_lin_3d(xb%rho(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
-                             model_rho(1), max_ob_levels, iv%Radar(n)%zk(1), num_levs )
+         call da_interp_lin_3d(xb%rho(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, &
+            dxm, dym, model_rho(1), max_ob_levels, iv%Radar(n)%zk(1), num_levs )
 
-         call da_interp_lin_3d(xb%qrn(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
-                             model_qrn(1), max_ob_levels, iv%Radar(n)%zk(1), num_levs )
+         call da_interp_lin_3d(xb%qrn(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, &
+            dxm, dym, model_qrn(1), max_ob_levels, iv%Radar(n)%zk(1), num_levs )
 
 #endif
 
-!        Test 5.E-5 as critical value. It can not be smaller.
+         ! Test 5.E-5 as critical value. It can not be smaller.
 
          do k=1,num_levs
             model_qrn(k)=amax1(5.E-5,model_qrn(k))
@@ -149,14 +135,15 @@ SUBROUTINE da_get_innov_vector_Radar ( it, xb, xp, ob, iv )
          iv%Radar(n)%model_qrn(1:num_levs) = model_qrn(1:num_levs)
          iv%Radar(n)%model_ps = model_ps
 
-! [3.0] Calculate rv, rf at OBS location and initialise components of innovation vector:
+         ! [3.0] Calculate rv, rf at OBS location and initialise components of &
+         ! innovation vector:
          
          if(fg_format == 1) then
             call da_latlon_to_ij(map_info, &
                               iv%Radar(n)%stn_loc%lat, iv%Radar(n)%stn_loc%lon, &
                               iv%Radar(n)%stn_loc%x,   iv%Radar(n)%stn_loc%y )
          else
-            CALL da_llxy ( iv%Radar(n)%stn_loc%lat, iv%Radar(n)%stn_loc%lon, &
+            call da_llxy ( iv%Radar(n)%stn_loc%lat, iv%Radar(n)%stn_loc%lon, &
                         iv%Radar(n)%stn_loc%x,   iv%Radar(n)%stn_loc%y )
          endif
 
@@ -167,71 +154,70 @@ SUBROUTINE da_get_innov_vector_Radar ( it, xb, xp, ob, iv )
          model_rf(:) = 0.0
 
          do k=1, num_levs
+            iv % Radar(n) % rv(k) % inv = 0.0
+            iv % Radar(n) % rf(k) % inv = 0.0
 
-          iv % Radar(n) % rv(k) % inv = 0.0
-          iv % Radar(n) % rf(k) % inv = 0.0
+            IF ( iv % Radar(n) % height_qc(k) /= below_model_surface .and.  &
+                 iv % Radar(n) % height_qc(k) /= above_model_lid ) THEN
 
-           IF ( iv % Radar(n) % height_qc(k) /= below_model_surface .and.  &
-                iv % Radar(n) % height_qc(k) /= above_model_lid ) THEN
+               IF (USE_Radar_rv) THEN
+                  IF ( ABS(iv % Radar(n) % rv(k) % qc - missing_data) > 1 ) THEN
+                     IF ( ABS(ob % Radar(n) % rv(k) - missing_r) > 1. .AND. &
+                          iv % Radar(n) % rv(k) % qc >= obs_qc_pointer ) THEN
 
-             IF (USE_Radar_rv) THEN
-              IF ( ABS(iv % Radar(n) % rv(k) % qc - missing_data) > 1 ) THEN
-               IF ( ABS(ob % Radar(n) % rv(k) - missing_r) > 1. .AND. &
-                    iv % Radar(n) % rv(k) % qc >= obs_qc_pointer ) THEN
+                        zr=iv%Radar(n)%height(k) - iv%Radar(n)%stn_loc%elv
 
-                  zr=iv%Radar(n)%height(k) - iv%Radar(n)%stn_loc%elv
+                        call da_radial_velocity(model_rv(k), model_p(k),  &
+                           model_u(k), model_v(k), model_w(k),          &
+                           model_qrn(k), model_ps, xr, yr, zr)
 
-                  call da_radial_velocity(model_rv(k), model_p(k),  &
-                       model_u(k), model_v(k), model_w(k),          &
-                       model_qrn(k), model_ps, xr, yr, zr)
-
-                    iv % Radar(n) % rv(k) % inv = ob % Radar(n) % rv(k) - &
+                        iv % Radar(n) % rv(k) % inv = ob % Radar(n) % rv(k) - &
                                                  model_rv(k)
+                     END IF
+                  END IF
                END IF
-              END IF
-             END IF
 
-             IF (USE_Radar_rf) THEN
-              IF ( ABS(iv % Radar(n) % rf(k) % qc - missing_data) > 1 ) THEN
-               IF ( ABS(ob % Radar(n) % rf(k) - missing_r) > 1. .AND. &
-                    iv % Radar(n) % rf(k) % qc >= obs_qc_pointer ) THEN
+               IF (USE_Radar_rf) THEN
+                  IF ( ABS(iv % Radar(n) % rf(k) % qc - missing_data) > 1 ) THEN
+                     IF ( ABS(ob % Radar(n) % rf(k) - missing_r) > 1. .AND. &
+                        iv % Radar(n) % rf(k) % qc >= obs_qc_pointer ) THEN
+                        call da_reflectivity( model_rf(k), model_rho(k), &
+                           model_qrn(k) )
 
-                  call da_reflectivity( model_rf(k), model_rho(k), model_qrn(k) )
-
-                    iv % Radar(n) % rf(k) % inv = ob % Radar(n) % rf(k) - &
+                        iv % Radar(n) % rf(k) % inv = ob % Radar(n) % rf(k) - &
                                                  model_rf(k)
+                     END IF
+                  END IF
                END IF
-              END IF
-             END IF
 
             END IF
 
          end do
 
-!------------------------------------------------------------------------
-! [4.0] Perform optional maximum error check:
-!------------------------------------------------------------------------
+         !------------------------------------------------------------------------
+         ! [4.0] Perform optional maximum error check:  
+         !------------------------------------------------------------------------
 
-      IF (check_max_iv )   & 
-      CALL da_check_max_iv_radar(it, iv % Radar(n), irv, irf, irvf, irff )
-
-       endif
+         IF (check_max_iv )  THEN
+            call da_check_max_iv_radar(it, iv % Radar(n), irv, irf, irvf, irff )
+         END IF
+      endif
             
-      END DO
+   END DO
 
-    write(unit = check_max_iv_unit, FMT ='(/,A,i5,A)')   &
-          'For outer iteration ', it, ', Total Rejections for Radar follows:'
+   write(unit = check_max_iv_unit, FMT ='(/,A,i5,A)')   &
+      'For outer iteration ', it, ', Total Rejections for Radar follows:'
 
-     IF ( USE_Radar_rv ) THEN
+   IF ( USE_Radar_rv ) THEN
        WRITE ( UNIT = check_max_iv_unit, FMT = '(/,2(A,I6))' ) &
-      'Number of failed rv observations:     ',irvf, ' on ',irv
-     ENDIF
+         'Number of failed rv observations:     ',irvf, ' on ',irv
+   ENDIF
 
-     IF ( USE_Radar_rf ) THEN
-       WRITE ( UNIT = check_max_iv_unit, FMT = '(/,2(A,I6))' ) &
-      'Number of failed rf observations:     ',irff, ' on ',irf
-     ENDIF
+   IF ( USE_Radar_rf ) THEN
+      WRITE ( UNIT = check_max_iv_unit, FMT = '(/,2(A,I6))' ) &
+         'Number of failed rf observations:     ',irff, ' on ',irf
+   ENDIF
 
 
-END SUBROUTINE da_get_innov_vector_radar
+end subroutine da_get_innov_vector_radar
 

@@ -1,4 +1,4 @@
-SUBROUTINE da_transform_xtotpw( xa, xb )
+subroutine da_transform_xtotpw( xa, xb )
 
 !------------------------------------------------------------------------
 !  Modified: 04/25/03                                   Wei Huang
@@ -28,4 +28,4 @@ SUBROUTINE da_transform_xtotpw( xa, xb )
    enddo
    enddo
  
-END SUBROUTINE da_transform_xtotpw
+end subroutine da_transform_xtotpw

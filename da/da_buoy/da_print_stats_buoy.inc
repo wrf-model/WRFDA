@@ -1,4 +1,4 @@
-SUBROUTINE DA_Print_Stats_Buoy( stats_unit, nu, nv, nt, np, nq, buoy )
+subroutine DA_Print_Stats_Buoy( stats_unit, nu, nv, nt, np, nq, buoy )
 
   IMPLICIT NONE
 
@@ -38,5 +38,5 @@ SUBROUTINE DA_Print_Stats_Buoy( stats_unit, nu, nv, nt, np, nq, buoy )
                        sqrt(buoy%rms_err%p/real(np)), &
                        sqrt(buoy%rms_err%q/real(nq))
 
-END SUBROUTINE DA_Print_Stats_Buoy
+end subroutine DA_Print_Stats_Buoy
 

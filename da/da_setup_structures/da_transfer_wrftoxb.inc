@@ -1,4 +1,4 @@
-SUBROUTINE da_transfer_wrftoxb( xbx, grid, &
+subroutine da_transfer_wrftoxb( xbx, grid, &
 !
 #include "em_dummy_args.inc"
 !
@@ -56,7 +56,7 @@ SUBROUTINE da_transfer_wrftoxb( xbx, grid, &
    REAL   :: qvf1, cvpm, cpovcv, ppb, ttb, albn, aln
    REAL, ALLOCATABLE :: arrayglobal(:,:)
 
-   IF (trace_use) CALL da_trace_entry("da_transfer_wrftoxb")
+   IF (trace_use) call da_trace_entry("da_transfer_wrftoxb")
 
 !---------------------------------------------------------------------------
 !--Set xb array range indices for processor subdomain.
@@ -668,7 +668,7 @@ SUBROUTINE da_transfer_wrftoxb( xbx, grid, &
    ! testing.  This will always be .FALSE. for a serial or 1-process MPI run.
    IF ( testing_dm_exact ) THEN
       ALLOCATE( arrayglobal( xp%ids:xp%ide, xp%jds:xp%jde ) )
-      CALL da_wv_patch_to_global( xb%psac, arrayglobal, xp%domdesc, &
+      call da_wv_patch_to_global( xb%psac, arrayglobal, xp%domdesc, &
                                xp%ids, xp%ide, xp%jds, xp%jde,   &
                                xp%ims, xp%ime, xp%jms, xp%jme,   &
                                xp%its, xp%ite, xp%jts, xp%jte )
@@ -684,7 +684,7 @@ SUBROUTINE da_transfer_wrftoxb( xbx, grid, &
 
    IF ( testing_dm_exact ) THEN
       ALLOCATE( arrayglobal( xp%ids:xp%ide, xp%jds:xp%jde ) )
-      CALL da_wv_patch_to_global( xb%lat, arrayglobal, xp%domdesc, &
+      call da_wv_patch_to_global( xb%lat, arrayglobal, xp%domdesc, &
                                xp%ids, xp%ide, xp%jds, xp%jde,  &
                                xp%ims, xp%ime, xp%jms, xp%jme,  &
                                xp%its, xp%ite, xp%jts, xp%jte )
@@ -700,14 +700,14 @@ SUBROUTINE da_transfer_wrftoxb( xbx, grid, &
 
    IF ( testing_dm_exact ) THEN
      ! Broadcast result from monitor to other tasks.
-     CALL wrf_dm_bcast_real( loc_psac_mean, 1 )
+     call wrf_dm_bcast_real( loc_psac_mean, 1 )
      xbx % psac_mean = loc_psac_mean
      ! Broadcast result from monitor to other tasks.
-     CALL wrf_dm_bcast_real( loc_latc_mean, (xp%jde-xp%jds+1) )
+     call wrf_dm_bcast_real( loc_latc_mean, (xp%jde-xp%jds+1) )
      xbx % latc_mean = loc_latc_mean
    ELSE
      xbx % psac_mean = wrf_dm_sum_real( loc_psac_mean )
-     CALL wrf_dm_sum_reals( loc_latc_mean, xbx % latc_mean )
+     call wrf_dm_sum_reals( loc_latc_mean, xbx % latc_mean )
    ENDIF
 
    if(print_detail_xb) then
@@ -725,7 +725,7 @@ SUBROUTINE da_transfer_wrftoxb( xbx, grid, &
      do j = xp%jts, xp%jte
      do i = xp%its, xp%ite
 
-       CALL da_cloud_model ( xb%t(I,J,:),   xb%p(I,J,:), xb%q(I,J,:), xb%qcw(I,J,:),  &
+       call da_cloud_model ( xb%t(I,J,:),   xb%p(I,J,:), xb%q(I,J,:), xb%qcw(I,J,:),  &
                              xb%qrn(I,J,:), xb%h(I,J,:), xb%hf(I,J,:),                &
                              DDT, xp%kts, xp%kte  )
 
@@ -738,8 +738,8 @@ SUBROUTINE da_transfer_wrftoxb( xbx, grid, &
 
    ENDIF
 
-   IF (trace_use) CALL da_trace_exit("da_transfer_wrftoxb")
+   IF (trace_use) call da_trace_exit("da_transfer_wrftoxb")
 
 
-END SUBROUTINE da_transfer_wrftoxb
+end subroutine da_transfer_wrftoxb
 

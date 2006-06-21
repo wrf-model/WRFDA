@@ -1,4 +1,4 @@
-SUBROUTINE da_check_eof_decomposition( be_eigenval, be_eigenvec, name )
+subroutine da_check_eof_decomposition( be_eigenval, be_eigenvec, name )
 
    !---------------------------------------------------------------------------
    ! PURPOSE: Check eigenvectors E of vertical covariance matrix B_{x} which 
@@ -24,7 +24,7 @@ SUBROUTINE da_check_eof_decomposition( be_eigenval, be_eigenvec, name )
    REAL, ALLOCATABLE             :: matrix2(:,:)     ! 2D Work matrix.
    LOGICAL, ALLOCATABLE          :: array_mask(:)    ! Array mask for MAXVAL.
 
-   IF (trace_use) CALL da_trace_entry("da_check_eof_decomposition")
+   IF (trace_use) call da_trace_entry("da_check_eof_decomposition")
 
    !----------------------------------------------------------------------
    ! [1.0]: Initialise:
@@ -108,7 +108,7 @@ SUBROUTINE da_check_eof_decomposition( be_eigenval, be_eigenvec, name )
    DEALLOCATE( matrix2 )
    DEALLOCATE( array_mask )
 
-   IF (trace_use) CALL da_trace_exit("da_check_eof_decomposition")
+   IF (trace_use) call da_trace_exit("da_check_eof_decomposition")
        
-END SUBROUTINE da_check_eof_decomposition
+end subroutine da_check_eof_decomposition
 

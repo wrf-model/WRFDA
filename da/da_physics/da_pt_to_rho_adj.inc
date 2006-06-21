@@ -1,4 +1,4 @@
-SUBROUTINE DA_PT_To_Rho_Adj( xb, xa ) 
+subroutine DA_PT_To_Rho_Adj( xb, xa ) 
  
 !------------------------------------------------------------------------------
 !  PURPOSE: Adjoint of DA_PT_To_Rho.
@@ -62,5 +62,5 @@ SUBROUTINE DA_PT_To_Rho_Adj( xb, xa )
    end do        
    end do        
 
-END SUBROUTINE DA_PT_To_Rho_Adj
+end subroutine DA_PT_To_Rho_Adj
 

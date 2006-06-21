@@ -1,4 +1,4 @@
-SUBROUTINE da_obs_sfc_correction(sfc_obs, xb )
+subroutine da_obs_sfc_correction(sfc_obs, xb )
 
 !--------------------------------------------------------------------!
 ! This subroutine is used to correct the surface measurements (wind, !
@@ -89,10 +89,10 @@ SUBROUTINE da_obs_sfc_correction(sfc_obs, xb )
          psfc = missing_r
          if (abs(ho - missing_r) > 1.) then
             if (abs(to - missing_r) > 1.) then
-               CALL da_sfcprs (xb%kts, xb%kte, pressure, t_mdl, q_mdl, &
+               call da_sfcprs (xb%kts, xb%kte, pressure, t_mdl, q_mdl, &
                             height, psfc, mslp, ho, to)
             else
-               CALL da_sfcprs (xb%kts, xb%kte, pressure, t_mdl, q_mdl, &
+               call da_sfcprs (xb%kts, xb%kte, pressure, t_mdl, q_mdl, &
                             height, psfc, mslp, ho)
             endif
          endif
@@ -186,11 +186,11 @@ SUBROUTINE da_obs_sfc_correction(sfc_obs, xb )
 
              if (abs(to  - missing_r) > 1. .and. &
                  abs(qo - missing_r) > 1.) then
-                 CALL da_intpsfc_prs (val, ho, po, hm, tm, qm, to, qo)
+                 call da_intpsfc_prs (val, ho, po, hm, tm, qm, to, qo)
              else if (abs(to  - missing_r) > 1.) then
-                 CALL da_intpsfc_prs (val, ho, po, hm, tm, qm, to)
+                 call da_intpsfc_prs (val, ho, po, hm, tm, qm, to)
              else
-                 CALL da_intpsfc_prs (val, ho, po, hm, tm, qm)
+                 call da_intpsfc_prs (val, ho, po, hm, tm, qm)
              endif
 
              !  Replace any previous pressure qc by the surface correction
@@ -207,7 +207,7 @@ SUBROUTINE da_obs_sfc_correction(sfc_obs, xb )
 
                !  Correct data
 
-               CALL da_intpsfc_tem (val, ho, po, to, height, pressure, t_mdl, xb%kts, xb%kte)
+               call da_intpsfc_tem (val, ho, po, to, height, pressure, t_mdl, xb%kts, xb%kte)
 
                sfc_obs % t % inv = val
 
@@ -229,4 +229,4 @@ SUBROUTINE da_obs_sfc_correction(sfc_obs, xb )
 
       ENDIF
 
-END  SUBROUTINE da_obs_sfc_correction
+END  subroutine da_obs_sfc_correction

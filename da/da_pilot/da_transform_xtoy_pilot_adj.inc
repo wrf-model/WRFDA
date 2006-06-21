@@ -1,4 +1,4 @@
-SUBROUTINE da_transform_xtoy_pilot_adj( iv, xp, jo_grad_y, jo_grad_x )
+subroutine da_transform_xtoy_pilot_adj( iv, xp, jo_grad_y, jo_grad_x )
 
   IMPLICIT NONE
 
@@ -43,5 +43,5 @@ SUBROUTINE da_transform_xtoy_pilot_adj( iv, xp, jo_grad_y, jo_grad_x )
     END DO
   END IF
 
-END SUBROUTINE da_transform_xtoy_pilot_adj
+end subroutine da_transform_xtoy_pilot_adj
 

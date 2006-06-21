@@ -1,4 +1,4 @@
-SUBROUTINE da_get_innov_vector_pilot ( it, xb, xp, ob, iv )
+subroutine da_get_innov_vector_pilot ( it, xb, xp, ob, iv )
 
   IMPLICIT NONE
 
@@ -106,7 +106,7 @@ SUBROUTINE da_get_innov_vector_pilot ( it, xb, xp, ob, iv )
         !------------------------------------------------------------------------
 
         IF ( check_max_iv ) THEN
-          CALL da_check_max_iv_pilot(it, iv % pilot(n), itu,ituf,itvv,itvvf)
+          call da_check_max_iv_pilot(it, iv % pilot(n), itu,ituf,itvv,itvvf)
         END IF
       endif
     END DO
@@ -119,5 +119,5 @@ SUBROUTINE da_get_innov_vector_pilot ( it, xb, xp, ob, iv )
       'Finally Total Pilot rejections ',ituf+itvvf,' on ',itu+itvv
   ENDIF
 
-END SUBROUTINE da_get_innov_vector_pilot
+end subroutine da_get_innov_vector_pilot
 

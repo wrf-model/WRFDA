@@ -48,11 +48,11 @@ subroutine da_get_bins_info(nj, nk, bin2d, evec_g, eval_g,&
    else
       WRITE(UNIT=errmsg(1),FMT='(A,I5)') &
          "Invalid value of vert_evalue=",vert_evalue
-      CALL wrf_error(__FILE__,__LINE__,errmsg(1))
+      call wrf_error(__FILE__,__LINE__,errmsg(1))
    end if
 
-   CALL da_get_vertical_truncation(max_vert_var, eval_g, be_sub)
-   CALL da_allocate_background_errors(nj, nk, eval_g, evec_g, &
+   call da_get_vertical_truncation(max_vert_var, eval_g, be_sub)
+   call da_allocate_background_errors(nj, nk, eval_g, evec_g, &
       e_val_loc, e_vec_loc, be_sub)
    if( be_sub%mz > 0 ) be_sub%val(:,:) = var_scaling * be_sub%val(:,:)
    deallocate ( e_vec_loc )

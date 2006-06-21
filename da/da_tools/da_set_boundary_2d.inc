@@ -1,4 +1,4 @@
-SUBROUTINE da_set_boundary_2d(var, &
+subroutine da_set_boundary_2d(var, &
                               ids, ide, jds, jde, &
                               ims, ime, jms, jme, &
                               its, ite, jts, jte)
@@ -30,5 +30,5 @@ SUBROUTINE da_set_boundary_2d(var, &
    enddo
    enddo
 
-END SUBROUTINE da_set_boundary_2d
+end subroutine da_set_boundary_2d
 

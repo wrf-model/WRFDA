@@ -1,4 +1,4 @@
-SUBROUTINE da_oi_stats_gpspw ( stats_unit, oi )
+subroutine da_oi_stats_gpspw ( stats_unit, oi )
 
   IMPLICIT NONE
 
@@ -21,7 +21,7 @@ SUBROUTINE da_oi_stats_gpspw ( stats_unit, oi )
   IF ( oi%num_Gpspw > 0 ) THEN
     DO n=1, oi%num_Gpspw
       if( oi%gpspw(n)%loc%proc_domain ) then
-        CALL da_stats_calculate( oi%Gpspw(n)%loc%obs_global_index, &
+        call da_stats_calculate( oi%Gpspw(n)%loc%obs_global_index, &
                               0, oi%gpspw(n)%tpw%qc, &
                              oi%gpspw(n)%tpw%inv, ntpw, &
                              gpspw%minimum%tpw  , gpspw%maximum%tpw, &
@@ -43,9 +43,9 @@ SUBROUTINE da_oi_stats_gpspw ( stats_unit, oi )
   IF ( wrf_dm_on_monitor() ) THEN
     IF (ntpw /= 0) THEN
       write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of OI for Gpspw'
-      CALL da_print_stats_gpspw( stats_unit, ntpw, Gpspw )
+      call da_print_stats_gpspw( stats_unit, ntpw, Gpspw )
     END IF
   END IF
 
-END SUBROUTINE da_oi_stats_gpspw
+end subroutine da_oi_stats_gpspw
 

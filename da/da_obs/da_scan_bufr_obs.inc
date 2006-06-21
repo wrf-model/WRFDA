@@ -1,4 +1,4 @@
-SUBROUTINE da_scan_bufr_obs (iunit, ob, xp, filename)
+subroutine da_scan_bufr_obs (iunit, ob, xp, filename)
 !-----------------------------------------------------------------------------!
 !  Purpose: Scan BUFR observation file for input to wrfvar
 !-----------------------------------------------------------------------------!
@@ -125,7 +125,7 @@ SUBROUTINE da_scan_bufr_obs (iunit, ob, xp, filename)
      errmsg(1) = "BUFR file does not exist"
      write(UNIT=errmsg(2), fmt='(a, i4)') &
        'INQUIRE cannot find unit: ',iunit
-     CALL wrf_errors(__FILE__,__LINE__,errmsg(1:2))
+     call wrf_errors(__FILE__,__LINE__,errmsg(1:2))
    endif
 
    INQUIRE (iunit, EXIST = exist )
@@ -133,7 +133,7 @@ SUBROUTINE da_scan_bufr_obs (iunit, ob, xp, filename)
      errmsg(1) = "BUFR file does not exist"
      write(UNIT=errmsg(2), fmt='(a, i4)') &
        'INQUIRE cannot find unit: ',iunit
-     CALL wrf_errors(__FILE__,__LINE__,errmsg(1:2))
+     call wrf_errors(__FILE__,__LINE__,errmsg(1:2))
    endif
 
    call openbf(iunit,'IN',iunit)
@@ -144,7 +144,7 @@ SUBROUTINE da_scan_bufr_obs (iunit, ob, xp, filename)
      write(UNIT=errmsg(2), fmt='(a, i4)') &
        'return code from readmg:', iret, &
        'Reach the end of obs unit: ', iunit
-     CALL wrf_errors(__FILE__,__LINE__,errmsg(1:2))
+     call wrf_errors(__FILE__,__LINE__,errmsg(1:2))
    end if
 
    write(UNIT=date,FMT='( i10)') idate
@@ -414,4 +414,4 @@ SUBROUTINE da_scan_bufr_obs (iunit, ob, xp, filename)
 
    end if
 
-END SUBROUTINE da_scan_bufr_obs
+end subroutine da_scan_bufr_obs

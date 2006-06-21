@@ -1,4 +1,4 @@
-SUBROUTINE da_radial_velocity_Lin(rv,p,u,v,w,qrn,ps0,x,y,z,qrn9)
+subroutine da_radial_velocity_Lin(rv,p,u,v,w,qrn,ps0,x,y,z,qrn9)
 
    implicit none
 
@@ -23,4 +23,4 @@ SUBROUTINE da_radial_velocity_Lin(rv,p,u,v,w,qrn,ps0,x,y,z,qrn9)
    rv=u*x+v*y+(w-vt)*z
    rv=rv/r
 
-END SUBROUTINE da_radial_velocity_Lin
+end subroutine da_radial_velocity_Lin

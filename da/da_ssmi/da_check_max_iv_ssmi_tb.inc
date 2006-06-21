@@ -1,4 +1,4 @@
-SUBROUTINE da_check_max_iv_ssmi_tb(it, ssmi_tb, &
+subroutine da_check_max_iv_ssmi_tb(it, ssmi_tb, &
                                    itb19v, itb19vf, itb19h, itb19hf, &
                                    itb22v, itb22vf,                  &
                                    itb37v, itb37vf, itb37h, itb37hf, &
@@ -52,43 +52,43 @@ SUBROUTINE da_check_max_iv_ssmi_tb(it, ssmi_tb, &
 
 !  Tb19h
 
-   CALL da_max_error_qc(it, ssmi_tb % info, ssmi_tb % tb19h,                  &
+   call da_max_error_qc(it, ssmi_tb % info, ssmi_tb % tb19h,                  &
                             max_error_tb, itb19h, itb19hf, iunit, 'TB19h', &
                             failed, print)
 
 !  Tb19v
 
-   CALL da_max_error_qc(it, ssmi_tb % info, ssmi_tb % tb19v,                  &
+   call da_max_error_qc(it, ssmi_tb % info, ssmi_tb % tb19v,                  &
                             max_error_tb, itb19v, itb19vf, iunit, 'TB19v', &
                             failed, print)
 
 !  Tb22v
 
-   CALL da_max_error_qc(it, ssmi_tb % info, ssmi_tb % tb22v,                  &
+   call da_max_error_qc(it, ssmi_tb % info, ssmi_tb % tb22v,                  &
                             max_error_tb, itb22v, itb22vf, iunit, 'TB22v', &
                             failed, print)
 
 !  Tb37h
 
-   CALL da_max_error_qc(it, ssmi_tb % info, ssmi_tb % tb37h,                  &
+   call da_max_error_qc(it, ssmi_tb % info, ssmi_tb % tb37h,                  &
                             max_error_tb, itb37h, itb37hf, iunit, 'TB37h', &
                             failed, print)
 
 !  Tb37v
 
-   CALL da_max_error_qc(it, ssmi_tb % info, ssmi_tb % tb37v,                  &
+   call da_max_error_qc(it, ssmi_tb % info, ssmi_tb % tb37v,                  &
                             max_error_tb, itb37v, itb37vf, iunit, 'TB37v', &
                             failed, print)
 
 !  Tb85h
 
-   CALL da_max_error_qc(it, ssmi_tb % info, ssmi_tb % tb85h,                  &
+   call da_max_error_qc(it, ssmi_tb % info, ssmi_tb % tb85h,                  &
                             max_error_tb, itb85h, itb85hf, iunit, 'TB85h', &
                             failed, print)
 
 !  Tb85v
 
-   CALL da_max_error_qc(it, ssmi_tb % info, ssmi_tb % tb85v,                  &
+   call da_max_error_qc(it, ssmi_tb % info, ssmi_tb % tb85v,                  &
                             max_error_tb, itb85v, itb85vf, iunit, 'TB85v', &
                             failed, print)
 
@@ -109,4 +109,4 @@ SUBROUTINE da_check_max_iv_ssmi_tb(it, ssmi_tb, &
 !     'Number of failed ssmi tb85v observations:  ',itb85vf,' on ',itb85v
 !  ENDIF
 
-END SUBROUTINE da_check_max_iv_ssmi_tb
+end subroutine da_check_max_iv_ssmi_tb

@@ -2,7 +2,7 @@
 ! Code copied from SI. See map_utils_header.inc for details
 !---------------------------------------------------------------------------
 
-SUBROUTINE da_map_init(proj)
+subroutine da_map_init(proj)
 
    ! Initializes the map projection structure to missing values
 
@@ -24,9 +24,9 @@ SUBROUTINE da_map_init(proj)
    proj%knownj   = -999.9
    proj%init     = .FALSE.
 
-END SUBROUTINE da_map_init
+end subroutine da_map_init
 
-  SUBROUTINE da_map_set(proj_code,lat1,lon1,knowni,knownj,dx,stdlon,truelat1,truelat2,proj)
+  subroutine da_map_set(proj_code,lat1,lon1,knowni,knownj,dx,stdlon,truelat1,truelat2,proj)
     ! Given a partially filled proj_info structure, this routine computes
     ! polei, polej, rsw, and cone (if LC projection) to complete the 
     ! structure.  This allows us to eliminate redundant calculations when
@@ -57,27 +57,27 @@ END SUBROUTINE da_map_init
 
     ! First, check for validity of mandatory variables in proj
     IF ( ABS(lat1) .GT. 90. ) THEN
-      CALL wrf_error(__FILE__,__LINE__, &
+      call wrf_error(__FILE__,__LINE__, &
         "Latitude of origin corner required as follows: -90N <= lat1 < = 90.N")
     ENDIF
     IF ( ABS(lon1) .GT. 180.) THEN
-      CALL wrf_error(__FILE__,__LINE__, &
+      call wrf_error(__FILE__,__LINE__, &
         "Longitude of origin required as follows: -180E <= lon1 <= 180W")
     ENDIF
     IF ((dx .LE. 0.).AND.(proj_code .NE. PROJ_LATLON)) THEN
-      CALL wrf_error(__FILE__,__LINE__, &
+      call wrf_error(__FILE__,__LINE__, &
         "Require grid spacing (dx) in meters be positive!")
     ENDIF
     IF ((ABS(stdlon) .GT. 180.).AND.(proj_code .NE. PROJ_MERC)) THEN
-      CALL wrf_error(__FILE__,__LINE__, &
+      call wrf_error(__FILE__,__LINE__, &
         "Need orientation longitude (stdlon) as: -180E <= lon1 <= 180W") 
     ENDIF
     IF (ABS(truelat1).GT.90.) THEN
-      CALL wrf_error(__FILE__,__LINE__, &
+      call wrf_error(__FILE__,__LINE__, &
         "Set true latitude 1 for all projections!")
     ENDIF
    
-    CALL da_map_init(proj) 
+    call da_map_init(proj) 
     proj%code  = proj_code
     proj%lat1 = lat1
     proj%lon1 = lon1
@@ -102,7 +102,7 @@ END SUBROUTINE da_map_init
         IF (print_detail_map) THEN
            WRITE(UNIT=stdout,FMT='(A)') 'Setting up POLAR STEREOGRAPHIC map...'
         END IF
-        CALL da_set_ps(proj)
+        call da_set_ps(proj)
 
       CASE(PROJ_LC)
         IF (print_detail_map) THEN
@@ -115,13 +115,13 @@ END SUBROUTINE da_map_init
            END IF
           proj%truelat2=proj%truelat1
         ENDIF
-        CALL da_set_lc(proj)
+        call da_set_lc(proj)
    
       CASE (PROJ_MERC)
         IF (print_detail_map) THEN
            WRITE(UNIT=stdout,FMT='(A)') 'Setting up MERCATOR map...'
         END IF
-        CALL da_set_merc(proj)
+        call da_set_merc(proj)
    
       CASE (PROJ_LATLON)
         IF (print_detail_map) THEN
@@ -132,13 +132,13 @@ END SUBROUTINE da_map_init
    
       CASE DEFAULT
         WRITE(UNIT=errmsg(1),FMT='(A,I2)') 'Unknown projection code: ', proj%code
-        CALL wrf_error(__FILE__,__LINE__,errmsg(1))
+        call wrf_error(__FILE__,__LINE__,errmsg(1))
       END SELECT pick_proj
     proj%init = .TRUE.
     RETURN
-  END SUBROUTINE da_map_set
+  end subroutine da_map_set
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  SUBROUTINE da_latlon_to_ij(proj, lat, lon, i, j)
+  subroutine da_latlon_to_ij(proj, lat, lon, i, j)
     ! Converts input lat/lon values to the cartesian (i,j) value
     ! for the given projection. 
 
@@ -150,38 +150,38 @@ END SUBROUTINE da_map_init
     REAL, INTENT(OUT)                    :: j
 
     IF (.NOT.proj%init) THEN
-      CALL wrf_error(__FILE__,__LINE__, &
+      call wrf_error(__FILE__,__LINE__, &
         "You have not called map_set for this projection!")
     ENDIF
 
     SELECT CASE(proj%code)
  
       CASE(PROJ_LATLON)
-        CALL da_llij_latlon(lat,lon,proj,i,j)
+        call da_llij_latlon(lat,lon,proj,i,j)
 
       CASE(PROJ_MERC)
-        CALL da_llij_merc(lat,lon,proj,i,j)
+        call da_llij_merc(lat,lon,proj,i,j)
         i = i + proj%knowni - 1.0
         j = j + proj%knownj - 1.0
 
       CASE(PROJ_PS)
-        CALL da_llij_ps(lat,lon,proj,i,j)
+        call da_llij_ps(lat,lon,proj,i,j)
       
       CASE(PROJ_LC)
-        CALL da_llij_lc(lat,lon,proj,i,j)
+        call da_llij_lc(lat,lon,proj,i,j)
         i = i + proj%knowni - 1.0
         j = j + proj%knownj - 1.0
 
       CASE DEFAULT
         WRITE(UNIT=errmsg(1),FMT='(A,I2)') &
           'Unrecognized map projection code: ', proj%code
-        CALL wrf_error(__FILE__,__LINE__,errmsg(1))
+        call wrf_error(__FILE__,__LINE__,errmsg(1))
  
     END SELECT
     RETURN
-  END SUBROUTINE da_latlon_to_ij
+  end subroutine da_latlon_to_ij
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  SUBROUTINE da_ij_to_latlon(proj, ii, jj, lat, lon)
+  subroutine da_ij_to_latlon(proj, ii, jj, lat, lon)
     ! Computes geographical latitude and longitude for a given (i,j) point
     ! in a grid with a projection of proj
 
@@ -194,7 +194,7 @@ END SUBROUTINE da_map_init
     REAL                                :: i, j
 
     IF (.NOT.proj%init) THEN
-      CALL wrf_error(__FILE__,__LINE__, &
+      call wrf_error(__FILE__,__LINE__, &
         "You have not called map_set for this projection!")
     ENDIF
 
@@ -204,32 +204,32 @@ END SUBROUTINE da_map_init
     SELECT CASE (proj%code)
 
       CASE (PROJ_LATLON)
-        CALL da_ijll_latlon(i, j, proj, lat, lon)
+        call da_ijll_latlon(i, j, proj, lat, lon)
 
       CASE (PROJ_MERC)
         i = ii - proj%knowni + 1.0
         j = jj - proj%knownj + 1.0
-        CALL da_ijll_merc(i, j, proj, lat, lon)
+        call da_ijll_merc(i, j, proj, lat, lon)
 
       CASE (PROJ_PS)
-        CALL da_ijll_ps(i, j, proj, lat, lon)
+        call da_ijll_ps(i, j, proj, lat, lon)
 
       CASE (PROJ_LC)
 
         i = ii - proj%knowni + 1.0
         j = jj - proj%knownj + 1.0
-        CALL da_ijll_lc(i, j, proj, lat, lon)
+        call da_ijll_lc(i, j, proj, lat, lon)
 
       CASE DEFAULT
         WRITE(UNIT=errmsg(1),FMT='(A,I2)') &
           "Unrecognized map projection code: ", proj%code
-        CALL wrf_error(__FILE__,__LINE__,errmsg(1))
+        call wrf_error(__FILE__,__LINE__,errmsg(1))
 
     END SELECT
     RETURN
-  END SUBROUTINE da_ij_to_latlon
+  end subroutine da_ij_to_latlon
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  SUBROUTINE da_set_ps(proj)
+  subroutine da_set_ps(proj)
     ! Initializes a polar-stereographic map projection from the partially
     ! filled proj structure. This routine computes the radius to the
     ! southwest corner and computes the i/j location of the pole for use
@@ -268,9 +268,9 @@ END SUBROUTINE da_map_init
        PRINT '(A,2F10.1)', 'Computed (I,J) of pole point: ',proj%polei,proj%polej
     END IF
     RETURN
-  END SUBROUTINE da_set_ps
+  end subroutine da_set_ps
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  SUBROUTINE da_llij_ps(lat,lon,proj,i,j)
+  subroutine da_llij_ps(lat,lon,proj,i,j)
     ! Given latitude (-90 to 90), longitude (-180 to 180), and the
     ! standard polar-stereographic projection information via the 
     ! public proj structure, this routine returns the i/j indices which
@@ -312,11 +312,11 @@ END SUBROUTINE da_map_init
     j = proj%polej + proj%hemi * rm * SIN(alo)
  
     RETURN
-  END SUBROUTINE da_llij_ps
+  end subroutine da_llij_ps
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  SUBROUTINE da_ijll_ps(i, j, proj, lat, lon)
+  subroutine da_ijll_ps(i, j, proj, lat, lon)
 
-    ! This is the inverse SUBROUTINE da_of llij_ps.  It returns the 
+    ! This is the inverse subroutine da_of llij_ps.  It returns the 
     ! latitude and longitude of an i/j point given the projection info 
     ! structure.  
 
@@ -372,9 +372,9 @@ END SUBROUTINE da_map_init
     IF (lon .LT. -180.) lon = lon + 360.
     RETURN
   
-  END SUBROUTINE da_ijll_ps
+  end subroutine da_ijll_ps
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  SUBROUTINE da_set_lc(proj)
+  subroutine da_set_lc(proj)
     ! Initialize the remaining items in the proj structure for a
     ! lambert conformal grid.
 
@@ -388,7 +388,7 @@ END SUBROUTINE da_map_init
     REAL                               :: ctl1r
 
     ! Compute cone factor
-    CALL da_lc_cone(proj%truelat1, proj%truelat2, proj%cone)
+    call da_lc_cone(proj%truelat1, proj%truelat2, proj%cone)
     IF (print_detail_map) THEN
        PRINT '(A,F8.6)', 'Computed cone factor: ', proj%cone
     END IF
@@ -415,11 +415,11 @@ END SUBROUTINE da_map_init
        PRINT '(A,2F10.3)', 'Computed pole i/j = ', proj%polei, proj%polej
     END IF
     RETURN
-  END SUBROUTINE da_set_lc                             
+  end subroutine da_set_lc                             
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  SUBROUTINE da_lc_cone(truelat1, truelat2, cone)
+  subroutine da_lc_cone(truelat1, truelat2, cone)
 
-  ! SUBROUTINE da_to compute the cone factor of a Lambert Conformal projection
+  ! subroutine da_to compute the cone factor of a Lambert Conformal projection
 
     IMPLICIT NONE
     
@@ -448,11 +448,11 @@ END SUBROUTINE da_map_init
        cone = SIN(ABS(truelat1)*rad_per_deg )  
     ENDIF
   RETURN
-  END SUBROUTINE da_lc_cone
+  end subroutine da_lc_cone
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  SUBROUTINE da_ijll_lc( i, j, proj, lat, lon)
+  subroutine da_ijll_lc( i, j, proj, lat, lon)
 
-  ! SUBROUTINE da_to convert from the (i,j) cartesian coordinate to the 
+  ! subroutine da_to convert from the (i,j) cartesian coordinate to the 
   ! geographical latitude and longitude for a Lambert Conformal projection.
 
   ! History:
@@ -526,11 +526,11 @@ END SUBROUTINE da_map_init
     IF (lon .GT. +180.) lon = lon - 360.
     IF (lon .LT. -180.) lon = lon + 360.
     RETURN
-    END SUBROUTINE da_ijll_lc
+    end subroutine da_ijll_lc
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  SUBROUTINE da_llij_lc( lat, lon, proj, i, j)
+  subroutine da_llij_lc( lat, lon, proj, i, j)
 
-  ! SUBROUTINE da_to compute the geographical latitude and longitude values
+  ! subroutine da_to compute the geographical latitude and longitude values
   ! to the cartesian x/y on a Lambert Conformal projection.
     
     IMPLICIT NONE
@@ -583,9 +583,9 @@ END SUBROUTINE da_map_init
       j = 2. - j
     ENDIF
     RETURN
-  END SUBROUTINE da_llij_lc
+  end subroutine da_llij_lc
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  SUBROUTINE da_set_merc(proj)
+  subroutine da_set_merc(proj)
   
     ! Sets up the remaining basic elements for the mercator projection
 
@@ -607,9 +607,9 @@ END SUBROUTINE da_map_init
       proj%rsw = (ALOG(TAN(0.5*((proj%lat1+90.)*rad_per_deg))))/proj%dlon
     ENDIF
     RETURN
-  END SUBROUTINE da_set_merc
+  end subroutine da_set_merc
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  SUBROUTINE da_llij_merc(lat, lon, proj, i, j)
+  subroutine da_llij_merc(lat, lon, proj, i, j)
 
     ! Compute i/j coordinate from lat lon for mercator projection
   
@@ -629,9 +629,9 @@ END SUBROUTINE da_map_init
            proj%dlon - proj%rsw
 
     RETURN
-  END SUBROUTINE da_llij_merc
+  end subroutine da_llij_merc
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  SUBROUTINE da_ijll_merc(i, j, proj, lat, lon)
+  subroutine da_ijll_merc(i, j, proj, lat, lon)
 
     ! Compute the lat/lon from i/j for mercator projection
 
@@ -648,9 +648,9 @@ END SUBROUTINE da_map_init
     IF (lon.GT.180.) lon = lon - 360.
     IF (lon.LT.-180.) lon = lon + 360.
     RETURN
-  END SUBROUTINE da_ijll_merc
+  end subroutine da_ijll_merc
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  SUBROUTINE da_llij_latlon(lat, lon, proj, i, j)
+  subroutine da_llij_latlon(lat, lon, proj, i, j)
  
     ! Compute the i/j location of a lat/lon on a LATLON grid.
     IMPLICIT NONE
@@ -691,9 +691,9 @@ END SUBROUTINE da_map_init
     i = deltalon/loninc + 1.
     j = deltalat/latinc + 1.
     RETURN
-    END SUBROUTINE da_llij_latlon
+    end subroutine da_llij_latlon
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  SUBROUTINE da_ijll_latlon(i, j, proj, lat, lon)
+  subroutine da_ijll_latlon(i, j, proj, lat, lon)
  
     ! Compute the lat/lon location of an i/j on a LATLON grid.
     IMPLICIT NONE
@@ -733,4 +733,4 @@ END SUBROUTINE da_map_init
     ENDIF
 
     RETURN
-  END SUBROUTINE da_ijll_latlon
+  end subroutine da_ijll_latlon

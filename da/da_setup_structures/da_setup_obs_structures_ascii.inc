@@ -1,4 +1,4 @@
-SUBROUTINE da_setup_obs_structures_ascii( xp, ob, iv )
+subroutine da_setup_obs_structures_ascii( xp, ob, iv )
 
    !---------------------------------------------------------------------------
    ! PURPOSE: Define, allocate and read of observation structure.
@@ -13,7 +13,7 @@ SUBROUTINE da_setup_obs_structures_ascii( xp, ob, iv )
    CHARACTER(len=120)           :: filename
    integer                      :: n
 
-   IF (trace_use) CALL da_trace_entry("da_setup_obs_structures_ascii")
+   IF (trace_use) call da_trace_entry("da_setup_obs_structures_ascii")
    
    !--------------------------------------------------------------------------
    ! [0.0] Initialize the counters.
@@ -162,7 +162,7 @@ SUBROUTINE da_setup_obs_structures_ascii( xp, ob, iv )
    ! Allocate the ob based on inputed number of obs:
    !--------------------------------------------------------------------------
 
-   CALL da_allocate_observations ( iv )
+   call da_allocate_observations ( iv )
 
    iv%total_obs = 0
    iv%num_sound = 0
@@ -251,11 +251,11 @@ SUBROUTINE da_setup_obs_structures_ascii( xp, ob, iv )
    ! [3.0] Calculate innovation vector (O-B) and create (smaller) ob structure:
    !--------------------------------------------------------------------------
 
-   CALL da_fill_obs_structures( iv, ob )
+   call da_fill_obs_structures( iv, ob )
 
    iv%current_ob_time = 1
 
-   IF (trace_use) CALL da_trace_exit("da_setup_obs_structures_ascii")
+   IF (trace_use) call da_trace_exit("da_setup_obs_structures_ascii")
 
-END SUBROUTINE da_setup_obs_structures_ascii
+end subroutine da_setup_obs_structures_ascii
 

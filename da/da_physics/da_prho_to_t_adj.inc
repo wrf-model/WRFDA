@@ -1,4 +1,4 @@
-SUBROUTINE DA_PRho_To_T_Adj( xb, xp, xa ) 
+subroutine DA_PRho_To_T_Adj( xb, xp, xa ) 
  
 !------------------------------------------------------------------------------
 !  PURPOSE: Adjoint of DA_PRho_To_T.
@@ -62,4 +62,4 @@ SUBROUTINE DA_PRho_To_T_Adj( xb, xp, xa )
                               temp(is:ie,js:je) / xb % rho(is:ie,js:je,k)
    end do  
                              
-END SUBROUTINE DA_PRho_To_T_Adj
+end subroutine DA_PRho_To_T_Adj

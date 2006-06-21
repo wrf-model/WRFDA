@@ -37,12 +37,12 @@ subroutine da_check_max_iv_qscat(it, qscat, itu, itvv, ituf, itvvf)
 
 !     U-wind
 
-      CALL da_max_error_qc(it, qscat % info, qscat % u, &
+      call da_max_error_qc(it, qscat % info, qscat % u, &
               max_error_uv, itu, ituf, iunit, 'U    ', &
                             failed, print)
 !     V-wind
 
-      CALL da_max_error_qc (it, qscat % info, qscat % v,&
+      call da_max_error_qc (it, qscat % info, qscat % v,&
               max_error_uv, itvv, itvvf, iunit, 'V    ', &
                              failed, print)                           
 

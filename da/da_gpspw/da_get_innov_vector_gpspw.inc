@@ -1,4 +1,4 @@
-SUBROUTINE da_get_innov_vector_gpspw ( it, xb, xp, ob, iv )
+subroutine da_get_innov_vector_gpspw ( it, xb, xp, ob, iv )
 
   !----------------------------------------------------------------
   !    Reviewed and re-written part of the code by Y.-R. Guo.           
@@ -190,7 +190,7 @@ SUBROUTINE da_get_innov_vector_gpspw ( it, xb, xp, ob, iv )
         !------------------------------------------------------------------------
 
         IF (  check_max_iv ) THEN
-          CALL da_check_max_iv_gpspw(it, iv % gpspw(n), ittpw,ittpwf )
+          call da_check_max_iv_gpspw(it, iv % gpspw(n), ittpw,ittpwf )
         END IF
 
         !---   
@@ -211,5 +211,5 @@ SUBROUTINE da_get_innov_vector_gpspw ( it, xb, xp, ob, iv )
 
   ENDIF
 
-END SUBROUTINE da_get_innov_vector_gpspw
+end subroutine da_get_innov_vector_gpspw
 

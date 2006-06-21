@@ -1,4 +1,4 @@
-SUBROUTINE da_allocate_y( iv, y )
+subroutine da_allocate_y( iv, y )
 
    !---------------------------------------------------------------------------
    ! PURPOSE: Allocate arrays used in y and residual obs structures.
@@ -332,4 +332,4 @@ SUBROUTINE da_allocate_y( iv, y )
       end do
    END IF
 
-END SUBROUTINE DA_Allocate_Y
+end subroutine DA_Allocate_Y

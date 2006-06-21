@@ -1,4 +1,4 @@
-SUBROUTINE da_set_boundary_xa( xa, xb )
+subroutine da_set_boundary_xa( xa, xb )
    !------------------------------------------------------------------------
    !  Purpose: 
    !
@@ -49,5 +49,5 @@ SUBROUTINE da_set_boundary_xa( xa, xb )
       enddo
    enddo
 
-END SUBROUTINE da_set_boundary_xa
+end subroutine da_set_boundary_xa
 

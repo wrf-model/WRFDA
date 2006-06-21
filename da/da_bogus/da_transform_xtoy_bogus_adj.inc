@@ -1,4 +1,4 @@
-SUBROUTINE da_transform_xtoy_bogus_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
+subroutine da_transform_xtoy_bogus_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
 
   !---------------------------------------------------------------------
   !  This subroutine is the adjoint of bogus observation operators.
@@ -131,5 +131,5 @@ SUBROUTINE da_transform_xtoy_bogus_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
     END DO
   END IF
 
-END SUBROUTINE da_transform_xtoy_bogus_adj
+end subroutine da_transform_xtoy_bogus_adj
 

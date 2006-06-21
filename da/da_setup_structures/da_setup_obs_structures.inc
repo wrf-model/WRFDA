@@ -1,4 +1,4 @@
-SUBROUTINE da_setup_obs_structures( xp, ob, iv )
+subroutine da_setup_obs_structures( xp, ob, iv )
 
 !------------------------------------------------------------------------------
 !  PURPOSE: Allocate and read in components of observation structure.
@@ -19,10 +19,10 @@ SUBROUTINE da_setup_obs_structures( xp, ob, iv )
    TYPE ( y_type), INTENT(OUT)  :: ob          ! Observation structure.
    TYPE (ob_type), INTENT(OUT)  :: iv          ! O-B structure.
 
-   IF (trace_use) CALL da_trace_entry("da_setup_obs_structures")
+   IF (trace_use) call da_trace_entry("da_setup_obs_structures")
 
 
-   CALL wrf_message('[4.0] Set up observations (ob)')
+   call wrf_message('[4.0] Set up observations (ob)')
 
 !------------------------------------------------------------------------------      
 !  [1.0] Setup and read in fields from first guess:
@@ -84,12 +84,12 @@ SUBROUTINE da_setup_obs_structures( xp, ob, iv )
    IF (use_obsgts) then
      ! Conventional obs can be in BUFR or ascii format
      IF ( ob_format == 1 ) THEN
-       CALL wrf_message('Using BUFR format observation input')
+       call wrf_message('Using BUFR format observation input')
        ! [1.1] BUFR observation input file:
        IF (iv%num_pseudo > 0) THEN
-         CALL wrf_message('Pseudo test only.')
-         CALL da_allocate_y( iv, ob )
-         CALL da_setup_pseudo_obs( iv, ob )
+         call wrf_message('Pseudo test only.')
+         call da_allocate_y( iv, ob )
+         call da_setup_pseudo_obs( iv, ob )
          iv%pseudo(1)%loc%i=int(iv%pseudo(1)%loc%x)
          iv%pseudo(1)%loc%j=int(iv%pseudo(1)%loc%y)
          iv%pseudo(1)%loc%dx=iv%pseudo(1)%loc%x-real(iv%pseudo(1)%loc%i)
@@ -97,11 +97,11 @@ SUBROUTINE da_setup_obs_structures( xp, ob, iv )
          iv%pseudo(1)%loc%dxm=1.0-iv%pseudo(1)%loc%dx
          iv%pseudo(1)%loc%dym=1.0-iv%pseudo(1)%loc%dy
        ELSE
-         CALL da_setup_obs_structures_bufr( xp, ob, iv )
+         call da_setup_obs_structures_bufr( xp, ob, iv )
        END IF 
      ELSE IF ( ob_format == 2 ) THEN
        ! [1.2] MM5 observation input file:
-       CALL da_setup_obs_structures_ascii( xp, ob, iv )
+       call da_setup_obs_structures_ascii( xp, ob, iv )
      END IF
    END IF
 
@@ -112,11 +112,11 @@ SUBROUTINE da_setup_obs_structures( xp, ob, iv )
      ! Stop any radiance work if RTTOV not defined, as there are
      ! huge preprocessor defined holes in the subsequent code, made so people
      ! can compile without the RTTOV library
-     CALL wrf_error(__FILE__,__LINE__, &
+     call wrf_error(__FILE__,__LINE__, &
         "Cannot run radiance code if compile directive RTTOV false")
 #endif
-     CALL wrf_message('Using NCEP BUFR radiance 1b input')
-     CALL da_setup_bufrtovs_structures( xp, ob, iv )
+     call wrf_message('Using NCEP BUFR radiance 1b input')
+     call da_setup_bufrtovs_structures( xp, ob, iv )
      ! These are per processor, so uninteresting
      ! write (UNIT=stderr,FMT=*) ' iv%total_rad_channel = ', iv%total_rad_channel
      ! write (UNIT=stderr,FMT=*) ' iv%total_rad_pixel   = ', iv%total_rad_pixel
@@ -125,7 +125,7 @@ SUBROUTINE da_setup_obs_structures( xp, ob, iv )
 !     Get horizontal interpolation weights.
       call da_setup_obs_interp_wts( xp, iv ) 
 
-   IF (trace_use) CALL da_trace_exit("da_setup_obs_structures")    
+   IF (trace_use) call da_trace_exit("da_setup_obs_structures")    
 
-END SUBROUTINE da_setup_obs_structures
+end subroutine da_setup_obs_structures
 

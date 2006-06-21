@@ -1,4 +1,4 @@
-SUBROUTINE da_tpq_to_rh_lin( xb, xp, xa )
+subroutine da_tpq_to_rh_lin( xb, xp, xa )
 
 !------------------------------------------------------------------------------
 !  PURPOSE: Convert T/pressure/q to relative humidity increments.
@@ -41,13 +41,13 @@ SUBROUTINE da_tpq_to_rh_lin( xb, xp, xa )
 !  [1.0] Calculate saturation specific humidity ratio qs~/qs:
 !------------------------------------------------------------------------------
  
-   CALL da_tp_to_qs_lin( xb, xp, xa, qs_prime_over_qs )
+   call da_tp_to_qs_lin( xb, xp, xa, qs_prime_over_qs )
 
 !-----------------------------------------------------------------------------
 !  [2.0] Culcalete background saturation specific humidity qs:
 !-----------------------------------------------------------------------------
 
-   CALL da_tp_to_qs1( xb, xp, es, qs) 
+   call da_tp_to_qs1( xb, xp, es, qs) 
    
 !------------------------------------------------------------------------------
 !  [3.0] Calculate relative humidity increment:
@@ -59,4 +59,4 @@ SUBROUTINE da_tpq_to_rh_lin( xb, xp, xa )
                                   xb % rh(is:ie,js:je,ks:ke) * &
                                   qs_prime_over_qs(is:ie,js:je,ks:ke)
 
-END SUBROUTINE da_tpq_to_rh_lin
+end subroutine da_tpq_to_rh_lin

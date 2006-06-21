@@ -1,4 +1,4 @@
-SUBROUTINE da_get_y_lhs_value( iv, y, &
+subroutine da_get_y_lhs_value( iv, y, &
                                partial_lhs, pertile_lhs, adj_ttl_lhs )
    
 !------------------------------------------------------------------------------
@@ -84,5 +84,5 @@ SUBROUTINE da_get_y_lhs_value( iv, y, &
    adj_ttl_lhs = partial_lhs
 #endif
    
-END SUBROUTINE da_get_y_lhs_value
+end subroutine da_get_y_lhs_value
 

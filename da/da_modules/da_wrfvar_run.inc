@@ -1,4 +1,4 @@
-SUBROUTINE da_wrfvar_run( )
+subroutine da_wrfvar_run( )
 !<DESCRIPTION>
 !     WRF run routine.
 !</DESCRIPTION>
@@ -24,12 +24,12 @@ SUBROUTINE da_wrfvar_run( )
   !  integration is from the first step (1) to the last step of the simulation.
 
   !--do wrfvar
-  IF (trace_use) CALL da_trace_entry("da_wrfvar_run")
+  IF (trace_use) call da_trace_entry("da_wrfvar_run")
 
-  CALL wrf_debug ( 100 , 'wrfvar: calling wrfvar ' )
-  CALL da_wrfvar_interface ( head_grid, config_flags )
-  CALL wrf_debug ( 100 , 'wrfvar: back from wrfvar ' )
+  call wrf_debug ( 100 , 'wrfvar: calling wrfvar ' )
+  call da_wrfvar_interface ( head_grid, config_flags )
+  call wrf_debug ( 100 , 'wrfvar: back from wrfvar ' )
 
-  IF (trace_use) CALL da_trace_exit("da_wrfvar_run")
+  IF (trace_use) call da_trace_exit("da_wrfvar_run")
 
-END SUBROUTINE da_wrfvar_run
+end subroutine da_wrfvar_run

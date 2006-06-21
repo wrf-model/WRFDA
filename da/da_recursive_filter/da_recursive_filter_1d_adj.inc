@@ -1,4 +1,4 @@
-SUBROUTINE DA_Recursive_Filter_1D_Adj( pass, alpha, field, n )
+subroutine DA_Recursive_Filter_1D_Adj( pass, alpha, field, n )
 
 !---- -------------------------------------------------------------------------
 !  PURPOSE: Perform one pass of recursive filter on 1D array - adjoint.
@@ -81,7 +81,7 @@ SUBROUTINE DA_Recursive_Filter_1D_Adj( pass, alpha, field, n )
 
    field(1:n) = a(1:n)
    
-END SUBROUTINE DA_Recursive_Filter_1D_Adj
+end subroutine DA_Recursive_Filter_1D_Adj
 
 
 

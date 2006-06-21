@@ -51,7 +51,7 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
       real             :: cv_je(1:cv_size_je)          ! Je control variable.
       real             :: xhat_je(1:cv_size_je)        ! Je control variable.
 
-      IF (trace_use) CALL da_trace_entry("da_calculate_j")
+      IF (trace_use) call da_trace_entry("da_calculate_j")
 
       je_start = cv_size_jb + 1
       je_end = cv_size_jb + cv_size_je
@@ -210,7 +210,7 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
       write(grad_unit,FMT='(2x,i2,1x,f6.3,2x,i4,2x,4f10.3)') & 
         it, EPS(it), iter, gnorm_j, gnorm_jb, gnorm_jo, gnorm_je
 
-      IF (trace_use) CALL da_trace_exit("da_calculate_j")
+      IF (trace_use) call da_trace_exit("da_calculate_j")
 
   end subroutine da_calculate_j
 

@@ -1,4 +1,4 @@
-SUBROUTINE da_cal_residual_ssmi_rv( oi, y, re, &
+subroutine da_cal_residual_ssmi_rv( oi, y, re, &
                                                   np_missing, np_bad_data, &
                                                   np_obs_used, np_available )
 
@@ -38,5 +38,5 @@ SUBROUTINE da_cal_residual_ssmi_rv( oi, y, re, &
    np_obs_used = np_obs_used + n_obs_bad % Speed % num % use    &
                              + n_obs_bad % q % num % use
 
-END SUBROUTINE da_cal_residual_ssmi_rv
+end subroutine da_cal_residual_ssmi_rv
 

@@ -1,4 +1,4 @@
-SUBROUTINE da_tp_to_qs( t, p, es, qs)
+subroutine da_tp_to_qs( t, p, es, qs)
 
 !------------------------------------------------------------------------------
 !  PURPOSE: Convert T/p to saturation specific humidity.
@@ -35,4 +35,4 @@ SUBROUTINE da_tp_to_qs( t, p, es, qs)
 
    qs = rd_over_rv * es / ( p - rd_over_rv1 * es )
 
-END SUBROUTINE da_tp_to_qs
+end subroutine da_tp_to_qs

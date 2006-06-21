@@ -1,4 +1,4 @@
-SUBROUTINE DA_Cal_Jo_and_GradY_SSMI_Rv( oi, re, jo, jo_grad_y )
+subroutine DA_Cal_Jo_and_GradY_SSMI_Rv( oi, re, jo, jo_grad_y )
 
    IMPLICIT NONE
 
@@ -41,5 +41,5 @@ SUBROUTINE DA_Cal_Jo_and_GradY_SSMI_Rv( oi, re, jo, jo_grad_y )
    jo % ssmir_Speed = 0.5 * jo % ssmir_Speed
    jo % ssmir_tpw   = 0.5 * jo % ssmir_tpw
 
-END SUBROUTINE DA_Cal_Jo_and_GradY_SSMI_Rv
+end subroutine DA_Cal_Jo_and_GradY_SSMI_Rv
 

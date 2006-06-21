@@ -1,4 +1,4 @@
-SUBROUTINE DA_Check_Vp_Errors( vp1, vp2, ne, &
+subroutine DA_Check_Vp_Errors( vp1, vp2, ne, &
                                its,ite, jts,jte, kts,kte )
 
 !------------------------------------------------------------------------------
@@ -136,4 +136,4 @@ SUBROUTINE DA_Check_Vp_Errors( vp1, vp2, ne, &
       end if
    end if
 
-END SUBROUTINE DA_Check_Vp_Errors
+end subroutine DA_Check_Vp_Errors

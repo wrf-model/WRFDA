@@ -1,5 +1,5 @@
 !
-SUBROUTINE da_qc_amsua ( inst, nchan, tb_ob, rad )
+subroutine da_qc_amsua ( inst, nchan, tb_ob, rad )
 !------------------------------------------------------------------------------
 !  PURPOSE: perform quality control for amsua data.
 !
@@ -113,4 +113,4 @@ SUBROUTINE da_qc_amsua ( inst, nchan, tb_ob, rad )
 
    return
 
-END SUBROUTINE da_qc_amsua
+end subroutine da_qc_amsua

@@ -1,4 +1,4 @@
-SUBROUTINE da_transform_xtoy_sonde_sfc ( xa, xb, iv, xp, y )
+subroutine da_transform_xtoy_sonde_sfc ( xa, xb, iv, xp, y )
 
   IMPLICIT NONE
 
@@ -67,11 +67,11 @@ SUBROUTINE da_transform_xtoy_sonde_sfc ( xa, xb, iv, xp, y )
     else if (sfc_assi_options == 2) then
       do n=iv%ob_numb(iv%current_ob_time-1)%sound + 1, iv%ob_numb(iv%current_ob_time)%sound
         if(iv%sonde_sfc(n)%loc%proc_domain_with_halo) then
-          CALL da_transform_xtopsfc( xb, xa, xp, iv%sonde_sfc(n), y%sonde_sfc(n) )
+          call da_transform_xtopsfc( xb, xa, xp, iv%sonde_sfc(n), y%sonde_sfc(n) )
         endif
       enddo
     endif
   ENDIF
 
-END SUBROUTINE da_transform_xtoy_sonde_sfc
+end subroutine da_transform_xtoy_sonde_sfc
 

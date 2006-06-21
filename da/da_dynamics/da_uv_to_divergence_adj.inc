@@ -1,4 +1,4 @@
-SUBROUTINE da_uv_to_divergence_adj( xp, xb, u, v, div, &
+subroutine da_uv_to_divergence_adj( xp, xb, u, v, div, &
                                ids,ide, jds,jde, kds,kde,  &
                                ims,ime, jms,jme, kms,kme,  &
                                its,ite, jts,jte, kts,kte )
@@ -165,5 +165,5 @@ SUBROUTINE da_uv_to_divergence_adj( xp, xb, u, v, div, &
 
    div = 0.0
 
-END SUBROUTINE da_uv_to_divergence_adj
+end subroutine da_uv_to_divergence_adj
 

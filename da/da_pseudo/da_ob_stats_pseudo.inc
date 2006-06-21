@@ -1,4 +1,4 @@
-SUBROUTINE da_ob_stats_pseudo ( stats_unit, oi )
+subroutine da_ob_stats_pseudo ( stats_unit, oi )
 
    IMPLICIT NONE
 
@@ -36,23 +36,23 @@ SUBROUTINE da_ob_stats_pseudo ( stats_unit, oi )
 
        if( oi%pseudo(n)%loc%proc_domain ) then
 
-         CALL da_stats_calculate( n, 0, oi%pseudo(n)%u%qc, & 
+         call da_stats_calculate( n, 0, oi%pseudo(n)%u%qc, & 
                                oi%pseudo(n)%u%inv, nu, & 
                                pseudo%minimum%u, pseudo%maximum%u, &
                                pseudo%average%u, pseudo%rms_err%u )
-         CALL da_stats_calculate( n, 0, oi%pseudo(n)%v%qc, & 
+         call da_stats_calculate( n, 0, oi%pseudo(n)%v%qc, & 
                                oi%pseudo(n)%v%inv, nv, & 
                                pseudo%minimum%v, pseudo%maximum%v, &
                                pseudo%average%v, pseudo%rms_err%v )
-         CALL da_stats_calculate( n, 0, oi%pseudo(n)%t%qc, & 
+         call da_stats_calculate( n, 0, oi%pseudo(n)%t%qc, & 
                                oi%pseudo(n)%t%inv, nt, & 
                                pseudo%minimum%t, pseudo%maximum%t, &
                                pseudo%average%t, pseudo%rms_err%t )
-         CALL da_stats_calculate( n, 0, oi%pseudo(n)%p%qc, & 
+         call da_stats_calculate( n, 0, oi%pseudo(n)%p%qc, & 
                                oi%pseudo(n)%p%inv, np, & 
                                pseudo%minimum%p, pseudo%maximum%p, &
                                pseudo%average%p, pseudo%rms_err%p )
-         CALL da_stats_calculate( n, 0, oi%pseudo(n)%q%qc, & 
+         call da_stats_calculate( n, 0, oi%pseudo(n)%q%qc, & 
                                oi%pseudo(n)%q%inv, nq, & 
                                pseudo%minimum%q, pseudo%maximum%q, &
                                pseudo%average%q, pseudo%rms_err%q )
@@ -97,10 +97,10 @@ SUBROUTINE da_ob_stats_pseudo ( stats_unit, oi )
    
      write(unit=stats_unit, fmt='(/a/)') ' O-B Diagnostics for pseudo'
    
-     CALL da_print_stats_pseudo( stats_unit, nu, nv, nt, np, nq, pseudo )
+     call da_print_stats_pseudo( stats_unit, nu, nv, nt, np, nq, pseudo )
    
     END IF
    
    END IF
 
-END SUBROUTINE da_ob_stats_pseudo
+end subroutine da_ob_stats_pseudo

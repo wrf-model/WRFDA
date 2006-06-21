@@ -1,4 +1,4 @@
-SUBROUTINE da_trace_int_sort( &
+subroutine da_trace_int_sort( &
    key, &
    n, &
    index)
@@ -64,4 +64,4 @@ SUBROUTINE da_trace_int_sort( &
       END DO sift2  
    END DO retire
 
-END SUBROUTINE da_trace_int_sort
+end subroutine da_trace_int_sort

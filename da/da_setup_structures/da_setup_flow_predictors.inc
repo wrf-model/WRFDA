@@ -25,10 +25,10 @@ subroutine da_setup_flow_predictors( ix, jy, kz, ne, ep )
    real                        :: temp3d(1:ix,1:jy,1:kz)! Temporary, real*4 array.
    real                        :: temp2d(1:ix,1:jy)     ! Temporary, real*4 array.
 
-   IF (trace_use) CALL da_trace_entry("da_setup_flow_predictors")
+   IF (trace_use) call da_trace_entry("da_setup_flow_predictors")
 
 
-   CALL wrf_message("Setup structures for flow-dependent information and read in")
+   call wrf_message("Setup structures for flow-dependent information and read in")
 
 !------------------------------------------------------------------------------
 !  Input ensemble perturbations
@@ -97,7 +97,7 @@ subroutine da_setup_flow_predictors( ix, jy, kz, ne, ep )
 
    end do 
 
-   IF (trace_use) CALL da_trace_exit("da_setup_flow_predictors")
+   IF (trace_use) call da_trace_exit("da_setup_flow_predictors")
 
 
 end subroutine da_setup_flow_predictors

@@ -1,8 +1,4 @@
-SUBROUTINE DA_Transform_XToTPW_Adj( xa, xb )
-
-!------------------------------------------------------------------------
-!  Modified: 04/25/03                                   Wei Huang
-!------------------------------------------------------------------------
+subroutine da_transform_xtotpw_adj( xa, xb )
 
    implicit none
 
@@ -13,7 +9,7 @@ SUBROUTINE DA_Transform_XToTPW_Adj( xa, xb )
 
    real    :: pw, dzpw
 
-!------------------------------------------------------------------------
+   if (trace_use) call da_trace_entry("da_transform_xtotpw_adj")
 
    is = xb%its
    js = xb%jts
@@ -35,20 +31,20 @@ SUBROUTINE DA_Transform_XToTPW_Adj( xa, xb )
       if ( je > xb%jde ) je = xb%jde
    endif
 
-!------------------------------------------------------------------------
-
    do j=js, je
-   do i=is, ie
-      pw = 0.1*xa%tpw(i,j)
+      do i=is, ie
+         pw = 0.1*xa%tpw(i,j)
 
-      do k=xb%kts, xb%kte
-         dzpw = (xb%hf(i,j,k+1)-xb%hf(i,j,k))*pw
+         do k=xb%kts, xb%kte
+            dzpw = (xb%hf(i,j,k+1)-xb%hf(i,j,k))*pw
 
-         xa%  q(i,j,k)=xa%  q(i,j,k)+dzpw*xb%rho(i,j,k)
-         xa%rho(i,j,k)=xa%rho(i,j,k)+dzpw*xb%  q(i,j,k)
+            xa%  q(i,j,k)=xa%  q(i,j,k)+dzpw*xb%rho(i,j,k)
+            xa%rho(i,j,k)=xa%rho(i,j,k)+dzpw*xb%  q(i,j,k)
+         enddo
       enddo
    enddo
-   enddo
+
+   if (trace_use) call da_trace_exit("da_transform_xtotpw_adj")
  
-END SUBROUTINE DA_Transform_XToTPW_Adj
+end subroutine da_transform_xtotpw_adj
 

@@ -1,4 +1,4 @@
-SUBROUTINE da_balance_equation_lin( xb, xbx, xp, u, v, phi_b,   &
+subroutine da_balance_equation_lin( xb, xbx, xp, u, v, phi_b,   &
                                     ids,ide, jds,jde, kds,kde,  &
                                     ims,ime, jms,jme, kms,kme,  &
                                     its,ite, jts,jte, kts,kte )
@@ -56,7 +56,7 @@ SUBROUTINE da_balance_equation_lin( xb, xbx, xp, u, v, phi_b,   &
       coefy = coefx   
    else
       WRITE(UNIT=errmsg(1),FMT='(A,I3)') 'Wrong FG_FORMAT = ',fg_format
-      CALL wrf_error(__FILE__,__LINE__,errmsg(1))
+      call wrf_error(__FILE__,__LINE__,errmsg(1))
    end if
 
    ! [1.1] Multiplicative coefficent for conversion RHS->Del**2 phi_b/M**2:
@@ -74,7 +74,7 @@ SUBROUTINE da_balance_equation_lin( xb, xbx, xp, u, v, phi_b,   &
 
       IF ( balance_type == balance_geo .OR. &
            balance_type == balance_geocyc ) THEN
-         CALL da_balance_geoterm_lin( xb % cori, xb % rho(:,:,k), &
+         call da_balance_geoterm_lin( xb % cori, xb % rho(:,:,k), &
                                       u(:,:,k), v(:,:,k), &
                                       term_x, term_y, ids,ide, jds,jde, &
                                       ims,ime, jms,jme, its,ite, jts,jte )
@@ -84,7 +84,7 @@ SUBROUTINE da_balance_equation_lin( xb, xbx, xp, u, v, phi_b,   &
 
       IF ( balance_type == balance_cyc .OR. &
            balance_type == balance_geocyc ) THEN
-         CALL da_balance_cycloterm_lin( xb % rho(:,:,k), xb % u(:,:,k),   &
+         call da_balance_cycloterm_lin( xb % rho(:,:,k), xb % u(:,:,k),   &
                                         xb % v(:,:,k), u(:,:,k), v(:,:,k),&
                                         xb % coefx(:,:), xb % coefy(:,:), &
                                         term_x(:,:), term_y(:,:),   &
@@ -120,10 +120,10 @@ SUBROUTINE da_balance_equation_lin( xb, xbx, xp, u, v, phi_b,   &
    !  [3.0] Solve Del**2 phi_b = RHS for phi_b:
    !------------------------------------------------------------------------------
 
-   CALL da_solve_poissoneqn_fst( xbx, xp, del2phi_b, phi_b,  &
+   call da_solve_poissoneqn_fst( xbx, xp, del2phi_b, phi_b,  &
                                  ids,ide, jds,jde, kds,kde,      &
                                  ims,ime, jms,jme, kms,kme,      &
                                  its,ite, jts,jte, kts,kte ) 
 
-END SUBROUTINE da_balance_equation_lin
+end subroutine da_balance_equation_lin
 

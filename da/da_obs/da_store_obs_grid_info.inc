@@ -1,4 +1,4 @@
-SUBROUTINE DA_Store_Obs_Grid_Info ( xp, loc )
+subroutine DA_Store_Obs_Grid_Info ( xp, loc )
 
    IMPLICIT NONE
 
@@ -13,5 +13,5 @@ SUBROUTINE DA_Store_Obs_Grid_Info ( xp, loc )
         loc%proc_domain = .true.
    endif
 
-END SUBROUTINE DA_Store_Obs_Grid_Info
+end subroutine DA_Store_Obs_Grid_Info
 

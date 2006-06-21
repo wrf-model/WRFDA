@@ -1,4 +1,4 @@
-SUBROUTINE da_read_ssmi (iunit, ob, xp, filename)
+subroutine da_read_ssmi (iunit, ob, xp, filename)
 
 !-----------------------------------------------------------------------------!
 ! Read the header of a MM5 3D-VAR 2.0 GTS observation file
@@ -275,7 +275,7 @@ head_line_2:  DO
 
                 ipass = .false.
                  iprecip = 0
-                 CALL filter(tb19v%inv, tb19h%inv, tb22v%inv, tb37v%inv, &
+                 call filter(tb19v%inv, tb19h%inv, tb22v%inv, tb37v%inv, &
                              tb37h%inv, tb85v%inv, tb85h%inv, ipass, iprecip, &
                              info%lat)
                 if (iprecip .eq. 1) then
@@ -351,10 +351,10 @@ head_line_2:  DO
 
    write(unit=stdout, fmt='(/,5x,a,i6/)') '** Rain contaminated SSMI_Tb =', irain
 
-END SUBROUTINE da_read_ssmi
+end subroutine da_read_ssmi
 
 !-------------------------------------------------------
-SUBROUTINE filter(tb19v, tb19h, tb22v, tb37v,          &
+subroutine filter(tb19v, tb19h, tb22v, tb37v,          &
                   tb37h, tb85v, tb85h, ipass, iprecip, xlat  )
 
 REAL    ,  INTENT (in)  :: tb19v, tb19h, tb22v, tb37v, &
@@ -412,7 +412,7 @@ REAL                    :: theta,tc,wv,u,alw19,alw37,alw85
 
      if (ipass1 .eq. 1) then
 
-         CALL pettyalgos(tb,theta,tc,sst,dsst,          &
+         call pettyalgos(tb,theta,tc,sst,dsst,          &
                          wv,u,alw19,alw37,alw85,iprecip, xlat)
 
          if (wv    .gt. -999. .and. u     .gt. -999. .and. &
@@ -446,7 +446,7 @@ REAL                    :: theta,tc,wv,u,alw19,alw37,alw85
 !    WRITE(UNIT=stdout,*) 'pass=',ipass1,ipass2,iprecip,ipass
 
 
-END SUBROUTINE filter
+end subroutine filter
 
 !***************************************************************
 !                    NOTICE
@@ -1133,7 +1133,7 @@ END SUBROUTINE filter
          enddo
          u = u + coeff2(7)*(theta-53.0)
       else
-        CALL wrf_error(__FILE__,__LINE__,"Invalid algorithm ID")
+        call wrf_error(__FILE__,__LINE__,"Invalid algorithm ID")
       endif
 
       end subroutine ualg

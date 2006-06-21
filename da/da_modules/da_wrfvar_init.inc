@@ -1,4 +1,4 @@
-SUBROUTINE da_wrfvar_init( no_init1 )
+subroutine da_wrfvar_init( no_init1 )
 !<DESCRIPTION>
 !     WRF initialization routine.
 !</DESCRIPTION>
@@ -22,15 +22,15 @@ SUBROUTINE da_wrfvar_init( no_init1 )
   ! Initialize WRF modules:  
   ! Phase 1 returns after MPI_INIT() (if it is called)
   IF ( .NOT. PRESENT( no_init1 ) ) THEN
-    CALL init_modules(1)
+    call init_modules(1)
     ! Initialize utilities (time manager, etc.)
-    CALL wrf_util_initialize( defaultCalendar=WRF_UTIL_CAL_GREGORIAN )
+    call wrf_util_initialize( defaultCalendar=WRF_UTIL_CAL_GREGORIAN )
   ENDIF
   ! Phase 2 resumes after MPI_INIT() (if it is called)
-  CALL init_modules(2)
+  call init_modules(2)
 
   IF (print_detail_timing) THEN
-     CALL start_timing ! end_timing call in wrfvar_finalize
+     call start_timing ! end_timing call in wrfvar_finalize
   END IF
 
 !<DESCRIPTION>
@@ -49,14 +49,14 @@ SUBROUTINE da_wrfvar_init( no_init1 )
 
 #ifdef DM_PARALLEL
   IF ( wrf_dm_on_monitor() ) THEN
-    CALL initial_config
+    call initial_config
   ENDIF
-  CALL get_config_as_buffer( configbuf, configbuflen, nbytes )
-  CALL wrf_dm_bcast_bytes( configbuf, nbytes )
-  CALL set_config_as_buffer( configbuf, configbuflen )
-  CALL wrf_dm_initialize
+  call get_config_as_buffer( configbuf, configbuflen, nbytes )
+  call wrf_dm_bcast_bytes( configbuf, nbytes )
+  call set_config_as_buffer( configbuf, configbuflen )
+  call wrf_dm_initialize
 #else
-  CALL initial_config
+  call initial_config
 #endif
 
   ! Copy namelist variables to DA_Constants
@@ -66,8 +66,8 @@ SUBROUTINE da_wrfvar_init( no_init1 )
 
 #include "config_assigns.inc"
 
-  IF (trace_use) CALL da_trace_init
-  IF (trace_use) CALL da_trace_entry("da_wrfvar_init")
+  IF (trace_use) call da_trace_init
+  IF (trace_use) call da_trace_entry("da_wrfvar_init")
 
 !<DESCRIPTION>
 ! Among the configuration variables read from the namelist is
@@ -82,8 +82,8 @@ SUBROUTINE da_wrfvar_init( no_init1 )
 !</DESCRIPTION>
 
   ! JRB This is the way we will use namelist variables once module_namelists goes
-  ! CALL nl_get_debug_level ( 1, debug_level )
-  ! CALL set_wrf_debug_level ( debug_level )
+  ! call nl_get_debug_level ( 1, debug_level )
+  ! call set_wrf_debug_level ( debug_level )
 
   ! allocated and configure the mother domain
 
@@ -99,10 +99,10 @@ SUBROUTINE da_wrfvar_init( no_init1 )
 !</DESCRIPTION>
 
   ! JRB This is the way we will use namelist variables once module_namelists goes
-  ! CALL nl_get_max_dom( 1, max_dom )
+  ! call nl_get_max_dom( 1, max_dom )
   IF ( max_dom > 1 ) THEN
 #if ( ! defined(DM_PARALLEL)  &&   ! defined(STUBMPI) )
-    CALL wrf_error(__FILE__,__LINE__, &
+    call wrf_error(__FILE__,__LINE__, &
       'nesting requires either an MPI build or use of the -DSTUBMPI option' ) 
 #endif
   END IF
@@ -123,28 +123,28 @@ SUBROUTINE da_wrfvar_init( no_init1 )
 ! broadcast of the configuration information.
 ! 
 !</DESCRIPTION>
-  CALL       wrf_message ( program_name )
-  CALL       wrf_message ( "Subversion "//subversion_version)
-  CALL       wrf_debug ( 100 , 'wrf: calling alloc_and_configure_domain ' )
-  CALL alloc_and_configure_domain ( domain_id  = 1 ,                  &
+  call       wrf_message ( program_name )
+  call       wrf_message ( "Subversion "//subversion_version)
+  call       wrf_debug ( 100 , 'wrf: calling alloc_and_configure_domain ' )
+  call alloc_and_configure_domain ( domain_id  = 1 ,                  &
                                     grid       = head_grid ,          &
                                     parent     = null_domain ,        &
                                     kid        = -1                   )
 
-  CALL       wrf_debug ( 100 , 'wrf: calling model_to_grid_config_rec ' )
-  CALL model_to_grid_config_rec ( head_grid%id , model_config_rec , config_flags )
-  CALL       wrf_debug ( 100 , 'wrf: calling set_scalar_indices_from_config ' )
-  CALL set_scalar_indices_from_config ( head_grid%id , idum1, idum2 )
-  CALL       wrf_debug ( 100 , 'wrf: calling init_wrfio' )
-  CALL init_wrfio
+  call       wrf_debug ( 100 , 'wrf: calling model_to_grid_config_rec ' )
+  call model_to_grid_config_rec ( head_grid%id , model_config_rec , config_flags )
+  call       wrf_debug ( 100 , 'wrf: calling set_scalar_indices_from_config ' )
+  call set_scalar_indices_from_config ( head_grid%id , idum1, idum2 )
+  call       wrf_debug ( 100 , 'wrf: calling init_wrfio' )
+  call init_wrfio
 
 #ifdef DM_PARALLEL
-  CALL get_config_as_buffer( configbuf, configbuflen, nbytes )
-  CALL wrf_dm_bcast_bytes( configbuf, nbytes )
-  CALL set_config_as_buffer( configbuf, configbuflen )
+  call get_config_as_buffer( configbuf, configbuflen, nbytes )
+  call wrf_dm_bcast_bytes( configbuf, nbytes )
+  call set_config_as_buffer( configbuf, configbuflen )
 #endif
 
-  CALL Setup_Timekeeping (head_grid)
+  call Setup_Timekeeping (head_grid)
 
 !<DESCRIPTION>
 ! The head grid is initialized with read-in data through the call to <a
@@ -167,15 +167,15 @@ SUBROUTINE da_wrfvar_init( no_init1 )
 ! 
 !</DESCRIPTION>
 
-  !  CALL med_initialdata_input( head_grid , config_flags )
+  !  call med_initialdata_input( head_grid , config_flags )
 
   IF((config_flags%real_data_init_type == 1) .or. (config_flags%real_data_init_type == 3)) THEN
-    CALL da_med_initialdata_input( head_grid , config_flags )
+    call da_med_initialdata_input( head_grid , config_flags )
   END IF
 
   head_grid%start_subtime = head_grid%start_time
   head_grid%stop_subtime = head_grid%stop_time
 
-  IF (trace_use) CALL da_trace_exit("da_wrfvar_init")
+  IF (trace_use) call da_trace_exit("da_wrfvar_init")
 
-END SUBROUTINE da_wrfvar_init
+end subroutine da_wrfvar_init

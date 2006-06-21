@@ -1,4 +1,4 @@
-SUBROUTINE da_calculate_residual_pilot( oi, y, re,                        &
+subroutine da_calculate_residual_pilot( oi, y, re,                        &
                                         np_missing, np_bad_data,          &
                                         np_obs_used, np_available )
 
@@ -38,5 +38,5 @@ SUBROUTINE da_calculate_residual_pilot( oi, y, re,                        &
                    n_obs_bad % v % num % use
   ENDIF
 
-END SUBROUTINE da_calculate_residual_pilot
+end subroutine da_calculate_residual_pilot
 

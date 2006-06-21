@@ -1,4 +1,4 @@
-      SUBROUTINE da_check_rh( xb, xa, xp )
+      subroutine da_check_rh( xb, xa, xp )
 
 !------------------------------------------------------------------------------
 !  PURPOSE: Remove RH over 100% or under 10%
@@ -133,5 +133,5 @@
       ENDDO
       ENDDO
 
-      END SUBROUTINE da_check_rh
+      end subroutine da_check_rh
 

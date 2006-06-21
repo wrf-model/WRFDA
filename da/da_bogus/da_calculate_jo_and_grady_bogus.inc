@@ -1,4 +1,4 @@
-SUBROUTINE DA_Calculate_Jo_and_GradY_Bogus( iv, re, jo, jo_grad_y )
+subroutine DA_Calculate_Jo_and_GradY_Bogus( iv, re, jo, jo_grad_y )
 
   IMPLICIT NONE
 
@@ -64,5 +64,5 @@ SUBROUTINE DA_Calculate_Jo_and_GradY_Bogus( iv, re, jo, jo_grad_y )
 
   END IF
 
-END SUBROUTINE DA_Calculate_Jo_and_GradY_Bogus
+end subroutine DA_Calculate_Jo_and_GradY_Bogus
 

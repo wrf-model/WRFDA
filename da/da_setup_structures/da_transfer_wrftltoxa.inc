@@ -1,4 +1,4 @@
-SUBROUTINE da_transfer_wrftltoxa( grid, config_flags, filnam, &
+subroutine da_transfer_wrftltoxa( grid, config_flags, filnam, &
 #include "em_dummy_args.inc"
                               )
 
@@ -28,7 +28,7 @@ SUBROUTINE da_transfer_wrftltoxa( grid, config_flags, filnam, &
 
    integer ndynopt
 
-IF (trace_use) CALL da_trace_entry("da_transfer_wrftltoxa")
+IF (trace_use) call da_trace_entry("da_transfer_wrftltoxa")
 
 
 !------------------------------------------------------------------------------
@@ -173,7 +173,7 @@ IF (trace_use) CALL da_trace_entry("da_transfer_wrftltoxa")
    endif
 #endif
 
-IF (trace_use) CALL da_trace_exit("da_transfer_wrftltoxa")
+IF (trace_use) call da_trace_exit("da_transfer_wrftltoxa")
 
-END SUBROUTINE da_transfer_wrftltoxa
+end subroutine da_transfer_wrftltoxa
 

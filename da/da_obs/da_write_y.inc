@@ -1,4 +1,4 @@
-SUBROUTINE da_write_y( iv, y )
+subroutine da_write_y( iv, y )
 !----------------------------------------------------------------------------   
 !  History:
 !
@@ -306,4 +306,4 @@ SUBROUTINE da_write_y( iv, y )
       END DO
    ENDIF
 
-END SUBROUTINE da_write_y
+end subroutine da_write_y

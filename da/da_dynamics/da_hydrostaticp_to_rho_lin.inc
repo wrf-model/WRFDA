@@ -1,4 +1,4 @@
-SUBROUTINE da_hydrostaticp_to_rho_lin( xb, xp, p, rho ) 
+subroutine da_hydrostaticp_to_rho_lin( xb, xp, p, rho ) 
 
    !---------------------------------------------------------------------------
    !  PURPOSE: Calculates density increment from pressure increment field.
@@ -89,5 +89,5 @@ SUBROUTINE da_hydrostaticp_to_rho_lin( xb, xp, p, rho )
       end do
    end do
    
-END SUBROUTINE da_hydrostaticp_to_rho_lin
+end subroutine da_hydrostaticp_to_rho_lin
 

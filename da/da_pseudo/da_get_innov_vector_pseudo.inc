@@ -1,4 +1,4 @@
-SUBROUTINE da_get_innov_vector_pseudo( xb, xp, ob, iv )
+subroutine da_get_innov_vector_pseudo( xb, xp, ob, iv )
 
    IMPLICIT NONE
    
@@ -81,5 +81,5 @@ SUBROUTINE da_get_innov_vector_pseudo( xb, xp, ob, iv )
       END DO
    ENDIF
 
-END SUBROUTINE da_get_innov_vector_pseudo
+end subroutine da_get_innov_vector_pseudo
 

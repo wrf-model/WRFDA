@@ -68,7 +68,7 @@
       logical bound
       real gamma,p,q,r,s,sgnd,stpc,stpf,stpq,theta
 
-      IF (trace_use) CALL da_trace_entry("da_vd05bd")
+      IF (trace_use) call da_trace_entry("da_vd05bd")
 
 
       info = 0
@@ -234,6 +234,6 @@
 ! 
 !     last card of subroutine vd05bd.
 
-      IF (trace_use) CALL da_trace_exit("da_vd05bd")
+      IF (trace_use) call da_trace_exit("da_vd05bd")
 
       end subroutine da_vd05bd

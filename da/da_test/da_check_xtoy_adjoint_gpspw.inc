@@ -1,4 +1,4 @@
-SUBROUTINE DA_Check_XToY_Adjoint_Gpspw( oi, y, adjtest_lhs, pertile_lhs )
+subroutine DA_Check_XToY_Adjoint_Gpspw( oi, y, adjtest_lhs, pertile_lhs )
 
    IMPLICIT NONE
 
@@ -28,5 +28,5 @@ SUBROUTINE DA_Check_XToY_Adjoint_Gpspw( oi, y, adjtest_lhs, pertile_lhs )
 
    ENDIF
 
-END SUBROUTINE DA_Check_XToY_Adjoint_Gpspw
+end subroutine DA_Check_XToY_Adjoint_Gpspw
 

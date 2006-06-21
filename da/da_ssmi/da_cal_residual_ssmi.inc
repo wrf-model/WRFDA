@@ -1,4 +1,4 @@
-SUBROUTINE da_cal_residual_ssmi( oi, y, re,                           &
+subroutine da_cal_residual_ssmi( oi, y, re,                           &
                                        np_missing, np_bad_data,             &
                                        np_obs_used, np_available            )
 
@@ -13,15 +13,15 @@ SUBROUTINE da_cal_residual_ssmi( oi, y, re,                           &
 
    IF ( oi%num_ssmi_tb .gt. 0 ) THEN
 
-      CALL da_cal_residual_ssmi_tb( oi, y, re,  &
+      call da_cal_residual_ssmi_tb( oi, y, re,  &
                                          np_missing, np_bad_data, &
                                          np_obs_used, np_available )
 
    ELSE IF ( oi%num_ssmi_retrieval .gt. 0) THEN
 
-      CALL da_cal_residual_ssmi_rv( oi, y, re,  &
+      call da_cal_residual_ssmi_rv( oi, y, re,  &
                                          np_missing, np_bad_data, &
                                          np_obs_used, np_available )
    ENDIF
 
-END SUBROUTINE da_cal_residual_ssmi
+end subroutine da_cal_residual_ssmi

@@ -1,4 +1,4 @@
-SUBROUTINE DA_Print_Stats_Bogus( stats_unit, nu, nv, nt, nq, nslp, Bogus )
+subroutine DA_Print_Stats_Bogus( stats_unit, nu, nv, nt, nq, nslp, Bogus )
 
   IMPLICIT NONE
 
@@ -40,5 +40,5 @@ SUBROUTINE DA_Print_Stats_Bogus( stats_unit, nu, nv, nt, nq, nslp, Bogus )
                        sqrt(Bogus%rms_err%q/real(nq)), &
                        sqrt(Bogus%rms_err%slp/real(nslp))
 
-END SUBROUTINE DA_Print_Stats_Bogus
+end subroutine DA_Print_Stats_Bogus
 

@@ -1,4 +1,4 @@
-SUBROUTINE DA_Deallocate_Background_Errors ( be )
+subroutine DA_Deallocate_Background_Errors ( be )
 
 !------------------------------------------------------------------------------
 !  PURPOSE: Deallocate components of 3dvar background errors.
@@ -16,7 +16,7 @@ SUBROUTINE DA_Deallocate_Background_Errors ( be )
    
 !-----End Of Header------------------------------------------------------------
 
-   IF (trace_use) CALL da_trace_entry("da_deallocate_background_errors")
+   IF (trace_use) call da_trace_entry("da_deallocate_background_errors")
 
 
 !  Deallocate gridpoint errors:
@@ -56,7 +56,7 @@ SUBROUTINE DA_Deallocate_Background_Errors ( be )
 
 !  DEALLOCATE ( be % cv % val )
 
-   IF (trace_use) CALL da_trace_exit("da_deallocate_background_errors")
+   IF (trace_use) call da_trace_exit("da_deallocate_background_errors")
 
 
-END SUBROUTINE DA_Deallocate_Background_Errors
+end subroutine DA_Deallocate_Background_Errors

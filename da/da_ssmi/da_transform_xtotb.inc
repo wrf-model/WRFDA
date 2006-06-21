@@ -1,79 +1,77 @@
+subroutine da_transform_xtotb( xb )
 
-!============================================================================
-SUBROUTINE DA_Transform_XToTb( xb )
-!----------------------------------------------------------------------------
    IMPLICIT NONE
-!----------------------------------------------------------------------------
-   type (xb_type), intent(inout)   :: xb       ! first guess state.
 
-!  LOCAL VARS
+   type (xb_type), intent(inout)   :: xb       ! first guess state.
 
    integer            :: i,j,k,ks,ke 
 
    real               :: psfc,ta,gamma,sst,htpw,speed,alw,zcld,tpw,dum1,zrhom
-!----------------------------------------------------------------------------
+
+   if (trace_use) call da_trace_entry("da_transform_xtotb")
 
    ks = xb%kts
    ke = xb%kte
 
    do j=xb%jts,xb%jte
-   do i=xb%its,xb%ite
+      do i=xb%its,xb%ite
+         ! surface pressure (mb) (940 -1030)
 
+         psfc          = 0.01*xb%psfc(i,j)
 
-! surface pressure (mb) (940 -1030)
+         ! sea surface temperature (k) (273 - 303) (doesnot change) 
 
-      psfc          = 0.01*xb%psfc(i,j)
+         sst           = xb%tgrn(i,j)
 
-! sea surface temperature (k) (273 - 303) (doesnot change) 
+         ! effective surface air temperature (263 - 303)
 
-      sst           = xb%tgrn(i,j)
+         ta          = xb%tgrn(i,j) + &
+                       (xb%t(i,j,ks)-xb%tgrn(i,j))*log(2./0.0001)/ &
+                       log(xb%h(i,j,ks)/0.0001)
 
-! effective surface air temperature (263 - 303)
+         ! gamma is an emperical formula and zcld is given for now
 
-      ta          = xb%tgrn(i,j) + &
-                    (xb%t(i,j,ks)-xb%tgrn(i,j))*log(2./0.0001)/ &
-                    log(xb%h(i,j,ks)/0.0001)
+         gamma   = (ta-270)*0.023 + 5.03  ! effective lapse rate(km) (4.0-6.5)
 
-! gamma is an emperical formula and zcld is given for now
-
-      gamma      = (ta-270)*0.023 + 5.03  ! effective lapse rate   (km) (4.0 - 6.5)
-
-      zcld       = 1                           ! effective cloud height (km)
+         zcld    = 1                           ! effective cloud height (km)
                                                ! = 1 if no cloud infomation
-! total precipitable water in cm
-! total precipitable water in (kg/m**2) (0 - 70)
+         ! total precipitable water in cm
+         ! total precipitable water in (kg/m**2) (0 - 70)
 
-      tpw          = xb%tpw(i,j)*10.
-      speed        = xb%speed(i,j)
- 
-!!Column liquid water (kg/m**2)   (0 - 0.5) (no data now. So, do it later.)
+         tpw          = xb%tpw(i,j)*10.
+         speed        = xb%speed(i,j)
 
-      alw          = 0.
+         ! Column liquid water (kg/m**2)  (0-0.5) (no data now. So do it later)
 
-! Column height weighted moisture density on the grid locally 
+         alw          = 0.
 
-      zrhom = 0.0
-      do k=ks,ke
-         zrhom=zrhom+(xb%hf(i,j,k+1)-xb%hf(i,j,k))*xb%h(i,j,k)*xb%q(i,j,k)*xb%rho(i,j,k)
-      END DO
+         ! Column height weighted moisture density on the grid locally 
 
-! Column moisture density on the grid locally
+         zrhom = 0.0
+         do k=ks,ke
+            zrhom=zrhom+(xb%hf(i,j,k+1)-xb%hf(i,j,k))*xb%h(i,j,k)*xb%q(i,j,k)* &
+               xb%rho(i,j,k)
+         END DO
 
-      htpw          = zrhom/tpw/1000.
+         ! Column moisture density on the grid locally
 
-      call tb(1,53.,psfc,ta,gamma,sst,tpw,htpw, &
-              speed,alw,zcld,xb%tb19v(i,j),xb%tb19h(i,j))
-      call tb(2,53.,psfc,ta,gamma,sst,tpw,htpw, &
-              speed,alw,zcld,xb%tb22v(i,j),dum1)
-      call tb(3,53.,psfc,ta,gamma,sst,tpw,htpw, &
-              speed,alw,zcld,xb%tb37v(i,j),xb%tb37h(i,j))
-      call tb(4,53.,psfc,ta,gamma,sst,tpw,htpw, &
-              speed,alw,zcld,xb%tb85v(i,j),xb%tb85h(i,j))
+         htpw          = zrhom/tpw/1000.
 
+         call tb(1,53.,psfc,ta,gamma,sst,tpw,htpw, &
+                 speed,alw,zcld,xb%tb19v(i,j),xb%tb19h(i,j))
+         call tb(2,53.,psfc,ta,gamma,sst,tpw,htpw, &
+                 speed,alw,zcld,xb%tb22v(i,j),dum1)
+         call tb(3,53.,psfc,ta,gamma,sst,tpw,htpw, &
+                 speed,alw,zcld,xb%tb37v(i,j),xb%tb37h(i,j))
+         call tb(4,53.,psfc,ta,gamma,sst,tpw,htpw, &
+                 speed,alw,zcld,xb%tb85v(i,j),xb%tb85h(i,j))
+
+      end do
    end do
-   end do
 
-END SUBROUTINE DA_Transform_XToTb
+   if (trace_use) call da_trace_entry("da_transform_xtotb")
+
+end subroutine da_transform_xtotb
 
 !--------------------------------------------------------------------------
 !Input :   IFREQ = (1,2,3, or 4 ) for (19.35, 22.235, 37, or 85.5 GHz)
@@ -213,10 +211,10 @@ END SUBROUTINE DA_Transform_XToTb
 
 !==============================================================
 !
-!  SYNOPSIS OF SUBROUTINES TB, TBATMOS
+!  SYNOPSIS OF subroutineS TB, TBATMOS
 !
 !===============================================================
-!  SUBROUTINE TBATMOS(IFREQ,THETA,P0,WV,HWV,TA,GAMMA,LW,ZCLD,TBUP,
+!  subroutine TBATMOS(IFREQ,THETA,P0,WV,HWV,TA,GAMMA,LW,ZCLD,TBUP,
 !                    TBDN,TAUATM)
 !
 !  This routine calculates the upwelling and downwelling microwave 
@@ -321,7 +319,7 @@ END SUBROUTINE DA_Transform_XToTb
 !                       SIGMA_V, EFFHT
 !
 !===============================================================
-!  SUBROUTINE TBATMOS(IFREQ,THETA,P0,WV,HWV,TA,GAMMA,LW,ZCLD,TBUP,
+!  subroutine TBATMOS(IFREQ,THETA,P0,WV,HWV,TA,GAMMA,LW,ZCLD,TBUP,
 !                    TBDN,TAUATM)
 !
 !  This routine calculates the upwelling and downwelling microwave 
@@ -379,7 +377,7 @@ END SUBROUTINE DA_Transform_XToTb
       mu = 1.0/cos(theta*0.0174533)
 ! get water vapor optical depth
 !=====
-      CALL da_cal_sigma_v(ifreq,p0,wv,hwv,ta,gamma,sigv)
+      call da_cal_sigma_v(ifreq,p0,wv,hwv,ta,gamma,sigv)
 ! otbar = one over "mean" temperature
       otbar = 1.0/(ta - gamma*zeta(ifreq))
 ! sigo = dry air optical depth
@@ -573,7 +571,7 @@ END SUBROUTINE DA_Transform_XToTb
 !
 !******************************************
 !
-! SUBROUTINE EFFHT(HO,HV,SIGO,SIGV,MU,ZCLD,HDN,HUP,HDNINF,HUPINF)
+! subroutine EFFHT(HO,HV,SIGO,SIGV,MU,ZCLD,HDN,HUP,HDNINF,HUPINF)
 !
 ! This subroutine returns "effective emitting heights" for an atmosphere
 ! with gaseous absorption approximated by two exponentially-decaying

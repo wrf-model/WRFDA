@@ -1,4 +1,4 @@
-SUBROUTINE da_tp_to_qs_adj1( t, p, es, t_prime, p_prime, &
+subroutine da_tp_to_qs_adj1( t, p, es, t_prime, p_prime, &
                              qs_prime_over_qs )
 
 !------------------------------------------------------------------------------
@@ -39,4 +39,4 @@ SUBROUTINE da_tp_to_qs_adj1( t, p, es, t_prime, p_prime, &
 
    t_prime = t_prime + es_gammabeta * es_prime_over_es / ( temp * temp )
 
-END SUBROUTINE da_tp_to_qs_adj1
+end subroutine da_tp_to_qs_adj1

@@ -1,10 +1,10 @@
-SUBROUTINE DA_Zero_vp_type( vp )
+subroutine da_zero_vp_type( vp )
 
    IMPLICIT NONE
 
    TYPE (vp_type), INTENT(INOUT) :: vp
 
-   IF (trace_use) CALL da_trace_entry("da_zero_vp_type")
+   IF (trace_use) call da_trace_entry("da_zero_vp_type")
  
 !  Standard fields:
    if(associated(vp % v1)) vp % v1(:,:,:) = 0.0
@@ -16,7 +16,7 @@ SUBROUTINE DA_Zero_vp_type( vp )
 !  Flow-dependent control variables:
    if( associated(vp % alpha) ) vp % alpha(:,:,:) = 0.0
 
-   IF (trace_use) CALL da_trace_exit("da_zero_vp_type")
+   IF (trace_use) call da_trace_exit("da_zero_vp_type")
 
-END SUBROUTINE DA_Zero_vp_type
+end subroutine da_zero_vp_type
 

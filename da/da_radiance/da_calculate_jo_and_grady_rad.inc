@@ -1,5 +1,5 @@
 
-SUBROUTINE da_calculate_jo_and_grady_rad( iv, re, jo, jo_grad_y ) 
+subroutine da_calculate_jo_and_grady_rad( iv, re, jo, jo_grad_y ) 
 !------------------------------------------------------------------------------
 !  PURPOSE: Calculate Gradient_y i and cost function Jo for radiance data.
 !
@@ -47,5 +47,5 @@ SUBROUTINE da_calculate_jo_and_grady_rad( iv, re, jo, jo_grad_y )
 
   RETURN
 
-END SUBROUTINE da_calculate_jo_and_grady_rad
+end subroutine da_calculate_jo_and_grady_rad
 

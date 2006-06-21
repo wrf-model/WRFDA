@@ -1,4 +1,4 @@
-SUBROUTINE da_transform_xtopsfc_adj(xb, xp, synop, j_synop_y, jo_grad_x ) 
+subroutine da_transform_xtopsfc_adj(xb, xp, synop, j_synop_y, jo_grad_x ) 
 
    IMPLICIT NONE
 
@@ -123,5 +123,5 @@ SUBROUTINE da_transform_xtopsfc_adj(xb, xp, synop, j_synop_y, jo_grad_x )
                           i, j, dx, dy, dxm, dym, psm_prime)
 #endif
 
-END SUBROUTINE da_transform_xtopsfc_adj
+end subroutine da_transform_xtopsfc_adj
 

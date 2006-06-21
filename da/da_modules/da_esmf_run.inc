@@ -1,4 +1,4 @@
-SUBROUTINE da_wrfvar_run( gcomp, importState, exportState, clock, rc )
+subroutine da_wrfvar_run( gcomp, importState, exportState, clock, rc )
 
    TYPE(ESMF_GridComp), INTENT(INOUT) :: gcomp
    TYPE(ESMF_State),    INTENT(INOUT) :: importState, exportState
@@ -19,13 +19,13 @@ SUBROUTINE da_wrfvar_run( gcomp, importState, exportState, clock, rc )
 
    !--do wrfvar
 
-   CALL wrf_debug ( 100 , 'wrfvar: calling wrfvar ' )
-   CALL da_wrfvar_interface ( head_grid, config_flags )
-   CALL wrf_debug ( 100 , 'wrfvar: back from wrfvar ' )
+   call wrf_debug ( 100 , 'wrfvar: calling wrfvar ' )
+   call da_wrfvar_interface ( head_grid, config_flags )
+   call wrf_debug ( 100 , 'wrfvar: back from wrfvar ' )
 
    ! return success status
    rc = ESMF_SUCCESS
 
-END SUBROUTINE da_wrfvar_run
+end subroutine da_wrfvar_run
 
 

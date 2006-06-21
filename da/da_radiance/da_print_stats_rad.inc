@@ -1,4 +1,4 @@
-SUBROUTINE DA_Print_Stats_rad( stats_unit, nchan, rad )
+subroutine DA_Print_Stats_rad( stats_unit, nchan, rad )
 !------------------------------------------------------------------------------
 !  PURPOSE: print out statistics of omb, oma for radiance data.
 !
@@ -37,5 +37,5 @@ SUBROUTINE DA_Print_Stats_rad( stats_unit, nchan, rad )
     end do
 
 
-END SUBROUTINE DA_Print_Stats_rad
+end subroutine DA_Print_Stats_rad
 

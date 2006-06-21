@@ -1,4 +1,4 @@
-SUBROUTINE  FM_DECODER (fm, platform, synop, ship,  metar, pilot, sound,   &
+subroutine  FM_DECODER (fm, platform, synop, ship,  metar, pilot, sound,   &
                                       satem, satob, airep, gpspw, gpsref,  &
                                       ssmi_retrieval, ssmi_tb, ssmt1, ssmt2, &
                                       qscat,profiler, buoy, other)
@@ -370,4 +370,4 @@ SUBROUTINE  FM_DECODER (fm, platform, synop, ship,  metar, pilot, sound,   &
 
        END SELECT
      
-END SUBROUTINE fm_decoder 
+end subroutine fm_decoder 

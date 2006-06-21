@@ -1,4 +1,4 @@
-SUBROUTINE da_filter(var, xp)
+subroutine da_filter(var, xp)
 
 !------------------------------------------------------------------------------
 !  HISTORY: 08/27/2004	Wei Huang
@@ -79,5 +79,5 @@ SUBROUTINE da_filter(var, xp)
    var(xp%its:xp%ite,xp%jts:xp%jte,xp%kts:xp%kte) = &
    xp%v1z(xp%its:xp%ite,xp%jts:xp%jte,xp%kts:xp%kte)
 
-END SUBROUTINE da_filter
+end subroutine da_filter
 

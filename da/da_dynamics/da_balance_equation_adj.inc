@@ -53,7 +53,7 @@ subroutine da_balance_equation_adj( xb, xbx, xp, phi_b, u, v, &
       coefy(is:ie,js:je) = coefx(is:ie,js:je)
    else
       WRITE (UNIT=errmsg(1),FMT='(A,I3)') ' Wrong FG_FORMAT = ',fg_format
-      CALL wrf_error(__FILE__,__LINE__,errmsg(1))
+      call wrf_error(__FILE__,__LINE__,errmsg(1))
    end if
 
    ! [1.1] Multiplicative coefficent for conversion RHS->Del**2 phi_b/M**2:
@@ -64,7 +64,7 @@ subroutine da_balance_equation_adj( xb, xbx, xp, phi_b, u, v, &
    ! [3.0] Solve Del**2 phi_b = RHS for phi_b:
    !---------------------------------------------------------------------------
 
-   CALL da_solve_poissoneqn_fst_adj(xbx, xp, phi_b, &
+   call da_solve_poissoneqn_fst_adj(xbx, xp, phi_b, &
                                  del2phi_b, &
                                  ids,ide, jds,jde, kds,kde,      &
                                  ims,ime, jms,jme, kms,kme,      &
@@ -98,7 +98,7 @@ subroutine da_balance_equation_adj( xb, xbx, xp, phi_b, u, v, &
 
       IF ( balance_type == balance_cyc .OR. &
            balance_type == balance_geocyc ) THEN
-         CALL da_balance_cycloterm_adj( xb % rho(:,:,k),xb % u(:,:,k),&
+         call da_balance_cycloterm_adj( xb % rho(:,:,k),xb % u(:,:,k),&
                                         xb % v(:,:,k), u(:,:,k), v(:,:,k),&
                                         xb % coefx(:,:), xb % coefy(:,:),&
                                         term_x(:,:), term_y(:,:), &
@@ -112,11 +112,11 @@ subroutine da_balance_equation_adj( xb, xbx, xp, phi_b, u, v, &
  
       IF ( balance_type == balance_geo .OR. &
            balance_type == balance_geocyc ) THEN
-         CALL da_balance_geoterm_adj( xb % cori, xb % rho(:,:,k), &
+         call da_balance_geoterm_adj( xb % cori, xb % rho(:,:,k), &
                                       term_x, term_y, &
                                       u(:,:,k), v(:,:,k), &
                                       ims,ime, jms,jme, its,ite, jts,jte )
       END IF
    END DO
 
-END SUBROUTINE da_balance_equation_adj
+end subroutine da_balance_equation_adj

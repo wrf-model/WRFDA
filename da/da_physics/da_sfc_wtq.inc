@@ -1,4 +1,4 @@
-SUBROUTINE da_sfc_wtq ( psfc, tg, ps, ts, qs, us, vs, ps2, ts2, qs2, &
+subroutine da_sfc_wtq ( psfc, tg, ps, ts, qs, us, vs, ps2, ts2, qs2, &
                      hs, roughness, xland, &
                      u10, v10, t2, q2, regime) 
 !-----------------------------------------------------------------------------!
@@ -362,4 +362,4 @@ SUBROUTINE da_sfc_wtq ( psfc, tg, ps, ts, qs, us, vs, ps2, ts2, qs2, &
       t2 = ( thg + ( ths - thg )*psit2/psit)*((psfc/100.)/1000.)**rcp
       q2 = qg + (qs - qg)*psiq2/psiq 
 
-END SUBROUTINE da_sfc_wtq
+end subroutine da_sfc_wtq

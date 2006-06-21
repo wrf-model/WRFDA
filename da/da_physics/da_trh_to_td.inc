@@ -1,4 +1,4 @@
-SUBROUTINE DA_TRH_To_TD (RH, T, TD, xp)
+subroutine DA_TRH_To_TD (RH, T, TD, xp)
 !!!---------------------------------------------------------------------CCC
 !!!
 !!!                       FUNCTION F_TD_FROM_RH
@@ -88,5 +88,5 @@ SUBROUTINE DA_TRH_To_TD (RH, T, TD, xp)
    end do
    end do
 
-END SUBROUTINE DA_TRH_To_TD
+end subroutine DA_TRH_To_TD
 

@@ -1,4 +1,4 @@
-SUBROUTINE da_autoc(DT,SCR2,PRC,kts,kte)
+subroutine da_autoc(DT,SCR2,PRC,kts,kte)
 
 !  Auto-conversion
 
@@ -19,5 +19,5 @@ SUBROUTINE da_autoc(DT,SCR2,PRC,kts,kte)
       endif
    ENDDO
 
-END SUBROUTINE da_autoc
+end subroutine da_autoc
 

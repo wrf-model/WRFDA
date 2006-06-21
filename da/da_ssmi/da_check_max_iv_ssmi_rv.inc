@@ -1,4 +1,4 @@
-SUBROUTINE da_check_max_iv_ssmi_rv(it, ssmi_retrieval, &
+subroutine da_check_max_iv_ssmi_rv(it, ssmi_retrieval, &
                      itpw, itpwf, ispeed, ispeedf)
 
    IMPLICIT NONE
@@ -35,14 +35,14 @@ SUBROUTINE da_check_max_iv_ssmi_rv(it, ssmi_retrieval, &
 
 !  TPW
 
-   CALL da_max_error_qc(it, ssmi_retrieval % info, ssmi_retrieval % tpw, &
+   call da_max_error_qc(it, ssmi_retrieval % info, ssmi_retrieval % tpw, &
                             max_error_pw, itpw, itpwf, iunit, 'TPW  ', &
                             failed, print)
 
 !  SPEED
 
-   CALL da_max_error_qc(it, ssmi_retrieval % info, ssmi_retrieval % speed, &
+   call da_max_error_qc(it, ssmi_retrieval % info, ssmi_retrieval % speed, &
                             max_error_uv, ispeed, ispeedf, iunit, 'SPEED', &
                             failed, print)
 
-END SUBROUTINE da_check_max_iv_ssmi_rv
+end subroutine da_check_max_iv_ssmi_rv

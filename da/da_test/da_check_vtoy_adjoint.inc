@@ -1,4 +1,4 @@
-SUBROUTINE da_check_vtoy_adjoint(cv_size,grid, config_flags, vp, vv, &
+subroutine da_check_vtoy_adjoint(cv_size,grid, config_flags, vp, vv, &
                                   xb, xbx, xp, be, ep, xa, iv, y,&
                                   ids,ide, jds,jde, kds,kde, &
                                   ims,ime, jms,jme, kms,kme, &
@@ -118,4 +118,4 @@ SUBROUTINE da_check_vtoy_adjoint(cv_size,grid, config_flags, vp, vv, &
 #endif
 
 
-END SUBROUTINE da_check_vtoy_adjoint
+end subroutine da_check_vtoy_adjoint

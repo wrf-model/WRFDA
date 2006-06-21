@@ -1,4 +1,4 @@
-SUBROUTINE da_wz_base(xb,WZ_b,                       &
+subroutine da_wz_base(xb,WZ_b,                       &
                       ids,ide, jds,jde, kds,kde,  &
                       ims,ime, jms,jme, kms,kme,  &
                       its,ite, jts,jte, kts,kte )
@@ -87,7 +87,7 @@ SUBROUTINE da_wz_base(xb,WZ_b,                       &
    end if
 
 
-   CALL da_uv_to_divergence(xb, xb%u,xb%v, DIV, &
+   call da_uv_to_divergence(xb, xb%u,xb%v, DIV, &
                             ids,ide, jds,jde, kds,kde,         &
                             ims,ime, jms,jme, kms,kme,         &
                             its,ite, jts,jte, kts,kte)
@@ -115,7 +115,7 @@ SUBROUTINE da_wz_base(xb,WZ_b,                       &
       ENDDO
    ENDDO
 
-   CALL da_uv_to_divergence(xb, URHO, VRHO, DIV, &
+   call da_uv_to_divergence(xb, URHO, VRHO, DIV, &
                             ids,ide, jds,jde, kds,kde,         &
                             ims,ime, jms,jme, kms,kme,         &
                             its,ite, jts,jte, kts,kte)
@@ -141,4 +141,4 @@ SUBROUTINE da_wz_base(xb,WZ_b,                       &
       ENDDO
    ENDDO
 
-END SUBROUTINE da_wz_base
+end subroutine da_wz_base

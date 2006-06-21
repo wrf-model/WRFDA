@@ -1,4 +1,4 @@
-SUBROUTINE da_tprh_to_q_adj( xb, xp, xa )
+subroutine da_tprh_to_q_adj( xb, xp, xa )
 
 !------------------------------------------------------------------------------
 !  PURPOSE: Adjoint of da_tprh_to_q_adj.
@@ -62,11 +62,11 @@ SUBROUTINE da_tprh_to_q_adj( xb, xp, xa )
 !  [2.0] Calculate saturation specific humidity ratio qs~/qs:
 !------------------------------------------------------------------------------
 
-   CALL da_tp_to_qs_adj( xb, xp, xa, qs_prime_over_qs )
+   call da_tp_to_qs_adj( xb, xp, xa, qs_prime_over_qs )
 
-END SUBROUTINE da_tprh_to_q_adj
+end subroutine da_tprh_to_q_adj
 
-!SUBROUTINE da_tprh_to_q_adj( t, p, es, q, rh, &
+!subroutine da_tprh_to_q_adj( t, p, es, q, rh, &
 !                             t_prime, p_prime, rh_prime, q_prime, n )
 
 !------------------------------------------------------------------------------
@@ -109,7 +109,7 @@ END SUBROUTINE da_tprh_to_q_adj
 !  [1.0] Calculate saturation specific humidity ratio qs~/qs:
 !------------------------------------------------------------------------------
 
-!   CALL da_tp_to_qs_adj( t, p, es, t_prime, p_prime, qs_prime_over_qs, n )
+!   call da_tp_to_qs_adj( t, p, es, t_prime, p_prime, qs_prime_over_qs, n )
 
-!END SUBROUTINE da_tprh_to_q_adj
+!end subroutine da_tprh_to_q_adj
 

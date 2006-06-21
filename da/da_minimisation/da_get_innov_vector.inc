@@ -1,4 +1,4 @@
-SUBROUTINE da_get_innov_vector( it, ob, iv, &
+subroutine da_get_innov_vector( it, ob, iv, &
                                 grid, config_flags, &
 #include "em_dummy_args.inc"
                  )
@@ -30,12 +30,12 @@ SUBROUTINE da_get_innov_vector( it, ob, iv, &
 
    integer            :: n
 
-   IF (trace_use) CALL da_trace_entry("da_get_innov_vector")
+   IF (trace_use) call da_trace_entry("da_get_innov_vector")
 
 
 !----------------------------------------------------------------------------   
 
-   CALL wrf_message("[5.1] Calculate innovation vector (iv)")
+   call wrf_message("[5.1] Calculate innovation vector (iv)")
 
    iv%ptop    = xb%ptop
 
@@ -96,7 +96,7 @@ SUBROUTINE da_get_innov_vector( it, ob, iv, &
 
 !-----GPSRF: 
  
-      CALL da_get_innov_vector_gpsref( it, xb, xp, ob, iv ) 
+      call da_get_innov_vector_gpsref( it, xb, xp, ob, iv ) 
 
 !-----SSMI:
 
@@ -147,19 +147,19 @@ SUBROUTINE da_get_innov_vector( it, ob, iv, &
 !--    random values:
 !--------------------------------------------------------------------------- 
    
-   if ( omb_set_rand ) CALL da_random_omb_all( iv, ob )
+   if ( omb_set_rand ) call da_random_omb_all( iv, ob )
    
 !---------------------------------------------------------------------------  
 !--[3] Optionally rescale observation errors:
 !--------------------------------------------------------------------------- 
    
-   if ( use_obs_errfac ) CALL da_use_obs_errfac( iv )
+   if ( use_obs_errfac ) call da_use_obs_errfac( iv )
 
 !---------------------------------------------------------------------------  
 !--[4] Optionally add Gaussian noise to O, O-B:
 !--------------------------------------------------------------------------- 
 
-   if ( omb_add_noise ) CALL da_add_noise_to_ob( iv, ob )
+   if ( omb_add_noise ) call da_add_noise_to_ob( iv, ob )
 
 !--------------------------------------------------------------------------- 
 
@@ -170,8 +170,8 @@ SUBROUTINE da_get_innov_vector( it, ob, iv, &
                               )
    endif
 
-   IF (trace_use) CALL da_trace_exit("da_get_innov_vector")
+   IF (trace_use) call da_trace_exit("da_get_innov_vector")
 
 
-END SUBROUTINE da_get_innov_vector
+end subroutine da_get_innov_vector
 

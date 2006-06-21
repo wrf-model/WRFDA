@@ -1,4 +1,4 @@
-SUBROUTINE da_wrfvar_init( gcomp, importState, exportState, clock, rc )
+subroutine da_wrfvar_init( gcomp, importState, exportState, clock, rc )
 
    TYPE(ESMF_GridComp), INTENT(INOUT) :: gcomp
    TYPE(ESMF_State),    INTENT(INOUT) :: importState, exportState
@@ -34,7 +34,7 @@ SUBROUTINE da_wrfvar_init( gcomp, importState, exportState, clock, rc )
 
    !  Get the NAMELIST data for input.
 
-   CALL init_modules(2)   ! Phase 2 resumes after MPI_INIT() (if it is called)
+   call init_modules(2)   ! Phase 2 resumes after MPI_INIT() (if it is called)
                           ! Phase 1 is called before ESMF starts up
 
    !<DESCRIPTION>
@@ -53,14 +53,14 @@ SUBROUTINE da_wrfvar_init( gcomp, importState, exportState, clock, rc )
 
 #ifdef DM_PARALLEL
    IF ( wrf_dm_on_monitor() ) THEN
-      CALL initial_config
+      call initial_config
    END IF
-   CALL get_config_as_buffer( configbuf, configbuflen, nbytes )
-   CALL wrf_dm_bcast_bytes( configbuf, nbytes )
-   CALL set_config_as_buffer( configbuf, configbuflen )
-   CALL wrf_dm_initialize
+   call get_config_as_buffer( configbuf, configbuflen, nbytes )
+   call wrf_dm_bcast_bytes( configbuf, nbytes )
+   call set_config_as_buffer( configbuf, configbuflen )
+   call wrf_dm_initialize
 #else
-   CALL initial_config
+   call initial_config
 #endif
 
    !<DESCRIPTION>
@@ -75,8 +75,8 @@ SUBROUTINE da_wrfvar_init( gcomp, importState, exportState, clock, rc )
    ! 
    !</DESCRIPTION>
 
-   CALL nl_get_debug_level ( 1, debug_level )
-   CALL set_wrf_debug_level ( debug_level )
+   call nl_get_debug_level ( 1, debug_level )
+   call set_wrf_debug_level ( debug_level )
 
    ! allocated and configure the mother domain
 
@@ -91,17 +91,17 @@ SUBROUTINE da_wrfvar_init( gcomp, importState, exportState, clock, rc )
    ! run option or we are on an acceptable machine.
    !</DESCRIPTION>
 
-   CALL nl_get_max_dom( 1, max_dom )
+   call nl_get_max_dom( 1, max_dom )
    IF ( max_dom > 1 ) THEN
 #if ( ! defined(DM_PARALLEL)  &&   ! defined(STUBMPI) )
-      CALL wrf_error(__FILE__,__LINE__, &
+      call wrf_error(__FILE__,__LINE__, &
          'nesting requires either an MPI build or use of the -DSTUBMPI option' ) 
 #endif
 #if ( defined ( MOVE_NESTS ) )
-      CALL wrf_message( '                      W A R N I N G                          ' )
-      CALL wrf_message( '  MOVING NEST CAPABILITY IS EXPERIMENTAL AND UNSUPPORTED     ' )
-      CALL wrf_message( '                 IN THIS VERSION OF WRF                      ' )
-      CALL wrf_message( '          U S E   A T   Y O U R   O W N   R I S K            ' )
+      call wrf_message( '                      W A R N I N G                          ' )
+      call wrf_message( '  MOVING NEST CAPABILITY IS EXPERIMENTAL AND UNSUPPORTED     ' )
+      call wrf_message( '                 IN THIS VERSION OF WRF                      ' )
+      call wrf_message( '          U S E   A T   Y O U R   O W N   R I S K            ' )
 #endif
    END IF
 
@@ -121,27 +121,27 @@ SUBROUTINE da_wrfvar_init( gcomp, importState, exportState, clock, rc )
    ! broadcast of the configuration information.
    ! 
 !</DESCRIPTION>
-   CALL       wrf_message ( program_name )
-   CALL       wrf_debug ( 100 , 'wrf: calling alloc_and_configure_domain ' )
-   CALL alloc_and_configure_domain ( domain_id  = 1 ,                  &
+   call       wrf_message ( program_name )
+   call       wrf_debug ( 100 , 'wrf: calling alloc_and_configure_domain ' )
+   call alloc_and_configure_domain ( domain_id  = 1 ,                  &
                                     grid       = head_grid ,          &
                                     parent     = null_domain ,        &
                                     kid        = -1                   )
 
-   CALL       wrf_debug ( 100 , 'wrf: calling model_to_grid_config_rec ' )
-   CALL model_to_grid_config_rec ( head_grid%id , model_config_rec , config_flags )
-   CALL       wrf_debug ( 100 , 'wrf: calling set_scalar_indices_from_config ' )
-   CALL set_scalar_indices_from_config ( head_grid%id , idum1, idum2 )
-   CALL       wrf_debug ( 100 , 'wrf: calling init_wrfio' )
-   CALL init_wrfio
+   call       wrf_debug ( 100 , 'wrf: calling model_to_grid_config_rec ' )
+   call model_to_grid_config_rec ( head_grid%id , model_config_rec , config_flags )
+   call       wrf_debug ( 100 , 'wrf: calling set_scalar_indices_from_config ' )
+   call set_scalar_indices_from_config ( head_grid%id , idum1, idum2 )
+   call       wrf_debug ( 100 , 'wrf: calling init_wrfio' )
+   call init_wrfio
 
 #ifdef DM_PARALLEL
-   CALL get_config_as_buffer( configbuf, configbuflen, nbytes )
-   CALL wrf_dm_bcast_bytes( configbuf, nbytes )
-   CALL set_config_as_buffer( configbuf, configbuflen )
+   call get_config_as_buffer( configbuf, configbuflen, nbytes )
+   call wrf_dm_bcast_bytes( configbuf, nbytes )
+   call set_config_as_buffer( configbuf, configbuflen )
 #endif
 
-   CALL setup_timekeeping (head_grid)
+   call setup_timekeeping (head_grid)
 
    !<DESCRIPTION>
    ! The head grid is initialized with read-in data through the call to <a
@@ -166,7 +166,7 @@ SUBROUTINE da_wrfvar_init( gcomp, importState, exportState, clock, rc )
 
    IF ((config_flags%real_data_init_type == 1) .OR. &
        (config_flags%real_data_init_type == 3)) THEN
-      CALL da_med_initialdata_input( head_grid , config_flags )
+      call da_med_initialdata_input( head_grid , config_flags )
    END IF
 
    !<DESCRIPTION>
@@ -196,4 +196,4 @@ SUBROUTINE da_wrfvar_init( gcomp, importState, exportState, clock, rc )
    ! return success status
    rc = ESMF_SUCCESS
 
-END SUBROUTINE da_wrfvar_init
+end subroutine da_wrfvar_init

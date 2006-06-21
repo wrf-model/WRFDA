@@ -1,4 +1,4 @@
-SUBROUTINE da_ao_stats_geoamv( stats_unit, oi, re )
+subroutine da_ao_stats_geoamv( stats_unit, oi, re )
 
    !-------------------------------------------------------------------------
    ! Purpose: Calculates (Obs - Analysis) statistics for Geo.  AMV's
@@ -32,11 +32,11 @@ SUBROUTINE da_ao_stats_geoamv( stats_unit, oi, re )
       DO n=1, oi%num_geoamv
          if( oi%geoamv(n)%loc%proc_domain ) then
             DO k=1, oi%geoamv(n)%info%levels
-               CALL da_stats_calculate( n, 0, oi%geoamv(n)%u(k)%qc, & 
+               call da_stats_calculate( n, 0, oi%geoamv(n)%u(k)%qc, & 
                                    re%geoamv(n)%u(k), nu, & 
                                    geoamv%minimum%u, geoamv%maximum%u, &
                                    geoamv%average%u, geoamv%rms_err%u )
-               CALL da_stats_calculate( n, 0, oi%geoamv(n)%v(k)%qc, & 
+               call da_stats_calculate( n, 0, oi%geoamv(n)%v(k)%qc, & 
                                    re%geoamv(n)%v(k), nv, & 
                                    geoamv%minimum%v, geoamv%maximum%v, &
                                    geoamv%average%v, geoamv%rms_err%v )
@@ -64,8 +64,8 @@ SUBROUTINE da_ao_stats_geoamv( stats_unit, oi, re )
    IF ( wrf_dm_on_monitor() ) THEN
       IF ( nu /= 0 .or. nv /= 0 ) THEN
          write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for Geoamv'
-         CALL da_print_stats_geoamv( stats_unit, nu, nv, geoamv )
+         call da_print_stats_geoamv( stats_unit, nu, nv, geoamv )
       END IF
    END IF
 
-END SUBROUTINE da_ao_stats_geoamv  
+end subroutine da_ao_stats_geoamv  

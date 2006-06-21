@@ -1,4 +1,4 @@
-      SUBROUTINE da_openfile (KUNIT, CDFILE, CDACCESS, CDSTATUS, CDFORM)
+      subroutine da_openfile (KUNIT, CDFILE, CDACCESS, CDSTATUS, CDFORM)
 !--------------------------------------------------------------------------!
 !
 !                       ROUTINE OPENFILE
@@ -64,8 +64,8 @@
 ! --------------------
  
  2000 CONTINUE
-      CALL wrf_error(__FILE__,__LINE__, &
+      call wrf_error(__FILE__,__LINE__, &
         "Cannot open file"//TRIM(CDFILE))
 
-      END SUBROUTINE da_openfile
+      end subroutine da_openfile
 

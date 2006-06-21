@@ -1,4 +1,4 @@
-SUBROUTINE da_transform_xtovp( xb, xbx, xa, xp, vp, be, &
+subroutine da_transform_xtovp( xb, xbx, xa, xp, vp, be, &
                                ids,ide, jds,jde, kds,kde,  &
                                ims,ime, jms,jme, kms,kme,  &
                                its,ite, jts,jte, kts,kte )

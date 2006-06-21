@@ -1,4 +1,4 @@
-SUBROUTINE da_get_innov_vector_ssmt1( it, xb, xp, ob, iv )
+subroutine da_get_innov_vector_ssmt1( it, xb, xp, ob, iv )
 
    IMPLICIT NONE
 
@@ -108,7 +108,7 @@ SUBROUTINE da_get_innov_vector_ssmt1( it, xb, xp, ob, iv )
 !        [5.0] Perform optional maximum error check:
 !------------------------------------------------------------------------
 
-      IF(check_max_iv) CALL da_check_max_iv_ssmt1(it,iv%ssmt1(n),itt,ittf)
+      IF(check_max_iv) call da_check_max_iv_ssmt1(it,iv%ssmt1(n),itt,ittf)
             
        endif
 
@@ -120,5 +120,5 @@ SUBROUTINE da_get_innov_vector_ssmt1( it, xb, xp, ob, iv )
 
    ENDIF
 
-END SUBROUTINE da_get_innov_vector_ssmt1
+end subroutine da_get_innov_vector_ssmt1
 

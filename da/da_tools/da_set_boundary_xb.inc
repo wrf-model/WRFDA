@@ -1,4 +1,4 @@
-SUBROUTINE da_set_boundary_xb(xb)
+subroutine da_set_boundary_xb(xb)
 
    !------------------------------------------------------------------------
    !  Purpose:  
@@ -75,5 +75,5 @@ SUBROUTINE da_set_boundary_xb(xb)
       enddo
    enddo
 
-END SUBROUTINE da_set_boundary_xb
+end subroutine da_set_boundary_xb
 

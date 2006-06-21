@@ -1,4 +1,4 @@
-SUBROUTINE da_tpq_to_rh_lin1( t, p, es, rh, &
+subroutine da_tpq_to_rh_lin1( t, p, es, rh, &
                               t_prime, p_prime, q_prime, rh_prime )
 
 !------------------------------------------------------------------------------
@@ -34,13 +34,13 @@ SUBROUTINE da_tpq_to_rh_lin1( t, p, es, rh, &
 !  [1.0] Calculate saturation specific humidity ratio qs~/qs:
 !------------------------------------------------------------------------------
 
-   CALL da_tp_to_qs_lin1( t, p, es, t_prime, p_prime, qs_prime_over_qs )
+   call da_tp_to_qs_lin1( t, p, es, t_prime, p_prime, qs_prime_over_qs )
    
 !-----------------------------------------------------------------------------
 !  [2.0] Culcalete background saturation specific humidity qs:
 !-----------------------------------------------------------------------------
 
-   CALL da_tp_to_qs( t, p, es1, qs) 
+   call da_tp_to_qs( t, p, es1, qs) 
    
 !------------------------------------------------------------------------------
 !  [3.0] Calculate relative humidity increment:
@@ -48,6 +48,6 @@ SUBROUTINE da_tpq_to_rh_lin1( t, p, es, rh, &
 
    rh_prime = 100. * (q_prime / qs) - rh * qs_prime_over_qs
 
-END SUBROUTINE da_tpq_to_rh_lin1
+end subroutine da_tpq_to_rh_lin1
 
 

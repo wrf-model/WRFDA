@@ -43,7 +43,7 @@ subroutine da_v_to_vv_spectral_adj( max_wavenumber, sizec, lenr, lenwrk, lensav,
 #include <mpif.h>
 #endif
 
-   IF (trace_use) CALL da_trace_entry("da_v_to_vv_spectral_adj")
+   IF (trace_use) call da_trace_entry("da_v_to_vv_spectral_adj")
 
    !----------------------------------------------------------------------
    ! [1] Perform Adjoint of inverse Fourier decomposition in E-W direction:
@@ -107,7 +107,7 @@ subroutine da_v_to_vv_spectral_adj( max_wavenumber, sizec, lenr, lenwrk, lensav,
       rcv(2*n     ) = aimag( ccv(n) )
    end do 
 
-   IF (trace_use) CALL da_trace_exit("da_v_to_vv_spectral_adj")
+   IF (trace_use) call da_trace_exit("da_v_to_vv_spectral_adj")
 
 end subroutine da_v_to_vv_spectral_adj
 

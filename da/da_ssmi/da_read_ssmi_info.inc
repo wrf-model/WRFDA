@@ -1,4 +1,4 @@
-SUBROUTINE da_read_ssmi_info (iunit, ob, xb, xbx)
+subroutine da_read_ssmi_info (iunit, ob, xb, xbx)
 
 !-----------------------------------------------------------------------------!
 ! Read the header of a MM5 3D-VAR 3.0 GTS observation file
@@ -163,17 +163,17 @@ head_line_2:  DO
   ! Model domains definition
     
       CASE ('NESTIX') ;
-           CALL da_read_ssmi_integer_array(nestix, maxnes, 8, 9)
+           call da_read_ssmi_integer_array(nestix, maxnes, 8, 9)
       CASE ('NESTJX') ; 
-           CALL da_read_ssmi_integer_array(nestjx, maxnes, 8, 9)
+           call da_read_ssmi_integer_array(nestjx, maxnes, 8, 9)
       CASE ('NUMC  ') ; 
-           CALL da_read_ssmi_integer_array(numnc , maxnes, 8, 9)
+           call da_read_ssmi_integer_array(numnc , maxnes, 8, 9)
       CASE ('DIS   ') ; 
-           CALL da_read_ssmi_real_array   (dis   , maxnes, 8, 9)
+           call da_read_ssmi_real_array   (dis   , maxnes, 8, 9)
       CASE ('NESTI ') ; 
-           CALL da_read_ssmi_integer_array(nesti , maxnes, 8, 9)
+           call da_read_ssmi_integer_array(nesti , maxnes, 8, 9)
       CASE ('NESTJ ') ; 
-           CALL da_read_ssmi_integer_array(nestj , maxnes, 8, 9)
+           call da_read_ssmi_integer_array(nestj , maxnes, 8, 9)
      END SELECT
 
      READ (UNIT = iunit, FMT = '(A)', IOSTAT = iost) char_ned
@@ -188,4 +188,4 @@ CONTAINS
 #include "da_read_ssmi_integer_array.inc"
 #include "da_read_ssmi_real_array.inc"
 
-END SUBROUTINE da_read_ssmi_info
+end subroutine da_read_ssmi_info

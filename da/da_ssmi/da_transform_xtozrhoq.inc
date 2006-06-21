@@ -1,4 +1,4 @@
-SUBROUTINE DA_Transform_XToZRhoQ( xb, i, j, zh, zf, zrhom)
+subroutine da_transform_xtozrhoq( xb, i, j, zh, zf, zrhom)
 
    implicit none
    
@@ -10,12 +10,16 @@ SUBROUTINE DA_Transform_XToZRhoQ( xb, i, j, zh, zf, zrhom)
    real,           intent(in),  &
            dimension(mkz+1)       :: zf
    integer                         :: k
+
+   IF (trace_use) call da_trace_entry("da_transform_xtozrhoq")
    
    zrhom = 0.
 
    DO k = 1,mkz
       zrhom = (zf(k)-zf(k+1))*zh(k)*(xb%q(i,j,k)*xb%rho(i,j,k))+zrhom
    END DO
+
+   IF (trace_use) call da_trace_exit("da_transform_xtozrhoq")
  
-END SUBROUTINE DA_Transform_XToZRhoQ
+end subroutine da_transform_xtozrhoq
 

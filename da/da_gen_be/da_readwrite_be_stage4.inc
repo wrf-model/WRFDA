@@ -41,13 +41,13 @@ if (uh_method .eq. 'power') then
       open (iunit, file = filename, form='unformatted')
       read(iunit)cvar
       if ( trim(cvar) /=  trim(variable) ) then
-        CALL wrf_error(__FILE__,__LINE__, &
+        call wrf_error(__FILE__,__LINE__, &
           "Variable name inconsistency")
       END IF
 
       read(iunit)max_wavenumber, kdum
       if ( kdum /= k ) then
-        CALL wrf_error(__FILE__,__LINE__, &
+        call wrf_error(__FILE__,__LINE__, &
          "Inconsistent vertical label")
       end if
 

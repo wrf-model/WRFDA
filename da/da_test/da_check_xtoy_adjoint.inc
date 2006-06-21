@@ -42,7 +42,7 @@ subroutine da_check_xtoy_adjoint( xb, xa, iv, xp, y, &
        kds ==0) THEN
    END IF
 
-   IF (trace_use) CALL da_trace_entry("da_check_xtoy_adjoint")
+   IF (trace_use) call da_trace_entry("da_check_xtoy_adjoint")
 
    write(UNIT=stdout, fmt='(/a)') ' da_check_xtoy_adjoint: Adjoint Test Results:'
 
@@ -265,6 +265,6 @@ subroutine da_check_xtoy_adjoint( xb, xa, iv, xp, y, &
       write(UNIT=stdout, fmt='(A,1pe22.14)') ' Whole Domain < x, x_adj > = ', adj_ttl_rhs
    ENDIF
    
-   IF (trace_use) CALL da_trace_exit("da_check_xtoy_adjoint")
+   IF (trace_use) call da_trace_exit("da_check_xtoy_adjoint")
 
 end subroutine da_check_xtoy_adjoint

@@ -1,4 +1,4 @@
-SUBROUTINE DA_Transform_XToSpeed_Adj(ADJ_speed,U,V,ADJ_u,ADJ_v)
+subroutine DA_Transform_XToSpeed_Adj(ADJ_speed,U,V,ADJ_u,ADJ_v)
 
 !------------------------------------------------------------------------------!
 ! Convert (U-V in m/s) components into wind speed (Speed in m/s)
@@ -19,5 +19,5 @@ SUBROUTINE DA_Transform_XToSpeed_Adj(ADJ_speed,U,V,ADJ_u,ADJ_v)
     ADJ_u = U*ADJ_speed/speed + ADJ_u
     ADJ_v = V*ADJ_speed/speed + ADJ_v
 
-END SUBROUTINE DA_Transform_XToSpeed_Adj
+end subroutine DA_Transform_XToSpeed_Adj
 

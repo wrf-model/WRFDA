@@ -1,4 +1,4 @@
-SUBROUTINE da_uv_to_vorticity(xb , u, v, vor, &
+subroutine da_uv_to_vorticity(xb , u, v, vor, &
                                ids,ide, jds,jde, kds,kde,  &
                                ims,ime, jms,jme, kms,kme,  &
                                its,ite, jts,jte, kts,kte )
@@ -135,5 +135,5 @@ SUBROUTINE da_uv_to_vorticity(xb , u, v, vor, &
                               its,ite, jts,jte, kts,kte )
    endif
 
-END SUBROUTINE da_uv_to_vorticity
+end subroutine da_uv_to_vorticity
 

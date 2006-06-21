@@ -1,4 +1,4 @@
-SUBROUTINE da_ll_to_xy (info, loc, xp, &
+subroutine da_ll_to_xy (info, loc, xp, &
                         outside, inside_halo, outside_all)
 
 !  This routine convert the (lat, lon) into (x,y) coordinates
@@ -23,13 +23,13 @@ SUBROUTINE da_ll_to_xy (info, loc, xp, &
 !  get the (x, y) coordinates
 
    if(fg_format == 1) then
-      CALL da_latlon_to_ij(map_info, info%lat, info%lon, loc%x, loc%y)
+      call da_latlon_to_ij(map_info, info%lat, info%lon, loc%x, loc%y)
 !  else if(fg_format == 2) then
-!     CALL llxy (info%lat, info%lon, loc%x, loc%y)
+!     call llxy (info%lat, info%lon, loc%x, loc%y)
    else if(fg_format == 3) then
-      CALL da_global_ll_to_xy (info%lat, info%lon, loc%x, loc%y)
+      call da_global_ll_to_xy (info%lat, info%lon, loc%x, loc%y)
    else
-      CALL da_llxy (info%lat, info%lon, loc%x, loc%y)
+      call da_llxy (info%lat, info%lon, loc%x, loc%y)
    endif
 
    call da_togrid (loc%x, xp%its-2, xp%ite+2, loc%i, loc%dx, loc%dxm)
@@ -95,5 +95,5 @@ SUBROUTINE da_ll_to_xy (info, loc, xp, &
       endif
    endif
 
-END SUBROUTINE da_ll_to_xy
+end subroutine da_ll_to_xy
 

@@ -1,4 +1,4 @@
-SUBROUTINE DA_Transform_XToZRhoQ_Lin( xb, xa, i, j, zh, zf, TGL_zrhom)
+subroutine da_transform_xtozrhoq_lin( xb, xa, i, j, zh, zf, tgl_zrhom)
 
    implicit none
    
@@ -12,6 +12,8 @@ SUBROUTINE DA_Transform_XToZRhoQ_Lin( xb, xa, i, j, zh, zf, TGL_zrhom)
                    dimension(mkz+1):: zf
    integer                         :: k
 
+   if (trace_use) call da_trace_entry("da_transform_xtozrhoq_lin")
+
    TGL_zrhom = 0.
 
    DO k = 1,mkz
@@ -19,6 +21,8 @@ SUBROUTINE DA_Transform_XToZRhoQ_Lin( xb, xa, i, j, zh, zf, TGL_zrhom)
                                          xa%q(i,j,k)*xb%rho(i,j,k)   &
                                         ) + TGL_zrhom
    END DO
+
+   if (trace_use) call da_trace_exit("da_transform_xtozrhoq_lin")
  
-END SUBROUTINE DA_Transform_XToZRhoQ_Lin
+end subroutine da_transform_xtozrhoq_lin
 

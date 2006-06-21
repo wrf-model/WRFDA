@@ -1,4 +1,4 @@
-SUBROUTINE da_moist_phys_adj( xb, xa, xp,    &
+subroutine da_moist_phys_adj( xb, xa, xp,    &
                 ids,ide, jds,jde, kds,kde,  &
                 ims,ime, jms,jme, kms,kme,  &
                 its,ite, jts,jte, kts,kte )
@@ -112,7 +112,7 @@ SUBROUTINE da_moist_phys_adj( xb, xa, xp,    &
          DT(k) = xb%delt(i,j,k)
        ENDDO
      else
-      CALL da_wdt(xb%h(I,J,:),xb%w(I,J,:),xb%terr(I,J),DT,kts,kte)
+      call da_wdt(xb%h(I,J,:),xb%w(I,J,:),xb%terr(I,J),DT,kts,kte)
      endif
 
       DO K=kts,kte
@@ -172,17 +172,17 @@ SUBROUTINE da_moist_phys_adj( xb, xa, xp,    &
          DUM111(K)=PRC1(K)**.3333/PRE1(K)**.5
       ENDDO
 
-      CALL da_autoc(DT,SCR2,PRC,kts,kte)
+      call da_autoc(DT,SCR2,PRC,kts,kte)
       DO k=kts,kte
          PRC2(K)=PRC(K)
       ENDDO
 
-      CALL da_accre(DT,SCR2,SCR3,SCR7,PRAC,BVT3,PRA,kts,kte)
+      call da_accre(DT,SCR2,SCR3,SCR7,PRAC,BVT3,PRA,kts,kte)
       DO k=kts,kte
          PRA2(K)=PRA(K)
       ENDDO
 
-      CALL da_evapo(DT,SCR3,SCR5,SCR7,DUM111,DUM41,xb%q(I,J,:),  &
+      call da_evapo(DT,SCR3,SCR5,SCR7,DUM111,DUM41,xb%q(I,J,:),  &
                  PREC1,PREC2,PRE,kts,kte)
 
       DO K=kts, kte
@@ -222,7 +222,7 @@ SUBROUTINE da_moist_phys_adj( xb, xa, xp,    &
          SCR71(K)=xb%t(I,J,K)+TTT(K)*DT(k)
       ENDDO
 
-      CALL da_condens_adj(DT,SCR31,SCR42,SCR71,DUM31,PRD,       &
+      call da_condens_adj(DT,SCR31,SCR42,SCR71,DUM31,PRD,       &
                           QVT,QCT,QRT,TTT,                      &
                           xb%p(I,J,:),xb%t(I,J,:),xb%q(I,J,:),  &
                           xb%qcw(I,J,:),xb%qrn(I,J,:),          &
@@ -281,14 +281,14 @@ SUBROUTINE da_moist_phys_adj( xb, xa, xp,    &
 
       ENDDO
        
-      CALL da_evapo_adj(DT,SCR3,SCR5,SCR7,DUM111,DUM41,xb%q(I,J,:),  &
+      call da_evapo_adj(DT,SCR3,SCR5,SCR7,DUM111,DUM41,xb%q(I,J,:),  &
                  PREC1,PREC2,PRE,  &
                  SCR39,SCR59,SCR79,DUM1119,DUM419,xa%q(I,J,:),PRE9,kts,kte)
 
-      CALL da_accre_adj(DT,SCR2,SCR3,SCR7,PRAC,BVT3,PRA,  &
+      call da_accre_adj(DT,SCR2,SCR3,SCR7,PRAC,BVT3,PRA,  &
                   SCR29,SCR79,PRA9,kts,kte)
 
-      CALL da_autoc_adj(DT,SCR2,PRC,SCR29,PRC9,kts,kte)
+      call da_autoc_adj(DT,SCR2,PRC,SCR29,PRC9,kts,kte)
 
 !  Preparation
 
@@ -392,4 +392,4 @@ SUBROUTINE da_moist_phys_adj( xb, xa, xp,    &
    ENDDO
    ENDDO
 
-END SUBROUTINE da_moist_phys_adj
+end subroutine da_moist_phys_adj

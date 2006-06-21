@@ -1,4 +1,4 @@
-SUBROUTINE da_cal_jo_and_grady_pseudo( iv, re, jo, jo_grad_y )
+subroutine da_cal_jo_and_grady_pseudo( iv, re, jo, jo_grad_y )
 
    IMPLICIT NONE
 
@@ -54,7 +54,7 @@ SUBROUTINE da_cal_jo_and_grady_pseudo( iv, re, jo, jo_grad_y )
       
    END IF
   
-END SUBROUTINE da_cal_jo_and_grady_pseudo
+end subroutine da_cal_jo_and_grady_pseudo
 
 
 

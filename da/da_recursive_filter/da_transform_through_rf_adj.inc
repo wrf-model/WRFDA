@@ -1,4 +1,4 @@
-SUBROUTINE da_transform_through_rf_adj( mz, grid_box_area, rf_alpha, val,&
+subroutine da_transform_through_rf_adj( mz, grid_box_area, rf_alpha, val,&
                                         xp, field, &
                                         ids,ide, jds,jde, kds,kde,  &
                                         ims,ime, jms,jme, kms,kme,  &
@@ -133,5 +133,5 @@ SUBROUTINE da_transform_through_rf_adj( mz, grid_box_area, rf_alpha, val,&
                                   p_x(its:ite,jts:jte)
    end do
 
-END SUBROUTINE da_transform_through_rf_adj
+end subroutine da_transform_through_rf_adj
 

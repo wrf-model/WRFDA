@@ -52,7 +52,7 @@ subroutine da_minimise_cg( grid, config_flags,            &
 
       integer                           :: ndynopt
 
-      IF (trace_use) CALL da_trace_entry("da_minimise_cg")
+      IF (trace_use) call da_trace_entry("da_minimise_cg")
 
       write (6,'(a/)') ' ----------------------------------------------------------'
       WRITE(UNIT=stdout,FMT='(A)') ' [5.2] Minimize cost function Using CG Method'
@@ -216,7 +216,7 @@ subroutine da_minimise_cg( grid, config_flags,            &
 
       call da_deallocate_y( jo_grad_y)   
 
-      IF (trace_use) CALL da_trace_exit("da_minimise_cg")
+      IF (trace_use) call da_trace_exit("da_minimise_cg")
 
       end subroutine da_minimise_cg
 

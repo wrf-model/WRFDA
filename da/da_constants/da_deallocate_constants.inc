@@ -1,4 +1,4 @@
-SUBROUTINE DA_Deallocate_Constants
+subroutine DA_Deallocate_Constants
 
 !------------------------------------------------------------------------------
 !  PURPOSE: Deallocate constant arrays defined in DA_Constants.
@@ -16,4 +16,4 @@ SUBROUTINE DA_Deallocate_Constants
 
 !   DEALLOCATE( rf_turnconds )
 
-END SUBROUTINE DA_Deallocate_Constants
+end subroutine DA_Deallocate_Constants

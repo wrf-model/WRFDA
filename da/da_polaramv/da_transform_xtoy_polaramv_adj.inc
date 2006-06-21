@@ -1,4 +1,4 @@
-SUBROUTINE da_transform_xtoy_polaramv_adj ( iv, xp, jo_grad_y, jo_grad_x )
+subroutine da_transform_xtoy_polaramv_adj ( iv, xp, jo_grad_y, jo_grad_x )
 
 !-------------------------------------------------------------------------
 !  HISTORY:
@@ -55,4 +55,4 @@ SUBROUTINE da_transform_xtoy_polaramv_adj ( iv, xp, jo_grad_y, jo_grad_x )
 
    END IF
 
-END SUBROUTINE da_transform_xtoy_polaramv_adj
+end subroutine da_transform_xtoy_polaramv_adj

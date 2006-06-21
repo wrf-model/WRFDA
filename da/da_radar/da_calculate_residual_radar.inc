@@ -1,4 +1,4 @@
-SUBROUTINE da_calculate_residual_radar( oi, y, re,                        &
+subroutine da_calculate_residual_radar( oi, y, re,                        &
                                         np_missing, np_bad_data,          &
                                         np_obs_used, np_available )
 
@@ -55,4 +55,4 @@ SUBROUTINE da_calculate_residual_radar( oi, y, re,                        &
                                 + n_obs_bad % rf % num % use
    ENDIF
 
-END SUBROUTINE da_calculate_residual_radar
+end subroutine da_calculate_residual_radar

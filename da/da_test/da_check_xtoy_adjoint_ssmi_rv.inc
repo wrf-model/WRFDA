@@ -1,4 +1,4 @@
-SUBROUTINE DA_Check_XToY_Adjoint_SSMI_Rv( oi, y, adjtest_lhs, pertile_lhs )
+subroutine DA_Check_XToY_Adjoint_SSMI_Rv( oi, y, adjtest_lhs, pertile_lhs )
 
    IMPLICIT NONE
 
@@ -33,5 +33,5 @@ SUBROUTINE DA_Check_XToY_Adjoint_SSMI_Rv( oi, y, adjtest_lhs, pertile_lhs )
 
    ENDIF
 
-END SUBROUTINE DA_Check_XToY_Adjoint_SSMI_Rv
+end subroutine DA_Check_XToY_Adjoint_SSMI_Rv
 

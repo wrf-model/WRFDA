@@ -1,4 +1,4 @@
-SUBROUTINE DA_Transform_XToSeaSfcWind_Lin( xa, xb )
+subroutine DA_Transform_XToSeaSfcWind_Lin( xa, xb )
 
 !------------------------------------------------------------------------------!
 !  Convert (U-V in m/s) components into wind speed (Speed in m/s)
@@ -26,5 +26,5 @@ SUBROUTINE DA_Transform_XToSeaSfcWind_Lin( xa, xb )
    enddo
    enddo
 
-END SUBROUTINE DA_Transform_XToSeaSfcWind_Lin
+end subroutine DA_Transform_XToSeaSfcWind_Lin
 

@@ -1,4 +1,4 @@
-SUBROUTINE da_check_max_iv_ssmt2(it, ssmt2, irh,irhf )
+subroutine da_check_max_iv_ssmt2(it, ssmt2, irh,irhf )
 
    IMPLICIT NONE
 
@@ -35,10 +35,10 @@ SUBROUTINE da_check_max_iv_ssmt2(it, ssmt2, irh,irhf )
    do k = 1, ssmt2 % info % levels
 
 !     Temperature
-      CALL da_max_error_qc (it, ssmt2 % info, ssmt2 % rh(k),&
+      call da_max_error_qc (it, ssmt2 % info, ssmt2 % rh(k),&
                              max_error_t, irh, irhf, iunit, 'RH  ', &
                              failed, print)
    END DO
 
-END SUBROUTINE da_check_max_iv_ssmt2
+end subroutine da_check_max_iv_ssmt2
 

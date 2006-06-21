@@ -23,7 +23,7 @@ subroutine da_transform_vtovv_global_adj ( cv_size, xb, xbx, be, cv, vv, &
    integer                              :: cv_s ! Counter.
    integer                              :: cv_e ! Counter.
 
-  IF (trace_use) CALL da_trace_entry("da_transform_vtovv_global_adj")
+  IF (trace_use) call da_trace_entry("da_transform_vtovv_global_adj")
 
 
 !-------------------------------------------------------------------------
@@ -114,7 +114,7 @@ subroutine da_transform_vtovv_global_adj ( cv_size, xb, xbx, be, cv, vv, &
       cv_s = cv_e + 1
    end do
 
-  IF (trace_use) CALL da_trace_exit("da_transform_vtovv_global_adj")
+  IF (trace_use) call da_trace_exit("da_transform_vtovv_global_adj")
 
 
 end subroutine da_transform_vtovv_global_adj

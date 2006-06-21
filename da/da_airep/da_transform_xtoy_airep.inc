@@ -57,5 +57,5 @@ Subroutine da_transform_xtoy_airep ( xa, iv, xp, y )
     end do
   ENDIF
 
-END SUBROUTINE da_transform_xtoy_airep
+end subroutine da_transform_xtoy_airep
 

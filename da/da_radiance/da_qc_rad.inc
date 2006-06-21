@@ -1,5 +1,5 @@
 !
-SUBROUTINE da_qc_rad ( inst, nchan, tb_ob, iv )
+subroutine da_qc_rad ( inst, nchan, tb_ob, iv )
 !------------------------------------------------------------------------------
 !  PURPOSE: perform quality control for radiance data.
 !
@@ -68,9 +68,9 @@ SUBROUTINE da_qc_rad ( inst, nchan, tb_ob, iv )
    else
      WRITE(UNIT=errmsg(1),FMT='(A,A)') &
        "Unrecognized Instrument",TRIM(inst_name(rtminit_sensor(inst)))
-     CALL wrf_error_fatal(errmsg(1))
+     call wrf_error_fatal(errmsg(1))
    end if
 
    return
 
-END SUBROUTINE da_qc_rad
+end subroutine da_qc_rad

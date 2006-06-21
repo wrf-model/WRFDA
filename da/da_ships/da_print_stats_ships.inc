@@ -1,4 +1,4 @@
-SUBROUTINE da_print_stats_ships( stats_unit, nu, nv, nt, np, nq, ships )
+subroutine da_print_stats_ships( stats_unit, nu, nv, nt, np, nq, ships )
 
    IMPLICIT NONE
 
@@ -38,5 +38,5 @@ SUBROUTINE da_print_stats_ships( stats_unit, nu, nv, nt, np, nq, ships )
                          sqrt(ships%rms_err%p/real(np)), &
                          sqrt(ships%rms_err%q/real(nq))
 
-END SUBROUTINE da_print_stats_ships
+end subroutine da_print_stats_ships
 

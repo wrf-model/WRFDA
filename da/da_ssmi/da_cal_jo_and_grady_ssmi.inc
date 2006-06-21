@@ -1,4 +1,4 @@
-SUBROUTINE da_cal_jo_and_grady_ssmi( oi, re, jo, jo_ssmi, jo_grad_y )
+subroutine da_cal_jo_and_grady_ssmi( oi, re, jo, jo_ssmi, jo_grad_y )
 
    IMPLICIT NONE
 
@@ -21,16 +21,16 @@ SUBROUTINE da_cal_jo_and_grady_ssmi( oi, re, jo, jo_ssmi, jo_grad_y )
 
    IF ( oi%num_ssmi_tb .gt. 0 ) THEN
 
-      CALL da_cal_jo_and_grady_ssmi_tb( oi, re, jo, jo_grad_y )
+      call da_cal_jo_and_grady_ssmi_tb( oi, re, jo, jo_grad_y )
       jo_ssmi = jo % ssmi_tb19v + jo % ssmi_tb19h + jo % ssmi_tb22v + &
                 jo % ssmi_tb37v + jo % ssmi_tb37h + jo % ssmi_tb85v + &
                 jo % ssmi_tb85h 
                 
    ELSE IF ( oi%num_ssmi_retrieval .gt. 0) THEN
 
-      CALL da_cal_jo_and_grady_ssmi_rv( oi, re, jo, jo_grad_y )
+      call da_cal_jo_and_grady_ssmi_rv( oi, re, jo, jo_grad_y )
       jo_ssmi = jo % ssmir_speed + jo % ssmir_tpw
 
    ENDIF
 
-END SUBROUTINE da_cal_jo_and_grady_ssmi
+end subroutine da_cal_jo_and_grady_ssmi

@@ -1,4 +1,4 @@
-SUBROUTINE da_deallocate_y( y )
+subroutine da_deallocate_y( y )
 
    !---------------------------------------------------------------------------
    ! PURPOSE: Deallocate arrays used in y and residual obs structures.
@@ -12,7 +12,7 @@ SUBROUTINE da_deallocate_y( y )
    INTEGER                               :: n,i,j  ! Loop counter.
 
 
-   IF (trace_use) CALL da_trace_entry("da_deallocate_y")
+   IF (trace_use) call da_trace_entry("da_deallocate_y")
 
    !---------------------------------------------------------------------------
    ! [1.0] Deallocate:
@@ -140,6 +140,6 @@ SUBROUTINE da_deallocate_y( y )
       DEALLOCATE (y % instid)
    END IF
 
-   IF (trace_use) CALL da_trace_exit("da_deallocate_y")
+   IF (trace_use) call da_trace_exit("da_deallocate_y")
 
-END SUBROUTINE da_deallocate_y
+end subroutine da_deallocate_y

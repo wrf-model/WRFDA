@@ -1,4 +1,4 @@
-SUBROUTINE da_transpose_z2x ( xp )
+subroutine da_transpose_z2x ( xp )
 
    IMPLICIT NONE
 
@@ -11,9 +11,9 @@ SUBROUTINE da_transpose_z2x ( xp )
    xp % v1z(xp%ids:xp%ide,xp%jds:xp%jde,xp%kds:xp%kde)
 #endif
 
-END SUBROUTINE da_transpose_z2x
+end subroutine da_transpose_z2x
 
-SUBROUTINE da_transpose_x2y ( xp )
+subroutine da_transpose_x2y ( xp )
 
    IMPLICIT NONE
 
@@ -26,9 +26,9 @@ SUBROUTINE da_transpose_x2y ( xp )
    xp % v1x(xp%ids:xp%ide,xp%jds:xp%jde,xp%kds:xp%kde)
 #endif
 
-END SUBROUTINE da_transpose_x2y
+end subroutine da_transpose_x2y
 
-SUBROUTINE da_transpose_x2y_v2( xp )
+subroutine da_transpose_x2y_v2( xp )
 
    IMPLICIT NONE
 
@@ -41,9 +41,9 @@ SUBROUTINE da_transpose_x2y_v2( xp )
    xp % v2x(xp%ids:xp%ide,xp%jds:xp%jde,xp%kds:xp%kde)
 #endif
 
-END SUBROUTINE da_transpose_x2y_v2
+end subroutine da_transpose_x2y_v2
 
-SUBROUTINE da_transpose_y2z ( xp )
+subroutine da_transpose_y2z ( xp )
 
    IMPLICIT NONE
 
@@ -56,9 +56,9 @@ SUBROUTINE da_transpose_y2z ( xp )
    xp % v1y(xp%ids:xp%ide,xp%jds:xp%jde,xp%kds:xp%kde)
 #endif
 
-END SUBROUTINE da_transpose_y2z
+end subroutine da_transpose_y2z
 
-SUBROUTINE da_transpose_z2y ( xp )
+subroutine da_transpose_z2y ( xp )
 
    IMPLICIT NONE
 
@@ -71,9 +71,9 @@ SUBROUTINE da_transpose_z2y ( xp )
    xp % v1z(xp%ids:xp%ide,xp%jds:xp%jde,xp%kds:xp%kde)
 #endif
 
-END SUBROUTINE da_transpose_z2y
+end subroutine da_transpose_z2y
 
-SUBROUTINE da_transpose_y2x ( xp )
+subroutine da_transpose_y2x ( xp )
 
    IMPLICIT NONE
 
@@ -86,9 +86,9 @@ SUBROUTINE da_transpose_y2x ( xp )
    xp % v1y(xp%ids:xp%ide,xp%jds:xp%jde,xp%kds:xp%kde)
 #endif
 
-END SUBROUTINE da_transpose_y2x
+end subroutine da_transpose_y2x
 
-SUBROUTINE da_transpose_y2x_v2( xp )
+subroutine da_transpose_y2x_v2( xp )
 
    IMPLICIT NONE
 
@@ -101,9 +101,9 @@ SUBROUTINE da_transpose_y2x_v2( xp )
    xp % v2y(xp%ids:xp%ide,xp%jds:xp%jde,xp%kds:xp%kde)
 #endif
 
-END SUBROUTINE da_transpose_y2x_v2
+end subroutine da_transpose_y2x_v2
 
-SUBROUTINE da_transpose_x2z ( xp )
+subroutine da_transpose_x2z ( xp )
 
    IMPLICIT NONE
 
@@ -116,5 +116,5 @@ SUBROUTINE da_transpose_x2z ( xp )
    xp % v1x(xp%ids:xp%ide,xp%jds:xp%jde,xp%kds:xp%kde)
 #endif
 
-END SUBROUTINE da_transpose_x2z
+end subroutine da_transpose_x2z
 

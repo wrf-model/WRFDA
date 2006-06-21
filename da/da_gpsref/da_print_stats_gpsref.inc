@@ -1,4 +1,4 @@
-SUBROUTINE DA_Print_Stats_GPSRef( stats_unit, ngpsref, GPSRef )
+subroutine DA_Print_Stats_GPSRef( stats_unit, ngpsref, GPSRef )
 
    IMPLICIT NONE
 
@@ -21,5 +21,5 @@ SUBROUTINE DA_Print_Stats_GPSRef( stats_unit, ngpsref, GPSRef )
         ' Average     : ', GPSRef%average%ref/real(ngpsref),    &
         '    RMSE     : ', sqrt(GPSRef%rms_err%ref/real(ngpsref))
 
-END SUBROUTINE DA_Print_Stats_GPSRef
+end subroutine DA_Print_Stats_GPSRef
 

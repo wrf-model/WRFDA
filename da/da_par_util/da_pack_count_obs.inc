@@ -1,4 +1,4 @@
-SUBROUTINE da_pack_count_obs ( num_obs, offset, value )
+subroutine da_pack_count_obs ( num_obs, offset, value )
 
 !------------------------------------------------------------------------------
 !  PURPOSE: Pack the 4 integer num_obs values into value(offset) to 
@@ -16,5 +16,5 @@ SUBROUTINE da_pack_count_obs ( num_obs, offset, value )
    value(offset+3) = num_obs % num_missing
    offset = offset + 4
 
-END SUBROUTINE da_pack_count_obs
+end subroutine da_pack_count_obs
 

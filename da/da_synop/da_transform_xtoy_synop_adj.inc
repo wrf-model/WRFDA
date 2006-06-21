@@ -1,4 +1,4 @@
-SUBROUTINE da_transform_xtoy_synop_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
+subroutine da_transform_xtoy_synop_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
 
   IMPLICIT NONE
 
@@ -59,12 +59,12 @@ SUBROUTINE da_transform_xtoy_synop_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
     else if (sfc_assi_options == 2) then
       do n=iv%ob_numb(iv%current_ob_time-1)%synop + 1, iv%ob_numb(iv%current_ob_time)%synop
         if(iv%synop(n)%loc%proc_domain_with_halo) then
-          CALL da_transform_xtopsfc_adj(xb,xp,iv%synop(n), &
+          call da_transform_xtopsfc_adj(xb,xp,iv%synop(n), &
                                             jo_grad_y%synop(n),jo_grad_x)
         endif
       ENDDO
     endif
   END IF
 
-END SUBROUTINE da_transform_xtoy_synop_adj
+end subroutine da_transform_xtoy_synop_adj
 

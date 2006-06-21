@@ -1,4 +1,4 @@
-SUBROUTINE da_stats_calculate( n, k, qc_flag, x, nn, &
+subroutine da_stats_calculate( n, k, qc_flag, x, nn, &
                             minimum, maximum, &
                             average, rms_err )
 
@@ -29,6 +29,6 @@ SUBROUTINE da_stats_calculate( n, k, qc_flag, x, nn, &
       rms_err = rms_err + x * x
    END IF
 
-END SUBROUTINE da_stats_calculate
+end subroutine da_stats_calculate
 
 

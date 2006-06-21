@@ -1,4 +1,4 @@
-SUBROUTINE da_random_omb_all( iv, ob )
+subroutine da_random_omb_all( iv, ob )
 !----------------------------------------------------------------------------
 !  History:
 !
@@ -319,4 +319,4 @@ SUBROUTINE da_random_omb_all( iv, ob )
       END DO
    ENDIF
 
-END SUBROUTINE da_random_omb_all
+end subroutine da_random_omb_all

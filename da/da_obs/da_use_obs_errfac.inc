@@ -1,4 +1,4 @@
-SUBROUTINE da_use_obs_errfac( iv )
+subroutine da_use_obs_errfac( iv )
 !----------------------------------------------------------------------------
 !  History:
 !
@@ -330,5 +330,5 @@ SUBROUTINE da_use_obs_errfac( iv )
       END DO
    END IF
 
-END SUBROUTINE da_use_obs_errfac
+end subroutine da_use_obs_errfac
 

@@ -1,4 +1,4 @@
-SUBROUTINE da_oi_stats_gpsref ( stats_unit, oi )
+subroutine da_oi_stats_gpsref ( stats_unit, oi )
 
 ! ----------------------------------------------------------------------
 !  Called by DA_Minimisation/da_write_diagnostics.inc.
@@ -28,7 +28,7 @@ SUBROUTINE da_oi_stats_gpsref ( stats_unit, oi )
       if( oi%gpsref(n)%loc%proc_domain ) then
          do k=1, oi%gpsref(n)%info%levels
 
-            CALL da_stats_calculate( oi%GPSRef(n)%loc%obs_global_index, &
+            call da_stats_calculate( oi%GPSRef(n)%loc%obs_global_index, &
                           k, oi%GPSRef(n)%ref(k)%qc, &
                           oi%GPSRef(n)%ref(k)%inv, ngpsref, &
                           GPSRef%minimum%ref, GPSRef%maximum%ref, &
@@ -49,8 +49,8 @@ SUBROUTINE da_oi_stats_gpsref ( stats_unit, oi )
    IF ( wrf_dm_on_monitor() .and. (ngpsref > 0)) THEN
       write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of OI for GPSRef'
    
-      CALL da_print_stats_gpsref( stats_unit, ngpsref, GPSRef )
+      call da_print_stats_gpsref( stats_unit, ngpsref, GPSRef )
    END IF
 
-END SUBROUTINE da_oi_stats_gpsref
+end subroutine da_oi_stats_gpsref
 

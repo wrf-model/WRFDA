@@ -1,4 +1,4 @@
-SUBROUTINE da_ao_stats_synop( stats_unit, oi, re )
+subroutine da_ao_stats_synop( stats_unit, oi, re )
 
   IMPLICIT NONE
 
@@ -35,23 +35,23 @@ SUBROUTINE da_ao_stats_synop( stats_unit, oi, re )
   IF ( oi%num_synop > 0 ) THEN
     DO n=1, oi%num_synop
       if( oi%synop(n)%loc%proc_domain ) then
-        CALL da_stats_calculate( n, 0, oi%synop(n)%u%qc,  & 
+        call da_stats_calculate( n, 0, oi%synop(n)%u%qc,  & 
                               re%synop(n)%u, nu, & 
                               synop%minimum%u, synop%maximum%u, &
                               synop%average%u, synop%rms_err%u )
-        CALL da_stats_calculate( n, 0, oi%synop(n)%v%qc,  & 
+        call da_stats_calculate( n, 0, oi%synop(n)%v%qc,  & 
                               re%synop(n)%v, nv, & 
                               synop%minimum%v, synop%maximum%v, &
                               synop%average%v, synop%rms_err%v )
-        CALL da_stats_calculate( n, 0, oi%synop(n)%t%qc,  & 
+        call da_stats_calculate( n, 0, oi%synop(n)%t%qc,  & 
                               re%synop(n)%t, nt, & 
                               synop%minimum%t, synop%maximum%t, &
                               synop%average%t, synop%rms_err%t )
-        CALL da_stats_calculate( n, 0, oi%synop(n)%p%qc,  & 
+        call da_stats_calculate( n, 0, oi%synop(n)%p%qc,  & 
                               re%synop(n)%p, np, & 
                               synop%minimum%p, synop%maximum%p, &
                               synop%average%p, synop%rms_err%p )
-        CALL da_stats_calculate( n, 0, oi%synop(n)%q%qc,  & 
+        call da_stats_calculate( n, 0, oi%synop(n)%q%qc,  & 
                               re%synop(n)%q, nq, & 
                               synop%minimum%q, synop%maximum%q, &
                               synop%average%q, synop%rms_err%q )
@@ -96,7 +96,7 @@ SUBROUTINE da_ao_stats_synop( stats_unit, oi, re )
     END IF
   END IF
 
-END SUBROUTINE da_ao_stats_synop
+end subroutine da_ao_stats_synop
 
 
 

@@ -1,4 +1,4 @@
-SUBROUTINE da_ffdduv (F,D,U,V,YLON,ID)
+subroutine da_ffdduv (F,D,U,V,YLON,ID)
 
    !----------------------------------------------------------------------------
    ! When ID =  1
@@ -113,8 +113,8 @@ SUBROUTINE da_ffdduv (F,D,U,V,YLON,ID)
 
       CASE DEFAULT
          WRITE(UNIT=errmsg(1),FMT='(A,I2)') ' UNKNOWN OPTION ',ID
-         CALL wrf_error(__FILE__,__LINE__,errmsg(1))
+         call wrf_error(__FILE__,__LINE__,errmsg(1))
 
    END SELECT
 
-END SUBROUTINE da_ffdduv
+end subroutine da_ffdduv

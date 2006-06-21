@@ -1,4 +1,4 @@
-SUBROUTINE da_transform_xtoy_geoamv_adj ( iv, xp, jo_grad_y, jo_grad_x )
+subroutine da_transform_xtoy_geoamv_adj ( iv, xp, jo_grad_y, jo_grad_x )
 
    !-------------------------------------------------------------------------
    ! Purpose: X to Y Transpose operator for Geo. AMV's
@@ -50,4 +50,4 @@ SUBROUTINE da_transform_xtoy_geoamv_adj ( iv, xp, jo_grad_y, jo_grad_x )
       END DO
    END IF
 
-END SUBROUTINE da_transform_xtoy_geoamv_adj
+end subroutine da_transform_xtoy_geoamv_adj

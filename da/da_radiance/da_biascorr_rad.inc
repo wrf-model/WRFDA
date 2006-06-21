@@ -1,5 +1,5 @@
 !
-SUBROUTINE da_biascorr_rad ( inst, nchan, tb_ob, iv )
+subroutine da_biascorr_rad ( inst, nchan, tb_ob, iv )
 !------------------------------------------------------------------------------
 !  PURPOSE: perform bias correction for radiance data.
 !
@@ -29,4 +29,4 @@ SUBROUTINE da_biascorr_rad ( inst, nchan, tb_ob, iv )
 
    return
 
-END SUBROUTINE da_biascorr_rad
+end subroutine da_biascorr_rad

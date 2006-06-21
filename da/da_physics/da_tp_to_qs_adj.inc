@@ -1,4 +1,4 @@
-SUBROUTINE da_tp_to_qs_adj( xb, xp, xa, qs_prime_over_qs )
+subroutine da_tp_to_qs_adj( xb, xp, xa, qs_prime_over_qs )
 
 !------------------------------------------------------------------------------
 !  PURPOSE: Adjoint of da_tp_to_qs_lin.
@@ -71,9 +71,9 @@ SUBROUTINE da_tp_to_qs_adj( xb, xp, xa, qs_prime_over_qs )
       end do
    end do
 
-END SUBROUTINE da_tp_to_qs_adj
+end subroutine da_tp_to_qs_adj
 
-!SUBROUTINE da_tp_to_qs_adj( t, p, es, t_prime, p_prime, &
+!subroutine da_tp_to_qs_adj( t, p, es, t_prime, p_prime, &
 !                            qs_prime_over_qs, n )
 
 !------------------------------------------------------------------------------
@@ -118,5 +118,5 @@ END SUBROUTINE da_tp_to_qs_adj
 !   t_prime(i) = t_prime(i) + es_gammabeta * es_prime_over_es / ( temp * temp )
 !   enddo
 
-!END SUBROUTINE da_tp_to_qs_adj
+!end subroutine da_tp_to_qs_adj
 

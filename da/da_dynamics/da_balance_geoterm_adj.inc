@@ -1,4 +1,4 @@
-SUBROUTINE da_balance_geoterm_adj( cori, rho, term_x, term_y, u, v, &
+subroutine da_balance_geoterm_adj( cori, rho, term_x, term_y, u, v, &
                                    ims,ime, jms,jme, its,ite, jts,jte )
  
    !---------------------------------------------------------------------------
@@ -38,5 +38,5 @@ SUBROUTINE da_balance_geoterm_adj( cori, rho, term_x, term_y, u, v, &
                       rho(its:ite,jts:jte) * cori(its:ite,jts:jte) * &
                    term_x(its:ite,jts:jte)
 
-END SUBROUTINE da_balance_geoterm_adj
+end subroutine da_balance_geoterm_adj
 

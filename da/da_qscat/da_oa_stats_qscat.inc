@@ -29,11 +29,11 @@ subroutine da_oa_stats_qscat( stats_unit, oi, re )
 
        if( oi%qscat(n)%loc%proc_domain ) then
 
-         CALL da_stats_calculate( n, 0, oi%qscat(n)%u%qc, & 
+         call da_stats_calculate( n, 0, oi%qscat(n)%u%qc, & 
                                re%qscat(n)%u, nu, & 
                                qscat%minimum%u, qscat%maximum%u, &
                                qscat%average%u, qscat%rms_err%u )
-         CALL da_stats_calculate( n, 0, oi%qscat(n)%v%qc, & 
+         call da_stats_calculate( n, 0, oi%qscat(n)%v%qc, & 
                                re%qscat(n)%v, nv, & 
                                qscat%minimum%v, qscat%maximum%v, &
                                qscat%average%v, qscat%rms_err%v )

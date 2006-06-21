@@ -103,7 +103,7 @@ subroutine da_get_innov_vector_qscat ( it, xb, xp, ob, iv )
 !------------------------------------------------------------------------
 
        IF( check_max_iv )& 
-       CALL da_check_max_iv_qscat(it, iv % qscat(n), itu, itvv, ituf,itvvf)
+       call da_check_max_iv_qscat(it, iv % qscat(n), itu, itvv, ituf,itvvf)
 
        endif
        endif

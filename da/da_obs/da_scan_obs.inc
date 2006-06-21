@@ -1,4 +1,4 @@
-SUBROUTINE da_scan_obs (iunit, ob, xp, filename)
+subroutine da_scan_obs (iunit, ob, xp, filename)
 !-----------------------------------------------------------------------------!
 !  Purpose: Scan WRFVAR GTS observation file
 !-----------------------------------------------------------------------------!
@@ -93,7 +93,7 @@ SUBROUTINE da_scan_obs (iunit, ob, xp, filename)
    IF (iost /= 0) THEN
       WRITE(UNIT=errmsg(1),FMT='(A,I5,A)') &
          "Error",iost," opening gts obs file "//TRIM(filename)
-      CALL wrf_warning(__FILE__,__LINE__,errmsg(1:1))
+      call wrf_warning(__FILE__,__LINE__,errmsg(1:1))
       RETURN
    ENDIF
 
@@ -132,7 +132,7 @@ SUBROUTINE da_scan_obs (iunit, ob, xp, filename)
       IF (iost /= 0) THEN
          WRITE(UNIT=errmsg(1),FMT='(A,I3,A,I3)') &
             "Error",iost,"reading gts obs header on unit",iunit
-         CALL wrf_warning(__FILE__,__LINE__,errmsg(1:1))
+         call wrf_warning(__FILE__,__LINE__,errmsg(1:1))
          return
       ENDIF
 
@@ -153,7 +153,7 @@ SUBROUTINE da_scan_obs (iunit, ob, xp, filename)
    IF (iost /= 0) THEN
       WRITE(UNIT=errmsg(1),FMT='(A,I3,A,I3)') &
          "Error",iost,"reading gts obs formats on unit",iunit
-         CALL wrf_warning(__FILE__,__LINE__,errmsg(1:1))
+         call wrf_warning(__FILE__,__LINE__,errmsg(1:1))
       RETURN
    ENDIF
 
@@ -534,5 +534,5 @@ loop_level: DO i = 1, platform%info%levels
 
    end if
 
-END SUBROUTINE da_scan_obs
+end subroutine da_scan_obs
 

@@ -1,4 +1,4 @@
-SUBROUTINE da_trace_init
+subroutine da_trace_init
 
    IMPLICIT NONE
 
@@ -15,8 +15,8 @@ SUBROUTINE da_trace_init
    IOStatus = 0
 
 #ifdef DM_PARALLEL
-   CALL wrf_get_nproc(nproc)
-   CALL wrf_get_myproc(mype)
+   call wrf_get_nproc(nproc)
+   call wrf_get_myproc(mype)
 #else
    nproc=1
    mype=0
@@ -41,7 +41,7 @@ SUBROUTINE da_trace_init
          IOSTAT=IOStatus)    ! O:
    
       IF (IOStatus /= 0) THEN
-         CALL wrf_error(__FILE__,__LINE__, &
+         call wrf_error(__FILE__,__LINE__, &
             "Cannot open trace file "//TraceFile)
       END IF
    END IF
@@ -73,10 +73,10 @@ SUBROUTINE da_trace_init
    Pointer     = 0
    NoRoutines  = 0
 
-   CALL SYSTEM_CLOCK( &
+   call SYSTEM_CLOCK( &
       COUNT=BaseElapsedTime)
 
-   CALL CPU_TIME(BaseCPUTime)
+   call CPU_TIME(BaseCPUTime)
 
    ! start trace output here so memory calculations are not distorted
    ! by IO buffer being grabbed later
@@ -101,4 +101,4 @@ SUBROUTINE da_trace_init
 
    RETURN
 
-END SUBROUTINE da_trace_init
+end subroutine da_trace_init

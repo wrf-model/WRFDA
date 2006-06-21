@@ -1,4 +1,4 @@
-SUBROUTINE da_get_jo_and_grady_geoamv( iv, re, jo, jo_grad_y )
+subroutine da_get_jo_and_grady_geoamv( iv, re, jo, jo_grad_y )
 
    !-------------------------------------------------------------------------
    ! Purpose:  Calculates Cost function and Gradient for Geo. CVMs 
@@ -44,5 +44,5 @@ SUBROUTINE da_get_jo_and_grady_geoamv( iv, re, jo, jo_grad_y )
 
    END IF
      
-END SUBROUTINE da_get_jo_and_grady_geoamv
+end subroutine da_get_jo_and_grady_geoamv
 

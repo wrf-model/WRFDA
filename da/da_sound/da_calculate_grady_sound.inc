@@ -1,4 +1,4 @@
-SUBROUTINE DA_Calculate_GradY_Sound( iv, re, jo_grad_y )
+subroutine DA_Calculate_GradY_Sound( iv, re, jo_grad_y )
 
   !-------------------------------------------------------------------------
   !  HISTORY: 
@@ -43,4 +43,4 @@ SUBROUTINE DA_Calculate_GradY_Sound( iv, re, jo_grad_y )
     END DO
   END IF
 
-END SUBROUTINE DA_Calculate_GradY_Sound
+end subroutine DA_Calculate_GradY_Sound

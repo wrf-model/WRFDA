@@ -28,7 +28,7 @@
       LOGICAL, EXTERNAL :: wrf_dm_on_monitor     ! For statistics output.
 !------------------------------------------------------------------------------
 
-   IF (trace_use) CALL da_trace_entry("da_write_diagnostics")
+   IF (trace_use) call da_trace_entry("da_write_diagnostics")
 
 !---- -------------------------------------------------------------------------
 !  [1.0] Calculate innovation vector (O-B) statistics:
@@ -238,7 +238,7 @@
       call da_write_y( iv, y )
    end if
 
-   IF (trace_use) CALL da_trace_exit("da_write_diagnostics")
+   IF (trace_use) call da_trace_exit("da_write_diagnostics")
 
  
    end subroutine da_write_diagnostics

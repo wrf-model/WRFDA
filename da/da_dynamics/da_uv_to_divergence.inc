@@ -1,4 +1,4 @@
-SUBROUTINE da_uv_to_divergence( xb, u, v, div, &
+subroutine da_uv_to_divergence( xb, u, v, div, &
                                ids,ide, jds,jde, kds,kde,  &
                                ims,ime, jms,jme, kms,kme,  &
                                its,ite, jts,jte, kts,kte )
@@ -127,5 +127,5 @@ SUBROUTINE da_uv_to_divergence( xb, u, v, div, &
                               its,ite, jts,jte, kts,kte )
    endif
 
-END SUBROUTINE da_uv_to_divergence
+end subroutine da_uv_to_divergence
 

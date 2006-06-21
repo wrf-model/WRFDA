@@ -1,4 +1,4 @@
-SUBROUTINE da_psichi_to_uv( psi, chi, coefx,coefy, u, v,&
+subroutine da_psichi_to_uv( psi, chi, coefx,coefy, u, v,&
                             ids,ide, jds,jde, kds,kde,  &
                             ims,ime, jms,jme, kms,kme,  &
                             its,ite, jts,jte, kts,kte )
@@ -178,5 +178,5 @@ SUBROUTINE da_psichi_to_uv( psi, chi, coefx,coefy, u, v,&
                             its,ite, jts,jte, kts,kte )
    end if
 
-END SUBROUTINE da_psichi_to_uv
+end subroutine da_psichi_to_uv
 

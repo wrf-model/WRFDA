@@ -1,4 +1,4 @@
-SUBROUTINE da_hydrostaticp_to_rho_adj( xb, xp, rho, p ) 
+subroutine da_hydrostaticp_to_rho_adj( xb, xp, rho, p ) 
 
    !---------------------------------------------------------------------------
    !  PURPOSE: Adjoint of DA_HydrostaticP_To_Rho.
@@ -102,5 +102,5 @@ SUBROUTINE da_hydrostaticp_to_rho_adj( xb, xp, rho, p )
       p(is:ie,js:je,k+1) = p(is:ie,js:je,k+1) + temp(is:ie,js:je)
    END DO                                  
 
-END SUBROUTINE da_hydrostaticp_to_rho_adj
+end subroutine da_hydrostaticp_to_rho_adj
 

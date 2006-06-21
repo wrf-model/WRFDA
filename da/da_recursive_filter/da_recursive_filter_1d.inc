@@ -1,4 +1,4 @@
-SUBROUTINE DA_Recursive_Filter_1D( pass, alpha, field, n )
+subroutine DA_Recursive_Filter_1D( pass, alpha, field, n )
 
 !---- -------------------------------------------------------------------------
 !  PURPOSE: Perform one pass of recursive filter on 1D array.
@@ -69,7 +69,7 @@ SUBROUTINE DA_Recursive_Filter_1D( pass, alpha, field, n )
         
    field(1:n) = c(1:n)
    
-END SUBROUTINE DA_Recursive_Filter_1D
+end subroutine DA_Recursive_Filter_1D
 
 
 

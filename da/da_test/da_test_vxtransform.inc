@@ -1,4 +1,4 @@
-SUBROUTINE da_test_vxtransform( xb, xbx, xp, be, &
+subroutine da_test_vxtransform( xb, xbx, xp, be, &
                                 xa, vv, vp, &
                                 ids,ide, jds,jde, kds,kde, &
                                 ims,ime, jms,jme, kms,kme, &

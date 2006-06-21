@@ -1,4 +1,4 @@
-SUBROUTINE DA_Check_XToY_Adjoint_pilot( oi, y, adjtest_lhs, pertile_lhs )
+subroutine DA_Check_XToY_Adjoint_pilot( oi, y, adjtest_lhs, pertile_lhs )
 
    IMPLICIT NONE
 
@@ -36,5 +36,5 @@ SUBROUTINE DA_Check_XToY_Adjoint_pilot( oi, y, adjtest_lhs, pertile_lhs )
 
    END IF
 
-END SUBROUTINE DA_Check_XToY_Adjoint_pilot
+end subroutine DA_Check_XToY_Adjoint_pilot
 

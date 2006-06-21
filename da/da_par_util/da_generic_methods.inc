@@ -1,6 +1,6 @@
 
 
-SUBROUTINE da_res_generic_set_info( res_generic, proc_domain, &
+subroutine da_res_generic_set_info( res_generic, proc_domain, &
                                       obs_global_index )
 
 !------------------------------------------------------------------------------
@@ -16,11 +16,11 @@ SUBROUTINE da_res_generic_set_info( res_generic, proc_domain, &
 
    res_generic%proc_domain = proc_domain
    res_generic%obs_global_index = obs_global_index
-END SUBROUTINE da_res_generic_set_info
+end subroutine da_res_generic_set_info
 
 
 
-SUBROUTINE da_res_sound_create_template( template )
+subroutine da_res_sound_create_template( template )
 
 !------------------------------------------------------------------------------
 ! PURPOSE:  Return storage template for specific type stored as 
@@ -34,12 +34,12 @@ SUBROUTINE da_res_sound_create_template( template )
    template%lbnd = 1
    template%ubnd = 4
 
-END SUBROUTINE da_res_sound_create_template
+end subroutine da_res_sound_create_template
 
 
 
 
-SUBROUTINE da_res_sound_to_generic( res_specific, iv_num_levels, &
+subroutine da_res_sound_to_generic( res_specific, iv_num_levels, &
                                       res_generic )
 
 !------------------------------------------------------------------------------
@@ -62,7 +62,7 @@ SUBROUTINE da_res_sound_to_generic( res_specific, iv_num_levels, &
    TYPE (residual_template_type) :: template
    INTEGER :: n
 
-   CALL da_res_sound_create_template( template )
+   call da_res_sound_create_template( template )
    ALLOCATE( res_generic%values(template%lbnd:template%ubnd) )
    ! only vector data for this type
    ! store references to vector data
@@ -77,15 +77,15 @@ SUBROUTINE da_res_sound_to_generic( res_specific, iv_num_levels, &
 !TBH:         residual_generic_type AND send this around.  Better to fix 
 !TBH:         allocation in specific types to avoid wasting memory!  
      IF ( SIZE(res_generic%values(n)%ptr) /= iv_num_levels ) THEN
-       CALL wrf_error_fatal( 'residual_sound_to_generic:  mismatched levels' )
+       call wrf_error_fatal( 'residual_sound_to_generic:  mismatched levels' )
      ENDIF
    ENDDO
 
-END SUBROUTINE da_res_sound_to_generic
+end subroutine da_res_sound_to_generic
 
 
 
-SUBROUTINE da_res_sound_from_generic( res_generic, res_specific )
+subroutine da_res_sound_from_generic( res_generic, res_specific )
 
 !------------------------------------------------------------------------------
 ! PURPOSE:  Eliminate redundant code for many obs types.  
@@ -106,11 +106,11 @@ SUBROUTINE da_res_sound_from_generic( res_generic, res_specific )
    res_specific%t => res_generic%values(3)%ptr
    res_specific%q => res_generic%values(4)%ptr
 
-END SUBROUTINE da_res_sound_from_generic
+end subroutine da_res_sound_from_generic
 
 
 
-SUBROUTINE da_res_synop_create_template( template )
+subroutine da_res_synop_create_template( template )
 
 !------------------------------------------------------------------------------
 ! PURPOSE:  Return storage template for specific type stored as 
@@ -124,12 +124,12 @@ SUBROUTINE da_res_synop_create_template( template )
    template%lbnd = 0
    template%ubnd = 0
 
-END SUBROUTINE da_res_synop_create_template
+end subroutine da_res_synop_create_template
 
 
 
 
-SUBROUTINE da_res_synop_to_generic( res_specific, iv_num_levels, &
+subroutine da_res_synop_to_generic( res_specific, iv_num_levels, &
                                       res_generic )
 
 !------------------------------------------------------------------------------
@@ -155,7 +155,7 @@ SUBROUTINE da_res_synop_to_generic( res_specific, iv_num_levels, &
    IF  (iv_num_levels==0) THEN
    END IF
 
-   CALL da_res_synop_create_template( template )
+   call da_res_synop_create_template( template )
    ALLOCATE( res_generic%values(template%lbnd:template%ubnd) )
    ! only scalar data for this type
    ALLOCATE( res_generic%values(0)%ptr(5) )
@@ -166,12 +166,12 @@ SUBROUTINE da_res_synop_to_generic( res_specific, iv_num_levels, &
    res_generic%values(0)%ptr(4) = res_specific%p
    res_generic%values(0)%ptr(5) = res_specific%q
 
-END SUBROUTINE da_res_synop_to_generic
+end subroutine da_res_synop_to_generic
 
 
 
 
-SUBROUTINE da_res_synop_from_generic( res_generic, res_specific )
+subroutine da_res_synop_from_generic( res_generic, res_specific )
 
 !------------------------------------------------------------------------------
 ! PURPOSE:  Eliminate redundant code for many obs types.  
@@ -193,12 +193,12 @@ SUBROUTINE da_res_synop_from_generic( res_generic, res_specific )
    res_specific%p = res_generic%values(0)%ptr(4)
    res_specific%q = res_generic%values(0)%ptr(5)
 
-END SUBROUTINE da_res_synop_from_generic
+end subroutine da_res_synop_from_generic
 
 
 
 
-SUBROUTINE da_y_facade_create( slice, num_obs, num_obs_glo, template )
+subroutine da_y_facade_create( slice, num_obs, num_obs_glo, template )
 
 !------------------------------------------------------------------------------
 ! PURPOSE:  Create a y_facade_type containing specified number of 
@@ -225,15 +225,15 @@ SUBROUTINE da_y_facade_create( slice, num_obs, num_obs_glo, template )
    slice%num_obs_glo = num_obs_glo
    ALLOCATE( slice%obs(slice%num_obs) )
    DO n=1, slice%num_obs
-     CALL da_res_generic_create( slice%obs(n), template=template )
+     call da_res_generic_create( slice%obs(n), template=template )
    ENDDO
 
-END SUBROUTINE da_y_facade_create
+end subroutine da_y_facade_create
 
 
 
 
-SUBROUTINE da_res_generic_create( res_generic, template )
+subroutine da_res_generic_create( res_generic, template )
 !------------------------------------------------------------------------------
 ! PURPOSE:  Create a residual_generic_type object.  This must be called 
 !           before any other operation is performed on a 
@@ -270,12 +270,12 @@ SUBROUTINE da_res_generic_create( res_generic, template )
        NULLIFY( res_generic%values(i)%ptr )
      ENDDO
    ENDIF
-END SUBROUTINE da_res_generic_create
+end subroutine da_res_generic_create
 
 
 
 
-SUBROUTINE da_res_generic_alloc_and_set( res_generic, val_index, values )
+subroutine da_res_generic_alloc_and_set( res_generic, val_index, values )
 ! TODO:  replace this with a full-blown copy-constructor!  
 !------------------------------------------------------------------------------
 ! PURPOSE:  Allocates and initializes one of the values (either scalar or 
@@ -303,11 +303,11 @@ SUBROUTINE da_res_generic_alloc_and_set( res_generic, val_index, values )
 
    IF ( ( val_index < LBOUND(res_generic%values,1) ) .OR. &
         ( val_index > UBOUND(res_generic%values,1) ) ) THEN
-     CALL wrf_error_fatal( 'residual_generic_alloc_and_set:  bad val_index' )
+     call wrf_error_fatal( 'residual_generic_alloc_and_set:  bad val_index' )
    ENDIF
    ALLOCATE( res_generic%values(val_index)%ptr(SIZE(values)) )
    res_generic%values(val_index)%ptr(:) = values(:)
-END SUBROUTINE da_res_generic_alloc_and_set
+end subroutine da_res_generic_alloc_and_set
 
 
 
@@ -341,7 +341,7 @@ END FUNCTION da_res_generic_has_scalar
 
 
 
-SUBROUTINE da_res_generic_free( res_generic )
+subroutine da_res_generic_free( res_generic )
 !------------------------------------------------------------------------------
 ! PURPOSE:  Free memory for residual_generic_type object.  
 !
@@ -368,11 +368,11 @@ SUBROUTINE da_res_generic_free( res_generic )
    IF ( oktofreevalues ) THEN
      DEALLOCATE( res_generic%values )
    ENDIF
-END SUBROUTINE da_res_generic_free
+end subroutine da_res_generic_free
 
 
 
-SUBROUTINE da_y_facade_free( slice )
+subroutine da_y_facade_free( slice )
 !------------------------------------------------------------------------------
 ! PURPOSE:  Free memory for y_facade_type object.  
 !
@@ -385,10 +385,10 @@ SUBROUTINE da_y_facade_free( slice )
    INTEGER :: n
    IF ( ASSOCIATED( slice%obs ) ) THEN
      DO n=1, SIZE(slice%obs)
-       CALL da_res_generic_free( slice%obs(n) )
+       call da_res_generic_free( slice%obs(n) )
      ENDDO
      DEALLOCATE( slice%obs )
    ENDIF
-END SUBROUTINE da_y_facade_free
+end subroutine da_y_facade_free
 
 

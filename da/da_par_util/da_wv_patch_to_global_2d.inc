@@ -1,4 +1,4 @@
-SUBROUTINE da_wv_patch_to_global_2d( vlocal, vglobal,    &
+subroutine da_wv_patch_to_global_2d( vlocal, vglobal,    &
                                   domdesc,            &
                                   ids, ide, jds, jde, &
                                   ims, ime, jms, jme, &
@@ -29,7 +29,7 @@ SUBROUTINE da_wv_patch_to_global_2d( vlocal, vglobal,    &
             vglobal3d( ids:ide, jds:jde, 1 ) )
   ! get rid of copies later
   vlocal3d(:,:,1) = vlocal(:,:)
-  CALL da_wv_patch_to_global_3d( vlocal3d, vglobal3d,     &
+  call da_wv_patch_to_global_3d( vlocal3d, vglobal3d,     &
                               domdesc, mz,             &
                               ids, ide, jds, jde, kds, &
                               ims, ime, jms, jme, kms, &
@@ -40,5 +40,5 @@ SUBROUTINE da_wv_patch_to_global_2d( vlocal, vglobal,    &
   DEALLOCATE( vlocal3d, vglobal3d )
 #endif
 
-END SUBROUTINE da_wv_patch_to_global_2d
+end subroutine da_wv_patch_to_global_2d
 

@@ -1,4 +1,4 @@
-SUBROUTINE da_oi_stats_sound ( stats_unit, oi )
+subroutine da_oi_stats_sound ( stats_unit, oi )
 
   IMPLICIT NONE
 
@@ -83,9 +83,9 @@ SUBROUTINE da_oi_stats_sound ( stats_unit, oi )
   IF ( wrf_dm_on_monitor() ) THEN
     IF (nu /= 0 .or. nv /= 0 .or. nt /= 0 .or. nq /= 0) THEN
       write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of OI for Sound'
-      CALL da_print_stats_sound( stats_unit, nu, nv, nt, nq, Sound )
+      call da_print_stats_sound( stats_unit, nu, nv, nt, nq, Sound )
     END IF
   END IF
 
-END SUBROUTINE da_oi_stats_sound
+end subroutine da_oi_stats_sound
 

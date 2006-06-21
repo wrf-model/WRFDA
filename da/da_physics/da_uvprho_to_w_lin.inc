@@ -1,4 +1,4 @@
-SUBROUTINE da_uvprho_to_w_lin( xb, xa, xp,                 &
+subroutine da_uvprho_to_w_lin( xb, xa, xp,                 &
                                ids,ide, jds,jde, kds,kde,  &
                                ims,ime, jms,jme, kms,kme,  &
                                its,ite, jts,jte, kts,kte )
@@ -105,7 +105,7 @@ SUBROUTINE da_uvprho_to_w_lin( xb, xa, xp,                 &
 
 ! Term 2.1: Divergence term from perturbed wind
 
-   CALL da_uv_to_divergence(xb, xa%u, xa%v, DIV, &
+   call da_uv_to_divergence(xb, xa%u, xa%v, DIV, &
                             ids,ide, jds,jde, kds,kde,         &
                             ims,ime, jms,jme, kms,kme,         &
                             its,ite, jts,jte, kts,kte )
@@ -120,7 +120,7 @@ SUBROUTINE da_uvprho_to_w_lin( xb, xa, xp,                 &
 
 ! Term 2.2: Divergence term from basic wind
 
-   CALL da_uv_to_divergence(xb, xb%u, xb%v, DIV, &
+   call da_uv_to_divergence(xb, xb%u, xb%v, DIV, &
                             ids,ide, jds,jde, kds,kde,         &
                             ims,ime, jms,jme, kms,kme,         &
                             its,ite, jts,jte, kts,kte )
@@ -149,7 +149,7 @@ SUBROUTINE da_uvprho_to_w_lin( xb, xa, xp,                 &
       ENDDO
    ENDDO
 
-   CALL da_uv_to_divergence(xb, URHO, VRHO, DIV, &
+   call da_uv_to_divergence(xb, URHO, VRHO, DIV, &
                             ids,ide, jds,jde, kds,kde,         &
                             ims,ime, jms,jme, kms,kme,         &
                             its,ite, jts,jte, kts,kte )
@@ -178,7 +178,7 @@ SUBROUTINE da_uvprho_to_w_lin( xb, xa, xp,                 &
       ENDDO
    ENDDO
 
-   CALL da_uv_to_divergence(xb, URHO, VRHO, DIV, &
+   call da_uv_to_divergence(xb, URHO, VRHO, DIV, &
                             ids,ide, jds,jde, kds,kde,         &
                             ims,ime, jms,jme, kms,kme,         &
                             its,ite, jts,jte, kts,kte )
@@ -221,7 +221,7 @@ SUBROUTINE da_uvprho_to_w_lin( xb, xa, xp,                 &
 
 ! Integration to calculate the vertical velocity 
 
-   CALL da_w_adjustment_lin(xb,xa%w,WZ,                  &
+   call da_w_adjustment_lin(xb,xa%w,WZ,                  &
                 ids,ide, jds,jde, kds,kde,   &
                 ims,ime, jms,jme, kms,kme,   &
                 its,ite, jts,jte, kts,kte )
@@ -240,4 +240,4 @@ SUBROUTINE da_uvprho_to_w_lin( xb, xa, xp,                 &
 
 !------------------------------------------------------
 
-END SUBROUTINE da_uvprho_to_w_lin
+end subroutine da_uvprho_to_w_lin

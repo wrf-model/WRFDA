@@ -1,4 +1,4 @@
-SUBROUTINE da_calculate_residual_synop( oi, y, re,                        &
+subroutine da_calculate_residual_synop( oi, y, re,                        &
                                         np_missing, np_bad_data,          &
                                         np_obs_used, np_available )
 
@@ -49,5 +49,5 @@ SUBROUTINE da_calculate_residual_synop( oi, y, re,                        &
                    n_obs_bad % p % num % use + n_obs_bad % q % num % use
   ENDIF
 
-END SUBROUTINE da_calculate_residual_synop
+end subroutine da_calculate_residual_synop
 

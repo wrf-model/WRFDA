@@ -1,4 +1,4 @@
-SUBROUTINE da_transfer_xatowrftl( grid, config_flags, filnam, &
+subroutine da_transfer_xatowrftl( grid, config_flags, filnam, &
 #include "em_dummy_args.inc"
                               )
 
@@ -31,7 +31,7 @@ SUBROUTINE da_transfer_xatowrftl( grid, config_flags, filnam, &
 
    integer ndynopt
 
-   IF (trace_use) CALL da_trace_entry("da_transfer_xatowrftl")
+   IF (trace_use) call da_trace_entry("da_transfer_xatowrftl")
 
 !---------------------------------------------------------------------------
    is=xp%its
@@ -255,7 +255,7 @@ SUBROUTINE da_transfer_xatowrftl( grid, config_flags, filnam, &
    grid%dyn_opt = ndynopt
    call nl_set_dyn_opt ( 1 , DYN_EM )
 
-   IF (trace_use) CALL da_trace_exit("da_transfer_xatowrftl")
+   IF (trace_use) call da_trace_exit("da_transfer_xatowrftl")
 
-END SUBROUTINE da_transfer_xatowrftl
+end subroutine da_transfer_xatowrftl
 

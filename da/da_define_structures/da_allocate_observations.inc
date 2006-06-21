@@ -1,4 +1,4 @@
-SUBROUTINE da_allocate_observations ( ob )
+subroutine da_allocate_observations ( ob )
 
    !---------------------------------------------------------------------------
    ! PURPOSE: Allocate components of observation structure.
@@ -8,7 +8,7 @@ SUBROUTINE da_allocate_observations ( ob )
 
    TYPE (ob_type), intent(inout)        :: ob     ! Observation structure.
 
-   IF (trace_use) CALL da_trace_entry("da_allocate_observations")
+   IF (trace_use) call da_trace_entry("da_allocate_observations")
 
    if(ob%num_sound > 0) then
       ALLOCATE(ob%sound(1:ob%num_sound))
@@ -73,6 +73,6 @@ SUBROUTINE da_allocate_observations ( ob )
    if(ob%num_Bogus     > 0) &
       ALLOCATE(ob%Bogus(1:ob%num_Bogus))
 
-   IF (trace_use) CALL da_trace_exit("da_allocate_observations")
+   IF (trace_use) call da_trace_exit("da_allocate_observations")
 
-END SUBROUTINE da_allocate_observations
+end subroutine da_allocate_observations

@@ -1,4 +1,4 @@
-SUBROUTINE da_add_increments( it, xp, xa, xb, xbx )
+subroutine da_add_increments( it, xp, xa, xb, xbx )
 
    !---------------------------------------------------------------------------
    !  PURPOSE: Add analysis increments to background field.  
@@ -14,7 +14,7 @@ SUBROUTINE da_add_increments( it, xp, xa, xb, xbx )
 
    integer                              :: is,ie,js,je,ks,ke
 
-   IF (trace_use) CALL da_trace_entry("da_add_increments")
+   IF (trace_use) call da_trace_entry("da_add_increments")
 
    is = xp%its
    ie = xp%ite
@@ -38,7 +38,7 @@ SUBROUTINE da_add_increments( it, xp, xa, xb, xbx )
       call da_check_rh_simple( xb, xa, xp )
    else if ( check_rh == 2 ) THEN
       ! Shu-Hua~s TPW conservation:
-      CALL da_check_rh( xb, xa, xp )
+      call da_check_rh( xb, xa, xp )
    end if
 
    !-------------------------------------------------------------------------
@@ -90,15 +90,15 @@ SUBROUTINE da_add_increments( it, xp, xa, xb, xbx )
    ! [5.0] Calculate analysis increment (A-B) statistics:
    !---------------------------------------------------------------------------
 
-   ! CALL da_analysis_stats ( stats_unit, xp, xa )
+   ! call da_analysis_stats ( stats_unit, xp, xa )
 
    !---------------------------------------------------------------------------
    ! [6.0] ADD PBL and SURFACE INFO.
    !---------------------------------------------------------------------------
 
-   CALL da_add_pbl_and_sfc_info( xp, xb, xbx )
+   call da_add_pbl_and_sfc_info( xp, xb, xbx )
 
-   IF (trace_use) CALL da_trace_exit("da_add_increments")
+   IF (trace_use) call da_trace_exit("da_add_increments")
 
 end subroutine da_add_increments
 

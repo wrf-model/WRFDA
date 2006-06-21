@@ -1,4 +1,4 @@
-SUBROUTINE DA_Obs_Count(count_obs, fm, cycle_report, &
+subroutine DA_Obs_Count(count_obs, fm, cycle_report, &
                         outside, discard, &
                         inside_halo )
 !----------------------------------------------------------------------------   
@@ -23,7 +23,7 @@ SUBROUTINE DA_Obs_Count(count_obs, fm, cycle_report, &
     cycle_report = .false.
 
     if (outside .or. discard .or. (.not. inside_halo) ) then
-       CALL fm_decoder (fm, obs_platform, &
+       call fm_decoder (fm, obs_platform, &
                         count_obs %num_synop % num_outside_iyjx, &
                         count_obs %num_ships % num_outside_iyjx, &
                         count_obs %num_metar % num_outside_iyjx, &
@@ -47,7 +47,7 @@ SUBROUTINE DA_Obs_Count(count_obs, fm, cycle_report, &
        cycle_report = .true.
     else
 
-       CALL fm_decoder (fm, obs_platform, &
+       call fm_decoder (fm, obs_platform, &
                         count_obs %num_synop % num_used, &
                         count_obs %num_ships % num_used, &
                         count_obs %num_metar % num_used, &
@@ -69,4 +69,4 @@ SUBROUTINE DA_Obs_Count(count_obs, fm, cycle_report, &
                         count_obs %num_other % num_used)
     endif
 
-END SUBROUTINE DA_Obs_Count
+end subroutine DA_Obs_Count

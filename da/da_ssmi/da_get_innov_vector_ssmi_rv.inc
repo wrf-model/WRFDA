@@ -1,4 +1,4 @@
-SUBROUTINE da_get_innov_vector_ssmi_rv ( it, xb, xp, ob, iv )
+subroutine da_get_innov_vector_ssmi_rv ( it, xb, xp, ob, iv )
 
    IMPLICIT NONE
 
@@ -63,7 +63,7 @@ SUBROUTINE da_get_innov_vector_ssmi_rv ( it, xb, xp, ob, iv )
 !------------------------------------------------------------------------
 
      IF ( check_max_iv )   &
-        CALL da_check_max_iv_ssmi_rv(it, iv % ssmi_retrieval (n),&
+        call da_check_max_iv_ssmi_rv(it, iv % ssmi_retrieval (n),&
           itpw,itpwf, ispeed,ispeedf )
     endif
 
@@ -76,5 +76,5 @@ SUBROUTINE da_get_innov_vector_ssmi_rv ( it, xb, xp, ob, iv )
 
    ENDIF
 
-END SUBROUTINE da_get_innov_vector_ssmi_rv
+end subroutine da_get_innov_vector_ssmi_rv
 

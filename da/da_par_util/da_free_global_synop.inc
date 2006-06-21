@@ -1,4 +1,4 @@
-SUBROUTINE da_free_global_synop( iv_glob, re_glob, jo_grad_y_glob )
+subroutine da_free_global_synop( iv_glob, re_glob, jo_grad_y_glob )
 
     IMPLICIT NONE
 
@@ -11,5 +11,5 @@ SUBROUTINE da_free_global_synop( iv_glob, re_glob, jo_grad_y_glob )
     DEALLOCATE( re_glob%synop )
     DEALLOCATE( jo_grad_y_glob%synop )
     RETURN
-END SUBROUTINE da_free_global_synop
+end subroutine da_free_global_synop
 

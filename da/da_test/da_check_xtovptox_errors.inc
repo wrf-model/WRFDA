@@ -1,4 +1,4 @@
-SUBROUTINE da_check_xtovptox_errors( xa, xa2_u, xa2_v, xa2_w, xa2_t, &
+subroutine da_check_xtovptox_errors( xa, xa2_u, xa2_v, xa2_w, xa2_t, &
                                      xa2_p, xa2_q, xa2_rho, &
                                      xa2_qt, xa2_qcw, xa2_qrn, &
                                      ids,ide, jds,jde, kds,kde, &
