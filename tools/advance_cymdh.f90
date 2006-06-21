@@ -1,5 +1,9 @@
 program advance_cymdh
 
+#ifdef crayx1
+#define iargc ipxfargc
+#endif
+
    implicit none
 
    interface
@@ -114,5 +118,18 @@ contains
          end if
       end if
    end subroutine change_date
+
+#ifdef crayx1
+
+contains
+   subroutine getarg(i, harg)
+     implicit none
+     character(len=*) :: harg
+     integer :: ierr, ilen, i
+
+     call pxfgetarg(i, harg, ilen, ierr)
+     return
+   end subroutine getarg
+#endif
 
 end program advance_cymdh
