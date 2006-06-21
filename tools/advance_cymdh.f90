@@ -121,7 +121,6 @@ contains
 
 #ifdef crayx1
 
-contains
    subroutine getarg(i, harg)
      implicit none
      character(len=*) :: harg
