@@ -831,9 +831,10 @@ FCENDIAN        =
 FCBASE          = #-Ovector0 -Ostream0 -Oscalar1
 FCFLAGS_RSL     = $(FCENDIAN)
 
-CCFLAGS2        = -UCRAY -I$(RSL)/RSL -h gen_private_callee
+CCFLAGS2        = -UCRAY -Dcrayx1 -I$(RSL)/RSL -h gen_private_callee
+CCFLAGS_RSL     = -Dcrayx1
+
 CCFLAGS_BUFR    = -DUNDERSCORE
-CCFLAGS_RSL     =
 
 LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)
 
@@ -847,54 +848,6 @@ arch :
           $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
 	     MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
              LEARN_BCAST=-DLEARN_BCAST crayx1 )
-
-###########################################################
-#ARCH   crayx1 UNICOS/mp  CRAY X1 (KMA)
-#
-
-SED_FTN		= sed -f cray_csd.sed
-M4              = m4 -B12000
-FC              = ftn
-FFC             = $(FC)
-SFC             = $(FC)
-CC              = cc
-SCC             = $(CC)
-# Do not use cross-compiler for tools
-CC_TOOLS        = gcc
-RANLIB          = echo
-LD              = $(FC)
-
-TRADFLAG        = -traditional-cpp
-FPPFLAGS2       = -DNORESHAPE -Dcrayx1 -DNONSTANDARD_SYSTEM
-                    
-DM_CPPFLAGS     = -I$(RSL)/RSL
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
-
-#FCOPTIM        = -Ofp3 -O3
-FCOPTIM         = -Ofp2 -O1 -Ogen_private_callee
-#FCOPTIM        = -Ofp2 -O1
-FCDEBUG         = #-g
-FCTYPE          = -sinteger32 -e m -sreal64 -dp
-FCFREE          = -f free -N 255
-FCENDIAN        =
-FCBASE          = #-Ovector0 -Ostream0 -Oscalar1
-FCFLAGS_RSL     = $(FCENDIAN)
-
-CCFLAGS2        = -UCRAY -Dcrayx1 -I$(RSL)/RSL -h gen_private_callee
-CCFLAGS_RSL     = -Dcrayx1
-
-LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)
-
-LOCAL_LIB       = #-L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c -lX11
-MPI_LIB		= -L$(RSL)/RSL -lrsl
-
-arch : 
-	$(LN) $(RSL)/*.c .
-	$(LN) $(RSL)/*.F .
-	( cd $(RSL)/RSL ; \
-          $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)"  \
-            MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
-            LEARN_BCAST=-DLEARN_BCAST crayx1 )
 
 ###########################################################
 #ARCH Darwin		(xlf single-threaded, no nesting, for G4/5)
