@@ -297,7 +297,7 @@ SUBROUTINE da_solve_v3d ( grid , config_flags , &
       ! [8.1] Calculate nonlinear model trajectory 
 
       if (lvar4d) then
-         call system("runvar4dnl.bsh")
+         call system("da_run_wrfplus_nl.bsh")
       endif
 
       ! [8.2] Calculate innovation vector (O-B):
