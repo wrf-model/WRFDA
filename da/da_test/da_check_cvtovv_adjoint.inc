@@ -3,11 +3,11 @@ subroutine da_check_cvtovv_adjoint( cv_size, xb, xbx, xp, be, cv, vv, &
                                     ims,ime, jms,jme, kms,kme, &
                                     its,ite, jts,jte, kts,kte )
 
-!------------------------------------------------------------------------------
-!  PURPOSE: Test vtovv routine and adjoint for compatibility.
-!
-!  METHOD:  Standard adjoint test: < vv, vv > = < cv_adj, cv >.
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! PURPOSE: Test vtovv routine and adjoint for compatibility.
+   !
+   ! METHOD:  Standard adjoint test: < vv, vv > = < cv_adj, cv >.
+   !---------------------------------------------------------------------------
 
    IMPLICIT NONE
 
@@ -29,18 +29,20 @@ subroutine da_check_cvtovv_adjoint( cv_size, xb, xbx, xp, be, cv, vv, &
    REAL                              :: adj_sum_rhs ! < cv_adj, cv >
    real                              :: cv2(1:cv_size)! control variable.
 
-!-------------------------------------------------------------------------
-!  [1.0] Initialise:
-!-------------------------------------------------------------------------
+   !-------------------------------------------------------------------------
+   ! [1.0] Initialise:
+   !-------------------------------------------------------------------------
 
-   write(unit=*, fmt='(/a/)') 'DA_Check_CvToVv_Adjoint: Test Results:'
+   if (trace_use) call da_trace_entry("da_check_cvtovv_adjoint")
+
+   write(unit=*, fmt='(/a/)') 'da_check_cvtovv_adjoint: Test Results:'
       
-!-------------------------------------------------------------------------
-!  [2.0] Perform Vp = U_v Vv transform:
-!-------------------------------------------------------------------------
+   !-------------------------------------------------------------------------
+   ! [2.0] Perform Vp = U_v Vv transform:
+   !-------------------------------------------------------------------------
 
    if ( global ) then
-      call da_transform_vtovv_global( cv_size, xb, xbx, be, cv, vv, &
+      call da_transform_vtovv_global( cv_size, xbx, be, cv, vv, &
                                       ids, ide, jds, jde, kds, kde, &
                                       ims, ime, jms, jme, kms, kme, &
                                       its, ite, jts, jte, kts, kte )
@@ -51,9 +53,9 @@ subroutine da_check_cvtovv_adjoint( cv_size, xb, xbx, xp, be, cv, vv, &
                                its,ite, jts,jte, kts,kte )
    end if
 
-!-------------------------------------------------------------------------
-!  [3.0] Calculate LHS of adjoint test equation:
-!-------------------------------------------------------------------------
+   !----------------------------------------------------------------------
+   ! [3.0] Calculate LHS of adjoint test equation:
+   !----------------------------------------------------------------------
 
    adj_par_lhs = SUM( vv % v1(its:ite,jts:jte,1:be%v1%mz)**2 ) &
                + SUM( vv % v2(its:ite,jts:jte,1:be%v2%mz)**2 ) &
@@ -65,12 +67,12 @@ subroutine da_check_cvtovv_adjoint( cv_size, xb, xbx, xp, be, cv, vv, &
       adj_par_lhs = adj_par_lhs + sum( vv % alpha(its:ite,jts:jte,1:be%ne)**2 )
    end if
 
-!-------------------------------------------------------------------------
-!  [4.0] Calculate RHS of adjoint test equation:
-!-------------------------------------------------------------------------
+   !----------------------------------------------------------------------
+   ! [4.0] Calculate RHS of adjoint test equation:
+   !----------------------------------------------------------------------
 
    if ( global ) then
-       call da_transform_vtovv_global_adj( cv_size, xb, xbx, be, cv2, vv, &
+      call da_transform_vtovv_global_adj( cv_size, xb, xbx, be, cv2, vv, &
                                            ids, ide, jds, jde, kds, kde, &
                                            ims, ime, jms, jme, kms, kme, &
                                            its, ite, jts, jte, kts, kte )
@@ -83,14 +85,14 @@ subroutine da_check_cvtovv_adjoint( cv_size, xb, xbx, xp, be, cv, vv, &
 
    adj_par_rhs = SUM( cv(1:cv_size) * cv2(1:cv_size) )
 
-!-------------------------------------------------------------------------
-!  [5.0] Print output:
-!-------------------------------------------------------------------------
+   !----------------------------------------------------------------------
+   ! [5.0] Print output:
+   !----------------------------------------------------------------------
 
    if( .not. global) then
-   write(unit=stdout, fmt='(a,1pe22.14)') &
-        'Single Domain: < Vv, Vv >     = ', adj_par_lhs, &
-        'Single Domain: < cv_adj, cv > = ', adj_par_rhs
+      write(unit=stdout, fmt='(a,1pe22.14)') &
+         'Single Domain: < Vv, Vv >     = ', adj_par_lhs, &
+         'Single Domain: < cv_adj, cv > = ', adj_par_rhs
    endif
 
    adj_sum_lhs = wrf_dm_sum_real( adj_par_lhs )
@@ -102,8 +104,8 @@ subroutine da_check_cvtovv_adjoint( cv_size, xb, xbx, xp, be, cv, vv, &
    endif  
 
    WRITE(UNIT=stdout,FMT='(A,2F12.2)') &
-     'TEST_COVERAGE_DA_Check_CvToVv_Adjoint:  adj_sum_lhs,adj_sum_rhs = ', &
-     adj_sum_lhs,adj_sum_rhs
+      'TEST_COVERAGE_DA_Check_CvToVv_Adjoint:  adj_sum_lhs,adj_sum_rhs = ', &
+      adj_sum_lhs,adj_sum_rhs
    IF ( wrf_dm_on_monitor() ) THEN
       write(unit=stdout, fmt='(/)')
       write(unit=stdout, fmt='(a,1pe22.14)') &
@@ -112,6 +114,8 @@ subroutine da_check_cvtovv_adjoint( cv_size, xb, xbx, xp, be, cv, vv, &
    ENDIF
       
    write(unit=stdout, fmt='(/a/)') &
-        'DA_Check_CvToVv_Adjoint: Test Finished.'
+      'da_check_cvtovv_adjoint: Test Finished.'
+
+   if (trace_use) call da_trace_exit("da_check_cvtovv_adjoint")
 
 end subroutine da_check_cvtovv_adjoint

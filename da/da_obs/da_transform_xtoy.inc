@@ -60,7 +60,7 @@ subroutine da_transform_xtoy( xb, iv, xa, xp, y )
    ! [8.0] SSMI observation operator y = H(x):
    !------------------------------------------------------------------------------
 
-   call da_transform_xtoy_ssmi ( xb, iv, xa, xp, y )
+   call da_transform_xtoy_ssmi ( xb, iv, xa, y )
 
    !---------------------------------------------------------------------------
    ! [9.0] Pilot observation operator y = H(x):

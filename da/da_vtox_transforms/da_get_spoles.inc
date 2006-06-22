@@ -18,6 +18,12 @@ subroutine da_get_spoles(x,              &
    integer                :: k
    real                   :: tmpvar,tmps,tmp_s
 
+   ! Stop compiler whinge
+   if (kde==0 .OR. kds==0) THEN
+   END IF
+
+   if (trace_use) call da_trace_entry("da_get_spoles")
+
    tmpvar      = 1.0/real(ide-ids+1)
 
    do k = kts, kte
@@ -33,6 +39,8 @@ subroutine da_get_spoles(x,              &
       tmps = wrf_dm_sum_real( tmp_s )
       if (jte == jde) x(its:ite,jte,k) = tmps
    end do
+
+   if (trace_use) call da_trace_exit("da_get_spoles")
 
 end subroutine da_get_spoles
 

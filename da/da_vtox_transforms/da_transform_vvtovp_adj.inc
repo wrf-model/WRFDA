@@ -4,9 +4,9 @@ subroutine da_transform_vvtovp_adj( evec, eval, vertical_wgt, &
                                     ims,ime, jms,jme, kms,kme,  &
                                     its,ite, jts,jte, kts,kte )
 
-!------------------------------------------------------------------------------
-!  PURPOSE: Adjoint of DA_Transform_VvToVp.
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! PURPOSE: Adjoint of da_transform_vvtovp.
+   !---------------------------------------------------------------------------
 
    implicit none
    
@@ -24,23 +24,24 @@ subroutine da_transform_vvtovp_adj( evec, eval, vertical_wgt, &
    INTEGER               :: i, j, m, k                 ! Loop counters.
    REAL                  :: temp
 
-  IF (trace_use) call da_trace_entry("da_transform_vvtovp_adj")
-
-
-!-------------------------------------------------------------------
-!  [1.0] Apply inner-product weighting if vertical_ip > 0:
-!------------------------------------------------------------------- 
-
-   IF ( vertical_ip /= 0 ) THEN
-
-      vp(its:ite,jts:jte,kts:kte) = vp(its:ite,jts:jte,kts:kte) / &
-                                    vertical_wgt(its:ite,jts:jte,kts:kte)
-
+   ! Stop compiler whinge
+   IF (ide==0 .OR. ids==0) THEN
    END IF
 
-!-------------------------------------------------------------------
-!  [2.0] Perform vp(i,j,k) = E L^{1/2} vv(i,j,m) transform:
-!------------------------------------------------------------------- 
+   IF (trace_use) call da_trace_entry("da_transform_vvtovp_adj")
+
+   !-------------------------------------------------------------------
+   ! [1.0] Apply inner-product weighting if vertical_ip > 0:
+   !------------------------------------------------------------------- 
+
+   IF ( vertical_ip /= 0 ) THEN
+      vp(its:ite,jts:jte,kts:kte) = vp(its:ite,jts:jte,kts:kte) / &
+                                    vertical_wgt(its:ite,jts:jte,kts:kte)
+   END IF
+
+   !-------------------------------------------------------------------
+   ! [2.0] Perform vp(i,j,k) = E L^{1/2} vv(i,j,m) transform:
+   !------------------------------------------------------------------- 
 
    vv = 0.0
    DO m = 1, mz
@@ -56,7 +57,6 @@ subroutine da_transform_vvtovp_adj( evec, eval, vertical_wgt, &
    END DO
 
   IF (trace_use) call da_trace_exit("da_transform_vvtovp_adj")
-
 
 end subroutine da_transform_vvtovp_adj
 

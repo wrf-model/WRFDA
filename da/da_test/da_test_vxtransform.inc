@@ -198,7 +198,7 @@ subroutine da_test_vxtransform( xb, xbx, xp, be, &
 
    if( .not. global ) then
       call da_zero_x(xa)
-      call da_transform_vptox( xb, xbx, vp, xp, xa, be,    &
+      call da_transform_vptox( xb, vp, xp, xa, be,    &
                               ids,ide, jds,jde, kds,kde,  &
                               ims,ime, jms,jme, kms,kme,  &
                               its,ite, jts,jte, kts,kte )

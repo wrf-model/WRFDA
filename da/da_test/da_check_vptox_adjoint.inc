@@ -103,7 +103,7 @@ PRINT *,'TEST_COVERAGE_DA_Check_VpToX_Adjoint A:  adj_sum_lhs,adj_sum_rhs = ', a
 !  [2.0] Perform x = U vp transform:
 !-------------------------------------------------------------------------
 
-   call da_transform_vptox( xb, xbx, vp, xp, xa, be, ep, &
+   call da_transform_vptox( xb, vp, xp, xa, be, ep, &
                             ids,ide, jds,jde, kds,kde,   &
                             ims,ime, jms,jme, kms,kme,   &
                             its,ite, jts,jte, kts,kte )

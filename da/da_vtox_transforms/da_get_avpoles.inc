@@ -17,9 +17,15 @@ subroutine da_get_avpoles(u,v,lon,       &
    real,    intent(in)    :: lon(ims:ime,jms:jme)         ! Longitudes   
  
    real                   :: conv,tmpvar                                         
-   real                   :: tmpu,tmp_u,tmpv,tmp_v,tmpp,tmp_p,tmpps,tmp_ps
+   real                   :: tmpu,tmp_u,tmpv,tmp_v
    integer                :: k
    real, dimension(ims:ime) :: xls, xln
+
+   ! Stop compiler whinge
+   IF (kds==0 .OR. kde==0) THEN
+   END IF
+
+   if (trace_use) call da_trace_entry("da_get_avpoles")
 
    conv = pi/180.0
 
@@ -75,6 +81,8 @@ subroutine da_get_avpoles(u,v,lon,       &
          v(its:ite,jte,k) = 0.0
       end if
    end do
+
+   if (trace_use) call da_trace_entry("da_get_avpoles")
 
 end subroutine da_get_avpoles
 

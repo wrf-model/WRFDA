@@ -17,9 +17,16 @@ subroutine da_get_vpoles(u,v,lon,        &
    real, intent(in)       :: lon(ims:ime,jms:jme)         ! Longitudes   
  
    real                   :: conv,tmpvar                                         
-   real                   :: tmpu,tmp_u,tmpv,tmp_v,tmpp,tmp_p,tmpps,tmp_ps
+   real                   :: tmpu,tmp_u,tmpv,tmp_v
    integer                :: k
    real, dimension(ims:ime) :: xls, xln
+
+   ! Stop compiler whinge
+
+   if (kde==0.OR.kds==0) THEN
+   END IF
+
+   IF (trace_use) call da_trace_entry("da_get_vpoles")
 
    conv = pi/180.0
 
@@ -66,6 +73,8 @@ subroutine da_get_vpoles(u,v,lon,        &
          v(its:ite,jte,k) = -tmpu*sin(xln(its:ite)) -tmpv*cos(xln(its:ite))
       end if
    end do
+
+   IF (trace_use) call da_trace_exit("da_get_vpoles")
 
 end subroutine da_get_vpoles
 

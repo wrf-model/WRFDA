@@ -9,7 +9,7 @@ subroutine da_transform_xtoy_buoy_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
   TYPE (x_type) , INTENT(INOUT) :: jo_grad_x   ! grad_x(jo)
 
   INTEGER                       :: n        ! Loop counter.
-  INTEGER                       :: i, j, kz ! Index dimension.
+  INTEGER                       :: i, j     ! Index dimension.
   REAL                          :: dx, dxm  ! 
   REAL                          :: dy, dym  !
 

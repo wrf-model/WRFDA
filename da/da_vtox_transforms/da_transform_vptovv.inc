@@ -4,14 +4,12 @@ subroutine da_transform_vptovv( evec, eval, vertical_wgt, &
                                 ims,ime, jms,jme, kms,kme,  &
                                 its,ite, jts,jte, kts,kte )
 
-!------------------------------------------------------------------------------
-!  PURPOSE: Transform from fields on vertical levels to fields on vertical EOFS.
-!
-!  METHOD:  Perform vv(i,j,m) = L^{-1/2} E^{T} vp(i,j,k) transform.
-!
-!  HISTORY: 02/23/2000 - Creation of F90 version.           Dale Barker
-!           10/30/2001 - Parallel version.                  Dale Barker
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! PURPOSE: Transform from fields on vertical levels to fields on vertical 
+   ! EOFS.
+   !
+   !  METHOD:  Perform vv(i,j,m) = L^{-1/2} E^{T} vp(i,j,k) transform.
+   !---------------------------------------------------------------------------
 
    implicit none
 
@@ -28,20 +26,24 @@ subroutine da_transform_vptovv( evec, eval, vertical_wgt, &
    INTEGER               :: i, j, m                    ! Loop counters.
    REAL                  :: ETVp                       ! E(k,m)^{T}*vp(i,j,k)
 
+   ! Stop compiler whinge
+   IF (ids==0 .OR. ide==0 .OR. jde==0) THEN
+   END IF
+
    IF (trace_use) call da_trace_entry("da_transform_vptovv")
    
-!-------------------------------------------------------------------
-!  [1.0] Apply inner-product weighting if vertical_ip > 0:
-!------------------------------------------------------------------- 
+   !-------------------------------------------------------------------
+   ! [1.0] Apply inner-product weighting if vertical_ip > 0:
+   !------------------------------------------------------------------- 
 
    IF ( vertical_ip /= 0 ) THEN
       vp(its:ite,jts:jte,kts:kte) = vp(its:ite,jts:jte,kts:kte) * &
                                     vertical_wgt(its:ite,jts:jte,kts:kte)
    END IF
 
-!-------------------------------------------------------------------
-!  [2.0] Perform vv(i,j,m) = L^{-1/2} E^T vp(i,j,k) transform:
-!-------------------------------------------------------------------
+   !-------------------------------------------------------------------
+   ! [2.0] Perform vv(i,j,m) = L^{-1/2} E^T vp(i,j,k) transform:
+   !-------------------------------------------------------------------
 
    do m = 1, mz
       do j = jts, jte

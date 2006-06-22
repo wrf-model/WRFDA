@@ -19,6 +19,13 @@ subroutine da_get_aspoles(x,              &
 
    tmpvar      = 1.0/real(ide-ids+1)
 
+   ! Stop compiler whinge
+
+   if (kde ==0) THEN
+   END IF
+
+   if (trace_use) call da_trace_entry("da_get_aspoles")
+
    do k = kts, kte
       tmps =0.0  ; tmp_s =0.0
       if (jts == jds) tmp_s = tmpvar*sum(x(its:ite,jts,k))
@@ -38,6 +45,8 @@ subroutine da_get_aspoles(x,              &
          x(its:ite,jte,k) = 0.0
       endif
    end do
+
+   if (trace_use) call da_trace_exit("da_get_aspoles")
 
 end subroutine da_get_aspoles
 

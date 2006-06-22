@@ -1,4 +1,4 @@
-subroutine da_transform_vptox( xb, xbx, vp, xp, xa, be, ep, &
+subroutine da_transform_vptox( xb, vp, xp, xa, be, ep, &
                                ids,ide, jds,jde, kds,kde,   &
                                ims,ime, jms,jme, kms,kme,   &
                                its,ite, jts,jte, kts,kte )
@@ -10,7 +10,6 @@ subroutine da_transform_vptox( xb, xbx, vp, xp, xa, be, ep, &
    implicit none
    
    type (xb_type), intent(in)           :: xb  ! First guess structure.
-   type (xbx_type),intent(in)           :: xbx ! Header & non-gridded vars.
    type (vp_type), intent(inout)        :: vp  ! CV on grid structure.
    type (xpose_type), intent(inout)     :: xp  ! Transpose variables.
    type (x_type), intent(out)           :: xa  ! Analysis increments.

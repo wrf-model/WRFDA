@@ -3,15 +3,9 @@ subroutine da_get_innov_vector( it, ob, iv, &
 #include "em_dummy_args.inc"
                  )
 
-
-!----------------------------------------------------------------------------
-!--Purpose: Compute O-B for different observation types:
-!           03/04/2005 - AMV's from Geostationary and       Syed  RH  Rizvi
-!                        Polar orbiting satellite are
-!                        seperated & used as profile
-!              07/2005 - Add radiance part                  Zhiquan Liu
-!
-!----------------------------------------------------------------------------
+   !-------------------------------------------------------------------------
+   !  Purpose: Compute O-B for different observation types:
+   !-------------------------------------------------------------------------
 
    IMPLICIT NONE
 
@@ -21,7 +15,7 @@ subroutine da_get_innov_vector( it, ob, iv, &
    TYPE(domain) ,  INTENT(INOUT) :: grid
    TYPE (grid_config_rec_type)   :: config_flags
 
-!--Definitions of dummy arguments to solve
+   ! Definitions of dummy arguments to solve
 #include "em_dummy_decl.inc"
 
    TYPE(xbx_type)     :: xbx          ! Header & non-gridded vars.
@@ -31,9 +25,6 @@ subroutine da_get_innov_vector( it, ob, iv, &
    integer            :: n
 
    IF (trace_use) call da_trace_entry("da_get_innov_vector")
-
-
-!----------------------------------------------------------------------------   
 
    call wrf_message("[5.1] Calculate innovation vector (iv)")
 
@@ -52,89 +43,88 @@ subroutine da_get_innov_vector( it, ob, iv, &
                            )
       endif
 
-!-----Radiosonde:
+      ! Radiosonde:
 
       call da_get_innov_vector_sound( it, xb, xp, ob, iv )
       call da_get_innov_vector_sonde_sfc( it, xb, xp, ob, iv )
 
-!-----Surface
+      ! Surface
 
       call da_get_innov_vector_synop( it, xb, xp, ob, iv )
 
-!-----Geostationary Satellite AMVs:
+      ! Geostationary Satellite AMVs:
 
       call da_get_innov_vector_geoamv( it, xb, xp, ob, iv )
 
-
-!-----Polar orbitting Satellite AMVs:
+      ! Polar orbitting Satellite AMVs:
 
       call da_get_innov_vector_polaramv( it, xb, xp, ob, iv )
 
-!-----Aireps:
+      ! Aireps:
 
       call da_get_innov_vector_airep( it, xb, xp, ob, iv )
 
-!-----Pilot:
+      ! Pilot:
 
       call da_get_innov_vector_pilot( it, xb, xp, ob, iv )
 
-!-----TC bogus
+      ! TC bogus
 
       call da_get_innov_vector_bogus( it, xb, xp, ob, iv )
 
-!-----Metar:
+      ! Metar:
 
       call da_get_innov_vector_metar( it, xb, xp, ob, iv )
 
-!-----Ships:
+      ! Ships:
 
       call da_get_innov_vector_ships( it, xb, xp, ob, iv )
 
-!-----GPSPW:
+      ! GPSPW:
 
       call da_get_innov_vector_gpspw( it, xb, xp, ob, iv )
 
-!-----GPSRF: 
+      ! GPSRF: 
  
       call da_get_innov_vector_gpsref( it, xb, xp, ob, iv ) 
 
-!-----SSMI:
+      ! SSMI:
 
-      call da_get_innov_vector_ssmi( it, xb, xp, ob, iv )
+      call da_get_innov_vector_ssmi( it, xb, ob, iv )
 
-!-----SSMT1:
+      ! SSMT1:
 
       call da_get_innov_vector_ssmt1( it, xb, xp, ob, iv )
 
-!-----SSMT2:
+      ! SSMT2:
 
       call da_get_innov_vector_ssmt2( it, xb, xp, ob, iv )
 
-!-----SATEM:
+      ! SATEM:
 
       call da_get_innov_vector_satem( it, xb, xp, ob, iv )
 
-!-----Radar obs:
+      ! Radar obs:
 
       call da_get_innov_vector_Radar( it, xb, xp, ob, iv )
 
-!-----Scatterometer:
+      ! Scatterometer:
 
       call da_get_innov_vector_qscat( it, xb, xp, ob, iv )
 
-!-----Profiler:
+      ! Profiler:
 
       call da_get_innov_vector_profiler( it, xb, xp, ob, iv )
 
-!-----Buoy:
+      ! Buoy:
 
       call da_get_innov_vector_buoy( it, xb, xp, ob, iv )
 
-!-----Radiance:
+      ! Radiance:
 
       call da_get_innov_vector_rad( it, xb, xp, ob, iv )
 
-!-----Pseudo obs:
+      ! Pseudo obs:
 
       call da_get_innov_vector_pseudo( xb, xp, ob, iv )
 
@@ -142,26 +132,24 @@ subroutine da_get_innov_vector( it, ob, iv, &
 
    iv%current_ob_time = 1
 
-!---------------------------------------------------------------------------  
-!--[2] Having calculated the real O-Bs, optionally overwrite with scaled,
-!--    random values:
-!--------------------------------------------------------------------------- 
+   !-------------------------------------------------------------------------
+   ! [2] Having calculated the real O-Bs, optionally overwrite with scaled,
+   !    random values:
+   !-------------------------------------------------------------------------
    
    if ( omb_set_rand ) call da_random_omb_all( iv, ob )
    
-!---------------------------------------------------------------------------  
-!--[3] Optionally rescale observation errors:
-!--------------------------------------------------------------------------- 
+   !------------------------------------------------------------------------- 
+   ! [3] Optionally rescale observation errors:
+   !-------------------------------------------------------------------------
    
    if ( use_obs_errfac ) call da_use_obs_errfac( iv )
 
-!---------------------------------------------------------------------------  
-!--[4] Optionally add Gaussian noise to O, O-B:
-!--------------------------------------------------------------------------- 
+   !------------------------------------------------------------------------ 
+   ! [4] Optionally add Gaussian noise to O, O-B:
+   !------------------------------------------------------------------------ 
 
    if ( omb_add_noise ) call da_add_noise_to_ob( iv, ob )
-
-!--------------------------------------------------------------------------- 
 
    if(num_fgat_time > 1) then
       call da_med_initialdata_input ( grid , config_flags )
@@ -171,7 +159,6 @@ subroutine da_get_innov_vector( it, ob, iv, &
    endif
 
    IF (trace_use) call da_trace_exit("da_get_innov_vector")
-
 
 end subroutine da_get_innov_vector
 
