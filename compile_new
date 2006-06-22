@@ -138,6 +138,7 @@ else
   echo " "
 
   cd build
+  touch depend.txt
   make -r setup
   make -r $arglist A2DCASE="$A2DCASE"
 
