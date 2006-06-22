@@ -83,7 +83,8 @@ libwrfplus.a : $(WRFPLUS_MODULES_WRFPLUS) $(WRFPLUS_OBJS)
 clean :
 	@ $(RM) *.exe *.o *.mod *.b *.a *.f inc/*.inc frame/*.f90 registry \
           Registry_tmp* module_state_description.f90 bufrlib.prm \
-          $(RSL)/RSL/*.a $(RSL)/RSL/*.o
+          $(EXTERNAL)/*.o $(EXTERNAL)/*.a $(EXTERNAL)/*/*.o $(EXTERNAL)/*/*.a \
+          inc/dm_comm_cpp_flags
 
 superclean : clean
 	@ $(RM) *.f90 *.F90 *.F *.inc *.int *.c *.h *.m4 *.code *.make \
