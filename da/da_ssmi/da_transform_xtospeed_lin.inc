@@ -1,22 +1,24 @@
+subroutine da_transform_xtospeed_lin(TGL_speed,U,V,TGL_u,TGL_v)
 
-subroutine DA_Transform_XToSpeed_Lin(TGL_speed,U,V,TGL_u,TGL_v)
+   !----------------------------------------------------------------------------
+   ! Convert (U-V in m/s) components into wind speed (Speed in m/s)
+   !----------------------------------------------------------------------------
 
-!------------------------------------------------------------------------------!
-! Convert (U-V in m/s) components into wind speed (Speed in m/s)
-!------------------------------------------------------------------------------!
+   IMPLICIT NONE
 
-    IMPLICIT NONE
+   REAL,     INTENT (out  )    :: TGL_speed
+   REAL,     INTENT (in   )    :: U,V
+   REAL,     INTENT (in   )    :: TGL_u,TGL_v
+   REAL                        :: speed
 
-    REAL,     INTENT (out  )    :: TGL_speed
-    REAL,     INTENT (in   )    :: U,V
-    REAL,     INTENT (in   )    :: TGL_u,TGL_v
-    REAL                        :: speed
-!------------------------------------------------------------------------------!
+   IF (trace_use) call da_trace_entry("da_transform_xtospeed_lin")
 
-    speed = sqrt( U*U + V*V + 1.E-6)
+   speed = sqrt( U*U + V*V + 1.E-6)
 
-    TGL_speed = (U*TGL_u + V*TGL_v)/speed
+   TGL_speed = (U*TGL_u + V*TGL_v)/speed
 
-end subroutine DA_Transform_XToSpeed_Lin
+   IF (trace_use) call da_trace_exit("da_transform_xtospeed_lin")
+
+end subroutine da_transform_xtospeed_lin
 
 
