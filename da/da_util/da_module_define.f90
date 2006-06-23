@@ -1,5 +1,5 @@
 
-module record_header
+module da_record_header
 
    implicit none
 
@@ -28,10 +28,10 @@ module record_header
    type (big_record_header) :: big_header
    type (sub_record_header) :: sub_header
 
-end module record_header
+end module da_record_header
 
 
-module color_table
+module da_color_table
 
    implicit none
 
@@ -48,10 +48,10 @@ module color_table
                         yellow = 10, &
                           gray = 11
 
-end module color_table
+end module da_color_table
 
 
-module plot_parameters
+module da_plot_parameters
 
    implicit none
 
@@ -65,9 +65,9 @@ module plot_parameters
                          yfb = 0.10, &
                          yfe = 0.90
 
-end module plot_parameters
+end module da_plot_parameters
 
-module mm5_model_state
+module da_mm5_model_state
  
    implicit none
 
@@ -90,5 +90,5 @@ module mm5_model_state
    integer, parameter :: dot=0, &
                          crs=1
 
-end module mm5_model_state
+end module da_mm5_model_state
 

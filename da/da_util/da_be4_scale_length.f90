@@ -35,7 +35,7 @@ program da_scale_length
    write(6,'(a)')' [1] Initialize namelist variables and other scalars.'
 !---------------------------------------------------------------------------------------------
 
-   vertical_ip = 0
+!    vertical_ip = 0
 
    start_date = '2004030312'
    end_date = '2004033112'

@@ -1,15 +1,15 @@
-module module_graph
+module da_module_graph
 
-   use color_table
-   use plot_parameters
+   use da_color_table
+   use da_plot_parameters
 
    implicit none
 
 CONTAINS
 
-   include 'close_gks.inc'
-   include 'open_gks.inc'
-   include 'setup_color_table.inc'
+#include "da_close_gks.inc"
+#include "da_open_gks.inc"
+#include "da_setup_color_table.inc"
 
-end module module_graph
+end module da_module_graph
 

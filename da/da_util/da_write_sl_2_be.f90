@@ -1,7 +1,7 @@
 program da_write_sl_2_be
 
-   use record_header
-   use module_io
+   use da_record_header
+   use da_module_io
 
    implicit none
 

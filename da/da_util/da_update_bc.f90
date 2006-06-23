@@ -1,7 +1,7 @@
 program da_update_bc
 
-   use record_header
-   use module_io
+   use da_record_header
+   use da_module_io
 
    implicit none
 

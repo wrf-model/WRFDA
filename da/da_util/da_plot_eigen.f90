@@ -1,9 +1,9 @@
 program da_plot_eigen
 
    use color_table
-   use record_header
+   use da_record_header
    use plot_parameters
-   use module_io
+   use da_module_io
    use module_graph
 
    implicit none

@@ -1,4 +1,4 @@
-subroutine setup_color_table
+subroutine da_setup_color_table
 
    implicit none
 
@@ -15,4 +15,4 @@ subroutine setup_color_table
    call gscr(1, 10, 1.00, 1.00, 0.00) ! Yellow
    call gscr(1, 11, 0.60, 0.60, 0.60) ! Gray
 
-end subroutine setup_color_table
+end subroutine da_setup_color_table
