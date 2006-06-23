@@ -349,7 +349,11 @@ state   real    cf1            -        misc      -         -     irh       "cf1
 state   real    cf2            -        misc      -         -     irh       "cf2"                   "2nd order extrapolation constant"         ""      
 state   real    cf3            -        misc      -         -     irh       "cf3"                   "2nd order extrapolation constant"         ""      
 state   integer number_at_same_level    -        -          -         -     -        "number_at_same_level"  ""         ""      
+
+# State for derived time quantities.  
 state   integer itimestep      -        -          -         -     rh         "itimestep"             ""         ""      
+state   real    xtime          -        -          -         -     rh         "xtime"                 "minutes since simulation start"         ""      
+state   real    julian         -        -          -         -     -          "julian"                "day of year"         ""      
 
 # for noise diagnoses
 
