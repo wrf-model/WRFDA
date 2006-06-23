@@ -1,4 +1,4 @@
-subroutine make_large(sub_header_small, sub_header_large, &
+subroutine da_make_large(sub_header_small, sub_header_large, &
                       data_small, iy, jx, iy_large, jx_large, &
                       lliy, lljx, output_unit)
 
@@ -58,7 +58,7 @@ subroutine make_large(sub_header_small, sub_header_large, &
    endif
 
    if(print_info) then
-      call print_sub_header(sub_header_small)
+      call da_print_sub_header(sub_header_small)
 
       write(unit=*, fmt='(a,e24.14)') &
            'Sample value:', data_small(1,1,1,1)
@@ -193,5 +193,5 @@ subroutine make_large(sub_header_small, sub_header_large, &
 
    deallocate(data_large)
 
-end subroutine make_large
+end subroutine da_make_large
 

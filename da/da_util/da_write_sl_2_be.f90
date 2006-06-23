@@ -31,7 +31,7 @@ program da_write_sl_2_be
          endif
 
          if(print_info) &
-         call print_big_header(big_header%bhi,  big_header%bhr, &
+         call da_print_big_header(big_header%bhi,  big_header%bhr, &
                                big_header%bhic, big_header%bhrc)
 
          iy=big_header%bhi(5,1)
@@ -217,7 +217,7 @@ CONTAINS
       sub_header%description(1:k) = description(1:k)
 
       if(print_info) &
-      call print_sub_header(sub_header)
+      call da_print_sub_header(sub_header)
 
       write(output_unit) flag
 

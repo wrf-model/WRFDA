@@ -1,10 +1,10 @@
 program da_plot_eigen
 
-   use color_table
+   use da_color_table
    use da_record_header
-   use plot_parameters
+   use da_plot_parameters
    use da_module_io
-   use module_graph
+   use da_module_graph
 
    implicit none
 

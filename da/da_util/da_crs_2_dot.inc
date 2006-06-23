@@ -1,4 +1,4 @@
-SUBROUTINE crs_2_dot (crs, dot)
+SUBROUTINE da_crs_2_dot (crs, dot)
 
    implicit none
 
@@ -30,4 +30,4 @@ SUBROUTINE crs_2_dot (crs, dot)
    dot (ix,jx) = crs (ix-1,jx-1)
    dot (ix, 1) = crs (ix-1,   1)
 
-END SUBROUTINE crs_2_dot
+END SUBROUTINE da_crs_2_dot

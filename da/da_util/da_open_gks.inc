@@ -1,4 +1,4 @@
-subroutine open_gks(fname)
+subroutine da_open_gks(fname)
 
    implicit none
 
@@ -17,5 +17,5 @@ subroutine open_gks(fname)
 
    call gsclip(0)
 
-end subroutine open_gks
+end subroutine da_open_gks
 

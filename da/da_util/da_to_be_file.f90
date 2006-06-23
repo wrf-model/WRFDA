@@ -2,7 +2,7 @@ program da_to_be_file
 
    use da_record_header
    use da_module_io
-   use module_trans
+   use da_module_trans
 
    implicit none
 
@@ -42,7 +42,7 @@ program da_to_be_file
          endif
 
          if(print_info) then
-            call print_big_header(big_header_large%bhi, big_header_large%bhr, &
+            call da_print_big_header(big_header_large%bhi, big_header_large%bhr, &
                                   big_header_large%bhic,big_header_large%bhrc)
          end if
 
@@ -68,7 +68,7 @@ program da_to_be_file
               sub_header_large%description
 
          if(print_info) then
-            call print_sub_header(sub_header_large)
+            call da_print_sub_header(sub_header_large)
          end if
 
          if(sub_header_large%ndim == 3) exit
@@ -100,7 +100,7 @@ program da_to_be_file
          miy_small_coarse=big_header_small%bhi(5,1)
          mjx_small_coarse=big_header_small%bhi(6,1)
 
-         call get_lliy_lljx(big_header_small, big_header_large, lliy, lljx)
+         call da_get_lliy_lljx(big_header_small, big_header_large, lliy, lljx)
 
          mkx=big_header_small%bhi(12,5)
 
@@ -160,7 +160,7 @@ program da_to_be_file
          enddo
 
          if(print_info) then
-            call print_big_header(big_header_small%bhi, big_header_small%bhr, &
+            call da_print_big_header(big_header_small%bhi, big_header_small%bhr, &
                                   big_header_small%bhic,big_header_small%bhrc)
          end if
 
@@ -203,7 +203,7 @@ program da_to_be_file
 
                write(output_unit) flag
 
-               call make_large(sub_header_small, sub_header_large, data_small, &
+               call da_make_large(sub_header_small, sub_header_large, data_small, &
                                miy_small, mjx_small, miy_large, mjx_large, &
                                lliy, lljx, output_unit)
 
@@ -226,7 +226,7 @@ program da_to_be_file
          deallocate(data_small)
 
          if(print_info) then
-            call print_sub_header(sub_header_small)
+            call da_print_sub_header(sub_header_small)
          end if
 
       elseif (flag == 2) then

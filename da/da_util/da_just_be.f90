@@ -2,7 +2,7 @@ program da_just_be
 
    use da_record_header
    use da_module_io
-   use module_trans
+   use da_module_trans
 
    implicit none
 
@@ -38,7 +38,7 @@ program da_just_be
          vert_corr = big_header%bhi(26,idx)
 
          if(print_info) then
-            call print_big_header(big_header%bhi, big_header%bhr, &
+            call da_print_big_header(big_header%bhi, big_header%bhr, &
                                   big_header%bhic,big_header%bhrc)
          end if
 
@@ -101,7 +101,7 @@ program da_just_be
          deallocate(data)
 
          if(print_info) then
-            call print_sub_header(sub_header)
+            call da_print_sub_header(sub_header)
          end if
 
       elseif (flag == 2) then

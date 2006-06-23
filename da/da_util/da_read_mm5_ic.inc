@@ -1,4 +1,4 @@
-subroutine read_mm5_ic(input_unit, error)
+subroutine da_read_mm5_ic(input_unit, error)
 
    implicit none
 
@@ -31,7 +31,7 @@ subroutine read_mm5_ic(input_unit, error)
          endif
 
          if(print_info) &
-         call print_big_header(big_header%bhi, big_header%bhr, &
+         call da_print_big_header(big_header%bhi, big_header%bhr, &
                                big_header%bhic,big_header%bhrc)
 
          mix = big_header%bhi(16, 1)
@@ -68,7 +68,7 @@ subroutine read_mm5_ic(input_unit, error)
          endif
 
          if(print_info) then
-            call print_sub_header(sub_header)
+            call da_print_sub_header(sub_header)
          endif
 
          allocate(data(sub_header%start_index(1):sub_header%end_index(1), &
@@ -83,22 +83,22 @@ subroutine read_mm5_ic(input_unit, error)
          elseif (sub_header%name ==  'V        ') then
             vvv(:,:,:) = data(:,:,:,1)
          elseif (sub_header%name ==  'T        ') then
-            call cleanRows(data, sub_header)
+            call da_clean_rows(data, sub_header)
             ttt(:,:,:) = data(:,:,:,1)
          elseif (sub_header%name ==  'Q        ') then
-            call cleanRows(data, sub_header)
+            call da_clean_rows(data, sub_header)
             qqq(:,:,:) = data(:,:,:,1)
          elseif (sub_header%name ==  'W        ') then
-            call cleanRows(data, sub_header)
+            call da_clean_rows(data, sub_header)
             www(:,:,:) = data(:,:,:,1)
          elseif (sub_header%name ==  'PP       ') then
-            call cleanRows(data, sub_header)
+            call da_clean_rows(data, sub_header)
             ppp(:,:,:) = data(:,:,:,1)
          elseif (sub_header%name ==  'PSTARCRS ') then
-            call cleanRows(data, sub_header)
+            call da_clean_rows(data, sub_header)
             ps_crs(:,:) = data(:,:,1,1)
 
-            call crs_2_dot(ps_crs, ps_dot)
+            call da_crs_2_dot(ps_crs, ps_dot)
          endif
 
          deallocate(data)
@@ -140,4 +140,4 @@ subroutine read_mm5_ic(input_unit, error)
    write(*,'(/,"Hit the end of file of unit ", I3)') &
          input_unit
 
-END SUBROUTINE read_mm5_ic
+END SUBROUTINE da_read_mm5_ic

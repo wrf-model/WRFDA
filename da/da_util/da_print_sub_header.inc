@@ -1,4 +1,4 @@
-   subroutine print_sub_header(sub_header)
+   subroutine da_print_sub_header(sub_header)
       type (sub_record_header), intent(in) :: sub_header
 
 !  write(unit=*, fmt='(a, i5)')  'ndim:        ', sub_header%ndim
@@ -26,4 +26,4 @@
          sub_header%units, &
          sub_header%description
 
-   end subroutine print_sub_header
+   end subroutine da_print_sub_header

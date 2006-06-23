@@ -1,7 +1,7 @@
 module da_module_io
 
    use da_record_header
-   use mm5_model_state
+   use da_mm5_model_state
 
    implicit none
 

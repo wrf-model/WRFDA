@@ -66,7 +66,7 @@ program da_generate_difference
             call abort()
          endif
 
-         call print_big_header(big_header_two%bhi, big_header_two%bhr, &
+         call da_print_big_header(big_header_two%bhi, big_header_two%bhr, &
                                big_header_two%bhic,big_header_two%bhrc)
 
          miy_two=big_header_two%bhi(16,1)
@@ -103,7 +103,7 @@ program da_generate_difference
 
          read(input_unit_1) data_one
 
-         call cleanRows(data_one, sub_header_one)
+         call da_clean_rows(data_one, sub_header_one)
 
          if(it_is_3dvar_analysis) then
             if(sub_header_one%name == 'TSFC     ' .or. &
@@ -152,7 +152,7 @@ program da_generate_difference
 
          read(input_unit_2) data_two
 
-         call cleanRows(data_two, sub_header_two)
+         call da_clean_rows(data_two, sub_header_two)
 
          write_index = 0
 
@@ -207,8 +207,8 @@ program da_generate_difference
             data_two(:,:,:,:)=data_two(:,:,:,:)-data_one(:,:,:,:)
          end if
 
-         call print_sub_header(sub_header_one)
-         call print_sub_header(sub_header_two)
+         call da_print_sub_header(sub_header_one)
+         call da_print_sub_header(sub_header_two)
 
          write(output_unit) data_two
 
@@ -246,7 +246,7 @@ program da_generate_difference
 
             read(input_unit_2) data_two
 
-            call cleanRows(data_two, sub_header_two)
+            call da_clean_rows(data_two, sub_header_two)
 
             deallocate(data_two)
          end do

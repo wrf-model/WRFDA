@@ -20,7 +20,7 @@ program da_update_bc
    print_info = .true.
 
 
-   call read_mm5_ic(ic_unit, ier)
+   call da_read_mm5_ic(ic_unit, ier)
 
    if(ier /= 0) then
       write(unit=*, fmt='(a)') &
@@ -50,7 +50,7 @@ program da_update_bc
          endif
 
          if(print_info) &
-         call print_big_header(big_header%bhi,  big_header%bhr, &
+         call da_print_big_header(big_header%bhi,  big_header%bhr, &
                                big_header%bhic, big_header%bhrc)
 
          time_interval=big_header%bhr(1,7)
@@ -85,7 +85,7 @@ program da_update_bc
          read(bc_unit) data
 
 !        if(print_info) &
-         call print_sub_header(sub_header)
+         call da_print_sub_header(sub_header)
 
          write(output_unit) &
                sub_header%ndim, &
@@ -211,7 +211,7 @@ program da_update_bc
          endif
 
          if(print_info) &
-         call print_big_header(big_header%bhi,  big_header%bhr, &
+         call da_print_big_header(big_header%bhi,  big_header%bhr, &
                                big_header%bhic, big_header%bhrc)
 
          write(output_unit) big_header%bhi,  big_header%bhr, &
@@ -238,7 +238,7 @@ program da_update_bc
          read(bc_unit) data
 
 !        if(print_info) &
-         call print_sub_header(sub_header)
+         call da_print_sub_header(sub_header)
 
          write(output_unit) &
                sub_header%ndim, &

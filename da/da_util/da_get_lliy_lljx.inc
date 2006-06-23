@@ -1,4 +1,4 @@
-   subroutine get_lliy_lljx(big_header_CAA_domain, big_header_current, &
+   subroutine da_get_lliy_lljx(big_header_CAA_domain, big_header_current, &
                             lliy, lljx)
 
       implicit none
@@ -106,4 +106,4 @@
               'lljx_CAA_domain=',lljx_CAA_domain, &
               'lliy=',lliy,'lljx=',lljx
 
-   end subroutine get_lliy_lljx
+   end subroutine da_get_lliy_lljx

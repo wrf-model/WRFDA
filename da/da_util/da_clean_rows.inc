@@ -1,4 +1,4 @@
-subroutine cleanRows(data, sub_header)
+subroutine da_clean_rows(data, sub_header)
 
    implicit none
 
@@ -57,4 +57,4 @@ subroutine cleanRows(data, sub_header)
       end if
    end if
 
-end subroutine cleanRows
+end subroutine da_clean_rows

@@ -27,7 +27,7 @@ program da_scale_length
 
    call opngks
 
-   call setup_color_table
+   call da_setup_color_table
 
 !  set background white
 
@@ -383,10 +383,10 @@ end program da_scale_length
       xpe=sqrt(real((nx-1)*(nx-1)+(ny-1)*(ny-1)))
 
       if(plot_switch > 0) then
-         call point_plot(plt,num,nx,ny,nt,ib,jb,ie,je, &
+         call da_point_plot(plt,num,nx,ny,nt,ib,jb,ie,je, &
                              xpb,xpe,ypb,ype)
       else
-         call line_plot(plt,num,nx,ny,nt,ib,jb,ie,je, &
+         call da_line_plot(plt,num,nx,ny,nt,ib,jb,ie,je, &
                             xpb,xpe,ypb,ype)
       end if
 

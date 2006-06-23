@@ -55,3 +55,64 @@ inc/da_generic_boilerplate.inc: da_generic_boilerplate.m4
 	@ $(RM) inc/da_generic_boilerplate.inc
 	  $(M4) da_generic_boilerplate.m4 > inc/da_generic_boilerplate.inc
 
+da_utils : da_diagnostics \
+           da_generate_difference \
+           da_ominusb \
+           da_just_be \
+           da_to_be_file \
+           da_tune \
+           da_update_bc \
+           da_write_sl_2_be
+
+da_plots : da_scale_length \
+           da_plot_eigen \
+           da_plot_eigen_in_be \
+           da_plot_eigen_gen_be
+           
+
+da_be4_scale_length: da_be4_scale_length.o
+	$(LD) -o $@.exe $@.o
+
+da_scale_length: da_scale_length.o
+	$(LD) -o $@.exe $@.o da_constants.o
+
+da_diagnostics: da_diagnostics.o
+	$(LD) -o $@.exe $@.o
+
+da_generate_difference: da_generate_difference.o
+	$(LD) -o $@.exe $@.o da_module_io.o da_module_define.o
+
+da_ominusb: da_ominusb.o
+	$(LD) -o $@.exe $@.o
+
+da_just_be: da_just_be.o
+	$(LD) -o $@.exe $@.o  da_module_io.o  da_module_trans.o \
+           da_module_define.o
+
+da_plot_eigen: da_plot_eigen.o
+	$(LD) -o $@.exe $@.o
+
+da_plot_eigen_in_be: da_plot_eigen_in_be.o
+	$(LD) -o $@.exe $@.o
+
+da_plot_eigen_gen_be: da_plot_eigen_gen_be.o
+	$(LD) -o $@.exe $@.o
+
+da_to_be_file: da_to_be_file.o
+	$(LD) -o $@.exe $@.o da_module_io.o  da_module_trans.o \
+           da_module_define.o
+
+da_tune: da_tune.o
+	$(LD) -o $@.exe $@.o
+
+da_update_bc: da_update_bc.o
+	$(LD) -o $@.exe $@.o da_module_io.o  da_module_trans.o \
+           da_module_define.o
+
+da_write_sl_2_be: da_write_sl_2_be.o
+	$(LD) -o $@.exe $@.o da_module_io.o  da_module_trans.o \
+           da_module_define.o
+
+grabbufr: grabbufr.o
+	$(LD) -o $@.exe $@.o
+
