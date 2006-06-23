@@ -11,8 +11,6 @@ links :
 	@ $(LN) $(MAIN)/* .
 	@ $(LN) $(TOOLS)/*.make .
 	@ $(LN) $(TOOLS)/*.f90 .
-	@ $(LN) $(TOOLS)/*.F90 .
-	@ $(LN) $(TOOLS)/*.F .
 	@ $(LN) $(TOOLS)/*.c .
 	@ $(LN) $(TOOLS)/*.h .
 	@ $(LN) $(DA)/*/* .
