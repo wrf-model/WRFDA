@@ -1468,15 +1468,15 @@ subroutine da_calc_new_factors1( ob_name, ob_num, ob_num_tot, &
    if ( j4e > 0.0 ) f4 = sqrt( j4a / j4e )
    if ( j5e > 0.0 ) f5 = sqrt( j5a / j5e )
    
-   write(6,'(x,a5,a21,2i8,6f15.5)')ob_name, ' obs, Jo (expected)= ', &
+   write(6,'(1x,a5,a21,2i8,6f15.5)')ob_name, ' obs, Jo (expected)= ', &
                                    ob_num, ob_num_tot, &
                                    j1e, j2e, j3e, j4e, j5e
 
-   write(6,'(x,a5,a21,2i8,6f15.5)')ob_name, ' obs, Jo (actual)  = ', &
+   write(6,'(1x,a5,a21,2i8,6f15.5)')ob_name, ' obs, Jo (actual)  = ', &
                                    ob_num, ob_num_tot, &
                                    j1a, j2a, j3a, j4a, j5a
 
-   write(6,'(x,a5,a21,2i8,6f15.5)')ob_name, ' obs, Error Factor = ', &
+   write(6,'(1x,a5,a21,2i8,6f15.5)')ob_name, ' obs, Error Factor = ', &
                                    ob_num, ob_num_tot, f1, f2, f3, f4, f5
    write(6,*)
    
@@ -1548,7 +1548,7 @@ subroutine da_get_j( ob )
    write(6,'(a,f15.5)')' Total Jb factor (old)   = ', jb_factor_old
 
    if ( jb_e < 0.0 ) then
-      write(6,'(a)')' Warning: Tr(HK) < 0.0! Too small a sample?'
+      write(6,'(a)')' Warning: Tr(HK) < 0.0 Too small a sample?'
       stop
    end if
    jb_factor_new = sqrt(jb/jb_e) * jb_factor_old

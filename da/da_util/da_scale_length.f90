@@ -1,4 +1,4 @@
-program scale_length
+program da_scale_length
 
    implicit none
 
@@ -108,13 +108,13 @@ program scale_length
 
    deallocate(tmp)
 
-   call process_single_variable(var,varname,dgrid,num,iy,jx,kz,nt)
+   call da_process_single_variable(var,varname,dgrid,num,iy,jx,kz,nt)
 
    call clsgks
 
 CONTAINS
 
-   subroutine process_single_variable(var,varname,dgrid,num,iy,jx,kz,nt)
+   subroutine da_process_single_variable(var,varname,dgrid,num,iy,jx,kz,nt)
 
       implicit none
 
@@ -153,7 +153,7 @@ CONTAINS
          end do
          end do
 
-         call make_scale_length(plt,num,k,varname, dgrid, &
+         call da_make_scale_length(plt,num,k,varname, dgrid, &
                                 iy,jx,nt,output_unit)
 
        call plot_it(plt,num,k,varname,iy,jx,nt)
@@ -161,9 +161,9 @@ CONTAINS
 
       close(unit=output_unit, status='keep')
 
-   end subroutine process_single_variable
+   end subroutine da_process_single_variable
 
-   subroutine make_scale_length(plt,num,k,varname,dgrid, nx,ny,nt,output_unit)
+   subroutine da_make_scale_length(plt,num,k,varname,dgrid, nx,ny,nt,output_unit)
 
       implicit none
 
@@ -199,7 +199,7 @@ CONTAINS
 
       real(kind=8) :: criteria, ml, sl, cl, a, b, c, d, e
 
-      call zero_mean(plt, nx, ny, nt, num)
+      call da_zero_mean(plt, nx, ny, nt, num)
       
       nn=nx+ny
       allocate( yr(0:nn))
@@ -303,9 +303,9 @@ CONTAINS
       if(nl > 1) &
          call plot_sl(yr,r,nl,nn,ml,cl,k,varname)
 
-   end subroutine make_scale_length
+   end subroutine da_make_scale_length
 
-   subroutine zero_mean(a, nx, ny, nt, nm)
+   subroutine da_zero_mean(a, nx, ny, nt, nm)
 
       implicit none
   
@@ -334,11 +334,11 @@ CONTAINS
          end do
       end do
 
-   end subroutine zero_mean
+   end subroutine da_zero_mean
 
-end program scale_length
+end program da_scale_length
 
-   subroutine plot_it(plt,num,k,varname,nx,ny,nt,plot_switch)
+   subroutine da_plot_it(plt,num,k,varname,nx,ny,nt,plot_switch)
       
       implicit none
 
@@ -351,6 +351,12 @@ end program scale_length
       integer :: i, j, ib, jb, ie, je, m, n, mm, nn
 
       real, dimension(nx,ny,nt) :: pltsqr
+
+      ! JRB hack. I don't know what I'm doing
+      real :: xwb, xwe, ywb, ywe,xlb,ylb
+      integer :: plot_style
+      real :: red
+      ! JRB
 
       character(len=20) :: pltlab
 
@@ -392,9 +398,9 @@ end program scale_length
 
       call frame
 
-   end subroutine plot_it
+   end subroutine da_plot_it
 
-   subroutine point_plot(plt,num,nx,ny,nt,ib,jb,ie,je, &
+   subroutine da_point_plot(plt,num,nx,ny,nt,ib,jb,ie,je, &
                              xpb,xpe,ypb,ype)
       
       implicit none
@@ -413,6 +419,11 @@ end program scale_length
       real, dimension(nx,ny,nt) :: pltsqr
 
       character(len=1), parameter :: symbol='.'
+
+      ! JRB hack
+      real :: xfb,xfe,yfb,yfe,blue
+      integer :: plot_style
+      ! JRB
 
       do n=1,num
       do j=1,ny
@@ -471,9 +482,9 @@ end program scale_length
       end do
       end do
 
-   end subroutine point_plot
+   end subroutine da_point_plot
 
-   subroutine line_plot(plt,num,nx,ny,nt,ib,jb,ie,je, &
+   subroutine da_line_plot(plt,num,nx,ny,nt,ib,jb,ie,je, &
                           xpb,xpe,ypb,ype)
       
       implicit none
@@ -489,6 +500,11 @@ end program scale_length
       real :: radius, value
 
       integer :: i, j, m, n, mm, nn
+
+      ! JRB hack
+      real :: xfb,xfe,yfb,yfe,blue
+      integer :: plot_style
+      ! JRB
 
 
       sum = 0.0
@@ -554,9 +570,9 @@ end program scale_length
          call line(real(i-2), avg(i-1), real(i-1), avg(i))
       end do
 
-   end subroutine line_plot
+   end subroutine da_line_plot
 
-   subroutine plot_sl(yr,r,nm,nn,slnt,cnst,k,varname)
+   subroutine da_plot_sl(yr,r,nm,nn,slnt,cnst,k,varname)
       
       implicit none
 
@@ -571,6 +587,11 @@ end program scale_length
 
       character(len=1), parameter :: symbol='.'
       character(len=9)            :: label
+
+      ! JRB hack
+      real :: xfb,xfe,yfb,yfe,red,xwb,xwe,ywb,ywe,xlb,ylb,blue
+      integer :: plot_style
+      ! JRB
 
       call set(xwb,xwe,ywb,ywe,xwb,xwe,ywb,ywe,plot_style)
 
@@ -648,4 +669,4 @@ end program scale_length
 
       call frame
 
-   end subroutine plot_sl
+   end subroutine da_plot_sl

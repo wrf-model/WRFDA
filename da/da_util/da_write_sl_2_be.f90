@@ -1,4 +1,4 @@
-program write_sl_2_be
+program da_write_sl_2_be
 
    use record_header
    use module_io
@@ -108,7 +108,7 @@ program write_sl_2_be
 
 !-----For PSI's (stream function) scale-lenght
 
-   call make_new_subheader('sl_print.psi', &
+   call da_make_new_subheader('sl_print.psi', &
                            'PSI_S_LEN', &
                            'Number of Grid Points    ', &
                            'Scale-Length for PSI (stream function)', &
@@ -116,7 +116,7 @@ program write_sl_2_be
 
 !-----For CHI's (velocity potential) scale-lenght
 
-   call make_new_subheader('sl_print.chi', &
+   call da_make_new_subheader('sl_print.chi', &
                            'CHI_S_LEN', &
                            'Number of Grid Points    ', &
                            'Scale-Length for CHI (velocity potential)', &
@@ -124,7 +124,7 @@ program write_sl_2_be
 
 !-----For P_U's (unbalanced pressure) scale-lenght
 
-      call make_new_subheader('sl_print.p_u', &
+      call da_make_new_subheader('sl_print.p_u', &
                               'P_U_S_LEN', &
                               'Number of Grid Points    ', &
                               'Scale-Length for P_U (unbalanced pressure)', &
@@ -132,7 +132,7 @@ program write_sl_2_be
 
 !-----For Q's scale-lenght
 
-      call make_new_subheader('sl_print.q_m', &
+      call da_make_new_subheader('sl_print.q_m', &
                               'Q_S_LEN  ', &
                               'Number of Grid Points    ', &
                               'Scale-Length for Q (specific humidity)', &
@@ -140,7 +140,7 @@ program write_sl_2_be
 
 !-----For RH's scale-lenght
 
-      call make_new_subheader('sl_print.rhm', &
+      call da_make_new_subheader('sl_print.rhm', &
                               'RH_S_LEN  ', &
                               'Number of Grid Points    ', &
                               'Scale-Length for RH (relative humidity)', &
@@ -157,7 +157,7 @@ program write_sl_2_be
 
 CONTAINS
 
-   subroutine make_new_subheader(filename, name, &
+   subroutine da_make_new_subheader(filename, name, &
                                  units, description, sub_header)
 
       implicit none
@@ -235,6 +235,6 @@ CONTAINS
 
       write(output_unit) scale_length
 
-   end subroutine make_new_subheader
+   end subroutine da_make_new_subheader
 
-end program write_sl_2_be
+end program da_write_sl_2_be

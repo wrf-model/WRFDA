@@ -1,4 +1,4 @@
-program update_bc
+program da_update_bc
 
    use record_header
    use module_io
@@ -110,7 +110,7 @@ program update_bc
          if(counter > 8) counter = counter - 8
 
          if(counter == 1) then
-            if(new_variable) call deallocate_bc
+            if(new_variable) call da_deallocate_bc
 
             new_variable = .true.
 
@@ -121,22 +121,22 @@ program update_bc
         
             if(var_name(1:1) == 'W') kl=mkx+1
 
-            call allocate_bc(mix,mjx,kl,nb)
+            call da_allocate_bc(mix,mjx,kl,nb)
 
             if(var_name(1:1) == 'U') then
-               call set_bc_val(mix,mjx,kl,nb,uuu,wbn,ebn,sbn,nbn,dot)
+               call da_set_bc_val(mix,mjx,kl,nb,uuu,wbn,ebn,sbn,nbn,dot)
             else if(var_name(1:1) == 'V') then
-               call set_bc_val(mix,mjx,kl,nb,vvv,wbn,ebn,sbn,nbn,dot)
+               call da_set_bc_val(mix,mjx,kl,nb,vvv,wbn,ebn,sbn,nbn,dot)
             else if(var_name(1:1) == 'W') then
-               call set_bc_val(mix,mjx,kl,nb,www,wbn,ebn,sbn,nbn,crs)
+               call da_set_bc_val(mix,mjx,kl,nb,www,wbn,ebn,sbn,nbn,crs)
             else if(var_name(1:1) == 'T') then
-               call set_bc_val(mix,mjx,kl,nb,ttt,wbn,ebn,sbn,nbn,crs)
+               call da_set_bc_val(mix,mjx,kl,nb,ttt,wbn,ebn,sbn,nbn,crs)
             else if(var_name(1:1) == 'Q') then
-               call set_bc_val(mix,mjx,kl,nb,qqq,wbn,ebn,sbn,nbn,crs)
+               call da_set_bc_val(mix,mjx,kl,nb,qqq,wbn,ebn,sbn,nbn,crs)
             else if(var_name(1:1) == 'P') then
                cb=3
                ce=5
-               call set_bc_val(mix,mjx,kl,nb,ppp,wbn,ebn,sbn,nbn,crs)
+               call da_set_bc_val(mix,mjx,kl,nb,ppp,wbn,ebn,sbn,nbn,crs)
             end if
          end if
 
@@ -159,25 +159,25 @@ program update_bc
          else if(var_name(cb:ce) == 'WBT') then
             wbt(:,:,:)=data(:,:,:,1)
 
-            call set_bc_ten(wbn,wbo,wbt)
+            call da_set_bc_ten(wbn,wbo,wbt)
 
             data(:,:,:,1)=wbt(:,:,:)
          else if(var_name(cb:ce) == 'EBT') then
             ebt(:,:,:)=data(:,:,:,1)
 
-            call set_bc_ten(ebn,ebo,ebt)
+            call da_set_bc_ten(ebn,ebo,ebt)
 
             data(:,:,:,1)=ebt(:,:,:)
          else if(var_name(cb:ce) == 'SBT') then
             sbt(:,:,:)=data(:,:,:,1)
 
-            call set_bc_ten(sbn,sbo,sbt)
+            call da_set_bc_ten(sbn,sbo,sbt)
 
             data(:,:,:,1)=sbt(:,:,:)
          else if(var_name(cb:ce) == 'NBT') then
             nbt(:,:,:)=data(:,:,:,1)
 
-            call set_bc_ten(nbn,nbo,nbt)
+            call da_set_bc_ten(nbn,nbo,nbt)
 
             data(:,:,:,1)=nbt(:,:,:)
          end if
@@ -262,7 +262,7 @@ program update_bc
 
 CONTAINS
 
-   subroutine allocate_bc(iy,jx,kz,nb)
+   subroutine da_allocate_bc(iy,jx,kz,nb)
 
       implicit none
 
@@ -284,9 +284,9 @@ CONTAINS
       allocate(nbo(jx,kz,nb))
       allocate(nbt(jx,kz,nb))
 
-   end subroutine allocate_bc
+   end subroutine da_allocate_bc
 
-   subroutine deallocate_bc
+   subroutine da_deallocate_bc
 
       implicit none
 
@@ -306,9 +306,9 @@ CONTAINS
       deallocate(nbo)
       deallocate(nbt)
 
-   end subroutine deallocate_bc
+   end subroutine da_deallocate_bc
 
-   subroutine set_bc_val(iy,jx,kz,nb,u,wbv,ebv,sbv,nbv,dot_crs)
+   subroutine da_set_bc_val(iy,jx,kz,nb,u,wbv,ebv,sbv,nbv,dot_crs)
 
       implicit none
 
@@ -335,9 +335,9 @@ CONTAINS
       end do
       end do
 
-   end subroutine set_bc_val
+   end subroutine da_set_bc_val
 
-   subroutine set_bc_ten(bn,bo,bt)
+   subroutine da_set_bc_ten(bn,bo,bt)
 
       implicit none
 
@@ -362,7 +362,7 @@ CONTAINS
       end do
       end do
 
-   end subroutine set_bc_ten
+   end subroutine da_set_bc_ten
 
-end program update_bc
+end program da_update_bc
 

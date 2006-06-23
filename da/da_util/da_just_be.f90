@@ -1,4 +1,4 @@
-program just_be
+program da_just_be
 
    use record_header
    use module_io
@@ -118,5 +118,5 @@ program just_be
 
    stop 99999
 
-end program just_be
+end program da_just_be
 

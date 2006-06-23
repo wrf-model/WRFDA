@@ -1,4 +1,4 @@
-program to_be_file
+program da_to_be_file
 
    use record_header
    use module_io
@@ -243,5 +243,5 @@ program to_be_file
 
    stop 99999
 
-end program to_be_file
+end program da_to_be_file
 

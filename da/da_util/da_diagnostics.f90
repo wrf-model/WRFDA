@@ -151,7 +151,7 @@ program da_diagnostics
 !  [1.0] Count total number of observations and allocate arrays:
 !--------------------------------------------------------------------------
 
-   filename = 'daprog_diagnostics.in'
+   filename = 'da_diagnostics.in'
    open( y_unit, file = filename, status = 'unknown' )
 
    call da_count_obs( y_unit, ob )

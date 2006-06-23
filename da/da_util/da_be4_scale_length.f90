@@ -1,4 +1,4 @@
-program scale_length
+program da_scale_length
 
    use da_constants
 
@@ -110,11 +110,11 @@ program scale_length
 
      num=num-1
 
-   call process_single_variable(field,variable,cut_dist_km,&
+   call da_process_single_variable(field,variable,cut_dist_km,&
                       resolution_km,num,ni,nj,ck,nt)
 
    if (nk.eq.vertical_level) then
-   call merge_scale_length(variable, nk)
+   call da_merge_scale_length(variable, nk)
    endif
 
-end program scale_length
+end program da_scale_length

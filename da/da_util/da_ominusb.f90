@@ -1,4 +1,4 @@
-program daprog_ominusb
+program da_ominusb
 
    implicit none
    
@@ -71,7 +71,7 @@ program daprog_ominusb
 
    times = 0
    station_chosen = "MOWV3"
-   filename = "daprog_ominusb_poamvu_"//station_chosen(1:5)//"_omb.out"
+   filename = "da_ominusb_poamvu_"//station_chosen(1:5)//"_omb.out"
    open(ounit, file = filename, status = "unknown" )
 
    do ! Loop over time:
@@ -533,7 +533,7 @@ subroutine da_bin_covariance( num_stations, num_times, max_distance, obs )
       end if
 
       if (obs % cov(b) /= 0.0 ) then
-         write(0,'(i5,i7,3e14.6,l,e13.6)')b, sum_obs(b), avg_dis(b), &
+         write(0,FMT='(i5,i7,3e14.6,l10,e13.6)')b, sum_obs(b), avg_dis(b), &
                                         obs % cov(b), &
                                         coverr(b), bin_pass(b), gaussian
       end if
@@ -543,7 +543,7 @@ subroutine da_bin_covariance( num_stations, num_times, max_distance, obs )
    if ( sum_b > 1 ) then
       ob_err_stdv = sqrt( obs % stdv_omb**2 - bk_err_var  )
       bk_err_stdv = sqrt( bk_err_var )
-      write(0,'(a)')' The following are derived from Gaussian fit (warning!):'
+      write(0,'(a)')' The following are derived from Gaussian fit (warning):'
       write(0,'(3(a,e14.6),2(a,i3),a)')' Scale =', lengthscale, &
                                        ' km, ob_err_stdv = ', ob_err_stdv, &
                                        ' , bk_err_stdv = ', bk_err_stdv, &
@@ -552,4 +552,4 @@ subroutine da_bin_covariance( num_stations, num_times, max_distance, obs )
 
 end subroutine da_bin_covariance
 
-end program daprog_ominusb
+end program da_ominusb

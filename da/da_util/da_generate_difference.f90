@@ -1,4 +1,4 @@
-program generate_difference
+program da_generate_difference
 
    use record_header
    use module_io
@@ -260,4 +260,4 @@ program generate_difference
 
    enddo
 
-end program generate_difference
+end program da_generate_difference
