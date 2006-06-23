@@ -45,7 +45,7 @@ subroutine da_transform_xtoy_ships_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
 #else
                call da_interp_obs_lin_2d_adj( &
                   jo_grad_x % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, &
-                  dxm, dym, o_grad_y%ships(n)%u, iv%ships(n)%zk)
+                  dxm, dym, jo_grad_y%ships(n)%u, iv%ships(n)%zk)
                call da_interp_obs_lin_2d_adj( &
                   jo_grad_x % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, &
                   dxm, dym, jo_grad_y%ships(n)%v, iv%ships(n)%zk)
