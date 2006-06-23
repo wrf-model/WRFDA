@@ -353,6 +353,7 @@ contains
 
    subroutine filter(tb19v, tb19h, tb22v, tb37v,          &
                      tb37h, tb85v, tb85h, ipass, iprecip, xlat  )
+   implicit none
 
    REAL    ,  INTENT (in)  :: tb19v, tb19h, tb22v, tb37v, &
                               tb37h, tb85v, tb85h, xlat
@@ -554,8 +555,10 @@ contains
          subroutine pettyalgos(tb,theta,tc,sst,dsst, &
               wv,u,alw19,alw37,alw85,iprecip,xlat)
    !
-         real tb(7),theta,tc,wv,u,alw19,alw37,alw85,xlat
-         parameter (BAD = -1000.0)
+         implicit none
+
+         real tb(7),theta,tc,wv,u,alw19,alw37,alw85,xlat, sst,dsst
+         real, parameter :: BAD = -1000.0
          integer iprecip
 
    ! get water vapor
@@ -592,10 +595,13 @@ contains
    !           iprecip --- set to 1 if precipitation flag invoked, else 0
    ! 
          subroutine pettylwp(tb,theta,ifreq,tc,alw,iprecip,xlat)
+         implicit none
          real tb(7),theta,alw,tc,xlat
          integer ifreq,iprecip
-         parameter (BAD = -1000.0)
+         real, parameter :: BAD = -1000.0
          real t19v,t19h,t22v,t37v,t37h,t85v,t85h,MISSING,pclr
+         real :: p,s85,v0,wv,u
+         integer :: ich
    ! 
          iprecip = 0
          MISSING = -8888.
@@ -665,11 +671,13 @@ contains
    ! at 19.35, 37, or 85.5 GHz  (indicated by IFREQ)
    !
          subroutine p2lwp(ifreq,p,tc,theta,alw,xlat) 
+         implicit none        
          integer ifreq
-         real p,alw,xlat
+         real p,alw,xlat,tc,theta
          real alpha(3),threshhold
          data alpha/2.08,2.05,1.78/
-         parameter (BAD = -1000.0)
+         real, parameter :: BAD = -1000.0
+         real :: ext, costheta
 
    ! check for extreme value due to precipitation
          if (p .lt. 0.01) then
@@ -713,9 +721,12 @@ contains
    !           iprecip --- set to 1 if precipitation flag invoked, else 0
    ! 
          subroutine ClearPol(tb,theta,ifreq,pclr,iprecip)
+         implicit none
          real tb(7),theta,pclr
          integer ifreq,iprecip
-         parameter (BAD = -1000.0)
+         real, parameter :: BAD = -1000.0
+         real :: wv,u
+         integer :: ich
 
    ! check for valid IFREQ
          if (ifreq.lt.1 .or. ifreq.gt.3) then
@@ -767,6 +778,14 @@ contains
    !
          function alw_ext(ifreq,tc)
    !
+         IMPLICIT NONE
+
+         integer, intent(in) :: ifreq
+         real, intent(in) :: tc
+
+         real :: alw_ext
+         real :: tc2,tc3
+
          tc2 = tc*tc
          tc3 = tc2*tc
    !
@@ -799,6 +818,14 @@ contains
    !         tb = brightness temperature
 
          subroutine tb_clear(ich,u,wv,tb)
+         IMPLICIT NONE
+         integer, intent(in)  :: ich
+         real,    intent(in)  :: u
+         real,    intent(in)  :: wv
+         real,    intent(out) :: tb
+
+         REAL :: wvp,up,x,x2,x3,y,y2,y3,xy,x2y,xy2
+         
          real a(10,10)
          data a/ &
           0.1984E+03, 0.1674E+02, 0.1998E+00,-0.3868E+00,-0.1818E+00, &
@@ -853,6 +880,7 @@ contains
    ! 
    ! 
          subroutine PettyVapor(tb,wv)
+         implicit none
          real tb(*),wv
 
          real t19v,t19h,t22v,t37v,t37h
@@ -860,7 +888,9 @@ contains
          save tbold,wvold
 
          logical flag
-         parameter (BAD = -1000.0)
+         real, parameter :: BAD = -1000.0
+         integer :: i
+         real :: del, t1,t2,t3,wv2,wv3
 
    ! check for same TBs used in previous call in order to avoid
    ! redundant calculations
@@ -949,13 +979,15 @@ contains
    ! 
    ! 
          subroutine PettyWind(tb,theta,sst,dsst,u)
+         implicit none
          real tb(5),theta,sst,dsst,u
 
          logical flag
          real t19v,t19h,t22v,t37v,t37h
-         parameter (BAD = -1000.0)
+         real, parameter :: BAD = -1000.0
 
-         integer iaold
+         real wv, alw37,errwv,p37clr,errlw,erru,p37,wv2,wv3
+         integer iaold,i,ia
          real tbold(5),uold
          save tbold,uold,iaold
 
@@ -1101,8 +1133,9 @@ contains
    !  When IA=2, the SST information is not used.
    !
          subroutine ualg(ia,theta,sst,tb,u)
+         implicit none
 
-         integer ia
+         integer ia,i
          real theta,sst,tb(5),u
 
          real coeff1(8)
