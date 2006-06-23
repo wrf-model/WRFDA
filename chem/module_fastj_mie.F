@@ -2398,7 +2398,7 @@
 !
 !
       if ( fatal )  then
-!         write ( *, '(2a)' )  ' ******* error >>>>>>  ', messag
+!         write ( *, '(2a)' )  ' ******* error ******  ', messag
 !         stop
    	  write( msg, '(a)' )   &
                   'FASTJ mie fatal error ' //   &
@@ -2419,7 +2419,7 @@
       else
          msg =   'FASTJ mie warning '  // messag
          call peg_message( lunerr, msg )  
-!         write ( *, '(2a)' )  ' ******* warning >>>>>>  ', messag
+!         write ( *, '(2a)' )  ' ******* warning ******  ', messag
       endif
 !
       return

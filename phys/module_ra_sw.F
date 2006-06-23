@@ -228,6 +228,8 @@ CONTAINS
 !       ADD EFFECT OF GRAUPEL
 !------------------------------------------------------------------
 
+  IMPLICIT NONE
+
   INTEGER, INTENT(IN ) ::                 kts,kte
 !
   REAL, DIMENSION( kts:kte ), INTENT(IN   )  ::                   &
@@ -248,6 +250,7 @@ CONTAINS
                                         SOLCON,XLAT,XLONG,ALBEDO, &
                                                   RADFRQ, DEGRAD
 !
+   INTEGER, INTENT(IN) :: icloud
    REAL, INTENT(INOUT)  ::                                   GSW
 !
 ! LOCAL VARS
@@ -280,6 +283,13 @@ CONTAINS
            0.,3.7,10.,15./
 
       DATA XMUVAL/0.,0.2,0.5,1.0/
+
+      REAL :: bext340, absc, alba, alw, csza,dabsa,dsca,dabs
+      REAL :: bexth2o, dscld, hrang,ff,oldalb,oldabs,oldabc
+      REAL :: soltop, totabs, tloctm, ugcm, uv,xabs,xabsa,wv
+      REAL :: wgm, xalb, xi, xsca, xt24,xmu,xabsc,trans0,yj
+      REAL :: xxlat,ww
+      INTEGER :: iil,ii,jjl,ju,k,iu
 
       GSW=0.0
       bext340=5.E-6

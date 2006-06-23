@@ -4184,6 +4184,8 @@ CONTAINS
 
    SUBROUTINE neg_check(dt,q,outq,outt,outqc,pret,its,ite,kts,kte,itf,ktf)
 
+   implicit none
+
    INTEGER,      INTENT(IN   ) ::            its,ite,kts,kte,itf,ktf
 
      real, dimension (its:ite,kts:kte  )                    ,                 &
@@ -4196,6 +4198,7 @@ CONTAINS
         ,intent (in  )                   ::                                   &
         dt
      real :: thresh,qmem,qmemf,qmem2,qtest,qmem1
+     integer :: i,k
 !
 ! first do check on vertical heating rate
 !

@@ -6373,7 +6373,10 @@ CONTAINS
 !    BPADE                        ! Pade approximation constant (=1./0.278)      
 !    ITR(NGPT,MXLAY)              ! Integer lookup table index                   
 !                                                                                
-! Parameters                                                                     
+! Parameters             
+
+      IMPLICIT NONE
+                                                        
       REAL, PARAMETER :: SECANG=1.66                                                    
 
       INTEGER, INTENT(IN )   ::  kts,ktep1
@@ -6413,6 +6416,9 @@ CONTAINS
                                                       JT, &
                                                      JT1, &
                                                  INDSELF
+
+      INTEGER :: lay,ipr
+      REAL :: odepth,tff
 
 ! This compiler directive was added to insure private common block storage       
 ! in multi-tasked mode on a CRAY or SGI for all commons except those that        
@@ -6541,6 +6547,8 @@ CONTAINS
 USE module_wrf_error
 USE module_dm
 
+IMPLICIT NONE
+
 !  RRTM Longwave Radiative Transfer Model                                        
 !  Atmospheric and Environmental Research, Inc., Cambridge, MA                   
 !                                                                                
@@ -6563,11 +6571,13 @@ USE module_dm
 !     TRANS   Transmittance                                                      
 !     BPADE   Inverse of the Pade approximation constant (= 1./0.278)            
 
-! Local                                         
+! Local                                        
+      INTEGER :: i,itre,igcsm,ibnd,igc,ind,ig,ipr,iprsm
+      REAL :: tfn,fp,rtfp,wtsum
       LOGICAL                 :: opened
       LOGICAL , EXTERNAL      :: wrf_dm_on_monitor
 
-      DIMENSION WTSM(MG)                       
+      REAL :: WTSM(MG)                       
       CHARACTER*80 errmess
       INTEGER rrtm_unit
 
