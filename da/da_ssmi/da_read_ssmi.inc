@@ -349,8 +349,6 @@ head_line_2:  DO
 
    write(unit=stdout, fmt='(/,5x,a,i6/)') '** Rain contaminated SSMI_Tb =', irain
 
-contains 
-
    subroutine filter(tb19v, tb19h, tb22v, tb37v,          &
                      tb37h, tb85v, tb85h, ipass, iprecip, xlat  )
    implicit none
@@ -1168,4 +1166,3 @@ contains
 
    end subroutine ualg
 
-end subroutine da_read_ssmi
