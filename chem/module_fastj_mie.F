@@ -2424,8 +2424,8 @@
 !
       return
 !
-!   99 format( ///,' >>>>>>  too many warning messages --  ',   &
-!         'they will no longer be printed  <<<<<<<', /// )
+!   99 format( ///,' ******  too many warning messages --  ',   &
+!         'they will no longer be printed  *******', /// )
       end subroutine  errmsg  
 !********************************************************************                     
       subroutine  wrtbad ( varnam, erflag )

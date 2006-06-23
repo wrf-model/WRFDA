@@ -4107,7 +4107,7 @@ END SUBROUTINE sorgam_depdriver
         fconca(lcell) = one88*gnc3a*gfm3a/(gnc3a+gfm3a)
         fconc = fconcn(lcell) + fconca(lcell)
 
-! *** NOTE: FCONCN and FCONCA will be redefined below <<<<<<
+! *** NOTE: FCONCN and FCONCA will be redefined below ******
 !bs
 !bs * start modifications for organcis
 !bs

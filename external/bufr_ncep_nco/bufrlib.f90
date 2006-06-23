@@ -8367,7 +8367,7 @@ C  --------------------------------------------------------------------
       PRINT*,'BUFRLIB: MSGUPD - SUBSET LONGER THAN ANY POSSIBLE ',
      . 'MESSAGE {SUBSET LENGTH= ',MBYT(LUN)+IBYT+8,', MESSAGE LENGTH= ',
      . MAXBYT,'}'
-      PRINT*,'>>>>>>>OVERLARGE SUBSET DISCARDED FROM FILE<<<<<<<<'
+      PRINT*,'*******OVERLARGE SUBSET DISCARDED FROM FILE********'
       PRINT*,'+++++++++++++++++++++++WARNING+++++++++++++++++++++++++'
       PRINT*
       ENDIF
@@ -17549,7 +17549,7 @@ C  --------------------------------------------------------------------
       PRINT*,'BUFRLIB: SUBUPD - SUBSET LONGER THAN ANY POSSIBLE ',
      . 'MESSAGE {SUBSET LENGTH= ',MBYT(LUN)+IBYT+8,', MESSAGE LENGTH= ',
      . MAXBYT,'}'
-      PRINT*,'>>>>>>>OVERLARGE SUBSET DISCARDED FROM FILE<<<<<<<<'
+      PRINT*,'*******OVERLARGE SUBSET DISCARDED FROM FILE********'
       PRINT*,'+++++++++++++++++++++++WARNING+++++++++++++++++++++++++'
       PRINT*
       ENDIF
@@ -18749,7 +18749,7 @@ C  -------------------------------------------------------------------
 1     FORMAT(I5,1X,A3,'-',I1,1X,A10,5X,G15.6,7(1X,I5))
 10    FORMAT(I5,1X,A3,'-',I1,1X,A10,5X,F15.6,7(1X,I5))
 2     FORMAT(I5,1X,A3,'-',I1,1X,A10,   A20,  7(1X,I5))
-3     FORMAT(/' >>> END OF SUBSET <<< '/)
+3     FORMAT(/' *** END OF SUBSET *** '/)
 
 C  EXITS
 C  -----
@@ -20273,8 +20273,8 @@ C  --------------------------------------------------
       PRINT*,'BUFRLIB: UFBMEM - THE NO. OF MESSAGES REQUIRED TO STORE',
      . ' ALL MESSAGES INTERNALLY EXCEEDS MAXIMUM (',MAXMSG,') - ',
      . 'INCOMPLETE READ'
-      PRINT*,'>>>UFBMEM STORED ',MSGP(0),' MESSAGES OUT OF ',NMSG,'<<<'
-      PRINT*,'>>>UFBMEM STORED ',MLAST0,' BYTES OUT OF ',MLAST,'<<<'
+      PRINT*,'***UFBMEM STORED ',MSGP(0),' MESSAGES OUT OF ',NMSG,'***'
+      PRINT*,'***UFBMEM STORED ',MLAST0,' BYTES OUT OF ',MLAST,'**'
       PRINT*,'+++++++++++++++++++++++WARNING+++++++++++++++++++++++++'
       PRINT*
       ENDIF
@@ -20292,8 +20292,8 @@ C  --------------------------------------------------
       PRINT*,'BUFRLIB: UFBMEM - THE NO. OF BYTES REQUIRED TO STORE',
      . ' ALL MESSAGES INTERNALLY EXCEEDS MAXIMUM (',MAXMEM,') - ',
      . 'INCOMPLETE READ'
-      PRINT*,'>>>UFBMEM STORED ',MLAST0,' BYTES OUT OF ',MLAST,'<<<'
-      PRINT*,'>>>UFBMEM STORED ',MSGP(0),' MESSAGES OUT OF ',NMSG,'<<<'
+      PRINT*,'***UFBMEM STORED ',MLAST0,' BYTES OUT OF ',MLAST,'***'
+      PRINT*,'***UFBMEM STORED ',MSGP(0),' MESSAGES OUT OF ',NMSG,'***'
       PRINT*,'+++++++++++++++++++++++WARNING+++++++++++++++++++++++++'
       PRINT*
       ENDIF
@@ -22948,7 +22948,7 @@ C  -------------------------------------------
       PRINT*,'BUFRLIB: UFBTAB - THE NO. OF DATA SUBSETS IN THE BUFR',
      . ' FILE IS .GT. LIMIT OF ',I2,' IN THE 4-TH ARG. (INPUT) - ',
      . 'INCOMPLETE READ'
-      PRINT*,'>>>UFBTAB STORED ',IRET,' REPORTS OUT OF ',NREP,'<<<'
+      PRINT*,'***UFBTAB STORED ',IRET,' REPORTS OUT OF ',NREP,'***'
       PRINT*,'+++++++++++++++++++++++WARNING+++++++++++++++++++++++++'
       PRINT*
       ENDIF
@@ -23231,7 +23231,7 @@ C  -------------------------------------------
       PRINT*,'+++++++++++++++++++++++WARNING+++++++++++++++++++++++++'
       PRINT*,'BUFRLIB: UFBTAM - THE NO. OF DATA SUBSETS IN MEMORY IS ',
      . '.GT. LIMIT OF ',I2,' IN THE 3-RD ARG. (INPUT) - INCOMPLETE READ'
-      PRINT*,'>>>UFBTAM STORED ',IRET,' REPORTS OUT OF ',NREP,'<<<'
+      PRINT*,'***UFBTAM STORED ',IRET,' REPORTS OUT OF ',NREP,'***'
       PRINT*,'+++++++++++++++++++++++WARNING+++++++++++++++++++++++++'
       PRINT*
       ENDIF
@@ -23447,7 +23447,7 @@ C  -------------------------------------------------------------------
       ENDDO
 
       WRITE(LUOUT,3)
-3     FORMAT(/' >>> END OF SUBSET <<< '/)
+3     FORMAT(/' *** END OF SUBSET *** '/)
 
 C  EXITS
 C  -----
