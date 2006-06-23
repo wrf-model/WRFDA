@@ -678,6 +678,7 @@ end subroutine da_read_ssmi
          data alpha/2.08,2.05,1.78/
          real, parameter :: BAD = -1000.0
          real :: ext, costheta
+         integer :: iprecip
 
    ! check for extreme value due to precipitation
          if (p .lt. 0.01) then
