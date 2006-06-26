@@ -1,0 +1,88 @@
+#############################
+Expected output for './hdp list -g tdata.hdf'
+#############################
+File: tdata.hdf
+Last modified with NCSA HDF Version 3.3 Release 4, October 1994
+
+   no             tagname     tag     ref  index_by_tag
+    0Linked Blocks Indicator      20      18           0
+    1Linked Blocks Indicator      20      19           1
+    2Linked Blocks Indicator      20      20           2
+    3Linked Blocks Indicator      20      21           3
+    4Linked Blocks Indicator      20      22           4
+    5Linked Blocks Indicator      20      23           5
+    6Linked Blocks Indicator      20      24           6
+    7Linked Blocks Indicator      20      25           7
+    8Linked Blocks Indicator      20      26           8
+    9  Version Descriptor      30       1           0
+   10         Number type     106      33           0
+   11         Number type     106      35           1
+   12         Number type     106      37           2
+   13SciData dimension record     701      33           0
+   14SciData dimension record     701      35           1
+   15SciData dimension record     701      37           2
+   16  Numeric Data Group     720       2           0
+	Contents: (3 objects)
+		Scientific Data               : (tag=   702) ref=18
+		Number type                   : (tag=   106) ref=33
+		SciData dimension record      : (tag=   701) ref=33
+   17  Numeric Data Group     720       3           1
+	Contents: (3 objects)
+		Scientific Data               : (tag=   702) ref=21
+		Number type                   : (tag=   106) ref=35
+		SciData dimension record      : (tag=   701) ref=35
+   18  Numeric Data Group     720       4           2
+	Contents: (3 objects)
+		Scientific Data               : (tag=   702) ref=24
+		Number type                   : (tag=   106) ref=37
+		SciData dimension record      : (tag=   701) ref=37
+   19               Vdata    1962      27           0
+   20               Vdata    1962      29           1
+   21               Vdata    1962      31           2
+   22       Vdata Storage    1963      27           0
+   23       Vdata Storage    1963      29           1
+   24       Vdata Storage    1963      31           2
+   25              Vgroup    1965      28           0
+	Contents: (1 objects)
+		Vdata                         : (tag=  1962) ref=27
+   26              Vgroup    1965      30           1
+	Contents: (1 objects)
+		Vdata                         : (tag=  1962) ref=29
+   27              Vgroup    1965      32           2
+	Contents: (1 objects)
+		Vdata                         : (tag=  1962) ref=31
+   28              Vgroup    1965      34           3
+	Contents: (7 objects)
+		Vgroup                        : (tag=  1965) ref=32
+		Vgroup                        : (tag=  1965) ref=28
+		Vgroup                        : (tag=  1965) ref=30
+		Scientific Data               : (tag=   702) ref=18
+		Number type                   : (tag=   106) ref=33
+		SciData dimension record      : (tag=   701) ref=33
+		Numeric Data Group            : (tag=   720) ref=2
+   29              Vgroup    1965      36           4
+	Contents: (6 objects)
+		Vgroup                        : (tag=  1965) ref=32
+		Vgroup                        : (tag=  1965) ref=30
+		Scientific Data               : (tag=   702) ref=21
+		Number type                   : (tag=   106) ref=35
+		SciData dimension record      : (tag=   701) ref=35
+		Numeric Data Group            : (tag=   720) ref=3
+   30              Vgroup    1965      38           5
+	Contents: (5 objects)
+		Vgroup                        : (tag=  1965) ref=32
+		Scientific Data               : (tag=   702) ref=24
+		Number type                   : (tag=   106) ref=37
+		SciData dimension record      : (tag=   701) ref=37
+		Numeric Data Group            : (tag=   720) ref=4
+   31              Vgroup    1965      39           6
+	Contents: (6 objects)
+		Vgroup                        : (tag=  1965) ref=28
+		Vgroup                        : (tag=  1965) ref=30
+		Vgroup                        : (tag=  1965) ref=32
+		Vgroup                        : (tag=  1965) ref=34
+		Vgroup                        : (tag=  1965) ref=36
+		Vgroup                        : (tag=  1965) ref=38
+   32Special Scientific Data   17086      18           0
+   33Special Scientific Data   17086      21           1
+   34Special Scientific Data   17086      24           2

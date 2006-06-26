@@ -1,0 +1,124 @@
+#############################
+Expected output for './hdp dumpsds -g swf32_fileattr.hdf'
+#############################
+File name: swf32_fileattr.hdf 
+
+File attributes:
+	 Attr0: Name = File purpose
+		 Type = 8-bit signed char 
+		 Count= 37
+	 Attr1: Name = File contents
+		 Type = 8-bit signed char 
+		 Count= 14
+	 Attr2: Name = Test clean format
+		 Type = 8-bit signed char 
+		 Count= 65
+
+Dimension Variable Name = fakeDim0
+	 Index = 0
+	 Scale Type= 32-bit floating point
+	 Ref. = 3
+	 Rank = 1
+	 Number of attributes = 3
+	 Dim0: Name=fakeDim0
+		 Size = 2
+	 Attr0: Name = long_name
+		 Type = 8-bit signed char 
+		 Count= 4
+		 Value = Time
+	 Attr1: Name = units
+		 Type = 8-bit signed char 
+		 Count= 6
+		 Value = Second
+	 Attr2: Name = format
+		 Type = 8-bit signed char 
+		 Count= 5
+		 Value = Int32
+	 Data : 
+                0.000000 100.000000 
+
+
+Dimension Variable Name = fakeDim1
+	 Index = 1
+	 Scale Type= 32-bit floating point
+	 Ref. = 4
+	 Rank = 1
+	 Number of attributes = 3
+	 Dim0: Name=fakeDim1
+		 Size = 3
+	 Attr0: Name = long_name
+		 Type = 8-bit signed char 
+		 Count= 4
+		 Value = Line
+	 Attr1: Name = units
+		 Type = 8-bit signed char 
+		 Count= 4
+		 Value = Inch
+	 Attr2: Name = format
+		 Type = 8-bit signed char 
+		 Count= 5
+		 Value = Int16
+	 Data : 
+                0.000000 10.000000 20.000000 
+
+
+Dimension Variable Name = fakeDim2
+	 Index = 2
+	 Scale Type= 32-bit floating point
+	 Ref. = 5
+	 Rank = 1
+	 Number of attributes = 3
+	 Dim0: Name=fakeDim2
+		 Size = 4
+	 Attr0: Name = long_name
+		 Type = 8-bit signed char 
+		 Count= 6
+		 Value = Column
+	 Attr1: Name = units
+		 Type = 8-bit signed char 
+		 Count= 2
+		 Value = Cm
+	 Attr2: Name = format
+		 Type = 8-bit signed char 
+		 Count= 5
+		 Value = Int32
+	 Data : 
+                0.000000 1.000000 2.000000 3.000000 
+
+
+Variable Name = Data-Set-2
+	 Index = 3
+	 Type= 32-bit floating point
+	 Ref. = 2
+	 Rank = 3
+	 Number of attributes = 2
+	 Dim0: Name=fakeDim0
+		 Size = 2
+		 Scale Type = 32-bit floating point
+		 Number of attributes = 3
+	 Dim1: Name=fakeDim1
+		 Size = 3
+		 Scale Type = 32-bit floating point
+		 Number of attributes = 3
+	 Dim2: Name=fakeDim2
+		 Size = 4
+		 Scale Type = 32-bit floating point
+		 Number of attributes = 3
+	 Attr0: Name = valid_max
+		 Type = 32-bit floating point 
+		 Count= 1
+		 Value = 123.000000 
+	 Attr1: Name = valid_min
+		 Type = 32-bit floating point 
+		 Count= 1
+		 Value = -1.000000 
+	 Data : 
+                0.000000 1.000000 2.000000 3.000000 
+                10.000000 11.000000 12.000000 13.000000 
+                20.000000 21.000000 22.000000 23.000000 
+
+                100.000000 101.000000 102.000000 103.000000 
+                110.000000 111.000000 112.000000 113.000000 
+                120.000000 121.000000 122.000000 123.000000 
+
+

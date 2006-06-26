@@ -1,0 +1,23 @@
+#########################################################################
+#
+# Name
+#	makerec.template
+#
+# Purpose
+#
+#	Template makefile for recursive make.
+#	Delete all these comments after copying as Makefile.
+#
+##########################################################################
+
+## Define the variable below and you are done.
+
+
+## SUBDIRS lists all subdirectories under this directory.
+SUBDIRS	    = 
+
+
+
+include $(SUBSYSTOP)/make/makerec.include
+
+

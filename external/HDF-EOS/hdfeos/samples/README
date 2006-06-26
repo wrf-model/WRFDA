@@ -1,0 +1,129 @@
+
+This directory provides sample programs for the user to run to check if the 
+HDF-EOS library installed correctly.  Below is a description of what routines 
+are available and the order in which the routines should be run.
+
+Swath Demonstration Programs
+----------------------------
+SetupSwath:   1) Creates swath file, "SwathFile.hdf" and a single swath within
+                 it, "Swath1".
+
+              2) Defines dimensions and the geolocation relation between 
+	         them.
+
+FORTRAN: setupswath
+
+
+DefineFields:    Defines a number of fields within the swath, "Swath1".
+
+FORTRAN: definefields
+
+
+WriteFields:     Writes data to the "Longitude", "Latitude", and "Spectra" 
+                 fields.
+
+FORTRAN: writefields
+
+
+ReadFields:      Reads data from the "Longitude" field.
+
+FORTRAN: readfields
+
+
+InquireSwath:    Retrieves and print information on the swath dimensions,
+                 geolocation relations and swath fields.
+
+FORTRAN: inquireswath
+
+
+AppendField:     Demonstrates use of unlimited dimension for appendable
+                 fields.
+
+FORTRAN: appendfield
+
+
+SubsetSwath:     Demonstrates subsetting on the "Spectra" field.
+
+FORTRAN: subsetswath
+
+
+
+
+Grid Demonstration Programs
+---------------------------
+SetupGrid:        Creates grid file, "GridFile.hdf" containing two grid 
+	          structures.
+
+FORTRAN: subsetgrid
+
+
+DefineGDflds:     Defines fields within the two grid structures.
+
+FORTRAN: definegdflds
+
+
+WriteGDflds:      Write to fields within the two grid structures.
+
+FORTRAN: writegdflds
+
+
+ReadGDflds:       Reads from fields within the two grid structures.
+
+FORTRAN: readgdflds
+
+
+InquireGrid:      Demonstrates the use of various inquiry routines in the
+                  grid API.
+
+FORTRAN: inquiregrid
+
+
+SubsetGrid:       Demonstrates subsetting on the "Temperature" field
+                  in the "PolarGrid" grid.
+
+FORTRAN: subsetgrid
+
+
+Swath Demonstration Programs
+----------------------------
+SetupPoint:   1) Creates point file, "PointFile.hdf" and defines three point
+                 structures, "Simple Point", "Fixed Buoy Point", and 
+                 "Float Buoy Point".
+ 
+ 
+FORTRAN: setuppoint
+ 
+DefineLevels:    Defines levels within the pointfile.
+ 
+FORTRAN: definelevels
+ 
+
+WriteLevels:     Writes data to levels within the pointfile.
+ 
+FORTRAN: writelevels
+ 
+ 
+ReadLevels:      Reads data from levels within pointfile.
+ 
+FORTRAN: readlevels
+ 
+ 
+UpdateLevels:    Updates levels within pointfile.
+ 
+FORTRAN: updatelevels
+ 
+ 
+SubsetPoint:     Demonstrates subsetting with the point interface.
+ 
+FORTRAN: subsetpoint
+ 
+
+
+
+
+Restrictions
+------------
+1) The "HDFE_ANYPOINT" option for swath subsetting has not yet been
+   implemented.  In additin swath subseting does not work with the
+   "Colatitude" field yet.
+

@@ -1,0 +1,84 @@
+#
+#
+# Copyright (C) 1996 Hughes and Applied Research Corporation
+#
+# Permission to use, modify, and distribute this software and its documentation 
+# for any purpose without fee is hereby granted, provided that the above 
+# copyright notice appear in all copies and that both that copyright notice and 
+# this permission notice appear in supporting documentation.
+#
+# Makefile
+# 
+# Makefile for field build of HDFEOS
+#
+# The following environment variables must be defined:
+#
+#   Flags:
+#     AR
+#     CC
+#     F77
+#     MACHINE
+#     NSL_FLAG 		(Set to -lnsl on Sun, blank on all others)
+#     RANLIB
+# 
+#   Directories:
+#     HDFEOS_BIN
+#     HDFEOS_INC
+#     HDFEOS_LIB
+#     HDFEOS_OBJ
+#     HDFEOS_SRC
+
+
+SHELL=/bin/sh
+
+INCLUDE = -I. -I$(HDFEOS_INC) -I$(HDFINC)
+LIBRARY = -L. -L$(HDFEOS_LIB) -L$(HDFLIB)
+GCTP = -lGctp
+
+LDFLAGS = -lhdfeos $(GCTP) -lmfhdf -ldf -ljpeg $(NSL_FLAG) -lz -lm
+
+RM = rm -f 
+
+.SUFFIXES :
+.SUFFIXES : .o .c .f
+
+.c.o:
+	$(CC) $(INCLUDE) -c $<
+
+.f.o:
+	$(F77) -c $<
+
+
+all: libhdfeos.a
+
+hdfeos: libhdfeos.a
+
+
+libhdfeos.a : EHapi.o SWapi.o GDapi.o PTapi.o
+	@if [ -f $(HDFEOS_LIB)/$@ ] ; then \
+	    echo "Removing old library." ; \
+	    $(RM) $(HDFEOS_LIB)/$@  ; \
+	fi
+	$(AR) $(HDFEOS_LIB)/$@ $?
+	$(RANLIB) $(HDFEOS_LIB)/$@
+
+EHapi.o : EHapi.c 
+	$(CC) $(INCLUDE) -c EHapi.c -o $@
+
+SWapi.o : SWapi.c
+	$(CC) $(INCLUDE) -c SWapi.c -o $@
+
+GDapi.o : GDapi.c
+	$(CC) $(INCLUDE) -c GDapi.c -o $@
+
+PTapi.o : PTapi.c
+	$(CC) $(INCLUDE) -c PTapi.c -o $@
+
+
+install: 
+	echo "No files to move"
+
+clean:
+	$(RM) *.o $(HDFEOS_OBJ)/*.o
+
+

@@ -1,0 +1,1 @@
+-t "dset4:GZIP 6" -c "dset4:2x2"

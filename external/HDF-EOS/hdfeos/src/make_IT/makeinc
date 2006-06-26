@@ -1,0 +1,145 @@
+
+# Copyright (C) 1996 Hughes and Applied Research Corporation
+# 
+# Permission to use, modify, and distribute this software and its documentation 
+# for any purpose without fee is hereby granted, provided that the above 
+# copyright notice appear in all copies and that both that copyright notice and 
+# this permission notice appear in supporting documentation.
+
+
+EXECBLD = ${CC} $@.o -o $@ ${LIBRARY} ${LDFLAGS}
+EXECBLDF77 = ${F77} $@.o -o $@ ${LIBRARY} ${LDFLAGS}
+
+AR = ar r
+
+.SUFFIXES :
+.SUFFIXES : .o .c .f
+
+.c.o:
+	${CC} ${INCLUDE} -c $<
+
+.f.o:
+	${F77} -c $<
+
+hdfeos: swathlib gridlib pointlib swathflib gridflib pointflib
+
+swathlib: SetupSwath DefineFields WriteFields ReadFields AppendField \
+	InquireSwath SubsetSwath
+
+SetupSwath: $$@.o libhdfeos.a
+	${EXECBLD}
+DefineFields: $$@.o libhdfeos.a
+	${EXECBLD}
+WriteFields: $$@.o libhdfeos.a
+	${EXECBLD}
+ReadFields: $$@.o libhdfeos.a
+	${EXECBLD}
+AppendField: $$@.o libhdfeos.a
+	${EXECBLD}
+InquireSwath: $$@.o libhdfeos.a
+	${EXECBLD}
+SubsetSwath: $$@.o libhdfeos.a
+	${EXECBLD}
+
+
+swathflib: setupswath definefields writefields readfields appendfield \
+	inquireswath subsetswath
+
+setupswath: $$@.o libhdfeos.a
+	${EXECBLDF77}
+definefields: $$@.o libhdfeos.a
+	${EXECBLDF77}
+writefields: $$@.o libhdfeos.a
+	${EXECBLDF77}
+readfields: $$@.o libhdfeos.a
+	${EXECBLDF77}
+appendfield: $$@.o libhdfeos.a
+	${EXECBLDF77}
+inquireswath: $$@.o libhdfeos.a
+	${EXECBLDF77}
+subsetswath: $$@.o libhdfeos.a
+	${EXECBLDF77}
+
+
+
+gridlib: SetupGrid DefineGDflds WriteGDflds ReadGDflds InquireGrid \
+         SubsetGrid
+
+SetupGrid: $$@.o libhdfeos.a
+	${EXECBLD}
+DefineGDflds: $$@.o libhdfeos.a
+	${EXECBLD}
+WriteGDflds: $$@.o libhdfeos.a
+	${EXECBLD}
+ReadGDflds: $$@.o libhdfeos.a
+	${EXECBLD}
+InquireGrid: $$@.o libhdfeos.a
+	${EXECBLD}
+SubsetGrid: $$@.o libhdfeos.a
+	${EXECBLD}
+
+
+gridflib: setupgrid definegdflds writegdflds readgdflds inquiregrid \
+          subsetgrid
+
+setupgrid: $$@.o libhdfeos.a
+	${EXECBLDF77}
+definegdflds: $$@.o libhdfeos.a
+	${EXECBLDF77}
+writegdflds: $$@.o libhdfeos.a
+	${EXECBLDF77}
+readgdflds: $$@.o libhdfeos.a
+	${EXECBLDF77}
+inquiregrid: $$@.o libhdfeos.a
+	${EXECBLDF77}
+subsetgrid: $$@.o libhdfeos.a
+	${EXECBLDF77}
+
+pointlib: SetupPoint DefineLevels WriteLevels UpdateLevels ReadLevels \
+        SubsetPoint
+ 
+SetupPoint: $$@.o libhdfeos.a
+	${EXECBLD}
+DefineLevels: $$@.o libhdfeos.a
+	${EXECBLD}
+WriteLevels: $$@.o libhdfeos.a
+	${EXECBLD}
+UpdateLevels: $$@.o libhdfeos.a
+	${EXECBLD}
+ReadLevels: $$@.o libhdfeos.a
+	${EXECBLD}
+SubsetPoint: $$@.o libhdfeos.a
+	${EXECBLD}
+
+pointflib: setuppoint definelevels writelevels readlevels updatelevels  \
+        subsetpoint
+ 
+setuppoint: $$@.o libhdfeos.a
+	${EXECBLDF77}
+definelevels: $$@.o libhdfeos.a
+	${EXECBLDF77}
+writelevels: $$@.o libhdfeos.a
+	${EXECBLDF77}
+readlevels: $$@.o libhdfeos.a
+	${EXECBLDF77}
+updatelevels: $$@.o libhdfeos.a
+	${EXECBLDF77}
+subsetpoint: $$@.o libhdfeos.a
+	${EXECBLDF77}
+
+
+
+EHapi.o : EHapi.c 
+	${CC} ${INCLUDE} -c EHapi.c -o EHapi.o
+
+SWapi.o : SWapi.c
+	${CC} ${INCLUDE} -c SWapi.c -o SWapi.o
+
+GDapi.o : GDapi.c
+	${CC} ${INCLUDE} -c GDapi.c -o GDapi.o
+
+PTapi.o : PTapi.c
+	${CC} ${INCLUDE} -c PTapi.c -o PTapi.o
+
+libhdfeos.a : EHapi.o SWapi.o GDapi.o PTapi.o
+	${AR} $@ $?

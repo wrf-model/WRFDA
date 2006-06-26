@@ -28,6 +28,7 @@ links :
 	@ $(LN) $(CONVERTOR)/convert_tool .
 	@ $(LN) $(CONVERTOR)/kma_wave2grid .
 	@ $(LN) $(CONVERTOR)/wave2grid_kma .
+	@ $(LN) $(CONVERTOR)/decode_l2_airs/* .
 	@ $(LN) $(ESMF_TIME_F90)/*.F90 .
 
 
@@ -40,6 +41,7 @@ include $(PHYS)/phys.make
 include $(DA)/da.make
 include $(GEN_BE)/gen_be.make
 include $(CONVERTOR)/convertor.make
+include $(CONVERTOR)/decode_l2_airs/decode_l2_airs.make
 include $(TOOLS)/tools.make
 include $(ESMF_TIME_F90)/esmf_time_f90.make
 include $(IO_INT)/io_int.make
@@ -90,5 +92,6 @@ superclean : clean
           convert_tool kma_wave2grid wave2grid_kma *.csh version_decl \
           *.bsh *.csh Utl* macros_utl module_dm_warning rsl_cpp_flags \
           scl_plotting_routines configure.wrf ../configure.wrf \
-          advance_cymdh.exe
+          advance_cymdh.exe decode_l2_airs.README time_window.nl \
+          Makefile_old 
 

@@ -1,0 +1,194 @@
+#
+# $Id: makepc.386,v 1.2 1993/11/03 21:57:10 koziol Exp $
+#
+# ##################################################################
+#
+#                   NCSA HDF Version 3.3 release 1
+#                          September 1993
+#
+#                  MAKEFILE for testing HDF Version 3.3
+#
+# This makefile creates HDF test programs.  There are three categories
+# of test programs:
+#
+#              application layer C test programs
+#              application layer FORTRAN test programs
+#              lower level C test programs
+#
+# The application layer C test programs are:
+#
+#              trig    (8-bit, 24-bit raster image sets and palette interface)
+#              tsdnt  (scientific data sets, data only)
+#              tsdnnt (same as tdfsd_nt with native number types)
+#              tsdmms (scientific data sets, data, max/min and scales)
+#              tsdnmms(same as tdfsd_mms with native number types)
+#              tsdstr (data and dimension strings: label, unit, format and coordsys)
+#              tan     (annotations for HDF objects)
+#              tanfile (annotations for HDF files)
+#              tstubs  (emulation of old lower level i/o routines)
+#              tlitend (Tests Little-endian support)
+#
+# The application layer FORTRAN test programs are:
+#
+#              tr8F     (8-bit raster image sets)
+#              t24F     (24-bit raster image sets)
+#              tpF      (Palettes)
+#              tsdntF   (scientific data sets, data only)
+#              tsdnntF  (same as tdfsd_nntF except all data types are native
+#                           machine number types)
+#              tsdmmsF  (scientific data sets, data, max/min and scales)
+#	       tsdnmmsF (same as tdfsd_mmsF with native number types)
+#              tsdstrF  (data and dimenstrings: label, unit, format and coordsys)
+#              tanF     (annotations for HDF objects)
+#              tanfileF (annotations for HDF files)
+#              tstubsF  (emulation of old lower level i/o routines)
+#
+# Vset test programs:
+#
+#	       egchi.c  (high level VSET write routines)
+#	       tv1.c    (the basic vgroup and vdata creation routines)
+#	       tv2.c    (creates vsets in 2 files simultaneously)
+#	       tvers.c  (get version string from an HDF file)
+# 	       egfhi.f  (Fortran version of egchi.c)
+#
+# The lower level C test programs are:
+#
+#              thfile     (basic i/o)
+#              terr       (error handling)
+#              thblocks   (linked blocks)
+#              thextelt   (i/o involving external files)
+#              tvers      (storing and retrieving version strings)
+#              thlinkage  (linkage of functions)
+#
+# Hyperslab Fortran test programs
+#              slabw      (write data as 5 slabs )
+#              slab1wf    (write data as first 3 of 5 slabs )
+#              slab2wf    (write data as last 2 of 5 slabs )
+#              slab3wf    (write data as 24 slabs i.e. each element )
+#              slab4wf    (write data as 1 slab )
+#
+# ##################################################################
+#
+#                      HOW TO USE THIS MAKEFILE
+#
+# You need df.lib to compile any of these test programs.  You will
+# also need selected header files as described below.
+#
+# To compile the application layer C test programs, enter "nmake ctests".
+# If there are test programs that you do not want to compile, do this 
+# by removing them from the lines "COBJS=" and "CSRCS=" below.
+# You need access to the header files indicated in the "CHDRS=" line
+# below to compile these programs. 
+#
+# To compile the application layer FORTRAN test programs, enter
+# "nmake ftests".  You need access to the header files indicated in
+# the "FHDRS=" line below to compile these programs. 
+# If there are test programs that you do not want to compile, do this 
+# by removing them from the lines "FOBJS=" and "FSRCS=" below.
+#
+# To compile the lower level C test programs, enter "make htests".
+# You need access to the header files indicated in the "HHDRS=" line
+# below to compile these programs.  If there are test programs that
+# you do not want to compile, do this by removing them from the lines
+# "HOBJS=" and "HSRCS=" below.
+#
+# To remove all object files created by this makefile, enter "make clean"
+#
+# ##################################################################
+#
+#                       PORTING INSTRUCTIONS
+#
+# You must modify the lines containing the symbol "==>" to make
+# this makefile compatible with your platform.
+#
+# ##################################################################
+
+.SUFFIXES : .f
+
+# ==> specify your machine
+#MACHINE=WIN3
+MACHINE=PC
+
+INCDIR=..\include
+LIBDIR=..\lib
+BINDIR=..\bin
+
+# ==> where are your hdf.h, hdfi.h and vg.h files located?
+IFLAGS=   /I$(INCDIR) /I.
+
+# ==> specify your FORTRAN compiler
+FC=fl
+FFLAGS= /c /Gt64 /AH /4I4 $(IFLAGS) /W2 /Od /Tf
+
+# ==> specify your C compiler
+CC=wcc386
+CFLAGS=  /ms /w4 /Od /d2 /s $(IFLAGS) /zc /ze
+#CFLAGS=  /ms /w4 /Oneatx /s $(IFLAGS) /zc /ze
+
+# ==> specify your Macro-Assembler compiler
+MM = ml
+MFLAGS = /c /nologo /W3
+
+# ==> where is your HDF library (libdf.a) located?
+LIBS= $(LIBDIR)\df.lib
+
+#BDIR=../backup
+
+# ==> specify your archiver
+AR=wlib
+ARFLAGS=/q /b
+ARFLAGS2=
+
+# ==> specify your linker
+LN=wlinkp
+LNFLAGS=
+
+# ==> specify your archive randomizer
+#RANLIB=ranlib
+
+RM=del
+RMFLAGS=
+LINTFLAGS=
+SHAR=zip
+ARCHIVE=hdf.zip
+
+SRCS=   testhdf.c rig.c sdstr.c blocks.c an.c anfile.c &
+        extelt.c file.c file1.c vers.c sdmms.c &
+        sdnmms.c slab.c litend.c tvset.c comp.c conv.c bitio.c &
+        tree.c
+
+CTESTS= testhdf.obj rig.obj sdstr.obj blocks.obj an.obj anfile.obj &
+        extelt.obj file.obj file1.obj vers.obj sdmms.obj &
+        sdnmms.obj slab.obj litend.obj tvset.obj comp.obj conv.obj bitio.obj &
+        tree.obj
+
+FTESTS= tr8f.exe t24f.exe tpf.exe tanf.exe tanfilef.exe tsdstrf.exe tsdntf.exe tsdnntf.exe &
+        tsdmmsf.exe tsdnmmsf.exe tstubsf.exe &
+        slabwf.exe slab1wf.exe slab2wf.exe slab3wf.exe slab4wf.exe
+TESTF = fortest.obj
+FOBJS = tr8f.obj t24f.obj tpf.obj tanf.obj tanfilef.obj tsdstrf.obj tsdntf.obj &
+        tsdnntf.obj tsdmmsf.obj tsdnmmsf.obj tstubsf.obj fortest.obj &
+        slabwf.obj slab1wf.obj slab2wf.obj slab3wf.obj slab4wf.obj
+
+#.f.obj:
+#    $(FC) $(FFLAGS) $<
+#
+.c.obj:
+    $(CC) $[@ $(CFLAGS)
+
+all: testhdf.exe fortest.exe
+    %null
+
+nofortran: testhdf.exe
+    %null
+
+testhdf.exe: $(CTESTS) $(LIBDIR)\df.lib testhdf.obj
+#    $(CC) $(CFLAGS) testhdf.c
+    $(LN) $(LNFLAGS) @testhdf.386
+
+fortest.exe: $(FTESTS) $(LIBDIR)\df.lib fortest.obj
+#    $(FC) $(FFLAGS) fortest.f
+    $(LN) $(LNFLAGS) fortest $(FTESTS),,,$(LIBDIR)\df.lib;
+
+clean:
+    -$(RM) $(RMFLAGS) *.hdf *.obj *.exe

@@ -1,0 +1,69 @@
+
+# Copyright (C) 1996 Hughes and Applied Research Corporation
+#
+# Permission to use, modify, and distribute this software and its documentation 
+# for any purpose without fee is hereby granted, provided that the above 
+# copyright notice appear in all copies and that both that copyright notice and 
+# this permission notice appear in supporting documentation.
+#
+## Template Makefile. See instructions in Makefile.instr ##
+ 
+CSCI    =   hdfeos
+ 
+include $(SUBSYSTOP)/make/make.options
+ 
+ 
+##############CUSTOM DEFINITIONS ########################################
+ 
+ 
+##############END OF CUSTOM DEFINITIONS##################################
+ 
+CXXSRCFILES     =
+ 
+CSRCFILES       = EHapi.c SWapi.c GDapi.c PTapi.c
+ 
+HFILES          = HdfEosDef.h cfortHdf.h
+ 
+OBJFILES        = EHapi.o SWapi.o GDapi.o PTapi.o
+ 
+LIBFILES        = $(LIBDIR)/libhdfeos.a
+ 
+BINFILES        =
+ 
+ 
+all: libhdfeos.a
+
+libhdfeos.a:	EHapi.o SWapi.o GDapi.o PTapi.c
+	${AR} $@ $?
+
+EHapi.o	: EHapi.c
+	${CC} ${INCLUDE} -c Ehapi.c -o EHapi.o
+
+SWapi.o	: SWapi.c
+	${CC} ${INCLUDE} -c SWapi.c -o SWapi.o
+
+GDapi.o	: GDapi.c
+	${CC} ${INCLUDE} -c GDapi.c -o GDapi.o
+
+PTapi.o : PTapi.c
+	${CC} ${INCLUDE} -c PTapi.c -o PTapi.o
+ 
+ 
+ 
+##############End of build target definitions############################
+ 
+ 
+CLEANFILES      = $(OBJFILES) $(LIBFILES) $(BINFILES)
+ 
+INSHFILES       = $(HFILES)
+ 
+INSLIBFILES     = $(LIBFILES)
+ 
+INSBINFILES     =
+ 
+LABELFILES      = $(LIBFILES)
+ 
+TESTSUBDIRS     = test
+ 
+include $(SUBSYSTOP)/make/make.targets
+

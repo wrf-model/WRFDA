@@ -1,0 +1,71 @@
+#########################################################################
+#
+# Name
+#	makerec/include
+#
+# Purpose
+#
+#	Make include file for building subdirectories recursively.
+#	This file will be included by Makefile at the src level
+#	which recursively builds all CSCs.
+#
+# Inputs
+#
+#	Set the following variables in the original makefile:
+#	    SUBDIRS - all the CSC subdirectories
+#	    TESTDIRS - all CSC test subdirectories
+#
+# Instructions
+#	make command builds all subsirectories (CSCs)
+#	make test command builds all test directories
+#	make clean command cleans all CSC subdirs
+#	make testclean cleans all test subdirs
+#
+##########################################################################
+
+##########################################################################
+#
+# THESE VALUES CAN BE USED FOR COMPARISON IN THE MAKEFILES
+#
+##########################################################################
+
+ARCH_hp		=	hp
+ARCH_sgi	=	sgi
+ARCH_sun5	=	sun5
+
+##########################################################################
+IDLMAKECMD	= clearmake -C gnu -f Makefile makeidl
+
+CLEANTARGET	=   clean
+TESTTARGET	=   test
+
+ifdef IDLDIRS
+all::	$(IDLDIRS) $(SUBDIRS)
+else
+all:: $(SUBDIRS)
+endif
+
+$(SUBDIRS)::
+	@echo "$B Building directory $@ ..."
+	@(B="${B}  "; export B; cd $@; $(MAKECMD))
+
+$(IDLDIRS)::
+	@echo "$B Building IDL directory $@ ..."
+	@(B="${B}  "; export B; cd $@; $(IDLMAKECMD))
+
+install::
+	@for DIR in $(SUBDIRS); do \
+		(echo "$B Installing directory $$DIR ..."; B="${B}  "; export B; cd $$DIR; $(MAKECMD) $@ ) \
+	done
+
+test::
+	@for DIR in $(SUBDIRS); do \
+		(echo "$B Building directory $$DIR ..."; B="${B}  "; export B; cd $$DIR; $(MAKECMD) $@ ) \
+	done
+
+testclean::
+	@for DIR in $(SUBDIRS); do \
+		(echo "$B Cleaning directory $$DIR ..."; B="${B}  "; export B; cd $$DIR; $(MAKECMD)  $@) \
+	done
+
+include $(CMTOP)/COMMON/make/makerec.cm

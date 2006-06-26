@@ -1,0 +1,146 @@
+#########################################################################
+#
+# Name
+#	Makefile.template
+#
+# Purpose
+#
+#	Template makefile for the CSS subsystem. Copy this file to your
+#	directory and follow instructions to create your custom
+#	makefile.
+#	Once you are finished creating the custom makefile. Delete
+#	These instructions.
+#
+##########################################################################
+
+
+
+##############Define CSCI################################################
+## CSCI must be defined before including the options file.
+## CSCI	=   CF
+CSCI	=   
+
+##############Include options file#######################################
+include $(SUBSYSTOP)/make/make.options
+
+
+
+##############CUSTOM DEFINITIONS ########################################
+## Include here any custom definitions for the directory. Note that you
+## may want to use some of these definitions in the later portion of the
+## makefile to define source, header, binary files etc.
+##
+
+
+
+
+##############END OF CUSTOM DEFINITIONS##################################
+
+
+
+##############Define CXXSRCFILES#########################################
+## Define all .cxx files in your directory here. Example below:
+## CXXSRCFILES	= myFile.cxx
+##
+CXXSRCFILES	= 
+
+##############Define CSRCFILES###########################################
+## Define all .c files in your directory here. Example
+## CSRCFILES	= myFile.c
+##
+CSRCFILES	= 
+
+##############Define HFILES##############################################
+## Define all .h files for your directory. Note that these files 
+## go in the include directory for the CSCI. Example
+## HFILES	= $(INCDIR)/myFile.h
+## Note that INCDIR defines the CSCI include directory
+##
+HFILES		= 
+
+
+##############Define OBJFILES############################################
+## Defines object files created in this directory
+## OBJFILES = $(OBJDIR)/myFile.o
+## Note that OBJDIR defines the location for .o files for the CSCI.
+##
+OBJFILES	=
+
+##############Define LIBFILES############################################
+## Defines the libraries you build in your directory. Example:
+## LIBFILES	= $(LIBDIR)/libmylib.a $(LIBDIR)/libmylib.a
+## Note that LIBDIR is the CSCI lib directory
+##
+LIBFILES	=
+
+##############Define BINFILES############################################
+## Defines any executables you build in this directory.
+## BINFILES	= $(BINDIR)/myServer
+##
+BINFILES	=
+
+
+
+
+##############Define build targets#######################################
+## all must be the first target in your makefile. Which would build 
+## the directory. Follow the all definition by the rest of the custom
+## targets and dependency list.
+##
+
+all:	
+
+
+
+
+
+##############End of build target definitions############################
+
+
+
+##############Define variables for targets in the standard file #########
+
+##############CLEANFILES###############################################
+## Defines files to cleanup (delete) for this directory. Please 
+## include names of ONLY the files that you create (derived files).
+## All other files like core etc will be cleanup for you.
+## Include additional files in the following if needed.
+
+CLEANFILES  =	$(OBJFILES) $(LIBFILES) $(BINFILES) 
+
+##############INSTALLFILES#############################################
+## Defines files to be released for the world
+##
+
+## INSHFILES - header files to be released.
+INSHFILES	= $(HFILES)
+
+## Libraries to be released
+INSLIBFILES	= $(LIBFILES)
+
+## Binaries to be released
+INSBINFILES	= $(BINFILES)
+
+##############LABELFILES###############################################
+## DCM needs this target to label all the executables and libraries that
+## are created in the directory. Default definition is provided.
+## Modify if needed.
+
+LABELFILES = $(LIBFILES) $(BINFILES)
+
+
+##############TESTSUBDIRS##############################################
+## Defines all subdirectories that have test driver or unit test code.
+## Do not include the complete path but just the name of the directory.
+## include all test subdirectories.
+
+TESTSUBDIRS	= test
+
+
+##############Include the additional targets file########################
+include $(SUBSYSTOP)/make/make.targets
+
+
+
+
+

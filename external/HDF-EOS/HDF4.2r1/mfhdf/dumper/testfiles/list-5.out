@@ -1,0 +1,8 @@
+#############################
+Expected output for './hdp list -t 720 tdata.hdf'
+#############################
+File: tdata.hdf
+Last modified with NCSA HDF Version 3.3 Release 4, October 1994
+
+Numeric Data Group  : (tag 720)
+	Ref nos: 2 3 4 

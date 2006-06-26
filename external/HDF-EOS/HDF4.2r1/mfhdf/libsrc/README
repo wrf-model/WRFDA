@@ -1,0 +1,45 @@
+$Id: README,v 1.1 1993/04/21 21:49:48 chouck Exp $
+
+Mon Apr 17 19:20:26 MDT 1989
+
+This is the source directory for the netcdf C language Library.
+
+There is a simple test program, "cdftest",
+which can be built to check the implementation.
+
+A much more exhaustive test can be found in ../nctest.
+
+Depending on the unkindness of your computer system vendor, you may
+need to build the xdr routines in ../xdr first. Most modern unix systems
+have the xdr routines aready in the C library.
+
+Running cdftest should produce output like the contents of "testout.sav".
+This program will also create a file called "test.cdf". This file should
+be byte for byte the same as "test_cdf.sav".
+
+
+Porting the netcdf code:
+
+	If your compiler supports the "void *" type and you wish to 
+   use this in the external interface, make sure that ncvoid is 
+   properly defined at the top of "netcdf.h".
+
+	If your compiler supports enums, "xdr_enum" works, and
+   you wish to use enums in the external interface, make sure
+   that USE_ENUM is defined at the top of "netcdf.h".
+
+	If your compiler supports the "binary mode" option to
+  fopen, as
+	fp = fopen(filename, "w+b") ;
+  be sure USE_BFLAG is defined near the top of "local_nc.h".
+  This is especially important on PC's and the MacIntosh, since
+  these systems will otherwise map bytes valued 0x0a ('\n') into
+  two bytes 0x0d 0x0a ('\r''\n').
+
+        Good Luck with the include files.
+
+
+The following files are only used on VAX/VMS:
+	descrip.mms - The immoral equivalent of a Makefile
+	htons.mar - 'Host to Network Short', in VAX Macro
+	ntohs.mar - 'Network to Host Short', in VAX Macro

@@ -1,0 +1,128 @@
+#! /bin/csh -f 
+#                   Script for testing fp2hdf
+#
+# The input files used in this script for testing fp2hdf are 
+# described in the file README.test.      
+#
+# Output files can be examined with hdfls to see if basic
+# contents are there.  Those with raster images can be displayed
+# using NCSA Image, DataScope, etc.  Those with floating point
+# data can be examined using hdfed or DataScope.
+# 
+# Note: these tests are not exhaustive.  You may want to add some
+# of your own, especially if you are doing something a little
+# different from what we are testing for.  You may also want to 
+# eliminate some of these tests if they are not relevant.
+# 
+set echo
+# text (100x100) => SDS only 
+./fp2hdf testfiles/fp2hdf/t100x100 -o o1 
+#
+# text => image only
+./fp2hdf testfiles/fp2hdf/t100x100 -o o2 -r
+#
+# text => SDS and image
+./fp2hdf testfiles/fp2hdf/t100x100 -o o3 -r -f
+#
+# hdf (100x100) => SDS and image
+./fp2hdf testfiles/fp2hdf/h100x100 -o o4 -r -f
+#
+# hdf => SDS and image w palette
+./fp2hdf testfiles/fp2hdf/h100x100 -o o5 -f -r -p testfiles/fp2hdf/pal.hdf
+#
+# hdf => 200x200 image, pixel replication 
+./fp2hdf testfiles/fp2hdf/h100x100 -o o6 -r -e 200 200
+#
+# hdf => 200x200 image, bilinear interporlation 
+./fp2hdf testfiles/fp2hdf/h100x100 -o o7 -r -i 200 200
+#
+# hdf => 40x120 interpolated image w palette
+./fp2hdf testfiles/fp2hdf/h100x100 -o o8 -r -i 40 120 -p testfiles/fp2hdf/pal.hdf
+#
+# hdf => 40x120 pixel rep image w palette (should generate and error)
+./fp2hdf testfiles/fp2hdf/h100x100 -o o9 -r -e 40 120 -p testfiles/fp2hdf/pal.hdf
+#
+# hdf (60x75) => 120x160 pixel rep image w palette
+./fp2hdf testfiles/fp2hdf/h60x75 -o o10 -r -e 120 160 -p testfiles/fp2hdf/pal.hdf
+#
+# hdf (100x100, horizontal scale is non-uniform) => SDS and image w palette
+./fp2hdf testfiles/fp2hdf/h100x100h -o o11 -f -r -p testfiles/fp2hdf/pal.hdf
+#
+# hdf (100x100, horiz and vert scales are non-uniform) => SDS and image w pal
+./fp2hdf testfiles/fp2hdf/h100x100hv -o o12 -f -r -p testfiles/fp2hdf/pal.hdf
+#
+# hdf (60x75 vert scale is non-uniform) => 120x160 image with palette
+./fp2hdf testfiles/fp2hdf/h60x75v -o o13 -r -e 120 160 -p testfiles/fp2hdf/pal.hdf
+#
+# hdf (60x75 no scales) => 120x150 pixel rep image with palette
+./fp2hdf testfiles/fp2hdf/h60x75n -o o14 -r -e 120 150 -p testfiles/fp2hdf/pal.hdf
+#
+# From several files => a file with 100x100 images for all of them
+./fp2hdf testfiles/fp2hdf/t100x100 testfiles/fp2hdf/h100x100 testfiles/fp2hdf/h100x100h testfiles/fp2hdf/h100x100hv testfiles/fp2hdf/h60x75 testfiles/fp2hdf/h60x75v -o o15 -r -e 100 100
+#
+# Now do test on the other set of input files
+#
+# C: text (3x4) => SDS 
+./fp2hdf ctxtr2 -o o20 
+#
+# C: text (3x4x5) => SDS 
+./fp2hdf ctxtr3 -o o21
+#
+# C: binary 32-bit (3x4) => SDS
+./fp2hdf cb32r2 -o o22 
+#
+# C: binary 32-bit (3x4x5) => SDS 
+./fp2hdf cb32r3 -o o23 
+#
+# C: binary 64-bit (3x4) => SDS 
+./fp2hdf cb64r2 -o o24 
+#
+# C: binary 64-bit (3x4x5) => SDS 
+./fp2hdf cb64r3 -o o25 
+#
+# C: text (3x4) => image
+./fp2hdf ctxtr2 -o o26 -raster -e 50 50 
+#
+# C: binary (3x4) => image and SDS
+./fp2hdf cb64r2 -o o27 -raster -i 50 50 -f
+#
+# 
+# Fortran: text (3x4) => SDS 
+./fp2hdf ftxtr2 -o o30 
+#
+# Fortran: text (3x4x5) => SDS 
+./fp2hdf ftxtr3 -o o31
+#
+# Fortran: binary 32-bit (3x4) => SDS
+./fp2hdf fb32r2 -o o32 
+#
+# Fortran: binary 32-bit (3x4x5) => SDS 
+./fp2hdf fb32r3 -o o33 
+#
+# Fortran: binary 64-bit (3x4) => SDS 
+./fp2hdf fb64r2 -o o34 
+#
+# Fortran: binary 64-bit (3x4x5) => SDS 
+./fp2hdf fb64r3 -o o35 
+#
+# Fortran: text (3x4) => image
+./fp2hdf ftxtr2 -o o36 -raster -e 50 50 
+#
+# Fortran: binary (3x4) => image and SDS
+./fp2hdf fb64r2 -o o37 -raster -i 50 50 -f
+#
+# 
+# Compare files o20-o27 with o30-o37.  They should be the same.
+#
+cmp o20 o30
+cmp o21 o31
+cmp o22 o32
+cmp o23 o33
+cmp o24 o34
+cmp o25 o35
+cmp o26 o36
+cmp o27 o37
+
+unset echo
+
+

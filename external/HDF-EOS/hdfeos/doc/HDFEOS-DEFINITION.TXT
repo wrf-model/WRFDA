@@ -1,0 +1,167 @@
+
+Definition of HDF-EOS
+Doug Ilg and Larry Klein
+
+Abstract
+HDF-EOS is a software library designed to support EOS-specific 
+data structures, namely Grid, Point, and Swath. The new data structures 
+are constructed from standard HDF data objects, using EOS conventions, 
+through the use of a software library [1,4]. A key feature of HDF-EOS files 
+is that instrument-independent services, such as subsetting by geolocation, 
+can be applied to the files across a wide variety of data products. The 
+library is extensible and new data structures can be added.
+
+This document provides a basic specification of an HDF-EOS file, a 
+generalized description of file contents and a discussion of certain 
+limitations of the format.
+
+Definitions
+HDF-EOS is a software library that is an extension of National Center 
+for Supercomputing Applications (NCSA) HDF. The library supports the 
+construction of new data structures: Grid, Point and Swath.
+
+HDF-EOS File:
+An HDF-EOS file is any valid HDF file (i.e., any file created by the 
+NCSA HDF library [1]), that contains a family of global attributes called 
+"coremetadata.X", where ".X" is a sequence number beginning at 0 and running 
+as high as 9. Optional data objects which may appear in an HDF-EOS file 
+include another family of global attributes called "archivemetadata.X" and 
+any number of Point, Swath, and/or Grid data structures. The existence of 
+Point, Swath, or Grid structures in an HDF-EOS file implies the existence 
+of another family of global attributes called "StructMetadata.X", which is 
+automatically created, populated, and maintained by the HDF-EOS library. 
+Note that all attribute names are case sensitive.
+
+Core Metadata:
+Core metadata represent information to which system-wide services, such as 
+searching, will be applied. These metadata, which are defined in DID 311 [3], 
+are contained in the "coremetadata.X" family of global attributes within an 
+HDF-EOS file. The syntax of these metadata is compliant with the Object 
+Description Language (ODL) [4]. Tools for formatting, accessing and writing 
+core metadata are provided in the ECS Science Data Processing (SDP) Toolkit [2].
+
+Archive Metadata:
+Archive metadata represent information that, by definition, will not be 
+searchable. It contains whatever information the file creator considers 
+necessary to be in file, but to which system-wide services will not be 
+applied. These metadata are also accessed via SDP Toolkit [2] calls and 
+are written in ODL [4] syntax into the "archivemetadata.X" family of global 
+attribtes.
+
+Structural Metadata:
+Structural metadata describe the contents and structure of an HDF-EOS file. 
+These metadata are present in the file only if the HDF-EOS library has been 
+invoked to create a Grid, Point, or Swath structure. These metadata are stored 
+in the "StructMetadata.X" family of global attributes and created and maintained 
+by the HDF-EOS library. These metadata are not intended to be directly accessed 
+by data producers or users. Therefore, all access to these metadata should be 
+via appropriate function calls in the HDF-EOS library.
+
+General Limitations
+1.) External element implementations of HDF or HDF-EOS files are not supported 
+    by the ECS.
+2.) There is an absolute limit of two gigabytes on the size of a single HDF or 
+    HDF-EOS file [1].
+3.) Individual HDF and HDF-EOS character attributes are limited to 64 kilobytes 
+    in length. Hence the potential need for "families" of attributes [1].
+4.) The HDF-EOS library does not provide tools for creating, populating, or 
+    maintaining the "coremetadata" or "archivemetadata" families of attributes. 
+    Those tools appear in the SDP Toolkit [2, 3].
+5.) Any user-supplied names are case sensitive and may contain up to 64 
+    characters. Commas (","), forward slashes ("/"), and colons (":") are the 
+    only invalid characters in names.
+
+Point Structure
+Point structures are implemented as a hierarchy of Vgroups containing several 
+Vdatas. All Vgroups and Vdatas that are part of any Point structure carry the 
+class "POINT". Each level of data within a Point structure is implemented as 
+a single Vdata, with each data field being a named field in the Vdata. Hence, 
+the following limitations apply:
+
+1.) The reserved field names for special purpose geolocation fields are 
+    "Longitude", "Latitude", "Colatitude", and "Time" (case sensitive). These 
+    fields are subject to the following requirements:
+Field Name	Data Type		Format
+Longitude	float32 or float64	Decimal degrees on the range [-180.0, 180.0]
+Latitude	float32 or float64	Decimal degrees on the range [-90.0, 90.0]
+Colatitude	float32 or float64	Decimal degrees on the range [0.0, 180.0]
+Time		float64			TAI93 (seconds until(-)/since(+) midnight, 
+					1/1/93)
+These fields may be one- or two-dimensional.
+2.) Fields may only be one-dimensional.
+3.) Up to 8 levels may exist in a Point structure.
+
+Swath Structure
+Swath structures are implemented as a hierarchy of Vgroups containing a number 
+of Vdatas and/or SDSs. All Vgroups and Vdatas that are part of any Swath 
+structure carry the class "SWATH".
+
+Each one-dimensional field is implemented as a named field within its own Vdata. 
+One-dimensional fields that are the same length, and are specifically allowed 
+by the calling program, are merged into "communal" Vdatas, with each data field 
+occupying one field in the Vdata.
+
+Each multi-dimensional field is implemented as an SDS. Three-dimensional fields 
+which share the same dimensionality, dimension sizes, and data type and which 
+are specifically allowed by the calling program are merged into communal SDSs 
+with three dimensions. Two-dimensional arrays are merged as if they were 
+three-dimensional arrays with a first dimension of size 1. No merging is 
+performed on fields with more than three dimensions, on fields with an unlimited 
+dimension, or on compressed fields. 
+Accordingly, the following limitations apply:
+
+1.) The reserved field names for special purpose geolocation fields are 
+    "Longitude", "Latitude", "Colatitude", and "Time" (case sensitive). These 
+    fields are subject to the following requirements:
+Field Name	Data Type		Format
+Longitude	float32 or float64	Decimal degrees on the range [-180.0, 180.0]
+Latitude	float32 or float64	Decimal degrees on the range [-90.0, 90.0
+Colatitude	float32 or float64	Decimal degrees on the range [0.0, 180.0]
+Time		float64			TAI93 (seconds until(-)/since(+) midnight, 
+                                        1/1/93)
+These fields may be one- or two-dimensional.
+2.) Non-reserved fields may have up to 8 dimensions.
+3.) An "unlimited" dimension must be the first dimension (in C-order).
+4.) For all multi-dimensional fields in scan- or profile-oriented Swaths, the 
+    dimension representing the "along track" dimension must precede the dimension 
+    representing the scan or profile dimension(s).
+5.) Compression is selectable at the field level within a Swath. All HDF-supported 
+    compression methods are available through the HDF-EOS library. Specifying 
+    compression on a field prevents merging.
+
+Grid Structure
+Grid structures are implemented as a hierarchy of Vgroups containing several SDSs. 
+All Vgroups that are part of any Grid structure carry the class "GRID". Each 
+data field within a Grid structure is implemented as a single SDS. Merging is 
+done the same way for Grid data fields as for multi-dimensional Swath 
+data fields. Therefore, the following limitations apply:
+1.) Fields may have from 2 to 8 dimensions.
+2.) Compression is selectable at the field level within a Grid. All 
+    HDF-supported compression methods are available through the HDF-EOS 
+    library. Specifying compression on a field prevents merging.
+
+References
+1.) Getting Started with HDF, 1993; HDF User's Guide, Version 4.0r2, 
+    July, 1996; HDF Reference Manual, Version 4.0r2, July, 1996; HDF 
+    Specifications and Developers Guide; National Center for Supercomputing 
+    Applications, University of Illinois. These documents are available by 
+    anonymous FTP at the following address: hdf.ncsa.uuic.edu
+2.) SDP Toolkit Users Guide for the ECS Project , May, 1996 [333-CD-003-004]. 
+    Documentation and software are available at http://edhs1.gsfc.nasa.gov/
+3.) Release B SDPS Database Design and Database Schema Specifications , 
+    May 1996 [311-CD-008-001]; Science Data Processing Segment (SDPS) Database 
+    Design and Database Schema Specifications for the ECS Project, December 1995, 
+    [311-CD-002-004].
+4.) Object Descriptor Language reference: Planetary Data Sytems Standard Reference, 
+    Version 3.2, July 1995, JPL, California.
+
+For more specific information on the use of the HDF-EOS library, please 
+refer to the HDF-EOS User's Guide  for the ECS Project , June , 1996 
+[170-TP-005-001].
+
+Referral:
+Refer comments to:
+Larry Klein
+ECS
+larry@eos.hitc.com
+301-925-0764

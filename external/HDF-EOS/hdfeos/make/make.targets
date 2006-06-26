@@ -1,0 +1,76 @@
+#########################################################################
+#
+# Name
+#	make.targets
+#
+# Purpose
+#
+#	Common targets for build. Must be included in the Makefile at
+#	the end. See the template makefile for instructions.
+#
+##########################################################################
+
+
+###############install####################################################
+## Installs the files to release directory. CM use only.
+
+LIBRARYFILES    := $(strip $(INSLIBFILES) )
+BINARYFILES    := $(strip $(INSBINFILES) )
+HEADERFILES    := $(strip $(INSHFILES) )
+DOCUMENTATIONFILES := $(strip $(INSDOCFILES) )
+EMPTY       := $(strip, " ")
+
+install:: installbinaryfiles \
+	installlibraryfiles
+
+installbinaryfiles::
+	@echo "$(B) Checking for binary files to Install ..."
+	@if [ "$(BINARYFILES)" = "$(EMPTY)" ] ; then \
+		echo "$(B) No binary files to Install ..." ; \
+	else \
+		if [ ! -d $(SUBSYSTOP)/install/bin ] ; then \
+			mkdir -p $(SUBSYSTOP)/install/bin ; \
+		fi ; \
+		echo "$(B) Installing $(INSBINFILES) ..." ; \
+		cp $(INSBINFILES) $(SUBSYSTOP)/install/bin ; \
+		chmod ug+w $(SUBSYSTOP)/install/bin/* ; \
+	fi
+
+installlibraryfiles::
+	@echo "$(B) Checking for library files to Install ..."
+	@if [ "$(LIBRARYFILES)" = "$(EMPTY)" ] ; then \
+		echo "$(B) No library files to Install ..." ; \
+	else \
+		echo "$(B) Installing $(INSLIBFILES) ..." ; \
+		cd $(SUBSYSTOP)/lib/$(ARCH) ; \
+		$(CMTOP)/COMMON/make/instvobele.sh $(INSLIBFILES) ; \
+	fi
+
+
+###############installdir#################################################
+## install for te directory (access to others ??)
+installdir:
+	@echo Installdir target executed ! Nothing done !!
+
+
+###############test#######################################################
+## builds all the test subdirectories recursively. Uses variable
+## TESTSUBDIRS specified in the makefile.
+
+test::
+	@for DIR in $(TESTSUBDIRS); do \
+		(echo "$B Building directory $$DIR ..." ; B="${B}  "; export B; cd $$DIR; $(MAKECMD) ) \
+	done
+ 
+	
+###############testclean##################################################
+## cleans all the test subdirectories recursively. Uses variable
+## TESTSUBDIRS specified in the makefile.
+
+testclean::
+	@for DIR in $(TESTSUBDIRS); do \
+		(echo "$B Cleaning $$DIR ..."; B="${B}  "; export B; cd $$DIR; $(MAKECMD) clean ) \
+	done
+ 
+
+include $(CMTOP)/COMMON/make/makecm.targets

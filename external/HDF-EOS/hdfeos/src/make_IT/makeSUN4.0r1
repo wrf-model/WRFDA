@@ -1,0 +1,26 @@
+
+# Copyright (C) 1996 Hughes and Applied Research Corporation
+#
+# Permission to use, modify, and distribute this software and its documentation 
+# for any purpose without fee is hereby granted, provided that the above 
+# copyright notice appear in all copies and that both that copyright notice and 
+# this permission notice appear in supporting documentation.
+
+#CC = cc -DSUN
+CC = gcc -DSUN -g
+F77 = f77
+
+MACHINE = SUN
+
+INCLUDE = -I. -I/home/hdf/sun/40r1p1/include -I/home/hdf/gctpc/source
+LIBRARY = -L. -L/home/hdf/sun/40r1p1/lib
+GCTP = /home/rgejjaga/gctpc/source/geolibSUN.a
+
+LDFLAGS = -lhdfeos ${GCTP} -lmfhdf -ldf -ljpeg -lnsl -lz -lm
+
+
+#INCLUDE = -I<Location of HDF include files>
+#LIBRARY = -L<Location of HDF libraries> 
+
+include makeinc
+

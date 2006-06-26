@@ -1,0 +1,1264 @@
+#!/bin/sh
+# Copyright (C) 1996 Hughes and Applied Research Corporation
+#
+# Permission to use, modify, and distribute this software and its documentation 
+# for any purpose without fee is hereby granted, provided that the above 
+# copyright notice appear in all copies and that both that copyright notice and 
+# this permission notice appear in supporting documentation.
+#
+#-----------------------------------------------------------------------------
+# filename:	
+# 	INSTALL-HDFEOS
+#
+# description:
+# 	This script handles the installation of HDFEOS.
+#
+# usage:
+# 	1) Set directory to HDFEOS top level directory.
+# 	2) Type:
+# 
+# 	       bin/INSTALL-HDFEOS [-dbug] [-sgi32 | -sgi64] [-i<incdir>] [-l<libdir>]
+#              bin/INSTALL-HDFEOS [-cc_path <path/compiler_name>]
+# 	       bin/INSTALL-HDFEOS [-h]
+# 
+# 	   Where (optional) flags are:
+#
+# 	      -dbug    : build debug version of HDF-EOS
+# 	      -sgi32   : build in -n32 mode (SGI Power Challenge only)
+# 	      -sgi64   : build in -64  mode (SGI Power Challenge only)
+#             -cc_path : set the path of the C compiler to <path/compiler_name>
+# 	      -i       : set HDF include directory to <libdir>
+# 	      -l       : set HDF library directory to <libdir>
+# 	      -h       : display this help message and exit
+#
+# 	3) Enter requested information when prompted.
+# 
+# notes:
+# 	1) This script is compatible with the following platforms:
+# 	   Sun, SGI, HP-9000, IBM RS-6000 and DEC Alpha.
+# 	   It automatically figures out which platform you are on,
+# 	   and sets environment variables accordingly.
+#
+# author:
+# 	Mike Sucher / A.R.C.
+#
+# history:
+#	18-Jun-1996 MES  Initial version 
+# 	27-Sep-1996 MES  Add -i and -l options
+#	17-Apr-1997 DaW  Added support for old 32-bit compiling on SGI
+#			 Power Challenge
+#       15-Sep-2003 PTN  Added -cc_path option
+#       17_Feb-2004 PTN  Modified for Linux 64
+#-----------------------------------------------------------------------------
+
+this_script="`basename $0`"
+
+#
+# Function to output error message
+#
+
+WriteError()
+{
+    echo ""
+    echo "${this_script}: Error: $*"  >&2
+}
+
+
+#
+# Function prompt for user response
+#
+
+UserPrompt()
+{
+    if [ "$BRAND" = "linux" ] ; then
+	/bin/echo "$* \c" > /dev/tty
+    else
+	echo "$* \\c" > /dev/tty
+    fi
+    read user_response
+}
+
+
+#
+# Function to output help message and exit
+#
+
+Help()
+{
+    sed -n '/filename:/,/author:/p' $0 | grep -v "author:" | cut -c3-300 | more
+    #this line must be here because it contains the string: "author:"
+    exit
+}
+
+
+#
+# Function to output a startup banner
+#
+
+Banner()
+{
+    echo ""
+    echo "-----------------------------------------------------------------------"
+    echo "$this_script: Installation script for HDFEOS"
+    echo ""
+    echo "    Installing HDFEOS on host $HOST running $OSTYPE"
+    echo "    HDFEOS home directory is: $HDFEOS_HOME"
+    echo ""
+    echo "    Starting HDFEOS installation at `date`"
+    echo ""
+    echo "-----------------------------------------------------------------------"
+    echo ""
+}
+
+#
+# Function to handle error exit
+#
+
+ErrorExit()
+{
+    echo ""
+    echo "${this_script}: Fatal error running command: $*"  >&2
+    echo ""
+
+    echo "-----------------------------------------------------------------------"
+    echo ""
+    echo "    HDFEOS installation ending with errors at `date`"
+    echo ""
+    echo "-----------------------------------------------------------------------"
+
+    exit 1
+}
+
+
+#
+# Functions to check HDF environment variables for validity
+#
+
+ValidHDFLIB()
+{
+    if [ "$HDFLIB" = "" ] ; then
+        WriteError "No HDF library directory specified"
+        exit 1
+    else
+        if [ ! -f "$HDFLIB/libdf.a" ] ; then
+            WriteError "HDF library not found in: $HDFLIB"
+            exit 1
+        fi
+    fi
+}
+
+ValidHDFINC()
+{
+    if [ "$HDFINC" = "" ] ; then
+        WriteError "No HDF include directory specified"
+        exit 1
+    else
+        if [ ! -f "$HDFINC/hdf.h" ] ; then
+            WriteError "HDF header file not found in: $HDFINC"
+            exit 1
+        fi
+    fi
+}
+
+
+#
+# Function to set up the HDF environment variables HDFINC and HDFLIB 
+# The values are set via the following priority scheme:
+#
+#     (1) command line override, via the -l and -i flags
+#     (2) loaded from the saved HDF environment file
+#     (3) user prompt or inherited from the environment.
+# 
+# The user will be prompted to override inherited values, except in
+# case (1).
+#
+
+GetHdfEnv()
+{
+    #
+    # If HDFINC or HDFLIB has not been specified on the command line. 
+    # first look for them in the saved HDF environment file
+    #
+
+    hdf_env_file=$HDFEOS_BIN/.hdf_env
+
+    if [ -f $hdf_env_file ] ; then
+
+        if [ $lib_flag = 0 ] ; then
+            echo "Getting HDFLIB from $hdf_env_file"
+            HDFLIB=`head -1 $hdf_env_file`
+        fi
+
+        if [ $inc_flag = 0 ] ; then
+            echo "Getting HDFINC from $hdf_env_file"
+            HDFINC=`tail -1 $hdf_env_file`
+        fi
+
+    fi
+
+    #
+    # If HDFINC or HDFLIB is undefined at this point, then prompt for them
+    # Otherwise ask if they should be accepted, unless specified via the
+    # command line.  Check them in any case !
+    #
+
+    if [ $lib_flag = 0 ] ; then
+        if [ "$HDFLIB" = "" ] ; then
+            UserPrompt "Please enter the HDF library files directory: "
+        else
+            echo "Current value of the HDF library directory is: $HDFLIB"
+            UserPrompt "New value (or Return to accept):"
+        fi
+        if [ "$user_response" != "" ] ; then
+            HDFLIB="$user_response"
+        fi
+    fi
+
+    ValidHDFLIB 	# make sure it's valid before proceeding
+    
+
+    if [ $inc_flag = 0 ] ; then
+        if [ "$HDFINC" = "" ] ; then
+            UserPrompt "Please enter the HDF include files directory: "
+        else
+            echo "Current value of the HDF include directory is: $HDFINC"
+            UserPrompt "New value (or Return to accept):"
+        fi
+        if [ "$user_response" != "" ] ; then
+            HDFINC="$user_response"
+        fi
+    fi
+
+    ValidHDFINC  	# make sure it's valid before proceeding
+
+
+    echo ""
+    echo "HDF include files in: $HDFINC"
+    echo "HDF library files in: $HDFLIB"
+
+
+    cat /dev/null > $hdf_env_file
+    echo $HDFLIB >> $hdf_env_file
+    echo $HDFINC >> $hdf_env_file
+    
+    export HDFLIB HDFINC
+
+}
+
+
+#
+# Function to set up architecture-dependent environment scripts
+#
+
+SetupEnvScripts()
+{
+
+echo ""
+echo ""
+echo "-----------------------------------------------------------------------"
+echo ""
+echo "Setting up installation-dependent scripts"
+echo ""
+echo "-----------------------------------------------------------------------"
+echo ""
+
+cd $HDFEOS_BIN
+
+if [ -f ../tmp/hdfeos_env.ksh.tmp ] ; then
+
+    echo "    Setting up Korn shell (ksh) script 'hdfeos_env.ksh' "
+    echo "    Korn shell users may call this file from their .profile "
+    echo "    file via the the line:"
+    echo "    "
+    echo "        . $HDFEOS_BIN/hdfeos_env.ksh  "
+    echo "    "
+    echo "    It sets up machine-specific environment variables needed "
+    echo "    by the HDFEOS makefiles for compilation and linking."
+    echo "    "
+
+    echo "# " > hdfeos_env.ksh
+
+    echo '# Clear all conditional flags'  	>> hdfeos_env.ksh
+    echo 'sgi_mode=""'  	>> hdfeos_env.ksh
+    echo 'hdfeos_f90_comp=""' 	>> hdfeos_env.ksh
+    echo 'hdfeos_nag_flag=""' 	>> hdfeos_env.ksh
+
+    echo " " >> hdfeos_env.ksh
+    echo "# set the HDFEOS home directory and HDF variables" >> hdfeos_env.ksh
+    echo "# HDFEOS installation done on `date` " >> hdfeos_env.ksh
+    echo "# " >> hdfeos_env.ksh
+    echo " " >> hdfeos_env.ksh
+
+    echo "HDFEOS_HOME=$HDFEOS_HOME	# the HDFEOS home directory" >> hdfeos_env.ksh
+    echo "HDFLIB=$HDFLIB 		# the HDF lib directory" >> hdfeos_env.ksh
+    echo "HDFINC=$HDFINC 		# the HDF include directory" >> hdfeos_env.ksh
+
+    case "$sgi_mode" in
+      64 ) echo "sgi_mode=64 		# SGI for -64 mode" >> hdfeos_env.ksh
+        ;;
+      n32 ) echo "sgi_mode=n32 		# SGI for -n32 mode" >> hdfeos_env.ksh
+        ;;
+      * ) echo "sgi_mode=32 		# SGI for standard mode" >> hdfeos_env.ksh
+        ;;
+    esac
+
+
+    if [ "$f90_flag" = "1" ] ; then	 	#  do FORTRAN-90 setup
+
+        echo "hdfeos_f90_comp='$F77' 		# f90 compiler" >> hdfeos_env.ksh
+
+        if [ "$nag_flag" = "1" ] ; then 	#  using NAG f90
+            echo "hdfeos_nag_flag=1		# using NAG f90" >> hdfeos_env.ksh
+        fi
+
+    fi
+
+    echo "opt_flag='$opt_flag'		# set compiler optimization level" >> hdfeos_env.ksh
+
+    echo " " >> hdfeos_env.ksh
+
+    cat ../tmp/hdfeos_env.ksh.tmp >> hdfeos_env.ksh
+    
+    sleep 3
+
+fi
+
+echo "                -----------------------------------"
+echo ""
+
+if [ -f ../tmp/hdfeos_env.csh.tmp ] ; then
+
+    echo "    Setting up C-shell (csh) script 'hdfeos_env.csh' "
+    echo "    This file may be called from your .cshrc file via the the line:"
+    echo "    "
+    echo "        source $HDFEOS_BIN/hdfeos_env.csh  "
+    echo "    "
+    echo "    It sets up machine-specific environment variables needed "
+    echo "    by the HDFEOS makefiles for compilation and linking."
+    echo "    "
+
+    echo "# " > hdfeos_env.csh
+
+    echo '# Clear all conditional flags'  	>> hdfeos_env.csh
+    echo "unset sgi_mode" 	>> hdfeos_env.csh
+    echo "unset hdfeos_f90_comp" 	>> hdfeos_env.csh
+    echo "unset hdfeos_nag_flag" 	>> hdfeos_env.csh
+
+    echo " " >> hdfeos_env.csh
+    echo "# set the HDFEOS home directory and HDF variables" >> hdfeos_env.csh
+    echo "# HDFEOS installation done on `date` " >> hdfeos_env.csh
+    echo "# " >> hdfeos_env.csh
+    echo " " >> hdfeos_env.csh
+
+    echo "setenv HDFEOS_HOME $HDFEOS_HOME	# the HDFEOS home directory" >> hdfeos_env.csh
+    echo "setenv HDFLIB $HDFLIB 		# the HDF lib directory" >> hdfeos_env.csh
+    echo "setenv HDFINC $HDFINC 		# the HDF include directory" >> hdfeos_env.csh
+
+    case "$sgi_mode" in
+      64 ) echo "set sgi_mode=64 		# SGI for -64 mode" >> hdfeos_env.csh
+        ;;
+      n32 ) echo "set sgi_mode=n32 		# SGI for -n32 mode" >> hdfeos_env.csh
+        ;;
+      * ) echo "set sgi_mode=32 		# SGI for standard mode" >> hdfeos_env.csh
+        ;;
+    esac
+
+
+    if [ "$f90_flag" = "1" ] ; then 		# do FORTRAN-90 setup
+
+        echo "hdfeos_f90_comp='$F77' 		# f90 compiler" >> hdfeos_env.csh
+
+        if [ "$nag_flag" = "1" ] ; then 	# check if using NAG f90
+            echo "hdfeos_nag_flag=1		# using NAG f90" >> hdfeos_env.csh
+        fi
+
+    fi
+
+    echo "set opt_flag='$opt_flag'		# set compiler optimization level" >> hdfeos_env.csh
+
+    echo " " >> hdfeos_env.csh
+
+
+    cat ../tmp/hdfeos_env.csh.tmp >> hdfeos_env.csh
+
+    sleep 3
+
+fi
+
+
+}
+
+
+#
+# Get parameters from command line
+#
+
+sgi_mode=32		# by default, SGI mode is standard 32-bit
+pgs_f90_comp="" 	# by default, no FORTRAN-90 compiler
+pgs_nag_flag=0		# by default, not using NAG FORTRAN-90
+inc_flag=0		# HDFINC override flag
+lib_flag=0		# HDFLIB override flag
+opt_flag=-O		# compiler optimization level
+fc_path=""
+cc_path=""
+
+while [ "$1" != "" ]
+do
+
+    case $1 in
+
+      -h | -he  | -hel  | -help  ) Help ;;	# help
+
+      -sgi32) sgi_mode=n32 ;;
+      -sgio32) sgi_mode=o32 ;;
+      -sgi64) sgi_mode=64 ;;
+
+      -dbug) opt_flag=-g ;;
+
+      -fc_path ) fc_path="$2" ; shift ;;
+      -cc_path ) cc_path="$2" ; shift ;;
+
+      -i) HDFINC=$2 ; inc_flag=1; shift ;;
+      -l) HDFLIB=$2 ; lib_flag=1; shift ;;
+
+      -i*) HDFINC=`echo $1 | cut -c3-` ; inc_flag=1 ;;
+      -l*) HDFLIB=`echo $1 | cut -c3-` ; lib_flag=1 ;;
+
+      -*)
+        echo "Invalid option: $1"
+        Help
+        ;;
+
+      *) 				# default
+        value1="$1"
+        ;;
+
+    esac
+
+    shift
+
+done
+
+
+
+# set path to a base subset of directories, allowing startup on unknown host
+# note: once the host has been determined the path is appropriately customized
+
+PATH=/usr/local/bin:/bin:/usr/bin:/etc:/usr/etc:/usr/ucb:/usr/bin/X11
+export PATH 
+
+# get operating system type, login name
+# special cases: SCO and Cray  - uname works differently,
+
+MACHINE="`uname -m | awk '{print $1}'`"	# needed on Cray & SCO
+
+case "$MACHINE" in
+    i386) OSTYPE=sco386 ;;		# SCO box
+    CRAY) OSTYPE=UNICOS ;;		# CRAY
+    *) OSTYPE="`uname`"	;;		# everybody else
+esac
+
+user=`id | cut -d\( -f2 | cut -d\) -f1`
+LOGNAME=$user				# make sure $LOGNAME is defined
+USER=$LOGNAME				# make sure $USER is defined
+export USER LOGNAME
+
+
+# set machine-dependent environment variables:
+# 	HOST   the host name of this machine
+# 	BRAND  used by other achitecture-specific code
+# 	PATH   the execution search path 
+
+case "$OSTYPE" in
+
+  AIX) 
+    PATH=/usr/local/bin:/bin:/usr/bin:/etc:/usr/etc:/usr/ucb:/usr/bin/X11:/usr/sbin
+    HOST="`hostname`"
+    BRAND="ibm"
+    ;;
+
+  HP-UX) 
+    PATH=/usr/local/bin:/bin:/usr/bin:/etc:/usr/bin/X11
+    HOST="`hostname`"
+    BRAND="hp"
+    ;;
+
+  IRIX) 
+    PATH=/usr/local/bin:/bin:/usr/bin:/etc:/usr/etc:/usr/bsd:/usr/sbin
+    HOST="`hostname`"
+    if [ `uname -r | awk -F. '{print $2}'` = "5" ] ; then
+       OS_VERSION="5"                  # release V6.5 IRIX
+       echo IRIX 6.5 platform
+       case $sgi_mode in
+          64 ) BRAND=sgi64 ;;
+          n32) BRAND=sgi32 ;;
+          *  ) BRAND=sgi64 ;;  # just in case
+       esac
+    fi
+    if [ `uname -r | awk -F. '{print $2}'` = "2" ] ; then
+       OS_VERSION="2"                  # release V6.2 IRIX
+       echo IRIX 6.2 platform
+       case $sgi_mode in
+          64 ) BRAND=sgi64 ;;
+          n32) BRAND=sgi32 ;;
+          *  ) BRAND=sgi64 ;;  # just in case
+       esac
+    else
+       BRAND="sgi"
+    fi
+    ;;
+
+  IRIX64) 
+    PATH=/usr/local/bin:/bin:/usr/bin:/etc:/usr/etc:/usr/bsd:/usr/sbin
+    HOST="`hostname`"
+    case $sgi_mode in
+      64 ) BRAND=sgi64 ;;
+      n32) BRAND=sgi32 ;;
+      o32) BRAND=sgio32 ;;
+      32 ) BRAND=sgi ;;
+      *  ) BRAND=sgi ;;  # just in case
+    esac
+    ;;
+
+  Linux )
+    PATH=/usr/local/bin:/bin:/usr/bin:/etc:/usr/etc:/usr/X11/bin
+    HOST=`hostname`
+    BRAND=linux
+    ;;
+
+  Darwin)
+    PATH=/bin:/sbin:/usr/bin:/usr/sbin
+    pgs_host=`hostname`
+    BRAND=macintosh
+    ;;
+
+  OSF1) 
+    PATH=/usr/local/bin:/bin:/usr/bin:/etc:/usr/etc:/usr/ucb:/usr/bin/X11:/usr/sbin
+    HOST="`hostname -s`"
+    BRAND="dec"
+    ;;
+
+  sco386) 
+    PATH=/usr/local/bin:/bin:/usr/bin:/etc:/usr/bin/X11
+    HOST="`hostname -s`"
+    BRAND="sco"
+    ;;
+
+  SunOS) 
+    # distinguish between SunOS 5.x and 4.x versions
+    if [ `uname -r | awk -F. '{print $1}'` = "5" ] ; then
+	if [ `uname -r | awk -F. '{print $2}'` = "10" ] ; then
+	    BRAND="sun5.10"			# release V5.x SunOS
+	    PATH=/usr/local/bin:/opt/SUNWspro/bin:/bin:/usr/bin:/etc:/usr/etc:/usr/ucb:/usr/openwin/bin:/usr/openwin/demo:/usr/sbin:/usr/ccs/bin
+	elif [ `uname -r | awk -F. '{print $2}'` = "9" ] ; then
+	    BRAND="sun5.9"			# release V5.x SunOS
+	    PATH=/usr/local/bin:/opt/SUNWspro/bin:/bin:/usr/bin:/etc:/usr/etc:/usr/ucb:/usr/openwin/bin:/usr/openwin/demo:/usr/sbin:/usr/ccs/bin
+	elif [ `uname -r | awk -F. '{print $2}'` = "8" ] ; then
+	    BRAND="sun5.8"			# release V5.x SunOS
+	    PATH=/usr/local/bin:/opt/SUNWspro/bin:/bin:/usr/bin:/etc:/usr/etc:/usr/ucb:/usr/openwin/bin:/usr/openwin/demo:/usr/sbin:/usr/ccs/bin
+	else                                
+	    BRAND="sun5"
+	    PATH=/usr/local/bin:/opt/SUNWspro/bin:/bin:/usr/bin:/etc:/usr/etc:/usr/ucb:/usr/openwin/bin:/usr/openwin/demo:/usr/sbin:/usr/ccs/bin 
+	fi
+    fi
+    if [ "`uname -r | awk -F. '{print $1}'`" = "4" ] ; then
+	BRAND="sun4"			# release V4.x SunOS
+        PATH=/usr/local/bin:/usr/local/lang:/usr/lang:/bin:/usr/bin:/etc:/usr/etc:/usr/ucb:/usr/openwin/demo
+    fi
+    HOST="`hostname`"
+    ;;
+
+  UNICOS) 
+    PATH=/usr/local/bin:/bin:/usr/bin:/etc:/usr/bin/X11
+    HOST="`hostname`"
+    BRAND="cray"
+    ;;
+
+  *)	
+    echo "Operating system: $OSTYPE not supported"
+    echo "This release of HDFEOS supports: "
+    echo "   Sun SGI HP-9000 IBM-6000 and DEC-Alpha "
+    ;;
+
+esac
+
+export PATH HOST BRAND
+
+
+#
+# Flag IRIX 6.2 because this may impact on makefiles
+#
+
+irix53=0
+case $BRAND in
+  sgi ) 
+    if [ "$OSTYPE" = "IRIX" ] ; then
+        irix53=1 
+    fi
+    ;;
+esac
+export irix53
+
+
+# set machine-dependent compilers and compilation switches:
+#
+#
+
+NSL_FLAG="" 			# this is nil on all but Sun platforms
+NSL_LIB="" 			# this is nil on all but Sun platforms
+AR="ar r"			# command to build library
+RANLIB=touch			# default for platforms that don't need ranlib
+RANLIBSUN4=touch		# default for platforms that don't need ranlib
+
+case "$BRAND" in
+
+    cray)
+	CC=cc 			# C compiler
+	CFLAGS="$opt_flag"	# default C flags (optimize, ansi)
+	C_CFH="-DCRAYFortran"   # C/cfortran.h called from FORTRAN
+	CFHFLAGS="$CFLAGS $C_CFH" # CFLAGS + C_CFH
+	C_F77_CFH="$C_CFH"	# calling FORTRAN
+	C_F77_LIB=""		# FORTRAN lib called by C main
+	F77=cf77		# FORTRAN compiler
+	F77FLAGS="$opt_flag"	# common FORTRAN flags
+	F77_CFH=""		# FORTRAN callable from C w/ cfortran.h
+	F77_C_CFH="$F77_CFH"	# calling C w/ cfortran.h
+	CFH_F77="$F77_C_CFH"	# old version of F77_C_CFH
+	F77_C_LIB=""		# C lib called by FORTRAN main 
+	HDFSYS=UNICOS		# system type as defined by HDF
+	MACHINE=CRAY		# system type as defined by HDFEOS
+	;;
+
+    dec)
+	CC=cc 			# C compiler
+	CFLAGS="$opt_flag -std"	# default C flags (optimize, ansi)
+	C_CFH="-DDECFortran"	# C w/ cfortran.h callable from FORTRAN
+	CFHFLAGS="$CFLAGS $C_CFH" # CFLAGS + C_CFH
+	C_F77_CFH="$C_CFH -Dmain=MAIN__" # calling FORTRAN
+	C_F77_LIB=""		# FORTRAN lib called by C main
+	F77=f77 		# FORTRAN compiler
+	F77FLAGS="$opt_flag"	# common FORTRAN flags
+	F77_CFH=""		# FORTRAN callable from C w/ cfortran.h
+	F77_C_CFH="$F77_CFH "   # calling C w/ cfortran.h
+	CFH_F77="$F77_C_CFH"	# old version of F77_C_CFH
+	F77_C_LIB=""		# C lib called by FORTRAN main
+	HDFSYS=DEC_ALPHA	# system type as defined by HDF
+	MACHINE=DEC		# system type as defined by HDFEOS
+	;;
+
+    hp)
+	CC=cc			# C compiler
+	CFLAGS="$opt_flag -Ae" 	# default C flags (optimize, ansi)
+	C_CFH="" 		# C w/ cfortran.h callable from FORTRAN
+	CFHFLAGS="$CFLAGS $C_CFH" # CFLAGS + C_CFH
+	C_F77_CFH="$C_CFH"	# calling FORTRAN
+	C_F77_LIB=""		# FORTRAN lib called by C main 
+	F77=fort77		# FORTRAN compiler
+	F77FLAGS="$opt_flag"	# common FORTRAN flags
+	F77_CFH=""		# FORTRAN callable from C w/ cfortran.h
+	F77_C_CFH="$F77_CFH"	# calling C w/ cfortran.h
+	CFH_F77="$F77_C_CFH"	# old version of F77_C_CFH
+	F77_C_LIB=""		# C lib called by FORTRAN main
+	HDFSYS=HP9000		# system type as defined by HDF
+	MACHINE=HP		# system type as defined by HDFEOS
+	;;
+
+    ibm)
+	CC=cc 			# C compiler
+	CFLAGS="$opt_flag -qlanglvl=ansi" # default C flags (optimize, ansi)
+	C_CFH="" 		# C w/ cfortran.h callable from FORTRAN
+	CFHFLAGS="$CFLAGS $C_CFH" # CFLAGS + C_CFH
+	C_F77_CFH="$C_CFH"	# calling FORTRAN
+	C_F77_LIB=""		# FORTRAN lib called by C main  FORTAN
+	F77=xlf 		# FORTRAN compiler
+	F77FLAGS="$opt_flag"	# common FORTRAN flags
+	F77_CFH="" 		# FORTRAN callable from C w/ cfortran.h
+	F77_C_CFH="$F77_CFH"	# calling C w/ cfortran.h
+	CFH_F77="$F77_C_CFH"	# old version of F77_C_CFH
+	F77_C_LIB=""		# C lib called by FORTRAN main
+	HDFSYS=IBM6000		# system type as defined by HDF
+	MACHINE=IBM		# system type as defined by HDFEOS
+	;;
+
+    linux)
+	CC=gcc  		# C compiler
+	CFLAGS="$opt_flag -ansi" # default C flags (optimize, ansi)
+	C_CFH="-Df2cFortran"	# C w/ cfortran.h callable from FORTRAN
+	CFHFLAGS="$CFLAGS $C_CFH" # CFLAGS + C_CFH
+	C_F77_CFH="$C_CFH"	# calling FORTRAN
+	C_F77_LIB=""		# FORTRAN lib called by C main
+# JRB allow compiler to be defined from outside
+#	F77=g77			# FORTRAN compiler
+	F77=${F77:-g95}		# FORTRAN compiler
+	F77FLAGS="$opt_flag"	# common FORTRAN flags
+	F77_CFH=""		# FORTRAN callable from C w/ cfortran.h
+	F77_C_CFH="$F77_CFH"	# calling C w/ cfortran.h
+	CFH_F77="$F77_C_CFH"	# old version of F77_C_CFH
+	F77_C_LIB=""		# C lib called by FORTRAN main
+        if [ `/bin/uname -m` = "x86_64" ]; then
+           HDFSYS=LINUX64       # Only for 64 bit linux
+	elif [ `/bin/uname -m` = "ia64" ]; then
+	   HDFSYS=IA64          #Only for IA64
+        else
+	   HDFSYS=LINUX		# system type as defined by HDF
+	fi
+	MACHINE=LINUX		# system type as defined by HDFEOS
+	;;
+
+    macintosh)
+        CC=gcc                  # C compiler
+        CFLAGS="$opt_flag -ansi" # default C flags (optimize, ansi)
+        C_CFH="-Df2cFortran"    # C w/ cfortran.h callable from FORTRAN
+        CFHFLAGS="$CFLAGS $C_CFH" # CFLAGS + C_CFH
+        C_F77_CFH="$C_CFH"      # calling FORTRAN
+        C_F77_LIB=""            # FORTRAN lib called by C main
+# JRB allow compiler to be defined from outside
+#	F77=g77			# FORTRAN compiler
+	F77=${F77:-g95}		# FORTRAN compiler
+        F77FLAGS="$opt_flag"    # common FORTRAN flags
+        F77_CFH=""              # FORTRAN callable from C w/ cfortran.h
+        F77_C_CFH="$F77_CFH"    # calling C w/ cfortran.h
+        CFH_F77="$F77_C_CFH"    # old version of F77_C_CFH
+        F77_C_LIB=""            # C lib called by FORTRAN main
+        RANLIB=ranlib		# activate the ranlib command
+        HDFSYS=MACINTOSH        # system type as defined by HDF
+        MACHINE=MACINTOSH       # system type as defined by HDFEOS
+        ;;
+
+    sco)
+	CC=cc  			# C compiler
+	CFLAGS="$opt_flag -posix" # default C flags (optimize, ansi)
+	C_CFH="-Df2cFortran"	# C w/ cfortran.h callable from FORTRAN
+	CFHFLAGS="$CFLAGS $C_CFH" # CFLAGS + C_CFH
+	C_F77_CFH="$C_CFH"	# calling FORTRAN
+	C_F77_LIB=""		# FORTRAN lib called by C main
+	F77=""			# FORTRAN compiler
+	F77FLAGS="$opt_flag"	# common FORTRAN flags
+	F77_CFH=""		# FORTRAN callable from C w/ cfortran.h
+	F77_C_CFH="$F77_CFH"	# calling C w/ cfortran.h
+	CFH_F77="$F77_C_CFH"	# old version of F77_C_CFH
+	F77_C_LIB=""		# C lib called by FORTRAN main
+	HDFSYS=SCO		# system type as defined by HDF
+	MACHINE=SCO		# system type as defined by HDFEOS
+	;;
+
+    sgi)
+	if [ $OSTYPE = "IRIX64" ]
+        then
+		CC="cc -32"	# C compiler (32 bit)
+		F77="f77 -32"	# FORTRAN compiler (32 bit)
+        else
+		CC=cc 		# C compiler
+		F77=f77		# FORTRAN compiler
+        fi
+	CFLAGS="$opt_flag -xansi -D_POSIX_SOURCE"	# default C flags (optimize, ansi)
+	C_CFH=""	 	# C w/ cfortran.h callable from FORTRAN
+	CFHFLAGS="$CFLAGS $C_CFH" # CFLAGS + C_CFH
+	C_F77_CFH="$C_CFH"	# calling FORTRAN
+	C_F77_LIB="-lI77 -lU77 -lF77" # FORTRAN lib called by C main
+	F77FLAGS="$opt_flag"	# common FORTRAN flags
+	F77_CFH=""		# FORTRAN callable from C w/ cfortran.h
+	F77_C_CFH="$F77_CFH"	# calling C w/ cfortran.h
+	CFH_F77="$F77_C_CFH"	# old version of F77_C_CFH
+	F77_C_LIB=""		# C lib called by FORTRAN main
+	HDFSYS=IRIS4		# system type as defined by HDF
+	MACHINE=SGI		# system type as defined by HDFEOS
+	;;
+
+    sgi32)
+	CC="cc -n32"		# C compiler (new-style 32 bit)
+	F77="f77 -n32"		# FORTRAN compiler (new-style 32 bit)
+	CFLAGS="$opt_flag -xansi -D_POSIX_SOURCE"	# default C flags (optimize, ansi)
+	C_CFH=""	 	# C w/ cfortran.h callable from FORTRAN
+	CFHFLAGS="$CFLAGS $C_CFH" # CFLAGS + C_CFH
+	C_F77_CFH="$C_CFH"	# calling FORTRAN
+	C_F77_LIB="-lI77 -lU77 -lF77" # FORTRAN lib called by C main
+	F77FLAGS="$opt_flag"	# common FORTRAN flags
+	F77_CFH=""		# FORTRAN callable from C w/ cfortran.h
+	F77_C_CFH="$F77_CFH"	# calling C w/ cfortran.h
+	CFH_F77="$F77_C_CFH"	# old version of F77_C_CFH
+	F77_C_LIB=""		# C lib called by FORTRAN main
+	HDFSYS=IRIS4		# system type as defined by HDF
+	MACHINE=SGI		# system type as defined by HDFEOS
+	;;
+
+    sgio32)
+	CC="cc -32 -mips2"	# C compiler (old-style 32 bit)
+	F77="f77 -32 -mips2"	# FORTRAN compiler (old-style 32 bit)
+	CFLAGS="$opt_flag -xansi -D_POSIX_SOURCE"	# default C flags (optimize, ansi)
+	C_CFH=""	 	# C w/ cfortran.h callable from FORTRAN
+	CFHFLAGS="$CFLAGS $C_CFH" # CFLAGS + C_CFH
+	C_F77_CFH="$C_CFH"	# calling FORTRAN
+	C_F77_LIB="-lI77 -lU77 -lF77" # FORTRAN lib called by C main
+	F77FLAGS="$opt_flag"	# common FORTRAN flags
+	F77_CFH=""		# FORTRAN callable from C w/ cfortran.h
+	F77_C_CFH="$F77_CFH"	# calling C w/ cfortran.h
+	CFH_F77="$F77_C_CFH"	# old version of F77_C_CFH
+	F77_C_LIB=""		# C lib called by FORTRAN main
+	HDFSYS=IRIS4		# system type as defined by HDF
+	MACHINE=SGI		# system type as defined by HDFEOS
+	;;
+
+    sgi64)
+	cpu_type=`hinv | fgrep CPU | head -1 | cut -d' ' -f3 | cut -b2`
+	if [ "$cpu_type" = "4" ] ; then
+	    CC="cc -64 -mips3"		# C compiler (R4?00 chip)
+	    F77="f77 -64 -mips3"	# FORTRAN compiler (R4?00 chip)
+        else
+            CC="cc -64 -mips4"      	# C compiler
+            F77="f77 -64 -mips4"    	# FORTRAN compiler
+        fi
+	CFLAGS="$opt_flag -xansi -D_POSIX_SOURCE"	# default C flags (optimize, ansi)
+	C_CFH=""	 	# C w/ cfortran.h callable from FORTRAN
+	CFHFLAGS="$CFLAGS $C_CFH" # CFLAGS + C_CFH
+	C_F77_CFH="$C_CFH"	# calling FORTRAN
+	C_F77_LIB="-lI77 -lU77 -lF77" # FORTRAN lib called by C main
+	F77FLAGS="$opt_flag"	# common FORTRAN flags
+	F77_CFH=""		# FORTRAN callable from C w/ cfortran.h
+	F77_C_CFH="$F77_CFH"	# calling C w/ cfortran.h
+	CFH_F77="$F77_C_CFH"	# old version of F77_C_CFH
+	F77_C_LIB=""		# C lib called by FORTRAN main
+	HDFSYS=IRIS4		# system type as defined by HDF
+	MACHINE=SGI		# system type as defined by HDFEOS
+	;;
+
+    sun4)
+	CC=acc			# C compiler
+	CFLAGS="$opt_flag -Xa" 	# default C flags (optimize, ansi)
+	C_CFH="-DsunFortran"	# C w/ cfortran.h callable from FORTRAN
+	CFHFLAGS="$CFLAGS $C_CFH" # CFLAGS + C_CFH
+	C_F77_CFH="$C_CFH"	# calling FORTRAN
+	C_F77_LIB=""		# FORTRAN lib called by C main
+	F77=f77 		# FORTRAN compiler
+	F77FLAGS="$opt_flag"	# common FORTRAN flags
+	F77_CFH=""		# FORTRAN callable from C w/ cfortran.h
+	F77_C_CFH="$F77_CFH" 	# calling C w/ cfortran.h
+	CFH_F77="$F77_C_CFH"	# old version of F77_C_CFH
+	F77_C_LIB="-lm" 	# C lib called by FORTRAN main
+	HDFSYS=SUN		# system type as defined by HDF
+	MACHINE=SUN4		# system type as defined by HDFEOS
+	NSL_FLAG="-lnsl"	# this is nil on all but Sun platforms
+	NSL_LIB="/usr/lib/libnsl.a"	# this is nil on all but Sun platforms
+        RANLIB=ranlib		# activate the ranlib command
+        RANLIBSUN4=ranlib
+	;;
+
+    sun5)
+	CC=cc			# C compiler
+	CFLAGS="$opt_flag -Xa" 	# default C flags (optimize, ansi)
+	C_CFH="-DsunFortran"	# C w/ cfortran.h callable from FORTRAN
+	CFHFLAGS="$CFLAGS $C_CFH" # CFLAGS + C_CFH
+	C_F77_CFH="$C_CFH"	# calling FORTRAN
+	C_F77_LIB=""		# FORTRAN lib called by C main
+	F77=f77 		# FORTRAN compiler
+	F77FLAGS="$opt_flag"	# common FORTRAN flags
+	F77_CFH=""		# FORTRAN callable from C w/ cfortran.h
+	F77_C_CFH="$F77_CFH" 	# calling C w/ cfortran.h
+	CFH_F77="$F77_C_CFH"	# old version of F77_C_CFH
+	F77_C_LIB="-lm" 	# C lib called by FORTRAN main
+	HDFSYS=SUN		# system type as defined by HDF
+	MACHINE=SUN5		# system type as defined by HDFEOS
+	NSL_FLAG="-lnsl"	# this is nil on all but Sun platforms
+	NSL_LIB="/usr/lib/libnsl.a"	# this is nil on all but Sun platforms
+	;;
+
+ sun5.8)
+        CC=cc                   # C compiler
+        CFLAGS="$opt_flag -Xa"  # default C flags (optimize, ansi)
+        C_CFH="-DsunFortran -DSUNOS58X"    # C w/ cfortran.h callable from FORTRAN
+        CFHFLAGS="$CFLAGS $C_CFH" # CFLAGS + C_CFH
+        C_F77_CFH="$C_CFH"      # calling FORTRAN
+        C_F77_LIB=""            # FORTRAN lib called by C main
+        F77=f77                 # FORTRAN compiler
+        F77FLAGS="$opt_flag"    # common FORTRAN flags
+        F77_CFH=""              # FORTRAN callable from C w/ cfortran.h
+        F77_C_CFH="$F77_CFH"    # calling C w/ cfortran.h
+        CFH_F77="$F77_C_CFH"    # old version of F77_C_CFH
+        F77_C_LIB="-lm"         # C lib called by FORTRAN main
+        HDFSYS=SUN              # system type as defined by HDF
+        MACHINE=SUN8            # system type as defined by HDFEOS
+        NSL_FLAG="-lnsl"        # this is nil on all but Sun platforms
+        NSL_LIB="/usr/lib/libnsl.a"     # this is nil on all but Sun platforms
+        ;;
+
+ sun5.9)
+        CC=cc                   # C compiler
+        CFLAGS="$opt_flag -Xa"  # default C flags (optimize, ansi)
+        C_CFH="-DsunFortran -DSUNOS58X"    # C w/ cfortran.h callable from FORTRAN
+        CFHFLAGS="$CFLAGS $C_CFH" # CFLAGS + C_CFH
+        C_F77_CFH="$C_CFH"      # calling FORTRAN
+        C_F77_LIB=""            # FORTRAN lib called by C main
+        F77=f77                 # FORTRAN compiler
+        F77FLAGS="$opt_flag"    # common FORTRAN flags
+        F77_CFH=""              # FORTRAN callable from C w/ cfortran.h
+        F77_C_CFH="$F77_CFH"    # calling C w/ cfortran.h
+        CFH_F77="$F77_C_CFH"    # old version of F77_C_CFH
+        F77_C_LIB="-lm"         # C lib called by FORTRAN main
+        HDFSYS=SUN              # system type as defined by HDF
+        MACHINE=SUN9            # system type as defined by HDFEOS
+        NSL_FLAG="-lnsl"        # this is nil on all but Sun platforms
+        NSL_LIB="/usr/lib/libnsl.a"     # this is nil on all but Sun platforms
+        ;;
+
+
+ sun5.10)
+        CC=cc                   # C compiler
+        CFLAGS="$opt_flag -Xa"  # default C flags (optimize, ansi)
+        C_CFH="-DsunFortran -DSUNOS58X"    # C w/ cfortran.h callable from FORTRAN
+        CFHFLAGS="$CFLAGS $C_CFH" # CFLAGS + C_CFH
+        C_F77_CFH="$C_CFH"      # calling FORTRAN
+        C_F77_LIB=""            # FORTRAN lib called by C main
+        F77=f77                 # FORTRAN compiler
+        F77FLAGS="$opt_flag"    # common FORTRAN flags
+        F77_CFH=""              # FORTRAN callable from C w/ cfortran.h
+        F77_C_CFH="$F77_CFH"    # calling C w/ cfortran.h
+        CFH_F77="$F77_C_CFH"    # old version of F77_C_CFH
+        F77_C_LIB="-lm"         # C lib called by FORTRAN main
+        HDFSYS=SUN              # system type as defined by HDF
+        MACHINE=SUN10            # system type as defined by HDFEOS
+        NSL_FLAG="-lnsl"        # this is nil on all but Sun platforms
+        NSL_LIB="/usr/lib/libnsl.a"     # this is nil on all but Sun platforms
+        ;;
+
+    *)
+	CC=cc			# C compiler
+	CFLAGS="$opt_flag" 	# default C flags (optimize)
+	C_CFH=""	# C w/ cfortran.h callable from FORTRAN
+	CFHFLAGS="$CFLAGS $C_CFH" # CFLAGS + C_CFH
+	C_F77_CFH="$C_CFH"	# calling FORTRAN
+	C_F77_LIB=""		# FORTRAN lib called by C main
+	F77=f77 		# FORTRAN compiler
+	F77FLAGS="$opt_flag"	# common FORTRAN flags
+	F77_CFH=""		# FORTRAN callable from C w/ cfortran.h
+	F77_C_CFH="$F77_CFH" 	# calling C w/ cfortran.h
+	CFH_F77="$F77_C_CFH"	# old version of F77_C_CFH
+	F77_C_LIB="-lm" 	# C lib called by FORTRAN main
+	HDFSYS=unknown		# system type as defined by HDF
+	MACHINE=unknown		# system type as defined by HDFEOS
+	;;
+esac
+
+export NSL_FLAG NSL_LIB AR RANLIB RANLIBSUN4
+
+export CC CFLAGS C_CFH CFHFLAGS C_F77_CFH C_F77_LIB F77
+export F77FLAGS F77_CFH F77_C_CFH CFH_F77 F77_C_LIB HDFSYS
+
+
+#
+# Verify that this is the HDFEOS home directory before proceeding
+# If OK, then set the value of HDFEOS_HOME, else quit.
+
+dirs="bin include lib obj src"
+ok=1
+
+for dir in $dirs ; do
+
+    if [ ! -d $dir ] ; then
+        ok=0
+        break
+    fi
+
+done
+
+if [ $ok = 1 ] ; then
+
+    HDFEOS_HOME=`pwd`
+
+else
+
+    WriteError "You must first go to the HDFEOS home directory."
+    Help
+
+fi
+
+dirs="bin lib obj"
+for dir in $dirs ; do
+
+    if [ ! -d $dir/$BRAND ] ; then
+	mkdir $dir/$BRAND
+    fi
+
+done
+
+#
+# set HDFEOS-related environment variables
+# these may be referred to in makefiles and on compiler command lines
+#
+
+if [ "$HDFEOS_HOME" != "" ] ; then
+
+# set up base set of HDFEOS directory variables.
+
+    HDFEOS_BIN=${HDFEOS_HOME}/bin/$BRAND	# executable files
+    HDFEOS_INC=$HDFEOS_HOME/include		# include header files
+    HDFEOS_LIB=${HDFEOS_HOME}/lib/$BRAND  	# library files
+    HDFEOS_OBJ=${HDFEOS_HOME}/obj/$BRAND	# object files
+    HDFEOS_SRC=$HDFEOS_HOME/src			# HDFEOS source files
+
+    export HDFEOS_HOME HDFEOS_BIN HDFEOS_DAT HDFEOS_INC HDFEOS_LIB 
+    export HDFEOS_MSG  HDFEOS_OBJ HDFEOS_RUN HDFEOS_SRC HDFEOS_TST
+
+# update path variables
+
+    PATH=$PATH:$HDFEOS_BIN; export PATH		# add HDFEOS_BIN to path
+
+else
+
+    echo "You must first set the environment variable HDFEOS_HOME"
+    exit 1
+
+fi
+
+
+# 
+# set up environment to handle FORTRAN-90 compiler
+#
+
+if [ "$pgs_f90_comp" != "" ] ; then		# using FORTRAN-90
+
+    F77="$pgs_f90_comp"
+
+    if [ "$pgs_nag_flag" = "1" ] ; then		# using NAG f90
+        C_CFH="$C_CFH -DNAGf90F"
+        CFHFLAGS="$CFLAGS $C_CFH"
+    fi
+
+    export CFHFLAGS C_CFH F77
+
+fi
+
+#
+# Ouput a banner
+#
+
+Banner
+
+#
+# Get the HDF library and include directories from the user
+#
+
+GetHdfEnv
+
+#
+# Set up the architecture-dependent environment scripts
+#
+
+SetupEnvScripts
+
+
+#
+# Run the architecture-dependent installation commands
+#
+
+MAKECMD=make; export MAKECMD 		# force use of regular make
+					# ClearMake doesn't work with
+					# current makefile
+
+: ${MAKECMD:=make}			# the make command defaults to 'make'
+
+					# augment path if using clearmake
+if [ "`echo $MAKECMD | grep clearmake`" != "" ] ; then
+    echo "$this_script : note : make command is set to clearmake"
+    PATH="$PATH:/usr/atria/bin" 
+    export PATH
+fi
+
+cd $HDFEOS_SRC
+
+echo ""
+echo ""
+echo "-----------------------------------------------------------------------"
+echo ""
+echo "Configuring the GCTP library"
+echo ""
+echo "-----------------------------------------------------------------------"
+echo ""
+
+make_file="-f Makefile"		# default makefile
+
+case $BRAND in
+
+  dec)
+    echo cp $HDFEOS_LIB/../tmp/geolibDEC.a $HDFEOS_LIB/libGctp.a
+    cp $HDFEOS_LIB/../tmp/geolibDEC.a $HDFEOS_LIB/libGctp.a
+    ;;
+
+  hp)
+    echo cp $HDFEOS_LIB/../tmp/geolibHP.a $HDFEOS_LIB/libGctp.a
+    cp $HDFEOS_LIB/../tmp/geolibHP.a $HDFEOS_LIB/libGctp.a
+    ;;
+
+  ibm)
+    echo cp $HDFEOS_LIB/../tmp/geolibIBM.a $HDFEOS_LIB/libGctp.a
+    cp $HDFEOS_LIB/../tmp/geolibIBM.a $HDFEOS_LIB/libGctp.a
+    ;;
+
+  sgi)
+    if [ $irix53 = 1 ] ; then
+        echo cp $HDFEOS_LIB/../tmp/geolibIRIX53.a $HDFEOS_LIB/libGctp.a
+        cp $HDFEOS_LIB/../tmp/geolibIRIX53.a $HDFEOS_LIB/libGctp.a
+    else
+        echo cp $HDFEOS_LIB/../tmp/geolibIRIX62-32.a $HDFEOS_LIB/libGctp.a
+        cp $HDFEOS_LIB/../tmp/geolibIRIX62-32.a $HDFEOS_LIB/libGctp.a
+    fi
+    ;;
+
+  sgi32)
+    echo cp $HDFEOS_LIB/../tmp/geolibIRIX62-n32.a $HDFEOS_LIB/libGctp.a
+    cp $HDFEOS_LIB/../tmp/geolibIRIX62-n32.a $HDFEOS_LIB/libGctp.a
+    ;;
+
+  sgi64)
+    if [ "$cpu_type" = "4" ] ; then
+	echo cp $HDFEOS_LIB/../tmp/geolibIRIX62-64mips3.a $HDFEOS_LIB/libGctp.a
+	cp $HDFEOS_LIB/../tmp/geolibIRIX62-64mips3.a $HDFEOS_LIB/libGctp.a
+    else
+	echo cp $HDFEOS_LIB/../tmp/geolibIRIX62-64.a $HDFEOS_LIB/libGctp.a
+	cp $HDFEOS_LIB/../tmp/geolibIRIX62-64.a $HDFEOS_LIB/libGctp.a
+    fi
+    ;;
+
+  sun4)
+    echo cp $HDFEOS_LIB/../tmp/geolibSUN4.a $HDFEOS_LIB/libGctp.a
+    cp $HDFEOS_LIB/../tmp/geolibSUN4.a $HDFEOS_LIB/libGctp.a
+    ;;
+
+  sun5)
+    echo cp $HDFEOS_LIB/../tmp/geolibSOL24.a $HDFEOS_LIB/libGctp.a
+    cp $HDFEOS_LIB/../tmp/geolibSOL24.a $HDFEOS_LIB/libGctp.a
+    ;;
+
+  sun5.8)
+    echo cp $HDFEOS_LIB/../tmp/geolibSOL28.a $HDFEOS_LIB/libGctp.a
+    cp $HDFEOS_LIB/../tmp/geolibSOL28.a $HDFEOS_LIB/libGctp.a
+    ;;
+
+  sun5.9)
+    echo cp $HDFEOS_LIB/../tmp/geolibSOL29.a $HDFEOS_LIB/libGctp.a
+    cp $HDFEOS_LIB/../tmp/geolibSOL29.a $HDFEOS_LIB/libGctp.a
+    ;;
+
+  sun5.10)
+    echo cp $HDFEOS_LIB/../tmp/geolibSOL210.a $HDFEOS_LIB/libGctp.a
+    cp $HDFEOS_LIB/../tmp/geolibSOL210.a $HDFEOS_LIB/libGctp.a
+    ;;
+
+  linux)
+    if [ `/bin/uname -m` = "x86_64" ]; then
+	echo cp $HDFEOS_LIB/../tmp/geolibLINUX64.a $HDFEOS_LIB/libGctp.a
+	cp $HDFEOS_LIB/../tmp/geolibLINUX64.a $HDFEOS_LIB/libGctp.a
+    elif [ `/bin/uname -m` = "ia64" ]; then
+	echo cp $HDFEOS_LIB/../tmp/geolibLINUXIA64.a $HDFEOS_LIB/libGctp.a
+	cp $HDFEOS_LIB/../tmp/geolibLINUXIA64.a $HDFEOS_LIB/libGctp.a
+    else
+	echo cp $HDFEOS_LIB/../tmp/geolibLINUX.a $HDFEOS_LIB/libGctp.a
+	cp $HDFEOS_LIB/../tmp/geolibLINUX.a $HDFEOS_LIB/libGctp.a
+    fi
+    ;;
+
+  macintosh)
+    echo cp $HDFEOS_LIB/../tmp/geolibMAC.a $HDFEOS_LIB/libGctp.a
+    cp $HDFEOS_LIB/../tmp/geolibMAC.a $HDFEOS_LIB/libGctp.a
+    ;;
+
+  *)
+    echo '!!!!!! WARNING !!!!!! WARNING !!!!!! WARNING !!!!! WARNING !!!!!!'
+    echo '"'$BRAND'"' is not officially supported, no GCTP library available
+    echo for this mode '"'$BRAND'"'.  HDF-EOS grid routines will not work
+    echo without this library.
+    ;;
+
+esac
+
+if [ -f $HDFEOS_LIB/libGctp.a ] ; then
+    chmod u+w $HDFEOS_LIB/libGctp.a
+fi
+
+#
+# check to see if valid C compiler path was specified
+#
+    
+cc=""
+    
+if [ "$cc_path" != ""  ] ; then
+    
+    if [ -f $cc_path ] ; then
+    
+            cc=`basename $cc_path`
+            cc_path=`echo $cc_path | sed 's%/[^/]*/*$%%'`
+	    case "$BRAND" in
+		"sgi32" )
+		    CC="$cc_path/$cc -n32"
+		;;
+
+		"sgi64" )
+		    cpu_type=`hinv | fgrep CPU | head -1 | cut -d' ' -f3 | cut -b2`
+		    if [ "$cpu_type" == "4" ] ; then
+			CC="$cc_path/$cc -64 -mips3"
+		    else
+			CC="$cc_path/$cc -64 -mips4"
+		    fi
+		;;
+
+		* )
+		    CC="$cc_path/$cc" 
+		;; 
+	    esac
+
+	    export CC		# user overrides C compiler name
+    fi
+    
+    if [ -d $cc_path ] ; then	# make sure cc_path is now a directory
+         PATH=${cc_path}:${PATH} 	# prepend cc_path to search path
+         export PATH
+    else
+         cc_path=""
+         echo "Warning: C compiler directory $cc_path not found."
+         echo  "HDFEOS build may fail."
+    fi
+fi
+
+
+echo ""
+echo ""
+echo "-----------------------------------------------------------------------"
+echo ""
+echo "Building HDFEOS"
+echo ""
+echo "-----------------------------------------------------------------------"
+echo ""
+
+$MAKECMD $make_file
+if [ $? != 0 ] ; then
+    ErrorExit "$MAKECMD $make_file"
+fi
+
+if [ $BRAND = "macintosh" ] ; then
+$RANLIB -s $HDFEOS_LIB/libGctp.a
+$RANLIB -s $HDFEOS_LIB/libhdfeos.a
+fi
+
+echo ""
+echo ""
+echo "-----------------------------------------------------------------------"
+echo ""
+echo "Cleaning up"
+echo ""
+echo "-----------------------------------------------------------------------"
+echo ""
+
+$MAKECMD $make_file clean
+if [ $? != 0 ] ; then
+    ErrorExit "$MAKECMD $make_file clean"
+fi
+
+# done
+
+echo ""
+echo ""
+echo "-----------------------------------------------------------------------"
+echo ""
+echo "    HDFEOS installation ending at `date`"
+echo ""
+echo "-----------------------------------------------------------------------"
+

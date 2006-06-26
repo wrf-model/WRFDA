@@ -1,0 +1,513 @@
+#########################################################################
+#
+# Name
+#	make.options
+#
+# Purpose
+#
+#	Sets make options for building DM code. All individual makefiles
+#	include this file.
+#
+# Level
+#
+#	CLS Subsystem
+#
+# Input
+#
+#	Variables to be set in the makefile before including this file
+#
+#	CSCI - indicates which CSCI is the makefile part of.
+#
+#	.buildrc must be sourced since variables set by that script
+#	are used in this file.
+#
+# Outputs
+#
+########################################################################
+
+
+###################### SET BUILDTOP BASED ON CSCI #####################
+#
+# Buildtop is the top level directory for the CSCI
+# The makefile must define CSCI before including this file
+#
+#######################################################################
+
+
+BUILDTOP    = $(SUBSYSTOP)/$(CSCI)
+
+
+###################### SET VARIOUS DIRECTORIES #########################
+#
+# THESE DIRECTORIES ARE BASED ON ARCHITECTURE
+#
+########################################################################
+
+
+## LIBDIR is the directory where the DM libraries reside
+LIBDIR		=  $(BUILDTOP)/lib/$(ARCH)
+
+## INCDIR is the directory where the DM include files reside
+INCDIR		= $(BUILDTOP)/include
+
+## BINDIR is the directory where the CSCI executables reside
+BINDIR		= $(BUILDTOP)/bin/$(ARCH)
+
+## SRCDIR is the directory where the CSCI source files reside
+SRCDIR		= $(BUILDTOP)/src
+
+## OBJDIR is the directory where the CSCI object files reside
+OBJDIR		= $(BUILDTOP)/obj/$(ARCH)
+
+## SUBSYSINCDIR is the location for CSCI common header files.
+SUBSYSINCDIR	= $(SUBSYSTOP)/common/include
+
+## ECSINCDIR is the location for ECS common header files (common software)
+ECSINCDIR	= /ecs/include
+
+## SUBSYSLIBDIR is the location for CSCI common library files.
+SUBSYSLIBDIR	= $(SUBSYSTOP)/common/lib/$(ARCH)
+
+## ECSLIBDIR is the location for ECS common library files (common software)
+ECSLIBDIR	= /ecs/lib/$(ARCH)
+
+
+###################### CONFIGURATION DEPENDENCY ########################
+#
+# CR_DEPENDENCIES are the files to be included in the 
+# Configuration Record.
+#
+########################################################################
+
+CR_DEPENDENCIES	= \
+		$(SUBSYSTOP)/.buildrc \
+		$(SUBSYSTOP)/make/.bldhost.$(ARCH) \
+		$(SUBSYSTOP)/make/make.options \
+		./Makefile
+
+
+
+###################### COMMON FLAGS FOR C/C++ ##########################
+#
+# These flags are common for both C and C++ compilation (based on ARCH).
+#
+########################################################################
+
+## PLATFORM_FLAG is used for writing platform specific ecs code (must be 
+## used with caution and justification).
+
+PLATFORM_FLAG_hp	= -DHPUX9X
+PLATFORM_FLAG_sgi	= -DIRIX5X
+PLATFORM_FLAG_sun5	= -DSUNOS5X
+
+PLATFORM_FLAG		= $(PLATFORM_FLAG_$(ARCH))
+
+
+## DEBUG_FLAG specifies whether code is optimized or set for the debugger
+## as well as defining debug flags needed for conditional compilation
+
+DEBUG_FLAG_hp	= -g
+DEBUG_FLAG_sgi	= -g
+DEBUG_FLAG_sun5	= -g
+
+DEBUG_FLAG	= $(DEBUG_FLAG_$(ARCH))
+
+
+## ANSI_FLAG is to specify ANSI compliance
+ANSI_FLAG_hp	    = -Aa +a1 +eh
+ANSI_FLAG_sgi	    = 
+ANSI_FLAG_sun5     = 
+
+ANSI_FLAG	    = $(ANSI_FLAG_$(ARCH))
+
+
+## INCLUDE_PATH is the common include path.
+INCLUDE_PATH		= -I$(SUBSYSINCDIR) -I$(INCDIR) -I$(ECSINCDIR)
+
+## COMMON_FLAGS is a handy macro to include all the flags above
+COMMON_FLAGS	= $(DEBUG_FLAG) $(ANSI_FLAG) $(PLATFORM_FLAG) \
+		    $(INCLUDE_PATH) $(LOCAL_COMMON_FLAGS)
+
+X11_MOTIF_FLAGS_sun5	= -I/opt/SUNWmotif/include \
+			-I/usr/openwin/include -D_REENTRANT -DSYSV
+X11_MOTIF_FLAGS_sgi	= -I/usr/include/X11 -I/usr/include/Xm
+X11_MOTIF_FLAGS_hp	= -I/usr/include/X11R5 \
+			  -I/usr/include/Motif1.2 \
+			  -DHP9000 -D_POSIX_SOURCE \
+			  -D_HPUX_SOURCE -D_REENTRANT \
+			-DMOTIF1_2 -I/usr/include/reentrant
+X11_MOTIF_FLAGS		= $(X11_MOTIF_FLAGS_$(ARCH))
+
+EPAK_FLAGS_sun5		= -I/tools/bx50/epak3/include -I/tools/bx50/epak3/include/X11
+EPAK_FLAGS_sgi		= -I/tools/bx50/epak3/include -I/tools/bx50/epak3/include/X11
+
+EPAK_FLAGS_hp		= -I/tools/bx50/include
+EPAK_FLAGS		= $(EPAK_FLAGS_$(ARCH))
+
+ROGUEWAVE_FLAGS_sun5	=
+ROGUEWAVE_FLAGS_hp	= -I/tools/rogue -DRWDEBUG
+ROGUEWAVE_FLAGS_sgi	= -I/tools/rogue -DRWDEBUG
+ROGUEWAVE_FLAGS		= $(ROGUEWAVE_FLAGS_$(ARCH))
+
+ECS_COMMON_DIR		= /ecs/formal/COMMON
+ECS_COMMON_INC		= -I$(ECS_COMMON_DIR)/include
+
+## COMMON_FLAGS are the flags common for both C source and C++ source.
+LOCAL_COMMON_FLAGS	= -I. $(X11_MOTIF_FLAGS) $(EPAK_FLAGS) $(ROGUEWAVE_FLAGS) \
+				$(ECS_COMMON_INC) -DLOGIN -DFUNCPROTO -DXTFUNCPROTO
+
+
+###################### C COMPILER SETUP ##################################
+#
+# Following flags setup the common options for the C compiler based on ARCH
+#
+##########################################################################
+
+## CC is the name of the C compiler to use
+CC_hp		= cc
+CC_sgi		= cc
+CC_sun5		= cc
+CC		= $(CC_$(ARCH))
+
+
+## CCOMMON_FLAG are other common C flags
+CCOMMON_FLAGS_hp    = -c
+CCOMMON_FLAGS_sgi   = -c
+CCOMMON_FLAGS_sun5  = -c
+
+CCOMMON_FLAGS	    = $(CCOMMON_FLAGS_$(ARCH))
+
+## CFLAGS is a combination of all the above. The applications can include
+## additional CFLAGS in the makefile.
+CFLAGS		    = $(COMMON_FLAGS) $(CCOMMON_FLAGS)
+
+
+###################### C++ COMPILER SETUP ################################
+#
+# Following flags setup the common options for the C++ compiler based on ARCH
+#
+##########################################################################
+
+## CXX is the name of the C++ compiler to use
+CXX_hp		= CC
+CXX_sgi		= CC
+CXX_sun5	= CC
+
+CXX		= $(CXX_$(ARCH))
+
+
+## CXXCOMMON_FLAG are other common C flags
+CXXCOMMON_FLAGS_hp    = -c
+CXXCOMMON_FLAGS_sgi   = -c -x
+CXXCOMMON_FLAGS_sun5  = -c
+
+CXXCOMMON_FLAGS	    = $(CXXCOMMON_FLAGS_$(ARCH))
+
+## CXXFLAGS is a combination of all the above. The applications can include
+## additional CXXFLAGS in the makefile.
+
+CXXFLAGS    = $(TEMPLATE_OPTION) $(COMMON_FLAGS)  $(CXXCOMMON_FLAGS)
+
+
+###################### Library setup #####################################
+#
+# Building libraries etc.
+#
+##########################################################################
+
+
+## AR is the name of the archive utility
+AR_hp	    = ar
+AR_sgi	    = ar
+AR_sun5	    = ar
+
+AR	    = $(AR_$(ARCH))
+
+
+## AR_FLAGS are the flags to use for archive command.
+
+AR_FLAGS_hp	= -r
+AR_FLAGS_sgi	= -r
+AR_FLAGS_sun5	= -r
+
+AR_FLAGS	= $(AR_FLAGS_$(ARCH))
+
+
+
+###################### LINKER SETUP ######################################
+#
+# Following flags setup the common options for the linker
+#
+##########################################################################
+
+
+## LD is the name of the linker to use
+LD_hp		= $(CXX)
+LD_sgi		= $(CXX)
+LD_sun5		= /opt/SUNWspro/bin/CC
+
+LD		= $(LD_$(ARCH))
+
+
+## LIB_PATH is the path for ecs specific libraries
+LIB_PATH		= -L$(SUBSYSLIBDIR) -L$(LIBDIR) -L$(ECSLIBDIR)
+
+## Motif Libraries
+X11_MOTIF_LIB_sun5	= -L/usr/openwin/lib -L/opt/SUNWmotif/lib \
+				-lXm -lXt -lX11 -lnsl -lgen
+X11_MOTIF_LIB_sgi	= -L/usr/lib -lXm -lXt -lX11
+X11_MOTIF_LIB_hp	= -L/usr/lib/Motif1.2 -L/usr/lib/X11R5	\
+				-lXm -lXt -lX11 -lC
+X11_MOTIF_LIB		= $(X11_MOTIF_LIB_$(ARCH))
+
+## EPak Libraries
+EPAK_LIB_sun5		= /tools/bx50/epak3/lib/libEPak.a
+EPAK_LIB_sgi		= /tools/bx50/epak3/lib/libEPak.a
+EPAK_LIB_hp		= /tools/bx50/lib/libXiWidgets.a
+EPAK_LIB		= $(EPAK_LIB_$(ARCH))
+
+## ROGUEWAVE Libraries
+ROGUEWAVE_LIB_sun5	= -lrwtool
+ROGUEWAVE_LIB_sgi	= -L/tools/rogue/lib -lrwtoolg
+ROGUEWAVE_LIB_hp	= -DRW_POSIX_THREADS -L/tools/rogue/lib -lrwtoolg_mteh
+ROGUEWAVE_LIB		= $(ROGUEWAVE_LIB_$(ARCH))
+
+## LDCOMMON_FLAGS are other common flags used
+LDCOMMON_FLAGS_hp	= 
+LDCOMMON_FLAGS_sgi	= -lc
+LDCOMMON_FLAGS_sun5	= -lm -lc
+
+LDCOMMON_FLAGS		= $(LDCOMMON_FLAGS_$(ARCH))
+
+
+## LD_FLAGS are common linker flags
+LD_FLAGS	= $(LIB_PATH) $(EPAK_LIB) $(X11_MOTIF_LIB) $(LDCOMMON_FLAGS) $(ROGUEWAVE_LIB)
+
+
+###################### IDL SETUP #########################################
+#
+# Idl files compilation rules etc (this is for DCE)
+#
+##########################################################################
+
+
+## command for idl compiler
+IDL_hp          = idl
+IDL_sgi		= idl
+IDL_sun5	= idl
+
+IDL		= $(IDL_$(ARCH))
+
+
+## Flags for the idl compiler
+IDL_FLAGS_hp	= -keep c_source
+IDL_FLAGS_sgi	=
+IDL_FLAGS_sun5	= -keep c_source
+
+IDL_FLAGS	= $(IDL_FLAGS_$(ARCH))
+
+
+###################### IDL++ SETUP #######################################
+#
+# Idl files compilation rules etc (this is for OODCE)
+#
+##########################################################################
+
+
+## command for idl++ compiler (not supported on SGI)
+IDLXX_hp	    = idl++
+IDLXX_sun5	    = idl++
+
+IDLXX		    = $(IDLXX_$(ARCH))
+
+
+## Flags for the idl compiler
+IDLXXFLAGS_hp		= -keep source
+IDLXXFLAGS_sun5		= -keep source
+
+IDLXXFLAGS	= $(IDLXXFLAGS_$(ARCH))
+
+
+###################### DCE SETUP #########################################
+#
+# These are popular options for building DCE applications
+#
+##########################################################################
+
+## COMPILER Options
+
+DCECFLAGS_hp	    = -I. -D_POSIX_SOURCE  -D_REENTRANT  +z -q
+DCECFLAGS_sgi	    = -I.
+DCECFLAGS_sun5	    = -I.
+
+
+DCECFLAGS	    = $(DCECFLAGS_$(ARCH))
+
+### Linker options. These to be included before object files
+DCELDFLAGS_hp	    = -Wl,-a,archive_shared
+DCELDFLAGS_sun5	    = 
+DCELDFLAGS_sgi	    = 
+
+DCELDFLAGS	    = $(DCELDFLAGS_$(ARCH))
+
+## Libraries
+DCELIBS_hp	    = -lbb -ldce -lm -lc_r
+DCELIBS_sgi	    =
+DCELIBS_sun5	    = -lnsl -ldce -lsocket -lthread -lm
+
+DCELIBS		    = $(DCELIBS_$(ARCH))
+
+
+###################### OODCE SETUP #######################################
+#
+# These are popular options for building OODCE applications.
+#
+##########################################################################
+
+## C COMPILER Options
+
+OODCECFLAGS_hp	    = -I. -D_POSIX_SOURCE  -D_REENTRANT  +z -q
+OODCECFLAGS_sgi	    =
+OODCECFLAGS_sun5    = -I. -DREENTRANT
+
+
+OODCECFLAGS	    = $(OODCECFLAGS_$(ARCH))
+
+## C++ COMPILER Options
+
+OODCECXXFLAGS_hp	    = -I. -I/usr/include/reentrant +eh \
+				-Dunix -DNIDL_PROTOTYPES -D__STDC__ \
+				-D_HPUX_SOURCE -D_CMA_PROTO_ -D_REENTRANT
+ODCECXXFLAGS_sgi	    =
+OODCECXXFLAGS_sun5	    = -I. -I/opt/SUNWspro/SC3.0.1/include/CC -mt \
+				-Dunix -DNIDL_PROTOTYPES -D_CMA_PROTO_ -DSYSV
+
+OODCECXXFLAGS	    = $(OODCECXXFLAGS_$(ARCH))
+
+### Linker options. These to be included before object files
+OODCELDFLAGS_hp	    = +eh -g -Wl,-aarchive
+OODCELDFLAGS_sgi    =
+OODCELDFLAGS_sun5   =
+
+
+OODCELDFLAGS	    = $(OODCELDFLAGS_$(ARCH))
+
+## Libraries
+OODCELIBS_hp	    = -loodce -lbb -ldce -lm -lc_r
+OODCELIBS_sgi	    =
+OODCELIBS_sun5	    = -loodce -ldce -lthread -lnsl -lsocket -lm -lc
+
+OODCELIBS	    = $(OODCELIBS_$(ARCH))
+
+
+###################### CLEANUP SUPPORT ###################################
+#
+# DEFINE COMMANDS TO DELETE FILES ETC. USED BY THE CLEAN TARGET.
+#
+##########################################################################
+
+DELFILES    =	rm -f
+
+
+###################### Suffix setup and default rules ####################
+#
+# Add ecs specific suffixes and common rules for building object files.
+#
+##########################################################################
+
+
+## Define custom ecs suffixes (.cxx is a c++ source file)
+.SUFFIXES: .cxx .C .cpp .idl $(SUFFIXES)
+
+
+## Define how to convert c++ file to object. Note that all object
+## files are copied to the OBJDIR.
+## Individual makefiles may define CSTM_CXXFLAGS to include
+## custom C++ flags in compilation.
+
+ifdef SILENTMODE
+$(OBJDIR)/%.o: %.cxx
+	@echo Compiling $< ...
+	@rm -f $@
+	@$(CXX) $(CXXFLAGS) $(CSTM_CXXFLAGS) $< -o $@
+
+$(OBJDIR)/%.o: %.cpp
+	@echo Compiling $< ...
+	@rm -f $@
+	@$(CXX) $(CXXFLAGS) $(CSTM_CXXFLAGS) $< -o $@
+
+
+$(OBJDIR)/%.o: %.C
+	@echo Compiling $< ...
+	@rm -f $@
+	@$(CXX) $(CXXFLAGS) $(CSTM_CXXFLAGS) $< -o $@
+
+%.o: %.C
+	@echo Compiling $< ...
+	@rm -f $@
+	@$(CXX) $(CXXFLAGS) $(CSTM_CXXFLAGS) $< -o $@
+%.o: %.cpp
+	@echo Compiling $< ...
+	@rm -f $@
+	@$(CXX) $(CXXFLAGS) $(CSTM_CXXFLAGS) $< -o $@
+%.o: %.cxx
+	@echo Compiling $< ...
+	@rm -f $@
+	@$(CXX) $(CXXFLAGS) $(CSTM_CXXFLAGS) $< -o $@
+else
+$(OBJDIR)/%.o: %.cxx
+	rm -f $@
+	$(CXX) $(CXXFLAGS) $(CSTM_CXXFLAGS) $< -o $@
+
+$(OBJDIR)/%.o: %.cpp
+	rm -f $@
+	$(CXX) $(CXXFLAGS) $(CSTM_CXXFLAGS) $< -o $@
+
+$(OBJDIR)/%.o: %.C
+	rm -f $@
+	$(CXX) $(CXXFLAGS) $(CSTM_CXXFLAGS) $< -o $@
+
+%.o: %.C
+	rm -f $@
+	$(CXX) $(CXXFLAGS) $(CSTM_CXXFLAGS) $< -o $@
+%.o: %.cxx
+	rm -f $@
+	$(CXX) $(CXXFLAGS) $(CSTM_CXXFLAGS) $< -o $@
+%.o: %.cpp
+	rm -f $@
+	$(CXX) $(CXXFLAGS) $(CSTM_CXXFLAGS) $< -o $@
+endif
+
+## Define how to convert c file to object. Note that all object
+## files are copied to the OBJDIR.
+## Individual makefiles may define CSTM_CFLAGS to include
+## custom C flags in compilation.
+
+ifdef SILENTMODE
+$(OBJDIR)/%.o: %.c
+	@echo Compiling $< ...
+	@rm -f $@
+	@$(CC) $(CFLAGS) $(CSTM_CFLAGS) $< -o $@
+%.o: %.c
+	@echo Compiling $< ...
+	@rm -f $@
+	@$(CC) $(CFLAGS) $(CSTM_CFLAGS) $< -o $@
+
+else
+$(OBJDIR)/%.o: %.c
+	rm -f $@
+	$(CC) $(CFLAGS) $(CSTM_CFLAGS) $< -o $@
+%.o: %.c
+	rm -f $@
+	$(CC) $(CFLAGS) $(CSTM_CFLAGS) $< -o $@
+
+endif
+
+include $(CMTOP)/COMMON/make/makecm.options
+ 
+## DO NOT ADD ANYTHING AFTER THIS LINE ##
+
+
+
+
+

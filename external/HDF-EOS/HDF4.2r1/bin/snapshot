@@ -1,0 +1,401 @@
+#!/bin/sh
+# snapshot: Snap shot testing command script for HDF4.
+# This script should be run nightly from cron.  It checks out hdf4
+# from the CVS source tree and compares it against the previous
+# snapshot.  If anything significant changed, it is build and tested.
+# After the test passes and if snapshot release is desired, a new snapshot
+# is created, the minor version number is incremented, and the change is
+# checked back into the CVS repository.
+
+# function definitions
+TIMESTAMP()
+{
+    echo "=====" "$1": "`date`" "====="
+}
+
+EXIT_BANNER()
+{
+TIMESTAMP "Exit $PROGNAME with status=$?"
+}
+
+# MAIN
+# SGI /bin/sh replaces $0 as function name if used in a function.
+# Set the name here to avoid that ambiguity and better style too.
+PROGNAME=$0
+
+echo "====================================="
+echo "$PROGNAME $*"
+echo "====================================="
+TIMESTAMP MAIN
+uname -a
+
+# setup exit banner message
+trap EXIT_BANNER 0
+
+# The path isn't properly initialized on hawkwind -- /usr/local/bin is
+# either missing or is after /usr/bin when it should be before.
+PATH="/usr/local/bin:$PATH"
+
+# Where are the snapshots stored?
+ARCHIVES_default=/afs/ncsa/ftp/HDF/pub/outgoing/hdf4/snapshots
+ARCHIVES=$ARCHIVES_default
+
+# Where is the zlib library?
+# At NCSA, half of the machines have it in /usr/lib, the other half at
+# /usr/ncsa/lib.  Leave it unset.
+ZLIB_default=
+ZLIB=$ZLIB_default
+
+# What compression methods to use?
+METHODS="gzip bzip2"
+
+# Hard set to gmake.
+# No parallel make (-j) because dependences are not set correctly for it.
+# Must use gmake for --srcdir support.
+MAKE=gmake
+export MAKE
+
+#
+# Command options
+cmd="all"
+test_opt=""
+errcode=0
+while [ $# -gt 0 ] ; do
+    case "$1" in
+	all)	
+	    cmd="all"
+	    ;;
+	checkout)
+	    cmdcheckout="checkout"
+	    cmd=""
+	    ;;
+	diff)
+	    cmddiff="diff"
+	    cmd=""
+	    ;;
+	test)
+	    cmdtest="test"
+	    cmd=""
+	    ;;
+	srcdir)
+	    #use srcdir option for test
+	    srcdir="yes"
+	    ;;
+	srcdirname)
+	    shift
+	    if [ $# -lt 1 ]; then
+		echo "srcdirname <dir> missing"
+		errcode=1
+		cmd="help"
+		break
+	    fi
+	    SRCDIRNAME="$1"
+	    ;;
+	release)
+	    cmdrel="release"
+	    cmd=""
+	    ;;
+	clean | distclean)
+	    cmdclean="$1"
+	    cmd=""
+	    ;;
+	help)
+	    cmd="help"
+	    break
+	    ;;
+	echo)
+	    set -x
+	    break
+	    ;;
+	zlib)
+	    shift
+	    if [ $# -lt 1 ]; then
+		echo "ZLIB information missing"
+		errcode=1
+		cmd="help"
+		break
+	    fi
+	    ZLIB="$1"
+	    ;;
+	archive)
+	    shift
+	    if [ $# -lt 1 ]; then
+		echo "Archive pathname missing"
+		errcode=1
+		cmd="help"
+		break
+	    fi
+	    ARCHIVES="$1"
+	    ;;
+	--*)
+	    OP_CONFIGURE="$OP_CONFIGURE $1"
+	    ;;
+	op-configure)
+	    shift
+	    if [ $# -lt 1 ]; then
+		echo "op-configure option missing"
+		errcode=1
+		cmd="help"
+		break
+	    fi
+	    OP_CONFIGURE="$OP_CONFIGURE $1"
+	    ;;
+	*)
+	    echo "Unkown option $1"
+	    errcode=1
+	    cmd="help"
+	    break
+	    ;;
+    esac
+    shift
+done
+
+if [ "$cmd" = help ]; then
+    set -
+    cat <<EOF
+Usage: $PROGNAME [all] [checkout] [diff] [test] [srcdir] [release] [help]
+          [zlib <zlib_path>] [archive <arch_path>] [dir <dir>]
+	  [op-configure <option>] [--<option>]
+    all:      Run all commands (checkout, test & release)
+              [Default is all]
+    checkout: Run cvs checkout
+    diff:     Run diff on current and previous versions.  Exit 0 if
+              no significant differences are found.  Otherwise, non-zero.
+    test:     Run test
+    release:  Run release
+    clean:    Run make clean
+    distclean:Run make distclean
+    srcdir:   Use srcdir option (does not imply other commands)
+              "snapshot srcdir" is equivalent to "snapshot srcdir all"
+              "snapshot srcdir checkout" is equivalent to "snapshot checkout"
+    srcdirname <dir>:
+              Use <dir> as the srcdir testing directory if srcdir is choosen.
+              If <dir> starts with '-', it is append to the default name
+              E.g., "snapshot srcdir srcdirname -xx" uses hostname-xx
+              [Default is hostname]
+    help:     Print this message
+    echo:     Turn on shell echo
+    zlib <zlib_path>:
+              Use <zlib_path> as the ZLIB locations
+              [Default is $ZLIB_default]
+    archive <arch_path>:
+              Use <arch_path> as the release ARCHIVE area
+              [Default is $ARCHIVES_default]
+    op-configure <option>:
+              Pass <option> to the configure command
+              E.g., "snapshot op-configure --enable-parallel"
+                  configures for parallel mode
+    --<option>:
+              Pass --<option> to the configure command
+              E.g., "snapshot --enable-parallel"
+                  configures for parallel mode
+EOF
+    exit $errcode
+fi
+
+# Setup the proper configure option (--with-zlib) to use zlib library
+# provide ZLIB is non-empty.
+ZLIB=${ZLIB:+"--with-zlib="$ZLIB}
+CONFIGURE="./configure $ZLIB $OP_CONFIGURE"
+
+# Execute the requests
+snapshot=yes
+
+H4VERSION=hdf4
+BASEDIR=${HOME}/snapshots-${H4VERSION}
+CURRENT=${BASEDIR}/current
+PREVIOUS=${BASEDIR}/previous
+HOSTNAME=`hostname | cut -f1 -d.`	# no domain part
+if [ $H4VERSION != hdf4 ]; then
+    CVSVERSION="-r $H4VERSION"
+else
+    CVSVERSION=				# use the default (main) version
+fi
+
+# Try finding a version of diff that supports the -I option too.
+DIFF=diff
+for d in `echo $PATH | sed -e 's/:/ /g'` ; do
+    test -x $d/diff && $d/diff -I XYZ /dev/null /dev/null > /dev/null 2>&1 &&
+	DIFF=$d/diff && break
+done
+
+#=============================
+# Run CVS checkout
+#=============================
+if [ "$cmd" = "all" -o -n "$cmdcheckout" ]; then
+    TIMESTAMP "checkout"
+    # Create a working directory.  Hopefully one is left over from last
+    # time that still has the contents of the previous release.  But if
+    # not, just create one and assume that a snapshot is necessary.
+    test -d ${BASEDIR} || mkdir -p ${BASEDIR} || exit 1
+
+    # If there is a Makefile in ${CURRENT}, the last test done in it
+    # has not been distclean'ed.  They would interfere with other
+    # --srcdir build since make considers the files in ${CURRENT} 
+    # take precedence over files in its own build-directory.  Run
+    # a "make distclean" to clean them all out.  This is not really
+    # part of the "checkout" functions but this is the most convenient
+    # spot to do the distclean.  We will also continue the checkout process
+    # regardless of the return code of distclean.
+    ( cd ${CURRENT}; test -f Makefile && ${MAKE} distclean)
+
+    # verify proper cvs setting
+    if [ -z "$CVSROOT" ]; then
+	echo "CVSROOT not defined!" 1>&2
+	exit 1
+    fi
+    # Check out the current version from CVS
+    (cd $BASEDIR; cvs -Q co -P -d current ${CVSVERSION} hdf4 ) || exit 1
+fi # Do CVS checkout
+
+
+#=============================
+# Run Test the HDF4 library
+#=============================
+if [ "$cmd" = "all" -o -n "$cmdtest" -o -n "$cmddiff" ]; then
+    TIMESTAMP "diff"
+    # setup if srcdir is used.
+    if [ -z "$srcdir" ]; then
+	TESTDIR=${CURRENT}
+    else
+	#create TESTDIR if not exist yet
+	case "$SRCDIRNAME" in
+	"")
+	    SRCDIRNAME=$HOSTNAME
+	    ;;
+	-*)
+	    SRCDIRNAME="$HOSTNAME$SRCDIRNAME"
+	    ;;
+	esac
+	TESTDIR=${BASEDIR}/TestDir/${SRCDIRNAME}
+	test -d ${TESTDIR} || mkdir ${TESTDIR}
+    fi
+    INSTALLDIR=${TESTDIR}/installdir
+    test -d $INSTALLDIR || mkdir $INSTALLDIR
+    # Make sure current version exists and is clean
+    if [ -d ${TESTDIR} ]; then
+	(cd ${TESTDIR} && ${MAKE} distclean)
+    else
+	errcode=$?
+        snapshot=no
+        exit $errcode
+    fi
+
+    # Compare it with the previous version.  Compare only files listed in
+    # the MANIFEST plus the MANIFEST itself.
+    if [ -d ${PREVIOUS} ]; then
+	if (${DIFF} -c ${PREVIOUS}/MANIFEST ${CURRENT}/MANIFEST); then
+	    snapshot=no
+	    for src in `grep '^\.' ${CURRENT}/MANIFEST|expand|cut -f1 -d' '`; do
+		if ${DIFF} -I H5_VERS_RELEASE -I " released on " \
+		    -I " currently under development" \
+		    ${PREVIOUS}/$src ${CURRENT}/$src
+		then
+		    :	#continue
+		else
+		    snapshot=yes
+		    break
+		fi
+	    done
+	fi
+    fi
+
+    # if diff is choosen, exit 0 if no significant differences are found.
+    # otherwise, exit 1.  This includes cases of other failures.
+    if [ -n "$cmddiff" ]; then
+	if [ $snapshot = no ]; then
+	    exit 0
+	else
+	    exit 1
+	fi
+    fi
+
+    # Make sure all the tests work.
+    # No uninstall target.  Use "rm -rf ..." for now.
+    if [ "$snapshot" = "yes" ]; then
+	if (cd ${TESTDIR} && \
+	    TIMESTAMP "configure" && \
+	    ${srcdir:+${CURRENT}/}${CONFIGURE} --prefix=$INSTALLDIR && \
+	    TIMESTAMP "make" && \
+	    ${MAKE} && \
+	    TIMESTAMP "check" && \
+	    ${MAKE} check && \
+	    TIMESTAMP "install" && \
+	    ${MAKE} install && \
+	    TIMESTAMP "uninstall" && \
+	    rm -rf $INSTALLDIR ); then
+	    :
+	else
+	    errcode=$?
+	    snapshot=no
+	    exit $errcode
+	fi
+    fi
+fi # Test the HDF4 library
+
+
+#=============================
+# Run Release snapshot, update version, and commit to cvs and tag
+#=============================
+if [ "$cmd" = "all" -o -n "$cmdrel" ]; then
+  if [ -n "$needmorework" ]; then
+    if [ "$snapshot" = "yes" ]; then
+	TIMESTAMP "release"
+	(cd ${CURRENT} && ${MAKE} distclean)
+	(
+	    # Turn on exit on error in the sub-shell so that it does not
+	    # cvs commit if errors encounter here.
+	    set -e
+	    cd ${CURRENT}
+	    bin/release -d $ARCHIVES $METHODS
+	    RELEASE_VERSION="`perl bin/h4vers -v`"
+	    perl bin/h4vers -i
+	    echo "***CVS commit SKIPPED***"
+	    echo cvs -Q commit -m "Snapshot $RELEASE_VERSION"
+	)
+	errcode=$?
+    fi
+  else
+    echo "need real release steps.  For now, only move current version to previous"
+  fi
+
+
+    # Replace the previous version with the current version.
+    # Should check if the errcode of the release process but there
+    # are other failures after release was done (e.g. h4vers or cvs failures)
+    # that should allow the replacement to occure.
+    rm -rf ${PREVIOUS}
+    mv ${CURRENT} ${PREVIOUS}
+fi #Release snapshot
+
+
+#=============================
+# Clean the test area.  Default is no clean.
+#=============================
+if [ -n "$cmdclean" ]; then
+    TIMESTAMP "clean"
+    # setup if srcdir is used.
+    if [ -z "$srcdir" ]; then
+	TESTDIR=${CURRENT}
+    else
+	case "$SRCDIRNAME" in
+	"")
+	    SRCDIRNAME=$HOSTNAME
+	    ;;
+	-*)
+	    SRCDIRNAME="$HOSTNAME$SRCDIRNAME"
+	    ;;
+	esac
+	TESTDIR=${BASEDIR}/TestDir/${SRCDIRNAME}
+    fi
+    # Make sure current version exists and is clean
+    if [ -d ${TESTDIR} ]; then
+	(cd ${TESTDIR} && ${MAKE} $cmdclean )
+    else
+	errcode=$?
+        snapshot=no
+        exit $errcode
+    fi
+fi # Clean the Test directory
+
+exit $errcode

@@ -1,0 +1,3525 @@
+
+This file was created for the HDF4.2r0. release to store the documents
+that were in the release_notes directory of the main HDF4 source tree
+since the 4.0.alpha release. See also HISTORY.txt file for more information.
+
+File contains the following *.txt files:
+
+
+Fortran_APIs.txt
+JPEG.txt
+Pablo.txt
+comp_SDS.txt
+compile.txt
+compression.txt
+dimval.txt
+external_path.txt
+hdp.txt
+install_winNT.txt
+macintosh.txt
+mf_anno.txt
+mf_ris.txt
+new_functions.txt
+page_buf.txt
+sd_chunk_examples.txt
+vattr.txt
+windows.txt
+
+To search for a particular document use "filename.txt=" string, for example 
+to seach for the beginning of the new_functions.txt file,
+use "new_functions.txt=" string
+
+================================Fortran_APIs.txt============================
+
+Problem:
+========
+
+In HDF4.0r1 and previous versions of HDF several Fortran 
+routines declared a formal parameter as character*(*) or 
+integer while the actual parameter was a character or 
+a numeric type. This caused problems on some systems, 
+such as VMS and T3D. 
+
+With HDF 4.0r2 and later releases, these routines have either 
+been replaced by 2 routines, one for character type parameters 
+and another for numeric type parameters; or, a new routine has 
+been added for char type parameters and the old routine is used 
+for numeric type parameters only. Those routines that were replaced 
+by two routines should be phased out in the future. However, in 
+order to not break currently working applications they are 
+still supported. New applications should use the new routines. 
+
+Routines and parameters affected:
+================================
+1. Write vdata
+
+Old:
+    vsfwrit(vsid, databuf, n_rec, interlace)
+        character*(*) databuf
+
+HDF4.0r2:
+    
+    Write to a vdata from a character buffer:
+      vsfwrtc(vsid, cbuf, n_rec, interlace) 
+           character*(*) cbuf
+    Write to a vdata from an integer buffer (for numeric values):
+      vsfwrt(vsid, buf, n_rec, interlace)  
+           integer  buf
+
+2. Read vdata
+ 
+Old:
+    vsfread(vsid, buf, n_recs, interlace)
+         character*(*) buf
+HDF4.0r2:
+    Read records into a character buffer:
+      vsfrdc(vsid, cbuf, n_recs, interlace)
+          character*(*) cbuf
+    Read records into an integer buffer (for numeric values):
+      vsfrd(vsid, buf, n_recs, interlace)
+          integer buf
+
+3. High level function for creating a single field single
+   component vdata
+ 
+Old:
+    vhfsd(f, field, buf, n, dtype, vsname, vsclass)
+         integer buf
+HDF4.0r2:
+    Store a simple character dataset in a vdata:
+      vhfscd(f,field,cbuf,n,dtype,vsname,vsclass)
+         character*(*) cbuf
+    Store a simple numeric dataset in a vdata
+      vhfsd(f, field, buf, n, dtype, vsname, vsclass)
+         integer buf
+
+4. High level function for creating a single field multi-
+   component vdata
+Old:
+    vhfsdm (f,field,buf,n,dtype,vsname,vsclass,order)
+         integer buf
+HDF4.0r2:
+    Store an aggregate char dataset in a vadata:      
+      vhfscdm (f,field,cbuf,n,dtype,vsname,vsclass,order)
+         character*(*) cbuf
+    Store a simple numeric dataset in a vdata
+      vhfsdm(f,field,buf,n,dtype,vsname,vsclass,order)
+         integer buf
+
+5. Write GR image
+Old:
+    mgwrimg(riid, start,stride,count,data)
+      <valid numeric type> data
+HDF4.0r2:
+    Write character type image data
+     mgwcimg(riid, start, stride, count, cdata)
+         character*(*)  cdata
+    Write numeric type image data
+      mgwrimg(riid, start,stride,count,data)
+      <valid numeric type> data
+
+6. Read GR image
+Old:
+    mgrdimg(riid,start,stride,count,data)
+      integer data
+HDF4.0r2:
+    Read character type image data
+      mgrcimg(riid,start,stride,count,cdata)
+          character*(*) cdata
+    Read numeric type image data
+      mgrdimg(riid,start,stride,count,data)
+          <valid numeric type> data
+
+7. Write LUT
+Old:
+    mgwrlut(lutid,ncomp,data_type,interlace,nentries,data)
+      <valid numeric type> data
+HDF4.0r2:
+    Write character type palette:
+      mgwclut(lutid,ncomp,data_type,interlace,nentries,cdata)
+          character*(*) cdata
+    Write numeric type palette:
+      mgwrlut(lutid,ncomp,data_type,interlace,nentries,data)
+          <valid numeric type> data
+
+8. Read LUT
+Old:
+    mgrdlut(lutid, data)
+      <valid numeric type> data
+HDF4.0r2:
+    Read char type palette:
+      mgrclut(lutid,cdata)
+        character*(*) cdata
+    Read numeric type palette:
+      mgrdlut(lutid, data) 
+        <valid numeric type> data
+
+9. Set GR attribute
+Old:
+    mgsattr(riid, name, nt, count, data)
+      character*(*) data
+HDF4.0r2:
+    Add char type attribute to a raster image
+      mgscatt(riid, name, nt, count, cdata)
+        character*(*) cdata
+    Add a numeric attribute to a raster image
+      mgsnatt(riid, name, nt, count, data)
+        integer data
+
+10. Get GR attribute
+Old:
+    mggattr(riid, index, data)
+      <valid numeric type> data
+HDF4.0r2:
+    Get a char type attribute:
+      mggcatt(riid, index, cdata)
+        character*(*) cdata
+    Get a numeric type attribute:
+      mggnatt(riid, index, data)
+        integer data
+
+11. Write SDS data
+Old:
+    sfwdata(sdsid,start,stride,end,values)
+      <valid numeric type> values
+HDF4.0r2
+    Write char type SDS data
+      sfwcdata(sdsid,start,stride,end,cvalues)
+        character*(*) cvalues
+    Write numeric type SDS data
+      sfwdata(sdsid,start,stride,end,values)
+        <valid numeric type> values
+
+12. Read SDS data
+Old:
+    sfrdata(sdsid,start,stride,end,values)
+      <valid numeric type> values
+HDF4.0r2
+    Read char type SDS data
+      sfrcdata(sdsid,start,stride,end,cvalues)
+        character*(*) cvalues
+    Read numeric type SDS data
+      sfrdata(sdsid,start,stride,end,values)
+        <valid numeric type> values
+
+13. Add an attribute to an object in SD interface
+Old:
+    sfsattr(id, name, nt, count, data)
+      character*(*) data
+HDF4.0r2
+    Add a char type attribute to an object
+      sfscatt(id, name, nt, count, cdata)
+        character*(*) cdata
+    Add a numeric type attribute to an object
+      sfsnatt(id, name,nt, count,data)
+        integer data
+
+14. Get contents of an attribute
+Old:
+    sfrattr(id, index, buf)
+      <valid numeric type> buf
+HDF4.0r2:
+    Get a char type attribute
+      sfrcatt(id, index, cbuf)
+        character*(*) cbuf
+    Get a numeric type attribute
+      sfrnatt(id, index, buf)
+        <valid numeric type> buf   
+
+15. Set fill value
+Old:
+    sfsfill(id, val)
+      <valid numeric type> val
+HDF4.0r2
+    Set a char type fill value
+      sfscfill(id, cval)
+        character cval
+    Set a numeric type fill value
+      sfsfill(id, val)
+        <valid numeric type> val
+
+16. Get fill value
+Old:
+    sfgfill(id, val)
+      <valid numeric type> val
+HDF4.0r2
+    Get char type fill value
+      sfgcfill(id, cval)
+        character cval
+    Get numeric type fill value
+      sfgfill(id, val)
+        <valid numeric type> val
+
+
+============================================================================
+================================JPEG.txt====================================
+
+Independant JPEG Group library
+    Version 4.1b of the HDF-netCDF library uses v6a of the Independent
+JPEG Group (IJG) JPEG file access library.  For most users of the HDF library,
+this will be completely transparent.  For users who are integrating the HDF
+library into an existing application which uses the IJG's JPEG library, linking
+with the HDF library is now much simpler and should be completely painless.
+The JPEG library will need to be linked with user's applications when raster
+images are being used (whether they are compressed with JPEG or not).
+
+     cc -o <myprog> myprog.c -I<include path> <path for libmfhdf.a> \
+           <path for libdf.a> <path for libjpeg.a>
+
+     Note: order of the libraries is important, the mfhdf library must be first
+and be followed by the hdf library.
+============================================================================
+================================Pablo.txt===================================
+
+
+Pablo Instrumentation of HDF
+===========================
+    This version of the distribution has support to create an instrumented 
+    version of the HDF library(libdf-inst.a). This library along with
+    the Pablo performance data capture libraries can be used to gather data
+    about I/O behavior and procedure execution times.  
+
+    More detailed documentation on how to use the instrumented version of
+    the HDF library with Pablo can be found in the Pablo directory 
+    '$(toplevel)/hdf/pablo'. 
+     See the provided '$(toplevel)/hdf/pablo/README.Pablo'
+     and the Postscript file '$(toplevel)/hdf/pablo/Pablo.ps'.
+
+    At this time only an instrumented version of the core HDF library libdf.a 
+    can be created. Future versions will have support for the SDxx interface
+    found in libmfhdf.a. Current interfaces supported are ANxx, GRxx, DFSDxx,
+    DFANxx, DFPxx, DFR8xx, DF24xx, Hxx, Vxx, and VSxx.
+
+    To enable the creation of an instrumented library the following section
+    in the makefile fragment($(toplevel)/config/mh-<os>) must be uncommented 
+    and set.
+
+    # ------------ Macros for Pablo Instrumentation  --------------------
+    # Uncomment the following lines to create a Pablo Instrumentation
+    # version of the HDF core library called 'libdf-inst.a'
+    # See the documentation in the directory 'hdf/pablo' for further 
+    # information about Pablo and what platforms it is supported on
+    # before enabling. 
+    # You need to set 'PABLO_INCLUDE' to the Pablo distribution 
+    # include directory to get the files 'IOTrace.h' and 'IOTrace_SD.h'.
+    #PABLO_FLAGS  = -DHAVE_PABLO
+    #PABLO_INCLUDE = -I/hdf2/Pablo/Instrument.HP/include
+
+    After setting these values you must re-run the top-level 'configure' script.
+    Make sure that your start from a clean re-build(i.e. 'make clean') after
+    re-running the toplevel 'configure' script and then run 'make'.
+    Details on running configure can be found in the section
+    'General Configuration/Installation - Unix' found in the top-level 
+    installation file '$(toplevel)/INSTALL'.
+============================================================================
+================================comp_SDS.txt================================
+
+Limitations of compressed SDS datasets
+    Due to certain limitations in the way compressed datasets are stored, data
+which has been compressed is not completely writable in ways that uncompressed
+datasets are.  The "rules" for writing to a compressed dataset are as follows:
+
+    (1) Write an entire dataset that is to be compressed.  I.e. build the
+        dataset entirely in memory, then write it out with a single call.
+ 
+    (2) Append to a compressed dataset.  I.e. write to a compressed dataset
+        that has already been written out by adding to the unlimited
+        dimension for that dataset.
+ 
+    (3) For users of HDF 4.1, write to any subset of a compressed dataset
+        that is also chunked.
+
+    Generally speaking, these mean that it is impossible to overwrite existing
+compressed data which is not stored in "chunked" form.  This is due to 
+compression algorithms not being suitable for "local" modifications in a
+compressed datastream.  Please send questions about compression to the
+general HDF support e-mail address:  hdfhelp@ncsa.uiuc.edu
+
+Compression for HDF SDS
+The SDsetcompress and SDsetnbitdataset functions are used as
+higher-level routines to access the HCcreate function (HCcreate is described
+in the reference manual).  SDsetnbitdataset allows for the storage of 1-32 bit 
+integer values (instead of being restricted to 8, 16 or 32-bit sizes) in a
+scientific dataset. SDsetcompress can be used to compress a scientific dataset
+through the SD interface instead of dropping down to the lower-level H
+interface.
+
+N-bit SDS using SDsetnbitdataset:
+
+    The interface to SDsetnbitdataset is described below:
+
+    intn SDsetnbitdataset(sds_id,start_bit,bit_len,sign_ext,fill_one); 
+
+    int32 sds_id - The id of a scientific dataset returned from SDcreate or
+        SDselect.
+        
+    intn start_bit - This value determines the bit position of the highest end
+        of the n-bit data to write out. Bits in all number-types are counted
+        from the right starting with 0. For example, in the following bit data,
+        "01111011", bits 2 and 7 are set to 0 and all the other bits are set to
+        one. 
+
+    intn bit_len - The number of bits in the n-bit data to write, including the
+        starting bit, counting towards the right (i.e. lower bit numbers). For
+        example, starting at bit 5 and writing 4 bits from the following bit
+        data, "01111011", would write out the bit data, "1110", to the dataset
+        on disk. 
+
+    intn sign_ext - Whether to use the top bit of the n-bit data to sign-extend
+        to the highest bit in the memory representation of the data. For
+        example, if 9-bit signed integer data is being extracted from bits
+        17-25 (nt=DFNT_INT32, start_bit=25, bit_len=9, see below for full
+        information about start_bit & bit_len parameters) and the bit in
+        position 25 is a 1, then when the data is read back in from the disk,
+        bits 26-31 will be set to a 1, otherwise bit 25 will be a zero and bits
+        26-31 will be set to 0. This bit-filling takes higher precedence (i.e.
+        is performed after) the fill_one (see below) bit-filling. 
+
+    intn fill_one - Whether to fill the "background" bits with 1's or 0's.
+        The "background" bits of a n-bit dataset are those bits in the
+        in-memory representation which fall outside of the actual n-bit field
+        stored on disk. For example, if 5 bits of an unsigned 16-bit integer
+        (in-memory) dataset located in bits 5-9 are written to disk with the
+        fill_one parameter set to TRUE (or 1), then when the data is read back
+        into memory at a future time, bits 0-4 and 10-15 would be set to 1. If
+        the same 5-bit data was written with a fill_one value of FALSE (or 0),
+        then bits 0-4 and 10-15 would be set to 0.  This setting has a lower
+        precedence (i.e. is performed first) than the sign_ext setting. For
+        example, using the sign_ext example above, bits 0-16 and 26-31 will
+        first be set to either 1 or 0 based on the fill_one parameter, and then
+        bits 26-31 will be set to 1 or 0 based on bit-25's value. 
+    
+    RETURNS - SUCCEED (0) or FAIL (-1) for success/failure.
+
+    The corresponding FORTRAN function name is sfsnbit which takes the
+    same parameters in the same order.
+
+    For example, to store an unsigned 12-bit integer (which is represented
+    unpacked in memory as an unsigned 16-bit integer), with no sign extension
+    or bit filling and which starts at bit 14 (counting from the right with bit
+    zero being the lowest) the following setup & call would be appropriate: 
+
+    intn sign_ext = FALSE; 
+    intn fill_one = FALSE; 
+    intn start_bit= 14; 
+    intn bit_len = 12; 
+    SDsetnbitdataset(sds_id,start_bit,bit_len,sign_ext,fill_one); 
+
+    Further reads and writes to this dataset would transparently convert the
+    16-bit unsigned integers from memory into 12-bit unsigned integers stored
+    on disk.
+
+    More details about this function can be found in the HDF library reference
+    manual.
+
+Compressed SDS data using SDsetcompress:
+
+        The SDsetcompress function call contains a subset of the parameters to
+the HCcreate function call described in compression.txt and performs the same
+types of compression.
+
+    The interface to SDsetcompress is described below:
+
+    intn SDsetcompress(sds_id,comp_type,c_info);
+
+    int32 sds_id - The id of a scientific dataset returned from SDcreate or
+        SDselect.
+
+    int32 comp_type - The type of compression to encode the dataset with.
+        The values are the same as for HCcreate:
+            COMP_CODE_NONE - for no compression
+            COMP_CODE_RLE - for RLE encoding
+            COMP_CODE_SKPHUFF - for adaptive Huffman
+            COMP_CODE_DEFLATE - for gzip 'deflation'
+
+    comp_info *c_info - Information needed for the encoding type chosen.
+        For COMP_CODE_NONE and COMP_CODE_RLE, this is unused and can be set to
+        NULL.  For COMP_CODE_SKPHUFF, the structure skphuff in this union needs
+        information about the size of the data elements in bytes (see example
+        below).  For COMP_CODE_DEFLATE, the structure deflate in this union
+        need information about "effort" to try to compress with (see example
+        below).  For more information about the types of compression 
+        see the compression.txt document in this directory.
+
+    RETURNS - SUCCEED (0) or FAIL (-1) for success/failure.
+
+    Similarly to the HCcreate function, SDsetcompress can be used to create
+    compressed dataset or to compress existing ones.
+
+    For example, to compress unsigned 16-bit integer data using the adaptive
+    Huffman algorithm, the following setup and call would be used:
+
+    comp_info c_info;
+    c_info.skphuff.skp_size=sizeof(uint16);
+    SDsetcompress(sds_id,COMP_CODE_SKPHUFF,&c_info);
+
+    Further reads and writes to this dataset would transparently convert the
+    16-bit unsigned integers from memory into a compressed representation on
+    disk.
+
+    For example, to compress a dataset using the gzip deflation algorithm, with
+    the maximum effort to compress the data, the following setup and call would
+    be used:
+
+    comp_info c_info;
+    c_info.deflate.level=9;
+    SDsetcompress(sds_id,COMP_CODE_DEFLATE,&c_info);
+
+    Currently, SDsetcompress is limited to creating new datasets or appending
+    new slices/slabs onto existing datasets.  Overwriting existing data in a
+    dataset will be supported at some point in the future.
+
+    More details about this function can be found in the HDF library reference
+    manual.
+
+============================================================================
+================================compile.txt=================================
+
+ 
+COMPILING A PROGRAM
+                  
+Following are instructions for compiling an application program on the 
+platforms supported by HDF, using the binaries that we provide.  For
+Unix, the information on options to specify comes from the configuration 
+files (mh-*) in the HDF source code (under ../HDF4.1r5/config).   
+
+In general, you compile your program as shown below.  If your platform is 
+not specified in the section, "INSTRUCTIONS FOR SPECIFIC PLATFORMS", then 
+use these instructions.  If you are unable to compile your program on Unix, 
+please check the configuration file for your platform for the correct 
+options.
+
+C:
+    cc -o <your program> <your program>.c -I<path for hdf include directory>\
+       -L<path for hdf libraries> -lmfhdf -ldf -ljpeg -lz
+
+   or
+
+    cc -o <your program> <your program>.c -I<path for hdf include directory> \
+          <path for libmfhdf.a>  <path for libdf.a> \
+          <path for libjpeg.a> <path for libz.a>
+
+FORTRAN:
+    f77 -o <your program> <your program>.f  \
+        -L<path for hdf libraries> -lmfhdf -ldf -ljpeg -lz
+   
+   or
+   
+    f77 -o <your program> <your program>.f  \
+          <path for libmfhdf.a>  <path for libdf.a> \
+          <path for libjpeg.a> <path for libz.a>
+
+NOTE: The order of the libraries is important: libmfhdf.a first,
+followed by libdf.a, then libjpeg.a and libz.a.  The libjpeg.a
+library is optional.
+
+INSTRUCTIONS FOR SPECIFIC PLATFORMS
+===================================
+
+Cray:
+----
+C:
+    cc  -O -s -o <your program> <your program>.c \  
+        -I<path for hdf include directory> \
+        -L<path for hdf libraries> -lmfhdf -ldf -ljpeg -lz
+
+FORTRAN:
+    f90 -O 1 -o <your program> <your program>.f  \
+         -L<path for hdf libraries> -lmfhdf -ldf -ljpeg -lz
+
+Dec Alpha/Digital Unix:
+----------------------
+C:
+    cc -Olimit 2048 -std1 -o <your program> <your program>.c \
+       -I<path for hdf include directory>\
+       -L<path for hdf libraries> -lmfhdf -ldf -ljpeg -lz
+
+FORTRAN:
+    f77 -o <your program> <your program>.f  \
+        -L<path for hdf libraries> -lmfhdf -ldf -ljpeg -lz
+ 
+Dec Alpha/OpenVMS AXP:
+---------------------
+   To compile your programs, prog.c and prog1.for, with the HDF library, 
+   mfhdf.olb, df.olb, and libz.olb are required.  The libjpeg.olb library 
+   is optional.
+
+   cc/opt/nodebug/define=(HDF,VMS)/nolist/include=<dir for include> prog.c
+   fort prog1.for
+   link/nodebug/notraceback/exec=prog.exe  prog.obj, prog1.obj, -
+         <dir for lib>mfhdf/lib -
+         <dir for lib>df/lib, <dir for lib>libjpeg/lib,  -
+         <dir for lib>libz/lib, sys$library:vaxcrtl/lib
+
+   NOTE: The order of the libraries is important: mfhdf.olb first,
+   followed by df.olb then libjpeg.olb and libz.olb.
+
+Exemplar:
+--------
+C:
+    cc -ext -nv -no <your program> <your program>.c \
+       -I<path for hdf include directory> \
+       -L<path for hdf libraries> -lmfhdf -ldf -ljpeg -lz
+
+FORTRAN:
+    fc  -sfc -72 -o <your program> <your program>.f  \
+        -L<path for hdf libraries> -lmfhdf -ldf -ljpeg -lz
+
+   NOTE: These instructions are for Convex/HP Exemplar machines running
+   versions of the OS ealier than 10.x.  For machines running version
+   10.x of HP-UX, follow the instructions for HP-UX 10.2.
+
+FreeBSD:
+-------
+C:
+    cc -ansi -Wall -pedantic -o <your program> <your program>.c \  
+        -I<path for hdf include directory> \
+        -L<path for hdf libraries> -lmfhdf -ldf -ljpeg -lz
+
+FORTRAN:
+    f77 -O -o <your program> <your program>.f  \
+        -L<path for hdf libraries> -lmfhdf -ldf -ljpeg -lz
+
+ 
+HP-UX:
+-----
+C:
+    cc -Ae -s -o <your program> <your program>.c \
+       -I<path for hdf include directory> \
+       -L<path for hdf libraries> -lmfhdf -ldf -ljpeg -lz
+
+FORTRAN:
+    f77 -s -o <your program> <your program>.f  \
+        -L<path for hdf libraries> -lmfhdf -ldf -ljpeg -lz
+ 
+
+IRIX 6.x:
+--------
+C:
+    cc -ansi -n32 -mips3 -O -s -o <your program> <your program>.c  \
+       -I<path for hdf include directory>\
+       -L<path for hdf libraries> -lmfhdf -ldf -ljpeg -lz
+
+FORTRAN:
+    f90 -n32 -mips3 -O -s -o <your program> <your program>.f  \
+        -L<path for hdf libraries> -lmfhdf -ldf -ljpeg -lz
+
+IRIX64 with 64-bit mode:
+------------------------
+C:
+    cc -ansi -64 -mips4 -O -s -o <your program> <your program>.c  \
+       -I<path for hdf include directory>\
+       -L<path for hdf libraries> -lmfhdf -ldf -ljpeg -lz
+
+FORTRAN:
+    f77 -64 -mips4 -O -s -o <your program> <your program>.f  \
+        -L<path for hdf libraries> -lmfhdf -ldf -ljpeg -lz
+
+  
+IRIX64 with n32-bit mode:
+-------------------------
+C:
+    cc -ansi -n32 -mips4 -O -s -o <your program> <your program>.c \
+     -I<path for hdf include directory> \
+     -L<path for hdf libraries> -lmfhdf -ldf -ljpeg -lz
+
+FORTRAN:
+    f77 -n32 -mips4 -O -s -o <your program> <your program>.f  \
+        -L<path for hdf libraries> -lmfhdf -ldf -ljpeg -lz
+
+Linux:
+-----
+C:
+    gcc -ansi -D_BSD_SOURCE -o <your program> <your program>.c \  
+        -I<path for hdf include directory> \
+        -L<path for hdf libraries> -lmfhdf -ldf -ljpeg -lz
+
+FORTRAN:
+    g77 -o <your program> <your program>.f  \
+        -L<path for hdf libraries> -lmfhdf -ldf -ljpeg -lz
+
+Solaris:
+-------
+   The -lnsl is necessary in order to include the xdr library.
+
+C:
+    cc -Xc -xO2 -o <your program> <your program>.c  \
+       -I<path for hdf include directory>\
+       -L<path for hdf libraries> -lmfhdf -ldf -ljpeg -lz \
+       -L/usr/lib -lnsl
+
+FORTRAN:
+    f77 -O -o <your program> <your program>.f  \
+        -L<path for hdf libraries> -lmfhdf -ldf -ljpeg -lz \
+        -L/usr/lib -lnsl
+
+Solaris_x86 (C only):
+--------------------
+    The -lnsl is necessary in order to include the xdr library.
+
+    gcc -ansi -O -o <your program> <your program>.c \
+        -I<path for hdf include directory> \
+        -L<path for hdf libraries> -lmfhdf -ldf -ljpeg -lz  \
+        -L/usr/lib -lnsl
+
+SP:
+---
+C:
+    xlc -qlanglvl=ansi -O -o <your program> <your program>.c \
+        -I<path for hdf include directory> \
+        -L<path for hdf libraries> -lmfhdf -ldf -ljpeg -lz
+
+FORTRAN:
+    f77 -O -o <your program> <your program>.f  \
+        -L<path for hdf libraries> -lmfhdf -ldf -ljpeg -lz
+
+
+T3E:
+---
+C:
+    
+    cc -X m -s -o <your program> <your program>.c \
+       -I<path for hdf include directory>\
+       -L<path for hdf libraries> -lmfhdf -ldf -ljpeg -lz
+
+FORTRAN:
+    f90 -X m -Wl"-Dpermok=yes" -Wl"-s" -o <your program> <your program>.f  \
+        -L<path for hdf libraries> -lmfhdf -ldf -ljpeg -lz
+
+
+Windows NT/98/2000:
+------------------
+Using Microsoft Visual C++ version 6.x:
+
+Under Tools->Options, select the folder, Directories:
+   Under "Show directories for", select "Include files".
+   Add the following directories:
+      C:<path to HDF includes>\INCLUDE  
+
+Under "Show directories for", select "Library files":
+   Add the following directories:
+      C:<path to HDF libs>\LIB        
+
+Under Project->Settings, select folder, Link:
+   Add the following libraries to the beginning of the list of
+   Object/Library Modules:
+         hd415.lib hm415.lib (single-threaded release version)
+         hd415d.lib hm415d.lib (single-threaded debug version)
+
+         hd415m.lib hm415m.lib (multi-threaded release version)
+         hd415md.lib hm415md.lib (multi-threaded debug version)
+
+
+
+============================================================================
+================================compression.txt=============================
+
+Compression Algorithms and interface
+
+    The low-level compression interface allows any data object to be 
+compressed using a variety of algorithms.  This is completely transparent 
+to users once the data has been compressed initially - further data written
+to an object or read from it are compressed or decompressed internally to
+the library, without user intervention.  (For information on compressing
+SDS datasets, see the ../release_notes/comp_SDS.txt file.)  
+
+Currently only three compression algorithms are supported: Run-Length Encoding 
+(RLE), adaptive Huffman, and an LZ-77 dictionary coder (the gzip 'deflation' 
+algorithm).  Plans for future algorithms include an Lempel/Ziv-78 dictionary 
+coding, an arithmetic coder and a faster Huffman algorithm.
+
+    The public interface for this routine is contained in the user-level
+function call, HCcreate.  The interface to HCcreate is described below:
+
+int32 HCcreate(id,tag,ref,model_type,m_info,coder_type,c_info);
+    int32 id;                IN: the file id to create the data in (from Hopen)
+    uint16 tag,ref;          IN: the tag/ref pair of the data object which
+                                    is to be compressed
+    comp_model_t model_type; IN: the type of modeling to use, currently
+                                    only COMP_MODEL_STDIO is supported, which
+                                    indicates data is transferred in the
+                                    same way as C I/O functions operate.
+    model_info *m_info;      IN: Information needed for the modeling type chosen
+                                    Nothing needed for COMP_MODEL_STDIO,
+                                    so NULL can be used.
+    comp_coder_t coder_type; IN: the type of encoding to use from the following:
+                                    COMP_CODE_NONE - for no compression
+                                    COMP_CODE_RLE - for RLE encoding
+                                    COMP_CODE_SKPHUFF - for adaptive Huffman
+                                    COMP_CODE_DEFLATE - for gzip 'deflation'
+    comp_info *c_info;       IN: Information needed for the encoding type chosen
+                                    For COMP_CODE_NONE and COMP_CODE_RLE,
+                                    this is unused and can be set to NULL.
+                                    For COMP_CODE_SKPHUFF, the structure skphuff
+                                    in this union needs information about the
+                                    size of the data elements in bytes (see
+                                    examples below).
+                                    For COMP_CODE_DEFLATE, the structure deflate
+                                    in this union needs information about the
+                                    "effort" to encode data with.  Higher
+                                    values of 'level' member indicate more
+                                    compression effort.  Values may range from
+                                    0 (minimal compression, fastest time) to
+                                    9 (maximum compression, slowest time).
+    RETURNS
+        Return an AID to the newly created compressed element, FAIL on error.
+
+    HCcreate will compress an existing data object with the specified 
+compression method, or it can create a new data object which will contain
+compressed data when it is written to.  In either case, Hendaccess must be
+called to release the AID allocated by HCcreate.  In the first two examples
+below the datasets already exist, in the final example the dataset is created
+by the HCcreate call.  There is currently no FORTRAN equivalent for this
+function.  More details about this function can be found in the HDF reference
+manual.
+
+The following example shows how to compress a scientific dataset data object
+(which is composed of multi-dimensional 32-bit integer data) using the
+adaptive Huffman encoding:
+    {
+        int32 aid;
+        comp_info c_info;
+
+        c_info.skphuff.skp_size=sizeof(int32);
+        aid=HCcreate(file_id, DFTAG_SD, ref, COMP_MODEL_STDIO, NULL, 
+            COMP_CODE_SKPHUFF,&c_info);
+        .
+        .
+        <access data object>
+        .
+        .
+        Hendaccess(aid);
+    }
+
+The following example shows show to compress a raster image data object
+using the RLE algorithm:
+    {
+        int32 aid;
+
+        aid=HCcreate(file_id, DFTAG_RI, ref, COMP_MODEL_STDIO, NULL, 
+            COMP_CODE_RLE,NULL);
+        .
+        .
+        <access data object>
+        .
+        .
+        Hendaccess(aid);
+    }
+
+The following example shows how to create a new data object whose data
+will compressed as it is written:
+    {
+        int32 aid;
+
+        aid=HCcreate(file_id, DFTAG_RI, ref, COMP_MODEL_STDIO, NULL, 
+            COMP_CODE_RLE,NULL);
+        .
+        .
+        Hwrite(aid,len,data);
+        .
+        .
+        Hendaccess(aid);
+    }
+============================================================================
+================================dimval.txt==================================
+
+             New Version of Dimension Values
+             ===============================
+
+HDF4.0b1 and previous releases use a vgroup to represent a dimension.
+The vgroup has a single field vdata with class "DimVal0.0".
+The vdata has <dimension size> number of records, each record has a 
+fake value from 0, 1, 2 ... , (<dimension size> - 1 ). The fake values 
+are not really required and take a lot of space. For applications that 
+create large one dimensional array datasets the disk space taken by 
+these fake values almost double the size of the HDF file. In order to 
+omit the fake values, a new version of dimension vdata has been proposed.
+
+The new version uses the same structure as the old version. The only
+differences are that the vdata has only 1 record with value 
+<dimension size> and that the vdata's class is "DimVal0.1" to 
+distinguish it from the old version.
+
+However, existing tools and utilities which were compiled with the old
+version can't recognize the new dimensions of hdf files created using
+HDF4.0b2 or later version. This could cause problems for HDF users.
+To solve this problem, we are planning to implement a transitional 
+policy:
+
+1. Starting from HDF4.0b2 both versions of the dimension will be
+   created by default. The old tools recognize the "DimVal0.0" 
+   dimension.
+2. A new function SDsetdimval_comp (sfsdmvc) is added which can 
+   be called for a specific dimension to suppress the creation 
+   of the "DimVal0.0" vdata for that dimension. Users who store 
+   big 1D arrays should use this function to create "DimVal0.1" 
+   only.  See the man page for sdsetdimval_comp.3. 
+3. A new function SDisdimval_bwcomp (sfisdmvc) is added which 
+   can be called to get the current compatibility mode of a 
+   dimension. See the man page for sdisdimval_bwcomp.3. 
+4. HDF4.0b2 and later version of HDF libraries can recognize both
+   old and new versions of dimensions. This means old HDF files can 
+   always be read by new HDF libraries.
+5. HDF4.1 will create only "DimVal0.1" by default and function 
+   SDsetdimval_comp should be called if "DimVal0.0" is also desired.  
+   The transition time period is ended.
+6. Existing tools and utilities should be re-compiled with HDF4.0b2
+   or later releases during that transition time period.
+7. A new utility will be written to remove redundant "DimVal0.0" from 
+   the files created during the transition time period.
+8. A new utility will be written to convert "DimVal0.1" to "DimVal0.0"
+   for special cases.
+
+Please send bug reports, comments and suggestions to hdfhelp@ncsa.uiuc.edu.
+
+
+============================================================================
+================================external_path.txt===========================
+
+User Settable File Location for External Elements
+
+Users sometimes encounter situations (e.g., disk space shortage,
+different filesystem names) that the external file containing the data
+of the external element has to reside in a directory different from the
+one it was created.  The user may set up symbolic pointers to forward
+the file locations but this does not work if the external filename is
+an absolute path type containing directory components that do not exist
+in the local system.
+
+A new feature is added such that an application can provide a list of
+directories for the HDF library to search for the external file.  This
+is set by the function call HXsetdir or via the environment variable
+$HDFEXTDIR.  See the man page HXsetdir(3) for details.
+
+A similar feature is also added to direct the HDF library to create the
+external file of a _new_ external element in the given directory.  An
+example for the need of this feature is that an application wants to
+create multiple external element files with certain naming conventions
+(e.g., Data950101, Data950102) while all these files share a common
+parent directory (project123/DataVault).  Different users will have a
+different choice of the common parent directory.  This can be set by
+the function call HXsetcreatedir or the environment variable
+$HDFEXTCREATEDIR.  See the man page for HXsetcreatedir (1) for detail.
+
+============================================================================
+================================hdp.txt=====================================
+
+           hdp -- HDF dumper 
+
+
+NAME
+     hdp - HDF dumper
+
+SYNOPSIS
+     hdp [hdp options] hdp command [command options] <filename list>
+
+DESCRIPTION
+     
+     hdp is a command line utility designed for quick display of 
+     contents and data of HDF3.3 objects. It can list the contents 
+     of hdf files at various levels with different details. It can 
+     also dump the data of one or more specific objects in the file. 
+
+
+HDP OPTIONS
+
+    Currently, there is only one option.
+
+    -H  Display usage information about the specified command.
+        If no command is specified, -H lists all available commands.
+
+
+HDP COMMANDS
+
+     hdp currently has two types of commands: list and dump. Other 
+     types of commands such as those for editing may be added in the
+     future.
+     
+     hdp list <filename list>
+         lists contents of files in <filename list> 
+
+     hdp dumpsds <filename list>
+         displays data of NDGs and SDGs in the listed files.
+
+     hdp dumpvd <filename list>
+         displays data of vdatas in the listed files.
+   
+     hdp dumpvg <filename list>
+         displays data of objects in vgroups in the listed files.
+
+     hdp dumprig <filename list>
+         displays data of RIGs in the listed files.
+
+     hdp dumpgr <filename list>
+         displays data of general RIGs in the listed files.
+
+HDP COMMAND OPTIONS
+
+(Note: options preceeded by an * have not yet been implemented.)
+
+
+     hdp list [format options] [content ops] [filter ops] [order ops] 
+	      <filename list>
+     --------------------------------------------------------------------------
+
+      Format options
+          decide how the info of objects will be presented on the screen.
+       
+        -s  (short format) under each tag #, all ref's of that tag are listed
+            in one or more lines, same as the output of hdfls. (default)
+
+        -l  (long format) one object per line. Each line contains tag-name, 
+            tag/ref and the index of this tag in the file.(e.g., the ith NDG 
+	    in the file).
+
+        -d  debug format, one object per line. Each line contains tag_name,
+            tag/ref, index, offset, and length, same as the output of hdfls -d.
+
+	no	tagname	   tag	  ref	index/tag	offset	length
+        --      -------    ---    ---   ---------       ------  ------
+
+	1	DFTAG_NT   106      2      1          
+        2       DFTAG_SD   701      3      1
+        ...
+
+
+         Content options
+              allow contents be displayed.
+  
+            -n  display the name or label of the object, if there is any.
+                -n puts you in -l format automatically.
+
+            -c  display the class of the object, if there is any. -l format.
+
+            -a  display description of the object, if there is any. -l format.
+
+         Filter options
+              select certain type of objects to display, default is all.
+
+            -g  display groups only. Objects which do not belong to 
+                any group will not be displayed. Nested groups will be
+                displayed in tree format.
+
+            -t <number>  display objects with specified tag number . e.g. 
+                         720 for NDG.
+            -t <name>    display objects with specified tag name.
+
+         Order options
+              sort the output list in different orders.
+ 
+            -ot  by tag # (default)
+            -of  by the order in file DDlist.
+            -og  by group
+            -on  by name(label)
+
+    hdp dumpsds [filter ops] [contents ops] [output ops] <filename list>
+    --------------------------------------------------------------------
+         Filter options
+              specify which SDS to dump.
+
+             -i <index> dump SDS's with indices specified in <index>; 
+			  indices correspond to the order of the SDS in the file
+             -r <ref>    dump SDS's with reference numbers specified in <ref>
+             -n <name>   dump SDS's with names specified in <name>
+             -a           dump all SDS's in the file. (default)
+
+	     Options -i, -r, and -n can be used inclusively to specify
+	     different SDS's.
+
+          Content options
+
+             -v    display everything including all annotations (default)
+             -h    header only, no annotation for elements or data
+             -d    data only, no tag/ref 
+
+	     These options are exclusive.
+
+          Output options
+
+             -o <filename> specify <filename> as output file name
+             -b            binary output
+             -x            ascii text output (default)
+
+	     Options -b and -x are exclusive, but each can be used with
+	     option -o.
+
+	  Format options
+	     -c    print space characters as they are, not \digit
+	     -g    do not print data of file (global) attributes
+	     -l    do not print data of local attributes
+	     -s    do not add carriage return to a long line - dump as a stream
+
+	     Options in this category can be used inclusively.
+
+	  Note: Any combination of an option from each of the categories can
+		be used as long as the criteria of that category are met.
+
+    hdp dumpvd [filter ops] [contents ops] [output ops] <filename list>
+    --------------------------------------------------------------------
+         Filter options
+              specify which vdata to dump.
+
+             -i <index>   dump vdatas with indices in <index>; indices 
+			  correspond to the order of the vdatas in the 
+			  files
+             -r <ref>     dump vdatas with reference numbers specified in
+			  <ref>
+             -n <name>    dump vdatas with names specified in <name>
+             -c <class>   dump vdatas with classes specified in <class>
+             -a           dump all vdatas in the file. (default)
+
+          Content options
+
+             -v    display everything including all annotations (default)
+             -h    header only, no annotation for elements or data
+             -d    data only, no tag/ref
+             -f <fields> dump data of specified fields
+
+          Output options
+
+             -o <fn>    specify fn as output file name
+           * -b         binary file
+             -t         text ascii file (default)
+
+    hdp dumpvg [filter ops] [contents ops] [output ops] <filename list>
+    --------------------------------------------------------------------
+         Filter options
+              specify which vgroups to dump.
+
+             -i <index>   dump vgroups with indices specified in <index>; 
+			  indices correspond to the order of the vgroups 
+			  specified in the files
+             -r <ref>     dump vgroups with reference numbers specified in <ref>
+             -n <name>    dump vgroups with names specified in <name>
+             -c <class>   dump vgroups with classes specified in <class>
+             -a           dump all vgroups in the file. (default)
+
+          Content options
+
+             -v    display everything including all annotations (default)
+             -h    header only, no annotation for elements or data
+             -d    data only
+
+          Output options
+
+             -o <fn>    specify fn as output file name
+           * -b         binary file
+             -t         text ascii file (default)
+
+    Note: Unless the "-d" option is specified, a graphical representation of
+	  the file will be given after the data has been displayed. 
+
+    hdp dumprig [filter ops] [contents ops] [output ops] <filename list>
+    --------------------------------------------------------------------
+         Filter options
+              specify which RIG to dump.
+
+             -i <index>   dump RIGs with indices specified in <index>; 
+			  indices correspond to the order of the RIGs 
+			  specified in the files
+             -r <ref>     dump RIGs with reference numbers specified in <ref>
+             -a           dump all RIGs in the file. (default)
+             -m  8|24     dump the RIGs of 8-bit or 24-bit. By default all
+                             RIGs in the file will be dumped
+
+          Content options
+
+             -v    display everything including all annotations (default)
+             -h    header only, no annotation for elements or data
+             -d    data only
+
+          Output options
+
+             -o <fn>    specify fn as output file name
+             -b         binary file
+             -t         text ascii file (default)
+
+    hdp dumpgr [filter ops] [contents ops] [output ops] <filename list>
+    --------------------------------------------------------------------
+         Filter options
+              specify which general RIGs to dump.
+
+             -i <index>   dump general RIG's with indices specified in 
+                          <index>; indices correspond to the order of 
+                          the RIG in the file
+             -r <ref>     dump general RIG's with reference numbers 
+                          specified in <ref>
+             -n <name>    dump general RIG's with names specified in <name>
+             -a           dump all general RIG's in the file. (default)
+
+          Content options
+
+             -v    display everything including all annotations (default)
+             -h    header only, no annotation for elements or data
+             -d    data only, no tag/ref
+
+          Output options
+
+             -o <fn>    specify fn as output file name
+             -b         binary file
+             -t         ascii text file (default)
+
+          Note: any combination of an option from each of the three categories
+                can be used; but no more than one option from one category is
+                allowed.
+============================================================================
+================================install_winNT.txt===========================
+
+      Install HDF4.1 Release 2 on Windows NT and Windows 95, and Alpha NT.
+
+Since Windows NT, Windows '95 (Chicago) and Windows 3.1
+(with the Win 32s extensions) all are designed to run the same 32-bit code, our 
+decision is to support only 32-bit libraries and code on the MS-Windows 
+platform. We are not planning on supporting any 16-bit versions in the 
+foreseeable future.
+
+The instructions which follow assume that you will be using one of 
+the 'zip' files that we provide, either the binary code release
+(hdf41r2.zip) or the source code release (hdf41r2s.zip).
+In building HDF from source code you may select between 
+two build environment options depending on your
+application and environment needs.  Each option has it's own zip file:
+
+
+Option I, (select Win32nof.zip)
+Test and Utility configuration : HDF library, tests, and utilities, no fortran,
+available for Win32 Intel platform only.
+
+Option II, (select Win32full.zip)
+Full configuration : HDF library, tests, and utilities, with fortran
+This version has been built and tested using DEC Visual Fortran on both
+the Win32 Intel platform and the Win32 Alpha platform.
+
+
+
+Building from Binary Code Release (hdf41r2.zip)
+===============================================
+To install the HDF, JPEG, zlib and mfhdf libraries and utilities, 
+it is assumed that you have done the following:
+      
+
+      1. Create a directory structure to unpack the library. For 
+      example: 
+
+	    c:\					(any drive)
+           MyHDFstuff\				(any folder name)
+
+      2. Copy the binary archive (HDF41r2.zip) to that directory 
+      and unpack it by running WinZip on HDF41r2.zip (the binary archive).
+      This should create a directory called 'HDF41r2' which 
+      contains the following files and directories.
+
+            c:\MyHDFstuff\HDF41r2\lib             ( Debug and Release versions of HDF libraries )
+            c:\MyHDFstuff\HDF41r2\include         ( HDF include files )
+            c:\MyHDFstuff\HDF41r2\bin             ( HDF utilities files )
+            c:\MyHDFstuff\HDF41r2\release_notes   ( release notes )
+            c:\MyHDFstuff\HDF41r2\install_NT_95   ( this file)
+
+      
+      3. If you are building an application that uses the HDF library 
+         the following locations will need to be specified for locating
+         header files and linking in the HDF libraries:
+ 
+            C:\MyHDFstuff\HDF41r2\lib
+            C:\MyHDFstuff\HDF41r2\include
+
+
+
+
+
+Building from Source Code Release (hdf41r2s.zip)
+===============================================
+
+STEP I:  Preconditions
+
+To build the HDF, JPEG, zlib and mfhdf libraries and utilities, 
+it is assumed that you have done the following:
+      
+      1. Installed MicroSoft Developer Studio, and Visual C++ 5.0.
+         Visual Fortran 5.0 is needed if you are going to build the
+         full HDF Library with Fortran support.
+
+      2. Set up a directory structure to unpack the library. For 
+      example: 
+
+	    c:\					(any drive)
+           MyHDFstuff\				(any folder name)
+
+      3. Copy the source distribution archive to that directory 
+      and unpack it using the appropriate archiver options to
+      create a directory  hierarchy.
+         
+      Run WinZip on HDF41r2s.zip (the entire source tree).
+      This should create a directory called 'HDF41r2' which 
+      contains several files and directories.
+      
+      ( Note for those using the Win32 Alpha platform:
+        If you do not have a Winzip utility for your Alpha system
+        you can download the needed executables from: 
+        http://www.cdrom.com/pub/infozip ) 
+       
+STEP II: Select Installation type and Build.
+
+You may select one of 2 ways to build the HDF library and 
+utilities, depending on your environment and application needs.
+
+Option I, (select Win32nof.zip)
+Test and Utility configuration : HDF library, tests, and utilities, no fortran
+
+Option II, (select Win32full.zip)
+Full configuration : HDF library, tests, and utilities, with fortran
+
+
+
+STEP III: Follow Instructions for Option I, or II
+
+
+INSTRUCTIONS FOR OPTION I, TEST AND UTILITY INSTALLATION, NO FORTRAN
+                 (Win32 Intel platform only)
+
+	*** Builds hdf library, hdf utilities, 
+	*** test programs and batch files. No fortran code.
+ 
+        1. You will use Win32nof.zip 
+           Unpack dev\win32nof.zip in directory dev\
+           
+            Run WinZip on 
+               c:\myHDFstuff\HDF41r2\Win32nof.zip
+               This archive contains a Developer Studio project "dev" and 
+               two batch files. 
+               40 project files (*.dsp files) will be created when 
+               Win32nof.zip is expanded.
+
+         2. Invoke Microsoft Visial C++ 5.0, go to "File" and select
+            "Open Workspace" option. 
+            Then open  c:\myHDFstuff\HDF41r2\dev.dsw workspace. 
+
+	 3. Select "Build", then Select "Set Active Configuration".
+            Select "dev -- Win32Debug" as active configuration.
+            Select "Build" and "Build dev.exe" to
+            build the Debug version of the HDF41r2 tree.
+
+	 4. Select "Build", then Select "Set Active Configuration".
+            Select "dev -- Win32Release" as active configuration.
+            Select "Build" and "Build dev.exe" to
+            build the Release version of the HDF41r2 tree.
+	
+         5. In command prompt window run the test batch file 
+            win32noftst.bat in directory HDF41r2\.
+
+         6. If all tests passed, run the installation batch file 
+       win32ins.bat in directory HDF41r2\. Commands in this file will create
+       subdirectories bin\, include\ and lib\ in HDF41r2\. The bin dirctory
+       will contain the HDF utilities, the include directory will contain 
+       header files, and the lib directory will contain:
+               jpeg.lib     - JPEG Library
+               jpegd.lib    - JPEG Library with DEBUG option
+               libsrc.lib   - multi-file SDS Inteface routines
+               libsrcd.lib  - multi-file SDS Inteface routines with DEBUG option
+               src.lib      - multi-file Vdata Interface
+                                         Vgroup Interface
+                                         AN Interface
+                                         GR Interface routines
+               srcd.lib     - multi-file Vdata Interface
+                                         Vgroup Interface
+                                         AN Interface
+                                         GR Interface routines with DEBUG option
+               xdr.lib      - XDR Library
+               xdrd.lib     - XDR Library with DEBUG option
+               zlib.lib     - GNU Zip Library 
+               zlibd.lib    - GNU Zip Library with DEBUG option 
+  
+
+INSTRUCTIONS FOR OPTION II, FULL INSTALLATION WITH FORTRAN
+
+        
+	*** Builds the hdf library, hdf utility programs, test programs,
+	*** and batch files. Includes fortran source code to be
+        *** compiled with Digital Visual Fortran on either a Win32 Intel
+        *** machine or a Win32 Alpha machine.
+
+	1. Unpack HDF41r2\Win32full.zip in directory HDF41r2\. 
+         
+        2. Invoke Microsoft Visial C++ 5.0, go to "File" and select
+           "Open Workspace" option. 
+           Then open  c:\myHDFstuff\HDF41r2\dev.dsw workspace. 
+
+        3. Select "Build", then Select "Set Active Configuration".
+           Select as the active configuration "dev -- Win32Debug" 
+           if you have a Win32 Intel processor OR 
+           select "dev-Win32AlphaDbg" if you have a Win32 Alpha processor. 
+           Select "Build" and "Build dev.exe" to
+           build the Debug version of the HDF41r2 tree.
+           You will see that Digital Visual Fortran compiler is invoked
+           by Visual C++ Development environment in compiling the fortran code.
+
+        4. Select "Build", then Select "Set Active Configuration".
+           Select as the active configuration"dev -- Win32Release"
+           if you have a Win32 Intel processor OR
+           select "dev-Win32AlphaRel" if you have a Win32 Alpha processor.
+           Select "Build" and "Build dev.exe" to
+           build the Release version of the HDF41r2 tree.
+		
+        5. In command prompt window run the test batch file which
+       resides in the HDF41r2 directory.
+       Run win32tst.bat if you have a Win32 Intel platform OR 
+       run win32ALPHAtst.bat if you have the Win32 Alpha platform.
+
+	6. If all tests passed, run the installation batch file which
+       resides in the HDF41r2 directory
+       Run win32ins.bat if you have a Win32 Intel platform OR
+       run win32ALPHAins.bat if you have a Win32 Alpha platform.
+       Commands in these files will create
+       subdirectories bin\, include\ and lib\ in HDF41r2\. The bin dirctory
+       will contain the HDF utilities, include directory will contain 
+       header files, and the lib directory will contain:
+               jpeg.lib     - JPEG Library
+               jpegd.lib    - JPEG Library with DEBUG option
+               libsrc.lib   - multi-file SDS Inteface routines
+               libsrcd.lib  - multi-file SDS Inteface routines with DEBUG option               src.lib      - multi-file Vdata Interface
+                                         Vgroup Interface
+                                         AN Interface
+                                         GR Interface routines
+               srcd.lib     - multi-file Vdata Interface
+                                         Vgroup Interface
+                                         AN Interface
+               xdrd.lib     - XDR Library with DEBUG option
+               zlib.lib     - GNU Zip Library 
+               zlibd.lib    - GNU Zip Library with DEBUG option
+ 
+
+
+STEP IV:
+
+BUILDING AN APPLICATION USING THE HDF LIBRARY - SOME HELPFUL POINTERS
+=====================================================================
+
+If you are building an application that uses the HDF library 
+the following locations will need to be specified for locating
+header files and linking in the HDF libraries:
+ 
+            <top-level HDF directory>\lib
+            <top-level HDF directory>\include
+
+where <top-level HDF directory> may be C:\myHDFstuff\dev or C:\MyHDFstuff\HDF41r2\
+
+Please refer to the <top-level HDF directory>\release_notes\compile.txt file
+for more information on compiling an application with the HDF libraries.
+
+
+MORE HELPFUL POINTERS
+=====================
+(as described in terms of installing the  nofortran configuration)
+
+Here are some notes that may be of help if you are not familiar
+with using the Visual C++ Development Environment.
+
+Project name and location issues: 
+         The files in Win32nof.zip must end up in the HDF41r2\ directory
+         installed by HDF41r2s.zip
+
+         If you must install dev.dsw and dev.dsp in 
+         another directory, relative to HDF41r2\ , you will be asked to
+	 locate the above 5 sub-project files, when you open the
+	 project dev.dsw.
+	 
+	 If you want to rename dev (the entire project),
+	 you will need to modify two files
+	 dev.dsw and dev.dsp as text
+	 (contrary to the explicit warnings in the files).
+
+	 You can also modify dev.dsw and dev.dsp
+	 as text, to allow these 2 files to be installed
+	 in another directory.
+
+
+
+  Settings... details:
+  If you create your own project, the necessary settings can be
+  read from the dev.dsp file(as text), or from the
+  Project Settings in the Developer Studio project settings 
+dialog.
+
+    Project
+	  Settings
+	      C/C++
+		  Category
+		     PreProcessor
+			 Code Generation
+			    Use run-time Library
+				   These are all set to use Single-Threaded.
+				   or Single-Threaded debug.
+
+
+
+
+============================================================================
+================================macintosh.txt===============================
+
+Fortner Software LLC ("Fortner") created the reference implementation for
+Macintosh of the HDF 4.1r3 library, providing C-language bindings to all
+4.1r3 features.
+
+The Macintosh reference implementation of the HDF 4.1r3 library was implemented
+and tested on a PowerMac Model 7600/120 running MacOS 8.5.1 using Metrowerks
+CodeWarrior Pro1.  The library has also been run on a PowerMac G3.  
+
+Fortner cannot be certain that the libraries will run on other versions of
+Macintoshes (or clones) or MacOS versions, or when built using other
+development tools.  (In particular, this Macintosh implementation has not
+addressed use with non-PowerPC versions of Macintosh [i.e., 680x0-based
+Macintoshes]).  Migrating the Macintosh reference implementation to other
+development and/or run-time environments is the responsibility of the
+library user.
+
+First-time HDF users are encouraged to read the FAQ in this release for
+more information about HDF.  Users can also look at the home page for HDF
+at:
+
+    http://hdf.ncsa.uiuc.edu/
+
+Please send questions, comments, and recommendations regarding the
+Macintosh version of the HDF library to:
+
+    hdfhelp@ncsa.uiuc.edu
+ 
+
+============================================================================
+================================mf_anno.txt=================================
+
+ Annotation access through the Multi-file Annotation Interface(ANxxx)
+ ==================================================================== 
+
+ These routines are for accessing file labels, file descriptions, data
+labels and data descriptions(i.e. all are annotations). General access
+requires the routines Hopen() and ANstart() to be called first and the 
+last call to be ANend() and Hclose() which ends annotation handling on the file
+and closes the file. Basic annotation manipulation involes dealing
+with  handles(ann_id's) foreach annotation and annotation interface 
+handle(an_id). 
+
+
+NOTES: 
+  Note that the annotation types are enumerated. 
+  TYPE here refers to file/data label/description types 
+  They are AN_FILE_LABEL, AN_FILE_DESC, AN_DATA_LABEL, AN_DATA_DESC
+  The tag/ref refers to data tag/ref.
+
+  AN_DATA_LABEL = 0, /* Data label */
+  AN_DATA_DESC  = 1, /* Data description */
+  AN_FILE_LABEL = 2, /* File label */
+  AN_FILE_DESC  = 3  /* File description */ 
+
+In C-code you need to declare the annotation type using the 
+enumerated type defintion.
+
+e.g. C-code fragment to write a File label
+
+#include "hdf.h"
+...
+..
+char fname[10] = {"ann.hdf"};
+char *file_lab[1] = {"File label #1: This is a file label"};
+
+int32   file_id; /* file id */
+int32   an_id;   /* annotation interface id */
+int32   ann_id;  /* annotation id */
+ann_type myanntype;  /* annotation type */
+
+/* Start Annotation inteface and create file */
+file_id = Hopen(fname, DFACC_CREATE,0);
+an_id = ANstart(file_id);
+
+/* Set annotation type to file label */
+myanntype = AN_FILE_LABEL;
+
+/* Create id for file label */
+ann_id = ANcreatef(an_id, myanntype);
+
+/* Write file label */
+ANwriteann(ann_id, file_lab[0], HDstrlen(file_lab[0]));
+
+/* end access to file label */
+ANendaccess(ann_id);
+
+/* end access to file and close it*/
+ANend(an_id);
+Hclose(file_id);
+....
+...
+
+NOTE: You could also call ANcreatef() like this 
+        ANcreatef(an_handle, AN_FILE_LABEL);
+      without using the intermediate variable.
+
+ ROUTINES NEEDED:
+================
+ Hopen    - Opening the file, returns a file handle
+ Hclose   - Close the file.
+ 
+ NEW ROUTINES:
+===============
+ ANstart     - open file for annotation handling, returns annotation
+               interface id
+ ANfileinfo  - get number of file/data annotations in file. Indices returned
+               are used in ANselect() calls.
+ ANend       - end access to annotation handling on file
+ ANcreate    - create a new data annotation and return an id(ann_id)
+ ANcreatef   - create a new file annotation and return an id(ann_id)
+ ANselect    - returns an annotation id(ann_id) from index for 
+               a particular annotation TYPE. This id is then used for
+               calls like ANwriteann(), ANreadann(), ANannlen(),..etc
+ ANnumann:   - return number of annotations that match TYPE/tag/ref
+ ANannlist:  - return list of id's(ann_id's) that match TYPE/tag/ref
+ ANannlen:   - get length of annotation given id(ann_id)
+ ANreadann:  - read annotation given id(ann_id)
+ ANwriteann: - write annotation given id(ann_id)
+ ANendaccess - end access to annotation using id(ann_id)
+
+
+Routines:
+----------
+
+C:
+/* ------------------------------- ANstart -------------------------------- 
+ NAME
+	ANstart -- open file for annotation handling
+ USAGE
+	int32 ANstart(file_id)
+        int32  file_id;    IN: file id
+
+ RETURNS
+        An annotation interface ID or FAIL
+ DESCRIPTION
+        Start annotation handling on the file and return an interface id.
+
+ 
+Fortran: afstart(file_id)
+
+/*------------------------------- ANfileinfo ----------------------------
+ NAME
+    ANfileinfo
+ PURPOSE
+    Report high-level information about the ANxxx interface for a given file.
+ USAGE
+    intn ANfileinfo(an_id, n_file_label, n_file_desc, n_data_label, n_data_desc)
+        int32 an_id;          IN:  annotation interface ID
+        int32 *n_file_label;  OUT: the # of file labels
+        int32 *n_file_desc;   OUT: the # of file descriptions
+        int32 *n_data_label;  OUT: the # of data labels
+        int32 *n_data_desc;   OUT: the # of data descriptions
+ RETURNS
+    SUCCEED/FAIL
+ DESCRIPTION
+    Reports general information about the number of file and data
+    annotations in the file. This routine is generally used to find
+    the range of acceptable indices for ANselect calls.
+
+Fortran: affileinfo(an_id, num_flabel, num_fdesc, num_dlabel, num_ddesc)
+
+/* -------------------------------- ANend ---------------------------------
+ NAME
+	ANend -- close annotation handling on a file
+ USAGE
+	int32 ANend(an_id)
+        int32 an_id;         IN: annotation interface ID for the file
+ RETURNS
+        SUCCEED / FAIL
+ DESCRIPTION
+      Closes annotation handling on the gvien annotation interface id.
+
+
+Fortran: afend(an_id)
+
+/* ------------------------------ ANcreate ---------------------------- 
+ NAME
+	ANcreate - create a new data annotation and return an id
+ USAGE
+	int32 ANcreate(an_id, tag, ref, type )
+        int32 an_id;    IN: annotation interface ID
+        uint16 tag;     IN: tag of item to be assigned annotation
+        uint16 ref;     IN: reference number of itme to be assigned ann
+        ann_type  type: IN: AN_DATA_LABEL for data labels, 
+                            AN_DATA_DESC for data descriptions,
+ RETURNS
+        An ID to an annotation which can either be a label or description
+ DESCRIPTION
+        Creates a data annotation, returns an 'ann_id' to work with the new 
+        annotation which can either be a label or description.
+
+
+Fortran: afcreate(an_id, tag, ref, type)
+
+/* ------------------------------ ANcreatef ---------------------------- 
+ NAME
+	ANcreatef - create a new file annotation and return an id
+ USAGE
+	int32 ANcreatef(an_id, type )
+        int32 an_id;    IN: annotation interface ID
+        ann_type  type: IN:  AN_FILE_LABEL for file labels,
+                             AN_FILE_DESC for file descritpions.
+ RETURNS
+        An ID to an annotation which can either be a file label or description
+ DESCRIPTION
+        Creates a file annotation, returns an 'ann_id' to work with the new 
+        file annotation which can either be a label or description.
+
+Fortran: afcreatef(an_id, type)
+
+
+/* ------------------------------- ANselect ------------------------------- 
+ NAME
+	ANselect -- get an annotation ID from index of 'type'
+ USAGE
+	int32 ANselect(an_id, index, type)
+        int32 an_id;    IN: annotation interface ID
+        int32 index;    IN: index of annottion to get ID for
+        ann_type  type: IN: AN_DATA_LABEL for data labels, 
+                            AN_DATA_DESC for data descriptions,
+                            AN_FILE_LABEL for file labels,
+                            AN_FILE_DESC for file descritpions.
+ RETURNS
+        An ID to an annotation type which can either be a label or description 
+ DESCRIPTION
+        The position index is ZERO based
+
+Fortran: afselect(an_id, index, type)
+
+
+/*------------------------------- ANnumann ---------------------------------
+ NAME
+   ANnumann -- find number of annotation of 'type' that 
+                 match the given element tag/ref 
+ USAGE
+       intn  ANnumann(an_id, type, elem_tag, elem_ref)
+       int32  an_id;     IN: annotation interface ID
+       int    type:      IN: AN_DATA_LABEL for data labels, 
+                             AN_DATA_DESC for data descriptions,
+                             AN_FILE_LABEL for file labels,
+                             AN_FILE_DESC for file descritpions.
+       uint16 elem_tag,: IN: tag of item of which this is annotation
+       uint16 elem_ref;  IN: ref of item of which this is annotation
+ RETURNS
+       number of annotation found if successful and FAIL (-1) otherwise
+ DESCRIPTION
+       Find number of annotation of 'type' for the given element 
+       tag/ref pair. Here an element is either a file label/desc or
+       data label/desc.
+
+
+Fortran: afnumann(an_id, type, tag, ref)
+
+
+/*--------------------------------------------------------------------------
+ NAME
+   ANannlist -- generate list of annotation ids of 'type' that 
+                 match the given element tag/ref 
+ USAGE
+       intn  ANannlist(an_id, type, elm_tag, elem_ref, ann_list[])
+       int32  an_id;     IN: annotation interface ID
+       ann_type  type:   IN: AN_DATA_LABEL for data labels, 
+                             AN_DATA_DESC for data descriptions,
+                             AN_FILE_LABEL for file labels,
+                             AN_FILE_DESC for file descritpions.
+       uint16 elem_tag,: IN: tag of element of which this is annotation
+       uint16 elem_ref;  IN: ref of element of which this is annotation
+       int32  ann_list[]; OUT: array of ann_id's that match criteria.
+ RETURNS
+       number of annotations ids found if successful and FAIL (-1) otherwise
+ DESCRIPTION
+       Find and generate list of annotation ids of 'type' for the given 
+       element tag/ref pair
+
+
+Fortran: afannlist(an_id,type, tag, ref, alist[])
+
+
+
+/*--------------------------------------------------------------------------
+ NAME
+       ANannlen -- get length of annotation givne annotation id
+ USAGE
+       int32 ANannlen(ann_id)
+       int32 ann_id;   IN: annotation id
+ RETURNS
+       length of annotation if successful and FAIL (-1) otherwise
+ DESCRIPTION
+       Get the length of the annotation specified.
+
+
+Fortran: afannlen(ann_id)
+
+/*--------------------------------------------------------------------------
+ NAME
+       ANwriteann -- write annotation given ann_id
+ USAGE
+       intn ANwriteann(ann_id, ann, ann_len)
+       char *ann_id;   IN: annotation id
+       char *ann;      IN: annotation to write
+       int32 ann_len;  IN: length of annotation
+
+ RETURNS
+       SUCCEED (0) if successful and FAIL (-1) otherwise
+ DESCRIPTION
+       Checks for pre-existence of given annotation, replacing old one if it
+       exists. Writes out annotation.
+
+Fortran: afwriteann(ann_id, ann, annlen)
+
+
+
+/*--------------------------------------------------------------------------
+ NAME
+       ANreadann -- read annotation given ann_id
+ USAGE
+       intn ANreadann(ann_id, ann, maxlen)
+       int32 ann_id;   IN: annotation id (handle)
+       char *ann;     OUT: space to return annotation in
+       int32 maxlen;   IN: size of space to return annotation in
+ RETURNS
+       SUCCEED (0) if successful and FAIL (-1) otherwise
+ DESCRIPTION
+       Gets tag and ref of annotation.  Finds DD for that annotation.
+       Reads the annotation, taking care of NULL terminator, if necessary.
+       
+
+Fortran: afreadann(ann_id, ann, maxlen)
+
+
+
+/* ----------------------------------------------------------------------- 
+ NAME
+	ANendaccess -- end access to an annotation given it's id
+ USAGE
+	intn ANendaccess(ann_id)
+        int32 an_id;    IN: annotation id
+ RETURNS
+        SUCCEED or FAIL
+ DESCRIPTION
+        Terminates access to an annotation. 
+
+
+Fortran: afendaccess(ann_id)
+
+
+ 
+
+
+
+============================================================================
+================================mf_ris.txt==================================
+
+                  The multi-file RIS interface
+                  =============================
+
+Contents:
+
+ Introduction
+ How to access files and images in the new interface
+ "Name = value" attributes in the new interface
+ Dealing with annotations in the new interface
+ Work not yet completed, bugs, limitations
+ A listing or routines
+ Descriptions of GR routines
+   File level interface
+   Dataset Manipulation
+   ID/Ref/Index Functions
+   Interlace Request Functions
+   LUT/Palette I/O Functions
+   Special Element Functions
+   Attribute Functions
+
+
+Introduction
+============
+The new Generic Raster (GR) interface provides a set of functions for
+manipulating raster images of all kinds.  This new interface is meant to
+replace the older RIS8 and RIS24 interfaces, although these older
+interfaces will continue to be supported.
+
+Generic raster images are composed of "pixels" which can have multiple
+components, including but not limited to 8-bit unsigned integers.  Each image
+can have multiple palettes associated with it and other 'attributes' in the
+same "name=value" style as the SD*() routines have.
+
+
+The new GR interface was motivated by a number of needs:
+
+o  The need for multi-file, multi-object access to raster images, allowing
+users to keep open more than one file at a time, and to "attach" more than
+one raster image at a time.
+
+o  A need to further integrate the netCDF data-model with the HDF data-models.
+
+o  A need for a more general framework for attributes within the RIS
+data-model (allowing 'name = value' style metadata).
+
+o  A need to be able to access subsamples and subsets of images.
+
+
+IMPORTANT:  The added functionality represented by this new interface has
+necessitated a change in how raster images are physically represented on
+disk.   As a result programs using the old single-file RIS interfaces will
+only be able to read the data out of files produced by the new interface.
+The metadata / attributes will not be accessible.
+
+The following chart represents what can be done with the various interfaces
+available in HDF 4.0b1:
+
+              old RIS-API    new GR-API
+
+old RIS         CRW             CRW
+HDF files
+
+new RIS          r              CRW
+HDF files
+
+'R' means read, 'W' means write and 'C' means create.  Entries with dashes
+'-' represent functionality which has not yet been implemented.  'r' stands
+for the ability to only read the data, not the metadata.
+
+
+Work not yet completed, bugs, limitations
+===========================================
+
+Misc. stuff left to do:
+    Deal with special elements for images.
+    GRrename for images.
+    GRsetflags to suppress writing fill data and to suppress fillvalue attr.
+
+Features not supported:
+    Full support for multiple palettes with each RI.
+    Support for named palettes with each RI.
+    Support for palettes with non-standard formats.
+    Deletion of attributes or images (would require changing the way index
+        numbers are handled)
+
+Other limitations:
+   Currently the following design limitations are still in place:
+   1 - Cannot have pixels or palette entries which contain mixed variable
+        types, i.e. all the pixel/palette components must be of the same
+        number type.
+   2 - Currently all the components must be of valid HDF number types,
+        fractional bytes (i.e. 6-bit components) or 'plain' multiple byte values
+        are not handled, although they can be packed into the next larger
+        sized number type in order to hold them.
+
+
+
+How to access files and images in the new interface
+======================================================
+
+
+Here are the steps involved in accessing images in the new interface:
+
+1. Open or create the file using Hopen.  This provides you with a file ID to
+be used in step 2.
+
+2. Activate the GR interface for the file with the file ID obtained from
+step 1, using GRstart.  This provides you with a GR interface ID (GR ID).
+
+3. Optionally obtain information about the raster images in the file and
+global GR attributes using GRfileinfo.  Use the GR ID from step 2 to refer
+to the image file.
+
+4. Optionally find the index of a raster image, by name using
+GRnametoindex, or by reference number using GRreftoindex.
+
+5. Select for access an image with a given index, using GRselect for each
+image.  Each call to GRselect returns a raster image ID (RI ID) for
+subsequent accesses involving the corresponding image.
+
+5. Access the image by its RI ID, using routines such as GRgetiminfo (to
+get information about the image) and GRreadimage (to read all or part of an
+image).
+
+6. Terminate access to a given image using GRendaccess.
+
+7. Terminate access to the GR interface for the file, using GRend.
+
+8. Close the file using Hclose.
+
+Notice that in the GR interface, images are identified in several ways.
+Before an image is accessible ("attached"), it is identified by index,
+name, and reference number. The index describes the relative position of
+the image in the file. The name is a character string associated with the
+image, and the reference number is a unique integer.  An image's name is
+assigned by the program when it is created, and the reference number is
+assigned by the HDF library when it is created. After an image is attached
+, it is identified by an raster image identifier, or RI ID.
+
+The following code fragment illustrates the steps involved in accessing the
+image in a file and printing information about them.
+
+
+    /* Open the file and initialize the GR interface */
+    hdf_file_id=Hopen(TESTFILE,DFACC_RDWR,0);
+    grid=GRstart(hdf_file_id);
+
+    /* Obtain information about the images in the file */
+    GRfileinfo(grid,&n_datasets,&n_attrs);
+
+    /* Attach to each image and print information about it */
+    for(i=0; i<n_datasets; i++)
+      {
+          riid=GRselect(grid,i);
+          GRgetiminfo(riid,NULL,&ncomp,&nt,&il,dimsizes,&n_attrs);
+
+          printf("%d: riid=%ld: ncomp=%ld, nt=%ld, il=%ld,
+                    dim[0]=%ld, dim[1]=%ld, n_attrs=%ld\n",
+                    i, riid, ncomp, nt, il, dimsizes[0],
+                    dimsizes[1], n_attrs);
+
+          /* Detach from the image */
+          GRendaccess(riid);
+      } /* end for */
+
+    /* Shut down the GR interface and close the file */
+    GRend(grid);
+    Hclose(hdf_file_id);
+
+
+
+"Name = value" attributes in the new interface
+===============================================
+
+Attributes of the form "name = value" were introduced in HDF 3.3, but at
+that time they were available only for SDSs and files.  In HDF 4.0 we have
+added the ability to attach local and global attributes to raster images
+and raster image dimensions.
+
+An attribute's "name" is a string, and "value" is the associated value or
+values.  If an attribute contains more than one value, all values must be
+of the same type.  For example the attribute 'valid_range' attribute might
+be assigned values the maximum and minimum valid values for a given image.
+
+Raster attributes can be "local" or "global."  A local raster image
+attribute is one that applies to one raster image only. Global raster image
+attributes apply to all of the images in a file.
+
+Attributes for raster images are created by the routine GRsetattr.
+Existing attributes are selected by giving an object pointer and an
+attribute index.  The functions GRattrinfo, GRfindattr, and GRgetattr may
+be used in combination to read attributes and their values.  GRattrinfo
+gets the name , number type, and number of values for an attribute with a
+given index.  GRfindattr gets the index of an attribute with a given name,
+and GRreadattr reads the values associate with an attribute with a given
+index.
+
+The following example illustrates how to attach GR image attributes, and
+also GR global (file) attributes.
+
+    /* Open file and initialize the GR interface */
+    hdf_file_id=Hopen(TESTFILE,DFACC_RDWR,0);
+    grid=GRstart(hdf_file_id);
+
+    /* Create a global attribute  -- applies to all rasters in the file */
+    HDstrcpy(attr_name,"Test1");
+    HDstrcpy(u8_attr,"Attribute value 1");
+    GRsetattr(grid,attr_name,DFNT_UINT8,HDstrlen(u8_attr)+1,u8_attr);
+
+    GRfileinfo(grid,&n_datasets,&n_attrs);
+
+    /* select every image in the file, and
+       assign a local attribute to each */
+    for(i=0; i<n_datasets; i++)
+      {
+          /* Attach to image with index==i */
+          riid=GRselect(grid,i);
+
+          /* Create an attribute for the image */
+          HDstrcpy(attr_name,"Image1");
+          HDstrcpy(u8_attr,"Attribute value 1");
+          GRsetattr(riid,attr_name,DFNT_UINT8,HDstrlen(u8_attr)+1,u8_attr);
+
+          GRgetiminfo(riid,NULL,&ncomp,&nt,&il,dimsizes,&n_attrs);
+
+          printf("%d: riid=%ld: ncomp=%ld, nt=%ld, il=%ld, dim[0]=%ld,
+                  dim[1]=%ld, n_attrs=%ld\n",i,riid,ncomp,nt,il,
+                  dimsizes[0], dimsizes[1],n_attrs);
+
+                for(j=0; j<n_attrs; j++)
+                  {
+                    GRattrinfo(riid,j,attr_name,&nt,&ncomp);
+
+                    GRgetattr(riid,j,u8_attr);
+                    printf("Image #%d Attribute #%d: Name=%s, Value=%s\n",
+                             i,j,attr_name,u8_attr);
+                  } /* end for */
+
+          /* Detach from the image */
+          GRendaccess(riid);
+      } /* end for */
+
+    /* Shut down the GR interface */
+    GRend(grid);
+
+    /* Close the file */
+    Hclose(hdf_file_id);
+
+
+
+Dealing with annotations in the new interface
+================================================
+
+The new GR interface allows you to reference rasters explicitly, by "GR
+id".  A GR id is different from its reference number.  Since annotation
+routines attach annotations to objects by reference number, there needs to
+be a mechanism for determining the reference number of a raster image,
+given its id. This is made possible by the addition of the routine
+GRidtoref.
+
+A similar problem occurs when going the other way.  For example, a call to
+DFANlabellist returns the reference numbers of objects that are
+annotated.  If those objects are RISs (i.e. they have the tag DFTAG_RIG),
+we need to map the reference numbers to the corresponding images.  For
+this, a two-step process is required.  You can use the function
+GRreftoindex to get the index, or position, of the dataset that has a
+certain reference number, then you use the routine GRselect to get the id
+for the image in that position.
+
+
+A listing or routines
+======================
+
+File/Interface Functions:
+int32 GRstart(int32 hdf_file_id)
+    - Initializes the GR interface for a particular file. Returns a 'grid' to
+        specify the GR group to operate on.
+intn GRfileinfo(int32 grid, int32 *n_datasets, int32 *n_attrs)
+    - Returns information about the datasets and "global" attributes for the
+        GR interface.
+intn GRend(int32 grid)
+    - Terminates multi-file GR access for a file.
+
+Image I/O Functions:
+int32 GRcreate(int32 grid,char *name,int32 ncomp,int32 nt,int32 il,int32
+dimsizes[2])
+    - Defines a raster image in a file.  Returns a 'riid' to work with the new
+        raster image.
+int32 GRselect(int32 grid,int32 index)
+    - Selects an existing RI to operate on.
+int32 GRnametoindex(int32 grid,char *name)
+    - Maps a RI name to an index which is returned.
+intn GRgetiminfo(int32 riid,char *name,int32 *ncomp,int32 *nt,int32
+*il,int32 dimsizes[2],int32 *n_attr)
+    - Gets information about an RI which has been selected/created.
+intn GRwriteimage(int32 riid,int32 start[2],int32 stride[2],int32
+count[2],VOIDP data)
+    - Writes image data to an RI.  Partial dataset writing and subsampling is
+        allowed, but only with the dimensions of the dataset (ie. no UNLIMITED
+        dimension support)
+intn GRreadimage(int32 riid,int32 start[2],int32 stride[2],int32
+count[2],VOIDP data)
+    - Read image data from an RI.  Partial reads and subsampling are allowed.
+intn GRendaccess(int32 riid)
+    - End access to an RI.
+
+Dimension Functions:
+int32 GRgetdimid(int32 riid,int32 index)
+    - Get a dimension id ('dimid') for an RI to assign atrributes to. [Later]
+intn GRsetdimname(int32 dimid,char *name)
+    - Set the name of a dimension. [Later]
+int32 GRdiminfo(int32 dimid,char *name,int32 *size,int32 *n_attr)
+    - Get information about the dimensions attributes and size. [Later]
+
+ID/Ref/Index Functions:
+uint16 GRidtoref(int32 riid)
+    - Maps an riid to a reference # for annotating or including in a Vgroup.
+int32 GRreftoindex(int32 hdf_file_id,uint16 ref)
+    - Maps the reference # of an RI into an index which can be used with
+        GRselect.
+
+Interlace Request Functions:
+intn GRreqlutil(int32 riid,intn il)
+    - Request that the next LUT read from an RI have a particular interlace.
+intn GRreqimageil(int32 riid,intn il)
+    - Request that the image read from an RI have a particular interlace.
+
+LUT/Palette I/O Functions:
+int32 GRgetlutid(int32 riid,int32 index)
+    - Get a palette id ('palid') for an RI.
+intn GRgetlutinfo(int32 riid,int32 *ncomp,int32 *nt,int32 *il,int32 *nentries)
+    - Gets information about a palette.
+intn GRwritelut(int32 riid,int32 ncomps,int32 nt,int32 il,int32
+nentries,VOIDP data)
+    - Writes out a palette for an RI.
+intn GRreadlut(int32 palid,VOIDP data)
+    - Reads a palette from an RI.
+
+Special Element Functions:
+int32 GRsetexternalfile(int32 riid,char *filename,int32 offset)
+    - Makes the image data of an RI into an external element special element.
+intn GRsetaccesstype(int32 riid,uintn accesstype)
+    - Sets the access for an RI to be either serial or parallel I/O.
+intn GRsetcompress(int32 riid,int32 comp_type,comp_info *cinfo)
+    - Makes the image data of an RI into a compressed special element.
+
+Attribute Functions:
+intn GRsetattr(int32 dimid|riid|grid,char *name,int32 attr_nt,int32
+count,VOIDP data)
+    - Write an attribute for an object.
+int32 GRattrinfo(int32 dimid|riid|grid,int32 index,char *name,int32
+*attr_nt,int32 *count)
+    - Get attribute information for an object.
+intn GRgetattr(int32 dimid|riid|grid,int32 index,VOIDP data)
+    - Read an attribute for an object.
+int32 GRfindattr(int32 dimid|riid|grid,char *name)
+    - Get the index of an attribute with a given name for an object.
+
+
+
+Routine Descriptions
+====================
+
+Most of the routines in the GR interface return a status value of type intn
+(native integers).  If the status is equal to SUCCEED the routine completed
+successfully.  If it is equal to FAIL an error occurred, information about
+the error may be available by calling HEprint(filestream, 0).  SUCCEED and
+FAIL are defined in hdf.h for C users and in constant.i for Fortran
+programs.
+
+All IDs (hdf_file_id, grid, riid) are int32 quantities.
+
+Prototypes for these functions can be found in the file hproto.h
+
+Routines that can be called from C are all of the form GRxxx
+
+More details about all the routines below can be found in the HDF reference
+manual.
+
+
+File level interface:
+=====================
+
+These routines initialize and de-initialize the GR interface, and provide
+information about the raster images in a file.
+
+GRstart
+-------
+    Initialize the GR*() interface for a given HDF file.
+ USAGE
+    int32 GRstart(hdf_file_id)
+        int32 hdf_file_id;          IN: file ID from Hopen
+ RETURNS
+    Return grid (GR ID) on success, or FAIL
+ DESCRIPTION
+    Initializes the GR*() interface to operate on the HDF file which was
+    specified by hdf_file_id.  This routine must be called before any further
+    GR*() routines are called for a file.
+
+GRfileinfo
+----------
+    Report high-level information about the GR*() interface for a given file.
+ USAGE
+    intn GRfileinfo(grid, n_datasets, n_attrs)
+        int32 grid;                 IN: GR ID to get information about
+        int32 *n_datasets;          OUT: the # of GR datasets in a file
+        int32 *n_attrs;             OUT: the # of "global" GR attributes
+ RETURNS
+    SUCCEED/FAIL
+ DESCRIPTION
+    Reports general information about the number of datasets and "global"
+    attributes for the GR interface.  This routine is generally used to find
+    the range of acceptable indices for GRselect calls.
+
+
+GRend
+-----
+    Terminate the GR*() interface for a given HDF file.
+ USAGE
+    intn GRend(grid)
+        int32 grid;          IN: GR ID from GRstart
+ RETURNS
+    SUCCEED/FAIL
+
+ DESCRIPTION
+    Terminates access to the GR*() interface for a file.
+
+
+DataSet Manipulation
+=====================
+
+GRcreate
+--------
+    Create a new raster image.
+
+ USAGE
+    int32 GRcreate(grid, name, ncomp, nt, il, dimsizes)
+        int32 grid;         IN: GR ID from GRstart
+        char *name;         IN: Name of raster image to create
+        int32 ncomp;        IN: Number of components in image
+        int32 nt;           IN: Number type of each component
+        int32 il;           IN: Interlace of the components in the image
+        int32 dimsizes[2];  IN: Dimensions of the new image
+
+ RETURNS
+    A valid riid (Raster-Image ID) on success, or FAIL.
+
+ DESCRIPTION
+    Creates a new raster image in a file.
+
+ASSUMPTIONS
+    All components must be the same number-type.
+
+
+GRselect
+--------
+    Select a raster image to operate on.
+ USAGE
+    int32 GRselect(grid,index)
+        int32 grid;          IN: GR ID from GRstart
+        int32 index;         IN: Which raster image to select (indexed from 0)
+ RETURNS
+    A valid riid (Raster-Image ID) on success, or FAIL.
+
+ DESCRIPTION
+    Selects a raster image from the file to work on.  This ID is needed for
+    all operations on the image dataset, including reading/writing data,
+    annotations, etc.
+
+
+
+GRnametoindex
+-------------
+    Map a raster image name to an index.
+ USAGE
+    int32 GRnametoindex(grid,name)
+        int32 grid;          IN: GR ID from GRstart
+        char *name;          IN: Name of raster image to search for
+ RETURNS
+    A valid index on success, or FAIL.
+
+ DESCRIPTION
+    Searches for a raster image based on the name provided.  This routine
+    maps from names of raster images to indices inside the GR group.
+
+GRgetiminfo
+-----------
+    Gets information about a raster image.
+
+ USAGE
+    intn GRgetiminfo(riid,name,ncomp,nt,il,dimsizes,n_attr)
+        int32 riid;         IN: RI ID from GRselect/GRcreate
+        char *name;         OUT: name of raster image
+        int32 *ncomp;       OUT: number of components in image
+        int32 *nt;          OUT: number type of components
+        int32 *il;          OUT: interlace of the image
+        int32 *dimsizes;    OUT: size of each dimension
+        int32 *n_attr;      OUT: the number of attributes for the image
+
+ RETURNS
+    SUCCEED/FAIL
+
+ DESCRIPTION
+    Looks up information about an image which has been selected or created
+    with the GR routines.  Each of the parameters can be NULL, in which case
+    that piece of information will not be retrieved.
+
+GRwriteimage
+------------
+    Writes raster data to an image
+
+ USAGE
+    intn GRwriteimage(riid,start,stride,edge,data)
+        int32 riid;         IN: RI ID from GRselect/GRcreate
+        int32 start[2];     IN: array containing the offset in the image of the
+                                image data to write out
+        int32 stride[2];    IN: array containing interval of data being written
+                                along each edge.  strides of 0 are illegal
+                                (and generate an error)
+                                ie. stride of 1 in each dimension means
+                                writing contiguous data, stride of 2 means
+                                writing every other element out along an edge.
+        int32 count[2];     IN: number of elements to write out along each edge.
+        VOIDP data;         IN: pointer to the data to write out.
+
+ RETURNS
+    SUCCEED/FAIL
+
+ DESCRIPTION
+    Writes image data to an RI.  Partial dataset writing and subsampling is
+        allowed, but only within the dimensions of the dataset (ie. no UNLIMITED
+        dimension support)
+
+ ASSUMPTIONS
+    If the stride parameter is set to NULL, a stride of 1 will be assumed.
+
+
+GRreadimage
+-----------
+    Read raster data for an image
+
+ USAGE
+    intn GRreadimage(riid,start,stride,edge,data)
+        int32 riid;         IN: RI ID from GRselect/GRcreate
+        int32 start[2];     IN: array containing the offset in the image of the
+                                image data to read in
+        int32 stride[2];    IN: array containing interval of data being read
+                                along each edge.  strides of 0 are illegal
+                                (and generate an error)
+                                ie. stride of 1 in each dimension means
+                                reading contiguous data, stride of 2 means
+                                reading every other element out along an edge.
+        int32 count[2];     IN: number of elements to read in along each edge.
+        VOIDP data;         IN: pointer to the data to read in.
+
+ RETURNS
+    SUCCEED/FAIL
+
+ DESCRIPTION
+    Read image data from an RI.  Partial dataset reading and subsampling is
+        allowed.
+
+ASSUMPTIONS
+    If the stride parameter is set to NULL, a stride of 1 will be assumed.
+
+
+
+GRendaccess
+-----------
+    End access to an RI.
+
+ USAGE
+    intn GRendaccess(riid)
+        int32 riid;         IN: RI ID from GRselect/GRcreate
+
+ RETURNS
+    SUCCEED/FAIL
+
+ DESCRIPTION
+    End access to an RI.  Further attempts to access the RI ID will result in
+    an error.
+
+
+Dimension Functions
+===================
+(these have not been completed)
+
+
+ID/Ref/Index Functions
+======================
+
+GRidtoref
+---------
+    Maps an RI ID to a reference # for annotating or including in a Vgroup.
+
+ USAGE
+    uint16 GRidtoref(riid)
+        int32 riid;         IN: RI ID from GRselect/GRcreate
+
+ RETURNS
+    A valid reference # on success or FAIL
+
+ DESCRIPTION
+    Maps an riid to a reference # for annotating or including in a Vgroup.
+
+
+GRreftoindex
+------------
+    Maps the reference # of an RI into an index which can be used with GRselect.
+
+ USAGE
+    int32 GRreftoindex(grid,ref)
+        int32 grid;         IN: GR ID from GRstart
+        uint16 ref;         IN: reference number of raster image to map to index
+
+ RETURNS
+    A valid index # on success or FAIL
+
+ DESCRIPTION
+    Maps the reference # of an RI into an index which can be used with GRselect.
+
+
+Interlace Request Functions
+===========================
+
+
+GRreqlutil
+----------
+    Request that the next LUT read from an RI have a particular interlace.
+
+ USAGE
+    intn GRreqlutil(riid,il)
+        int32 riid;         IN: RI ID from GRselect/GRcreate
+        intn il;            IN: interlace for next LUT.  From the following
+                                values (found in mfgr.h):
+                      MFGR_INTERLACE_PIXEL      - pixel interlacing
+                      MFGR_INTERLACE_LINE       - line interlacing
+                      MFGR_INTERLACE_COMPONENT  - component/plane interlacing
+
+ RETURNS
+    SUCCEED/FAIL
+
+ DESCRIPTION
+    Request that the next LUT read from an RI have a particular interlace.
+
+
+
+GRreqimageil
+------------
+    Request that the image read from an RI have a particular interlace.
+
+ USAGE
+    intn GRreqimageil(riid,il)
+        int32 riid;         IN: RI ID from GRselect/GRcreate
+        intn il;            IN: interlace for next RI.  From the following
+                                values (found in mfgr.h):
+                      MFGR_INTERLACE_PIXEL      - pixel interlacing
+                      MFGR_INTERLACE_LINE       - line interlacing
+                      MFGR_INTERLACE_COMPONENT  - component/plane interlacing
+
+ RETURNS
+    SUCCEED/FAIL
+
+ DESCRIPTION
+    Request that the image read from an RI have a particular interlace.
+
+
+
+
+LUT/Palette I/O Functions
+=========================
+
+GRgetlutid
+----------
+    Get a LUT id ('lutid') for an RI.
+
+ USAGE
+    int32 GRgetlutid(riid,index)
+        int32 riid;         IN: RI ID from GRselect/GRcreate
+        int32 lut_index;    IN: Which LUT image to select (indexed from 0)
+
+ RETURNS
+    Valid LUT ID on success, FAIL on failure
+
+ DESCRIPTION
+    Get a LUT id ('lutid') for accessing LUTs in an RI.
+
+ GLOBAL VARIABLES
+ COMMENTS, BUGS, ASSUMPTIONS
+    Currently only supports one LUT per image, at index 0 and LUTID==RIID.
+
+
+
+
+intn GRgetlutinfo(int32 riid,int32 *ncomp,int32 *nt,int32 *il,int32 *nentries)
+    - Gets information about a palette.
+
+
+
+GRwritelut
+----------
+    Writes out a LUT for an RI.
+
+ USAGE
+    intn GRwritelut(riid,name,ncomps,nt,il,nentries,data)
+        int32 lutid;        IN: LUT ID from GRgetlutid
+        char *name;         IN: name of LUT image
+        int32 ncomp;        IN: number of components in LUT
+        int32 nt;           IN: number type of components
+        int32 il;           IN: interlace of the LUT
+        int32 nentries;     IN: the number of entries for the LUT
+        VOIDP data;         IN: LUT data to write out
+
+ RETURNS
+    SUCCEED/FAIL
+
+ DESCRIPTION
+    Writes out a LUT for an RI.
+
+
+GRreadlut
+---------
+    Reads a LUT from an RI.
+
+ USAGE
+    intn GRreadlut(lutid,data)
+        int32 lutid;        IN: LUT ID from GRgetlutid
+        VOIDP data;         IN: buffer for LUT data read in
+
+ RETURNS
+    SUCCEED/FAIL
+
+ DESCRIPTION
+    Reads a LUT from an RI.
+
+
+
+
+Special Element Functions
+=========================
+
+
+GRsetexternalfile
+-----------------
+    Makes the image data of an RI into an external element special element.
+
+ USAGE
+    intn GRsetexternalfile(riid,filename,offset)
+        int32 riid;         IN: RI ID from GRselect/GRcreate
+        char *filename;     IN: name of the external file
+        int32 offset;       IN: offset in the external file to store the image
+
+ RETURNS
+    SUCCEED/FAIL
+
+ DESCRIPTION
+    Makes the image data of an RI into an external element special element.
+        Cause the actual data for a dataset to be stored in an
+        external file.  This can only be done once for any given
+        dataset and it is the user's responsibility to make sure the
+        external datafile is transported when the "header" file is
+        moved.  The offset is the number of byte from the beginning of
+        the file where the data should be stored.  This routine can
+        only be called on HDF 3.3 files (i.e. calling on an XDR-based
+        netCDF file that was opened with the multi-file interface will
+        fail).
+
+
+
+
+
+GRsetaccesstype
+---------------
+    Sets the access for an RI to be either serial or parallel I/O.
+
+ USAGE
+    intn GRsetaccesstype(riid,accesstype)
+        int32 riid;         IN: RI ID from GRselect/GRcreate
+        uintn accesstype;   IN: access type for image data, from the following
+                                values:
+                                    DFACC_SERIAL - for serial access
+                                    DFACC_PARALLEL - for parallel access
+
+ RETURNS
+    SUCCEED/FAIL
+
+ DESCRIPTION
+    Sets the access for an RI to be either serial or parallel I/O.
+
+
+
+
+GRsetcompress
+-------------
+    Compressed the image data of an RI.
+
+ USAGE
+    intn GRsetcompress(riid,comp_type,cinfo)
+        int32 riid;         IN: RI ID from GRselect/GRcreate
+        int32 comp_type;    IN: type of compression, from list in hcomp.h
+        comp_info *cinfo;   IN: compression specific information
+
+ RETURNS
+    SUCCEED/FAIL
+
+ DESCRIPTION
+    Compressed the image data of an RI.
+    (Makes the image data of an RI into a compressed special element)
+
+
+
+
+Attribute Functions
+===================
+
+GRsetattr
+---------
+    Write an attribute for an object.
+
+ USAGE
+    intn GRsetattr(dimid|riid|grid,name,attr_nt,count,data)
+        int32 dimid|riid|grid;  IN: DIM|RI|GR ID
+        char *name;             IN: name of attribute
+        int32 attr_nt;          IN: number-type of attribute
+        int32 count;            IN: number of entries of the attribute
+        VOIDP data;             IN: attribute data to write
+
+ RETURNS
+    SUCCEED/FAIL
+
+ DESCRIPTION
+    Write an attribute for an object (function will figure out ID type).
+
+ GLOBAL VARIABLES
+ COMMENTS, BUGS, ASSUMPTIONS
+    Currently does not allow changing NT of an existing attribute.
+
+
+
+
+GRattrinfo
+----------
+    Get attribute information for an object.
+
+ USAGE
+    intn GRattrinfo(dimid|riid|grid,index,name,attr_nt,count)
+        int32 dimid|riid|grid;  IN: DIM|RI|GR ID
+        int32 index;            IN: index of the attribute for info
+        char *name;             OUT: name of attribute
+        int32 attr_nt;          OUT: number-type of attribute
+        int32 count;            OUT: number of entries of the attribute
+
+ RETURNS
+    SUCCEED/FAIL
+
+ DESCRIPTION
+    Get attribute information for an object.
+
+
+
+
+GRgetattr
+---------
+    Read an attribute for an object.
+
+ USAGE
+    intn GRgetattr(dimid|riid|grid,index,data)
+        int32 dimid|riid|grid;  IN: DIM|RI|GR ID
+        int32 index;            IN: index of the attribute for info
+        VOIDP data;             OUT: data read for attribute
+
+ RETURNS
+    SUCCEED/FAIL
+
+ DESCRIPTION
+    Read an attribute for an object.
+
+
+
+
+GRfindattr
+----------
+    Get the index of an attribute with a given name for an object.
+
+ USAGE
+    int32 GRfindattr(int32 dimid|riid|grid,char *name)
+        int32 dimid|riid|grid;  IN: DIM|RI|GR ID
+        char *name;             IN: name of attribute to search for
+
+ RETURNS
+    Valid index for an attribute on success, FAIL on failure
+
+ DESCRIPTION
+    Get the index of an attribute with a given name for an object.
+
+
+
+
+
+
+
+
+============================================================================
+================================new_functions.txt===========================
+
+This file contains a list of the new functions added with HDF 4.1r2.
+The functions in parenthesis were already present in the HDF library,
+and are included for clarity.
+
+C                     FORTRAN                 Description
+--------------------------------------------------------------------------------
+
+(SDsetcompress)       sfscompress             compresses SDS
+
+(SDwritechunk)        sfwchnk                 writes the specified chunk of
+                                              NUMERIC data to the SDS
+
+(SDwritechunk)        sfwcchnk                writes the specified chunk of
+                                              CHARACTER data to the SDS
+
+(SDreadchunk)         sfrchnk                 reads the specified chunk of
+                                              NUMERIC data to the SDS
+
+(SDreadchunk)         sfrcchnk                reads the specified chunk of
+                                              CHARACTER data to the SDS
+ 
+(SDsetchunk)          sfschnk                 makes the SDS a chunked SDS
+ 
+(SDsetchunkcache)     sfscchnk                sets the maximum number of chunks
+                                              to cache
+ 
+(SDgetchunkinfo)      sfgichnk                gets info on SDS
+
+(SDsetblocksize)      sfsblsz                 sets block size 
+
+(SDisrecord)          sfisrcrd                checks if an SDS is unlimited
+
+
+
+(GRsetcompress)       mgscompress             compresses raster image
+
+GRsetchunk            mgschnk                 makes a raster image a chunked
+                                              raster image
+
+GRgetchunkinfo        mggichnk                gets info on a raster image
+
+GRsetchunkcache       mgscchnk                sets the maximum number of chunks
+                                              to cache
+
+
+(Hgetlibversion)      hglibver                gets version of the HDF Library
+
+(Hgetfileversion)     hgfilver                gets version of the HDF file
+
+
+Vdeletetagref        vfdtr                    deletes tag/ref pair ( HDF object)
+                                              from a vgroup
+
+(VSfindclass)        vsffcls                  finds class with a specified 
+                                              name in a vdata
+
+VSdelete             vsfdlte                  deletes a vdata
+
+Vdelete              vdelete                  deletes a vgroup
+
+
+
+============================================================================
+================================page_buf.txt================================
+
+****************************** Beta Version *********************************
+File Caching(Beta release)
+=================================
+    This version of the distribution has preliminary support for file caching.
+
+*NOTE*: This version is NOT officially supported on all platforms
+        and has not been extensively tested. As such it is provided as is.
+        It will be supported officially in a later release.
+
+    The file caching allows the file to be mapped to user memory on 
+    a per page basis i.e a memory pool of the file. With regards to the 
+    file system, page sizes can be allocated based on the file system page-size 
+    or if the user wants in some multiple of the file system page-size. This 
+    allows for fewer pages to be managed along with accommodating the users file
+    usage pattern.
+
+    The current version supports setting the page-size and number of pages
+    in the memory pool through user C-routines(Fortran will be added in the
+    next release). The default is 8192 bytes for page-size and 1 for number 
+    of pages in the pool.
+
+    Two user C-routines are provided: one to set the values for page-size and
+    number of pages to cache, and the other to inquire the current values being 
+    used for the pagesize and number of pages cached.
+
+    Routines:(The names may change in the future...)
+    -------------------------------------------------
+    Hmpset(int pagesize, int maxcache, int flags)
+    --------------------------------------------
+    o  Set the pagesize and maximum number of pages to cache on the next
+       open/create of a file. A pagesize that is a power of 2 is recommended.
+       'pagesize' must be greater than MIN_PAGESIZE(512) bytes and 
+       'maxcache' must be greater than or equal to 1. Valid values
+       for both arguments are required when using this call.
+
+       The values set here only affect the next open/creation of a file and
+       do not change a particular file's paging behaviour after it has been
+       opened or created. This maybe changed in a later release.
+
+       Use flags argument of 'MP_PAGEALL' if the whole file is to be cached
+       in memory otherwise pass in zero. In this case the value for 'maxcache'
+       is ignored. You must pass in a valid value for 'pagesize' when
+       using the flag 'MP_PAGEALL'. 
+ 
+    Hmpget(int *pagesize, int *maxcache, int flags)
+    ----------------------------------------------
+    o   This gets the last pagesize and maximum number of pages cached for
+        the last open/create of a file. The 'flags' variable is not used.
+    
+    In this version a new file memory pool is created for every file that is
+    created/opened and can not be shared. Future versions will allow sharing 
+    of the file memory pool with other threads/processes.
+
+    To enable the creation of a library using page caching the following 
+    section in the makefile fragment($(toplevel)/config/mh-<os>) must be 
+    uncommented and set.
+
+    # ------------ Macros for Shared Memory File Buffer Pool(fmpool) ------
+    # Uncomment the following lines to enable shared memory file buffer pool
+    # version of the HDF core library libdf.a. Please read the
+    # documentation before enabling this feature.
+    #FMPOOL_FLAGS  = -DHAVE_FMPOOL
+
+    After setting these values you must re-run  the toplevel 'configure' script.
+    Make sure that your start from a clean re-build(i.e. 'make clean') after
+    re-running the toplevel 'configure' script and then run 'make'.
+    Details on running configure can be found in the section
+    'General Configuration/Installation - Unix' in the installation file 
+    '$(toplevel)/INSTALL'.
+
+    The file caching version of libdf.a is automatically tested
+    when the regular HDF and netCDF tests are run. The page caching
+    version has been tested only on a few UNIX platforms and is NOT
+    available for the Macintosh ,IBM-PC(Windows NT/95) or VMS.
+
+****************************** Beta Version *********************************
+============================================================================
+================================sd_chunk_examples.txt=======================
+
+/**************************************************************************
+File: sd_chunk_examples.c
+
+  Examples for writing/reading SDS with Chunking and Chunking w/ Compression.
+   - Sample C-code using SDS chunking routines. 
+   - No real error checking is done and the value of 'status' should 
+     be checked for proper values.
+
+5 Examples are shown, 1 for 2-D array, 3 for 3-D arrays and
+                      1 for 2-D array with compression..
+
+  Example 1. 2-D 9x4 SDS of uint16 with 3x2 chunks
+             Write data using SDwritechunk().
+             Read data using SDreaddata().
+
+  Example 2. 3-D 2x3x4 SDS of uint16 with 2x3x2 chunks
+             Write data using SDwritedata().
+             Read data using SDreaddata().
+
+  Example 3. 3-D 2x3x4 SDS of uint16 with 1x1x4 chunks
+             Write data using SDwritechunk().
+             Read data using SDreaddata().
+
+  Example 4. 3-D 2x3x4 SDS of uint16 with 1x1x4 chunks
+             Write data using SDwritedata().
+             Read data using SDreadchunk().
+
+  Example 5. 2-D 9x4 SDS of uint16 with 3x2 chunks with GZIP compression.
+             Write data using SDwritechunk().
+             Read data using SDreaddata().
+
+Author - GeorgeV
+Date   - 11/25/96
+********************************************************************/
+
+#include "mfhdf.h"
+
+/* arrays holding dim info for datasets */
+static int32  d_dims[3]     = {2, 3, 4};  /* data dimensions */
+static int32  edge_dims[3]  = {0, 0, 0};  /* edge dims */
+static int32  start_dims[3] = {0, 0, 0};  /* starting dims  */
+
+/* data arrays layed out in memory  */
+
+/* used in Example 1 and 5 */
+static uint16  u16_2data[9][4] =
+{ 
+   {11, 21, 31, 41},
+   {12, 22, 32, 42},
+   {13, 23, 33, 43},
+   {14, 24, 34, 44},
+   {15, 25, 35, 45},
+   {16, 26, 36, 46},
+   {17, 27, 37, 47},
+   {18, 28, 38, 48},
+   {19, 29, 39, 49},
+};
+
+/* uint16 3x2 chunk arrays used in example 1 and 5*/
+static uint16  chunk1_2u16[6] = {11, 21, 
+                                 12, 22, 
+                                 13, 23};
+
+static uint16  chunk2_2u16[6] = {31, 41, 
+                                 32, 42, 
+                                 33, 43};
+
+static uint16  chunk3_2u16[6] = {14, 24, 
+                                 15, 25, 
+                                 16, 26};
+
+static uint16  chunk4_2u16[6] = {34, 44, 
+                                 35, 45, 
+                                 36, 46};
+
+static uint16  chunk5_2u16[6] = {17, 27, 
+                                 18, 28, 
+                                 19, 29};
+
+static uint16  chunk6_2u16[6] = {37, 47, 
+                                 38, 48, 
+                                 39, 49};
+
+
+/* uint16 1x1x4 chunk arrays used in example 3 */
+static uint16  chunk1_3u16[4] =  { 0, 1, 2, 3};
+
+static uint16  chunk2_3u16[4] =  { 10, 11, 12, 13};
+
+static uint16  chunk3_3u16[4] =  { 20, 21, 22, 23};
+
+static uint16  chunk4_3u16[4] =  { 100, 101, 102, 103};
+
+static uint16  chunk5_3u16[4] =  { 110, 111, 112, 113};
+
+static uint16  chunk6_3u16[4] =  { 120, 121, 122, 123};
+
+
+/* Used in Examples 2 and 4 */
+static uint16  u16_3data[2][3][4] =
+{
+    {
+        { 0, 1, 2, 3},
+        { 10, 11, 12, 13},
+        { 20, 21, 22, 23}},
+    {
+        { 100, 101, 102, 103},
+        { 110, 111, 112, 113},
+        { 120, 121, 122, 123}}};
+
+/*
+ * Main routine
+ */
+int main(int argc, char *argv[])
+{
+   int32 f1;                    /* file handle */
+   int32 sdsid;                 /* SDS handle */
+   uint16  inbuf_3u16[2][3][4]; /* Data array read for Example 2 and 3*/
+   uint16  inbuf_2u16[5][2];    /* Data array read for Example 1 */
+   uint16  ru16_3data[4];       /* whole chunk input buffer */
+   uint16  fill_u16 = 0;        /* fill value */
+   HDF_CHUNK_DEF chunk_def;     /* Chunk defintion set */ 
+   HDF_CHUNK_DEF rchunk_def;    /* Chunk defintion read */ 
+   int32   cflags;              /* chunk flags */
+   comp_info cinfo;             /* compression info */
+   intn status;
+
+   ncopts = NC_VERBOSE;
+
+    /* create file */
+    f1 = SDstart("chunk.hdf", DFACC_CREATE);
+
+    /* 
+      Example 1. 2-D 9x4 SDS of uint16 with 3x2 chunks
+                 Write data using SDwritechunk().
+                 Read data using SDreaddata().
+    */
+
+    /* create a  9x4 SDS of uint16 in file 1 */
+    d_dims[0] = 9;
+    d_dims[1] = 4;
+    sdsid = SDcreate(f1, "DataSetChunked_1", DFNT_UINT16, 2, d_dims);
+
+    /* set fill value */
+    fill_u16 = 0;
+    status = SDsetfillvalue(sdsid, (VOIDP) &fill_u16);
+
+    /* Create chunked SDS 
+       chunk is 3x2 which will create 6 chunks */
+    chunk_def.chunk_lengths[0] = 3;
+    chunk_def.chunk_lengths[1] = 2;
+    status = SDsetchunk(sdsid, chunk_def, HDF_CHUNK);
+
+    /* Set Chunk cache to hold 3 chunks */
+    status = SDsetchunkcache(sdsid, 3, 0);
+
+    /* Write data use SDwritechunk */
+
+    /* Write chunk 1 */
+    start_dims[0] = 0;
+    start_dims[1] = 0;
+    status = SDwritechunk(sdsid, start_dims, (VOIDP) chunk1_2u16);
+
+    /* Write chunk 4 */
+    start_dims[0] = 1;
+    start_dims[1] = 1;
+    status = SDwritechunk(sdsid, start_dims, (VOIDP) chunk4_2u16);
+
+    /* Write chunk 2 */
+    start_dims[0] = 0;
+    start_dims[1] = 1;
+    status = SDwritechunk(sdsid, start_dims, (VOIDP) chunk2_2u16);
+
+    /* Write chunk 5 */
+    start_dims[0] = 2;
+    start_dims[1] = 0;
+    status = SDwritechunk(sdsid, start_dims, (VOIDP) chunk5_2u16);
+
+    /* Write chunk 3 */
+    start_dims[0] = 1;
+    start_dims[1] = 0;
+    status = SDwritechunk(sdsid, start_dims, (VOIDP) chunk3_2u16);
+
+    /* Write chunk 6 */
+    start_dims[0] = 2;
+    start_dims[1] = 1;
+    status = SDwritechunk(sdsid, start_dims, (VOIDP) chunk6_2u16);
+ 
+    /* read a portion of data back in using SDreaddata
+       i.e  5x2 subset of the whole array */
+    start_dims[0] = 2;
+    start_dims[1] = 1;
+    edge_dims[0] = 5;
+    edge_dims[1] = 2;
+    status = SDreaddata(sdsid, start_dims, NULL, edge_dims, (VOIDP) inbuf_2u16);
+
+   /* This 5x2 array should look somethink like this
+         {{23, 24, 25, 26, 27},
+          {33, 34, 35, 36, 37}}    
+    */
+
+    /* Get chunk information */
+    status = SDgetchunkinfo(sdsid, &rchunk_def, &cflags);
+
+
+    /* Close down this SDS*/    
+    status = SDendaccess(sdsid);
+
+    /* 
+      Example 2. 3-D 2x3x4 SDS of uint16 with 2x3x2 chunks
+                 Write data using SDwritedata().
+                 Read data using SDreaddata().
+    */
+
+    /* create a new 2x3x4 SDS of uint16 in file 1 */
+    d_dims[0] = 2;
+    d_dims[1] = 3;
+    d_dims[2] = 4;
+    sdsid = SDcreate(f1, "DataSetChunked_2", DFNT_UINT16, 3, d_dims);
+
+    /* set fill value */
+    fill_u16 = 0;
+    status = SDsetfillvalue(sdsid, (VOIDP) &fill_u16);
+
+    /* Create chunked SDS
+       chunk is 2x3x2 which will create 2 chunks */
+    chunk_def.chunk_lengths[0] = 2;
+    chunk_def.chunk_lengths[1] = 2;
+    chunk_def.chunk_lengths[2] = 3;
+    status = SDsetchunk(sdsid, chunk_def, HDF_CHUNK);
+
+    /* Set Chunk cache to hold 2 chunks*/
+    status = SDsetchunkcache(sdsid, 2, 0);
+
+    /* Write data using SDwritedata*/
+    start_dims[0] = 0;
+    start_dims[1] = 0;
+    start_dims[2] = 0;
+    edge_dims[0] = 2;
+    edge_dims[1] = 3;
+    edge_dims[2] = 4;
+    status = SDwritedata(sdsid, start_dims, NULL, edge_dims, (VOIDP) u16_3data);
+
+    /* read data back in using SDreaddata*/
+    start_dims[0] = 0;
+    start_dims[1] = 0;
+    start_dims[2] = 0;
+    edge_dims[0] = 2;
+    edge_dims[1] = 3;
+    edge_dims[2] = 4;
+    status = SDreaddata(sdsid, start_dims, NULL, edge_dims, (VOIDP) inbuf_3u16);
+
+    /* Verify the data in inbuf_3u16 against u16_3data[] */
+
+    /* Get chunk information */
+    status = SDgetchunkinfo(sdsid, &rchunk_def, &cflags);
+
+    /* Close down this SDS*/    
+    status = SDendaccess(sdsid);
+
+    /* 
+      Example 3. 3-D 2x3x4 SDS of uint16 with 1x1x4 chunks
+                 Write data using SDwritechunk().
+                 Read data using SDreaddata().
+    */
+
+    /* Now create a new 2x3x4 SDS of uint16 in file 'chunk.hdf' */
+    d_dims[0] = 2;
+    d_dims[1] = 3;
+    d_dims[2] = 4;
+    sdsid = SDcreate(f1, "DataSetChunked_3", DFNT_UINT16, 3, d_dims);
+
+    /* set fill value */
+    fill_u16 = 0;
+    status = SDsetfillvalue(sdsid, (VOIDP) &fill_u16);
+
+    /* Create chunked SDS 
+       chunk is 1x1x4 which will create 6 chunks */
+    chunk_def.chunk_lengths[0] = 1;
+    chunk_def.chunk_lengths[1] = 1;
+    chunk_def.chunk_lengths[2] = 4;
+    status = SDsetchunk(sdsid, chunk_def, HDF_CHUNK);
+
+    /* Set Chunk cache to hold 4 chunks*/
+    status = SDsetchunkcache(sdsid, 4, 0);
+
+    /* Write data use SDwritechunk */
+
+    /* Write chunk 1 */
+    start_dims[0] = 0;
+    start_dims[1] = 0;
+    start_dims[2] = 0;
+    status = SDwritechunk(sdsid, start_dims, (VOIDP) chunk1_3u16);
+
+    /* Write chunk 4 */
+    start_dims[0] = 1;
+    start_dims[1] = 0;
+    start_dims[2] = 0;
+    status = SDwritechunk(sdsid, start_dims, (VOIDP) chunk4_3u16);
+
+    /* Write chunk 2 */
+    start_dims[0] = 0;
+    start_dims[1] = 1;
+    start_dims[2] = 0;
+    status = SDwritechunk(sdsid, start_dims, (VOIDP) chunk2_3u16);
+
+    /* Write chunk 5 */
+    start_dims[0] = 1;
+    start_dims[1] = 1;
+    start_dims[2] = 0;
+    status = SDwritechunk(sdsid, start_dims, (VOIDP) chunk5_3u16);
+
+    /* Write chunk 3 */
+    start_dims[0] = 0;
+    start_dims[1] = 2;
+    start_dims[2] = 0;
+    status = SDwritechunk(sdsid, start_dims, (VOIDP) chunk3_3u16);
+
+    /* Write chunk 6 */
+    start_dims[0] = 1;
+    start_dims[1] = 2;
+    start_dims[2] = 0;
+    status = SDwritechunk(sdsid, start_dims, (VOIDP) chunk6_3u16);
+ 
+    /* read data back in using SDreaddata*/
+    start_dims[0] = 0;
+    start_dims[1] = 0;
+    start_dims[2] = 0;
+    edge_dims[0] = 2;
+    edge_dims[1] = 3;
+    edge_dims[2] = 4;
+    status = SDreaddata(sdsid, start_dims, NULL, edge_dims, (VOIDP) inbuf_3u16);
+
+    /* Verify the data in inbuf_3u16 against u16_3data[] */
+
+    /* Close down this SDS*/    
+    status = SDendaccess(sdsid);
+
+
+    /* 
+      Example 4. 3-D 2x3x4 SDS of uint16 with 1x1x4 chunks
+                 Write data using SDwritedata().
+                 Read data using SDreadchunk().
+    */
+
+    /* Now create a new 2x3x4 SDS of uint16 in file 'chunk.hdf' */
+    d_dims[0] = 2;
+    d_dims[1] = 3;
+    d_dims[2] = 4;
+    sdsid = SDcreate(f1, "DataSetChunked_4", DFNT_UINT16, 3, d_dims);
+
+    /* set fill value */
+    fill_u16 = 0;
+    status = SDsetfillvalue(sdsid, (VOIDP) &fill_u16);
+
+    /* Create chunked SDS
+       chunk is 1x1x4 which will create 6 chunks */
+    chunk_def.chunk_lengths[0] = 1;
+    chunk_def.chunk_lengths[1] = 1;
+    chunk_def.chunk_lengths[2] = 4;
+    status = SDsetchunk(sdsid, chunk_def, HDF_CHUNK);
+
+    /* Set Chunk cache to hold 4 chunks */
+    status = SDsetchunkcache(sdsid, 4, 0);
+
+    /* Write data using SDwritedata*/
+    start_dims[0] = 0;
+    start_dims[1] = 0;
+    start_dims[2] = 0;
+    edge_dims[0] = 2;
+    edge_dims[1] = 3;
+    edge_dims[2] = 4;
+    status = SDwritedata(sdsid, start_dims, NULL, edge_dims, (VOIDP) u16_3data);
+
+    /* read data back in using SDreadchunk and verify against
+       the chunk arrays chunk1_3u16[] ... chunk6_3u16[] */
+
+    /* read chunk 1 */
+    start_dims[0] = 0;
+    start_dims[1] = 0;
+    start_dims[2] = 0;
+    status = SDreadchunk(sdsid, start_dims, (VOIDP) ru16_3data);
+
+    /* read chunk 2 */
+    start_dims[0] = 0;
+    start_dims[1] = 1;
+    start_dims[2] = 0;
+    status = SDreadchunk(sdsid, start_dims, (VOIDP) ru16_3data);
+
+    /* read chunk 3 */
+    start_dims[0] = 0;
+    start_dims[1] = 2;
+    start_dims[2] = 0;
+    status = SDreadchunk(sdsid, start_dims, (VOIDP) ru16_3data);
+
+    /* read chunk 4 */
+    start_dims[0] = 1;
+    start_dims[1] = 0;
+    start_dims[2] = 0;
+    status = SDreadchunk(sdsid, start_dims, (VOIDP) ru16_3data);
+
+    /* read chunk 5 */
+    start_dims[0] = 1;
+    start_dims[1] = 1;
+    start_dims[2] = 0;
+    status = SDreadchunk(sdsid, start_dims, (VOIDP) ru16_3data);
+
+    /* read chunk 6 */
+    start_dims[0] = 1;
+    start_dims[1] = 2;
+    start_dims[2] = 0;
+    status = SDreadchunk(sdsid, start_dims, (VOIDP) ru16_3data);
+
+    /* Close down this SDS*/    
+    status = SDendaccess(sdsid);
+
+
+    /* 
+      Example 5. 2-D 9x4 SDS of uint16 with 3x2 chunks with GZIP compression
+                 Write data using SDwritechunk().
+                 Read data using SDreaddata().
+    */
+
+    /* create a  9x4 SDS of uint16 in file 1 */
+    d_dims[0] = 9;
+    d_dims[1] = 4;
+    sdsid = SDcreate(f1, "DataSetChunked_1", DFNT_UINT16, 2, d_dims);
+
+    /* set fill value */
+    fill_u16 = 0;
+    status = SDsetfillvalue(sdsid, (VOIDP) &fill_u16);
+
+    /* Create chunked SDS 
+       chunk is 3x2 which will create 6 chunks 
+       Compression set will be GZIP. 
+       Note that 'chunk_def' is a union. 
+       See the man page 'sd_chunk.3' for more info on the union. */
+    chunk_def.comp.chunk_lengths[0] = 3;
+    chunk_def.comp.chunk_lengths[1] = 2;
+    chunk_def.comp.comp_type = COMP_CODE_DEFLATE; /* GZIP */
+    chunk_def.comp.cinfo.deflate.level = 6;       /* Level */
+
+    /* set Chunking with Compression */
+    status = SDsetchunk(sdsid, chunk_def, HDF_CHUNK | HDF_COMP);
+
+    /* Set Chunk cache to hold 3 chunks */
+    status = SDsetchunkcache(sdsid, 3, 0);
+
+    /* Write data use SDwritechunk 
+       NOTE: This is the recommended way when using Compression */
+
+    /* Write chunk 1 */
+    start_dims[0] = 0;
+    start_dims[1] = 0;
+    status = SDwritechunk(sdsid, start_dims, (VOIDP) chunk1_2u16);
+
+    /* Write chunk 4 */
+    start_dims[0] = 1;
+    start_dims[1] = 1;
+    status = SDwritechunk(sdsid, start_dims, (VOIDP) chunk4_2u16);
+
+    /* Write chunk 2 */
+    start_dims[0] = 0;
+    start_dims[1] = 1;
+    status = SDwritechunk(sdsid, start_dims, (VOIDP) chunk2_2u16);
+
+    /* Write chunk 5 */
+    start_dims[0] = 2;
+    start_dims[1] = 0;
+    status = SDwritechunk(sdsid, start_dims, (VOIDP) chunk5_2u16);
+
+    /* Write chunk 3 */
+    start_dims[0] = 1;
+    start_dims[1] = 0;
+    status = SDwritechunk(sdsid, start_dims, (VOIDP) chunk3_2u16);
+
+    /* Write chunk 6 */
+    start_dims[0] = 2;
+    start_dims[1] = 1;
+    status = SDwritechunk(sdsid, start_dims, (VOIDP) chunk6_2u16);
+ 
+    /* read a portion of data back in using SDreaddata
+       i.e  5x2 subset of the whole array */
+    start_dims[0] = 2;
+    start_dims[1] = 1;
+    edge_dims[0] = 5;
+    edge_dims[1] = 2;
+    status = SDreaddata(sdsid, start_dims, NULL, edge_dims, (VOIDP) inbuf_2u16);
+
+   /* This 5x2 array should look somethink like this
+         {{23, 24, 25, 26, 27},
+          {33, 34, 35, 36, 37}}    
+    */
+
+    /* Get chunk information */
+    status = SDgetchunkinfo(sdsid, &rchunk_def, &cflags);
+
+    /* Close down this SDS*/    
+    status = SDendaccess(sdsid);
+
+    /* Close down SDS interface */
+    status = SDend(f1);
+
+}
+============================================================================
+================================vattr.txt===================================
+
+        Vgroup and vdata attributes 
+                   9/8/96
+ 
+Vdata/vgroup version
+--------------------
+Previously (up to HDF4.0r2), the vdata and vgroup version was 3, 
+VSET_VERSION.  With attributes added, the version number has been 
+changed to 4, VSET_NEW_VERSION. For backward compatibility, a vdata 
+or a vgroup will still have version number 3 if it has no attribute(s) 
+assigned. 
+
+Attribute
+---------
+An attribute has a name, data type, a number of values and the 
+values.  All values of an attribute should be of the same data type.
+For example, 10 characters, or 2 32-bit integers.
+
+Any number of attributes can be assigned to a vgroup, a vdata 
+(entire vdata) or any field of a vdata.  An attribute name should be 
+unique in its scope.  For example, a field attribute name 
+should be unique among all attributes of that field. 
+
+Attributes in HDF files
+-----------------------
+Attributes will be stored in vdatas.  The vdata's name is
+the attribute name specified by the user. Its class is 
+"Attr0.0", _HDF_ATTRIBUTE.  
+
+All attributes of a vgroup or a vdata will be included in 
+the vgroup represented by DFTAG_VG,  or the vdata header,
+DFTAG_VH. 
+ 
+Vdata/Vgroup attribute routines (see man pages for more info)
+----------------------------------------------------------
+  intn VSfindex(int32 vsid, char *fieldname, int32 *fldindex)
+       find out the index of a field given the field name.
+  intn VSsetattr(int32 vsid, int32 findex, char *attrname, 
+                 int32 datatype, int32 count, VOIDP values)
+       set attr for a field of a vdata or for the vdata.
+       if the attr already exists the new values will replace
+          the current ones, provided the datatype and order
+          have not been changed.
+  intn VSnattrs(int32 vsid)
+       total number of attr for a vdata and its fields
+  int32 VSfnattrs(int32 vsid, int32 findex) 
+       number of attrs for a vdata or a field of it
+  intn VSfindattr(int32 vsid, int32 findex, char *attrname)
+       get index of an attribute with a given name
+  intn VSattrinfo(int32 vsid, int32 findex, intn attrindex,
+                  char *name, int32 *datatype, int32 *count,
+                    int32 *size);
+       get info about an attribute
+  intn VSgetattr(int32 vsid, int32 findex, intn attrindex, 
+                 VOIDP values)
+       get values of an attribute
+  intn VSisattr(int32 vsid)
+       test if a vdata is an attribute of other object
+  intn Vsetattr(int32 vgid,  char *attrname, int32 datatype,
+                int32 count, VOIDP values) 
+       set attr for a vgroup
+  intn Vnattrs(int32 vgid)
+       number of attrs for a vgroup
+  intn Vfindattr(int32 vgid, char *attrname)
+       get index of an attribute with a given name
+  intn Vattrinfo(int32 vgid, intn attrindex, char *name, 
+                 int32 *datatype, int32 *count, int32 *size)
+       get info about an attribute
+  intn Vgetattr(int32 vgid, intn attrindex, VOIDP values)
+       get values of an attribute
+  int32 Vgetversion(int32 vgid)
+       get vset version of a vgroup
+  ( int32 VSgetversion(int32 vsid) already exists.) 
+
+Changes in the vdata header in HDF files :
+------------------------------------------
+1. If attributes or other new features are assigned:
+     o version number will be VSET_NEW_VERSION (4, 
+         defined in vg.h)
+     o the new DFTAG_VH looks like:
+           
+       interlace  number_records hdf_rec_size n_fields
+         2 bytes        4              2           2
+       datatype_field_n offset_field_n order_field_n fldnmlen_n
+         2*n_fields        2*n_fields     2*n_fields  2*n_fields
+       fldnm_n namelen name classlen class extag exref version
+                 2            2             2     2      2
+       more  flags  < nattrs  field_index attr0_tag/ref 
+        2      4         4         4         2/2        
+       field_index  attr1_tag/ref ...> version  more extra_byte
+             4           2/2          
+ 
+   If no attributes or other new features were assigned, 
+       version number is still VSET_VERSION and the old 
+       vdata header will be written out.
+
+2. In the old implementation the 'version' and 'more' fields
+   follow the 'exref' field. In order to not break existing
+   applications the new implementation keeps these two
+   fields and adds a duplication of 'version' and 'more'
+   at the end, along with an extra byte which was not 
+   documented in the old documentation. 
+
+3. The field "flags" of  uint32: 
+           bit 0 -- has attr
+           bit 1 -- 15  -- unused.
+     o Fields follow the 'flags' are:
+           total_number_of_attrs this vdata has  (4 bytes)
+           vs_attr_list  (#_attrs * 8 bytes (4+2+2))
+            (field_index, attr_vdata_tag, attr_vdata_ref) 
+       the flags and attribute fields are added after the 
+           first 'more' fields.
+ 
+Changes in the vgroup data in HDF files 
+---------------------------------------
+1. If has attribute(s):
+      o add a flag field, uint16,
+          bit 0 -- has attr
+          bit 1-15  -- unused.
+      o version number will be changed to 4 
+      o fields following the flag are:
+          number_of_attrs 
+          vg_attr_list 
+        the above fields are added preceding the version field
+      o vg_attr_list consists of a list of attribute_tag/ref
+         pairs
+   If no attribute:
+      No changes in vgroup data and version number is still 3
+============================================================================
+================================windows.txt=================================
+
+Fortner Software LLC ("Fortner") created the reference implementation for
+Windows of the HDF 4.1r3 library, providing C-language bindings to all
+4.1r3 features.
+
+The Windows reference implementation of the 4.1r3 library was implemented
+and tested on a Pentium PC running Windows95 4.00.950 using Microsoft
+Developers Studio 97 Visual C++ Version 5.00.   The library has also been
+run on Pentium PC running WindowsNT version 4.0.
+
+Fortner cannot be certain that the libraries will run on other versions of
+Windows or when built using other development tools.  (In particular, this
+Windows implementation has not addressed use with Windows 3.x, or non-PC
+versions of WindowsNT).  Migrating the Windows reference implementation to
+other development and/or run-time environments is the responsibility of the
+library user.
+
+First-time HDF users are encouraged to read the FAQ in this release for
+more information about HDF.  Users can also look at the home page for HDF
+at:
+
+    http://hdf.ncsa.uiuc.edu/
+
+Please send questions, comments, and recommendations regarding the Windows
+version of the HDF library to:
+
+    hdfhelp@ncsa.uiuc.edu
+ 
+============================================================================

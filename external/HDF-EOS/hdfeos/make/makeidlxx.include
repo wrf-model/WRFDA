@@ -1,0 +1,107 @@
+# Must define the following variables
+# MYPARENT - where the idl files are located
+# NAME1 - name of the first idl file (minus the .idl extension)
+# NAME2 -
+# NAME3 -
+# CSTM_IDLXXFLAGS - additionla idl flags if any
+# CSTM_CFLAGS - custom c flags if any
+# MAKECMD - environment variable must be set (done by buildrc)
+#   An acf file (even if dummy must be defined)
+
+IDLXXMAKECMD	= clearmake -C gnu -f ../Makefile idltarget
+
+IDLXXNAME		=   NAME.idl
+IDLXXNAMEH	=   NAME.h \
+		    NAMEC.H \
+		    NAMES.H
+IDLXXNAMEC	=   NAME_cstub.c \
+		    NAME_sstub.c \
+		    NAMEE.C \
+		    NAMEC.C
+IDLXXNAMEO	=   $(IDLXXNAMEC:.c=.o)
+ACFNAME		=   NAME.acf
+
+ifdef NAME1
+IDLXXFILE1        :=   $(subst NAME, $(NAME1), $(IDLXXNAME))
+IDLXXGENH1        :=   $(subst NAME, $(NAME1), $(IDLXXNAMEH))
+IDLXXGENC1	:=   $(subst NAME, $(NAME1), $(IDLXXNAMEC))
+IDLXXGENO1	:=   $(subst NAME, $(NAME1), $(IDLXXNAMEO))
+ACF1		:=   $(subst NAME, $(NAME1), $(ACFNAME))
+else
+IDLXXFILE1        =
+IDLXXGENH1        =
+IDLXXGENC1	=
+IDLXXGENO1	=
+ACF1		=
+endif
+
+ifdef NAME2
+IDLXXFILE2        :=   $(subst NAME, $(NAME2), $(IDLXXNAME))
+IDLXXGENH2        :=   $(subst NAME, $(NAME2), $(IDLXXNAMEH))
+IDLXXGENC2	:=   $(subst NAME, $(NAME2), $(IDLXXNAMEC))
+IDLXXGENO2	:=   $(subst NAME, $(NAME2), $(IDLXXNAMEO))
+ACF2		:=   $(subst NAME, $(NAME2), $(ACFNAME))
+else
+IDLXXFILE2        =
+IDLXXGENH2        =
+IDLXXGENC2	=
+IDLXXGENO2	=
+ACF2		=
+endif
+
+ifdef NAME3
+IDLXXFILE3        :=   $(subst NAME, $(NAME3), $(IDLXXNAME))
+IDLXXGENH3        :=   $(subst NAME, $(NAME3), $(IDLXXNAMEH))
+IDLXXGENC3	:=   $(subst NAME, $(NAME3), $(IDLXXNAMEC))
+IDLXXGENO3	:=   $(subst NAME, $(NAME3), $(IDLXXNAMEO))
+
+ACF3		:=   $(subst NAME, $(NAME3), $(ACFNAME))
+else
+IDLXXFILE3        =
+IDLXXGENH3        =
+IDLXXGENC3	=
+IDLXXGENO3	=
+ACF3		=
+endif
+
+IDLXXFILES	:=  $(IDLXXFILE1)	$(IDLXXFILE2) $(IDLXXFILE3)
+IDLXXHFILES	:=  $(IDLXXGENH1) $(IDLXXGENH2) $(IDLXXGENH3)
+IDLXXCFILES	:=  $(IDLXXGENC1) $(IDLXXGENC2) $(IDLXXGENC3) 
+IDLXXOBJFILES	:=  $(IDLXXGENO1) $(IDLXXGENO2) $(IDLXXGENO3)
+ACFFILES	:=  $(ACF1) $(ACF2) $(ACF3)
+
+IDLXXHFILES	:= $(IDLXXGENH1) $(IDLXXGENH2)$(IDLXXGENH3)
+
+IDLXXGENFILES	:=  $(IDLXXFILES) \
+		    $(ACFFILES) \
+		    $(IDLXXHFILES) \
+		    $(IDLXXCFILES) \
+		    $(IDLXXOBJFILES)
+
+IDLXXDGENFILES	:=  $(patsubst %, $(ARCH)/%, $(IDLXXGENFILES))
+
+
+ifdef MYPARENT
+%.idl:	$(MYPARENT)/%.idl
+	rm -f $@; \
+	cp $(MYPARENT)/$@ $@
+
+%.acf:	$(MYPARENT)/%.acf
+	rm -f $@; \
+	cp $(MYPARENT)/$@ $@
+
+%.h:	%.idl
+	$(IDLXX) ${IDLXXFLAGS} $(CSTM_IDLXXFLAGS) $<
+endif
+
+makeidl:
+	(cd $(ARCH); $(IDLXXMAKECMD))
+
+idltarget:  $(IDLXXHFILES)
+
+
+
+
+
+
+

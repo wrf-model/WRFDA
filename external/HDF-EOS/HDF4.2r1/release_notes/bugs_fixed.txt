@@ -1,0 +1,343 @@
+For bugs fixed in the current release see RELEASE.txt file
+For bugs fixed in all releases after HDF4.2r0-Beta see HISTORY.txt file.
+
+HDF4.2r0-Beta
+========
+1. "hdp dumpgr" and "hdp dumpsds" have two new options:
+        -g to suppress the data of global (or file) attributes
+        -l to suppress the data of local attributes
+
+2. The problem where hdp failed on very long file name has been
+   fixed. (bug #693)
+
+3. The problem where VSinquire failed when being called on a vdata
+   that has no fields defined, has been fixed. (bug #626)
+
+4. A user attempted to change the values of VGNAMELENMAX and VSNAMELENMAX
+   to 256 for her own use, but the hdp output showed that the change was
+   not in effect.  This problem is now fixed. (bug #606)
+
+5. hdp dumpvg failed sometimes when reading a file that has a vgroup 
+   being inserted into another.  This has been fixed. (bug #477)
+
+6. fp2hdf when used with -p option did the opposite of what it was supposed
+   to do with palette files. This problem is now fixed. (bug #800). However
+   the utility hdfimport should be used in the future instead of fp2hdf.
+
+7. hdf2gif failed when a user tried it on JPEG compressed images. (Bug #601).
+   The problem is now fixed. An error message is displayed if the image is not
+   8-bit. If the image is 24-bit, the message suggests using hdf2jpeg.
+
+8. ncdump failed to read NetCDF files 3.5 when there were more than one variable
+   with unlimited dimensions. Fixed.
+
+9. NetCDF part of the HDF4 Library was not ported to Compaq True64 system. Fixed.
+
+10. The hdp commands dumpsds, dumpgr, dumpvd, and dumpvg now display an 
+    informative message when a non-HDF file is given as input. (Bug #817)
+
+11. The compilation warnings and error on the macro HDFclose are fixed.
+    (Bug #818)
+
+HDF4.1r5
+========
+1. The following VS routines are added as requested (bug #267):
+     VSsetblocksize/vsfsetblsz -- sets the block size of the linked-block element.
+     VSsetnumblocks/vsfsetnmbl -- sets the number of blocks for 
+                                  a linked-block element.
+     VSgetblockinfo/vsfgetblinfo -- retrieves the block size and the 
+                                    number of blocks of a linked-block element.
+
+2. When using SDsetdimscale to set the data type for a dimension to 
+   an unsigned type, the type became signed inadvertently (bug #172).  
+   This problem is now fixed.
+
+3. The memory leak in the netCDF part of the HDF/mfhdf distribution
+   is fixed. (bug #418)
+
+4. When using "hdp dumpgr", data was being printed in the range of 0-250
+   when it should be 0-168 (bug #422).  This problem is now fixed.
+
+5. hdp dumpgr has a new option to print palette data only -pd.  Also,
+   whenever option -p or -pd is given, only palettes are printed, no 
+   images nor file attributes. (bug #439)
+
+6. The "#define NULL" was removed since ANSI C compilers are required to
+   define NULL. (bug #448)
+
+7. Giving NULL to the fieldname argument in VSsetfields now returns
+   FAIL instead of causing segmentation fault. (bug #554)
+
+8. Giving a NULL to the argument name in several name setting routines
+   now returns FAIL instead of causing segmentation fault. (bug #514)
+
+9. Two routines were added to get compression information for the SD and
+   GR interfaces, including chunked elements: SDgetcompress/sfgcompress 
+   and GRgetcompress/mggcompress. (bug #307)  
+   Note: 
+   - for a JPEG image, GRgetcompress only returns the compression type, not 
+     the compression information (i.e, quantity and force_baseline) because 
+     this information currently is not retrievable.
+   - getting compression type for JPEG chunked images is not working yet.
+
+10.  Added new fortran function heprntf (HEprint) that takes two
+     arguments: file name and level. If file name string has 0 length
+     error messages will be printed to the standard output. 
+
+11.  Fix the linking bug of unresolved symbol(error_top) DLL when HEclear 
+     was called by users. Users who want to use hdf DLL should define HDFAPDLL 
+     in their applications. Simply going to project setting and adding HDFAPDLL
+     as the predefined constant should work.
+
+HDF4.1r4
+========
+1. Fixed GR JPEG compression problem.
+2. Added -s, -c and -l options to hdp.
+
+HDF4.1r3
+=========
+1. HDF 4.1r2 was unable to properly read HDF SDSs created with HDF 3.3x.
+   It did not read the correct SDS names.  This problem has been fixed.
+2. Many problems with the GR interface were fixed:
+   - The GR interface can now read compressed files created with the
+     DFR8 and DF24 interfaces, except for those which were compressed
+     with IMCOMP compression.
+   - The GR interface can read and write images compressed with RLE,
+     GZIP and Skipping Huffman compression methods.
+   - Palettes can now be written and read properly with the GR interface.
+   - 24-bit raster images can now be read by the GR interface.
+3. You can now create an SDS with a name up to 256 characters in length.
+   The previous limit was 64.
+4. SDfileinfo no longer returns the wrong number of datasets for old
+   files created with the DFSD interface.
+5. The Vdata/Vgroup interfaces in HDF did not check return values, which
+   caused problems on the Macintosh, and could have potentially caused
+   problems on all platforms.  HDF now checks all return values properly.
+6. Several missing Fortran functions have been added to the
+  ./include/dffunc.inc file.
+7. Calling SDreaddata after setting the fill value and before doing
+   an SDendaccess and SDend caused a core dump on IRIX6.x with the
+   -64 bit option.  This problem has been fixed.
+8. Many hdp fixes were made:
+   - Options 'o' and 'b' or 'x': it used to be that you had to give -o
+     in order for -b or -x to be valid; now you can just give -b or -x
+     and the output will go to the screen.  Basically, you can have either
+     binary or ASCII text to the screen now where it used to be just ASCII.
+   - Options (-r,-i,-n,-c) can be given on the same command line; previously
+     the last option overrode all the previous ones.
+   - Added printing of GR file attributes (bug #192)
+   - Added printing of a palette to the dumpgr command (bug #252) with the new
+     option -p
+       -p : print palette info and data
+       -p -h : print palette info
+       -p -d : print palette data
+   - Added printing of SD file attributes to the dumpsds command
+   - The -c option for dumpvd used to only show the first vdata; now all vdatas
+     of the same class show for option -c.  Also, multiple class names listed
+     with this option are searched; they used to be ignored.
+   - Added printing file annotations to the dumpvd command.
+   - Improved output wording for the dumpvd command.  For example, <Undefine>
+     gets printed instead of nothing, or FULL_INTERLACE/NO_INTERLACE is printed
+     instead of "0/1".
+   - In one case the dumpvg command would get into an infinite loop.  This
+     problem has been fixed.
+   - With the dumpvg command, all vgroups of the same class show for option -c;
+     previously only the first one was shown.  Also, multiple class names listed
+     with this option are now searched; they used to be ignored.
+   - File annotations can now be printed with the dumpvg command.
+   - With the dumpvg command, occasionally a core dump occurred when printing
+     the Graphical Representation part if multiple hdf files were given.  This
+     has been fixed.
+
+HDF4.1r2
+========
+1. The hdp utility can now dump data properly to a binary file (using
+   the -b option).
+2. HDF no longer core dumps when reading a NetCDF file.
+3. HDF now supports little-endian conversion for VAX and Dec Alpha OpenVMS.
+4. The SD interface can now properly handle writing to a one-dimensional
+   array that is unlimited.
+5. The SD interface can now properly handle attributes with a data type
+   of Little Endian.
+6. HDF will no longer fail if you write data to a vdata that had no data 
+   written to it when it was first created.
+7. The problems that occurred on the Crays with HDF 4.1r1 have been
+   corrected.
+
+HDF4.1r1
+========
+1. A bug was fixed where you would receive an error if you changed the 
+   name of a Vdata to a name that was longer than the original name.
+2. The FORTRAN equivalents have been added for several ANxx utility routines 
+   (ANget_tagref, ANid2tagref ...).
+3. A bug was fixed where old data (DFSD) in native and little endian format 
+   could not be read by the SD interface correctly.
+4. The variable _HDF_ENTIRE_VDATA has been changed to _HDF_VDATA, to avoid 
+   confusion.  This variable had been added to HDF 4.1b1.  For those
+   users who are already using it, a macro called  _HDF_ENTIRE_VDATA has been
+   added, which is defined as _HDF_VDATA.
+5. SD_FILL and SD_NOFILL were added as file fillmodes.   
+6. In HDF 4.0r2, you could create an empty compressed SDS.  With 4.1b1 you
+   could not.  This was fixed in the 4.1 release. 
+7. There was a bug in hdp where 'hdp list -a' did not list the file attributes. 
+   This was fixed.
+8. In 4.1b1, the SD chunking routine names contained upper case characters
+   after the initial two "SD" characters (for eg. SDwriteChunk).  With 4.1r1
+   the SD chunking routine names were changed to lower case after the
+   initial "SD" characters, to be consistent with the SD interface 
+   naming scheme (for eg. SDwritechunk). 
+
+HDF4.1b1
+========
+1. If you opened a file in read only mode with the SD interface,
+   it would create the file if the file did not exist. This has been fixed.
+2. There was a problem with GRstart, which caused GRend to
+   trigger a segmentation fault when it was called twice.
+   This has been fixed.
+3. DFNT_UCHAR has been added to hdf_unmap_type.  
+4. A problem was fixed in HDc2fstr, which caused garbage to
+   be attached to a converted string.
+5. The multi-file annotation functions were added to dffunc.inc.
+6. A bug was fixed in the DFPnpals function, where it would return
+   the wrong number of palettes.
+7. A problem was fixed with the gzip compression, where an error
+   occurred if you attempted to write to an SDS that you have created, and 
+   then performed an SDendaccess, followed by a SDselect.
+8. HDF4.0r2 did not recognize JPEG images created by HDF 3.3r4.  This
+   has been fixed.
+9. The newest SGI cc compiler (7.0) has eliminated the compression code
+   errors when '-O' option is used.
+
+HDF4.0r2
+========
+1. SDstart (<non-existent file>, DFACC_RDWR) no longer fails.
+   It will create a file now.
+2. When appending compressed data onto the end of an unlimited
+   dimension SDS, the SD interface no longer writes the fill-
+   values in locations where they will immediately be over-
+   written by data.
+3. dfkcray.c, IEG2JPEG and JPEG2IEG do not work if the foreign
+   data does not start from the 64-bit boundary.
+4. On IRIX 6.1 with -n32,  hdf/test/comp.c gave error messages.
+   Fix: Not to use '-O' option (for now).
+5. Problem when running 'make test' on UNICOS has been fixed
+   (bug was in hdf/util/he_main.c).
+6. The RIG tag was not getting written out when creating a
+   GR object, so you couldn't view it with "hdp list". The hdp
+   command has been updated.
+
+HDF4.0r1p1
+==========
+1. Fixed a bug in SDS interface which caused a wrong
+   number of records for UNLIMITED dimensions when 
+   ncsync was called to write data to hdf files. 
+2. A bug has been fixed in the UNLIMITED dimension record 
+   to improve backward compatibility.
+3. Parameter 'class' in vffndcls() has been changed to 
+   'vgclass' to avoid conflicts with C++ reserved word 
+   'class'.
+
+HDF4.0r1
+========
+1. Fixed Fortran character string handling under UNICOS. 
+2. Added checks on the return values of HDmalloc calls. 
+3. The automatic test of hdf utilities (in hdf/util/) 
+   is added to the Makefile and will be executed by 
+   'make test' at the top level. 
+4. Thanks to Mark W. Dalton for his contribution to the fix
+   of the adaptive Huffman compression on the CRAY YMP. 
+   His fix is merged into 4.0r1.
+5. Added check in SDsetattr() to make sure that the argument 
+   'count' < MAX_ORDER.
+
+HDF4.0b2
+========
+1. To avoid conflicts with C++, field name 'new' in vgroup_desc 
+   of vg.h is changed to 'new_vg', and in accrec_t 'new' of 
+   hfile.h is changed to 'new_elem'.
+2. Fixed the max number of fields of vdata in vparse.c, vshow.c 
+   and show.c (in mfhdf/dumper/). Now vshow and hdp can dump
+   VSFIELDMAX number of fields. 
+3. Fixed platform number subclass problem when external data file was
+   written in Little_endian format (IBM-PC). 
+4. Fixed the core-dump on some machines when writing large number of 
+   big SDS by holding the buffer instead of freeing it every time.
+5. The max number of files which can be open at one time was defined
+   in hdf.h, hfile.h and netcdf.h. Now there is only one definition
+   by MAX_FILE in hdf/src/hlimits.h.
+6. A bug in SDsetnbitdataset is fixed. 
+7. Uninitialized memory reads in SDIputattr and hdf_create_dim_vdata
+    are fixed. 
+
+HDF4.0b1
+========
+1. Added support to unsigned integers for attributes.
+2. Bug fixed in SDsetdimscale if dim strings or other attributes already
+   assigned to that dimension and if the size of the number type
+   is not 4 bytes. 
+3. Bug fixed in SDgetdimscale.  For dimensions that have no dim scale 
+   SDgetdimscale now returns 0 for nt to indicate that  no-scale was assigned.
+4. Several buffers allocated by Hxxxx, SDxxxx, and VSxxxx functions were 
+   used through the entire excecution time of HDF application programs.
+   In previous releases those buffers were not freed by HDF. Some debugging 
+   tools list those buffers as memory leaks. In HDF4.0b1 those buffers are freed
+   by HDF when the programs exit. The fix doesn't work on SunOS.  
+5. Added Fortran version of VSQueryxxxx and VSfind:
+     vsqfnelt -- VSQuerycount
+     vsqfintr -- VSQueryinterlace
+     vsqfflds -- VSQueryfields
+     vsqfvsiz -- VSQuerysize
+     vsqfname -- VSQueryname
+     vsffnd   -- VSfind
+6.  SDsetdimscale () did not set scales for unlimited dimension. 
+    After appending records to the unlimited dimension, the number of 
+    records was not updated.  The bug is fixed. 
+7.  In previous releases, the Vdata interface couldn't define more than 36 
+    fields even though VSFIELDMAX was defined as 64 in hdf.h. 
+    The bug is fixed. Now the maximum number of fields is decided by
+    VSFIELDMAX. 
+8.  The Fortran function sfgdinfo now returns nattr correctly.
+9.  hdfrseq is moved out from the HDF release. It is now available on the NCSA
+    ftp server in directory: /HDF/contrib/NCSA/hdfrseq/.
+10. If the same file is accessed twice with DFSDputdata (i.e. the file 
+    is first destroyed), the first call to DFANputlabel after the second 
+    call to DFSDputdata fails. To fix this problem, a new function 
+    DFANclear has been added. 
+    -----------------------------------------------------------------
+    Name:    DFANclear
+    Purpose: Clear DFAN interface
+    Inputs:  void
+    Returns: SUCCEED if ok; FAIL otherwise.
+    Remarks: When a file is re-created in a single run, user should
+             call DFANclear() before the file is re-created to reset DFAN 
+             interface structures.
+    Example: 
+             main()
+             {
+                  int ret;
+                  dump(0);  /* DFSDputdata("myfile.hdf",...) is called  */
+                            /* in dump() to create myfile.hdf  */
+                  ret = DFANclear();
+                  dump(1);  /* DFSDputdata("myfile.hdf",...) is called  */
+                            /* again to re-create a file with the same  */
+                            /* name myfile.hdf  */
+             }
+
+11. A bug is fixed in SDgetcal, which failed in getting number_type from 
+    old hdf files, created by DFSDxxxx calls.  
+12. hdf.inc missing constants and commas
+13. HDgettagname() can't recognize DFTAG_FV and DFTAG_COMPRESSED
+    in hkit.c  
+14. fp2hdf is back in hdf/util/.
+
+--------------------------------------------------------------
+
+Known problems:
+1. Need Fortran version of VFfieldxxxx functions.
+2. Need an easy way to append to a vdata. One solution would be 
+   to make all FULL_INTERLACE vdatas appendable.
+3. Need a high level function to create external Vdata, similar to 
+   SDsetexternalfile(). 
+4. SDxxxx interface creates dummy values for dimension records. 
+   For multi-dimensional SDS this isn't too bad. However, for 
+   1-D SDS it doubles the size of the file. 

@@ -1,0 +1,76 @@
+$Id: README,v 1.1 1993/04/21 21:54:15 chouck Exp $
+
+Mon Apr 17 18:40:07 MDT 1989
+
+This directory contains materials copyrighted by Sun Microsystems, Inc.
+Please read "NOTICE.h"
+
+This is the minimum subset of RPCSRC 3.9 needed to build the netcdf library.
+It is included here for those systems which lack xdr support.
+If your system already has these xdr routines, by all means use them.
+Unix systems which suport the Network File System (NFS) usually have these
+routines in the 'c' library, /usr/lib/libc.a,
+so you don't need to link in any additional libraries.
+Another candididate is librpclib.a in /usr/lib or /usr/local/lib.
+
+The complete RPCSRC distribution may be obtained from Sun or
+from the sun-spots archive at rice.edu.
+
+If you must build this portion of the system, make xdrtest. 
+Running it should produce output like the contents of
+testout.sav on standard output.
+N.B **** For the double precision numbers, the last three
+decimal digits will vary between vaxes and ieee machines. *****
+Running xdrtest will also produce the file "test.xdr".
+Once standard out looks good, then do a binary comparison of the
+files "test.xdr" and "test_xdr.sav".
+(On unix you enter, 'cmp test.xdr test_xdr.sav').
+If the files are byte for byte identical, you are okay.
+
+
+On VAX/VMS, you WILL probably have to build this directory.
+The following files are only used on vms:
+	descrip.mms - The immoral equivalent of a Makefile
+	htonl.mar - 'Host To Network Long', in VAX Macro
+	ntohl.mar - 'Network To Host Long', in VAX Macro
+Because the stdio implementation in vax C runtime library is so poor,
+this code runs 3 times slower on vms than under Ultrix on the same
+Microvax.  If someone were very civic minded they would rewrite the
+file xdrstdio.c as xdr_qio.c. (This is not as bad as it sounds,
+the similar thing has already been done for MacOS Toolbox calls.)
+The file netcdf/src/file.c would also need to be changed ...
+Otherwise, hammer on DEC to get there C language support together.
+
+
+Notes:
+
+Fri Sep 23 10:11:14 MDT 1988
+
+The return value of xdr_getpos and the corresponding argument to xdr_setpos
+changed from 'u_int' to 'u_long' (fpos_t??) in anticipation of problems
+on micros where sizeof(int) < sizeof(long). OK with Steve Nahm at sun.
+
+
+Thu Mar  9 22:23:00 MDT 1989
+
+Added support for architectures where sizeof(enum) == sizeof(char)
+in xdr.c:xdr_enum. Note that, as written this is a runtime !?! check...
+
+
+Mon Apr 17 15:08:05 MDT 1989
+
+The Iris computers seem to put the xdr routines in /usr/lib/libsun.a.
+EG, you don't need to build the ones here.
+You may have to muck around to get the include files right on an iris.
+Also may need libbsd.a.
+
+
+Wed Apr 26 19:48:46 MDT 1989
+
+Fix to xdr_float.c:xdr_float:"#ifdef vax" to handle values less than 
+2^^-127 properly.
+
+
+May 1989
+
+Added MIPSEL #ifdef for ieee, byte swapped machines like DECstations.

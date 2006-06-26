@@ -1,0 +1,93 @@
+ 
+COMPILING A PROGRAM
+                  
+Following are instructions for compiling an application program on the 
+window NT and window 95/98, using the hdfeos binaries that we provide or 
+you build.
+
+Make sure that you already had all following libraries before you start
+to compile an application program:  libjpeg.lib, zlib.lib, szlib.lib, 
+hd420.lib, hm420.lib, hdfeos.lib, gctp.lib.
+
+NOTE: The current versions that we're using: jpeg6b, zlib1.1.3
+szip1.2, HDF4.2r0, HDFEOS2.13.
+If you want to use the latest versions of jpeg, zlib and szlib, 
+go to ncsa website (ftp://ftp.ncsa.uiuc.edu/HDF/lib-external)
+to download.
+
+C or Fortran program :
+-------------
+Using Microsoft Visual C++ version 5.x or later version for C program:
+Using Digitalt Visual Fortran version 5.x or later version for 
+
+For example, you want to run the hdfeos testdrivers:
+Go to /hdfeos/testdrivers/
+Open a testdriver (for example /swath/testswath.c) by clicking it.
+Select Build->"compile testswath.c" to invoke it into 
+a workspace.
+
+Select Build->Set Active Configuration->testswath-Win32Release->OK
+
+
+Select Tools->Options->Directories->"Show directories for"->
+"Include files", add the following directories:
+	F:\Program Files\ArrayVisualizer\INCLUDE
+        F:\Program Files\Microsoft Visual Studio\VC98\MFC\Include                   
+        F:\Program Files\Microsoft Visual Studio\VC98\INCLUDE
+	C:<path to jpeg>\jpeg  
+	C:<path to zlib>\include
+	C:<path to szlib>\include      
+        C:<path to HDF>\include 
+        C:<path to HDFEOS>\include 
+	C:<path to HDFEOS>\gctp\include
+
+Select Tools->Options->Directories->"Show directories for"->
+"Libraries files", add the following directories:
+	C:\Program Files\ArrayVisualizer\LIB
+        C:\Program Files\Microsoft Visual Studio\VC98\LIB
+        C:\Program Files\Microsoft Visual Studio\VC98\MFC\LIB
+	C:<path to jpeg lib>\jpeg  
+	C:<path to zlib>\lib
+	C:<path to szlib>\lib
+	C:<path to HDF>\lib
+	C:<path to HDFEOS>\lib\nt_98
+
+Select Project->Settings, select forder, C/C++
+   Add the following to "Preprocessor definitions": 
+   VISUAL_CPLUSPLUS, INTEL86
+The following were already there:   WIN32,_CONSOLE
+
+Select Project->Settings, select folder, Link:
+  
+   Add the following libraries to the beginning of the list of
+   Object/Library Modules:
+   
+   Swath & Point:
+   ==============
+      ws2_32.lib hdfeos.lib hd420.lib hm420.lib libjpeg.lib zlib.lib szlib.lib
+
+   Grid
+   ====
+      ws2_32.lib hdfeos.lib gctp.lib hd420.lib hm420.lib libjpeg.lib zlib.lib szlib.lib
+
+   The following libraries may (or may not) need to be included: 
+       kernel32.lib user32.lib gdi32.lib winspool.lib comdig32.lib
+       advapi32lib shell32.lib ole32.lib oleaut32.lib uuid.lib
+       odbc32.lib odbccp32.lib
+
+NOTE: hdfeos.lib and gctp.lib are Release Version.
+      hdfeosd.lib is Debug version.
+
+Select Build and "Build testswath.exe"
+
+To run the executable file, for example, testswath.exe
+
+Open MS-Dos, go to ../testdrivers/swath/release and run testswath.exe to get the output. 
+
+NOTE: Before running testpoint.exe, you should copy all ".txt" files to release
+      folder.
+
+NOTE: Deal to the Fortran problem with HDF on windows, HDFEOS fortran testdrivers doesn't 
+      support the windows.  C is good.
+
+

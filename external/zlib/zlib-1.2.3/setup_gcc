@@ -1,0 +1,5 @@
+./configure
+make
+mkdir lib include
+mv libz.a lib
+mv *.h include

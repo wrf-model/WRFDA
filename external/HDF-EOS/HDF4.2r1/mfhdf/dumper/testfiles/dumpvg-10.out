@@ -1,0 +1,71 @@
+#############################
+Expected output for './hdp dumpvg -h -c Dim0.0,Var0.0 tdata.hdf'
+#############################
+File name: tdata.hdf 
+
+
+Vgroup:0
+     tag = 1965; reference = 28;
+     name = nsamp; class = Dim0.0;
+     number of entries = 1;
+   number of attributes = 0 
+
+
+Vgroup:1
+     tag = 1965; reference = 30;
+     name = bands; class = Dim0.0;
+     number of entries = 1;
+   number of attributes = 0 
+
+
+Vgroup:3
+     tag = 1965; reference = 34;
+     name = a; class = Var0.0;
+     number of entries = 7;
+   number of attributes = 0 
+
+
+Vgroup:4
+     tag = 1965; reference = 36;
+     name = b; class = Var0.0;
+     number of entries = 6;
+   number of attributes = 0 
+
+
+Vgroup:5
+     tag = 1965; reference = 38;
+     name = c; class = Var0.0;
+     number of entries = 5;
+   number of attributes = 0 
+
+
+Graphical representation of the file:-
+(vg#: vgroup;   vd: vdata)
+
+   vg0 	-- vd  
+
+   vg1 	-- vd  
+
+   vg2 	-- vd  
+
+   vg3 	-- vg2 	-- vd  
+	-- vg0 	-- vd  
+	-- vg1 	-- vd  
+	-- Scientific Data  
+	-- Number type  
+	-- SciData dimension record  
+	-- Numeric Data Group  
+
+   vg4 	-- vg2 	-- vd  
+	-- vg1 	-- vd  
+	-- Scientific Data  
+	-- Number type  
+	-- SciData dimension record  
+	-- Numeric Data Group  
+
+   vg5 	-- vg2 	-- vd  
+	-- Scientific Data  
+	-- Number type  
+	-- SciData dimension record  
+	-- Numeric Data Group  
+

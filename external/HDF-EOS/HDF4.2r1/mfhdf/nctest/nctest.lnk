@@ -1,0 +1,5 @@
+driver vartests cdftests dimtests atttests misctest
+nctest /noi
+nctest
+nctest.lib ..\libsrc\netcdf.lib ..\xdr\xdr.lib  \hdf\hdf\lib\df.lib /NOD:llibce llibcewq libw
+nctest

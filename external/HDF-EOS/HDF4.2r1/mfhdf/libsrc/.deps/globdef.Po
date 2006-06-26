@@ -1,0 +1,8 @@
+globdef.o globdef.o: globdef.c netcdf.h ../../hdf/src/hlimits.h \
+  hdf2netcdf.h
+
+netcdf.h:
+
+../../hdf/src/hlimits.h:
+
+hdf2netcdf.h:

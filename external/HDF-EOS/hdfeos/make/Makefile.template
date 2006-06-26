@@ -1,0 +1,63 @@
+## Template Makefile. See instructions in Makefile.instr ##
+ 
+CSCI    =   hdfeos
+ 
+include $(SUBSYSTOP)/make/make.options
+ 
+ 
+##############CUSTOM DEFINITIONS ########################################
+ 
+ 
+##############END OF CUSTOM DEFINITIONS##################################
+ 
+CXXSRCFILES     =
+ 
+CSRCFILES       = EHapi.c SWapi.c GDapi.c PTapi.c
+ 
+HFILES          = HdfEosDef.h cfortHdf.h
+ 
+OBJFILES        = EHapi.o SWapi.o GDapi.o PTapi.o
+ 
+LIBFILES        = $(LIBDIR)/libhdfeos.a
+ 
+BINFILES        =
+ 
+ 
+all: libhdfeos.a
+
+libhdfeos.a:	EHapi.o SWapi.o GDapi.o PTapi.c
+	${AR} $@ $?
+
+EHapi.o	: EHapi.c
+	${CC} ${INCLUDE} -c Ehapi.c -o EHapi.o
+
+SWapi.o	: SWapi.c
+	${CC} ${INCLUDE} -c SWapi0.c -o SWapi.o
+	rm SWapi0.c
+
+GDapi.o	: GDapi.c
+	${CC} ${INCLUDE} -c GDapi0.c -o GDapi.o
+	rm GDapi0.c
+
+PTapi.o : PTapi.c
+	${CC} ${INCLUDE} -c PTapi0.c -o PTapi.o
+ 
+ 
+ 
+##############End of build target definitions############################
+ 
+ 
+CLEANFILES      = $(OBJFILES) $(LIBFILES) $(BINFILES)
+ 
+INSHFILES       = $(HFILES)
+ 
+INSLIBFILES     = $(LIBFILES)
+ 
+INSBINFILES     =
+ 
+LABELFILES      = $(LIBFILES)
+ 
+TESTSUBDIRS     = test
+ 
+include $(SUBSYSTOP)/make/make.targets
+

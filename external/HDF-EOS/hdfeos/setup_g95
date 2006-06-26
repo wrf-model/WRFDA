@@ -1,0 +1,10 @@
+#!/bin/sh
+
+make clean
+
+export FC=g95
+export F77=g95
+export F90=g95
+export CC=gcc
+
+./bin/INSTALL-HDFEOS

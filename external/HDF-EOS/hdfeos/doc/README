@@ -1,0 +1,482 @@
+
+
+Copyright (C) 1996 Hughes and Applied Research Corporation
+
+Permission to use, modify, and distribute this software and its documentation 
+for any purpose without fee is hereby granted, provided that the above 
+copyright notice appear in all copies and that both that copyright notice and 
+this permission notice appear in supporting documentation.
+
+#-----------------------------------------------------------------------------
+# filename:	
+# 	README
+# 	
+# description:
+#       Installation instructions for HDFEOS
+# 	
+# author:
+#	Mike Sucher / Applied Research Corp.
+# 	
+# history:
+#       18-Jun-1996 MES Initial version
+#	10-Apr-1997 DaW Updated for Release B0
+#	29-Oct-1997 DaW Updated for Release 2.1
+#	23-Mar-1998 MEDS Updated for Release 2.2
+#	16-Jun-1998 MEDS Updated for Release 2.3
+#	27-Aug-1998 MEDS Updated for Release 2.4
+#	30-Oct-2002 Phuong Nguyen - Updated for Release 2.8
+#-----------------------------------------------------------------------------
+
+Contents
+========
+
+
+    Installation Instructions
+
+        Preliminary
+
+        Unpacking the distribution file
+
+        Starting the installation procedure
+
+        User Account Setup
+
+        File Cleanup
+
+        Compiling and Linking with HDFEOS
+
+
+    Notes
+
+        Approved platforms
+
+        Architecture type names
+
+        Directory and file environment variables
+
+        Other environment variables
+
+        Copyright notice for cfortran.h
+
+
+
+
+
+Installation Instructions
+=========================
+
+    Preliminary
+    -----------
+
+    Before installing HDFEOS, you must already have installed NCSA HDF,
+    version 4.1 release 5, on your host.  The installation script will prompt
+    for the paths to the HDF include and library directories.
+
+
+    Unpacking the distribution file
+    -------------------------------
+
+    1)  Select a location for the HDFEOS directory tree.  Installing
+        HDFEOS alone requires a disk partition with at least 25 Mb  
+        of free space.  
+
+    2)  Copy the file HDF-EOS2.8v1.00.tar.Z to the target directory by  
+        typing the command:
+    
+    	    cp HDF-EOS2.8v1.00.tar.Z <target-dir>
+    
+        where <target-dir> is the full pathname of your target directory.
+         
+    3)  Set your default directory to the target directory by typing 
+        the command:
+    
+            cd <target-dir>
+    
+    4)  Uncompress this file and extract the contents by typing the command:
+    
+    	    zcat HDF-EOS2.8v1.00.tar.Z | tar xvf -
+
+        This will create a subdirectory of the current directory 
+        called 'hdfeos'.  This is the top-level HDFEOS directory,  
+        which contains the full HDFEOS directory structure.
+
+
+    Starting the installation procedure
+    -----------------------------------
+
+    1)  Set your default directory to the top-level HDFEOS directory by  
+        typing the command:
+    
+            cd hdfeos
+
+    2) Select installation options.
+    
+       Currently, the only options are those specific to the SGI Power 
+       Challenge platform.
+ 
+       On the SGI Power Challenge, the default is to build HDFEOS in
+       64-bit mode.  The following table gives the option
+       to specify the appropriate architecture to be built:
+
+            binary format	architecture	<install-options>
+            -------------	------------	---------------
+            old-style 32 bit	sgi		-sgi
+            new-style 32 bit    sgi32		-sgi32
+            64 bit         	sgi64		<default>
+
+	Please note that the old-32-bit mode has been dropped as the default 
+	because it is no longer being supported by SGI, it is therefore 
+	recommended that all users migrate to new-style 32 bit or 64 bit mode.
+
+    3)  Run the installation script. 
+
+        Please note that the installation script for this release of  
+        HDFEOS requires user interaction.  Because of this, it should NOT 
+        be run as a background task.  
+        
+        3.0) (optional)
+            If you wish to generate a log of this session, use the Unix 
+            'script' command.  This command runs a sub-shell that saves 
+            all terminal output to the specified file.  
+            
+            To log the session, type:
+        
+              script <logfile-name>
+
+            where <logfile-name> is the name of the log file.
+
+        3.1) 
+           To run the installation script, type the command:
+    
+             bin/INSTALL-HDFEOS <install-options>
+    
+           where <install-options> is the list of options determined in
+           the previous step.
+
+           The installation script will then run.  It will output various
+           startup messages, beginning with:
+
+             HDFEOS installation starting at <date/time>
+
+        3.2) 
+           Enter the full pathnames for the HDF4.1 library and include  
+           directory paths, when the script prompts for them.  If there
+           is an error in the supplied paths, the script will exit.
+        
+          NOTE:
+            If the environment variables HDFLIB and/or HDFINC are set
+            in your shell, the script will use these for the default values.
+            If this is not the first run of the script, the default values
+            will be taken from the values used for the last run of the script.
+        
+            In either of these cases, the installation script will prompt with:
+        
+              Current value of the HDF library directory is: <path>
+              Accept [y]/n:  
+
+            and/or
+
+              Current value of the HDF include directory is: <path>
+              Accept [y]/n:  
+
+            Make sure to type 'n' and hit return, if the defaults do not 
+            point to the correct directories.  The script will then prompt 
+            for the new values.
+        
+
+         3.3) 
+            The installation script will finish with the following message:
+    
+              HDFEOS installation ending at <date/time>
+
+         3.4) (optional - see 3.0) 
+            If you ran the Unix 'script' command to create a log file, then
+            type 'exit' and hit return at the command prompt.  This will 
+            exit the sub-shell stated by 'script' and save the log file.
+        
+            HINT:
+              The log file generated by the script command may contain 'hard
+              return' characters at the end of each line.  These appear in
+              some text editors as "^M".   They can be removed with the 
+              following command:
+          
+                sed 's/.$//' <logfile-name> > <logfile-name>.new
+            
+              where <logfile-name> is the name of the log file.
+
+
+
+    User Account Setup
+    ------------------
+
+    Once HDFEOS has been installed, the accounts of HDFEOS users
+    must be set up to define environment variables needed to compile and
+    run code with HDFEOS (see parts 2 and 3 of the Notes section, below).
+    The type of setup depends on the user's login shell.
+    
+    1A) C shell (csh) users:
+
+        Edit the HDFEOS user's .cshrc file to include the
+        following line:
+
+ 	    source <HDFEOS-home-dir>/bin/$BRAND/hdfeos_env.csh  
+	
+ 	where <HDFEOS-home-dir> is the full path of the HDFEOS home 
+        directory, and $BRAND is an architecture-specific value for 
+        your host.  Please refer to part 2 of the Notes section, 
+        below, to determine the correct value.
+
+        The script hdfeos_env.csh sets up all the variables discussed in 
+        parts 2 and 3 of the Notes section, below, and it adds the HDFEOS 
+        bin directory to the user path. 
+
+        The environment variables will become available during all 
+        subsequent login sessions.  To activate them for the current 
+        session, simply type one of the two lines listed above, at the
+        Unix prompt.
+
+        Note regarding path setup with hdfeos_env.csh
+        ----------------------------------------------
+            The script hdfeos_env.csh also makes available a variable
+            called hdfeos_path.  This can be added to the user's path to
+            ensure that it accesses the directories necessary for the
+            compilers and other utilities used to generate executable
+            programs.  It is not added to the user path by default,
+            because in many cases it adds unnecessary complexity to
+            the user path.  To add hdfeos_path to the user path, modify
+            the HDFEOS user's .cshrc file to include the following:
+
+                set my_path = ($path)			# save path
+                source <HDFEOS-HOME-DIR>/bin/$BRAND/hdfeos_env.csh # HDFEOS setup
+                set path = ($my_path $hdfeos_path)	# add hdfeos_path 
+
+            INSTEAD OF the line listed at the beginning of this step.  
+            Note that it is the user's responsibility to set up 
+            his or her own path so that it doesn't duplicate the 
+            directories set up in hdfeos_path.  Please also note that the 
+            hdfeos_path is added AFTER the user's path.  This way, the 
+            user's directories will be searched first when running Unix 
+            commands.
+
+    1B) Korn shell (ksh) users:
+
+        Edit the HDFEOS user's .profile file to include the following line:
+
+ 	    . <HDFEOS-home-dir>/bin/$BRAND/hdfeos_env.ksh  
+	
+ 	where <HDFEOS-home-dir> is the full path of the HDFEOS home 
+        directory, and $BRAND is an architecture-specific value for 
+        your host.  Please refer to part 2 of the Notes section, 
+        below, to determine the correct value.
+
+        The script hdfeos_env.ksh sets up all the variables discussed in 
+        part 2 and 3 of the Notes section, below, and it adds the HDFEOS 
+        bin directory to the user path. 
+
+        The environment variables will become available during all 
+        subsequent login sessions.  To activate them for the current 
+        session, simply type one of the two lines listed above, at the
+        Unix prompt.
+
+        Note regarding path setup with hdfeos_env.ksh
+        ----------------------------------------------
+            The script hdfeos_env.ksh also makes available a variable
+            called hdfeos_path.  This can be added to the user's path to
+            ensure that it accesses the directories necessary for the
+            compilers and other utilities used to generate executable
+            programs.  It is not added to the user path by default,
+            because in many cases it adds unnecessary complexity to
+            the user path.  To add hdfeos_path to the user path, modify
+            the HDFEOS user's .profile file to include the following:
+
+                my_path="$PATH"				    # save path
+                . <HDFEOS-HOME-DIR>/bin/$BRAND/hdfeos_env.ksh # HDFEOS setup
+                PATH="$my_path:$hdfeos_path" ; export PATH     # add hdfeos_path 
+
+            INSTEAD OF the line listed at the beginning of this step.  
+            Note that it is the user's responsibility to set up 
+            his or her own path so that it doesn't duplicate the 
+            directories set up in hdfeos_path.  Please also note that the 
+            hdfeos_path is added AFTER the user's path.  This way, the 
+            user's directories will be searched first when running Unix 
+            commands.
+
+    1C) Bourne shell (sh) users:
+
+        Set up the required HDFEOS environment variables by appending  
+        the contents of the file <HDFEOS-home-dir>/bin/$BRAND/hdfeos_env.ksh 
+        to the end of the HDFEOS user's .profile, where <HDFEOS-home-dir> 
+        is the full path of the HDFEOS home directory, and $BRAND is an 
+        architecture-specific value for your host.  Please refer to part
+        2 of the Notes section, below, to determine the correct value.
+
+        The environment variables will become available during all 
+        subsequent login sessions.  To activate them, log out and
+        then log back in.
+    
+
+    File Cleanup
+    ------------
+
+    Once HDFEOS has been built and tested, you can delete certain 
+    temporary files and directories to save some disk space.   Note 
+    that once these files have been removed, you will need to unpack 
+    the original distribution file in order to re-do the installation.
+
+    To remove these files:
+    
+        cd <HDFEOS-home-dir>/bin
+        rm -rf tmp
+        cd <HDFEOS-home-dir>/lib
+        rm -rf tmp
+ 
+
+
+    Compiling and Linking with HDFEOS
+    ---------------------------------
+    
+    In order to compile and link programs with the HDFEOS you must
+    access the HDFEOS include and library files.   To do this be
+    sure that your makefiles include something like the following:
+
+
+    INCLUDE = -I. -I$(HDFEOS_INC) -I$(HDFINC)
+    LIBRARY = -L. -L$(HDFEOS_LIB) -L$(HDFLIB)
+
+
+    LDFLAGS = -lhdfeos -lGctp -lmfhdf -ldf -ljpeg -lnsl -lz -lm (Sun platform)
+    LDFLAGS = -lhdfeos -lGctp -lmfhdf -ldf -ljpeg -lz -lm	(others)
+
+
+    The environment variables HDFEOS_INC, HDFEOS_LIB, HDFINC and HDFLIB
+    are set up by the HDFEOS environment scripts (see User Setup, above).
+    They refer to the include and library directories for HDFEOS and HDF,
+    respectively.
+    
+    The INCLUDE macro should be included in all compilation statements.
+    The LIBRARY an LDFLAGS macros should be included in all link statements.
+
+
+
+Notes
+=====
+
+    1)  Approved platforms
+
+        HDFEOS was built and tested in a multi-platform environment.
+        The list of approved platforms, which includes information about 
+        operating system and compiler versions, may be found in the
+        HDFEOS User's Guide.
+
+
+    2)  Architecture type names
+
+        To track architecture dependencies, HDFEOS defines the 
+        environment variable $BRAND.  Following is a list of valid values 
+        for this variable, which is referred to throughout this document:
+
+        $BRAND	Architecture
+        ======	============
+
+        dec 	   DEC Alpha
+        hp 	   HP 9000
+        ibm 	   IBM RS-6000
+	sgi	   IRIX 5.3;6.2
+        sgi 	   SGI Power Challenge (old-style 32-bit mode)
+        sgi32 	   SGI Power Challenge (new-style 32-bit mode)
+        sgi64 	   SGI Power Challenge (64-bit mode)
+        sun4 	   Sun: SunOS 4.x
+        sun5 	   Sun: SunOS 5.x
+        linux      Linux: Red Hat 7.0
+	linux64    SuSE Linux (Opteron): 2.4.19-SMP
+	IA64       Linux: 2.4.21-sgi240rp04032500_10054
+	Macintosh  Darwin6.8
+	Windows    98/NT: Microsoft Visual C++ 6.0
+
+    3)  Directory and file environment variables
+
+        In order to use the HDFEOS libraries and utilities, a number of
+        environment variables MUST be set up to point to HDFEOS directories
+        and files.  These variables are automatically set up in User Account 
+        Setup section of the installation instructions.  They are 
+        listed here for reference:
+
+	name			value			   description
+	====			=====			   ===========
+
+	HDFEOS_HOME 		<install-path>/hdfeos	   top-level directory
+
+	(where <install-path> is the absolute directory path above hdfeos)
+
+	HDFEOS_BIN 		$HDFEOS_HOME/bin/$BRAND	  executable files
+	HDFEOS_INC 		$HDFEOS_HOME/include      header files
+	HDFEOS_LIB 		$HDFEOS_HOME/lib/$BRAND   library files
+	HDFEOS_OBJ 		$HDFEOS_HOME/obj/$BRAND   object files
+	HDFEOS_SRC 		$HDFEOS_HOME/src          source files
+
+
+    4)  Other environment variables
+
+        In addition, the makefiles which are used to build the libraries
+        require certain machine-specific environment variables.  These set
+        compilers, compilation flags and libraries, allowing a single set of
+        makefiles to serve on multiple platforms.  The User Account Setup 
+        section of the installation instructions explains how to set them up.  
+        They are listed here for reference:
+       
+	name			description
+	====	 		===========
+
+	CC 			C compiler
+	CFLAGS 			default C flags (optimize, ANSI)
+	C_CFH 			C w/ cfortran.h callable from FORTRAN
+	CFHFLAGS 		CFLAGS + C_CFH
+	C_F77_CFH 		C w/ cfortran.h calling FORTRAN
+	C_F77_LIB 		FORTRAN lib called by C main
+	F77 			FORTRAN compiler
+	F77FLAGS		common FORTRAN flags
+	F77_CFH			FORTRAN callable from C w/ cfortran.h
+	F77_C_CFH 	 	FORTRAN calling C w/ cfortran.h
+	CFH_F77 		same as F77_C_CFH
+	F77_C_LIB  		C lib called by FORTRAN main
+
+	
+    5)  Tools provided with this release
+
+        For a complete list of the tools provided with this release of 
+        HDFEOS, please refer to HDFEOS User's Guide.
+
+    6)  Copyright notice for cfortran.h
+
+        The majority of the HDFEOS functions are written in C.
+        These C-based tools include the file cfortran.h, using it to 
+        generate machine-independent FORTRAN bindings. The cfortran.h 
+        facility includes the following notice which must accompany
+        distributions that use it:
+
+THIS PACKAGE, I.E. CFORTRAN.H, THIS DOCUMENT, AND THE CFORTRAN.H EXAMPLE
+PROGRAMS ARE PROPERTY OF THE AUTHOR WHO RESERVES ALL RIGHTS. THIS PACKAGE AND
+THE CODE IT PRODUCES MAY BE FREELY DISTRIBUTED WITHOUT FEES, SUBJECT TO THE
+FOLLOWING RESTRICTIONS:
+- YOU MUST ACCOMPANY ANY COPIES OR DISTRIBUTION WITH THIS (UNALTERED) NOTICE.
+- YOU MAY NOT RECEIVE MONEY FOR THE DISTRIBUTION OR FOR ITS MEDIA 
+  (E.G. TAPE, DISK, COMPUTER, PAPER.)
+- YOU MAY NOT PREVENT OTHERS FROM COPYING IT FREELY.
+- YOU MAY NOT DISTRIBUTE MODIFIED VERSIONS WITHOUT CLEARLY DOCUMENTING YOUR
+  CHANGES AND NOTIFYING THE AUTHOR.
+- YOU MAY NOT MISREPRESENTED THE ORIGIN OF THIS SOFTWARE, EITHER BY EXPLICIT
+  CLAIM OR BY OMISSION.
+
+THE INTENT OF THE ABOVE TERMS IS TO ENSURE THAT THE CFORTRAN.H PACKAGE NOT BE
+USED FOR PROFIT MAKING ACTIVITIES UNLESS SOME ROYALTY ARRANGEMENT IS ENTERED
+INTO WITH ITS AUTHOR.
+              
+THIS SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+EXPRESSED OR IMPLIED. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
+SOFTWARE IS WITH YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST
+OF ALL NECESSARY SERVICING, REPAIR OR CORRECTION. THE AUTHOR IS NOT RESPONSIBLE
+FOR ANY SUPPORT OR SERVICE OF THE CFORTRAN.H PACKAGE.
+
+                                              Burkhard Burow 
+                                              burow@vxdesy.cern.ch
+

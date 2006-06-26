@@ -1,0 +1,1 @@
+uddummy.o uddummy.o: uddummy.c

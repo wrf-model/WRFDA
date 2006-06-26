@@ -1,0 +1,166 @@
+#! /bin/sh
+##
+## Copyright by the Board of Trustees of the University of Illinois.
+## All rights reserved.
+##
+
+## Update HDF4 compiler tools after the HDF4 software has been installed
+## in a new location.
+## For help page, use "h5redeploy -help"
+
+# Function definitions
+
+# show help page
+usage() {
+  # A wonderfully informative "usage" message.
+  echo "usage: $prog_name [OPTIONS]"
+  echo "  OPTIONS:"
+  echo "    -help|help   This help message"
+  echo "    -echo        Show all the shell commands executed"
+  echo "    -force       No prompt, just do it"
+  echo "    -prefix=DIR  New directory to find HDF4 lib/ and include/"
+  echo "                   subdirectories [default: current directory]"
+  echo "    -tool=TOOL   Tool to update. TOOL must be in the current"
+  echo "                   directory and writable. [default: $h4tools]"
+  echo "    -show        Show the commands without executing them"
+  echo " "
+  exit 1
+}
+
+# display variable values
+dump_vars(){
+    echo "====Showing all variable values====="
+    echo prefix=$prefix
+    echo h4tools=$h4tools
+    echo "====End Showing====="
+}
+
+# show actions to be taken
+show_action()
+{
+    echo "Update the following tools because they are now installed at a new directory"
+    for t in $foundtools; do
+	echo "${t}:"
+	echo "   current setting=`sed -e '/^prefix=/s/prefix=//p' -e d $t`"
+	echo "   new     setting="\""$prefix"\"
+    done
+}
+
+
+# Report Error message
+ERROR()
+{
+    echo "***ERROR***"
+    echo "$1"
+}
+
+# Main
+#
+# Initialization
+h4tools="h4cc h4fc"	# possible hdf4 tools
+foundtools=		# tools found and will be modified
+fmode=			# force mode, default is off
+prefix=`(cd ..;pwd)`
+
+# Parse options
+for arg in $@ ; do
+  case "$arg" in
+    -prefix=*)
+      prefix="`expr "$arg" : '-prefix=\(.*\)'`"
+      ;;
+    -echo)
+      set -x
+      ;;
+    -show)
+      SHOW="echo"
+      ;;
+    -tool=*)
+      h4tools="`expr "$arg" : '-tool=\(.*\)'`"
+      ;;
+    -help|help)
+      usage
+      ;;
+    -force)
+      fmode=yes
+      ;;
+    *)
+      ERROR "Unknown Option($arg)"
+      usage
+      exit 1
+      ;;
+  esac
+done
+
+# Sanity checks
+if [ ! -d $prefix ]; then
+    ERROR "prefix($prefix) is not an existing directory"
+    exit 1
+fi
+
+for x in $h4tools; do
+    if [ -f $x ]; then
+	foundtools="$foundtools $x"
+	if [ ! -w $x ]; then
+	    ERROR "h5tool($x) is not writable"
+	    exit 1
+	fi
+    fi
+done
+
+if [ -z "$foundtools" ]; then
+    ERROR "found no tools to modify"
+    exit 1
+fi
+
+# Show actions to be taken and get consent
+show_action
+# Ask confirmation unless fmode is on
+if [ x-$fmode = x- ]; then
+    echo "Continue? (yes/no)"
+    read ansx
+    ans=`echo $ansx | tr "[A-Z]" "[a-z]"`
+    if [ x-$ans != x-yes ]; then
+	echo ABORT.  No tools changed.
+	exit 1
+    fi
+fi
+
+
+# Create the update commands
+CMDFILE=/tmp/h5redeploy.$$
+touch $CMDFILE
+chmod 0600 $CMDFILE
+echo "/^prefix/c"                 >> $CMDFILE
+echo prefix=\""$prefix"\"         >> $CMDFILE
+echo .                            >> $CMDFILE
+(echo w; echo q)                  >> $CMDFILE
+
+
+# Update them
+if [ "$SHOW" = "echo" ]; then
+    echo "===Update commands are:===="
+    cat $CMDFILE
+    echo "===End Update commands====="
+fi
+
+for t in $foundtools; do
+    echo Update $t ...
+    COMMAND="ed - $t"
+    if [ "$SHOW" = "echo" ]; then
+	echo $COMMAND
+    else
+	$COMMAND < $CMDFILE
+    fi
+done
+
+
+# Cleanup
+rm -f $CMDFILE
+exit 0
+
+# Some possible future features to add
+# CCBASE - Name of the alternative C compiler
+# CLINKERBASE - Name of the alternative linker
+# LDFLAGS   - Path to different libraries your application will link with
+#     (this path should include the path to the zlib library)
+# LIBS      - Libraries your application will link with

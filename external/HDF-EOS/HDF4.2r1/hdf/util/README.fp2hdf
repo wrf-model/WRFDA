@@ -1,0 +1,19 @@
+
+This revision of fptohdf, which we are calling fp2hdf,  supports native
+mode floating point (both single and double precision), and 3D floating 
+point data sets.
+
+For these additions we owe our thanks to Bob Weaver and colleagues
+at INEL.
+
+You should be able to compile fp2hdf, as well as the two programs
+for generating test data, by executing "make".  Note: you will
+need to change some of the definitions in the makefile to conform
+to your system.
+
+Except for Makefile, fp2hdf.c, and this README file, all of the
+files in this directory are for testing fp2hdf and illustrating
+its use.
+
+Mike Folk
+

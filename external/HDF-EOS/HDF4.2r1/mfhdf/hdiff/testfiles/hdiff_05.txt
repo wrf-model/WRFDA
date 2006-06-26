@@ -1,0 +1,18 @@
+#############################
+Expected output for 'hdiff -D hdifftst1.hdf hdifftst2.hdf'
+#############################
+
+---------------------------
+Vdata Name: vdata1 (Data record comparison)
+> 0: V
+< 0: X
+
+---------------------------
+Vdata Name: vdata2 (Data record comparison)
+> 0: 1 2 3 4 
+< 0: 1 1 1 1 
+
+---------------------------
+Vdata Name: vdata3 (Data record comparison)
+> 0: 1.000000 2.000000 3.000000 4.000000 5.000000 6.000000 
+< 0: 1.000000 1.000000 1.000000 1.000000 1.000000 1.000000 

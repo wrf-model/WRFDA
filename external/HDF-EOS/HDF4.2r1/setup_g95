@@ -1,0 +1,24 @@
+#!/bin/sh
+
+make clean
+
+export FC=g95
+export F77=g95
+export F90=g95
+export CC=gcc
+
+UNAME=`uname`
+
+if test $UNAME == 'Darwin'; then
+  export LIBS=-lSystemStubs
+  cd mfhdf/fortran/config
+  cp ftest-linux.f ftest-apple.f      
+  cp jackets-linux.c jackets-apple.c
+  cp netcdf-linux.inc netcdf-apple.inc
+  cd ../../..
+fi
+
+./configure --with-jpeg=$PWD/../../jpeg/jpeg-6b \
+  --with-zlib=$PWD/../../zlib/zlib-1.2.3
+make
+make install
