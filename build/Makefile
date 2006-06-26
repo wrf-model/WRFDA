@@ -89,5 +89,6 @@ superclean : clean
           bufrlib.param *.sed registry \
           convert_tool kma_wave2grid wave2grid_kma *.csh version_decl \
           *.bsh *.csh Utl* macros_utl module_dm_warning rsl_cpp_flags \
-          scl_plotting_routines
+          scl_plotting_routines configure.wrf ../configure.wrf \
+          advance_cymdh.exe
 

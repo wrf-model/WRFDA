@@ -55,9 +55,9 @@ export DA_SSMI=${DA_SSMI:-$OB_DIR/$DA_DATE/ssmi.dat}               # SSM/I radia
 export DA_RADAR=${DA_RADAR:-$OB_DIR/$DA_DATE/radar.dat}            # Radar data (ignore if not using).
 
 # DA_FG01_DATE=$DA_DATE
-# DA_FG02_DATE=`$DA_BUILD_DIR/advance_cymdh $DA_FG01 1`
-# DA_FG03_DATE=`$DA_BUILD_DIR/advance_cymdh $DA_FG01 2`
-# DA_FG04_DATE=`$DA_BUILD_DIR/advance_cymdh $DA_FG01 3`
+# DA_FG02_DATE=`$DA_BUILD_DIR/advance_cymdh.exe $DA_FG01 1`
+# DA_FG03_DATE=`$DA_BUILD_DIR/advance_cymdh.exe $DA_FG01 2`
+# DA_FG04_DATE=`$DA_BUILD_DIR/advance_cymdh.exe $DA_FG01 3`
 # export DA_FG01=${DA_FG01:-$OB_DIR}
 
 export RTTOV=${RTTOV:-$HOME/rttov/rttov85}                            # RTTOV
@@ -85,7 +85,7 @@ export NL_START_HOUR=$DA_HH
 
 export NL_ANALYSIS_DATE=${DA_CY}-${DA_MM}-${DA_DD}_${DA_HH}:00:00.0000
 
-export DA_END_DATE=`$DA_BUILD_DIR/advance_cymdh $DA_DATE $NL_RUN_HOURS`
+export DA_END_DATE=`$DA_BUILD_DIR/advance_cymdh.exe $DA_DATE $NL_RUN_HOURS`
 
 export DA_CY=`echo $DA_END_DATE | cut -c1-4`
 export DA_MM=`echo $DA_END_DATE | cut -c5-6`
