@@ -34,7 +34,6 @@ wrf_num_bytes_between.o :
 module_state_description.f90 : registry ../Registry/$(REGISTRY)
 	./registry $(REGFLAGS) ../Registry/$(REGISTRY)
 	$(LN) inc/*.inc .
-	$(LN) $(PWD)/inc/namelist_script.inc ../main
 	$(LN) frame/module_state_description.f90 .
 
 md_calls.inc : md_calls.m4
