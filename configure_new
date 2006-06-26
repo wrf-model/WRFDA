@@ -384,7 +384,8 @@ if test -e $CONFIG ; then
       sed '/^CC .*=/s/$/ -DMPI2_SUPPORT/' $CONFIG > xx$$ ; /bin/mv xx$$ $CONFIG
     else
       echo "  " MPI_Comm_f2c and MPI_Comm_c2f are not supported
-    fi
+    fi 
+    /bin/rm -f tools/mpi2_test
   fi
 fi
 
