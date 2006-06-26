@@ -373,3 +373,9 @@ C-----------------------------------------------------------------------
  
       RETURN
       END
+
+      SUBROUTINE wrf_abort
+        STOP
+      END SUBROUTINE wrf_abort
+
+
