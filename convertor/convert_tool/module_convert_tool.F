@@ -1,6 +1,6 @@
-MODULE module_convert_tool
+MODULE da_module_convert_tool
 
-  use DA_Constants
+  use da_constants
 
   implicit none
 
@@ -9,5 +9,5 @@ CONTAINS
 #include "da_convertor_v_interp.inc"
 #include "da_ref_height.inc"
 
-END MODULE module_convert_tool
+END MODULE da_module_convert_tool
 
