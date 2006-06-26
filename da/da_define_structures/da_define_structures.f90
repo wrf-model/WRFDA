@@ -262,7 +262,8 @@ module da_define_structures
       REAL                            :: ref_p        ! Reference pressure
       REAL                  , pointer :: p        (:) ! Multi-level pressure
 
-      TYPE (field_type)     , pointer :: thickness(:) ! Thickness.
+      TYPE (field_type)     , pointer :: thickness(:)     ! Thickness.
+      TYPE (field_type)     , pointer :: org_thickness(:) ! To store original Thickness info.
    END TYPE satem_type
 
    TYPE geoamv_type

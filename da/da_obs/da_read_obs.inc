@@ -1,4 +1,4 @@
-subroutine da_read_obs (iunit, ob, xp, filename)
+SUBROUTINE da_read_obs (iunit, ob, xp, filename)
 !-----------------------------------------------------------------------------!
 !  Purpose: Read the header of a MM5 3D-VAR 2.0 GTS observation file
 !
@@ -22,8 +22,9 @@ subroutine da_read_obs (iunit, ob, xp, filename)
 !                     08/30/2005           Syed RH Rizvi
 !           Writing original errors & thicknesses
 !           desired for outputting QC obs with NTMAX = 0
+!
+!            06/23/2006  MPI update        Syed RH Rizvi
 !-----------------------------------------------------------------------------!
-
    implicit none
 
    INTEGER,           INTENT (in)   :: iunit
@@ -69,10 +70,11 @@ subroutine da_read_obs (iunit, ob, xp, filename)
                                    num_profiler, num_buoy, num_bogus
 
    INTEGER                        :: ndup, n, report
+   LOGICAL                        :: surface_sound
 
 !--------------------------------------------------------------------
 
-   if (trace_use) call da_trace_entry("da_read_obs")
+   if (trace_use) CALL da_trace_entry("da_read_obs")
 
    total_obs = ob%total_obs
    num_sound = ob%num_sound
@@ -108,7 +110,7 @@ subroutine da_read_obs (iunit, ob, xp, filename)
    IF (iost /= 0) THEN
       WRITE(UNIT=errmsg(1),FMT='(A,I5,A)') &
          "Error",iost," opening gts obs file "//TRIM(filename)
-      call wrf_warning(__FILE__,__LINE__,errmsg(1:1))
+      CALL wrf_warning(__FILE__,__LINE__,errmsg(1:1))
       RETURN
    ENDIF
 
@@ -350,7 +352,7 @@ loop_level: DO i = 1, platform%info%levels
              platform%info%lon,         &
              platform%info%elv,         &
              platform%info%id
-         call wrf_warning(__FILE__,__LINE__,errmsg(1:2))
+         CALL wrf_warning(__FILE__,__LINE__,errmsg(1:2))
 
          platform%info%levels = nlevels
       else if( nlevels < 1) then
@@ -360,7 +362,7 @@ loop_level: DO i = 1, platform%info%levels
          endif
       endif
 
-      call da_obs_proc_station(platform)
+      CALL da_obs_proc_station(platform)
 
       nlevels = platform%info%levels
 !    Loop over duplicating obs for global
@@ -623,14 +625,16 @@ loop_level: DO i = 1, platform%info%levels
 
          allocate (ob%satem(num_satem)%p        (1:nlevels))
          allocate (ob%satem(num_satem)%thickness(1:nlevels))
+         allocate (ob%satem(num_satem)%org_thickness(1:nlevels))
 
          ob%satem(num_satem)%p(1) = platform%each(1)%p%inv
          ob%satem(num_satem)%thickness(1) = platform%each(1)%t
 !  write original thickness errors for filtered obs
+         if( analysis_type(1:6) == "QC-OBS" .or. analysis_type(1:6) == "qc-obs" ) then
          do i = 1, nlevels
-         if(NTMAX == 0) write(thickness_errors_unit,'(i8,2x,i8,2f12.3)') &
-              num_satem,i,platform%each(i)%t%inv,platform%each(i)%t%error 
+         ob%satem(num_satem)%org_thickness(i) = platform%each(i)%t
          end do 
+         endif
 
 !        Splitting the reported Satem data into smaller layers.
 
@@ -945,7 +949,7 @@ loop_level: DO i = 1, platform%info%levels
          if( num_bogus > max_bogus_input) then
            write(UNIT=errmsg(1),FMT='(A,I6,A,I6)') &
              'Bogus #=', num_bogus, ' > max_bogus_input=', max_bogus_input
-           call wrf_error(__FILE__,__LINE__,errmsg(1))
+           CALL wrf_error(__FILE__,__LINE__,errmsg(1))
          endif
 
          ob%bogus(num_bogus)%info = platform%info
@@ -1016,7 +1020,7 @@ loop_level: DO i = 1, platform%info%levels
                'platform%info%platform=', platform%info%platform
             write(unit=errmsg(3), fmt='(a, i3)') &
                'platform%info%levels=', platform%info%levels
-            call wrf_warning(__FILE__,__LINE__,errmsg(1:3))
+            CALL wrf_warning(__FILE__,__LINE__,errmsg(1:3))
 
       END SELECT
 
@@ -1154,7 +1158,7 @@ loop_level: DO i = 1, platform%info%levels
            'ob%ob_numb(ob%current_ob_time)%profiler=', ob%ob_numb(ob%current_ob_time)%profiler, &
            'ob%num_profiler=', ob%num_profiler
 
-      call wrf_error(__FILE__,__LINE__,"Obs mismatch")
+      CALL wrf_error(__FILE__,__LINE__,"Obs mismatch")
    endif
 
 !  if((ob%ob_numb(ob%current_ob_time)%ssmi_tb        /= ob%num_ssmi_tb) .or. &
@@ -1167,6 +1171,6 @@ loop_level: DO i = 1, platform%info%levels
 !     stop 'Obs mismatch.'
 !  endif
 
-   IF (trace_use) call da_trace_exit("da_read_obs")
+   IF (trace_use) CALL da_trace_exit("da_read_obs")
 
-end subroutine da_read_obs
+END SUBROUTINE da_read_obs

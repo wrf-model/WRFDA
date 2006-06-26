@@ -52,5 +52,10 @@ CONTAINS
 #include "da_scan_bufr_obs.inc"
 #include "da_count_filtered_obs.inc"
 #include "da_deallocate_obs.inc"
+#include "da_final_write_obs.inc"
+#include "da_final_write_y.inc"
+#include "da_read_fort47.inc"
+#include "da_read_fort50.inc"
+#include "da_write_noise_to_ob.inc"
 
 end module da_obs

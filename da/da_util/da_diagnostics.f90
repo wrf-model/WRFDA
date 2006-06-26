@@ -47,21 +47,21 @@ program da_diagnostics
       type (field_type)          :: v
    end type qscat_type
 
-   type geamv_type
+   type geoamv_type
       type (info_type)           :: info
       real                       :: height
       type (field_type)          :: u
       type (field_type)          :: v
-   end type geamv_type
+   end type geoamv_type
 
-   type poamv_type
+   type polaramv_type
       type (info_type)           :: info
       character*2                :: channel 
       character*1                :: landmask
       real                       :: pressure
       type (field_type)          :: u
       type (field_type)          :: v
-   end type poamv_type
+   end type polaramv_type
    
    type gpspw_type
       type (info_type)           :: info
@@ -125,15 +125,15 @@ program da_diagnostics
 
    type ob_type
       integer                    :: num_synop, num_metar, num_ships, &
-                                    num_poamv, num_qscat, num_geamv, num_gpspw, num_sound, &
+                                    num_polaramv, num_qscat, num_geoamv, num_gpspw, num_sound, &
                                     num_airep, num_pilot, num_ssmir, &
                                     num_satem, num_ssmt1, num_ssmt2
 
       type (surfc_type), pointer :: synop(:)
       type (surfc_type), pointer :: metar(:)
       type (surfc_type), pointer :: ships(:)
-      type (poamv_type), pointer :: poamv(:)
-      type (geamv_type), pointer :: geamv(:)
+      type (polaramv_type), pointer :: polaramv(:)
+      type (geoamv_type), pointer :: geoamv(:)
       type (qscat_type), pointer :: qscat(:)
       type (gpspw_type), pointer :: gpspw(:)
       type (sound_type), pointer :: sound(:)
@@ -193,15 +193,15 @@ program da_diagnostics
       write(6,*)
    end if
    
-   if ( ob % num_poamv > 0 ) then
-      call da_calc_stats( 'poamv u  ', ob % num_poamv, ob % poamv % u )
-      call da_calc_stats( 'poamv v  ', ob % num_poamv, ob % poamv % v )
+   if ( ob % num_polaramv > 0 ) then
+      call da_calc_stats( 'polaramv u  ', ob % num_polaramv, ob % polaramv % u )
+      call da_calc_stats( 'polaramv v  ', ob % num_polaramv, ob % polaramv % v )
       write(6,*)
    end if
 
-   if ( ob % num_geamv > 0 ) then
-      call da_calc_stats( 'geamv u  ', ob % num_geamv, ob % geamv % u )
-      call da_calc_stats( 'geamv v  ', ob % num_geamv, ob % geamv % v )
+   if ( ob % num_geoamv > 0 ) then
+      call da_calc_stats( 'geoamv u  ', ob % num_geoamv, ob % geoamv % u )
+      call da_calc_stats( 'geoamv v  ', ob % num_geoamv, ob % geoamv % v )
       write(6,*)
    end if
 
@@ -350,18 +350,18 @@ program da_diagnostics
 
 !  [4.4] Polar AMV O-B:
 
-   open( unit1, file = 'poamvu_omb.dat', status = 'unknown' )
-   open( unit2, file = 'poamvv_omb.dat', status = 'unknown' )
+   open( unit1, file = 'polaramvu_omb.dat', status = 'unknown' )
+   open( unit2, file = 'polaramvv_omb.dat', status = 'unknown' )
 
    current_time = 1
-   do n = 1, ob % num_poamv
-      call da_write_data( 1, current_time, ob % num_poamv, unit1, &
-                          ob % poamv(n) % info, &
-                          ob % poamv(n) % pressure, ob % poamv(n) % u )
-      call da_write_data( 1, current_time, ob % num_poamv, unit2, &
-                          ob % poamv(n) % info, &
-                          ob % poamv(n) % pressure, ob % poamv(n) % v )
-      current_time = ob % poamv(n) % info % time
+   do n = 1, ob % num_polaramv
+      call da_write_data( 1, current_time, ob % num_polaramv, unit1, &
+                          ob % polaramv(n) % info, &
+                          ob % polaramv(n) % pressure, ob % polaramv(n) % u )
+      call da_write_data( 1, current_time, ob % num_polaramv, unit2, &
+                          ob % polaramv(n) % info, &
+                          ob % polaramv(n) % pressure, ob % polaramv(n) % v )
+      current_time = ob % polaramv(n) % info % time
    end do
 
    write(unit1,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
@@ -403,7 +403,7 @@ subroutine da_count_obs( y_unit, ob )
    integer, intent(in)               :: y_unit
    type (ob_type), intent(inout)     :: ob
 
-   character*5          :: ob_name
+   character*20         :: ob_name
    integer              :: num_obs, num_times
 
 !  [1] Initialize ob numbers:
@@ -411,8 +411,8 @@ subroutine da_count_obs( y_unit, ob )
    ob % num_synop = 0
    ob % num_metar = 0
    ob % num_ships = 0
-   ob % num_poamv = 0
-   ob % num_geamv = 0
+   ob % num_polaramv = 0
+   ob % num_geoamv = 0
    ob % num_qscat = 0
    ob % num_gpspw = 0
    ob % num_sound = 0
@@ -429,42 +429,44 @@ subroutine da_count_obs( y_unit, ob )
    do       ! loop over entire input file: (ends in *end*)
       do    ! loop over particular time (ends in *****)
 
-         read(y_unit,'(a5,i8)')ob_name, num_obs
+         read(y_unit,'(a20,i8)')ob_name, num_obs
  
-         if ( trim(ob_name) == '*****' .or. trim(ob_name) == '*end*' ) exit
+!         if ( trim(ob_name)(1:5) == '*****' .or. trim(ob_name)(1:5) == '*end*' ) exit
+         if ( index( ob_name,'*****') > 0 .or. index( ob_name,'*end*') > 0 ) exit  
 
-         if ( trim(ob_name) == 'synop' ) then
+         if ( index( ob_name,'synop') > 0 ) then
             ob % num_synop = ob % num_synop + num_obs
-         else if ( trim(ob_name) == 'metar' ) then
+         else if ( index( ob_name,'metar') > 0 ) then
             ob % num_metar = ob % num_metar + num_obs
-         else if ( trim(ob_name) == 'ships' ) then
+         else if ( index( ob_name,'ships') > 0 ) then
             ob % num_ships = ob % num_ships + num_obs
-         else if ( trim(ob_name) == 'poamv' ) then
-            ob % num_poamv = ob % num_poamv + num_obs
-         else if ( trim(ob_name) == 'geamv' ) then
-            ob % num_geamv = ob % num_geamv + num_obs
-         else if ( trim(ob_name) == 'qscat' ) then
+         else if ( index( ob_name,'polaramv') > 0 ) then
+            ob % num_polaramv = ob % num_polaramv + num_obs
+         else if ( index( ob_name,'geoamv') > 0 ) then
+            ob % num_geoamv = ob % num_geoamv + num_obs
+         else if ( index( ob_name,'qscat') > 0 ) then
             ob % num_qscat = ob % num_qscat + num_obs
-         else if ( trim(ob_name) == 'gpspw' ) then
+         else if ( index( ob_name,'gpspw') > 0 ) then
             ob % num_gpspw = ob % num_gpspw + num_obs
-         else if ( trim(ob_name) == 'sound' ) then
+         else if ( index( ob_name,'sound') > 0 ) then
             ob % num_sound = ob % num_sound + num_obs
-         else if ( trim(ob_name) == 'airep' ) then
+         else if ( index( ob_name,'airep') > 0 ) then
              ob % num_airep = ob % num_airep + num_obs
-         else if ( trim(ob_name) == 'pilot' ) then
+         else if ( index( ob_name,'pilot') > 0 ) then
              ob % num_pilot = ob % num_pilot + num_obs
-         else if ( trim(ob_name) == 'ssmir' ) then
+         else if ( index( ob_name,'ssmir') > 0 ) then
              ob % num_ssmir = ob % num_ssmir + num_obs
-         else if ( trim(ob_name) == 'satem' ) then
+         else if ( index( ob_name,'satem') > 0 ) then
              ob % num_satem = ob % num_satem + num_obs
-         else if ( trim(ob_name) == 'ssmt1' ) then
+         else if ( index( ob_name,'ssmt1') > 0 ) then
              ob % num_ssmt1 = ob % num_ssmt1 + num_obs
-         else if ( trim(ob_name) == 'ssmt2' ) then
+         else if ( index( ob_name,'ssmt2') > 0 ) then
              ob % num_ssmt2 = ob % num_ssmt2 + num_obs
          end if
       end do
       
-      if ( trim(ob_name) == '*end*' ) then
+!      if ( trim(ob_name)(1:5) == '*end*' ) then
+      if ( index( ob_name,'*end*') > 0 ) then  
          exit
       else
          num_times = num_times + 1
@@ -490,14 +492,14 @@ subroutine da_count_obs( y_unit, ob )
       write(6,'(a,i8)')' Number of ships obs = ', ob % num_ships
    end if
    
-   if ( ob % num_poamv > 0 ) then
-      allocate( ob % poamv(1:ob % num_poamv) )
-      write(6,'(a,i8)')' Number of poamv obs = ', ob % num_poamv
+   if ( ob % num_polaramv > 0 ) then
+      allocate( ob % polaramv(1:ob % num_polaramv) )
+      write(6,'(a,i8)')' Number of polaramv obs = ', ob % num_polaramv
    end if
    
-   if ( ob % num_geamv > 0 ) then
-      allocate( ob % geamv(1:ob % num_geamv) )
-      write(6,'(a,i8)')' Number of geamv obs = ', ob % num_geamv
+   if ( ob % num_geoamv > 0 ) then
+      allocate( ob % geoamv(1:ob % num_geoamv) )
+      write(6,'(a,i8)')' Number of geoamv obs = ', ob % num_geoamv
    end if
 
    if ( ob % num_qscat > 0 ) then
@@ -558,33 +560,33 @@ subroutine da_read_y( y_unit, ob )
    integer, intent(in)               :: y_unit
    type (ob_type), intent(inout)     :: ob
 
-   character*5          :: ob_name
+   character*20         :: ob_name
    integer              :: n, ndum, k, kdum, num_obs, num_levs
    integer              :: num_obs_synop, num_obs_metar, num_obs_ships
-   integer              :: num_obs_qscat,  num_obs_poamv, num_obs_geamv
+   integer              :: num_obs_qscat,  num_obs_polaramv, num_obs_geoamv
    integer              :: num_obs_gpspw, num_obs_sound, num_obs_airep, num_obs_pilot
    integer              :: num_obs_ssmir, num_obs_satem, num_obs_ssmt1, num_obs_ssmt2
-   integer              :: synopt, metart, shipst, poamvt, geamvt, qscatt, gpspwt, soundt
+   integer              :: synopt, metart, shipst, polaramvt, geoamvt, qscatt, gpspwt, soundt
    integer              :: airept, pilott, ssmirt, satemt, ssmt1t, ssmt2t
    real                 :: rdum
 
    rewind (y_unit)
    num_obs_synop = 0; num_obs_metar = 0; num_obs_ships = 0
-   num_obs_poamv = 0; num_obs_geamv = 0; num_obs_qscat = 0
+   num_obs_polaramv = 0; num_obs_geoamv = 0; num_obs_qscat = 0
    num_obs_gpspw = 0; num_obs_sound = 0; num_obs_airep = 0; num_obs_pilot = 0
    num_obs_ssmir = 0; num_obs_satem = 0; num_obs_ssmt1 = 0; num_obs_ssmt2 = 0
-   synopt = 0; metart = 0; shipst = 0; poamvt = 0; geamvt = 0; qscatt = 0
+   synopt = 0; metart = 0; shipst = 0; polaramvt = 0; geoamvt = 0; qscatt = 0
    gpspwt = 0; soundt = 0; airept = 0; pilott = 0
    ssmirt = 0; satemt = 0; ssmt1t = 0; ssmt2t = 0
 
    do
 
-      read(y_unit,'(a5,i8)')ob_name, num_obs
+      read(y_unit,'(a20,i8)')ob_name, num_obs
       
-      if ( trim(ob_name) == 'synop' ) then
+      if ( index( ob_name,'synop') > 0 ) then
          synopt = synopt + 1
          do n = num_obs_synop + 1, num_obs_synop + num_obs
-            read(y_unit,'(2i8,a5,2f9.3,f17.7,5(2f17.7,i8,2f17.7))') &
+            read(y_unit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))') &
             ndum, kdum, ob % synop(n) % info % id, &        ! Station
                         ob % synop(n) % info % lat, &       ! Latitude
                         ob % synop(n) % info % lon, &       ! Longitude
@@ -598,10 +600,10 @@ subroutine da_read_y( y_unit, ob )
          end do
          num_obs_synop = num_obs_synop + num_obs
 
-      else if ( trim(ob_name) == 'metar' ) then
+      elseif ( index( ob_name,'metar') > 0 ) then
          metart = metart + 1
          do n = num_obs_metar + 1, num_obs_metar + num_obs
-            read(y_unit,'(2i8,a5,2f9.3,f17.7,5(2f17.7,i8,2f17.7))') &
+            read(y_unit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))') &
             ndum, kdum, ob % metar(n) % info % id, &        ! Station
                         ob % metar(n) % info % lat, &       ! Latitude
                         ob % metar(n) % info % lon, &       ! Longitude
@@ -615,10 +617,10 @@ subroutine da_read_y( y_unit, ob )
          end do
          num_obs_metar = num_obs_metar + num_obs
 
-      else if ( trim(ob_name) == 'ships' ) then
+      elseif ( index( ob_name,'ships') > 0 ) then
          shipst = shipst + 1
          do n = num_obs_ships + 1, num_obs_ships + num_obs
-            read(y_unit,'(2i8,a5,2f9.3,f17.7,5(2f17.7,i8,2f17.7))') &
+            read(y_unit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))') &
             ndum, kdum, ob % ships(n) % info % id, &        ! Station
                         ob % ships(n) % info % lat, &       ! Latitude
                         ob % ships(n) % info % lon, &       ! Longitude
@@ -632,40 +634,40 @@ subroutine da_read_y( y_unit, ob )
          end do
          num_obs_ships = num_obs_ships + num_obs
          
-      else if ( trim(ob_name) == 'poamv' ) then
-         poamvt = poamvt + 1
-         do n = num_obs_poamv + 1, num_obs_poamv + num_obs
-            read(y_unit,'(2i8,a5,2f9.3,f17.7,5(2f17.7,i8,2f17.7))') &
-            ndum, kdum, ob % poamv(n) % info % id, &        ! Station
-                        ob % poamv(n) % info % lat, &       ! Latitude
-                        ob % poamv(n) % info % lon, &       ! Longitude
-                        ob % poamv(n) % pressure, &         ! Obs pressure
-                        ob % poamv(n) % u, &                ! O, O-B, O-A
-                        ob % poamv(n) % v
-            ob % poamv(n) % info % time = poamvt
-            ob % poamv(n) % channel = ob % poamv(n) % info % id(3:4)
-            ob % poamv(n) % landmask = ob % poamv(n) % info % id(5:5)
+      elseif ( index( ob_name,'polaramv') > 0 ) then
+         polaramvt = polaramvt + 1
+         do n = num_obs_polaramv + 1, num_obs_polaramv + num_obs
+            read(y_unit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))') &
+            ndum, kdum, ob % polaramv(n) % info % id, &        ! Station
+                        ob % polaramv(n) % info % lat, &       ! Latitude
+                        ob % polaramv(n) % info % lon, &       ! Longitude
+                        ob % polaramv(n) % pressure, &         ! Obs pressure
+                        ob % polaramv(n) % u, &                ! O, O-B, O-A
+                        ob % polaramv(n) % v
+            ob % polaramv(n) % info % time = polaramvt
+            ob % polaramv(n) % channel = ob % polaramv(n) % info % id(3:4)
+            ob % polaramv(n) % landmask = ob % polaramv(n) % info % id(5:5)
          end do
-         num_obs_poamv = num_obs_poamv + num_obs
+         num_obs_polaramv = num_obs_polaramv + num_obs
 
-      else if ( trim(ob_name) == 'geamv' ) then
-         geamvt = geamvt + 1
-         do n = num_obs_geamv + 1, num_obs_geamv + num_obs
-            read(y_unit,'(2i8,a5,2f9.3,f17.7,5(2f17.7,i8,2f17.7))') &
-            ndum, kdum, ob % geamv(n) % info % id, &        ! Station
-                        ob % geamv(n) % info % lat, &       ! Latitude
-                        ob % geamv(n) % info % lon, &       ! Longitude
-                        ob % geamv(n) % height, &           ! Obs height
-                        ob % geamv(n) % u, &                ! O, O-B, O-A
-                        ob % geamv(n) % v
-            ob % geamv(n) % info % time = geamvt
+      elseif ( index( ob_name,'geoamv') > 0 ) then
+         geoamvt = geoamvt + 1
+         do n = num_obs_geoamv + 1, num_obs_geoamv + num_obs
+            read(y_unit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))') &
+            ndum, kdum, ob % geoamv(n) % info % id, &        ! Station
+                        ob % geoamv(n) % info % lat, &       ! Latitude
+                        ob % geoamv(n) % info % lon, &       ! Longitude
+                        ob % geoamv(n) % height, &           ! Obs height
+                        ob % geoamv(n) % u, &                ! O, O-B, O-A
+                        ob % geoamv(n) % v
+            ob % geoamv(n) % info % time = geoamvt
          end do
-         num_obs_geamv = num_obs_geamv + num_obs
+         num_obs_geoamv = num_obs_geoamv + num_obs
 
-      else if ( trim(ob_name) == 'qscat' ) then
+      elseif ( index( ob_name,'qscat') > 0 ) then
          qscatt = qscatt + 1
          do n = num_obs_qscat + 1, num_obs_qscat + num_obs
-            read(y_unit,'(2i8,a5,2f9.3,f17.7,5(2f17.7,i8,2f17.7))') &
+            read(y_unit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))') &
             ndum, kdum, ob % qscat(n) % info % id, &        ! Station
                         ob % qscat(n) % info % lat, &       ! Latitude
                         ob % qscat(n) % info % lon, &       ! Longitude
@@ -676,10 +678,10 @@ subroutine da_read_y( y_unit, ob )
          end do
          num_obs_qscat = num_obs_qscat + num_obs
          
-      else if ( trim(ob_name) == 'gpspw' ) then
+      elseif ( index( ob_name,'gpspw') > 0 ) then
          gpspwt = gpspwt + 1
          do n = num_obs_gpspw + 1, num_obs_gpspw + num_obs
-            read(y_unit,'(2i8,a5,2f9.3,f17.7,5(2f17.7,i8,2f17.7))') &
+            read(y_unit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))') &
             ndum, kdum, ob % gpspw(n) % info % id, &        ! Station
                         ob % gpspw(n) % info % lat, &       ! Latitude
                         ob % gpspw(n) % info % lon, &       ! Longitude
@@ -689,7 +691,7 @@ subroutine da_read_y( y_unit, ob )
          end do
          num_obs_gpspw = num_obs_gpspw + num_obs
 
-      else if ( trim(ob_name) == 'sound' ) then
+      elseif ( index( ob_name,'sound') > 0 ) then
          soundt = soundt + 1
          do n = num_obs_sound + 1, num_obs_sound + num_obs
             read(y_unit,'(i8)')num_levs
@@ -702,7 +704,7 @@ subroutine da_read_y( y_unit, ob )
             allocate( ob % sound(n) % q(1:num_levs) )
 
             do k = 1, num_levs
-               read(y_unit,'(2i8,a5,2f9.3,f17.7,5(2f17.7,i8,2f17.7))') &
+               read(y_unit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))') &
                ndum, kdum, ob % sound(n) % info % id, &     ! Station
                         ob % sound(n) % info % lat, &       ! Latitude
                         ob % sound(n) % info % lon, &       ! Longitude
@@ -717,7 +719,7 @@ subroutine da_read_y( y_unit, ob )
          end do
          num_obs_sound = num_obs_sound + num_obs
 
-      else if ( trim(ob_name) == 'airep' ) then
+      elseif ( index( ob_name,'airep') > 0 ) then
          airept = airept + 1
          do n = num_obs_airep + 1, num_obs_airep + num_obs
             read(y_unit,'(i8)')num_levs
@@ -728,7 +730,7 @@ subroutine da_read_y( y_unit, ob )
             allocate( ob % airep(n) % t(1:num_levs) )
 
             do k = 1, num_levs
-               read(y_unit,'(2i8,a5,2f9.3,f17.7,5(2f17.7,i8,2f17.7))') &
+               read(y_unit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))') &
                ndum, kdum, ob % airep(n) % info % id, &     ! Station
                         ob % airep(n) % info % lat, &       ! Latitude
                         ob % airep(n) % info % lon, &       ! Longitude
@@ -741,7 +743,7 @@ subroutine da_read_y( y_unit, ob )
          end do
          num_obs_airep = num_obs_airep + num_obs
 
-      else if ( trim(ob_name) == 'pilot' ) then
+      elseif ( index( ob_name,'pilot') > 0 ) then
          pilott = pilott + 1
          do n = num_obs_pilot + 1, num_obs_pilot + num_obs
             read(y_unit,'(i8)')num_levs
@@ -751,7 +753,7 @@ subroutine da_read_y( y_unit, ob )
             allocate( ob % pilot(n) % v(1:num_levs) )
 
             do k = 1, num_levs
-               read(y_unit,'(2i8,a5,2f9.3,f17.7,5(2f17.7,i8,2f17.7))') &
+               read(y_unit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))') &
                ndum, kdum, ob % pilot(n) % info % id, &     ! Station
                         ob % pilot(n) % info % lat, &       ! Latitude
                         ob % pilot(n) % info % lon, &       ! Longitude
@@ -763,10 +765,10 @@ subroutine da_read_y( y_unit, ob )
          end do
          num_obs_pilot = num_obs_pilot + num_obs
 
-      else if ( trim(ob_name) == 'ssmir' ) then
+      elseif ( index( ob_name,'ssmir') > 0 ) then
          ssmirt = ssmirt + 1
          do n = num_obs_ssmir + 1, num_obs_ssmir + num_obs
-            read(y_unit,'(2i8,a5,2f9.3,f17.7,5(2f17.7,i8,2f17.7))') &
+            read(y_unit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))') &
             ndum, kdum, ob % ssmir(n) % info % id, &     ! Station
                         ob % ssmir(n) % info % lat, &       ! Latitude
                         ob % ssmir(n) % info % lon, &       ! Longitude
@@ -777,7 +779,7 @@ subroutine da_read_y( y_unit, ob )
          end do
          num_obs_ssmir = num_obs_ssmir + num_obs
 
-      else if ( trim(ob_name) == 'satem' ) then
+      elseif ( index( ob_name,'satem') > 0 ) then
          satemt = satemt + 1
          do n = num_obs_satem + 1, num_obs_satem + num_obs
             read(y_unit,'(i8)')num_levs
@@ -786,7 +788,7 @@ subroutine da_read_y( y_unit, ob )
             allocate( ob % satem(n) % thickness(1:num_levs) )
 
             do k = 1, num_levs
-               read(y_unit,'(2i8,a5,2f9.3,f17.7,5(2f17.7,i8,2f17.7))') &
+               read(y_unit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))') &
                ndum, kdum, ob % satem(n) % info % id, &     ! Station
                         ob % satem(n) % info % lat, &       ! Latitude
                         ob % satem(n) % info % lon, &       ! Longitude
@@ -797,7 +799,7 @@ subroutine da_read_y( y_unit, ob )
          end do
          num_obs_satem = num_obs_satem + num_obs
 
-      else if ( trim(ob_name) == 'ssmt1' ) then
+      elseif ( index( ob_name,'ssmt1') > 0 ) then
          ssmt1t = ssmt1t + 1
          do n = num_obs_ssmt1 + 1, num_obs_ssmt1 + num_obs
             read(y_unit,'(i8)')num_levs
@@ -806,7 +808,7 @@ subroutine da_read_y( y_unit, ob )
             allocate( ob % ssmt1(n) % t(1:num_levs) )
             
             do k = 1, num_levs
-               read(y_unit,'(2i8,a5,2f9.3,f17.7,5(2f17.7,i8,2f17.7))') &
+               read(y_unit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))') &
                ndum, kdum, ob % ssmt1(n) % info % id, &     ! Station
                         ob % ssmt1(n) % info % lat, &       ! Latitude
                         ob % ssmt1(n) % info % lon, &       ! Longitude
@@ -817,7 +819,7 @@ subroutine da_read_y( y_unit, ob )
          end do
          num_obs_ssmt1 = num_obs_ssmt1 + num_obs
 
-      else if ( trim(ob_name) == 'ssmt2' ) then
+      elseif ( index( ob_name,'ssmt2') > 0 ) then
          ssmt2t = ssmt2t + 1
          do n = num_obs_ssmt2 + 1, num_obs_ssmt2 + num_obs
             read(y_unit,'(i8)')num_levs
@@ -826,7 +828,7 @@ subroutine da_read_y( y_unit, ob )
             allocate( ob % ssmt2(n) % rh(1:num_levs) )
 
             do k = 1, num_levs
-               read(y_unit,'(2i8,a5,2f9.3,f17.7,5(2f17.7,i8,2f17.7))') &
+               read(y_unit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))') &
                ndum, kdum, ob % ssmt2(n) % info % id, &     ! Station
                         ob % ssmt2(n) % info % lat, &       ! Latitude
                         ob % ssmt2(n) % info % lon, &       ! Longitude
@@ -837,7 +839,7 @@ subroutine da_read_y( y_unit, ob )
          end do
          num_obs_ssmt2 = num_obs_ssmt2 + num_obs
 
-      else if ( trim(ob_name) == '*end*' ) then
+      elseif ( index( ob_name,'*end*') > 0 ) then
          exit
       end if
 

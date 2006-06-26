@@ -1,10 +1,12 @@
-subroutine da_write_filtered_obs( ob, iv, xp )
-!----------------------------------------------------------------------------   
+SUBROUTINE da_write_filtered_obs( ob, iv, xb, xp, & 
+                          phic, xlonc, truelat1, truelat2)
+
+!---------------------------------------------------------------------------   
 !  History:
 !  Purpose: Writes filtered observations by WRFVAR
 !  Author:
 !             02/28/2005         Syed RH Rizvi
-!----------------------------------------------------------------------------   
+!---------------------------------------------------------------------------   
 !  Note:                                                           
 !   (a) Information just needed for WRFVAR  is only written  
 !   (b) Both U and V should be of good quality ( qc > obs_qc_pointer) 
@@ -25,38 +27,65 @@ subroutine da_write_filtered_obs( ob, iv, xp )
 !   (a) Original iv & ob arrays are not modified
 !   (b) "DA_Count_Filtered_Obs" is called to get exact count of various
 !        observations type included in the filtered obs
-!        
-!----------------------------------------------------------------------------   
+!
+!..........................................................................
+! The Quality Controlled observations (QCed obs) means
+!
+!   i) The check against the Background;
+!
+!  ii) The model bottom/top check, i.e. the observations below the
+!      lowest model level (note, not bottom) and higher than the highest
+!      model level (note, not model top) are filled with missing values
+!      except the Sound data;
+!
+! iii) For Sound data, the above-top/below-bottom data are not written out.
+!
+! The can be use for 3D-Var with check_max_iv = .FALSE., or for
+! verification with  ANALYSIS_TYPE = 'VERIFY.
+!
+!                                      Yong-Run Guo   02/01/2006        
+!..........................................................................
+!           06/02/2006 - Updated for MPI run               Syed  RH  Rizvi
+!---------------------------------------------------------------------------   
    IMPLICIT NONE
+#ifdef DM_PARALLEL
+#   include <mpif.h>
+#endif
 
-   type (y_type),  intent(in)    :: ob      ! Observation structure.
-   TYPE (ob_type), intent(inout)    :: iv      ! O-B structure.
-   TYPE (xpose_type), INTENT(IN) :: xp           ! Domain decomposition vars.
-
+   type (y_type),     intent(in)  :: ob      ! Observation structure.
+   TYPE (ob_type),    intent(in)  :: iv      ! O-B structure.
+   TYPE (xpose_type), intent(in)  :: xp      ! Domain decomposition vars.
+   TYPE (xb_type),    intent(in)  :: xb      ! First guess structure.
+   REAL, INTENT(IN)               :: phic, xlonc, truelat1, truelat2
 !
    CHARACTER (LEN =  10)        :: info_fmt_name,srfc_fmt_name,each_fmt_name
    CHARACTER (LEN =  80)        :: blank                                         
-   CHARACTER (LEN = 160)        :: fmt_info, fmt_loc, fmt_each
-   INTEGER                      :: i, iost, nlevels
+   INTEGER                      :: i, j, iost, nlevels, fm
+   TYPE (multi_level_type)      :: platform
 
-   integer                       :: n1, n2, n, zero
+   integer                       :: n1, n2, n, k, zero , ships_elv_qual
    real                          :: es, qs, speed, dir, rh, rh_error, uu, vv
    real                          :: xmiss, height, height_error, pr_error, slp_error
    real                          :: thick, thick_error,dir_error,speed_error
-   real                          :: td, td_error , elv_error,ships_pr_error
+   real                          :: td, td_error , elv_error,ships_elv, ships_pr_error
 !----------------------------------------------------------------------------!
    real                          :: slp_inv,speed_err,dir_err, p,p_err
    real                          :: t, t_err,ref, ref_err
    integer                       :: thick_qc, t_qc, td_qc, rh_qc, height_qc
    integer                       :: slp_qc, speed_qc, dir_qc,p_qc, ref_qc
 !----------------------------------------------------------------------------!
-   INTEGER                       :: iunit, ounit
+   INTEGER                       :: ounit, nz, mnz
+   logical, external             :: wrf_dm_on_monitor
+   INTEGER                       :: root      ! Monitor processor.
+   INTEGER                       :: myrank    ! Id of my processor.
+   INTEGER                       :: ierr      ! Error code from MPI routines.
 !----------------------------------------------------------------------------!
-
-   if (trace_use) call da_trace_entry("da_write_filtered_obs")
-
-   iunit = gts_iunit
-   ounit = filtered_obs_iunit - 10
+  if (trace_use) CALL da_trace_entry("da_write_filtered_obs")
+    ounit = filtered_obs_iunit + 1 
+#ifdef DM_PARALLEL
+  call MPI_COMM_RANK( MPI_COMM_WORLD, myrank, ierr )
+   ounit = filtered_obs_iunit + myrank  + 1
+#endif
    zero = 0
 ! Note: Currently in 3DVAR there is no active role of 
 !       "height" and "TD"        
@@ -75,56 +104,20 @@ subroutine da_write_filtered_obs( ob, iv, xp )
    elv_error = 6.0
    dir_error = 5.0
    dir_err   = 5.0
+   ships_elv = 0.0
+   ships_elv_qual = 0 
 
-!----------------------------------------------------------------------------!
-!----------------------------------------------------------------------------!
-!  READ HEADER
-!  ===========
-   rewind (iunit)
-   head_info: DO
-
-      READ (UNIT = iunit, FMT = '(A80)', IOSTAT = iost) blank        
-      write(ounit, FMT = '(A80)') blank
-
-      IF (iost /= 0) THEN
-         write(unit=errmsg(1), fmt='(/a,i3)') &
-            'ERROR READING FILE UNIT:', iunit
-         call wrf_error(__FILE__,__LINE__,errmsg(1))   
-      ENDIF
-
-      if (blank(1:6) == 'EACH  ') EXIT
-
-   ENDDO head_info
-
-!----------------------------------------------------------------------------!
-!  READ FORMATS
-!  ------------
-
-   READ (iunit, FMT = '(A10,1X,A)', IOSTAT = iost) &
-        info_fmt_name, fmt_info, &
-        srfc_fmt_name, fmt_loc,  &
-        each_fmt_name, fmt_each
-   WRITE (ounit, FMT = '(A10,1X,A)') &
-        info_fmt_name, fmt_info, &
-        srfc_fmt_name, fmt_loc,  &
-        each_fmt_name, fmt_each
-
-   IF (iost /= 0) THEN
-      write(unit=errmsg(1), fmt='(/A,I3,A/)') &
-           ' ERROR IN INPUT FILE UNIT ',iunit, &
-           ' FOR GTS OBSERVATIONS CANNOT BE FOUND OR CANNOT BE OPENED'
-      call wrf_error(__FILE__,__LINE__,errmsg(1))
-   ENDIF
-!----------------------------------------------------------------------------!
-    READ (iunit, FMT = '(A80)') blank
-    write(ounit, FMT = '(A80)') blank     
 !----------------------------------------------------------------------------!
 !  Write Synop:
    IF ( iv % num_synop > 0 ) THEN
     if(print_detail_f_obs) print*,' writing filtered Obs for synop ',iv%num_synop
 !
 !----------------------------------------------------------------------------!
-    DO i = 1, iv % num_synop               
+    DO i = 1, iv % num_synop
+     if( .not. iv%synop(i)%loc%proc_domain) cycle
+! Guo .. not write out the data below the lowest model level:
+    if (iv%synop(i)%zk == missing_r) cycle
+
     nlevels = iv%synop(i)%info%levels
     if(iv%synop(i)%info%levels > 1) then
      print*,' for SYNOP station ',iv%synop(i)%info%name,' got levels ',&
@@ -134,7 +127,7 @@ subroutine da_write_filtered_obs( ob, iv, xp )
      write(ounit, FMT = fmt_info)                &
                    iv%synop(i)%info%platform,    &
                    iv%synop(i)%info%date_char,   &
-                   iv%synop(i)%info%name,        &
+                  iv%synop(i)%info%name,        &
                    nlevels,                      &
                    iv%synop(i)%info%lat,         &
                    iv%synop(i)%info%lon,         &
@@ -142,11 +135,11 @@ subroutine da_write_filtered_obs( ob, iv, xp )
                    iv%synop(i)%info%id
     slp_inv= iv%synop(i)%loc%slp%inv
     slp_qc = iv%synop(i)%loc%slp%qc
-    if( iv%synop(i)%p%qc < obs_qc_pointer  ) then
+    if( iv%synop(i)%p%qc <= fails_error_max) then
     slp_inv = missing_r
     slp_qc  = missing_data
     end if
-  write(ounit, FMT = fmt_loc) slp_inv,slp_qc,iv%synop(i)%loc%slp%error, iv%synop(i)%loc%pw
+  write(ounit, FMT = fmt_srfc) slp_inv,slp_qc,iv%synop(i)%loc%slp%error, iv%synop(i)%loc%pw
 !----------------------------------------------------------------------------!
 ! get speed and direction
       if( iv%synop(i)%u%qc >= obs_qc_pointer .and. &
@@ -167,8 +160,6 @@ subroutine da_write_filtered_obs( ob, iv, xp )
 !----------------------------------------------------------------------------!
 ! get RH from Q & T    
       if( iv%synop(i)%q%qc >= obs_qc_pointer .and.  &
-          iv%synop(i)%t%qc >= obs_qc_pointer .and.  &
-          iv%synop(i)%p%qc >= obs_qc_pointer .and.  &
           abs(iv%synop(i)%q%error - missing_r ) > 1. .and.  &
           abs(ob%synop(i)%t       - missing_r ) > 1. .and.  &
           abs(ob%synop(i)%p       - missing_r ) > 1.    ) then 
@@ -184,14 +175,14 @@ subroutine da_write_filtered_obs( ob, iv, xp )
    p    = ob%synop(i)%p
    p_qc = iv%synop(i)%p%qc
    p_err = iv%synop(i)%p%error
-   if( iv%synop(i)%p%qc < obs_qc_pointer  ) then
+   if( iv%synop(i)%p%qc <= fails_error_max) then
      p_qc = missing_data
      p    = missing_r
    p_err  = pr_error           
    end if
    t    =  ob%synop(i)%t
    t_qc =  iv%synop(i)%t%qc
-   if( iv%synop(i)%t%qc < obs_qc_pointer  ) then
+   if( iv%synop(i)%t%qc <= fails_error_max) then
      t_qc = missing_data
      t   = missing_r
    end if
@@ -213,7 +204,11 @@ subroutine da_write_filtered_obs( ob, iv, xp )
     if(print_detail_f_obs) print*,' writing filtered Obs for metar ',iv%num_metar
 !
 !----------------------------------------------------------------------------!
-    DO i = 1, iv % num_metar               
+    DO i = 1, iv % num_metar
+     if( .not. iv%metar(i)%loc%proc_domain) cycle
+! Guo .. not write out the data below the lowest model level:
+    if (iv%metar(i)%zk == missing_r) cycle
+               
     nlevels = iv%metar(i)%info%levels
     if(iv%metar(i)%info%levels > 1) then
      print*,' for SYNOP station ',iv%metar(i)%info%name,' got levels ',&
@@ -231,11 +226,11 @@ subroutine da_write_filtered_obs( ob, iv, xp )
                    iv%metar(i)%info%id
     slp_inv= iv%metar(i)%loc%slp%inv
     slp_qc = iv%metar(i)%loc%slp%qc
-    if( iv%metar(i)%p%qc < obs_qc_pointer  ) then
+    if( iv%metar(i)%p%qc <= fails_error_max) then
     slp_inv = missing_r
     slp_qc  = missing_data
     end if
-  write(ounit, FMT = fmt_loc) slp_inv,slp_qc,iv%metar(i)%loc%slp%error, iv%metar(i)%loc%pw
+  write(ounit, FMT = fmt_srfc) slp_inv,slp_qc,iv%metar(i)%loc%slp%error, iv%metar(i)%loc%pw
 !----------------------------------------------------------------------------!
 ! get speed and direction
       if( iv%metar(i)%u%qc >= obs_qc_pointer .and. &
@@ -256,8 +251,6 @@ subroutine da_write_filtered_obs( ob, iv, xp )
 !----------------------------------------------------------------------------!
 ! get RH from Q & T    
       if( iv%metar(i)%q%qc >= obs_qc_pointer .and.  &
-          iv%metar(i)%t%qc >= obs_qc_pointer .and.  &
-          iv%metar(i)%p%qc >= obs_qc_pointer .and.  &
           abs(iv%metar(i)%q%error - missing_r ) > 1. .and.  &
           abs(ob%metar(i)%t       - missing_r ) > 1. .and.  &
           abs(ob%metar(i)%p       - missing_r ) > 1.    ) then 
@@ -273,14 +266,14 @@ subroutine da_write_filtered_obs( ob, iv, xp )
    p    = ob%metar(i)%p
    p_qc = iv%metar(i)%p%qc
    p_err = iv%metar(i)%p%error
-   if( iv%metar(i)%p%qc < obs_qc_pointer  ) then
+   if( iv%metar(i)%p%qc <= fails_error_max) then
      p_qc = missing_data
      p    = missing_r
    p_err  = pr_error           
    end if
    t    =  ob%metar(i)%t
    t_qc =  iv%metar(i)%t%qc
-   if( iv%metar(i)%t%qc < obs_qc_pointer  ) then
+   if( iv%metar(i)%t%qc <= fails_error_max) then
      t_qc = missing_data
      t   = missing_r
    end if
@@ -302,7 +295,11 @@ subroutine da_write_filtered_obs( ob, iv, xp )
     if(print_detail_f_obs) print*,' writing filtered Obs for ships ',iv%num_ships
 !
 !----------------------------------------------------------------------------!
-    DO i = 1, iv % num_ships               
+    DO i = 1, iv % num_ships
+     if( .not. iv%ships(i)%loc%proc_domain) cycle
+! Guo .. not write out the data below the lowest model level:
+    if (iv%ships(i)%zk == missing_r) cycle
+               
     nlevels = iv%ships(i)%info%levels
     if(iv%ships(i)%info%levels > 1) then
      print*,' for SYNOP station ',iv%ships(i)%info%name,' got levels ',&
@@ -320,11 +317,11 @@ subroutine da_write_filtered_obs( ob, iv, xp )
                    iv%ships(i)%info%id
     slp_inv= iv%ships(i)%loc%slp%inv
     slp_qc = iv%ships(i)%loc%slp%qc
-    if( iv%ships(i)%p%qc < obs_qc_pointer  ) then
+    if( iv%ships(i)%p%qc <= fails_error_max) then
     slp_inv = missing_r
     slp_qc  = missing_data
     end if
-  write(ounit, FMT = fmt_loc) slp_inv,slp_qc,iv%ships(i)%loc%slp%error, iv%ships(i)%loc%pw
+  write(ounit, FMT = fmt_srfc) slp_inv,slp_qc,iv%ships(i)%loc%slp%error, iv%ships(i)%loc%pw
 !----------------------------------------------------------------------------!
 ! get speed and direction
       if( iv%ships(i)%u%qc >= obs_qc_pointer .and. &
@@ -345,8 +342,6 @@ subroutine da_write_filtered_obs( ob, iv, xp )
 !----------------------------------------------------------------------------!
 ! get RH from Q & T    
       if( iv%ships(i)%q%qc >= obs_qc_pointer .and.  &
-          iv%ships(i)%t%qc >= obs_qc_pointer .and.  &
-          iv%ships(i)%p%qc >= obs_qc_pointer .and.  &
           abs(iv%ships(i)%q%error - missing_r ) > 1. .and.  &
           abs(ob%ships(i)%t       - missing_r ) > 1. .and.  &
           abs(ob%ships(i)%p       - missing_r ) > 1.    ) then 
@@ -362,13 +357,13 @@ subroutine da_write_filtered_obs( ob, iv, xp )
    p     = ob%ships(i)%p
    p_qc  = iv%ships(i)%p%qc
    p_err =  ships_pr_error
-   if( iv%ships(i)%p%qc < obs_qc_pointer  ) then
+   if( iv%ships(i)%p%qc <= fails_error_max) then
      p_qc = missing_data
      p    = missing_r
    end if
    t    =  ob%ships(i)%t
    t_qc =  iv%ships(i)%t%qc
-   if( iv%ships(i)%t%qc < obs_qc_pointer  ) then
+   if( iv%ships(i)%t%qc <= fails_error_max) then
      t_qc = missing_data
      t   = missing_r
    end if
@@ -389,10 +384,14 @@ subroutine da_write_filtered_obs( ob, iv, xp )
    IF ( iv % num_buoy  > 0 ) THEN
     if(print_detail_f_obs) print*,' writing filtered Obs for buoy  ',iv%num_buoy 
 !----------------------------------------------------------------------------!
-    DO i = 1, iv % num_buoy                
+    DO i = 1, iv % num_buoy
+     if( .not. iv%buoy(i)%loc%proc_domain) cycle
+! Guo .. not write out the data below the lowest model level:
+    if (iv%buoy (i)%zk == missing_r) cycle
+                
     nlevels = iv%buoy (i)%info%levels
     if(iv%buoy (i)%info%levels > 1) then
-     print*,' for SYNOP station ',iv%buoy (i)%info%name,' got levels ',&
+     print*,' for BUOY  station ',iv%buoy (i)%info%name,' got levels ',&
      iv%buoy (i)%info%levels ,' but wrote only one level'
      nlevels = 1
     end if
@@ -407,11 +406,11 @@ subroutine da_write_filtered_obs( ob, iv, xp )
                    iv%buoy (i)%info%id
     slp_inv= iv%buoy (i)%loc%slp%inv
     slp_qc = iv%buoy (i)%loc%slp%qc
-    if( iv%buoy (i)%p%qc < obs_qc_pointer  ) then
+    if( iv%buoy (i)%p%qc <= fails_error_max) then
     slp_inv = missing_r
     slp_qc  = missing_data
     end if
-  write(ounit, FMT = fmt_loc) slp_inv,slp_qc,iv%buoy (i)%loc%slp%error, iv%buoy (i)%loc%pw
+  write(ounit, FMT = fmt_srfc) slp_inv,slp_qc,iv%buoy (i)%loc%slp%error, iv%buoy (i)%loc%pw
 !----------------------------------------------------------------------------!
 ! get speed and direction
       if( iv%buoy (i)%u%qc >= obs_qc_pointer .and. &
@@ -432,8 +431,6 @@ subroutine da_write_filtered_obs( ob, iv, xp )
 !----------------------------------------------------------------------------!
 ! get RH from Q & T    
       if( iv%buoy (i)%q%qc >= obs_qc_pointer .and.  &
-          iv%buoy (i)%t%qc >= obs_qc_pointer .and.  &
-          iv%buoy (i)%p%qc >= obs_qc_pointer .and.  &
           abs(iv%buoy (i)%q%error - missing_r ) > 1. .and.  &
           abs(ob%buoy (i)%t       - missing_r ) > 1. .and.  &
           abs(ob%buoy (i)%p       - missing_r ) > 1.    ) then 
@@ -449,14 +446,14 @@ subroutine da_write_filtered_obs( ob, iv, xp )
    p     = ob%buoy (i)%p
    p_qc  = iv%buoy (i)%p%qc
    p_err = iv%buoy (i)%p%error
-   if( iv%buoy (i)%p%qc < obs_qc_pointer  ) then
+   if( iv%buoy (i)%p%qc <= fails_error_max) then
      p_qc = missing_data
      p    = missing_r
    p_err  = pr_error           
    end if
    t    =  ob%buoy (i)%t
    t_qc =  iv%buoy (i)%t%qc
-   if( iv%buoy (i)%t%qc < obs_qc_pointer  ) then
+   if( iv%buoy (i)%t%qc <= fails_error_max) then
      t_qc = missing_data
      t   = missing_r
    end if
@@ -478,6 +475,7 @@ subroutine da_write_filtered_obs( ob, iv, xp )
 !
 !----------------------------------------------------------------------------!
     DO i = 1, iv % num_geoamv               
+    if( .not. iv%geoamv(i)%loc%proc_domain) cycle
      write(ounit, FMT = fmt_info, IOSTAT = iost) &
                    iv%geoamv(i)%info%platform,    &
                    iv%geoamv(i)%info%date_char,   &
@@ -487,7 +485,7 @@ subroutine da_write_filtered_obs( ob, iv, xp )
                    iv%geoamv(i)%info%lon,         &
                    iv%geoamv(i)%info%elv,         &
                    iv%geoamv(i)%info%id
-     write(ounit, FMT = fmt_loc) iv%geoamv(i)%loc%slp, iv%geoamv(i)%loc%pw
+     write(ounit, FMT = fmt_srfc) iv%geoamv(i)%loc%slp, iv%geoamv(i)%loc%pw
 !
 !----------------------------------------------------------------------------!
      DO n = 1, iv%geoamv(i)%info%levels
@@ -528,6 +526,7 @@ subroutine da_write_filtered_obs( ob, iv, xp )
 !
 !----------------------------------------------------------------------------!
     DO i = 1, iv % num_polaramv               
+    if( .not. iv%polaramv(i)%loc%proc_domain) cycle
      write(ounit, FMT = fmt_info, IOSTAT = iost) &
                    iv%polaramv(i)%info%platform,    &
                    iv%polaramv(i)%info%date_char,   &
@@ -537,7 +536,7 @@ subroutine da_write_filtered_obs( ob, iv, xp )
                    iv%polaramv(i)%info%lon,         &
                    iv%polaramv(i)%info%elv,         &
                    iv%polaramv(i)%info%id
-     write(ounit, FMT = fmt_loc) iv%polaramv(i)%loc%slp, iv%polaramv(i)%loc%pw
+     write(ounit, FMT = fmt_srfc) iv%polaramv(i)%loc%slp, iv%polaramv(i)%loc%pw
 !
 !----------------------------------------------------------------------------!
      DO n = 1, iv%polaramv(i)%info%levels
@@ -576,16 +575,19 @@ subroutine da_write_filtered_obs( ob, iv, xp )
    IF ( iv % num_sound > 0 ) THEN
     if(print_detail_f_obs) print*,' writing filtered Obs for sound  ',iv%num_sound 
 !
+    mnz = 0
+!    write(999 ,'(5X,a,i4/)') "Sound out unit =", ounit
 !----------------------------------------------------------------------------!
    DO i = 1, iv % num_sound               
+   if( .not. iv%sound(i)%loc%proc_domain) cycle
      if( iv%sonde_sfc(i)%info%platform /= iv%sound(i)%info%platform .or. &
          iv%sonde_sfc(i)%info%lat      /= iv%sound(i)%info%lat      .or. &
          iv%sonde_sfc(i)%info%lon      /= iv%sound(i)%info%lon      .or. &
          iv%sonde_sfc(i)%info%elv      /= iv%sound(i)%info%elv      .or. &
          iv%sonde_sfc(i)%info%id       /= iv%sound(i)%info%id       ) then
-       WRITE(UNIT=errmsg(1),FMT='(A)') "Mismatch for Sound surface and upper air reports"
-       WRITE(UNIT=errmsg(2),FMT='(A)') "Surface details:            "
-       WRITE(unit=errmsg(3), fmt=fmt_info) &
+     print*,' Mismatch for Sound surface and upper air report '
+     print*,' Surface Sound Deatils:            '
+      write(unit=*, fmt=fmt_info) &
             iv%sonde_sfc(i)%info%platform,    &
             iv%sonde_sfc(i)%info%date_char,   &
             iv%sonde_sfc(i)%info%name,        &
@@ -595,8 +597,8 @@ subroutine da_write_filtered_obs( ob, iv, xp )
             iv%sonde_sfc(i)%info%elv,         &
             iv%sonde_sfc(i)%info%id
 
-       WRITE(UNIT=errmsg(4),FMT='(A)') "Upper level details: "
-       write(unit=errmsg(5), fmt=fmt_info) &
+     print*,' Upper level  Deatils: '
+      write(unit=*, fmt=fmt_info) &
             iv%sound(i)%info%platform,    &
             iv%sound(i)%info%date_char,   &
             iv%sound(i)%info%name,        &
@@ -605,25 +607,64 @@ subroutine da_write_filtered_obs( ob, iv, xp )
             iv%sound(i)%info%lon,         &
             iv%sound(i)%info%elv,         &
             iv%sound(i)%info%id
-       call wrf_errors(__FILE__,__LINE__, errmsg(1:5))
+     stop
      end if
+! Guo....
+     nz = 0
+     if (iv%sonde_sfc(i)%zk == missing_r) then
+        nz = nz + 1
+!        write(999,'(i3,"  Sonde_sfc==> height,zk:",2f12.2)') &
+!                       nz, iv%sonde_sfc(i)%h, iv%sonde_sfc(i)%zk
+     endif
+
+     DO n = 1, iv%sound(i)%info%levels
+        if (iv%sound(i)%zk(n) == missing_r) then
+           nz = nz + 1
+!           write(999,'(i3,"  Level=",i3," height,zk:",2f12.2)') &
+!                          nz, n,iv%sound(i)%h(n), iv%sound(i)%zk(n)
+        endif
+     ENDDO
+     if (nz > 0) then
+       mnz = mnz + 1
+!       write(999, FMT = fmt_info, IOSTAT = iost) &
+!                   iv%sound(i)%info%platform,    &
+!                   iv%sound(i)%info%date_char,   &
+!                   iv%sound(i)%info%name,        &
+!                   iv%sound(i)%info%levels + 1,  &
+!                   iv%sound(i)%info%lat,         &
+!                   iv%sound(i)%info%lon,         &
+!                   iv%sound(i)%info%elv,         &
+!                   iv%sound(i)%info%id
+!       write(999,'(i5,a,i3)') mnz, "  Num. of outside model column =", nz
+     endif
+     nz = iv%sound(i)%info%levels + 1 - nz
+     if( nz < 1) cycle
      write(ounit, FMT = fmt_info, IOSTAT = iost) &
                    iv%sound(i)%info%platform,    &
                    iv%sound(i)%info%date_char,   &
                    iv%sound(i)%info%name,        &
-                   iv%sound(i)%info%levels + 1,  &
+                   nz,                           &
                    iv%sound(i)%info%lat,         &
                    iv%sound(i)%info%lon,         &
                    iv%sound(i)%info%elv,         &
                    iv%sound(i)%info%id
+!                   iv%sound(i)%info%levels + 1,  &
     slp_inv= iv%sound(i)%loc%slp%inv
     slp_qc = iv%sound(i)%loc%slp%qc
-    if( iv%sonde_sfc(i)%p%qc < obs_qc_pointer  ) then
+    if( iv%sonde_sfc(i)%p%qc <= fails_error_max) then
     slp_inv = missing_r
     slp_qc  = missing_data
     end if
-  write(ounit, FMT = fmt_loc) slp_inv,slp_qc,iv%sound(i)%loc%slp%error, iv%sound(i)%loc%pw
+  write(ounit, FMT = fmt_srfc) slp_inv,slp_qc,iv%sound(i)%loc%slp%error, iv%sound(i)%loc%pw
 !----------------------------------------------------------------------------!
+!
+  nz = 0
+  j  = 0
+! ==> Not below the first model level..... (YRG)
+  if (iv%sonde_sfc(i)%zk == missing_r) then
+     nz = nz + 1
+  else
+     j = j + 1
 ! First write surface level information
 !----------------------------------------------------------------------------!
 ! get speed and direction
@@ -645,8 +686,6 @@ subroutine da_write_filtered_obs( ob, iv, xp )
 !----------------------------------------------------------------------------!
 ! get RH from Q & T    
       if( iv%sonde_sfc(i)%q%qc >= obs_qc_pointer .and.  &
-          iv%sonde_sfc(i)%t%qc >= obs_qc_pointer .and.  &
-          iv%sonde_sfc(i)%p%qc >= obs_qc_pointer .and.  &
           abs(iv%sonde_sfc(i)%q%error - missing_r ) > 1. .and.  &
           abs(ob%sonde_sfc(i)%t       - missing_r ) > 1. .and.  &
           abs(ob%sonde_sfc(i)%p       - missing_r ) > 1.    ) then 
@@ -662,7 +701,7 @@ subroutine da_write_filtered_obs( ob, iv, xp )
    p     = ob%sonde_sfc(i)%p
    p_qc  = iv%sonde_sfc(i)%p%qc
    p_err = iv%sonde_sfc(i)%p%error
-   if( iv%sonde_sfc(i)%p%qc < obs_qc_pointer  ) then
+   if( iv%sonde_sfc(i)%p%qc <= fails_error_max) then
      p_qc  = missing_data
      p     = missing_r
    p_err   = pr_error           
@@ -670,7 +709,7 @@ subroutine da_write_filtered_obs( ob, iv, xp )
    t     =  ob%sonde_sfc(i)%t
    t_qc  =  iv%sonde_sfc(i)%t%qc
    t_err =  iv%sonde_sfc(i)%t%error
-   if( iv%sonde_sfc(i)%t%qc < obs_qc_pointer  ) then
+   if( iv%sonde_sfc(i)%t%qc <= fails_error_max) then
      t_qc  = missing_data
      t     = missing_r
      t_err = xmiss       
@@ -680,12 +719,19 @@ subroutine da_write_filtered_obs( ob, iv, xp )
          p,  p_qc,   p_err,                         &
          speed,speed_qc, speed_err ,                &
          dir  , dir_qc,  dir_err ,                  &
-         iv%sonde_sfc(i)%info%elv, zero, elv_error, &
+         iv%sonde_sfc(i)%h, zero, elv_error,        &
          t, t_qc, t_err,                            &
          td, td_qc, td_error,                       &
-         rh, rh_qc,  rh_error                
+         rh, rh_qc,  rh_error
+  endif
+                
 !----------------------------------------------------------------------------!
-      DO n = 1, iv%sound(i)%info%levels 
+      DO n = 1, iv%sound(i)%info%levels
+
+     if (iv%sound(i)%zk(n) == missing_r) then
+       nz = nz + 1
+     else
+       j  = j + 1
 !----------------------------------------------------------------------------!
 ! get speed and direction
       if( iv%sound(i)%u(n)%qc >= obs_qc_pointer .and. &
@@ -706,7 +752,6 @@ subroutine da_write_filtered_obs( ob, iv, xp )
 !----------------------------------------------------------------------------!
 ! get RH from Q & T    
       if( iv%sound(i)%q(n)%qc >= obs_qc_pointer .and.  &
-          iv%sound(i)%t(n)%qc >= obs_qc_pointer .and.  &
           abs(iv%sound(i)%q(n)%error - missing_r ) > 1. .and.  &
           abs(ob%sound(i)%t(n)       - missing_r ) > 1. .and.  &
           abs(iv%sound(i)%p(n)       - missing_r ) > 1.    ) then 
@@ -722,7 +767,7 @@ subroutine da_write_filtered_obs( ob, iv, xp )
    t    =  ob%sound(i)%t(n)
    t_qc =  iv%sound(i)%t(n)%qc
    t_err= iv%sound(i)%t(n)%error
-   if( iv%sound(i)%t(n)%qc < obs_qc_pointer  ) then
+   if( iv%sound(i)%t(n)%qc <= fails_error_max) then
      t_qc = missing_data
      t   = missing_r
    end if
@@ -731,12 +776,17 @@ subroutine da_write_filtered_obs( ob, iv, xp )
          iv%sound(i)%p(n), zero,    pr_error,       &
          speed, speed_qc, speed_err ,               &
          dir  , dir_qc,  dir_err ,                  &
-         iv%sound(i)%info%elv, zero, elv_error,     &
+         iv%sound(i)%h(n), zero, elv_error,         &
          t,  t_qc, t_err,                           &
          td, td_qc, td_error,                       &
          rh, rh_qc,  rh_error                
+ 
+     endif
 
       ENDDO 
+!       write(999,'("Sonde ",i5,a,i3,a,i3,a,i3," levels"/)')               &
+!                       mnz, " Written out", j, " levels, discarded", nz, &
+!                       " levels total", iv%sound(i)%info%levels+1
 !
       ENDDO 
    ENDIF
@@ -746,6 +796,7 @@ subroutine da_write_filtered_obs( ob, iv, xp )
     if(print_detail_f_obs) print*,' writing filtered Obs for airep  ',iv%num_airep 
 !----------------------------------------------------------------------------!
     DO i = 1, iv % num_airep               
+     if( .not. iv%airep(i)%loc%proc_domain) cycle
      write(ounit, FMT = fmt_info, IOSTAT = iost) &
                    iv%airep(i)%info%platform,    &
                    iv%airep(i)%info%date_char,   &
@@ -755,7 +806,7 @@ subroutine da_write_filtered_obs( ob, iv, xp )
                    iv%airep(i)%info%lon,         &
                    iv%airep(i)%info%elv,         &
                    iv%airep(i)%info%id
-  write(ounit, FMT = fmt_loc) iv%airep(i)%loc%slp, iv%airep(i)%loc%pw
+  write(ounit, FMT = fmt_srfc) iv%airep(i)%loc%slp, iv%airep(i)%loc%pw
 !----------------------------------------------------------------------------!
      DO n = 1, iv%airep(i)%info%levels
 !----------------------------------------------------------------------------!
@@ -779,7 +830,7 @@ subroutine da_write_filtered_obs( ob, iv, xp )
    t    =  ob%airep(i)%t(n)
    t_qc =  iv%airep(i)%t(n)%qc
    t_err= iv%airep(i)%t(n)%error
-   if( iv%airep(i)%t(n)%qc < obs_qc_pointer  ) then
+   if( iv%airep(i)%t(n)%qc <= fails_error_max) then
      t_qc = missing_data
      t   = missing_r
    end if
@@ -803,6 +854,7 @@ subroutine da_write_filtered_obs( ob, iv, xp )
     if(print_detail_f_obs) print*,' writing filtered Obs for pilot  ',iv%num_pilot 
 !----------------------------------------------------------------------------!
    DO i = 1, iv % num_pilot               
+    if( .not. iv%pilot(i)%loc%proc_domain) cycle
      write(ounit, FMT = fmt_info, IOSTAT = iost) &
                    iv%pilot(i)%info%platform,    &
                    iv%pilot(i)%info%date_char,   &
@@ -812,7 +864,7 @@ subroutine da_write_filtered_obs( ob, iv, xp )
                    iv%pilot(i)%info%lon,         &
                    iv%pilot(i)%info%elv,         &
                    iv%pilot(i)%info%id
-    write(ounit, FMT = fmt_loc) iv%pilot(i)%loc%slp, iv%pilot(i)%loc%pw
+    write(ounit, FMT = fmt_srfc) iv%pilot(i)%loc%slp, iv%pilot(i)%loc%pw
 !----------------------------------------------------------------------------!
      DO n = 1, iv%pilot(i)%info%levels
 !----------------------------------------------------------------------------!
@@ -854,8 +906,8 @@ subroutine da_write_filtered_obs( ob, iv, xp )
     if(print_detail_f_obs) print*,' writing filtered Obs for satem  ',iv%num_satem 
 !----------------------------------------------------------------------------!
 !  Write Satem:          
-   rewind 193
    DO i = 1, iv % num_satem           
+    if( .not. iv%satem(i)%loc%proc_domain) cycle
      write(ounit, FMT = fmt_info, IOSTAT = iost) &
                    iv%satem(i)%info%platform,    &
                    iv%satem(i)%info%date_char,   &
@@ -865,20 +917,15 @@ subroutine da_write_filtered_obs( ob, iv, xp )
                    iv%satem(i)%info%lon,         &
                    iv%satem(i)%info%elv,         &
                    iv%satem(i)%info%id
-     write(ounit, FMT = fmt_loc) iv%satem(i)%loc%slp, iv%satem(i)%loc%pw
+     write(ounit, FMT = fmt_srfc) iv%satem(i)%loc%slp, iv%satem(i)%loc%pw
      DO n = 1, iv%satem(i)%info%levels 
 !
-! read original thickness error from unit 193
-     read(UNIT=193,FMT='(i8,2x,i8,2f12.3)')n1,n2,thick,thick_error
-     if( n1 /= i  .or. n2 /= n) then
-       WRITE(UNIT=errmsg(1),FMT='(A,4I5)') &
-         "mismatch in reading thickness errors from unit 193 ",i,n1,n,n2
-       call wrf_error(__FILE__,__LINE__,errmsg(1))
-     end if
        thick_qc = iv%satem(i)%thickness(n)%qc
+       thick = iv%satem(i)%org_thickness(n)%inv   
+       thick_error = iv%satem(i)%org_thickness(n)%error
        if( iv%satem(i)%thickness(n)%qc < obs_qc_pointer) thick_qc = missing_data
 !
-         write(UNIT=ounit, FMT = TRIM (fmt_each))               &
+         write(ounit, FMT = TRIM (fmt_each))               &
          iv%satem(i)%p(n),zero, slp_error,                 &
          missing_r, missing_data, xmiss,                   &
          missing_r, missing_data, xmiss,                   &
@@ -899,6 +946,7 @@ subroutine da_write_filtered_obs( ob, iv, xp )
     if(print_detail_f_obs) print*,' writing filtered Obs for qscat  ',iv%num_qscat 
 !----------------------------------------------------------------------------!
    DO i = 1, iv % num_qscat               
+    if( .not. iv%qscat(i)%loc%proc_domain) cycle
      write(ounit, FMT = fmt_info, IOSTAT = iost) &
                    iv%qscat(i)%info%platform,    &
                    iv%qscat(i)%info%date_char,   &
@@ -908,7 +956,7 @@ subroutine da_write_filtered_obs( ob, iv, xp )
                    iv%qscat(i)%info%lon,         &
                    iv%qscat(i)%info%elv,         &
                    iv%qscat(i)%info%id
-     write(ounit, FMT = fmt_loc) iv%qscat(i)%loc%slp, iv%qscat(i)%loc%pw
+     write(ounit, FMT = fmt_srfc) iv%qscat(i)%loc%slp, iv%qscat(i)%loc%pw
 !
 !----------------------------------------------------------------------------!
 ! get speed and direction
@@ -943,6 +991,7 @@ subroutine da_write_filtered_obs( ob, iv, xp )
     if(print_detail_f_obs) print*,' writing filtered Obs for profiler  ',iv%num_profiler 
 !----------------------------------------------------------------------------!
    DO i = 1, iv % num_profiler            
+    if( .not. iv%profiler(i)%loc%proc_domain) cycle
      write(ounit, FMT = fmt_info, IOSTAT = iost)    &
                    iv%profiler(i)%info%platform,    &
                    iv%profiler(i)%info%date_char,   &
@@ -952,7 +1001,7 @@ subroutine da_write_filtered_obs( ob, iv, xp )
                    iv%profiler(i)%info%lon,         &
                    iv%profiler(i)%info%elv,         &
                    iv%profiler(i)%info%id
-     write(ounit, FMT = fmt_loc) iv%profiler(i)%loc%slp, iv%profiler(i)%loc%pw
+     write(ounit, FMT = fmt_srfc) iv%profiler(i)%loc%slp, iv%profiler(i)%loc%pw
 !----------------------------------------------------------------------------!
    DO n = 1, iv%profiler(i)%info%levels
 !----------------------------------------------------------------------------!
@@ -990,6 +1039,7 @@ subroutine da_write_filtered_obs( ob, iv, xp )
     if(print_detail_f_obs) print*,' writing filtered Obs for ssmi retrieval  ', iv % num_ssmi_retrieval 
 !----------------------------------------------------------------------------!
     DO i = 1, iv % num_ssmi_retrieval
+     if( .not. iv%ssmi_retrieval(i)%loc%proc_domain) cycle
      write(ounit, FMT = fmt_info, IOSTAT = iost) &
                    iv%ssmi_retrieval(i)%info%platform,    &
                    iv%ssmi_retrieval(i)%info%date_char,   &
@@ -999,7 +1049,7 @@ subroutine da_write_filtered_obs( ob, iv, xp )
                    iv%ssmi_retrieval(i)%info%lon,         &
                    iv%ssmi_retrieval(i)%info%elv,         &
                    iv%ssmi_retrieval(i)%info%id
-     write(ounit, FMT = fmt_loc) iv%ssmi_retrieval(i)%loc%slp, iv%ssmi_retrieval(i)%loc%pw
+     write(ounit, FMT = fmt_srfc) iv%ssmi_retrieval(i)%loc%slp, iv%ssmi_retrieval(i)%loc%pw
       ENDDO    
    ENDIF
 !----------------------------------------------------------------------------!
@@ -1007,7 +1057,8 @@ subroutine da_write_filtered_obs( ob, iv, xp )
    IF ( iv % num_ssmt1 > 0 ) THEN
     if(print_detail_f_obs) print*,' writing filtered Obs for ssmt1 ', iv % num_ssmt1 
 !----------------------------------------------------------------------------!
-   DO i = 1, iv % num_ssmi_retrieval
+    DO i = 1, iv % num_ssmt1             
+     if( .not. iv%ssmt1(i)%loc%proc_domain) cycle
      write(ounit, FMT = fmt_info, IOSTAT = iost) &
                    iv%ssmt1(i)%info%platform,    &
                    iv%ssmt1(i)%info%date_char,   &
@@ -1017,7 +1068,7 @@ subroutine da_write_filtered_obs( ob, iv, xp )
                    iv%ssmt1(i)%info%lon,         &
                    iv%ssmt1(i)%info%elv,         &
                    iv%ssmt1(i)%info%id
-     write(ounit, FMT = fmt_loc) iv%ssmt1(i)%loc%slp, iv%ssmt1(i)%loc%pw
+     write(ounit, FMT = fmt_srfc) iv%ssmt1(i)%loc%slp, iv%ssmt1(i)%loc%pw
 !----------------------------------------------------------------------------!
      DO n = 1, iv%ssmt1(i)%info%levels
       write(ounit, FMT = TRIM (fmt_each))                            &
@@ -1037,7 +1088,8 @@ subroutine da_write_filtered_obs( ob, iv, xp )
    IF ( iv % num_ssmt2 > 0 ) THEN
     if(print_detail_f_obs) print*,' writing filtered Obs for ssmt2 ', iv % num_ssmt2 
 !----------------------------------------------------------------------------!
-    DO i = 1, iv % num_ssmi_retrieval
+    DO i = 1, iv % num_ssmt2              
+    if( .not. iv%ssmt2(i)%loc%proc_domain) cycle
      write(ounit, FMT = fmt_info, IOSTAT = iost) &
                    iv%ssmt2(i)%info%platform,    &
                    iv%ssmt2(i)%info%date_char,   &
@@ -1047,7 +1099,7 @@ subroutine da_write_filtered_obs( ob, iv, xp )
                    iv%ssmt2(i)%info%lon,         &
                    iv%ssmt2(i)%info%elv,         &
                    iv%ssmt2(i)%info%id
-     write(ounit, FMT = fmt_loc) iv%ssmt2(i)%loc%slp, iv%ssmt2(i)%loc%pw
+     write(ounit, FMT = fmt_srfc) iv%ssmt2(i)%loc%slp, iv%ssmt2(i)%loc%pw
 !----------------------------------------------------------------------------!
     DO n = 1, iv%ssmt2(i)%info%levels
       write(ounit, FMT = TRIM (fmt_each))                  &
@@ -1069,9 +1121,9 @@ subroutine da_write_filtered_obs( ob, iv, xp )
     if(print_detail_f_obs) print*,' writing filtered Obs for gpspw ', iv % num_gpspw 
 !----------------------------------------------------------------------------!
    DO i = 1, iv % num_gpspw
-! Hardwired levels = 0 for GPSPW (Syed RH Rizvi 05/12/2006)
+     if( .not. iv%gpspw(i)%loc%proc_domain) cycle
+! hardwired the # of levels = 0 for GPSPW (YRG 03/02/2006)
      iv%gpspw(i)%info%levels = 0
-
      write(ounit, FMT = fmt_info, IOSTAT = iost) &
                    iv%gpspw(i)%info%platform,    &
                    iv%gpspw(i)%info%date_char,   &
@@ -1081,7 +1133,7 @@ subroutine da_write_filtered_obs( ob, iv, xp )
                    iv%gpspw(i)%info%lon,         &
                    iv%gpspw(i)%info%elv,         &
                    iv%gpspw(i)%info%id
-     write(ounit, FMT = fmt_loc) iv%gpspw(i)%loc%slp, iv%gpspw(i)%loc%pw
+     write(ounit, FMT = fmt_srfc) iv%gpspw(i)%loc%slp, iv%gpspw(i)%loc%pw
       ENDDO 
    ENDIF
 !----------------------------------------------------------------------------!
@@ -1090,6 +1142,7 @@ subroutine da_write_filtered_obs( ob, iv, xp )
     if(print_detail_f_obs) print*,' writing filtered Obs for gpsref ', iv % num_gpsref
 !----------------------------------------------------------------------------!
    DO i = 1, iv % num_gpsref
+    if( .not. iv%gpsref(i)%loc%proc_domain) cycle
      write(ounit, FMT = fmt_info, IOSTAT = iost) &
                    iv%gpsref(i)%info%platform,    &
                    iv%gpsref(i)%info%date_char,   &
@@ -1099,14 +1152,12 @@ subroutine da_write_filtered_obs( ob, iv, xp )
                    iv%gpsref(i)%info%lon,         &
                    iv%gpsref(i)%info%elv,         &
                    iv%gpsref(i)%info%id
-     write(ounit, FMT = fmt_loc) iv%gpsref(i)%loc%slp, iv%gpsref(i)%loc%pw
+     write(ounit, FMT = fmt_srfc) iv%gpsref(i)%loc%slp, iv%gpsref(i)%loc%pw
 !----------------------------------------------------------------------------!
     DO n = 1, iv%gpsref(i)%info%levels
 !----------------------------------------------------------------------------!
 ! get RH from Q & T    
       if( iv%gpsref(i)%q(n)%qc >= obs_qc_pointer .and.  &
-          iv%gpsref(i)%t(n)%qc >= obs_qc_pointer .and.  &
-          iv%gpsref(i)%p(n)%qc >= obs_qc_pointer .and.  &
           abs(iv%gpsref(i)%q(n)%error - missing_r ) > 1. .and.  &
           abs(ob%gpsref(i)%t(n)       - missing_r ) > 1. .and.  &
           abs(ob%gpsref(i)%p(n)       - missing_r ) > 1.    ) then 
@@ -1120,21 +1171,21 @@ subroutine da_write_filtered_obs( ob, iv, xp )
 !----------------------------------------------------------------------------!
     p    = ob%gpsref(i)%p(n)
     p_qc = iv%gpsref(i)%p(n)%qc 
-   if( iv%gpsref(i)%p(n)%qc < obs_qc_pointer  ) then
+   if( iv%gpsref(i)%p(n)%qc <= fails_error_max) then
     p    = missing_r     
     p_qc = missing_data  
    end if
     t    = ob%gpsref(i)%t(n)
    t_qc  = iv%gpsref(i)%t(n)%qc
    t_err = iv%gpsref(i)%t(n)%error   
-   if( iv%gpsref(i)%t(n)%qc < obs_qc_pointer  ) then
+   if( iv%gpsref(i)%t(n)%qc <= fails_error_max) then
     t    = missing_r     
     t_qc = missing_data  
    end if
    ref = ob%gpsref(i)%ref(n)
    ref_qc = iv%gpsref(i)%ref(n)%qc
    ref_err = iv%gpsref(i)%ref(n)%error   
-   if( iv%gpsref(i)%ref(n)%qc < obs_qc_pointer  ) then
+   if( iv%gpsref(i)%ref(n)%qc <= fails_error_max) then
     ref    = missing_r     
     ref_qc = missing_data  
    endif
@@ -1143,23 +1194,24 @@ subroutine da_write_filtered_obs( ob, iv, xp )
          p,  p_qc, slp_error,                         &
          missing_r, missing_data, xmiss,              &
          missing_r, missing_data, xmiss,              &
-         iv%gpsref(i)%h(n), zero, xmiss,              &
-         t, t_qc,  t_err,                             &
-         ref, ref_qc,  ref_err,                       &
+         iv%gpsref(i)%h(n), zero, height_error,       &
+         t, t_qc,  t_err,                             &   
+         ref, ref_qc,  ref_err,                       &   
          rh, rh_qc, iv%gpsref(i)%q(n)%error
-
       ENDDO 
 !
       ENDDO 
    ENDIF
 !----------------------------------------------------------------------------!
    IF ( iv % num_ssmi_tb > 0 ) &     
-   print*,'Warning ------>  Currently SSMI brightness temperature info is not written'
-   rewind ounit
-   call da_count_filtered_obs(ounit, xp)
+   print*,'Warning ------>  Currently SSMI brightness temperature info is not written for filtered obs'
+   close(ounit)
+#ifdef DM_PARALLEL
+     call MPI_BARRIER(MPI_COMM_WORLD, ierr)
+#endif
+    call da_count_filtered_obs(xb, xp, phic, xlonc, truelat1, truelat2)
    close (ounit)
+if (trace_use) CALL da_trace_exit("da_write_filtered_obs")
+
 !--------------------------------------------------------------------------
-
-   if (trace_use) call da_trace_exit("da_write_filtered_obs")
-
-end subroutine da_write_filtered_obs
+END SUBROUTINE da_write_filtered_obs

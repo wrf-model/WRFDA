@@ -210,7 +210,6 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
    INTEGER, PARAMETER :: rtm_info_unit = 109  ! Radiance info file
    INTEGER, PARAMETER :: rtm_bias_unit = 110  ! Radiance bias file
    INTEGER, PARAMETER :: filtered_obs_iunit  = 192  ! Unit number for writing filtered obs
-   INTEGER, PARAMETER :: thickness_errors_unit = 193 ! See DA_Read_Obs
    INTEGER, PARAMETER :: unit_983            = 983 ! TBD
    integer, parameter  :: iunit = 70
    integer, parameter  :: ounit = iunit + 1
@@ -557,6 +556,9 @@ INTEGER, PARAMETER :: fm_index(max_no_fm) = (/ &
    0,0,0,0,0,0,0,0,0,0,                                & ! 271-280
    qscat_index,0,0,0,0,0,0,0,0,0 /)                      ! 281-290
 
+ CHARACTER*120  :: fmt_info ='(a12,1x,a19,1x,a40,1x,i6,3(f12.3,11x),6x,a5)'
+ CHARACTER*120  :: fmt_srfc = '(7(:,f12.3,i4,f7.2))'
+ CHARACTER*120  :: fmt_each = '(3(f12.3,i4,f7.2),11x,3(f12.3,i4,f7.2),11x,1(f12.3,i4,f7.2))'
 
 
  CONTAINS
@@ -569,4 +571,3 @@ INTEGER, PARAMETER :: fm_index(max_no_fm) = (/ &
 #include "da_gamma.inc"
 
 end module da_constants
-

@@ -55,11 +55,22 @@ SUBROUTINE da_solve_v3d ( grid , config_flags , &
 
    integer                      :: cv_size
    real                         :: j_grad_norm_target ! TArget j norm.
-   integer                      :: iost
+   integer                      :: iost, ierr
 
    IF (trace_use) call da_trace_entry("da_solve_v3d")
 
    call wrf_message("***  VARIATIONAL ANALYSIS ***")
+#ifdef DM_PARALLEL
+         call MPI_COMM_SIZE(MPI_COMM_WORLD, numb_procs, ierr)
+#else
+         numb_procs = 1
+#endif
+!------------------------------------------------------------------------------
+! If it is verification run set check_max_iv as .false.
+!------------------------------------------------------------------------------
+   if( (analysis_type(1:6) == "VERIFY" .or.  analysis_type(1:6) == "verify") ) then
+     check_max_iv = .false.
+   endif
 
    ! Things that used to be done in da_read_namelist
 
@@ -324,10 +335,11 @@ SUBROUTINE da_solve_v3d ( grid , config_flags , &
       end if
 
       ! Write "clean" QCed observations if requested:
-      if ( write_filtered_obs .and. it == 1 ) THEN
-         call da_write_filtered_obs( ob, iv, xp )
-      END IF
-
+     if( (analysis_type(1:6) == "QC-OBS" .or.  analysis_type(1:6) == "qc-obs") )then
+       if( it == 1) CALL da_write_filtered_obs(ob, iv, xb, xp, &
+                          grid%moad_cen_lat, grid%stand_lon,&
+                          grid%truelat1, grid%truelat2 )
+      endif
       if (lmonitoring) call wrf_shutdown
 
       ! [8.3] Interpolate x_g to low resolution grid
@@ -347,9 +359,6 @@ SUBROUTINE da_solve_v3d ( grid , config_flags , &
                            its, ite, jts, jte, kts, kte         )
 
       !------------------------------------------------------------------------
-      ! For first outer loop write filtered obs when ntmax = 0 
-      ! if(it == 1 .and. ntmax == 0) &
-      ! call da_write_filtered_obs(gts_iunit, filtered_obs_iunit, ob, iv)
 
       ! [8.5] Update latest analysis solution:
 

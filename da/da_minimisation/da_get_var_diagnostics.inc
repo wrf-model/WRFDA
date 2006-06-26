@@ -8,7 +8,7 @@ subroutine da_get_var_diagnostics ( iv, j )
 
    LOGICAL, EXTERNAL :: wrf_dm_on_monitor     ! For statistics output.
 
-   IF (trace_use) call da_trace_entry("da_get_var_diagnostics")
+   IF (trace_use) CALL da_trace_entry("da_get_var_diagnostics")
 
    !-----------------------------------------------------------------------------
    ! [1.0] Sum up Jo across processors:
@@ -132,7 +132,7 @@ subroutine da_get_var_diagnostics ( iv, j )
 
 
       if ( iv % num_geoamv_glo > 0 ) then
-         write(UNIT=jo_unit,FMT='(a30,2i8,10f15.5)')'    geo. cmv obs, Jo (actual)  = ', &
+         write(UNIT=jo_unit,FMT='(a30,2i8,10f15.5)')'    geoamv ob, Jo (actual)  = ', &
                                iv % num_geoamv_glo, num_geoamv_tot, &
                                j % jo % geoamv_u, iv % geoamv_ef_u, &
                                j % jo % geoamv_v, iv % geoamv_ef_v, &
@@ -140,7 +140,7 @@ subroutine da_get_var_diagnostics ( iv, j )
       end if
 
       if ( iv % num_polaramv_glo > 0 ) then
-         write(UNIT=jo_unit,FMT='(a30,2i8,10f15.5)')'   Polar cmv obs, Jo (actual)  = ', &
+         write(UNIT=jo_unit,FMT='(a30,2i8,10f15.5)')'    polaramv,  Jo (actual)  = ', &
                                iv % num_polaramv_glo, num_polaramv_tot, &
                                j % jo % polaramv_u, iv % polaramv_ef_u, &
                                j % jo % polaramv_v, iv % polaramv_ef_v, &
@@ -261,6 +261,6 @@ subroutine da_get_var_diagnostics ( iv, j )
       end if
    end if
 
-   IF (trace_use) call da_trace_exit("da_get_var_diagnostics")
+   IF (trace_use) CALL da_trace_exit("da_get_var_diagnostics")
       
 end subroutine da_get_var_diagnostics

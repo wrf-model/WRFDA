@@ -1,20 +1,39 @@
-subroutine da_add_noise_to_ob( iv, ob )
+SUBROUTINE da_add_noise_to_ob( iv, ob )
 !----------------------------------------------------------------------------   
 !  History:
 !
 !  Additions:
 !             07/08/2003      Profiler and Buoy Obs            S. R. H. Rizvi
+!             06/23/2006      MPI update                      S. R. H. Rizvi
 !
 !  Purpose: Allocates observation structure and fills it fro iv.
 !----------------------------------------------------------------------------   
    IMPLICIT NONE
+#ifdef DM_PARALLEL
+#   include <mpif.h>
+#endif
+
 
    TYPE (ob_type), INTENT(INOUT) :: iv   ! Obs and header structure.
    TYPE (y_type), INTENT(INOUT)  :: ob   ! (Smaller) observation structure.
 
-   real                          :: z1, z2, z3, z4, z5, z6, z7 ! Random numbers.
+   real                          :: z1, z2, z3, z4, z5, z6, z7, dum ! Random numbers.
    integer                       :: n, k     ! Loop counters.
-
+   integer                       :: myrank    ! Id of my processor.
+   integer                       :: ierr      ! Error code from MPI routines.
+   integer                       :: ounit     ! Output unit
+!----------------------------------------------------------------------------
+!  Fix output unit
+!----------------------------------------------------------------------------
+      ounit = rand_unit        
+   if( numb_procs > 1) then
+#ifdef DM_PARALLEL
+! Get output unit for MPI run
+  call MPI_COMM_RANK( MPI_COMM_WORLD, myrank, ierr )
+  ounit = ounit*10 +  myrank
+#endif
+   end if
+   dum = -999999.9
 !----------------------------------------------------------------------
 !  [1.0] Initiate random number sequence:
 !----------------------------------------------------------------------
@@ -29,10 +48,10 @@ subroutine da_add_noise_to_ob( iv, ob )
 
    IF ( iv % num_synop > 0 ) THEN
    
-      write(rand_unit,'(a,i8)')'synop', iv % num_synop
+      write(ounit,'(a20,i8)')'synop', iv % num_synop
 
       DO n = 1, iv % num_synop
-
+       write(ounit,'(i8)')  1
 !        Add random perturbation:
          call da_add_noise( iv % synop(n) % u, ob % synop(n) % u, z1 )
          call da_add_noise( iv % synop(n) % v, ob % synop(n) % v, z2 )
@@ -41,11 +60,12 @@ subroutine da_add_noise_to_ob( iv, ob )
          call da_add_noise( iv % synop(n) % q, ob % synop(n) % q, z5 )
 
 !        Write out data:
-         write(rand_unit,'(2i8,10e15.7)')n, 1, iv % synop(n) % u % error, z1, &
+         write(ounit,'(2i8,7e15.7)')n, 1, iv % synop(n) % u % error, z1, &
                                   iv % synop(n) % v % error, z2, &
                                   iv % synop(n) % t % error, z3, &
                                   iv % synop(n) % p % error, z4, &
-                                  iv % synop(n) % q % error, z5
+                                  iv % synop(n) % q % error, z5, &
+                                  dum, dum
       END DO
    ENDIF
 
@@ -53,9 +73,10 @@ subroutine da_add_noise_to_ob( iv, ob )
 
    IF ( iv % num_metar > 0 ) THEN
 
-      write(rand_unit,'(a,i8)')'metar', iv % num_metar
+      write(ounit,'(a20,i8)')'metar', iv % num_metar
    
       DO n = 1, iv % num_metar
+       write(ounit,'(i8)')  1
 
 !        Add random perturbation:
          call da_add_noise( iv % metar(n) % u, ob % metar(n) % u, z1 )
@@ -65,12 +86,13 @@ subroutine da_add_noise_to_ob( iv, ob )
          call da_add_noise( iv % metar(n) % q, ob % metar(n) % q, z5 )
 
 !        Write out data:
-         write(rand_unit,'(2i8,10e15.7)')n, 1, &
+         write(ounit,'(2i8,7e15.7)')n, 1, &
                                   iv % metar(n) % u % error, z1, &
                                   iv % metar(n) % v % error, z2, &
                                   iv % metar(n) % t % error, z3, &
                                   iv % metar(n) % p % error, z4, &
-                                  iv % metar(n) % q % error, z5
+                                  iv % metar(n) % q % error, z5, &
+                                  dum, dum
 
       END DO
    ENDIF
@@ -79,7 +101,7 @@ subroutine da_add_noise_to_ob( iv, ob )
 
    IF ( iv % num_ships > 0 ) THEN
 
-      write(rand_unit,'(a,i8)')'ships', iv % num_ships
+      write(ounit,'(a20,i8)')'ships', iv % num_ships
   
       DO n = 1, iv % num_ships
 
@@ -91,12 +113,13 @@ subroutine da_add_noise_to_ob( iv, ob )
          call da_add_noise( iv % ships(n) % q, ob % ships(n) % q, z5 )
 
 !        Write out data:
-         write(rand_unit,'(2i8,10e15.7)')n, 1, &
+         write(ounit,'(2i8,7e15.7)')n, 1, &
                                   iv % ships(n) % u % error, z1, &
                                   iv % ships(n) % v % error, z2, &
                                   iv % ships(n) % t % error, z3, &
                                   iv % ships(n) % p % error, z4, &
-                                  iv % ships(n) % q % error, z5
+                                  iv % ships(n) % q % error, z5, &
+                                  dum, dum
       END DO
    ENDIF
 
@@ -105,10 +128,10 @@ subroutine da_add_noise_to_ob( iv, ob )
 
    IF ( iv % num_geoamv > 0 ) THEN
 
-      write(rand_unit,'(a,i8)')'geoamv', iv % num_geoamv
+      write(ounit,'(a20,i8)')'geoamv', iv % num_geoamv
 
       DO n = 1, iv % num_geoamv
-         write(rand_unit,'(i8)')iv % geoamv(n) % info % levels
+         write(ounit,'(i8)')iv % geoamv(n) % info % levels
 
          DO k = 1, iv % geoamv(n) % info % levels
 
@@ -117,9 +140,10 @@ subroutine da_add_noise_to_ob( iv, ob )
             call da_add_noise( iv % geoamv(n) % v(k), ob % geoamv(n) % v(k), z2)
 
 !           Write out data:
-            write(rand_unit,'(2i8,10e15.7)')n, k, &
+            write(ounit,'(2i8,7e15.7)')n, k, &
                                iv % geoamv(n) % u(k) % error, z1, &
-                               iv % geoamv(n) % v(k) % error, z2
+                               iv % geoamv(n) % v(k) % error, z2, &
+                               dum, dum, dum, dum, dum
          END DO
       END DO
    ENDIF
@@ -128,10 +152,10 @@ subroutine da_add_noise_to_ob( iv, ob )
 
    IF ( iv % num_polaramv > 0 ) THEN
 
-      write(rand_unit,'(a,i8)')'polaramv', iv % num_polaramv
+      write(ounit,'(a20,i8)')'polaramv', iv % num_polaramv
 
       DO n = 1, iv % num_geoamv
-         write(rand_unit,'(i8)')iv % polaramv(n) % info % levels
+         write(ounit,'(i8)')iv % polaramv(n) % info % levels
 
          DO k = 1, iv % polaramv(n) % info % levels
 
@@ -140,9 +164,10 @@ subroutine da_add_noise_to_ob( iv, ob )
             call da_add_noise( iv % polaramv(n) % v(k), ob % polaramv(n) % v(k), z2)
 
 !           Write out data:
-            write(rand_unit,'(2i8,10e15.7)')n, k, &
+            write(ounit,'(2i8,7e15.7)')n, k, &
                                iv % polaramv(n) % u(k) % error, z1, &
-                               iv % polaramv(n) % v(k) % error, z2
+                               iv % polaramv(n) % v(k) % error, z2, &
+                               dum, dum, dum, dum, dum
          END DO
       END DO
    ENDIF
@@ -152,7 +177,7 @@ subroutine da_add_noise_to_ob( iv, ob )
 
    IF ( iv % num_gpspw > 0 ) THEN
 
-      write(rand_unit,'(a,i8)')'gpspw', iv % num_gpspw
+      write(ounit,'(a20,i8)')'gpspw', iv % num_gpspw
 
       DO n = 1, iv % num_gpspw
 
@@ -160,7 +185,8 @@ subroutine da_add_noise_to_ob( iv, ob )
          call da_add_noise( iv % gpspw(n) % tpw, ob % gpspw(n) % tpw, z1 )
          
 !        Write out data:
-         write(rand_unit,'(2i8,10e15.7)')n, 1, iv % gpspw(n) % tpw % error, z1
+         write(ounit,'(2i8,7e15.7)')n, 1, iv % gpspw(n) % tpw % error, z1, &
+                               dum, dum, dum, dum, dum, dum
 
       END DO
    ENDIF
@@ -169,10 +195,10 @@ subroutine da_add_noise_to_ob( iv, ob )
 
    IF ( iv % num_sound > 0 ) THEN
 
-      write(rand_unit,'(a,i8)')'sound', iv % num_sound
+      write(ounit,'(a20,i8)')'sound', iv % num_sound
 
       DO n = 1, iv % num_sound
-         write(rand_unit,'(i8)')iv % sound(n) % info % levels
+         write(ounit,'(i8)')iv % sound(n) % info % levels
 
          DO k = 1, iv % sound(n) % info % levels
 
@@ -183,18 +209,31 @@ subroutine da_add_noise_to_ob( iv, ob )
             call da_add_noise( iv % sound(n) % q(k), ob % sound(n) % q(k), z4)
 
 !           Write out data:
-            write(rand_unit,'(2i8,10e15.7)')n, k, &
+            write(ounit,'(2i8,7e15.7)')n, k, &
                                iv % sound(n) % u(k) % error, z1, &
                                iv % sound(n) % v(k) % error, z2, &
                                iv % sound(n) % t(k) % error, z3, &
-                               iv % sound(n) % q(k) % error, z4
+                               iv % sound(n) % q(k) % error, z4, &
+                               dum, dum, dum
          END DO
-
+       END DO
+      write(ounit,'(a20,i8)')'sound_sfc', iv % num_sound
+      DO n = 1, iv % num_sound
+         write(ounit,'(i8)') 1                                 
          call da_add_noise( iv % sonde_sfc(n) % u, ob % sonde_sfc(n) % u, z1 )
          call da_add_noise( iv % sonde_sfc(n) % v, ob % sonde_sfc(n) % v, z2 )
          call da_add_noise( iv % sonde_sfc(n) % t, ob % sonde_sfc(n) % t, z3 )
          call da_add_noise( iv % sonde_sfc(n) % p, ob % sonde_sfc(n) % p, z4 )
          call da_add_noise( iv % sonde_sfc(n) % q, ob % sonde_sfc(n) % q, z5 )
+
+!           Write out data:
+            write(ounit,'(2i8,7e15.7)')n, 1, &
+                               iv % sonde_sfc(n) % u % error, z1, &
+                               iv % sonde_sfc(n) % v % error, z2, &
+                               iv % sonde_sfc(n) % t % error, z3, &
+                               iv % sonde_sfc(n) % p % error, z4, &
+                               iv % sonde_sfc(n) % q % error, z5, &
+                               dum, dum
       END DO
    ENDIF
 
@@ -202,10 +241,10 @@ subroutine da_add_noise_to_ob( iv, ob )
 
    IF ( iv % num_airep > 0 ) THEN
 
-      write(rand_unit,'(a,i8)')'airep', iv % num_airep
+      write(ounit,'(a20,i8)')'airep', iv % num_airep
 
       DO n = 1, iv % num_airep
-         write(rand_unit,'(i8)')iv % airep(n) % info % levels
+         write(ounit,'(i8)')iv % airep(n) % info % levels
 
          DO k = 1, iv % airep(n) % info % levels
 
@@ -215,10 +254,11 @@ subroutine da_add_noise_to_ob( iv, ob )
             call da_add_noise( iv % airep(n) % t(k), ob % airep(n) % t(k), z3)
 
 !           Write out data:
-            write(rand_unit,'(2i8,10e15.7)')n, k, &
+            write(ounit,'(2i8,7e15.7)')n, k, &
                                iv % airep(n) % u(k) % error, z1, &
                                iv % airep(n) % v(k) % error, z2, &
-                               iv % airep(n) % t(k) % error, z3
+                               iv % airep(n) % t(k) % error, z3, &
+                               dum, dum, dum, dum
          END DO
       END DO
    ENDIF
@@ -227,10 +267,10 @@ subroutine da_add_noise_to_ob( iv, ob )
 
    IF ( iv % num_pilot > 0 ) THEN
    
-      write(rand_unit,'(a,i8)')'pilot', iv % num_pilot
+      write(ounit,'(a20,i8)')'pilot', iv % num_pilot
    
       DO n = 1, iv % num_pilot
-         write(rand_unit,'(i8)')iv % pilot(n) % info % levels
+         write(ounit,'(i8)')iv % pilot(n) % info % levels
 
          DO k = 1, iv % pilot(n) % info % levels
 
@@ -239,9 +279,10 @@ subroutine da_add_noise_to_ob( iv, ob )
             call da_add_noise( iv % pilot(n) % v(k), ob % pilot(n) % v(k), z2)
 
 !           Write out data:
-            write(rand_unit,'(2i8,10e15.7)')n, k, &
+            write(ounit,'(2i8,7e15.7)')n, k, &
                                iv % pilot(n) % u(k) % error, z1, &
-                               iv % pilot(n) % v(k) % error, z2
+                               iv % pilot(n) % v(k) % error, z2, &
+                               dum, dum, dum, dum, dum
          END DO
       END DO
    ENDIF
@@ -249,7 +290,7 @@ subroutine da_add_noise_to_ob( iv, ob )
 !  [2.9] Transfer SSM/I obs:SSMI:
 
    IF ( iv % num_ssmi_retrieval > 0 ) THEN
-      write(rand_unit,'(a,i8)')'ssmir', iv % num_ssmi_retrieval
+      write(ounit,'(a20,i8)')'ssmir', iv % num_ssmi_retrieval
 
       DO n = 1, iv % num_ssmi_retrieval
  
@@ -260,9 +301,10 @@ subroutine da_add_noise_to_ob( iv, ob )
                             ob % ssmi_retrieval(n) % tpw, z2 )
 
 !        Write out data:
-         write(rand_unit,'(2i8,10e15.7)')n, 1, &
+         write(ounit,'(2i8,7e15.7)')n, 1, &
                                   iv % ssmi_retrieval(n) % speed % error, z1, &
-                                  iv % ssmi_retrieval(n) % tpw % error, z2
+                                  iv % ssmi_retrieval(n) % tpw % error, z2,   & 
+                                  dum, dum, dum, dum, dum
       END DO
    ENDIF
 
@@ -286,7 +328,7 @@ subroutine da_add_noise_to_ob( iv, ob )
                             ob % ssmi_tb(n) % tb85v, z7)
 
 !        Write out data:
-         write(rand_unit,'(2i8,14e15.7)')n, 1, &
+         write(ounit,'(2i8,14e15.7)')n, 1, &
                                   iv % ssmi_tb(n) % tb19h % error, z1, &
                                   iv % ssmi_tb(n) % tb19v % error, z2, &
                                   iv % ssmi_tb(n) % tb22v % error, z3, &
@@ -301,10 +343,10 @@ subroutine da_add_noise_to_ob( iv, ob )
 !  [2.10] Transfer satem obs:
 
    IF ( iv % num_satem > 0 ) THEN
-      write(rand_unit,'(a,i8)')'satem', iv % num_satem
+      write(ounit,'(a20,i8)')'satem', iv % num_satem
 
       DO n = 1, iv % num_satem
-         write(rand_unit,'(i8)')iv % satem(n) % info % levels
+         write(ounit,'(i8)')iv % satem(n) % info % levels
 
          DO k = 1, iv % satem(n) % info % levels
 
@@ -313,8 +355,9 @@ subroutine da_add_noise_to_ob( iv, ob )
                                ob % satem(n) % thickness(k), z1 )
 
 !           Write out data:
-            write(rand_unit,'(2i8,10e15.7)')n, k, &
-                                     iv % satem(n) % thickness(k) % error, z1
+            write(ounit,'(2i8,7e15.7)')n, k, &
+                                     iv % satem(n) % thickness(k) % error, z1, &
+                                     dum, dum, dum, dum, dum, dum
          END DO
       END DO
    ENDIF
@@ -322,10 +365,10 @@ subroutine da_add_noise_to_ob( iv, ob )
 !  [2.11] Transfer ssmt1 obs:
 
    IF ( iv % num_ssmt1 > 0 ) THEN
-      write(rand_unit,'(a,i8)')'ssmt1', iv % num_ssmt1
+      write(ounit,'(a20,i8)')'ssmt1', iv % num_ssmt1
 
       DO n = 1, iv % num_ssmt1
-         write(rand_unit,'(i8)')iv % ssmt1(n) % info % levels
+         write(ounit,'(i8)')iv % ssmt1(n) % info % levels
          
          DO k = 1, iv % ssmt1(n) % info % levels
 
@@ -334,7 +377,8 @@ subroutine da_add_noise_to_ob( iv, ob )
                                ob % ssmt1(n) % t(k), z1 )
 
 !           Write out data:
-            write(rand_unit,'(2i8,10e15.7)')n, k, iv % ssmt1(n) % t(k) % error, z1
+            write(ounit,'(2i8,7e15.7)')n, k, iv % ssmt1(n) % t(k) % error, z1, &
+                                     dum, dum, dum, dum, dum, dum
          END DO
       END DO
    ENDIF
@@ -342,10 +386,10 @@ subroutine da_add_noise_to_ob( iv, ob )
 !  [2.12] Transfer ssmt2 obs:
 
    IF ( iv % num_ssmt2 > 0 ) THEN
-      write(rand_unit,'(a,i8)')'ssmt2', iv % num_ssmt2
+      write(ounit,'(a20,i8)')'ssmt2', iv % num_ssmt2
 
       DO n = 1, iv % num_ssmt2
-         write(rand_unit,'(i8)')iv % ssmt2(n) % info % levels
+         write(ounit,'(i8)')iv % ssmt2(n) % info % levels
          
          DO k = 1, iv % ssmt2(n) % info % levels
 !           Add random perturbation:
@@ -353,7 +397,8 @@ subroutine da_add_noise_to_ob( iv, ob )
                                ob % ssmt2(n) % rh(k), z1 )
 
 !           Write out data:
-            write(rand_unit,'(2i8,10e15.7)')n, k, iv % ssmt2(n) % rh(k) % error, z1
+            write(ounit,'(2i8,7e15.7)')n, k, iv % ssmt2(n) % rh(k) % error, z1, &
+                                     dum, dum, dum, dum, dum, dum
          END DO
       END DO
    ENDIF
@@ -362,7 +407,7 @@ subroutine da_add_noise_to_ob( iv, ob )
 
    IF ( iv % num_qscat > 0 ) THEN
 
-      write(rand_unit,'(a,i8)')'qscat', iv % num_qscat
+      write(ounit,'(a20,i8)')'qscat', iv % num_qscat
   
       DO n = 1, iv % num_qscat
 
@@ -371,9 +416,10 @@ subroutine da_add_noise_to_ob( iv, ob )
          call da_add_noise( iv % qscat(n) % v, ob % qscat(n) % v, z2 )
 
 !        Write out data:
-         write(rand_unit,'(2i8,10e15.7)')n, 1, &
+         write(ounit,'(2i8,7e15.7)')n, 1, &
                                   iv % qscat(n) % u % error, z1, &
-                                  iv % qscat(n) % v % error, z2
+                                  iv % qscat(n) % v % error, z2, &
+                                  dum, dum, dum, dum, dum
       END DO
    ENDIF
 
@@ -381,7 +427,7 @@ subroutine da_add_noise_to_ob( iv, ob )
 
    IF ( iv % num_buoy > 0 ) THEN
 
-      write(rand_unit,'(a,i8)')'buoy', iv % num_buoy
+      write(ounit,'(a20,i8)')'buoy', iv % num_buoy
   
       DO n = 1, iv % num_buoy
 
@@ -393,12 +439,13 @@ subroutine da_add_noise_to_ob( iv, ob )
          call da_add_noise( iv % buoy(n) % q, ob % buoy(n) % q, z5 )
 
 !        Write out data:
-         write(rand_unit,'(2i8,10e15.7)')n, 1, &
+         write(ounit,'(2i8,7e15.7)')n, 1, &
                                   iv % buoy(n) % u % error, z1, &
                                   iv % buoy(n) % v % error, z2, &
                                   iv % buoy(n) % t % error, z3, &
                                   iv % buoy(n) % p % error, z4, &
-                                  iv % buoy(n) % q % error, z5
+                                  iv % buoy(n) % q % error, z5, &
+                                  dum, dum
       END DO
    ENDIF
 
@@ -406,10 +453,10 @@ subroutine da_add_noise_to_ob( iv, ob )
 
    IF ( iv % num_profiler > 0 ) THEN
    
-      write(rand_unit,'(a,i8)')'profiler', iv % num_profiler
+      write(ounit,'(a20,i8)')'profiler', iv % num_profiler
    
       DO n = 1, iv % num_profiler
-         write(rand_unit,'(i8)')iv % profiler(n) % info % levels
+         write(ounit,'(i8)')iv % profiler(n) % info % levels
 
          DO k = 1, iv % profiler(n) % info % levels
 
@@ -418,9 +465,10 @@ subroutine da_add_noise_to_ob( iv, ob )
             call da_add_noise( iv % profiler(n) % v(k), ob % profiler(n) % v(k), z2)
 
 !           Write out data:
-            write(rand_unit,'(2i8,10e15.7)')n, k, &
+            write(ounit,'(2i8,7e15.7)')n, k, &
                                iv % profiler(n) % u(k) % error, z1, &
-                               iv % profiler(n) % v(k) % error, z2
+                               iv % profiler(n) % v(k) % error, z2, &
+                               dum, dum, dum, dum, dum
          END DO
       END DO
    ENDIF
@@ -429,10 +477,15 @@ subroutine da_add_noise_to_ob( iv, ob )
 
    IF ( iv % num_bogus > 0 ) THEN
 
-      write(rand_unit,'(a,i8)')'bogus', iv % num_bogus
+      write(ounit,'(a20,i8)')'bogus', iv % num_bogus
 
       DO n = 1, iv % num_bogus
-         write(rand_unit,'(i8)')iv % bogus(n) % info % levels
+         call da_add_noise( iv % bogus(n) % slp, ob % bogus(n) % slp, z1 )
+         write(ounit,'(2i8,7e15.7)')n, 1, &
+                                  iv % bogus(n) % slp % error, z1, &
+                                  dum, dum, dum, dum, dum, dum
+
+         write(ounit,'(i8)')iv % bogus(n) % info % levels
 
          DO k = 1, iv % bogus(n) % info % levels
 
@@ -443,18 +496,19 @@ subroutine da_add_noise_to_ob( iv, ob )
             call da_add_noise( iv % bogus(n) % q(k), ob % bogus(n) % q(k), z4)
 
 !           Write out data:
-            write(rand_unit,'(2i8,10e15.7)')n, k, &
+            write(ounit,'(2i8,7e15.7)')n, k, &
                                iv % bogus(n) % u(k) % error, z1, &
                                iv % bogus(n) % v(k) % error, z2, &
                                iv % bogus(n) % t(k) % error, z3, &
-                               iv % bogus(n) % q(k) % error, z4
+                               iv % bogus(n) % q(k) % error, z4, &
+                               dum, dum, dum
          END DO
 
-         call da_add_noise( iv % bogus(n) % slp, ob % bogus(n) % slp, z5 )
-         write(rand_unit,'(2i8,10e15.7)')n, 1, &
-                                  iv % bogus(n) % slp % error, z5
 
       END DO
    ENDIF
 
-end subroutine da_add_noise_to_ob
+  write(ounit,'(a20,i8)')'********************', 0
+  close (ounit)
+
+END SUBROUTINE da_add_noise_to_ob

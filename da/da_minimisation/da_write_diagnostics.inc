@@ -10,7 +10,7 @@
 !                        seperated & used as profile
 !              07/2005 - Add radiance part                  Zhiquan Liu
 !
-!
+!              05/16/2006   Updated for MPI run 
 !  PARENT_MODULE: DA_Diagnostics
 !------------------------------------------------------------------------------
    
@@ -28,7 +28,7 @@
       LOGICAL, EXTERNAL :: wrf_dm_on_monitor     ! For statistics output.
 !------------------------------------------------------------------------------
 
-   IF (trace_use) call da_trace_entry("da_write_diagnostics")
+   IF (trace_use) CALL da_trace_entry("da_write_diagnostics")
 
 !---- -------------------------------------------------------------------------
 !  [1.0] Calculate innovation vector (O-B) statistics:
@@ -231,14 +231,15 @@
 !---- -------------------------------------------------------------------------
 !  [5.0] Write observation data (O, O-B, O-A, y=hx'):
 !------------------------------------------------------------------------------
-!rizvi   if ( wrf_dm_on_monitor()  ) then
       call da_write_obs( ob, iv, re )
-!rizvi   end if
-   if ( wrf_dm_on_monitor()  ) then
+#ifdef DM_PARALLEL
+      if( numb_procs > 1) call da_final_write_obs(ob, iv, re )
+#endif
       call da_write_y( iv, y )
-   end if
+#ifdef DM_PARALLEL
+      if( numb_procs > 1) call da_final_write_y(iv, y )
+#endif
 
-   IF (trace_use) call da_trace_exit("da_write_diagnostics")
-
+   IF (trace_use) CALL da_trace_exit("da_write_diagnostics")
  
    end subroutine da_write_diagnostics
