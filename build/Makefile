@@ -80,18 +80,18 @@ libwrfplus.a : $(WRFPLUS_MODULES_WRFPLUS) $(WRFPLUS_OBJS)
 	$(AR) libwrfplus.a $(WRFPLUS_MODULES) $(WRFPLUS_OBJS)
 	$(RANLIB) libwrfplus.a
 
-clean :
+clean : arch_clean
 	@ $(RM) *.exe *.o *.mod *.b *.a *.f inc/*.inc frame/*.f90 registry \
           Registry_tmp* module_state_description.f90 bufrlib.prm \
           $(EXTERNAL)/*.o $(EXTERNAL)/*.a $(EXTERNAL)/*/*.o $(EXTERNAL)/*/*.a \
           inc/dm_comm_cpp_flags
 
-superclean : clean
+superclean : clean arch_superclean
 	@ $(RM) *.f90 *.F90 *.F *.inc *.int *.c *.h *.m4 *.code *.make \
           bufrlib.param *.sed registry \
           convert_tool kma_wave2grid wave2grid_kma *.csh version_decl \
           *.bsh *.csh Utl* macros_utl module_dm_warning rsl_cpp_flags \
           scl_plotting_routines configure.wrf ../configure.wrf \
           advance_cymdh.exe decode_l2_airs.README time_window.nl \
-          Makefile_old 
+          Makefile_old da_macros_utl
 
