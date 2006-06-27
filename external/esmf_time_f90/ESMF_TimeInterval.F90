@@ -45,6 +45,8 @@
       use ESMF_FractionMod, only : ESMF_Fraction
       use ESMF_CalendarMod
 
+      use module_wrf_error
+
       implicit none
 !
 !------------------------------------------------------------------------------
@@ -57,11 +59,13 @@
 !     !  all dereferencing within class is performed by C++ implementation
 
       type ESMF_TimeInterval
+        ! time interval is expressed as basetime
         type(ESMF_BaseTime) :: basetime  ! inherit base class
-        logical                :: instant  ! false for instant, true for interval
-        integer                :: YR     ! calendar interval number of days
-        integer                :: MM     ! calendar interval number of days
-        integer                :: DD     ! calendar interval number of days
+        ! Relative year and month fields support monthly or yearly time 
+        ! intervals.  Many operations are undefined when these fields are 
+        ! non-zero!  
+        INTEGER :: YR                    ! relative year
+        INTEGER :: MM                    ! relative month
       end type
 
 !------------------------------------------------------------------------------
@@ -78,27 +82,25 @@
 
 ! Required inherited and overridden ESMF_Base class methods
 
-!      public ESMF_TimeIntervalRead
-!      public ESMF_TimeIntervalWrite
-      public ESMF_TimeIntervalValidate
-      public ESMF_TimeIntervalPrint
+!!!!!!!!! added 20051012, JM
+!      public WRFADDITION_TimeIntervalDIVQuot 
+!!!!!!!!! renamed to simplify testing 20060320, TH
+      public ESMF_TimeIntervalDIVQuot 
+
+      ! This convenience routine is only used by other modules in 
+      ! esmf_time_f90.  
+      public ESMF_TimeIntervalIsPositive
+
 
 ! !PRIVATE MEMBER FUNCTIONS:
  
 ! overloaded operator functions
  
-      public operator(.DIV.)
-      private ESMF_TimeIntervalFQuot
-
       public operator(/)
-      private ESMF_TimeIntervalRQuot
       private ESMF_TimeIntervalQuotI
-      private ESMF_TimeIntervalQuotR
 
       public operator(*)
       private ESMF_TimeIntervalProdI
-      private ESMF_TimeIntervalProdF
-      private ESMF_TimeIntervalProdR
 
 ! Inherited and overloaded from ESMF_BaseTime
 
@@ -134,49 +136,29 @@
 !==============================================================================
 !BOP
 ! !INTERFACE:
-      interface operator(.DIV.)
+      interface operator(*)
 
 ! !PRIVATE MEMBER FUNCTIONS:
-      module procedure ESMF_TimeIntervalFQuot
+      module procedure ESMF_TimeIntervalProdI
 
 ! !DESCRIPTION:
-!     This interface defines a new .DIV. operator for the
-!     {\tt ESMF\_TimeInterval} class
+!     This interface overloads the * operator for the {\tt ESMF\_TimeInterval}
+!     class
 !
 !EOP
       end interface
 !
 !------------------------------------------------------------------------------
-!
 !BOP
 ! !INTERFACE:
       interface operator(/)
 
 ! !PRIVATE MEMBER FUNCTIONS:
-      module procedure ESMF_TimeIntervalRQuot
       module procedure ESMF_TimeIntervalQuotI
-      module procedure ESMF_TimeIntervalQuotR
 
 ! !DESCRIPTION:
-!     This interface overloads the / operator for the {\tt ESMF\_TimeInterval}
-!     class
-!
-!EOP
-      end interface
-!
-!------------------------------------------------------------------------------
-!BOP
-! !INTERFACE:
-      interface operator(*)
-
-! !PRIVATE MEMBER FUNCTIONS:
-      module procedure ESMF_TimeIntervalProdI
-      module procedure ESMF_TimeIntervalProdF
-      module procedure ESMF_TimeIntervalProdR
-
-! !DESCRIPTION:
-!     This interface overloads the * operator for the {\tt ESMF\_TimeInterval}
-!     class
+!     This interface overloads the / operator for the
+!     {\tt ESMF\_TimeInterval} class
 !
 !EOP
       end interface
@@ -316,35 +298,19 @@
 ! !IROUTINE: ESMF_TimeIntervalGet - Get value in user-specified units
 
 ! !INTERFACE:
-      subroutine ESMF_TimeIntervalGet(timeinterval, YY, YYl, MO, MOl, D, Dl, &
-                                      H, M, S, Sl, MS, US, NS, d_, h_, m_, s_, &
-                                      ms_, us_, ns_, Sn, Sd, rc)
+      subroutine ESMF_TimeIntervalGet(timeinterval, D, d_r8, S, Sn, Sd, &
+                                      TimeString, rc )
 
 ! !ARGUMENTS:
       type(ESMF_TimeInterval), intent(in) :: timeinterval
-      integer, intent(out), optional :: YY
-      integer(ESMF_IKIND_I8), intent(out), optional :: YYl
-      integer, intent(out), optional :: MO
-      integer(ESMF_IKIND_I8), intent(out), optional :: MOl
       integer, intent(out), optional :: D
-      integer(ESMF_IKIND_I8), intent(out), optional :: Dl
-      integer, intent(out), optional :: H
-      integer, intent(out), optional :: M
+      real(ESMF_KIND_R8),      intent(out), optional :: d_r8
       integer, intent(out), optional :: S
-      integer(ESMF_IKIND_I8), intent(out), optional :: Sl
-      integer, intent(out), optional :: MS
-      integer, intent(out), optional :: US
-      integer, intent(out), optional :: NS
-      double precision, intent(out), optional :: d_
-      double precision, intent(out), optional :: h_
-      double precision, intent(out), optional :: m_
-      double precision, intent(out), optional :: s_
-      double precision, intent(out), optional :: ms_
-      double precision, intent(out), optional :: us_
-      double precision, intent(out), optional :: ns_
       integer, intent(out), optional :: Sn
       integer, intent(out), optional :: Sd
+      character*(*), optional, intent(out) :: TimeString
       integer, intent(out), optional :: rc
+
 
 ! !DESCRIPTION:
 !     Get the value of the {\tt ESMF\_TimeInterval} in units specified by the
@@ -412,11 +378,33 @@
 ! !REQUIREMENTS:
 !     TMG1.1
 !EOP
+      INTEGER(ESMF_KIND_I8) :: seconds
+      INTEGER :: ierr
 
-      ! use optional args for any subset
-      call c_ESMC_TimeIntervalGet(timeinterval, YY, YYl, MO, MOl, D, Dl, &
-                                  H, M, S, Sl, MS, US, NS, d_, h_, m_, s_, &
-                                  ms_, us_, ns_, Sn, Sd, rc)
+      ierr = ESMF_SUCCESS
+      seconds = timeinterval%basetime%S
+      ! note that S is overwritten below (if present) if other args are also 
+      ! present
+      IF ( PRESENT(S) ) S = seconds
+      IF ( PRESENT( D ) ) THEN
+        D = seconds / SECONDS_PER_DAY
+        IF ( PRESENT(S) ) S = MOD( seconds, SECONDS_PER_DAY )
+      ENDIF
+      IF ( PRESENT( d_r8 ) ) THEN
+        D_r8 = REAL( seconds, ESMF_KIND_R8 ) / &
+               REAL( SECONDS_PER_DAY, ESMF_KIND_R8 )
+        IF ( PRESENT(S) ) S = MOD( seconds, SECONDS_PER_DAY )
+      ENDIF
+      IF ( PRESENT(Sn) ) THEN
+        Sn = timeinterval%basetime%Sn
+      ENDIF
+      IF ( PRESENT(Sd) ) THEN
+        Sd = timeinterval%basetime%Sd
+      ENDIF
+      IF ( PRESENT( timeString ) ) THEN
+        CALL ESMFold_TimeIntervalGetString( timeinterval, timeString, rc=ierr )
+      ENDIF
+      IF ( PRESENT(rc) ) rc = ierr
     
       end subroutine ESMF_TimeIntervalGet
 
@@ -433,15 +421,15 @@
 ! !ARGUMENTS:
       type(ESMF_TimeInterval), intent(out) :: timeinterval
       integer, intent(in), optional :: YY
-      integer(ESMF_IKIND_I8), intent(in), optional :: YYl
+      integer(ESMF_KIND_I8), intent(in), optional :: YYl
       integer, intent(in), optional :: MM
-      integer(ESMF_IKIND_I8), intent(in), optional :: MOl
+      integer(ESMF_KIND_I8), intent(in), optional :: MOl
       integer, intent(in), optional :: D
-      integer(ESMF_IKIND_I8), intent(in), optional :: Dl
+      integer(ESMF_KIND_I8), intent(in), optional :: Dl
       integer, intent(in), optional :: H
       integer, intent(in), optional :: M
       integer, intent(in), optional :: S
-      integer(ESMF_IKIND_I8), intent(in), optional :: Sl
+      integer(ESMF_KIND_I8), intent(in), optional :: Sl
       integer, intent(in), optional :: MS
       integer, intent(in), optional :: US
       integer, intent(in), optional :: NS
@@ -455,6 +443,8 @@
       integer, intent(in), optional :: Sn
       integer, intent(in), optional :: Sd
       integer, intent(out), optional :: rc
+      ! locals
+      INTEGER :: nfeb
 
 ! !DESCRIPTION:
 !     Set the value of the {\tt ESMF\_TimeInterval} in units specified by
@@ -523,13 +513,8 @@
 !     TMGn.n.n
 !EOP
 
-      ! use optional args for any subset
-      call c_ESMC_TimeIntervalSet(timeinterval, YY, YYl, MM, MOl, D, Dl, &
-                                  H, M, S, Sl, MS, US, NS, &
-                                  d_, h_, m_, s_, ms_, us_, ns_, &
-                                  Sn, Sd, rc)
-
-      timeinterval%instant = .false.
+      IF ( PRESENT(rc) ) rc = ESMF_FAILURE
+      ! note that YR and MM are relative
       timeinterval%YR = 0
       IF ( PRESENT( YY ) ) THEN
         timeinterval%YR = YY
@@ -538,62 +523,62 @@
       IF ( PRESENT( MM ) ) THEN
         timeinterval%MM = MM
       ENDIF
-!
-!      timeinterval%basetime%S = 0
-!      IF ( PRESENT( H ) ) THEN
-!        timeinterval%basetime%S = timeinterval%basetime%S + H * 3600
-!      ENDIF
-!      IF ( PRESENT( M ) ) THEN
-!        timeinterval%basetime%S = timeinterval%basetime%S + M * 60
-!      ENDIF
-!      IF ( PRESENT( S ) ) THEN
-!        timeinterval%basetime%S = timeinterval%basetime%S + S
-!      ENDIF
-!      IF ( PRESENT( MS ) ) THEN
-!        timeinterval%basetime%MS = MS
-!      ELSE IF ( PRESENT( Sd ) .AND. PRESENT( Sn ) ) THEN
-!        timeinterval%basetime%Sd = Sd
-!        timeinterval%basetime%Sn = Sn
-!        timeinterval%basetime%MS = NINT( Sn*1.0D0 / Sd*1.0D0 * 1000 )
-!      ENDIF
-
-      timeinterval%DD = 0
-      timeinterval%basetime%S = 0
-      IF ( PRESENT( D ) ) THEN
-        timeinterval%basetime%S = timeinterval%basetime%S + D * 24 * 3600
+      ! Rollover months to years
+      IF      ( abs(timeinterval%MM) .GE. MONTHS_PER_YEAR ) THEN
+        timeinterval%YR = timeinterval%YR + timeinterval%MM/MONTHS_PER_YEAR
+        timeinterval%MM = mod(timeinterval%MM,MONTHS_PER_YEAR)
       ENDIF
+
+      timeinterval%basetime%S = 0
+      ! For 365-day calendar, immediately convert years to days since we know 
+      ! how to do it in this case.  
+!$$$ replace this hack with something saner...
+      IF ( nfeb( 2004 ) == 28 ) THEN
+        timeinterval%basetime%S = timeinterval%basetime%S + &
+          ( 365_ESMF_KIND_I8 * &
+            INT( timeinterval%YR, ESMF_KIND_I8 ) * SECONDS_PER_DAY )
+        timeinterval%YR = 0
+      ENDIF
+      IF ( PRESENT( D ) ) THEN
+        timeinterval%basetime%S = timeinterval%basetime%S + &
+          ( SECONDS_PER_DAY * INT( D, ESMF_KIND_I8 ) )
+      ENDIF
+!$$$ Push H,M,S,Sn,Sd,MS down into BaseTime constructor from EVERYWHERE
+!$$$ and THEN add ESMF scaling behavior when other args are present...  
       IF ( PRESENT( H ) ) THEN
-        timeinterval%basetime%S = timeinterval%basetime%S + H * 3600
+        timeinterval%basetime%S = timeinterval%basetime%S + &
+          ( SECONDS_PER_HOUR * INT( H, ESMF_KIND_I8 ) )
       ENDIF
       IF ( PRESENT( M ) ) THEN
-        timeinterval%basetime%S = timeinterval%basetime%S + M * 60
+        timeinterval%basetime%S = timeinterval%basetime%S + &
+          ( SECONDS_PER_MINUTE * INT( M, ESMF_KIND_I8 ) )
       ENDIF
       IF ( PRESENT( S ) ) THEN
-        timeinterval%basetime%S = timeinterval%basetime%S + S
+        timeinterval%basetime%S = timeinterval%basetime%S + &
+          INT( S, ESMF_KIND_I8 )
       ENDIF
-      timeinterval%basetime%MS = 0
+      IF ( PRESENT( Sn ) .AND. ( .NOT. PRESENT( Sd ) ) ) THEN
+        CALL wrf_error_fatal( &
+          "ESMF_TimeIntervalSet:  Must specify Sd if Sn is specified")
+      ENDIF
+      IF ( PRESENT( Sd ) .AND. PRESENT( MS ) ) THEN
+        CALL wrf_error_fatal( &
+          "ESMF_TimeIntervalSet:  Must not specify both Sd and MS")
+      ENDIF
       timeinterval%basetime%Sn = 0
       timeinterval%basetime%Sd = 0
       IF ( PRESENT( MS ) ) THEN
-        timeinterval%basetime%MS = MS
-      ELSE IF ( PRESENT( Sd ) .AND. PRESENT( Sn ) ) THEN
-        timeinterval%basetime%Sn = Sn
+        timeinterval%basetime%Sn = MS
+        timeinterval%basetime%Sd = 1000_ESMF_KIND_I8
+      ELSE IF ( PRESENT( Sd ) ) THEN
         timeinterval%basetime%Sd = Sd
-        if ( abs( Sn ) .GE. Sd ) THEN
-          IF ( Sn .GE. 0 ) THEN
-            timeinterval%basetime%S = timeinterval%basetime%S + Sn / Sd
-          ELSE
-            IF ( Sn .NE. Sd ) THEN
-              timeinterval%basetime%S = timeinterval%basetime%S + Sn / Sd - 1
-            ELSE
-              timeinterval%basetime%S = timeinterval%basetime%S + Sn / Sd
-            ENDIF
-          ENDIF
+        IF ( PRESENT( Sn ) ) THEN
+          timeinterval%basetime%Sn = Sn
         ENDIF
-        timeinterval%basetime%MS = NINT( Sn*1.0D0 / Sd*1.0D0  * 1000 )
       ENDIF
+      CALL normalize_timeint( timeinterval )
 
-      rc = ESMF_SUCCESS
+      IF ( PRESENT(rc) ) rc = ESMF_SUCCESS
 
       end subroutine ESMF_TimeIntervalSet
 
@@ -608,6 +593,11 @@
       type(ESMF_TimeInterval), intent(in) :: timeinterval
       character*(*),  intent(out) :: TimeString
       integer, intent(out), optional :: rc
+      ! locals
+      integer :: signnormtimeint
+      LOGICAL :: negative
+      INTEGER(ESMF_KIND_I8) :: iS, iSn, iSd, H, M, S
+      character (len=1) :: signstr
 
 ! !DESCRIPTION:
 !     Convert {\tt ESMF\_TimeInterval}'s value into string format
@@ -626,14 +616,36 @@
 !     TMG1.5.9
 !EOP
 
-      write(TimeString,'(I5.5"_"I2.2":"I2.2":"I2.2)') &
-             timeinterval%basetime%S / (3600 * 24) , &
-             mod( timeinterval%basetime%S / 3600 , 24 ) , &
-             mod( timeinterval%basetime%S / 60 , 60 ), &
-             mod( timeinterval%basetime%S  , 60 )
+! NOTE:  YR, MM, Sn, and Sd are not yet included in the returned string...  
+!PRINT *,'DEBUG ESMFold_TimeIntervalGetString():  YR,MM,S,Sn,Sd = ', &
+!        timeinterval%YR, &
+!        timeinterval%MM, &
+!        timeinterval%basetime%S, &
+!        timeinterval%basetime%Sn, &
+!        timeinterval%basetime%Sd
+
+      negative = ( signnormtimeint( timeInterval ) == -1 )
+      IF ( negative ) THEN
+        iS = -timeinterval%basetime%S
+        iSn = -timeinterval%basetime%Sn
+        signstr = '-'
+      ELSE
+        iS = timeinterval%basetime%S
+        iSn = timeinterval%basetime%Sn
+        signstr = ''
+      ENDIF 
+      iSd = timeinterval%basetime%Sd
+
+      H = mod( iS, SECONDS_PER_DAY ) / SECONDS_PER_HOUR
+      M = mod( iS, SECONDS_PER_HOUR) / SECONDS_PER_MINUTE
+      S = mod( iS, SECONDS_PER_MINUTE )
+
+!$$$here...  need to print Sn and Sd when they are used ???
+
+      write(TimeString,FMT="(A,I10.10,'_',I3.3,':',I3.3,':',I3.3)") &
+        TRIM(signstr), ( iS / SECONDS_PER_DAY ), H, M, S
 
 !write(0,*)'TimeIntervalGetString Sn ',timeinterval%basetime%Sn,' Sd ',timeinterval%basetime%Sd
-
 
       rc = ESMF_SUCCESS
 
@@ -667,9 +679,13 @@
 ! !REQUIREMENTS:
 !     TMG1.5.8
 !EOP
-    
-      CALL ESMF_TimeIntervalSet( ESMF_TimeIntervalAbsValue, rc=rc )
-      call c_ESMC_TimeIntervalAbsValue(timeinterval, ESMF_TimeIntervalAbsValue)
+      CALL timeintchecknormalized( timeinterval, 'ESMF_TimeIntervalAbsValue arg1' )
+      ESMF_TimeIntervalAbsValue = timeinterval
+!$$$here...  move implementation into BaseTime
+      ESMF_TimeIntervalAbsValue%basetime%S  = &
+        abs(ESMF_TimeIntervalAbsValue%basetime%S)
+      ESMF_TimeIntervalAbsValue%basetime%Sn = &
+        abs(ESMF_TimeIntervalAbsValue%basetime%Sn )
 
       end function ESMF_TimeIntervalAbsValue
 
@@ -701,10 +717,14 @@
 ! !REQUIREMENTS:
 !     TMG1.5.8
 !EOP
+      CALL timeintchecknormalized( timeinterval, 'ESMF_TimeIntervalNegAbsValue arg1' )
     
-      CALL ESMF_TimeIntervalSet( ESMF_TimeIntervalNegAbsValue, rc=rc )
-      call c_ESMC_TimeIntervalNegAbsValue(timeinterval, &
-                                          ESMF_TimeIntervalNegAbsValue)
+      ESMF_TimeIntervalNegAbsValue = timeinterval
+!$$$here...  move implementation into BaseTime
+      ESMF_TimeIntervalNegAbsValue%basetime%S  = &
+        -abs(ESMF_TimeIntervalNegAbsValue%basetime%S)
+      ESMF_TimeIntervalNegAbsValue%basetime%Sn = &
+        -abs(ESMF_TimeIntervalNegAbsValue%basetime%Sn )
 
       end function ESMF_TimeIntervalNegAbsValue
 
@@ -716,18 +736,21 @@
 ! than 2 arguments for arithmetic overloaded operators
 !
 !------------------------------------------------------------------------------
-!BOP
-! !IROUTINE:  ESMF_TimeIntervalFQuot - Divide two time intervals, return fraction result
 
-! !INTERFACE:
-      function ESMF_TimeIntervalFQuot(timeinterval1, timeinterval2)
+!!!!!!!!!!!!!!!!!! added jm 20051012
+! new WRF-specific function, Divide two time intervals and return the whole integer, without remainder
+      function ESMF_TimeIntervalDIVQuot(timeinterval1, timeinterval2)
 
 ! !RETURN VALUE:
-      type(ESMF_Fraction) :: ESMF_TimeIntervalFQuot
+      INTEGER :: ESMF_TimeIntervalDIVQuot 
 
-! !ARGUMENTS: 
+! !ARGUMENTS:
       type(ESMF_TimeInterval), intent(in) :: timeinterval1
       type(ESMF_TimeInterval), intent(in) :: timeinterval2
+
+! !LOCAL
+      INTEGER :: retval, isgn, rc
+      type(ESMF_TimeInterval) :: zero, i1,i2
 
 ! !DESCRIPTION:
 !     Returns timeinterval1 divided by timeinterval2 as a fraction quotient.
@@ -744,45 +767,35 @@
 !     TMG1.5.5
 !EOP
 
-      call c_ESMC_TimeIntervalFQuot(timeinterval1, timeinterval2, &
-                                    ESMF_TimeIntervalFQuot)
+      CALL timeintchecknormalized( timeinterval1, 'ESMF_TimeIntervalDIVQuot arg1' )
+      CALL timeintchecknormalized( timeinterval2, 'ESMF_TimeIntervalDIVQuot arg2' )
 
-      end function ESMF_TimeIntervalFQuot
+      call ESMF_TimeIntervalSet( zero, rc=rc )
+      i1 = timeinterval1
+      i2 = timeinterval2
+      isgn = 1
+      if ( i1 .LT. zero ) then
+        i1 = ESMF_TimeIntervalProdI(i1, -1)
+        isgn = -isgn
+      endif
+      if ( i2 .LT. zero ) then
+        i2 = ESMF_TimeIntervalProdI(i2, -1)
+        isgn = -isgn
+      endif
+! repeated subtraction
+      retval = 0
+      DO WHILE (  i1 .GE. i2 )
+        i1 = i1 - i2
+        retval = retval + 1
+      ENDDO
+      retval = retval * isgn
 
-!------------------------------------------------------------------------------
-!BOP
-! !IROUTINE:  ESMF_TimeIntervalRQuot - Divide two time intervals, return double precision result
+      ESMF_TimeIntervalDIVQuot = retval
 
-! !INTERFACE:
-      function ESMF_TimeIntervalRQuot(timeinterval1, timeinterval2)
+      end function ESMF_TimeIntervalDIVQuot
+!!!!!!!!!!!!!!!!!!
 
-! !RETURN VALUE:
-      double precision :: ESMF_TimeIntervalRQuot
 
-! !ARGUMENTS: 
-      type(ESMF_TimeInterval), intent(in) :: timeinterval1
-      type(ESMF_TimeInterval), intent(in) :: timeinterval2
-
-! !DESCRIPTION:
-!     Returns timeinterval1 divided by timeinterval2 as a double precision
-!     quotient.
-!
-!     The arguments are:
-!     \begin{description}
-!     \item[timeinterval1]
-!          The dividend
-!     \item[timeinterval2]
-!          The divisor
-!     \end{description}
-!
-! !REQUIREMENTS:
-!     TMG1.5.5
-!EOP
-
-      call c_ESMC_TimeIntervalRQuot(timeinterval1, timeinterval2, &
-                                    ESMF_TimeIntervalRQuot)
-
-      end function ESMF_TimeIntervalRQuot
 
 !------------------------------------------------------------------------------
 !BOP
@@ -797,11 +810,6 @@
 ! !ARGUMENTS:
       type(ESMF_TimeInterval), intent(in) :: timeinterval
       integer, intent(in) :: divisor
-      integer  d, n
-!
-      type(ESMF_TimeInterval) :: retval
-! !LOCAL:
-      integer    :: rc
 
 ! !DESCRIPTION:
 !     Divides a {\tt ESMF\_TimeInterval} by an integer divisor, returns
@@ -819,64 +827,28 @@
 !     TMG1.5.6, TMG5.3, TMG7.2
 !EOP
 
-      retval = timeinterval
+!PRINT *,'DEBUG ESMF_TimeIntervalQuotI() A:  S,Sn,Sd = ', &
+!  timeinterval%basetime%S,timeinterval%basetime%Sn,timeinterval%basetime%Sd
+!PRINT *,'DEBUG ESMF_TimeIntervalQuotI() A:  divisor = ', divisor
 
-      CALL ESMF_TimeIntervalSet( retval, rc=rc )
-      call c_ESMC_TimeIntervalQuotI(timeinterval, divisor, &
-                                    ESMF_TimeIntervalQuotI)
+      CALL timeintchecknormalized( timeinterval, 'ESMF_TimeIntervalQuotI arg1' )
 
-! convert timeinterval to a fraction and divide by multipling the denonminator by the divisor
-      n = timeinterval%basetime%S * timeinterval%basetime%Sd + timeinterval%basetime%Sn
-      d = timeinterval%basetime%Sd * divisor
-
-      CALL simplify(n,d,retval%basetime%Sn,retval%basetime%Sd) 
-
-      IF ( retval%basetime%Sn > retval%basetime%Sd ) THEN
-        retval%basetime%S = retval%basetime%Sn / retval%basetime%Sd
-        retval%basetime%Sn = mod( retval%basetime%Sn, retval%basetime%Sd )
+      IF ( divisor == 0 ) THEN
+        CALL wrf_error_fatal( 'ESMF_TimeIntervalQuotI:  divide by zero' )
       ENDIF
+      ESMF_TimeIntervalQuotI = timeinterval
+!PRINT *,'DEBUG ESMF_TimeIntervalQuotI() B:  S,Sn,Sd = ', &
+!  ESMF_TimeIntervalQuotI%basetime%S,ESMF_TimeIntervalQuotI%basetime%Sn,ESMF_TimeIntervalQuotI%basetime%Sd
+      ESMF_TimeIntervalQuotI%basetime = &
+        timeinterval%basetime / divisor
+!PRINT *,'DEBUG ESMF_TimeIntervalQuotI() C:  S,Sn,Sd = ', &
+!  ESMF_TimeIntervalQuotI%basetime%S,ESMF_TimeIntervalQuotI%basetime%Sn,ESMF_TimeIntervalQuotI%basetime%Sd
 
-      ESMF_TimeIntervalQuotI = retval
+      CALL normalize_timeint( ESMF_TimeIntervalQuotI )
+!PRINT *,'DEBUG ESMF_TimeIntervalQuotI() D:  S,Sn,Sd = ', &
+!  ESMF_TimeIntervalQuotI%basetime%S,ESMF_TimeIntervalQuotI%basetime%Sn,ESMF_TimeIntervalQuotI%basetime%Sd
 
       end function ESMF_TimeIntervalQuotI
-
-!------------------------------------------------------------------------------
-!BOP
-! !IROUTINE:  ESMF_TimeIntervalQuotR - Divide time interval by a double precision, return time interval result 
-
-! !INTERFACE:
-      function ESMF_TimeIntervalQuotR(timeinterval, divisor)
-
-! !RETURN VALUE:
-      type(ESMF_TimeInterval) :: ESMF_TimeIntervalQuotR
-
-! !ARGUMENTS:
-      type(ESMF_TimeInterval), intent(in) :: timeinterval
-      double precision, intent(in) :: divisor
-! !LOCAL:
-      integer    :: rc
-
-! !DESCRIPTION:
-!     Divides an {\tt ESMF\_TimeInterval} by a double precision divisor, returns
-!     quotient as a {\tt ESMF\_TimeInterval}
-!
-!     The arguments are:
-!     \begin{description}
-!     \item[timeinterval]
-!          The dividend
-!     \item[divisor]
-!          Double precision divisor
-!     \end{description}
-!
-! !REQUIREMENTS:
-!     TMG1.5.6, TMG5.3, TMG7.2
-!EOP
-
-      CALL ESMF_TimeIntervalSet( ESMF_TimeIntervalQuotR, rc=rc )
-      call c_ESMC_TimeIntervalQuotR(timeinterval, divisor, &
-                                    ESMF_TimeIntervalQuotR)
-
-      end function ESMF_TimeIntervalQuotR
 
 !------------------------------------------------------------------------------
 !BOP
@@ -909,87 +881,19 @@
 ! !REQUIREMENTS:
 !     TMG1.5.7, TMG7.2
 !EOP
+      CALL timeintchecknormalized( timeinterval, 'ESMF_TimeIntervalProdI arg1' )
 
       CALL ESMF_TimeIntervalSet( ESMF_TimeIntervalProdI, rc=rc )
-      call c_ESMC_TimeIntervalProdI(timeinterval, multiplier, &
-                                    ESMF_TimeIntervalProdI)
+!$$$move this into overloaded operator(*) in BaseTime
+      ESMF_TimeIntervalProdI%basetime%S  = &
+        timeinterval%basetime%S * INT( multiplier, ESMF_KIND_I8 )
+      ESMF_TimeIntervalProdI%basetime%Sn = &
+        timeinterval%basetime%Sn * INT( multiplier, ESMF_KIND_I8 )
+      ! Don't multiply Sd
+      ESMF_TimeIntervalProdI%basetime%Sd = timeinterval%basetime%Sd
+      CALL normalize_timeint( ESMF_TimeIntervalProdI )
 
       end function ESMF_TimeIntervalProdI
-
-!------------------------------------------------------------------------------
-!BOP
-! !IROUTINE:  ESMF_TimeIntervalProdF - Multiply a time interval by a fraction
-
-! !INTERFACE:
-      function ESMF_TimeIntervalProdF(timeinterval, multiplier)
-
-! !RETURN VALUE:
-      type(ESMF_TimeInterval) :: ESMF_TimeIntervalProdF
-
-! !ARGUMENTS:
-      type(ESMF_TimeInterval), intent(in) :: timeinterval
-      type(ESMF_Fraction), intent(in) :: multiplier
-! !LOCAL:
-      integer :: rc
-
-! !DESCRIPTION:
-!     Multiply a {\tt ESMF\_TimeInterval} by a fraction, return product as a
-!     {\tt ESMF\_TimeInterval}
-!
-!     The arguments are:
-!     \begin{description}
-!     \item[timeinterval]
-!          The multiplicand
-!     \item[mutliplier]
-!          Fraction multiplier
-!     \end{description}
-!
-! !REQUIREMENTS:
-!     TMG1.5.7, TMG7.2
-!EOP
-
-      CALL ESMF_TimeIntervalSet( ESMF_TimeIntervalProdF, rc=rc )
-      call c_ESMC_TimeIntervalProdF(timeinterval, multiplier, &
-                                    ESMF_TimeIntervalProdF)
-
-      end function ESMF_TimeIntervalProdF
-!------------------------------------------------------------------------------
-!BOP
-! !IROUTINE:   ESMF_TimeIntervalProdR - Multiply a time interval by a double precision
-
-! !INTERFACE:
-      function ESMF_TimeIntervalProdR(timeinterval, multiplier)
-
-! !RETURN VALUE:
-      type(ESMF_TimeInterval) :: ESMF_TimeIntervalProdR
-
-! !ARGUMENTS:
-      type(ESMF_TimeInterval), intent(in) :: timeinterval
-      double precision, intent(in) :: multiplier
-! !LOCAL:
-      integer :: rc
-
-! !DESCRIPTION:
-!     Multiply a {\tt ESMF\_TimeInterval} by a double precision number,
-!     return product as a {\tt ESMF\_TimeInterval}
-!
-!     The arguments are:
-!     \begin{description}
-!     \item[timeinterval]
-!          The multiplicand
-!     \item[mutliplier]
-!          Double precision multiplier
-!     \end{description}
-!
-! !REQUIREMENTS:
-!     TMG1.5.7, TMG7.2
-!EOP
-
-      CALL ESMF_TimeIntervalSet( ESMF_TimeIntervalProdR, rc=rc )
-      call c_ESMC_TimeIntervalProdR(timeinterval, multiplier, &
-                                    ESMF_TimeIntervalProdR)
-
-      end function ESMF_TimeIntervalProdR
 
 !------------------------------------------------------------------------------
 !
@@ -1027,11 +931,14 @@
 !     TMG1.5.4, TMG2.4.4, TMG2.4.5, TMG2.4.6, TMG5.1, TMG5.2, 
 !                 TMG7.2
 !EOP
+      CALL timeintchecknormalized( timeinterval1, 'ESMF_TimeIntervalSum arg1' )
+      CALL timeintchecknormalized( timeinterval2, 'ESMF_TimeIntervalSum arg2' )
 
-      CALL ESMF_TimeIntervalSet( ESMF_TimeIntervalSum, rc=rc )
-      ! call ESMC_BaseTime base class function
-      call c_ESMC_BaseTimeIntervalSum(timeinterval1, timeinterval2, &
-                                      ESMF_TimeIntervalSum)
+      ESMF_TimeIntervalSum = timeinterval1
+      ESMF_TimeIntervalSum%basetime = ESMF_TimeIntervalSum%basetime + &
+                                      timeinterval2%basetime
+
+      CALL normalize_timeint( ESMF_TimeIntervalSum )
 
       end function ESMF_TimeIntervalSum
 
@@ -1067,11 +974,13 @@
 ! !REQUIREMENTS:
 !     TMG1.5.4, TMG2.4.4, TMG2.4.5, TMG2.4.6, TMG5.1, TMG5.2, TMG7.2
 !EOP
+      CALL timeintchecknormalized( timeinterval1, 'ESMF_TimeIntervalDiff arg1' )
+      CALL timeintchecknormalized( timeinterval2, 'ESMF_TimeIntervalDiff arg2' )
 
-      CALL ESMF_TimeIntervalSet( ESMF_TimeIntervalDiff, rc=rc )
-      ! call ESMC_BaseTime base class function
-      call c_ESMC_BaseTimeIntervalDiff(timeinterval1, timeinterval2, &
-                                       ESMF_TimeIntervalDiff)
+      ESMF_TimeIntervalDiff = timeinterval1
+      ESMF_TimeIntervalDiff%basetime = ESMF_TimeIntervalDiff%basetime - &
+                                       timeinterval2%basetime
+      CALL normalize_timeint( ESMF_TimeIntervalDiff )
 
       end function ESMF_TimeIntervalDiff
 
@@ -1105,9 +1014,12 @@
 ! !REQUIREMENTS:
 !     TMG1.5.3, TMG2.4.3, TMG7.2
 !EOP
+      CALL timeintchecknormalized( timeinterval1, 'ESMF_TimeIntervalEQ arg1' )
+      CALL timeintchecknormalized( timeinterval2, 'ESMF_TimeIntervalEQ arg2' )
 
+!$$$here...  move all this out of Meat.F90 ?  
       ! call ESMC_BaseTime base class function
-      call c_ESMC_BaseTimeEQ(timeinterval1, timeinterval2, ESMF_TimeIntervalEQ)
+      call c_ESMC_BaseTimeIntEQ(timeinterval1, timeinterval2, ESMF_TimeIntervalEQ)
 
       end function ESMF_TimeIntervalEQ
 
@@ -1141,9 +1053,11 @@
 ! !REQUIREMENTS:
 !     TMG1.5.3, TMG2.4.3, TMG7.2
 !EOP
+      CALL timeintchecknormalized( timeinterval1, 'ESMF_TimeIntervalNE arg1' )
+      CALL timeintchecknormalized( timeinterval2, 'ESMF_TimeIntervalNE arg2' )
 
       ! call ESMC_BaseTime base class function
-      call c_ESMC_BaseTimeNE(timeinterval1, timeinterval2, ESMF_TimeIntervalNE)
+      call c_ESMC_BaseTimeIntNE(timeinterval1, timeinterval2, ESMF_TimeIntervalNE)
 
       end function ESMF_TimeIntervalNE
 
@@ -1177,9 +1091,11 @@
 ! !REQUIREMENTS:
 !     TMG1.5.3, TMG2.4.3, TMG7.2
 !EOP
+      CALL timeintchecknormalized( timeinterval1, 'ESMF_TimeIntervalLT arg1' )
+      CALL timeintchecknormalized( timeinterval2, 'ESMF_TimeIntervalLT arg2' )
 
       ! call ESMC_BaseTime base class function
-      call c_ESMC_BaseTimeLT(timeinterval1, timeinterval2, ESMF_TimeIntervalLT)
+      call c_ESMC_BaseTimeIntLT(timeinterval1, timeinterval2, ESMF_TimeIntervalLT)
 
       end function ESMF_TimeIntervalLT
 
@@ -1213,9 +1129,11 @@
 ! !REQUIREMENTS:
 !     TMG1.5.3, TMG2.4.3, TMG7.2
 !EOP
+      CALL timeintchecknormalized( timeinterval1, 'ESMF_TimeIntervalGT arg1' )
+      CALL timeintchecknormalized( timeinterval2, 'ESMF_TimeIntervalGT arg2' )
 
       ! call ESMC_BaseTime base class function
-      call c_ESMC_BaseTimeGT(timeinterval1, timeinterval2, ESMF_TimeIntervalGT)
+      call c_ESMC_BaseTimeIntGT(timeinterval1, timeinterval2, ESMF_TimeIntervalGT)
 
       end function ESMF_TimeIntervalGT
 
@@ -1250,9 +1168,11 @@
 ! !REQUIREMENTS:
 !     TMG1.5.3, TMG2.4.3, TMG7.2
 !EOP
+      CALL timeintchecknormalized( timeinterval1, 'ESMF_TimeIntervalLE arg1' )
+      CALL timeintchecknormalized( timeinterval2, 'ESMF_TimeIntervalLE arg2' )
 
       ! call ESMC_BaseTime base class function
-      call c_ESMC_BaseTimeLE(timeinterval1, timeinterval2, ESMF_TimeIntervalLE)
+      call c_ESMC_BaseTimeIntLE(timeinterval1, timeinterval2, ESMF_TimeIntervalLE)
 
       end function ESMF_TimeIntervalLE
 
@@ -1286,174 +1206,56 @@
 ! !REQUIREMENTS:
 !     TMG1.5.3, TMG2.4.3, TMG7.2
 !EOP
+      CALL timeintchecknormalized( timeinterval1, 'ESMF_TimeIntervalGE arg1' )
+      CALL timeintchecknormalized( timeinterval2, 'ESMF_TimeIntervalGE arg2' )
 
       ! call ESMC_BaseTime base class function
-      call c_ESMC_BaseTimeGE(timeinterval1, timeinterval2, ESMF_TimeIntervalGE)
+      call c_ESMC_BaseTimeIntGE(timeinterval1, timeinterval2, ESMF_TimeIntervalGE)
 
       end function ESMF_TimeIntervalGE
 
-!------------------------------------------------------------------------------
-!
-! This section defines the overridden Read, Write, Validate and Print methods
-! from the ESMF_Base class
-!
-!------------------------------------------------------------------------------
-!BOP
-! !IROUTINE:  ESMF_TimeIntervalRead - Restore a time interval's properties
-
-! !INTERFACE:
-      subroutine ESMF_TimeIntervalRead(timeinterval, S, Sn, Sd, YY, MO, rc)
-
-! !ARGUMENTS:
-      type(ESMF_TimeInterval), intent(out) :: timeinterval
-      integer(ESMF_IKIND_I8), intent(in) :: S
-      integer, intent(in) :: Sn
-      integer, intent(in) :: Sd
-      integer(ESMF_IKIND_I8), intent(in) :: YY
-      integer(ESMF_IKIND_I8), intent(in) :: MO
-      integer, intent(out), optional :: rc
-
-! !DESCRIPTION:
-!     Perform a restore on a {\tt ESMF\_TimeInterval}'s properties
-!
-!     The arguments are:
-!     \begin{description}
-!     \item[timeinterval]
-!          {\tt ESMF\_TimeInterval} to restore
-!     \item[S]
-!          64-bit integer seconds
-!     \item[Sn]
-!          Integer fractional seconds - numerator
-!     \item[Sd]
-!          Integer fractional seconds - denominator
-!     \item[YY]
-!          64-bit integer calendar interval number of years
-!     \item[MO]
-!          64-bit integer calendar interval number of months
-!     \item[{[rc]}]
-!          Return code; equals {\tt ESMF\_SUCCESS} if there are no errors.
-!     \end{description}
-!
-! !REQUIREMENTS:
-!     TMGn.n.n
-!EOP
-   
-      call c_ESMC_TimeIntervalRead(timeinterval, S, Sn, Sd, YY, MO, rc)
-
-      end subroutine ESMF_TimeIntervalRead
 
 !------------------------------------------------------------------------------
 !BOP
-! !IROUTINE:  ESMF_TimeIntervalWrite - Save a time interval's properties
+! !IROUTINE:  ESMF_TimeIntervalIsPositive - Time interval greater than zero?
 
 ! !INTERFACE:
-      subroutine ESMF_TimeIntervalWrite(timeinterval, S, Sn, Sd, YY, MO, rc)
+      function ESMF_TimeIntervalIsPositive(timeinterval)
+!
+! !RETURN VALUE:
+      logical :: ESMF_TimeIntervalIsPositive
 
 ! !ARGUMENTS:
       type(ESMF_TimeInterval), intent(in) :: timeinterval
-      integer(ESMF_IKIND_I8), intent(out) :: S
-      integer, intent(out) :: Sn
-      integer, intent(out) :: Sd
-      integer(ESMF_IKIND_I8), intent(out) :: YY
-      integer(ESMF_IKIND_I8), intent(out) :: MO
-      integer, intent(out), optional :: rc
+
+! !LOCALS:
+      type(ESMF_TimeInterval) :: zerotimeint
+      integer :: rcint
 
 ! !DESCRIPTION:
-!     Perform a save on an {\tt ESMF\_TimeInterval}'s properties
+!     Return true if time interval is greater than zero,  
+!     false otherwise. 
 !
 !     The arguments are:
 !     \begin{description}
 !     \item[timeinterval]
-!          {\tt ESMF\_TimeInterval} to save
-!     \item[S]
-!          64-bit integer seconds
-!     \item[Sn]
-!          Integer fractional seconds - numerator
-!     \item[Sd]
-!          Integer fractional seconds - denominator
-!     \item[YY]
-!          64-bit integer calendar interval number of years
-!     \item[MO]
-!          64-bit integer calendar interval number of months
-!     \item[{[rc]}]
-!          Return code; equals {\tt ESMF\_SUCCESS} if there are no errors.
+!          Time interval to compare
 !     \end{description}
-!
-! !REQUIREMENTS:
-!     TMGn.n.n
 !EOP
-   
-      call c_ESMC_TimeIntervalWrite(timeinterval, S, Sn, Sd, YY, MO, rc)
+      CALL timeintchecknormalized( timeinterval, &
+                                   'ESMF_TimeIntervalIsPositive arg' )
 
-      end subroutine ESMF_TimeIntervalWrite
-
-!------------------------------------------------------------------------------
-!BOP
-! !IROUTINE:  ESMF_TimeIntervalValidate - Validate a time interval's properties
-
-! !INTERFACE:
-      subroutine ESMF_TimeIntervalValidate(timeinterval, opts, rc)
-
-! !ARGUMENTS:
-      type(ESMF_TimeInterval), intent(in) :: timeinterval
-      character (len=*), intent(in), optional :: opts
-      integer, intent(out), optional :: rc
-
-! !DESCRIPTION:
-!     Perform a validation check on a {\tt ESMF\_TimeInterval}'s properties
-!
-!     The arguments are:
-!     \begin{description}
-!     \item[timeinterval]
-!          {\tt ESMF\_TimeInterval} to validate
-!     \item[{[opts]}]
-!          Validate options
-!     \item[{[rc]}]
-!          Return code; equals {\tt ESMF\_SUCCESS} if there are no errors.
-!     \end{description}
-!
-! !REQUIREMENTS:
-!     TMGn.n.n
-!EOP
-    
-      call c_ESMC_TimeIntervalValidate(timeinterval, opts, rc)
-
-      end subroutine ESMF_TimeIntervalValidate
-
-!------------------------------------------------------------------------------
-!BOP
-! !IROUTINE:  ESMF_TimeIntervalPrint - Print out a time interval's properties
-
-! !INTERFACE:
-      subroutine ESMF_TimeIntervalPrint(timeinterval, opts, rc)
-
-! !ARGUMENTS:
-      type(ESMF_TimeInterval), intent(in) :: timeinterval
-      character (len=*), intent(in), optional :: opts
-      integer, intent(out), optional :: rc
-
-! !DESCRIPTION:
-!     To support testing/debugging, print out an {\tt ESMF\_TimeInterval}'s
-!     properties.
-!
-!     The arguments are:
-!     \begin{description}
-!     \item[timeinterval]
-!          Time interval to print out
-!     \item[{[opts]}]
-!          Print options
-!     \item[{[rc]}]
-!          Return code; equals {\tt ESMF\_SUCCESS} if there are no errors.
-!     \end{description}
-!
-! !REQUIREMENTS:
-!     TMGn.n.n
-!EOP
-    
-      call c_ESMC_TimeIntervalPrint(timeinterval, opts, rc)
-
-      end subroutine ESMF_TimeIntervalPrint
-
-!------------------------------------------------------------------------------
+      CALL ESMF_TimeIntervalSet ( zerotimeint, rc=rcint )
+      IF ( rcint /= ESMF_SUCCESS ) THEN
+        CALL wrf_error_fatal( &
+          'ESMF_TimeIntervalIsPositive:  ESMF_TimeIntervalSet failed' )
+      ENDIF
+! hack for bug in PGI 5.1-x
+!      ESMF_TimeIntervalIsPositive = timeinterval > zerotimeint
+      ESMF_TimeIntervalIsPositive = ESMF_TimeIntervalGT( timeinterval, &
+                                                         zerotimeint )
+      end function ESMF_TimeIntervalIsPositive
 
       end module ESMF_TimeIntervalMod
+
+

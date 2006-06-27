@@ -10,27 +10,22 @@ MODULE ESMF_Stubs
 
 ! Bogus typedefs
    TYPE ESMF_Grid
-      SEQUENCE
       INTEGER :: dummy
    END TYPE
 
    TYPE ESMF_GridComp
-      SEQUENCE
       INTEGER :: dummy
    END TYPE
 
    TYPE ESMF_State
-      SEQUENCE
       INTEGER :: dummy
    END TYPE
 
    TYPE ESMF_VM
-      SEQUENCE
       INTEGER :: dummy
    END TYPE
 
    TYPE ESMF_MsgType
-      SEQUENCE
       INTEGER :: mtype
    END TYPE
    TYPE(ESMF_MsgType), PARAMETER  ::      &
@@ -39,10 +34,10 @@ MODULE ESMF_Stubs
       ESMF_LOG_ERROR =   ESMF_MsgType(3)
 
    TYPE ESMF_LOG
-      SEQUENCE
       INTEGER :: dummy
    END TYPE
 
+   LOGICAL, private, save :: initialized = .false.
 
    PUBLIC ESMF_Grid, ESMF_GridComp, ESMF_State, ESMF_VM
    PUBLIC ESMF_Initialize, ESMF_Finalize, ESMF_IsInitialized
@@ -59,14 +54,37 @@ CONTAINS
       TYPE(ESMF_VM),           INTENT(IN   ), OPTIONAL :: vm
       TYPE(ESMF_CalendarType), INTENT(IN   ), OPTIONAL :: defaultCalendar
       INTEGER,                 INTENT(  OUT), OPTIONAL :: rc
+
+      TYPE(ESMF_CalendarType) :: defaultCalType
+      INTEGER :: status
+
+      IF ( PRESENT( rc ) ) rc = ESMF_FAILURE
+      ! Initialize the default time manager calendar
+      IF ( PRESENT(defaultCalendar) )THEN
+         defaultCalType = defaultCalendar
+      ELSE
+         defaultCalType = ESMF_CAL_NOLEAP
+      END IF
+      allocate( defaultCal )
+      defaultCal = ESMF_CalendarCreate( calendarType=defaultCalType, &
+                        rc=status)
+
+      ! initialize tables in time manager
+      CALL initdaym
+
+      IF (status .ne. ESMF_SUCCESS) THEN
+          PRINT *, "Error initializing the default time manager calendar"
+          RETURN
+      END IF
+      initialized = .true.
+
       IF ( PRESENT( rc ) ) rc = ESMF_SUCCESS
    END SUBROUTINE ESMF_Initialize
 
 
-! NOOP for "is initialized" extension
    FUNCTION ESMF_IsInitialized()
       LOGICAL ESMF_IsInitialized
-      ESMF_IsInitialized = .TRUE.
+      ESMF_IsInitialized = initialized
    END FUNCTION ESMF_IsInitialized
 
 
@@ -74,7 +92,18 @@ CONTAINS
    SUBROUTINE ESMF_Finalize( rc )
       USE esmf_basemod
       INTEGER, INTENT(  OUT), OPTIONAL :: rc
+#if (defined SPMD) || (defined COUP_CSM)
+#include <mpif.h>
+#endif
+      INTEGER :: ier
+
       IF ( PRESENT( rc ) ) rc = ESMF_SUCCESS
+#if (defined SPMD) || (defined COUP_CSM)
+      CALL MPI_Finalize( ier ) 
+      IF ( ier .ne. mpi_success )THEN
+        IF ( PRESENT( rc ) ) rc = ESMF_FAILURE
+      END IF
+#endif
    END SUBROUTINE ESMF_Finalize
 
 ! NOOP
@@ -85,7 +114,7 @@ CONTAINS
       INTEGER, INTENT(IN), OPTIONAL :: line
       CHARACTER(LEN=*), INTENT(IN), OPTIONAL :: file
       CHARACTER(LEN=*), INTENT(IN), OPTIONAL :: method
-      TYPE(ESMF_LOG),INTENT(IN),TARGET,OPTIONAL :: log
+      TYPE(ESMF_LOG),TARGET,OPTIONAL :: log
       INTEGER, INTENT(OUT),OPTIONAL :: rc
       IF ( PRESENT( rc ) ) rc = ESMF_SUCCESS
    END SUBROUTINE ESMF_LogWrite

@@ -191,7 +191,9 @@
         alarm%alarmint%RingIntervalSet = .FALSE.
         alarm%alarmint%StopTimeSet = .FALSE.
         IF ( PRESENT( RingInterval ) ) THEN
-          alarm%alarmint%RingInterval = RingInterval
+          ! force RingInterval to be positive
+          alarm%alarmint%RingInterval = &
+            ESMF_TimeIntervalAbsValue( RingInterval )
           alarm%alarmint%RingIntervalSet = .TRUE.
         ENDIF
         IF ( PRESENT( RingTime ) ) THEN
@@ -260,7 +262,7 @@
 ! !REQUIREMENTS:
 !     TMG4.7
 !EOP
-      CALL wrf_error_fatal( 'ESMF_AlarmGetRingInterval not supported' )
+      RingInterval = alarm%alarmint%RingInterval
       end subroutine ESMF_AlarmGetRingInterval
  
 !------------------------------------------------------------------------------
@@ -361,11 +363,12 @@
 ! !IROUTINE:  ESMF_AlarmGet - Get an alarm's parameters -- compatibility with ESMF 2.0.1
 !
 ! !INTERFACE:
-      subroutine ESMF_AlarmGet(alarm, PrevRingTime, rc)
+      subroutine ESMF_AlarmGet(alarm, PrevRingTime, RingInterval, rc)
 
 ! !ARGUMENTS:
       type(ESMF_Alarm), intent(in) :: alarm
       type(ESMF_Time), intent(out), optional :: PrevRingTime
+      type(ESMF_TimeInterval), intent(out), optional :: RingInterval
       integer, intent(out), optional :: rc
       integer :: ierr
 
@@ -390,6 +393,9 @@
 
       IF ( PRESENT(PrevRingTime) ) THEN
         CALL ESMF_AlarmGetPrevRingTime(alarm, PrevRingTime, rc=ierr)
+      ENDIF
+      IF ( PRESENT(RingInterval) ) THEN
+        CALL ESMF_AlarmGetRingInterval(alarm, RingInterval, rc=ierr)
       ENDIF
 
       IF ( PRESENT(rc) ) THEN

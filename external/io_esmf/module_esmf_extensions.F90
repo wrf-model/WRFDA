@@ -57,7 +57,12 @@ MODULE module_esmf_extensions
   PUBLIC ESMF_ExportStateGetCurrent
   PUBLIC ESMF_GridCompGetCurrent
   ! "is-initialized" inquiry
-  PUBLIC WRF_UTIL_IsInitialized
+  PUBLIC WRFU_IsInitialized
+
+  ! extensions to standard ESMF interfaces
+  ! these extensions conform to documented plans for ESMF extensions
+  ! they should be removed as ESMF implementations are released
+  PUBLIC WRFU_TimeGet
 
   ! public routines to be replaced by ESMF internal implementations
   ! These interfaces will not be public because ESMF will always be able 
@@ -71,15 +76,22 @@ MODULE module_esmf_extensions
   ! "is-initialized" inquiry
   PUBLIC ESMF_SetInitialized
 
+!!!!!!!!! added 20051012, JM
+  ! Need to request that this interface be added...  
+  PUBLIC WRFU_TimeIntervalDIVQuot
+
+  ! duplicated routines from esmf_time_f90
+  ! move these to a common shared location later...  
+  PUBLIC fraction_to_string
 
 CONTAINS
 
 
 ! Add "is initialized" behavior to ESMF interface
-  FUNCTION WRF_UTIL_IsInitialized()
-    LOGICAL WRF_UTIL_IsInitialized
-    WRF_UTIL_IsInitialized = esmf_is_initialized
-  END FUNCTION WRF_UTIL_IsInitialized
+  FUNCTION WRFU_IsInitialized()
+    LOGICAL WRFU_IsInitialized
+    WRFU_IsInitialized = esmf_is_initialized
+  END FUNCTION WRFU_IsInitialized
 
 ! Add "is initialized" behavior to ESMF interface
 ! This interface will go away as it will be done inside ESMF_Initialize().  
@@ -286,6 +298,203 @@ CONTAINS
     ENDIF
   END SUBROUTINE ESMF_SetCurrent
 !------------------------------------------------------------------------------
+
+
+! Note:  this implementation is largely duplicated from external/esmf_time_f90
+!!!!!!!!!!!!!!!!!! added jm 20051012
+! new WRF-specific function, Divide two time intervals and return the whole integer, without remainder
+      function WRFU_TimeIntervalDIVQuot(timeinterval1, timeinterval2)
+
+! !RETURN VALUE:
+      INTEGER :: WRFU_TimeIntervalDIVQuot
+
+! !ARGUMENTS:
+      type(ESMF_TimeInterval), intent(in) :: timeinterval1
+      type(ESMF_TimeInterval), intent(in) :: timeinterval2
+
+! !LOCAL
+      INTEGER :: retval, isgn, rc
+      type(ESMF_TimeInterval) :: zero, i1,i2
+
+! !DESCRIPTION:
+!     Returns timeinterval1 divided by timeinterval2 as a fraction quotient.
+!
+!     The arguments are:
+!     \begin{description}
+!     \item[timeinterval1]
+!          The dividend
+!     \item[timeinterval2]
+!          The divisor
+!     \end{description}
+!
+! !REQUIREMENTS:
+!     TMG1.5.5
+!EOP
+      call ESMF_TimeIntervalSet( zero, rc=rc )
+      i1 = timeinterval1
+      i2 = timeinterval2
+      isgn = 1
+      if ( i1 .LT. zero ) then
+        i1 = i1 * (-1)
+        isgn = -isgn
+      endif
+      if ( i2 .LT. zero ) then
+        i2 = i2 * (-1)
+        isgn = -isgn
+      endif
+! repeated subtraction
+      retval = 0
+      DO WHILE (  i1 .GE. i2 )
+        i1 = i1 - i2
+        retval = retval + 1
+      ENDDO
+      retval = retval * isgn
+
+      WRFU_TimeIntervalDIVQuot = retval
+
+      end function WRFU_TimeIntervalDIVQuot
+!!!!!!!!!!!!!!!!!!
+
+
+
+  ! implementations of extensions to standard ESMF interfaces
+  ! these extensions conform to documented plans for ESMF extensions
+  ! they should be removed as ESMF implementations are released
+
+      ! extend ESMF_TimeGet() to make dayOfYear_r8 work...  
+      subroutine WRFU_TimeGet(time, yy, yy_i8, &
+                                    mm, dd, &
+                                    d, d_i8, &
+                                    h, m, &
+                                    s, s_i8, &
+                                    ms, us, ns, &
+                                    d_r8, h_r8, m_r8, s_r8, &
+                                    ms_r8, us_r8, ns_r8, &
+                                    sN, sD, &
+                                    calendar, calendarType, timeZone, &
+                                    timeString, timeStringISOFrac, &
+                                    dayOfWeek, midMonth, &
+                                    dayOfYear,  dayOfYear_r8, &
+                                    dayOfYear_intvl, rc)
+
+      type(ESMF_Time),         intent(in)            :: time
+      integer(ESMF_KIND_I4),   intent(out), optional :: yy
+      integer(ESMF_KIND_I8),   intent(out), optional :: yy_i8
+      integer,                 intent(out), optional :: mm
+      integer,                 intent(out), optional :: dd
+      integer(ESMF_KIND_I4),   intent(out), optional :: d
+      integer(ESMF_KIND_I8),   intent(out), optional :: d_i8
+      integer(ESMF_KIND_I4),   intent(out), optional :: h
+      integer(ESMF_KIND_I4),   intent(out), optional :: m
+      integer(ESMF_KIND_I4),   intent(out), optional :: s
+      integer(ESMF_KIND_I8),   intent(out), optional :: s_i8
+      integer(ESMF_KIND_I4),   intent(out), optional :: ms
+      integer(ESMF_KIND_I4),   intent(out), optional :: us
+      integer(ESMF_KIND_I4),   intent(out), optional :: ns
+      real(ESMF_KIND_R8),      intent(out), optional :: d_r8  ! not implemented
+      real(ESMF_KIND_R8),      intent(out), optional :: h_r8  ! not implemented
+      real(ESMF_KIND_R8),      intent(out), optional :: m_r8  ! not implemented
+      real(ESMF_KIND_R8),      intent(out), optional :: s_r8  ! not implemented
+      real(ESMF_KIND_R8),      intent(out), optional :: ms_r8 ! not implemented
+      real(ESMF_KIND_R8),      intent(out), optional :: us_r8 ! not implemented
+      real(ESMF_KIND_R8),      intent(out), optional :: ns_r8 ! not implemented
+      integer(ESMF_KIND_I4),   intent(out), optional :: sN
+      integer(ESMF_KIND_I4),   intent(out), optional :: sD
+      type(ESMF_Calendar),     intent(out), optional :: calendar
+      type(ESMF_CalendarType), intent(out), optional :: calendarType
+      integer,                 intent(out), optional :: timeZone
+      character (len=*),       intent(out), optional :: timeString
+      character (len=*),       intent(out), optional :: timeStringISOFrac
+      integer,                 intent(out), optional :: dayOfWeek
+      type(ESMF_Time),         intent(out), optional :: midMonth
+      integer(ESMF_KIND_I4),   intent(out), optional :: dayOfYear
+      real(ESMF_KIND_R8),      intent(out), optional :: dayOfYear_r8 ! NOW implemented
+      type(ESMF_TimeInterval), intent(out), optional :: dayOfYear_intvl
+      integer,                 intent(out), optional :: rc
+      REAL(ESMF_KIND_R8) :: rsec
+      INTEGER(ESMF_KIND_I4) :: year, seconds, Sn, Sd
+      INTEGER(ESMF_KIND_I8), PARAMETER :: SECONDS_PER_DAY = 86400_ESMF_KIND_I8
+
+      call ESMF_TimeGet(time, yy, yy_i8, &
+                              mm, dd, &
+                              d, d_i8, &
+                              h, m, &
+                              s, s_i8, &
+                              ms, us, ns, &
+                              d_r8, h_r8, m_r8, s_r8, &
+                              ms_r8, us_r8, ns_r8, &
+                              sN, sD, &
+                              calendar, calendarType, timeZone, &
+                              timeString, timeStringISOFrac, &
+                              dayOfWeek, midMonth, &
+                              dayOfYear,  dayOfYear_r8, &
+                              dayOfYear_intvl, rc)
+      IF ( rc == ESMF_SUCCESS ) THEN
+        IF ( PRESENT( dayOfYear_r8 ) ) THEN
+          ! get seconds since start of year and fractional seconds
+          CALL ESMF_TimeGet( time, yy=year, s=seconds, sN=Sn, sD=Sd, rc=rc )
+          IF ( rc == ESMF_SUCCESS ) THEN
+            ! 64-bit IEEE 754 has 52-bit mantisssa -- only need 25 bits to hold
+            ! number of seconds in a year...
+            rsec = REAL( seconds, ESMF_KIND_R8 )
+            IF ( Sd /= 0 ) THEN
+              rsec = rsec + ( REAL( Sn, ESMF_KIND_R8 ) / REAL( Sd, ESMF_KIND_R8 ) )
+            ENDIF
+            dayOfYear_r8 = rsec / REAL( SECONDS_PER_DAY, ESMF_KIND_R8 )
+            ! start at 1
+            dayOfYear_r8 = dayOfYear_r8 + 1.0_ESMF_KIND_R8
+          ENDIF
+        ENDIF
+      ENDIF
+
+      end subroutine WRFU_TimeGet
+
+!------------------------------------------------------------------------------
+
+
+! duplicated routines from esmf_time_f90
+! move these to a common shared location later...  
+
+! Convert fraction to string with leading sign.
+! If fraction simplifies to a whole number or if
+! denominator is zero, return empty string.
+! INTEGER*8 interface.  
+SUBROUTINE fraction_to_stringi8( numerator, denominator, frac_str )
+  INTEGER(ESMF_KIND_I8), INTENT(IN) :: numerator
+  INTEGER(ESMF_KIND_I8), INTENT(IN) :: denominator
+  CHARACTER (LEN=*), INTENT(OUT) :: frac_str
+  IF ( denominator > 0 ) THEN
+    IF ( mod( numerator, denominator ) /= 0 ) THEN
+      IF ( numerator > 0 ) THEN
+        WRITE(frac_str,FMT="('+',I2.2,'/',I2.2)") abs(numerator), denominator
+      ELSE   ! numerator < 0
+        WRITE(frac_str,FMT="('-',I2.2,'/',I2.2)") abs(numerator), denominator
+      ENDIF
+    ELSE   ! includes numerator == 0 case
+      frac_str = ''
+    ENDIF
+  ELSE   ! no-fraction case
+    frac_str = ''
+  ENDIF
+END SUBROUTINE fraction_to_stringi8
+
+
+! Convert fraction to string with leading sign.
+! If fraction simplifies to a whole number or if
+! denominator is zero, return empty string.
+! INTEGER interface.  
+SUBROUTINE fraction_to_string( numerator, denominator, frac_str )
+  INTEGER, INTENT(IN) :: numerator
+  INTEGER, INTENT(IN) :: denominator
+  CHARACTER (LEN=*), INTENT(OUT) :: frac_str
+  ! locals
+  INTEGER(ESMF_KIND_I8) :: numerator_i8, denominator_i8
+  numerator_i8 = INT( numerator, ESMF_KIND_I8 )
+  denominator_i8 = INT( denominator, ESMF_KIND_I8 )
+  CALL fraction_to_stringi8( numerator_i8, denominator_i8, frac_str )
+END SUBROUTINE fraction_to_string
+
+! end of duplicated routines from esmf_time_f90
 
 
 END MODULE module_esmf_extensions

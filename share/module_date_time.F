@@ -8,7 +8,7 @@ MODULE module_date_time
   CHARACTER* 24 ::   start_date = '                        '
   CHARACTER* 24 ::   current_date
   INTEGER , PARAMETER :: len_current_date  = 24
-  REAL,PRIVATE :: xtime
+  REAL , PRIVATE :: xtime
 
 !  1.  geth_idts (ndate, odate, idts)
 !  Get the time period between two dates.
@@ -670,7 +670,7 @@ CONTAINS
    
       IMPLICIT NONE
    
-      INTEGER, INTENT(IN) :: year
+      INTEGER,INTENT(IN) :: year
       INTEGER :: num_days
    
       num_days = 28 ! By default, February has 28 days ...
@@ -725,14 +725,14 @@ END MODULE module_date_time
    ! TBH:  change the WRF format to match the standard, then we remove the 
    ! TBH:  WRF dependence...  
 
-   ! Converts WRF date-time string into an WRF_UTIL_Time object.  
+   ! Converts WRF date-time string into an WRFU_Time object.  
    ! The format of the WRF date-time strings is a slight variant on ISO 8601: 
    ! ISO is "YYYY-MM-DDThh:mm:ss" while WRF is "YYYY-MM-DD_hh:mm:ss".  
    SUBROUTINE wrf_atotime ( str, time )
       USE module_utility
       USE module_wrf_error
       CHARACTER (LEN=*), INTENT( IN) :: str
-      TYPE(WRF_UTIL_Time),   INTENT(OUT) :: time
+      TYPE(WRFU_Time),   INTENT(OUT) :: time
       INTEGER yr, mm, dd, h, m, s, ms
       INTEGER rc
       IF ( LEN( str ) .GE. 20 ) THEN
@@ -748,9 +748,9 @@ END MODULE module_date_time
         READ(str,33) yr,mm,dd,h,m,s
         ms = 0
       ENDIF
-      CALL WRF_UTIL_TimeSet( time, YY=yr, MM=mm, DD=dd, H=h, M=m, S=s, MS=ms, rc=rc )
-      CALL wrf_check_error( WRF_UTIL_SUCCESS, rc, &
-                            'WRF_UTIL_TimeSet() in wrf_atotime() FAILED', &
+      CALL WRFU_TimeSet( time, YY=yr, MM=mm, DD=dd, H=h, M=m, S=s, MS=ms, rc=rc )
+      CALL wrf_check_error( WRFU_SUCCESS, rc, &
+                            'WRFU_TimeSet() in wrf_atotime() FAILED', &
                             __FILE__ , &
                             __LINE__  )
 33 FORMAT (I4.4,1x,I2.2,1x,I2.2,1x,I2.2,1x,I2.2,1x,I2.2)
@@ -760,58 +760,93 @@ END MODULE module_date_time
 
 
 
-   ! Converts an WRF_UTIL_Time object into a WRF date-time string.  
+   ! Converts an WRFU_Time object into a WRF date-time string.  
    ! The format of the WRF date-time strings is a slight variant on ISO 8601: 
    ! ISO is "YYYY-MM-DDThh:mm:ss" while WRF is "YYYY-MM-DD_hh:mm:ss".  
    SUBROUTINE wrf_timetoa ( time, str )
       USE module_utility
       USE module_wrf_error
-      TYPE(WRF_UTIL_Time),   INTENT( IN) :: time
+      TYPE(WRFU_Time),   INTENT( IN) :: time
       CHARACTER (LEN=*), INTENT(OUT) :: str
-      INTEGER rc
-      CHARACTER (LEN=256) :: mess
-      CALL WRF_UTIL_TimeGet( time, timeString=str, rc=rc )
-      CALL wrf_check_error( WRF_UTIL_SUCCESS, rc, &
-                            'WRF_UTIL_TimeGet() in wrf_timetoa() FAILED', &
+      INTEGER strlen, rc
+      CHARACTER (LEN=256) :: mess, tmpstr
+      ! Assertion
+      IF ( LEN(str) < 19 ) THEN
+        CALL wrf_error_fatal( 'wrf_timetoa:  str is too short' )
+      ENDIF
+      tmpstr = ''
+      CALL WRFU_TimeGet( time, timeString=tmpstr, rc=rc )
+      CALL wrf_check_error( WRFU_SUCCESS, rc, &
+                            'WRFU_TimeGet() in wrf_timetoa() FAILED', &
                             __FILE__ , &
                             __LINE__  )
-      ! change ISO 8601 'T' to WRF '_'
+      ! change ISO 8601 'T' to WRF '_' and hack off fraction if str is not 
+      ! big enough to hold it
+      strlen = MIN( LEN(str), LEN_TRIM(tmpstr) )
+      str = ''
+      str(1:strlen) = tmpstr(1:strlen)
       str(11:11) = '_'
       WRITE (mess,*) 'DEBUG wrf_timetoa():  returning with str = [',TRIM(str),']'
-      CALL wrf_debug ( 150 , mess )
+      CALL wrf_debug ( 150 , TRIM(mess) )
       RETURN
    END SUBROUTINE wrf_timetoa
 
 
 
+   ! Converts an WRFU_TimeInterval object into a time-interval string.  
+   SUBROUTINE wrf_timeinttoa ( timeinterval, str )
+      USE module_utility
+      USE module_wrf_error
+      TYPE(WRFU_TimeInterval),   INTENT( IN) :: timeinterval
+      CHARACTER (LEN=*), INTENT(OUT) :: str
+      INTEGER rc
+      CHARACTER (LEN=256) :: mess
+      CALL WRFU_TimeIntervalGet( timeinterval, timeString=str, rc=rc )
+      CALL wrf_check_error( WRFU_SUCCESS, rc, &
+                            'WRFU_TimeIntervalGet() in wrf_timeinttoa() FAILED', &
+                            __FILE__ , &
+                            __LINE__  )
+      WRITE (mess,*) 'DEBUG wrf_timeinttoa():  returning with str = [',TRIM(str),']'
+      CALL wrf_debug ( 150 , TRIM(mess) )
+      RETURN
+   END SUBROUTINE wrf_timeinttoa
+
+
+
    ! Debug routine to print key clock information.  
    ! Every printed line begins with pre_str.  
-   ! If clock is invalid, also print its state using WRF_UTIL_ClockPrint().  
-   ! Lines printed by WRF_UTIL_ClockPrint() currently do not begin with 
-   ! pre_str.  
    SUBROUTINE wrf_clockprint ( level, clock, pre_str )
       USE module_utility
       USE module_wrf_error
       INTEGER,           INTENT( IN) :: level
-      TYPE(WRF_UTIL_Clock),  INTENT( IN) :: clock
+      TYPE(WRFU_Clock),  INTENT( IN) :: clock
       CHARACTER (LEN=*), INTENT( IN) :: pre_str
       INTEGER rc
       INTEGER :: debug_level
-      TYPE(WRF_UTIL_Time) :: currTime, startTime, stopTime
-      CHARACTER (LEN=25) :: currTime_str, startTime_str, stopTime_str
+      TYPE(WRFU_Time) :: currTime, startTime, stopTime
+      TYPE(WRFU_TimeInterval) :: timeStep
+      CHARACTER (LEN=64) :: currTime_str, startTime_str, stopTime_str
+      CHARACTER (LEN=64) :: timeStep_str
       CHARACTER (LEN=256) :: mess
       CALL get_wrf_debug_level( debug_level )
       IF ( level .LE. debug_level ) THEN
-        CALL WRF_UTIL_ClockGet( clock, CurrTime=currTime, StartTime=startTime, &
-                                StopTime=stopTime, rc=rc )
+        CALL WRFU_ClockGet( clock, CurrTime=currTime, StartTime=startTime, &
+                                   StopTime=stopTime, TimeStep=timeStep, rc=rc )
+        CALL wrf_check_error( WRFU_SUCCESS, rc, &
+                              'wrf_clockprint:  WRFU_ClockGet() FAILED', &
+                              __FILE__ , &
+                              __LINE__  )
         CALL wrf_timetoa( currTime, currTime_str )
         CALL wrf_timetoa( startTime, startTime_str )
         CALL wrf_timetoa( stopTime, stopTime_str )
+        CALL wrf_timeinttoa( timeStep, timeStep_str )
         WRITE (mess,*) TRIM(pre_str),'  clock start time = ',TRIM(startTime_str)
         CALL wrf_message(TRIM(mess))
         WRITE (mess,*) TRIM(pre_str),'  clock current time = ',TRIM(currTime_str)
         CALL wrf_message(TRIM(mess))
         WRITE (mess,*) TRIM(pre_str),'  clock stop time = ',TRIM(stopTime_str)
+        CALL wrf_message(TRIM(mess))
+        WRITE (mess,*) TRIM(pre_str),'  clock time step = ',TRIM(timeStep_str)
         CALL wrf_message(TRIM(mess))
       ENDIF
       RETURN
