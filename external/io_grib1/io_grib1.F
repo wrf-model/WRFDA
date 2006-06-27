@@ -14,13 +14,13 @@
 !*
 
 
-module data_info
+module gr1_data_info
   USE module_wrf_error
 
 !*
 !* This module will hold data internal to this I/O implementation.  
 !*   The variables will be accessible by all functions (provided they have a 
-!*   "USE data_info" line).
+!*   "USE gr1_data_info" line).
 !*
 
   integer                , parameter       :: FATAL            = 1
@@ -49,14 +49,19 @@ module data_info
   real                                     :: proj_central_lon
   real                                     :: timestep
   character,     dimension(:), pointer     :: grib_tables
+  logical                                  :: table_filled = .FALSE.
   character,     dimension(:), pointer     :: grid_info
-  character, dimension(:,:), pointer :: fileindex
-  integer,   dimension(maxFileHandles)     :: CurrentTime
-  integer,   dimension(maxFileHandles)     :: NumberTimes
-  character (DateStrLen), dimension(:,:), pointer :: Times
   integer                                  :: full_xsize, full_ysize
-  integer, dimension(maxDomains)           :: domains
+  integer, dimension(maxDomains)           :: domains = -1
   integer                                  :: max_domain = 0
+  
+  TYPE :: HandleVar
+     character, dimension(:), pointer      :: fileindex(:)
+     integer                               :: CurrentTime
+     integer                               :: NumberTimes
+     character (DateStrLen), dimension(:),pointer  :: Times(:)
+  ENDTYPE
+  TYPE (HandleVar), dimension(maxFileHandles) :: fileinfo
 
   TYPE :: prevdata
      integer :: fcst_secs_rainc
@@ -85,14 +90,15 @@ module data_info
 
   logical                                  :: WrfIOnotInitialized = .true.
 
-end module data_info
+end module gr1_data_info
 
 
 subroutine ext_gr1_ioinit(SysDepInfo,Status)
 
-  USE data_info
+  USE gr1_data_info
   implicit none
 #include "wrf_status_codes.h"
+#include "wrf_io_flags.h"
   CHARACTER*(*), INTENT(IN) :: SysDepInfo
   integer ,intent(out) :: Status
   integer :: i
@@ -114,18 +120,7 @@ subroutine ext_gr1_ioinit(SysDepInfo,Status)
     pressure(i)%lastDateStr = ''
   enddo
 
-  CALL GET_GRIB1_TABLES_SIZE(size)
-  ALLOCATE(grib_tables(1:size), STAT=istat)
-  CALL LOAD_GRIB1_TABLES ("gribmap.txt"//ACHAR(0), grib_tables, istat)
-  if (istat .ne. 0) then
-     DEALLOCATE(grib_tables)
-     WRITE( wrf_err_message , * ) &
-          'Could not open file gribmap.txt '
-     CALL wrf_error_fatal ( TRIM ( wrf_err_message ) )
-     Status = WRF_ERR_FATAL_BAD_FILE_STATUS
-     return
-  endif
-
+  FileStatus(1:maxFileHandles) = WRF_FILE_NOT_OPENED
   WrfIOnotInitialized = .false.
 
   Status = WRF_NO_ERR
@@ -137,7 +132,7 @@ end subroutine ext_gr1_ioinit
 
 subroutine ext_gr1_ioexit(Status)
 
-  USE data_info
+  USE gr1_data_info
   implicit none
 #include "wrf_status_codes.h"
   integer istat
@@ -145,8 +140,11 @@ subroutine ext_gr1_ioexit(Status)
 
   call wrf_debug ( DEBUG , 'Entering ext_gr1_ioexit')
 
-  CALL free_gribmap(grib_tables)
-  DEALLOCATE(grib_tables, stat=istat)
+  if (table_filled) then
+     CALL free_gribmap(grib_tables)
+     DEALLOCATE(grib_tables, stat=istat)
+     table_filled = .FALSE.
+  endif
   DEALLOCATE(grid_info, stat=istat)
 
   Status = WRF_NO_ERR
@@ -159,8 +157,7 @@ end subroutine ext_gr1_ioexit
 SUBROUTINE ext_gr1_open_for_read_begin ( FileName , Comm_compute, Comm_io, &
      SysDepInfo, DataHandle , Status )
 
-  USE data_info
-  USE module_wrf_error
+  USE gr1_data_info
   IMPLICIT NONE
 #include "wrf_status_codes.h"
 #include "wrf_io_flags.h"
@@ -191,7 +188,7 @@ SUBROUTINE ext_gr1_open_for_read_begin ( FileName , Comm_compute, Comm_io, &
 
   call wrf_debug ( DEBUG , 'Entering ext_gr1_open_for_read_begin')
 
-  CALL get_new_handle(DataHandle)
+  CALL gr1_get_new_handle(DataHandle)
 
   if (DataHandle .GT. 0) then
      CALL open_file(TRIM(FileName), 'r', FileFd(DataHandle), ierr)
@@ -200,36 +197,55 @@ SUBROUTINE ext_gr1_open_for_read_begin ( FileName , Comm_compute, Comm_io, &
      else
         opened(DataHandle) = .true.
         DataFile(DataHandle) = TRIM(FileName)
-        FileStatus(DataHandle) = WRF_FILE_OPENED_FOR_READ
+        FileStatus(DataHandle) = WRF_FILE_OPENED_NOT_COMMITTED
      endif
   else
      Status = WRF_WARN_TOO_MANY_FILES
      return
   endif
  
+  ! Read the grib index file first
+  if (.NOT. table_filled) then
+     table_filled = .TRUE.
+     CALL GET_GRIB1_TABLES_SIZE(size)
+     ALLOCATE(grib_tables(1:size), STAT=ierr)
+     CALL LOAD_GRIB1_TABLES ("gribmap.txt", grib_tables, ierr)
+     if (ierr .ne. 0) then
+        DEALLOCATE(grib_tables)
+        WRITE( wrf_err_message , * ) &
+             'Could not open file gribmap.txt '
+        CALL wrf_error_fatal ( TRIM ( wrf_err_message ) )
+        Status = WRF_ERR_FATAL_BAD_FILE_STATUS
+        return
+     endif
+  endif
+
   ! Begin by indexing file and reading metadata into structure.
   CALL GET_FILEINDEX_SIZE(size)
-  ALLOCATE(fileindex(DataHandle,1:size), STAT=ierr)
+  ALLOCATE(fileinfo(DataHandle)%fileindex(1:size), STAT=ierr)
 
-  CALL ALLOC_INDEX_FILE(fileindex(DataHandle,:))
-  CALL INDEX_FILE(FileFd(DataHandle),fileindex(DataHandle,:))
+  CALL ALLOC_INDEX_FILE(fileinfo(DataHandle)%fileindex(:))
+  CALL INDEX_FILE(FileFd(DataHandle),fileinfo(DataHandle)%fileindex(:))
 
   ! Get times into Times variable
-  CALL GET_NUM_TIMES(fileindex(DataHandle,:),NumberTimes(DataHandle));
+  CALL GET_NUM_TIMES(fileinfo(DataHandle)%fileindex(:), &
+       fileinfo(DataHandle)%NumberTimes);
 
-  ALLOCATE(Times(DataHandle,1:NumberTimes(DataHandle)), STAT=ierr)
-  do idx = 1,NumberTimes(DataHandle)
-     CALL GET_TIME(fileindex(DataHandle,:),idx,Times(DataHandle,idx))
+  ALLOCATE(fileinfo(DataHandle)%Times(1:fileinfo(DataHandle)%NumberTimes), STAT=ierr)
+  do idx = 1,fileinfo(DataHandle)%NumberTimes
+     CALL GET_TIME(fileinfo(DataHandle)%fileindex(:),idx, &
+          fileinfo(DataHandle)%Times(idx))
   enddo
 
   ! CurrentTime starts as 0.  The first time in the file is 1.  So,
   !   until set_time or get_next_time is called, the current time
   !   is not set.
-  CurrentTime(DataHandle) = 0
+  fileinfo(DataHandle)%CurrentTime = 0
 
-  CALL FILL_ETA_LEVELS(fileindex(DataHandle,:), FileFd(DataHandle), & 
+  CALL gr1_fill_eta_levels(fileinfo(DataHandle)%fileindex(:), &
+       FileFd(DataHandle), & 
        grib_tables, "ZNW", full_eta)
-  CALL FILL_ETA_LEVELS(fileindex(DataHandle,:), FileFd(DataHandle), &
+  CALL gr1_fill_eta_levels(fileinfo(DataHandle)%fileindex(:), FileFd(DataHandle), &
        grib_tables, "ZNU", half_eta)
 
   ! 
@@ -245,23 +261,23 @@ SUBROUTINE ext_gr1_open_for_read_begin ( FileName , Comm_compute, Comm_io, &
 
   leveltype = 112
 
-  CALL GET_GRIB_INDICES(fileindex(DataHandle,:),center, subcenter, parmtbl, &
+  CALL GET_GRIB_INDICES(fileinfo(DataHandle)%fileindex(:),center, subcenter, parmtbl, &
        dpth_parmid,"*",leveltype, &
        -HUGE(1),-HUGE(1), -HUGE(1),-HUGE(1),indices,numindices)
 
   last_grb_index = -1;
   do idx = 1,numindices
-     CALL READ_GRIB(fileindex(DataHandle,:), FileFd(DataHandle), &
+     CALL READ_GRIB(fileinfo(DataHandle)%fileindex(:), FileFd(DataHandle), &
           indices(idx), soil_depth(idx))
      !
      ! Now read the soil thickenesses
      !
-     CALL GET_LEVEL1(fileindex(DataHandle,:),indices(idx),level1)
-     CALL GET_LEVEL2(fileindex(DataHandle,:),indices(idx),level2)
-     CALL GET_GRIB_INDEX_GUESS(fileindex(DataHandle,:), &
+     CALL GET_LEVEL1(fileinfo(DataHandle)%fileindex(:),indices(idx),level1)
+     CALL GET_LEVEL2(fileinfo(DataHandle)%fileindex(:),indices(idx),level2)
+     CALL GET_GRIB_INDEX_GUESS(fileinfo(DataHandle)%fileindex(:), &
           center, subcenter, parmtbl, thk_parmid,"*",leveltype, &
           level1,level2,-HUGE(1),-HUGE(1), last_grb_index+1, grb_index)
-     CALL READ_GRIB(fileindex(DataHandle,:),FileFd(DataHandle),grb_index, &
+     CALL READ_GRIB(fileinfo(DataHandle)%fileindex(:),FileFd(DataHandle),grb_index, &
           soil_thickness(idx))
 
      last_grb_index = grb_index
@@ -272,7 +288,7 @@ SUBROUTINE ext_gr1_open_for_read_begin ( FileName , Comm_compute, Comm_io, &
   !
   ! Fill up any variables that need to be retrieved from Metadata
   !
-  CALL GET_METADATA_VALUE(fileindex(DataHandle,:), 'PROGRAM_NAME', "none", &
+  CALL GET_METADATA_VALUE(fileinfo(DataHandle)%fileindex(:), 'PROGRAM_NAME', "none", &
        "none", InputProgramName, stat)
   if (stat /= 0) then
      CALL wrf_debug (DEBUG , "PROGRAM_NAME not found in input METADATA")
@@ -290,9 +306,10 @@ END SUBROUTINE ext_gr1_open_for_read_begin
 
 SUBROUTINE ext_gr1_open_for_read_commit( DataHandle , Status )
 
-  USE data_info
+  USE gr1_data_info
   IMPLICIT NONE
 #include "wrf_status_codes.h"
+#include "wrf_io_flags.h"
   character(len=1000) :: msg
   INTEGER ,       INTENT(IN ) :: DataHandle
   INTEGER ,       INTENT(OUT) :: Status
@@ -307,6 +324,8 @@ SUBROUTINE ext_gr1_open_for_read_commit( DataHandle , Status )
     return
   endif
   committed(DataHandle) = .true.
+  FileStatus(DataHandle) = WRF_FILE_OPENED_FOR_READ
+
   Status = WRF_NO_ERR
 
   RETURN
@@ -317,9 +336,10 @@ END SUBROUTINE ext_gr1_open_for_read_commit
 SUBROUTINE ext_gr1_open_for_read ( FileName , Comm_compute, Comm_io, &
      SysDepInfo, DataHandle , Status )
 
-  USE data_info
+  USE gr1_data_info
   IMPLICIT NONE
 #include "wrf_status_codes.h"
+#include "wrf_io_flags.h"
   CHARACTER*(*) :: FileName
   INTEGER ,       INTENT(IN)  :: Comm_compute , Comm_io
   CHARACTER*(*) :: SysDepInfo
@@ -333,7 +353,8 @@ SUBROUTINE ext_gr1_open_for_read ( FileName , Comm_compute, Comm_io, &
   CALL ext_gr1_open_for_read_begin( FileName, Comm_compute, Comm_io, &
        SysDepInfo, DataHandle, Status )
   IF ( Status .EQ. WRF_NO_ERR ) THEN
-    CALL ext_gr1_open_for_read_commit( DataHandle, Status )
+     FileStatus(DataHandle) = WRF_FILE_OPENED_NOT_COMMITTED
+     CALL ext_gr1_open_for_read_commit( DataHandle, Status )
   ENDIF
   return
 
@@ -345,7 +366,7 @@ END SUBROUTINE ext_gr1_open_for_read
 SUBROUTINE ext_gr1_open_for_write_begin(FileName, Comm, IOComm, SysDepInfo, &
      DataHandle, Status)
   
-  USE data_info
+  USE gr1_data_info
   implicit none
 #include "wrf_status_codes.h"
 #include "wrf_io_flags.h"
@@ -357,11 +378,27 @@ SUBROUTINE ext_gr1_open_for_write_begin(FileName, Comm, IOComm, SysDepInfo, &
   integer              ,intent(out) :: DataHandle
   integer              ,intent(out) :: Status
   integer :: ierr
+  integer             :: size
 
   call wrf_debug ( DEBUG , 'Entering ext_gr1_open_for_write_begin')
 
+  if (.NOT. table_filled) then
+     table_filled = .TRUE.
+     CALL GET_GRIB1_TABLES_SIZE(size)
+     ALLOCATE(grib_tables(1:size), STAT=ierr)
+     CALL LOAD_GRIB1_TABLES ("gribmap.txt", grib_tables, ierr)
+     if (ierr .ne. 0) then
+        DEALLOCATE(grib_tables)
+        WRITE( wrf_err_message , * ) &
+             'Could not open file gribmap.txt '
+        CALL wrf_error_fatal ( TRIM ( wrf_err_message ) )
+        Status = WRF_ERR_FATAL_BAD_FILE_STATUS
+        return
+     endif
+  endif
+
   Status = WRF_NO_ERR
-  CALL get_new_handle(DataHandle)
+  CALL gr1_get_new_handle(DataHandle)
   if (DataHandle .GT. 0) then
      CALL open_file(TRIM(FileName), 'w', FileFd(DataHandle), ierr)
      if (ierr .ne. 0) then
@@ -369,7 +406,7 @@ SUBROUTINE ext_gr1_open_for_write_begin(FileName, Comm, IOComm, SysDepInfo, &
      else
         opened(DataHandle) = .true.
         DataFile(DataHandle) = TRIM(FileName)
-        FileStatus(DataHandle) = WRF_FILE_OPENED_FOR_WRITE
+        FileStatus(DataHandle) = WRF_FILE_OPENED_NOT_COMMITTED
      endif
      committed(DataHandle) = .false.
      td_output(DataHandle) = ''
@@ -384,9 +421,10 @@ END SUBROUTINE ext_gr1_open_for_write_begin
 
 SUBROUTINE ext_gr1_open_for_write_commit( DataHandle , Status )
 
-  USE data_info
+  USE gr1_data_info
   IMPLICIT NONE
 #include "wrf_status_codes.h"
+#include "wrf_io_flags.h"
   INTEGER ,       INTENT(IN ) :: DataHandle
   INTEGER ,       INTENT(OUT) :: Status
 
@@ -395,6 +433,7 @@ SUBROUTINE ext_gr1_open_for_write_commit( DataHandle , Status )
   IF ( opened( DataHandle ) ) THEN
     IF ( used( DataHandle ) ) THEN
       committed(DataHandle) = .true.
+      FileStatus(DataHandle) = WRF_FILE_OPENED_FOR_WRITE
     ENDIF
   ENDIF
 
@@ -406,7 +445,7 @@ END SUBROUTINE ext_gr1_open_for_write_commit
 !*****************************************************************************
 
 subroutine ext_gr1_inquiry (Inquiry, Result, Status)
-  use data_info
+  use gr1_data_info
   implicit none
 #include "wrf_status_codes.h"
   character *(*), INTENT(IN)    :: Inquiry
@@ -436,7 +475,7 @@ end subroutine ext_gr1_inquiry
 
 SUBROUTINE ext_gr1_inquire_opened ( DataHandle, FileName , FileStat, Status )
 
-  USE data_info
+  USE gr1_data_info
   IMPLICIT NONE
 #include "wrf_status_codes.h"
 #include "wrf_io_flags.h"
@@ -454,7 +493,9 @@ SUBROUTINE ext_gr1_inquire_opened ( DataHandle, FileName , FileStat, Status )
   else
      FileStat = WRF_FILE_NOT_OPENED
   endif
+  
   Status = FileStat
+
   RETURN
 END SUBROUTINE ext_gr1_inquire_opened
 
@@ -462,7 +503,7 @@ END SUBROUTINE ext_gr1_inquire_opened
 
 SUBROUTINE ext_gr1_ioclose ( DataHandle, Status )
 
-  USE data_info
+  USE gr1_data_info
   IMPLICIT NONE
 #include "wrf_status_codes.h"
   INTEGER DataHandle, Status
@@ -515,8 +556,7 @@ SUBROUTINE ext_gr1_write_field( DataHandle , DateStr , VarName , &
      PatchStart , PatchEnd , &
      Status )
 
-  USE data_info
-  USE module_wrf_error
+  USE gr1_data_info
   IMPLICIT NONE
 #include "wrf_status_codes.h"
 #include "wrf_io_flags.h"
@@ -566,7 +606,7 @@ SUBROUTINE ext_gr1_write_field( DataHandle , DateStr , VarName , &
   real    :: region_center_lat, region_center_lon
   integer :: dom_xsize, dom_ysize;
 
-  call wrf_debug ( DEBUG , 'Entering ext_gr1_write_field')
+  call wrf_debug ( DEBUG , 'Entering ext_gr1_write_field for parameter'//VarName)
 
   !
   ! If DateStr is all 0's, we reset it to StartDate.  For some reason, 
@@ -680,7 +720,7 @@ SUBROUTINE ext_gr1_write_field( DataHandle , DateStr , VarName , &
   call get_vert_stag(OutName,Stagger,vert_stag)
 
   do idx = 1, zsize
-     call get_levels(OutName, idx, zsize, soil_layers, vert_stag, fraction, &
+     call gr1_get_levels(OutName, idx, zsize, soil_layers, vert_stag, fraction, &
           vert_unit, level1(idx), level2(idx))
   enddo
 
@@ -863,6 +903,10 @@ SUBROUTINE ext_gr1_write_field( DataHandle , DateStr , VarName , &
               data(1,1) = Field(1,z,1,1)
            CASE ('z')
               data(1,1) = Field(1,z,1,1)
+           CASE ('C')
+              data = Field(1,1:xsize,1:ysize,z)
+           CASE ('c')
+              data = Field(1,1:xsize,1:ysize,z)
            CASE ('0')
               data(1,1) = Field(1,1,1,1)
            END SELECT
@@ -873,11 +917,14 @@ SUBROUTINE ext_gr1_write_field( DataHandle , DateStr , VarName , &
            if (FieldType == WRF_INTEGER) then
               mold = 0
               do idx=1,xsize
-                 data(idx,:)=transfer(data(idx,:),mold)
+                 !
+                 ! The parentheses around data(idx,:) are needed in order
+                 !   to fix a bug with transfer with the xlf compiler on NCAR's
+                 !   IBM (bluesky).
+                 !
+                 data(idx,:)=transfer((data(idx,:)),mold)
               enddo
            endif
-           
-           
            ! 
            ! Here, we do any necessary conversions to the data.
            !
@@ -965,7 +1012,7 @@ SUBROUTINE ext_gr1_read_field ( DataHandle , DateStr , VarName , Field , &
      DimNames , DomainStart , DomainEnd , MemoryStart , MemoryEnd ,      &
      PatchStart , PatchEnd ,  Status )
 
-  USE data_info
+  USE gr1_data_info
   IMPLICIT NONE  
 #include "wrf_status_codes.h"
 #include "wrf_io_flags.h"
@@ -1033,10 +1080,10 @@ SUBROUTINE ext_gr1_read_field ( DataHandle , DateStr , VarName , Field , &
   last_grb_index = -1
   do zidx = z_start,z_end
      
-     CALL get_levels(VarName,zidx,z_end-z_start,soil_layers,vert_stag, &
+     CALL gr1_get_levels(VarName,zidx,z_end-z_start,soil_layers,vert_stag, &
           .false., vert_unit,level1,level2)
      
-     CALL GET_GRIB_INDEX_VALIDTIME_GUESS(fileindex(DataHandle,:), center, &
+     CALL GET_GRIB_INDEX_VALIDTIME_GUESS(fileinfo(DataHandle)%fileindex(:), center, &
           subcenter, parmtbl, parmid,DateStr,vert_unit,level1, &
           level2, last_grb_index + 1, grb_index)
      if (grb_index < 0) then
@@ -1047,12 +1094,12 @@ SUBROUTINE ext_gr1_read_field ( DataHandle , DateStr , VarName , Field , &
      endif
 
      if (data_allocated .eq. 0) then
-        CALL GET_SIZEOF_GRID(fileindex(DataHandle,:),grb_index,numcols,numrows)
+        CALL GET_SIZEOF_GRID(fileinfo(DataHandle)%fileindex(:),grb_index,numcols,numrows)
         allocate(data(z_start:z_end,1:numcols*numrows),stat=istat)
         data_allocated = 1
      endif
 
-     CALL READ_GRIB(fileindex(DataHandle,:), FileFd(DataHandle), grb_index, &
+     CALL READ_GRIB(fileinfo(DataHandle)%fileindex(:), FileFd(DataHandle), grb_index, &
           data(zidx,:))
 
      !
@@ -1109,7 +1156,7 @@ END SUBROUTINE ext_gr1_read_field
 
 SUBROUTINE ext_gr1_get_next_var ( DataHandle, VarName, Status )
 
-  USE data_info
+  USE gr1_data_info
   IMPLICIT NONE
 #include "wrf_status_codes.h"
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -1127,7 +1174,7 @@ END SUBROUTINE ext_gr1_get_next_var
 
 subroutine ext_gr1_end_of_frame(DataHandle, Status)
 
-  USE data_info
+  USE gr1_data_info
   implicit none
 #include "wrf_status_codes.h"
   integer               ,intent(in)     :: DataHandle
@@ -1144,21 +1191,17 @@ end subroutine ext_gr1_end_of_frame
 
 SUBROUTINE ext_gr1_iosync ( DataHandle, Status )
 
-  USE data_info  
+  USE gr1_data_info  
   IMPLICIT NONE
 #include "wrf_status_codes.h"
   INTEGER ,       INTENT(IN)  :: DataHandle
   INTEGER ,       INTENT(OUT) :: Status
-  integer                     :: ierror
 
   call wrf_debug ( DEBUG , 'Entering ext_gr1_iosync')
 
   Status = WRF_NO_ERR
   if (DataHandle .GT. 0) then
-     CALL flush_file(FileFd(DataHandle), ierror)
-     if (ierror .ne. 0) then
-        Status = WRF_WARN_WRITE_RONLY_FILE
-     endif
+     CALL flush_file(FileFd(DataHandle))
   else
      Status = WRF_WARN_TOO_MANY_FILES
   endif
@@ -1171,7 +1214,7 @@ END SUBROUTINE ext_gr1_iosync
 SUBROUTINE ext_gr1_inquire_filename ( DataHandle, FileName , FileStat, &
      Status )
 
-  USE data_info
+  USE gr1_data_info
   IMPLICIT NONE
 #include "wrf_status_codes.h"
 #include "wrf_io_flags.h"
@@ -1185,7 +1228,13 @@ SUBROUTINE ext_gr1_inquire_filename ( DataHandle, FileName , FileStat, &
 
   FileName = DataFile(DataHandle) 
 
-  FileStat = WRF_NO_ERR
+  if ((DataHandle .ge. firstFileHandle) .and. &
+       (DataHandle .le. maxFileHandles)) then
+     FileStat = FileStatus(DataHandle)
+  else
+     FileStat = WRF_FILE_NOT_OPENED
+  endif
+  
   Status = WRF_NO_ERR
 
   RETURN
@@ -1196,8 +1245,7 @@ END SUBROUTINE ext_gr1_inquire_filename
 SUBROUTINE ext_gr1_get_var_info ( DataHandle , VarName , NDim , &
      MemoryOrder , Stagger , DomainStart , DomainEnd , WrfType, Status )
 
-  USE data_info
-  USE module_wrf_error
+  USE gr1_data_info
   IMPLICIT NONE
 #include "wrf_status_codes.h"
   integer               ,intent(in)     :: DataHandle
@@ -1221,7 +1269,7 @@ END SUBROUTINE ext_gr1_get_var_info
 
 SUBROUTINE ext_gr1_set_time ( DataHandle, DateStr, Status )
 
-  USE data_info
+  USE gr1_data_info
   IMPLICIT NONE
 #include "wrf_status_codes.h"
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -1233,10 +1281,10 @@ SUBROUTINE ext_gr1_set_time ( DataHandle, DateStr, Status )
   call wrf_debug ( DEBUG , 'Entering ext_gr1_set_time')
 
   found_time = 0
-  do idx = 1,NumberTimes(DataHandle)
-     if (Times(DataHandle,idx) == DateStr) then
+  do idx = 1,fileinfo(DataHandle)%NumberTimes
+     if (fileinfo(DataHandle)%Times(idx) == DateStr) then
         found_time = 1
-        CurrentTime(DataHandle) = idx
+        fileinfo(DataHandle)%CurrentTime = idx
      endif
   enddo
   if (found_time == 0) then 
@@ -1252,7 +1300,7 @@ END SUBROUTINE ext_gr1_set_time
 
 SUBROUTINE ext_gr1_get_next_time ( DataHandle, DateStr, Status )
 
-  USE data_info
+  USE gr1_data_info
   IMPLICIT NONE
 #include "wrf_status_codes.h"
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -1261,11 +1309,11 @@ SUBROUTINE ext_gr1_get_next_time ( DataHandle, DateStr, Status )
 
   call wrf_debug ( DEBUG , 'Entering ext_gr1_get_next_time')
 
-  if (CurrentTime(DataHandle) == NumberTimes(DataHandle)) then
+  if (fileinfo(DataHandle)%CurrentTime == fileinfo(DataHandle)%NumberTimes) then
      Status = WRF_WARN_TIME_EOF
   else
-     CurrentTime(DataHandle) = CurrentTime(DataHandle) + 1
-     DateStr = Times(DataHandle,CurrentTime(DataHandle))
+     fileinfo(DataHandle)%CurrentTime = fileinfo(DataHandle)%CurrentTime + 1
+     DateStr = fileinfo(DataHandle)%Times(fileinfo(DataHandle)%CurrentTime)
      Status = WRF_NO_ERR
   endif
 
@@ -1276,7 +1324,7 @@ END SUBROUTINE ext_gr1_get_next_time
 
 SUBROUTINE ext_gr1_get_previous_time ( DataHandle, DateStr, Status )
 
-  USE data_info
+  USE gr1_data_info
   IMPLICIT NONE
 #include "wrf_status_codes.h"
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -1285,11 +1333,11 @@ SUBROUTINE ext_gr1_get_previous_time ( DataHandle, DateStr, Status )
 
   call wrf_debug ( DEBUG , 'Entering ext_gr1_get_previous_time')
 
-  if (CurrentTime(DataHandle) <= 1) then
+  if (fileinfo(DataHandle)%CurrentTime <= 0) then
      Status = WRF_WARN_TIME_EOF
   else
-     CurrentTime(DataHandle) = CurrentTime(DataHandle) - 1
-     DateStr = Times(DataHandle,CurrentTime(DataHandle))
+     fileinfo(DataHandle)%CurrentTime = fileinfo(DataHandle)%CurrentTime - 1
+     DateStr = fileinfo(DataHandle)%Times(fileinfo(DataHandle)%CurrentTime)
      Status = WRF_NO_ERR
   endif
 
@@ -1303,7 +1351,7 @@ END SUBROUTINE ext_gr1_get_previous_time
 SUBROUTINE ext_gr1_get_var_ti_real ( DataHandle,Element,  Varname, Data, &
      Count, Outcount, Status )
 
-  USE data_info
+  USE gr1_data_info
   IMPLICIT NONE
 #include "wrf_status_codes.h"
   INTEGER ,       INTENT(IN)    :: DataHandle
@@ -1321,7 +1369,7 @@ SUBROUTINE ext_gr1_get_var_ti_real ( DataHandle,Element,  Varname, Data, &
 
   Status = WRF_NO_ERR
   
-  CALL GET_METADATA_VALUE(fileindex(DataHandle,:), TRIM(Element), "none", &
+  CALL GET_METADATA_VALUE(fileinfo(DataHandle)%fileindex(:), TRIM(Element), "none", &
        Varname, Value, stat)
   if (stat /= 0) then
      CALL wrf_debug ( DEBUG , "GET_METADATA_VALUE failed for "//Element)
@@ -1345,7 +1393,7 @@ END SUBROUTINE ext_gr1_get_var_ti_real
 SUBROUTINE ext_gr1_get_var_ti_real8 ( DataHandle,Element,  Varname, Data, &
      Count, Outcount, Status )
 
-  USE data_info
+  USE gr1_data_info
   IMPLICIT NONE
 #include "wrf_status_codes.h"
   INTEGER ,       INTENT(IN)      :: DataHandle
@@ -1363,7 +1411,7 @@ SUBROUTINE ext_gr1_get_var_ti_real8 ( DataHandle,Element,  Varname, Data, &
 
   Status = WRF_NO_ERR
   
-  CALL GET_METADATA_VALUE(fileindex(DataHandle,:),TRIM(Element),&
+  CALL GET_METADATA_VALUE(fileinfo(DataHandle)%fileindex(:),TRIM(Element),&
        "none",Varname,Value,stat)
   if (stat /= 0) then
      CALL wrf_debug ( DEBUG , "GET_METADATA_VALUE failed for "//Element)
@@ -1386,7 +1434,7 @@ END SUBROUTINE ext_gr1_get_var_ti_real8
 
 SUBROUTINE ext_gr1_get_var_ti_double ( DataHandle,Element,  Varname, Data, &
      Count, Outcount, Status )
-  USE data_info
+  USE gr1_data_info
   IMPLICIT NONE
 #include "wrf_status_codes.h"
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -1404,7 +1452,7 @@ SUBROUTINE ext_gr1_get_var_ti_double ( DataHandle,Element,  Varname, Data, &
 
   Status = WRF_NO_ERR
   
-  CALL GET_METADATA_VALUE(fileindex(DataHandle,:), TRIM(Element), &
+  CALL GET_METADATA_VALUE(fileinfo(DataHandle)%fileindex(:), TRIM(Element), &
        "none", Varname, &
        Value,stat)
   if (stat /= 0) then
@@ -1429,7 +1477,7 @@ END SUBROUTINE ext_gr1_get_var_ti_double
 SUBROUTINE ext_gr1_get_var_ti_integer ( DataHandle,Element,  Varname, Data, &
      Count, Outcount, Status )
 
-  USE data_info
+  USE gr1_data_info
   IMPLICIT NONE
 #include "wrf_status_codes.h"
   INTEGER ,       INTENT(IN)       :: DataHandle
@@ -1447,7 +1495,7 @@ SUBROUTINE ext_gr1_get_var_ti_integer ( DataHandle,Element,  Varname, Data, &
 
   Status = WRF_NO_ERR
   
-  CALL GET_METADATA_VALUE(fileindex(DataHandle,:), TRIM(Element), &
+  CALL GET_METADATA_VALUE(fileinfo(DataHandle)%fileindex(:), TRIM(Element), &
        "none", Varname, Value, stat)
   if (stat /= 0) then
      CALL wrf_debug ( DEBUG , "GET_METADATA_VALUE failed for "//Element)
@@ -1471,7 +1519,7 @@ END SUBROUTINE ext_gr1_get_var_ti_integer
 SUBROUTINE ext_gr1_get_var_ti_logical ( DataHandle,Element,  Varname, Data, &
      Count, Outcount, Status )
 
-  USE data_info
+  USE gr1_data_info
   IMPLICIT NONE
 #include "wrf_status_codes.h"
   INTEGER ,       INTENT(IN)       :: DataHandle
@@ -1489,7 +1537,7 @@ SUBROUTINE ext_gr1_get_var_ti_logical ( DataHandle,Element,  Varname, Data, &
 
   Status = WRF_NO_ERR
   
-  CALL GET_METADATA_VALUE(fileindex(DataHandle,:), TRIM(Element), &
+  CALL GET_METADATA_VALUE(fileinfo(DataHandle)%fileindex(:), TRIM(Element), &
        "none", Varname, Value,stat)
   if (stat /= 0) then
      CALL wrf_debug ( DEBUG , "GET_METADATA_VALUE failed for "//Element)
@@ -1513,8 +1561,7 @@ END SUBROUTINE ext_gr1_get_var_ti_logical
 SUBROUTINE ext_gr1_get_var_ti_char ( DataHandle,Element,  Varname, Data,  &
      Status )
 
-  USE data_info
-  USE module_wrf_error
+  USE gr1_data_info
   IMPLICIT NONE
 #include "wrf_status_codes.h"
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -1528,7 +1575,7 @@ SUBROUTINE ext_gr1_get_var_ti_char ( DataHandle,Element,  Varname, Data,  &
   
   call wrf_debug ( DEBUG , 'Entering ext_gr1_get_var_ti_char')
 
-  CALL GET_METADATA_VALUE(fileindex(DataHandle,:), TRIM(Element), &
+  CALL GET_METADATA_VALUE(fileinfo(DataHandle)%fileindex(:), TRIM(Element), &
        "none", Varname, Data,stat)
   if (stat /= 0) then
      CALL wrf_debug ( DEBUG , "GET_METADATA_VALUE failed for "//Element)
@@ -1551,8 +1598,7 @@ END SUBROUTINE ext_gr1_get_var_ti_char
 SUBROUTINE ext_gr1_put_var_ti_real ( DataHandle,Element,  Varname, Data, &
      Count,  Status )
 
-  USE data_info
-  USE module_wrf_error
+  USE gr1_data_info
   IMPLICIT NONE
 #include "wrf_status_codes.h"
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -1572,7 +1618,7 @@ SUBROUTINE ext_gr1_put_var_ti_real ( DataHandle,Element,  Varname, Data, &
         write(tmpstr(idx),'(G17.10)')Data(idx)
      enddo
 
-     CALL build_string (ti_output(DataHandle), Element, tmpstr, Count, Status)
+     CALL gr1_build_string (ti_output(DataHandle), Element, tmpstr, Count, Status)
 
   endif
 
@@ -1583,8 +1629,7 @@ END SUBROUTINE ext_gr1_put_var_ti_real
 
 SUBROUTINE ext_gr1_put_var_ti_double ( DataHandle,Element,  Varname, Data, &
      Count,  Status )
-  USE data_info
-  USE module_wrf_error
+  USE gr1_data_info
   IMPLICIT NONE
 #include "wrf_status_codes.h"
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -1604,7 +1649,7 @@ SUBROUTINE ext_gr1_put_var_ti_double ( DataHandle,Element,  Varname, Data, &
         write(tmpstr(idx),'(G17.10)')Data(idx)
      enddo
      
-     CALL build_string (ti_output(DataHandle), Element, tmpstr, Count, Status)
+     CALL gr1_build_string (ti_output(DataHandle), Element, tmpstr, Count, Status)
   endif
 
   RETURN
@@ -1615,7 +1660,7 @@ END SUBROUTINE ext_gr1_put_var_ti_double
 SUBROUTINE ext_gr1_put_var_ti_real8 ( DataHandle,Element,  Varname, Data, &
      Count,  Status )
 
-  USE data_info
+  USE gr1_data_info
   IMPLICIT NONE
 #include "wrf_status_codes.h"
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -1635,7 +1680,7 @@ SUBROUTINE ext_gr1_put_var_ti_real8 ( DataHandle,Element,  Varname, Data, &
         write(tmpstr(idx),'(G17.10)')Data(idx)
      enddo
      
-     CALL build_string (ti_output(DataHandle), Element, tmpstr, Count, Status)
+     CALL gr1_build_string (ti_output(DataHandle), Element, tmpstr, Count, Status)
   endif
 
   RETURN
@@ -1646,7 +1691,7 @@ END SUBROUTINE ext_gr1_put_var_ti_real8
 SUBROUTINE ext_gr1_put_var_ti_integer ( DataHandle,Element,  Varname, Data, &
      Count,  Status )
 
-  USE data_info
+  USE gr1_data_info
   IMPLICIT NONE
 #include "wrf_status_codes.h"
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -1666,7 +1711,7 @@ SUBROUTINE ext_gr1_put_var_ti_integer ( DataHandle,Element,  Varname, Data, &
         write(tmpstr(idx),'(G17.10)')Data(idx)
      enddo
      
-     CALL build_string (ti_output(DataHandle), Element, tmpstr, Count, Status)
+     CALL gr1_build_string (ti_output(DataHandle), Element, tmpstr, Count, Status)
   endif
 
   RETURN
@@ -1677,7 +1722,7 @@ END SUBROUTINE ext_gr1_put_var_ti_integer
 SUBROUTINE ext_gr1_put_var_ti_logical ( DataHandle,Element,  Varname, Data, &
      Count,  Status )
 
-  USE data_info
+  USE gr1_data_info
   IMPLICIT NONE
 #include "wrf_status_codes.h"
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -1697,7 +1742,7 @@ SUBROUTINE ext_gr1_put_var_ti_logical ( DataHandle,Element,  Varname, Data, &
         write(tmpstr(idx),'(G17.10)')Data(idx)
      enddo
      
-     CALL build_string (ti_output(DataHandle), Element, tmpstr, Count, Status)
+     CALL gr1_build_string (ti_output(DataHandle), Element, tmpstr, Count, Status)
 
   endif
 
@@ -1709,7 +1754,7 @@ END SUBROUTINE ext_gr1_put_var_ti_logical
 SUBROUTINE ext_gr1_put_var_ti_char ( DataHandle,Element,  Varname, Data,  &
      Status )
 
-  USE data_info
+  USE gr1_data_info
   IMPLICIT NONE
 #include "wrf_status_codes.h"
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -1728,7 +1773,7 @@ SUBROUTINE ext_gr1_put_var_ti_char ( DataHandle,Element,  Varname, Data,  &
 
      write(tmpstr(1),*)trim(Data)
 
-     CALL build_string (ti_output(DataHandle), Element, tmpstr, 1, Status)
+     CALL gr1_build_string (ti_output(DataHandle), Element, tmpstr, 1, Status)
 
   endif
 
@@ -1745,7 +1790,7 @@ END SUBROUTINE ext_gr1_put_var_ti_char
 
 SUBROUTINE ext_gr1_get_var_td_double ( DataHandle,Element,  DateStr, &
      Varname, Data, Count, Outcount, Status )
-  USE data_info
+  USE gr1_data_info
   IMPLICIT NONE
 #include "wrf_status_codes.h"
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -1764,7 +1809,7 @@ SUBROUTINE ext_gr1_get_var_td_double ( DataHandle,Element,  DateStr, &
 
   Status = WRF_NO_ERR
   
-  CALL GET_METADATA_VALUE(fileindex(DataHandle,:),TRIM(Element),DateStr,&
+  CALL GET_METADATA_VALUE(fileinfo(DataHandle)%fileindex(:),TRIM(Element),DateStr,&
        Varname,Value,stat)
   if (stat /= 0) then
      CALL wrf_debug ( DEBUG , "GET_METADATA_VALUE failed for "//Element)
@@ -1788,7 +1833,7 @@ END SUBROUTINE ext_gr1_get_var_td_double
 SUBROUTINE ext_gr1_get_var_td_real ( DataHandle,Element,  DateStr,Varname, &
      Data, Count, Outcount, Status )
 
-  USE data_info
+  USE gr1_data_info
   IMPLICIT NONE
 #include "wrf_status_codes.h"
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -1807,7 +1852,7 @@ SUBROUTINE ext_gr1_get_var_td_real ( DataHandle,Element,  DateStr,Varname, &
 
   Status = WRF_NO_ERR
   
-  CALL GET_METADATA_VALUE(fileindex(DataHandle,:), TRIM(Element), DateStr, &
+  CALL GET_METADATA_VALUE(fileinfo(DataHandle)%fileindex(:), TRIM(Element), DateStr, &
        Varname, Value, stat)
   if (stat /= 0) then
      CALL wrf_debug ( DEBUG , "GET_METADATA_VALUE failed for "//Element)
@@ -1831,7 +1876,7 @@ END SUBROUTINE ext_gr1_get_var_td_real
 SUBROUTINE ext_gr1_get_var_td_real8 ( DataHandle,Element,  DateStr,Varname, &
      Data, Count, Outcount, Status )
 
-  USE data_info
+  USE gr1_data_info
   IMPLICIT NONE
 #include "wrf_status_codes.h"
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -1850,7 +1895,7 @@ SUBROUTINE ext_gr1_get_var_td_real8 ( DataHandle,Element,  DateStr,Varname, &
 
   Status = WRF_NO_ERR
   
-  CALL GET_METADATA_VALUE(fileindex(DataHandle,:),TRIM(Element),DateStr,&
+  CALL GET_METADATA_VALUE(fileinfo(DataHandle)%fileindex(:),TRIM(Element),DateStr,&
        Varname,Value,stat)
   if (stat /= 0) then
      CALL wrf_debug ( DEBUG , "GET_METADATA_VALUE failed for "//Element)
@@ -1874,7 +1919,7 @@ END SUBROUTINE ext_gr1_get_var_td_real8
 SUBROUTINE ext_gr1_get_var_td_integer ( DataHandle,Element,  DateStr,Varname, &
      Data, Count, Outcount, Status )
 
-  USE data_info
+  USE gr1_data_info
   IMPLICIT NONE
 #include "wrf_status_codes.h"
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -1893,7 +1938,7 @@ SUBROUTINE ext_gr1_get_var_td_integer ( DataHandle,Element,  DateStr,Varname, &
 
   Status = WRF_NO_ERR
   
-  CALL GET_METADATA_VALUE(fileindex(DataHandle,:), TRIM(Element), DateStr, &
+  CALL GET_METADATA_VALUE(fileinfo(DataHandle)%fileindex(:), TRIM(Element), DateStr, &
        Varname, Value,stat)
   if (stat /= 0) then
      CALL wrf_debug ( DEBUG , "GET_METADATA_VALUE failed for "//Element)
@@ -1917,7 +1962,7 @@ END SUBROUTINE ext_gr1_get_var_td_integer
 SUBROUTINE ext_gr1_get_var_td_logical ( DataHandle,Element,  DateStr,Varname, &
      Data, Count, Outcount, Status )
   
-  USE data_info
+  USE gr1_data_info
   IMPLICIT NONE
 #include "wrf_status_codes.h"
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -1936,7 +1981,7 @@ SUBROUTINE ext_gr1_get_var_td_logical ( DataHandle,Element,  DateStr,Varname, &
 
   Status = WRF_NO_ERR
   
-  CALL GET_METADATA_VALUE(fileindex(DataHandle,:), TRIM(Element), DateStr, &
+  CALL GET_METADATA_VALUE(fileinfo(DataHandle)%fileindex(:), TRIM(Element), DateStr, &
        Varname, Value,stat)
   if (stat /= 0) then
      CALL wrf_debug ( DEBUG , "GET_METADATA_VALUE failed for "//Element)
@@ -1960,7 +2005,7 @@ END SUBROUTINE ext_gr1_get_var_td_logical
 SUBROUTINE ext_gr1_get_var_td_char ( DataHandle,Element,  DateStr,Varname, &
      Data,  Status )
 
-  USE data_info
+  USE gr1_data_info
   IMPLICIT NONE
 #include "wrf_status_codes.h"
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -1975,7 +2020,7 @@ SUBROUTINE ext_gr1_get_var_td_char ( DataHandle,Element,  DateStr,Varname, &
   
   call wrf_debug ( DEBUG , 'Entering ext_gr1_get_var_td_char')
 
-  CALL GET_METADATA_VALUE(fileindex(DataHandle,:), TRIM(Element), DateStr, &
+  CALL GET_METADATA_VALUE(fileinfo(DataHandle)%fileindex(:), TRIM(Element), DateStr, &
        Varname, Data,stat)
   if (stat /= 0) then
      CALL wrf_debug ( DEBUG , "GET_METADATA_VALUE failed for "//Element)
@@ -1996,7 +2041,7 @@ END SUBROUTINE ext_gr1_get_var_td_char
 
 SUBROUTINE ext_gr1_put_var_td_double ( DataHandle, Element, DateStr, Varname, &
      Data, Count,  Status )
-  USE data_info
+  USE gr1_data_info
   IMPLICIT NONE
 #include "wrf_status_codes.h"
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -2018,7 +2063,7 @@ SUBROUTINE ext_gr1_put_var_td_double ( DataHandle, Element, DateStr, Varname, &
         write(tmpstr(idx),'(G17.10)')Data(idx)
      enddo
 
-     CALL build_string (td_output(DataHandle), &
+     CALL gr1_build_string (td_output(DataHandle), &
           Varname//';'//DateStr//';'//Element, tmpstr, Count, Status)
 
   endif
@@ -2031,7 +2076,7 @@ END SUBROUTINE ext_gr1_put_var_td_double
 SUBROUTINE ext_gr1_put_var_td_integer ( DataHandle,Element,  DateStr, &
      Varname, Data, Count,  Status )
 
-  USE data_info
+  USE gr1_data_info
   IMPLICIT NONE
 #include "wrf_status_codes.h"
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -2052,7 +2097,7 @@ SUBROUTINE ext_gr1_put_var_td_integer ( DataHandle,Element,  DateStr, &
         write(tmpstr(idx),'(G17.10)')Data(idx)
      enddo
      
-     CALL build_string (td_output(DataHandle), &
+     CALL gr1_build_string (td_output(DataHandle), &
           Varname//';'//DateStr//';'//Element, tmpstr, Count, Status)
 
   endif
@@ -2065,7 +2110,7 @@ END SUBROUTINE ext_gr1_put_var_td_integer
 SUBROUTINE ext_gr1_put_var_td_real ( DataHandle,Element,  DateStr,Varname, &
      Data, Count,  Status )
 
-  USE data_info
+  USE gr1_data_info
   IMPLICIT NONE
 #include "wrf_status_codes.h"
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -2086,7 +2131,7 @@ SUBROUTINE ext_gr1_put_var_td_real ( DataHandle,Element,  DateStr,Varname, &
         write(tmpstr(idx),'(G17.10)')Data(idx)
      enddo
      
-     CALL build_string (td_output(DataHandle), &
+     CALL gr1_build_string (td_output(DataHandle), &
           Varname//';'//DateStr//';'//Element, tmpstr, Count, Status)
 
   endif
@@ -2099,7 +2144,7 @@ END SUBROUTINE ext_gr1_put_var_td_real
 SUBROUTINE ext_gr1_put_var_td_real8 ( DataHandle,Element,  DateStr,Varname, &
      Data, Count,  Status )
 
-  USE data_info
+  USE gr1_data_info
   IMPLICIT NONE
 #include "wrf_status_codes.h"
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -2119,7 +2164,7 @@ SUBROUTINE ext_gr1_put_var_td_real8 ( DataHandle,Element,  DateStr,Varname, &
         write(tmpstr(idx),'(G17.10)')Data(idx)
      enddo
      
-     CALL build_string (td_output(DataHandle), &
+     CALL gr1_build_string (td_output(DataHandle), &
           Varname//';'//DateStr//';'//Element, tmpstr, Count, Status)
   endif
 
@@ -2131,7 +2176,7 @@ END SUBROUTINE ext_gr1_put_var_td_real8
 SUBROUTINE ext_gr1_put_var_td_logical ( DataHandle,Element,  DateStr, &
      Varname, Data, Count,  Status )
 
-  USE data_info
+  USE gr1_data_info
   IMPLICIT NONE
 #include "wrf_status_codes.h"
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -2152,7 +2197,7 @@ SUBROUTINE ext_gr1_put_var_td_logical ( DataHandle,Element,  DateStr, &
         write(tmpstr(idx),'(G17.10)')Data(idx)
      enddo
 
-     CALL build_string (td_output(DataHandle), &
+     CALL gr1_build_string (td_output(DataHandle), &
           Varname//';'//DateStr//';'//Element, tmpstr, Count, Status)
 
   endif
@@ -2165,7 +2210,7 @@ END SUBROUTINE ext_gr1_put_var_td_logical
 SUBROUTINE ext_gr1_put_var_td_char ( DataHandle,Element,  DateStr,Varname, &
      Data,  Status )
 
-  USE data_info
+  USE gr1_data_info
   IMPLICIT NONE
 #include "wrf_status_codes.h"
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -2183,7 +2228,7 @@ SUBROUTINE ext_gr1_put_var_td_char ( DataHandle,Element,  DateStr,Varname, &
 
      write(tmpstr(idx),*)Data
 
-     CALL build_string (td_output(DataHandle), &
+     CALL gr1_build_string (td_output(DataHandle), &
           Varname//';'//DateStr//';'//Element, tmpstr, 1, Status)
 
   endif
@@ -2203,7 +2248,7 @@ END SUBROUTINE ext_gr1_put_var_td_char
 SUBROUTINE ext_gr1_get_dom_ti_real ( DataHandle,Element,   Data, Count, &
      Outcount, Status )
 
-  USE data_info
+  USE gr1_data_info
   IMPLICIT NONE
 #include "wrf_status_codes.h"
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -2220,7 +2265,7 @@ SUBROUTINE ext_gr1_get_dom_ti_real ( DataHandle,Element,   Data, Count, &
 
   Status = WRF_NO_ERR
   
-  CALL GET_METADATA_VALUE(fileindex(DataHandle,:), TRIM(Element), "none", &
+  CALL GET_METADATA_VALUE(fileinfo(DataHandle)%fileindex(:), TRIM(Element), "none", &
        "none", Value,stat)
   if (stat /= 0) then
      CALL wrf_debug ( DEBUG , "GET_METADATA_VALUE failed for "//Element)
@@ -2244,7 +2289,7 @@ END SUBROUTINE ext_gr1_get_dom_ti_real
 SUBROUTINE ext_gr1_get_dom_ti_real8 ( DataHandle,Element,   Data, Count, &
      Outcount, Status )
 
-  USE data_info
+  USE gr1_data_info
   IMPLICIT NONE
 #include "wrf_status_codes.h"
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -2261,7 +2306,7 @@ SUBROUTINE ext_gr1_get_dom_ti_real8 ( DataHandle,Element,   Data, Count, &
 
   Status = WRF_NO_ERR
   
-  CALL GET_METADATA_VALUE(fileindex(DataHandle,:), TRIM(Element), "none", &
+  CALL GET_METADATA_VALUE(fileinfo(DataHandle)%fileindex(:), TRIM(Element), "none", &
        "none", Value,stat)
   if (stat /= 0) then
      CALL wrf_debug ( DEBUG , "GET_METADATA_VALUE failed for "//Element)
@@ -2285,7 +2330,7 @@ END SUBROUTINE ext_gr1_get_dom_ti_real8
 SUBROUTINE ext_gr1_get_dom_ti_integer ( DataHandle,Element,   Data, Count, &
      Outcount, Status )
 
-  USE data_info
+  USE gr1_data_info
   IMPLICIT NONE
 #include "wrf_status_codes.h"
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -2300,7 +2345,7 @@ SUBROUTINE ext_gr1_get_dom_ti_integer ( DataHandle,Element,   Data, Count, &
   
   call wrf_debug ( DEBUG , 'Entering ext_gr1_get_dom_ti_integer Element: '//Element)
 
-  CALL GET_METADATA_VALUE(fileindex(DataHandle,:), TRIM(Element), "none", &
+  CALL GET_METADATA_VALUE(fileinfo(DataHandle)%fileindex(:), TRIM(Element), "none", &
        "none", Value,stat)
   if (stat /= 0) then
      CALL wrf_debug ( DEBUG , "GET_METADATA_VALUE failed for "//Element)
@@ -2324,7 +2369,7 @@ END SUBROUTINE ext_gr1_get_dom_ti_integer
 SUBROUTINE ext_gr1_get_dom_ti_logical ( DataHandle,Element,   Data, Count, &
      Outcount, Status )
 
-  USE data_info
+  USE gr1_data_info
   IMPLICIT NONE
 #include "wrf_status_codes.h"
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -2341,7 +2386,7 @@ SUBROUTINE ext_gr1_get_dom_ti_logical ( DataHandle,Element,   Data, Count, &
 
   Status = WRF_NO_ERR
   
-  CALL GET_METADATA_VALUE(fileindex(DataHandle,:), TRIM(Element), "none", &
+  CALL GET_METADATA_VALUE(fileinfo(DataHandle)%fileindex(:), TRIM(Element), "none", &
        "none", Value,stat)
   if (stat /= 0) then
      CALL wrf_debug ( DEBUG , "GET_METADATA_VALUE failed for "//Element)
@@ -2364,7 +2409,7 @@ END SUBROUTINE ext_gr1_get_dom_ti_logical
 
 SUBROUTINE ext_gr1_get_dom_ti_char ( DataHandle,Element,   Data,  Status )
 
-  USE data_info
+  USE gr1_data_info
   IMPLICIT NONE
 #include "wrf_status_codes.h"
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -2378,7 +2423,7 @@ SUBROUTINE ext_gr1_get_dom_ti_char ( DataHandle,Element,   Data,  Status )
   
   call wrf_debug ( DEBUG , 'Entering ext_gr1_get_dom_ti_char')
 
-  CALL GET_METADATA_VALUE(fileindex(DataHandle,:), TRIM(Element), "none", &
+  CALL GET_METADATA_VALUE(fileinfo(DataHandle)%fileindex(:), TRIM(Element), "none", &
        "none", Data, stat)
   if (stat /= 0) then
      CALL wrf_debug ( DEBUG , "GET_METADATA_VALUE failed for "//Element)
@@ -2393,7 +2438,7 @@ END SUBROUTINE ext_gr1_get_dom_ti_char
 
 SUBROUTINE ext_gr1_get_dom_ti_double ( DataHandle,Element,   Data, Count, &
      Outcount, Status )
-  USE data_info
+  USE gr1_data_info
   IMPLICIT NONE
 #include "wrf_status_codes.h"
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -2410,7 +2455,7 @@ SUBROUTINE ext_gr1_get_dom_ti_double ( DataHandle,Element,   Data, Count, &
 
   Status = WRF_NO_ERR
   
-  CALL GET_METADATA_VALUE(fileindex(DataHandle,:), TRIM(Element), "none", &
+  CALL GET_METADATA_VALUE(fileinfo(DataHandle)%fileindex(:), TRIM(Element), "none", &
        "none", Value, stat)
   if (stat /= 0) then
      CALL wrf_debug ( DEBUG , "GET_METADATA_VALUE failed for "//Element)
@@ -2441,7 +2486,7 @@ END SUBROUTINE ext_gr1_get_dom_ti_double
 SUBROUTINE ext_gr1_put_dom_ti_real ( DataHandle,Element,   Data, Count,  &
      Status )
 
-  USE data_info
+  USE gr1_data_info
   IMPLICIT NONE
 #include "wrf_status_codes.h"
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -2487,7 +2532,7 @@ SUBROUTINE ext_gr1_put_dom_ti_real ( DataHandle,Element,   Data, Count,  &
         write(tmpstr(idx),'(G17.10)')Data(idx)
      enddo
      
-     CALL build_string (ti_output(DataHandle), Element, tmpstr, Count, Status)
+     CALL gr1_build_string (ti_output(DataHandle), Element, tmpstr, Count, Status)
 
   endif
 
@@ -2499,7 +2544,7 @@ END SUBROUTINE ext_gr1_put_dom_ti_real
 SUBROUTINE ext_gr1_put_dom_ti_real8 ( DataHandle,Element,   Data, Count,  &
      Status )
 
-  USE data_info
+  USE gr1_data_info
   IMPLICIT NONE
 #include "wrf_status_codes.h"
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -2518,7 +2563,7 @@ SUBROUTINE ext_gr1_put_dom_ti_real8 ( DataHandle,Element,   Data, Count,  &
         write(tmpstr(idx),'(G17.10)')Data(idx)
      enddo
      
-     CALL build_string (ti_output(DataHandle), Element, tmpstr, Count, Status)
+     CALL gr1_build_string (ti_output(DataHandle), Element, tmpstr, Count, Status)
 
   endif
 
@@ -2530,7 +2575,7 @@ END SUBROUTINE ext_gr1_put_dom_ti_real8
 SUBROUTINE ext_gr1_put_dom_ti_integer ( DataHandle,Element,   Data, Count,  &
      Status )
 
-  USE data_info
+  USE gr1_data_info
   IMPLICIT NONE
 #include "wrf_status_codes.h"
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -2559,7 +2604,7 @@ SUBROUTINE ext_gr1_put_dom_ti_integer ( DataHandle,Element,   Data, Count,  &
         write(tmpstr(idx),'(G17.10)')Data(idx)
      enddo
      
-     CALL build_string (ti_output(DataHandle), Element, tmpstr, Count, Status)
+     CALL gr1_build_string (ti_output(DataHandle), Element, tmpstr, Count, Status)
 
   endif
 
@@ -2573,7 +2618,7 @@ END SUBROUTINE ext_gr1_put_dom_ti_integer
 SUBROUTINE ext_gr1_put_dom_ti_logical ( DataHandle,Element,   Data, Count,  &
      Status )
 
-  USE data_info
+  USE gr1_data_info
   IMPLICIT NONE
 #include "wrf_status_codes.h"
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -2592,7 +2637,7 @@ SUBROUTINE ext_gr1_put_dom_ti_logical ( DataHandle,Element,   Data, Count,  &
         write(tmpstr(idx),'(G17.10)')Data(idx)
      enddo
      
-     CALL build_string (ti_output(DataHandle), Element, tmpstr, Count, Status)
+     CALL gr1_build_string (ti_output(DataHandle), Element, tmpstr, Count, Status)
 
   endif
 
@@ -2604,7 +2649,7 @@ END SUBROUTINE ext_gr1_put_dom_ti_logical
 SUBROUTINE ext_gr1_put_dom_ti_char ( DataHandle,Element,   Data,  &
      Status )
 
-  USE data_info
+  USE gr1_data_info
   IMPLICIT NONE
 #include "wrf_status_codes.h"
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -2624,7 +2669,7 @@ SUBROUTINE ext_gr1_put_dom_ti_char ( DataHandle,Element,   Data,  &
 
      write(tmpstr(1),*)trim(Data)
      
-     CALL build_string (ti_output(DataHandle), Element, tmpstr, 1, Status)
+     CALL gr1_build_string (ti_output(DataHandle), Element, tmpstr, 1, Status)
 
   endif
 
@@ -2635,7 +2680,7 @@ END SUBROUTINE ext_gr1_put_dom_ti_char
 
 SUBROUTINE ext_gr1_put_dom_ti_double ( DataHandle,Element, Data, Count, &
      Status )
-  USE data_info
+  USE gr1_data_info
   IMPLICIT NONE
 #include "wrf_status_codes.h"
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -2654,7 +2699,7 @@ SUBROUTINE ext_gr1_put_dom_ti_double ( DataHandle,Element, Data, Count, &
         write(tmpstr(idx),'(G17.10)')Data(idx)
      enddo
 
-     CALL build_string (ti_output(DataHandle), Element, tmpstr, Count, Status)
+     CALL gr1_build_string (ti_output(DataHandle), Element, tmpstr, Count, Status)
 
   endif
   
@@ -2673,7 +2718,7 @@ END SUBROUTINE ext_gr1_put_dom_ti_double
 SUBROUTINE ext_gr1_get_dom_td_real ( DataHandle,Element, DateStr,  Data, &
      Count, Outcount, Status )
 
-  USE data_info
+  USE gr1_data_info
   IMPLICIT NONE
 #include "wrf_status_codes.h"
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -2691,7 +2736,7 @@ SUBROUTINE ext_gr1_get_dom_td_real ( DataHandle,Element, DateStr,  Data, &
 
   Status = WRF_NO_ERR
   
-  CALL GET_METADATA_VALUE(fileindex(DataHandle,:), TRIM(Element), DateStr, &
+  CALL GET_METADATA_VALUE(fileinfo(DataHandle)%fileindex(:), TRIM(Element), DateStr, &
        "none", Value, stat)
   if (stat /= 0) then
      CALL wrf_debug ( DEBUG , "GET_METADATA_VALUE failed for "//Element)
@@ -2715,7 +2760,7 @@ END SUBROUTINE ext_gr1_get_dom_td_real
 SUBROUTINE ext_gr1_get_dom_td_real8 ( DataHandle,Element, DateStr,  Data, &
      Count, Outcount, Status )
 
-  USE data_info
+  USE gr1_data_info
   IMPLICIT NONE
 #include "wrf_status_codes.h"
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -2733,7 +2778,7 @@ SUBROUTINE ext_gr1_get_dom_td_real8 ( DataHandle,Element, DateStr,  Data, &
 
   Status = WRF_NO_ERR
   
-  CALL GET_METADATA_VALUE(fileindex(DataHandle,:), TRIM(Element), DateStr, &
+  CALL GET_METADATA_VALUE(fileinfo(DataHandle)%fileindex(:), TRIM(Element), DateStr, &
        "none", Value, stat)
   if (stat /= 0) then
      CALL wrf_debug ( DEBUG , "GET_METADATA_VALUE failed for "//Element)
@@ -2757,7 +2802,7 @@ END SUBROUTINE ext_gr1_get_dom_td_real8
 SUBROUTINE ext_gr1_get_dom_td_integer ( DataHandle,Element, DateStr,  Data, &
      Count, Outcount, Status )
 
-  USE data_info
+  USE gr1_data_info
   IMPLICIT NONE
 #include "wrf_status_codes.h"
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -2775,7 +2820,7 @@ SUBROUTINE ext_gr1_get_dom_td_integer ( DataHandle,Element, DateStr,  Data, &
 
   Status = WRF_NO_ERR
   
-  CALL GET_METADATA_VALUE(fileindex(DataHandle,:), TRIM(Element), DateStr, &
+  CALL GET_METADATA_VALUE(fileinfo(DataHandle)%fileindex(:), TRIM(Element), DateStr, &
        "none", Value,stat)
   if (stat /= 0) then
      CALL wrf_debug ( DEBUG , "GET_METADATA_VALUE failed for "//Element)
@@ -2799,7 +2844,7 @@ END SUBROUTINE ext_gr1_get_dom_td_integer
 SUBROUTINE ext_gr1_get_dom_td_logical ( DataHandle,Element, DateStr,  Data, &
      Count, Outcount, Status )
 
-  USE data_info
+  USE gr1_data_info
   IMPLICIT NONE
 #include "wrf_status_codes.h"
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -2817,7 +2862,7 @@ SUBROUTINE ext_gr1_get_dom_td_logical ( DataHandle,Element, DateStr,  Data, &
 
   Status = WRF_NO_ERR
   
-  CALL GET_METADATA_VALUE(fileindex(DataHandle,:), TRIM(Element), DateStr, &
+  CALL GET_METADATA_VALUE(fileinfo(DataHandle)%fileindex(:), TRIM(Element), DateStr, &
        "none", Value, stat)
   if (stat /= 0) then
      CALL wrf_debug ( DEBUG , "GET_METADATA_VALUE failed for "//Element)
@@ -2841,7 +2886,7 @@ END SUBROUTINE ext_gr1_get_dom_td_logical
 SUBROUTINE ext_gr1_get_dom_td_char ( DataHandle,Element, DateStr,  Data,  &
      Status )
 
-  USE data_info
+  USE gr1_data_info
   IMPLICIT NONE
 #include "wrf_status_codes.h"
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -2855,7 +2900,7 @@ SUBROUTINE ext_gr1_get_dom_td_char ( DataHandle,Element, DateStr,  Data,  &
   
   call wrf_debug ( DEBUG , 'Entering ext_gr1_get_dom_td_char')
 
-  CALL GET_METADATA_VALUE(fileindex(DataHandle,:), TRIM(Element), DateStr, &
+  CALL GET_METADATA_VALUE(fileinfo(DataHandle)%fileindex(:), TRIM(Element), DateStr, &
        "none", Data, stat)
   if (stat /= 0) then
      CALL wrf_debug ( DEBUG , "GET_METADATA_VALUE failed for "//Element)
@@ -2870,7 +2915,7 @@ END SUBROUTINE ext_gr1_get_dom_td_char
 
 SUBROUTINE ext_gr1_get_dom_td_double ( DataHandle,Element, DateStr,  Data, &
      Count, Outcount, Status )
-  USE data_info
+  USE gr1_data_info
   IMPLICIT NONE
 #include "wrf_status_codes.h"
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -2888,7 +2933,7 @@ SUBROUTINE ext_gr1_get_dom_td_double ( DataHandle,Element, DateStr,  Data, &
 
   Status = WRF_NO_ERR
   
-  CALL GET_METADATA_VALUE(fileindex(DataHandle,:), TRIM(Element), DateStr, &
+  CALL GET_METADATA_VALUE(fileinfo(DataHandle)%fileindex(:), TRIM(Element), DateStr, &
        "none", Value, stat)
   if (stat /= 0) then
      CALL wrf_debug ( DEBUG , "GET_METADATA_VALUE failed for "//Element)
@@ -2920,7 +2965,7 @@ END SUBROUTINE ext_gr1_get_dom_td_double
 SUBROUTINE ext_gr1_put_dom_td_real8 ( DataHandle,Element, DateStr,  Data, &
      Count,  Status )
 
-  USE data_info
+  USE gr1_data_info
   IMPLICIT NONE
 #include "wrf_status_codes.h"
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -2940,7 +2985,7 @@ SUBROUTINE ext_gr1_put_dom_td_real8 ( DataHandle,Element, DateStr,  Data, &
         write(tmpstr(idx),'(G17.10)')Data(idx)
      enddo
 
-     CALL build_string (td_output(DataHandle), DateStr//';'//Element, tmpstr, &
+     CALL gr1_build_string (td_output(DataHandle), DateStr//';'//Element, tmpstr, &
           Count, Status)
 
   endif
@@ -2953,7 +2998,7 @@ END SUBROUTINE ext_gr1_put_dom_td_real8
 SUBROUTINE ext_gr1_put_dom_td_integer ( DataHandle,Element, DateStr,  Data, &
      Count,  Status )
 
-  USE data_info
+  USE gr1_data_info
   IMPLICIT NONE
 #include "wrf_status_codes.h"
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -2973,7 +3018,7 @@ SUBROUTINE ext_gr1_put_dom_td_integer ( DataHandle,Element, DateStr,  Data, &
         write(tmpstr(idx),'(G17.10)')Data(idx)
      enddo
      
-     CALL build_string (td_output(DataHandle), DateStr//';'//Element, tmpstr, &
+     CALL gr1_build_string (td_output(DataHandle), DateStr//';'//Element, tmpstr, &
           Count, Status)
 
   endif
@@ -2986,7 +3031,7 @@ END SUBROUTINE ext_gr1_put_dom_td_integer
 SUBROUTINE ext_gr1_put_dom_td_logical ( DataHandle,Element, DateStr,  Data, &
      Count,  Status )
 
-  USE data_info
+  USE gr1_data_info
   IMPLICIT NONE
 #include "wrf_status_codes.h"
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -3006,7 +3051,7 @@ SUBROUTINE ext_gr1_put_dom_td_logical ( DataHandle,Element, DateStr,  Data, &
         write(tmpstr(idx),'(G17.10)')Data(idx)
      enddo
      
-     CALL build_string (td_output(DataHandle), DateStr//';'//Element, tmpstr, &
+     CALL gr1_build_string (td_output(DataHandle), DateStr//';'//Element, tmpstr, &
           Count, Status)
 
   endif
@@ -3019,7 +3064,7 @@ END SUBROUTINE ext_gr1_put_dom_td_logical
 SUBROUTINE ext_gr1_put_dom_td_char ( DataHandle,Element, DateStr,  Data, &
      Status )
 
-  USE data_info
+  USE gr1_data_info
   IMPLICIT NONE
 #include "wrf_status_codes.h"
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -3035,7 +3080,7 @@ SUBROUTINE ext_gr1_put_dom_td_char ( DataHandle,Element, DateStr,  Data, &
 
      write(tmpstr(1),*)Data
 
-     CALL build_string (td_output(DataHandle), DateStr//';'//Element, tmpstr, &
+     CALL gr1_build_string (td_output(DataHandle), DateStr//';'//Element, tmpstr, &
           1, Status)
 
   endif
@@ -3047,7 +3092,7 @@ END SUBROUTINE ext_gr1_put_dom_td_char
 
 SUBROUTINE ext_gr1_put_dom_td_double ( DataHandle,Element, DateStr,  Data, &
      Count,  Status )
-  USE data_info
+  USE gr1_data_info
   IMPLICIT NONE
 #include "wrf_status_codes.h"
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -3067,7 +3112,7 @@ SUBROUTINE ext_gr1_put_dom_td_double ( DataHandle,Element, DateStr,  Data, &
         write(tmpstr(idx),'(G17.10)')Data(idx)
      enddo
 
-     CALL build_string (td_output(DataHandle), DateStr//';'//Element, tmpstr, &
+     CALL gr1_build_string (td_output(DataHandle), DateStr//';'//Element, tmpstr, &
           Count, Status)
 
   endif
@@ -3080,7 +3125,7 @@ END SUBROUTINE ext_gr1_put_dom_td_double
 SUBROUTINE ext_gr1_put_dom_td_real ( DataHandle,Element, DateStr,  Data, &
      Count,  Status )
 
-  USE data_info
+  USE gr1_data_info
   IMPLICIT NONE
 #include "wrf_status_codes.h"
   INTEGER ,       INTENT(IN)  :: DataHandle
@@ -3100,7 +3145,7 @@ SUBROUTINE ext_gr1_put_dom_td_real ( DataHandle,Element, DateStr,  Data, &
         write(tmpstr(idx),'(G17.10)')Data(idx)
      enddo
      
-     CALL build_string (td_output(DataHandle), DateStr//';'//Element, tmpstr, &
+     CALL gr1_build_string (td_output(DataHandle), DateStr//';'//Element, tmpstr, &
           Count, Status)
 
   endif
@@ -3114,320 +3159,9 @@ END SUBROUTINE ext_gr1_put_dom_td_real
 !******************************************************************************
 
 
-SUBROUTINE get_new_handle(DataHandle)
-  USE data_info
-  IMPLICIT NONE
-  
-  INTEGER ,       INTENT(OUT)  :: DataHandle
-  INTEGER :: i
-
-  DataHandle = -1
-  do i=firstFileHandle, maxFileHandles
-     if (.NOT. used(i)) then
-        DataHandle = i
-        used(i) = .true.
-        exit
-     endif
-  enddo
-
-  RETURN
-END SUBROUTINE get_new_handle
-
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-FUNCTION ndfeb ( year ) RESULT (num_days)
-  
-  ! Compute the number of days in February for the given year
-  
-  IMPLICIT NONE
-  
-  INTEGER :: year
-  INTEGER :: num_days
-  
-  num_days = 28 ! By default, February has 28 days ...
-  IF (MOD(year,4).eq.0) THEN  
-     num_days = 29  ! But every four years, it has 29 days ...
-     IF (MOD(year,100).eq.0) THEN
-        num_days = 28  ! Except every 100 years, when it has 28 days ...
-        IF (MOD(year,400).eq.0) THEN
-           num_days = 29  ! Except every 400 years, when it has 29 days.
-        END IF
-     END IF
-  END IF
-  
-END FUNCTION ndfeb
-
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-SUBROUTINE geth_idts (ndate, odate, idts)
-
-  USE module_wrf_error
-
-  IMPLICIT NONE
-
-  !  From 2 input mdates ('YYYY-MM-DD HH:MM:SS.ffff'), 
-  !  compute the time difference.
-
-  !  on entry     -  ndate  -  the new hdate.
-  !                  odate  -  the old hdate.
-
-  !  on exit      -  idts    -  the change in time in seconds.
-
-  CHARACTER (LEN=*) , INTENT(INOUT) :: ndate, odate
-  REAL              , INTENT(OUT)   :: idts
-
-  !  Local Variables
-
-  !  yrnew    -  indicates the year associated with "ndate"
-  !  yrold    -  indicates the year associated with "odate"
-  !  monew    -  indicates the month associated with "ndate"
-  !  moold    -  indicates the month associated with "odate"
-  !  dynew    -  indicates the day associated with "ndate"
-  !  dyold    -  indicates the day associated with "odate"
-  !  hrnew    -  indicates the hour associated with "ndate"
-  !  hrold    -  indicates the hour associated with "odate"
-  !  minew    -  indicates the minute associated with "ndate"
-  !  miold    -  indicates the minute associated with "odate"
-  !  scnew    -  indicates the second associated with "ndate"
-  !  scold    -  indicates the second associated with "odate"
-  !  i        -  loop counter
-  !  mday     -  a list assigning the number of days in each month
-
-  CHARACTER (LEN=24) :: tdate
-  INTEGER :: olen, nlen
-  INTEGER :: yrnew, monew, dynew, hrnew, minew, scnew
-  INTEGER :: yrold, moold, dyold, hrold, miold, scold
-  INTEGER :: mday(12), i, newdys, olddys
-  LOGICAL :: npass, opass
-  INTEGER :: isign
-  INTEGER :: ndfeb
-
-  IF (odate.GT.ndate) THEN
-     isign = -1
-     tdate=ndate
-     ndate=odate
-     odate=tdate
-  ELSE
-     isign = 1
-  END IF
-
-  !  Assign the number of days in a months
-
-  mday( 1) = 31
-  mday( 2) = 28
-  mday( 3) = 31
-  mday( 4) = 30
-  mday( 5) = 31
-  mday( 6) = 30
-  mday( 7) = 31
-  mday( 8) = 31
-  mday( 9) = 30
-  mday(10) = 31
-  mday(11) = 30
-  mday(12) = 31
-
-  !  Break down old hdate into parts
-
-  hrold = 0
-  miold = 0
-  scold = 0
-  olen = LEN(odate)
-
-  READ(odate(1:4),  '(I4)') yrold
-  READ(odate(6:7),  '(I2)') moold
-  READ(odate(9:10), '(I2)') dyold
-  IF (olen.GE.13) THEN
-     READ(odate(12:13),'(I2)') hrold
-     IF (olen.GE.16) THEN
-        READ(odate(15:16),'(I2)') miold
-        IF (olen.GE.19) THEN
-           READ(odate(18:19),'(I2)') scold
-        END IF
-     END IF
-  END IF
-
-  !  Break down new hdate into parts
-
-  hrnew = 0
-  minew = 0
-  scnew = 0
-  nlen = LEN(ndate)
-
-  READ(ndate(1:4),  '(I4)') yrnew
-  READ(ndate(6:7),  '(I2)') monew
-  READ(ndate(9:10), '(I2)') dynew
-  IF (nlen.GE.13) THEN
-     READ(ndate(12:13),'(I2)') hrnew
-     IF (nlen.GE.16) THEN
-        READ(ndate(15:16),'(I2)') minew
-        IF (nlen.GE.19) THEN
-           READ(ndate(18:19),'(I2)') scnew
-        END IF
-     END IF
-  END IF
-
-  !  Check that the dates make sense.
-
-  npass = .true.
-  opass = .true.
-
-  !  Check that the month of NDATE makes sense.
-
-  IF ((monew.GT.12).or.(monew.LT.1)) THEN
-     PRINT*, 'GETH_IDTS:  Month of NDATE = ', monew
-     npass = .false.
-  END IF
-
-  !  Check that the month of ODATE makes sense.
-
-  IF ((moold.GT.12).or.(moold.LT.1)) THEN
-     PRINT*, 'GETH_IDTS:  Month of ODATE = ', moold
-     opass = .false.
-  END IF
-
-  !  Check that the day of NDATE makes sense.
-
-  IF (monew.ne.2) THEN
-     ! ...... For all months but February
-     IF ((dynew.GT.mday(monew)).or.(dynew.LT.1)) THEN
-        PRINT*, 'GETH_IDTS:  Day of NDATE = ', dynew
-        npass = .false.
-     END IF
-  ELSE IF (monew.eq.2) THEN
-     ! ...... For February
-     IF ((dynew.GT.ndfeb(yrnew)).OR.(dynew.LT.1)) THEN
-        PRINT*, 'GETH_IDTS:  Day of NDATE = ', dynew
-        npass = .false.
-     END IF
-  END IF
-
-  !  Check that the day of ODATE makes sense.
-
-  IF (moold.ne.2) THEN
-     ! ...... For all months but February
-     IF ((dyold.GT.mday(moold)).or.(dyold.LT.1)) THEN
-        PRINT*, 'GETH_IDTS:  Day of ODATE = ', dyold
-        opass = .false.
-     END IF
-  ELSE IF (moold.eq.2) THEN
-     ! ....... For February
-     IF ((dyold.GT.ndfeb(yrold)).or.(dyold.LT.1)) THEN
-        PRINT*, 'GETH_IDTS:  Day of ODATE = ', dyold
-        opass = .false.
-     END IF
-  END IF
-
-  !  Check that the hour of NDATE makes sense.
-
-  IF ((hrnew.GT.23).or.(hrnew.LT.0)) THEN
-     PRINT*, 'GETH_IDTS:  Hour of NDATE = ', hrnew
-     npass = .false.
-  END IF
-
-  !  Check that the hour of ODATE makes sense.
-
-  IF ((hrold.GT.23).or.(hrold.LT.0)) THEN
-     PRINT*, 'GETH_IDTS:  Hour of ODATE = ', hrold
-     opass = .false.
-  END IF
-
-  !  Check that the minute of NDATE makes sense.
-
-  IF ((minew.GT.59).or.(minew.LT.0)) THEN
-     PRINT*, 'GETH_IDTS:  Minute of NDATE = ', minew
-     npass = .false.
-  END IF
-
-  !  Check that the minute of ODATE makes sense.
-
-  IF ((miold.GT.59).or.(miold.LT.0)) THEN
-     PRINT*, 'GETH_IDTS:  Minute of ODATE = ', miold
-     opass = .false.
-  END IF
-
-  !  Check that the second of NDATE makes sense.
-
-  IF ((scnew.GT.59).or.(scnew.LT.0)) THEN
-     PRINT*, 'GETH_IDTS:  SECOND of NDATE = ', scnew
-     npass = .false.
-  END IF
-
-  !  Check that the second of ODATE makes sense.
-
-  IF ((scold.GT.59).or.(scold.LT.0)) THEN
-     PRINT*, 'GETH_IDTS:  Second of ODATE = ', scold
-     opass = .false.
-  END IF
-
-  IF (.not. npass) THEN
-     WRITE( wrf_err_message , * ) &
-          'module_date_time: geth_idts: Bad NDATE: ', ndate(1:nlen)
-     CALL wrf_error_fatal ( TRIM ( wrf_err_message ) )
-  END IF
-
-  IF (.not. opass) THEN
-     WRITE( wrf_err_message , * ) &
-          'module_date_time: geth_idts: Bad ODATE: ', odate(1:olen)
-     CALL wrf_error_fatal ( TRIM ( wrf_err_message ) )
-  END IF
-
-  !  Date Checks are completed.  Continue.
-
-  !  Compute number of days from 1 January ODATE, 00:00:00 until ndate
-  !  Compute number of hours from 1 January ODATE, 00:00:00 until ndate
-  !  Compute number of minutes from 1 January ODATE, 00:00:00 until ndate
-
-  newdys = 0
-  DO i = yrold, yrnew - 1
-     newdys = newdys + (365 + (ndfeb(i)-28))
-  END DO
-
-  IF (monew .GT. 1) THEN
-     mday(2) = ndfeb(yrnew)
-     DO i = 1, monew - 1
-        newdys = newdys + mday(i)
-     END DO
-     mday(2) = 28
-  END IF
-
-  newdys = newdys + dynew-1
-
-  !  Compute number of hours from 1 January ODATE, 00:00:00 until odate
-  !  Compute number of minutes from 1 January ODATE, 00:00:00 until odate
-
-  olddys = 0
-
-  IF (moold .GT. 1) THEN
-     mday(2) = ndfeb(yrold)
-     DO i = 1, moold - 1
-        olddys = olddys + mday(i)
-     END DO
-     mday(2) = 28
-  END IF
-
-  olddys = olddys + dyold-1
-
-  !  Determine the time difference in seconds
-
-  idts = (newdys - olddys) * 86400
-  idts = idts + (hrnew - hrold) * 3600
-  idts = idts + (minew - miold) * 60
-  idts = idts + (scnew - scold)
-
-  IF (isign .eq. -1) THEN
-     tdate=ndate
-     ndate=odate
-     odate=tdate
-     idts = idts * isign
-  END IF
-
-END SUBROUTINE geth_idts
-
 !*****************************************************************************
 
-SUBROUTINE build_string (string, Element, Value, Count, Status)
+SUBROUTINE gr1_build_string (string, Element, Value, Count, Status)
 
   IMPLICIT NONE
 #include "wrf_status_codes.h"
@@ -3456,187 +3190,37 @@ SUBROUTINE build_string (string, Element, Value, Count, Status)
 
   Status = WRF_NO_ERR
 
-END SUBROUTINE build_string
+END SUBROUTINE gr1_build_string
 
 !*****************************************************************************
 
-SUBROUTINE get_dims(MemoryOrder, Start, End, ndim, x_start, x_end, y_start, &
-     y_end, z_start, z_end)
-  USE module_wrf_error
+SUBROUTINE gr1_get_new_handle(DataHandle)
+  USE gr1_data_info
   IMPLICIT NONE
-  CHARACTER (LEN=*)    ,INTENT(IN)    :: MemoryOrder
-  INTEGER              ,INTENT(OUT)   :: ndim,x_start,x_end,y_start
-  INTEGER              ,INTENT(OUT)   :: y_end,z_start,z_end
-  integer ,dimension(*),intent(in)    :: Start, End
-  CHARACTER (LEN=1) :: char
-  INTEGER           :: idx
-
-  x_start = 1
-  x_end   = 1
-  y_start = 1
-  y_end   = 1
-  z_start = 1
-  z_end   = 1
-
-  !
-  ! Note: Need to add "char == 'S'" for boundary conditions
-  !
-
-  ndim = 0
-
-  !
-  ! First, do the special boundary cases.  These do not seem to 
-  !    
-  if ((MemoryOrder(1:3) .eq. 'XSZ') &
-       .or. (MemoryOrder(1:3) .eq. 'XEZ')) then
-     x_start = Start(3)
-     x_end = End(3)
-     y_start = Start(1)
-     y_end = End(1)
-     z_start = Start(2)
-     z_end = End(2)
-  else if ((MemoryOrder(1:3) .eq. 'YSZ') .or. &
-       (MemoryOrder(1:3) .eq. 'YEZ')) then
-     x_start = Start(1)
-     x_end = End(1)
-     y_start = Start(3)
-     y_end = End(3)
-     z_start = Start(2)
-     z_end = End(2)
-  else if ((MemoryOrder(1:2) .eq. 'YS') .or. &
-       (MemoryOrder(1:2) .eq. 'YE')) then
-     x_start = Start(1)
-     x_end = End(1)
-     y_start = Start(2)
-     y_end = End(2)
-  else if ((MemoryOrder(1:2) .eq. 'XS') .or. &
-       (MemoryOrder(1:2) .eq. 'XE')) then
-     x_start = Start(2)
-     x_end = End(2)
-     y_start = Start(1)
-     y_end = End(1)
-  else
-     do idx=1,len_trim(MemoryOrder)
-        ndim = ndim + 1
-        char = MemoryOrder(idx:idx)
-        if ((char == 'X') .or. (char == 'x')) then
-           x_start = Start(idx)
-           x_end   = End(idx)
-        else if ((char == 'Y') .or. (char == 'y')) then
-           y_start = Start(idx)
-           y_end   = End(idx)
-        else if ((char == 'Z') .or. (char == 'z')) then
-           z_start = Start(idx)
-           z_end   = End(idx)
-        else if (char == '0') then
-           ! Do nothing, this indicates field is a scalar.
-        else if ((char == 'C') .or. (char == 'c')) then
-           ! Do nothing, this is a "non-decomposed" field.
-        else
-           call wrf_message('Invalid Dimension in get_dims: '//char)
-        endif
-     enddo
-  endif
-
-END SUBROUTINE get_dims
-
-!*****************************************************************************
-
-SUBROUTINE get_dimvals(MemoryOrder,x,y,z,dims)
-  USE module_wrf_error
-  IMPLICIT NONE
-  CHARACTER (LEN=*)    ,INTENT(IN)    :: MemoryOrder
-  INTEGER              ,INTENT(IN)    :: x,y,z
-  INTEGER, DIMENSION(*),INTENT(OUT)   :: dims
-  INTEGER                             :: idx
-  CHARACTER (LEN=1) :: char
-
-  dims(1) = 1
-  dims(2) = 1
-  dims(3) = 1
-  !
-  ! Note: Need to add "char == 'S'" for boundary conditions
-  !
-
-  if ((MemoryOrder(1:3) .eq. 'XSZ') &
-       .or. (MemoryOrder(1:3) .eq. 'XEZ')) then
-     dims(1) = y
-     dims(2) = z
-     dims(3) = x
-  else if ((MemoryOrder(1:3) .eq. 'YSZ') .or. &
-       (MemoryOrder(1:3) .eq. 'YEZ')) then
-     dims(1) = x
-     dims(2) = z
-     dims(3) = y
-  else if ((MemoryOrder(1:2) .eq. 'YS') .or. &
-       (MemoryOrder(1:2) .eq. 'YE')) then
-     dims(1) = x
-     dims(2) = y
-     dims(3) = z
-  else if ((MemoryOrder(1:2) .eq. 'XS') .or. &
-       (MemoryOrder(1:2) .eq. 'XE')) then
-     dims(1) = y
-     dims(2) = x
-     dims(3) = z
-  else 
-     do idx=1,len_trim(MemoryOrder)
-        char = MemoryOrder(idx:idx)
-        if ((char == 'X') .or. (char == 'x')) then
-           dims(idx) = x
-        else if ((char == 'Y') .or. (char == 'y')) then
-           dims(idx) = y
-        else if ((char == 'Z') .or. (char == 'z')) then
-           dims(idx) = z
-        else if (char == '0') then
-           ! This is a scalar, do nothing.
-        else if ((char == 'C') .or. (char == 'c')) then
-           ! Do nothing, this is a "non-decomposed" field.
-        else
-           call wrf_message ('Invalid Dimension in get_dimvals: '//char)
-        endif
-     enddo
-  endif
-
-END SUBROUTINE get_dimvals
-
-!*****************************************************************************
-
-SUBROUTINE get_vert_stag(VarName,Stagger,vert_stag)
   
-  character (LEN=*) :: VarName
-  character (LEN=*) :: Stagger
-  logical           :: vert_stag
+  INTEGER ,       INTENT(OUT)  :: DataHandle
+  INTEGER :: i
 
-  if ((index(Stagger,'Z') > 0) .or. (VarName .eq. 'DNW') &
-       .or.(VarName .eq. 'RDNW')) then
-     vert_stag = .true.
-  else
-     vert_stag = .false.
-  endif
-end SUBROUTINE
+  DataHandle = -1
+  do i=firstFileHandle, maxFileHandles
+     if (.NOT. used(i)) then
+        DataHandle = i
+        used(i) = .true.
+        exit
+     endif
+  enddo
 
-!*****************************************************************************
+  RETURN
+END SUBROUTINE gr1_get_new_handle
 
-SUBROUTINE get_soil_layers(VarName,soil_layers)
-  
-  character (LEN=*) :: VarName
-  logical           :: soil_layers
 
-  if ((VarName .eq. 'ZS') .or. (VarName .eq. 'DZS') &
-       .or.(VarName .eq. 'TSLB') .or. (VarName .eq. 'SMOIS') &
-       .or. (VarName .eq. 'SH2O') .or. (VarName .eq. 'SMSTOT')) then
-     soil_layers = .true.
-  else
-     soil_layers = .false.
-  endif
-end SUBROUTINE
+!******************************************************************************
 
-!*****************************************************************************
 
-SUBROUTINE get_levels(VarName, zidx, zsize, soil_layers, vert_stag, fraction, &
+SUBROUTINE gr1_get_levels(VarName, zidx, zsize, soil_layers, vert_stag, fraction, &
      vert_unit, level1, level2)
 
-  use data_info
+  use gr1_data_info
   IMPLICIT NONE
 
   integer :: zidx
@@ -3696,13 +3280,12 @@ SUBROUTINE get_levels(VarName, zidx, zsize, soil_layers, vert_stag, fraction, &
      endif
   endif
 
-end SUBROUTINE get_levels
+end SUBROUTINE gr1_get_levels
 
 !*****************************************************************************
 
 
-SUBROUTINE FILL_ETA_LEVELS(fileindex, FileFd, grib_tables, VarName, eta_levels)
-  USE module_wrf_error
+SUBROUTINE gr1_fill_eta_levels(fileindex, FileFd, grib_tables, VarName, eta_levels)
   IMPLICIT NONE
 
   CHARACTER (len=*) :: fileindex
@@ -3758,59 +3341,5 @@ SUBROUTINE FILL_ETA_LEVELS(fileindex, FileFd, grib_tables, VarName, eta_levels)
      enddo
   enddo sortloop
 
-end subroutine FILL_ETA_LEVELS
-
-!*****************************************************************************
-
-SUBROUTINE Transpose(MemoryOrder, di, FieldType, Field, &
-     Start1, End1, Start2, End2, Start3, End3, data, zidx, numrows, numcols)
-
-  IMPLICIT NONE
-
-#include "wrf_io_flags.h"
-
-  CHARACTER (LEN=*),INTENT(IN)    :: MemoryOrder
-  INTEGER          ,INTENT(IN)    :: Start1,End1,Start2,End2,Start3,End3
-  INTEGER          ,INTENT(IN)    :: di
-  integer          ,intent(inout) :: &
-       Field(di,Start1:End1,Start2:End2,Start3:End3)
-  INTEGER          ,intent(in)    :: FieldType
-  real             ,intent(in)    :: data(*)
-  INTEGER          ,INTENT(IN)    :: zidx, numcols, numrows
-  INTEGER, DIMENSION(3)           :: dims
-  INTEGER                         :: col, row
-  LOGICAL                         :: logicaltype
-  CHARACTER (LEN=1000)            :: msg
-     
-!        Field(1:di,dims(1),dims(2),dims(3)) = data((row-1)*numcols+col)
-! if ((FieldType == WRF_REAL) .or. (FieldType == WRF_DOUBLE)) then
-     do col=1,numcols
-        do row=1,numrows
-           call get_dimvals(MemoryOrder,col,row,zidx,dims)
-           Field(1:di,dims(1),dims(2),dims(3)) = &
-                TRANSFER(data((row-1)*numcols+col),Field,1)
-        enddo
-     enddo
-! else if (FieldType == WRF_INTEGER) then
-!    do col=1,numcols
-!       do row=1,numrows
-!          call get_dimvals(MemoryOrder,col,row,zidx,dims)
-!          Field(1:di,dims(1),dims(2),dims(3)) = data((row-1)*numcols+col)
-!       enddo
-!    enddo
-! else if (FieldType == WRF_LOGICAL) then
-!    do col=1,numcols
-!       do row=1,numrows
-!          call get_dimvals(MemoryOrder,col,row,zidx,dims)
-!          Field(1:di,dims(1),dims(2),dims(3)) = &
-!               TRANSFER(data((row-1)*numcols+col),logicaltype,1)
-!       enddo
-!    enddo
-! else 
-!    write (msg,*)'Reading of type ',FieldType,'from grib1 data not supported'
-!    call wrf_message(msg)
-! endif
-  
-
-end SUBROUTINE Transpose
+end subroutine gr1_fill_eta_levels
 
