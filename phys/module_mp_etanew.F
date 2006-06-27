@@ -6,17 +6,18 @@ MODULE module_mp_etanew
 !-----------------------------------------------------------------------
       REAL,PRIVATE,SAVE ::  ABFR, CBFR, CIACW, CIACR, C_N0r0,           &
      &  CN0r0, CN0r_DMRmin, CN0r_DMRmax, CRACW, CRAUT, ESW0,            &
-     &  QAUT0, RFmax, RQR_DR1, RQR_DR2, RQR_DR3, RQR_DRmin,             &
+     &  RFmax, RQR_DR1, RQR_DR2, RQR_DR3, RQR_DRmin,                    &
      &  RQR_DRmax, RR_DRmin, RR_DR1, RR_DR2, RR_DR3, RR_DRmax
 !
       INTEGER, PRIVATE,PARAMETER :: MY_T1=1, MY_T2=35
       REAL,PRIVATE,DIMENSION(MY_T1:MY_T2),SAVE :: MY_GROWTH
 !
       REAL, PRIVATE,PARAMETER :: DMImin=.05e-3, DMImax=1.e-3,           &
-     &      DelDMI=1.e-6,XMImin=1.e6*DMImin, XMImax=1.e6*DMImax    
-      INTEGER, PRIVATE,PARAMETER :: MDImin=XMImin, MDImax=XMImax
+     &      DelDMI=1.e-6,XMImin=1.e6*DMImin
+      INTEGER, PUBLIC,PARAMETER :: XMImax=1.e6*DMImax, XMIexp=.0536,    &
+     &                             MDImin=XMImin, MDImax=XMImax
       REAL, PRIVATE,DIMENSION(MDImin:MDImax) ::                         &
-     &      ACCRI,MASSI,SDENS,VSNOWI,VENTI1,VENTI2
+     &      ACCRI,SDENS,VSNOWI,VENTI1,VENTI2
 !
       REAL, PRIVATE,PARAMETER :: DMRmin=.05e-3, DMRmax=.45e-3,          &
      &      DelDMR=1.e-6,XMRmin=1.e6*DMRmin, XMRmax=1.e6*DMRmax
@@ -64,17 +65,20 @@ MODULE module_mp_etanew
 !          presence of ice saturated/supersaturated conditions
 ! ======================================================================
       REAL, PUBLIC,PARAMETER ::                                         &
-     &  RHgrd=1.0                                                       &
+     &  RHgrd=1.                                                        &
      & ,T_ICE=-30.                                                      &
      & ,T_ICEK=T0C+T_ICE                                                &
      & ,T_ICE_init=-5.                                                  &
-     & ,NLImax=20.E3                                                    &
-     & ,NLImin=100.                                                     &
+     & ,NLImax=5.E3                                                     &
+     & ,NLImin=1.E3                                                     &
      & ,N0r0=8.E6                                                       &
-     & ,N0rmin=1.E4                                                    &
-     & ,NCW=200.E6                                                      &
+     & ,N0rmin=1.E4                                                     &
+     & ,NCW=100.E6                                                      &
      & ,FLARGE1=1.                                                      &
-     & ,FLARGE2=.2                                                      
+     & ,FLARGE2=.2
+!--- Other public variables passed to other routines:
+      REAL,PUBLIC,SAVE ::  QAUT0
+      REAL, PUBLIC,DIMENSION(MDImin:MDImax) :: MASSI
 !
 !
       CONTAINS
@@ -82,14 +86,15 @@ MODULE module_mp_etanew
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
       SUBROUTINE ETAMP_NEW (itimestep,DT,DX,DY,                         &
-     &                      dz8w,rho_phy,p_phy,pi_phy,th_phy,qv,qc,     &
+     &                      dz8w,rho_phy,p_phy,pi_phy,th_phy,qv,qt,     &
      &                      LOWLYR,SR,                                  &
      &                      F_ICE_PHY,F_RAIN_PHY,F_RIMEF_PHY,           &
+     &                      QC,QR,QS,                                   &
      &                      mp_restart_state,tbpvs_state,tbpvs0_state,  &
+     &                      RAINNC,RAINNCV,                             &
      &                      ids,ide, jds,jde, kds,kde,		        &
      &                      ims,ime, jms,jme, kms,kme,		        &
-     &                      its,ite, jts,jte, kts,kte,                  &
-     &                      RAINNC,RAINNCV )
+     &                      its,ite, jts,jte, kts,kte )
 !-----------------------------------------------------------------------
       IMPLICIT NONE
 !-----------------------------------------------------------------------
@@ -104,10 +109,12 @@ MODULE module_mp_etanew
       REAL, INTENT(IN),     DIMENSION(ims:ime, kms:kme, jms:jme)::      &
      &                      dz8w,p_phy,pi_phy,rho_phy
       REAL, INTENT(INOUT),  DIMENSION(ims:ime, kms:kme, jms:jme)::      &
-     &                      th_phy,qv,qc
+     &                      th_phy,qv,qt
+      REAL, INTENT(INOUT),  DIMENSION(ims:ime, kms:kme, jms:jme ) ::    &
+     &                      qc,qr,qs
       REAL, INTENT(INOUT),  DIMENSION(ims:ime, kms:kme, jms:jme ) ::    &
      &                      F_ICE_PHY,F_RAIN_PHY,F_RIMEF_PHY
-      REAL, INTENT(INOUT),  DIMENSION(ims:ime,jms:jme), OPTIONAL ::     &
+      REAL, INTENT(INOUT),  DIMENSION(ims:ime,jms:jme)           ::     &
      &                                                   RAINNC,RAINNCV
       REAL, INTENT(OUT),    DIMENSION(ims:ime,jms:jme):: SR
 !
@@ -141,6 +148,7 @@ MODULE module_mp_etanew
       REAL,  DIMENSION(its:ite, kts:kte, jts:jte):: t_phy
 
       INTEGER :: I,J,K,KFLIP
+      REAL :: WC
 !
 !-----------------------------------------------------------------------
 !**********************************************************************
@@ -214,7 +222,7 @@ MODULE module_mp_etanew
 
       CALL EGCP01DRV(DT,LOWLYR,                                         &
      &               APREC,PREC,ACPREC,SR,NSTATS,QMAX,QTOT,	        &
-     &               dz8w,rho_phy,qc,t_phy,qv,F_ICE_PHY,P_PHY,          &
+     &               dz8w,rho_phy,qt,t_phy,qv,F_ICE_PHY,P_PHY,          &
      &               F_RAIN_PHY,F_RIMEF_PHY,TLATGS_PHY,TRAIN_PHY,       &
      &               ids,ide, jds,jde, kds,kde,		                &
      &               ims,ime, jms,jme, kms,kme,		                &
@@ -226,27 +234,40 @@ MODULE module_mp_etanew
 	DO i = its,ite
   	   th_phy(i,k,j) = t_phy(i,k,j)/pi_phy(i,k,j)
            qv(i,k,j)=qv(i,k,j)/(1.-qv(i,k,j))  !Convert to mixing ratio
+           WC=qt(I,K,J)
+           QS(I,K,J)=0.
+           QR(I,K,J)=0.
+           QC(I,K,J)=0.
+           IF(F_ICE_PHY(I,K,J)>=1.)THEN
+             QS(I,K,J)=WC
+           ELSEIF(F_ICE_PHY(I,K,J)<=0.)THEN
+             QC(I,K,J)=WC
+           ELSE
+             QS(I,K,J)=F_ICE_PHY(I,K,J)*WC
+             QC(I,K,J)=WC-QS(I,K,J)
+           ENDIF
+!
+           IF(QC(I,K,J)>0..AND.F_RAIN_PHY(I,K,J)>0.)THEN
+             IF(F_RAIN_PHY(I,K,J).GE.1.)THEN
+               QR(I,K,J)=QC(I,K,J)
+               QC(I,K,J)=0.
+             ELSE
+               QR(I,K,J)=F_RAIN_PHY(I,K,J)*QC(I,K,J)
+               QC(I,K,J)=QC(I,K,J)-QR(I,K,J)
+             ENDIF
+           ENDIF
 	ENDDO
         ENDDO
      ENDDO
 ! 
 ! update rain (from m to mm)
 
-     IF(PRESENT(RAINNC))THEN
        DO j=jts,jte
        DO i=its,ite
           RAINNC(i,j)=APREC(i,j)*1000.+RAINNC(i,j)
-       ENDDO
-       ENDDO
-     ENDIF
-!
-     IF(PRESENT(RAINNCV))THEN
-       DO j=jts,jte
-       DO i=its,ite
           RAINNCV(i,j)=APREC(i,j)*1000.
        ENDDO
        ENDDO
-     ENDIF
 !
      MP_RESTART_STATE(MY_T1:MY_T2)=MY_GROWTH(MY_T1:MY_T2)
      MP_RESTART_STATE(MY_T2+1)=C1XPVS0
@@ -277,7 +298,7 @@ MODULE module_mp_etanew
      &  its,ite, jts,jte, kts,kte)
 !-----------------------------------------------------------------------
 ! DTPH           Physics time step (s)
-! CWM_PHY (qc)   Mixing ratio of the total condensate. kg/kg
+! CWM_PHY (qt)   Mixing ratio of the total condensate. kg/kg
 ! Q_PHY          Mixing ratio of water vapor. kg/kg
 ! F_RAIN_PHY     Fraction of rain. 
 ! F_ICE_PHY      Fraction of ice.
@@ -2161,7 +2182,7 @@ nsteps = 0
 !
         IF ( etampnew_unit1 < 0 ) THEN
           CALL wrf_error_fatal ( &
-            'Can not find unused fortran unit to read in lookup table.' )
+             'Can not find unused fortran unit to read in lookup table.' )
         ENDIF
 !
         IF ( wrf_dm_on_monitor() ) THEN

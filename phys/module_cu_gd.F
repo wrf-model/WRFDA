@@ -2,7 +2,7 @@
 !
 
 MODULE module_cu_gd
-  USE module_wrf_error
+   USE module_wrf_error
 
 CONTAINS
 
@@ -11,7 +11,7 @@ CONTAINS
                DT,itimestep,DX                                  &
               ,rho,RAINCV                                       &
               ,U,V,t,W,q,p,pi                                   &
-              ,dz8w,XLV,CP,G,r_v                                &
+              ,dz8w,p8w,XLV,CP,G,r_v                            &
               ,STEPCU                                           &
               ,CU_ACT_FLAG,warm_rain                            &
               ,APR_GR,APR_W,APR_MC,APR_ST,APR_AS                &
@@ -53,6 +53,7 @@ CONTAINS
                                                           q,    &
                                                           p,    &
                                                        dz8w,    &
+                                                        p8w,    &
                                                         rho
 
 
@@ -115,9 +116,9 @@ CONTAINS
      real,    dimension ( ims:ime , jms:jme , 1:ensdim) ::      &
         massfln,xf_ens,pr_ens
      real,    dimension (its:ite,kts:kte) ::                    &
-        OUTT,OUTQ,OUTQC
+        OUTT,OUTQ,OUTQC,phf,phh
      real,    dimension (its:ite)         ::                    &
-        pret, ter11, aa0
+        pret, ter11, aa0, fp
 !+lxz
      integer, dimension (its:ite) ::                            &
         kbcon, ktop
@@ -174,7 +175,7 @@ CONTAINS
      ENDDO
      ENDDO
      DO I=ITS,ITF
-         PSUR(I)=p(I,1,J)*.01
+         PSUR(I)=p8w(I,1,J)*.01
          TER11(I)=HT(i,j)
          mconv(i)=0.
          aaeq(i)=0.
@@ -184,10 +185,38 @@ CONTAINS
          vmean(i)=0.
          pmean(i)=0.
      ENDDO
+
+     !  hydrostatic pressure, first on full levels
+     DO I=ITS,ITF
+         phf(i,1) = p8w(i,1,j) 
+     ENDDO
+     !  integrate up, dp = -rho * g * dz
+     DO K=kts+1,ktf+1
+     DO I=ITS,ITF
+         phf(i,k) = phf(i,k-1) - rho(i,k-1,j) * g * dz8w(i,k-1,j)
+     ENDDO
+     ENDDO
+     !  scale factor so that pressure is not zero after integration
+     DO I=ITS,ITF
+         fp(i) = (p8w(i,kts,j)-p8w(i,kte,j))/(phf(i,kts)-phf(i,kte))
+     ENDDO
+     !  re-integrate up, dp = -rho * g * dz * scale_factor
+     DO K=kts+1,ktf+1
+     DO I=ITS,ITF
+         phf(i,k) = phf(i,k-1) - rho(i,k-1,j) * g * dz8w(i,k-1,j) * fp(i)
+     ENDDO
+     ENDDO
+     !  put hydrostatic pressure on half levels
+     DO K=kts,ktf
+     DO I=ITS,ITF
+         phh(i,k) = (phf(i,k) + phf(i,k+1))*0.5
+     ENDDO
+     ENDDO
+
      DO K=kts,ktf
      DO I=ITS,ITF
          omeg(i,k)=0.
-         po(i,k)=p(i,k,j)*.01
+         po(i,k)=phh(i,k)*.01
          P2d(I,K)=PO(i,k)
          US(I,K) =u(i,k,j)
          VS(I,K) =v(i,k,j)
@@ -2571,6 +2600,7 @@ CONTAINS
           endif
           IF(ierr(i).eq.0)then
 !           kclim=0
+            kclim=1
            do k=mkxcrt,1,-1
              if(p_cup(i,ktop(i)).lt.pcrit(k))then
                kclim=k
@@ -4184,8 +4214,6 @@ CONTAINS
 
    SUBROUTINE neg_check(dt,q,outq,outt,outqc,pret,its,ite,kts,kte,itf,ktf)
 
-   implicit none
-
    INTEGER,      INTENT(IN   ) ::            its,ite,kts,kte,itf,ktf
 
      real, dimension (its:ite,kts:kte  )                    ,                 &
@@ -4198,7 +4226,6 @@ CONTAINS
         ,intent (in  )                   ::                                   &
         dt
      real :: thresh,qmem,qmemf,qmem2,qtest,qmem1
-     integer :: i,k
 !
 ! first do check on vertical heating rate
 !

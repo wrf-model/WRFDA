@@ -7,7 +7,7 @@ SUBROUTINE microphysics_driver(                                          &
                        th, rho, pi_phy, p                                &
                       ,ht, dz8w, p8w, dt,dx,dy                           &
                       ,mp_physics, spec_zone                             &
-                      ,specified                                         &
+                      ,specified, channel_switch                         &
                       ,warm_rain                                         &
                       ,xland,itimestep                                   &
                       ,f_ice_phy,f_rain_phy,f_rimef_phy                  &
@@ -18,6 +18,7 @@ SUBROUTINE microphysics_driver(                                          &
                       ,qv_curr,qc_curr,qr_curr,qi_curr,qs_curr,qg_curr   &
                       ,qni_curr                                          &
                       ,f_qv,f_qc,f_qr,f_qi,f_qs,f_qg,f_qni               &
+                      ,qt_curr,f_qt                                      &
                       ,mp_restart_state,tbpvs_state,tbpvs0_state          & ! for etampnew
                       ,w ,z                                              &
                       ,rainnc, rainncv                                   &
@@ -157,7 +158,7 @@ SUBROUTINE microphysics_driver(                                          &
 !======================================================================
 
    INTEGER,    INTENT(IN   )    :: mp_physics
-   LOGICAL,    INTENT(IN   )    :: specified 
+   LOGICAL,    INTENT(IN   )    :: specified
 !
    INTEGER,      INTENT(IN   )    ::       ids,ide, jds,jde, kds,kde
    INTEGER,      INTENT(IN   )    ::       ims,ime, jms,jme, kms,kme
@@ -198,12 +199,13 @@ SUBROUTINE microphysics_driver(                                          &
 !
 ! Optional
 !
+   LOGICAL,  OPTIONAL,   INTENT(IN   )    :: channel_switch
    REAL, DIMENSION( ims:ime, kms:kme, jms:jme ),                  &
          OPTIONAL,                                                &
          INTENT(INOUT ) ::                                        &
                   w, z                                            & 
                  ,qv_curr,qc_curr,qr_curr,qi_curr,qs_curr,qg_curr &
-                 ,qni_curr
+                 ,qt_curr,qni_curr
 
 !
    REAL, DIMENSION( ims:ime , jms:jme ),                          &
@@ -219,17 +221,21 @@ SUBROUTINE microphysics_driver(                                          &
                                          ,tbpvs_state,tbpvs0_state
 !
 
-   LOGICAL, OPTIONAL ::             f_qv,f_qc,f_qr,f_qi,f_qs,f_qg,f_qni
+   LOGICAL, OPTIONAL ::      f_qv,f_qc,f_qr,f_qi,f_qs,f_qg,f_qni,f_qt
 
 
 ! LOCAL  VAR
 
    INTEGER :: i,j,k,its,ite,jts,jte,ij,sz,n
+   LOGICAL :: channel
 
 !---------------------------------------------------------------------
 !  check for microphysics type.  We need a clean way to 
 !  specify these things!
 !---------------------------------------------------------------------
+
+   channel = .FALSE.
+   IF ( PRESENT ( channel_switch ) ) channel = channel_switch
 
    if (mp_physics .eq. 0) return
    IF( specified ) THEN
@@ -243,8 +249,13 @@ SUBROUTINE microphysics_driver(                                          &
 
    DO ij = 1 , num_tiles
 
-       its = max(i_start(ij),ids+sz)
-       ite = min(i_end(ij),ide-1-sz)
+       IF (channel) THEN
+         its = max(i_start(ij),ids)
+         ite = min(i_end(ij),ide-1)
+       ELSE
+         its = max(i_start(ij),ids+sz)
+         ite = min(i_end(ij),ide-1-sz)
+       ENDIF
        jts = max(j_start(ij),jds+sz)
        jte = min(j_end(ij),jde-1-sz)
 
@@ -256,6 +267,7 @@ SUBROUTINE microphysics_driver(                                          &
              CALL wrf_debug ( 100 , 'microphysics_driver: calling kessler' )
              IF ( PRESENT( QV_CURR ) .AND. PRESENT( QC_CURR ) .AND.  &
                                            PRESENT( QR_CURR ) .AND.  &
+                  PRESENT( RAINNC  ) .AND. PRESENT ( RAINNCV ) .AND.  &
                                            PRESENT( Z       ))  THEN
                CALL kessler(                                        &
                   T=th                                              &
@@ -266,11 +278,10 @@ SUBROUTINE microphysics_driver(                                          &
                  ,EP2=ep_2,SVP1=svp1,SVP2=svp2                      &
                  ,SVP3=svp3,SVPT0=svpt0,RHOWATER=rhowater           &
                  ,DZ8W=dz8w                                         &
+                 ,RAINNC=rainnc,RAINNCV=rainncv                     &
                  ,IDS=ids,IDE=ide, JDS=jds,JDE=jde, KDS=kds,KDE=kde &
                  ,IMS=ims,IME=ime, JMS=jms,JME=jme, KMS=kms,KME=kme &
                  ,ITS=its,ITE=ite, JTS=jts,JTE=jte, KTS=kts,KTE=kte &
-              ! Optional
-                 ,RAINNC=rainnc,RAINNCV=rainncv                     &
                                                                     )
              ELSE 
                 CALL wrf_error_fatal ( 'arguments not present for calling kessler' )
@@ -309,7 +320,6 @@ SUBROUTINE microphysics_driver(                                          &
                  ,IDS=ids,IDE=ide, JDS=jds,JDE=jde, KDS=kds,KDE=kde &
                  ,IMS=ims,IME=ime, JMS=jms,JME=jme, KMS=kms,KME=kme &
                  ,ITS=its,ITE=ite, JTS=jts,JTE=jte, KTS=kts,KTE=kte &
-                 ,F_QI=f_qi, F_QS=f_qs, F_QG=f_qg, F_QNI=f_qni  &
                                                                     )
              ELSE 
                 CALL wrf_error_fatal ( 'arguments not present for calling thompson_et_al' )
@@ -318,13 +328,17 @@ SUBROUTINE microphysics_driver(                                          &
         CASE (LINSCHEME)
              CALL wrf_debug ( 100 , 'microphysics_driver: calling lin_et_al' )
              IF ( PRESENT( QV_CURR ) .AND. PRESENT ( QC_CURR ) .AND.  &
-                  PRESENT( QR_CURR )                           .AND.  &
+                  PRESENT( QR_CURR ) .AND. PRESENT ( QI_CURR ) .AND.  &
+                  PRESENT( QS_CURR )                           .AND.  &
+                  PRESENT( RAINNC  ) .AND. PRESENT ( RAINNCV ) .AND.  &
                   PRESENT( Z       ) .AND. PRESENT ( W       )  ) THEN
                CALL lin_et_al(                                      &
                   TH=th                                             &
                  ,QV=qv_curr                                        &
                  ,QL=qc_curr                                        &
                  ,QR=qr_curr                                        &
+                 ,QI=qi_curr                                        &
+                 ,QS=qs_curr                                        &
                  ,RHO=rho, PII=pi_phy, P=p, DT_IN=dt, Z=z           &
                  ,HT=ht, DZ8W=dz8w, GRAV=G,  CP=cp                  &
                  ,RAIR=r_d, RVAPOR=R_v                              &
@@ -332,14 +346,11 @@ SUBROUTINE microphysics_driver(                                          &
                  ,RHOWATER=rhowater, RHOSNOW=rhosnow                &
                  ,EP2=ep_2,SVP1=svp1,SVP2=svp2                      &
                  ,SVP3=svp3,SVPT0=svpt0                             &
+                 ,RAINNC=rainnc, RAINNCV=rainncv                    &
                  ,IDS=ids,IDE=ide, JDS=jds,JDE=jde, KDS=kds,KDE=kde &
                  ,IMS=ims,IME=ime, JMS=jms,JME=jme, KMS=kms,KME=kme &
                  ,ITS=its,ITE=ite, JTS=jts,JTE=jte, KTS=kts,KTE=kte &
-              ! Optional
-                 ,RAINNC=rainnc, RAINNCV=rainncv                    &
-                 ,F_QI=f_qi, F_QS=f_qs, F_QG=f_qg                   &
-                 ,QI=qi_curr                                        &
-                 ,QS=qs_curr                                        &
+                 ,F_QG=f_qg                                         &
                  ,QG=qg_curr                                        &
                                                                     )
              ELSE 
@@ -350,6 +361,7 @@ SUBROUTINE microphysics_driver(                                          &
              CALL wrf_debug ( 100 , 'microphysics_driver: calling wsm3' )
              IF ( PRESENT( QV_CURR ) .AND. PRESENT ( QC_CURR ) .AND.  &
                   PRESENT( QR_CURR ) .AND.                            &
+                  PRESENT( RAINNC  ) .AND. PRESENT ( RAINNCV ) .AND.  &
                   PRESENT( W       )                            ) THEN
              CALL wsm3(                                             &
                   TH=th                                             &
@@ -363,11 +375,10 @@ SUBROUTINE microphysics_driver(                                          &
                  ,XLS=xls, XLV0=xlv, XLF0=xlf                       &
                  ,DEN0=rhoair0, DENR=rhowater                       &
                  ,CLIQ=cliq,CICE=cice,PSAT=psat                     &
+                 ,RAIN=rainnc ,RAINNCV=rainncv                      &
                  ,IDS=ids,IDE=ide, JDS=jds,JDE=jde, KDS=kds,KDE=kde &
                  ,IMS=ims,IME=ime, JMS=jms,JME=jme, KMS=kms,KME=kme &
                  ,ITS=its,ITE=ite, JTS=jts,JTE=jte, KTS=kts,KTE=kte &
-              ! Optional
-                 ,RAIN=rainnc ,RAINNCV=rainncv                      &
                                                                     )
              ELSE 
                 CALL wrf_error_fatal ( 'arguments not present for calling wsm3' )
@@ -378,6 +389,7 @@ SUBROUTINE microphysics_driver(                                          &
              IF ( PRESENT( QV_CURR ) .AND. PRESENT ( QC_CURR ) .AND.  &
                   PRESENT( QR_CURR ) .AND. PRESENT ( QI_CURR ) .AND.  &
                   PRESENT( QS_CURR ) .AND.                            &
+                  PRESENT( RAINNC  ) .AND. PRESENT ( RAINNCV ) .AND.  &
                   PRESENT( W       )                            ) THEN
              CALL wsm5(                                             &
                   TH=th                                             &
@@ -393,11 +405,10 @@ SUBROUTINE microphysics_driver(                                          &
                  ,XLS=xls, XLV0=xlv, XLF0=xlf                       &
                  ,DEN0=rhoair0, DENR=rhowater                       &
                  ,CLIQ=cliq,CICE=cice,PSAT=psat                     &
+                 ,RAIN=rainnc ,RAINNCV=rainncv                      &
                  ,IDS=ids,IDE=ide, JDS=jds,JDE=jde, KDS=kds,KDE=kde &
                  ,IMS=ims,IME=ime, JMS=jms,JME=jme, KMS=kms,KME=kme &
                  ,ITS=its,ITE=ite, JTS=jts,JTE=jte, KTS=kts,KTE=kte &
-              ! Optional
-                 ,RAIN=rainnc ,RAINNCV=rainncv                      &
                                                                     )
              ELSE
                 CALL wrf_error_fatal ( 'arguments not present for calling wsm5' )
@@ -408,6 +419,7 @@ SUBROUTINE microphysics_driver(                                          &
              IF ( PRESENT( QV_CURR ) .AND. PRESENT ( QC_CURR ) .AND.  &
                   PRESENT( QR_CURR ) .AND. PRESENT ( QI_CURR ) .AND.  &
                   PRESENT( QS_CURR ) .AND. PRESENT ( QG_CURR ) .AND.  &
+                  PRESENT( RAINNC  ) .AND. PRESENT ( RAINNCV ) .AND.  &
                   PRESENT( W       )                            ) THEN
              CALL wsm6(                                             &
                   TH=th                                             &
@@ -424,11 +436,10 @@ SUBROUTINE microphysics_driver(                                          &
                  ,XLS=xls, XLV0=xlv, XLF0=xlf                       &
                  ,DEN0=rhoair0, DENR=rhowater                       &
                  ,CLIQ=cliq,CICE=cice,PSAT=psat                     &
+                 ,RAIN=rainnc ,RAINNCV=rainncv                      &
                  ,IDS=ids,IDE=ide, JDS=jds,JDE=jde, KDS=kds,KDE=kde &
                  ,IMS=ims,IME=ime, JMS=jms,JME=jme, KMS=kms,KME=kme &
                  ,ITS=its,ITE=ite, JTS=jts,JTE=jte, KTS=kts,KTE=kte &
-              ! Optional
-                 ,RAIN=rainnc ,RAINNCV=rainncv                      &
                                                                     )
              ELSE
                 CALL wrf_error_fatal ( 'arguments not present for calling wsm6' )
@@ -437,7 +448,10 @@ SUBROUTINE microphysics_driver(                                          &
         CASE (ETAMPNEW)
              CALL wrf_debug ( 100 , 'microphysics_driver: calling etampnew')
 
-             IF ( PRESENT( qv_curr ) .AND. PRESENT( qc_curr ) .AND. &
+             IF ( PRESENT( qv_curr ) .AND. PRESENT( qt_curr ) .AND. &
+                  PRESENT( qc_curr ) .AND. PRESENT( qr_curr ) .AND. &
+                  PRESENT( qs_curr ) .AND.                          &
+                  PRESENT( RAINNC  ) .AND. PRESENT ( RAINNCV ) .AND.  &
                   PRESENT( mp_restart_state )                  .AND. &
                   PRESENT( tbpvs_state )                      .AND. &
                   PRESENT( tbpvs0_state )                       ) THEN
@@ -446,14 +460,16 @@ SUBROUTINE microphysics_driver(                                          &
                  ,DZ8W=dz8w,RHO_PHY=rho,P_PHY=p,PI_PHY=pi_phy,TH_PHY=th &
                  ,QV=qv_curr                                        &
                  ,QC=qc_curr                                        &
+                 ,QS=qs_curr                                        &
+                 ,QR=qr_curr                                        &
+                 ,QT=qt_curr                                        &
                  ,LOWLYR=LOWLYR,SR=SR                               &
                  ,F_ICE_PHY=F_ICE_PHY,F_RAIN_PHY=F_RAIN_PHY         &
                  ,F_RIMEF_PHY=F_RIMEF_PHY                           &
+                 ,RAINNC=rainnc,RAINNCV=rainncv                     &
                  ,IDS=ids,IDE=ide, JDS=jds,JDE=jde, KDS=kds,KDE=kde &
                  ,IMS=ims,IME=ime, JMS=jms,JME=jme, KMS=kms,KME=kme &
                  ,ITS=its,ITE=ite, JTS=jts,JTE=jte, KTS=kts,KTE=kte &
-              ! Optional
-                 ,RAINNC=rainnc,RAINNCV=rainncv                     &
                  ,MP_RESTART_STATE=mp_restart_state                 &
                  ,TBPVS_STATE=tbpvs_state,TBPVS0_STATE=tbpvs0_state &
                                                                     )
@@ -465,6 +481,7 @@ SUBROUTINE microphysics_driver(                                          &
              CALL wrf_debug ( 100 , 'microphysics_driver: calling ncloud3' )
              IF ( PRESENT( QV_CURR ) .AND. PRESENT ( QC_CURR ) .AND.  &
                   PRESENT( QR_CURR ) .AND.                            &
+                  PRESENT( RAINNC  ) .AND. PRESENT ( RAINNCV ) .AND.  &
                   PRESENT( W       )                            ) THEN
              CALL ncloud3(                                          &
                   TH=th                                             &
@@ -478,11 +495,10 @@ SUBROUTINE microphysics_driver(                                          &
                  ,XLS=xls, XLV0=xlv, XLF0=xlf                       &
                  ,DEN0=rhoair0, DENR=rhowater                       &
                  ,CLIQ=cliq,CICE=cice,PSAT=psat                     &
+                 ,RAIN=RAINNC,RAINNCV=RAINNCV                       &
                  ,IDS=ids,IDE=ide, JDS=jds,JDE=jde, KDS=kds,KDE=kde &
                  ,IMS=ims,IME=ime, JMS=jms,JME=jme, KMS=kms,KME=kme &
                  ,ITS=its,ITE=ite, JTS=jts,JTE=jte, KTS=kts,KTE=kte &
-              ! Optional
-                 ,RAIN=RAINNC,RAINNCV=RAINNCV                       &
                                                                     )
 
              ELSE
@@ -494,6 +510,7 @@ SUBROUTINE microphysics_driver(                                          &
              IF ( PRESENT( QV_CURR ) .AND. PRESENT ( QC_CURR ) .AND.  &
                   PRESENT( QR_CURR ) .AND. PRESENT ( QI_CURR ) .AND.  &
                   PRESENT( QS_CURR ) .AND. PRESENT ( QG_CURR ) .AND.  &
+                  PRESENT( RAINNC  ) .AND. PRESENT ( RAINNCV ) .AND.  &
                   PRESENT( W       )                            ) THEN
              CALL ncloud5(                                          &
                   TH=th                                             &
@@ -509,11 +526,10 @@ SUBROUTINE microphysics_driver(                                          &
                  ,XLS=xls, XLV0=xlv, XLF0=xlf                       &
                  ,DEN0=rhoair0, DENR=rhowater                       &
                  ,CLIQ=cliq,CICE=cice,PSAT=psat                     &
+                 ,RAIN=RAINNC,RAINNCV=RAINNCV                       &
                  ,IDS=ids,IDE=ide, JDS=jds,JDE=jde, KDS=kds,KDE=kde &
                  ,IMS=ims,IME=ime, JMS=jms,JME=jme, KMS=kms,KME=kme &
                  ,ITS=its,ITE=ite, JTS=jts,JTE=jte, KTS=kts,KTE=kte &
-              ! Optional
-                 ,RAIN=RAINNC,RAINNCV=RAINNCV                       &
                                                                     )
              ELSE
                 CALL wrf_error_fatal ( 'arguments not present for calling ncepcloud5' )

@@ -86,7 +86,7 @@ CONTAINS
    IF ( .NOT. PRESENT( no_init1 ) ) THEN
      CALL init_modules(1)
      ! Initialize utilities (time manager, etc.)
-     CALL WRF_UTIL_Initialize( defaultCalendar=WRF_UTIL_CAL_GREGORIAN )
+     CALL WRFU_Initialize( defaultCalendar=WRFU_CAL_GREGORIAN )
    ENDIF
    ! Phase 2 resumes after MPI_INIT() (if it is called)
    CALL init_modules(2)
@@ -233,8 +233,9 @@ CONTAINS
 #endif
    END IF
 
-   head_grid%start_subtime = head_grid%start_time
-   head_grid%stop_subtime = head_grid%stop_time
+   ! set default values for subtimes
+   head_grid%start_subtime = domain_get_start_time ( head_grid )
+   head_grid%stop_subtime = domain_get_stop_time ( head_grid )
 
    END SUBROUTINE wrf_init
 
@@ -289,7 +290,7 @@ CONTAINS
    ! for DM parallel runs).  
    IF ( .NOT. PRESENT( no_shutdown ) ) THEN
      ! Finalize time manager
-     CALL WRF_UTIL_Finalize
+     CALL WRFU_Finalize
      CALL wrf_shutdown
    ENDIF
 

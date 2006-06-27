@@ -1,12 +1,36 @@
 #define WSM5_OPTIM
 #define INL
+#define INL_STATFUN
 #if (RWORDSIZE == DWORDSIZE)
 #  define VREC(A,B,C) vrec(A,B,C)
+#  define VLOG(A,B,C) vlog(A,B,C)
+#  define VEXP(A,B,C) vexp(A,B,C)
 #  define VSQRT(A,B,C) vsqrt(A,B,C)
+#  define VRSQRT(A,B,C) vrsqrt(A,B,C)
 #else
 #  define VREC(A,B,C) vsrec(A,B,C)
+#  define VLOG(A,B,C) vslog(A,B,C)
+#  define VEXP(A,B,C) vsexp(A,B,C)
 #  define VSQRT(A,B,C) vssqrt(A,B,C)
+#  define VRSQRT(A,B,C) vsrsqrt(A,B,C)
 #endif
+!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! NEW OPTIMIZATIONS, 20060214, JM : 
+! Comment these defines to turn off particular
+! optimizations
+! AAA and BBB are Section 7 optimizations
+! CCC is for Section 13 optimizations
+! ALGEBRAIC_11 is for Section 11 optimizations
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#define AAA
+#define BBB
+#define CCC
+#define ALGEBRAIC_11
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! uncomment to output timing of code sections
+!#define WSM5_TIMERS
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 MODULE module_mp_wsm5
 !
@@ -49,6 +73,7 @@ MODULE module_mp_wsm5
              rsloper2max,rslopes2max,rslopeg2max,    &
              rsloper3max,rslopes3max,rslopeg3max
 
+integer, parameter :: zones = 16
 !
 ! Specifies code-inlining of fpvs function in WSM52D below. JM 20040507
 !
@@ -62,11 +87,10 @@ CONTAINS
                  ,ep1, ep2, qmin                                   &
                  ,XLS, XLV0, XLF0, den0, denr                      &
                  ,cliq,cice,psat                                   &
+                 ,rain, rainncv                                    &
                  ,ids,ide, jds,jde, kds,kde                        &
                  ,ims,ime, jms,jme, kms,kme                        &
                  ,its,ite, jts,jte, kts,kte                        &
-              ! Optional 
-                 ,rain, rainncv                                    &
                                                                    )
 !-------------------------------------------------------------------
   IMPLICIT NONE
@@ -123,18 +147,27 @@ CONTAINS
                                                             cice, &
                                                             psat, &
                                                             denr
-!
-! Optional
-!
   REAL, DIMENSION( ims:ime , jms:jme ),                           &
-        OPTIONAL,                                                 &
         INTENT(INOUT) ::                                    rain, &
                                                          rainncv
 ! LOCAL VAR
   REAL, DIMENSION( its:ite , kts:kte ) ::   t
   REAL, DIMENSION( its:ite , kts:kte, 2 ) ::   qci, qrs
   INTEGER ::               i,j,k
+
+integer, external :: rsl_internal_microclock
+integer time
+integer timers( zones, jts:jte )
 !-------------------------------------------------------------------
+#ifdef WSM5_TIMERS
+time = rsl_internal_microclock()
+DO j=jts,jte
+DO i=1,zones
+timers(i,j) = 0
+ENDDO
+ENDDO
+#endif
+
       DO j=jts,jte
          DO k=kts,kte
          DO i=its,ite
@@ -153,11 +186,10 @@ CONTAINS
                     ,XLS, XLV0, XLF0, den0, denr                   &
                     ,cliq,cice,psat                                &
                     ,j                                             &
+                    ,rain(ims,j),rainncv(ims,j)                    &
                     ,ids,ide, jds,jde, kds,kde                     &
                     ,ims,ime, jms,jme, kms,kme                     &
-                    ,its,ite, jts,jte, kts,kte                     &
-                 ! optional
-                    ,rain(ims,j),rainncv(ims,j)                    &
+                    ,its,ite, jts,jte, kts,kte, timers(1,j)        &
                                                                    )
          DO K=kts,kte
          DO I=its,ite
@@ -169,6 +201,14 @@ CONTAINS
          ENDDO
          ENDDO
       ENDDO
+
+#ifdef WSM5_TIMERS
+write(0,*)' total: ',rsl_internal_microclock() - time
+DO j=jts,jte
+WRITE(0,'(i3,20i5)')j,(timers(i,j),i=1,zones)
+ENDDO
+#endif
+
   END SUBROUTINE wsm5
 !===================================================================
 !
@@ -178,11 +218,11 @@ CONTAINS
                    ,XLS, XLV0, XLF0, den0, denr                    &
                    ,cliq,cice,psat                                 &
                    ,lat                                            &
+                   ,rain,rainncv                                   &
                    ,ids,ide, jds,jde, kds,kde                      &
                    ,ims,ime, jms,jme, kms,kme                      &
                    ,its,ite, jts,jte, kts,kte                      &
-                 ! optional
-                   ,rain,rainncv                                   &
+,timers &
                                                                    )
 !-------------------------------------------------------------------
   IMPLICIT NONE
@@ -224,11 +264,7 @@ CONTAINS
                                                             cice, &
                                                             psat, &
                                                             denr
-!
-! Optional
-!
   REAL, DIMENSION( ims:ime ),                                     &
-        OPTIONAL,                                                 &
         INTENT(INOUT) ::                                    rain, &
                                                          rainncv
 ! LOCAL VAR
@@ -242,8 +278,12 @@ CONTAINS
   REAL, DIMENSION( its:ite , kts:kte ) ::                         &
         pgen, pisd, pcon, xl, cpm, work2, psml, psev, denfac, xni,&
         n0sfac
-  REAL, DIMENSION( its:ite )           :: tvec1
+  REAL, DIMENSION( its:ite )           :: tvec1,tvec2,tvec3,tvec4
   INTEGER, DIMENSION( its:ite ) :: mstep, numdt
+
+  REAL, DIMENSION(its:ite) :: rmstep
+  REAL dtcldden, rdelz, rdtcld
+
   LOGICAL, DIMENSION( its:ite ) :: flgcld
   REAL  ::  pi,                                                   &
             cpmcal, xlcal, lamdar, lamdas, diffus,                &
@@ -257,11 +297,23 @@ CONTAINS
   REAL  :: holdc, holdci
   INTEGER :: i, j, k, mstepmax,                                   &
             iprt, latd, lond, loop, loops, ifsat, n
+
+integer timer, timers(zones)
+integer, external :: rsl_internal_microclock
+real qrs1_points, qrs2_points
+
 #ifdef INL
 ! Temporaries used for inlining fpvs function
   REAL  :: dldti, xb, xai, tr, xbi, xa, hvap, cvap, hsub, dldt, ttp
 #endif
 
+#ifdef WSM5_TIMERS
+# define STARTTIME  timer = rsl_internal_microclock()
+# define ENDTIME(Z) timers(Z) = timers(Z) + rsl_internal_microclock() - timer 
+#else
+# define STARTTIME
+# define ENDTIME(Z)
+#endif
 !
 !=================================================================
 !   compute internal functions
@@ -281,15 +333,27 @@ CONTAINS
 !     diffus: diffusion coefficient of the water vapor
 !     viscos: kinematic viscosity(m2s-1)
 !
-      diffus(x,y) = 8.794e-5 * PWR(x,1.81) / y        ! 8.794e-5*x**1.81/y
-      viscos(x,y) = 1.496e-6 * (x*sqrt(x)) /(x+120.)/y  ! 1.496e-6*x**1.5/(x+120.)/y
-      xka(x,y) = 1.414e3*viscos(x,y)*y
-      diffac(a,b,c,d,e) = d*a*a/(xka(c,d)*rv*c*c)+1./(e*diffus(c,b))
-!      venfac(a,b,c) = (viscos(b,c)/diffus(b,a))**(.3333333)       &
-!                      /viscos(b,c)**(.5)*(den0/c)**0.25
-      venfac(a,b,c) = PWR((viscos(b,c)/diffus(b,a)),(.3333333))    &
-                     /sqrt(viscos(b,c))*sqrt(sqrt(den0/c))
-      conden(a,b,c,d,e) = (max(b,qmin)-c)/(1.+d*d/(rv*e)*c/(a*a))
+# ifdef INL_STATFUN
+#   define DIFFUS(x,y) (8.794e-5 * PWR(x,1.81) / y        )
+#   define VISCOS(x,y) (1.496e-6 * ((x)*sqrt(x)) /((x)+120.)/(y)  )
+#   define XKA(x,y) (1.414e3*VISCOS(x,y)*(y))
+#   define DIFFAC(a,b,c,d,e) ((d)*(a)*(a)/(XKA(c,d)*rv*(c)*(c))+1./((e)*DIFFUS(c,b)))
+#   define VENFAC(a,b,c) (PWR((VISCOS(b,c)/DIFFUS(b,a)),(.3333333))/sqrt(VISCOS(b,c))*sqrt(sqrt(den0/(c))))
+#   define CONDEN(a,b,c,d,e)  ((max(b,qmin)-(c))/(1.+(d)*(d)/(rv*(e))*(c)/((a)*(a))))
+# else
+#   define DIFFUS(x,y)       diffus(x,y)
+#   define VISCOS(x,y)       viscos(x,y)
+#   define XKA(x,y)          xka(x,y)
+#   define DIFFAC(a,b,c,d,e) diffac(a,b,c,d,e)
+#   define VENFAC(a,b,c)     venfac(a,b,c)
+#   define CONDEN(a,b,c,d,e) conden(a,b,c,d,e)
+      diffus(x,y)= 8.794e-5 * PWR(x,1.81) / y        ! 8.794e-5*x**1.81/y
+      viscos(x,y)= 1.496e-6 * ( x *sqrt(x)) /( x +120.)/ y  ! 1.496e-6*x**1.5/(x+120.)/y
+      xka(x,y)= 1.414e3*viscos(x,y)* y
+      diffac(a,b,c,d,e) = d * a * a /(xka(c,d)*rv* c * c )+1./( e *diffus(c,b))
+      venfac(a,b,c)= PWR((viscos(b,c)/diffus(b,a)),(.3333333))/sqrt(viscos(b,c))*sqrt(sqrt(den0/ c ))
+      conden(a,b,c,d,e) = (max(b,qmin)- c )/(1.+ d * d /(rv* e )* c /( a * a ))
+# endif
 #else
 #define PWR(A,B)  ((A)**(B))
 !
@@ -315,12 +379,14 @@ CONTAINS
 !----------------------------------------------------------------
 !     paddint 0 for negative values generated by dynamics
 !
+STARTTIME
       do k = kts, kte
         do i = its, ite
           qci(i,k,1) = max(qci(i,k,1),0.0)
           qrs(i,k,1) = max(qrs(i,k,1),0.0)
           qci(i,k,2) = max(qci(i,k,2),0.0)
           qrs(i,k,2) = max(qrs(i,k,2),0.0)
+!write(0,'(3i4," ",1e22.12)')i,k,lat,-qrs(i,k,2)
         enddo
       enddo
 !
@@ -342,8 +408,10 @@ CONTAINS
       loops = max(nint(delt/dtcldcr),1)
       dtcld = delt/loops
       if(delt.le.dtcldcr) dtcld = delt
+ENDTIME(1)
 !
       do loop = 1,loops
+STARTTIME
 !
 !----------------------------------------------------------------
 !     initialize the large scale variables
@@ -368,6 +436,8 @@ CONTAINS
         enddo
       enddo
 #endif
+ENDTIME(2)
+STARTTIME
 !
 #ifdef INL
       hsub = xls
@@ -407,6 +477,8 @@ CONTAINS
           rh(i,k,2) = max(q(i,k) / qs(i,k,2),qmin)
         enddo
       enddo
+ENDTIME(3)
+STARTTIME
 !
 !----------------------------------------------------------------
 !     initialize the variables for microphysical physics
@@ -435,6 +507,8 @@ CONTAINS
           xni(i,k) = 1.e3
         enddo
       enddo
+ENDTIME(4)
+STARTTIME
 !
 !----------------------------------------------------------------
 !     compute the fallout term:
@@ -482,6 +556,8 @@ CONTAINS
 #endif
         enddo
       enddo
+ENDTIME(5)
+STARTTIME
 !
       mstepmax = 1
       numdt = 1
@@ -495,31 +571,63 @@ CONTAINS
       enddo
       do i = its, ite
         if(mstepmax.le.mstep(i)) mstepmax = mstep(i)
+#ifdef AAA
+        rmstep(i) = 1./mstep(i)
+#endif
       enddo
+ENDTIME(6)
+STARTTIME
 !
       do n = 1, mstepmax
         k = kte
         do i = its, ite
           if(n.le.mstep(i)) then
+#ifdef AAA
+              falk(i,k,1) = den(i,k)*qrs(i,k,1)*work1(i,k,1)*rmstep(i)
+              falk(i,k,2) = den(i,k)*qrs(i,k,2)*work1(i,k,2)*rmstep(i)
+#else
               falk(i,k,1) = den(i,k)*qrs(i,k,1)*work1(i,k,1)/mstep(i)
               falk(i,k,2) = den(i,k)*qrs(i,k,2)*work1(i,k,2)/mstep(i)
+#endif
               fall(i,k,1) = fall(i,k,1)+falk(i,k,1)
               fall(i,k,2) = fall(i,k,2)+falk(i,k,2)
+#ifdef BBB
+              dtcldden = dtcld/den(i,k)
+              qrs(i,k,1) = max(qrs(i,k,1)-falk(i,k,1)*dtcldden,0.)
+              qrs(i,k,2) = max(qrs(i,k,2)-falk(i,k,2)*dtcldden,0.)
+#else
               qrs(i,k,1) = max(qrs(i,k,1)-falk(i,k,1)*dtcld/den(i,k),0.)
               qrs(i,k,2) = max(qrs(i,k,2)-falk(i,k,2)*dtcld/den(i,k),0.)
-            endif
-          enddo
+#endif
+!write(0,'(3i4," ",4e22.12)')i,k,lat,falk(i,k,1),falk(i,k,2),qrs(i,k,1),qrs(i,k,2)
+          endif
+        enddo
         do k = kte-1, kts, -1
           do i = its, ite
             if(n.le.mstep(i)) then
+#ifdef AAA
+              falk(i,k,1) = den(i,k)*qrs(i,k,1)*work1(i,k,1)*rmstep(i)
+              falk(i,k,2) = den(i,k)*qrs(i,k,2)*work1(i,k,2)*rmstep(i)
+#else
               falk(i,k,1) = den(i,k)*qrs(i,k,1)*work1(i,k,1)/mstep(i)
               falk(i,k,2) = den(i,k)*qrs(i,k,2)*work1(i,k,2)/mstep(i)
+#endif
               fall(i,k,1) = fall(i,k,1)+falk(i,k,1)
               fall(i,k,2) = fall(i,k,2)+falk(i,k,2)
+#ifdef BBB
+              dtcldden = dtcld/den(i,k)
+              rdelz = 1./delz(i,k)
+              qrs(i,k,1) = max(qrs(i,k,1)-(falk(i,k,1)-falk(i,k+1,1)    &
+                          *delz(i,k+1)*rdelz)*dtcldden,0.)
+              qrs(i,k,2) = max(qrs(i,k,2)-(falk(i,k,2)-falk(i,k+1,2)    &
+                          *delz(i,k+1)*rdelz)*dtcldden,0.)
+#else
               qrs(i,k,1) = max(qrs(i,k,1)-(falk(i,k,1)-falk(i,k+1,1)    &
                           *delz(i,k+1)/delz(i,k))*dtcld/den(i,k),0.)
               qrs(i,k,2) = max(qrs(i,k,2)-(falk(i,k,2)-falk(i,k+1,2)    &
                           *delz(i,k+1)/delz(i,k))*dtcld/den(i,k),0.)
+#endif
+!write(0,'(3i4," ",4e22.12)')i,k,lat,falk(i,k,1),falk(i,k,2),qrs(i,k,1),qrs(i,k,2)
             endif
           enddo
         enddo
@@ -532,9 +640,20 @@ CONTAINS
 !       (T>T0: S->R)
 !----------------------------------------------------------------
                 xlf = xlf0
-                work2(i,k) = venfac(p(i,k),t(i,k),den(i,k))
+#ifdef INL_STATFUN
+                work2(i,k)= (exp(log(((1.496e-6*((t(i,k))*sqrt(t(i,k))) &
+                            /((t(i,k))+120.)/(den(i,k)))/(8.794e-5      &
+                            *exp(log(t(i,k))*(1.81))/p(i,k))))          &
+                            *((.3333333)))/sqrt((1.496e-6*((t(i,k))     &
+                            *sqrt(t(i,k)))/((t(i,k))+120.)/(den(i,k)))) &
+                            *sqrt(sqrt(den0/(den(i,k)))))
+#else
+                work2(i,k) = VENFAC(p(i,k),t(i,k),den(i,k))
+#endif
                 coeres = rslope2(i,k,2)*sqrt(rslope(i,k,2)*rslopeb(i,k,2))
-                psml(i,k) = xka(t(i,k),den(i,k))/xlf*(t0c-t(i,k))*pi/2. &
+                psml(i,k) = &
+XKA(t(i,k),den(i,k))&
+                            /xlf*(t0c-t(i,k))*pi/2.                     &
                             *n0sfac(i,k)*(precs1*rslope2(i,k,2)+precs2  &
                             *work2(i,k)*coeres)
                 psml(i,k) = min(max(psml(i,k)*dtcld/mstep(i),           &
@@ -547,6 +666,8 @@ CONTAINS
           enddo
         enddo
       enddo
+ENDTIME(7)
+STARTTIME
 !---------------------------------------------------------------
 ! Vice [ms-1] : fallout of ice crystal [HDC 5a]
 !---------------------------------------------------------------
@@ -599,6 +720,8 @@ CONTAINS
           enddo
         enddo
       enddo
+ENDTIME(8)
+STARTTIME
 !
 !
 !----------------------------------------------------------------
@@ -607,10 +730,12 @@ CONTAINS
       do i = its, ite
         fallsum = fall(i,1,1)+fall(i,1,2)
         if(fallsum.gt.0.) then
-          IF(PRESENT(rainncv))rainncv(i) = fallsum*delz(i,1)/denr*dtcld*1000.
-          IF(PRESENT(rain   ))rain(i) = fallsum*delz(i,1)/denr*dtcld*1000. + rain(i)
+          rainncv(i) = fallsum*delz(i,1)/denr*dtcld*1000.
+          rain(i) = fallsum*delz(i,1)/denr*dtcld*1000. + rain(i)
         endif
       enddo
+ENDTIME(9)
+STARTTIME
 !
 !---------------------------------------------------------------
 ! piml: instantaneous melting of cloud ice [RH83 A28]
@@ -673,6 +798,8 @@ CONTAINS
           endif
         enddo
       enddo
+ENDTIME(10)
+STARTTIME
 !
 !----------------------------------------------------------------
 !     rsloper: reverse of the slope parameter of the rain(m)
@@ -682,6 +809,12 @@ CONTAINS
 !             (ry88, y93, h85)
 !     work2: parameter associated with the ventilation effects(y93)
 !
+
+#if 1
+#define LAMDAR(X,Y)  (sqrt(sqrt(pidn0r/((X)*(Y)))))
+#define LAMDAS(X,Y,Z)  (sqrt(sqrt(pidn0s*(Z)/((X)*(Y)))))
+!qrs1_points = 0
+!qrs2_points = 0
       do k = kts, kte
         do i = its, ite
           if(qrs(i,k,1).le.qcrmin)then
@@ -690,8 +823,56 @@ CONTAINS
             rslope2(i,k,1) = rsloper2max
             rslope3(i,k,1) = rsloper3max
           else
-            rslope(i,k,1) = 1./lamdar(qrs(i,k,1),den(i,k))
+!qrs1_points = qrs1_points+1
+            rslope(i,k,1) = 1./LAMDAR(qrs(i,k,1),den(i,k))
             rslopeb(i,k,1) = PWR(rslope(i,k,1),bvtr)
+            rslope2(i,k,1) = rslope(i,k,1)*rslope(i,k,1)
+            rslope3(i,k,1) = rslope2(i,k,1)*rslope(i,k,1)
+          endif
+          if(qrs(i,k,2).le.qcrmin)then
+            rslope(i,k,2) = rslopesmax
+            rslopeb(i,k,2) = rslopesbmax
+            rslope2(i,k,2) = rslopes2max
+            rslope3(i,k,2) = rslopes3max
+          else
+!qrs2_points = qrs2_points+1
+            rslope(i,k,2) = 1./LAMDAS(qrs(i,k,2),den(i,k),n0sfac(i,k))
+            rslopeb(i,k,2) = PWR(rslope(i,k,2),bvts)
+            rslope2(i,k,2) = rslope(i,k,2)*rslope(i,k,2)
+            rslope3(i,k,2) = rslope2(i,k,2)*rslope(i,k,2)
+          endif
+        enddo
+      enddo
+!write(0,'("qrs_points ",4f10.4)')qrs1_points,qrs1_points/((kte-kts+1)*(ite-its+1)),qrs2_points,qrs2_points/((kte-kts+1)*(ite-its+1))
+#else
+      do k = kts, kte
+
+        do i = its, ite
+          tvec1(i) = qrs(i,k,1)*den(i,k)
+        enddo
+        CALL VREC( tvec2(its),tvec1(its),ite-its+1)
+        do i = its, ite
+          tvec2(i) = tvec1(i)*pidn0r
+        enddo
+        CALL VSQRT( tvec2(its),tvec1(its),ite-its+1)
+        CALL VRSQRT( tvec1(its),tvec2(its),ite-its+1)
+        CALL VLOG( tvec3(its),tvec1(its), ite-its+1 )
+        do i = its, ite
+          tvec3(i) = tvec3(i)*bvtr
+        enddo
+        CALL VEXP( tvec4(its),tvec3(its), ite-its+1 )
+
+        do i = its, ite
+          if(qrs(i,k,1).le.qcrmin)then
+            rslope(i,k,1) = rslopermax
+            rslopeb(i,k,1) = rsloperbmax
+            rslope2(i,k,1) = rsloper2max
+            rslope3(i,k,1) = rsloper3max
+          else
+!            rslope(i,k,1) = 1./lamdar(qrs(i,k,1),den(i,k))
+            rslope(i,k,1) = tvec1(i)
+!            rslopeb(i,k,1) = PWR(rslope(i,k,1),bvtr)
+            rslopeb(i,k,1) = tvec4(i)
             rslope2(i,k,1) = rslope(i,k,1)*rslope(i,k,1)
             rslope3(i,k,1) = rslope2(i,k,1)*rslope(i,k,1)
           endif
@@ -708,14 +889,81 @@ CONTAINS
           endif
         enddo
       enddo
+#endif
 !
+
+#ifndef ALGEBRAIC_11
+#if 1
+      do k = kts, kte
+        do i = its, ite
+          work1(i,k,1) = DIFFAC(xl(i,k),p(i,k),t(i,k),den(i,k),qs(i,k,1))
+          work1(i,k,2) = DIFFAC(xls,p(i,k),t(i,k),den(i,k),qs(i,k,2))
+          work2(i,k) = VENFAC(p(i,k),t(i,k),den(i,k))
+!write(0,'(3i4," ",3e22.12)')i,k,lat,work1(i,k,1),work1(i,k,2),work2(i,k)
+        enddo
+      enddo
+#  else
       do k = kts, kte
         do i = its, ite
           work1(i,k,1) = diffac(xl(i,k),p(i,k),t(i,k),den(i,k),qs(i,k,1))
           work1(i,k,2) = diffac(xls,p(i,k),t(i,k),den(i,k),qs(i,k,2))
           work2(i,k) = venfac(p(i,k),t(i,k),den(i,k))
+!write(0,'(3i4," ",3e22.12)')i,k,lat,work1(i,k,1),work1(i,k,2),work2(i,k)
         enddo
       enddo
+#  endif
+#else
+      do k = kts, kte
+        do i = its, ite
+
+          work1(i,k,1) =                                                     &
+        ((((den(i,k))*(xl(i,k))*(xl(i,k))) * ((t(i,k))+120.) * (den(i,k)))   &
+           /                                                                 &
+         ( 1.414e3 * (1.496e-6 * ((t(i,k))*sqrt(t(i,k)))) * (den(i,k)) *     &
+                                                   (rv*(t(i,k))*(t(i,k)))))  &
+        +                                                                    &
+        p(i,k) / ( (qs(i,k,1)) * ( 8.794e-5 * exp(log(t(i,k))*(1.81)) ) )
+
+          work1(i,k,2) =                                                     &
+        (                                                                    &
+         (((den(i,k))*(xls)*(xls))*((t(i,k))+120.)*(den(i,k)))               &
+           /                                                                 &
+          (                                                                  &
+         1.414e3 * (1.496e-6 * ((t(i,k))*sqrt(t(i,k)))) * (den(i,k)) *       &
+                                                   (rv*(t(i,k))*(t(i,k)))    &
+          )                                                                  &
+          +                                                                  &
+         p(i,k)                                                              &
+          /                                                                  &
+         ( qs(i,k,2) * (8.794e-5 * exp(log(t(i,k))*(1.81))))                 &
+        )
+
+          work2(i,k) =                                                       &
+        (                                                                    &
+         exp(.3333333*log(                                                   &
+             ((1.496e-6 * ((t(i,k))*sqrt(t(i,k))))*p(i,k))                   &
+                /                                                            &
+             (((t(i,k))+120.)*den(i,k)*(8.794e-5 * exp(log(t(i,k))*(1.81)))) &
+           ))                                                                &
+           *                                                                 &
+           sqrt(sqrt(den0/(den(i,k))))                                       &
+        )                                                                    &
+        /                                                                    &
+        sqrt(                                                                &
+           (1.496e-6 * ((t(i,k))*sqrt(t(i,k))))                              &
+             /                                                               &
+           (                                                                 &
+            ((t(i,k))+120.) * den(i,k)                                       &
+           )                                                                 &
+        )
+
+!write(0,'(3i4," ",3e22.12)')i,k,lat,work1(i,k,1),work1(i,k,2),work2(i,k)
+        ENDDO
+      ENDDO
+#endif
+
+ENDTIME(11)
+STARTTIME
 !
 !===============================================================
 !
@@ -762,6 +1010,8 @@ CONTAINS
           endif
         enddo
       enddo
+ENDTIME(12)
+STARTTIME
 !
 !===============================================================
 !
@@ -776,6 +1026,7 @@ CONTAINS
 !
 !===============================================================
 !
+      rdtcld = 1./dtcld
       do k = kts, kte
         do i = its, ite
           supcol = t0c-t(i,k)
@@ -799,7 +1050,11 @@ CONTAINS
             if(qrs(i,k,2).gt.qcrmin.and.qci(i,k,2).gt.qmin) then
               pacr(i,k,2) = min(pacrs*n0sfac(i,k)*eacrs*rslope3(i,k,2)  &
                            *rslopeb(i,k,2)*qci(i,k,2)*denfac(i,k)       &
+#ifdef CCC
+                           ,qci(i,k,2)*rdtcld)
+#else
                            ,qci(i,k,2)/dtcld)
+#endif
             endif
 !-------------------------------------------------------------
 ! psacw: Accretion of cloud water by snow  [LFO 24]
@@ -808,7 +1063,11 @@ CONTAINS
             if(qrs(i,k,2).gt.qcrmin.and.qci(i,k,1).gt.qmin) then
               pacr(i,k,3) = min(pacrc*n0sfac(i,k)*rslope3(i,k,2)        &
                            *rslopeb(i,k,2)*qci(i,k,1)*denfac(i,k)       &
+#ifdef CCC
+                           ,qci(i,k,1)*rdtcld)
+#else
                            ,qci(i,k,1)/dtcld)
+#endif
             endif
 !-------------------------------------------------------------
 ! pisd: Deposition/Sublimation rate of ice [HDC 9]
@@ -820,10 +1079,19 @@ CONTAINS
               pisd(i,k) = 4.*diameter*xni(i,k)*(rh(i,k,2)-1.)/work1(i,k,2)
               supice = satdt-pres(i,k,1)
               if(pisd(i,k).lt.0.) then
+#ifdef CCC
+                pisd(i,k) = max(max(pisd(i,k),satdt*.5),supice)
+                pisd(i,k) = max(pisd(i,k),-qci(i,k,2)*rdtcld)
+#else
                 pisd(i,k) = max(max(pisd(i,k),satdt/2),supice)
                 pisd(i,k) = max(pisd(i,k),-qci(i,k,2)/dtcld)
+#endif
               else
+#ifdef CCC
+                pisd(i,k) = min(min(pisd(i,k),satdt*.5),supice)
+#else
                 pisd(i,k) = min(min(pisd(i,k),satdt/2),supice)
+#endif
               endif
               if(abs(pres(i,k,1)+pisd(i,k)).ge.abs(satdt)) ifsat = 1
             endif
@@ -839,10 +1107,19 @@ CONTAINS
                          *work2(i,k)*coeres)/work1(i,k,2)
             supice = satdt-pres(i,k,1)-pisd(i,k)
             if(pres(i,k,2).lt.0.) then
+#ifdef CCC
+              pres(i,k,2) = max(pres(i,k,2),-qrs(i,k,2)*rdtcld)
+              pres(i,k,2) = max(max(pres(i,k,2),satdt*.5),supice)
+#else
               pres(i,k,2) = max(pres(i,k,2),-qrs(i,k,2)/dtcld)
               pres(i,k,2) = max(max(pres(i,k,2),satdt/2),supice)
+#endif
             else
+#ifdef CCC
+              pres(i,k,2) = min(min(pres(i,k,2),satdt*.5),supice)
+#else
               pres(i,k,2) = min(min(pres(i,k,2),satdt/2),supice)
+#endif
             endif
             if(abs(pres(i,k,1)+pisd(i,k)+pres(i,k,2)).ge.abs(satdt))    &
               ifsat = 1
@@ -857,7 +1134,11 @@ CONTAINS
               xni0 = 1.e3*exp(0.1*supcol)
               roqi0 = 4.92e-11*PWR(xni0,1.33)
               pgen(i,k) = max(0.,(roqi0/den(i,k)-max(qci(i,k,2),0.))    &
+#ifdef CCC
+                         *rdtcld)
+#else
                          /dtcld)
+#endif
               pgen(i,k) = min(min(pgen(i,k),satdt),supice)
             endif
 !
@@ -867,7 +1148,11 @@ CONTAINS
 !-------------------------------------------------------------
             if(qci(i,k,2).gt.0.) then
               qimax = roqimax/den(i,k)
+#ifdef CCC
+              paut(i,k,2) = max(0.,(qci(i,k,2)-qimax)*rdtcld)
+#else
               paut(i,k,2) = max(0.,(qci(i,k,2)-qimax)/dtcld)
+#endif
             endif
           endif
 !-------------------------------------------------------------
@@ -877,10 +1162,17 @@ CONTAINS
           if(supcol.lt.0.) then
             if(qrs(i,k,2).gt.0..and.rh(i,k,1).lt.1.)                    &
               psev(i,k) = pres(i,k,2)*work1(i,k,2)/work1(i,k,1)
+#ifdef CCC
+              psev(i,k) = min(max(psev(i,k),-qrs(i,k,2)*rdtcld),0.)
+#else
               psev(i,k) = min(max(psev(i,k),-qrs(i,k,2)/dtcld),0.)
+#endif
           endif
+!write(0,'(4i4," ",7e22.12)')loop,i,k,lat,pgen(i,k),paut(i,k,2),psev(i,k),pres(i,k,2),-qrs(i,k,2),-qrs(i,k,2)*rdtcld,-qrs(i,k,2)/dtcld
         enddo
       enddo
+ENDTIME(13)
+STARTTIME
 !
 !
 !----------------------------------------------------------------
@@ -964,6 +1256,8 @@ CONTAINS
           endif
         enddo
       enddo
+ENDTIME(14)
+STARTTIME
 !
 #ifdef INL
       hsub = xls
@@ -1001,6 +1295,8 @@ CONTAINS
           qs(i,k,2) = max(qs(i,k,2),qmin)
         enddo
       enddo
+ENDTIME(15)
+STARTTIME
 !
 !----------------------------------------------------------------
 !  pcon: condensational/evaporational rate of cloud water [RH83 A6]
@@ -1009,7 +1305,7 @@ CONTAINS
 !
       do k = kts, kte
         do i = its, ite
-          work1(i,k,1) = conden(t(i,k),q(i,k),qs(i,k,1),xl(i,k),cpm(i,k))
+          work1(i,k,1) = CONDEN(t(i,k),q(i,k),qs(i,k,1),xl(i,k),cpm(i,k))
           work2(i,k) = qci(i,k,1)+work1(i,k,1)
           pcon(i,k) = min(max(work1(i,k,1)/dtcld,0.),max(q(i,k),0.)/dtcld)
           if(qci(i,k,1).gt.0..and.work1(i,k,1).lt.0.)                   &
@@ -1030,6 +1326,7 @@ CONTAINS
           if(qci(i,k,2).le.qmin) qci(i,k,2) = 0.0
         enddo
       enddo
+ENDTIME(16)
       enddo                  ! big loops
   END SUBROUTINE wsm52d
 ! ...................................................................

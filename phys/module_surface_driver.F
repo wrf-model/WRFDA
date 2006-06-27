@@ -498,6 +498,15 @@ CONTAINS
        ELSE
          CALL wrf_error_fatal('Lacking arguments for SFCLAY in surface driver')
        ENDIF
+
+! SET NEW VALUES
+
+       DO j=j_start(ij),j_end(ij)
+       DO i=i_start(ij),i_end(ij)
+          UST(i,j)=USTOLD(i,j)
+          ZNT(i,j)=ZNTOLD(i,j)
+       ENDDO
+       ENDDO
 #else
        CALL wrf_error_fatal('SFCLAY cannot be used with NMM')
 #endif
@@ -614,7 +623,7 @@ CONTAINS
                 albedo,snoalb,sh2o,snowh,                       &
                 ids,ide, jds,jde, kds,kde,                      &
                 ims,ime, jms,jme, kms,kme,                      &
-                i_start(ij),i_end(ij), j_start(ij),j_end(ij), kts,kte    )
+                i_start(ij),i_end(ij), j_start(ij),j_end(ij), kts,kte )
           CALL wrf_debug(100,'back from NMM LSM')
        ELSE
          CALL wrf_error_fatal('Lacking arguments for NMMLSM in surface driver')
@@ -638,7 +647,7 @@ CONTAINS
                 chs, chs2, cqs2, cpm,rcp,                       &    
                 sh2o,snowh,                                     & !h  
                 snoalb,shdmin,shdmax,                           & !i
-                acsnow,acsnow,                                  & !o 
+                acsnom,acsnow,                                  & !o 
                 ids,ide, jds,jde, kds,kde,                      &
                 ims,ime, jms,jme, kms,kme,                      &
                 i_start(ij),i_end(ij), j_start(ij),j_end(ij), kts,kte    )

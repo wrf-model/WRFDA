@@ -509,6 +509,7 @@ END SUBROUTINE phy_cu_ten
 !----------------------------------------------------------------------
 SUBROUTINE advance_ppt(RTHCUTEN,RQVCUTEN,RQCCUTEN,RQRCUTEN,           &
                      RQICUTEN,RQSCUTEN,RAINC,RAINCV,NCA,              &
+                     HTOP,HBOT,CUTOP,CUBOT,                           &
                      CUPPT, config_flags,                             &
                      ids,ide, jds,jde, kds,kde,                       &
                      ims,ime, jms,jme, kms,kme,                       &
@@ -540,11 +541,16 @@ SUBROUTINE advance_ppt(RTHCUTEN,RQVCUTEN,RQCCUTEN,RQRCUTEN,           &
           INTENT(INOUT) ::                                RAINC, &
                                                          RAINCV, &
                                                             NCA, &
+                                                           HTOP, &
+                                                           HBOT, &
+                                                          CUTOP, &
+                                                          CUBOT, &
                                                           CUPPT
 
 ! LOCAL  VAR
 
    INTEGER :: i,j,k,i_start,i_end,j_start,j_end,k_start,k_end
+   INTEGER :: NCUTOP, NCUBOT
 
 !-----------------------------------------------------------------
 
@@ -608,10 +614,38 @@ SUBROUTINE advance_ppt(RTHCUTEN,RQVCUTEN,RQCCUTEN,RQRCUTEN,           &
         ENDDO
         ENDDO
 
+   CASE (BMJSCHEME)
+ 
+        DO J = j_start,j_end
+        DO i = i_start,i_end
+
+! HTOP, HBOT FOR GFDL RADIATION
+           NCUTOP=NINT(CUTOP(I,J))
+           NCUBOT=NINT(CUBOT(I,J))
+           IF(NCUTOP>1.AND.NCUTOP<KDE)THEN
+             HTOP(I,J)=MAX(CUTOP(I,J),HTOP(I,J))
+           ENDIF
+           IF(NCUBOT>0.AND.NCUBOT<KDE)THEN
+             HBOT(I,J)=MIN(CUBOT(I,J),HBOT(I,J))
+           ENDIF
+
+        ENDDO
+        ENDDO
+
    CASE (KFETASCHEME)
 
         DO J = j_start,j_end
         DO i = i_start,i_end
+
+! HTOP, HBOT FOR GFDL RADIATION
+           NCUTOP=NINT(CUTOP(I,J))
+           NCUBOT=NINT(CUBOT(I,J))
+           IF(NCUTOP>1.AND.NCUTOP<KDE)THEN
+             HTOP(I,J)=MAX(CUTOP(I,J),HTOP(I,J))
+           ENDIF
+           IF(NCUBOT>0.AND.NCUBOT<KDE)THEN
+             HBOT(I,J)=MIN(CUBOT(I,J),HBOT(I,J))
+           ENDIF
 
            IF ( NINT(NCA(I,J)).GT. 0 ) THEN
 
@@ -677,6 +711,8 @@ SUBROUTINE add_a2a(lvar,rvar,config_flags,                  &
         config_flags%nested) j_start = MAX(jds+1,jts)
    IF ( config_flags%specified .or. &
         config_flags%nested) j_end   = MIN(jde-2,jte)
+      IF ( config_flags%periodic_x ) i_start = its
+      IF ( config_flags%periodic_x ) i_end = MIN( ite, ide-1 )
 
    DO j = j_start,j_end
    DO k = kts,ktf
@@ -728,6 +764,8 @@ SUBROUTINE add_a2c_u(lvar,rvar,config_flags,                &
         config_flags%nested) j_start = MAX(jds+1,jts)
    IF ( config_flags%specified .or. &
         config_flags%nested) j_end   = MIN(jde-2,jte)
+      IF ( config_flags%periodic_x ) i_start = its
+      IF ( config_flags%periodic_x ) i_end = ite
 
    DO j = j_start,j_end
    DO k = kts,ktf
@@ -780,6 +818,8 @@ SUBROUTINE add_a2c_v(lvar,rvar,config_flags,                &
         config_flags%nested) j_start = MAX(jds+1,jts)
    IF ( config_flags%specified .or. &
         config_flags%nested) j_end   = MIN(jde-1,jte)
+      IF ( config_flags%periodic_x ) i_start = its
+      IF ( config_flags%periodic_x ) i_end = MIN( ite, ide-1 )
 
    DO j = j_start,j_end
    DO k = kts,kte

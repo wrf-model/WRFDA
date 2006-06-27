@@ -9,13 +9,14 @@ contains
 !
    subroutine ysu(u3d,v3d,th3d,t3d,qv3d,qc3d,qi3d,p3d,pi3d,        &
                   rublten,rvblten,rthblten,                        &
-                  rqvblten,rqcblten,rqiblten,          		   &
+                  rqvblten,rqcblten,rqiblten,                      &
                   cp,g,rovcp,rd,rovg,                              &
                   dz8w,z,xlv,rv,psfc,                              &
                   znt,ust,zol,hol,hpbl,psim,psih,                  &
                   xland,hfx,qfx,tsk,gz1oz0,wspd,br,                &
                   dt,dtmin,kpbl2d,                                 &
                   svp1,svp2,svp3,svpt0,ep1,ep2,karman,eomeg,stbolt,&
+                  exch_h,                                          &
                   ids,ide, jds,jde, kds,kde,                       &
                   ims,ime, jms,jme, kms,kme,                       &
                   its,ite, jts,jte, kts,kte,                       &
@@ -30,7 +31,7 @@ contains
 !-- t3d         temperature (k)
 !-- qv3d        3d water vapor mixing ratio (kg/kg)
 !-- qc3d        3d cloud mixing ratio (kg/kg)
-!-- qi3d        3d ice mixing ratio (kg/kg)   
+!-- qi3d        3d ice mixing ratio (kg/kg)
 !               (note: if P_QI<PARAM_FIRST_SCALAR this should be zero filled)
 !-- p3d         3d pressure (pa)
 !-- pi3d	3d exner function (dimensionless)
@@ -130,28 +131,28 @@ contains
 							  rvblten, &
 							 rthblten, &
 							 rqvblten, &
-							 rqcblten
-
+                                                         rqcblten
+      real,     dimension( ims:ime, kms:kme, jms:jme )           , &
+                intent(inout)   ::                         exch_h
 !
       real,     dimension( ims:ime, jms:jme )                    , &
                 intent(in   )   ::                          xland, &
            			                              hfx, &
-           					              qfx, &
-     					                     psim, &
-           					             psih, &
-							   gz1oz0, &
-							       br, &
+                                                              qfx, &
+                                                             psim, &
+                                                             psih, &
+                                                           gz1oz0, &
+                                                               br, &
                                                              psfc, &
                                                               tsk
 !
       real,     dimension( ims:ime, jms:jme )                    , &
                 intent(inout)   ::                            hol, &
-							      ust, &
-							     hpbl, &
+                                                              ust, &
+                                                             hpbl, &
                                                               znt, &
-						             wspd, &
+                                                             wspd, &
                                                               zol
-
 !
      real,     dimension( ims:ime, kms:kme, jms:jme )            , &
                 intent(in   )   ::                            u3d, &
@@ -168,7 +169,6 @@ contains
                 optional                                         , &
                 intent(inout)   ::                        rqiblten
 !
-							      
 !local
    integer ::  i,j,k
 !
@@ -195,6 +195,7 @@ contains
               ,svp1=svp1,svp2=svp2,svp3=svp3,svpt0=svpt0           &
               ,ep1=ep1,ep2=ep2,karman=karman,eomeg=eomeg           &
               ,stbolt=stbolt                                       &
+              ,exch_hx=exch_h(ims,kms,j)                           &
               ,ids=ids,ide=ide, jds=jds,jde=jde, kds=kds,kde=kde   &
               ,ims=ims,ime=ime, jms=jms,jme=jme, kms=kms,kme=kme   &
               ,its=its,ite=ite, jts=jts,jte=jte, kts=kts,kte=kte   )
@@ -211,13 +212,14 @@ contains
 !
    subroutine ysu2d(j,ux,vx,tx,qx,qcx,qix,p2d,                     &
                   utnp,vtnp,ttnp,                                  &
-                  qtnp,qctnp,qitnp,             		   &
+                  qtnp,qctnp,qitnp,                                &
                   cp,g,rovcp,rd,rovg,                              &
                   dz8w2d,z2d,xlv,rv,psfcpa,                        &
                   znt,ust,zol,hol,hpbl,psim,psih,                  &
                   xland,hfx,qfx,tsk,gz1oz0,wspd,br,                &
                   dt,dtmin,kpbl1d,                                 &
                   svp1,svp2,svp3,svpt0,ep1,ep2,karman,eomeg,stbolt,&
+                  exch_hx,                                         &
                   ids,ide, jds,jde, kds,kde,                       &
                   ims,ime, jms,jme, kms,kme,                       &
                   its,ite, jts,jte, kts,kte,                       &
@@ -270,7 +272,7 @@ contains
       real afac, phifac, qmin
       real d1,d2,d3
       real h1,h2
-      parameter (rlam = 150.,prmin = 0.25,prmax = 4.)
+      parameter (rlam = 30.,prmin = 0.25,prmax = 4.)
       parameter (brcr = 0.0,bfac = 6.8,pfac = 2.0,sfcfrac = 0.1)
       parameter (afac = 6.8,phifac = 8.,qmin=1.e-2)
       parameter (d1 = 0.02, d2 = 0.05, d3 = 0.001)
@@ -278,6 +280,9 @@ contains
       parameter (ckz = 0.001,zfmin = 1.e-8,aphi5 = 5.,aphi16 = 16.)
       parameter (gamcrt = 3.,gamcrq = 2.e-3)
       parameter (xka = 2.4e-5)
+!wig 16-sep-2005: Parameter added to set a minimum pbl height. To disable
+!                 this option, set hpblmin=0.
+      real, parameter :: hpblmin=0.
 !
       integer,  intent(in   )   ::      ids,ide, jds,jde, kds,kde, &
                                         ims,ime, jms,jme, kms,kme, &
@@ -310,29 +315,26 @@ contains
 !
       real,     dimension( ims:ime )                             , &
                 intent(inout)   ::                            hol, &
-							      ust, &
-							     hpbl, &
+                                                              ust, &
+                                                             hpbl, &
                                                               znt
-
-
       real,     dimension( ims:ime )                             , &
                 intent(in   )   ::                          xland, &
-           			                              hfx, &
-           					              qfx
+                                                              hfx, &
+                                                              qfx
 !
       real,     dimension( ims:ime ), intent(inout)   ::     wspd
       real,     dimension( ims:ime ), intent(in  )    ::       br
 !
-
       real,     dimension( ims:ime ), intent(in   )   ::     psim, &
-           					             psih
+                                                             psih
       real,     dimension( ims:ime ), intent(in   )   ::   gz1oz0
-
 !
       real,     dimension( ims:ime ), intent(in   )   ::   psfcpa
       real,     dimension( ims:ime ), intent(in   )   ::      tsk
       real,     dimension( ims:ime ), intent(inout)   ::      zol
       integer,  dimension( ims:ime ), intent(out  )   ::   kpbl1d
+!
 !
       real,     dimension( ims:ime, kms:kme )                    , &
                 intent(in   )   ::                             ux, &
@@ -378,6 +380,9 @@ contains
                                                                al, &
                                                              zfac, &
                                                              scr4
+!jdf added exch_hx
+      real,    dimension( ims:ime, kms:kme )                     , &
+               intent(inout)   ::                         exch_hx
       real,    dimension( its:ite, kts:kte, ncloud)  ::        f3
 !
       logical, dimension( its:ite )             ::         pblflg, &
@@ -387,7 +392,9 @@ contains
       integer ::  n,i,k,l,nzol,imvdif,ic
       integer ::  klpbl
 !
-      integer, dimension( its:ite )             ::           kpbl
+!wig 16-sep-2005: Added kmin for setting minimum pbl height
+      integer, dimension( its:ite )             ::           kpbl, &
+                                                             kmin
 !
       real    ::  zoln,x,y,thcon,tvcon,e1,dtstep
       real    ::  zl,tskv,dthvdz,dthvm,vconv,rzol
@@ -403,20 +410,19 @@ contains
       real, dimension( its:ite )              ::            ust3, &
                                                     wstar3,wstar, &
                                                      hgamu,hgamv, &
-                                                         wm2, &
+                                                         wm2, we, &
                                                           bfxpbl, &
                                                    hfxpbl,qfxpbl, &
                                                    ufxpbl,vfxpbl, &
                                                      delta,dthvx
       real    ::  prnumfac,bfx0,hfx0,qfx0,delb,dux,dvx,           &
-                  dsdzu,dsdzv,we,wm3,dthx,dqx
+                  dsdzu,dsdzv,wm3,dthx,dqx
 !
 !----------------------------------------------------------------------
 !
       klpbl = kte
 !
 !-- imvdif      imvdif = 1 for moist adiabat vertical diffusion
-
       imvdif = 1
 !
 !----convert ground temperature to potential temperature:
@@ -491,6 +497,19 @@ contains
       do i = its,ite
         govrth(i) = g/thx(i,1)
       enddo
+!
+!wig 16-sep-2005: Determine the k level associated with hpblmin.
+      if( hpblmin >= 1. ) then
+         do i = its,ite
+            kmin(i) = 1
+            do k = kte-1,kts,-1
+               if( zq(i,k) <= hpblmin ) then
+                  kmin(i) = k
+                  exit
+               end if
+            end do
+         end do
+      end if
 !
 !-----initialize vertical tendencies and
 !
@@ -581,7 +600,9 @@ contains
         thermal(i)= thvx(i,1)
         pblflg(i) = .true.
         sfcflg(i) = .true.
-        if(br(i).gt.0.0) sfcflg(i) = .false.
+!wig 12-aug-2004: Turn off check for sfc stability if using a minimum
+!                 pbl height > 0.
+        if(br(i).gt.0.0 .and. hpblmin<=1.) sfcflg(i) = .false.
       enddo
 !
 !     compute the first guess of pbl height
@@ -613,7 +634,15 @@ contains
           brint = (brcr-brdn(i))/(brup(i)-brdn(i))
         endif
         hpbl(i) = za(i,k-1)+brint*(za(i,k)-za(i,k-1))
-        if(hpbl(i).lt.zq(i,2)) kpbl(i) = 1
+
+!wig 16-sep-2005: rig a minimum PBL heigt
+        if( hpblmin >= 1. .and. hpbl(i).lt.hpblmin) then
+           kpbl(i) = kmin(i)
+           hpbl(i) = hpblmin
+        else
+           if(hpbl(i).lt.zq(i,2)) kpbl(i) = 1
+        end if
+
         if(kpbl(i).le.1) pblflg(i) = .false.
       enddo
 !
@@ -710,7 +739,15 @@ contains
             brint = (brcr-brdn(i))/(brup(i)-brdn(i))
           endif
           hpbl(i) = za(i,k-1)+brint*(za(i,k)-za(i,k-1))
-          if(hpbl(i).lt.zq(i,2)) kpbl(i) = 1
+
+!wig 16-sep-2005: rig a minimum PBL heigt
+          if(hpblmin >= 1. .and. hpbl(i).lt.hpblmin) then
+             kpbl(i) = kmin(i)
+             hpbl(i) = hpblmin
+          else
+             if(hpbl(i).lt.zq(i,2)) kpbl(i) = 1
+          end if
+
           if(kpbl(i).le.1) pblflg(i) = .false.
         endif
       enddo
@@ -723,7 +760,8 @@ contains
           ss = ((ux(i,k+1)-ux(i,k))*(ux(i,k+1)-ux(i,k))+(vx(i,k+1)- &
              vx(i,k))*(vx(i,k+1)-vx(i,k)))/(dza(i,k+1)*dza(i,k+1))+ &
              1.e-9
-          ri = govrth(i)*(thvx(i,k+1)-thvx(i,k))/(ss*dza(i,k+1))
+          govrthv = g/(0.5*(thvx(i,k+1)+thvx(i,k)))
+          ri = govrthv*(thvx(i,k+1)-thvx(i,k))/(ss*dza(i,k+1))
           if(imvdif.eq.1)then
             if((qcx(i,k)+qix(i,k)).gt.0.01e-3.and.(qcx(i,k+1)+      &
               qix(i,k+1)).gt.0.01e-3)then
@@ -742,14 +780,26 @@ contains
           dthvx(i)  = max(thvx(i,k+1)-thvx(i,k),qmin)
           dthx  = max(thx(i,k+1)-thx(i,k),qmin)
           dqx   = min(qx(i,k+1)-qx(i,k),0.0)
-          we = max(bfxpbl(i)/dthvx(i),-sqrt(wm2(i)))
-          hfxpbl(i) = we*dthx
-          qfxpbl(i) = we*dqx
+          we(i) = max(bfxpbl(i)/dthvx(i),-sqrt(wm2(i)))
+          hfxpbl(i) = we(i)*dthx
+          qfxpbl(i) = we(i)*dqx
 !
           dux = ux(i,k+1)-ux(i,k)
           dvx = vx(i,k+1)-vx(i,k)
-          ufxpbl(i) = prpbl(i)*we*dux
-          vfxpbl(i) = prpbl(i)*we*dvx
+          if(dux.gt.qmin) then
+            ufxpbl(i) = max(prpbl(i)*we(i)*dux,-ust(i)*ust(i))
+          elseif(dux.lt.-qmin) then
+            ufxpbl(i) = min(prpbl(i)*we(i)*dux,ust(i)*ust(i))
+          else
+            ufxpbl(i) = 0.0
+          endif
+          if(dvx.gt.qmin) then
+            vfxpbl(i) = max(prpbl(i)*we(i)*dvx,-ust(i)*ust(i))
+          elseif(dvx.lt.-qmin) then
+            vfxpbl(i) = min(prpbl(i)*we(i)*dvx,ust(i)*ust(i))
+          else
+            vfxpbl(i) = 0.0
+          endif
           delb  = govrth(i)*d3*hpbl(i)
           delta(i) = min(d1*hpbl(i) + d2*wm2(i)/delb,100.)
         endif
@@ -758,7 +808,7 @@ contains
       do k = kts,klpbl
         do i = its,ite
           if(pblflg(i).and.k.ge.kpbl(i))then
-            entfac(i,k) = ((zq(i,k)-hpbl(i))/delta(i))**2.
+            entfac(i,k) = ((zq(i,k+1)-hpbl(i))/delta(i))**2.
           else
             entfac(i,k) = 1.e30
           endif
@@ -789,6 +839,9 @@ contains
             xkzm(i,k) = max(xkzm(i,k),xkzmin)
             xkzh(i,k) = min(xkzh(i,k),xkzmax)
             xkzh(i,k) = max(xkzh(i,k),xkzmin)
+!wig 16-sep-2005: This code is unnecessary. exch_hx will get overwritten
+!                 with the same values further down in this routine
+!            exch_hx(i,k) = xkzh(i,k)
           endif
         enddo
       enddo
@@ -837,6 +890,10 @@ contains
             xkzh(i,k) = max(xkzh(i,k),xkzmin)
             xkzml(i,k) = xkzm(i,k)
             xkzhl(i,k) = xkzh(i,k)
+!wig 16-sep-2005: This code is unnecessary. exch_hx will get overwritten
+!                 further down in this routine after adjustments are made
+!                 for entrainment.
+!            exch_hx(i,k) = xkzh(i,k)
           endif
         enddo
       enddo
@@ -893,7 +950,7 @@ contains
             f3(i,k,1) = f3(i,k,1)+dtodsd*dsdzq
             f3(i,k+1,1) = qx(i,k+1)-dtodsu*dsdzq
           elseif(pblflg(i).and.k.ge.kpbl(i).and.entfac(i,k).lt.4.6) then
-            xkzh(i,k) = -bfxpbl(i)*dza(i,kpbl(i)+1)*exp(-entfac(i,k))/dthvx(i)
+            xkzh(i,k) = -we(i)*dza(i,kpbl(i))*exp(-entfac(i,k))
             xkzh(i,k) = sqrt(xkzh(i,k)*xkzhl(i,k))
             xkzh(i,k) = min(xkzh(i,k),xkzmax)
             xkzh(i,k) = max(xkzh(i,k),xkzmin)
@@ -908,6 +965,7 @@ contains
           al(i,k)   = -dtodsu*dsdz2
           ad(i,k)   = ad(i,k)-au(i,k)
           ad(i,k+1) = 1.-al(i,k)
+          exch_hx(i,k) = xkzh(i,k)
         enddo
       enddo
 !
@@ -1172,4 +1230,3 @@ contains
    end subroutine ysuinit
 !-------------------------------------------------------------------
 end module module_bl_ysu
-

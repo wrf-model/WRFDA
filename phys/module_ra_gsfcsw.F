@@ -1,3 +1,9 @@
+!Comment the following out to turn off aerosol-radiation
+!feedback between MOSAIC and GSFCSW. wig, 21-Feb-2005
+#ifdef WRF_CHEM
+#define AER_RA_FEEDBACK   
+#endif
+
 MODULE module_ra_gsfcsw
 
    REAL,    PARAMETER, PRIVATE ::   thresh=1.e-9
@@ -11,10 +17,15 @@ CONTAINS
 
 !------------------------------------------------------------------
    SUBROUTINE GSFCSWRAD(rthraten,gsw,xlat,xlong                   &
+                   ,dz8w,rho_phy                                  &
                    ,alb,t3d,qv3d,qc3d,qr3d                        &
-                   ,qi3d,qs3d,qg3d,p3d,p8w3d,pi3d,cldfra3d        &
+                   ,qi3d,qs3d,qg3d                                &
+                   ,p3d,p8w3d,pi3d,cldfra3d                       &
                    ,gmt,cp,g,julday,xtime,declin,solcon           &
                    ,radfrq,degrad,taucldi,taucldc,warm_rain       &
+                   ,tauaer300,tauaer400,tauaer600,tauaer999       & ! jcb
+                   ,gaer300,gaer400,gaer600,gaer999               & ! jcb
+                   ,waer300,waer400,waer600,waer999               & ! jcb
                    ,f_qv,f_qc,f_qr,f_qi,f_qs,f_qg                 &
                    ,ids,ide, jds,jde, kds,kde                     & 
                    ,ims,ime, jms,jme, kms,kme                     &
@@ -40,6 +51,8 @@ CONTAINS
                                                            P8W3D, &
                                                             pi3D, &
                                                              T3D, &
+                                                            dz8w, &
+                                                         rho_phy, &
                                                         CLDFRA3D
 
 
@@ -63,6 +76,10 @@ CONTAINS
 !
 ! Optional
 !
+   REAL, DIMENSION( ims:ime, kms:kme, jms:jme ), OPTIONAL ,       &
+         INTENT(IN    ) :: tauaer300,tauaer400,tauaer600,tauaer999, & ! jcb
+                                 gaer300,gaer400,gaer600,gaer999, & ! jcb
+                                 waer300,waer400,waer600,waer999    ! jcb
 
    REAL, DIMENSION( ims:ime, kms:kme, jms:jme ),                  &
          OPTIONAL,                                                &           
@@ -115,6 +132,8 @@ CONTAINS
                                                              P2D, &
                                                              T2D, &
                                                           fcld2D
+   real, DIMENSION( its:ite , kts:kte+1 ) :: phyd
+   real, DIMENSION( its:ite , kts:kte   ) :: phydmid
 
    REAL, DIMENSION( np, 5 ) ::                              pres, &
                                                            ozone
@@ -141,6 +160,10 @@ CONTAINS
    REAL    :: XLAT0,XLONG0
    REAL    :: fac,latrmp
    REAL    :: xt24,tloctm,hrang,xxlat
+   real, dimension(11) :: midbands  ! jcb
+   data midbands/.2,.235,.27,.2875,.3025,.305,.3625,.55,1.92,1.745,6.135/   ! jcb
+   real :: ang,slope ! jcb
+   character(len=200) :: msg !wig
 !
 !--------------------------------------------------------------------------------
 !   data set 1
@@ -335,6 +358,24 @@ CONTAINS
         0.5167E-07,  0.5063E-07,  0.4961E-07,  0.4860E-07,  0.4761E-07/
 
 !--------------------------------------------------------------------------------
+
+#ifdef AER_RA_FEEDBACK   
+   IF ( .NOT. &
+      ( PRESENT(tauaer300) .AND. &
+        PRESENT(tauaer400) .AND. &
+        PRESENT(tauaer600) .AND. &
+        PRESENT(tauaer999) .AND. &
+        PRESENT(gaer300) .AND. &
+        PRESENT(gaer400) .AND. &
+        PRESENT(gaer600) .AND. &
+        PRESENT(gaer999) .AND. &
+        PRESENT(waer300) .AND. &
+        PRESENT(waer400) .AND. &
+        PRESENT(waer600) .AND. &
+        PRESENT(waer999) ) ) THEN
+      CALL wrf_error_fatal ( 'Warning: missing fields required for aerosol radiation' )
+   ENDIF
+#endif
    cldwater = .true.
    overcast = .false.
 
@@ -409,12 +450,23 @@ CONTAINS
          p(k)=pres(k,iprof)
       ENDDO
 
+      do k = kts,kte+1
+      do i = its,ite
+      if(k.eq.kts)then
+        phyd(i,k)=p8w3d(i,kts,j)
+      else
+        phyd(i,k)=phyd(i,k-1) - g*rho_phy(i,k-1,j)*dz8w(i,k-1,j)
+        phydmid(i,k-1)=0.5*(phyd(i,k-1)+phyd(i,k))
+      endif
+      enddo
+      enddo
+
 ! reverse vars 
 !
       DO K=kts,kte+1
       DO I=its,ite
          NK=kme-K+kms
-         P8W2D(I,K)=P8W3D(I,NK,J)*0.01   ! P8w2D is in mb
+         P8W2D(I,K)=phyd(I,NK)*0.01   ! P8w2D is in mb
       ENDDO
       ENDDO
 
@@ -434,7 +486,7 @@ CONTAINS
          cwc(I,K,2)=QC3D(I,NK,J)
          cwc(I,K,2)=max(0.,cwc(I,K,2))
 
-         P2D(I,K)=P3D(I,NK,J)*0.01      ! P2D is in mb
+         P2D(I,K)=phydmid(I,NK)*0.01      ! P2D is in mb
          fcld2D(I,K)=CLDFRA3D(I,NK,J)
       ENDDO
       ENDDO
@@ -515,8 +567,9 @@ CONTAINS
             endif
         end do
       end do
-!
-! ... Ignore aerosol effects
+
+!wig beg
+! ... Aerosol effects. Added aerosol feedbacks with MOSAIC, Dec. 2005.
 !
       do ib = 1, 11
       do k = kts-1,kte
@@ -527,6 +580,92 @@ CONTAINS
       end do
       end do
       end do
+
+#ifdef AER_RA_FEEDBACK
+!wig end
+      do ib = 1, 11
+      do k = kts-1,kte-1      !wig
+      do i = its,ite
+
+!        taual(i,kte-k,ib) = 0.
+!        ssaal(i,kte-k,ib) = 0.
+!        asyal(i,kte-k,ib) = 0.
+
+!jcb beg
+! convert optical properties at 300,400,600, and 999 to conform to the band wavelengths
+! these are: 200,235,270,287.5,302.5,305,362.5,550,1920,1745,6135; why the emphasis on the UV?
+! taual - use angstrom exponent
+        if(tauaer300(i,k+1,j).gt.thresh .and. tauaer999(i,k+1,j).gt.thresh) then
+           ang=log(tauaer300(i,k+1,j)/tauaer999(i,k+1,j))/log(999./300.)
+!       write(6,*)i,k,ang,tauaer300(i,k+1,j),tauaer999(i,k+1,j)
+           taual(i,kte-k,ib)=tauaer400(i,k+1,j)*(0.4/midbands(ib))**ang ! notice reserved variable
+!       write(6,10001)i,k,ang,tauaer300(i,k+1,j),tauaer999(i,k+1,j),midbands(ib),taual(i,k,ib)
+!10001      format(i3,i3,5f12.6)
+
+! ssa - linear interpolation; extrapolation
+           slope=(waer600(i,k+1,j)-waer400(i,k+1,j))/.2
+           ssaal(i,kte-k,ib) = slope*(midbands(ib)-.6)+waer600(i,k+1,j) ! notice reversed variables
+           if(ssaal(i,kte-k,ib).lt.0.4) ssaal(i,kte-k,ib)=0.4
+           if(ssaal(i,kte-k,ib).ge.0.9) ssaal(i,kte-k,ib)=0.9
+
+! g - linear interpolation;extrapolation
+           slope=(gaer600(i,k+1,j)-gaer400(i,k+1,j))/.2
+           asyal(i,kte-k,ib) = slope*(midbands(ib)-.6)+gaer600(i,k+1,j) ! notice reversed varaibles
+           if(asyal(i,kte-k,ib).lt.0.5) asyal(i,kte-k,ib)=0.5
+           if(asyal(i,kte-k,ib).ge.1.0) asyal(i,kte-k,ib)=1.0
+        endif
+!jcb end
+      end do
+      end do
+      end do
+
+!wig beg
+      do ib = 1, 11
+      do i = its,ite
+         slope = 0.  !use slope as a sum holder
+         do k = kts-1,kte
+            slope = slope + taual(i,k,ib)
+         end do
+         if( slope < 0. ) then
+            write(msg,'("ERROR: Negative total optical depth of ",f8.2," at point i,j,ib=",3i5)') slope,i,j,ib
+            call wrf_error_fatal(msg)
+         else if( slope > 5. ) then
+            call wrf_message("-------------------------")
+            write(msg,'("WARNING: Large total optical depth of ",f8.2," at point i,j,ib=",3i5)') slope,i,j,ib
+            call wrf_message(msg)
+
+            call wrf_message("Diagnostics 1: k, tauaer300, tauaer400, tauaer600, tauaer999")
+            do k=kts,kte
+               write(msg,'(i4,4f8.2)') k, tauaer300(i,k,ib), tauaer400(i,k,ib), &
+                    tauaer600(i,k,ib), tauaer999(i,k,ib)
+               call wrf_message(msg)
+            end do
+
+            call wrf_message("Diagnostics 2: k, gaer300, gaer400, gaer600, gaer999")
+            do k=kts,kte
+               write(msg,'(i4,4f8.2)') k, gaer300(i,k,ib), gaer400(i,k,ib), &
+                    gaer600(i,k,ib), gaer999(i,k,ib)
+               call wrf_message(msg)
+            end do
+
+            call wrf_message("Diagnostics 3: k, waer300, waer400, waer600, waer999")
+            do k=kts,kte
+               write(msg,'(i4,4f8.2)') k, waer300(i,k,ib), waer400(i,k,ib), &
+                    waer600(i,k,ib), waer999(i,k,ib)
+               call wrf_message(msg)
+            end do
+
+            call wrf_message("Diagnostics 4: k, ssaal, asyal, taual")
+            do k=kts-1,kte
+               write(msg,'(i4,3f8.2)') k, ssaal(i,k,ib), asyal(i,k,ib), taual(i,k,ib)
+               call wrf_message(msg)
+            end do
+            call wrf_message("-------------------------")
+         end if
+      end do
+      end do
+!wig end
+#endif
 !
 ! ... Initialize output arrays
 !
@@ -570,8 +709,9 @@ CONTAINS
 !
       do k = kts, kte
       do i = its, ite
-         taucldc(i,k,j)=taucld(i,k,2)
-         taucldi(i,k,j)=taucld(i,k,1)
+         nk=kme-1-k+kms
+         taucldc(i,nk,j)=taucld(i,k,2)
+         taucldi(i,nk,j)=taucld(i,k,1)
       enddo
       enddo
  
@@ -610,7 +750,7 @@ CONTAINS
 
       DO K=kts,kte          
          NK=kme-1-K+kms
-         DO I=its,ite          
+         DO I=its,ite
             RTHRATEN(I,K,J)=RTHRATEN(I,K,J)+TTEN2D(I,NK)/pi3D(I,K,J)
          ENDDO
       ENDDO

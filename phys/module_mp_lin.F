@@ -37,19 +37,20 @@ CONTAINS
 !-------------------------------------------------------------------
   SUBROUTINE lin_et_al(th                                          &
                       ,qv, ql, qr                                  &
+                      ,qi, qs                                      &
                       ,rho, pii, p                                 &
                       ,dt_in                                       &
                       ,z,ht, dz8w                                  &
                       ,grav, cp, Rair, rvapor                      &
                       ,XLS, XLV, XLF, rhowater, rhosnow            &
                       ,EP2,SVP1,SVP2,SVP3,SVPT0                    &
+                      , RAINNC, RAINNCV                            &
                       ,ids,ide, jds,jde, kds,kde                   &
                       ,ims,ime, jms,jme, kms,kme                   &
                       ,its,ite, jts,jte, kts,kte                   &
                   ! Optional 
-                      , RAINNC, RAINNCV                            &
-                      , F_QI,F_QS,F_QG                             &
-                      , qi, qs, qg                                 &
+                      , F_QG                                       &
+                      , qg                                         &
                                                                    )
 !-------------------------------------------------------------------
   IMPLICIT NONE
@@ -97,6 +98,10 @@ CONTAINS
 
   REAL, INTENT(IN   ) :: EP2,SVP1,SVP2,SVP3,SVPT0
 
+  REAL, DIMENSION( ims:ime , jms:jme ),                           &
+        INTENT(INOUT) ::                                  RAINNC, &
+                                                         RAINNCV
+
 ! Optional
 
   REAL, DIMENSION( ims:ime , kms:kme , jms:jme ),                 &
@@ -106,12 +111,7 @@ CONTAINS
                                                               qs, &
                                                               qg
 
-  REAL, DIMENSION( ims:ime , jms:jme ),                           &
-        OPTIONAL,                                                 &
-        INTENT(INOUT) ::                                  RAINNC, &
-                                                         RAINNCV
-
-  LOGICAL, INTENT(IN), OPTIONAL :: F_QI,F_QS,F_QG
+  LOGICAL, INTENT(IN), OPTIONAL :: F_QG
 
 ! LOCAL VAR
 
@@ -128,28 +128,18 @@ CONTAINS
                                                         prez, zz, &
                                                         dzw
 
-  LOGICAL flag_qi, flag_qs, flag_qg
+  LOGICAL flag_qg
 !
   REAL    ::         dt, pptrain, pptsnow, pptgraul, rhoe_s,      &
                      gindex, pptice
 
   INTEGER ::               i,j,k
 !
-   flag_qi = .false.
-   flag_qs = .false.
    flag_qg = .false.
-   IF ( PRESENT ( f_qi ) ) flag_qi = f_qi
-   IF ( PRESENT ( f_qs ) ) flag_qs = f_qs
    IF ( PRESENT ( f_qg ) ) flag_qg = f_qg
 !
    dt=dt_in
    rhoe_s=1.29
-!
-   IF ( .NOT. flag_qi .OR. .NOT. flag_qs ) THEN
-      CALL wrf_error_fatal ( &
-        'module_mp_lin: Improper use of Lin et al scheme; no ice phase. Please chose another one.')
-   ENDIF
-
    gindex=1.0
 
    IF (.not.flag_qg) gindex=0.
@@ -174,25 +164,10 @@ CONTAINS
       dzw(k)=dz8w(i,k,j)
    END DO
 
-   IF ( flag_qi .AND. PRESENT( qi ) ) THEN
       DO k = kts, kte
          qiz(k)=qi(i,k,j)
-      ENDDO
-   ELSE
-      DO k = kts, kte
-         qiz(k)=0.
-      ENDDO
-   ENDIF
-
-   IF ( flag_qs .AND. PRESENT( qs ) ) THEN
-      DO k = kts, kte
          qsz(k)=qs(i,k,j)
       ENDDO
-   ELSE
-      DO k = kts, kte
-         qsz(k)=0.
-      ENDDO
-   ENDIF
 
    IF ( flag_qg .AND. PRESENT( qg ) ) THEN
       DO k = kts, kte
@@ -228,8 +203,8 @@ CONTAINS
    graupel(i,j)=pptgraul
    ice(i,j)=pptice
 !
-   IF ( PRESENT( RAINNCV ) ) RAINNCV(i,j)= pptrain + pptsnow + pptgraul + pptice
-   IF ( PRESENT( RAINNC  ) ) RAINNC(i,j)=RAINNC(i,j) + pptrain + pptsnow + pptgraul + pptice
+   RAINNCV(i,j)= pptrain + pptsnow + pptgraul + pptice
+   RAINNC(i,j)=RAINNC(i,j) + pptrain + pptsnow + pptgraul + pptice
 
 !
 !- update data from 1-D back to 3-D
@@ -242,17 +217,10 @@ CONTAINS
       th(i,k,j)=thz(k)
    END DO
 !
-   IF ( flag_qi .AND. PRESENT( qi ) ) THEN
       DO k = kts, kte
          qi(i,k,j)=qiz(k)
-      ENDDO
-   ENDIF
-
-   IF ( flag_qs .AND. PRESENT( qs ) ) THEN
-      DO k = kts, kte
          qs(i,k,j)=qsz(k)
       ENDDO
-   ENDIF
 
    IF ( flag_qg .AND. PRESENT( qg ) ) THEN
       DO k = kts, kte

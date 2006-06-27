@@ -189,6 +189,8 @@ CONTAINS
                DTDT(k)=0.
             ENDDO
             RAINCV(I,J)=0.
+            CUTOP(I,J)=KTS
+            CUBOT(I,J)=KTE+1
 !
 ! assign vars from 3D to 1D
 
@@ -202,7 +204,6 @@ CONTAINS
                W0AVG1D(K) =W0AVG(I,K,J)
                DZ1D(k)=dz8w(I,K,J)
             ENDDO
-          CALL wrf_debug(500,'calling kf_eta_para')
             CALL KF_eta_PARA(I, J,                  &
                  U1D,V1D,T1D,QV1D,P1D,DZ1D,         &
                  W0AVG1D,DT,DX,DXSQ,RHO1D,          &
@@ -215,7 +216,6 @@ CONTAINS
                  ids,ide, jds,jde, kds,kde,         &
                  ims,ime, jms,jme, kms,kme,         &
                  its,ite, jts,jte, kts,kte)
-          CALL wrf_debug(500,'after kf_eta_para')
             IF(PRESENT(rthcuten).AND.PRESENT(rqvcuten)) THEN
               DO K=kts,kte
                  RTHCUTEN(I,K,J)=DTDT(K)/pi(I,K,J)
@@ -485,6 +485,7 @@ CONTAINS
 !
 !...DZQ IS DZ BETWEEN SIGMA SURFACES, DZA IS DZ BETWEEN MODEL HALF LEVEL
         Z0(1)=.5*DZQ(1)
+!cdir novector
         DO K=2,KL
           Z0(K)=Z0(K-1)+.5*(DZQ(K)+DZQ(K-1))
           DZA(K-1)=Z0(K)-Z0(K-1)
@@ -583,6 +584,7 @@ usl:   DO
 !...MASS-WEIGHTING THE CHARACTERISTICS OF THE INDIVIDUAL MODEL
 !...LAYERS...
 !
+!cdir novector
            DO NK=LC,KPBL
              TMIX=TMIX+DP(NK)*T0(NK)
              QMIX=QMIX+DP(NK)*Q0(NK)
@@ -2051,8 +2053,7 @@ iter:     DO NCOUNT=1,10
 !    *               U0(K),V0(K),DP(K)/100.,W0AVG(I,J,K)
  310        CONTINUE
             IF(ISTOP.EQ.1)THEN
-              CALL wrf_error_fatal (&
-                'KAIN-FRITSCH, istop=1, diags' )
+              CALL wrf_error_fatal ( 'KAIN-FRITSCH, istop=1, diags' )
             ENDIF
 !         ENDIF
   4455  format(8f11.3) 
@@ -2189,8 +2190,7 @@ iter:     DO NCOUNT=1,10
             ENDIF
           ELSE
 !              PRINT *,'THIS COMBINATION OF IMOIST, IEXICE, IICE NOT ALLOWED!'
-              CALL wrf_error_fatal ( &
-                'KAIN-FRITSCH, THIS COMBINATION OF IMOIST, IEXICE, IICE NOT ALLOWED' )
+              CALL wrf_error_fatal ( 'KAIN-FRITSCH, THIS COMBINATION OF IMOIST, IEXICE, IICE NOT ALLOWED' )
           ENDIF
           DTDT(K)=(TG(K)-T0(K))/TIMEC
           DQDT(K)=(QG(K)-Q0(K))/TIMEC

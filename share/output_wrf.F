@@ -38,6 +38,7 @@
     INTEGER grid_id , parent_id , i_parent_start , j_parent_start , parent_grid_ratio
 #endif
     CHARACTER (len=19) simulation_start_date
+    CHARACTER (len=len_current_date) current_date_save
     INTEGER simulation_start_year   , &
             simulation_start_month  , &
             simulation_start_day    , &
@@ -47,21 +48,63 @@
     INTEGER rc
     INTEGER :: io_form
     LOGICAL, EXTERNAL :: multi_files
+    INTEGER, EXTERNAL :: use_package
 
     CHARACTER*256 message
     CHARACTER*80  fname
     CHARACTER*80  char_junk
     INTEGER    ibuf(1)
     REAL       rbuf(1)
-    TYPE(WRF_UTIL_TimeInterval) :: bdy_increment
-    TYPE(WRF_UTIL_Time)         :: next_time, current_time
+    TYPE(WRFU_TimeInterval) :: bdy_increment
+    TYPE(WRFU_Time)         :: next_time, currentTime, startTime
     CHARACTER*40            :: next_datestr
     INTEGER :: start_year , start_month , start_day , start_hour , start_minute , start_second
+    LOGICAL :: adjust
+
+    WRITE(wrf_err_message,*)'output_wrf: begin, fid = ',fid
+    CALL wrf_debug( 300 , wrf_err_message )
 
     CALL wrf_inquire_filename ( fid , fname , filestate , ierr )
     IF ( ierr /= 0 ) THEN
       WRITE(wrf_err_message,*)'module_io_wrf: output_wrf: wrf_inquire_filename Status = ',ierr
       CALL wrf_error_fatal( wrf_err_message )
+    ENDIF
+
+    WRITE(wrf_err_message,*)'output_wrf: fid,filestate = ',fid,filestate
+    CALL wrf_debug( 300 , wrf_err_message )
+
+    ! io_form is used to determine if multi-file I/O is enabled and to 
+    ! control writing of format-specific time-independent metadata
+    IF ( switch .EQ. model_input_only ) THEN
+      CALL nl_get_io_form_input( 1, io_form )
+    ELSE IF ( switch .EQ. aux_model_input1_only ) THEN
+      CALL nl_get_io_form_auxinput1( 1, io_form )
+    ELSE IF ( switch .EQ. aux_model_input2_only ) THEN
+      CALL nl_get_io_form_auxinput2( 1, io_form )
+    ELSE IF ( switch .EQ. aux_model_input3_only ) THEN
+      CALL nl_get_io_form_auxinput3( 1, io_form )
+    ELSE IF ( switch .EQ. aux_model_input4_only ) THEN
+      CALL nl_get_io_form_auxinput4( 1, io_form )
+    ELSE IF ( switch .EQ. aux_model_input5_only ) THEN
+      CALL nl_get_io_form_auxinput5( 1, io_form )
+    ELSE IF ( switch .EQ. history_only ) THEN
+      CALL nl_get_io_form_history( 1, io_form )
+    ELSE IF ( switch .EQ. aux_hist1_only ) THEN
+      CALL nl_get_io_form_auxhist1( 1, io_form )
+    ELSE IF ( switch .EQ. aux_hist2_only ) THEN
+      CALL nl_get_io_form_auxhist2( 1, io_form )
+    ELSE IF ( switch .EQ. aux_hist3_only ) THEN
+      CALL nl_get_io_form_auxhist3( 1, io_form )
+    ELSE IF ( switch .EQ. aux_hist4_only ) THEN
+      CALL nl_get_io_form_auxhist4( 1, io_form )
+    ELSE IF ( switch .EQ. aux_hist5_only ) THEN
+      CALL nl_get_io_form_auxhist5( 1, io_form )
+    ELSE IF ( switch .EQ. restart_only ) THEN
+      CALL nl_get_io_form_restart( 1, io_form )
+    ELSE IF ( switch .EQ. boundary_only ) THEN
+      CALL nl_get_io_form_boundary( 1, io_form )
+    ELSE  ! default:  use history
+      CALL nl_get_io_form_history( 1, io_form )
     ENDIF
 
     dryrun       = ( filestate .EQ. WRF_FILE_OPENED_NOT_COMMITTED )
@@ -109,15 +152,21 @@
     CALL nl_get_parent_grid_ratio ( grid%id , parent_grid_ratio )
 #endif
 
-    CALL wrf_clockprint(150, grid%domain_clock, &
-                        'DEBUG output_wrf():  before call to WRF_UTIL_ClockGet,')
-    CALL WRF_UTIL_ClockGet( grid%domain_clock, currTime=current_time, rc=rc )
-    CALL wrf_timetoa ( current_time, current_date )
+    CALL domain_clockprint(150, grid, &
+           'DEBUG output_wrf():  before call to domain_clock_get,')
+    CALL domain_clock_get( grid, current_time=currentTime, &
+                                 start_time=startTime,     &
+                                 current_timestr=current_date )
     WRITE ( wrf_err_message , * ) 'output_wrf: begin, current_date=',current_date
     CALL wrf_debug ( 300 , wrf_err_message )
 
     WRITE( message , * ) "OUTPUT FROM " , TRIM(program_name)
     CALL wrf_put_dom_ti_char ( fid , 'TITLE' , TRIM(message) , ierr )
+    ! added grib-specific metadata:  Todd Hutchinson 8/21/2005
+    IF ( ( use_package( io_form ) == IO_GRIB1 ) .OR. &
+         ( use_package( io_form ) == IO_GRIB2 ) ) THEN
+      CALL wrf_put_dom_ti_char ( fid, 'PROGRAM_NAME', TRIM(program_name) , ierr )
+    ENDIF
     CALL nl_get_start_year(grid%id,start_year)
     CALL nl_get_start_month(grid%id,start_month)
     CALL nl_get_start_day(grid%id,start_day)
@@ -150,6 +199,11 @@
 
     ibuf(1) = config_flags%e_vert - config_flags%s_vert + 1
     CALL wrf_put_dom_ti_integer ( fid , 'BOTTOM-TOP_GRID_DIMENSION' , ibuf , 1 , ierr )
+
+#if (EM_CORE == 1)
+    CALL wrf_put_dom_ti_real ( fid , 'DX' , config_flags%dx , 1 , ierr )
+    CALL wrf_put_dom_ti_real ( fid , 'DY' , config_flags%dy , 1 , ierr )
+#endif
 
 ! added this metadatum for H. Chuan, NCEP, 030417, JM
     SELECT CASE ( dyn_opt )
@@ -200,37 +254,6 @@
 ! added these fields for use by reassembly programs , 010831, JM
 ! modified these fields so "patch" == "domain" when multi-file output 
 ! formats are not used.  051018, TBH
-    IF ( switch .EQ. model_input_only ) THEN
-      CALL nl_get_io_form_input( 1, io_form )
-    ELSE IF ( switch .EQ. aux_model_input1_only ) THEN
-      CALL nl_get_io_form_auxinput1( 1, io_form )
-    ELSE IF ( switch .EQ. aux_model_input2_only ) THEN
-      CALL nl_get_io_form_auxinput2( 1, io_form )
-    ELSE IF ( switch .EQ. aux_model_input3_only ) THEN
-      CALL nl_get_io_form_auxinput3( 1, io_form )
-    ELSE IF ( switch .EQ. aux_model_input4_only ) THEN
-      CALL nl_get_io_form_auxinput4( 1, io_form )
-    ELSE IF ( switch .EQ. aux_model_input5_only ) THEN
-      CALL nl_get_io_form_auxinput5( 1, io_form )
-    ELSE IF ( switch .EQ. history_only ) THEN
-      CALL nl_get_io_form_history( 1, io_form )
-    ELSE IF ( switch .EQ. aux_hist1_only ) THEN
-      CALL nl_get_io_form_auxhist1( 1, io_form )
-    ELSE IF ( switch .EQ. aux_hist2_only ) THEN
-      CALL nl_get_io_form_auxhist2( 1, io_form )
-    ELSE IF ( switch .EQ. aux_hist3_only ) THEN
-      CALL nl_get_io_form_auxhist3( 1, io_form )
-    ELSE IF ( switch .EQ. aux_hist4_only ) THEN
-      CALL nl_get_io_form_auxhist4( 1, io_form )
-    ELSE IF ( switch .EQ. aux_hist5_only ) THEN
-      CALL nl_get_io_form_auxhist5( 1, io_form )
-    ELSE IF ( switch .EQ. restart_only ) THEN
-      CALL nl_get_io_form_restart( 1, io_form )
-    ELSE IF ( switch .EQ. boundary_only ) THEN
-      CALL nl_get_io_form_boundary( 1, io_form )
-    ELSE  ! default:  use history
-      CALL nl_get_io_form_history( 1, io_form )
-    ENDIF
 
     ibuf(1) = MAX(ips,ids)
     IF ( .NOT. multi_files ( io_form ) ) ibuf(1) = ids
@@ -284,8 +307,10 @@
 
 ! end add 010831 JM
 
+#if (EM_CORE != 1)
     CALL wrf_put_dom_ti_real ( fid , 'DX' ,  config_flags%dx , 1 , ierr )
     CALL wrf_put_dom_ti_real ( fid , 'DY' ,  config_flags%dy , 1 , ierr )
+#endif
     CALL wrf_put_dom_ti_real ( fid , 'DT' ,  config_flags%dt , 1 , ierr )
     CALL wrf_put_dom_ti_real ( fid , 'CEN_LAT' ,  config_flags%cen_lat , 1 , ierr )
     CALL wrf_put_dom_ti_real ( fid , 'CEN_LON' ,  config_flags%cen_lon , 1 , ierr )
@@ -298,6 +323,11 @@
       CALL wrf_put_dom_ti_integer ( fid , 'JULYR' ,  config_flags%julyr , 1 , ierr )
       CALL wrf_put_dom_ti_integer ( fid , 'JULDAY' ,  config_flags%julday , 1 , ierr )
     ENDIF
+#if (NMM_CORE == 1)
+        write(0,*) 'MMINLU would be: ', MMINLU(1:4)
+        MMINLU(1:4)='USGS'
+        write(0,*) 'MMINLU now: ', MMINLU(1:4)
+#endif
     CALL wrf_put_dom_ti_integer ( fid , 'MAP_PROJ' ,  config_flags%map_proj , 1 , ierr )
     CALL wrf_put_dom_ti_char ( fid , 'MMINLU',  mminlu(1:4) , ierr )
     CALL wrf_put_dom_ti_integer ( fid , 'ISWATER' ,  config_flags%iswater , 1 , ierr )
@@ -310,13 +340,23 @@
 
 
     IF ( switch .EQ. boundary_only ) THEN
-        CALL WRF_UTIL_TimeIntervalSet( bdy_increment, S=NINT(config_flags%bdyfrq),rc=rc)
-        next_time = current_time + bdy_increment
+        CALL WRFU_TimeIntervalSet( bdy_increment, S=NINT(config_flags%bdyfrq),rc=rc)
+        next_time = currentTime + bdy_increment
         CALL wrf_timetoa ( next_time, next_datestr )
         CALL wrf_put_dom_td_char ( fid , 'THISBDYTIME' ,  current_date(1:19), current_date(1:19), ierr )
         CALL wrf_put_dom_td_char ( fid , 'NEXTBDYTIME' ,  current_date(1:19), next_datestr(1:19), ierr )
     ENDIF
 
+    ! added grib2-specific metadata:  Todd Hutchinson 8/21/2005
+    IF ( use_package( io_form ) == IO_GRIB2 ) THEN
+      CALL wrf_put_dom_ti_integer ( fid , 'BACKGROUND_PROC_ID' , config_flags%background_proc_id , 1 , ierr )
+      CALL wrf_put_dom_ti_integer ( fid , 'FORECAST_PROC_ID' , config_flags%forecast_proc_id , 1 , ierr )
+      CALL wrf_put_dom_ti_integer ( fid , 'PRODUCTION_STATUS' , config_flags%production_status , 1 , ierr )
+      CALL wrf_put_dom_ti_integer ( fid , 'COMPRESSION' , config_flags%compression , 1 , ierr )
+    ENDIF
+
+    CALL nl_get_adjust_output_times( grid%id, adjust ) 
+    current_date_save = current_date
 #if 1
     IF ( switch .EQ. model_input_only ) THEN
       CALL wrf_debug ( 300 , 'output_wrf: calling code in wrf_inputout.inc' )
@@ -338,21 +378,27 @@
       CALL wrf_auxinput5out( fid , grid , config_flags, switch, dryrun,  ierr )
     ELSE IF ( switch .EQ. history_only ) THEN
       CALL wrf_debug ( 300 , 'output_wrf: calling code in wrf_histout.inc' )
+      IF ( adjust ) CALL adjust_io_timestr( grid%io_intervals( HISTORY_ALARM ), currentTime, startTime, current_date )
       CALL wrf_histout( fid , grid , config_flags, switch, dryrun,  ierr )
     ELSE IF ( switch .EQ. aux_hist1_only ) THEN
       CALL wrf_debug ( 300 , 'output_wrf: calling wrf_auxhist1out' )
+      IF ( adjust ) CALL adjust_io_timestr( grid%io_intervals( AUXHIST1_ALARM ), currentTime, startTime, current_date )
       CALL wrf_auxhist1out( fid , grid , config_flags, switch, dryrun,  ierr )
     ELSE IF ( switch .EQ. aux_hist2_only ) THEN
       CALL wrf_debug ( 300 , 'output_wrf: calling code in wrf_auxhist2out.inc' )
+      IF ( adjust ) CALL adjust_io_timestr( grid%io_intervals( AUXHIST2_ALARM ), currentTime, startTime, current_date )
       CALL wrf_auxhist2out( fid , grid , config_flags, switch, dryrun,  ierr )
     ELSE IF ( switch .EQ. aux_hist3_only ) THEN
       CALL wrf_debug ( 300 , 'output_wrf: calling code in wrf_auxhist3out.inc' )
+      IF ( adjust ) CALL adjust_io_timestr( grid%io_intervals( AUXHIST3_ALARM ), currentTime, startTime, current_date )
       CALL wrf_auxhist3out( fid , grid , config_flags, switch, dryrun,  ierr )
     ELSE IF ( switch .EQ. aux_hist4_only ) THEN
       CALL wrf_debug ( 300 , 'output_wrf: calling code in wrf_auxhist1out.inc' )
+      IF ( adjust ) CALL adjust_io_timestr( grid%io_intervals( AUXHIST4_ALARM ), currentTime, startTime, current_date )
       CALL wrf_auxhist4out( fid , grid , config_flags, switch, dryrun,  ierr )
     ELSE IF ( switch .EQ. aux_hist5_only ) THEN
       CALL wrf_debug ( 300 , 'output_wrf: calling code in wrf_auxhist4out.inc' )
+      IF ( adjust ) CALL adjust_io_timestr( grid%io_intervals( AUXHIST5_ALARM ), currentTime, startTime, current_date )
       CALL wrf_auxhist5out( fid , grid , config_flags, switch, dryrun,  ierr )
     ELSE IF ( switch .EQ. restart_only ) THEN
       CALL wrf_debug ( 300 , 'output_wrf: calling code in wrf_restartout.inc' )
@@ -364,6 +410,7 @@
 #else
     CALL wrf_message ( "ALL I/O DISABLED IN share/module_io_wrf.F")
 #endif
+    current_date = current_date_save
 
     IF ( .NOT. dryrun ) THEN
        CALL wrf_debug ( 300 , 'output_wrf: calling wrf_iosync ' )
@@ -371,6 +418,8 @@
        CALL wrf_debug ( 300 , 'output_wrf: back from wrf_iosync ' )
     ENDIF
 
-    CALL wrf_debug ( 300 , 'output_wrf: returning from ' )
+    WRITE(wrf_err_message,*)'output_wrf: end, fid = ',fid
+    CALL wrf_debug( 300 , wrf_err_message )
+
     RETURN
   END SUBROUTINE output_wrf

@@ -35,15 +35,16 @@ CONTAINS
                          RTHRATEN,RTHRATENLW,RTHRATENSW,         &
                          STEPBL,STEPRA,STEPCU,                   &
                          W0AVG, RAINNC, RAINC, RAINCV, RAINNCV,  &
-                         NCA,                                    &
+                         NCA,swrad_scat,                         &
                          CLDEFI,LOWLYR,                          &
                          MASS_FLUX,                              &
                          RTHFTEN, RQVFTEN,                       &
                          CLDFRA,GLW,GSW,EMISS,LU_INDEX,          &
                          XLAT,XLONG,ALBEDO,ALBBCK,GMT,JULYR,JULDAY,&
                          TMN,XLAND,ZNT,Z0,UST,MOL,PBLH,TKE_MYJ,  &
-                         EXCH_H,THC,SNOWC,MAVAIL,HFX,QFX,RAINBL,        &
+                         EXCH_H,THC,SNOWC,MAVAIL,HFX,QFX,RAINBL, &
                          TSLB,ZS,DZS,num_soil_layers,warm_rain,  & 
+                         adv_moist_cond,                         &
                          APR_GR,APR_W,APR_MC,APR_ST,APR_AS,      &
                          APR_CAPMA,APR_CAPME,APR_CAPMI,          &
                          XICE,VEGFRA,SNOW,CANWAT,SMSTAV,         &
@@ -65,7 +66,7 @@ CONTAINS
    TYPE (grid_config_rec_type)              :: config_flags
 
    INTEGER , INTENT(IN)        :: id
-   LOGICAL , INTENT(OUT)       :: warm_rain
+   LOGICAL , INTENT(OUT)       :: warm_rain, adv_moist_cond
 !   LOGICAL , INTENT (IN)       :: FNDSOILW, FNDSNOWH
    LOGICAL, PARAMETER          :: FNDSOILW=.true., FNDSNOWH=.true.
    INTEGER , INTENT(IN)        :: ids, ide, jds, jde, kds, kde,  &
@@ -76,6 +77,7 @@ CONTAINS
 
    REAL,     INTENT(IN)        :: DT, p_top, DX, DY
    REAL,     INTENT(IN)        :: RADT,BLDT,CUDT,MPDT
+   REAL,     INTENT(IN)        :: swrad_scat
 
    REAL,     DIMENSION( kms:kme ) , INTENT(IN) :: zfull, zhalf
    REAL,     DIMENSION( ims:ime , jms:jme ) , INTENT(IN) :: TSK, XLAT, XLONG
@@ -176,6 +178,7 @@ CONTAINS
    LOGICAL :: restart
    INTEGER :: hr, min, sec, ms, rc
 integer myproc
+   TYPE (WRFU_Time) :: currentTime
 
 !-----------------------------------------------------------------
 
@@ -191,12 +194,12 @@ integer myproc
 
    IF ( .NOT. grid%restart ) THEN
      restart = .false.
-     CALL wrf_clockprint(150, grid%domain_clock, &
-                         'DEBUG phy_init():  get currTime from grid%domain_clock,')
-     CALL WRF_UTIL_ClockGet( grid%domain_clock, currTime=grid%current_time, rc=rc )
-     CALL WRF_UTIL_TimeGet( grid%current_time, YY=julyr, dayOfYear=julday, H=hr, M=min, S=sec, MS=ms, rc=rc)
-     CALL wrf_timetoa ( grid%current_time, message )
-     WRITE( wrf_err_message , * ) 'DEBUG phy_init():  currTime = [',TRIM( message ),']'
+     CALL domain_clockprint(150, grid, &
+            'DEBUG phy_init():  get currentTime from grid')
+     CALL domain_clock_get( grid, current_time=currentTime, &
+                            current_timestr=message )
+     CALL WRFU_TimeGet( currentTime, YY=julyr, dayOfYear=julday, H=hr, M=min, S=sec, MS=ms, rc=rc)
+     WRITE( wrf_err_message , * ) 'DEBUG phy_init():  currentTime = [',TRIM( message ),']'
      CALL wrf_debug( 150, TRIM(wrf_err_message) )
      gmt=hr+real(min)/60.+real(sec)/3600.+real(ms)/(1000*3600)
      WRITE( wrf_err_message , * ) 'DEBUG phy_init():  julyr,hr,min,sec,ms,julday = ', &
@@ -209,6 +212,21 @@ integer myproc
      CALL nl_get_julyr (id, julyr)
      CALL nl_get_julday (id, julday)
      CALL nl_get_gmt (id, gmt)
+#if (NMM_CORE == 1)
+     CALL domain_clockprint(150, grid, &
+            'DEBUG phy_init():  get currentTime from grid')
+     CALL domain_clock_get( grid, current_time=currentTime, &
+                            current_timestr=message )
+     CALL WRFU_TimeGet( currentTime, YY=julyr, dayOfYear=julday, H=hr, M=min, S=sec, MS=ms, rc=rc)
+     WRITE( wrf_err_message , * ) 'DEBUG phy_init():  currentTime = [',TRIM( message ),']'
+     CALL wrf_debug( 150, TRIM(wrf_err_message) )
+     gmt=hr+real(min)/60.+real(sec)/3600.+real(ms)/(1000*3600)
+     WRITE( wrf_err_message , * ) 'DEBUG phy_init():  julyr,hr,min,sec,ms,julday = ', &
+                                  julyr,hr,min,sec,ms,julday
+     CALL wrf_debug( 150, TRIM(wrf_err_message) )
+     WRITE( wrf_err_message , * ) 'DEBUG phy_init():  gmt = ',gmt
+     CALL wrf_debug( 150, TRIM(wrf_err_message) )
+#endif
    END IF
 
    ZZLND=0.1
@@ -240,6 +258,7 @@ integer myproc
       QFX(i,j)=0.
       RAINBL(i,j)=0.
       RAINNCV(i,j)=0.
+      ACSNOW(i,j)=0.
    ENDDO
    ENDDO
    ENDIF
@@ -268,6 +287,7 @@ integer myproc
 #endif
        MAVAIL(i,j)=1.0 
      ENDIF
+
    ENDDO
    ENDDO
 
@@ -278,11 +298,15 @@ integer myproc
 
      CALL landuse_init(lu_index, snowc, albedo, albbck, mavail, emiss,      &
                 znt, Z0, thc, xland, xice, julday, cen_lat, iswater, mminlu_loc,  &
+                grid%landuse_ISICE, grid%landuse_LUCATS,            &
+                grid%landuse_LUSEAS, grid%landuse_ISN,              &
+                grid%lu_state,                                      &
                 allowed_to_read , usebgalb ,                        &
                 ids, ide, jds, jde, kds, kde,                       &
                 ims, ime, jms, jme, kms, kme,                       &
                 its, ite, jts, jte, kts, kte                       ) 
    ENDIF
+
   ENDIF
 
 !-- convert zfull and zhalf to sigma values for ra_init (Eta CO2 needs these)
@@ -302,7 +326,7 @@ integer myproc
 
    CALL ra_init(grid,STEPRA,RADT,DT,RTHRATEN,RTHRATENLW,             &
                 RTHRATENSW,CLDFRA,EMISS,cen_lat,JULYR,JULDAY,GMT,    &
-                sfull,shalf,pptop,                              &
+                sfull,shalf,pptop,swrad_scat,                   &
                 config_flags,restart,                           & 
                 allowed_to_read ,                                   &
                 ids, ide, jds, jde, kds, kde,                   &
@@ -347,6 +371,7 @@ integer myproc
    CALL wrf_debug ( 200 , 'module_start: phy_init: Before call to mp_init' )
 
    CALL mp_init(RAINNC,config_flags,restart,warm_rain,          &
+                adv_moist_cond,                                 &
                 MPDT, DT, DX, DY, LOWLYR,                       & 
                 F_ICE_PHY,F_RAIN_PHY,F_RIMEF_PHY,               &
                 mp_restart_state,tbpvs_state,tbpvs0_state,       &
@@ -363,6 +388,8 @@ integer myproc
 !=====================================================================
    SUBROUTINE landuse_init(lu_index, snowc, albedo, albbck, mavail, emiss,  &
                 znt,Z0,thc,xland, xice, julday, cen_lat, iswater, mminlu, &
+                ISICE, LUCATS, LUSEAS, ISN,                         &
+                lu_state,                                           &
                 allowed_to_read , usebgalb ,                        &
                 ids, ide, jds, jde, kds, kde,                       &
                 ims, ime, jms, jme, kms, kme,                       &
@@ -382,29 +409,52 @@ integer myproc
    LOGICAL,  INTENT(IN)           :: allowed_to_read , usebgalb
    REAL,     DIMENSION( ims:ime , jms:jme ) , INTENT(IN   ) :: lu_index, snowc, xice
    REAL,     DIMENSION( ims:ime , jms:jme ) , INTENT(OUT  ) :: albedo, albbck, mavail, emiss, &
-                                                         znt, Z0, thc, xland
+                                                               znt, Z0, thc, xland
+   INTEGER , INTENT(INOUT)  :: ISICE, LUCATS, LUSEAS, ISN
+   REAL    , INTENT(INOUT)  , DIMENSION( : ) :: lu_state
 
 !---------------------------------------------------------------------
 ! Local
    CHARACTER*4 LUTYPE
    CHARACTER*80 :: message
    INTEGER  :: landuse_unit, LS, LC, LI, LUN, NSN
-   INTEGER  :: i, j, itf, jtf, is
-   INTEGER , PARAMETER :: max_cats = 100 , max_seas = 12 
+   INTEGER  :: i, j, itf, jtf, is, cats, seas, curs
    INTEGER , PARAMETER :: OPEN_OK = 0
    INTEGER :: ierr
+   INTEGER , PARAMETER :: max_cats = 100 , max_seas = 12 
+   REAL    , DIMENSION( max_cats, max_seas ) :: ALBD, SLMO, SFEM, SFZ0, THERIN, SFHC
+   REAL    , DIMENSION( max_cats )     :: SCFX
 ! save these fields in case nest moves or has to be reinitialized
 ! and this routine is called with allowed_to_read set to false
 ! note that by saving these, we're locking in the same landuse for
 ! the duration of a run; possible implications for long climate runs
-   INTEGER , SAVE :: ISICE, LUCATS, LUSEAS, ISN
-   REAL    , SAVE , DIMENSION( max_cats, max_seas ) :: ALBD, SLMO, SFEM, SFZ0, THERIN, SFHC
-   REAL    , SAVE , DIMENSION( max_cats )     :: SCFX
-   LOGICAL :: FOUND_LU
+   LOGICAL :: found_lu, end_of_file
    LOGICAL, EXTERNAL :: wrf_dm_on_monitor
 
 !---------------------------------------------------------------------
    CALL wrf_debug( 100 , 'top of landuse_init' )
+
+! recover LU variables from state
+   IF ( 6*(max_cats*max_seas)+1*max_cats .GT. 7501 ) THEN
+      WRITE(message,*)'landuse_init: lu_state overflow. Make Registry dimspec p > ',6*(max_cats*max_seas)+1*max_cats
+   ENDIF
+   curs = 1
+   DO cats = 1, max_cats
+     SCFX(cats) =           lu_state(curs)         ; curs = curs + 1
+     DO seas = 1, max_seas
+       ALBD(cats,seas) =    lu_state(curs)         ; curs = curs + 1
+       SLMO(cats,seas) =    lu_state(curs)         ; curs = curs + 1
+       SFEM(cats,seas) =    lu_state(curs)         ; curs = curs + 1
+       SFZ0(cats,seas) =    lu_state(curs)         ; curs = curs + 1
+       SFHC(cats,seas) =    lu_state(curs)         ; curs = curs + 1
+       THERIN(cats,seas) =  lu_state(curs)         ; curs = curs + 1
+     ENDDO
+   ENDDO
+
+! Determine season (summer=1, winter=2)
+   ISN=1                                                            
+   IF(JULDAY.LT.105.OR.JULDAY.GT.288)ISN=2                         
+   IF(CEN_LAT.LT.0.0)ISN=3-ISN                                   
 
    FOUND_LU = .TRUE.
    IF ( allowed_to_read ) THEN
@@ -417,10 +467,6 @@ integer myproc
           CALL wrf_error_fatal ( message ) 
         END IF
       ENDIF
-! Determine season (summer=1, winter=2)
-      ISN=1                                                            
-      IF(JULDAY.LT.105.OR.JULDAY.GT.288)ISN=2                         
-      IF(CEN_LAT.LT.0.0)ISN=3-ISN                                   
 
 ! Read info from file LANDUSE.TBL
       IF(MMINLU.EQ.'OLD ')THEN
@@ -438,16 +484,25 @@ integer myproc
       ENDIF
       PRINT *, 'INPUT LANDUSE = ',MMINLU
       FOUND_LU = .FALSE.
- 1999   CONTINUE                                                      
-      if ( wrf_dm_on_monitor() ) then
-        READ (landuse_unit,2000,END=2001)LUTYPE                                
-        READ (landuse_unit,*)LUCATS,LUSEAS                                    
+      end_of_file = .FALSE.
+!!! BEGINNING OF 1999 LOOP
+ 1999 CONTINUE                                                      
+      IF ( wrf_dm_on_monitor() ) THEN
+        READ (landuse_unit,2000,END=2002)LUTYPE                                
+        GOTO 2003
+ 2002   CONTINUE
+        CALL wrf_message( 'INPUT FILE FOR LANDUSE REACHED END OF FILE' )
+        end_of_file = .TRUE.
+ 2003   CONTINUE
+        IF ( .NOT. end_of_file ) READ (landuse_unit,*)LUCATS,LUSEAS                                    
         FOUND_LU = LUTYPE.EQ.MMINLU
-      endif
-      CALL wrf_dm_bcast_string(lutype, 4)
-      CALL wrf_dm_bcast_bytes (lucats,  IWORDSIZE )
-      CALL wrf_dm_bcast_bytes (luseas,  IWORDSIZE )
-      CALL wrf_dm_bcast_bytes (found_lu,  LWORDSIZE )
+      ENDIF
+      CALL wrf_dm_bcast_bytes (end_of_file, LWORDSIZE )
+      IF ( .NOT. end_of_file ) THEN
+        CALL wrf_dm_bcast_string(lutype, 4)
+        CALL wrf_dm_bcast_bytes (lucats,  IWORDSIZE )
+        CALL wrf_dm_bcast_bytes (luseas,  IWORDSIZE )
+        CALL wrf_dm_bcast_bytes (found_lu,  LWORDSIZE )
  2000   FORMAT (A4)                                                
         IF(FOUND_LU)THEN                                  
           LUN=LUCATS                                             
@@ -457,12 +512,12 @@ integer myproc
                    ' WATER CATEGORY = ',ISWATER,               &
                    ' SNOW CATEGORY = ',ISICE                
         ENDIF                                             
-        DO LS=1,LUSEAS                                   
+        DO ls=1,luseas                                   
           if ( wrf_dm_on_monitor() ) then
             READ (landuse_unit,*)                                   
           endif
           DO LC=1,LUCATS                               
-            IF(FOUND_LU)THEN                  
+            IF(found_lu)THEN                  
               IF ( wrf_dm_on_monitor() ) THEN
                 READ (landuse_unit,*)LI,ALBD(LC,LS),SLMO(LC,LS),SFEM(LC,LS),        &       
                            SFZ0(LC,LS),THERIN(LC,LS),SCFX(LC),SFHC(LC,LS)       
@@ -486,13 +541,15 @@ integer myproc
         CALL wrf_dm_bcast_bytes (therin, max_cats * max_seas * RWORDSIZE )
         CALL wrf_dm_bcast_bytes (sfhc,   max_cats * max_seas * RWORDSIZE )
         CALL wrf_dm_bcast_bytes (scfx,   max_cats *            RWORDSIZE )
+      ENDIF
 
-        IF(.NOT. FOUND_LU) GOTO 1999
- 2001   CONTINUE                                                      
-        IF(.NOT. FOUND_LU)THEN                                         
-          CALL wrf_message ( 'LANDUSE IN INPUT FILE DOES NOT MATCH LUTABLE: TABLE NOT USED' )
-        ENDIF                                                     
-     ENDIF  ! allowed_to_read
+      IF(.NOT. found_lu .AND. .NOT. end_of_file ) GOTO 1999
+!!! END OF 1999 LOOP
+
+      IF(.NOT. found_lu .OR. end_of_file )THEN                                         
+        CALL wrf_message ( 'LANDUSE IN INPUT FILE DOES NOT MATCH LUTABLE: TABLE NOT USED' )
+      ENDIF                                                     
+    ENDIF  ! allowed_to_read
 
     IF(FOUND_LU)THEN
 ! Set arrays according to lu_index
@@ -543,13 +600,28 @@ integer myproc
     endif
     CALL wrf_debug( 100 , 'returning from of landuse_init' )
 
+! restore LU variables from state
+    curs = 1
+    DO cats = 1, max_cats
+      lu_state(curs) = SCFX(cats)                 ; curs = curs + 1
+      DO seas = 1, max_seas
+        lu_state(curs) = ALBD(cats,seas)          ; curs = curs + 1
+        lu_state(curs) = SLMO(cats,seas)          ; curs = curs + 1
+        lu_state(curs) = SFEM(cats,seas)          ; curs = curs + 1
+        lu_state(curs) = SFZ0(cats,seas)          ; curs = curs + 1
+        lu_state(curs) = SFHC(cats,seas)          ; curs = curs + 1
+        lu_state(curs) = THERIN(cats,seas)        ; curs = curs + 1
+      ENDDO
+    ENDDO
+
     RETURN
         
    END SUBROUTINE landuse_init 
-!===================================================================== 
+
+!=====================================================================
    SUBROUTINE ra_init(grid,STEPRA,RADT,DT,RTHRATEN,RTHRATENLW,       & 
                       RTHRATENSW,CLDFRA,EMISS,cen_lat,JULYR,JULDAY,GMT,    &
-                      sfull,shalf,pptop,                             &
+                      sfull,shalf,pptop,swrad_scat,                  &
                       config_flags,restart,                          & 
                       allowed_to_read ,                              &
                       ids, ide, jds, jde, kds, kde,                  &
@@ -574,7 +646,8 @@ integer myproc
                                      its, ite, jts, jte, kts, kte
 
    INTEGER , INTENT(IN)           :: JULDAY,JULYR
-   REAL ,    INTENT(IN)           :: DT, RADT, cen_lat, GMT, pptop
+   REAL ,    INTENT(IN)           :: DT, RADT, cen_lat, GMT, pptop,  &
+                                     swrad_scat
 
    INTEGER , INTENT(INOUT)        :: STEPRA
    INTEGER :: isn
@@ -587,6 +660,7 @@ integer myproc
                                                              CLDFRA
    REAL , DIMENSION( ims:ime , jms:jme ) , INTENT(INOUT) :: EMISS
    LOGICAL :: etalw = .false.
+   LOGICAL :: etamp = .false.
    integer :: month,iday
 !---------------------------------------------------------------------
 
@@ -595,6 +669,14 @@ integer myproc
     STEPRA = nint(RADT*60./DT)
     STEPRA = max(STEPRA,1)
 
+!-- find out which microphysics option is used first
+
+   mp_select: SELECT CASE(config_flags%mp_physics)
+
+        CASE (ETAMPNEW)
+             etamp = .true.
+
+   END SELECT mp_select
 
 !-- chose long wave radiation scheme
  
@@ -608,13 +690,16 @@ integer myproc
                            ims, ime, jms, jme, kms, kme,    &
                            its, ite, jts, jte, kts, kte     )
         CASE (GFDLLWSCHEME)
+            if(.not. etamp)CALL wrf_error_fatal &
+            ( 'module_physics_init: use Ferrier mp scheme for this lw radiation option' )
              CALL nl_get_start_month(grid%id,month)
              CALL nl_get_start_day(grid%id,iday)
-             CALL gfdletainit(emiss,sfull,shalf,pptop,JULYR,MONTH,IDAY,GMT,&
-                           config_flags,allowed_to_read ,            &
-                           ids, ide, jds, jde, kds, kde,    &
-                           ims, ime, jms, jme, kms, kme,    &
-                           its, ite, jts, jte, kts, kte     )
+             CALL gfdletainit(emiss,sfull,shalf,pptop,      &
+                              julyr,month,iday,gmt,         &
+                              config_flags,allowed_to_read, &
+                              ids, ide, jds, jde, kds, kde, &
+                              ims, ime, jms, jme, kms, kme, &
+                              its, ite, jts, jte, kts, kte  )
              etalw = .true.
         CASE DEFAULT
 
@@ -625,6 +710,7 @@ integer myproc
 
         CASE (SWRADSCHEME)
              CALL swinit(RTHRATEN,RTHRATENSW,              &
+                         swrad_scat,                       &
                          restart,                          &
                          allowed_to_read ,                 &
                          ids, ide, jds, jde, kds, kde,     &
@@ -635,14 +721,17 @@ integer myproc
              CALL gsfc_swinit(cen_lat, allowed_to_read )
 
         CASE (GFDLSWSCHEME)
+            if(.not. etamp)CALL wrf_error_fatal &
+            ( 'module_physics_init: use Ferrier mp scheme for this sw radiation option' )
              IF(.not.etalw)THEN
              CALL nl_get_start_month(grid%id,month)
              CALL nl_get_start_day(grid%id,iday)
-             CALL gfdletainit(emiss,sfull,shalf,pptop,JULYR,MONTH,IDAY,GMT,&
-                           config_flags,allowed_to_read,             &
-                           ids, ide, jds, jde, kds, kde,    &
-                           ims, ime, jms, jme, kms, kme,    &
-                           its, ite, jts, jte, kts, kte     )
+             CALL gfdletainit(emiss,sfull,shalf,pptop,      &
+                              julyr,month,iday,gmt,         &
+                              config_flags,allowed_to_read, &
+                              ids, ide, jds, jde, kds, kde, &
+                              ims, ime, jms, jme, kms, kme, &
+                              its, ite, jts, jte, kts, kte  )
              ENDIF
 
         CASE DEFAULT
@@ -779,11 +868,13 @@ integer myproc
            isfc = 2
 
       CASE (GFSSFCSCHEME)
+           CALL myjsfcinit(LOWLYR,UST,                         &
 #if ( NMM_CORE == 1 )
-           CALL myjsfcinit(LOWLYR,UST,Z0,XLAND,XICE,           &
+                                      Z0,                      &
 #else
-           CALL myjsfcinit(LOWLYR,UST,ZNT,XLAND,XICE,           &
+                                      ZNT,                     &
 #endif
+                                          XLAND,XICE,          &
                          IVGTYP,restart,                       &
                          allowed_to_read ,                     &
                          ids, ide, jds, jde, kds, kde,         &
@@ -1032,6 +1123,7 @@ integer myproc
 
 !==================================================================
    SUBROUTINE mp_init(RAINNC,config_flags,restart,warm_rain,      &
+                      adv_moist_cond,                             & ! for eta mp
                       MPDT, DT, DX, DY, LOWLYR,                   & ! for eta mp
                       F_ICE_PHY,F_RAIN_PHY,F_RIMEF_PHY,           & ! for eta mp
                       mp_restart_state,tbpvs_state,tbpvs0_state,   & ! eta mp
@@ -1053,7 +1145,7 @@ integer myproc
 ! Arguments
    TYPE (grid_config_rec_type) ::     config_flags
    LOGICAL , INTENT(IN)        :: restart
-   LOGICAL , INTENT(OUT)       :: warm_rain
+   LOGICAL , INTENT(OUT)       :: warm_rain, adv_moist_cond
    REAL    , INTENT(IN)        :: MPDT, DT, DX, DY
 
    INTEGER , INTENT(IN)        :: ids, ide, jds, jde, kds, kde,   &
@@ -1071,6 +1163,7 @@ integer myproc
    INTEGER :: i, j, itf, jtf
 
    warm_rain = .false.
+   adv_moist_cond = .true.
    itf=min0(ite,ide-1)
    jtf=min0(jte,jde-1)
 
@@ -1093,6 +1186,7 @@ integer myproc
      CASE (WSM6SCHEME)
           CALL wsm6init(rhoair0,rhowater,rhosnow,cliq,cv, allowed_to_read )
      CASE (ETAMPNEW)
+         adv_moist_cond = .false.
          CALL etanewinit (MPDT,DT,DX,DY,LOWLYR,restart,           &
                           F_ICE_PHY,F_RAIN_PHY,F_RIMEF_PHY,       &
                           mp_restart_state,tbpvs_state,tbpvs0_state,&

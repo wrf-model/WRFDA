@@ -3,9 +3,6 @@
 FRAME_MODULES =  module_internal_header_util.o \
                  module_driver_constants.o  \
                 module_domain.o            \
-                module_domain1.o            \
-                module_domain2.o            \
-                module_domain3.o            \
                 module_integrate.o         \
                 module_timing.o            \
                 module_configure.o         \

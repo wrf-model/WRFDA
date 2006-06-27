@@ -39,7 +39,7 @@ MODULE module_mp_thompson
 !
   REAL, dimension(31) :: aber1 = (/7939E-07,.7841E-06,.3369E-05,.4336E-05, &
                         .5285E-05,.3728E-05,.1852E-05,.2991E-06,.4248E-06, &
-                        .7434E-06,.1812E-05,.4394E-05,.9145E-05,.1725E-06, &
+                        .7434E-06,.1812E-05,.4394E-05,.9145E-05,.1725E-04, &
                         .3348E-04,.1725E-04,.9175E-05,.4412E-05,.2252E-05, &
                         .9115E-06,.4876E-06,.3473E-06,.4758E-06,.6306E-06, &
                         .8573E-06,.7868E-06,.7192E-06,.6513E-06,.5956E-06, &
@@ -68,7 +68,6 @@ CONTAINS
                        ids,ide, jds,jde, kds,kde,                  & ! domain dims
                        ims,ime, jms,jme, kms,kme,                  & ! memory dims
                        its,ite, jts,jte, kts,kte                   & ! tile   dims
-                      , F_QI,F_QS,F_QG,F_QNI                       &
                                                                    )
 
 !
@@ -113,9 +112,6 @@ CONTAINS
 
   REAL, INTENT(IN   ) :: 				   dt_in
   INTEGER, INTENT(IN   ) ::                              itimestep
-  LOGICAL, INTENT(IN), OPTIONAL ::                                &
-				      F_QI,F_QS,F_QG,             &
-                                      F_QNI
 
 ! LOCAL VAR
 
@@ -137,35 +133,16 @@ CONTAINS
                                                     dzw, wz
 !
   REAL    ::         dt, pptrain, pptsnow, pptgraul, rhoe_s,      &
-                     gindex, pptice
+                     pptice
 !
   INTEGER ::               i,j,k,iterm
 !
-  LOGICAL flag_qi, flag_qs, flag_qg, flag_qni
 
-   flag_qi = .false.
-   flag_qs = .false.
-   flag_qg = .false.
-   flag_qni = .false.
-   IF ( PRESENT ( f_qi ) ) flag_qi = f_qi
-   IF ( PRESENT ( f_qs ) ) flag_qs = f_qs
-   IF ( PRESENT ( f_qg ) ) flag_qg = f_qg
-   IF ( PRESENT ( f_qni ) ) flag_qni = f_qni
-!
 
    dt=dt_in
    ipstep=itimestep
    rhoe_s=1.29
 !
-   IF (  .NOT. flag_qi .OR. .NOT. flag_qs ) THEN
-      CALL wrf_error_fatal ( &
-        'Improper use of thompson scheme; no ice phase. Please chose another one.')
-   ENDIF
-
-   gindex=1.0
-
-   IF ( .NOT. flag_qg ) gindex=0.
-
      ql_max=0.
      qr_max=0.
      qs_max=0.
@@ -195,45 +172,12 @@ CONTAINS
    END DO
 !
 !
-   IF (flag_qi) THEN
       DO k = kts, kte
          qiz(k)=qi(i,k,j)
-      ENDDO
-   ELSE
-      DO k = kts, kte
-         qiz(k)=0.
-      ENDDO
-   ENDIF
-
-   IF (flag_qs) THEN
-      DO k = kts, kte
          qsz(k)=qs(i,k,j)
-      ENDDO
-   ELSE
-      DO k = kts, kte
-         qsz(k)=0.
-      ENDDO
-   ENDIF
-
-   IF (flag_qg) THEN
-      DO k = kts, kte
          qgz(k)=qg(i,k,j)
-      ENDDO
-   ELSE
-      DO k = kts, kte
-         qgz(k)=0.
-      ENDDO
-   ENDIF
-!
-   IF (flag_qni) THEN
-      DO k = kts, kte
          qniz(k)=qni(i,k,j)
       ENDDO
-   ELSE
-      DO k = kts, kte
-         qniz(k)=0.
-      ENDDO
-   ENDIF
 !
    pptrain=0.
    pptsnow=0.
@@ -278,30 +222,13 @@ CONTAINS
      qni_max=amax1(qni_max,qniz(k))
    END DO
 !
-   IF (flag_qi) THEN
       DO k = kts, kte
          qi(i,k,j)=qiz(k)
-      ENDDO
-   ENDIF
-
-   IF (flag_qs) THEN
-      DO k = kts, kte
          qs(i,k,j)=qsz(k)
-      ENDDO
-   ENDIF
-
-   IF (flag_qg) THEN
-      DO k = kts, kte
          qg(i,k,j)=qgz(k)
-      ENDDO
-   ENDIF
-!
-   IF (flag_qni) THEN
-      DO k = kts, kte
          qni(i,k,j)=qniz(k)
       ENDDO
-   ENDIF
-!
+
 !
    ENDDO i_loop
    ENDDO j_loop
@@ -450,7 +377,7 @@ CONTAINS
                                      FALOUTG, SLOG, SLOG2, PGFR, PICNG, PGIACW, PGEMB, GONV
 ! ARRAYS FOR NCI                                                             
                                                                               
-  REAL,  DIMENSION( kts:kte )   ::  NI_RS, NI_AG, NI_CG, NI_DE, NI_EV, SCR4N, FALOUTN
+  REAL,  DIMENSION( kts:kte )   ::  NI_RS, NI_AG, NI_CG, NI_DE, NI_EV, SCR4N, FALOUTN                                                                                
 ! EXTRA ARRAYS                                                                  
                                                                             
   REAL,  DIMENSION( kts:kte )   ::  DUM11, DUM21, DUM31, SCR4, SCR8, RHOFAC, rkz,  &
@@ -2115,7 +2042,7 @@ k_sc  = k_c * (nu_c+2.0e0)/(nu_c+1.0e0)                                !..selfco
       EFSR=1.
       DSNOW=100.
       delta_v=ASNOW*DIAS**BS-ARAIN*DIAR**BR
-      KER_S_ACR=PI*(diar+dias)**2*EFSR*.5*(delta_v+abs(delta_v))*PI/6.*DIAR**3*DRAIN
+      KER_S_ACR=.25*PI*(diar+dias)**2*EFSR*.5*(delta_v+abs(delta_v))*PI/6.*DIAR**3*DRAIN
       return
       end function ker_s_acr
 !
@@ -2135,7 +2062,7 @@ k_sc  = k_c * (nu_c+2.0e0)/(nu_c+1.0e0)                                !..selfco
       EFSR=1.
       DSNOW=100.
       delta_v=ARAIN*DIAR**BR-ASNOW*DIAS**BS
-      KER_R_ACS=PI*(diar+dias)**2*EFSR*(delta_v+abs(delta_v))*PI/6.*DIAS**3*DSNOW
+      KER_R_ACS=.25*PI*(diar+dias)**2*EFSR*.5*(delta_v+abs(delta_v))*PI/6.*DIAS**3*DSNOW
       return
       end function ker_r_acs
 !----------------------------------------------------------------

@@ -6,26 +6,31 @@ CONTAINS
 ! !IROUTINE: radiation_driver - interface to radiation physics options
 
 ! !INTERFACE:
-   SUBROUTINE radiation_driver (                                         &
-                       itimestep,dt ,lw_physics,sw_physics ,NPHS         &
-                      ,AER_DRY,AER_WATER                                 &
-                      ,RTHRATENLW,RTHRATENSW,RTHRATEN                    &
-                      ,GLW,GSW,SWDOWN,XLAT,XLONG,ALBEDO                  &
-                      ,EMISS ,rho ,p8w,p ,pi,dz8w,t,t8w,GMT              &
-                      ,XLAND,TSK,HTOP,HBOT,CUPPT,VEGFRA,SNOW             &
-                      ,julyr ,JULDAY ,RADT,STEPRA,ICLOUD ,warm_rain      &
-                      ,TOTSWDN,TOTLWDN,RSWTOA,RLWTOA,CZMEAN              &
-                      ,CFRACL,CFRACM,CFRACH                              &
-                      ,ACFRST,NCFRST,ACFRCV,NCFRCV                       &
-                      ,ids,ide, jds,jde, kds,kde                         &
-                      ,ims,ime, jms,jme, kms,kme                         &
-                      ,i_start,i_end,j_start,j_end,kts,kte,num_tiles     &
-                    ! Optional
-                      ,taucldi ,taucldc                                  &
-                      ,qv,qc,qr,qi,qs,qg                                 &
-                      ,f_qv,f_qc,f_qr,f_qi,f_qs,f_qg                     &
-                      ,CLDFRA ,Pb                                        &
-                                                                         )
+   SUBROUTINE radiation_driver (                                          &
+               itimestep,dt ,lw_physics,sw_physics ,NPHS                  &
+              ,RTHRATENLW ,RTHRATENSW ,RTHRATEN                           &
+              ,GLW, GSW, SWDOWN, XLAT, XLONG, ALBEDO                      &
+              ,EMISS, rho, p8w, p , pi , dz8w ,t, t8w, GMT                &
+              ,XLAND, TSK, HTOP,HBOT,HTOPR,HBOTR, CUPPT, VEGFRA, SNOW     &
+              ,julyr, JULDAY, julian, RADT, STEPRA, ICLOUD, warm_rain     &
+              ,RSWTOA,RLWTOA, CZMEAN                                      &
+              ,CFRACL, CFRACM, CFRACH                                     &
+              ,ACFRST,NCFRST,ACFRCV,NCFRCV,SWDOWNC                        &
+              ,taucldi, taucldc, xtime                                    & ! Optional
+              ,ids, ide, jds, jde, kds, kde                               &
+              ,ims, ime, jms, jme, kms, kme                               &
+              ,i_start, i_end                                             &
+              ,j_start, j_end                                             &
+              ,kts, kte                                                   &
+              ,num_tiles                                                  &
+              ,qv,qc,qr,qi,qs,qg                                          &
+              ,f_qv,f_qc,f_qr,f_qi,f_qs,f_qg                              &
+              ,CLDFRA ,Pb                                         &
+              ,pm2_5_dry, pm2_5_water, pm2_5_dry_ec                       &
+              ,tauaer300, tauaer400, tauaer600, tauaer999                 & ! jcb
+              ,gaer300, gaer400, gaer600, gaer999                         & ! jcb
+              ,waer300, waer400, waer600, waer999                         & ! jcb
+                                                                          )
 
 !-------------------------------------------------------------------------
 
@@ -132,6 +137,9 @@ CONTAINS
 ! Qi         cloud ice mixing ratio (kg/kg)
 ! Qs         snow mixing ratio (kg/kg)
 !-----------------------------------------------------------------
+!-- PM2_5_DRY     Dry PM2.5 aerosol mass for all species (ug m^-3)
+!-- PM2_5_WATER   PM2.5 water mass (ug m^-3)
+!-- PM2_5_DRY_EC  Dry PM2.5 elemental carbon aersol mass (ug m^-3)
 !-- RTHRATEN      Theta tendency 
 !                 due to radiation (K/s)
 !-- RTHRATENLW    Theta tendency 
@@ -143,6 +151,7 @@ CONTAINS
 !-- GLW           downward long wave flux at ground surface (W/m^2)
 !-- GSW           net short wave flux at ground surface (W/m^2)
 !-- SWDOWN        downward short wave flux at ground surface (W/m^2)
+!-- SWDOWNC       clear-sky downward short wave flux at ground surface (W/m^2; optional; for AQ)
 !-- XLAT          latitude, south is negative (degree)
 !-- XLONG         longitude, west is negative (degree)
 !-- ALBEDO                albedo (between 0 and 1)
@@ -220,6 +229,8 @@ CONTAINS
    REAL, DIMENSION( ims:ime, jms:jme ),                           &
          INTENT(INOUT)  ::                                  HTOP, &
                                                             HBOT, &
+                                                           HTOPR, &
+                                                           HBOTR, &
                                                            CUPPT
 
    INTEGER, INTENT(IN   )  ::   julyr
@@ -231,9 +242,19 @@ CONTAINS
                                                               pi, &
                                                                t, &
                                                              t8w, &
-                                                             rho, &
-                                                         aer_dry, &
-                                                       aer_water
+                                                             rho
+!
+   REAL, DIMENSION( ims:ime, kms:kme, jms:jme ), OPTIONAL ,       &
+         INTENT(IN ) ::  tauaer300,tauaer400,tauaer600,tauaer999, & ! jcb
+                                 gaer300,gaer400,gaer600,gaer999, & ! jcb
+                                 waer300,waer400,waer600,waer999    ! jcb
+!
+! variables for aerosols (only if running with chemistry)
+!
+   REAL, DIMENSION( ims:ime, kms:kme, jms:jme ), OPTIONAL ,       &
+         INTENT(IN ) ::                                pm2_5_dry, &
+                                                     pm2_5_water, &
+                                                    pm2_5_dry_ec
 !
    REAL, DIMENSION( ims:ime, kms:kme, jms:jme ),                  &
          INTENT(INOUT)  ::                              RTHRATEN, &
@@ -253,7 +274,8 @@ CONTAINS
 
    REAL, DIMENSION( ims:ime, jms:jme ), INTENT(OUT)  ::   SWDOWN
 !
-   REAL, INTENT(IN  )   ::                                GMT,dt
+   REAL, INTENT(IN  )   ::                                GMT,dt, &
+                                                   julian, xtime
 !
    INTEGER, INTENT(IN  ) ::                    JULDAY, itimestep
 
@@ -262,16 +284,13 @@ CONTAINS
                                                       CFRACH,     & !Added
                                                       CFRACL,     & !Added
                                                       CFRACM,     & !Added
-                                                      CZMEAN,     & !Added
-                                                      TOTLWDN,    & !Added
-                                                      TOTSWDN       !Added
-
+                                                      CZMEAN        !Added
    REAL, DIMENSION( ims:ime, jms:jme ),                           &
          INTENT(INOUT)  ::                                        &
-                                                          RLWTOA, &  !Added
-                                                          RSWTOA, &  !Added
-                                                          ACFRST, &  !Added
-                                                          ACFRCV     !Added
+                                                      RLWTOA,     & !Added
+                                                      RSWTOA,     & !Added
+                                                      ACFRST,     & !Added
+                                                      ACFRCV        !Added
 
    INTEGER,DIMENSION( ims:ime, jms:jme ),INTENT(INOUT)        ::  &
                                                           NCFRST, &  !Added
@@ -283,6 +302,9 @@ CONTAINS
    REAL, DIMENSION( ims:ime, kms:kme, jms:jme ),                  &
          OPTIONAL,                                                &
          INTENT(INOUT) ::                                 CLDFRA
+   REAL, DIMENSION( ims:ime, jms:jme ),                           &
+         OPTIONAL,                                                &
+         INTENT(OUT) ::                                   SWDOWNC
 !
    REAL, DIMENSION( ims:ime, kms:kme, jms:jme ),                  &
          OPTIONAL,                                                &
@@ -300,7 +322,7 @@ CONTAINS
 
    REAL, DIMENSION( ims:ime, jms:jme ) ::             GLAT,GLON
 
-   REAL    ::    XTIME,DECLIN,SOLCON 
+   REAL    ::    DECLIN,SOLCON 
    INTEGER ::    i,j,k,its,ite,jts,jte,ij
    LOGICAL ::    gfdl_lw,gfdl_sw
 
@@ -347,8 +369,17 @@ CONTAINS
 !---------------
 ! Calculate constant for short wave radiation
 
-     CALL radconst(XTIME,DECLIN,SOLCON,GMT,JULDAY,           &
-                   DEGRAD,DPD,itimestep,dt                   )
+     CALL radconst(XTIME,DECLIN,SOLCON,JULIAN,               &
+                   DEGRAD,DPD                                )
+
+     lwrad_gfdl_select: SELECT CASE(lw_physics)
+
+        CASE (GFDLLWSCHEME)
+
+!-- Do nothing, since cloud fractions (with partial cloudiness effects) 
+!-- are defined in GFDL LW/SW schemes and do not need to be initialized.
+
+        CASE DEFAULT
 
      IF ( PRESENT ( CLDFRA ) .AND.                           &
           PRESENT(F_QC) .AND. PRESENT ( F_QI ) ) THEN
@@ -357,6 +388,8 @@ CONTAINS
                        ims,ime, jms,jme, kms,kme,            &
                        its,ite, jts,jte, kts,kte             )
      ENDIF
+
+     END SELECT lwrad_gfdl_select    
 
 !pjj/cray  Cray X1 cannot print from threaded region
 #ifndef crayx1
@@ -391,16 +424,18 @@ CONTAINS
 
              CALL wrf_debug (100, 'CALL gfdllw')
 
-             IF ( PRESENT(F_QV) .AND. PRESENT(F_QC) .AND. PRESENT(F_QI) .AND. &
-                  PRESENT(qv)   .AND. PRESENT(qc)   .AND. PRESENT(qi)  ) THEN
-               IF ( F_QV .AND. F_QC .AND. F_QI ) THEN
+             IF ( PRESENT(F_QV) .AND. PRESENT(F_QC) .AND. PRESENT(F_QS) .AND. &
+                  PRESENT(qv)   .AND. PRESENT(qc)   .AND. PRESENT(qs)  ) THEN
+               IF ( F_QV .AND. F_QC .AND. F_QS ) THEN
                  gfdl_lw  = .true.
                  CALL ETARA(                                        &
                   DT=dt,XLAND=xland                                 &
                  ,P8W=p8w,DZ8W=dz8w,RHO_PHY=rho,P_PHY=p,T=t         &
-                 ,QV=qv,QW=qc,QI=qi                                 &
-                 ,TSK2D=tsk,GLW=glw,GSW=gsw,PI3D=pi                 &
+                 ,QV=qv,QW=qc,QI=qi,QS=qs                           &
+                 ,TSK2D=tsk,GLW=GLW,RSWIN=SWDOWN,GSW=GSW            &
+                 ,RSWINC=SWDOWNC,CLDFRA=CLDFRA,PI3D=pi              &
                  ,GLAT=glat,GLON=glon,HTOP=htop,HBOT=hbot           &
+                 ,HBOTR=hbotr, HTOPR=htopr                          &
                  ,ALBEDO=albedo,CUPPT=cuppt                         &
                  ,VEGFRA=vegfra,SNOW=snow,G=g,GMT=gmt               &
                  ,NSTEPRA=stepra,NPHS=nphs,ITIMESTEP=itimestep      &
@@ -409,7 +444,6 @@ CONTAINS
                  ,CFRACL=cfracl,CFRACM=cfracm,CFRACH=cfrach         &
                  ,ACFRST=acfrst,NCFRST=ncfrst                       &
                  ,ACFRCV=acfrcv,NCFRCV=ncfrcv                       &
-                 ,TOTSWDN=totswdn,TOTLWDN=totlwdn                   &
                  ,RSWTOA=rswtoa,RLWTOA=rlwtoa,CZMEAN=czmean         &
                  ,THRATEN=rthraten,THRATENLW=rthratenlw             &
                  ,THRATENSW=rthratensw                              &
@@ -431,7 +465,7 @@ CONTAINS
            
      END SELECT lwrad_select    
 
-     IF (lw_physics .gt. 0 ) THEN
+     IF (lw_physics .gt. 0 .and. .not.gfdl_lw) THEN
         DO j=jts,jte
         DO k=kts,kte
         DO i=its,ite
@@ -449,7 +483,10 @@ CONTAINS
              CALL SWRAD(                                               &
                      DT=dt,RTHRATEN=rthraten,GSW=gsw                   &
                     ,XLAT=xlat,XLONG=xlong,ALBEDO=albedo               &
-                    ,AER_DRY=aer_dry,AER_WATER=aer_water               &
+#ifdef WRF_CHEM
+                    ,PM2_5_DRY=pm2_5_dry,PM2_5_WATER=pm2_5_water       &
+                    ,PM2_5_DRY_EC=pm2_5_dry_ec                         &
+#endif
                     ,RHO_PHY=rho,T3D=t                                 &
                     ,P3D=p,PI3D=pi,DZ8W=dz8w,GMT=gmt                   &
                     ,R=r_d,CP=cp,G=g,JULDAY=julday                     &
@@ -474,6 +511,7 @@ CONTAINS
              CALL GSFCSWRAD(                                           &
                      RTHRATEN=rthraten,GSW=gsw,XLAT=xlat,XLONG=xlong   &
                     ,ALB=albedo,T3D=t,P3D=p,P8W3D=p8w,pi3D=pi          &
+                    ,DZ8W=dz8w,RHO_PHY=rho                             &
                     ,CLDFRA3D=cldfra                                   &
                     ,GMT=gmt,CP=cp,G=g                                 &
                     ,JULDAY=julday,XTIME=xtime                         &
@@ -481,6 +519,14 @@ CONTAINS
                     ,RADFRQ=radt,DEGRAD=degrad                         &
                     ,TAUCLDI=taucldi,TAUCLDC=taucldc                   &
                     ,WARM_RAIN=warm_rain                               &
+#ifdef WRF_CHEM
+                    ,TAUAER300=tauaer300,TAUAER400=tauaer400           & ! jcb
+                    ,TAUAER600=tauaer600,TAUAER999=tauaer999           & ! jcb
+                    ,GAER300=gaer300,GAER400=gaer400                   & ! jcb
+                    ,GAER600=gaer600,GAER999=gaer999                   & ! jcb
+                    ,WAER300=waer300,WAER400=waer400                   & ! jcb
+                    ,WAER600=waer600,WAER999=waer999                   & ! jcb
+#endif
                     ,IDS=ids,IDE=ide, JDS=jds,JDE=jde, KDS=kds,KDE=kde &     
                     ,IMS=ims,IME=ime, JMS=jms,JME=jme, KMS=kms,KME=kme &
                     ,ITS=its,ITE=ite, JTS=jts,JTE=jte, KTS=kts,KTE=kte &
@@ -498,16 +544,18 @@ CONTAINS
 
              CALL wrf_debug (100, 'CALL gfdlsw')
 
-             IF ( PRESENT(F_QV) .AND. PRESENT(F_QC) .AND. PRESENT(F_QI) .AND. &
-                  PRESENT(qv)   .AND. PRESENT(qc)   .AND. PRESENT(qi)  ) THEN
-               IF ( F_QV .AND. F_QC .AND. F_QI ) THEN
+             IF ( PRESENT(F_QV) .AND. PRESENT(F_QC) .AND. PRESENT(F_QS) .AND. &
+                  PRESENT(qv)   .AND. PRESENT(qc)   .AND. PRESENT(qs)  ) THEN
+               IF ( F_QV .AND. F_QC .AND. F_QS ) THEN
                  gfdl_sw = .true.
                  CALL ETARA(                                        &
                   DT=dt,XLAND=xland                                 &
                  ,P8W=p8w,DZ8W=dz8w,RHO_PHY=rho,P_PHY=p,T=t         &
-                 ,QV=qv,QW=qc,QI=qi                                 &
-                 ,TSK2D=tsk,GLW=glw,GSW=gsw,PI3D=pi                 &
+                 ,QV=qv,QW=qc,QI=qi,QS=qs                           &
+                 ,TSK2D=tsk,GLW=GLW,RSWIN=SWDOWN,GSW=GSW            &
+                 ,RSWINC=SWDOWNC,CLDFRA=CLDFRA,PI3D=pi              &
                  ,GLAT=glat,GLON=glon,HTOP=htop,HBOT=hbot           &
+                 ,HBOTR=hbotr, HTOPR=htopr                          &
                  ,ALBEDO=albedo,CUPPT=cuppt                         &
                  ,VEGFRA=vegfra,SNOW=snow,G=g,GMT=gmt               &
                  ,NSTEPRA=stepra,NPHS=nphs,ITIMESTEP=itimestep      &
@@ -516,7 +564,6 @@ CONTAINS
                  ,CFRACL=cfracl,CFRACM=cfracm,CFRACH=cfrach         &
                  ,ACFRST=acfrst,NCFRST=ncfrst                       &
                  ,ACFRCV=acfrcv,NCFRCV=ncfrcv                       &
-                 ,TOTSWDN=totswdn,TOTLWDN=totlwdn                   &
                  ,RSWTOA=rswtoa,RLWTOA=rlwtoa,CZMEAN=czmean         &
                  ,THRATEN=rthraten,THRATENLW=rthratenlw             &
                  ,THRATENSW=rthratensw                              &
@@ -538,7 +585,7 @@ CONTAINS
 
      END SELECT swrad_select    
 
-     IF (sw_physics .gt. 0) THEN
+     IF (sw_physics .gt. 0 .and. .not.gfdl_sw) THEN
         DO j=jts,jte
         DO k=kts,kte
         DO i=its,ite
@@ -566,18 +613,17 @@ CONTAINS
 !BOP
 ! !IROUTINE: radconst - compute radiation terms
 ! !INTERFAC:
-   SUBROUTINE radconst(XTIME,DECLIN,SOLCON,GMT,JULDAY,               &
-                       DEGRAD,DPD,step,dt                            )
+   SUBROUTINE radconst(XTIME,DECLIN,SOLCON,JULIAN,                   &
+                       DEGRAD,DPD                                    )
 !---------------------------------------------------------------------
    USE module_wrf_error
    IMPLICIT NONE
 !---------------------------------------------------------------------
 
 ! !ARGUMENTS:
-   INTEGER, INTENT(IN   )   ::       JULDAY, step
-   REAL, INTENT(IN   )      ::       GMT,dt,DEGRAD,DPD
-   REAL, INTENT(OUT  )      ::       XTIME,DECLIN,SOLCON
-   REAL                     ::       OBECL,SINOB,SXLONG,ARG,JULIAN,  &
+   REAL, INTENT(IN   )      ::       DEGRAD,DPD,XTIME,JULIAN
+   REAL, INTENT(OUT  )      ::       DECLIN,SOLCON
+   REAL                     ::       OBECL,SINOB,SXLONG,ARG,  &
                                      DECDEG,DJUL,RJUL,ECCFAC
 !
 ! !DESCRIPTION:
@@ -593,11 +639,9 @@ CONTAINS
         
    OBECL=23.5*DEGRAD
    SINOB=SIN(OBECL)
-   XTIME=float(step)*dt/60.
         
 !-----CALCULATE LONGITUDE OF THE SUN FROM VERNAL EQUINOX:
         
-   JULIAN=FLOAT(JULDAY-1)+(XTIME/60.+GMT)/24.
    IF(JULIAN.GE.80.)SXLONG=DPD*(JULIAN-80.)
    IF(JULIAN.LT.80.)SXLONG=DPD*(JULIAN+285.)
    SXLONG=SXLONG*DEGRAD
