@@ -151,9 +151,9 @@ SUBROUTINE wrf_messages(strs)
 #endif
 !TBH:  work around deficiencies in build-automation
 #ifdef USE_LOGERR
-  IF ( WRF_UTIL_IsInitialized() ) THEN
+  IF ( WRFU_IsInitialized() ) THEN
     DO I=1,SIZE(strs) 
-      CALL WRF_UTIL_LogWrite( strs(i), WRF_UTIL_LOG_INFO )
+      CALL WRFU_LogWrite( strs(i), WRFU_LOG_INFO )
     END DO
   ENDIF
 #endif
@@ -172,9 +172,9 @@ SUBROUTINE wrf_messages2(strs )
   END DO
 !TBH:  work around deficiencies in build-automation
 #ifdef USE_LOGERR
-  IF ( WRF_UTIL_IsInitialized() ) THEN
+  IF ( WRFU_IsInitialized() ) THEN
      DO I=1,SIZE(strs) 
-      CALL WRF_UTIL_LogWrite( strs(i), WRF_UTIL_LOG_INFO )
+      CALL WRFU_LogWrite( strs(i), WRFU_LOG_INFO )
     END DO
   ENDIF
 #endif
@@ -190,8 +190,8 @@ SUBROUTINE wrf_message2(str)
    write(0,*) str
 !TBH:  work around deficiencies in build-automation
 #ifdef USE_LOGERR
-  IF ( WRF_UTIL_IsInitialized() ) THEN
-    CALL WRF_UTIL_LogWrite( str, WRF_UTIL_LOG_INFO )
+  IF ( WRFU_IsInitialized() ) THEN
+    CALL WRFU_LogWrite( str, WRFU_LOG_INFO )
   ENDIF
 #endif
 END SUBROUTINE wrf_message2
@@ -255,8 +255,8 @@ SUBROUTINE wrf_message( str)
 #endif
 !TBH:  work around deficiencies in build-automation
 #ifdef USE_LOGERR
-  IF ( WRF_UTIL_IsInitialized() ) THEN
-    CALL WRF_UTIL_LogWrite( str, WRF_UTIL_LOG_INFO )
+  IF ( WRFU_IsInitialized() ) THEN
+    CALL WRFU_LogWrite( str, WRFU_LOG_INFO )
   ENDIF
 #endif
 END SUBROUTINE wrf_message

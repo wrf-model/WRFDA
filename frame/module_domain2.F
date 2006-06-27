@@ -588,10 +588,10 @@ write (message,*) "grid%id",grid%id
             DEALLOCATE( grid%parents )
             DEALLOCATE( grid%nests )
             ! clean up time manager bits
-            CALL WRF_UTIL_ClockDestroy( grid%domain_clock )
+            CALL WRFU_ClockDestroy( grid%domain_clock )
             DO alarmid = 1, MAX_WRF_ALARMS
               IF ( grid%alarms_created( alarmid ) ) THEN
-                CALL WRF_UTIL_AlarmDestroy( grid%alarms( alarmid ) )
+                CALL WRFU_AlarmDestroy( grid%alarms( alarmid ) )
                 grid%alarms_created( alarmid ) = .FALSE.
               ENDIF
             ENDDO
