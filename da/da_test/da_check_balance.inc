@@ -1,12 +1,10 @@
 subroutine da_check_balance( phi, phi_u )
 
-!------------------------------------------------------------------------------
-!  PURPOSE: Compare balanced mass (phi_b - function of wind) and actual phi.
-!
-!  METHOD:  Calculate correlation between balanced and actual phi.
-!
-!  HISTORY: 02/23/2000 - Creation of F90 version.           Dale Barker
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! PURPOSE: Compare balanced mass (phi_b - function of wind) and actual phi.
+   !
+   ! METHOD:  Calculate correlation between balanced and actual phi.
+   !---------------------------------------------------------------------------
 
    IMPLICIT NONE
       
@@ -23,20 +21,24 @@ subroutine da_check_balance( phi, phi_u )
    REAL, ALLOCATABLE            :: phi_b2(:,:)     ! 2D balanced phi.
    REAL, ALLOCATABLE            :: corr_coeff(:,:) ! Correlation coefficient.
    REAL, ALLOCATABLE            :: accuracy(:,:)   ! Accuracy.
+
+   if (trace_use) call da_trace_entry("da_check_balance")
           
    IF ( balance_type == balance_geo ) THEN
-      write(UNIT=stdout, fmt='(a)') ' DA_Check_Balance: Balance is geostrophic.'
+      write(UNIT=stdout, fmt='(a)') ' da_check_balance: Balance is geostrophic.'
    ELSE IF ( balance_type == balance_cyc ) THEN
-      write(UNIT=stdout, fmt='(a)') ' DA_Check_Balance: Balance is cyclostrophic.'
+      write(UNIT=stdout, fmt='(a)') &
+         ' da_check_balance: Balance is cyclostrophic.'
    ELSE IF ( balance_type == balance_geocyc ) THEN
-      write(UNIT=stdout, fmt='(a)') ' DA_Check_Balance: Balance is geo/cyclostrophic.'
+      write(UNIT=stdout, fmt='(a)') &
+         ' da_check_balance: Balance is geo/cyclostrophic.'
    END IF
       
-   write(UNIT=stdout, fmt='(a)') ' DA_Check_Balance: Correlation/accuracy: '
+   write(UNIT=stdout, fmt='(a)') ' da_check_balance: Correlation/accuracy: '
       
-!-------------------------------------------------------------------------
-!  [1.0]: Initialise:
-!-------------------------------------------------------------------------  
+   !-------------------------------------------------------------------------
+   ! [1.0]: Initialise:
+   !-------------------------------------------------------------------------  
 
    iy = SIZE(phi_u, DIM=1)
    jx = SIZE(phi_u, DIM=2)
@@ -51,9 +53,9 @@ subroutine da_check_balance( phi, phi_u )
    ALLOCATE(accuracy(1:kz,1:iy))
    accuracy(1:kz,1:iy) = 0.0
       
-!-------------------------------------------------------------------------
-!  [2.0]: Calculate correlations/accuracy:
-!-------------------------------------------------------------------------  
+   !-------------------------------------------------------------------------
+   ! [2.0]: Calculate correlations/accuracy:
+   !-------------------------------------------------------------------------  
 
    do k = 1, kz
       do i = 1, iy
@@ -63,7 +65,7 @@ subroutine da_check_balance( phi, phi_u )
          call da_correlation_coeff1d( phi_b1(2:jx-1), phi(i,2:jx-1,k), &
                                       corr_coeff(k,i), accuracy(k,i) )
      
-!        write(58,*) corr_coeff(k,i), accuracy(k,i)
+         ! write(58,*) corr_coeff(k,i), accuracy(k,i)
       end do
          
       phi_b2(2:iy-1,2:jx-1) = phi(2:iy-1,2:jx-1,k) - phi_u(2:iy-1,2:jx-1,k)
@@ -76,14 +78,16 @@ subroutine da_check_balance( phi, phi_u )
 
    end do
 
-!-------------------------------------------------------------------------
-!  [3.0]: Tidy up:
-!-------------------------------------------------------------------------  
+   !-------------------------------------------------------------------------
+   ! [3.0]: Tidy up:
+   !-------------------------------------------------------------------------  
 
    DEALLOCATE(phi_b1)
    DEALLOCATE(phi_b2)
    DEALLOCATE(corr_coeff)
    DEALLOCATE(accuracy)
+
+   if (trace_use) call da_trace_exit("da_check_balance")
 
 end subroutine da_check_balance
 

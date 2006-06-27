@@ -1,4 +1,4 @@
-subroutine DA_Check_XToY_Adjoint_Ships( oi, y, adjtest_lhs, pertile_lhs )
+subroutine da_check_xtoy_adjoint_ships( oi, y, adjtest_lhs, pertile_lhs )
 
    IMPLICIT NONE
 
@@ -60,5 +60,5 @@ subroutine DA_Check_XToY_Adjoint_Ships( oi, y, adjtest_lhs, pertile_lhs )
       endif
    ENDDO
 
-end subroutine DA_Check_XToY_Adjoint_Ships
+end subroutine da_check_xtoy_adjoint_ships
 

@@ -104,7 +104,7 @@ subroutine da_check_cvtovv_adjoint( cv_size, xb, xbx, xp, be, cv, vv, &
    endif  
 
    WRITE(UNIT=stdout,FMT='(A,2F12.2)') &
-      'TEST_COVERAGE_DA_Check_CvToVv_Adjoint:  adj_sum_lhs,adj_sum_rhs = ', &
+      'TEST_COVERAGE_da_check_cvtovv_adjoint:  adj_sum_lhs,adj_sum_rhs = ', &
       adj_sum_lhs,adj_sum_rhs
    IF ( wrf_dm_on_monitor() ) THEN
       write(unit=stdout, fmt='(/)')

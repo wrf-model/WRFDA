@@ -119,5 +119,5 @@ subroutine da_transform_vtovv_global ( cv_size, xbx, be, cv, vv, &
 
    IF (trace_use) call da_trace_exit("da_transform_vtovv_global")
 
-end subroutine DA_Transform_VToVv_Global
+end subroutine da_transform_vtovv_global
 

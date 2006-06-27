@@ -1,4 +1,4 @@
-subroutine DA_Check_XToY_Adjoint_Sound( oi, y, adjtest_lhs, pertile_lhs )
+subroutine da_check_xtoy_adjoint_sound( oi, y, adjtest_lhs, pertile_lhs )
 
    IMPLICIT NONE
 
@@ -7,8 +7,6 @@ subroutine DA_Check_XToY_Adjoint_Sound( oi, y, adjtest_lhs, pertile_lhs )
    REAL          , INTENT(inout)  :: adjtest_lhs, pertile_lhs   
 
    INTEGER                        :: n, k          ! Loop counter.
-
-!----------------------------------------------------------------------------
 
    IF ( oi%num_Sound < 1 ) return
 
@@ -39,5 +37,5 @@ subroutine DA_Check_XToY_Adjoint_Sound( oi, y, adjtest_lhs, pertile_lhs )
       endif
    ENDDO
 
-end subroutine DA_Check_XToY_Adjoint_Sound
+end subroutine da_check_xtoy_adjoint_sound
 

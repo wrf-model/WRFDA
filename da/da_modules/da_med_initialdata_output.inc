@@ -46,8 +46,6 @@ subroutine da_med_initialdata_output ( grid , config_flags, out_filename )
    config_flags%julyr = julyr
    config_flags%julday = julday
 
-   !--------------------------------------------------------------------- 
-
    call output_model_input ( fid, grid , config_flags , ierr )
 
    call close_dataset ( fid , config_flags, "DATASET=INPUT" )
@@ -60,4 +58,3 @@ subroutine da_med_initialdata_output ( grid , config_flags, out_filename )
    IF (trace_use) call da_trace_exit("da_med_initialdata_output")
 
 end subroutine da_med_initialdata_output
-

@@ -19,67 +19,69 @@ subroutine da_check( cv_size, xb, xbx, be, ep, iv, &
    type (y_type),     intent(inout) :: ob            ! yo
    type (y_type),     intent(inout) :: y             ! y = h (xa)
 
-   integer, intent(in)            :: ids,ide, jds,jde, kds,kde ! domain dims.
-   integer, intent(in)            :: ims,ime, jms,jme, kms,kme ! memory dims.
-   integer, intent(in)            :: its,ite, jts,jte, kts,kte ! tile   dims.
-   integer                        :: sizec
-   real                           :: cvtest(1:cv_size)    ! background error structure.
-   real                           :: field(its:ite,jts:jte) ! Field for spectral transform test.
+   integer, intent(in) :: ids,ide, jds,jde, kds,kde ! domain dims.
+   integer, intent(in) :: ims,ime, jms,jme, kms,kme ! memory dims.
+   integer, intent(in) :: its,ite, jts,jte, kts,kte ! tile   dims.
 
-!------------------------------------------------------------------------------------
-!  [1] Set up test data:
-!------------------------------------------------------------------------------------
+   integer :: sizec
+   real    :: cvtest(1:cv_size)    ! background error structure.
+   real    :: field(its:ite,jts:jte) ! Field for spectral transform test.
 
-!  Initialize cv values with random data:
+   !----------------------------------------------------------------------------
+   ! [1] Set up test data:
+   !----------------------------------------------------------------------------
+
+   ! Initialize cv values with random data:
    call random_number( cvtest(:) )
    cvtest(:) = cvtest(:) - 0.5
 
-!  vv arrays initialized already.
-!  vp arrays initialized already.
+   ! vv arrays initialized already.
+   ! vp arrays initialized already.
 
-!------------------------------------------------------------------------------------
-!  [2] Perform vtox adjoint tests:
-!------------------------------------------------------------------------------------
+   !----------------------------------------------------------------------------
+   ! [2] Perform vtox adjoint tests:
+   !----------------------------------------------------------------------------
 
    call wrf_message("Performing vtox adjoint tests")
 
-!  v_to_vv adjoint test:
+   ! v_to_vv adjoint test:
 
    call da_check_cvtovv_adjoint( cv_size, xb, xbx,xp, be, cvtest, vv, &
                                  ids, ide, jds, jde, kds, kde,      &
                                  ims, ime, jms, jme, kms, kme,      &
                                  its, ite, jts, jte, kts, kte )
 
-!-------------------------------------------------------------------------
-!  vv_to_vp adjoint test:
-!-------------------------------------------------------------------------
+   !-------------------------------------------------------------------------
+   ! vv_to_vp adjoint test:
+   !-------------------------------------------------------------------------
 
    call da_check_vvtovp_adjoint( be % ne, xb, be, vv, vp, &
                                  ids,ide, jds,jde, kds,kde, &
                                  ims,ime, jms,jme, kms,kme, &
                                  its,ite, jts,jte, kts,kte )
 
-!-------------------------------------------------------------------------
-!  vptox adjoint test:
-!-------------------------------------------------------------------------
+   !-------------------------------------------------------------------------
+   ! vptox adjoint test:
+   !-------------------------------------------------------------------------
 
    call da_check_vptox_adjoint( be % ne, xb, xbx, be, ep, xp, vp, xa, &
                                 ids, ide, jds, jde, kds, kde,    &
                                 ims, ime, jms, jme, kms, kme,    &
                                 its, ite, jts, jte, kts, kte )
 
-!-------------------------------------------------------------------------
-!  vtox adjoint test: <x,x> = <v_adj,v>
-!-------------------------------------------------------------------------
+   !-------------------------------------------------------------------------
+   ! vtox adjoint test: <x,x> = <v_adj,v>
+   !-------------------------------------------------------------------------
 
-   call da_check_vtox_adjoint( cv_size, xb, xbx, be, ep, cvtest, vv, vp, xp, xa, &
+   call da_check_vtox_adjoint( cv_size, xb, xbx, be, ep, cvtest, vv, vp, xp, &
+                               xa, &
                                ids, ide, jds, jde, kds, kde,      &
                                ims, ime, jms, jme, kms, kme,      &
                                its, ite, jts, jte, kts, kte )
 
-!------------------------------------------------------------------------------------
-!  [2] Perform xtoy adjoint tests:
-!------------------------------------------------------------------------------------
+   !----------------------------------------------------------------------------
+   ! [2] Perform xtoy adjoint tests:
+   !----------------------------------------------------------------------------
 
    call wrf_message("Performing xtoy adjoint tests")
 
@@ -87,18 +89,18 @@ subroutine da_check( cv_size, xb, xbx, be, ep, iv, &
    call da_zero_x(xa)
 
 #if 1
-      call da_setup_testfield( xb, xa, xp, &
+   call da_setup_testfield( xb, xa, xp, &
                                ids,ide, jds,jde, kds,kde, &
                                ims,ime, jms,jme, kms,kme, &
                                its,ite, jts,jte, kts,kte )
 #else
 
-!-----Make cv_array random.
+   ! Make cv_array random.
 
-      call random_number(cvtest(1:cv_size))
-      cvtest(1:cv_size) = cvtest(1:cv_size) - 0.5
+   call random_number(cvtest(1:cv_size))
+   cvtest(1:cv_size) = cvtest(1:cv_size) - 0.5
 
-      call da_transform_vtox( cv_size, xb, xbx, be, ep, cvtest, vv, vp, xp, xa, &
+   call da_transform_vtox( cv_size, xb, xbx, be, ep, cvtest, vv, vp, xp, xa, &
                               ids, ide, jds, jde, kds, kde,           &
                               ims, ime, jms, jme, kms, kme,           &
                               its, ite, jts, jte, kts, kte )
@@ -111,11 +113,11 @@ subroutine da_check( cv_size, xb, xbx, be, ep, iv, &
 
    call da_deallocate_y( y )
 
-!------------------------------------------------------------------------------------
-!  [4] Perform spectral test:
-!------------------------------------------------------------------------------------
+   !----------------------------------------------------------------------------
+   ! [4] Perform spectral test:
+   !----------------------------------------------------------------------------
 
-   if ( global) then
+   if (global) then
 
       call wrf_message("Performing spectral tests")
 

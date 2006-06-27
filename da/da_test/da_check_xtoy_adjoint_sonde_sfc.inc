@@ -1,4 +1,4 @@
-subroutine DA_Check_XToY_Adjoint_Sonde_Sfc( oi, y, adjtest_lhs, pertile_lhs )
+subroutine da_check_xtoy_adjoint_sonde_sfc( oi, y, adjtest_lhs, pertile_lhs )
 
    IMPLICIT NONE
 
@@ -7,8 +7,6 @@ subroutine DA_Check_XToY_Adjoint_Sonde_Sfc( oi, y, adjtest_lhs, pertile_lhs )
    REAL          , INTENT(inout)  :: adjtest_lhs, pertile_lhs   
 
    INTEGER                        :: n             ! Loop counter.
-
-!----------------------------------------------------------------------------
 
    IF ( oi%num_sound < 1 ) return
 
@@ -60,5 +58,5 @@ subroutine DA_Check_XToY_Adjoint_Sonde_Sfc( oi, y, adjtest_lhs, pertile_lhs )
       endif
    ENDDO
 
-end subroutine DA_Check_XToY_Adjoint_Sonde_Sfc
+end subroutine da_check_xtoy_adjoint_sonde_sfc
 

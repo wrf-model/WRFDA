@@ -1,4 +1,4 @@
-subroutine DA_Check_XToY_Adjoint_Buoy( oi, y, adjtest_lhs, pertile_lhs )
+subroutine da_check_xtoy_adjoint_buoy( oi, y, adjtest_lhs, pertile_lhs )
 
    IMPLICIT NONE
 
@@ -8,13 +8,11 @@ subroutine DA_Check_XToY_Adjoint_Buoy( oi, y, adjtest_lhs, pertile_lhs )
 
    INTEGER                        :: n             ! Loop counter.
 
-!----------------------------------------------------------------------------
-
-   IF ( oi%num_buoy < 1 ) return
+   IF (oi%num_buoy < 1) return
 
    DO n=1, oi%num_buoy
-      if( oi%buoy(n)%loc%proc_domain_with_halo ) then
-         if(oi%buoy(n)%zk < 1.0) then
+      if (oi%buoy(n)%loc%proc_domain_with_halo) then
+         if (oi%buoy(n)%zk < 1.0) then
             y%buoy(n)%u = 0.0
             y%buoy(n)%v = 0.0
             y%buoy(n)%t = 0.0
@@ -30,7 +28,7 @@ subroutine DA_Check_XToY_Adjoint_Buoy( oi, y, adjtest_lhs, pertile_lhs )
          y%buoy(n)%p = y%buoy(n)%p/typical_p_rms
          y%buoy(n)%q = y%buoy(n)%q/typical_q_rms
 
-         if( oi%buoy(n)%loc%proc_domain ) then
+         if (oi%buoy(n)%loc%proc_domain) then
             adjtest_lhs = adjtest_lhs  &
                         + ( y%buoy(n)%u )**2 &
                         + ( y%buoy(n)%v )**2 &
@@ -60,5 +58,5 @@ subroutine DA_Check_XToY_Adjoint_Buoy( oi, y, adjtest_lhs, pertile_lhs )
       endif
    ENDDO
 
-end subroutine DA_Check_XToY_Adjoint_Buoy
+end subroutine da_check_xtoy_adjoint_buoy
 

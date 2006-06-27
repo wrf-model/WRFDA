@@ -111,27 +111,33 @@ subroutine da_check_sfc_assi( xb, xa, iv, xp, y, &
 
    call da_transform_xtowtq_adj ( xp, xb, xa )
    
-   pertile_rhs = sum( xa%u(ims:ime, jms:jme, kms:kme) * xa2_u(ims:ime, jms:jme, kms:kme) ) + &
-                 sum( xa%v(ims:ime, jms:jme, kms:kme) * xa2_v(ims:ime, jms:jme, kms:kme) ) + &
-                 sum( xa%t(ims:ime, jms:jme, kms:kme) * xa2_t(ims:ime, jms:jme, kms:kme) ) + &
-                 sum( xa%p(ims:ime, jms:jme, kms:kme) * xa2_p(ims:ime, jms:jme, kms:kme) ) + &
-                 sum( xa%q(ims:ime, jms:jme, kms:kme) * xa2_q(ims:ime, jms:jme, kms:kme) ) + &
+   pertile_rhs = sum( xa%u(ims:ime, jms:jme, kms:kme) * &
+      xa2_u(ims:ime, jms:jme, kms:kme) ) + &
+                 sum( xa%v(ims:ime, jms:jme, kms:kme) * &
+      xa2_v(ims:ime, jms:jme, kms:kme) ) + &
+                 sum( xa%t(ims:ime, jms:jme, kms:kme) * &
+      xa2_t(ims:ime, jms:jme, kms:kme) ) + &
+                 sum( xa%p(ims:ime, jms:jme, kms:kme) * &
+      xa2_p(ims:ime, jms:jme, kms:kme) ) + &
+                 sum( xa%q(ims:ime, jms:jme, kms:kme) * &
+      xa2_q(ims:ime, jms:jme, kms:kme) ) + &
                  sum( xa%psfc(ims:ime, jms:jme) * xa2_psfc(ims:ime, jms:jme) )
 
-!---- --------------------------------------------------------------------
-!     [6.0] Calculate RHS of adjivnt test equation:
-!-------------------------------------------------------------------------
+   !-------------------------------------------------------------------------
+   ! [6.0] Calculate RHS of adjivnt test equation:
+   !-------------------------------------------------------------------------
    
-   partial_rhs = sum( xa%u(its:ite, jts:jte, kts:kte) * xa2_u(its:ite, jts:jte, kts:kte) ) + &
-                 sum( xa%v(its:ite, jts:jte, kts:kte) * xa2_v(its:ite, jts:jte, kts:kte) ) + &
-                 sum( xa%t(its:ite, jts:jte, kts:kte) * xa2_t(its:ite, jts:jte, kts:kte) ) + &
-                 sum( xa%p(its:ite, jts:jte, kts:kte) * xa2_p(its:ite, jts:jte, kts:kte) ) + &
-                 sum( xa%q(its:ite, jts:jte, kts:kte) * xa2_q(its:ite, jts:jte, kts:kte) ) + &
-                 sum( xa%psfc(its:ite, jts:jte) * xa2_psfc(its:ite, jts:jte) )
+   partial_rhs = &
+      sum(xa%u(its:ite, jts:jte, kts:kte) * xa2_u(its:ite,jts:jte,kts:kte)) + &
+      sum(xa%v(its:ite, jts:jte, kts:kte) * xa2_v(its:ite,jts:jte,kts:kte)) + &
+      sum(xa%t(its:ite, jts:jte, kts:kte) * xa2_t(its:ite,jts:jte,kts:kte)) + &
+      sum(xa%p(its:ite, jts:jte, kts:kte) * xa2_p(its:ite,jts:jte,kts:kte)) + &
+      sum(xa%q(its:ite, jts:jte, kts:kte) * xa2_q(its:ite,jts:jte,kts:kte)) + &
+      sum(xa%psfc(its:ite, jts:jte) * xa2_psfc(its:ite, jts:jte) )
    
-!---- --------------------------------------------------------------------
-!     [7.0] Print output:
-!-------------------------------------------------------------------------
+   !-------------------------------------------------------------------------
+   ! [7.0] Print output:
+   !-------------------------------------------------------------------------
    
    write(UNIT=stdout, fmt='(A,1pe22.14)') &
         ' Tile < y, y     > = ', pertile_lhs, &
@@ -139,10 +145,13 @@ subroutine da_check_sfc_assi( xb, xa, iv, xp, y, &
 
    adj_ttl_lhs = wrf_dm_sum_real( partial_lhs )
    adj_ttl_rhs = wrf_dm_sum_real( partial_rhs )
-   PRINT *,'TEST_COVERAGE_check_sfc_assi_A:  adj_ttl_lhs,adj_ttl_rhs = ', adj_ttl_lhs,adj_ttl_rhs
+   PRINT *,'TEST_COVERAGE_check_sfc_assi_A:  adj_ttl_lhs,adj_ttl_rhs = ', &
+      adj_ttl_lhs,adj_ttl_rhs
    IF ( wrf_dm_on_monitor() ) THEN
-      write(UNIT=stdout, fmt='(A,1pe22.14)') ' Whole Domain < y, y     > = ', adj_ttl_lhs
-      write(UNIT=stdout, fmt='(A,1pe22.14)') ' Whole Domain < x, x_adj > = ', adj_ttl_rhs
+      write(UNIT=stdout, fmt='(A,1pe22.14)') &
+         ' Whole Domain < y, y     > = ', adj_ttl_lhs
+      write(UNIT=stdout, fmt='(A,1pe22.14)') &
+         ' Whole Domain < x, x_adj > = ', adj_ttl_rhs
    ENDIF
 
    ! recover xa
