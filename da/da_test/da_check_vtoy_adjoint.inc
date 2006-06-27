@@ -106,7 +106,7 @@ subroutine da_check_vtoy_adjoint(cv_size,grid, config_flags, vp, vv, &
    IF ( wrf_dm_on_monitor() ) THEN
       write(unit=stdout, fmt='(A,1pe22.14)') &
       'Whole Domain  < y, y     > = ', adj_sum_lhs
-      write(unit=stoud, fmt='(A,1pe22.14)') &
+      write(unit=stdout, fmt='(A,1pe22.14)') &
          'Whole Domain  < v, v_adj > = ', adj_sum_rhs
    END IF
 #else
