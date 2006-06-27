@@ -1,10 +1,8 @@
 #makefile to build io_int that does binary i/o
 
-include ../../configure.wrf
-
 OBJSL   = io_int.o 
 OBJS    = $(OBJSL)
-FFLAGS  = $(FCFLAGS)  -I../../frame
+FFLAGS  = $(FCFLAGS)
 LIBS    = 
 CPP1    = $(CPP) $(TRADFLAG)
 M4      = m4 -Uinclude -Uindex -Ulen
@@ -12,7 +10,7 @@ AR      = ar
 
 .SUFFIXES:      .F90 .F .f .o .code
 
-all : libwrfio_int.a diffwrf_int
+all : libwrfio_int.a diffwrf
 
 libwrfio_int.a:		$(OBJS)
 			/bin/rm -f libwrfio_int.a
@@ -20,7 +18,7 @@ libwrfio_int.a:		$(OBJS)
 			$(RANLIB) libwrfio_int.a
 
 io_int.o:               io_int.F90 module_internal_header_util.o
-			$(CPP1) -I../ioapi_share io_int.F90 | $(M4) - > io_int.f
+			$(CPP1) io_int.F90 | $(M4) - > io_int.f
 			$(FC) $(FFLAGS) -I. -I../ioapi_share -c io_int.f
 			/bin/rm -f module_internal_header_util.o
 			/bin/rm -f intio_tags.h
@@ -34,23 +32,22 @@ module_internal_header_util.o :
 			$(FC) $(FFLAGS) -I. -c module_internal_header_util.f
 			/bin/rm -f module_internal_header_util.b
 
-diffwrf_int:            diffwrf_int.F ../../frame/pack_utils.o ../../frame/module_machine.o ../../frame/module_wrf_error.o libwrfio_int.a
+diffwrf:                diffwrf.F ../../frame/pack_utils.o ../../frame/module_machine.o ../../frame/module_wrf_error.o \
+				libwrfio_int.a $(ESMF_MOD_DEPENDENCE)
 			if [ -f ../../frame/pack_utils.o ] ; then \
-			  mv diffwrf_int.F diffwrf_int.F90    ; \
-			  $(CPP1) $(CPPFLAGS) diffwrf_int.F90 > diffwrf_int.f  ; \
-			  $(SFC) -c $(FFLAGS) -I../ioapi_share diffwrf_int.f    ; \
-			  mv diffwrf_int.F90 diffwrf_int.F ; \
-			  $(SFC) $(FFLAGS) $(LDFLAGS) -o diffwrf_int diffwrf_int.o $(OBJSL) \
-                            ../../frame/pack_utils.o ../../frame/module_internal_header_util.o \
-                            ../../frame/module_driver_constants.o \
-			    ../../frame/module_machine.o ../../frame/module_wrf_error.o ; \
-                        fi
+			mv diffwrf.F diffwrf.F90    ; \
+			$(CPP1) diffwrf.F90 > diffwrf.f  ; \
+			$(SFC) -c $(FFLAGS) -I../ioapi_share diffwrf.f    ; \
+			mv diffwrf.F90 diffwrf.F ; \
+			$(SFC) $(FFLAGS) $(LDFLAGS) -o diffwrf diffwrf.o $(OBJSL) \
+                        ../../frame/pack_utils.o ../../frame/module_internal_header_util.o \
+                        ../../frame/module_driver_constants.o \
+			../../frame/module_machine.o ../../frame/module_wrf_error.o \
+			$(ESMF_IO_LIB_EXT) ; fi
 
-../../frame/pack_utils.o ../../frame/internal_header_util.o ../../frame/module_machine.o ../../frame/module_wrf_error.o :
-			@echo "Diffwrf will be built later on in this compile. No need to rerun compile. "
+../../frame/pack_utils.o ../../frame/internal_header_util.o ../../frame/module_machine.o ../../frame/module_wrf_error.o \
+$(ESMF_MOD_DEPENDENCE) :
+			@echo "Diffwrf io_int will be built later on in this compile. No need to rerun compile. "
 
-clean :
-	@ $(RM) *.o *.f *.mod
-
-superclean: clean
-	$(RM) *.a diffwrf_int
+superclean:
+			/bin/rm -f *.f *.o *.mod libwrfio_int.a diffwrf 

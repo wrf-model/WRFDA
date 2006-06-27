@@ -1,64 +1,80 @@
-#makefile to build io_grib1 that does GriB i/o
+#------------------------------------------------------------------------------
+#  Makefile for producing libdbclient.so 
+#
+#  Copyright (C) 2001, WSI Corporation
+#------------------------------------------------------------------------------
+#
 
-OBJSL   = io_grib1.o gribmap.o grib1_routines.o trim.o
-OBJS    = $(OBJSL)
-LIBS    = -lm
-M4      = m4 -Uinclude -Uindex -Ulen
-AR      = ar
-CPPFLAGS = -C -P
-INCLUDEDIRS  = -I. -Igrib1_util -IMEL_grib1
-RANLIB  = echo
+.SUFFIXES:      .c .o
 
-.SUFFIXES:      .F90 .F .f .c .o
+#
+# Specity location for Makefiles that are included.
+#
+INCLUDEDIRS = -I. -I./MEL_grib1 -Igrib1_util -I../io_grib_share
+BUILD_DIR = $(BUILD_DIR_PRE)../io_grib_share/build
+#
+# Specify directory that output library is to be put in.
+#
+LIB_DEST = .
+#
+#  SPECIFY local include directories used during compilation of source code. 
+#
+#    CXX_INCLUDES is for C++ files
+#    C_INCLUDES is for C files
+#
+C_INCLUDES   = $(INCLUDEDIRS)
+CXX_INCLUDES = $(INCLUDEDIRS)
+F_INCLUDES   = $(INCLUDEDIRS)
+ARFLAGS      = cruv
 
-all : clean_a LOCAL_LIBS libio_grib1.a wgrib
+FORMAT = $(FREE)
 
-wgrib :
-	( cd WGRIB ; make CC="$(CC) $(CFLAGS)" )
-	ln -sf WGRIB/wgrib .
+#
+#  SPECIFY any subdirectories containing libraries that may be dynamically
+#          linked by this library.
+#
+SUB_DIRS =
 
-clean_a :
-	/bin/rm -f libio_grib1.a
+#
+#  SPECIFY information for building a library:
+#
+#    LIB_NAME - Fragment of name of the library to build
+#               e.g. if library file name is libfoo.so, set LIB_NAME = foo 
+#    DEP_LIBS - The tokens required to link a shared library against other
+#               shared libraries upon which it depends.  DEP_LIBS should
+#               contain -L<dir> tokens to specify where the dependent 
+#               libraries are, and -l<lib> tokens to specify libraries to link.
+#    OBJS     - List of object files that go into the library.
+#
+#  NOTES:
+#  1. Be careful about whitespace after the last character in the LIB_NAME.
+#     These spaces will generate an error when the library is made.
+#
+LIB_NAME = io_grib1
+SYS_DEFINES =
+DEP_LIBS = 
+OBJS =  \
+	grib1_routines.o \
+	gribmap.o \
+	io_grib1.o \
+	trim.o
 
-libio_grib1.a:	$(OBJS) makelib
+#
+#  List of subdirectories to which to pass make commands.
+#
+LIB_DIRS = \
+	MEL_grib1 \
+	grib1_util \
+	WGRIB
+EXE_DIRS =
+SUB_DIRS = $(LIB_DIRS) $(EXE_DIRS)
 
-makelib: .FORCE
-	$(AR) cruv libio_grib1.a $(OBJS)
-	$(RANLIB) libio_grib1.a
+#
+#  Include the boilerplate rules for building library modules.
+#
+include $(BUILD_DIR)/library_rules.mk
 
-io_grib1.o:     io_grib1.F 
-	$(CPP) $(CPPFLAGS) -I../../main io_grib1.F -I. | $(M4) - > io_grib1.f
-	$(FC) $(FCFLAGS) -I../../main -I../../inc -I../ioapi_share -I. -c io_grib1.f
-
-test_write_grib: test_write_grib.c grib1_routines.c gridnav.c gribmap.c open_file.c trim.c
-	$(CC) $(CFLAGS) -g test_write_grib.c grib1_routines.c gridnav.c gribmap.c open_file.c trim.c \
-		libgrib1_util.a libMEL_grib1.a -lm
-
-test_grib1_routines: test_grib1_routines.F90 gridnav.c gribmap.c open_file.c trim.c
-	$(FC) -c -g test_grib1_routines.F90
-	$(CC) $(CFLAGS) -c -g grib1_routines.c gridnav.c gribmap.c open_file.c trim.c
-	$(FC) -g -o test_grib1_routines test_grib1_routines.o grib1_routines.o gridnav.o gribmap.o open_file.o trim.o \
-		libgrib1_util.a libMEL_grib1.a -lm
-
-LOCAL_LIBS :
-	( cd MEL_grib1; make CC="$(CC) $(CFLAGS)" archive )
-	( cd grib1_util; make CC="$(CC) $(CFLAGS)" archive )
-
-.FORCE:
-
-superclean: clean
-	@ /bin/rm *.a
-	@ ( cd MEL_grib1; make superclean )
-	@ ( cd grib1_util; make superclean )
-	@ ( cd WGRIB; make superclean )
-
-clean:  
-	@ /bin/rm -f  *.f *.o *.mod
-	@ ( cd MEL_grib1; make clean )
-	@ ( cd grib1_util; make clean )
-	@ ( cd WGRIB; make clean )
-
-.c.o:
-	$(CC) -c $(CFLAGS) $(INCLUDEDIRS) $(DEBUG) $*.c
-
+#
+#  Compile dependencies.  These are appended to this file by make depend. 
+#
 # DO NOT DELETE THIS LINE -- make depend depends on it.

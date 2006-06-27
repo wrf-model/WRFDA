@@ -15,6 +15,7 @@ RECURSIVE SUBROUTINE integrate_ad ( grid, nl_date_string, nl_date_index, ad_date
    USE module_configure
    USE module_timing
    USE esmf_mod
+   USE esmf_clockmod
 
    IMPLICIT NONE
 
