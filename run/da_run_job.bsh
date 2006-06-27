@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 export RELEASE=${RELEASE:-WRF_V2.1.2}
 export REL_DIR=${REL_DIR:-$HOME/code_development/$RELEASE}
@@ -23,7 +23,7 @@ if test $HOSTNAME = "bs1101en" -o $HOSTNAME = "bs1201en"; then # bluesky
   let NODES=($NUM_PROCS-1)/8+1
 
   cat > job.bsh <<EOF
-#!/bin/bash
+#!/bin/sh
 ##@ network.MPI=csss,shared,us
 ##@ notification=error
 #IBM:

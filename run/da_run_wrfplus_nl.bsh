@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Called from da_solve_3d inside WRFVAR. The script is only temporary until we
 # can couple the models through memory rather than files
