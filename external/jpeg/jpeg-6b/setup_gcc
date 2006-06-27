@@ -5,5 +5,5 @@ export CC=gcc
 make
 mkdir lib include
 mv libjpeg.a lib
-mv *.h include
+cp *.h include
 ranlib lib/libjpeg.a
