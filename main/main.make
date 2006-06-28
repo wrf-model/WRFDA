@@ -1,7 +1,5 @@
 # MAIN
 
-setup : links arch depend
-
 var : wrfvar
 
 wrfvar  : advance_cymdh $(WRFVAR_LIBS) wrfvar.o pack_utils.o

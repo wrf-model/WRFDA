@@ -1,5 +1,10 @@
 include configure.wrf
 
+setup : links arch makedepf90 depend
+
+makedepf90 : 
+	@ ( cd  $(EXTERNAL)/makedepf90/makedepf90-2.8.8; ./configure; make )
+
 links : 
 	@ $(LN) $(CHEM)/* .
 	@ $(LN) $(DYN_NMM)/* .
@@ -57,7 +62,8 @@ include $(MAIN)/main.make
 
 depend : links module_state_description.f90 md_calls.inc \
                       inc/da_generic_boilerplate.inc
-	makedepf90 $(FPPFLAGS) *.F *.f90 *.F90 > depend.txt 2>/dev/null
+	$(EXTERNAL)/makedepf90/makedepf90-2.8.8/makedepf90 $(FPPFLAGS) \
+           *.F *.f90 *.F90 > depend.txt 2>/dev/null
 
 include depend.txt
 
@@ -85,6 +91,7 @@ clean : arch_clean
           Registry_tmp* module_state_description.f90 bufrlib.prm \
           $(EXTERNAL)/*.o $(EXTERNAL)/*.a $(EXTERNAL)/*/*.o $(EXTERNAL)/*/*.a \
           inc/dm_comm_cpp_flags
+	@ ( cd  $(EXTERNAL)/makedepf90/makedepf90-2.8.8; make clean )
 
 superclean : clean arch_superclean
 	@ $(RM) *.f90 *.F90 *.F *.inc *.int *.c *.h *.m4 *.code *.make \
@@ -94,4 +101,3 @@ superclean : clean arch_superclean
           scl_plotting_routines configure.wrf ../configure.wrf \
           advance_cymdh.exe decode_l2_airs.README time_window.nl \
           Makefile_old da_macros_utl
-
