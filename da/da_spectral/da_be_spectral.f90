@@ -3,6 +3,7 @@ module be_spectral
    use da_constants
    use fftpack5
    USE module_wrf_error
+   use da_tracing
 
    !--------------------------------------------------------------------
    ! Contains all necessary routines to perform global spectral transform

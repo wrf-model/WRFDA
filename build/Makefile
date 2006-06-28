@@ -1,19 +1,21 @@
 include configure.wrf
 
-setup : arch links makedepf90 depend
+setup : arch depend
 
 makedepf90 : 
 	@ ( cd $(EXTERNAL)/makedepf90/makedepf90-2.8.8; ./configure; make )
+	cp $(EXTERNAL)/makedepf90/makedepf90-2.8.8/makedepf90 .
 
 links : 
 	@ $(LN) $(CHEM)/* .
 	@ $(LN) $(DYN_NMM)/* .
 	@ $(LN) $(DYNAMICS)/* .
-	@ $(LN) $(PHYS)/* .
+	@ $(LN) $(GEN_BE)/* .
 	@ $(LN) $(INC)/* .
 	@ $(LN) $(SHARE)/* .
 	@ $(LN) $(FRAME)/* .
 	@ $(LN) $(MAIN)/* .
+	@ $(LN) $(PHYS)/* .
 	@ $(LN) $(TOOLS)/*.make .
 	@ $(LN) $(TOOLS)/*.f90 .
 	@ $(LN) $(TOOLS)/*.c .
@@ -26,7 +28,7 @@ links :
 	@ $(LN) $(EXTERNAL)/*/*.F .
 	@ $(LN) $(EXTERNAL)/*/*.c .
 	@ $(LN) $(EXTERNAL)/*/*.h .
-	@ $(LN) $(EXTERNAL)/*/*sh ..
+	@ $(LN) $(EXTERNAL)/*/*sh .
 	@ $(LN) $(BUFR_NCEP_NCO)/bufrlib.param .
 	@ $(LN) $(IO_NETCDF)/*.code .
 	@ $(LN) $(ARCH)/*.sed .
@@ -35,6 +37,7 @@ links :
 	@ $(LN) $(CONVERTOR)/wave2grid_kma .
 	@ $(LN) $(CONVERTOR)/decode_l2_airs/* .
 	@ $(LN) $(ESMF_TIME_F90)/*.F90 .
+	@ touch links
 
 
 # Manual rules specified first take precedence
@@ -61,9 +64,9 @@ include $(RSL_LITE)/RSL_LITE.make
 include $(MAIN)/main.make
 
 
-depend : module_state_description.f90 md_calls.inc \
+depend : links registry makedepf90 module_state_description.f90 md_calls.inc \
                       inc/da_generic_boilerplate.inc
-	$(EXTERNAL)/makedepf90/makedepf90-2.8.8/makedepf90 $(FPPFLAGS) \
+	./makedepf90 $(FPPFLAGS) \
            *.F *.f90 *.F90 > depend 2>/dev/null
 
 include depend
