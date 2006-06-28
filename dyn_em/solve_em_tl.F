@@ -561,14 +561,15 @@ BENCH_END(phy_prep_tim)
 BENCH_START(rad_driver_tim)
          if(dyn_opt == DYN_EM) then
          CALL radiation_driver(                                           &
-     &         ACFRCV=acfrcv      ,ACFRST=acfrst      ,AER_DRY=aer_dry    &
-     &        ,AER_WATER=aer_water                    ,ALBEDO=albedo      &
+     &         ACFRCV=acfrcv      ,ACFRST=acfrst                          &
+     &                            ,ALBEDO=albedo      &
      &        ,CFRACH=cfrach      ,CFRACL=cfracl      ,CFRACM=cfracm      &
      &        ,CUPPT=cuppt        ,CZMEAN=czmean      ,DT=dt              &
      &        ,DZ8W=dz8w          ,EMISS=emiss        ,GLW=glw            &
      &        ,GMT=gmt            ,GSW=gsw            ,HBOT=hbot          &
-     &        ,HTOP=htop          ,ICLOUD=icloud                          &
-     &        ,ITIMESTEP=itimestep                    ,JULDAY=julday      &
+     &        ,HTOP=htop          ,HTOPR=htopr        ,ICLOUD=icloud                          &
+     &        ,ITIMESTEP=itimestep,HBOTR=hbotr        ,JULDAY=julday      &
+     &        ,julian=julian &
      &        ,JULYR=julyr        ,LW_PHYSICS=config_flags%ra_lw_physics  &
      &        ,NCFRCV=ncfrcv      ,NCFRST=ncfrst      ,NPHS=1             &
      &        ,P8W=p8w            ,P=p_phy            ,PI=pi_phy          &
@@ -579,7 +580,7 @@ BENCH_START(rad_driver_tim)
      &        ,STEPRA=stepra      ,SWDOWN=swdown                          &
      &        ,SW_PHYSICS=config_flags%ra_sw_physics  ,T8W=t8w            &
      &        ,T=t_phy            ,TAUCLDC=taucldc    ,TAUCLDI=taucldi    &
-     &        ,TOTLWDN=totlwdn    ,TOTSWDN=totswdn    ,TSK=tsk            &
+     &        ,xtime=xtime        ,TSK=tsk            &
      &        ,VEGFRA=vegfra      ,WARM_RAIN=warm_rain                    &
      &        ,XLAND=xland        ,XLAT=xlat          ,XLONG=xlong        &
             ! indexes

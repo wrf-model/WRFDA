@@ -254,14 +254,13 @@ RECURSIVE SUBROUTINE integrate_tl ( grid, nl_date_string, nl_date_index )
 
    IF ( .NOT. ESMF_ClockIsStopTime(grid%domain_clock ,rc=rc) ) THEN
       CALL model_to_grid_config_rec ( grid%id , model_config_rec , config_flags )
-      CALL ESMF_ClockGet( grid%domain_clock, currTime=grid%current_time, rc=rc )
       CALL wrf_clockprint ( 150, grid%domain_clock, &
                             'DEBUG:  top of integrate_tl(),' )
 
       CALL ESMF_TimeIntervalPrint(grid%domain_clock%clockint%TimeStep, 'DEBUG:  integrate_tl.', rc)
       CALL print_a_timeinterval(grid%domain_clock%clockint%TimeStep)
 
-      DO WHILE ( grid%current_time .LT. grid%stop_subtime )
+      DO WHILE ( domain_get_current_time(grid) .LT. grid%stop_subtime )
          IF ( wrf_dm_on_monitor() ) THEN
            CALL start_timing
          END IF
@@ -289,7 +288,7 @@ RECURSIVE SUBROUTINE integrate_tl ( grid, nl_date_string, nl_date_index )
 !-----------start check non-linear input
             CALL wrf_clockprint ( 150, grid%domain_clock, 'DEBUG:  integrate_tl(),' )
 
-            CALL wrf_timetoa( grid%current_time, currTime_str )
+            CALL wrf_timetoa( domain_get_current_time(grid), currTime_str )
 
             if(currTime_str(1:19) .eq. nl_date_string(nl_date_index)(1:19)) then
                write(unit=*, fmt='(a,i5,4(1x,a))') &
@@ -331,7 +330,6 @@ RECURSIVE SUBROUTINE integrate_tl ( grid, nl_date_string, nl_date_index )
                                   __LINE__  )
             CALL wrf_clockprint ( 150, grid_ptr%domain_clock, &
                                   'DEBUG integrate_tl():  after ESMF_ClockAdvance,' )
-            CALL ESMF_ClockGet( grid_ptr%domain_clock, currTime=grid_ptr%current_time, rc=rc )
             CALL wrf_debug( 100 , 'module_integrate_tl: back from solve interface _tl' )
             grid_ptr => grid_ptr%sibling
          END DO
@@ -345,8 +343,8 @@ RECURSIVE SUBROUTINE integrate_tl ( grid, nl_date_string, nl_date_index )
                 CALL wrf_debug( 100 , 'module_integrate_tl: calling med_nest_force ' )
                 CALL med_nest_force ( grid_ptr , grid_ptr%nests(kid)%ptr , config_flags )
                 CALL wrf_debug( 100 , 'module_integrate_tl: back from med_nest_force ' )
-                grid_ptr%nests(kid)%ptr%start_subtime = grid%current_time - grid%step_time
-                grid_ptr%nests(kid)%ptr%stop_subtime = grid%current_time
+                grid_ptr%nests(kid)%ptr%start_subtime = domain_get_current_time(grid) - domain_get_time_step(grid)
+                grid_ptr%nests(kid)%ptr%stop_subtime = domain_get_current_time(grid)
                 CALL integrate_tl ( grid_ptr%nests(kid)%ptr, nl_date_string, nl_date_index ) 
                 CALL wrf_debug( 100 , 'module_integrate_tl: back from recursive call to integrate_tl ' )
                 CALL wrf_debug( 100 , 'module_integrate_tl: calling med_nest_feedback ' )
@@ -361,7 +359,7 @@ RECURSIVE SUBROUTINE integrate_tl ( grid, nl_date_string, nl_date_index )
          END DO
          !  Report on the timing for a single time step.
          IF ( wrf_dm_on_monitor() ) THEN
-           CALL wrf_timetoa ( grid%current_time, message2 )
+           CALL wrf_timetoa ( domain_get_current_time(grid), message2 )
            WRITE ( message , FMT = '("main: time ",A," on domain ",I3)' ) TRIM(message2), grid%id
            CALL end_timing ( TRIM(message) )
          END IF

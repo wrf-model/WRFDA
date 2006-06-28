@@ -253,12 +253,11 @@ RECURSIVE SUBROUTINE integrate_ad ( grid, nl_date_string, nl_date_index, ad_date
 
    IF ( .NOT. ESMF_ClockIsStartTime(grid%domain_clock ,rc=rc) ) THEN
       CALL model_to_grid_config_rec ( grid%id , model_config_rec , config_flags )
-      CALL ESMF_ClockGet( grid%domain_clock, currTime=grid%current_time, rc=rc )
 
 !-----start check nonlinear and adjoint input
       CALL wrf_clockprint ( 150, grid%domain_clock, 'DEBUG:  integrate_ad(),' )
 
-      CALL wrf_timetoa( grid%current_time, currTime_str )
+      CALL wrf_timetoa( domain_get_current_time(grid), currTime_str )
 
 !-----start check non-linear input
       if(currTime_str(1:19) .eq. nl_date_string(nl_date_index)(1:19)) then
@@ -305,17 +304,16 @@ RECURSIVE SUBROUTINE integrate_ad ( grid, nl_date_string, nl_date_index, ad_date
       CALL ESMF_TimeIntervalPrint(grid%domain_clock%clockint%TimeStep, 'DEBUG:  integrate_ad.', rc)
       CALL print_a_timeinterval(grid%domain_clock%clockint%TimeStep)
 
-      DO WHILE ( grid%current_time .GT. grid%start_subtime )
+      DO WHILE ( domain_get_current_time(grid) .GT. grid%start_subtime )
          IF ( wrf_dm_on_monitor() ) THEN
            CALL start_timing
          END IF
 
 !--------start check nonlinear and adjoint input
 
-         CALL ESMF_ClockGet( grid%domain_clock, currTime=grid%current_time, rc=rc )
          CALL wrf_clockprint ( 150, grid%domain_clock, 'DEBUG:  integrate_ad(),' )
 
-         CALL wrf_timetoa( grid%current_time, currTime_str )
+         CALL wrf_timetoa( domain_get_current_time(grid), currTime_str )
 
 !-----start check non-linear input
          if(currTime_str(1:19) .eq. nl_date_string(nl_date_index)(1:19)) then
@@ -394,7 +392,6 @@ RECURSIVE SUBROUTINE integrate_ad ( grid, nl_date_string, nl_date_index, ad_date
                                   __LINE__  )
             CALL wrf_clockprint ( 150, grid_ptr%domain_clock, &
                                   'DEBUG integrate_ad():  after ESMF_ClockBack,' )
-            CALL ESMF_ClockGet( grid_ptr%domain_clock, currTime=grid_ptr%current_time, rc=rc )
             CALL wrf_debug( 100 , 'module_integrate_ad: back from solve interface ad' )
             grid_ptr => grid_ptr%sibling
          END DO
@@ -406,8 +403,9 @@ RECURSIVE SUBROUTINE integrate_ad ( grid, nl_date_string, nl_date_index, ad_date
                 CALL wrf_debug( 100 , 'module_integrate_ad: calling med_nest_force ' )
                 CALL med_nest_force ( grid_ptr , grid_ptr%nests(kid)%ptr , config_flags )
                 CALL wrf_debug( 100 , 'module_integrate_ad: back from med_nest_force ' )
-                grid_ptr%nests(kid)%ptr%start_subtime = grid%current_time - grid%step_time
-                grid_ptr%nests(kid)%ptr%stop_subtime = grid%current_time
+                grid_ptr%nests(kid)%ptr%start_subtime = domain_get_current_time(grid) - &
+                   domain_get_time_step(grid)
+                grid_ptr%nests(kid)%ptr%stop_subtime = domain_get_current_time(grid)
                 CALL integrate_ad ( grid_ptr%nests(kid)%ptr, nl_date_string, nl_date_index, ad_date_string, ad_date_index ) 
                 CALL wrf_debug( 100 , 'module_integrate_ad: back from recursive call to integrate_ad ' )
                 CALL wrf_debug( 100 , 'module_integrate_ad: calling med_nest_feedback ' )
@@ -422,7 +420,7 @@ RECURSIVE SUBROUTINE integrate_ad ( grid, nl_date_string, nl_date_index, ad_date
          END DO
          !  Report on the timing for a single time step.
          IF ( wrf_dm_on_monitor() ) THEN
-           CALL wrf_timetoa ( grid%current_time, message2 )
+           CALL wrf_timetoa ( domain_get_current_time(grid), message2 )
            WRITE ( message , FMT = '("main: time ",A," on domain ",I3)' ) TRIM(message2), grid%id
            CALL end_timing ( TRIM(message) )
          END IF
@@ -434,10 +432,9 @@ RECURSIVE SUBROUTINE integrate_ad ( grid, nl_date_string, nl_date_index, ad_date
 
 !--------start check nonlinear and adjoint input
 
-         CALL ESMF_ClockGet( grid%domain_clock, currTime=grid%current_time, rc=rc )
          CALL wrf_clockprint ( 1, grid%domain_clock, 'Check last time:  integrate_ad(),' )
 
-         CALL wrf_timetoa( grid%current_time, currTime_str )
+         CALL wrf_timetoa( domain_get_current_time(grid), currTime_str )
 
 !--------start check non-linear input
          if(currTime_str(1:19) .eq. nl_date_string(nl_date_index)(1:19)) then

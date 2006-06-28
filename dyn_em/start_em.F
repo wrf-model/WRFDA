@@ -2,7 +2,7 @@
 
    SUBROUTINE start_domain_em ( grid, allowed_to_read , &
 ! Actual arguments generated from Registry
-# include <em_dummy_args.inc>
+#include "em_dummy_args.inc"
 !
 )
 
@@ -19,6 +19,10 @@
    USE module_tiles
 
    USE module_physics_init
+#ifdef WRF_CHEM
+   USE module_aerosols_sorgam, only: sum_pm_sorgam
+   USE module_mosaic_driver, only: sum_pm_mosaic
+#endif
 
 #ifdef DM_PARALLEL
    USE module_dm
@@ -35,8 +39,9 @@
    LOGICAL , INTENT(IN)   :: allowed_to_read
 
    !  Definitions of dummy arguments to this routine (generated from Registry).
-# include <em_dummy_decl.inc>
-#include <namelist_defines2.inc>
+#include "em_dummy_decl.inc"
+#include "namelist_defines2.inc"
+
    !  Structure that contains run-time configuration (namelist) data for domain
    TYPE (grid_config_rec_type)              :: config_flags
 
@@ -47,7 +52,7 @@
                                   ips, ipe, jps, jpe, kps, kpe, &
                                   its, ite, jts, jte, kts, kte, &
                                   ij,i,j,k,ii,jj,kk,loop,error,l
-                                  
+
 ! These are used if -DDEREF_KLUDGE is compiled
 !  see http://www.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm
    INTEGER     :: sm31  , em31  , sm32  , em32  , sm33  , em33
@@ -56,18 +61,18 @@
 
    INTEGER     :: hr, mn, sec, ms, rc
 
-   CHARACTER*80 :: message
-
-   REAL        :: p00, t00, base_lapse_local, p_surf, pd_surf
+   REAL        :: p00, t00, p_surf, pd_surf
 
    REAL :: qvf1, qvf2, qvf
    REAL :: MPDT
+   REAL :: spongeweight
    LOGICAL :: first_trip_for_this_domain
 
    REAL :: lat1 , lat2 , lat3 , lat4
    REAL :: lon1 , lon2 , lon3 , lon4
    INTEGER :: num_points_lat_lon , iloc , jloc
-!integer myproc
+   CHARACTER (LEN=132) :: message
+   TYPE(WRFU_Time) :: CurrTime
 
 ! Trick problematic compilers into not performing copy-in/copy-out by adding
 ! indices to array arguments in the CALL statements in this routine.
@@ -84,7 +89,7 @@
 ! The definition of COPY_IN or COPY_OUT before the include defines the
 ! direction of the copy.  Em_scalar_derefs.inc is generated from Registry
 #define COPY_IN
-#include <em_scalar_derefs.inc>
+#include "em_scalar_derefs.inc"
 
 ! Needed by some comm layers, e.g. RSL. If needed, nmm_data_calls.inc is
 ! generated from the registry.  The definition of REGISTER_I1 allows
@@ -103,6 +108,14 @@
 
    CALL model_to_grid_config_rec ( grid%id , model_config_rec , config_flags )
 
+   IF ( ( MOD (ide-ids,config_flags%parent_grid_ratio) .NE. 0 ) .OR. &
+        ( MOD (jde-jds,config_flags%parent_grid_ratio) .NE. 0 ) ) THEN
+      WRITE(message, FMT='("Nested dimensions are illegal for domain ",I2,":  Both &
+         &MOD(",I4,"-",I1,",",I2,") and MOD(",I4,"-",I1,",",I2,") must = 0" )') &
+         grid%id,ide,ids,config_flags%parent_grid_ratio,jde,jds,config_flags%parent_grid_ratio
+      CALL wrf_error_fatal ( message ) 
+   END IF
+
 ! here we check to see if the boundary conditions are set properly
 
    CALL boundary_condition_check( config_flags, bdyzone, error, grid%id )
@@ -118,43 +131,49 @@
       first_trip_for_this_domain = .FALSE.
    END IF
 
-   IF ( .not. restart ) THEN 
+   IF ( .not. ( config_flags%restart .or. moved ) ) THEN 
        itimestep=0
    ENDIF
 
-   IF ( restart .or. moved ) THEN 
+   IF ( config_flags%restart .or. moved ) THEN 
        first_trip_for_this_domain = .TRUE.
    ENDIF
-   
+
    IF (config_flags%specified) THEN
 !
 ! Arrays for specified boundary conditions
+! wig: Add a combined exponential+linear weight on the mother boundaries
+!      following code changes by Ruby Leung. For the nested grid, there
+!      appears to be some problems when a sponge is used. The points where
+!      processors meet have problematic values.
 
-
-     DO loop = spec_zone + 1, spec_zone + relax_zone
-       fcx(loop) = 0.1 / dt * (spec_zone + relax_zone - loop) / (relax_zone - 1)
-       gcx(loop) = 1.0 / dt / 50. * (spec_zone + relax_zone - loop) / (relax_zone - 1)
+     DO loop = grid%spec_zone + 1, grid%spec_zone + grid%relax_zone
+       fcx(loop) = 0.1 / grid%dt * (grid%spec_zone + grid%relax_zone - loop) / (grid%relax_zone - 1)
+       gcx(loop) = 1.0 / grid%dt / 50. * (grid%spec_zone + grid%relax_zone - loop) / (grid%relax_zone - 1)
+!      spongeweight=exp(-(loop-2)/3.)
+!      fcx(loop) = fcx(loop)*spongeweight
+!      gcx(loop) = gcx(loop)*spongeweight
      ENDDO
 
    ELSE IF (config_flags%nested) THEN
 !
 ! Arrays for specified boundary conditions
 
-     DO loop = spec_zone + 1, spec_zone + relax_zone
-!       fcx(loop) = 0.1 / dt * (spec_zone + relax_zone - loop) / (relax_zone - 1)
-!       gcx(loop) = 1.0 / dt / 50. * (spec_zone + relax_zone - loop) / (relax_zone - 1)
-       fcx(loop) = 0.
-       gcx(loop) = 0.
+     DO loop = grid%spec_zone + 1, grid%spec_zone + grid%relax_zone
+       fcx(loop) = 0.1 / grid%dt * (grid%spec_zone + grid%relax_zone - loop) / (grid%relax_zone - 1)
+       gcx(loop) = 1.0 / grid%dt / 50. * (grid%spec_zone + grid%relax_zone - loop) / (grid%relax_zone - 1)
+!      spongeweight=exp(-(loop-2)/3.)
+!      fcx(loop) = fcx(loop)*spongeweight
+!      gcx(loop) = gcx(loop)*spongeweight
+!      fcx(loop) = 0.
+!      gcx(loop) = 0.
      ENDDO
 
      dtbc = 0.
 
    ENDIF
 
-
-!call wrf_get_myproc(myproc)
-
-      IF ( grid%id .NE. 1 ) THEN
+!     IF ( grid%id .NE. 1 ) THEN
    
       !  Every time a domain starts or every time a domain moves, this routine is called.  We want
       !  the center (middle) lat/lon of the grid for the metacode.  The lat/lon values are
@@ -298,19 +317,14 @@
          CALL nl_set_cen_lat ( grid%id , ( lat1 + lat2 + lat3 + lat4 ) * 0.25 )
          CALL nl_set_cen_lon ( grid%id , ( lon1 + lon2 + lon3 + lon4 ) * 0.25 )
       END IF
-   END IF
+!  END IF
 
-   
-
-   
-   
-
-
-   IF ( ( config_flags%input_from_hires ) .OR. ( config_flags%input_from_file ) ) THEN
+   IF ( .NOT. config_flags%restart .AND. &
+        (( config_flags%input_from_hires ) .OR. ( config_flags%input_from_file ))) THEN
 
       CALL nl_get_base_pres  ( 1 , p00 )
       CALL nl_get_base_temp  ( 1 , t00 )
-      CALL nl_get_base_lapse ( 1 , base_lapse_local   )
+      CALL nl_get_base_lapse ( 1 , base_lapse   )
 
       !  Base state potential temperature and inverse density (alpha = 1/rho) from
       !  the half eta levels and the base-profile surface pressure.  Compute 1/rho
@@ -323,12 +337,12 @@
             !  the hand full of constants: p00 (sea level pressure, Pa), t00 (sea level
             !  temperature, K), and A (temperature difference, from 1000 mb to 300 mb, K).
 
-            p_surf = p00 * EXP ( -t00/base_lapse_local + ( (t00/base_lapse_local)**2 - &
-              2.*g*ht(i,j)/base_lapse_local/r_d ) **0.5 )
+            p_surf = p00 * EXP ( -t00/base_lapse + ( (t00/base_lapse)**2 - &
+               2.*g*ht(i,j)/base_lapse/r_d ) **0.5 )
 
             DO k = 1, kte-1
                pb(i,k,j) = znu(k)*(p_surf - p_top) + p_top
-               t_init(i,k,j) = (t00 + base_lapse_local*LOG(pb(i,k,j)/p00))*(p00/pb(i,k,j))**(r_d/cp) - t0
+               t_init(i,k,j) = (t00 + base_lapse*LOG(pb(i,k,j)/p00))*(p00/pb(i,k,j))**(r_d/cp) - t0
                alb(i,k,j) = (r_d/p1000mb)*(t_init(i,k,j)+t0)*(pb(i,k,j)/p1000mb)**cvpm
             END DO
 
@@ -425,7 +439,7 @@
 
    ENDIF
 
-   IF ( ( grid%id .NE. 1 ) .AND. &
+   IF ( ( grid%id .NE. 1 ) .AND. .NOT. ( config_flags%restart ) .AND. &
        ( ( config_flags%input_from_hires ) .OR. ( config_flags%input_from_file ) ) ) THEN
       DO j = jts, MIN(jte,jde-1)
          DO i = its, MIN(ite,ide-1)
@@ -452,24 +466,25 @@
 ! set GMT outside of phy_init because phy_init may not be called on this
 ! process if, for example, it is a moving nest and if this part of the domain is not
 ! being initialized (not the leading edge).
-   IF ( .NOT. grid%restart ) THEN
-     CALL wrf_clockprint(150, grid%domain_clock, &
-                         'DEBUG phy_init():  get currTime from grid%domain_clock,')
-     CALL WRFU_ClockGet( grid%domain_clock, currTime=grid%current_time, rc=rc )
-     CALL WRFU_TimeGet( grid%current_time, YY=julyr, dayOfYear=julday, H=hr, M=mn, S=sec, MS=ms, rc=rc)
-     CALL wrf_timetoa ( grid%current_time, message )
+   IF ( .NOT. config_flags%restart ) THEN
+     CALL domain_clockprint(150, grid, &
+       'DEBUG phy_init():  get currTime from clock,')
+     CALL domain_clock_get ( grid, current_time=CurrTime, &
+                                   current_timestr=message )
+     CALL WRFU_TimeGet( CurrTime, YY=grid%julyr, dayOfYear=grid%julday, &
+                        H=hr, M=mn, S=sec, MS=ms, rc=rc)
      WRITE( wrf_err_message , * ) 'DEBUG start_em():  currTime = [',TRIM( message ),']'
      CALL wrf_debug( 150, TRIM(wrf_err_message) )
-     gmt=hr+real(mn)/60.+real(sec)/3600.+real(ms)/(1000*3600)
+     grid%gmt=hr+real(mn)/60.+real(sec)/3600.+real(ms)/(1000*3600)
      WRITE( wrf_err_message , * ) 'DEBUG start_em():  julyr,hr,mn,sec,ms,julday = ', &
-                                  julyr,hr,mn,sec,ms,julday
+                                  grid%julyr,hr,mn,sec,ms,grid%julday
      CALL wrf_debug( 150, TRIM(wrf_err_message) )
-     WRITE( wrf_err_message , * ) 'DEBUG start_em():  gmt = ',gmt
+     WRITE( wrf_err_message , * ) 'DEBUG start_em():  gmt = ',grid%gmt
      CALL wrf_debug( 150, TRIM(wrf_err_message) )
    ELSE
-     CALL nl_get_julyr (grid%id, julyr)
-     CALL nl_get_julday (grid%id, julday)
-     CALL nl_get_gmt (grid%id, gmt)
+     CALL nl_get_julyr (grid%id, grid%julyr)
+     CALL nl_get_julday (grid%id, grid%julday)
+     CALL nl_get_gmt (grid%id, grid%gmt)
    END IF
 
    CALL set_tiles ( grid , imask_nostag, ims, ime, jms, jme, ips, ipe, jps, jpe )
@@ -479,8 +494,8 @@
    DO ij = 1, grid%num_tiles
 
      CALL phy_init (  grid,                                   &  
-                      grid%id , config_flags, DT, znw, znu,   &
-                      p_top, TSK, RADT,BLDT,CUDT, MPDT,       &
+                      grid%id , config_flags, grid%DT, znw, znu,   &
+                      p_top, TSK, grid%RADT,grid%BLDT,grid%CUDT, MPDT,       &
                       RTHCUTEN, RQVCUTEN, RQRCUTEN,           &
                       RQCCUTEN, RQSCUTEN, RQICUTEN,           &
                       RUBLTEN,RVBLTEN,RTHBLTEN,               &
@@ -488,22 +503,23 @@
                       RTHRATEN,RTHRATENLW,RTHRATENSW,         &
                       STEPBL,STEPRA,STEPCU,                   &
                       W0AVG, RAINNC, RAINC, RAINCV, RAINNCV,  &
-                      NCA,                                    &
+                      NCA,grid%swrad_scat,                    &
                       CLDEFI,LOWLYR,                          &
                       MASS_FLUX,                              &
                       RTHFTEN, RQVFTEN,                       &
                       CLDFRA,GLW,GSW,EMISS,LU_INDEX,          &
-                      XLAT,XLONG,ALBEDO,ALBBCK,GMT,JULYR,JULDAY,     &
+                      XLAT,XLONG,ALBEDO,ALBBCK,grid%GMT,grid%JULYR,grid%JULDAY,     &
                       TMN,XLAND,ZNT,Z0,UST,MOL,PBLH,TKE_MYJ,     &
                       EXCH_H,THC,SNOWC,MAVAIL,HFX,QFX,RAINBL, &
-                      TSLB,ZS,DZS,num_soil_layers,warm_rain,  &
+                      TSLB,ZS,DZS,config_flags%num_soil_layers,warm_rain,  &
+                      adv_moist_cond,                         &
                       APR_GR,APR_W,APR_MC,APR_ST,APR_AS,      &
                       APR_CAPMA,APR_CAPME,APR_CAPMI,          &
                       XICE,VEGFRA,SNOW,CANWAT,SMSTAV,         &
                       SMSTOT, SFCRUNOFF,UDRUNOFF,GRDFLX,ACSNOW,      &
                       ACSNOM,IVGTYP,ISLTYP, SFCEVP,SMOIS,     &
                       SH2O, SNOWH, SMFR3D,                    &
-                      DX,DY,F_ICE_PHY,F_RAIN_PHY,F_RIMEF_PHY, &
+                      grid%DX,grid%DY,F_ICE_PHY,F_RAIN_PHY,F_RIMEF_PHY, &
                       mp_restart_state,tbpvs_state,tbpvs0_state,&
                       allowed_to_read, moved ,                &
                       ids, ide, jds, jde, kds, kde,           &
@@ -511,8 +527,6 @@
                       grid%i_start(ij), grid%i_end(ij), grid%j_start(ij), grid%j_end(ij), kts, kte           )
 
    ENDDO
-
-!                     SH2O, SNOWH, FNDSOILW, FNDSNOWH,        &  ! correct one
 
    CALL wrf_debug ( 100 , 'module_start: start_domain_rk: After call to phy_init' )
 
@@ -522,6 +536,10 @@
 #endif
 
    END IF
+
+#if 0
+#include "CYCLE_TEST.inc"
+#endif
 
 !
 !
@@ -586,17 +604,17 @@
 
 !--------------------------------------------------------------
 
-
 #ifdef DM_PARALLEL
-#  include "PERIOD_BDY_EM_INIT.inc"
-#  include "PERIOD_BDY_EM_MOIST.inc"
-#  include "PERIOD_BDY_EM_CHEM.inc"
 #  include "HALO_EM_INIT_1.inc"
 #  include "HALO_EM_INIT_2.inc"
 #  include "HALO_EM_INIT_3.inc"
 #  include "HALO_EM_INIT_4.inc"
 #  include "HALO_EM_INIT_5.inc"
+#  include "PERIOD_BDY_EM_INIT.inc"
+#  include "PERIOD_BDY_EM_MOIST.inc"
+#  include "PERIOD_BDY_EM_CHEM.inc"
 #endif
+
 
    CALL set_physical_bc3d( u_1 , 'U' , config_flags ,                  &
                          ids , ide , jds , jde , kds , kde ,        &
@@ -628,7 +646,7 @@
                            its , ite , jts , jte , &
                            its , ite , jts , jte   )
 
-   IF ( .not. restart ) THEN 
+   IF ( .not. config_flags%restart ) THEN 
    CALL set_w_surface(  config_flags,                                      &
                         w_1, ht, u_1, v_1, cf1, cf2, cf3, rdx, rdy, msft,  &
                         ids, ide, jds, jde, kds, kde,                      &
@@ -758,39 +776,77 @@
 
    ENDIF
 
+#ifdef WRF_CHEM
+! Zero out the Mie arrays so they do not cause instabilities when not calling Fast-J.
+   if( .NOT. config_flags%restart ) then
+      do j=jts,jte
+         do k=kts,kte
+            do i=its,ite
+               tauaer1(i,k,j) = 0.
+               tauaer2(i,k,j) = 0.
+               tauaer3(i,k,j) = 0.
+               tauaer4(i,k,j) = 0.
+               gaer1(i,k,j) = 0.
+               gaer2(i,k,j) = 0.
+               gaer3(i,k,j) = 0.
+               gaer4(i,k,j) = 0.
+               waer1(i,k,j) = 0.
+               waer2(i,k,j) = 0.
+               waer3(i,k,j) = 0.
+               waer4(i,k,j) = 0.
+            end do
+         end do
+      end do
+   end if
+#endif
+
    IF (num_chem >= PARAM_FIRST_SCALAR ) THEN
 #ifdef WRF_CHEM
-         CALL chem_init (grid%id,chem,dt,bioemdt,photdt,chemdt,           &
+         CALL chem_init (grid%id,chem,grid%dt,grid%bioemdt,grid%photdt,grid%chemdt,           &
                          stepbioe,stepphot,stepchem,                        &
                          ph_2,phb,g,aerwrf,config_flags,                    &
                          alt,t_1,pb,p,t0,p1000mb,rcp,                       &
-                         aer_dry,aer_water,chem_in_opt,                     &
-                         imicrogram,                                        &
+                         tauaer1,tauaer2,tauaer3,tauaer4,                   &
+                         gaer1,gaer2,gaer3,gaer4,                           &
+                         waer1,waer2,waer3,waer4,                           &
+                         pm2_5_dry,pm2_5_water,pm2_5_dry_ec,                &
+                         grid%chem_in_opt,                                  &
                                  ids , ide , jds , jde , kds , kde ,        &
                                  ims , ime , jms , jme , kms , kme ,        &
                                  its , ite , jts , jte , kts , kte          )
 !
 ! calculate initial pm
 !
-        print *,'calculating initial pm'
-        do j=jts,jte
-        jj=min(jde-1,j)
-        do k=kts,kte
-        kk=min(kde-1,k)
-        do i=its,ite
-        ii=min(ide-1,i)
+!       print *,'calculating initial pm'
+        select case (config_flags%chem_opt)
+        case (RADM2SORG, RACMSORG)
+           call sum_pm_sorgam (                                             &
+                alt, chem, h2oaj, h2oai,                                    &
+                pm2_5_dry, pm2_5_water, pm2_5_dry_ec, pm10,                 &
+                ids,ide, jds,jde, kds,kde,                                  &
+                ims,ime, jms,jme, kms,kme,                                  &
+                its,ite, jts,jte, kts,kte                                   )
 
-          pm2_5(i,k,j)=0.
-          do l=p_so4aj,p_p25i
-             pm2_5(i,k,j)=pm2_5(i,k,j)+chem(ii,kk,jj,l)
-          enddo
-          pm10(i,k,j)= pm2_5(i,k,j)                      &
-                      +chem(ii,kk,jj,p_antha)             &
-                      +chem(ii,kk,jj,p_soila)             &
-                      +chem(ii,kk,jj,p_seas)
-        enddo
-        enddo
-        enddo
+        case (CBMZ_MOSAIC_AA, CBMZ_MOSAIC_BB)
+           call sum_pm_mosaic (                                             &
+                alt, chem,                                                  &
+                pm2_5_dry, pm2_5_water, pm2_5_dry_ec, pm10,                 &
+                ids,ide, jds,jde, kds,kde,                                  &
+                ims,ime, jms,jme, kms,kme,                                  &
+                its,ite, jts,jte, kts,kte                                   )
+
+        case default
+           do j=jts,min(jte,jde-1)
+              do k=kts,min(kte,kde-1)
+                 do i=its,min(ite,ide-1)
+                    pm2_5_dry(i,k,j)    = 0.
+                    pm2_5_water(i,k,j)  = 0.
+                    pm2_5_dry_ec(i,k,j) = 0.
+                    pm10(i,k,j)         = 0.
+                 enddo
+              enddo
+           enddo
+        end select
 #endif
 
 ! use of (:,:,:,loop) not efficient on DEC, but (ims,kms,jms,loop) not portable to SGI/Cray
@@ -847,12 +903,15 @@
 #   include "HALO_EM_INIT_3.inc"
 #   include "HALO_EM_INIT_4.inc"
 #   include "HALO_EM_INIT_5.inc"
+#  include "PERIOD_BDY_EM_INIT.inc"
+#  include "PERIOD_BDY_EM_MOIST.inc"
+#  include "PERIOD_BDY_EM_CHEM.inc"
 #endif
 
      CALL wrf_debug ( 100 , 'module_start: start_domain_rk: Returning' )
 
 #define COPY_OUT
-#include <em_scalar_derefs.inc>
+#include "em_scalar_derefs.inc"
 
      RETURN
 

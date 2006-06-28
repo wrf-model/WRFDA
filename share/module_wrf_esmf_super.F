@@ -263,8 +263,8 @@ CONTAINS
    !  The forecast integration for the most coarse grid is now started.  The
    !  integration is from the first step (1) to the last step of the simulation.
 
-   head_grid%start_subtime = head_grid%start_time
-   head_grid%stop_subtime = head_grid%stop_time
+   head_grid%start_subtime = domain_get_start_time(head_grid)
+   head_grid%stop_subtime =  domain_get_stop_time(head_grid)
 
    ! return success status
    rc = ESMF_SUCCESS
@@ -308,10 +308,9 @@ CONTAINS
       CALL Setup_date_string (head_grid, nl_date_string, 'tn' )
       nl_date_index = 1
 
-      head_grid%current_time = head_grid%start_time
 ! JRB bugger it
-      CALL ESMF_ClockSetCurrTime( head_grid%domain_clock, currTime=head_grid%current_time, rc=rc )
-      CALL ESMF_ClockGetCurrTime( head_grid%domain_clock, currTime=head_grid%current_time, rc=rc )
+      CALL ESMF_ClockSetCurrTime( head_grid%domain_clock, currTime=domain_get_start_time(head_grid), rc=rc )
+!      CALL ESMF_ClockGetCurrTime( head_grid%domain_clock, currTime=domain_get_start_time(head_grid), rc=rc )
 
       CALL integrate_tl ( head_grid, nl_date_string, nl_date_index )
 
@@ -325,10 +324,9 @@ CONTAINS
       nl_date_index = 1
       ad_date_index = 1
 
-      head_grid%current_time = head_grid%stop_time
 !JRB bugger it
-      CALL ESMF_ClockSetCurrTime( head_grid%domain_clock, currTime=head_grid%current_time, rc=rc )
-      CALL ESMF_ClockGetCurrTime( head_grid%domain_clock, currTime=head_grid%current_time, rc=rc )
+      CALL ESMF_ClockSetCurrTime( head_grid%domain_clock, currTime=domain_get_stop_time(head_grid), rc=rc )
+!      CALL ESMF_ClockGetCurrTime( head_grid%domain_clock, currTime=domain_get_stop_time(head_grid), rc=rc )
 
       CALL integrate_ad ( head_grid, nl_date_string, nl_date_index, ad_date_string, ad_date_index )
    ELSE IF ( config_flags%dyn_opt == DYN_EM_TST ) THEN

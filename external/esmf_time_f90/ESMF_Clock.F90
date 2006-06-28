@@ -100,8 +100,8 @@
 !      public ESMF_ClockGetAdvanceCount
 !      public ESMF_ClockGetTimeStep
 !      public ESMF_ClockSetTimeStep
-!      public ESMF_ClockGetCurrTime
-!      public ESMF_ClockSetCurrTime
+      public ESMF_ClockGetCurrTime
+      public ESMF_ClockSetCurrTime
 !      public ESMF_ClockGetStartTime
 !      public ESMF_ClockGetStopTime
 !      public ESMF_ClockGetRefTime
@@ -1190,6 +1190,7 @@ SUBROUTINE ESMF_ClockBack(clock, RingingAlarmList, &
 
 END SUBROUTINE ESMF_ClockBack
 
+! JRB end of stubs
 
 !------------------------------------------------------------------------------
 !

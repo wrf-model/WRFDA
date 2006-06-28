@@ -9960,6 +9960,7 @@ SUBROUTINE t_spec_bdy_scalar ( scalar_tend,    &
    CALL spec_bdy_scalar ( scalar_tend,    &
                           scalar_b, scalar_bt,             &
                           spec_bdy_width, spec_zone,                   &
+                          config_flags, &
                           ijds, ijde,                 & ! min/max(id,jd)
                           ids,ide, jds,jde, kds,kde,  & ! domain dims
                           ims,ime, jms,jme, kms,kme,  & ! memory dims
@@ -9990,6 +9991,7 @@ SUBROUTINE t_spec_bdy_scalar ( scalar_tend,    &
       CALL spec_bdy_scalar ( P_scalar_tend,    &
                              scalar_b, P_scalar_bt,             &
                           spec_bdy_width, spec_zone,                   &
+                          config_flags, &
                           ijds, ijde,                 & ! min/max(id,jd)
                           ids,ide, jds,jde, kds,kde,  & ! domain dims
                           ims,ime, jms,jme, kms,kme,  & ! memory dims
