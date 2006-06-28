@@ -1,9 +1,9 @@
 include configure.wrf
 
-setup : links arch makedepf90 depend
+setup : arch links makedepf90 depend
 
 makedepf90 : 
-	@ ( cd  $(EXTERNAL)/makedepf90/makedepf90-2.8.8; ./configure; make )
+	@ ( cd $(EXTERNAL)/makedepf90/makedepf90-2.8.8; ./configure; make )
 
 links : 
 	@ $(LN) $(CHEM)/* .
@@ -60,12 +60,13 @@ include $(FFTPACK5)/fftpack5.make
 include $(RSL_LITE)/RSL_LITE.make
 include $(MAIN)/main.make
 
-depend : links module_state_description.f90 md_calls.inc \
+
+depend : module_state_description.f90 md_calls.inc \
                       inc/da_generic_boilerplate.inc
 	$(EXTERNAL)/makedepf90/makedepf90-2.8.8/makedepf90 $(FPPFLAGS) \
-           *.F *.f90 *.F90 > depend.txt 2>/dev/null
+           *.F *.f90 *.F90 > depend 2>/dev/null
 
-include depend.txt
+include depend
 
 WRF_OBJS=$(SHARE_OBJS) $(FRAME_OBJS) $(PHYS_OBJS) $(DYN_OBJS) \
   $(ESMF_TIME_F90_OBJS) $(IO_INT_OBJS) $(IO_NETCDF_OBJS) \
@@ -90,7 +91,7 @@ clean : arch_clean
 	@ $(RM) *.exe *.o *.mod *.b *.a *.f inc/*.inc frame/*.f90 registry \
           Registry_tmp* module_state_description.f90 bufrlib.prm \
           $(EXTERNAL)/*.o $(EXTERNAL)/*.a $(EXTERNAL)/*/*.o $(EXTERNAL)/*/*.a \
-          inc/dm_comm_cpp_flags
+          inc/dm_comm_cpp_flags depend
 	@ ( cd  $(EXTERNAL)/makedepf90/makedepf90-2.8.8; make clean )
 
 superclean : clean arch_superclean
