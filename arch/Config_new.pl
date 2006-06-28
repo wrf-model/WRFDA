@@ -9,6 +9,7 @@ $sw_da_core = "" ;
 $sw_nmm_core = "" ;
 $sw_coamps_core = "" ;
 $sw_exp_core = "" ;
+$sw_wrfplus = "" ;
 $sw_perl_path = perl ;
 $sw_netcdf_path = "" ;
 $sw_phdf5_path=""; 
@@ -43,6 +44,9 @@ while ( substr( $ARGV[0], 0, 1 ) eq "-" ) {
   }
   if ( substr( $ARGV[0], 1, 9 ) eq "exp_core=" ) {
     $sw_exp_core = substr( $ARGV[0], 10 ) ;
+  }
+  if ( substr( $ARGV[0], 1, 8 ) eq "wrfplus=" ) {
+    $sw_wrfplus = substr( $ARGV[0], 9 ) ;
   }
   if ( substr( $ARGV[0], 1, 5 ) eq "perl=" ) {
     $sw_perl_path = substr( $ARGV[0], 6 ) ;
@@ -175,6 +179,7 @@ while ( <CONFIGURE_PREAMBLE> ) {
   $_ =~ s/CONFIGURE_NMM_CORE/$sw_nmm_core/g ;
   $_ =~ s/CONFIGURE_COAMPS_CORE/$sw_coamps_core/g ;
   $_ =~ s/CONFIGURE_EXP_CORE/$sw_exp_core/g ;
+  $_ =~ s/CONFIGURE_WRFPLUS_FLAG/$sw_wrfplus/g ;
   
   if ( $sw_netcdf_path ) { 
     $_ =~ s:CONFIGURE_NETCDF_PATH:$sw_netcdf_path:g ;

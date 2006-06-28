@@ -89,7 +89,7 @@ SUBROUTINE solve_em_tl ( grid , config_flags , &
    REAL ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33,num_scalar) :: g_scalar_old
 
 
-#ifdef WRFPLUS
+#ifdef (VAR4D_CORE == 1)
    INTEGER :: rc 
    INTEGER :: number_of_small_timesteps, rk_step
    INTEGER :: klevel,ijm,ijp,i,j,k,size1,size2    ! for prints/plots only
