@@ -104,4 +104,4 @@ superclean : clean arch_superclean
           *.bsh *.csh Utl* macros_utl module_dm_warning rsl_cpp_flags \
           scl_plotting_routines configure.wrf ../configure.wrf \
           advance_cymdh.exe decode_l2_airs.README time_window.nl \
-          Makefile_old da_macros_utl
+          Makefile_old da_macros_utl links
