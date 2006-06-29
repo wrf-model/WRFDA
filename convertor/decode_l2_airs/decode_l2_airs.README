@@ -1,105 +1,78 @@
-All development and testing has been performed on a machine running Linux; PGI 
-Fortran compilers are available, as are the JPEG and ZLIB compression libraries.
 
-UPDATED 2006-06-02: Necessary changes to compile and run on OS X have been 
-added.
-
-Installation of HDFEOS libraries
+Installing the decoder
 ________________________________________________________________________________
 
- In order to install the HDF-EOS libraries, which are required by the AIRS 
- decoder, the following sequence of compilations was used.
+The basic procedure for installing the AIRS decoder involves first building
+and installing the HDFEOS libraries, which themselves depend on other libraries,
+and then compiling the decoder itself. The following steps may be followed.
 
- NOTE: The SZIP library seems to be completely unnecessary, and thus, the user
- need not install it or reference it in any compilations.
+Beginning at the root directory:
 
- 0) Retrieve all necessary source code from the internet. This was 
-    accomplished by:
+0) If using the g95 compiler, set the following environment variables
 
-       Downloading SZIP 2.0 (szip-2.0.tar.gz) from 
-                         ftp://ftp.ncsa.uiuc.edu/HDF/lib-external/szip/2.0/src/
+   export G95_ENDIAN=BIG
+   export G95_FPU_INVALID=${G95_FPU_INVALID:-T}
+   export G95_FPU_ZERODIV=${G95_FPU_ZERODIV:-T}
+   export G95_FPU_OVERFLOW=${G95_FPU_OVERFLOW:-F}
+   export G95_FPU_UNDERFLOW=${G95_FPU_UNDERFLOW:-F}
+   export G95_FPU_INEXACT=${G95_FPU_INEXACT:-F}
+   export G95_FPU_EXCEPTIONS=${G95_FPU_EXCEPTIONS:-F}
+   export G95_UNBUFFERED_ALL=${G95_UNBUFFERED_ALL:-T}
+   export G95_MEM_INIT=${G95_MEM_INIT:-0x00}
+   export G95_MEM_MAXALLOC=${G95_MEM_MAXALLOC:-F}
 
-       Download JPEG library (jpegsrc.v6b.tar.gz) from
-                         ftp://ftp.uu.net/graphics/jpeg/
+1) Set the NETCDF environment variable to the location where NETCDF is installed.
 
-       Download ZLIB library (zlib-1.2.3.tar.gz) from
-                         http://www.zlib.net/
+2) > ./configure_new wrfvar
 
-       Downloading HDF 4.2r1 (HDF4.2r1.tar.gz) from 
-                         ftp://ftp.ncsa.uiuc.edu/HDF/HDF/HDF_Current/src/
+3) > cd external/zlib/zlib-1.2.3
 
-       Downloading HDF-EOS v2.14v1.00 libraries (HDF-EOS2.14v1.00.tar.Z) from 
-                         http://www.hdfeos.org/software/HDFEOS_2_14_v1/
+4) Edit the setup_gcc script to use the compilers appropriate for the target 
+   system.
 
- 1) Compile szip libraries. These libraries are listed as being optional for the 
-    HDF4 installation, but have been compiled anyway. The following sequence of 
-    commands was sufficient to successfully install.
+5) > ./setup_gcc
 
-       > ./configure --prefix=`pwd`
-       [ edit examples/Makefile so that "LDFLAGS=-lm" ]
-       > make
-       > make check
-       > make install
+6) > cd ../../jpeg/jpeg-6b
 
- 2) Compile JPEG library. This is only necessary if libjpeg.a does not 
-    already exist on the system.
-    These steps were used to compile on a Mac running OS X. The gcc 4.0
-    compiler seems to have problems compiling C that links well with 
-    Fortran, so gcc-3.3 is used. This may not be an issue for the JPEG
-    library, but it seems to be for others.
-       > setenv CC /usr/bin/gcc-3.3
-       > ./configure
-       > make
-       > mkdir lib include
-       > mv libjpeg.a lib
-       > mv *.h include
-       > ranlib lib/libjpeg.a
+7) Edit the setup_gcc script to use the compilers appropriate for the target 
+   system.
 
- 3) Compile ZLIB library. As with the JPEG library, this is only necessary
-    if libz.a is not already installed. The steps below were used on a 
-    Mac running OS X.
-       > ./configure
-       > make
-       > mkdir lib include
-       > mv libz.a lib
-       > mv *.h include
+8) > ./setup_gcc
 
- 4) Compile HDF4 libraries. The following sequence of commands was used.
+9) > cd ../../HDF-EOS/HDF4.2r1
 
-       > setenv CC pgcc      [OS X -- use gcc-3.3]
-       > setenv FC pgf90     [OX X -- use g95]
-       > setenv F77 pgf90    [OX X -- use g95]
-       > setenv F90 pgf90    [OX X -- use g95]
-       > cd mfhdf/fortran/config     [next 5 steps are necessary on OS X]
-       > cp ftest-linux.f ftest-apple.f      
-       > cp jackets-linux.c jackets-apple.c
-       > cp netcdf-linux.inc netcdf-apple.inc
-       > cd ../../..
-       > ./configure --with-zlib=[ path to lib/libz.a ] \
-                     --with-jpeg=[ path to lib/libjpeg.a ] \
-                     --with-szlib=[ path to szip installation in step 1 ] \
-                     --prefix=`pwd`
-       [ if using szip for some reason, add szlib lib directory to 
-         LD_LIBRARY_PATH; alternatively, there is probably a way to tell the 
-         Makefile to use a compiler option to link the static version of the 
-         szip library, rather than the shared one ]
-       [ add "-lm" to the LIBS variable in mfhdf/hdiff/Makefile ]
-       > gmake    [OS X -- make works just fine]
-       > gmake check 
-         [ here, one of the tests failed, but doesn't seem to be critical ]
-       > gmake install
+10) Edit the setup_g95 script to use the compilers appropriate for the target 
+    system.
 
- 5) Compile HDFEOS libraries as follows.
+11) > ./setup_g95
 
-       > [change CC and F77 in bin/INSTALL-HDFEOS in the "macintosh" section; Mac OS X only]
-       > ./bin/INSTALL-HDFEOS
-       [ the script will ask for the paths to the HDF4 library and include files
-         installed above ]
+12) Take note of the location where the HDF4 libraries are installed. This
+    location, and the location where the include files reside in will be 
+    needed when installing the HDFEOS libraries. The relative paths to the
+    libraries and include files should be NewHDF/lib and NewHDF/include,
+    respectively; however, the absolute path names should be noted.
 
- 6) Compile the AIRS decoder. This software is quite simple, and is built by 
-    typing "make" in the AIRS_decoder directory. However, it will be necessary
-    to first edit the Makefile to set the proper library paths. Also, on a Mac,
-    it is necessary to add "#define OSX" to the top of the file geth_newdate.c.
+    Alternatively, two environment variables may be set to avoid interactively
+    providing the paths to the libraries and include files:
+
+12a) Set the HDFLIB environment variable to `pwd`/NewHDF/lib
+
+12b) Set the HDFINC environment variable to `pwd`/NewHDF/include
+
+13) > cd ../hdfeos
+
+14) Edit the setup_g95 script to use the compilers appropriate for the target 
+    system.
+
+15) > ./setup_g95
+
+16) > cd ../../../build
+
+17) > touch depend.txt
+
+18) > make setup 
+
+19) > make -r decode_airs
 
 
 Running the decoder
