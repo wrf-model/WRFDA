@@ -51,6 +51,7 @@ SUBROUTINE da_write_obs( ob, iv, re )
       DO n = 1, iv % num_synop  
        if(iv%synop(n)%loc%proc_domain) then
        num_obs = num_obs + 1
+       write(ounit,'(i8)') 1                                 
          write(ounit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))')&
                   num_obs , 1, iv % synop(n) % info % id, &  ! Station
                          iv % synop(n) % info % lat, &       ! Latitude
@@ -79,6 +80,7 @@ SUBROUTINE da_write_obs( ob, iv, re )
       DO n = 1, iv % num_metar  
        if(iv%metar(n)%loc%proc_domain) then
        num_obs = num_obs + 1
+       write(ounit,'(i8)') 1                                 
          write(ounit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))')&
                  num_obs  , 1, iv % metar(n) % info % id, &  ! Station
                          iv % metar(n) % info % lat, &       ! Latitude
@@ -106,6 +108,7 @@ SUBROUTINE da_write_obs( ob, iv, re )
       num_obs = 0
       DO n = 1, iv % num_ships  
        if(iv%ships(n)%loc%proc_domain) then
+       write(ounit,'(i8)') 1                                 
        num_obs = num_obs + 1
          write(ounit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))')&
                     num_obs,1, iv % ships(n) % info % id, &  ! Station
@@ -190,6 +193,7 @@ SUBROUTINE da_write_obs( ob, iv, re )
       DO n = 1, iv % num_gpspw
        if(iv%gpspw(n)%loc%proc_domain) then
        num_obs = num_obs + 1
+       write(ounit,'(i8)') 1                                 
          write(ounit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))')&
                    num_obs, 1, iv % gpspw(n) % info % id, &  ! Station
                          iv % gpspw(n) % info % lat, &       ! Latitude
@@ -239,6 +243,7 @@ SUBROUTINE da_write_obs( ob, iv, re )
       DO n = 1, iv % num_sound
       if(iv%sound(n)%loc%proc_domain) then 
        num_obs = num_obs + 1
+         write(ounit,'(i8)') 1
          write(ounit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))')&
                   num_obs , 1, iv % sonde_sfc(n) % info % id, &  ! Station
                          iv % sonde_sfc(n) % info % lat, &       ! Latitude
@@ -325,6 +330,7 @@ SUBROUTINE da_write_obs( ob, iv, re )
       DO n = 1, iv % num_ssmi_retrieval
        if(iv%ssmi_retrieval(n)%loc%proc_domain) then
        num_obs = num_obs + 1
+         write(ounit,'(i8)') 1
          write(ounit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))')&
                  num_obs, 1, 'SSMIR',              &       ! Station
                        iv % ssmi_retrieval(n) % info % lat, &! Latitude
@@ -349,6 +355,7 @@ SUBROUTINE da_write_obs( ob, iv, re )
          write(ounit,*)' SSMI radiance output not yet coded.'
        if(iv%ssmi_tb(n)%loc%proc_domain) then
        num_obs = num_obs + 1
+         write(ounit,'(i8)') 1
          write(ounit,'(2i8,a5,2f9.2,f17.7,7(2f17.7,i8,2f17.7))')&
                    num_obs, 1, 'SSMIT',              &        ! Station
                          iv % ssmi_tb(n) % info % lat, &! Latitude
@@ -467,6 +474,7 @@ SUBROUTINE da_write_obs( ob, iv, re )
       DO n = 1, iv % num_qscat  
        if(iv%qscat(n)%loc%proc_domain) then
        num_obs = num_obs + 1
+         write(ounit,'(i8)') 1
          write(ounit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))')&
                    num_obs, 1, iv % qscat(n) % info % id, &  ! Station
                          iv % qscat(n) % info % lat, &       ! Latitude
@@ -520,6 +528,7 @@ SUBROUTINE da_write_obs( ob, iv, re )
       DO n = 1, iv % num_buoy  
        if(iv%buoy(n)%loc%proc_domain) then
        num_obs = num_obs + 1
+         write(ounit,'(i8)') 1
          write(ounit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))')&
                     num_obs,1, iv % buoy(n) % info % id, &  ! Station
                          iv % buoy(n) % info % lat, &       ! Latitude
@@ -548,6 +557,7 @@ SUBROUTINE da_write_obs( ob, iv, re )
       DO n = 1, iv % num_bogus
        if(iv%bogus(n)%loc%proc_domain) then
        num_obs = num_obs + 1
+         write(ounit,'(i8)') 1
          write(ounit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))')&
                    num_obs, 1, iv % bogus(n) % info % id, &  ! Station
                          iv % bogus(n) % info % lat, &       ! Latitude
