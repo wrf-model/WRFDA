@@ -168,8 +168,9 @@ subroutine da_get_var_diagnostics ( iv, j )
                                j % jo % sound_u, iv % sound_ef_u, &
                                j % jo % sound_v, iv % sound_ef_v, &
                                j % jo % sound_t, iv % sound_ef_t, &
-                               j % jo % sound_q, iv % sound_ef_q                                
-         write(UNIT=jo_unit,FMT='(a30,2i8,10f15.5)')'sound_sfc obs, Jo (actual)  = ', &
+                               j % jo % sound_q, iv % sound_ef_q, &                                
+                               0.0, 1.0
+         write(UNIT=jo_unit,FMT='(a30,2i8,10f15.5)')'    sonde obs, Jo (actual)  = ', &
                                iv % num_sound_glo, num_sound_tot, &
                                j % jo % sonde_sfc_u, iv % synop_ef_u, &
                                j % jo % sonde_sfc_v, iv % synop_ef_v, &
@@ -243,7 +244,7 @@ subroutine da_get_var_diagnostics ( iv, j )
       end if
 
       if ( iv % num_buoy_glo > 0 ) then
-         write(UNIT=jo_unit,FMT='(a30,2i8,10f15.5)')'    buoy obs, Jo (actual)  = ', &
+         write(UNIT=jo_unit,FMT='(a30,2i8,10f15.5)')'    buoy  obs, Jo (actual)  = ', &
                                iv % num_buoy_glo, num_buoy_tot, &
                                j % jo % buoy_u, iv % buoy_ef_u, &
                                j % jo % buoy_v, iv % buoy_ef_v, &
@@ -253,7 +254,7 @@ subroutine da_get_var_diagnostics ( iv, j )
       end if
 
       if ( iv % num_profiler_glo > 0 ) then
-         write(UNIT=jo_unit,FMT='(a30,2i8,10f15.5)')'    profiler obs, Jo (actual)  = ', &
+         write(UNIT=jo_unit,FMT='(a30,2i8,10f15.5)')'    profiler,  Jo (actual)  = ', &
                                iv % num_profiler_glo, num_profiler_tot, &
                                j % jo % profiler_u, iv % profiler_ef_u, &
                                j % jo % profiler_v, iv % profiler_ef_v, &

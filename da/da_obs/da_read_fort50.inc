@@ -1,4 +1,4 @@
-subroutine da_read_fort50(unit_in,obs_type_in, nc)
+subroutine da_read_fort50(unit_in,num,obs_type_in, nc)
 !----------------------------------------------------------------------------   
 !  Program to read diagnostics written in fort.50 by WRF-Var
 !  Author:   Syed RH Rizvi
@@ -6,9 +6,10 @@ subroutine da_read_fort50(unit_in,obs_type_in, nc)
 !----------------------------------------------------------------------------   
    IMPLICIT NONE
 
-   INTEGER      ,intent (IN) :: unit_in
-   character*(*),intent (IN) :: obs_type_in                 
-   INTEGER      ,intent (IN) :: nc      
+   INTEGER      ,intent (IN)    :: unit_in
+   INTEGER      ,intent (INOUT) :: num      
+   character*(*),intent (IN)    :: obs_type_in                 
+   INTEGER      ,intent (IN)    :: nc      
 !
    integer      :: num_obs 
    character*9  :: dummy_c
@@ -63,6 +64,8 @@ subroutine da_read_fort50(unit_in,obs_type_in, nc)
 
    if( index( ob_type,'qscat') > 0) go to 110
 
+   if( index( ob_type,'bogus') > 0) go to 120
+
    if( index( ob_type,'*****') > 0) return   
 
    write(unit=stdout, fmt='(/a,a20,a,i3/a/)') &
@@ -76,8 +79,14 @@ subroutine da_read_fort50(unit_in,obs_type_in, nc)
 !----------------------------------------------------------------------------   
    IF ( num_obs > 0 ) THEN
       DO n = 1, num_obs    
+         read(unit_in,'(i8)')levels
+         if(if_write) then
+          write(omb_unit,'(i8)')levels
+         num = num + 1
+         end if
+         do k = 1, levels
          read(unit_in,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))', err= 1000)&
-                         k, l, stn_id, &          ! Station
+                         kk,l, stn_id, &          ! Station
                          lat, lon, press, &       ! Lat/lon, pressure
                          u_obs, u_inv, u_qc, u_error, u_inc, & 
                          v_obs, v_inv, v_qc, v_error, v_inc, &
@@ -86,14 +95,14 @@ subroutine da_read_fort50(unit_in,obs_type_in, nc)
                          q_obs, q_inv, q_qc, q_error, q_inc
         if(if_write) &
          write(omb_unit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))', err= 1000)&
-                         k, l, stn_id, &          ! Station
+                         num, k, stn_id, &          ! Station
                          lat, lon, press, &       ! Lat/lon, pressure
                          u_obs, u_inv, u_qc, u_error, u_inc, & 
                          v_obs, v_inv, v_qc, v_error, v_inc, &
                          t_obs, t_inv, t_qc, t_error, t_inc, &
                          p_obs, p_inv, p_qc, p_error, p_inc, &
                          q_obs, q_inv, q_qc, q_error, q_inc
-
+        enddo
       END DO
    ENDIF
    if (if_write) return  
@@ -106,8 +115,11 @@ subroutine da_read_fort50(unit_in,obs_type_in, nc)
    IF ( num_obs > 0 ) THEN
       DO n = 1, num_obs    
          read(unit_in,'(i8)')levels
-         if(if_write) write(omb_unit,'(i8)')levels
-         DO k = 1, levels
+         if(if_write) then
+          write(omb_unit,'(i8)')levels
+         num = num + 1
+         endif
+         do k = 1, levels
          read(unit_in,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))', err= 1000)&
                          kk, l, stn_id, &          ! Station
                          lat, lon, press, &        ! Lat/lon, pressure
@@ -115,13 +127,12 @@ subroutine da_read_fort50(unit_in,obs_type_in, nc)
                          v_obs, v_inv, v_qc, v_error, v_inc
         if(if_write) &
          write(omb_unit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))', err= 1000)&
-                         kk, l, stn_id, &          ! Station
+                         num, k, stn_id, &          ! Station
                          lat, lon, press, &        ! Lat/lon, pressure
                          u_obs, u_inv, u_qc, u_error, u_inc, & 
                          v_obs, v_inv, v_qc, v_error, v_inc
 
-         END DO
-
+         enddo 
       END DO
    ENDIF
 
@@ -132,15 +143,22 @@ subroutine da_read_fort50(unit_in,obs_type_in, nc)
 !----------------------------------------------------------------------------   
    IF ( num_obs > 0 ) THEN
       DO n = 1, num_obs    
+         read(unit_in,'(i8)')levels
+         if(if_write) then
+          write(omb_unit,'(i8)')levels
+         num = num + 1
+         endif
+         do k = 1, levels
          read(unit_in,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))', err= 1000)&
-                         k, l, stn_id, &          ! Station
+                         kk,l, stn_id, &          ! Station
                          lat, lon, dummy, &       ! Lat/lon, dummy    
                          tpw_obs, tpw_inv, tpw_qc, tpw_err, tpw_inc
          if(if_write) &
          write(omb_unit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))', err= 1000)&
-                         k, l, stn_id, &          ! Station
+                         num, k, stn_id,  &       ! Station
                          lat, lon, dummy, &       ! Lat/lon, dummy    
                          tpw_obs, tpw_inv, tpw_qc, tpw_err, tpw_inc
+         enddo
       END DO
    ENDIF
 
@@ -154,8 +172,11 @@ subroutine da_read_fort50(unit_in,obs_type_in, nc)
    IF ( num_obs > 0 ) THEN
       DO n = 1, num_obs    
          read(unit_in,'(i8)')levels
-         if(if_write) write(omb_unit,'(i8)')levels
-         DO k = 1, levels
+         if(if_write) then
+          write(omb_unit,'(i8)')levels
+          num = num + 1 
+         endif
+         do k = 1, levels
             read(unit_in,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))', err= 1000)&
                          kk,l, stn_id, &          ! Station
                          lat, lon, press, &       ! Lat/lon, dummy    
@@ -165,13 +186,13 @@ subroutine da_read_fort50(unit_in,obs_type_in, nc)
                          q_obs, q_inv, q_qc, q_error, q_inc
            if(if_write) &
            write(omb_unit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))', err= 1000)&
-                         kk,l, stn_id, &          ! Station
+                         num, k, stn_id,  &       ! Station
                          lat, lon, press, &       ! Lat/lon, dummy    
                          u_obs, u_inv, u_qc, u_error, u_inc, & 
                          v_obs, v_inv, v_qc, v_error, v_inc, &
                          t_obs, t_inv, t_qc, t_error, t_inc, &
                          q_obs, q_inv, q_qc, q_error, q_inc
-         END DO
+         enddo 
       END DO
    ENDIF
    if (if_write) return  
@@ -182,8 +203,11 @@ subroutine da_read_fort50(unit_in,obs_type_in, nc)
    IF ( num_obs > 0 ) THEN
       DO n = 1, num_obs    
          read(unit_in,'(i8)') levels
-         if(if_write) write(omb_unit,'(i8)')levels
-         DO k = 1, levels
+         if(if_write) then
+          write(omb_unit,'(i8)')levels
+          num = num + 1 
+         endif
+         do k = 1, levels
             read(unit_in,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))', err= 1000)&
                          kk,l, stn_id, &          ! Station
                          lat, lon, press, &       ! Lat/lon, dummy    
@@ -192,12 +216,12 @@ subroutine da_read_fort50(unit_in,obs_type_in, nc)
                          t_obs, t_inv, t_qc, t_error, t_inc    
            if(if_write) &
            write(omb_unit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))', err= 1000)&
-                         kk,l, stn_id, &          ! Station
+                         num, k, stn_id,  &       ! Station
                          lat, lon, press, &       ! Lat/lon, dummy    
                          u_obs, u_inv, u_qc, u_error, u_inc, & 
                          v_obs, v_inv, v_qc, v_error, v_inc, &
                          t_obs, t_inv, t_qc, t_error, t_inc    
-         END DO
+         enddo  
       END DO
    ENDIF
 
@@ -211,8 +235,11 @@ subroutine da_read_fort50(unit_in,obs_type_in, nc)
    IF ( num_obs > 0 ) THEN
       DO n = 1, num_obs    
          read(unit_in,'(i8)')levels
-         if(if_write) write(omb_unit,'(i8)')levels
-         DO k = 1, levels
+         if(if_write) then
+          write(omb_unit,'(i8)')levels
+          num = num + 1 
+         endif
+         do k = 1, levels
             read(unit_in,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))', err= 1000)&
                          kk,l, stn_id, &          ! Station
                          lat, lon, press, &       ! Lat/lon, dummy    
@@ -220,11 +247,11 @@ subroutine da_read_fort50(unit_in,obs_type_in, nc)
                          v_obs, v_inv, v_qc, v_error, v_inc
            if(if_write) &
            write(omb_unit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))', err= 1000)&
-                         kk,l, stn_id, &          ! Station
+                         num, k, stn_id,  &       ! Station
                          lat, lon, press, &       ! Lat/lon, dummy    
                          u_obs, u_inv, u_qc, u_error, u_inc, & 
                          v_obs, v_inv, v_qc, v_error, v_inc
-         END DO
+         enddo  
       END DO
    ENDIF
    if (if_write) return  
@@ -234,15 +261,22 @@ subroutine da_read_fort50(unit_in,obs_type_in, nc)
 !----------------------------------------------------------------------------   
    IF ( num_obs > 0 ) THEN
       DO n = 1, num_obs    
+         read(unit_in,'(i8)')levels
+         if(if_write) then
+          write(omb_unit,'(i8)')levels
+          num = num + 1 
+         endif
+         do k = 1, levels
          read(unit_in,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))', err= 1000)&
-                         k, l, stn_id, &          ! Station
+                         kk,l, stn_id, &          ! Station
                          lat, lon, dummy, &       ! Lat/lon, dummy    
                          spd_obs, spd_inv, spd_qc, spd_err, spd_inc
            if(if_write) &
            write(omb_unit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))', err= 1000)&
-                         k, l, stn_id, &          ! Station
+                         num, k, stn_id,  &       ! Station
                          lat, lon, dummy, &       ! Lat/lon, dummy    
                          spd_obs, spd_inv, spd_qc, spd_err, spd_inc
+         enddo
       END DO
    ENDIF
 
@@ -254,10 +288,14 @@ subroutine da_read_fort50(unit_in,obs_type_in, nc)
 
    IF ( num_obs > 0 ) THEN
       DO n = 1, num_obs    
-         read(unit_in,*)dummy_c                                 
-         if(if_write) write(omb_unit,*)dummy_c          
+         read(unit_in,'(i8)')levels
+         if(if_write) then
+          write(omb_unit,'(i8)')levels
+          num = num + 1 
+         endif
+         do k = 1, levels
          read(unit_in,'(2i8,a5,2f9.2,f17.7,7(2f17.7,i8,2f17.7))', err= 1000)&
-                         k, l, stn_id, &          ! Station
+                         kk,l, stn_id, &          ! Station
                          lat, lon, dummy, &       ! Lat/lon, dummy    
                          dummy, dummy, dummy_i, dummy, dummy, &    
                          dummy, dummy, dummy_i, dummy, dummy, &    
@@ -268,7 +306,7 @@ subroutine da_read_fort50(unit_in,obs_type_in, nc)
                          dummy, dummy, dummy_i, dummy, dummy
          if(if_write) &
          write(omb_unit,'(2i8,a5,2f9.2,f17.7,7(2f17.7,i8,2f17.7))', err= 1000)&
-                         k, l, stn_id, &          ! Station
+                         num,k,stn_id, &          ! Station
                          lat, lon, dummy, &       ! Lat/lon, dummy    
                          dummy, dummy, dummy_i, dummy, dummy, &    
                          dummy, dummy, dummy_i, dummy, dummy, &    
@@ -277,6 +315,7 @@ subroutine da_read_fort50(unit_in,obs_type_in, nc)
                          dummy, dummy, dummy_i, dummy, dummy, &    
                          dummy, dummy, dummy_i, dummy, dummy, &    
                          dummy, dummy, dummy_i, dummy, dummy
+         enddo
       END DO
    ENDIF
    if (if_write) return  
@@ -287,18 +326,21 @@ subroutine da_read_fort50(unit_in,obs_type_in, nc)
    IF ( num_obs > 0 ) THEN
       DO n = 1, num_obs    
          read(unit_in,'(i8)') levels
-         if(if_write) write(omb_unit,'(i8)')levels
-         DO k = 1, levels
+         if(if_write) then
+          write(omb_unit,'(i8)')levels
+          num = num + 1 
+         endif
+         do k = 1, levels
             read(unit_in,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))', err= 1000)&
                          kk,l, stn_id, &          ! Station
                          lat, lon, dummy, &       ! Lat/lon, dummy    
                          dummy,dummy, dummy_i, dummy, dummy
             if(if_write) &
             write(omb_unit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))', err= 1000)&
-                         kk,l, stn_id, &          ! Station
+                         num,k,stn_id, &          ! Station
                          lat, lon, dummy, &       ! Lat/lon, dummy    
                          dummy,dummy, dummy_i, dummy, dummy
-         END DO
+         enddo  
       END DO
    ENDIF
    
@@ -310,18 +352,21 @@ subroutine da_read_fort50(unit_in,obs_type_in, nc)
    IF ( num_obs > 0 ) THEN
       DO n = 1, num_obs    
          read(unit_in,'(i8)') levels
-         if(if_write) write(omb_unit,'(i8)')levels
-         DO k = 1, levels
+         if(if_write) then
+          write(omb_unit,'(i8)')levels
+          num = num + 1 
+         endif
+         do k = 1, levels
             read(unit_in,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))', err= 1000)&
                          kk,l, stn_id, &          ! Station
                          lat, lon, dummy, &       ! Lat/lon, dummy    
                          dummy,dummy, dummy_i, dummy, dummy
             if(if_write) &
             write(omb_unit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))', err= 1000)&
-                         kk,l, stn_id, &          ! Station
+                         num,k,stn_id, &          ! Station
                          lat, lon, dummy, &       ! Lat/lon, dummy    
                          dummy,dummy, dummy_i, dummy, dummy
-         END DO
+         enddo 
       END DO
    ENDIF
 
@@ -332,22 +377,76 @@ subroutine da_read_fort50(unit_in,obs_type_in, nc)
 !----------------------------------------------------------------------------   
    IF ( num_obs > 0 ) THEN
       DO n = 1, num_obs    
+         read(unit_in,'(i8)') levels
+         if(if_write) then
+          write(omb_unit,'(i8)')levels
+          num = num + 1 
+         endif
+         do k = 1, levels
          read(unit_in,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))', err= 1000)&
-                         k, l, stn_id, &          ! Station
+                         kk,l, stn_id, &          ! Station
                          lat, lon, press, &       ! Lat/lon, dummy    
                          u_obs, u_inv, u_qc, u_error, u_inc, & 
                          v_obs, v_inv, v_qc, v_error, v_inc
          if(if_write) &
          write(omb_unit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))', err= 1000)&
-                         k, l, stn_id, &          ! Station
+                         num,k,stn_id, &          ! Station
                          lat, lon, press, &       ! Lat/lon, dummy    
                          u_obs, u_inv, u_qc, u_error, u_inc, & 
                          v_obs, v_inv, v_qc, v_error, v_inc
+         enddo
       END DO
    ENDIF
 
    if (if_write) return  
    go to 1
+!----------------------------------------------------------------------------   
+                120  continue      !  TC bogus data           
+! Note:      Syed  RH Rizvi   06/26/2006   
+!  TC Bogus data is writtenn in two records
+!  1st record holds info about surface level
+! 2nd is for upper air
+!----------------------------------------------------------------------------   
+   IF ( num_obs > 0 ) THEN
+      DO n = 1, num_obs    
+         read(unit_in,'(i8)') levels
+         if(if_write) then
+          write(omb_unit,'(i8)')levels
+          num = num + 1 
+         endif
+         do k = 1, levels
+         read(unit_in,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))', err= 1000)&
+                         kk,l, stn_id, &          ! Station
+                         lat, lon, press, &       ! Lat/lon, dummy    
+                         u_obs, u_inv, u_qc, u_error, u_inc, & 
+                         v_obs, v_inv, v_qc, v_error, v_inc
+         if(if_write) &
+         write(omb_unit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))', err= 1000)&
+                         num,l,stn_id, &          ! Station
+                         lat, lon, press, &       ! Lat/lon, dummy    
+                         u_obs, u_inv, u_qc, u_error, u_inc, & 
+                         v_obs, v_inv, v_qc, v_error, v_inc
+         enddo
+         read(unit_in,'(i8)') levels
+         if(if_write) then
+          write(omb_unit,'(i8)')levels
+         endif
+         do k = 1, levels
+         read(unit_in,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))', err= 1000)&
+                         kk,l, stn_id, &          ! Station
+                         lat, lon, press, &       ! Lat/lon, dummy    
+                         u_obs, u_inv, u_qc, u_error, u_inc, & 
+                         v_obs, v_inv, v_qc, v_error, v_inc
+         if(if_write) &
+         write(omb_unit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))', err= 1000)&
+                         num,l,stn_id, &          ! Station
+                         lat, lon, press, &       ! Lat/lon, dummy    
+                         u_obs, u_inv, u_qc, u_error, u_inc, & 
+                         v_obs, v_inv, v_qc, v_error, v_inc
+         enddo
+      END DO
+   ENDIF
+
 !--------------------------------------------------------------
 999  continue
    write(unit=stdout, fmt='(/a,i3/a/)') &

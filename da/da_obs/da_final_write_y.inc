@@ -47,7 +47,7 @@ subroutine da_final_write_y( iv, y )
     DO k = 0,numb_procs-1
     iunit = ounit*10 +  k
     rewind iunit
-    if ( wrf_dm_on_monitor() )call da_read_fort47(iunit,ounit,num_obs,'synop',5)
+    if ( wrf_dm_on_monitor() )call da_read_y_unit(iunit,ounit,num_obs,'synop',5)
     ENDDO
     endif
 !------------------------------------------------------------------
@@ -66,7 +66,7 @@ subroutine da_final_write_y( iv, y )
     DO k = 0,numb_procs-1
     iunit = ounit*10 +  k
     rewind iunit
-    if ( wrf_dm_on_monitor() )call da_read_fort47(iunit,ounit,num_obs,'metar',5)    
+    if ( wrf_dm_on_monitor() )call da_read_y_unit(iunit,ounit,num_obs,'metar',5)    
     ENDDO
     endif
 
@@ -86,7 +86,7 @@ subroutine da_final_write_y( iv, y )
     DO k = 0,numb_procs-1
     iunit = ounit*10 +  k
     rewind iunit
-    if ( wrf_dm_on_monitor() )call da_read_fort47(iunit,ounit,num_obs,'ships',5)
+    if ( wrf_dm_on_monitor() )call da_read_y_unit(iunit,ounit,num_obs,'ships',5)
     ENDDO
     endif
 
@@ -106,7 +106,7 @@ subroutine da_final_write_y( iv, y )
     DO k = 0,numb_procs-1
     iunit = ounit*10 +  k
     rewind iunit
-    if ( wrf_dm_on_monitor() )call da_read_fort47(iunit,ounit,num_obs,'geoamv',6)
+    if ( wrf_dm_on_monitor() )call da_read_y_unit(iunit,ounit,num_obs,'geoamv',6)
     ENDDO
     endif
 !------------------------------------------------------------------
@@ -125,7 +125,7 @@ subroutine da_final_write_y( iv, y )
     DO k = 0,numb_procs-1
     iunit = ounit*10 +  k
     rewind iunit
-    if ( wrf_dm_on_monitor() )call da_read_fort47(iunit,ounit,num_obs,'polaramv',8) 
+    if ( wrf_dm_on_monitor() )call da_read_y_unit(iunit,ounit,num_obs,'polaramv',8) 
     ENDDO
     endif
 
@@ -145,7 +145,7 @@ subroutine da_final_write_y( iv, y )
     DO k = 0,numb_procs-1
     iunit = ounit*10 +  k
     rewind iunit
-    if ( wrf_dm_on_monitor() )call da_read_fort47(iunit,ounit,num_obs,'gpspw',5)     
+    if ( wrf_dm_on_monitor() )call da_read_y_unit(iunit,ounit,num_obs,'gpspw',5)     
     ENDDO
     endif
 !------------------------------------------------------------------
@@ -164,7 +164,7 @@ subroutine da_final_write_y( iv, y )
     DO k = 0,numb_procs-1
     iunit = ounit*10 +  k
     rewind iunit
-    if ( wrf_dm_on_monitor() ) call da_read_fort47(iunit,ounit,num_obs,'sound',5)     
+    if ( wrf_dm_on_monitor() ) call da_read_y_unit(iunit,ounit,num_obs,'sound',5)     
     ENDDO
 !  writing Sonde_sfc  
     if ( wrf_dm_on_monitor() ) write(ounit,'(a20,i8)')'sonde_sfc', num_obs  
@@ -172,7 +172,7 @@ subroutine da_final_write_y( iv, y )
     DO k = 0,numb_procs-1
     iunit = ounit*10 +  k
     rewind iunit
-    if ( wrf_dm_on_monitor() )call da_read_fort47(iunit,ounit,num_obs,'sonde_sfc',9)
+    if ( wrf_dm_on_monitor() )call da_read_y_unit(iunit,ounit,num_obs,'sonde_sfc',9)
     ENDDO
     endif
 
@@ -192,7 +192,7 @@ subroutine da_final_write_y( iv, y )
     DO k = 0,numb_procs-1
     iunit = ounit*10 +  k
     rewind iunit
-    if ( wrf_dm_on_monitor() )call da_read_fort47(iunit,ounit,num_obs,'airep',5)   
+    if ( wrf_dm_on_monitor() )call da_read_y_unit(iunit,ounit,num_obs,'airep',5)   
     ENDDO
     endif
 !------------------------------------------------------------------
@@ -211,7 +211,7 @@ subroutine da_final_write_y( iv, y )
     DO k = 0,numb_procs-1
     iunit = ounit*10 +  k
     rewind iunit
-    if ( wrf_dm_on_monitor() )call da_read_fort47(iunit,ounit,num_obs,'pilot',5)    
+    if ( wrf_dm_on_monitor() )call da_read_y_unit(iunit,ounit,num_obs,'pilot',5)    
     ENDDO
     endif
 !------------------------------------------------------------------
@@ -230,7 +230,7 @@ subroutine da_final_write_y( iv, y )
     DO k = 0,numb_procs-1
     iunit = ounit*10 +  k
     rewind iunit
-    if ( wrf_dm_on_monitor() )call da_read_fort47(iunit,ounit,num_obs,'ssmir',5)    
+    if ( wrf_dm_on_monitor() )call da_read_y_unit(iunit,ounit,num_obs,'ssmir',5)    
     ENDDO
     endif
 !------------------------------------------------------------------
@@ -249,7 +249,7 @@ subroutine da_final_write_y( iv, y )
     DO k = 0,numb_procs-1
     iunit = ounit*10 +  k
     rewind iunit
-    if ( wrf_dm_on_monitor() )call da_read_fort47(iunit,ounit,num_obs,'ssmiT',5)    
+    if ( wrf_dm_on_monitor() )call da_read_y_unit(iunit,ounit,num_obs,'ssmiT',5)    
     ENDDO
     endif
 !------------------------------------------------------------------
@@ -268,7 +268,7 @@ subroutine da_final_write_y( iv, y )
     DO k = 0,numb_procs-1
     iunit = ounit*10 +  k
     rewind iunit
-    if ( wrf_dm_on_monitor() )call da_read_fort47(iunit,ounit,num_obs,'satem',5)    
+    if ( wrf_dm_on_monitor() )call da_read_y_unit(iunit,ounit,num_obs,'satem',5)    
     ENDDO
     endif
 !------------------------------------------------------------------
@@ -287,7 +287,7 @@ subroutine da_final_write_y( iv, y )
     DO k = 0,numb_procs-1
     iunit = ounit*10 +  k
     rewind iunit
-    if ( wrf_dm_on_monitor() )call da_read_fort47(iunit,ounit,num_obs,'ssmt1',5)    
+    if ( wrf_dm_on_monitor() )call da_read_y_unit(iunit,ounit,num_obs,'ssmt1',5)    
     ENDDO
     endif
 !------------------------------------------------------------------
@@ -306,7 +306,7 @@ subroutine da_final_write_y( iv, y )
     DO k = 0,numb_procs-1
     iunit = ounit*10 +  k
     rewind iunit
-    if ( wrf_dm_on_monitor() )call da_read_fort47(iunit,ounit,num_obs,'ssmt2',5)    
+    if ( wrf_dm_on_monitor() )call da_read_y_unit(iunit,ounit,num_obs,'ssmt2',5)    
     ENDDO
     endif
 !------------------------------------------------------------------
@@ -325,7 +325,7 @@ subroutine da_final_write_y( iv, y )
     DO k = 0,numb_procs-1
     iunit = ounit*10 +  k
     rewind iunit
-    if ( wrf_dm_on_monitor() )call da_read_fort47(iunit,ounit,num_obs,'qscat',5)    
+    if ( wrf_dm_on_monitor() )call da_read_y_unit(iunit,ounit,num_obs,'qscat',5)    
     ENDDO
     endif
 !------------------------------------------------------------------
@@ -344,7 +344,7 @@ subroutine da_final_write_y( iv, y )
     DO k = 0,numb_procs-1
     iunit = ounit*10 +  k
     rewind iunit
-    if ( wrf_dm_on_monitor() )call da_read_fort47(iunit,ounit,num_obs,'profiler',8)    
+    if ( wrf_dm_on_monitor() )call da_read_y_unit(iunit,ounit,num_obs,'profiler',8)    
     ENDDO
     endif
 
@@ -365,7 +365,7 @@ subroutine da_final_write_y( iv, y )
     DO k = 0,numb_procs-1
     iunit = ounit*10 +  k
     rewind iunit
-    if ( wrf_dm_on_monitor() )call da_read_fort47(iunit,ounit,num_obs,'buoy',4)    
+    if ( wrf_dm_on_monitor() )call da_read_y_unit(iunit,ounit,num_obs,'buoy',4)    
     ENDDO
     endif
 
@@ -385,7 +385,7 @@ subroutine da_final_write_y( iv, y )
     DO k = 0,numb_procs-1
     iunit = ounit*10 +  k
     rewind iunit
-    if ( wrf_dm_on_monitor() )call da_read_fort47(iunit,ounit,num_obs,'bogus',5)    
+    if ( wrf_dm_on_monitor() )call da_read_y_unit(iunit,ounit,num_obs,'bogus',5)    
     ENDDO
     endif
 !-------------------------------------------------------------------

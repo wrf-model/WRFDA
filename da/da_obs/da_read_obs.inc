@@ -402,7 +402,7 @@ loop_level: DO i = 1, platform%info%levels
 
          CASE (12) ;
 
-         ob%num_synop_glo = ob%num_synop_glo + 1
+         if( n==1) ob%num_synop_glo = ob%num_synop_glo + 1
          IF(outside) THEN
             CYCLE reports
          ENDIF
@@ -429,7 +429,7 @@ loop_level: DO i = 1, platform%info%levels
 
          CASE (13, 17) ;                  ! ships   
 
-         ob%num_ships_glo = ob%num_ships_glo + 1
+         if (n == 1) ob%num_ships_glo = ob%num_ships_glo + 1
          IF(outside) THEN
             CYCLE reports
          ENDIF
@@ -437,6 +437,7 @@ loop_level: DO i = 1, platform%info%levels
          if(.not.use_ShipsObs) cycle reports
 
          num_ships  = num_ships  + 1
+         
          ! Track serial obs index for reassembly of obs during bit-for-bit 
          ! tests with different numbers of MPI tasks.  
          platform%loc%obs_global_index = ob%num_ships_glo
@@ -455,7 +456,7 @@ loop_level: DO i = 1, platform%info%levels
 
          CASE (15:16) ;
 
-         ob%num_metar_glo = ob%num_metar_glo + 1
+         if( n==1) ob%num_metar_glo = ob%num_metar_glo + 1
          IF(outside) THEN
             CYCLE reports
          ENDIF
@@ -481,7 +482,7 @@ loop_level: DO i = 1, platform%info%levels
 
          CASE (32:34) ;
 
-         ob%num_pilot_glo = ob%num_pilot_glo + 1
+         if( n==1) ob%num_pilot_glo = ob%num_pilot_glo + 1
          IF(outside) THEN
             CYCLE reports
          ENDIF
@@ -511,7 +512,7 @@ loop_level: DO i = 1, platform%info%levels
 
          CASE (35:38) ;
 
-         ob%num_sound_glo = ob%num_sound_glo + 1
+         if( n==1) ob%num_sound_glo = ob%num_sound_glo + 1
          IF(outside) THEN
             CYCLE reports
          ENDIF
@@ -598,7 +599,7 @@ loop_level: DO i = 1, platform%info%levels
 
          CASE (86)    ;
 
-         ob%num_satem_glo = ob%num_satem_glo + 1
+         if( n==1) ob%num_satem_glo = ob%num_satem_glo + 1
          IF(outside) THEN
             CYCLE reports
          ENDIF
@@ -670,7 +671,7 @@ loop_level: DO i = 1, platform%info%levels
       if(index(platform%info%name, 'MODIS') > 0 .or. &
          index(platform%info%name, 'modis') > 0 )  then
 
-         ob%num_polaramv_glo = ob%num_polaramv_glo + 1
+         if( n==1) ob%num_polaramv_glo = ob%num_polaramv_glo + 1
          IF(outside) THEN
             CYCLE reports
          ENDIF
@@ -698,7 +699,7 @@ loop_level: DO i = 1, platform%info%levels
 
       else
 
-         ob%num_geoamv_glo = ob%num_geoamv_glo + 1
+         if( n==1) ob%num_geoamv_glo = ob%num_geoamv_glo + 1
          IF(outside) THEN
             CYCLE reports
          ENDIF
@@ -730,7 +731,7 @@ loop_level: DO i = 1, platform%info%levels
 
          CASE (42,96:97) ;
 
-         ob%num_airep_glo = ob%num_airep_glo + 1
+         if( n==1) ob%num_airep_glo = ob%num_airep_glo + 1
          IF(outside) THEN
             CYCLE reports
          ENDIF
@@ -764,7 +765,7 @@ loop_level: DO i = 1, platform%info%levels
         ! GPSPW(111), GPSZD(114):
          CASE (111, 114) ;
          
-         ob%num_gpspw_glo = ob%num_gpspw_glo + 1
+         if( n==1) ob%num_gpspw_glo = ob%num_gpspw_glo + 1
          IF(outside) THEN
             CYCLE reports
          ENDIF
@@ -783,7 +784,7 @@ loop_level: DO i = 1, platform%info%levels
 !     else if(index(platform%info%source, 'GPSRF') > 0) then
          CASE (116) ;
 
-         ob%num_gpsref_glo = ob%num_gpsref_glo + 1
+         if( n==1) ob%num_gpsref_glo = ob%num_gpsref_glo + 1
          IF(outside) THEN
             CYCLE reports
          ENDIF
@@ -819,7 +820,7 @@ loop_level: DO i = 1, platform%info%levels
 !        SSM/T1 temperatures:
          CASE (121) ;
 
-         ob%num_ssmt1_glo = ob%num_ssmt1_glo + 1
+         if( n==1) ob%num_ssmt1_glo = ob%num_ssmt1_glo + 1
          IF(outside) THEN
             CYCLE reports
          ENDIF
@@ -848,7 +849,7 @@ loop_level: DO i = 1, platform%info%levels
 !        SSM/T2 relative humidities:
          CASE (122) ;
 
-         ob%num_ssmt2_glo = ob%num_ssmt2_glo + 1
+         if( n==1) ob%num_ssmt2_glo = ob%num_ssmt2_glo + 1
          IF(outside) THEN
             CYCLE reports
          ENDIF
@@ -878,7 +879,7 @@ loop_level: DO i = 1, platform%info%levels
 
          CASE (281)    ;
 
-         ob%num_qscat_glo = ob%num_qscat_glo + 1
+         if( n==1) ob%num_qscat_glo = ob%num_qscat_glo + 1
          IF(outside) THEN
             CYCLE reports
          ENDIF
@@ -904,7 +905,7 @@ loop_level: DO i = 1, platform%info%levels
 
          CASE (132) ;
 
-         ob%num_profiler_glo = ob%num_profiler_glo + 1
+         if( n==1) ob%num_profiler_glo = ob%num_profiler_glo + 1
          IF(outside) THEN
             CYCLE reports
          ENDIF
@@ -934,7 +935,7 @@ loop_level: DO i = 1, platform%info%levels
 
          CASE (135) ;
 
-         ob%num_bogus_glo = ob%num_bogus_glo + 1
+         if( n==1) ob%num_bogus_glo = ob%num_bogus_glo + 1
          IF(outside) THEN
             CYCLE reports
          ENDIF
@@ -991,7 +992,7 @@ loop_level: DO i = 1, platform%info%levels
 
          CASE (18,19) ;             ! buoy
 
-         ob%num_buoy_glo = ob%num_buoy_glo + 1
+         if( n==1) ob%num_buoy_glo = ob%num_buoy_glo + 1
          IF(outside) THEN
             CYCLE reports
          ENDIF

@@ -15,8 +15,11 @@ Reason for changes (explain before making changes)
      to polaramv & geoamv
 
  (c) All the programs to read diagnostics for tuning Obs error statistics
-     have been adjusted to properly read the corresponding diag files
+     have been adjusted to read properly the corresponding diag files
                                              
+ (d) For global options in case the observation is duplicated, the global count was not
+     proper and the same has been fixed.
+
 Expected Differences
 --------------------
  No differences is expected for WRF-Var analysis or increments.
@@ -24,15 +27,16 @@ Expected Differences
  to all the obs (conventional). Size of filtered obs (Qcd's Obs written on 
  unit 192 ) will be large as it holds all observations.
 
+ In fort.48 unit the global counts will be different.
 
 Note: The order of diagnostics written will be different for single and multi 
-      processor run. However, the final content of fort.50 should be same. The
-      same is true for filtered_obs file as well.
+      processor run. However, the final content of iof these files like fort.50,
+      fort.47 etc.  should be same. 
  
 Accuracy: 
  
 CPU:
-  Slight increase in CPU, if run in MPI mode.
+  Slight increase in CPU, if run in MPI mode. Also due to increase in I/O
 
 memory:
   Slight increase is expected when with "ANALYSIS_TYEP" = "QC-OBS". 
@@ -44,7 +48,8 @@ Files added:
 -------------------------------------
 
  wrfvar/da/da_obs/da_read_fort50.inc
- wrfvar/da/da_obs/da_read_fort47.inc
+ wrfvar/da/da_obs/da_read_y_unit.inc
+ wrfvar/da/da_obs/da_read_rand_unit.inc
  wrfvar/da/da_obs/da_final_write_obs.inc
  wrfvar/da/da_obs/da_write_noise_to_ob.inc
  wrfvar/da/da_obs/da_final_write_y.inc
@@ -66,6 +71,7 @@ Files Modified:
  wrfvar/da/da_solve_v3d/da_solve_v3d.f90              
  wrfvar/da/da_util/daprog_diagnostics.f90       
  wrfvar/da/da_util/da_tune.f90                     
+ wrfvar/da/da_util/da_tune.csh                     
 
 cvs commit ?
 

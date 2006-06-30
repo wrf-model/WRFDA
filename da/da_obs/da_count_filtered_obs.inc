@@ -39,7 +39,7 @@ subroutine da_count_filtered_obs(xb, xp, phic, xlonc, truelat1, truelat2)
                                    num_bogus, &
                                    num_others
 
-   INTEGER                        :: iunit, ounit, files     
+   INTEGER                        :: iunit, ounit, files, total_obs     
    CHARACTER (LEN =  80)          :: blank
    logical                        :: first_time
    INTEGER                        :: maxnes, numc, idd, nesti, nestj 
@@ -315,13 +315,19 @@ loop_level: DO i = 1, platform%info%levels
 !-------------------------------------------------------------------------------
 !  Write Counts in the Header 
 !-------------------------------------------------------------------------------
-      WRITE  (UNIT = ounit, FMT = '((A,I7),A,A,F8.0,A)')    &
-      "TOTAL =",num_synop + num_metar + num_ships + &
-                num_buoy + num_sound + num_airep + num_pilot + &
-                num_geoamv + num_polaramv + num_gpspw + num_gpsref + &
-                num_profiler + num_qscat + num_ssmt1 + num_ssmt2 +  &
-                num_satem  + num_bogus +  num_others,", ", &
-                "MISS. =",missing_r,","  
+      total_obs = num_synop + num_metar + num_ships + &
+             num_buoy + num_sound + num_airep + num_pilot + &
+             num_geoamv + num_polaramv + num_gpspw + num_gpsref + &
+             num_profiler + num_qscat + num_ssmt1 + num_ssmt2 +  &
+             num_satem  + num_bogus +  num_others
+      WRITE  (UNIT = ounit, FMT = '(A,I7,A,F8.0,A)')    &
+      "TOTAL =",total_obs, ", MISS. =",missing_r,","  
+!      "TOTAL =",num_synop + num_metar + num_ships + &
+!                num_buoy + num_sound + num_airep + num_pilot + &
+!                num_geoamv + num_polaramv + num_gpspw + num_gpsref + &
+!                num_profiler + num_qscat + num_ssmt1 + num_ssmt2 +  &
+!                num_satem  + num_bogus +  num_others,", ", &
+!                "MISS. =",missing_r,","  
 
 ! Write missing value 
 ! -------------------
@@ -329,7 +335,6 @@ loop_level: DO i = 1, platform%info%levels
 
 ! Write other counts       
 ! -------------------
-
       WRITE  (UNIT = ounit, FMT = '(6(A,I7,A))' )    &
       "SYNOP =",num_synop,", ", &
       "METAR =",num_metar,", ", &

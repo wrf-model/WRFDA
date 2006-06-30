@@ -1,4 +1,4 @@
-subroutine da_deallocate_obs (ob)
+SUBROUTINE da_deallocate_obs (ob)
 
    USE da_constants
 
@@ -8,7 +8,7 @@ subroutine da_deallocate_obs (ob)
 
    INTEGER :: i
 
-   IF (trace_use) call da_trace_entry("da_deallocate_obs")
+   IF (trace_use) CALL da_trace_entry("da_deallocate_obs")
 
    IF (use_PilotObs) THEN
       DO i=1,ob%num_pilot
@@ -35,6 +35,7 @@ subroutine da_deallocate_obs (ob)
       DO i=1,ob%num_satem
          deallocate (ob%satem(i)%p)
          deallocate (ob%satem(i)%thickness)
+         deallocate (ob%satem(i)%org_thickness)
       END DO
    END IF
 
@@ -117,6 +118,6 @@ subroutine da_deallocate_obs (ob)
       END DO
    END IF
 
-   IF (trace_use) call da_trace_exit("da_deallocate_obs")
+   IF (trace_use) CALL da_trace_exit("da_deallocate_obs")
 
-end subroutine da_deallocate_obs
+END SUBROUTINE da_deallocate_obs

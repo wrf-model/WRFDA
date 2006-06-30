@@ -49,7 +49,7 @@ program da_diagnostics
 
    type geoamv_type
       type (info_type)           :: info
-      real                       :: height
+      real                       :: pressure 
       type (field_type)          :: u
       type (field_type)          :: v
    end type geoamv_type
@@ -98,8 +98,8 @@ program da_diagnostics
 
    type ssmir_type
       type (info_type)           :: info
-      type (field_type) :: speed
-      type (field_type) :: tpw
+      type (field_type)          :: speed
+      type (field_type)          :: tpw
    end type ssmir_type
    
    type satem_type
@@ -122,16 +122,29 @@ program da_diagnostics
       real, pointer              :: height(:)
       type (field_type), pointer :: rh(:)
    end type ssmt2_type
+   type bogus_type
+      type (info_type)           :: info
+      integer                    :: numlevs
+      real, pointer              :: pressure(:)
+      type (field_type), pointer :: u(:)
+      type (field_type), pointer :: v(:)
+      type (field_type), pointer :: t(:)
+      type (field_type), pointer :: q(:)
+      type (field_type)          :: slp 
+   end type bogus_type
 
    type ob_type
       integer                    :: num_synop, num_metar, num_ships, &
                                     num_polaramv, num_qscat, num_geoamv, num_gpspw, num_sound, &
                                     num_airep, num_pilot, num_ssmir, &
-                                    num_satem, num_ssmt1, num_ssmt2
+                                    num_satem, num_ssmt1, num_ssmt2, &
+                                    num_sonde_sfc, num_buoy, num_profiler, num_bogus
 
       type (surfc_type), pointer :: synop(:)
       type (surfc_type), pointer :: metar(:)
       type (surfc_type), pointer :: ships(:)
+      type (surfc_type), pointer :: sonde_sfc(:)
+      type (surfc_type), pointer :: buoy(:)
       type (polaramv_type), pointer :: polaramv(:)
       type (geoamv_type), pointer :: geoamv(:)
       type (qscat_type), pointer :: qscat(:)
@@ -139,10 +152,12 @@ program da_diagnostics
       type (sound_type), pointer :: sound(:)
       type (airep_type), pointer :: airep(:)
       type (pilot_type), pointer :: pilot(:)
+      type (pilot_type), pointer :: profiler(:)
       type (ssmir_type), pointer :: ssmir(:)
       type (satem_type), pointer :: satem(:)
       type (ssmt1_type), pointer :: ssmt1(:)
       type (ssmt2_type), pointer :: ssmt2(:)
+      type (bogus_type), pointer :: bogus(:)
    end type ob_type
 
    type (ob_type)       :: ob
@@ -172,6 +187,24 @@ program da_diagnostics
       call da_calc_stats( 'synop t  ', ob % num_synop, ob % synop % t )
       call da_calc_stats( 'synop p  ', ob % num_synop, ob % synop % p )
       call da_calc_stats( 'synop q  ', ob % num_synop, ob % synop % q )
+      write(6,*)
+   end if
+
+   if ( ob % num_buoy > 0 ) then
+      call da_calc_stats( 'buoy u   ', ob % num_buoy, ob % buoy % u )
+      call da_calc_stats( 'buoy v   ', ob % num_buoy, ob % buoy % v )
+      call da_calc_stats( 'buoy t   ', ob % num_buoy, ob % buoy % t )
+      call da_calc_stats( 'buoy p   ', ob % num_buoy, ob % buoy % p )
+      call da_calc_stats( 'buoy q   ', ob % num_buoy, ob % buoy % q )
+      write(6,*)
+   end if
+
+   if ( ob % num_sonde_sfc > 0 ) then
+      call da_calc_stats( 'sondsfc u', ob % num_sonde_sfc, ob % sonde_sfc % u )
+      call da_calc_stats( 'sondsfc v', ob % num_sonde_sfc, ob % sonde_sfc % v )
+      call da_calc_stats( 'sondsfc t', ob % num_sonde_sfc, ob % sonde_sfc % t )
+      call da_calc_stats( 'sondsfc p', ob % num_sonde_sfc, ob % sonde_sfc % p )
+      call da_calc_stats( 'sondsfc q', ob % num_sonde_sfc, ob % sonde_sfc % q )
       write(6,*)
    end if
    
@@ -225,9 +258,11 @@ program da_diagnostics
    if ( ob % num_sound > 0 ) call da_calc_stats_sound( ob % num_sound, ob % sound )
    if ( ob % num_airep > 0 ) call da_calc_stats_airep( ob % num_airep, ob % airep ) 
    if ( ob % num_pilot > 0 ) call da_calc_stats_pilot( ob % num_pilot, ob % pilot )
+   if ( ob % num_profiler > 0 ) call da_calc_stats_profiler( ob % num_profiler, ob % profiler )
    if ( ob % num_satem > 0 ) call da_calc_stats_satem( ob % num_satem, ob % satem )
    if ( ob % num_ssmt1 > 0 ) call da_calc_stats_ssmt1( ob % num_ssmt1, ob % ssmt1 )
    if ( ob % num_ssmt2 > 0 ) call da_calc_stats_ssmt2( ob % num_ssmt2, ob % ssmt2 )
+   if ( ob % num_bogus > 0 ) call da_calc_stats_bogus( ob % num_sound, ob % bogus )
 
 !--------------------------------------------------------------------------
 !  [4.0] Write data for post-processing:
@@ -368,6 +403,98 @@ program da_diagnostics
    write(unit2,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
 
    close( unit1 ); close( unit2 )
+!  [4.5] Geo AMV O-B:
+
+   open( unit1, file = 'geoamvu_omb.dat', status = 'unknown' )
+   open( unit2, file = 'geoamvv_omb.dat', status = 'unknown' )
+
+   current_time = 1
+   do n = 1, ob % num_geoamv
+      call da_write_data( 1, current_time, ob % num_geoamv, unit1, &
+                          ob % geoamv(n) % info, &
+                          ob % geoamv(n) % pressure, ob % geoamv(n) % u )
+      call da_write_data( 1, current_time, ob % num_geoamv, unit2, &
+                          ob % geoamv(n) % info, &
+                          ob % geoamv(n) % pressure, ob % geoamv(n) % v )
+      current_time = ob % geoamv(n) % info % time
+   end do
+
+   write(unit1,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
+   write(unit2,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
+
+   close( unit1 ); close( unit2 )
+
+!  [4.6] Buoy  O-B:
+
+   open( unit1, file = 'buoyu_omb.dat', status = 'unknown' )
+   open( unit2, file = 'buoyv_omb.dat', status = 'unknown' )
+   open( unit3, file = 'buoyt_omb.dat', status = 'unknown' )
+   open( unit4, file = 'buoyp_omb.dat', status = 'unknown' )
+   open( unit5, file = 'buoyq_omb.dat', status = 'unknown' )
+
+   current_time = 1
+   do n = 1, ob % num_buoy
+      call da_write_data( 1, current_time, ob % num_buoy, unit1, &
+                          ob % buoy(n) % info, &
+                          ob % buoy(n) % pressure, ob % buoy(n) % u )
+      call da_write_data( 1, current_time, ob % num_buoy, unit2, &
+                          ob % buoy(n) % info, &
+                          ob % buoy(n) % pressure, ob % buoy(n) % v )
+      call da_write_data( 1, current_time, ob % num_buoy, unit3, &
+                          ob % buoy(n) % info, &
+                          ob % buoy(n) % pressure, ob % buoy(n) % t )
+      call da_write_data( 1, current_time, ob % num_buoy, unit4, &
+                          ob % buoy(n) % info, &
+                          ob % buoy(n) % pressure, ob % buoy(n) % p )
+      call da_write_data( 1, current_time, ob % num_buoy, unit5, &
+                          ob % buoy(n) % info, &
+                          ob % buoy(n) % pressure, ob % buoy(n) % q )
+      current_time = ob % buoy(n) % info % time
+   end do
+
+   write(unit1,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
+   write(unit2,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
+   write(unit3,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
+   write(unit4,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
+   write(unit5,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
+
+   close( unit1 ); close( unit2 ); close( unit3 ); close( unit4 ); close( unit5 )
+
+!  [4.7] sonde_sfc  O-B:
+
+   open( unit1, file = 'sondsfcu_omb.dat', status = 'unknown' )
+   open( unit2, file = 'sondsfcv_omb.dat', status = 'unknown' )
+   open( unit3, file = 'sondsfct_omb.dat', status = 'unknown' )
+   open( unit4, file = 'sondsfcp_omb.dat', status = 'unknown' )
+   open( unit5, file = 'sondsfcq_omb.dat', status = 'unknown' )
+
+   current_time = 1
+   do n = 1, ob % num_sonde_sfc
+      call da_write_data( 1, current_time, ob % num_sonde_sfc, unit1, &
+                          ob % sonde_sfc(n) % info, &
+                          ob % sonde_sfc(n) % pressure, ob % sonde_sfc(n) % u )
+      call da_write_data( 1, current_time, ob % num_sonde_sfc, unit2, &
+                          ob % sonde_sfc(n) % info, &
+                          ob % sonde_sfc(n) % pressure, ob % sonde_sfc(n) % v )
+      call da_write_data( 1, current_time, ob % num_sonde_sfc, unit3, &
+                          ob % sonde_sfc(n) % info, &
+                          ob % sonde_sfc(n) % pressure, ob % sonde_sfc(n) % t )
+      call da_write_data( 1, current_time, ob % num_sonde_sfc, unit4, &
+                          ob % sonde_sfc(n) % info, &
+                          ob % sonde_sfc(n) % pressure, ob % sonde_sfc(n) % p )
+      call da_write_data( 1, current_time, ob % num_sonde_sfc, unit5, &
+                          ob % sonde_sfc(n) % info, &
+                          ob % sonde_sfc(n) % pressure, ob % sonde_sfc(n) % q )
+      current_time = ob % sonde_sfc(n) % info % time
+   end do
+
+   write(unit1,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
+   write(unit2,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
+   write(unit3,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
+   write(unit4,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
+   write(unit5,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
+
+   close( unit1 ); close( unit2 ); close( unit3 ); close( unit4 ); close( unit5 )
 
 contains
 
@@ -403,8 +530,8 @@ subroutine da_count_obs( y_unit, ob )
    integer, intent(in)               :: y_unit
    type (ob_type), intent(inout)     :: ob
 
-   character*20         :: ob_name
-   integer              :: num_obs, num_times
+   character*20         :: ob_name, dummy
+   integer              :: num_obs, num_times, levels,k, kk
 
 !  [1] Initialize ob numbers:
 
@@ -422,6 +549,11 @@ subroutine da_count_obs( y_unit, ob )
    ob % num_satem = 0
    ob % num_ssmt1 = 0
    ob % num_ssmt2 = 0
+   ob % num_sonde_sfc = 0
+   ob % num_buoy = 0
+   ob % num_profiler = 0
+   ob % num_bogus = 0
+  
    num_times = 0
       
 !  [2] Loop through input file to count number of obs:
@@ -431,7 +563,6 @@ subroutine da_count_obs( y_unit, ob )
 
          read(y_unit,'(a20,i8)')ob_name, num_obs
  
-!         if ( trim(ob_name)(1:5) == '*****' .or. trim(ob_name)(1:5) == '*end*' ) exit
          if ( index( ob_name,'*****') > 0 .or. index( ob_name,'*end*') > 0 ) exit  
 
          if ( index( ob_name,'synop') > 0 ) then
@@ -462,10 +593,30 @@ subroutine da_count_obs( y_unit, ob )
              ob % num_ssmt1 = ob % num_ssmt1 + num_obs
          else if ( index( ob_name,'ssmt2') > 0 ) then
              ob % num_ssmt2 = ob % num_ssmt2 + num_obs
+         else if ( index( ob_name,'sonde_sfc') > 0 ) then
+             ob % num_sonde_sfc = ob % num_sonde_sfc + num_obs
+         else if ( index( ob_name,'buoy') > 0 ) then
+             ob % num_buoy = ob % num_buoy  + num_obs
+         else if ( index( ob_name,'profiler') > 0 ) then
+             ob % num_profiler = ob % num_profiler + num_obs
+         else if ( index( ob_name,'bogus') > 0 ) then
+             ob % num_bogus = ob % num_bogus + num_obs
+         else
+             print*,' unknown obs type: ',trim(ob_name),' found in diagnostics.in file ' 
          end if
+           
+          do kk = 1, num_obs
+           if( index( ob_name,'bogus')  > 0  ) then
+            read(y_unit,'(i8)') levels
+            read(y_unit,'(a20)') dummy 
+           endif
+            read(y_unit,'(i8)') levels
+            do k=1,levels
+            read(y_unit,'(a20)') dummy 
+            end do
+          enddo
       end do
       
-!      if ( trim(ob_name)(1:5) == '*end*' ) then
       if ( index( ob_name,'*end*') > 0 ) then  
          exit
       else
@@ -547,45 +698,72 @@ subroutine da_count_obs( y_unit, ob )
       write(6,'(a,i8)')' Number of ssmt2 obs = ', ob % num_ssmt2
    end if
  
+   if ( ob % num_buoy > 0 ) then
+      allocate( ob % buoy(1:ob % num_buoy) )
+      write(6,'(a,i8)')' Number of buoy obs = ', ob % num_buoy
+   end if
+   
+   if ( ob % num_sonde_sfc > 0 ) then
+      allocate( ob % sonde_sfc(1:ob % num_sonde_sfc) )
+      write(6,'(a,i8)')' Number of sonde_sfc obs = ', ob % num_sonde_sfc
+   end if
+   
+   if ( ob % num_profiler > 0 ) then
+      allocate( ob % profiler(1:ob % num_profiler) )
+      write(6,'(a,i8)')' Number of profiler obs = ', ob % num_profiler
+   end if
+   
+   if ( ob % num_bogus > 0 ) then
+      allocate( ob % bogus(1:ob % num_bogus) )
+      write(6,'(a,i8)')' Number of bogus obs = ', ob % num_bogus
+   end if
+   
   write(6,*)
  
 end subroutine da_count_obs
-
-!--------------------------------------------------------------------------
-
 subroutine da_read_y( y_unit, ob )
 
    implicit none
-   
+
    integer, intent(in)               :: y_unit
    type (ob_type), intent(inout)     :: ob
 
-   character*20         :: ob_name
+   character*20         :: ob_name, dummy
    integer              :: n, ndum, k, kdum, num_obs, num_levs
+   integer              :: num_obs_sonde_sfc, num_obs_buoy, num_obs_profiler, num_obs_bogus
    integer              :: num_obs_synop, num_obs_metar, num_obs_ships
    integer              :: num_obs_qscat,  num_obs_polaramv, num_obs_geoamv
    integer              :: num_obs_gpspw, num_obs_sound, num_obs_airep, num_obs_pilot
    integer              :: num_obs_ssmir, num_obs_satem, num_obs_ssmt1, num_obs_ssmt2
    integer              :: synopt, metart, shipst, polaramvt, geoamvt, qscatt, gpspwt, soundt
+   integer              :: sonde_sfct, buoyt, profilert, bogust
    integer              :: airept, pilott, ssmirt, satemt, ssmt1t, ssmt2t
    real                 :: rdum
 
    rewind (y_unit)
+   num_obs_buoy = 0; num_obs_sonde_sfc = 0; num_obs_profiler = 0 ; num_obs_bogus = 0
    num_obs_synop = 0; num_obs_metar = 0; num_obs_ships = 0
    num_obs_polaramv = 0; num_obs_geoamv = 0; num_obs_qscat = 0
    num_obs_gpspw = 0; num_obs_sound = 0; num_obs_airep = 0; num_obs_pilot = 0
    num_obs_ssmir = 0; num_obs_satem = 0; num_obs_ssmt1 = 0; num_obs_ssmt2 = 0
+   buoyt = 0; sonde_sfct = 0; profilert = 0; bogust = 0
    synopt = 0; metart = 0; shipst = 0; polaramvt = 0; geoamvt = 0; qscatt = 0
    gpspwt = 0; soundt = 0; airept = 0; pilott = 0
    ssmirt = 0; satemt = 0; ssmt1t = 0; ssmt2t = 0
+!
+   do       ! loop over entire input file: (ends in *end*)
+      do    ! loop over particular time (ends in *****)
 
-   do
+         read(y_unit,'(a20,i8)')ob_name, num_obs
+         print*,' got ob_type ',trim(ob_name) 
+      if ( index( ob_name,'*****') > 0 .or. index( ob_name,'*end*') > 0 ) exit  
 
-      read(y_unit,'(a20,i8)')ob_name, num_obs
-      
       if ( index( ob_name,'synop') > 0 ) then
          synopt = synopt + 1
          do n = num_obs_synop + 1, num_obs_synop + num_obs
+
+            read(y_unit,'(i8)') num_levs
+            do k = 1, num_levs
             read(y_unit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))') &
             ndum, kdum, ob % synop(n) % info % id, &        ! Station
                         ob % synop(n) % info % lat, &       ! Latitude
@@ -596,6 +774,7 @@ subroutine da_read_y( y_unit, ob )
                         ob % synop(n) % t, &                ! O, O-B, O-A
                         ob % synop(n) % p, &                ! O, O-B, O-A
                         ob % synop(n) % q                   ! O, O-B, O-A
+            end do
             ob % synop(n) % info % time = synopt
          end do
          num_obs_synop = num_obs_synop + num_obs
@@ -603,6 +782,8 @@ subroutine da_read_y( y_unit, ob )
       elseif ( index( ob_name,'metar') > 0 ) then
          metart = metart + 1
          do n = num_obs_metar + 1, num_obs_metar + num_obs
+            read(y_unit,'(i8)') num_levs
+            do k = 1, num_levs
             read(y_unit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))') &
             ndum, kdum, ob % metar(n) % info % id, &        ! Station
                         ob % metar(n) % info % lat, &       ! Latitude
@@ -613,13 +794,15 @@ subroutine da_read_y( y_unit, ob )
                         ob % metar(n) % t, &                ! O, O-B, O-A
                         ob % metar(n) % p, &                ! O, O-B, O-A
                         ob % metar(n) % q                   ! O, O-B, O-A
+            end do
             ob % metar(n) % info % time = metart
          end do
          num_obs_metar = num_obs_metar + num_obs
-
       elseif ( index( ob_name,'ships') > 0 ) then
          shipst = shipst + 1
          do n = num_obs_ships + 1, num_obs_ships + num_obs
+            read(y_unit,'(i8)') num_levs
+            do k = 1, num_levs
             read(y_unit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))') &
             ndum, kdum, ob % ships(n) % info % id, &        ! Station
                         ob % ships(n) % info % lat, &       ! Latitude
@@ -630,13 +813,16 @@ subroutine da_read_y( y_unit, ob )
                         ob % ships(n) % t, &                ! O, O-B, O-A
                         ob % ships(n) % p, &                ! O, O-B, O-A
                         ob % ships(n) % q                   ! O, O-B, O-A
+            end do
             ob % ships(n) % info % time = shipst
          end do
          num_obs_ships = num_obs_ships + num_obs
-         
+
       elseif ( index( ob_name,'polaramv') > 0 ) then
          polaramvt = polaramvt + 1
          do n = num_obs_polaramv + 1, num_obs_polaramv + num_obs
+            read(y_unit,'(i8)') num_levs
+            do k = 1, num_levs
             read(y_unit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))') &
             ndum, kdum, ob % polaramv(n) % info % id, &        ! Station
                         ob % polaramv(n) % info % lat, &       ! Latitude
@@ -647,26 +833,31 @@ subroutine da_read_y( y_unit, ob )
             ob % polaramv(n) % info % time = polaramvt
             ob % polaramv(n) % channel = ob % polaramv(n) % info % id(3:4)
             ob % polaramv(n) % landmask = ob % polaramv(n) % info % id(5:5)
+            end do
          end do
          num_obs_polaramv = num_obs_polaramv + num_obs
 
       elseif ( index( ob_name,'geoamv') > 0 ) then
          geoamvt = geoamvt + 1
          do n = num_obs_geoamv + 1, num_obs_geoamv + num_obs
+            read(y_unit,'(i8)') num_levs
+            do k = 1, num_levs
             read(y_unit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))') &
-            ndum, kdum, ob % geoamv(n) % info % id, &        ! Station
+            ndum, kdum, ob % geoamv(n) % info % id,  &       ! Station
                         ob % geoamv(n) % info % lat, &       ! Latitude
                         ob % geoamv(n) % info % lon, &       ! Longitude
-                        ob % geoamv(n) % height, &           ! Obs height
+                        ob % geoamv(n) % pressure,   &       ! Obs pressure
                         ob % geoamv(n) % u, &                ! O, O-B, O-A
                         ob % geoamv(n) % v
+            end do
             ob % geoamv(n) % info % time = geoamvt
          end do
          num_obs_geoamv = num_obs_geoamv + num_obs
-
       elseif ( index( ob_name,'qscat') > 0 ) then
          qscatt = qscatt + 1
          do n = num_obs_qscat + 1, num_obs_qscat + num_obs
+            read(y_unit,'(i8)') num_levs
+            do k = 1, num_levs
             read(y_unit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))') &
             ndum, kdum, ob % qscat(n) % info % id, &        ! Station
                         ob % qscat(n) % info % lat, &       ! Latitude
@@ -675,12 +866,15 @@ subroutine da_read_y( y_unit, ob )
                         ob % qscat(n) % u, &                ! O, O-B, O-A
                         ob % qscat(n) % v
             ob % qscat(n) % info % time = qscatt
+            end do
          end do
          num_obs_qscat = num_obs_qscat + num_obs
-         
+
       elseif ( index( ob_name,'gpspw') > 0 ) then
          gpspwt = gpspwt + 1
          do n = num_obs_gpspw + 1, num_obs_gpspw + num_obs
+            read(y_unit,'(i8)') num_levs
+            do k = 1, num_levs
             read(y_unit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))') &
             ndum, kdum, ob % gpspw(n) % info % id, &        ! Station
                         ob % gpspw(n) % info % lat, &       ! Latitude
@@ -688,8 +882,10 @@ subroutine da_read_y( y_unit, ob )
                         rdum, &                             ! Obs height
                         ob % gpspw(n) % tpw
             ob % gpspw(n) % info % time = gpspwt
+            end do
          end do
          num_obs_gpspw = num_obs_gpspw + num_obs
+
 
       elseif ( index( ob_name,'sound') > 0 ) then
          soundt = soundt + 1
@@ -718,7 +914,6 @@ subroutine da_read_y( y_unit, ob )
             ob % sound(n) % info % time = soundt
          end do
          num_obs_sound = num_obs_sound + num_obs
-
       elseif ( index( ob_name,'airep') > 0 ) then
          airept = airept + 1
          do n = num_obs_airep + 1, num_obs_airep + num_obs
@@ -768,6 +963,8 @@ subroutine da_read_y( y_unit, ob )
       elseif ( index( ob_name,'ssmir') > 0 ) then
          ssmirt = ssmirt + 1
          do n = num_obs_ssmir + 1, num_obs_ssmir + num_obs
+            read(y_unit,'(i8)')num_levs
+            do k = 1, num_levs
             read(y_unit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))') &
             ndum, kdum, ob % ssmir(n) % info % id, &     ! Station
                         ob % ssmir(n) % info % lat, &       ! Latitude
@@ -775,6 +972,7 @@ subroutine da_read_y( y_unit, ob )
                         rdum, &                             ! Obs height
                         ob % ssmir(n) % speed, &            ! O, O-B, O-A
                         ob % ssmir(n) % tpw
+            end do
             ob % ssmir(n) % info % time = ssmirt
          end do
          num_obs_ssmir = num_obs_ssmir + num_obs
@@ -806,7 +1004,7 @@ subroutine da_read_y( y_unit, ob )
             ob % ssmt1(n) % numlevs = num_levs
             allocate( ob % ssmt1(n) % height(1:num_levs) )
             allocate( ob % ssmt1(n) % t(1:num_levs) )
-            
+
             do k = 1, num_levs
                read(y_unit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))') &
                ndum, kdum, ob % ssmt1(n) % info % id, &     ! Station
@@ -839,15 +1037,117 @@ subroutine da_read_y( y_unit, ob )
          end do
          num_obs_ssmt2 = num_obs_ssmt2 + num_obs
 
-      elseif ( index( ob_name,'*end*') > 0 ) then
-         exit
-      end if
+     elseif ( index( ob_name,'sonde_sfc') > 0 ) then
+         sonde_sfct = sonde_sfct + 1
+         do n = num_obs_sonde_sfc + 1, num_obs_sonde_sfc + num_obs
+             read(y_unit,'(i8)') num_levs
+            do k = 1, num_levs
+            read(y_unit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))') &
+            ndum, kdum, ob % sonde_sfc(n) % info % id, &        ! Station
+                        ob % sonde_sfc(n) % info % lat, &       ! Latitude
+                        ob % sonde_sfc(n) % info % lon, &       ! Longitude
+                        ob % sonde_sfc(n) % pressure, &         ! Obs height
+                        ob % sonde_sfc(n) % u, &                ! O, O-B, O-A
+                        ob % sonde_sfc(n) % v, &                ! O, O-B, O-A
+                        ob % sonde_sfc(n) % t, &                ! O, O-B, O-A
+                        ob % sonde_sfc(n) % p, &                ! O, O-B, O-A
+                        ob % sonde_sfc(n) % q                   ! O, O-B, O-A
+            end do
+            ob % sonde_sfc(n) % info % time = sonde_sfct
+         end do
+         num_obs_sonde_sfc = num_obs_sonde_sfc + num_obs
 
-   end do
-   
+      elseif ( index( ob_name,'buoy') > 0 ) then
+         buoyt = buoyt + 1
+         do n = num_obs_buoy + 1, num_obs_buoy + num_obs
+
+            read(y_unit,'(i8)') num_levs
+            do k = 1, num_levs
+            read(y_unit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))') &
+            ndum, kdum, ob % buoy(n) % info % id, &        ! Station
+                        ob % buoy(n) % info % lat, &       ! Latitude
+                        ob % buoy(n) % info % lon, &       ! Longitude
+                        ob % buoy(n) % pressure, &         ! Obs height
+                        ob % buoy(n) % u, &                ! O, O-B, O-A
+                        ob % buoy(n) % v, &                ! O, O-B, O-A
+                        ob % buoy(n) % t, &                ! O, O-B, O-A
+                        ob % buoy(n) % p, &                ! O, O-B, O-A
+                        ob % buoy(n) % q                   ! O, O-B, O-A
+            end do
+            ob % buoy(n) % info % time = buoyt
+         end do
+         num_obs_buoy = num_obs_buoy + num_obs
+      elseif ( index( ob_name,'profiler') > 0 ) then
+         profilert = profilert + 1
+         do n = num_obs_profiler + 1, num_obs_profiler + num_obs
+            read(y_unit,'(i8)')num_levs
+            ob % profiler(n) % numlevs = num_levs
+            allocate( ob % profiler(n) % height(1:num_levs) )
+            allocate( ob % profiler(n) % u(1:num_levs) )
+            allocate( ob % profiler(n) % v(1:num_levs) )
+
+            do k = 1, num_levs
+               read(y_unit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))') &
+               ndum, kdum, ob % profiler(n) % info % id, &     ! Station
+                        ob % profiler(n) % info % lat, &       ! Latitude
+                        ob % profiler(n) % info % lon, &       ! Longitude
+                        ob % profiler(n) % height(k), &        ! Obs height
+                        ob % profiler(n) % u(k), &             ! O, O-B, O-A
+                        ob % profiler(n) % v(k)
+            end do
+            ob % profiler(n) % info % time = profilert
+         end do
+         num_obs_profiler = num_obs_profiler + num_obs
+
+      elseif ( index( ob_name,'bogus') > 0 ) then
+         bogust = bogust + 1
+         do n = num_obs_bogus + 1, num_obs_bogus + num_obs
+            read(y_unit,'(i8)')num_levs
+               read(y_unit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))') &
+               ndum, kdum, ob % bogus(n) % info % id, &     ! Station
+                        ob % bogus(n) % info % lat, &       ! Latitude
+                        ob % bogus(n) % info % lon, &       ! Longitude
+                        dummy,                      &
+                        ob % bogus(n) % slp                 ! O, O-B, O-A
+
+
+            read(y_unit,'(i8)')num_levs
+            ob % bogus(n) % numlevs = num_levs
+            allocate( ob % bogus(n) % pressure(1:num_levs) )
+            allocate( ob % bogus(n) % u(1:num_levs) )
+            allocate( ob % bogus(n) % v(1:num_levs) )
+            allocate( ob % bogus(n) % t(1:num_levs) )
+            allocate( ob % bogus(n) % q(1:num_levs) )
+
+            do k = 1, num_levs
+               read(y_unit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))') &
+               ndum, kdum, ob % bogus(n) % info % id, &     ! Station
+                        ob % bogus(n) % info % lat, &       ! Latitude
+                        ob % bogus(n) % info % lon, &       ! Longitude
+                        ob % bogus(n) % pressure(k), &      ! Obs height
+                        ob % bogus(n) % u(k), &             ! O, O-B, O-A
+                        ob % bogus(n) % v(k), &             ! O, O-B, O-A
+                        ob % bogus(n) % t(k), &             ! O, O-B, O-A
+                        ob % bogus(n) % q(k)                ! O, O-B, O-A
+            enddo
+            ob % bogus(n) % info % time = bogust
+          enddo
+         num_obs_bogus = num_obs_bogus + num_obs
+
+      elseif ( index( ob_name,'ssmiT') > 0 ) then
+         do n = 1, num_obs
+            read(y_unit,'(i8)')num_levs
+            read(y_unit,'(a)')dummy
+         enddo
+      else
+      print*,' Got unknown obs_tye : ',trim(ob_name)
+      stop
+      endif
+    enddo     ! loop over particular time (ends in *****)
+      if ( index( ob_name,'*end*') > 0 ) exit  
+  end do      ! loop over entire input file: (ends in *end*)
+
 end subroutine da_read_y
-
-!--------------------------------------------------------------------------
 
 subroutine da_calc_stats( ob_name, num_obs, field )
 
@@ -970,6 +1270,82 @@ subroutine da_calc_stats_sound( num_obs, sound )
 
 end subroutine da_calc_stats_sound
 
+!--------------------------------------------------------------------------
+
+subroutine da_calc_stats_bogus( num_obs, bogus )
+
+   implicit none
+
+   integer, intent(in)           :: num_obs               ! Number of obs.
+   type (bogus_type), intent(in) :: bogus(1:num_obs)      ! Obs data.
+
+   integer                       :: n, k, count, count1
+   real                          :: sum_omb, sum_oma, sum_omb2, sum_oma2
+   real                          :: mean_omb, mean_oma, stdv_omb, stdv_oma
+
+   if ( num_obs > 0 ) then
+ 
+      count = 0; count1 = 0
+      sum_omb = 0.0; sum_oma = 0.0; sum_omb2 = 0.0; sum_oma2 = 0.0
+      do n = 1, num_obs
+         do k = 1, bogus(n) % numlevs
+            count1 = count1 + 1
+            call da_increment_stats( bogus(n) % u(k), count, &
+                                     sum_omb, sum_oma, sum_omb2, sum_oma2, &
+                                     mean_omb, mean_oma, stdv_omb, stdv_oma  )
+         end do
+      end do
+      write(6,'(1x,a9,i8,a,i8,a,4f10.4)')'bogus u  ', count, '/', count1, &
+                                        '. O-B(m,s), O-A(m,s) =', &
+                                        mean_omb, stdv_omb, mean_oma, stdv_oma
+
+      count = 0; count1 = 0
+      sum_omb = 0.0; sum_oma = 0.0; sum_omb2 = 0.0; sum_oma2 = 0.0
+      do n = 1, num_obs
+         do k = 1, bogus(n) % numlevs
+            count1 = count1 + 1
+            call da_increment_stats( bogus(n) % v(k), count, &
+                                     sum_omb, sum_oma, sum_omb2, sum_oma2, &
+                                     mean_omb, mean_oma, stdv_omb, stdv_oma  )
+         end do
+      end do
+      write(6,'(1x,a9,i8,a,i8,a,4f10.4)')'bogus v  ', count, '/', count1, &
+                                        '. O-B(m,s), O-A(m,s) =', &
+                                        mean_omb, stdv_omb, mean_oma, stdv_oma
+
+      count = 0; count1 = 0
+      sum_omb = 0.0; sum_oma = 0.0; sum_omb2 = 0.0; sum_oma2 = 0.0
+      do n = 1, num_obs
+         do k = 1, bogus(n) % numlevs
+            count1 = count1 + 1
+            call da_increment_stats( bogus(n) % t(k), count, &
+                                     sum_omb, sum_oma, sum_omb2, sum_oma2, &
+                                     mean_omb, mean_oma, stdv_omb, stdv_oma  )
+         end do
+      end do
+      write(6,'(1x,a9,i8,a,i8,a,4f10.4)')'bogus t  ', count, '/', count1, &
+                                        '. O-B(m,s), O-A(m,s) =', &
+                                        mean_omb, stdv_omb, mean_oma, stdv_oma
+
+      count = 0; count1 = 0
+      sum_omb = 0.0; sum_oma = 0.0; sum_omb2 = 0.0; sum_oma2 = 0.0
+      do n = 1, num_obs
+         do k = 1, bogus(n) % numlevs
+            count1 = count1 + 1
+            call da_increment_stats( bogus(n) % q(k), count, &
+                                     sum_omb, sum_oma, sum_omb2, sum_oma2, &
+                                     mean_omb, mean_oma, stdv_omb, stdv_oma  )
+         end do
+      end do
+      write(6,'(1x,a9,i8,a,i8,a,4f10.4)')'bogus q  ', count, '/', count1, &
+                                        '. O-B(m,s), O-A(m,s) =', &
+                                        mean_omb, stdv_omb, mean_oma, stdv_oma
+      write(6,*)
+
+   end if
+
+end subroutine da_calc_stats_bogus
+
 subroutine da_calc_stats_airep( num_obs, airep )
 
    implicit none
@@ -1073,6 +1449,51 @@ subroutine da_calc_stats_pilot( num_obs, pilot )
 
    end if
 end subroutine da_calc_stats_pilot
+
+subroutine da_calc_stats_profiler( num_obs, profiler )
+
+   implicit none
+
+   integer, intent(in)           :: num_obs               ! Number of obs.
+   type (pilot_type), intent(in) :: profiler(1:num_obs)      ! Obs data.
+
+   integer                       :: n, k, count, count1
+   real                          :: sum_omb, sum_oma, sum_omb2, sum_oma2
+   real                          :: mean_omb, mean_oma, stdv_omb, stdv_oma
+
+   if ( num_obs > 0 ) then
+
+      count = 0; count1 = 0
+      sum_omb = 0.0; sum_oma = 0.0; sum_omb2 = 0.0; sum_oma2 = 0.0
+      do n = 1, num_obs
+         do k = 1, profiler(n) % numlevs
+            count1 = count1 + 1
+            call da_increment_stats( profiler(n) % u(k), count, &
+                                     sum_omb, sum_oma, sum_omb2, sum_oma2, &
+                                     mean_omb, mean_oma, stdv_omb, stdv_oma  )
+         end do
+      end do
+      write(6,'(1x,a9,i8,a,i8,a,4f10.4)')'profiler u  ', count, '/', count1, &
+                                        '. O-B(m,s), O-A(m,s) =', &
+                                        mean_omb, stdv_omb, mean_oma, stdv_oma
+
+      count = 0; count1 = 0
+      sum_omb = 0.0; sum_oma = 0.0; sum_omb2 = 0.0; sum_oma2 = 0.0
+      do n = 1, num_obs
+         do k = 1, profiler(n) % numlevs
+            count1 = count1 + 1
+            call da_increment_stats( profiler(n) % v(k), count, &
+                                     sum_omb, sum_oma, sum_omb2, sum_oma2, &
+                                     mean_omb, mean_oma, stdv_omb, stdv_oma  )
+         end do
+      end do
+      write(6,'(1x,a9,i8,a,i8,a,4f10.4)')'profiler v  ', count, '/', count1, &
+                                        '. O-B(m,s), O-A(m,s) =', &
+                                        mean_omb, stdv_omb, mean_oma, stdv_oma
+      write(6,*)
+
+   end if
+end subroutine da_calc_stats_profiler
 
 subroutine da_calc_stats_satem( num_obs, satem )
 
