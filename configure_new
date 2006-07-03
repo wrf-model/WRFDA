@@ -5,6 +5,7 @@ export EM_CORE=0
 export NMM_CORE=0
 export COAMPS_CORE=0
 export EXP_CORE=0
+export VAR4D_CORE=0
 
 option=$1
 
@@ -26,13 +27,16 @@ elif [ "$option" = "wrfvar" ] ; then
     REGISTRY=Registry.wrfvar
     DA_CORE=1
     EM_CORE=1
+    VAR4D_CORE=1
 elif [ "$option" = "var" ] ; then
     REGISTRY=Registry.wrfvar
     DA_CORE=1
     EM_CORE=1
+    VAR4D_CORE=1
 elif [ "$option" = "wrfplus" ] ; then
     REGISTRY=Registry.EM_4DVAR
     EM_CORE=1
+    VAR4D_CORE=1
 elif [ "$option" = "be" ] ; then
     REGISTRY=Registry.wrfvar
     DA_CORE=1
@@ -365,7 +369,7 @@ if test -n "$PERL" ; then
   echo option = $option
   $PERL arch/Config_new.pl -perl=$PERL -netcdf=$NETCDF -phdf5=$PHDF5 -rttov=$RTTOV -os=$os -mach=$mach -ldflags=$ldflags \
      -compileflags=$compileflags -registry=$REGISTRY -da_core=$DA_CORE -em_core=$EM_CORE -nmm_core=$NMM_CORE \
-     -coamps_core=$COAMPS_CORE -exp_core=$EXP_CORE
+     -coamps_core=$COAMPS_CORE -exp_core=$EXP_CORE -var4d_core=$VAR4D_CORE
 fi
 
 export CONFIG=configure.wrf

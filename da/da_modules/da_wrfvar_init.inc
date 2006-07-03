@@ -174,10 +174,11 @@ subroutine da_wrfvar_init( no_init1 )
   END IF
 
 ! JRB
-   CALL wrf_warning3(__FILE__,__LINE__,"Fix me")
+   CALL wrf_warning(__FILE__,__LINE__,(/"Fix me"/))
 !  head_grid%start_subtime = head_grid%start_time
 !  head_grid%stop_subtime = head_grid%stop_time
 
   IF (trace_use) call da_trace_exit("da_wrfvar_init")
 
 end subroutine da_wrfvar_init
+
