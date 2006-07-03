@@ -50,7 +50,7 @@ SUBROUTINE solve_em_tl ( grid , config_flags , &
    TYPE(domain) , TARGET          :: grid
 
    !  Definitions of dummy arguments to this routine (generated from Registry).
-#include <em_dummy_decl.inc>
+#include "em_dummy_decl.inc"
 
    !  Structure that contains run-time configuration (namelist) data for domain
    TYPE (grid_config_rec_type) , INTENT(IN)          :: config_flags
@@ -71,8 +71,8 @@ SUBROUTINE solve_em_tl ( grid , config_flags , &
    LOGICAL                         :: specified_bdy
 
 ! storage for tendencies and decoupled state (generated from Registry)
-#include <em_i1_decl.inc>
-#include <namelist_defines2.inc>
+#include "em_i1_decl.inc"
+#include "namelist_defines2.inc"
 
 ! Previous time level of tracer arrays now defined as i1 variables;
 ! the state 4d arrays now redefined as 1-time level arrays in Registry.
@@ -89,7 +89,7 @@ SUBROUTINE solve_em_tl ( grid , config_flags , &
    REAL ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33,num_scalar) :: g_scalar_old
 
 
-#ifdef (VAR4D_CORE == 1)
+#if (VAR4D_CORE == 1)
    INTEGER :: rc 
    INTEGER :: number_of_small_timesteps, rk_step
    INTEGER :: klevel,ijm,ijp,i,j,k,size1,size2    ! for prints/plots only
@@ -116,7 +116,7 @@ SUBROUTINE solve_em_tl ( grid , config_flags , &
    INTEGER     :: sm31y , em31y , sm32y , em32y , sm33y , em33y
 
 ! Define benchmarking timers if -DBENCH is compiled
-#include <bench_solve_em_def.h>
+#include "bench_solve_em_def.h"
 
 !----------------------
 ! Executable statements
@@ -137,14 +137,14 @@ SUBROUTINE solve_em_tl ( grid , config_flags , &
 ! The definition of COPY_IN or COPY_OUT before the include defines the
 ! direction of the copy.  Em_scalar_derefs.inc is generated from Registry
 #define COPY_IN
-#include <em_scalar_derefs.inc>
+#include "em_scalar_derefs.inc"
 
 ! Needed by some comm layers, e.g. RSL. If needed, nmm_data_calls.inc is
 ! generated from the registry.  The definition of REGISTER_I1 allows
 ! I1 data to be communicated in this routine if necessary.
 #ifdef DM_PARALLEL
 #    define REGISTER_I1
-#      include <em_data_calls.inc>
+#include "em_data_calls.inc"
 #endif
 
 !<DESCRIPTION>
@@ -179,7 +179,7 @@ SUBROUTINE solve_em_tl ( grid , config_flags , &
 !</DESCRIPTION>
 
 ! Initialize timers if compiled with -DBENCH
-#include <bench_solve_em_init.h>
+#include "bench_solve_em_init.h"
 
 ! xyh identity operation return here
    return
@@ -278,9 +278,9 @@ SUBROUTINE solve_em_tl ( grid , config_flags , &
 !--------------------------------------------------------------
      CALL wrf_debug ( 200 , ' call HALO_RK_CHEM' )
      IF      ( h_mom_adv_order <= 4 ) THEN
-#      include "HALO_EM_CHEM_E_3.inc"
+#include "HALO_EM_CHEM_E_3.inc"
      ELSE IF ( h_mom_adv_order <= 6 ) THEN
-#      include "HALO_EM_CHEM_E_5.inc"
+#include "HALO_EM_CHEM_E_5.inc"
      ELSE
        WRITE(wrf_err_message,*)'solve_em_tl: invalid h_mom_adv_order = ',h_mom_adv_order
        CALL wrf_error_fatal(TRIM(wrf_err_message))
@@ -415,14 +415,14 @@ BENCH_END(step_prep_tim)
 !j muv    x
 !j mut    x
 !--------------------------------------------------------------
-#    include "HALO_EM_A.inc"
+#include "HALO_EM_A.inc"
 #endif
 
 ! set boundary conditions on variables 
 ! from big_step_prep for use in big_step_proc
 
 #ifdef DM_PARALLEL
-#  include "PERIOD_BDY_EM_A.inc"
+#include "PERIOD_BDY_EM_A.inc"
 #endif
 
 !   CALL set_tiles ( grid , ids , ide , jds , jde , ips-1 , ipe+1 , jps-1 , jpe+1 )
@@ -496,7 +496,7 @@ num_3d_m, num_3d_c,num_3d_s, &
 BENCH_END(init_zero_tend_tim)
 
 #ifdef DM_PARALLEL
-#     include "HALO_EM_PHYS_A.inc"
+#include "HALO_EM_PHYS_A.inc"
 #endif
 
 !<DESCRIPTION>
@@ -821,7 +821,7 @@ BENCH_START(comp_diff_metrics_tim)
 BENCH_END(comp_diff_metrics_tim)
 
 #ifdef DM_PARALLEL
-#  include "PERIOD_BDY_EM_A1.inc"
+#include "PERIOD_BDY_EM_A1.inc"
 #endif
 
 BENCH_START(tke_diff_bc_tim)
@@ -870,7 +870,7 @@ BENCH_START(tke_diff_bc_tim)
 BENCH_END(tke_diff_bc_tim)
 
 #ifdef DM_PARALLEL
-#     include "HALO_EM_TKE_C.inc"
+#include "HALO_EM_TKE_C.inc"
 #endif
 
 BENCH_START(deform_div_tim)
@@ -899,7 +899,7 @@ BENCH_END(deform_div_tim)
 
 
 #ifdef DM_PARALLEL
-#     include "HALO_EM_TKE_D.inc"
+#include "HALO_EM_TKE_D.inc"
 #endif
 
 
@@ -937,14 +937,14 @@ BENCH_START(calc_tke_tim)
 BENCH_END(calc_tke_tim)
 
 #ifdef DM_PARALLEL
-#     include "HALO_EM_TKE_E.inc"
+#include "HALO_EM_TKE_E.inc"
 #endif
 
      ENDIF
 
 #ifdef DM_PARALLEL
-#      include "PERIOD_BDY_EM_PHY_BC.inc"
-#      include "PERIOD_BDY_EM_CHEM.inc"
+#include "PERIOD_BDY_EM_PHY_BC.inc"
+#include "PERIOD_BDY_EM_CHEM.inc"
 #endif
 
 BENCH_START(phy_bc_tim)
@@ -1000,16 +1000,16 @@ BENCH_END(phy_bc_tim)
 !
 !-----------------------------------------------------------------------
       IF ( bl_pbl_physics .ge. 1 ) THEN
-#      include "HALO_EM_PHYS_PBL.inc"
+#include "HALO_EM_PHYS_PBL.inc"
       ENDIF
       IF ( diff_opt .ge. 1 ) THEN
-#      include "HALO_EM_PHYS_DIFFUSION.inc"
+#include "HALO_EM_PHYS_DIFFUSION.inc"
       ENDIF
 
       IF      ( h_mom_adv_order <= 4 ) THEN
-#       include "HALO_EM_TKE_3.inc"
+#include "HALO_EM_TKE_3.inc"
       ELSE IF ( h_mom_adv_order <= 6 ) THEN
-#       include "HALO_EM_TKE_5.inc"
+#include "HALO_EM_TKE_5.inc"
       ELSE
         WRITE(wrf_err_message,*)'solve_em_tl: invalid h_mom_adv_order = ',h_mom_adv_order
         CALL wrf_error_fatal(TRIM(wrf_err_message))
@@ -1391,8 +1391,8 @@ BENCH_END(small_step_prep_tim)
 !j mu_2      x
 !j mudf      x
 !--------------------------------------------------------------
-#      include "HALO_EM_B.inc"
-#      include "PERIOD_BDY_EM_B.inc"
+#include "HALO_EM_B.inc"
+#include "PERIOD_BDY_EM_B.inc"
 #endif
 
 BENCH_START(set_phys_bc2_tim)
@@ -1490,7 +1490,7 @@ BENCH_END(set_phys_bc2_tim)
    ! Boundary condition time (or communication time).  
 
 #ifdef DM_PARALLEL
-#      include "PERIOD_BDY_EM_B.inc"
+#include "PERIOD_BDY_EM_B.inc"
 #endif
 
 
@@ -1565,7 +1565,7 @@ BENCH_END(spec_bdy_uv_tim)
 !  u_2               x
 !  v_2                          x
 !
-#     include "HALO_EM_C.inc"
+#include "HALO_EM_C.inc"
 #endif
 
       !$OMP PARALLEL DO   &
@@ -1784,8 +1784,8 @@ BENCH_END(cald_p_rho_tim)
 !  muts   x
 !  mudf   x
 
-#      include "HALO_EM_C2.inc"
-#      include "PERIOD_BDY_EM_B3.inc"
+#include "HALO_EM_C2.inc"
+#include "PERIOD_BDY_EM_B3.inc"
 #endif
 
 BENCH_START(phys_bc_tim)
@@ -1913,7 +1913,7 @@ BENCH_END(small_step_finish_tim)
 !
 !--------------------------------------------------------------
 
-#  include "HALO_EM_D.inc"
+#include "HALO_EM_D.inc"
 #endif
 
 !<DESCRIPTION>
@@ -2241,9 +2241,9 @@ BENCH_START(tke_adv_tim)
 
 #ifdef DM_PARALLEL
       IF      ( h_mom_adv_order <= 4 ) THEN
-#       include "HALO_EM_TKE_ADVECT_3.inc"
+#include "HALO_EM_TKE_ADVECT_3.inc"
       ELSE IF ( h_mom_adv_order <= 6 ) THEN
-#       include "HALO_EM_TKE_ADVECT_5.inc"
+#include "HALO_EM_TKE_ADVECT_5.inc"
       ELSE
         WRITE(wrf_err_message,*)'solve_em_tl: invalid h_mom_adv_order = ',h_mom_adv_order
         CALL wrf_error_fatal(TRIM(wrf_err_message))
@@ -2491,17 +2491,17 @@ BENCH_END(diag_w_tim)
 
 #ifdef DM_PARALLEL
    IF      ( h_mom_adv_order <= 4 ) THEN
-#    include "HALO_EM_D2_3.inc"
+#include "HALO_EM_D2_3.inc"
    ELSE IF ( h_mom_adv_order <= 6 ) THEN
-#    include "HALO_EM_D2_5.inc"
+#include "HALO_EM_D2_5.inc"
    ELSE 
      WRITE(wrf_err_message,*)'solve_em_tl: invalid h_mom_adv_order = ',h_mom_adv_order
      CALL wrf_error_fatal(TRIM(wrf_err_message))
    ENDIF
-#  include "PERIOD_BDY_EM_D.inc"
-#  include "PERIOD_BDY_EM_MOIST.inc"
-#  include "PERIOD_BDY_EM_CHEM.inc"
-#  include "PERIOD_BDY_EM_SCALAR.inc"
+#include "PERIOD_BDY_EM_D.inc"
+#include "PERIOD_BDY_EM_MOIST.inc"
+#include "PERIOD_BDY_EM_CHEM.inc"
+#include "PERIOD_BDY_EM_SCALAR.inc"
 #endif
 
 BENCH_START(bc_end_tim)
@@ -2574,9 +2574,9 @@ BENCH_END(bc_end_tim)
 #ifdef DM_PARALLEL
 
       IF      ( h_mom_adv_order <= 4 ) THEN
-#       include "HALO_EM_TKE_3.inc"
+#include "HALO_EM_TKE_3.inc"
       ELSE IF ( h_mom_adv_order <= 6 ) THEN
-#       include "HALO_EM_TKE_5.inc"
+#include "HALO_EM_TKE_5.inc"
       ELSE
         WRITE(wrf_err_message,*)'solve_em_tl: invalid h_mom_adv_order = ',h_mom_adv_order
         CALL wrf_error_fatal(TRIM(wrf_err_message))
@@ -2584,7 +2584,7 @@ BENCH_END(bc_end_tim)
 
 #if 0
    IF (km_opt .eq. 2) THEN
-#      include  "HALO_EM_TKE_F.inc"
+#include  "HALO_EM_TKE_F.inc"
    ENDIF
 #endif
 
@@ -2599,9 +2599,9 @@ BENCH_END(bc_end_tim)
 ! moist                   x
 
      IF      ( h_mom_adv_order <= 4 ) THEN
-#      include "HALO_EM_MOIST_E_3.inc"
+#include "HALO_EM_MOIST_E_3.inc"
      ELSE IF ( h_mom_adv_order <= 6 ) THEN
-#      include "HALO_EM_MOIST_E_5.inc"
+#include "HALO_EM_MOIST_E_5.inc"
      ELSE
        WRITE(wrf_err_message,*)'solve_em_tl: invalid h_mom_adv_order = ',h_mom_adv_order
        CALL wrf_error_fatal(TRIM(wrf_err_message))
@@ -2618,9 +2618,9 @@ BENCH_END(bc_end_tim)
 ! chem                      x
 
      IF      ( h_mom_adv_order <= 4 ) THEN
-#      include "HALO_EM_CHEM_E_3.inc"
+#include "HALO_EM_CHEM_E_3.inc"
      ELSE IF ( h_mom_adv_order <= 6 ) THEN
-#      include "HALO_EM_CHEM_E_5.inc"
+#include "HALO_EM_CHEM_E_5.inc"
      ELSE
        WRITE(wrf_err_message,*)'solve_em_tl: invalid h_mom_adv_order = ',h_mom_adv_order
        CALL wrf_error_fatal(TRIM(wrf_err_message))
@@ -2859,16 +2859,16 @@ BENCH_END(moist_phys_end_tim)
 
 #ifdef DM_PARALLEL
    IF      ( h_mom_adv_order <= 4 ) THEN
-#    include "HALO_EM_D3_3.inc"
+#include "HALO_EM_D3_3.inc"
    ELSE IF ( h_mom_adv_order <= 6 ) THEN
-#    include "HALO_EM_D3_5.inc"
+#include "HALO_EM_D3_5.inc"
    ELSE 
      WRITE(wrf_err_message,*)'solve_em_tl: invalid h_mom_adv_order = ',h_mom_adv_order
      CALL wrf_error_fatal(TRIM(wrf_err_message))
    ENDIF
-#  include "PERIOD_BDY_EM_D3.inc"
-#  include "PERIOD_BDY_EM_MOIST.inc"
-#  include "PERIOD_BDY_EM_CHEM.inc"
+#include "PERIOD_BDY_EM_D3.inc"
+#include "PERIOD_BDY_EM_MOIST.inc"
+#include "PERIOD_BDY_EM_CHEM.inc"
 #endif
 
 !  now set physical b.c on a patch
@@ -2947,9 +2947,9 @@ BENCH_END(bc_2d_tim)
 !--------------------------------------------------------------
    CALL wrf_debug ( 200 , ' call HALO_RK_E' )
    IF      ( h_mom_adv_order <= 4 ) THEN
-#    include "HALO_EM_E_3.inc"
+#include "HALO_EM_E_3.inc"
    ELSE IF ( h_mom_adv_order <= 6 ) THEN
-#    include "HALO_EM_E_5.inc"
+#include "HALO_EM_E_5.inc"
    ELSE
      WRITE(wrf_err_message,*)'solve_em_tl: invalid h_mom_adv_order = ',h_mom_adv_order
      CALL wrf_error_fatal(TRIM(wrf_err_message))
@@ -2963,9 +2963,9 @@ BENCH_END(bc_2d_tim)
 !--------------------------------------------------------------
      CALL wrf_debug ( 200 , ' call HALO_RK_MOIST' )
      IF      ( h_mom_adv_order <= 4 ) THEN
-#      include "HALO_EM_MOIST_E_3.inc"
+#include "HALO_EM_MOIST_E_3.inc"
      ELSE IF ( h_mom_adv_order <= 6 ) THEN
-#      include "HALO_EM_MOIST_E_5.inc"
+#include "HALO_EM_MOIST_E_5.inc"
      ELSE
        WRITE(wrf_err_message,*)'solve_em_tl: invalid h_mom_adv_order = ',h_mom_adv_order
        CALL wrf_error_fatal(TRIM(wrf_err_message))
@@ -2977,9 +2977,9 @@ BENCH_END(bc_2d_tim)
 !--------------------------------------------------------------
      CALL wrf_debug ( 200 , ' call HALO_RK_CHEM' )
      IF      ( h_mom_adv_order <= 4 ) THEN
-#      include "HALO_EM_CHEM_E_3.inc"
+#include "HALO_EM_CHEM_E_3.inc"
      ELSE IF ( h_mom_adv_order <= 6 ) THEN
-#      include "HALO_EM_CHEM_E_5.inc"
+#include "HALO_EM_CHEM_E_5.inc"
      ELSE
        WRITE(wrf_err_message,*)'solve_em_tl: invalid h_mom_adv_order = ',h_mom_adv_order
        CALL wrf_error_fatal(TRIM(wrf_err_message))
@@ -2990,11 +2990,11 @@ BENCH_END(bc_2d_tim)
    CALL wrf_debug ( 200 , ' call end of solve_em_tl' )
 
 ! Finish timers if compiled with -DBENCH.
-#include <bench_solve_em_end.h>
+#include "bench_solve_em_end.h"
 
 ! See comment before earlier #include of this file.
 #define COPY_OUT
-#include <em_scalar_derefs.inc>
+#include "em_scalar_derefs.inc"
 
 #endif
 
