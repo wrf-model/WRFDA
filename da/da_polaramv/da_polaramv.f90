@@ -7,7 +7,7 @@ module da_polaramv
    use da_tools
    use da_par_util
 
-   ! The "stats_polaramv_type" is ONLY used locally in DA_PolarAMV:
+   ! The "stats_polaramv_type" is ONLY used locally in da_polaramv:
 
    TYPE residual_polaramv1_type
       REAL          :: u                        ! u-wind.
@@ -15,12 +15,12 @@ module da_polaramv
    END TYPE residual_polaramv1_type
 
    TYPE maxmin_polaramv_stats_type
-        TYPE (maxmin_type)         :: u, v, t, q
+      TYPE (maxmin_type)         :: u, v, t, q
    END TYPE maxmin_polaramv_stats_type
 
    TYPE stats_polaramv_type
-        TYPE (maxmin_polaramv_stats_type)  :: maximum, minimum
-        TYPE (residual_polaramv1_type)     :: average, rms_err
+      TYPE (maxmin_polaramv_stats_type)  :: maximum, minimum
+      TYPE (residual_polaramv1_type)     :: average, rms_err
    END TYPE stats_polaramv_type
 
 

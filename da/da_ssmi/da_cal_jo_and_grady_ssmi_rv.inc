@@ -1,4 +1,4 @@
-subroutine DA_Cal_Jo_and_GradY_SSMI_Rv( oi, re, jo, jo_grad_y )
+subroutine da_cal_jo_and_grady_ssmi_rv( oi, re, jo, jo_grad_y )
 
    IMPLICIT NONE
 
@@ -13,33 +13,31 @@ subroutine DA_Cal_Jo_and_GradY_SSMI_Rv( oi, re, jo, jo_grad_y )
    jo % ssmir_tpw=0.0
 
    do n=1, oi%num_ssmi_retrieval
+      if( oi%ssmi_retrieval(n)%loc%proc_domain_with_halo ) then
 
-    if( oi%ssmi_retrieval(n)%loc%proc_domain_with_halo ) then
+        jo_grad_y%ssmi_retrieval(n)%Speed = - re%ssmi_retrieval(n)%Speed / &
+                                           ( oi%ssmi_retrieval(n)%Speed%error * &
+                                             oi%ssmi_retrieval(n)%Speed%error )
 
-      jo_grad_y%ssmi_retrieval(n)%Speed = - re%ssmi_retrieval(n)%Speed / &
-                                         ( oi%ssmi_retrieval(n)%Speed%error * &
-                                           oi%ssmi_retrieval(n)%Speed%error )
-                                           
-      jo_grad_y%ssmi_retrieval(n)%tpw = -re%ssmi_retrieval(n)%tpw / &
-                                       ( oi%ssmi_retrieval(n)%tpw%error * &
-                                         oi%ssmi_retrieval(n)%tpw%error )
-    endif
+        jo_grad_y%ssmi_retrieval(n)%tpw = -re%ssmi_retrieval(n)%tpw / &
+                                         ( oi%ssmi_retrieval(n)%tpw%error * &
+                                           oi%ssmi_retrieval(n)%tpw%error )
+      endif
 
-    if( oi%ssmi_retrieval(n)%loc%proc_domain ) then
-    
-      jo % ssmir_Speed = jo % ssmir_Speed - &
-                      re%ssmi_retrieval(n)%Speed * &
-                      jo_grad_y%ssmi_retrieval(n)%Speed
+      if (oi%ssmi_retrieval(n)%loc%proc_domain) then
 
-      jo % ssmir_tpw = jo % ssmir_tpw - &
-                    re%ssmi_retrieval(n)%tpw * jo_grad_y%ssmi_retrieval(n)%tpw
+         jo % ssmir_Speed = jo % ssmir_Speed - &
+                        re%ssmi_retrieval(n)%Speed * &
+                        jo_grad_y%ssmi_retrieval(n)%Speed
 
-    endif
+        jo % ssmir_tpw = jo % ssmir_tpw - &
+                      re%ssmi_retrieval(n)%tpw * jo_grad_y%ssmi_retrieval(n)%tpw
 
+      endif
    end do
    
    jo % ssmir_Speed = 0.5 * jo % ssmir_Speed
    jo % ssmir_tpw   = 0.5 * jo % ssmir_tpw
 
-end subroutine DA_Cal_Jo_and_GradY_SSMI_Rv
+end subroutine da_cal_jo_and_grady_ssmi_rv
 

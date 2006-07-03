@@ -7,7 +7,7 @@ module da_profiler
    use da_tools
    use da_par_util
 
-! The "stats_profiler_type" is ONLY used locally in DA_Profiler:
+   ! The "stats_profiler_type" is ONLY used locally in da_profiler:
 
    TYPE residual_profiler1_type
       REAL          :: u                        ! u-wind.
@@ -15,12 +15,12 @@ module da_profiler
    END TYPE residual_profiler1_type
 
    TYPE maxmin_profiler_stats_type
-        TYPE (maxmin_type)         :: u, v
+      TYPE (maxmin_type)         :: u, v
    END TYPE maxmin_profiler_stats_type
 
    TYPE stats_profiler_type
-        TYPE (maxmin_profiler_stats_type)  :: maximum, minimum
-        TYPE (residual_profiler1_type)     :: average, rms_err
+      TYPE (maxmin_profiler_stats_type)  :: maximum, minimum
+      TYPE (residual_profiler1_type)     :: average, rms_err
    END TYPE stats_profiler_type
 
 CONTAINS

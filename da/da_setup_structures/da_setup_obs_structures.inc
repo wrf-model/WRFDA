@@ -1,17 +1,8 @@
 subroutine da_setup_obs_structures( xp, ob, iv )
 
-!------------------------------------------------------------------------------
-!  PURPOSE: Allocate and read in components of observation structure.
-!
-!  METHOD:  Allocate and read in components of observation structure.
-!
-!  HISTORY: 10/05/2001 - Creation of F90 version.           Dale Barker
-!           10/19/2001 - Mods for parallel implementation.  Al Bourgeois
-!           02/12/2002 - Compute interplation weights.      Al Bourgeois
-!              07/2005 - Add radiance part                  Zhiquan Liu
-!
-!  PARENT_MODULE: DA_Setup_Structures
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! PURPOSE: Allocate and read in components of observation structure.
+   !---------------------------------------------------------------------------
 
    IMPLICIT NONE
    
@@ -24,12 +15,12 @@ subroutine da_setup_obs_structures( xp, ob, iv )
 
    call wrf_message('[4.0] Set up observations (ob)')
 
-!------------------------------------------------------------------------------      
-!  [1.0] Setup and read in fields from first guess:
-!------------------------------------------------------------------------------      
+   !-----------------------------------------------------------------------------    
+   ! [1.0] Setup and read in fields from first guess:
+   !-----------------------------------------------------------------------------    
 
    iv%missing = missing
-!  iv%ptop    = xb%ptop
+   ! iv%ptop    = xb%ptop
 
    iv%total_obs         = 0
    iv%total_rad_pixel   = 0
@@ -82,48 +73,45 @@ subroutine da_setup_obs_structures( xp, ob, iv )
    iv%num_pseudo_glo=iv%num_pseudo
 
    IF (use_obsgts) then
-     ! Conventional obs can be in BUFR or ascii format
-     IF ( ob_format == 1 ) THEN
-       call wrf_message('Using BUFR format observation input')
-       ! [1.1] BUFR observation input file:
-       IF (iv%num_pseudo > 0) THEN
-         call wrf_message('Pseudo test only.')
-         call da_allocate_y( iv, ob )
-         call da_setup_pseudo_obs( iv, ob )
-         iv%pseudo(1)%loc%i=int(iv%pseudo(1)%loc%x)
-         iv%pseudo(1)%loc%j=int(iv%pseudo(1)%loc%y)
-         iv%pseudo(1)%loc%dx=iv%pseudo(1)%loc%x-real(iv%pseudo(1)%loc%i)
-         iv%pseudo(1)%loc%dy=iv%pseudo(1)%loc%y-real(iv%pseudo(1)%loc%j)
-         iv%pseudo(1)%loc%dxm=1.0-iv%pseudo(1)%loc%dx
-         iv%pseudo(1)%loc%dym=1.0-iv%pseudo(1)%loc%dy
-       ELSE
-         call da_setup_obs_structures_bufr( xp, ob, iv )
-       END IF 
-     ELSE IF ( ob_format == 2 ) THEN
-       ! [1.2] MM5 observation input file:
-       call da_setup_obs_structures_ascii( xp, ob, iv )
-     END IF
+      ! Conventional obs can be in BUFR or ascii format
+      IF ( ob_format == 1 ) THEN
+         call wrf_message('Using BUFR format observation input')
+         ! [1.1] BUFR observation input file:
+         IF (iv%num_pseudo > 0) THEN
+            call wrf_message('Pseudo test only.')
+            call da_allocate_y( iv, ob )
+            call da_setup_pseudo_obs( iv, ob )
+            iv%pseudo(1)%loc%i=int(iv%pseudo(1)%loc%x)
+            iv%pseudo(1)%loc%j=int(iv%pseudo(1)%loc%y)
+            iv%pseudo(1)%loc%dx=iv%pseudo(1)%loc%x-real(iv%pseudo(1)%loc%i)
+            iv%pseudo(1)%loc%dy=iv%pseudo(1)%loc%y-real(iv%pseudo(1)%loc%j)
+            iv%pseudo(1)%loc%dxm=1.0-iv%pseudo(1)%loc%dx
+            iv%pseudo(1)%loc%dym=1.0-iv%pseudo(1)%loc%dy
+         ELSE
+            call da_setup_obs_structures_bufr( xp, ob, iv )
+         END IF 
+      ELSE IF ( ob_format == 2 ) THEN
+         ! [1.2] MM5 observation input file:
+         call da_setup_obs_structures_ascii( xp, ob, iv )
+      END IF
    END IF
 
    ! Radiance files can only be in BUFR
 
    IF (use_radiance) then
 #ifndef RTTOV
-     ! Stop any radiance work if RTTOV not defined, as there are
-     ! huge preprocessor defined holes in the subsequent code, made so people
-     ! can compile without the RTTOV library
-     call wrf_error(__FILE__,__LINE__, &
-        "Cannot run radiance code if compile directive RTTOV false")
+      ! Stop any radiance work if RTTOV not defined, as there are
+      ! huge preprocessor defined holes in the subsequent code, made so people
+      ! can compile without the RTTOV library
+      call wrf_error(__FILE__,__LINE__, &
+         "Cannot run radiance code if compile directive RTTOV false")
 #endif
-     call wrf_message('Using NCEP BUFR radiance 1b input')
-     call da_setup_bufrtovs_structures( xp, ob, iv )
-     ! These are per processor, so uninteresting
-     ! write (UNIT=stderr,FMT=*) ' iv%total_rad_channel = ', iv%total_rad_channel
-     ! write (UNIT=stderr,FMT=*) ' iv%total_rad_pixel   = ', iv%total_rad_pixel
+      call wrf_message('Using NCEP BUFR radiance 1b input')
+      call da_setup_bufrtovs_structures( xp, ob, iv )
    END IF
 
-!     Get horizontal interpolation weights.
-      call da_setup_obs_interp_wts( xp, iv ) 
+   ! Get horizontal interpolation weights.
+   call da_setup_obs_interp_wts( xp, iv ) 
 
    IF (trace_use) call da_trace_exit("da_setup_obs_structures")    
 

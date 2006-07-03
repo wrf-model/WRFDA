@@ -1,8 +1,8 @@
 subroutine da_scan_ssmi (iunit, ob, xp, filename)
 
-!-----------------------------------------------------------------------------!
-! Read the header of a MM5 3D-VAR 2.0 GTS observation file
-!-----------------------------------------------------------------------------!
+   !---------------------------------------------------------------------------
+   ! Read the header of a MM5 3D-VAR 2.0 GTS observation file
+   !---------------------------------------------------------------------------
 
    implicit none
 
@@ -31,7 +31,6 @@ subroutine da_scan_ssmi (iunit, ob, xp, filename)
    LOGICAL                      :: isfilter,ipass 
    LOGICAL                      :: outside, inside_halo
    INTEGER                      :: irain, iprecip
-! -------------------------------------------------------------------
 
    isfilter = .true. ! filter out rain points
    irain = 0
@@ -39,8 +38,7 @@ subroutine da_scan_ssmi (iunit, ob, xp, filename)
    ob%ob_numb(ob%current_ob_time)%ssmi_retrieval = ob%num_ssmi_retrieval
    ob%ob_numb(ob%current_ob_time)%ssmi_tb        = ob%num_ssmi_tb
 
-! -------------------------------------------------------------------
-!  OPEN FILE
+   ! OPEN FILE
 
    if(present(filename)) then
       OPEN(UNIT   = iunit,     &
@@ -74,16 +72,16 @@ subroutine da_scan_ssmi (iunit, ob, xp, filename)
 
    REWIND (UNIT = iunit)
 
-! 2.  READ HEADER
-! ===============
+   ! 2.  READ HEADER
+   ! ===============
 
-! 2.1 READ FIRST LINE
-!     ---------------
+   ! 2.1 READ FIRST LINE
+   !     ---------------
 
    READ (UNIT = iunit, FMT = '(A)', IOSTAT = iost) char_ned
 
-! 2.2 PROCESS ERROR
-!     -------------
+   ! 2.2 PROCESS ERROR
+   !     -------------
 
    IF (iost /= 0) THEN
       write(unit=stderr, fmt='(/a,i3/)') &
@@ -93,67 +91,58 @@ subroutine da_scan_ssmi (iunit, ob, xp, filename)
       return
    else
       write(UNIT=stdout, fmt='(/2a/)') &
-           'in DA_Read_SSMI_Info.inc, char_ned=', trim(char_ned)
+           'in da_scan_ssmi.inc, char_ned=', trim(char_ned)
    ENDIF
 
-! 2.3 READ NUMBER OF REPORTS
-!     ---------------------
+   ! 2.3 READ NUMBER OF REPORTS
+   !     ---------------------
 
-head_line_1:  DO
-   READ (UNIT = iunit, FMT = '(A)', IOSTAT = iost) char_ned
+   DO
+      READ (UNIT = iunit, FMT = '(A)', IOSTAT = iost) char_ned
 
-   IF (iost /= 0) THEN
-      write(unit=stderr, fmt='(/a,i3/)') &
-           'ERROR READING FILE UNIT:', iunit, &
-           'ERROR CODE:', iost
+      IF (iost /= 0) THEN
+         write(unit=stderr, fmt='(/a,i3/)') &
+              'ERROR READING FILE UNIT:', iunit, &
+              'ERROR CODE:', iost
 
-      return
-   ENDIF
+         return
+      ENDIF
 
-   if (char_ned(1:6) == 'NESTIX') EXIT head_line_1
+      if (char_ned(1:6) == 'NESTIX') EXIT
+   ENDDO
 
-   ENDDO head_line_1
-
-head_line_2:  DO
-
-     READ (UNIT = iunit, FMT = '(A)', IOSTAT = iost) char_ned
-     if (char_ned(1:6) == 'INFO  ') EXIT head_line_2
-
-   ENDDO head_line_2
+   DO
+      READ (UNIT = iunit, FMT = '(A)', IOSTAT = iost) char_ned
+      if (char_ned(1:6) == 'INFO  ') EXIT
+   ENDDO
 
    READ (UNIT = iunit, FMT = '(A)', IOSTAT = iost) char_ned
 
-! -------------------------------------------------------------------
-
-!  READ FORMATS
-!  ------------
+   ! READ FORMATS
+   ! ------------
 
    READ (UNIT=iunit, FMT = '(A,1X,A)') &
         fmt_name, fmt_info, &
         fmt_name, fmt_loc
 
-! write(UNIT=stdout, fmt='(2a)') &
-!      'fmt_info=', TRIM (fmt_info), &
-!      'fmt_loc =', TRIM (fmt_loc)
-
-!  SKIP 1 line
-!  -----------
+   ! SKIP 1 line
+   ! -----------
 
    READ (UNIT=iunit, FMT = '(A)') fmt_name
 
-!  WRITE (UNIT = stdout, FMT = '(/,2(A,F3.0,/))')  &
-!     'Error max test ratio for SWS = ',max_error_uv,  &
-!     'Error max test ratio for PW  = ',max_error_pw,  &
-!     'Error max test ratio for PW  = ',max_error_tb
+   !  WRITE (UNIT = stdout, FMT = '(/,2(A,F3.0,/))')  &
+   !     'Error max test ratio for SWS = ',max_error_uv,  &
+   !     'Error max test ratio for PW  = ',max_error_pw,  &
+   !     'Error max test ratio for PW  = ',max_error_tb
 
 
-!  LOOP OVER RECORDS
-!  -----------------
+   ! LOOP OVER RECORDS
+   ! -----------------
 
    reports: DO
 
-!  READ STATION GENERAL INFO
-!  =========================
+      ! READ STATION GENERAL INFO
+      ! =========================
 
       READ (UNIT=iunit, FMT = fmt_info, IOSTAT = iost) &
                    info % platform,    &
@@ -173,11 +162,9 @@ head_line_2:  DO
 
       ob % total_obs = ob % total_obs + 1
 
-!==============================================================================
-
       SELECT CASE(fm)
          CASE (125)    ;
-!-----------READ SURFACE WIND SPEED AND PRECIPITABLE WATER
+            ! READ SURFACE WIND SPEED AND PRECIPITABLE WATER
             READ (UNIT=iunit, FMT = fmt_loc) speed, tpw
          CASE (126)    ;
             READ (UNIT=iunit, FMT = fmt_loc) &
@@ -190,13 +177,11 @@ head_line_2:  DO
                  'info%(lon,lat)=', info%lon, info%lat
       END SELECT
 
-!==============================================================================
+      ! CHECK IF OBS IS IN HORIZONTAL DOMAIN
+      ! ====================================
 
-!  CHECK IF OBS IS IN HORIZONTAL DOMAIN
-!  ====================================
-
-!-----Compute the model horizontal coordinate x, y
-!-----Check if obs is wihin horizontal domain
+      ! Compute the model horizontal coordinate x, y
+      ! Check if obs is wihin horizontal domain
 
       call da_ll_to_xy (info, loc, xp, outside, inside_halo)
 
@@ -206,7 +191,7 @@ head_line_2:  DO
          CASE (125) ;
             if ( .not. Use_SsmiRetrievalObs ) CYCLE reports
 
-!-----------Check if at least one field is present
+            ! Check if at least one field is present
             IF ((tpw % qc == missing) .AND. (speed % qc == missing)) THEN
                CYCLE reports
             ENDIF
@@ -216,7 +201,7 @@ head_line_2:  DO
          CASE (126) ;
             if ( .not. Use_SsmiTbObs ) CYCLE reports
 
-!-----------Check if at least one field is present
+            ! Check if at least one field is present
 
             IF ((tb19v % qc == missing) .AND. (tb19h % qc == missing)  .AND. &
                 (tb22v % qc == missing)                                .AND. &
@@ -225,8 +210,8 @@ head_line_2:  DO
                  CYCLE reports
             ENDIF
 
-!           FILTER RAIN PIXELS
-!           ====================================
+           ! FILTER RAIN PIXELS
+           ! ====================================
 
              IF (isfilter) then
 
@@ -243,25 +228,24 @@ head_line_2:  DO
 
             ob % num_ssmi_tb = ob % num_ssmi_tb + 1
 
-       CASE DEFAULT;
-!---------Do nothing.
+         CASE DEFAULT;
+            !---------Do nothing.
       END SELECT
-
-!==============================================================================
 
    ENDDO reports
 
    close(UNIT=iunit)
    
-!  PRINT OUT
-!  =========
+   ! PRINT OUT
+   ! =========
  
    write(UNIT=stdout, fmt='(5x,a,i6,a)') &
         'Read:  ', ob % num_ssmi_retrieval , ' SSMI_RETRIEVAL reports,', &
         'Read:  ', ob % num_ssmi_tb ,        ' SSMI_Tb reports,', &
         'Read:  ', ob % total_obs, ' Total Observations.'
 
-   write(UNIT=stdout, fmt='(/,5x,a,i6/)') '** Rain contaminated SSMI_Tb =', irain
+   write(UNIT=stdout, fmt='(/,5x,a,i6/)') &
+      '** Rain contaminated SSMI_Tb =', irain
 
    ob%ob_numb(ob%current_ob_time)%ssmi_retrieval = ob%num_ssmi_retrieval
    ob%ob_numb(ob%current_ob_time)%ssmi_tb        = ob%num_ssmi_tb

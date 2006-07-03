@@ -1,15 +1,11 @@
 subroutine da_rescale_background_errors ( ix, jy, var_scaling, len_scaling, &
                                           ds, s, be_sub )
 
-!------------------------------------------------------------------------------
-!  PURPOSE: Rescale wrfvar background errors.
-!
-!  METHOD:  Empirical scaling and inclusion of recursive filter rescaling.
-!
-!  HISTORY: 10/10/2000 - Creation of F90 version.           Dale Barker
-!
-!  PARENT_MODULE: DA_Setup_Structures
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! PURPOSE: Rescale wrfvar background errors.
+   !
+   ! METHOD:  Empirical scaling and inclusion of recursive filter rescaling.
+   !---------------------------------------------------------------------------
 
    IMPLICIT NONE
 
@@ -27,20 +23,19 @@ subroutine da_rescale_background_errors ( ix, jy, var_scaling, len_scaling, &
 
    IF (trace_use) call da_trace_entry("da_rescale_background_errors")
 
-   
-!-----------------------------------------------------------------------------
-!  [1.0] Initialise:
-!-----------------------------------------------------------------------------
+   !--------------------------------------------------------------------------
+   ! [1.0] Initialise:
+   !--------------------------------------------------------------------------
 
    mz = be_sub % mz
 
-!-----------------------------------------------------------------------------
-!  [2.0] Perform various rescalings:
-!-----------------------------------------------------------------------------
+   !--------------------------------------------------------------------------
+   ! [2.0] Perform various rescalings:
+   !--------------------------------------------------------------------------
 
    IF ( mz > 0 ) THEN
 
-!     [2.1] Empirical rescaling of lengthscales:
+      ! [2.1] Empirical rescaling of lengthscales:
       s(1:mz) = len_scaling * s(1:mz)
    
       IF (print_detail_be) THEN
@@ -50,13 +45,13 @@ subroutine da_rescale_background_errors ( ix, jy, var_scaling, len_scaling, &
          end do
       END IF
       
-!     [2.2] Make lengthscale nondimensional:
+      ! [2.2] Make lengthscale nondimensional:
       s(1:mz) = s(1:mz) / ds
 
-!     [2.3] Empirical rescaling of variances:
+      ! [2.3] Empirical rescaling of variances:
       be_sub % val(:,:) = var_scaling * be_sub % val(:,:)
 
-!     Calculate recursive filter rescaling:
+      ! Calculate recursive filter rescaling:
 
       ALLOCATE( rf_scale_factor(1:mz) )
 
@@ -72,7 +67,6 @@ subroutine da_rescale_background_errors ( ix, jy, var_scaling, len_scaling, &
    END IF
 
    IF (trace_use) call da_trace_exit("da_rescale_background_errors")
-
 
 end subroutine da_rescale_background_errors
 

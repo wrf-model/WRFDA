@@ -1,9 +1,9 @@
 subroutine da_correlation_coeff2d( field1, field2, corr_coeff, &
                                    rel_acc )
    
-   !-----------------------------------------------------------------------------
+   !--------------------------------------------------------------------------
    ! PURPOSE: Calculate correlation coefficient between two fields.
-   !-----------------------------------------------------------------------------
+   !--------------------------------------------------------------------------
    
    real, intent(in)           :: field1(:,:)     ! input field 1.
    real, intent(in)           :: field2(:,:)     ! input field 2.
@@ -62,4 +62,4 @@ subroutine da_correlation_coeff2d( field1, field2, corr_coeff, &
    deallocate( data1 )
    deallocate( data2 )
    
-end subroutine DA_Correlation_Coeff2d
+end subroutine da_correlation_coeff2d

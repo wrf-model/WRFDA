@@ -2,16 +2,9 @@ subroutine da_transfer_xatoanalysis( it, xbx, grid, config_flags ,&
 #include "em_dummy_args.inc"
                            )
 
-!------------------------------------------------------------------------------
-!  PURPOSE: Transfer xb and xa (increments) to analysis.
-!
-!  METHOD:  
-!
-!  HISTORY: 08/11/2004
-!           Wei Huang
-!
-!  PARENT_MODULE: DA_Setup_Structures
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! PURPOSE: Transfer xb and xa (increments) to analysis.
+   !---------------------------------------------------------------------------
 
    USE da_wrfvar_io
 
@@ -23,18 +16,18 @@ subroutine da_transfer_xatoanalysis( it, xbx, grid, config_flags ,&
 
    TYPE (grid_config_rec_type), intent(inout) :: config_flags
 
-!--Definitions of dummy arguments
+   ! Definitions of dummy arguments
 #include "em_dummy_decl.inc"
 
    character*4 filnam
 
    IF (trace_use) call da_trace_entry("da_transfer_xatoanalysis")
 
-!------------------------------------------------------------------------------      
-!  Write out analysis in differing formats:
-!------------------------------------------------------------------------------      
+   !---------------------------------------------------------------------------
+   ! Write out analysis in differing formats:
+   !---------------------------------------------------------------------------      
 
-   if(fg_format == 1) then
+   if (fg_format == 1) then
       if (write_increments) then
          write(UNIT=filnam,FMT='(a3,i1)') 'inc',it
          call da_transfer_xatowrftl( grid, config_flags, filnam, &
@@ -46,8 +39,8 @@ subroutine da_transfer_xatoanalysis( it, xbx, grid, config_flags ,&
 #include "em_dummy_args.inc"
                            )
 
-      if(it < max_ext_its) then
-         if(lvar4d) then
+      if (it < max_ext_its) then
+         if (lvar4d) then
             call da_med_initialdata_output( grid , config_flags )
          endif
 
@@ -55,15 +48,15 @@ subroutine da_transfer_xatoanalysis( it, xbx, grid, config_flags ,&
 #include "em_dummy_args.inc"
                           )
       endif
-   else if(fg_format == 2) then
+   else if (fg_format == 2) then
       if(it < max_ext_its) then
          call da_add_increments(it, xp, xa, xb, xbx)
       endif
-   else if(fg_format == 3) then
+   else if (fg_format == 3) then
       call da_transfer_xatokma( xbx, grid, &
 #include "em_dummy_args.inc"
                            )
-      if(it < max_ext_its) then
+      if (it < max_ext_its) then
          call da_transfer_kmatoxb( xbx, grid, &
 #include "em_dummy_args.inc"
                            )
@@ -71,7 +64,6 @@ subroutine da_transfer_xatoanalysis( it, xbx, grid, config_flags ,&
    end if
 
    IF (trace_use) call da_trace_exit("da_transfer_xatoanalysis")
-
 
 end subroutine da_transfer_xatoanalysis
 

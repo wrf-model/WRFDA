@@ -1,4 +1,4 @@
-subroutine DA_Get_Jo_and_GradY_profiler( iv, re, jo, jo_grad_y )
+subroutine da_get_jo_and_grady_profiler( iv, re, jo, jo_grad_y )
 
    IMPLICIT NONE
 
@@ -13,36 +13,27 @@ subroutine DA_Get_Jo_and_GradY_profiler( iv, re, jo, jo_grad_y )
    jo % profiler_u = 0.0
    jo % profiler_v = 0.0
 
-   IF ( iv%num_profiler > 0 ) THEN
-   
+   IF (iv%num_profiler > 0) THEN
       DO n=1, iv%num_profiler
+         if( iv%profiler(n)%loc%proc_domain_with_halo ) then
+            do k=1, iv%profiler(n)%info%levels
+               jo_grad_y%profiler(n)%u(k) = -re%profiler(n)%u(k) / &
+                                         ( iv%profiler(n)%u(k)%error * &
+                                           iv%profiler(n)%u(k)%error )
+               jo_grad_y%profiler(n)%v(k) = -re%profiler(n)%v(k) / &
+                                         ( iv%profiler(n)%v(k)%error * &
+                                           iv%profiler(n)%v(k)%error )
+            end do
+         endif
 
-       if( iv%profiler(n)%loc%proc_domain_with_halo ) then
-
-         do k=1, iv%profiler(n)%info%levels
-
-            jo_grad_y%profiler(n)%u(k) = -re%profiler(n)%u(k) / &
-                                      ( iv%profiler(n)%u(k)%error * &
-                                        iv%profiler(n)%u(k)%error )
-            jo_grad_y%profiler(n)%v(k) = -re%profiler(n)%v(k) / &
-                                      ( iv%profiler(n)%v(k)%error * &
-                                        iv%profiler(n)%v(k)%error )
-         end do
-       
-       endif
-
-       if( iv%profiler(n)%loc%proc_domain ) then
-
-         do k=1, iv%profiler(n)%info%levels
-
-            jo % profiler_u = jo % profiler_u - &
+         if (iv%profiler(n)%loc%proc_domain) then
+            do k=1, iv%profiler(n)%info%levels
+               jo % profiler_u = jo % profiler_u - &
                          re%profiler(n)%u(k) * jo_grad_y%profiler(n)%u(k)
-            jo % profiler_v = jo % profiler_v - &
+               jo % profiler_v = jo % profiler_v - &
                          re%profiler(n)%v(k) * jo_grad_y%profiler(n)%v(k)
-         end do
-
-       endif
-
+            end do
+         endif
       END DO
       
       jo % profiler_u = 0.5 * jo % profiler_u
@@ -50,5 +41,5 @@ subroutine DA_Get_Jo_and_GradY_profiler( iv, re, jo, jo_grad_y )
       
    END IF
 
-end subroutine DA_Get_Jo_and_GradY_profiler
+end subroutine da_get_jo_and_grady_profiler
 

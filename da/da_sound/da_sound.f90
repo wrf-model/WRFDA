@@ -8,7 +8,7 @@ MODULE da_sound
    USE da_physics
    USE da_par_util
 
-   ! The "stats_sound_type" is ONLY used locally in DA_Sound:
+   ! The "stats_sound_type" is ONLY used locally in da_sound:
 
    TYPE residual_sound1_type
       REAL          :: u                        ! u-wind.
@@ -26,7 +26,7 @@ MODULE da_sound
       TYPE (residual_sound1_type)     :: average, rms_err
    END TYPE stats_sound_type
 
-   ! The "stats_sonde_sfc_type" is ONLY used locally in DA_Sonde_Sfc:
+   ! The "stats_sonde_sfc_type" is ONLY used locally in da_sonde_sfc:
 
    TYPE residual_sonde_sfc1_type
       REAL          :: u                        ! u-wind.
