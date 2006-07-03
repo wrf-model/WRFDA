@@ -1353,6 +1353,7 @@ SUBROUTINE wrf_quilt_open_for_write_begin( FileName , Comm_compute, Comm_io, Sys
 ! Local
   CHARACTER*132   :: locFileName, locSysDepInfo
   INTEGER i, itypesize, tasks_in_group, ierr, comm_io_group
+  LOGICAL, EXTERNAL :: wrf_dm_on_monitor
   REAL dummy
 
   CALL wrf_debug ( DEBUG_LVL, 'in wrf_quilt_open_for_write_begin' ) 
@@ -1904,6 +1905,7 @@ SUBROUTINE wrf_quilt_put_dom_ti_real ( DataHandle,Element,   Data, Count,  Statu
   CHARACTER*132   :: locElement
   INTEGER i, typesize, itypesize, tasks_in_group, ierr, comm_io_group
   REAL dummy
+  LOGICAL, EXTERNAL :: wrf_dm_on_monitor
 !
 !JMTIMING  CALL start_timing
   CALL wrf_debug ( DEBUG_LVL, 'in wrf_quilt_put_dom_ti_real' ) 
@@ -2047,6 +2049,7 @@ SUBROUTINE wrf_quilt_put_dom_ti_integer ( DataHandle,Element,   Data, Count,  St
   CHARACTER*132   :: locElement
   INTEGER i, typesize, itypesize, tasks_in_group, ierr, comm_io_group
   REAL dummy
+  LOGICAL, EXTERNAL :: wrf_dm_on_monitor
 !
 
 !JMTIMING  CALL start_timing
@@ -2186,6 +2189,7 @@ SUBROUTINE wrf_quilt_put_dom_ti_char ( DataHandle, Element,  Data,  Status )
   INTEGER                     :: Status
   INTEGER i, itypesize, tasks_in_group, ierr, comm_io_group, me
   REAL dummy
+  LOGICAL, EXTERNAL :: wrf_dm_on_monitor
 !
 !JMTIMING  CALL start_timing
   CALL wrf_debug ( DEBUG_LVL, 'in wrf_quilt_put_dom_ti_char' ) 
@@ -2722,6 +2726,7 @@ SUBROUTINE wrf_quilt_put_var_ti_char ( DataHandle,Element,  Varname, Data,  Stat
   INTEGER                     :: Status
   INTEGER i, itypesize, tasks_in_group, ierr, comm_io_group
   REAL dummy
+  LOGICAL, EXTERNAL :: wrf_dm_on_monitor
 !
 
 !JMTIMING  CALL start_timing
@@ -3101,6 +3106,7 @@ SUBROUTINE wrf_quilt_write_field ( DataHandle , DateStr , VarName , Field , Fiel
                    MemoryStart(3):MemoryEnd(3) ) :: Field
   INTEGER locsize , typesize, inttypesize
   INTEGER ierr, tasks_in_group, comm_io_group, dummy, i
+  LOGICAL, EXTERNAL :: wrf_dm_on_monitor
   INTEGER, EXTERNAL :: use_package
 
 !JMTIMING  CALL start_timing
