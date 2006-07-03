@@ -28,6 +28,8 @@ else
    cp ../wrfvar_input wrfinput_d01
 fi
 
+export G95_UNIT_ENDIAN_98=BIG
+
 mpirun -v -np 1 -machinefile ../hosts ../wrfplus.exe > wrf_nl.out 2>wrf_nl.error
 
 # cp auxhist2_d01_$NL_ANALYSIS_DATE fgat_fg.01

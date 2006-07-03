@@ -6636,7 +6636,9 @@ IMPLICIT NONE
 !  g-points, or sub-intervals, per band.  These data are combined and            
 !  weighted using a mapping procedure in routine RRTMINIT to reduce              
 !  the total number of g-points from 256 to 140 for use in the CCM.              
-! **************************************************************************     
+! ************************************************************************** 
+! JRB hardwire unit to 98 to ensure it is read big endian by g95
+      rrtm_unit=98    
         IF ( wrf_dm_on_monitor() ) THEN
           OPEN(rrtm_unit,FILE='RRTM_DATA',                  &
                FORM='UNFORMATTED',STATUS='OLD',ERR=9009)
