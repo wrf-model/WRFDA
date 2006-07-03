@@ -15,6 +15,7 @@ MODULE module_check
    USE a_module_diffusion_em
    USE g_module_bc_em
    USE a_module_bc_em
+   USE module_configure
 
 
 CONTAINS
@@ -294,6 +295,7 @@ SUBROUTINE t_rk_tendency ( config_flags, rk_step,                         &
                          msfu, msfv, msft, f, e, sina, cosa,              &
                          fnm, fnp, rdn, rdnw,                             &
                          dt, rdx, rdy, khdif, kvdif, xkmhd,               &
+                         diff_6th_opt, diff_6th_rate,                     &
                          dampcoef,zdamp,damp_opt,                         &
                          cf1, cf2, cf3, cfn, cfn1, n_moist,               &
                          non_hydrostatic,                                 &
@@ -421,6 +423,9 @@ SUBROUTINE t_rk_tendency ( config_flags, rk_step,                         &
                                                                 dt,      &
                                                                 khdif,   &
                                                                 kvdif
+   INTEGER, INTENT( IN ) :: diff_6th_opt
+   REAL,    INTENT( IN ) :: diff_6th_rate
+
    INTEGER, INTENT( IN ) :: damp_opt
 
    REAL, INTENT( IN ) :: zdamp, dampcoef
@@ -671,6 +676,7 @@ SUBROUTINE t_rk_tendency ( config_flags, rk_step,                         &
                          msfu, msfv, msft, f, e, sina, cosa,              &
                          fnm, fnp, rdn, rdnw,                             &
                          dt, rdx, rdy, khdif, kvdif, xkmhd,               &
+                            diff_6th_opt, diff_6th_rate,  &
                          dampcoef,zdamp,damp_opt,                        &
                          cf1, cf2, cf3, cfn, cfn1, n_moist,               &
                          non_hydrostatic,                                 &
@@ -828,7 +834,8 @@ cf1, cf2, cf3, cfn, cfn1, non_hydrostatic, ids, ide, jds, jde, kde, ims, ime, jm
                          u_base, v_base, t_base, qv_base, z_base,                   &
                          msfu, msfv, msft, f, e, sina, cosa,                        &
                          fnm, fnp, rdn, rdnw,                                       &
-                         dt, rdx, rdy, khdif, kvdif, P_xkmhd,                         &
+                         dt, rdx, rdy, khdif, kvdif, P_xkmhd, &
+                         diff_6th_opt, diff_6th_rate,                               &
                          dampcoef,zdamp,damp_opt,                        &      
                          cf1, cf2, cf3, cfn, cfn1, n_moist,                         &
                          non_hydrostatic,                                           &
@@ -9461,6 +9468,7 @@ SUBROUTINE t_rk_scalar_tend ( scs, sce, config_flags,    &
                             msfu, msfv, msft,             &
                             rdx, rdy, rdn, rdnw,          &
                             khdif, kvdif, xkmhd,          &
+                            diff_6th_opt, diff_6th_rate,  &
                             ids, ide, jds, jde, kds, kde, &
                             ims, ime, jms, jme, kms, kme, &
                             its, ite, jts, jte, kts, kte )
@@ -9513,6 +9521,9 @@ SUBROUTINE t_rk_scalar_tend ( scs, sce, config_flags,    &
                                                                   rdy,     &
                                                                   khdif,   &
                                                                   kvdif
+
+   INTEGER, INTENT( IN ) :: diff_6th_opt
+   REAL,    INTENT( IN ) :: diff_6th_rate
 
    REAL ,                                        INTENT(IN   ) :: dt
 
@@ -9607,6 +9618,7 @@ SUBROUTINE t_rk_scalar_tend ( scs, sce, config_flags,    &
                             msfu, msfv, msft,             &
                             rdx, rdy, rdn, rdnw,          &
                             khdif, kvdif, xkmhd,          &
+                            diff_6th_opt, diff_6th_rate,  &
                             ids, ide, jds, jde, kds, kde, &
                             ims, ime, jms, jme, kms, kme, &
                             its, ite, jts, jte, kts, kte )
@@ -9695,6 +9707,7 @@ SUBROUTINE t_rk_scalar_tend ( scs, sce, config_flags,    &
                             msfu, msfv, msft,             &
                             rdx, rdy, rdn, rdnw,          &
                             khdif, kvdif, P_xkmhd,          &
+                            diff_6th_opt, diff_6th_rate,  &
                             ids, ide, jds, jde, kds, kde, &
                             ims, ime, jms, jme, kms, kme, &
                             its, ite, jts, jte, kts, kte )

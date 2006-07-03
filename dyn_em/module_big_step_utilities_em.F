@@ -1706,6 +1706,8 @@ SUBROUTINE rhs_ph( ph_tend, u, v, ww,               &
 
    IF (config_flags%open_xs .or. specified ) i_start = max(its,ids+2)
    IF (config_flags%open_xe .or. specified ) itf     = min(itf,ide-3)
+   IF ( config_flags%periodic_x ) i_start = its
+   IF ( config_flags%periodic_x ) itf=MIN(ite,ide-1)
 
    DO j = j_start, jtf
 
@@ -2027,6 +2029,8 @@ SUBROUTINE horizontal_pressure_gradient( ru_tend,rv_tend,                &
            config_flags%nested ) .and. its == ids ) i_start = its+1
    IF ( (config_flags%open_xe .or. specified .or. &
            config_flags%nested ) .and. ite == ide ) itf = itf-1
+   IF ( config_flags%periodic_x ) i_start = its
+   IF ( config_flags%periodic_x ) itf=ite
 
    DO j = j_start, jtf
 
@@ -2182,6 +2186,8 @@ SUBROUTINE w_damp( rw_tend, ww, w, mut, rdnw, dt,     &
    INTEGER :: itf, jtf, i, j, k, maxi, maxj, maxk
    INTEGER :: some
    CHARACTER*512 :: temp
+   CHARACTER (LEN=256) :: time_str
+   CHARACTER (LEN=256) :: grid_str
 
 !<DESCRIPTION>
 !
@@ -2219,10 +2225,9 @@ SUBROUTINE w_damp( rw_tend, ww, w, mut, rdnw, dt,     &
              maxcfl = cfl ; maxi = i ; maxj = j ; maxk = k 
              maxdub = w(i,k,j) ; maxdeta = -1./rdnw(k)
            ENDIF
-           WRITE(temp,*)i,j,k,' cfl,w,d(eta)=',cfl,w(i,k,j),-1./rdnw(k), &
-                              ' in w_damp'
+           WRITE(temp,*)i,j,k,' cfl,w,d(eta)=',cfl,w(i,k,j),-1./rdnw(k)
            CALL wrf_debug ( 100 , TRIM(temp) )
-           some = some + 1
+           if ( cfl > 2. ) some = some + 1
            rw_tend(i,k,j) = rw_tend(i,k,j)-sign(1.,w(i,k,j))*w_alpha*(cfl-w_beta)*mut(i,j)
         endif
      END DO
@@ -2242,18 +2247,19 @@ SUBROUTINE w_damp( rw_tend, ww, w, mut, rdnw, dt,     &
              maxcfl = cfl ; maxi = i ; maxj = j ; maxk = k 
              maxdub = w(i,k,j) ; maxdeta = -1./rdnw(k)
            ENDIF
-           WRITE(temp,*)i,j,k,' cfl,w,d(eta)=',cfl,w(i,k,j),-1./rdnw(k), &
-                              ' in w_damp'
+           WRITE(temp,*)i,j,k,' cfl,w,d(eta)=',cfl,w(i,k,j),-1./rdnw(k)
            CALL wrf_debug ( 100 , TRIM(temp) )
-           some = some + 1
+           if ( cfl > 2. ) some = some + 1
         endif
      END DO
      ENDDO
      ENDDO
    ENDIF
    IF ( some .GT. 0 ) THEN
+     CALL get_current_time_string( time_str )
+     CALL get_current_grid_name( grid_str )
      WRITE(wrf_err_message,*)some,                                            &
-            ' points exceeded cfl in w_damp (module_big_step_utilities_em.F) '
+            ' points exceeded cfl=2 in domain '//TRIM(grid_str)//' at time '//TRIM(time_str)//' hours'
      CALL wrf_debug ( 0 , TRIM(wrf_err_message) )
      WRITE(wrf_err_message,*)'MAX AT i,j,k: ',maxi,maxj,maxk,' cfl,w,d(eta)=',maxcfl, &
                              maxdub,maxdeta
@@ -2333,6 +2339,8 @@ SUBROUTINE horizontal_diffusion ( name, field, tendency, mu,           &
       IF ( config_flags%open_xe .or. specified ) i_end   = MIN(ide-1,ite)
       IF ( config_flags%open_ys .or. specified ) j_start = MAX(jds+1,jts)
       IF ( config_flags%open_ye .or. specified ) j_end   = MIN(jde-2,jte)
+      IF ( config_flags%periodic_x ) i_start = its
+      IF ( config_flags%periodic_x ) i_end = ite
 
       DO j = j_start, j_end
       DO k=kts,ktf
@@ -2369,6 +2377,8 @@ SUBROUTINE horizontal_diffusion ( name, field, tendency, mu,           &
       IF ( config_flags%open_xe .or. specified ) i_end   = MIN(ide-2,ite)
       IF ( config_flags%open_ys .or. specified ) j_start = MAX(jds+1,jts)
       IF ( config_flags%open_ye .or. specified ) j_end   = MIN(jde-1,jte)
+      IF ( config_flags%periodic_x ) i_start = its
+      IF ( config_flags%periodic_x ) i_end = MIN(ite,ide-1)
 
       DO j = j_start, j_end
       DO k=kts,ktf
@@ -2405,6 +2415,8 @@ SUBROUTINE horizontal_diffusion ( name, field, tendency, mu,           &
       IF ( config_flags%open_xe .or. specified ) i_end   = MIN(ide-2,ite)
       IF ( config_flags%open_ys .or. specified ) j_start = MAX(jds+1,jts)
       IF ( config_flags%open_ye .or. specified ) j_end   = MIN(jde-2,jte)
+      IF ( config_flags%periodic_x ) i_start = its
+      IF ( config_flags%periodic_x ) i_end = MIN(ite,ide-1)
 
       DO j = j_start, j_end
       DO k=kts+1,ktf
@@ -2446,6 +2458,8 @@ SUBROUTINE horizontal_diffusion ( name, field, tendency, mu,           &
       IF ( config_flags%open_xe .or. specified ) i_end   = MIN(ide-2,ite)
       IF ( config_flags%open_ys .or. specified ) j_start = MAX(jds+1,jts)
       IF ( config_flags%open_ye .or. specified ) j_end   = MIN(jde-2,jte)
+      IF ( config_flags%periodic_x ) i_start = its
+      IF ( config_flags%periodic_x ) i_end = MIN(ite,ide-1)
 
       DO j = j_start, j_end
       DO k=kts,ktf
@@ -2543,6 +2557,8 @@ SUBROUTINE horizontal_diffusion_3dmp ( name, field, tendency, mu,           &
       IF ( config_flags%open_xe .or. specified ) i_end   = MIN(ide-2,ite)
       IF ( config_flags%open_ys .or. specified ) j_start = MAX(jds+1,jts)
       IF ( config_flags%open_ye .or. specified ) j_end   = MIN(jde-2,jte)
+      IF ( config_flags%periodic_x ) i_start = its
+      IF ( config_flags%periodic_x ) i_end = MIN(ite,ide-1)
 
       DO j = j_start, j_end
       DO k=kts,ktf
@@ -2946,6 +2962,8 @@ SUBROUTINE vertical_diffusion_u ( field, tendency,              &
 
       IF ( config_flags%open_xs .or. specified ) i_start = MAX(ids+1,its)
       IF ( config_flags%open_xe .or. specified ) i_end   = MIN(ide-1,ite)
+      IF ( config_flags%periodic_x ) i_start = its
+      IF ( config_flags%periodic_x ) i_end = ite
 
 
 j_loop_u : DO j = j_start, j_end
@@ -3188,6 +3206,8 @@ SUBROUTINE coriolis ( ru, rv, rw, ru_tend, rv_tend, rw_tend, &
         config_flags%nested) i_start = MAX(ids+1,its)
    IF ( config_flags%open_xe .or. specified .or. &
         config_flags%nested) i_end   = MIN(ide-1,ite)
+      IF ( config_flags%periodic_x ) i_start = its
+      IF ( config_flags%periodic_x ) i_end = ite
 
    DO j = jts, MIN(jte,jde-1)
 
@@ -3385,6 +3405,8 @@ SUBROUTINE perturbation_coriolis ( ru_in, rv_in, rw, ru_tend, rv_tend, rw_tend, 
         config_flags%nested) i_start = MAX(ids+1,its)
    IF ( config_flags%open_xe .or. specified .or. &
         config_flags%nested) i_end   = MIN(ide-1,ite)
+      IF ( config_flags%periodic_x ) i_start = its
+      IF ( config_flags%periodic_x ) i_end = ite
 
 !  compute perturbation mu*v for use in u momentum equation
 
@@ -3694,6 +3716,8 @@ SUBROUTINE curvature ( ru, rv, rw, u, v, w, ru_tend, rv_tend, rw_tend, &
         config_flags%nested) .and. (jts == jds) ) j_start = jts
    IF ( ( config_flags%open_ye .or. specified .or. &
         config_flags%nested) .and. (jte == jde) ) j_end   = jte-1
+      IF ( config_flags%periodic_x ) i_start = its-1
+      IF ( config_flags%periodic_x ) i_end = ite
 
    DO j=j_start, j_end
    DO k=kts,ktf
@@ -3708,7 +3732,7 @@ SUBROUTINE curvature ( ru, rv, rw, u, v, w, ru_tend, rv_tend, rw_tend, &
 !  Rather crude at present, we are assuming there is no
 !    variation in this term at the boundary.
 
-   IF ( ( config_flags%open_xs .or. specified .or. &
+   IF ( ( config_flags%open_xs .or. (specified .AND. .NOT. config_flags%periodic_x) .or. &
         config_flags%nested) .and. (its == ids) ) THEN
 
      DO j = jts-1, jte
@@ -3719,7 +3743,7 @@ SUBROUTINE curvature ( ru, rv, rw, u, v, w, ru_tend, rv_tend, rw_tend, &
 
    ENDIF
 
-   IF ( ( config_flags%open_xe .or. specified .or. &
+   IF ( ( config_flags%open_xe .or. (specified .AND. .NOT. config_flags%periodic_x) .or. &
         config_flags%nested) .and. (ite == ide) ) THEN
 
      DO j = jts-1, jte
@@ -3759,6 +3783,8 @@ SUBROUTINE curvature ( ru, rv, rw, u, v, w, ru_tend, rv_tend, rw_tend, &
         config_flags%nested) i_start = MAX ( ids+1 , its )
    IF ( config_flags%open_xe .or. specified .or. &
         config_flags%nested) i_end   = MIN ( ide-1 , ite )
+      IF ( config_flags%periodic_x ) i_start = its
+      IF ( config_flags%periodic_x ) i_end = ite
 
    DO j=jts,MIN(jde-1,jte)
    DO k=kts,ktf
@@ -4856,5 +4882,286 @@ END SUBROUTINE set_tend
 !-----------------------------------------------------------------------
 
     END SUBROUTINE rk_rayleigh_damp
+
+!==============================================================================
+!==============================================================================
+                                                                                
+      SUBROUTINE sixth_order_diffusion( name, field, tendency, mu, dt,  &
+                                        config_flags,                   &
+                                        diff_6th_opt, diff_6th_rate,    &
+                                        ids, ide, jds, jde, kds, kde,   &
+                                        ims, ime, jms, jme, kms, kme,   &
+                                        its, ite, jts, jte, kts, kte )
+                                                                                
+! History:       07 Jun 2006   Revised and generalized by Jason Knievel  
+!                25 Apr 2005   Original code by Jason Knievel, NCAR
+                                                                                
+! Purpose:       Apply 6th-order, monotonic (flux-limited), numerical
+!                diffusion to 3-d velocity and to scalars.
+                                                                                
+! References:    Ming Xue (MWR Aug 2000)
+!                Durran ("Numerical Methods for Wave Equations..." 1999)
+!                George Bryan (personal communication)
+ 
+!------------------------------------------------------------------------------
+! Begin: Declarations.
+
+    IMPLICIT NONE
+
+    INTEGER, INTENT(IN)  &
+    :: ids, ide, jds, jde, kds, kde,   &
+       ims, ime, jms, jme, kms, kme,   &
+       its, ite, jts, jte, kts, kte
+ 
+    TYPE(grid_config_rec_type), INTENT(IN)  &
+    :: config_flags
+ 
+    REAL, DIMENSION( ims:ime, kms:kme, jms:jme ), INTENT(INOUT)  &
+    :: tendency
+ 
+    REAL, DIMENSION( ims:ime, kms:kme, jms:jme ), INTENT(IN)  &
+    :: field
+ 
+    REAL, DIMENSION( ims:ime , jms:jme ), INTENT(IN)  &
+    :: mu
+ 
+    REAL, INTENT(IN)  &
+    :: dt
+
+    REAL, INTENT(IN)  &
+    :: diff_6th_rate
+
+    INTEGER, INTENT(IN)  &
+    :: diff_6th_opt
+
+    CHARACTER(LEN=1) , INTENT(IN)  &
+    :: name
+
+    INTEGER  &
+    :: i, j, k,         &
+       i_start, i_end,  &
+       j_start, j_end,  &
+       k_start, k_end,  &
+       ktf
+ 
+    REAL  &
+    :: dflux_x_p0, dflux_y_p0,  &
+       dflux_x_p1, dflux_y_p1,  &
+       tendency_x, tendency_y,  &
+       mu_avg_p0, mu_avg_p1,    &
+       diff_6th_coef
+
+    LOGICAL  &
+    :: specified
+ 
+! End: Declarations.
+!------------------------------------------------------------------------------
+
+!------------------------------------------------------------------------------
+! Begin: Translate the diffusion rate into a diffusion coefficient.  See
+! Durran's text, section 2.4.3, then adjust for sixth-order diffusion (not
+! fourth) and for diffusion in two dimensions (not one).  For reference, a
+! rate of 1.0 would mean complete diffusion of a 2dx wave in one time step,
+! although application of the flux limiter reduces somewhat the effects of
+! diffusion for a given coefficient.
+
+    diff_6th_coef = diff_6th_rate * 0.015625 / ( 2.0 * dt )  
+
+! End: Translate diffusion rate.
+!------------------------------------------------------------------------------
+
+!------------------------------------------------------------------------------
+! Begin: Assign limits of spatial loops depending on variable to be diffused.
+! The halo regions are already filled with values by the time this subroutine
+! is called, which allows the stencil to extend beyond the domains' edges.
+
+    ktf = MIN( kte, kde-1 )
+
+    IF ( name .EQ. 'u' ) THEN
+
+      i_start = its
+      i_end   = ite
+      j_start = jts
+      j_end   = MIN(jde-1,jte)
+      k_start = kts
+      k_end   = ktf
+
+    ELSE IF ( name .EQ. 'v' ) THEN
+ 
+      i_start = its
+      i_end   = MIN(ide-1,ite)
+      j_start = jts
+      j_end   = jte
+      k_start = kts
+      k_end   = ktf
+ 
+    ELSE IF ( name .EQ. 'w' ) THEN
+
+      i_start = its
+      i_end   = MIN(ide-1,ite)
+      j_start = jts
+      j_end   = MIN(jde-1,jte)
+      k_start = kts+1
+      k_end   = ktf
+
+    ELSE
+
+      i_start = its
+      i_end   = MIN(ide-1,ite)
+      j_start = jts
+      j_end   = MIN(jde-1,jte)
+      k_start = kts
+      k_end   = ktf
+ 
+    ENDIF
+
+! End: Assignment of limits of spatial loops.
+!------------------------------------------------------------------------------
+
+!------------------------------------------------------------------------------
+! Begin: Loop across spatial dimensions.
+
+    DO j = j_start, j_end
+    DO k = k_start, k_end
+    DO i = i_start, i_end
+
+!------------------------------------------------------------------------------
+! Begin: Diffusion in x (i index).
+ 
+! Calculate the diffusive flux in x direction (from Xue's eq. 3).
+ 
+      dflux_x_p0 = (  10.0 * ( field(i,  k,j) - field(i-1,k,j) )    &
+                     - 5.0 * ( field(i+1,k,j) - field(i-2,k,j) )    &
+                     +       ( field(i+2,k,j) - field(i-3,k,j) ) )
+ 
+      dflux_x_p1 = (  10.0 * ( field(i+1,k,j) - field(i  ,k,j) )    &
+                     - 5.0 * ( field(i+2,k,j) - field(i-1,k,j) )    &
+                     +       ( field(i+3,k,j) - field(i-2,k,j) ) )
+ 
+! If requested in the namelist (diff_6th_opt=2), prohibit up-gradient diffusion
+! (variation on Xue's eq. 10).
+
+      IF ( diff_6th_opt .EQ. 2 ) THEN
+ 
+        IF ( dflux_x_p0 * ( field(i  ,k,j)-field(i-1,k,j) ) .LE. 0.0 ) THEN
+          dflux_x_p0 = 0.0
+        END IF
+ 
+        IF ( dflux_x_p1 * ( field(i+1,k,j)-field(i  ,k,j) ) .LE. 0.0 ) THEN
+          dflux_x_p1 = 0.0
+        END IF
+
+      END IF
+
+! Apply 6th-order diffusion in x direction.
+ 
+      IF      ( name .EQ. 'u' ) THEN
+        mu_avg_p0 = mu(i-1,j)
+        mu_avg_p1 = mu(i  ,j)
+      ELSE IF ( name .EQ. 'v' ) THEN
+        mu_avg_p0 = 0.25 * (       &
+                    mu(i-1,j-1) +  &
+                    mu(i  ,j-1) +  &
+                    mu(i-1,j  ) +  &
+                    mu(i  ,j  ) )
+        mu_avg_p1 = 0.25 * (       &
+                    mu(i  ,j-1) +  &
+                    mu(i+1,j-1) +  &
+                    mu(i  ,j  ) +  &
+                    mu(i+1,j  ) )
+      ELSE
+        mu_avg_p0 = 0.5 * (        &
+                    mu(i-1,j) +    &
+                    mu(i  ,j) )
+        mu_avg_p1 = 0.5 * (        &
+                    mu(i  ,j) +    &
+                    mu(i+1,j) )
+      END IF
+ 
+      tendency_x = diff_6th_coef *  &
+                 ( ( mu_avg_p1 * dflux_x_p1 ) - ( mu_avg_p0 * dflux_x_p0 ) )
+ 
+! End: Diffusion in x.
+!------------------------------------------------------------------------------
+ 
+!------------------------------------------------------------------------------
+! Begin: Diffusion in y (j index).
+ 
+! Calculate the diffusive flux in y direction (from Xue's eq. 3).
+ 
+      dflux_y_p0 = (  10.0 * ( field(i,k,j  ) - field(i,k,j-1) )    &
+                     - 5.0 * ( field(i,k,j+1) - field(i,k,j-2) )    &
+                     +       ( field(i,k,j+2) - field(i,k,j-3) ) )
+ 
+      dflux_y_p1 = (  10.0 * ( field(i,k,j+1) - field(i,k,j  ) )    &
+                     - 5.0 * ( field(i,k,j+2) - field(i,k,j-1) )    &
+                     +       ( field(i,k,j+3) - field(i,k,j-2) ) )
+ 
+! If requested in the namelist (diff_6th_opt=2), prohibit up-gradient diffusion
+! (variation on Xue's eq. 10).
+
+      IF ( diff_6th_opt .EQ. 2 ) THEN
+ 
+        IF ( dflux_y_p0 * ( field(i,k,j  )-field(i,k,j-1) ) .LE. 0.0 ) THEN
+          dflux_y_p0 = 0.0
+        END IF
+ 
+        IF ( dflux_y_p1 * ( field(i,k,j+1)-field(i,k,j  ) ) .LE. 0.0 ) THEN
+          dflux_y_p1 = 0.0
+        END IF
+
+      END IF
+ 
+! Apply 6th-order diffusion in y direction.
+ 
+      IF      ( name .EQ. 'u' ) THEN
+        mu_avg_p0 = 0.25 * (       &
+                    mu(i-1,j-1) +  &
+                    mu(i  ,j-1) +  &
+                    mu(i-1,j  ) +  &
+                    mu(i  ,j  ) )
+        mu_avg_p1 = 0.25 * (       &
+                    mu(i-1,j  ) +  &
+                    mu(i  ,j  ) +  &
+                    mu(i-1,j+1) +  &
+                    mu(i  ,j+1) )
+      ELSE IF ( name .EQ. 'v' ) THEN
+        mu_avg_p0 = mu(i,j-1)
+        mu_avg_p1 = mu(i,j  )
+      ELSE
+        mu_avg_p0 = 0.5 * (      &
+                    mu(i,j-1) +  &
+                    mu(i,j  ) )
+        mu_avg_p1 = 0.5 * (      &
+                    mu(i,j  ) +  &
+                    mu(i,j+1) )
+      END IF
+ 
+      tendency_y = diff_6th_coef *  &
+                 ( ( mu_avg_p1 * dflux_y_p1 ) - ( mu_avg_p0 * dflux_y_p0 ) )
+ 
+! End: Diffusion in y.
+!------------------------------------------------------------------------------
+ 
+!------------------------------------------------------------------------------
+! Begin: Combine diffusion in x and y.
+     
+      tendency(i,k,j) = tendency(i,k,j) + tendency_x + tendency_y
+ 
+! End: Combine diffusion in x and y.
+!------------------------------------------------------------------------------
+
+    ENDDO
+    ENDDO
+    ENDDO
+
+! End: Loop across spatial dimensions.
+!------------------------------------------------------------------------------
+ 
+    END SUBROUTINE sixth_order_diffusion
+ 
+!==============================================================================
+!==============================================================================
+
 
 END MODULE module_big_step_utilities_em

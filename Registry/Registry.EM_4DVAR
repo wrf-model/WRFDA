@@ -192,7 +192,7 @@ state    real   g_t              ikjb     dyn_em      2       -     \
        i0123rh023usdf=(bdy_interp:dt)   "G_t"      "G_perturbation potential temperature (theta-t0)" "K"
 state    real   a_t              ikjb     dyn_em      2       -     \
        i0123rh023usdf=(bdy_interp:dt)   "A_t"      "A_perturbation potential temperature (theta-t0)" "K"
-state    real   t_init         ikj     dyn_em      1         -      r        "t_init" "initial potential temperature" "K"
+state    real   t_init         ikj     dyn_em      1         -      ir        "t_init" "initial potential temperature" "K"
 # g_t_init missing
 i1       real   t_tend         ikj     dyn_em      1         -  
 i1       real   g_t_tend         ikj     dyn_em      1       -  
@@ -771,7 +771,7 @@ state    real  mp_restart_state   p      misc        1         -      r       "M
 state    real  tbpvs_state        p      misc        1         -      r        "TBPVS_STATE"           "STATE FOR ETAMPNEW MICROPHYSICS"
 state    real  tbpvs0_state       p      misc        1         -      r        "TBPVS0_STATE"          "STATE FOR ETAMPNEW MICROPHYSICS"
 
-# State variables for landuse_init, Must be declared state because the are read in and needed for restarts. Had been SAVE vars in 
+# State variables for landuse_init, Must be declared state because they are read in and needed for restarts. Had been SAVE vars in 
 # landuse_init (phys/module_physics_init.F)
 state    integer  landuse_isice   -      misc       -          -     r
 state    integer  landuse_lucats  -      misc       -          -     r
@@ -1350,6 +1350,8 @@ rconfig   real    zdamp                   namelist,dynamics	max_domains    5000.
 rconfig   real    dampcoef                namelist,dynamics     max_domains    0.2     h    "dampcoef"              ""      ""
 rconfig   real    khdif                   namelist,dynamics	max_domains    0       h    "khdif"         ""      ""
 rconfig   real    kvdif                   namelist,dynamics	max_domains    0       h    "kvdif"         ""      ""
+rconfig   real    diff_6th_rate           namelist,dynamics     max_domains    0.12    h    "diff_6th_rate" "rate 6th-order numerical diffusion"
+rconfig   integer diff_6th_opt            namelist,dynamics     max_domains    0      irh   "diff_6th_opt" "switch for 6th-order numerical diffusion"
 rconfig   real    smdiv                   namelist,dynamics	max_domains    0.      h    "smdiv"         ""      ""
 rconfig   real    emdiv                   namelist,dynamics	max_domains    0.      h    "emdiv"         ""      ""
 rconfig   real    epssm                   namelist,dynamics	max_domains    .1      h    "epssm"         ""      ""
