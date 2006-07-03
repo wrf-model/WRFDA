@@ -155,7 +155,9 @@ CONTAINS
   REAL, DIMENSION( its:ite , kts:kte, 2 ) ::   qci, qrs
   INTEGER ::               i,j,k
 
+#ifdef WSM5_TIMERS
 integer, external :: rsl_internal_microclock
+#endif
 integer time
 integer timers( zones, jts:jte )
 !-------------------------------------------------------------------
@@ -299,7 +301,9 @@ ENDDO
             iprt, latd, lond, loop, loops, ifsat, n
 
 integer timer, timers(zones)
+#ifdef WSM5_TIMERS
 integer, external :: rsl_internal_microclock
+#endif
 real qrs1_points, qrs2_points
 
 #ifdef INL
