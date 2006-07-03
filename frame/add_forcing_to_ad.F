@@ -1,7 +1,7 @@
 SUBROUTINE add_forcing_to_ad(grid)
    USE module_domain
    TYPE(domain), INTENT(INOUT)  :: grid
-#ifdef (VAR4D_CORE == 1)
+#if (VAR4D_CORE == 1)
    grid%em_a_u_1  = grid%em_a_u_1  + grid%em_g_u_1
    grid%em_a_u_2  = grid%em_a_u_2  + grid%em_g_u_2
    grid%em_a_v_1  = grid%em_a_v_1  + grid%em_g_v_1
