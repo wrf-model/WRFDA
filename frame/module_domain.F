@@ -61,12 +61,12 @@ MODULE module_domain
                                             ! the alarms declared above.  
 #endif
 
-#include <state_subtypes.inc>
+#include "state_subtypes.inc"
 
    TYPE domain
 
 ! SEE THE INCLUDE FILE FOR DEFINITIONS OF STATE FIELDS WITHIN THE DOMAIN DATA STRUCTURE
-#include <state_struct.inc>
+#include "state_struct.inc"
 
       INTEGER                                             :: comms( max_comms ), shift_x, shift_y
 
@@ -1091,7 +1091,7 @@ CONTAINS
           CALL wrf_message ( 'DYNAMICS OPTION: dynamics disabled ' )
 
 #if ALLOW_NODYN
-# include <nodyn_allocs.inc>
+# include "nodyn_allocs.inc"
 #else
         WRITE(message,*)                                        &
           "To run the the NODYN option, recompile ",            &
@@ -1103,25 +1103,25 @@ CONTAINS
       ELSE IF ( dyn_opt == DYN_EM ) THEN
         IF ( grid%id .EQ. 1 ) CALL wrf_message ( &
           'DYNAMICS OPTION: Eulerian Mass Coordinate ')
-# include <em_allocs.inc>
+# include "em_allocs.inc"
 #endif
 #if (NMM_CORE == 1)
       ELSE IF ( dyn_opt == DYN_NMM ) THEN
         IF ( grid%id .EQ. 1 ) &
           CALL wrf_message ( 'DYNAMICS OPTION: nmm dyncore' )
-# include <nmm_allocs.inc>
+# include "nmm_allocs.inc"
 #endif
 #if (COAMPS_CORE == 1)
       ELSE IF ( dyn_opt == DYN_COAMPS ) THEN
         IF ( grid%id .EQ. 1 ) &
           CALL wrf_message ( 'DYNAMICS OPTION: coamps dyncore' )
-# include <coamps_allocs.inc>
+#include "coamps_allocs.inc"
 #endif
 #if (EXP_CORE==1)
       ELSE IF ( dyn_opt == DYN_EXP ) THEN
         IF ( grid%id .EQ. 1 ) &
           CALL wrf_message ( 'DYNAMICS OPTION: experimental dyncore' )
-# include <exp_allocs.inc>
+#include "exp_allocs.inc"
 #endif
 
       ELSE
@@ -1265,19 +1265,19 @@ CONTAINS
 
 #if (EM_CORE == 1)
       ELSE IF ( dyn_opt == DYN_EM ) THEN
-# include <em_deallocs.inc>
+#include "em_deallocs.inc"
 #endif
 #if (NMM_CORE == 1)
       ELSE IF ( dyn_opt == DYN_NMM ) THEN
-# include <nmm_deallocs.inc>
+#include "nmm_deallocs.inc"
 #endif
 #if (COAMPS_CORE == 1)
       ELSE IF ( dyn_opt == DYN_COAMPS ) THEN
-# include <coamps_deallocs.inc>
+#include "coamps_deallocs.inc"
 #endif
 #if (EXP_CORE==1)
       ELSE IF ( dyn_opt == DYN_EXP ) THEN
-# include <exp_deallocs.inc>
+#include "exp_deallocs.inc"
 #endif
       ELSE
         WRITE( wrf_err_message , * )'dealloc_space_field: ', &
