@@ -190,8 +190,10 @@ subroutine da_wrfvar_init( gcomp, importState, exportState, clock, rc )
    !  The forecast integration for the most coarse grid is now started.  The
    !  integration is from the first step (1) to the last step of the simulation.
 
-   head_grid%start_subtime = head_grid%start_time
-   head_grid%stop_subtime = head_grid%stop_time
+! JRB
+   CALL wrf_warning3(__FILE__,__LINE__,"Fix me")
+!   head_grid%start_subtime = head_grid%start_time
+!   head_grid%stop_subtime = head_grid%stop_time
 
    ! return success status
    rc = ESMF_SUCCESS

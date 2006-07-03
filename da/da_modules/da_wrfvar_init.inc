@@ -24,7 +24,7 @@ subroutine da_wrfvar_init( no_init1 )
   IF ( .NOT. PRESENT( no_init1 ) ) THEN
     call init_modules(1)
     ! Initialize utilities (time manager, etc.)
-    call wrf_util_initialize( defaultCalendar=WRF_UTIL_CAL_GREGORIAN )
+    call wrfu_initialize( defaultCalendar=WRFU_CAL_GREGORIAN )
   ENDIF
   ! Phase 2 resumes after MPI_INIT() (if it is called)
   call init_modules(2)
@@ -173,8 +173,10 @@ subroutine da_wrfvar_init( no_init1 )
     call da_med_initialdata_input( head_grid , config_flags )
   END IF
 
-  head_grid%start_subtime = head_grid%start_time
-  head_grid%stop_subtime = head_grid%stop_time
+! JRB
+   CALL wrf_warning3(__FILE__,__LINE__,"Fix me")
+!  head_grid%start_subtime = head_grid%start_time
+!  head_grid%stop_subtime = head_grid%stop_time
 
   IF (trace_use) call da_trace_exit("da_wrfvar_init")
 
