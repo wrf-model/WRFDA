@@ -26,6 +26,9 @@ links :
 	@ $(LN) $(IO_GRIB_SHARE)/* .
 	@ $(LN) $(IO_GRIB1)/* .
 	@ $(LN) $(IOAPI_SHARE)/* .
+	@ $(LN) $(BLAS)/* .
+	@ $(LN) $(LAPACK)/* .
+	@ $(LN) $(FFTPACK5)/* .
 	@ $(LN) $(ESMF_TIME_F90)/* .
 	@ $(LN) $(BUFR_NCEP_NCO)/* .
 	@ $(LN) $(IO_NETCDF)/*.code .
