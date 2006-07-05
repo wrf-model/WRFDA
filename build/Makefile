@@ -21,6 +21,8 @@ links :
 	@ $(LN) $(TOOLS)/*.c .
 	@ $(LN) $(TOOLS)/*.h .
 	@ $(LN) $(DA)/*/* .
+	@ $(LN) $(IO_GRIB_SHARE)/* .
+	@ $(LN) $(IOAPI_SHARE)/* .
 	@ $(LN) $(ESMF_TIME_F90)/* .
 	@ $(LN) $(BUFR_NCEP_NCO)/* .
 	@ $(LN) $(IO_NETCDF)/*.code .
