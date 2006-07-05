@@ -6,6 +6,8 @@ MODULE module_get_file_names
 !  commands.  These are activated from either the "system" command or 
 !  the "exec" command.  Neither is part of the Fortran standard.
 
+   USE module_wrf_error
+
    INTEGER :: number_of_eligible_files
    CHARACTER(LEN=132) , DIMENSION(:) , ALLOCATABLE :: eligible_file_name
 
