@@ -1,6 +1,6 @@
 include configure.wrf
 
-setup : arch depend
+setup : depend
 
 makedepf90 : 
 	@ ( cd $(EXTERNAL)/makedepf90/makedepf90-2.8.8; ./configure; make )
@@ -21,22 +21,14 @@ links :
 	@ $(LN) $(TOOLS)/*.c .
 	@ $(LN) $(TOOLS)/*.h .
 	@ $(LN) $(DA)/*/* .
-	@ $(LN) $(EXTERNAL)/*/*.make .
-	@ $(LN) $(EXTERNAL)/*/*.f90 .
-	@ $(LN) $(EXTERNAL)/*/*.F90 .
-	@ $(LN) $(EXTERNAL)/*/*.inc .
-	@ $(LN) $(EXTERNAL)/*/*.F .
-	@ $(LN) $(EXTERNAL)/*/*.c .
-	@ $(LN) $(EXTERNAL)/*/*.h .
-	@ $(LN) $(EXTERNAL)/*/*sh .
-	@ $(LN) $(BUFR_NCEP_NCO)/bufrlib.param .
+	@ $(LN) $(ESMF_TIME_F90)/* .
+	@ $(LN) $(BUFR_NCEP_NCO)/* .
 	@ $(LN) $(IO_NETCDF)/*.code .
 	@ $(LN) $(ARCH)/*.sed .
 	@ $(LN) $(CONVERTOR)/convert_tool .
 	@ $(LN) $(CONVERTOR)/kma_wave2grid .
 	@ $(LN) $(CONVERTOR)/wave2grid_kma .
 	@ $(LN) $(CONVERTOR)/decode_l2_airs/* .
-	@ $(LN) $(ESMF_TIME_F90)/*.F90 .
 	@ touch links
 
 
@@ -64,10 +56,11 @@ include $(RSL_LITE)/RSL_LITE.make
 include $(MAIN)/main.make
 
 
-depend : links registry makedepf90 module_state_description.f90 md_calls.inc \
+depend : arch links registry makedepf90 module_state_description.f90 md_calls.inc \
                       inc/da_generic_boilerplate.inc
 	./makedepf90 $(FPPFLAGS) \
            *.F *.f90 *.F90 > depend 2>/dev/null
+	touch depend
 
 include depend
 
@@ -104,4 +97,4 @@ superclean : clean arch_superclean
           *.bsh *.csh Utl* macros_utl module_dm_warning rsl_cpp_flags \
           scl_plotting_routines configure.wrf ../configure.wrf \
           advance_cymdh.exe decode_l2_airs.README time_window.nl \
-          Makefile_old da_macros_utl links
+          Makefile_old da_macros_utl links arch
