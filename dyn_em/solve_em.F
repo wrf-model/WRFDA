@@ -2637,9 +2637,9 @@ BENCH_END(calc_p_rho_tim)
      CALL wrf_error_fatal(TRIM(wrf_err_message))
    ENDIF
 #  include "PERIOD_BDY_EM_D.inc"
-#  include "PERIOD_BDY_EM_MOIST2.inc"
-#  include "PERIOD_BDY_EM_CHEM2.inc"
-#  include "PERIOD_BDY_EM_SCALAR2.inc"
+#  include "PERIOD_BDY_EM_MOIST.inc"
+#  include "PERIOD_BDY_EM_CHEM.inc"
+#  include "PERIOD_BDY_EM_SCALAR.inc"
 #endif
 
 BENCH_START(bc_end_tim)

@@ -87,6 +87,7 @@ FFTPACK5      = $(EXTERNAL)/fftpack5
 BLAS          = $(EXTERNAL)/blas
 BUFR_NCEP_NCO = $(EXTERNAL)/bufr_ncep_nco
 IO_GRIB1      = $(EXTERNAL)/io_grib1
+IO_GRIB_SHARE = $(EXTERNAL)/io_grib_share
 IO_INT        = $(EXTERNAL)/io_int
 ESMF_TIME_F90 = $(EXTERNAL)/esmf_time_f90
 IO_NETCDF     = $(EXTERNAL)/io_netcdf
