@@ -1,34 +1,20 @@
 subroutine da_transfer_wrftoxb( xbx, grid, &
-!
 #include "em_dummy_args.inc"
-!
                               )
 
 !------------------------------------------------------------------------------
-!  PURPOSE: Transfers fields from WRF to first guess structure.
-!
-!  METHOD:  
-!
-!  HISTORY: 09/27/2002		Wei Huang
-!
-!  HISTORY: 06/28/2004 with respect to the cloud water and rain water        Jianfeng Gu
-!              07/2005 - Add skin temperature to xb structure                Zhiquan Liu
-!                        also in Registry file
-!
-!  PARENT_MODULE: DA_Setup_Structures
+! PURPOSE: Transfers fields from WRF to first guess structure.
 !------------------------------------------------------------------------------
 
    IMPLICIT NONE
    
-   TYPE (xbx_type), INTENT(INOUT)     :: xbx          ! Header & non-gridded vars.
+   TYPE (xbx_type), INTENT(INOUT)     :: xbx       ! Header & non-gridded vars.
 
    TYPE(domain), TARGET               :: grid
 
-!  Definitions of dummy arguments to solve
+   !  Definitions of dummy arguments to solve
 
 #include "em_dummy_decl.inc"
-
-!---------------------------------------------------------------------------
 
    integer :: i, j, k, n
 
@@ -43,7 +29,6 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
 
    character(len=19) :: current_date
 
-!---------------------------------------------------------------------------
    real :: loc_psac_mean
 
    real, dimension(xp%jds:xp%jde) :: loc_latc_mean
@@ -51,16 +36,53 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
    integer :: size2d
 
    real, dimension(xp%kms:xp%kme) :: DDT
-!------------------------------------------------------------------------------
 
    REAL   :: qvf1, cvpm, cpovcv, ppb, ttb, albn, aln
    REAL, ALLOCATABLE :: arrayglobal(:,:)
 
    IF (trace_use) call da_trace_entry("da_transfer_wrftoxb")
 
-!---------------------------------------------------------------------------
-!--Set xb array range indices for processor subdomain.
-!---------------------------------------------------------------------------
+   ! Set all fields to debug values
+
+   IF (jrb_wind > -9999.9) THEN
+      ! Set all fields to debug values
+      u_1  = jrb_wind
+      u_2  = jrb_wind
+      v_1  = jrb_wind
+      v_2  = jrb_wind
+      w_1  = jrb_wind
+      w_2  = jrb_wind
+   END IF
+
+   IF (jrb_wind > -9999.9) THEN
+      t_1  = jrb_temp
+      t_2  = jrb_temp
+   end if
+
+   IF (jrb_p > -9999.9) THEN
+      p    = jrb_p
+   end if
+
+   if (jrb_ph > -9999.9) then
+      ph_1 = jrb_ph
+      ph_2 = jrb_ph
+      phb = jrb_ph
+   end if
+
+   if (jrb_mu > -9999.9) then
+      mu0 = jrb_mu
+      mub = jrb_mu
+      mu_1 = jrb_mu
+      mu_2 = jrb_mu
+   end if
+
+   if (jrb_moist > -9999.9) then
+      moist = jrb_moist
+   end if
+
+   !---------------------------------------------------------------------------
+   ! Set xb array range indices for processor subdomain.
+   !---------------------------------------------------------------------------
 
    is = xp % its
    ie = xp % ite
@@ -70,16 +92,15 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
    ke = xp % kte
 
    xb % map  = grid%map_proj
-!  xb % ds   = 1.0/grid%rdx
    xb % ds   = grid%dx
 
    xb % mix = xp % ide - xp % ids + 1
    xb % mjy = xp % jde - xp % jds + 1
    xb % mkz = xp % kde - xp % kds + 1
 
-!---------------------------------------------------------------------------
-!--WRF-specific fields:
-!---------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! WRF-specific fields:
+   !---------------------------------------------------------------------------
 
    ptop = grid%p_top
    ps0  = 100000.0    ! Base sea level pressure
@@ -105,9 +126,9 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
    xb % ps0  = ps0
    xb % tlp  = tlp
       
-!---------------------------------------------------------------------------
-!--Convert WRF fields to xb:
-!---------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! Convert WRF fields to xb:
+   !---------------------------------------------------------------------------
 
    if(print_detail_xb) then
      write(unit=stdout, fmt='(3a, i8)') &
@@ -209,71 +230,69 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
      write(unit=stdout, fmt=*) ' '
    endif
 
-!---------------------------------------------------------------
-!--Need this to exchange values in the halo region.
-!  xa%u and xa%v are used as tempory arrays and so
-!  it is easy to use the existing exchange scheme.
-!
-!  Note, this is needed as u_2 and v_2 has no guarantee
-!  the most east column, and the most north raw are
-!  properly initailized for each tile.
-!                             Wei Huang, 03/06/03
-!---------------------------------------------------------------
+   !---------------------------------------------------------------
+   ! Need this to exchange values in the halo region.
+   ! xa%u and xa%v are used as tempory arrays and so
+   ! it is easy to use the existing exchange scheme.
+   !
+   ! Note, this is needed as u_2 and v_2 has no guarantee
+   ! the most east column, and the most north raw are
+   ! properly initailized for each tile.
+   !                             Wei Huang, 03/06/03
+   !---------------------------------------------------------------
 
    do j=js,je
-   do k=ks,ke
-   do i=is,ie+1
-      xa%u(i,j,k) = u_2(i,j,k)
-   enddo
-   enddo
+      do k=ks,ke
+         do i=is,ie+1
+            xa%u(i,j,k) = u_2(i,j,k)
+         enddo
+      enddo
    enddo
 
    do j=js,je+1
-   do k=ks,ke
-   do i=is,ie
-      xa%v(i,j,k) = v_2(i,j,k)
-   enddo
-   enddo
+      do k=ks,ke
+         do i=is,ie
+            xa%v(i,j,k) = v_2(i,j,k)
+         enddo
+      enddo
    enddo
 
-!--Fill the halo region for u and v.
+   ! Fill the halo region for u and v.
 
    call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id3)
 
-!---------------------------------------------------------------
+      if(print_detail_xb) then
+      write(unit=stdout, fmt=*) 'is,ie,js,je,ks,ke=', is,ie,js,je,ks,ke
+      write(unit=stdout, fmt=*) 'xp%its, xp%ite=', xp%its, xp%ite
+      write(unit=stdout, fmt=*) 'xp%jts, xp%jte=', xp%jts, xp%jte
+      write(unit=stdout, fmt=*) 'xp%kts, xp%kte=', xp%kts, xp%kte
+      write(unit=stdout, fmt=*) 'xp%ims, xp%ime=', xp%ims, xp%ime
+      write(unit=stdout, fmt=*) 'xp%jms, xp%jme=', xp%jms, xp%jme
+      write(unit=stdout, fmt=*) 'xp%kms, xp%kme=', xp%kms, xp%kme
+      write(unit=stdout, fmt=*) 'xp%ids, xp%ide=', xp%ids, xp%ide
+      write(unit=stdout, fmt=*) 'xp%jds, xp%jde=', xp%jds, xp%jde
+      write(unit=stdout, fmt=*) 'xp%kds, xp%kde=', xp%kds, xp%kde
 
-   if(print_detail_xb) then
-   write(unit=stdout, fmt=*) 'is,ie,js,je,ks,ke=', is,ie,js,je,ks,ke
-   write(unit=stdout, fmt=*) 'xp%its, xp%ite=', xp%its, xp%ite
-   write(unit=stdout, fmt=*) 'xp%jts, xp%jte=', xp%jts, xp%jte
-   write(unit=stdout, fmt=*) 'xp%kts, xp%kte=', xp%kts, xp%kte
-   write(unit=stdout, fmt=*) 'xp%ims, xp%ime=', xp%ims, xp%ime
-   write(unit=stdout, fmt=*) 'xp%jms, xp%jme=', xp%jms, xp%jme
-   write(unit=stdout, fmt=*) 'xp%kms, xp%kme=', xp%kms, xp%kme
-   write(unit=stdout, fmt=*) 'xp%ids, xp%ide=', xp%ids, xp%ide
-   write(unit=stdout, fmt=*) 'xp%jds, xp%jde=', xp%jds, xp%jde
-   write(unit=stdout, fmt=*) 'xp%kds, xp%kde=', xp%kds, xp%kde
+      write(unit=stdout, fmt=*) 'size(xb%u, dim=1)=', size(xb%u, dim=1)
+      write(unit=stdout, fmt=*) 'size(xb%u, dim=2)=', size(xb%u, dim=2)
+      write(unit=stdout, fmt=*) 'size(xb%u, dim=3)=', size(xb%u, dim=3)
+      write(unit=stdout, fmt=*) 'size(xb%v, dim=1)=', size(xb%v, dim=1)
+      write(unit=stdout, fmt=*) 'size(xb%v, dim=2)=', size(xb%v, dim=2)
+      write(unit=stdout, fmt=*) 'size(xb%v, dim=3)=', size(xb%v, dim=3)
 
-   write(unit=stdout, fmt=*) 'size(xb%u, dim=1)=', size(xb%u, dim=1)
-   write(unit=stdout, fmt=*) 'size(xb%u, dim=2)=', size(xb%u, dim=2)
-   write(unit=stdout, fmt=*) 'size(xb%u, dim=3)=', size(xb%u, dim=3)
-   write(unit=stdout, fmt=*) 'size(xb%v, dim=1)=', size(xb%v, dim=1)
-   write(unit=stdout, fmt=*) 'size(xb%v, dim=2)=', size(xb%v, dim=2)
-   write(unit=stdout, fmt=*) 'size(xb%v, dim=3)=', size(xb%v, dim=3)
+      write(unit=stdout, fmt=*) 'size(xa%u, dim=1)=', size(xa%u, dim=1)
+      write(unit=stdout, fmt=*) 'size(xa%u, dim=2)=', size(xa%u, dim=2)
+      write(unit=stdout, fmt=*) 'size(xa%u, dim=3)=', size(xa%u, dim=3)
+      write(unit=stdout, fmt=*) 'size(xa%v, dim=1)=', size(xa%v, dim=1)
+      write(unit=stdout, fmt=*) 'size(xa%v, dim=2)=', size(xa%v, dim=2)
+      write(unit=stdout, fmt=*) 'size(xa%v, dim=3)=', size(xa%v, dim=3)
 
-   write(unit=stdout, fmt=*) 'size(xa%u, dim=1)=', size(xa%u, dim=1)
-   write(unit=stdout, fmt=*) 'size(xa%u, dim=2)=', size(xa%u, dim=2)
-   write(unit=stdout, fmt=*) 'size(xa%u, dim=3)=', size(xa%u, dim=3)
-   write(unit=stdout, fmt=*) 'size(xa%v, dim=1)=', size(xa%v, dim=1)
-   write(unit=stdout, fmt=*) 'size(xa%v, dim=2)=', size(xa%v, dim=2)
-   write(unit=stdout, fmt=*) 'size(xa%v, dim=3)=', size(xa%v, dim=3)
-
-   write(unit=stdout, fmt=*) 'size(u_2, dim=1)=', size(u_2, dim=1)
-   write(unit=stdout, fmt=*) 'size(u_2, dim=2)=', size(u_2, dim=2)
-   write(unit=stdout, fmt=*) 'size(u_2, dim=3)=', size(u_2, dim=3)
-   write(unit=stdout, fmt=*) 'size(v_2, dim=1)=', size(v_2, dim=1)
-   write(unit=stdout, fmt=*) 'size(v_2, dim=2)=', size(v_2, dim=2)
-   write(unit=stdout, fmt=*) 'size(v_2, dim=3)=', size(v_2, dim=3)
+      write(unit=stdout, fmt=*) 'size(u_2, dim=1)=', size(u_2, dim=1)
+      write(unit=stdout, fmt=*) 'size(u_2, dim=2)=', size(u_2, dim=2)
+      write(unit=stdout, fmt=*) 'size(u_2, dim=3)=', size(u_2, dim=3)
+      write(unit=stdout, fmt=*) 'size(v_2, dim=1)=', size(v_2, dim=1)
+      write(unit=stdout, fmt=*) 'size(v_2, dim=2)=', size(v_2, dim=2)
+      write(unit=stdout, fmt=*) 'size(v_2, dim=3)=', size(v_2, dim=3)
    endif
 
    do j=js,je
@@ -736,7 +755,88 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
      enddo
      enddo
 
-   ENDIF
+   ENDIF   ! Set all fields to debug values
+
+   if (jrb_p > -9999.9) then
+      xb % u = jrb_wind
+      xb % v = jrb_wind
+      xb % w = jrb_wind
+   end if
+
+   if (jrb_temp > -9999.9) then
+      xb % t = jrb_temp
+   end if
+
+   if (jrb_p > -9999.9) then
+      xb % p = jrb_p
+   end if
+
+goto 9999
+      xb % q = jrb_real1
+      xb % qrn = jrb_real1
+      xb % qcw = jrb_real1
+      xb % qci = jrb_real1
+      xb % qsn = jrb_real1
+      xb % qgr = jrb_real1
+      xb % qt = jrb_real1
+      xb % delt = jrb_real1
+      xb % h = jrb_real1
+      xb % hf = jrb_real1
+      xb % wh = jrb_real1
+      xb % rho = jrb_real1
+      xb % rh = jrb_real1
+      xb % es = jrb_real1
+      xb % qs = jrb_real1
+      xb % td = jrb_real1
+      xb % vertical_inner_product = jrb_real1
+      xb % ref = jrb_real1
+      xb % rough = jrb_real1
+      xb % tpw = jrb_real1
+      xb % slp = jrb_real1
+      xb % speed = jrb_real1
+      xb % tb19v = jrb_real1
+      xb % tb19h = jrb_real1
+      xb % tb22v = jrb_real1
+      xb % tb37v = jrb_real1
+      xb % tb37h = jrb_real1
+      xb % tb85v = jrb_real1
+      xb % tb85h = jrb_real1
+      xb % cori = jrb_real1
+      xb % tgrn = jrb_real1
+      !xb % lat = jrb_real1
+      !xb % lon = jrb_real1
+      xb % terr = jrb_real1
+      xb % psac = jrb_real1
+      xb % lanu = jrb_real1
+      xb % snow = jrb_real1
+      xb % xland = jrb_real1
+      xb % landmask = jrb_real1
+      xb % u10 = jrb_wind
+      xb % v10 = jrb_wind
+      xb % t2 = jrb_real1
+      xb % q2 = jrb_real1
+      xb % psfc = jrb_real1
+      xb % tsk = jrb_real1
+      xb % smois = jrb_real1
+      xb % tslb = jrb_real1
+      xb % xice = jrb_real1
+      !xb % ivgtyp = jrb_integer1
+      !xb % isltyp = jrb_integer1
+      xb % vegfra = jrb_real1
+      xb % snowh = jrb_real1
+      xb % regime = jrb_real1
+      xb % znu = jrb_real1
+      xb % znw = jrb_real1
+      xb % dn = jrb_real1
+      xb % dnw = jrb_real1
+      xb % sigmah = jrb_real1
+      xb % sigmaf = jrb_real1
+      !xb % coefx = jrb_real1
+      !xb % coefy = jrb_real1
+      !xb % coefz = jrb_real1
+      !xb % kma_a = jrb_real1
+      !xb % kma_b = jrb_real1
+9999 continue
 
    IF (trace_use) call da_trace_exit("da_transfer_wrftoxb")
 
