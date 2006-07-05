@@ -49,7 +49,7 @@ arch :
           $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
             LEARN_BCAST=-DLEARN_BCAST linux )
-	touch arch
+	@ touch arch
 
 arch_clean :
 	( cd $(RSL)/RSL; make clean )
@@ -86,7 +86,7 @@ LOCAL_LIB       = -L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c -lX11
 
 arch : 
 		$(LN) $(RSL_STUBS)/* .
-		touch arch
+		@ touch arch
 
 arch_clean : 
 
@@ -135,7 +135,7 @@ arch :
           $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
             LEARN_BCAST=-DLEARN_BCAST alpha )
-	touch arch
+	@ touch arch
 
 arch_clean :
 	( cd $(RSL)/RSL; make clean )
@@ -172,7 +172,7 @@ LOCAL_LIB       = -L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c -lX11
 
 arch : 
 		$(LN) $(RSL_STUBS)/* .
-		touch arch
+		@ touch arch
 
 arch_clean :
 
@@ -211,7 +211,7 @@ LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/X11R6/lib -L/usr/local/lib \
 
 arch : 
 		$(LN) $(RSL_STUBS)/* .
-		touch arch
+		@ touch arch
 
 arch_clean :
 
@@ -260,7 +260,7 @@ arch :
           $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
             LEARN_BCAST=-DLEARN_BCAST linux )
-	touch arch
+	@ touch arch
 
 arch_clean :
 	( cd $(RSL)/RSL; make clean )
@@ -308,7 +308,7 @@ MPI_LIB		= -lrsl
 arch : 
 	$(LN) $(RSL_LITE)/*.c .
 	$(LN) $(RSL_LITE)/*.F .
-	touch arch
+	@ touch arch
 
 arch_clean :
 
@@ -346,7 +346,7 @@ LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/X11R6/lib -L/usr/local/lib \
 
 arch : 
 		$(LN) $(RSL_STUBS)/* .
-		touch arch
+		@ touch arch
 
 arch_clean :
 
@@ -395,7 +395,7 @@ arch :
           $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
             LEARN_BCAST=-DLEARN_BCAST linux )
-	touch arch
+	@ touch arch
 
 arch_clean :
 	( cd $(RSL)/RSL; make clean )
@@ -444,7 +444,7 @@ MPI_LIB		= -lrsl_lite
 arch : 
 	$(LN) $(RSL_LITE)/*.c .
 	$(LN) $(RSL_LITE)/*.F .
-	touch arch
+	@ touch arch
 
 arch_clean :
 
@@ -483,7 +483,7 @@ LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/X11R6/lib -L/usr/local/lib \
 
 arch : 
 		$(LN) $(RSL_STUBS)/* .
-		touch arch
+		@ touch arch
 
 arch_clean :
 
@@ -521,7 +521,7 @@ LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/X11R6/lib -L/usr/local/lib \
 
 arch :
 		$(LN) $(RSL_STUBS)/* .
-		touch arch
+		@ touch arch
 
 arch_clean :
 
@@ -569,7 +569,7 @@ arch :
           $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
             LEARN_BCAST=-DLEARN_BCAST linux )
-	touch arch
+	@ touch arch
 
 arch_clean :
 	( cd $(RSL)/RSL; make clean )
@@ -610,7 +610,7 @@ LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/local/lib \
 
 arch : 
 		$(LN) $(RSL_STUBS)/* .
-		touch arch
+		@ touch arch
 
 arch_clean :
 
@@ -658,7 +658,7 @@ arch :
           $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
           MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
           LEARN_BCAST=-DLEARN_BCAST linux )
-	touch arch
+	@ touch arch
 
 arch_clean :
 	( cd $(RSL)/RSL; make clean )
@@ -700,7 +700,7 @@ LOCAL_LIB       = -L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c -lX11
 
 arch : 
 		$(LN) $(RSL_STUBS)/* .
-		touch arch
+		@ touch arch
 
 arch_clean :
 
@@ -747,7 +747,7 @@ arch :
           $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
             LEARN_BCAST=-DLEARN_BCAST o2k )
-	touch arch
+	@ touch arch
 
 arch_clean :
 	( cd $(RSL)/RSL; make clean )
@@ -786,7 +786,7 @@ LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN) #-Wl"-Z 3000000"
 
 arch : 
 		$(LN) $(RSL_STUBS)/* .
-		touch arch
+		@ touch arch
 
 arch_clean :
 
@@ -823,7 +823,7 @@ LOCAL_LIB	= -lmass -lmassv
 
 arch : 
 		$(LN) $(RSL_STUBS)/* .
-		touch arch
+		@ touch arch
 
 arch_clean :
 
@@ -873,7 +873,7 @@ arch :
           $(MAKE) CC="mpcc $(CCFLAGS_RSL)" FC="mpxlf $(FCFLAGS_RSL)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
             LEARN_BCAST=-DLEARN_BCAST sp2 )
-	touch arch
+	@ touch arch
 
 arch_clean :
 	( cd $(RSL)/RSL; make clean )
@@ -922,7 +922,7 @@ MPI_LIB		= -lrsl
 arch : 
 	$(LN) $(RSL_LITE)/*.c .
 	$(LN) $(RSL_LITE)/*.F .
-	touch arch
+	@ touch arch
 
 arch_clean :
 
@@ -978,7 +978,7 @@ arch :
           $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
 	     MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
              LEARN_BCAST=-DLEARN_BCAST crayx1 )
-	touch arch
+	@ touch arch
 
 arch_clean :
 	( cd $(RSL)/RSL; make clean )
@@ -1020,7 +1020,7 @@ EXTRA_LIBS      = -lSystemStubs
   
 arch : 
 		$(LN) $(RSL_STUBS)/* .
-		touch arch
+		@ touch arch
 
 arch_clean :
 
@@ -1073,7 +1073,7 @@ arch :
           $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
              MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
              LEARN_BCAST=-DLEARN_BCAST darwin )
-	touch arch
+	@ touch arch
 
 arch_clean :
 	( cd $(RSL)/RSL; make clean )
@@ -1115,7 +1115,7 @@ EXTRA_LIBS      = -lSystemStubs
 
 arch : 
 		$(LN) $(RSL_STUBS)/* .
-		touch arch
+		@ touch arch
 
 arch_clean :
 
@@ -1164,7 +1164,7 @@ arch :
           $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
             LEARN_BCAST=-DLEARN_BCAST darwin )
-	touch arch
+	@ touch arch
 
 arch_clean :
 	( cd $(RSL)/RSL; make clean )
@@ -1212,7 +1212,7 @@ EXTRA_LIBS      = -lSystemStubs
 arch : 
 	$(LN) $(RSL_LITE)/*.c .
 	$(LN) $(RSL_LITE)/*.F .
-	touch arch
+	@ touch arch
 
 arch_clean :
 

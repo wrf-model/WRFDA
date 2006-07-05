@@ -1,4 +1,9 @@
-include ../configure.wrf
+#
+
+LN      =       ln -sf
+MAKE    =       make -i -r
+RM      =       rm -f
+
 
 MODULES =                 		\
         module_advect_em.o   		\
@@ -9,19 +14,6 @@ MODULES =                 		\
         module_solvedebug_em.o    	\
         module_bc_em.o                  \
         module_init_utilities.o         \
-        module_check.o                  \
-        module_em_tl.o         		\
-        module_em_ad.o       		\
-        module_advect_em_ad.o  		\
-        module_advect_em_tl.o  		\
-        module_bc_em_ad.o               \
-        module_bc_em_tl.o               \
-	module_diffusion_em_ad.o	\
-	module_diffusion_em_tl.o	\
-	module_small_step_em_tl.o	\
-	module_small_step_em_ad.o	\
-        module_big_step_utilities_em_ad.o  \
-        module_big_step_utilities_em_tl.o  \
 	$(CASE_MODULE)
 
 # possible CASE_MODULE settings
@@ -39,76 +31,44 @@ OBJS    = 		        \
 	solve_em.o              \
         start_em.o              \
         shift_domain_em.o       \
+        couple_or_uncouple_em.o \
         nest_init_utils.o	\
-        interp_domain_em.o      \
-	solve_em_ad.o           \
-	solve_em_tl.o           \
+        interp_domain_em.o
  
 
-all : dyn_em
-
-dyn_em :  $(MODULES) $(OBJS)
+LIBTARGET    =  dyn_em
+TARGETDIR    =  ./
+$(LIBTARGET) :  $(MODULES) $(OBJS)
 		$(AR) ../main/libwrflib.a $(MODULES) $(OBJS)
 
-clean:
-	@ $(RM) *.f *.o
+include ../configure.wrf
 
-superclean : clean
+clean:
+	@ echo 'use the clean script'
 
 # DEPENDENCIES : only dependencies after this line (don't remove the word DEPENDENCIES)
+
+couple_or_uncouple_em.o: ../frame/module_domain.o \
+		../frame/module_configure.o \
+		../frame/module_driver_constants.o \
+		../frame/module_machine.o \
+		../frame/module_tiles.o \
+		../frame/module_dm.o \
+		../frame/module_state_description.o
 
 init_modules_em.o: module_big_step_utilities_em.o
 
 interp_domain_em.o: ../frame/module_domain.o \
 		../frame/module_configure.o 
 
-module_check.o: module_em_tl.o \
-                module_em_ad.o \
-                module_bc_em_ad.o \
-                module_bc_em_tl.o \
-                module_diffusion_em_ad.o \
-                module_diffusion_em_tl.o \
-                module_advect_em_ad.o \
-                module_advect_em_tl.o \
-                module_big_step_utilities_em_ad.o \
-                module_big_step_utilities_em_tl.o \
-                module_small_step_em_ad.o \
-                module_small_step_em_tl.o
-
 module_advect_em.o: ../share/module_bc.o \
-		../share/module_model_constants.o \
-		../frame/module_wrf_error.o
-
-module_advect_em_ad.o: ../share/module_bc_ad.o \
-		../share/module_model_constants.o \
-		../frame/module_wrf_error.o
-
-module_advect_em_tl.o: ../share/module_bc_tl.o \
 		../share/module_model_constants.o \
 		../frame/module_wrf_error.o
 
 module_bc_em.o: ../share/module_bc.o ../frame/module_configure.o \
 		../frame/module_wrf_error.o
 
-module_bc_em_ad.o: ../share/module_bc_ad.o ../frame/module_configure.o \
-		../frame/module_wrf_error.o
-
-module_bc_em_tl.o: ../share/module_bc_tl.o ../frame/module_configure.o \
-		../frame/module_wrf_error.o
-
 module_big_step_utilities_em.o: \
-		../frame/module_domain.o \
-		../frame/module_configure.o  \
-		../frame/module_state_description.o \
-		../share/module_model_constants.o 
-
-module_big_step_utilities_em_ad.o: \
-		../frame/module_domain.o \
-		../frame/module_configure.o  \
-		../frame/module_state_description.o \
-		../share/module_model_constants.o 
-
-module_big_step_utilities_em_tl.o: \
 		../frame/module_domain.o \
 		../frame/module_configure.o  \
 		../frame/module_state_description.o \
@@ -121,44 +81,11 @@ module_diffusion_em.o:  module_big_step_utilities_em.o \
 		../share/module_bc.o \
 		../frame/module_wrf_error.o
 
-module_diffusion_em_ad.o:  module_big_step_utilities_em_ad.o \
-		../frame/module_configure.o  \
-		../frame/module_state_description.o \
-		../share/module_model_constants.o \
-		../share/module_bc_ad.o \
-		../frame/module_wrf_error.o
-
-
-module_diffusion_em_tl.o:  module_big_step_utilities_em_tl.o \
-		../frame/module_configure.o  \
-		../frame/module_state_description.o \
-		../share/module_model_constants.o \
-		../share/module_bc_tl.o \
-		../frame/module_wrf_error.o
-
 module_em.o:    module_big_step_utilities_em.o module_advect_em.o \
 		../frame/module_state_description.o \
 		../share/module_model_constants.o 
 
-module_em_ad.o: module_big_step_utilities_em_ad.o \
-                module_advect_em_ad.o \
-		../frame/module_state_description.o \
-		../share/module_model_constants.o 
-
-module_em_tl.o:  module_big_step_utilities_em_tl.o \
-                 module_advect_em_tl.o \
-		../frame/module_state_description.o \
-		../share/module_model_constants.o 
-
 module_small_step_em.o: \
-		../frame/module_configure.o  \
-		../share/module_model_constants.o 
-
-module_small_step_em_ad.o: \
-		../frame/module_configure.o  \
-		../share/module_model_constants.o 
-
-module_small_step_em_tl.o: \
 		../frame/module_configure.o  \
 		../share/module_model_constants.o 
 
@@ -257,57 +184,10 @@ start_em.o: module_bc_em.o \
 
 solve_em.o:     module_small_step_em.o \
 		module_em.o            \
-		module_check.o         \
 		module_solvedebug_em.o \
                 module_bc_em.o         \
 		module_diffusion_em.o  \
 		module_big_step_utilities_em.o \
-		../frame/module_domain.o \
-		../frame/module_configure.o  \
-		../frame/module_driver_constants.o \
-		../frame/module_state_description.o \
-		../frame/module_machine.o \
-		../frame/module_tiles.o \
-		../frame/module_dm.o \
-		../share/module_model_constants.o \
-		../share/module_bc.o \
-		../phys/module_radiation_driver.o \
-		../phys/module_surface_driver.o \
-		../phys/module_cumulus_driver.o \
-		../phys/module_microphysics_driver.o \
-		../phys/module_microphysics_zero_out.o \
-		../phys/module_pbl_driver.o \
-		../phys/module_physics_addtendc.o
-
-solve_em_ad.o:  module_small_step_em_ad.o \
-		module_em_ad.o            \
-		module_solvedebug_em.o \
-                module_bc_em_ad.o         \
-		module_diffusion_em_ad.o  \
-		module_big_step_utilities_em_ad.o \
-		../frame/module_domain.o \
-		../frame/module_configure.o  \
-		../frame/module_driver_constants.o \
-		../frame/module_state_description.o \
-		../frame/module_machine.o \
-		../frame/module_tiles.o \
-		../frame/module_dm.o \
-		../share/module_model_constants.o \
-		../share/module_bc.o \
-		../phys/module_radiation_driver.o \
-		../phys/module_surface_driver.o \
-		../phys/module_cumulus_driver.o \
-		../phys/module_microphysics_driver.o \
-		../phys/module_microphysics_zero_out.o \
-		../phys/module_pbl_driver.o \
-		../phys/module_physics_addtendc.o
-
-solve_em_tl.o:  module_small_step_em_tl.o \
-		module_em_tl.o            \
-		module_solvedebug_em.o \
-                module_bc_em_tl.o         \
-		module_diffusion_em_tl.o  \
-		module_big_step_utilities_em_tl.o \
 		../frame/module_domain.o \
 		../frame/module_configure.o  \
 		../frame/module_driver_constants.o \
