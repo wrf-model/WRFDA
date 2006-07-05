@@ -1,15 +1,14 @@
-include ../configure.wrf
+#
 
-MODULES =       module_internal_header_util.o   \
-                module_driver_constants.o  \
+LN      =       ln -sf
+MAKE    =       make -i -r
+RM      =       rm -f
+
+
+
+MODULES =       module_driver_constants.o  \
                 module_domain.o            \
-                module_domain1.o           \
-                module_domain2.o           \
-                module_domain3.o           \
                 module_integrate.o         \
-                module_integrate_ad.o      \
-                module_integrate_tl.o      \
-                module_integrate_tst.o     \
                 module_timing.o            \
                 module_configure.o         \
                 module_tiles.o             \
@@ -23,8 +22,7 @@ MODULES =       module_internal_header_util.o   \
                 module_quilt_outbuf_ops.o  \
                 module_io_quilt.o
 
-OBJS    =       pack_utils.o               \
-                wrf_num_bytes_between.o    \
+OBJS    =       wrf_num_bytes_between.o    \
                 wrf_shutdown.o             \
                 libmassv.o                 \
                 collect_on_comm.o
@@ -33,23 +31,23 @@ OBJS    =       pack_utils.o               \
 SPECIAL =       module_internal_header_util.o pack_utils.o
    
 
-framework :  $(MODULES) $(OBJS) $(SPECIAL)
+include ../configure.wrf
+
+LIBTARGET    =  framework
+TARGETDIR    =  ./
+$(LIBTARGET) :  $(MODULES) $(OBJS) $(SPECIAL)
 		$(AR) ../main/libwrflib.a $(MODULES) $(OBJS)
 		$(RANLIB) ../main/libwrflib.a
 
-module_dm.F :
-	@ $(LN) $(RSL)/module_dm.F .
 
 wrf_num_bytes_between.o :
 	$(CC) -c $(CFLAGS) wrf_num_bytes_between.c
 
 clean:
-	@ $(RM) *.o *.f
+	@ echo 'use the clean script'
 
-superclean : clean
-
-module_state_description.f90 : ../Registry/$(REGISTRY)
-		( cd .. ; tools/registry $(REGFLAGS) Registry/$(REGISTRY) )
+module_state_description.F : ../Registry/$(REGISTRY)
+		( cd .. ; tools/registry $(ARCHFLAGS) Registry/$(REGISTRY) )
 
 md_calls.inc : md_calls.m4
 	$(M4) md_calls.m4 > md_calls.inc
@@ -57,15 +55,13 @@ md_calls.inc : md_calls.m4
 
 # DEPENDENCIES : only dependencies after this line (don't remove the word DEPENDENCIES)
 
-module_state_description.o : module_state_description.f90
 
 module_configure.o: \
 		module_state_description.o \
                 module_wrf_error.o \
 		module_driver_constants.o 
 
-module_dm.o: module_dm.F \
-        module_machine.o module_state_description.o module_wrf_error.o \
+module_dm.o: module_machine.o module_state_description.o module_wrf_error.o \
 		module_domain.o \
 		module_driver_constants.o \
 		module_timing.o \
@@ -73,21 +69,12 @@ module_dm.o: module_dm.F \
 
 module_dm_stubs.F: module_domain.o
 
-module_domain.o: module_domain1.o \
-                 module_domain2.o \
-                 module_domain3.o 
-
-module_domain1.o: module_driver_constants.o \
+module_domain.o: module_driver_constants.o \
 		module_configure.o \
 		module_machine.o  \
 		module_state_description.o \
                 module_wrf_error.o \
 		$(ESMF_MOD_DEPENDENCE)
-
-module_domain2.o: module_domain1.o \
-                  module_domain3.o
-
-module_domain3.o: module_domain1.o
 
 module_driver_constants.o: \
 		module_state_description.o \
@@ -100,31 +87,6 @@ module_integrate.o: module_domain.o \
 		module_nesting.o \
 		module_configure.o \
 		$(ESMF_MOD_DEPENDENCE)
-
-module_integrate_ad.o: module_domain.o \
-		module_timing.o \
-		module_driver_constants.o \
-		module_state_description.o \
-		module_nesting.o \
-		module_configure.o \
-		$(ESMF_MOD_DEPENDENCE)
-
-module_integrate_tl.o: module_domain.o \
-		module_timing.o \
-		module_driver_constants.o \
-		module_state_description.o \
-		module_nesting.o \
-		module_configure.o \
-		$(ESMF_MOD_DEPENDENCE)
-
-module_integrate_tst.o: module_domain.o \
-		module_timing.o \
-		module_driver_constants.o \
-		module_state_description.o \
-		module_nesting.o \
-		module_configure.o \
-		$(ESMF_MOD_DEPENDENCE)
-
 
 module_io.o : md_calls.inc \
 		module_state_description.o \
@@ -156,6 +118,7 @@ module_timing.o: \
                 module_wrf_error.o
 
 module_wrf_error.o: \
-		wrf_shutdown.o
+		wrf_shutdown.o \
+		$(ESMF_MOD_DEPENDENCE)
 
 # DO NOT DELETE

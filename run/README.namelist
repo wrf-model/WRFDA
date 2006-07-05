@@ -77,7 +77,7 @@ Additional ones when running WRFVAR:
 
  write_input                         = t,       ; write input-formatted data as output
  inputout_interval                   = 180,     ; interval in minutes when writing input-formatted data 
- input_outname                       = 'wrfvar_input_d<domain>_<date>' ; you may change the output file name
+ input_outname                       = 'wrf_wrfvar_input_d<domain>_<date>' ; you may change the output file name
  inputout_begin_y                    = 0
  inputout_begin_mo                   = 0
  inputout_begin_d                    = 0
@@ -326,6 +326,12 @@ Namelist variables for controling the automatic moving nest:
                                                   0 = without damping
                                                   1 = with diffusive damping (dampcoef nondimensional ~0.01-0.1)
                                                   2 = with Rayleigh  damping (dampcoef inverse time scale [1/s] e.g. .003)
+ diff_6th_opt                        = 0,       ; 6th-order numerical diffusion
+                                                  0 = no 6th-order diffusion (default)
+                                                  1 = 6th-order numerical diffusion
+                                                  2 = 6th-order numerical diffusion but prohibit up-gradient diffusion
+ diff_6th_rate                       = 0.24,    ; 6th-order numerical diffusion non-dimensional rate (max value 1.0
+                                                      corresponds to complete removal of 2dx wave in one timestep)
  dampcoef (max_dom)                  = 0.,	; damping coefficient (see above)
  zdamp (max_dom)                     = 5000.,	; damping depth (m) from model top
  w_damping                           = 0,       ; vertical velocity damping flag (for operational use)

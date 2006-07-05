@@ -13,16 +13,16 @@ SUBROUTINE solve_interface ( grid )
 
    INTERFACE
 #if (EM_CORE == 1 && DA_CORE != 1)
-# include  <solve_em.int>
+# include "solve_em.int"
 #endif
 #if (NMM_CORE == 1)
-# include  <solve_nmm.int>
+# include  "solve_nmm.int"
 #endif
 #if (COAMPS_CORE == 1)
-# include  <solve_coamps.int>
+# include  "solve_coamps.int"
 #endif
 #if (EXP_CORE == 1)
-# include  <solve_exp.int>
+# include  "solve_exp.int"
 #endif
    END INTERFACE
 
@@ -51,7 +51,7 @@ SUBROUTINE solve_interface ( grid )
    ELSE IF ( config_flags%dyn_opt == DYN_EM  ) THEN
      CALL solve_em  ( grid , config_flags , &
 !
-# include <em_actual_args.inc>
+# include "em_actual_args.inc"
 !
                )
 
@@ -60,7 +60,7 @@ SUBROUTINE solve_interface ( grid )
 
      CALL chem_driver  ( grid , config_flags , &
 !
-# include <em_actual_args.inc>
+# include "em_actual_args.inc"
 !
                )
    ENDIF
@@ -70,7 +70,7 @@ SUBROUTINE solve_interface ( grid )
    ELSE IF ( config_flags%dyn_opt == DYN_NMM  ) THEN
      CALL solve_nmm  ( grid , config_flags , &
 !
-# include <nmm_actual_args.inc>
+# include "nmm_actual_args.inc"
 !
                )
 #endif
@@ -78,7 +78,7 @@ SUBROUTINE solve_interface ( grid )
    ELSE IF ( config_flags%dyn_opt == DYN_COAMPS  ) THEN
      CALL solve_coamps  ( grid , config_flags , &
 !
-# include <coamps_actual_args.inc>
+# include "coamps_actual_args.inc"
 !
                )
 #endif
@@ -89,7 +89,7 @@ SUBROUTINE solve_interface ( grid )
    ELSE IF ( config_flags%dyn_opt == DYN_EXP  ) THEN
      CALL solve_exp  ( grid ,            &
 !
-# include <exp_actual_args.inc>
+# include "exp_actual_args.inc"
 !
                )
 #endif

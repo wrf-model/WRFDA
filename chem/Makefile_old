@@ -1,4 +1,9 @@
-include ../configure.wrf
+#
+
+LN      =       ln -sf
+MAKE    =       make -i -r
+RM      =       rm -f
+
 
 MODULES =                           \
   module_chem_utilities.o           \
@@ -49,15 +54,18 @@ OBJS    =                           \
         dry_dep_driver.o            \
         aerosol_driver.o 
 
-all : chemics
 
-chemics :  $(MODULES) $(OBJS)
+LIBTARGET    =  chemics
+TARGETDIR    =  ./
+$(LIBTARGET) :  $(MODULES) $(OBJS)
 		$(AR) ../main/libwrflib.a $(MODULES) $(OBJS)
 
-clean:
-	@ $(RM) *.o *.f
+include ../configure.wrf
 
-superclean : clean
+CPP = cpp
+
+clean:
+	@ echo 'use the clean script'
 
 # DEPENDENCIES : only dependencies after this line (don't remove the word DEPENDENCIES)
 

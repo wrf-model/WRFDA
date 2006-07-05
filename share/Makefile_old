@@ -1,15 +1,19 @@
-include ../configure.wrf
+#
+
+LN      =       ln -sf
+MAKE    =       make -i -r
+RM      =       rm -f
 
 MODULES =                       \
 	module_bc.o	        \
-	module_bc_ad.o	        \
-	module_bc_tl.o	        \
 	module_bc_time_utilities.o	\
 	module_io_wrf.o	        \
 	module_date_time.o	\
 	module_get_file_names.o	\
 	module_io_domain.o	\
 	module_model_constants.o \
+	module_MPP.o \
+	module_wrf_top.o \
 	module_optional_si_input.o	\
 	module_compute_geop.o           \
 	module_soil_pre.o
@@ -58,14 +62,15 @@ OBJS    = 		\
         wrf_bdyin.o             	\
         wrf_histin.o            	\
         wrf_restartin.o                 \
-        landread.o                      \
-        couple_or_uncouple_em.o
+        landread.o
+
 
 NMM_MODULES = 
 
-all : shared
 
-shared :  $(MODULES) $(OBJS)
+LIBTARGET    =  shared
+TARGETDIR    =  ./
+$(LIBTARGET) :  $(MODULES) $(OBJS)
 		if [ $(WRF_NMM_CORE) -eq 1 ] ; then \
                   $(MAKE) nmm_contrib                                      ; \
                   $(AR) ../main/libwrflib.a $(MODULES) $(OBJS) $(NMM_OBJS) $(NMM_MODULES) ; \
@@ -73,41 +78,23 @@ shared :  $(MODULES) $(OBJS)
                   $(AR) ../main/libwrflib.a $(MODULES) $(OBJS)             ; \
                 fi
 
+include ../configure.wrf
+
 nmm_contrib : $(NMM_OBJS) $(NMM_MODULES)
 
 clean:
-	@ $(RM) *.o *.f
+	@ echo 'use the clean script'
 
-superclean : clean
 
 # DEPENDENCIES : only dependencies after this line (don't remove the word DEPENDENCIES)
-
-couple_or_uncouple_em.o: ../frame/module_domain.o \
-		../frame/module_configure.o \
-		../frame/module_driver_constants.o \
-		../frame/module_machine.o \
-		../frame/module_tiles.o \
-		../frame/module_dm.o \
-		module_bc.o \
-		../frame/module_state_description.o
-
-module_wrf_esmf_super.o : frame/module_integrate_ad.o \
-                          frame/module_integrate_tl.o \
-                          frame/module_integrate_tst.o
 
 solve_interface.o: solve_em.int ../frame/module_domain.o ../frame/module_configure.o \
 		../frame/module_timing.o ../frame/module_driver_constants.o \
 		../frame/module_wrf_error.o
 
-start_domain: start_domain_em.int ../frame/module_domain.o ../frame/module_configure.o
+start_domain.o: start_domain_em.int ../frame/module_domain.o ../frame/module_configure.o
 
 module_bc.o: ../frame/module_configure.o ../frame/module_state_description.o \
-		../frame/module_wrf_error.o
-
-module_bc_ad.o: ../frame/module_configure.o ../frame/module_state_description.o \
-		../frame/module_wrf_error.o
-
-module_bc_bl.o: ../frame/module_configure.o ../frame/module_state_description.o \
 		../frame/module_wrf_error.o
 
 module_bc_time_utilities.o: $(ESMF_MOD_DEPENDENCE)
@@ -184,6 +171,15 @@ mediation_interp_domain.o: ../frame/module_domain.o ../frame/module_configure.o 
 
 set_timekeeping.o: ../frame/module_domain.o ../frame/module_configure.o \
                    $(ESMF_MOD_DEPENDENCE)
+
+module_wrf_top.o: ../frame/module_machine.o \
+                  ../frame/module_domain.o \
+                  ../frame/module_integrate.o \
+                  ../frame/module_driver_constants.o \
+                  ../frame/module_configure.o \
+                  ../frame/module_timing.o \
+                  ../frame/module_wrf_error.o \
+                  $(ESMF_MOD_DEPENDENCE)
 
 wrf_inputout.o                  : ../frame/module_domain.o \
 				../frame/module_configure.o ../frame/module_io.o module_io_wrf.o module_bc_time_utilities.o 
