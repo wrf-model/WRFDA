@@ -795,12 +795,12 @@ arch_superclean :
 ###########################################################
 #ARCH   AIX             (single-threaded, no nesting)
 #
-M4              = m4 -B12000
+M4              = m4 -B24000
 FC              = xlf90_r
 FFC             = xlf_r
 SFC             = $(FC)
 CC              = cc_r
-CC_TOOLS        = cc
+CC_TOOLS        = xlc
 LD              = $(FC)
 
 TRADFLAG        =
@@ -832,12 +832,12 @@ arch_superclean :
 ###########################################################
 #ARCH	AIX DM-Parallel          (RSL, IBM-MPI, supports nesting)
 #
-M4              = m4 -B12000
+M4              = m4 -B24000
 FC              = mpxlf90_r
 FFC             = mpxlf_r
 SFC             = xlf90_r
 CC              = mpcc_r
-CC_TOOLS        = cc
+CC_TOOLS        = xlc
 SCC             = cc_r
 LD              = $(FC)
 
@@ -884,12 +884,12 @@ arch_superclean :
 ###########################################################
 #ARCH	AIX DM-Parallel          (RSL_LITE, IBM-MPI, supports nesting)
 #
-M4              = m4 -B12000
+M4              = m4 -B24000
 FC              = mpxlf90_r
 FFC             = mpxlf_r
 SFC             = xlf90_r
 CC              = mpcc_r
-CC_TOOLS        = cc
+CC_TOOLS        = xlc
 SCC             = cc_r
 LD              = $(FC)
 

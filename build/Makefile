@@ -3,7 +3,7 @@ include configure.wrf
 setup : depend
 
 makedepf90 : 
-	@ ( cd $(EXTERNAL)/makedepf90/makedepf90-2.8.8; ./configure; make )
+	@ ( cd $(EXTERNAL)/makedepf90/makedepf90-2.8.8; export CC=$(CC_TOOLS); ./configure; make )
 	cp $(EXTERNAL)/makedepf90/makedepf90-2.8.8/makedepf90 .
 
 links : 

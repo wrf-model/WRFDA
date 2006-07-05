@@ -1840,6 +1840,7 @@ SUBROUTINE init_module_io
 !</DESCRIPTION>
   CALL init_io_handles
 END SUBROUTINE init_module_io
+
 END MODULE module_io
 
 

@@ -27,8 +27,8 @@ PROG = makedepf90
 
 VERSION = 2.8.8
 
-CC = gcc
-CFLAGS = -g -O2
+CC = xlc
+CFLAGS = -g
 CPPFLAGS =  -DVERSION=\"$(VERSION)\"
 
 LEX = flex
@@ -44,7 +44,7 @@ bindir = ${exec_prefix}/bin
 mandir = ${prefix}/man
 
 # How to install stuff
-INSTALL=/usr/bin/install -c
+INSTALL=/usr/local/bin/install -c
 INSTALL_PROGRAM=${INSTALL}
 INSTALL_DATA=${INSTALL} -m 644
 
