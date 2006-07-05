@@ -24,6 +24,7 @@ links :
 	@ $(LN) $(IO_INT)/* .
 	@ $(LN) $(IO_NETCDF)/* .
 	@ $(LN) $(IO_GRIB_SHARE)/* .
+	@ $(LN) $(IO_GRIB1)/* .
 	@ $(LN) $(IOAPI_SHARE)/* .
 	@ $(LN) $(ESMF_TIME_F90)/* .
 	@ $(LN) $(BUFR_NCEP_NCO)/* .
