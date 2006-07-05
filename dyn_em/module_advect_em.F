@@ -491,6 +491,8 @@ SUBROUTINE advect_u   ( u, u_old, tendency,            &
       i_end   = ite
       IF ( config_flags%open_xs .or. specified ) i_start = MAX(ids+1,its)
       IF ( config_flags%open_xe .or. specified ) i_end   = MIN(ide-1,ite)
+      IF ( config_flags%periodic_x ) i_start = its
+      IF ( config_flags%periodic_x ) i_end = ite
 
       j_start = jts
       j_end   = MIN(jte,jde-1)
@@ -792,6 +794,8 @@ SUBROUTINE advect_u   ( u, u_old, tendency,            &
       i_end   = ite
       IF ( config_flags%open_xs .or. specified ) i_start = MAX(ids+1,its)
       IF ( config_flags%open_xe .or. specified ) i_end   = MIN(ide-1,ite)
+      IF ( config_flags%periodic_x ) i_start = its
+      IF ( config_flags%periodic_x ) i_end = ite
 
       j_start = jts
       j_end   = MIN(jte,jde-1)
@@ -970,6 +974,8 @@ SUBROUTINE advect_u   ( u, u_old, tendency,            &
       i_end   = ite
       IF ( config_flags%open_xs .or. specified ) i_start = MAX(ids+1,its)
       IF ( config_flags%open_xe .or. specified ) i_end   = MIN(ide-1,ite)
+      IF ( config_flags%periodic_x ) i_start = its
+      IF ( config_flags%periodic_x ) i_end = ite
 
       j_start = jts
       j_end   = MIN(jte,jde-1)
@@ -1055,6 +1061,8 @@ SUBROUTINE advect_u   ( u, u_old, tendency,            &
       IF ( config_flags%open_xe ) i_end   = MIN(ide-1,ite)
       IF ( specified ) i_start = MAX(ids+2,its)
       IF ( specified ) i_end   = MIN(ide-2,ite)
+      IF ( config_flags%periodic_x ) i_start = its
+      IF ( config_flags%periodic_x ) i_end = ite
 
       DO j = j_start, j_end
       DO k=kts,ktf
@@ -1067,7 +1075,7 @@ SUBROUTINE advect_u   ( u, u_old, tendency,            &
       ENDDO
       ENDDO
 
-      IF ( specified .AND. its .LE. ids+1 ) THEN
+      IF ( specified .AND. its .LE. ids+1 .AND. .NOT. config_flags%periodic_x ) THEN
         DO j = j_start, j_end
         DO k=kts,ktf
            i = ids+1
@@ -1080,7 +1088,7 @@ SUBROUTINE advect_u   ( u, u_old, tendency,            &
         ENDDO
         ENDDO
       ENDIF
-      IF ( specified .AND. ite .GE. ide-1 ) THEN
+      IF ( specified .AND. ite .GE. ide-1 .AND. .NOT. config_flags%periodic_x ) THEN
         DO j = j_start, j_end
         DO k=kts,ktf
            i = ide-1
@@ -1221,6 +1229,8 @@ SUBROUTINE advect_u   ( u, u_old, tendency,            &
 
    IF ( config_flags%open_ys .or. specified ) i_start = MAX(ids+1,its)
    IF ( config_flags%open_ye .or. specified ) i_end   = MIN(ide-1,ite)
+      IF ( config_flags%periodic_x ) i_start = its
+      IF ( config_flags%periodic_x ) i_end = ite
 
    DO i = i_start, i_end
      vflux(i,kts)=0.
@@ -1466,20 +1476,20 @@ SUBROUTINE advect_v   ( v, v_old, tendency,            &
    REAL    :: q_im3, q_im2, q_im1, q_i, q_ip1, q_ip2, ua, vel
 
    flux4(q_im2, q_im1, q_i, q_ip1, ua) =                     &
-            (7./12.)*(q_i + q_im1) - (1./12.)*(q_ip1 + q_im2)
+          ( 7.*(q_i + q_im1) - (q_ip1 + q_im2) )/12.0
 
    flux3(q_im2, q_im1, q_i, q_ip1, ua) =                     &
            flux4(q_im2, q_im1, q_i, q_ip1, ua) +                &
-           sign(1.,ua)*(1./12.)*((q_ip1 - q_im2)-3.*(q_i-q_im1))
+           sign(1.,ua)*((q_ip1 - q_im2)-3.*(q_i-q_im1))/12.0
 
    flux6(q_im3, q_im2, q_im1, q_i, q_ip1, q_ip2, ua) =       &
-            (37./60.)*(q_i+q_im1) - (2./15.)*(q_ip1+q_im2)      &
-            +(1./60.)*(q_ip2+q_im3)
+                      ( 37.*(q_i+q_im1) - 8.*(q_ip1+q_im2)   &
+                     +(q_ip2+q_im3) )/60.0
 
    flux5(q_im3, q_im2, q_im1, q_i, q_ip1, q_ip2, ua) =       &
            flux6(q_im3, q_im2, q_im1, q_i, q_ip1, q_ip2, ua)    &
-            -sign(1.,ua)*(1./60.)*(                             &
-              (q_ip2-q_im3)-5.*(q_ip1-q_im2)+10.*(q_i-q_im1) )
+            -sign(1.,ua)*(                             &
+              (q_ip2-q_im3)-5.*(q_ip1-q_im2)+10.*(q_i-q_im1) )/60.0
 
 
 
@@ -2376,8 +2386,10 @@ SUBROUTINE advect_v   ( v, v_old, tendency,            &
         ENDDO
       ENDIF
 
-      IF ( config_flags%open_xs .or. specified ) i_start = MAX(ids+1,its)
-      IF ( config_flags%open_xe .or. specified ) i_end   = MIN(ide-2,ite)
+      IF ( .NOT. config_flags%periodic_x ) THEN
+        IF ( config_flags%open_xs .or. specified ) i_start = MAX(ids+1,its)
+        IF ( config_flags%open_xe .or. specified ) i_end   = MIN(ide-2,ite)
+      ENDIF
 
       DO j = j_start, j_end
       DO k=kts,ktf
@@ -2771,20 +2783,20 @@ SUBROUTINE advect_scalar   ( field, field_old, tendency,    &
    REAL    :: q_im3, q_im2, q_im1, q_i, q_ip1, q_ip2, ua, vel
 
       flux4(q_im2, q_im1, q_i, q_ip1, ua) =                     &
-            (7./12.)*(q_i + q_im1) - (1./12.)*(q_ip1 + q_im2)
+          ( 7.*(q_i + q_im1) - (q_ip1 + q_im2) )/12.0
 
       flux3(q_im2, q_im1, q_i, q_ip1, ua) =                     &
            flux4(q_im2, q_im1, q_i, q_ip1, ua) +                &
-           sign(1.,ua)*(1./12.)*((q_ip1 - q_im2)-3.*(q_i-q_im1))
+           sign(1.,ua)*((q_ip1 - q_im2)-3.*(q_i-q_im1))/12.0
 
       flux6(q_im3, q_im2, q_im1, q_i, q_ip1, q_ip2, ua) =       &
-            (37./60.)*(q_i+q_im1) - (2./15.)*(q_ip1+q_im2)      &
-            +(1./60.)*(q_ip2+q_im3)
+          ( 37.*(q_i+q_im1) - 8.*(q_ip1+q_im2)                  &
+            +(q_ip2+q_im3) )/60.0
 
       flux5(q_im3, q_im2, q_im1, q_i, q_ip1, q_ip2, ua) =       &
            flux6(q_im3, q_im2, q_im1, q_i, q_ip1, q_ip2, ua)    &
-            -sign(1.,ua)*(1./60.)*(                             &
-              (q_ip2-q_im3)-5.*(q_ip1-q_im2)+10.*(q_i-q_im1) )
+            -sign(1.,ua)*(                             &
+              (q_ip2-q_im3)-5.*(q_ip1-q_im2)+10.*(q_i-q_im1) )/60.0
 
 
    LOGICAL :: specified
@@ -3578,8 +3590,10 @@ SUBROUTINE advect_scalar   ( field, field_old, tendency,    &
       j_start = jts
       j_end   = MIN(jte,jde-1)
 
-      IF ( config_flags%open_xs .or. specified ) i_start = MAX(ids+1,its)
-      IF ( config_flags%open_xe .or. specified ) i_end   = MIN(ide-2,ite)
+      IF ( .NOT. config_flags%periodic_x ) THEN
+        IF ( config_flags%open_xs .or. specified ) i_start = MAX(ids+1,its)
+        IF ( config_flags%open_xe .or. specified ) i_end   = MIN(ide-2,ite)
+      ENDIF
 
       DO j = j_start, j_end
       DO k = kts, ktf
@@ -3939,20 +3953,20 @@ SUBROUTINE advect_w    ( w, w_old, tendency,            &
    REAL    :: q_im3, q_im2, q_im1, q_i, q_ip1, q_ip2, ua, vel
 
       flux4(q_im2, q_im1, q_i, q_ip1, ua) =                     &
-            (7./12.)*(q_i + q_im1) - (1./12.)*(q_ip1 + q_im2)
+          ( 7.*(q_i + q_im1) - (q_ip1 + q_im2) )/12.0
 
       flux3(q_im2, q_im1, q_i, q_ip1, ua) =                     &
            flux4(q_im2, q_im1, q_i, q_ip1, ua) +                &
-           sign(1.,ua)*(1./12.)*((q_ip1 - q_im2)-3.*(q_i-q_im1))
+           sign(1.,ua)*((q_ip1 - q_im2)-3.*(q_i-q_im1))/12.0
 
       flux6(q_im3, q_im2, q_im1, q_i, q_ip1, q_ip2, ua) =       &
-            (37./60.)*(q_i+q_im1) - (2./15.)*(q_ip1+q_im2)      &
-            +(1./60.)*(q_ip2+q_im3)
+                      ( 37.*(q_i+q_im1) - 8.*(q_ip1+q_im2)      &
+                     +(q_ip2+q_im3) )/60.0
 
       flux5(q_im3, q_im2, q_im1, q_i, q_ip1, q_ip2, ua) =       &
            flux6(q_im3, q_im2, q_im1, q_i, q_ip1, q_ip2, ua)    &
-            -sign(1.,ua)*(1./60.)*(                             &
-              (q_ip2-q_im3)-5.*(q_ip1-q_im2)+10.*(q_i-q_im1) )
+            -sign(1.,ua)*(                             &
+              (q_ip2-q_im3)-5.*(q_ip1-q_im2)+10.*(q_i-q_im1) )/60.0
 
 
    LOGICAL :: specified
@@ -4933,8 +4947,10 @@ ELSE IF (horz_order == 2 ) THEN
       j_start = jts
       j_end   = MIN(jte,jde-1)
 
-      IF ( config_flags%open_xs .or. specified ) i_start = MAX(ids+1,its)
-      IF ( config_flags%open_xe .or. specified ) i_end   = MIN(ide-2,ite)
+      IF ( .NOT. config_flags%periodic_x ) THEN
+        IF ( config_flags%open_xs .or. specified ) i_start = MAX(ids+1,its)
+        IF ( config_flags%open_xe .or. specified ) i_end   = MIN(ide-2,ite)
+      ENDIF
 
       DO j = j_start, j_end
       DO k=kts+1,ktf

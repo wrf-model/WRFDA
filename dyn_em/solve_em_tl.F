@@ -2267,6 +2267,7 @@ BENCH_START(tke_adv_tim)
                            msfu, msfv, msft,                 &
                            rdx, rdy, rdn, rdnw, khdif,       &
                            kvdif, xkmhd,                     &
+                           grid%diff_6th_opt, grid%diff_6th_rate, &
                            ids, ide, jds, jde, kds, kde,     &
                            ims, ime, jms, jme, kms, kme,     &
                            grid%i_start(ij), grid%i_end(ij), &
@@ -2346,6 +2347,7 @@ BENCH_END(tke_adv_tim)
                              msfu, msfv, msft,                 &
                              rdx, rdy, rdn, rdnw,              &
                              khdif, kvdif, xkmhd,              &
+                             grid%diff_6th_opt, grid%diff_6th_rate, &
                              ids, ide, jds, jde, kds, kde,     &
                              ims, ime, jms, jme, kms, kme,     &
                              grid%i_start(ij), grid%i_end(ij), &

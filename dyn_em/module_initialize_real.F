@@ -112,12 +112,16 @@ CONTAINS
       LOGICAL :: were_bad
 
       LOGICAL :: stretch_grid, dry_sounding, debug
+integer iicount
 
 !      INTEGER , PARAMETER :: nl_max = 1000
 !      REAL , DIMENSION(nl_max) :: dn
 
 
 integer::oops1,oops2
+
+!-- Carsel and Parrish [1988]
+        REAL , DIMENSION(100) :: lqmi
 
 #ifdef DEREF_KLUDGE
 !  see http://www.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm
@@ -190,7 +194,7 @@ integer::oops1,oops2
 
       !  Pull in the info in the namelist to compare it to the input data.
 
-      real_data_init_type = model_config_rec%real_data_init_type
+      grid%real_data_init_type = model_config_rec%real_data_init_type
 
       !  Save the TSK field for later use in the sea ice surface temperature
       !  for the Noah LSM scheme.
@@ -279,15 +283,15 @@ integer::oops1,oops2
       num_veg_cat      = SIZE ( landusef , DIM=2 )
       num_soil_top_cat = SIZE ( soilctop , DIM=2 )
       num_soil_bot_cat = SIZE ( soilcbot , DIM=2 )
-      CALL nl_get_seaice_threshold ( grid%id , seaice_threshold ) 
-      CALL nl_get_isice ( grid%id , isice )
-      CALL nl_get_iswater ( grid%id , iswater )
+      CALL nl_get_seaice_threshold ( grid%id , grid%seaice_threshold ) 
+      CALL nl_get_isice ( grid%id , grid%isice )
+      CALL nl_get_iswater ( grid%id , grid%iswater )
       CALL adjust_for_seaice_pre ( xice , landmask , tsk , ivgtyp , vegcat , lu_index , &
                                    xland , landusef , isltyp , soilcat , soilctop , &
                                    soilcbot , tmn , &
-                                   seaice_threshold , &
+                                   grid%seaice_threshold , &
                                    num_veg_cat , num_soil_top_cat , num_soil_bot_cat , &
-                                   iswater , isice , &
+                                   grid%iswater , grid%isice , &
                                    model_config_rec%sf_surface_physics(grid%id) , & 
                                    ids , ide , jds , jde , kds , kde , & 
                                    ims , ime , jms , jme , kms , kme , & 
@@ -462,6 +466,74 @@ integer::oops1,oops2
 
       END SELECT interpolate_soil_tmw
 
+      !  Minimum soil values, residual, from RUC LSM scheme.  For input from Noah and using
+      !  RUC LSM scheme, this must be subtracted from the input total soil moisture.  For
+      !  input RUC data and using the Noah LSM scheme, this value must be added to the soil
+      !  moisture input.
+
+      lqmi(1:num_soil_top_cat) = &
+      (/0.045, 0.057, 0.065, 0.067, 0.034, 0.078, 0.10,     &
+        0.089, 0.095, 0.10,  0.070, 0.068, 0.078, 0.0,      &
+        0.004, 0.065, 0.020, 0.004, 0.008 /)
+
+      !  At the initial time we care about values of soil moisture and temperature, other times are
+      !  ignored by the model, so we ignore them, too.  
+
+      IF ( domain_ClockIsStartTime(grid) ) THEN
+         account_for_zero_soil_moisture : SELECT CASE ( model_config_rec%sf_surface_physics(grid%id) )
+   
+            CASE ( LSMSCHEME )
+               iicount = 0
+               IF      ( FLAG_SM000010 .EQ. 1 ) THEN
+                  DO j = jts, MIN(jde-1,jte)
+                     DO i = its, MIN(ide-1,ite)
+                        IF ( (landmask(i,j).gt.0.5) .and. ( tslb(i,1,j) .gt. 200 ) .and. &
+                             ( tslb(i,1,j) .lt. 400 ) .and. ( smois(i,1,j) .lt. 0.005 ) ) then
+                           print *,'Noah -> Noah: bad soil moisture at i,j = ',i,j,smois(i,:,j)
+                           iicount = iicount + 1
+                           smois(i,:,j) = 0.005
+                        END IF
+                     END DO
+                  END DO
+                  IF ( iicount .GT. 0 ) THEN
+                     print *,'Noah -> Noah: total number of small soil moisture locations = ',iicount
+                  END IF
+               ELSE IF ( FLAG_SOILM000 .EQ. 1 ) THEN
+                  DO j = jts, MIN(jde-1,jte)
+                     DO i = its, MIN(ide-1,ite)
+                        smois(i,:,j) = smois(i,:,j) + lqmi(isltyp(i,j))
+                     END DO
+                  END DO
+                  DO j = jts, MIN(jde-1,jte)
+                     DO i = its, MIN(ide-1,ite)
+                        IF ( (landmask(i,j).gt.0.5) .and. ( tslb(i,1,j) .gt. 200 ) .and. &
+                             ( tslb(i,1,j) .lt. 400 ) .and. ( smois(i,1,j) .lt. 0.005 ) ) then
+                           print *,'RUC -> Noah: bad soil moisture at i,j = ',i,j,smois(i,:,j)
+                           iicount = iicount + 1
+                           smois(i,:,j) = 0.005
+                        END IF
+                     END DO
+                  END DO
+                  IF ( iicount .GT. 0 ) THEN
+                     print *,'RUC -> Noah: total number of small soil moisture locations = ',iicount
+                  END IF
+               END IF
+   
+            CASE ( RUCLSMSCHEME )
+               iicount = 0
+               IF      ( FLAG_SM000010 .EQ. 1 ) THEN
+                  DO j = jts, MIN(jde-1,jte)
+                     DO i = its, MIN(ide-1,ite)
+                        smois(i,:,j) = MAX ( smois(i,:,j) - lqmi(isltyp(i,j)) , 0. )
+                     END DO
+                  END DO
+               ELSE IF ( FLAG_SOILM000 .EQ. 1 ) THEN
+                  ! no op
+               END IF
+   
+         END SELECT account_for_zero_soil_moisture
+      END IF
+
       !  Is the TSLB reasonable?
 
       DO j = jts, MIN(jde-1,jte)
@@ -519,17 +591,17 @@ integer::oops1,oops2
       num_veg_cat      = SIZE ( landusef , DIM=2 )
       num_soil_top_cat = SIZE ( soilctop , DIM=2 )
       num_soil_bot_cat = SIZE ( soilcbot , DIM=2 )
-      CALL nl_get_seaice_threshold ( grid%id , seaice_threshold ) 
-      CALL nl_get_isice ( grid%id , isice )
-      CALL nl_get_iswater ( grid%id , iswater )
+      CALL nl_get_seaice_threshold ( grid%id , grid%seaice_threshold ) 
+      CALL nl_get_isice ( grid%id , grid%isice )
+      CALL nl_get_iswater ( grid%id , grid%iswater )
       CALL adjust_for_seaice_post ( xice , landmask , tsk , tsk_save , ivgtyp , vegcat , lu_index , &
                                     xland , landusef , isltyp , soilcat , soilctop , &
                                     soilcbot , tmn , vegfra , &
                                     tslb , smois , sh2o , &
-                                    seaice_threshold , &
+                                    grid%seaice_threshold , &
                                     num_veg_cat , num_soil_top_cat , num_soil_bot_cat , &
                                     model_config_rec%num_soil_layers , &
-                                    iswater , isice , &
+                                    grid%iswater , grid%isice , &
                                     model_config_rec%sf_surface_physics(grid%id) , & 
                                     ids , ide , jds , jde , kds , kde , & 
                                     ims , ime , jms , jme , kms , kme , & 
@@ -661,8 +733,8 @@ endif
 
       !  Inverse grid distances.
 
-      rdx = 1./dx
-      rdy = 1./dy
+      rdx = 1./config_flags%dx
+      rdy = 1./config_flags%dy
 
       !  Some of the many weird geopotential initializations that we'll see today: ph0 is total, 
       !  and ph_2 is a perturbation from the base state geopotential.  We set the base geopotential 
@@ -1106,6 +1178,36 @@ endif
 #   include "HALO_EM_INIT_5.inc"
 #endif
    END SUBROUTINE rebalance
+
+!---------------------------------------------------------------------
+
+   RECURSIVE SUBROUTINE find_my_parent ( grid_ptr_in , grid_ptr_out , id_wanted , found_the_id )
+
+      USE module_domain
+
+      TYPE(domain) , POINTER :: grid_ptr_in , grid_ptr_out
+      TYPE(domain) , POINTER :: grid_ptr_sibling
+      INTEGER :: id_wanted
+      LOGICAL :: found_the_id
+
+      found_the_id = .FALSE.
+      grid_ptr_sibling => grid_ptr_in
+      DO WHILE ( ASSOCIATED ( grid_ptr_sibling ) )
+
+         IF ( grid_ptr_sibling%grid_id .EQ. id_wanted ) THEN
+            found_the_id = .TRUE.
+            grid_ptr_out => grid_ptr_sibling
+            RETURN
+         ELSE IF ( grid_ptr_sibling%num_nests .GT. 0 ) THEN
+            grid_ptr_sibling => grid_ptr_sibling%nests(1)%ptr
+            CALL find_my_parent ( grid_ptr_sibling , grid_ptr_out , id_wanted , found_the_id )
+         ELSE
+            grid_ptr_sibling => grid_ptr_sibling%sibling
+         END IF
+
+      END DO
+
+   END SUBROUTINE find_my_parent
 
 !---------------------------------------------------------------------
 

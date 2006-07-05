@@ -1,4 +1,9 @@
-include ../configure.wrf
+#
+
+LN      =       ln -sf
+MAKE    =       make -i -r
+RM      =       rm -f
+
 
 MODULES =                 		\
         module_exp.o         		\
@@ -15,10 +20,10 @@ TARGETDIR    =  ./
 $(LIBTARGET) :  $(MODULES) $(OBJS)
 		$(AR) ../main/libwrflib.a $(MODULES) $(OBJS)
 
-clean:
-	@ $(RM) *.o *.f
+include ../configure.wrf
 
-superclean : clean
+clean:
+	@ echo 'use the clean script'
 
 # DEPENDENCIES : only dependencies after this line (don't remove the word DEPENDENCIES)
 

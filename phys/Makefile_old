@@ -1,4 +1,9 @@
-include ../configure.wrf
+#
+
+LN      =       ln -sf
+MAKE    =       make -i -r
+RM      =       rm -f
+
 
 MODULES = \
 	module_bl_ysu.o \
@@ -27,6 +32,7 @@ MODULES = \
 	module_sf_gfs.o \
 	module_sf_slab.o  \
 	module_sf_noahlsm.o  \
+	module_sf_lsm_nmm.o  \
 	module_sf_ruclsm.o \
 	module_sf_sfcdiags.o \
 	module_sf_myjsfc.o \
@@ -45,11 +51,12 @@ MODULES = \
   
 OBJS    =
 
-NMM_MODULES =  module_sf_lsm_nmm.o
+NMM_MODULES =  
 
-all : physics
+LIBTARGET    =  physics
+TARGETDIR    =  ./
 
-physics : 
+$(LIBTARGET) :
 		if [ $(WRF_NMM_CORE) -eq 1 ] ; then \
                   $(MAKE) nmm_contrib                                      ; \
                   $(AR) ../main/libwrflib.a $(MODULES) $(OBJS) $(NMM_OBJS) $(NMM_MODULES) ; \
@@ -58,14 +65,14 @@ physics :
                   $(AR) ../main/libwrflib.a $(MODULES) $(OBJS)             ; \
                 fi
 
+include ../configure.wrf
+
 nmm_contrib : $(NMM_OBJS) $(NMM_MODULES) $(MODULES) $(OBJS)
 
 non_nmm : $(MODULES) $(OBJS)
 
 clean:
-	@ $(RM) *.o *.f
-
-superclean : clean
+	@ echo 'use the clean script'
 
 # DEPENDENCIES : only dependencies after this line (don't remove the word DEPENDENCIES)
 
@@ -98,7 +105,8 @@ module_ra_rrtm.o: ../frame/module_wrf_error.o \
 
 module_mp_lin.o : ../frame/module_wrf_error.o
 
-module_sf_lsm_nmm.o: ../share/module_model_constants.o
+module_sf_lsm_nmm.o: ../share/module_model_constants.o \
+		../share/module_MPP.o
 
 module_sf_myjsfc.o: ../share/module_model_constants.o 
 
@@ -149,7 +157,8 @@ module_physics_init.o : \
 		../frame/module_wrf_error.o \
 		../frame/module_dm.o \
 		../share/module_model_constants.o \
-		../share/module_date_time.o
+		../share/module_date_time.o  \
+		module_sf_lsm_nmm.o	
 
 module_microphysics_driver.o: \
                 module_mp_kessler.o module_mp_lin.o \
@@ -201,6 +210,7 @@ module_surface_driver.o: \
 		module_sf_sfcdiags.o		\
 		../frame/module_state_description.o \
 		../frame/module_configure.o \
-		../share/module_model_constants.o
+		../share/module_model_constants.o  \
+ 		module_sf_lsm_nmm.o
 
 # DO NOT DELETE

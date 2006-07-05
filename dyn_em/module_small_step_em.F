@@ -120,7 +120,7 @@ SUBROUTINE small_step_prep( u_1, u_2, v_1, v_2, w_1, w_2, &
     !  if this is the first RK step, reset *_1 to *_2
     !  (we are replacing the t-dt fields with the time t fields)
 
-    IF ((rk_step == 1)) THEN
+    IF (rk_step == 1) THEN
 
 ! 1 jun 2001 -> added boundary copy to 2D boundary condition routines,
 !  should be OK now without the following data copy
@@ -808,7 +808,6 @@ SUBROUTINE advance_uv ( u, ru_tend, v, rv_tend,        &
 !  now, the real work.
 !  set the loop bounds taking into account boundary conditions.
 
-
     IF( config_flags%nested .or. config_flags%specified ) THEN
       i_start = max( its,ids+spec_zone )
       i_end   = min( ite,ide-spec_zone-1 )
@@ -1115,8 +1114,6 @@ SUBROUTINE advance_mu_t( ww, ww_1, u, u_1, v, v_1,            &
   j_end   = jte
   k_start = kts
   k_end   = kte-1
-
-
      
   i_endu = i_end
   j_endv = j_end
@@ -1124,17 +1121,20 @@ SUBROUTINE advance_mu_t( ww, ww_1, u, u_1, v, v_1,            &
   IF(j_end == jde) j_end = j_end - 1
   IF(i_end == ide) i_end = i_end - 1
 
-  IF ( (config_flags%specified .or. config_flags%nested) .and. (its == ids) ) &
+  IF ( .NOT. config_flags%periodic_x )THEN
+    IF ( (config_flags%specified .or. config_flags%nested) .and. (its == ids) ) &
              i_start = i_start + 1
 
-  IF ( (config_flags%specified .or. config_flags%nested) .and. (ite == ide) ) &
+    IF ( (config_flags%specified .or. config_flags%nested) .and. (ite == ide) ) &
              i_end   = i_end - 1
+  ENDIF
 
   IF ( (config_flags%specified .or. config_flags%nested) .and. (jts == jds) ) &
              j_start = j_start + 1
 
   IF ( (config_flags%specified .or. config_flags%nested) .and. (jte == jde) ) &
              j_end   = j_end - 1
+
 
 !        CALCULATION OF WW (dETA/dt)
    DO j = j_start, j_end
@@ -1319,8 +1319,8 @@ SUBROUTINE advance_w( w, rw_tend, ww, u, v,       &
 !</DESCRIPTION>
 
 !  set loop limits.
-!  Currently set for periodic boundary conditions
-      
+!  currently set for periodic boundary conditions
+
       i_start = its
       i_end   = ite
       j_start = jts
@@ -1332,11 +1332,13 @@ SUBROUTINE advance_w( w, rw_tend, ww, u, v,       &
       IF(j_end == jde) j_end = j_end - 1
       IF(i_end == ide) i_end = i_end - 1
 
-  IF ( (config_flags%specified .or. config_flags%nested) .and. (its == ids) ) &
+  IF ( .NOT. config_flags%periodic_x )THEN
+    IF ( (config_flags%specified .or. config_flags%nested) .and. (its == ids) ) &
              i_start = i_start + 1
 
-  IF ( (config_flags%specified .or. config_flags%nested) .and. (ite == ide) ) &
+    IF ( (config_flags%specified .or. config_flags%nested) .and. (ite == ide) ) &
              i_end   = i_end - 1
+  ENDIF
 
   IF ( (config_flags%specified .or. config_flags%nested) .and. (jts == jds) ) &
              j_start = j_start + 1
@@ -1356,17 +1358,21 @@ SUBROUTINE advance_w( w, rw_tend, ww, u, v,       &
        mut_inv(i) = 1./mut(i,j)
        msft_inv(i) = 1./msft(i,j)
     ENDDO
-
     DO k=1, k_end
     DO i=i_start, i_end
       t_2ave(i,k,j)=.5*((1.+epssm)*t_2(i,k,j)       &
                     +(1.-epssm)*t_2ave(i,k,j))
       t_2ave(i,k,j)=(t_2ave(i,k,j)-mu1(i,j)*t_1(i,k,j)) &
                     /(muts(i,j)*(t0+t_1(i,k,j)))
-      wdwn(i,k+1)=.5*(ww(i,k+1,j)+ww(i,k,j))*rdnw(k)    &
-           *(ph_1(i,k+1,j)-ph_1(i,k,j)+phb(i,k+1,j)-phb(i,k,j))
-      rhs(i,k+1) = dts*(ph_tend(i,k+1,j) + .5*g*(1.-epssm)*w(i,k+1,j))
+    ENDDO
+    ENDDO
 
+
+    DO k=2,k_end+1
+    DO i=i_start, i_end
+      wdwn(i,k)=.5*(ww(i,k,j)+ww(i,k-1,j))*rdnw(k-1)    &
+           *(ph_1(i,k,j)-ph_1(i,k-1,j)+phb(i,k,j)-phb(i,k-1,j))
+      rhs(i,k) = dts*(ph_tend(i,k,j) + .5*g*(1.-epssm)*w(i,k,j))
     ENDDO
     ENDDO
 
@@ -1454,14 +1460,18 @@ SUBROUTINE advance_w( w, rw_tend, ww, u, v,       &
     DO k=k_end,2,-1
     DO i=i_start, i_end
        w (i,k,j)=w (i,k,j)-gamma(i,k,j)*w(i,k+1,j)
-       ph(i,k+1,j) = rhs(i,k+1)+msft(i,j)*.5*dts*g*(1.+epssm) &
-                      *w(i,k+1,j)/muts(i,j)
     ENDDO
     ENDDO
 
+! NOTE:  phi'' is not coupled with the map-scale factor (1/m),
+!        but the tendency is, so...
+!        we must multiply tendency by msft here
+
+    DO k=2,k_end+1
     DO i=i_start, i_end
-       ph(i,2,j) =  rhs(i,2)+msft(i,j)*.5*dts*g*(1.+epssm) &
-                      *w(i,2,j)/muts(i,j)
+      ph(i,k,j) = rhs(i,k)+msft(i,j)*.5*dts*g*(1.+epssm) &
+                      *w(i,k,j)/muts(i,j)
+    ENDDO
     ENDDO
 
   ENDDO j_loop_w
@@ -1504,8 +1514,6 @@ SUBROUTINE sumflux ( ru, rv, ww,                             &
                                                                 ww_m
   REAL, DIMENSION(ims:ime, jms:jme) , INTENT(IN   ) :: muu, muv, msfu, msfv
 
-  INTEGER :: mini, minj, mink
-
   REAL, INTENT(IN   )  ::  epssm
   INTEGER   :: i,j,k
 
@@ -1528,98 +1536,61 @@ SUBROUTINE sumflux ( ru, rv, ww,                             &
       ENDDO
     ENDIF
 
-  mini = min(ide-1,ite)
-  minj = min(jde-1,jte)
-  mink = min(kde-1,kte)
-
-
-    DO  j = jts, minj
-    DO  k = kts, mink
-    DO  i = its, mini
+    DO  j = jts, min(jde-1,jte)
+    DO  k = kts, min(kde-1,kte)
+    DO  i = its, ite
       ru_m(i,k,j)  = ru_m(i,k,j) + ru(i,k,j)
+    ENDDO
+    ENDDO
+    ENDDO
+
+    DO  j = jts, jte
+    DO  k = kts, min(kde-1,kte)
+    DO  i = its, min(ide-1,ite)
       rv_m(i,k,j)  = rv_m(i,k,j) + rv(i,k,j)
+    ENDDO
+    ENDDO
+    ENDDO
+
+    DO  j = jts, min(jde-1,jte)
+    DO  k = kts, kte
+    DO  i = its, min(ide-1,ite)
       ww_m(i,k,j)  = ww_m(i,k,j) + ww(i,k,j)
     ENDDO
     ENDDO
     ENDDO
- 
-    IF (ite .GT. mini) THEN
-      DO  j = jts, minj
-      DO  k = kts, mink
-      DO  i = mini+1, ite
-        ru_m(i,k,j)  = ru_m(i,k,j) + ru(i,k,j)
-      ENDDO
-      ENDDO
-      ENDDO
-    END IF
-    IF (jte .GT. minj) THEN
-      DO  j = minj+1, jte
-      DO  k = kts, mink
-      DO  i = its, mini
-	rv_m(i,k,j)  = rv_m(i,k,j) + rv(i,k,j)
-      ENDDO
-      ENDDO
-      ENDDO
-    END IF
-    IF ( kte .GT. mink) THEN
-      DO  j = jts, minj
-      DO  k = mink+1, kte
-      DO  i = its, mini
-        ww_m(i,k,j)  = ww_m(i,k,j) + ww(i,k,j)
-      ENDDO
-      ENDDO
-      ENDDO
-    END IF
 
   IF (iteration == number_of_small_timesteps) THEN
 
-    DO  j = jts, minj
-    DO  k = kts, mink
-    DO  i = its, mini
+    DO  j = jts, min(jde-1,jte)
+    DO  k = kts, min(kde-1,kte)
+    DO  i = its, ite
       ru_m(i,k,j)  = ru_m(i,k,j) / number_of_small_timesteps   &
                      + muu(i,j)*u_lin(i,k,j)/msfu(i,j)
+   
+    ENDDO
+    ENDDO
+    ENDDO
+
+    DO  j = jts, jte
+    DO  k = kts, min(kde-1,kte)
+    DO  i = its, min(ide-1,ite)
       rv_m(i,k,j)  = rv_m(i,k,j) / number_of_small_timesteps   &
-                     + muv(i,j)*v_lin(i,k,j)/msfv(i,j) 
-      ww_m(i,k,j)  = ww_m(i,k,j) / number_of_small_timesteps   &
-                     + ww_lin(i,k,j) 
-    ENDDO
-    ENDDO
-    ENDDO
-
-
-    IF (ite .GT. mini) THEN
-      DO  j = jts, minj
-      DO  k = kts, mink
-      DO  i = mini+1, ite
-        ru_m(i,k,j)  = ru_m(i,k,j) / number_of_small_timesteps   &
-                     + muu(i,j)*u_lin(i,k,j)/msfu(i,j)
-      ENDDO
-      ENDDO
-      ENDDO
-    END IF
-    IF (jte .GT. minj) THEN
-      DO  j = minj+1, jte
-      DO  k = kts, mink
-      DO  i = its, mini
-	rv_m(i,k,j)  = rv_m(i,k,j) / number_of_small_timesteps   &
                      + muv(i,j)*v_lin(i,k,j)/msfv(i,j)
-      ENDDO
-      ENDDO
-      ENDDO
-    END IF
-    IF ( kte .GT. mink) THEN
-      DO  j = jts, minj
-      DO  k = mink+1, kte
-      DO  i = its, mini
-        ww_m(i,k,j)  = ww_m(i,k,j) / number_of_small_timesteps   &
+    ENDDO
+    ENDDO
+    ENDDO
+
+    DO  j = jts, min(jde-1,jte)
+    DO  k = kts, kte
+    DO  i = its, min(ide-1,ite)
+      ww_m(i,k,j)  = ww_m(i,k,j) / number_of_small_timesteps   &
                      + ww_lin(i,k,j)
-      ENDDO
-      ENDDO
-      ENDDO
-    END IF
+    ENDDO
+    ENDDO
+    ENDDO
 
   ENDIF
-
 
 
 END SUBROUTINE sumflux 

@@ -1,9 +1,15 @@
-include ../configure.wrf
+#
+
+LN      =       ln -sf
+MAKE    =       make -i -r
+RM      =       rm -f
+
 
 MODULES =                 		\
         module_ADVECTION.o         	\
         module_BC_NMM.o         	\
         module_BNDRY_COND.o         	\
+        module_NEST_UTIL.o              \
         module_CTLBLK.o         	\
         module_DIFFUSION_NMM.o         	\
         module_IGWAVE_ADJUST.o         	\
@@ -33,17 +39,19 @@ OBJS    = 		          	\
 	RDTEMP.o    			\
 	BUCKETS.o 			\
         DSTRB.o                         \
-	CLTEND.o
+	CLTEND.o                        \
+        NMM_NEST_UTILS1.o
 
-all : dyn_nmm
 
-dyn_nmm  :  $(MODULES) $(OBJS)
+LIBTARGET    =  dyn_nmm
+TARGETDIR    =  ./
+$(LIBTARGET) :  $(MODULES) $(OBJS)
 		$(AR) ../main/libwrflib.a $(MODULES) $(OBJS)
 
-clean:
-	@ $(RM) *.f *.o
+include ../configure.wrf
 
-superclean : clean
+clean:
+	@ echo 'use the clean script'
 
 # DEPENDENCIES : only dependencies after this line (don't remove the word DEPENDENCIES)
 
