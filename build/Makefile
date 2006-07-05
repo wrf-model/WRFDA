@@ -21,15 +21,16 @@ links :
 	@ $(LN) $(TOOLS)/*.c .
 	@ $(LN) $(TOOLS)/*.h .
 	@ $(LN) $(DA)/*/* .
+	@ $(LN) $(IO_INT)/* .
 	@ $(LN) $(IO_GRIB_SHARE)/* .
 	@ $(LN) $(IOAPI_SHARE)/* .
 	@ $(LN) $(ESMF_TIME_F90)/* .
 	@ $(LN) $(BUFR_NCEP_NCO)/* .
 	@ $(LN) $(IO_NETCDF)/*.code .
 	@ $(LN) $(ARCH)/*.sed .
-	@ $(LN) $(CONVERTOR)/convert_tool .
-	@ $(LN) $(CONVERTOR)/kma_wave2grid .
-	@ $(LN) $(CONVERTOR)/wave2grid_kma .
+	@ $(LN) $(CONVERTOR)/convert_tool/* .
+	@ $(LN) $(CONVERTOR)/kma_wave2grid/* .
+	@ $(LN) $(CONVERTOR)/wave2grid_kma/* .
 	@ $(LN) $(CONVERTOR)/decode_l2_airs/* .
 	@ touch links
 
