@@ -3,18 +3,11 @@
 set nonomatch
 
 
-foreach dir ( frame chem share dyn_em dyn_exp dyn_nmm phys main tools da )
-( cd $dir ; echo $dir ; /bin/rm -f core wrf *.f *.exe *.kmo *.mod *.o *.inc *.a .*.m *.lst \
-                      db_* Warnings module_state_description.f90 module_dm.F gmeta \
+foreach dir ( frame chem share dyn_em dyn_exp dyn_nmm phys main tools )
+( cd $dir ; echo $dir ; /bin/rm -f core wrf *.f *.exe *.kmo *.mod *.o *.inc *.F90 *.a \
+                      db_* Warnings module_state_description.F module_dm.F gmeta \
                       wrfdata whatiread rsl.* show_domain* )
 end
-
-( cd da ; /bin/rm -f *.f *.o *.mod *.stb .*.m *.lst bufrlib.prm \
-  da_par_util/da_generic_boilerplate.inc )
-( cd external/RSL/RSL ; /bin/rm -f *.lst LAST_MADE* )
-( cd external/io_int ; /bin/rm -f *.f *.mod diffwrf)
-( cd convertor ; /bin/rm -f *.f *.o *.mod *.exe *.stb .*.m *.lst )
-( cd gen_be ; /bin/rm -f *.f *.o *.mod *.exe *.stb .*.m *.lst )
 
 ( cd tools/CodeBase ; make clean )
 
@@ -22,27 +15,20 @@ end
 
 
 if ( "$1" == '-a' ) then
-
-  if ( -f Registry/Registry ) then
-    /bin/cp Registry/Registry Registry/Registry.backup
-    /bin/rm -f Registry/Registry
-  endif
-
-  /bin/rm -fr ./netcdf_links
-  /bin/rm -fr tools/code_dbase
-  ( /bin/rm -f core *.out 1 )
-  ( cd external ; make -i superclean )
-  ( cd external/io_grib1/WGRIB ; make superclean )
-  ( cd tools ; make superclean )
-  ( cd inc; make superclean )
-  ( cd run ; make superclean )
-  ( cd test; make superclean )
-  ( cd main; make superclean )
-  ( cd da; make superclean )
-
   if ( -f configure.wrf ) then
     /bin/cp configure.wrf configure.wrf.backup
     /bin/rm -f configure.wrf
   endif
+  if ( -f Registry/Registry ) then
+    /bin/cp Registry/Registry Registry/Registry.backup
+    /bin/rm -f Registry/Registry
+  endif
+  /bin/rm -fr ./netcdf_links
+  /bin/rm -fr tools/code_dbase
+  ( cd external ; make -i superclean )
+  ( cd external/io_grib1/WGRIB ; make clean )
+  ( cd tools ; /bin/rm -f registry gen_comms.c fseeko_test fseeko64_test )
+  ( cd inc; /bin/rm -f dm_comm_cpp_flags wrf_io_flags.h wrf_status_codes.h )
+  ( cd run ; /bin/rm -f gm* out* fort* ideal* )
+  ( cd test/exp_real ; /bin/rm -f gm* out* fort* real* )
 endif
-
