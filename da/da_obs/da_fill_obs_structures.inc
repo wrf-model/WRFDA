@@ -1,9 +1,10 @@
-subroutine da_fill_obs_structures( iv, ob )
+SUBROUTINE da_fill_obs_structures( iv, ob )
 !----------------------------------------------------------------------------   
 !  History:
 !
 !  Additions:
-!             07/08/2003      Profiler and Buoy Obs            S. R. H. Rizvi
+!             07/08/2003     Profiler and Buoy Obs           Syed RH Rizvi    
+!             07/03/2006     Updated for AIRS retrievals     Syed RH Rizvi 
 !
 !  Purpose: Allocates observation structure and fills it from iv.
 !----------------------------------------------------------------------------   
@@ -16,14 +17,13 @@ subroutine da_fill_obs_structures( iv, ob )
    REAL                          :: rh_error ! RH obs. error.
    REAL                          :: q_error  ! q obs. error.
 
-   if (trace_use) call da_trace_entry("da_fill_obs_structures")
-
+   if (trace_use) CALL da_trace_entry("da_fill_obs_structures")
 
 !---------------------------------------------------------------------------
 !  [1.0] Allocate innovation vector and observation structures:
 !---------------------------------------------------------------------------
-
-   call da_allocate_y( iv, ob )
+   PRINT*,' IN DA_FILL OB_STRUCTURE ALLOCATING Y-ARRAY'
+   CALL da_allocate_y( iv, ob )
 
 !----------------------------------------------------------------------
 !  [2.0] Transfer observations:
@@ -225,7 +225,6 @@ subroutine da_fill_obs_structures( iv, ob )
    ENDIF
 
 !  [2.7] Transfer sonde obs:
-
    IF ( iv % num_sound > 0 ) THEN
       DO n = 1, iv % num_sound
          DO k = 1, iv % sound(n) % info % levels
@@ -274,7 +273,6 @@ subroutine da_fill_obs_structures( iv, ob )
       iv % sound_ef_u = 1.0
       iv % sound_ef_v = 1.0
       iv % sound_ef_t = 1.0
-      iv % sound_ef_p = 1.0
       iv % sound_ef_q = 1.0
 
    ENDIF
@@ -548,7 +546,37 @@ subroutine da_fill_obs_structures( iv, ob )
 
    ENDIF
 
-   if (trace_use) call da_trace_exit("da_fill_obs_structures")
+!  Transfer AIRS  retrievals:
+
+   IF ( iv % num_airsr > 0 ) THEN
+      DO n = 1, iv % num_airsr
+         DO k = 1, iv % airsr(n) % info % levels
+
+!           Copy observations variables:
+
+            ob % airsr(n) % t(k) = iv % airsr(n) % t(k) % inv
+            ob % airsr(n) % q(k) = iv % airsr(n) % q(k) % inv
+
+!           Calculate q error from rh error:
+
+            rh_error = iv%airsr(n)%q(k)%error ! q error is rh at this stage!
+            call da_get_q_error( iv % airsr(n) % p(k), &
+                                 ob % airsr(n) % t(k), &
+                                 ob % airsr(n) % q(k), &
+                                 iv % airsr(n) % t(k) % error, &
+                                 rh_error, q_error )
+
+            iv % airsr(n) % q(k) % error = q_error
+          if(iv%airsr(n)% q(k) % error == missing_r) iv%airsr(n)% q(k) % qc = missing_data
+          END DO
+      END DO
+
+!     Initialise obs error factors (optionally overwritten in use_obs_errfac)
+      iv % airsr_ef_t = 1.0
+      iv % airsr_ef_q = 1.0
+
+   ENDIF
+   if (trace_use) CALL da_trace_exit("da_fill_obs_structures")
 
 
-end subroutine da_fill_obs_structures
+END SUBROUTINE da_fill_obs_structures

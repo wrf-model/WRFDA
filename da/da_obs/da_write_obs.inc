@@ -1,4 +1,4 @@
-SUBROUTINE da_write_obs( ob, iv, re )
+subroutine da_write_obs( ob, iv, re )
 !----------------------------------------------------------------------------   
 !  History:
 !  Purpose: Writes out components of iv=O-B structure.
@@ -8,6 +8,7 @@ SUBROUTINE da_write_obs( ob, iv, re )
 !                        Polar orbiting satellite are
 !                        seperated & used as profile
 !           05/16/2006 - Updated for MPI run               Syed  RH  Rizvi
+!           07/03/2006 - Updated for AIRS retrievals       Syed  RH  Rizvi
 !
 !----------------------------------------------------------------------------   
    IMPLICIT NONE
@@ -582,8 +583,36 @@ SUBROUTINE da_write_obs( ob, iv, re )
     endif
    ENDIF
 
+!   Transfer AIRS retrievals:
+
+   IF ( iv % num_airsr > 0 ) THEN
+      num_obs = 0
+      DO n = 1, iv % num_airsr
+       if(iv%airsr(n)%loc%proc_domain) num_obs = num_obs + 1
+      ENDDO
+    if( num_obs > 0) then
+      write(ounit,'(a20,i8)')'airsr', num_obs    
+      num_obs = 0
+      DO n = 1, iv % num_airsr
+       if(iv%airsr(n)%loc%proc_domain) then
+        num_obs = num_obs + 1
+         write(ounit,'(i8)')iv % airsr(n) % info % levels
+         DO k = 1, iv % airsr(n) % info % levels
+            write(ounit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))')&
+                    num_obs,k, iv % airsr(n) % info % id, &  ! Station
+                         iv % airsr(n) % info % lat, &       ! Latitude
+                         iv % airsr(n) % info % lon, &       ! Longitude
+                         iv % airsr(n) % p(k), &             ! Obs Pressure
+                         ob%airsr(n)%t(k), iv%airsr(n)%t(k), re%airsr(n)%t(k), &! O,O-B,O-A t
+                         ob%airsr(n)%q(k), iv%airsr(n)%q(k), re%airsr(n)%q(k)   ! O,O-B,O-A q
+         END DO
+       endif
+      END DO
+    endif
+   ENDIF
+
    write(ounit,'(a20,i8)')'********************', 0
 
    close (ounit)
-END SUBROUTINE da_write_obs
+end subroutine da_write_obs
 

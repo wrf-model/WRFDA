@@ -1,8 +1,15 @@
-subroutine da_setup_obs_structures_bufr( xp, ob, iv )
+SUBROUTINE da_setup_obs_structures_bufr( xp, ob, iv )
 
-   !---------------------------------------------------------------------------
-   ! PURPOSE: Define, allocate and read observation structure.
-   !---------------------------------------------------------------------------
+!------------------------------------------------------------------------------
+! PURPOSE: Define, allocate and read observation structure.
+!
+! METHOD:  Define, allocate and read observation structure.
+!
+! HISTORY: 08/03/2005 - Creation of F90 version         Syed RH Rizvi  
+!          07/03/2006 - Update for AIRS retrieval       Syed RH Rizvi
+!
+! PARENT_MODULE: DA_Setup_Structures
+!------------------------------------------------------------------------------
 
    IMPLICIT NONE
    
@@ -13,11 +20,11 @@ subroutine da_setup_obs_structures_bufr( xp, ob, iv )
    CHARACTER(len=120)           :: filename
    integer                      :: n   
 
-   IF (trace_use) call da_trace_entry("da_setup_obs_structures_bufr")
+   IF (trace_use) CALL da_trace_entry("da_setup_obs_structures_bufr")
 
-   !--------------------------------------------------------------------------
-   ! [0.0] Initialize the counters.
-   !--------------------------------------------------------------------------
+!-----------------------------------------------------------------------------
+!  [0.0] Initialize the counters.
+!-----------------------------------------------------------------------------
 
    iv%total_obs = 0
    iv%num_sound = 0
@@ -41,6 +48,7 @@ subroutine da_setup_obs_structures_bufr( xp, ob, iv )
    iv%num_buoy  = 0
    iv%num_radar  = 0
    iv%num_bogus  = 0
+   iv%num_airsr = 0
 
    do n=0, max_fgat_time
       iv%ob_numb(n)%total = 0
@@ -65,13 +73,14 @@ subroutine da_setup_obs_structures_bufr( xp, ob, iv )
       iv%ob_numb(n)%buoy  = 0
       iv%ob_numb(n)%radar  = 0
       iv%ob_numb(n)%bogus  = 0
+      iv%ob_numb(n)%airsr = 0
    enddo
- 
-   !--------------------------------------------------------------------------
-   ! [1.0] Scan BUFR observation header and get idea of number of obs:
-   !--------------------------------------------------------------------------
 
-   if (num_fgat_time > 1) then
+!-----------------------------------------------------------------------------
+!  [1.0] Scan BUFR observation header and get idea of number of obs:
+!-----------------------------------------------------------------------------
+
+   if(num_fgat_time > 1) then
       filename = ' '
 
       do n=1, num_fgat_time
@@ -79,30 +88,28 @@ subroutine da_setup_obs_structures_bufr( xp, ob, iv )
 
          write(filename(1:10), fmt='(a, i2.2)') 'fgat_ob.', n
 
-         ! scan PREPBUFR OBSERVATION FILE
+!--------scan PREPBUFR OBSERVATION FILE
          call da_scan_bufr_obs (bufr_iunit, iv, xp, filename)
 
-
-         ! if(Use_RadarObs) then
-         !    ! scan Radar OBSERVATION FILE
-         !    write(filename(1:10), fmt='(a, i2.2)') 'radarob.', n
-         !    call da_scan_bufr_radar(Radar_iunit-1, iv, xp, filename)
-         ! endif
+!
+!         if(Use_RadarObs) then
+!!-----------scan Radar OBSERVATION FILE
+!            write(filename(1:10), fmt='(a, i2.2)') 'radarob.', n
+!            call da_scan_bufr_radar(Radar_iunit-1, iv, xp, filename)
+!         endif
       enddo
    else
       iv%current_ob_time = 1
       filename="ob.bufr"
       call da_scan_bufr_obs(bufr_iunit, iv, xp, filename)
 
-      ! scan MAIN BODY OF Radar OBSERVATION FILE
-      ! if(Use_RadarObs) &
-      !    call da_scan_bufr_radar(Radar_iunit-1, iv, xp)
+!-----scan MAIN BODY OF Radar OBSERVATION FILE
+!      if(Use_RadarObs) &
+!      call da_scan_bufr_radar(Radar_iunit-1, iv, xp)
    endif
-
-   !--------------------------------------------------------------------
-   ! Safety guard.
-   !--------------------------------------------------------------------
-
+!--------------------------------------------------------------------
+!--Safety guard.
+!--------------------------------------------------------------------
    if(iv%num_sound > max_sound_input ) &
       iv%num_sound = max_sound_input
 
@@ -142,14 +149,19 @@ subroutine da_setup_obs_structures_bufr( xp, ob, iv )
       iv%num_radar = max_radar_input
    if(iv%num_bogus > max_bogus_input ) &
       iv%num_bogus = max_bogus_input
-   ! if(iv%num_pseudo > max_pseudo_input ) &
-   !    iv%num_pseudo = max_pseudo_input
+   if(iv%num_airsr > max_airsret_input ) &
+      iv%num_airsr = max_airsret_input
+!  if(iv%num_pseudo > max_pseudo_input ) &
+!     iv%num_pseudo = max_pseudo_input
 
-   !--------------------------------------------------------------------------
-   ! Allocate the ob based on inputed number of obs:
-   !--------------------------------------------------------------------------
+!-----------------------------------------------------------------------------
+!   Allocate the ob based on inputed number of obs:
+!-----------------------------------------------------------------------------
 
-   call da_allocate_observations ( iv )
+   CALL da_allocate_observations ( iv )
+
+!-----------------------------------------------------------------------------
+
 
    iv%total_obs = 0
    iv%num_sound = 0
@@ -173,43 +185,47 @@ subroutine da_setup_obs_structures_bufr( xp, ob, iv )
    iv%num_buoy  = 0
    iv%num_radar  = 0
    iv%num_bogus  = 0
+   iv%num_airsr  = 0
 
-   if (num_fgat_time > 1) then
+!-----------------------------------------------------------------------------
+
+   if(num_fgat_time > 1) then
       do n=1, num_fgat_time
          iv%current_ob_time = n
 
          write(filename(1:10), fmt='(a, i2.2)') 'fgat_ob.', n
 
-         ! Read PREPBUFR OBSERVATION FILE
+!--------Read PREPBUFR OBSERVATION FILE
          call da_read_bufr_obs (bufr_iunit, iv, xp, filename)
 
-         ! if (Use_RadarObs) then
-         !    ! Read Radar OBSERVATION FILE
-         !    write(filename(1:10), fmt='(a, i2.2)') 'radarob.', n
-         !    call da_read_bufr_radar(Radar_iunit, iv, xp, filename)
-         ! endif
+!         if(Use_RadarObs) then
+!!-----------Read Radar OBSERVATION FILE
+!            write(filename(1:10), fmt='(a, i2.2)') 'radarob.', n
+!            call da_read_bufr_radar(Radar_iunit, iv, xp, filename)
+!         endif
       enddo
    else
+
       iv%current_ob_time = 1
 
       filename="ob.bufr"
       call da_read_bufr_obs(bufr_iunit, iv, xp,filename)
 
-      ! if (Use_RadarObs) then
-      !    ! Read Radar OBSERVATION FILE
-      !    call da_read_bufr_radar(Radar_iunit, iv, xp)
-      ! endif
+!      if(Use_RadarObs) then
+!!--------Read Radar OBSERVATION FILE
+!         call da_read_bufr_radar(Radar_iunit, iv, xp)
+!      endif
    endif
 
-   !--------------------------------------------------------------------------
-   ! [3.0] Calculate innovation vector (O-B) and create (smaller) ob structure
-   !--------------------------------------------------------------------------
+!-----------------------------------------------------------------------------
+!  [3.0] Calculate innovation vector (O-B) and create (smaller) ob structure:
+!-----------------------------------------------------------------------------
 
-   call da_fill_obs_structures( iv, ob )
+   CALL da_fill_obs_structures( iv, ob )
 
    iv%current_ob_time = 1
 
-   IF (trace_use) call da_trace_exit("da_setup_obs_structures_bufr")
+   IF (trace_use) CALL da_trace_exit("da_setup_obs_structures_bufr")
 
-end subroutine da_setup_obs_structures_bufr
+END SUBROUTINE da_setup_obs_structures_bufr
 

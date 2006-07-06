@@ -23,7 +23,8 @@ SUBROUTINE da_read_obs (iunit, ob, xp, filename)
 !           Writing original errors & thicknesses
 !           desired for outputting QC obs with NTMAX = 0
 !
-!            06/23/2006  MPI update        Syed RH Rizvi
+!            06/23/2006  MPI update                     Syed RH Rizvi
+!            07/03/2006  Updated for AIRS retrievals    Syed RH Rizvi
 !-----------------------------------------------------------------------------!
    implicit none
 
@@ -67,7 +68,8 @@ SUBROUTINE da_read_obs (iunit, ob, xp, filename)
                                    num_ssmt1, &
                                    num_ssmt2, &
                                    num_qscat, &
-                                   num_profiler, num_buoy, num_bogus
+                                   num_profiler, &
+                                   num_airsr,num_buoy, num_bogus
 
    INTEGER                        :: ndup, n, report
    LOGICAL                        :: surface_sound
@@ -96,6 +98,7 @@ SUBROUTINE da_read_obs (iunit, ob, xp, filename)
    num_profiler = ob%num_profiler
    num_buoy = ob%num_buoy
    num_bogus= ob%num_bogus
+   num_airsr= ob%num_airsr
 !----------------------------------------------------------------------------!
 !  OPEN FILE
 !  ---------
@@ -393,7 +396,6 @@ loop_level: DO i = 1, platform%info%levels
 
      end if
     ENDIF
-
    dup_loop: DO n = 1, ndup
 
       SELECT CASE(fm)
@@ -1013,6 +1015,35 @@ loop_level: DO i = 1, platform%info%levels
          ob%buoy(num_buoy)%t = platform%each(1)%t
          ob%buoy(num_buoy)%p = platform%each(1)%p
          ob%buoy(num_buoy)%q = platform%each(1)%q
+!--------AIRS retrievals                                     
+
+         CASE (133)    ;         ! AIRS retrievals  
+         if( n==1) ob%num_airsr_glo = ob%num_airsr_glo + 1
+         IF(outside) THEN
+            CYCLE reports
+         ENDIF
+
+         if(.not.use_AIRSRETObs) cycle reports
+   
+         num_airsr = num_airsr + 1
+                                                              
+         platform%loc%obs_global_index = ob%num_airsr_glo
+        
+         ob%airsr(num_airsr)%info = platform%info
+         ob%airsr(num_airsr)%loc  = platform%loc
+
+
+         allocate (ob%airsr(num_airsr)%zk(1:nlevels))
+         allocate (ob%airsr(num_airsr)%h (1:nlevels))
+         allocate (ob%airsr(num_airsr)%p (1:nlevels))
+         allocate (ob%airsr(num_airsr)%t (1:nlevels))
+         allocate (ob%airsr(num_airsr)%q (1:nlevels))
+         do i = 1, nlevels
+              ob%airsr(num_airsr)%h(i) = platform%each(i)%height
+              ob%airsr(num_airsr)%p(i) = platform%each(i)%p%inv
+              ob%airsr(num_airsr)%t(i) = platform%each(i)%t
+              ob%airsr(num_airsr)%q(i) = platform%each(i)%q
+         end do
 
          CASE DEFAULT;
 
@@ -1056,6 +1087,7 @@ loop_level: DO i = 1, platform%info%levels
    ob%num_buoy  = num_buoy
    ob%num_profiler = num_profiler
    ob%num_bogus = num_bogus
+   ob%num_airsr = num_airsr
 
 !  ob%num_ssmt1 = num_ssmt1
 !  ob%num_ssmt2 = num_ssmt2
@@ -1091,6 +1123,7 @@ loop_level: DO i = 1, platform%info%levels
            'Read:  ', num_profiler,        ' Profiler       reports,', &
            'Read:  ', num_buoy,            ' Buoy           reports,', &
            'Read:  ', num_bogus,           ' Bogus          reports,', &
+           'Read:  ', num_airsr,           ' AIRSRET        reports,', &
            'Read:  ', total_obs,           ' Total reports.', &
            'There are ', total_obs - num_sound - num_synop &
                                    - num_pilot - num_satem &
@@ -1100,7 +1133,7 @@ loop_level: DO i = 1, platform%info%levels
                                    - num_ssmi_tb - num_ssmt1 - num_ssmt2 &
                                    - num_gpspw - num_gpsref - num_qscat  &
                                    - num_profiler - num_buoy &
-                                   - num_bogus, &
+                                   - num_bogus - num_airsr , &
                                    '  reports unsaved.'
       write(unit=stdout,FMT=*) ' '
    end if
@@ -1121,6 +1154,7 @@ loop_level: DO i = 1, platform%info%levels
       (ob%ob_numb(ob%current_ob_time)%bogus /= ob%num_bogus) .or. &
       (ob%ob_numb(ob%current_ob_time)%ssmt2 /= ob%num_ssmt1) .or. &
       (ob%ob_numb(ob%current_ob_time)%ssmt2 /= ob%num_ssmt2) .or. &
+      (ob%ob_numb(ob%current_ob_time)%airsr /= ob%num_airsr) .or. &
       (ob%ob_numb(ob%current_ob_time)%profiler /= ob%num_profiler)) then
 
       write(unit=stderr, fmt='(a, i6, 2x, a, i6)') &
@@ -1156,6 +1190,8 @@ loop_level: DO i = 1, platform%info%levels
            'ob%num_ssmt1=', ob%num_ssmt1, &
            'ob%ob_numb(ob%current_ob_time)%ssmt2=', ob%ob_numb(ob%current_ob_time)%ssmt2, &
            'ob%num_ssmt2=', ob%num_ssmt2, &
+           'ob%ob_numb(ob%current_ob_time)%airsr=', ob%ob_numb(ob%current_ob_time)%airsr, &
+           'ob%num_airsr=', ob%num_airsr, &
            'ob%ob_numb(ob%current_ob_time)%profiler=', ob%ob_numb(ob%current_ob_time)%profiler, &
            'ob%num_profiler=', ob%num_profiler
 

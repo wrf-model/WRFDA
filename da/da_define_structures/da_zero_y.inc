@@ -1,4 +1,4 @@
-subroutine da_zero_y( iv, y )
+SUBROUTINE da_zero_y( iv, y )
 
    !---------------------------------------------------------------------------
    ! PURPOSE: Initialises the Y-array
@@ -12,7 +12,7 @@ subroutine da_zero_y( iv, y )
    INTEGER                               :: n       ! Loop counter.
    INTEGER                               :: nlevels ! Number of levels.
 
-   IF (trace_use) call da_trace_entry("da_zero_y")
+   IF (trace_use) CALL da_trace_entry("da_zero_y")
 
    !---------------------------------------------------------------------------
    ! [1.0] Copy number of observations:
@@ -40,6 +40,7 @@ subroutine da_zero_y( iv, y )
    y % num_buoy     = iv % num_buoy    
    y % num_radar    = iv % num_radar   
    y % num_bogus    = iv % num_bogus   
+   y % num_airsr    = iv % num_airsr   
 
    !---------------------------------------------------------------------------
    ! [2.0] Allocate:
@@ -253,7 +254,18 @@ subroutine da_zero_y( iv, y )
          y % radar(n) % rf(1:nlevels) = 0.0
       end do
    END IF
+   ! Initialize AIRS retrievals:
 
-   IF (trace_use) call da_trace_exit("da_zero_y")
+   IF ( y % num_airsr > 0 ) THEN
+      do n = 1, y % num_airsr
+         nlevels = iv % airsr(n) % info % levels
 
-end subroutine da_zero_y        
+         y % airsr(n) % t(1:nlevels) = 0.0
+         y % airsr(n) % q(1:nlevels) = 0.0
+      end do
+   END IF
+
+
+   IF (trace_use) CALL da_trace_exit("da_zero_y")
+
+END SUBROUTINE da_zero_y        

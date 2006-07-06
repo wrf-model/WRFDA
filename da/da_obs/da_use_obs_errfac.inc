@@ -1,4 +1,4 @@
-subroutine da_use_obs_errfac( iv )
+SUBROUTINE da_use_obs_errfac( iv )
 !----------------------------------------------------------------------------
 !  History:
 !
@@ -8,6 +8,7 @@ subroutine da_use_obs_errfac( iv )
 !                        Polar orbiting satellite are
 !                        seperated & used as profile
 !
+!           07/03/2005 - Updated for AIRS retrievals      Syed  RH  Rizvi
 !
 !  Purpose: Allocates observation structure and fills it fro iv.
 !----------------------------------------------------------------------------
@@ -120,7 +121,7 @@ subroutine da_use_obs_errfac( iv )
    IF ( iv % num_sound > 0 ) THEN
 
       call da_read_errfac( 'sound', iv % sound_ef_u, iv % sound_ef_v, &
-                           iv % sound_ef_t, iv % sound_ef_p, iv % sound_ef_q )
+                           iv % sound_ef_t, iv % sound_ef_q, d1 )
 
       DO n = 1, iv % num_sound
          DO k = 1, iv % sound(n) % info % levels
@@ -329,6 +330,21 @@ subroutine da_use_obs_errfac( iv )
          iv % bogus(n) % slp % error = iv % bogus(n) % slp % error * iv % bogus_ef_slp
       END DO
    END IF
+!  Transfer AIRS retrievals:
 
-end subroutine da_use_obs_errfac
+   IF ( iv % num_airsr > 0 ) THEN
+      call da_read_errfac( 'airsr', iv % airsr_ef_t, iv % airsr_ef_q, d1, d3, d3)
+
+      DO n = 1, iv % num_airsr
+         DO k = 1, iv % airsr(n) % info % levels
+            iv % airsr(n) % t(k) % error = iv % airsr(n) % t(k) % error * &
+                                           iv % airsr_ef_t
+            iv % airsr(n) % q(k) % error = iv % airsr(n) % q(k) % error * &
+                                           iv % airsr_ef_q
+         END DO
+      END DO
+   END IF
+
+
+END SUBROUTINE da_use_obs_errfac
 

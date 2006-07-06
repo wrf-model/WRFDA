@@ -5,6 +5,7 @@ SUBROUTINE da_write_y( iv, y )
 !  Additions:
 !             07/08/2003 - Profiler and Buoy Obs          Syed RH Rizvi      
 !             05/16/2006 - Updated for MPI run            Syed RH Rizvi
+!             07/03/2006 - Updated for AIRS retrievals    Syed RH Rizvi
 !
 !
 !  Purpose: Writes out components of y=H(x_inc) structure.
@@ -497,6 +498,29 @@ SUBROUTINE da_write_y( iv, y )
        endif
       END DO
     endif
+   ENDIF
+!  [17] Transfer AIRS retrievals:
+
+   IF ( iv % num_airsr > 0 ) THEN
+      num_obs = 0
+      DO n = 1, iv % num_airsr
+       if(iv%airsr(n)%loc%proc_domain) num_obs = num_obs + 1
+      ENDDO
+     if( num_obs > 0) then
+      write(ounit,'(a20,i8)')'airsr', num_obs
+      num_obs = 0
+      DO n = 1, iv % num_airsr
+       if(iv%airsr(n)%loc%proc_domain) then
+         num_obs = num_obs + 1
+         write(ounit,'(i8)')iv % airsr(n) % info % levels
+         DO k = 1, iv % airsr(n) % info % levels
+         call da_check_missing(iv%airsr(n)%t(k)%qc, y%airsr(n)%t(k), f1)
+         call da_check_missing(iv%airsr(n)%q(k)%qc, y%airsr(n)%q(k), f2)
+         write(ounit,'(2i8,7e15.7)')num_obs, k, f1, f2, dum, dum, dum, dum,dum
+         END DO
+        endif
+      END DO
+     endif
    ENDIF
 
   write(ounit,'(a20,i8)')'********************', 0

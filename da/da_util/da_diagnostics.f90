@@ -1,5 +1,10 @@
 program da_diagnostics
-
+!-----------------------------------------------------------
+! Abstract:
+!    Purpose: Preparing necessary data for 
+!             Observation error tuning  (Hollingseorh method)
+!        Ref: 
+!-----------------------------------------------------------
    implicit none
 
    integer, parameter            :: y_unit = 50
@@ -42,7 +47,7 @@ program da_diagnostics
    
    type qscat_type
       type (info_type)           :: info
-      real                       :: height
+      real                       :: height   
       type (field_type)          :: u
       type (field_type)          :: v
    end type qscat_type
@@ -75,9 +80,17 @@ program da_diagnostics
       type (field_type), pointer :: u(:)
       type (field_type), pointer :: v(:)
       type (field_type), pointer :: t(:)
-      type (field_type), pointer :: p(:)
       type (field_type), pointer :: q(:)
    end type sound_type
+
+   type airsr_type
+      type (info_type)           :: info
+      integer                    :: numlevs
+      real, pointer              :: pressure(:)
+      type (field_type), pointer :: t(:)
+      type (field_type), pointer :: q(:)
+   end type airsr_type
+   
    
    type airep_type
       type (info_type)           :: info
@@ -91,7 +104,7 @@ program da_diagnostics
    type pilot_type
       type (info_type)           :: info
       integer                    :: numlevs
-      real, pointer              :: height(:)
+      real, pointer              :: pressure(:)
       type (field_type), pointer :: u(:)
       type (field_type), pointer :: v(:)
    end type pilot_type
@@ -136,7 +149,7 @@ program da_diagnostics
    type ob_type
       integer                    :: num_synop, num_metar, num_ships, &
                                     num_polaramv, num_qscat, num_geoamv, num_gpspw, num_sound, &
-                                    num_airep, num_pilot, num_ssmir, &
+                                    num_airep, num_pilot, num_ssmir, num_airsret, &
                                     num_satem, num_ssmt1, num_ssmt2, &
                                     num_sonde_sfc, num_buoy, num_profiler, num_bogus
 
@@ -150,6 +163,7 @@ program da_diagnostics
       type (qscat_type), pointer :: qscat(:)
       type (gpspw_type), pointer :: gpspw(:)
       type (sound_type), pointer :: sound(:)
+      type (airsr_type), pointer :: airsr(:)
       type (airep_type), pointer :: airep(:)
       type (pilot_type), pointer :: pilot(:)
       type (pilot_type), pointer :: profiler(:)
@@ -256,43 +270,35 @@ program da_diagnostics
    end if
    
    if ( ob % num_sound > 0 ) call da_calc_stats_sound( ob % num_sound, ob % sound )
+   if ( ob % num_airsret> 0 ) call da_calc_stats_airsr( ob % num_airsret, ob % airsr )
    if ( ob % num_airep > 0 ) call da_calc_stats_airep( ob % num_airep, ob % airep ) 
    if ( ob % num_pilot > 0 ) call da_calc_stats_pilot( ob % num_pilot, ob % pilot )
+   
    if ( ob % num_profiler > 0 ) call da_calc_stats_profiler( ob % num_profiler, ob % profiler )
    if ( ob % num_satem > 0 ) call da_calc_stats_satem( ob % num_satem, ob % satem )
    if ( ob % num_ssmt1 > 0 ) call da_calc_stats_ssmt1( ob % num_ssmt1, ob % ssmt1 )
    if ( ob % num_ssmt2 > 0 ) call da_calc_stats_ssmt2( ob % num_ssmt2, ob % ssmt2 )
-   if ( ob % num_bogus > 0 ) call da_calc_stats_bogus( ob % num_sound, ob % bogus )
+   if ( ob % num_bogus > 0 ) call da_calc_stats_bogus( ob % num_bogus, ob % bogus )
 
 !--------------------------------------------------------------------------
 !  [4.0] Write data for post-processing:
 !--------------------------------------------------------------------------
-
 !  [4.1] Sonde O-B:
-
+ if ( ob % num_sound > 0 ) then
    open( unit1, file = 'soundu_omb.dat', status = 'unknown' )
    open( unit2, file = 'soundv_omb.dat', status = 'unknown' )
    open( unit3, file = 'soundt_omb.dat', status = 'unknown' )
-   open( unit4, file = 'soundp_omb.dat', status = 'unknown' )
-   open( unit5, file = 'soundq_omb.dat', status = 'unknown' )
-
+   open( unit4, file = 'soundq_omb.dat', status = 'unknown' )
    current_time = 1
    do n = 1, ob % num_sound
       do k = 1, ob % sound(n) % numlevs
-         call da_write_data( k, current_time, ob % num_sound, unit1, &
-                             ob % sound(n) % info, ob % sound(n) % pressure(k), &
-                             ob % sound(n) % u(k) )
-         call da_write_data( k, current_time, ob % num_sound, unit2, &
-                             ob % sound(n) % info, &
+         call da_write_data( k, current_time, unit1, ob % sound(n) % info, &
+                             ob % sound(n) % pressure(k), ob % sound(n) % u(k) )
+         call da_write_data( k, current_time, unit2, ob % sound(n) % info, &
                              ob % sound(n) % pressure(k), ob % sound(n) % v(k) )
-         call da_write_data( k, current_time, ob % num_sound, unit3, &
-                             ob % sound(n) % info, &
+         call da_write_data( k, current_time, unit3, ob % sound(n) % info, &
                              ob % sound(n) % pressure(k), ob % sound(n) % t(k) )
-         call da_write_data( k, current_time, ob % num_sound, unit4, &
-                             ob % sound(n) % info, &
-                             ob % sound(n) % pressure(k), ob % sound(n) % p(k) )
-         call da_write_data( k, current_time, ob % num_sound, unit5, &
-                             ob % sound(n) % info, &
+         call da_write_data( k, current_time, unit4, ob % sound(n) % info, &
                              ob % sound(n) % pressure(k), ob % sound(n) % q(k) )
 
       end do
@@ -303,11 +309,12 @@ program da_diagnostics
    write(unit2,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
    write(unit3,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
    write(unit4,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
-   write(unit5,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
 
-   close( unit1 ); close( unit2 ); close( unit3 ); close( unit4 ); close( unit5 )
+   close( unit1 ); close( unit2 ); close( unit3 ); close( unit4 )
 
+ endif
 !  [4.2] Synop O-B:
+   if ( ob % num_synop  > 0 ) then
 
    open( unit1, file = 'synopu_omb.dat', status = 'unknown' )
    open( unit2, file = 'synopv_omb.dat', status = 'unknown' )
@@ -317,20 +324,15 @@ program da_diagnostics
 
    current_time = 1
    do n = 1, ob % num_synop
-      call da_write_data( 1, current_time, ob % num_synop, unit1, &
-                          ob % synop(n) % info, &
+      call da_write_data( 1, current_time, unit1, ob % synop(n) % info, &
                           ob % synop(n) % pressure, ob % synop(n) % u )
-      call da_write_data( 1, current_time, ob % num_synop, unit2, &
-                          ob % synop(n) % info, &
+      call da_write_data( 1, current_time, unit2, ob % synop(n) % info, &
                           ob % synop(n) % pressure, ob % synop(n) % v )
-      call da_write_data( 1, current_time, ob % num_synop, unit3, &
-                          ob % synop(n) % info, &
+      call da_write_data( 1, current_time, unit3, ob % synop(n) % info, &
                           ob % synop(n) % pressure, ob % synop(n) % t )
-      call da_write_data( 1, current_time, ob % num_synop, unit4, &
-                          ob % synop(n) % info, &
+      call da_write_data( 1, current_time, unit4, ob % synop(n) % info, &
                           ob % synop(n) % pressure, ob % synop(n) % p )
-      call da_write_data( 1, current_time, ob % num_synop, unit5, &
-                          ob % synop(n) % info, &
+      call da_write_data( 1, current_time, unit5, ob % synop(n) % info, &
                           ob % synop(n) % pressure, ob % synop(n) % q )
       current_time = ob % synop(n) % info % time
    end do
@@ -342,8 +344,9 @@ program da_diagnostics
    write(unit5,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
 
    close( unit1 ); close( unit2 ); close( unit3 ); close( unit4 ); close( unit5 )
-
+ endif
 !  [4.3] Metar O-B:
+ if ( ob % num_metar  > 0 ) then
 
    open( unit1, file = 'metaru_omb.dat', status = 'unknown' )
    open( unit2, file = 'metarv_omb.dat', status = 'unknown' )
@@ -351,26 +354,17 @@ program da_diagnostics
    open( unit4, file = 'metarp_omb.dat', status = 'unknown' )
    open( unit5, file = 'metarq_omb.dat', status = 'unknown' )
 
-!--------------------------------------------------------------------------
-!  [6.0] Write metar data for post-processing:
-!--------------------------------------------------------------------------
-
    current_time = 1
    do n = 1, ob % num_metar
-      call da_write_data( 1, current_time, ob % num_metar, unit1, &
-                          ob % metar(n) % info, &
+      call da_write_data( 1, current_time, unit1, ob % metar(n) % info, &
                           ob % metar(n) % pressure, ob % metar(n) % u )
-      call da_write_data( 1, current_time, ob % num_metar, unit2, &
-                          ob % metar(n) % info, &
+      call da_write_data( 1, current_time, unit2, ob % metar(n) % info, &
                           ob % metar(n) % pressure, ob % metar(n) % v )
-      call da_write_data( 1, current_time, ob % num_metar, unit3, &
-                          ob % metar(n) % info, &
+      call da_write_data( 1, current_time, unit3, ob % metar(n) % info, &
                           ob % metar(n) % pressure, ob % metar(n) % t )
-      call da_write_data( 1, current_time, ob % num_metar, unit4, &
-                          ob % metar(n) % info, &
+      call da_write_data( 1, current_time, unit4, ob % metar(n) % info, &
                           ob % metar(n) % pressure, ob % metar(n) % p )
-      call da_write_data( 1, current_time, ob % num_metar, unit5, &
-                          ob % metar(n) % info, &
+      call da_write_data( 1, current_time, unit5, ob % metar(n) % info, &
                           ob % metar(n) % pressure, ob % metar(n) % q )
       current_time = ob % metar(n) % info % time
    end do
@@ -382,19 +376,17 @@ program da_diagnostics
    write(unit5,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
 
    close( unit1 ); close( unit2 ); close( unit3 ); close( unit4 ); close( unit5 )
-
+ endif
 !  [4.4] Polar AMV O-B:
-
+ if ( ob % num_polaramv  > 0 ) then
    open( unit1, file = 'polaramvu_omb.dat', status = 'unknown' )
    open( unit2, file = 'polaramvv_omb.dat', status = 'unknown' )
 
    current_time = 1
    do n = 1, ob % num_polaramv
-      call da_write_data( 1, current_time, ob % num_polaramv, unit1, &
-                          ob % polaramv(n) % info, &
+      call da_write_data( 1, current_time, unit1, ob % polaramv(n) % info, &
                           ob % polaramv(n) % pressure, ob % polaramv(n) % u )
-      call da_write_data( 1, current_time, ob % num_polaramv, unit2, &
-                          ob % polaramv(n) % info, &
+      call da_write_data( 1, current_time, unit2, ob % polaramv(n) % info, &
                           ob % polaramv(n) % pressure, ob % polaramv(n) % v )
       current_time = ob % polaramv(n) % info % time
    end do
@@ -403,18 +395,18 @@ program da_diagnostics
    write(unit2,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
 
    close( unit1 ); close( unit2 )
+ endif
 !  [4.5] Geo AMV O-B:
+ if ( ob % num_geoamv  > 0 ) then
 
    open( unit1, file = 'geoamvu_omb.dat', status = 'unknown' )
    open( unit2, file = 'geoamvv_omb.dat', status = 'unknown' )
 
    current_time = 1
    do n = 1, ob % num_geoamv
-      call da_write_data( 1, current_time, ob % num_geoamv, unit1, &
-                          ob % geoamv(n) % info, &
+      call da_write_data( 1, current_time, unit1, ob % geoamv(n) % info, &
                           ob % geoamv(n) % pressure, ob % geoamv(n) % u )
-      call da_write_data( 1, current_time, ob % num_geoamv, unit2, &
-                          ob % geoamv(n) % info, &
+      call da_write_data( 1, current_time, unit2, ob % geoamv(n) % info, &
                           ob % geoamv(n) % pressure, ob % geoamv(n) % v )
       current_time = ob % geoamv(n) % info % time
    end do
@@ -424,8 +416,10 @@ program da_diagnostics
 
    close( unit1 ); close( unit2 )
 
+ endif
 !  [4.6] Buoy  O-B:
 
+ if ( ob % num_buoy > 0 ) then
    open( unit1, file = 'buoyu_omb.dat', status = 'unknown' )
    open( unit2, file = 'buoyv_omb.dat', status = 'unknown' )
    open( unit3, file = 'buoyt_omb.dat', status = 'unknown' )
@@ -434,20 +428,15 @@ program da_diagnostics
 
    current_time = 1
    do n = 1, ob % num_buoy
-      call da_write_data( 1, current_time, ob % num_buoy, unit1, &
-                          ob % buoy(n) % info, &
+      call da_write_data( 1, current_time, unit1, ob % buoy(n) % info, &
                           ob % buoy(n) % pressure, ob % buoy(n) % u )
-      call da_write_data( 1, current_time, ob % num_buoy, unit2, &
-                          ob % buoy(n) % info, &
+      call da_write_data( 1, current_time, unit2, ob % buoy(n) % info, &
                           ob % buoy(n) % pressure, ob % buoy(n) % v )
-      call da_write_data( 1, current_time, ob % num_buoy, unit3, &
-                          ob % buoy(n) % info, &
+      call da_write_data( 1, current_time, unit3, ob % buoy(n) % info, &
                           ob % buoy(n) % pressure, ob % buoy(n) % t )
-      call da_write_data( 1, current_time, ob % num_buoy, unit4, &
-                          ob % buoy(n) % info, &
+      call da_write_data( 1, current_time, unit4, ob % buoy(n) % info, &
                           ob % buoy(n) % pressure, ob % buoy(n) % p )
-      call da_write_data( 1, current_time, ob % num_buoy, unit5, &
-                          ob % buoy(n) % info, &
+      call da_write_data( 1, current_time, unit5, ob % buoy(n) % info, &
                           ob % buoy(n) % pressure, ob % buoy(n) % q )
       current_time = ob % buoy(n) % info % time
    end do
@@ -459,9 +448,11 @@ program da_diagnostics
    write(unit5,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
 
    close( unit1 ); close( unit2 ); close( unit3 ); close( unit4 ); close( unit5 )
+ endif
 
 !  [4.7] sonde_sfc  O-B:
 
+ if ( ob % num_sonde_sfc > 0 ) then
    open( unit1, file = 'sondsfcu_omb.dat', status = 'unknown' )
    open( unit2, file = 'sondsfcv_omb.dat', status = 'unknown' )
    open( unit3, file = 'sondsfct_omb.dat', status = 'unknown' )
@@ -470,20 +461,15 @@ program da_diagnostics
 
    current_time = 1
    do n = 1, ob % num_sonde_sfc
-      call da_write_data( 1, current_time, ob % num_sonde_sfc, unit1, &
-                          ob % sonde_sfc(n) % info, &
+      call da_write_data( 1, current_time, unit1, ob % sonde_sfc(n) % info, &
                           ob % sonde_sfc(n) % pressure, ob % sonde_sfc(n) % u )
-      call da_write_data( 1, current_time, ob % num_sonde_sfc, unit2, &
-                          ob % sonde_sfc(n) % info, &
+      call da_write_data( 1, current_time, unit2, ob % sonde_sfc(n) % info, &
                           ob % sonde_sfc(n) % pressure, ob % sonde_sfc(n) % v )
-      call da_write_data( 1, current_time, ob % num_sonde_sfc, unit3, &
-                          ob % sonde_sfc(n) % info, &
+      call da_write_data( 1, current_time, unit3, ob % sonde_sfc(n) % info, &
                           ob % sonde_sfc(n) % pressure, ob % sonde_sfc(n) % t )
-      call da_write_data( 1, current_time, ob % num_sonde_sfc, unit4, &
-                          ob % sonde_sfc(n) % info, &
+      call da_write_data( 1, current_time, unit4, ob % sonde_sfc(n) % info, &
                           ob % sonde_sfc(n) % pressure, ob % sonde_sfc(n) % p )
-      call da_write_data( 1, current_time, ob % num_sonde_sfc, unit5, &
-                          ob % sonde_sfc(n) % info, &
+      call da_write_data( 1, current_time, unit5, ob % sonde_sfc(n) % info, &
                           ob % sonde_sfc(n) % pressure, ob % sonde_sfc(n) % q )
       current_time = ob % sonde_sfc(n) % info % time
    end do
@@ -495,16 +481,135 @@ program da_diagnostics
    write(unit5,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
 
    close( unit1 ); close( unit2 ); close( unit3 ); close( unit4 ); close( unit5 )
+ endif
+!  [4.8] Profiler  O-B:
+ if ( ob % num_profiler  > 0 ) then
+   open( unit1, file = 'profileru_omb.dat', status = 'unknown' )
+   open( unit2, file = 'profilerv_omb.dat', status = 'unknown' )
 
+   current_time = 1
+   do n = 1, ob % num_profiler
+      do k = 1, ob % profiler(n) % numlevs
+      call da_write_data( 1, current_time, unit1, ob % profiler(n) % info, &
+                          ob % profiler(n) % pressure(k), ob % profiler(n) % u(k) )
+      call da_write_data( 1, current_time, unit2, ob % profiler(n) % info, &
+                          ob % profiler(n) % pressure(k), ob % profiler(n) % v(k) )
+      enddo
+      current_time = ob % profiler(n) % info % time
+   end do
+
+   write(unit1,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
+   write(unit2,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
+
+   close( unit1 ); close( unit2 )
+ endif
+!  [4.9] AIRS retrievals  O-B:
+ if ( ob % num_airsret > 0 ) then
+   open( unit1, file = 'airsrt_omb.dat', status = 'unknown' )
+   open( unit2, file = 'airsrq_omb.dat', status = 'unknown' )
+   current_time = 1
+   do n = 1, ob % num_airsret
+      do k = 1, ob % airsr(n) % numlevs
+         call da_write_data( k, current_time, unit1, ob % airsr(n) % info, &
+                             ob % airsr(n) % pressure(k), ob % airsr(n) % t(k) )
+         call da_write_data( k, current_time, unit2, ob % airsr(n) % info, &
+                             ob % airsr(n) % pressure(k), ob % airsr(n) % q(k) )
+
+      end do
+      current_time = ob % airsr(n) % info % time
+   end do
+
+   write(unit1,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
+   write(unit2,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
+
+   close( unit1 ); close( unit2 )
+ endif
+!  [4.10] Pilot  O-B:
+ if ( ob % num_pilot  > 0 ) then
+   open( unit1, file = 'pilotu_omb.dat', status = 'unknown' )
+   open( unit2, file = 'pilotv_omb.dat', status = 'unknown' )
+
+   current_time = 1
+   do n = 1, ob % num_pilot
+      do k = 1, ob % pilot(n) % numlevs
+      call da_write_data( 1, current_time, unit1, ob % pilot(n) % info, &
+                          ob % pilot(n) % pressure(k), ob % pilot(n) % u(k) )
+      call da_write_data( 1, current_time, unit2, ob % pilot(n) % info, &
+                          ob % pilot(n) % pressure(k), ob % pilot(n) % v(k) )
+      end do
+      current_time = ob % pilot(n) % info % time
+   end do
+
+   write(unit1,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
+   write(unit2,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
+
+   close( unit1 ); close( unit2 )
+ endif
+!--------------------------------------------------------------------------
+!  [4.11] For Bogus O-B:
+ if ( ob % num_bogus > 0 ) then
+   open( unit1, file = 'bogusu_omb.dat', status = 'unknown' )
+   open( unit2, file = 'bogusv_omb.dat', status = 'unknown' )
+   open( unit3, file = 'bogust_omb.dat', status = 'unknown' )
+   open( unit4, file = 'bogusq_omb.dat', status = 'unknown' )
+   current_time = 1
+   do n = 1, ob % num_bogus
+      do k = 1, ob % bogus(n) % numlevs
+         call da_write_data( k, current_time, unit1, ob % bogus(n) % info, &
+                             ob % bogus(n) % pressure(k), ob % bogus(n) % u(k) )
+         call da_write_data( k, current_time, unit2, ob % bogus(n) % info, &
+                             ob % bogus(n) % pressure(k), ob % bogus(n) % v(k) )
+         call da_write_data( k, current_time, unit3, ob % bogus(n) % info, &
+                             ob % bogus(n) % pressure(k), ob % bogus(n) % t(k) )
+         call da_write_data( k, current_time, unit4, ob % bogus(n) % info, &
+                             ob % bogus(n) % pressure(k), ob % bogus(n) % q(k) )
+
+      end do
+      current_time = ob % bogus(n) % info % time
+   end do
+
+   write(unit1,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
+   write(unit2,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
+   write(unit3,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
+   write(unit4,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
+
+   close( unit1 ); close( unit2 ); close( unit3 ); close( unit4 )
+
+ endif
+!--------------------------------------------------------------------------
+!  [4.11] For Airep O-B:
+ if ( ob % num_airep > 0 ) then
+   open( unit1, file = 'airepu_omb.dat', status = 'unknown' )
+   open( unit2, file = 'airepv_omb.dat', status = 'unknown' )
+   open( unit3, file = 'airept_omb.dat', status = 'unknown' )
+   current_time = 1
+   do n = 1, ob % num_airep
+      do k = 1, ob % airep(n) % numlevs
+         call da_write_data( k, current_time, unit1, ob % airep(n) % info, &
+                             ob % airep(n) % pressure(k), ob % airep(n) % u(k) )
+         call da_write_data( k, current_time, unit2, ob % airep(n) % info, &
+                             ob % airep(n) % pressure(k), ob % airep(n) % v(k) )
+         call da_write_data( k, current_time, unit3, ob % airep(n) % info, &
+                             ob % airep(n) % pressure(k), ob % airep(n) % t(k) )
+      end do
+      current_time = ob % airep(n) % info % time
+   end do
+
+   write(unit1,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
+   write(unit2,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
+   write(unit3,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
+
+   close( unit1 ); close( unit2 ); close( unit3 )
+
+ endif
 contains
 
-subroutine da_write_data( lev, current_time, num_obs, ounit, info, p, field )
+subroutine da_write_data( lev, current_time, ounit, info, p, field )
 
    implicit none
 
    integer, intent(in)           :: lev
    integer, intent(in)           :: current_time
-   integer, intent(in)           :: num_obs
    integer, intent(in)           :: ounit
    type (info_type), intent(in)  :: info
    real, intent(in)              :: p
@@ -543,6 +648,7 @@ subroutine da_count_obs( y_unit, ob )
    ob % num_qscat = 0
    ob % num_gpspw = 0
    ob % num_sound = 0
+   ob % num_airsret = 0
    ob % num_airep = 0
    ob % num_pilot = 0
    ob % num_ssmir = 0
@@ -581,6 +687,8 @@ subroutine da_count_obs( y_unit, ob )
             ob % num_gpspw = ob % num_gpspw + num_obs
          else if ( index( ob_name,'sound') > 0 ) then
             ob % num_sound = ob % num_sound + num_obs
+         else if ( index( ob_name,'airsr') > 0 ) then
+            ob % num_airsret = ob % num_airsret + num_obs
          else if ( index( ob_name,'airep') > 0 ) then
              ob % num_airep = ob % num_airep + num_obs
          else if ( index( ob_name,'pilot') > 0 ) then
@@ -668,6 +776,11 @@ subroutine da_count_obs( y_unit, ob )
       write(6,'(a,i8)')' Number of sound obs = ', ob % num_sound
    end if
    
+   if ( ob % num_airsret > 0 ) then
+      allocate( ob % airsr(1:ob % num_airsret) )
+      write(6,'(a,i8)')' Number of AIRS retrievals = ', ob % num_airsret
+   end if
+   
    if ( ob % num_airep > 0 ) then
       allocate( ob % airep(1:ob % num_airep) )
       write(6,'(a,i8)')' Number of airep obs = ', ob % num_airep
@@ -733,9 +846,9 @@ subroutine da_read_y( y_unit, ob )
    integer              :: num_obs_sonde_sfc, num_obs_buoy, num_obs_profiler, num_obs_bogus
    integer              :: num_obs_synop, num_obs_metar, num_obs_ships
    integer              :: num_obs_qscat,  num_obs_polaramv, num_obs_geoamv
-   integer              :: num_obs_gpspw, num_obs_sound, num_obs_airep, num_obs_pilot
+   integer              :: num_obs_gpspw, num_obs_sound, num_obs_airsr, num_obs_airep, num_obs_pilot
    integer              :: num_obs_ssmir, num_obs_satem, num_obs_ssmt1, num_obs_ssmt2
-   integer              :: synopt, metart, shipst, polaramvt, geoamvt, qscatt, gpspwt, soundt
+   integer              :: synopt, metart, shipst, polaramvt, geoamvt, qscatt, gpspwt, soundt, airsrt
    integer              :: sonde_sfct, buoyt, profilert, bogust
    integer              :: airept, pilott, ssmirt, satemt, ssmt1t, ssmt2t
    real                 :: rdum
@@ -744,18 +857,17 @@ subroutine da_read_y( y_unit, ob )
    num_obs_buoy = 0; num_obs_sonde_sfc = 0; num_obs_profiler = 0 ; num_obs_bogus = 0
    num_obs_synop = 0; num_obs_metar = 0; num_obs_ships = 0
    num_obs_polaramv = 0; num_obs_geoamv = 0; num_obs_qscat = 0
-   num_obs_gpspw = 0; num_obs_sound = 0; num_obs_airep = 0; num_obs_pilot = 0
+   num_obs_gpspw = 0; num_obs_sound = 0; num_obs_airsr = 0; num_obs_airep = 0; num_obs_pilot = 0
    num_obs_ssmir = 0; num_obs_satem = 0; num_obs_ssmt1 = 0; num_obs_ssmt2 = 0
    buoyt = 0; sonde_sfct = 0; profilert = 0; bogust = 0
    synopt = 0; metart = 0; shipst = 0; polaramvt = 0; geoamvt = 0; qscatt = 0
-   gpspwt = 0; soundt = 0; airept = 0; pilott = 0
+   gpspwt = 0; soundt = 0; airsrt = 0; airept = 0; pilott = 0
    ssmirt = 0; satemt = 0; ssmt1t = 0; ssmt2t = 0
 !
    do       ! loop over entire input file: (ends in *end*)
       do    ! loop over particular time (ends in *****)
 
          read(y_unit,'(a20,i8)')ob_name, num_obs
-         print*,' got ob_type ',trim(ob_name) 
       if ( index( ob_name,'*****') > 0 .or. index( ob_name,'*end*') > 0 ) exit  
 
       if ( index( ob_name,'synop') > 0 ) then
@@ -862,7 +974,7 @@ subroutine da_read_y( y_unit, ob )
             ndum, kdum, ob % qscat(n) % info % id, &        ! Station
                         ob % qscat(n) % info % lat, &       ! Latitude
                         ob % qscat(n) % info % lon, &       ! Longitude
-                        ob % qscat(n) % height, &           ! Obs height
+                        ob % qscat(n) % height,    &        ! Obs height/pressure
                         ob % qscat(n) % u, &                ! O, O-B, O-A
                         ob % qscat(n) % v
             ob % qscat(n) % info % time = qscatt
@@ -886,7 +998,6 @@ subroutine da_read_y( y_unit, ob )
          end do
          num_obs_gpspw = num_obs_gpspw + num_obs
 
-
       elseif ( index( ob_name,'sound') > 0 ) then
          soundt = soundt + 1
          do n = num_obs_sound + 1, num_obs_sound + num_obs
@@ -896,7 +1007,6 @@ subroutine da_read_y( y_unit, ob )
             allocate( ob % sound(n) % u(1:num_levs) )
             allocate( ob % sound(n) % v(1:num_levs) )
             allocate( ob % sound(n) % t(1:num_levs) )
-            allocate( ob % sound(n) % p(1:num_levs) )
             allocate( ob % sound(n) % q(1:num_levs) )
 
             do k = 1, num_levs
@@ -908,12 +1018,34 @@ subroutine da_read_y( y_unit, ob )
                         ob % sound(n) % u(k), &             ! O, O-B, O-A
                         ob % sound(n) % v(k), &             ! O, O-B, O-A
                         ob % sound(n) % t(k), &             ! O, O-B, O-A
-                        ob % sound(n) % p(k), &             ! O, O-B, O-A
                         ob % sound(n) % q(k)                ! O, O-B, O-A
             end do
             ob % sound(n) % info % time = soundt
          end do
          num_obs_sound = num_obs_sound + num_obs
+
+      elseif ( index( ob_name,'airsr') > 0 ) then
+         airsrt = airsrt + 1
+         do n = num_obs_airsr + 1, num_obs_airsr + num_obs
+            read(y_unit,'(i8)')num_levs
+            ob % airsr(n) % numlevs = num_levs
+            allocate( ob % airsr(n) % pressure(1:num_levs) )
+            allocate( ob % airsr(n) % t(1:num_levs) )
+            allocate( ob % airsr(n) % q(1:num_levs) )
+
+            do k = 1, num_levs
+               read(y_unit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))') &
+               ndum, kdum, ob % airsr(n) % info % id, &     ! Station
+                        ob % airsr(n) % info % lat, &       ! Latitude
+                        ob % airsr(n) % info % lon, &       ! Longitude
+                        ob % airsr(n) % pressure(k), &      ! Obs height
+                        ob % airsr(n) % t(k), &             ! O, O-B, O-A
+                        ob % airsr(n) % q(k)                ! O, O-B, O-A
+            end do
+            ob % airsr(n) % info % time = airsrt
+         end do
+         num_obs_airsr = num_obs_airsr + num_obs
+
       elseif ( index( ob_name,'airep') > 0 ) then
          airept = airept + 1
          do n = num_obs_airep + 1, num_obs_airep + num_obs
@@ -943,7 +1075,7 @@ subroutine da_read_y( y_unit, ob )
          do n = num_obs_pilot + 1, num_obs_pilot + num_obs
             read(y_unit,'(i8)')num_levs
             ob % pilot(n) % numlevs = num_levs
-            allocate( ob % pilot(n) % height(1:num_levs) )
+            allocate( ob % pilot(n) % pressure(1:num_levs) )
             allocate( ob % pilot(n) % u(1:num_levs) )
             allocate( ob % pilot(n) % v(1:num_levs) )
 
@@ -952,7 +1084,7 @@ subroutine da_read_y( y_unit, ob )
                ndum, kdum, ob % pilot(n) % info % id, &     ! Station
                         ob % pilot(n) % info % lat, &       ! Latitude
                         ob % pilot(n) % info % lon, &       ! Longitude
-                        ob % pilot(n) % height(k), &        ! Obs height
+                        ob % pilot(n) % pressure(k), &      ! Obs height
                         ob % pilot(n) % u(k), &             ! O, O-B, O-A
                         ob % pilot(n) % v(k)
             end do
@@ -1082,16 +1214,16 @@ subroutine da_read_y( y_unit, ob )
          do n = num_obs_profiler + 1, num_obs_profiler + num_obs
             read(y_unit,'(i8)')num_levs
             ob % profiler(n) % numlevs = num_levs
-            allocate( ob % profiler(n) % height(1:num_levs) )
+            allocate( ob % profiler(n) % pressure(1:num_levs) )
             allocate( ob % profiler(n) % u(1:num_levs) )
             allocate( ob % profiler(n) % v(1:num_levs) )
 
             do k = 1, num_levs
                read(y_unit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))') &
                ndum, kdum, ob % profiler(n) % info % id, &     ! Station
-                        ob % profiler(n) % info % lat, &       ! Latitude
-                        ob % profiler(n) % info % lon, &       ! Longitude
-                        ob % profiler(n) % height(k), &        ! Obs height
+                        ob % profiler(n) % info % lat,   &     ! Latitude
+                        ob % profiler(n) % info % lon,   &     ! Longitude
+                        ob % profiler(n) % pressure(k),  &     ! Obs height
                         ob % profiler(n) % u(k), &             ! O, O-B, O-A
                         ob % profiler(n) % v(k)
             end do
@@ -1172,7 +1304,7 @@ subroutine da_calc_stats( ob_name, num_obs, field )
                                   mean_omb, mean_oma, stdv_omb, stdv_oma )
       end do
 
-      write(6,'(1x,a9,i8,a,i8,a,4f10.4)')ob_name, count, '/', num_obs, &
+      write(6,'(1x,a9,i10,a,i10,a,4f10.4)')ob_name, count, '/', num_obs, &
                                         '. O-B(m,s), O-A(m,s) =', &
                                         mean_omb, stdv_omb, mean_oma, stdv_oma
 
@@ -1205,7 +1337,7 @@ subroutine da_calc_stats_sound( num_obs, sound )
                                      mean_omb, mean_oma, stdv_omb, stdv_oma  )
          end do
       end do
-      write(6,'(1x,a9,i8,a,i8,a,4f10.4)')'sound u  ', count, '/', count1, &
+      write(6,'(1x,a9,i10,a,i10,a,4f10.4)')'sound u  ', count, '/', count1, &
                                         '. O-B(m,s), O-A(m,s) =', &
                                         mean_omb, stdv_omb, mean_oma, stdv_oma
 
@@ -1219,7 +1351,7 @@ subroutine da_calc_stats_sound( num_obs, sound )
                                      mean_omb, mean_oma, stdv_omb, stdv_oma  )
          end do
       end do
-      write(6,'(1x,a9,i8,a,i8,a,4f10.4)')'sound v  ', count, '/', count1, &
+      write(6,'(1x,a9,i10,a,i10,a,4f10.4)')'sound v  ', count, '/', count1, &
                                         '. O-B(m,s), O-A(m,s) =', &
                                         mean_omb, stdv_omb, mean_oma, stdv_oma
 
@@ -1233,21 +1365,7 @@ subroutine da_calc_stats_sound( num_obs, sound )
                                      mean_omb, mean_oma, stdv_omb, stdv_oma  )
          end do
       end do
-      write(6,'(1x,a9,i8,a,i8,a,4f10.4)')'sound t  ', count, '/', count1, &
-                                        '. O-B(m,s), O-A(m,s) =', &
-                                        mean_omb, stdv_omb, mean_oma, stdv_oma
-
-      count = 0; count1 = 0
-      sum_omb = 0.0; sum_oma = 0.0; sum_omb2 = 0.0; sum_oma2 = 0.0
-      do n = 1, num_obs
-         do k = 1, sound(n) % numlevs
-            count1 = count1 + 1
-            call da_increment_stats( sound(n) % p(k), count, &
-                                     sum_omb, sum_oma, sum_omb2, sum_oma2, &
-                                     mean_omb, mean_oma, stdv_omb, stdv_oma  )
-         end do
-      end do
-      write(6,'(1x,a9,i8,a,i8,a,4f10.4)')'sound p  ', count, '/', count1, &
+      write(6,'(1x,a9,i10,a,i10,a,4f10.4)')'sound t  ', count, '/', count1, &
                                         '. O-B(m,s), O-A(m,s) =', &
                                         mean_omb, stdv_omb, mean_oma, stdv_oma
 
@@ -1261,7 +1379,7 @@ subroutine da_calc_stats_sound( num_obs, sound )
                                      mean_omb, mean_oma, stdv_omb, stdv_oma  )
          end do
       end do
-      write(6,'(1x,a9,i8,a,i8,a,4f10.4)')'sound q  ', count, '/', count1, &
+      write(6,'(1x,a9,i10,a,i10,a,4f10.4)')'sound q  ', count, '/', count1, &
                                         '. O-B(m,s), O-A(m,s) =', &
                                         mean_omb, stdv_omb, mean_oma, stdv_oma
       write(6,*)
@@ -1271,6 +1389,53 @@ subroutine da_calc_stats_sound( num_obs, sound )
 end subroutine da_calc_stats_sound
 
 !--------------------------------------------------------------------------
+
+subroutine da_calc_stats_airsr( num_obs, airsr )
+
+   implicit none
+
+   integer, intent(in)           :: num_obs               ! Number of obs.
+   type (airsr_type), intent(in) :: airsr(1:num_obs)      ! Obs data.
+
+   integer                       :: n, k, count, count1
+   real                          :: sum_omb, sum_oma, sum_omb2, sum_oma2
+   real                          :: mean_omb, mean_oma, stdv_omb, stdv_oma
+!--------------------------------------------------------------------------
+
+   if ( num_obs > 0 ) then
+ 
+ 
+      count = 0; count1 = 0
+      sum_omb = 0.0; sum_oma = 0.0; sum_omb2 = 0.0; sum_oma2 = 0.0
+      do n = 1, num_obs
+         do k = 1, airsr(n) % numlevs
+            count1 = count1 + 1
+            call da_increment_stats( airsr(n) % t(k), count, &
+                                     sum_omb, sum_oma, sum_omb2, sum_oma2, &
+                                     mean_omb, mean_oma, stdv_omb, stdv_oma  )
+         end do
+      end do
+      write(6,'(1x,a9,i10,a,i10,a,4f10.4)')'airsr t  ', count, '/', count1, &
+                                        '. O-B(m,s), O-A(m,s) =', &
+                                        mean_omb, stdv_omb, mean_oma, stdv_oma
+      count = 0; count1 = 0
+      sum_omb = 0.0; sum_oma = 0.0; sum_omb2 = 0.0; sum_oma2 = 0.0
+      do n = 1, num_obs
+         do k = 1, airsr(n) % numlevs
+            count1 = count1 + 1
+            call da_increment_stats( airsr(n) % q(k), count, &
+                                     sum_omb, sum_oma, sum_omb2, sum_oma2, &
+                                     mean_omb, mean_oma, stdv_omb, stdv_oma  )
+         end do
+      end do
+      write(6,'(1x,a9,i10,a,i10,a,4f10.4)')'airsr q  ', count, '/', count1, &
+                                        '. O-B(m,s), O-A(m,s) =', &
+                                        mean_omb, stdv_omb, mean_oma, stdv_oma
+      write(6,*)
+
+   end if
+
+end subroutine da_calc_stats_airsr
 
 subroutine da_calc_stats_bogus( num_obs, bogus )
 
@@ -1295,7 +1460,7 @@ subroutine da_calc_stats_bogus( num_obs, bogus )
                                      mean_omb, mean_oma, stdv_omb, stdv_oma  )
          end do
       end do
-      write(6,'(1x,a9,i8,a,i8,a,4f10.4)')'bogus u  ', count, '/', count1, &
+      write(6,'(1x,a9,i10,a,i10,a,4f10.4)')'bogus u  ', count, '/', count1, &
                                         '. O-B(m,s), O-A(m,s) =', &
                                         mean_omb, stdv_omb, mean_oma, stdv_oma
 
@@ -1309,7 +1474,7 @@ subroutine da_calc_stats_bogus( num_obs, bogus )
                                      mean_omb, mean_oma, stdv_omb, stdv_oma  )
          end do
       end do
-      write(6,'(1x,a9,i8,a,i8,a,4f10.4)')'bogus v  ', count, '/', count1, &
+      write(6,'(1x,a9,i10,a,i10,a,4f10.4)')'bogus v  ', count, '/', count1, &
                                         '. O-B(m,s), O-A(m,s) =', &
                                         mean_omb, stdv_omb, mean_oma, stdv_oma
 
@@ -1323,7 +1488,7 @@ subroutine da_calc_stats_bogus( num_obs, bogus )
                                      mean_omb, mean_oma, stdv_omb, stdv_oma  )
          end do
       end do
-      write(6,'(1x,a9,i8,a,i8,a,4f10.4)')'bogus t  ', count, '/', count1, &
+      write(6,'(1x,a9,i10,a,i10,a,4f10.4)')'bogus t  ', count, '/', count1, &
                                         '. O-B(m,s), O-A(m,s) =', &
                                         mean_omb, stdv_omb, mean_oma, stdv_oma
 
@@ -1337,7 +1502,7 @@ subroutine da_calc_stats_bogus( num_obs, bogus )
                                      mean_omb, mean_oma, stdv_omb, stdv_oma  )
          end do
       end do
-      write(6,'(1x,a9,i8,a,i8,a,4f10.4)')'bogus q  ', count, '/', count1, &
+      write(6,'(1x,a9,i10,a,i10,a,4f10.4)')'bogus q  ', count, '/', count1, &
                                         '. O-B(m,s), O-A(m,s) =', &
                                         mean_omb, stdv_omb, mean_oma, stdv_oma
       write(6,*)
@@ -1369,7 +1534,7 @@ subroutine da_calc_stats_airep( num_obs, airep )
                                     mean_omb, mean_oma, stdv_omb, stdv_oma  )
          end do
       end do
-      write(6,'(1x,a9,i5,a,i5,a,4f10.4)')'airep u  ', count, '/', count1, &
+      write(6,'(1x,a9,i10,a,i10,a,4f10.4)')'airep u  ', count, '/', count1, &
                                         '. O-B(m,s), O-A(m,s) =', &
                                         mean_omb, stdv_omb, mean_oma, stdv_oma
 
@@ -1383,7 +1548,7 @@ subroutine da_calc_stats_airep( num_obs, airep )
                                     mean_omb, mean_oma, stdv_omb, stdv_oma  )
          end do
       end do
-      write(6,'(1x,a9,i8,a,i8,a,4f10.4)')'airep v  ', count, '/', count1, &
+      write(6,'(1x,a9,i10,a,i10,a,4f10.4)')'airep v  ', count, '/', count1, &
                                         '. O-B(m,s), O-A(m,s) =', &
                                         mean_omb, stdv_omb, mean_oma, stdv_oma
       count = 0; count1 = 0
@@ -1396,7 +1561,7 @@ subroutine da_calc_stats_airep( num_obs, airep )
                                     mean_omb, mean_oma, stdv_omb, stdv_oma  )
          end do
       end do
-      write(6,'(1x,a9,i8,a,i8,a,4f10.4)')'airep t  ', count, '/', count1, &
+      write(6,'(1x,a9,i10,a,i10,a,4f10.4)')'airep t  ', count, '/', count1, &
                                         '. O-B(m,s), O-A(m,s) =', &
                                         mean_omb, stdv_omb, mean_oma, stdv_oma
       write(6,*)
@@ -1428,7 +1593,7 @@ subroutine da_calc_stats_pilot( num_obs, pilot )
                                      mean_omb, mean_oma, stdv_omb, stdv_oma  )
          end do
       end do
-      write(6,'(1x,a9,i8,a,i8,a,4f10.4)')'pilot u  ', count, '/', count1, &
+      write(6,'(1x,a9,i10,a,i10,a,4f10.4)')'pilot u  ', count, '/', count1, &
                                         '. O-B(m,s), O-A(m,s) =', &
                                         mean_omb, stdv_omb, mean_oma, stdv_oma
 
@@ -1442,7 +1607,7 @@ subroutine da_calc_stats_pilot( num_obs, pilot )
                                      mean_omb, mean_oma, stdv_omb, stdv_oma  )
          end do
       end do
-      write(6,'(1x,a9,i8,a,i8,a,4f10.4)')'pilot v  ', count, '/', count1, &
+      write(6,'(1x,a9,i10,a,i10,a,4f10.4)')'pilot v  ', count, '/', count1, &
                                         '. O-B(m,s), O-A(m,s) =', &
                                         mean_omb, stdv_omb, mean_oma, stdv_oma
       write(6,*)
@@ -1473,7 +1638,7 @@ subroutine da_calc_stats_profiler( num_obs, profiler )
                                      mean_omb, mean_oma, stdv_omb, stdv_oma  )
          end do
       end do
-      write(6,'(1x,a9,i8,a,i8,a,4f10.4)')'profiler u  ', count, '/', count1, &
+      write(6,'(1x,a9,i10,a,i10,a,4f10.4)')'profiler u  ', count, '/', count1, &
                                         '. O-B(m,s), O-A(m,s) =', &
                                         mean_omb, stdv_omb, mean_oma, stdv_oma
 
@@ -1487,7 +1652,7 @@ subroutine da_calc_stats_profiler( num_obs, profiler )
                                      mean_omb, mean_oma, stdv_omb, stdv_oma  )
          end do
       end do
-      write(6,'(1x,a9,i8,a,i8,a,4f10.4)')'profiler v  ', count, '/', count1, &
+      write(6,'(1x,a9,i10,a,i10,a,4f10.4)')'profiler v  ', count, '/', count1, &
                                         '. O-B(m,s), O-A(m,s) =', &
                                         mean_omb, stdv_omb, mean_oma, stdv_oma
       write(6,*)
@@ -1518,7 +1683,7 @@ subroutine da_calc_stats_satem( num_obs, satem )
                                      mean_omb, mean_oma, stdv_omb, stdv_oma  )
          end do
       end do
-      write(6,'(1x,a9,i8,a,i8,a,4f10.4)')'satem thk', count, '/', count1, &
+      write(6,'(1x,a9,i10,a,i10,a,4f10.4)')'satem thk', count, '/', count1, &
                                         '. O-B(m,s), O-A(m,s) =', &
                                         mean_omb, stdv_omb, mean_oma, stdv_oma
       write(6,*)
@@ -1550,7 +1715,7 @@ subroutine da_calc_stats_ssmt1( num_obs, ssmt1 )
                                      mean_omb, mean_oma, stdv_omb, stdv_oma  )
          end do
       end do
-      write(6,'(1x,a9,i8,a,i8,a,4f10.4)')'ssmt1 t  ', count, '/', count1, &
+      write(6,'(1x,a9,i10,a,i10,a,4f10.4)')'ssmt1 t  ', count, '/', count1, &
                                         '. O-B(m,s), O-A(m,s) =', &
                                         mean_omb, stdv_omb, mean_oma, stdv_oma
       write(6,*)
@@ -1582,7 +1747,7 @@ subroutine da_calc_stats_ssmt2( num_obs, ssmt2 )
                                      mean_omb, mean_oma, stdv_omb, stdv_oma  )
          end do
       end do
-      write(6,'(1x,a9,i8,a,i8,a,4f10.4)')'ssmt2 rh ', count, '/', count1, &
+      write(6,'(1x,a9,i10,a,i10,a,4f10.4)')'ssmt2 rh ', count, '/', count1, &
                                         '. O-B(m,s), O-A(m,s) =', &
                                         mean_omb, stdv_omb, mean_oma, stdv_oma
       write(6,*)

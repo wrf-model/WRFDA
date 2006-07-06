@@ -1,4 +1,4 @@
-subroutine da_scan_bufr_obs (iunit, ob, xp, filename)
+SUBROUTINE da_scan_bufr_obs (iunit, ob, xp, filename)
 !-----------------------------------------------------------------------------!
 !  Purpose: Scan BUFR observation file for input to wrfvar
 !-----------------------------------------------------------------------------!
@@ -15,7 +15,8 @@ subroutine da_scan_bufr_obs (iunit, ob, xp, filename)
    CHARACTER(*),   INTENT (in), OPTIONAL :: filename
 
    TYPE (multi_level_type)      :: platform
-   LOGICAL                      :: inside_halo, outside
+   LOGICAL                      :: inside_halo, outside, cycle_report
+   REAL                         :: height_error
    INTEGER                      :: total_obs, &
                                    num_sound, &
                                    num_synop, &
@@ -28,11 +29,12 @@ subroutine da_scan_bufr_obs (iunit, ob, xp, filename)
                                    num_ships, &
                                    num_gpspw, &
                                    num_gpsref, &
+                                   num_ssmi_retrieval, &
+                                   num_ssmi_tb      , &
                                    num_ssmt1, &
                                    num_ssmt2, &
-                                   num_qscat, &
+                                   num_pseudo, num_qscat, &
                                    num_profiler, num_buoy, num_bogus
-   ! INTEGER                      :: ssmi_tb, num_ssmi_retrieval
    character(len=40) :: hdstr
    character(len=10) :: date
    character(len=8 ) :: subset
@@ -99,10 +101,11 @@ subroutine da_scan_bufr_obs (iunit, ob, xp, filename)
    num_ships = 0
    num_gpspw = 0
    num_gpsref = 0
-   ! num_ssmi_retrieval = 0
-   ! num_ssmi_tb       = 0
+   num_ssmi_retrieval = 0
+   num_ssmi_tb       = 0
    num_ssmt1 = 0
    num_ssmt2 = 0
+   num_pseudo = 0
    num_qscat = 0
    num_profiler = 0
    num_buoy = 0
@@ -125,7 +128,7 @@ subroutine da_scan_bufr_obs (iunit, ob, xp, filename)
      errmsg(1) = "BUFR file does not exist"
      write(UNIT=errmsg(2), fmt='(a, i4)') &
        'INQUIRE cannot find unit: ',iunit
-     call wrf_errors(__FILE__,__LINE__,errmsg(1:2))
+     CALL wrf_errors(__FILE__,__LINE__,errmsg(1:2))
    endif
 
    INQUIRE (iunit, EXIST = exist )
@@ -133,7 +136,7 @@ subroutine da_scan_bufr_obs (iunit, ob, xp, filename)
      errmsg(1) = "BUFR file does not exist"
      write(UNIT=errmsg(2), fmt='(a, i4)') &
        'INQUIRE cannot find unit: ',iunit
-     call wrf_errors(__FILE__,__LINE__,errmsg(1:2))
+     CALL wrf_errors(__FILE__,__LINE__,errmsg(1:2))
    endif
 
    call openbf(iunit,'IN',iunit)
@@ -144,7 +147,7 @@ subroutine da_scan_bufr_obs (iunit, ob, xp, filename)
      write(UNIT=errmsg(2), fmt='(a, i4)') &
        'return code from readmg:', iret, &
        'Reach the end of obs unit: ', iunit
-     call wrf_errors(__FILE__,__LINE__,errmsg(1:2))
+     CALL wrf_errors(__FILE__,__LINE__,errmsg(1:2))
    end if
 
    write(UNIT=date,FMT='( i10)') idate
@@ -414,4 +417,4 @@ subroutine da_scan_bufr_obs (iunit, ob, xp, filename)
 
    end if
 
-end subroutine da_scan_bufr_obs
+END SUBROUTINE da_scan_bufr_obs

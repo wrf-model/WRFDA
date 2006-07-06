@@ -10,7 +10,8 @@
 !                        seperated & used as profile
 !              07/2005 - Add radiance part                  Zhiquan Liu
 !
-!              05/16/2006   Updated for MPI run 
+!              05/16/2006  -  Updated for MPI run       Syed RH Rizvi 
+!              07/03/2006  -  Updated for AIRS data     Syed RH Rizvi
 !  PARENT_MODULE: DA_Diagnostics
 !------------------------------------------------------------------------------
    
@@ -88,19 +89,19 @@
 
 !  [1.12] Pseudo obs:
 
-      call da_ob_stats_pseudo ( stats_unit, iv )
+      call da_oi_stats_pseudo ( stats_unit, iv )
 
 !  [1.13] SSM/T1:
 
-      call da_ob_stats_ssmt1 ( stats_unit, iv )
+      call da_oi_stats_ssmt1 ( stats_unit, iv )
 
 !  [1.14] SSM/T2:
 
-      call da_ob_stats_ssmt2 ( stats_unit, iv )
+      call da_oi_stats_ssmt2 ( stats_unit, iv )
       
 !  [1.15] Quikscat:
 
-      call da_ob_stats_qscat ( stats_unit, iv )
+      call da_oi_stats_qscat ( stats_unit, iv )
 
 !  [1.16] Profiler:
 
@@ -123,6 +124,10 @@
 !      print *, 'iv%num_inst = ', iv%num_inst
       call da_omb_stats_rad ( stats_unit, iv )
 
+!  [1.21] AIRS retrievals:
+
+      call da_oi_stats_airsr ( stats_unit, iv )
+
 
 !---- -------------------------------------------------------------------------
 !  [2.0] Calculate residual vector (O-A) statistics:
@@ -130,7 +135,6 @@
 
 !  [2.1] Sondes:
 
-      num_sound_tot = 0
       call da_ao_stats_sound ( stats_unit, iv, re )
       call da_ao_stats_sonde_sfc ( stats_unit, iv, re )
 
@@ -183,19 +187,19 @@
    
 !  [2.12] Pseudo obs:
 
-      call da_oa_stats_pseudo ( stats_unit, iv, re )
+      call da_ao_stats_pseudo ( stats_unit, iv, re )
 
 !  [2.13] SSM/T1:
 
-      call da_oa_stats_ssmt1 ( stats_unit, iv, re )
+      call da_ao_stats_ssmt1 ( stats_unit, iv, re )
       
 !  [2.14] SSM/T2:
 
-      call da_oa_stats_ssmt2 ( stats_unit, iv, re )
+      call da_ao_stats_ssmt2 ( stats_unit, iv, re )
       
 !  [2.15] Quikscat:
 
-      call da_oa_stats_qscat ( stats_unit, iv, re )
+      call da_ao_stats_qscat ( stats_unit, iv, re )
 
 !  [2.16] Profiler
 
@@ -216,6 +220,10 @@
 !  [2.20] Radiance:
 
       call da_oma_stats_rad ( stats_unit, iv, re )
+
+!  [2.21] Radiance:
+                                                                               
+      call da_ao_stats_airsr ( stats_unit, iv, re )
 
 !---- -------------------------------------------------------------------------
 !  [3.0] Calculate analysis increment (A-B) statistics:

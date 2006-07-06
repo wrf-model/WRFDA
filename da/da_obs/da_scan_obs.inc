@@ -1,4 +1,4 @@
-subroutine da_scan_obs (iunit, ob, xp, filename)
+SUBROUTINE da_scan_obs (iunit, ob, xp, filename)
 !-----------------------------------------------------------------------------!
 !  Purpose: Scan WRFVAR GTS observation file
 !-----------------------------------------------------------------------------!
@@ -8,6 +8,7 @@ subroutine da_scan_obs (iunit, ob, xp, filename)
 !              Fix Obs-Long as -180 if it is +180
 !                     03/30/2005           Syed RH Rizvi
 !              For global option duplicate obs at East/West boundary
+!              07/03/2006  AIRS retrieval update   Syed RH Rizvi
 !
 !-----------------------------------------------------------------------------!
 
@@ -27,7 +28,7 @@ subroutine da_scan_obs (iunit, ob, xp, filename)
                                    fmt_loc, & 
                                    fmt_each
 
-   INTEGER                      :: i, iost, fm, report
+   INTEGER                      :: i, j, iost, fm, report
 
    TYPE (multi_level_type)      :: platform
 
@@ -49,12 +50,12 @@ subroutine da_scan_obs (iunit, ob, xp, filename)
                                    num_ships, &
                                    num_gpspw, &
                                    num_gpsref, &
+                                   num_ssmi_retrieval, &
+                                   num_ssmi_tb      , &
                                    num_ssmt1, &
-                                   num_ssmt2, &
-                                   num_qscat, &
+                                   num_ssmt2, num_airsr, &
+                                   num_pseudo, num_qscat, &
                                    num_profiler, num_buoy, num_bogus
-   !INTEGER                      :: num_ssmi_retrieval, &
-   !                                num_ssmi_tb
 
    INTEGER                        :: ndup, n
 
@@ -77,6 +78,7 @@ subroutine da_scan_obs (iunit, ob, xp, filename)
 
    ob%ob_numb(ob%current_ob_time)%ssmt1 = ob%num_ssmt1
    ob%ob_numb(ob%current_ob_time)%ssmt2 = ob%num_ssmt2
+   ob%ob_numb(ob%current_ob_time)%airsr = ob%num_airsr
 !  ob%ob_numb(ob%current_ob_time)%ssmi_tb        = ob%num_ssmi_tb
 !  ob%ob_numb(ob%current_ob_time)%ssmi_retrieval = ob%num_ssmi_retrieval
 !----------------------------------------------------------------------------!
@@ -93,7 +95,7 @@ subroutine da_scan_obs (iunit, ob, xp, filename)
    IF (iost /= 0) THEN
       WRITE(UNIT=errmsg(1),FMT='(A,I5,A)') &
          "Error",iost," opening gts obs file "//TRIM(filename)
-      call wrf_warning(__FILE__,__LINE__,errmsg(1:1))
+      CALL wrf_warning(__FILE__,__LINE__,errmsg(1:1))
       RETURN
    ENDIF
 
@@ -111,14 +113,16 @@ subroutine da_scan_obs (iunit, ob, xp, filename)
    num_ships = 0
    num_gpspw = 0
    num_gpsref = 0
-   ! num_ssmi_retrieval = 0
-    ! num_ssmi_tb       = 0   
+   num_ssmi_retrieval = 0
+   num_ssmi_tb       = 0   
    num_ssmt1 = 0
    num_ssmt2 = 0
+   num_pseudo = 0
    num_qscat = 0
    num_profiler = 0
    num_buoy = 0
    num_bogus = 0
+   num_airsr = 0
 
 !----------------------------------------------------------------------------!
 
@@ -132,7 +136,7 @@ subroutine da_scan_obs (iunit, ob, xp, filename)
       IF (iost /= 0) THEN
          WRITE(UNIT=errmsg(1),FMT='(A,I3,A,I3)') &
             "Error",iost,"reading gts obs header on unit",iunit
-         call wrf_warning(__FILE__,__LINE__,errmsg(1:1))
+         CALL wrf_warning(__FILE__,__LINE__,errmsg(1:1))
          return
       ENDIF
 
@@ -153,7 +157,7 @@ subroutine da_scan_obs (iunit, ob, xp, filename)
    IF (iost /= 0) THEN
       WRITE(UNIT=errmsg(1),FMT='(A,I3,A,I3)') &
          "Error",iost,"reading gts obs formats on unit",iunit
-         call wrf_warning(__FILE__,__LINE__,errmsg(1:1))
+         CALL wrf_warning(__FILE__,__LINE__,errmsg(1:1))
       RETURN
    ENDIF
 
@@ -259,10 +263,6 @@ loop_level: DO i = 1, platform%info%levels
               platform%each (i)%t,            &
               platform%each (i)%td,           &
               platform%each (i)%rh
-
-       ! JRB stop compiler whinging
-       IF (height_error == 0) THEN
-       END IF
 
 !      write(UNIT=stdout, FMT = '( a, i6)') 'i=', i
 !      write(UNIT=stdout, FMT = TRIM (fmt_each)) &
@@ -431,6 +431,11 @@ loop_level: DO i = 1, platform%info%levels
             if(.not.use_BuoyObs) cycle reports
             num_buoy  = num_buoy  + 1
 
+         CASE (133) ;               ! AIRS retrievals
+            if(.not.use_AIRSRETObs) cycle reports
+
+            num_airsr = num_airsr + 1
+
          CASE DEFAULT;
 
             write(UNIT=stdout, fmt='(/a/)') &
@@ -474,6 +479,7 @@ loop_level: DO i = 1, platform%info%levels
 
    ob%num_ssmt1 = ob%num_ssmt1 + num_ssmt1
    ob%num_ssmt2 = ob%num_ssmt2 + num_ssmt2
+   ob%num_airsr = ob%num_airsr + num_airsr
 
 !  ob%num_ssmi_tb        = ob%num_ssmi_tb + num_ssmi_tb
 !  ob%num_ssmi_retrieval = ob%num_ssmi_retrieval + num_ssmi_retrieval
@@ -496,6 +502,7 @@ loop_level: DO i = 1, platform%info%levels
 
    ob%ob_numb(ob%current_ob_time)%ssmt1 = ob%num_ssmt1
    ob%ob_numb(ob%current_ob_time)%ssmt2 = ob%num_ssmt2
+   ob%ob_numb(ob%current_ob_time)%airsr = ob%num_airsr
 
 !  ob%ob_numb(ob%current_ob_time)%ssmi_tb        = ob%num_ssmi_tb
 !  ob%ob_numb(ob%current_ob_time)%ssmi_retrieval = ob%num_ssmi_retrieval
@@ -526,7 +533,8 @@ loop_level: DO i = 1, platform%info%levels
            'Scan:  ', num_buoy, ' Buoy reports,', &
            'Scan:  ', num_bogus, ' TCBGS reports,', &
            'Scan:  ', num_ssmt1, ' SSMT1 reports,', &
-           'Scan:  ', num_ssmt2, ' SSMT2 reports.'
+           'Scan:  ', num_ssmt2, ' SSMT2 reports.', &
+           'Scan:  ', num_airsr, ' AIRS retrieval reports'
 
 !     write(UNIT=stdout, fmt='(5x,a,i6,a)') &
 !          'Scan:  ', num_ssmi_retrieval , ' SSMI_RETRIEVAL reports,', &
@@ -534,5 +542,5 @@ loop_level: DO i = 1, platform%info%levels
 
    end if
 
-end subroutine da_scan_obs
+END SUBROUTINE da_scan_obs
 

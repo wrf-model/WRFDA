@@ -1,4 +1,4 @@
-subroutine DA_Deallocate_Observations ( ob )
+SUBROUTINE DA_Deallocate_Observations ( ob )
 
 !------------------------------------------------------------------------------
 !  PURPOSE: Deallocate components of observation structure.
@@ -6,6 +6,9 @@ subroutine DA_Deallocate_Observations ( ob )
 !  METHOD:  Deallocate components in turn.
 !
 !  HISTORY: 01/06/2000 - Creation of F90 version.           Dale Barker
+!  Additions:
+!             07/03/2006     Updated for AIRS retrievals     Syed RH Rizvi
+!
 !
 !  PARENT_MODULE: DA_Define_Structures
 !------------------------------------------------------------------------------
@@ -15,7 +18,7 @@ subroutine DA_Deallocate_Observations ( ob )
    TYPE (ob_type), intent(inout)        :: ob     ! Observation structure.
    integer   :: n
 
-   IF (trace_use) call da_trace_entry("da_deallocate_observations")
+   IF (trace_use) CALL da_trace_entry("da_deallocate_observations")
 
 !------------------------------------------------------------------------------
 !  [1.0] Deallocate:
@@ -146,7 +149,19 @@ subroutine DA_Deallocate_Observations ( ob )
 
    if(ob%num_buoy     > 0) DEALLOCATE(ob%buoy)
 
-   IF (trace_use) call da_trace_exit("da_deallocate_observations")
+   IF ( ob % num_airsr > 0 ) then
+      do n = 1, ob % num_airsr
+         deallocate (ob % airsr ( n ) % h )
+         deallocate (ob % airsr ( n ) % p )
+         deallocate (ob % airsr ( n ) % zk)
+         deallocate (ob % airsr ( n ) % t )
+         deallocate (ob % airsr ( n ) % q )
+      enddo
 
-end subroutine DA_Deallocate_Observations
+      DEALLOCATE (ob % airsr)
+   endif
+
+   IF (trace_use) CALL da_trace_exit("da_deallocate_observations")
+
+END SUBROUTINE DA_Deallocate_Observations
 

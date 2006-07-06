@@ -117,6 +117,15 @@ SUBROUTINE da_deallocate_obs (ob)
          deallocate (ob%bogus(i)%q)
       END DO
    END IF
+   IF (use_AIRSRETObs) THEN
+      DO i=1,ob%num_airsr
+         deallocate (ob%airsr(i)%h)
+         deallocate (ob%airsr(i)%p)
+         deallocate (ob%airsr(i)%zk)
+         deallocate (ob%airsr(i)%t)
+         deallocate (ob%airsr(i)%q)
+      END DO
+   END IF
 
    IF (trace_use) CALL da_trace_exit("da_deallocate_obs")
 

@@ -357,6 +357,18 @@ module da_define_structures
       TYPE (field_type)     , pointer :: q        (:) ! q.
    END TYPE sound_type
 
+   TYPE airsr_type
+      TYPE (info_type)      :: info
+      TYPE (model_loc_type) :: loc
+
+      real                  , pointer :: h        (:) ! Height in m
+      real                  , pointer :: p        (:) ! pressure.
+      real                  , pointer :: zk       (:) ! k-coordinates
+
+      TYPE (field_type)     , pointer :: t        (:) ! temperature.
+      TYPE (field_type)     , pointer :: q        (:) ! q.
+   END TYPE airsr_type
+
    TYPE gpspw_type
       TYPE (info_type)        :: info
       TYPE (model_loc_type)   :: loc
@@ -484,7 +496,8 @@ module da_define_structures
                  profiler, &
                  buoy, &
                  Radar, &
-                 radiance
+                 radiance, &
+                 airsr
    END TYPE ob_numb_type
 
    TYPE ob_type
@@ -492,7 +505,7 @@ module da_define_structures
 
       INTEGER :: current_ob_time
 
-      INTEGER :: total_obs, num_synop, &
+      INTEGER :: total_obs, num_synop, num_airsr, &
                  num_sound, num_geoamv, num_polaramv, &
                  num_pilot, num_satem, &
                  num_airep, num_metar, &
@@ -503,7 +516,7 @@ module da_define_structures
                  num_Radar, num_gpsref, num_bogus, &
                  num_inst, total_rad_pixel, total_rad_channel
 
-      INTEGER :: num_synop_glo, &
+      INTEGER :: num_synop_glo, num_airsr_glo, &
                  num_sound_glo, num_geoamv_glo, num_polaramv_glo, &
                  num_pilot_glo, num_satem_glo, &
                  num_airep_glo, num_metar_glo, &
@@ -520,7 +533,7 @@ module da_define_structures
       real    :: geoamv_ef_u, geoamv_ef_v
       real    :: polaramv_ef_u, polaramv_ef_v
       real    :: gpspw_ef_tpw
-      real    :: sound_ef_u, sound_ef_v, sound_ef_t, sound_ef_p, sound_ef_q
+      real    :: sound_ef_u, sound_ef_v, sound_ef_t, sound_ef_q
       real    :: airep_ef_u, airep_ef_v, airep_ef_t
       real    :: pilot_ef_u, pilot_ef_v
       real    :: ssmir_ef_speed, ssmir_ef_tpw
@@ -531,7 +544,9 @@ module da_define_structures
       real    :: buoy_ef_u, buoy_ef_v, buoy_ef_t, buoy_ef_p, buoy_ef_q
       real    :: Radar_ef_rv, Radar_ef_rf
       real    :: bogus_ef_u, bogus_ef_v, bogus_ef_t, bogus_ef_p, bogus_ef_q, bogus_ef_slp
+      real    :: airsr_ef_t,  airsr_ef_q
 
+      TYPE (airsr_type)         , pointer :: airsr(:)
       TYPE (sound_type)         , pointer :: sound(:)
       TYPE (synop_type)         , pointer :: sonde_sfc(:)
       TYPE (airep_type)         , pointer :: airep(:)
@@ -601,7 +616,7 @@ module da_define_structures
  
    TYPE count_obs_type
 
-        TYPE (count_obs_number_type)  :: total_obs, num_synop, &
+        TYPE (count_obs_number_type)  :: total_obs, num_synop, num_airsr_obs,&
                                          num_sound, num_geoamv, num_polaramv,&
                                          num_pilot, num_satem, &
                                          num_airep, num_metar, &
@@ -655,6 +670,11 @@ module da_define_structures
       REAL, POINTER :: t(:)                     ! temperature.
       REAL, POINTER :: q(:)                     ! specific humidity.
    END TYPE residual_sound_type
+
+   TYPE residual_airsr_type
+      REAL, POINTER :: t(:)                     ! temperature.
+      REAL, POINTER :: q(:)                     ! specific humidity.
+   END TYPE residual_airsr_type
 
    TYPE residual_airep_type
       REAL, POINTER :: u(:)                     ! u-wind.
@@ -736,7 +756,7 @@ module da_define_structures
    TYPE y_type
         TYPE(ob_numb_type) :: ob_numb
 
-        INTEGER :: total_obs, num_synop, &
+        INTEGER :: total_obs, num_synop, num_airsr, &
                    num_sound, num_geoamv, num_polaramv, &
                    num_pilot, num_satem, &
                    num_airep, num_metar, &
@@ -755,6 +775,7 @@ module da_define_structures
         TYPE (residual_gpspw_type ), POINTER :: gpspw (:)
         TYPE (residual_gpsref_type), POINTER :: gpsref(:)
         TYPE (residual_sound_type), POINTER :: sound(:)
+        TYPE (residual_airsr_type), POINTER :: airsr(:)
         TYPE (residual_bogus_type), POINTER :: bogus(:)
         TYPE (residual_synop_type), POINTER :: sonde_sfc(:) ! Same as synop type
         TYPE (residual_airep_type), POINTER :: airep(:)
@@ -809,6 +830,7 @@ module da_define_structures
       real                :: buoy_u, buoy_v, buoy_t, buoy_p, buoy_q
       real                :: Radar_rv, Radar_rf
       real                :: bogus_u, bogus_v, bogus_t, bogus_q, bogus_slp
+      real                :: airsr_t, airsr_q
       real, pointer       :: rad(:)
    end type jo_type
 

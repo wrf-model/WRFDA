@@ -3,8 +3,9 @@ SUBROUTINE da_add_noise_to_ob( iv, ob )
 !  History:
 !
 !  Additions:
-!             07/08/2003      Profiler and Buoy Obs         Syed RH Rizvi    
-!             06/23/2006      MPI update                    Syed RH Rizvi    
+!             07/08/2003  -   Profiler and Buoy Obs         Syed RH Rizvi    
+!             06/23/2006  -   MPI update                    Syed RH Rizvi    
+!             07/03/2006  -   update for AIRS retrievals    Syed RH Rizvi    
 !
 !  Purpose: Allocates observation structure and fills it fro iv.
 !----------------------------------------------------------------------------   
@@ -601,6 +602,34 @@ SUBROUTINE da_add_noise_to_ob( iv, ob )
                                iv % bogus(n) % t(k) % error, z3, &
                                iv % bogus(n) % q(k) % error, z4, &
                                dum, dum
+         END DO
+       endif
+      END DO
+   ENDIF
+!
+!  Transfer AIRS retrievals:
+!
+   IF ( iv % num_airsr > 0 ) THEN
+      num_obs = 0
+      DO n = 1, iv % num_airsr
+       if(iv%airsr(n)%loc%proc_domain) num_obs = num_obs + 1
+      ENDDO
+      write(ounit,'(a20,i8)')'airsr', num_obs   
+      num_obs = 0 
+      DO n = 1, iv % num_airsr
+       if(iv%airsr(n)%loc%proc_domain) then
+         num_obs = num_obs + 1
+         write(ounit,'(i8)')iv % airsr(n) % info % levels
+         DO k = 1, iv % airsr(n) % info % levels
+!           Add random perturbation:
+            call da_add_noise( iv % airsr(n) % t(k), ob % airsr(n) % t(k), z1)
+            call da_add_noise( iv % airsr(n) % q(k), ob % airsr(n) % q(k), z2)
+
+!           Write out data:
+            write(ounit,'(2i8,10e15.7)')num_obs, k, &
+                               iv % airsr(n) % t(k) % error, z1, &
+                               iv % airsr(n) % q(k) % error, z2, &
+                               dum, dum, dum, dum, dum, dum
          END DO
        endif
       END DO

@@ -382,6 +382,25 @@ subroutine da_write_noise_to_ob (iv)
     if ( wrf_dm_on_monitor() )call da_read_rand_unit(iunit,ounit,num_obs,'bogus',5)    
     ENDDO
     endif
+!------------------------------------------------------------------
+!  writing AIRS retrievals
+!------------------------------------------------------------------
+      num_obs = 0
+    IF ( iv % num_airsr > 0 ) THEN
+      DO n = 1, iv % num_airsr
+       if(iv%airsr(n)%loc%proc_domain) num_obs = num_obs + 1
+      ENDDO
+    ENDIF
+    call da_proc_sum_int(num_obs)
+    if(num_obs > 0) then
+    if ( wrf_dm_on_monitor() ) write(ounit,'(a20,i8)')'airsr', num_obs  
+    num_obs = 0
+    DO k = 0,numb_procs-1
+    iunit = rand_unit*10 +  k
+    rewind iunit
+    if ( wrf_dm_on_monitor() )call da_read_rand_unit(iunit,ounit,num_obs,'airsr',5)    
+    ENDDO
+    endif
 !-------------------------------------------------------------------
   if ( wrf_dm_on_monitor() ) write(ounit,'(a20,i8)')'********************', 0
 !-------------------------------------------------------------------

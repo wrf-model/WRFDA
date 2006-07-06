@@ -1,8 +1,8 @@
 subroutine da_read_rand_unit(unit_in,unit_out,num,obs_type_in, nc)
 !----------------------------------------------------------------------------   
 !  Program to read diagnostics written on yp_unit or y_unit by WRF-Var
-!  Author:   Syed RH Rizvi
-!            05/16/2005
+!  Author:   Syed RH Rizvi          MMM/NCAR       05/16/2006
+!    
 !----------------------------------------------------------------------------   
    IMPLICIT NONE
 

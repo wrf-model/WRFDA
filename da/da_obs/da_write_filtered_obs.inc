@@ -46,6 +46,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xb, xp, &
 !                                      Yong-Run Guo   02/01/2006        
 !..........................................................................
 !           06/02/2006 - Updated for MPI run               Syed  RH  Rizvi
+!           07/03/2006 - Updated for AIRS retrievals       Syed  RH  Rizvi
 !---------------------------------------------------------------------------   
    IMPLICIT NONE
 #ifdef DM_PARALLEL
@@ -1201,6 +1202,60 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xb, xp, &
       ENDDO 
 !
       ENDDO 
+   ENDIF
+!----------------------------------------------------------------------------!
+!  Write AIRS  retrievals:
+   IF ( iv % num_airsr > 0 ) THEN
+    if(print_detail_f_obs) print*,' writing filtered Obs for AIRS retrievals ',iv%num_airsr 
+!----------------------------------------------------------------------------!
+    DO i = 1, iv % num_airsr               
+     if( .not. iv%airsr(i)%loc%proc_domain) cycle
+     write(ounit, FMT = fmt_info, IOSTAT = iost) &
+                   iv%airsr(i)%info%platform,    &
+                   iv%airsr(i)%info%date_char,   &
+                   iv%airsr(i)%info%name,        &
+                   iv%airsr(i)%info%levels,      &
+                   iv%airsr(i)%info%lat,         &
+                   iv%airsr(i)%info%lon,         &
+                   iv%airsr(i)%info%elv,         &
+                   iv%airsr(i)%info%id
+  write(ounit, FMT = fmt_srfc) iv%airsr(i)%loc%slp, iv%airsr(i)%loc%pw
+!----------------------------------------------------------------------------!
+     DO n = 1, iv%airsr(i)%info%levels
+!----------------------------------------------------------------------------!
+! get RH from Q & T    
+      if( iv%airsr(i)%q(n)%qc >= obs_qc_pointer .and.  &
+          abs(iv%airsr(i)%q(n)%error - missing_r ) > 1. .and.  &
+          abs(ob%airsr(i)%t(n)       - missing_r ) > 1. .and.  &
+          abs(iv%airsr(i)%p(n)       - missing_r ) > 1.    ) then 
+         call da_tp_to_qs(ob%airsr(i)%t(n), iv%airsr(i)%p(n), es, qs )
+         rh = (ob%airsr(i)%q(n)/qs ) * 100.
+       rh_qc = iv%airsr(i)%q(n)%qc
+      else
+        rh    = missing_r
+        rh_qc = missing_data
+      endif
+   if( rh_qc < 0) rh_qc = missing_data
+!----------------------------------------------------------------------------!
+   t    =  ob%airsr(i)%t(n)
+   t_qc =  iv%airsr(i)%t(n)%qc
+   t_err= iv%airsr(i)%t(n)%error
+   if( iv%airsr(i)%t(n)%qc <= fails_error_max) then
+     t_qc = missing_data
+     t   = missing_r
+   end if
+!----------------------------------------------------------------------------!
+         write(ounit, FMT = TRIM (fmt_each))      &
+         iv%airsr(i)%p(n), zero,    pr_error,     &
+         missing_r, missing_data, xmiss,          &
+         missing_r, missing_data, xmiss,          &
+         iv%airsr(i)%h(n), zero, elv_error,       &
+         t,  t_qc, t_err,                         &
+         td, td_qc, td_error,                     &
+         rh, rh_qc,  rh_error                
+      ENDDO 
+!
+    ENDDO     
    ENDIF
 !----------------------------------------------------------------------------!
    IF ( iv % num_ssmi_tb > 0 ) &     

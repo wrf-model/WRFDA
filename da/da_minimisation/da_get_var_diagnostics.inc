@@ -1,5 +1,8 @@
 subroutine da_get_var_diagnostics ( iv, j )
 
+!-------------------------------------------------------------------------
+!     07/03/2006  -  Update for AIRS retrievals
+!-------------------------------------------------------------------------
    type (ob_type), intent(inout):: iv      ! innovation vector.
    type (j_type), intent(inout) :: j       ! Cost function.
 
@@ -19,7 +22,8 @@ subroutine da_get_var_diagnostics ( iv, j )
                  num_ssmt2_tot + num_satem_tot + num_airep_tot + &
                  num_geoamv_tot+ num_polaramv_tot+ num_ships_tot + &
                  num_sound_tot + num_qscat_tot + num_profiler_tot+ &
-                 num_buoy_tot + num_gpsref_tot + num_bogus_tot
+                 num_buoy_tot + num_gpsref_tot + num_bogus_tot   + &
+                 num_airsr_tot
 
    call da_sum_reals( 5, j % jo % synop_u, j % jo % synop_v, &
                       j % jo % synop_t, j % jo % synop_p, j % jo % synop_q,&
@@ -70,6 +74,8 @@ subroutine da_get_var_diagnostics ( iv, j )
    call da_sum_reals( 5, j % jo % buoy_u, j % jo % buoy_v, &
                       j % jo % buoy_t, j % jo % buoy_p, j % jo % buoy_q,   &
                                                                 dum1, dum2 )
+   call da_sum_reals( 2, j % jo % airsr_t, j % jo % airsr_q, &
+                         dum1, dum2,dum3, dum4, dum5 )
    !-----------------------------------------------------------------------------
    ! [2.0] Print out VAR diagnostics:
    !-----------------------------------------------------------------------------
@@ -168,8 +174,7 @@ subroutine da_get_var_diagnostics ( iv, j )
                                j % jo % sound_u, iv % sound_ef_u, &
                                j % jo % sound_v, iv % sound_ef_v, &
                                j % jo % sound_t, iv % sound_ef_t, &
-                               j % jo % sound_q, iv % sound_ef_q, &                                
-                               0.0, 1.0
+                               j % jo % sound_q, iv % sound_ef_q, 0.0, 1.0 
          write(UNIT=jo_unit,FMT='(a30,2i8,10f15.5)')'    sonde obs, Jo (actual)  = ', &
                                iv % num_sound_glo, num_sound_tot, &
                                j % jo % sonde_sfc_u, iv % synop_ef_u, &
@@ -258,6 +263,13 @@ subroutine da_get_var_diagnostics ( iv, j )
                                iv % num_profiler_glo, num_profiler_tot, &
                                j % jo % profiler_u, iv % profiler_ef_u, &
                                j % jo % profiler_v, iv % profiler_ef_v, &
+                               0.0, 1.0, 0.0, 1.0, 0.0, 1.0
+      end if
+      if ( iv % num_airsr_glo > 0 ) then
+         write(UNIT=jo_unit,FMT='(a30,2i8,10f15.5)')'    airsr obs, Jo (actual)  = ', &
+                               iv % num_airsr_glo, num_airsr_tot, &
+                               j % jo % airsr_t, iv % airsr_ef_t, &
+                               j % jo % airsr_q, iv % airsr_ef_q, &
                                0.0, 1.0, 0.0, 1.0, 0.0, 1.0
       end if
    end if

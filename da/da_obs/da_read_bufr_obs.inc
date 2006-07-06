@@ -1,4 +1,4 @@
-subroutine da_read_bufr_obs (iunit, ob, xp, filename)
+SUBROUTINE da_read_bufr_obs (iunit, ob, xp, filename)
 !-----------------------------------------------------------------------------!
 !  Purpose: Read BUFR observation file for input to wrfvar
 !-----------------------------------------------------------------------------!
@@ -18,6 +18,7 @@ subroutine da_read_bufr_obs (iunit, ob, xp, filename)
 
    TYPE (multi_level_type)      :: platform
    LOGICAL                      :: inside_halo, outside, outside_all
+   REAL                         :: height_error
    INTEGER                      :: total_obs, &
                                    num_sound, &
                                    num_synop, &
@@ -34,21 +35,21 @@ subroutine da_read_bufr_obs (iunit, ob, xp, filename)
                                    num_ssmi_tb      , &
                                    num_ssmt1, &
                                    num_ssmt2, &
-                                   num_qscat, &
+                                   num_pseudo, num_qscat, &
                                    num_profiler, num_buoy, num_bogus
 
-   character(len=40)     :: obstr,hdstr,qmstr,oestr
-   ! character(len=40)     :: drift
+   character(len=40)     :: obstr,drift,hdstr,qmstr,oestr
+   character(len=10)     :: date
    character(len=8 )     :: subset, c8id
    real,dimension(7)     :: hdr
    real,dimension(2,1)   :: pmo
-   ! real,dimension(9,255) :: drf
-   real,dimension(9,255) :: obs,qms,oes
-   real                  :: time,woe,toe,qoe,poe,zob,rob,roe
+   real,dimension(9,255) :: drf,obs,qms,oes
+   real                  :: time,woe,qob,toe,qoe,poe,pob,tob,zob,rob,roe
 
    integer               :: iost, ndup, n, i, j, k, surface_level, report
-   integer               :: iret, idate, kx, nlevels, nrecs,t29, jx, ix
-   integer               :: zqm,pqm,qqm,tqm,wqm,pwq,pmq,rqm
+   integer               :: year, month, day,hour
+   integer               :: iret, idate, kx, nlevels, nrecs,miscd, t29, jx, ix
+   integer               :: cat,zqm,pqm,qqm,tqm,wqm,pwq,pmq,rqm
 
    integer, parameter    :: qflag=4         ! Flag for retaining data
    EQUIVALENCE     ( hdr(1), c8id )
@@ -74,6 +75,7 @@ subroutine da_read_bufr_obs (iunit, ob, xp, filename)
    num_profiler = ob%num_profiler
    num_buoy = ob%num_buoy
    num_bogus= ob%num_bogus
+   num_pseudo = 0
 !----------------------------------------------------------------------------!
 !  OPEN FILE
 !  ---------
@@ -96,12 +98,13 @@ subroutine da_read_bufr_obs (iunit, ob, xp, filename)
 !
    hdstr='SID XOB YOB DHR TYP ELV T29     '
    obstr='POB QOB TOB ZOB UOB VOB PWO ROB CAT '
-   ! drift='XDR YDR HRDR                    '
+   drift='XDR YDR HRDR                    '
    qmstr='PQM QQM TQM ZQM WQM NUL PWQ PMQ RQM '
    oestr='POE QOE TOE NUL WOE NUL PWE ROE '
 
 !----------------------------------------------------------------------------!
    nrecs = 0
+   miscd = 0
 !------------------------------------------------------------------------------
 !  READ BUFR OBSERVATION FILE
 !   call openbf(iunit,'IN',iunit)
@@ -112,7 +115,7 @@ subroutine da_read_bufr_obs (iunit, ob, xp, filename)
            'return code from readmg:', iret, &
            'Reach the end of obs unit: ', iunit
 
-      call wrf_error(__FILE__,__LINE__, &
+      CALL wrf_error(__FILE__,__LINE__, &
         "No BUFR observations")
    end if
 !------------------------------------------------------------------------------
@@ -283,6 +286,7 @@ subroutine da_read_bufr_obs (iunit, ob, xp, filename)
       enddo loop_init_value
 
       loop_level: DO k = 1, platform % info % levels
+         pob=obs(1,k)
 ! scale q and compute t from tv and set units to Kelvin, if they aren't missing
 !         WRITE(UNIT=stdout,FMT=*) '--------- k = ',k,' q = ',obs(2,k),' t = ',obs(3,k)
 
@@ -298,6 +302,8 @@ subroutine da_read_bufr_obs (iunit, ob, xp, filename)
 !            WRITE(UNIT=stdout,FMT=*) '--------- t is now ',obs(3,k)
 	   endif
 	 endif
+         qob=obs(2,k)
+         tob=obs(3,k)
          zob=obs(4,k)
          rob=obs(8,k)
          pqm = qflag
@@ -316,6 +322,7 @@ subroutine da_read_bufr_obs (iunit, ob, xp, filename)
          if( abs(qms(9,k)) < qflag) rqm=nint(qms(9,k))
 	 pmq = qflag
          if( abs(pmo(2,1)) < qflag) pmq=nint(pmo(2,1))
+         cat=nint(obs(9,k))
 
          if ( pmq < qflag ) then
             platform % loc % slp % inv =pmo(1,1)*100.
@@ -433,7 +440,7 @@ subroutine da_read_bufr_obs (iunit, ob, xp, filename)
 !  if rh, temp and pr all available computes Qs otherwise sets Qs= missing
 !  if rh > 100 sets q = qs otherwise q = rh*Qs/100. 
 ! Note: Currently da_obs_proc_station is active only for ob_format=2 (Ascii)
-!      call da_obs_proc_station(platform)
+!      CALL da_obs_proc_station(platform)
 !---------------------------------------------------------------------------
 !    Loop over duplicating obs for global
      ndup = 1
@@ -894,7 +901,7 @@ subroutine da_read_bufr_obs (iunit, ob, xp, filename)
          if( num_bogus > max_bogus_input) then
            WRITE(UNIT=errmsg(1),FMT='(A,I6,A,I6)') &
              'Bogus #=', num_bogus, ' > max_bogus_input=', max_bogus_input
-           call wrf_error(__FILE__,__LINE__,errmsg(1))
+           CALL wrf_error(__FILE__,__LINE__,errmsg(1))
          endif
 
          ob%bogus(num_bogus)%info = platform%info
@@ -1074,6 +1081,6 @@ subroutine da_read_bufr_obs (iunit, ob, xp, filename)
            'ob%ob_numb(ob%current_ob_time)%profiler=', ob%ob_numb(ob%current_ob_time)%profiler, &
            'ob%num_profiler=', ob%num_profiler
 
-      call wrf_error(__FILE__,__LINE__,"Obs mismatch")
+      CALL wrf_error(__FILE__,__LINE__,"Obs mismatch")
    endif
-end subroutine da_read_bufr_obs
+END SUBROUTINE da_read_bufr_obs

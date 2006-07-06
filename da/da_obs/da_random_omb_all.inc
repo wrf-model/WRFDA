@@ -1,4 +1,4 @@
-subroutine da_random_omb_all( iv, ob )
+SUBROUTINE da_random_omb_all( iv, ob )
 !----------------------------------------------------------------------------
 !  History:
 !
@@ -7,7 +7,7 @@ subroutine da_random_omb_all( iv, ob )
 !           03/04/2005 - AMV's from Geostationary and     Syed  RH  Rizvi
 !                        Polar orbiting satellite are
 !                        seperated & used as profile
-!
+!           07/03/2006 - update for AIRS retrievals       Syed RH Rizvi
 !
 !  Purpose: Allocates observation structure and fills it fro iv.
 !----------------------------------------------------------------------------
@@ -319,4 +319,17 @@ subroutine da_random_omb_all( iv, ob )
       END DO
    ENDIF
 
-end subroutine da_random_omb_all
+!  Transfer AIRS retrievals:
+
+   IF ( iv % num_airsr > 0 ) THEN
+      DO n = 1, iv % num_airsr
+         DO k = 1, iv % airsr(n) % info % levels
+            call da_random_omb( iv % airsr(n) % t(k) % error, ob % airsr(n) % t(k), &
+                              iv % airsr(n) % t(k) % qc, iv % airsr(n) % t(k) % inv )
+            call da_random_omb( iv % airsr(n) % q(k) % error, ob % airsr(n) % q(k), &
+                              iv % airsr(n) % q(k) % qc, iv % airsr(n) % q(k) % inv )
+         END DO
+      END DO
+   ENDIF
+
+END SUBROUTINE da_random_omb_all

@@ -286,7 +286,7 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
                            num_satem_tot, num_geoamv_tot,num_polaramv_tot, num_ships_tot, &
                            num_sound_tot, num_airep_tot, num_qscat_tot, &
                            num_profiler_tot, num_buoy_tot, num_gpsref_tot, &
-                           num_Radar_tot, num_bogus_tot
+                           num_Radar_tot, num_bogus_tot,num_airsr_tot
 
  logical       :: gaussian_lats  
 
@@ -399,32 +399,10 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
 
 !Observations:
 
- INTEGER, PARAMETER     :: max_sound = 5000,   &   ! Maximum Number of radiosonde obs.
-                           max_synop = 50000,  &   ! Maximum Number of surface obs.
-                           max_geoamv= 300000, &   ! Maximum Number of Geo. AMV  wind obs.
-                           max_polaramv= 300000, &   ! Maximum Number of Polar AMV wind obs.
-                           max_airep = 200000, &   ! Maximum Number of AIREP obs.
-                           max_satem = 50000,  &   ! Maximum Number of SATEM obs.
-                           max_pilot = 30000,  &   ! Maximum Number of PILOT obs.
-                           max_metar = 30000,  &   ! Maximum Number of METAR obs.
-                           max_gpspw = 4000,   &   ! Maximum Number of GPSPW obs.
-                           max_gpsref= 800000, &   ! Maximum Number of GPSRef obs.
-                           max_ships = 20000,  &   ! Maximum Number of SHIP obs.
-                           max_ssmi_retrieval = 30000, & ! Maximum Number of SSMI_retrieval obs.
-                           max_ssmi_tb        = 30000, & ! Maximum Number of SSMI_tb obs.
-                           max_ssmt1 = 30000, &    ! Maximum Number of SSM/T1 obs.
-                           max_ssmt2 = 30000, &    ! Maximum Number of SSM/T2 obs.
-                           max_profiler = 30000, & ! Maximum Number of profiler obs.
-                           max_buoy = 30000, &     ! Maximum Number of buoy obs.
-                           max_Radar = 10000, &   ! Maximum Number of Radar obs.
-                           max_qscat  = 50000, &   ! Maximum Number of Quik SCAT obs.
-                           max_bogus  = 5000       ! Maximum Number of bogus obs.
-
-
+ INTEGER, PARAMETER     :: max_Radar = 10000      ! Maximum Number of Radar obs.
 
  integer                :: numb_procs, &         ! Number of total processors.
                            my_proc_id            ! My processor ID.
-
 !
 ! RTM_INIT setup parameter (read from namelist.wrfvar)
 !
@@ -445,7 +423,7 @@ INTEGER :: trace_repeat_body=100        ! Number of times trace body details
                                         ! can be PRINTed
 INTEGER :: trace_start_points=0         ! Number of routines to initiate trace (0=all)
 
-INTEGER, PARAMETER :: num_ob_indexes = 22
+INTEGER, PARAMETER :: num_ob_indexes = 23
 
 INTEGER, PARAMETER :: sound_index          = 1
 INTEGER, PARAMETER :: synop_index          = 2
@@ -469,6 +447,7 @@ INTEGER, PARAMETER :: bogus_index          = 19
 INTEGER, PARAMETER :: pseudo_index         = 20
 INTEGER, PARAMETER :: radar_index          = 21
 INTEGER, PARAMETER :: radiance_index       = 22
+INTEGER, PARAMETER :: airsr_index          = 23
 
 CHARACTER(LEN=14), PARAMETER :: obs_names(num_ob_indexes) = (/ &
    "SOUND         ", &
@@ -492,7 +471,8 @@ CHARACTER(LEN=14), PARAMETER :: obs_names(num_ob_indexes) = (/ &
    "Bogus         ", &
    "Pseudo        ", &
    "Radar         ", &
-   "Radiance      "  &
+   "Radiance      ", &
+   "AIRS retrieval"  &
 /)
 
 INTEGER, PARAMETER :: max_no_fm = 290
@@ -539,7 +519,7 @@ INTEGER, PARAMETER :: fm_index(max_no_fm) = (/ &
    0,0,0,0,0,0,0,0,0,0,                                & ! 101-110
    gpspw_index,0,0,gpspw_index,0,gpsref_index,0,0,0,0, & ! 111-120
    ssmt1_index,ssmt2_index,0,0,0,0,0,0,0,0,            & ! 121-130
-   0,profiler_index,0,0,bogus_index,0,0,0,0,0,         & ! 131-140
+   0,profiler_index,airsr_index,0,bogus_index,0,0,0,0,0, & ! 131-140
    0,0,0,0,0,0,0,0,0,0,                                & ! 141-150
    0,0,0,0,0,0,0,0,0,0,                                & ! 151-160
    0,0,0,0,0,0,0,0,0,0,                                & ! 161-170

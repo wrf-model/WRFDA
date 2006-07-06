@@ -1,7 +1,11 @@
 #! /bin/csh
-
-
-setenv REGION   kma_t63
+#-------------------------------------------------------------------
+#  Script for running Observation error tuning (Desroz Method)
+#  07/05/2006      Syed RH Rizvi
+#-------------------------------------------------------------------
+#Set up directories:
+  setenv REGION   kma_t63
+#-------------------------------------------------------------------
 setenv DA_DIR  /Volumes/mahua2/rizvi/wrfvar_update
 setenv DAT_DIR  /Volumes/mahua2/rizvi/data
 setenv RUN_DIR  /Volumes/mahua2/rizvi/data/desroz_results
@@ -9,11 +13,16 @@ setenv RUN_DIR  /Volumes/mahua2/rizvi/data/desroz_results
  if ( ! -d $RUN_DIR )  mkdir $RUN_DIR
  cd ${RUN_DIR}
 
+ setenv DIR_PREFIX  ${DAT_DIR}/${REGION}
+
  echo ""
  echo "Running script da_tune.csh for region: " ${REGION}
  echo ""
+ echo "DA_DIR      = " $DA_DIR
+ echo "DAT_DIR     = " $DAT_DIR
+ echo "DIR_PREFIX  = " $DIR_PREFIX
+ echo "RUN_DIR     = " $RUN_DIR
 
- setenv DIR_PREFIX  ${DAT_DIR}/${REGION}
 
  cp ${DA_DIR}/build/da_tune.exe .
 

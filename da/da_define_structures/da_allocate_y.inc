@@ -1,4 +1,4 @@
-subroutine da_allocate_y( iv, y )
+SUBROUTINE da_allocate_y( iv, y )
 
    !---------------------------------------------------------------------------
    ! PURPOSE: Allocate arrays used in y and residual obs structures.
@@ -38,6 +38,7 @@ subroutine da_allocate_y( iv, y )
    y % num_qscat = iv % num_qscat
    y % num_profiler = iv % num_profiler
    y % num_buoy     = iv % num_buoy    
+   y % num_airsr    = iv % num_airsr   
    y % num_inst     = iv % num_inst
 
   !---------------------------------------------------------------------------
@@ -331,5 +332,19 @@ subroutine da_allocate_y( iv, y )
          end do
       end do
    END IF
+   ! Initialize AIRS retrievals:
 
-end subroutine DA_Allocate_Y
+   IF ( y % num_airsr > 0 ) THEN
+      ALLOCATE (y % airsr(1:y % num_airsr))
+      do n = 1, y % num_airsr
+         nlevels = iv % airsr(n) % info % levels
+         ALLOCATE (y % airsr(n)%t(1:nlevels))
+         ALLOCATE (y % airsr(n)%q(1:nlevels))
+
+         y % airsr(n) % t(1:nlevels) = 0.0
+         y % airsr(n) % q(1:nlevels) = 0.0
+      end do
+   END IF
+
+
+END SUBROUTINE DA_Allocate_Y

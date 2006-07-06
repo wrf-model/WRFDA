@@ -2,10 +2,8 @@ subroutine da_final_write_y( iv, y )
 !----------------------------------------------------------------------------   
 !  Purpose: Writes full diagnostics for y=H(x_inc)      
 !  History:
-!  Author:
-!           05/16/2006        Syed  RH  Rizvi
+!  Author:    Syed RH Rizvi     MMM/NCAR    05/16/2006     
 !
-
 !----------------------------------------------------------------------------   
    IMPLICIT NONE
 
@@ -21,7 +19,7 @@ subroutine da_final_write_y( iv, y )
    integer                       :: root      ! Monitor processor.
    integer                       :: myrank    ! Id of my processor.
    integer                       :: ierr      ! Error code from MPI routines.
-   integer                       :: num_obs
+   integer                       :: sound_num_obs, num_obs
 
 !------------------------------------------------------------------
 #ifdef DM_PARALLEL
@@ -41,13 +39,13 @@ subroutine da_final_write_y( iv, y )
       ENDDO
     ENDIF
     call da_proc_sum_int(num_obs)
-    if(num_obs > 0) then
-    if ( wrf_dm_on_monitor() ) write(ounit,'(a20,i8)')'synop', num_obs  
+    if(wrf_dm_on_monitor() .and. num_obs > 0) then
+    write(ounit,'(a20,i8)')'synop', num_obs  
     num_obs = 0
     DO k = 0,numb_procs-1
     iunit = ounit*10 +  k
     rewind iunit
-    if ( wrf_dm_on_monitor() )call da_read_y_unit(iunit,ounit,num_obs,'synop',5)
+    call da_read_y_unit(iunit,ounit,num_obs,'synop',5)
     ENDDO
     endif
 !------------------------------------------------------------------
@@ -60,13 +58,13 @@ subroutine da_final_write_y( iv, y )
       ENDDO
     ENDIF
     call da_proc_sum_int(num_obs)
-    if(num_obs > 0) then
-    if ( wrf_dm_on_monitor() ) write(ounit,'(a20,20i8)')'metar', num_obs  
+    if(wrf_dm_on_monitor() .and. num_obs > 0) then
+    write(ounit,'(a20,20i8)')'metar', num_obs  
     num_obs = 0
     DO k = 0,numb_procs-1
     iunit = ounit*10 +  k
     rewind iunit
-    if ( wrf_dm_on_monitor() )call da_read_y_unit(iunit,ounit,num_obs,'metar',5)    
+    call da_read_y_unit(iunit,ounit,num_obs,'metar',5)    
     ENDDO
     endif
 
@@ -80,13 +78,13 @@ subroutine da_final_write_y( iv, y )
       ENDDO
     ENDIF
     call da_proc_sum_int(num_obs)
-    if(num_obs > 0) then
-    if ( wrf_dm_on_monitor() )write(ounit,'(a20,i8)')'ships', num_obs  
+    if(wrf_dm_on_monitor() .and. num_obs > 0) then
+    write(ounit,'(a20,i8)')'ships', num_obs  
     num_obs = 0
     DO k = 0,numb_procs-1
     iunit = ounit*10 +  k
     rewind iunit
-    if ( wrf_dm_on_monitor() )call da_read_y_unit(iunit,ounit,num_obs,'ships',5)
+    call da_read_y_unit(iunit,ounit,num_obs,'ships',5)
     ENDDO
     endif
 
@@ -100,13 +98,13 @@ subroutine da_final_write_y( iv, y )
       ENDDO
     ENDIF
     call da_proc_sum_int(num_obs)
-    if(num_obs > 0) then
-    if ( wrf_dm_on_monitor() ) write(ounit,'(a20,i8)')'geoamv', num_obs  
+    if(wrf_dm_on_monitor() .and. num_obs > 0) then
+    write(ounit,'(a20,i8)')'geoamv', num_obs  
     num_obs = 0
     DO k = 0,numb_procs-1
     iunit = ounit*10 +  k
     rewind iunit
-    if ( wrf_dm_on_monitor() )call da_read_y_unit(iunit,ounit,num_obs,'geoamv',6)
+    call da_read_y_unit(iunit,ounit,num_obs,'geoamv',6)
     ENDDO
     endif
 !------------------------------------------------------------------
@@ -119,13 +117,13 @@ subroutine da_final_write_y( iv, y )
       ENDDO
     ENDIF
     call da_proc_sum_int(num_obs)
-    if(num_obs > 0) then
-    if ( wrf_dm_on_monitor() ) write(ounit,'(a20,i8)')'polaramv', num_obs  
+    if(wrf_dm_on_monitor() .and. num_obs > 0) then
+    write(ounit,'(a20,i8)')'polaramv', num_obs  
     num_obs = 0
     DO k = 0,numb_procs-1
     iunit = ounit*10 +  k
     rewind iunit
-    if ( wrf_dm_on_monitor() )call da_read_y_unit(iunit,ounit,num_obs,'polaramv',8) 
+    call da_read_y_unit(iunit,ounit,num_obs,'polaramv',8) 
     ENDDO
     endif
 
@@ -139,13 +137,13 @@ subroutine da_final_write_y( iv, y )
       ENDDO
     ENDIF
     call da_proc_sum_int(num_obs)
-    if(num_obs > 0) then
-    if ( wrf_dm_on_monitor() ) write(ounit,'(a20,i8)')'gpspw', num_obs  
+    if(wrf_dm_on_monitor() .and. num_obs > 0) then
+    write(ounit,'(a20,i8)')'gpspw', num_obs  
     num_obs = 0
     DO k = 0,numb_procs-1
     iunit = ounit*10 +  k
     rewind iunit
-    if ( wrf_dm_on_monitor() )call da_read_y_unit(iunit,ounit,num_obs,'gpspw',5)     
+    call da_read_y_unit(iunit,ounit,num_obs,'gpspw',5)     
     ENDDO
     endif
 !------------------------------------------------------------------
@@ -158,21 +156,22 @@ subroutine da_final_write_y( iv, y )
       ENDDO
     ENDIF
     call da_proc_sum_int(num_obs)
-    if(num_obs > 0) then
-    if ( wrf_dm_on_monitor() ) write(ounit,'(a20,i8)')'sound', num_obs  
+    sound_num_obs = num_obs
+    if(wrf_dm_on_monitor() .and. num_obs > 0) then
+    write(ounit,'(a20,i8)')'sound', sound_num_obs  
     num_obs = 0
     DO k = 0,numb_procs-1
     iunit = ounit*10 +  k
     rewind iunit
-    if ( wrf_dm_on_monitor() ) call da_read_y_unit(iunit,ounit,num_obs,'sound',5)     
+    call da_read_y_unit(iunit,ounit,num_obs,'sound',5)     
     ENDDO
 !  writing Sonde_sfc  
-    if ( wrf_dm_on_monitor() ) write(ounit,'(a20,i8)')'sonde_sfc', num_obs  
+    write(ounit,'(a20,i8)')'sonde_sfc', sound_num_obs  
     num_obs = 0
     DO k = 0,numb_procs-1
     iunit = ounit*10 +  k
     rewind iunit
-    if ( wrf_dm_on_monitor() )call da_read_y_unit(iunit,ounit,num_obs,'sonde_sfc',9)
+    call da_read_y_unit(iunit,ounit,num_obs,'sonde_sfc',9)
     ENDDO
     endif
 
@@ -186,13 +185,13 @@ subroutine da_final_write_y( iv, y )
       ENDDO
     ENDIF
     call da_proc_sum_int(num_obs)
-    if(num_obs > 0) then
-    if ( wrf_dm_on_monitor() ) write(ounit,'(a20,i8)')'airep', num_obs  
+    if(wrf_dm_on_monitor() .and. num_obs > 0) then
+    write(ounit,'(a20,i8)')'airep', num_obs  
     num_obs = 0
     DO k = 0,numb_procs-1
     iunit = ounit*10 +  k
     rewind iunit
-    if ( wrf_dm_on_monitor() )call da_read_y_unit(iunit,ounit,num_obs,'airep',5)   
+    call da_read_y_unit(iunit,ounit,num_obs,'airep',5)   
     ENDDO
     endif
 !------------------------------------------------------------------
@@ -205,13 +204,13 @@ subroutine da_final_write_y( iv, y )
       ENDDO
     ENDIF
     call da_proc_sum_int(num_obs)
-    if(num_obs > 0) then
-    if ( wrf_dm_on_monitor() ) write(ounit,'(a20,i8)')'pilot', num_obs  
+    if(wrf_dm_on_monitor() .and. num_obs > 0) then
+    write(ounit,'(a20,i8)')'pilot', num_obs  
     num_obs = 0
     DO k = 0,numb_procs-1
     iunit = ounit*10 +  k
     rewind iunit
-    if ( wrf_dm_on_monitor() )call da_read_y_unit(iunit,ounit,num_obs,'pilot',5)    
+    call da_read_y_unit(iunit,ounit,num_obs,'pilot',5)    
     ENDDO
     endif
 !------------------------------------------------------------------
@@ -224,13 +223,13 @@ subroutine da_final_write_y( iv, y )
       ENDDO
     ENDIF
     call da_proc_sum_int(num_obs)
-    if(num_obs > 0) then
-    if ( wrf_dm_on_monitor() ) write(ounit,'(a20,i8)')'ssmir', num_obs  
+    if(wrf_dm_on_monitor() .and. num_obs > 0) then
+    write(ounit,'(a20,i8)')'ssmir', num_obs  
     num_obs = 0
     DO k = 0,numb_procs-1
     iunit = ounit*10 +  k
     rewind iunit
-    if ( wrf_dm_on_monitor() )call da_read_y_unit(iunit,ounit,num_obs,'ssmir',5)    
+    call da_read_y_unit(iunit,ounit,num_obs,'ssmir',5)    
     ENDDO
     endif
 !------------------------------------------------------------------
@@ -243,13 +242,13 @@ subroutine da_final_write_y( iv, y )
       ENDDO
     ENDIF
     call da_proc_sum_int(num_obs)
-    if(num_obs > 0) then
-    if ( wrf_dm_on_monitor() ) write(ounit,'(a20,i8)')'ssmiT', num_obs  
+    if(wrf_dm_on_monitor() .and. num_obs > 0) then
+    write(ounit,'(a20,i8)')'ssmiT', num_obs  
     num_obs = 0
     DO k = 0,numb_procs-1
     iunit = ounit*10 +  k
     rewind iunit
-    if ( wrf_dm_on_monitor() )call da_read_y_unit(iunit,ounit,num_obs,'ssmiT',5)    
+    call da_read_y_unit(iunit,ounit,num_obs,'ssmiT',5)    
     ENDDO
     endif
 !------------------------------------------------------------------
@@ -262,13 +261,13 @@ subroutine da_final_write_y( iv, y )
       ENDDO
     ENDIF
     call da_proc_sum_int(num_obs)
-    if(num_obs > 0) then
-    if ( wrf_dm_on_monitor() ) write(ounit,'(a20,i8)')'satem', num_obs  
+    if(wrf_dm_on_monitor() .and. num_obs > 0) then
+    write(ounit,'(a20,i8)')'satem', num_obs  
     num_obs = 0
     DO k = 0,numb_procs-1
     iunit = ounit*10 +  k
     rewind iunit
-    if ( wrf_dm_on_monitor() )call da_read_y_unit(iunit,ounit,num_obs,'satem',5)    
+    call da_read_y_unit(iunit,ounit,num_obs,'satem',5)    
     ENDDO
     endif
 !------------------------------------------------------------------
@@ -281,13 +280,13 @@ subroutine da_final_write_y( iv, y )
       ENDDO
     ENDIF
     call da_proc_sum_int(num_obs)
-    if(num_obs > 0) then
-    if ( wrf_dm_on_monitor() ) write(ounit,'(a20,i8)')'ssmt1', num_obs  
+    if(wrf_dm_on_monitor() .and. num_obs > 0) then
+    write(ounit,'(a20,i8)')'ssmt1', num_obs  
     num_obs = 0
     DO k = 0,numb_procs-1
     iunit = ounit*10 +  k
     rewind iunit
-    if ( wrf_dm_on_monitor() )call da_read_y_unit(iunit,ounit,num_obs,'ssmt1',5)    
+    call da_read_y_unit(iunit,ounit,num_obs,'ssmt1',5)    
     ENDDO
     endif
 !------------------------------------------------------------------
@@ -300,13 +299,13 @@ subroutine da_final_write_y( iv, y )
       ENDDO
     ENDIF
     call da_proc_sum_int(num_obs)
-    if(num_obs > 0) then
-    if ( wrf_dm_on_monitor() ) write(ounit,'(a20,i8)')'ssmt2', num_obs  
+    if(wrf_dm_on_monitor() .and. num_obs > 0) then
+    write(ounit,'(a20,i8)')'ssmt2', num_obs  
     num_obs = 0
     DO k = 0,numb_procs-1
     iunit = ounit*10 +  k
     rewind iunit
-    if ( wrf_dm_on_monitor() )call da_read_y_unit(iunit,ounit,num_obs,'ssmt2',5)    
+    call da_read_y_unit(iunit,ounit,num_obs,'ssmt2',5)    
     ENDDO
     endif
 !------------------------------------------------------------------
@@ -319,13 +318,13 @@ subroutine da_final_write_y( iv, y )
       ENDDO
     ENDIF
     call da_proc_sum_int(num_obs)
-    if(num_obs > 0) then
-    if ( wrf_dm_on_monitor() ) write(ounit,'(a20,i8)')'qscat', num_obs  
+    if(wrf_dm_on_monitor() .and. num_obs > 0) then
+    write(ounit,'(a20,i8)')'qscat', num_obs  
     num_obs = 0
     DO k = 0,numb_procs-1
     iunit = ounit*10 +  k
     rewind iunit
-    if ( wrf_dm_on_monitor() )call da_read_y_unit(iunit,ounit,num_obs,'qscat',5)    
+    call da_read_y_unit(iunit,ounit,num_obs,'qscat',5)    
     ENDDO
     endif
 !------------------------------------------------------------------
@@ -338,13 +337,13 @@ subroutine da_final_write_y( iv, y )
       ENDDO
     ENDIF
     call da_proc_sum_int(num_obs)
-    if(num_obs > 0) then
-    if ( wrf_dm_on_monitor() ) write(ounit,'(a20,i8)')'profiler', num_obs  
+    if(wrf_dm_on_monitor() .and. num_obs > 0) then
+    write(ounit,'(a20,i8)')'profiler', num_obs  
     num_obs = 0
     DO k = 0,numb_procs-1
     iunit = ounit*10 +  k
     rewind iunit
-    if ( wrf_dm_on_monitor() )call da_read_y_unit(iunit,ounit,num_obs,'profiler',8)    
+    call da_read_y_unit(iunit,ounit,num_obs,'profiler',8)    
     ENDDO
     endif
 
@@ -359,13 +358,13 @@ subroutine da_final_write_y( iv, y )
       ENDDO
     ENDIF
     call da_proc_sum_int(num_obs)
-    if(num_obs > 0) then
-    if ( wrf_dm_on_monitor() ) write(ounit,'(a20,i8)')'buoy', num_obs  
+    if(wrf_dm_on_monitor() .and. num_obs > 0) then
+    write(ounit,'(a20,i8)')'buoy', num_obs  
     num_obs = 0
     DO k = 0,numb_procs-1
     iunit = ounit*10 +  k
     rewind iunit
-    if ( wrf_dm_on_monitor() )call da_read_y_unit(iunit,ounit,num_obs,'buoy',4)    
+    call da_read_y_unit(iunit,ounit,num_obs,'buoy',4)    
     ENDDO
     endif
 
@@ -379,13 +378,32 @@ subroutine da_final_write_y( iv, y )
       ENDDO
     ENDIF
     call da_proc_sum_int(num_obs)
-    if(num_obs > 0) then
-    if ( wrf_dm_on_monitor() ) write(ounit,'(a20,i8)')'bogus', num_obs  
+    if(wrf_dm_on_monitor() .and. num_obs > 0) then
+    write(ounit,'(a20,i8)')'bogus', num_obs  
     num_obs = 0
     DO k = 0,numb_procs-1
     iunit = ounit*10 +  k
     rewind iunit
-    if ( wrf_dm_on_monitor() )call da_read_y_unit(iunit,ounit,num_obs,'bogus',5)    
+    call da_read_y_unit(iunit,ounit,num_obs,'bogus',5)    
+    ENDDO
+    endif
+!------------------------------------------------------------------
+!  writing  AIRS retrievals:
+!------------------------------------------------------------------
+      num_obs = 0
+    IF ( iv % num_airsr > 0 ) THEN
+      DO n = 1, iv % num_airsr
+       if(iv%airsr(n)%loc%proc_domain) num_obs = num_obs + 1
+      ENDDO
+    ENDIF
+    call da_proc_sum_int(num_obs)
+    if(wrf_dm_on_monitor() .and. num_obs > 0) then
+    write(ounit,'(a20,i8)')'airsr', num_obs  
+    num_obs = 0
+    DO k = 0,numb_procs-1
+    iunit = ounit*10 +  k
+    rewind iunit
+    call da_read_y_unit(iunit,ounit,num_obs,'airsr',5)    
     ENDDO
     endif
 !-------------------------------------------------------------------

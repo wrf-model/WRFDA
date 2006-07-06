@@ -1,8 +1,7 @@
 subroutine da_read_fort50(unit_in,num,obs_type_in, nc)
 !----------------------------------------------------------------------------   
 !  Program to read diagnostics written in fort.50 by WRF-Var
-!  Author:   Syed RH Rizvi
-!            05/16/2005
+!  Author:   Syed RH Rizvi      MMM/NCAR      05/16/2006
 !----------------------------------------------------------------------------   
    IMPLICIT NONE
 
@@ -65,6 +64,7 @@ subroutine da_read_fort50(unit_in,num,obs_type_in, nc)
    if( index( ob_type,'qscat') > 0) go to 110
 
    if( index( ob_type,'bogus') > 0) go to 120
+   if( index( ob_type,'airsr') > 0) go to 130
 
    if( index( ob_type,'*****') > 0) return   
 
@@ -446,6 +446,31 @@ subroutine da_read_fort50(unit_in,num,obs_type_in, nc)
          enddo
       END DO
    ENDIF
+!----------------------------------------------------------------------------   
+                130  continue      !  AIRS  retrievals        
+!----------------------------------------------------------------------------   
+   IF ( num_obs > 0 ) THEN
+      DO n = 1, num_obs    
+         read(unit_in,'(i8)') levels
+         if(if_write) write(omb_unit,'(i8)')levels
+         num = num + 1
+         do k = 1, levels
+         read(unit_in,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))', err= 1000)&
+                         kk,l, stn_id, &          ! Station
+                         lat, lon, press, &       ! Lat/lon, dummy    
+                         t_obs, t_inv, t_qc, t_error, t_inc, & 
+                         q_obs, q_inv, q_qc, q_error, q_inc
+         if(if_write) &
+         write(omb_unit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))', err= 1000)&
+                         num,k,stn_id, &          ! Station
+                         lat, lon, press, &       ! Lat/lon, dummy    
+                         t_obs, t_inv, t_qc, t_error, t_inc, & 
+                         q_obs, q_inv, q_qc, q_error, q_inc
+         enddo
+      END DO
+   ENDIF
+   if (if_write) return  
+   go to 1
 
 !--------------------------------------------------------------
 999  continue

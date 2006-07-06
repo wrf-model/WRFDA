@@ -1,7 +1,8 @@
-subroutine da_setup_obs_structures_ascii( xp, ob, iv )
+SUBROUTINE da_setup_obs_structures_ascii( xp, ob, iv )
 
    !---------------------------------------------------------------------------
    ! PURPOSE: Define, allocate and read of observation structure.
+   !          07/03/2006 - Update for AIRS retrieval       Syed RH Rizvi
    !---------------------------------------------------------------------------
 
    IMPLICIT NONE
@@ -13,7 +14,7 @@ subroutine da_setup_obs_structures_ascii( xp, ob, iv )
    CHARACTER(len=120)           :: filename
    integer                      :: n
 
-   IF (trace_use) call da_trace_entry("da_setup_obs_structures_ascii")
+   IF (trace_use) CALL da_trace_entry("da_setup_obs_structures_ascii")
    
    !--------------------------------------------------------------------------
    ! [0.0] Initialize the counters.
@@ -41,6 +42,7 @@ subroutine da_setup_obs_structures_ascii( xp, ob, iv )
    iv%num_buoy  = 0
    iv%num_radar  = 0
    iv%num_bogus  = 0
+   iv%num_airsr  = 0
 
    do n=0, max_fgat_time
       iv%ob_numb(n)%total = 0
@@ -65,6 +67,7 @@ subroutine da_setup_obs_structures_ascii( xp, ob, iv )
       iv%ob_numb(n)%buoy  = 0
       iv%ob_numb(n)%radar  = 0
       iv%ob_numb(n)%bogus  = 0
+      iv%ob_numb(n)%airsr  = 0
    enddo
 
    !--------------------------------------------------------------------------
@@ -97,6 +100,7 @@ subroutine da_setup_obs_structures_ascii( xp, ob, iv )
    else
       iv%current_ob_time = 1
       filename="ob.ascii"
+
       call da_scan_obs(gts_iunit, iv, xp, filename)
 
       !-----------------------------------------------------------------------
@@ -155,14 +159,17 @@ subroutine da_setup_obs_structures_ascii( xp, ob, iv )
       iv%num_radar = max_radar_input
    if(iv%num_bogus > max_bogus_input ) &
       iv%num_bogus = max_bogus_input
+   if(iv%num_airsr > max_airsret_input ) &
+      iv%num_airsr = max_airsret_input
    ! if(iv%num_pseudo > max_pseudo_input ) &
    !    iv%num_pseudo = max_pseudo_input
+
 
    !--------------------------------------------------------------------------
    ! Allocate the ob based on inputed number of obs:
    !--------------------------------------------------------------------------
 
-   call da_allocate_observations ( iv )
+   CALL da_allocate_observations ( iv )
 
    iv%total_obs = 0
    iv%num_sound = 0
@@ -186,6 +193,7 @@ subroutine da_setup_obs_structures_ascii( xp, ob, iv )
    iv%num_buoy  = 0
    iv%num_radar  = 0
    iv%num_bogus  = 0
+   iv%num_airsr  = 0
 
    iv%num_sound_glo=0
    iv%num_synop_glo=0
@@ -208,6 +216,7 @@ subroutine da_setup_obs_structures_ascii( xp, ob, iv )
    iv%num_buoy_glo=0
    iv%num_Radar_glo=0
    iv%num_bogus_glo=0
+   iv%num_airsr_glo=0
 
    if(num_fgat_time > 1) then
       do n=1, num_fgat_time
@@ -251,11 +260,11 @@ subroutine da_setup_obs_structures_ascii( xp, ob, iv )
    ! [3.0] Calculate innovation vector (O-B) and create (smaller) ob structure:
    !--------------------------------------------------------------------------
 
-   call da_fill_obs_structures( iv, ob )
+   CALL da_fill_obs_structures( iv, ob )
 
    iv%current_ob_time = 1
 
-   IF (trace_use) call da_trace_exit("da_setup_obs_structures_ascii")
+   IF (trace_use) CALL da_trace_exit("da_setup_obs_structures_ascii")
 
-end subroutine da_setup_obs_structures_ascii
+END SUBROUTINE da_setup_obs_structures_ascii
 

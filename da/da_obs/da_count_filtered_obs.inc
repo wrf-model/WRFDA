@@ -6,8 +6,8 @@ subroutine da_count_filtered_obs(xb, xp, phic, xlonc, truelat1, truelat2)
 !-----------------------------------------------------------------------------!
 ! Original code:      10/18/2005            Syed RH Rizvi
 ! Update History:     
-!      MPI Run update
-!                     06/01/2006            Syed RH Rizvi
+!      06/01/2006  - Updated for MPI run            Syed RH Rizvi
+!      06/01/2006  - Updated for AIRS retrievals    Syed RH Rizvi
 !                     
 !-----------------------------------------------------------------------------!
    implicit none
@@ -37,6 +37,7 @@ subroutine da_count_filtered_obs(xb, xp, phic, xlonc, truelat1, truelat2)
                                    num_ssmt2, &
                                    num_satem, &
                                    num_bogus, &
+                                   num_airsr, &
                                    num_others
 
    INTEGER                        :: iunit, ounit, files, total_obs     
@@ -64,6 +65,7 @@ subroutine da_count_filtered_obs(xb, xp, phic, xlonc, truelat1, truelat2)
    num_profiler = 0
    num_buoy = 0
    num_bogus = 0
+   num_airsr = 0
    num_others = 0
 !----------------------------------------------------------------------------!
 1000      continue
@@ -294,6 +296,10 @@ loop_level: DO i = 1, platform%info%levels
             if(.not.use_BuoyObs) cycle reports
             num_buoy  = num_buoy  + 1
 
+         CASE (133) ;      !  AIRS retrievals
+            if(.not.use_AIRSRETObs) cycle reports
+            num_airsr = num_airsr + 1
+
          CASE DEFAULT;
              num_others = num_others + 1
             write(unit=*, fmt='(/a/)') &
@@ -319,15 +325,9 @@ loop_level: DO i = 1, platform%info%levels
              num_buoy + num_sound + num_airep + num_pilot + &
              num_geoamv + num_polaramv + num_gpspw + num_gpsref + &
              num_profiler + num_qscat + num_ssmt1 + num_ssmt2 +  &
-             num_satem  + num_bogus +  num_others
+             num_satem  + num_bogus +  num_airsr + num_others
       WRITE  (UNIT = ounit, FMT = '(A,I7,A,F8.0,A)')    &
       "TOTAL =",total_obs, ", MISS. =",missing_r,","  
-!      "TOTAL =",num_synop + num_metar + num_ships + &
-!                num_buoy + num_sound + num_airep + num_pilot + &
-!                num_geoamv + num_polaramv + num_gpspw + num_gpsref + &
-!                num_profiler + num_qscat + num_ssmt1 + num_ssmt2 +  &
-!                num_satem  + num_bogus +  num_others,", ", &
-!                "MISS. =",missing_r,","  
 
 ! Write missing value 
 ! -------------------
@@ -353,6 +353,7 @@ loop_level: DO i = 1, platform%info%levels
       "SSMT2 =",num_ssmt2,", ", &
       "SATEM =",num_satem, ", ", &
       "BOGUS =",num_bogus,", ", &
+      "AIRSRET =",num_airsr,", ", &
       "OTHER =",num_others,", "
 
 ! Write Reference state Info

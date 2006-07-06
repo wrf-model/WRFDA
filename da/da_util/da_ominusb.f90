@@ -1,13 +1,17 @@
-program da_ominusb
-
+program daprog_ominusb
+!-----------------------------------------------------------
+! Abstract:
+!    Purpose: Observation error tuning  (Holingwoth method)
+!        Ref: 
+!-----------------------------------------------------------
    implicit none
    
    character*5, parameter    :: missing_c = '*****'
    integer, parameter        :: ounit = 10
    integer, parameter        :: num_bins_p = 10
    integer, parameter        :: obs_qc_pointer = 0
-   integer, parameter        :: max_stations = 1000
-   integer, parameter        :: max_times = 1000
+   integer, parameter        :: max_stations = 5000
+   integer, parameter        :: max_times = 200  
    integer, parameter        :: inunit = 35
    integer, parameter        :: min_obs = 30
    integer, parameter        :: num_bins = 100
@@ -15,7 +19,7 @@ program da_ominusb
    real, parameter           :: bottom_pressure = 1000.0
    real, parameter           :: bin_width_p = 100.0
    real, parameter           :: missing_r = -888888.0
-   real, parameter           :: max_distance = 1000      ! km
+   real, parameter           :: max_distance = 5000      ! km
    real, parameter           :: pi = 3.1415926535897932346
 !  real, parameter           :: earth_radius = 6378.1500 ! km
    real, parameter           :: earth_radius = 6370.00   ! km, consistant with WRF
@@ -54,10 +58,20 @@ program da_ominusb
    real                      :: target_p, p_ob
    real                      :: lati, long, iv, error
    logical                   :: surface_obs
-   type (obs_type)           :: obs(1:num_bins_p)
+!   type (obs_type)           :: obs(1:num_bins_p)
+  type (obs_type),allocatable           :: obs(:)
+
 
    real                      :: bin_start_p(1:num_bins_p)    ! Number of pressure bins
+   real                      :: obs_err_used(1:num_bins_p)   ! Obs error currently used 
 
+!
+! for temperature it is 1.0
+!   data obs_err_used/ 1.0,  1.0,  1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0/ 
+   data obs_err_used/ 1.1,  1.1,  1.1, 1.4, 1.8, 2.3, 2.8, 3.3, 3.3, 2.7/ 
+!                      1000  900   800  700  600  500  400  300  200  100 
+     print*,' num_bins_p = ',num_bins_p 
+      allocate ( obs( 1: num_bins_p) )
    do b = 1, num_bins_p
       bin_start_p(b) = bottom_pressure - real(b-1) * bin_width_p
 
@@ -70,8 +84,11 @@ program da_ominusb
 !-----------------------------------------------------------------------
 
    times = 0
-   station_chosen = "MOWV3"
-   filename = "da_ominusb_poamvu_"//station_chosen(1:5)//"_omb.out"
+!   station_chosen = "MOWV3"
+!   filename = "daprog_ominusb_poamvu_"//station_chosen(1:5)//"_omb.out"
+!   station_chosen = "91652"
+!   filename = "daprog_ominusb_soundt_"//station_chosen(1:5)//"_omb.out"
+   filename = "ominusb.out"
    open(ounit, file = filename, status = "unknown" )
 
    do ! Loop over time:
@@ -83,20 +100,26 @@ program da_ominusb
                                             p_ob, iv, error, qc
 
 !        [1.1] Exit when come to end of file markers:
-         if ( station_id(1:5) == '*****' .or. station_id == '*end*' ) exit
+!         if ( station_id(1:5) == '*****' .or. station_id == '*end*' ) exit
+         if ( station_id(1:5) == '*****' .or. station_id == '*end*' ) then
+         print*,' Hit station_id as ',station_id
+          exit
+         endif
          
 !        [1.2] Store data:
 
-         if ( station_id(1:5) == station_chosen ) then
+!         if ( station_id(1:5) == station_chosen ) then
 
             p_ob = 0.01 * p_ob   ! Convert Pa to hPa
-            if ( p_ob > bin_start_p(2) ) then
+!            if ( p_ob > bin_start_p(2) ) then
+            if ( p_ob >= bin_start_p(1) ) then
                bin = 1
-            else if ( p_ob <= bin_start_p(num_bins_p-1) ) then
+!            else if ( p_ob <= bin_start_p(num_bins_p-1) ) then
+            else if ( p_ob <= bin_start_p(num_bins_p) ) then
                bin = num_bins_p
             else
                do b = 2, num_bins_p-1
-                  if ( p_ob <= bin_start_p(b) .and. p_ob > bin_start_p(b+1) ) then
+                  if ( p_ob < bin_start_p(b-1) .and. p_ob >= bin_start_p(b) ) then
                      bin = b
                      exit
                   end if
@@ -105,7 +128,7 @@ program da_ominusb
 
             call da_store_ominusb( station_id, times, qc, lati, long, &
                                    p_ob, iv, error, obs(bin) )
-         end if
+!         end if
                
       end do
 
@@ -125,7 +148,8 @@ program da_ominusb
 !-----------------------------------------------------------------------
 
    write(0,'(A)')' P(hPA)  Stations Obs-Used Obs-Reject     Mean(O-B)    STDV(O-B)'
-   write(0,'(a,a)')' Station chosen = ', station_chosen
+   write(ounit,'(A)')' P(hPA)  Stations Obs-Used Obs-Reject     Mean(O-B)    STDV(O-B)'
+!   write(0,'(a,a)')' Station chosen = ', station_chosen
    do b = 1, num_bins_p
    call da_obs_stats( num_times, obs(b) )
 
@@ -146,18 +170,22 @@ program da_ominusb
 !  [3.0]: Calculate matrix of distances between points:
 !-----------------------------------------------------------------------
 
-!   do b = 1, num_bins_p
-!      n = obs(b) % num_stations
-!      call da_get_distance( n, obs(b) % lat(1:n), obs(b) % lon(1:n), obs(b) % dis(1:n,1:n) )
-!   end do
+   do b = 1, num_bins_p
+      n = obs(b) % num_stations
+      call da_get_distance( n, obs(b) % lat(1:n), obs(b) % lon(1:n), obs(b) % dis(1:n,1:n) )
+      write(0,'(4i8,2f13.6)')int(bin_start_p(b)), obs(b) % num_stations, &
+                             obs(b) % num_keep, obs(b) % num_reject, &
+                             obs(b) % mean_omb, obs(b) % stdv_omb
+   end do
 
 !-----------------------------------------------------------------------
 !  [4.0]: Calculate O-B covariances:
 !-----------------------------------------------------------------------
 
-!   do b = 1, num_bins_p
+   do b = 1, num_bins_p
 !      call da_bin_covariance( obs(b) % num_stations, num_times, max_distance, obs(b) )
-!   end do
+      call da_bin_covariance( obs(b) % num_stations, num_times, max_distance, obs(b), obs_err_used(b),b)
+   end do
 
 contains
 
@@ -399,7 +427,7 @@ subroutine da_get_distance( num_stations, lat, lon, dis )
 
 end subroutine da_get_distance
 
-subroutine da_bin_covariance( num_stations, num_times, max_distance, obs )
+subroutine da_bin_covariance( num_stations, num_times, max_distance, obs, obs_err_used, lvl)
 
    implicit none
 
@@ -407,6 +435,8 @@ subroutine da_bin_covariance( num_stations, num_times, max_distance, obs )
    integer, intent(in)       :: num_times
    real, intent(in)          :: max_distance
    type (obs_type), intent(inout) :: obs
+   real, intent(in)          :: obs_err_used
+   integer, intent(in)       :: lvl           
 
    integer                   :: b, n1, n2, times, sum_b
    real                      :: bin_width, bin_dis
@@ -460,7 +490,7 @@ subroutine da_bin_covariance( num_stations, num_times, max_distance, obs )
          end do
       end do
       
-      write(6,'(2i8,2f15.5)')b, sum_obs(b), sum_covar, obs % cov(b)
+!      write(6,'(2i8,2f15.5)')b, sum_obs(b), sum_covar, obs % cov(b)
 
 !     Calculate average separation and covariance of obs:
       if ( sum_obs(b) > 0 ) then
@@ -524,18 +554,23 @@ subroutine da_bin_covariance( num_stations, num_times, max_distance, obs )
 
 !  Print out covariance data:
 
-
+   if( bin_pass(b) ) &
    write(0,'(a)')' Bin  NumObs  Separation(km) Covariance      CovErr        GaussFit'
    gaussian = 0.0
    do b = 1, num_bins
+   if( bin_pass(b) ) &
+   write(0,'(a)')' Bin  NumObs  Separation(km) Covariance      CovErr        GaussFit'
       if ( gradient < 0.0 ) then
          gaussian = bk_err_var*exp(-0.125*(avg_dis(b)/lengthscale)**2)
       end if
 
       if (obs % cov(b) /= 0.0 ) then
-         write(0,FMT='(i5,i7,3e14.6,l10,e13.6)')b, sum_obs(b), avg_dis(b), &
+         write(0,'(i5,i7,3e14.6,l,e13.6)')b, sum_obs(b), avg_dis(b), &
                                         obs % cov(b), &
                                         coverr(b), bin_pass(b), gaussian
+         if (obs % cov(b) /= 0.0 .and. bin_pass(b) ) & 
+         write(70+lvl,'(2i7,4e14.6)')b, sum_obs(b), avg_dis(b), obs % cov(b),& 
+                                        coverr(b), gaussian
       end if
    end do
    write(0,*)
@@ -548,8 +583,9 @@ subroutine da_bin_covariance( num_stations, num_times, max_distance, obs )
                                        ' km, ob_err_stdv = ', ob_err_stdv, &
                                        ' , bk_err_stdv = ', bk_err_stdv, &
                                        ' using', sum_b, ' /', num_bins, ' bins.'
+      write(30,'(4f15.3)') ob_err_stdv, bk_err_stdv, obs_err_used, lengthscale
    end if
 
 end subroutine da_bin_covariance
 
-end program da_ominusb
+end program daprog_ominusb
