@@ -100,6 +100,14 @@ CONTAINS
 #include "da_calculate_grady_ssmi.inc"
 #include "da_calculate_grady_ssmt1.inc"
 #include "da_calculate_grady_ssmt2.inc"
+#include "da_adj_tb.inc"
+#include "da_adj_cal_sigma_v.inc"
+#include "da_adj_effang.inc"
+#include "da_adj_effht.inc"
+#include "da_adj_epsalt.inc"
+#include "da_adj_roughem.inc"
+#include "da_adj_spemiss.inc"
+#include "da_adj_tbatmos.inc"
    
 end module da_ssmi
 

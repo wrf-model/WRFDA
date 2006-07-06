@@ -103,7 +103,7 @@ SUBROUTINE da_get_innov_vector( it, ob, iv, &
 
 !-----SSMI:
 
-      call da_get_innov_vector_ssmi( it, xb, xp, ob, iv )
+      call da_get_innov_vector_ssmi( it, xb, ob, iv )
 
 !-----SSMT1:
 
