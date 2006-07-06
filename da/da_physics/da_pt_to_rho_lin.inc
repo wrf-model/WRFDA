@@ -1,14 +1,12 @@
-subroutine DA_PT_To_Rho_Lin( xb, xa, xp )
- 
-!------------------------------------------------------------------------------
-!  PURPOSE: Calculates density increments from pressure/temperature increments.
-!
-!  METHOD:  Linearised ideal gas law: rho~/rho = p'/p - T'/T
-!
-!  ASSUMPTIONS: 1) Model level stored top down.
-!
-!  HISTORY: 03/21/2000 - Creation of F90 version.           Dale Barker
-!------------------------------------------------------------------------------
+subroutine da_pt_to_rho_lin( xb, xa, xp )
+
+   !---------------------------------------------------------------------------
+   ! PURPOSE: Calculates density increments from pressure/temperature increments
+   !
+   ! METHOD:  Linearised ideal gas law: rho~/rho = p'/p - T'/T
+   !
+   ! ASSUMPTIONS: 1) Model level stored top down.
+   !---------------------------------------------------------------------------
 
    IMPLICIT NONE
    
@@ -19,9 +17,10 @@ subroutine DA_PT_To_Rho_Lin( xb, xa, xp )
    integer                       :: is, ie       ! 1st dim. end points.
    integer                       :: js, je       ! 2nd dim. end points.
    integer                       :: ks, ke       ! 3rd dim. end points.
-!------------------------------------------------------------------------------
-!  [1.0] Initialise:
-!------------------------------------------------------------------------------
+
+   !---------------------------------------------------------------------------
+   ! [1.0] Initialise:
+   !---------------------------------------------------------------------------
 
    is = xp%its
    ie = xp%ite
@@ -30,9 +29,9 @@ subroutine DA_PT_To_Rho_Lin( xb, xa, xp )
    ks = xp%kts
    ke = xp%kte
 
-!------------------------------------------------------------------------------
-!  [2.0] Calculate temperature increments:
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! [2.0] Calculate temperature increments:
+   !---------------------------------------------------------------------------
 
    xa % rho(is:ie,js:je,ks:ke) = xb % rho(is:ie,js:je,ks:ke) * &
                                ( xa % p(is:ie,js:je,ks:ke) / &
@@ -40,5 +39,5 @@ subroutine DA_PT_To_Rho_Lin( xb, xa, xp )
                                  xa % t(is:ie,js:je,ks:ke) / &
                                  xb % t(is:ie,js:je,ks:ke) )                       
 
-end subroutine DA_PT_To_Rho_Lin
+end subroutine da_pt_to_rho_lin
 

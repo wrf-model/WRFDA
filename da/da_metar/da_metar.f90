@@ -9,7 +9,7 @@ module da_metar
   use da_par_util
   use da_tracing
 
-  ! The "stats_metar_type" is ONLY used locally in DA_Metar:
+  ! The "stats_metar_type" is ONLY used locally in da_metar:
 
   TYPE residual_metar1_type
     REAL          :: u                        ! u-wind.
@@ -20,12 +20,12 @@ module da_metar
   END TYPE residual_metar1_type
 
   TYPE maxmin_metar_stats_type
-    TYPE (maxmin_type)         :: u, v, t, p, q
+     TYPE (maxmin_type)         :: u, v, t, p, q
   END TYPE maxmin_metar_stats_type
 
   TYPE stats_metar_type
-    TYPE (maxmin_metar_stats_type)  :: maximum, minimum
-    TYPE (residual_metar1_type)     :: average, rms_err
+     TYPE (maxmin_metar_stats_type)  :: maximum, minimum
+     TYPE (residual_metar1_type)     :: average, rms_err
   END TYPE stats_metar_type
 
 CONTAINS

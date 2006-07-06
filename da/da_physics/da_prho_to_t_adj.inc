@@ -1,14 +1,12 @@
-subroutine DA_PRho_To_T_Adj( xb, xp, xa ) 
- 
-!------------------------------------------------------------------------------
-!  PURPOSE: Adjoint of DA_PRho_To_T.
-!
-!  METHOD:  Standard adjoint coding.
-!
-!  ASSUMPTIONS: 1) Model level stored top down.
-!
-!  HISTORY: 03/21/2000 - Creation of F90 version.           Dale Barker
-!------------------------------------------------------------------------------
+subroutine da_prho_to_t_adj( xb, xp, xa ) 
+
+   !---------------------------------------------------------------------------
+   !  PURPOSE: Adjoint of da_prho_to_t.
+   !
+   !  METHOD:  Standard adjoint coding.
+   !
+   !  ASSUMPTIONS: 1) Model level stored top down.
+   !---------------------------------------------------------------------------
 
    IMPLICIT NONE
    
@@ -21,10 +19,10 @@ subroutine DA_PRho_To_T_Adj( xb, xp, xa )
    integer                       :: ks, ke       ! 3rd dim. end points.
    INTEGER                       :: k            ! Loop counter.
    REAL                  :: temp(xp%its:xp%ite,xp%jts:xp%jte) ! Temporary array.
-   
-!------------------------------------------------------------------------------
-!  [1.0] Initialise:
-!------------------------------------------------------------------------------
+
+   !---------------------------------------------------------------------------
+   !  [1.0] Initialise:
+   !---------------------------------------------------------------------------
 
    is = xp%its
    ie = xp%ite
@@ -33,7 +31,7 @@ subroutine DA_PRho_To_T_Adj( xb, xp, xa )
    ks = xp%kts
    ke = xp%kte
    
-   if ( Testing_WRFVAR ) then
+   if (Testing_WRFVAR) then
       is = xb%its-1
       js = xb%jts-1
 
@@ -47,9 +45,9 @@ subroutine DA_PRho_To_T_Adj( xb, xp, xa )
       if ( je > xb%jde ) je = xb%jde
    endif
 
-!------------------------------------------------------------------------------
-!  [2.0] Calculate temperature increments:
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! [2.0] Calculate temperature increments:
+   !---------------------------------------------------------------------------
 
    do k = ks, ke
    
@@ -62,4 +60,4 @@ subroutine DA_PRho_To_T_Adj( xb, xp, xa )
                               temp(is:ie,js:je) / xb % rho(is:ie,js:je,k)
    end do  
                              
-end subroutine DA_PRho_To_T_Adj
+end subroutine da_prho_to_t_adj

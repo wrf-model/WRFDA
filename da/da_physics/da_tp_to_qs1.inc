@@ -1,16 +1,15 @@
 subroutine da_tp_to_qs1( xb, xp, es, qs)
 
-!------------------------------------------------------------------------------
-!  PURPOSE: Convert T/p to saturation specific humidity.
-!
-!  METHOD: qs = es_alpha * es / ( p - ( 1 - rd_over_rv ) * es ).
-!          Use Rogers & Yau (1989) formula: es = a exp( bTc / (T_c + c) ).
-!
-!  This DA_TP_To_Qs1 was added and called by the corrected subroutine
-!       DA_TPQ_To_RH_Lin.
-!
-!  10/30/2003                                               Yong-Run Guo
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   !  PURPOSE: Convert T/p to saturation specific humidity.
+   !
+   !  METHOD: qs = es_alpha * es / ( p - ( 1 - rd_over_rv ) * es ).
+   !          Use Rogers & Yau (1989) formula: es = a exp( bTc / (T_c + c) ).
+   !
+   !  This da_tp_to_qs1 was added and called by the corrected subroutine
+   !       da_tpq_to_rh_lin.
+   !---------------------------------------------------------------------------
+
    IMPLICIT NONE
 
    TYPE (xb_type), INTENT(IN)    :: xb           ! First guess structure.
@@ -24,9 +23,9 @@ subroutine da_tp_to_qs1( xb, xp, es, qs)
    integer                       :: i, j, k      ! Loop counters.
    real                          :: t_c          ! Working variable.
 
-!------------------------------------------------------------------------------
-!  [1.0] Initialise:
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! [1.0] Initialise:
+   !---------------------------------------------------------------------------
 
    is = xp%its; ie = xp%ite
    js = xp%jts; je = xp%jte
@@ -36,23 +35,23 @@ subroutine da_tp_to_qs1( xb, xp, es, qs)
       do j = js, je
          do i = is, ie
 
-!------------------------------------------------------------------------------
-!  [1.0] Initialise:
-!------------------------------------------------------------------------------
+            !------------------------------------------------------------------
+            ! [1.0] Initialise:
+            !------------------------------------------------------------------
 
-         t_c = xb % t(i,j,k) - t_kelvin
+            t_c = xb % t(i,j,k) - t_kelvin
    
-!------------------------------------------------------------------------------
-!  [2.0] Calculate saturation vapour pressure:
-!------------------------------------------------------------------------------
+            !------------------------------------------------------------------
+            ! [2.0] Calculate saturation vapour pressure:
+            !------------------------------------------------------------------
 
-         es(i,j,k) = es_alpha * exp( es_beta * t_c / ( t_c + es_gamma ) )
+            es(i,j,k) = es_alpha * exp( es_beta * t_c / ( t_c + es_gamma ) )
    
-!------------------------------------------------------------------------------
-!  [3.0] Calculate saturation specific humidity:
-!------------------------------------------------------------------------------
+            !------------------------------------------------------------------
+            ! [3.0] Calculate saturation specific humidity:
+            !------------------------------------------------------------------
 
-         qs(i,j,k) = rd_over_rv * es(i,j,k) / &
+            qs(i,j,k) = rd_over_rv * es(i,j,k) / &
                      (xb % p(i,j,k) - rd_over_rv1 * es(i,j,k))
 
          end do

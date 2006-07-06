@@ -30,7 +30,7 @@ real function da_diff_seconds(date_char_1, date_char_2)
           mi_2, &
           ss_2
 
-   if(ccyy_2 >= ccyy_1) then
+   if (ccyy_2 >= ccyy_1) then
       start_year = ccyy_1
       end_year   = ccyy_2
    else
@@ -42,16 +42,16 @@ real function da_diff_seconds(date_char_1, date_char_2)
   
    do year=start_year,end_year-1
       diff_days = diff_days + 365
-      if(mod(year,4) == 0) then
+      if (mod(year,4) == 0) then
          diff_days = diff_days + 1
 
-         if((mod(year,100) == 0) .and. (mod(year,400) /= 0)) then
+         if ((mod(year,100) == 0) .and. (mod(year,400) /= 0)) then
             diff_days = diff_days - 1
          endif
       endif
    enddo
 
-   if(mod(ccyy_1,4) == 0) then
+   if (mod(ccyy_1,4) == 0) then
       mmday(2) = 29
 
       if((mod(ccyy_1,100) == 0) .and. (mod(ccyy_1,400) /= 0)) then
@@ -70,7 +70,7 @@ real function da_diff_seconds(date_char_1, date_char_2)
        + 60.0*(real(hh_1) &
        + 24.0* real(jd_1)))
 
-   if(mod(ccyy_2,4) == 0) then
+   if (mod(ccyy_2,4) == 0) then
       mmday(2) = 29
 
       if((mod(ccyy_2,100) == 0) .and. (mod(ccyy_2,400) /= 0)) then
@@ -78,7 +78,7 @@ real function da_diff_seconds(date_char_1, date_char_2)
       endif
    endif
 
-   if(ccyy_2 >= ccyy_1) then
+   if (ccyy_2 >= ccyy_1) then
       jd_2 = dd_2 + diff_days
    else
       jd_2 = dd_2 - diff_days
@@ -93,7 +93,7 @@ real function da_diff_seconds(date_char_1, date_char_2)
        + 60.0*(real(hh_2) &
        + 24.0* real(jd_2)))
 
-   DA_Diff_Seconds = abs(s_1 - s_2)
+   da_diff_seconds = abs(s_1 - s_2)
 
 END function da_diff_seconds
 

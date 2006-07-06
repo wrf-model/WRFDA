@@ -1,13 +1,9 @@
 subroutine da_tprh_to_q_adj1( t, p, es, q, rh, &
                               t_prime, p_prime, rh_prime, q_prime )
 
-!------------------------------------------------------------------------------
-!  PURPOSE: Adjoint of DA_TPRH_To_Q_Adj.
-!
-!  METHOD: Standard adjoint coding.
-!
-!  HISTORY: 10/03/2000 - Creation of F90 version.           Dale Barker
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   !  PURPOSE: Adjoint of da_tprh_to_q_adj.
+   !---------------------------------------------------------------------------
 
    IMPLICIT NONE
 
@@ -24,19 +20,19 @@ subroutine da_tprh_to_q_adj1( t, p, es, q, rh, &
    REAL                          :: temp     ! Temporary storage.
    REAL                          :: qs_prime_over_qs ! qs~/qs.
 
-  temp = q * q_prime
+   temp = q * q_prime
 
-!------------------------------------------------------------------------------
-!  [2.0] Calculate relative humidity increment:
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! [2.0] Calculate relative humidity increment:
+   !---------------------------------------------------------------------------
 
-  rh_prime = rh_prime + temp / rh
-  qs_prime_over_qs = temp
+   rh_prime = rh_prime + temp / rh
+   qs_prime_over_qs = temp
 
-!------------------------------------------------------------------------------
-!  [1.0] Calculate saturation specific humidity ratio qs~/qs:
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! [1.0] Calculate saturation specific humidity ratio qs~/qs:
+   !---------------------------------------------------------------------------
 
-  call da_tp_to_qs_adj1( t, p, es, t_prime, p_prime, qs_prime_over_qs )
+   call da_tp_to_qs_adj1( t, p, es, t_prime, p_prime, qs_prime_over_qs )
 
 end subroutine da_tprh_to_q_adj1
