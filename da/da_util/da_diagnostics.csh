@@ -1,8 +1,9 @@
 #! /bin/csh -f
 #-------------------------------------------------------------------------
-#  Script for preparing initial input for
+#  Script for getting initial diagnostics for 
 #  Observation error tuning (Hollingsworh Method)
-#  07/05/2006      Syed RH Rizvi
+#        Ref: Tellus (1986) 38, pp.111-161 (Part I & II)
+#             07/05/2006      Syed RH Rizvi
 #-------------------------------------------------------------------------
  echo ""
  echo "Running da_diagnostics.exe"

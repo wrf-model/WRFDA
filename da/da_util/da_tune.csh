@@ -1,8 +1,9 @@
 #! /bin/csh
 #-------------------------------------------------------------------
-#  Script for running Observation error tuning (Desroz Method)
+#  Script for running observation error tuning  (Desroziers method)
 #  07/05/2006      Syed RH Rizvi
 #-------------------------------------------------------------------
+#
 #Set up directories:
   setenv REGION   kma_t63
 #-------------------------------------------------------------------

@@ -1,8 +1,11 @@
 program daprog_ominusb
 !-----------------------------------------------------------
 ! Abstract:
-!    Purpose: Observation error tuning  (Holingwoth method)
-!        Ref: 
+!    Purpose: Program for tuning observation errors
+!             (Hollingsworh method)
+!        Ref: Tellus (1986) 38, pp.111-161 (Part I & II)
+!    Updates:
+!               07/05/2007     Syed RH Rizvi
 !-----------------------------------------------------------
    implicit none
    

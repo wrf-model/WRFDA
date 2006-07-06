@@ -1,7 +1,8 @@
 #! /bin/csh -f
 #-------------------------------------------------------------------
-#  Script for running Observation error tuning (Hollingsworh Method)
-#  07/05/2006      Syed RH Rizvi
+#  Script for running observation error tuning (Hollingsworh Method)
+#        Ref: Tellus (1986) 38, pp.111-161 (Part I & II)
+#             07/05/2006      Syed RH Rizvi
 #-------------------------------------------------------------------
 
  echo ""

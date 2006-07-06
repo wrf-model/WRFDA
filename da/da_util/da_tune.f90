@@ -1,8 +1,11 @@
 program da_tune
 !-----------------------------------------------------------
 ! Abstract:
-!    Purpose: Observation error tuning  (Desroz method)
-!        Ref:
+!    Purpose: Observation error tuning  (Desroziers method)
+!        Ref: QJRMS (2001), 127, pp. 1433-1452   
+!             Gerald Desroziers and Serguei Ivanov
+!    Updates: 
+!             07/05/2007     Syed RH Rizvi
 !-----------------------------------------------------------
    implicit none
 
