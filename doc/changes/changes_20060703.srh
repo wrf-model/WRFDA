@@ -1,0 +1,149 @@
+Change Log for update to WRF 3DVAR code
+---------------------------------------
+
+Author  : Syed RH Rizvi
+Reviewer: 
+Date: 07/03/2006
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+ a) Update for AIRS retrievals                                    
+ b) Removed unwanted files like da_obs_count.inc, da_fm_decoder.inc etc.
+    from wrfvar/da/da_obs directory
+ c) Thoroughly revides obs tuning programs.
+ c) Renamed subroutines computing OI & AO diagnostics in da_ssmi, 
+    da_pseudo & da_qscat like in other data subdirectories.
+ 
+Expected Differences
+--------------------
+ No change if WRF-Var is run without ARS retrieval data        
+ 
+Accuracy: 
+ 
+CPU:
+ No change if WRF-Var is run without ARS retrieval data        
+
+memory:
+ 
+ No change if WRF-Var is run without ARS retrieval data        
+
+Files added:
+-------------------------------------
+
+ wrfvar/da/da_airsr
+ wrfvar/da/da_airsr/da_ao_stats_airsr.inc
+ wrfvar/da/da_airsr/da_calculate_jo_and_grady_airsr.inc
+ wrfvar/da/da_airsr/da_compute_jo_airsr_tq.inc
+ wrfvar/da/da_airsr/da_calculate_residual_airsr.inc
+ wrfvar/da/da_airsr/da_oi_stats_airsr.inc
+ wrfvar/da/da_airsr/da_print_stats_airsr.inc
+ wrfvar/da/da_airsr/da_transform_xtoy_airsr.inc
+ wrfvar/da/da_airsr/da_transform_xtoy_airsr_adj.inc
+ wrfvar/da/da_airsr/da_check_max_iv_airsr.inc
+ wrfvar/da/da_airsr/da_get_innov_vector_airsr.inc
+ wrfvar/da/da_airsr/da_calculate_grady_airsr.inc
+
+ wrfvar/da/da_pseudo/da_oi_stats_pseudo.inc
+ wrfvar/da/da_pseudo/da_ao_stats_pseudo.inc
+ 
+ wrfvar/da/da_qscat/da_oi_stats_qscat.inc
+ wrfvar/da/da_qscat/da_ao_stats_qscat.inc
+
+ wrfvar/da/da_ssmi/da_oi_stats_ssmt1.inc
+ wrfvar/da/da_ssmi/da_oi_stats_ssmt2.inc
+ wrfvar/da/da_ssmi/da_ao_stats_ssmt1.inc
+ wrfvar/da/da_ssmi/da_ao_stats_ssmt2.inc
+ 
+ wrfvar/doc/changes/changes_20060703.srh
+
+Files deleted:
+-------------------------------------
+
+ wrfvar/da/da_obs/da_obs_count.inc
+ wrfvar/da/da_obs/da_fm_decoder.inc
+
+ wrfvar/da/da_ssmi/da_ob_stats_ssmt1.inc
+ wrfvar/da/da_ssmi/da_ob_stats_ssmt2.inc
+ wrfvar/da/da_ssmi/da_oa_stats_ssmt1.inc
+ wrfvar/da/da_ssmi/da_oa_stats_ssmt2.inc
+ 
+ wrfvar/da/da_pseudo/da_ob_stats_pseudo.inc
+ wrfvar/da/da_pseudo/da_oa_stats_pseudo.inc
+ 
+ wrfvar/da/da_qscat/da_ob_stats_qscat.inc
+ wrfvar/da/da_qscat/da_oa_stats_qscat.inc
+ 
+ wrfvar/da/da_obs/da_read_fort47.inc
+
+Files Modified:
+-------------------------------------
+
+ wrfvar/Registry/Registry.wrfvar                                            
+ wrfvar/da/da.make                                                 
+ wrfvar/da/da_constants/da_constants.f90            
+
+ wrfvar/da/da_setup_structures/da_setup_obs_structures.inc
+ wrfvar/da/da_setup_structures/da_setup_obs_structures_ascii.inc
+ wrfvar/da/da_setup_structures/da_setup_obs_structures_bufr.inc
+ wrfvar/da/da_setup_structures/da_setup_obs_interp_wts.inc
+
+ wrfvar/da/da_define_structures/da_define_structures.f90
+ wrfvar/da/da_define_structures/da_deallocate_observations.inc
+ wrfvar/da/da_define_structures/da_allocate_observations.inc
+ wrfvar/da/da_define_structures/da_allocate_y.inc             
+ wrfvar/da/da_define_structures/da_deallocate_y.inc           
+ wrfvar/da/da_define_structures/da_zero_y.inc           
+
+ wrfvar/da/da_obs/da_obs.f90                       
+ wrfvar/da/da_obs/da_read_obs.inc                        
+ wrfvar/da/da_obs/da_scan_obs.inc                        
+ wrfvar/da/da_obs/da_read_bufr_obs.inc                        
+ wrfvar/da/da_obs/da_scan_bufr_obs.inc                        
+ wrfvar/da/da_obs/da_write_obs.inc        
+ wrfvar/da/da_obs/da_write_y.inc        
+ wrfvar/da/da_obs/da_final_write_obs.inc        
+ wrfvar/da/da_obs/da_final_write_y.inc        
+ wrfvar/da/da_obs/da_read_rand_unit.inc 
+ wrfvar/da/da_obs/da_read_y_unit.inc 
+ wrfvar/da/da_obs/da_write_noise_to_ob.inc
+ wrfvar/da/da_obs/da_read_fort50.inc
+ wrfvar/da/da_obs/da_write_filtered_obs.inc        
+ wrfvar/da/da_obs/da_transform_xtoy.inc
+ wrfvar/da/da_obs/da_transform_xtoy_adj.inc
+ wrfvar/da/da_obs/da_count_filtered_obs.inc
+ wrfvar/da/da_obs/da_deallocate_obs.inc      
+ wrfvar/da/da_obs/da_use_obs_errfac.inc      
+ wrfvar/da/da_obs/da_random_omb_all.inc
+ wrfvar/da/da_obs/da_fill_obs_structures.inc 
+ wrfvar/da/da_obs/da_add_noise_to_ob.inc      
+
+ wrfvar/da/da_minimisation/da_minimisation.f90     
+ wrfvar/da/da_minimisation/da_calculate_grady.inc
+ wrfvar/da/da_minimisation/da_calculate_jo_and_grady.inc
+ wrfvar/da/da_minimisation/da_write_diagnostics.inc
+ wrfvar/da/da_minimisation/da_calculate_residual.inc     
+ wrfvar/da/da_minimisation/da_get_var_diagnostics.inc
+ wrfvar/da/da_minimisation/da_get_innov_vector.inc
+
+ wrfvar/da/da_pseudo/da_pseudo.f90
+ wrfvar/da/da_ssmi/da_ssmi.f90
+ wrfvar/da/da_qscat/da_qscat.f90
+
+ wrfvar/da/da_util/da_diagnostics.f90           
+ wrfvar/da/da_util/da_ominusb.f90           
+ wrfvar/da/da_util/da_tune.f90                     
+ wrfvar/da/da_util/da_diagnostics.csh           
+ wrfvar/da/da_util/da_ominusb.csh                     
+ wrfvar/da/da_util/da_tune.csh                     
+
+cvs commit ?
+
+CHANGES:
+
+changes/changes_20060703.srh
+
+Test results:
+ Updated version of WRF-Var gives exactly same results when run with "Use_AIRSObs" = .FALSE. 
+
+Tag:
