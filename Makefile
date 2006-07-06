@@ -320,7 +320,7 @@ em_core :
 
 # rule used by configure to test if this will compile with MPI 2 calls MPI_Comm_f2c and _c2f
 mpi2_test :
-	@ cd tools ; /bin/rm -f mpi2_test ; $(CC) -c mpi2_test.c ; cd ..
+	@ cd tools ; /bin/rm -f mpi2_test ; $(CC) -o mpi2_test mpi2_test.c ; cd ..
 
 # rule used by configure to test if fseeko and fseeko64 are supported (for share/landread.c to work right)
 fseek_test :
