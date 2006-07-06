@@ -29,7 +29,7 @@ subroutine da_transform_xtoy( xb, iv, xa, xp, y )
 
    ! Geostationary Satellite
    call da_transform_xtoy_geoamv( xa, iv, xp, y )
-   ! Polar orbitting Satellite
+   ! Polar orbiting Satellite
    call da_transform_xtoy_polaramv( xa, iv, xp, y )
 
    !---------------------------------------------------------------------------
@@ -55,6 +55,7 @@ subroutine da_transform_xtoy( xb, iv, xa, xp, y )
    !---------------------------------------------------------------------------
 
    call da_transform_xtoy_gpspw ( xb, iv, xa, xp, y )
+
 
    !---------------------------------------------------------------------------
    ! [8.0] SSMI observation operator y = H(x):

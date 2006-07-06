@@ -8,13 +8,9 @@ subroutine da_transform_xtoy_ssmi ( xb, oi, xa, y )
    TYPE (y_type), INTENT(INOUT) :: y        ! y = h (xa)
 
    IF ( oi%num_ssmi_tb > 0 ) THEN
-
       call da_transform_xtoy_ssmi_tb ( xb, oi, xa, y )
-
    ELSE IF ( oi%num_ssmi_retrieval > 0) THEN
-
       call da_transform_xtoy_ssmi_rv ( xb, oi, xa, y )
-
    ENDIF
 
 end subroutine da_transform_xtoy_ssmi
