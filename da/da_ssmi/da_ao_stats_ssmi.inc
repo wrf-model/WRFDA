@@ -8,6 +8,7 @@ subroutine da_ao_stats_ssmi ( stats_unit, oi, re )
 
    integer  :: num_ssmi_tb, num_ssmi_retrieval       ! # obs over global domain.
 
+   num_ssmi_tot = 0
    num_ssmi_tb = wrf_dm_sum_integer( oi%num_ssmi_tb )
    num_ssmi_retrieval = wrf_dm_sum_integer( oi%num_ssmi_retrieval )
 
