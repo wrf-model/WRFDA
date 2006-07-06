@@ -1,136 +1,59 @@
+
+# These sub-directory builds are identical across all architectures
+wrfio_esmf :
+	( cd ../external/io_esmf ; \
+	make FC="$(FC) $(PROMOTION) $(FCDEBUG) $(FCBASEOPTS) $(ESMF_MOD_INC)" RANLIB="$(RANLIB)" CPP="$(CPP) $(POUND_DEF) " )
+
+
 #
-ARCHFLAGS         = $(FPPFLAGS1) $(FPPFLAGS2) -I$(NETCDFPATH)/include 
-REGFLAGS          = $(ARCHFLAGS)
-CFLAGS            = $(CCFLAGS1) $(CCFLAGS2)
+#	Macros, these should be generic for all machines
 
-VAR_LIB		  = $(NETCDF_LIB) $(RTTOV_LIB) $(MPI_LIB) $(LOCAL_LIB) \
-                      $(IO_INT_LIB) $(IO_GRIB_LIB) $(ESMF_TIME_LIB) \
-                      $(LAPACK_LIB) $(BLAS_LIB) $(BUFR_LIB) \
-                      $(FFTPACK5_LIB) $(EXTRA_LIBS)
+LN	=	ln -sf
+MAKE	=	make -i -r
+RM	= 	rm -f
 
-WRF_LIB		  = $(NETCDF_LIB) $(MPI_LIB) $(LOCAL_LIB) $(IO_INT_LIB) \
-                      $(IO_GRIB_LIB) $(ESMF_TIME_LIB) $(EXTRA_LIBS)
+#	There is probably no reason to modify these rules
 
-GEN_BE_LIB        = $(NETCDF_LIB)  $(LAPACK_LIB) $(BLAS_LIB) $(FFTPACK5_LIB) \
-                      $(EXTRA_LIBS)
-EXTRAMODULES      =
-FCBASEOPTS        = $(FCTYPE) $(FCBASE) $(FCFREE) $(FCHOST) $(FCDEBUG) \
-                      $(FCENDIAN) -I.
-FCFLAGS           = $(FCOPTIM) $(FCBASEOPTS) $(OMP)
-INCLUDE_MODULES   = -I$(DA) \
-		      -I$(IO_NETCDF) -I$(IO_INT) \
-                      -I$(ESMF_TIME_F90) \
-                      -I$(LAPACK) \
-                      -I$(FFTPACK5) \
-                      -I$(BLAS) \
-                      -I$(BUFR_NCEP_NCO) \
-                      -I$(FRAME) -I$(SHARE) -I$(PHYS) -I$(INC)
-MODULE_DIRS       = $(INCLUDE_MODULES)
+wrf_ioapi_includes :
+	( cd ../external/ioapi_share ; \
+	$(MAKE) NATIVE_RWORDSIZE="$(NATIVE_RWORDSIZE)" RWORDSIZE="$(RWORDSIZE)" )
 
-CPPFLAGS          = $(TRADFLAG) $(LIBINCLUDE) -C -P $(ARCHFLAGS) \
-                      $(ENVCOMPDEFS) \
-		      $(DM_CPP_FLAGS) $(COREDEFS)
-
-INC_MOD_WRFVAR    = -I$(NETCDF_IO_PATH) \
-		      -I$(DA) \
-                      -I$(LAPACK) \
-                      -I$(FFTPACK5) \
-                      -I$(BLAS) \
-                      -I$(BUFR_NCEP_NCO) \
-		      -I$(IO_INT) \
-                      -I$(ESMF_TIME_F90) \
-                      -I$(FRAME) -I$(SHARE) -I$(INC)
-FIXEDFLAGS_ENDIAN = $(FCTYPE)
-FIXEDFLAGS_BUFR   = $(FCTYPE) $(FCBASE) $(FCHOST) $(FCDEBUG) -I.
-FIXEDFLAGS_WRFVAR = $(FCTYPE) $(FCBASE) $(FCHOST) $(FCDEBUG) $(FCENDIAN) -I.
-FUFLAGS           = $(FCOPTIM) $(FCBASE) $(FCFREE) $(FCDEBUG)
-
-wrfio_nf : 
-	( cd $(IO_NETCDF) ; \
-        make NETCDFPATH=$(NETCDFPATH) CPP="$(CPP)" CPPFLAGS="$(CPPFLAGS)" \
-	RANLIB="$(RANLIB)" FC="$(FC)" \
-        FCFLAGS="$(FCDEBUG) $(FCFREE) $(FCBASE) -w" TRADFLAG="$(TRADFLAG)" )
-
-wrfio_int : 
-	( cd $(IO_INT) ; \
-        make CPP="$(CPP)" RANLIB="$(RANLIB)" \
-	CC="$(CC)" FC="$(FC)" FCFLAGS="$(FCDEBUG) $(FCFREE) $(FCBASE)" all )
-
-wrfio_grib1 :
-	( cd $(IO_GRIB1) ; \
-        make CPP="$(CPP)" CPPFLAGS="$(CPPFLAGS)" RANLIB="$(RANLIB)" \
-	CC="$(CC)" CFLAGS="$(CFLAGS)" \
-	FC="$(FC)" FCFLAGS="$(FCDEBUG) $(LIBINCLUDE) $(FCFREE) $(FCBASE)" )
-
-esmf_time : 
-	( cd $(ESMF_TIME_F90) ; \
-	make FC="$(FC) $(FCFLAGS)" \
-	RANLIB="$(RANLIB)" \
-	CPP="$(CPP) -I$(INC) -I. $(ARCHFLAGS) $(TRADFLAG)" )
-
-# compile these without high optimization to speed compile
-
-module_io_mm5.o : module_io_mm5.F
-module_si_io.o : module_si_io.F
-module_io_wrf.o : module_io_wrf.F
-module_start.o : module_start.F
-module_initialize.o : module_initialize.F
-module_initialize_b_wave.o : module_initialize_b_wave.F
-module_initialize_hill2d_x.o : module_initialize_hill2d_x.F
-module_initialize_quarter_ss.o : module_initialize_quarter_ss.F
-module_initialize_squall2d_x.o : module_initialize_squall2d_x.F
-module_initialize_squall2d_y.o : module_initialize_squall2d_y.F
-module_initialize_real.o : module_initialize_real.F
-module_dm.o : module_dm.F
-start_domain.o : start_domain.F
-module_domain.o : module_domain.F
-module_configure.o : module_configure.F
-mediation_interp_domain.o : mediation_interp_domain.F
-mediation_force_domain.o : mediation_force_domain.F
-mediation_feedback_domain.o : mediation_feedback_domain.F
-
-module_io_mm5.o module_si_io.o module_io_wrf.o module_domain.o \
-module_start.o module_initialize.o module_initialize_b_wave.o  \
-module_initialize_hill2d_x.o module_initialize_quarter_ss.o    \
-module_initialize_squall2d_x.o module_initialize_squall2d_y.o  \
-module_configure.o mediation_interp_domain.o                   \
-mediation_force_domain.o mediation_feedback_domain.o           \
-module_initialize_real.o module_dm.o start_domain.o :
-	@ $(RM) $@
-	@ $(SED_FTN) $*.F > $*.b 
-	$(CPP) $(CPPFLAGS) $*.b  > $*.f
-	@ $(RM) $*.b
-	$(FC) -c $(FCBASEOPTS) $(MODULE_DIRS) -O0 $*.f
-
-#There is probably no reason to modify these rules
-
-.f90.o:
-	@ $(RM) $@
-	@ $(SED_FTN) $*.f90 > $*.b
-	@ $(CPP) $(CPPFLAGS) $*.b  > $*.f
-	@ $(RM) $*.b
-	@ echo $(FC) -c $(FCFLAGS) $*.f
-	  $(FC) -c $(FCFLAGS) $(MODULE_DIRS) $*.f
-
-.F90.o:
-	@ $(RM) $@
-	@ $(SED_FTN) $*.F90 > $*.b
-	  $(CPP) $(CPPFLAGS) $*.b  > $*.f
-	@ $(RM) $*.b
-	  $(FC) -c $(FCFLAGS) $(MODULE_DIRS) $*.f
+.F.i:
+	$(RM) $@
+	$(CPP) -I../inc $(CPPFLAGS) $*.F > $@
+	mv $*.i $(DEVTOP)/pick/$*.f
+	cp $*.F $(DEVTOP)/pick
 
 .F.o:
-	@ $(RM) $@
-	@ $(SED_FTN) $*.F > $*.b
-	  $(CPP) $(CPPFLAGS) $*.b  > $*.f
-	@ $(RM) $*.b
-	  $(FC) -c $(FCFLAGS) $(MODULE_DIRS) $*.f
+	$(RM) $@
+	$(SED_FTN) $*.F > $*.b 
+	$(CPP) -I../inc $(CPPFLAGS) $*.b  > $*.f
+	$(RM) $*.b
+	$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) $*.f
+#PGI	if [ ! -e $@ ] ; then \
+#PGI	sleep 10 ; $(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) $*.f ; \
+#PGI	fi
+#PGI	if [ ! -e $@ ] ; then \
+#PGI	sleep 10 ; $(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) $*.f ; \
+#PGI	fi
+
+.F.f:
+	$(RM) $@
+	$(SED_FTN) $*.F > $*.b 
+	$(CPP) -I../inc $(CPPFLAGS) $*.b  > $@
+	$(RM) $*.b
 
 .f.o:
-	@ $(RM) $@
-	  $(FC) -c $(FCFLAGS) $*.f
+	$(RM) $@
+	$(FC) -c $(FCFLAGS) $(PROMOTION) $*.f
+#PGI	if [ ! -e $@ ] ; then \
+#PGI	sleep 10 ; $(FC) -c $(FCFLAGS) $(PROMOTION) $*.f ; \
+#PGI	fi
+#PGI	if [ ! -e $@ ] ; then \
+#PGI	sleep 10 ; $(FC) -c $(FCFLAGS) $(PROMOTION) $*.f ; \
+#PGI	fi
 
 .c.o:
-	@ $(RM) $@
-	  $(CC) -c $(CFLAGS) $*.c
+	$(RM) $@
+	$(CC) -c $(CFLAGS) $*.c
 

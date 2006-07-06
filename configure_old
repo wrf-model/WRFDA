@@ -1,37 +1,6 @@
 #!/bin/sh
 
-option=$1
-
-echo option = $option
-
-if [ "$option" = "wrf" ] ; then
-    echo "configure wrf"
-    REGISTRY=Registry.EM
-elif [ "$option" = "var" ] ; then
-    echo "configure var"
-    DA_CORE=1
-    EM_CORE=1
-    REGISTRY=Registry.wrfvar
-elif [ "$option" = "wrfvar" ] ; then
-    echo "configure wrfvar"
-    DA_CORE=1
-    EM_CORE=1
-    REGISTRY=Registry.wrfvar
-elif [ "$option" = "wrfplus" ] ; then
-    echo "configure wrf for 4dvar"
-    REGISTRY=Registry.EM_4DVAR
-    DA_CORE=0
-    EM_CORE=1
-elif [ "$option" = "be" ] ; then
-    echo "configure for be"
-    REGISTRY=Registry.wrfvar
-else
-   echo "Please type : <configure wrf> to compile wrf,"
-   echo "    or type : <configure var> to compile var."
-   echo "    or type : <configure wrfplus> to compile wrf for 4dvar."
-   echo "    or type : <configure be> to compile be."
-   exit
-fi
+arg1=$1
 
 # lifted from the configure file for mpich; 00/03/10 jm
 #
@@ -128,19 +97,6 @@ if test -n "$PERL" ; then
     
 fi
 
-# Look for RTTOV for VAR radiances. Only needed for satellite radiances
-
-if [ "$option" = "var" ] ; then
-  if test -z "$RTTOV" ; then
-    for p in /usr/local/rttov; do
-      if test -d $p; then
-        RTTOV=$p
-        break
-      fi
-    done
-  fi
-fi
-
 # Look for netcdf
 if test -z "$NETCDF" ; then
   for p in /usr/local/netcdf
@@ -152,10 +108,10 @@ if test -z "$NETCDF" ; then
   done
 fi
 if  test -z "$NETCDF"  ; then
-
+ 
   if [ `hostname | cut -c 1-2` = "bs" -o \
        `hostname | cut -c 1-2` = "bd" -o \
-       `hostname` = "tempest" -o `hostname` = "ute" ] ; then 
+       `hostname` = "tempest" -o `hostname` = "ute" ] ; then
     echo 'Compiling on an NCAR system with weird paths to NetCDF'
     echo 'Setting up a local NetCDF directory with symlinks'
     if ( test -d ./netcdf_links ) ; then
@@ -281,14 +237,6 @@ else
   echo "PHDF5 not set in environment. Will configure WRF for use without."
 fi
 
-if [ "$option" = "var" ] ; then
-  if [ -n "$RTTOV" ] ; then
-    echo "Will use RTTOV in dir: $RTTOV"
-  else
-    echo "Will configure for use without RTTOV"
-  fi
-fi
-
 # Users who are cross-compiling can set environment variable 
 # $WRF_OS to override the value normally obtained from `uname`.  
 # If $WRF_OS is set, then $WRF_MACH can also be set to override 
@@ -351,19 +299,8 @@ fi
 
 # Found perl, so proceed with configuration
 if test -n "$PERL" ; then
-  echo option = $option
-
-  if [ "$option" = "var" -o "$option" = "wrfvar"  -o "$option" = "be" -o "$option" = "wrfplus" ] ; then
-     echo "configure for wrfvar"
-     $PERL arch/Config_wrfvar.pl -perl=$PERL -netcdf=$NETCDF -phdf5=$PHDF5 -rttov=$RTTOV -os=$os -mach=$mach -ldflags=$ldflags \
-       -compileflags=$compileflags -registry=$REGISTRY -da_core=$DA_CORE -em_core=$EM_CORE
-     echo "configure for var/be"
-  else
-     echo "configure for wrf"
-     $PERL arch/Config.pl -perl=$PERL -netcdf=$NETCDF -phdf5=$PHDF5 -os=$os -mach=$mach -ldflags=$ldflags \
-       -compileflags=$compileflags
-     echo "configure for wrf"
-  fi
+   $PERL arch/Config.pl -perl=$PERL -netcdf=$NETCDF -phdf5=$PHDF5 -os=$os -mach=$mach -ldflags=$ldflags \
+   -compileflags=$compileflags
 fi
 
 if [ "$arg1" = "-d" ] ; then
@@ -376,7 +313,7 @@ fi
 
 # new feb 2005.  test whether MPI-2
 if test -f configure.wrf ; then
-  grep 'DM_PARALLEL' configure.wrf > /dev/null
+  grep 'DMPARALLEL .*=.*1' configure.wrf > /dev/null
   if [ $? = 0 ] ; then
     echo testing for MPI_Comm_f2c and MPI_Comm_c2f 
     /bin/rm -f tools/mpi2_test
@@ -388,7 +325,6 @@ if test -f configure.wrf ; then
       echo "  " MPI_Comm_f2c and MPI_Comm_c2f are not supported
     fi
   fi
-
 # new dec 2005.  test what fseek is supported (needed for share/landread.c to work correctly)
   echo testing for fseeko and fseeko64
   /bin/rm -f tools/fseeko_test tools/fseeko64_test
