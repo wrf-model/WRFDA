@@ -55,5 +55,5 @@ subroutine da_pt_to_rho_adj( xb, xa )
       end do        
    end do        
 
-end subroutine s
+end subroutine da_pt_to_rho_adj
 
