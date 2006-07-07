@@ -7,7 +7,7 @@ MODULE da_pilot
    use da_tools
    use da_par_util
 
-   ! The "stats_pilot_type" is ONLY used locally in DA_Pilot:
+   ! The "stats_pilot_type" is ONLY used locally in da_pilot:
 
    TYPE residual_pilot1_type
       REAL          :: u                        ! u-wind.
