@@ -155,14 +155,15 @@ get_entry_r ( char * name , char * use , node_t * node )
     }
 
     strcpy( tmp, name ) ;
-    t1 = NULL ;
-    if ((t1 = index(tmp,'%'))!= NULL ) *t1 = '\0' ;
 
     /* first check for exact match */
     if ( !strcmp( p->name , tmp ) )
     {
       return(p) ;
     }
+
+    t1 = NULL ;
+    if ((t1 = index(tmp,'%'))!= NULL ) *t1 = '\0' ;
 
     if ( p->ntl > 1 )
     {
@@ -192,6 +193,7 @@ get_entry_r ( char * name , char * use , node_t * node )
   }
   return(NULL) ;
 }
+
 
 node_t *
 get_dimnode_for_coord ( node_t * node , int coord_axis )
