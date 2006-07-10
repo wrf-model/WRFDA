@@ -302,7 +302,7 @@ LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)
 LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/X12R6/lib -L/usr/local/lib \
                     -lncarg -lncarg_gks -lncarg_c -lX11 
 MPI_LIBS	= librsl_lite.a
-MPI_LIB		= -lrsl
+MPI_LIB		= -lrsl_lite
 
 
 arch : 
@@ -917,7 +917,7 @@ LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN) \
 
 LOCAL_LIB	= -lmass -lmassv
 MPI_LIBS	= librsl_lite.a
-MPI_LIB		= -lrsl
+MPI_LIB		= -lrsl_lite
 
 arch : 
 	$(LN) $(RSL_LITE)/*.c .
