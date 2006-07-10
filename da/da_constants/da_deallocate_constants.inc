@@ -1,19 +1,15 @@
-subroutine DA_Deallocate_Constants
+subroutine da_deallocate_constants
 
-!------------------------------------------------------------------------------
-!  PURPOSE: Deallocate constant arrays defined in DA_Constants.
-!
-!  METHOD:  Straightforward.
-!
-!  HISTORY: 08/25/00    - Original f90 version. Dale Barker
-!-----------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! PURPOSE: Deallocate constant arrays defined in da_constants.
+   !---------------------------------------------------------------------------
 
    IMPLICIT NONE
 
-!------------------------------------------------------------------------------
-!  [1.0] Recursive filter:
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! [1.0] Recursive filter:
+   !---------------------------------------------------------------------------
 
-!   DEALLOCATE( rf_turnconds )
+   ! DEALLOCATE( rf_turnconds )
 
-end subroutine DA_Deallocate_Constants
+end subroutine da_deallocate_constants

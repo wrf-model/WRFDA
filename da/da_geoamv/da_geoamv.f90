@@ -7,7 +7,7 @@ MODULE da_geoamv
    USE da_tools
    USE da_par_util
 
-   ! The "stats_geoamv_type" is ONLY used locally in DA_GeoAMV:
+   ! The "stats_geoamv_type" is ONLY used locally in da_geoamv:
 
    TYPE residual_geoamv1_type
       REAL          :: u                        ! u-wind.

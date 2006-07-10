@@ -8,7 +8,7 @@ MODULE da_airsr
    USE da_physics
    USE da_par_util
 
-   ! The "stats_airsr_type" is ONLY used locally in DA_Sound:
+   ! The "stats_airsr_type" is ONLY used locally in da_airsr:
 
    TYPE residual_airsr1_type
       REAL          :: t                        ! temperature

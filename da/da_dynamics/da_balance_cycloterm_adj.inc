@@ -5,12 +5,7 @@ subroutine da_balance_cycloterm_adj( rho, ub, vb, u, v, coefx,   &
                                      its,ite, jts,jte, kts,kte )
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: Adjoint of DA_Balance_CycloTerm.
-   !
-   ! METHOD:  Standard adjoint code. See forward routine for details.
-   !
-   ! ASSUMPTIONS: Various (see documentation).
-   !
+   ! PURPOSE: Adjoint of da_balance_cycloterm
    !---------------------------------------------------------------------------
 
    implicit none

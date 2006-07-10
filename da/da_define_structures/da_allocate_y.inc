@@ -347,4 +347,4 @@ SUBROUTINE da_allocate_y( iv, y )
    END IF
 
 
-END SUBROUTINE DA_Allocate_Y
+END SUBROUTINE da_allocate_y

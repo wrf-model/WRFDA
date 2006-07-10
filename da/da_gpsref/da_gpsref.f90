@@ -7,7 +7,7 @@ module da_gpsref
    use da_tools
    use da_par_util
 
-   ! The "stats_gpsref_type" is ONLY used locally in DA_Gpsref:
+   ! The "stats_gpsref_type" is ONLY used locally in da_gpsref:
 
    TYPE residual_gpsref1_type
       REAL :: ref                   ! GPS Refractivity

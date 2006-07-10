@@ -1,11 +1,10 @@
 subroutine da_calculate_residual_gpsref( oi, y, re,               &
                                         np_missing, np_bad_data,  &
                                         np_obs_used, np_available )
-! -------------------------------------------------------------------------
-!  Called by DA_Minimisation/da_calculate_residual.inc
-!
-!                                     Y.-R. Guo  06/02/2004
-! -------------------------------------------------------------------------
+
+   !-----------------------------------------------------------------------
+   ! Called by da_minimisation/da_calculate_residual.inc
+   !-----------------------------------------------------------------------
 
    IMPLICIT NONE
 

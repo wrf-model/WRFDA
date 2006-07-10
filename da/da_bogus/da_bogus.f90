@@ -1,31 +1,31 @@
 module da_bogus
 
-  use da_constants
-  use da_define_structures
-  use da_interpolation
-  use da_statistics
-  use da_tools
-  use da_physics
-  use da_par_util
+   use da_constants
+   use da_define_structures
+   use da_interpolation
+   use da_statistics
+   use da_tools
+   use da_physics
+   use da_par_util
 
-  ! The "stats_bogus_type" is ONLY used locally in DA_Bogus:
+   ! The "stats_bogus_type" is ONLY used locally in da_bogus:
 
-  TYPE residual_bogus1_type
-    REAL          :: u                        ! u-wind.
-    REAL          :: v                        ! v-wind.
-    REAL          :: t                        ! temperature
-    REAL          :: q                        ! specific humidity
-    REAL          :: slp                      ! sea level pressure (hPa)
-  END TYPE residual_bogus1_type
+   TYPE residual_bogus1_type
+      REAL          :: u                        ! u-wind.
+      REAL          :: v                        ! v-wind.
+      REAL          :: t                        ! temperature
+      REAL          :: q                        ! specific humidity
+      REAL          :: slp                      ! sea level pressure (hPa)
+   END TYPE residual_bogus1_type
 
-  TYPE maxmin_bogus_stats_type
-    TYPE (maxmin_type)         :: u, v, t, q, slp 
-  END TYPE maxmin_bogus_stats_type
+   TYPE maxmin_bogus_stats_type
+      TYPE (maxmin_type)         :: u, v, t, q, slp 
+   END TYPE maxmin_bogus_stats_type
 
-  TYPE stats_bogus_type
-    TYPE (maxmin_bogus_stats_type)  :: maximum, minimum
-    TYPE (residual_bogus1_type)     :: average, rms_err
-  END TYPE stats_bogus_type
+   TYPE stats_bogus_type
+      TYPE (maxmin_bogus_stats_type)  :: maximum, minimum
+      TYPE (residual_bogus1_type)     :: average, rms_err
+   END TYPE stats_bogus_type
 
 CONTAINS
 

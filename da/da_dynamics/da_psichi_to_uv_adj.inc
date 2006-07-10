@@ -4,7 +4,7 @@ subroutine da_psichi_to_uv_adj( u, v, coefx, coefy, psi, chi, &
                                its,ite, jts,jte, kts,kte )
 
    !---------------------------------------------------------------------------
-   !  PURPOSE: Adjoint code of DA_PsiChi_To_UV  
+   !  PURPOSE: Adjoint code of da_psichi_to_uv  
    !
    !  METHOD:  u = coefx * ( -dpsi/dy + dchi/dx )
    !           v = coefy * (  dpsi/dx + dchi/dy )
@@ -36,7 +36,7 @@ subroutine da_psichi_to_uv_adj( u, v, coefx, coefy, psi, chi, &
    ! [5.0] For Global application, set Wast-Eest Periodic boundary
    !---------------------------------------------------------------------------
 
-   if( global ) then
+   if (global) then
       call da_set_boundary_3d(u, &
                             ids,ide, jds,jde, kds,kde,  & 
                             ims,ime, jms,jme, kms,kme,  & 

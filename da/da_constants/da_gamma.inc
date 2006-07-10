@@ -1,5 +1,5 @@
 ! REV PROCESSED 213 LINES OF CODE. PROGRAM DONE.
-REAL FUNCTION DA_GAMMA(X)
+REAL FUNCTION da_gamma(X)
 !D    DOUBLE PRECISION FUNCTION DGAMMA(X)
 !----------------------------------------------------------------------
 ! 
@@ -245,8 +245,8 @@ REAL FUNCTION DA_GAMMA(X)
 !----------------------------------------------------------------------
       IF(PARITY)RES=-RES
       IF(FACT.NE.ONE)RES=FACT/RES
-  900 DA_GAMMA=RES
+  900 da_gamma=RES
 !D900 DGAMMA = RES
 ! ---------- LAST LINE OF GAMMA ----------
-END FUNCTION DA_GAMMA
+END FUNCTION da_gamma
   

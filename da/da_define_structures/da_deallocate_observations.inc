@@ -1,17 +1,8 @@
-SUBROUTINE DA_Deallocate_Observations ( ob )
+SUBROUTINE da_deallocate_observations ( ob )
 
-!------------------------------------------------------------------------------
-!  PURPOSE: Deallocate components of observation structure.
-!
-!  METHOD:  Deallocate components in turn.
-!
-!  HISTORY: 01/06/2000 - Creation of F90 version.           Dale Barker
-!  Additions:
-!             07/03/2006     Updated for AIRS retrievals     Syed RH Rizvi
-!
-!
-!  PARENT_MODULE: DA_Define_Structures
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! PURPOSE: Deallocate components of observation structure.
+   !---------------------------------------------------------------------------
 
    IMPLICIT NONE
 
@@ -20,9 +11,9 @@ SUBROUTINE DA_Deallocate_Observations ( ob )
 
    IF (trace_use) CALL da_trace_entry("da_deallocate_observations")
 
-!------------------------------------------------------------------------------
-!  [1.0] Deallocate:
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! [1.0] Deallocate:
+   !---------------------------------------------------------------------------
 
    IF ( ob % num_sound > 0 ) then
       do n = 1, ob % num_sound
@@ -114,7 +105,7 @@ SUBROUTINE DA_Deallocate_Observations ( ob )
    if (ob % num_ssmi_tb > 0) DEALLOCATE (ob % ssmi_tb)
    if (ob % num_ssmi_retrieval > 0) DEALLOCATE (ob % ssmi_retrieval)
 
-   if ( ob % num_ssmt1 > 0 ) then
+   if (ob % num_ssmt1 > 0) then
       do n = 1, ob % num_ssmt1
          deallocate (ob % ssmt1(n) % h )
          deallocate (ob % ssmt1(n) % p )
@@ -125,7 +116,7 @@ SUBROUTINE DA_Deallocate_Observations ( ob )
       DEALLOCATE (ob % ssmt1)
    endif
    
-   if ( ob % num_ssmt2 > 0 ) then
+   if (ob % num_ssmt2 > 0) then
       do n = 1, ob % num_ssmt2
          deallocate (ob % ssmt2(n) % h )
          deallocate (ob % ssmt2(n) % p )
@@ -138,7 +129,7 @@ SUBROUTINE DA_Deallocate_Observations ( ob )
 
    if (ob % num_qscat > 0) DEALLOCATE (ob % qscat)
 
-   if(ob%num_profiler > 0) then
+   if (ob%num_profiler > 0) then
       do n = 1, ob % num_profiler
          DEALLOCATE (ob%profiler(n)%u)
          DEALLOCATE (ob%profiler(n)%u)
@@ -147,9 +138,9 @@ SUBROUTINE DA_Deallocate_Observations ( ob )
       DEALLOCATE(ob%profiler)
    endif
 
-   if(ob%num_buoy     > 0) DEALLOCATE(ob%buoy)
+   if (ob%num_buoy     > 0) DEALLOCATE(ob%buoy)
 
-   IF ( ob % num_airsr > 0 ) then
+   IF (ob % num_airsr > 0) then
       do n = 1, ob % num_airsr
          deallocate (ob % airsr ( n ) % h )
          deallocate (ob % airsr ( n ) % p )
@@ -163,5 +154,5 @@ SUBROUTINE DA_Deallocate_Observations ( ob )
 
    IF (trace_use) CALL da_trace_exit("da_deallocate_observations")
 
-END SUBROUTINE DA_Deallocate_Observations
+END SUBROUTINE da_deallocate_observations
 

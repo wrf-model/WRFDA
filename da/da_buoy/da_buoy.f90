@@ -1,31 +1,31 @@
 module da_buoy 
 
-  use da_constants
-  use da_define_structures
-  use da_interpolation
-  use da_statistics
-  use da_tools
-  use da_physics
-  use da_par_util
+   use da_constants
+   use da_define_structures
+   use da_interpolation
+   use da_statistics
+   use da_tools
+   use da_physics
+   use da_par_util
 
-  ! The "stats_buoy_type" is ONLY used locally in DA_Buoy:
+   ! The "stats_buoy_type" is ONLY used locally in da_buoy:
 
-  TYPE residual_buoy1_type
-    REAL          :: u                        ! u-wind.
-    REAL          :: v                        ! v-wind.
-    REAL          :: t                        ! temperature
-    REAL          :: p                        ! pressure
-    REAL          :: q                        ! specific humidity
-  END TYPE residual_buoy1_type
+   TYPE residual_buoy1_type
+      REAL          :: u                        ! u-wind.
+      REAL          :: v                        ! v-wind.
+      REAL          :: t                        ! temperature
+      REAL          :: p                        ! pressure
+      REAL          :: q                        ! specific humidity
+   END TYPE residual_buoy1_type
 
-  TYPE maxmin_buoy_stats_type
-    TYPE (maxmin_type)         :: u, v, t, p, q
-  END TYPE maxmin_buoy_stats_type
+   TYPE maxmin_buoy_stats_type
+      TYPE (maxmin_type)         :: u, v, t, p, q
+   END TYPE maxmin_buoy_stats_type
 
-  TYPE stats_buoy_type
-    TYPE (maxmin_buoy_stats_type)  :: maximum, minimum
-    TYPE (residual_buoy1_type)     :: average, rms_err
-  END TYPE stats_buoy_type
+   TYPE stats_buoy_type
+      TYPE (maxmin_buoy_stats_type)  :: maximum, minimum
+      TYPE (residual_buoy1_type)     :: average, rms_err
+   END TYPE stats_buoy_type
 
 CONTAINS
 

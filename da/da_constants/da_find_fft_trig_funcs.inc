@@ -1,14 +1,8 @@
-subroutine DA_Find_FFT_Trig_Funcs( n, trig_functs )
+subroutine da_find_fft_trig_funcs( n, trig_functs )
 
-!------------------------------------------------------------------------------
-!  PURPOSE: Set up constants required for Fourier, sine and cosine transforms.
-!
-!  METHOD:  Calculate sin, cos of points on grid for trig_functs array.
-!
-!  HISTORY: 1988     - Clive Temperton~s original.
-!           1995     - Modified by Andrew Lorenc at UKMO.
-!           02/08/00 - Modified to f90 WRF format.
-!-----------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! PURPOSE: Set up constants required for Fourier, sine and cosine transforms
+   !---------------------------------------------------------------------------
 
    IMPLICIT NONE
 
@@ -18,9 +12,9 @@ subroutine DA_Find_FFT_Trig_Funcs( n, trig_functs )
    INTEGER                    :: k, nil, nhl
    REAL                       :: del, angle
 
-!------------------------------------------------------------------------------
-!  [1.0] Trig functions for real periodic transform:
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! [1.0] Trig functions for real periodic transform:
+   !---------------------------------------------------------------------------
 
    trig_functs(:) = 0.0
 
@@ -34,7 +28,7 @@ subroutine DA_Find_FFT_Trig_Funcs( n, trig_functs )
       trig_functs(2*K+2)=SIN(ANGLE)
    END DO
 
-!  [1.1] Extra trig functions for cosine transform:
+   ! [1.1] Extra trig functions for cosine transform:
 
    DEL=0.5*DEL
    DO K=1,NHL
@@ -42,7 +36,7 @@ subroutine DA_Find_FFT_Trig_Funcs( n, trig_functs )
       trig_functs(2*N+K)=SIN(ANGLE)
    END DO
   
-!  [1.2] Extra trig functions for shifted cosine transform:
+   ! [1.2] Extra trig functions for shifted cosine transform:
 
    DEL=0.5*DEL
    DO K=1,N
@@ -50,4 +44,4 @@ subroutine DA_Find_FFT_Trig_Funcs( n, trig_functs )
       trig_functs(N+K)=SIN(ANGLE)
    END DO
 
-end subroutine DA_Find_FFT_Trig_Funcs
+end subroutine da_find_fft_trig_funcs

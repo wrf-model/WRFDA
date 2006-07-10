@@ -1,17 +1,13 @@
 subroutine da_solve_poissoneqn_fct_adj(xbx, b, del2b, xp)
 
-!------------------------------------------------------------------------------
-!  PURPOSE: Solve Del**2 B = A for B with zero gradient boundary conditions.
-!
-!  METHOD:  1) Compute spectral del2b using double forward FCT.
-!           2) Calculate spectral b.
-!           3) Reform gridpt. b using inverse double FCT.
-!           4) Remove mean b (arbitrary constant).
-!
-!  HISTORY: 09/28/1999 - Creation of F90 version.           Dale Barker
-!           10/19/2001 - Mods for parallel implementation.  Al Bourgeois
-!           02/17/2004 - parallel implementation(for WRFVAR). Wei Huang
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   !  PURPOSE: Solve Del**2 B = A for B with zero gradient boundary conditions.
+   !
+   !  METHOD:  1) Compute spectral del2b using double forward FCT.
+   !           2) Calculate spectral b.
+   !           3) Reform gridpt. b using inverse double FCT.
+   !           4) Remove mean b (arbitrary constant).
+   !---------------------------------------------------------------------------
 
    IMPLICIT NONE
    
@@ -22,8 +18,6 @@ subroutine da_solve_poissoneqn_fct_adj(xbx, b, del2b, xp)
                       INTENT(INOUT) :: del2b   ! Del**2 B.
    REAL, DIMENSION(xp%ims:xp%ime,xp%jms:xp%jme,xp%kms:xp%kme), &
                       INTENT(IN)    :: b       ! B
-
-!------------------------------------------------------------------------------
 
    INTEGER                  :: vector_inc    ! Increment between FST data.
    INTEGER                  :: vector_jump   ! Jump between start of vectors.
@@ -41,19 +35,19 @@ subroutine da_solve_poissoneqn_fct_adj(xbx, b, del2b, xp)
 
    REAL :: rij
 
-!------------------------------------------------------------------------------
-!  [1.0] Initialise:
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! [1.0] Initialise:
+   !---------------------------------------------------------------------------
 
-!  Calculate work space needed.
+   ! Calculate work space needed.
 
    n = max(xbx%fft_ix*(xp%jtex-xp%jtsx+1), &
            xbx%fft_jy*(xp%itey-xp%itsy+1+xbx%pad_num))
 
-!  Allocate work arrays.
+   ! Allocate work arrays.
    ALLOCATE( work_1d(1:n) )
 
-!  Remove mean b (set arbitrary constant to zero):
+   ! Remove mean b (set arbitrary constant to zero):
 
    rij = 1.0/real((xp%ite-xp%its)*(xp%jte-xp%jts))
 
@@ -62,25 +56,28 @@ subroutine da_solve_poissoneqn_fct_adj(xbx, b, del2b, xp)
    enddo
 
    call wrf_dm_sum_reals ( local_mean, global_mean )
-do k=xp%kts,xp%kte
-PRINT *,'TEST_COVERAGE_DA_Solve_PoissonEqn_FCT_Adj:  global_mean(',k,') = ', global_mean(k)
-enddo
+   do k=xp%kts,xp%kte
+      PRINT *, &
+         'TEST_COVERAGE_da_solve_poissoneqn_fct_adj:  global_mean(',k,') = ', &
+         global_mean(k)
+   enddo
 
-!  [2.5] Write data array into b:
+   ! [2.5] Write data array into b:
 
    do k=xp%kts, xp%kte
-      xp%v1z(xp%its:xp%ite,xp%jts:xp%jte,k) = b(xp%its:xp%ite,xp%jts:xp%jte,k) - global_mean(k)
+      xp%v1z(xp%its:xp%ite,xp%jts:xp%jte,k) = b(xp%its:xp%ite,xp%jts:xp%jte,k) &
+         - global_mean(k)
    enddo
       
-!------------------------------------------------------------------------------
-!  [2.0] Perform calculation of gridpoint b level by level:
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! [2.0] Perform calculation of gridpoint b level by level:
+   !---------------------------------------------------------------------------
 
-!  [2.1] Apply (i',j',k -> i,j',k') transpose (v1z -> v1x).
+   ! [2.1] Apply (i',j',k -> i,j',k') transpose (v1z -> v1x).
 
    call da_transpose_z2x ( xp )
 
-!  [2.2] Set up FFT parameters:
+   ! [2.2] Set up FFT parameters:
   
    idim = xbx%fft_ix
    jdim = xp%jtex - xp%jtsx + 1
@@ -93,7 +90,7 @@ enddo
 
    work_area   = (vector_size+1)*num_vectors
 
-!  [2.3] Perform forward FFT:
+   ! [2.3] Perform forward FFT:
 
    DO k = xp%ktsx, xp%ktex
       ij = 0
@@ -128,17 +125,17 @@ enddo
       enddo
    END DO
 
-!------------------------------------------------------------------------------
-!  [3.0] For each k-level, perform forward FFT in y direction, apply spectral
-!        Poisson equation, and then perform inverse FFT in x direction:
-!------------------------------------------------------------------------------
+   !------------------------------------------------------------------------------
+   ! [3.0] For each k-level, perform forward FFT in y direction, apply spectral
+   !       Poisson equation, and then perform inverse FFT in x direction:
+   !------------------------------------------------------------------------------
 
-!  [3.1] Apply (i,j',k' -> i',j,k') transpose ( v1x -> v1y ).
+   ! [3.1] Apply (i,j',k' -> i',j,k') transpose ( v1x -> v1y ).
 
    call da_transpose_x2y ( xp )
    call da_transpose_x2y_v2 ( xp )
 
-!  [3.2] Set up FFT parameters:
+   ! [3.2] Set up FFT parameters:
 
    idim = xp%itey - xp%itsy + 1 + xbx%pad_num
    jdim = xbx%fft_jy
@@ -166,10 +163,10 @@ enddo
       enddo
 
       do j=1, xbx%fft_pad_j
-      do i=xp%itsy, xp%itey+xbx%pad_num
-         ij=ij+1
-         work_1d(ij) = 0.0
-      enddo
+         do i=xp%itsy, xp%itey+xbx%pad_num
+            ij=ij+1
+            work_1d(ij) = 0.0
+         enddo
       enddo
 
       call da_fast_cosine_transform( Forward_FFT, vector_inc, vector_jump, &
@@ -177,9 +174,9 @@ enddo
                                    xbx % fft_factors_y, xbx % trig_functs_y, &
                                    work_1d(1), work_area )
 
-!------------------------------------------------------------------------------
-!  [4.0] Solve spectral Poisson equation:
-!------------------------------------------------------------------------------
+      !------------------------------------------------------------------------
+      ! [4.0] Solve spectral Poisson equation:
+      !------------------------------------------------------------------------
 
       ij = 0
       do j=xp%jds, xbx%fft_jy
@@ -194,7 +191,7 @@ enddo
          enddo
       enddo
 
-!     Reform gridpt. b using inverse double FST in i.
+      ! Reform gridpt. b using inverse double FST in i.
 
       call da_fast_cosine_transform( Inverse_FFT, vector_inc, vector_jump, &
                                    num_vectors, vector_size, &
@@ -215,16 +212,16 @@ enddo
       enddo
    ENDDO
 
-!------------------------------------------------------------------------------
-!  Perform inverse FFT in x direction:
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! Perform inverse FFT in x direction:
+   !---------------------------------------------------------------------------
 
-!  Apply (i',j,k' -> i,j',k') transpose ( v1y -> v1x ).
+   ! Apply (i',j,k' -> i,j',k') transpose ( v1y -> v1x ).
 
    call da_transpose_y2x ( xp )
    call da_transpose_y2x_v2 ( xp )
 
-!  Set up FFT parameters:
+   ! Set up FFT parameters:
 
    idim = xbx%fft_ix
    jdim = xp%jtex - xp%jtsx + 1
@@ -237,7 +234,7 @@ enddo
 
    work_area   = (vector_size+1)*num_vectors
 
-!  [2.3] Perform forward FFT:
+   ! [2.3] Perform forward FFT:
 
    DO k = xp%ktsx, xp%ktex
       ij = 0
@@ -270,23 +267,23 @@ enddo
       enddo
    END DO
 
-!  Apply (i,j',k') -> i',j',k ) transpose to restore v1z.
+   ! Apply (i,j',k') -> i',j',k ) transpose to restore v1z.
 
    call da_transpose_x2z ( xp )
 
    call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id2)
 
-!  [2.5] Write data array into del2b:
+   ! [2.5] Write data array into del2b:
 
-    del2b(xp%ims:xp%ime,xp%jms:xp%jme,xp%kms:xp%kme) = &
-    del2b(xp%ims:xp%ime,xp%jms:xp%jme,xp%kms:xp%kme) + &
+   del2b(xp%ims:xp%ime,xp%jms:xp%jme,xp%kms:xp%kme) = &
+   del2b(xp%ims:xp%ime,xp%jms:xp%jme,xp%kms:xp%kme) + &
    xp%v1z(xp%ims:xp%ime,xp%jms:xp%jme,xp%kms:xp%kme)
 
-!------------------------------------------------------------------------------
-!  [5.0] Tidy up:
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! [5.0] Tidy up:
+   !---------------------------------------------------------------------------
 
-   if(ALLOCATED( work_1d )) DEALLOCATE( work_1d )
+   if (ALLOCATED(work_1d)) DEALLOCATE (work_1d)
 
 end subroutine da_solve_poissoneqn_fct_adj
 

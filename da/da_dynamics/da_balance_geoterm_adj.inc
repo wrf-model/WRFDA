@@ -2,11 +2,7 @@ subroutine da_balance_geoterm_adj( cori, rho, term_x, term_y, u, v, &
                                    ims,ime, jms,jme, its,ite, jts,jte )
  
    !---------------------------------------------------------------------------
-   !  PURPOSE: Adjoint of DA_Balance_GeoTerm.
-   !
-   !  METHOD:  Standard adjoint code. See forward routine for details.
-   !
-   !  ASSUMPTIONS: Various (see documentation).
+   ! PURPOSE: Adjoint of da_balance_geoterm.
    !---------------------------------------------------------------------------
 
    implicit none

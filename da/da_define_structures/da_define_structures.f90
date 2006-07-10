@@ -1,9 +1,3 @@
-!WRF:MODEL_LAYER:DEFINE_STRUCTURES
-!
-
-! DA_Define_Structures code to define WRFVAR structures.
-!---------------------------------------------------------------------------
-
 module da_define_structures
 
     use module_domain   ! for typedefs (vp_type, xb_type, xpose_type)
@@ -11,30 +5,18 @@ module da_define_structures
     use da_tracing
     use module_wrf_error
 
-!------------------------------------------------------------------------------
-!  PURPOSE: Collection of routines to define and allocate structures.
-!
-!  METHOD:  Varied.
-!
-!  HISTORY: 01/06/2000 - Creation of F90 version.           Dale Barker
-!           10/19/2001 - Mods for parallel implementation.  Al Bourgeois
-!           05/25/2004 - "gpsref" added.             W. Huang, Y.-R. Guo
-!           10/08/2004 - Updated be_type             Syed  RH Rizvi         
-!           03/04/2005 - CMV's from Geostationary and       Syed  RH  Rizvi
-!                        Polar orbiting satellite are
-!                        seperated & used as profile
-!              07/2005 - Add radiance related data structure    Zhiquan Liu
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! PURPOSE: Collection of routines to define and allocate structures.
+   !---------------------------------------------------------------------------
 
    use da_constants
 
    IMPLICIT NONE
    
-!-----------------------------------------------------------------------------
-!  [2.0] Background field structure definition:
-!-----------------------------------------------------------------------------
+   !--------------------------------------------------------------------------
+   ! [2.0] Background field structure definition:
+   !--------------------------------------------------------------------------
 
-!ajb Extracted non-grid variables from xb_type  
    TYPE xbx_type
 
       CHARACTER (len=4):: mminlu
@@ -62,7 +44,7 @@ module da_define_structures
       REAL, POINTER    :: fft_coeffs(:,:)    ! FFT Coefficients
 
       REAL             :: fft_adjoint_factor ! FFT Adjoint factor
-!  spectral transform related variables
+      ! spectral transform related variables
       INTEGER          :: inc                ! Vector array increment 
       INTEGER          :: ni
       INTEGER          :: nj
@@ -72,24 +54,22 @@ module da_define_structures
       INTEGER          :: lensav
       INTEGER          :: lenwrk
       INTEGER          :: alp_size
-   real, pointer       :: wsave(:)          ! Primes for FFT.
-   real, pointer       :: lon(:)            ! Longitude (radians).
-   real, pointer       :: sinlon(:)         ! sine(longitude).
-   real, pointer       :: coslon(:)         ! cosine(longitude).
-   real, pointer       :: lat(:)            ! Latitude (radians, from south).
-   real, pointer       :: sinlat(:)         ! sine(latitude).
-   real, pointer       :: coslat(:)         ! cosine(latitude).
-   real, pointer       :: int_wgts(:)       ! Legendre integration weights.
-   real, pointer       :: alp(:)            ! Associated Legendre Polynomial.
-
-
+      real, pointer       :: wsave(:)          ! Primes for FFT.
+      real, pointer       :: lon(:)            ! Longitude (radians).
+      real, pointer       :: sinlon(:)         ! sine(longitude).
+      real, pointer       :: coslon(:)         ! cosine(longitude).
+      real, pointer       :: lat(:)            ! Latitude (radians, from south).
+      real, pointer       :: sinlat(:)         ! sine(latitude).
+      real, pointer       :: coslat(:)         ! cosine(latitude).
+      real, pointer       :: int_wgts(:)       ! Legendre integration weights.
+      real, pointer       :: alp(:)            ! Associated Legendre Polynomial.
    END TYPE xbx_type
 
-!-----------------------------------------------------------------------------
-!  [3.0] Innovation vector structure definition:
-!-----------------------------------------------------------------------------
+   !--------------------------------------------------------------------------
+   ! [3.0] Innovation vector structure definition:
+   !--------------------------------------------------------------------------
 
-!  [3.1] Generic sub-structures used in ob_type:
+   ! [3.1] Generic sub-structures used in ob_type:
 
    TYPE field_type
       REAL                   :: inv             ! Innovation vector
@@ -99,10 +79,10 @@ module da_define_structures
 
    TYPE model_loc_type
       TYPE (field_type)       :: slp            ! Pressure in Pa
-!     TYPE (field_type)       :: psfc           ! Pressure in Pa
-! Remove the following in future (needed now for obs i/o only):
+      ! TYPE (field_type)       :: psfc           ! Pressure in Pa
+      ! Remove the following in future (needed now for obs i/o only):
       TYPE (field_type)       :: pw             ! Toatl precipitable water cm
-!
+
       real                    :: x
       real                    :: y
       integer                 :: i
@@ -189,32 +169,32 @@ module da_define_structures
    END TYPE Radar_type
 
    TYPE multi_level_type
-        TYPE (info_type)                        :: info
-        TYPE (model_loc_type)                   :: loc
-        TYPE (each_level_type), &
-              DIMENSION (max_ob_levels)         :: each
+      TYPE (info_type)                        :: info
+      TYPE (model_loc_type)                   :: loc
+      TYPE (each_level_type), &
+         DIMENSION (max_ob_levels)         :: each
    END TYPE multi_level_type
 
    TYPE Radar_stn_type
-        CHARACTER (LEN = 5)    :: platform      ! Data type
-        CHARACTER (LEN = 12)   :: name          ! Station name
-        CHARACTER (LEN = 19)   :: date_char     ! CCYY-MM-DD_HH:MM:SS date
-        INTEGER                :: numObs        ! number of Obs
-        INTEGER                :: levels        ! number of levels
-        REAL                   :: lat           ! Latitude in degree
-        REAL                   :: lon           ! Longitude in degree
-        REAL                   :: elv           ! Elevation in m
+      CHARACTER (LEN = 5)    :: platform      ! Data type
+      CHARACTER (LEN = 12)   :: name          ! Station name
+      CHARACTER (LEN = 19)   :: date_char     ! CCYY-MM-DD_HH:MM:SS date
+      INTEGER                :: numObs        ! number of Obs
+      INTEGER                :: levels        ! number of levels
+      REAL                   :: lat           ! Latitude in degree
+      REAL                   :: lon           ! Longitude in degree
+      REAL                   :: elv           ! Elevation in m
    END TYPE Radar_stn_type
 
    TYPE Radar_multi_level_type
-        TYPE (Radar_stn_type)                   :: stn
-        TYPE (info_type)                        :: info
-        TYPE (model_loc_type)                   :: loc
-        TYPE (Radar_each_level_type), &
-              DIMENSION (max_ob_levels)         :: each
+      TYPE (Radar_stn_type)                   :: stn
+      TYPE (info_type)                        :: info
+      TYPE (model_loc_type)                   :: loc
+      TYPE (Radar_each_level_type), &
+         DIMENSION (max_ob_levels)         :: each
    END TYPE Radar_multi_level_type
 
-!  [3.2] Innovation vector structure:
+   ! [3.2] Innovation vector structure:
 
    TYPE airep_type
       TYPE (info_type)        :: info
@@ -301,33 +281,33 @@ module da_define_structures
       TYPE (field_type), pointer :: q  (:)      ! From NCEP analysis.
    END TYPE gpsref_type
 
-!  TYPE metar_type
-!     TYPE (info_type)        :: info
-!     TYPE (model_loc_type)   :: loc
+   ! TYPE metar_type
+   !    TYPE (info_type)        :: info
+   !    TYPE (model_loc_type)   :: loc
 
-!     REAL                    :: h              ! Height in m
-!     REAL                    :: zk             ! k-coordinates
+   !    REAL                    :: h              ! Height in m
+   !    REAL                    :: zk             ! k-coordinates
 
-!     TYPE (field_type)       :: u              ! u-wind.
-!     TYPE (field_type)       :: v              ! v-wind.
-!     TYPE (field_type)       :: t              ! temperature.
-!     TYPE (field_type)       :: p              ! pressure.
-!     TYPE (field_type)       :: q              ! q.
-!  END TYPE metar_type
+   !    TYPE (field_type)       :: u              ! u-wind.
+   !    TYPE (field_type)       :: v              ! v-wind.
+   !    TYPE (field_type)       :: t              ! temperature.
+   !    TYPE (field_type)       :: p              ! pressure.
+   !    TYPE (field_type)       :: q              ! q.
+   ! END TYPE metar_type
 
-!  TYPE ships_type
-!     TYPE (info_type)        :: info
-!     TYPE (model_loc_type)   :: loc
+   ! TYPE ships_type
+   !    TYPE (info_type)        :: info
+   !    TYPE (model_loc_type)   :: loc
 
-!     REAL                    :: h              ! Height in m
-!     REAL                    :: zk             ! k-coordinates
+   !    REAL                    :: h              ! Height in m
+   !    REAL                    :: zk             ! k-coordinates
 
-!     TYPE (field_type)       :: u              ! u-wind.
-!     TYPE (field_type)       :: v              ! v-wind.
-!     TYPE (field_type)       :: t              ! temperature.
-!     TYPE (field_type)       :: p              ! pressure.
-!     TYPE (field_type)       :: q              ! q.
-!  END TYPE ships_type
+   !    TYPE (field_type)       :: u              ! u-wind.
+   !    TYPE (field_type)       :: v              ! v-wind.
+   !    TYPE (field_type)       :: t              ! temperature.
+   !    TYPE (field_type)       :: p              ! pressure.
+   !    TYPE (field_type)       :: q              ! q.
+   ! END TYPE ships_type
 
    TYPE synop_type
       TYPE (info_type)        :: info
@@ -423,7 +403,7 @@ module da_define_structures
       TYPE (info_type)        :: info
       TYPE (model_loc_type)   :: loc
 
-!     REAL                    :: h              ! Height in m
+      ! REAL                    :: h              ! Height in m
       REAL                    :: zk             ! k-coordinates
 
       TYPE (field_type)       :: u              ! u-wind.
@@ -452,10 +432,10 @@ module da_define_structures
         integer   ::  landsea_mask
         integer   ::  scanline, scanpos
         real      ::  satzen, satazi, solzen, solazi        !  satellite and solar angles
-! channels' bright temperature
+        ! channels' bright temperature
         type(field_type), pointer   ::   tb(:)                       !  bright temperatures
         real,    pointer   ::   emiss(:), tb_xb(:)
-!        logical, pointer   ::   calcemis(:)
+        ! logical, pointer   ::   calcemis(:)
         real,    pointer   ::   t(:), mr(:), zk(:)
         real,    pointer   ::   pm(:), tm(:), qm(:), qrn(:), qcw(:),qci(:),qsn(:),qgr(:)
         real               ::   ps,ts,t2m,mr2m,u10,v10, clwp
@@ -465,7 +445,7 @@ module da_define_structures
    END TYPE rad_type
 
    TYPE instid_type
-!! Instrument triplet, follow the convension of RTTOV
+      ! Instrument triplet, follow the convension of RTTOV
       INTEGER              :: platform_id, satellite_id, sensor_id
       CHARACTER(LEN=20)    :: rttovid_string
       INTEGER              :: num_rad, nchan, nlevels
@@ -576,7 +556,7 @@ module da_define_structures
 
    END TYPE ob_type
 
-!  [3.3] Where are these used:?
+   ! [3.3] Where are these used:?
 
    TYPE number
       integer                    :: bad
@@ -633,9 +613,9 @@ module da_define_structures
 
    END TYPE count_obs_type
 
-!-----------------------------------------------------------------------------
-!  [3.0] Observation/residual structure definition:
-!-----------------------------------------------------------------------------
+   !--------------------------------------------------------------------------
+   ! [3.0] Observation/residual structure definition:
+   !--------------------------------------------------------------------------
 
    TYPE residual_synop_type
       REAL :: u                                 ! u-wind.
@@ -793,20 +773,20 @@ module da_define_structures
         TYPE (residual_instid_type), POINTER :: instid(:)
    END TYPE y_type
 
-!-----------------------------------------------------------------------------
-!  [4.0] Control variable structure:
-!-----------------------------------------------------------------------------
+   !--------------------------------------------------------------------------
+   ! [4.0] Control variable structure:
+   !--------------------------------------------------------------------------
 
-! Max/Min type:
+   ! Max/Min type:
 
    TYPE maxmin_type
         REAL                       :: value
         INTEGER                    :: n, l
    END TYPE maxmin_type
 
-!-----------------------------------------------------------------------------
-!  [5.0] Control variable structure:
-!-----------------------------------------------------------------------------
+   !--------------------------------------------------------------------------
+   ! [5.0] Control variable structure:
+   !--------------------------------------------------------------------------
 
    type jo_type
       real                :: total
@@ -817,7 +797,8 @@ module da_define_structures
       real                :: polaramv_u, polaramv_v
       real                :: gpspw_tpw, satem_thickness, gpsref_ref
       real                :: sound_u, sound_v, sound_t, sound_q
-      real                :: sonde_sfc_u, sonde_sfc_v, sonde_sfc_t, sonde_sfc_p, sonde_sfc_q
+      real                :: sonde_sfc_u, sonde_sfc_v, sonde_sfc_t, &
+                             sonde_sfc_p, sonde_sfc_q
       real                :: airep_u, airep_v, airep_t
       real                :: pilot_u, pilot_v
       real                :: ssmir_speed, ssmir_tpw
@@ -842,32 +823,32 @@ module da_define_structures
    end type j_type
 
    TYPE cv_type
-      INTEGER          :: size               ! Total size of control variable.
-      INTEGER          :: size_jb            ! Size of CV array for Jb term.
-      INTEGER          :: size_je            ! Size of CV array for Je term.
-      INTEGER          :: size1c             ! Complex size of CV array of 1st variable error.
-      INTEGER          :: size2c             ! Complex size of CV array of 2nd variable error.
-      INTEGER          :: size3c             ! Complex size of CV array of 3rd variable error.
-      INTEGER          :: size4c             ! Complex size of CV array of 4th variable error.
-      INTEGER          :: size5c             ! Complex size of CV array of 5th variable error.
-      integer          :: size_alphac        ! Size of alpha control variable (complex).
-      INTEGER          :: size1              ! Size of CV array of 1st variable error.
-      INTEGER          :: size2              ! Size of CV array of 2nd variable error.
-      INTEGER          :: size3              ! Size of CV array of 3rd variable error.
-      INTEGER          :: size4              ! Size of CV array of 4th variable error.
-      INTEGER          :: size5              ! Size of CV array of 5th variable error.
+      INTEGER :: size        ! Total size of control variable.
+      INTEGER :: size_jb     ! Size of CV array for Jb term.
+      INTEGER :: size_je     ! Size of CV array for Je term.
+      INTEGER :: size1c      ! Complex size of CV array of 1st variable error.
+      INTEGER :: size2c      ! Complex size of CV array of 2nd variable error.
+      INTEGER :: size3c      ! Complex size of CV array of 3rd variable error.
+      INTEGER :: size4c      ! Complex size of CV array of 4th variable error.
+      INTEGER :: size5c      ! Complex size of CV array of 5th variable error.
+      integer :: size_alphac ! Size of alpha control variable (complex).
+      INTEGER :: size1       ! Size of CV array of 1st variable error.
+      INTEGER :: size2       ! Size of CV array of 2nd variable error.
+      INTEGER :: size3       ! Size of CV array of 3rd variable error.
+      INTEGER :: size4       ! Size of CV array of 4th variable error.
+      INTEGER :: size5       ! Size of CV array of 5th variable error.
    END TYPE cv_type
 
    TYPE be_subtype
-      INTEGER           :: mz                ! Vertical truncation of errors.
-      integer           :: max_wave          ! Global only - horizontal spectral truncation.
-      CHARACTER*5       :: name              ! Variable name.
-      REAL, POINTER     :: rf_alpha(:)       ! RF scale length.
-      REAL, POINTER     :: val(:,:)          ! LOcal Standard dev./sqrt(eigenvalue).
-      REAL, POINTER     :: evec(:,:,:)       ! LOcal Vertical eigenvectors.
-      REAL, POINTER     :: val_g(:)          ! Global Standard dev./sqrt(eigenvalue).
-      REAL, POINTER     :: evec_g(:,:)       ! Global Vertical eigenvectors.
-      REAL, POINTER     :: power(:,:)        ! Power spectrum
+      INTEGER           :: mz          ! Vertical truncation of errors.
+      integer           :: max_wave    ! Global only - horizontal spectral truncation.
+      CHARACTER*5       :: name        ! Variable name.
+      REAL, POINTER     :: rf_alpha(:) ! RF scale length.
+      REAL, POINTER     :: val(:,:)    ! Local Standard dev./sqrt(eigenvalue).
+      REAL, POINTER     :: evec(:,:,:) ! Local Vertical eigenvectors.
+      REAL, POINTER     :: val_g(:)    ! Global Standard dev./sqrt(eigenvalue).
+      REAL, POINTER     :: evec_g(:,:) ! Global Vertical eigenvectors.
+      REAL, POINTER     :: power(:,:)  ! Power spectrum
    END TYPE be_subtype
 
    TYPE be_type
@@ -882,8 +863,8 @@ module da_define_structures
       TYPE (be_subtype) :: v5
       type (be_subtype) :: alpha
       REAL, POINTER     :: pb_vert_reg(:,:,:)
-!
-!     Control variable space errors:
+
+      ! Control variable space errors:
       TYPE (cv_type)    :: cv
 
       REAL, POINTER     :: reg_chi(:,:)
@@ -891,7 +872,7 @@ module da_define_structures
       REAL, POINTER     :: reg_ps (:,:)
    END TYPE be_type
 
-!  Analysis_Stats maximum-minumum structure.
+   ! Analysis_Stats maximum-minumum structure.
 
    TYPE maxmin_field_type
       REAL                         :: value
@@ -899,12 +880,12 @@ module da_define_structures
    END TYPE maxmin_field_type
 
 
-!  vp_type is defined in the Registry
-!  x_type  is defined in the Registry
-!  The framework allocates the (local-grid) xa structure.
-!  The framework allocates the (local-grid) xb structure.
-!  The framework (de)allocates the vv structure.
-!  The framework (de)allocates the vp structure.
+   ! vp_type is defined in the Registry
+   ! x_type  is defined in the Registry
+   ! The framework allocates the (local-grid) xa structure.
+   ! The framework allocates the (local-grid) xb structure.
+   ! The framework (de)allocates the vv structure.
+   ! The framework (de)allocates the vp structure.
 
 CONTAINS
 

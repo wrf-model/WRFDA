@@ -8,7 +8,7 @@ MODULE da_gpspw
    USE da_tools
    USE da_par_util
 
-   ! The "stats_gpspw_type" is ONLY used locally in DA_Gpspw:
+   ! The "stats_gpspw_type" is ONLY used locally in da_gpspw:
 
    TYPE residual_gpspw1_type
       REAL          :: tpw                      ! Precipitable water

@@ -1,28 +1,28 @@
 module da_airep
 
-  use da_constants
-  use da_define_structures
-  use da_interpolation
-  use da_statistics
-  use da_tools
-  use da_par_util
+   use da_constants
+   use da_define_structures
+   use da_interpolation
+   use da_statistics
+   use da_tools
+   use da_par_util
 
-  ! The "stats_airep_type" is ONLY used locally in DA_Airep:
+   ! The "stats_airep_type" is ONLY used locally in da_airep:
 
-  TYPE residual_airep1_type
-    REAL          :: u                        ! u-wind.
-    REAL          :: v                        ! v-wind.
-    REAL          :: t                        ! temperature
-  END TYPE residual_airep1_type
+   TYPE residual_airep1_type
+      REAL          :: u                        ! u-wind.
+      REAL          :: v                        ! v-wind.
+      REAL          :: t                        ! temperature
+   END TYPE residual_airep1_type
 
-  TYPE maxmin_airep_stats_type
-    TYPE (maxmin_type)         :: u, v, t 
-  END TYPE maxmin_airep_stats_type
+   TYPE maxmin_airep_stats_type
+      TYPE (maxmin_type)         :: u, v, t 
+   END TYPE maxmin_airep_stats_type
 
-  TYPE stats_airep_type
-    TYPE (maxmin_airep_stats_type)  :: maximum, minimum
-    TYPE (residual_airep1_type)     :: average, rms_err
-  END TYPE stats_airep_type
+   TYPE stats_airep_type
+      TYPE (maxmin_airep_stats_type)  :: maximum, minimum
+      TYPE (residual_airep1_type)     :: average, rms_err
+   END TYPE stats_airep_type
 
 CONTAINS
 

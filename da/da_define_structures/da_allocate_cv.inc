@@ -1,14 +1,8 @@
 subroutine da_allocate_cv( cv_size, cv )
 
-!------------------------------------------------------------------------------
-!  PURPOSE: Allocate components of control variable.
-!
-!  METHOD:  Allocate component in turn.
-!
-!  HISTORY: 06/08/2000 - Creation of F90 version.           Dale Barker
-!
-!  PARENT_MODULE: DA_Define_Structures
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! PURPOSE: Allocate components of control variable.
+   !---------------------------------------------------------------------------
 
    implicit none
 
@@ -22,21 +16,21 @@ subroutine da_allocate_cv( cv_size, cv )
    IF (trace_use) call da_trace_entry("da_allocate_cv")
 
 
-!------------------------------------------------------------------------------
-!  [1.0] Initialize parameters:
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! [1.0] Initialize parameters:
+   !---------------------------------------------------------------------------
 
    cv % j_grad_norm_target = 1.0
 
-!------------------------------------------------------------------------------
-!  [2.0] Allocate arrays:
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! [2.0] Allocate arrays:
+   !---------------------------------------------------------------------------
 
-   allocate ( cv % array(1:cv_size) )
+   allocate (cv % array(1:cv_size))
 
-   if ( analysis_type == 'randomcv' ) then
+   if (analysis_type == 'randomcv') then
    
-!     [2.1] Initialize random number generator and scalars:
+      ! [2.1] Initialize random number generator and scalars:
 
       call random_seed
       
@@ -44,36 +38,33 @@ subroutine da_allocate_cv( cv_size, cv )
       sum_cv2 = 0.0
       count = 0
 
-!    [2.2] Calculate random numbers with Gaussian distribution:
+      ! [2.2] Calculate random numbers with Gaussian distribution:
 
-     do i = 1, cv_size
-   
-        call da_gauss_noise(z)
-        cv % array(i) = z
-         
-        sum_cv = sum_cv + cv % array(i)
-        sum_cv2 = sum_cv2 + cv % array(i) * cv % array(i)
-        count = count + 1
-      
-        mean_cv = sum_cv / real(count)
-        rms_cv = sqrt(sum_cv2 / real(count) )
-        std_dev_cv = sqrt( rms_cv * rms_cv - mean_cv * mean_cv )
+      do i = 1, cv_size
 
-     end do
-   
-     write(UNIT=stdout)
-     write(UNIT=stdout,FMT='(a)')' Gaussian (Normal) noise statistics:'
-     write(UNIT=stdout,FMT='(a,f15.5)')' Mean = ',mean_cv
-     write(UNIT=stdout,FMT='(a,f15.5)')' RMS = ', rms_cv
-     write(UNIT=stdout,FMT='(a,f15.5)')' STD DEV = ', std_dev_cv
+         call da_gauss_noise(z)
+         cv % array(i) = z
+
+         sum_cv = sum_cv + cv % array(i)
+         sum_cv2 = sum_cv2 + cv % array(i) * cv % array(i)
+         count = count + 1
+
+         mean_cv = sum_cv / real(count)
+         rms_cv = sqrt(sum_cv2 / real(count) )
+         std_dev_cv = sqrt( rms_cv * rms_cv - mean_cv * mean_cv )
+
+      end do
+
+      write(UNIT=stdout)
+      write(UNIT=stdout,FMT='(a)')' Gaussian (Normal) noise statistics:'
+      write(UNIT=stdout,FMT='(a,f15.5)')' Mean = ',mean_cv
+      write(UNIT=stdout,FMT='(a,f15.5)')' RMS = ', rms_cv
+      write(UNIT=stdout,FMT='(a,f15.5)')' STD DEV = ', std_dev_cv
 
    else
-
       cv % array = 0.0
-
    end if
 
    IF (trace_use) call da_trace_exit("da_allocate_cv")
-
 
 end subroutine da_allocate_cv
