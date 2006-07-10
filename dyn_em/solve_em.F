@@ -76,10 +76,6 @@ SUBROUTINE solve_em ( grid , config_flags , &
 ! time.  Potential problem on stack-limited architectures: increases
 ! amount of data on program stack by making these automatic arrays.
 
-   REAL ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33,num_moist)  :: moist_old
-   REAL ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33,num_chem)   :: chem_old
-   REAL ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33,num_scalar) :: scalar_old
-
    INTEGER :: rc 
    INTEGER :: number_of_small_timesteps, rk_step
    INTEGER :: klevel,ijm,ijp,i,j,k,size1,size2    ! for prints/plots only
