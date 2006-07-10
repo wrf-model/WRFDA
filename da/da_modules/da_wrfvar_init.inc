@@ -81,11 +81,8 @@ subroutine da_wrfvar_init( no_init1 )
 ! 
 !</DESCRIPTION>
 
-  ! JRB This is the way we will use namelist variables once module_namelists goes
-  ! call nl_get_debug_level ( 1, debug_level )
-  ! call set_wrf_debug_level ( debug_level )
-
-  ! allocated and configure the mother domain
+   CALL nl_get_debug_level ( 1, debug_level )
+   CALL set_wrf_debug_level ( debug_level )
 
   NULLIFY( null_domain )
 
