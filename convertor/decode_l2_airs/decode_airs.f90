@@ -168,8 +168,8 @@ program decode_airs
                latitude = ret%Latitude(xtrack,track)
                longitude = ret%Longitude(xtrack,track)
                id       = 'AIRS L2 Std Retrieval                   '
-               name     = '                                        '
-               platform = 'FM-35                                   '
+               name     = 'AIRSRET                                 '
+               platform = 'FM-133                                  '
                source   = 'GES DAAC                                '
                elevation = -888888.
                n_valid = nvalid

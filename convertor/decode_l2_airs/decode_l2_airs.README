@@ -66,13 +66,15 @@ Beginning at the root directory:
 
 15) > ./setup_g95
 
-16) > cd ../../../build
+16) Link lib/<YOUR ARCHITECTURE>/* lib (e.g., cd lib; ln -s macintosh/* .)
 
-17) > touch depend.txt
+17) > cd ../../../build
 
-18) > make setup 
+18) > touch depend.txt
 
-19) > make -r decode_airs
+19) > make setup 
+
+20) > make -r decode_airs
 
 
 Running the decoder
