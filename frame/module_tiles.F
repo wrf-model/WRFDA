@@ -4,7 +4,7 @@
 MODULE module_tiles
 
   USE module_configure
-     USE module_domain
+  USE module_domain
 
   INTERFACE set_tiles
     MODULE PROCEDURE set_tiles1 , set_tiles2, set_tiles3
