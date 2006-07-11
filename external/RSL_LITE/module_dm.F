@@ -8,6 +8,34 @@ MODULE module_dm
    USE module_wrf_error
    IMPLICIT NONE
 
+! JRB STUBS
+
+#ifdef RSL_LITE
+   integer,parameter :: IO2D_IJ_INTERNAL=24
+   integer,parameter :: RSL_DOUBLE=1
+   integer,parameter :: IO3D_IJK_INTERNAL=26
+   integer, parameter :: invalid_message_value = -9999
+   integer,parameter :: XPOSE_V1 = invalid_message_value
+   integer,parameter :: XPOSE_V2 = invalid_message_value
+   integer, parameter :: HALO_INIT = 0
+   integer, parameter :: HALO_PSICHI_UV = 0
+   integer, parameter :: HALO_BAL_EQN_ADJ = 0
+   integer, parameter :: HALO_PSICHI_UV_ADJ = 0
+   integer, parameter :: HALO_XA = 0
+   integer, parameter :: HALO_XB = 0
+   integer, parameter :: HALO_SFC_XA = 0
+   integer, parameter :: HALO_SFC_XB = 0
+   integer, parameter :: HALO_SSMI_XA = 0
+   integer, parameter :: HALO_SSMI_XB = 0
+   integer, parameter :: HALO_RADAR_XA = 0
+   integer, parameter :: HALO_RADAR_XB = 0
+   integer, parameter :: HALO_2D_WORK = 0
+   integer, parameter :: HALO_RADAR_XA_W = 0
+
+#endif
+
+! end JRB STUBS
+
 #if ( NMM_CORE == 1 ) || defined( WRF_CHEM ) 
    INTEGER, PARAMETER :: max_halo_width = 6
 #else
@@ -29,6 +57,107 @@ MODULE module_dm
    END INTERFACE
 
 CONTAINS
+
+#ifdef RSL_LITE
+! JRB more stubs
+
+SUBROUTINE wrf_dm_halo ( domdesc , comms , stencil_id )
+   IMPLICIT NONE
+   INTEGER domdesc , comms(*) , stencil_id
+   RETURN
+END SUBROUTINE wrf_dm_halo
+
+SUBROUTINE wrf_dm_sum_reals ( inval, retval )
+   IMPLICIT NONE
+   INTEGER ierr
+   REAL, INTENT(IN   ) :: inval(:)
+   REAL, INTENT(  OUT) :: retval(:)
+
+END SUBROUTINE wrf_dm_sum_reals
+
+SUBROUTINE wrf_dm_xpose_z2y ( domdesc , comms , xpose_id )
+   IMPLICIT NONE
+   INTEGER domdesc , comms(*) , xpose_id
+   RETURN
+END SUBROUTINE wrf_dm_xpose_z2y
+
+SUBROUTINE wrf_dm_xpose_y2z ( domdesc , comms , xpose_id )
+   IMPLICIT NONE
+   INTEGER domdesc , comms(*) , xpose_id
+   RETURN
+END SUBROUTINE wrf_dm_xpose_y2z
+
+SUBROUTINE wrf_dm_xpose_y2x ( domdesc , comms , xpose_id )
+   IMPLICIT NONE
+   INTEGER domdesc , comms(*) , xpose_id
+   RETURN
+END SUBROUTINE wrf_dm_xpose_y2x
+
+SUBROUTINE wrf_dm_xpose_x2y ( domdesc , comms , xpose_id )
+   IMPLICIT NONE
+   INTEGER domdesc , comms(*) , xpose_id
+   RETURN
+END SUBROUTINE wrf_dm_xpose_x2y
+
+SUBROUTINE wrf_dm_xpose_x2z ( domdesc , comms , xpose_id )
+   IMPLICIT NONE
+   INTEGER domdesc , comms(*) , xpose_id
+   RETURN
+END SUBROUTINE wrf_dm_xpose_x2z
+
+SUBROUTINE wrf_dm_xpose_z2x ( domdesc , comms , xpose_id )
+   IMPLICIT NONE
+   INTEGER domdesc , comms(*) , xpose_id
+   RETURN
+END SUBROUTINE wrf_dm_xpose_z2x
+
+SUBROUTINE setup_xpose_rsl( grid )
+    USE module_domain
+    IMPLICIT NONE
+    TYPE(domain) , INTENT (INOUT) :: grid 
+   INTEGER i, kms, ims, jms
+
+END SUBROUTINE setup_xpose_rsl
+
+SUBROUTINE reset_msgs_xpose
+   IMPLICIT NONE
+END SUBROUTINE reset_msgs_xpose
+
+SUBROUTINE add_msg_xpose_real( fld_z, fld_x, fld_y, dim )
+   IMPLICIT NONE
+   real fld_z(*), fld_x(*), fld_y(*)
+   integer dim
+END SUBROUTINE add_msg_xpose_real
+
+#if ( RWORDSIZE != DWORDSIZE )
+SUBROUTINE add_msg_xpose_doubleprecision( fld_z, fld_x, fld_y, dim )
+   IMPLICIT NONE
+   doubleprecision fld_z(*), fld_x(*), fld_y(*)
+   integer dim
+   if (      dim == 3 ) then
+     CALL rsl_build_message(msg_z,RSL_DOUBLE_F90,fld_z,dim,decomp(1),glen(1),llen(1))
+     CALL rsl_build_message(msg_y,RSL_DOUBLE_F90,fld_x,dim,decomp(1),glen(1),llen_tx(1))  ! msg_y->msg_x 20020908
+     CALL rsl_build_message(msg_x,RSL_DOUBLE_F90,fld_y,dim,decomp(1),glen(1),llen_ty(1))  ! msg_x->msg_y 20020908
+   endif
+END SUBROUTINE add_msg_xpose_doubleprecision
+#endif
+
+
+SUBROUTINE add_msg_xpose_integer ( fld_z, fld_x, fld_y, dim )
+   IMPLICIT NONE
+   integer fld_z(*), fld_x(*), fld_y(*)
+   integer dim
+END SUBROUTINE add_msg_xpose_integer
+
+SUBROUTINE define_xpose ( did, xp )
+   IMPLICIT NONE
+   INTEGER did , xp
+END SUBROUTINE define_xpose
+
+
+#endif
+
+
 
 
    SUBROUTINE MPASPECT( P, MINM, MINN, PROCMIN_M, PROCMIN_N )

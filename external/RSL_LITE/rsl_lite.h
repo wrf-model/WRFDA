@@ -2,6 +2,9 @@
 # ifdef NOUNDERSCORE
 #      define RSL_LITE_ERROR_DUP1 rsl_error_dup1
 #      define BYTE_BCAST byte_bcast
+/* JRB stubs */
+#      define RSL_WRITE rsl_write
+
 #      define RSL_LITE_INIT_EXCH rsl_lite_init_exch
 #      define RSL_LITE_EXCH_Y rsl_lite_exch_y
 #      define RSL_LITE_EXCH_X rsl_lite_exch_x
@@ -37,6 +40,9 @@
 #   ifdef F2CSTYLE
 #      define RSL_LITE_ERROR_DUP1 rsl_error_dup1__
 #      define BYTE_BCAST byte_bcast__
+/* JRB stubs */
+#      define RSL_WRITE rsl_write__
+
 #      define RSL_LITE_INIT_EXCH rsl_lite_init_exch__
 #      define RSL_LITE_EXCH_Y rsl_lite_exch_y__
 #      define RSL_LITE_EXCH_X rsl_lite_exch_x__
@@ -71,6 +77,10 @@
 #   else
 #      define RSL_LITE_ERROR_DUP1 rsl_error_dup1_
 #      define BYTE_BCAST byte_bcast_
+
+/* JRB stubs */
+#      define RSL_WRITE rsl_write_
+
 #      define RSL_LITE_INIT_EXCH rsl_lite_init_exch_
 #      define RSL_LITE_EXCH_Y rsl_lite_exch_y_
 #      define RSL_LITE_EXCH_X rsl_lite_exch_x_

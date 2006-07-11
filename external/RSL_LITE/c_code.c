@@ -10,6 +10,27 @@
 
 #define F_PACK
 
+/* JRB stubs */
+
+RSL_WRITE ( unit_p, iotag_p, base, d_p, type_p, glen, llen  )
+  int_p
+    unit_p              /* (I) Fortran unit number. */
+   ,iotag_p ;           /* (I) RSL I/O code. */
+  char *
+    base ;              /* (I) Buffer. */
+  int_p
+    d_p                 /* (I) RSL domain descriptor */
+   ,type_p ;            /* (I) RSL data type code. */
+  int
+    glen[]              /* (I) Global dimension information. */
+   ,llen[] ;            /* (I) Local dimension information. */
+{
+return;
+}
+
+/* JRB end stubs */
+
+
 RSL_LITE_ERROR_DUP1 ( int *me )
 {
     int newfd ;
