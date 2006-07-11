@@ -1,4 +1,4 @@
-subroutine DA_Store_Obs_Grid_Info ( xp, loc )
+subroutine da_store_obs_grid_info ( xp, loc )
 
    IMPLICIT NONE
 
@@ -8,10 +8,10 @@ subroutine DA_Store_Obs_Grid_Info ( xp, loc )
    loc%proc_domain_with_halo = .true.
    loc%proc_domain = .false.
    
-   if(loc%i >= xp%its .and. loc%i <= xp%ite .and. &
+   if (loc%i >= xp%its .and. loc%i <= xp%ite .and. &
       loc%j >= xp%jts .and. loc%j <= xp%jte) then
-        loc%proc_domain = .true.
+      loc%proc_domain = .true.
    endif
 
-end subroutine DA_Store_Obs_Grid_Info
+end subroutine da_store_obs_grid_info
 

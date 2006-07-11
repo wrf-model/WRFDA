@@ -8,7 +8,7 @@ MODULE da_synop
    USE da_physics
    USE da_par_util
 
-   ! The "stats_synop_type" is ONLY used locally in DA_Synop:
+   ! The "stats_synop_type" is ONLY used locally in da_synop:
 
    TYPE residual_synop1_type
       REAL          :: u                        ! u-wind.
@@ -25,7 +25,7 @@ MODULE da_synop
    TYPE stats_synop_type
       TYPE (maxmin_synop_stats_type)  :: maximum, minimum
       TYPE (residual_synop1_type)     :: average, rms_err
-  END TYPE stats_synop_type
+   END TYPE stats_synop_type
 
 CONTAINS
 

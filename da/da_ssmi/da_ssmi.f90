@@ -10,33 +10,33 @@ MODULE da_ssmi
    USE da_par_util
    USE module_wrf_error
 
-   ! The "stats_ssmi_rv_type" is ONLY used locally in DA_Ssmi_Rv:
+   ! The "stats_ssmi_rv_type" is ONLY used locally in da_ssmi_rv:
 
    TYPE maxmin_ssmi_rv_stats_type
-        TYPE (maxmin_type)         :: tpw      ! Toatl precipitable water cm
-        TYPE (maxmin_type)         :: Speed    ! Wind speed (m/s)
+      TYPE (maxmin_type)         :: tpw      ! Toatl precipitable water cm
+      TYPE (maxmin_type)         :: Speed    ! Wind speed (m/s)
    END TYPE maxmin_ssmi_rv_stats_type
 
    TYPE stats_ssmi_retrieval_type
-        TYPE (maxmin_ssmi_rv_stats_type)      :: maximum, minimum
-        TYPE (residual_ssmi_retrieval_type)   :: average, rms_err
+      TYPE (maxmin_ssmi_rv_stats_type)      :: maximum, minimum
+      TYPE (residual_ssmi_retrieval_type)   :: average, rms_err
    END TYPE stats_ssmi_retrieval_type
 
-   ! The "stats_ssmi_tb_type" is ONLY used locally in DA_Ssmi_tb:
+   ! The "stats_ssmi_tb_type" is ONLY used locally in da_ssmi_tb:
 
    TYPE maxmin_ssmi_tb_stats_type
-        TYPE (maxmin_type)         :: tb19v    ! brightness temperature (K)
-        TYPE (maxmin_type)         :: tb19h    ! brightness temperature (K)
-        TYPE (maxmin_type)         :: tb22v    ! brightness temperature (K)
-        TYPE (maxmin_type)         :: tb37v    ! brightness temperature (K)
-        TYPE (maxmin_type)         :: tb37h    ! brightness temperature (K)
-        TYPE (maxmin_type)         :: tb85v    ! brightness temperature (K)
-        TYPE (maxmin_type)         :: tb85h    ! brightness temperature (K)
+      TYPE (maxmin_type)         :: tb19v    ! brightness temperature (K)
+      TYPE (maxmin_type)         :: tb19h    ! brightness temperature (K)
+      TYPE (maxmin_type)         :: tb22v    ! brightness temperature (K)
+      TYPE (maxmin_type)         :: tb37v    ! brightness temperature (K)
+      TYPE (maxmin_type)         :: tb37h    ! brightness temperature (K)
+      TYPE (maxmin_type)         :: tb85v    ! brightness temperature (K)
+      TYPE (maxmin_type)         :: tb85h    ! brightness temperature (K)
    END TYPE maxmin_ssmi_tb_stats_type
 
    TYPE stats_ssmi_tb_type
-        TYPE (maxmin_ssmi_tb_stats_type)  :: maximum, minimum
-        TYPE (residual_ssmi_tb_type)      :: average, rms_err
+      TYPE (maxmin_ssmi_tb_stats_type)  :: maximum, minimum
+      TYPE (residual_ssmi_tb_type)      :: average, rms_err
    END TYPE stats_ssmi_tb_type
 
 

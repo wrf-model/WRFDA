@@ -78,7 +78,7 @@ subroutine da_read_ssmi_info (iunit, ob, xb, xbx)
       return
    else
       write(UNIT=stdout, fmt='(/2a/)') &
-           'in DA_Read_SSMI_Info.inc, char_ned=', trim(char_ned)
+           'in da_read_ssmi_info.inc, char_ned=', trim(char_ned)
    ENDIF
 
    ! 2.3 READ NUMBER OF REPORTS
