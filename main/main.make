@@ -8,8 +8,8 @@ wrfvar  : advance_cymdh $(WRFVAR_LIBS) wrfvar.o
 wrf     : $(WRF_LIBS) wrf.o
 	$(LD) -o wrf.exe $(LDFLAGS) wrf.o $(WRF_LIB)
 
-wrfplus : $(WRFPLUS_LIBS) pack_utils.o wrf.o
-	$(LD) -o wrfplus.exe $(LDFLAGS) wrf.o $(WRFPLUS_LIB) pack_utils.o
+wrfplus : $(WRFPLUS_LIBS) wrf.o
+	$(LD) -o wrfplus.exe $(LDFLAGS) wrf.o $(WRFPLUS_LIB)
 
 kma2netcdf :  $(WRFVAR_LIBS) $(CONVERTOR_MODULES) $(CONVERTOR_OBJS) kma2netcdf.o
 	$(LD) -o kma2netcdf.exe $(LDFLAGS) kma2netcdf.o \
