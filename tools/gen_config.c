@@ -226,7 +226,8 @@ gen_get_nl_config ( char * dirname )
         fprintf(fp,"  USE module_configure\n") ;
       }
       fprintf(fp,"  %s , INTENT(%s) :: %s\n",p->type->name,intnt,p->name) ;
-      fprintf(fp,"  INTEGER, INTENT(IN) ::  id_id\n") ;
+      fprintf(fp,"  INTEGER id_id\n") ;
+      fprintf(fp,"  CHARACTER*80 emess\n") ;
       if ( sw == 0 ) /* get */
       {
         if ( !strcmp( p->nentries, "1" )) {
@@ -243,7 +244,6 @@ gen_get_nl_config ( char * dirname )
           }
         } else {
           if ( ! sw_ifort_kludge ) {
-            fprintf(fp,"  CHARACTER*80 emess\n") ;
             if        ( !strcmp( p->nentries, "max_domains" )) {
               fprintf(fp,"  IF ( id_id .LT. 1 .OR. id_id .GT. model_config_rec%%max_dom ) THEN\n") ;
               fprintf(fp,"    WRITE(emess,*)'nl_%s_%s: Out of range domain number: ',id_id\n",gs,p->name) ;
@@ -279,7 +279,6 @@ gen_get_nl_config ( char * dirname )
           }
         } else {
           if ( ! sw_ifort_kludge ) {
-            fprintf(fp,"  CHARACTER*80 emess\n") ;
             if        ( !strcmp( p->nentries, "max_domains" )) {
               fprintf(fp,"  IF ( id_id .LT. 1 .OR. id_id .GT. model_config_rec%%max_dom ) THEN\n") ;
               fprintf(fp,"    WRITE(emess,*)'nl_%s_%s: Out of range domain number: ',id_id\n",gs,p->name) ;
