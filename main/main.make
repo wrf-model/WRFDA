@@ -20,7 +20,7 @@ netcdf2kma : $(WRFVAR_LIBS) $(CONVERTOR_MODULES) $(CONVERTOR_OBJS) netcdf2kma.o
            $(CONVERTOR_MODULES) $(CONVERTOR_OBJS) $(WRFVAR_LIB)
 
 $(SOLVER) : $(WRF_LIBS) $(SOLVER).o
-	$(LD) -o $(SOLVER).exe $(LDFLAGS) $(SOLVER).o libwrflib.a $(WRF_LIB)
+	$(LD) -o $(SOLVER).exe $(LDFLAGS) $(SOLVER).o libwrf.a $(WRF_LIB)
 
 $(SOLVER)_wrf : $(WRF_LIBS) wrf.o
 	$(LD) -o wrf.exe $(LDFLAGS) wrf.o $(WRF_LIB)
@@ -40,10 +40,10 @@ $(SOLVER)_real : $(WRF_LIBS) module_initialize real_$(SOLVER).o ndown_$(SOLVER).
 	$(LD) -o ndown.exe $(LDFLAGS) ndown_$(SOLVER).o  module_initialize_$(IDEAL_CASE).o $(WRF_LIB)
 
 convert_bioemiss : $(WRF_LIBS) convert_bioemiss.o
-	$(FC) -o convert_bioemiss.exe $(LDFLAGS) convert_bioemiss.o libwrflib.a $(WRF_LIB)
+	$(FC) -o convert_bioemiss.exe $(LDFLAGS) convert_bioemiss.o libwrf.a $(WRF_LIB)
 
 convert_emiss : $(WRF_LIBS) convert_emiss.o
-	$(FC) -o convert_emiss.exe $(LDFLAGS) convert_emiss.o libwrflib.a $(WRF_LIB)
+	$(FC) -o convert_emiss.exe $(LDFLAGS) convert_emiss.o libwrf.a $(WRF_LIB)
 
 real_nmm : $(WRF_LIBS) real_nmm.o module_initialize_real.o \
           module_optional_si_input.o input_wrf.o module_io_domain.o

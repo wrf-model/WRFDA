@@ -20,7 +20,8 @@ FRAME_MODULES =  module_internal_header_util.o \
 FRAME_OBJS    = wrf_num_bytes_between.o    \
                 wrf_shutdown.o             \
                 libmassv.o                 \
-                collect_on_comm.o
+                collect_on_comm.o          \
+                pack_utils.o
 
 #compile as a .o but do not link into the main library
 #FRAME_SPECIAL_OBJS =       module_internal_header_util.o pack_utils.o

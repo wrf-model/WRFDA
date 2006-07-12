@@ -1,4 +1,4 @@
-DA_OBJS        =	da_solve_v3d.o		\
+DA_MODULES        =	da_solve_v3d.o		\
 			da_par_util.o           \
 			da_par_util1.o          \
 			da_setup_structures.o	\
@@ -37,7 +37,6 @@ DA_OBJS        =	da_solve_v3d.o		\
 			da_spectral.o           \
 			da_radiance.o		\
                         da_tracing.o            \
-                        da_memory.o             \
 			rttov_const.o		\
 			rttov_global.o		\
 			rttov_types.o		\
@@ -49,9 +48,8 @@ DA_OBJS        =	da_solve_v3d.o		\
 	   		da_wrfvar_top.o     \
                         da_reporting.o
 
-libwrfvar.a : $(DA_OBJS)
-	$(AR) libwrfvar.a $(DA_OBJS)
-	$(RANLIB) libwrfvar.a
+DA_OBJS        =	da_memory.o \
+                        da_solve_v3d.o
 
 inc/da_generic_boilerplate.inc: da_generic_boilerplate.m4
 	@ $(RM) inc/da_generic_boilerplate.inc

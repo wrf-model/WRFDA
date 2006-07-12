@@ -28,6 +28,8 @@ MODULE module_io
 
   USE module_configure
 
+  IMPLICIT NONE
+
   LOGICAL :: is_inited = .FALSE.
   INTEGER, PARAMETER, PRIVATE :: MAX_WRF_IO_HANDLE = 1000
   INTEGER :: wrf_io_handles(MAX_WRF_IO_HANDLE), how_opened(MAX_WRF_IO_HANDLE) 
@@ -107,6 +109,7 @@ END SUBROUTINE wrf_ioinit
 !--- ioexit
 
 SUBROUTINE wrf_ioexit( Status )
+USE module_wrf_quilt
 !<DESCRIPTION>
 !<PRE>
 ! Shut down the WRF I/O system.  
