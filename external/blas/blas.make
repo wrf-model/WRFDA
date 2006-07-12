@@ -19,8 +19,7 @@ blas.o:	               blas.f90      \
 		       dtrmm.inc    \
 		       dtrmv.inc    \
 		       lsame.inc    \
-		       xerbla.inc   \
-		       module_wrf_error.o
+		       xerbla.inc   
 			$(CPP) $(CPPFLAGS) $(FPPFLAGS) blas.f90 > blas.f
 			$(FFC) -c $(FIXEDFLAGS) blas.f
 
