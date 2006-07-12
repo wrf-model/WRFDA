@@ -67,7 +67,7 @@ subroutine da_tpq_to_slp_adj ( T, Q, P, TERR, PSFC, &
           'ERROR FINDING PRESSURE LEVEL ',PCONST,' MB ABOVE THE SURFACE'
         WRITE(UNIT=errmsg(2),FMT='(A,F11.3,2X,A,F11.3)') &
           'PL=',PL,'  PSFC=',psfc
-        call wrf_errors(__FILE__,__LINE__,errmsg(1:2))
+        call da_error(__FILE__,__LINE__,errmsg(1:2))
       END IF                                                         
 
 ! ... GET TEMPERATURE AT PL (TL), EXTRAPOLATE T AT SURFACE (TS)     

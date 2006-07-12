@@ -3,6 +3,7 @@ module da_define_structures
     use module_domain   ! for typedefs (vp_type, xb_type, xpose_type)
     use module_dm       ! for rsl definitions
     use da_tracing
+    use da_reporting
     use module_wrf_error
 
    !---------------------------------------------------------------------------

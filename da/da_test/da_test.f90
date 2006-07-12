@@ -38,6 +38,7 @@ module da_test
    use da_wrfvar_io
    use module_wrf_error
    use da_minimisation
+   use da_reporting
 
    implicit none
 

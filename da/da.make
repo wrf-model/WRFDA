@@ -46,7 +46,8 @@ DA_OBJS        =	da_solve_v3d.o		\
 			gsi_constants.o		\
                         da_wrfvar_io.o      \
                         da_airsr.o          \
-	   		da_wrfvar_top.o
+	   		da_wrfvar_top.o     \
+                        da_reporting.o
 
 libwrfvar.a : $(DA_OBJS)
 	$(AR) libwrfvar.a $(DA_OBJS)

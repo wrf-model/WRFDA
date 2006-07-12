@@ -111,7 +111,7 @@ subroutine da_get_gausslats( nj, glats, gwgts, sinlat, coslat )
 !         print*, 'Root ',k,' number of iterations ',i
 
          if (i >= MaxIter) then
-            call wrf_error(__FILE__,__LINE__, &
+            call da_error(__FILE__,__LINE__, &
               "No convergence finding Gaussian latitudes")
          end if
 
@@ -126,7 +126,7 @@ subroutine da_get_gausslats( nj, glats, gwgts, sinlat, coslat )
    end do
 
    if (k /= nj+1) then
-      call wrf_error(__FILE__,__LINE__,"Not all roots found")
+      call da_error(__FILE__,__LINE__,"Not all roots found")
    end if
 
 !  Calculate sin, cosine:

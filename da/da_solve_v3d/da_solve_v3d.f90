@@ -25,6 +25,7 @@ SUBROUTINE da_solve_v3d ( grid , config_flags , &
    use da_minimisation
    use da_par_util
    use da_tracing
+   use da_reporting
    use module_get_file_names ! for system interface on cray
 
    ! Registry generated module

@@ -48,7 +48,7 @@ subroutine da_get_bins_info(nj, nk, bin2d, evec_g, eval_g,&
    else
       WRITE(UNIT=errmsg(1),FMT='(A,I5)') &
          "Invalid value of vert_evalue=",vert_evalue
-      call wrf_error(__FILE__,__LINE__,errmsg(1))
+      call da_error(__FILE__,__LINE__,errmsg(1))
    end if
 
    call da_get_vertical_truncation(max_vert_var, eval_g, be_sub)

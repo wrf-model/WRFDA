@@ -536,7 +536,6 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
    CHARACTER*120  :: fmt_each = &
       '(3(f12.3,i4,f7.2),11x,3(f12.3,i4,f7.2),11x,1(f12.3,i4,f7.2))'
 
-
 CONTAINS
 
 #include "da_advance_cymdh.inc"

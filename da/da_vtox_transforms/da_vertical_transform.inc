@@ -308,7 +308,7 @@ subroutine da_vertical_transform( string, be, vertical_wgt, vv, vp, &
 
    case default;
    
-      call wrf_error(__FILE__,__LINE__, &
+      call da_error(__FILE__,__LINE__, &
          "Invalid da_vertical_transform option "//TRIM(string))
 
    end select

@@ -60,7 +60,7 @@ subroutine da_transform_xtovp( xb, xbx, xa, xp, vp, be, &
       else
          WRITE(UNIT=errmsg(1),FMT='(A,I5,A,L10)') &
             ' Wrong choice of fg_format= ',fg_format,' with global = ',global
-         call wrf_error(__FILE__,__LINE__,errmsg(1))
+         call da_error(__FILE__,__LINE__,errmsg(1))
       end if
    end if
 
@@ -92,7 +92,7 @@ subroutine da_transform_xtovp( xb, xbx, xa, xp, vp, be, &
       else
          WRITE(UNIT=errmsg(1),FMT='(A,I5,A,L10)') &
             ' Wrong choice of fg_format= ',fg_format,' with global = ',global
-         call wrf_error(__FILE__,__LINE__,errmsg(1))
+         call da_error(__FILE__,__LINE__,errmsg(1))
       end if
    end if
 

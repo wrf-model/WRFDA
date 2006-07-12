@@ -74,7 +74,7 @@ subroutine da_sfcprs (kts, kte, p, t, q, height, psfc, pslv, h_obs, t_obs)
 !           PLMB(1), PLMB(2),' and ',PLMB(3),' Pa. values, at least.'
 !         errmsg(kx+3)="not enough levels"
 !         errmsg(kx+4)="Change the pressure levels by -25mb"
-!         call wrf_errors(__FILE__,__LINE__,errmsg(1:kx+4))
+!         call da_error(__FILE__,__LINE__,errmsg(1:kx+4))
          PLMB(1) = PLMB(1) - 2500.
          PLMB(2) = PLMB(2) - 2500.
          PLMB(3) = PLMB(3) - 2500.

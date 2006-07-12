@@ -16,6 +16,7 @@ module da_radiance
 !   use da_obs
    use da_par_util
    USE module_wrf_error
+   USE da_reporting
 
    use rttov_const,  only : &
             errorstatus_success, &

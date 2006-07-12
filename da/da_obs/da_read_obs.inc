@@ -113,7 +113,7 @@ SUBROUTINE da_read_obs (iunit, ob, xp, filename)
    IF (iost /= 0) THEN
       WRITE(UNIT=errmsg(1),FMT='(A,I5,A)') &
          "Error",iost," opening gts obs file "//TRIM(filename)
-      CALL wrf_warning(__FILE__,__LINE__,errmsg(1:1))
+      CALL da_warning(__FILE__,__LINE__,errmsg(1:1))
       RETURN
    ENDIF
 
@@ -355,7 +355,7 @@ loop_level: DO i = 1, platform%info%levels
              platform%info%lon,         &
              platform%info%elv,         &
              platform%info%id
-         CALL wrf_warning(__FILE__,__LINE__,errmsg(1:2))
+         CALL da_warning(__FILE__,__LINE__,errmsg(1:2))
 
          platform%info%levels = nlevels
       else if( nlevels < 1) then
@@ -952,7 +952,7 @@ loop_level: DO i = 1, platform%info%levels
          if( num_bogus > max_bogus_input) then
            write(UNIT=errmsg(1),FMT='(A,I6,A,I6)') &
              'Bogus #=', num_bogus, ' > max_bogus_input=', max_bogus_input
-           CALL wrf_error(__FILE__,__LINE__,errmsg(1))
+           CALL da_error(__FILE__,__LINE__,errmsg(1))
          endif
 
          ob%bogus(num_bogus)%info = platform%info
@@ -1052,7 +1052,7 @@ loop_level: DO i = 1, platform%info%levels
                'platform%info%platform=', platform%info%platform
             write(unit=errmsg(3), fmt='(a, i3)') &
                'platform%info%levels=', platform%info%levels
-            CALL wrf_warning(__FILE__,__LINE__,errmsg(1:3))
+            CALL da_warning(__FILE__,__LINE__,errmsg(1:3))
 
       END SELECT
 
@@ -1195,7 +1195,7 @@ loop_level: DO i = 1, platform%info%levels
            'ob%ob_numb(ob%current_ob_time)%profiler=', ob%ob_numb(ob%current_ob_time)%profiler, &
            'ob%num_profiler=', ob%num_profiler
 
-      CALL wrf_error(__FILE__,__LINE__,"Obs mismatch")
+      CALL da_error(__FILE__,__LINE__,"Obs mismatch")
    endif
 
 !  if((ob%ob_numb(ob%current_ob_time)%ssmi_tb        /= ob%num_ssmi_tb) .or. &

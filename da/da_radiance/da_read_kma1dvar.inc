@@ -73,7 +73,7 @@ subroutine da_read_kma1dvar (inst,iv, ob, xp, inunit, infile)
   open(unit=inunit,file=trim(infile),form='formatted', &
        iostat = iost, status = 'old')
   if (iost /= 0) then
-    call wrf_error(__FILE__,__LINE__,&
+    call da_error(__FILE__,__LINE__,&
       "Cannot open file "//TRIM(infile))
   end if
 
@@ -141,7 +141,7 @@ subroutine da_read_kma1dvar (inst,iv, ob, xp, inunit, infile)
    size = size + 1
    allocate ( p%next, stat=error)   ! add next data
    if (error /= 0 ) then
-     call wrf_error(__FILE__,__LINE__, &
+     call da_error(__FILE__,__LINE__, &
        "Cannot allocate radiance structure")
    end if
 
@@ -177,13 +177,13 @@ subroutine da_read_kma1dvar (inst,iv, ob, xp, inunit, infile)
                              i, iv%instid(inst)%rttovid_string, iv%instid(inst)%num_rad
       allocate( iv%instid(inst)%rad(1:iv%instid(inst)%num_rad), stat = error )
       If( error /= 0 ) Then
-        call wrf_error(__FILE__,__LINE__, &
+        call da_error(__FILE__,__LINE__, &
           "mem allocation error to iv%instid(inst)%rad")
       End If
 
       allocate( ob%instid(inst)%rad(1:ob%instid(inst)%num_rad), stat = error )
       If( error /= 0 ) Then
-        call wrf_error(__FILE__,__LINE__, &
+        call da_error(__FILE__,__LINE__, &
           "mem allocation error to ob%instid(inst)%rad")
       End If
 

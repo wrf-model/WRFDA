@@ -56,7 +56,7 @@ subroutine da_balance_equation_lin( xb, xbx, xp, u, v, phi_b,   &
       coefy = coefx   
    else
       WRITE(UNIT=errmsg(1),FMT='(A,I3)') 'Wrong FG_FORMAT = ',fg_format
-      call wrf_error(__FILE__,__LINE__,errmsg(1))
+      call da_error(__FILE__,__LINE__,errmsg(1))
    end if
 
    ! [1.1] Multiplicative coefficent for conversion RHS->Del**2 phi_b/M**2:

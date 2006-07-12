@@ -85,7 +85,7 @@ subroutine da_scan_radar (iunit, ob, xp, filename)
 !     -------------
 
    IF (iost /= 0) THEN
-     call wrf_error(__FILE__,__LINE__, &
+     call da_error(__FILE__,__LINE__, &
        "Cannot read radar file")
    ENDIF
 
@@ -208,7 +208,7 @@ subroutine da_scan_radar (iunit, ob, xp, filename)
           if( num_Radar > max_Radar ) then
             write(UNIT=errmsg(1),FMT='(A,I6,A,I6)') &
               ' Radar #= ',ob % num_Radar, ' > max_Radar = ', max_Radar
-            call wrf_error(__FILE__,__LINE__,errmsg(1))
+            call da_error(__FILE__,__LINE__,errmsg(1))
           endif
 
         CASE DEFAULT;

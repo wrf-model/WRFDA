@@ -10,6 +10,7 @@ MODULE da_tools
    USE da_define_structures
    USE lapack
    USE module_wrf_error
+   use da_reporting
    
    IMPLICIT NONE
    

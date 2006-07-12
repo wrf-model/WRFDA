@@ -9,6 +9,7 @@ MODULE da_physics
    use da_grid_definitions
    use da_interpolation
    use da_dynamics
+   use da_reporting
    use module_wrf_error
 
    IMPLICIT NONE

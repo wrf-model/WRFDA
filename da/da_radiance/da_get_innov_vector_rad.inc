@@ -102,7 +102,7 @@
      allocate (zlsat(nprofiles), stat= alloc_status(7) )
      allocate (polar(nchanl), stat= alloc_status(8) )
      if ( any(alloc_status /= 0) ) then
-       call wrf_error(__FILE__,__LINE__, &
+       call da_error(__FILE__,__LINE__, &
          "Cannot Allocate mem zk, pres tb con_vars aux_vars")
      end if
 
@@ -125,7 +125,7 @@
          allocate (iv%instid(inst)%rad(n)%pm(xp%kms:xp%kme), stat= alloc_status(15) )
 
          if ( any(alloc_status /= 0) ) then
-           call wrf_error(__FILE__,__LINE__, &
+           call da_error(__FILE__,__LINE__, &
              "Cannot Allocate mem iv%zk, t, mr")
          end if
 
@@ -350,7 +350,7 @@
 !  Allocate ( iv%instid(inst)%rad(n)%calcemis(knchpf), stat = alloc_status(10) )
   
          if ( any(alloc_status /= 0) ) then
-           call wrf_error(__FILE__,__LINE__, &
+           call da_error(__FILE__,__LINE__, &
              "Cannot allocate mem before emiss")
          end if
 
@@ -529,7 +529,7 @@
 #endif
   open(UNIT=innov_vector_unit,file=trim(filename),form='formatted',iostat=ios)
   if( ios /= 0 ) Then
-    call wrf_error(__FILE__,__LINE__,&
+    call da_error(__FILE__,__LINE__,&
       "Cannot open output file "//TRIM(filename))
   Endif
     write(UNIT=innov_vector_unit,FMT='(a,a,i7,a,i5,a)') &

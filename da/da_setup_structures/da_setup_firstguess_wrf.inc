@@ -50,7 +50,7 @@ call da_oi(__FILE__,__LINE__)
          "diff=",seconds,"   ANALYSIS_ACCU=",ANALYSIS_ACCU
       errmsg(3)="=======> Wrong xb time found???"
 call da_oi(__FILE__,__LINE__)
-      call wrf_warning(__FILE__,__LINE__,errmsg(1:3))
+      call da_warning(__FILE__,__LINE__,errmsg(1:3))
    endif
 
    !------------------------------------------------------------------------
@@ -168,7 +168,7 @@ call da_oi(__FILE__,__LINE__)
          FMT='("Upper-right: lat,lon,x,y,xp%ide,xp%jde:",4f10.3,2i6)') &
          xlat(xp%ide,xp%jde),  xlong(xp%ide,xp%jde), start_x, start_y, &
          xp%ide, xp%jde
-      call wrf_messages(errmsg(1:5))
+      call wrf_message(errmsg(1:5))
    endif
 
    ! Setup the domain definition for use of the MM5/GRAPH:
@@ -209,7 +209,7 @@ call da_oi(__FILE__,__LINE__)
       WRITE(UNIT=errmsg(4),FMT='(a,2i5,2x,a,2f6.1)') &
             'Dimension of MOAD: ix, jy:',coarse_ix, coarse_jy, &
             'parent_x, parent_y:', start_x, start_y
-      call wrf_messages(errmsg(1:4))
+      call wrf_message(errmsg(1:4))
    endif
 
    call da_set_map_para ! set up the map background parameters
@@ -220,7 +220,7 @@ call da_oi(__FILE__,__LINE__)
       "Please check if the domain's central point (x,y) is correct:"
    WRITE(UNIT=errmsg(2),FMT='(a,4f12.3)') 'grid%cen_lat,grid%cen_lon,x,y:', &
                          grid%cen_lat,grid%cen_lon,x,y
-   call wrf_warning(__FILE__,__LINE__,errmsg(1:2)) 
+   call da_warning(__FILE__,__LINE__,errmsg(1:2)) 
 
    !--------------------------------------------------------------------------
    ! [3.0] Interpolate WRF C-grid winds to p points of WRFVAR grid (interpolate 

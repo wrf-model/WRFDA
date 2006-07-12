@@ -129,7 +129,7 @@ subroutine da_rtm_init(iv,ob)
       nchanl(n)  = 4
       nscan(n)   = 90
    else
-    call wrf_error(__FILE__,__LINE__, &
+    call da_error(__FILE__,__LINE__, &
       ' unrecognized instrument '//TRIM(inst_name(rtminit_sensor(n))))
    end if
 
@@ -138,13 +138,13 @@ subroutine da_rtm_init(iv,ob)
 
       allocate ( iv%instid(n)%ichan(1:nchanl(n)), stat = error )
       if( error /= 0 ) then
-        call wrf_error(__FILE__,__LINE__, &
+        call da_error(__FILE__,__LINE__, &
           "mem allocation error to iv%instid(n)%ichan")
       end if
 
       allocate ( ob%instid(n)%ichan(1:nchanl(n)), stat = error )
       if( error /= 0 ) then
-        call wrf_error(__FILE__,__LINE__, &
+        call da_error(__FILE__,__LINE__, &
           "mem allocation error to ob%instid(n)%ichan")
       end if
 
@@ -154,7 +154,7 @@ subroutine da_rtm_init(iv,ob)
            form='formatted',iostat = iost, status='old')
 
   if (iost /= 0) then
-    call wrf_error(__FILE__,__LINE__, &
+    call da_error(__FILE__,__LINE__, &
       'Cannot open Radiance Info FILE '// &
       TRIM(iv%instid(n)%rttovid_string)//'.info')
   end if
@@ -206,7 +206,7 @@ subroutine da_rtm_init(iv,ob)
 #endif
 
   if( any(errorstatus(:) /= errorstatus_success )) then
-    call wrf_error(__FILE__,__LINE__, &
+    call da_error(__FILE__,__LINE__, &
      'rttov_setup failed')
   endif
 
@@ -233,7 +233,7 @@ subroutine da_rtm_init(iv,ob)
                                 coefs_scatt(1))
 #endif
      if(coef_errorstatus /= errorstatus_success ) then
-       call wrf_error(__FILE__,__LINE__, &
+       call da_error(__FILE__,__LINE__, &
          'rttov_readscattcoeffs failed')
      endif
    end if
@@ -247,7 +247,7 @@ subroutine da_rtm_init(iv,ob)
                                  coefs_scatt(1))
 #endif
       if(coef_errorstatus /= errorstatus_success ) then
-       call wrf_error(__FILE__,__LINE__, &
+       call da_error(__FILE__,__LINE__, &
          'rttov_readscattcoeffs failed')
       endif      
    end if
@@ -262,7 +262,7 @@ subroutine da_rtm_init(iv,ob)
                                coefs_scatt(1))
 #endif
     if(coef_errorstatus /= errorstatus_success ) then
-       call wrf_error(__FILE__,__LINE__, &
+       call da_error(__FILE__,__LINE__, &
          'rttov_readscattcoeffs failed')
     endif
     coefs_scatt_instname(2) = 'amsub'
@@ -271,7 +271,7 @@ subroutine da_rtm_init(iv,ob)
                                coefs_scatt(2))
 #endif
     if(coef_errorstatus /= errorstatus_success ) then
-       call wrf_error(__FILE__,__LINE__, &
+       call da_error(__FILE__,__LINE__, &
          'rttov_readscattcoeffs failed')
     endif
    end if
@@ -340,7 +340,7 @@ subroutine da_rtm_init(iv,ob)
   open(UNIT=rtm_bias_unit,file=trim(iv%instid(n)%rttovid_string)//'.bias', &
            form='formatted',iostat = iost, status='old')
   if (iost /= 0) then
-    call wrf_error(__FILE__,__LINE__, &
+    call da_error(__FILE__,__LINE__, &
       'Cannot open radiance biascorr FILE '//TRIM(iv%instid(n)%rttovid_string)//'.bias')
   end if
 

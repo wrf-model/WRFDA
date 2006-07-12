@@ -60,7 +60,7 @@ subroutine da_transform_xtoy_rad_adj ( iv, xp, jo_grad_y, jo_grad_x )
      allocate (aux_vars(nprofiles), stat= alloc_status(6) )
 
      if ( any(alloc_status /= 0) ) then
-       call wrf_error(__FILE__,__LINE__, &
+       call da_error(__FILE__,__LINE__, &
          "Canot allocate memory to con_vars")
      end if
 

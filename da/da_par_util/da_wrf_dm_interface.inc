@@ -30,7 +30,7 @@ subroutine da_local_to_global(xp, x, xg, dim)
    else
      WRITE(UNIT=errmsg(1),FMT='(A,I5,A)') &
        "dim=",dim,"must be 2 or 3"
-     call wrf_error(__FILE__,__LINE__,errmsg(1))
+     call da_error(__FILE__,__LINE__,errmsg(1))
    end if
 
 end subroutine da_local_to_global

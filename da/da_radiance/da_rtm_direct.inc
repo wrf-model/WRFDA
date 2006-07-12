@@ -70,7 +70,7 @@ subroutine da_rtm_direct( inst, isflg, nchanl, nprofiles, &
    If( Any(alloc_status /= 0) ) Then
      WRITE(UNIT=errmsg(1),FMT='(A,I5)') &
        "mem allocation error to profile",n
-     call wrf_error(__FILE__,__LINE__,errmsg(1))
+     call da_error(__FILE__,__LINE__,errmsg(1))
    End If
 
     profiles(n) % ozone_data = .false.
@@ -158,7 +158,7 @@ subroutine da_rtm_direct( inst, isflg, nchanl, nprofiles, &
   Allocate( radiance % clear_out( nbtout ) ,stat= alloc_status(24))
 
   If( Any(alloc_status /= 0) ) Then
-     call wrf_error(__FILE__,__LINE__, &
+     call da_error(__FILE__,__LINE__, &
        "mem allocation error prior to rttov_direct")
   End If
 
@@ -343,7 +343,7 @@ end if
   Deallocate( radiance % clear_out ,stat= alloc_status(22))
 
   If( Any(alloc_status /= 0) ) Then
-     call wrf_error(__FILE__,__LINE__, &
+     call da_error(__FILE__,__LINE__, &
        "mem deallocation error")
   End If
 

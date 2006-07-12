@@ -18,6 +18,7 @@ MODULE da_setup_structures
    use da_radiance
    USE module_wrf_error
    use da_tracing
+   use da_reporting
 
    IMPLICIT NONE
 

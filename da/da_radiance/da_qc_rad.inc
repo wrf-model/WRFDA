@@ -9,8 +9,6 @@ subroutine da_qc_rad ( inst, nchan, tb_ob, iv )
 !
 !------------------------------------------------------------------------------
 
-   USE module_wrf_error
-
    IMPLICIT NONE
 
    INTEGER, INTENT(IN)             :: inst       ! sensor index.

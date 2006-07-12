@@ -67,7 +67,7 @@ subroutine da_setup_be_global( ide, jde, kde, be  )
    read(be_unit, err = 100)bin2d(1:ni,1:nj)
 
    if( ni /= ide .or. nj /= jde .or. nk /= kde ) THEN
-     call wrf_error(__FILE__,__LINE__, &
+     call da_error(__FILE__,__LINE__, &
        "Cannot generate BE at this resolution")
    END IF
 
@@ -307,10 +307,10 @@ subroutine da_setup_be_global( ide, jde, kde, be  )
    return
 
 99  write(UNIT=errmsg(1),FMT='(a, i5)')' Unexpected end on BE-unit = ',be_unit
-    call wrf_error(__FILE__,__LINE__,errmsg(1))
+    call da_error(__FILE__,__LINE__,errmsg(1))
 
 100 write(UNIT=errmsg(1),FMT='(a, i5)')' Read error on BE-unit = ',be_unit
-    call wrf_error(__FILE__,__LINE__,errmsg(1))
+    call da_error(__FILE__,__LINE__,errmsg(1))
 
 ! JRB daft having these here
 

@@ -53,7 +53,7 @@ subroutine da_setup_runconstants( xp, xb, xbx)
    END DO
 
    IF ( .NOT. found_magic ) THEN
-     call wrf_error(__FILE__,__LINE__, &
+     call da_error(__FILE__,__LINE__, &
        "No factor found")
    END IF
 
@@ -80,7 +80,7 @@ subroutine da_setup_runconstants( xp, xb, xbx)
    END DO
       
    IF ( .NOT. found_magic ) THEN
-     call wrf_error(__FILE__,__LINE__, &
+     call da_error(__FILE__,__LINE__, &
        "No factor found")
    END IF
 
@@ -146,7 +146,7 @@ subroutine da_setup_runconstants( xp, xb, xbx)
       write(UNIT=errmsg(2), fmt='(2x,a,i4)') &
          '(xp%ide-xp%ids+1) = ', (xp%ide-xp%ids+1), &
          'xbx%fft_pad_i = ', xbx%fft_pad_i
-      call wrf_errors (__FILE__,__LINE__,errmsg(1:2))
+      call da_error (__FILE__,__LINE__,errmsg(1:2))
    else
       xbx%pad_inc = (xp%ide-xp%ids+1)/xbx%fft_pad_i
    endif

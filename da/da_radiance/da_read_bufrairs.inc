@@ -184,7 +184,7 @@ subroutine da_read_bufrairs(obstype,iv,xp,lnbufr,infile)
          'da_read_bufrairs:  Reading BUFR Table A file: ',trim(table_file)
       open(UNIT=airs_table_unit,file=table_file,iostat = iost)
       IF (iost /= 0) THEN
-         call wrf_error(__FILE__,__LINE__, &
+         call da_error(__FILE__,__LINE__, &
             "Cannot open file "//TRIM(table_file))
       END IF
    endif
@@ -192,7 +192,7 @@ subroutine da_read_bufrairs(obstype,iv,xp,lnbufr,infile)
    ! Open BUFR file
    open(UNIT=lnbufr,file=trim(infile),form='unformatted',iostat = iost)
    IF (iost /= 0) THEN
-      call wrf_error(__FILE__,__LINE__, &
+      call da_error(__FILE__,__LINE__, &
          "Cannot open file "//TRIM(infile))
    END IF
    if ( airstab ) then
@@ -370,7 +370,7 @@ subroutine da_read_bufrairs(obstype,iv,xp,lnbufr,infile)
       size = size + 1
       allocate ( p%next, stat=error)   ! add next data
       if (error /= 0 ) then
-         call wrf_error(__FILE__,__LINE__, &
+         call da_error(__FILE__,__LINE__, &
             "Cannot allocate radiance structure")
       end if
 
@@ -393,7 +393,7 @@ subroutine da_read_bufrairs(obstype,iv,xp,lnbufr,infile)
                               inst, iv%instid(inst)%rttovid_string, iv%instid(inst)%num_rad
       allocate( iv%instid(inst)%rad(1:iv%instid(inst)%num_rad), stat = error )
       If (error /= 0) Then
-         call wrf_error(__FILE__,__LINE__, &
+         call da_error(__FILE__,__LINE__, &
             "mem allocation error to iv%instid(inst)%rad")
       End if
    End If

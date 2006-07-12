@@ -99,7 +99,7 @@ subroutine da_wrfvar_init( no_init1 )
   ! call nl_get_max_dom( 1, max_dom )
   IF ( max_dom > 1 ) THEN
 #if ( ! defined(DM_PARALLEL)  &&   ! defined(STUBMPI) )
-    call wrf_error(__FILE__,__LINE__, &
+    call da_error(__FILE__,__LINE__, &
       'nesting requires either an MPI build or use of the -DSTUBMPI option' ) 
 #endif
   END IF
@@ -171,7 +171,7 @@ subroutine da_wrfvar_init( no_init1 )
   END IF
 
 ! JRB
-   CALL wrf_warning(__FILE__,__LINE__,(/"Fix me"/))
+   CALL da_warning(__FILE__,__LINE__,(/"Fix me"/))
 !  head_grid%start_subtime = head_grid%start_time
 !  head_grid%stop_subtime = head_grid%stop_time
 

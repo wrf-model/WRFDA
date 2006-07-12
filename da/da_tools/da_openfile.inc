@@ -64,7 +64,7 @@
 ! --------------------
  
  2000 CONTINUE
-      call wrf_error(__FILE__,__LINE__, &
+      call da_error(__FILE__,__LINE__, &
         "Cannot open file"//TRIM(CDFILE))
 
       end subroutine da_openfile

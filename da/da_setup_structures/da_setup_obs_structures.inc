@@ -105,7 +105,7 @@ SUBROUTINE da_setup_obs_structures( xp, ob, iv )
       ! Stop any radiance work if RTTOV not defined, as there are
       ! huge preprocessor defined holes in the subsequent code, made so people
       ! can compile without the RTTOV library
-      CALL wrf_error(__FILE__,__LINE__, &
+      CALL da_error(__FILE__,__LINE__, &
          "Cannot run radiance code if compile directive RTTOV false")
 #endif
       CALL wrf_message('Using NCEP BUFR radiance 1b input')

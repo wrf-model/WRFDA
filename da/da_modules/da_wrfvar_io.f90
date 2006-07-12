@@ -12,6 +12,7 @@ MODULE da_wrfvar_io
 
    USE da_tracing
    USE da_constants
+   use da_reporting
 
 CONTAINS
 

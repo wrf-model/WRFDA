@@ -449,7 +449,7 @@ subroutine da_sfc_wtq_adj (psfc, tg, ps, ts, qs, us, vs, regime,&
        CASE DEFAULT;
          WRITE(UNIT=errmsg(1),FMT='(A,I2,A)') &
           "Regime=",iregime," is invalid."
-         call wrf_error(__FILE__,__LINE__,errmsg(1))
+         call da_error(__FILE__,__LINE__,errmsg(1))
 
       END SELECT
 !
@@ -761,7 +761,7 @@ subroutine da_sfc_wtq_adj (psfc, tg, ps, ts, qs, us, vs, regime,&
        CASE DEFAULT;
          WRITE(UNIT=errmsg(1),FMT='(A,I2,A)') &
           "Regime=",iregime," is invalid."
-         call wrf_error(__FILE__,__LINE__,errmsg(1))
+         call da_error(__FILE__,__LINE__,errmsg(1))
 
       END SELECT
  
