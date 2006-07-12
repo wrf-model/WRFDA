@@ -11,8 +11,7 @@
 !
 !     ESMF Alarm Module
       module ESMF_AlarmMod
-         USE module_wrf_error
-      
+     
 !
 !==============================================================================
 !

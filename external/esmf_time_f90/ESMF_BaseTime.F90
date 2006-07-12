@@ -37,7 +37,6 @@
 !------------------------------------------------------------------------------
 ! !USES:
       use ESMF_BaseMod    ! ESMF Base class
-      use module_wrf_error
 
       implicit none
 !

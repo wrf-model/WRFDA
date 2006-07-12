@@ -45,8 +45,6 @@
       use ESMF_CalendarMod
       use ESMF_Stubs
 
-      use module_wrf_error
-
       implicit none
 !
 !------------------------------------------------------------------------------

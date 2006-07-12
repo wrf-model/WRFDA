@@ -45,8 +45,6 @@
       use ESMF_FractionMod, only : ESMF_Fraction
       use ESMF_CalendarMod
 
-      use module_wrf_error
-
       implicit none
 !
 !------------------------------------------------------------------------------

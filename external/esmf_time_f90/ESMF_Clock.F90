@@ -43,8 +43,6 @@
       use ESMF_TimeMod           ! , only : ESMF_Time
       use ESMF_AlarmMod,        only : ESMF_Alarm
 
-      use module_wrf_error
-
       implicit none
 !
 !------------------------------------------------------------------------------
