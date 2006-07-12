@@ -20,7 +20,8 @@ cd $EXP_DIR
 if test $HOSTNAME = "bs1101en" -o $HOSTNAME = "bs1201en"; then # bluesky
 
   # Rather simplistic node calculation 
-  let NODES=($NUM_PROCS-1)/8+1
+  let TEMP=$NUM_PROCS-1
+  let NODES=$TEMP/8+1
 
   cat > job.bsh <<EOF
 #!/bin/sh
