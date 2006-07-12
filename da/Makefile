@@ -49,7 +49,8 @@ OBJS_FOR_ALL =		da_solve_v3d.o		\
 			gsi_kinds.o		\
 			gsi_constants.o		\
                         da_wrfvar_top.o         \
-                        da_wrfvar_io.o
+                        da_wrfvar_io.o          \
+                        da_reporting.o
 
 TARGETDIR    =  ../..
 wrfvar :	$(OBJS_FOR_ALL)
@@ -1111,6 +1112,15 @@ da_tracing.o:           da_tracing.f90           \
                         da_par_util1.o
 			$(CPP) $(CPPFLAGS) da_tracing.f90 > da_tracing.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_tracing.f
+
+da_reporting.o:         da_reporting.f90       \
+                        da_error.inc           \
+                        da_messages.inc        \
+                        da_messages2.inc       \
+                        da_warning.inc         \
+                        module_wrf_error.o
+			$(CPP) $(CPPFLAGS) da_reporting.f90 > da_reporting.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_reporting.f
 
 be_spectral.o:		da_be_spectral.f90          \
 			da_constants.o	            \
