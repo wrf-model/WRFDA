@@ -10,6 +10,7 @@ contains
 
 #include "da_error.inc"
 #include "da_warning.inc"
+#include "da_messages.inc"
 #include "da_messages2.inc"
 
 end module da_reporting

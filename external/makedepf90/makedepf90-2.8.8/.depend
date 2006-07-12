@@ -1,8 +1,6 @@
 errormesg.o: errormesg.c config.h
 find_dep.o: find_dep.c finddep.h list.h xmalloc.h global.h config.h \
   utils.h errormesg.h macro.h modfile_name.h
-find_dep.tab.o: find_dep.tab.c finddep.h list.h xmalloc.h global.h \
-  config.h utils.h errormesg.h macro.h modfile_name.h
 lexer.o: lexer.c global.h config.h list.h errormesg.h find_dep.h utils.h \
   xmalloc.h
 list.o: list.c list.h xmalloc.h
