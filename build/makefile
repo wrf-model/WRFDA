@@ -88,7 +88,7 @@ libwrf.a : $(WRF_OBJS) wrf.o
 	mv registry.o1 registry.o
 	$(RANLIB) libwrf.a
 
-libwrfplus.a : $(WRFPLUS_OBJS) wrf.o
+libwrfplus.a : $(WRF_OBJS) $(WRFPLUS_OBJS) wrf.o
 	mv registry.o registry.o1
 	$(AR) libwrfplus.a *.o
 	mv registry.o1 registry.o
