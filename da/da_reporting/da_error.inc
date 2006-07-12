@@ -14,7 +14,7 @@ subroutine da_error( file_str, line, errors)
    if (line > 0) then
       call wrf_message( 'FATAL callED FROM FILE:  '//file_str//'  LINE:  '//TRIM(line_str) )
    end if
-   call wrf_messages(errors)
+   call da_messages(errors)
    call wrf_message( '-------------------------------------------' )
 #else
    call wrf_message2( '-------------- FATAL callED ---------------' )

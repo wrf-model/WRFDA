@@ -14,7 +14,7 @@ subroutine da_warning( file_str, line, warnings )
    if (line > 0) then
       call wrf_message( 'WARNING FROM FILE:  '//file_str//'  LINE:  '//TRIM(line_str) )
    end if
-   call wrf_messages(warnings)
+   call da_messages(warnings)
    call wrf_message( '-------------------------------------------' )
 #else
    call wrf_message2( '-------------- WARNING ---------------' )
