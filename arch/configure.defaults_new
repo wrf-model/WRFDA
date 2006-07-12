@@ -36,8 +36,8 @@ LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)
 
 # Libraries
 
-LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/X12R6/lib -L/usr/local/lib \
-                  -lncarg -lncarg_gks -lncarg_c -lX11
+LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/local/lib \
+                  -lncarg -lncarg_gks -lncarg_c
 MPI_LIB		= -L$(RSL)/RSL -lrsl
 
 # Architecture
@@ -82,7 +82,7 @@ FCBASE          = -automatic -cpp -fpe0 -align dcommons -align records
 
 LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)
 
-LOCAL_LIB       = -L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c -lX11
+LOCAL_LIB       = -L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c
 
 arch : 
 		$(LN) $(RSL_STUBS)/* .
@@ -125,7 +125,7 @@ CCFLAGS_RSL     =
 LDFLAGS         = $(FCBASE) ${FCOPTIM) $(FCENDIAN)
 
 
-LOCAL_LIB       = -L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c -lX11
+LOCAL_LIB       = -L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c
 MPI_LIB		= -L$(RSL)/RSL -lrsl
 
 arch : 
@@ -168,7 +168,7 @@ FCBASE          = -automatic -cpp -fpe0 -align dcommons -align records
 
 LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)
 
-LOCAL_LIB       = -L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c -lX11
+LOCAL_LIB       = -L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c
 
 arch : 
 		$(LN) $(RSL_STUBS)/* .
@@ -206,8 +206,8 @@ CCFLAGS_RSL     =
 
 LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)
 
-LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/X11R6/lib -L/usr/local/lib \
-		    -lncarg -lncarg_gks -lncarg_c -lX11
+LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/local/lib \
+		    -lncarg -lncarg_gks -lncarg_c
 
 arch : 
 		$(LN) $(RSL_STUBS)/* .
@@ -248,8 +248,8 @@ CCFLAGS_RSL     =
 
 LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)
 
-LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/X12R6/lib -L/usr/local/lib \
-                    -lncarg -lncarg_gks -lncarg_c -lX11 
+LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/local/lib \
+                    -lncarg -lncarg_gks -lncarg_c
 MPI_LIB		= -L$(RSL)/RSL -lrsl
 
 
@@ -299,8 +299,8 @@ CCFLAGS_RSL     =
 
 LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)
 
-LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/X12R6/lib -L/usr/local/lib \
-                    -lncarg -lncarg_gks -lncarg_c -lX11 
+LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/local/lib \
+                    -lncarg -lncarg_gks -lncarg_
 MPI_LIBS	= librsl_lite.a
 MPI_LIB		= -lrsl_lite
 
@@ -341,8 +341,8 @@ CCFLAGS_BUFR    = -DUNDERSCORE
 
 LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)
 
-LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/X11R6/lib -L/usr/local/lib \
-		    -lncarg -lncarg_gks -lncarg_c -lX11
+LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/local/lib \
+		    -lncarg -lncarg_gks -lncarg_c
 
 arch : 
 		$(LN) $(RSL_STUBS)/* .
@@ -384,8 +384,8 @@ CCFLAGS_RSL     =
 
 LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)
 
-LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/X12R6/lib -L/usr/local/lib \
-                    -lncarg -lncarg_gks -lncarg_c -lX11 
+LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/local/lib \
+                    -lncarg -lncarg_gks -lncarg_c
 MPI_LIB		= -L$(RSL)/RSL -lrsl
 
 arch : 
@@ -436,8 +436,8 @@ CCFLAGS_RSL     =
 
 LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)
 
-LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/X12R6/lib -L/usr/local/lib \
-                    -lncarg -lncarg_gks -lncarg_c -lX11 
+LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/local/lib \
+                    -lncarg -lncarg_gks -lncarg_c
 MPI_LIBS	= librsl_lite.a 
 MPI_LIB		= -lrsl_lite
 
@@ -478,8 +478,8 @@ CCFLAGS_BUFR    = -DUNDERSCORE
 
 LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)
 
-LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/X11R6/lib -L/usr/local/lib \
-		    -lncarg -lncarg_gks -lncarg_c -lX11
+LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/local/lib \
+		    -lncarg -lncarg_gks -lncarg_
 
 arch : 
 		$(LN) $(RSL_STUBS)/* .
@@ -516,8 +516,8 @@ CCFLAGS_RSL     =
 
 LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)
 
-LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/X11R6/lib -L/usr/local/lib \
-		    -lncarg -lncarg_gks -lncarg_c -lX11
+LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/local/lib \
+		    -lncarg -lncarg_gks -lncarg_c
 
 arch :
 		$(LN) $(RSL_STUBS)/* .
@@ -558,8 +558,8 @@ CCFLAGS_BUFR    = -DUNDERSCORE
 
 LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)
 
-LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/X12R6/lib -L/usr/local/lib \
-                    -lncarg -lncarg_gks -lncarg_c -lX11 
+LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/local/lib \
+                    -lncarg -lncarg_gks -lncarg_c
 MPI_LIB		= -L$(RSL)/RSL -lrsl
 
 arch : 
@@ -696,7 +696,7 @@ CCFLAGS_RSL     =
 
 LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)
 
-LOCAL_LIB       = -L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c -lX11
+LOCAL_LIB       = -L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c
 
 arch : 
 		$(LN) $(RSL_STUBS)/* .
@@ -737,7 +737,7 @@ CCFLAGS_RSL     =
 
 LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)
 
-LOCAL_LIB       = -L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c -lX11
+LOCAL_LIB       = -L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c
 MPI_LIB		= -L$(RSL)/RSL -lrsl -lmpi
 
 arch : 
@@ -968,7 +968,7 @@ CCFLAGS_BUFR    = -DUNDERSCORE
 
 LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)
 
-LOCAL_LIB       = #-L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c -lX11
+LOCAL_LIB       = #-L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c
 MPI_LIB		= -L$(RSL)/RSL -lrsl
 
 arch : 
