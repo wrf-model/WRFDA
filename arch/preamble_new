@@ -98,10 +98,10 @@ RSL_STUBS     = $(EXTERNAL)/RSL_STUBS
 
 PHDF5_LIB     = -L$(EXTERNAL)/io_phdf5 -lwrfio_phdf5 -L$(PHDF5_PATH)/lib \
   -lhdf5_fortran -lhdf5 -lm -lz -L$(PHDF5PATH)/lib -lsz
-LAPACK_LIB    = -llapack
-BLAS_LIB      = -lblas
-BUFR_LIB      = -lbufr
-FFTPACK5_LIB  = -lfftpack5
+#LAPACK_LIB    = -llapack
+#BLAS_LIB      = -lblas
+#BUFR_LIB      = -lbufr
+#FFTPACK5_LIB  = -lfftpack5
 
 #### Get core settings from environment (set in compile script)
 #### Note to add a core, this has to be added to.

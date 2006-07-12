@@ -83,15 +83,22 @@ WRFPLUS_OBJS=$(SHARE_OBJS_WRFPLUS) $(DYN_OBJS_WRFPLUS)
 WRFPLUS_MODULES=$(SHARE_MODULES_WRFPLUS) $(DYN_MODULES_WRFPLUS)
 
 libwrf.a : $(WRF_OBJS) wrf.o
+	mv registry.o registry.o1
 	$(AR) libwrf.a $(WRF_OBJS) *.o
+	mv registry.o1 registry.o
 	$(RANLIB) libwrf.a
 
 libwrfplus.a : $(WRFPLUS_OBJS) wrf.o
+	mv registry.o registry.o1
 	$(AR) libwrfplus.a $(WRFPLUS_OBJS) *.o
+	mv registry.o1 registry.o
 	$(RANLIB) libwrfplus.a
 
 libwrfvar.a : $(WRF_OBJS) $(DA_OBJS) $(BUFR_OBJS) wrfvar.o
+	mv registry.o registry.o1
 	$(AR) libwrfvar.a $(WRF_OBJS) $(DA_OBJS) $(BUFR_OBJS) *.o
+	mv registry.o1 registry.o
+	$(RANLIB) libwrfvar.a
 
 clean : arch_clean
 	@ $(RM) *.exe *.o *.mod *.b *.a *.f inc/*.inc frame/*.f90 registry \

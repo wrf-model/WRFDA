@@ -2,11 +2,11 @@
 
 var : wrfvar
 
-wrfvar  : advance_cymdh $(WRFVAR_LIBS) wrfvar.o pack_utils.o
-	$(LD) -o wrfvar.exe $(LDFLAGS) wrfvar.o $(WRFVAR_LIB) pack_utils.o
+wrfvar  : advance_cymdh $(WRFVAR_LIBS) wrfvar.o
+	$(LD) -o wrfvar.exe $(LDFLAGS) wrfvar.o $(WRFVAR_LIB)
 
-wrf     : $(WRF_LIBS) pack_utils.o wrf.o
-	$(LD) -o wrf.exe $(LDFLAGS) wrf.o $(WRF_LIB) pack_utils.o
+wrf     : $(WRF_LIBS) wrf.o
+	$(LD) -o wrf.exe $(LDFLAGS) wrf.o $(WRF_LIB)
 
 wrfplus : $(WRFPLUS_LIBS) pack_utils.o wrf.o
 	$(LD) -o wrfplus.exe $(LDFLAGS) wrf.o $(WRFPLUS_LIB) pack_utils.o
