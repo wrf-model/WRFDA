@@ -23,7 +23,7 @@ WRF_LIBS     = libwrflib.a libwrfio_nf.a libesmf_time.a libio_grib1.a $(MPI_LIBS
 WRFPLUS_LIBS = libwrflib.a libwrfplus.a libwrfio_nf.a libesmf_time.a \
                libio_grib1.a $(MPI_LIBS)
 
-WRFVAR_LIB  = -L. -lwrfvar $(NETCDF_LIB)  \
+WRFVAR_LIB  = -L. -lwrfvar -lwrflib $(NETCDF_LIB)  \
                -L$(EXTERNAL)/io_grib1 -lio_grib1 $(LOCAL_LIB) \
                $(LAPACK_LIB) $(BLAS_LIB) $(BUFR_LIB) $(FFTPACK5_LIB) \
                $(RTTOV_LIB) $(MPI_LIB) $(EXTRA_LIBS)
@@ -32,7 +32,7 @@ WRF_LIB     = -L. -lwrf \
               -L$(EXTERNAL)/io_grib1 -lio_grib1 $(LOCAL_LIB) \
               $(NETCDF_LIB) $(MPI_LIB) $(EXTRA_LIBS)
 
-WRFPLUS_LIB = -L. -lwrfplus \
+WRFPLUS_LIB = -L. -lwrfplus -lwrflib \
               -L$(EXTERNAL)/io_grib1 -lio_grib1 $(LOCAL_LIB) \
               $(NETCDF_LIB) $(MPI_LIB) $(EXTRA_LIBS)
 
