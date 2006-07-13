@@ -952,7 +952,7 @@ loop_level: DO i = 1, platform%info%levels
          if( num_bogus > max_bogus_input) then
            write(UNIT=errmsg(1),FMT='(A,I6,A,I6)') &
              'Bogus #=', num_bogus, ' > max_bogus_input=', max_bogus_input
-           CALL da_error(__FILE__,__LINE__,errmsg(1))
+           CALL da_error(__FILE__,__LINE__,errmsg(1:1))
          endif
 
          ob%bogus(num_bogus)%info = platform%info
@@ -1195,7 +1195,7 @@ loop_level: DO i = 1, platform%info%levels
            'ob%ob_numb(ob%current_ob_time)%profiler=', ob%ob_numb(ob%current_ob_time)%profiler, &
            'ob%num_profiler=', ob%num_profiler
 
-      CALL da_error(__FILE__,__LINE__,"Obs mismatch")
+      CALL da_error(__FILE__,__LINE__,(/"Obs mismatch"/))
    endif
 
 !  if((ob%ob_numb(ob%current_ob_time)%ssmi_tb        /= ob%num_ssmi_tb) .or. &

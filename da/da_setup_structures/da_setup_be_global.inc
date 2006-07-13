@@ -68,7 +68,7 @@ subroutine da_setup_be_global( ide, jde, kde, be  )
 
    if( ni /= ide .or. nj /= jde .or. nk /= kde ) THEN
      call da_error(__FILE__,__LINE__, &
-       "Cannot generate BE at this resolution")
+       (/"Cannot generate BE at this resolution"/))
    END IF
 
 !---------------------------------------------------------------------
@@ -307,10 +307,10 @@ subroutine da_setup_be_global( ide, jde, kde, be  )
    return
 
 99  write(UNIT=errmsg(1),FMT='(a, i5)')' Unexpected end on BE-unit = ',be_unit
-    call da_error(__FILE__,__LINE__,errmsg(1))
+    call da_error(__FILE__,__LINE__,errmsg(1:1))
 
 100 write(UNIT=errmsg(1),FMT='(a, i5)')' Read error on BE-unit = ',be_unit
-    call da_error(__FILE__,__LINE__,errmsg(1))
+    call da_error(__FILE__,__LINE__,errmsg(1:1))
 
 ! JRB daft having these here
 

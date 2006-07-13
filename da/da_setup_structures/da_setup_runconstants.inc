@@ -54,7 +54,7 @@ subroutine da_setup_runconstants( xp, xb, xbx)
 
    IF ( .NOT. found_magic ) THEN
      call da_error(__FILE__,__LINE__, &
-       "No factor found")
+       (/"No factor found"/))
    END IF
 
    ALLOCATE( xbx % trig_functs_x(1:3*fft_size_i) )  
@@ -81,7 +81,7 @@ subroutine da_setup_runconstants( xp, xb, xbx)
       
    IF ( .NOT. found_magic ) THEN
      call da_error(__FILE__,__LINE__, &
-       "No factor found")
+       (/"No factor found"/))
    END IF
 
    ALLOCATE( xbx % trig_functs_y(1:3*fft_size_j) )  

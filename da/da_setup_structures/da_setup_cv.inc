@@ -58,7 +58,7 @@ subroutine da_setup_cv( its, ite, jts, jte, &
       else
          be % cv % size_je = ij * be % alpha % mz
          call da_error(__FILE__,__LINE__, &
-            "flow-dependence not yet coded for regional!")
+            (/"flow-dependence not yet coded for regional!"/))
       end if
    END IF
 

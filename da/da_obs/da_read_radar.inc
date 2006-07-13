@@ -88,7 +88,7 @@ subroutine da_read_radar (iunit, ob, xp, filename)
 
    IF (iost /= 0) THEN
      call da_error(__FILE__,__LINE__, &
-       "Cannot read radar file")
+        (/"Cannot read radar file"/))
    ENDIF
 
 !  2.3 TOTAL RADAR NUMBER
@@ -269,7 +269,7 @@ subroutine da_read_radar (iunit, ob, xp, filename)
           if( num_Radar > max_Radar ) then
             WRITE(UNIT=errmsg(1),FMT='(A,I6,A,I6)') &
               "Radar #= ",ob % num_Radar, " > max_Radar = ", max_Radar
-            call da_error(__FILE__,__LINE__,errmsg(1))
+            call da_error(__FILE__,__LINE__,errmsg(1:1))
           endif
 
           ob % Radar ( num_Radar ) % stn_loc % lon = platform % stn % lon
@@ -349,7 +349,7 @@ subroutine da_read_radar (iunit, ob, xp, filename)
         'Radar obs mismatch ob%ob_numb(ob%current_ob_time)%Radar=', &
         ob%ob_numb(ob%current_ob_time)%Radar, &
         'ob%num_Radar=', ob%num_Radar
-      call da_error(__FILE__,__LINE__,errmsg(1))
+      call da_error(__FILE__,__LINE__,errmsg(1:1))
     endif
 !----------------------------------------------------------------------------!
 

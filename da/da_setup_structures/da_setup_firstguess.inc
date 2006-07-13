@@ -70,7 +70,7 @@ subroutine da_setup_firstguess( xbx, grid, &
    else
       WRITE(UNIT=errmsg(1),FMT='(A,I5)') &
          "Wrong choice for fg_format = ",fg_format
-      call da_error(__FILE__,__LINE__,errmsg(1))
+      call da_error(__FILE__,__LINE__,errmsg(1:1))
    end if
 
    call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id0)

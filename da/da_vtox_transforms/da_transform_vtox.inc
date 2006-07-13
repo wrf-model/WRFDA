@@ -161,7 +161,7 @@ subroutine da_transform_vtox( cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa, &
               Use_SsmiTbObs .or. Use_SsmiRetrievalObs ) then
             if( global ) then
                call da_error(__FILE__,__LINE__, &
-               "xb%speed is not available, see da_transfer_kmatoxb.inc")
+                  (/"xb%speed is not available, see da_transfer_kmatoxb.inc"/))
             end if
             call da_transform_xtoseasfcwind_lin( xa, xb )
          endif
