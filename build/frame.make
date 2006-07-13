@@ -31,13 +31,7 @@ wrf_num_bytes_between.o :
 
 module_state_description.f90 : registry ../Registry/$(REGISTRY)
 	./registry $(REGFLAGS) ../Registry/$(REGISTRY)
-	$(LN) inc/*.inc .
 	$(LN) frame/module_state_description.f90 .
 
 md_calls.inc : md_calls.m4
 	$(M4) md_calls.m4 > md_calls.inc
-
-
-# DEPENDENCIES : only dependencies after this line (don't remove the word DEPENDENCIES)
-
-# DO NOT DELETE

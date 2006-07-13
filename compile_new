@@ -140,7 +140,7 @@ else
   echo " "
 
   cd build
-  touch depend
+  touch -t01010101 depend
   make -r setup
   make -r $arglist A2DCASE="$A2DCASE"
   ln -fs *.exe ../main

@@ -41,6 +41,7 @@ links :
 
 # Manual rules specified first take precedence
 
+include da.make
 include dyn_$(SOLVER).make
 include share.make
 include frame.make
@@ -81,8 +82,7 @@ WRFPLUS_OBJS=$(SHARE_OBJS_WRFPLUS) $(DYN_OBJS_WRFPLUS)
 WRFPLUS_MODULES=$(SHARE_MODULES_WRFPLUS) $(DYN_MODULES_WRFPLUS)
 
 libwrflib.a : $(WRF_OBJS) $(WRF_MODULES)
-	$(AR) libwrf.a $(WRF_OBJS) $(WRF_MODULES)
-	mv registry.o1 registry.o
+	$(AR) libwrflib.a $(WRF_OBJS) $(WRF_MODULES)
 	$(RANLIB) libwrflib.a
 
 libwrfplus.a : $(WRFPLUS_OBJS) $(WRFPLUS_MODULES)
