@@ -16,6 +16,8 @@ subroutine da_init_wrfvar( grid, xp, xb, &
 
    INTEGER :: ii
 
+   INTEGER :: sm31,sm32,sm33,sm31x,sm32x,sm33x,sm31y,sm32y,sm33y
+
 !if ( DWORDSIZE != RWORDSIZE )
 #define TRUE_MSG_XPOSE add_msg_xpose_real
 !else
@@ -35,6 +37,16 @@ subroutine da_init_wrfvar( grid, xp, xb, &
    call set_tiles ( grid , ids , ide , jds , jde , ips , ipe , jps , jpe )
 
    call da_copy_tile_dims( grid, xp, its, ite, jts, jte, kts, kte )
+
+   sm31             = grid%sm31
+   sm32             = grid%sm32
+   sm33             = grid%sm33
+   sm31x            = grid%sm31x
+   sm32x            = grid%sm32x
+   sm33x            = grid%sm33x
+   sm31y            = grid%sm31y
+   sm32y            = grid%sm32y
+   sm33y            = grid%sm33y
 
    ! Register xpose arrays and build messages for processor communication.
 
