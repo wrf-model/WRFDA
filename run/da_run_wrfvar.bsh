@@ -69,7 +69,7 @@ export NL_LVAR4D=${NL_LVAR4D:-.FALSE.}
 export NL_RUN_HOURS=${NL_RUN_HOURS:-1}
 
 export NPROC_X=${NPROC_X:-0}                        # Regional, always set NPROC_X to 0, Global, always 1
-if test $NL_GLOBAL == ".TRUE."; then
+if test $NL_GLOBAL = ".TRUE."; then
   export NPROC_X=1
 fi
 
@@ -134,7 +134,7 @@ cp $DA_DIR/run/gribmap.txt .
 cp $DA_DIR/run/LANDUSE.TBL .
 cp $DA_DIR/run/gmao_airs_bufr.tbl .
 cp $DA_BUILD_DIR/wrfvar.exe  wrfvar.exe
-if test $NL_LVAR4D == .TRUE.; then
+if test $NL_LVAR4D = .TRUE.; then
   cp $WRFPLUS_BUILD_DIR/wrfplus.exe  wrfplus.exe
   ln -s $DA_DIR/run/*sh .
   export PATH=$DA_DIR/run:$PATH
@@ -144,7 +144,7 @@ ln -sf $DA_FIRST_GUESS	 wrfvar_input
 ln -sf $DA_BOUNDARIES 	 wrfbdy_d01
 ln -sf $DA_FIRST_GUESS	 wrfinput_d01
 ln -sf $DA_BACK_ERRORS   fort.34
-if test $NL_OB_FORMAT == 1; then
+if test $NL_OB_FORMAT = 1; then
   ln -sf $DA_OBSERVATIONS ob.bufr
 else
   ln -sf $DA_OBSERVATIONS ob.ascii
@@ -171,12 +171,12 @@ for FILE in $DAT_DIR/*.bufr; do
   fi
 done
 
-if test $PLATFORM == "Linux"; then
+if test $PLATFORM = "Linux"; then
 #  ENDIAN=little_endian
   ENDIAN=big_endian
 fi
 
-if test $PLATFORM == "Darwin" -o $PLATFORM == "AIX"; then
+if test $PLATFORM = "Darwin" -o $PLATFORM = "AIX"; then
   ENDIAN=big_endian
 fi
 
@@ -227,7 +227,7 @@ echo "End date:                    $DA_END_DATE"
 # Create namelist.input file:
 
 
-if test $NL_LVAR4D == .TRUE.; then
+if test $NL_LVAR4D = .TRUE.; then
    export NL_AUXHIST2_INNAME='auxhist2_d<domain>_<date>'
 
    export NL_DYN_OPT=2
@@ -261,7 +261,7 @@ mkdir trace
 #Run WRF-Var:
 #-------------------------------------------------------------------
 
-if test $PLATFORM == "Linux"; then
+if test $PLATFORM = "Linux"; then
   if test $NUM_PROCS -gt 1; then
     mpirun -v -np $NUM_PROCS -nolocal -machinefile $HOSTS ./wrfvar.exe > wrfvar.out 2>wrfvar.error
     RC=$?
@@ -272,7 +272,7 @@ if test $PLATFORM == "Linux"; then
   fi
 fi
 
-if test $PLATFORM == "Darwin"; then
+if test $PLATFORM = "Darwin"; then
   if test $NUM_PROCS -gt 1; then
     mpirun -v -np $NUM_PROCS -all-local -machinefile $HOSTS ./wrfvar.exe > wrfvar.out 2>wrfvar.error
     RC=$?
@@ -286,7 +286,7 @@ fi
 #./wrfvar.exe > wrfvar.out 2>wrfvar.error
 #RC=$?
 
-if test $PLATFORM == "AIX"; then
+if test $PLATFORM = "AIX"; then
   #IBM (llsubmit):
   #poe ./wrfvar.exe
   #mpirun -np ${NUM_PROCS} ./wrfvar.exe
@@ -366,7 +366,7 @@ EOF
 ls -l $EXP_DIR/cost_fn >> $HTML
 ls -l $EXP_DIR/cost_fn
 
-if test $RC == 0; then
+if test $RC = 0; then
   echo "passed on $DATE" >> $HTML
   echo "passed on $DATE"
 else
