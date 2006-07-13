@@ -74,7 +74,7 @@ subroutine da_read_kma1dvar (inst,iv, ob, xp, inunit, infile)
        iostat = iost, status = 'old')
   if (iost /= 0) then
     call da_error(__FILE__,__LINE__,&
-      "Cannot open file "//TRIM(infile))
+      (/"Cannot open file "//TRIM(infile)/))
   end if
 
   read(UNIT=inunit,FMT='(A,I10,I12)') instrument,idate,npass
@@ -142,7 +142,7 @@ subroutine da_read_kma1dvar (inst,iv, ob, xp, inunit, infile)
    allocate ( p%next, stat=error)   ! add next data
    if (error /= 0 ) then
      call da_error(__FILE__,__LINE__, &
-       "Cannot allocate radiance structure")
+       (/"Cannot allocate radiance structure"/))
    end if
 
    p => p%next
@@ -178,13 +178,13 @@ subroutine da_read_kma1dvar (inst,iv, ob, xp, inunit, infile)
       allocate( iv%instid(inst)%rad(1:iv%instid(inst)%num_rad), stat = error )
       If( error /= 0 ) Then
         call da_error(__FILE__,__LINE__, &
-          "mem allocation error to iv%instid(inst)%rad")
+          (/"mem allocation error to iv%instid(inst)%rad"/))
       End If
 
       allocate( ob%instid(inst)%rad(1:ob%instid(inst)%num_rad), stat = error )
       If( error /= 0 ) Then
         call da_error(__FILE__,__LINE__, &
-          "mem allocation error to ob%instid(inst)%rad")
+          (/"mem allocation error to ob%instid(inst)%rad"/))
       End If
 
 !  4.0 assign sequential structure to innovation structure

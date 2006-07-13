@@ -61,7 +61,7 @@ subroutine da_allocate_background_errors ( jy, kz, l, e, be_eval_loc, &
          if(be_eval_loc(j,k) <=0) then
            WRITE(UNIT=errmsg(1),FMT='(A,I5,A,I5,A,F10.2)') &
              "At lat= ",j," For mode = ",k," local eigen value= ",be_eval_loc(j,k)
-           call da_error(__FILE__,__LINE__,errmsg(1))
+           call da_error(__FILE__,__LINE__,errmsg(1:1))
          end if
          end do
          end do

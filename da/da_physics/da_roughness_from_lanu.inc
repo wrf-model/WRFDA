@@ -30,7 +30,7 @@ subroutine da_roughness_from_lanu(ltbl, mminlu, date_mm5, xp, lanu, rough)
                      ACTION = 'read', IOSTAT = io_error )
   else
     call da_error(__FILE__,__LINE__,&
-      "Cannot open file LANDUSE.TBL for conversion of roughness")
+      (/"Cannot open file LANDUSE.TBL for conversion of roughness"/))
   endif
 
   LUMATCH=0  
@@ -52,7 +52,7 @@ subroutine da_roughness_from_lanu(ltbl, mminlu, date_mm5, xp, lanu, rough)
                END IF
                IF(LC /= LI) THEN
                  call da_error(__FILE__,__LINE__, &
-                   "MISSING LANDUSE: LC")
+                   (/"MISSING LANDUSE: LC"/))
                END IF
             ELSE 
                READ (UNIT=ltbl,FMT=*) 
@@ -65,7 +65,7 @@ subroutine da_roughness_from_lanu(ltbl, mminlu, date_mm5, xp, lanu, rough)
 
    IF(LUMATCH == 0)THEN
     call da_error(__FILE__,__LINE__,&
-      "LANDUSE IN INPUT FILE DOES NOT MATCH LUTABLE")
+      (/"LANDUSE IN INPUT FILE DOES NOT MATCH LUTABLE"/))
    ENDIF   
 
    m1 = xp % its

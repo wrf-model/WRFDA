@@ -65,7 +65,7 @@
  
  2000 CONTINUE
       call da_error(__FILE__,__LINE__, &
-        "Cannot open file"//TRIM(CDFILE))
+        (/"Cannot open file"//TRIM(CDFILE)/))
 
       end subroutine da_openfile
 

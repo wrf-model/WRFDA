@@ -42,7 +42,7 @@ subroutine da_trace_init
    
       IF (IOStatus /= 0) THEN
          call da_error(__FILE__,__LINE__, &
-            "Cannot open trace file "//TraceFile)
+            (/"Cannot open trace file "//TraceFile/))
       END IF
    END IF
 

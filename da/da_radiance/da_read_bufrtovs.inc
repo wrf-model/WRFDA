@@ -150,7 +150,7 @@ subroutine da_read_bufrtovs (obstype, iv, xp, lnbufr, infile)
        iostat = iost, status = 'old')
   if (iost /= 0) then
     call da_error(__FILE__,__LINE__, &
-      "Cannot open file "//TRIM(infile))
+      (/"Cannot open file "//TRIM(infile)/))
   end if
 
   call openbf(lnbufr,'IN',lnbufr)
@@ -304,7 +304,7 @@ subroutine da_read_bufrtovs (obstype, iv, xp, lnbufr, infile)
    allocate ( p%next, stat=error)   ! add next data
    if (error /= 0 ) then
      call da_error(__FILE__,__LINE__, &
-       "Cannot allocate radiance structure")
+       (/"Cannot allocate radiance structure"/))
    end if
 
    p => p%next
@@ -331,7 +331,7 @@ subroutine da_read_bufrtovs (obstype, iv, xp, lnbufr, infile)
       allocate( iv%instid(i)%rad(1:iv%instid(i)%num_rad), stat = error )
       If( error /= 0 ) Then
         call da_error(__FILE__,__LINE__, &
-          & "mem allocation error to iv%instid(i)%rad")
+          & (/"mem allocation error to iv%instid(i)%rad"/))
       End If
   end do
 
@@ -358,7 +358,7 @@ subroutine da_read_bufrtovs (obstype, iv, xp, lnbufr, infile)
    allocate ( iv%instid(inst)%rad(nread(inst))%tb(1:nchanl), stat = error  )
      IF (error /= 0) THEN
        call da_error(__FILE__,__LINE__, &
-         & "mem allocation error to iv%instid(inst)%rad(nread(inst))%tb")
+         & (/"mem allocation error to iv%instid(inst)%rad(nread(inst))%tb"/))
      END IF
    iv%instid(inst)%rad(nread(inst))%tb(1:nchanl)%inv = p%rad%tb(1:nchanl)%inv
 !   iv%instid(inst)%rad(nread(inst))%inv(1:nchanl) = 0.0

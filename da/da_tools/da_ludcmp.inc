@@ -25,7 +25,7 @@ subroutine da_ludcmp( n, np, indx, a, d)
          if ( abs(a(i,j)) > aamax ) aamax = abs(a(i,j))
       end do
       if ( aamax == 0.0 ) then
-         call da_error(__FILE__,__LINE__,"Singular matrix")
+         call da_error(__FILE__,__LINE__,(/"Singular matrix"/))
       end if
       vv(i) = 1.0 / aamax
    end do

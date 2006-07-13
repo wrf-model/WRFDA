@@ -66,7 +66,7 @@ subroutine da_rtm_ad( inst, nchanl, nprofiles, con_vars, &
     If( Any(alloc_status /= 0) ) Then
       WRITE(UNIT=errmsg(1),FMT='(A,I5)') &
         "ad mem allocation error to profile",n
-      call da_error(__FILE__,__LINE__,errmsg(1))
+      call da_error(__FILE__,__LINE__,errmsg(1:1))
     End If
 
     profiles(n) % ozone_data = .false.
@@ -107,7 +107,7 @@ subroutine da_rtm_ad( inst, nchanl, nprofiles, con_vars, &
     If( Any(alloc_status /= 0) ) Then
       WRITE(UNIT=errmsg(1),FMT='(A,I5)') &
         "mem allocation error to profiles_ad",n
-      call da_error(__FILE__,__LINE__,errmsg(1))
+      call da_error(__FILE__,__LINE__,errmsg(1:1))
     End If
 
     profiles_ad(n) % ozone_Data = .False.  ! no meaning
@@ -196,7 +196,7 @@ subroutine da_rtm_ad( inst, nchanl, nprofiles, con_vars, &
 
   If( Any(alloc_status /= 0) ) Then
     call da_error(__FILE__,__LINE__, &
-      "mem allocation error prior to rttov_ad")
+      (/"mem allocation error prior to rttov_ad"/))
   End If
 
      ! initialise all radiance increments to 0
@@ -389,7 +389,7 @@ subroutine da_rtm_ad( inst, nchanl, nprofiles, con_vars, &
 
   If( Any(alloc_status /= 0) ) Then
     call da_error(__FILE__,__LINE__, &
-      "mem deallocation error")
+      (/"mem deallocation error"/))
   End If
 
  return

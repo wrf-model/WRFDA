@@ -112,7 +112,7 @@ subroutine da_get_gausslats( nj, glats, gwgts, sinlat, coslat )
 
          if (i >= MaxIter) then
             call da_error(__FILE__,__LINE__, &
-              "No convergence finding Gaussian latitudes")
+              (/"No convergence finding Gaussian latitudes"/))
          end if
 
          glats(k) = ASIN(x)
@@ -126,7 +126,7 @@ subroutine da_get_gausslats( nj, glats, gwgts, sinlat, coslat )
    end do
 
    if (k /= nj+1) then
-      call da_error(__FILE__,__LINE__,"Not all roots found")
+      call da_error(__FILE__,__LINE__,(/"Not all roots found"/))
    end if
 
 !  Calculate sin, cosine:

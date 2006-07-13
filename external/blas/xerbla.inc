@@ -39,7 +39,7 @@
 *
       WRITE(UNIT=errmsg(1), FMT = 9999 )SRNAME, INFO
 *
-      CALL da_error(__FILE__,__LINE__,errmsg(1))
+      CALL da_error(__FILE__,__LINE__,errmsg(1:1))
 *
  9999 FORMAT( ' ** On entry to ', A6, ' parameter number ', I2, ' had ',
      $      'an illegal value' )

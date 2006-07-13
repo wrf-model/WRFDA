@@ -58,23 +58,23 @@ end subroutine da_map_init
     ! First, check for validity of mandatory variables in proj
     IF ( ABS(lat1) .GT. 90. ) THEN
       call da_error(__FILE__,__LINE__, &
-        "Latitude of origin corner required as follows: -90N <= lat1 < = 90.N")
+        (/"Latitude of origin corner required as follows: -90N <= lat1 < = 90.N"/))
     ENDIF
     IF ( ABS(lon1) .GT. 180.) THEN
       call da_error(__FILE__,__LINE__, &
-        "Longitude of origin required as follows: -180E <= lon1 <= 180W")
+        (/"Longitude of origin required as follows: -180E <= lon1 <= 180W"/))
     ENDIF
     IF ((dx .LE. 0.).AND.(proj_code .NE. PROJ_LATLON)) THEN
       call da_error(__FILE__,__LINE__, &
-        "Require grid spacing (dx) in meters be positive!")
+        (/"Require grid spacing (dx) in meters be positive!"/))
     ENDIF
     IF ((ABS(stdlon) .GT. 180.).AND.(proj_code .NE. PROJ_MERC)) THEN
       call da_error(__FILE__,__LINE__, &
-        "Need orientation longitude (stdlon) as: -180E <= lon1 <= 180W") 
+        (/"Need orientation longitude (stdlon) as: -180E <= lon1 <= 180W"/)) 
     ENDIF
     IF (ABS(truelat1).GT.90.) THEN
       call da_error(__FILE__,__LINE__, &
-        "Set true latitude 1 for all projections!")
+        (/"Set true latitude 1 for all projections!"/))
     ENDIF
    
     call da_map_init(proj) 
@@ -132,7 +132,7 @@ end subroutine da_map_init
    
       CASE DEFAULT
         WRITE(UNIT=errmsg(1),FMT='(A,I2)') 'Unknown projection code: ', proj%code
-        call da_error(__FILE__,__LINE__,errmsg(1))
+        call da_error(__FILE__,__LINE__,errmsg(1:1))
       END SELECT pick_proj
     proj%init = .TRUE.
     RETURN
@@ -151,7 +151,7 @@ end subroutine da_map_init
 
     IF (.NOT.proj%init) THEN
       call da_error(__FILE__,__LINE__, &
-        "You have not called map_set for this projection!")
+        (/"You have not called map_set for this projection!"/))
     ENDIF
 
     SELECT CASE(proj%code)
@@ -175,7 +175,7 @@ end subroutine da_map_init
       CASE DEFAULT
         WRITE(UNIT=errmsg(1),FMT='(A,I2)') &
           'Unrecognized map projection code: ', proj%code
-        call da_error(__FILE__,__LINE__,errmsg(1))
+        call da_error(__FILE__,__LINE__,errmsg(1:1))
  
     END SELECT
     RETURN
@@ -195,7 +195,7 @@ end subroutine da_map_init
 
     IF (.NOT.proj%init) THEN
       call da_error(__FILE__,__LINE__, &
-        "You have not called map_set for this projection!")
+        (/"You have not called map_set for this projection!"/))
     ENDIF
 
     i = ii
@@ -223,7 +223,7 @@ end subroutine da_map_init
       CASE DEFAULT
         WRITE(UNIT=errmsg(1),FMT='(A,I2)') &
           "Unrecognized map projection code: ", proj%code
-        call da_error(__FILE__,__LINE__,errmsg(1))
+        call da_error(__FILE__,__LINE__,errmsg(1:1))
 
     END SELECT
     RETURN

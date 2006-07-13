@@ -70,7 +70,7 @@ subroutine da_rtm_direct( inst, isflg, nchanl, nprofiles, &
    If( Any(alloc_status /= 0) ) Then
      WRITE(UNIT=errmsg(1),FMT='(A,I5)') &
        "mem allocation error to profile",n
-     call da_error(__FILE__,__LINE__,errmsg(1))
+     call da_error(__FILE__,__LINE__,errmsg(1:1))
    End If
 
     profiles(n) % ozone_data = .false.
@@ -159,7 +159,7 @@ subroutine da_rtm_direct( inst, isflg, nchanl, nprofiles, &
 
   If( Any(alloc_status /= 0) ) Then
      call da_error(__FILE__,__LINE__, &
-       "mem allocation error prior to rttov_direct")
+       (/"mem allocation error prior to rttov_direct"/))
   End If
 
   surfem (:) = 0.
@@ -344,7 +344,7 @@ end if
 
   If( Any(alloc_status /= 0) ) Then
      call da_error(__FILE__,__LINE__, &
-       "mem deallocation error")
+       (/"mem deallocation error"/))
   End If
 
  return

@@ -103,7 +103,7 @@
      allocate (polar(nchanl), stat= alloc_status(8) )
      if ( any(alloc_status /= 0) ) then
        call da_error(__FILE__,__LINE__, &
-         "Cannot Allocate mem zk, pres tb con_vars aux_vars")
+         (/"Cannot Allocate mem zk, pres tb con_vars aux_vars"/))
      end if
 
      pres(1:num_levs) = coefs(inst) % ref_prfl_p(1:num_levs)
@@ -126,7 +126,7 @@
 
          if ( any(alloc_status /= 0) ) then
            call da_error(__FILE__,__LINE__, &
-             "Cannot Allocate mem iv%zk, t, mr")
+             (/"Cannot Allocate mem iv%zk, t, mr"/))
          end if
 
          model_t(:) = 0.0
@@ -351,7 +351,7 @@
   
          if ( any(alloc_status /= 0) ) then
            call da_error(__FILE__,__LINE__, &
-             "Cannot allocate mem before emiss")
+             (/"Cannot allocate mem before emiss"/))
          end if
 
   sensor_type  = coefs(inst)%id_sensor - 1  ! 0:IR 1:MW
@@ -530,7 +530,7 @@
   open(UNIT=innov_vector_unit,file=trim(filename),form='formatted',iostat=ios)
   if( ios /= 0 ) Then
     call da_error(__FILE__,__LINE__,&
-      "Cannot open output file "//TRIM(filename))
+      (/"Cannot open output file "//TRIM(filename)/))
   Endif
     write(UNIT=innov_vector_unit,FMT='(a,a,i7,a,i5,a)') &
       trim(iv%instid(n)%rttovid_string), &

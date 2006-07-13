@@ -1156,7 +1156,7 @@ subroutine ualg(ia,theta,sst,tb,u)
       enddo
       u = u + coeff2(7)*(theta-53.0)
    else
-      call da_error(__FILE__,__LINE__,"Invalid algorithm ID")
+      call da_error(__FILE__,__LINE__,(/"Invalid algorithm ID"/))
    endif
 
 end subroutine ualg

@@ -113,7 +113,7 @@ subroutine da_ffdduv (F,D,U,V,YLON,ID)
 
       CASE DEFAULT
          WRITE(UNIT=errmsg(1),FMT='(A,I2)') ' UNKNOWN OPTION ',ID
-         call da_error(__FILE__,__LINE__,errmsg(1))
+         call da_error(__FILE__,__LINE__,errmsg(1:1))
 
    END SELECT
 

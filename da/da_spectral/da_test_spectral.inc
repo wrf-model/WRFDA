@@ -94,7 +94,7 @@ subroutine da_test_spectral( max_wave, sizec, xbx, field, &
    do mm = index_start, index_end
       if( 2*mm > 2*sizec) THEN
          call da_error(__FILE__,__LINE__, &
-            "rcv_out index bounce")
+            (/"rcv_out index bounce"/))
       END IF
       ccv(mm) = cmplx (rcv_out(2*mm-1), rcv_out(2*mm))
    end do
