@@ -411,11 +411,6 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
 
    ! Tracing
 
-   INTEGER :: trace_max_depth=100    ! Maximum depth for PRINTing trace
-   INTEGER :: trace_repeat_head=100  ! Number of times trace header details
-                                     ! can be PRINTed
-   INTEGER :: trace_repeat_body=100  ! Number of times trace body details
-                                     ! can be PRINTed
    INTEGER :: trace_start_points=0   ! Number of routines to initiate trace
 
    INTEGER, PARAMETER :: num_ob_indexes = 23

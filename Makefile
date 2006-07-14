@@ -62,6 +62,8 @@ wrf : configcheck
 	( cd main ; $(MAKE) MODULE_DIRS="$(ALL_MODULES)" SOLVER=em em_wrf )
 	( cd run ; /bin/rm -f wrf.exe ; ln -s ../main/wrf.exe . )
 
+wrfvar : var
+
 var : 
 	/bin/rm -f main/libwrflib.a
 	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" ext
@@ -109,11 +111,11 @@ n2k :
 
 BE_OBJS = da_gen_be.o DA_Constants.o be_spectral.o LAPACK.o BLAS.o da_fftpack5.o
 BE_MODULES1 = -I../../frame
-BE_MODULES2 = -I../da_3dvar/src -I../frame
+BE_MODULES2 = -I../da -I../frame
 be : 
 	( cd tools; $(MAKE) FC="$(FC)" FCFLAGS="$(FCFLAGS)" advance_cymdh )
 	( cd frame; $(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" externals module_wrf_error.o )
-	( cd da_3dvar/src; $(MAKE) MODULE_DIRS="$(BE_MODULES1)" $(BE_OBJS) da_gen_be.o )
+	( cd da; $(MAKE) MODULE_DIRS="$(BE_MODULES1)" $(BE_OBJS) da_gen_be.o )
 	( cd gen_be ; \
 	/bin/rm -f *.exe ; \
 	$(MAKE) MODULE_DIRS="$(BE_MODULES2)" gen_be )
@@ -288,15 +290,15 @@ em_core :
 
 wrfvar_src :
 	@ echo '--------------------------------------'
-	( cd da_3dvar/src; $(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES_2)" wrfvar )
+	( cd da; $(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES_2)" wrfvar )
 
 wrfvar_io :
 	@ echo '--------------------------------------'
-	( cd da_3dvar; $(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" wrfvar_io )
+	( cd da; $(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" wrfvar_io )
 
 wrfvar_interface :
 	@ echo '--------------------------------------'
-	( cd da_3dvar; $(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" wrfvar_interface )
+	( cd da; $(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" wrfvar_interface )
 
 convertor_drivers :
 	@ echo '--------------------------------------'

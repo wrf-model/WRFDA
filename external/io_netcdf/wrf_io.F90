@@ -92,7 +92,6 @@ module wrf_data
 end module wrf_data
 
 module ext_ncd_support_routines
-  use module_wrf_error
 
   implicit none
 

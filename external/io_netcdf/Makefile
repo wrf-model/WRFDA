@@ -5,7 +5,7 @@ OBJS    = $(OBJSL)
 CODE    = ext_ncd_get_dom_ti.code ext_ncd_get_var_td.code ext_ncd_get_var_ti.code ext_ncd_put_dom_ti.code ext_ncd_put_var_td.code ext_ncd_put_var_ti.code transpose.code 
 FFLAGS  =  $(FCFLAGS) -I$(NETCDFPATH)/include -I../ioapi_share
 LIBS    = -L$(NETCDFPATH)/lib -lnetcdf
-CPP1    = $(CPP) -C -P $(TRADFLAG)
+CPP1    = $(CPP) -C -P $(TRADFLAG) -I$(NETCDFPATH)/include
 M4      = m4 -Uinclude -Uindex -Ulen
 AR      = ar
 

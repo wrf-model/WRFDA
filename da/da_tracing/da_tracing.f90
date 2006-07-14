@@ -9,9 +9,6 @@ MODULE da_tracing
    INTEGER, PARAMETER :: TraceIndentAmount      = 2   ! default indent
    INTEGER, PARAMETER :: MaxNoRoutines          = 440 ! maxium number of subroutines
    INTEGER, PARAMETER :: TraceNameLen           = 31  ! Length of trace name
-   INTEGER, PARAMETER :: TraceMaxDepthDefault   = 30
-   INTEGER, PARAMETER :: TraceRepeatHeadDefault = 50
-   INTEGER, PARAMETER :: TraceRepeatBodyDefault = 50
 
    ! Variables
 

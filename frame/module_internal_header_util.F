@@ -31,8 +31,6 @@ MODULE module_internal_header_util
 !</PRE>
 !</DESCRIPTION>
 
-  USE module_wrf_error
-
 INTERFACE int_get_ti_header
    MODULE PROCEDURE int_get_ti_header_integer, int_get_ti_header_real
 END INTERFACE

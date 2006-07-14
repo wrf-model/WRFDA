@@ -6,7 +6,6 @@
 SUBROUTINE normalize_basetime( basetime )
   USE esmf_basemod
   USE esmf_basetimemod
-  USE module_wrf_error
   IMPLICIT NONE
   TYPE(ESMF_BaseTime), INTENT(INOUT) :: basetime
 !PRINT *,'DEBUG:  BEGIN normalize_basetime()'
@@ -121,7 +120,6 @@ FUNCTION signnormtimeint ( timeInt )
   USE esmf_basemod
   USE esmf_basetimemod
   USE esmf_timeintervalmod
-  USE module_wrf_error
   IMPLICIT NONE
   TYPE(ESMF_TimeInterval), INTENT(IN) :: timeInt
   INTEGER :: signnormtimeint
@@ -156,7 +154,6 @@ END FUNCTION signnormtimeint
 ! Exits with error message if timeInt is not normalized.  
 SUBROUTINE timeintchecknormalized( timeInt, msgstr )
   USE esmf_timeintervalmod
-  USE module_wrf_error
   IMPLICIT NONE
   TYPE(ESMF_TimeInterval), INTENT(IN) :: timeInt
   CHARACTER(LEN=*), INTENT(IN) :: msgstr
@@ -293,7 +290,6 @@ SUBROUTINE timegetmonth( time, MM )
   USE esmf_basetimemod
   USE esmf_timemod
   USE esmf_calendarmod
-  USE module_wrf_error
   IMPLICIT NONE
   TYPE(ESMF_Time), INTENT(IN) :: time
   INTEGER, INTENT(OUT) :: MM
@@ -355,7 +351,6 @@ SUBROUTINE timeaddmonths( time, MM, ierr )
   USE esmf_basetimemod
   USE esmf_timemod
   USE esmf_calendarmod
-  USE module_wrf_error
   IMPLICIT NONE
   TYPE(ESMF_Time), INTENT(INOUT) :: time
   INTEGER, INTENT(IN) :: MM

@@ -15,7 +15,6 @@
 
 
 module gr1_data_info
-  USE module_wrf_error
 
 !*
 !* This module will hold data internal to this I/O implementation.  
@@ -103,6 +102,7 @@ subroutine ext_gr1_ioinit(SysDepInfo,Status)
   integer ,intent(out) :: Status
   integer :: i
   integer :: size, istat
+  CHARACTER (LEN=300) :: wrf_err_message
 
   call wrf_debug ( DEBUG , 'Entering ext_gr1_ioinit')
 
@@ -185,6 +185,7 @@ SUBROUTINE ext_gr1_open_for_read_begin ( FileName , Comm_compute, Comm_io, &
   integer   :: stat
   integer   :: endchar
   integer   :: last_grb_index
+  CHARACTER (LEN=300) :: wrf_err_message
 
   call wrf_debug ( DEBUG , 'Entering ext_gr1_open_for_read_begin')
 
@@ -378,6 +379,7 @@ SUBROUTINE ext_gr1_open_for_write_begin(FileName, Comm, IOComm, SysDepInfo, &
   integer              ,intent(out) :: DataHandle
   integer              ,intent(out) :: Status
   integer :: ierr
+  CHARACTER (LEN=300) :: wrf_err_message
   integer             :: size
 
   call wrf_debug ( DEBUG , 'Entering ext_gr1_open_for_write_begin')

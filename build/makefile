@@ -42,7 +42,7 @@ links :
 # Manual rules specified first take precedence
 
 include da.make
-include dyn_$(SOLVER).make
+include dyn_em.make
 include share.make
 include frame.make
 include phys.make
