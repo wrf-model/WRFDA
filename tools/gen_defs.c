@@ -60,7 +60,7 @@ gen_dummy_decls ( char * dn )
     else                  { sprintf(fname,"%s%s",corename,fn) ; }
     if ((fp = fopen( fname , "w" )) == NULL ) continue ;
     print_warning(fp,fname) ;
-    gen_decls ( fp, corename, &Domain , GRIDREF , NOPOINTERDECL , FIELD | FOURD , MEDIATION_LAYER ) ;
+    gen_decls ( fp, corename, &Domain , GRIDREF , NOPOINTERDECL , FIELD | RCONFIG | FOURD , MEDIATION_LAYER ) ;
     fprintf(fp,"#undef COPY_IN\n") ;
     fprintf(fp,"#undef COPY_OUT\n") ;
     close_the_file( fp ) ;
