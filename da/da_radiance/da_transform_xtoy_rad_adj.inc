@@ -41,9 +41,12 @@ subroutine da_transform_xtoy_rad_adj ( iv, xp, jo_grad_y, jo_grad_x )
    type(con_vars_type),  pointer  :: con_vars(:), con_vars_ad(:)
    type(aux_vars_type),  pointer  :: aux_vars(:)
 
-  alloc_status (:) = 0
+   IF ( iv%num_inst < 1 ) return
 
-  IF ( iv%num_inst < 1 ) return
+   if (trace_use) call da_trace_entry("da_transform_xtoy_rad_adj")
+
+   alloc_status (:) = 0
+
 
  do inst = 1, iv%num_inst                 ! loop for sensor
      if ( iv%instid(inst)%num_rad < 1 ) cycle
@@ -193,7 +196,7 @@ subroutine da_transform_xtoy_rad_adj ( iv, xp, jo_grad_y, jo_grad_x )
 
   end do        ! end loop for sensor
 
- return
+   if (trace_use) call da_trace_exit("da_transform_xtoy_rad_adj")
  
 end subroutine da_transform_xtoy_rad_adj
 

@@ -19,6 +19,8 @@ subroutine da_calculate_jo_and_grady_rad( iv, re, jo, jo_grad_y )
 
   INTEGER                       :: n, k, i
 
+  if (trace_use) call da_trace_entry("da_calculate_jo_and_grady_rad")
+
   IF ( iv%num_inst < 1 ) RETURN
 
   ALLOCATE ( jo % rad(1:iv%num_inst) )
@@ -45,7 +47,7 @@ subroutine da_calculate_jo_and_grady_rad( iv, re, jo, jo_grad_y )
     jo % rad(i) = 0.5 * jo % rad(i)
   END DO
 
-  RETURN
+  if (trace_use) call da_trace_exit("da_calculate_jo_and_grady_rad")
 
 end subroutine da_calculate_jo_and_grady_rad
 

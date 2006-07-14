@@ -24,6 +24,9 @@ subroutine da_calculate_residual_rad( iv, y, re,                 &
    INTEGER                           :: n, k, i
 
    IF ( iv%num_inst < 1 ) return
+
+   if (trace_use) call da_trace_entry("da_calculate_residual_rad")
+
    DO i = 1, iv%num_inst
 
       IF ( iv%instid(i)%num_rad < 1 ) cycle
@@ -51,6 +54,8 @@ subroutine da_calculate_residual_rad( iv, y, re,                 &
       np_missing  = np_missing  + n_obs_bad % rad % num % miss
       np_bad_data = np_bad_data + n_obs_bad % rad % num % bad
       np_obs_used = np_obs_used + n_obs_bad % rad % num % use 
+
+   if (trace_use) call da_trace_exit("da_calculate_residual_rad")
    
 end subroutine da_calculate_residual_rad
 

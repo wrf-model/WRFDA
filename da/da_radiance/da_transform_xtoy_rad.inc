@@ -54,6 +54,8 @@ subroutine da_transform_xtoy_rad ( xa, iv, xp, y )
       (/"Must compile with $RTTOV option for radiances"/))
 #else
 
+   if (trace_use) call da_trace_entry("da_transform_xtoy_rad")
+
 !  print *, ' Computing Radiance Increment Hdx ------- '
   alloc_status(:) = 0
 
@@ -216,9 +218,9 @@ subroutine da_transform_xtoy_rad ( xa, iv, xp, y )
      deallocate (aux_vars_tl)
 
   end do        ! end loop for sensor
+
+   if (trace_use) call da_trace_entry("da_transform_xtoy_rad")
 #endif
 
- return
- 
 end subroutine da_transform_xtoy_rad
 

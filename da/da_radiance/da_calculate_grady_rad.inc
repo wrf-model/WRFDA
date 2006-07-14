@@ -18,6 +18,8 @@ subroutine da_calculate_grady_rad( iv, re, jo_grad_y )
 
    IF ( iv%num_inst < 1 ) RETURN
 
+   if (trace_use) call da_trace_entry("da_calculate_grady_rad")
+
    DO i =1, iv%num_inst
 
    IF ( iv%instid(i)%num_rad < 1 ) cycle
@@ -39,7 +41,7 @@ subroutine da_calculate_grady_rad( iv, re, jo_grad_y )
 
    END DO
 
-   RETURN
+   if (trace_use) call da_trace_exit("da_calculate_grady_rad")
 
 end subroutine da_calculate_grady_rad
 
