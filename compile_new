@@ -143,8 +143,8 @@ else
   touch -t01010101 depend
   make -r setup
   make -r $arglist A2DCASE="$A2DCASE"
-  ln -fs $PWD/*.exe ../main
-  ln -fs $PWD/inc/namelist_script.inc ../inc
+  cp *.exe ../main
+  cp inc/namelist_script.inc ../inc
 
 endif
 
