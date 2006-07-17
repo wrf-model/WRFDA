@@ -11,7 +11,7 @@ subroutine da_calculate_residual_geoamv( oi, y, re,                        &
 
    TYPE (ob_type), INTENT(IN)        :: oi     ! Innovation vector (O-B).
    TYPE (y_type) , INTENT(IN)        :: y      ! y = H (xa)
-   TYPE (y_type) , INTENT(OUT)       :: re     ! Residual vector (O-A).
+   TYPE (y_type) , INTENT(INOUT)     :: re     ! Residual vector (O-A).
 
    INTEGER       , INTENT(INOUT)     :: np_available, np_obs_used,          &
                                         np_missing  , np_bad_data

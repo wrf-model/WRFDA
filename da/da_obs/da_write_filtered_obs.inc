@@ -54,7 +54,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xb, xp, &
 #endif
 
    type (y_type),     intent(in)  :: ob      ! Observation structure.
-   TYPE (ob_type),    intent(in)  :: iv      ! O-B structure.
+   TYPE (ob_type),    intent(inout) :: iv      ! O-B structure.
    TYPE (xpose_type), intent(in)  :: xp      ! Domain decomposition vars.
    TYPE (xb_type),    intent(in)  :: xb      ! First guess structure.
    REAL, INTENT(IN)               :: phic, xlonc, truelat1, truelat2

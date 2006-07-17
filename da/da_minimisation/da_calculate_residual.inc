@@ -7,7 +7,7 @@
       
       type (ob_type), intent(in)        :: iv     ! Innovation vector (O-B).
       type (y_type), intent(in)         :: y      ! y = H (xa)
-      type (y_type), intent(out)        :: re     ! Residual (O-A).
+      type (y_type), intent(inout)      :: re     ! Residual (O-A).
 
       integer    :: np_available, np_obs_used, np_missing  , np_bad_data 
 
