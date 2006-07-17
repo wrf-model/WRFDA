@@ -13,7 +13,6 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
    type (xpose_type), intent(in) :: xp   ! Dimensions and xpose buffers.
 
    INTEGER                     :: nrec, max_wavenumber  ! Scalar.
-   INTEGER                     :: ij,ijk                ! Scalar.
    INTEGER                     :: i, j, k, m, ic, jc       ! Loop counters.
    INTEGER                     :: ier                   ! error index
    real, allocatable   :: height(:,:,:)      ! Height field.
@@ -341,7 +340,7 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
                                        be5_evec_loc, be % v5 )
 
    IF (print_detail_be) THEN
-      WRITE(UNIT=stdout,FMT='(2x,a,i10)') "b) Finished eigenvector processing! ij=", ij
+      WRITE(UNIT=stdout,FMT='(2x,a,i10)') "b) Finished eigenvector processing!"
    END IF
 
 ! 5.0 Load the scale lengths

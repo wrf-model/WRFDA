@@ -315,7 +315,8 @@ subroutine da_rtm_ad( inst, nchanl, nprofiles, con_vars, &
  endif
 
  do n = 1, nprofiles
- 
+    allocate(con_vars_ad(n)%t(size(profiles_ad(n) % t)))
+    allocate(con_vars_ad(n)%q(size(profiles_ad(n) % q)))
     con_vars_ad(n)%t(:)         = profiles_ad(n) % t(:)
     con_vars_ad(n)%q(:)         = profiles_ad(n) % q(:)
     con_vars_ad(n)%ps           = profiles_ad(n) % s2m  % p

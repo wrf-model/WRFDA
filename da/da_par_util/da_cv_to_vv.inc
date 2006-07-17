@@ -8,7 +8,7 @@ subroutine da_cv_to_vv ( cv_size, rcv, xp, mzs, vv )
    REAL,           INTENT(IN)    :: rcv(1:cv_size) ! Control variables v.
    TYPE (xpose_type), INTENT(IN) :: xp          ! Dimensions and xpose buffers.
    INTEGER,        INTENT(IN)    :: mzs(:) ! Background error structure levels.
-   TYPE (vp_type), INTENT(OUT)   :: vv          ! Grdipt/EOF cv_array.
+   TYPE (vp_type), INTENT(INOUT) :: vv          ! Grdipt/EOF cv_array.
 
    integer   :: is,ie       ! Local grid range in y coordinate.
    integer   :: js,je       ! Local grid range in x coordinate.

@@ -2,7 +2,7 @@ subroutine da_zero_x ( x )
 
    IMPLICIT NONE
 
-   TYPE (x_type), INTENT(OUT)        :: x      ! Analysis incrs structure.
+   TYPE (x_type), INTENT(INOUT)        :: x      ! Analysis incrs structure.
 
    IF (trace_use) call da_trace_entry("da_zero_x")
 

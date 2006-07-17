@@ -323,7 +323,7 @@ while ( <ARCH_POSTAMBLE> ) {
 close ARCH_POSTAMBLE ;
 close CONFIGURE_WRF ;
 
-printf "Configuration successful for $sw_os. To build the model 'cd build; make setup; make -r target'.\n" ;
+printf "Configuration successful for $sw_os. To build the model './compile_new target'.\n" ;
 printf "--------------------------------------------------------------------------------\n" ;
 
 

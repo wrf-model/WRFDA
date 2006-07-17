@@ -21,7 +21,7 @@ subroutine da_balance_geoterm_lin( cori, rho, u, v, term_x, term_y, &
                                                     u, &     ! u wind increment
                                                     v        ! v wind increment
 
-   real, dimension(ims:ime,jms:jme), intent(out) :: &
+   real, dimension(ims:ime,jms:jme), intent(inout) :: &
       term_x, & ! x component of term.
       term_y    ! y component of term.
 

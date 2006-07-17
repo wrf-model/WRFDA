@@ -951,8 +951,9 @@ DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
 
 #FCOPTIM        = -Ofp3 -O3
 # needed for OpenMP
-FCOPTIM         = -Ofp2 -O1 -Ogen_private_callee
-#FCOPTIM        = -Ofp2 -O0
+#FCOPTIM         = -Ofp2 -O1 -Ogen_private_callee
+#FCOPTIM         = -Ofp2 -O0
+FCOPTIM         = -O0
 FCDEBUG         = #-g
 #FCTYPE         = -sinteger32 -e m -sreal64 -dp
 FCTYPE          = -e m -sreal64 -dp
