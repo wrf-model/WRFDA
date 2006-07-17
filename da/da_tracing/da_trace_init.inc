@@ -31,15 +31,26 @@ subroutine da_trace_init
    !-----------------------------------------------------------------
 
    IF (trace_write .AND. trace_unit /= 0) THEN
-      WRITE(UNIT=TraceFile,FMT='(A,I0,A)') &
-        "trace/",mype,".html"
-      OPEN ( &
-         UNIT=trace_unit, &   ! I:
-         FILE=TRIM(TraceFile), &   ! I:
-         STATUS="REPLACE", & ! I:
-         ACTION="WRITE", &   ! I:
-         IOSTAT=IOStatus)    ! O:
-   
+      if (use_html) then
+         WRITE(UNIT=TraceFile,FMT='(A,I0,A)') &
+           "trace/",mype,".html"
+         OPEN ( &
+            UNIT=trace_unit, &   ! I:
+            FILE=TRIM(TraceFile), &   ! I:
+            STATUS="REPLACE", & ! I:
+            ACTION="WRITE", &   ! I:
+            IOSTAT=IOStatus)    ! O:
+      else   
+         WRITE(UNIT=TraceFile,FMT='(A,I0,A)') &
+           "trace/",mype,".txt"
+         OPEN ( &
+            UNIT=trace_unit, &   ! I:
+            FILE=TRIM(TraceFile), &   ! I:
+            STATUS="REPLACE", & ! I:
+            ACTION="WRITE", &   ! I:
+            IOSTAT=IOStatus)    ! O:
+      end if
+
       IF (IOStatus /= 0) THEN
          call da_error(__FILE__,__LINE__, &
             (/"Cannot open trace file "//TraceFile/))
@@ -84,21 +95,24 @@ subroutine da_trace_init
    TraceDepth = 0
 
    IF (trace_write) THEN
-      WRITE (UNIT=trace_unit,FMT='(A)') "<html><head><title>Tracing</title></head>"
-      WRITE (UNIT=trace_unit,FMT='(A)') "<body><h1>Trace Output</h1>"
-      WRITE (UNIT=trace_unit,FMT='(A)') "<ul>"
-      WRITE (UNIT=trace_unit,FMT='(A)') "<li><a href=#tree>Calling Tree</a>"
-      WRITE (UNIT=trace_unit,FMT='(A)') "<li><a href=#local>Local routine timings</a>"
-      WRITE (UNIT=trace_unit,FMT='(A)') "<li><a href=#overall>Overall routine timings</a>"
-      WRITE (UNIT=trace_unit,FMT='(A)') "<li><a href=#memory>Memory usage</a>"
-      WRITE (UNIT=trace_unit,FMT='(A)') "</ul>"
-      WRITE (UNIT=trace_unit,FMT='(A)') "Links are to documentation set"
-      WRITE (UNIT=trace_unit,FMT='(A)') "<a href=",TRIM(Documentation_url), &
-         ">",TRIM(Documentation_url),"</a>"
-      WRITE (UNIT=trace_unit,FMT='(A)') ", <strong>NOT</strong> to exact code under test.<p>"
-      WRITE (UNIT=trace_unit,FMT='(A)') "<a name=tree><h2>Calling Tree</h2></a><pre>"
+      if (use_html) then
+         WRITE (UNIT=trace_unit,FMT='(A)') "<html><head><title>Tracing</title></head>"
+         WRITE (UNIT=trace_unit,FMT='(A)') "<body><h1>Trace Output</h1>"
+         WRITE (UNIT=trace_unit,FMT='(A)') "<ul>"
+         WRITE (UNIT=trace_unit,FMT='(A)') "<li><a href=#tree>Calling Tree</a>"
+         WRITE (UNIT=trace_unit,FMT='(A)') "<li><a href=#local>Local routine timings</a>"
+         WRITE (UNIT=trace_unit,FMT='(A)') "<li><a href=#overall>Overall routine timings</a>"
+         WRITE (UNIT=trace_unit,FMT='(A)') "<li><a href=#memory>Memory usage</a>"
+         WRITE (UNIT=trace_unit,FMT='(A)') "</ul>"
+         WRITE (UNIT=trace_unit,FMT='(A)') "Links are to documentation set"
+         WRITE (UNIT=trace_unit,FMT='(A)') "<a href=",TRIM(Documentation_url), &
+            ">",TRIM(Documentation_url),"</a>"
+         WRITE (UNIT=trace_unit,FMT='(A)') ", <strong>NOT</strong> to exact code under test.<p>"
+         WRITE (UNIT=trace_unit,FMT='(A)') "<a name=tree><h2>Calling Tree</h2></a><pre>"
+      else
+         WRITE (UNIT=trace_unit,FMT='(A)') "Trace Output"
+         WRITE (UNIT=trace_unit,FMT='(A)') ""
+      end if
    END IF
-
-   RETURN
 
 end subroutine da_trace_init

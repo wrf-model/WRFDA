@@ -67,10 +67,11 @@ export NUM_PROCS=${NUM_PROCS:-1}               # Number of processors to run on.
 export NL_GLOBAL=${NL_GLOBAL:-.FALSE.}
 export NL_LVAR4D=${NL_LVAR4D:-.FALSE.}
 export NL_RUN_HOURS=${NL_RUN_HOURS:-1}
+export NL_USE_HTML=${NL_USE_HTML:-.FALSE.}
 
 export NPROC_X=${NPROC_X:-0}                        # Regional, always set NPROC_X to 0, Global, always 1
 if test $NL_GLOBAL = ".TRUE."; then
-  export NPROC_X=1
+   export NPROC_X=1
 fi
 
 export DA_CY=`echo $DA_DATE | cut -c1-4`
@@ -192,11 +193,13 @@ if test -r $DA_SSMI; then
   set NL_USE_SSMIRETRIEVALOBS = .TRUE.
 fi
 
-HTML=$EXP_DIR/index.html
-
 DATE=`date`
 
-cat > $HTML << EOF
+if test $NL_USE_HTML = .TRUE.; then
+
+   HTML=$EXP_DIR/index.html
+
+   cat > $HTML << EOF
 <HTML><HEAD><TITLE>$EXPT</TITLE></HEAD><BODY>
 <H1>$EXPT</H1>
 
@@ -212,6 +215,7 @@ Observation Input File:      $DA_OBSERVATIONS
 Start date:                  $DA_DATE
 End date:                    $DA_END_DATE
 EOF
+fi
 
 echo "Experiment directory:        $EXP_DIR"
 echo "Run directory:               $RUN_DIR"
@@ -322,31 +326,31 @@ cp $RUN_DIR/namelist.* .
 
 mkdir rsl
 cp $RUN_DIR/rsl* rsl
-cd rsl
-for FILE in rsl*; do
-  echo "<HTML><HEAD><TITLE>$FILE</TITLE></HEAD>" > $FILE.html
-  echo "<H1>$FILE</H1><PRE>" >> $FILE.html
-  cat $FILE >> $FILE.html
-  echo "</PRE></BODY></HTML>" >> $FILE.html
-  rm $FILE
-done
-cd $EXP_DIR
-  
-if test -f $RUN_DIR/wrfvar.out; then
-  echo "<HTML><HEAD><TITLE>stdout</TITLE></HEAD>" > stdout.html
-  echo "<H1>stdout</H1><PRE>" >> stdout.html
-  cat $RUN_DIR/wrfvar.out >> stdout.html
-  echo "</PRE></BODY></HTML>" >> stdout.html
-fi
+if test $NL_USE_HTML = .TRUE.; then
+   cd rsl
+   for FILE in rsl*; do
+     echo "<HTML><HEAD><TITLE>$FILE</TITLE></HEAD>" > $FILE.html
+     echo "<H1>$FILE</H1><PRE>" >> $FILE.html
+     cat $FILE >> $FILE.html
+     echo "</PRE></BODY></HTML>" >> $FILE.html
+     rm $FILE
+   done
+   cd $EXP_DIR
+ 
+   if test -f $RUN_DIR/wrfvar.out; then
+     echo "<HTML><HEAD><TITLE>stdout</TITLE></HEAD>" > stdout.html
+     echo "<H1>stdout</H1><PRE>" >> stdout.html
+     cat $RUN_DIR/wrfvar.out >> stdout.html
+     echo "</PRE></BODY></HTML>" >> stdout.html
+   fi
 
-if test -f $RUN_DIR/wrfvar.error; then
-  echo "<HTML><HEAD><TITLE>stderr</TITLE></HEAD>" > stderr.html
-  echo "<H1>stderr</H1><PRE>" >> stderr.html
-  cat $RUN_DIR/wrfvar.error >> stderr.html
-  echo "</PRE></BODY></HTML>" >> stderr.html
-fi
+   if test -f $RUN_DIR/wrfvar.error; then
+     echo "<HTML><HEAD><TITLE>stderr</TITLE></HEAD>" > stderr.html
+     echo "<H1>stderr</H1><PRE>" >> stderr.html
+     cat $RUN_DIR/wrfvar.error >> stderr.html
+     echo "</PRE></BODY></HTML>" >> stderr.html
 
-cat >> $HTML << EOF
+   cat >> $HTML << EOF
 <A HREF="namelist.input">Namelist input</a>
 <A HREF="namelist.output">Namelist output</a>
 <A HREF="stdout.html">Stdout</a>
@@ -362,15 +366,22 @@ cat >> $HTML << EOF
 </PRE>
 </BODY></HTML>
 EOF
+fi
 
-ls -l $EXP_DIR/cost_fn >> $HTML
+if test $NL_USE_HTML = .TRUE.; then
+   ls -l $EXP_DIR/cost_fn >> $HTML
+   if test $RC = 0; then
+     echo "passed on $DATE" >> $HTML
+   else
+     echo "failed on $DATE with error $RC" >> $HTML
+   fi
+fi
+
 ls -l $EXP_DIR/cost_fn
 
 if test $RC = 0; then
-  echo "passed on $DATE" >> $HTML
   echo "passed on $DATE"
 else
-  echo "failed on $DATE with error $RC" >> $HTML
   echo "failed on $DATE with error $RC"
 fi
 

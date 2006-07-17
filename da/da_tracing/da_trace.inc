@@ -82,17 +82,31 @@ subroutine da_trace( &
 
       IF (NoCallsBody(Pointer) <= LocalMaxNoCalls) THEN
          IF (trace_memory) THEN
-             WRITE (UNIT=trace_unit, &
-                FMT='(A, "| <a href=",A,"/",A,".html>",A,"</a>",I11,A)', &
-                IOSTAT=IOStatus) &
-                pad(1:TraceDepth*TraceIndentAmount),TRIM(Documentation_url), &
-                TRIM(Name), TRIM(Name), TotalSpace, Change
+             if (use_html) then
+                WRITE (UNIT=trace_unit, &
+                   FMT='(A, "| <a href=",A,"/",A,".html>",A,"</a>",I11,A)', &
+                   IOSTAT=IOStatus) &
+                   pad(1:TraceDepth*TraceIndentAmount),TRIM(Documentation_url), &
+                   TRIM(Name), TRIM(Name), TotalSpace, Change
+             else
+                WRITE (UNIT=trace_unit, &
+                   FMT='(A, "| ",A,I11,A)', &
+                   IOSTAT=IOStatus) &
+                   pad(1:TraceDepth*TraceIndentAmount),TRIM(Name), TotalSpace, Change
+            end if
          ELSE
-            WRITE (UNIT=trace_unit, &
-               FMT='(A, "| <a href=",A,"/",A,".html>",A,"</a>")', &
-               IOSTAT=IOStatus) &
-               pad(1:TraceDepth*TraceIndentAmount),TRIM(Documentation_url), &
-               TRIM(Name), TRIM(Name)
+            if (use_html) then
+               WRITE (UNIT=trace_unit, &
+                  FMT='(A, "| <a href=",A,"/",A,".html>",A,"</a>")', &
+                  IOSTAT=IOStatus) &
+                  pad(1:TraceDepth*TraceIndentAmount),TRIM(Documentation_url), &
+                  TRIM(Name), TRIM(Name)  
+            else 
+               WRITE (UNIT=trace_unit, &
+                  FMT='(A, "| ",A)', &
+                  IOSTAT=IOStatus) &
+                  pad(1:TraceDepth*TraceIndentAmount),TRIM(Name)
+            end if
          END IF
          IF (IOStatus /= 0) THEN
             call da_error(__FILE__,__LINE__, &
@@ -130,6 +144,6 @@ subroutine da_trace( &
       END IF
    END IF ! trace_write
 
-   RETURN
-
 end subroutine da_trace
+
+

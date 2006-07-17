@@ -44,6 +44,13 @@ subroutine da_trace_report
    ! start of code
    !==========================================================================
 
+
+   if (.not. use_html) then
+      write (unit=trace_unit, FMT='(A)') &
+         "Report only available if use_html is TRUE"
+      return
+   end if
+
    call SYSTEM_CLOCK (COUNT=temp)
 
    TotalElapsedTime=temp-BaseElapsedTime ! on PE 0

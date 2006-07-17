@@ -115,52 +115,66 @@ subroutine da_trace_exit( &
 
       IF (NoCalls(Pointer) <= LocalMaxNoCalls) THEN
          IF (trace_memory) THEN
-            WRITE (UNIT=trace_unit, &
-               FMT='(A, "&lt; <a href=",A,"/",A,".html>",A,"</a>",I11,A)', &
-               IOSTAT=IOStatus) &
-               pad(1:TraceDepth*TraceIndentAmount),TRIM(Documentation_url), &
-               TRIM(Name),TRIM(Name), TotalSpace, Change
-       ELSE
-           WRITE (UNIT=trace_unit, &
-              FMT='(A, "&lt; <a href=",A,"/",A,".html>",A,"</a>")', &
-              IOSTAT=IOStatus) &
-              pad(1:TraceDepth*TraceIndentAmount),TRIM(Documentation_url), &
-              TRIM(Name),TRIM(Name)
-       END IF
-       IF (IOStatus /= 0) THEN
-           call da_error(__FILE__,__LINE__, &
-             (/"Cannot write to trace file for "//TRIM(Name)/))
-       END IF
-
-       IF (PRESENT(Message)) THEN
-           WRITE (UNIT=trace_unit, FMT='(A," ",A)', IOSTAT=IOStatus) &
-             pad(1:TraceDepth*TraceIndentAmount),TRIM(Message)
-         IF (IOStatus .NE. 0) THEN
-           call da_error(__FILE__,__LINE__, &
-             (/"Cannot write to trace file for "//TRIM(Name)/))
+            if (use_html) then
+               WRITE (UNIT=trace_unit, &
+                  FMT='(A, "&lt; <a href=",A,"/",A,".html>",A,"</a>",I11,A)', &
+                  IOSTAT=IOStatus) &
+                  pad(1:TraceDepth*TraceIndentAmount),TRIM(Documentation_url), &
+                  TRIM(Name),TRIM(Name), TotalSpace, Change
+            else
+               WRITE (UNIT=trace_unit, &
+                  FMT='(A, "<",A,I11,A)', &
+                  IOSTAT=IOStatus) &
+                  pad(1:TraceDepth*TraceIndentAmount),TRIM(Name), TotalSpace, Change
+            end if
+         ELSE
+            if (use_html) then
+               WRITE (UNIT=trace_unit, &
+                  FMT='(A, "&lt; <a href=",A,"/",A,".html>",A,"</a>")', &
+                  IOSTAT=IOStatus) &
+                  pad(1:TraceDepth*TraceIndentAmount),TRIM(Documentation_url), &
+                  TRIM(Name),TRIM(Name)
+            else
+               WRITE (UNIT=trace_unit, FMT='(A, "<",A)', IOSTAT=IOStatus) &
+                  pad(1:TraceDepth*TraceIndentAmount),TRIM(Name)
+            end if
          END IF
-       END IF
 
-       IF (PRESENT(Messages)) THEN
-         DO Loop = 1, SIZE(Messages)
-             WRITE (UNIT=trace_unit, FMT='(A," ",A)', IOSTAT=IOStatus) &
-               pad(1:TraceDepth*TraceIndentAmount),TRIM(Messages(Loop))
-           IF (IOStatus .NE. 0) THEN
-           call da_error(__FILE__,__LINE__, &
-             (/"Cannot write to trace file for "//TRIM(Name)/))
-           END IF
-         END DO ! Loop
-       END IF
-     END IF
+         IF (IOStatus /= 0) THEN
+            call da_error(__FILE__,__LINE__, &
+              (/"Cannot write to trace file for "//TRIM(Name)/))
+         END IF
 
-     IF (NoCalls(Pointer) == trace_repeat_head) THEN
-         WRITE(UNIT=trace_unit,FMT='(A,"  Called enough, going quiet")',IOSTAT=IOStatus)&
-           pad(1:TraceDepth*TraceIndentAmount)
-       IF (IOStatus .NE. 0) THEN
-           call da_error(__FILE__,__LINE__, &
-             (/"Cannot write to trace file for "//TRIM(Name)/))
-       END IF
-     END IF
+         IF (PRESENT(Message)) THEN
+            WRITE (UNIT=trace_unit, FMT='(A," ",A)', IOSTAT=IOStatus) &
+               pad(1:TraceDepth*TraceIndentAmount),TRIM(Message)
+            IF (IOStatus .NE. 0) THEN
+               call da_error(__FILE__,__LINE__, &
+                  (/"Cannot write to trace file for "//TRIM(Name)/))
+            END IF
+         END IF
+
+         IF (PRESENT(Messages)) THEN
+            DO Loop = 1, SIZE(Messages)
+               WRITE (UNIT=trace_unit, FMT='(A," ",A)', IOSTAT=IOStatus) &
+                  pad(1:TraceDepth*TraceIndentAmount),TRIM(Messages(Loop))
+               IF (IOStatus .NE. 0) THEN
+                  call da_error(__FILE__,__LINE__, &
+                     (/"Cannot write to trace file for "//TRIM(Name)/))
+               END IF
+            END DO ! Loop
+         END IF
+      END IF
+
+      IF (NoCalls(Pointer) == trace_repeat_head) THEN
+         WRITE(UNIT=trace_unit,FMT='(A,"  Called enough, going quiet")', &
+            IOSTAT=IOStatus)&
+            pad(1:TraceDepth*TraceIndentAmount)
+         IF (IOStatus .NE. 0) THEN
+            call da_error(__FILE__,__LINE__, &
+               (/"Cannot write to trace file for "//TRIM(Name)/))
+         END IF
+      END IF
    END IF ! trace_write
 
    ! Restore pointer
@@ -176,5 +190,6 @@ subroutine da_trace_exit( &
 
    ! call FLUSH(trace_unit)
 
-   RETURN
 end subroutine da_trace_exit
+
+
