@@ -1010,7 +1010,7 @@ FCTYPE          = -qrealsize=8
 FCFREE          = -qfree=f90
 FCENDIAN        =
 FCBASE          = -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767 \
-                    -qflttrap=zerodivide:invalid:enable -qsigtrap=xl__trce -C
+                    -qflttrap=zerodivide:invalid:enable -qsigtrap=xl__trce
 
 CCFLAGS2        = -DNOUNDERSCORE -DLANDREAD_STUB -DMACOS
 
@@ -1052,7 +1052,7 @@ FCTYPE          = -qrealsize=8
 FCFREE          = -qfree=f90
 FCENDIAN        =
 FCBASE          = -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767 \
-                  -qflttrap=zerodivide:invalid:enable -qsigtrap=xl__trce -C
+                  -qflttrap=zerodivide:invalid:enable -qsigtrap=xl__trce
 FCFLAGS_RSL     = -qfixed $(FCENDIAN)
 
 # Avoid problems with missing _vsprintf$LDBLStub, _vprintf$LDBLStub, 
