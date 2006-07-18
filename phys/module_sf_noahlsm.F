@@ -1,7 +1,6 @@
 MODULE module_sf_noahlsm
  
   USE module_model_constants
-  USE module_wrf_error
 
   INTEGER, PARAMETER   :: NSOLD=20
 !   REAL, PARAMETER    :: CP = 1004.5
@@ -640,8 +639,7 @@ CONTAINS
      ENDDO
    ENDDO
    IF ( errflag .EQ. 1 ) THEN
-      CALL wrf_error_fatal( &
-        "lsminit: out of range value of ISLTYP. Is this field in the input?" )
+      CALL wrf_error_fatal( "module_sf_noahlsm.F: lsminit: out of range value of ISLTYP. Is this field in the input?" )
    ENDIF
 
 ! initialize soil liquid water content SH2O
@@ -4016,12 +4014,12 @@ CONTAINS
 ! ----------------------------------------------------------------------         
 ! ADJUSTMENT OF SNOW DENSITY DEPENDING ON NEW SNOWFALL                           
 ! ----------------------------------------------------------------------         
-      HNEWC = NEWSNC / DSNEW                                                       
+      HNEWC = NEWSNC / DSNEW                                                     
       IF (SNOWHC + HNEWC .LT. 1.0E-3) THEN
          SNDENS = MAX(DSNEW,SNDENS)
       ELSE
          SNDENS = (SNOWHC * SNDENS + HNEWC * DSNEW)/ (SNOWHC + HNEWC)               
-      ENDIF                
+      ENDIF
       SNOWHC = SNOWHC + HNEWC                                                    
       SNOWH = SNOWHC *0.01                                                       
                                                                                  

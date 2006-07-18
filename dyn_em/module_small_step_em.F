@@ -1319,7 +1319,7 @@ SUBROUTINE advance_w( w, rw_tend, ww, u, v,       &
 !</DESCRIPTION>
 
 !  set loop limits.
-!  currently set for periodic boundary conditions
+!  Currently set for periodic boundary conditions
 
       i_start = its
       i_end   = ite
@@ -1364,15 +1364,10 @@ SUBROUTINE advance_w( w, rw_tend, ww, u, v,       &
                     +(1.-epssm)*t_2ave(i,k,j))
       t_2ave(i,k,j)=(t_2ave(i,k,j)-mu1(i,j)*t_1(i,k,j)) &
                     /(muts(i,j)*(t0+t_1(i,k,j)))
-    ENDDO
-    ENDDO
+      wdwn(i,k+1)=.5*(ww(i,k+1,j)+ww(i,k,j))*rdnw(k)    &
+           *(ph_1(i,k+1,j)-ph_1(i,k,j)+phb(i,k+1,j)-phb(i,k,j))
+      rhs(i,k+1) = dts*(ph_tend(i,k+1,j) + .5*g*(1.-epssm)*w(i,k+1,j))
 
-
-    DO k=2,k_end+1
-    DO i=i_start, i_end
-      wdwn(i,k)=.5*(ww(i,k,j)+ww(i,k-1,j))*rdnw(k-1)    &
-           *(ph_1(i,k,j)-ph_1(i,k-1,j)+phb(i,k,j)-phb(i,k-1,j))
-      rhs(i,k) = dts*(ph_tend(i,k,j) + .5*g*(1.-epssm)*w(i,k,j))
     ENDDO
     ENDDO
 
@@ -1460,18 +1455,14 @@ SUBROUTINE advance_w( w, rw_tend, ww, u, v,       &
     DO k=k_end,2,-1
     DO i=i_start, i_end
        w (i,k,j)=w (i,k,j)-gamma(i,k,j)*w(i,k+1,j)
+      ph(i,k+1,j) = rhs(i,k+1)+msft(i,j)*.5*dts*g*(1.+epssm) &
+                      *w(i,k+1,j)/muts(i,j)
     ENDDO
     ENDDO
 
-! NOTE:  phi'' is not coupled with the map-scale factor (1/m),
-!        but the tendency is, so...
-!        we must multiply tendency by msft here
-
-    DO k=2,k_end+1
     DO i=i_start, i_end
-      ph(i,k,j) = rhs(i,k)+msft(i,j)*.5*dts*g*(1.+epssm) &
-                      *w(i,k,j)/muts(i,j)
-    ENDDO
+       ph(i,2,j) =  rhs(i,2)+msft(i,j)*.5*dts*g*(1.+epssm) &
+                      *w(i,2,j)/muts(i,j)
     ENDDO
 
   ENDDO j_loop_w
@@ -1514,6 +1505,8 @@ SUBROUTINE sumflux ( ru, rv, ww,                             &
                                                                 ww_m
   REAL, DIMENSION(ims:ime, jms:jme) , INTENT(IN   ) :: muu, muv, msfu, msfv
 
+  INTEGER :: mini, minj, mink
+
   REAL, INTENT(IN   )  ::  epssm
   INTEGER   :: i,j,k
 
@@ -1536,59 +1529,96 @@ SUBROUTINE sumflux ( ru, rv, ww,                             &
       ENDDO
     ENDIF
 
-    DO  j = jts, min(jde-1,jte)
-    DO  k = kts, min(kde-1,kte)
-    DO  i = its, ite
+  mini = min(ide-1,ite)
+  minj = min(jde-1,jte)
+  mink = min(kde-1,kte)
+
+
+    DO  j = jts, minj
+    DO  k = kts, mink
+    DO  i = its, mini
       ru_m(i,k,j)  = ru_m(i,k,j) + ru(i,k,j)
-    ENDDO
-    ENDDO
-    ENDDO
-
-    DO  j = jts, jte
-    DO  k = kts, min(kde-1,kte)
-    DO  i = its, min(ide-1,ite)
       rv_m(i,k,j)  = rv_m(i,k,j) + rv(i,k,j)
-    ENDDO
-    ENDDO
-    ENDDO
-
-    DO  j = jts, min(jde-1,jte)
-    DO  k = kts, kte
-    DO  i = its, min(ide-1,ite)
       ww_m(i,k,j)  = ww_m(i,k,j) + ww(i,k,j)
     ENDDO
     ENDDO
     ENDDO
+ 
+    IF (ite .GT. mini) THEN
+      DO  j = jts, minj
+      DO  k = kts, mink
+      DO  i = mini+1, ite
+        ru_m(i,k,j)  = ru_m(i,k,j) + ru(i,k,j)
+      ENDDO
+      ENDDO
+      ENDDO
+    END IF
+
+    IF (jte .GT. minj) THEN
+      DO  j = minj+1, jte
+      DO  k = kts, mink
+      DO  i = its, mini
+	rv_m(i,k,j)  = rv_m(i,k,j) + rv(i,k,j)
+      ENDDO
+      ENDDO
+      ENDDO
+    END IF
+    IF ( kte .GT. mink) THEN
+      DO  j = jts, minj
+      DO  k = mink+1, kte
+      DO  i = its, mini
+        ww_m(i,k,j)  = ww_m(i,k,j) + ww(i,k,j)
+      ENDDO
+      ENDDO
+      ENDDO
+    END IF
 
   IF (iteration == number_of_small_timesteps) THEN
 
-    DO  j = jts, min(jde-1,jte)
-    DO  k = kts, min(kde-1,kte)
-    DO  i = its, ite
+    DO  j = jts, minj
+    DO  k = kts, mink
+    DO  i = its, mini
       ru_m(i,k,j)  = ru_m(i,k,j) / number_of_small_timesteps   &
                      + muu(i,j)*u_lin(i,k,j)/msfu(i,j)
-   
-    ENDDO
-    ENDDO
-    ENDDO
-
-    DO  j = jts, jte
-    DO  k = kts, min(kde-1,kte)
-    DO  i = its, min(ide-1,ite)
       rv_m(i,k,j)  = rv_m(i,k,j) / number_of_small_timesteps   &
-                     + muv(i,j)*v_lin(i,k,j)/msfv(i,j)
+                     + muv(i,j)*v_lin(i,k,j)/msfv(i,j) 
+      ww_m(i,k,j)  = ww_m(i,k,j) / number_of_small_timesteps   &
+                     + ww_lin(i,k,j) 
     ENDDO
     ENDDO
     ENDDO
 
-    DO  j = jts, min(jde-1,jte)
-    DO  k = kts, kte
-    DO  i = its, min(ide-1,ite)
-      ww_m(i,k,j)  = ww_m(i,k,j) / number_of_small_timesteps   &
+
+    IF (ite .GT. mini) THEN
+      DO  j = jts, minj
+      DO  k = kts, mink
+      DO  i = mini+1, ite
+        ru_m(i,k,j)  = ru_m(i,k,j) / number_of_small_timesteps   &
+                     + muu(i,j)*u_lin(i,k,j)/msfu(i,j)
+      ENDDO
+      ENDDO
+      ENDDO
+    END IF
+    IF (jte .GT. minj) THEN
+      DO  j = minj+1, jte
+      DO  k = kts, mink
+      DO  i = its, mini
+	rv_m(i,k,j)  = rv_m(i,k,j) / number_of_small_timesteps   &
+                     + muv(i,j)*v_lin(i,k,j)/msfv(i,j)
+      ENDDO
+      ENDDO
+      ENDDO
+    END IF
+    IF ( kte .GT. mink) THEN
+      DO  j = jts, minj
+      DO  k = mink+1, kte
+      DO  i = its, mini
+        ww_m(i,k,j)  = ww_m(i,k,j) / number_of_small_timesteps   &
                      + ww_lin(i,k,j)
-    ENDDO
-    ENDDO
-    ENDDO
+      ENDDO
+      ENDDO
+      ENDDO
+    END IF
 
   ENDIF
 

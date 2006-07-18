@@ -2,7 +2,6 @@
 !
 
 MODULE module_pbl_driver
-   use module_wrf_error
 CONTAINS
 
 !------------------------------------------------------------------

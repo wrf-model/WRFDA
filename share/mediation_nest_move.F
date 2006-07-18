@@ -35,7 +35,7 @@ SUBROUTINE med_nest_move ( parent, nest )
 #if ( EM_CORE == 1 )
      SUBROUTINE shift_domain_em ( grid, disp_x, disp_y,  &
 !
-#include "em_dummy_args.inc"
+# include <em_dummy_args.inc>
 !
                            )
         USE module_domain
@@ -44,7 +44,7 @@ SUBROUTINE med_nest_move ( parent, nest )
         IMPLICIT NONE
         INTEGER disp_x, disp_y
         TYPE(domain) , POINTER                 :: grid
-#include "em_dummy_decl.inc"
+# include <em_dummy_decl.inc>
      END SUBROUTINE shift_domain_em
 #endif
 #if ( NMM_CORE == 1 )
@@ -142,7 +142,7 @@ SUBROUTINE med_nest_move ( parent, nest )
      IF ( dyn_opt .EQ. DYN_EM ) THEN
        CALL shift_domain_em( grid, dx, dy,  &
 !
-#include "em_actual_args.inc"
+# include <em_actual_args.inc>
 !
                            )
      ENDIF

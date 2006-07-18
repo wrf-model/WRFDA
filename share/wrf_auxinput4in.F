@@ -8,8 +8,8 @@ SUBROUTINE wrf_auxinput4in ( fid , grid , config_flags , switch , ierr )
     USE module_bc_time_utilities
     USE module_utility
     IMPLICIT NONE
-#include "wrf_io_flags.h"
-#include "wrf_status_codes.h"
+#include <wrf_io_flags.h>
+#include <wrf_status_codes.h>
     TYPE(domain) :: grid
     TYPE(grid_config_rec_type),  INTENT(INOUT)    :: config_flags
     INTEGER, INTENT(IN) :: fid
@@ -21,6 +21,7 @@ SUBROUTINE wrf_auxinput4in ( fid , grid , config_flags , switch , ierr )
             ims , ime , jms , jme , kms , kme , &
             ips , ipe , jps , jpe , kps , kpe
 
+    INTEGER       itrace
     INTEGER       iname(9)
     INTEGER       iordering(3)
     INTEGER       icurrent_date(24)
@@ -51,7 +52,7 @@ SUBROUTINE wrf_auxinput4in ( fid , grid , config_flags , switch , ierr )
 
     CALL nl_get_dyn_opt ( 1 , dyn_opt )
 
-#include "wrf_auxinput4in.inc"
+#include <wrf_auxinput4in.inc>
 
     RETURN
     END

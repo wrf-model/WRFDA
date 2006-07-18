@@ -1,7 +1,6 @@
 !WRF:MODEL_MP:PHYSICS
 !
 MODULE module_mp_etanew
-   USE module_wrf_error
 !
 !-----------------------------------------------------------------------
       REAL,PRIVATE,SAVE ::  ABFR, CBFR, CIACW, CIACR, C_N0r0,           &

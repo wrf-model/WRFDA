@@ -14,9 +14,9 @@ USE module_domain
 CONTAINS
 
   SUBROUTINE open_r_dataset ( id , fname , grid , config_flags , sysdepinfo, ierr )
-   TYPE (domain), INTENT(INOUT) :: grid
-   CHARACTER*(*), INTENT(IN)    :: fname
-   CHARACTER*(*), INTENT(IN)    :: sysdepinfo
+   TYPE (domain)             :: grid
+   CHARACTER*(*) :: fname
+   CHARACTER*(*) :: sysdepinfo
    INTEGER      , INTENT(INOUT) :: id , ierr
    LOGICAL , EXTERNAL :: wrf_dm_on_monitor
    TYPE(grid_config_rec_type),  INTENT(IN   )    :: config_flags

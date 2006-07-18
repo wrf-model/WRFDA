@@ -5,7 +5,6 @@ MODULE module_quilt_outbuf_ops
 ! servers to assemble fields ("quilting") and write them to disk.  
 !</PRE>
 !</DESCRIPTION>
-  USE module_wrf_error
   INTEGER, PARAMETER :: tabsize = 1000
   INTEGER            :: num_entries
 

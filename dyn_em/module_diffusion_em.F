@@ -355,6 +355,9 @@
          config_flags%nested) j_start = MAX( jds+1, jts )
     IF ( config_flags%open_ye .OR. config_flags%specified .OR. &
          config_flags%nested) j_end   = MIN( jde-1, jte )
+      IF ( config_flags%periodic_x ) i_start = its
+      IF ( config_flags%periodic_x ) i_end = ite
+
 
 !-----------------------------------------------------------------------
 ! Calculate du/dy.
@@ -560,6 +563,7 @@
     IF ( config_flags%open_ys .OR. config_flags%specified .OR. &
          config_flags%nested) j_start = MAX( jds+1, jts )
 
+    IF ( config_flags%periodic_x ) i_start = its
     IF ( config_flags%periodic_x ) i_end = MIN( ite, ide )
     IF ( config_flags%periodic_y ) j_end = MIN( jte, jde )
 
@@ -702,6 +706,8 @@
     IF ( config_flags%open_ys .OR. config_flags%specified .OR. &
          config_flags%nested) j_start = MAX( jds+1, jts )
     IF ( config_flags%periodic_y ) j_end = MIN( jte, jde )
+      IF ( config_flags%periodic_x ) i_start = its
+      IF ( config_flags%periodic_x ) i_end = MIN( ite, ide-1 )
 
 ! Square mapscale factor.
 
@@ -1045,6 +1051,14 @@ SUBROUTINE cal_dampkm( config_flags,xkmhd,xkmh,xkhh,xkmv,xkhv,                 &
    j_start = jts
    j_end   = MIN(jte,jde-1)
 
+! keep upper damping diffusion away from relaxation zones at boundaries if used
+   IF(config_flags%specified .OR. config_flags%nested)THEN
+     i_start = MAX(i_start,ids+config_flags%spec_bdy_width-1)
+     i_end   = MIN(i_end,ide-config_flags%spec_bdy_width)
+     j_start = MAX(j_start,jds+config_flags%spec_bdy_width-1)
+     j_end   = MIN(j_end,jde-config_flags%spec_bdy_width)
+   ENDIF
+
    kmmax=dx*dx/dt
    degrad90=DEGRAD*90.
    DO j = j_start, j_end
@@ -1181,6 +1195,8 @@ END SUBROUTINE cal_dampkm
          config_flags%nested) j_start = MAX( jds+1, jts )
     IF ( config_flags%open_ye .OR. config_flags%specified .OR. &
          config_flags%nested) j_end   = MIN( jde-2 ,jte )
+      IF ( config_flags%periodic_x ) i_start = its
+      IF ( config_flags%periodic_x ) i_end = MIN( ite, ide-1 )
  
     IF ( P_QC .GT. PARAM_FIRST_SCALAR) THEN
       DO j = j_start, j_end
@@ -1460,6 +1476,8 @@ SUBROUTINE smag_km( config_flags,xkmh,xkmhd,xkmv,xkhh,xkhv,BN2,                &
         config_flags%nested) j_start = MAX(jds+1,jts)
    IF ( config_flags%open_ye .or. config_flags%specified .or. &
         config_flags%nested) j_end   = MIN(jde-2,jte)
+      IF ( config_flags%periodic_x ) i_start = its
+      IF ( config_flags%periodic_x ) i_end = MIN( ite, ide-1 )
 
    pr = prandtl
    cr_len = cr_len_in
@@ -1479,7 +1497,7 @@ SUBROUTINE smag_km( config_flags,xkmh,xkmhd,xkmv,xkhh,xkhv,BN2,                &
    do i=i_start,i_end
       tmp=0.25*(defor12(i  ,k,j)+defor12(i  ,k,j+1)+ &
                 defor12(i+1,k,j)+defor12(i+1,k,j+1))
-      def2(i,k,j)=def2(i,k,j)+0.5*tmp*tmp
+      def2(i,k,j)=def2(i,k,j)+tmp*tmp
    enddo
    enddo
    enddo
@@ -1489,7 +1507,7 @@ SUBROUTINE smag_km( config_flags,xkmh,xkmhd,xkmv,xkhh,xkhv,BN2,                &
    do i=i_start,i_end
       tmp=0.25*(defor13(i  ,k+1,j)+defor13(i  ,k,j)+ &
                 defor13(i+1,k+1,j)+defor13(i+1,k,j))
-      def2(i,k,j)=def2(i,k,j)+0.5*tmp*tmp
+      def2(i,k,j)=def2(i,k,j)+tmp*tmp
    enddo
    enddo
    enddo
@@ -1499,7 +1517,7 @@ SUBROUTINE smag_km( config_flags,xkmh,xkmhd,xkmv,xkhh,xkhv,BN2,                &
    do i=i_start,i_end
       tmp=0.25*(defor23(i,k+1,j  )+defor23(i,k,j  )+ &
                 defor23(i,k+1,j+1)+defor23(i,k,j+1))
-      def2(i,k,j)=def2(i,k,j)+0.5*tmp*tmp
+      def2(i,k,j)=def2(i,k,j)+tmp*tmp
    enddo
    enddo
    enddo
@@ -1607,13 +1625,15 @@ SUBROUTINE smag2d_km( config_flags,xkmh,xkmhd,xkmv,xkhh,xkhv,                  &
         config_flags%nested) j_start = MAX(jds+1,jts)
    IF ( config_flags%open_ye .or. config_flags%specified .or. &
         config_flags%nested) j_end   = MIN(jde-2,jte)
+      IF ( config_flags%periodic_x ) i_start = its
+      IF ( config_flags%periodic_x ) i_end = MIN( ite, ide-1 )
 
    pr=prandtl
 
    do j=j_start,j_end
    do k=kts,ktf
    do i=i_start,i_end
-      def2(i,k,j)=0.25*(defor11(i,k,j)-defor22(i,k,j))**2
+      def2(i,k,j)=0.25*((defor11(i,k,j)-defor22(i,k,j))*(defor11(i,k,j)-defor22(i,k,j)))
       tmp=0.25*(defor12(i  ,k,j)+defor12(i  ,k,j+1)+ &
                 defor12(i+1,k,j)+defor12(i+1,k,j+1))
       def2(i,k,j)=def2(i,k,j)+tmp*tmp
@@ -1625,7 +1645,7 @@ SUBROUTINE smag2d_km( config_flags,xkmh,xkmhd,xkmv,xkhh,xkhv,                  &
       DO j = j_start, j_end
       DO k = kts, ktf
       DO i = i_start, i_end
-         tmp=def2(i,k,j)**0.5
+         tmp=sqrt(def2(i,k,j))
 !        xkmh(i,k,j)=max(c_s*c_s*mlen_h*mlen_h*tmp, 1.0E-6*mlen_h*mlen_h )
          xkmh(i,k,j)=c_s*c_s*mlen_h*mlen_h*tmp
          xkmh(i,k,j)=min(xkmh(i,k,j), 10.*mlen_h )
@@ -1721,6 +1741,8 @@ END SUBROUTINE smag2d_km
          config_flags%nested) j_start = MAX( jds+1, jts )
     IF ( config_flags%open_ye .OR. config_flags%specified .OR. &
          config_flags%nested) j_end   = MIN( jde-2, jte)
+      IF ( config_flags%periodic_x ) i_start = its
+      IF ( config_flags%periodic_x ) i_end = MIN( ite, ide-1 )
 
 ! in the absence of surface drag or a surface heat flux, there
 ! is no way to generate tke without pre-existing tke.  Use
@@ -2187,6 +2209,8 @@ SUBROUTINE horizontal_diffusion_u_2( tendency, mu, config_flags,          &
         config_flags%nested) j_start = MAX(jds+1,jts)
    IF ( config_flags%open_ye .or. config_flags%specified .or. &
         config_flags%nested) j_end   = MIN(jde-2,jte)
+      IF ( config_flags%periodic_x ) i_start = its
+      IF ( config_flags%periodic_x ) i_end = ite
 
 ! titau1 = titau11 
    is_ext=1
@@ -2361,6 +2385,8 @@ SUBROUTINE horizontal_diffusion_v_2( tendency, mu, config_flags,          &
         config_flags%nested) j_start = MAX(jds+1,jts)
    IF ( config_flags%open_ye .or. config_flags%specified .or. &
         config_flags%nested) j_end   = MIN(jde-1,jte)
+      IF ( config_flags%periodic_x ) i_start = its
+      IF ( config_flags%periodic_x ) i_end = MIN(ite,ide-1)
 
 ! titau1 = titau21
    is_ext=0
@@ -2533,6 +2559,8 @@ SUBROUTINE horizontal_diffusion_w_2( tendency, mu, config_flags,          &
         config_flags%nested) j_start = MAX(jds+1,jts)
    IF ( config_flags%open_ye .or. config_flags%specified .or. &
         config_flags%nested) j_end   = MIN(jde-2,jte)
+      IF ( config_flags%periodic_x ) i_start = its
+      IF ( config_flags%periodic_x ) i_end = MIN(ite,ide-1)
 
 ! titau1 = titau31
    is_ext=0
@@ -2730,6 +2758,8 @@ SUBROUTINE horizontal_diffusion_s (tendency, mu, config_flags, var,       &
         config_flags%nested) j_start = MAX(jds+1,jts)
    IF ( config_flags%open_ye .or. config_flags%specified .or. &
         config_flags%nested) j_end   = MIN(jde-2,jte)
+      IF ( config_flags%periodic_x ) i_start = its
+      IF ( config_flags%periodic_x ) i_end = MIN(ite,ide-1)
 
 ! diffusion of the TKE needs mutiple 2
 
@@ -3296,6 +3326,8 @@ SUBROUTINE vertical_diffusion_u_2( tendency, config_flags, mu,            &
         config_flags%nested) j_start = MAX(jds+1,jts)
    IF ( config_flags%open_ye .or. config_flags%specified .or. &
         config_flags%nested) j_end   = MIN(jde-2,jte)
+      IF ( config_flags%periodic_x ) i_start = its
+      IF ( config_flags%periodic_x ) i_end = ite
 
 ! titau3 = titau13
    is_ext=0
@@ -3399,6 +3431,8 @@ SUBROUTINE vertical_diffusion_v_2( tendency, config_flags, mu,            &
         config_flags%nested) j_start = MAX(jds+1,jts)
    IF ( config_flags%open_ye .or. config_flags%specified .or. &
         config_flags%nested) j_end   = MIN(jde-1,jte)
+      IF ( config_flags%periodic_x ) i_start = its
+      IF ( config_flags%periodic_x ) i_end = MIN(ite,ide-1)
 
 ! titau3 = titau23
    is_ext=0
@@ -3500,6 +3534,8 @@ SUBROUTINE vertical_diffusion_w_2(tendency, config_flags, mu,             &
         config_flags%nested) j_start = MAX(jds+1,jts)
    IF ( config_flags%open_ye .or. config_flags%specified .or. &
         config_flags%nested) j_end   = MIN(jde-2,jte)
+      IF ( config_flags%periodic_x ) i_start = its
+      IF ( config_flags%periodic_x ) i_end = MIN(ite,ide-1)
 
 ! titau3 = titau33
    is_ext=0
@@ -3599,6 +3635,8 @@ SUBROUTINE vertical_diffusion_s( tendency, config_flags, var, mu, xkhv,   &
         config_flags%nested) j_start = MAX(jds+1,jts)
    IF ( config_flags%open_ye .or. config_flags%specified .or. &
         config_flags%nested) j_end   = MIN(jde-2,jte)
+      IF ( config_flags%periodic_x ) i_start = its
+      IF ( config_flags%periodic_x ) i_end = MIN(ite,ide-1)
 
    IF (doing_tke) THEN
       DO j = j_start, j_end
@@ -3727,6 +3765,8 @@ END SUBROUTINE vertical_diffusion_s
          config_flags%nested) j_start = MAX( jds+1, jts )
     IF ( config_flags%open_ye .OR. config_flags%specified .OR. &
          config_flags%nested) j_end   = MIN( jde-1, jte )
+      IF ( config_flags%periodic_x ) i_start = its
+      IF ( config_flags%periodic_x ) i_end = ite
 
     i_start = i_start - is_ext
     i_end   = i_end   + ie_ext   
@@ -3832,6 +3872,8 @@ END SUBROUTINE vertical_diffusion_s
          config_flags%nested ) j_start = MAX( jds+1, jts )
     IF ( config_flags%open_ye .OR. config_flags%specified .OR. &
          config_flags%nested ) j_end   = MIN( jde-1, jte )
+      IF ( config_flags%periodic_x ) i_start = its
+      IF ( config_flags%periodic_x ) i_end = ite
 
     i_start = i_start - is_ext
     i_end   = i_end   + ie_ext   
@@ -3947,6 +3989,8 @@ END SUBROUTINE vertical_diffusion_s
          config_flags%nested) j_start = MAX( jds+1, jts )
     IF ( config_flags%open_ye .OR. config_flags%specified .OR. &
          config_flags%nested) j_end   = MIN( jde-2, jte )
+      IF ( config_flags%periodic_x ) i_start = its
+      IF ( config_flags%periodic_x ) i_end = ite
 
     i_start = i_start - is_ext
     i_end   = i_end   + ie_ext   
@@ -4067,6 +4111,8 @@ END SUBROUTINE vertical_diffusion_s
          config_flags%nested) j_start = MAX( jds+1, jts )
     IF ( config_flags%open_ye .OR. config_flags%specified .OR. &
          config_flags%nested) j_end   = MIN( jde-1, jte )
+      IF ( config_flags%periodic_x ) i_start = its
+      IF ( config_flags%periodic_x ) i_end = MIN( ite, ide-1 )
 
     i_start = i_start - is_ext
     i_end   = i_end   + ie_ext   
@@ -4163,6 +4209,14 @@ SUBROUTINE phy_bc ( config_flags,div,defor11,defor22,defor33,              &
 
    ENDIF
 
+   ! move out of the conditional, below; this one is needed for 
+   ! all diff_opt cases.  JM
+   CALL set_physical_bc3d( xkmhd   , 't', config_flags,                   &
+                                ids, ide, jds, jde, kds, kde,             &
+                                ims, ime, jms, jme, kms, kme,             &
+                                ips, ipe, jps, jpe, kps, kpe,             &
+                                its, ite, jts, jte, kts, kte              )
+
    IF(config_flags%diff_opt .eq. 2) THEN
 
    CALL set_physical_bc3d( xkmh    , 't', config_flags,                   &
@@ -4171,11 +4225,6 @@ SUBROUTINE phy_bc ( config_flags,div,defor11,defor22,defor33,              &
                                 ips, ipe, jps, jpe, kps, kpe,             &
                                 its, ite, jts, jte, kts, kte              )
 
-   CALL set_physical_bc3d( xkmhd   , 't', config_flags,                   &
-                                ids, ide, jds, jde, kds, kde,             &
-                                ims, ime, jms, jme, kms, kme,             &
-                                ips, ipe, jps, jpe, kps, kpe,             &
-                                its, ite, jts, jte, kts, kte              )
 
    CALL set_physical_bc3d( xkmv    , 't', config_flags,                   &
                                 ids, ide, jds, jde, kds, kde,             &
@@ -4342,6 +4391,8 @@ END SUBROUTINE phy_bc
          config_flags%nested) j_start = MAX(jds+1,jts)
     IF ( config_flags%open_ye .or. config_flags%specified .or. &
          config_flags%nested) j_end   = MIN(jde-2,jte)
+      IF ( config_flags%periodic_x ) i_start = its
+      IF ( config_flags%periodic_x ) i_end = MIN( ite, ide-1 )
  
     DO j = j_start, j_end
     DO k = kts, ktf
@@ -4418,6 +4469,8 @@ END SUBROUTINE phy_bc
          config_flags%nested ) j_start = MAX( jds+1, jts )
     IF ( config_flags%open_ye .OR. config_flags%specified .OR. &
          config_flags%nested ) j_end   = MIN( jde-2, jte )
+      IF ( config_flags%periodic_x ) i_start = its
+      IF ( config_flags%periodic_x ) i_end = MIN( ite, ide-1 )
  
     DO j = j_start, j_end
     DO k = kts+1, ktf
@@ -4546,6 +4599,8 @@ END SUBROUTINE phy_bc
          config_flags%nested) j_start = MAX( jds+1, jts )
     IF ( config_flags%open_ye .OR. config_flags%specified .OR. &
          config_flags%nested) j_end   = MIN( jde-2, jte )
+      IF ( config_flags%periodic_x ) i_start = its
+      IF ( config_flags%periodic_x ) i_end = MIN( ite, ide-1 )
 
     cr_len = cr_len_in
     cr_len = dx + 1.0 !  hardwire for mixing length = (dx*dy*dz)**(1/3).
@@ -4728,6 +4783,8 @@ END SUBROUTINE phy_bc
          config_flags%nested ) j_start = MAX( jds+1, jts )
     IF ( config_flags%open_ye .OR. config_flags%specified .OR. &
          config_flags%nested ) j_end   = MIN( jde-2, jte )
+      IF ( config_flags%periodic_x ) i_start = its
+      IF ( config_flags%periodic_x ) i_end = MIN( ite, ide-1 )
 
     DO j = j_start, j_end
     DO k = kts, ktf

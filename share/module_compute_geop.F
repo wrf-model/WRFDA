@@ -1,5 +1,4 @@
 MODULE module_compute_geop
-  USE module_wrf_error
 
 CONTAINS
   SUBROUTINE compute_500mb_height  ( ph, phb, p, pb,                  &

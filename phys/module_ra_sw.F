@@ -17,7 +17,8 @@ CONTAINS
                     RADFRQ,ICLOUD,DEGRAD,warm_rain,               &
                     ids,ide, jds,jde, kds,kde,                    & 
                     ims,ime, jms,jme, kms,kme,                    &
-                    its,ite, jts,jte, kts,kte                     ) 
+                    its,ite, jts,jte, kts,kte                     &
+                    )
 !------------------------------------------------------------------
    IMPLICIT NONE
 !------------------------------------------------------------------
@@ -375,12 +376,13 @@ CONTAINS
 !     WATER VAPOR ABSORPTION AS IN LACIS AND HANSEN (1974)
          TOTABS=2.9*UGCM/((1.+141.5*UGCM)**0.635+5.925*UGCM)
 !     APPROXIMATE RAYLEIGH + AEROSOL SCATTERING
-!         XSCA=1.E-5*XATP(K)/XMU
+!        XSCA=1.E-5*XATP(K)/XMU
 !          XSCA=(1.E-5*XATP(K)+aer_dry1(K)*bext340+aer_water1(K)*bexth2o)/XMU
          beta=0.4*(1.0-XMU)+0.1
 !     CSSCA - CLEAR-SKY SCATTERING SET FROM NAMELIST SWRAD_SCAT
          XSCA=(cssca*XATP(K)+beta*aer_dry1(K)*bext340*DZ(K) &
-              +beta*aer_water1(K)*bexth2o*DZ(K))/XMU
+              +beta*aer_water1(K)*bexth2o*DZ(K))/XMU   
+
 !     LAYER VAPOR ABSORPTION DONE FIRST
          XABS=(TOTABS-OLDABS)*(SDOWN(1)-DSCLD-DSCA-DABSA)/SDOWN(K)
 !rs   AEROSOL ABSORB (would be elemental carbon). So far XABSA = 0.

@@ -39,7 +39,7 @@ SUBROUTINE med_interp_domain ( parent_grid , nested_grid )
          TYPE(domain), POINTER :: intermediate_grid
          TYPE(domain), POINTER :: ngrid
          TYPE (grid_config_rec_type)            :: config_flags
-#        include "em_dummy_decl.inc"
+#        include <em_dummy_decl.inc>
       END SUBROUTINE interp_domain_em_part1
 
       SUBROUTINE interp_domain_em_part2 ( grid, nested_grid, config_flags ,  &
@@ -52,7 +52,7 @@ SUBROUTINE med_interp_domain ( parent_grid , nested_grid )
          TYPE(domain), POINTER :: grid          ! name of the grid being dereferenced (must be "grid")
          TYPE(domain), POINTER :: nested_grid
          TYPE (grid_config_rec_type)            :: config_flags
-#        include "em_dummy_decl.inc"
+#        include <em_dummy_decl.inc>
       END SUBROUTINE interp_domain_em_part2
 #endif
 ! ----------------------------------------------------------
@@ -74,7 +74,7 @@ SUBROUTINE med_interp_domain ( parent_grid , nested_grid )
          TYPE(domain), POINTER :: intermediate_grid
          TYPE(domain), POINTER :: ngrid
          TYPE (grid_config_rec_type)            :: config_flags
-# include <nmm_dummy_decl.inc"
+# include <nmm_dummy_decl.inc>
       END SUBROUTINE interp_domain_nmm_part1
 
       SUBROUTINE interp_domain_nmm_part2 ( grid, nested_grid, config_flags ,  &
@@ -87,7 +87,7 @@ SUBROUTINE med_interp_domain ( parent_grid , nested_grid )
          TYPE(domain), POINTER :: grid          ! name of the grid being dereferenced (must be "grid")
          TYPE(domain), POINTER :: nested_grid
          TYPE (grid_config_rec_type)            :: config_flags
-# include <nmm_dummy_decl.inc"
+# include <nmm_dummy_decl.inc>
       END SUBROUTINE interp_domain_nmm_part2
 
 !=======================================================================

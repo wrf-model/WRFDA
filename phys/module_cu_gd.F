@@ -2,7 +2,6 @@
 !
 
 MODULE module_cu_gd
-   USE module_wrf_error
 
 CONTAINS
 

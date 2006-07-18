@@ -32,7 +32,7 @@ WRF_LIB     = -L. -lwrf \
               -L$(EXTERNAL)/io_grib1 -lio_grib1 $(LOCAL_LIB) \
               $(NETCDF_LIB) $(MPI_LIB) $(EXTRA_LIBS)
 
-WRFPLUS_LIB = -L. -lwrfplus -lwrflib \
+WRFPLUS_LIB = -L. $(NETCDF_LIB) -lwrflib -lwrfplus \
               -L$(EXTERNAL)/io_grib1 -lio_grib1 $(LOCAL_LIB) \
               $(NETCDF_LIB) $(MPI_LIB) $(EXTRA_LIBS)
 

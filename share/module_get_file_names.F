@@ -6,8 +6,6 @@ MODULE module_get_file_names
 !  commands.  These are activated from either the "system" command or 
 !  the "exec" command.  Neither is part of the Fortran standard.
 
-   USE module_wrf_error
-
    INTEGER :: number_of_eligible_files
    CHARACTER(LEN=132) , DIMENSION(:) , ALLOCATABLE :: eligible_file_name
 
@@ -162,8 +160,8 @@ print *,TRIM(eligible_file_name(loop))
 
       IMPLICIT NONE
 
-      INTEGER, INTENT(IN) :: length_of_char
-      CHARACTER (LEN=length_of_char), INTENT(INOUT) :: command
+      INTEGER :: length_of_char
+      CHARACTER (LEN=length_of_char) :: command
       INTEGER :: loop
 
       DO loop = 1 , length_of_char
