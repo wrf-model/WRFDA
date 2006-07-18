@@ -1,7 +1,7 @@
 #
 
 GEN_BE_OBJS = da_gen_be.o da_constants.o da_be_spectral.o module_wrf_error.o \
-  da_tracing.o da_memory.o
+  da_tracing.o da_memory.o da_reporting.o
 
 be :		setup                   \
                 $(GEN_BE_LIBS)          \
@@ -20,9 +20,6 @@ be :		setup                   \
 		gen_be_diags		\
 		gen_be_diags_read       \
                 advance_cymdh
-
-GEN_BE_OBJS = da_gen_be.o da_constants.o da_be_spectral.o module_wrf_error.o \
-  da_tracing.o da_memory.o
 
 gen_be_stage0_wrf.o      : gen_be_stage0_wrf.f90
 
