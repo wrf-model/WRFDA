@@ -596,14 +596,14 @@ FCOPTIM         = #-fastsse
 FCDEBUG         = #-g
 FCTYPE          = -r8
 FCFREE          = -freeform
-FCENDIAN        = -byteswapio
+FCENDIAN        = -convert big_endian
 FCBASE          =  -fno-second-underscore
 FCFLAGS_RSL     = $(FCENDIAN) $(FCBASE)
 
 CCFLAGS_BUFR    = -DUNDERSCORE
 CCFLAGS_RSL     =
 
-LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN) -convert big_endian
+LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)
 
 LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/local/lib \
 		    -lncarg -lncarg_gks -lncarg_c
@@ -637,7 +637,7 @@ FCOPTIM         = #-fastsse
 FCDEBUG         = #-g
 FCTYPE          = -r8
 FCFREE          = -freeform
-FCENDIAN        = -byteswapio
+FCENDIAN        = -convert big_endian
 FCBASE          = -fno-second-underscore
 FCFLAGS_RSL     = $(FCENDIAN) $(FCBASE)
 
@@ -645,7 +645,7 @@ CCFLAGS2        = -I$(RSL)/RSL
 CCFLAGS_RSL     = 
 CCFLAGS_BUFR    = -DUNDERSCORE
 
-LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN) -convert big_endian
+LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)
 
 LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/local/lib \
                   -lncarg -lncarg_gks -lncarg_c 

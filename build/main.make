@@ -101,6 +101,7 @@ ndown_em.o: \
 	module_dm.o \
 	module_wrf_esmf_super.o \
 	module_wrf_error.o \
+	wrf_debug.o \
 	module_integrate.o \
 	module_bc.o \
 	module_io_domain.o \
@@ -137,6 +138,7 @@ wrf.o: \
 	module_configure.o \
 	module_timing.o \
 	module_wrf_error.o \
+	wrf_debug.o \
 	module_dm.o \
 	module_wrf_esmf_super.o \
         module_wrf_top.o \
