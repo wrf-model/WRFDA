@@ -349,6 +349,7 @@ if test $NL_USE_HTML = .TRUE.; then
      echo "<H1>stderr</H1><PRE>" >> stderr.html
      cat $RUN_DIR/wrfvar.error >> stderr.html
      echo "</PRE></BODY></HTML>" >> stderr.html
+   fi
 
    cat >> $HTML << EOF
 <A HREF="namelist.input">Namelist input</a>
