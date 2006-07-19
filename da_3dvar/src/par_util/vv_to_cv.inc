@@ -21,6 +21,7 @@ SUBROUTINE vv_to_cv(vv, xp, be, cv_size, cv_array )
    integer   :: i,j,k,ijk
 #endif
 
+
    is = xp % its
    ie = xp % ite
    js = xp % jts

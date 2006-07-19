@@ -21,7 +21,6 @@
 !-------------------------------------------------------------------------
 
 !  [2.1] Transform 1st control variable:
-
    mz = be % v1 % mz
    IF ( mz > 0 ) then
       CALL DA_Transform_Through_RF_Adj( mz, xb % grid_box_area, be % v1 % rf_alpha,&

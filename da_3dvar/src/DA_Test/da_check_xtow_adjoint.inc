@@ -33,8 +33,6 @@ SUBROUTINE da_check_xtow_adjoint( grid, config_flags, &
    ks = xp % kts
    ke = xp % kte
 
-   write(6,*) 'xyh in check xtow '
-
 #endif
 
 END SUBROUTINE da_check_xtow_adjoint

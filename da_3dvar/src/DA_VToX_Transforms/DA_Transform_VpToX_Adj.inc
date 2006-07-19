@@ -165,12 +165,16 @@ subroutine DA_Transform_VpToX_Adj( xb, xbx, xa, vp, be, xp, &
 
 elseif( cv_options == 5) then    ! psi, chi_u, t_u, pseudo_rh , psfc_u
 
+!  [3.5] treat humidity
+      vp % v4(its:ite,jts:jte,kts:kte) = xa % q(its:ite,jts:jte,kts:kte) &
+                                       * xb % qs(its:ite,jts:jte,kts:kte)
+
 !  [3.4]  adj of Transform psi and chi to u and v:
 
    CALL wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id3)
 
-   vp%v1(:,:,:)=0.
-   vp%v2(:,:,:)=0.
+!  vp%v1(:,:,:)=0.
+!  vp%v2(:,:,:)=0.
          
    CALL DA_PsiChi_To_UV_Adj( xa % u, xa % v, xb % coefx,   &
                              xb % coefy, vp % v1, vp % v2, &
@@ -216,10 +220,6 @@ elseif( cv_options == 5) then    ! psi, chi_u, t_u, pseudo_rh , psfc_u
    END DO
 
    vp % v3(its:ite,jts:jte,kts:kte)= xa % t(its:ite,jts:jte,kts:kte)
-
-!  [3.5] treat humidity
-      vp % v4(its:ite,jts:jte,kts:kte) = xa % q(its:ite,jts:jte,kts:kte) &
-                                       * xb % qs(its:ite,jts:jte,kts:kte)
  end if
 
 END subroutine DA_Transform_VpToX_Adj

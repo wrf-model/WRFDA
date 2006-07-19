@@ -912,7 +912,7 @@ if (non_hydrostatic) then
 ! recompute : qvf
           al(i,k,j) = -(1./muts(i,j)*(alb(i,k,j)*mu(i,j)+rdnw(k)*(ph(i,k+1,j)-ph(i,k,j))))
 ! recompute : al
-          if(j.eq.60) write(100+k,*)'i,a_al,a_p=', i,a_al(i,k,j),a_p(i,k,j)
+!xyh          if(j.eq.60) write(100+k,*)'i,a_al,a_p=', i,a_al(i,k,j),a_p(i,k,j)
           a_al(i,k,j) = a_al(i,k,j)-a_p(i,k,j)*r_d*(t0+t(i,k,j))*qvf*p0/(p0*(al(i,k,j)+alb(i,k,j))*p0*(al(i,k,j)+alb(i,k,j)))*&
 &cpovcv*(r_d*(t0+t(i,k,j))*qvf/(p0*(al(i,k,j)+alb(i,k,j))))**(cpovcv-1)*p0
           a_qvf = a_qvf+a_p(i,k,j)*r_d*(t0+t(i,k,j))/(p0*(al(i,k,j)+alb(i,k,j)))*cpovcv*(r_d*(t0+t(i,k,j))*qvf/(p0*(al(i,k,j)+&

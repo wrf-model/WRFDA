@@ -59,7 +59,6 @@ subroutine DA_Minimise_QN( grid, config_flags,               &
         ' [5.2] Minimizing cost function using Quasi Newton Method'
       write (6,'(A)') &
         ' --------------------------------------------------------'
-      write(6,*)
 
       iflag = 0
       llfin = .false.

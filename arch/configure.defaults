@@ -8437,6 +8437,7 @@ REGISTRY        =       Registry
 LIB             =       CONFIGURE_NETCDF_LIB_PATH -lxlsmp \
                         -L../external/io_int -lwrfio_int \
                         -L../external/io_grib1 -lio_grib1 \
+                        -L/usr/lib -lSystemStubs \
 			../frame/module_internal_header_util.o ../frame/pack_utils.o -L../external/esmf_time_f90 -lesmf_time 
 LDFLAGS         =	$(OMP) -Wl,-stack_size,10000000,-stack_addr,0xc0000000 
 ENVCOMPDEFS	=	CONFIGURE_COMPILEFLAGS
