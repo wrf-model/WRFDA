@@ -1,0 +1,52 @@
+MACHINE=`hostname`
+COMPILER=${1:-g95}
+
+if test $COMPILER = xlf; then
+   if test -d /opt/ibmcmp/xlf/8.1; then
+      export PATH=/opt/ibmcmp/xlf/8.1/bin:$PATH
+      export MANPATH=/opt/ibmcmp/xlf/8.1/man/en_US/man:$MANPATH
+   fi
+fi
+
+# List options in order of increasing preference
+
+if test -d /data7/da/bray; then
+   export NETCDF=/data7/da/bray/netcdf/netcdf-3.6.1_${COMPILER}
+   export RTTOV=/data7/da/bray/rttov/rttov85_${COMPILER}${COMPILER}
+   export MPICH=/data7/da/bray/mpich/mpich-1.2.7p1_${COMPILER}${COMPILER}
+fi
+
+if test -d ~bray; then
+   export NETCDF=~bray/netcdf/netcdf-3.6.1_${COMPILER}
+   export RTTOV=~bray/rttov/rttov85_${COMPILER}
+   export MPICH=~bray/mpich/mpich-1.2.7p1_${COMPILER}
+fi
+
+if test -d /Volumes/$MACHINE/bray/tools; then
+   export NETCDF /Volumes/$MACHINE/bray/tools/netcdf-3.6.1_${COMPILER}
+   export RTTOV /Volumes/$MACHINE/bray/tools/rttov85_${COMPILER}
+   export MPICH /Volumes/$MACHINE/bray/tools/mpich-1.2.7p1_${COMPILER}
+fi
+
+export MPIHOME=$MPICH
+export PATH=$MPICH/bin:$PATH
+export MANPATH=$MPICH/man:$MANPATH
+
+if test $COMPILER = 'g95'; then
+   export G95_ENDIAN=BIG
+   export G95_FPU_INVALID=${G95_FPU_INVALID:-T}
+   export G95_FPU_ZERODIV=${G95_FPU_ZERODIV:-T}
+   export G95_FPU_OVERFLOW=${G95_FPU_OVERFLOW:-F}
+   export G95_FPU_UNDERFLOW=${G95_FPU_UNDERFLOW:-F}
+   export G95_FPU_INEXACT=${G95_FPU_INEXACT:-F}
+   export G95_FPU_EXCEPTIONS=${G95_FPU_EXCEPTIONS:-F}
+   export G95_UNBUFFERED_ALL=${G95_UNBUFFERED_ALL:-T}
+   export G95_MEM_INIT=${G95_MEM_INIT:-0x00}
+   export G95_MEM_MAXALLOC=${G95_MEM_MAXALLOC:-F}
+fi
+
+echo
+echo "MPICH       " $MPICH
+echo "RTTOV       " $RTTOV
+echo "NETCDF      " $NETCDF
+echo "which mpif90" `which mpif90`
