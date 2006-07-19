@@ -13,6 +13,10 @@ program gen_be_stage0_wrf
 !
 !----------------------------------------------------------------------
 
+#ifdef crayx1
+#define iargc ipxfargc
+#endif
+
    use da_constants
    use da_gen_be
    use da_tracing
@@ -2535,6 +2539,18 @@ End subroutine DA_Fast_Sine_Transform
       residual(:,:) = rd(:,:)
 
    END SUBROUTINE da_relax
+
+#ifdef crayx1
+
+   subroutine getarg(i, harg)
+     implicit none
+     character(len=*) :: harg
+     integer :: ierr, ilen, i
+
+     call pxfgetarg(i, harg, ilen, ierr)
+     return
+   end subroutine getarg
+#endif
 
 end program gen_be_stage0_wrf
 

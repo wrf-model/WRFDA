@@ -929,6 +929,50 @@ arch_clean :
 arch_superclean :
 
 ###########################################################
+#ARCH   crayx1 UNICOS/mp  CRAY X1 serial 
+
+SED_FTN		= sed -f ../arch/cray_csd.sed
+M4              = m4 -B12000
+FC              = ftn
+SFC             = ftn
+FFC             = $(FC)
+CC              = cc
+SCC             = cc
+# Do not use cross-compiler for tools
+CC_TOOLS        = gcc
+RANLIB          = echo
+LD              = $(FC)
+
+TRADFLAG        = -traditional-cpp
+FPPFLAGS2       = -DNORESHAPE -Dcrayx1 -DNONSTANDARD_SYSTEM
+                    
+#FCOPTIM        = -Ofp3 -O3
+FCOPTIM         = -O0
+FCDEBUG         = #-g
+#FCTYPE         = -sinteger32 -e m -sreal64 -dp
+FCTYPE          = -e m -sreal64 -dp
+FCFREE          = -f free -N 255
+FCENDIAN        =
+FCBASE          = #-Ovector0 -Ostream0 -Oscalar1
+FCFLAGS_RSL     = $(FCENDIAN)
+
+CCFLAGS2        = -UCRAY -Dcrayx1
+
+CCFLAGS_BUFR    = -DUNDERSCORE
+
+LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)
+
+LOCAL_LIB       = #-L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c
+
+arch : 
+	$(LN) $(RSL_STUBS)/* .
+	@ touch arch
+
+arch_clean :
+
+arch_superclean :
+
+###########################################################
 #ARCH   crayx1 UNICOS/mp  CRAY X1
 
 SED_FTN		= sed -f ../arch/cray_csd.sed
@@ -986,7 +1030,6 @@ arch_clean :
 
 arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
-
 ###########################################################
 #ARCH Darwin		(xlf single-threaded, no nesting, for G4/5)
 #

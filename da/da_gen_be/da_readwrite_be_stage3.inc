@@ -23,13 +23,13 @@ subroutine da_readwrite_be_stage3( outunit, nk, variable, be_method )
    read(iunit)vardum
    if ( trim(vardum) /= trim(variable) ) then
      call da_error(__FILE__,__LINE__, &
-       "Inconsistent variable name")
+       (/"Inconsistent variable name"/))
    end if
 
    read(iunit)nkdum, num_bins2d
    if ( nkdum /= nk ) then
      call da_error(__FILE__,__LINE__, &
-       "Inconsistent nk between regression coefficients and vertical modes")
+       (/"Inconsistent nk between regression coefficients and vertical modes"/))
    end if
 
    allocate( e_vec_loc(1:nk,1:nk,1:num_bins2d) )

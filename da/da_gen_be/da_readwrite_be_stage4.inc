@@ -42,13 +42,13 @@ if (uh_method .eq. 'power') then
       read(iunit)cvar
       if ( trim(cvar) /=  trim(variable) ) then
         call da_error(__FILE__,__LINE__, &
-          "Variable name inconsistency")
+          (/"Variable name inconsistency"/))
       END IF
 
       read(iunit)max_wavenumber, kdum
       if ( kdum /= k ) then
         call da_error(__FILE__,__LINE__, &
-         "Inconsistent vertical label")
+          (/"Inconsistent vertical label"/))
       end if
 
       read(iunit)data_on_levels, use_global_eofs
