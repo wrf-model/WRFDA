@@ -10,21 +10,33 @@ endif
 
 # List options in order of increasing preference
 
-if (-d /data7/da/bray) then
+if (-d /data7/da/bray/netcdf/netcdf-3.6.1_${COMPILER}) then
    setenv NETCDF /data7/da/bray/netcdf/netcdf-3.6.1_${COMPILER}
-   setenv RTTOV  /data7/da/bray/rttov/rttov85_${COMPILER}
-   setenv MPICH  /data7/da/bray/mpich/mpich-1.2.7p1_${COMPILER}
+endif
+if (-d /data7/da/bray/rttov/rttov85_${COMPILER}) then
+   setenv RTTOV /data7/da/bray/rttov/rttov85_${COMPILER}
+endif
+if (-d /data7/da/bray/mpich/mpich-1.2.7p1_${COMPILER}) then
+   setenv MPICH /data7/da/bray/mpich/mpich-1.2.7p1_${COMPILER}
 endif
 
-if (-d ~bray) then
+if (-d ~bray/netcdf/netcdf-3.6.1_${COMPILER}) then
    setenv NETCDF ~bray/netcdf/netcdf-3.6.1_${COMPILER}
+endif
+if (-d ~bray/rttov/rttov85_${COMPILER}) then
    setenv RTTOV  ~bray/rttov/rttov85_${COMPILER}
+endif
+if ((-d ~bray/mpich/mpich-1.2.7p1_${COMPILER}) then
    setenv MPICH  ~bray/mpich/mpich-1.2.7p1_${COMPILER}
 endif
 
-if (-d /Volumes/$MACHINE/bray/tools) then
+if (-d /Volumes/$MACHINE/bray/tools/netcdf-3.6.1_${COMPILER}) then
    setenv NETCDF /Volumes/$MACHINE/bray/tools/netcdf-3.6.1_${COMPILER}
+endif
+if (-d /Volumes/$MACHINE/bray/tools/rttov85_${COMPILER}) then
    setenv RTTOV  /Volumes/$MACHINE/bray/tools/rttov85_${COMPILER}
+endif
+if (-d /Volumes/$MACHINE/bray/tools/mpich-1.2.7p1_${COMPILER}) then
    setenv MPICH  /Volumes/$MACHINE/bray/tools/mpich-1.2.7p1_${COMPILER}
 endif
 

@@ -10,21 +10,33 @@ fi
 
 # List options in order of increasing preference
 
-if test -d /data7/da/bray; then
-   export NETCDF=/data7/da/bray/netcdf/netcdf-3.6.1_${COMPILER}
-   export RTTOV=/data7/da/bray/rttov/rttov85_${COMPILER}${COMPILER}
-   export MPICH=/data7/da/bray/mpich/mpich-1.2.7p1_${COMPILER}${COMPILER}
+if test -d /data7/da/bray/netcdf/netcdf-3.6.1_${COMPILER}; then
+  export NETCDF=/data7/da/bray/netcdf/netcdf-3.6.1_${COMPILER}
+fi
+if test -d /data7/da/bray/rttov/rttov85_${COMPILER}; then
+   export RTTOV=/data7/da/bray/rttov/rttov85_${COMPILER}
+fi
+if test -d /data7/da/bray/mpich/mpich-1.2.7p1_${COMPILER}; then
+   export MPICH=/data7/da/bray/mpich/mpich-1.2.7p1_${COMPILER}
 fi
 
-if test -d ~bray; then
+if test -d ~bray/netcdf/netcdf-3.6.1_${COMPILER}; then
    export NETCDF=~bray/netcdf/netcdf-3.6.1_${COMPILER}
+fi
+if test -d ~bray/rttov/rttov85_${COMPILER}; then
    export RTTOV=~bray/rttov/rttov85_${COMPILER}
+fi
+if test -d ~bray/mpich/mpich-1.2.7p1_${COMPILER}; then
    export MPICH=~bray/mpich/mpich-1.2.7p1_${COMPILER}
 fi
 
-if test -d /Volumes/$MACHINE/bray/tools; then
+if test -d /Volumes/$MACHINE/bray/tools/netcdf-3.6.1_${COMPILER}; then
    export NETCDF=/Volumes/$MACHINE/bray/tools/netcdf-3.6.1_${COMPILER}
+fi
+if test -d /Volumes/$MACHINE/bray/tools/rttov85_${COMPILER}; then
    export RTTOV=/Volumes/$MACHINE/bray/tools/rttov85_${COMPILER}
+fi
+if test -d /Volumes/$MACHINE/bray/tools/mpich-1.2.7p1_${COMPILER}; then
    export MPICH=/Volumes/$MACHINE/bray/tools/mpich-1.2.7p1_${COMPILER}
 fi
 
