@@ -23,9 +23,9 @@ if test -d ~bray; then
 fi
 
 if test -d /Volumes/$MACHINE/bray/tools; then
-   export NETCDF /Volumes/$MACHINE/bray/tools/netcdf-3.6.1_${COMPILER}
-   export RTTOV /Volumes/$MACHINE/bray/tools/rttov85_${COMPILER}
-   export MPICH /Volumes/$MACHINE/bray/tools/mpich-1.2.7p1_${COMPILER}
+   export NETCDF=/Volumes/$MACHINE/bray/tools/netcdf-3.6.1_${COMPILER}
+   export RTTOV=/Volumes/$MACHINE/bray/tools/rttov85_${COMPILER}
+   export MPICH=/Volumes/$MACHINE/bray/tools/mpich-1.2.7p1_${COMPILER}
 fi
 
 export MPIHOME=$MPICH
