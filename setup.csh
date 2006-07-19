@@ -1,5 +1,12 @@
 setenv MACHINE `hostname`
-setenv COMPILER $1
+
+if ($MACHINE == bs1201en || $MACHINE == bs1101en) then
+   # Brain dead Aix /bin/csh cannot handle arguments to 
+   # sourced scripts, so force use of xlf
+   setenv COMPILER xlf
+else
+   setenv COMPILER $1
+endif
 
 if ($COMPILER == xlf) then
    if (-d /opt/ibmcmp/xlf/8.1) then
@@ -23,21 +30,27 @@ endif
 if (-d ~bray/netcdf/netcdf-3.6.1_${COMPILER}) then
    setenv NETCDF ~bray/netcdf/netcdf-3.6.1_${COMPILER}
 endif
-if (-d ~bray/rttov/rttov85_${COMPILER}) then
-   setenv RTTOV  ~bray/rttov/rttov85_${COMPILER}
+echo oi
+if (-d ~bray/rttov/rttov85_$COMPILER) then
+   setenv RTTOV ~bray/rttov/rttov85_$COMPILER
+echo $RTTOV
 endif
-if ((-d ~bray/mpich/mpich-1.2.7p1_${COMPILER}) then
-   setenv MPICH  ~bray/mpich/mpich-1.2.7p1_${COMPILER}
+if (-d ~bray/mpich/mpich-1.2.7p1_${COMPILER}) then
+   setenv MPICH ~bray/mpich/mpich-1.2.7p1_${COMPILER}
 endif
 
 if (-d /Volumes/$MACHINE/bray/tools/netcdf-3.6.1_${COMPILER}) then
    setenv NETCDF /Volumes/$MACHINE/bray/tools/netcdf-3.6.1_${COMPILER}
 endif
 if (-d /Volumes/$MACHINE/bray/tools/rttov85_${COMPILER}) then
-   setenv RTTOV  /Volumes/$MACHINE/bray/tools/rttov85_${COMPILER}
+   setenv RTTOV /Volumes/$MACHINE/bray/tools/rttov85_${COMPILER}
 endif
 if (-d /Volumes/$MACHINE/bray/tools/mpich-1.2.7p1_${COMPILER}) then
-   setenv MPICH  /Volumes/$MACHINE/bray/tools/mpich-1.2.7p1_${COMPILER}
+   setenv MPICH /Volumes/$MACHINE/bray/tools/mpich-1.2.7p1_${COMPILER}
+endif
+
+if (-d /usr/lpp/ppe.poe) then
+   setenv MPICH /usr/lpp/ppe.poe
 endif
 
 setenv MPIHOME $MPICH
@@ -61,4 +74,3 @@ echo
 echo "MPICH       " $MPICH
 echo "RTTOV       " $RTTOV
 echo "NETCDF      " $NETCDF
-echo "which mpif90" `which mpif90`
