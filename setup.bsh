@@ -8,6 +8,19 @@ if test $COMPILER = xlf; then
    fi
 fi
 
+if test $COMPILER = g95; then
+   if test -d /data7/da/bray/g95; then
+      export PATH=/data7/da/bray/g95:$PATH
+   fi
+   if test -d ~bray/g95; then
+      export PATH=~bray/g95:$PATH
+   fi
+   if test -d /Volumes/$MACHINE/bray/tools/g95; then
+      export PATH=/Volumes/$MACHINE/bray/tools/g95:$PATH
+   fi
+fi
+
+
 # List options in order of increasing preference
 
 if test -d /data7/da/bray/netcdf/netcdf-3.6.1_${COMPILER}; then

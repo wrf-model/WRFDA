@@ -15,14 +15,29 @@ if ($COMPILER == xlf) then
    endif
 endif
 
+if ($COMPILER == g95) then
+   if (-d /data7/da/bray/g95) then
+      setenv PATH /data7/da/bray/g95:$PATH
+   endif
+   if (-d ~bray/g95) then
+      setenv PATH ~bray/g95:$PATH
+   endif
+   if (-d /Volumes/$MACHINE/bray/tools/g95) then
+      setenv PATH /Volumes/$MACHINE/bray/tools/g95:$PATH
+   endif
+endif
+
 # List options in order of increasing preference
 
 if (-d /data7/da/bray/netcdf/netcdf-3.6.1_${COMPILER}) then
    setenv NETCDF /data7/da/bray/netcdf/netcdf-3.6.1_${COMPILER}
 endif
 if (-d /data7/da/bray/rttov/rttov85_${COMPILER}) then
-   setenv RTTOV /data7/da/bray/rttov/rttov85_${COMPILER}
+echo setting RTTOV to /data7/da/bray/rttov/rttov85_${COMPILER}
+   setenv RTTOV /data7/da/bray/rttov/rttov85_$COMPILER
+echo 0 $RTTOV
 endif
+echo 1 $RTTOV
 if (-d /data7/da/bray/mpich/mpich-1.2.7p1_${COMPILER}) then
    setenv MPICH /data7/da/bray/mpich/mpich-1.2.7p1_${COMPILER}
 endif
@@ -39,6 +54,7 @@ if (-d ~bray/mpich/mpich-1.2.7p1_${COMPILER}) then
    setenv MPICH ~bray/mpich/mpich-1.2.7p1_${COMPILER}
 endif
 
+echo 2 $RTTOV
 if (-d /Volumes/$MACHINE/bray/tools/netcdf-3.6.1_${COMPILER}) then
    setenv NETCDF /Volumes/$MACHINE/bray/tools/netcdf-3.6.1_${COMPILER}
 endif
@@ -49,6 +65,7 @@ if (-d /Volumes/$MACHINE/bray/tools/mpich-1.2.7p1_${COMPILER}) then
    setenv MPICH /Volumes/$MACHINE/bray/tools/mpich-1.2.7p1_${COMPILER}
 endif
 
+echo 3 $RTTOV
 if (-d /usr/lpp/ppe.poe) then
    setenv MPICH /usr/lpp/ppe.poe
 endif
