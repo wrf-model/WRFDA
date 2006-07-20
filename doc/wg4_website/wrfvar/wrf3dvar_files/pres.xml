@@ -1,0 +1,50 @@
+<xml xmlns:v="urn:schemas-microsoft-com:vml"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:p="urn:schemas-microsoft-com:office:powerpoint">
+ <p:presentation notessizex="4416" notessizey="5856">
+  <p:master id="3" type="main" href="master03.htm" xmlhref="master03.xml"
+   template="Default Design" layout="title_body"
+   slots="title,body,dateTime,footer,slideNumber">
+   <p:schemes>
+    <p:colorscheme
+     colors="#0000FF,#FFFFFF,#000000,#FFFF00,#FF9900,#00FFFF,#FF0000,#969696"/>
+    <p:colorscheme
+     colors="#FFFFFF,#000000,#808080,#000000,#00CC99,#3333CC,#CCCCFF,#B2B2B2"/>
+    <p:colorscheme
+     colors="#FFFFFF,#000000,#333333,#000000,#DDDDDD,#808080,#4D4D4D,#EAEAEA"/>
+    <p:colorscheme
+     colors="#FFFFCC,#000000,#666633,#808000,#339933,#800000,#0033CC,#FFCC66"/>
+    <p:colorscheme
+     colors="#FFFFFF,#000000,#808080,#000000,#FFCC66,#0000FF,#CC00CC,#C0C0C0"/>
+    <p:colorscheme
+     colors="#FFFFFF,#000000,#808080,#000000,#C0C0C0,#0066FF,#FF0000,#009900"/>
+    <p:colorscheme
+     colors="#FFFFFF,#000000,#808080,#000000,#3399FF,#99FFCC,#CC00CC,#B2B2B2"/>
+   </p:schemes>
+  </p:master>
+  <p:slide id="1" href="slide0001.htm"/>
+  <p:slide id="4" href="slide0004.htm"/>
+  <p:slide id="2" href="slide0002.htm"/>
+  <p:slide id="3" href="slide0003.htm"/>
+  <p:slide id="5" href="slide0005.htm"/>
+  <p:slide id="6" href="slide0006.htm"/>
+  <p:slide id="7" href="slide0007.htm"/>
+  <p:slide id="8" href="slide0008.htm"/>
+  <p:slide id="9" href="slide0009.htm"/>
+  <p:slide id="10" href="slide0010.htm"/>
+  <p:slide id="11" href="slide0011.htm"/>
+  <p:slide id="12" href="slide0012.htm"/>
+  <p:slide id="13" href="slide0013.htm"/>
+  <p:slide id="14" href="slide0014.htm"/>
+  <p:viewstate type="slideView" slidehref="slide0014.htm" scale="66"
+   vertbarstate="0" horizbarstate="2"/>
+  <p:font name="Times New Roman" charset="0" type="4"/>
+  <p:font name="Arial" charset="0" type="4" family="34"/>
+  <p:headersfooters noheader="t"/>
+  <p:pptdocumentsettings framecolors="PresentationSchemeTextColor"/>
+  <p:htmlpublishsettings browsersupport="dual"
+   href="C:\WINDOWS\Desktop\wrf3dvar.htm" hidespeakernote="t"/>
+ </p:presentation>
+ <o:shapedefaults v:ext="edit" spidmax="17410">
+  <o:colormru v:ext="edit" colors="red,blue,#066,teal,#099,#00c,#606,#903"/>
+ </o:shapedefaults></xml>

@@ -1,0 +1,147 @@
+ WRFVAR V2.1.0.0 MODEL                                                           
+ DYNAMICS OPTION: Eulerian Mass Coordinate 
+  alloc_space_field: domain  1   0                                                                                                                                                                                                                               
+  NetCDF error: Variable not found
+  NetCDF error in wrf_io.F90, line 2594  Varname A
+  NetCDF error: Variable not found
+  NetCDF error in wrf_io.F90, line 2594  Varname B
+Timing for Reading 3dvar input for domain        1:    0.09000 elapsed seconds.
+before CALL solve_v3d:module_wrf_3dvar_interface.b, line:    87
+
+ ***  VARIATIONAL ANALYSIS ***
+
+ -------------------------
+ [1.0] Read 3DVAR namelist
+ -------------------------
+    3DVAR namelist options used are in: namelist.3dvar      
+
+ WRF NUMBER OF TILES =   1                                                       
+
+-----------------------------------
+
+[2.0] Set up first guess field (xb)
+-----------------------------------
+
+Setting up LAMBERT CONFORMAL map...
+Computed cone factor: 0.715567
+Computed pole i/j =      0.500    33.583
+
+grid%cen_lon  , grid%cen_lat     : -0.967716064453E+02  0.409203720093E+02
+grid%stand_lon, grid%moad_cen_lat: -0.980000000000E+02  0.409203720093E+02
+## Compute the coarse_ix, coarse_jy, start_x, and start_y: ##
+Dimension of MOAD: ix, jy:   63   63  parent_x, parent_y:  11.0  11.0
+
+Please check if the domain's central point (x,y) is correct:
+grid%cen_lat,grid%cen_lon,x,y:      40.920     -96.772      22.000      21.504
+
+ current_date=2003-01-01_12:00:00
+ ------------------------------
+ [4.0] Set up observations (ob)
+ ------------------------------
+ 
+    Using MM5 format observation input
+
+ END OF OBS UNIT:        92
+
+ IOSTAT:                 -1
+
+ END OF OBS UNIT:        92
+
+ IOSTAT:                 -1
+num_pseudo=       0
+ ----------------------------------------------------------
+ [3.0] Set up background errors (be) for cv_option:  3
+ ----------------------------------------------------------
+ 
+    DA_Setup_Background_Errors: 3DVAR dry control variables are:
+    psi, chi_u, t_u and psfc
+    DA_Setup_Background_Errors: 3DVAR humidity control variable is q/qsg
+ 
+ number of vertical level =  27
+ number of vertical level for stats = 42
+ be_corp= 0.728887954090773728E-03
+ size(be % corz, dim=1)= 44
+ size(be % corz, dim=2)= 44
+ size(be % corz, dim=3)= 27
+ size(be % corz, dim=4)= 4
+ hwllp= 147529.610857102496
+ vz= 0.468170898777200861 0.691901159682086764 1.57457136837071654 0.930356946749524960
+
+ --------------------------------------
+ [5.1] Calculate innovation vector (iv)
+ --------------------------------------
+ 
+ ----------------------------------------------------------
+ 
+ [5.2] Minimize cost function Using CG Method
+  For this run cost function diagnostics will not be written
+ ----------------------------------------------------------
+ 
+  Starting outer iteration :   1
+  Original gradient is  1.35997136D+03
+  For this outer iteration Gradient target is  1.35997136D+01
+  Starting Cost function:  1.92893966D+04 Gradient=  1.35997136D+03
+ ----------------------------------------------------------
+
+   Iter      Gradient             Step
+ 
+    1      9.49687710D+02      4.48419089D-03
+    2      6.21067267D+02      5.11766592D-03
+    3      5.13979178D+02      5.45760873D-03
+    4      4.36508802D+02      5.50690463D-03
+    5      3.86433369D+02      6.58847075D-03
+    6      3.58317612D+02      6.15679277D-03
+    7      3.00184100D+02      5.80697189D-03
+    8      3.09474874D+02      6.98043467D-03
+    9      2.79967167D+02      5.43009002D-03
+   10      2.31656325D+02      5.75703698D-03
+   11      2.13800538D+02      8.55409968D-03
+   12      2.00203383D+02      8.14588614D-03
+   13      1.94019022D+02      6.54503475D-03
+   14      1.61335884D+02      7.62259453D-03
+   15      1.50621729D+02      8.28280556D-03
+   16      1.28887217D+02      9.23366240D-03
+   17      1.33358494D+02      8.78452901D-03
+   18      1.16381723D+02      5.32069456D-03
+   19      1.04303184D+02      8.29866187D-03
+   20      9.27555746D+01      9.28140342D-03
+   21      8.60904828D+01      8.24907942D-03
+   22      7.46502994D+01      8.68198164D-03
+   23      7.45381224D+01      9.18992702D-03
+   24      6.29856519D+01      7.60502681D-03
+   25      5.57880939D+01      9.44027769D-03
+   26      4.79345463D+01      1.10861169D-02
+   27      3.97748228D+01      1.12768781D-02
+   28      3.69609198D+01      1.34682523D-02
+   29      3.52746142D+01      1.05664999D-02
+   30      3.24813797D+01      1.08028426D-02
+   31      2.72990567D+01      9.65500996D-03
+   32      2.57852476D+01      1.11717350D-02
+   33      2.13865224D+01      9.39015926D-03
+   34      2.09705925D+01      1.27338418D-02
+   35      2.12922062D+01      9.91804904D-03
+   36      2.04742442D+01      4.54944800D-03
+   37      1.50051801D+01      6.22334670D-03
+   38      1.34695192D+01      1.14787342D-02
+ ----------------------------------------------------------
+  Inner iteration stopped after   38 iterations
+   Final cost function :  7.45561670D+03 and Gradient:  1.34695192D+01
+ ----------------------------------------------------------
+ 
+    Final cost function J  =  7455.61670184893228
+ 
+    Total number of obs.    =    10345
+    Final 3DVAR value of J  =      7455.61670
+    Final 3DVAR value of Jo =      5926.26770
+    Final 3DVAR value of Jb =      1529.34900
+    Final J / total num_obs =         0.72070
+    3DVAR Jb factor used (1)=         1.00000
+    3DVAR Jb factor used (2)=         1.00000
+    3DVAR Jb factor used (3)=         1.00000
+    3DVAR Jb factor used (4)=         1.00000
+    3DVAR Jb factor used (5)=         1.00000
+ 
+ *** 3DVAR completed successfully ***
+ 
+Timing for Writing 3dvar output for domain        1:    0.21000 elapsed seconds.
+ wrfvar: SUCCESS COMPLETE WRFVAR

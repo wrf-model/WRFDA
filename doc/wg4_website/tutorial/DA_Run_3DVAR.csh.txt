@@ -1,0 +1,368 @@
+#! /bin/csh -f
+#IBM:
+# @ job_type   = parallel
+# @ environment = COPY_ALL;MP_EUILIB=us
+# @ job_name   = 3dvar
+# @ output     = 3dvar.out
+# @ error      = 3dvar.err
+# @ node       = 1,1
+# @ network.MPI    = css0,shared,us
+# @ tasks_per_node = 1
+# @ node_usage = not_shared
+## @ requirements = (Memory > 0)
+# @ checkpoint = no
+# @ wall_clock_limit = 1200
+# NCEP IBM=dev, NCAR IBM=com_reg:
+# @ class      =  dev 
+# @ queue
+#
+#FSL JET (Alpha/Linux):
+#PBS -V -A sfmlidar
+#PBS -lnodes=4:comp -lwalltime=1000
+#Uncomment for JET: source /usr/local/bin/setup-mpi.csh
+#-----------------------------------------------------------------------
+# Script DA_Run_3DVAR.csh
+#
+# Purpose: Top level script for running 3DVAR system
+#
+# Method:  1) Set up links to run directory.
+#          2) Run 3DVAR in run directory.
+#
+# History: 11/16/99  Original version. Dale Barker
+#          12/01/99  Modifications to defaults and names. Dale Barker
+#
+#-----------------------------------------------------------------------
+
+unlimit
+
+setenv MP_SHARED_MEMORY yes
+
+echo ""
+echo "Running script DA_Run_3DVAR"
+echo "---------------------------"
+echo ""
+
+#-----------------------------------------------------------------------
+# [1.0] Set up input/output file environment variables:
+#-----------------------------------------------------------------------
+
+#Specify job details:
+
+setenv RUN_ID 3DVAR.testnew
+set DA_ANALYSIS_DATE = 2003-08-03_00:00:00.0000
+
+#Specify directories, files:
+
+setenv WRF_DIR Your-source-code-directory
+setenv DAT_DIR Your-data-directory
+setenv RUN_DIR your-run-directory
+setenv DA_FIRST_GUESS ${DAT_DIR}/wrf_3dvar_input
+setenv DA_BACK_ERRORS ${DAT_DIR}/be
+setenv DA_OBSERVATIONS ${DAT_DIR}/ob
+
+if ( ! -d $RUN_DIR ) then
+   mkdir $RUN_DIR
+endif
+
+if ( -d $RUN_DIR/$RUN_ID ) then
+   rm -rf $RUN_DIR/$RUN_ID
+endif
+mkdir $RUN_DIR/$RUN_ID
+cd $RUN_DIR/$RUN_ID
+
+cp $WRF_DIR/run/LANDUSE.TBL		.
+cp $WRF_DIR/run/namelist.input.wrf	.
+cp $WRF_DIR/main/da_3dvar.exe		.
+
+#MPP runs require a machine-specific hosts file:
+#cp $WRF_DIR/run/hosts.dec  $RUN_DIR/$RUN_ID/hosts
+
+#Check settings:
+
+if ( ! $?DA_FIRST_GUESS ) then
+   echo "DA_Run_3DVAR error: DA_FIRST_GUESS must be specified"
+   exit 1
+else
+   if ( -e $DA_FIRST_GUESS ) then
+      ln -sf $DA_FIRST_GUESS	wrf_3dvar_input
+   else
+      echo "DA_Run_3DVAR error: DA_FIRST_GUESS=$DA_FIRST_GUESS not readable"
+      exit 1
+   endif
+endif
+
+if (( ! $?DA_OBSERVATIONS ) && (! $?DA_SSMI)) then
+   echo "DA_Run_3DVAR error: DA_OBSERVATIONS or DA_SSMI must be specified"
+   exit 1
+else
+   if ($?DA_OBSERVATIONS) then
+        if  ( -e $DA_OBSERVATIONS) then
+             ln -sf $DA_OBSERVATIONS	fort.99
+        else
+             echo "DA_Run_3DVAR error: DA_OBSERVATIONS=$DA_OBSERVATIONS not readable"
+             exit 1
+        endif
+   endif
+
+   if ($?DA_SSMI) then
+      echo "SSM/I Obs. Input File:       $DA_SSMI"
+
+      if ( -e $DA_SSMI) then
+         cp $DA_SSMI $RUN_DIR/$RUN_ID/fort.125
+         set DA_USE_SSMIRETRIEVALOBS = .TRUE.
+      else
+         echo "DA_Run_3DVAR error: DA_SSMI=$DA_SSMI not readable"
+         set DA_USE_SSMIRETRIEVALOBS = .FALSE.
+      endif
+   endif
+endif
+
+if ( ! $?DA_BACK_ERRORS ) then
+   echo "DA_Run_3DVAR error: DA_BACK_ERRORS must be specified"
+   exit 1
+else
+   if ( -e $DA_BACK_ERRORS ) then
+      ln -sf $DA_BACK_ERRORS	fort.98
+   else
+      echo "DA_Run_3DVAR error: DA_BACK_ERRORS=$DA_BACK_ERRORS not readable"
+      exit 1
+   endif
+endif
+
+echo "First Guess Input File:      $DA_FIRST_GUESS"
+echo "Background Error Input File: $DA_BACK_ERRORS"
+echo "Observation Input File:      $DA_OBSERVATIONS"
+
+#-----------------------------------------------------------------------
+# [2.0] Set up details of analysis algorithm:
+#-----------------------------------------------------------------------
+
+if ( ! $?DA_MODEL_TYPE )   set DA_MODEL_TYPE = WRF
+if ( ! $?DA_WRITE_INCREMENTS ) set DA_WRITE_INCREMENTS = .TRUE.
+if ( ! $?DA_ANALYSIS_TYPE ) set DA_ANALYSIS_TYPE = 3D-VAR
+if ( ! $?DA_ANALYSIS_DATE ) set DA_ANALYSIS_DATE = 2002-08-03_00:00:00.0000
+if ( ! $?DA_ANALYSIS_ACCU ) set DA_ANALYSIS_ACCU = 900
+if ( ! $?DA_FG_FORMAT )     set DA_FG_FORMAT = 1
+if ( ! $?DA_OB_FORMAT )     set DA_OB_FORMAT = 1
+if ( ! $?DA_PROCESS_OBS )   set DA_PROCESS_OBS = YES
+if ( ! $?DA_QC_POINTER )    set DA_QC_POINTER = 0
+if ( ! $?DA_USE_SYNOPOBS )  set DA_USE_SYNOPOBS = .TRUE. 
+if ( ! $?DA_USE_SHIPSOBS )  set DA_USE_SHIPSOBS = .TRUE. 
+if ( ! $?DA_USE_METAROBS )  set DA_USE_METAROBS = .TRUE. 
+if ( ! $?DA_USE_PILOTOBS )  set DA_USE_PILOTOBS = .TRUE. 
+if ( ! $?DA_USE_SOUNDOBS )  set DA_USE_SOUNDOBS = .TRUE. 
+if ( ! $?DA_USE_SATEMOBS )  set DA_USE_SATEMOBS = .TRUE. 
+if ( ! $?DA_USE_SATOBOBS )  set DA_USE_SATOBOBS = .TRUE. 
+if ( ! $?DA_USE_AIREPOBS )  set DA_USE_AIREPOBS = .TRUE. 
+if ( ! $?DA_USE_GPSPWOBS )  set DA_USE_GPSPWOBS = .TRUE. 
+if ( ! $?DA_USE_SSMIRETRIEVALOBS  )  set DA_USE_SSMIRETRIEVALOBS = .FALSE.
+if ( ! $?DA_USE_SSMITBOBS ) set DA_USE_SSMITBOBS = .FALSE.
+if ( ! $?DA_USE_SSMT1OBS ) set DA_USE_SSMT1OBS = .FALSE.
+if ( ! $?DA_USE_SSMT2OBS ) set DA_USE_SSMT2OBS = .FALSE.
+if ( ! $?DA_USE_QSCATOBS ) set DA_USE_QSCATOBS = .TRUE.
+if ( ! $?DA_Check_Max_IV )  set DA_Check_Max_IV        = .TRUE.
+if ( ! $?DA_USE_OBS_ERRFAC ) set DA_USE_OBS_ERRFAC = .FALSE.
+if ( ! $?DA_PUT_RAND_SEED ) set DA_PUT_RAND_SEED = .FALSE.
+if ( ! $?DA_OMB_SET_RAND ) set DA_OMB_SET_RAND = .FALSE.
+if ( ! $?DA_OMB_ADD_NOISE ) set DA_OMB_ADD_NOISE = .FALSE.
+if ( ! $?DA_TIME_WINDOW )   set DA_TIME_WINDOW = 3.
+if ( ! $?DA_PRINT_DETAIL )  set DA_PRINT_DETAIL = 0
+if ( ! $?DA_MAX_EXT_ITS )   set DA_MAX_EXT_ITS = 1
+if ( ! $?DA_EPS0 )          set DA_EPS0 = 1.E-02
+if ( ! $?DA_NTMAX )         set DA_NTMAX = 100
+if ( ! $?DA_NVERIF )        set DA_NVERIF = 0
+if ( ! $?DA_NSAVE )         set DA_NSAVE = 4
+if ( ! $?DA_WRITE_SWITCH )  set DA_WRITE_SWITCH   = .FALSE.
+if ( ! $?DA_WRITE_INTERVAL )set DA_WRITE_INTERVAL = 5
+if ( ! $?DA_RF_PASSES )     set DA_RF_PASSES = 6
+if ( ! $?DA_VAR_SCALING1 )  set DA_VAR_SCALING1 = 1.0
+if ( ! $?DA_VAR_SCALING2 )  set DA_VAR_SCALING2 = 1.0
+if ( ! $?DA_VAR_SCALING3 )  set DA_VAR_SCALING3 = 1.0
+if ( ! $?DA_VAR_SCALING4 )  set DA_VAR_SCALING4 = 1.0
+if ( ! $?DA_VAR_SCALING5 )  set DA_VAR_SCALING5 = 1.0
+if ( ! $?DA_LEN_SCALING1 )  set DA_LEN_SCALING1 = 1.0
+if ( ! $?DA_LEN_SCALING2 )  set DA_LEN_SCALING2 = 1.0
+if ( ! $?DA_LEN_SCALING3 )  set DA_LEN_SCALING3 = 1.0
+if ( ! $?DA_LEN_SCALING4 )  set DA_LEN_SCALING4 = 1.0
+if ( ! $?DA_LEN_SCALING5 )  set DA_LEN_SCALING5 = 1.0
+if ( ! $?DA_NSMOOTH )       set DA_NSMOOTH = 0
+if ( ! $?DA_DEF_SUB_DOMAIN )set DA_DEF_SUB_DOMAIN = .FALSE.
+if ( ! $?DA_XJ_START_SUB_DOMAIN )set DA_XJ_START_SUB_DOMAIN = 55.0
+if ( ! $?DA_YI_START_SUB_DOMAIN )set DA_YI_START_SUB_DOMAIN = 35.0
+if ( ! $?DA_XJ_END_SUB_DOMAIN )set DA_XJ_END_SUB_DOMAIN = 80.0
+if ( ! $?DA_YI_END_SUB_DOMAIN )set DA_YI_END_SUB_DOMAIN = 60.0
+if ( ! $?DA_TESTING_3DVAR ) set DA_TESTING_3DVAR = .FALSE.
+if ( ! $?DA_TEST_TRANSFORMS )  set DA_TEST_TRANSFORMS = .FALSE.  
+if ( ! $?DA_TEST_STATISTICS )  set DA_TEST_STATISTICS = .FALSE.
+if ( ! $?DA_INTERPOLATE_STATS )  set DA_INTERPOLATE_STATS = .FALSE.
+if ( ! $?DA_CV_OPTIONS )    set DA_CV_OPTIONS = 3
+if ( ! $?DA_CV_OPTIONS_HUM ) set DA_CV_OPTIONS_HUM = 1
+if ( ! $?DA_CHECK_RH )      set DA_CHECK_RH = 1
+if ( ! $?DA_as1        )    set DA_as1 = "0.2, 0.5, 1.5"
+if ( ! $?DA_as2        )    set DA_as2 = "0.2, 0.5, 1.5"
+if ( ! $?DA_as3        )    set DA_as3 = "0.2, 0.5, 1.5"
+if ( ! $?DA_as4        )    set DA_as4 = "0.2, 0.5, 1.5"
+if ( ! $?DA_as5        )    set DA_as5 = "0.5, 1.0, 1.0"
+if ( ! $?DA_SET_OMB_RAND_FAC )  set DA_SET_OMB_RAND_FAC = 1.0
+if ( ! $?DA_SEED_ARRAY1 )   set DA_SEED_ARRAY1 = 0
+if ( ! $?DA_SEED_ARRAY2 )   set DA_SEED_ARRAY2 = 0
+if ( ! $?DA_BALANCE_TYPE )  set DA_BALANCE_TYPE = 1
+if ( ! $?DA_VERT_CORR )     set DA_VERT_CORR = 2
+if ( ! $?DA_VERTICAL_IP )   set DA_VERTICAL_IP = 0
+if ( ! $?DA_VERT_EVALUE )   set DA_VERT_EVALUE = 1
+if ( ! $?DA_MAX_VERT_VAR1 ) set DA_MAX_VERT_VAR1 = 99.0
+if ( ! $?DA_MAX_VERT_VAR2 ) set DA_MAX_VERT_VAR2 = 99.0
+if ( ! $?DA_MAX_VERT_VAR3 ) set DA_MAX_VERT_VAR3 = 99.0
+if ( ! $?DA_MAX_VERT_VAR4 ) set DA_MAX_VERT_VAR4 = 99.0
+if ( ! $?DA_MAX_VERT_VAR5 ) set DA_MAX_VERT_VAR5 = 0.0
+if ( ! $?DA_NUM_PSEUDO ) set DA_NUM_PSEUDO = 0
+if ( ! $?DA_PSEUDO_X ) set DA_PSEUDO_X = 1.0
+if ( ! $?DA_PSEUDO_Y ) set DA_PSEUDO_Y = 1.0
+if ( ! $?DA_PSEUDO_Z ) set DA_PSEUDO_Z = 1.0
+if ( ! $?DA_PSEUDO_VAL ) set DA_PSEUDO_VAL = 1.0
+if ( ! $?DA_PSEUDO_ERR ) set DA_PSEUDO_ERR = 1.0
+if ( ! $?DA_PSEUDO_VAR ) set DA_PSEUDO_VAR = t
+
+cat >! namelist.3dvar << EOF
+&record1
+ MODEL_TYPE = '$DA_MODEL_TYPE',
+ WRITE_INCREMENTS = $DA_WRITE_INCREMENTS /
+
+&record2
+ ANALYSIS_TYPE = '$DA_ANALYSIS_TYPE',
+ ANALYSIS_DATE = '$DA_ANALYSIS_DATE',
+ ANALYSIS_ACCU = $DA_ANALYSIS_ACCU /
+
+&record3
+ fg_format = $DA_FG_FORMAT, 
+ ob_format = $DA_OB_FORMAT /
+
+&record4
+ PROCESS_OBS    = '$DA_PROCESS_OBS',
+ obs_qc_pointer = $DA_QC_POINTER,
+ Use_SynopObs   = $DA_USE_SYNOPOBS,
+ Use_ShipsObs   = $DA_USE_SHIPSOBS,
+ Use_MetarObs   = $DA_USE_METAROBS,
+ Use_PilotObs   = $DA_USE_PILOTOBS,
+ Use_SoundObs   = $DA_USE_SOUNDOBS,
+ Use_SatemObs   = $DA_USE_SATEMOBS,
+ Use_SatobObs   = $DA_USE_SATOBOBS,
+ Use_AirepObs   = $DA_USE_AIREPOBS,
+ Use_GpspwObs   = $DA_USE_GPSPWOBS,
+ Use_SsmiRetrievalObs = $DA_USE_SSMIRETRIEVALOBS,
+ Use_SsmiTbObs  = $DA_USE_SSMITBOBS,
+ use_ssmt1obs   = $DA_USE_SSMT1OBS,
+ use_ssmt2obs   = $DA_USE_SSMT2OBS,
+ use_qscatobs   = $DA_USE_QSCATOBS,
+ check_max_iv   = $DA_Check_Max_IV,
+ use_obs_errfac = $DA_USE_OBS_ERRFAC,
+ put_rand_seed  = $DA_PUT_RAND_SEED,
+ omb_set_rand   = $DA_OMB_SET_RAND,
+ omb_add_noise  = $DA_OMB_ADD_NOISE /
+
+&record5
+ TIME_WINDOW    = $DA_TIME_WINDOW,
+ PRINT_DETAIL   = $DA_PRINT_DETAIL /
+
+&record6
+ max_ext_its    = $DA_MAX_EXT_ITS,
+ EPS0           = $DA_EPS0,
+ NTMAX          = $DA_NTMAX,
+ NVERIF         = $DA_NVERIF,
+ NSAVE          = $DA_NSAVE,
+ WRITE_SWITCH   = $DA_WRITE_SWITCH,
+ WRITE_INTERVAL = $DA_WRITE_INTERVAL /
+
+&record7
+ RF_PASSES      = $DA_RF_PASSES,
+ VAR_SCALING1   = $DA_VAR_SCALING1,
+ VAR_SCALING2   = $DA_VAR_SCALING2,
+ VAR_SCALING3   = $DA_VAR_SCALING3,
+ VAR_SCALING4   = $DA_VAR_SCALING4,
+ VAR_SCALING5   = $DA_VAR_SCALING5,
+ LEN_SCALING1   = $DA_LEN_SCALING1,
+ LEN_SCALING2   = $DA_LEN_SCALING2,
+ LEN_SCALING3   = $DA_LEN_SCALING3,
+ LEN_SCALING4   = $DA_LEN_SCALING4,
+ LEN_SCALING5   = $DA_LEN_SCALING5 /
+
+&record8
+ NSMOOTH        = $DA_NSMOOTH,
+ def_sub_domain = $DA_DEF_SUB_DOMAIN,
+ xj_start_sub_domain = $DA_XJ_START_SUB_DOMAIN,
+ yi_start_sub_domain = $DA_YI_START_SUB_DOMAIN,
+ xj_end_sub_domain   = $DA_XJ_END_SUB_DOMAIN,
+ yi_end_sub_domain   = $DA_YI_END_SUB_DOMAIN /
+
+&record10
+ Testing_3DVAR  = $DA_TESTING_3DVAR,
+ Test_Transforms = $DA_TEST_TRANSFORMS,
+ Test_Statistics = $DA_TEST_STATISTICS,
+ Interpolate_Stats = $DA_INTERPOLATE_STATS /
+ 
+&record11
+ cv_options     = $DA_CV_OPTIONS,
+ cv_options_hum = $DA_CV_OPTIONS_HUM,
+ check_rh       = $DA_CHECK_RH,
+ as1            = $DA_as1,
+ as2            = $DA_as2,
+ as3            = $DA_as3,
+ as4            = $DA_as4,
+ as5            = $DA_as5,
+ set_omb_rand_fac = $DA_SET_OMB_RAND_FAC,
+ seed_array1    = $DA_SEED_ARRAY1,
+ seed_array2    = $DA_SEED_ARRAY2 /
+ 
+&record12
+ balance_type   = $DA_BALANCE_TYPE /
+ 
+&record13
+ vert_corr      = $DA_VERT_CORR,
+ vertical_ip    = $DA_VERTICAL_IP,
+ vert_evalue    = $DA_VERT_EVALUE,
+ max_vert_var1  = $DA_MAX_VERT_VAR1,
+ max_vert_var2  = $DA_MAX_VERT_VAR2,
+ max_vert_var3  = $DA_MAX_VERT_VAR3,
+ max_vert_var4  = $DA_MAX_VERT_VAR4,
+ max_vert_var5  = $DA_MAX_VERT_VAR5 /
+ 
+&pseudo_ob_nl
+ num_pseudo     = $DA_NUM_PSEUDO, 
+ pseudo_x       = $DA_PSEUDO_X,
+ pseudo_y       = $DA_PSEUDO_Y,
+ pseudo_z       = $DA_PSEUDO_Z,
+ pseudo_val     = $DA_PSEUDO_VAL,
+ pseudo_err     = $DA_PSEUDO_ERR,
+ pseudo_var     = '$DA_PSEUDO_VAR' /
+
+EOF
+
+#-----------------------------------------------------------------------
+# [3.0] Run 3DVAR:
+#-----------------------------------------------------------------------
+
+echo ""
+echo "Running da_3dvar.exe - run output in da_3dvar.out"
+
+#Uncomment for particular machine:
+#DEC: 
+#timex ./da_3dvar.exe >& ./da_3dvar.out
+#DEC, SGI, Linux/PC multiPE: mpirun -np 4 -machinefile hosts ./da_3dvar.exe
+#JET (qsub): mpirun -np 4 ./da_3dvar.exe
+#IBM (llsubmit): poe ./da_3dvar.exe
+ poe ./da_3dvar.exe
+#AFWA: setenv LOADL_INTERACTIVE_CLASS 1
+#AFWA: poe ./da_3dvar.exe -euilib us -hostfile host.afwa -procs 15
+
+#mv fort.11 DAProg_3DVAR.analincs
+#mv fort.21 DAProg_3DVAR.analysis
+
+mv fort.12 DAProg_3DVAR.statistics
+mv fort.91 DAProg_3DVAR.cost_fn
+mv fort.92 DAProg_3DVAR.cost_fn_grad
+
+#rm fort.99 fort.125 da_3dvar.exe >&! /dev/null
+
+echo "DA_Run_3DVAR.csh completed"
+exit (0)
+

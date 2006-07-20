@@ -1,0 +1,19 @@
+#!/bin/csh -f
+
+ rm -f parame.in
+
+cat > parame.in << EOF
+&control_param
+ wrf_3dvar_output_file = '/wrf/mmm02/wrfvar-testdata/wrf-var/wrf_3dvar_output'
+ wrf_bdy_file          = '/wrf/mmm02/wrfvar-testdata/wrfbdy_d01.2003010112'
+ wrf_input_from_si     = '/wrf/mmm02/wrfvar-testdata/wrfinput_d01.2003010112'
+
+ cycling = .false.
+ debug   = .true. 
+ low_bdy_only = .false. /
+EOF
+
+ ./update_wrf_bc.exe
+
+ exit ( 0 )
+

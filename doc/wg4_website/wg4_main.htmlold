@@ -1,0 +1,548 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html xmlns:o="urn:schemas-microsoft-com:office:office"
+xmlns:w="urn:schemas-microsoft-com:office:word"
+xmlns="http://www.w3.org/TR/REC-html40">
+
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=iso-8859-1">
+<meta name=ProgId content=Word.Document>
+<meta name=Generator content="Microsoft Word 9">
+<meta name=Originator content="Microsoft Word 9">
+<link rel=File-List href="./wg4_main_files/filelist.xml">
+<title>WORKING GROUP 4: 3D-VAR Data Assimilation </title>
+<!--[if gte mso 9]><xml>
+ <o:DocumentProperties>
+  <o:Author>dmbarker</o:Author>
+  <o:LastAuthor>dmbarker</o:LastAuthor>
+  <o:Revision>13</o:Revision>
+  <o:TotalTime>324</o:TotalTime>
+  <o:Created>2003-06-30T18:11:00Z</o:Created>
+  <o:LastSaved>2003-07-03T18:18:00Z</o:LastSaved>
+  <o:Pages>2</o:Pages>
+  <o:Words>928</o:Words>
+  <o:Characters>5294</o:Characters>
+  <o:Company>NCAR/UCAR</o:Company>
+  <o:Lines>44</o:Lines>
+  <o:Paragraphs>10</o:Paragraphs>
+  <o:CharactersWithSpaces>6501</o:CharactersWithSpaces>
+  <o:Version>9.2720</o:Version>
+ </o:DocumentProperties>
+ <o:OfficeDocumentSettings>
+  <o:AllowPNG/>
+  <o:TargetScreenSize>1024x768</o:TargetScreenSize>
+ </o:OfficeDocumentSettings>
+</xml><![endif]-->
+<!--<link rel=Stylesheet type="text/css" media=all href="./wrf.css">-->
+<LINK rel="stylesheet" href="/wrf/wrf.css">
+<style>
+<STYLE TYPE="text/css">
+<!--
+ /* Font Definitions */
+@font-face
+	{font-family:Wingdings;
+	panose-1:5 0 0 0 0 0 0 0 0 0;
+	mso-font-charset:2;
+	mso-generic-font-family:auto;
+	mso-font-pitch:variable;
+	mso-font-signature:0 268435456 0 0 -2147483648 0;}
+ /* Style Definitions */
+p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{mso-style-parent:"";
+	margin:0in;
+	margin-bottom:.0001pt;
+	mso-pagination:widow-orphan;
+	font-size:12.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";}
+p.MsoBodyText, li.MsoBodyText, div.MsoBodyText
+	{margin:0in;
+	margin-bottom:.0001pt;
+	text-align:justify;
+	mso-pagination:widow-orphan;
+	font-size:12.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";}
+p.MsoBodyTextIndent, li.MsoBodyTextIndent, div.MsoBodyTextIndent
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:4.8pt;
+	margin-bottom:.0001pt;
+	text-align:justify;
+	mso-pagination:widow-orphan;
+	tab-stops:4.8pt;
+	font-size:12.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";}
+a:link, span.MsoHyperlink
+	{color:blue;
+	text-decoration:underline;
+	text-underline:single;}
+a:visited, span.MsoHyperlinkFollowed
+	{color:blue;
+	text-decoration:underline;
+	text-underline:single;}
+p
+	{margin-right:0in;
+	mso-margin-top-alt:auto;
+	mso-margin-bottom-alt:auto;
+	margin-left:0in;
+	mso-pagination:widow-orphan;
+	font-size:12.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";}
+p.tabtop, li.tabtop, div.tabtop
+	{mso-style-name:tabtop;
+	margin-right:0in;
+	mso-margin-top-alt:auto;
+	mso-margin-bottom-alt:auto;
+	margin-left:0in;
+	mso-pagination:widow-orphan;
+	font-size:12.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";}
+p.tabtop2, li.tabtop2, div.tabtop2
+	{mso-style-name:tabtop2;
+	margin-right:0in;
+	mso-margin-top-alt:auto;
+	mso-margin-bottom-alt:auto;
+	margin-left:0in;
+	mso-pagination:widow-orphan;
+	font-size:12.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";}
+p.left, li.left, div.left
+	{mso-style-name:left;
+	margin-right:0in;
+	mso-margin-top-alt:auto;
+	mso-margin-bottom-alt:auto;
+	margin-left:0in;
+	mso-pagination:widow-orphan;
+	font-size:12.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";}
+p.mailer1, li.mailer1, div.mailer1
+	{mso-style-name:mailer1;
+	margin-right:0in;
+	mso-margin-top-alt:auto;
+	mso-margin-bottom-alt:auto;
+	margin-left:0in;
+	mso-pagination:widow-orphan;
+	font-size:12.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";}
+@page Section1
+	{size:8.5in 11.0in;
+	margin:1.0in 1.25in 1.0in 1.25in;
+	mso-header-margin:.5in;
+	mso-footer-margin:.5in;
+	mso-paper-source:0;}
+div.Section1
+	{page:Section1;}
+ /* List Definitions */
+@list l0
+	{mso-list-id:256526992;
+	mso-list-type:hybrid;
+	mso-list-template-ids:1598458856 67698689 67698691 67698693 67698689 67698691 67698693 67698689 67698691 67698693;}
+@list l0:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l1
+	{mso-list-id:845091410;
+	mso-list-type:hybrid;
+	mso-list-template-ids:-544289212 67698711 67698713 67698715 67698703 67698713 67698715 67698703 67698713 67698715;}
+@list l1:level1
+	{mso-level-number-format:alpha-lower;
+	mso-level-text:"%1\)";
+	mso-level-tab-stop:.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;}
+@list l2
+	{mso-list-id:1449156812;
+	mso-list-type:hybrid;
+	mso-list-template-ids:-1707848096 67698689 67698691 67698693 67698689 67698691 67698693 67698689 67698691 67698693;}
+@list l2:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l3
+	{mso-list-id:1487085336;
+	mso-list-type:hybrid;
+	mso-list-template-ids:598082638 67698689 67698691 67698693 67698689 67698691 67698693 67698689 67698691 67698693;}
+@list l3:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l4
+	{mso-list-id:2026206779;
+	mso-list-type:hybrid;
+	mso-list-template-ids:281313296 1135239612 90361096 1224887542 -385612980 -403282716 -525941970 1327021558 637849480 1087040562;}
+@list l4:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+ol
+	{margin-bottom:0in;}
+ul
+	{margin-bottom:0in;}
+-->
+</style>
+</head>
+
+<CENTER>
+<p><IMG SRC="./wrf.gif"<BR>
+<p><IMG SRC="./line.gif"width="60%"<BR>
+</CENTER>
+
+<table align="center" border="0" cellpadding="10" cellspacing="10" width="90%">
+<tr bgcolor="#0000AA">
+<th align="center" valign="center" width="10%"><a href="http://wrf-model.org/Welcome.html"><p class="tabtop">WRF HOME</a></td>
+<th align="center" valign="center" width="10%"><a href="http://wrf-model.org/administration_main.html"><p class="tabtop">ADMIN</a></td>
+<th align="center" valign="center" width="10%"><a href="http://wrf-model.org/calendar_main.html"><p class="tabtop">CALENDAR</a></td>
+<th align="center" valign="center" width="10%" bgcolor="#FF0000"><a href="http://wrf-model.org/group_main.html"><p class="tabtop2">GROUP HOME PAGES</a></td>
+<th align="center" valign="center" width="10%"><a href="http://wrf-model.org/ADMINISTRATION/WRF_directory.html"><p class="tabtop">DIRECTORY</a></td>
+<th align="center" valign="center" width="10%"><a href="http://www.mmm.ucar.edu/wrf/users/user_main.html"><p class="tabtop">USERS</a></td>
+<th align="center" valign="center" width="10%"><a href="http://wrf-model.org/documentation_main.html"><p class="tabtop">DOCS<br><br>TALKS</a></td>
+<th align="center" valign="center" width="10%"><a href="http://wrf-model.org/forum_main.html"><p class="tabtop">FORUM</a></td>
+<th align="center" valign="center" width="10%"><a href="http://wrf-model.org/REAL_TIME/real_time.html"><p class="tabtop">REAL<br>TIME<BR>FCSTS</a></td>
+</tr>
+</table>
+
+<CENTER>
+<p><IMG SRC="./line.gif" width=60%><BR>
+</CENTER>
+
+<body lang=EN-US link=blue vlink=blue style='tab-interval:.5in'>
+
+<div class=Section1>
+
+<p class=MsoNormal align=center style='text-align:center'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></p>
+
+<p class=MsoNormal align=center style='text-align:center'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></p>
+
+<p class=MsoNormal align=center style='text-align:center'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></p>
+
+<table border=0 cellspacing=5 cellpadding=0 width="90%" style='width:90.0%;
+ mso-cellspacing:3.7pt;mso-padding-alt:3.75pt 3.75pt 3.75pt 3.75pt'>
+ <tr>
+  <td width="20%" valign=top style='width:20.0%;background:#0000AA;padding:
+  3.75pt 3.75pt 3.75pt 3.75pt'>
+  <p class=MsoNormal style='text-align:justify'><a
+  href="http://wrf-model.org/WG1/wg1_main.html"></a><span class=MsoHyperlink><o:p></o:p></span></p>
+  <p class=left style='text-align:justify'><a
+  href="http://wrf-model.org/WG1/wg1_main.html"><b>WG1</b><br>
+  <span style='font-size:10.0pt'>Numerics &amp; Model Dynamics</span></a><span
+  class=MsoHyperlink><span style='font-size:10.0pt'><o:p></o:p></span></span></p>
+  <p style='text-align:justify'><span style='font-size:10.0pt'><a
+  href="http://wrf-model.org/WG2/wg2_main.html"></a><span class=MsoHyperlink><o:p></o:p></span></span></p>
+  <p class=left style='text-align:justify'><a
+  href="http://wrf-model.org/WG2/wg2_main.html"><b><span style='font-size:10.0pt'>WG2</span></b><span
+  style='font-size:10.0pt'><br>
+  </span><span style='font-size:7.5pt'>Software Architecture, Standards &amp;
+  Implementation </span></a><span class=MsoHyperlink><span style='font-size:
+  7.5pt'><o:p></o:p></span></span></p>
+  <p style='text-align:justify'><span style='font-size:7.5pt'><a
+  href="http://wrf-model.org/WG3/wg3_main.html"></a><span class=MsoHyperlink><o:p></o:p></span></span></p>
+  <p class=left style='text-align:justify'><a
+  href="http://wrf-model.org/WG3/wg3_main.html"><b><span style='font-size:7.5pt'>WG3</span></b><span
+  style='font-size:7.5pt'><br>
+  Standard Initialization Procedures</span></a><span class=MsoHyperlink><span
+  style='font-size:7.5pt'><o:p></o:p></span></span></p>
+  <p style='text-align:justify'><span style='font-size:7.5pt'><a
+  href="http://wrf-model.org/WG4/wg4_main.html"></a><span class=MsoHyperlink><o:p></o:p></span></span></p>
+  <p class=left style='text-align:justify'><a
+  href="http://wrf-model.org/WG4/wg4_main.html"><b><span style='font-size:7.5pt;
+  color:#FF8888'>WG4</span></b><span style='font-size:7.5pt;color:#FF8888'><br>
+  3D-VAR Data Assimilation</span></a><span class=MsoHyperlink><span
+  style='font-size:7.5pt;color:#FF8888'><o:p></o:p></span></span></p>
+  <p style='text-align:justify'><span style='font-size:7.5pt;color:#FF8888'><a
+  href="http://wrf-model.org/WG5/wg5_main.html"></a></span><span
+  class=MsoHyperlink><span style='font-size:7.5pt'><o:p></o:p></span></span></p>
+  <p class=left style='text-align:justify'><a
+  href="http://wrf-model.org/WG5/wg5_main.html"><b><span style='font-size:7.5pt'>WG5</span></b><span
+  style='font-size:7.5pt'><br>
+  Model Physics</span></a><span class=MsoHyperlink><span style='font-size:7.5pt'><o:p></o:p></span></span></p>
+  <p style='text-align:justify'><span style='font-size:7.5pt;color:#FF8888'><a
+  href="http://wrf-model.org/WG6/wg6_main.html"></a></span><span
+  class=MsoHyperlink><span style='font-size:7.5pt'><o:p></o:p></span></span></p>
+  <p class=left style='text-align:justify'><a
+  href="http://wrf-model.org/WG6/wg6_main.html"><b><span style='font-size:7.5pt'>WG6</span></b><span
+  style='font-size:7.5pt'><br>
+  Post Processing</span></a><span class=MsoHyperlink><span style='font-size:
+  7.5pt'><o:p></o:p></span></span></p>
+  <p style='text-align:justify'><span style='font-size:7.5pt;color:#FF8888'><a
+  href="http://wrf-model.org/WG7/wg7_main.html"></a></span><span
+  class=MsoHyperlink><span style='font-size:7.5pt'><o:p></o:p></span></span></p>
+  <p class=left style='text-align:justify'><a
+  href="http://wrf-model.org/WG7/wg7_main.html"><b><span style='font-size:7.5pt'>WG7</span></b><span
+  style='font-size:7.5pt'><br>
+  Model Testing &amp; Verification</span></a><span class=MsoHyperlink><span
+  style='font-size:7.5pt'><o:p></o:p></span></span></p>
+  <p style='text-align:justify'><span style='font-size:7.5pt;color:#FF8888'><a
+  href="http://wrf-model.org/WG8/wg8_main.html"></a></span><span
+  class=MsoHyperlink><span style='font-size:7.5pt'><o:p></o:p></span></span></p>
+  <p class=left style='text-align:justify'><a
+  href="http://wrf-model.org/WG8/wg8_main.html"><b><span style='font-size:7.5pt'>WG8</span></b><span
+  style='font-size:7.5pt'><br>
+  Workshops &amp; Model Support</span></a><span class=MsoHyperlink><span
+  style='font-size:7.5pt'><o:p></o:p></span></span></p>
+  <p style='text-align:justify'><span style='font-size:7.5pt;color:#FF8888'><a
+  href="http://wrf-model.org/WG9/wg9_main.html"></a></span><span
+  class=MsoHyperlink><span style='font-size:7.5pt'><o:p></o:p></span></span></p>
+  <p class=left style='text-align:justify'><a
+  href="http://wrf-model.org/WG9/wg9_main.html"><b><span style='font-size:7.5pt'>WG9</span></b><span
+  style='font-size:7.5pt'><br>
+  Operational Implementation</span></a><span class=MsoHyperlink><span
+  style='font-size:7.5pt'><o:p></o:p></span></span></p>
+  <p style='text-align:justify'><span style='font-size:7.5pt;color:#FF8888'><a
+  href="http://wrf-model.org/WG10/wg10_main.html"></a></span><span
+  class=MsoHyperlink><span style='font-size:7.5pt'><o:p></o:p></span></span></p>
+  <p class=left style='text-align:justify'><a
+  href="http://wrf-model.org/WG10/wg10_main.html"><b><span style='font-size:
+  7.5pt'>WG10</span></b><span style='font-size:7.5pt'><br>
+  4D-VAR Data Assimilation</span></a><span class=MsoHyperlink><span
+  style='font-size:7.5pt'><o:p></o:p></span></span></p>
+  <p style='text-align:justify'><span style='font-size:7.5pt;color:#FF8888'><a
+  href="http://wrf-model.org/WG11/wg11_main.html"></a></span><span
+  class=MsoHyperlink><span style='font-size:7.5pt'><o:p></o:p></span></span></p>
+  <p class=left style='text-align:justify'><a
+  href="http://wrf-model.org/WG11/wg11_main.html"><b><span style='font-size:
+  7.5pt'>WG11</span></b><span style='font-size:7.5pt'><br>
+  Atmospheric Chemistry</span></a><span class=MsoHyperlink><span
+  style='font-size:7.5pt'><o:p></o:p></span></span></p>
+  <p style='text-align:justify'><span style='font-size:7.5pt;color:#FF8888'><a
+  href="http://wrf-model.org/WG12/wg12_main.html"></a></span><span
+  class=MsoHyperlink><span style='font-size:7.5pt'><o:p></o:p></span></span></p>
+  <p class=left style='text-align:justify'><a
+  href="http://wrf-model.org/WG12/wg12_main.html"><b><span style='font-size:
+  7.5pt'>WG12</span></b><span style='font-size:7.5pt'><br>
+  Data Handling and Archive</span></a><span class=MsoHyperlink><span
+  style='font-size:7.5pt'><o:p></o:p></span></span></p>
+  <p style='text-align:justify'><span style='font-size:7.5pt;color:#FF8888'><a
+  href="http://wrf-model.org/WG13/wg13_main.html"></a></span><span
+  class=MsoHyperlink><span style='font-size:7.5pt'><o:p></o:p></span></span></p>
+  <p class=left style='text-align:justify'><a
+  href="http://wrf-model.org/WG13/wg13_main.html"><b><span style='font-size:
+  7.5pt'>WG13</span></b><span style='font-size:7.5pt'><br>
+  Ensemble Forecasting</span></a><span class=MsoHyperlink><span
+  style='font-size:7.5pt'><o:p></o:p></span></span></p>
+  <p style='text-align:justify'><span style='font-size:7.5pt;color:#FF8888'><a
+  href="http://wrf-model.org/WG14/wg14_main.html"></a></span><span
+  class=MsoHyperlink><span style='font-size:7.5pt'><o:p></o:p></span></span></p>
+  <p class=left style='text-align:justify'><a
+  href="http://wrf-model.org/WG14/wg14_main.html"><b><span style='font-size:
+  7.5pt'>WG14</span></b><span style='font-size:7.5pt'><br>
+  Land Surface Modeling</span></a><span class=MsoHyperlink><span
+  style='font-size:7.5pt'><o:p></o:p></span></span></p>
+  <p style='text-align:justify'><![if !supportEmptyParas]>&nbsp;<![endif]><span
+  style='font-size:7.5pt;color:#FF8888'><o:p></o:p></span></p>
+  </td>
+  <td style='padding:3.75pt 3.75pt 3.75pt 3.75pt'>
+  <h2 style='text-align:justify'>WORKING GROUP 4: 3D-VAR Data Assimilation</h2>
+  <h3 style='text-align:justify'>1. Representatives:</h3>
+  <ul type=disc>
+   <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
+       auto;text-align:justify;mso-list:l4 level1 lfo3;tab-stops:list .5in'>NCEP:
+       John Derber (lead), Wan-Shu Wu.</li>
+   <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
+       auto;text-align:justify;mso-list:l4 level1 lfo3;tab-stops:list .5in'>NCAR:
+       Dale Barker, Yong-Run Guo, Wei Huang.</li>
+   <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
+       auto;text-align:justify;mso-list:l4 level1 lfo3;tab-stops:list .5in'>AFWA/The
+       Aerospace Corporation: Michael McAtee.</li>
+   <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
+       auto;text-align:justify;mso-list:l4 level1 lfo3;tab-stops:list .5in'>FSL:
+       Stanley Benjamin, Dezso Devenyi.</li>
+   <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
+       auto;text-align:justify;mso-list:l4 level1 lfo3;tab-stops:list .5in'>CAPS:
+       Jidong Gao, Ming Xue.</li>
+   <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
+       auto;text-align:justify;mso-list:l4 level1 lfo3;tab-stops:list .5in'>CIMSS/U.
+       of Wisconsin: Bob Aune.</li>
+  </ul>
+  <h3 style='text-align:justify'>2. Overview of area of focus, objectives and
+  strategies</h3>
+  <p class=MsoBodyText>We intend to develop an advanced system of 3D-
+  variational (3D-Var) data assimilation tools for the WRF model.&nbsp; The
+  analysis system must be able to properly resolve all variables and scales of
+  importance of the assimilation system.&nbsp; This formidable problem will be
+  addressed incrementally by analyzing scales and variables, which we currently
+  know how to do and developing techniques to perform the analysis at smaller
+  scales and with additional analysis variables. We have designed the framework
+  of a basic 3D-Var analysis scheme capable of analyzing most standard
+  meteorological data.&nbsp; Incorporation of both traditional and
+  non-traditional observational data will be crucial in seeking to improve
+  fine-scale forecast accuracy; thus, the WRF assimilation research will strive
+  to develop the &quot;forward models&quot; (and their adjoints) by which the
+  WRF model fields can be transformed and interpolated to the observation
+  locations and values for each of these data.&nbsp; </p>
+  <p style='text-align:justify'>The 3D-Var system will be developed in three
+  major stages.&nbsp; </p>
+  <p style='text-align:justify'>a) The basic system (June 2003) </p>
+  <p class=MsoBodyTextIndent>The basic system contains the necessary
+  infrastructure, but not all the complexities (e.g. radiance assimilation,
+  anisotropic recursive filters) of subsequent &#8220;research&#8221; and &#8220;advanced&#8221;
+  versions.&nbsp; The characteristics of the basic 3D-Var system will be:</p>
+  <p class=MsoNormal style='text-align:justify'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></p>
+  <ul style='margin-top:0in' type=disc>
+   <li class=MsoNormal style='text-align:justify;mso-list:l0 level1 lfo4;
+       tab-stops:list .5in'>Incremental formulation.</li>
+   <li class=MsoNormal style='text-align:justify;mso-list:l0 level1 lfo4;
+       tab-stops:list .5in'>MPI ready.</li>
+   <li class=MsoNormal style='text-align:justify;mso-list:l0 level1 lfo4;
+       tab-stops:list .5in'>Flexible observational F90 structures. </li>
+   <li class=MsoNormal style='text-align:justify;mso-list:l0 level1 lfo4;
+       tab-stops:list .5in'>Weak balance constraint through the choice of
+       analysis variables.</li>
+   <li class=MsoNormal style='text-align:justify;mso-list:l0 level1 lfo4;
+       tab-stops:list .5in'>Unstaggered grid.</li>
+   <li class=MsoNormal style='text-align:justify;mso-list:l0 level1 lfo4;
+       tab-stops:list .5in'>Model space solution.</li>
+   <li class=MsoNormal style='text-align:justify;mso-list:l0 level1 lfo4;
+       tab-stops:list .5in'>3D- isotropic/homogeneous background error
+       covariance matrix generated through the use of recursive filters </li>
+   <li class=MsoNormal style='text-align:justify;mso-list:l0 level1 lfo4;
+       tab-stops:list .5in'>Observation operators and covariances will assume
+       uncorrelated observational errors. </li>
+   <li class=MsoNormal style='text-align:justify;mso-list:l0 level1 lfo4;
+       tab-stops:list .5in'>Platform specific quality control to be performed
+       prior to analysis (WG12).&nbsp; Multi-platform quality control to be
+       performed within analysis system </li>
+   <li class=MsoNormal style='text-align:justify;mso-list:l0 level1 lfo4;
+       tab-stops:list .5in'>Primary input data to be in BUFR format.</li>
+   <li class=MsoNormal style='text-align:justify;mso-list:l0 level1 lfo4;
+       tab-stops:list .5in'>Comprehensive performance diagnostics.</li>
+   <li class=MsoNormal style='text-align:justify;mso-list:l0 level1 lfo4;
+       tab-stops:list .5in'>Code management using CVS. </li>
+  </ul>
+  <p style='text-align:justify'>b) Research version (June 2004) </p>
+  <p style='text-align:justify'>This version will incorporate the following (and
+  other yet to be decided) additional capabilities:</p>
+  <p style='margin-left:.5in;text-align:justify;text-indent:-.25in;mso-list:
+  l3 level1 lfo5;tab-stops:list .5in'><![if !supportLists]><span
+  style='font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  </span></span><![endif]>Re-ordering of grid-points to i=x and k=1 at bottom (FSL).</p>
+  <p style='margin-left:.5in;text-align:justify;text-indent:-.25in;mso-list:
+  l3 level1 lfo5;tab-stops:list .5in'><![if !supportLists]><span
+  style='font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  </span></span><![endif]>&#8220;Variational&#8221; quality control via inner/outer loop
+  structure (NCAR).</p>
+  <p style='margin-left:.5in;text-align:justify;text-indent:-.25in;mso-list:
+  l3 level1 lfo5;tab-stops:list .5in'><![if !supportLists]><span
+  style='font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  </span></span><![endif]>Direct assimilation of IR/MW radiances (NCEP).</p>
+  <p style='margin-left:.5in;text-align:justify;text-indent:-.25in;mso-list:
+  l3 level1 lfo5;tab-stops:list .5in'><![if !supportLists]><span
+  style='font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  </span></span><![endif]>Assimilation of radar radial velocities (NCAR, CAPS).</p>
+  <p style='margin-left:.5in;text-align:justify;text-indent:-.25in;mso-list:
+  l3 level1 lfo5;tab-stops:list .5in'><![if !supportLists]><span
+  style='font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  </span></span><![endif]>Flow/terrain-dependent background error covariances (NCEP,
+  NCAR).</p>
+  <p style='margin-left:.5in;text-align:justify;text-indent:-.25in;mso-list:
+  l3 level1 lfo5;tab-stops:list .5in'><![if !supportLists]><span
+  style='font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  </span></span><![endif]>First-guess at analysis time (FGAT) &#8211; to make better
+  use of asynoptic observations in 3DVAR (NCAR, AFWA?).</p>
+  <p style='margin-left:.5in;text-align:justify;text-indent:-.25in;mso-list:
+  l3 level1 lfo5;tab-stops:list .5in'><![if !supportLists]><span
+  style='font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  </span></span><![endif]>Improved balance constraints applicable to 1-10km
+  resolution range (CAPS, FSL).</p>
+  <p style='margin-left:.5in;text-align:justify;text-indent:-.25in;mso-list:
+  l3 level1 lfo5;tab-stops:list .5in'><![if !supportLists]><span
+  style='font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  </span></span><![endif]>Improved documentation (CIMMS, NESDIS?).</p>
+  <p style='text-align:justify'>c) Advanced Version (2006)</p>
+  <p style='text-align:justify'>The advanced version will incorporate new
+  developments from the WRF team to create an improved 3DVAR system. </p>
+  <h3 style='text-align:justify'>3. Process for inclusion of new capabilities
+  in the official 3DVAR repository</h3>
+  <p style='text-align:justify'>The development of WRF 3D-Var is a joint effort
+  across a number of institutions. To avoid duplication of work, and to coordinate
+  multiple code changes, the following procedure has been adopted:</p>
+  <p style='margin-left:.5in;text-align:justify;text-indent:-.25in;mso-list:
+  l1 level1 lfo6;tab-stops:list .5in'><![if !supportLists]>a)<span
+  style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span><![endif]>Change
+  proposed to <a href="mailto:wg4@wrf-model.org">wg4@wrf-model.org</a> including
+  draft of methodology and impact in initial tests (if any).</p>
+  <p style='margin-left:.5in;text-align:justify;text-indent:-.25in;mso-list:
+  l1 level1 lfo6;tab-stops:list .5in'><![if !supportLists]>b)<span
+  style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span><![endif]>If
+  approved for potential inclusion, reviewer assigned (from another center if
+  possible) and schedule for development decided.</p>
+  <p style='margin-left:.5in;text-align:justify;text-indent:-.25in;mso-list:
+  l1 level1 lfo6;tab-stops:list .5in'><![if !supportLists]>c)<span
+  style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span><![endif]>&#8220;Contributed&#8221;
+  code tested in &#8220;repository&#8221; system (including standard tests and additional
+  tests which show the new capability in action).</p>
+  <p style='margin-left:.5in;text-align:justify;text-indent:-.25in;mso-list:
+  l1 level1 lfo6;tab-stops:list .5in'><![if !supportLists]>d)<span
+  style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span><![endif]>Developer/reviewer
+  present results to <a href="mailto:wg4@wrf-model.org">wg4@wrf-model.org</a>.</p>
+  <p style='margin-left:.5in;text-align:justify;text-indent:-.25in;mso-list:
+  l1 level1 lfo6;tab-stops:list .5in'><![if !supportLists]>e)<span
+  style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span><![endif]>When
+  approved by WG4, change is added to repository (including change file
+  describing code changes and impacts).</p>
+  <p>A working table of planned changes, including dates, reviewers etc, can be
+  found <a href="wrf3dvar_devel.htm">here</a>.</p>
+  <h3 style='text-align:justify'>4. Summary of current status of development
+  efforts<a name=status></a></h3>
+  <p class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
+  text-align:justify'>The &#8220;basic&#8221; version of WRF 3DVAR has been released for
+  testing by friendly users. See the WRF <a
+  href="http://www.mmm.ucar.edu/wrf/users/download.html">download page</a> for
+  details. Work is now focusing on the &#8220;research&#8221; version of 3D-Var.</p>
+  <h3 style='text-align:justify'>5. Links, Documentation</h3>
+  <ul style='margin-top:0in' type=disc>
+   <li class=MsoNormal style='text-align:justify;mso-list:l2 level1 lfo7;
+       tab-stops:list .5in'><a href="wrf3dvar_cvoptions3.htm">Description</a>
+       of NCEP&#8217;s formulation of background error covariance (cv_options=3)
+       (Wan-Shu Wu).</li>
+   <li class=MsoNormal style='text-align:justify;mso-list:l2 level1 lfo7;
+       tab-stops:list .5in'><a href="http://www.mmm.ucar.edu/mm53dvar">MM5
+       3DVAR Homepage</a> - useful for general documentation, and an online
+       tutorial describing the basic use of use of 3DVAR (Dale Barker).</li>
+  </ul>
+  <p class=MsoNormal style='text-align:justify'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></p>
+  </td>
+ </tr>
+ <tr>
+  <td style='padding:3.75pt 3.75pt 3.75pt 3.75pt'>
+  <p class=MsoNormal style='text-align:justify'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></p>
+  </td>
+  <td style='padding:3.75pt 3.75pt 3.75pt 3.75pt'>
+  <p class=MsoNormal style='margin-left:.5in;text-align:justify'>&nbsp; <a
+  name=mission></a><a name=representatives></a></p>
+  <h3 style='text-align:justify'><![if !supportEmptyParas]>&nbsp;<![endif]><span
+  class=link><o:p></o:p></span></h3>
+  </td>
+ </tr>
+</table>
+
+<p class=MsoNormal style='text-align:justify'><span style='display:none;
+mso-hide:all'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p style='text-align:justify'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></p>
+
+</div>
+
+</body>
+
+</html>
