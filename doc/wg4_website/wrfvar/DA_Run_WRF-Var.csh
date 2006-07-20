@@ -56,12 +56,7 @@
 # USER: Define non-default job via environment variables: 
 #-----------------------------------------------------------------------
 
-#e.g.: setenv DAT_DIR /users/dmbarker/data overrides the default below.
-setenv DAT_DIR /wrf/mmm02/wrfvar-testdata
-setenv SRC_DIR /wrf/mmm02
-setenv WEST_EAST_GRID_NUMBER 45
-setenv SOUTH_NORTH_GRID_NUMBER 45
-setenv GRID_DISTANCE 200000
+#e.g.: setenv START_DATE 2004050200 overrides the default.
 
 ##########################################################################
 #USER: DO NOT MAKE CHANGES BELOW (if you do, you're on your own!) 
@@ -71,8 +66,7 @@ setenv GRID_DISTANCE 200000
 # [1.0] Specify default environment variables:
 #-----------------------------------------------------------------------
 
- if ( ! $?START_DATE )              setenv START_DATE 2003010112       # Analysis date.
- if ( ! $?DA_CV_OPTIONS )           setenv DA_CV_OPTIONS 3             # Background error statistics: 2=NCAR, 3=NCEP.
+ if ( ! $?START_DATE )              setenv START_DATE 2004050100       # Analysis date.
 
 #Default directories/files:
  if ( ! $?SRC_DIR )    setenv SRC_DIR    ${HOME}/code_development
@@ -83,16 +77,16 @@ setenv GRID_DISTANCE 200000
 
  if ( ! $?DA_FIRST_GUESS ) setenv DA_FIRST_GUESS ${DAT_DIR}/wrfinput_d01.${START_DATE} # wrfvar "first guess" input.
  if ( ! $?DA_OBSERVATIONS ) setenv DA_OBSERVATIONS ${DAT_DIR}/obs_gts.3dvar.${START_DATE} # wrfvar observation input.
- if ( ! $?DA_BACK_ERRORS ) setenv DA_BACK_ERRORS ${DAT_DIR}/be.cv_${DA_CV_OPTIONS}    # wrfvar background errors.
- if ( ! $?DA_SSMI ) setenv DA_SSMI ${DAT_DIR}/ssmi.dat         # SSM/I radiances (ignore if not using).
- if ( ! $?DA_RADAR) setenv DA_RADAR ${DAT_DIR}/radar.dat       # Radar data (ignore if not using).
+ if ( ! $?DA_BACK_ERRORS ) setenv DA_BACK_ERRORS ${DAT_DIR}/be    # wrfvar background errors.
+ if ( ! $?DA_SSMI ) setenv DA_SSMI ${DAT_DIR}/ob/ssmi.dat         # SSM/I radiances (ignore if not using).
+ if ( ! $?DA_RADAR) setenv DA_RADAR ${DAT_DIR}/ob/radar.dat       # Radar data (ignore if not using).
 
 #Default WRF namelist variables:
  if ( ! $?NUM_PROCS ) setenv NUM_PROCS 1                          # Number of processors to run on.
- if ( ! $?WEST_EAST_GRID_NUMBER )   setenv WEST_EAST_GRID_NUMBER 180   # X grid dimension.
- if ( ! $?SOUTH_NORTH_GRID_NUMBER ) setenv SOUTH_NORTH_GRID_NUMBER 180 # Y grid dimension.
- if ( ! $?VERTICAL_GRID_NUMBER ) setenv VERTICAL_GRID_NUMBER 28   # Z grid dimension.
- if ( ! $?GRID_DISTANCE ) setenv GRID_DISTANCE 50000              # Grid resolution (m).
+ if ( ! $?WEST_EAST_GRID_NUMBER )   setenv WEST_EAST_GRID_NUMBER 165   # X grid dimension.
+ if ( ! $?SOUTH_NORTH_GRID_NUMBER ) setenv SOUTH_NORTH_GRID_NUMBER 217 # Y grid dimension.
+ if ( ! $?VERTICAL_GRID_NUMBER ) setenv VERTICAL_GRID_NUMBER 31   # Z grid dimension.
+ if ( ! $?GRID_DISTANCE ) setenv GRID_DISTANCE 60000              # Grid resolution (m).
  if ( ! $?DA_SF_SURFACE_PHYSICS ) setenv DA_SF_SURFACE_PHYSICS 1  #(1=Thermal diffusion, 2=Noah LSM).
  if ( $DA_SF_SURFACE_PHYSICS == 1 ) setenv DA_NUM_SOIL_LAYERS 5   # (Thermal diffusion surface physics).
  if ( $DA_SF_SURFACE_PHYSICS == 2 ) setenv DA_NUM_SOIL_LAYERS 4   # (Noah LSM surface physics).
@@ -100,6 +94,7 @@ setenv GRID_DISTANCE 200000
 #Supported default WRF-Var namelist variables:
  if ( ! $?DA_FG_FORMAT )  setenv DA_FG_FORMAT 1                   # First guess format: 1=WRF, 2=MM5, 3=KMA
  if ( ! $?DA_OB_FORMAT )  setenv DA_OB_FORMAT 2                   # Observation format: 1=BUFR, 2=ASCII "little_r"
+ if ( ! $?DA_CV_OPTIONS ) setenv DA_CV_OPTIONS 2                  # Background error statistics: 2=NCAR, 3=NCEP.
  if ( ! $?DA_GLOBAL )     setenv DA_GLOBAL .FALSE.                # Regional/global domain.
  if ( ! $?NPROC_X )       setenv NPROC_X 0                        # Regional, always set NPROC_X to 0, Global, always 1
  if (   $DA_GLOBAL == ".TRUE.") setenv NPROC_X 1
@@ -213,19 +208,19 @@ setenv GRID_DISTANCE 200000
 # [2.0] Perform sanity checks:
 #-----------------------------------------------------------------------
 
- if ( ! -e $DA_FIRST_GUESS ) then
+ if ( ! -s $DA_FIRST_GUESS ) then
     echo "Error: First Guess file does not exist:"
     echo  $DA_FIRST_GUESS
     exit 1
  endif
 
- if ( ! -e $DA_OBSERVATIONS ) then
+ if ( ! -s $DA_OBSERVATIONS ) then
     echo "Error: Observation file does not exist:"
     echo  $DA_OBSERVATIONS
     exit 1
  endif
 
- if ( ! -e $DA_BACK_ERRORS ) then
+ if ( ! -s $DA_BACK_ERRORS ) then
     echo "Error: Background Error file does not exist:"
     echo  $DA_BACK_ERRORS
     exit 1
@@ -241,6 +236,7 @@ setenv GRID_DISTANCE 200000
 
  cp $WRFVAR_DIR/run/LANDUSE.TBL .
  cp $WRFVAR_DIR/main/wrfvar.exe  wrfvar.exe
+ cp $WRFVAR_DIR/run/hosts .
 
  ln -sf $DA_FIRST_GUESS		wrf_3dvar_input
  ln -sf $DA_BACK_ERRORS		fort.3${DA_CV_OPTIONS}
@@ -517,16 +513,12 @@ EOF
 #Run WRF-Var:
 #-------------------------------------------------------------------
 
-#PC-Linux:
-#if ( $NUM_PROCS > 1  )then
-# cp $WRFVAR_DIR/run/hosts .
-#   mpirun -v -np ${NUM_PROCS} -nolocal -machinefile hosts ./wrfvar.exe >&! /dev/null
-#else
-#   mpirun -v -np 1 ./wrfvar.exe >&! /dev/null #Assumes compile in DM mode.
-#endif
-
-#DEC:
-./wrfvar.exe >&! wrfvar.out
+if ( $NUM_PROCS > 1  )then
+#  Remember to create hosts file for your machine (wrfvar/run/hosts file).
+   mpirun -v -np ${NUM_PROCS} -nolocal -machinefile hosts ./wrfvar.exe >&! /dev/null
+else
+   mpirun -v -np 1 ./wrfvar.exe >&! /dev/null #Assumes compile in DM mode.
+endif
 
 #IBM (llsubmit):
 #poe ./wrfvar.exe

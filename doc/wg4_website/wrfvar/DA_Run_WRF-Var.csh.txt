@@ -57,11 +57,13 @@
 #-----------------------------------------------------------------------
 
 #e.g.: setenv DAT_DIR /users/dmbarker/data overrides the default below.
-setenv DAT_DIR /wrf/mmm02/wrfvar-testdata
-setenv SRC_DIR /wrf/mmm02
+setenv DAT_DIR /ocotillo/users/bray/tutorial
+setenv RUN_DIR /ocotillo/users/bray/tutorial/run1
+setenv WRFVAR_DIR /ocotillo/users/bray/tutorial/wrfvar_v2.1
 setenv WEST_EAST_GRID_NUMBER 45
 setenv SOUTH_NORTH_GRID_NUMBER 45
 setenv GRID_DISTANCE 200000
+setenv START_DATE 2003010112
 
 ##########################################################################
 #USER: DO NOT MAKE CHANGES BELOW (if you do, you're on your own!) 
