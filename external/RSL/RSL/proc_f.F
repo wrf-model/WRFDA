@@ -84,8 +84,7 @@ C
       integer function rsl_phys2comp( p )
       implicit none
       external rsl_phys2comp_c
-      integer, INTENT(IN) :: p
-      integer retval
+      integer retval, p
       call  rsl_phys2comp_c( p, retval )
       rsl_phys2comp = retval
       return
