@@ -50,7 +50,7 @@ wrfio_grib1 :
 
 esmf_time : 
 	( cd ../external/esmf_time_f90 ; \
-	make FC="$(FC)" FCFLAGS="$(FCDEBUG) $(FCFLAGS)" \
+	make FC="$(FC) $(FCFLAGS) " FCFLAGS="$(FCDEBUG) " \
 	RANLIB="$(RANLIB)" \
 	CPP="$(CPP) -I../../inc -I. $(POUND_DEF) $(TRADFLAG)" )
 
@@ -82,31 +82,25 @@ module_configure.o mediation_interp_domain.o                   \
 mediation_force_domain.o mediation_feedback_domain.o           \
 module_initialize_real.o module_dm.o start_domain.o :
 	$(RM) $@
-	$(MV) $*.F $*.fs
-	$(SED_FTN) $*.fs > $*.b 
+	$(SED_FTN) $*.F > $*.b 
 	$(CPP) -I../inc $(CPPFLAGS) $*.b  > $*.f
 	$(RM) $*.b
 	$(FC) -c $(FCBASEOPTS) $(MODULE_DIRS) -O0 $*.f
-	$(MV) $*.fs $*.F
 
 #There is probably no reason to modify these rules
 
 .F.o:
 	$(RM) $@
-	$(MV) $*.F $*.fs
-	$(SED_FTN) $*.fs > $*.b
+	$(SED_FTN) $*.F > $*.b
 	$(CPP) -I../inc $(CPPFLAGS) $*.b  > $*.f
 	$(RM) $*.b
 	$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $*.f
-	$(MV) $*.fs $*.F
 
 .F.f:
 	$(RM) $@
-	$(MV) $*.F $*.fs
-	$(SED_FTN) $*.fs > $*.b 
+	$(SED_FTN) $*.F > $*.b 
 	$(CPP) -I../inc $(CPPFLAGS) $*.b > $*.f
 	$(RM) $*.b
-	$(MV) $*.fs $*.F
 
 .f.o:
 	$(RM) $@

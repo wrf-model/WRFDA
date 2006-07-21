@@ -29,7 +29,7 @@ COREDEFS = -DEM_CORE=$(WRF_EM_CORE) \
 #### at least 1 + 2*(number of total nests).  For example, 1 coarse
 #### grid + three fine grids = 1 + 2(3) = 7, so MAX_DOMAINS=7.
 
-MAX_DOMAINS	=	21
+MAX_DOMAINS	=	5
 
 #### DM buffer length for the configuration flags.
 

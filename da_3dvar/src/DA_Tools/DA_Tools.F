@@ -702,6 +702,7 @@ CONTAINS
     REAL                          :: r2
     REAL                          :: xx
     REAL                          :: yy
+    REAL*4                        :: C360R
 
     ! BEGIN CODE
 
@@ -732,7 +733,12 @@ CONTAINS
        
       ! Longitude
       lon = proj%stdlon + deg_per_rad * ATAN2(proj%hemi*xx,yy)/proj%cone
+#ifndef MAC_G95
       lon = AMOD(lon+360., 360.)
+#else
+      C360R = 360.
+      lon = AMOD(lon+360., C360R)
+#endif
 
       ! Latitude.  Latitude determined by solving an equation adapted 
       ! from:
@@ -933,6 +939,7 @@ CONTAINS
     REAL                         :: lon360
     REAL                         :: latinc
     REAL                         :: loninc
+    REAL*4                       :: C360R
 
     ! Extract the latitude and longitude increments for this grid
     ! (e.g., 2.5 deg for NCEP reanalysis) from the proj structure, where
@@ -948,13 +955,19 @@ CONTAINS
     lat = proj%lat1 + deltalat
     lon = proj%lon1 + deltalon
 
+
     IF ((ABS(lat) .GT. 90.).OR.(ABS(deltalon) .GT.360.)) THEN
       ! Off the earth for this grid
       lat = -999.
       lon = -999.
     ELSE
       lon = lon + 360.
+#ifndef MAC_G95
       lon = AMOD(lon,360.)
+#else
+      C360R = 360.
+      lon = AMOD(lon,C360R)
+#endif
       IF (lon .GT. 180.) lon = lon -360.
     ENDIF
 

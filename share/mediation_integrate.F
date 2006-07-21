@@ -203,7 +203,7 @@ SUBROUTINE med_nest_initial ( parent , nest , config_flags )
        USE module_domain
        USE module_configure
        TYPE (domain), POINTER ::  nest , parent
-       TYPE (grid_config_rec_type) config_flags
+       TYPE (grid_config_rec_type), INTENT(IN):: config_flags
      END SUBROUTINE med_nest_feedback
 
      SUBROUTINE start_domain ( grid , allowed_to_move )
@@ -421,7 +421,7 @@ SUBROUTINE init_domain_constants ( parent , nest )
    INTERFACE 
      SUBROUTINE med_init_domain_constants ( parent , nest )
         USE module_domain
-        TYPE(domain) :: parent , nest
+        TYPE(domain) ,POINTER :: parent , nest
      END SUBROUTINE med_init_domain_constants
    END INTERFACE 
    CALL init_domain_constants_em ( parent, nest )

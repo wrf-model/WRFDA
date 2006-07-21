@@ -184,18 +184,8 @@ print CONFIGURE_WRF @machopts  ;
 
 if($sw_os =~ m/darwin/i)
 {
-   chomp $optchoice;
-
-   if($optchoice != 1)
-   {
-      open ARCH_POSTAMBLE, "< arch/postamble_3dvar.mac_g4"
-      or die "cannot open arch/postamble_3dvar.mac_g4" ;
-   }
-   else
-   {
-      open ARCH_POSTAMBLE, "< arch/postamble_3dvar"
-      or die "cannot open arch/postamble_3dvar" ;
-   }
+   open ARCH_POSTAMBLE, "< arch/postamble_3dvar.mac_g4"
+   or die "cannot open arch/postamble_3dvar.mac_g4" ;
 }
 elsif(($sw_os =~ m/crayx1/i) || ($sw_os =~ m/UNICOS/i))
 {

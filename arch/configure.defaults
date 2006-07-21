@@ -6,7 +6,7 @@ SFC		=	$(FC)
 LD		=	f90
 CC              =       cc
 SCC		=	$(CC)
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 FCDEBUG         =       # -g
 FCBASEOPTS      =       -freeform -I. -w
 FCFLAGS		=	$(FCBASEOPTS)
@@ -102,7 +102,7 @@ FC		=	f90
 SFC		=	$(FC)
 CC              =       cc
 SCC		=	$(CC)
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 FCDEBUG         =       # -g
 FCBASEOPTS      =       -freeform -I. -w
 FCFLAGS		=	-freeform -I. -w
@@ -196,9 +196,9 @@ CC              =       cc
 SCC		=	$(CC)
 PROMOTION	=	-r$(RWORDSIZE) -i4
 CFLAGS          =       -64 -DLANDREAD_STUB
-FCOPTIM         =       -O3
+FCOPTIM         =       
 FCDEBUG         =       # -g
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 FCBASEOPTS      =       -freeform -I. -64 -cpp -OPT:Olimit=5269 $(FCDEBUG) -w
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS)
 INCLUDE_MODULES =       -I../external/io_netcdf -I../external/io_int -I../external/esmf_time_f90 \
@@ -295,12 +295,12 @@ SFC		=	$(FC)
 LD              =       f90 -n32 -mips4 -w
 CC              =       cc
 SCC		=	$(CC)
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 PROMOTION	=	-r$(RWORDSIZE) -i4
 CFLAGS          =       -n32 -mips4
 FCDEBUG         =       # -g
 FCBASEOPTS      =       -freeform -I. -w
-FCFLAGS         =       -freeform -I. -O3 -OPT:roundoff=3:IEEE_arithmetic=3 -OPT:fold_arith_limit=2001
+FCFLAGS         =       -freeform -I. -OPT:roundoff=3:IEEE_arithmetic=3 -OPT:fold_arith_limit=2001
 ARCHFLAGS       =       -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4 CONFIGURE_NETCDF_FLAG \
                         -DINTIO -DTRIEDNTRUE   -DLIMIT_ARGS
 EXTRAMODULES    =       
@@ -390,10 +390,10 @@ SFC		=	$(FC)
 LD              =       f90
 CC              =       cc
 SCC		=	$(CC)
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 PROMOTION	=	-r$(RWORDSIZE) -i4
 CFLAGS          =       -64 -DLANDREAD_STUB
-FCOPTIM         =       -O3
+FCOPTIM         =       
 FCDEBUG         =       # -g
 FCBASEOPTS      =       -freeform -I. -64 -cpp -OPT:Olimit=5269 $(FCDEBUG) -w
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS) $(OMP)
@@ -498,12 +498,12 @@ SFC		=	$(FC)
 LD              =       f90
 CC              =       cc
 SCC		=	$(CC)
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 PROMOTION	=	-r$(RWORDSIZE) -i4
 CFLAGS          =       -w -64 -mips4 -DWRF_RSL_IO -DMAXDOM_MAKE=$(MAX_DOMAINS) \
                         -DMAXPROC_MAKE=$(MAX_PROC) -I../external/RSL/RSL -DDM_PARALLEL -DLANDREAD_STUB
 FCDEBUG         =       # -g
-FCOPTIM         =       -O3 -OPT:roundoff=3:IEEE_arithmetic=3
+FCOPTIM         =       -OPT:roundoff=3:IEEE_arithmetic=3
 FCBASEOPTS	=	-freeform -I. -64 -mips4 -w $(FCDEBUG) -w
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS) $(OMP)
 ARCHFLAGS       =       -DINTIO -DYYY -DWRF_RSL_IO -DRSL -DDM_PARALLEL -DIWORDSIZE=4 \
@@ -612,11 +612,11 @@ SFC		=	$(FC)
 LD              =       f95
 CC              =       cc
 SCC		=	$(CC)
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 RSIZEBITS	=	`expr $(RWORDSIZE) \* 8`
 PROMOTION	=	-xtypemap=real:$(RSIZEBITS),integer:32
 CFLAGS          =
-FCOPTIM		=	-O2 # -O4 -xlibmopt
+FCOPTIM		=	# -O4 -xlibmopt
 FCDEBUG		=	#-g
 FCBASEOPTS	=	-fnonstd -free -xpp=cpp $(FCDEBUG) -w
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS)
@@ -743,7 +743,7 @@ SFC		=	$(FC)
 LD              =       f95
 CC              =       cc
 SCC		=	$(CC)
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 ARCHFLAGS       =       -DNETCDF -DYYY -DINTIO \
                         -DDM_PARALLEL -DRSL \
                         -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4 \
@@ -753,7 +753,7 @@ ARCHFLAGS       =       -DNETCDF -DYYY -DINTIO \
 RSIZEBITS	=	`expr $(RWORDSIZE) \* 8`
 PROMOTION	=	-xtypemap=real:$(RSIZEBITS),integer:32
 CFLAGS          =       $(ARCHFLAGS) -I../external/RSL/RSL
-FCOPTIM         =       -O2 # -O4 -xlibmopt
+FCOPTIM         =       # -O4 -xlibmopt
 FCDEBUG         =       # -g
 FCBASEOPTS      =       -fnonstd -free -xpp=cpp $(FCDEBUG) -w
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS) $(OMP)
@@ -876,11 +876,11 @@ SFC		=	$(FC)
 LD              =       f95
 CC              =       cc
 SCC		=	$(CC)
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 RSIZEBITS	=	`expr $(RWORDSIZE) \* 8`
 PROMOTION	=	-xtypemap=real:$(RSIZEBITS),integer:32
 CFLAGS          =
-FCOPTIM		=	-O3 -xlibmopt
+FCOPTIM		=	-xlibmopt
 FCDEBUG		=	#-g
 FCBASEOPTS	=	-fnonstd -free -xpp=cpp $(FCDEBUG) $(OMP) -w
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS)
@@ -992,7 +992,7 @@ SFC		=	$(FC)
 LD              =       f95
 CC              =       cc
 SCC		=	$(CC)
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 ARCHFLAGS       =       -DNETCDF -DYYY -DINTIO \
                         -DDM_PARALLEL -DRSL \
                         -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4 \
@@ -1002,7 +1002,7 @@ ARCHFLAGS       =       -DNETCDF -DYYY -DINTIO \
 RSIZEBITS	=	`expr $(RWORDSIZE) \* 8`
 PROMOTION	=	-xtypemap=real:$(RSIZEBITS),integer:32
 CFLAGS          =       $(ARCHFLAGS) -I../external/RSL/RSL
-FCOPTIM         =       -O3 -xlibmopt
+FCOPTIM         =       -xlibmopt
 FCDEBUG         =       # -g
 FCBASEOPTS      =       -fnonstd -free -xpp=cpp $(FCDEBUG) -w
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS) $(OMP)
@@ -1111,12 +1111,12 @@ SFC		=	$(FC)
 LD              =       xlf90_r
 CC              =       cc_r
 SCC		=	$(CC)
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 PROMOTION	=	-qrealsize=$(RWORDSIZE) -qintsize=4
 CFLAGS          =       -DNOUNDERSCORE
-FCOPTIM         =       -O2 -qarch=auto
+FCOPTIM         =       -qarch=auto
 FCDEBUG         =       # -qnoopt -qfullpath
-FCBASEOPTS      =       -qspill=20000 $(FCDEBUG) -qmaxmem=32767 -w #-qflttrap=zerodivide:invalid:enable -qsigtrap
+FCBASEOPTS      =       -qspill=20000 $(FCDEBUG) -qmaxmem=32767 -qinitauto=00 -w #-qflttrap=zerodivide:invalid:enable -qsigtrap
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS)
 INCLUDE_MODULES =       -I../external/io_netcdf -I../external/io_int  -I../external/esmf_time_f90 \
                         -I../frame -I../share -I../phys -I../chem -I../inc
@@ -1172,7 +1172,7 @@ esmf_time :
 solve_interface.o : solve_interface.F
 	$(RM) $@
 	$(CPP) -I../inc $(CPPFLAGS) $*.F > $*.f
-	$(FC) -c -qfree=f90 -qspillsize=32767 -I. $(PROMOTION) $(MODULE_DIRS) $*.f
+	$(FC) -c -qfree=f90 -qspillsize=32767 -qinitauto=00 -I. $(PROMOTION) $(MODULE_DIRS) $*.f
 
 # compile these without high optimization to speed compile
 module_io_mm5.o : module_io_mm5.F
@@ -1230,12 +1230,12 @@ SFC		=	$(FC)
 LD              =       xlf90_r
 CC              =       cc_r
 SCC		=	$(CC)
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 PROMOTION	=	-qrealsize=$(RWORDSIZE) -qintsize=4
 CFLAGS          =       -DNOUNDERSCORE
-FCOPTIM         =       -O2 -qarch=auto
+FCOPTIM         =       -qarch=auto
 FCDEBUG         =       # -qnoopt -qfullpath
-FCBASEOPTS      =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767 #-qflttrap=zerodivide:invalid:enable -qsigtrap
+FCBASEOPTS      =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767 -qinitauto=00 #-qflttrap=zerodivide:invalid:enable -qsigtrap
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS)
 INCLUDE_MODULES =       -I../external/io_netcdf -I../external/io_int  -I../external/esmf_time_f90 \
                         -I../frame -I../share -I../phys -I../chem -I../inc
@@ -1317,13 +1317,13 @@ SCC             =       cc_r
 FC              =       mpxlf90_r
 LD              =       mpxlf90_r
 CC              =       mpcc_r
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 PROMOTION	=	-qrealsize=$(RWORDSIZE) -qintsize=4
-CFLAGS          =       -O3 -DNOUNDERSCORE  -I../external/RSL_LITE -DDM_PARALLEL \
+CFLAGS          =       -DNOUNDERSCORE  -I../external/RSL_LITE -DDM_PARALLEL \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC)
-FCOPTIM         =       -O2 -qarch=auto
+FCOPTIM         =       -qarch=auto
 FCDEBUG         =       # -qnoopt -qfullpath
-FCBASEOPTS      =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767 #-qflttrap=zerodivide:invalid:enable -qsigtrap
+FCBASEOPTS      =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767 -qinitauto=00 #-qflttrap=zerodivide:invalid:enable -qsigtrap
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS)
 INCLUDE_MODULES =       -I../external/io_netcdf -I../external/io_int  -I../external/esmf_time_f90 \
                         -I../frame -I../share -I../phys -I../chem -I../inc
@@ -1428,13 +1428,13 @@ SCC             =       cc_r
 FC              =       mpxlf90_r
 LD              =       mpxlf90_r
 CC              =       mpcc_r
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 PROMOTION	=	-qrealsize=$(RWORDSIZE) -qintsize=4
 CFLAGS          =       -DNOUNDERSCORE -DWRF_RSL_IO  -I../external/RSL/RSL -DDM_PARALLEL  \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC)
-FCOPTIM         =       -O2 -qarch=auto
+FCOPTIM         =       -qarch=auto
 FCDEBUG         =       # -qnoopt -qfullpath
-FCBASEOPTS      =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767 #-qflttrap=zerodivide:invalid:enable -qsigtrap
+FCBASEOPTS      =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767 -qinitauto=00 #-qflttrap=zerodivide:invalid:enable -qsigtrap
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS)
 INCLUDE_MODULES =       -I../external/io_netcdf -I../external/io_int  -I../external/esmf_time_f90 \
                         -I../frame -I../share -I../phys -I../chem -I../inc
@@ -1539,11 +1539,11 @@ SCC             =       cc_r
 FC              =       mpxlf90_r
 LD              =       mpxlf90_r
 CC              =       mpcc_r
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 PROMOTION	=	-qrealsize=$(RWORDSIZE) -qintsize=4
 CFLAGS          =       -DNOUNDERSCORE -DWRF_RSL_IO  -I../external/RSL/RSL -DDM_PARALLEL  \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC)
-FCOPTIM         =       -O2 -qarch=auto 
+FCOPTIM         =       -qarch=auto 
 FCDEBUG         =       # -qnoopt -qfullpath
 FCBASEOPTS      =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=-1 #-qflttrap=zerodivide:invalid:enable -qsigtrap
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS)
@@ -1653,11 +1653,11 @@ SCC             =       cc_r
 FC              =       mpxlf90_r
 LD              =       mpxlf90_r
 CC              =       mpcc_r
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 PROMOTION	=	-qrealsize=$(RWORDSIZE) -qintsize=4
 CFLAGS          =       -DNOUNDERSCORE  -I../external/RSL_LITE -DDM_PARALLEL  \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC)
-FCOPTIM         =       -O2 -qarch=auto 
+FCOPTIM         =       -qarch=auto 
 FCDEBUG         =       # -qnoopt -qfullpath
 FCBASEOPTS      =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=-1 #-qflttrap=zerodivide:invalid:enable -qsigtrap
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS)
@@ -1769,13 +1769,13 @@ SCC             =       cc_r
 FC		=	mpxlf90_r
 LD		=	mpxlf90_r
 CC              =       mpcc_r
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 PROMOTION	=	-qrealsize=$(RWORDSIZE) -qintsize=4
 CFLAGS          =       -DNOUNDERSCORE -DWRF_RSL_IO  -I../external/RSL/RSL -DDM_PARALLEL  \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC)
-FCOPTIM         =       -O2 -qarch=auto
+FCOPTIM         =       -qarch=auto
 FCDEBUG         =       # -qnoopt -qfullpath
-FCBASEOPTS      =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767 #-qflttrap=zerodivide:invalid:enable -qsigtrap
+FCBASEOPTS      =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767 -qinitauto=00 #-qflttrap=zerodivide:invalid:enable -qsigtrap
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS) $(OMP)
 INCLUDE_MODULES =       -I../external/io_netcdf -I../external/io_int  -I../external/esmf_time_f90 \
                         -I../frame -I../share -I../phys -I../chem -I../inc
@@ -1834,7 +1834,7 @@ esmf_time :
 solve_interface.o : solve_interface.F
 	$(RM) $@
 	$(CPP) -I../inc $(CPPFLAGS) $*.F > $*.f
-	$(FC) -c -qfree=f90 -qspillsize=32767 -I. $(PROMOTION) $(MODULE_DIRS) $*.f
+	$(FC) -c -qfree=f90 -qspillsize=32767 -qinitauto=00 -I. $(PROMOTION) $(MODULE_DIRS) $*.f
 
 ../external/RSL/RSL/librsl.a :
 	( cd ../external/RSL/RSL ; make MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) LEARN_BCAST=-DLEARN_BCAST sp2 )
@@ -1901,13 +1901,13 @@ SCC             =       cc_r
 FC              =       mpxlf90_r
 LD              =       mpxlf90_r
 CC              =       mpcc_r
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 PROMOTION	=	-qrealsize=$(RWORDSIZE) -qintsize=4
 CFLAGS          =       -DNOUNDERSCORE -DWRF_RSL_IO  -I../external/RSL/RSL -DDM_PARALLEL  \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC)
-FCOPTIM         =       -O2 -qarch=auto
+FCOPTIM         =       -qarch=auto
 FCDEBUG         =       # -qnoopt -qfullpath
-FCBASEOPTS      =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767 #-qflttrap=zerodivide:invalid:enable -qsigtrap
+FCBASEOPTS      =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767 -qinitauto=00 #-qflttrap=zerodivide:invalid:enable -qsigtrap
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS)
 INCLUDE_MODULES =       -I../external/io_netcdf -I../external/io_int  -I../external/esmf_time_f90 \
                         -I../frame -I../share -I../phys -I../inc
@@ -2012,14 +2012,14 @@ SCC             =       cc_r
 FC              =       mpxlf90_r
 LD              =       mpCC_r
 CC              =       mpcc_r
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 MCELHOME        =       /home/bluesky/bettenc/disttest
 PROMOTION	=	-qrealsize=$(RWORDSIZE) -qintsize=4
 CFLAGS          =       -DNOUNDERSCORE -DWRF_RSL_IO  -I../external/RSL/RSL -DDM_PARALLEL  \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC)
-FCOPTIM         =       -O2 -qarch=auto
+FCOPTIM         =       -qarch=auto
 FCDEBUG         =       # -qnoopt -qfullpath
-FCBASEOPTS      =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767 #-qflttrap=zerodivide:invalid:enable -qsigtrap
+FCBASEOPTS      =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767 -qinitauto=00 #-qflttrap=zerodivide:invalid:enable -qsigtrap
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS)
 INCLUDE_MODULES =       -I../external/io_netcdf -I../external/io_int  -I../external/esmf_time_f90 \
                         -I../frame -I../share -I../phys -I../chem -I../inc
@@ -2138,13 +2138,13 @@ SCC             =       cc_r
 FC              =       mpxlf90_r
 LD              =       mpxlf90_r
 CC              =       mpcc_r
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 PROMOTION	=	-qrealsize=$(RWORDSIZE) -qintsize=4
 CFLAGS          =       -DNOUNDERSCORE -DWRF_RSL_IO  -I../external/RSL/RSL -DDM_PARALLEL  \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC)
-FCOPTIM         =       -O2 -qarch=auto
+FCOPTIM         =       -qarch=auto
 FCDEBUG         =       # -qnoopt -qfullpath
-FCBASEOPTS      =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767 #-qflttrap=zerodivide:invalid:enable -qsigtrap
+FCBASEOPTS      =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767 -qinitauto=00 #-qflttrap=zerodivide:invalid:enable -qsigtrap
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS)
 # begin ESMF paths
 ESMF_DIR        =       /home/bluesky/hender/esmf
@@ -2270,13 +2270,13 @@ SCC             =       cc_r
 FC              =       mpxlf90_r
 LD              =       mpxlf90_r
 CC              =       mpcc_r
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 PROMOTION	=	-qrealsize=$(RWORDSIZE) -qintsize=4
 CFLAGS          =       -DNOUNDERSCORE -DWRF_RSL_IO  -I../external/RSL/RSL -DDM_PARALLEL  \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC)
-FCOPTIM         =       -O2 -qarch=auto
+FCOPTIM         =       -qarch=auto
 FCDEBUG         =       # -qnoopt -qfullpath
-FCBASEOPTS      =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767 #-qflttrap=zerodivide:invalid:enable -qsigtrap
+FCBASEOPTS      =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767 -qinitauto=00 #-qflttrap=zerodivide:invalid:enable -qsigtrap
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS)
 # begin ESMF paths
 ESMF_DIR        =       /home/bluesky/hender/esmf
@@ -2403,13 +2403,13 @@ SCC             =       cc_r
 FC              =       xlf90_r
 LD              =       xlf90_r
 CC              =       cc_r
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 PROMOTION	=	-qrealsize=$(RWORDSIZE) -qintsize=4
 CFLAGS          =       -DNOUNDERSCORE -DWRF_RSL_IO  -I../external/RSL/RSL -DDM_PARALLEL  \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) -DSTUBMPI
-FCOPTIM         =       -O2 -qarch=auto
+FCOPTIM         =       -qarch=auto
 FCDEBUG         =       # -qnoopt -qfullpath
-FCBASEOPTS      =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767 #-qflttrap=zerodivide:invalid:enable -qsigtrap
+FCBASEOPTS      =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767 -qinitauto=00 #-qflttrap=zerodivide:invalid:enable -qsigtrap
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS)
 INCLUDE_MODULES =       -I../external/io_netcdf -I../external/io_int  -I../external/esmf_time_f90 \
                         -I../frame -I../share -I../phys -I../chem -I../inc
@@ -2518,13 +2518,13 @@ SCC             =       cc_r
 FC              =       xlf90_r
 LD              =       xlf90_r
 CC              =       cc_r
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 PROMOTION	=	-qrealsize=$(RWORDSIZE) -qintsize=4
 CFLAGS          =       -DNOUNDERSCORE -DWRF_RSL_IO  -I../external/RSL/RSL -DDM_PARALLEL  \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) -DSTUBMPI
-FCOPTIM         =       -O2 -qarch=auto
+FCOPTIM         =       -qarch=auto
 FCDEBUG         =       # -qnoopt -qfullpath
-FCBASEOPTS      =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767 #-qflttrap=zerodivide:invalid:enable -qsigtrap
+FCBASEOPTS      =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767 -qinitauto=00 #-qflttrap=zerodivide:invalid:enable -qsigtrap
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS)
 INCLUDE_MODULES =       -I../external/io_netcdf -I../external/io_int  -I../external/esmf_time_f90 \
                         -I../frame -I../share -I../phys -I../chem -I../inc
@@ -2643,7 +2643,7 @@ SFC		=	$(FC)
 LD              =       f90
 CC              =       cc
 SCC		=	$(CC)
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE CONFIGURE_NETCDF_FLAG -DYYY -DINTIO \
                         -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4 \
                         -DTRIEDNTRUE   \
@@ -2752,7 +2752,7 @@ SFC		=	$(FC)
 LD              =       f90
 CC              =       cc
 SCC		=	$(CC)
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DNETCDF -DYYY -DINTIO -DWRF_RSL_IO \
                         -DDM_PARALLEL -DRSL \
                         -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4 \
@@ -2871,7 +2871,7 @@ SFC		=	$(FC)
 LD              =       f90
 CC              =       cc
 SCC		=	$(CC)
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE CONFIGURE_NETCDF_FLAG -DYYY -DINTIO \
                         -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4 \
                         -DTRIEDNTRUE   \
@@ -2981,7 +2981,7 @@ SFC		=	$(FC)
 LD              =       f90
 CC              =       cc
 SCC		=	$(CC)
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DNETCDF -DYYY -DINTIO -DWRF_RSL_IO \
                         -DDM_PARALLEL -DRSL \
                         -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4 \
@@ -3102,7 +3102,7 @@ SFC		=	f90
 LD              =       mpif90
 CC              =       mpicc
 SCC		=	cc
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DNETCDF -DYYY -DINTIO \
                         -DDM_PARALLEL -DRSL_LITE \
                         -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4 \
@@ -3224,7 +3224,7 @@ SFC		=	f90
 LD              =       mpif90
 CC              =       mpicc
 SCC		=	cc
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE CONFIGURE_NETCDF_FLAG -DYYY -DINTIO -DWRF_RSL_IO \
                         -DDM_PARALLEL -DRSL \
                         -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4 \
@@ -3346,7 +3346,7 @@ SFC		=	f90
 LD              =       mpif90
 CC              =       mpicc
 SCC		=	cc
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE CONFIGURE_NETCDF_FLAG -DYYY -DINTIO -DWRF_RSL_IO \
                         -DDM_PARALLEL -DRSL \
                         -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4 \
@@ -3469,7 +3469,7 @@ SFC		=	$(FC)
 LD              =       f90
 CC              =       cc
 SCC		=	$(CC)
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE CONFIGURE_NETCDF_FLAG -DYYY -DINTIO -DWRF_RSL_IO \
                         -DDM_PARALLEL -DRSL \
                         -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4 \
@@ -3589,7 +3589,7 @@ SFC		=	f90
 LD              =       mpif90
 CC              =       mpicc
 SCC		=	cc
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE CONFIGURE_NETCDF_FLAG -DYYY -DINTIO -DWRF_RSL_IO \
                         -DDM_PARALLEL -DRSL \
                         -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4 \
@@ -3708,7 +3708,7 @@ SFC		=	f90
 LD              =       mpif90 -f90=cxx
 CC              =       mpicc
 SCC		=	cc
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE CONFIGURE_NETCDF_FLAG -DYYY -DINTIO -DWRF_RSL_IO \
                         -DDM_PARALLEL -DRSL -DFLOATSAFE \
                         -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4 \
@@ -3837,7 +3837,7 @@ SFC             =       echo # mpif90
 LD              =       echo # mpif90
 CC              =       echo # mpicc
 SCC		=	echo # cc
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 ARCHFLAGS       =       -DAUTODOC_BUILD CONFIGURE_NETCDF_FLAG -DYYY -DINTIO -DWRF_RSL_IO \
                         -DDM_PARALLEL="'<b>DM_PARALLEL</b>'" -DRSL="'<b>RSL</b>'" \
                         -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4 \
@@ -3945,7 +3945,7 @@ SFC		=	$(FC)
 LD              =       fort
 CC              =       cc
 SCC		=	$(CC)
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 PROMOTION	=	-r$(RWORDSIZE) -i4
 CFLAGS          =       -DF2CSTYLE 
 FCOPTIM         =       -fast -O4
@@ -4043,7 +4043,7 @@ SFC		=	$(FC)
 LD              =       fort
 CC              =       cc
 SCC		=	$(CC)
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 PROMOTION	=	-r$(RWORDSIZE) -i4
 CFLAGS          =       -DF2CSTYLE 
 FCOPTIM         =       -fast -O4
@@ -4143,7 +4143,7 @@ SFC		=	f90
 LD              =       mpif90
 CC              =       mpicc
 SCC		=	cc
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 PROMOTION	=	-r$(RWORDSIZE) -i4
 CFLAGS          =       -DDM_PARALLEL -DWRF_RSL_IO -DF2CSTYLE \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) \
@@ -4254,7 +4254,7 @@ SFC		=	$(FC)
 LD              =       frt
 CC              =       vcc
 SCC		=	$(CC)
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 PROMOTION	=	-r$(RWORDSIZE) -i4
 CFLAGS          =
 FCFLAGS         =       -Free -X9 -Am
@@ -4354,7 +4354,7 @@ FC              =       pgf90
 LD              =       pgf90
 CC              =       gcc
 SCC		=	$(CC)
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 SFC             =       $(FC)
 PROMOTION	=	-r$(RWORDSIZE) -i4
 CFLAGS          =
@@ -4461,7 +4461,7 @@ LD              =       pgf90
 CC              =       gcc
 SCC		=	$(CC)
 SFC             =       pgf90
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 FCOPTIM		=	-fast
 FCDEBUG		=	#-g
 #FCBASEOPTS      =       -w -byteswapio -Ktrap=fp -Mfree -tp p6 $(FCDEBUG)
@@ -4572,7 +4572,7 @@ FC              =       pgf90
 LD              =       pgf90
 CC              =       gcc
 SCC		=	$(CC)
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 SFC             =       $(FC)
 PROMOTION	=	-r$(RWORDSIZE) -i4
 CFLAGS          =
@@ -4682,7 +4682,7 @@ LD              =       pgf90
 CC              =       gcc
 SCC		=	$(CC)
 SFC             =       pgf90
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 FCOPTIM		=	-fast
 FCDEBUG		=	#-g
 #FCBASEOPTS      =       -w -byteswapio -Ktrap=fp -Mfree -tp p6 $(FCDEBUG)
@@ -4797,7 +4797,7 @@ LD              =       mpif90 -f90=pgf90
 CC              =       mpicc -cc=gcc
 SCC		=	gcc
 SFC             =       pgf90
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 PROMOTION	=	-r$(RWORDSIZE) -i4
 CFLAGS          =       -DDM_PARALLEL -DWRF_RSL_IO \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) -I../external/RSL/RSL
@@ -4909,7 +4909,7 @@ LD              =       mpif90 -f90=pgf90
 CC              =       mpicc -cc=gcc
 SCC		=	gcc
 SFC             =       pgf90
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 PROMOTION	=	-r$(RWORDSIZE) -i4
 CFLAGS          =       -DDM_PARALLEL \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) -I../external/RSL_LITE
@@ -5025,12 +5025,12 @@ LD = mpif90
 CC = mpicc
 SCC = cc
 SFC = efc
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 PROMOTION	=	-r$(RWORDSIZE) -i4
 CFLAGS = -DDM_PARALLEL -DWRF_RSL_IO -w \
          -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) -I../external/RSL/RSL -size_lp64 \
          -I/usr/lib/mpi/mpi_intel/include
-FCOPTIM = -O2 -ftz
+FCOPTIM = -ftz
 FCDEBUG = #-g
 FCBASEOPTS = $(FCDEBUG) -w -FR -I$(INCLUDE) -w -cm 
 FCNOOPTS = -O0 $(FCDEBUG) -FR -I$(INCLUDE) -w -cm 
@@ -5147,12 +5147,12 @@ LD = ifort
 CC = cc
 SCC = $(CC)
 SFC = ifort
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 RSIZEBITS	=	`expr $(RWORDSIZE) \* 8`
 PROMOTION	=	-real_size $(RSIZEBITS)
 CFLAGS = -DDM_PARALLEL -DWRF_RSL_IO -cm -w \
          -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) -I../external/RSL/RSL -size_lp64
-FCOPTIM = -O2 -ftz
+FCOPTIM = -ftz
 FCDEBUG = #-g
 FCBASEOPTS = $(FCDEBUG) -w -FR -I$(INCLUDE) -cm -convert big_endian -mp
 FCNOOPTS = -O0 $(FCDEBUG) -FR -I$(INCLUDE) -w -cm 
@@ -5264,7 +5264,7 @@ LD              =       pgf90
 CC              =       gcc
 SCC		=	$(CC)
 SFC             =       $(FC)
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 PROMOTION	=	-r$(RWORDSIZE) -i4
 CFLAGS          =
 FCOPTIM		=	-fastsse #-Mipa=fast
@@ -5375,7 +5375,7 @@ LD              =       mpif90
 CC              =       mpicc
 SCC		=	gcc
 SFC             =       pgf90
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 PROMOTION	=	-r$(RWORDSIZE) -i4
 CFLAGS          =       -DDM_PARALLEL -DWRF_RSL_IO \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) -I../external/RSL/RSL
@@ -5493,7 +5493,7 @@ LD              =       mpif90
 CC              =       mpicc
 SCC		=	gcc
 SFC             =       pgf90
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 PROMOTION	=	-r$(RWORDSIZE) -i4
 CFLAGS          =       -DDM_PARALLEL \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) -I../external/RSL_LITE
@@ -5615,11 +5615,11 @@ LD         = mpif90
 CC         = mpicc
 SCC        = gcc
 SFC        = efc
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 PROMOTION	=	-r$(RWORDSIZE) -i4
 CFLAGS     = -DDM_PARALLEL -w -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) \
              -I../external/RSL_LITE -size_lp64 -I/usr/lib/mpi/mpi_intel/include
-FCOPTIM = -O2 -ftz
+FCOPTIM = -ftz
 FCDEBUG = #-g
 FCBASEOPTS = $(FCDEBUG) -w -FR -I$(INCLUDE) -cm 
 FCNOOPTS = -O0 $(FCDEBUG) -FR -I$(INCLUDE) -w -cm 
@@ -5738,11 +5738,11 @@ LD = efc
 CC = ecc -I. -I/usr/local/vmi/mpich/include
 SCC		=	$(CC)
 SFC = efc
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 PROMOTION	=	-r$(RWORDSIZE) -i4
 CFLAGS = -DDM_PARALLEL -DWRF_RSL_IO \
 -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) -I../external/RSL/RSL -size_lp64
-FCOPTIM = -O3 -ftz
+FCOPTIM = -ftz
 FCDEBUG = #-g
 FCBASEOPTS = $(FCDEBUG) -w -FR -I$(INCLUDE) -I. -cm
 FCFLAGS = $(FCOPTIM) $(FCBASEOPTS) $(OMP) -size_lp64
@@ -5856,11 +5856,11 @@ LD = efc
 CC = ecc -I. -I/usr/local/vmi/mpich/include
 SCC		=	$(CC)
 SFC = efc
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 PROMOTION	=	-r$(RWORDSIZE) -i4
 CFLAGS = -DDM_PARALLEL -I../external/RSL_LITE \
 -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) -size_lp64
-FCOPTIM = -O3 -ftz
+FCOPTIM = -ftz
 FCDEBUG = #-g
 FCBASEOPTS = $(FCDEBUG) -w -FR -I$(INCLUDE) -I. -cm
 FCFLAGS = $(FCOPTIM) $(FCBASEOPTS) $(OMP) -size_lp64
@@ -5960,12 +5960,12 @@ FC		=	ifort
 CC              =       icc
 SCC		=	$(CC)
 SFC		=	$(FC)
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 RSIZEBITS	=	`expr $(RWORDSIZE) \* 8`
 PROMOTION	=	-real_size $(RSIZEBITS)
 FCDEBUG         =       # -g
 FCBASEOPTS      =       -w -FR -cm -I. -Vaxlib -convert big_endian -mp
-FCOPTIM		=	-O2
+FCOPTIM		=	
 FCFLAGS		=	$(FCOPTIM) $(FCBASEOPTS) $(OMP)
 CFLAGS		=       -w
 EXTRAMODULES    =       
@@ -6077,10 +6077,10 @@ LD              =       ifort
 CC              =       icc
 SCC		=	$(CC)
 SFC             =       ifort
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 RSIZEBITS	=	`expr $(RWORDSIZE) \* 8`
 PROMOTION	=	-real_size $(RSIZEBITS)
-FCOPTIM		=	-O3 -xW
+FCOPTIM		=	-xW
 FCDEBUG		=	#-g
 FCBASEOPTS      =       -FR -cm -w -I. $(FCDEBUG) -convert big_endian -mp
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS) $(OMP)
@@ -6192,11 +6192,11 @@ LD              =       ifort
 CC              =       gcc
 SCC		=	$(CC)
 SFC             =       $(FC)
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 RSIZEBITS	=	`expr $(RWORDSIZE) \* 8`
 PROMOTION	=	-real_size $(RSIZEBITS)
 CFLAGS          =
-FCOPTIM		=	-O3 -xW
+FCOPTIM		=	-xW
 FCDEBUG		=	#-g
 FCBASEOPTS      =       -FR -cm -w -I. $(FCDEBUG) -convert big_endian -mp
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS) $(OMP)
@@ -6303,10 +6303,10 @@ LD              =       ifort
 CC              =       icc
 SCC		=	$(CC)
 SFC             =       ifort
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 RSIZEBITS	=	`expr $(RWORDSIZE) \* 8`
 PROMOTION	=	-real_size $(RSIZEBITS)
-FCOPTIM		=	-O3 -xW
+FCOPTIM		=	-xW
 FCDEBUG		=	#-g
 FCBASEOPTS      =       -FR -cm -w -I. $(FCDEBUG) -convert big_endian -mp
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS) $(OMP)
@@ -6420,10 +6420,10 @@ LD              =       mpif90 -f90=ifort
 CC              =       mpicc -cc=icc
 SCC		=	icc
 SFC             =       ifort
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 RSIZEBITS	=	`expr $(RWORDSIZE) \* 8`
 PROMOTION	=	-real_size $(RSIZEBITS)
-FCOPTIM		=	-O3 -xW
+FCOPTIM		=	-xW
 FCDEBUG		=	#-g
 FCBASEOPTS      =       -FR -cm -w -I. $(FCDEBUG) -convert big_endian -mp
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS)
@@ -6536,10 +6536,10 @@ LD              =       mpif90 -f90=ifort
 CC              =       mpicc -cc=gcc
 SCC		=	gcc
 SFC             =       ifort
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 RSIZEBITS	=	`expr $(RWORDSIZE) \* 8`
 PROMOTION	=	-real_size $(RSIZEBITS)
-FCOPTIM		=	-O3 -xW
+FCOPTIM		=	-xW
 FCDEBUG		=	#-g
 FCBASEOPTS      =       -FR -cm -w -I. $(FCDEBUG) -convert big_endian -mp
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS)
@@ -6816,14 +6816,14 @@ CC                = icc -I.
 SCC		=	$(CC)
 CC_TOOLS          = cc
 SFC               = ifort
-RWORDSIZE         = 4
+RWORDSIZE         = 8
 RSIZEBITS	=	`expr $(RWORDSIZE) \* 8`
 PROMOTION	=	-real_size $(RSIZEBITS)
-CFLAGS            = -w -O3 -ip -tpp2 -c -ftz -no-gcc -DDM_PARALLEL -DWRF_RSL_IO \
+CFLAGS            = -w -c -ftz -no-gcc -DDM_PARALLEL -DWRF_RSL_IO \
                     -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) -I../external/RSL/RSL
-FCOPTIM           = -O3
+FCOPTIM           = 
 FCDEBUG           = # -g
-FCBASEOPTS        = -w -ip -tpp2 -ftz -FR -convert big_endian -mp $(FCDEBUG) \
+FCBASEOPTS        = -w -ftz -FR -convert big_endian -mp $(FCDEBUG) \
                      -fno-alias -fno-fnalias -align all \
                      -mP3OPT_ecg_mm_fp_ld_latency=20 \
                      -mP3OPT_ecg_non_ieee_sqrt=T -mP3OPT_ecg_non_ieee_div=T  \
@@ -6845,7 +6845,7 @@ LIB               = -L../external/io_netcdf -lwrfio_nf $(OMP) \
                     -L../external/io_int -lwrfio_int \
                     ../frame/module_internal_header_util.o ../frame/pack_utils.o \
                     -L$(MPI_HOME)/lib -lmpi -L../external/esmf_time_f90 -lesmf_time 
-LDFLAGS           = -O3 -ip $(OMP)
+LDFLAGS           = $(OMP)
 ENVCOMPDEFS	=	CONFIGURE_COMPILEFLAGS
 CPP               = /lib/cpp -C -P -traditional
 POUND_DEF         = -DNO_RRTM_PHYSICS  -DF90_STANDALONE -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
@@ -6958,14 +6958,14 @@ CC                = icc -I.
 SCC		=	$(CC)
 CC_TOOLS          = cc
 SFC               = ifort
-RWORDSIZE         = 4
+RWORDSIZE         = 8
 RSIZEBITS	=	`expr $(RWORDSIZE) \* 8`
 PROMOTION	=	-real_size $(RSIZEBITS)
-CFLAGS            = -w -O3 -ip -tpp2 -c -ftz -DDM_PARALLEL -I../external/RSL_LITE \
+CFLAGS            = -w -c -ftz -DDM_PARALLEL -I../external/RSL_LITE \
                     -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC)
-FCOPTIM           = -O3
+FCOPTIM           = 
 FCDEBUG           = # -g
-FCBASEOPTS        = -w -ip -tpp2 -ftz -FR -convert big_endian $(FCDEBUG) \
+FCBASEOPTS        = -w -ftz -FR -convert big_endian $(FCDEBUG) \
                      -fno-alias -fno-fnalias -align all \
                      -mP3OPT_ecg_mm_fp_ld_latency=20 \
                      -mP3OPT_ecg_non_ieee_sqrt=T -mP3OPT_ecg_non_ieee_div=T  \
@@ -6986,7 +6986,7 @@ LIB               = -L../external/io_netcdf -lwrfio_nf $(OMP) \
                     -L../external/io_int -lwrfio_int \
                     ../frame/module_internal_header_util.o ../frame/pack_utils.o \
                     -L$(MPI_HOME)/lib -lmpi -L../external/esmf_time_f90 -lesmf_time 
-LDFLAGS           = -O3 -ip $(OMP)
+LDFLAGS           = $(OMP)
 ENVCOMPDEFS	=	CONFIGURE_COMPILEFLAGS
 CPP               = /lib/cpp -C -P -traditional
 POUND_DEF         = -DNO_RRTM_PHYSICS  -DF90_STANDALONE -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
@@ -7035,8 +7035,8 @@ esmf_time :
 	  make FC="$(FC) $(PROMOTION) $(FCDEBUG) $(FCFLAGS)" RANLIB="$(RANLIB)" CPP="$(CPP) -I../../inc -I. $(POUND_DEF)" )
 
 ../external/RSL_LITE/librsl_lite.a :
-	( cd ../external/RSL_LITE ; make CC='icc -I. -w -O3 -I$(MPI_HOME)/include '\
-	 FC="$(SFC) $(PROMOTION) -w -O3 -I../../.. " MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) )
+	( cd ../external/RSL_LITE ; make CC='icc -I. -w -I$(MPI_HOME)/include '\
+	 FC="$(SFC) $(PROMOTION) -w -I../../.. " MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) )
 
 # compile these without high optimization to speed compile
 mediation_integrate.o : mediation_integrate.F
@@ -7087,13 +7087,13 @@ CC                = icc -I.
 SCC		=	$(CC)
 CC_TOOLS          = cc
 SFC               = ifort
-RWORDSIZE         = 4
+RWORDSIZE         = 8
 RSIZEBITS	=	`expr $(RWORDSIZE) \* 8`
 PROMOTION	=	-real_size $(RSIZEBITS)
-CFLAGS            = -w -O3 -ip -tpp2 -c -ftz 
-FCOPTIM           = -O3
+CFLAGS            = -w -c -ftz 
+FCOPTIM           = 
 FCDEBUG           = # -g
-FCBASEOPTS        = -w -ip -tpp2 -ftz -FR -convert big_endian $(FCDEBUG) \
+FCBASEOPTS        = -w -ftz -FR -convert big_endian $(FCDEBUG) \
                      -fno-alias -fno-fnalias -align all \
                      -mP3OPT_ecg_mm_fp_ld_latency=20 \
                      -mP3OPT_ecg_non_ieee_sqrt=T -mP3OPT_ecg_non_ieee_div=T  \
@@ -7112,7 +7112,7 @@ LIB               = -L../external/io_netcdf -lwrfio_nf $(OMP) \
                     -L../external/io_grib1 -lio_grib1 \
                     ../frame/module_internal_header_util.o ../frame/pack_utils.o \
                     -L../external/esmf_time_f90 -lesmf_time 
-LDFLAGS           = -O3 -ip $(OMP)
+LDFLAGS           = $(OMP)
 ENVCOMPDEFS	=	CONFIGURE_COMPILEFLAGS
 CPP               = /lib/cpp -C -P -traditional
 POUND_DEF         = -DNO_RRTM_PHYSICS  -DF90_STANDALONE -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
@@ -7204,13 +7204,13 @@ CC                = icc -I.
 SCC		=	$(CC)
 CC_TOOLS          = cc
 SFC               = ifort
-RWORDSIZE         = 4
+RWORDSIZE         = 8
 RSIZEBITS	=	`expr $(RWORDSIZE) \* 8`
 PROMOTION	=	-real_size $(RSIZEBITS)
-CFLAGS            = -w -O3 -ip -tpp2 -c -ftz 
-FCOPTIM           = -O3
+CFLAGS            = -w -c -ftz 
+FCOPTIM           = 
 FCDEBUG           = # -g
-FCBASEOPTS        = -w -ip -tpp2 -ftz -FR -convert big_endian $(FCDEBUG) \
+FCBASEOPTS        = -w -ftz -FR -convert big_endian $(FCDEBUG) \
                      -fno-alias -fno-fnalias -align all \
                      -mP3OPT_ecg_mm_fp_ld_latency=20 \
                      -mP3OPT_ecg_non_ieee_sqrt=T -mP3OPT_ecg_non_ieee_div=T  \
@@ -7229,7 +7229,7 @@ LIB               = -L../external/io_netcdf -lwrfio_nf \
                     -L../external/io_grib1 -lio_grib1 \
                     ../frame/module_internal_header_util.o ../frame/pack_utils.o \
                     -L../external/esmf_time_f90 -lesmf_time 
-LDFLAGS           = -O3 -ip 
+LDFLAGS           = 
 ENVCOMPDEFS	=	CONFIGURE_COMPILEFLAGS
 CPP               = /lib/cpp -C -P -traditional
 POUND_DEF         = -DNO_RRTM_PHYSICS  -DF90_STANDALONE -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
@@ -7332,10 +7332,10 @@ X1_CROSS_COMP = "cc"
 X1_CROSS_CFLG = "-hcommand"
 CC_TOOLS        = 	$(X1_CROSS_COMP) $(X1_CROSS_CFLG)
 
-RWORDSIZE         = 4
+RWORDSIZE         = 8
 FCDEBUG         =       # -g
 FCBASEOPTS      =       -f free -N 255 -I. -Oscalar1 -Ovector0 -Ostream0 -x omp
-FCFLAGS         =       -f free -N 255  -I. -Ofp3 -O3 -x omp -Ogen_private_callee
+FCFLAGS         =       -f free -N 255  -I. -Ofp3 -x omp -Ogen_private_callee
 FCFLAGS2        =       -f free -N 255  -I. -Ofp2 -O1 -x omp -Ogen_private_callee
 # MSP (non-CSD mode)
 #FCFLAGS2        =       -f free -N 255  -I. -Ofp3 -x omp,csd -Ostream1 -Ovector3 
@@ -7472,11 +7472,11 @@ X1_CROSS_COMP = "cc"
 X1_CROSS_CFLG = "-hcommand"
 CC_TOOLS        = 	$(X1_CROSS_COMP) $(X1_CROSS_CFLG)
 
-RWORDSIZE       = 4
+RWORDSIZE       = 8
 FCDEBUG         =       # -g
 FCBASEOPTS      =       -f free -N 255 -I. -Oscalar1 -Ovector0 -Ostream0 -x csd -Ossp
-FCFLAGS         =       -f free -N 255  -I. -Ofp3 -O3 -x csd -Ossp
-FCFLAGS2        =       -f free -N 255  -I. -Oipa1 -Ofp2 -x csd -O3 -Ossp
+FCFLAGS         =       -f free -N 255  -I. -Ofp3 -x csd -Ossp
+FCFLAGS2        =       -f free -N 255  -I. -Oipa1 -Ofp2 -x csd -Ossp
 PROMOTION	=	-r$(RWORDSIZE) -i4
 CFLAGS          =       -I../external/RSL_LITE -DMAXDOM_MAKE=$(MAX_DOMAINS) \
                         -DMAXPROC_MAKE=$(MAX_PROC) -DDM_PARALLEL -UCRAY -Dcrayx1 -h ssp
@@ -7597,7 +7597,7 @@ SFC		=	$(FC)
 LD              =       f90
 CC              =       cc
 SCC		=	$(CC)
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 ARCHFLAGS       =       CONFIGURE_NETCDF_FLAG -DINTIO -DTRIEDNTRUE -DLIMIT_ARGS -DFLOATSAFE \
                         -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4 
 PROMOTION	=	-r$(RWORDSIZE) -i4
@@ -7692,7 +7692,7 @@ SFC		=	$(FC)
 LD              =       f90
 CC              =       cc
 SCC		=	$(CC)
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 ARCHFLAGS       =       CONFIGURE_NETCDF_FLAG -DWRF_RSL_IO -DRSL -DINTIO -DTRIEDNTRUE -DLIMIT_ARGS \
                         -DDM_PARALLEL -DFLOATSAFE -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4 \
 			-DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) -DSTUBMPI
@@ -7796,7 +7796,7 @@ SFC		=	$(FC)
 LD              =       f90
 CC              =       cc
 SCC		=	$(CC)
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 ARCHFLAGS       =       CONFIGURE_NETCDF_FLAG -DINTIO -DTRIEDNTRUE -DLIMIT_ARGS -DFLOATSAFE \
                         -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4 
 PROMOTION	=	-r$(RWORDSIZE) -i4
@@ -7890,7 +7890,7 @@ SFC		=	$(FC)
 LD              =       f90
 CC              =       cc
 SCC		=	$(CC)
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 ARCHFLAGS       =       CONFIGURE_NETCDF_FLAG -DWRF_RSL_IO -DRSL -DINTIO -DTRIEDNTRUE -DLIMIT_ARGS -DFLOATSAFE \
                         -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4 -DSTUBMPI
 PROMOTION	=	-r$(RWORDSIZE) -i4
@@ -7984,7 +7984,7 @@ SFC		=	$(FC)
 LD              =       f90
 CC              =       cc
 SCC		=	$(CC)
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 ARCHFLAGS       =       CONFIGURE_NETCDF_FLAG -DINTIO -DTRIEDNTRUE -DLIMIT_ARGS -DFLOATSAFE \
                         -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4 
 PROMOTION	=	-r$(RWORDSIZE) -i4
@@ -8080,7 +8080,7 @@ SFC		=	f90
 LD              =       mpif90
 CC              =       mpicc
 SCC		=	cc
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 ARCHFLAGS       =       CONFIGURE_NETCDF_FLAG -DINTIO -DWRF_RSL_IO -DTRIEDNTRUE -DLIMIT_ARGS -DFLOATSAFE \
                         -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4  -DDM_PARALLEL -DRSL \
 			-DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC)
@@ -8187,7 +8187,7 @@ SFC		=	f90
 LD              =       mpif90
 CC              =       mpicc
 SCC		=	cc
-RWORDSIZE       =       4
+RWORDSIZE       =       8
 ARCHFLAGS       =       CONFIGURE_NETCDF_FLAG -DINTIO -DWRF_RSL_IO -DTRIEDNTRUE -DLIMIT_ARGS -DFLOATSAFE \
                         -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4  -DDM_PARALLEL -DRSL \
 			-DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC)
@@ -8295,12 +8295,12 @@ LD              =       xlf90_r
 #CC              =       cc_r
 CC              =       cc
 SCC		=	$(CC)
-RWORDSIZE       =	4
+RWORDSIZE       =	8
 PROMOTION	=	-qrealsize=$(RWORDSIZE) -qintsize=4
 CFLAGS          =       -DNOUNDERSCORE -DLANDREAD_STUB
-FCOPTIM         =       -O3 -qarch=auto #-qfloat=nomaf
+FCOPTIM         =       -O0 -qarch=auto #-qfloat=nomaf
 FCDEBUG         =       # -qnoopt -qfullpath
-FCBASEOPTS      =       -qsave $(FCDEBUG) -qmaxmem=32767 -w 
+FCBASEOPTS      =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767 -qinitauto=00 #-qflttrap=zerodivide:invalid:enable -qsigtrap
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS)
 INCLUDE_MODULES =       -I../external/io_netcdf -I../external/io_int  -I../external/esmf_time_f90 \
                         -I../frame -I../share -I../phys -I../inc
@@ -8315,13 +8315,13 @@ REGISTRY        =       Registry
 LIB             =       CONFIGURE_NETCDF_LIB_PATH \
                         -L../external/io_int -lwrfio_int \
                         -L../external/io_grib1 -lio_grib1 \
-			../frame/module_internal_header_util.o ../frame/pack_utils.o -L../external/esmf_time_f90 -lesmf_time 
+			../frame/module_internal_header_util.o ../frame/pack_utils.o -L../external/esmf_time_f90 -lesmf_time -L/usr/lib -lSystemStubs 
 
 LDFLAGS         =	 -Wl,-stack_size,10000000,-stack_addr,0xc0000000
 ENVCOMPDEFS	=	CONFIGURE_COMPILEFLAGS
 #CPP             =       /opt/ibmcmp/xlf/8.1/exe/cpp -C -P
 CPP             =       /usr/bin/cpp  -C -P -xassembler-with-cpp
-POUND_DEF	=	-DNONSTANDARD_SYSTEM -DF90_STANDALONE -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+POUND_DEF	=	-DMAC_OS -DNONSTANDARD_SYSTEM -DF90_STANDALONE -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 CPPFLAGS        =       -I$(LIBINCLUDE) -C -P $(ARCHFLAGS) $(COREDEFS) $(ENVCOMPDEFS) $(POUND_DEF) 
 AR              =       ar ru
 M4              =       m4 -B 10000
@@ -8359,7 +8359,7 @@ esmf_time :
 solve_interface.o : solve_interface.F
 	$(RM) $@
 	$(CPP) -I../inc $(CPPFLAGS) $*.F > $*.f
-	$(FC) -c -qfree=f90 -qspillsize=32767 -I. $(PROMOTION) $(MODULE_DIRS) $*.f
+	$(FC) -c -qfree=f90 -qspillsize=32767 -qinitauto=00 -I. $(PROMOTION) $(MODULE_DIRS) $*.f
 
 # compile these without high optimization to speed compile
 module_io_mm5.o : module_io_mm5.F
@@ -8419,12 +8419,12 @@ SFC		=	$(FC)
 LD              =       xlf90_r
 CC              =       cc
 SCC		=	$(CC)
-RWORDSIZE       =	4
+RWORDSIZE       =	8
 PROMOTION	=	-qrealsize=$(RWORDSIZE) -qintsize=4
 CFLAGS          =       -DNOUNDERSCORE -DLANDREAD_STUB
-FCOPTIM         =       -O2 -qarch=auto -qunroll=yes #-qfloat=nomaf
+FCOPTIM         =       -O0 -qarch=auto -qunroll=yes #-qfloat=nomaf
 FCDEBUG         =       # -qnoopt -qfullpath
-FCBASEOPTS      =       -w -qsave $(FCDEBUG) -qmaxmem=32767 #-qflttrap=zerodivide:invalid:enable -qsigtrap
+FCBASEOPTS      =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767 -qinitauto=00 #-qflttrap=zerodivide:invalid:enable -qsigtrap
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS)
 INCLUDE_MODULES =       -I../external/io_netcdf -I../external/io_int  -I../external/esmf_time_f90 \
                         -I../frame -I../share -I../phys -I../inc
@@ -8513,12 +8513,12 @@ LD              =       xlf90_r
 #CC              =       cc_r
 CC              =       cc
 SCC		=	$(CC)
-RWORDSIZE       =	4
+RWORDSIZE       =	8
 PROMOTION	=	-qrealsize=$(RWORDSIZE) -qintsize=4
 CFLAGS          =       -DNOUNDERSCORE -DLANDREAD_STUB
 FCOPTIM         =       -O0 -qarch=auto #-qfloat=nomaf
 FCDEBUG         =       # -qnoopt -qfullpath
-FCBASEOPTS      =       -qsave $(FCDEBUG) -qmaxmem=32767 -w 
+FCBASEOPTS      =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767 -qinitauto=00 #-qflttrap=zerodivide:invalid:enable -qsigtrap
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS)
 INCLUDE_MODULES =       -I../external/io_netcdf -I../external/io_int  -I../external/esmf_time_f90 \
                         -I../frame -I../share -I../phys -I../inc
@@ -8540,7 +8540,7 @@ LDFLAGS         =	 -Wl,-stack_size,10000000,-stack_addr,0xc0000000
 ENVCOMPDEFS	=	CONFIGURE_COMPILEFLAGS
 #CPP             =       /opt/ibmcmp/xlf/8.1/exe/cpp -C -P
 CPP             =       /usr/bin/cpp  -C -P -xassembler-with-cpp
-POUND_DEF	=	-DNONSTANDARD_SYSTEM -DF90_STANDALONE -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+POUND_DEF	=	-DMAC_OS -DNONSTANDARD_SYSTEM -DF90_STANDALONE -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 CPPFLAGS        =       -I$(LIBINCLUDE) -C -P $(ARCHFLAGS) $(COREDEFS) $(ENVCOMPDEFS) $(POUND_DEF) 
 AR              =       ar ru
 M4              =       m4 -B 10000
@@ -8580,7 +8580,7 @@ solve_interface.o : solve_interface.F
 	$(SED_FTN) $*.F > $*.b 
 	$(CPP) -I../inc $(CPPFLAGS) $*.b > $*.f
 	$(RM) $*.b
-	$(FC) -c -qfree=f90 -qspillsize=32767 -I. $(PROMOTION) $(MODULE_DIRS) $*.f
+	$(FC) -c -qfree=f90 -qspillsize=32767  -qinitauto=00 -I. $(PROMOTION) $(MODULE_DIRS) $*.f
 
 # compile these without high optimization to speed compile
 module_io_mm5.o : module_io_mm5.F
@@ -8626,6 +8626,131 @@ mediation_force_domain.o start_domain.o :
 	$(RM) $*.b
 	$(FC) -c $(PROMOTION) $(FCBASEOPTS) $(MODULE_DIRS) -qnoopt $*.f
 
+###########################################################
+#ARCH Darwin		(single-threaded, no nesting, g95 compiler)
+#     
+#     Using -qfloat=nomaf option can result in identical results with
+#           non-optimized and optimized results (suggested by Fovell of UCLA)
+#           One may turn on by uncommenting it in FCOPTIM line
+#
+FC              =       g95
+SFC		=	$(FC)
+LD              =       g95
+CC              =       cc
+SCC		=	$(CC)
+RWORDSIZE       =	8
+#PROMOTION	=	-ffree-form -ffree-line-length-huge -r$(RWORDSIZE) -i4
+PROMOTION	=	-ffree-form -ffree-line-length-huge -r$(RWORDSIZE) -i4 -fendian=big
+CFLAGS          =       -DF2CSTYLE -DLANDREAD_STUB
+FCOPTIM         =       -O0  #-qfloat=nomaf
+FCDEBUG         =       # -qnoopt -qfullpath
+FCBASEOPTS      =       -ffree-form -ffree-line-length-huge -fstatic $(FCDEBUG) 
+FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS)
+INCLUDE_MODULES =       -I../external/io_netcdf -I../external/io_int  -I../external/esmf_time_f90 \
+                        -I../frame -I../share -I../phys -I../inc
+EXTRAMODULES    =       
+ARCHFLAGS       =       -DYYY -DINTIO -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4 \
+                        CONFIGURE_NETCDF_FLAG -DTRIEDNTRUE   \
+			-DLIMIT_ARGS -DNO_NAMELIST_PRINT -DLANDREAD_STUB
+#			-DLIMIT_ARGS -DNO_NAMELIST_PRINT -DNATIVE_MASSV 
+PERL            =       CONFIGURE_PERL_PATH
+REGISTRY        =       Registry
+#LIB             =       CONFIGURE_NETCDF_LIB_PATH -lmass -lmassv 
+LIB             =       CONFIGURE_NETCDF_LIB_PATH \
+                        -L../external/io_int -lwrfio_int \
+                        -L../external/io_grib1 -lio_grib1 \
+                        -L/usr/lib -lSystemStubs \
+			../frame/module_internal_header_util.o ../frame/pack_utils.o -L../external/esmf_time_f90 -lesmf_time 
+
+LDFLAGS         =	 -Wl,-stack_size,10000000,-stack_addr,0xc0000000
+ENVCOMPDEFS	=	CONFIGURE_COMPILEFLAGS
+#CPP             =       /opt/ibmcmp/xlf/8.1/exe/cpp -C -P
+CPP             =       /usr/bin/cpp  -C -P -xassembler-with-cpp
+POUND_DEF	=	-DMAC_OS -DMAC_G95 -DNONSTANDARD_SYSTEM -DF90_STANDALONE -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+CPPFLAGS        =       -I$(LIBINCLUDE) -C -P $(ARCHFLAGS) $(COREDEFS) $(ENVCOMPDEFS) $(POUND_DEF) 
+AR              =       ar ru
+M4              =       m4 -B 10000
+RANLIB          =       ranlib
+NETCDFPATH	=	CONFIGURE_NETCDF_PATH
+CC_TOOLS        =       cc
+
+externals : CONFIGURE_WRFIO_NF wrfio_grib1 wrfio_int module_dm.F esmf_time
+
+module_dm.F :
+	( /bin/cp module_dm_warning module_dm.F ; cat module_dm_stubs.F >> module_dm.F )
+
+wrfio_nf : 
+	( cd ../external/io_netcdf ; make NETCDFPATH=CONFIGURE_NETCDF_PATH RANLIB="$(RANLIB)" CPP="$(CPP)" FC="$(FC) $(PROMOTION) $(FCDEBUG) " ; \
+	if [ $(RWORDSIZE) -eq 8 ] ; then \
+	  /bin/rm -f foo_io_flags.h; \
+	  sed -e 's/104/105/' wrf_io_flags.h > foo_io_flags.h ;\
+	  /bin/mv foo_io_flags.h wrf_io_flags.h ; fi ; \
+	/bin/cp wrf_io_flags.h wrf_status_codes.h ../../inc ; \
+	/bin/cp wrf_io_flags.h wrf_status_codes.h ../io_phdf5 ; \
+	/bin/cp wrf_io_flags.h ../io_quilt )
+
+wrfio_int : 
+	( cd ../external/io_int ; \
+          make CC="$(CC)" RANLIB="$(RANLIB)" CPP="$(CPP)" SFC="$(SFC) $(PROMOTION) $(FCDEBUG) $(FCBASEOPTS)" FC="$(FC) $(PROMOTION) $(FCDEBUG) " all )
+
+wrfio_grib1 :
+	( cd ../external/io_grib1 ; \
+          make CC="$(SCC)" CFLAGS="$(CFLAGS)" RANLIB="$(RANLIB)" CPP="$(CPP)" FC="$(FC) $(PROMOTION) $(FCDEBUG) " )
+
+esmf_time : 
+	( cd ../external/esmf_time_f90 ; \
+	  make FC="$(FC) $(PROMOTION) $(FCDEBUG) $(FCBASEOPTS)" RANLIB="$(RANLIB)" CPP="$(CPP) -I../../inc -I. $(POUND_DEF)" )
+
+solve_interface.o : solve_interface.F
+	$(RM) $@
+	$(SED_FTN) $*.F > $*.b 
+	$(CPP) -I../inc $(CPPFLAGS) $*.b > $*.f
+	$(RM) $*.b
+	$(FC) -c -ffree-form -ffree-line-length-huge  -I. $(PROMOTION) $(MODULE_DIRS) $*.f
+
+# compile these without high optimization to speed compile
+module_io_mm5.o : module_io_mm5.F
+module_si_io.o : module_si_io.F
+module_io_wrf.o : module_io_wrf.F
+module_domain.o : module_domain.F
+module_start.o : module_start.F
+module_initialize.o : module_initialize.F
+module_initialize_b_wave.o : module_initialize_b_wave.F
+module_initialize_hill2d_x.o : module_initialize_hill2d_x.F
+module_initialize_quarter_ss.o : module_initialize_quarter_ss.F
+module_initialize_squall2d_x.o : module_initialize_squall2d_x.F
+module_initialize_squall2d_y.o : module_initialize_squall2d_y.F
+module_initialize_real.o : module_initialize_real.F
+module_dm.o : module_dm.F
+start_domain.o : start_domain.F
+mediation_interp_domain.o : mediation_interp_domain.F
+mediation_force_domain.o : mediation_force_domain.F
+mediation_feedback_domain.o : mediation_feedback_domain.F
+convert_nmm.o : convert_nmm.F
+module_configure.o : module_configure.F
+
+module_io_mm5.o module_si_io.o module_io_wrf.o module_domain.o \
+module_start.o module_initialize.o module_initialize_b_wave.o  \
+module_initialize_hill2d_x.o module_initialize_quarter_ss.o    \
+module_initialize_squall2d_x.o module_initialize_squall2d_y.o  \
+module_initialize_real.o module_dm.o \
+mediation_interp_domain.o \
+module_configure.o                                             \
+convert_nmm.o :
+	$(RM) $@
+	$(SED_FTN) $*.F > $*.b 
+	$(CPP) -I../inc $(CPPFLAGS) $*.b  > $*.f
+	$(RM) $*.b
+	$(FC) -c $(PROMOTION) $(FCBASEOPTS) $(MODULE_DIRS) $*.f
+
+# to prevent having to call our service representative
+mediation_feedback_domain.o \
+mediation_force_domain.o start_domain.o :
+	$(RM) $@
+	$(SED_FTN) $*.F > $*.b
+	$(CPP) -I../inc $(CPPFLAGS) $*.b  > $*.f
+	$(RM) $*.b
+	$(FC) -c $(PROMOTION) $(FCBASEOPTS) $(MODULE_DIRS) $*.f
 
 ##################################################################
 #ARCH  NULL
