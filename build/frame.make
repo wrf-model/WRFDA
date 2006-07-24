@@ -31,10 +31,8 @@ wrf_num_bytes_between.o :
 	$(CC) -c $(CCFLAGS) wrf_num_bytes_between.c
 
 module_state_description.f90 : registry ../Registry/$(REGISTRY)
-	( cd ..; \
-	build/registry $(REGFLAGS) Registry/$(REGISTRY) ; \
-	$(LN) frame/module_state_description.f90 build; \
-	$(LN) $(INC)/* build )
+	./registry $(REGFLAGS) ../Registry/$(REGISTRY)
+	$(LN) frame/module_state_description.f90 .
 
 md_calls.inc : md_calls.m4
 	$(M4) md_calls.m4 > md_calls.inc

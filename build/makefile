@@ -94,9 +94,8 @@ libwrfvar.a : $(DA_OBJS) $(DA_MODULES)
 	$(RANLIB) libwrfvar.a
 
 clean : arch_clean
-	@ $(RM) *.exe *.o *.mod *.b *.a *.f $(INC)/*.inc registry \
-          Registry_tmp* $(FRAME)/module_state_description.f90 \
-          module_state_description.f90 bufrlib.prm \
+	@ $(RM) *.exe *.o *.mod *.b *.a *.f inc/*.inc frame/*.f90 registry \
+          Registry_tmp* module_state_description.f90 bufrlib.prm \
           $(EXTERNAL)/*.o $(EXTERNAL)/*.a $(EXTERNAL)/*/*.o $(EXTERNAL)/*/*.a \
           inc/dm_comm_cpp_flags depend
 	@ ( cd  $(EXTERNAL)/makedepf90/makedepf90-2.8.8; make clean )
