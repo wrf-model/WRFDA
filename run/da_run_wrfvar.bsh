@@ -1,4 +1,5 @@
-#!/bin/sh
+#!/bin/ksh
+set -x
 
 PLATFORM=`uname`
 
@@ -8,7 +9,7 @@ SVN_REV=`svnversion -n $DIR`
 export MP_SHARED_MEMORY=yes
 
 echo ""
-echo "Running script da_run_wrfvar.bsh"
+echo "Running script da_run_wrfvar.ksh"
 echo "---------------------------------"
 echo ""
 

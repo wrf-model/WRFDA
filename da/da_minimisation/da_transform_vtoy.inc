@@ -45,7 +45,7 @@ subroutine da_transform_vtoy( cv_size, be, ep, cv, iv, vp, vv, xa, xb, xbx, &
 #include "em_actual_args.inc"
                                  )
 
-      call system("da_run_wrfplus_tl.bsh")
+      call system("da_run_wrfplus_tl.ksh")
 
       do nobwin=1, num_fgat_time
          iv%current_ob_time = nobwin

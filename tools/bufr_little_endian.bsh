@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/ksh
 
 # Argument is input big endian BUFR file
 # Output to little endian BUFR, for PC Linux etc
