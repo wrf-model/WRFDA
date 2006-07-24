@@ -248,7 +248,7 @@ if test $NL_LVAR4D = .TRUE.; then
    mv namelist.input namelist.var4dad
 
 
-   export NL_DYN_OPT=202
+   export NL_DYN_OPT=302
    export NL_INPUT_OUTNAME='tl<date>'
    export NL_AUXHIST3_OUTNAME='auxhist3_d<domain>_<date>'
    . $WRFPLUS_INC_DIR/namelist_script.inc
