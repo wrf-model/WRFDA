@@ -1,10 +1,8 @@
 !MEDIATION_LAYER:SOLVE_V3D
-!
 
 SUBROUTINE da_solve_v3d ( grid , config_flags , &
-#include "em_dummy_args.inc"
+   #include "em_dummy_args.inc"
                  )
-
 
    ! Driver layer modules
    USE module_domain
@@ -37,7 +35,7 @@ SUBROUTINE da_solve_v3d ( grid , config_flags , &
    TYPE (grid_config_rec_type), intent(inout) :: config_flags
 
    ! Definitions of dummy arguments to solve
-#include "em_dummy_decl.inc"
+   #include "em_dummy_decl.inc"
 
    TYPE (xbx_type)              :: xbx         ! For header & non-grid arrays.
    TYPE (be_type)               :: be          ! Background error structure.
@@ -62,15 +60,17 @@ SUBROUTINE da_solve_v3d ( grid , config_flags , &
 
    call wrf_message("***  VARIATIONAL ANALYSIS ***")
 #ifdef DM_PARALLEL
-         call MPI_COMM_SIZE(MPI_COMM_WORLD, numb_procs, ierr)
+   call MPI_COMM_SIZE(MPI_COMM_WORLD, numb_procs, ierr)
 #else
-         numb_procs = 1
+   numb_procs = 1
 #endif
-!------------------------------------------------------------------------------
-! If it is verification run set check_max_iv as .false.
-!------------------------------------------------------------------------------
-   if( (analysis_type(1:6) == "VERIFY" .or.  analysis_type(1:6) == "verify") ) then
-     check_max_iv = .false.
+
+   !---------------------------------------------------------------------------
+   ! If it is verification run set check_max_iv as .false.
+   !---------------------------------------------------------------------------
+
+   if ((analysis_type(1:6)=="VERIFY" .or. analysis_type(1:6) == "verify")) then
+      check_max_iv = .false.
    endif
 
    ! Things that used to be done in da_read_namelist
@@ -90,22 +90,23 @@ SUBROUTINE da_solve_v3d ( grid , config_flags , &
    IF (use_Hirs2Obs .OR. use_Hirs3Obs .OR. use_MsuObs .OR. use_AmsuaObs .OR. &
       use_AmsubObs .OR. use_AirsObs .OR. use_Eos_AmsuaObs .OR. &
       use_Eos_RadObs .OR. use_HsbObs .OR. use_kma1dvar) THEN
-     use_radiance = .TRUE.
+      use_radiance = .TRUE.
    ELSE
-     use_radiance = .FALSE.
+      use_radiance = .FALSE.
    END IF
 
    ! testing_dm_exact can be set to .true. to force DM_PARALLEL runs 
    ! to produce results that are bitwise-identical regardless of the number of 
-   ! MPI tasks used.  This is useful for validating that multi-processor runs are 
-   ! not a source of bugs.  Runtime will be much longer.  This option is 
+   ! MPI tasks used.  This is useful for validating that multi-processor runs 
+   ! are not a source of bugs.  Runtime will be much longer.  This option is 
    ! automatically overridden to .false. for serial or 1-MPI-task runs.  
-   IF ( testing_dm_exact ) THEN
-      call wrf_get_nproc( nproc )
-      IF ( nproc == 1 ) THEN
+
+   IF (testing_dm_exact) THEN
+      call wrf_get_nproc(nproc)
+      IF (nproc == 1) THEN
          testing_dm_exact = .FALSE.
          WRITE(UNIT=stdout,FMT='(A)') &
-           ' testing_dm_exact overridden to .FALSE. for serial or 1-MPI-task run'
+            ' testing_dm_exact overridden to .FALSE. for serial or 1-MPI-task run'
       ENDIF
       ! Only implmenented for Sound and Synop, so switch other types off
       Use_ShipsObs         = .FALSE.
@@ -138,7 +139,7 @@ SUBROUTINE da_solve_v3d ( grid , config_flags , &
       Use_Radiance         = .FALSE.
    ENDIF
     
-   if ( num_pseudo > 0 ) then
+   if (num_pseudo > 0) then
       call wrf_message("Single OBS Test:: Turn off all the OBS switches ***")
       Use_SynopObs         = .FALSE.
       Use_ShipsObs         = .FALSE.
@@ -236,7 +237,7 @@ SUBROUTINE da_solve_v3d ( grid , config_flags , &
    !---------------------------------------------------------------------------
 
    call da_setup_firstguess( xbx, grid, &
-#include "em_dummy_args.inc"
+      #include "em_dummy_args.inc"
                            )
 
    !---------------------------------------------------------------------------
@@ -259,7 +260,7 @@ SUBROUTINE da_solve_v3d ( grid , config_flags , &
    !---------------------------------------------------------------------------
 
    ep % ne = be % ne
-   if ( be % ne > 0 ) THEN
+   if (be % ne > 0) THEN
       call da_setup_flow_predictors( ide, jde, kde, be % ne, ep )
    end if
 
@@ -278,7 +279,7 @@ SUBROUTINE da_solve_v3d ( grid , config_flags , &
    if ( test_transforms .or. Testing_WRFVAR ) then
       call da_get_innov_vector( it, ob, iv, &
                                 grid , config_flags , &
-#include "em_dummy_args.inc"
+         #include "em_dummy_args.inc"
                  )
 
       call da_allocate_y( iv, re )
@@ -316,10 +317,10 @@ SUBROUTINE da_solve_v3d ( grid , config_flags , &
 
       call da_get_innov_vector( it, ob, iv, &
                                 grid , config_flags , &
-#include "em_dummy_args.inc"
+         #include "em_dummy_args.inc"
                  )
 
-      if ( test_transforms ) then
+      if (test_transforms) then
          call da_check( cv_size, xb, xbx, be, ep, iv, &
                         xa, vv, vp, xp, ob, y, &
                         ids, ide, jds, jde, kds, kde, &
@@ -327,7 +328,7 @@ SUBROUTINE da_solve_v3d ( grid , config_flags , &
                         its, ite, jts, jte, kts, kte )
       end if
 
-      if ( testing_wrfvar ) then
+      if (testing_wrfvar) then
          call da_check( cv_size, xb, xbx, be, ep, iv, &
                         xa, vv, vp, xp, ob, y, &
                         ids, ide, jds, jde, kds, kde, &
@@ -336,11 +337,15 @@ SUBROUTINE da_solve_v3d ( grid , config_flags , &
       end if
 
       ! Write "clean" QCed observations if requested:
-     if( (analysis_type(1:6) == "QC-OBS" .or.  analysis_type(1:6) == "qc-obs") )then
-       if( it == 1) CALL da_write_filtered_obs(ob, iv, xb, xp, &
+      if ((analysis_type(1:6) == "QC-OBS" .or. &
+           analysis_type(1:6) == "qc-obs")) then
+         if (it == 1) then
+            CALL da_write_filtered_obs(ob, iv, xb, xp, &
                           grid%moad_cen_lat, grid%stand_lon,&
                           grid%truelat1, grid%truelat2 )
+         end if     
       endif
+
       if (lmonitoring) call wrf_shutdown
 
       ! [8.3] Interpolate x_g to low resolution grid
@@ -371,15 +376,13 @@ SUBROUTINE da_solve_v3d ( grid , config_flags , &
       ! [8.6] Only when use_RadarObs = .false. and W_INCREMENTS =.true.,
       !       the W_increment need to be diagnosed:
 
-      if (W_INCREMENTS .and. .not.use_RadarObs) then
-
+      if (W_INCREMENTS .and. .not. use_RadarObs) then
          call da_uvprho_to_w_lin( xb, xa, xp,                 &
                                   ids,ide, jds,jde, kds,kde,  &
                                   ims,ime, jms,jme, kms,kme,  &
                                   its,ite, jts,jte, kts, kte )
 
          call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id13)
-
       endif
 
       ! [8.7] Write out diagnostics
@@ -391,8 +394,8 @@ SUBROUTINE da_solve_v3d ( grid , config_flags , &
       !------------------------------------------------------------------------
 
       call da_transfer_xatoanalysis( it, xbx, grid, config_flags ,&
-#include "em_dummy_args.inc"
-                           )
+         #include "em_dummy_args.inc"
+         )
    END DO
 
    !---------------------------------------------------------------------------
