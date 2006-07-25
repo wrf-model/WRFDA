@@ -4,7 +4,7 @@ subroutine da_wrfvar_interface ( grid, config_flags )
 
 #ifndef DEREF_KLUDGE
    INTERFACE
-      subroutine da_solve_v3d ( grid , config_flags , &
+      subroutine da_solve ( grid , config_flags , &
 #include "em_dummy_args.inc"
       )
 
@@ -34,7 +34,7 @@ subroutine da_wrfvar_interface ( grid, config_flags )
 
 #include "em_dummy_decl.inc"
 
-      end subroutine da_solve_v3d
+      end subroutine da_solve
    END INTERFACE
 #endif
 
@@ -65,7 +65,7 @@ subroutine da_wrfvar_interface ( grid, config_flags )
    em33             = grid%em33
 #endif
 
-   call da_solve_v3d ( grid , config_flags , &
+   call da_solve ( grid , config_flags , &
 #include "em_actual_args.inc"
     )
 

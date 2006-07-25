@@ -1,5 +1,4 @@
-DA_MODULES        =	da_solve_v3d.o		\
-			da_par_util.o           \
+DA_MODULES        =	da_par_util.o           \
 			da_par_util1.o          \
 			da_setup_structures.o	\
 			da_minimisation.o	\
@@ -49,7 +48,7 @@ DA_MODULES        =	da_solve_v3d.o		\
                         da_reporting.o
 
 DA_OBJS        =	da_memory.o \
-                        da_solve_v3d.o
+                        da_solve.o
 
 inc/da_generic_boilerplate.inc: da_generic_boilerplate.m4
 	@ $(RM) inc/da_generic_boilerplate.inc
