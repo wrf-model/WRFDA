@@ -23,8 +23,8 @@ if test $HOSTNAME = "bs1101en" -o $HOSTNAME = "bs1201en"; then # bluesky
   let TEMP=$NUM_PROCS-1
   let NODES=$TEMP/8+1
 
-  cat > job.bsh <<EOF
-#!/bin/sh
+  cat > job.ksh <<EOF
+#!/bin/ksh
 ##@ network.MPI=csss,shared,us
 ##@ notification=error
 #IBM:
@@ -52,12 +52,12 @@ if test $HOSTNAME = "bs1101en" -o $HOSTNAME = "bs1201en"; then # bluesky
 #PBS -V -A sfmlidar
 #PBS -lnodes=4:comp -lwalltime=1000
 #Uncomment for JET: source /usr/local/bin/setup-mpi.csh
-. $DA_DIR/run/da_run_wrfvar.bsh
+. $DA_DIR/run/da_run_wrfvar.ksh
 EOF
 
-  llsubmit job.bsh
+  llsubmit job.ksh
 else
-  $DA_DIR/run/da_run_wrfvar.bsh
+  $DA_DIR/run/da_run_wrfvar.ksh
 fi
 
 exit 0
