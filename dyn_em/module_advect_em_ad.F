@@ -36,6 +36,7 @@ use module_model_constants
 use module_wrf_error
 use module_advect_em
 
+
 !==============================================
 ! all entries are defined explicitly
 !==============================================
@@ -793,7 +794,8 @@ a_horizontal_order_test: if (horz_order .eq. 6) then
       jp1 = jp0
       jp0 = jtmp
     end do j_loop_y_flux_9c
-    if (j .gt. j_start) then
+!    if (j .gt. j_start) then
+    if (j .gt. jds+1) then
       do k = kts, ktf
         do i = i_start, i_end
           mrdy = msft(i,j-1)*rdy
@@ -1061,6 +1063,7 @@ else if (horz_order .eq. 5) then a_horizontal_order_test
     j_end = min(jte,jde-2)
   endif
 ! recompute vars : j_end
+
   a_j_loop_y_flux_5: do j = j_end+1, j_start, -1
 ! recompute pos : ASSIGN_STMT module_advect_em.f90:3080
 ! recompute vars : jp1
@@ -1076,7 +1079,8 @@ else if (horz_order .eq. 5) then a_horizontal_order_test
       jp1 = jp0
       jp0 = jtmp
     end do j_loop_y_flux_9a
-    if (j .gt. j_start) then
+!    if (j .gt. j_start) then
+    if (j .gt. jds+1) then
       do k = kts, ktf
         do i = i_start, i_end
           mrdy = msft(i,j-1)*rdy
@@ -1107,6 +1111,9 @@ else if (horz_order .eq. 5) then a_horizontal_order_test
           a_vel = 0.
         end do
       end do
+
+
+
     else if (j .eq. jds+1) then
       do k = kts, ktf
         do i = i_start, i_end
@@ -1243,7 +1250,8 @@ else if (horz_order .eq. 4) then a_horizontal_order_test
       jp1 = jp0
       jp0 = jtmp
     end do
-    if (j .gt. j_start) then
+!    if (j .gt. j_start) then
+    if (j .gt. jds+1) then
       do k = kts, ktf
         do i = i_start, i_end
           mrdy = msft(i,j-1)*rdy
@@ -1435,7 +1443,8 @@ else if (horz_order .eq. 3) then a_horizontal_order_test
       jp1 = jp0
       jp0 = jtmp
     end do
-    if (j .gt. j_start) then
+!    if (j .gt. j_start) then
+    if (j .gt. jds+1) then
       do k = kts, ktf
         do i = i_start, i_end
           mrdy = msft(i,j-1)*rdy
@@ -2515,7 +2524,8 @@ a_horizontal_order_test: if (horz_order .eq. 6) then
       jp1 = jp0
       jp0 = jtmp
     end do j_loop_y_flux_9c
-    if (j .gt. j_start) then
+!    if (j .gt. j_start) then
+    if (j .gt. jds+1) then
       do k = kts, ktf
         do i = i_start, i_end
           mrdy = msfu(i,j-1)*rdy
@@ -2846,7 +2856,8 @@ else if (horz_order .eq. 5) then a_horizontal_order_test
       jp1 = jp0
       jp0 = jtmp
     end do j_loop_y_flux_9a
-    if (j .gt. j_start) then
+!    if (j .gt. j_start) then
+    if (j .gt. jds+1) then
       do k = kts, ktf
         do i = i_start, i_end
           mrdy = msfu(i,j-1)*rdy
@@ -3024,7 +3035,8 @@ else if (horz_order .eq. 4) then a_horizontal_order_test
       jp1 = jp0
       jp0 = jtmp
     end do
-    if (j .gt. j_start) then
+!    if (j .gt. j_start) then
+    if (j .gt. jds+1) then
       do k = kts, ktf
         do i = i_start, i_end
           mrdy = msfu(i,j-1)*rdy
@@ -3270,7 +3282,8 @@ else if (horz_order .eq. 3) then a_horizontal_order_test
       jp1 = jp0
       jp0 = jtmp
     end do
-    if (j .gt. j_start) then
+!      if (j .gt. j_start) then
+    if (j .gt. jds+1) then
       do k = kts, ktf
         do i = i_start, i_end
           mrdy = msfu(i,j-1)*rdy
@@ -4453,7 +4466,8 @@ a_horizontal_order_test: if (horz_order .eq. 6) then
       jp1 = jp0
       jp0 = jtmp
     end do j_loop_y_flux_9c
-    if (j .gt. j_start) then
+!     if (j .gt. j_start) then
+    if (j .gt. jds+1) then
       do k = kts, ktf
         do i = i_start, i_end
           mrdy = msfv(i,j-1)*rdy
@@ -4780,7 +4794,8 @@ else if (horz_order .eq. 5) then a_horizontal_order_test
       jp1 = jp0
       jp0 = jtmp
     end do j_loop_y_flux_9a
-    if (j .gt. j_start) then
+!    if (j .gt. j_start) then
+    if (j .gt. jds+1) then
       do k = kts, ktf
         do i = i_start, i_end
           mrdy = msfv(i,j-1)*rdy
@@ -5050,7 +5065,8 @@ else if (horz_order .eq. 4) then a_horizontal_order_test
       jp1 = jp0
       jp0 = jtmp
     end do
-    if (j .gt. j_start) then
+!    if (j .gt. j_start) then
+    if (j .gt. jds+1) then
       do k = kts, ktf
         do i = i_start, i_end
           mrdy = msfv(i,j-1)*rdy
@@ -5280,7 +5296,8 @@ else if (horz_order .eq. 3) then a_horizontal_order_test
       jp1 = jp0
       jp0 = jtmp
     end do
-    if (j .gt. j_start) then
+!    if (j .gt. j_start) then
+    if (j .gt. jds+1) then
       do k = kts, ktf
         do i = i_start, i_end
           mrdy = msfv(i,j-1)*rdy
@@ -6543,7 +6560,8 @@ a_horizontal_order_test: if (horz_order .eq. 6) then
       jp1 = jp0
       jp0 = jtmp
     end do j_loop_y_flux_9c
-    if (j .gt. j_start) then
+!    if (j .gt. j_start) then
+    if (j .gt. jds+1) then
       do k = kts+1, ktf+1
         do i = i_start, i_end
           mrdy = msft(i,j-1)*rdy
@@ -6967,7 +6985,8 @@ else if (horz_order .eq. 5) then a_horizontal_order_test
       jp1 = jp0
       jp0 = jtmp
     end do j_loop_y_flux_9a
-    if (j .gt. j_start) then
+!    if (j .gt. j_start) then
+    if (j .gt. jds+1) then
       do k = kts+1, ktf+1
         do i = i_start, i_end
           mrdy = msft(i,j-1)*rdy
@@ -7209,7 +7228,8 @@ else if (horz_order .eq. 4) then a_horizontal_order_test
       jp1 = jp0
       jp0 = jtmp
     end do
-    if (j .gt. j_start) then
+!    if (j .gt. j_start) then
+    if (j .gt. jds+1) then
       do k = kts+1, ktf+1
         do i = i_start, i_end
           mrdy = msft(i,j-1)*rdy
@@ -7485,7 +7505,8 @@ else if (horz_order .eq. 3) then a_horizontal_order_test
       jp1 = jp0
       jp0 = jtmp
     end do
-    if (j .gt. j_start) then
+!    if (j .gt. j_start) then
+    if (j .gt. jds+1) then
       do k = kts+1, ktf+1
         do i = i_start, i_end
           mrdy = msft(i,j-1)*rdy

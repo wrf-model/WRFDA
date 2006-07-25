@@ -34,10 +34,15 @@ subroutine DA_Transform_VToY(be, cv, iv, vp, vv, xa, xb, xbx, xp, y, &
       type(grid_config_rec_type), intent(inout) :: config_flags
 
       integer :: nobwin
+      integer ierr,comm
 
       character(len=4) :: filnam
 
+!------------------------------------------------------------------------------
+      LOGICAL, EXTERNAL :: wrf_dm_on_monitor     ! For statistics output.
+!------------------------------------------------------------------------------
 !
+      CALL wrf_debug(100,"entering DA_Transform_VToY")
       call da_transform_vtox( xb, xbx, be, cv, vv, vp, xp, xa,  &
                               ids, ide, jds, jde, kds, kde,     &
                               ims, ime, jms, jme, kms, kme,     &
@@ -51,7 +56,27 @@ subroutine DA_Transform_VToY(be, cv, iv, vp, vv, xa, xb, xbx, xp, y, &
 #include <em_actual_args.inc>
                                  )
 
+#ifdef DM_PARALLEL
+         call system_4dv("runvar4dtl.csh pre ")
+
+         IF ( wrf_dm_on_monitor() ) THEN
+           call system("rm wrf_done")
+           call system("touch wrf_go_ahead")
+           DO WHILE ( .true. )
+             OPEN(99,file="wrf_done",status="old",err=303)
+             CLOSE(99)
+             EXIT
+303          CONTINUE
+             CALL system("sleep 1")
+           ENDDO
+         ENDIF
+         CALL wrf_get_dm_communicator ( comm )
+         CALL mpi_barrier( comm, ierr )
+
+         call system_4dv("runvar4dtl.csh post ")
+#else
          call system("runvar4dtl.csh")
+#endif
 
          do nobwin=1, num_fgat_time
             iv%current_ob_time = nobwin
@@ -71,6 +96,8 @@ subroutine DA_Transform_VToY(be, cv, iv, vp, vv, xa, xb, xbx, xp, y, &
          call da_transform_xtoy( xb, iv, xa, xp, y )
 
       endif ! lvar4d
+
+      CALL wrf_debug(100,"leaving DA_Transform_VToY")
 
 end subroutine DA_Transform_VToY
 

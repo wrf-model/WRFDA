@@ -9,6 +9,9 @@ subroutine da_calculate_j( it, iter, xb, xbx, be, iv, xhat, cv, vv, &
 !
 ! PARENT_MODULE: DA_DA_Minimisation  
 !------------------------------------------------------------------------------
+#ifdef DM_PARALLEL
+   USE module_dm, ONLY : mpi_comm_local
+#endif
 
       implicit none
 
@@ -49,6 +52,8 @@ subroutine da_calculate_j( it, iter, xb, xbx, be, iv, xhat, cv, vv, &
 
 !-------------------------------------------------------------------------
       
+      CALL wrf_debug(100,"entering da_calculate_j")
+
       call da_allocate_y( iv, jo_grad_y )
 
 !-------------------------------------------------------------------------
@@ -78,7 +83,7 @@ subroutine da_calculate_j( it, iter, xb, xbx, be, iv, xhat, cv, vv, &
 
 #ifdef DM_PARALLEL
       call MPI_ALLREDUCE( jo_partial, j % jo % total, 1, TRUE_MPI_REAL, MPI_SUM, &
-                          MPI_COMM_WORLD, IERROR )
+                          mpi_comm_local, IERROR )
 #else
       j % jo % total = jo_partial
 #endif
@@ -165,6 +170,8 @@ subroutine da_calculate_j( it, iter, xb, xbx, be, iv, xhat, cv, vv, &
       gnorm_j = sqrt(gnorm_j )
 
       write(82,81) it, EPS(it), iter, gnorm_j, gnorm_cv, gnorm_jo
+
+      CALL wrf_debug(100,"leaving da_calculate_j")
 
   end subroutine da_calculate_j
 

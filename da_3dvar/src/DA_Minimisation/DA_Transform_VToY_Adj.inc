@@ -34,9 +34,16 @@ subroutine DA_Transform_VToY_Adj(be, cv, iv, vp, vv, xa, xb, xbx, xp, y, &
       type(grid_config_rec_type), intent(inout) :: config_flags
 
       integer :: nobwin,ndynopt
+      integer ierr, comm
 
       character(len=4) :: filnam
+!------------------------------------------------------------------------------
+      LOGICAL, EXTERNAL :: wrf_dm_on_monitor     ! For statistics output.
+!------------------------------------------------------------------------------
+
 !-------------------------------------------------------------------------
+
+      CALL wrf_debug(100,"entering DA_Transform_VToY_Adj")
 
       if ( lvar4d ) then
 
@@ -52,7 +59,28 @@ subroutine DA_Transform_VToY_Adj(be, cv, iv, vp, vv, xa, xb, xbx, xp, y, &
                                  )
          enddo
 
+#ifdef DM_PARALLEL
+         call system_4dv("runvar4dad.csh pre ")
+
+         IF ( wrf_dm_on_monitor() ) THEN
+           call system("rm wrf_done")
+           call system("touch wrf_go_ahead")
+           DO WHILE ( .true. )
+             OPEN(99,file="wrf_done",status="old",err=303)
+             CLOSE(99)
+             EXIT
+303          CONTINUE
+             CALL system("sleep 1")
+           ENDDO
+         ENDIF
+         CALL wrf_get_dm_communicator ( comm )
+         CALL mpi_barrier( comm, ierr )
+
+         call system_4dv("runvar4dad.csh post ")
+#else
          call system("runvar4dad.csh")
+#endif
+
          filnam = 'gr00'
          call DA_Transfer_XatoWRFTL_Adj( grid, config_flags, filnam, &
 #include <em_actual_args.inc>
@@ -74,6 +102,8 @@ subroutine DA_Transform_VToY_Adj(be, cv, iv, vp, vv, xa, xb, xbx, xp, y, &
                                ids, ide, jds, jde, kds, kde,       &
                                ims, ime, jms, jme, kms, kme,       &
                                its, ite, jts, jte, kts, kte )
+
+      CALL wrf_debug(100,"leaving DA_Transform_VToY_Adj")
 !
 end subroutine DA_Transform_VToY_Adj
 

@@ -36,7 +36,7 @@ MODULE module_dm
    INTEGER llen_ty(3)
    INTEGER ips_save, jps_save
    INTEGER ipe_save, jpe_save
-   INTEGER, PRIVATE :: mpi_comm_local
+   INTEGER          :: mpi_comm_local
    INTEGER, PRIVATE :: nproc_lt, nproc_ln
 
 #if ( RWORDSIZE != DWORDSIZE )
@@ -2912,7 +2912,14 @@ messages(120)=  s5e5
         ! should already be stored and use that.
         CALL mpi_init ( ierr )
         CALL wrf_termio_dup
+#  if DA_CORE==1
+        ! IBM specific, for use with -pgmmodel mpmd and -cmdfile
+        ! color=2 means this is the communicator assigned to the DA processes
+        CALL mpi_comm_split( MPI_COMM_WORLD , 2 , 1 , mpi_comm_local, ierr )
+        CALL wrf_set_dm_communicator ( mpi_comm_local )
+#  else
         CALL wrf_set_dm_communicator ( MPI_COMM_WORLD )
+#  endif
       ENDIF
       CALL wrf_get_dm_communicator( mpi_comm_local )
       CALL wrf_termio_dup

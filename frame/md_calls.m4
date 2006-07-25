@@ -46,6 +46,7 @@ LOGICAL, EXTERNAL           :: wrf_dm_on_monitor, multi_files, use_output_server
 INTEGER                     :: locCount
 
 INTEGER io_form , Hndl
+CHARACTER*20 DataSet
 
 CALL wrf_debug( DEBUG_LVL, "module_io.F (md_calls.m4) : in wrf_$1_$2_$6_$3$4_$5 " )
 
@@ -54,7 +55,7 @@ ifelse($3,real,`locCount = Count')
 ifelse($3,logical,`locCount = Count')
 
 Status = 0
-CALL get_handle ( Hndl, io_form , for_out, DataHandle )
+CALL get_handle ( Hndl, io_form , for_out, DataSet, DataHandle )
 IF ( Hndl .GT. -1 ) THEN
   IF ( multi_files( io_form ) .OR. .NOT. (for_out .AND. use_output_servers()) ) THEN
     SELECT CASE ( use_package( io_form ) )

@@ -13,6 +13,9 @@ SUBROUTINE DA_GET_SPoles(x,              &
 !
 !  PARENT_MODULE: DA_Tools              
 !------------------------------------------------------------------------------
+#ifdef DM_PARALLEL
+   USE module_dm, ONLY : mpi_comm_local
+#endif
    IMPLICIT NONE
    
 
@@ -31,7 +34,7 @@ SUBROUTINE DA_GET_SPoles(x,              &
    if( jts == jds)  tmp_s = tmpvar*sum(x(its:ite,jts+1,k))
 
 #ifdef DM_PARALLEL
-   call MPI_ALLREDUCE(tmp_s,tmps,1, MPI_REAL8, MPI_SUM, MPI_COMM_WORLD, IERROR )
+   call MPI_ALLREDUCE(tmp_s,tmps,1, MPI_REAL8, MPI_SUM, mpi_comm_local, IERROR )
 #else
    tmps = tmp_s                    
 #endif
@@ -41,7 +44,7 @@ SUBROUTINE DA_GET_SPoles(x,              &
    if( jte == jde) tmp_s = tmpvar*sum(x(its:ite,jte-1,k))
 
 #ifdef DM_PARALLEL
-   call MPI_ALLREDUCE(tmp_s,tmps,1, MPI_REAL8, MPI_SUM, MPI_COMM_WORLD, IERROR )
+   call MPI_ALLREDUCE(tmp_s,tmps,1, MPI_REAL8, MPI_SUM, mpi_comm_local, IERROR )
 #else
    tmps = tmp_s                    
 #endif

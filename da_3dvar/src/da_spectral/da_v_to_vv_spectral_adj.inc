@@ -8,6 +8,9 @@ subroutine da_v_to_vv_spectral_adj(xbx, power, rcv, field, &
 !
 !  History:   November 20th 2004: Coded by   Syed RH Rizvi
 !-------------------------------------------------------------------------
+#ifdef DM_PARALLEL
+   USE module_dm, ONLY : mpi_comm_local
+#endif
 
    implicit none
 
@@ -85,7 +88,7 @@ subroutine da_v_to_vv_spectral_adj(xbx, power, rcv, field, &
                               cv_local(index_start:index_end), v_fou(jts:jte,m) )
 
       n = index_end - index_start + 1
-      call MPI_ALLREDUCE( cv_local(index_start:index_end), cv(index_start:index_end), n, TRUE_MPI_COMPLEX, MPI_SUM, MPI_COMM_WORLD, IER )
+      call MPI_ALLREDUCE( cv_local(index_start:index_end), cv(index_start:index_end), n, TRUE_MPI_COMPLEX, MPI_SUM, mpi_comm_local, IER )
 #else
       call da_legtra_inv_adj( jds, jde, jts, jte, xbx%max_wavenumber, xbx%alp_size, m, xbx%alp, &
                                cv(index_start:index_end), v_fou(jts:jte,m) )

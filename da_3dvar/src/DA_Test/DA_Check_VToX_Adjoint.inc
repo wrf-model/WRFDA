@@ -11,6 +11,9 @@ SUBROUTINE DA_Check_VToX_Adjoint( xb, xbx, be, cv1, vv, vp, xp, xa, &
 !
 !  HISTORY: 02/23/2000 - Creation of F90 version.           Dale Barker
 !------------------------------------------------------------------------------
+#ifdef DM_PARALLEL
+   USE module_dm, ONLY : mpi_comm_local
+#endif
 
    IMPLICIT NONE
 
@@ -147,13 +150,13 @@ SUBROUTINE DA_Check_VToX_Adjoint( xb, xbx, be, cv1, vv, vp, xp, xa, &
 
 #ifdef DM_PARALLEL
    call MPI_ALLREDUCE( adj_par_lhs, adj_sum_lhs, 1, TRUE_MPI_REAL, MPI_SUM, &
-                       MPI_COMM_WORLD, IERROR )
+                       mpi_comm_local, IERROR )
 
    if( global ) then
    adj_sum_rhs = adj_par_rhs
    else
    call MPI_ALLREDUCE( adj_par_rhs, adj_sum_rhs, 1, TRUE_MPI_REAL, MPI_SUM, &
-                       MPI_COMM_WORLD, IERROR )
+                       mpi_comm_local, IERROR )
    end if
 
    IF ( wrf_dm_on_monitor() ) THEN

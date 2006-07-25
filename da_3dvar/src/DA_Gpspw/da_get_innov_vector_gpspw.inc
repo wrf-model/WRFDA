@@ -3,6 +3,9 @@ SUBROUTINE da_get_innov_vector_gpspw ( it, xb, xp, ob, iv )
 !    Reviewed and re-written part of the code by Y.-R. Guo.           
 !                                                    07/16/2004
 !----------------------------------------------------------------
+#ifdef DM_PARALLEL
+   USE module_dm, ONLY : mpi_comm_local
+#endif
    IMPLICIT NONE
 
 !-----
@@ -34,7 +37,7 @@ SUBROUTINE da_get_innov_vector_gpspw ( it, xb, xp, ob, iv )
 
    LOGICAL, EXTERNAL :: wrf_dm_on_monitor
 
-!   call MPI_COMM_RANK( MPI_COMM_WORLD, myrank, ierr )
+!   call MPI_COMM_RANK( mpi_comm_local, myrank, ierr )
    myrank=0
    unit_gps = myrank + 140
 !---------------------------------------------------------------------------

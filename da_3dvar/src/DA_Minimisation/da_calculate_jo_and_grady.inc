@@ -24,6 +24,8 @@
 !     [1.0] Compute components of Grad_y(Jo):
 !-------------------------------------------------------------------------
 
+      CALL wrf_debug( 100, "entering da_calculate_jo_and_grady")
+
 !     Radiosonde
 
       call da_calculate_jo_and_grady_Sound( iv, re, jo, jo_grad_y)
@@ -169,7 +171,15 @@
       call da_calculate_jo_and_grady_bogus ( iv, re, jo, jo_grad_y)
       jo_bogus = jo % bogus_u + jo % bogus_v + jo % bogus_slp + &
                   jo % bogus_t + jo % bogus_q
-
+      if(print_detail > 0) then
+         write(unit=*, fmt='(a, e24.12)') &
+              'jo_bogus =', jo_bogus, &
+              'jo%bogus_u =', jo%bogus_u, &
+              'jo%bogus_v =', jo%bogus_v, &
+              'jo%bogus_t =', jo%bogus_t, &
+              'jo%bogus_q =', jo%bogus_q, &
+              'jo%bogus_slp =', jo%bogus_slp
+      endif
       
 !     Buoy: 
 
@@ -215,6 +225,8 @@
               'jo_gpsref =', jo_gpsref, &
               'jo_bogus =', jo_bogus
       endif
+
+      CALL wrf_debug( 100, "leaving da_calculate_jo_and_grady")
                    
       end subroutine da_calculate_jo_and_grady
 

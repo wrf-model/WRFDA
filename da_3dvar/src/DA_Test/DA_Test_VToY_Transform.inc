@@ -12,6 +12,9 @@ SUBROUTINE DA_Test_VToY_Transform(grid, config_flags, vp, vv, &
 !  HISTORY: 07/21/2005            Syed  RH  Rizvi
 !
 !------------------------------------------------------------------------------
+#ifdef DM_PARALLEL
+   USE module_dm, ONLY : mpi_comm_local
+#endif
 
    IMPLICIT NONE
 
@@ -97,7 +100,7 @@ SUBROUTINE DA_Test_VToY_Transform(grid, config_flags, vp, vv, &
    adj_sum_rhs = adj_rhs
   else
    call MPI_ALLREDUCE( adj_rhs, adj_sum_rhs, 1, TRUE_MPI_REAL, MPI_SUM, &
-                       MPI_COMM_WORLD, IERROR )
+                       mpi_comm_local, IERROR )
   end if
 #else
    adj_sum_rhs = adj_rhs

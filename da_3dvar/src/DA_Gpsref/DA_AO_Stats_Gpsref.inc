@@ -5,6 +5,9 @@ SUBROUTINE DA_AO_Stats_GPSRef( stats_unit, oi, re )
 !
 !                                           Y.-R. Guo  06/02/2004
 ! ----------------------------------------------------------------------
+#ifdef DM_PARALLEL
+   USE module_dm, ONLY : mpi_comm_local
+#endif
    IMPLICIT NONE
 
    INTEGER,        INTENT (in)      :: stats_unit    ! Output unit for stats.
@@ -58,13 +61,13 @@ SUBROUTINE DA_AO_Stats_GPSRef( stats_unit, oi, re )
 #ifdef DM_PARALLEL 
 #if 0
    call MPI_ALLREDUCE( o_minus_b, o_minus_b_0, 1, TRUE_MPI_REAL, MPI_SUM, & 
-                       MPI_COMM_WORLD, IERROR ) 
+                       mpi_comm_local, IERROR ) 
    call MPI_ALLREDUCE( o_minus_a, o_minus_a_0, 1, TRUE_MPI_REAL, MPI_SUM, & 
-                       MPI_COMM_WORLD, IERROR ) 
+                       mpi_comm_local, IERROR ) 
    call MPI_ALLREDUCE( sigma_o, sigma_o_0, 1, TRUE_MPI_REAL, MPI_SUM, & 
-                       MPI_COMM_WORLD, IERROR ) 
+                       mpi_comm_local, IERROR ) 
    call MPI_ALLREDUCE( sigma_b, sigma_b_0, 1, TRUE_MPI_REAL, MPI_SUM, & 
-                       MPI_COMM_WORLD, IERROR ) 
+                       mpi_comm_local, IERROR ) 
    IF ( wrf_dm_on_monitor() ) THEN 
              write(stats_unit,'(/A,A3,A,f12.3)')  &
                          ' Pseudo ', pseudo_var, ' O-B: ', o_minus_b_0

@@ -101,7 +101,7 @@ fprintf(fp,"CALL wrf_debug(2,'calling %s')\n",fname) ;
           else
           {
             if ( q->node_kind & FOURD ) {
-#if 1
+
               if ( n4d < MAX_4DARRAYS ) {
                 strcpy( name_4d[n4d], q->name ) ;
               } else { 
@@ -111,26 +111,7 @@ fprintf(fp,"CALL wrf_debug(2,'calling %s')\n",fname) ;
                 exit(5) ;
               }
               n4d++ ;
-#else
-              node_t *member ;
-              zdex = get_index_for_coord( q , COORD_Z ) ;
-              if ( zdex >=1 && zdex <= 3 )
-              {
-                for ( member = q->members ; member != NULL ; member = member->next )
-                {
-                  if ( strcmp( member->name, "-" ) )
-                  {
-                    if        ( ! strcmp( q->type->name, "real") ) n3dR++ ;
-                    else if   ( ! strcmp( q->type->name, "integer") ) n3dI++ ;
-                    else if   ( ! strcmp( q->type->name, "doubleprecision") ) n3dD++ ;
-                  }
-                }
-              }
-              else
-              {
-                fprintf(stderr,"WARNING: %d some dimension info missing for 4d array %s\n",zdex,t2) ;
-              }
-#endif
+
             }
             else
             {
@@ -368,7 +349,7 @@ fprintf(fp,"CALL wrf_debug(3,wrf_err_message)\n") ;
                     fprintf(fp,"ips, ipe, jps, jpe, %d, %d              )\n",dimd->coord_start,dimd->coord_end) ;
                   }
                 }
-              } else {
+              } else if ( q->ndims == 2 ) {
 #if 0
 fprintf(fp,"write(wrf_err_message,*)' d ',ids, ide, jds, jde, 1, 1\n" ) ;
 fprintf(fp,"CALL wrf_debug(3,wrf_err_message)\n") ;
@@ -382,6 +363,8 @@ fprintf(fp,"CALL wrf_debug(3,wrf_err_message)\n") ;
                 fprintf(fp,"ids, ide, jds, jde, 1  , 1  ,             &\n") ;
                 fprintf(fp,"ims, ime, jms, jme, 1  , 1  ,             &\n") ;
                 fprintf(fp,"ips, ipe, jps, jpe, 1  , 1                )\n") ;
+              } else {
+                fprintf(stderr,"Registry WARNING: %s is not 2 or 3 dimensional\n",t2) ;
               }
 #if 0
 fprintf(fp,"CALL wrf_debug(3,'back from RSL_LITE_PACK')\n") ;
@@ -1036,7 +1019,7 @@ int
 gen_comms ( char * dirname )
 {
   if ( sw_dm_parallel )
-    fprintf(stderr,"ADVISORY: RSL version of gen_comms is linked in with registry program.\n") ;
+    fprintf(stderr,"ADVISORY: RSL_LITE version of gen_comms is linked in with registry program.\n") ;
 
   gen_halos( "inc" ) ;
   gen_shift( "inc" ) ;

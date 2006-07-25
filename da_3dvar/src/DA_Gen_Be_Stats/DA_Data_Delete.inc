@@ -18,14 +18,14 @@ Subroutine DA_Data_Delete(file_date)
 
        write(*,'(a90)') trim(cmd_line)
 
-       call system(cmd_line)
+       call system_4dv(cmd_line)
 
        cmd_line = 'rm -rf '//trim(directory_name)//'/' &
                    //'*.tar'
 
        write(*,'(a90)') trim(cmd_line)
 
-       call system(cmd_line)
+       call system_4dv(cmd_line)
 #endif
 
 End Subroutine DA_Data_Delete

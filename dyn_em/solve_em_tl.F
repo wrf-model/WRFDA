@@ -93,7 +93,7 @@ SUBROUTINE solve_em_tl ( grid , config_flags , &
    real, DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width,4)    :: g_rqs_btm
    real, DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width,4)    :: g_rqg_btm
 
-   real, DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33,num_moist) :: g_moist_tend
+!JM   real, DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33,num_moist) :: g_moist_tend
 
 ! These are used if -DDEREF_KLUDGE is compiled
 !  see http://www.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm
@@ -198,6 +198,18 @@ SUBROUTINE solve_em_tl ( grid , config_flags , &
   CALL set_tiles ( grid , ids , ide , jds , jde , ips , ipe , jps , jpe )
 
   itimestep = itimestep + 1
+
+#ifdef DM_PARALLEL
+#   include "HALO_EM_INIT_1.inc"
+#   include "HALO_EM_INIT_2.inc"
+#   include "HALO_EM_INIT_3.inc"
+#   include "HALO_EM_INIT_4.inc"
+#   include "HALO_EM_INIT_5.inc"
+#   include "HALO_EM_TL_INIT_1.inc"
+#   include "HALO_EM_TL_INIT_2.inc"
+#   include "HALO_EM_TL_INIT_3.inc"
+#   include "HALO_EM_TL_INIT_5.inc"
+#endif
 
 !**********************************************************************
 !
@@ -422,6 +434,7 @@ BENCH_END(step_prep_tim)
 !j mut    x
 !--------------------------------------------------------------
 #    include "HALO_EM_A.inc"
+#    include "HALO_EM_TL_A.inc"
 #endif
 
 ! set boundary conditions on variables 
@@ -499,6 +512,7 @@ BENCH_END(init_zero_tend_tim)
 
 #ifdef DM_PARALLEL
 #     include "HALO_EM_PHYS_A.inc"
+#     include "HALO_EM_PHYS_TL_A.inc"
 #endif
 
 !<DESCRIPTION>
@@ -797,6 +811,7 @@ BENCH_END(tke_diff_bc_tim)
 
 #ifdef DM_PARALLEL
 #     include "HALO_EM_TKE_C.inc"
+#     include "HALO_EM_TKE_TL_C.inc"
 #endif
 
 BENCH_START(deform_div_tim)
@@ -864,6 +879,7 @@ BENCH_END(calc_tke_tim)
 
 #ifdef DM_PARALLEL
 #     include "HALO_EM_TKE_E.inc"
+#     include "HALO_EM_TKE_TL_E.inc"
 #endif
 
      ENDIF
@@ -1095,6 +1111,7 @@ BENCH_END(hor_diff_tim)
                          grid%j_start(ij), grid%j_end(ij),                &
                          k_start, k_end                                  )
 #endif
+
     call g_rk_tendency( config_flags,rk_step,ru_tend,g_ru_tend,rv_tend,g_rv_tend,rw_tend,g_rw_tend,ph_tend,g_ph_tend,t_tend,&
 &g_t_tend,ru_tendf,g_ru_tendf,rv_tendf,g_rv_tendf,rw_tendf,g_rw_tendf,t_tendf,g_t_tendf,mu_tend,g_mu_tend,u_save,g_u_save,&
 &v_save,g_v_save,w_save,g_w_save,ph_save,g_ph_save,t_save,g_t_save,ru,g_ru,rv,g_rv,rw,g_rw,ww,g_ww,u_2,g_u_2,v_2,g_v_2,w_2,&
@@ -1102,6 +1119,7 @@ BENCH_END(hor_diff_tim)
 &muv,g_muv,mub,al,g_al,alt,g_alt,p,g_p,pb,php,g_php,cqu,g_cqu,cqv,g_cqv,cqw,g_cqw,u_base,v_base,z_base,msfu,msfv,msft,f,e,sina,&
 &cosa,fnm,fnp,rdn,rdnw,dt,rdx,rdy,kvdif,xkmhd,g_xkmhd,cf1,cf2,cf3,cfn,cfn1,non_hydrostatic,leapfrog,ids,ide,jds,jde,kde,ims,&
 &ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
+
    END DO
    !$OMP END PARALLEL DO
 BENCH_END(rk_tend_tim)
@@ -1137,7 +1155,6 @@ BENCH_START(relax_bdy_dry_tim)
 &w_b,g_w_b,mu_b,g_mu_b,u_bt,g_u_bt,v_bt,g_v_bt,ph_bt,g_ph_bt,t_bt,g_t_bt,w_bt,g_w_bt,mu_bt,g_mu_bt,spec_bdy_width,spec_zone,&
 &relax_zone,dtbc,fcx,gcx,ijds,ijde,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%&
 &j_start(ij),grid%j_end(ij),k_start,k_end )
-
 
      ENDIF
 #if 0
@@ -1179,6 +1196,7 @@ BENCH_START(relax_bdy_dry_tim)
 &mu_tend,g_mu_tend,u_bt,g_u_bt,v_bt,g_v_bt,ph_bt,g_ph_bt,t_bt,g_t_bt,w_bt,g_w_bt,mu_bt,g_mu_bt,spec_bdy_width,spec_zone,ijds,&
 &ijde,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),&
 &k_start,k_end )
+
      ENDIF
 
    END DO
@@ -1256,9 +1274,11 @@ BENCH_START(small_step_prep_tim)
 &g_u_save,v_save,g_v_save,w_save,g_w_save,t_save,g_t_save,ph_save,g_ph_save,mu_save,g_mu_save,ww,g_ww,ww1,g_ww1,c2a,g_c2a,pb,p,&
 &g_p,alt,g_alt,msfu,msfv,msft,rk_step,leapfrog,ide,jde,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%&
 &j_start(ij),grid%j_end(ij),k_start,k_end )
+
     call g_calc_p_rho( al,g_al,p,g_p,ph_2,g_ph_2,alt,g_alt,t_2,g_t_2,t_save,g_t_save,c2a,g_c2a,pm1,g_pm1,mu_2,g_mu_2,muts,g_muts,&
 &znu,t0,rdnw,dnw,smdiv,non_hydrostatic,0,ide,jde,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),&
 &grid%j_end(ij),k_start,k_end )
+
       IF (non_hydrostatic) THEN
 #if 0
       CALL calc_coef_w( a,alpha,gamma,                    &
@@ -1319,6 +1339,7 @@ BENCH_END(small_step_prep_tim)
 !j mudf      x
 !--------------------------------------------------------------
 #      include "HALO_EM_B.inc"
+#      include "HALO_EM_TL_B.inc"
 #      include "PERIOD_BDY_EM_B.inc"
 #endif
 
@@ -1443,6 +1464,7 @@ BENCH_START(advance_uv_tim)
                            grid%j_start(ij), grid%j_end(ij), &
                            k_start    , k_end               )
 #endif
+
       call g_advance_uv( u_2,g_u_2,ru_tend,g_ru_tend,v_2,g_v_2,rv_tend,g_rv_tend,p,g_p,pb,ph_2,g_ph_2,php,g_php,alt,g_alt,al,g_al,&
 &mu_2,g_mu_2,muu,g_muu,cqu,g_cqu,muv,g_muv,cqv,g_cqv,mudf,g_mudf,rdx,rdy,dts,cf1,cf2,cf3,fnm,fnp,emdiv,rdnw,config_flags,&
 &spec_zone,non_hydrostatic,ids,ide,jds,jde,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%&
@@ -1475,6 +1497,7 @@ BENCH_START(spec_bdy_uv_tim)
 &i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
         call g_spec_bdyupdate( v_2,g_v_2,rv_tend,g_rv_tend,dts_rk,'v',spec_zone,ids,ide,jds,jde,kde,ims,ime,jms,jme,kms,kme,grid%&
 &i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
+
          ENDIF
 BENCH_END(spec_bdy_uv_tim)
 
@@ -1493,6 +1516,7 @@ BENCH_END(spec_bdy_uv_tim)
 !  v_2                          x
 !
 #     include "HALO_EM_C.inc"
+#     include "HALO_EM_TL_C.inc"
 #endif
 
       !$OMP PARALLEL DO   &
@@ -1712,6 +1736,7 @@ BENCH_END(cald_p_rho_tim)
 !  mudf   x
 
 #      include "HALO_EM_C2.inc"
+#      include "HALO_EM_TL_C2.inc"
 #      include "PERIOD_BDY_EM_B3.inc"
 #endif
 
@@ -1841,6 +1866,7 @@ BENCH_END(small_step_finish_tim)
 !--------------------------------------------------------------
 
 #  include "HALO_EM_D.inc"
+#  include "HALO_EM_TL_D.inc"
 #endif
 
 !<DESCRIPTION>
@@ -1888,11 +1914,13 @@ BENCH_START(rk_scalar_tend_tim)
                               grid%j_start(ij), grid%j_end(ij), &
                               k_start    , k_end               )
 #endif
+
         call g_rk_scalar_tend( im,im,config_flags,rk_step,ru_m,g_ru_m,rv_m,g_rv_m,ww_m,g_ww_m,mut,g_mut,alt,g_alt,moist_1(ims,kms,&
 &jms,im),g_moist_1(ims,kms,jms,im),moist_2(ims,kms,jms,im),g_moist_2(ims,kms,jms,im),moist_tend(ims,kms,jms,im),&
 &g_moist_tend(ims,kms,jms,im),advect_tend,g_advect_tend,qv_base, .true. ,fnm,fnp,msfu,msfv,msft,rdx,rdy,rdn,rdnw,kvdif,&
 &xkmhd,g_xkmhd,leapfrog,ids,ide,jds,jde,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%&
 &j_end(ij),k_start,k_end )
+
 BENCH_END(rk_scalar_tend_tim)
 
 BENCH_START(rlx_bdy_scalar_tim)
@@ -2410,8 +2438,10 @@ BENCH_END(diag_w_tim)
 #ifdef DM_PARALLEL
    IF      ( h_mom_adv_order <= 4 ) THEN
 #    include "HALO_EM_D2_3.inc"
+#    include "HALO_EM_TL_D2_3.inc"
    ELSE IF ( h_mom_adv_order <= 6 ) THEN
 #    include "HALO_EM_D2_5.inc"
+#    include "HALO_EM_TL_D2_5.inc"
    ELSE 
      WRITE(wrf_err_message,*)'solve_em_tl: invalid h_mom_adv_order = ',h_mom_adv_order
      CALL wrf_error_fatal(TRIM(wrf_err_message))
@@ -2801,8 +2831,10 @@ BENCH_END(time_filt_tim)
 #ifdef DM_PARALLEL
    IF      ( h_mom_adv_order <= 4 ) THEN
 #    include "HALO_EM_D3_3.inc"
+#    include "HALO_EM_TL_D3_3.inc"
    ELSE IF ( h_mom_adv_order <= 6 ) THEN
 #    include "HALO_EM_D3_5.inc"
+#    include "HALO_EM_TL_D3_5.inc"
    ELSE 
      WRITE(wrf_err_message,*)'solve_em_tl: invalid h_mom_adv_order = ',h_mom_adv_order
      CALL wrf_error_fatal(TRIM(wrf_err_message))
@@ -2904,8 +2936,10 @@ BENCH_END(bc_2d_tim)
    CALL wrf_debug ( 200 , ' call HALO_RK_E' )
    IF      ( h_mom_adv_order <= 4 ) THEN
 #    include "HALO_EM_E_3.inc"
+#    include "HALO_EM_TL_E_3.inc"
    ELSE IF ( h_mom_adv_order <= 6 ) THEN
 #    include "HALO_EM_E_5.inc"
+#    include "HALO_EM_TL_E_5.inc"
    ELSE
      WRITE(wrf_err_message,*)'solve_em_tl: invalid h_mom_adv_order = ',h_mom_adv_order
      CALL wrf_error_fatal(TRIM(wrf_err_message))
@@ -2920,8 +2954,10 @@ BENCH_END(bc_2d_tim)
      CALL wrf_debug ( 200 , ' call HALO_RK_MOIST' )
      IF      ( h_mom_adv_order <= 4 ) THEN
 #      include "HALO_EM_MOIST_E_3.inc"
+#      include "HALO_EM_MOIST_TL_E_3.inc"
      ELSE IF ( h_mom_adv_order <= 6 ) THEN
 #      include "HALO_EM_MOIST_E_5.inc"
+#      include "HALO_EM_MOIST_TL_E_5.inc"
      ELSE
        WRITE(wrf_err_message,*)'solve_em_tl: invalid h_mom_adv_order = ',h_mom_adv_order
        CALL wrf_error_fatal(TRIM(wrf_err_message))
@@ -2956,7 +2992,6 @@ BENCH_END(bc_2d_tim)
 !----------------
 !6789 continue !zzma
 !----------------
-
 
    RETURN
 

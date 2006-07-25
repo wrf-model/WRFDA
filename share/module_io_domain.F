@@ -327,9 +327,7 @@ CONTAINS
     TYPE(grid_config_rec_type),  INTENT(IN   )    :: config_flags
     INTEGER, INTENT(IN) :: fid
     INTEGER, INTENT(INOUT) :: ierr
-write(0,*)'in input_aux_model_input1 : config_flags%io_form_auxinput1 ',config_flags%io_form_auxinput1
     IF ( config_flags%io_form_auxinput1 .GT. 0 ) THEN
-write(0,*)'calling input_wrf '
       CALL input_wrf ( fid , grid , config_flags , aux_model_input1_only , ierr )
     ENDIF
     RETURN

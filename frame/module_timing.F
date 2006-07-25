@@ -37,9 +37,11 @@ CONTAINS
       IMPLICIT NONE
 
       CHARACTER *(*) :: string
+      CHARACTER*256 :: message
 
       IF ( cn .lt. 1 ) THEN
-        CALL wrf_message( 'module_timing: clock nesting error' ) 
+        WRITE(message,*)"module_timing: clock nesting error: ",TRIM(string)
+        CALL wrf_message(TRIM(message))
         RETURN
       ENDIF
 

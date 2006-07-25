@@ -20,21 +20,21 @@ Subroutine DA_Mss_Read(file_date)
                    trim(directory_name)//'/.'
 
        write(*,'(a90)') trim(cmd_line)
-       call system(cmd_line)
+       call system_4dv(cmd_line)
 
        cmd_line = 'tar -xvf '//trim(directory_name)//'/' &
                    //file_head(1:6)//'_'//tar_date//'.tar '
 
        write(*,'(a90)') trim(cmd_line)
 
-       call system(cmd_line)
+       call system_4dv(cmd_line)
 
        cmd_line = 'mv '//trim(file_head)//'* '//&
                   trim(directory_name)//'/.'
 
        write(*,'(a90)') trim(cmd_line)
 
-       call system(cmd_line)
+       call system_4dv(cmd_line)
 #endif
 
 End Subroutine DA_Mss_Read

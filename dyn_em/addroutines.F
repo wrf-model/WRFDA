@@ -3,6 +3,7 @@ SUBROUTINE calc_dpsdt ( itimestep, dt, psfc, psfcm, cn, &
                         ids, ide, jds, jde,             &
                         ims, ime, jms, jme,             &
                         its, ite, jts, jte              )
+  USE module_dm
 
   IMPLICIT NONE
 
@@ -27,7 +28,7 @@ SUBROUTINE calc_dpsdt ( itimestep, dt, psfc, psfcm, cn, &
 
   CHARACTER(LEN=2) ,     INTENT(IN   ) :: cn
 
-  integer :: i, j, k, itf, jtf, ierror
+  integer :: i, j, k, itf, jtf, ierror, comm
   REAL    :: nsum
 
   itf=MIN(ite,ide-1)
@@ -48,8 +49,14 @@ SUBROUTINE calc_dpsdt ( itimestep, dt, psfc, psfcm, cn, &
   avg_abs_dpsdt = avg_abs_dpsdt/( (ide-ids)*(jde-jds) )
 
 #ifdef DM_PARALLEL
+  call wrf_get_dm_communicator(comm)
+#if (RWORDSIZE == 4 )
   call MPI_ALLREDUCE( avg_abs_dpsdt, nsum, 1, MPI_REAL, MPI_SUM, &
-                       MPI_COMM_WORLD, IERROR )
+                       comm, IERROR )
+#else
+  call MPI_ALLREDUCE( avg_abs_dpsdt, nsum, 1, MPI_DOUBLE, MPI_SUM, &
+                       comm, IERROR )
+#endif
 
   avg_abs_dpsdt = nsum
 

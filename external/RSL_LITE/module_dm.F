@@ -7,7 +7,7 @@ MODULE module_dm
    USE module_state_description
    USE module_wrf_error
 
-#if ( NMM_CORE == 1 ) || defined( WRF_CHEM ) 
+#if ( NMM_CORE == 1 ) || defined( WRF_CHEM ) || defined(WRFVAR) 
    INTEGER, PARAMETER :: max_halo_width = 6
 #else
    INTEGER, PARAMETER :: max_halo_width = 4
@@ -503,8 +503,11 @@ CONTAINS
 	! initialized MPI, so just grab the communicator that
 	! should already be stored and use that.
 	CALL mpi_init ( ierr )
-        CALL wrf_termio_dup
-	CALL wrf_set_dm_communicator ( MPI_COMM_WORLD )
+        ! IBM specific, for use with -pgmmodel mpmd and -cmdfile
+        ! color=1 means this is the communicator assigned to the DA processes
+        CALL mpi_comm_split( MPI_COMM_WORLD , 1 , 1 , mpi_comm_local, ierr )
+        CALL wrf_set_dm_communicator ( mpi_comm_local )
+        CALL wrf_termio_dup ( mpi_comm_local )
       ENDIF
       CALL wrf_get_dm_communicator( mpi_comm_local )
    END SUBROUTINE init_module_dm
@@ -561,12 +564,12 @@ SUBROUTINE wrf_dm_patch_domain ( id  , domdesc , parent_id , parent_domdesc , &
    RETURN
 END SUBROUTINE wrf_dm_patch_domain
 
-SUBROUTINE wrf_termio_dup
+SUBROUTINE wrf_termio_dup ( comm )
   IMPLICIT NONE
   INCLUDE 'mpif.h'
-  INTEGER mytask, ntasks, ierr
-  CALL mpi_comm_size(MPI_COMM_WORLD, ntasks, ierr )
-  CALL mpi_comm_rank(MPI_COMM_WORLD, mytask, ierr )
+  INTEGER mytask, ntasks, ierr, comm
+  CALL mpi_comm_size(comm, ntasks, ierr )
+  CALL mpi_comm_rank(comm, mytask, ierr )
   write(0,*)'starting wrf task ',mytask,' of ',ntasks
   CALL rsl_error_dup1( mytask )
 END SUBROUTINE wrf_termio_dup
@@ -735,7 +738,14 @@ END
 
    LOGICAL FUNCTION wrf_dm_on_monitor()
       USE module_dm
-      wrf_dm_on_monitor = mytask .EQ. 0
+      INTEGER me, ierr
+      LOGICAL mpi_inited
+      CALL mpi_initialized ( mpi_inited, ierr ) 
+      IF ( .NOT. mpi_inited ) THEN
+        CALL wrf_error_fatal ( "wrf_dm_on_monitor: mpi not initialized" )
+      ENDIF
+      CALL mpi_comm_rank ( local_communicator, me, ierr )
+      wrf_dm_on_monitor = me .EQ. 0
       RETURN
    END FUNCTION wrf_dm_on_monitor
 

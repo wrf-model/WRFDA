@@ -7,6 +7,8 @@
       type (y_type), intent(out)        :: re     ! Residual (O-A).
 
       integer    :: np_available, np_obs_used, np_missing  , np_bad_data 
+
+      CALL wrf_debug(100,"entering da_calculate_residual")
       
       np_available = 0
       np_obs_used  = 0
@@ -121,5 +123,7 @@
 
       call da_calculate_residual_Buoy( iv, y, re, np_missing, np_bad_data, & 
                                         np_obs_used, np_available )
+
+      CALL wrf_debug(100,"leaving da_calculate_residual")
 
       end subroutine da_calculate_residual

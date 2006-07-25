@@ -31,6 +31,7 @@ set_state_dims ( char * dims , node_t * node )
   node->proc_orient = ALL_Z_ON_PROC ;  /* default */
   node->ndims = 0 ;
   node->boundary_array = 0 ;
+
   for ( c = dims ; *c ; c++ )
   {
     if      ( *c == 'f' )
@@ -154,18 +155,36 @@ get_entry_r ( char * name , char * use , node_t * node )
     }
 
     strcpy( tmp, name ) ;
+
+    /* first check for exact match */
+    if ( !strcmp( p->name , tmp ) )
+    {
+      return(p) ;
+    }
+
     t1 = NULL ;
     if ((t1 = index(tmp,'%'))!= NULL ) *t1 = '\0' ;
 
     if ( p->ntl > 1 )
     {
-      if (( t2 = rindex( tmp , '_' )) != NULL ) 
-      {  
+      if (( t2 = rindex( tmp , '_' )) != NULL )
+      {
          /* be sure it really is an integer that follows the _ and that */
          /* that is that is the last character                          */
-         if ((*(t2+1) >= '0' && *(t2+1) <= '9') && *(t2+2)=='\0') *t2 = '\0' ; 
+         if ((*(t2+1) >= '0' && *(t2+1) <= '9') && *(t2+2)=='\0') *t2 = '\0' ;
       }
     }
+
+    /* also allow _tend */
+    if (( t2 = rindex( tmp , '_' )) != NULL ) {
+         if (!strcmp(t2,"_tend")) *t2 = '\0' ;
+    }
+
+    /* also allow _tend */
+    if (( t2 = rindex( tmp , '_' )) != NULL ) {
+         if (!strcmp(t2,"_old")) *t2 = '\0' ;
+    }
+
     if ( !strcmp( p->name , tmp ) )
     {
       if ( t1 != NULL ) return( get_entry_r( t1+1 , use , p->type->fields ) ) ;
@@ -174,6 +193,7 @@ get_entry_r ( char * name , char * use , node_t * node )
   }
   return(NULL) ;
 }
+
 
 node_t *
 get_dimnode_for_coord ( node_t * node , int coord_axis )

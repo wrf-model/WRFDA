@@ -13,7 +13,9 @@ MODULE module_wrf_esmf_super
    USE module_integrate
    USE module_integrate_ad
    USE module_integrate_tl
+#if 0
    USE module_integrate_tst
+#endif
    USE module_driver_constants
    USE module_configure
 
@@ -95,8 +97,10 @@ CONTAINS
 
    !  Get the NAMELIST data for input.
 
+write(0,*)'calling init_modules'
    CALL init_modules(2)   ! Phase 2 resumes after MPI_INIT() (if it is called)
                           ! Phase 1 is called before ESMF starts up
+write(0,*)'back from init_modules'
 
 !<DESCRIPTION>
 ! The wrf namelist.input file is read and stored in the USE associated
@@ -372,13 +376,13 @@ CONTAINS
    CALL       wrf_debug ( 100 , 'wrf: back from med_shutdown_io' )
 
    CALL       wrf_debug (   0 , 'wrf: SUCCESS COMPLETE WRF' )
-   CALL wrf_shutdown
+   CALL       dealloc_space_field ( head_grid )
+!   CALL wrf_shutdown
 
    ! return success status
    rc = ESMF_SUCCESS
 
    END SUBROUTINE wrf_finalize
-
 
 END MODULE module_wrf_esmf_super
 

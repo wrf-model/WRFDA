@@ -166,3 +166,51 @@ dst_on_comm ( int * Fcomm, int * typesize ,
   return(0) ;
 }
 
+/*#include <malloc.h>    XZ comment */
+
+#ifndef MACOS
+#  include <sys/resource.h>
+#endif
+
+#if 0
+  int getrusage(
+          int who,
+          struct rusage *r_usage);
+#endif
+
+#if 0
+extern int outy ;
+extern int maxstug, nouty, maxouty ;
+#endif
+
+
+#if 0
+#include <unistd.h>
+#include <sys/times.h>
+/*  used internally for chasing memory leaks on ibm  */
+rlim_ ()
+{
+#ifndef MACOS
+
+   struct rusage r_usage ;
+   struct mallinfo minf ;
+   struct tms  tm ;
+   long tick, tock ;
+
+   tick = sysconf( _SC_CLK_TCK ) ;
+   times( &tm ) ;
+   tock = (tm.tms_utime + tm.tms_stime)*tick ;
+
+   getrusage ( RUSAGE_SELF, &r_usage ) ;
+   if ( tock != 0 ) {
+     fprintf(stderr,"sm %ld d %ld s %ld maxrss %ld %d %d %ld\n",r_usage.ru_ixrss/tock,r_usage.ru_idrss/tock,r_usage.ru_isrss/tock, r_usage.ru_maxrss,tick,tock,r_usage.ru_ixrss) ;
+   }
+   minf = mallinfo() ;
+   fprintf(stderr,"a %ld usm %ld fsm %ld uord %ld ford %ld hblkhd %d\n",minf.arena,minf.usmblks,minf.fsmblks,minf.uordblks,minf.fordblks,minf.hblkhd) ;
+# if 0
+   fprintf(stderr," outy %d  nouty %d  maxstug %d maxouty %d \n", outy, nouty, maxstug, maxouty ) ;
+# endif
+#endif
+}
+#endif
+

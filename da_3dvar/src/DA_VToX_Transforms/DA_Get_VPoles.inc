@@ -11,6 +11,9 @@ SUBROUTINE DA_GET_VPoles(u,v,lon,        &
 !
 !  PARENT_MODULE: DA_Tools              
 !------------------------------------------------------------------------------
+#ifdef DM_PARALLEL
+   USE module_dm, ONLY : mpi_comm_local
+#endif
    IMPLICIT NONE
    
    integer, intent(in)    :: ids, ide, jds, jde, kds, kde
@@ -47,8 +50,8 @@ SUBROUTINE DA_GET_VPoles(u,v,lon,        &
    end if
 
 #ifdef DM_PARALLEL
-   call MPI_ALLREDUCE(tmp_u,tmpu,1, MPI_REAL8, MPI_SUM, MPI_COMM_WORLD, IERROR )
-   call MPI_ALLREDUCE(tmp_v,tmpv,1, MPI_REAL8, MPI_SUM, MPI_COMM_WORLD, IERROR )
+   call MPI_ALLREDUCE(tmp_u,tmpu,1, MPI_REAL8, MPI_SUM, mpi_comm_local, IERROR )
+   call MPI_ALLREDUCE(tmp_v,tmpv,1, MPI_REAL8, MPI_SUM, mpi_comm_local, IERROR )
 #else
    tmpu = tmp_u                    
    tmpv = tmp_v                    
@@ -70,8 +73,8 @@ SUBROUTINE DA_GET_VPoles(u,v,lon,        &
                          -v(its:ite,jte-1,k)*cos(xln(its:ite)))
    end if
 #ifdef DM_PARALLEL
-   call MPI_ALLREDUCE(tmp_u,tmpu,1, MPI_REAL8, MPI_SUM, MPI_COMM_WORLD, IERROR )
-   call MPI_ALLREDUCE(tmp_v,tmpv,1, MPI_REAL8, MPI_SUM, MPI_COMM_WORLD, IERROR )
+   call MPI_ALLREDUCE(tmp_u,tmpu,1, MPI_REAL8, MPI_SUM, mpi_comm_local, IERROR )
+   call MPI_ALLREDUCE(tmp_v,tmpv,1, MPI_REAL8, MPI_SUM, mpi_comm_local, IERROR )
    tmpu =tmpu
    tmpv =tmpv
 #else

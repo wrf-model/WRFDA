@@ -7,6 +7,9 @@ SUBROUTINE proc_diagnostics_collect(num_sound, iv, re )
 !           communication.)
 !
 !------------------------------------------------------------------------------
+#ifdef DM_PARALLEL
+   USE module_dm, ONLY : mpi_comm_local
+#endif
 
    INCLUDE 'mpif.h'
 
@@ -54,8 +57,8 @@ SUBROUTINE proc_diagnostics_collect(num_sound, iv, re )
    q(1:sum_levels) = 0.0
 
 ! Get rank of monitor processor and broadcast to others.
-   call MPI_COMM_RANK( MPI_COMM_WORLD, myrank, ierr ) 
-   call MPI_COMM_SIZE( MPI_COMM_WORLD, nprocs, ierr )
+   call MPI_COMM_RANK( mpi_comm_local, myrank, ierr ) 
+   call MPI_COMM_SIZE( mpi_comm_local, nprocs, ierr )
    IF ( wrf_dm_on_monitor() ) root = myrank
    call wrf_dm_bcast_integer ( root, 1 )
 
@@ -78,30 +81,30 @@ SUBROUTINE proc_diagnostics_collect(num_sound, iv, re )
        obs_level = obs_level + nlevels
      end do
      call MPI_SEND( on_proc, num_sound, MPI_LOGICAL, root, &
-                    30, MPI_COMM_WORLD, IERR )
+                    30, mpi_comm_local, IERR )
      call MPI_SEND( u, sum_levels, MPI_DOUBLE_PRECISION, root, &
-                    31, MPI_COMM_WORLD, IERR )
+                    31, mpi_comm_local, IERR )
      call MPI_SEND( v, sum_levels, MPI_DOUBLE_PRECISION, root, &
-                    32, MPI_COMM_WORLD, IERR )
+                    32, mpi_comm_local, IERR )
      call MPI_SEND( t, sum_levels, MPI_DOUBLE_PRECISION, root, &
-                    33, MPI_COMM_WORLD, IERR )
+                    33, mpi_comm_local, IERR )
      call MPI_SEND( q, sum_levels, MPI_DOUBLE_PRECISION, root, &
-                    34, MPI_COMM_WORLD, IERR )
+                    34, mpi_comm_local, IERR )
 
    else
       
      do iproc = 1, nprocs-1
 
        call MPI_RECV(on_proc, num_sound, MPI_LOGICAL, MPI_ANY_SOURCE, &
-                     30, MPI_COMM_WORLD, STATUS, IERR )
+                     30, mpi_comm_local, STATUS, IERR )
        call MPI_RECV(u, sum_levels, MPI_DOUBLE_PRECISION, MPI_ANY_SOURCE, &
-                     31, MPI_COMM_WORLD, STATUS, IERR )
+                     31, mpi_comm_local, STATUS, IERR )
        call MPI_RECV(v, sum_levels, MPI_DOUBLE_PRECISION, MPI_ANY_SOURCE, &
-                     32, MPI_COMM_WORLD, STATUS, IERR )
+                     32, mpi_comm_local, STATUS, IERR )
        call MPI_RECV(t, sum_levels, MPI_DOUBLE_PRECISION, MPI_ANY_SOURCE, &
-                     33, MPI_COMM_WORLD, STATUS, IERR )
+                     33, mpi_comm_local, STATUS, IERR )
        call MPI_RECV(q, sum_levels, MPI_DOUBLE_PRECISION, MPI_ANY_SOURCE, &
-                     34, MPI_COMM_WORLD, STATUS, IERR )
+                     34, mpi_comm_local, STATUS, IERR )
 
        obs_level = 0
        do n = 1, num_sound
@@ -139,26 +142,26 @@ SUBROUTINE proc_diagnostics_collect(num_sound, iv, re )
        obs_level = obs_level + nlevels
      end do
      call MPI_SEND( u, sum_levels, MPI_DOUBLE_PRECISION, root, &
-                    31, MPI_COMM_WORLD, IERR )
+                    31, mpi_comm_local, IERR )
      call MPI_SEND( v, sum_levels, MPI_DOUBLE_PRECISION, root, &
-                    32, MPI_COMM_WORLD, IERR )
+                    32, mpi_comm_local, IERR )
      call MPI_SEND( t, sum_levels, MPI_DOUBLE_PRECISION, root, &
-                    33, MPI_COMM_WORLD, IERR )
+                    33, mpi_comm_local, IERR )
      call MPI_SEND( q, sum_levels, MPI_DOUBLE_PRECISION, root, &
-                    34, MPI_COMM_WORLD, IERR )
+                    34, mpi_comm_local, IERR )
 
    else
       
      do iproc = 1, nprocs-1
 
        call MPI_RECV(u, sum_levels, MPI_DOUBLE_PRECISION, MPI_ANY_SOURCE, &
-                     31, MPI_COMM_WORLD, STATUS, IERR )
+                     31, mpi_comm_local, STATUS, IERR )
        call MPI_RECV(v, sum_levels, MPI_DOUBLE_PRECISION, MPI_ANY_SOURCE, &
-                     32, MPI_COMM_WORLD, STATUS, IERR )
+                     32, mpi_comm_local, STATUS, IERR )
        call MPI_RECV(t, sum_levels, MPI_DOUBLE_PRECISION, MPI_ANY_SOURCE, &
-                     33, MPI_COMM_WORLD, STATUS, IERR )
+                     33, mpi_comm_local, STATUS, IERR )
        call MPI_RECV(q, sum_levels, MPI_DOUBLE_PRECISION, MPI_ANY_SOURCE, &
-                     34, MPI_COMM_WORLD, STATUS, IERR )
+                     34, mpi_comm_local, STATUS, IERR )
 
        obs_level = 0
        do n = 1, num_sound

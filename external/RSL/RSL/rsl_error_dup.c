@@ -94,10 +94,10 @@ RSL_ERROR_DUP ()
     me = &rsl_myproc ;
 
 /* redirect standard out*/
-    sprintf(filename,"rsl.out.%04d",*me) ;
+    sprintf(filename,"var.out.%04d",*me) ;
     if ((newfd = open( filename, O_CREAT | O_WRONLY, 0666 )) < 0 )
     {
-	perror("error_dup: cannot open rsl.out.nnnn") ;
+	perror("error_dup: cannot open var.out.nnnn") ;
 	fprintf(stderr,"...sending error to standard error and continuing.\n") ;
 	return ;
     }
@@ -110,10 +110,10 @@ RSL_ERROR_DUP ()
     }
 
 /* redirect standard error */
-    sprintf(filename,"rsl.error.%04d",*me) ;
+    sprintf(filename,"var.error.%04d",*me) ;
     if ((newfd = open( filename, O_CREAT | O_WRONLY, 0666 )) < 0 )
     {
-	perror("error_dup: cannot open rsl.error.log") ;
+	perror("error_dup: cannot open var.error.log") ;
 	fprintf(stderr,"...sending error to standard error and continuing.\n") ;
 	return ;
     }
@@ -133,10 +133,10 @@ RSL_ERROR_DUP1 ( int *me )
     char filename[256] ;
 
 /* redirect standard out*/
-    sprintf(filename,"rsl.out.%04d",*me) ;
+    sprintf(filename,"var.out.%04d",*me) ;
     if ((newfd = open( filename, O_CREAT | O_WRONLY, 0666 )) < 0 )
     {
-        perror("error_dup: cannot open rsl.out.nnnn") ;
+        perror("error_dup: cannot open var.out.nnnn") ;
         fprintf(stderr,"...sending error to standard error and continuing.\n") ;
         return ;
     }
@@ -149,10 +149,10 @@ RSL_ERROR_DUP1 ( int *me )
     }
 
 /* redirect standard error */
-    sprintf(filename,"rsl.error.%04d",*me) ;
+    sprintf(filename,"var.error.%04d",*me) ;
     if ((newfd = open( filename, O_CREAT | O_WRONLY, 0666 )) < 0 )
     {
-        perror("error_dup: cannot open rsl.error.log") ;
+        perror("error_dup: cannot open var.error.log") ;
         fprintf(stderr,"...sending error to standard error and continuing.\n") ;
         return ;
     }

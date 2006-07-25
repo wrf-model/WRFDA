@@ -10,6 +10,9 @@ SUBROUTINE proc_maxmin_combine( n, max, min )
 !           communication.)
 !
 !------------------------------------------------------------------------------
+#ifdef DM_PARALLEL
+   USE module_dm, ONLY : mpi_comm_local
+#endif
 
    INCLUDE 'mpif.h'
 
@@ -29,7 +32,7 @@ SUBROUTINE proc_maxmin_combine( n, max, min )
    LOGICAL, EXTERNAL :: wrf_dm_on_monitor
 
 ! Get rank of monitor processor and broadcast to others.
-   call MPI_COMM_RANK( MPI_COMM_WORLD, myrank, ierr ) 
+   call MPI_COMM_RANK( mpi_comm_local, myrank, ierr ) 
    IF ( wrf_dm_on_monitor() ) root = myrank
    call wrf_dm_bcast_integer ( root, 1 )
 
@@ -40,7 +43,7 @@ SUBROUTINE proc_maxmin_combine( n, max, min )
    end do
 
    call MPI_REDUCE(in, out, n, MPI_2DOUBLE_PRECISION, MPI_MINLOC, &
-                                     root, MPI_COMM_WORLD, IERR )
+                                     root, mpi_comm_local, IERR )
 
    if( myrank .eq. root ) then
      do i = 1, n
@@ -56,14 +59,14 @@ SUBROUTINE proc_maxmin_combine( n, max, min )
      if( proc_id(i) .ne. root ) then
        if( myrank .eq. root ) then
          call MPI_RECV( min(i)%i, 1, MPI_INTEGER, proc_id(i), &
-                           10, MPI_COMM_WORLD, STATUS, IERR )
+                           10, mpi_comm_local, STATUS, IERR )
          call MPI_RECV( min(i)%j, 1, MPI_INTEGER, proc_id(i), &
-                           11, MPI_COMM_WORLD, STATUS, IERR )
+                           11, mpi_comm_local, STATUS, IERR )
        else if( myrank .eq. proc_id(i) ) then
          call MPI_SEND( min(i)%i, 1, MPI_INTEGER, root, &
-                             10, MPI_COMM_WORLD, IERR )
+                             10, mpi_comm_local, IERR )
          call MPI_SEND( min(i)%j, 1, MPI_INTEGER, root, &
-                             11, MPI_COMM_WORLD, IERR )
+                             11, mpi_comm_local, IERR )
        end if
      end if
    end do
@@ -74,7 +77,7 @@ SUBROUTINE proc_maxmin_combine( n, max, min )
      in(2,i) = myrank
    end do
    call MPI_REDUCE(in, out, n, MPI_2DOUBLE_PRECISION, MPI_MAXLOC, &
-                                     root, MPI_COMM_WORLD, IERR )
+                                     root, mpi_comm_local, IERR )
 
    if( myrank .eq. root ) then
      do i = 1, n
@@ -90,14 +93,14 @@ SUBROUTINE proc_maxmin_combine( n, max, min )
      if( proc_id(i) .ne. root ) then
        if( myrank .eq. root ) then
          call MPI_RECV( max(i)%i, 1, MPI_INTEGER, proc_id(i), &
-                           10, MPI_COMM_WORLD, STATUS, IERR )
+                           10, mpi_comm_local, STATUS, IERR )
          call MPI_RECV( max(i)%j, 1, MPI_INTEGER, proc_id(i), &
-                           11, MPI_COMM_WORLD, STATUS, IERR )
+                           11, mpi_comm_local, STATUS, IERR )
        else if( myrank .eq. proc_id(i) ) then
          call MPI_SEND( max(i)%i, 1, MPI_INTEGER, root, &
-                             10, MPI_COMM_WORLD, IERR )
+                             10, mpi_comm_local, IERR )
          call MPI_SEND( max(i)%j, 1, MPI_INTEGER, root, &
-                             11, MPI_COMM_WORLD, IERR )
+                             11, mpi_comm_local, IERR )
        end if
      end if
    end do

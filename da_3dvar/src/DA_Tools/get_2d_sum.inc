@@ -2,6 +2,9 @@ subroutine get_2d_sum(var, name, &
                       ids, ide, jds, jde, &
                       ims, ime, jms, jme, &
                       its, ite, jts, jte )
+#ifdef DM_PARALLEL
+   USE module_dm, ONLY : mpi_comm_local
+#endif
 
    implicit none
    integer, intent(in) :: ids, ide, jds, jde, &
@@ -27,7 +30,7 @@ subroutine get_2d_sum(var, name, &
 
 #ifdef DM_PARALLEL
    call MPI_ALLREDUCE( partial, total, 1, TRUE_MPI_REAL, MPI_SUM, &
-                       MPI_COMM_WORLD, IERROR )
+                       mpi_comm_local, IERROR )
 #else
    total = partial
 #endif

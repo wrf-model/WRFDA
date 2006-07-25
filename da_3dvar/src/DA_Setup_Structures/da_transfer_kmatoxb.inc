@@ -11,6 +11,9 @@ SUBROUTINE DA_Transfer_KMAToXb( xbx, grid, &
 !
 !  PARENT_MODULE: DA_Setup_Structures
 !------------------------------------------------------------------------------
+#ifdef DM_PARALLEL
+   USE module_dm, ONLY : mpi_comm_local
+#endif
 
    IMPLICIT NONE
    
@@ -263,7 +266,7 @@ SUBROUTINE DA_Transfer_KMAToXb( xbx, grid, &
   tmp_ps  = sum(xb%psfc(is:ie,js:je)) /real((xp%ide-xp%ids+1)*(xp%jde-xp%jds+1))
 
 #ifdef DM_PARALLEL
-   call MPI_ALLREDUCE(tmp_ps,tmpps,1, MPI_REAL8, MPI_SUM, MPI_COMM_WORLD, IERROR )
+   call MPI_ALLREDUCE(tmp_ps,tmpps,1, MPI_REAL8, MPI_SUM, mpi_comm_local, IERROR )
 #else
    tmpps = tmp_ps                    
 #endif
@@ -271,7 +274,7 @@ SUBROUTINE DA_Transfer_KMAToXb( xbx, grid, &
  do k=ks,ke
   tmp_p  = sum(xb%p(is:ie,js:je,k)) /real((xp%ide-xp%ids+1)*(xp%jde-xp%jds+1))
 #ifdef DM_PARALLEL
-   call MPI_ALLREDUCE(tmp_p,tmpp,1, MPI_REAL8, MPI_SUM, MPI_COMM_WORLD, IERROR )
+   call MPI_ALLREDUCE(tmp_p,tmpp,1, MPI_REAL8, MPI_SUM, mpi_comm_local, IERROR )
 #else
    tmpp = tmp_p                    
 #endif
@@ -536,7 +539,7 @@ SUBROUTINE DA_Transfer_KMAToXb( xbx, grid, &
 
 #ifdef DM_PARALLEL
    call MPI_ALLREDUCE( loc_latc_mean, xbx % latc_mean, (xp%jde-xp%jds+1), &
-                       MPI_REAL8, MPI_SUM, MPI_COMM_WORLD, IERROR )
+                       MPI_REAL8, MPI_SUM, mpi_comm_local, IERROR )
 #else
    xbx % latc_mean = loc_latc_mean
 #endif

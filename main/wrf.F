@@ -23,20 +23,80 @@ PROGRAM wrf
    TYPE(ESMF_VM)       :: vm   
    INTEGER :: rc
 
+   LOGICAL, EXTERNAL :: await_next
+   LOGICAL , EXTERNAL      :: wrf_dm_on_monitor
+   INTEGER comm
+
+write(0,*)'********* ********* *********'
+
    ! This call includes everything that must be done before ESMF_Initialize() 
    ! is called.  
+
+#ifdef DM_PARALLEL
+! disable quilting for WRFVAR which splits the communicator its own way
+   CALL disable_quilting
+#endif
+
    CALL init_modules(1)   ! Phase 1 returns after MPI_INIT() (if it is called)
 
    CALL ESMF_Initialize( vm=vm, defaultCalendar=ESMF_CAL_GREGORIAN, rc=rc )
+#ifdef DM_PARALLEL
+   CALL init_modules(2)   ! 
+#endif
 
-   CALL wrf_init( gcomp, importState, exportState, clock, rc )
+#ifdef DM_PARALLEL
+   DO WHILE ( await_next() )
+call system("echo -n model_start ; date")
+#endif
+     CALL wrf_init( gcomp, importState, exportState, clock, rc )
+     CALL wrf_run( gcomp, importState, exportState, clock, rc )
+     CALL wrf_finalize( gcomp, importState, exportState, clock, rc )
+#ifdef DM_PARALLEL
+     IF ( wrf_dm_on_monitor() ) THEN
+       CALL system("touch wrf_done")
+     ENDIF
+call system("echo -n model_end ; date")
+   ENDDO
+#endif
 
-   CALL wrf_run( gcomp, importState, exportState, clock, rc )
-
-   CALL wrf_finalize( gcomp, importState, exportState, clock, rc )
+#ifdef DM_PARALLEL
+   CALL wrf_get_dm_communicator( comm )
+   CALL MPI_BARRIER(comm,ierr)
+#endif
+   CALL wrf_shutdown 
 
    CALL ESMF_Finalize( rc=rc )
 
 END PROGRAM wrf
 
+LOGICAL FUNCTION await_next()
+   LOGICAL, EXTERNAL :: wrf_dm_on_monitor
+   INTEGER result, myproc
+
+301 CONTINUE
+    result = 0
+
+    IF ( wrf_dm_on_monitor() ) THEN
+      OPEN( 99, file="wrf_go_ahead",status="old",form="formatted",ERR=303 )
+      CLOSE(99)
+      CALL system("rm wrf_go_ahead")
+      result = 1
+303   CONTINUE
+      OPEN( 99, file="wrf_stop_now",status="old",form="formatted",ERR=304 )
+      CLOSE(99)
+      CALL system("rm wrf_stop_now")
+      result = -1
+304   CONTINUE
+    ENDIF
+    CALL wrf_dm_bcast_integer( result, 1 )
+    IF ( result .EQ. 0 ) THEN
+      CALL system("sleep 1")
+      GOTO 301
+    ELSE IF ( result .GT. 0 ) THEN
+      await_next = .TRUE.
+    ELSE
+      await_next = .FALSE.
+    ENDIF
+
+END FUNCTION await_next 
 

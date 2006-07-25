@@ -98,15 +98,20 @@ else
   endif
   if (($WRF_EM_CORE == 1) && ($WRF_DA_CORE != 1)) then
     if ( ! -f Registry/Registry ) then
+      echo "Registry/Registry did not exist so overwriting"
       set overwrite=1
     else
       head -2 Registry/Registry | tail -1 | grep EM > /dev/null
       if ( $status ) then
+        echo overwriting because Registry did not contain EM string
         set overwrite=1
       else
         set em_time=`ls -1tr Registry | cat -n | grep -w 'Registry\.EM' | grep -v 'Registry.EM.' | awk '{print $1}'`
         set rg_time=`ls -1tr Registry | cat -n | grep -w 'Registry' | grep -v 'Registry.' | awk '{print $1}'`
-        if ( $em_time > $rg_time ) set overwrite=1
+        if ( $em_time > $rg_time ) then
+           set overwrite=1
+           echo overwriting because Registry.EM is newer than Registry
+        endif
       endif
     endif
     if ( $overwrite ) then

@@ -7,6 +7,9 @@
                                  ps1, pe1, ps2, pe2, ps3, pe3, Status          )
     USE module_io
     USE module_wrf_error
+#ifdef WRFVAR
+    USE module_state_description
+#endif
     IMPLICIT NONE
 
     integer                                      :: DataHandle
@@ -30,6 +33,12 @@
     INTEGER , DIMENSION(3) :: memory_start , memory_end
     INTEGER , DIMENSION(3) :: patch_start , patch_end
     CHARACTER*80 , DIMENSION(3) :: dimnames
+    INTEGER l
+#ifdef WRFVAR
+    INTEGER Hndl, Hopened, dyn_opt
+    LOGICAL for_out
+    CHARACTER*20 DataSet
+#endif
 
     integer                       ,intent(inout)   :: Status
 
@@ -46,6 +55,27 @@
     CALL debug_io_wrf ( debug_message,DateStr,                          &
                         domain_start,domain_end,patch_start,patch_end,  &
                         memory_start,memory_end                          )
+
+#ifdef WRFVAR
+    CALL get_handle ( Hndl, Hopened, for_out, DataSet, DataHandle )
+
+    CALL nl_get_dyn_opt( 1, dyn_opt )
+
+    l = min(len(trim(var)),2)
+
+    IF      ( dyn_opt .EQ. dyn_em     ) THEN
+      IF (                                        VAR(1:l) .EQ. 'A_' .OR. VAR(1:l) .EQ. 'G_'  ) RETURN
+    ELSE IF ( dyn_opt .EQ. dyn_em_tl ) THEN
+      IF ( TRIM(DataSet) .EQ. 'INPUT'     .AND.   VAR(1:l) .EQ. 'A_'                          ) RETURN
+      IF ( TRIM(DataSet) .EQ. 'AUXINPUT2' .AND. ( VAR(1:l) .EQ. 'A_' .OR. VAR(1:l) .EQ. 'G_' )) RETURN
+      IF ( TRIM(DataSet) .EQ. 'AUXINPUT3' .AND. ( VAR(1:l) .EQ. 'A_' .OR. VAR(1:l) .EQ. 'G_' )) RETURN
+      IF ( TRIM(DataSet) .EQ. 'HISTORY'   .AND.   VAR(1:l) .EQ. 'A_'                          ) RETURN
+      IF ( TRIM(DataSet) .EQ. 'AUXHIST3'  .AND.   VAR(1:l) .EQ. 'A_'                          ) RETURN
+    ELSE IF ( dyn_opt .EQ. dyn_em_ad ) THEN
+      IF ( TRIM(DataSet) .EQ. 'AUXINPUT2' .AND. ( VAR(1:l) .EQ. 'A_' .OR. VAR(1:l) .EQ. 'G_' )) RETURN
+      IF ( TRIM(DataSet) .EQ. 'AUXINPUT3' .AND. ( .NOT.  VAR(1:l) .EQ. 'G_'                  )) RETURN
+    ENDIF
+#endif
 
     Status = 1
     if ( de1 - ds1 < 0 ) return

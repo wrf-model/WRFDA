@@ -1,4 +1,7 @@
 subroutine da_get_var_diagnostics ( iv, j )
+#ifdef DM_PARALLEL
+   USE module_dm, ONLY : mpi_comm_local
+#endif
 
 
 !------------------------------------------------------------------------------
@@ -16,6 +19,8 @@ subroutine da_get_var_diagnostics ( iv, j )
 !------------------------------------------------------------------------------
       LOGICAL, EXTERNAL :: wrf_dm_on_monitor     ! For statistics output.
 !------------------------------------------------------------------------------
+
+      CALL wrf_debug(100,"entering da_get_var_diagnostics")
 
 !-----------------------------------------------------------------------------
 !  [1.0] Sum up Jo across processors:
@@ -55,9 +60,8 @@ subroutine da_get_var_diagnostics ( iv, j )
                          j % jo % airep_t, dum1, dum2, dum3, dum4 )
       call da_sum_reals( 2, j % jo % pilot_u, j % jo % pilot_v, dum1, dum2,   &
                                                              dum3, dum4, dum5 )
-      call da_sum_reals( 5, j % jo % bogus_u, j % jo % bogus_v, &
-                            j % jo % bogus_t, j % jo % bogus_q, &
-                            j % jo % bogus_slp, dum1, dum2 )
+      call da_sum_reals( 3, j % jo % bogus_u, j % jo % bogus_v, &
+                            j % jo % bogus_slp, dum1, dum2, dum3, dum4 )
       call da_sum_reals( 2, j % jo % ssmir_speed, j % jo % ssmir_tpw, &
                          dum1, dum2, dum3, dum4, dum5 )
       call da_sum_reals( 7, j % jo % ssmi_tb19v, j % jo % ssmi_tb19h, &
@@ -83,39 +87,39 @@ subroutine da_get_var_diagnostics ( iv, j )
 
 #ifdef DM_PARALLEL
       call MPI_ALLREDUCE( iv%num_synop, iv%num_synop_glo, 1, MPI_INTEGER, &
-                          MPI_SUM, MPI_COMM_WORLD, IERROR )
+                          MPI_SUM, mpi_comm_local, IERROR )
       call MPI_ALLREDUCE( iv%num_metar, iv%num_metar_glo, 1, MPI_INTEGER, &
-                          MPI_SUM, MPI_COMM_WORLD, IERROR )
+                          MPI_SUM, mpi_comm_local, IERROR )
       call MPI_ALLREDUCE( iv%num_ships, iv%num_ships_glo, 1, MPI_INTEGER, &
-                          MPI_SUM, MPI_COMM_WORLD, IERROR )
+                          MPI_SUM, mpi_comm_local, IERROR )
       call MPI_ALLREDUCE( iv%num_pilot, iv%num_pilot_glo, 1, MPI_INTEGER, &
-                          MPI_SUM, MPI_COMM_WORLD, IERROR )
+                          MPI_SUM, mpi_comm_local, IERROR )
       call MPI_ALLREDUCE( iv%num_ssmi_retrieval , iv%num_ssmi_retrieval_glo , 1, MPI_INTEGER, &
-                          MPI_SUM, MPI_COMM_WORLD, IERROR )
+                          MPI_SUM, mpi_comm_local, IERROR )
       call MPI_ALLREDUCE( iv%num_ssmt1, iv%num_ssmt1_glo, 1, MPI_INTEGER, &
-                          MPI_SUM, MPI_COMM_WORLD, IERROR )
+                          MPI_SUM, mpi_comm_local, IERROR )
       call MPI_ALLREDUCE( iv%num_ssmt2, iv%num_ssmt2_glo, 1, MPI_INTEGER, &
-                          MPI_SUM, MPI_COMM_WORLD, IERROR )
+                          MPI_SUM, mpi_comm_local, IERROR )
       call MPI_ALLREDUCE( iv%num_satem, iv%num_satem_glo, 1, MPI_INTEGER, &
-                          MPI_SUM, MPI_COMM_WORLD, IERROR )
+                          MPI_SUM, mpi_comm_local, IERROR )
       call MPI_ALLREDUCE( iv%num_gpspw, iv%num_gpspw_glo, 1, MPI_INTEGER, &
-                          MPI_SUM, MPI_COMM_WORLD, IERROR )
+                          MPI_SUM, mpi_comm_local, IERROR )
       call MPI_ALLREDUCE( iv%num_airep, iv%num_airep_glo, 1, MPI_INTEGER, &
-                          MPI_SUM, MPI_COMM_WORLD, IERROR )
+                          MPI_SUM, mpi_comm_local, IERROR )
       call MPI_ALLREDUCE( iv%num_geoamv, iv%num_geoamv_glo, 1, MPI_INTEGER, &
-                          MPI_SUM, MPI_COMM_WORLD, IERROR )
+                          MPI_SUM, mpi_comm_local, IERROR )
       call MPI_ALLREDUCE( iv%num_polaramv, iv%num_polaramv_glo, 1, MPI_INTEGER, &
-                          MPI_SUM, MPI_COMM_WORLD, IERROR )
+                          MPI_SUM, mpi_comm_local, IERROR )
       call MPI_ALLREDUCE( iv%num_sound, iv%num_sound_glo, 1, MPI_INTEGER, &
-                          MPI_SUM, MPI_COMM_WORLD, IERROR )
+                          MPI_SUM, mpi_comm_local, IERROR )
       call MPI_ALLREDUCE( iv%num_qscat, iv%num_qscat_glo, 1, MPI_INTEGER, &
-                          MPI_SUM, MPI_COMM_WORLD, IERROR )
+                          MPI_SUM, mpi_comm_local, IERROR )
       call MPI_ALLREDUCE( iv%num_buoy, iv%num_buoy_glo, 1, MPI_INTEGER, &
-                          MPI_SUM, MPI_COMM_WORLD, IERROR )
+                          MPI_SUM, mpi_comm_local, IERROR )
       call MPI_ALLREDUCE( iv%num_profiler, iv%num_profiler_glo, 1, MPI_INTEGER, &
-                          MPI_SUM, MPI_COMM_WORLD, IERROR )
+                          MPI_SUM, mpi_comm_local, IERROR )
       call MPI_ALLREDUCE( iv%num_bogus, iv%num_bogus_glo, 1, MPI_INTEGER, &
-                          MPI_SUM, MPI_COMM_WORLD, IERROR )
+                          MPI_SUM, mpi_comm_local, IERROR )
 #else
       iv%num_profiler_glo = iv%num_profiler
       iv%num_buoy_glo = iv%num_buoy
@@ -251,9 +255,8 @@ subroutine da_get_var_diagnostics ( iv, j )
                                   iv % num_bogus_glo, num_bogus_tot, &
                                   j % jo % bogus_u, iv % bogus_ef_u, &
                                   j % jo % bogus_v, iv % bogus_ef_v, &
-                                  j % jo % bogus_t, iv % bogus_ef_t, &
-                                  j % jo % bogus_q, iv % bogus_ef_q, &
-                                  j % jo % bogus_slp, iv % bogus_ef_slp
+                                  j % jo % bogus_slp, iv % bogus_ef_slp, &
+                                  0.0, 1.0, 0.0, 1.0
          end if
 
          if ( iv % num_pilot_glo > 0 ) then
@@ -319,5 +322,7 @@ subroutine da_get_var_diagnostics ( iv, j )
                                   0.0, 1.0, 0.0, 1.0, 0.0, 1.0
          end if
       end if
+
+      CALL wrf_debug(100,"leaving da_get_var_diagnostics")
       
 end subroutine da_get_var_diagnostics

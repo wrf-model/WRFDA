@@ -4,6 +4,9 @@
 !     uses unrolled loops for increments equal to one.
 !     jack dongarra, linpack, 3/11/78.
 !
+#ifdef DM_PARALLEL
+      USE module_dm, ONLY : mpi_comm_local
+#endif
       implicit none
 
       integer, intent(in)               :: n
@@ -39,7 +42,7 @@
       if(global) then
          da_dot = dtemp1
       else
-         call mpi_allreduce(dtemp1,dtemp1x,1,TRUE_MPI_REAL,mpi_sum,mpi_comm_world,ierror)
+         call mpi_allreduce(dtemp1,dtemp1x,1,TRUE_MPI_REAL,mpi_sum,mpi_comm_local,ierror)
          da_dot = dtemp1x
       endif
 #else

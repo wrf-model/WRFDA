@@ -1,4 +1,7 @@
 SUBROUTINE DA_AO_Stats_SSMI ( stats_unit, oi, re )
+#ifdef DM_PARALLEL
+   USE module_dm, ONLY : mpi_comm_local
+#endif
 
    IMPLICIT NONE
 
@@ -15,10 +18,10 @@ SUBROUTINE DA_AO_Stats_SSMI ( stats_unit, oi, re )
 
 #ifdef DM_PARALLEL
    call MPI_ALLREDUCE(oi%num_ssmi_tb, num_ssmi_tb, 1, &
-                      MPI_INTEGER, MPI_SUM, MPI_COMM_WORLD, ierror)
+                      MPI_INTEGER, MPI_SUM, mpi_comm_local, ierror)
 
    call MPI_ALLREDUCE(oi%num_ssmi_retrieval, num_ssmi_retrieval, 1, &
-                      MPI_INTEGER, MPI_SUM, MPI_COMM_WORLD, ierror)
+                      MPI_INTEGER, MPI_SUM, mpi_comm_local, ierror)
 #else
    num_ssmi_tb = oi%num_ssmi_tb
    num_ssmi_retrieval = oi%num_ssmi_retrieval

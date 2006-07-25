@@ -52,6 +52,11 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
 
    TYPE (cv_type)               :: xhat  ! Increament control variable
 
+   INTEGER ierr,comm
+!------------------------------------------------------------------------------
+      LOGICAL, EXTERNAL :: wrf_dm_on_monitor     ! For statistics output.
+!------------------------------------------------------------------------------
+
 !------------------------------------------------------------------------------
 
    write (6, '(/,A,/)') ' ***  VARIATIONAL ANALYSIS ***'
@@ -127,9 +132,31 @@ SUBROUTINE solve_v3d ( grid , config_flags , &
 
 !     [8.1] Calculate nonlinear model trajectory 
 
+
       if (lvar4d) then
 #ifdef WRFVAR
+#ifdef DM_PARALLEL
+         call system_4dv("runvar4dnl.csh pre ")
+!         call system("./wrf.exe -rmpool 1")
+         IF ( wrf_dm_on_monitor() ) THEN
+           call system("rm wrf_done")
+           call system("touch wrf_go_ahead")
+           DO WHILE ( .true. )
+             OPEN(99,file="wrf_done",status="old",err=303)
+             CLOSE(99)
+             EXIT
+303          CONTINUE
+             CALL system("sync")
+             CALL system("sleep 1")
+           ENDDO
+         ENDIF
+         CALL wrf_get_dm_communicator ( comm )
+         CALL mpi_barrier( comm, ierr )
+         
+         call system_4dv("runvar4dnl.csh post ")
+#else
          call system("runvar4dnl.csh")
+#endif
 #endif
       endif
 

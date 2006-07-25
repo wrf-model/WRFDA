@@ -53,12 +53,18 @@ subroutine DA_Minimise_QN( grid, config_flags,               &
       integer, dimension(2)             :: iprint
       logical                           :: llfin
 
+      CHARACTER*256 message
+
+      CALL wrf_debug(100,"entering DA_Minimise_QN")
+
+
       write (6,'(A)') &
         ' --------------------------------------------------------'
       write (6,'(A)') &
         ' [5.2] Minimizing cost function using Quasi Newton Method'
       write (6,'(A)') &
         ' --------------------------------------------------------'
+      write(6,*)
 
       iflag = 0
       llfin = .false.
@@ -104,7 +110,13 @@ subroutine DA_Minimise_QN( grid, config_flags,               &
                            its, ite, jts, jte, kts, kte,             &
                            grid, config_flags                        )
 
+      WRITE(message,*)'DA_Minimise_QN: j%total ',j%total
+      CALL wrf_debug(100,TRIM(message))
+
       if( j %total == 0.0) go to 1004
+
+      WRITE(message,*)'DA_Minimise_QN: after go to 1004'
+      CALL wrf_debug(100,TRIM(message))
 
       llfin = .false.
 
@@ -129,7 +141,10 @@ subroutine DA_Minimise_QN( grid, config_flags,               &
 
 !      iter_start = (it-1) * ntmax + 1
 !      do iter = iter_start, iter_start + ntmax - 1
+
       do iter = 1, ntmax                            
+        WRITE(message,*)'DA_Minimise: iter ',iter,' ntmax ',ntmax
+        CALL wrf_debug(100,message)
 
 !         iter_inner = iter - iter_start + 1
 
@@ -140,6 +155,8 @@ subroutine DA_Minimise_QN( grid, config_flags,               &
                       cv_size, j_grad, j_grad_old, &
                       nsave, zs, zy, zw )
 
+        WRITE(message,*)'DA_Minimise: iflag ',iflag
+        CALL wrf_debug(100,message)
          if (iflag < 0 ) exit              ! minimisation achieved.
 
 !        [3.3] find stepsize down descent direction:
@@ -192,7 +209,12 @@ subroutine DA_Minimise_QN( grid, config_flags,               &
 !------------------------------------------------------------------------------
 
       if (iter > ntmax) iter = iter-1
+      WRITE(message,*)'DA_Minimise_QN: before 1004, iter ',iter,' ntmax ',ntmax
+      CALL wrf_debug(100,TRIM(message))
+
 1004  continue
+
+      CALL wrf_debug(100,"leaving DA_Minimise_QN")
 
 end subroutine DA_Minimise_QN
 

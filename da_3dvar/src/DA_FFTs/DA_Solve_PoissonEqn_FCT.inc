@@ -11,6 +11,9 @@ SUBROUTINE DA_Solve_PoissonEqn_FCT( xb, xbx, del2b, b, xp)
 !  HISTORY: 09/28/1999 - Creation of F90 version.           Dale Barker
 !           10/19/2001 - Mods for parallel implementation.  Al Bourgeois
 !------------------------------------------------------------------------------
+#ifdef DM_PARALLEL
+   USE module_dm, ONLY : mpi_comm_local
+#endif
 
    IMPLICIT NONE
    
@@ -285,7 +288,7 @@ SUBROUTINE DA_Solve_PoissonEqn_FCT( xb, xbx, del2b, b, xp)
 
 #ifdef DM_PARALLEL
    call MPI_ALLREDUCE( local_mean, global_mean, n, TRUE_MPI_REAL, MPI_SUM, &
-                       MPI_COMM_WORLD, IERROR )
+                       mpi_comm_local, IERROR )
 #else
    global_mean(xp%kts:xp%kte) = local_mean(xp%kts:xp%kte)
 #endif

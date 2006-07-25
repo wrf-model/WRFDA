@@ -2,6 +2,9 @@ SUBROUTINE check_sfc_assi( xb, xa, iv, xp, y, &
                            ids,ide, jds,jde, kds,kde, &
                            ims,ime, jms,jme, kms,kme, &
                            its,ite, jts,jte, kts,kte )
+#ifdef DM_PARALLEL
+   USE module_dm, ONLY : mpi_comm_local
+#endif
    
    implicit none
   
@@ -152,10 +155,10 @@ SUBROUTINE check_sfc_assi( xb, xa, iv, xp, y, &
 
 #ifdef DM_PARALLEL
    call MPI_ALLREDUCE( partial_lhs, adj_ttl_lhs, 1, TRUE_MPI_REAL, MPI_SUM, &
-                       MPI_COMM_WORLD, IERROR )
+                       mpi_comm_local, IERROR )
 
    call MPI_ALLREDUCE( partial_rhs, adj_ttl_rhs, 1, TRUE_MPI_REAL, MPI_SUM, &
-                       MPI_COMM_WORLD, IERROR )
+                       mpi_comm_local, IERROR )
    
    IF ( wrf_dm_on_monitor() ) THEN
       write(unit=*, fmt='(A,1pe22.14)') ' Whole Domain < y, y     > = ', adj_ttl_lhs
@@ -316,10 +319,10 @@ SUBROUTINE check_psfc( xb, xa, iv, xp, y, &
 
 #ifdef DM_PARALLEL
    call MPI_ALLREDUCE( partial_lhs, adj_ttl_lhs, 1, TRUE_MPI_REAL, MPI_SUM, &
-                       MPI_COMM_WORLD, IERROR )
+                       mpi_comm_local, IERROR )
 
    call MPI_ALLREDUCE( partial_rhs, adj_ttl_rhs, 1, TRUE_MPI_REAL, MPI_SUM, &
-                       MPI_COMM_WORLD, IERROR )
+                       mpi_comm_local, IERROR )
    
    IF ( wrf_dm_on_monitor() ) THEN
       write(unit=*, fmt='(A,1pe22.14)') ' Whole Domain < y, y     > = ', adj_ttl_lhs

@@ -22,9 +22,15 @@ PROGRAM wrfvar
    TYPE(ESMF_Clock)    :: clock
    TYPE(ESMF_VM)       :: vm   
    INTEGER :: rc
+!------------------------------------------------------------------------------
+      LOGICAL, EXTERNAL :: wrf_dm_on_monitor     ! For statistics output.
+!------------------------------------------------------------------------------
+
 
    ! This call includes everything that must be done before ESMF_Initialize() 
    ! is called.  
+
+   CALL disable_quilting
    CALL init_modules(1)   ! Phase 1 returns after MPI_INIT() (if it is called)
 
    CALL ESMF_Initialize( vm=vm, defaultCalendar=ESMF_CAL_GREGORIAN, rc=rc )
@@ -33,9 +39,14 @@ PROGRAM wrfvar
 
    CALL wrfvar_run( gcomp, importState, exportState, clock, rc )
 
+   IF ( wrf_dm_on_monitor() ) THEN
+      CALL system ("touch wrf_stop_now") 
+   ENDIF
+
    CALL wrfvar_finalize( gcomp, importState, exportState, clock, rc )
 
    CALL ESMF_Finalize( rc=rc )
+
 
 END PROGRAM wrfvar
 

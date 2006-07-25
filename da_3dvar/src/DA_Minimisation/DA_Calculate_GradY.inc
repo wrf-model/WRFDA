@@ -20,6 +20,8 @@
 !     [1.0] Compute components of Grad_y(Jo):
 !-------------------------------------------------------------------------
 
+      CALL wrf_debug(100,"entering DA_Calculate_GradY")
+
 !     Radiosonde
 
       call DA_Calculate_GradY_Sound( iv, re,  jo_grad_y)
@@ -101,5 +103,7 @@
 !     Radar:               
 
       call DA_Calculate_GradY_Radar( iv, re, jo_grad_y)
+
+      CALL wrf_debug(100,"leaving DA_Calculate_GradY")
                    
       end subroutine DA_Calculate_GradY

@@ -325,11 +325,13 @@ if test -n "$PERL" ; then
      echo "configure for var"
      $PERL arch/Config_3dvar.pl -perl=$PERL -netcdf=$NETCDF -phdf5=$PHDF5 -os=$os -mach=$mach -ldflags=$ldflags \
        -compileflags=$compileflags
+     /bin/cp tools/gen_wrf_io.c.var tools/gen_wrf_io.c
      echo "configure for var/be"
   else
      echo "configure for wrf"
      $PERL arch/Config.pl -perl=$PERL -netcdf=$NETCDF -phdf5=$PHDF5 -os=$os -mach=$mach -ldflags=$ldflags \
        -compileflags=$compileflags
+     /bin/cp tools/gen_wrf_io.c.model tools/gen_wrf_io.c
      echo "configure for wrf"
   fi
 fi

@@ -15,6 +15,9 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
 !
 !  PARENT_MODULE: DA_Setup_Structures
 !------------------------------------------------------------------------------
+#ifdef DM_PARALLEL
+   USE module_dm, ONLY : mpi_comm_local
+#endif
 
    IMPLICIT NONE
    
@@ -610,7 +613,7 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
      write(unit=*, fmt='(a)') &
           'Brightness temperature'
    endif
-
+ 
    if ( Use_SsmiTbObs)   &
    call DA_Transform_XToTb( xb )
 
@@ -658,9 +661,9 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
 
 #ifdef DM_PARALLEL
    call MPI_ALLREDUCE( loc_psac_mean, xbx % psac_mean, 1, TRUE_MPI_REAL, MPI_SUM, &
-                       MPI_COMM_WORLD, IERROR )
+                       mpi_comm_local, IERROR )
    call MPI_ALLREDUCE( loc_latc_mean, xbx % latc_mean, (xp%jde-xp%jds+1), &
-                       TRUE_MPI_REAL, MPI_SUM, MPI_COMM_WORLD, IERROR )
+                       TRUE_MPI_REAL, MPI_SUM, mpi_comm_local, IERROR )
 #else
    xbx % psac_mean = loc_psac_mean
    xbx % latc_mean = loc_latc_mean

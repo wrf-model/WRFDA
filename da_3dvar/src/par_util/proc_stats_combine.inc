@@ -8,6 +8,9 @@ SUBROUTINE proc_stats_combine( proc_ave, proc_err, proc_min, proc_max, &
 !           (In this way, we do not have to do all-to-all communication.)
 !
 !------------------------------------------------------------------------------
+#ifdef DM_PARALLEL
+   USE module_dm, ONLY : mpi_comm_local
+#endif
 
    INCLUDE 'mpif.h'
 
@@ -33,13 +36,13 @@ SUBROUTINE proc_stats_combine( proc_ave, proc_err, proc_min, proc_max, &
    LOGICAL, EXTERNAL :: wrf_dm_on_monitor
 
 ! Get rank of monitor processor and broadcast to others.
-   call MPI_COMM_RANK( MPI_COMM_WORLD, myrank, ierr ) 
+   call MPI_COMM_RANK( mpi_comm_local, myrank, ierr ) 
    IF ( wrf_dm_on_monitor() ) root = myrank
    call wrf_dm_bcast_integer ( root, 1 )
 
 ! Sum average and rms error over all processors and store on monitor processor.
-   call MPI_REDUCE(proc_ave, average, 1, TRUE_MPI_REAL, MPI_SUM, root, MPI_COMM_WORLD, IERR )
-   call MPI_REDUCE(proc_err, rms_err, 1, TRUE_MPI_REAL, MPI_SUM, root, MPI_COMM_WORLD, IERR )
+   call MPI_REDUCE(proc_ave, average, 1, TRUE_MPI_REAL, MPI_SUM, root, mpi_comm_local, IERR )
+   call MPI_REDUCE(proc_err, rms_err, 1, TRUE_MPI_REAL, MPI_SUM, root, mpi_comm_local, IERR )
 
    IF ( wrf_dm_on_monitor() ) THEN
      proc_ave = average
@@ -49,7 +52,7 @@ SUBROUTINE proc_stats_combine( proc_ave, proc_err, proc_min, proc_max, &
 ! Get minimum value and associated processor index.
    in(1) = proc_min
    in(2) = myrank
-   call MPI_REDUCE(in, out, 1, MPI_2DOUBLE_PRECISION, MPI_MINLOC, root, MPI_COMM_WORLD, IERR )
+   call MPI_REDUCE(in, out, 1, MPI_2DOUBLE_PRECISION, MPI_MINLOC, root, mpi_comm_local, IERR )
 
    if( myrank .eq. root ) then
      proc_min = out(1)
@@ -60,11 +63,11 @@ SUBROUTINE proc_stats_combine( proc_ave, proc_err, proc_min, proc_max, &
 ! Get obs number and k-level where minimum occurs.
    if( proc_id .ne. root ) then
      if( myrank .eq. root ) then
-       call MPI_RECV( nobs_min, 1, MPI_INTEGER, proc_id, 10, MPI_COMM_WORLD, STATUS, IERR )
-       call MPI_RECV( klev_min, 1, MPI_INTEGER, proc_id, 11, MPI_COMM_WORLD, STATUS, IERR )
+       call MPI_RECV( nobs_min, 1, MPI_INTEGER, proc_id, 10, mpi_comm_local, STATUS, IERR )
+       call MPI_RECV( klev_min, 1, MPI_INTEGER, proc_id, 11, mpi_comm_local, STATUS, IERR )
      else if( myrank .eq. proc_id ) then
-       call MPI_SEND( nobs_min, 1, MPI_INTEGER, root, 10, MPI_COMM_WORLD, IERR )
-       call MPI_SEND( klev_min, 1, MPI_INTEGER, root, 11, MPI_COMM_WORLD, IERR )
+       call MPI_SEND( nobs_min, 1, MPI_INTEGER, root, 10, mpi_comm_local, IERR )
+       call MPI_SEND( klev_min, 1, MPI_INTEGER, root, 11, mpi_comm_local, IERR )
      end if
    end if
 
@@ -72,7 +75,7 @@ SUBROUTINE proc_stats_combine( proc_ave, proc_err, proc_min, proc_max, &
    in(1) = proc_max
    in(2) = myrank
 
-   call MPI_REDUCE(in, out, 1, MPI_2DOUBLE_PRECISION, MPI_MAXLOC, root, MPI_COMM_WORLD, IERR )
+   call MPI_REDUCE(in, out, 1, MPI_2DOUBLE_PRECISION, MPI_MAXLOC, root, mpi_comm_local, IERR )
 
    if( myrank .eq. root ) then
      proc_max = out(1)
@@ -84,11 +87,11 @@ SUBROUTINE proc_stats_combine( proc_ave, proc_err, proc_min, proc_max, &
 ! Get obs number and k-level where maximum occurs.
    if( proc_id .ne. root ) then
      if( myrank .eq. root ) then
-       call MPI_RECV( nobs_max, 1, MPI_INTEGER, proc_id, 10, MPI_COMM_WORLD, STATUS, IERR )
-       call MPI_RECV( klev_max, 1, MPI_INTEGER, proc_id, 11, MPI_COMM_WORLD, STATUS, IERR )
+       call MPI_RECV( nobs_max, 1, MPI_INTEGER, proc_id, 10, mpi_comm_local, STATUS, IERR )
+       call MPI_RECV( klev_max, 1, MPI_INTEGER, proc_id, 11, mpi_comm_local, STATUS, IERR )
      else if( myrank .eq. proc_id ) then
-       call MPI_SEND( nobs_max, 1, MPI_INTEGER, root, 10, MPI_COMM_WORLD, IERR )
-       call MPI_SEND( klev_max, 1, MPI_INTEGER, root, 11, MPI_COMM_WORLD, IERR )
+       call MPI_SEND( nobs_max, 1, MPI_INTEGER, root, 10, mpi_comm_local, IERR )
+       call MPI_SEND( klev_max, 1, MPI_INTEGER, root, 11, mpi_comm_local, IERR )
      end if
    end if
    RETURN

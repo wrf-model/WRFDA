@@ -5,6 +5,7 @@
 !     uses unrolled loops for increments equal to one.
 !     jack dongarra, linpack, 3/11/78.
 !
+      USE module_dm, ONLY : mpi_comm_local
       implicit none
 
       INCLUDE 'mpif.h'
@@ -45,7 +46,7 @@
         end if
       end if
 !
-      call mpi_allreduce(dtemp1,dtemp1x,1,TRUE_MPI_REAL,mpi_sum,mpi_comm_world,ierror)
+      call mpi_allreduce(dtemp1,dtemp1x,1,TRUE_MPI_REAL,mpi_sum,mpi_comm_local,ierror)
 !
       da_dot = dtemp1x
       return

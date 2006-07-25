@@ -36,6 +36,8 @@ subroutine da_minimise( grid, config_flags, &
 
    character(len=120)                :: message
 
+   CALL wrf_debug(100,"entering da_minimise")
+
    sm31             = grid%sm31
    em31             = grid%em31
    sm32             = grid%sm32
@@ -79,6 +81,8 @@ subroutine da_minimise( grid, config_flags, &
            'Invalid minimisation_option =', minimisation_option
       CALL WRF_ERROR_FATAL ( message )
    endif
+
+   CALL wrf_debug(100,"leaving da_minimise")
 
 end subroutine da_minimise
 

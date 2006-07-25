@@ -214,22 +214,11 @@ SUBROUTINE input_terrain_rsmas ( ter , xlat, xlon, dx , &
    REAL , INTENT(IN)                                  :: DX
    LOGICAL, EXTERNAL ::  wrf_dm_on_monitor
 
-   INTEGER :: i , j , k , myproc
+   INTEGER :: i , j , k
 
 #if DM_PARALLEL
 ! Local globally sized arrays
    REAL , DIMENSION(ids:ide,jds:jde) :: ter_g, xlat_g, xlon_g
-#endif
-
-   CALL wrf_get_myproc ( myproc ) 
-
-#if 0
-write(30+myproc,*)ipe-ips+1,jpe-jps+1,' HT before '
-do j = jps,jpe
-do i = ips,ipe
-write(30+myproc,*)ter(i,j)
-enddo
-enddo
 #endif
 
 #if ( defined( DM_PARALLEL ) && ( ! defined( STUBMPI ) ) )
@@ -262,14 +251,5 @@ enddo
 
 #endif
 
-#if 0
-write(30+myproc,*)ipe-ips+1,jpe-jps+1,' HT after '
-do j = jps,jpe
-do i = ips,ipe
-write(30+myproc,*)ter(i,j)
-enddo
-enddo
-#endif
-                       
 END SUBROUTINE input_terrain_rsmas
 

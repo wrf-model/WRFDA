@@ -31,6 +31,8 @@ SUBROUTINE da_get_innov_vector( it, ob, iv, &
 
 !----------------------------------------------------------------------------   
 
+   CALL wrf_debug(100,"entering da_get_innov_vector")
+
    write (6,'(/,A)') ' --------------------------------------'
    write (6,'(A)')   ' [5.1] Calculate innovation vector (iv)'
    write (6,'(A)')   ' --------------------------------------'
@@ -164,6 +166,8 @@ SUBROUTINE da_get_innov_vector( it, ob, iv, &
 #include <em_dummy_args.inc>
                               )
    endif
+
+   CALL wrf_debug(100,"leaving da_get_innov_vector")
 
 END SUBROUTINE da_get_innov_vector
 

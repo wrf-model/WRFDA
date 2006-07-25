@@ -45,7 +45,30 @@
 
     integer                       ,intent(inout)   :: Status
     LOGICAL for_out
+    CHARACTER*20 DataSet
     INTEGER Hndl, io_form
+    INTEGER l
+#ifdef WRFVAR
+    INTEGER dyn_opt
+#endif
+
+#ifdef WRFVAR
+    CALL get_handle ( Hndl, io_form, for_out, DataSet, DataHandle )
+    CALL nl_get_dyn_opt( 1, dyn_opt )
+    l = min(len(trim(var)),2)
+    IF      ( dyn_opt .EQ. dyn_em     ) THEN
+      IF (                                        VAR(1:l) .EQ. 'A_' .OR. VAR(1:l) .EQ. 'G_'  ) RETURN
+    ELSE IF ( dyn_opt .EQ. dyn_em_tl ) THEN
+      IF ( TRIM(DataSet) .EQ. 'INPUT'     .AND.   VAR(1:l) .EQ. 'A_'                          ) RETURN
+      IF ( TRIM(DataSet) .EQ. 'AUXINPUT2' .AND. ( VAR(1:l) .EQ. 'A_' .OR. VAR(1:l) .EQ. 'G_' )) RETURN
+      IF ( TRIM(DataSet) .EQ. 'AUXINPUT3' .AND.   VAR(1:l) .EQ. 'A_'                          ) RETURN
+      IF ( TRIM(DataSet) .EQ. 'HISTORY'   .AND.   VAR(1:l) .EQ. 'A_'                          ) RETURN
+      IF ( TRIM(DataSet) .EQ. 'AUXHIST3'  .AND.   VAR(1:l) .EQ. 'A_'                          ) RETURN
+    ELSE IF ( dyn_opt .EQ. dyn_em_ad ) THEN
+      IF ( TRIM(DataSet) .EQ. 'AUXINPUT2' .AND. ( VAR(1:l) .EQ. 'A_' .OR. VAR(1:l) .EQ. 'G_' )) RETURN
+      IF ( TRIM(DataSet) .EQ. 'AUXHIST3'  .AND. ( VAR(1:l) .EQ. 'A_' .OR. VAR(1:l) .EQ. 'G_' )) RETURN
+    ENDIF
+#endif
 
     IF ( wrf_at_debug_level( 500 ) ) THEN
       call start_timing
@@ -101,7 +124,7 @@
                       ,patch_end                  &  ! PatchEnd
                       ,Status )
 
-    CALL get_handle ( Hndl, io_form , for_out, DataHandle )
+    CALL get_handle ( Hndl, io_form , for_out, DataSet, DataHandle )
 
     IF ( dryrun .and. io_form .EQ. IO_NETCDF) THEN
       CALL wrf_put_var_ti_char( &

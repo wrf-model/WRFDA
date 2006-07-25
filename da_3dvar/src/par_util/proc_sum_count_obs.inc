@@ -18,6 +18,9 @@ SUBROUTINE proc_sum_count_obs ( count_obs )
 !
 !         07/08/2003 - Updated for Buoy     obs.           S. R. H. Rizvi
 !-------------------------------------------------------------------------------
+#ifdef DM_PARALLEL
+   USE module_dm, ONLY : mpi_comm_local
+#endif
 
    INCLUDE 'mpif.h'
    
@@ -35,7 +38,7 @@ SUBROUTINE proc_sum_count_obs ( count_obs )
    LOGICAL, EXTERNAL :: wrf_dm_on_monitor
 
 ! Get rank of monitor processor and broadcast to others.
-   call MPI_COMM_RANK( MPI_COMM_WORLD, myrank, ierr )
+   call MPI_COMM_RANK( mpi_comm_local, myrank, ierr )
 
    IF ( wrf_dm_on_monitor() ) root = myrank
    call wrf_dm_bcast_integer ( root, 1 )
@@ -61,7 +64,7 @@ SUBROUTINE proc_sum_count_obs ( count_obs )
    call pack_count_obs( count_obs % num_bogus, offset, procval )
    call pack_count_obs( count_obs % num_buoy, offset, procval )
 
-   call MPI_REDUCE(procval, sumval, numvals, MPI_INTEGER, MPI_SUM, root, MPI_COMM_WORLD, IERR )
+   call MPI_REDUCE(procval, sumval, numvals, MPI_INTEGER, MPI_SUM, root, mpi_comm_local, IERR )
    
    IF ( myrank .eq. root ) then
      offset = 1

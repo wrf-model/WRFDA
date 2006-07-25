@@ -2,6 +2,9 @@ SUBROUTINE da_get_y_lhs_value( iv, y, &
                                partial_lhs, pertile_lhs, adj_ttl_lhs )
    
 !------------------------------------------------------------------------------
+#ifdef DM_PARALLEL
+   USE module_dm, ONLY : mpi_comm_local
+#endif
    
    implicit none
    
@@ -79,7 +82,7 @@ SUBROUTINE da_get_y_lhs_value( iv, y, &
 
 #ifdef DM_PARALLEL
    call MPI_ALLREDUCE( partial_lhs, adj_ttl_lhs, 1, TRUE_MPI_REAL, MPI_SUM, &
-                       MPI_COMM_WORLD, IERROR )
+                       mpi_comm_local, IERROR )
 #else
    adj_ttl_lhs = partial_lhs
 #endif

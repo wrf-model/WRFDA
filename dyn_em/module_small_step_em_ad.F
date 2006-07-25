@@ -231,6 +231,7 @@ do j = j_start, j_end
     a_wdtn(i,1) = 0.
   end do
 end do
+
 do j = j_start, j_end
   do k = 1, k_end
     do i = i_start, i_end
@@ -521,6 +522,7 @@ a_v_outer_j_loop: do j = j_endv, j_start, -1
         a_p(i,2,j) = a_p(i,2,j)+0.5*a_dpn(i,1)*cf2
         a_p(i,1,j-1) = a_p(i,1,j-1)+0.5*a_dpn(i,1)*cf1
         a_p(i,1,j) = a_p(i,1,j)+0.5*a_dpn(i,1)*cf1
+
         a_dpn(i,1) = 0.
       end do
     endif
@@ -820,6 +822,9 @@ if ((config_flags%specified .or. config_flags%nested) .and. jte .eq. jde) then
 endif
 ! recompute : j_end
 do j = j_start, j_end
+  DO i=i_start, i_end
+    rhs(i,1) = 0.
+  ENDDO
   do i = i_start, i_end
     mut_inv(i) = 1./mut(i,j)
     msft_inv(i) = 1./msft(i,j)
