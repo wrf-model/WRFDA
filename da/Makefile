@@ -2,7 +2,7 @@
 
 include ../configure.wrf
 
-OBJS_FOR_ALL =		da_solve_v3d.o		\
+OBJS_FOR_ALL =		da_solve.o		\
                         da_memory.o             \
                         da_tracing.o            \
 			da_par_util.o           \
@@ -114,7 +114,7 @@ da_par_util1.o:		da_proc_sum_int.inc               \
 			$(CPP) $(CPPFLAGS) da_par_util1.f90 > da_par_util1.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_par_util1.f
 
-da_solve_v3d.o:		da_constants.o			\
+da_solve.o:		da_constants.o			\
 			da_define_structures.o		\
 			da_setup_structures.o		\
 			da_test.o			\
@@ -122,10 +122,10 @@ da_solve_v3d.o:		da_constants.o			\
 			da_minimisation.o		\
 			da_par_util.o			\
 			da_init_wrfvar.inc \
-			da_solve_v3d.f90
+			da_solve.f90
 			$(RM) $@
-			$(CPP) $(CPPFLAGS) da_solve_v3d.f90 > da_solve_v3d.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_solve_v3d.f
+			$(CPP) $(CPPFLAGS) da_solve.f90 > da_solve.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) da_solve.f
 
 da_minimisation.o:	da_minimisation.f90 \
                         $(FFTPACK5)/fftpack5.o \
