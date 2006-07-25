@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/ksh
 
 export RELEASE=${RELEASE:-WRF_V2.1.2}
 export REL_DIR=${REL_DIR:-$HOME/code_development/$RELEASE}
