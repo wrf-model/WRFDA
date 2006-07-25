@@ -1,7 +1,7 @@
 !MEDIATION_LAYER:SOLVE_V3D
 
 SUBROUTINE da_solve_v3d ( grid , config_flags , &
-   #include "em_dummy_args.inc"
+#include "em_dummy_args.inc"
                  )
 
    ! Driver layer modules
@@ -35,7 +35,7 @@ SUBROUTINE da_solve_v3d ( grid , config_flags , &
    TYPE (grid_config_rec_type), intent(inout) :: config_flags
 
    ! Definitions of dummy arguments to solve
-   #include "em_dummy_decl.inc"
+#include "em_dummy_decl.inc"
 
    TYPE (xbx_type)              :: xbx         ! For header & non-grid arrays.
    TYPE (be_type)               :: be          ! Background error structure.
@@ -237,7 +237,7 @@ SUBROUTINE da_solve_v3d ( grid , config_flags , &
    !---------------------------------------------------------------------------
 
    call da_setup_firstguess( xbx, grid, &
-      #include "em_dummy_args.inc"
+#include "em_dummy_args.inc"
                            )
 
    !---------------------------------------------------------------------------
@@ -279,7 +279,7 @@ SUBROUTINE da_solve_v3d ( grid , config_flags , &
    if ( test_transforms .or. Testing_WRFVAR ) then
       call da_get_innov_vector( it, ob, iv, &
                                 grid , config_flags , &
-         #include "em_dummy_args.inc"
+#include "em_dummy_args.inc"
                  )
 
       call da_allocate_y( iv, re )
@@ -310,14 +310,16 @@ SUBROUTINE da_solve_v3d ( grid , config_flags , &
       ! [8.1] Calculate nonlinear model trajectory 
 
       if (lvar4d) then
+         call da_trace("da_solve_v3d","Starting da_run_wrfplus_nl.ksh")
          call system("da_run_wrfplus_nl.ksh")
+         call da_trace("da_solve_v3d","Finished da_run_wrfplus_nl.ksh")
       endif
 
       ! [8.2] Calculate innovation vector (O-B):
 
       call da_get_innov_vector( it, ob, iv, &
                                 grid , config_flags , &
-         #include "em_dummy_args.inc"
+#include "em_dummy_args.inc"
                  )
 
       if (test_transforms) then
@@ -394,7 +396,7 @@ SUBROUTINE da_solve_v3d ( grid , config_flags , &
       !------------------------------------------------------------------------
 
       call da_transfer_xatoanalysis( it, xbx, grid, config_flags ,&
-         #include "em_dummy_args.inc"
+#include "em_dummy_args.inc"
          )
    END DO
 

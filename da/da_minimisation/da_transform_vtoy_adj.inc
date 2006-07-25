@@ -49,7 +49,10 @@ subroutine da_transform_vtoy_adj( cv_size, be, ep, cv, iv, vp, vv, xa, xb, &
                               )
       enddo
 
+      call da_trace("da_solve_v3d","Starting da_run_wrfplus_ad.ksh")
       call system("da_run_wrfplus_ad.ksh")
+      call da_trace("da_solve_v3d","Finished da_run_wrfplus_ad.ksh")
+
       filnam = 'gr00'
       call da_transfer_xatowrftl_adj( grid, config_flags, filnam, &
 #include "em_actual_args.inc"
