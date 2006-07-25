@@ -1,6 +1,6 @@
-!MEDIATION_LAYER:SOLVE_V3D
+!MEDIATION_LAYER:SOLVE_DA
 
-SUBROUTINE da_solve_v3d ( grid , config_flags , &
+SUBROUTINE da_solve ( grid , config_flags , &
 #include "em_dummy_args.inc"
                  )
 
@@ -56,7 +56,7 @@ SUBROUTINE da_solve_v3d ( grid , config_flags , &
    real                         :: j_grad_norm_target ! TArget j norm.
    integer                      :: iost, ierr
 
-   IF (trace_use) call da_trace_entry("da_solve_v3d")
+   IF (trace_use) call da_trace_entry("da_solve")
 
    call wrf_message("***  VARIATIONAL ANALYSIS ***")
 #ifdef DM_PARALLEL
@@ -224,7 +224,7 @@ SUBROUTINE da_solve_v3d ( grid , config_flags , &
    end if
 
    !---------------------------------------------------------------------------
-   ! [2.0] Initialise 3D-Var parameters:
+   ! [2.0] Initialise wrfvar parameters:
    !---------------------------------------------------------------------------
 
    call da_init_wrfvar( grid, xp, xb, &
@@ -310,9 +310,9 @@ SUBROUTINE da_solve_v3d ( grid , config_flags , &
       ! [8.1] Calculate nonlinear model trajectory 
 
       if (lvar4d) then
-         call da_trace("da_solve_v3d","Starting da_run_wrfplus_nl.ksh")
+         call da_trace("da_solve","Starting da_run_wrfplus_nl.ksh")
          call system("da_run_wrfplus_nl.ksh")
-         call da_trace("da_solve_v3d","Finished da_run_wrfplus_nl.ksh")
+         call da_trace("da_solve","Finished da_run_wrfplus_nl.ksh")
       endif
 
       ! [8.2] Calculate innovation vector (O-B):
@@ -412,13 +412,11 @@ SUBROUTINE da_solve_v3d ( grid , config_flags , &
 
    call wrf_message("*** WRF-Var completed successfully ***")
 
-   call wrf_debug ( 200 , ' call end of solve_v3d' )
-
-   IF (trace_use) call da_trace_exit("da_solve_v3d")
+   IF (trace_use) call da_trace_exit("da_solve")
 
 CONTAINS
 
 #include "da_init_wrfvar.inc"
 
-end subroutine da_solve_v3d
+end subroutine da_solve
 
