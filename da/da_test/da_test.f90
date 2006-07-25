@@ -43,7 +43,7 @@ module da_test
    implicit none
 
 #ifdef DM_PARALLEL
-#include <mpif.h>
+   INCLUDE 'mpif.h'
 #if ( DWORDSIZE != RWORDSIZE )
 #define TRUE_MPI_REAL     MPI_REAL
 #else

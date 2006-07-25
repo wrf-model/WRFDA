@@ -12,7 +12,7 @@ subroutine da_setup_bufrtovs_structures( xp, ob, iv )
    IMPLICIT NONE
 
 #ifdef DM_PARALLEL
-#include <mpif.h>
+   INCLUDE 'mpif.h'
 #endif
 
    TYPE (xpose_type), INTENT(IN)   :: xp         ! Domain decomposition vars.

@@ -10,7 +10,7 @@ subroutine da_proc_stats_combine( proc_ave, proc_err, proc_min, proc_max, &
 !------------------------------------------------------------------------------
 
 #ifdef DM_PARALLEL
-#include <mpif.h>
+   INCLUDE 'mpif.h'
 #endif
 
    REAL,      INTENT(INOUT)      :: proc_ave       ! Processor average.
