@@ -1,0 +1,74 @@
+Change Log for update to WRF 3DVAR code
+---------------------------------------
+
+Author: 	Yong-Run Guo
+Reviewer: 	
+Date: 		07/26/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+This code from Subversion Branch RB_V21:
+
+    https://svn-wrf-var.cgd.ucar.edu/branches/RB_V21/
+
+and will be uploaded to web site:
+
+    http://www.mmm.ucar.edu/wrf/users/download/get_source2.html
+
+    for public eelease
+and
+   
+    http://www.mmm.ucar.edu/wrf/wrfvar_v2.1.tar.gz
+
+    for tutorial on 27~28 July 2006.
+
+
+Bugs fix 
+
+1, da_3dvar/src/DA_Sound/DA_Transform_XToY_Sound.inc
+
+   One line added:
+
+         if ( k < 1 ) cycle
+
+   This solved the single level SOUND OBS problem and also
+   the space paging problem.
+
+2, da_3dvar/src/DA_Obs/da_write_filtered_obs.inc
+
+   Change 
+
+    TYPE (ob_type), intent(in)    :: iv      ! O-B structure
+
+   to
+
+    TYPE (ob_type), intent(inout) :: iv      ! O-B structure
+
+   Because there is an assignment statement to iv (GPSPW part) in 
+   this subroutine
+
+Expected Differences
+--------------------
+   
+   Non
+
+Accuracy:        
+
+   not chnage.
+
+Files added:
+------------
+
+   Non
+
+Files modified:
+---------------
+
+1, da_3dvar/src/DA_Sound/DA_Transform_XToY_Sound.inc
+2, da_3dvar/src/DA_Obs/da_write_filtered_obs.inc
+
+Minor-tag:
+---------
+
+
