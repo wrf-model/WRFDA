@@ -8,3 +8,5 @@ else
   make clean
 endif
 
+rm ../main/*exe
+
