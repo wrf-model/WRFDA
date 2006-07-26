@@ -1,0 +1,28 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: Syed Rizvi
+Reviewer: John Bray
+Date: 07/26/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Update WRFVAR tutorial powerpoint talk
+
+Test results (run on which machines?)
+------------------------------------------------------
+
+balsam. Visible in Open Office Impress.
+
+--------------------------------------------------------------------------------------
+
+Files added:
+------------
+doc/changes/changes_20060726c.jrb (this file)
+
+
+Files modified:
+---------------
+
+doc/da_tutorial/wrfvar-system.ppt
