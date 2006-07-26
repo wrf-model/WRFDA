@@ -1,0 +1,49 @@
+Change Log for update to WRF 3DVAR code
+---------------------------------------
+
+Author  : John Bray
+Reviewer: John Bray 
+Date: 07/26/07
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Add script that modifies the directory strcture to match the trunk version,
+so easier comparison can be made
+
+See http://manse.johnbray.org.uk/mmmwiki/index.php/VAR_changes_200606.jrb
+
+Test results
+------------------------------------------------------
+
+balsam: script runs
+
+Compilation system not changed, so DO NOT COMPILE AFTER RUNNING SCRIPT
+
+
+Files added:
+-------------------------------------
+
+
+da_3dvar/changes/changes_20060726d.jrb (this file
+rename.ksh
+
+Files Removed:
+-------------------------------------
+
+Files Modified:
+-------------------------------------
+
+
+svn commit ?
+
+CHANGES
+
+changes/changes_20060626d.jrb
+
+
+
+Tag:
+
+                  
+
