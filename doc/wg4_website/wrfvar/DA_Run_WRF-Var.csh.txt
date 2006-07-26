@@ -74,7 +74,7 @@ setenv START_DATE 2003010112
 #-----------------------------------------------------------------------
 
  if ( ! $?START_DATE )              setenv START_DATE 2003010112       # Analysis date.
- if ( ! $?DA_CV_OPTIONS )           setenv DA_CV_OPTIONS 3             # Background error statistics: 2=NCAR, 3=NCEP.
+ if ( ! $?DA_CV_OPTIONS )           setenv DA_CV_OPTIONS 5             # Background error statistics: 2=NCAR, 3=NCEP.
 
 #Default directories/files:
  if ( ! $?SRC_DIR )    setenv SRC_DIR    ${HOME}/code_development
