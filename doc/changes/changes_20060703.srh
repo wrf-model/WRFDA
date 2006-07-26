@@ -11,9 +11,10 @@ Reason for changes (explain before making changes)
  a) Update for AIRS retrievals                                    
  b) Removed unwanted files like da_obs_count.inc, da_fm_decoder.inc etc.
     from wrfvar/da/da_obs directory
- c) Thoroughly revides obs tuning programs.
+ c) Thoroughly revised obs tuning programs both for Hollingworth  & Desroziers 
+    methods.
  c) Renamed subroutines computing OI & AO diagnostics in da_ssmi, 
-    da_pseudo & da_qscat like in other data subdirectories.
+    da_pseudo & da_qscat like in other data subdirectories.  
  
 Expected Differences
 --------------------
