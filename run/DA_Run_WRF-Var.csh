@@ -208,19 +208,19 @@
 # [2.0] Perform sanity checks:
 #-----------------------------------------------------------------------
 
- if ( ! -s $DA_FIRST_GUESS ) then
+ if ( ! -f $DA_FIRST_GUESS ) then
     echo "Error: First Guess file does not exist:"
     echo  $DA_FIRST_GUESS
     exit 1
  endif
 
- if ( ! -s $DA_OBSERVATIONS ) then
+ if ( ! -f $DA_OBSERVATIONS ) then
     echo "Error: Observation file does not exist:"
     echo  $DA_OBSERVATIONS
     exit 1
  endif
 
- if ( ! -s $DA_BACK_ERRORS ) then
+ if ( ! -f $DA_BACK_ERRORS ) then
     echo "Error: Background Error file does not exist:"
     echo  $DA_BACK_ERRORS
     exit 1
