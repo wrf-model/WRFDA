@@ -26,7 +26,6 @@ if test $HOSTNAME = "bs1101en" -o $HOSTNAME = "bs1201en"; then # bluesky
   cat > job.ksh <<EOF
 #!/bin/ksh
 ##@ network.MPI=csss,shared,us
-##@ notification=error
 #IBM:
 # @ job_type   = parallel
 # @ environment = COPY_ALL
@@ -34,6 +33,7 @@ if test $HOSTNAME = "bs1101en" -o $HOSTNAME = "bs1201en"; then # bluesky
 # @ output     = $EXPT.e\$(jobid)
 # @ error      = $EXPT.o\$(jobid)
 # @ node       = $NODES
+# @ notification = never
 ## @ network.MPI    = css0,shared,us
 # @ network.MPI    = css0,shared,ip
 # @ total_tasks = $NUM_PROCS

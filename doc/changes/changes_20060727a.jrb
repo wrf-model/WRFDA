@@ -1,0 +1,28 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: John Bray
+Date: 07/27/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Stop emailing after loadleveller jobs complete on IBM
+
+Test results (run on which machines?)
+------------------------------------------------------
+
+bluesky. Job ran with no email
+
+--------------------------------------------------------------------------------------
+
+Files added:
+------------
+doc/changes/changes_20060727a.jrb (this file)
+
+
+Files modified:
+---------------
+
+run/da_run_job.ksh
