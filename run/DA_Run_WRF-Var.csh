@@ -517,9 +517,8 @@ EOF
 setenv PLATFORM `uname`
 
 if ( $PLATFORM == "Linux" ) then
-  if test $NUM_PROCS -gt 1; then
+  if ( $NUM_PROCS > 1 ) then
     mpirun -v -np $NUM_PROCS -nolocal -machinefile $HOSTS ./wrfvar.exe >&! wrfvar.out
-    RC=$?
   else
     # mpirun -v -np 1 ./wrfvar.exe >&! /dev/null #Assumes compile in DM mode.
     ./wrfvar.exe >&! wrfvar.out
@@ -527,7 +526,7 @@ if ( $PLATFORM == "Linux" ) then
 endif
 
 if ( $PLATFORM == "Darwin" ) then
-  if test $NUM_PROCS -gt 1; then
+  if ( $NUM_PROCS > 1 ) then
     mpirun -v -np $NUM_PROCS -all-local -machinefile $HOSTS ./wrfvar.exe >&! wrfvar.out
   else
     ./wrfvar.exe >&! wrfvar.out

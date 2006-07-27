@@ -1,0 +1,42 @@
+Change Log for update to WRF 3DVAR code
+---------------------------------------
+
+Author  : John Bray
+Reviewer: John Bray 
+Date: 07/27/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Use > rather than -gt for csh comparison
+
+Test results
+------------------------------------------------------
+
+ocotillo:
+
+Code works. It would not run on Linux before
+
+
+Files added:
+-------------------------------------
+
+da_3dvar/changes/changes_20060727g.jrb (this file)
+
+Files Removed:
+-------------------------------------
+
+Files Modified:
+-------------------------------------
+run/DA_Run_WRF-Var.csh
+
+CHANGES
+
+changes/changes_20060727g.jrb
+
+
+
+Tag:
+
+                  
+
