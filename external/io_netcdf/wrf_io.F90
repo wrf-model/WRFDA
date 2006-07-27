@@ -50,7 +50,7 @@ module wrf_data
   character (8)          , parameter      :: NO_NAME          = 'NULL'
   character (DateStrLen) , parameter      :: ZeroDate = '0000-00-00-00:00:00'
 
-#include "wrf_io_flags.h"
+  include 'wrf_io_flags.h'
 
   character (256)                         :: msg
   logical                                 :: WrfIOnotInitialized = .true.
@@ -99,7 +99,7 @@ CONTAINS
 
 subroutine allocHandle(DataHandle,DH,Comm,Status)
   use wrf_data
-#include "wrf_status_codes.h"
+  include 'wrf_status_codes.h'
   integer              ,intent(out) :: DataHandle
   type(wrf_data_handle),pointer     :: DH
   integer              ,intent(IN)  :: Comm
@@ -201,7 +201,7 @@ end subroutine allocHandle
 
 subroutine deallocHandle(DataHandle, Status)
   use wrf_data
-#include "wrf_status_codes.h"
+  include 'wrf_status_codes.h'
   integer              ,intent(in) :: DataHandle
   integer              ,intent(out) :: Status
   type(wrf_data_handle),pointer     :: DH
@@ -289,7 +289,7 @@ end subroutine deallocHandle
 
 subroutine GetDH(DataHandle,DH,Status)
   use wrf_data
-#include "wrf_status_codes.h"
+  include 'wrf_status_codes.h'
   integer               ,intent(in)     :: DataHandle
   type(wrf_data_handle) ,pointer        :: DH
   integer               ,intent(out)    :: Status
@@ -309,7 +309,7 @@ end subroutine GetDH
 
 subroutine DateCheck(Date,Status)
   use wrf_data
-#include "wrf_status_codes.h"
+  include 'wrf_status_codes.h'
   character*(*) ,intent(in)      :: Date
   integer       ,intent(out)     :: Status
   
@@ -323,7 +323,7 @@ end subroutine DateCheck
 
 subroutine GetName(Element,Var,Name,Status)
   use wrf_data
-#include "wrf_status_codes.h"
+  include 'wrf_status_codes.h'
   character*(*) ,intent(in)     :: Element
   character*(*) ,intent(in)     :: Var
   character*(*) ,intent(out)    :: Name
@@ -346,8 +346,8 @@ end subroutine GetName
 
 subroutine GetTimeIndex(IO,DataHandle,DateStr,TimeIndex,Status)
   use wrf_data
-#include "wrf_status_codes.h"
-#include <netcdf.inc>
+  include 'wrf_status_codes.h'
+  include 'netcdf.inc'
   character (*)         ,intent(in)     :: IO
   integer               ,intent(in)     :: DataHandle
   character*(*)         ,intent(in)     :: DateStr
@@ -415,7 +415,7 @@ subroutine GetTimeIndex(IO,DataHandle,DateStr,TimeIndex,Status)
 end subroutine GetTimeIndex
 
 subroutine GetDim(MemoryOrder,NDim,Status)
-#include "wrf_status_codes.h"
+  include 'wrf_status_codes.h'
   character*(*) ,intent(in)  :: MemoryOrder
   integer       ,intent(out) :: NDim
   integer       ,intent(out) :: Status
@@ -465,7 +465,7 @@ end subroutine GetIndices
 
 subroutine ExtOrder(MemoryOrder,Vector,Status)
   use wrf_data
-#include "wrf_status_codes.h"
+  include 'wrf_status_codes.h'
   character*(*)              ,intent(in)    :: MemoryOrder
   integer,dimension(*)       ,intent(inout) :: Vector
   integer                    ,intent(out)   :: Status
@@ -512,7 +512,7 @@ end subroutine ExtOrder
 
 subroutine ExtOrderStr(MemoryOrder,Vector,ROVector,Status)
   use wrf_data
-#include "wrf_status_codes.h"
+  include 'wrf_status_codes.h'
   character*(*)                    ,intent(in)    :: MemoryOrder
   character*(*),dimension(*)       ,intent(in)    :: Vector
   character(80),dimension(NVarDims),intent(out)   :: ROVector
@@ -594,8 +594,8 @@ end subroutine UpperCase
 
 subroutine netcdf_err(err,Status)
   use wrf_data
-#include "wrf_status_codes.h"
-#include <netcdf.inc>
+  include 'wrf_status_codes.h'
+  include 'netcdf.inc'
   integer  ,intent(in)  :: err
   integer  ,intent(out) :: Status
   character(len=80)     :: errmsg
@@ -615,8 +615,8 @@ end subroutine netcdf_err
 subroutine FieldIO(IO,DataHandle,DateStr,Length,MemoryOrder &
                      ,FieldType,NCID,VarID,XField,Status)
   use wrf_data
-#include "wrf_status_codes.h"
-#include <netcdf.inc>
+  include 'wrf_status_codes.h'
+  include 'netcdf.inc'
   character (*)              ,intent(in)    :: IO
   integer                    ,intent(in)    :: DataHandle
   character*(*)              ,intent(in)    :: DateStr
@@ -665,6 +665,7 @@ VCount(:) = 1
       call wrf_debug ( WARN , TRIM(msg))
       return
   END IF
+
   return
 end subroutine FieldIO
 
@@ -766,7 +767,7 @@ end subroutine reorder
 ! returned.  
 LOGICAL FUNCTION ncd_ok_to_put_dom_ti( DataHandle )
     USE wrf_data
-#include "wrf_status_codes.h"
+    include 'wrf_status_codes.h'
     INTEGER, INTENT(IN) :: DataHandle 
     CHARACTER*80 :: fname
     INTEGER :: filestate
@@ -792,7 +793,7 @@ END FUNCTION ncd_ok_to_put_dom_ti
 ! returned.  
 LOGICAL FUNCTION ncd_ok_to_get_dom_ti( DataHandle )
     USE wrf_data
-#include "wrf_status_codes.h"
+    include 'wrf_status_codes.h'
     INTEGER, INTENT(IN) :: DataHandle 
     CHARACTER*80 :: fname
     INTEGER :: filestate
@@ -816,7 +817,7 @@ END FUNCTION ncd_ok_to_get_dom_ti
 ! referenced by DataHandle.  If DataHandle is invalid, .FALSE. is returned.  
 LOGICAL FUNCTION ncd_is_first_operation( DataHandle )
     USE wrf_data
-#include "wrf_status_codes.h"
+    INCLUDE 'wrf_status_codes.h'
     INTEGER, INTENT(IN) :: DataHandle 
     TYPE(wrf_data_handle) ,POINTER :: DH
     INTEGER :: Status
@@ -840,8 +841,8 @@ subroutine ext_ncd_open_for_read(DatasetName, Comm1, Comm2, SysDepInfo, DataHand
   use wrf_data
   use ext_ncd_support_routines
   implicit none
-#include "wrf_status_codes.h"
-#include <netcdf.inc>
+  include 'wrf_status_codes.h'
+  include 'netcdf.inc'
   character *(*), INTENT(IN)   :: DatasetName
   integer       , INTENT(IN)   :: Comm1, Comm2
   character *(*), INTENT(IN)   :: SysDepInfo
@@ -861,8 +862,8 @@ subroutine ext_ncd_open_for_read_commit(DataHandle, Status)
   use wrf_data
   use ext_ncd_support_routines
   implicit none
-#include "wrf_status_codes.h"
-#include <netcdf.inc>
+  include 'wrf_status_codes.h'
+  include 'netcdf.inc'
   integer, intent(in) :: DataHandle
   integer, intent(out) :: Status
   type(wrf_data_handle) ,pointer         :: DH
@@ -889,8 +890,8 @@ subroutine ext_ncd_open_for_read_begin( FileName, Comm, IOComm, SysDepInfo, Data
   use wrf_data
   use ext_ncd_support_routines
   implicit none
-#include "wrf_status_codes.h"
-#include <netcdf.inc>
+  include 'wrf_status_codes.h'
+  include 'netcdf.inc'
   character*(*)         ,intent(IN)      :: FileName
   integer               ,intent(IN)      :: Comm
   integer               ,intent(IN)      :: IOComm
@@ -1022,8 +1023,8 @@ subroutine ext_ncd_open_for_update( FileName, Comm, IOComm, SysDepInfo, DataHand
   use wrf_data
   use ext_ncd_support_routines
   implicit none
-#include "wrf_status_codes.h"
-#include <netcdf.inc>
+  include 'wrf_status_codes.h'
+  include 'netcdf.inc'
   character*(*)         ,intent(IN)      :: FileName
   integer               ,intent(IN)      :: Comm
   integer               ,intent(IN)      :: IOComm
@@ -1156,8 +1157,8 @@ SUBROUTINE ext_ncd_open_for_write_begin(FileName,Comm,IOComm,SysDepInfo,DataHand
   use wrf_data
   use ext_ncd_support_routines
   implicit none
-#include "wrf_status_codes.h"
-#include <netcdf.inc>
+  include 'wrf_status_codes.h'
+  include 'netcdf.inc'
   character*(*)        ,intent(in)  :: FileName
   integer              ,intent(in)  :: Comm
   integer              ,intent(in)  :: IOComm
@@ -1236,8 +1237,8 @@ subroutine ext_ncd_open_for_write (DatasetName, Comm1, Comm2, &
   use wrf_data
   use ext_ncd_support_routines
   implicit none
-#include "wrf_status_codes.h"
-#include <netcdf.inc>
+  include 'wrf_status_codes.h'
+  include 'netcdf.inc'
   character *(*), intent(in)  ::DatasetName
   integer       , intent(in)  ::Comm1, Comm2
   character *(*), intent(in)  ::SysDepInfo
@@ -1252,8 +1253,8 @@ SUBROUTINE ext_ncd_open_for_write_commit(DataHandle, Status)
   use wrf_data
   use ext_ncd_support_routines
   implicit none
-#include "wrf_status_codes.h"
-#include <netcdf.inc>
+  include 'wrf_status_codes.h'
+  include 'netcdf.inc'
   integer              ,intent(in)  :: DataHandle
   integer              ,intent(out) :: Status
   type(wrf_data_handle),pointer     :: DH
@@ -1288,8 +1289,8 @@ subroutine ext_ncd_ioclose(DataHandle, Status)
   use wrf_data
   use ext_ncd_support_routines
   implicit none
-#include "wrf_status_codes.h"
-#include <netcdf.inc>
+  include 'wrf_status_codes.h'
+  include 'netcdf.inc'
   integer              ,intent(in)  :: DataHandle
   integer              ,intent(out) :: Status
   type(wrf_data_handle),pointer     :: DH
@@ -1338,8 +1339,8 @@ subroutine ext_ncd_iosync( DataHandle, Status)
   use wrf_data
   use ext_ncd_support_routines
   implicit none
-#include "wrf_status_codes.h"
-#include <netcdf.inc>
+  include 'wrf_status_codes.h'
+  include 'netcdf.inc'
   integer              ,intent(in)  :: DataHandle
   integer              ,intent(out) :: Status
   type(wrf_data_handle),pointer     :: DH
@@ -1385,8 +1386,8 @@ subroutine ext_ncd_redef( DataHandle, Status)
   use wrf_data
   use ext_ncd_support_routines
   implicit none
-#include "wrf_status_codes.h"
-#include <netcdf.inc>
+  include 'wrf_status_codes.h'
+  include 'netcdf.inc'
   integer              ,intent(in)  :: DataHandle
   integer              ,intent(out) :: Status
   type(wrf_data_handle),pointer     :: DH
@@ -1433,8 +1434,8 @@ subroutine ext_ncd_enddef( DataHandle, Status)
   use wrf_data
   use ext_ncd_support_routines
   implicit none
-#include "wrf_status_codes.h"
-#include <netcdf.inc>
+  include 'wrf_status_codes.h'
+  include 'netcdf.inc'
   integer              ,intent(in)  :: DataHandle
   integer              ,intent(out) :: Status
   type(wrf_data_handle),pointer     :: DH
@@ -1480,7 +1481,7 @@ end subroutine ext_ncd_enddef
 subroutine ext_ncd_ioinit(SysDepInfo, Status)
   use wrf_data
   implicit none
-#include "wrf_status_codes.h"
+  include 'wrf_status_codes.h'
   CHARACTER*(*), INTENT(IN) :: SysDepInfo
   INTEGER ,INTENT(INOUT)    :: Status
 
@@ -1497,7 +1498,7 @@ end subroutine ext_ncd_ioinit
 subroutine ext_ncd_inquiry (Inquiry, Result, Status)
   use wrf_data
   implicit none
-#include "wrf_status_codes.h"
+  include 'wrf_status_codes.h'
   character *(*), INTENT(IN)    :: Inquiry
   character *(*), INTENT(OUT)   :: Result
   integer        ,INTENT(INOUT) :: Status
@@ -1526,8 +1527,8 @@ subroutine ext_ncd_ioexit(Status)
   use wrf_data
   use ext_ncd_support_routines
   implicit none
-#include "wrf_status_codes.h"
-#include <netcdf.inc>
+  include 'wrf_status_codes.h'
+  include 'netcdf.inc'
   integer       , INTENT(INOUT)     ::Status
   integer                           :: error
   type(wrf_data_handle),pointer     :: DH
@@ -2215,8 +2216,8 @@ subroutine ext_ncd_write_field(DataHandle,DateStr,Var,Field,FieldType,Comm, &
   use wrf_data
   use ext_ncd_support_routines
   implicit none
-#include "wrf_status_codes.h"
-#include <netcdf.inc>
+  include 'wrf_status_codes.h'
+  include 'netcdf.inc'
   integer                       ,intent(in)    :: DataHandle
   character*(*)                 ,intent(in)    :: DateStr
   character*(*)                 ,intent(in)    :: Var
@@ -2377,6 +2378,7 @@ subroutine ext_ncd_write_field(DataHandle,DateStr,Var,Field,FieldType,Comm, &
       DH%VarDimLens(j,NVar) = Length(j)
     enddo
     VDimIDs(NDim+1) = DH%DimUnlimID
+
     ! Do not use SELECT statement here as sometimes WRF_REAL=WRF_DOUBLE
     IF (FieldType == WRF_REAL) THEN
       XType = NF_FLOAT
@@ -2392,6 +2394,7 @@ subroutine ext_ncd_write_field(DataHandle,DateStr,Var,Field,FieldType,Comm, &
         call wrf_debug ( WARN , TRIM(msg))
         return
     END IF
+
     stat = NF_DEF_VAR(NCID,VarName,XType,NDim+1,VDimIDs,VarID)
     call netcdf_err(stat,Status)
     if(Status /= WRF_NO_ERR) then
@@ -2491,8 +2494,8 @@ subroutine ext_ncd_read_field(DataHandle,DateStr,Var,Field,FieldType,Comm,  &
   use wrf_data
   use ext_ncd_support_routines
   implicit none
-#include "wrf_status_codes.h"
-#include <netcdf.inc>
+  include 'wrf_status_codes.h'
+  include 'netcdf.inc'
   integer                       ,intent(in)    :: DataHandle
   character*(*)                 ,intent(in)    :: DateStr
   character*(*)                 ,intent(in)    :: Var
@@ -2617,6 +2620,7 @@ subroutine ext_ncd_read_field(DataHandle,DateStr,Var,Field,FieldType,Comm,  &
       call wrf_debug ( WARN , TRIM(msg))
       return
     endif      
+      
     ! Do not use SELECT statement here as sometimes WRF_REAL=WRF_DOUBLE
     IF (FieldType == WRF_REAL) THEN
 ! allow coercion between double and single prec real
@@ -2644,6 +2648,7 @@ subroutine ext_ncd_read_field(DataHandle,DateStr,Var,Field,FieldType,Comm,  &
         Status = WRF_WARN_DATA_TYPE_NOT_FOUND
         write(msg,*) 'Warning DATA TYPE NOT FOUND in ',__FILE__,', line', __LINE__
     END IF
+
     if(Status /= WRF_NO_ERR) then
       call wrf_debug ( WARN , TRIM(msg))
       return
@@ -2742,7 +2747,7 @@ subroutine ext_ncd_inquire_opened( DataHandle, FileName , FileStatus, Status )
   use wrf_data
   use ext_ncd_support_routines
   implicit none
-#include "wrf_status_codes.h"
+  include 'wrf_status_codes.h'
   integer               ,intent(in)     :: DataHandle
   character*(*)         ,intent(in)     :: FileName
   integer               ,intent(out)    :: FileStatus
@@ -2767,7 +2772,7 @@ subroutine ext_ncd_inquire_filename( Datahandle, FileName,  FileStatus, Status )
   use wrf_data
   use ext_ncd_support_routines
   implicit none
-#include "wrf_status_codes.h"
+  include 'wrf_status_codes.h'
   integer               ,intent(in)     :: DataHandle
   character*(*)         ,intent(out)    :: FileName
   integer               ,intent(out)    :: FileStatus
@@ -2790,7 +2795,7 @@ subroutine ext_ncd_set_time(DataHandle, DateStr, Status)
   use wrf_data
   use ext_ncd_support_routines
   implicit none
-#include "wrf_status_codes.h"
+  include 'wrf_status_codes.h'
   integer               ,intent(in)     :: DataHandle
   character*(*)         ,intent(in)     :: DateStr
   integer               ,intent(out)    :: Status
@@ -2846,7 +2851,7 @@ subroutine ext_ncd_get_next_time(DataHandle, DateStr, Status)
   use wrf_data
   use ext_ncd_support_routines
   implicit none
-#include "wrf_status_codes.h"
+  include 'wrf_status_codes.h'
   integer               ,intent(in)     :: DataHandle
   character*(*)         ,intent(out)    :: DateStr
   integer               ,intent(out)    :: Status
@@ -2891,7 +2896,7 @@ subroutine ext_ncd_get_previous_time(DataHandle, DateStr, Status)
   use wrf_data
   use ext_ncd_support_routines
   implicit none
-#include "wrf_status_codes.h"
+  include 'wrf_status_codes.h'
   integer               ,intent(in)     :: DataHandle
   character*(*)         ,intent(out)    :: DateStr
   integer               ,intent(out)    :: Status
@@ -2934,8 +2939,8 @@ subroutine ext_ncd_get_next_var(DataHandle, VarName, Status)
   use wrf_data
   use ext_ncd_support_routines
   implicit none
-#include "wrf_status_codes.h"
-#include <netcdf.inc>
+  include 'wrf_status_codes.h'
+  include 'netcdf.inc'
   integer               ,intent(in)     :: DataHandle
   character*(*)         ,intent(out)    :: VarName
   integer               ,intent(out)    :: Status
@@ -2982,8 +2987,8 @@ subroutine ext_ncd_end_of_frame(DataHandle, Status)
   use wrf_data
   use ext_ncd_support_routines
   implicit none
-#include <netcdf.inc>
-#include "wrf_status_codes.h"
+  include 'netcdf.inc'
+  include 'wrf_status_codes.h'
   integer               ,intent(in)     :: DataHandle
   integer               ,intent(out)    :: Status
   type(wrf_data_handle) ,pointer        :: DH
@@ -2998,8 +3003,8 @@ subroutine ext_ncd_get_var_info(DataHandle,Name,NDim,MemoryOrder,Stagger,DomainS
   use wrf_data
   use ext_ncd_support_routines
   implicit none
-#include <netcdf.inc>
-#include "wrf_status_codes.h"
+  include 'netcdf.inc'
+  include 'wrf_status_codes.h'
   integer               ,intent(in)     :: DataHandle
   character*(*)         ,intent(in)     :: Name
   integer               ,intent(out)    :: NDim
@@ -3144,8 +3149,8 @@ subroutine ext_ncd_warning_str( Code, ReturnString, Status)
   use wrf_data
   use ext_ncd_support_routines
   implicit none
-#include <netcdf.inc>
-#include "wrf_status_codes.h"
+  include 'netcdf.inc'
+  include 'wrf_status_codes.h'
   
   integer  , intent(in)  ::Code
   character *(*), intent(out) :: ReturnString
@@ -3340,8 +3345,8 @@ subroutine ext_ncd_error_str( Code, ReturnString, Status)
   use wrf_data
   use ext_ncd_support_routines
   implicit none
-#include <netcdf.inc>
-#include "wrf_status_codes.h"
+  include 'netcdf.inc'
+  include 'wrf_status_codes.h'
 
   integer  , intent(in)  ::Code
   character *(*), intent(out) :: ReturnString

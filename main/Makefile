@@ -12,6 +12,18 @@ LIBPATHS =
 
 include ../configure.wrf
 
+wrfvar : wrfvar.o
+	$(RANLIB) libwrflib.a
+	$(LD) -o wrfvar.exe $(LDFLAGS) wrfvar.o libwrflib.a $(LIB)
+
+kma2netcdf : kma2netcdf.o
+	$(RANLIB) libwrflib.a
+	$(LD) -o kma2netcdf.exe $(LDFLAGS) kma2netcdf.o libwrflib.a $(LIB) -L../convertor
+
+netcdf2kma : netcdf2kma.o
+	$(RANLIB) libwrflib.a
+	$(LD) -o netcdf2kma.exe $(LDFLAGS) netcdf2kma.o libwrflib.a $(LIB) -L../convertor 
+
 $(SOLVER)_wrf : wrf.o
 	$(RANLIB) libwrflib.a
 	$(LD) -o wrf.exe $(LDFLAGS) wrf.o libwrflib.a $(LIB)
@@ -148,6 +160,8 @@ real_em.o: \
 #	../chem/module_input_chem_bioemiss.o \
 
 wrf.o:  ../share/module_wrf_top.o
+
+wrfvar.o: ../da/da_wrfvar_top.o
 
 wrf_ESMFMod.o:  ../share/module_wrf_top.o
 

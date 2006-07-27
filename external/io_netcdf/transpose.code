@@ -8,32 +8,24 @@
 
 ! pjj/cray
   if(IO == 'write') then
-#ifndef PATHSCALE
 !dir$ concurrent
-#endif
   do k=k1,k2
     do j=j1,j2
-#ifndef PATHSCALE
 !dir$ prefervector
 !dir$ concurrent
 !cdir select(vector)
-#endif
       do i=i1,i2
           DFIELD = Field(1:di,abs(ix-i),abs(jx-j),abs(kx-k))
       enddo
     enddo
   enddo
 else
-#ifndef PATHSCALE
 !dir$ concurrent
-#endif
   do k=k1,k2
     do j=j1,j2
-#ifndef PATHSCALE
 !dir$ prefervector
 !dir$ concurrent
 !cdir select(vector)
-#endif
       do i=i1,i2
           Field(1:di,abs(ix-i),abs(jx-j),abs(kx-k)) = DFIELD
       enddo

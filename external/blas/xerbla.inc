@@ -1,7 +1,5 @@
       SUBROUTINE XERBLA( SRNAME, INFO )
 
-      use da_reporting
-
 *  -- LAPACK auxiliary routine (version 3.0) --
 *     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
 *     Courant Institute, Argonne National Lab, and Rice University
@@ -10,6 +8,8 @@
 *     .. Scalar Arguments ..
       CHARACTER*6        SRNAME
       INTEGER            INFO
+
+      character(len=200) :: errmsg(1)
 *     ..
 *
 *  Purpose
@@ -39,7 +39,8 @@
 *
       WRITE(UNIT=errmsg(1), FMT = 9999 )SRNAME, INFO
 *
-      CALL da_error(__FILE__,__LINE__,errmsg(1:1))
+* JRB old compilation system problem here
+*      CALL da_error(__FILE__,__LINE__,errmsg(1:1))
 *
  9999 FORMAT( ' ** On entry to ', A6, ' parameter number ', I2, ' had ',
      $      'an illegal value' )

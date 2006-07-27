@@ -1,0 +1,25 @@
+#!/bin/csh -f
+
+if ( $argv != "" ) then
+  unsetenv A2DCASE
+  setenv A2DCASE `echo $argv | grep 2d`
+endif
+
+setenv WRF_EM_CORE 1
+setenv WRF_DA_CORE 1
+setenv WRF_4DVAR_CORE 1
+setenv WRF_NMM_CORE 0
+setenv WRF_COAMPS_CORE 0
+setenv WRF_EXP_CORE 0
+
+setenv REGISTRY Registry/Registry.wrfvar
+cp $REGISTRY Registry/Registry
+
+# This incredible hackery due to OSF1 $(PWD) not changing during 
+# build via regtest.csh ...  
+# Note that $WRF_SRC_ROOT_DIR is only used by the OSF1 build.  
+if ( $?WRF_SRC_ROOT_DIR ) then
+  make wrfvar $argv A2DCASE="$A2DCASE" WRF_SRC_ROOT_DIR="$WRF_SRC_ROOT_DIR"
+else
+  make wrfvar $argv A2DCASE="$A2DCASE" WRF_SRC_ROOT_DIR="$PWD"
+endif

@@ -10,7 +10,7 @@ subroutine da_write_noise_to_ob (iv)
    IMPLICIT NONE
 
 #ifdef DM_PARALLEL
-#   include <mpif.h>
+   INCLUDE 'mpif.h'
 #endif
 
    TYPE (ob_type), INTENT(IN)    :: iv   ! Obs and header structure.

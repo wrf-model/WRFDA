@@ -34,7 +34,7 @@ subroutine da_transform_vtox_adj( cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv, 
 !   Polar treatment for Global
 !-------------------------------------------------------------------------
    if( global ) then     
-!  Poles treatment for global 3DVAR
+!  Poles treatment for global WRFVAR
 #ifndef DEREF_KLUDGE
     call da_get_avpoles(xa%u,xa%v,xb%lon,&
           ids, ide, jds, jde, kds, kde,  &

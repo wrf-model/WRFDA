@@ -6,7 +6,6 @@ all : $(FFTPACK5_OBJS)
 	$(AR) libfftpack5.a $(FFTPACK5_OBJS)
 
 fftpack5.o:	         \
-			$(DA)/da_constants.o		\
 			r1f2kb.inc  \
 			r1f2kf.inc  \
 			r1f3kb.inc  \
@@ -26,7 +25,7 @@ fftpack5.o:	         \
 			xerfft.inc  \
 			fftpack5.f90
 			$(CPP) $(CPPFLAGS) fftpack5.f90 > fftpack5.f
-			$(FFC) -c $(FIXEDFLAGS_WRFVAR) $(MODULE_DIRS) fftpack5.f
+			$(SFC) -c $(MODULE_DIRS) $(PROMOTION) fftpack5.f
 
 clean :
 	$(RM) $(FFTPACK_OBJS)

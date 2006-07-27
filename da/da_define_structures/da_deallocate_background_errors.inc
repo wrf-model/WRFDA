@@ -1,7 +1,7 @@
 subroutine DA_Deallocate_Background_Errors ( be )
 
 !------------------------------------------------------------------------------
-!  PURPOSE: Deallocate components of 3dvar background errors.
+!  PURPOSE: Deallocate components of wrfvar background errors.
 !
 !  METHOD:  Deallocate component in turn.
 !

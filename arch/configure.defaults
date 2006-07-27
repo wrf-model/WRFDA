@@ -5136,16 +5136,16 @@ module_initialize_real.o module_dm.o start_domain.o :
 #PGI	fi
 
 ###########################################################
-#ARCH    PC Linux i486 i586 i686, g95 compiler  (single threaded, allows nesting using RSL without MPI)
+#ARCH    PC Linux i486 i586 i686, g95 compiler  (DM-Parallel, RSL, MPICH)
 #
 # Notes: for experimental implementation of moving nests, add -DMOVE_NESTS to ARCHFLAGS
 #        for experimental implementation of vortex tracking nests, add -DMOVE_NESTS -DVORTEX_CENTER to ARCHFLAGS
 #
 DMPARALLEL      =       1
 MAX_PROC        =       1024
-FC              =       g95
-LD              =       g95
-CC              =       gcc
+FC              =       mpif90
+LD              =       mpif90
+CC              =       mpicc
 SCC		=	$(CC)
 SFC             =       g95
 RWORDSIZE       =       8
@@ -5154,10 +5154,10 @@ FCDEBUG		=	#-g
 FCBASEOPTS      =       -cpp -Wno=101,139,155,158 -fno-second-underscore \
                            -ftrace=full -finteger=-9999 -freal=nan -C -ffree-form  -ffree-line-length-huge
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS)
-ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DGRIB1 CONFIGURE_GRIB2_FLAG -DINTIO -DWRF_RSL_IO -DRSL -DDM_PARALLEL \
+ARCHFLAGS       =       -DGRIB1 CONFIGURE_GRIB2_FLAG -DINTIO -DWRF_RSL_IO -DRSL -DDM_PARALLEL \
                         -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4 CONFIGURE_NETCDF_FLAG \
                         -DTRIEDNTRUE   \
-			-DLIMIT_ARGS -DSTUBMPI
+			-DLIMIT_ARGS
 PROMOTION	=	-r$(RWORDSIZE) -i4
 CFLAGS          =       -DDM_PARALLEL -DWRF_RSL_IO \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) -I../external/RSL/RSL $(ARCHFLAGS)
@@ -5165,8 +5165,9 @@ CFLAGS          =       -DDM_PARALLEL -DWRF_RSL_IO \
 ESMF_LIB_FLAGS  =       
 ESMF_IO_LIB     =       ESMFIOLIB
 ESMF_IO_LIB_EXT =       ESMFIOEXTLIB
-INCLUDE_MODULES =       -module ../main -I../external/io_netcdf -I../external/io_int -I../external/esmf_time_f90 \
-                        -I../external -I../frame -I../share -I../phys -I../inc
+INCLUDE_MODULES =       -I../main -I../external/io_netcdf -I../external/io_int -I../external/esmf_time_f90 \
+                        -I../external -I../frame -I../share -I../phys -I../inc -I../external/lapack \
+                        -I../external/fftpack5 -I../external/blas -I../da
 PERL            =       perl
 REGISTRY        =       Registry
 LIB             =       CONFIGURE_NETCDF_LIB_PATH -L../external/RSL/RSL -lrsl \
@@ -5174,7 +5175,11 @@ LIB             =       CONFIGURE_NETCDF_LIB_PATH -L../external/RSL/RSL -lrsl \
                         CONFIGURE_GRIB2_LIB \
                         -L../external/io_grib_share -lio_grib_share \
 			-L../external/io_int -lwrfio_int \
-			../frame/module_internal_header_util.o ../frame/pack_utils.o -L../external/esmf_time_f90 -lesmf_time 
+			../frame/module_internal_header_util.o ../frame/pack_utils.o \
+                        -L../external/esmf_time_f90 -lesmf_time \
+                        -L../external/lapack -llapack -L../external/blas -lblas \
+                        -L../external/fftpack5 -lfftpack5 \
+                        -L../external/bufr_ncep_nco -lbufr
 LDFLAGS         =       $(FCFLAGS) CONFIGURE_LDFLAGS
 ENVCOMPDEFS	=	CONFIGURE_COMPILEFLAGS
 CPP             =       /lib/cpp -C -P -traditional -I$(DEVTOP)/external/ioapi_share
@@ -5185,6 +5190,12 @@ M4              =       m4 -B 14000
 RANLIB          =       ranlib
 NETCDFPATH	=	CONFIGURE_NETCDF_PATH
 CC_TOOLS        =       cc
+                    
+FPPFLAGS_BUFR   = -C -P  $(TRADFLAG) -DLINUX -Dlinux
+CCFLAGS_BUFR    = -DUNDERSCORE
+FIXEDFLAGS_BUFR = -fno-second-underscore
+FIXEDFLAGS_WRFVAR = -fno-second-underscore
+
 
 externals : wrf_ioapi_includes CONFIGURE_WRFIO_NF wrfio_grib_share wrfio_grib1 CONFIGURE_WRFIO_GRIB2 ../external/RSL/RSL/librsl.a wrfio_int gen_comms.c module_dm.F esmf_time
 
@@ -5220,7 +5231,7 @@ esmf_time :
 	  make FC="$(FC) $(PROMOTION) $(FCDEBUG) $(FCBASEOPTS)" RANLIB="$(RANLIB)" CPP="$(CPP) -I../../inc -I. $(POUND_DEF)" )
 
 ../external/RSL/RSL/librsl.a :
-	( cd ../external/RSL/RSL ; make CC="$(CC)" CFLAGS='-DSTUBS' FC="$(FC) $(PROMOTION)" FFLAGS='' MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) LEARN_BCAST=-DLEARN_BCAST stub )
+	( cd ../external/RSL/RSL ; make CC="$(CC)" CFLAGS='-DSTUBS' FC="$(FC) $(PROMOTION)" FFLAGS='-fno-second-underscore' MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) LEARN_BCAST=-DLEARN_BCAST stub )
 
 # compile these without high optimization to speed compile
 solve_interface.o : solve_interface.F
@@ -5256,15 +5267,6 @@ module_initialize_real.o module_dm.o start_domain.o :
 	$(CPP) -I../inc $(CPPFLAGS) $*.b  > $*.f
 	$(RM) $*.b
 	$(FC) -c $(PROMOTION) $(FCBASEOPTS) $(MODULE_DIRS) $*.f
-#PGI	if [ ! -e $@ ] ; then \
-#PGI	sleep 10 ; $(FC) -c $(PROMOTION) $(FCBASEOPTS) $(MODULE_DIRS) $*.f ; \
-#PGI	fi
-#PGI	if [ ! -e $@ ] ; then \
-#PGI	sleep 30 ; $(FC) -c $(PROMOTION) $(FCBASEOPTS) $(MODULE_DIRS) $*.f ; \
-#PGI	fi
-#PGI	if [ ! -e $@ ] ; then \
-#PGI	sleep 300 ; $(FC) -c $(PROMOTION) $(FCBASEOPTS) $(MODULE_DIRS) $*.f ; \
-#PGI	fi
 
 
 ###########################################################

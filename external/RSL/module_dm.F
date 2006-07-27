@@ -3053,7 +3053,7 @@ messages(120)=  s5e5
 !
 ! </DESCRIPTION>
 #ifndef STUBMPI
-#include <mpif.h>
+      INCLUDE 'mpif.h'
       CALL mpi_allreduce ( inval, retval , SIZE(inval), getrealmpitype() , MPI_SUM, mpi_comm_local, ierr )
 #else
       retval = inval
@@ -3089,7 +3089,7 @@ messages(120)=  s5e5
 !
 ! </DESCRIPTION>
 #ifndef STUBMPI
-#include <mpif.h>
+      INCLUDE 'mpif.h'
       CALL mpi_allreduce ( inval, retval , SIZE(inval), MPI_INTEGER, MPI_SUM, mpi_comm_local, ierr )
 #else
       retval = inval

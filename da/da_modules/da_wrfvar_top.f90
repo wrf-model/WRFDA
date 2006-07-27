@@ -47,7 +47,9 @@ MODULE da_wrfvar_top
 
    CHARACTER (LEN=80)      :: rstname
    CHARACTER (LEN=80)      :: message
-   CHARACTER (LEN=40)      :: subversion_version=SVN_REV
+!JRB fix for WRF compilation system later
+!   CHARACTER (LEN=40)      :: subversion_version=SVN_REV
+   CHARACTER (LEN=40)      :: subversion_version="TBD"
 
    INTERFACE 
       SUBROUTINE setup_timekeeping( grid )

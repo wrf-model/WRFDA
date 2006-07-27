@@ -12,7 +12,6 @@
 MODULE module_ext_internal
 
   USE module_internal_header_util
-  USE module_wrf_error
 
   INTEGER, PARAMETER :: int_num_handles = 99
   LOGICAL, DIMENSION(int_num_handles) :: okay_for_io, int_handle_in_use, okay_to_commit
@@ -49,7 +48,7 @@ MODULE module_ext_internal
     END FUNCTION int_valid_handle
 
     SUBROUTINE int_get_fresh_handle( retval )
-#include "wrf_io_flags.h"
+      include 'wrf_io_flags.h'
       INTEGER i, retval
       retval = -1
 ! dont use first 8 handles
@@ -70,7 +69,7 @@ MODULE module_ext_internal
     END SUBROUTINE int_get_fresh_handle
 
     SUBROUTINE release_handle( i )
-#include "wrf_io_flags.h"
+      include 'wrf_io_flags.h'
       INTEGER, INTENT(IN) :: i
       IF ( i .LT. 8 .OR. i .GT. int_num_handles ) RETURN
       IF ( .NOT. int_handle_in_use(i) ) RETURN
@@ -95,7 +94,7 @@ MODULE module_ext_internal
 ! file referenced by DataHandle.  If DataHandle is invalid, .FALSE. is 
 ! returned.  
 LOGICAL FUNCTION int_ok_to_put_dom_ti( DataHandle )
-#include "wrf_io_flags.h"
+    include 'wrf_io_flags.h'
     INTEGER, INTENT(IN) :: DataHandle 
     CHARACTER*256 :: fname
     INTEGER :: filestate
@@ -122,7 +121,7 @@ END FUNCTION int_ok_to_put_dom_ti
 ! file referenced by DataHandle.  If DataHandle is invalid, .FALSE. is 
 ! returned.  
 LOGICAL FUNCTION int_ok_to_get_dom_ti( DataHandle )
-#include "wrf_io_flags.h"
+    include 'wrf_io_flags.h'
     INTEGER, INTENT(IN) :: DataHandle 
     CHARACTER*256 :: fname
     INTEGER :: filestate
@@ -169,7 +168,7 @@ SUBROUTINE ext_int_open_for_write( FileName , Comm_compute, Comm_io, SysDepInfo,
                                    DataHandle , Status )
   USE module_ext_internal
   IMPLICIT NONE
-#include "intio_tags.h"
+  INCLUDE 'intio_tags.h'
   CHARACTER*(*) :: FileName
   INTEGER ,       INTENT(IN)  :: Comm_compute , Comm_io
   CHARACTER*(*) :: SysDepInfo
@@ -188,8 +187,8 @@ SUBROUTINE ext_int_open_for_write_begin( FileName , Comm_compute, Comm_io, SysDe
                                          DataHandle , Status )
   USE module_ext_internal
   IMPLICIT NONE
-#include "intio_tags.h"
-#include "wrf_io_flags.h"
+  INCLUDE 'intio_tags.h'
+  INCLUDE 'wrf_io_flags.h'
   CHARACTER*(*) :: FileName
   INTEGER ,       INTENT(IN)  :: Comm_compute , Comm_io
   CHARACTER*(*) :: SysDepInfo
@@ -223,8 +222,8 @@ END SUBROUTINE ext_int_open_for_write_begin
 SUBROUTINE ext_int_open_for_write_commit( DataHandle , Status )
   USE module_ext_internal
   IMPLICIT NONE
-#include "intio_tags.h"
-#include "wrf_io_flags.h"
+  INCLUDE 'intio_tags.h'
+  INCLUDE 'wrf_io_flags.h'
   INTEGER ,       INTENT(IN ) :: DataHandle
   INTEGER ,       INTENT(OUT) :: Status
   REAL dummy
@@ -248,7 +247,7 @@ SUBROUTINE ext_int_open_for_read ( FileName , Comm_compute, Comm_io, SysDepInfo,
                                DataHandle , Status )
   USE module_ext_internal
   IMPLICIT NONE
-#include "wrf_io_flags.h"
+  INCLUDE 'wrf_io_flags.h'
   CHARACTER*(*) :: FileName
   INTEGER ,       INTENT(IN)  :: Comm_compute , Comm_io
   CHARACTER*(*) :: SysDepInfo
@@ -277,7 +276,7 @@ END SUBROUTINE ext_int_open_for_read
 SUBROUTINE ext_int_inquire_opened ( DataHandle, FileName , FileStatus, Status )
   USE module_ext_internal
   IMPLICIT NONE
-#include "wrf_io_flags.h"
+  include 'wrf_io_flags.h'
   INTEGER ,       INTENT(IN)  :: DataHandle
   CHARACTER*(*) :: FileName
   INTEGER ,       INTENT(OUT) :: FileStatus
@@ -300,7 +299,7 @@ END SUBROUTINE ext_int_inquire_opened
 SUBROUTINE ext_int_inquire_filename ( DataHandle, FileName , FileStatus, Status )
   USE module_ext_internal
   IMPLICIT NONE
-#include "wrf_io_flags.h"
+  include 'wrf_io_flags.h'
   INTEGER ,       INTENT(IN)  :: DataHandle
   CHARACTER*(*) :: FileName
   INTEGER ,       INTENT(OUT) :: FileStatus
@@ -364,7 +363,7 @@ SUBROUTINE ext_int_ioexit( Status )
 
   USE module_ext_internal
   IMPLICIT NONE
-#include "intio_tags.h"
+  INCLUDE 'intio_tags.h'
   INTEGER ,       INTENT(OUT) :: Status
   INTEGER                     :: DataHandle
   INTEGER i,ierr
@@ -377,7 +376,7 @@ END SUBROUTINE ext_int_ioexit
 SUBROUTINE ext_int_get_next_time ( DataHandle, DateStr, Status )
   USE module_ext_internal
   IMPLICIT NONE
-#include "intio_tags.h"
+  INCLUDE 'intio_tags.h'
   INTEGER ,       INTENT(IN)  :: DataHandle
   CHARACTER*(*) :: DateStr
   INTEGER ,       INTENT(OUT) :: Status
@@ -462,7 +461,7 @@ END SUBROUTINE ext_int_get_next_time
 SUBROUTINE ext_int_set_time ( DataHandle, DateStr, Status )
   USE module_ext_internal
   IMPLICIT NONE
-#include "intio_tags.h"
+  INCLUDE 'intio_tags.h'
   INTEGER ,       INTENT(IN)  :: DataHandle
   CHARACTER*(*) :: DateStr
   INTEGER ,       INTENT(OUT) :: Status
@@ -479,7 +478,7 @@ SUBROUTINE ext_int_get_var_info ( DataHandle , VarName , NDim , MemoryOrder , St
                               DomainStart , DomainEnd , WrfType, Status )
   USE module_ext_internal
   IMPLICIT NONE
-#include "intio_tags.h"
+  INCLUDE 'intio_tags.h'
   integer               ,intent(in)     :: DataHandle
   character*(*)         ,intent(in)     :: VarName
   integer               ,intent(out)    :: NDim
@@ -560,7 +559,7 @@ END SUBROUTINE ext_int_get_var_info
 SUBROUTINE ext_int_get_next_var ( DataHandle, VarName, Status )
   USE module_ext_internal
   IMPLICIT NONE
-#include "intio_tags.h"
+  include 'intio_tags.h'
   include 'wrf_status_codes.h'
   INTEGER ,       INTENT(IN)  :: DataHandle
   CHARACTER*(*) :: VarName
@@ -659,7 +658,7 @@ END SUBROUTINE ext_int_get_next_var
 SUBROUTINE ext_int_get_dom_ti_real ( DataHandle,Element,   Data, Count, Outcount, Status )
   USE module_ext_internal
   IMPLICIT NONE
-#include "intio_tags.h"
+  INCLUDE 'intio_tags.h'
   INTEGER ,       INTENT(IN)  :: DataHandle
   CHARACTER*(*) :: Element
   REAL ,          INTENT(OUT) :: Data(*)
@@ -711,7 +710,7 @@ END SUBROUTINE ext_int_get_dom_ti_real
 SUBROUTINE ext_int_put_dom_ti_real ( DataHandle,Element,   Data, Count,  Status )
   USE module_ext_internal
   IMPLICIT NONE
-#include "intio_tags.h"
+  INCLUDE 'intio_tags.h'
   INTEGER ,       INTENT(IN)  :: DataHandle
   CHARACTER*(*) :: Element
   REAL ,          INTENT(IN) :: Data(*)
@@ -771,7 +770,7 @@ END SUBROUTINE ext_int_put_dom_ti_double
 SUBROUTINE ext_int_get_dom_ti_integer ( DataHandle,Element,   Data, Count, Outcount, Status )
   USE module_ext_internal
   IMPLICIT NONE
-#include "intio_tags.h"
+  INCLUDE 'intio_tags.h'
   INTEGER ,       INTENT(IN)  :: DataHandle
   CHARACTER*(*) :: Element
   integer ,            INTENT(OUT) :: Data(*)
@@ -824,7 +823,7 @@ END SUBROUTINE ext_int_get_dom_ti_integer
 SUBROUTINE ext_int_put_dom_ti_integer ( DataHandle,Element,   Data, Count,  Status )
   USE module_ext_internal
   IMPLICIT NONE
-#include "intio_tags.h"
+  INCLUDE 'intio_tags.h'
   INTEGER ,       INTENT(IN)  :: DataHandle
   CHARACTER*(*) :: Element
   INTEGER ,       INTENT(IN) :: Data(*)
@@ -883,7 +882,7 @@ END SUBROUTINE ext_int_put_dom_ti_logical
 SUBROUTINE ext_int_get_dom_ti_char ( DataHandle,Element,   Data,  Status )
   USE module_ext_internal
   IMPLICIT NONE
-#include "intio_tags.h"
+  INCLUDE 'intio_tags.h'
   INTEGER ,       INTENT(IN)  :: DataHandle
   CHARACTER*(*) :: Element
   CHARACTER*(*) :: Data
@@ -932,7 +931,7 @@ END SUBROUTINE ext_int_get_dom_ti_char
 SUBROUTINE ext_int_put_dom_ti_char ( DataHandle, Element,  Data,  Status )
   USE module_ext_internal
   IMPLICIT NONE
-#include "intio_tags.h"
+  INCLUDE 'intio_tags.h'
   INTEGER ,       INTENT(IN)  :: DataHandle
   CHARACTER*(*) :: Element
   CHARACTER*(*) :: Data
@@ -982,7 +981,6 @@ END SUBROUTINE ext_int_put_dom_td_real
 
 !--- get_dom_td_double
 SUBROUTINE ext_int_get_dom_td_double ( DataHandle,Element, DateStr,  Data, Count, Outcount, Status )
-  USE module_wrf_error
   IMPLICIT NONE
   INTEGER ,       INTENT(IN)  :: DataHandle
   CHARACTER*(*) :: Element
@@ -997,7 +995,6 @@ END SUBROUTINE ext_int_get_dom_td_double
 
 !--- put_dom_td_double
 SUBROUTINE ext_int_put_dom_td_double ( DataHandle,Element, DateStr,  Data, Count,  Status )
-  USE module_wrf_error
   IMPLICIT NONE
   INTEGER ,       INTENT(IN)  :: DataHandle
   CHARACTER*(*) :: Element
@@ -1063,7 +1060,7 @@ END SUBROUTINE ext_int_put_dom_td_logical
 SUBROUTINE ext_int_get_dom_td_char ( DataHandle,Element, DateStr,  Data,  Status )
   USE module_ext_internal
   IMPLICIT NONE
-#include "intio_tags.h"
+  INCLUDE 'intio_tags.h'
   INTEGER ,       INTENT(IN)  :: DataHandle
   CHARACTER*(*) :: Element
   CHARACTER*(*) :: Data, DateStr
@@ -1104,7 +1101,7 @@ END SUBROUTINE ext_int_get_dom_td_char
 SUBROUTINE ext_int_put_dom_td_char ( DataHandle,Element, DateStr,  Data,  Status )
   USE module_ext_internal
   IMPLICIT NONE
-#include "intio_tags.h"
+  INCLUDE 'intio_tags.h'
   INTEGER ,       INTENT(IN)  :: DataHandle
   CHARACTER*(*) :: Element
   CHARACTER*(*) :: Data, DateStr
@@ -1150,7 +1147,6 @@ END SUBROUTINE ext_int_put_var_ti_real
 
 !--- get_var_ti_double
 SUBROUTINE ext_int_get_var_ti_double ( DataHandle,Element,  Varname, Data, Count, Outcount, Status )
-  USE module_wrf_error
   IMPLICIT NONE
   INTEGER ,       INTENT(IN)  :: DataHandle
   CHARACTER*(*) :: Element
@@ -1165,7 +1161,6 @@ END SUBROUTINE ext_int_get_var_ti_double
 
 !--- put_var_ti_double
 SUBROUTINE ext_int_put_var_ti_double ( DataHandle,Element,  Varname, Data, Count,  Status )
-  USE module_wrf_error
   IMPLICIT NONE
   INTEGER ,       INTENT(IN)  :: DataHandle
   CHARACTER*(*) :: Element
@@ -1231,7 +1226,7 @@ END SUBROUTINE ext_int_put_var_ti_logical
 SUBROUTINE ext_int_get_var_ti_char ( DataHandle,Element,  Varname, Data,  Status )
   USE module_ext_internal
   IMPLICIT NONE
-#include "intio_tags.h"
+  INCLUDE 'intio_tags.h'
   INTEGER ,       INTENT(IN)  :: DataHandle
   CHARACTER*(*) :: Element
   CHARACTER*(*) :: VarName 
@@ -1256,7 +1251,7 @@ END SUBROUTINE ext_int_get_var_ti_char
 SUBROUTINE ext_int_put_var_ti_char ( DataHandle,Element,  Varname, Data,  Status )
   USE module_ext_internal
   IMPLICIT NONE
-#include "intio_tags.h"
+  INCLUDE 'intio_tags.h'
   INTEGER ,       INTENT(IN)  :: DataHandle
   CHARACTER*(*) :: Element
   CHARACTER*(*) :: VarName 
@@ -1304,7 +1299,6 @@ END SUBROUTINE ext_int_put_var_td_real
 
 !--- get_var_td_double
 SUBROUTINE ext_int_get_var_td_double ( DataHandle,Element,  DateStr,Varname, Data, Count, Outcount, Status )
-  USE module_wrf_error
   IMPLICIT NONE
   INTEGER ,       INTENT(IN)  :: DataHandle
   CHARACTER*(*) :: Element
@@ -1320,7 +1314,6 @@ END SUBROUTINE ext_int_get_var_td_double
 
 !--- put_var_td_double
 SUBROUTINE ext_int_put_var_td_double ( DataHandle,Element,  DateStr,Varname, Data, Count,  Status )
-  USE module_wrf_error
   IMPLICIT NONE
   INTEGER ,       INTENT(IN)  :: DataHandle
   CHARACTER*(*) :: Element
@@ -1419,10 +1412,9 @@ SUBROUTINE ext_int_read_field ( DataHandle , DateStr , VarName , Field , FieldTy
                             PatchStart , PatchEnd ,                                      &
                             Status )
   USE module_ext_internal
-  USE module_wrf_error
   IMPLICIT NONE
-#include "wrf_io_flags.h"
-#include "intio_tags.h"
+  include 'wrf_io_flags.h'
+  include 'intio_tags.h'
   INTEGER ,       INTENT(IN)    :: DataHandle 
   CHARACTER*(*) :: DateStr
   CHARACTER*(*) :: VarName
@@ -1522,7 +1514,7 @@ SUBROUTINE ext_int_write_field ( DataHandle , DateStr , VarName , Field , FieldT
                              Status )
   USE module_ext_internal
   IMPLICIT NONE
-#include "wrf_io_flags.h"
+  include 'wrf_io_flags.h'
   INTEGER ,       INTENT(IN)    :: DataHandle 
   CHARACTER*(*) :: DateStr
   CHARACTER*(*) :: VarName

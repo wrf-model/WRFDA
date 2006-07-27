@@ -64,7 +64,7 @@ include RSL_LITE.make
 include main.make
 
 
-depend : arch links registry makedepf90 module_state_description.f90 md_calls.inc \
+depend : arch links registry makedepf90 module_state_description.F md_calls.inc \
                       inc/da_generic_boilerplate.inc
 	./makedepf90 $(FPPFLAGS) \
            *.F *.f90 *.F90 > depend 2>/dev/null

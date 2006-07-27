@@ -1,8 +1,5 @@
       module fftpack5
 
-      use da_constants
-!      use da_define_structures
-
 !-----------------------------------------------------------------------
 !  Contains all necessary routines to perform FFT                      
 !-----------------------------------------------------------------------

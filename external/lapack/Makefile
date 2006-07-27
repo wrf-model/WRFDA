@@ -6,7 +6,7 @@ all : $(LAPACK_OBJS)
 	$(AR) liblapack.a $(LAPACK_OBJS)
 
 lapack.o:		lapack.f90 \
-			$(BLAS)/blas.o \
+			../blas/blas.o \
 			dlae2.inc \
 			dlaev2.inc \
 			dlamc1.inc \
@@ -20,7 +20,7 @@ lapack.o:		lapack.f90 \
 			dlapy2.inc \
 			dsyev.inc
 			$(CPP) $(CPPFLAGS) lapack.f90 > lapack.f
-			$(FFC) -c $(FIXEDFLAGS_WRFVAR) $(MODULE_DIRS) lapack.f
+			$(SFC) -c $(FIXEDFLAGS_WRFVAR) $(PROMOTION) -I../blas lapack.f
 
 clean :
 	@ $(RM) *.o *.f *.mod

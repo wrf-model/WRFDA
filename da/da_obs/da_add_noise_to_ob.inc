@@ -11,7 +11,7 @@ SUBROUTINE da_add_noise_to_ob( iv, ob )
 !----------------------------------------------------------------------------   
    IMPLICIT NONE
 #ifdef DM_PARALLEL
-#   include <mpif.h>
+   INCLUDE 'mpif.h'
 #endif
 
 

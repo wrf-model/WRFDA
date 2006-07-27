@@ -223,7 +223,7 @@ MODULE module_wrf_quilt
 !</PRE>
 !</DESCRIPTION>
       IMPLICIT NONE
-#include <mpif.h>
+      INCLUDE 'mpif.h'
       INTEGER,                      INTENT(IN)  :: nio_tasks_per_group, mytask, ntasks, &
                                                    n_groups_arg, mpi_comm_wrld
       INTEGER,  INTENT(OUT)                     :: mpi_comm_local, nio
@@ -328,7 +328,7 @@ MODULE module_wrf_quilt
       USE module_state_description
       USE module_quilt_outbuf_ops
       IMPLICIT NONE
-#include <mpif.h>
+      INCLUDE 'mpif.h'
 #include "intio_tags.h"
 #include "wrf_io_flags.h"
       INTEGER itag, ninbuf, ntasks_io_group, ntasks_local_group, mytask_local, ierr
@@ -1235,7 +1235,7 @@ MODULE module_wrf_quilt
 !</DESCRIPTION>
 #if defined( DM_PARALLEL ) && !defined( STUBMPI )
       IMPLICIT NONE
-#include <mpif.h>
+      INCLUDE 'mpif.h'
       INTEGER i
       NAMELIST /namelist_quilt/ nio_tasks_per_group, nio_groups
       INTEGER ntasks, mytask, ierr, io_status
@@ -1340,7 +1340,7 @@ SUBROUTINE wrf_quilt_open_for_write_begin( FileName , Comm_compute, Comm_io, Sys
 #if defined( DM_PARALLEL ) && !defined( STUBMPI )
   USE module_wrf_quilt
   IMPLICIT NONE
-#include <mpif.h>
+      INCLUDE 'mpif.h'
 #include "intio_tags.h"
   CHARACTER *(*), INTENT(IN)  :: FileName
   INTEGER ,       INTENT(IN)  :: Comm_compute , Comm_io
@@ -1411,7 +1411,7 @@ SUBROUTINE wrf_quilt_open_for_write_commit( DataHandle , Status )
 #if defined( DM_PARALLEL ) && !defined( STUBMPI )
   USE module_wrf_quilt
   IMPLICIT NONE
-#include <mpif.h>
+      INCLUDE 'mpif.h'
 #include "intio_tags.h"
   INTEGER ,       INTENT(IN ) :: DataHandle
   INTEGER ,       INTENT(OUT) :: Status
@@ -1573,7 +1573,7 @@ SUBROUTINE wrf_quilt_iosync ( DataHandle, Status )
 #if  defined( DM_PARALLEL ) && ! defined (STUBMPI) 
   USE module_wrf_quilt
   IMPLICIT NONE
-#include <mpif.h>
+      INCLUDE 'mpif.h'
   INTEGER ,       INTENT(IN)  :: DataHandle
   INTEGER ,       INTENT(OUT) :: Status
 
@@ -1641,7 +1641,7 @@ SUBROUTINE wrf_quilt_ioclose ( DataHandle, Status )
   USE module_wrf_quilt
   USE module_timing
   IMPLICIT NONE
-#include <mpif.h>
+      INCLUDE 'mpif.h'
 #include "intio_tags.h"
   INTEGER ,       INTENT(IN)  :: DataHandle
   INTEGER ,       INTENT(OUT) :: Status
@@ -1711,7 +1711,7 @@ SUBROUTINE wrf_quilt_ioexit( Status )
 #if defined( DM_PARALLEL ) && ! defined (STUBMPI ) 
   USE module_wrf_quilt
   IMPLICIT NONE
-#include <mpif.h>
+      INCLUDE 'mpif.h'
 #include "intio_tags.h"
   INTEGER ,       INTENT(OUT) :: Status
   INTEGER                     :: DataHandle
@@ -1788,7 +1788,7 @@ SUBROUTINE wrf_quilt_set_time ( DataHandle, Data,  Status )
 #if defined( DM_PARALLEL ) && !defined( STUBMPI )
   USE module_wrf_quilt
   IMPLICIT NONE
-#include <mpif.h>
+      INCLUDE 'mpif.h'
 #include "intio_tags.h"
   INTEGER ,       INTENT(IN)  :: DataHandle
   CHARACTER*(*) , INTENT(IN)  :: Data
@@ -1881,7 +1881,7 @@ SUBROUTINE wrf_quilt_put_dom_ti_real ( DataHandle,Element,   Data, Count,  Statu
 #if defined( DM_PARALLEL ) && !defined( STUBMPI )
   USE module_wrf_quilt
   IMPLICIT NONE
-#include <mpif.h>
+      INCLUDE 'mpif.h'
 #include "intio_tags.h"
   INTEGER ,       INTENT(IN)  :: DataHandle
   CHARACTER*(*) , INTENT(IN)  :: Element
@@ -2020,7 +2020,7 @@ SUBROUTINE wrf_quilt_put_dom_ti_integer ( DataHandle,Element,   Data, Count,  St
 #if defined( DM_PARALLEL ) && !defined( STUBMPI )
   USE module_wrf_quilt
   IMPLICIT NONE
-#include <mpif.h>
+      INCLUDE 'mpif.h'
 #include "intio_tags.h"
   INTEGER ,       INTENT(IN)  :: DataHandle
   CHARACTER*(*) , INTENT(IN)  :: Element
@@ -2158,7 +2158,7 @@ SUBROUTINE wrf_quilt_put_dom_ti_char ( DataHandle, Element,  Data,  Status )
 #if defined( DM_PARALLEL ) && !defined( STUBMPI )
   USE module_wrf_quilt
   IMPLICIT NONE
-#include <mpif.h>
+      INCLUDE 'mpif.h'
 #include "intio_tags.h"
   INTEGER ,       INTENT(IN)  :: DataHandle
   CHARACTER*(*) , INTENT(IN)  :: Element
@@ -2688,7 +2688,7 @@ SUBROUTINE wrf_quilt_put_var_ti_char ( DataHandle,Element,  Varname, Data,  Stat
 #if defined( DM_PARALLEL ) && !defined( STUBMPI )
   USE module_wrf_quilt
   IMPLICIT NONE
-#include <mpif.h>
+      INCLUDE 'mpif.h'
 #include "intio_tags.h"
   INTEGER ,       INTENT(IN)  :: DataHandle
   CHARACTER*(*) , INTENT(IN)  :: Element
@@ -3048,7 +3048,7 @@ SUBROUTINE wrf_quilt_write_field ( DataHandle , DateStr , VarName , Field , Fiel
   USE module_state_description
   USE module_wrf_quilt
   IMPLICIT NONE
-#include <mpif.h>
+      INCLUDE 'mpif.h'
 #include "wrf_io_flags.h"
   INTEGER ,       INTENT(IN)    :: DataHandle 
   CHARACTER*(*) , INTENT(IN)    :: DateStr

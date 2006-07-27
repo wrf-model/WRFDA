@@ -37,10 +37,10 @@ foreach a ( $argv )
       set compare_wrf = 1
     else if ( "$a" == "wrfplus" ) then
       # too difficult to patch this script, so call another one
-      ./compile_wrfplus
+      ./compile_wrfplus $arglist
       exit 0
     else if ( "$a" == "var" || "$a" == "wrfvar" || "$a" == "k2n" || "$a" == "n2k" ) then
-      ./compile_wrfvar
+      ./compile_wrfvar $arglist
       exit 0
     endif
   endif

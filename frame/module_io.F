@@ -28,8 +28,6 @@ MODULE module_io
 
   USE module_configure
 
-  IMPLICIT NONE
-
   LOGICAL :: is_inited = .FALSE.
   INTEGER, PARAMETER, PRIVATE :: MAX_WRF_IO_HANDLE = 1000
   INTEGER :: wrf_io_handles(MAX_WRF_IO_HANDLE), how_opened(MAX_WRF_IO_HANDLE) 
@@ -44,7 +42,7 @@ MODULE module_io
 !
 !</PRE>
 !</DESCRIPTION>
-#include "md_calls.inc"
+#include <md_calls.inc>
 
 !--- ioinit
 
@@ -109,7 +107,6 @@ END SUBROUTINE wrf_ioinit
 !--- ioexit
 
 SUBROUTINE wrf_ioexit( Status )
-USE module_wrf_quilt
 !<DESCRIPTION>
 !<PRE>
 ! Shut down the WRF I/O system.  
@@ -179,8 +176,8 @@ SUBROUTINE wrf_open_for_write_begin( FileName , Comm_compute, Comm_io, SysDepInf
 !</DESCRIPTION>
   USE module_state_description
   IMPLICIT NONE
-#include "wrf_io_flags.h"
-  CHARACTER*(*), INTENT(IN)   :: FileName
+#include <wrf_io_flags.h>
+  CHARACTER*(*) :: FileName
   INTEGER ,       INTENT(IN)  :: Comm_compute , Comm_io
   CHARACTER*(*), INTENT(INOUT):: SysDepInfo
   INTEGER ,       INTENT(OUT) :: DataHandle
@@ -389,7 +386,7 @@ SUBROUTINE wrf_open_for_write_commit( DataHandle , Status )
   LOGICAL                     :: for_out
   INTEGER, EXTERNAL           :: use_package
   LOGICAL, EXTERNAL           :: wrf_dm_on_monitor, multi_files, use_output_servers
-#include "wrf_io_flags.h"
+#include <wrf_io_flags.h>
 
   CALL wrf_debug( DEBUG_LVL, 'module_io.F: in wrf_open_for_write_commit' )
 
@@ -480,12 +477,12 @@ SUBROUTINE wrf_open_for_read_begin( FileName , Comm_compute, Comm_io, SysDepInfo
 !</DESCRIPTION>
   USE module_state_description
   IMPLICIT NONE
-#include "wrf_io_flags.h"
-  CHARACTER*(*), INTENT(IN)   :: FileName
-  INTEGER ,      INTENT(IN)   :: Comm_compute , Comm_io
-  CHARACTER*(*), INTENT(IN)   :: SysDepInfo
-  INTEGER ,      INTENT(OUT)  :: DataHandle
-  INTEGER ,      INTENT(OUT)  :: Status
+#include <wrf_io_flags.h>
+  CHARACTER*(*) :: FileName
+  INTEGER ,       INTENT(IN)  :: Comm_compute , Comm_io
+  CHARACTER*(*) :: SysDepInfo
+  INTEGER ,       INTENT(OUT) :: DataHandle
+  INTEGER ,       INTENT(OUT) :: Status
   
   CHARACTER*128               :: DataSet
   INTEGER                     :: io_form
@@ -658,7 +655,7 @@ SUBROUTINE wrf_open_for_read_commit( DataHandle , Status )
   LOGICAL                     :: for_out
   INTEGER, EXTERNAL           :: use_package
   LOGICAL, EXTERNAL           :: wrf_dm_on_monitor, multi_files, use_output_servers
-#include "wrf_io_flags.h"
+#include <wrf_io_flags.h>
 
   CALL wrf_debug( DEBUG_LVL, 'module_io.F: in wrf_open_for_read_commit' )
 
@@ -732,9 +729,9 @@ SUBROUTINE wrf_open_for_read ( FileName , Comm_compute, Comm_io, SysDepInfo, &
 !</DESCRIPTION>
   USE module_state_description
   IMPLICIT NONE
-  CHARACTER*(*),  INTENT(IN)  :: FileName
+  CHARACTER*(*) :: FileName
   INTEGER ,       INTENT(IN)  :: Comm_compute , Comm_io
-  CHARACTER*(*),  INTENT(IN)  :: SysDepInfo
+  CHARACTER*(*) :: SysDepInfo
   INTEGER ,       INTENT(OUT) :: DataHandle
   INTEGER ,       INTENT(OUT) :: Status
 
@@ -904,14 +901,14 @@ SUBROUTINE wrf_inquire_opened ( DataHandle, FileName , FileStatus, Status )
   USE module_state_description
   IMPLICIT NONE
   INTEGER ,       INTENT(IN)  :: DataHandle
-  CHARACTER*(*),  INTENT(IN)  :: FileName
+  CHARACTER*(*) :: FileName
   INTEGER ,       INTENT(OUT) :: FileStatus
   INTEGER ,       INTENT(OUT) :: Status
   LOGICAL                     :: for_out
   INTEGER, EXTERNAL           :: use_package
   LOGICAL, EXTERNAL           :: wrf_dm_on_monitor, multi_files, use_output_servers
-#include "wrf_io_flags.h"
-#include "wrf_status_codes.h"
+#include <wrf_io_flags.h>
+#include <wrf_status_codes.h>
 
   INTEGER io_form , Hndl
 
@@ -990,10 +987,10 @@ SUBROUTINE wrf_inquire_filename ( DataHandle, FileName , FileStatus, Status )
   USE module_state_description
   IMPLICIT NONE
   INTEGER ,       INTENT(IN)  :: DataHandle
-  CHARACTER*(*),  INTENT(OUT)  :: FileName
+  CHARACTER*(*) :: FileName
   INTEGER ,       INTENT(OUT) :: FileStatus
   INTEGER ,       INTENT(OUT) :: Status
-#include "wrf_status_codes.h"
+#include <wrf_status_codes.h>
   INTEGER, EXTERNAL           :: use_package
   LOGICAL, EXTERNAL           :: wrf_dm_on_monitor, multi_files, use_output_servers
   LOGICAL                     :: for_out
@@ -1074,7 +1071,7 @@ SUBROUTINE wrf_iosync ( DataHandle, Status )
   IMPLICIT NONE
   INTEGER ,       INTENT(IN)  :: DataHandle
   INTEGER ,       INTENT(OUT) :: Status
-#include "wrf_status_codes.h"
+#include <wrf_status_codes.h>
   INTEGER, EXTERNAL           :: use_package
   LOGICAL, EXTERNAL           :: wrf_dm_on_monitor, multi_files, use_output_servers
   LOGICAL                     :: for_out
@@ -1147,7 +1144,7 @@ SUBROUTINE wrf_ioclose ( DataHandle, Status )
   IMPLICIT NONE
   INTEGER ,       INTENT(IN)  :: DataHandle
   INTEGER ,       INTENT(OUT) :: Status
-#include "wrf_status_codes.h"
+#include <wrf_status_codes.h>
   INTEGER, EXTERNAL           :: use_package
   LOGICAL, EXTERNAL           :: wrf_dm_on_monitor, multi_files, use_output_servers
   INTEGER io_form , Hndl
@@ -1231,9 +1228,9 @@ SUBROUTINE wrf_get_next_time ( DataHandle, DateStr, Status )
   USE module_state_description
   IMPLICIT NONE
   INTEGER ,       INTENT(IN)  :: DataHandle
-  CHARACTER*(*),  INTENT(OUT) :: DateStr
+  CHARACTER*(*) :: DateStr
   INTEGER ,       INTENT(OUT) :: Status
-#include "wrf_status_codes.h"
+#include <wrf_status_codes.h>
 
   INTEGER, EXTERNAL           :: use_package
   LOGICAL, EXTERNAL           :: wrf_dm_on_monitor, multi_files, use_output_servers
@@ -1329,9 +1326,9 @@ SUBROUTINE wrf_get_previous_time ( DataHandle, DateStr, Status )
   USE module_state_description
   IMPLICIT NONE
   INTEGER ,       INTENT(IN)  :: DataHandle
-  CHARACTER*(*),  INTENT(OUT) :: DateStr
+  CHARACTER*(*) :: DateStr
   INTEGER ,       INTENT(OUT) :: Status
-#include "wrf_status_codes.h"
+#include <wrf_status_codes.h>
 
   INTEGER, EXTERNAL           :: use_package
   LOGICAL, EXTERNAL           :: wrf_dm_on_monitor, multi_files, use_output_servers
@@ -1420,9 +1417,9 @@ SUBROUTINE wrf_set_time ( DataHandle, DateStr, Status )
   USE module_state_description
   IMPLICIT NONE
   INTEGER ,       INTENT(IN)  :: DataHandle
-  CHARACTER*(*), INTENT(IN)   :: DateStr
+  CHARACTER*(*) :: DateStr
   INTEGER ,       INTENT(OUT) :: Status
-#include "wrf_status_codes.h"
+#include <wrf_status_codes.h>
 
   INTEGER, EXTERNAL           :: use_package
   LOGICAL, EXTERNAL           :: wrf_dm_on_monitor, multi_files, use_output_servers
@@ -1499,9 +1496,9 @@ SUBROUTINE wrf_get_next_var ( DataHandle, VarName, Status )
   USE module_state_description
   IMPLICIT NONE
   INTEGER ,       INTENT(IN)  :: DataHandle
-  CHARACTER*(*),  INTENT(OUT) :: VarName
+  CHARACTER*(*) :: VarName
   INTEGER ,       INTENT(OUT) :: Status
-#include "wrf_status_codes.h"
+#include <wrf_status_codes.h>
 
   INTEGER, EXTERNAL           :: use_package
   LOGICAL, EXTERNAL           :: wrf_dm_on_monitor, multi_files, use_output_servers
@@ -1582,7 +1579,7 @@ SUBROUTINE wrf_get_var_info ( DataHandle , VarName , NDim , MemoryOrder , Stagge
   CHARACTER*(*)         ,INTENT(OUT)    :: Stagger
   INTEGER ,dimension(*) ,INTENT(OUT)    :: DomainStart, DomainEnd
   INTEGER               ,INTENT(OUT)    :: Status
-#include "wrf_status_codes.h"
+#include <wrf_status_codes.h>
   INTEGER io_form , Hndl
   LOGICAL                     :: for_out
   INTEGER, EXTERNAL           :: use_package
@@ -1843,7 +1840,6 @@ SUBROUTINE init_module_io
 !</DESCRIPTION>
   CALL init_io_handles
 END SUBROUTINE init_module_io
-
 END MODULE module_io
 
 
@@ -1886,8 +1882,8 @@ SUBROUTINE wrf_read_field ( DataHandle , DateStr , VarName , Field , FieldType ,
   INTEGER ,dimension(*)         ,INTENT(IN)    :: MemoryStart, MemoryEnd
   INTEGER ,dimension(*)         ,INTENT(IN)    :: PatchStart,  PatchEnd
   INTEGER                       ,INTENT(OUT)   :: Status
-#include "wrf_status_codes.h"
-#include "wrf_io_flags.h"
+#include <wrf_status_codes.h>
+#include <wrf_io_flags.h>
   INTEGER, ALLOCATABLE        :: ICAST(:)
   LOGICAL perturb_input
   IF ( FieldType .EQ. WRF_LOGICAL ) THEN
@@ -1952,7 +1948,7 @@ SUBROUTINE wrf_read_field1 ( DataHandle , DateStr , VarName , Field , FieldType 
   INTEGER ,dimension(*)         ,INTENT(IN)    :: MemoryStart, MemoryEnd
   INTEGER ,dimension(*)         ,INTENT(IN)    :: PatchStart,  PatchEnd
   INTEGER                       ,INTENT(OUT)   :: Status
-#include "wrf_status_codes.h"
+#include <wrf_status_codes.h>
   INTEGER io_form , Hndl
   LOGICAL                     :: for_out
   INTEGER, EXTERNAL           :: use_package
@@ -2087,7 +2083,7 @@ SUBROUTINE wrf_read_field1 ( DataHandle , DateStr , VarName , Field , FieldType 
           Status = 0
       END SELECT
     ELSE
-      CALL wrf_error_fatal('input_servers not inplemented yet')
+      CALL wrf_error_fatal('module_io.F: wrf_read_field: input_servers not implemented yet')
     ENDIF
   ELSE
     Status = WRF_ERR_FATAL_BAD_FILE_STATUS
@@ -2128,8 +2124,8 @@ SUBROUTINE wrf_write_field ( DataHandle , DateStr , VarName , Field , FieldType 
   INTEGER ,dimension(*)         ,INTENT(IN)    :: MemoryStart, MemoryEnd
   INTEGER ,dimension(*)         ,INTENT(IN)    :: PatchStart,  PatchEnd
   INTEGER                       ,INTENT(OUT)   :: Status
-#include "wrf_status_codes.h"
-#include "wrf_io_flags.h"
+#include <wrf_status_codes.h>
+#include <wrf_io_flags.h>
   INTEGER, ALLOCATABLE        :: ICAST(:)
   IF ( FieldType .EQ. WRF_LOGICAL ) THEN
       ALLOCATE(ICAST((MemoryEnd(1)-MemoryStart(1)+1)*(MemoryEnd(2)-MemoryStart(2)+1)*(MemoryEnd(3)-MemoryStart(3)+1)))
@@ -2190,7 +2186,7 @@ SUBROUTINE wrf_write_field1 ( DataHandle , DateStr , VarName , Field , FieldType
   INTEGER ,dimension(*)         ,INTENT(IN)    :: MemoryStart, MemoryEnd
   INTEGER ,dimension(*)         ,INTENT(IN)    :: PatchStart,  PatchEnd
   INTEGER                       ,INTENT(OUT)   :: Status
-#include "wrf_status_codes.h"
+#include <wrf_status_codes.h>
   INTEGER io_form , Hndl
   LOGICAL                     :: for_out
   INTEGER, EXTERNAL           :: use_package
@@ -2443,7 +2439,7 @@ SUBROUTINE collect_fld_and_call_pkg (    fcn, donotcollect_arg,                 
 !</PRE>
 !</DESCRIPTION>
   IMPLICIT NONE
-#include "wrf_io_flags.h"
+  include 'wrf_io_flags.h'
   EXTERNAL fcn
   LOGICAL,        INTENT(IN)    :: donotcollect_arg
   INTEGER ,       INTENT(IN)    :: Hndl
@@ -2777,9 +2773,9 @@ SUBROUTINE collect_generic_and_call_pkg ( fcn, globbuf,                         
   USE module_state_description
   USE module_driver_constants
   IMPLICIT NONE
-#include "wrf_io_flags.h"
+  include 'wrf_io_flags.h'
 #if defined( DM_PARALLEL ) && ! defined(STUBMPI)
-#include <mpif.h>
+include "mpif.h"
 #endif
   EXTERNAL fcn
   REAL , DIMENSION(*) , INTENT(INOUT) :: globbuf
@@ -3163,7 +3159,7 @@ SUBROUTINE call_pkg_and_dist (       fcn, donotdist_arg, update_arg,            
 !</PRE>
 !</DESCRIPTION>
   IMPLICIT NONE
-#include "wrf_io_flags.h"
+  include 'wrf_io_flags.h'
   EXTERNAL fcn
   LOGICAL,        INTENT(IN)    :: donotdist_arg, update_arg  ! update means collect old field update it and dist
   INTEGER ,       INTENT(IN)    :: Hndl
@@ -3482,7 +3478,7 @@ SUBROUTINE call_pkg_and_dist_generic (   fcn, globbuf , update_arg ,            
 !</DESCRIPTION>
   USE module_driver_constants
   IMPLICIT NONE
-#include "wrf_io_flags.h"
+#include <wrf_io_flags.h>
   EXTERNAL fcn
   REAL, DIMENSION(*) ::  globbuf
   INTEGER ,       INTENT(IN)    :: Hndl

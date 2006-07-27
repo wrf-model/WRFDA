@@ -15,7 +15,7 @@ subroutine da_write_obs( ob, iv, re )
 
 
 #ifdef DM_PARALLEL
-#   include <mpif.h>
+      INCLUDE 'mpif.h'
 #endif
 
    type (y_type), intent(in)     :: ob      ! Observation structure.

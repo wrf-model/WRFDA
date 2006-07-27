@@ -15,7 +15,7 @@ bufrlib.prm:		bufrlib.param
 bufrlib.o:		bufrlib.f90 bufrlib.prm
 			$(RM) $@
 			$(CPP) $(CPPFLAGS) bufrlib.f90 > bufrlib.f
-			$(FFC) -c $(FIXEDFLAGS_BUFR) $(MODULE_DIRS) bufrlib.f
+			$(SFC) -c $(FIXEDFLAGS_BUFR) $(MODULE_DIRS) bufrlib.f
 
 bort_exit.o:		bort_exit.c
 			$(RM) $@
@@ -30,7 +30,7 @@ wrdesc.o:		wrdesc.c
 			$(CC) -c $(CCFLAGS_BUFR) wrdesc.c
 
 clean :
-	$(RM) $(BUFR_OBJS)
+	$(RM) $(BUFR_OBJS) bufrlib.prm bufrlib.f
 
 superclean : clean
 

@@ -14,6 +14,8 @@ DEVTOP          =       `pwd`
 LIBINCLUDE      =       .
 .SUFFIXES: .F .i .o .f .c
 
+SVNDEF = -DSVN_REV='"$(shell svnversion -n .)"'
+
 #### Get core settings from environment (set in compile script)
 #### Note to add a core, this has to be added to.
 
