@@ -3,7 +3,11 @@ SUBROUTINE DA_Setup_Background_Errors5(xb, be, xbx, xp)
 
 !------------------------------------------------------------------------------
 !  PURPOSE: Define and allocate components of background errors.
+!  Updates:
 !
+!      Bug fix for reading BE            Syed RH Rizvi 07/26/2006 
+!      compatible with gen_be output
+!              
 !  PARENT_MODULE: DA_Setup_Structures
 !------------------------------------------------------------------------------
    IMPLICIT NONE
@@ -234,11 +238,11 @@ rewind (be_cv_5_unit)
 
 ! 2.1 Allocate the arrays
 
-   ALLOCATE ( be1_eval_loc (1:kz,1:jy) )
-   ALLOCATE ( be2_eval_loc (1:kz,1:jy) )
-   ALLOCATE ( be3_eval_loc (1:kz,1:jy) )
-   ALLOCATE ( be4_eval_loc (1:kz,1:jy) )
-   ALLOCATE ( be5_eval_loc (1:1,1:jy) )
+   ALLOCATE ( be1_eval_loc (1:kz,1:num_bins2d) )
+   ALLOCATE ( be2_eval_loc (1:kz,1:num_bins2d) )
+   ALLOCATE ( be3_eval_loc (1:kz,1:num_bins2d) )
+   ALLOCATE ( be4_eval_loc (1:kz,1:num_bins2d) )
+   ALLOCATE ( be5_eval_loc (1:1,1:num_bins2d) )
 
    IF ( vert_corr == 2 ) THEN
 
@@ -248,11 +252,11 @@ rewind (be_cv_5_unit)
       ALLOCATE ( be4_eval_glo(1:kz) )
       ALLOCATE ( be5_eval_glo(1:1) )
 
-      ALLOCATE ( be1_evec_loc(1:kz,1:kz,1:jy) )
-      ALLOCATE ( be2_evec_loc(1:kz,1:kz,1:jy) )
-      ALLOCATE ( be3_evec_loc(1:kz,1:kz,1:jy) )
-      ALLOCATE ( be4_evec_loc(1:kz,1:kz,1:jy) )
-      ALLOCATE ( be5_evec_loc(1:1,1:1,1:jy) )
+      ALLOCATE ( be1_evec_loc(1:kz,1:kz,1:num_bins2d) )
+      ALLOCATE ( be2_evec_loc(1:kz,1:kz,1:num_bins2d) )
+      ALLOCATE ( be3_evec_loc(1:kz,1:kz,1:num_bins2d) )
+      ALLOCATE ( be4_evec_loc(1:kz,1:kz,1:num_bins2d) )
+      ALLOCATE ( be5_evec_loc(1:1,1:1,1:num_bins2d) )
 
       ALLOCATE ( be1_evec_glo(1:kz,1:kz) )
       ALLOCATE ( be2_evec_glo(1:kz,1:kz) )
