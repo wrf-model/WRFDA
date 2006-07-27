@@ -234,6 +234,7 @@
  mkdir ${RUN_DIR}/wrf-var >&! /dev/null
  cd $RUN_DIR/wrf-var
 
+ cp $WRFVAR_DIR/run/gribmap.txt .
  cp $WRFVAR_DIR/run/LANDUSE.TBL .
  cp $WRFVAR_DIR/main/wrfvar.exe  wrfvar.exe
  cp $WRFVAR_DIR/run/hosts .
@@ -513,16 +514,36 @@ EOF
 #Run WRF-Var:
 #-------------------------------------------------------------------
 
-if ( $NUM_PROCS > 1  )then
-#  Remember to create hosts file for your machine (wrfvar/run/hosts file).
-   mpirun -v -np ${NUM_PROCS} -nolocal -machinefile hosts ./wrfvar.exe >&! /dev/null
-else
-   mpirun -v -np 1 ./wrfvar.exe >&! /dev/null #Assumes compile in DM mode.
+setenv PLATFORM `uname`
+
+if ( $PLATFORM == "Linux" ) then
+  if test $NUM_PROCS -gt 1; then
+    mpirun -v -np $NUM_PROCS -nolocal -machinefile $HOSTS ./wrfvar.exe >&! wrfvar.out
+    RC=$?
+  else
+    # mpirun -v -np 1 ./wrfvar.exe >&! /dev/null #Assumes compile in DM mode.
+    ./wrfvar.exe >&! wrfvar.out
+  endif
 endif
 
-#IBM (llsubmit):
-#poe ./wrfvar.exe
-#mpirun -np ${NUM_PROCS} ./wrfvar.exe
+if ( $PLATFORM == "Darwin" ) then
+  if test $NUM_PROCS -gt 1; then
+    mpirun -v -np $NUM_PROCS -all-local -machinefile $HOSTS ./wrfvar.exe >&! wrfvar.out
+  else
+    ./wrfvar.exe >&! wrfvar.out
+  endif
+endif
+
+#DEC:
+#./wrfvar.exe >&! wrfvar.out
+#RC=$?
+
+if ( $PLATFORM == "AIX" ) then
+  #IBM (llsubmit):
+  #poe ./wrfvar.exe
+  #mpirun -np ${NUM_PROCS} ./wrfvar.exe
+  ./wrfvar.exe >&! wrfvar.out
+endif
 
 cp fort.12 DAProg_WRF-Var.statistics >&! /dev/null
 cp fort.81 DAProg_WRF-Var.cost_fn >&! /dev/null
