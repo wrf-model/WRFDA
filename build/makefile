@@ -67,10 +67,10 @@ include main.make
 depend : arch links registry makedepf90 module_state_description.F md_calls.inc \
                       inc/da_generic_boilerplate.inc
 	./makedepf90 $(FPPFLAGS) \
-           *.F *.f90 *.F90 > depend 2>/dev/null
-	touch depend
+           *.F *.f90 *.F90 > depend.txt 2>/dev/null
+	
 
-include depend
+include depend.txt
 
 WRF_OBJS=$(SHARE_OBJS) $(FRAME_OBJS) $(PHYS_OBJS) $(DYN_OBJS) \
   $(ESMF_TIME_F90_OBJS) $(IO_INT_OBJS) $(IO_NETCDF_OBJS) \
