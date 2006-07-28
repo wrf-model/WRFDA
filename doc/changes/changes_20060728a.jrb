@@ -1,0 +1,40 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: John Bray
+Date: 07/28/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Fix errors in tutorial after first practical session in July 2006
+workshop
+
+1) People trying to use ncl scripts which don't work, so tell them not
+to.
+
+2) Not overwriting run/DA_Run_WRF-Var.csh with website version. Make
+instructions more explicit.
+
+3) Incorect netcdf path for update_bc/Makefile
+
+4) Remove obsolete files
+
+Test results (run on which machines?)
+------------------------------------------------------
+
+N/A
+
+--------------------------------------------------------------------------------------
+
+File changes:
+------------
+
+A      doc/changes/changes_20060728a.jrb (this file)
+D      wg4_main.old.html
+D      wg4_main.htmlold
+M      wrfvar/wrfvar-wrf_bc.htm
+M      wrfvar/wrfvar-casestudy.htm
+M      wrfvar/wrfvar-diagnostics.htm
+M      wrfvar/WRF_BC_v2.1.tar.gz
