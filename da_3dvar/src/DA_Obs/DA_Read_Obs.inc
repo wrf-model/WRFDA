@@ -353,8 +353,7 @@ loop_level: DO i = 1, platform%info%levels
          endif
       endif
 
-      CALL DA_Obs_Proc_Station(platform)
-
+      if( fm /= 86) CALL DA_Obs_Proc_Station(platform)
       nlevels = platform%info%levels
 !    Loop over duplicating obs for global
      ndup = 1
@@ -579,6 +578,7 @@ loop_level: DO i = 1, platform%info%levels
          do i = 2, nlevels
            ob%satem(num_satem)%p(i) = platform%each(i)%p%inv
            ob%satem(num_satem)%thickness(i) = platform%each(i)%t
+
            if(platform%each(i)%t%qc /= missing_data   .and. &
               platform%each(i-1)%t%qc /= missing_data) then
               ob%satem(num_satem)%thickness(i)%inv =            &
@@ -600,6 +600,7 @@ loop_level: DO i = 1, platform%info%levels
          ob%satem(num_satem)%thickness(1)%error = &
                         sqrt( ob%satem(num_satem)%thickness(1)%error ** 2 + &
                         platform%loc%pw%error ** 2) / gravity
+
 
 !--------Geostatinary ot Polar orbitting Satellite AMVs:
 
