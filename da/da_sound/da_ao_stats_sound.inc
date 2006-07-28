@@ -1,5 +1,9 @@
 subroutine da_ao_stats_sound( stats_unit, oi, re )
 
+  !-------------------------------------------------------------
+  !  Updates:       
+  !     Bug fix for num_sound_tot   Syed RH Rizvi   07/28/2006    
+  !-------------------------------------------------------------
   IMPLICIT NONE
 
   INTEGER,        INTENT (in)      :: stats_unit    ! Output unit for stats.
@@ -59,7 +63,8 @@ subroutine da_ao_stats_sound( stats_unit, oi, re )
   call da_proc_sum_int( nv )
   call da_proc_sum_int( nt )
   call da_proc_sum_int( nq )
-  num_sound_tot = num_sound_tot + nu + nv + nt + nq
+
+   num_sound_tot = nu + nv + nt + nq
 
   call da_proc_stats_combine(Sound%average%u, Sound%rms_err%u, &
                           Sound%minimum%u%value, Sound%maximum%u%value, &
