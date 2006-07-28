@@ -1,0 +1,31 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: John Bray
+Date: 07/28/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+
+Change include of wrf_io_flags.h to #include to allow preprocessing 
+inside the file
+
+
+Test results
+------------------------------------------------------
+
+No change to results possible
+
+bluesky: Compiles
+ocotillo: Compiles
+
+--------------------------------------------------------------------------------------
+
+File changes:
+------------
+
+A    doc/changes/changes_20060728c.jrb
+M    external/io_int/io_int.F90
+M    external/io_netcdf/wrf_io.F90
