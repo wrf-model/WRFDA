@@ -294,8 +294,13 @@ if test $PLATFORM = "AIX"; then
   #IBM (llsubmit):
   #poe ./wrfvar.exe
   #mpirun -np ${NUM_PROCS} ./wrfvar.exe
-  ./wrfvar.exe > wrfvar.out 2>wrfvar.error
-  RC=$?
+  if test -z $DEBUGGER; then
+     ./wrfvar.exe > wrfvar.out 2>wrfvar.error
+     RC=$?
+  else
+     $DEBUGGER ./wrfvar.exe > wrfvar.out 2>wrfvar.error
+     RC=$?
+  fi
 fi
 
 DATE=`date`
