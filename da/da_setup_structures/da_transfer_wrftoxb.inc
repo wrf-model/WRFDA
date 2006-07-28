@@ -1,20 +1,33 @@
 subroutine da_transfer_wrftoxb( xbx, grid, &
-#include "em_dummy_args.inc"
+#include <em_dummy_args.inc>
+!
                               )
 
 !------------------------------------------------------------------------------
-! PURPOSE: Transfers fields from WRF to first guess structure.
+!  PURPOSE: Transfers fields from WRF to first guess structure.
+!
+!  METHOD:  
+!
+!  HISTORY: 09/27/2002		Wei Huang
+!
+!  HISTORY: 06/28/2004 with respect to the cloud water and rain water        Jianfeng Gu
+!  Updates: 
+!      Bug fix for getting correct xb%p array      Syed RH Rizvi 07/28/2006
+!
+!  PARENT_MODULE: DA_Setup_Structures
 !------------------------------------------------------------------------------
 
    IMPLICIT NONE
    
-   TYPE (xbx_type), INTENT(INOUT)     :: xbx       ! Header & non-gridded vars.
+   TYPE (xbx_type), INTENT(INOUT)     :: xbx          ! Header & non-gridded vars.
 
    TYPE(domain), TARGET               :: grid
 
-   !  Definitions of dummy arguments to solve
+!  Definitions of dummy arguments to solve
 
-#include "em_dummy_decl.inc"
+#include <em_dummy_decl.inc>
+
+!---------------------------------------------------------------------------
 
    integer :: i, j, k, n
 
@@ -29,60 +42,23 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
 
    character(len=19) :: current_date
 
+!---------------------------------------------------------------------------
    real :: loc_psac_mean
 
    real, dimension(xp%jds:xp%jde) :: loc_latc_mean
 
-   integer :: size2d
+   integer :: ierror, size2d
 
    real, dimension(xp%kms:xp%kme) :: DDT
+!------------------------------------------------------------------------------
 
    REAL   :: qvf1, cvpm, cpovcv, ppb, ttb, albn, aln
    REAL, ALLOCATABLE :: arrayglobal(:,:)
 
+!---------------------------------------------------------------------------
+!--Set xb array range indices for processor subdomain.
+!---------------------------------------------------------------------------
    IF (trace_use) call da_trace_entry("da_transfer_wrftoxb")
-
-   ! Set all fields to debug values
-
-   IF (jrb_wind > -9999.9) THEN
-      ! Set all fields to debug values
-      u_1  = jrb_wind
-      u_2  = jrb_wind
-      v_1  = jrb_wind
-      v_2  = jrb_wind
-      w_1  = jrb_wind
-      w_2  = jrb_wind
-   END IF
-
-   IF (jrb_wind > -9999.9) THEN
-      t_1  = jrb_temp
-      t_2  = jrb_temp
-   end if
-
-   IF (jrb_p > -9999.9) THEN
-      p    = jrb_p
-   end if
-
-   if (jrb_ph > -9999.9) then
-      ph_1 = jrb_ph
-      ph_2 = jrb_ph
-      phb = jrb_ph
-   end if
-
-   if (jrb_mu > -9999.9) then
-      mu0 = jrb_mu
-      mub = jrb_mu
-      mu_1 = jrb_mu
-      mu_2 = jrb_mu
-   end if
-
-   if (jrb_moist > -9999.9) then
-      moist = jrb_moist
-   end if
-
-   !---------------------------------------------------------------------------
-   ! Set xb array range indices for processor subdomain.
-   !---------------------------------------------------------------------------
 
    is = xp % its
    ie = xp % ite
@@ -92,18 +68,25 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
    ke = xp % kte
 
    xb % map  = grid%map_proj
+!  xb % ds   = 1.0/grid%rdx
    xb % ds   = grid%dx
 
    xb % mix = xp % ide - xp % ids + 1
    xb % mjy = xp % jde - xp % jds + 1
    xb % mkz = xp % kde - xp % kds + 1
 
-   !---------------------------------------------------------------------------
-   ! WRF-specific fields:
-   !---------------------------------------------------------------------------
+!rizvi   xbx%big_header%bhi(5,5) = grid%start_year
+!rizvi   xbx%big_header%bhi(6,5) = grid%start_month
+!rizvi   xbx%big_header%bhi(7,5) = grid%start_day
+!rizvi   xbx%big_header%bhi(8,5) = grid%start_hour
+
+!---------------------------------------------------------------------------
+!--WRF-specific fields:
+!---------------------------------------------------------------------------
 
    ptop = grid%p_top
    ps0  = 100000.0    ! Base sea level pressure
+   ts0  = 300.0       ! Base potential temperature for all levels.
    tis0 = 290.0       ! Base sea level temperature
    tlp  = 50.0        ! temperature difference from 1000mb to 300mb
 
@@ -124,6 +107,7 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
 
    xb % ptop = ptop
    xb % ps0  = ps0
+   xb % ts0  = ts0
    xb % tlp  = tlp
       
    !---------------------------------------------------------------------------
@@ -230,36 +214,37 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
      write(unit=stdout, fmt=*) ' '
    endif
 
-   !---------------------------------------------------------------
-   ! Need this to exchange values in the halo region.
-   ! xa%u and xa%v are used as tempory arrays and so
-   ! it is easy to use the existing exchange scheme.
-   !
-   ! Note, this is needed as u_2 and v_2 has no guarantee
-   ! the most east column, and the most north raw are
-   ! properly initailized for each tile.
-   !                             Wei Huang, 03/06/03
-   !---------------------------------------------------------------
+!---------------------------------------------------------------
+!--Need this to exchange values in the halo region.
+!  xa%u and xa%v are used as tempory arrays and so
+!  it is easy to use the existing exchange scheme.
+!
+!  Note, this is needed as u_2 and v_2 has no guarantee
+!  the most east column, and the most north raw are
+!  properly initailized for each tile.
+!                             Wei Huang, 03/06/03
+!---------------------------------------------------------------
 
    do j=js,je
-      do k=ks,ke
-         do i=is,ie+1
-            xa%u(i,j,k) = u_2(i,j,k)
-         enddo
-      enddo
+   do k=ks,ke
+   do i=is,ie+1
+      xa%u(i,j,k) = u_2(i,j,k)
+   enddo
+   enddo
    enddo
 
    do j=js,je+1
-      do k=ks,ke
-         do i=is,ie
-            xa%v(i,j,k) = v_2(i,j,k)
-         enddo
-      enddo
+   do k=ks,ke
+   do i=is,ie
+      xa%v(i,j,k) = v_2(i,j,k)
+   enddo
+   enddo
    enddo
 
-   ! Fill the halo region for u and v.
+!--Fill the halo region for u and v.
 
    call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id3)
+
 
       if(print_detail_xb) then
       write(unit=stdout, fmt=*) 'is,ie,js,je,ks,ke=', is,ie,js,je,ks,ke
@@ -311,17 +296,6 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
        xb%lanu(i,j) = lu_index(i,j)
        xb%landmask(i,j) = landmask(i,j)
        xb%xland(i,j) = xland(i,j)
-       xb%tsk(i,j) = tsk(i,j)
-       xb%smois(i,j) = smois(i,j,1)
-       xb%tslb(i,j) = tslb(i,j,1)
-       xb%xice(i,j) = xice(i,j)
-       xb%ivgtyp(i,j) = ivgtyp(i,j)
-       xb%isltyp(i,j) = isltyp(i,j)
-       xb%vegfra(i,j) = vegfra(i,j)
-!       xb%snowh(i,j) = snowh(i,j)
-       xb%snowh(i,j) = snow(i,j)*10.     ! convert snow water equivalent kg/m2 to snow depth mm
-!      write(unit=stdout, fmt=*) i, j, nint(xb%landmask(i,j)), nint(xb%xice(i,j)), nint(xb%snow(i,j))
-
      enddo
 
 #if 0
@@ -399,26 +373,19 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
 ! Background qrn needed for Radar Radial velocity assimilation:
 
          if( size(moist,dim=4) >= 4 ) then
-!          write(UNIT=stdout,FMT=*)'P_QV, P_QCW, P_QRN:',P_QV, P_QCW, P_QRN
+!          write(6,*)'P_QV, P_QCW, P_QRN:',P_QV, P_QCW, P_QRN
            xb%qcw(i,j,k) = moist(i,j,k,p_qc)
            xb%qrn(i,j,k) = moist(i,j,k,p_qr)
            xb%qt (i,j,k) = xb%q(i,j,k) + xb%qcw(i,j,k) + xb%qrn(i,j,k)
-           if(xb%qcw(i,j,k) < 0.0 ) xb%qcw(i,j,k) = 0.0
-           if(xb%qrn(i,j,k) < 0.0 ) xb%qrn(i,j,k) = 0.0
-           if(xb%qt(i,j,k)  < 0.0 ) xb%qt(i,j,k) = 0.0
-
          endif
 
          if( size(moist,dim=4) >= 6 ) then
            xb%qci(i,j,k) = moist(i,j,k,p_qi)
            xb%qsn(i,j,k) = moist(i,j,k,p_qs)
-           if(xb%qci(i,j,k) < 0.0 ) xb%qci(i,j,k) = 0.0
-           if(xb%qsn(i,j,k) < 0.0 ) xb%qsn(i,j,k) = 0.0
          endif
 
          if( size(moist,dim=4) >= 7 ) then
            xb%qgr(i,j,k) = moist(i,j,k,p_qg)
-           if(xb%qgr(i,j,k) < 0.0 ) xb%qgr(i,j,k) = 0.0
          endif
 
        enddo
@@ -499,7 +466,7 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
 
    current_date = '2000-01-01_00:00:00'
 
-   write(UNIT=current_date(1:19), fmt='(i4.4, 5(a1, i2.2))') &
+   write(current_date(1:19), fmt='(i4.4, 5(a1, i2.2))') &
          grid%start_year, '-', &
          grid%start_month, '-', &
          grid%start_day, '_', &
@@ -507,7 +474,7 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
          grid%start_minute, ':', &
          grid%start_second
 
-   write(unit=stdout, fmt=*) 'current_date=', current_date
+   print *, 'current_date=', current_date
 
    xbx % mminlu = 'USGS'
 
@@ -521,7 +488,6 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
 !------------------------------------------------------------------------------
 !--Calculate 1/grid box areas:
 !------------------------------------------------------------------------------
-
    if(print_detail_xb) then
        write(unit=stdout, fmt='(/a, e24.16)') &
            'xb % ds=', xb % ds
@@ -559,7 +525,7 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
    do j=js,je
    do k=ks,ke
    do i=is,ie
-      call da_tpq_to_rh( xb % t(i,j,k), xb % p(i,j,k), xb % q(i,j,k), &
+      call DA_TPQ_To_RH( xb % t(i,j,k), xb % p(i,j,k), xb % q(i,j,k), &
                          xb %es(i,j,k), xb %qs(i,j,k), xb %rh(i,j,k) )
    end do
    end do
@@ -570,11 +536,11 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
 !------------------------------------------------------------------------------
 
 #ifdef DEREF_KLUDGE
-   call da_trh_to_td(xb % rh(xp%ims,xp%jms,xp%kms), &
+   call DA_TRH_To_TD(xb % rh(xp%ims,xp%jms,xp%kms), &
                      xb %  t(xp%ims,xp%jms,xp%kms), &
                      xb % td(xp%ims,xp%jms,xp%kms), xp)
 #else
-   call da_trh_to_td(xb % rh, xb % t, xb % td, xp)
+   call DA_TRH_To_TD(xb % rh, xb % t, xb % td, xp)
 #endif
 
    if(print_detail_xb) then
@@ -591,7 +557,6 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
 !------------------------------------------------------------------------------
 !--Sea level pressure and total precipitable water
 !------------------------------------------------------------------------------
-
    if(print_detail_xb) then
      write(unit=stdout, fmt='(3a, i8)') &
           'file:', __FILE__, ', line:', __LINE__
@@ -604,7 +569,7 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
 
 !  do j = js,je
 !  do i = is,ie
-!     call da_tpq_to_slp( xb%t(i,j,:), xb%q(i,j,:), xb%p(i,j,:), xb%terr(i,j), &
+!     call DA_TPQ_To_SLP( xb%t(i,j,:), xb%q(i,j,:), xb%p(i,j,:), xb%terr(i,j), &
 !                        xb%psfc(i,j), xb%slp(i,j), xp )
 !  end do
 !  end do
@@ -654,13 +619,13 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
 !--GPS Refractivity linked by Y.-R. Guo 05/28/2004
 !------------------------------------------------------------------------------
 
-   if(print_detail_xb) then
+  if(print_detail_xb) then
      write(unit=stdout, fmt='(3a, i8)') &
           'file:', __FILE__, ', line:', __LINE__
 
      write(unit=stdout, fmt='(a)') &
           'GPS Refractivity'
-   endif
+  endif
 
    call da_transform_xtogpsref(xb, xp)
 
@@ -668,7 +633,7 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
 !--Ground-based GPS ZTD must follow the GPS Refractivity calculation. YRG 04/05/05
 !------------------------------------------------------------------------------
 
-!  if (Use_GpsztdObs) call da_transform_xtoztd( xb )
+!  if (Use_GpsztdObs) call DA_Transform_XToZTD( xb )
 
 !------------------------------------------------------------------------------
 !--Calculate means for later use in setting up background errors.
@@ -682,8 +647,9 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
 
    tmpvar = 1.0/real(size2d)
 
+
    ! Bitwise-exact reduction preserves operation order of serial code for
-   ! testing, at the cost of much-increased run-time.  Turn it off when not     
+   ! testing, at the cost of much-increased run-time.  Turn it off when not
    ! testing.  This will always be .FALSE. for a serial or 1-process MPI run.
    IF ( testing_dm_exact ) THEN
       ALLOCATE( arrayglobal( xp%ids:xp%ide, xp%jds:xp%jde ) )
@@ -698,8 +664,6 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
    ENDIF
 
    tmpvar = 1.0/real(xp%ide-xp%ids+1)
-
-   loc_latc_mean(:) = 0.0
 
    IF ( testing_dm_exact ) THEN
       ALLOCATE( arrayglobal( xp%ids:xp%ide, xp%jds:xp%jde ) )
@@ -744,7 +708,7 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
      do j = xp%jts, xp%jte
      do i = xp%its, xp%ite
 
-       call da_cloud_model ( xb%t(I,J,:),   xb%p(I,J,:), xb%q(I,J,:), xb%qcw(I,J,:),  &
+       CALL DA_CLOUD_MODEL ( xb%t(I,J,:),   xb%p(I,J,:), xb%q(I,J,:), xb%qcw(I,J,:),  &
                              xb%qrn(I,J,:), xb%h(I,J,:), xb%hf(I,J,:),                &
                              DDT, xp%kts, xp%kte  )
 
@@ -755,89 +719,9 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
      enddo
      enddo
 
-   ENDIF   ! Set all fields to debug values
-
-   if (jrb_p > -9999.9) then
-      xb % u = jrb_wind
-      xb % v = jrb_wind
-      xb % w = jrb_wind
-   end if
-
-   if (jrb_temp > -9999.9) then
-      xb % t = jrb_temp
-   end if
-
-   if (jrb_p > -9999.9) then
-      xb % p = jrb_p
-   end if
-
-   !xb % q = jrb_real1
-   !xb % qrn = jrb_real1
-   !xb % qcw = jrb_real1
-   !xb % qci = jrb_real1
-   !xb % qsn = jrb_real1
-   !xb % qgr = jrb_real1
-   !xb % qt = jrb_real1
-   !xb % delt = jrb_real1
-   !xb % h = jrb_real1
-   !xb % hf = jrb_real1
-   !xb % wh = jrb_real1
-   !xb % rho = jrb_real1
-   !xb % rh = jrb_real1
-   !xb % es = jrb_real1
-   !xb % qs = jrb_real1
-   !xb % td = jrb_real1
-   !xb % vertical_inner_product = jrb_real1
-   !xb % ref = jrb_real1
-   !xb % rough = jrb_real1
-   !xb % tpw = jrb_real1
-   !xb % slp = jrb_real1
-   !xb % speed = jrb_real1
-   !xb % tb19v = jrb_real1
-   !xb % tb19h = jrb_real1
-   !xb % tb22v = jrb_real1
-   !xb % tb37v = jrb_real1
-   !xb % tb37h = jrb_real1
-   !xb % tb85v = jrb_real1
-   !xb % tb85h = jrb_real1
-   !xb % cori = jrb_real1
-   !xb % tgrn = jrb_real1
-   !xb % lat = jrb_real1
-   !xb % lon = jrb_real1
-   !xb % terr = jrb_real1
-   !xb % psac = jrb_real1
-   !xb % lanu = jrb_real1
-   !xb % snow = jrb_real1
-   !xb % xland = jrb_real1
-   !xb % landmask = jrb_real1
-   !xb % u10 = jrb_wind
-   !xb % v10 = jrb_wind
-   !xb % t2 = jrb_real1
-   !xb % q2 = jrb_real1
-   !xb % psfc = jrb_real1
-   !xb % tsk = jrb_real1
-   !xb % smois = jrb_real1
-   !xb % tslb = jrb_real1
-   !xb % xice = jrb_real1
-   !xb % ivgtyp = jrb_integer1
-   !xb % isltyp = jrb_integer1
-   !xb % vegfra = jrb_real1
-   !xb % snowh = jrb_real1
-   !xb % regime = jrb_real1
-   !xb % znu = jrb_real1
-   !xb % znw = jrb_real1
-   !xb % dn = jrb_real1
-   !xb % dnw = jrb_real1
-   !xb % sigmah = jrb_real1
-   !xb % sigmaf = jrb_real1
-   !xb % coefx = jrb_real1
-   !xb % coefy = jrb_real1
-   !xb % coefz = jrb_real1
-   !xb % kma_a = jrb_real1
-   !xb % kma_b = jrb_real1
+   ENDIF
 
    IF (trace_use) call da_trace_exit("da_transfer_wrftoxb")
-
 
 end subroutine da_transfer_wrftoxb
 
