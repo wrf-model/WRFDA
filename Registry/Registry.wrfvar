@@ -1585,7 +1585,7 @@ rconfig   integer   set_omb_rand_fac      namelist,record11        1            
 rconfig   integer   seed_array1           namelist,record11        1              0            -   "TBD"              "TBD"              "TBD"     
 rconfig   integer   seed_array2           namelist,record11        1              0            -   "TBD"              "TBD"              "TBD"     
 rconfig   integer   sfc_assi_options      namelist,record11        1              1            -   "TBD"              "TBD"              "TBD"     
-rconfig   logical   calculate_cg_cost_fn  namelist,record11        1              .true.       -   "TBD"              "TBD"              "TBD"     
+rconfig   logical   calculate_cg_cost_fn  namelist,record11        1              .false.      -   "TBD"              "TBD"              "TBD"     
 rconfig   logical   write_outer_loop      namelist,record11        1              .false.      -   "TBD"              "TBD"              "TBD"     
 rconfig   logical   lat_stats_option      namelist,record11        1              .true.       -   "TBD"              "TBD"              "TBD"     
 rconfig   real      as1                   namelist,record11        3              (/0.25,0.5,1.5/) -   "TBD"              "TBD"              "TBD"     
