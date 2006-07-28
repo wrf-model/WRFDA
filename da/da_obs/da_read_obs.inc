@@ -365,7 +365,7 @@ loop_level: DO i = 1, platform%info%levels
          endif
       endif
 
-      CALL da_obs_proc_station(platform)
+      if( fm /= 86) CALL da_obs_proc_station(platform)
 
       nlevels = platform%info%levels
 !    Loop over duplicating obs for global
