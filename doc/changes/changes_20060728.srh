@@ -1,0 +1,162 @@
+Change Log for update to WRF-Var code (svn main trunk)
+------------------------------------------------------
+
+Author  : Syed RH Rizvi
+Reviewer:  John Bray & Yong-Run Guo
+Date: 07/28/2006
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+  (a) Surface pressure variance was not taken into account
+  (b) Set defult value of "calulate_cg_cost_fn" as .false. instead of .true.
+  (b) Match the output with RB_V21 code
+  
+Expected Differences
+--------------------
+ No changes, if code is run with default option, 
+ ie. without AIRS, Radiance & alpha control variable 
+ which is an added feature of the main svn repository code.
+ 
+Accuracy: 
+ 
+CPU:
+ No change 
+
+memory:
+ 
+ No change 
+
+Files Modified:
+-------------------------------------
+
+ trunk/da/da_vtox_transforms/da_vertical_transform.inc
+ trunk/da/da_sound/da_ao_stats_sound.inc
+ trunk/da/da_setup_structures/da_transfer_wrftoxb.inc
+ trunk/Registry/Registry.wrfvar                                            
+
+Files added:
+-------------------------------------
+  trunk/doc/changes/changes_20060728.srh
+
+
+Files deleted:
+-------------------------------------
+ None
+
+cvs commit ?
+
+CHANGES:
+
+changes/changes_20060728.srh
+
+Test results:
+ On Mac (mahua) two cases namely cons200 (regional) and kma_T63 (global) were run
+ and its output was compared with RB_V21 (updated as on 07/28/2007 after fixing
+ SATEM data issue)
+
+ con200 (Case I):
+------------------
+ (a)  Log output for updated code: 
+ =================================
+  Starting outer iteration :   1
+  Original gradient is  2.95142198D+02
+  For this outer iteration Gradient target is  2.95142198D+00
+  Starting Cost function:  1.88131266D+04 Gradient=  2.95142198D+02
+  ----------------------------------------------------------
+
+  Inner iteration stopped after   18 iterations
+   Final cost function :  1.34579935D+04 and Gradient:  2.31298771D+00
+ ----------------------------------------------------------
+
+    Final cost function J    =     13457.99
+
+    Total number of obs.     =   11721
+    Final WRFVAR value of J  =    13457.99352
+    Final WRFVAR value of Jo =    11780.62955
+    Final WRFVAR value of Jb =     1677.36397
+    Final WRFVAR value of Je =        0.00000
+    Final J / total num_obs =         1.14819
+
+
+ (b)  Log output for RB_V21 code:
+ =================================
+  Starting outer iteration :   1
+  Original gradient is  2.95142198D+02
+  For this outer iteration Gradient target is  2.95142198D+00
+  Starting Cost function:  1.88131266D+04 Gradient=  2.95142198D+02
+ ----------------------------------------------------------
+
+  Inner iteration stopped after   18 iterations
+   Final cost function :  1.34579935D+04 and Gradient:  2.31298771D+00
+ ----------------------------------------------------------
+
+    Final cost function J  =  13457.9935192821176
+
+    Total number of obs.    =    11721
+    Final 3DVAR value of J  =     13457.99352
+    Final 3DVAR value of Jo =     11780.62955
+    Final 3DVAR value of Jb =      1677.36397
+    Final J / total num_obs =         1.14819
+
+
+
+ kma_T63 (Case II):
+------------------
+ (a)  Log output for updated code: 
+ ================================
+  Starting outer iteration :   1
+  Original gradient is  1.75290757D+04    
+  For this outer iteration Gradient target is  1.75290757D+02
+  Starting Cost function:  1.97074239D+05 Gradient=  1.75290757D+04
+ ----------------------------------------------------------
+  Iter      Gradient             Step
+
+   16      3.04946241D+03      5.82156565D-04
+   17      2.60784849D+03      5.25274797D-04
+   18      2.43803348D+03      7.72033149D-04
+
+ ----------------------------------------------------------
+  Inner iteration stopped after  100 iterations
+   Final cost function :  7.41989199D+04 and Gradient:  3.16047660D+02
+ ----------------------------------------------------------
+ 
+    Final cost function J    =     74198.92
+ 
+    Total number of obs.     =  164189
+    Final WRFVAR value of J  =    74198.91987
+    Final WRFVAR value of Jo =    62779.54399
+    Final WRFVAR value of Jb =    11419.37588
+    Final WRFVAR value of Je =        0.00000
+    Final J / total num_obs =         0.45191
+
+
+ (b)  Log output for RB_V21 code:
+ ================================
+  Starting outer iteration :   1
+  Original gradient is  1.75290757D+04
+  For this outer iteration Gradient target is  1.75290757D+02
+  Starting Cost function:  1.97074239D+05 Gradient=  1.75290757D+04
+ ----------------------------------------------------------
+  Iter      Gradient             Step
+
+   16      3.04946241D+03      5.82156565D-04
+   17      2.60784863D+03      5.25274791D-04
+   18      2.43805878D+03      7.72032000D-04
+
+
+  Inner iteration stopped after  100 iterations
+   Final cost function :  7.41955429D+04 and Gradient:  3.78023369D+02
+ ----------------------------------------------------------
+
+    Final cost function J  =  74195.5428913244104
+
+    Total number of obs.    =   164189
+    Final 3DVAR value of J  =     74195.54289
+    Final 3DVAR value of Jo =     62770.68084
+    Final 3DVAR value of Jb =     11424.86205
+    Final J / total num_obs =         0.45189
+
+Note: It is expected that these chabges are due to the different compiler used for compiling 
+      RB_V21 (xlf) and trunk updated (g95) code.
+
+Tag:
