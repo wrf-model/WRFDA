@@ -357,7 +357,7 @@ arch_superclean :
 FC              = mpif90
 FFC             = $(FC)
 SFC             = g95
-CC              = mpicc
+CC              = mpicc -DMPI2_SUPPORT
 CC_TOOLS        = gcc
 LD              = $(FC)
 

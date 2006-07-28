@@ -51,7 +51,7 @@ SUBROUTINE kma2netcdf_solver( grid, config_flags, &
 !  Definitions of dummy arguments to solve
 
 #include "em_dummy_decl.inc"
-!#include <mpif.h>
+!include 'mpif.h'
     real, allocatable      :: q(:,:,:) 
     Integer                :: my_proc_id, ierr 
     Integer                :: ii, jj,landmask_T213(428,215)  

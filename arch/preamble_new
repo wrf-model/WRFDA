@@ -48,7 +48,7 @@ FPPFLAGS1   = CONFIGURE_NETCDF_FLAG CONFIGURE_RTTOV_FLAG $(WORDSIZE_DEF) \
 CCFLAGS1    = -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) \
               -DLANDREAD_STUB
 WRFIO       = CONFIGURE_WRFIO_NF wrfio_int wrfio_grib1
-INCS        = -I. -I./inc CONFIGURE_RTTOV_INC -I$(MPICH)/include
+INCS        = -I. -I./inc CONFIGURE_RTTOV_INC
 
 # switch to use separately installed ESMF library for coupling:  1==true
 ESMF_COUPLING       = CONFIGURE_ESMF_COUPLING
