@@ -1096,7 +1096,7 @@ FCFLAGS_RSL     = $(FCENDIAN) -ffixed-form -fno-second-underscore
 
 CCFLAGS2        = -I$(RSL)/RSL -DLANDREAD_STUB -DMACOS
 CCFLAGS_BUFR    = -DUNDERSCORE
-CCFLAGS_RSL     = -DMACOS -I/usr/include/sys
+CCFLAGS_RSL     = -DMACOS -I/usr/include/sys  -DMPI2_SUPPORT
 
 LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN) 
 
