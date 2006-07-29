@@ -4,6 +4,8 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
 !  PURPOSE: Define and allocate components of background errors.
 !
 !  PARENT_MODULE: DA_Setup_Structures
+!  Updates:
+!   Aligned BE output with gen_be output            Syed RH Rizvi    07/29/2006
 !------------------------------------------------------------------------------
    IMPLICIT NONE
 
@@ -56,7 +58,9 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
    REAL, ALLOCATABLE           :: be4_rf_lengthscale(:) ! RF lengthscale.
    REAL, ALLOCATABLE           :: be5_rf_lengthscale(:)
    REAL, ALLOCATABLE           :: alpha_rf_lengthscale(:)
-
+!------------------------------------------------------------------------------
+   real, allocatable           :: evec_loc(:,:,:)        ! Latitudinally varying eigenvectors.
+   real, allocatable           :: eval_loc(:,:)          ! Latitudinally varying eigenvalues.
 !------------------------------------------------------------------------------
 !
    character*10                :: variable
@@ -192,12 +196,12 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
    endif
     
 !  2.0 Load the eigenvector and eigenvalue
-
-   ALLOCATE ( be1_eval_loc (1:kz,1:num_bins2d) )
-   ALLOCATE ( be2_eval_loc (1:kz,1:num_bins2d) )
-   ALLOCATE ( be3_eval_loc (1:kz,1:num_bins2d) )
-   ALLOCATE ( be4_eval_loc (1:kz,1:num_bins2d) )
-   ALLOCATE ( be5_eval_loc (1:1,1:num_bins2d) )
+ 
+      ALLOCATE ( be1_eval_loc (1:jy,1:kz) )
+      ALLOCATE ( be2_eval_loc (1:jy,1:kz) )
+      ALLOCATE ( be3_eval_loc (1:jy,1:kz) )
+      ALLOCATE ( be4_eval_loc (1:jy,1:kz) )
+      ALLOCATE ( be5_eval_loc (1:jy,1:1 ) )
 
    IF ( vert_corr == 2 ) THEN
 
@@ -207,11 +211,11 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
       ALLOCATE ( be4_eval_glo(1:kz) )
       ALLOCATE ( be5_eval_glo(1:1) )
 
-      ALLOCATE ( be1_evec_loc(1:kz,1:kz,1:num_bins2d) )
-      ALLOCATE ( be2_evec_loc(1:kz,1:kz,1:num_bins2d) )
-      ALLOCATE ( be3_evec_loc(1:kz,1:kz,1:num_bins2d) )
-      ALLOCATE ( be4_evec_loc(1:kz,1:kz,1:num_bins2d) )
-      ALLOCATE ( be5_evec_loc(1:1,1:1,1:num_bins2d) )
+      ALLOCATE ( be1_evec_loc(1:jy,1:kz,1:kz))
+      ALLOCATE ( be2_evec_loc(1:jy,1:kz,1:kz))
+      ALLOCATE ( be3_evec_loc(1:jy,1:kz,1:kz))
+      ALLOCATE ( be4_evec_loc(1:jy,1:kz,1:kz))
+      ALLOCATE ( be5_evec_loc(1:jy,1: 1,1: 1))
 
       ALLOCATE ( be1_evec_glo(1:kz,1:kz) )
       ALLOCATE ( be2_evec_glo(1:kz,1:kz) )
@@ -224,60 +228,111 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
 
 ! 2.2.1 Control variable 1 (psi)
 
-   read(be_unit) variable   
-   read(be_unit) nk, num_bins2d 
-   read(be_unit)  be1_evec_glo   
-   read(be_unit)  be1_eval_glo    
-   read(be_unit)  be1_evec_loc     
-   read(be_unit)  be1_eval_loc    
-
+   read(be_unit) variable
+   read(be_unit) nk, num_bins2d
+   read(be_unit)  be1_evec_glo
+   read(be_unit)  be1_eval_glo
+   allocate( evec_loc(1:nk,1:nk,1:num_bins2d) )
+   allocate( eval_loc(1:nk,     1:num_bins2d) )
+   read(be_unit)  evec_loc
+   read(be_unit)  eval_loc
+   if( variable(1:3) /= 'psi') then
+   print*,' Variable mismatch while transfering eigen values from BE file '
+   print*,' Expected psi but got ',variable
+   stop
+   endif
    be % v1 % name = variable
-! 2.2.2 Control variable 2 (chi_u)
+   do j=1,nj
+      b = bin2d(1,j)
+    be1_evec_loc(j,1:nk,1:nk) = evec_loc(1:nk,1:nk,b)
+    be1_eval_loc(j,1:nk     ) = eval_loc(1:nk,b)
+   enddo
 
+! 2.2.2 Control variable 2 (chi_u)
    read(be_unit) variable
    read(be_unit) nk, num_bins2d
    read(be_unit)  be2_evec_glo
    read(be_unit)  be2_eval_glo
-   read(be_unit)  be2_evec_loc
-   read(be_unit)  be2_eval_loc
-
+   read(be_unit)  evec_loc
+   read(be_unit)  eval_loc
+   if( variable(1:5) /= 'chi_u') then
+   print*,' Variable mismatch while transfering eigen values from BE file '
+   print*,' Expected chi_u but got ',variable
+   stop
+   endif
    be % v2 % name = variable
-!   print*,'variable ',be % v2 % name,nk,num_bins2d
-
+   do j=1,nj
+      b = bin2d(1,j)
+    be2_evec_loc(j,1:nk,1:nk) = evec_loc(1:nk,1:nk,b)
+    be2_eval_loc(j,1:nk     ) = eval_loc(1:nk,b)
+   enddo
 ! 2.2.3 Control variable 3 (t_u)
 
    read(be_unit) variable
    read(be_unit) nk, num_bins2d
    read(be_unit)  be3_evec_glo
    read(be_unit)  be3_eval_glo
-   read(be_unit)  be3_evec_loc
-   read(be_unit)  be3_eval_loc
-
+   read(be_unit)  evec_loc
+   read(be_unit)  eval_loc
+   if( variable(1:3) /= 't_u') then
+   print*,' Variable mismatch while transfering eigen values from BE file '
+   print*,' Expected t_u but got ',variable
+   stop
+   endif
    be % v3 % name = variable
-!   print*,'variable ',be % v3 % name,nk,num_bins2d
+   do j=1,nj
+      b = bin2d(1,j)
+    be3_evec_loc(j,1:nk,1:nk) = evec_loc(1:nk,1:nk,b)
+    be3_eval_loc(j,1:nk     ) = eval_loc(1:nk,b)
+   enddo
 
 ! 2.2.4 Control variable 4 (q/qsg)
+
 
    read(be_unit) variable
    read(be_unit) nk, num_bins2d
    read(be_unit)  be4_evec_glo
    read(be_unit)  be4_eval_glo
-   read(be_unit)  be4_evec_loc
-   read(be_unit)  be4_eval_loc
-!
+   read(be_unit)  evec_loc
+   read(be_unit)  eval_loc
+   if( variable(1:3) /= 'rh') then
+   print*,' Variable mismatch while transfering eigen values from BE file '
+   print*,' Expected rh but got ',variable
+   stop
+   endif
    be % v4 % name = variable
-!   print*,'variable ',be % v4 % name,nk,num_bins2d
+   do j=1,nj
+      b = bin2d(1,j)
+    be4_evec_loc(j,1:nk,1:nk) = evec_loc(1:nk,1:nk,b)
+    be4_eval_loc(j,1:nk     ) = eval_loc(1:nk,b)
+   enddo
+!
+   deallocate ( evec_loc )
+   deallocate ( eval_loc )
+! 2.2.5 Control variable ps_u
 
    read(be_unit) variable
    read(be_unit) nk_2d, num_bins2d
+   allocate( evec_loc(1:nk_2d,1:nk_2d,1:num_bins2d) )
+   allocate( eval_loc(1:nk_2d,        1:num_bins2d) )
    read(be_unit)  be5_evec_glo
    read(be_unit)  be5_eval_glo
-   read(be_unit)  be5_evec_loc
-   read(be_unit)  be5_eval_loc
-
+   read(be_unit)  evec_loc
+   read(be_unit)  eval_loc
+   if( variable(1:4) /= 'ps_u') then
+   print*,' Variable mismatch while transfering eigen values from BE file '
+   print*,' Expected ps_u but got ',variable
+   stop
+   endif
    be % v5 % name = variable
-!   print*,'variable ',be % v5 % name,nk_2d,num_bins2d
+   do j=1,nj
+      b = bin2d(1,j)
+    be5_evec_loc(j,1:1,1:1) = evec_loc(1:1,1:1,b)
+    be5_eval_loc(j,1:1    ) = eval_loc(1:1,b)
+   enddo
 
+   deallocate ( evec_loc )
+   deallocate ( eval_loc )
 ! 3.0 Check and get the truncated number of the vertical modes
 ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
