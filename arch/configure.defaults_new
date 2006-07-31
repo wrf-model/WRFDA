@@ -21,7 +21,7 @@ DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
 FPPFLAGS_BUFR   = -C -P $(TRADFLAG) -DLINUX -Dlinux
 
 FCOPTIM         = #-fast
-FCDEBUG         = #-g -C
+FCDEBUG         = -g -C
 FCTYPE          = -r8
 FCFREE          = -Mfree
 FCENDIAN        = -byteswapio
@@ -69,11 +69,12 @@ CC_TOOLS        = $(FC)
 LD              = $(FC)
 
 TRADFLAG        =
-FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DDEC_ALPHA -DNONSTANDARD_SYSTEM                    
+FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DDEC_ALPHA \
+                    -DNONSTANDARD_SYSTEM                    
 
 #FCOPTIM        = -fast -O2 -Olimit 2000
 FCOPTIM         = #-fast -O2
-FCDEBUG         = #-g
+FCDEBUG         = # -g
 FCTYPE          = -r8
 FCFREE          = -free
 FCHOST          = -arch host
@@ -104,14 +105,15 @@ CC_TOOLS        = cc
 LD              = $(FC)
 
 TRADFLAG        =
-FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DDEC_ALPHA -DNONSTANDARD_SYSTEM
+FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DDEC_ALPHA \
+                    -DNONSTANDARD_SYSTEM
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
 
 #FCOPTIM        = -fast -O2 -Olimit 2000
 FCOPTIM         = -fast -O2
-FCDEBUG         = #-g
+FCDEBUG         = -g
 FCTYPE          = -r8
 FCFREE          = -free
 FCHOST          = -arch host
@@ -155,11 +157,12 @@ CC_TOOLS        = $(CC)
 LD              = $(FC)
 
 TRADFLAG        =
-FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DDEC_ALPHA -DNONSTANDARD_SYSTEM
+FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DDEC_ALPHA \
+                    -DNONSTANDARD_SYSTEM
                    
 #FCOPTIM        = -fast -O2 -Olimit 2000
 FCOPTIM         = -O0
-FCDEBUG         = #-g
+FCDEBUG         = # -g
 FCTYPE          = -r8
 FCFREE          = -free
 FCHOST          = -arch host
@@ -465,7 +468,7 @@ FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DNONSTANDARD_SYSTEM
 FPPFLAGS_BUFR   = -C -P $(TRADFLAG) -DLINUX -Dlinux
 
 FCOPTIM         = -O3 -xW
-FCDEBUG         = #-g
+FCDEBUG         = # -g
 FCFREE          = -FR -cm -w
 FCENDIAN        = -convert big_endian
 FCBASE          = 
@@ -681,7 +684,7 @@ TRADFLAG        =
 FPPFLAGS2       = -DNORESHAPE -DIRIX -DNONSTANDARD_SYSTEM                    
 
 FCOPTIM         = -O2
-FCDEBUG         = #-g
+FCDEBUG         = # -g
 FCTYPE          = -r8
 FCFREE          = -freeform
 FCENDIAN        =
@@ -722,7 +725,7 @@ FPPFLAGS2       = -DIRIX -DNONSTANDARD_SYSTEM
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
 FCOPTIM         = -O3 -OPT:roundoff=3:IEEE_arithmetic=3
-FCDEBUG         = #-g
+FCDEBUG         = # -g
 FCTYPE          = -r8
 FCFREE          = -freeform
 FCENDIAN        =
@@ -805,10 +808,11 @@ FPPFLAGS2       = -DNATIVE_MASSV -DAIX -DNONSTANDARD_SYSTEM
 
 FCOPTIM         = -O0 -qarch=auto
 FCDEBUG         = #-g -qfullpath -C
+
 FCTYPE          = -qrealsize=8
 FCFREE          = -qfree=f90
 FCENDIAN        =
-FCBASE          = -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767 \
+FCBASE          = -w -qspill=20000 -qmaxmem=32767 \
                     -qflttrap=zerodivide:invalid:enable -qsigtrap=xl__trce
 
 CCFLAGS2        = -DNOUNDERSCORE -DNCARIBM_NOC99
@@ -849,7 +853,7 @@ FCDEBUG         = #-g -qfullpath -C
 FCTYPE          = -qrealsize=8
 FCFREE          = -qfree=f90
 FCENDIAN        =
-FCBASE          = -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767 \
+FCBASE          = -w -qspill=20000 -qmaxmem=32767 \
  		    -qflttrap=zerodivide:invalid:enable -qsigtrap=xl__trce
 FCFLAGS_RSL     = $(FCENDIAN)
 
@@ -901,8 +905,8 @@ FCDEBUG         = #-g -qfullpath -C
 FCTYPE          = -qrealsize=8
 FCFREE          = -qfree=f90
 FCENDIAN        =
-FCBASE          = -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767 \
- 		    -qflttrap=zerodivide:invalid:enable -qsigtrap=xl__trce
+FCBASE          = -w -qspill=20000 -qmaxmem=32767 \
+ 		    -qflttrap=zerodivide:invalid:enable -qsigtrap=xl__trce 
 FCFLAGS_RSL     = $(FCENDIAN)
 
 CCFLAGS2        = -DNOUNDERSCORE -DNCARIBM_NOC99 -I$(RSL_LITE)
@@ -945,7 +949,7 @@ FPPFLAGS2       = -DNORESHAPE -Dcrayx1 -DNONSTANDARD_SYSTEM
                     
 #FCOPTIM        = -Ofp3 -O3
 FCOPTIM         = -O0
-FCDEBUG         = #-g
+FCDEBUG         = # -g
 #FCTYPE         = -sinteger32 -e m -sreal64 -dp
 FCTYPE          = -e m -sreal64 -dp
 FCFREE          = -f free -N 255
@@ -995,7 +999,7 @@ DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
 #FCOPTIM         = -Ofp2 -O1 -Ogen_private_callee
 #FCOPTIM         = -Ofp2 -O0
 FCOPTIM         = -O0
-FCDEBUG         = #-g
+FCDEBUG         = -g
 #FCTYPE         = -sinteger32 -e m -sreal64 -dp
 FCTYPE          = -e m -sreal64 -dp
 FCFREE          = -f free -N 255
@@ -1086,7 +1090,7 @@ FPPFLAGS2       = -DMACOS -DNONSTANDARD_SYSTEM		      \
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
 
-FCOPTIM         = 
+FCOPTIM         =
 FCDEBUG         = -g -ftrace=full -finteger=-9999 -freal=nan -C
 FCTYPE          = -r8
 FCFREE          = -ffree-form  -ffree-line-length-huge
@@ -1096,7 +1100,7 @@ FCFLAGS_RSL     = $(FCENDIAN) -ffixed-form -fno-second-underscore
 
 CCFLAGS2        = -I$(RSL)/RSL -DLANDREAD_STUB -DMACOS
 CCFLAGS_BUFR    = -DUNDERSCORE
-CCFLAGS_RSL     = -DMACOS -I/usr/include/sys  -DMPI2_SUPPORT
+CCFLAGS_RSL     = -DMACOS -I/usr/include/sys -DMPI2_SUPPORT
 
 LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN) 
 
