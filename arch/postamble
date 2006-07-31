@@ -1,3 +1,10 @@
+WRFVAR_INC = -I../external/lapack -I../external/fftpack5 -I../external/blas \
+               -I../da
+
+WRFVAR_LIB = -L../external/lapack -llapack -L../external/blas -lblas \
+               -L../external/fftpack5 -lfftpack5 \
+               -L../external/bufr_ncep_nco -lbufr
+
 
 # These sub-directory builds are identical across all architectures
 wrfio_esmf :

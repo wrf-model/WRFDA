@@ -5166,8 +5166,7 @@ ESMF_LIB_FLAGS  =
 ESMF_IO_LIB     =       ESMFIOLIB
 ESMF_IO_LIB_EXT =       ESMFIOEXTLIB
 INCLUDE_MODULES =       -I../main -I../external/io_netcdf -I../external/io_int -I../external/esmf_time_f90 \
-                        -I../external -I../frame -I../share -I../phys -I../inc -I../external/lapack \
-                        -I../external/fftpack5 -I../external/blas -I../da
+                        -I../external -I../frame -I../share -I../phys -I../inc
 PERL            =       perl
 REGISTRY        =       Registry
 LIB             =       CONFIGURE_NETCDF_LIB_PATH -L../external/RSL/RSL -lrsl \
@@ -5176,10 +5175,7 @@ LIB             =       CONFIGURE_NETCDF_LIB_PATH -L../external/RSL/RSL -lrsl \
                         -L../external/io_grib_share -lio_grib_share \
 			-L../external/io_int -lwrfio_int \
 			../frame/module_internal_header_util.o ../frame/pack_utils.o \
-                        -L../external/esmf_time_f90 -lesmf_time \
-                        -L../external/lapack -llapack -L../external/blas -lblas \
-                        -L../external/fftpack5 -lfftpack5 \
-                        -L../external/bufr_ncep_nco -lbufr
+                        -L../external/esmf_time_f90 -lesmf_time
 LDFLAGS         =       $(FCFLAGS) CONFIGURE_LDFLAGS
 ENVCOMPDEFS	=	CONFIGURE_COMPILEFLAGS
 CPP             =       /lib/cpp -C -P -traditional -I$(DEVTOP)/external/ioapi_share

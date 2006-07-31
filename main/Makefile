@@ -14,7 +14,7 @@ include ../configure.wrf
 
 wrfvar : wrfvar.o
 	$(RANLIB) libwrflib.a
-	$(LD) -o wrfvar.exe $(LDFLAGS) wrfvar.o libwrflib.a $(LIB)
+	$(LD) -o wrfvar.exe $(LDFLAGS) wrfvar.o libwrflib.a $(LIB) $(WRFVAR_LIB)
 
 kma2netcdf : kma2netcdf.o
 	$(RANLIB) libwrflib.a

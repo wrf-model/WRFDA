@@ -113,14 +113,14 @@ da_par_util.o:		da_par_util.f90                   \
 			da_y_facade_to_global.inc
 			$(RM) $@
 			$(CPP) $(CPPFLAGS) -I../inc da_par_util.f90 > da_par_util.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) da_par_util.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_par_util.f
 
 da_par_util1.o:		da_proc_sum_int.inc               \
 			da_proc_sum_real.inc \
 			da_par_util1.f90
 			$(RM) $@
 			$(CPP) $(CPPFLAGS) -I../inc da_par_util1.f90 > da_par_util1.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) da_par_util1.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_par_util1.f
 
 da_solve.o:		da_constants.o			\
 			da_define_structures.o		\
@@ -133,7 +133,7 @@ da_solve.o:		da_constants.o			\
 			da_solve.f90
 			$(RM) $@
 			$(CPP) $(CPPFLAGS) -I../inc da_solve.f90 > da_solve.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) da_solve.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_solve.f
 
 da_minimisation.o:	da_minimisation.f90 \
 			da_wrfvar_io.o \
@@ -175,7 +175,7 @@ da_minimisation.o:	da_minimisation.f90 \
 			da_minimise_cg.inc
 			$(RM) $@
 			$(CPP) $(CPPFLAGS) -I../inc da_minimisation.f90 > da_minimisation.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) da_minimisation.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_minimisation.f
 
 da_setup_structures.o:	da_setup_structures.f90 \
 			da_define_structures.o \
@@ -221,7 +221,7 @@ da_setup_structures.o:	da_setup_structures.f90 \
 			da_write_increments.inc
 			$(RM) $@
 			$(CPP) $(CPPFLAGS) -I../inc da_setup_structures.f90 > da_setup_structures.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) da_setup_structures.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_setup_structures.f
 
 da_memory.o:		da_memory.c
 			$(RM) $@
@@ -255,7 +255,7 @@ da_vtox_transforms.o:	da_vtox_transforms.f90 \
 			da_vertical_transform.inc
 			$(RM) $@
 			$(CPP) $(CPPFLAGS) -I../inc da_vtox_transforms.f90 > da_vtox_transforms.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) da_vtox_transforms.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_vtox_transforms.f
 
 da_obs.o:		da_obs.f90 \
 			da_constants.o \
@@ -306,7 +306,7 @@ da_obs.o:		da_obs.f90 \
                         da_deallocate_obs.inc
 			$(RM) $@
 			$(CPP) $(CPPFLAGS) -I../inc da_obs.f90 > da_obs.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) da_obs.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_obs.f
 
 da_pseudo.o:		da_pseudo.f90 \
 			da_constants.o \
@@ -325,7 +325,7 @@ da_pseudo.o:		da_pseudo.f90 \
 			da_transform_xtoy_pseudo_adj.inc
 			$(RM) $@
 			$(CPP) $(CPPFLAGS) -I../inc da_pseudo.f90 > da_pseudo.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) da_pseudo.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_pseudo.f
 
 da_metar.o:		da_metar.f90 \
 			da_constants.o \
@@ -346,7 +346,7 @@ da_metar.o:		da_metar.f90 \
 			da_get_innov_vector_metar.inc
 			$(RM) $@
 			$(CPP) $(CPPFLAGS) -I../inc da_metar.f90 > da_metar.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) da_metar.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_metar.f
 
 da_geoamv.o:		da_geoamv.f90 \
 			da_constants.o \
@@ -366,7 +366,7 @@ da_geoamv.o:		da_geoamv.f90 \
 			da_get_innov_vector_geoamv.inc
 			$(RM) $@
 			$(CPP) $(CPPFLAGS) -I../inc da_geoamv.f90 > da_geoamv.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) da_geoamv.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_geoamv.f
 
 da_polaramv.o:		da_polaramv.f90 \
 			da_constants.o \
@@ -386,7 +386,7 @@ da_polaramv.o:		da_polaramv.f90 \
 			da_get_innov_vector_polaramv.inc
 			$(RM) $@
 			$(CPP) $(CPPFLAGS) -I../inc da_polaramv.f90 > da_polaramv.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) da_polaramv.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_polaramv.f
 
 da_satem.o:		da_satem.f90 \
 			da_constants.o \
@@ -406,7 +406,7 @@ da_satem.o:		da_satem.f90 \
 			da_get_innov_vector_satem.inc
 			$(RM) $@
 			$(CPP) $(CPPFLAGS) -I../inc da_satem.f90 > da_satem.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) da_satem.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_satem.f
 
 da_ships.o:		da_ships.f90 \
 			da_constants.o \
@@ -427,7 +427,7 @@ da_ships.o:		da_ships.f90 \
 			da_get_innov_vector_ships.inc
 			$(RM) $@
 			$(CPP) $(CPPFLAGS) -I../inc da_ships.f90 > da_ships.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) da_ships.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_ships.f
 
 da_synop.o:		da_synop.f90 \
 			da_constants.o \
@@ -449,7 +449,7 @@ da_synop.o:		da_synop.f90 \
 			da_transform_xtoy_synop_adj.inc
 			$(RM) $@
 			$(CPP) $(CPPFLAGS) -I../inc da_synop.f90 > da_synop.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) da_synop.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_synop.f
 
 da_sound.o:		da_sound.f90 \
 			da_constants.o \
@@ -482,7 +482,7 @@ da_sound.o:		da_sound.f90 \
 			da_calculate_grady_sonde_sfc.inc
 			$(RM) $@
 			$(CPP) $(CPPFLAGS) -I../inc da_sound.f90 > da_sound.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) da_sound.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_sound.f
 
 da_airep.o:		da_airep.f90 \
 			da_constants.o \
@@ -502,7 +502,7 @@ da_airep.o:		da_airep.f90 \
 			da_get_innov_vector_airep.inc
 			$(RM) $@
 			$(CPP) $(CPPFLAGS) -I../inc da_airep.f90 > da_airep.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) da_airep.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_airep.f
 
 da_pilot.o:		da_pilot.f90 \
 			da_constants.o \
@@ -522,7 +522,7 @@ da_pilot.o:		da_pilot.f90 \
 			da_get_innov_vector_pilot.inc
 			$(RM) $@
 			$(CPP) $(CPPFLAGS) -I../inc da_pilot.f90 > da_pilot.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) da_pilot.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_pilot.f
 
 da_bogus.o:		da_bogus.f90 \
 			da_constants.o \
@@ -543,7 +543,7 @@ da_bogus.o:		da_bogus.f90 \
 			da_get_innov_vector_bogus.inc
 			$(RM) $@
 			$(CPP) $(CPPFLAGS) -I../inc da_bogus.f90 > da_bogus.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) da_bogus.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_bogus.f
 
 da_radar.o:		da_radar.f90 \
 			da_constants.o \
@@ -571,7 +571,7 @@ da_radar.o:		da_radar.f90 \
 			da_max_error_qc_radar.inc
 			$(RM) $@
 			$(CPP) $(CPPFLAGS) -I../inc da_radar.f90 > da_radar.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) da_radar.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_radar.f
 
 da_gpspw.o:		da_gpspw.f90 \
 			da_constants.o \
@@ -592,7 +592,7 @@ da_gpspw.o:		da_gpspw.f90 \
 			da_transform_xtoy_gpspw_adj.inc
 			$(RM) $@
 			$(CPP) $(CPPFLAGS) -I../inc da_gpspw.f90 > da_gpspw.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) da_gpspw.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_gpspw.f
 
 da_gpsref.o:		da_gpsref.f90 \
 			da_constants.o \
@@ -613,7 +613,7 @@ da_gpsref.o:		da_gpsref.f90 \
 			da_get_innov_vector_gpsref.inc
 			$(RM) $@
 			$(CPP) $(CPPFLAGS) -I../inc da_gpsref.f90 > da_gpsref.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) da_gpsref.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_gpsref.f
 
 da_ssmi.o:		da_ssmi.f90 \
 			da_constants.o \
@@ -678,7 +678,7 @@ da_ssmi.o:		da_ssmi.f90 \
 			da_transform_xtoy_ssmt2_adj.inc
 			$(RM) $@
 			$(CPP) $(CPPFLAGS) -I../inc da_ssmi.f90 > da_ssmi.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) da_ssmi.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_ssmi.f
 
 da_qscat.o:		da_qscat.f90 \
 			da_constants.o \
@@ -698,7 +698,7 @@ da_qscat.o:		da_qscat.f90 \
 			da_transform_xtoy_qscat_adj.inc
 			$(RM) $@
 			$(CPP) $(CPPFLAGS) -I../inc da_qscat.f90 > da_qscat.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) da_qscat.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_qscat.f
 
 da_airsr.o:		da_airsr.f90 \
                         da_ao_stats_airsr.inc \
@@ -714,7 +714,7 @@ da_airsr.o:		da_airsr.f90 \
                         da_transform_xtoy_airsr.inc
 			$(RM) $@
 			$(CPP) $(CPPFLAGS) -I../inc da_airsr.f90 > da_airsr.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) da_airsr.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_airsr.f
 
 da_profiler.o:		da_profiler.f90 \
 			da_constants.o \
@@ -735,7 +735,7 @@ da_profiler.o:		da_profiler.f90 \
 			da_get_innov_vector_profiler.inc
 			$(RM) $@
 			$(CPP) $(CPPFLAGS) -I../inc da_profiler.f90 > da_profiler.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) da_profiler.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_profiler.f
 
 
 da_buoy.o:		da_buoy.f90 \
@@ -757,7 +757,7 @@ da_buoy.o:		da_buoy.f90 \
 			da_get_innov_vector_buoy.inc
 			$(RM) $@
 			$(CPP) $(CPPFLAGS) -I../inc da_buoy.f90 > da_buoy.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) da_buoy.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_buoy.f
 
 da_dynamics.o:		da_dynamics.f90 \
 			da_constants.o \
@@ -785,7 +785,7 @@ da_dynamics.o:		da_dynamics.f90 \
 			da_uv_to_vorticity.inc
 			$(RM) $@
 			$(CPP) $(CPPFLAGS) -I../inc da_dynamics.f90 > da_dynamics.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) da_dynamics.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_dynamics.f
 
 da_physics.o:		da_physics.f90 \
 			da_constants.o \
@@ -840,7 +840,7 @@ da_physics.o:		da_physics.f90 \
 			da_moist_phys_lin.inc
 			$(RM) $@
 			$(CPP) $(CPPFLAGS) -I../inc da_physics.f90 > da_physics.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) da_physics.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_physics.f
 
 da_ffts.o:		\
 			da_define_structures.o \
@@ -855,7 +855,7 @@ da_ffts.o:		\
 			da_solve_poissoneqn_fst_adj.inc
 			$(RM) $@
 			$(CPP) $(CPPFLAGS) -I../inc da_ffts.f90 > da_ffts.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) da_ffts.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_ffts.f
 
 da_tools.o:		\
 			da_constants.o \
@@ -889,7 +889,7 @@ da_tools.o:		\
 			da_xyll.inc    
 			$(RM) $@
 			$(CPP) $(CPPFLAGS) -I../inc da_tools.f90 > da_tools.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) da_tools.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_tools.f
 
 da_recursive_filter.o:	\
 			da_constants.o \
@@ -902,7 +902,7 @@ da_recursive_filter.o:	\
 			da_transform_through_rf_adj.inc
 			$(RM) $@
 			$(CPP) $(CPPFLAGS) -I../inc da_recursive_filter.f90 > da_recursive_filter.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) da_recursive_filter.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_recursive_filter.f
 
 da_interpolation.o:	\
 			da_constants.o \
@@ -919,7 +919,7 @@ da_interpolation.o:	\
 			da_interp_lin_3d_adj.inc
 			$(RM) $@
 			$(CPP) $(CPPFLAGS) -I../inc da_interpolation.f90 > da_interpolation.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) da_interpolation.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_interpolation.f
 
 da_grid_definitions.o:	\
 			da_constants.o \
@@ -932,7 +932,7 @@ da_grid_definitions.o:	\
 			da_set_map_para.inc
 			$(RM) $@
 			$(CPP) $(CPPFLAGS) -I../inc da_grid_definitions.f90 > da_grid_definitions.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) da_grid_definitions.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_grid_definitions.f
 
 da_statistics.o:	da_statistics.f90 \
 			da_define_structures.o \
@@ -945,7 +945,7 @@ da_statistics.o:	da_statistics.f90 \
 			da_stats_calculate.inc
 			$(RM) $@
 			$(CPP) $(CPPFLAGS) -I../inc da_statistics.f90 > da_statistics.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) da_statistics.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_statistics.f
 
 da_define_structures.o:	da_define_structures.f90 \
 			da_constants.o \
@@ -963,7 +963,7 @@ da_define_structures.o:	da_define_structures.f90 \
 			da_zero_y.inc    
 			$(RM) $@
 			$(CPP) $(CPPFLAGS) -I../inc da_define_structures.f90 > da_define_structures.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) da_define_structures.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_define_structures.f
 
 da_constants.o:		da_constants.f90 \
 			da_array_print.inc \
@@ -974,7 +974,7 @@ da_constants.o:		da_constants.f90 \
                         ../frame/module_driver_constants.o 
 			$(RM) $@
 			$(CPP) -I../inc $(CPPFLAGS) -I../inc da_constants.f90 > da_constants.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) da_constants.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_constants.f
 
 da_test.o:		da_test.f90 \
 			da_constants.o \
@@ -1038,7 +1038,7 @@ da_test.o:		da_test.f90 \
 			da_set_tst_trnsf_fld.inc
 			$(RM) $@
 			$(CPP) $(CPPFLAGS) -I../inc da_test.f90 > da_test.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) da_test.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_test.f
 
 da_gen_be.o:	        da_gen_be.f90 \
 			da_constants.o			\
@@ -1084,14 +1084,14 @@ da_spectral.o:		da_spectral.f90             \
 			da_legtra_inv_adj.inc       \
 			da_apply_power.inc
 			$(CPP) $(CPPFLAGS) -I../inc da_spectral.f90 > da_spectral.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) da_spectral.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_spectral.f
 
 da_wrfvar_io.o : da_wrfvar_io.f90 \
                      da_med_initialdata_input.inc \
                      da_med_initialdata_output.inc \
                         da_tracing.o
 			$(CPP) $(CPPFLAGS) -I../inc da_wrfvar_io.f90 > da_wrfvar_io.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) da_wrfvar_io.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_wrfvar_io.f
 
 da_wrfvar_top.o : da_wrfvar_top.f90 \
                              da_wrfvar_init.inc \
@@ -1101,7 +1101,7 @@ da_wrfvar_top.o : da_wrfvar_top.f90 \
                   da_wrfvar_io.o \
                       da_tracing.o
 			$(CPP) $(CPPFLAGS) -I../inc da_wrfvar_top.f90 > da_wrfvar_top.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) da_wrfvar_top.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_wrfvar_top.f
 
 da_wrfvar_esmf_super.o : da_wrfvar_esmf_super.f90 \
                              da_esmf_init.inc \
@@ -1110,7 +1110,7 @@ da_wrfvar_esmf_super.o : da_wrfvar_esmf_super.f90 \
                              da_wrfvar_interface.inc \
                              da_wrfvar_io.o
 			$(CPP) $(CPPFLAGS) -I../inc da_wrfvar_esmf_super.f90 > da_wrfvar_esmf_super.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) da_wrfvar_esmf_super.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_wrfvar_esmf_super.f
 
 da_tracing.o:           da_tracing.f90           \
                         da_trace_init.inc      \
@@ -1125,7 +1125,7 @@ da_tracing.o:           da_tracing.f90           \
                         da_memory.o                       \
                         da_par_util1.o
 			$(CPP) $(CPPFLAGS) -I../inc da_tracing.f90 > da_tracing.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) da_tracing.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_tracing.f
 
 da_reporting.o:         da_reporting.f90       \
                         da_error.inc           \
@@ -1133,7 +1133,7 @@ da_reporting.o:         da_reporting.f90       \
                         da_messages2.inc       \
                         da_warning.inc
 			$(CPP) $(CPPFLAGS) -I../inc da_reporting.f90 > da_reporting.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) da_reporting.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_reporting.f
 
 be_spectral.o:		da_be_spectral.f90          \
 			da_constants.o	            \
@@ -1151,7 +1151,7 @@ be_spectral.o:		da_be_spectral.f90          \
 			da_apply_power.inc          \
 			da_be_spectral.f90
 			$(CPP) $(CPPFLAGS) -I../inc da_be_spectral.f90 > da_be_spectral.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) da_be_spectral.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_be_spectral.f
 
 da_radiance.o:		da_radiance.f90 \
                         da_constants.o          \
@@ -1194,39 +1194,39 @@ da_radiance.o:		da_radiance.f90 \
 			seaem.inc
 			$(RM) $@
 			$(CPP) -I$(RTTOV)/src $(CPPFLAGS) -I../inc da_radiance.f90 > da_radiance.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) da_radiance.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_radiance.f
 
 rttov_const.o:		rttov_const.f90 \
                         parkind1.o
 			$(RM) $@
 			$(CPP) -I$(RTTOV)/src $(CPPFLAGS) -I../inc rttov_const.f90 > rttov_const.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) rttov_const.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) rttov_const.f
 
 rttov_global.o:		rttov_global.f90 \
                         parkind1.o	\
 			rttov_const.o
 			$(RM) $@
 			$(CPP) -I$(RTTOV)/src $(CPPFLAGS) -I../inc rttov_global.f90 > rttov_global.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) rttov_global.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) rttov_global.f
 
 rttov_types.o:		rttov_types.f90 \
                         parkind1.o	\
 			rttov_const.o
 			$(CPP) -I$(RTTOV)/src $(CPPFLAGS) -I../inc rttov_types.f90 > rttov_types.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) rttov_types.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) rttov_types.f
 
 parkind1.o:		parkind1.f90
 			$(CPP) -I$(RTTOV)/src $(CPPFLAGS) -I../inc parkind1.f90 > parkind1.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) parkind1.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) parkind1.f
 
 gsi_kinds.o:		gsi_kinds.f90
 			$(CPP) -I$(RTTOV)/src $(CPPFLAGS) -I../inc gsi_kinds.f90 > gsi_kinds.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) gsi_kinds.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) gsi_kinds.f
 
 gsi_constants.o:	gsi_constants.f90 \
                         gsi_kinds.o
 			$(CPP) -I$(RTTOV)/src $(CPPFLAGS) -I../inc gsi_constants.f90 > gsi_constants.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) gsi_constants.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) gsi_constants.f
 
 ##############################################################################
 
