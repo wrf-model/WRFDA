@@ -51,14 +51,6 @@ SUBROUTINE med_initialdata_input ( grid , config_flags )
    CHARACTER (LEN=80)     :: message
    LOGICAL                :: restart
 
-   REAL    :: jrb_wind
-   REAL    :: jrb_temp
-   REAL    :: jrb_p
-   REAL    :: jrb_ph
-   REAL    :: jrb_mu
-   REAL    :: jrb_moist
-
-
    CALL nl_get_restart( 1, restart )
    IF ( .NOT. restart ) THEN
      !  Initialize the mother domain.
@@ -132,54 +124,6 @@ SUBROUTINE med_initialdata_input ( grid , config_flags )
      grid%imask_xystag = 1
      CALL start_domain ( grid , .TRUE. )
    ENDIF
-
-   CALL nl_get_jrb_wind( 1, jrb_wind )
-   CALL nl_get_jrb_temp( 1, jrb_temp )
-   CALL nl_get_jrb_p( 1, jrb_p )
-   CALL nl_get_jrb_ph( 1, jrb_ph )
-   CALL nl_get_jrb_mu( 1, jrb_mu )
-   CALL nl_get_jrb_moist( 1, jrb_moist )
-
-   IF (jrb_wind > -9999.9) THEN
-      call wrf_message("Fiddling with wind in med_initialdata_input")
-      grid % em_u_1  = jrb_wind
-      grid % em_u_2  = jrb_wind
-      grid % em_v_1  = jrb_wind
-      grid % em_v_2  = jrb_wind
-      grid % em_w_1  = jrb_wind
-      grid % em_w_2  = jrb_wind
-   end if
-
-   if (jrb_temp > -9999.9) then
-      call wrf_message("Fiddling with temp in med_initialdata_input")
-      grid % em_t_1  = jrb_temp
-      grid % em_t_2  = jrb_temp
-   end if
-
-   if (jrb_p > -9999.9) then
-      call wrf_message("Fiddling with p in med_initialdata_input")
-      grid % em_p    = jrb_p
-   end if
-
-   if (jrb_ph > -9999.9) then
-      call wrf_message("Fiddling with ph in med_initialdata_input")
-      grid % em_ph_1 = jrb_ph
-      grid % em_ph_2 = jrb_ph
-      grid % em_phb  = jrb_ph
-   end if
-
-   if (jrb_mu > -9999.9) then
-      call wrf_message("Fiddling with mu in med_initialdata_input")
-      grid % em_mu0  = jrb_mu
-      grid % em_mub  = jrb_mu
-      grid % em_mu_1 = jrb_mu
-      grid % em_mu_2 = jrb_mu
-   end if
-
-   if (jrb_moist > -9999.9) then
-      call wrf_message("Fiddling with moist in med_initialdata_input")
-      grid % moist = jrb_moist
-   END IF
 
    RETURN
 END SUBROUTINE med_initialdata_input
