@@ -24,6 +24,8 @@ subroutine da_init_wrfvar( grid, xp, xb, &
 !define TRUE_MSG_XPOSE add_msg_xpose_doubleprecision
 !endif
 
+   if (trace_use) call da_trace_entry("da_init_wrfvar")
+
    ! De-reference dimension information stored in the grid data structure.
 
    call da_copy_dims( grid, xp, &
@@ -48,9 +50,11 @@ subroutine da_init_wrfvar( grid, xp, xb, &
    sm32y            = grid%sm32y
    sm33y            = grid%sm33y
 
-   ! Register xpose arrays and build messages for processor communication.
-
 #ifdef DM_PARALLEL
+   if (trace_use) call da_trace("da_init_wrfvar", &
+      Message="Setup Register xpose arrays")
+
+   ! Register xpose arrays and build messages for processor communication.
 #define REGISTER_I1
 #include "em_data_calls.inc"
    ! XPOSE_V1
@@ -83,6 +87,9 @@ subroutine da_init_wrfvar( grid, xp, xb, &
       call define_xpose ( grid%domdesc , grid%comms ( XPOSE_V2 ) )
    ENDIF
 
+   if (trace_use) call da_trace("da_init_wrfvar", &
+      Message="Setup halo region communication")
+
    ! Define halo region communication.
    !-----------------------------------------------------------------------
    !  Stencils for patch communications
@@ -111,6 +118,9 @@ subroutine da_init_wrfvar( grid, xp, xb, &
 #include "HALO_RADAR_XB.inc"
 #include "HALO_2D_WORK.inc"
 #include "HALO_RADAR_XA_W.inc"
+
+   if (trace_use) call da_trace("da_init_wrfvar", &
+      Message="Copy domain and transpose descriptors")
 
    ! Copy domain and transpose descriptors.
 
@@ -162,6 +172,8 @@ subroutine da_init_wrfvar( grid, xp, xb, &
    xb%jte = xp%jte 
    xb%kts = xp%kts
    xb%kte = xp%kte 
+
+   if (trace_use) call da_trace_exit("da_init_wrfvar")
 
 end subroutine da_init_wrfvar
 

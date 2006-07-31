@@ -1,0 +1,32 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: John Bray
+Date: 07/31/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Add more trace calls to da_init_wrfvar and the routines
+it calls to reveal where bloat occurs. Add extra space
+for padding da_trace Message text
+
+Test results
+------------------------------------------------------
+
+No change to results possible
+
+ocotillo: Compiles and runs producing correct trace file
+
+--------------------------------------------------------------------------------------
+
+File changes:
+------------
+
+
+M      da/da_tracing/da_trace.inc
+M      da/da_par_util/da_copy_tile_dims.inc
+M      da/da_par_util/da_copy_dims.inc
+M      da/da_solve/da_init_wrfvar.inc
+A      doc/changes/changes_20060731d.jrb

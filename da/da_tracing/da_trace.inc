@@ -110,7 +110,7 @@ subroutine da_trace( &
          END IF
 
          IF (PRESENT(Message)) THEN
-            WRITE (UNIT=trace_unit, FMT='(A," ",A)', IOSTAT=IOStatus) &
+            WRITE (UNIT=trace_unit, FMT='(A,"  ",A)', IOSTAT=IOStatus) &
                pad(1:TraceDepth*TraceIndentAmount),TRIM(Message)
             IF (IOStatus .NE. 0) THEN
                call da_error(__FILE__,__LINE__, &
@@ -120,7 +120,7 @@ subroutine da_trace( &
 
          IF (PRESENT(Messages)) THEN
             DO Loop = 1, SIZE(Messages)
-               WRITE (UNIT=trace_unit, FMT='(A," ",A)', IOSTAT=IOStatus) &
+               WRITE (UNIT=trace_unit, FMT='(A,"  ",A)', IOSTAT=IOStatus) &
                   pad(1:TraceDepth*TraceIndentAmount),TRIM(Messages(Loop))
                IF (IOStatus .NE. 0) THEN
                   call da_error(__FILE__,__LINE__, &

@@ -2,19 +2,21 @@ subroutine da_copy_dims(grid, xp, &
                      ids, ide, jds, jde, kds, kde, &
                      ims, ime, jms, jme, kms, kme, &
                      ips, ipe, jps, jpe, kps, kpe )
-!------------------------------------------------------------------------------
-!  PURPOSE: Copy dimensioning information from grid structure.
-!
-!------------------------------------------------------------------------------
+
+   !---------------------------------------------------------------------------
+   ! PURPOSE: Copy dimensioning information from grid structure.
+   !---------------------------------------------------------------------------
 
    TYPE(domain), INTENT(IN)         :: grid
    TYPE (xpose_type),INTENT(INOUT)  :: xp      ! Transpose variables.
 
-   INTEGER,      INTENT(OUT)        :: ids,ide, jds,jde, kds,kde   ! domain dims.
-   INTEGER,      INTENT(OUT)        :: ims,ime, jms,jme, kms,kme   ! memory dims.
-   INTEGER,      INTENT(OUT)        :: ips,ipe, jps,jpe, kps,kpe   ! patch  dims.
+   INTEGER,      INTENT(OUT) :: ids,ide, jds,jde, kds,kde   ! domain dims.
+   INTEGER,      INTENT(OUT) :: ims,ime, jms,jme, kms,kme   ! memory dims.
+   INTEGER,      INTENT(OUT) :: ips,ipe, jps,jpe, kps,kpe   ! patch  dims.
 
-!--De-reference dimension information stored in the grid data structure.
+   if (trace_use) call da_trace_entry("da_copy_dims")
+
+   ! De-reference dimension information stored in the grid data structure.
 
    ids = grid%sd31 
    ide = grid%ed31 - 1
@@ -37,7 +39,7 @@ subroutine da_copy_dims(grid, xp, &
    kps = grid%sp33 
    kpe = grid%ep33 
 
-!--Indices for yz decomposition
+   ! Indices for yz decomposition
 
    xp%idsx = grid%sd31
    xp%idex = grid%ed31 - 1
@@ -67,7 +69,7 @@ subroutine da_copy_dims(grid, xp, &
    xp%kpsx = grid%sp33x
    xp%kpex = grid%ep33x
 
-!--Indices for xz decomposition
+   ! Indices for xz decomposition
 
    xp%idsy = grid%sd31
    xp%idey = grid%ed31 - 1
@@ -97,33 +99,33 @@ subroutine da_copy_dims(grid, xp, &
    xp%kpsy = grid%sp33y
    xp%kpey = grid%ep33y
 
-   if(ipe > ide) ipe = ide
-   if(jpe > jde) jpe = jde
-   if(kpe > kde) kpe = kde
+   if (ipe > ide) ipe = ide
+   if (jpe > jde) jpe = jde
+   if (kpe > kde) kpe = kde
 
    ! Indices for yz decomposition
 
-   if(xp%itex > ide) xp%itex = ide
-   if(xp%jtex > jde) xp%jtex = jde
-   if(xp%ktex > kde) xp%ktex = kde
+   if (xp%itex > ide) xp%itex = ide
+   if (xp%jtex > jde) xp%jtex = jde
+   if (xp%ktex > kde) xp%ktex = kde
 
-   if(xp%ipex > ide) xp%ipex = ide
-   if(xp%jpex > jde) xp%jpex = jde
-   if(xp%kpex > kde) xp%kpex = kde
+   if (xp%ipex > ide) xp%ipex = ide
+   if (xp%jpex > jde) xp%jpex = jde
+   if (xp%kpex > kde) xp%kpex = kde
 
    ! Indices for xz decomposition
 
-   if(xp%itey > ide) xp%itey = ide
-   if(xp%jtey > jde) xp%jtey = jde
-   if(xp%ktey > kde) xp%ktey = kde
+   if (xp%itey > ide) xp%itey = ide
+   if (xp%jtey > jde) xp%jtey = jde
+   if (xp%ktey > kde) xp%ktey = kde
 
-   if(xp%ipey > ide) xp%ipey = ide
-   if(xp%jpey > jde) xp%jpey = jde
-   if(xp%kpey > kde) xp%kpey = kde
+   if (xp%ipey > ide) xp%ipey = ide
+   if (xp%jpey > jde) xp%jpey = jde
+   if (xp%kpey > kde) xp%kpey = kde
 
-!  Copy xpose dimensions from grid structure to xp structure.
+   ! Copy xpose dimensions from grid structure to xp structure.
 
-!--Indices for xy decomposition
+   ! Indices for xy decomposition
 
    xp%ids = ids
    xp%ide = ide
@@ -146,7 +148,7 @@ subroutine da_copy_dims(grid, xp, &
    xp%kps = kps
    xp%kpe = kpe
 
-   if(print_detail_parallel) then
+   if (print_detail_parallel) then
       write(unit=stdout, fmt='(2(a, i4, 5x))') &
            'xp%ids =', xp%ids , 'xp%ide =', xp%ide , &
            'xp%jds =', xp%jds , 'xp%jde =', xp%jde , &
@@ -188,6 +190,8 @@ subroutine da_copy_dims(grid, xp, &
            'xp%jpsy =', xp%jpsy, 'xp%jpey=', xp%jpey, &
            'xp%kpsy =', xp%kpsy, 'xp%kpey=', xp%kpey
    endif
+
+   if (trace_use) call da_trace_exit("da_copy_dims")
 
 end subroutine da_copy_dims
 
