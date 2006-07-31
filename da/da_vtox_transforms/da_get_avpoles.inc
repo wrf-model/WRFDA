@@ -82,7 +82,7 @@ subroutine da_get_avpoles(u,v,lon,       &
       end if
    end do
 
-   if (trace_use) call da_trace_entry("da_get_avpoles")
+   if (trace_use) call da_trace_exit("da_get_avpoles")
 
 end subroutine da_get_avpoles
 

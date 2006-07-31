@@ -1,0 +1,34 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: John Bray
+Date: 07/28/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Trace pad array too small.
+
+Inbalanced calls to trace_entry and trace_exit
+
+Test results
+------------------------------------------------------
+
+No change to results possible
+
+ocotillo: Compiles and runs producing correct trace file
+
+--------------------------------------------------------------------------------------
+
+File changes:
+------------
+
+M    da/da_vtox_transforms/da_get_avpoles.inc
+M    da/da_tracing/da_trace_exit.inc
+M    da/da_tracing/da_tracing.f90
+M    da/da_tracing/da_trace.inc
+M    da/da_tracing/da_trace_entry.inc
+M    da/da_minimisation/da_minimise_cg.inc
+M    da/da_radiance/da_calculate_jo_and_grady_rad.inc
+A    doc/changes/changes_20060731a.jrb

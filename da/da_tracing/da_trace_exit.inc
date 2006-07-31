@@ -13,10 +13,6 @@ subroutine da_trace_exit( &
    CHARACTER (LEN=*), OPTIONAL, INTENT(IN) :: Messages(:)  ! text to trace
    INTEGER, OPTIONAL, INTENT(IN)           :: MaxNoCalls   ! max no calls to show
 
-   ! Local constants
-
-   CHARACTER (LEN=*), PARAMETER :: pad = "                                                  "
-
    ! Local variables
 
    INTEGER                         :: IOStatus        ! I-O return code 
@@ -123,7 +119,7 @@ subroutine da_trace_exit( &
                   TRIM(Name),TRIM(Name), TotalSpace, Change
             else
                WRITE (UNIT=trace_unit, &
-                  FMT='(A, "<",A,I11,A)', &
+                  FMT='(A, "< ",A,I11,A)', &
                   IOSTAT=IOStatus) &
                   pad(1:TraceDepth*TraceIndentAmount),TRIM(Name), TotalSpace, Change
             end if
@@ -135,7 +131,7 @@ subroutine da_trace_exit( &
                   pad(1:TraceDepth*TraceIndentAmount),TRIM(Documentation_url), &
                   TRIM(Name),TRIM(Name)
             else
-               WRITE (UNIT=trace_unit, FMT='(A, "<",A)', IOSTAT=IOStatus) &
+               WRITE (UNIT=trace_unit, FMT='(A, "< ",A)', IOSTAT=IOStatus) &
                   pad(1:TraceDepth*TraceIndentAmount),TRIM(Name)
             end if
          END IF

@@ -10,6 +10,10 @@ MODULE da_tracing
    INTEGER, PARAMETER :: MaxNoRoutines          = 440 ! maxium number of subroutines
    INTEGER, PARAMETER :: TraceNameLen           = 31  ! Length of trace name
 
+   CHARACTER (LEN=*), PARAMETER :: &
+      pad = "                                                                "
+
+
    ! Variables
 
    INTEGER :: TraceDepth                   ! Current depth of trace

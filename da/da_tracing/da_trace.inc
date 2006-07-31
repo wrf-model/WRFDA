@@ -15,10 +15,6 @@ subroutine da_trace( &
    CHARACTER (LEN=*), OPTIONAL, INTENT(IN) :: Messages(:)  ! Text to trace
    INTEGER, OPTIONAL, INTENT(IN)           :: MaxNoCalls   ! max no calls to show
 
-   ! Local constants
-
-   CHARACTER (LEN=*), PARAMETER :: pad = "                                                  "
-
    ! Local variables
 
    INTEGER           :: IOStatus     ! I-O return code
