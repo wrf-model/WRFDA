@@ -294,7 +294,7 @@ if test $PLATFORM = "AIX"; then
   #IBM (llsubmit):
   #poe ./wrfvar.exe
   #mpirun -np ${NUM_PROCS} ./wrfvar.exe
-  if test -z $DEBUGGER; then
+  if test $DEBUGGER'.' = '.' ; then
      ./wrfvar.exe > wrfvar.out 2>wrfvar.error
      RC=$?
   else
