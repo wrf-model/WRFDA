@@ -298,7 +298,9 @@ RECURSIVE SUBROUTINE integrate_tl ( grid, nl_date_string, nl_date_index )
 
                write(unit=*, fmt='(2a)') 'xyh NL state from ', nl_date_string(nl_date_index)
 
-               CALL med_auxinput2_in ( grid , config_flags , nl_date_string(nl_date_index) )
+!!!!  for Non-exactly trajectory update   08/02/2006   Xin Zhang
+!!!!           CALL med_auxinput2_in ( grid , config_flags , nl_date_string(nl_date_index) )
+               CALL med_auxinput2_in4ad ( grid , config_flags , nl_date_string(nl_date_index) )
 
                nl_date_index = nl_date_index + 1
 
@@ -306,7 +308,9 @@ RECURSIVE SUBROUTINE integrate_tl ( grid, nl_date_string, nl_date_index )
 
                write(unit=*, fmt='(2a)') 'xyh NL state from ', nl_date_string(nl_date_index-1)
 
-               CALL med_auxinput2_in ( grid , config_flags , nl_date_string(nl_date_index-1) )
+!!!!  for Non-exactly trajectory update   08/02/2006   Xin Zhang
+!!!!          CALL med_auxinput2_in ( grid , config_flags , nl_date_string(nl_date_index-1) )
+              CALL med_auxinput2_in4ad ( grid , config_flags , nl_date_string(nl_date_index-1) )
 
             endif
 
