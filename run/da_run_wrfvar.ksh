@@ -50,6 +50,7 @@ cd $RUN_DIR
 export DA_FIRST_GUESS=${DA_FIRST_GUESS:-$CS_DIR/$DA_DATE/wrfinput_d01}    # wrfvar "first guess" input.
 export DA_BOUNDARIES=${DA_BOUNDARIES:-$CS_DIR/$DA_DATE/wrfbdy_d01}    # wrfvar boundaries input.
 export DA_OBSERVATIONS=${DA_OBSERVATIONS:-$OB_DIR/$DA_DATE/ob.ascii} # wrfvar observation input.
+export DA_BUFR_DIR=${DA_BUFR_DIR:-$OB_DIR/$DA_DATE} # radiance bufr file directory
 export DA_BACK_ERRORS=${DA_BACK_ERRORS:-$BE_DIR/gen_be.NMC.dat} # wrfvar background errors.
 export DA_SSMI=${DA_SSMI:-$OB_DIR/$DA_DATE/ssmi.dat}               # SSM/I radiances (ignore if not using).
 export DA_RADAR=${DA_RADAR:-$OB_DIR/$DA_DATE/radar.dat}            # Radar data (ignore if not using).
@@ -61,6 +62,8 @@ export DA_RADAR=${DA_RADAR:-$OB_DIR/$DA_DATE/radar.dat}            # Radar data 
 # export DA_FG01=${DA_FG01:-$OB_DIR}
 
 export RTTOV=${RTTOV:-$HOME/rttov/rttov85}                            # RTTOV
+export DA_RTTOV_COEFFS=${DA_RTTOV_COEFFS:-$RTTOV/rtcoef_rttov7}
+
 
 export NUM_PROCS=${NUM_PROCS:-1}               # Number of processors to run on.
 
@@ -166,7 +169,7 @@ done
 # Link to bufr files, picking which endian type when a
 # choice is available
 
-for FILE in $DAT_DIR/*.bufr; do
+for FILE in $DA_BUFR_DIR/*.bufr; do
   if test -f $FILE; then
     ln -s $FILE .
   fi
