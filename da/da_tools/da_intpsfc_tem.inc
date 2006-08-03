@@ -75,11 +75,13 @@ subroutine da_intpsfc_tem (val, ho, po, to, height, pressure, temp, kts, kte)
 
        IF ((k_100mb .LE. kts) .OR. (k_200mb .LE. kts) .OR. &
            (k_200mb .LT. k_100mb)) THEN
-            WRITE (UNIT=errmsg(1),FMT='(A)') ' ERROR CANNOT FIND SFC + 200hPA AND SFC + 100hPA' 
+            WRITE (UNIT=errmsg(1),FMT='(A)') ' CANNOT FIND SFC + 200hPA AND SFC + 100hPA' 
             WRITE (UNIT=errmsg(2),FMT='(A,I2,A,F10.3)') ' P (',k_200mb,') = ',prs_mb (k_200mb) 
             WRITE (UNIT=errmsg(3),FMT='(A,I2,A,F10.3)') ' P (',k_100mb,') = ',prs_mb (k_100mb) 
             WRITE (UNIT=errmsg(4),FMT='(A,F10.3)')      ' P_SFC  = ',         prs_mb (kts) 
-            call da_error(__FILE__,__LINE__,errmsg(1:4))
+          call da_warning(__FILE__,__LINE__,errmsg(1:4))
+          val = missing_r
+          return
        ENDIF
 
 
