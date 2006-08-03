@@ -1,21 +1,21 @@
-subroutine da_write_obs( ob, iv, re )
-!----------------------------------------------------------------------------   
-!  History:
-!  Purpose: Writes out components of iv=O-B structure.
-!  Additions:
-!           07/08/2003 - Profiler and Buoy Obs             Syed  RH  Rizvi
-!           03/04/2005 - AMV's from Geostationary and      Syed  RH  Rizvi
-!                        Polar orbiting satellite are
-!                        seperated & used as profile
-!           05/16/2006 - Updated for MPI run               Syed  RH  Rizvi
-!           07/03/2006 - Updated for AIRS retrievals       Syed  RH  Rizvi
-!
-!----------------------------------------------------------------------------   
+subroutine da_write_obs( ob, iv, re)
+
+   !-------------------------------------------------------------------------   
+   ! History:
+   ! Purpose: Writes out components of iv=O-B structure.
+   ! Additions:
+   !          07/08/2003 - Profiler and Buoy Obs             Syed  RH  Rizvi
+   !          03/04/2005 - AMV's from Geostationary and      Syed  RH  Rizvi
+   !                       Polar orbiting satellite are
+   !                       seperated & used as profile
+   !          05/16/2006 - Updated for MPI run               Syed  RH  Rizvi
+   !          07/03/2006 - Updated for AIRS retrievals       Syed  RH  Rizvi
+   !-------------------------------------------------------------------------   
    IMPLICIT NONE
 
 
 #ifdef DM_PARALLEL
-      INCLUDE 'mpif.h'
+   INCLUDE 'mpif.h'
 #endif
 
    type (y_type), intent(in)     :: ob      ! Observation structure.
@@ -26,49 +26,52 @@ subroutine da_write_obs( ob, iv, re )
    integer                       :: myrank    ! Id of my processor.
    integer                       :: ierr      ! Error code from MPI routines.
    integer                       :: ounit     ! Output unit           
-!----------------------------------------------------------------------------
-!  Fix output unit
-!----------------------------------------------------------------------------
-  ounit = omb_unit
-  if ( numb_procs > 1) then
+
+   if (trace_use) call da_trace_entry("da_write_obs")
+
+   !-------------------------------------------------------------------------
+   ! Fix output unit
+   !-------------------------------------------------------------------------
+
+   ounit = omb_unit
+   if ( numb_procs > 1) then
 #ifdef DM_PARALLEL
-! Get output unit for MPI run
-  call MPI_COMM_RANK( MPI_COMM_WORLD, myrank, ierr )
-  ounit = omb_unit*10 +  myrank
+      ! Get output unit for MPI run
+      call MPI_COMM_RANK( MPI_COMM_WORLD, myrank, ierr )
+      ounit = omb_unit*10 +  myrank
 #endif
-  end if
-!----------------------------------------------------------------------------   
+   end if
 
-!  [1] Transfer surface obs:
+   ! [1] Transfer surface obs:
 
-   IF ( iv % num_synop > 0 ) THEN
+   IF (iv % num_synop > 0) THEN
       num_obs = 0
       DO n = 1, iv % num_synop
-       if(iv%synop(n)%loc%proc_domain) num_obs = num_obs + 1
+         if (iv%synop(n)%loc%proc_domain) num_obs = num_obs + 1
       ENDDO
-      if( num_obs > 0) then
-      write(ounit,'(a20,i8)')'synop', num_obs  
-      num_obs = 0
-      DO n = 1, iv % num_synop  
-       if(iv%synop(n)%loc%proc_domain) then
-       num_obs = num_obs + 1
-       write(ounit,'(i8)') 1                                 
-         write(ounit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))')&
+      if (num_obs > 0) then
+         write(ounit,'(a20,i8)')'synop', num_obs  
+         num_obs = 0
+         DO n = 1, iv % num_synop  
+            if (iv%synop(n)%loc%proc_domain) then
+               num_obs = num_obs + 1
+               write(ounit,'(i8)') 1                                 
+               write(ounit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))')&
                   num_obs , 1, iv % synop(n) % info % id, &  ! Station
-                         iv % synop(n) % info % lat, &       ! Latitude
-                         iv % synop(n) % info % lon, &       ! Longitude
-                         ob % synop(n) % p, &                ! Obs Pressure
-                         ob%synop(n)%u, iv%synop(n)%u, re%synop(n)%u, &! O, O-B, O-A u
-                         ob%synop(n)%v, iv%synop(n)%v, re%synop(n)%v, &! O, O-B, O-A v
-                         ob%synop(n)%t, iv%synop(n)%t, re%synop(n)%t, &! O, O-B, O-A t
-                         ob%synop(n)%p, iv%synop(n)%p, re%synop(n)%p, &! O, O-B, O-A p
-                         ob%synop(n)%q, iv%synop(n)%q, re%synop(n)%q   ! O, O-B, O-A q
+                  iv % synop(n) % info % lat, &       ! Latitude
+                  iv % synop(n) % info % lon, &       ! Longitude
+                  ob % synop(n) % p, &                ! Obs Pressure
+                  ob%synop(n)%u, iv%synop(n)%u, re%synop(n)%u, &! O, O-B, O-A u
+                  ob%synop(n)%v, iv%synop(n)%v, re%synop(n)%v, &! O, O-B, O-A v
+                  ob%synop(n)%t, iv%synop(n)%t, re%synop(n)%t, &! O, O-B, O-A t
+                  ob%synop(n)%p, iv%synop(n)%p, re%synop(n)%p, &! O, O-B, O-A p
+                  ob%synop(n)%q, iv%synop(n)%q, re%synop(n)%q   ! O, O-B, O-A q
+            endif
+         END DO
       endif
-      END DO
-     endif
    ENDIF
 
-!  [2] Transfer metar obs:
+   ! [2] Transfer metar obs:
 
    IF ( iv % num_metar > 0 ) THEN
       num_obs = 0
@@ -614,5 +617,8 @@ subroutine da_write_obs( ob, iv, re )
    write(ounit,'(a20,i8)')'********************', 0
 
    close (ounit)
+
+   if (trace_use) call da_trace_exit("da_write_obs")
+
 end subroutine da_write_obs
 

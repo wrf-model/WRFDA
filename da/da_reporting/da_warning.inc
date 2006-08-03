@@ -18,9 +18,11 @@ subroutine da_warning( file_str, line, warnings )
    if (line > 0) then
       if (use_html) then
          call wrf_message( 'WARNING FROM FILE: <A HREF="'// &
-            TRIM(documentation_url)//'/'//html_file//'">'//file_str//'</a>  LINE:  '//TRIM(line_str) )
+            TRIM(documentation_url)//'/'//trim(html_file)//'">'//trim(file_str)// &
+               '</a>  LINE:  '//TRIM(line_str) )
       else
-         call wrf_message( 'WARNING FROM FILE:  '//file_str//'  LINE:  '//TRIM(line_str) )
+         call wrf_message( 'WARNING FROM FILE:  '//trim(file_str)// &
+            '  LINE:  '//TRIM(line_str) )
       end if
    end if
    call da_messages(warnings)
@@ -31,9 +33,11 @@ subroutine da_warning( file_str, line, warnings )
    if (line > 0) then
       if (use_html) then
          call wrf_message2( 'WARNING FROM FILE: <A HREF="'// &
-            TRIM(documentation_url)//'/'//html_file//'">'//file_str//'</a>  LINE:  '//TRIM(line_str) )
+            TRIM(documentation_url)//'/'//trim(html_file)//'">'// &
+               trim(file_str)//'</a>  LINE:  '//TRIM(line_str) )
       else
-         call wrf_message2( 'WARNING FROM FILE:  '//file_str//'  LINE:  '//TRIM(line_str) )
+         call wrf_message2( 'WARNING FROM FILE:  '//trim(file_str)// &
+            '  LINE:  '//TRIM(line_str) )
       end if
    end if
    call da_messages2(warnings)

@@ -1,10 +1,11 @@
 subroutine da_final_write_obs( ob, iv, re )
-!----------------------------------------------------------------------------   
-!  Purpose: Writes full diagnostics for O, (O-B) & OMA togather
-!  History:
-!  Author:  Syed RH Rizvi     MMM/UCAR     05/16/2006     
-!
-!----------------------------------------------------------------------------   
+
+   !-------------------------------------------------------------------------
+   ! Purpose: Writes full diagnostics for O, (O-B) & OMA togather
+   ! History:
+   ! Author:  Syed RH Rizvi     MMM/UCAR     05/16/2006     
+   !-------------------------------------------------------------------------   
+
    IMPLICIT NONE
 
 #ifdef DM_PARALLEL
@@ -22,130 +23,141 @@ subroutine da_final_write_obs( ob, iv, re )
    INTEGER                       :: ierr      ! Error code from MPI routines.
    INTEGER                       :: num_obs, num_sound_obs
 
-!------------------------------------------------------------------
+   if (trace_use) call da_trace_entry("da_final_write_obs")
+
+
 #ifdef DM_PARALLEL
-     call MPI_BARRIER(MPI_COMM_WORLD, ierr)
+   call MPI_BARRIER(MPI_COMM_WORLD, ierr)
 #endif
-!------------------------------------------------------------------
-      num_obs = 0
-    IF ( iv % num_synop > 0 ) THEN
+
+   num_obs = 0
+   IF (iv % num_synop > 0) THEN
       DO n = 1, iv % num_synop
-       if(iv%synop(n)%loc%proc_domain) num_obs = num_obs + 1
+         if(iv%synop(n)%loc%proc_domain) num_obs = num_obs + 1
       ENDDO
-    ENDIF
-    call da_proc_sum_int(num_obs)
-    if(num_obs > 0) then
-    if ( wrf_dm_on_monitor() ) write(omb_unit,'(a20,i8)')'synop', num_obs  
-    num_obs = 0
-    DO k = 0,numb_procs-1
-    iunit = omb_unit*10 +  k
-    rewind iunit
-    if ( wrf_dm_on_monitor() )call DA_Read_Fort50(iunit,num_obs,'synop',5)
-    ENDDO
-    endif
-!------------------------------------------------------------------
-! [2] writing Metar
-!------------------------------------------------------------------
+   ENDIF
+   call da_proc_sum_int(num_obs)
+   if (num_obs > 0) then
+      if (wrf_dm_on_monitor()) write(omb_unit,'(a20,i8)')'synop', num_obs  
       num_obs = 0
-    IF ( iv % num_metar > 0 ) THEN
+      DO k = 0,numb_procs-1
+         iunit = omb_unit*10 +  k
+         rewind iunit
+         if (wrf_dm_on_monitor()) call da_read_fort50(iunit,num_obs,'synop',5)
+      ENDDO
+   endif
+
+   !------------------------------------------------------------------
+   ! [2] writing Metar
+   !------------------------------------------------------------------
+
+   num_obs = 0
+   IF ( iv % num_metar > 0 ) THEN
       DO n = 1, iv % num_metar
-       if(iv%metar(n)%loc%proc_domain) num_obs = num_obs + 1
+         if (iv%metar(n)%loc%proc_domain) num_obs = num_obs + 1
       ENDDO
-    ENDIF
-    call da_proc_sum_int(num_obs)
-    if(num_obs > 0) then
-    if ( wrf_dm_on_monitor() ) write(omb_unit,'(a20,20i8)')'metar', num_obs  
+   ENDIF
+   call da_proc_sum_int(num_obs)
+   if (num_obs > 0) then
+      if ( wrf_dm_on_monitor() ) write(omb_unit,'(a20,20i8)')'metar', num_obs  
       num_obs = 0
-    DO k = 0,numb_procs-1
-    iunit = omb_unit*10 +  k
-    rewind iunit
-    if ( wrf_dm_on_monitor() )call DA_Read_Fort50(iunit,num_obs,'metar',5)    
-    ENDDO
-    endif
+      DO k = 0,numb_procs-1
+         iunit = omb_unit*10 +  k
+         rewind iunit
+         if (wrf_dm_on_monitor()) call da_read_fort50(iunit,num_obs,'metar',5)    
+      ENDDO
+   endif
 
-!------------------------------------------------------------------
-! [3] writing Ships
-!------------------------------------------------------------------
-      num_obs = 0
-    IF ( iv % num_ships > 0 ) THEN
+   !------------------------------------------------------------------
+   ! [3] writing Ships
+   !------------------------------------------------------------------
+
+   num_obs = 0
+   IF (iv % num_ships > 0) THEN
       DO n = 1, iv % num_ships
-       if(iv%ships(n)%loc%proc_domain) num_obs = num_obs + 1
+         if(iv%ships(n)%loc%proc_domain) num_obs = num_obs + 1
       ENDDO
     ENDIF
     call da_proc_sum_int(num_obs)
-    if(num_obs > 0) then
-    if ( wrf_dm_on_monitor() ) write(omb_unit,'(a20,i8)')'ships', num_obs  
-      num_obs = 0
-    DO k = 0,numb_procs-1
-    iunit = omb_unit*10 +  k
-    rewind iunit
-    if ( wrf_dm_on_monitor() )call DA_Read_Fort50(iunit,num_obs,'ships',5)
-    ENDDO
+    if (num_obs > 0) then
+       if ( wrf_dm_on_monitor() ) write(omb_unit,'(a20,i8)')'ships', num_obs  
+       num_obs = 0
+       DO k = 0,numb_procs-1
+          iunit = omb_unit*10 +  k
+          rewind iunit
+          if (wrf_dm_on_monitor()) call da_read_fort50(iunit,num_obs,'ships',5)
+       ENDDO
     endif
 
-!------------------------------------------------------------------
-! [4] writing GeoAMV
-!------------------------------------------------------------------
-      num_obs = 0
-    IF ( iv % num_geoamv > 0 ) THEN
-      DO n = 1, iv % num_geoamv
-       if(iv%geoamv(n)%loc%proc_domain) num_obs = num_obs + 1
+   !------------------------------------------------------------------
+   ! [4] writing GeoAMV
+   !------------------------------------------------------------------
+
+   num_obs = 0
+   IF (iv % num_geoamv > 0) THEN
+       DO n = 1, iv % num_geoamv
+          if(iv%geoamv(n)%loc%proc_domain) num_obs = num_obs + 1
       ENDDO
-    ENDIF
-    call da_proc_sum_int(num_obs)
-    if(num_obs > 0) then
-    if ( wrf_dm_on_monitor() ) write(omb_unit,'(a20,i8)')'geoamv', num_obs  
+   ENDIF
+   call da_proc_sum_int(num_obs)
+   if (num_obs > 0) then
+      if (wrf_dm_on_monitor()) write(omb_unit,'(a20,i8)')'geoamv', num_obs  
       num_obs = 0
-    DO k = 0,numb_procs-1
-    iunit = omb_unit*10 +  k
-    rewind iunit
-    if ( wrf_dm_on_monitor() )call DA_Read_Fort50(iunit,num_obs,'geoamv',6)
-    ENDDO
-    endif
-!------------------------------------------------------------------
-! [5] writing PolarAMV
-!------------------------------------------------------------------
-      num_obs = 0
-    IF ( iv % num_polaramv > 0 ) THEN
+      DO k = 0,numb_procs-1
+         iunit = omb_unit*10 +  k
+         rewind iunit
+         if (wrf_dm_on_monitor()) call da_read_fort50(iunit,num_obs,'geoamv',6)
+      ENDDO
+   endif
+
+   !------------------------------------------------------------------
+   ! [5] writing PolarAMV
+   !------------------------------------------------------------------
+
+   num_obs = 0
+   IF (iv % num_polaramv > 0) THEN
       DO n = 1, iv % num_polaramv
-       if(iv%polaramv(n)%loc%proc_domain) num_obs = num_obs + 1
+         if (iv%polaramv(n)%loc%proc_domain) num_obs = num_obs + 1
       ENDDO
-    ENDIF
-    call da_proc_sum_int(num_obs)
-    if(num_obs > 0) then
-    if ( wrf_dm_on_monitor() ) write(omb_unit,'(a20,i8)')'polaramv', num_obs  
+   ENDIF
+   call da_proc_sum_int(num_obs)
+   if (num_obs > 0) then
+      if (wrf_dm_on_monitor()) write(omb_unit,'(a20,i8)')'polaramv', num_obs  
       num_obs = 0
-    DO k = 0,numb_procs-1
-    iunit = omb_unit*10 +  k
-    rewind iunit
-    if ( wrf_dm_on_monitor() )call DA_Read_Fort50(iunit,num_obs,'polaramv',8) 
-    ENDDO
-    endif
+      DO k = 0,numb_procs-1
+         iunit = omb_unit*10 +  k
+         rewind iunit
+         if (wrf_dm_on_monitor()) call da_read_fort50(iunit,num_obs,'polaramv',8) 
+      ENDDO
+   endif
 
-!------------------------------------------------------------------
-! [5] writing GPSPW  
-!------------------------------------------------------------------
-      num_obs = 0
-    IF ( iv % num_gpspw > 0 ) THEN
+   !------------------------------------------------------------------
+   ! [5] writing GPSPW  
+   !------------------------------------------------------------------
+
+   num_obs = 0
+   IF (iv % num_gpspw > 0) THEN
       DO n = 1, iv % num_gpspw
-       if(iv%gpspw(n)%loc%proc_domain) num_obs = num_obs + 1
+         if(iv%gpspw(n)%loc%proc_domain) num_obs = num_obs + 1
       ENDDO
-    ENDIF
-    call da_proc_sum_int(num_obs)
-    if(num_obs > 0) then
-    if ( wrf_dm_on_monitor() ) write(omb_unit,'(a20,i8)')'gpspw', num_obs  
+   ENDIF
+   call da_proc_sum_int(num_obs)
+   if (num_obs > 0) then
+      if (wrf_dm_on_monitor()) write(omb_unit,'(a20,i8)')'gpspw', num_obs  
       num_obs = 0
-    DO k = 0,numb_procs-1
-    iunit = omb_unit*10 +  k
-    rewind iunit
-    if ( wrf_dm_on_monitor() )call DA_Read_Fort50(iunit,num_obs,'gpspw',5)     
-    ENDDO
-    endif
-!------------------------------------------------------------------
-! [6] writing Sonde  
-!------------------------------------------------------------------
-      num_obs = 0
-    IF ( iv % num_sound > 0 ) THEN
+      DO k = 0,numb_procs-1
+         iunit = omb_unit*10 +  k
+         rewind iunit
+         if (wrf_dm_on_monitor()) call da_read_fort50(iunit,num_obs,'gpspw',5)     
+      ENDDO
+   endif
+
+   !------------------------------------------------------------------
+   ! [6] writing Sonde  
+   !------------------------------------------------------------------
+
+   num_obs = 0
+   IF (iv % num_sound > 0) THEN
       DO n = 1, iv % num_sound
        if(iv%sound(n)%loc%proc_domain) num_obs = num_obs + 1
       ENDDO
@@ -158,7 +170,7 @@ subroutine da_final_write_obs( ob, iv, re )
     DO k = 0,numb_procs-1
     iunit = omb_unit*10 +  k
     rewind iunit
-    if ( wrf_dm_on_monitor() ) call DA_Read_Fort50(iunit,num_obs,'sound',5)     
+    if ( wrf_dm_on_monitor() ) call da_read_fort50(iunit,num_obs,'sound',5)     
     ENDDO
 !  writing Sonde_sfc  
     if ( wrf_dm_on_monitor() ) write(omb_unit,'(a20,i8)')'sonde_sfc', num_sound_obs  
@@ -166,7 +178,7 @@ subroutine da_final_write_obs( ob, iv, re )
     DO k = 0,numb_procs-1
     iunit = omb_unit*10 +  k
     rewind iunit
-    if ( wrf_dm_on_monitor() )call DA_Read_Fort50(iunit,num_obs,'sonde_sfc',9)
+    if ( wrf_dm_on_monitor() )call da_read_fort50(iunit,num_obs,'sonde_sfc',9)
     ENDDO
     endif
 
@@ -186,7 +198,7 @@ subroutine da_final_write_obs( ob, iv, re )
     DO k = 0,numb_procs-1
     iunit = omb_unit*10 +  k
     rewind iunit
-    if ( wrf_dm_on_monitor() )call DA_Read_Fort50(iunit,num_obs,'airep',5)   
+    if ( wrf_dm_on_monitor() )call da_read_fort50(iunit,num_obs,'airep',5)   
     ENDDO
     endif
 !------------------------------------------------------------------
@@ -205,7 +217,7 @@ subroutine da_final_write_obs( ob, iv, re )
     DO k = 0,numb_procs-1
     iunit = omb_unit*10 +  k
     rewind iunit
-    if ( wrf_dm_on_monitor() )call DA_Read_Fort50(iunit,num_obs,'pilot',5)    
+    if ( wrf_dm_on_monitor() )call da_read_fort50(iunit,num_obs,'pilot',5)    
     ENDDO
     endif
 !------------------------------------------------------------------
@@ -224,7 +236,7 @@ subroutine da_final_write_obs( ob, iv, re )
     DO k = 0,numb_procs-1
     iunit = omb_unit*10 +  k
     rewind iunit
-    if ( wrf_dm_on_monitor() )call DA_Read_Fort50(iunit,num_obs,'ssmir',5)    
+    if ( wrf_dm_on_monitor() )call da_read_fort50(iunit,num_obs,'ssmir',5)    
     ENDDO
     endif
 !------------------------------------------------------------------
@@ -243,7 +255,7 @@ subroutine da_final_write_obs( ob, iv, re )
     DO k = 0,numb_procs-1
     iunit = omb_unit*10 +  k
     rewind iunit
-    if ( wrf_dm_on_monitor() )call DA_Read_Fort50(iunit,num_obs,'ssmiT',5)    
+    if ( wrf_dm_on_monitor() )call da_read_fort50(iunit,num_obs,'ssmiT',5)    
     ENDDO
     endif
 !------------------------------------------------------------------
@@ -262,7 +274,7 @@ subroutine da_final_write_obs( ob, iv, re )
     DO k = 0,numb_procs-1
     iunit = omb_unit*10 +  k
     rewind iunit
-    if ( wrf_dm_on_monitor() )call DA_Read_Fort50(iunit,num_obs,'satem',5)    
+    if ( wrf_dm_on_monitor() )call da_read_fort50(iunit,num_obs,'satem',5)    
     ENDDO
     endif
 !------------------------------------------------------------------
@@ -281,7 +293,7 @@ subroutine da_final_write_obs( ob, iv, re )
     DO k = 0,numb_procs-1
     iunit = omb_unit*10 +  k
     rewind iunit
-    if ( wrf_dm_on_monitor() )call DA_Read_Fort50(iunit,num_obs,'ssmt1',5)    
+    if ( wrf_dm_on_monitor() )call da_read_fort50(iunit,num_obs,'ssmt1',5)    
     ENDDO
     endif
 !------------------------------------------------------------------
@@ -300,7 +312,7 @@ subroutine da_final_write_obs( ob, iv, re )
     DO k = 0,numb_procs-1
     iunit = omb_unit*10 +  k
     rewind iunit
-    if ( wrf_dm_on_monitor() )call DA_Read_Fort50(iunit,num_obs,'ssmt2',5)    
+    if ( wrf_dm_on_monitor() )call da_read_fort50(iunit,num_obs,'ssmt2',5)    
     ENDDO
     endif
 !------------------------------------------------------------------
@@ -319,7 +331,7 @@ subroutine da_final_write_obs( ob, iv, re )
     DO k = 0,numb_procs-1
     iunit = omb_unit*10 +  k
     rewind iunit
-    if ( wrf_dm_on_monitor() )call DA_Read_Fort50(iunit,num_obs,'qscat',5)    
+    if ( wrf_dm_on_monitor() )call da_read_fort50(iunit,num_obs,'qscat',5)    
     ENDDO
     endif
 !------------------------------------------------------------------
@@ -338,7 +350,7 @@ subroutine da_final_write_obs( ob, iv, re )
     DO k = 0,numb_procs-1
     iunit = omb_unit*10 +  k
     rewind iunit
-    if ( wrf_dm_on_monitor() )call DA_Read_Fort50(iunit,num_obs,'profiler',8)    
+    if ( wrf_dm_on_monitor() )call da_read_fort50(iunit,num_obs,'profiler',8)    
     ENDDO
     endif
 
@@ -359,7 +371,7 @@ subroutine da_final_write_obs( ob, iv, re )
     DO k = 0,numb_procs-1
     iunit = omb_unit*10 +  k
     rewind iunit
-    if ( wrf_dm_on_monitor() )call DA_Read_Fort50(iunit,num_obs,'buoy',4)    
+    if ( wrf_dm_on_monitor() )call da_read_fort50(iunit,num_obs,'buoy',4)    
     ENDDO
     endif
 
@@ -379,7 +391,7 @@ subroutine da_final_write_obs( ob, iv, re )
     DO k = 0,numb_procs-1
     iunit = omb_unit*10 +  k
     rewind iunit
-    if ( wrf_dm_on_monitor() )call DA_Read_Fort50(iunit,num_obs,'bogus',5)    
+    if ( wrf_dm_on_monitor()) call da_read_fort50(iunit,num_obs,'bogus',5)    
     ENDDO
     endif
 !------------------------------------------------------------------
@@ -398,11 +410,12 @@ subroutine da_final_write_obs( ob, iv, re )
     DO k = 0,numb_procs-1
     iunit = omb_unit*10 +  k
     rewind iunit
-    if ( wrf_dm_on_monitor() )call DA_Read_Fort50(iunit,num_obs,'airsr',5)
+    if ( wrf_dm_on_monitor() )call da_read_fort50(iunit,num_obs,'airsr',5)
     ENDDO
     endif
-!-------------------------------------------------------------------
-  if ( wrf_dm_on_monitor() ) write(omb_unit,'(a20,i8)')'********************', 0
-!-------------------------------------------------------------------
+
+   if (wrf_dm_on_monitor()) write(omb_unit,'(a20,i8)')'********************', 0
+
+   if (trace_use) call da_trace_exit("da_final_write_obs")
    
 end subroutine da_final_write_obs

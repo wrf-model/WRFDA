@@ -1,10 +1,10 @@
 subroutine da_final_write_y( iv, y )
-!----------------------------------------------------------------------------   
-!  Purpose: Writes full diagnostics for y=H(x_inc)      
-!  History:
-!  Author:    Syed RH Rizvi     MMM/NCAR    05/16/2006     
-!
-!----------------------------------------------------------------------------   
+
+   !-------------------------------------------------------------------------   
+   ! Purpose: Writes full diagnostics for y=H(x_inc)      
+   ! History:
+   ! Author:    Syed RH Rizvi     MMM/NCAR    05/16/2006     
+   !-------------------------------------------------------------------------   
    IMPLICIT NONE
 
 #ifdef DM_PARALLEL
@@ -21,82 +21,92 @@ subroutine da_final_write_y( iv, y )
    integer                       :: ierr      ! Error code from MPI routines.
    integer                       :: sound_num_obs, num_obs
 
-!------------------------------------------------------------------
+
+   if (trace_use) call da_trace_entry("da_final_write_y")
+
 #ifdef DM_PARALLEL
-     call MPI_BARRIER(MPI_COMM_WORLD, ierr)
+   call MPI_BARRIER(MPI_COMM_WORLD, ierr)
 #endif
-!------------------------------------------------------------------
+
    if ( omb_add_noise ) then
       ounit = yp_unit            ! 3DVAR is a perturbed ob run.
    else
       ounit = y_unit             ! 3DVAR is an unperturbed ob run.
    end if
 
-    num_obs = 0
-    IF ( iv % num_synop > 0 ) THEN
+   !------------------------------------------------------------------
+   ! [1] writing Surface
+   !------------------------------------------------------------------
+
+   num_obs = 0
+   IF (iv % num_synop > 0) THEN
       DO n = 1, iv % num_synop
-       if(iv%synop(n)%loc%proc_domain) num_obs = num_obs + 1
+         if (iv%synop(n)%loc%proc_domain) num_obs = num_obs + 1
       ENDDO
-    ENDIF
-    call da_proc_sum_int(num_obs)
-    if(wrf_dm_on_monitor() .and. num_obs > 0) then
-    write(ounit,'(a20,i8)')'synop', num_obs  
-    num_obs = 0
-    DO k = 0,numb_procs-1
-    iunit = ounit*10 +  k
-    rewind iunit
-    call da_read_y_unit(iunit,ounit,num_obs,'synop',5)
-    ENDDO
-    endif
-!------------------------------------------------------------------
-! [2] writing Metar
-!------------------------------------------------------------------
+   ENDIF
+   call da_proc_sum_int(num_obs)
+   if (wrf_dm_on_monitor() .and. num_obs > 0) then
+      write(ounit,'(a20,i8)')'synop', num_obs  
       num_obs = 0
-    IF ( iv % num_metar > 0 ) THEN
+      DO k = 0,numb_procs-1
+         iunit = ounit*10 +  k
+         rewind iunit
+         call da_read_y_unit(iunit,ounit,num_obs,'synop',5)
+      ENDDO
+   endif
+
+   !------------------------------------------------------------------
+   ! [2] writing Metar
+   !------------------------------------------------------------------
+   
+   num_obs = 0
+   IF ( iv % num_metar > 0 ) THEN
       DO n = 1, iv % num_metar
-       if(iv%metar(n)%loc%proc_domain) num_obs = num_obs + 1
+        if (iv%metar(n)%loc%proc_domain) num_obs = num_obs + 1
       ENDDO
-    ENDIF
-    call da_proc_sum_int(num_obs)
-    if(wrf_dm_on_monitor() .and. num_obs > 0) then
-    write(ounit,'(a20,20i8)')'metar', num_obs  
-    num_obs = 0
-    DO k = 0,numb_procs-1
-    iunit = ounit*10 +  k
-    rewind iunit
-    call da_read_y_unit(iunit,ounit,num_obs,'metar',5)    
-    ENDDO
-    endif
-
-!------------------------------------------------------------------
-! [3] writing Ships
-!------------------------------------------------------------------
+   ENDIF
+   call da_proc_sum_int(num_obs)
+   if (wrf_dm_on_monitor() .and. num_obs > 0) then
+      write(ounit,'(a20,20i8)')'metar', num_obs  
       num_obs = 0
-    IF ( iv % num_ships > 0 ) THEN
+      DO k = 0,numb_procs-1
+         iunit = ounit*10 +  k
+         rewind iunit
+         call da_read_y_unit(iunit,ounit,num_obs,'metar',5)    
+      ENDDO
+   endif
+
+   !------------------------------------------------------------------
+   ! [3] writing Ships
+   !------------------------------------------------------------------
+
+   num_obs = 0
+   IF (iv % num_ships > 0 ) THEN
       DO n = 1, iv % num_ships
-       if(iv%ships(n)%loc%proc_domain) num_obs = num_obs + 1
+        if (iv%ships(n)%loc%proc_domain) num_obs = num_obs + 1
       ENDDO
-    ENDIF
-    call da_proc_sum_int(num_obs)
-    if(wrf_dm_on_monitor() .and. num_obs > 0) then
-    write(ounit,'(a20,i8)')'ships', num_obs  
-    num_obs = 0
-    DO k = 0,numb_procs-1
-    iunit = ounit*10 +  k
-    rewind iunit
-    call da_read_y_unit(iunit,ounit,num_obs,'ships',5)
-    ENDDO
-    endif
-
-!------------------------------------------------------------------
-! [4] writing GeoAMV
-!------------------------------------------------------------------
+   ENDIF
+   call da_proc_sum_int(num_obs)
+   if (wrf_dm_on_monitor() .and. num_obs > 0) then
+      write(ounit,'(a20,i8)')'ships', num_obs  
       num_obs = 0
-    IF ( iv % num_geoamv > 0 ) THEN
-      DO n = 1, iv % num_geoamv
-       if(iv%geoamv(n)%loc%proc_domain) num_obs = num_obs + 1
+      DO k = 0,numb_procs-1
+         iunit = ounit*10 +  k
+         rewind iunit
+         call da_read_y_unit(iunit,ounit,num_obs,'ships',5)
       ENDDO
-    ENDIF
+   endif
+
+   !---------------------------------------------------------------
+   ! [4] writing GeoAMV
+   !------------------------------------------------------------------
+   
+   num_obs = 0
+   IF ( iv % num_geoamv > 0 ) THEN
+      DO n = 1, iv % num_geoamv
+         if (iv%geoamv(n)%loc%proc_domain) num_obs = num_obs + 1
+      ENDDO
+   ENDIF
     call da_proc_sum_int(num_obs)
     if(wrf_dm_on_monitor() .and. num_obs > 0) then
     write(ounit,'(a20,i8)')'geoamv', num_obs  
@@ -347,30 +357,30 @@ subroutine da_final_write_y( iv, y )
     ENDDO
     endif
 
-!   Transfer Buoy obs:
-!------------------------------------------------------------------
-! [16] writing Buoy 
-!------------------------------------------------------------------
-      num_obs = 0
-    IF ( iv % num_buoy > 0 ) THEN
-      DO n = 1, iv % num_buoy
-       if(iv%buoy(n)%loc%proc_domain) num_obs = num_obs + 1
-      ENDDO
-    ENDIF
-    call da_proc_sum_int(num_obs)
-    if(wrf_dm_on_monitor() .and. num_obs > 0) then
-    write(ounit,'(a20,i8)')'buoy', num_obs  
-    num_obs = 0
-    DO k = 0,numb_procs-1
-    iunit = ounit*10 +  k
-    rewind iunit
-    call da_read_y_unit(iunit,ounit,num_obs,'buoy',4)    
-    ENDDO
-    endif
+   !---------------------------------------------------------------
+   ! [16] writing Buoy 
+   !---------------------------------------------------------------
 
-!------------------------------------------------------------------
-! [17] writing  Bogus 
-!------------------------------------------------------------------
+   num_obs = 0
+   IF ( iv % num_buoy > 0 ) THEN
+      DO n = 1, iv % num_buoy
+         if (iv%buoy(n)%loc%proc_domain) num_obs = num_obs + 1
+      ENDDO
+   ENDIF
+   call da_proc_sum_int(num_obs)
+   if (wrf_dm_on_monitor() .and. num_obs > 0) then
+      write(ounit,'(a20,i8)')'buoy', num_obs  
+      num_obs = 0
+      DO k = 0,numb_procs-1
+         iunit = ounit*10 +  k
+         rewind iunit
+         call da_read_y_unit(iunit,ounit,num_obs,'buoy',4)    
+      ENDDO
+   endif
+
+   !---------------------------------------------------------------
+   ! [17] writing  Bogus  
+   !---------------------------------------------------------------
       num_obs = 0
     IF ( iv % num_bogus > 0 ) THEN
       DO n = 1, iv % num_bogus
@@ -406,8 +416,9 @@ subroutine da_final_write_y( iv, y )
     call da_read_y_unit(iunit,ounit,num_obs,'airsr',5)    
     ENDDO
     endif
-!-------------------------------------------------------------------
-  if ( wrf_dm_on_monitor() ) write(ounit,'(a20,i8)')'********************', 0
-!-------------------------------------------------------------------
+
+   if ( wrf_dm_on_monitor() ) write(ounit,'(a20,i8)')'********************', 0
+
+   if (trace_use) call da_trace_exit("da_final_write_y")
    
 end subroutine da_final_write_y
