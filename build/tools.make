@@ -14,7 +14,7 @@ registry : $(TOOLS_OBJ)
 
 advance_cymdh : advance_cymdh.o 
 	$(RM) $@
-	$(FC) -o advance_cymdh.exe advance_cymdh.o
+	$(SFC) -o advance_cymdh.exe advance_cymdh.o
 	
 
 bufr_little_endian : bufr_little_endian.o
