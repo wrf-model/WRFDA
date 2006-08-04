@@ -1,0 +1,37 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: John Bray
+Date: 08/04/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Bring wrf files we don't use in line with wrf trunk.
+
+Introduce wrf compilation system changes
+
+Remove INTENT declarations not in wrf trunk
+
+Nesting changes
+
+Test results
+------------------------------------------------------
+
+balsam: wrf.exe compiles under old and new systems
+
+--------------------------------------------------------------------------------------
+
+File changes:
+------------
+
+A      doc/changes/changes_20060804d.jrb 
+M      Registry/Registry.EM
+M      external/io_grib1/Makefile
+M      external/io_grib2/Makefile
+M      external/io_grib_share/Makefile
+M      chem/chem_driver.F
+M      arch/preamble
+M      external/RSL/RSL/set_f_padarea.F
+M      share/Makefile
