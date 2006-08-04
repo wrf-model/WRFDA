@@ -552,6 +552,9 @@ cp DAProg_WRF-Var.statistics ../statistics >&! /dev/null
 cp DAProg_WRF-Var.cost_fn ../cost_fn >&! /dev/null
 cp DAProg_WRF_Var.grad_fn ../grad_fn >&! /dev/null
 
+mkdir ../rsl
+cp rsl* ../rsl
+
 echo "WRF-Var completed"
 
 exit (0)
