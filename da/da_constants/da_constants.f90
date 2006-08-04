@@ -252,6 +252,7 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
    INTEGER, PARAMETER :: v_interp_not_specified = missing, &
                          v_interp_p             = 1, &
                          v_interp_h             = 2
+   INTEGER            :: p_below = 0, p_above = 0, h_below = 0, h_above = 0
 
    !------------------------------------------------------------------------------
    ! WRFVAR scalar constants:
