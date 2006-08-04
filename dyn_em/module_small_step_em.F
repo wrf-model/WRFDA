@@ -94,6 +94,7 @@ SUBROUTINE small_step_prep( u_1, u_2, v_1, v_2, w_1, w_2, &
   INTEGER :: i_start, i_end, j_start, j_end, k_start, k_end
   INTEGER :: i_endu, j_endv
 
+
 !<DESCRIPTION>
 !
 !  small_step_prep prepares the prognostic variables for the small timestep.
@@ -190,7 +191,7 @@ SUBROUTINE small_step_prep( u_1, u_2, v_1, v_2, w_1, w_2, &
         muts(i,j)=mub(i,j)+mu_2(i,j)
       ENDDO
       DO i=i_start, i_endu
-!  rk_step==1, WCS fix for tiling
+!  rk_step==1, not leapfrog, WCS fix for tiling
 !        muus(i,j)=0.5*(mub(i,j)+mu_2(i,j)+mub(i-1,j)+mu_2(i-1,j))
         muus(i,j) = muu(i,j)
       ENDDO
@@ -198,7 +199,7 @@ SUBROUTINE small_step_prep( u_1, u_2, v_1, v_2, w_1, w_2, &
 
     DO j=j_start, j_endv
     DO i=i_start, i_end
-!  rk_step==1, WCS fix for tiling
+!  rk_step==1, not leapfrog, WCS fix for tiling
 !      muvs(i,j)=0.5*(mub(i,j)+mu_2(i,j)+mub(i,j-1)+mu_2(i,j-1))
         muvs(i,j) = muv(i,j)
     ENDDO
@@ -795,6 +796,7 @@ SUBROUTINE advance_uv ( u, ru_tend, v, rv_tend,        &
       INTEGER :: i_endu, j_endv, k_endw
       INTEGER :: i_start_up, i_end_up, j_start_up, j_end_up
       INTEGER :: i_start_vp, i_end_vp, j_start_vp, j_end_vp
+
       INTEGER :: i_start_u_tend, i_end_u_tend, j_start_v_tend, j_end_v_tend
 
 !<DESCRIPTION>
@@ -924,6 +926,7 @@ SUBROUTINE advance_uv ( u, ru_tend, v, rv_tend,        &
        dpn(i,kde) = 0.
      ENDDO
 
+
      DO k = k_start+1, k_end
        DO i = i_start_up, i_end_up
          dpn(i,k) = .5*( fnm(k)*(p(i,k  ,j)+p(i-1,k  ,j))   &
@@ -954,6 +957,7 @@ SUBROUTINE advance_uv ( u, ru_tend, v, rv_tend,        &
 
   v_outer_j_loop: DO j = j_start_v_tend, j_end_v_tend
 
+
    DO k = k_start, k_end
    DO i = i_start, i_end
      v(i,k,j) = v(i,k,j) + dts*rv_tend(i,k,j)
@@ -964,19 +968,20 @@ SUBROUTINE advance_uv ( u, ru_tend, v, rv_tend,        &
      mudf_xy(i)= -emdiv*dy*(mudf(i,j)-mudf(i,j-1))
    ENDDO
 
-   IF (     ( j >= j_start_vp)  &
+     IF (     ( j >= j_start_vp)  &
        .and.( j <= j_end_vp  ) )  THEN
 
-     DO k = k_start, k_end
-     DO i = i_start, i_end
+         DO k = k_start, k_end
+	 DO i = i_start, i_end
 
-       dpxy(i,k)= .5*rdy*muv(i,j)*(                               &
-        ((ph(i,k+1,j)-ph(i,k+1,j-1))+(ph (i,k,j)-ph (i,k,j-1)))   &
-        +(alt(i,k  ,j)+alt(i,k  ,j-1))*(p  (i,k,j)-p  (i,k,j-1))  &
-        +(al (i,k  ,j)+al (i,k  ,j-1))*(pb (i,k,j)-pb (i,k,j-1)) ) 
+	  dpxy(i,k)= .5*rdy*muv(i,j)*(                               &
+	  ((ph(i,k+1,j)-ph(i,k+1,j-1))+(ph (i,k,j)-ph (i,k,j-1)))   &
+	  +(alt(i,k  ,j)+alt(i,k  ,j-1))*(p  (i,k,j)-p  (i,k,j-1))  &
+	  +(al (i,k  ,j)+al (i,k  ,j-1))*(pb (i,k,j)-pb (i,k,j-1)) ) 
 
-     ENDDO
-     ENDDO
+	    ENDDO
+	    ENDDO
+
 
      IF (non_hydrostatic) THEN
 
@@ -986,6 +991,7 @@ SUBROUTINE advance_uv ( u, ru_tend, v, rv_tend,        &
                         +cf3*(p(i,3,j)+p(i,3,j-1)) )
          dpn(i,kde) = 0.
        ENDDO
+
 
        DO k = k_start+1, k_end
          DO i = i_start, i_end
@@ -1010,11 +1016,9 @@ SUBROUTINE advance_uv ( u, ru_tend, v, rv_tend,        &
          v(i,k,j)=v(i,k,j)-dts*cqv(i,k,j)*dpxy(i,k)+mudf_xy(i)
        ENDDO
      ENDDO
-
    END IF
 
   ENDDO  v_outer_j_loop
-
 
 END SUBROUTINE advance_uv
 
@@ -1140,7 +1144,7 @@ SUBROUTINE advance_mu_t( ww, ww_1, u, u_1, v, v_1,            &
    DO j = j_start, j_end
 
      DO i=i_start, i_end
-       dmdt(i) = 0.
+            dmdt(i) = 0.
      ENDDO
 !  NOTE:  mu is not coupled with the map scale factor.
 !         ww (omega) IS coupled with the map scale factor.
@@ -1358,6 +1362,7 @@ SUBROUTINE advance_w( w, rw_tend, ww, u, v,       &
        mut_inv(i) = 1./mut(i,j)
        msft_inv(i) = 1./msft(i,j)
     ENDDO
+
     DO k=1, k_end
     DO i=i_start, i_end
       t_2ave(i,k,j)=.5*((1.+epssm)*t_2(i,k,j)       &
@@ -1455,7 +1460,7 @@ SUBROUTINE advance_w( w, rw_tend, ww, u, v,       &
     DO k=k_end,2,-1
     DO i=i_start, i_end
        w (i,k,j)=w (i,k,j)-gamma(i,k,j)*w(i,k+1,j)
-      ph(i,k+1,j) = rhs(i,k+1)+msft(i,j)*.5*dts*g*(1.+epssm) &
+       ph(i,k+1,j) = rhs(i,k+1)+msft(i,j)*.5*dts*g*(1.+epssm) &
                       *w(i,k+1,j)/muts(i,j)
     ENDDO
     ENDDO
@@ -1510,6 +1515,7 @@ SUBROUTINE sumflux ( ru, rv, ww,                             &
   REAL, INTENT(IN   )  ::  epssm
   INTEGER   :: i,j,k
 
+
 !<DESCRIPTION>
 !
 !  update the small-timestep time-averaged mass fluxes;  these
@@ -1553,7 +1559,6 @@ SUBROUTINE sumflux ( ru, rv, ww,                             &
       ENDDO
       ENDDO
     END IF
-
     IF (jte .GT. minj) THEN
       DO  j = minj+1, jte
       DO  k = kts, mink
