@@ -2,7 +2,7 @@
 
    SUBROUTINE start_domain_em ( grid, allowed_to_read , &
 ! Actual arguments generated from Registry
-#include "em_dummy_args.inc"
+#include <em_dummy_args.inc>
 !
 )
 
@@ -39,7 +39,7 @@
    LOGICAL , INTENT(IN)   :: allowed_to_read
 
    !  Definitions of dummy arguments to this routine (generated from Registry).
-#include "em_dummy_decl.inc"
+#include <em_dummy_decl.inc>
 #include "namelist_defines2.inc"
 
    !  Structure that contains run-time configuration (namelist) data for domain
@@ -89,7 +89,7 @@
 ! The definition of COPY_IN or COPY_OUT before the include defines the
 ! direction of the copy.  Em_scalar_derefs.inc is generated from Registry
 #define COPY_IN
-#include "em_scalar_derefs.inc"
+#include <em_scalar_derefs.inc>
 
 ! Needed by some comm layers, e.g. RSL. If needed, nmm_data_calls.inc is
 ! generated from the registry.  The definition of REGISTER_I1 allows
@@ -322,6 +322,10 @@
    IF ( .NOT. config_flags%restart .AND. &
         (( config_flags%input_from_hires ) .OR. ( config_flags%input_from_file ))) THEN
 
+      IF ( config_flags%map_proj .EQ. 0 ) THEN
+         CALL wrf_error_fatal ( 'start_domain: Idealized case cannot have a separate nested input file' )
+      END IF 
+
       CALL nl_get_base_pres  ( 1 , p00 )
       CALL nl_get_base_temp  ( 1 , t00 )
       CALL nl_get_base_lapse ( 1 , base_lapse   )
@@ -393,6 +397,20 @@
 
 !  reconstitute base-state fields
 
+    IF(config_flags%max_dom .EQ. 1)THEN
+! with single domain, t_init from wrfinput is OK to use
+     DO j = jts,min(jte,jde-1)
+     DO k = kts,kte-1
+     DO i = its, min(ite,ide-1)
+       IF ( imask_nostag(i,j) .EQ. 1 ) THEN
+         pb(i,k,j) = znu(k)*mub(i,j)+p_top
+         alb(i,k,j) = (r_d/p1000mb)*(t_init(i,k,j)+t0)*(pb(i,k,j)/p1000mb)**cvpm
+       ENDIF
+     ENDDO
+     ENDDO
+     ENDDO
+    ELSE
+! with nests, t_init generally needs recomputations (since it is not interpolated)
      DO j = jts,min(jte,jde-1)
      DO k = kts,kte-1
      DO i = its, min(ite,ide-1)
@@ -404,6 +422,7 @@
      ENDDO
      ENDDO
      ENDDO
+    ENDIF
 
      DO j = jts,min(jte,jde-1)
 
@@ -911,7 +930,7 @@
      CALL wrf_debug ( 100 , 'module_start: start_domain_rk: Returning' )
 
 #define COPY_OUT
-#include "em_scalar_derefs.inc"
+#include <em_scalar_derefs.inc>
 
      RETURN
 

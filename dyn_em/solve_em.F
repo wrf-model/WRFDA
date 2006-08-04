@@ -47,7 +47,7 @@ SUBROUTINE solve_em ( grid , config_flags , &
    TYPE(domain) , TARGET          :: grid
 
    !  Definitions of dummy arguments to this routine (generated from Registry).
-#include "em_dummy_decl.inc"
+#include <em_dummy_decl.inc>
 #include "namelist_defines2.inc"
 
    !  Structure that contains run-time configuration (namelist) data for domain
@@ -68,7 +68,7 @@ SUBROUTINE solve_em ( grid , config_flags , &
    LOGICAL                         :: specified_bdy, channel_bdy
 
 ! storage for tendencies and decoupled state (generated from Registry)
-#include "em_i1_decl.inc"
+#include <em_i1_decl.inc>
 
 ! Previous time level of tracer arrays now defined as i1 variables;
 ! the state 4d arrays now redefined as 1-time level arrays in Registry.
@@ -93,7 +93,7 @@ SUBROUTINE solve_em ( grid , config_flags , &
    INTEGER     :: sm31y , em31y , sm32y , em32y , sm33y , em33y
 
 ! Define benchmarking timers if -DBENCH is compiled
-#include "bench_solve_em_def.h"
+#include <bench_solve_em_def.h>
 
 !----------------------
 ! Executable statements
@@ -114,14 +114,14 @@ SUBROUTINE solve_em ( grid , config_flags , &
 ! The definition of COPY_IN or COPY_OUT before the include defines the
 ! direction of the copy.  Em_scalar_derefs.inc is generated from Registry
 #define COPY_IN
-#include "em_scalar_derefs.inc"
+#include <em_scalar_derefs.inc>
 
 ! Needed by some comm layers, e.g. RSL. If needed, nmm_data_calls.inc is
 ! generated from the registry.  The definition of REGISTER_I1 allows
 ! I1 data to be communicated in this routine if necessary.
 #ifdef DM_PARALLEL
 #    define REGISTER_I1
-#      include "em_data_calls.inc"
+#      include <em_data_calls.inc>
 #endif
 
 !<DESCRIPTION>
@@ -156,7 +156,7 @@ SUBROUTINE solve_em ( grid , config_flags , &
 !</DESCRIPTION>
 
 ! Initialize timers if compiled with -DBENCH
-#include "bench_solve_em_init.h"
+#include <bench_solve_em_init.h>
 
 !  set runge-kutta solver (2nd or 3rd order)
 
@@ -1147,7 +1147,7 @@ BENCH_START(rk_tend_tim)
                          u_base, v_base, t_base, qv_base, z_base,         &
                          msfu, msfv, msft, f, e, sina, cosa,              &
                          fnm, fnp, rdn, rdnw,                             &
-                         grid%dt, rdx, rdy, grid%khdif, grid%kvdif, xkmhd,               &
+                         grid%dt, rdx, rdy, grid%khdif, grid%kvdif, xkmhd,&
                          grid%diff_6th_opt, grid%diff_6th_rate,           &
                          grid%dampcoef,grid%zdamp,config_flags%damp_opt,  &
                          cf1, cf2, cf3, cfn, cfn1, num_3d_m,              &
@@ -2100,7 +2100,7 @@ BENCH_START(rk_scalar_tend_tim)
                               msfu, msfv, msft,                 &
                               rdx, rdy, rdn, rdnw, grid%khdif,       &
                               grid%kvdif, xkmhd,                     &
-                              grid%diff_6th_opt, grid%diff_6th_rate,   &
+                              grid%diff_6th_opt, grid%diff_6th_rate, &
                               ids, ide, jds, jde, kds, kde,     &
                               ims, ime, jms, jme, kms, kme,     &
                               grid%i_start(ij), grid%i_end(ij), &
@@ -2256,7 +2256,7 @@ BENCH_START(tke_adv_tim)
                            msfu, msfv, msft,                 &
                            rdx, rdy, rdn, rdnw, grid%khdif,       &
                            grid%kvdif, xkmhd,                     &
-                           grid%diff_6th_opt, grid%diff_6th_rate,   &
+                           grid%diff_6th_opt, grid%diff_6th_rate, &
                            ids, ide, jds, jde, kds, kde,     &
                            ims, ime, jms, jme, kms, kme,     &
                            grid%i_start(ij), grid%i_end(ij), &
@@ -2945,6 +2945,8 @@ BENCH_START(micro_driver_tim)
      &        ,NUM_TILES=grid%num_tiles                                   &
                  ! Optional
      &        , RAINNC=rainnc, RAINNCV=rainncv                            &
+     &        , SNOWNC=snownc, SNOWNCV=snowncv                            &
+     &        , GRAUPELNC=graupelnc, GRAUPELNCV=graupelncv                &
      &        , W=w_2, Z=z, HT=ht                                         &
      &        , MP_RESTART_STATE=mp_restart_state                         &
      &        , TBPVS_STATE=tbpvs_state                                   & ! etampnew
@@ -3257,11 +3259,11 @@ BENCH_END(bc_2d_tim)
    CALL wrf_debug ( 200 , ' call end of solve_em' )
 
 ! Finish timers if compiled with -DBENCH.
-#include "bench_solve_em_end.h"
+#include <bench_solve_em_end.h>
 
 ! See comment before earlier #include of this file.
 #define COPY_OUT
-#include "em_scalar_derefs.inc"
+#include <em_scalar_derefs.inc>
 
    RETURN
 
