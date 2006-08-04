@@ -23,6 +23,20 @@ fi
 
 # List options in order of increasing preference
 
+# Initially make mpich2 less desirable than mpich1
+
+if test -d /data7/da/bray/mpich/mpich2-1.0.3_${COMPILER}; then
+   export MPICH=/data7/da/bray/mpich/mpich2-1.0.3_${COMPILER}
+fi
+if test -d ~bray/mpich/mpich2-1.0.3_${COMPILER}; then
+   export MPICH=~bray/mpich/mpich2-1.0.3_${COMPILER}
+fi
+if test -d /Volumes/$MACHINE/bray/tools/mpich2-1.0.3_${COMPILER}; then
+   export MPICH=/Volumes/$MACHINE/bray/tools/mpich2-1.0.3_${COMPILER}
+fi
+
+
+
 if test -d /data7/da/bray/netcdf/netcdf-3.6.1_${COMPILER}; then
   export NETCDF=/data7/da/bray/netcdf/netcdf-3.6.1_${COMPILER}
 fi

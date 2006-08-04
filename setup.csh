@@ -29,6 +29,18 @@ endif
 
 # List options in order of increasing preference
 
+# Initially make mpich2 less desirable than mpich1
+
+if ( -d /data7/da/bray/mpich/mpich2-1.0.3_${COMPILER}) then
+   setenv MPICH /data7/da/bray/mpich/mpich2-1.0.3_${COMPILER}
+endif
+if ( -d ~bray/mpich/mpich2-1.0.3_${COMPILER}) then
+   setenv MPICH ~bray/mpich/mpich2-1.0.3_${COMPILER}
+endif
+if ( -d /Volumes/$MACHINE/bray/tools/mpich2-1.0.3_${COMPILER}) then
+   setenv MPICH /Volumes/$MACHINE/bray/tools/mpich2-1.0.3_${COMPILER}
+endif
+
 if (-d /data7/da/bray/netcdf/netcdf-3.6.1_${COMPILER}) then
    setenv NETCDF /data7/da/bray/netcdf/netcdf-3.6.1_${COMPILER}
 endif
