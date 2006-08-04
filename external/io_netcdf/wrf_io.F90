@@ -50,7 +50,7 @@ module wrf_data
   character (8)          , parameter      :: NO_NAME          = 'NULL'
   character (DateStrLen) , parameter      :: ZeroDate = '0000-00-00-00:00:00'
 
-#include <wrf_io_flags.h>
+#include "wrf_io_flags.h"
 
   character (256)                         :: msg
   logical                                 :: WrfIOnotInitialized = .true.

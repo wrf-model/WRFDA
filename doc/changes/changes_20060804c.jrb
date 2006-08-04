@@ -1,0 +1,36 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: John Bray
+Date: 08/04/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Change #include <wrf_io_flags.h> to #include "wrf_io_flags.h",
+add yet another copy of the dratted file to external/io_int
+
+Rename the unique named diffwrf_netcdf.F90 and diffwrf_int.F
+back to their clashing diffwrf names, to fit with wrf trunk
+
+
+Test results
+------------------------------------------------------
+
+balsam: wrf.exe compiles under old and new systems
+
+--------------------------------------------------------------------------------------
+
+File changes:
+------------
+
+A      doc/changes/changes_20060804c.jrb
+M      external/io_int/io_int.F90
+A      external/io_int/wrf_io_flags.h
+D      external/io_int/diffwrf_int.F
+A  +   external/io_int/diffwrf.F
+M      external/io_netcdf/wrf_io.F90
+A  +   external/io_netcdf/diffwrf.F90
+D      external/io_netcdf/diffwrf_netcdf.F90
+
