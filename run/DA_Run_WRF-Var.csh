@@ -548,6 +548,10 @@ cp fort.12 DAProg_WRF-Var.statistics >&! /dev/null
 cp fort.81 DAProg_WRF-Var.cost_fn >&! /dev/null
 cp fort.82 DAProg_WRF_Var.grad_fn >&! /dev/null
 
+cp DAProg_WRF-Var.statistics ../statistics >&! /dev/null
+cp DAProg_WRF-Var.cost_fn ../cost_fn >&! /dev/null
+cp DAProg_WRF_Var.grad_fn ../grad_fn >&! /dev/null
+
 echo "WRF-Var completed"
 
 exit (0)

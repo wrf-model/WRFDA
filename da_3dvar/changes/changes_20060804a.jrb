@@ -1,0 +1,24 @@
+Change Log for update to WRF 3DVAR code
+---------------------------------------
+
+Author  : John Bray
+Reviewer: John Bray 
+Date: 08/04/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Copy DAProg_WRF-Var.cost_fn etc to level above with
+names like cost_fn, for easier comparison with trunk
+runs
+
+Test results
+------------------------------------------------------
+
+No change to results possible
+
+File Changes:
+-------------------------------------
+
+A     da_3dvar/changes/changes_20060804a.jrb
+M     run/DA_Run_WRF-Var.csh
