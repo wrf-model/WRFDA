@@ -464,7 +464,7 @@ CC_TOOLS        = gcc
 LD              = $(FC)
 
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DNONSTANDARD_SYSTEM 
+FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DLINUX -DNONSTANDARD_SYSTEM 
                     
 FPPFLAGS_BUFR   = -C -P $(TRADFLAG) -DLINUX -Dlinux
 
@@ -666,6 +666,46 @@ arch_clean :
 
 arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
+
+###########################################################
+#ARCH Settings for PC Linux x86_64, ifort compiler  (Single-threaded)
+#
+M4              = m4 -B12000
+FC              = ifort
+FFC             = $(FC)
+SFC             = $(FC)
+CC              = icc
+CC_TOOLS        = gcc
+LD              = $(FC)
+
+TRADFLAG        = -traditional
+FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DLINUX -DNONSTANDARD_SYSTEM
+                    
+FPPFLAGS_BUFR   = -C -P $(TRADFLAG) -DLINUX -Dlinux
+
+FCOPTIM         = #-O3 -xW
+FCDEBUG         = -g -C
+FCTYPE          = -r8
+FCFREE          = -FR -cm -w
+FCENDIAN        = -convert big_endian
+FCBASE          = 
+
+CCFLAGS_BUFR    = -DUNDERSCORE
+CCFLAGS_RSL     =
+
+LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)
+
+LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/local/lib \
+		    -lncarg -lncarg_gks -lncarg_c
+
+arch :
+		$(LN) $(RSL_STUBS)/* .
+		@ touch arch
+
+arch_clean :
+
+arch_superclean :
+
 
 ###########################################################
 
