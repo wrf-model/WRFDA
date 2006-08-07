@@ -25,7 +25,7 @@ fftpack5.o:	         \
 			xerfft.inc  \
 			fftpack5.f90
 			$(CPP) $(CPPFLAGS) fftpack5.f90 > fftpack5.f
-			$(SFC) -c $(MODULE_DIRS) $(PROMOTION) fftpack5.f
+			$(SFC) -c $(FCFIXED) $(MODULE_DIRS) $(PROMOTION) fftpack5.f
 
 clean :
 	$(RM) $(FFTPACK_OBJS) *.mod *.f

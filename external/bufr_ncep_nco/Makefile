@@ -15,7 +15,7 @@ bufrlib.prm:		bufrlib.param
 bufrlib.o:		bufrlib.f90 bufrlib.prm
 			$(RM) $@
 			$(CPP) $(CPPFLAGS) bufrlib.f90 > bufrlib.f
-			$(SFC) -c $(FIXEDFLAGS_BUFR) $(MODULE_DIRS) bufrlib.f
+			$(SFC) -c $(FCFIXED) $(MODULE_DIRS) bufrlib.f
 
 bort_exit.o:		bort_exit.c
 			$(RM) $@

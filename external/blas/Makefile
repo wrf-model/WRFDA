@@ -23,7 +23,7 @@ blas.o:	         blas.f90 \
 			lsame.inc  \
 			xerbla.inc
 			$(CPP) $(CPPFLAGS) blas.f90 > blas.f
-			$(SFC) -c $(FIXEDFLAGS_WRFVAR) $(MODULE_DIRS) $(PROMOTION) blas.f
+			$(SFC) -c $(FCFIXED) $(MODULE_DIRS) $(PROMOTION) blas.f
 
 clean :
 	@ $(RM) *.o *.f *.mod

@@ -1206,6 +1206,7 @@ CFLAGS          =       -DNOUNDERSCORE -DNCARIBM_NOC99
 FCOPTIM         =       -O2 -qarch=auto
 FCDEBUG         =       # -qnoopt -qfullpath
 FCBASEOPTS      =       -qspill=20000 $(FCDEBUG) -qmaxmem=32767 -w #-qflttrap=zerodivide:invalid:enable -qsigtrap
+FCFIXED         =       -qfixed
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS)
 # machine-specific flags needed to link in ESMF library (C++ run-time-library, etc.)
 ESMF_LIB_FLAGS  =       -lC
@@ -1551,6 +1552,7 @@ CFLAGS          =       -DNOUNDERSCORE -DWRF_RSL_IO  -I../external/RSL/RSL -DDM_
 FCOPTIM         =       -O2 -qarch=auto
 FCDEBUG         =       # -qnoopt -qfullpath
 FCBASEOPTS      =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767 #-qflttrap=zerodivide:invalid:enable -qsigtrap
+FCFIXED         =       -qfixed
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS)
 # machine-specific flags needed to link in ESMF library (C++ run-time-library, etc.)
 ESMF_LIB_FLAGS  =       -lC

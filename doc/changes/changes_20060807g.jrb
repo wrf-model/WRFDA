@@ -1,0 +1,29 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: John Bray
+Date: 08/07/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Use FCFIXED for lapack, blas and fftpack5, bufr_ncep_nco compilation on Aix
+
+Test results
+------------------------------------------------------
+
+bluesky: wrfvar compiles lapack, fftpack5, blas and bufr_ncep_nco under old
+compilation system
+
+--------------------------------------------------------------------------------------
+
+File changes:
+------------
+
+A      doc/changes/changes_20060807g.jrb 
+M      arch/configure.defaults
+M      external/lapack/Makefile
+M      external/blas/Makefile
+M      external/fftpack5/Makefile
+M      external/bufr_ncep_nco/Makefile

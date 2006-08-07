@@ -20,7 +20,7 @@ lapack.o:		lapack.f90 \
 			dlapy2.inc \
 			dsyev.inc
 			$(CPP) $(CPPFLAGS) lapack.f90 > lapack.f
-			$(SFC) -c $(FIXEDFLAGS_WRFVAR) $(PROMOTION) -I../blas lapack.f
+			$(SFC) -c $(FCFIXED) $(PROMOTION) -I../blas lapack.f
 
 clean :
 	@ $(RM) *.o *.f *.mod
