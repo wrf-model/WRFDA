@@ -298,6 +298,7 @@ CONTAINS
 
    IF ( config_flags%dyn_opt == DYN_EM ) THEN
       CALL integrate ( head_grid )
+#if VAR4D_CORE==1
    ELSE IF ( config_flags%dyn_opt == DYN_EM_SN ) THEN
       CALL integrate ( head_grid )
    ELSE IF ( config_flags%dyn_opt == DYN_EM_TL ) THEN
@@ -331,6 +332,7 @@ CONTAINS
       CALL integrate_ad ( head_grid, nl_date_string, nl_date_index, ad_date_string, ad_date_index )
    ELSE IF ( config_flags%dyn_opt == DYN_EM_TST ) THEN
       CALL integrate_tst ( head_grid )
+#endif
    ENDIF
 
    CALL       wrf_debug ( 100 , 'wrf: back from integrate' )

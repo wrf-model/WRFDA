@@ -28,7 +28,7 @@ WRFVAR_LIB  = -L. -lwrfvar -lwrflib $(NETCDF_LIB)  \
                $(LAPACK_LIB) $(BLAS_LIB) $(BUFR_LIB) $(FFTPACK5_LIB) \
                $(RTTOV_LIB) $(MPI_LIB) $(EXTRA_LIBS)
 
-WRF_LIB     = -L. -lwrf \
+WRF_LIB     = -L. -lwrflib \
               -L$(EXTERNAL)/io_grib1 -lio_grib1 $(LOCAL_LIB) \
               $(NETCDF_LIB) $(MPI_LIB) $(EXTRA_LIBS)
 

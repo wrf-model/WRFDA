@@ -1,0 +1,26 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: John Bray
+Date: 08/07/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Allow wrf executable to be built without wrfplus changes
+
+Test results
+------------------------------------------------------
+
+lightning: Compiles wrf using compile_new
+
+--------------------------------------------------------------------------------------
+
+File changes:
+------------
+
+A      doc/changes/changes_20060807b.jrb
+M      module_wrf_esmf_super.F
+M      arch/postamble_new
+
