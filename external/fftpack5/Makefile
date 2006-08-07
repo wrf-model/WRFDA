@@ -28,7 +28,7 @@ fftpack5.o:	         \
 			$(SFC) -c $(MODULE_DIRS) $(PROMOTION) fftpack5.f
 
 clean :
-	$(RM) $(FFTPACK_OBJS)
+	$(RM) $(FFTPACK_OBJS) *.mod *.f
 
 superclean : clean
 

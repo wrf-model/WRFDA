@@ -32,8 +32,6 @@ CCFLAGS2        = -I$(RSL)/RSL
 CCFLAGS_BUFR    = -DUNDERSCORE
 CCFLAGS_RSL     = 
 
-LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)
-
 # Libraries
 
 LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/local/lib \
@@ -81,8 +79,6 @@ FCHOST          = -arch host
 FCENDIAN        = -convert big_endian
 FCBASE          = -automatic -cpp -fpe0 -align dcommons -align records
 
-LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)
-
 LOCAL_LIB       = -L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c
 
 arch : 
@@ -123,9 +119,6 @@ FCFLAGS_RSL     = $(FCENDIAN)
 
 CCFLAGS2        = -I$(RSL)/RSL
 CCFLAGS_RSL     = 
-
-LDFLAGS         = $(FCBASE) ${FCOPTIM) $(FCENDIAN)
-
 
 LOCAL_LIB       = -L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c
 MPI_LIB		= -L$(RSL)/RSL -lrsl
@@ -169,8 +162,6 @@ FCHOST          = -arch host
 FCENDIAN        = -convert big_endian
 FCBASE          = -automatic -cpp -fpe0 -align dcommons -align records
 
-LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)
-
 LOCAL_LIB       = -L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c
 
 arch : 
@@ -206,8 +197,6 @@ FCFLAGS_RSL     = $(FCENDIAN)
 
 CCFLAGS_BUFR    = -DUNDERSCORE
 CCFLAGS_RSL     =
-
-LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)
 
 LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/local/lib \
 		    -lncarg -lncarg_gks -lncarg_c
@@ -249,8 +238,6 @@ FCFLAGS_RSL     = $(FCENDIAN)
 CCFLAGS2        = -I$(RSL)/RSL
 CCFLAGS_BUFR    = -DUNDERSCORE
 CCFLAGS_RSL     = 
-
-LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)
 
 LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/local/lib \
                     -lncarg -lncarg_gks -lncarg_c
@@ -301,8 +288,6 @@ CCFLAGS2        = -I$(RSL_LITE)
 CCFLAGS_BUFR    = -DUNDERSCORE
 CCFLAGS_RSL     = 
 
-LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)
-
 LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/local/lib \
                     -lncarg -lncarg_gks -lncarg_
 MPI_LIBS	= librsl_lite.a
@@ -341,8 +326,6 @@ FCBASE          = -cpp -Wno=101,139,155,158 -fno-second-underscore
 FCTYPE          = -r8
 
 CCFLAGS_BUFR    = -DUNDERSCORE
-
-LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)
 
 LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/local/lib \
 		    -lncarg -lncarg_gks -lncarg_c
@@ -383,8 +366,6 @@ FCFLAGS_RSL     = $(FCENDIAN) -ffixed-form -fno-second-underscore
 CCFLAGS2        = -I$(RSL)/RSL
 CCFLAGS_BUFR    = -DUNDERSCORE
 CCFLAGS_RSL     = 
-
-LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)
 
 LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/local/lib \
                     -lncarg -lncarg_gks -lncarg_c
@@ -435,8 +416,6 @@ CCFLAGS2        = -I$(RSL_LITE)
 CCFLAGS_BUFR    = -DUNDERSCORE
 CCFLAGS_RSL     = 
 
-LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)
-
 LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/local/lib \
                     -lncarg -lncarg_gks -lncarg_c
 MPI_LIBS	= librsl_lite.a 
@@ -477,8 +456,6 @@ FCTYPE          = -r8
 
 CCFLAGS_BUFR    = -DUNDERSCORE
 
-LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)
-
 LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/local/lib \
 		    -lncarg -lncarg_gks -lncarg_
 
@@ -514,8 +491,6 @@ FCBASE          = -Ktrap=fp
 
 CCFLAGS_BUFR    = -DUNDERSCORE
 CCFLAGS_RSL     =
-
-LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)
 
 LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/local/lib \
 		    -lncarg -lncarg_gks -lncarg_c
@@ -556,8 +531,6 @@ FCFLAGS_RSL     = $(FCENDIAN)
 CCFLAGS2        = -I$(RSL)/RSL
 CCFLAGS_RSL     = 
 CCFLAGS_BUFR    = -DUNDERSCORE
-
-LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)
 
 LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/local/lib \
                     -lncarg -lncarg_gks -lncarg_c
@@ -604,8 +577,6 @@ FCFLAGS_RSL     = $(FCENDIAN) $(FCBASE)
 CCFLAGS_BUFR    = -DUNDERSCORE
 CCFLAGS_RSL     =
 
-LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)
-
 LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/local/lib \
 		    -lncarg -lncarg_gks -lncarg_c
 
@@ -645,8 +616,6 @@ FCFLAGS_RSL     = $(FCENDIAN) $(FCBASE)
 CCFLAGS2        = -I$(RSL)/RSL
 CCFLAGS_RSL     = 
 CCFLAGS_BUFR    = -DUNDERSCORE
-
-LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)
 
 LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/local/lib \
                   -lncarg -lncarg_gks -lncarg_c 
@@ -735,8 +704,6 @@ FCFLAGS_RSL     = $(FCENDIAN)
 CCFLAGS2        = -w -64 -mips4 -DUNDERSCORE
 CCFLAGS_RSL     = 
 
-LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)
-
 LOCAL_LIB       = -L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c
 
 arch : 
@@ -775,8 +742,6 @@ FCFLAGS_RSL     = $(FCENDIAN)
 
 CCFLAGS2        = -w -64 -mips4 -I$(RSL)/RSL -I/tea2/huangwei/mpich-1.2.4/include
 CCFLAGS_RSL     =
-
-LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)
 
 LOCAL_LIB       = -L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c
 MPI_LIB		= -L$(RSL)/RSL -lrsl -lmpi
@@ -823,8 +788,6 @@ FCBASE          = -C hopt \
 		  -Wf"-init stack=zero heap=zero -pvctl loopcnt=100000000 noassume -O nooverlap" \
                   -pi -ew -eb -float0 -Wf"-L fmtlist"
 
-LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN) #-Wl"-Z 3000000"
-
 arch : 
 		$(LN) $(RSL_STUBS)/* .
 		@ touch arch
@@ -858,8 +821,7 @@ FCBASE          = -w -qspill=20000 -qmaxmem=32767 \
 
 CCFLAGS2        = -DNOUNDERSCORE -DNCARIBM_NOC99
 
-LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN) \
-                    -bmaxstack:256000000 -bmaxdata:2048000000
+LDFLAGS2        = -bmaxstack:256000000 -bmaxdata:2048000000
 
 LOCAL_LIB	= -lmass -lmassv
 
@@ -902,8 +864,7 @@ CCFLAGS2        = -DNOUNDERSCORE -DNCARIBM_NOC99 -I$(RSL)/RSL
 CCFLAGS_BUFR    = -DNOUNDERSCORE
 CCFLAGS_RSL     =
 
-LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN) \
-                    -bmaxstack:256000000 -bmaxdata:2048000000
+LDFLAGS2         = -bmaxstack:256000000 -bmaxdata:2048000000
 
 LOCAL_LIB	= -lmass -lmassv
 MPI_LIB		= -L$(RSL)/RSL -lrsl
@@ -954,8 +915,7 @@ CCFLAGS2        = -DNOUNDERSCORE -DNCARIBM_NOC99 -I$(RSL_LITE)
 CCFLAGS_BUFR    = -DNOUNDERSCORE
 CCFLAGS_RSL     =
 
-LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN) \
-                    -bmaxstack:256000000 -bmaxdata:2048000000
+LDFLAGS2         = -bmaxstack:256000000 -bmaxdata:2048000000
 
 LOCAL_LIB	= -lmass -lmassv
 MPI_LIBS	= librsl_lite.a
@@ -1001,8 +961,6 @@ FCFLAGS_RSL     = $(FCENDIAN)
 CCFLAGS2        = -UCRAY -Dcrayx1
 
 CCFLAGS_BUFR    = -DUNDERSCORE
-
-LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)
 
 LOCAL_LIB       = #-L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c
 
@@ -1053,8 +1011,6 @@ CCFLAGS_RSL     = -Dcrayx1
 
 CCFLAGS_BUFR    = -DUNDERSCORE
 
-LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)
-
 LOCAL_LIB       = #-L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c
 MPI_LIB		= -L$(RSL)/RSL -lrsl
 
@@ -1101,8 +1057,6 @@ CCFLAGS2        = -DLANDREAD_STUB -DMACOS
 CCFLAGS_BUFR    = -DUNDERSCORE
 CCFLAGS_RSL     =
 
-LDFLAGS         =  $(FCBASE) $(FCOPTIM) $(FCENDIAN) 
-
 EXTRA_LIBS      = -lSystemStubs
 
 arch : 
@@ -1142,8 +1096,6 @@ FCFLAGS_RSL     = $(FCENDIAN) -ffixed-form -fno-second-underscore
 CCFLAGS2        = -I$(RSL)/RSL -DLANDREAD_STUB -DMACOS
 CCFLAGS_BUFR    = -DUNDERSCORE
 CCFLAGS_RSL     = -DMACOS -I/usr/include/sys -DMPI2_SUPPORT
-
-LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN) 
 
 MPI_LIB		= -L$(RSL)/RSL -lrsl
 EXTRA_LIBS      = -lSystemStubs
@@ -1192,8 +1144,6 @@ FCFLAGS_RSL     = $(FCENDIAN) -ffixed-form -fno-second-underscore
 CCFLAGS2        = -I$(RSL_LITE) -DLANDREAD_STUB -DMACOS
 CCFLAGS_BUFR    = -DUNDERSCORE
 CCFLAGS_RSL     = -DMACOS -I/usr/include/sys
-
-LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN) 
 
 MPI_LIBS	= librsl_lite.a
 MPI_LIB		= -lrsl_lite

@@ -99,13 +99,14 @@ clean : arch_clean
           Registry_tmp* module_state_description.f90 bufrlib.prm \
           $(EXTERNAL)/*.o $(EXTERNAL)/*.a $(EXTERNAL)/*/*.o $(EXTERNAL)/*/*.a \
           inc/dm_comm_cpp_flags depend
-	@ ( cd  $(EXTERNAL)/makedepf90/makedepf90-2.8.8; make clean )
+	@ ( cd $(EXTERNAL); make clean )
 
 superclean : clean arch_superclean
+	@ ( cd $(EXTERNAL); make superclean )
 	@ $(RM) *.f90 *.F90 *.F *.inc *.int *.c *.h *.m4 *.code \
           bufrlib.param *.sed registry \
           convert_tool kma_wave2grid wave2grid_kma *.csh version_decl \
           *.bsh *.csh Utl* macros_utl module_dm_warning rsl_cpp_flags \
           scl_plotting_routines configure.wrf ../configure.wrf \
           advance_cymdh.exe decode_l2_airs.README time_window.nl \
-          Makefile_old da_macros_utl links arch
+          da_macros_utl links arch

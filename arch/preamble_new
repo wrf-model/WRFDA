@@ -49,6 +49,7 @@ CCFLAGS1    = -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) \
               -DLANDREAD_STUB
 WRFIO       = CONFIGURE_WRFIO_NF wrfio_int wrfio_grib1
 INCS        = -I. -I./inc CONFIGURE_RTTOV_INC
+LDFLAGS1    = CONFIGURE_LDFLAGS
 
 # switch to use separately installed ESMF library for coupling:  1==true
 ESMF_COUPLING       = CONFIGURE_ESMF_COUPLING
@@ -59,6 +60,8 @@ ESMF_IO_DEFS        = CONFIGURE_ESMF_IO_DEFS
 ESMF_TARGET         = CONFIGURE_ESMF_TARGET
 
 SOLVER=em
+
+NETCDF_LIB_PATH = ${NETCDF_PATH}/lib
 
 # Short cuts to directories
 

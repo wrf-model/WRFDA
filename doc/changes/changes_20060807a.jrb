@@ -1,0 +1,44 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: John Bray
+Date: 08/07/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Update clean_new mechanism
+
+Create NETCDF_LIB_PATH as wrf compiles complain if path
+defined at end of load command
+
+Split LDFLAGS into LDFLAGS1 in preamble_new and LDFLAGS2 in
+configure_defaults_new
+
+
+Test results
+------------------------------------------------------
+
+bluesky: Compiles wrf, wrfplus, wrf under new system
+
+--------------------------------------------------------------------------------------
+
+File changes:
+------------
+
+A      doc/changes/changes_20060807a.jrb
+M      arch/postamble_new
+M      arch/configure.defaults_new
+M      arch/preamble_new
+M      arch/Config_new.pl
+M      clean
+M      external/io_int/Makefile
+M      external/io_esmf/Makefile
+M      external/ioapi_share/Makefile
+M      external/esmf_time_f90/Makefile
+M      external/io_netcdf/Makefile
+M      external/fftpack5/Makefile
+M      external/io_mcel/Makefile
+M      external/Makefile
+M      main/Makefile

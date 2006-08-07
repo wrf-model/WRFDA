@@ -185,7 +185,7 @@ while ( <CONFIGURE_PREAMBLE> ) {
     $_ =~ s:CONFIGURE_NETCDF_PATH:$sw_netcdf_path:g ;
     $_ =~ s:CONFIGURE_WRFIO_NF:wrfio_nf:g ;
     $_ =~ s:CONFIGURE_NETCDF_FLAG:-DNETCDF: ;
-    $_ =~ s:CONFIGURE_NETCDF_LIB:-L$sw_netcdf_path/lib -lnetcdf: ;
+    $_ =~ s:CONFIGURE_NETCDF_LIB:-lnetcdf: ;
   } else { 
     $_ =~ s:CONFIGURE_NETCDF_PATH::g ;
     $_ =~ s:CONFIGURE_WRFIO_NF::g ;

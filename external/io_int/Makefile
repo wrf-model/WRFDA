@@ -49,5 +49,7 @@ diffwrf:                diffwrf.F ../../frame/pack_utils.o ../../frame/module_ma
 $(ESMF_MOD_DEPENDENCE) :
 			@echo "Diffwrf io_int will be built later on in this compile. No need to rerun compile. "
 
-superclean:
+clean :
+
+superclean: clean
 			/bin/rm -f *.f *.o *.mod libwrfio_int.a diffwrf 

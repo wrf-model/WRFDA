@@ -42,6 +42,8 @@ field_routines.o:	field_routines.F90
 			$(CPP1) field_routines.F90 > field_routines.f
 			$(FC) $(FFLAGS) -c field_routines.f
 
-superclean:
+clean :
+
+superclean: clean
 			/bin/rm -f *.f *.o testWRFWrite testWRFRead \
 			*.mod libwrfio_nf.a diffwrf
