@@ -4,7 +4,7 @@ setup : depend
 
 makedepf90 : 
 	@ ( cd $(EXTERNAL)/makedepf90/makedepf90-2.8.8; export CC=$(CC_TOOLS); \
-          ./configure; touch find_dep.c find_dep.h; make )
+          touch configure; ./configure; touch find_dep.c find_dep.h; make )
 	cp $(EXTERNAL)/makedepf90/makedepf90-2.8.8/makedepf90 .
 
 links : 
