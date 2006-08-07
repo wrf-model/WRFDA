@@ -39,6 +39,7 @@
  e_sn                                = 82,    97,    91,
  s_vert                              = 1,     1,     1,
  e_vert                              = 28,    28,    28,
+ num_metgrid_levels                  = 27
  dx                                  = 10000,  3333,  1111,
  dy                                  = 10000,  3333,  1111,
  grid_id                             = 1,     2,     3,
@@ -82,6 +83,8 @@
  base_temp                           = 290.
  khdif                               = 0,      0,      0,
  kvdif                               = 0,      0,      0,
+ diff_6th_opt                        = 0,
+ diff_6th_rate                       = 0.24,
  non_hydrostatic                     = .true., .true., .true.,
  /
 
