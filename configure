@@ -237,6 +237,20 @@ else
   echo "PHDF5 not set in environment. Will configure WRF for use without."
 fi
 
+if [ -n "$HDF" ] ; then
+  echo "Will use HDF in dir: $HDF"
+else
+  # No-one cares
+  # echo "HDF not set in environment. Will configure WRF for use without."
+fi
+
+if [ -n "$HDFEOS" ] ; then
+  echo "Will use HDFEOS in dir: $HDFEOS"
+else
+  # No-one cares
+  # echo "HDFEOS not set in environment. Will configure WRF for use without."
+fi
+
 # Users who are cross-compiling can set environment variable 
 # $WRF_OS to override the value normally obtained from `uname`.  
 # If $WRF_OS is set, then $WRF_MACH can also be set to override 
@@ -299,7 +313,8 @@ fi
 
 # Found perl, so proceed with configuration
 if test -n "$PERL" ; then
-   $PERL arch/Config.pl -perl=$PERL -netcdf=$NETCDF -phdf5=$PHDF5 -os=$os -mach=$mach -ldflags=$ldflags \
+   $PERL arch/Config.pl -perl=$PERL -netcdf=$NETCDF -phdf5=$PHDF5 \
+   -hdf=$HDF -hdfeos=$HDFEOS -os=$os -mach=$mach -ldflags=$ldflags \
    -compileflags=$compileflags
 fi
 

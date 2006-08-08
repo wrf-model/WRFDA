@@ -13,6 +13,8 @@ $sw_var4d_core = "" ;
 $sw_perl_path = perl ;
 $sw_netcdf_path = "" ;
 $sw_phdf5_path=""; 
+$sw_hdf_path=""; 
+$sw_hdfeos_path=""; 
 $sw_jasperlib_path=""; 
 $sw_jasperinc_path=""; 
 $sw_esmflib_path="";
@@ -56,6 +58,12 @@ while ( substr( $ARGV[0], 0, 1 ) eq "-" ) {
   }
   if ( substr( $ARGV[0], 1, 6 ) eq "phdf5=" ) {
     $sw_phdf5_path = substr( $ARGV[0], 7 ) ;
+  }
+  if ( substr( $ARGV[0], 1, 4 ) eq "hdf=" ) {
+    $sw_hdf_path = substr( $ARGV[0], 5 ) ;
+  }
+  if ( substr( $ARGV[0], 1, 7 ) eq "hdfeos=" ) {
+    $sw_hdfeos_path = substr( $ARGV[0], 8 ) ;
   }
   if ( substr( $ARGV[0], 1, 6 ) eq "rttov=" ) {
     $sw_rttov_path = substr( $ARGV[0], 7 ) ;
@@ -201,6 +209,22 @@ while ( <CONFIGURE_PREAMBLE> ) {
     $_ =~ s:CONFIGURE_PHDF5_PATH::g ;
     $_ =~ s:CONFIGURE_WRFIO_PHDF5::g ;
     $_ =~ s:CONFIGURE_PHDF5_FLAG::g ;
+  }
+
+  if ( $sw_hdf_path ) { 
+    $_ =~ s:CONFIGURE_HDF_LIB:$sw_hdf_path/NewHDF/lib: ;
+    $_ =~ s:CONFIGURE_HDF_INC:$sw_hdf_path/NewHDF/include: ;
+  } else { 
+    $_ =~ s:CONFIGURE_HDF_LIB::g ;
+    $_ =~ s:CONFIGURE_HDF_INC::g ;
+  }
+
+  if ( $sw_hdfeos_path ) { 
+    $_ =~ s:CONFIGURE_HDFEOS_LIB:$sw_hdfeos_path/lib: ;
+    $_ =~ s:CONFIGURE_HDFEOS_INC:$sw_hdfeos_path/include: ;
+  } else { 
+    $_ =~ s:CONFIGURE_HDFEOS_LIB::g ;
+    $_ =~ s:CONFIGURE_HDFEOS_INC::g ;
   }
 
   if ( $sw_jasperlib_path && $sw_jasperinc_path ) 

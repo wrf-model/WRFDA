@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/ksh
 
 export DA_CORE=0
 export EM_CORE=0
@@ -6,6 +6,8 @@ export NMM_CORE=0
 export COAMPS_CORE=0
 export EXP_CORE=0
 export VAR4D_CORE=0
+export HDF=${HDF:-}
+export HDFEOS=${HDFEOS:-}
 
 option=$1
 
@@ -296,6 +298,20 @@ else
   echo "PHDF5 not set in environment. Will configure WRF for use without."
 fi
 
+if [ -n "$HDF" ] ; then
+  echo "Will use HDF in dir: $HDF"
+#else
+  # No-one cares
+  # echo "HDF not set in environment. Will configure WRF for use without."
+fi
+
+if [ -n "$HDFEOS" ] ; then
+  echo "Will use HDFEOS in dir: $HDFEOS"
+#else
+  # No-one cares
+  # echo "HDFEOS not set in environment. Will configure WRF for use without."
+fi
+
 if [ "$option" = "var" ] ; then
   if [ -n "$RTTOV" ] ; then
     echo "Will use RTTOV in dir: $RTTOV"
@@ -367,7 +383,8 @@ fi
 # Found perl, so proceed with configuration
 if test -n "$PERL" ; then
   echo option = $option
-  $PERL arch/Config_new.pl -perl=$PERL -netcdf=$NETCDF -phdf5=$PHDF5 -rttov=$RTTOV -os=$os -mach=$mach -ldflags=$ldflags \
+  $PERL arch/Config_new.pl -perl=$PERL -netcdf=$NETCDF -phdf5=$PHDF5 -hdf=$HDF \
+     -hdfeos=$HDFEOS -rttov=$RTTOV -os=$os -mach=$mach -ldflags=$ldflags \
      -compileflags=$compileflags -registry=$REGISTRY -da_core=$DA_CORE -em_core=$EM_CORE -nmm_core=$NMM_CORE \
      -coamps_core=$COAMPS_CORE -exp_core=$EXP_CORE -var4d_core=$VAR4D_CORE
 fi

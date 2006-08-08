@@ -1,8 +1,0 @@
-+hfile +herr +hblocks +hextelt +hkit +dfan +dfr8 +dfcomp +dfrle +dfimcomp
-+dfjpeg +dfunjpeg +dfp +dfgr +df24 +dfsd +dfgroup +dfconv +dfknat +dfkswap
-+dfkcray +dfkvms +dfkconv +dfkfuji +dfufp2i +vg +vrw +vio +vparse +vconv
-+vsfld +vgp +vhi +tbbt +dfutil +dfstubs +hdfalloc +jutils +jerror +jmemmgr
-+jmemsys +jmemdosa +jcmaster +jcdeflts +jcarith +jccolor +jcexpand +jchuff
-+jcmcu +jcpipe +jcsample +jfwddct +jdmaster +jddeflts +jbsmooth +jdarith
-+jdcolor +jdhuff +jdmcu +jdpipe +jdsample +jquant1 +jquant2 +jrevdct
-

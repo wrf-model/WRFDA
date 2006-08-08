@@ -1,8 +1,0 @@
-#############################
-Expected output for 'hdiff -D -u vdata1 hdifftst1.hdf hdifftst2.hdf'
-#############################
-
----------------------------
-Vdata Name: vdata1 (Data record comparison)
-> 0: V
-< 0: X

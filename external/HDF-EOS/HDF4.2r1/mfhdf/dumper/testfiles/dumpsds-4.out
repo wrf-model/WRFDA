@@ -1,4 +1,0 @@
-#############################
-Expected output for './hdp dumpsds -n Time swf32.hdf'
-#############################
-SDS with name Time: not found

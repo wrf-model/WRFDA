@@ -1,0 +1,36 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: John Bray
+Date: 08/08/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+To save space, make hdf and hdfeos for the rarely used decode_l2_airs
+come from external libraries with paths defined by environment variables
+HDF and HDFEOS
+
+If environment variable CLEAN true, remove RUN_DIR at the end
+of da_run_wrfvar.ksh to save space.
+
+Test results
+------------------------------------------------------
+
+balsam: decode_airs.exe compiles
+
+--------------------------------------------------------------------------------------
+
+File changes:
+------------
+
+A    doc/changes/changes_20060808f.jrb
+M    configure
+M    arch/Config.pl
+M    arch/preamble_new
+M    arch/Config_new.pl
+M    convertor/decode_l2_airs/Makefile
+D    external/HDF-EOS
+M    configure_new
+M    build/decode_l2_airs.make

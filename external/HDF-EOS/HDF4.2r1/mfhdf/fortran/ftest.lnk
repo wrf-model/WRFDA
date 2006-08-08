@@ -1,1 +1,0 @@
-llibc7.lib oldnames.lib llibfor7.lib \hdf\hdf\lib\df.lib ..\xdr\xdr.lib ..\libsrc\netcdf.lib;

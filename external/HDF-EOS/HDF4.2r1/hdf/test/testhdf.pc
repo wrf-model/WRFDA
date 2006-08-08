@@ -1,4 +1,0 @@
-testhdf rig sdstr blocks an anfile extelt file file1 vers sdmms sdnmms slab litend comp tvset conv nbit bitio tree
-testhdf /noi
-testhdf
-..\lib\df.lib,;

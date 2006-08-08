@@ -1,8 +1,0 @@
-#############################
-Expected output for 'hdiff -d -v dset1 hdifftst1.hdf hdifftst2.hdf'
-#############################
-position        dset1           dset1           difference          
-------------------------------------------------------------
-[ 0 1 ]          1               2               1              
-[ 1 0 ]          1               3               2              
-[ 1 1 ]          1               4               3              
