@@ -42,6 +42,10 @@ rm -rf ${RUN_DIR}
 mkdir -p ${RUN_DIR}
 cd $RUN_DIR
 
+# Do we remove the RUN_DIR at the end to save space
+export CLEAN=${CLEAN:-false}
+                       
+
 export DA_FIRST_GUESS=${DA_FIRST_GUESS:-$CS_DIR/$DA_DATE/wrfinput_d01}    # wrfvar "first guess" input.
 export DA_BOUNDARIES=${DA_BOUNDARIES:-$CS_DIR/$DA_DATE/wrfbdy_d01}    # wrfvar boundaries input.
 export DA_OBSERVATIONS=${DA_OBSERVATIONS:-$OB_DIR/$DA_DATE/ob.ascii} # wrfvar observation input.
@@ -391,11 +395,15 @@ fi
 
 # We never look at core files
 
-for DIR in coredir.*; do
+for DIR in $RUN_DIR/coredir.*; do
    if test -d $DIR; then
       rm -rf $DIR
    fi
 done
+
+if $CLEAN; then
+   rm -rf $RUN_DIR
+fi
 
 echo "WRF-Var completed"
 date
