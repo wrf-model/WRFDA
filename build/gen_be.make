@@ -1,7 +1,7 @@
 #
 
 GEN_BE_OBJS = da_gen_be.o da_constants.o da_be_spectral.o module_wrf_error.o \
-  da_tracing.o da_memory.o da_reporting.o
+  module_driver_constants.o da_tracing.o da_memory.o da_reporting.o
 
 be :		setup                   \
                 $(GEN_BE_LIBS)          \

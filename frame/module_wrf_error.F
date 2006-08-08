@@ -20,7 +20,7 @@ END MODULE module_wrf_error
 
 SUBROUTINE wrf_message( str )
   USE module_wrf_error
-  USE module_utility
+!  USE module_utility
   IMPLICIT NONE
   CHARACTER*(*) str
 #if defined( DM_PARALLEL ) && ! defined( STUBMPI) 
@@ -39,7 +39,7 @@ END SUBROUTINE wrf_message
 ! intentionally write to stderr only
 SUBROUTINE wrf_message2( str )
   USE module_wrf_error
-  USE module_utility
+!  USE module_utility
   IMPLICIT NONE
   CHARACTER*(*) str
   write(0,*) str
