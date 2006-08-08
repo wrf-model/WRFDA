@@ -394,6 +394,14 @@ else
   echo "failed on $DATE with error $RC"
 fi
 
+# We never look at core files
+
+for DIR in coredir.*; do
+   if test -d $DIR; then
+      rm -rf $DIR
+   fi
+done
+
 echo "WRF-Var completed"
 date
 
