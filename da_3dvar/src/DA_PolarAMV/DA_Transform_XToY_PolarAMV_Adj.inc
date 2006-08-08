@@ -23,7 +23,9 @@ SUBROUTINE DA_Transform_XToY_PolarAMV_Adj ( iv, xp, jo_grad_y, jo_grad_x )
 
    IF ( iv%num_polaramv > 0 ) THEN
 
-      do n=1, iv % num_polaramv
+!xyh      do n=1, iv % num_polaramv
+
+      DO n=iv%ob_numb(iv%current_ob_time-1)%polaramv + 1, iv%ob_numb(iv%current_ob_time)%polaramv
 
        if(iv%polaramv(n)%loc%proc_domain_with_halo) then
 

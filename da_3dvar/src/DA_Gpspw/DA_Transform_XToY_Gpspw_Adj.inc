@@ -1,4 +1,4 @@
-SUBROUTINE DA_Transform_XToY_Gpspw_Adj( xb, oi, xp, jo_grad_y, jo_grad_x )
+SUBROUTINE DA_Transform_XToY_Gpspw_Adj( xb, iv, xp, jo_grad_y, jo_grad_x )
 !----------------------------------------------------------------
 !  HISTORY
 !
@@ -13,7 +13,7 @@ SUBROUTINE DA_Transform_XToY_Gpspw_Adj( xb, oi, xp, jo_grad_y, jo_grad_x )
    IMPLICIT NONE
 
    TYPE (xb_type), INTENT(IN)    :: xb          ! first guess state.
-   TYPE (ob_type), INTENT(IN)    :: oi          ! obs. inc vector (o-b).
+   TYPE (ob_type), INTENT(IN)    :: iv          ! obs. inc vector (o-b).
    TYPE (xpose_type), INTENT(IN) :: xp          ! Domain decomposition vars.
    TYPE (y_type) , INTENT(IN)    :: jo_grad_y   ! grad_y(jo)
    TYPE (x_type) , INTENT(INOUT) :: jo_grad_x   ! grad_x(jo)
@@ -36,19 +36,21 @@ SUBROUTINE DA_Transform_XToY_Gpspw_Adj( xb, oi, xp, jo_grad_y, jo_grad_x )
    REAL,DIMENSION(xp%kts:xp%kte):: model_drho ! model drho at GPS site [kg/m^3]
 !--
 
-   IF ( oi%num_Gpspw > 0 ) THEN
+   IF ( iv%num_Gpspw > 0 ) THEN
 
 
-      do n=1, oi % num_Gpspw
+!xyh      do n=1, iv % num_Gpspw
 
-       if(oi%gpspw(n)%loc%proc_domain_with_halo) then
+      DO n=iv%ob_numb(iv%current_ob_time-1)%gpspw + 1, iv%ob_numb(iv%current_ob_time)%gpspw
 
-         i = oi%gpspw(n)%loc%i
-         dy = oi%gpspw(n)%loc%dy
-         dym = oi%gpspw(n)%loc%dym
-         j = oi%gpspw(n)%loc%j
-         dx = oi%gpspw(n)%loc%dx
-         dxm = oi%gpspw(n)%loc%dxm
+       if(iv%gpspw(n)%loc%proc_domain_with_halo) then
+
+         i = iv%gpspw(n)%loc%i
+         dy = iv%gpspw(n)%loc%dy
+         dym = iv%gpspw(n)%loc%dym
+         j = iv%gpspw(n)%loc%j
+         dx = iv%gpspw(n)%loc%dx
+         dxm = iv%gpspw(n)%loc%dxm
 
 !  Initialise the varibles
          dpw           = 0.
@@ -57,7 +59,7 @@ SUBROUTINE DA_Transform_XToY_Gpspw_Adj( xb, oi, xp, jo_grad_y, jo_grad_x )
          model_rho(:)  = 0.
          model_drho(:) = 0.
 
-         obs_terr   = oi%gpspw(n)%info%elv
+         obs_terr   = iv%gpspw(n)%info%elv
          model_terr = dym*(dxm*xb%terr(i,j)   + dx*xb%terr(i+1,j)) + &
                       dy *(dxm*xb%terr(i,j+1) + dx*xb%terr(i+1,j+1))
          

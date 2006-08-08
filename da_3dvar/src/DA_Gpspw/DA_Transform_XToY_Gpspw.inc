@@ -38,9 +38,11 @@ SUBROUTINE DA_Transform_XToY_Gpspw ( xb, iv, xa, xp, y )
 
    IF ( iv%num_Gpspw > 0 ) THEN
 
-      y % gpspw(:)% tpw = 0.0
+!xyh      y % gpspw(:)% tpw = 0.0
 
-      do n=1, iv % num_Gpspw
+!xyh      do n=1, iv % num_Gpspw
+
+      DO n=iv%ob_numb(iv%current_ob_time-1)%gpspw + 1, iv%ob_numb(iv%current_ob_time)%gpspw
 
        if(iv%gpspw(n)%loc%proc_domain_with_halo) then
 
