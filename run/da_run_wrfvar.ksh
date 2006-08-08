@@ -22,14 +22,9 @@ export DA_DATE=${DA_DATE:-2003010112}       # Analysis date.
 
 #Default directories/files:
 
-export RELEASE=${RELEASE:-WRF_V2.1.2}
-export REL_DIR=${REL_DIR:-$HOME/code_development/$RELEASE}
+export REL_DIR=${REL_DIR:-$HOME/trunk}
 export DA_DIR=${DA_DIR:-$REL_DIR/wrfvar}
-export DA_BUILD_DIR=${DA_BUILD_DIR:-$DA_DIR/main}
-export DA_INC_DIR=${DA_INC_DIR:-$DA_DIR/inc}
 export WRFPLUS_DIR=${WRFPLUS_DIR:-$REL_DIR/wrfplus}
-export WRFPLUS_BUILD_DIR=${WRFPLUS_BUILD_DIR:-$WRFPLUS_DIR/main}
-export WRFPLUS_INC_DIR=${WRFPLUS_INC_DIR:-$WRFPLUS_DIR/inc}
 export DA_ID=${DA_ID:-wrfvar}
 export HOSTS=${HOSTS:-$PWD/hosts}
 export REGION=${REGION:-con200}
@@ -56,9 +51,9 @@ export DA_SSMI=${DA_SSMI:-$OB_DIR/$DA_DATE/ssmi.dat}               # SSM/I radia
 export DA_RADAR=${DA_RADAR:-$OB_DIR/$DA_DATE/radar.dat}            # Radar data (ignore if not using).
 
 # DA_FG01_DATE=$DA_DATE
-# DA_FG02_DATE=`$DA_BUILD_DIR/advance_cymdh.exe $DA_FG01 1`
-# DA_FG03_DATE=`$DA_BUILD_DIR/advance_cymdh.exe $DA_FG01 2`
-# DA_FG04_DATE=`$DA_BUILD_DIR/advance_cymdh.exe $DA_FG01 3`
+# DA_FG02_DATE=`$DA_DIR/main/advance_cymdh.exe $DA_FG01 1`
+# DA_FG03_DATE=`$DA_DIR/main/advance_cymdh.exe $DA_FG01 2`
+# DA_FG04_DATE=`$DA_DIR/main/advance_cymdh.exe $DA_FG01 3`
 # export DA_FG01=${DA_FG01:-$OB_DIR}
 
 export RTTOV=${RTTOV:-$HOME/rttov/rttov85}                            # RTTOV
@@ -89,7 +84,7 @@ export NL_START_HOUR=$DA_HH
 
 export NL_ANALYSIS_DATE=${DA_CY}-${DA_MM}-${DA_DD}_${DA_HH}:00:00.0000
 
-export DA_END_DATE=`$DA_BUILD_DIR/advance_cymdh.exe $DA_DATE $NL_RUN_HOURS`
+export DA_END_DATE=`$DA_DIR/main/advance_cymdh.exe $DA_DATE $NL_RUN_HOURS`
 
 export DA_CY=`echo $DA_END_DATE | cut -c1-4`
 export DA_MM=`echo $DA_END_DATE | cut -c5-6`
@@ -137,9 +132,9 @@ fi
 cp $DA_DIR/run/gribmap.txt .
 cp $DA_DIR/run/LANDUSE.TBL .
 cp $DA_DIR/run/gmao_airs_bufr.tbl .
-cp $DA_BUILD_DIR/wrfvar.exe  wrfvar.exe
+cp $DA_DIR/main/wrfvar.exe  wrfvar.exe
 if test $NL_LVAR4D = .TRUE.; then
-  cp $WRFPLUS_BUILD_DIR/wrfplus.exe  wrfplus.exe
+  cp $WRFPLUS_DIR/main/wrfplus.exe  wrfplus.exe
   ln -s $DA_DIR/run/*sh .
   export PATH=$DA_DIR/run:$PATH
 fi
@@ -239,26 +234,26 @@ if test $NL_LVAR4D = .TRUE.; then
 
    export NL_DYN_OPT=2
    export NL_INPUT_OUTNAME='wrfvar_input_d<domain>_<date>'
-   . $WRFPLUS_INC_DIR/namelist_script.inc
+   . $WRFPLUS_DIR/inc/namelist_script.inc
    mv namelist.input namelist.var4dnl
 
 
    export NL_DYN_OPT=202
    export NL_INPUT_OUTNAME='wrfvar_input_d<domain>_<date>'
    export NL_AUXINPUT3_INNAME='auxinput3_d<domain>_<date>'
-   . $WRFPLUS_INC_DIR/namelist_script.inc
+   . $WRFPLUS_DIR/inc/namelist_script.inc
    mv namelist.input namelist.var4dad
 
 
    export NL_DYN_OPT=302
    export NL_INPUT_OUTNAME='tl<date>'
    export NL_AUXHIST3_OUTNAME='auxhist3_d<domain>_<date>'
-   . $WRFPLUS_INC_DIR/namelist_script.inc
+   . $WRFPLUS_DIR/inc/namelist_script.inc
    mv namelist.input namelist.var4dtl
    export NL_DYN_OPT=2
 fi
 
-. $DA_INC_DIR/namelist_script.inc
+. $DA_DIR/inc/namelist_script.inc
 
 
 
