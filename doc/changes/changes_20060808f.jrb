@@ -12,9 +12,6 @@ To save space, make hdf and hdfeos for the rarely used decode_l2_airs
 come from external libraries with paths defined by environment variables
 HDF and HDFEOS
 
-If environment variable CLEAN true, remove RUN_DIR at the end
-of da_run_wrfvar.ksh to save space.
-
 Test results
 ------------------------------------------------------
 
