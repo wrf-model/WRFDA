@@ -24,6 +24,9 @@ subroutine da_setup_bufrtovs_structures( xp, ob, iv )
    logical                     :: lprinttovs 
    
    integer                     :: myproc, ierr
+
+   if (trace_use) call da_trace_entry("da_setup_bufrtovs_structures")
+
 !-------------------------------------------------------------------
 !  [1.0] Initialize RTTOV coefs and innovations vector for radiance
 !-------------------------------------------------------------------
@@ -241,6 +244,9 @@ if ( lprinttovs ) then
   close(UNIT=innov_vector_unit)
  end do
 end if
+
+
+   if (trace_use) call da_trace_exit("da_setup_bufrtovs_structures")
 
  return
 
