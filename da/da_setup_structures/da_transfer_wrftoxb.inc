@@ -296,6 +296,15 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
        xb%lanu(i,j) = lu_index(i,j)
        xb%landmask(i,j) = landmask(i,j)
        xb%xland(i,j) = xland(i,j)
+! Z. Liu below are variables used by RTTOV
+       xb%tsk(i,j) = tsk(i,j)
+       xb%smois(i,j) = smois(i,j,1)
+       xb%tslb(i,j) = tslb(i,j,1)
+       xb%xice(i,j) = xice(i,j)
+       xb%ivgtyp(i,j) = ivgtyp(i,j)
+       xb%isltyp(i,j) = isltyp(i,j)
+       xb%vegfra(i,j) = vegfra(i,j)
+       xb%snowh(i,j) = snow(i,j)*10.     ! convert snow water equivalent kg/m2 to snow depth mm
      enddo
 
 #if 0

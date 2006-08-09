@@ -1,4 +1,4 @@
-subroutine da_read_bufrtovs (obstype, iv, xp, lnbufr, infile)
+subroutine da_read_bufrtovs (obstype,iv,xp,lnbufr,infile)
 !------------------------------------------------------------------------------
 !  PURPOSE: read in NCEP bufr tovs 1b data to innovation structure
 !
@@ -6,8 +6,8 @@ subroutine da_read_bufrtovs (obstype, iv, xp, lnbufr, infile)
 !            so that da_scan_bufrtovs is not necessary any more.
 !            1. read file radiance data in sequential data structure
 !            2. do gross QC check
-!            2. assign sequential data structure to innovation structure
-!                  and deallocate sequential data structure
+!            3. assign sequential data structure to innovation structure
+!               and deallocate sequential data structure
 !
 !  HISTORY: 07/2005 - Creation            Zhiquan Liu
 !
@@ -66,6 +66,7 @@ subroutine da_read_bufrtovs (obstype, iv, xp, lnbufr, infile)
    integer   :: platform_id, satellite_id, sensor_id
 ! pixial information
    integer   ::  year,month,day,hour,minute,second  ! observation time
+   real      ::  obs_time
    integer   ::  scanline, scanpos
    real      ::  rlat, rlon                         !  lat/lon in degrees   for Anfovs
    real      ::  satzen, satazi, solzen, solazi     !  scan angles for Anfovs
@@ -78,7 +79,7 @@ subroutine da_read_bufrtovs (obstype, iv, xp, lnbufr, infile)
 
   type (datalink), pointer    :: head, p, current
 
-  integer                        ::  inst, size, error
+  integer                        ::  inst, size, error, ifgat
   type(info_type)                ::  info
   type(model_loc_type)           ::  loc
 
@@ -157,7 +158,7 @@ subroutine da_read_bufrtovs (obstype, iv, xp, lnbufr, infile)
   call datelen(10)
   call readmg(lnbufr,subset,idate,iret)
   if( subset /= subfgn) then
-     write(UNIT=stderr,FMT=*) 'READ_BUFRTOVS:  *** WARNING: ',&
+     write(UNIT=stderr,FMT=*) 'da_read_bufrtovs:  *** WARNING: ',&
           'THE FILE TITLE NOT MATCH DATA SUBSET'
      write(UNIT=stderr,FMT=*) '  infile=', lnbufr, infile,' subset=',&
           subset, ' subfgn=',subfgn
@@ -175,7 +176,6 @@ subroutine da_read_bufrtovs (obstype, iv, xp, lnbufr, infile)
   write(UNIT=stdout,FMT=*) &
     'da_read_bufrtovs: bufr file date is ',iy,im,idd,ihh,infile
 
-
 ! Loop to read bufr file and assign information to a sequential structure
 !-------------------------------------------------------------------------
 
@@ -188,9 +188,9 @@ subroutine da_read_bufrtovs (obstype, iv, xp, lnbufr, infile)
   do while (IREADMG(lnbufr,subset,idate)==0 .and. subset==subfgn)
      do while (IREADSB(lnbufr)==0)
 
-!  open(UNIT=15, file='bufr.out')
+!  open(15, file='bufr.out')
 !  call ufbdmp(lnbufr, 6)
-!  close(UNIT=15)
+!  close(15)
 !  return
 
 
@@ -218,7 +218,7 @@ subroutine da_read_bufrtovs (obstype, iv, xp, lnbufr, infile)
 !
         satellite_id = nint(bfr1bhdr(1))-191
         ifov = nint(bfr1bhdr(2))    
-        scanpos = ifov
+
 !  QC2:  limb pixel rejected (not implemented)
 
 !  3.2     Extract date information.
@@ -230,10 +230,23 @@ subroutine da_read_bufrtovs (obstype, iv, xp, lnbufr, infile)
         minute = bfr1bhdr(7) !minute
         second = bfr1bhdr(8) !second
 
-   write(UNIT=info%date_char,FMT='(i4,a,i2.2,a,i2.2,a,i2.2,a,i2.2,a,i2.2)')  &
+   write(UNIT=info%date_char, FMT='(i4,a,i2.2,a,i2.2,a,i2.2,a,i2.2,a,i2.2)')  &
             year, '-', month, '-', day, '_', hour, ':', minute, ':', second
 
 !  QC3: time consistency check with the background date
+
+      IF (year .LE. 99) THEN
+        IF (year .LT. 78) THEN
+          year = year + 2000
+        ELSE
+          year = year + 1900
+        ENDIF
+      ENDIF
+
+      call da_get_julian_time(year,month,day,hour,minute,obs_time)
+
+      if ( obs_time < time_slots(0) .or.  &
+           obs_time >= time_slots(num_fgat_time) ) cycle
 
 !  3.3     Find wrfvar instrument index from RTTOV instrument triplet
 !          go to next data if id is not in the lists
@@ -252,9 +265,16 @@ subroutine da_read_bufrtovs (obstype, iv, xp, lnbufr, infile)
           .or. satellite_id /= rtminit_satid(inst) &
           .or. sensor_id /= rtminit_sensor(inst)  ) cycle
 
+!  3.2.1   determine FGAT index ifgat
+!
+       do ifgat=1,num_fgat_time
+           if ( obs_time >= time_slots(ifgat-1) .and.  &
+                obs_time  < time_slots(ifgat) ) exit
+       end do
+
 !  3.4     extract satellite and solor angle
 !
-        panglr=(start+(ifov-1)*step)*deg2rad
+        panglr=(start+float(ifov-1)*step)*deg2rad
         if(hirs2 .or. msu)then
            satzen = asin(rato*sin(panglr))*rad2deg
            satzen = abs(satzen)
@@ -266,7 +286,7 @@ subroutine da_read_bufrtovs (obstype, iv, xp, lnbufr, infile)
 !           if(hirs3 .and. ifov .le. 28) satzen=-satzen
         end if
         satazi = panglr*rad2deg            ! look angle
-        if(satazi<0.0) satazi = satazi+360.0
+!        if(satazi<0.0) satazi = satazi+360.0
         solzen = bfr1bhdr(12)              ! solar zenith angle
 
 !  3.5    extract surface information
@@ -293,14 +313,17 @@ subroutine da_read_bufrtovs (obstype, iv, xp, lnbufr, infile)
    p%rad%info             = info
    p%rad%loc              = loc
    p%rad%landsea_mask     = landsea_mask
-   p%rad%scanpos          = scanpos
+   p%rad%scanpos          = ifov
    p%rad%satzen           = satzen
-   p%rad%satazi            = satazi
+   p%rad%satazi           = satazi
    p%rad%solzen           = solzen
    p%rad%tb(1:nchanl)%inv = tb(1:nchanl)
    p%sensor_index         = inst
+   p%ifgat                = ifgat
 
    size = size + 1
+!   print *, size,year,month,day,hour,minute,second,obs_time,ifgat
+
    allocate ( p%next, stat=error)   ! add next data
    if (error /= 0 ) then
      call da_error(__FILE__,__LINE__, &
@@ -341,13 +364,13 @@ subroutine da_read_bufrtovs (obstype, iv, xp, lnbufr, infile)
   p => head
 !  do while ( associated(p) )
   do i = 1, size
-
    inst = p%sensor_index
    nread(inst) = nread(inst) + 1
 
    iv%instid(inst)%rad(nread(inst))%info   =  p%rad%info
    iv%instid(inst)%rad(nread(inst))%loc    =  p%rad%loc
 
+   iv%instid(inst)%rad(nread(inst))%ifgat  =  p%ifgat
    iv%instid(inst)%rad(nread(inst))%landsea_mask = p%rad%landsea_mask
 !   iv%instid(inst)%rad(nread(inst))%scanline
    iv%instid(inst)%rad(nread(inst))%scanpos      = p%rad%scanpos
@@ -355,16 +378,13 @@ subroutine da_read_bufrtovs (obstype, iv, xp, lnbufr, infile)
    iv%instid(inst)%rad(nread(inst))%satazi = p%rad%satazi
    iv%instid(inst)%rad(nread(inst))%solzen = p%rad%solzen
 !   iv%instid(inst)%rad(nread(inst))%solazi
-   allocate ( iv%instid(inst)%rad(nread(inst))%tb(1:nchanl), stat = error  )
-     IF (error /= 0) THEN
-       call da_error(__FILE__,__LINE__, &
-         & (/"mem allocation error to iv%instid(inst)%rad(nread(inst))%tb"/))
-     END IF
+   allocate ( iv%instid(inst)%rad(nread(inst))%tb(1:nchanl), stat = error )
+   IF (error /= 0) THEN
+     call da_error(__FILE__,__LINE__, &
+       & (/"mem allocation error to iv%instid(inst)%rad(nread(inst))%tb"/))
+   END IF
    iv%instid(inst)%rad(nread(inst))%tb(1:nchanl)%inv = p%rad%tb(1:nchanl)%inv
-!   iv%instid(inst)%rad(nread(inst))%inv(1:nchanl) = 0.0
-!   iv%instid(inst)%rad(nread(inst))%err(1:nchanl) = 0.0
 
-!   print *, inst, nread(inst), iv%instid(inst)%rad(nread(inst))%tb(1:nchanl)%inv
    current => p
    p => p%next
 

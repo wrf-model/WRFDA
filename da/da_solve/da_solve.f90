@@ -89,7 +89,7 @@ SUBROUTINE da_solve ( grid , config_flags , &
 
    IF (use_Hirs2Obs .OR. use_Hirs3Obs .OR. use_MsuObs .OR. use_AmsuaObs .OR. &
       use_AmsubObs .OR. use_AirsObs .OR. use_Eos_AmsuaObs .OR. &
-      use_Eos_RadObs .OR. use_HsbObs .OR. use_kma1dvar) THEN
+      use_Eos_RadObs .OR. use_HsbObs .OR. use_kma1dvar .OR. use_filtered_rad) THEN
       use_radiance = .TRUE.
    ELSE
       use_radiance = .FALSE.
@@ -390,6 +390,13 @@ SUBROUTINE da_solve ( grid , config_flags , &
       ! [8.7] Write out diagnostics
 
       call da_write_diagnostics( ob, iv, re, y, xp, xa, j )
+
+      ! [8.8] Write Ascii radiance OMB and OMA file
+
+      if ( lwrite_oa_rad_ascii ) then
+        write(UNIT=stdout,FMT=*)  ' writing radiance OMB and OMA ascii file'
+        CALL da_write_oa_rad_ascii(xp,ob,iv,re)
+      end if
 
       !------------------------------------------------------------------------
       ! [8.0] Output WRFVAR analysis and analysis increments:

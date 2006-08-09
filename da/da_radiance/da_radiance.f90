@@ -38,13 +38,14 @@ module da_radiance
    real, parameter             :: q2ppmv = 1.60771704e+6
    integer                     :: n_scatt_coef
    character(len=5), pointer   :: coefs_scatt_instname(:)
+   real,             pointer   :: time_slots(:)
    TYPE( rttov_coef ), pointer :: coefs(:)         ! RTTOV8_5 coefficients
    TYPE( rttov_scatt_coef ), pointer :: coefs_scatt(:)
 
    TYPE datalink
      type (rad_type)           :: rad
      type (residual_rad_type)  :: rad_ob
-     integer                   :: sensor_index
+     integer                   :: sensor_index,ifgat
      type (datalink), pointer  :: next ! pointer to next data
    END TYPE datalink
 
@@ -80,7 +81,7 @@ module da_radiance
    END TYPE maxmin_rad_stats_type
 
    TYPE stats_rad_type
-        TYPE (maxmin_rad_stats_type)  :: ichan(19)
+        TYPE (maxmin_rad_stats_type), pointer  :: ichan(:)
    END TYPE stats_rad_type
 
    TYPE rad_header_type                       ! innovation file header
@@ -164,6 +165,7 @@ module da_radiance
         real   , pointer   :: std(:,:)      ! std of bias corr file
         real   , pointer   :: a(:,:)        ! bias corr coef a Tb*(xb)=a+b*Tb(xb)
         real   , pointer   :: b(:,:)        ! bias corr coef b
+        real   , pointer   :: error_factor(:) ! error tuning factor
    END TYPE satinfo_type
    
    TYPE (satinfo_type), pointer :: satinfo(:)
@@ -176,6 +178,10 @@ CONTAINS
 #include "da_qc_rad.inc"
 #include "da_qc_amsua.inc"
 #include "da_qc_amsub.inc"
+#include "da_write_iv_rad_ascii.inc"
+#include "da_write_filtered_rad.inc"
+#include "da_read_filtered_rad.inc"
+#include "da_write_oa_rad_ascii.inc"
 #include "da_get_innov_vector_rad.inc"
 #include "da_detsurtyp.inc"
 #include "da_oma_stats_rad.inc"
@@ -184,6 +190,8 @@ CONTAINS
 #include "da_transform_xtoy_rad.inc"
 #include "da_transform_xtoy_rad_adj.inc"
 #include "da_calculate_grady_rad.inc"
+#include "da_get_julian_time.inc"
+#include "da_get_time_slots.inc"
 
 #include "da_rtm_init.inc"
 #include "da_rtm_direct.inc"
@@ -192,6 +200,7 @@ CONTAINS
 #include "da_read_bufrtovs.inc"
 #include "da_read_bufrairs.inc"
 #include "da_read_kma1dvar.inc"
+#include "da_sort_rad.inc"
 #include "da_setup_bufrtovs_structures.inc"
 
 #include "gsi_emiss.inc"

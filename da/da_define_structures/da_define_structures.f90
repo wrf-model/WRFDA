@@ -430,7 +430,7 @@ module da_define_structures
       TYPE (info_type)        :: info
       TYPE (model_loc_type)   :: loc
 
-        integer   ::  landsea_mask
+        integer   ::  ifgat, landsea_mask
         integer   ::  scanline, scanpos
         real      ::  satzen, satazi, solzen, solazi        !  satellite and solar angles
         ! channels' bright temperature
@@ -477,7 +477,7 @@ module da_define_structures
                  profiler, &
                  buoy, &
                  Radar, &
-                 radiance, &
+                 radiance(maxsensor), &
                  airsr
    END TYPE ob_numb_type
 
@@ -788,6 +788,11 @@ module da_define_structures
    !--------------------------------------------------------------------------
    ! [5.0] Control variable structure:
    !--------------------------------------------------------------------------
+   
+   type jo_type_rad
+      integer, pointer :: num_ichan(:)
+      real, pointer    :: jo_ichan(:)
+   end type jo_type_rad
 
    type jo_type
       real                :: total
@@ -813,7 +818,7 @@ module da_define_structures
       real                :: Radar_rv, Radar_rf
       real                :: bogus_u, bogus_v, bogus_t, bogus_q, bogus_slp
       real                :: airsr_t, airsr_q
-      real, pointer       :: rad(:)
+      type(jo_type_rad), pointer       :: rad(:)
    end type jo_type
 
    type j_type

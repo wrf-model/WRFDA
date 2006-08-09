@@ -32,7 +32,7 @@ subroutine da_transform_xtoy_rad_adj ( iv, xp, jo_grad_y, jo_grad_x )
    
    REAL, DIMENSION(xp%kms:xp%kme)   :: v_p      ! Model value p at ob hor. location.
 
-   INTEGER            :: inst, nprofiles, nchanl, unit, iprof, ios
+   INTEGER            :: inst, nprofiles, nchanl, unit, iprof, ios, iscan
    REAL,    pointer   :: zk(:)
    REAL,    pointer   :: pres(:)
    character(len=30)  :: filename
@@ -46,7 +46,6 @@ subroutine da_transform_xtoy_rad_adj ( iv, xp, jo_grad_y, jo_grad_x )
    if (trace_use) call da_trace_entry("da_transform_xtoy_rad_adj")
 
    alloc_status (:) = 0
-
 
  do inst = 1, iv%num_inst                 ! loop for sensor
      if ( iv%instid(inst)%num_rad < 1 ) cycle
@@ -76,9 +75,13 @@ subroutine da_transform_xtoy_rad_adj ( iv, xp, jo_grad_y, jo_grad_x )
 !------------------------------------------------------------------------
 !        [1.0] assign tb = R^-1 Re :
 !------------------------------------------------------------------------
-
+         iscan = iv%instid(inst)%rad(n)%scanpos
          do k = 1, nchanl
-           tb(nprofiles,k) = jo_grad_y%instid(inst)%rad(n)%tb(k) 
+           if (lbiascorr) then
+             tb(nprofiles,k) = satinfo(inst)%b(iscan+1,k)* jo_grad_y%instid(inst)%rad(n)%tb(k)
+           else
+             tb(nprofiles,k) = jo_grad_y%instid(inst)%rad(n)%tb(k) 
+           end if
          end do
 
 !---------------------------------------------
@@ -146,7 +149,6 @@ subroutine da_transform_xtoy_rad_adj ( iv, xp, jo_grad_y, jo_grad_x )
 !
 !    adjoint of q(kg/kg) to ppmv
 !
-!               con_vars_ad(nprofiles)%q(k) = model_mr(k) * 1.60771704e+6
                con_vars_ad(nprofiles)%q(k) = model_mr(k) * q2ppmv
 !               call rttov_v2q (&
 !                 & gas_unit_ppmv,      &! in
@@ -160,7 +162,7 @@ subroutine da_transform_xtoy_rad_adj ( iv, xp, jo_grad_y, jo_grad_x )
 !
 !   adjoint ofconvert to hPa
 !
-         con_vars_ad(nprofiles)% ps = con_vars_ad(nprofiles)% ps / 100.0 
+         con_vars_ad(nprofiles)% ps = con_vars_ad(nprofiles)% ps*0.01 
          
 !
 !        [4.3] Interpolate horizontally from ob to grid:

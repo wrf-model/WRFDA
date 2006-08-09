@@ -13,10 +13,6 @@
 
    IMPLICIT NONE
    
-#ifdef DM_PARALLEL
-   INCLUDE 'mpif.h'
-#endif
-
 !#include "rttov_q2v.interface"
 
    INTEGER, INTENT(IN)            :: it       ! External iteration.
@@ -50,14 +46,12 @@
                                        model_qci, model_qsn, &
                                        model_qgr, model_qm
 
-   INTEGER            :: inst, nprofiles, nchanl, iprof, ios
+   INTEGER            :: inst, nprofiles, nchanl, iprof
    INTEGER            :: nfrequencies, nchannels, nbtout
    REAL,    pointer   :: zk(:), polar(:)
    REAL,    pointer   :: pres(:)
-   character(len=30)  :: filename
    real,    pointer   :: tb(:,:)
    logical            :: amsua, amsub, mhs, ssmi
-   integer            :: myproc, ierr, ndomain
 
    integer            :: ip,kn,knchpf,sensor_type
    integer, pointer   :: kprof(:), kchan(:),kochan(:),knchan(:),indexn(:,:)
@@ -72,11 +66,6 @@
    REAL, dimension(xp%kms:xp%kme)     :: vtm, clw, dlnpf
    REAL, dimension(xp%kms:xp%kme+1)   :: pf
    REAL                               :: clwp
-
-
-#ifdef DM_PARALLEL
-   LOGICAL, EXTERNAL :: wrf_dm_on_monitor
-#endif
 
    alloc_status (:) = 0
 
@@ -108,7 +97,11 @@
 
      pres(1:num_levs) = coefs(inst) % ref_prfl_p(1:num_levs)
 
-   do n= 1, iv%instid(inst)%num_rad           ! loop for pixel
+    if (iv%ob_numb(iv%current_ob_time)%radiance(inst) <= &
+        iv%ob_numb(iv%current_ob_time-1)%radiance(inst) ) cycle
+
+!   do n= 1, iv%instid(inst)%num_rad           ! loop for pixel
+    do n= iv%ob_numb(iv%current_ob_time-1)%radiance(inst)+1, iv%ob_numb(iv%current_ob_time)%radiance(inst)
 !      if ( n > iv%instid(inst)%num_rad ) exit
       if(iv%instid(inst)%rad(n)%loc%proc_domain_with_halo) then
 
@@ -167,9 +160,9 @@
 
 !        [1.2] Interpolate horizontally to ob:
 
-         call da_interp_lin_3d( xb%t, xp, i, j, dx, dy, dxm, dym, &      ! temperature
+         call da_interp_lin_3D( xb%t, xp, i, j, dx, dy, dxm, dym, &      ! temperature
                               model_t, max_ob_levels, zk, num_levs )
-         call da_interp_lin_3d( xb%q, xp, i, j, dx, dy, dxm, dym, &      ! specific humidity
+         call da_interp_lin_3D( xb%q, xp, i, j, dx, dy, dxm, dym, &      ! specific humidity
                               model_q, max_ob_levels, zk, num_levs )
 
          do k=1, num_levs
@@ -178,7 +171,6 @@
                model_t(k) = coefs(inst) % ref_prfl_t(k,gas_id_watervapour)  ! outside model level
                model_mr(k) = coefs(inst) % ref_prfl_mr(k,gas_id_watervapour)
             ELSE
-!            model_mr(k) = model_q(k) * 1.60771704e+6 ! convert q(kg/kg) to ppmv
              model_mr(k) = model_q(k) * q2ppmv
 !               call rttov_q2v (&
 !                 & gas_unit_specconc,  &! in
@@ -192,6 +184,16 @@
             iv%instid(inst)%rad(n)%mr(k) = model_mr(k)
 
          end do
+
+!
+! determine surface type of obs location
+!-----------------------------------------
+         call da_detsurtyp( xb%snow, xb%xice, xb%landmask,  &
+                            xb%ivgtyp, xb%isltyp, &
+                            xp%ims, xp%ime, xp%jms, xp%jme, &
+                            i, j, dx, dy, dxm, dym, &
+                            model_isflg(1),model_ivgtyp(1), model_isltyp(1) )
+
 
          call da_interp_lin_2d( xb % u10, xp%ims, xp%ime, xp%jms, xp%jme, &
                              i, j, dx, dy, dxm, dym, &
@@ -208,9 +210,17 @@
          call da_interp_lin_2d( xb % psfc, xp%ims, xp%ime, xp%jms, xp%jme, &
                              i, j, dx, dy, dxm, dym, &
                              model_psfc )
-         call da_interp_lin_2d( xb % tsk, xp%ims, xp%ime, xp%jms, xp%jme, &
+
+         if ( model_isflg(1) == 0 ) then   ! over sea using SST
+             call da_interp_lin_2d( xb % tgrn, xp%ims, xp%ime, xp%jms, xp%jme, &
                              i, j, dx, dy, dxm, dym, &
                              model_ts(1) )
+         else
+             call da_interp_lin_2d( xb % tsk, xp%ims, xp%ime, xp%jms, xp%jme, &
+                             i, j, dx, dy, dxm, dym, &
+                             model_ts(1) )
+         end if
+
          call da_interp_lin_2d( xb % terr, xp%ims, xp%ime, xp%jms, xp%jme, &
                              i, j, dx, dy, dxm, dym, &
                              model_elv )
@@ -232,16 +242,6 @@
 
 !         model_snowh(1) = model_snowh(1)*100.0   ! convert from m to mm
          model_vegfra(1) = 0.01*model_vegfra(1)  ! convert range to 0~1
-
-!
-! determine surface type of obs location
-!-----------------------------------------
-         call da_detsurtyp( xb%snow, xb%xice, xb%landmask,  &
-                            xb%ivgtyp, xb%isltyp, &
-                            xp%ims, xp%ime, xp%jms, xp%jme, &
-                            i, j, dx, dy, dxm, dym, &
-                            model_isflg(1),model_ivgtyp(1), model_isltyp(1) )
-
 
 ! variables for calculation of cloud affected radiance
 !-------------------------------------------------------
@@ -287,7 +287,6 @@
        enddo
 
           model_psfc = 0.01*model_psfc           ! convert to hPa 
-!          model_mr2m = model_q2m * 1.60771704e+6  ! convert q(kg/kg) to ppmv
           model_mr2m = model_q2m * q2ppmv
 
 !   ADD for computing cloud liquid water path (mm) from guess
@@ -378,7 +377,7 @@
       call rttov_setupchan(nprofiles, nchanl, coefs(inst), &   ! in
                      nfrequencies, nchannels, nbtout )      ! out
 #endif
-      allocate(emissivity(nchannels))
+      Allocate ( emissivity(nchannels))
       Allocate ( iv%instid(inst)%rad(n)%emiss(nchannels))
 
       pemsv(:)    = 0.0
@@ -427,8 +426,6 @@
 
         end do
 
-      if (.not. use_kma1dvar) then
-
 !        [1.3] Call RTM foreward model
 
          !print *, n, iv%instid(inst)%rad(n)%info%lat,iv%instid(inst)%rad(n)%info%lon
@@ -438,12 +435,17 @@
                              con_vars, aux_vars, &
                              tb, calcemis, pemsv, pemsh, emissivity )
 
+       do iprof = 1, nprofiles
+         deallocate (con_vars(iprof) % t)
+         deallocate (con_vars(iprof) % q)
+       end do
+
 !------------------------------------------------------------------------
 !        [2.0] calculate components of innovation vector:
 !------------------------------------------------------------------------
 
          do k = 1, nchanl
-          if ( iv%instid(inst)%rad(n)%tb(k)%inv > missing_r ) then 
+          if ( iv%instid(inst)%rad(n)%tb(k)%inv /= missing_r ) then 
             iv%instid(inst)%rad(n)%tb_xb(k)  = tb(nprofiles,k)
             iv%instid(inst)%rad(n)%tb(k)%inv = &
                ob%instid(inst)%rad(n)%tb(k) - tb(nprofiles,k)
@@ -453,6 +455,12 @@
           end if
          end do
                
+    if (coefs(inst)%id_sensor == 2) then ! microwave
+         iv%instid(inst)%rad(n)%emiss(1:nchanl) = pems5(1:nchanl)
+    else
+         iv%instid(inst)%rad(n)%emiss(1:nchanl) = emissivity(1:nchanl)
+    end if
+
 !------------------------------------------------------------------------
 !        [3.0] Apply Bias Correction 
 !------------------------------------------------------------------------
@@ -461,26 +469,6 @@
                                  ob%instid(inst)%rad(n)%tb, &
                                  iv%instid(inst)%rad(n) )
         end if
-
-!------------------------------------------------------------------------
-!        [4.0] Perform QC check
-!------------------------------------------------------------------------
-            call da_qc_rad(inst,nchanl,  &
-                           ob%instid(inst)%rad(n)%tb, &
-                           iv%instid(inst)%rad(n) )
-
-       end if   ! end if .not. use_kma1dvar
-
-          if (coefs(inst)%id_sensor == 2) then ! microwave
-             iv%instid(inst)%rad(n)%emiss(1:nchanl) = pems5(1:nchanl)
-          else
-             iv%instid(inst)%rad(n)%emiss(1:nchanl) = emissivity(1:nchanl)
-          end if
-
-          do iprof = 1, nprofiles
-             deallocate (con_vars(iprof) % t)
-             deallocate (con_vars(iprof) % q)
-          end do
 
        end if   !  end endif for within_halo
 
@@ -498,267 +486,17 @@
 
   end do        ! end loop for sensor
 
-!  6.0  print iv output
-!------------------------------
- if ( lwrite_iv ) then
-#ifdef DM_PARALLEL
- call MPI_COMM_RANK( MPI_COMM_WORLD, myproc, ierr )
-#endif
- do n = 1, iv%num_inst
-  if (iv%instid(n)%num_rad < 1) cycle
 
-!! count number of obs within the loc%proc_domain
-!!---------------------------------------------
-  ndomain = 0
-  do i =1,iv%instid(n)%num_rad
-
-  if(iv%instid(n)%rad(i)%loc%proc_domain) then
-    ndomain = ndomain + 1
-  end if
-  end do
-#ifdef DM_PARALLEL
-  write(UNIT=stdout,FMT='(a,i3,a,i7)') 'number of obs in proc # ', myproc,' : ', ndomain
-#else
-  write(UNIT=stdout,FMT='(a,i7)') 'number of obs in proc # ', ndomain
-#endif
-
-#ifdef DM_PARALLEL
-  write(UNIT=filename,FMT='(a,i2.2)') trim(iv%instid(n)%rttovid_string)//'.inv_', myproc
-#else
-  write(UNIT=filename,FMT='(a)') trim(iv%instid(n)%rttovid_string)//'.inv'
-#endif
-  open(UNIT=innov_vector_unit,file=trim(filename),form='formatted',iostat=ios)
-  if( ios /= 0 ) Then
-    call da_error(__FILE__,__LINE__,&
-      (/"Cannot open output file "//TRIM(filename)/))
-  Endif
-    write(UNIT=innov_vector_unit,FMT='(a,a,i7,a,i5,a)') &
-      trim(iv%instid(n)%rttovid_string), &
-                        ' number-of-pixels : ', ndomain, &
-                        ' channel-number-of-each-pixel : ', iv%instid(n)%nchan, &
-                        ' index-of-channels : '
-    write(UNIT=innov_vector_unit,FMT='(10i5)') iv%instid(n)%ichan
-    write(UNIT=innov_vector_unit,FMT=*) ' pixel-info : i date scanpos landsea_mask  elv lat lon  satzen satazi '
-    write(UNIT=innov_vector_unit,FMT=*) ' xb-surf-info : i t2m mr2m(ppmv) u10 v10 ps ts smois tslb snowh isflg &
-                    & soiltyp vegtyp vegfra elev clwp'
-   ndomain = 0
-  do i =1,iv%instid(n)%num_rad
-   if(iv%instid(n)%rad(i)%loc%proc_domain) then
-    ndomain=ndomain+1
-    write(UNIT=innov_vector_unit,FMT='(a,i7,2x,a,2i3,f6.0,4f8.2)') &
-      'INFO : ', ndomain, &
-                             iv%instid(n)%rad(i)%info%date_char, &
-                             iv%instid(n)%rad(i)%scanpos,   &
-                             iv%instid(n)%rad(i)%landsea_mask, &
-                             iv%instid(n)%rad(i)%info%elv,  &
-                             iv%instid(n)%rad(i)%info%lat,  &
-                             iv%instid(n)%rad(i)%info%lon, &
-                             iv%instid(n)%rad(i)%satzen,    &
-                             iv%instid(n)%rad(i)%satazi
- if (iv%instid(n)%rad(i)%isflg==0) then
-    write(UNIT=innov_vector_unit,FMT='(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') &
-      ' SEA : ', i, &
-                             iv%instid(n)%rad(i)%t2m, &
-                             iv%instid(n)%rad(i)%mr2m,   &
-                             iv%instid(n)%rad(i)%u10, &
-                             iv%instid(n)%rad(i)%v10,  &
-                             iv%instid(n)%rad(i)%ps,  &
-                             iv%instid(n)%rad(i)%ts,  &
-                             iv%instid(n)%rad(i)%smois,  &
-                             iv%instid(n)%rad(i)%tslb,  &
-                             iv%instid(n)%rad(i)%snowh, &
-                             iv%instid(n)%rad(i)%isflg, &
-                             nint(iv%instid(n)%rad(i)%soiltyp), &
-                             nint(iv%instid(n)%rad(i)%vegtyp), &
-                             iv%instid(n)%rad(i)%vegfra, &
-                             iv%instid(n)%rad(i)%elevation, &
-                             iv%instid(n)%rad(i)%clwp
- else if (iv%instid(n)%rad(i)%isflg==1) then
-   write(UNIT=innov_vector_unit,FMT='(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') &
-     ' ICE : ', i, &
-                             iv%instid(n)%rad(i)%t2m, &
-                             iv%instid(n)%rad(i)%mr2m,   &
-                             iv%instid(n)%rad(i)%u10, &
-                             iv%instid(n)%rad(i)%v10,  &
-                             iv%instid(n)%rad(i)%ps,  &
-                             iv%instid(n)%rad(i)%ts,  &
-                             iv%instid(n)%rad(i)%smois,  &
-                             iv%instid(n)%rad(i)%tslb,  &
-                             iv%instid(n)%rad(i)%snowh, &
-                             iv%instid(n)%rad(i)%isflg, &
-                             nint(iv%instid(n)%rad(i)%soiltyp), &
-                             nint(iv%instid(n)%rad(i)%vegtyp), &
-                             iv%instid(n)%rad(i)%vegfra, &
-                             iv%instid(n)%rad(i)%elevation, &
-                             iv%instid(n)%rad(i)%clwp
- else if (iv%instid(n)%rad(i)%isflg==2) then
-   write(UNIT=innov_vector_unit,FMT='(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') &
-     'LAND : ', i, &
-                             iv%instid(n)%rad(i)%t2m, &
-                             iv%instid(n)%rad(i)%mr2m,   &
-                             iv%instid(n)%rad(i)%u10, &
-                             iv%instid(n)%rad(i)%v10,  &
-                             iv%instid(n)%rad(i)%ps,  &
-                             iv%instid(n)%rad(i)%ts,  &
-                             iv%instid(n)%rad(i)%smois,  &
-                             iv%instid(n)%rad(i)%tslb,  &
-                             iv%instid(n)%rad(i)%snowh, &
-                             iv%instid(n)%rad(i)%isflg, &
-                             nint(iv%instid(n)%rad(i)%soiltyp), &
-                             nint(iv%instid(n)%rad(i)%vegtyp), &
-                             iv%instid(n)%rad(i)%vegfra, &
-                             iv%instid(n)%rad(i)%elevation, &
-                             iv%instid(n)%rad(i)%clwp
- else if (iv%instid(n)%rad(i)%isflg==3) then
-   write(UNIT=innov_vector_unit,FMT='(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') &
-     'SNOW : ', i, &
-                             iv%instid(n)%rad(i)%t2m, &
-                             iv%instid(n)%rad(i)%mr2m,   &
-                             iv%instid(n)%rad(i)%u10, &
-                             iv%instid(n)%rad(i)%v10,  &
-                             iv%instid(n)%rad(i)%ps,  &
-                             iv%instid(n)%rad(i)%ts,  &
-                             iv%instid(n)%rad(i)%smois,  &
-                             iv%instid(n)%rad(i)%tslb,  &
-                             iv%instid(n)%rad(i)%snowh, &
-                             iv%instid(n)%rad(i)%isflg, &
-                             nint(iv%instid(n)%rad(i)%soiltyp), &
-                             nint(iv%instid(n)%rad(i)%vegtyp), &
-                             iv%instid(n)%rad(i)%vegfra, &
-                             iv%instid(n)%rad(i)%elevation, &
-                             iv%instid(n)%rad(i)%clwp
- else if (iv%instid(n)%rad(i)%isflg==4) then
-   write(UNIT=innov_vector_unit,FMT='(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') &
-     'MSEA : ', i, &
-                             iv%instid(n)%rad(i)%t2m, &
-                             iv%instid(n)%rad(i)%mr2m,   &
-                             iv%instid(n)%rad(i)%u10, &
-                             iv%instid(n)%rad(i)%v10,  &
-                             iv%instid(n)%rad(i)%ps,  &
-                             iv%instid(n)%rad(i)%ts,  &
-                             iv%instid(n)%rad(i)%smois,  &
-                             iv%instid(n)%rad(i)%tslb,  &
-                             iv%instid(n)%rad(i)%snowh, &
-                             iv%instid(n)%rad(i)%isflg, &
-                             nint(iv%instid(n)%rad(i)%soiltyp), &
-                             nint(iv%instid(n)%rad(i)%vegtyp), &
-                             iv%instid(n)%rad(i)%vegfra, &
-                             iv%instid(n)%rad(i)%elevation, &
-                             iv%instid(n)%rad(i)%clwp
- else if (iv%instid(n)%rad(i)%isflg==5) then
-   write(UNIT=innov_vector_unit,FMT='(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') &
-     'MICE : ', i, &
-                             iv%instid(n)%rad(i)%t2m, &
-                             iv%instid(n)%rad(i)%mr2m,   &
-                             iv%instid(n)%rad(i)%u10, &
-                             iv%instid(n)%rad(i)%v10,  &
-                             iv%instid(n)%rad(i)%ps,  &
-                             iv%instid(n)%rad(i)%ts,  &
-                             iv%instid(n)%rad(i)%smois,  &
-                             iv%instid(n)%rad(i)%tslb,  &
-                             iv%instid(n)%rad(i)%snowh, &
-                             iv%instid(n)%rad(i)%isflg, &
-                             nint(iv%instid(n)%rad(i)%soiltyp), &
-                             nint(iv%instid(n)%rad(i)%vegtyp), &
-                             iv%instid(n)%rad(i)%vegfra, &
-                             iv%instid(n)%rad(i)%elevation, &
-                             iv%instid(n)%rad(i)%clwp
- else if (iv%instid(n)%rad(i)%isflg==6) then
-   write(UNIT=innov_vector_unit,FMT='(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') &
-     'MLND : ', i, &
-                             iv%instid(n)%rad(i)%t2m, &
-                             iv%instid(n)%rad(i)%mr2m,   &
-                             iv%instid(n)%rad(i)%u10, &
-                             iv%instid(n)%rad(i)%v10,  &
-                             iv%instid(n)%rad(i)%ps,  &
-                             iv%instid(n)%rad(i)%ts,  &
-                             iv%instid(n)%rad(i)%smois,  &
-                             iv%instid(n)%rad(i)%tslb,  &
-                             iv%instid(n)%rad(i)%snowh, &
-                             iv%instid(n)%rad(i)%isflg, &
-                             nint(iv%instid(n)%rad(i)%soiltyp), &
-                             nint(iv%instid(n)%rad(i)%vegtyp), &
-                             iv%instid(n)%rad(i)%vegfra, &
-                             iv%instid(n)%rad(i)%elevation, &
-                             iv%instid(n)%rad(i)%clwp
- else if (iv%instid(n)%rad(i)%isflg==7) then
-   write(UNIT=innov_vector_unit, FMT='(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') &
-     'MSNO : ', i, &
-                             iv%instid(n)%rad(i)%t2m, &
-                             iv%instid(n)%rad(i)%mr2m,   &
-                             iv%instid(n)%rad(i)%u10, &
-                             iv%instid(n)%rad(i)%v10,  &
-                             iv%instid(n)%rad(i)%ps,  &
-                             iv%instid(n)%rad(i)%ts,  &
-                             iv%instid(n)%rad(i)%smois,  &
-                             iv%instid(n)%rad(i)%tslb,  &
-                             iv%instid(n)%rad(i)%snowh, &
-                             iv%instid(n)%rad(i)%isflg, &
-                             nint(iv%instid(n)%rad(i)%soiltyp), &
-                             nint(iv%instid(n)%rad(i)%vegtyp), &
-                             iv%instid(n)%rad(i)%vegfra, &
-                             iv%instid(n)%rad(i)%elevation, &
-                             iv%instid(n)%rad(i)%clwp
+!------------------------------------------------------------------------
+!        [4.0] Perform QC check
+!------------------------------------------------------------------------
+ if (lqc_rad) then
+  do inst = 1, iv%num_inst                 ! loop for sensor
+      WRITE(UNIT=stdout,FMT='(A,A)') 'performing QC for ', trim(iv%instid(inst)%rttovid_string) 
+      nchanl    = iv%instid(inst)%nchan
+      call da_qc_rad(inst,nchanl, ob, iv )
+  end do        ! end loop for sensor
  end if
-
-!    write(UNIT=innov_vector_unit,FMT='(a,19f11.2)')
-!      'OBS  : ', ob%instid(n)%rad(i)%tb(:)
-!    write(UNIT=innov_vector_unit,FMT='(a,19f11.2)')
-!      'INV  : ', iv%instid(n)%rad(i)%tb(:)%inv
-!    write(UNIT=innov_vector_unit,FMT='(a,19f11.2)')
-!      'EMS  : ', iv%instid(n)%rad(i)%emiss(1:iv%instid(n)%nchan)
-    write(UNIT=innov_vector_unit,FMT='(a)') 'OBS  : '
-    write(UNIT=innov_vector_unit,FMT='(10f11.2)') &
-      ob%instid(n)%rad(i)%tb(:)
-    write(UNIT=innov_vector_unit,FMT='(a)') 'INV  : '
-    write(UNIT=innov_vector_unit,FMT='(10f11.2)') &
-      iv%instid(n)%rad(i)%tb(:)%inv
-    write(UNIT=innov_vector_unit,FMT='(a)') 'EMS  : '
-    write(UNIT=innov_vector_unit,FMT='(10f11.2)') &
-      iv%instid(n)%rad(i)%emiss(1:iv%instid(n)%nchan)
-
-!    write(UNIT=innov_vector_unit,FMT='(a,19f11.2)') &
-!      'ERR  : ', iv%instid(n)%rad(i)%tb(:)%error
-!    write(UNIT=innov_vector_unit,FMT='(a,19i11)') &
-!      'QC   : ', iv%instid(n)%rad(i)%tb(:)%qc
-
-
-  if (lwrite_profile) then
-    write(UNIT=innov_vector_unit,FMT=*) &
-      'RTM_level pres(mb) T(k) Q(ppmv) WRF_level pres(mb) T(k) q(g/kg) clw(g/kg) rain(g/kg)'
-    do k=xp%kts,xp%kte
-     if (k <= num_levs) then
-      write(UNIT=innov_vector_unit,FMT='(i3,f10.2,f8.2,e11.4,i3,f10.2,f8.2,3e11.4)') &
-            k, &                             ! RTTOV levels
-            coefs(n) % ref_prfl_p(k) , &
-            iv%instid(n)%rad(i)%t(k) , &
-            iv%instid(n)%rad(i)%mr(k), &
-            k,  &                            ! WRF model levels
-            iv%instid(n)%rad(i)%pm(k) , &
-            iv%instid(n)%rad(i)%tm(k) , &
-            iv%instid(n)%rad(i)%qm(k)*1000 , &    
-            iv%instid(n)%rad(i)%qcw(k)*1000., &
-            iv%instid(n)%rad(i)%qrn(k)*1000.
-
-     else
-      write(UNIT=innov_vector_unit,FMT='(32x,i3,f10.2,f8.2,3e11.4)') k, &
-            iv%instid(n)%rad(i)%pm(k) , &
-            iv%instid(n)%rad(i)%tm(k) , &
-            iv%instid(n)%rad(i)%qm(k)*1000 , &
-            iv%instid(n)%rad(i)%qcw(k)*1000., &
-            iv%instid(n)%rad(i)%qrn(k)*1000.
-!            iv%instid(n)%rad(i)%qci(k)*1000., &
-!            iv%instid(n)%rad(i)%qsn(k)*1000., &
-!            iv%instid(n)%rad(i)%qgr(k)*1000.
-     end if  
-    end do   ! end loop profile
-    end if   ! end if write_profile
-
-   end if    ! end if proc_domain
-  end do     ! end do pixels
-  close(UNIT=innov_vector_unit)
- end do    !! end do instruments
-end if     !! end if lwrite_iv
 
  return
  

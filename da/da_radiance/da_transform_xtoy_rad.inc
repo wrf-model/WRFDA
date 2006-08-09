@@ -40,7 +40,7 @@ subroutine da_transform_xtoy_rad ( xa, iv, xp, y )
 
    REAL, DIMENSION(xp%kms:xp%kme)   :: v_p      ! Model value p at ob hor. location.
 
-   INTEGER            :: inst, nprofiles, nchanl, unit, iprof, ios
+   INTEGER            :: inst, nprofiles, nchanl, unit, iprof, ios, iscan
    REAL,    pointer   :: zk(:)
    REAL,    pointer   :: pres(:)
    character(len=30)  :: filename
@@ -200,9 +200,13 @@ subroutine da_transform_xtoy_rad ( xa, iv, xp, y )
 !------------------------------------------------------------------------
 !        [2.0] assign Hdx :
 !------------------------------------------------------------------------
-
+         iscan = iv%instid(inst)%rad(n)%scanpos
          do k = 1, nchanl
+           if (lbiascorr) then
+            y%instid(inst)%rad(n)%tb(k) = satinfo(inst)%b(iscan+1,k)* tb(nprofiles,k)
+           else
             y%instid(inst)%rad(n)%tb(k) = tb(nprofiles,k)
+           end if
          end do
                
        end if   !  end endif for within_halo

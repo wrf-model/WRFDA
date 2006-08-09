@@ -4,7 +4,7 @@ subroutine da_read_kma1dvar (inst,iv, ob, xp, inunit, infile)
 !
 !   METHOD: use F90 sequantial data structure to avoid read file twice  
 !            so that da_scan_bufrtovs is not necessary any more.
-!            1. read file radiance data in sequential data structure
+!            1. read radiance data in sequential data structure
 !            2. assign sequential data structure to innovation structure
 !                  and deallocate sequential data structure
 !
@@ -16,7 +16,7 @@ subroutine da_read_kma1dvar (inst,iv, ob, xp, inunit, infile)
 
 ! subroutine argument
   integer           ,  intent (in)    :: inst
-  character(200)    ,  intent (in)    :: infile
+  character(20)     ,  intent (in)    :: infile
   integer           ,  intent (in)    :: inunit
   type (xpose_type) ,  intent (in)    :: xp
   type (y_type)     ,  intent (inout) :: ob
@@ -45,14 +45,12 @@ subroutine da_read_kma1dvar (inst,iv, ob, xp, inunit, infile)
 
   type (datalink), pointer    :: head, p, current
 
-  integer                        ::  size, error
+  integer                        ::  inst, size, error
   type(info_type)                ::  info
   type(model_loc_type)           ::  loc
 
 !**************************************************************************
 ! Initialize variables
-
-  call init_constants_derived
 
   nchanl = iv%instid(inst)%nchan
 
@@ -88,15 +86,15 @@ subroutine da_read_kma1dvar (inst,iv, ob, xp, inunit, infile)
   size = 0
 
   OUT_LOOP: DO j=1,npass
-    read(UNIT=inunit,FMT='(2F12.4)')    rlat,rlon
-    read(UNIT=inunit,FMT='(I5,20I5)')   knchan,(kchan(i),i=1,knchan)
+    read(inunit,'(2F12.4)')    rlat,rlon
+    read(inunit,'(I5,20I5)')   knchan,(kchan(i),i=1,knchan)
 ! landsea_mask: 0:land ; 1:sea (same as RTTOV)
-    read(UNIT=inunit,FMT='(I5,F12.4,I5,F12.4)')  scanpos,satzen,landsea_mask,srf_height
-    read(UNIT=inunit,FMT='(20F12.4)') (oerr(i),i=1,knchan)
-    read(UNIT=inunit,FMT='(20F12.4)') (emiss(i),i=1,knchan)
-    read(UNIT=inunit,FMT='(5F12.4)')  (fastem(i),i=1,5)
-    read(UNIT=inunit,FMT='(20F12.4)') (otb(i),i=1,knchan)
-    read(UNIT=inunit,FMT='(20F12.4)') (inov(i),i=1,knchan)
+    read(inunit,'(I5,F12.4,I5,F12.4)')  scanpos,satzen,landsea_mask,srf_height
+    read(inunit,'(20F12.4)') (oerr(i),i=1,knchan)
+    read(inunit,'(20F12.4)') (emiss(i),i=1,knchan)
+    read(inunit,'(5F12.4)')  (fastem(i),i=1,5)
+    read(inunit,'(20F12.4)') (otb(i),i=1,knchan)
+    read(inunit,'(20F12.4)') (inov(i),i=1,knchan)
 
 !  1.0     Extract observation location and other required information
 !          juge if data is in the domain, read next record if not
@@ -108,7 +106,7 @@ subroutine da_read_kma1dvar (inst,iv, ob, xp, inunit, infile)
         if (outside) cycle
 
         info%elv = srf_height
-        write(UNIT=info%date_char,FMT='(i10)') idate 
+        write(UNIT=info%date_char, FMT='(i10)') idate 
 
         tb(1:nchanl) = missing_r
         inv(1:nchanl) = missing_r
@@ -129,7 +127,7 @@ subroutine da_read_kma1dvar (inst,iv, ob, xp, inunit, infile)
    p%rad%loc              = loc
    p%rad%landsea_mask     = landsea_mask
    p%rad%scanpos          = scanpos
-   p%rad%satzen           = abs(satzen)
+   p%rad%satzen           = satzen
    p%rad%satazi           = missing_r
    p%rad%solzen           = missing_r
    p%rad%tb(1:nchanl)%inv = inv(1:nchanl)
@@ -199,12 +197,20 @@ subroutine da_read_kma1dvar (inst,iv, ob, xp, inunit, infile)
    iv%instid(inst)%rad(i)%satzen = p%rad%satzen
    iv%instid(inst)%rad(i)%satazi = p%rad%satazi
    iv%instid(inst)%rad(i)%solzen = p%rad%solzen
-   allocate ( iv%instid(inst)%rad(i)%tb(1:nchanl) )
+   allocate ( iv%instid(inst)%rad(i)%tb(1:nchanl), stat = error )
+   If( error /= 0 ) Then
+        call da_error(__FILE__,__LINE__, &
+          (/"mem allocation error to iv%instid(inst)%rad(i)%tb"/))
+   End If
    iv%instid(inst)%rad(i)%tb(1:nchanl)%inv   = p%rad%tb(1:nchanl)%inv
    iv%instid(inst)%rad(i)%tb(1:nchanl)%error = p%rad%tb(1:nchanl)%error
    iv%instid(inst)%rad(i)%tb(1:nchanl)%qc    = p%rad%tb(1:nchanl)%qc
 
-   allocate ( ob%instid(inst)%rad(i)%tb(1:nchanl) )
+   allocate ( ob%instid(inst)%rad(i)%tb(1:nchanl), stat = error )
+   If( error /= 0 ) Then
+        call da_error(__FILE__,__LINE__, &
+          (/"mem allocation error to ob%instid(inst)%rad(i)%tb"/))
+   End If
    ob%instid(inst)%rad(i)%tb(1:nchanl) = p%rad_ob%tb(1:nchanl)
 
 !   WRITE(UNIT=stdout,*) inst, nread, iv%instid(inst)%rad(i)%tb(1:nchanl)%inv
@@ -222,7 +228,7 @@ subroutine da_read_kma1dvar (inst,iv, ob, xp, inunit, infile)
 !
 !  p => head
 !  do i = 1, size
-!   WRITE(UNIT=stdout,*) i, p%rad%tb(1:nchanl)%inv
+!   print *, i, p%rad%tb(1:nchanl)%inv
 !   p => p%next
 !  end do
 

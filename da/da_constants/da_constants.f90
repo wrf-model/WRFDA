@@ -204,6 +204,10 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
    INTEGER, PARAMETER :: rtm_info_unit = 109  ! Radiance info file
    INTEGER, PARAMETER :: rtm_bias_unit = 110  ! Radiance bias file
    INTEGER, PARAMETER :: filtered_obs_iunit  = 192  ! Unit number for writing filtered obs
+   INTEGER, PARAMETER :: filtered_rad_unit   = 193  ! Unit number for writing filtered radiance
+   INTEGER, PARAMETER :: innov_rad_unit      = 194  ! Unit number for writing innovation radiance
+   INTEGER, PARAMETER :: oma_rad_unit        = 195  ! Unit number for writing oma radiance
+   INTEGER, PARAMETER :: error_factor_rad_unit = 196  ! Unit number for radiance error factor
    INTEGER, PARAMETER :: unit_983            = 983 ! TBD
    integer, parameter  :: iunit = 70
    integer, parameter  :: ounit = iunit + 1
@@ -283,7 +287,8 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
                              num_ships_tot, &
                              num_sound_tot, num_airep_tot, num_qscat_tot, &
                              num_profiler_tot, num_buoy_tot, num_gpsref_tot, &
-                             num_Radar_tot, num_bogus_tot,num_airsr_tot
+                             num_Radar_tot, num_bogus_tot,num_airsr_tot, &
+                             num_radiance_tot
 
    logical       :: gaussian_lats  
 

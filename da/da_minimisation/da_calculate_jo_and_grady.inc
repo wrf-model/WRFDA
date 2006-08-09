@@ -23,7 +23,7 @@
                                       jo_pseudo, jo_qscat, jo_buoy, &
                                       jo_profiler, jo_Radar, jo_gpsref, jo_bogus, &
                                       jo_radiance, jo_airsr
-      integer                      :: i
+      integer                      :: i,k
 !-------------------------------------------------------------------------
 !     [1.0] Compute components of Grad_y(Jo):
 !-------------------------------------------------------------------------
@@ -182,18 +182,21 @@
 
 !     Radiance:
 
-      call da_calculate_jo_and_grady_rad ( iv, re, jo, jo_grad_y)
+       call da_calculate_jo_and_grady_rad ( iv, re, jo, jo_grad_y)
+       jo_radiance = 0. 
       if ( use_radiance ) then
-        jo_radiance = sum ( jo % rad(:) )
-      else
-        jo_radiance = 0.
+       do i=1,iv%num_inst
+       do k=1,iv%instid(i)%nchan
+        jo_radiance = jo_radiance + jo % rad(i)%jo_ichan(k)
+       end do
+       end do
       end if
       if(print_detail_grad) then
          write(UNIT=stdout, fmt='(a, e24.12)') &
               'jo_radiance =', jo_radiance
        do i = 1, iv%num_inst
          write(UNIT=stdout, fmt='(a, e24.12)') &
-              trim('jo_'//iv%instid(i)%rttovid_string), jo % rad(i)
+              trim('jo_'//iv%instid(i)%rttovid_string), sum(jo % rad(i)%jo_ichan(:))
        end do
       end if
 !-------------------------------------------------------------------------

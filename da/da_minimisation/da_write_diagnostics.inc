@@ -121,7 +121,6 @@
 
 !  [1.20] Radiance:
 
-!      print *, 'iv%num_inst = ', iv%num_inst
       call da_omb_stats_rad ( stats_unit, iv )
 
 !  [1.21] AIRS retrievals:
@@ -221,7 +220,7 @@
 
       call da_oma_stats_rad ( stats_unit, iv, re )
 
-!  [2.21] Radiance:
+!  [2.21] AIRS Retrieval:
                                                                                
       call da_ao_stats_airsr ( stats_unit, iv, re )
 

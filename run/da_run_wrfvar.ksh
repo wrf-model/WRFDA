@@ -165,6 +165,12 @@ for FILE in $DA_DIR/run/*.bias; do
   fi
 done
 
+for FILE in $DA_DIR/run/*.info; do
+  if test -f $FILE; then
+    ln -s $FILE .
+  fi
+done
+
 # Link to bufr files, picking which endian type when a
 # choice is available
 

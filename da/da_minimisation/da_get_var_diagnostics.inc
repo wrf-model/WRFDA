@@ -1,6 +1,7 @@
 subroutine da_get_var_diagnostics ( iv, j )
 
 !-------------------------------------------------------------------------
+!     02/22/2006  -  add radiance Jo diagnostics output     Zhiquan Liu
 !     07/03/2006  -  Update for AIRS retrievals
 !-------------------------------------------------------------------------
    type (ob_type), intent(inout):: iv      ! innovation vector.
@@ -8,6 +9,8 @@ subroutine da_get_var_diagnostics ( iv, j )
 
    integer                      :: num_obs_tot, ierror
    real                         :: dum1, dum2, dum3, dum4, dum5, dum6
+   integer                      :: i,k
+   real                         :: jo_radiance
 
    LOGICAL, EXTERNAL :: wrf_dm_on_monitor     ! For statistics output.
 
@@ -23,7 +26,7 @@ subroutine da_get_var_diagnostics ( iv, j )
                  num_geoamv_tot+ num_polaramv_tot+ num_ships_tot + &
                  num_sound_tot + num_qscat_tot + num_profiler_tot+ &
                  num_buoy_tot + num_gpsref_tot + num_bogus_tot   + &
-                 num_airsr_tot
+                 num_radiance_tot + num_airsr_tot
 
    call da_sum_reals( 5, j % jo % synop_u, j % jo % synop_v, &
                       j % jo % synop_t, j % jo % synop_p, j % jo % synop_q,&
@@ -76,6 +79,19 @@ subroutine da_get_var_diagnostics ( iv, j )
                                                                 dum1, dum2 )
    call da_sum_reals( 2, j % jo % airsr_t, j % jo % airsr_q, &
                          dum1, dum2,dum3, dum4, dum5 )
+
+    if ( use_radiance ) then
+      jo_radiance = 0.
+      do i = 1, iv%num_inst                 ! loop for sensor
+      do k = 1, iv%instid(i)%nchan          ! loop for channels
+         call da_proc_sum_int ( j % jo % rad(i)% num_ichan(k) )
+         call da_sum_reals( 1, j % jo % rad(i) % jo_ichan(k),  &
+                    dum1, dum2, dum3, dum4, dum5, dum6 )
+         jo_radiance = jo_radiance + j % jo % rad(i) % jo_ichan(k)
+      end do
+      end do
+    end if
+
    !-----------------------------------------------------------------------------
    ! [2.0] Print out VAR diagnostics:
    !-----------------------------------------------------------------------------
@@ -85,6 +101,9 @@ subroutine da_get_var_diagnostics ( iv, j )
       write(UNIT=stdout,FMT=*) ' '
       WRITE(UNIT=stdout,FMT='(A,F12.2)')  '    Final cost function J    = ', j % total
       write(UNIT=stdout,FMT=*) ' '
+
+      write(UNIT=stdout,FMT='(a39,i8)')   '    Total number of radiance obs.    = ', num_radiance_tot
+      write(UNIT=stdout,FMT='(a39,f15.5)')'    Cost Function of radiance obs.   = ', jo_radiance
 
       write(UNIT=stdout,FMT='(a30,i8)')   '    Total number of obs.     = ', num_obs_tot
       write(UNIT=stdout,FMT='(a30,f15.5)')'    Final WRFVAR value of J  = ', j % total
@@ -272,6 +291,16 @@ subroutine da_get_var_diagnostics ( iv, j )
                                j % jo % airsr_q, iv % airsr_ef_q, &
                                0.0, 1.0, 0.0, 1.0, 0.0, 1.0
       end if
+      do i = 1, iv%num_inst                 ! loop for sensor
+      do k = 1, iv%instid(i)%nchan
+        if ( j % jo % rad(i) % num_ichan(k) > 0 ) then
+           write(UNIT=jo_unit,FMT='(a30,a19,i5,i8,f15.5)') 'radiance obs, Jo (actual)  = ', &
+                                 iv%instid(i)%rttovid_string, k , &
+                                 j % jo % rad(i) % num_ichan(k), &
+                                 j % jo % rad(i) % jo_ichan(k)
+        end if
+      end do
+      end do
    end if
 
    IF (trace_use) CALL da_trace_exit("da_get_var_diagnostics")

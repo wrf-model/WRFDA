@@ -1,4 +1,4 @@
-SUBROUTINE da_get_innov_vector( it, ob, iv, &
+subroutine da_get_innov_vector( it, ob, iv, &
                                 grid, config_flags, &
 #include "em_dummy_args.inc"
                  )
@@ -155,6 +155,23 @@ SUBROUTINE da_get_innov_vector( it, ob, iv, &
 #endif
    endif
 
+   !----------------------------------------------
+   !  [5]  write out radiance iv in ascii format
+   !-----------------------------------------------
+   if ( lwrite_iv_rad_ascii ) then
+     write(UNIT=stdout,FMT=*)  ' writing radiance iv ascii'
+     call da_write_iv_rad_ascii(xp,ob,iv)
+   end if
+
+   !----------------------------------------------------------
+   !  [6]  write out filtered radiance obs in binary format
+   !----------------------------------------------------------
+   if ( lwrite_filtered_rad ) then
+     write(UNIT=stdout,FMT=*) ' writing filtered radiance'
+     call da_write_filtered_rad(ob,iv)
+   end if
+
+!---------------------------------------------------------------------------
    if (num_fgat_time > 1) then
       call da_med_initialdata_input ( grid , config_flags )
       call da_setup_firstguess( xbx, grid, &
@@ -164,5 +181,5 @@ SUBROUTINE da_get_innov_vector( it, ob, iv, &
 
    IF (trace_use) CALL da_trace_exit("da_get_innov_vector")
 
-END SUBROUTINE da_get_innov_vector
+end subroutine da_get_innov_vector
 

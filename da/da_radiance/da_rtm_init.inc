@@ -5,7 +5,8 @@ subroutine da_rtm_init(iv,ob)
 !
 !  METHOD:  1. read RTTOV coefs files; 2. allocate radiance structure
 !
-!  HISTORY: 28/07/2005 - Creation            Zhiquan Liu
+!  HISTORY: 07/28/2005 - Creation                               Zhiquan Liu
+!           03/22/2006   add error tuning factor read in        Zhiquan Liu
 !
 !------------------------------------------------------------------------------
 
@@ -21,12 +22,13 @@ subroutine da_rtm_init(iv,ob)
 
 !  local arguments
 !------------------- 
- integer   :: n, k,j, iscan,ichan,npos
+ integer   :: n, k,j,bunit, iscan,ichan,npos
  real      :: ave
 
 !
 !  input parameters of RTTOV_SETUP
 !----------------------------------
+  integer :: err_unit        ! Logical error unit (<0 for default)
   integer :: verbosity_level ! (<0 for default)
   integer :: nsensor
   integer, allocatable :: sensor(:,:) ! instrument id
@@ -36,8 +38,7 @@ subroutine da_rtm_init(iv,ob)
 !-------------------------------------
   integer, allocatable :: errorstatus(:)  ! return code
   integer              :: coef_errorstatus, i_amsua, i_amsub
-!  type( rttov_coef ), allocatable :: coefs(:)         ! coefficients
-  integer     :: error
+  integer     :: j, error
   integer , pointer   ::  nscan(:), nchanl(:)
 
 ! local variables
@@ -47,14 +48,20 @@ subroutine da_rtm_init(iv,ob)
  real    , pointer   :: surfem(:), emissivity(:)
  integer , pointer   :: channels (:), polarisations(:,:)
  integer             :: mxchn
- integer , pointer   :: coefs_channels (:,:)
+! integer , pointer   :: coefs_channels (:,:)
  
  integer             :: idum, wmo_sensor_id, sensor_type, iost
+
+! local variables for tuning error factor
+ character(len=20)   ::  rttovid_string
+ integer             ::  num_tot
+ real                ::  joa, jo, trace, factor 
 
 !--------------------------------------------------------------
 !  1.0 setup RTTOV instrument triplets from namelist parameter
 !--------------------------------------------------------------
 
+    print *, 'running da_rtm_init'
     mxchn           =  300
     verbosity_level =  rtminit_print
     nsensor         =  rtminit_nsensor
@@ -62,14 +69,14 @@ subroutine da_rtm_init(iv,ob)
   allocate (errorstatus(nsensor))
   allocate (coefs(nsensor))
   allocate (sensor(3,nsensor))
-  allocate (coefs_channels(mxchn,nsensor))
+!  allocate (coefs_channels(mxchn,nsensor))
   allocate (nscan(nsensor))
   allocate (nchanl(nsensor))
 
   sensor (1,1:nsensor)  = rtminit_platform (1:nsensor) 
   sensor (2,1:nsensor)  = rtminit_satid    (1:nsensor)
   sensor (3,1:nsensor)  = rtminit_sensor   (1:nsensor)
-  coefs_channels(:,:)   = 0
+!  coefs_channels(:,:)   = 0
 
   WRITE(UNIT=stdout,FMT=*) ' verbosity_level      = ', verbosity_level
   WRITE(UNIT=stdout,FMT=*) ' nsensor              = ', nsensor
@@ -89,26 +96,23 @@ subroutine da_rtm_init(iv,ob)
 
   iv%instid(1:nsensor)%num_rad = 0
   ob%instid(1:nsensor)%num_rad = 0
-!  iv%instid(1:nsensor)%nlevels = coefs(1:nsensor)%nlevels
-!  write(UNIT=stdout,FMT=*) ' Have read in the RTTOV coef files for the following sensors '
 
   loop_sensor: do n = 1, nsensor
 
    iv%instid(n)%platform_id  = rtminit_platform(n)
    iv%instid(n)%satellite_id = rtminit_satid(n)
    iv%instid(n)%sensor_id    = rtminit_sensor(n)
- if ( rtminit_satid(n) < 10 ) then
-   write(UNIT=iv%instid(n)%rttovid_string,FMT='(a,i1,a)')  &
+   if ( rtminit_satid(n) < 10 ) then
+      write(UNIT=iv%instid(n)%rttovid_string, FMT='(a,i1,a)')  &
              trim( platform_name(rtminit_platform(n)) )//'-',  &
              rtminit_satid(n),     &
              '-'//trim( inst_name(rtminit_sensor(n)) )
- else
-   write(UNIT=iv%instid(n)%rttovid_string,FMT='(a,i2.2,a)')  &
+   else
+      write(UNIT=iv%instid(n)%rttovid_string, FMT='(a,i2.2,a)')  &
              trim( platform_name(rtminit_platform(n)) )//'-',  &
              rtminit_satid(n),     &
              '-'//trim( inst_name(rtminit_sensor(n)) )
- end if
-!   write(UNIT=stdout,FMT=*)  iv%instid(n)%rttovid_string
+   end if
 
    if ( trim( inst_name(rtminit_sensor(n))) == 'msu' ) then
       nchanl(n)  = 4
@@ -129,8 +133,8 @@ subroutine da_rtm_init(iv,ob)
       nchanl(n)  = 4
       nscan(n)   = 90
    else
-    call da_error(__FILE__,__LINE__, &
-      (/" unrecognized instrument "//TRIM(inst_name(rtminit_sensor(n)))/))
+      call da_error(__FILE__,__LINE__, &
+        (/" unrecognized instrument "//TRIM(inst_name(rtminit_sensor(n)))/))
    end if
 
       iv%instid(n)%nchan  = nchanl(n)
@@ -148,8 +152,8 @@ subroutine da_rtm_init(iv,ob)
           (/"mem allocation error to ob%instid(n)%ichan"/))
       end if
 
-     if (trim( inst_name(rtminit_sensor(n))) == 'airs') then
-
+!  read satellite infomation file: currently used is just 'iuse' for QC purpose
+!-------------------------------------------------------------------------------
   open(UNIT=rtm_info_unit,file=trim(iv%instid(n)%rttovid_string)//'.info', &
            form='formatted',iostat = iost, status='old')
 
@@ -177,16 +181,8 @@ subroutine da_rtm_init(iv,ob)
     iv%instid(n)%ichan(j) = satinfo(n)%ichan(j)
     ob%instid(n)%ichan(j) = satinfo(n)%ichan(j)
 ! only load coefs of selected channels for AIRS
-    coefs_channels(j,n)   = satinfo(n)%ichan(j) 
+!    coefs_channels(j,n)   = satinfo(n)%ichan(j) 
   end do
-
-     else
-      do j = 1, nchanl(n)
-        iv%instid(n)%ichan(j) = j
-        ob%instid(n)%ichan(j) = j
-        coefs_channels(j,n)   = j
-      end do
-     end if
 
   end do loop_sensor
 
@@ -201,8 +197,8 @@ subroutine da_rtm_init(iv,ob)
       & verbosity_level,  &! in
       & nsensor,          &! in
       & coefs,            &! out
-      & sensor,           &! in
-      & coefs_channels )   ! in Optional
+      & sensor ) !,           &! in
+!      & coefs_channels )   ! in Optional not work with amsua+b
 #endif
 
   if( any(errorstatus(:) /= errorstatus_success )) then
@@ -340,14 +336,14 @@ subroutine da_rtm_init(iv,ob)
   open(UNIT=rtm_bias_unit,file=trim(iv%instid(n)%rttovid_string)//'.bias', &
            form='formatted',iostat = iost, status='old')
   if (iost /= 0) then
-    call da_error(__FILE__,__LINE__, &
-      (/'Cannot open radiance biascorr FILE '//TRIM(iv%instid(n)%rttovid_string)//'.bias'/))
+     call da_error(__FILE__,__LINE__, &
+        (/'Cannot open radiance bias correction FILE '//trim(iv%instid(n)%rttovid_string)//'.bias'/))
   end if
 
-  allocate ( satinfo(n) % rms(nscan(n),nchanl(n)) )
-  allocate ( satinfo(n) % std(nscan(n),nchanl(n)) )
-  allocate ( satinfo(n) %   a(nscan(n),nchanl(n)) )
-  allocate ( satinfo(n) %   b(nscan(n),nchanl(n)) )
+  allocate ( satinfo(n) % rms(nscan(n)+1,nchanl(n)) )
+  allocate ( satinfo(n) % std(nscan(n)+1,nchanl(n)) )
+  allocate ( satinfo(n) %   a(nscan(n)+1,nchanl(n)) )
+  allocate ( satinfo(n) %   b(nscan(n)+1,nchanl(n)) )
 
    read(UNIT=rtm_bias_unit,FMT=*)  !trim(platform),'-',trim(satid),'-',trim(instrument)
    read(UNIT=rtm_bias_unit,FMT=*)  !trim(cdate)
@@ -365,14 +361,7 @@ subroutine da_rtm_init(iv,ob)
 
    read(UNIT=rtm_bias_unit,FMT=*) !  'scan  ', 'chan ', 'number ', 'average ', 'rms  std ', 'a ','b '
 
-   do j = 1,nchanl(n)
-      read(UNIT=rtm_bias_unit,FMT=*)
-!     read(UNIT=rtm_bias_unit,FMT='(i3,i5,i8,2(2x,f8.3),2(2x,f11.3))') &
-!                 iscan, ichan(j), bias_nc(j), bias_ave(j), &
-!                 bias_std(j),bias_a(j),bias_b(j)
-   end do
-
-   do k = 1,nscan(n)
+   do k = 1,nscan(n)+1
    do j = 1,nchanl(n)
       read(UNIT=rtm_bias_unit,FMT='(i3,i5,i8,3(2x,f8.3),2(2x,f11.3))') &
          iscan, ichan, npos,ave, &
@@ -386,6 +375,49 @@ subroutine da_rtm_init(iv,ob)
  end if
 
   end do loop_sensor2
+
+!-------------------------------------
+!  7.0 read radiance error factor file
+!-------------------------------------
+ if (use_error_factor_rad) then
+
+    do n=1,rtminit_nsensor
+       allocate ( satinfo(n)%error_factor(1:nchanl(n)) )
+       satinfo(n)%error_factor(:) = 1.0
+    end do
+
+    open(UNIT=error_factor_rad_unit, file='radiance_error.factor', &
+         form='formatted',iostat = iost, status='old')    
+
+    if (iost /= 0) then
+      call da_error(__FILE__,__LINE__, &
+        (/'Cannot open radiance error factor FILE radiance_error.factor'/))
+    end if
+
+    read(UNIT=error_factor_rad_unit, FMT=*)
+    do 
+      read(UNIT=error_factor_rad_unit, FMT='(a15,i3,i8,3f15.5,f8.3)',iostat=iost)   &
+          rttovid_string, ichan, num_tot, joa,jo,trace,factor 
+      if ( iost == 0 ) then
+        do n=1,rtminit_nsensor
+          if ( trim(rttovid_string)== trim(iv%instid(n)%rttovid_string) ) then
+             satinfo(n)%error_factor(ichan) = factor
+             !if (print_detail >= 1)  &
+                write(UNIT=stdout,FMT='(a,i5,a,f10.3)')  &
+                   trim(rttovid_string)//' Channel ', ichan, ' Error Factor = ', factor
+             exit
+          end if
+        end do
+      else
+         exit
+      end if
+    end do
+
+ end if
+
+   allocate( time_slots(0:num_fgat_time) )
+   call da_get_time_slots(num_fgat_time,time_window_min,time_analysis, &
+                       time_window_max,time_slots)
 
   deallocate(nscan)
   deallocate(nchanl)
