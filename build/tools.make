@@ -19,12 +19,12 @@ advance_cymdh : advance_cymdh.o
 
 bufr_little_endian : bufr_little_endian.o
 	$(RM) $@
-	$(FC) -o bufr_little_endian.exe bufr_little_endian.o bufrlib.o \
+	$(FFC) -o bufr_little_endian.exe bufr_little_endian.o bufrlib.o \
           bort_exit.o restd.o wrdesc.o
 
 bufr_little_endian.o : bort_exit.o restd.o wrdesc.o bufrlib.o
 	$(CPP) $(CPPFLAGS) bufr_little_endian.f90 > bufr_little_endian.f
-	$(FC) -c $(FIXEDFLAGS_ENDIAN) bufr_little_endian.f
+	$(FFC) -c $(FIXEDFLAGS_ENDIAN) bufr_little_endian.f
 
 
 # regenerate this list with "makedepend -Y *.c"

@@ -887,7 +887,7 @@ arch_superclean :
 #
 M4              = m4 -B24000
 FC              = mpxlf90_r
-FFC             = mpxlf_r
+FFC             = xlf_r
 SFC             = xlf90_r
 CC              = mpcc_r
 CC_TOOLS        = xlc
