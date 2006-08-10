@@ -53,6 +53,7 @@ export DA_BUFR_DIR=${DA_BUFR_DIR:-$OB_DIR/$DA_DATE} # radiance bufr file directo
 export DA_BACK_ERRORS=${DA_BACK_ERRORS:-$BE_DIR/gen_be.NMC.dat} # wrfvar background errors.
 export DA_SSMI=${DA_SSMI:-$OB_DIR/$DA_DATE/ssmi.dat}               # SSM/I radiances (ignore if not using).
 export DA_RADAR=${DA_RADAR:-$OB_DIR/$DA_DATE/radar.dat}            # Radar data (ignore if not using).
+export ENDIAN=${ENDIAN:-big_endian}
 
 # DA_FG01_DATE=$DA_DATE
 # DA_FG02_DATE=`$DA_DIR/main/advance_cymdh.exe $DA_FG01 1`
@@ -171,25 +172,15 @@ for FILE in $DA_DIR/run/*.info; do
   fi
 done
 
-# Link to bufr files, picking which endian type when a
-# choice is available
-
 for FILE in $DA_BUFR_DIR/*.bufr; do
   if test -f $FILE; then
     ln -s $FILE .
   fi
 done
 
-if test $PLATFORM = "Linux"; then
-#  ENDIAN=little_endian
-  ENDIAN=big_endian
-fi
+# Overwrite with specific endian files if available
 
-if test $PLATFORM = "Darwin" -o $PLATFORM = "AIX"; then
-  ENDIAN=big_endian
-fi
-
-for FILE in $DAT_DIR/*.$ENDIAN; do 
+for FILE in $DA_BUFR_DIR/*.$ENDIAN; do 
   if test -f $FILE; then
     FILE1=`basename $FILE`
     ln -sf $FILE ${FILE1%%.$ENDIAN}
