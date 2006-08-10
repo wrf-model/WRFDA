@@ -38,7 +38,7 @@ subroutine da_rtm_init(iv,ob)
 !-------------------------------------
   integer, allocatable :: errorstatus(:)  ! return code
   integer              :: coef_errorstatus, i_amsua, i_amsub
-  integer     :: j, error
+  integer     :: error
   integer , pointer   ::  nscan(:), nchanl(:)
 
 ! local variables

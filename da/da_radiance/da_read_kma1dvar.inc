@@ -45,7 +45,7 @@ subroutine da_read_kma1dvar (inst,iv, ob, xp, inunit, infile)
 
   type (datalink), pointer    :: head, p, current
 
-  integer                        ::  inst, size, error
+  integer                        ::  size, error
   type(info_type)                ::  info
   type(model_loc_type)           ::  loc
 

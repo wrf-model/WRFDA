@@ -1,0 +1,26 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: John Bray
+Date: 08/10/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Remove duplicate definitions of variables that g95 objects to
+
+
+Test results
+------------------------------------------------------
+
+ocotillo: Compiles
+
+--------------------------------------------------------------------------------------
+
+File changes:
+------------
+
+A    doc/changes/changes_20060810b.jrb
+M    da/da_radiance/da_read_kma1dvar.inc
+M    da/da_radiance/da_rtm_init.inc
