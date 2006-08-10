@@ -215,7 +215,7 @@ arch_superclean :
 FC              = mpif90
 FFC             = $(FC)
 SFC             = pgf90
-CC              = mpicc -DMPI2_SUPPORT
+CC              = mpicc
 #CC              = mpicc
 CC_TOOLS        = gcc
 LD              = $(FC)
@@ -237,7 +237,7 @@ FCFLAGS_RSL     = $(FCENDIAN)
 
 CCFLAGS2        = -I$(RSL)/RSL
 CCFLAGS_BUFR    = -DUNDERSCORE
-CCFLAGS_RSL     = 
+CCFLAGS_RSL     = -DMPI2_SUPPORT
 
 LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/local/lib \
                     -lncarg -lncarg_gks -lncarg_c
@@ -344,7 +344,7 @@ arch_superclean :
 FC              = mpif90
 FFC             = $(FC)
 SFC             = g95
-CC              = mpicc -DMPI2_SUPPORT
+CC              = mpicc
 CC_TOOLS        = gcc
 LD              = $(FC)
 
@@ -365,7 +365,7 @@ FCFLAGS_RSL     = $(FCENDIAN) -ffixed-form -fno-second-underscore
 
 CCFLAGS2        = -I$(RSL)/RSL
 CCFLAGS_BUFR    = -DUNDERSCORE
-CCFLAGS_RSL     = 
+CCFLAGS_RSL     = -DMPI2_SUPPORT
 
 LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/local/lib \
                     -lncarg -lncarg_gks -lncarg_c
@@ -614,7 +614,7 @@ FCBASE          = -fno-second-underscore
 FCFLAGS_RSL     = $(FCENDIAN) $(FCBASE)
 
 CCFLAGS2        = -I$(RSL)/RSL
-CCFLAGS_RSL     = 
+CCFLAGS_RSL     = -DMPI2_SUPPORT
 CCFLAGS_BUFR    = -DUNDERSCORE
 
 LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/local/lib \
