@@ -148,8 +148,8 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
    REAL, PARAMETER    :: inv_typ_vp5_sumsq = 0.00001 ! 1/SUM(?**2)
    REAL, PARAMETER    :: inv_typ_vpalpha_sumsq = 1.0 ! 1/SUM(?**2)
 
-   CHARACTER(LEN=*),PARAMETER :: wrfvar_version = "WRFVAR V2.1.2"
-   CHARACTER(LEN=*),PARAMETER :: wrf_version    = "WRF V2.1.2"
+   CHARACTER(LEN=*),PARAMETER :: wrfvar_version = "WRFVAR V2.2"
+   CHARACTER(LEN=*),PARAMETER :: wrf_version    = "WRF V2.2"
 
    ! Fortran unit  parameters:
 
