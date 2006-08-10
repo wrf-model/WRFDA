@@ -1,0 +1,26 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: John Bray
+Date: 08/10/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Remove duplicate definitions of
+use_landem and mw_emis_sea, as already defined in Registry
+
+
+Test results
+------------------------------------------------------
+
+blukesy: Compiles
+
+--------------------------------------------------------------------------------------
+
+File changes:
+------------
+
+A    doc/changes/changes_20060810a.jrb
+M    da/da_constants/da_constants.f90

@@ -405,13 +405,9 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
    integer                :: numb_procs, &         ! Number of total processors.
                              my_proc_id            ! My processor ID.
 
-   ! RTM_INIT setup parameter (read from namelist.wrfvar)
+   ! RTM_INIT setup parameter
 
    integer, parameter            :: maxsensor = 30
-
-   logical       :: use_landem      ! if use weng's landem model
-   integer       :: mw_emis_sea     ! surface emissivity type over sea
-                                    ! 0:FASTEM-2; 1:Weng's model
 
    ! type( rttov_coef ), pointer :: coefs(:)         ! RTTOV coefficients
 
