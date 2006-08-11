@@ -85,7 +85,8 @@ SUBROUTINE DA_Check_VToY_Adjoint(grid, config_flags, vp, vv, &
 !   call da_zero_vp_type(vv)
 !   call da_zero_x(xa)      
 !
-   call DA_Transform_VToY_Adj(be, cv, iv, vp, vv, xa, xb, xbx, xp, y, &
+   print*, 'Please check here, xinzhang'
+   call DA_Transform_VToY_Adj( 0, be, cv, iv, vp, vv, xa, xb, xbx, xp, y, &
                                  ids, ide, jds, jde, kds, kde,     &
                                  ims, ime, jms, jme, kms, kme,     &
                                  its, ite, jts, jte, kts, kte,     &

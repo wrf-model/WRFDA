@@ -41,12 +41,13 @@ subroutine da_calculate_j( it, iter, xb, xbx, be, iv, xhat, cv, vv, &
 
       real             :: jb                           ! jb
       real             :: jo                           ! jo
+      real             :: jc                           ! jc-dfi
       real             :: jo_partial                   ! jo for this processor
       real             :: gnorm_cv, gnorm_jo, gnorm_j
  
       type (y_type)    :: jo_grad_y ! Grad_y(jo)
 
-      integer          :: ierror
+      integer          :: ierror , ndynopt
 
       character(len=4) :: filnam
 
@@ -90,6 +91,31 @@ subroutine da_calculate_j( it, iter, xb, xbx, be, iv, xhat, cv, vv, &
  
 
 !-------------------------------------------------------------------------
+!     [2.5] calculate jc-dfi:
+!-------------------------------------------------------------------------
+
+         jc = 0.0
+
+         if ( iter > 0 ) then
+
+            ndynopt      = grid%dyn_opt
+            grid%dyn_opt = DYN_EM_TL
+            call nl_set_dyn_opt ( 1 , DYN_EM_TL )
+
+            filnam ='tldf'
+            call med_initialdata_input_3dvar( grid , config_flags, in_filename=filnam )
+
+            grid%dyn_opt = ndynopt
+            call nl_set_dyn_opt ( 1 , DYN_EM )
+
+            jc = jc + 0.5*da_dot( grid%em_g_u_2 , grid%em_g_u_2 , size(grid%em_g_u_2) )
+            jc = jc + 0.5*da_dot( grid%em_g_v_2 , grid%em_g_v_2 , size(grid%em_g_v_2) )
+            jc = jc + 0.5*da_dot( grid%em_g_t_2 , grid%em_g_t_2 , size(grid%em_g_t_2) )
+            jc = jc + 0.5*da_dot( grid%em_g_mu_2 , grid%em_g_mu_2 , size(grid%em_g_mu_2) )
+            jc = jc + 0.5*da_dot( grid%g_moist_2 , grid%g_moist_2 , size(grid%g_moist_2) )
+
+         endif
+!-------------------------------------------------------------------------
 !     [1.0] calculate jb:
 !-------------------------------------------------------------------------
 
@@ -100,26 +126,33 @@ subroutine da_calculate_j( it, iter, xb, xbx, be, iv, xhat, cv, vv, &
      endif
 
 !-------------------------------------------------------------------------
-!     [3.0] calculate total cost function j = jo + jb:
+!     [3.0] calculate total cost function j = jo + jb + jc:
 !-------------------------------------------------------------------------
 
-      j % total = j % jb + j % jo % total
+      if( grid%jcdfi_onoff ) then
+         j % total = j % jb + j % jo % total + jc
+      else
+         j % total = j % jb + j % jo % total
+      endif
 
       if(it == 1 .and. iter == 0) then
-      write(81,'(a)')'Outer   EPS   Inner      J          Jb      Jo'
+      write(81,'(a)')'Outer   EPS   Inner      J          Jb      Jo     Jc'
       write(81,'(a)')'Iter          Iter                            '
+      write(*,'(a)')'Outer   EPS   Inner  J=      J          Jb      Jo         Jc'
       write(82,'(a)')'Outer   EPS   Inner      G          Gb      Go'
       write(82,'(a)')'Iter          Iter                            '
       endif
 
-      write(81,81) it, EPS(it), iter, j % total, j % jb, j % jo % total
- 81   format(2x,i2,1x,f6.3,2x,i4,2x,3f10.3)
+      write(81,81) it, EPS(it), iter, j % total, j % jb, j % jo % total, jc
+      write(*,89) it, EPS(it), iter, ' J= ',j % total, j % jb, j % jo % total, jc
+ 89   format(2x,i2,1x,f6.3,2x,i4,2x,a,2x,4f10.3)
+ 81   format(2x,i2,1x,f6.3,2x,i4,2x,4f10.3)
 
 !-------------------------------------------------------------------------
 !     [2.0] calculate grad_v (jo):
 !-------------------------------------------------------------------------
 
-      call DA_Transform_VToY_Adj( be, j_grad, iv, vp, vv, xa, xb, xbx, xp, jo_grad_y, &
+      call DA_Transform_VToY_Adj( iter, be, j_grad, iv, vp, vv, xa, xb, xbx, xp, jo_grad_y, &
                                   ids, ide, jds, jde, kds, kde,     &
                                   ims, ime, jms, jme, kms, kme,     &
                                   its, ite, jts, jte, kts, kte,     &

@@ -1147,6 +1147,13 @@ rconfig   logical mix_full_fields         namelist,dynamics     max_domains  .fa
 rconfig   real    base_pres               namelist,dynamics	1          100000.     h    "base_pres"  "Base state pressure - do not change (10^5 Pa), real only"      "Pa"
 rconfig   real    base_temp               namelist,dynamics	1             290.     h    "base_temp"  "Base state sea level temperature, real only"      "K"
 rconfig   real    base_lapse              namelist,dynamics	1              50.     h    "base_lapse" "Base state temperature difference between base pres and 1/e of atm depth - do not change, real only"      "K"
+rconfig   logical jcdfi_onoff             namelist,dynamics     1              .true.  rh   "jcdfi_onoff"   "JcDFI on/off"      ""
+rconfig   real    jcdfi_tauc              namelist,dynamics     1              10800.  rh   "jcdfi_tauc"   "JcDFI cut-off"      ""
+rconfig   real    jcdfi_gama              namelist,dynamics     1              1.      rh   "jcdfi_gama"    "Weighting for JcDFI"      ""
+rconfig   real    jcdfi_error_wind        namelist,dynamics     1              3.      rh   "jcdfi_error_wind"    "Wind Error for JcDFI"      "m/s"
+rconfig   real    jcdfi_error_t           namelist,dynamics     1              1.      rh   "jcdfi_error_t"    "Temp. Error for JcDFI"      "K"
+rconfig   real    jcdfi_error_q           namelist,dynamics     1              0.001   rh   "jcdfi_error_q"    "Moist Error for JcDFI"      "kg/kg"
+rconfig   real    jcdfi_error_mu          namelist,dynamics     1              1000.   rh   "jcdfi_error_mu"    "Pert. Pres. Error for JcDFI"      "Pa"
 
 
 # Bdy_control

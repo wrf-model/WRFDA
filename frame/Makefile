@@ -8,6 +8,7 @@ RM      =       rm -f
 
 MODULES =       module_driver_constants.o  \
                 module_domain.o            \
+                module_dfi.o               \
                 module_integrate.o         \
                 module_integrate_ad.o      \
                 module_integrate_tl.o      \
@@ -69,6 +70,10 @@ module_dm.o: module_machine.o module_state_description.o module_wrf_error.o \
 		module_domain.o \
 		module_driver_constants.o \
 		module_timing.o \
+		module_configure.o 
+
+module_dfi.o: module_wrf_error.o \
+		module_domain.o \
 		module_configure.o 
 
 module_dm_stubs.F: module_domain.o

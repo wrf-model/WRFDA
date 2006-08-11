@@ -1,4 +1,11 @@
 #!/bin/csh -f
+#@ class       = share
+#@ job_type    = serial
+#@ job_name    = wrfvar
+#@ output      = wrfvar.out
+#@ error       = wrfvar.err
+#@ wall_clock_limit = 6:00:00
+#@ queue
 #-----------------------------------------------------------------------
 # Script DA_Run_WRF-4DVar_serial.csh
 #
@@ -33,16 +40,76 @@ setenv RESOLUTION               135              # resolution: km
 setenv DA_TIME_STEP             600              # Model integrate time step : second
 setenv TRAJECTORY_SAVE_FREQ     10               # The frequency of the trajectory will be saved : Minutes
 setenv CASE_NAME                haitang          # Case name and resolution
-setenv DA_NTMAX                 2                # Maximum number of inner loop iterations.
+setenv EXPE_NAME                var4d05          # Case name and resolution
+setenv DA_NTMAX                 100              # Maximum number of inner loop iterations.
+setenv DA_TIME_WINDOW           3                # Data assimilation time window : Hours
+
+setenv DA_VAR_SCALING1          1.0
+setenv DA_VAR_SCALING2          1.0
+setenv DA_VAR_SCALING3          1.0
+setenv DA_VAR_SCALING4          1.0
+setenv DA_VAR_SCALING5          1.0
+setenv DA_LEN_SCALING1          0.5 # 1.0
+setenv DA_LEN_SCALING2          0.5 # 1.0
+setenv DA_LEN_SCALING3          0.5 # 1.0
+setenv DA_LEN_SCALING4          0.5 # 1.0
+setenv DA_LEN_SCALING5          0.5 # 1.0
+
+setenv DA_JCDFI_ON_OFF          .FALSE.            # JcDFI ON/OFF
+setenv DA_JCDFI_TAUC            10800.            # JcDFI Tauc : seconds
+setenv DA_JCDFI_GAMA            10.0              # Weighting given to JcDFI term
+setenv DA_JCDFI_ERROR_WIND      3.0               # JcDFI error for horizontal wind : m/s
+setenv DA_JCDFI_ERROR_T         1.0               # JcDFI error for temperature : K
+setenv DA_JCDFI_ERROR_Q         0.001             # JcDFI error for moisture : kg/kg
+setenv DA_JCDFI_ERROR_MU        1000.             # JcDFI error for pert. pressure : Pa
+
 
 setenv ROOT_DIR /ptmp/huangx/wrf             # common reference src, data, etc
-
-setenv USER_DIR /ptmp/xinzhang/wrf           # user data and results
+setenv USER_DIR /ptmp/xinzhang/wrf.QN_DFI    # user data and results
+setenv RES_DIR $ROOT_DIR                     # results
 
 set GRID_DISTANCE=`expr $RESOLUTION \* 1000`   			          	  # Model horizontal resolution : meter
-setenv RUN_DIR $USER_DIR/var4d${RESOLUTION}km$START_DATE                  # The directory in which you wish your case run
-setenv RES_DIR $USER_DIR/$CASE_NAME/${RESOLUTION}km/results/var4d/$START_DATE	# The directory in which you wish your case run
+set INTERVAL_SECONDS=`expr $DA_TIME_WINDOW \* 3600`   		         	  # Time Window in Seconds
+set DA_NUM_FGAT_TIME=`expr $DA_TIME_WINDOW \+ 1`                                  # Number of FGAT ob windows.
+setenv RUN_DIR $USER_DIR/${EXPE_NAME}${RESOLUTION}km$START_DATE                  # The directory in which you wish your case run
 setenv BE_NAME gen_be_nmc_${CASE_NAME}${RESOLUTION}_${WEST_EAST_GRID_NUMBER}x${SOUTH_NORTH_GRID_NUMBER}x${VERTICAL_GRID_NUMBER}.dat    						# The BE file name
+
+# setup the directory for storing results (5 levels here below)
+setenv RES_DIR $RES_DIR/$CASE_NAME
+ if (  -d ${RES_DIR} ) then
+    echo "The RES_DIR directory: $RES_DIR has already been used"
+ else
+    mkdir -p ${RES_DIR}
+ endif
+setenv RES_DIR $RES_DIR/${RESOLUTION}km
+ if (  -d ${RES_DIR} ) then
+    echo "The RES_DIR directory: $RES_DIR has already been used"
+ else
+    mkdir -p ${RES_DIR}
+ endif
+setenv RES_DIR $RES_DIR/results
+ if (  -d ${RES_DIR} ) then
+    echo "The RES_DIR directory: $RES_DIR has already been used"
+ else
+    mkdir -p ${RES_DIR}
+ endif
+setenv RES_DIR $RES_DIR/$EXPE_NAME
+ if (  -d ${RES_DIR} ) then
+    echo "The RES_DIR directory: $RES_DIR has already been used"
+ else
+    mkdir -p ${RES_DIR}
+ endif
+setenv RES_DIR $RES_DIR/$START_DATE
+ if (  -d ${RES_DIR}) then
+    echo '------------------------ ATTENTION -----------------------------------------'
+    echo "The RES_DIR directory: $RES_DIR has already been used"
+    echo 'please assign another dirctory'
+    echo '----------------------------------------------------------------------------'
+    exit (1)
+ else
+    mkdir -p ${RES_DIR}
+ endif
+
 
  @ dummy = ($TRAJECTORY_SAVE_FREQ * 60 ) % $DA_TIME_STEP
  if ($dummy != 0) then
@@ -62,16 +129,6 @@ setenv BE_NAME gen_be_nmc_${CASE_NAME}${RESOLUTION}_${WEST_EAST_GRID_NUMBER}x${S
  else
     mkdir -p ${RUN_DIR}
     cd ${RUN_DIR}
- endif
-
- if (  -d ${RES_DIR}) then
-    echo '------------------------ ATTENTION -----------------------------------------'
-    echo "The RES_DIR directory: $RES_DIR  is  already exist "
-    echo 'please assign another dirctory'
-    echo '----------------------------------------------------------------------------'
-    exit (1)
- else
-    mkdir -p ${RES_DIR}
  endif
 
 ##########################################################################
@@ -151,7 +208,7 @@ echo '#-----------------------------------------------------------------------'
  if ( ! $?DA_TEST_TRANSFORMS )  set DA_TEST_TRANSFORMS = .FALSE.  # Test WRF-Var transforms.
  if ( ! $?DA_TEST_STATISTICS )  set DA_TEST_STATISTICS = .FALSE.  # Test WRF-Var statistics.
  if ( ! $?DA_INTERPOLATE_STATS )set DA_INTERPOLATE_STATS = .TRUE. # True if statistics computed on different domain.
- if ( ! $?DA_MINIMISATION_OPTION) set DA_MINIMISATION_OPTION = 2  # 1=Quasi-Newton, 2=Conjugate gradient.
+ if ( ! $?DA_MINIMISATION_OPTION) set DA_MINIMISATION_OPTION = 1  # 1=Quasi-Newton, 2=Conjugate gradient.
  if ( ! $?DA_CALCULATE_CG_COST_FUNCTION) set DA_CALCULATE_CG_COST_FUNCTION = .FALSE. # True if want CG diagnostic output. 
  if ( ! $?DA_CV_OPTIONS_HUM ) set DA_CV_OPTIONS_HUM = 1           # Moist control variable (1-3).
  if ( ! $?DA_CHECK_RH )      set DA_CHECK_RH = 0                  # Physical check on humidity (0-2).
@@ -216,6 +273,13 @@ echo '#-----------------------------------------------------------------------'
  if ( ! $?DA_PSEUDO_VAL ) set DA_PSEUDO_VAL = 1.0
  if ( ! $?DA_PSEUDO_ERR ) set DA_PSEUDO_ERR = 1.0
  if ( ! $?DA_PSEUDO_VAR ) set DA_PSEUDO_VAR = t
+ if ( ! $?DA_JCDFI_ON_OFF) set DA_JCDFI_ON_OFF = .TRUE.            # JcDFI ON/OFF
+ if ( ! $?DA_JCDFI_TAUC) set DA_JCDFI_TAUC = 10800.            # JcDFI Tauc : seconds
+ if ( ! $?DA_JCDFI_GAMA ) set DA_JCDFI_GAMA = 1.0               # Weighting given to JcDFI term
+ if ( ! $?DA_JCDFI_ERROR_WIND) set DA_JCDFI_ERROR_WIND = 3.0               # JcDFI error for horizontal wind : m/s
+ if ( ! $?DA_JCDFI_ERROR_T) set DA_JCDFI_ERROR_T = 1.0               # JcDFI error for temperature : K
+ if ( ! $?DA_JCDFI_ERROR_Q) set DA_JCDFI_ERROR_Q = 0.001             # JcDFI error for moisture : kg/kg
+ if ( ! $?DA_JCDFI_ERROR_MU) set DA_JCDFI_ERROR_MU = 1000.             # JcDFI error for pert. pressure : Pa
 
  setenv DA_ANALYSIS_DATE ${DA_CY}-${DA_MM}-${DA_DD}_${DA_HH}:00:00.0000
 
@@ -306,7 +370,7 @@ echo '#-----------------------------------------------------------------------'
 
 echo '#Create WRF-Var namelist file: '
 
- set NEW_DATE = `geth_new.exe ${DA_CY}-${DA_MM}-${DA_DD}-${DA_HH} 6`
+ set NEW_DATE = `geth_new.exe ${DA_CY}-${DA_MM}-${DA_DD}-${DA_HH} ${DA_TIME_WINDOW}`
  set NEW_CY = `echo $NEW_DATE | cut -c1-4`
  set NEW_MM = `echo $NEW_DATE | cut -c6-7`
  set NEW_DD = `echo $NEW_DATE | cut -c9-10`
@@ -401,6 +465,7 @@ cat >! namelist.3dvar << EOF
  minimisation_option = $DA_MINIMISATION_OPTION,
  cv_options     = $DA_CV_OPTIONS,
  cv_options_hum = $DA_CV_OPTIONS_HUM,
+ calculate_cg_cost_function = $DA_CALCULATE_CG_COST_FUNCTION,
  check_rh       = $DA_CHECK_RH,
  as1            = $DA_as1,
  as2            = $DA_as2,
@@ -440,7 +505,7 @@ echo '#Create WRF 4dVar namelist.var4dnl  input file:'
 cat >! namelist.var4dnl << EOF
  &time_control
  run_days                            = 0,
- run_hours                           = 6,
+ run_hours                           = $DA_TIME_WINDOW,
  run_minutes                         = 0,
  run_seconds                         = 0,
  start_year                          = $DA_CY, $DA_CY, $DA_CY,
@@ -455,7 +520,7 @@ cat >! namelist.var4dnl << EOF
  end_hour                            = $NEW_HH, $NEW_HH, $NEW_HH,
  end_minute                          = 00,
  end_second                          = 00,
- interval_seconds                    = 21600,
+ interval_seconds                    = $INTERVAL_SECONDS,
  input_from_file                     = .true.,.false.,.false.,
  history_interval                    = 9999,  60,   60,
  frames_per_outfile                  = 1000, 1000, 1000,
@@ -544,6 +609,13 @@ cat >! namelist.var4dnl << EOF
  v_mom_adv_order                     = 3,      3,      3,
  h_sca_adv_order                     = 5,      5,      5,
  v_sca_adv_order                     = 3,      3,      3,
+ jcdfi_onoff                         = $DA_JCDFI_ON_OFF,
+ jcdfi_tauc                          = $DA_JCDFI_TAUC,
+ jcdfi_gama                          = $DA_JCDFI_GAMA,
+ jcdfi_error_wind                    = $DA_JCDFI_ERROR_WIND,
+ jcdfi_error_t                       = $DA_JCDFI_ERROR_T,
+ jcdfi_error_q                       = $DA_JCDFI_ERROR_Q,
+ jcdfi_error_mu                      = $DA_JCDFI_ERROR_MU,
  /
 
  &bdy_control
@@ -576,7 +648,7 @@ echo '#Create WRF 4dVar namelist.var4dtl  input file:'
 cat >! namelist.var4dtl << EOF
  &time_control
  run_days                            = 0,
- run_hours                           = 6,
+ run_hours                           = $DA_TIME_WINDOW,
  run_minutes                         = 0,
  run_seconds                         = 0,
  start_year                          = $DA_CY, $DA_CY, $DA_CY,
@@ -591,7 +663,7 @@ cat >! namelist.var4dtl << EOF
  end_hour                            = $NEW_HH, $NEW_HH, $NEW_HH,
  end_minute                          = 00,
  end_second                          = 00,
- interval_seconds                    = 21600,
+ interval_seconds                    = $INTERVAL_SECONDS,
  input_from_file                     = .true.,.false.,.false.,
  history_interval                    = 9999,  60,   60,
  frames_per_outfile                  = 1000, 1000, 1000,
@@ -607,8 +679,6 @@ cat >! namelist.var4dtl << EOF
  input_outname                       = 'tl<date>',
  auxinput2_inname                    = 'auxhist2_d<domain>_<date>'
  auxinput2_interval                  = $TRAJECTORY_SAVE_FREQ,
- auxhist3_outname                    = 'auxhist3_d<domain>_<date>'
- auxhist3_interval                   = 60,
  frames_per_auxhist2                 = 1,
  /
 
@@ -681,6 +751,13 @@ cat >! namelist.var4dtl << EOF
  v_mom_adv_order                     = 3,      3,      3,
  h_sca_adv_order                     = 5,      5,      5,
  v_sca_adv_order                     = 3,      3,      3,
+ jcdfi_onoff                         = $DA_JCDFI_ON_OFF,
+ jcdfi_tauc                          = $DA_JCDFI_TAUC,
+ jcdfi_gama                          = $DA_JCDFI_GAMA,
+ jcdfi_error_wind                    = $DA_JCDFI_ERROR_WIND,
+ jcdfi_error_t                       = $DA_JCDFI_ERROR_T,
+ jcdfi_error_q                       = $DA_JCDFI_ERROR_Q,
+ jcdfi_error_mu                      = $DA_JCDFI_ERROR_MU,
  /
 
  &bdy_control
@@ -719,7 +796,7 @@ echo '#Create WRF 4dVar namelist.var4dad  input file:'
 cat >! namelist.var4dad << EOF
  &time_control
  run_days                            = 0,
- run_hours                           = 6,
+ run_hours                           = $DA_TIME_WINDOW,
  run_minutes                         = 0,
  run_seconds                         = 0,
  start_year                          = $DA_CY, $DA_CY, $DA_CY,
@@ -734,7 +811,7 @@ cat >! namelist.var4dad << EOF
  end_hour                            = $NEW_HH, $NEW_HH, $NEW_HH,
  end_minute                          = 00,
  end_second                          = 00,
- interval_seconds                    = 21600,
+ interval_seconds                    = $INTERVAL_SECONDS,
  input_from_file                     = .true.,.false.,.false.,
  history_interval                    = 9999,  60,   60,
  frames_per_outfile                  = 1000, 1000, 1000,
@@ -829,6 +906,13 @@ cat >! namelist.var4dad << EOF
  v_mom_adv_order                     = 3,      3,      3,
  h_sca_adv_order                     = 5,      5,      5,
  v_sca_adv_order                     = 3,      3,      3,
+ jcdfi_onoff                         = $DA_JCDFI_ON_OFF,
+ jcdfi_tauc                          = $DA_JCDFI_TAUC,
+ jcdfi_gama                          = $DA_JCDFI_GAMA,
+ jcdfi_error_wind                    = $DA_JCDFI_ERROR_WIND,
+ jcdfi_error_t                       = $DA_JCDFI_ERROR_T,
+ jcdfi_error_q                       = $DA_JCDFI_ERROR_Q,
+ jcdfi_error_mu                      = $DA_JCDFI_ERROR_MU,
  /
 
  &bdy_control
@@ -936,6 +1020,12 @@ EOF
 
 echo '#Create WRF 4dVar runvar4dtl.csh :'
 
+ set NEW_DATE = `geth_new.exe ${DA_CY}-${DA_MM}-${DA_DD}-${DA_HH} ${DA_TIME_WINDOW}`
+ set NEW_CY = `echo $NEW_DATE | cut -c1-4`
+ set NEW_MM = `echo $NEW_DATE | cut -c6-7`
+ set NEW_DD = `echo $NEW_DATE | cut -c9-10`
+ set NEW_HH = `echo $NEW_DATE | cut -c12-13`
+
 cat >! runvar4dtl.csh << EOF
 #!/bin/csh -f
 
@@ -952,6 +1042,8 @@ cat >! runvar4dtl.csh << EOF
  mv tl${CY04}-${MM04}-${DD04}_${HH04}:00:00 tl04
  mv tl${CY05}-${MM05}-${DD05}_${HH05}:00:00 tl05
  mv tl${CY06}-${MM06}-${DD06}_${HH06}:00:00 tl06
+
+ mv auxhist3_d01_${NEW_CY}-${NEW_MM}-${NEW_DD}_${NEW_HH}:00:00 tldf
 
  cp namelist.var4dnl namelist.input
 
@@ -977,6 +1069,7 @@ cat >! runvar4dad.csh << EOF
  mv af02 auxinput3_d01_${CY02}-${MM02}-${DD02}_${HH02}:00:00
  mv af01 auxinput3_d01_${CY02}-${MM01}-${DD01}_${HH01}:00:00
  mv af00 auxinput3_d01_${DA_CY}-${DA_MM}-${DA_DD}_${DA_HH}:00:00
+ mv afdf auxinput3_d01_dfi
 
  wrf.exe  >>& stdout.ad
 
@@ -997,6 +1090,8 @@ echo '#-------------------------------------------------------------------'
 
  echo `date` > stdout.mi
  da_3dvar.exe >> & stdout.mi
+
+exit (0)
 
 mv fort.12 DAProg_WRF-Var.statistics >&! /dev/null
 mv fort.81 DAProg_WRF-Var.cost_fn >&! /dev/null

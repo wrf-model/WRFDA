@@ -1,4 +1,4 @@
-subroutine DA_Transform_VToY_Adj(be, cv, iv, vp, vv, xa, xb, xbx, xp, y, &
+subroutine DA_Transform_VToY_Adj(iter, be, cv, iv, vp, vv, xa, xb, xbx, xp, y, &
                                  ids, ide, jds, jde, kds, kde,     &
                                  ims, ime, jms, jme, kms, kme,     &
                                  its, ite, jts, jte, kts, kte,     &
@@ -34,7 +34,7 @@ subroutine DA_Transform_VToY_Adj(be, cv, iv, vp, vv, xa, xb, xbx, xp, y, &
       type(grid_config_rec_type), intent(inout) :: config_flags
 
       integer :: nobwin,ndynopt
-      integer ierr, comm
+      integer ierr, comm, iter
 
       character(len=4) :: filnam
 !------------------------------------------------------------------------------
@@ -58,6 +58,29 @@ subroutine DA_Transform_VToY_Adj(be, cv, iv, vp, vv, xa, xb, xbx, xp, y, &
 #include <em_actual_args.inc>
                                  )
          enddo
+
+         ndynopt      = grid%dyn_opt
+         grid%dyn_opt = DYN_EM_TL
+         call nl_set_dyn_opt ( 1 , DYN_EM_TL )
+
+         if ( iter > 0 ) then
+            filnam ='tldf'
+            call med_initialdata_input_3dvar( grid , config_flags, in_filename=filnam )
+         else
+            grid%em_g_u_2 = 0.0
+            grid%em_g_v_2 = 0.0
+            grid%em_g_w_2 = 0.0
+            grid%em_g_t_2 = 0.0
+            grid%em_g_ph_2 = 0.0
+            grid%em_g_mu_2 = 0.0
+            grid%g_moist_2 = 0.0
+         endif
+
+         filnam ='afdf'
+         call med_initialdata_output_3dvar( grid , config_flags, filnam )
+
+         grid%dyn_opt = ndynopt
+         call nl_set_dyn_opt ( 1 , DYN_EM )
 
 #ifdef DM_PARALLEL
          call system_4dv("runvar4dad.csh pre ")
