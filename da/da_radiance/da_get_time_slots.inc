@@ -21,6 +21,8 @@ subroutine da_get_time_slots(nt,tmin,tana,tmax,time_slots)
    REAL      :: dt
    INTEGER   :: it
 
+   if (trace_use) call da_trace_entry("da_get_time_slots")
+
    read(UNIT=tmin,FMT='(i4,5(a1,i2))') min_yyyy,s,min_mm,s,min_dd,s,min_hh,s,min_mn,s,min_ss
    read(UNIT=tmax,FMT='(i4,5(a1,i2))') max_yyyy,s,max_mm,s,max_dd,s,max_hh,s,max_mn,s,max_ss
 
@@ -37,8 +39,11 @@ subroutine da_get_time_slots(nt,tmin,tana,tmax,time_slots)
        time_slots(it) = time_slots(it-1)+dt
      enddo
    end if
-   write(UNIT=stdout,FMT='(a,12f10.0)') ' time_slots ', time_slots(0:nt)
 
- RETURN
+   if (print_detail_radiance) then
+      write(UNIT=stdout,FMT='(a,12f10.0)') ' time_slots ', time_slots(0:nt)
+   end if
+
+   if (trace_use) call da_trace_exit("da_get_time_slots")
 
 end subroutine da_get_time_slots
