@@ -23,6 +23,7 @@ PHYS_MODULES = \
 	module_ra_gsfcsw.o \
 	module_ra_rrtm.o  \
 	module_ra_gfdleta.o \
+	module_ra_cam.o \
 	module_sf_sfclay.o \
 	module_sf_gfs.o \
 	module_sf_slab.o  \

@@ -1,0 +1,27 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: John Bray
+Date: 08/15/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Update arguments to radiation_driver for solve_em_tl
+
+Add module_ra_cam.o to PHYS_MODULES
+
+Test results
+------------------------------------------------------
+
+ocotillo: compiles wrfplus
+
+--------------------------------------------------------------------------------------
+
+File changes:
+------------
+
+A    doc/changes/changes_20060815d.jrb
+M      dyn_em/solve_em_tl.F
+M      build/phys.make
