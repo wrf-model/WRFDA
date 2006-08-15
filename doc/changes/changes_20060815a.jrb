@@ -1,0 +1,53 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: John Bray
+Date: 08/15/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Duplicate cma changes from wrf trunk, with the exception
+of the run/CAM_ABS_DATA, which at 20Mb, is just too damn big
+to clutter our repository with.
+
+Test results
+------------------------------------------------------
+
+bluesky: compiles wrfvar, wrf, under old and new compilation systems
+
+Runs kma_t63 and con200 test cases.
+
+Note that the changes bloat the 4DVAR registry so much that wrfplus no longer compiles, as
+it hits a hardwired limit inside the xlf compiler
+We need to devise a strategy to keep the 4DVAR version slimmer, as trying to incorporate
+all Registry.EM changes isn't working
+
+--------------------------------------------------------------------------------------
+
+File changes:
+------------
+
+A    doc/changes/changes_20060815a.jrb
+M      dyn_nmm/module_PHYSICS_CALLS.F
+M      dyn_nmm/start_domain_nmm.F
+M      dyn_nmm/solve_nmm.F
+M      Registry/Registry.EM_CHEM
+M      Registry/Registry.NMM_NEST
+M      Registry/Registry.EM
+M      Registry/Registry.EM_4DVAR
+M      Registry/Registry.NMM
+M      dyn_em/module_em.F
+M      dyn_em/solve_em.F
+M      dyn_em/start_em.F
+M      arch/configure.defaults
+M      Makefile
+A      phys/module_ra_cam.F
+M      phys/Makefile
+M      phys/module_physics_init.F
+A      run/ozone_plev.formatted
+A      run/CAM_AEROPT_DATA
+M      run/README.namelist
+A      run/ozone.formatted
+
