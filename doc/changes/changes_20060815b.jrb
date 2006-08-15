@@ -1,0 +1,26 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: John Bray
+Date: 08/15/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Rename makedepf90 makedepf90.exe
+
+Test results
+------------------------------------------------------
+
+bluesky: compiles wrfvar, wrf, wrf_plus under old and new compilation systems
+
+Runs kma_t63 and con200 test cases.
+
+--------------------------------------------------------------------------------------
+
+File changes:
+------------
+
+A    doc/changes/changes_20060815b.jrb
+M      build/makefile

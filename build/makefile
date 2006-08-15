@@ -2,10 +2,10 @@ include configure.wrf
 
 setup : depend
 
-makedepf90 : 
+makedepf90.exe : 
 	@ ( cd $(EXTERNAL)/makedepf90/makedepf90-2.8.8; export CC=$(CC_TOOLS); \
           touch configure; ./configure; touch find_dep.c find_dep.h; make )
-	cp $(EXTERNAL)/makedepf90/makedepf90-2.8.8/makedepf90 .
+	cp $(EXTERNAL)/makedepf90/makedepf90-2.8.8/makedepf90 makedepf90.exe
 
 links : 
 	@ $(LN) $(CHEM)/* .
@@ -64,9 +64,9 @@ include RSL_LITE.make
 include main.make
 
 
-depend : arch links registry makedepf90 module_state_description.F md_calls.inc \
+depend : arch links registry makedepf90.exe module_state_description.F md_calls.inc \
                       inc/da_generic_boilerplate.inc
-	./makedepf90 $(FPPFLAGS) \
+	./makedepf90.exe $(FPPFLAGS) \
            *.F *.f90 *.F90 > depend.txt 2>/dev/null
 	
 
@@ -108,5 +108,5 @@ superclean : clean arch_superclean
           convert_tool kma_wave2grid wave2grid_kma *.csh version_decl \
           *.bsh *.csh Utl* macros_utl module_dm_warning rsl_cpp_flags \
           scl_plotting_routines configure.wrf ../configure.wrf \
-          advance_cymdh.exe decode_l2_airs.README time_window.nl \
+          decode_l2_airs.README time_window.nl \
           da_macros_utl links arch
