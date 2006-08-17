@@ -55,7 +55,7 @@ subroutine da_minimise_cg( grid, config_flags,            &
 
    IF (trace_use) call da_trace_entry("da_minimise_cg")
 
-   write (UNIT=stdout,'(a/)') ' ----------------------------------------------------------'
+   write (UNIT=stdout,FMT='(a/)') ' ----------------------------------------------------------'
    WRITE(UNIT=stdout,FMT='(A)') ' [5.2] Minimize cost function Using CG Method'
    if (calculate_cg_cost_fn) then
       WRITE(UNIT=stdout,FMT='(A)') &
