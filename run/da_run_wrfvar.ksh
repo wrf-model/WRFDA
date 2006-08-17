@@ -1,11 +1,11 @@
 #!/bin/ksh
 
-PLATFORM=`uname`
-
 DIR=`dirname $0`
 SVN_REV=`svnversion -n $DIR`
 
-export MP_SHARED_MEMORY=yes
+export NUM_PROCS=${NUM_PROCS:-1}               # Number of processors to run on.
+export HOSTS=${HOSTS:-$PWD/hosts}
+export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS -nolocal -machinefile $HOSTS}
 
 echo ""
 echo "Running script da_run_wrfvar.ksh"
@@ -26,10 +26,9 @@ export REL_DIR=${REL_DIR:-$HOME/trunk}
 export DA_DIR=${DA_DIR:-$REL_DIR/wrfvar}
 export WRFPLUS_DIR=${WRFPLUS_DIR:-$REL_DIR/wrfplus}
 export DA_ID=${DA_ID:-wrfvar}
-export HOSTS=${HOSTS:-$PWD/hosts}
 export REGION=${REGION:-con200}
 export EXPT=${EXPT:-test}
-export DAT_DIR=${DAT_DIR:-/data7/da/bray/data}
+export DAT_DIR=${DAT_DIR:-$HOME/data}
 export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION}
 export OB_DIR=${OB_DIR:-$REG_DIR/ob}
 export BE_DIR=${BE_DIR:-$REG_DIR/be}
@@ -43,8 +42,7 @@ mkdir -p ${RUN_DIR}
 cd $RUN_DIR
 
 # Do we remove the RUN_DIR at the end to save space
-export CLEAN=${CLEAN:-false}
-                       
+export CLEAN=${CLEAN:-false}                      
 
 export DA_FIRST_GUESS=${DA_FIRST_GUESS:-$CS_DIR/$DA_DATE/wrfinput_d01}    # wrfvar "first guess" input.
 export DA_BOUNDARIES=${DA_BOUNDARIES:-$CS_DIR/$DA_DATE/wrfbdy_d01}    # wrfvar boundaries input.
@@ -64,12 +62,9 @@ export ENDIAN=${ENDIAN:-big_endian}
 export RTTOV=${RTTOV:-$HOME/rttov/rttov85}                            # RTTOV
 export DA_RTTOV_COEFFS=${DA_RTTOV_COEFFS:-$RTTOV/rtcoef_rttov7}
 
-
-export NUM_PROCS=${NUM_PROCS:-1}               # Number of processors to run on.
-
 export NL_GLOBAL=${NL_GLOBAL:-.FALSE.}
 export NL_LVAR4D=${NL_LVAR4D:-.FALSE.}
-export NL_RUN_HOURS=${NL_RUN_HOURS:-1}
+export NL_RUN_HOURS=${NL_RUN_HOURS:-6}
 export NL_USE_HTML=${NL_USE_HTML:-.FALSE.}
 
 export NPROC_X=${NPROC_X:-0}                        # Regional, always set NPROC_X to 0, Global, always 1
@@ -256,51 +251,14 @@ fi
 
 . $DA_DIR/inc/namelist_script.inc
 
-
-
 mkdir trace
 
 #-------------------------------------------------------------------
 #Run WRF-Var:
 #-------------------------------------------------------------------
 
-if test $PLATFORM = "Linux"; then
-  if test $NUM_PROCS -gt 1; then
-    mpirun -v -np $NUM_PROCS -nolocal -machinefile $HOSTS ./wrfvar.exe > wrfvar.out 2>wrfvar.error
-    RC=$?
-  else
-    # mpirun -v -np 1 ./wrfvar.exe > /dev/null #Assumes compile in DM mode.
-    ./wrfvar.exe > wrfvar.out 2>wrfvar.error
-    RC=$?
-  fi
-fi
-
-if test $PLATFORM = "Darwin"; then
-  if test $NUM_PROCS -gt 1; then
-    mpirun -v -np $NUM_PROCS -all-local -machinefile $HOSTS ./wrfvar.exe > wrfvar.out 2>wrfvar.error
-    RC=$?
-  else
-    ./wrfvar.exe > wrfvar.out 2>wrfvar.error
-    RC=$?
-  fi
-fi
-
-#DEC:
-#./wrfvar.exe > wrfvar.out 2>wrfvar.error
-#RC=$?
-
-if test $PLATFORM = "AIX"; then
-  #IBM (llsubmit):
-  #poe ./wrfvar.exe
-  #mpirun -np ${NUM_PROCS} ./wrfvar.exe
-  if test $DEBUGGER'.' = '.' ; then
-     ./wrfvar.exe > wrfvar.out 2>wrfvar.error
-     RC=$?
-  else
-     $DEBUGGER ./wrfvar.exe > wrfvar.out 2>wrfvar.error
-     RC=$?
-  fi
-fi
+$RUN_CMD ./wrfvar.exe > wrfvar.out 2>wrfvar.error
+RC=$?
 
 DATE=`date`
 

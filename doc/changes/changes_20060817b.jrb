@@ -1,0 +1,32 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Michalakes
+Reviewer: John Bray
+Date: 08/17/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Add lsf support for lightning job submission. Needs mpich_gm
+to work.
+
+Move machine level logic out of da_run_wrfvar.ksh by introducing
+idea of RUN_CMD in da_run_job.ksh
+
+Test results
+------------------------------------------------------
+
+lightning: compiles pathscale wrfvar, runs con200
+bluesky: Still compiles xlf wrfvar, runs con200
+
+--------------------------------------------------------------------------------------
+
+File changes:
+------------
+
+A    doc/changes/changes_20060817b.jrb
+M      setup/setup.csh
+M      setup/setup.ksh
+M      run/da_run_wrfvar.ksh
+M      run/da_run_job.ksh

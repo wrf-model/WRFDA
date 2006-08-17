@@ -71,6 +71,17 @@ if test -d /usr/lpp/ppe.poe; then
    export MPICH=/usr/lpp/ppe.poe
 fi
 
+# Lightning
+
+if test $HOSTNAME == "ln0126en" -o $HOSTNAME == "ln0127en"; then 
+   if test $COMPILER == pathscale; then
+      export MPICH=/contrib/2.6/mpich-gm/1.2.6..14a-pathscale-2.4-64
+   fi
+   if test $COMPILER == pgi; then
+      export MPICH=/usr/local/mpich-gm/mpichgm-1.2.6..14a-64
+   fi
+fi
+
 export MPIHOME=$MPICH
 export PATH=$MPICH/bin:$PATH
 export MANPATH=$MPICH/man:$MANPATH

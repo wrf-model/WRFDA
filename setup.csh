@@ -45,11 +45,8 @@ if (-d /data7/da/bray/netcdf/netcdf-3.6.1_${COMPILER}) then
    setenv NETCDF /data7/da/bray/netcdf/netcdf-3.6.1_${COMPILER}
 endif
 if (-d /data7/da/bray/rttov/rttov85_${COMPILER}) then
-echo setting RTTOV to /data7/da/bray/rttov/rttov85_${COMPILER}
    setenv RTTOV /data7/da/bray/rttov/rttov85_$COMPILER
-echo 0 $RTTOV
 endif
-echo 1 $RTTOV
 if (-d /data7/da/bray/mpich/mpich-1.2.7p1_${COMPILER}) then
    setenv MPICH /data7/da/bray/mpich/mpich-1.2.7p1_${COMPILER}
 endif
@@ -57,16 +54,14 @@ endif
 if (-d ~bray/netcdf/netcdf-3.6.1_${COMPILER}) then
    setenv NETCDF ~bray/netcdf/netcdf-3.6.1_${COMPILER}
 endif
-echo oi
+
 if (-d ~bray/rttov/rttov85_$COMPILER) then
    setenv RTTOV ~bray/rttov/rttov85_$COMPILER
-echo $RTTOV
 endif
 if (-d ~bray/mpich/mpich-1.2.7p1_${COMPILER}) then
    setenv MPICH ~bray/mpich/mpich-1.2.7p1_${COMPILER}
 endif
 
-echo 2 $RTTOV
 if (-d /Volumes/$MACHINE/bray/tools/netcdf-3.6.1_${COMPILER}) then
    setenv NETCDF /Volumes/$MACHINE/bray/tools/netcdf-3.6.1_${COMPILER}
 endif
@@ -77,9 +72,19 @@ if (-d /Volumes/$MACHINE/bray/tools/mpich-1.2.7p1_${COMPILER}) then
    setenv MPICH /Volumes/$MACHINE/bray/tools/mpich-1.2.7p1_${COMPILER}
 endif
 
-echo 3 $RTTOV
 if (-d /usr/lpp/ppe.poe) then
    setenv MPICH /usr/lpp/ppe.poe
+endif
+
+# Lightning
+
+if ( $HOSTNAME == "ln0126en" || $HOSTNAME == "ln0127en" ) then 
+   if ( $COMPILER == pathscale ) then
+      setenv MPICH /contrib/2.6/mpich-gm/1.2.6..14a-pathscale-2.4-64
+   endif
+   if ( $COMPILER == pgi ) then
+      setenv MPICH /usr/local/mpich-gm/mpichgm-1.2.6..14a-64
+   endif
 endif
 
 setenv MPIHOME $MPICH
