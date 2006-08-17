@@ -19,11 +19,11 @@
 
    IF (trace_use) call da_trace_entry("da_transform_vtovv_adj")
 
-!-------------------------------------------------------------------------
-!  [2.0] Perform VToVV Transform:
-!-------------------------------------------------------------------------
+   !-------------------------------------------------------------------------
+   ! [2.0] Perform VToVV Transform:
+   !-------------------------------------------------------------------------
 
-!  [2.1] Transform 1st control variable:
+   ! [2.1] Transform 1st control variable:
 
    mz = be % v1 % mz
    IF ( mz > 0 ) then
@@ -34,7 +34,7 @@
                                     its,ite, jts,jte, kts,kte )
    END IF
 
-!  [2.2] Transform 2nd control variable:
+   ! [2.2] Transform 2nd control variable:
 
    mz = be % v2 % mz
    IF ( mz > 0 ) then
@@ -45,7 +45,7 @@
                                     its,ite, jts,jte, kts,kte )
    END IF
 
-!  [2.3] Transform 3rd control variable
+   ! [2.3] Transform 3rd control variable
 
    mz = be % v3 % mz
    IF ( mz > 0 ) then
@@ -56,7 +56,7 @@
                                     its,ite, jts,jte, kts,kte )
    END IF
    
-!  [2.4] Transform 4th control variable
+   ! [2.4] Transform 4th control variable
       
    mz = be % v4 % mz
    IF ( mz > 0 ) then
@@ -67,7 +67,7 @@
                                     its,ite, jts,jte, kts,kte )
    END IF
 
-!  [2.5] Transform 5th control variable
+   ! [2.5] Transform 5th control variable
 
    mz = be % v5 % mz
    IF ( mz > 0 ) then
@@ -78,7 +78,7 @@
                                     its,ite, jts,jte, kts,kte )
    END IF
 
-!  [2.6] Transform alpha control variable
+   ! [2.6] Transform alpha control variable
 
    mz = be % alpha % mz
    IF ( mz > 0 ) then
@@ -89,13 +89,13 @@
                                         its,ite, jts,jte, kts,kte )
    END IF
 
-!-------------------------------------------------------------------------
-!  [1.0] Fill 1D cv array from 3-dimensional vv arrays.
-!-------------------------------------------------------------------------
+   !-------------------------------------------------------------------------
+   ! [1.0] Fill 1D cv array from 3-dimensional vv arrays.
+   !-------------------------------------------------------------------------
 
    call da_vv_to_cv( vv, xp, &
-                  (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%ne /), &
-                  cv_size, cv )
+      (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%ne /), &
+      cv_size, cv )
 
    IF (trace_use) call da_trace_exit("da_transform_vtovv_adj")
 

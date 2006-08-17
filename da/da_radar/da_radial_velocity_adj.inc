@@ -20,7 +20,7 @@ subroutine da_radial_velocity_Adj(rv,p,u,v,w,qrn,ps0,x,y,z,qrn9)
    w = w + rv*z
    vt = -rv*z
 
-   if(qrn9 >  0.) then
+   if (qrn9 >  0.0) then
       qrn = qrn + vt*0.675*alpha*qrn9**(-0.875)
    end if
 

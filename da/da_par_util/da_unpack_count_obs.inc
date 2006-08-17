@@ -1,10 +1,10 @@
 subroutine da_unpack_count_obs ( num_obs, offset, value )
 
-!------------------------------------------------------------------------------
-!  PURPOSE: Unpack the 4 integer values starting at value(offset) into the
-!           num_obs structure.
-!
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! PURPOSE: Unpack the 4 integer values starting at value(offset) into the
+   !          num_obs structure.
+   !
+   !---------------------------------------------------------------------------
 
    TYPE (count_obs_number_type), INTENT(OUT)    :: num_obs
    INTEGER                     , INTENT(INOUT)  :: offset

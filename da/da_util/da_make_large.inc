@@ -23,7 +23,7 @@ subroutine da_make_large(sub_header_small, sub_header_large, &
    print_info = .true.
 
 
-   if(sub_header_small%ndim > 1  .and. &
+   if (sub_header_small%ndim > 1  .and. &
       sub_header_small%end_index(1) == iy) then
 
       if(sub_header_small%end_index(2) == jx) then
@@ -45,19 +45,19 @@ subroutine da_make_large(sub_header_small, sub_header_large, &
          sub_header_small%start_index(2)=1
          sub_header_small%end_index(2)  =mkx
 
-!        do k=3,4
-!           sub_header_small%start_index(k)=1
-!           sub_header_small%end_index(k)  =1
-!        end do
+         ! do k=3,4
+         !    sub_header_small%start_index(k)=1
+         !    sub_header_small%end_index(k)  =1
+         ! end do
 
-!        if(sub_header_small%ndim == 3) then
-!           sub_header_small%start_index(3)=1
-!           sub_header_small%end_index(3)  =mkx
-!        end if
+         ! if(sub_header_small%ndim == 3) then
+         !    sub_header_small%start_index(3)=1
+         !    sub_header_small%end_index(3)  =mkx
+         ! end if
       end if
    endif
 
-   if(print_info) then
+   if (print_info) then
       call da_print_sub_header(sub_header_small)
 
       write(unit=*, fmt='(a,e24.14)') &
@@ -71,11 +71,11 @@ subroutine da_make_large(sub_header_small, sub_header_large, &
 
    data_large = 0.0
 
-   if(index(sub_header_small%name, '_EVALG') > 0 .or. &
+   if (index(sub_header_small%name, '_EVALG') > 0 .or. &
       index(sub_header_small%name, '_EVECG') > 0) then
       data_large = data_small
-   else if(sub_header_small%end_index(1) == iy_large) then
-      if(sub_header_small%end_index(2) == jx_large ) then
+   else if (sub_header_small%end_index(1) == iy_large) then
+      if (sub_header_small%end_index(2) == jx_large ) then
          do k=sub_header_small%start_index(3), sub_header_large%end_index(3)
             do j=1,jx
                do i=1,iy

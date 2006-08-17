@@ -1,16 +1,12 @@
 subroutine da_calculate_rf_factors( rf_lengthscale, rf_alpha, rf_scale_factor )
 
-!------------------------------------------------------------------------------
-!  PURPOSE: Calculate:
-!           1) Alpha value for recursive filter.
-!           2) Turning conditions appropriate for B=UU^T RF.
-!           3) Generic (depends only on rf_passes) rescaling factor.
-!           4) Grid-dependent (hopefully temporary) scaling factor - removed.
-!
-!  METHOD:  See below and documentation.
-!
-!  HISTORY: 08/07/2000 - Creation of F90 version.           Dale Barker
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! PURPOSE: Calculate:
+   !          1) Alpha value for recursive filter.
+   !          2) Turning conditions appropriate for B=UU^T RF.
+   !          3) Generic (depends only on rf_passes) rescaling factor.
+   !          4) Grid-dependent (hopefully temporary) scaling factor - removed.
+   !---------------------------------------------------------------------------
 
    IMPLICIT NONE
    
@@ -27,9 +23,9 @@ subroutine da_calculate_rf_factors( rf_lengthscale, rf_alpha, rf_scale_factor )
 
    real, dimension(-n:n) :: field_in, field_out, field_out1  ! Working field.
 
-!-------------------------------------------------------------------------
-!  [1.0]: Initialise:
-!-------------------------------------------------------------------------  
+   !-------------------------------------------------------------------------
+   ! [1.0]: Initialise:
+   !-------------------------------------------------------------------------  
 
    kz = SIZE(rf_scale_factor)
    
@@ -37,20 +33,20 @@ subroutine da_calculate_rf_factors( rf_lengthscale, rf_alpha, rf_scale_factor )
    
    DO k = 1, kz
 
-!-------------------------------------------------------------------------
-!     [2.0]: Calculate RF alpha:
-!-------------------------------------------------------------------------  
+      !-------------------------------------------------------------------------
+      ! [2.0]: Calculate RF alpha:
+      !-------------------------------------------------------------------------  
 
       rf_e = 0.25 * rf_passes / ( rf_lengthscale(k) * rf_lengthscale(k) )
       rf_alpha(k) = 1.0 + rf_e - SQRT( rf_e * ( rf_e + 2.0 ) )
 
-!-------------------------------------------------------------------------
-!     [3.0]: Calculate rescaling factor:
-!-------------------------------------------------------------------------
+      !-------------------------------------------------------------------------
+      ! [3.0]: Calculate rescaling factor:
+      !-------------------------------------------------------------------------
 
-!     [3.1]: Calculate generic rescaling (normalise zero distance to 1):
-!     For rf_passes=2 (SOAR) = 4*rf_lengthscale.
-!     For rf_passes=infinity (Gaussian) = SQRT(8*pi)*rf_lengthscale.
+      ! [3.1]: Calculate generic rescaling (normalise zero distance to 1):
+      ! For rf_passes=2 (SOAR) = 4*rf_lengthscale.
+      ! For rf_passes=infinity (Gaussian) = SQRT(8*pi)*rf_lengthscale.
 
       field_in(-n:n) = 0.0
       field_in(0) = 1.0
@@ -66,19 +62,19 @@ subroutine da_calculate_rf_factors( rf_lengthscale, rf_alpha, rf_scale_factor )
 
       rf_scale_factor(k) = 1.0 / field_out(0)
 
-!     Uncomment the following to test equivalence of UU^T and RF:
-!      WRITE(UNIT=stderr,FMT='(A,f15.5)')' RF Scaling Factor = ', 1.0 / field_out(0)
-!      field_out1(-n:n) = field_in(-n:n)
-!      DO pass = 1, rf_passes
-!         call da_recursive_filter_1d( pass, rf_alpha(k), field_out1, 2*n+1 )
-!      END DO
-         
-!      do nn = -n, n
-!         WRITE(UNIT=stderr,FMT='(2i5,4f12.5)')k, nn, field_in(nn), &
-!                                field_out(nn) / field_out(0), &
-!                                field_out1(nn) / field_out1(0), &
-!                                exp( -0.125*(REAL(nn)/rf_lengthscale(k))**2 )
-!      end do
+      ! Uncomment the following to test equivalence of UU^T and RF:
+      ! WRITE(UNIT=stderr,FMT='(A,f15.5)')' RF Scaling Factor = ', 1.0 / field_out(0)
+      ! field_out1(-n:n) = field_in(-n:n)
+      ! DO pass = 1, rf_passes
+      !    call da_recursive_filter_1d( pass, rf_alpha(k), field_out1, 2*n+1 )
+      ! END DO
+
+      ! do nn = -n, n
+      !    WRITE(UNIT=stderr,FMT='(2i5,4f12.5)')k, nn, field_in(nn), &
+      !                             field_out(nn) / field_out(0), &
+      !                             field_out1(nn) / field_out1(0), &
+      !                             exp( -0.125*(REAL(nn)/rf_lengthscale(k))**2 )
+      ! end do
 
    END DO ! End loop over k
    

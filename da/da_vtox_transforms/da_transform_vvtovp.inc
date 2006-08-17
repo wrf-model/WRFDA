@@ -4,14 +4,12 @@ subroutine da_transform_vvtovp( evec, eval, vertical_wgt, &
                                 ims,ime, jms,jme, kms,kme,  &
                                 its,ite, jts,jte, kts,kte )
 
-!------------------------------------------------------------------------------
-!  PURPOSE: Transform from fields on vertical EOFS to fields on vertical levels.
-!
-!  METHOD:  Perform vp(i,j,k) = P E L^{1/2} vv(i,j,m) transform.
-!
-!  HISTORY: 02/23/2000 - Creation of F90 version.           Dale Barker
-!           10/30/2001 - Parallel version.                  Dale Barker
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! PURPOSE: Transform from fields on vertical EOFS to fields on vertical 
+   ! levels.
+   !
+   ! METHOD:  Perform vp(i,j,k) = P E L^{1/2} vv(i,j,m) transform.
+   !---------------------------------------------------------------------------
 
    implicit none
    
@@ -29,12 +27,11 @@ subroutine da_transform_vvtovp( evec, eval, vertical_wgt, &
    integer               :: i, j, k, m                 ! Loop counters.
    real                  :: temp
 
-  IF (trace_use) call da_trace_entry("da_transform_vvtovp")
+   IF (trace_use) call da_trace_entry("da_transform_vvtovp")
 
-
-!-------------------------------------------------------------------
-!  [1.0] Perform vp(i,j,k) = E L^{1/2} vv(i,j,m) transform:
-!------------------------------------------------------------------- 
+   !-------------------------------------------------------------------
+   ! [1.0] Perform vp(i,j,k) = E L^{1/2} vv(i,j,m) transform:
+   !------------------------------------------------------------------- 
 
    vp = 0.0
    DO k = kts, kte
@@ -49,15 +46,13 @@ subroutine da_transform_vvtovp( evec, eval, vertical_wgt, &
       END DO
    END DO
    
-!-------------------------------------------------------------------
-!  [2.0] Apply inner-product weighting if vertical_ip > 0:
-!------------------------------------------------------------------- 
+   !-------------------------------------------------------------------
+   ! [2.0] Apply inner-product weighting if vertical_ip > 0:
+   !------------------------------------------------------------------- 
 
    IF ( vertical_ip /= 0 ) THEN
-
       vp(its:ite,jts:jte,kts:kte) = vp(its:ite,jts:jte,kts:kte) / &
-                                    vertical_wgt(its:ite,jts:jte,kts:kte)
-                           
+                                    vertical_wgt(its:ite,jts:jte,kts:kte)                          
    END IF
 
    IF (trace_use) call da_trace_exit("da_transform_vvtovp")

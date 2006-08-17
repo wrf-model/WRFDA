@@ -1,13 +1,12 @@
 subroutine da_proc_sum_real ( n, value )
 
-!------------------------------------------------------------------------------
-!  PURPOSE: Do MPI reduction operation across processors to sum a real vector.  
-!           On return, each of the N components of the vector "value" represents
-!           the sum of parts from each processor. The result is stored only on 
-!           the root processor, i.e., processor 0. (In this way, we do not have 
-!           to do all-to-all communication.)
-!
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   !  PURPOSE: Do MPI reduction operation across processors to sum a real vector.  
+   !           On return, each of the N components of the vector "value" represents
+   !           the sum of parts from each processor. The result is stored only on 
+   !           the root processor, i.e., processor 0. (In this way, we do not have 
+   !           to do all-to-all communication.)
+   !---------------------------------------------------------------------------
 
 #ifdef DM_PARALLEL
    INCLUDE 'mpif.h'
@@ -25,18 +24,16 @@ subroutine da_proc_sum_real ( n, value )
    LOGICAL, EXTERNAL :: wrf_dm_on_monitor
 
 #ifdef DM_PARALLEL
-
-! Get rank of monitor processor and broadcast to others.
+   ! Get rank of monitor processor and broadcast to others.
    call MPI_COMM_RANK( MPI_COMM_WORLD, myrank, ierr )
 
-   IF ( wrf_dm_on_monitor() ) root = myrank
+   IF (wrf_dm_on_monitor()) root = myrank
    call wrf_dm_bcast_integer ( root, 1 )
    apsum=0
    call MPI_REDUCE(value, apsum, n, TRUE_MPI_REAL, MPI_SUM, root, MPI_COMM_WORLD, IERR )
 
-   IF ( myrank .eq. root ) value = apsum
+   IF (myrank .eq. root) value = apsum
 #endif
 
-   RETURN
 end subroutine da_proc_sum_real
 

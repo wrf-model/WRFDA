@@ -1,8 +1,8 @@
 subroutine da_cv_to_vv ( cv_size, rcv, xp, mzs, vv )
 
-!------------------------------------------------------------------------------
-!  PURPOSE: Fill (local) vv arrays from 1D (local) cv array.
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! PURPOSE: Fill (local) vv arrays from 1D (local) cv array.
+   !---------------------------------------------------------------------------
 
    INTEGER,        INTENT(IN)    :: cv_size     ! Length of CV array.
    REAL,           INTENT(IN)    :: rcv(1:cv_size) ! Control variables v.
@@ -25,35 +25,38 @@ subroutine da_cv_to_vv ( cv_size, rcv, xp, mzs, vv )
    jy = je-js+1
    cv_e = 0
 
-!--------------------------------------------------------------------------
-! [1] Transfer components of Jb control variable:
-!--------------------------------------------------------------------------
+   !--------------------------------------------------------------------------
+   ! [1] Transfer components of Jb control variable:
+   !--------------------------------------------------------------------------
 
-!Fill v1
+   ! Fill v1
    mz = mzs(1)
    if ( mz > 0 ) then
-     ijm = ix * jy * mz
-     cv_s = cv_e + 1
-     cv_e = cv_s + ijm - 1
-     vv % v1(is:ie,js:je,1:mz) = RESHAPE( rcv(cv_s:cv_e),(/ix, jy, mz/) )
+      ijm = ix * jy * mz
+      cv_s = cv_e + 1
+      cv_e = cv_s + ijm - 1
+      vv % v1(is:ie,js:je,1:mz) = RESHAPE( rcv(cv_s:cv_e),(/ix, jy, mz/) )
    end if
-!Fill v2
+
+   ! Fill v2
    mz = mzs(2)
    if ( mz > 0 ) then
-     ijm = ix * jy * mz
-     cv_s = cv_e + 1
-     cv_e = cv_s + ijm - 1
-     vv % v2(is:ie,js:je,1:mz) = RESHAPE( rcv(cv_s:cv_e),(/ix, jy, mz/) )
+      ijm = ix * jy * mz
+      cv_s = cv_e + 1
+      cv_e = cv_s + ijm - 1
+      vv % v2(is:ie,js:je,1:mz) = RESHAPE( rcv(cv_s:cv_e),(/ix, jy, mz/) )
    end if
-!Fill v3
+
+   ! Fill v3
    mz = mzs(3)
    if ( mz > 0 ) then
-     ijm = ix * jy * mz
-     cv_s = cv_e + 1
-     cv_e = cv_s + ijm - 1
-     vv % v3(is:ie,js:je,1:mz) = RESHAPE( rcv(cv_s:cv_e),(/ix, jy, mz/) )
+      ijm = ix * jy * mz
+      cv_s = cv_e + 1
+      cv_e = cv_s + ijm - 1
+      vv % v3(is:ie,js:je,1:mz) = RESHAPE( rcv(cv_s:cv_e),(/ix, jy, mz/) )
    end if
-!Fill v4
+
+   ! Fill v4
    mz = mzs(4)
    if ( mz > 0 ) then
      ijm = ix * jy * mz
@@ -61,7 +64,8 @@ subroutine da_cv_to_vv ( cv_size, rcv, xp, mzs, vv )
      cv_e = cv_s + ijm - 1
      vv % v4(is:ie,js:je,1:mz) = RESHAPE( rcv(cv_s:cv_e),(/ix, jy, mz/) )
    end if
-!Fill v5
+
+   ! Fill v5
    mz = mzs(5)
    if ( mz == 1 ) then ! Can only be 0 or 1 (2D ps_u field)
      ijm = ix * jy * mz
@@ -70,9 +74,9 @@ subroutine da_cv_to_vv ( cv_size, rcv, xp, mzs, vv )
      vv % v5(is:ie,js:je,1:mz) = RESHAPE( rcv(cv_s:cv_e),(/ix, jy,mz/) )
    end if
 
-!--------------------------------------------------------------------------
-!  [2] Transfer components of Je control variable:
-!--------------------------------------------------------------------------
+   !--------------------------------------------------------------------------
+   ! [2] Transfer components of Je control variable:
+   !--------------------------------------------------------------------------
 
    mz = mzs(6)
    if ( mz > 0 ) then

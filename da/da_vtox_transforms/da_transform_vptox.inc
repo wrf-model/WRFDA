@@ -3,9 +3,9 @@ subroutine da_transform_vptox( xb, vp, xp, xa, be, ep, &
                                ims,ime, jms,jme, kms,kme,   &
                                its,ite, jts,jte, kts,kte )
 
-!-----------------------------------------------------------------------
-! Purpose : Physical transform of analysis increment variables.
-!-----------------------------------------------------------------------
+   !-----------------------------------------------------------------------
+   ! Purpose : Physical transform of analysis increment variables.
+   !-----------------------------------------------------------------------
 
    implicit none
    
@@ -24,10 +24,9 @@ subroutine da_transform_vptox( xb, vp, xp, xa, be, ep, &
 
    IF (trace_use) call da_trace_entry("da_transform_vptox") 
 
-
-!--------------------------------------------------------------------------
-!  [1] Include alpha control variable:
-!--------------------------------------------------------------------------
+   !--------------------------------------------------------------------------
+   ! [1] Include alpha control variable:
+   !--------------------------------------------------------------------------
 
    do n = 1, be % ne
 
@@ -35,34 +34,34 @@ subroutine da_transform_vptox( xb, vp, xp, xa, be, ep, &
                              sqrt(sum(vp%alpha(:,:,n)**2)/real(ite*jte))
       do k = kts, kte
 
-!        psi:
+         ! psi:
          vp % v1(its:ite,jts:jte,k) = vp % v1(its:ite,jts:jte,k) + &
                                       vp % alpha(its:ite,jts:jte,n) * &
                                       ep % v1(its:ite,jts:jte,k,n)
-!        chi_u:
+         ! chi_u:
          vp % v2(its:ite,jts:jte,k) = vp % v2(its:ite,jts:jte,k) + &
                                       vp % alpha(its:ite,jts:jte,n) * &
                                       ep % v2(its:ite,jts:jte,k,n)
-!        t_u:
+         ! t_u:
          vp % v3(its:ite,jts:jte,k) = vp % v3(its:ite,jts:jte,k) + &
                                       vp % alpha(its:ite,jts:jte,n) * &
                                       ep % v3(its:ite,jts:jte,k,n)
-!        rh:
+         ! rh:
          vp % v4(its:ite,jts:jte,k) = vp % v4(its:ite,jts:jte,k) + &
                                       vp % alpha(its:ite,jts:jte,n) * &
                                       ep % v4(its:ite,jts:jte,k,n)
-!       ps_u
+        ! ps_u
         vp % v5(its:ite,jts:jte,k) = vp % v5(its:ite,jts:jte,k) + &
                                      vp % alpha(its:ite,jts:jte,n) * &
                                      ep % v5(its:ite,jts:jte,k,n)
       end do
    end do
 
-!--------------------------------------------------------------------------
-!  [2] Impose statistical balance constraints:
-!--------------------------------------------------------------------------
+   !--------------------------------------------------------------------------
+   ! [2] Impose statistical balance constraints:
+   !--------------------------------------------------------------------------
 
-!  Chi:
+   ! Chi:
    do k = kts, kte
       do j = jts, jte
          vp%v2(its:ite,j,k) = vp%v2(its:ite,j,k) + &
@@ -70,7 +69,7 @@ subroutine da_transform_vptox( xb, vp, xp, xa, be, ep, &
       end do
    end do
   
-!  Temperature:
+   ! Temperature:
    xa%t(its:ite,jts:jte,kts:kte) = vp%v3(its:ite,jts:jte,kts:kte)
    do k1 = kts, kte
       do k = kts, kte
@@ -81,7 +80,7 @@ subroutine da_transform_vptox( xb, vp, xp, xa, be, ep, &
      end do
    end do
 
-!  Surface Pressure
+   ! Surface Pressure
    xa%psfc(its:ite,jts:jte) = vp%v5(its:ite,jts:jte,1) 
    do k = kts,kte
       do j = jts,jte
@@ -89,14 +88,14 @@ subroutine da_transform_vptox( xb, vp, xp, xa, be, ep, &
       end do
    end do
 
-!--------------------------------------------------------------------------
-!  [3] Transform to model variable space:
-!--------------------------------------------------------------------------
+   !--------------------------------------------------------------------------
+   ! [3] Transform to model variable space:
+   !--------------------------------------------------------------------------
 
-!  Communicate halo region.
+   ! Communicate halo region.
    call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id1)
 
-!  Psi and chi to u and v:
+   ! Psi and chi to u and v:
 
    call da_PsiChi_To_UV( vp % v1, vp % v2, xb % coefx, &
                          xb % coefy , xa % u, xa % v, &
@@ -104,7 +103,7 @@ subroutine da_transform_vptox( xb, vp, xp, xa, be, ep, &
                          ims,ime, jms,jme, kms,kme, &
                          its,ite, jts,jte, kts,kte )
 
-!  Pseudo RH --> Specific humidity:
+   ! Pseudo RH --> Specific humidity:
    xa % q(its:ite,jts:jte,kts:kte) = vp%v4(its:ite,jts:jte,kts:kte) * &
                                      xb%qs(its:ite,jts:jte,kts:kte)
 

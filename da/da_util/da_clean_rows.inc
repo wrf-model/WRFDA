@@ -21,38 +21,38 @@ subroutine da_clean_rows(data, sub_header)
    kb = 1
    lb = 1
 
-!  ie = sub_header%end_index(1)
-!  je = sub_header%end_index(2)
-!  ke = sub_header%end_index(3)
-!  le = sub_header%end_index(4)
+   ! ie = sub_header%end_index(1)
+   ! je = sub_header%end_index(2)
+   ! ke = sub_header%end_index(3)
+   ! le = sub_header%end_index(4)
 
-!  ib = sub_header%start_index(1)
-!  jb = sub_header%start_index(2)
-!  kb = sub_header%start_index(3)
-!  lb = sub_header%start_index(4)
+   ! ib = sub_header%start_index(1)
+   ! jb = sub_header%start_index(2)
+   ! kb = sub_header%start_index(3)
+   ! lb = sub_header%start_index(4)
 
-!  write(unit=*, fmt='(3a,5(2x,a,2i5))') &
-!       'Clean Field <', sub_header%name, '>', &
-!       'ib,ie=', ib, ie, &
-!       'jb,je=', jb, je, &
-!       'kb,ke=', kb, ke, &
-!       'lb,le=', lb, le, &
-!       'iy,jx=', mix, mjx
+   ! write(unit=*, fmt='(3a,5(2x,a,2i5))') &
+   !    'Clean Field <', sub_header%name, '>', &
+   !    'ib,ie=', ib, ie, &
+   !    'jb,je=', jb, je, &
+   !    'kb,ke=', kb, ke, &
+   !    'lb,le=', lb, le, &
+   !    'iy,jx=', mix, mjx
 
-   if(sub_header%ndim > 1) then
-      if(sub_header%staggering(1:1) == 'c' .or. &
+   if (sub_header%ndim > 1) then
+      if (sub_header%staggering(1:1) == 'c' .or. &
          sub_header%staggering(1:1) == 'C') then
 
          do l=lb,le
-         do k=kb,ke
-            do j=jb,je-1
-               data(ie,j,k,l)=data(ie-1,j,k,l)
-            end do
+            do k=kb,ke
+               do j=jb,je-1
+                  data(ie,j,k,l)=data(ie-1,j,k,l)
+               end do
  
-            do i=ib,ie
-               data(i,je,k,l)=data(i,je-1,k,l)
+               do i=ib,ie
+                  data(i,je,k,l)=data(i,je-1,k,l)
+               end do
             end do
-         end do
          end do
       end if
    end if

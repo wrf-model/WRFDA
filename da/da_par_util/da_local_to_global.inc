@@ -1,11 +1,10 @@
-
 subroutine da_local_to_global(xp, x, xg, dim)
 
-!------------------------------------------------------------------------------
-!  PURPOSE: Make xg global-grid array by gathering the subdomain arrays x from 
-!           each processor. The global array xg is stored only on the monitor
-!           processor (typically, processor 0). 
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! PURPOSE: Make xg global-grid array by gathering the subdomain arrays x from 
+   !           each processor. The global array xg is stored only on the monitor
+   !           processor (typically, processor 0). 
+   !---------------------------------------------------------------------------
 
     TYPE (XPOSE_TYPE), INTENT(IN):: xp                                    ! Domain decomposition vars.
     REAL,  INTENT(IN)   :: x (xp%ims:xp%ime,xp%jms:xp%jme,xp%kms:xp%kme)  ! Local-grid input array.
@@ -15,23 +14,23 @@ subroutine da_local_to_global(xp, x, xg, dim)
     integer                      :: glen(3) ! Global grid dimensions
     integer                      :: llen(3) ! Local grid dimensions
 
-! Set global and local index extent arrays.
+   ! Set global and local index extent arrays.
    glen(1) = xp%ide-xp%ids+1
    llen(1) = xp%ime-xp%ims+1
    glen(2) = xp%jde-xp%jds+1
    llen(2) = xp%jme-xp%jms+1
-   if(dim .eq. 2) then
-     glen(3) = 1
-     llen(3) = 1
-     call rsl_write(xg,IO2D_IJ_INTERNAL,x,0,TRUE_RSL_REAL,glen,llen)
-   elseif(dim.eq.3) then
-     glen(3) = xp%kde-xp%kds+1
-     llen(3) = xp%kme-xp%kms+1
-     call rsl_write(xg,IO3D_IJK_INTERNAL,x,0,TRUE_RSL_REAL,glen,llen)
+   if (dim .eq. 2) then
+      glen(3) = 1
+      llen(3) = 1
+      call rsl_write(xg,IO2D_IJ_INTERNAL,x,0,TRUE_RSL_REAL,glen,llen)
+   elseif (dim.eq.3) then
+      glen(3) = xp%kde-xp%kds+1
+      llen(3) = xp%kme-xp%kms+1
+      call rsl_write(xg,IO3D_IJK_INTERNAL,x,0,TRUE_RSL_REAL,glen,llen)
    else
-     WRITE(UNIT=errmsg(1),FMT='(A,I5,A)') &
-       "dim=",dim,"must be 2 or 3"
-     call da_error(__FILE__,__LINE__,errmsg(1:1))
+      WRITE(UNIT=errmsg(1),FMT='(A,I5,A)') &
+         "dim=",dim,"must be 2 or 3"
+      call da_error(__FILE__,__LINE__,errmsg(1:1))
    end if
 
 end subroutine da_local_to_global

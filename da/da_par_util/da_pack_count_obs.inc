@@ -1,10 +1,9 @@
 subroutine da_pack_count_obs ( num_obs, offset, value )
 
-!------------------------------------------------------------------------------
-!  PURPOSE: Pack the 4 integer num_obs values into value(offset) to 
-!           value(offset+3).
-!
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! PURPOSE: Pack the 4 integer num_obs values into value(offset) to 
+   !          value(offset+3).
+   !---------------------------------------------------------------------------
 
    TYPE (count_obs_number_type), INTENT(IN)     :: num_obs
    INTEGER                     , INTENT(INOUT)  :: offset

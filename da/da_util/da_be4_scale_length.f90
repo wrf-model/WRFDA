@@ -31,11 +31,11 @@ program da_scale_length
                                 cut_dist_km, resolution_km
    logical             :: use_global_eofs, data_on_levels
    integer             :: num
-!---------------------------------------------------------------------------------------------
-   write(6,'(a)')' [1] Initialize namelist variables and other scalars.'
-!---------------------------------------------------------------------------------------------
 
-!    vertical_ip = 0
+   write(6,'(a)')' [1] Initialize namelist variables and other scalars.'
+
+
+   ! vertical_ip = 0
 
    start_date = '2004030312'
    end_date = '2004033112'
@@ -63,11 +63,10 @@ program da_scale_length
 
    allocate(field(1:ni, 1:nj, 1:nt))
 
-!----------------------------------------------------------------------------------------
    num=0
    do while ( cdate <= edate )
       do member = 1, ne
-      num=num+1
+         num=num+1
          write(6,'(5a,i4)')'    Date = ', date, ', variable ', trim(variable), &
                            ' and member ', member
 
@@ -75,46 +74,46 @@ program da_scale_length
          if ( member < 10 ) ce = '00'//ce(3:3)
          if ( member >= 10 .and. member < 100 ) ce = '0'//ce(2:3)
 
-!        Output fields (split into 2D files to allow parallel horizontal treatment):
-!            read(ck,'(i2)') nk
-            write(ck,'(i2)') nk
+         ! Output fields (split into 2D files to allow parallel horizontal treatment):
+         ! read(ck,'(i2)') nk
+         write(ck,'(i2)') nk
 
-            if ( nk < 10 ) ck = '0'//ck(2:2)
-            k_label = 'm'
+         if ( nk < 10 ) ck = '0'//ck(2:2)
+         k_label = 'm'
 
-!           Assumes variable directory has been created by script:
-            filename = trim(variable)//'/'//date(1:10)//'.'//trim(variable)
-!ols.101204            if (trim(variable).eq.'ps_u') then
-!            filename = trim(filename)//'.'//trim(be_method)//'.e'//ce 
-!            else
-!            filename = trim(filename)//'.'//trim(be_method)//'.e'//ce//'.'//k_label//ck
-!            endif
-            filename = trim(filename)//'.'//trim(be_method)//'.e'//ce//'.'//ck
+         ! Assumes variable directory has been created by script:
+         filename = trim(variable)//'/'//date(1:10)//'.'//trim(variable)
+         ! ols.101204 
+         ! if (trim(variable).eq.'ps_u') then
+         !    filename = trim(filename)//'.'//trim(be_method)//'.e'//ce 
+         ! else 
+         !    filename = trim(filename)//'.'//trim(be_method)//'.e'//ce//'.'//k_label//ck
+         ! endif
+         filename = trim(filename)//'.'//trim(be_method)//'.e'//ce//'.'//ck
 
-            open (iunit, file = filename, form='unformatted')
-            read(iunit) ni0, nj0, k
-            if (ni.ne.ni0.or.nj.ne.nj0) then
+         open (iunit, file = filename, form='unformatted')
+         read(iunit) ni0, nj0, k
+         if (ni.ne.ni0.or.nj.ne.nj0) then
             write(*,'(a)') 'dimension problem',ni,ni0,nj,nj0
             stop
-            endif
-            read(iunit) data_on_levels, use_global_eofs
-            read(iunit)field(1:ni,1:nj,num)
+         endif
+         read(iunit) data_on_levels, use_global_eofs
+         read(iunit)field(1:ni,1:nj,num)
       end do ! End loop over members.
 
-!     Calculate next date:
+      ! Calculate next date:
       call da_advance_cymdh( date, interval, new_date )
       date = new_date
       read(date(1:10), fmt='(i10)')cdate
    end do
 
-
-     num=num-1
+   num=num-1
 
    call da_process_single_variable(field,variable,cut_dist_km,&
                       resolution_km,num,ni,nj,ck,nt)
 
    if (nk.eq.vertical_level) then
-   call da_merge_scale_length(variable, nk)
+      call da_merge_scale_length(variable, nk)
    endif
 
 end program da_scale_length

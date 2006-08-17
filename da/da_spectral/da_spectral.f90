@@ -5,10 +5,10 @@ module da_spectral
    use fftpack5
    USE module_wrf_error
 
-!-----------------------------------------------------------------------
-!  Contains all necessary routines to perform global spectral transform
-!  (based on Fourier and Legendre decompositions). 
-!-----------------------------------------------------------------------
+   !-----------------------------------------------------------------------
+   ! Contains all necessary routines to perform global spectral transform
+   ! (based on Fourier and Legendre decompositions). 
+   !-----------------------------------------------------------------------
 
    implicit none
 

@@ -19,12 +19,12 @@ subroutine da_perform_2drf( ni, nj, num_passes, rf_scale, field )
 
    do pass = 1, num_passes
 
-!     Perform filter in I-direction:
+      ! Perform filter in I-direction:
       do j = 1, nj
          call da_recursive_filter_1d( pass, alpha, field(1:ni,j), ni )
       end do
 
-!     Perform filter in J-direction:
+      ! Perform filter in J-direction:
       do i = 1, ni
          call da_recursive_filter_1d( pass, alpha, field(i,1:nj), nj )
       end do

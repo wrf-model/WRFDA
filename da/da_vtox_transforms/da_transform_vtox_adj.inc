@@ -3,9 +3,10 @@ subroutine da_transform_vtox_adj( cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv, 
                                   ims, ime, jms, jme, kms, kme,           &
                                   its, ite, jts, jte, kts, kte )
 
-!--------------------------------------------------------------------------
-! Purpose   : Control variable transform Adjoint
-!--------------------------------------------------------------------------
+   !--------------------------------------------------------------------------
+   ! Purpose   : Control variable transform Adjoint
+   !--------------------------------------------------------------------------
+
    implicit none
 
    integer, intent(in)              :: cv_size ! Size of cv array.
@@ -29,81 +30,81 @@ subroutine da_transform_vtox_adj( cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv, 
 
   IF (trace_use) call da_trace_entry("da_transform_vtox_adj")
 
+   !-------------------------------------------------------------------------
+   ! Polar treatment for Global
+   !-------------------------------------------------------------------------
 
-!-------------------------------------------------------------------------
-!   Polar treatment for Global
-!-------------------------------------------------------------------------
-   if( global ) then     
-!  Poles treatment for global WRFVAR
+   if (global) then     
+      ! Poles treatment for global WRFVAR
 #ifndef DEREF_KLUDGE
-    call da_get_avpoles(xa%u,xa%v,xb%lon,&
-          ids, ide, jds, jde, kds, kde,  &
-          ims, ime, jms, jme, kms, kme,  &
-          its, ite, jts, jte, kts, kte   )
-    call da_get_aspoles(xa%t,            &
-          ids, ide, jds, jde, kds, kde,  &
-          ims, ime, jms, jme, kms, kme,  &
-          its, ite, jts, jte, kts, kte   )
-    call da_get_aspoles(xa%p,            &
-          ids, ide, jds, jde, kds, kde,  &
-          ims, ime, jms, jme, kms, kme,  &
-          its, ite, jts, jte, kts, kte   )
-    call da_get_aspoles(xa%q,            &
-          ids, ide, jds, jde, kds, kde,  &
-          ims, ime, jms, jme, kms, kme,  &
-          its, ite, jts, jte, kts, kte   )
-    call da_get_aspoles(xa%psfc,         &
-          ids, ide, jds, jde,   1,   1,  &
-          ims, ime, jms, jme,   1,   1,  &
-          its, ite, jts, jte,   1,   1   )
+      call da_get_avpoles(xa%u,xa%v,xb%lon,&
+            ids, ide, jds, jde, kds, kde,  &
+            ims, ime, jms, jme, kms, kme,  &
+            its, ite, jts, jte, kts, kte   )
+      call da_get_aspoles(xa%t,            &
+            ids, ide, jds, jde, kds, kde,  &
+            ims, ime, jms, jme, kms, kme,  &
+            its, ite, jts, jte, kts, kte   )
+      call da_get_aspoles(xa%p,            &
+            ids, ide, jds, jde, kds, kde,  &
+            ims, ime, jms, jme, kms, kme,  &
+            its, ite, jts, jte, kts, kte   )
+      call da_get_aspoles(xa%q,            &
+            ids, ide, jds, jde, kds, kde,  &
+            ims, ime, jms, jme, kms, kme,  &
+            its, ite, jts, jte, kts, kte   )
+      call da_get_aspoles(xa%psfc,         &
+            ids, ide, jds, jde,   1,   1,  &
+            ims, ime, jms, jme,   1,   1,  &
+            its, ite, jts, jte,   1,   1   )
 #else
-    call da_get_avpoles(xa%u(ims,jms,kms),         &
-                        xa%v(ims,jms,kms),         &
-                        xb%lon(ims,jms),           &
-                    ids, ide, jds, jde, kds, kde,  &
-                    ims, ime, jms, jme, kms, kme,  &
-                    its, ite, jts, jte, kts, kte   )
-    call da_get_aspoles(xa%t(ims,jms,kms),         &
-                    ids, ide, jds, jde, kds, kde,  &
-                    ims, ime, jms, jme, kms, kme,  &
-                    its, ite, jts, jte, kts, kte   )
-    call da_get_aspoles(xa%p(ims,jms,kms),         &
-                    ids, ide, jds, jde, kds, kde,  &
-                    ims, ime, jms, jme, kms, kme,  &
-                    its, ite, jts, jte, kts, kte   )
-    call da_get_aspoles(xa%q(ims,jms,kms),         &
-                    ids, ide, jds, jde, kds, kde,  &
-                    ims, ime, jms, jme, kms, kme,  &
-                    its, ite, jts, jte, kts, kte   )
-    call da_get_aspoles(xa%psfc(ims,jms),          &
-                    ids, ide, jds, jde,   1,   1,  &
-                    ims, ime, jms, jme,   1,   1,  &
-                    its, ite, jts, jte,   1,   1   )
+      call da_get_avpoles(xa%u(ims,jms,kms),         &
+                          xa%v(ims,jms,kms),         &
+                          xb%lon(ims,jms),           &
+                      ids, ide, jds, jde, kds, kde,  &
+                      ims, ime, jms, jme, kms, kme,  &
+                      its, ite, jts, jte, kts, kte   )
+      call da_get_aspoles(xa%t(ims,jms,kms),         &
+                      ids, ide, jds, jde, kds, kde,  &
+                      ims, ime, jms, jme, kms, kme,  &
+                      its, ite, jts, jte, kts, kte   )
+      call da_get_aspoles(xa%p(ims,jms,kms),         &
+                      ids, ide, jds, jde, kds, kde,  &
+                      ims, ime, jms, jme, kms, kme,  &
+                      its, ite, jts, jte, kts, kte   )
+      call da_get_aspoles(xa%q(ims,jms,kms),         &
+                      ids, ide, jds, jde, kds, kde,  &
+                      ims, ime, jms, jme, kms, kme,  &
+                      its, ite, jts, jte, kts, kte   )
+      call da_get_aspoles(xa%psfc(ims,jms),          &
+                      ids, ide, jds, jde,   1,   1,  &
+                      ims, ime, jms, jme,   1,   1,  &
+                      its, ite, jts, jte,   1,   1   )
 #endif
    end if     
 
-!--Compute w increments using Richardson's eqn.
-     if ( Use_RadarObs ) then
+   ! Compute w increments using Richardson's eqn.
+   if ( Use_RadarObs ) then
 
-        do k=xp%kts,xp%kte
-        do j=xp%jts,xp%jte
-        do i=xp%its,xp%ite
-           xa%w(i,j,k)=xa%w(i,j,k)+0.5*xa%wh(i,j,k)
-           xa%w(i,j,k+1)=xa%w(i,j,k+1)+0.5*xa%wh(i,j,k)
-           xa%wh(i,j,k)=0.
-        enddo
-        enddo
-        enddo
+      do k=xp%kts,xp%kte
+         do j=xp%jts,xp%jte
+            do i=xp%its,xp%ite
+               xa%w(i,j,k)=xa%w(i,j,k)+0.5*xa%wh(i,j,k)
+               xa%w(i,j,k+1)=xa%w(i,j,k+1)+0.5*xa%wh(i,j,k)
+               xa%wh(i,j,k)=0.
+            enddo
+         enddo
+      enddo
 
-       call da_uvprho_to_w_adj( xb, xa, xp,                 &
-                                ids,ide, jds,jde, kds,kde,  &
-                                ims,ime, jms,jme, kms,kme,  &
-                                its,ite, jts,jte, kts,kte)
+     call da_uvprho_to_w_adj( xb, xa, xp,                 &
+                              ids,ide, jds,jde, kds,kde,  &
+                              ims,ime, jms,jme, kms,kme,  &
+                              its,ite, jts,jte, kts,kte)
 
-     endif
+   endif
 
-!-------------------------------------------------------------------------
-!--If Testing_wrfvar = .TRUE., not "XToY" transform needed to do here (YRG):
+   !-------------------------------------------------------------------------
+   ! If Testing_wrfvar = .TRUE., not "XToY" transform needed to do here (YRG):
 
    if (.not.testing_wrfvar) then
 
@@ -121,11 +122,11 @@ subroutine da_transform_vtox_adj( cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv, 
             call da_transform_xtoseasfcwind_adj( xa, xb )
          endif
 
-!--------GPS Refractivity:
+         ! GPS Refractivity:
          if ( use_GpsrefObs ) &
             call da_transform_xtogpsref_adj(xa, xb, xp)
 
-!--------Now for PW.
+         ! Now for PW.
          call da_transform_xtotpw_adj( xa, xb )
 
       end if
@@ -133,64 +134,62 @@ subroutine da_transform_vtox_adj( cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv, 
       if (sfc_assi_options == 2) call da_transform_xtowtq_adj( xp, xb, xa )
 
    endif
-!-------------------------------------------------------------------------
+   !-------------------------------------------------------------------------
  
-  call da_pt_to_rho_adj( xb, xa )
+   call da_pt_to_rho_adj( xb, xa )
    do j=xb%jts,xb%jte
-   do i=xb%its,xb%ite
-     if (fg_format == 1) then
-      mu=0.0
-      s1md=0.0
+      do i=xb%its,xb%ite
+         if (fg_format == 1) then
+            mu=0.0
+            s1md=0.0
 
-      p(:)=0.0
+            p(:)=0.0
 
-      do k=xb%kts,xb%kte
-         mr_b(k) = xb%q(i,j,k)/(1.0 - xb%q(i,j,k))
-         s1md=s1md+(1.0+mr_b(k))*xb%dnw(k)
+            do k=xb%kts,xb%kte
+               mr_b(k) = xb%q(i,j,k)/(1.0 - xb%q(i,j,k))
+               s1md=s1md+(1.0+mr_b(k))*xb%dnw(k)
 
-         p(k) = p(k) + 0.5*xa%p(i,j,k)
-         p(k+1) = p(k+1) + 0.5*xa%p(i,j,k)
+               p(k) = p(k) + 0.5*xa%p(i,j,k)
+               p(k+1) = p(k+1) + 0.5*xa%p(i,j,k)
 
-         mu = mu - p(k)*(1.0+mr_b(k))*xb%dnw(k)
+               mu = mu - p(k)*(1.0+mr_b(k))*xb%dnw(k)
 
-         mr_a(k) = - p(k)*xb%psac(i,j)*xb%dnw(k)
-         p(k+1) = p(k+1) + p(k)
+               mr_a(k) = - p(k)*xb%psac(i,j)*xb%dnw(k)
+               p(k+1) = p(k+1) + p(k)
+            enddo
+
+            xa%psfc(i,j) = xa%psfc(i,j) - mu/s1md
+            sdmd=-mu*xb%psac(i,j)/s1md
+
+            do k=xb%kts,xb%kte
+               mr_a(k) = mr_a(k) + sdmd*xb%dnw(k)
+               xa%q(i,j,k) = xa%q(i,j,k) + mr_a(k)/(1.0 - xb%q(i,j,k))**2
+            enddo
+         else if(fg_format == 3)then
+            do k=xb%kts,xb%kte
+               if (k == xb%kte) then
+                  coeff = xb%KMA_B(K)/(xb%KMA_A(K)+xb%KMA_B(K)*xb%psfc(I,J)/100.0)
+               else
+                  PU = xb%KMA_A(K+1) + xb%KMA_B(K+1)*xb%psfc(I,J)/100.0
+                  PD = xb%KMA_A(K  ) + xb%KMA_B(K  )*xb%psfc(I,J)/100.0
+                  coeff=xb%KMA_B(K)  *1.0/(PD-PU)**2*(-PU*(LOG(PD)-LOG(PU))+PD-PU)&
+                  + xb%KMA_B(K+1)*1.0/(PD-PU)**2*( PD*(LOG(PD)-LOG(PU))-PD+PU)
+               end if
+      
+               xa%psfc(i,j) = xa % psfc(i,j) + &
+                 xb%p(i,j,k) * xa % p(i,j,k)/100.0 * coeff 
+            end do
+         endif
       enddo
-
-      xa%psfc(i,j) = xa%psfc(i,j) - mu/s1md
-      sdmd=-mu*xb%psac(i,j)/s1md
-
-      do k=xb%kts,xb%kte
-         mr_a(k) = mr_a(k) + sdmd*xb%dnw(k)
-         xa%q(i,j,k) = xa%q(i,j,k) + mr_a(k)/(1.0 - xb%q(i,j,k))**2
-      enddo
-     else if(fg_format == 3)then
-      do k=xb%kts,xb%kte
-       if(k == xb%kte) then
-        coeff = xb%KMA_B(K)/(xb%KMA_A(K)+xb%KMA_B(K)*xb%psfc(I,J)/100.0)
-       else
-          PU = xb%KMA_A(K+1) + xb%KMA_B(K+1)*xb%psfc(I,J)/100.0
-          PD = xb%KMA_A(K  ) + xb%KMA_B(K  )*xb%psfc(I,J)/100.0
-          coeff=xb%KMA_B(K)  *1.0/(PD-PU)**2*(-PU*(LOG(PD)-LOG(PU))+PD-PU)&
-        + xb%KMA_B(K+1)*1.0/(PD-PU)**2*( PD*(LOG(PD)-LOG(PU))-PD+PU)
-       end if
-!
-!-------------------------------------------------------------------------
-       xa%psfc(i,j) = xa % psfc(i,j) + &
-                       xb%p(i,j,k) * xa % p(i,j,k)/100.0 * coeff 
-!-------------------------------------------------------------------------
-      end do
-     endif
-   enddo
    enddo
 
- if( global ) then     
-   call da_set_boundary_xa(xa, xb)
- endif
+   if (global) then     
+      call da_set_boundary_xa(xa, xb)
+    endif
 
-!-------------------------------------------------------------------------
-!  [3.0]: Perform x = u_p vp transform::
-!-------------------------------------------------------------------------
+   !-------------------------------------------------------------------------
+   ! [3.0]: Perform x = u_p vp transform::
+   !-------------------------------------------------------------------------
 
    call da_zero_vp_type ( vp )
    call da_transform_vptox_adj( xb, xbx, xa, vp, be, ep, xp, &
@@ -198,13 +197,13 @@ subroutine da_transform_vtox_adj( cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv, 
                                 ims,ime, jms,jme, kms,kme,  &
                                 its,ite, jts,jte, kts,kte )
 
-!-------------------------------------------------------------------------
-!  [2.0]: Perform vp = u_v vv transform:
-!-------------------------------------------------------------------------
+   !-------------------------------------------------------------------------
+   ! [2.0]: Perform vp = u_v vv transform:
+   !-------------------------------------------------------------------------
 
    call da_zero_vp_type ( vv )
 
-!  Uv for alpha is a null transform:
+   ! Uv for alpha is a null transform:
    if ( be % ne > 0 ) then
       vv % alpha(its:ite,jts:jte,1:be%ne) = vp % alpha(its:ite,jts:jte,1:be%ne) 
    end if
@@ -228,11 +227,11 @@ subroutine da_transform_vtox_adj( cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv, 
       vv % v5(its:ite,jts:jte,kts:kte) = vp % v5(its:ite,jts:jte,kts:kte)
    end if
 
-!-------------------------------------------------------------------------
-!  [1.0]: perform vv = u_h cv transform:
-!-------------------------------------------------------------------------
+   !-------------------------------------------------------------------------
+   ! [1.0]: perform vv = u_h cv transform:
+   !-------------------------------------------------------------------------
 
-   if ( global ) then
+   if (global) then
       call da_transform_vtovv_global_adj( cv_size, xb, xbx, be, cv, vv, &
                                           ids,ide, jds,jde, kds,kde,  &
                                           ims,ime, jms,jme, kms,kme,  &
@@ -244,7 +243,7 @@ subroutine da_transform_vtox_adj( cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv, 
                                    its,ite, jts,jte, kts,kte )
    end if
 
-  IF (trace_use) call da_trace_exit("da_transform_vtox_adj")
+   IF (trace_use) call da_trace_exit("da_transform_vtox_adj")
 
 
 end subroutine da_transform_vtox_adj

@@ -1,4 +1,3 @@
-
    ! generic vector type
    TYPE generic_vector_type
       REAL, POINTER :: ptr(:)

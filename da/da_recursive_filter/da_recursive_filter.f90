@@ -1,12 +1,8 @@
 MODULE da_recursive_filter
 
-!------------------------------------------------------------------------------
-!  PURPOSE: Jim Pursers recursive filter routines.
-!
-!  METHOD:  See individual routines.
-!
-!  HISTORY: 01/07/2000 - Creation of F90 version.           Dale Barker
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! PURPOSE: Jim Pursers recursive filter routines.
+   !---------------------------------------------------------------------------
 
    use da_constants
    use da_define_structures

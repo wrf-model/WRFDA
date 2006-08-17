@@ -4,22 +4,25 @@ module da_record_header
    implicit none
 
    type big_record_header
-!      integer(kind=4), dimension(50,20) :: bhi
-!      real(kind=4),    dimension(20,20) :: bhr
+      ! integer(kind=4), dimension(50,20) :: bhi
+      ! real(kind=4),    dimension(20,20) :: bhr
       integer, dimension(50,20) :: bhi
       real,    dimension(20,20) :: bhr
       character(80),   dimension(50,20) :: bhic
       character(80),   dimension(20,20) :: bhrc
    end type big_record_header
 
-   type sub_record_header
-! JRB     integer(kind=4) :: ndim
+   type sub_record_header   
+      ! JRB 
+      ! integer(kind=4) :: ndim
       integer :: ndim
 
-! JRB      integer(kind=4), dimension(4) :: start_index, end_index
+      ! JRB   
+      ! integer(kind=4), dimension(4) :: start_index, end_index
       integer, dimension(4) :: start_index, end_index
 
-! JRB      real(kind=4)                  :: current_time
+      ! JRB   
+      ! real(kind=4)                  :: current_time
       real                  :: current_time
 
       character(len= 4) :: staggering, ordering

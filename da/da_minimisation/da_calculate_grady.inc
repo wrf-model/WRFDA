@@ -1,119 +1,109 @@
-      subroutine da_calculate_grady( iv, re, jo_grad_y)
+subroutine da_calculate_grady( iv, re, jo_grad_y)
 
-!-------------------------------------------------------------------------
-!  HISTORY: 
-!
-!      Created: 02/17/2003                   S. R. H. Rizvi
-!                  07/2005 - Add radiance part   Zhiquan Liu
-!               03/07/2006 - Update for AIRS retrievals      Syed RH Rizvi
-!
-!      Purpose:
-!            
-!           Does part of the obs gradient operation   
-!
-!-------------------------------------------------------------------------
-      implicit none
-      
-      type (ob_type), intent(IN)    :: iv          ! Innovation vector (O-B).
-      type (y_type),  intent(INOUT) :: re          ! Residual vector (O-A).
-      type (y_type),  intent(OUT)   :: jo_grad_y   ! Grad_y(Jo)
+   !-------------------------------------------------------------------------
+   ! Purpose: Does part of the obs gradient operation   
+   !-------------------------------------------------------------------------
 
-      IF (trace_use) CALL da_trace_entry("da_calculate_grady")
+   implicit none
 
-!-------------------------------------------------------------------------
-!     [1.0] Compute components of Grad_y(Jo):
-!-------------------------------------------------------------------------
+   type (ob_type), intent(IN)    :: iv          ! Innovation vector (O-B).
+   type (y_type),  intent(INOUT) :: re          ! Residual vector (O-A).
+   type (y_type),  intent(OUT)   :: jo_grad_y   ! Grad_y(Jo)
 
-!     Radiosonde
+   IF (trace_use) CALL da_trace_entry("da_calculate_grady")
 
-      call da_calculate_grady_sound( iv, re,  jo_grad_y)
-      call da_calculate_grady_sonde_sfc( iv, re,  jo_grad_y)
+   !-------------------------------------------------------------------------
+   ! [1.0] Compute components of Grad_y(Jo):
+   !-------------------------------------------------------------------------
 
-!     Surface
+   ! Radiosonde
 
-      call da_calculate_grady_synop( iv, re,  jo_grad_y)
-                 
+   call da_calculate_grady_sound( iv, re,  jo_grad_y)
+   call da_calculate_grady_sonde_sfc( iv, re,  jo_grad_y)
 
-!     Geostationary Satellite AMVs
+   ! Surface
 
-      call da_calculate_grady_geoamv( iv, re,  jo_grad_y)
+   call da_calculate_grady_synop( iv, re,  jo_grad_y)
 
-!     Polar orbitting Satellite AMVs
+   ! Geostationary Satellite AMVs
 
-      call da_calculate_grady_polaramv( iv, re,  jo_grad_y)
+   call da_calculate_grady_geoamv( iv, re,  jo_grad_y)
 
+   ! Polar orbitting Satellite AMVs
 
-!     Airep
+   call da_calculate_grady_polaramv( iv, re,  jo_grad_y)
 
-      call da_calculate_grady_airep( iv, re,  jo_grad_y)
+   ! Airep
 
-!     Pilot
+   call da_calculate_grady_airep( iv, re,  jo_grad_y)
 
-      call da_calculate_grady_pilot( iv, re,  jo_grad_y)
-      
-!     Profiler
-      call da_calculate_grady_profiler( iv, re,  jo_grad_y)
-      
-!     Satem
+   ! Pilot
 
-      call da_calculate_grady_satem( iv, re,  jo_grad_y)
+   call da_calculate_grady_pilot( iv, re,  jo_grad_y)
 
-!     Metar:
+   ! Profiler
+   call da_calculate_grady_profiler( iv, re,  jo_grad_y)
 
-      call da_calculate_grady_metar( iv, re,  jo_grad_y)
+   ! Satem
 
-!     Ships:
+   call da_calculate_grady_satem( iv, re,  jo_grad_y)
 
-      call da_calculate_grady_ships( iv, re,  jo_grad_y)
+   ! Metar:
 
-!     Buoy :
+   call da_calculate_grady_metar( iv, re,  jo_grad_y)
 
-       call da_calculate_grady_buoy ( iv, re,  jo_grad_y)
+   ! Ships:
 
-!     GPSPW:
+   call da_calculate_grady_ships( iv, re,  jo_grad_y)
 
-      call da_calculate_grady_gpspw( iv, re,  jo_grad_y)
+   ! Buoy :
 
-!     GPSRF:
+   call da_calculate_grady_buoy ( iv, re,  jo_grad_y)
 
-      call da_calculate_grady_gpsref( iv, re,  jo_grad_y)
+   ! GPSPW:
 
-!     SSMI:
+   call da_calculate_grady_gpspw( iv, re,  jo_grad_y)
 
-      call da_calculate_grady_ssmi( iv, re, jo_grad_y) 
+   ! GPSRF:
 
-!     SSMT1:
+   call da_calculate_grady_gpsref( iv, re,  jo_grad_y)
 
-      call da_calculate_grady_ssmt1( iv, re,  jo_grad_y)
+   ! SSMI:
 
-!     SSMT2:
+   call da_calculate_grady_ssmi( iv, re, jo_grad_y) 
 
-      call da_calculate_grady_ssmt2( iv, re,  jo_grad_y)  
+   ! SSMT1:
 
-!     Pseudo obs:
+   call da_calculate_grady_ssmt1( iv, re,  jo_grad_y)
 
-      call da_calculate_grady_pseudo( iv, re,  jo_grad_y )    
+   ! SSMT2:
 
-!     TC bogus obs:
+   call da_calculate_grady_ssmt2( iv, re,  jo_grad_y)  
 
-      call da_calculate_grady_bogus( iv, re,  jo_grad_y )    
-                  
-!     Quikscat scatterometer:
+   ! Pseudo obs:
 
-      call da_calculate_grady_qscat( iv, re, jo_grad_y)
-                   
-!     Radar:               
+   call da_calculate_grady_pseudo( iv, re,  jo_grad_y )    
 
-      call da_calculate_grady_radar( iv, re, jo_grad_y)
-                   
-!     Radiance:
+   ! TC bogus obs:
 
-      call da_calculate_grady_rad( iv, re, jo_grad_y)
+   call da_calculate_grady_bogus( iv, re,  jo_grad_y )    
 
-!     AIRS retrievals
+   ! Quikscat scatterometer:
 
-      call da_calculate_grady_airsr( iv, re,  jo_grad_y)
+   call da_calculate_grady_qscat( iv, re, jo_grad_y)
 
-      IF (trace_use) CALL da_trace_exit("da_calculate_grady")
+   ! Radar:               
 
-      end subroutine da_calculate_grady
+   call da_calculate_grady_radar( iv, re, jo_grad_y)
+
+   ! Radiance:
+
+   call da_calculate_grady_rad( iv, re, jo_grad_y)
+
+   ! AIRS retrievals
+
+   call da_calculate_grady_airsr( iv, re,  jo_grad_y)
+
+   IF (trace_use) CALL da_trace_exit("da_calculate_grady")
+
+end subroutine da_calculate_grady

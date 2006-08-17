@@ -147,7 +147,6 @@ SUBROUTINE da_deallocate_y( y )
       DEALLOCATE (y % airsr)
    endif
 
-
    IF (trace_use) CALL da_trace_exit("da_deallocate_y")
 
 END SUBROUTINE da_deallocate_y

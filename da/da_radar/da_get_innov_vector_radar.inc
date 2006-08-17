@@ -189,9 +189,7 @@ subroutine da_get_innov_vector_radar ( it, xb, xp, ob, iv )
                      END IF
                   END IF
                END IF
-
             END IF
-
          end do
 
          !------------------------------------------------------------------------
@@ -201,8 +199,7 @@ subroutine da_get_innov_vector_radar ( it, xb, xp, ob, iv )
          IF (check_max_iv )  THEN
             call da_check_max_iv_radar(it, iv % Radar(n), irv, irf, irvf, irff )
          END IF
-      endif
-            
+      endif           
    END DO
 
    write(unit = check_max_iv_unit, FMT ='(/,A,i5,A)')   &

@@ -1,0 +1,49 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: John Bray
+Date: 08/15/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Tidy code layout, fixing trace problems
+
+Remove unused da_vd05bd.inc
+
+Test results
+------------------------------------------------------
+
+balsam: compiles wrfvar with pgi
+
+Runs kma_t63 and con200 test cases.
+
+--------------------------------------------------------------------------------------
+
+File changes:
+------------
+
+A    doc/changes/changes_20060816a.jrb
+M      da/da_interpolation/da_to_zk.inc
+M      da/da_define_structures/da_deallocate_y.inc
+M      da/da_define_structures/da_zero_vp_type.inc
+M      da/da_define_structures/da_deallocate_background_errors.inc
+M      da/da_define_structures/da_allocate_background_errors.inc
+M      da/da_define_structures/da_gauss_noise.inc
+M      da/da_define_structures/da_allocate_observations.inc
+M      da/da_minimisation/da_calculate_j.inc
+M      da/da_minimisation/da_get_innov_vector.inc
+M      da/da_minimisation/da_dot_cv.inc
+M      da/da_minimisation/da_get_var_diagnostics.inc
+M      da/da_minimisation/da_write_diagnostics.inc
+M      da/da_minimisation/da_calculate_grady.inc
+M      da/da_minimisation/da_minimise_cg.inc
+D      da/da_minimisation/da_vd05bd.inc
+M      da/da_minimisation/da_calculate_residual.inc
+M      da/da_minimisation/da_minimisation.f90
+M      da/da_minimisation/da_minimisation_warning.inc
+M      da/da_minimisation/da_dot.inc
+M      da/da_minimisation/da_calculate_jo_and_grady.inc
+M      da/da_modules/da_wrfvar_run.inc
+M      da/da_radiance/da_transform_xtoy_rad.inc

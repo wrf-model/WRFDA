@@ -20,7 +20,7 @@ subroutine da_legtra ( nj, max_wavenumber, alp_size, m, int_wgts, alp, r_leg, v)
 
    index_m = m * ( max_wavenumber + 1 - m ) + m * ( m + 1 ) / 2 + 1 - m
 
-   if ( (nj+1) / 2 == nj/2 + 1 ) then
+   if ((nj+1) / 2 == nj/2 + 1) then
       eq_coeff = 1.0 ! Odd latitudes
    else
       eq_coeff = 0.0 ! Even latitudes
@@ -45,7 +45,7 @@ subroutine da_legtra ( nj, max_wavenumber, alp_size, m, int_wgts, alp, r_leg, v)
             alp(index)
       end do
      
-     if( eq_coeff > 0.0) then
+      if (eq_coeff > 0.0) then
          ! Skip this step for Even lats    ! Syed RH Rizvi
          ! Add equator term (wrong if even nj, but then eq_coeff = 0.0 so OK):
          j = nj/2 + 1

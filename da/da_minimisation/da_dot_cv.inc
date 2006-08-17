@@ -1,12 +1,11 @@
 real function da_dot_cv( cv_size, cv_size_domain, x, y, xp, mzs )
 
-! Forms the dot product of two vectors that are organized in the 
-! format of a "cv_type".  
-!
-! Capable of producing bitwise-exact results for distributed-memory 
-! parallel runs for testing.  This feature is very slow and consumes 
-! lots of memory. 
-!
+   ! Forms the dot product of two vectors that are organized in the 
+   ! format of a "cv_type".  
+   !
+   ! Capable of producing bitwise-exact results for distributed-memory 
+   ! parallel runs for testing.  This feature is very slow and consumes 
+   ! lots of memory. 
 
    implicit none
 
@@ -30,15 +29,15 @@ real function da_dot_cv( cv_size, cv_size_domain, x, y, xp, mzs )
    ! testing.  This will always be .FALSE. for a serial run or 
    ! one-processor DM_PARALLEL run.
 
-   IF ( testing_dm_exact ) THEN
+   IF (testing_dm_exact) THEN
 
       ! Collect local cv arrays x and y to globally-sized serially-ordered 
       ! arrays xg and yg.  Note that xg and yg will only exist on the 
       ! monitor task.  
 
-      IF ( wrf_dm_on_monitor() ) THEN
-         allocate( xg(1:cv_size_domain) )
-         allocate( yg(1:cv_size_domain) )
+      IF (wrf_dm_on_monitor()) THEN
+         allocate(xg(1:cv_size_domain))
+         allocate(yg(1:cv_size_domain))
       ENDIF
 
       call da_cv_to_global( cv_size, cv_size_domain, x, xp, mzs, xg )
@@ -49,7 +48,7 @@ real function da_dot_cv( cv_size, cv_size_domain, x, y, xp, mzs )
          deallocate( xg, yg )
       ENDIF
 
-!     Broadcast result from monitor to other tasks.  
+      ! Broadcast result from monitor to other tasks.  
       call wrf_dm_bcast_real( dtemp1, 1 )
 
    else
@@ -58,7 +57,7 @@ real function da_dot_cv( cv_size, cv_size_domain, x, y, xp, mzs )
 
       if ( .not. global ) then
          dtemp1x = dtemp1
-!        summation across processors:
+         ! summation across processors:
          dtemp1 = wrf_dm_sum_real( dtemp1x )
       end if
 

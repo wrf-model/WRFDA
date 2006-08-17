@@ -2,42 +2,42 @@ subroutine da_get_gausslats( nj, glats, gwgts, sinlat, coslat )
 
    implicit none
 
-!  Calculates nj Gaussian latitudes i.e. latitudes at which the Legendre
-!  polynomial Pn(sin(lat)) = 0.0, n=nj, m=0.
-!  The integral from -1 to +1 of f(x)*Pn(x) where f is a polynomial
-!  of degree <= 2n-1 can be calculated using
-!  0.5 * SUM(GaussWgts(:)*Pn(:)*f(:)) with the values at Gaussian latitudes.
-!  See eqns 77-79 of 'The Spectral Technique' M.Jarraud and A.J.Simmons
-!  (1983 ECMWF Seminar or 1990 ECMWF Lecture Notes).
-!  The orthogonality and normalisation of the Legendre polynomials
-!  checked in this way are very accurate on the Cray, but somewhat
-!  less accurate on the HPs (32-bit arithmetic).
-!  Starting with a regular latitude grid, use Newton-Raphson interpolation
-!  (with bisection steps to add robustness)
-!  to find the zeros of the Legendre polynomial Pn(x), 0 <= x < 1,
-!  the negative roots (-1 < x < 0) are set by symmetry.
-!  ASIN(x) gives the Gaussian latitudes.
-!  This gives slightly better results than finding the roots of Pn(sin(lat))
-!  (Algorithm from Numerical Recipies (Fortran version), 1989, p 258)
+   !  Calculates nj Gaussian latitudes i.e. latitudes at which the Legendre
+   !  polynomial Pn(sin(lat)) = 0.0, n=nj, m=0.
+   !  The integral from -1 to +1 of f(x)*Pn(x) where f is a polynomial
+   !  of degree <= 2n-1 can be calculated using
+   !  0.5 * SUM(GaussWgts(:)*Pn(:)*f(:)) with the values at Gaussian latitudes.
+   !  See eqns 77-79 of 'The Spectral Technique' M.Jarraud and A.J.Simmons
+   !  (1983 ECMWF Seminar or 1990 ECMWF Lecture Notes).
+   !  The orthogonality and normalisation of the Legendre polynomials
+   !  checked in this way are very accurate on the Cray, but somewhat
+   !  less accurate on the HPs (32-bit arithmetic).
+   !  Starting with a regular latitude grid, use Newton-Raphson interpolation
+   !  (with bisection steps to add robustness)
+   !  to find the zeros of the Legendre polynomial Pn(x), 0 <= x < 1,
+   !  the negative roots (-1 < x < 0) are set by symmetry.
+   !  ASIN(x) gives the Gaussian latitudes.
+   !  This gives slightly better results than finding the roots of Pn(sin(lat))
+   !  (Algorithm from Numerical Recipies (Fortran version), 1989, p 258)
 
-   integer, intent(in)    :: nj                       ! Gridpoints in N-S direction.
-   real, intent(out)      :: glats(1:nj)              ! Gaussian latitudes (S->N, radians).
-   real, intent(out)      :: gwgts(1:nj)              ! Gaussian weights.
-   real, intent(out), optional :: sinlat(1:nj)        ! sin(Latitude).
-   real, intent(out), optional :: coslat(1:nj)        ! cos(Latitude).
+   integer, intent(in)    :: nj                ! Gridpoints in N-S direction.
+   real, intent(out)      :: glats(1:nj)       ! Gaussian latitudes (S->N, radians).
+   real, intent(out)      :: gwgts(1:nj)       ! Gaussian weights.
+   real, intent(out), optional :: sinlat(1:nj) ! sin(Latitude).
+   real, intent(out), optional :: coslat(1:nj) ! cos(Latitude).
 
-   integer, parameter     :: maxiter = 100            ! Maximum number of iterations.
-   integer                :: i, j, k                  ! Loop counters.
+   integer, parameter     :: maxiter = 100     ! Maximum number of iterations.
+   integer                :: i, j, k           ! Loop counters.
 
-   real                   :: fj, fjold                ! Pn(x) on search grid
-   real                   :: xj, xjold                ! search grid
-   real                   :: x1, x2                   ! bounds on root
-   real                   :: x                        ! iterated values of x
-   real                   :: z                        ! = sqrt(1-x*x)
-   real                   :: fn                       ! Pn(x)
-   real                   :: fn1                      ! Pn-1(x)
-   real                   :: dfr                      ! 1/Pn'(x)
-   real                   :: dx, dxold                ! step size, previous step
+   real                   :: fj, fjold         ! Pn(x) on search grid
+   real                   :: xj, xjold         ! search grid
+   real                   :: x1, x2            ! bounds on root
+   real                   :: x                 ! iterated values of x
+   real                   :: z                 ! = sqrt(1-x*x)
+   real                   :: fn                ! Pn(x)
+   real                   :: fn1               ! Pn-1(x)
+   real                   :: dfr               ! 1/Pn'(x)
+   real                   :: dx, dxold         ! step size, previous step
 
    k = (nj + 2) / 2
    xj = 0.0
@@ -52,19 +52,19 @@ subroutine da_get_gausslats( nj, glats, gwgts, sinlat, coslat )
       k = k+1
    end if
 
-!  Search interval 0 < x <= 1 for zeros of Legendre polynomials:
+   ! Search interval 0 < x <= 1 for zeros of Legendre polynomials:
    do j = 2, nj * 2
       xjold = xj
       fjold = fj
 
-!     Roots are approximately equally spaced in asin(x)
+      ! Roots are approximately equally spaced in asin(x)
       xj = SIN(REAL(j)*Pi/REAL(nj*4))
       z  = SQRT(1.0-xj*xj)
       call da_asslegpol(nj, 0, xj, z, fj)
 
       if ( fj >= 0.0 .AND. fjold < 0.0 .OR. fj <  0.0 .AND. fjold >= 0.0 ) then
 
-!        Perform simple interpolation to improve roots (find Gaussian latitudes)
+         ! Perform simple interpolation to improve roots (find Gaussian latitudes)
          if (fjold < 0.0) then  ! Orient the search so that fn(x1) < 0
             x1 = xjold
             x2 = xj
@@ -83,12 +83,12 @@ subroutine da_get_gausslats( nj, glats, gwgts, sinlat, coslat )
 
          do i = 1, maxiter
 
-!           Bisect if Newton out of range or not decreasing fast enough
-            if (((x-x1)-fn*dfr)*((x-x2)-fn*dfr) > 0.0 .OR. ABS(2.0*fn) > ABS(dxold/dfr)) then
+            ! Bisect if Newton out of range or not decreasing fast enough
+            if (((x-x1)-fn*dfr)*((x-x2)-fn*dfr) > 0.0 &
+               .OR. ABS(2.0*fn) > ABS(dxold/dfr)) then
                dxold = dx
                dx = 0.5 * (x1 - x2)
                x = x2 + dx
-!               Print*, 'bisection step, x, x2, dx ',x, x2, dx
             else ! Newton-Raphson step
                dxold  = dx
                dx = fn * dfr
@@ -107,8 +107,6 @@ subroutine da_get_gausslats( nj, glats, gwgts, sinlat, coslat )
                x2 = x
             end if
          end do
-
-!         print*, 'Root ',k,' number of iterations ',i
 
          if (i >= MaxIter) then
             call da_error(__FILE__,__LINE__, &
@@ -129,13 +127,13 @@ subroutine da_get_gausslats( nj, glats, gwgts, sinlat, coslat )
       call da_error(__FILE__,__LINE__,(/"Not all roots found"/))
    end if
 
-!  Calculate sin, cosine:
+   ! Calculate sin, cosine:
 
    do j = 1, nj / 2
       sinlat(j) = sin(glats(j))
       coslat(j) = cos(glats(j))
 
-!     Use symmetry for northern hemisphere:
+      ! Use symmetry for northern hemisphere:
       sinlat(nj+1-j) = -sinlat(j)
       coslat(nj+1-j) = coslat(j)
    end do

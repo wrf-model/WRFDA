@@ -17,22 +17,20 @@ subroutine da_transform_vtovv( cv_size, xb, be, cv, vv, xp, &
 
    integer                          :: mz   ! Vertical truncation.
 
-  IF (trace_use) call da_trace_entry("da_transform_vtovv")
+   IF (trace_use) call da_trace_entry("da_transform_vtovv")
 
-
-!-------------------------------------------------------------------------
-!  [1.0] Fill vv arrays from 1-dimensional cv array.
-!-------------------------------------------------------------------------
+   !-------------------------------------------------------------------------
+   ! [1.0] Fill vv arrays from 1-dimensional cv array.
+   !-------------------------------------------------------------------------
 
    call da_cv_to_vv( cv_size, cv, xp, &
-                  (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%ne /), &
-                  vv )
+      (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%ne /), vv)
 
-!-------------------------------------------------------------------------
-!  [2.0] Perform VToVV Transform:
-!-------------------------------------------------------------------------
+   !-------------------------------------------------------------------------
+   ! [2.0] Perform VToVV Transform:
+   !-------------------------------------------------------------------------
 
-!  [2.1] Transform 1st control variable:
+   ! [2.1] Transform 1st control variable:
 
    mz = be % v1 % mz
    IF ( mz > 0 ) then
@@ -43,7 +41,7 @@ subroutine da_transform_vtovv( cv_size, xb, be, cv, vv, xp, &
                                     its,ite, jts,jte, kts,kte )
    END IF
 
-!  [2.2] Transform 2nd control variable:
+   ! [2.2] Transform 2nd control variable:
 
    mz = be % v2 % mz
    IF ( mz > 0 ) then
@@ -54,7 +52,7 @@ subroutine da_transform_vtovv( cv_size, xb, be, cv, vv, xp, &
                                     its,ite, jts,jte, kts,kte )
    END IF
 
-!  [2.3] Transform 3rd control variable
+   ! [2.3] Transform 3rd control variable
 
    mz = be % v3 % mz
    IF ( mz > 0 ) then
@@ -65,7 +63,7 @@ subroutine da_transform_vtovv( cv_size, xb, be, cv, vv, xp, &
                                     its,ite, jts,jte, kts,kte )
    END IF
 
-!  [2.4] Transform 4th control variable
+   ! [2.4] Transform 4th control variable
       
    mz = be % v4 % mz
    IF ( mz > 0 ) then
@@ -76,7 +74,7 @@ subroutine da_transform_vtovv( cv_size, xb, be, cv, vv, xp, &
                                     its,ite, jts,jte, kts,kte )
    END IF
 
-!  [2.5] Transform 5th control variable
+   ! [2.5] Transform 5th control variable
 
    mz = be % v5 % mz
    IF ( mz > 0 ) then
@@ -87,7 +85,7 @@ subroutine da_transform_vtovv( cv_size, xb, be, cv, vv, xp, &
                                     its,ite, jts,jte, kts,kte )
    END IF
 
-!  [2.6] Transform alpha control variable
+   ! [2.6] Transform alpha control variable
 
    mz = be % alpha % mz
    IF ( mz > 0 ) then

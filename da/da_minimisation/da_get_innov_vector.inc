@@ -156,7 +156,7 @@ subroutine da_get_innov_vector( it, ob, iv, &
    endif
 
    !----------------------------------------------
-   !  [5]  write out radiance iv in ascii format
+   ! [5]  write out radiance iv in ascii format
    !-----------------------------------------------
    if ( lwrite_iv_rad_ascii ) then
      write(UNIT=stdout,FMT=*)  ' writing radiance iv ascii'
@@ -164,7 +164,7 @@ subroutine da_get_innov_vector( it, ob, iv, &
    end if
 
    !----------------------------------------------------------
-   !  [6]  write out filtered radiance obs in binary format
+   ! [6]  write out filtered radiance obs in binary format
    !----------------------------------------------------------
    if ( lwrite_filtered_rad ) then
      write(UNIT=stdout,FMT=*) ' writing filtered radiance'

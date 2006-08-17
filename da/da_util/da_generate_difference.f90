@@ -23,7 +23,7 @@ program da_generate_difference
    do
       read(input_unit_1, iostat=ier) flag
 
-      if(ier/=0) then
+      if (ier/=0) then
          print *, 'ier 1=', ier
 
          exit
@@ -33,22 +33,21 @@ program da_generate_difference
          read(input_unit_1,iostat=ier) big_header_one%bhi,  big_header_one%bhr, &
                                        big_header_one%bhic, big_header_one%bhrc
 
-         if(ier/=0) then
+         if (ier/=0) then
             write(*,'("Error reading big header one domain")')
             call abort()
          endif
 
-!        call print_big_header(big_header_one%bhi, big_header_one%bhr, &
-!                              big_header_one%bhic,big_header_one%bhrc)
+         ! call print_big_header(big_header_one%bhi, big_header_one%bhr, &
+         !    big_header_one%bhic,big_header_one%bhrc)
 
          miy_one=big_header_one%bhi(16,1)
          mjx_one=big_header_one%bhi(17,1)
 
          read(input_unit_2, iostat=ier) flag_2
 
-         if(ier/=0) then
+         if (ier/=0) then
             print *, 'ier 2=', ier
-
             exit
          end if
  
@@ -164,7 +163,7 @@ program da_generate_difference
 
                write_index = write_index + 1
 
-!              stop 'Wrong index'
+               ! stop 'Wrong index'
             end if
 
             if(sub_header_one%end_index(m) /= sub_header_two%end_index(m)) then
@@ -174,7 +173,7 @@ program da_generate_difference
 
                write_index = write_index + 1
 
-!              stop 'Wrong index'
+               !stop 'Wrong index'
             end if
          end do
 
@@ -192,7 +191,7 @@ program da_generate_difference
 
          if(sub_header_two%name /= 'PSTARCRS ' .and. &
             sub_header_two%name /= 'GROUND T ' .and. &
-!           sub_header_two%name /= 'TERRAIN  ' .and. &
+            ! sub_header_two%name /= 'TERRAIN  ' .and. &
             sub_header_two%name /= 'MAPFACCR ' .and. &
             sub_header_two%name /= 'MAPFACDT ' .and. &
             sub_header_two%name /= 'CORIOLIS ' .and. &

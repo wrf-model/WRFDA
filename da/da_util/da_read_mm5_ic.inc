@@ -18,7 +18,6 @@ subroutine da_read_mm5_ic(input_unit, error)
    nb=5
 
    do
-
       read(input_unit, iostat=ier) flag
 
       if (flag == 0) then
@@ -106,7 +105,7 @@ subroutine da_read_mm5_ic(input_unit, error)
       elseif (flag == 2) then
          error = 0
 
-!--------couple variables here.
+         ! couple variables here.
 
          do j=1,mjx
          do k=1,mkx
