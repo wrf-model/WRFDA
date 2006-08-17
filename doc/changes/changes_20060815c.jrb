@@ -1,0 +1,28 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: John Bray
+Date: 08/15/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Change AMOD to MOD in module_ra_cam.F to allow compilation with 
+g95 compiler
+
+Test results
+------------------------------------------------------
+
+ocotillo: compiles wrfvar
+
+Runs kma_t63 and con200 test cases.
+
+--------------------------------------------------------------------------------------
+
+File changes:
+------------
+
+A    doc/changes/changes_20060815c.jrb
+M      phys/module_ra_cam.F
+
