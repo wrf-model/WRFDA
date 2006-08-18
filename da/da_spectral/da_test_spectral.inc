@@ -116,7 +116,7 @@ subroutine da_test_spectral( max_wave, sizec, xbx, field, &
 
       xx = sum( real(r_leg(1:xbx%nj))* real(r_leg(1:xbx%nj))+ &
                aimag(r_leg(1:xbx%nj))*aimag(r_leg(1:xbx%nj)) )
-      write(unit=stdout,fmt='(a,i5,a,e30.20(') 'For Wave = ',m,' LX.LX    = ',xx
+      write(unit=stdout,fmt='(a,i5,a,e30.20)') 'For Wave = ',m,' LX.LX    = ',xx
 
       ccv1(index_start:index_end) = 0.
       call da_legtra_inv_adj( jds, jde, jts, jte, max_wave, xbx%alp_size, m, xbx%alp, &
