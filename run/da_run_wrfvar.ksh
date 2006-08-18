@@ -18,12 +18,12 @@ date
 # [1.0] Specify default environment variables:
 #-----------------------------------------------------------------------
 
-export DA_DATE=${DA_DATE:-2003010112}       # Analysis date.
+export DATE=${DATE:-2003010112}       # Analysis date.
 
 #Default directories/files:
 
 export REL_DIR=${REL_DIR:-$HOME/trunk}
-export DA_DIR=${DA_DIR:-$REL_DIR/wrfvar}
+export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
 export WRFPLUS_DIR=${WRFPLUS_DIR:-$REL_DIR/wrfplus}
 export DA_ID=${DA_ID:-wrfvar}
 export REGION=${REGION:-con200}
@@ -44,19 +44,19 @@ cd $RUN_DIR
 # Do we remove the RUN_DIR at the end to save space
 export CLEAN=${CLEAN:-false}                      
 
-export DA_FIRST_GUESS=${DA_FIRST_GUESS:-$CS_DIR/$DA_DATE/wrfinput_d01}    # wrfvar "first guess" input.
-export DA_BOUNDARIES=${DA_BOUNDARIES:-$CS_DIR/$DA_DATE/wrfbdy_d01}    # wrfvar boundaries input.
-export DA_OBSERVATIONS=${DA_OBSERVATIONS:-$OB_DIR/$DA_DATE/ob.ascii} # wrfvar observation input.
-export DA_BUFR_DIR=${DA_BUFR_DIR:-$OB_DIR/$DA_DATE} # radiance bufr file directory
+export DA_FIRST_GUESS=${DA_FIRST_GUESS:-$CS_DIR/$DATE/wrfinput_d01}    # wrfvar "first guess" input.
+export DA_BOUNDARIES=${DA_BOUNDARIES:-$CS_DIR/$DATE/wrfbdy_d01}    # wrfvar boundaries input.
+export DA_OBSERVATIONS=${DA_OBSERVATIONS:-$OB_DIR/$DATE/ob.ascii} # wrfvar observation input.
+export DA_BUFR_DIR=${DA_BUFR_DIR:-$OB_DIR/$DATE} # radiance bufr file directory
 export DA_BACK_ERRORS=${DA_BACK_ERRORS:-$BE_DIR/gen_be.NMC.dat} # wrfvar background errors.
-export DA_SSMI=${DA_SSMI:-$OB_DIR/$DA_DATE/ssmi.dat}               # SSM/I radiances (ignore if not using).
-export DA_RADAR=${DA_RADAR:-$OB_DIR/$DA_DATE/radar.dat}            # Radar data (ignore if not using).
+export DA_SSMI=${DA_SSMI:-$OB_DIR/$DATE/ssmi.dat}               # SSM/I radiances (ignore if not using).
+export DA_RADAR=${DA_RADAR:-$OB_DIR/$DATE/radar.dat}            # Radar data (ignore if not using).
 export ENDIAN=${ENDIAN:-big_endian}
 
-# DA_FG01_DATE=$DA_DATE
-# DA_FG02_DATE=`$DA_DIR/main/advance_cymdh.exe $DA_FG01 1`
-# DA_FG03_DATE=`$DA_DIR/main/advance_cymdh.exe $DA_FG01 2`
-# DA_FG04_DATE=`$DA_DIR/main/advance_cymdh.exe $DA_FG01 3`
+# DA_FG01_DATE=$DATE
+# DA_FG02_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe $DA_FG01 1`
+# DA_FG03_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe $DA_FG01 2`
+# DA_FG04_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe $DA_FG01 3`
 # export DA_FG01=${DA_FG01:-$OB_DIR}
 
 export RTTOV=${RTTOV:-$HOME/rttov/rttov85}                            # RTTOV
@@ -72,10 +72,10 @@ if test $NL_GLOBAL = ".TRUE."; then
    export NPROC_X=1
 fi
 
-export DA_CY=`echo $DA_DATE | cut -c1-4`
-export DA_MM=`echo $DA_DATE | cut -c5-6`
-export DA_DD=`echo $DA_DATE | cut -c7-8`
-export DA_HH=`echo $DA_DATE | cut -c9-10`
+export DA_CY=`echo $DATE | cut -c1-4`
+export DA_MM=`echo $DATE | cut -c5-6`
+export DA_DD=`echo $DATE | cut -c7-8`
+export DA_HH=`echo $DATE | cut -c9-10`
 
 export NL_START_YEAR=$DA_CY
 export NL_START_MONTH=$DA_MM
@@ -84,7 +84,7 @@ export NL_START_HOUR=$DA_HH
 
 export NL_ANALYSIS_DATE=${DA_CY}-${DA_MM}-${DA_DD}_${DA_HH}:00:00.0000
 
-export DA_END_DATE=`$DA_DIR/main/advance_cymdh.exe $DA_DATE $NL_RUN_HOURS`
+export DA_END_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe $DATE $NL_RUN_HOURS`
 
 export DA_CY=`echo $DA_END_DATE | cut -c1-4`
 export DA_MM=`echo $DA_END_DATE | cut -c5-6`
@@ -129,14 +129,14 @@ if test $DA_RTTOV_COEFFS'.' != '.'; then
   ln -s $DA_RTTOV_COEFFS/* .
 fi
 
-cp $DA_DIR/run/gribmap.txt .
-cp $DA_DIR/run/LANDUSE.TBL .
-cp $DA_DIR/run/gmao_airs_bufr.tbl .
-cp $DA_DIR/main/wrfvar.exe  wrfvar.exe
+cp $WRFVAR_DIR/run/gribmap.txt .
+cp $WRFVAR_DIR/run/LANDUSE.TBL .
+cp $WRFVAR_DIR/run/gmao_airs_bufr.tbl .
+cp $WRFVAR_DIR/main/wrfvar.exe  wrfvar.exe
 if test $NL_LVAR4D = .TRUE.; then
   cp $WRFPLUS_DIR/main/wrfplus.exe  wrfplus.exe
-  ln -s $DA_DIR/run/*sh .
-  export PATH=$DA_DIR/run:$PATH
+  ln -s $WRFVAR_DIR/run/*sh .
+  export PATH=$WRFVAR_DIR/run:$PATH
 fi
 
 ln -sf $DA_FIRST_GUESS	 wrfvar_input
@@ -155,13 +155,13 @@ for FILE in $DAT_DIR/*.inv; do
   fi
 done
 
-for FILE in $DA_DIR/run/*.bias; do
+for FILE in $WRFVAR_DIR/run/*.bias; do
   if test -f $FILE; then
     ln -s $FILE .
   fi
 done
 
-for FILE in $DA_DIR/run/*.info; do
+for FILE in $WRFVAR_DIR/run/*.info; do
   if test -f $FILE; then
     ln -s $FILE .
   fi
@@ -206,7 +206,7 @@ Subversion revision:         $SVN_REV
 First Guess Input File:      $DA_FIRST_GUESS
 Background Error Input File: $DA_BACK_ERRORS
 Observation Input File:      $DA_OBSERVATIONS
-Start date:                  $DA_DATE
+Start date:                  $DATE
 End date:                    $DA_END_DATE
 EOF
 fi
@@ -218,7 +218,7 @@ echo "Subversion revision:         $SVN_REV"
 echo "First Guess Input File:      $DA_FIRST_GUESS"
 echo "Background Error Input File: $DA_BACK_ERRORS"
 echo "Observation Input File:      $DA_OBSERVATIONS"
-echo "Start date:                  $DA_DATE"
+echo "Start date:                  $DATE"
 echo "End date:                    $DA_END_DATE"
 
 
@@ -249,7 +249,7 @@ if test $NL_LVAR4D = .TRUE.; then
    export NL_DYN_OPT=2
 fi
 
-. $DA_DIR/inc/namelist_script.inc
+. $WRFVAR_DIR/inc/namelist_script.inc
 
 mkdir trace
 

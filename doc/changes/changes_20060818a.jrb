@@ -1,0 +1,26 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: John Bray
+Date: 08/18/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+For suite consistency, change DA_DIR to WRFVAR_DIR and DA_DATE to DATE
+
+Test results
+------------------------------------------------------
+
+No compilation needed
+
+hazel: runs kma_t63
+
+--------------------------------------------------------------------------------------
+
+File changes:
+------------
+
+A    doc/changes/changes_20060818a.jrb
+M      run/da_run_wrfvar.ksh
