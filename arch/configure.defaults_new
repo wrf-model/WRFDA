@@ -25,7 +25,7 @@ FCDEBUG         = -g -C
 FCTYPE          = -r8
 FCFREE          = -Mfree
 FCENDIAN        = -byteswapio
-FCBASE          = -Ktrap=fp -tp p6
+FCBASE          = -Ktrap=fp
 FCFLAGS_RSL     = $(FCENDIAN)
 
 CCFLAGS2        = -I$(RSL)/RSL
@@ -192,7 +192,7 @@ FCDEBUG         = -g -C
 FCTYPE          = -r8
 FCFREE          = -Mfree
 FCENDIAN        = -byteswapio
-FCBASE          = -Ktrap=fp -tp p6
+FCBASE          = -Ktrap=fp
 FCFLAGS_RSL     = $(FCENDIAN)
 
 CCFLAGS_BUFR    = -DUNDERSCORE
@@ -215,7 +215,7 @@ arch_superclean :
 FC              = mpif90
 FFC             = $(FC)
 SFC             = pgf90
-CC              = mpicc
+CC              = mpicc -DMPI2_SUPPORT
 #CC              = mpicc
 CC_TOOLS        = gcc
 LD              = $(FC)
@@ -232,7 +232,7 @@ FCDEBUG         = -g -C
 FCTYPE          = -r8
 FCFREE          = -Mfree
 FCENDIAN        = -byteswapio
-FCBASE          = -Ktrap=fp -tp p6
+FCBASE          = -Ktrap=fp
 FCFLAGS_RSL     = $(FCENDIAN)
 
 CCFLAGS2        = -I$(RSL)/RSL
@@ -281,7 +281,7 @@ FCDEBUG         = -g -C
 FCTYPE          = -r8
 FCFREE          = -Mfree
 FCENDIAN        = -byteswapio
-FCBASE          = -Ktrap=fp -tp p6
+FCBASE          = -Ktrap=fp
 FCFLAGS_RSL     = $(FCENDIAN)
 
 CCFLAGS2        = -I$(RSL_LITE)
