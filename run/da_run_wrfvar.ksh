@@ -187,7 +187,7 @@ if test -r $DA_SSMI; then
   set NL_USE_SSMIRETRIEVALOBS = .TRUE.
 fi
 
-DATE=`date`
+LOCAL_DATE=`date`
 
 if test $NL_USE_HTML = .TRUE.; then
 
@@ -198,7 +198,7 @@ if test $NL_USE_HTML = .TRUE.; then
 <H1>$EXPT</H1>
 
 <PRE>
-Started: $DATE
+Started: $LOCAL_DATE
 Experiment directory:        $EXP_DIR
 Run directory:               $RUN_DIR
 Release directory:           $REL_DIR
@@ -260,7 +260,7 @@ mkdir trace
 $RUN_CMD ./wrfvar.exe > wrfvar.out 2>wrfvar.error
 RC=$?
 
-DATE=`date`
+LOCAL_DATE=`date`
 
 cd $EXP_DIR
 
@@ -334,18 +334,18 @@ fi
 if test $NL_USE_HTML = .TRUE.; then
    ls -l $EXP_DIR/cost_fn >> $HTML
    if test $RC = 0; then
-     echo "passed on $DATE" >> $HTML
+     echo "passed on $LOCAL_DATE" >> $HTML
    else
-     echo "failed on $DATE with error $RC" >> $HTML
+     echo "failed on $LOCAL_DATE with error $RC" >> $HTML
    fi
 fi
 
 ls -l $EXP_DIR/cost_fn
 
 if test $RC = 0; then
-  echo "passed on $DATE"
+  echo "passed on $LOCAL_DATE"
 else
-  echo "failed on $DATE with error $RC"
+  echo "failed on $LOCAL_DATE with error $RC"
 fi
 
 # We never look at core files
