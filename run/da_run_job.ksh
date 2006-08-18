@@ -14,9 +14,8 @@ export HOSTNAME=`hostname`
 export NUM_PROCS=${NUM_PROCS:-1}
 
 export MP_SHARED_MEMORY=${MP_SHARED_MEMORY:-yes}
-export MPI_RUN=${MPI_RUN:-mpirun}
 export HOSTS=${HOSTS:-$PWD/hosts}
-export MPI_OPTS=${MPI_OPTS:--v -np $NUM_PROCS -nolocal -machinefile $HOSTS}
+export RUN_CMD=${RUN_CMD:-mpirun -v -np $NUM_PROCS -all-local -machinefile $HOSTS}
 
 rm -rf $EXP_DIR
 mkdir $EXP_DIR
@@ -79,17 +78,16 @@ elif test $HOSTNAME = "ln0126en" -o $HOSTNAME = "ln0127en"; then
 #BSUB -e $EXPT.err               
 #BSUB -q regular  
 
-export RUN_CMD="mpirun.lsf -v -np $NUM_PROCS}"
+export RUN_CMD=${RUN_CMD:-mpirun.lsf -v -np $NUM_PROCS}
 . $SCRIPT
 
 EOF
    chmod +x job.ksh
    bsub -q regular -n $NUM_PROCS $PWD/job.ksh
 
-elif test $PLATFORM = "Darwin"; then
-   export RUN_CMD="mpirun -v -np $NUM_PROCS -all-local}"
+elif test $HOSTNAME = ocotillo; then
+   export RUN_CMD=${RUN_CMD:-mpirun -v -np $NUM_PROCS -nolocal -machinefile $HOSTS}
    $SCRIPT
-
 else
    $SCRIPT
 fi
