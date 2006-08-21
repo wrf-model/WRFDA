@@ -260,50 +260,6 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for PC Linux i486 i586 i686, PGI compiler  (RSL_LITE, MPICH, RSL IO)
-#
-FC              = mpif90
-FFC             = $(FC)
-SFC             = pgf90
-CC              = mpicc
-CC_TOOLS        = gcc
-LD              = $(FC)
-
-TRADFLAG        = -traditional
-FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DLINUX -DNONSTANDARD_SYSTEM
-                    
-FPPFLAGS_BUFR   = -C -P $(TRADFLAG) -DLINUX -Dlinux
-DM_CPPFLAGS     = -I$(RSL_LITE)
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL_LITE -DDM_PARALLEL
-
-FCOPTIM         = #-fast
-FCDEBUG         = -g -C
-FCTYPE          = -r8
-FCFREE          = -Mfree
-FCENDIAN        = -byteswapio
-FCBASE          = -Ktrap=fp
-FCFLAGS_RSL     = $(FCENDIAN)
-
-CCFLAGS2        = -I$(RSL_LITE)
-CCFLAGS_BUFR    = -DUNDERSCORE
-CCFLAGS_RSL     = 
-
-LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/local/lib \
-                    -lncarg -lncarg_gks -lncarg_
-MPI_LIBS	= librsl_lite.a
-MPI_LIB		= -lrsl_lite
-
-
-arch : 
-	$(LN) $(RSL_LITE)/*.c .
-	$(LN) $(RSL_LITE)/*.F .
-	@ touch arch
-
-arch_clean :
-
-arch_superclean :
-
-###########################################################
 #ARCH Settings for PC Linux i486 i586 i686, g95 compiler  (Single-threaded)
 #
 FC              = g95
@@ -385,50 +341,6 @@ arch_clean :
 
 arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
-
-###########################################################
-#ARCH Settings for PC Linux i486 i586 i686, g95 compiler  (RSL_LITE, MPICH, RSL IO)
-#
-FC              = mpif90
-FFC             = $(FC)
-SFC             = g95
-CC              = mpicc
-CC_TOOLS        = gcc
-LD              = $(FC)
-
-
-TRADFLAG        = -traditional
-FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM 
-                    
-DM_CPPFLAGS     = -I$(RSL_LITE)
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL_LITE -DDM_PARALLEL
-FPPFLAGS_BUFR   = -C -P $(TRADFLAG) -DLINUX -Dlinux
-
-FCOPTIM         =
-FCDEBUG         = -g -ftrace=full -finteger=-9999 -freal=nan -C
-FCFREE          = -ffree-form  -ffree-line-length-huge
-FCENDIAN        =
-FCBASE          = -cpp -Wno=101,139,155,158 -fno-second-underscore
-FCTYPE          = -r8
-FCFLAGS_RSL     = $(FCENDIAN) -ffixed-form -fno-second-underscore
-
-CCFLAGS2        = -I$(RSL_LITE)
-CCFLAGS_BUFR    = -DUNDERSCORE
-CCFLAGS_RSL     = 
-
-LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/local/lib \
-                    -lncarg -lncarg_gks -lncarg_c
-MPI_LIBS	= librsl_lite.a 
-MPI_LIB		= -lrsl_lite
-
-arch : 
-	$(LN) $(RSL_LITE)/*.c .
-	$(LN) $(RSL_LITE)/*.F .
-	@ touch arch
-
-arch_clean :
-
-arch_superclean :
 
 ###########################################################
 #ARCH Intel xeon i686 ia32 Xeon Linux, ifort compiler (single-threaded, no nesting)
@@ -934,52 +846,6 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH	AIX DM-Parallel          (RSL_LITE, IBM-MPI, supports nesting)
-#
-M4              = m4 -B24000
-FC              = mpxlf90_r
-FFC             = mpxlf_r
-SFC             = xlf90_r
-CC              = mpcc_r
-CC_TOOLS        = xlc
-SCC             = cc_r
-LD              = $(FC)
-
-TRADFLAG        =
-FPPFLAGS2       = -DNATIVE_MASSV -DNORESHAPE -DAIX -DNONSTANDARD_SYSTEM
-                    
-DM_CPPFLAGS     = -I$(RSL_LITE)
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL_LITE -DDM_PARALLEL
-
-FCOPTIM         = -O0 -qarch=auto
-FCDEBUG         = #-g -qfullpath -C
-FCTYPE          = -qrealsize=8
-FCFREE          = -qfree=f90
-FCENDIAN        =
-FCBASE          = -w -qspill=20000 -qmaxmem=32767 \
- 		    -qflttrap=zerodivide:invalid:enable -qsigtrap=xl__trce 
-FCFLAGS_RSL     = $(FCENDIAN)
-
-CCFLAGS2        = -DNOUNDERSCORE -DNCARIBM_NOC99 -I$(RSL_LITE)
-CCFLAGS_BUFR    = -DNOUNDERSCORE
-CCFLAGS_RSL     =
-
-LDFLAGS2         = -bmaxstack:256000000 -bmaxdata:2048000000
-
-LOCAL_LIB	= -lmass -lmassv
-MPI_LIBS	= librsl_lite.a
-MPI_LIB		= -lrsl_lite
-
-arch : 
-	$(LN) $(RSL_LITE)/*.c .
-	$(LN) $(RSL_LITE)/*.F .
-	@ touch arch
-
-arch_clean :
-
-arch_superclean :
-
-###########################################################
 #ARCH   crayx1 UNICOS/mp  CRAY X1 serial 
 
 SED_FTN		= sed -f ../arch/cray_csd.sed
@@ -1163,49 +1029,6 @@ arch_clean :
 
 arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
-
-###########################################################
-#ARCH Darwin		(g95 parallel for G4/5 (RSL_LITE, MPICH, RSL IO)
-#
-CPP             = /usr/bin/cpp
-M4              = m4 -B12000
-FC              = mpif90
-FFC             = $(FC)
-SFC             = g95
-LD              = $(FC)
-CC              = mpicc
-CC_TOOLS        = cc
-
-TRADFLAG        =
-FPPFLAGS2       = -DMACOS -DNONSTANDARD_SYSTEM		      \
-                     
-DM_CPPFLAGS     = -I$(RSL_LITE)
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL_LITE -DDM_PARALLEL
-
-FCOPTIM         = 
-FCDEBUG         = -g -ftrace=full -finteger=-9999 -freal=nan -C
-FCTYPE          = -r8
-FCFREE          = -ffree-form  -ffree-line-length-huge
-FCENDIAN        =
-FCBASE          = -cpp -Wno=101,139,155,158 -fno-second-underscore
-FCFLAGS_RSL     = $(FCENDIAN) -ffixed-form -fno-second-underscore
-
-CCFLAGS2        = -I$(RSL_LITE) -DLANDREAD_STUB -DMACOS
-CCFLAGS_BUFR    = -DUNDERSCORE
-CCFLAGS_RSL     = -DMACOS -I/usr/include/sys
-
-MPI_LIBS	= librsl_lite.a
-MPI_LIB		= -lrsl_lite
-EXTRA_LIBS      = -lSystemStubs
-
-arch : 
-	$(LN) $(RSL_LITE)/*.c .
-	$(LN) $(RSL_LITE)/*.F .
-	@ touch arch
-
-arch_clean :
-
-arch_superclean :
 
 ###########################################################
 #ARCH  NULL
