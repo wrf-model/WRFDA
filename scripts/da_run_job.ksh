@@ -7,7 +7,7 @@ export EXPT=${EXPT:-test}
 export DAT_DIR=${DAT_DIR:-$HOME/data}
 export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION}
 export EXP_DIR=${EXP_DIR:-$REG_DIR/$EXPT}
-export SCRIPT=${SCRIPT:-$WRFVAR_DIR/run/da_run_wrfvar.ksh}
+export SCRIPT=${SCRIPT:-$WRFVAR_DIR/scripts/da_run_wrfvar.ksh}
 
 export PLATFORM=`uname`
 export HOSTNAME=`hostname`

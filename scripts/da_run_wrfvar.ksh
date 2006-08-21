@@ -135,8 +135,7 @@ cp $WRFVAR_DIR/run/gmao_airs_bufr.tbl .
 cp $WRFVAR_DIR/main/wrfvar.exe  wrfvar.exe
 if test $NL_LVAR4D = .TRUE.; then
   cp $WRFPLUS_DIR/main/wrfplus.exe  wrfplus.exe
-  ln -s $WRFVAR_DIR/run/*sh .
-  export PATH=$WRFVAR_DIR/run:$PATH
+  export PATH=$WRFPLUS_DIR/scripts:$PATH
 fi
 
 ln -sf $DA_FIRST_GUESS	 wrfvar_input
