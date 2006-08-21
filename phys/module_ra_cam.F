@@ -384,7 +384,7 @@ subroutine camrad(RTHRATENLW,RTHRATENSW,                           &
 !                                                            lwdn, &
 !                                                       lwdnclear
 
-   REAL, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT)  ::         &
+   REAL, DIMENSION( ims:ime, jms:jme ), OPTIONAL, INTENT(INOUT)  ::         &
                     SWUPT,SWUPTC,SWDNT,SWDNTC,                    &
                     LWUPT,LWUPTC,LWDNT,LWDNTC,                    &
                     SWUPB,SWUPBC,SWDNB,SWDNBC,                    &
@@ -745,6 +745,8 @@ subroutine camrad(RTHRATENLW,RTHRATENSW,                           &
       enddo
       endif
 
+      IF(PRESENT(SWUPT))THEN
+
 ! Added shortwave and longwave upward/downward total and clear sky fluxes
       do k = kts,kte+1
       kk = kte +1 - k + kts
@@ -785,6 +787,7 @@ subroutine camrad(RTHRATENLW,RTHRATENSW,                           &
 !            endif
       enddo
       enddo
+      ENDIF
 
       do i = its,ite
       ii = i - its + 1

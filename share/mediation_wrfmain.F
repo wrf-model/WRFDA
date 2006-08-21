@@ -12,7 +12,7 @@ SUBROUTINE med_initialdata_input_ptr ( grid , config_flags )
          USE module_domain
          USE module_configure
          TYPE (domain) :: grid
-         TYPE (grid_config_rec_type) , INTENT(IN) :: config_flags
+         TYPE (grid_config_rec_type) :: config_flags
       END SUBROUTINE med_initialdata_input
    END INTERFACE
    CALL  med_initialdata_input ( grid , config_flags )
@@ -51,10 +51,10 @@ SUBROUTINE med_initialdata_input ( grid , config_flags )
    CHARACTER (LEN=80)     :: message
    LOGICAL                :: restart
 
+
    CALL nl_get_restart( 1, restart )
    IF ( .NOT. restart ) THEN
      !  Initialize the mother domain.
-     CALL start_timing
      grid%input_from_file = .true.
      IF ( grid%input_from_file ) THEN
 
@@ -171,7 +171,7 @@ SUBROUTINE med_add_config_info_to_grid ( grid )
 #define SOURCE_RECORD model_config_rec %
 #define SOURCE_REC_DEX (grid%id)
 #define DEST_RECORD   grid %
-#include "config_assigns.inc"
+#include <config_assigns.inc>
 
    RETURN
 

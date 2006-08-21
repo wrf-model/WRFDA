@@ -70,12 +70,6 @@ SUBROUTINE solve_em ( grid , config_flags , &
 ! storage for tendencies and decoupled state (generated from Registry)
 #include <em_i1_decl.inc>
 
-! Previous time level of tracer arrays now defined as i1 variables;
-! the state 4d arrays now redefined as 1-time level arrays in Registry.
-! Benefit: save memory in nested runs, since only 1 domain is active at a
-! time.  Potential problem on stack-limited architectures: increases
-! amount of data on program stack by making these automatic arrays.
-
    INTEGER :: rc 
    INTEGER :: number_of_small_timesteps, rk_step
    INTEGER :: klevel,ijm,ijp,i,j,k,size1,size2    ! for prints/plots only
@@ -181,6 +175,7 @@ SUBROUTINE solve_em ( grid , config_flags , &
 !  Compute these starting and stopping locations for each tile and number of tiles.
 !  See: http://www.mmm.ucar.edu/wrf/WG2/topics/settiles
   CALL set_tiles ( grid , ids , ide , jds , jde , ips , ipe , jps , jpe )
+!print *,julian,grid%julday,' julian,grid%julday in solve'
 
   itimestep = itimestep + 1
 
@@ -564,6 +559,7 @@ BENCH_START(rad_driver_tim)
      &        , QI=moist(ims,kms,jms,P_QI), F_QI=F_QI                     &
      &        , QS=moist(ims,kms,jms,P_QS), F_QS=F_QS                     &
      &        , QG=moist(ims,kms,jms,P_QG), F_QG=F_QG                     &
+#ifdef ACFLUX
      &        ,ACSWUPT=acswupt    ,ACSWUPTC=acswuptc                      &
      &        ,ACSWDNT=acswdnt    ,ACSWDNTC=acswdntc                      &
      &        ,ACSWUPB=acswupb    ,ACSWUPBC=acswupbc                      &
@@ -580,6 +576,7 @@ BENCH_START(rad_driver_tim)
      &        ,LWDNT=lwdnt    ,LWDNTC=lwdntc                              &
      &        ,LWUPB=lwupb    ,LWUPBC=lwupbc                              &
      &        ,LWDNB=lwdnb    ,LWDNBC=lwdnbc                              &
+#endif
      &        ,LWCF=lwcf                                                  &
      &        ,SWCF=swcf                                                  &
      &        ,OLR=olr                                                    &
