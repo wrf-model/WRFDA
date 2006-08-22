@@ -1,0 +1,25 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: John Bray
+Date: 08/22/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Reapply INTENT fix needed by g95. Lost when reverting to wrf trunk,
+which still has the bug
+
+Test results
+------------------------------------------------------
+
+balsam: compile wrfvar with g95
+
+--------------------------------------------------------------------------------------
+
+File changes:
+------------
+
+A    doc/changes/changes_20060822a.jrb
+M    share/mediation/wrfmain.F
