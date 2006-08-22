@@ -1,4 +1,4 @@
-MODULE da_module_netcdf_interface
+MODULE da_netcdf_interface
 
 CONTAINS
 
@@ -8,7 +8,7 @@ CONTAINS
         
   implicit none
 
-  include 'netcdf.inc'
+#include <netcdf.inc>
 
   integer, intent(in)  ::  max_times  
   integer, intent(out) ::  n_times
@@ -71,7 +71,7 @@ CONTAINS
         
   implicit none
 
-  include 'netcdf.inc'
+#include <netcdf.inc>
 
   character (len=80), intent(in) :: file
   character (len=*), intent(in) :: var
@@ -114,7 +114,7 @@ CONTAINS
         
   implicit none
 
-  include 'netcdf.inc'
+#include <netcdf.inc>
 
   character (len=80), intent(in) :: file
   character (len=*), intent(in) :: att_name
@@ -146,7 +146,7 @@ CONTAINS
         
     implicit none
 
-    include 'netcdf.inc'
+#include <netcdf.inc>
 
     character (len=80), intent(in) :: file
     character (len=*), intent(in) :: att_name
@@ -199,7 +199,7 @@ CONTAINS
         
   implicit none
 
-  include 'netcdf.inc'
+#include <netcdf.inc>
 
   integer, intent(in)  ::  i1, i2, i3, time
   character (len=80), intent(in) :: file
@@ -293,7 +293,7 @@ CONTAINS
         
   implicit none
 
-  include 'netcdf.inc'
+#include <netcdf.inc>
 
   integer, intent(in)  ::  i1, i2, time
   character (len=80), intent(in) :: file
@@ -383,7 +383,7 @@ CONTAINS
         
   implicit none
 
-  include 'netcdf.inc'
+#include <netcdf.inc>
 
   integer, intent(in)  ::  i1, i2, i3, time
   character (len=80), intent(in) :: file
@@ -470,7 +470,7 @@ CONTAINS
         
     implicit none
 
-    include 'netcdf.inc'
+#include <netcdf.inc>
 
     integer, intent(in)  ::  i1, i2, time
     character (len=80), intent(in) :: file
@@ -551,7 +551,7 @@ CONTAINS
         
   implicit none
 
-  include 'netcdf.inc'
+#include <netcdf.inc>
 
   integer, intent(in)  ::  i1, i2, time
   character (len=80), intent(in) :: file
@@ -628,7 +628,7 @@ CONTAINS
 
      implicit none
 
-     include 'netcdf.inc'
+#include <netcdf.inc>
 
      character (len=80), intent(in) :: file
      character (len=*), intent(in) :: var
@@ -667,7 +667,7 @@ CONTAINS
 
      implicit none
 
-     include 'netcdf.inc'
+#include <netcdf.inc>
 
      character (len=80), intent(in) :: file
      character (len=*), intent(in) :: var, att_name, text
@@ -729,7 +729,7 @@ CONTAINS
         
   implicit none
 
-  include 'netcdf.inc'
+#include <netcdf.inc>
 
   character(len=80), intent(in ) :: this_datestr, next_datestr
   real,              intent(out) :: bdyfrq
@@ -737,8 +737,8 @@ CONTAINS
 
   real    :: this_bdy_time, next_bdy_time
 
-  CALL atotime(this_datestr, this_bdy_time)
-  CALL atotime(next_datestr, next_bdy_time)
+  CALL da_atotime(this_datestr, this_bdy_time)
+  CALL da_atotime(next_datestr, next_bdy_time)
 
   bdyfrq = next_bdy_time - this_bdy_time
 
@@ -755,7 +755,7 @@ CONTAINS
         
   implicit none
 
-  include 'netcdf.inc'
+#include <netcdf.inc>
 
   integer,           intent(in ) :: max_times
   logical,           intent(in ) :: debug
@@ -858,5 +858,5 @@ CONTAINS
 
 END subroutine da_atotime
 
-END MODULE da_module_netcdf_interface
+END MODULE da_netcdf_interface
 

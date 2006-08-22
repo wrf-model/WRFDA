@@ -75,28 +75,3 @@ module da_plot_parameters
 
 end module da_plot_parameters
 
-module da_mm5_model_state
- 
-   implicit none
-
-   integer :: mix,mjx,mkx,kl,cb,ce,nl,nb
-
-   real    :: time_interval
-
-   real, dimension(:,:,:), allocatable :: uuu, vvv, www, &
-                                          ttt, qqq, ppp
-   real, dimension(:,:,:), allocatable :: wbn, ebn, sbn, nbn, &
-                                          wbo, ebo, sbo, nbo, &
-                                          wbt, ebt, sbt, nbt
-
-   real, dimension(:,:), allocatable :: ps_crs, ps_dot
-
-   logical :: new_variable
-
-   character(len=9) :: var_name
-
-   integer, parameter :: dot=0, &
-                         crs=1
-
-end module da_mm5_model_state
-

@@ -2,7 +2,7 @@
 
 var : wrfvar
 
-wrfvar  : advance_cymdh $(WRFVAR_LIBS) wrfvar.o
+wrfvar  : advance_cymdh da_update_bc $(WRFVAR_LIBS) wrfvar.o
 	$(LD) -o wrfvar.exe $(LDFLAGS) wrfvar.o $(WRFVAR_LIB)
 
 wrf     : $(WRF_LIBS) wrf.o

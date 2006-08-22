@@ -1,4 +1,4 @@
-MODULE da_module_couple_uv
+MODULE da_couple_uv
 
 CONTAINS
 
@@ -119,5 +119,5 @@ subroutine da_couple ( mut, field, msf, &
 
 END subroutine da_couple
 
-END MODULE da_module_couple_uv
+END MODULE da_couple_uv
 

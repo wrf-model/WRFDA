@@ -3,8 +3,8 @@
 
 program da_update_bc
 
-   USE da_module_netcdf_interface
-   USE da_module_couple_uv
+   USE da_netcdf_interface
+   USE da_couple_uv
 
    implicit none
 

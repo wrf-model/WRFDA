@@ -1,16 +1,18 @@
 C***********************************************************************        
       PROGRAM PREGSM                                                            
-      PARAMETER ( KMAX=30 )
-      PARAMETER ( IMAX=640, JMAX=320 )                                 
-      PARAMETER ( IMAXE=640, JMAXE=321 )                                 
-      PARAMETER ( ISST=360, JSST=181 )                                          
-      PARAMETER ( ISNW=360, JSNW=180 )                                          
-      PARAMETER ( IDIM=428, JDIM=214 ) ! MAX(MAX,SST,SNW)                       
-      PARAMETER ( MAXJZ=16 )                                                    
-      PARAMETER (MEND1 =214,NEND1=214,JEND1=214)
-      PARAMETER (JMAXHF= JMAX/2)
-      PARAMETER (MNWAV =MEND1*(MEND1+1)/2)
-      PARAMETER (IVAR=6,IMX=IMAX+2)
+      USE module_wave2grid_kma
+! Duplicated in module
+!      PARAMETER ( KMAX=30 )
+!      PARAMETER ( IMAX=640, JMAX=320 )                                 
+!      PARAMETER ( IMAXE=640, JMAXE=321 )                                 
+!      PARAMETER ( ISST=360, JSST=181 )                                          
+!      PARAMETER ( ISNW=360, JSNW=180 )                                          
+!      PARAMETER ( IDIM=428, JDIM=214 ) ! MAX(MAX,SST,SNW)                       
+!      PARAMETER ( MAXJZ=16 )                                                    
+!      PARAMETER (MEND1 =214,NEND1=214,JEND1=214)
+!      PARAMETER (JMAXHF= JMAX/2)
+!      PARAMETER (MNWAV =MEND1*(MEND1+1)/2)
+!      PARAMETER (IVAR=6,IMX=IMAX+2)
 C                                                                               
       INTEGER IDATE(5), IDGES(5), IDSST(5)                                      
       CHARACTER*8 FILE, MODEL, RESL                                             
