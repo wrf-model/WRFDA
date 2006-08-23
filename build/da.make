@@ -105,7 +105,8 @@ da_tune: da_tune.o
 	$(LD) -o $@.exe $@.o
 
 da_update_bc: da_update_bc.o
-	$(LD) -L${NETCDF_PATH}/lib -o $@.exe $@.o da_netcdf_interface.o da_couple_uv.o ${NETCDF_LIB}
+	$(LD) -L${NETCDF_PATH}/lib -o $@.exe $@.o da_netcdf_interface.o \
+           da_module_couple_uv.o ${NETCDF_LIB}
 
 da_write_sl_2_be: da_write_sl_2_be.o
 	$(LD) -o $@.exe $@.o da_module_io.o  da_module_trans.o \
