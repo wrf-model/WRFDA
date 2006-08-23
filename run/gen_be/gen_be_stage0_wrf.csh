@@ -29,13 +29,16 @@
  if ( ! $?ID )            setenv ID           gen_be
  if ( ! $?SRC_DIR )       setenv SRC_DIR      ${HOME}/code_development/WRF_V2.1.2
  if ( ! $?WRFVAR_DIR )    setenv WRFVAR_DIR   ${SRC_DIR}/wrfvar
- if ( ! $?BUILD_DIR )     setenv BUILD_DIR    ${WRFVAR_DIR}/gen_be
- if ( ! $?BIN_DIR )       setenv BIN_DIR      ${WRFVAR_DIR}/tools
+ if ( ! $?BUILD_DIR )     setenv BUILD_DIR    ${WRFVAR_DIR}/build
  if ( ! $?DATA_DISK )     setenv DATA_DISK    /ocotillo1
  if ( ! $?DOMAIN )        setenv DOMAIN       con200      # Application name.
  if ( ! $?DAT_DIR )       setenv DAT_DIR      ${DATA_DISK}/${USER}/data/${DOMAIN}/${EXPT}
  if ( ! $?RUN_DIR )       setenv RUN_DIR      ${DAT_DIR}/$ID
- if ( ! $?STAGE0_DIR )    setenv STAGE0_DIR   ${RUN_DIR}/stage0
+ if ( ! $?STAGE0_DIR )    setenv STAGE0_DIR   ${DAT_DIR}/stage0
+ if ( ! $?LOCAL )         setenv LOCAL false            # True if local machine.
+ if ( ! $?NUM_JOBS )      setenv NUM_JOBS    1            # Number of jobs to run.
+ if ( ! $?MACHINES )      set MACHINES = ( node1 node1 node2 node2 node3 node3 node4 node4 \
+                                           node5 node5 node6 node6 node7 node7 node8 node8 )  # For parallel runs.
 
  if ( ! -d ${RUN_DIR} )   mkdir ${RUN_DIR}
  if ( ! -d ${STAGE0_DIR} )  mkdir ${STAGE0_DIR}
@@ -43,8 +46,8 @@
 #OK, let's go!
 
 #Derive times of initial/final FCST_RANGE forecasts:
- setenv START_DATE_STAGE0 `${BIN_DIR}/advance_cymdh.exe $START_DATE -$FCST_RANGE`
- setenv END_DATE_STAGE0   `${BIN_DIR}/advance_cymdh.exe $END_DATE   -$FCST_RANGE`
+ setenv START_DATE_STAGE0 `${BUILD_DIR}/advance_cymdh.exe $START_DATE -$FCST_RANGE`
+ setenv END_DATE_STAGE0   `${BUILD_DIR}/advance_cymdh.exe $END_DATE   -$FCST_RANGE`
 
  setenv DATE $START_DATE_STAGE0
 
@@ -56,7 +59,7 @@
    cd ${TMP_DIR}
 
 #  Create file dates:
-   setenv FCST_TIME `${BIN_DIR}/advance_cymdh.exe $DATE $FCST_RANGE`
+   setenv FCST_TIME `${BUILD_DIR}/advance_cymdh.exe $DATE $FCST_RANGE`
    echo "gen_be_stage0_wrf: Calculating standard perturbation fields valid at time " $FCST_TIME
 
    set YYYY = `echo $FCST_TIME | cut -c1-4`
@@ -66,7 +69,7 @@
    set FILE_DATE = ${YYYY}-${MM}-${DD}_${HH}:00:00
    set FILE = ${DAT_DIR}/${DATE}/wrfout_d01_${FILE_DATE}
 
-   set NEXT_DATE = `${BIN_DIR}/advance_cymdh.exe $DATE $INTERVAL`
+   set NEXT_DATE = `${BUILD_DIR}/advance_cymdh.exe $DATE $INTERVAL`
    if ( $BE_METHOD == NMC ) then
       ln -sf $FILE ${FILE}.e001
       ln -sf ${DAT_DIR}/${NEXT_DATE}/wrfout_d01_${FILE_DATE} ${FILE}.e002

@@ -1,10 +1,10 @@
 program gen_be_stage0_wrf
 !
 !---------------------------------------------------------------------- 
-!  Purpose : To convert EPS output to "standard perturbation fields"
+!  Purpose : To convert WRF output to "standard perturbation fields"
 !  required by the WRF-Var BE covariance generation utility "gen_be".
 !
-!  Input  : WRF EPS forecasts for a specified date (NETCDF format). 
+!  Input  : WRF forecasts for a specified date (NETCDF format). 
 !
 !  Output : Binary files for use in gen_be_stage1.
 !

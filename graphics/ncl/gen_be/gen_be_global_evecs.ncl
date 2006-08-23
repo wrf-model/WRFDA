@@ -9,13 +9,9 @@ begin
 ; read in data
 ;************************************************
 
- domain = "con200"
+ works = "x11"
+ dir = "/smoke/dmbarker/data/con200/noobs/gen_be/"
  nrow = 27
-; domain = "t4b"
-; nrow = 41
-
- dir = "/ocotillo1/dmbarker/data/"+domain+"/noobs/gen_be/"
-
  ncol = 6
  y = new((/nrow/),float)
  x = new((/5,nrow/),float)
@@ -40,7 +36,7 @@ begin
 ;************************************************
 ; plotting parameters
 ;************************************************
- wks   = gsn_open_wks ("pdf","global_evecs."+domain)  ; open workstation
+ wks   = gsn_open_wks (works,"gen_be_global_evecs")  ; open workstation
 
  res                  = True                     ; plot mods desired
  res@trXMinF  =  -1.0                  ; min value on x-axis

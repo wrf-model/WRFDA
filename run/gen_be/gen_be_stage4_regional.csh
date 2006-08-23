@@ -34,7 +34,7 @@
  if ( ! $?ID )            setenv ID           cwb_wrf
  if ( ! $?SRC_DIR )       setenv SRC_DIR      ${HOME}/code_development/WRF_V2.1.2
  if ( ! $?WRFVAR_DIR )    setenv WRFVAR_DIR   ${SRC_DIR}/wrfvar
- if ( ! $?BUILD_DIR )     setenv BUILD_DIR    ${WRFVAR_DIR}/gen_be
+ if ( ! $?BUILD_DIR )     setenv BUILD_DIR    ${WRFVAR_DIR}/build
  if ( ! $?DATA_DISK )     setenv DATA_DISK /tara
  if ( ! $?DOMAIN )        setenv DOMAIN katrina.12km
  if ( ! $?DAT_DIR )       setenv DAT_DIR ${DATA_DISK}/${user}/data/${DOMAIN}/noobs/gen_be

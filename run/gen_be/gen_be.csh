@@ -23,6 +23,7 @@
 # RUN_GEN_BE_STAGE4 # Set to run stage 4 (Horizontal Covariances).
 # RUN_GEN_BE_DIAGS  # Set to run gen_be diagnostics.
 # RUN_GEN_BE_DIAGS_READ  # Set to run gen_be diagnostics_read.
+# RUN_GEN_BE_MULTICOV  # Set to calculate chi/T/ps regression diagnostics.
 
 #-----------------------------------------------------------------------------------
 # Don't change anything below this line.
@@ -61,14 +62,13 @@ if ( ! $?ID )            setenv ID gen_be
 if ( ! $?ID1 )           setenv ID1 ${BE_METHOD}.bin_type${BIN_TYPE}
 if ( ! $?RELEASE )       setenv RELEASE WRF_V2.1.2
 if ( ! $?REL_DIR )       setenv REL_DIR ${HOME}/code_development/${RELEASE}
-if ( ! $?GEN_BE_DIR )    setenv GEN_BE_DIR ${REL_DIR}/wrfvar
-if ( ! $?BUILD_DIR )     setenv BUILD_DIR ${GEN_BE_DIR}/gen_be
-if ( ! $?BIN_DIR )       setenv BIN_DIR   ${GEN_BE_DIR}/tools
+if ( ! $?WRFVAR_DIR )    setenv WRFVAR_DIR ${REL_DIR}/wrfvar
+if ( ! $?BUILD_DIR )     setenv BUILD_DIR ${WRFVAR_DIR}/build
 if ( ! $?DATA_DISK )     setenv DATA_DISK /ocotillo1
 if ( ! $?REGION )        setenv REGION con200
 if ( ! $?DAT_DIR )       setenv DAT_DIR ${DATA_DISK}/${USER}/data/${REGION}/${EXPT}
 if ( ! $?RUN_DIR )       setenv RUN_DIR ${DAT_DIR}/$ID
-if ( ! $?STAGE0_DIR )    setenv STAGE0_DIR ${RUN_DIR}/stage0
+if ( ! $?STAGE0_DIR )    setenv STAGE0_DIR ${DAT_DIR}/stage0
 
 if ( ! -d ${RUN_DIR} )   mkdir ${RUN_DIR}
 if ( ! -d ${STAGE0_DIR} )  mkdir ${STAGE0_DIR}
@@ -109,7 +109,7 @@ if ( $?RUN_GEN_BE_STAGE0 ) then
    set BEGIN_CPU = `date`
    echo "Beginning CPU time: ${BEGIN_CPU}"
 
-   $GEN_BE_DIR/run/gen_be/gen_be_stage0_wrf.csh
+   $WRFVAR_DIR/run/gen_be/gen_be_stage0_wrf.csh
 
    set RC = $status
    if ( $RC != 0 ) then
@@ -316,7 +316,7 @@ if ( $?RUN_GEN_BE_STAGE4 ) then
       echo "Run Stage 4: Calculate horizontal covariances (global power spectra)."
       echo "---------------------------------------------------------------"
 
-      ${GEN_BE_DIR}/run/gen_be/gen_be_stage4_global.csh >&! gen_be_stage4_global.log
+      ${WRFVAR_DIR}/run/gen_be/gen_be_stage4_global.csh >&! gen_be_stage4_global.log
       set RC = $status
       if ( $RC != 0 ) then
         echo "Stage 4 global failed with error" $RC
@@ -329,7 +329,7 @@ if ( $?RUN_GEN_BE_STAGE4 ) then
       echo "Run Stage 4: Calculate horizontal covariances (regional lengthscales)."
       echo "---------------------------------------------------------------"
 
-      ${GEN_BE_DIR}/run/gen_be/gen_be_stage4_regional.csh >&! gen_be_stage4_regional.log
+      ${WRFVAR_DIR}/run/gen_be/gen_be_stage4_regional.csh >&! gen_be_stage4_regional.log
       set RC = $status
       if ( $RC != 0 ) then
         echo "Stage 4 regional failed with error" $RC
@@ -383,6 +383,50 @@ EOF
    set RC = $status
    if ( $RC != 0 ) then
      echo "BE diags read failed with error" $RC
+     exit 1
+   endif
+
+endif
+
+#------------------------------------------------------------------------
+#  Calculate multivariate regression diagnostics:
+#------------------------------------------------------------------------
+
+if ( $?RUN_GEN_BE_MULTICOV ) then
+
+#  Calculate chi diagnostics:
+   setenv VARIABLE1 chi_u
+   setenv VARIABLE2 chi
+
+   $WRFVAR_DIR/run/gen_be/gen_be_cov3d.csh
+
+   set RC = $status
+   if ( $RC != 0 ) then
+     echo "gen_be_cov3d (chi) failed with error" $RC
+     exit 1
+   endif
+
+#  Calculate T diagnostics:
+   setenv VARIABLE1 t_u
+   setenv VARIABLE2 t
+
+   $WRFVAR_DIR/run/gen_be/gen_be_cov3d.csh
+
+   set RC = $status
+   if ( $RC != 0 ) then
+     echo "gen_be_cov3d (T) failed with error" $RC
+     exit 1
+   endif
+
+#  Calculate ps diagnostics:
+   setenv VARIABLE1 ps_u
+   setenv VARIABLE2 ps
+
+   $WRFVAR_DIR/run/gen_be/gen_be_cov2d.csh
+
+   set RC = $status
+   if ( $RC != 0 ) then
+     echo "gen_be_cov2d failed with error" $RC
      exit 1
    endif
 

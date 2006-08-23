@@ -22,11 +22,11 @@ if ( ! $?EXPT )          setenv EXPT noobs
 if ( ! $?ID )            setenv ID gen_be
 if ( ! $?RELEASE )       setenv RELEASE WRF_V2.1.2
 if ( ! $?REL_DIR )       setenv REL_DIR ${HOME}/code_development/${RELEASE}
-if ( ! $?GEN_BE_DIR )    setenv GEN_BE_DIR ${REL_DIR}/wrfvar
-if ( ! $?BUILD_DIR )     setenv BUILD_DIR ${GEN_BE_DIR}/gen_be
+if ( ! $?WRFVAR_DIR )    setenv WRFVAR_DIR ${REL_DIR}/wrfvar
+if ( ! $?BUILD_DIR )     setenv BUILD_DIR ${WRFVAR_DIR}/build
 if ( ! $?DATA_DISK )     setenv DATA_DISK /ocotillo1
-if ( ! $?DOMAIN )        setenv DOMAIN con200
-if ( ! $?DAT_DIR )       setenv DAT_DIR ${DATA_DISK}/${user}/data/${DOMAIN}/${EXPT}
+if ( ! $?REGION )        setenv REGION con200
+if ( ! $?DAT_DIR )       setenv DAT_DIR ${DATA_DISK}/${user}/data/${REGION}/${EXPT}
 if ( ! $?RUN_DIR )       setenv RUN_DIR ${DAT_DIR}/$ID
 
 cd ${RUN_DIR}

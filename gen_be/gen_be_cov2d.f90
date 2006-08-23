@@ -175,7 +175,7 @@ program gen_be_cov2d
    do j = 1, nj
       do i = 1, ni
          b = bin2d(i,j)
-         write(ounit,'(f22.5)')covar(b) / var(b)
+         write(ounit,'(f16.8)')covar(b) / var(b)
       end do
    end do
 

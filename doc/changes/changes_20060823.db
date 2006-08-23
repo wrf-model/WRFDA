@@ -1,0 +1,42 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: Dale Barker 
+Reviewer: Dale Barker
+Date: 08/23/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Get gen_be graphics working. Also tidy gen_be scripts and code.
+
+Test results
+------------------------------------------------------
+
+smoke: con200 NMC and ENS methods. Results the same.
+
+--------------------------------------------------------------------------------------
+
+File changes:
+------------
+
+A         doc/changes/changes_20060823.db
+M         gen_be/gen_be_stage0_wrf.f90
+M         gen_be/gen_be_cov2d.f90
+M         gen_be/gen_be_cov3d.f90
+M         graphics/ncl/gen_be/gen_be_global_evecs.ncl
+M         graphics/ncl/gen_be/gen_be_global_evals.ncl
+M         graphics/ncl/gen_be/gen_be_lengthscales.ncl
+D         graphics/ncl/gen_be/gen_be_corr_xy.ncl
+A         graphics/ncl/gen_be/gen_be_corr_z.ncl
+A         graphics/ncl/gen_be/gen_be_corr_yz.ncl
+A         run/gen_be/gen_be_wrapper.csh
+D         run/gen_be/gen_be_wrapper_ens.csh
+D         run/gen_be/gen_be_wrapper_nmc.csh
+M         run/gen_be/gen_be_stage4_global.csh
+M         run/gen_be/gen_be_stage4_regional.csh
+M         run/gen_be/gen_be_cov2d.csh
+M         run/gen_be/gen_be_cov3d.csh
+M         run/gen_be/gen_be.csh
+M         run/gen_be/gen_be_stage0_wrf.csh
+

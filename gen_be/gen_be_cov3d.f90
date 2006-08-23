@@ -153,12 +153,14 @@ program gen_be_cov3d
 
    do k = 1, nk
       do j = 1, nj
-         b = bin(ni/2,j,k) ! Take value from center of i dimension.
-         if ( var(b) /= 0.0 ) then
-            write(ounit,'(f22.5)')covar(b) / var(b)
-         else
-            write(ounit,'(f22.5)')0.0
-         end if
+         do i = 1, ni
+            b = bin(i,j,k) ! Take value from center of i dimension.
+            if ( var(b) /= 0.0 ) then
+               write(ounit,'(f16.8)')covar(b) / var(b)
+            else
+               write(ounit,'(f16.8)')0.0
+            end if
+         end do
       end do
    end do
 
