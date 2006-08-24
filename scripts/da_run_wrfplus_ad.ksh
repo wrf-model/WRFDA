@@ -8,7 +8,7 @@
 # The namelist hard wires the case as 3 hours from 200-01-25-00, so
 # the inputs to the adjoint, af03 to af00 correspond to T+3 t T+0
 #
-# WRF produces gradient file wrfvar_input_d01_2000-01-25_00:00:00 which
+# WRF produces gradient file wrfvar_input_d${DOMAIN}_2000-01-25_00:00:00 which
 # is renamed gr00 for VAR
 
 set -x 
@@ -18,15 +18,15 @@ cd ad
 
 cp ../namelist.var4dad namelist.input
 
-cp ../wrfvar_input wrfinput_d01
+cp ../wrfvar_input wrfinput_d${DOMAIN}
 
 # rm tl0* 
 
-cp ../af03 auxinput3_d01_2000-01-25_03:00:00
-cp ../af02 auxinput3_d01_2000-01-25_02:00:00
-cp ../af01 auxinput3_d01_2000-01-25_01:00:00
-cp ../af00 auxinput3_d01_2000-01-25_00:00:00
+cp ../af03 auxinput3_d${DOMAIN}_2000-01-25_03:00:00
+cp ../af02 auxinput3_d${DOMAIN}_2000-01-25_02:00:00
+cp ../af01 auxinput3_d${DOMAIN}_2000-01-25_01:00:00
+cp ../af00 auxinput3_d${DOMAIN}_2000-01-25_00:00:00
 
 ../wrfplus.exe > wrf_ad.out 2>wrf_ad.error
 
-cp wrfvar_input_d01_2000-01-25_00:00:00 ../gr00
+cp wrfvar_input_d${DOMAIN}_2000-01-25_00:00:00 ../gr00

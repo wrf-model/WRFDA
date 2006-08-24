@@ -27,8 +27,8 @@ endif
 
 if ( ! $?SRC_DIR )          setenv SRC_DIR ${HOME}/code_development/WRF_V2.1 # Code directory.
 if ( ! $?WRF_BC_DIR )       setenv WRF_BC_DIR ${SRC_DIR}/WRF_BC
-if ( ! $?DA_FIRST_GUESS )   setenv DA_FIRST_GUESS ${RUN_DIR}/wrf_3dvar_input
-if ( ! $?DA_ANALYSIS )      setenv DA_ANALYSIS ${RUN_DIR}/wrf_3dvar_output
+if ( ! $?DA_FIRST_GUESS )   setenv DA_FIRST_GUESS ${RUN_DIR}/wrfvar_input
+if ( ! $?DA_ANALYSIS )      setenv DA_ANALYSIS ${RUN_DIR}/wrfvar_output
 
 setenv BDYIN $REG_DIR/wrfbdy_d01.${START_DATE}
 setenv BDYOUT $RUN_DIR/wrfbdy_d01
@@ -38,15 +38,15 @@ mkdir  ${RUN_DIR}/tmpdir.wrf_bc
 cd ${RUN_DIR}/tmpdir.wrf_bc
 
 cp $BDYIN wrfbdy_d01
-ln -sf $DA_ANALYSIS wrf_3dvar_output
-ln -sf $DA_FIRST_GUESS wrf_3dvar_input
+ln -sf $DA_ANALYSIS wrfvar_output
+ln -sf $DA_FIRST_GUESS wrfvar_input
 ln -sf ${WRF_BC_DIR}/update_wrf_bc.exe .
 
 cat > parame.in << EOF
 &control_param
- wrf_3dvar_output_file = 'wrf_3dvar_output'
+ wrf_3dvar_output_file = 'wrfvar_output'
  wrf_bdy_file          = 'wrfbdy_d01'
- wrf_input_from_si     = 'wrf_3dvar_input'
+ wrf_input_from_si     = 'wrfvar_input'
 
  cycling = ${CYCLING}
  debug   = .true.

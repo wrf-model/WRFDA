@@ -58,7 +58,7 @@ if test $HOSTNAME = "bs1101en" -o $HOSTNAME = "bs1201en"; then
 #PBS -lnodes=4:comp -lwalltime=1000
 #Uncomment for JET: source /usr/local/bin/setup-mpi.csh
 export RUN_CMD="$DEBUGGER " # Space important
-. $SCRIPT
+. $SCRIPT >> $EXP_DIR/index.html 2>&1
 EOF
 
    llsubmit job.ksh
@@ -79,17 +79,45 @@ elif test $HOSTNAME = "ln0126en" -o $HOSTNAME = "ln0127en"; then
 #BSUB -q regular  
 
 export RUN_CMD=${RUN_CMD:-mpirun.lsf -v -np $NUM_PROCS}
-. $SCRIPT
+. $SCRIPT >> $EXP_DIR/index.html 2>&1
 
 EOF
-   chmod +x job.ksh
-   bsub -q regular -n $NUM_PROCS $PWD/job.ksh
-
 elif test $HOSTNAME = ocotillo; then
-   export RUN_CMD=${RUN_CMD:-mpirun -v -np $NUM_PROCS -nolocal -machinefile $HOSTS}
-   $SCRIPT
+   cat > job.ksh <<EOF
+export RUN_CMD=${RUN_CMD:-mpirun -v -np $NUM_PROCS -nolocal -machinefile $HOSTS}
+$SCRIPT >> $EXP_DIR/index.html 2>&1
+EOF
 else
-   $SCRIPT
+   cat > job.ksh <<EOF
+$SCRIPT >> $EXP_DIR/index.html 2>&1
+EOF
 fi
+
+cat >> job.ksh <<EOF
+RC=\$?
+if test \$RC = 0; then
+   echo Succeeded
+else
+   echo Failed with error \$RC
+fi
+EOF
+
+chmod +x job.ksh
+
+echo "<HTML><HEAD><TITLE>$EXPT</TITLE></HEAD><BODY><H1>$EXPT</H1>" > $EXP_DIR/index.html
+
+if test $HOSTNAME = "bs1101en" -o $HOSTNAME = "bs1201en"; then 
+   llsubmit job.ksh
+elif test $HOSTNAME = "ln0126en" -o $HOSTNAME = "ln0127en"; then 
+   bsub -q regular -n $NUM_PROCS $PWD/job.ksh
+elif test $HOSTNAME = ocotillo; then
+   ./job.ksh
+else
+   ./job.ksh
+fi
+
+echo "</BODY></HTML>" >> $EXP_DIR/index.html
+
+
 
 exit 0

@@ -74,7 +74,6 @@ setenv DELTA_Y 200000
 setenv DA_TIME_STEP_SOUND 6
 
 #WRF-Var:
-#setenv DA_CV_OPTIONS 5
 #setenv DA_BACK_ERRORS /ocotillo1/dmbarker/data/con200/noobs/gen_be/NMC.bin_type1/gen_be.NMC.dat
 
 #########################################################################

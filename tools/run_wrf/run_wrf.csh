@@ -151,12 +151,11 @@ if ( ! $?PS0 )              setenv PS0 100000.0
 if ( ! $?TS0 )              setenv TS0 300.0
 if ( ! $?TLP )              setenv TLP 50.0
 
-#Additional namelist variables for WRF-Var (a lot more specified in 3dvar script):
+#Additional namelist variables for WRF-Var (a lot more specified in wrfvar script):
  if ( ! $?DA_FG_FORMAT )   setenv DA_FG_FORMAT 1 # First guess format: 1=WRF, 2=MM5, 3=KMA
  if ( ! $?DA_OB_FORMAT )   setenv DA_OB_FORMAT 2 # Observation format: 1=BUFR, 2=ASCII "little_r"
- if ( ! $?DA_CV_OPTIONS )  setenv DA_CV_OPTIONS 3 # Background error statistics: 2=NCAR, 3=NCEP.
- if ( ! $?DA_FIRST_GUESS ) setenv DA_FIRST_GUESS ${DAT_DIR}/wrfinput_d01 # wrf3dvar "first guess" input.
- if ( ! $?DA_BACK_ERRORS ) setenv DA_BACK_ERRORS ${DAT_DIR}/be/be.cv_${DA_CV_OPTIONS} # background errors.
+ if ( ! $?DA_FIRST_GUESS ) setenv DA_FIRST_GUESS ${DAT_DIR}/wrfinput_d01 # wrfvar "first guess" input.
+ if ( ! $?DA_BACK_ERRORS ) setenv DA_BACK_ERRORS ${DAT_DIR}/be/gen_be.NMC.dat # background errors.
 
  setenv VERTICAL_GRID_NUMBER $ZDIM # Number of vertical levels.
  setenv WEST_EAST_GRID_NUMBER $XDIM # Number of gridpoints in x(i) dim.
@@ -234,7 +233,7 @@ while ( $START_DATE <= $FINAL_DATE )
    if ( ! -d ${RUN_DISK}/${EXPT} ) mkdir ${RUN_DISK}/${EXPT}
    if ( ! -d ${RUN_DIR} ) mkdir ${RUN_DIR}
 
-   setenv DA_OBSERVATIONS ${OBS_DIR}/obs_gts.3dvar.${START_DATE}
+   setenv DA_OBSERVATIONS ${OBS_DIR}/ob.ascii.${START_DATE}
 
    if ( $RUN_OBSPROC == .TRUE. ) then
 
@@ -246,7 +245,7 @@ while ( $START_DATE <= $FINAL_DATE )
       ${BIN_DIR}/preprocess_ob.csh >&! /dev/null
    endif
 
-   setenv DA_ANALYSIS ${RUN_DIR}/wrf_3dvar_output
+   setenv DA_ANALYSIS ${RUN_DIR}/wrfvar_output
    setenv START_YEAR `echo $START_DATE | cut -c1-4`
    setenv START_MONTH `echo $START_DATE | cut -c5-6`
    setenv START_DAY `echo $START_DATE | cut -c7-8`
@@ -262,26 +261,26 @@ while ( $START_DATE <= $FINAL_DATE )
 
       if ( $CYCLING == ".TRUE." ) then
          echo "   Running WRF-Var in full cycling mode."
-         setenv CYCLING_FG wrf_3dvar_input_d01_${START_YEAR}-${START_MONTH}-${START_DAY}_${START_HOUR}:00:00
+         setenv CYCLING_FG wrfvar_input_d01_${START_YEAR}-${START_MONTH}-${START_DAY}_${START_HOUR}:00:00
          setenv DA_FIRST_GUESS ${RUN_DISK}/$EXPT/${PREV_DATE}/${CYCLING_FG}
       else
          echo "   Running WRF-Var in cold-start mode."
       endif
       echo ""
 
-      ${BIN_DIR}/run_wrf-var.csh >&! /dev/null
+      ${BIN_DIR}/da_run_wrfvar.ksh >&! /dev/null
 
-      mv ${RUN_DIR}/${DA_ID}/wrf_3dvar_output ${DA_ANALYSIS}
-      mv ${RUN_DIR}/${DA_ID}/DAProg_WRF-Var.statistics ${RUN_DIR}/DAProg_WRF-Var.statistics.${DA_ID}
+      mv ${RUN_DIR}/${DA_ID}/wrfvar_output ${DA_ANALYSIS}
+      mv ${RUN_DIR}/${DA_ID}/statistics ${RUN_DIR}/.statistics.${DA_ID}
       mv ${RUN_DIR}/${DA_ID}/fort.50 ${RUN_DIR}/fort.50.${DA_ID}
       mv ${RUN_DIR}/${DA_ID}/rsl.out.0000 ${RUN_DIR}/rsl.out.0000.${DA_ID}
-      mv ${RUN_DIR}/${DA_ID}/namelist.3dvar ${RUN_DIR}/namelist.3dvar.${DA_ID}
+      mv ${RUN_DIR}/${DA_ID}/namelist.output ${RUN_DIR}/namelist.output.${DA_ID}
 #      rm -rf ${RUN_DIR}/${DA_ID} >&! /dev/null
    else
       if ( $CYCLING == ".TRUE." ) then
          echo "   Running free-forecast."
          echo ""
-         setenv CYCLING_FG wrf_3dvar_input_d01_${START_YEAR}-${START_MONTH}-${START_DAY}_${START_HOUR}:00:00
+         setenv CYCLING_FG wrfvar_input_d01_${START_YEAR}-${START_MONTH}-${START_DAY}_${START_HOUR}:00:00
          ln -sf ${RUN_DISK}/$EXPT/${PREV_DATE}/${CYCLING_FG} $DA_ANALYSIS
       else
          echo "   Running noobs from interpolated fnl."
@@ -330,7 +329,7 @@ while ( $START_DATE <= $FINAL_DATE )
 
       mpirun -v -nolocal -np ${NUM_PROCS} -machinefile nodes ./wrf.exe >&! /dev/null
 
-      mv wrf_3dvar_input* ../.
+      mv wrfvar_input* ../.
       mv wrfout* ../.
       rm ../wrfout_d01_${CCYY}-${MM}-${DD}_${HH}:00:00
       mv namelist.input ../.

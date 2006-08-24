@@ -2,7 +2,7 @@
 #-----------------------------------------------------------------------
 # Script preprocess_ob.csh
 #
-# Purpose: Creates observation file for input to 3DVAR (ob_format_2).
+# Purpose: Creates observation file for input to WRFVAR (ob_format_2).
 #
 #-----------------------------------------------------------------------
 
@@ -25,7 +25,7 @@ if ( ! $?RUN_DIR )          setenv RUN_DIR ${REG_DIR}/$EXPT/${START_DATE}
 if ( ! -d ${RUN_DIR} )      mkdir ${RUN_DIR}
 
 if ( ! $?OBSPROC_DIR )      setenv OBSPROC_DIR ${DAT_DIR}/3DVAR_OBSPROC # Observation preprocessing
-if ( ! $?DA_OBSERVATIONS )  setenv DA_OBSERVATIONS $RUN_DIR/obs_gts.3dvar.${START_DATE}
+if ( ! $?DA_OBSERVATIONS )  setenv DA_OBSERVATIONS $RUN_DIR/obs.ascii.${START_DATE}
 
 #Namelist (wrfsi.nl) variables used in obs. preprocessor:
 if ( ! $?XDIM )             setenv XDIM 110
@@ -86,7 +86,7 @@ endif
 echo ""
 
 #-------------------------------------------
-# [3] Run MM5 3DVAR obs preprocessor:
+# [3] Run MM5 WRFVAR obs preprocessor:
 #--------------------------------------------
 
 cd ${OBSPROC_DIR}
