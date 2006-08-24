@@ -55,13 +55,9 @@ inc/da_generic_boilerplate.inc: da_generic_boilerplate.m4
 	  $(M4) da_generic_boilerplate.m4 > inc/da_generic_boilerplate.inc
 
 da_utils : da_diagnostics \
-           da_generate_difference \
            da_ominusb \
-           da_just_be \
-           da_to_be_file \
            da_tune \
-           da_update_bc \
-           da_write_sl_2_be
+           da_update_bc
 
 da_plots : da_scale_length \
            da_plot_eigen \
