@@ -180,8 +180,8 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
       write(unit=stdout, fmt=*) 'ph_2(is,js,ks)=', ph_2(is,js,ks)
       write(unit=stdout, fmt=*) ' phb(is,js,ks)=',  phb(is,js,ks)
 
-      write(unit=stdout, fmt=*) 'grid%sm31,grid%em31,grid%sm32,grid%em32, &
-         grid%sm33,grid%em33=', &
+      write(unit=stdout, fmt=*) &
+         'grid%sm31,grid%em31,grid%sm32,grid%em32, grid%sm33,grid%em33=', &
          grid%sm31,grid%em31,grid%sm32,grid%em32,grid%sm33,grid%em33
 
       write(unit=stdout, fmt=*) 'p_top=', grid%p_top

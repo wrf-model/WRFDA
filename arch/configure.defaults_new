@@ -871,7 +871,6 @@ FCTYPE          = -e m -sreal64 -dp
 FCFREE          = -f free -N 255
 FCENDIAN        =
 FCBASE          = #-Ovector0 -Ostream0 -Oscalar1
-FCFLAGS_RSL     = $(FCENDIAN)
 
 CCFLAGS2        = -UCRAY -Dcrayx1
 
@@ -913,7 +912,7 @@ DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
 #FCOPTIM         = -Ofp2 -O1 -Ogen_private_callee
 #FCOPTIM         = -Ofp2 -O0
 FCOPTIM         = -O0
-FCDEBUG         = -g
+FCDEBUG         = #-g
 #FCTYPE         = -sinteger32 -e m -sreal64 -dp
 FCTYPE          = -e m -sreal64 -dp
 FCFREE          = -f free -N 255
@@ -922,7 +921,7 @@ FCBASE          = #-Ovector0 -Ostream0 -Oscalar1
 FCFLAGS_RSL     = $(FCENDIAN)
 
 CCFLAGS2        = -UCRAY -Dcrayx1 -I$(RSL)/RSL -h gen_private_callee
-CCFLAGS_RSL     = -Dcrayx1
+CCFLAGS_RSL     = -Dcrayx1 -DMPI2_SUPPORT
 
 CCFLAGS_BUFR    = -DUNDERSCORE
 
