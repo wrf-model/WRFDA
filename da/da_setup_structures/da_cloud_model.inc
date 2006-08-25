@@ -1,13 +1,11 @@
 subroutine da_cloud_model ( TB, PB, QB, QCWB, QRNB, ZB, ZFB, DT, kts, kte )
 
-!-----------------------------------------------------------------
-! PURPOSE: Calculate DT (=dz/w) using cumulus parameterization 
-!          of a one-dimensional cloud model.
-!
-! HISTORY: August 2004 of F90 version.  Jianfeng Gu
-!-----------------------------------------------------------------
+   !-----------------------------------------------------------------
+   ! PURPOSE: Calculate DT (=dz/w) using cumulus parameterization 
+   !          of a one-dimensional cloud model.
+   !-----------------------------------------------------------------
 
-!  Calculate DT
+   ! Calculate DT
 
    implicit none
 
@@ -34,13 +32,13 @@ subroutine da_cloud_model ( TB, PB, QB, QCWB, QRNB, ZB, ZFB, DT, kts, kte )
    MU=0.183/RC
 
    DO k = kts, kte+1
-     W0(k)=0.0  
-     W(k)=0.0  
+      W0(k)=0.0  
+      W(k)=0.0  
    ENDDO
 
    DO k = kts, kte
-     PP(k)=PB(k)/100.0
-     DT(k)=0.0
+      PP(k)=PB(k)/100.0
+      DT(k)=0.0
    ENDDO
 
    P0 = PP(kts)
@@ -57,40 +55,36 @@ subroutine da_cloud_model ( TB, PB, QB, QCWB, QRNB, ZB, ZFB, DT, kts, kte )
                   ZC, TC, QC, KCB, KCT, PCT, ZCT, kts, kte )
 
    DO k = KCB, KCT
+      TCV(k) = TC(k) * ( 1. + 0.608 * QC(k) )
+      TBV(k) = TB(k) * ( 1. + 0.608 * QB(k) )
    
-     TCV(k) = TC(k) * ( 1. + 0.608 * QC(k) )
-     TBV(k) = TB(k) * ( 1. + 0.608 * QB(k) )
-   
-     B(k) = ( TCV(k)-TBV(k) ) / TBV(k)
+      B(k) = ( TCV(k)-TBV(k) ) / TBV(k)
 
-     QT(k) = QC(k) + QCWB(k) + QRNB(k)
-
+      QT(k) = QC(k) + QCWB(k) + QRNB(k)
    ENDDO
 
    W0(KCB) = 0.0
    DO k = KCB+1, KCT+1
-        XX = 1.0+2.0*MU*(ZFB(k)-ZFB(k-1))
-        YY = 2.0*G*( B(k-1)/(1.+ALPHA) - QT(k-1) ) * ( ZFB(k)-ZFB(k-1) )
-     W0(k) =  ( W0(k-1)+YY ) / XX
+      XX = 1.0+2.0*MU*(ZFB(k)-ZFB(k-1))
+      YY = 2.0*G*( B(k-1)/(1.+ALPHA) - QT(k-1) ) * ( ZFB(k)-ZFB(k-1) )
+      W0(k) =  ( W0(k-1)+YY ) / XX
    ENDDO
      
    DO k = KCB, KCT+1
-     IF ( W0(k) >= 0. ) THEN
-       W(k) = SQRT( W0(k) )
-     ENDIF
+      IF ( W0(k) >= 0. ) THEN
+         W(k) = SQRT( W0(k) )
+      ENDIF
    ENDDO
 
 
    DO k = KCT, KCB+1, -1
-     IF ( W(k) >= 0.01 ) THEN
-       DT(k) = (ZB(k)-ZB(k-1))/W(k)
-     ELSE
-       DT(k) = 0.0
-     ENDIF
+      IF ( W(k) >= 0.01 ) THEN
+         DT(k) = (ZB(k)-ZB(k-1))/W(k)
+      ELSE
+         DT(k) = 0.0
+      ENDIF
    ENDDO
 
    IF (trace_use) call da_trace_exit("da_cloud_model")
-
-
 
 end subroutine da_cloud_model

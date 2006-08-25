@@ -1,365 +1,358 @@
 subroutine da_sfc_wtq ( psfc, tg, ps, ts, qs, us, vs, ps2, ts2, qs2, &
                      hs, roughness, xland, &
                      u10, v10, t2, q2, regime) 
-!-----------------------------------------------------------------------------!
-! Calculate the  10m wind, 2m temperature and moisture based on the
-! similarity theory/
-!
-!  The unit for pressure   : psfc, ps, ps2     is Pa.
-!  The unit for temperature: tg, ts, ts2, t2   is K.
-!  The unit for moisture   : qs, qs2, q2       is kg/kg.
-!  The unit for wind       : us, vs, u10, v10  is m/s.
-!  The unit for height     : hs, roughness     is m.
-!  xland and regime are dimensionless.
-!
-! Reference:
-! ---------
-!  Detail MM5/physics/pbl_sfc/mrfpbl/MRFPBL.F
-!
-!  Input Variables:
-! 
-!   psfc, tg               : surface pressure and ground temperature
-!   ps, ts, qs, us, vs, hs : model variable at lowlest half sigma level
-!   ps2, ts2, qs2          : model variables at the second lowest half 
-!                            sigma level
-!
-!
-!  Constants:
-!
-!   hs                     : height at the lowest half sigma level
-!   roughness              : roughness
-!   xland                  : land-water-mask (=2 water, =1 land)
-!
-!  Output Variables:
-!
-!   regime                 : PBL regime
-!   u10, v10               : 10-m high observed wind components
-!   t2 , q2                : 2-m high observed temperature and mixing ratio
-!
-!-----------------------------------------------------------------------------!
-!  
-!                      psim  : mechanical psi at lowlest sigma level
-!                      psim2 : mechanical psi at 2m 
-!                      psimz : mechanical psi at 10m 
-!
-!-----------------------------------------------------------------------------!
-
-      IMPLICIT NONE
-
-      REAL, INTENT (in)                :: ps , ts , qs , us, vs
-      REAL, INTENT (in)                :: ps2, ts2, qs2, psfc, tg
-      REAL, INTENT (in)                :: hs, roughness, xland
-
-      REAL,    INTENT (out)            :: regime
-      REAL   , INTENT (out)            :: u10, v10, t2, q2
-
-! Maximum number of iterations in computing psim, psih
-
-      INTEGER, PARAMETER :: k_iteration = 10
-!      INTEGER, PARAMETER :: k_iteration = 1
 
-! h10 is the height of 10m where the wind observed
-! h2  is the height of 2m where the temperature and 
-!        moisture observed.
+   !---------------------------------------------------------------------------
+   ! Calculate the  10m wind, 2m temperature and moisture based on the
+   ! similarity theory/
+   !
+   !  The unit for pressure   : psfc, ps, ps2     is Pa.
+   !  The unit for temperature: tg, ts, ts2, t2   is K.
+   !  The unit for moisture   : qs, qs2, q2       is kg/kg.
+   !  The unit for wind       : us, vs, u10, v10  is m/s.
+   !  The unit for height     : hs, roughness     is m.
+   !  xland and regime are dimensionless.
+   !
+   ! Reference:
+   ! ---------
+   !  Detail MM5/physics/pbl_sfc/mrfpbl/MRFPBL.F
+   !
+   !  Input Variables:
+   ! 
+   !   psfc, tg               : surface pressure and ground temperature
+   !   ps, ts, qs, us, vs, hs : model variable at lowlest half sigma level
+   !   ps2, ts2, qs2          : model variables at the second lowest half 
+   !                            sigma level
+   !
+   !
+   !  Constants:
+   !
+   !   hs                     : height at the lowest half sigma level
+   !   roughness              : roughness
+   !   xland                  : land-water-mask (=2 water, =1 land)
+   !
+   !  Output Variables:
+   !
+   !   regime                 : PBL regime
+   !   u10, v10               : 10-m high observed wind components
+   !   t2 , q2                : 2-m high observed temperature and mixing ratio
+   !
+   !---------------------------------------------------------------------------
+   !  
+   !                      psim  : mechanical psi at lowlest sigma level
+   !                      psim2 : mechanical psi at 2m 
+   !                      psimz : mechanical psi at 10m 
+   !
+   !---------------------------------------------------------------------------
+
+   IMPLICIT NONE
+
+   REAL, INTENT (in)                :: ps , ts , qs , us, vs
+   REAL, INTENT (in)                :: ps2, ts2, qs2, psfc, tg
+   REAL, INTENT (in)                :: hs, roughness, xland
 
-      REAL, PARAMETER :: h10 = 10., h2 = 2.
-!
-! Default roughness over the land
+   REAL,    INTENT (out)            :: regime
+   REAL   , INTENT (out)            :: u10, v10, t2, q2
 
-      REAL, PARAMETER :: zint0 = 0.01 
-!
-! Von Karman constant
+   ! Maximum number of iterations in computing psim, psih
 
-      REAL, PARAMETER :: k_kar = 0.4
-!
-! Working variables
+   INTEGER, PARAMETER :: k_iteration = 10
+   ! INTEGER, PARAMETER :: k_iteration = 1
 
-      REAL :: Vc2, Va2, V2 
-      REAL :: rib, rcp, xx, yy, cc
-      REAL :: psiw, psiz, mol, ust, hol, holz, hol2
-      REAL :: psim, psimz, psim2, psih, psihz, psih2
-      REAL :: psit, psit2, psiq, psiq2
-      REAL :: gzsoz0, gz10oz0, gz2oz0
-      REAL :: eg, qg, tvg, tvs, tvs2
-      REAL :: ths, thg, thvs, thvg, thvs2
-      REAL :: zq0, z0
+   ! h10 is the height of 10m where the wind observed
+   ! h2  is the height of 2m where the temperature and 
+   !        moisture observed.
 
-      REAL, PARAMETER :: ka = 2.4E-5
+   REAL, PARAMETER :: h10 = 10., h2 = 2.
+   
+   ! Default roughness over the land
 
-!-----------------------------------------------------------------------------!
-      rcp = gas_constant/cp
+   REAL, PARAMETER :: zint0 = 0.01 
+   
+   ! Von Karman constant
 
-! 1 Compute the roughness length based upon season and land use 
-! =====================================
+   REAL, PARAMETER :: k_kar = 0.4
+   
+   ! Working variables
 
-! 1.1 Define the rouhness length
-!     -----------------
+   REAL :: Vc2, Va2, V2 
+   REAL :: rib, rcp, xx, yy, cc
+   REAL :: psiw, psiz, mol, ust, hol, holz, hol2
+   REAL :: psim, psimz, psim2, psih, psihz, psih2
+   REAL :: psit, psit2, psiq, psiq2
+   REAL :: gzsoz0, gz10oz0, gz2oz0
+   REAL :: eg, qg, tvg, tvs, tvs2
+   REAL :: ths, thg, thvs, thvg, thvs2
+   REAL :: zq0, z0
 
-      z0 = roughness
+   REAL, PARAMETER :: ka = 2.4E-5
 
-      if( z0 < 0.0001) z0 = 0.0001
+   rcp = gas_constant/cp
 
-! 1.2 Define the rouhgness length for moisture
-!     -----------------
+   ! 1 Compute the roughness length based upon season and land use 
+   ! =====================================
 
-      if ( xland .ge. 1.5 ) then
-        zq0 = z0
-       else
-        zq0 =  zint0
-      endif
+   ! 1.1 Define the rouhness length
+   !     -----------------
 
-! 1.3 Define the some constant variable for psi
-!     -----------------
+   z0 = roughness
 
-      gzsoz0 = log(hs/z0)
+   if ( z0 < 0.0001) z0 = 0.0001
 
-      gz10oz0 = log(h10/z0)
+   ! 1.2 Define the rouhgness length for moisture
 
-      gz2oz0 = log(h2/z0)
+   if (xland .ge. 1.5 ) then
+      zq0 = z0
+   else
+      zq0 =  zint0
+   endif
 
+   ! 1.3 Define the some constant variable for psi
 
-! 2. Calculate the virtual temperature
-! =====================================
+   gzsoz0 = log(hs/z0)
 
-! 2.1 Compute Virtual temperature on the lowest half sigma level
-!     ---------------------------------------------------------
+   gz10oz0 = log(h10/z0)
 
-      tvs  = ts * (1. + 0.608 * qs)
+   gz2oz0 = log(h2/z0)
 
-! 2.2 Compute Virtual temperature on the second lowest half sigma level
-!     -----------------------------------------------------------------
 
-      tvs2  = ts2 * (1. + 0.608 * qs2)
+   ! 2. Calculate the virtual temperature
+   ! =====================================
 
-! 2.3 Convert ground virtual temperature assuming it's saturated
-!     ----------------------------------------------------------
+   ! 2.1 Compute Virtual temperature on the lowest half sigma level
+   !     ---------------------------------------------------------
 
-      call da_tp_to_qs( tg, psfc, eg, qg )
-      tvg  = tg * (1. + 0.608 * qg)
+   tvs  = ts * (1. + 0.608 * qs)
 
-! 3.  Compute the potential temperature
-! ======================================
+   ! 2.2 Compute Virtual temperature on the second lowest half sigma level
+   !     -----------------------------------------------------------------
 
-! 3.1 Potential temperature on the lowest half sigma level
-!     ----------------------------------------------------
+   tvs2  = ts2 * (1. + 0.608 * qs2)
 
-      ths  = ts * (1000. / (ps/100.)) ** rcp
+   ! 2.3 Convert ground virtual temperature assuming it's saturated
+   !     ----------------------------------------------------------
 
-! 3.2 Potential temperature at the ground
-!     -----------------------------------
+   call da_tp_to_qs( tg, psfc, eg, qg )
+   tvg  = tg * (1. + 0.608 * qg)
 
-      thg  = tg * (1000. / (psfc/100.)) ** rcp
+   ! 3.  Compute the potential temperature
+   ! ======================================
 
+   ! 3.1 Potential temperature on the lowest half sigma level
+   !     ----------------------------------------------------
 
-! 4. Virtual potential temperature
-! ==================================
+   ths  = ts * (1000. / (ps/100.)) ** rcp
 
-! 4.1 Virtual potential temperature on the lowest half sigma level
-!     ------------------------------------------------------------
+   ! 3.2 Potential temperature at the ground
+   !     -----------------------------------
 
-      thvs = tvs * (1000. / (ps/100.)) ** rcp
+   thg  = tg * (1000. / (psfc/100.)) ** rcp
 
-! 4.2 Virtual potential temperature on the second lowest half sigma level
-!     ------------------------------------------------------------------
 
-      thvs2 = tvs2 * (1000. / (ps2/100.)) ** rcp
+   ! 4. Virtual potential temperature
+   ! ==================================
 
-! 4.3 Virtual potential temperature at ground
-!     ---------------------------------------
+   ! 4.1 Virtual potential temperature on the lowest half sigma level
+   !     ------------------------------------------------------------
 
-      thvg = tvg * (1000. / (psfc/100.)) ** rcp
+   thvs = tvs * (1000. / (ps/100.)) ** rcp
 
+   ! 4.2 Virtual potential temperature on the second lowest half sigma level
+   !     ------------------------------------------------------------------
 
-! 5.  BULK RICHARDSON NUMBER AND MONI-OBUKOV LENGTH
-! =================================================
+   thvs2 = tvs2 * (1000. / (ps2/100.)) ** rcp
 
-! 5.1 Velocity
-!     --------
-!
-!     Wind speed:
+   ! 4.3 Virtual potential temperature at ground
+   !     ---------------------------------------
 
-      Va2 =   us*us + vs*vs
-!  
-!     Convective velocity:
+   thvg = tvg * (1000. / (psfc/100.)) ** rcp
 
-      if ( thvg >= thvs ) then
-         Vc2 = 4. * (thvg - thvs)
-        else
-         Vc2 = 0.
-      endif
-!
-      V2  = Va2 + Vc2
 
-! 5.2 Bulk richardson number
-!     ----------------------
+   ! 5.  BULK RICHARDSON NUMBER AND MONI-OBUKOV LENGTH
+   ! =================================================
 
-      rib = (gravity * hs / ths) * (thvs - thvg) / V2
+   ! 5.1 Velocity
+   !     --------
+   
+   !     Wind speed:
 
-! 6.  CALCULATE PSI BASED UPON REGIME
-! =======================================
+   Va2 =   us*us + vs*vs
+   !  
+   !     Convective velocity:
 
-! 6.1 Stable conditions (REGIME 1)
-!     ---------------------------
+   if (thvg >= thvs ) then
+      Vc2 = 4. * (thvg - thvs)
+   else
+      Vc2 = 0.
+   endif
+   
+   V2  = Va2 + Vc2
 
-      IF       (rib .GE. 0.2) THEN
-         regime = 1.1
-         psim = -10.*gzsoz0
-         psimz = -10.*gz10oz0
-         psim2 = -10.*gz2oz0
-         psim = max(psim,-10.)
-         psimz = max(psimz,-10.)
-         psim2 = max(psim2,-10.)
-         psih = psim
-         psihz = psimz
-         psih2 = psim2
+   ! 5.2 Bulk richardson number
+   !     ----------------------
 
-! 6.2 Mechanically driven turbulence (REGIME 2)
-!     ------------------------------------------
+   rib = (gravity * hs / ths) * (thvs - thvg) / V2
 
-      ELSE IF ((rib .LT. 0.2) .AND. (rib .GT. 0.)) THEN
+   ! 6.  CALCULATE PSI BASED UPON REGIME
+   ! =======================================
 
-         regime = 2.1
-         psim = ( -5. * rib ) * gzsoz0 / (1.1 - 5.*rib)
-         psimz = ( -5. * rib ) * gz10oz0 / (1.1 - 5.*rib)
-         psim2 = ( -5. * rib ) * gz2oz0 / (1.1 - 5.*rib)
 
-         psim = max(psim,-10.)
-         psimz = max(psimz,-10.)
-         psim2 = max(psim2,-10.)
-         psih = psim
-         psihz = psimz
-         psih2 = psim2
+   IF (rib .GE. 0.2) THEN
+      ! 6.1 Stable conditions (REGIME 1)
+      !     ---------------------------
+      regime = 1.1
+      psim = -10.*gzsoz0
+      psimz = -10.*gz10oz0
+      psim2 = -10.*gz2oz0
+      psim = max(psim,-10.)
+      psimz = max(psimz,-10.)
+      psim2 = max(psim2,-10.)
+      psih = psim
+      psihz = psimz
+      psih2 = psim2
 
-! 6.3 Unstable Forced convection (REGIME 3)
-!     -------------------------------------
+   ELSE IF ((rib .LT. 0.2) .AND. (rib .GT. 0.)) THEN
+      ! 6.2 Mechanically driven turbulence (REGIME 2)
+      !     ------------------------------------------
 
-      ELSE IF ((rib .EQ. 0.) .or. (rib.LT.0.0 .and. thvs2.GT.thvs)) THEN
-         regime = 3.1
-         psim = 0.
-         psimz = 0.
-         psim2 = 0.
-         psih = psim
-         psihz = psimz
-         psih2 = psim2
+      regime = 2.1
+      psim = ( -5. * rib ) * gzsoz0 / (1.1 - 5.*rib)
+      psimz = ( -5. * rib ) * gz10oz0 / (1.1 - 5.*rib)
+      psim2 = ( -5. * rib ) * gz2oz0 / (1.1 - 5.*rib)
 
+      psim = max(psim,-10.)
+      psimz = max(psimz,-10.)
+      psim2 = max(psim2,-10.)
+      psih = psim
+      psihz = psimz
+      psih2 = psim2
 
-! 6.4 Free convection (REGIME 4)
-!     --------------------------
+   ELSE IF ((rib .EQ. 0.) .or. (rib.LT.0.0 .and. thvs2.GT.thvs)) THEN
+      ! 6.3 Unstable Forced convection (REGIME 3)
+      !     -------------------------------------
+      regime = 3.1
+      psim = 0.
+      psimz = 0.
+      psim2 = 0.
+      psih = psim
+      psihz = psimz
+      psih2 = psim2
 
-      ELSE 
-        regime = 4.1
-       
-!      Calculate psi m and pshi h using iteration method
-       
-        psim = 0.
-        psih = 0.
-        cc = 2. * atan(1.0)
+   ELSE 
+      ! 6.4 Free convection (REGIME 4)
+      !     --------------------------
+      regime = 4.1
 
-!        do k = 1 , k_iteration
+      ! Calculate psi m and pshi h using iteration method
 
-! 6.4.1  Calculate   ust, m/L (mol), h/L (hol)
-!        --------------------------
+      psim = 0.
+      psih = 0.
+      cc = 2. * atan(1.0)
 
-!       Friction speed
+      ! do k = 1 , k_iteration
 
-          ust = k_kar * sqrt(v2) /( gzsoz0 - psim)
+      ! 6.4.1  Calculate   ust, m/L (mol), h/L (hol)
+      !        --------------------------
 
-!       Heat flux factor
+      ! Friction speed
 
-          mol = k_kar * (ths - thg )/( gzsoz0 - psih)
-
-!       Ratio of PBL height to Monin-Obukhov length
-
-          if ( ust .LT. 0.01 ) then
-             hol = rib * gzsoz0
-           else
-             hol = k_kar * gravity * hs * mol / ( ths * ust * ust )
-          endif
-
-! 6.4.2  Calculate n, nz, R, Rz
-!        --------------------------
-       
-          hol = min(hol,0.)
-          hol = max(hol,-10.)
-         
-          holz = (h10 / hs) * hol
-          holz = min(holz,0.)
-          holz = max(holz,-10.)
-
-          hol2 = (h2 / hs) * hol
-          hol2 = min(hol2,0.)
-          hol2 = max(hol2,-10.)
-
-! 6.4.3 Calculate Psim & psih
-!        --------------------------
-
-!       Using the look-up table:
-!          nn = int( -100. * hol )
-!          rr = ( -100. * hol ) - nn
-!          psim = psimtb(nn) + rr * ( psimtb(nn+1) - psimtb(nn))
-!          psih = psihtb(nn) + rr * ( psihtb(nn+1) - psihtb(nn))
-!       Using the continuous function:
-          xx = (1. - 16. * hol) ** 0.25
-          yy = log((1.+xx*xx)/2.)
-          psim = 2. * log((1.+xx)/2.) + yy - 2. * atan(xx) + cc
-          psih = 2. * yy
-
-!       Using the look-up table:
-!          nz = int( -100. * holz )
-!          rz = ( -100. * holz ) - nz
-!          psimz = psimtb(nz) + rz * ( psimtb(nz+1) - psimtb(nz))
-!          psihz = psihtb(nz) + rz * ( psihtb(nz+1) - psihtb(nz))
-!       Using the continuous function:
-          xx = (1. - 16. * holz) ** 0.25
-          yy = log((1.+xx*xx)/2.)
-          psimz = 2. * log((1.+xx)/2.) + yy - 2. * atan(xx) + cc
-          psihz = 2. * yy
-
-!       Using the look-up table:
-!          n2 = int( -100. * hol2 )
-!          r2 = ( -100. * hol2 ) - n2
-!          psim2 = psimtb(n2) + r2 * ( psimtb(n2+1) - psimtb(n2))
-!          psih2 = psihtb(n2) + r2 * ( psihtb(n2+1) - psihtb(n2))
-!       Using the continuous function:
-          xx = (1. - 16. * hol2) ** 0.25
-          yy = log((1.+xx*xx)/2.)
-          psim2 = 2. * log((1.+xx)/2.) + yy - 2. * atan(xx) + cc
-          psih2 = 2. * yy
-
-!      enddo 
-
-! 6.4.4 Define the limit value for psim & psih
-!        --------------------------
-
-       psim = min(psim,0.9*gzsoz0)
-       psimz = min(psimz,0.9*gz10oz0)
-       psim2 = min(psim2,0.9*gz2oz0)
-       psih = min(psih,0.9*gzsoz0)
-       psihz = min(psihz,0.9*gz10oz0)
-       psih2 = min(psih2,0.9*gz2oz0)
-  
-      ENDIF  ! Regime
-
-! 7.  CALCULATE PSI FOR WIND, TEMPERATURE AND MOISTURE
-! =======================================
-
-      psiw = gzsoz0 - psim
-      psiz = gz10oz0 - psimz
-      psit = gzsoz0 - psih
-      psit2 = gz2oz0 - psih2
-
-!     Friction speed
       ust = k_kar * sqrt(v2) /( gzsoz0 - psim)
 
-      psiq  = log(k_kar*ust*hs/ka + hs / zq0 ) - psih
-      psiq2 = log(k_kar*ust*h2/ka + h2 / zq0 ) - psih2
+      ! Heat flux factor
+ 
+      mol = k_kar * (ths - thg )/( gzsoz0 - psih)
 
-! 8.  CALCULATE 10M WIND, 2M TEMPERATURE AND MOISTURE
-! =======================================
+      ! Ratio of PBL height to Monin-Obukhov length
 
-      u10 = us * psiz / psiw
-      v10 = vs * psiz / psiw
-      t2 = ( thg + ( ths - thg )*psit2/psit)*((psfc/100.)/1000.)**rcp
-      q2 = qg + (qs - qg)*psiq2/psiq 
+      if ( ust .LT. 0.01 ) then
+         hol = rib * gzsoz0
+      else
+         hol = k_kar * gravity * hs * mol / ( ths * ust * ust )
+      endif
+
+      ! 6.4.2  Calculate n, nz, R, Rz
+      !        --------------------------
+
+      hol = min(hol,0.)
+      hol = max(hol,-10.)
+
+      holz = (h10 / hs) * hol
+      holz = min(holz,0.)
+      holz = max(holz,-10.)
+
+      hol2 = (h2 / hs) * hol
+      hol2 = min(hol2,0.)
+      hol2 = max(hol2,-10.)
+
+      ! 6.4.3 Calculate Psim & psih
+      !        --------------------------
+
+      !       Using the look-up table:
+      !          nn = int( -100. * hol )
+      !          rr = ( -100. * hol ) - nn
+      !          psim = psimtb(nn) + rr * ( psimtb(nn+1) - psimtb(nn))
+      !          psih = psihtb(nn) + rr * ( psihtb(nn+1) - psihtb(nn))
+      !       Using the continuous function:
+      xx = (1. - 16. * hol) ** 0.25
+      yy = log((1.+xx*xx)/2.)
+      psim = 2. * log((1.+xx)/2.) + yy - 2. * atan(xx) + cc
+      psih = 2. * yy
+
+      !       Using the look-up table:
+      !          nz = int( -100. * holz )
+      !          rz = ( -100. * holz ) - nz
+      !          psimz = psimtb(nz) + rz * ( psimtb(nz+1) - psimtb(nz))
+      !          psihz = psihtb(nz) + rz * ( psihtb(nz+1) - psihtb(nz))
+      !       Using the continuous function:
+      xx = (1. - 16. * holz) ** 0.25
+      yy = log((1.+xx*xx)/2.)
+      psimz = 2. * log((1.+xx)/2.) + yy - 2. * atan(xx) + cc
+      psihz = 2. * yy
+
+      !       Using the look-up table:
+      !          n2 = int( -100. * hol2 )
+      !          r2 = ( -100. * hol2 ) - n2
+      !          psim2 = psimtb(n2) + r2 * ( psimtb(n2+1) - psimtb(n2))
+      !          psih2 = psihtb(n2) + r2 * ( psihtb(n2+1) - psihtb(n2))
+      !       Using the continuous function:
+      xx = (1. - 16. * hol2) ** 0.25
+      yy = log((1.+xx*xx)/2.)
+      psim2 = 2. * log((1.+xx)/2.) + yy - 2. * atan(xx) + cc
+      psih2 = 2. * yy
+
+      ! enddo 
+
+      ! 6.4.4 Define the limit value for psim & psih
+      !        --------------------------
+
+      psim = min(psim,0.9*gzsoz0)
+      psimz = min(psimz,0.9*gz10oz0)
+      psim2 = min(psim2,0.9*gz2oz0)
+      psih = min(psih,0.9*gzsoz0)
+      psihz = min(psihz,0.9*gz10oz0)
+      psih2 = min(psih2,0.9*gz2oz0)
+   ENDIF  ! Regime
+
+   ! 7.  CALCULATE PSI FOR WIND, TEMPERATURE AND MOISTURE
+   ! =======================================
+
+   psiw = gzsoz0 - psim
+   psiz = gz10oz0 - psimz
+   psit = gzsoz0 - psih
+   psit2 = gz2oz0 - psih2
+
+   ! Friction speed
+   ust = k_kar * sqrt(v2) /( gzsoz0 - psim)
+
+   psiq  = log(k_kar*ust*hs/ka + hs / zq0 ) - psih
+   psiq2 = log(k_kar*ust*h2/ka + h2 / zq0 ) - psih2
+
+   ! 8.  CALCULATE 10M WIND, 2M TEMPERATURE AND MOISTURE
+   ! =======================================
+
+   u10 = us * psiz / psiw
+   v10 = vs * psiz / psiw
+   t2 = ( thg + ( ths - thg )*psit2/psit)*((psfc/100.)/1000.)**rcp
+   q2 = qg + (qs - qg)*psiq2/psiq 
 
 end subroutine da_sfc_wtq
