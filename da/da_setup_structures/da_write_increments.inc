@@ -26,18 +26,6 @@ subroutine da_write_increments ( xp, xb, xa, q_cgrid, mu_cgrid, ph_cgrid )
 
    LOGICAL, EXTERNAL :: wrf_dm_on_monitor
 
-   ! This analysis increment data file ("ANALYSIS_INCREMENT") can be converted 
-   ! to MM5V3 MMINPUT file ("MMINPUT_ANALYSIS_INCREMENT") by the program 
-   ! "da_3dvar/utl/convert_to_mm5v3.f90" with a template file named as 
-   ! "MMIMPUT_template", which is any of the available MMINPUT files 
-   ! (for details see the internal documentation inside the program
-   ! "da_3dvar/utl/convert_to_mm5v3.f90").
-   !
-   ! Then, MM5/GRAPH can be used to plot the horizontal maps and cross-section 
-   ! maps of the increments fileds with the file: "MMINPUT_ANALYSIS_INCREMENT".
-   !
-   !                                        Yong-Run Guo 07/20/2004
-
    IF (trace_use) call da_trace_entry("da_write_increments")
 
 

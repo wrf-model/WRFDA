@@ -29,11 +29,11 @@ PROGRAM wrfvar
 
    CALL ESMF_Initialize( vm=vm, defaultCalendar=ESMF_CAL_GREGORIAN, rc=rc )
 
-   CALL wrfvar_init( gcomp, importState, exportState, clock, rc )
+   CALL da_wrfvar_init( gcomp, importState, exportState, clock, rc )
 
-   CALL wrfvar_run( gcomp, importState, exportState, clock, rc )
+   CALL da_wrfvar_run( gcomp, importState, exportState, clock, rc )
 
-   CALL wrfvar_finalize( gcomp, importState, exportState, clock, rc )
+   CALL da_wrfvar_finalize( gcomp, importState, exportState, clock, rc )
 
    CALL ESMF_Finalize( rc=rc )
 

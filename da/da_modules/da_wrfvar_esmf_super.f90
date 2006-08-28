@@ -39,9 +39,7 @@ MODULE da_wrfvar_esmf_super
    INTEGER                 :: number_at_same_level
    INTEGER                 :: time_step_begin_restart
 
-   INTEGER :: max_dom , domain_id , fid , oid , idum1 , idum2 , ierr
-   INTEGER :: debug_level
-   LOGICAL :: input_from_file
+   INTEGER :: domain_id , fid , oid , idum1 , idum2 , ierr
 
 #ifdef DM_PARALLEL
    INTEGER                 :: nbytes
