@@ -36,6 +36,7 @@ links :
 	@ $(LN) $(CONVERTOR)/convert_tool/* .
 	@ $(LN) $(CONVERTOR)/kma_wave2grid/* .
 	@ $(LN) $(CONVERTOR)/wave2grid_kma/* .
+	@ $(LN) $(CONVERTOR)/kma_netcdf/* .
 	@ $(LN) $(CONVERTOR)/decode_l2_airs/* .
 	@ touch links
 

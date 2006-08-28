@@ -11,6 +11,10 @@ wrf     : $(WRF_LIBS) wrf.o
 wrfplus : $(WRFPLUS_LIBS) wrf.o
 	$(LD) -o wrfplus.exe $(LDFLAGS) wrf.o $(WRFPLUS_LIB)
 
+k2n : kma2netcdf
+
+n2k : netcdf2kma
+
 kma2netcdf :  $(WRFVAR_LIBS) $(CONVERTOR_MODULES) $(CONVERTOR_OBJS) kma2netcdf.o
 	$(LD) -o kma2netcdf.exe $(LDFLAGS) kma2netcdf.o \
           $(CONVERTOR_MODULES) $(CONVERTOR_OBJS) $(WRFVAR_LIB)
