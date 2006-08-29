@@ -104,7 +104,7 @@ EOF
 
 chmod +x job.ksh
 
-echo "<HTML><HEAD><TITLE>$EXPT</TITLE></HEAD><BODY><H1>$EXPT</H1>" > $EXP_DIR/index.html
+echo "<HTML><HEAD><TITLE>$EXPT</TITLE></HEAD><BODY><H1>$EXPT</H1><PRE>" > $EXP_DIR/index.html
 
 if test $HOSTNAME = "bs1101en" -o $HOSTNAME = "bs1201en"; then 
    llsubmit job.ksh
@@ -116,7 +116,7 @@ else
    ./job.ksh
 fi
 
-echo "</BODY></HTML>" >> $EXP_DIR/index.html
+echo "</PRE></BODY></HTML>" >> $EXP_DIR/index.html
 
 
 

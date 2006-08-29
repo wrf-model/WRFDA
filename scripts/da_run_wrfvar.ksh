@@ -265,8 +265,6 @@ if test ! -f $DA_ANALYSIS; then
       RC=$?
    fi
 
-   LOCAL_DATE=`date`
-
    if test -f namelist.input; then
      cp namelist.input $OUT_DIR
    fi
@@ -323,9 +321,10 @@ if test ! -f $DA_ANALYSIS; then
    ls -l $OUT_DIR/cost_fn
 
    if test $RC = 0; then
-     echo "${OK}Succeeded${END} on $LOCAL_DATE"
+     echo `date` "${OK}Succeeded${END}"
    else
-      echo "${ERR}Failed${END} on $LOCAL_DATE with error $RC"
+      echo `date` "${ERR}Failed${END} with error $RC"
+      exit 1
    fi
 
    # We never look at core files
@@ -346,8 +345,6 @@ if test ! -f $DA_ANALYSIS; then
 else
    echo "$DA_ANALYSIS already exists, skipping"
 fi
-
-date
 
 if $NL_USE_HTML; then
    echo '</PRE></BODY></HTML>'

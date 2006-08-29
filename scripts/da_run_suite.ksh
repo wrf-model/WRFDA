@@ -53,7 +53,7 @@ export CYCLE_PERIOD=${CYCLE_PERIOD:-6}                 # Assimilation frequency.
 
 # Run LONG_FCST_RANGE hr fcsts at these hours.
 export LONG_FCST_TIME_1=${LONG_FCST_TIME_1:-00}
-export LONG_FCST_TIME_2=${LONG_FCST_TIME_2:-00}
+export LONG_FCST_TIME_2=${LONG_FCST_TIME_2:-99}
 export LONG_FCST_TIME_3=${LONG_FCST_TIME_3:-99}
 export LONG_FCST_TIME_4=${LONG_FCST_TIME_4:-99}
 
@@ -118,8 +118,6 @@ if test ! -d $EXP_DIR; then
    mkdir ${EXP_DIR}
 fi
 
-export HTML=$EXP_DIR/index.html
-
 # WPS
 
 export OPT_GEOGRID_TBL_PATH=${OPT_GEOGRID_TBL_PATH:-geogrid/}
@@ -138,7 +136,7 @@ export NL_DY=${NL_DY:-100000}                # Resolution (m).
 # Additional Namelist variable for real (namelist.input):
 
 export NL_HISTORY_INTERVAL=${NL_HISTORY_INTERVAL:-360}          # (minutes)
-export NL_TIME_STEP=${NLTIME_STEP:-360}                # Timestep (s) (dt=4-6*dx(km) recommended).
+export NL_TIME_STEP=${NL_TIME_STEP:-360}                # Timestep (s) (dt=4-6*dx(km) recommended).
 export NL_E_VERT=${NL_E_VERT:-28}                   # 
 export NL_SMOOTH_OPTION=${NL_SMOOTH_OPTION:-1}           # ?
 export NL_MP_PHYSICS=${NL_MP_PHYSICS:-3}           # 
@@ -168,10 +166,6 @@ export DATE=$INITIAL_DATE
 
 export PREV_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe $DATE -$CYCLE_PERIOD 2>/dev/null`
 
-if $NL_USE_HTML; then
-   echo "<HTML><HEAD><TITLE>$EXPT</TITLE></HEAD><BODY><H1>$EXPT</H1><PRE>" > $HTML
-fi
-
 if $CHECK_SVNVERSION; then
    WRF_VN=`svnversion -n $WRF_DIR`
    WRFVAR_VN=`svnversion -n $WRFVAR_DIR`
@@ -179,7 +173,7 @@ if $CHECK_SVNVERSION; then
    WPS_VN=`svnversion -n $WPS_DIR`
 fi
 
-echo REL_DIR $REL_DIR >> $HTML
+echo "REL_DIR      $REL_DIR"
 echo "WRF          $WRF_DIR $WRF_VN"
 echo "WRFVAR       $WRFVAR_DIR $WRFVAR_VN"
 echo "WRFPLUS      $WRFPLUS_DIR $WRFPLUS_VN"
@@ -187,6 +181,7 @@ echo "WPS          $WPS_DIR $WPS_VN"
 echo "WRFSI        $WRFSI_DIR"
 echo "OBSPROC      $OBSPROC_DIR"
 
+echo "NUM_PROCS    $NUM_PROCS"
 echo "INITIAL_DATE $INITIAL_DATE"
 echo "FINAL_DATE   $FINAL_DATE"
 
@@ -203,19 +198,19 @@ while test $DATE != $FINAL_DATE; do
 
    # Decide on length of forecast to run
    if test $HH == $LONG_FCST_TIME_1; then
-      FCST_RANGE=$LONG_FCST_RANGE_1
+      export FCST_RANGE=$LONG_FCST_RANGE_1
    fi
 
    if test $HH == $LONG_FCST_TIME_2; then
-      FCST_RANGE=$LONG_FCST_RANGE_2
+      export FCST_RANGE=$LONG_FCST_RANGE_2
    fi
 
    if test $HH == $LONG_FCST_TIME_3; then
-      FCST_RANGE=$LONG_FCST_RANGE_3
+      export FCST_RANGE=$LONG_FCST_RANGE_3
    fi
 
    if test $HH == $LONG_FCST_TIME_4; then
-      FCST_RANGE=$LONG_FCST_RANGE_4
+      export FCST_RANGE=$LONG_FCST_RANGE_4
    fi
 
    . ${WRFVAR_DIR}/scripts/da_get_date_range.ksh $DATE $FCST_RANGE
@@ -230,10 +225,8 @@ while test $DATE != $FINAL_DATE; do
 
       $WRFVAR_DIR/scripts/da_trace.ksh da_run_restore_data_ncep $OUT_DIR
       ${WRFVAR_DIR}/scripts/da_restore_data_ncep.ksh > $OUT_DIR/index.html 2>&1
-      if test $? == 0; then
-         echo "${OK}Suceeded${END}" `date`
-      else
-         echo "${ERR}Failed with error$?$END" `date`
+      if test $? != 0; then
+         echo `date` "${ERR}Failed with error$?$END"
          exit 1
       fi
       if $CLEAN; then
@@ -248,10 +241,8 @@ while test $DATE != $FINAL_DATE; do
 
       $WRFVAR_DIR/scripts/da_trace.ksh da_run_wrfsi $OUT_DIR
       ${WRFVAR_DIR}/scripts/da_run_wrfsi.ksh > $OUT_DIR/index.html 2>&1
-      if test $? == 0; then
-         echo "${OK}Suceeded${END}" `date`
-      else
-         echo "${ERR}Failed with error $?$END" `date`
+      if test $? != 0; then
+         echo `date` "${ERR}Failed with error $?$END"
          exit 1
       fi
       if $CLEAN; then
@@ -266,10 +257,8 @@ while test $DATE != $FINAL_DATE; do
 
       $WRFVAR_DIR/scripts/da_trace.ksh da_run_wps $OUT_DIR
       ${WRFVAR_DIR}/scripts/da_run_wps.ksh > $OUT_DIR/index.html 2>&1
-      if test $? == 0; then
-         echo "${OK}Suceeded${END}" `date`
-      else
-         echo "${ERR}Failed with error $?$END" `date`
+      if test $? != 0; then
+         echo `date` "${ERR}Failed with error $?$END"
          exit 1
       fi
       if $CLEAN; then
@@ -288,10 +277,8 @@ while test $DATE != $FINAL_DATE; do
 
       $WRFVAR_DIR/scripts/da_trace.ksh da_run_real $OUT_DIR
       ${WRFVAR_DIR}/scripts/da_run_real.ksh > $OUT_DIR/index.html 2>&1
-      if test $? == 0; then
-         echo "${OK}Suceeded${END}" `date`
-      else
-         echo "${ERR}Failed  with error $?$END" `date`
+      if test $? != 0; then
+         echo `date` "${ERR}Failed with error $?$END"
          exit 1
       fi
       if $CLEAN; then
@@ -305,12 +292,10 @@ while test $DATE != $FINAL_DATE; do
       mkdir -p $OUT_DIR
 
       export DA_OBSERVATIONS=$OB_DIR/$DATE/ob.ascii
-      $WRFVAR_DIR/scripts/da_trace.ksh da_run_obsproc $OUT_DIR "${NUM_PROCS} processors"
+      $WRFVAR_DIR/scripts/da_trace.ksh da_run_obsproc $OUT_DIR
       ${WRFVAR_DIR}/scripts/da_run_obsproc.ksh > $OUT_DIR/index.html 2>&1
-      if test $? == 0; then
-         echo "${OK}Suceeded${END}" `date`
-      else
-         echo "${ERR}Failed with error $?$END" `date`
+      if test $? != 0; then
+         echo `date` "${ERR}Failed with error $?$END"
          exit 1
       fi
 
@@ -326,10 +311,7 @@ while test $DATE != $FINAL_DATE; do
 
    if $RUN_WRFVAR; then
       if $CYCLING; then
-         MESSAGE="${NUM_PROCS} processors in full cycling mode"
          export DA_FIRST_GUESS=${CS_DIR}/${PREV_DATE}/wrfvar_input_d${DOMAIN}
-      else
-         MESSAGE="${NUM_PROCS} processors in cold-start mode"
       fi
 
       export RUN_DIR=$EXP_DIR/wrfvar
@@ -337,12 +319,10 @@ while test $DATE != $FINAL_DATE; do
       mkdir -p $OUT_DIR $DA_DIR
 
       export DA_ANALYSIS=$DA_DIR/$DATE/wrfvar_output
-      $WRFVAR_DIR/scripts/da_trace.ksh da_run_wrfvar $OUT_DIR $MESSAGE
+      $WRFVAR_DIR/scripts/da_trace.ksh da_run_wrfvar $OUT_DIR
       ${WRFVAR_DIR}/scripts/da_run_wrfvar.ksh > $OUT_DIR/index.html 2>&1
-      if test $? == 0; then
-         echo "${OK}Suceeded${END}" `date`
-      else
-         echo "${ERR}Failed with error $?$END" `date`
+      if test $? != 0; then
+         echo `date` "${ERR}Failed with error $?$END"
          exit 1
       fi
  
@@ -368,10 +348,8 @@ while test $DATE != $FINAL_DATE; do
 
       $WRFVAR_DIR/scripts/da_trace.ksh da_update_bc $OUT_DIR
       $WRFVAR_DIR/scripts/da_update_bc.ksh > $OUT_DIR/index.html 2>&1
-      if test $? == 0; then
-         echo "${OK}Suceeded${END}" `date`
-      else
-         echo "${ERR}Failed with error $?$END" `date`
+      if test $? != 0; then
+         echo `date` "${ERR}Failed with error $?$END"
          exit 1
       fi
 
@@ -388,12 +366,11 @@ while test $DATE != $FINAL_DATE; do
       export OUT_DIR=$RUN_DIR/$DATE
       mkdir -p $OUT_DIR
 
-      $WRFVAR_DIR/scripts/da_trace.ksh da_run_wrf $OUT_DIR ${FCST_RANGE} hours
+      $WRFVAR_DIR/scripts/da_trace.ksh da_run_wrf $OUT_DIR
       $WRFVAR_DIR/scripts/da_run_wrf.ksh > $OUT_DIR/index.html 2>&1
-      if test $? == 0; then
-         echo "${OK}Suceeded${END}" `date`
-      else
-         echo "${ERR}Failed $?$END" `date`
+      if test $? != 0; then
+         echo `date` "${ERR}Failed with error $?$END"
+         exit 1
       fi
 
       # What files do we want?
@@ -407,8 +384,6 @@ while test $DATE != $FINAL_DATE; do
    export DATE=`$WRFVAR_DIR/main/advance_cymdh.exe $DATE $CYCLE_PERIOD 2>/dev/null`
 
 done
-
-echo "</PRE></BODY></HTML>" >> $HTML
 
 exit 0
 

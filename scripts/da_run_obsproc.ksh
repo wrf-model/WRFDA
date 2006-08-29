@@ -70,13 +70,13 @@ if test ! -f $OB_DIR/$DATE/ob.ascii; then
    fi
 
    . $WRFVAR_DIR/scripts/da_get_date_range.ksh $DATE -$MAX_OB_RANGE
-   export TIME_WINDOW_MIN=${END_YEAR}-${END_MONTH}-${END_DAY}_${END_HOUR}:00:00
+   export TIME_WINDOW_MIN=${NL_END_YEAR}-${NL_END_MONTH}-${NL_END_DAY}_${NL_END_HOUR}:00:00
    . $WRFVAR_DIR/scripts/da_get_date_range.ksh $DATE $MAX_OB_RANGE
-   export TIME_WINDOW_MAX=${END_YEAR}-${END_MONTH}-${END_DAY}_${END_HOUR}:00:00
+   export TIME_WINDOW_MAX=${NL_END_YEAR}-${NL_END_MONTH}-${NL_END_DAY}_${NL_END_HOUR}:00:00
    . $WRFVAR_DIR/scripts/da_get_date_range.ksh $DATE 00
-   export TIME_ANALYSIS=${START_YEAR}-${START_MONTH}-${START_DAY}_${START_HOUR}:00:00
+   export TIME_ANALYSIS=${NL_START_YEAR}-${NL_START_MONTH}-${NL_START_DAY}_${NL_START_HOUR}:00:00
 
-   export OB_FILE=obs.${START_YEAR}${START_MONTH}${START_DAY}${START_HOUR}
+   export OB_FILE=obs.${NL_START_YEAR}${NL_START_MONTH}${NL_START_DAY}${NL_START_HOUR}
 
    cd ${RUN_DIR}
 

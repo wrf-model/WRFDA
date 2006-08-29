@@ -9,7 +9,7 @@
 #-----------------------------------------------------------------------
 
 export DATE=${DATE:-2003010100}
-export FCST_RANGE=${FCST_RANGE:-06}
+export CYCLE_PERIOD=${CYCLE_PERIOD:-06}
 export REGION=${REGION:-con200}
 export DOMAIN=${DOMAIN:-01}
 export DUMMY=${DUMMY:-false}
@@ -20,9 +20,7 @@ export WPS_DIR=${WPS_DIR:-$REL_DIR/wps}
 export OPT_GEOGRID_TBL_PATH=${OPT_GEOGRID_TBL_PATH:-$WPS_DIR/geogrid}
 export OPT_METGRID_TBL_PATH=${OPT_METGRID_TBL_PATH:-$WPS_DIR/metgrid}
 
-# Need to find room for this in $DAT_DIR
-# export WPS_GEOG_DIR=${WPS_GEOG_DIR:-$DAT_DIR/wps_geog}
-export WPS_GEOG_DIR=${WPS_GEOG_DIR:-$WPS_DIR/geog}
+export WPS_GEOG_DIR=${WPS_GEOG_DIR:-$DAT_DIR/wps_geog}
 
 export NL_E_WE=${NL_E_WE:-110}
 export NL_E_SN=${NL_E_SN:-145}
@@ -35,7 +33,8 @@ export STAND_LON=${STAND_LON:-180.0}
 export NL_DX=${NL_DX:-90000}
 export NL_DY=${NL_DY:-90000}
 export LBC_FREQ=${LBC_FREQ:-06}
-export GEOG_DATA_RES=${GEOG_DATA_RES:-30s}
+export GEOG_DATA_RES=${GEOG_DATA_RES:-10m}
+export FG_TYPE=${FG_TYPE:-GFS}
 
 export EXPT=${EXPT:-test}
 export DAT_DIR=${DAT_DIR:-$HOME/data}
@@ -59,7 +58,7 @@ let LBC_FREQ_SS=$LBC_FREQ*3600
 
 # Calculate end dates
 
-. ${WRFVAR_DIR}/scripts/da_get_date_range.ksh $DATE $FCST_RANGE
+. ${WRFVAR_DIR}/scripts/da_get_date_range.ksh $DATE $CYCLE_PERIOD
 
 cat >namelist.wps <<EOF
 &share
@@ -76,7 +75,7 @@ cat >namelist.wps <<EOF
  interval_seconds = $LBC_FREQ_SS,
  io_form_geogrid = 2,
  opt_output_from_geogrid_path = '$RUN_DIR',
- debug_print = .false.
+ debug_level = 0
 /
 
 &geogrid
@@ -85,9 +84,9 @@ cat >namelist.wps <<EOF
  i_parent_start =      1,
  j_parent_start =      1,
  s_we           = 1,
- e_we           = $E_WE,
+ e_we           = $NL_E_WE,
  s_sn           = 1,
- e_sn           = $E_SN,
+ e_sn           = $NL_E_SN,
  geog_data_res  = '$GEOG_DATA_RES',
  dx = $NL_DX,
  dy = $NL_DY,
@@ -114,34 +113,55 @@ cat >namelist.wps <<EOF
 /
 EOF
 
+cp namelist.wps $OUT_DIR
+
 #-----------------------------------------------------------------------
 # [3.0] Run WPS:
 #-----------------------------------------------------------------------
-
-if $DUMMY; then
-   echo "Dummy wps"
-   LOCAL_DATE=$DATE
-   while test $LOCAL_DATE -lt $END_DATE; do
-      export CCYY=`echo $LOCAL_DATE | cut -c1-4`
-      export MM=`echo $LOCAL_DATE | cut -c5-6`
-      export DD=`echo $LOCAL_DATE | cut -c7-8`
-      export HH=`echo $LOCAL_DATE | cut -c9-10`
-      echo Dummy wps > met_em.d${DOMAIN}.${CCYY}-${MM}-${DD}_${HH}:00:00
-      LOCAL_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe ${LOCAL_DATE} 1 2>/dev/null`
-   done
-else
-   $WPS_DIR/geogrid.exe
-   $WPS_DIR/ungrid.exe
-   $WPS_DIR/metgrid.exe
-fi
 
 export CCYY=`echo $DATE | cut -c1-4`
 export MM=`echo $DATE | cut -c5-6`
 export DD=`echo $DATE | cut -c7-8`
 export HH=`echo $DATE | cut -c9-10`
 
-mv met_em.d${DOMAIN}.${CCYY}-${MM}-${DD}_${HH}:00:00 \
-   $CS_DIR/$DATE/wrfem_input_d$DOMAIN
+if test ! -f $CS_DIR/$DATE/met_em.d${DOMAIN}.${CCYY}-${MM}-${DD}_${HH}:00:00.nc; then
+   if $DUMMY; then
+      echo "Dummy wps"
+      LOCAL_DATE=$DATE
+      while test $LOCAL_DATE -le $END_DATE; do
+         export CCYY=`echo $LOCAL_DATE | cut -c1-4`
+         export MM=`echo $LOCAL_DATE | cut -c5-6`
+         export DD=`echo $LOCAL_DATE | cut -c7-8`
+         export HH=`echo $LOCAL_DATE | cut -c9-10`
+         echo Dummy wps > met_em.d${DOMAIN}.${CCYY}-${MM}-${DD}_${HH}:00:00
+         LOCAL_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe ${LOCAL_DATE} 1 2>/dev/null`
+      done
+   else
+      ln -fs $WPS_DIR/ungrib/Variable_Tables/Vtable.$FG_TYPE Vtable
+      $WPS_DIR/link_grib.csh $CS_DIR/$START_DATE/fn* $CS_DIR/$END_DATE/fn*
+      $WPS_DIR/geogrid.exe
+      RC=$?
+      if test $RC != 0; then
+         echo geogrid failed with error $RC
+         exit 1
+      fi
+      $WPS_DIR/ungrib.exe
+      RC=$?
+      if test $RC != 0; then
+         echo ungrib failed with error $RC
+         exit 1
+      fi
+      $WPS_DIR/metgrid.exe
+      RC=$?
+      if test $RC != 0; then
+         echo metgrid failed with error $RC
+         exit 1
+      fi
+   fi
+   mv met_em.d${DOMAIN}* $CS_DIR/$DATE
+else
+   echo "$CS_DIR/$DATE/met_em.d${DOMAIN}* files exist, skipping"
+fi
 
 cd $OLDPWD
 

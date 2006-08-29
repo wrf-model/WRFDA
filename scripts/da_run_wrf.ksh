@@ -27,20 +27,20 @@ export EXPT=${EXPT:-test}                             # Experiment name.
 export HOSTNAME=${HOSTNAME:-`hostname`}
 
 # Directories:
-export TMP_DIR=${TMP_DIR:-/var/tmp/$USER}  # Temporary directory.
 export DAT_DIR=${DAT_DIR:-$HOME/data} # Data directory.
 export HOSTS=${HOSTS:-$DAT_DIR/hosts/$HOSTNAME.hosts}
 export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION} # Data directory for region.
 export RUN_DIR=${RUN_DIR:-$DAT_DIR/$REGION/$EXPT} #Run directory.
+export WORK_DIR=${WORK_DIR:-$RUN_DIR/working}  # Temporary directory.
 export REL_DIR=${REL_DIR:-$HOME/trunk} # Code directory.
 export WRF_DIR=${WRF_DIR:-$REL_DIR/wrf}                  # Code subdirectory.
 
 
 # Additional Namelist variable for real (namelist.input):
 
-export NL_RUN_HOURS=${NL_RUN_HOURS:-6}
+export NL_RUN_HOURS=${NL_RUN_HOURS:-$CYCLE_PERIOD}
 export NL_HISTORY_INTERVAL=${NL_HISTORY_INTERVAL:-360}          # (minutes)
-export NL_TIME_STEP=${NLTIME_STEP:-360}                # Timestep (s) (dt=4-6*dx(km) recommended).
+export NL_TIME_STEP=${NL_TIME_STEP:-360}                # Timestep (s) (dt=4-6*dx(km) recommended).
 export NL_E_VERT=${NL_E_VERT:-28}                   # 
 export NL_SMOOTH_OPTION=${NL_SMOOTH_OPTION:-1}           # ?
 export NL_MP_PHYSICS=${NL_MP_PHYSICS:-3}           # 
@@ -62,10 +62,10 @@ fi
 date
 
 # Create temporary directory:
-export TMP_DIR=${RUN_DIR}/working
-rm -rf ${TMP_DIR}
-mkdir -p ${TMP_DIR}
-cd ${TMP_DIR}
+mkdir -p ${WORK_DIR}
+cd ${WORK_DIR}
+
+ln -s $WORK_DIR $OUT_DIR
 
 # Copy necessary info (better than link as not overwritten):
 cp ${WRF_DIR}/main/wrf.exe .
@@ -78,7 +78,7 @@ cp ${WRF_DIR}/run/VEGPARM.TBL .
 cp ${WRF_DIR}/run/gribmap.txt .
 cp ${DA_ANALYSIS} wrfinput_d${DOMAIN}
 cp ${CS_DIR}/$DATE/wrfbdy_d${DOMAIN} wrfbdy_d${DOMAIN}
-cp ${CS_DIR}/$DATE/wrflowinp_d${DOMAIN} wrflowinp_d${DOMAIN}
+#cp ${CS_DIR}/$DATE/wrflowinp_d${DOMAIN} wrflowinp_d${DOMAIN}
 
 export CCYY=`echo $DATE | cut -c1-4`
 export MM=`echo $DATE | cut -c5-6`
@@ -99,48 +99,63 @@ export NL_END_MONTH=`echo $END_DATE | cut -c5-6`
 export NL_END_DAY=`echo $END_DATE | cut -c7-8`
 export NL_END_HOUR=`echo $END_DATE | cut -c9-10`
 
+export NL_INTERVAL_SECONDS=`expr $LBC_FREQ \* 3600`
+
 . $WRF_DIR/inc/namelist_script.inc
+cp namelist.input $OUT_DIR
 
-if $DUMMY; then
-   echo Dummy wrf
-   echo Dummy wrf > wrfout_d${DOMAIN}_${CCYY}-${MM}-${DD}_${HH}:00:00
-else
-   $RUN_CMD ./wrf.exe
-fi
-
-if test -f namelist.input; then
-  cp namelist.input $OUT_DIR
-fi
-
-if test -f fort.9; then
-  cp fort.9 $OUT_DIR/namelist.output
-fi
-
-mkdir $OUT_DIR/rsl
-mv rsl* $OUT_DIR/rsl
 if $NL_USE_HTML; then
-   cd $OUT_DIR/rsl
-   for FILE in rsl*; do
-      echo "<HTML><HEAD><TITLE>$FILE</TITLE></HEAD>" > $FILE.html
-      echo "<H1>$FILE</H1><PRE>" >> $FILE.html
-      cat $FILE >> $FILE.html
-      echo "</PRE></BODY></HTML>" >> $FILE.html
-      rm $FILE
-   done
-   cd $OUT_DIR
-
    echo '<A HREF="namelist.input">Namelist input</a>'
-   echo '<A HREF="namelist.output">Namelist output</a>'
-   echo '<A HREF="rsl/rsl.out.0000.html">rsl.out.0000</a>'
-   echo '<A HREF="rsl/rsl.error.0000.html">rsl.error.0000</a>'
-   echo '<A HREF="rsl">Other RSL output</a>'
+fi
+
+#mv namelist.input namelist.input1
+#cp $REG_DIR/namelist.input .
+
+
+if test ! -f $CS_DIR/$DATE/wrfout_d${DOMAIN}_${CCYY}-${MM}-${DD}_${HH}:00:00; then
+   if $NL_USE_HTML; then
+      echo '<A HREF="working">Working directory</a>'
+      echo '<A HREF="namelist.input">Namelist input</a>'
+   fi
+
+   if $DUMMY; then
+      echo Dummy wrf
+      echo Dummy wrf > wrfout_d${DOMAIN}_${CCYY}-${MM}-${DD}_${HH}:00:00
+   else
+      $RUN_CMD ./wrf.exe
+   fi
+
+   if test -f fort.9; then
+     cp fort.9 $OUT_DIR/namelist.output
+   fi
+
+   mkdir $OUT_DIR/rsl
+   mv rsl* $OUT_DIR/rsl
+   if $NL_USE_HTML; then
+      cd $OUT_DIR/rsl
+      for FILE in rsl*; do
+         echo "<HTML><HEAD><TITLE>$FILE</TITLE></HEAD>" > $FILE.html
+         echo "<H1>$FILE</H1><PRE>" >> $FILE.html
+         cat $FILE >> $FILE.html
+         echo "</PRE></BODY></HTML>" >> $FILE.html
+         rm $FILE
+      done
+      cd $WORK_DIR
+
+      echo '<A HREF="namelist.output">Namelist output</a>'
+      echo '<A HREF="rsl/rsl.out.0000.html">rsl.out.0000</a>'
+      echo '<A HREF="rsl/rsl.error.0000.html">rsl.error.0000</a>'
+      echo '<A HREF="rsl">Other RSL output</a>'
+   fi
+   mv wrfout* $CS_DIR/$DATE
+else
+   echo "$CS_DIR/$DATE/wrfout_d${DOMAIN}_${CCYY}-${MM}-${DD}_${HH}:00:00 already exists, skipping"
 fi
 
 
-mv wrfvar_input* ../.
-mv wrfout* ../.
-rm ../wrfout_d${DOMAIN}_${CCYY}-${MM}-${DD}_${HH}:00:00
-mv namelist.input ../.
+if $CLEAN; then
+   rm -rf $WORK_DIR
+fi
 
 date
 

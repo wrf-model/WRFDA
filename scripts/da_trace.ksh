@@ -9,12 +9,12 @@ if test ! -z $DIR; then
    shift 2
    typeset REST="$@"
    if test -d $DIR; then
-      echo "<A HREF=\"$DIR/index.html\">$NAME</a> $(date) $REST"
+      echo `date` "<A HREF=\"$DIR/index.html\">$NAME</a> $REST"
    else
-      echo "$NAME $(date)"
+      echo `date` "$NAME"
    fi
 else
    shift 1
    typeset REST="$@"
-   echo "$INIT $NAME $(date)" $REST
+   echo `date` "$INIT $NAME" $REST
 fi

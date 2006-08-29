@@ -35,3 +35,17 @@ export END_YEAR=`echo $END_DATE | cut -c1-4`
 export END_MONTH=`echo $END_DATE | cut -c5-6`
 export END_DAY=`echo $END_DATE | cut -c7-8`
 export END_HOUR=`echo $END_DATE | cut -c9-10`
+
+export NL_START_YEAR=`echo $START_DATE | cut -c1-4`
+export NL_START_MONTH=`echo $START_DATE | cut -c5-6`
+export NL_START_DAY=`echo $START_DATE | cut -c7-8`
+export NL_START_HOUR=`echo $START_DATE | cut -c9-10`
+export NL_START_MINUTE=00
+export NL_START_SECOND=00
+
+export NL_END_YEAR=`echo $END_DATE | cut -c1-4`
+export NL_END_MONTH=`echo $END_DATE | cut -c5-6`
+export NL_END_DAY=`echo $END_DATE | cut -c7-8`
+export NL_END_HOUR=`echo $END_DATE | cut -c9-10`
+export NL_END_MINUTE=00
+export NL_END_SECOND=00

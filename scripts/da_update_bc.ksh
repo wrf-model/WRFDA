@@ -35,7 +35,7 @@ date
 if test ! -d ${RUN_DIR}; then
    mkdir ${RUN_DIR}
 fi
-
+set -x
 export REL_DIR=${REL_DIR:-$HOME/trunk} # Code directory.
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
 export DA_FIRST_GUESS=${DA_FIRST_GUESS:-$CS_DIR/$DATE/wrfvar_input_d$DOMAIN}
@@ -62,7 +62,7 @@ cat > parame.in << EOF
  low_bdy_only = .false. /
 EOF
 
-if test $DUMMY; then
+if $DUMMY; then
    echo "Dummy update_bc"
    echo Dummy update_bc > wrfbdy_d$DOMAIN
 else

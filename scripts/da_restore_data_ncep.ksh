@@ -38,9 +38,13 @@ fi
 
 date
 
+   echo "START_DATE $START_DATE"
+   echo "END_DATE   $END_DATE"
+   echo "LBC_FREQ   $LBC_FREQ"
+
 LOCAL_DATE=$START_DATE
 
-while test $LOCAL_DATE != $END_DATE; do
+while test $LOCAL_DATE -le $END_DATE; do
 
    CCYY=`echo $LOCAL_DATE | cut -c1-4`
    YY=`echo $LOCAL_DATE | cut -c3-4`
