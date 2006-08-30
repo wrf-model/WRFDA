@@ -54,6 +54,20 @@ convert_bioemiss : $(WRF_LIBS) convert_bioemiss.o
 convert_emiss : $(WRF_LIBS) convert_emiss.o
 	$(FC) -o convert_emiss.exe $(LDFLAGS) convert_emiss.o libwrf.a $(WRF_LIB)
 
+real_em : $(WRF_LIBS) real_em.o
+	$(FC) -o real_em.exe $(LDFLAGS) real_em.o module_bc.o \
+            module_big_step_utilities_em.o \
+            module_date_time.o module_optional_si_input.o module_bc_time_utilities.o \
+            module_dm.o module_utility.o module_timing.o module_configure.o \
+            module_driver_constants.o module_io_domain.o module_initialize_real.o \
+            module_domain.o module_machine.o $(WRF_LIB)
+
+real_em.o : real_em.F version_decl module_bc.o module_big_step_utilities_em.o \
+              module_date_time.o module_optional_si_input.o module_bc_time_utilities.o \
+              module_dm.o module_utility.o module_timing.o module_configure.o \
+              module_driver_constants.o module_io_domain.o module_initialize_real.o \
+              module_domain.o module_machine.o 
+
 real_nmm : $(WRF_LIBS) real_nmm.o module_initialize_real.o \
           module_optional_si_input.o input_wrf.o module_io_domain.o
 	$(FC) -o real_nmm.exe $(LDFLAGS) real_nmm.o module_initialize_real.o \

@@ -144,6 +144,7 @@ else
   make -r setup
   make -r $arglist A2DCASE="$A2DCASE"
   cp *.exe ../main
+  cp *.exe ../bin
   cp inc/namelist_script.inc ../inc
 
 endif

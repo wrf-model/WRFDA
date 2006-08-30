@@ -769,7 +769,7 @@ CC_TOOLS        = xlc
 LD              = $(FC)
 
 TRADFLAG        =
-FPPFLAGS2       = -DNATIVE_MASSV -DAIX -DNONSTANDARD_SYSTEM                    
+FPPFLAGS2       = -DNATIVE_MASSV -DNONSTANDARD_SYSTEM                    
 
 FCOPTIM         = -O0 -qarch=auto
 FCDEBUG         = #-g -qfullpath -C
@@ -807,7 +807,7 @@ SCC             = cc_r
 LD              = $(FC)
 
 TRADFLAG        =
-FPPFLAGS2       = -DNATIVE_MASSV -DNORESHAPE -DAIX -DNONSTANDARD_SYSTEM
+FPPFLAGS2       = -DNATIVE_MASSV -DNORESHAPE -DNONSTANDARD_SYSTEM
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL

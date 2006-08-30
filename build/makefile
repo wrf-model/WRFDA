@@ -65,11 +65,17 @@ include fftpack5.make
 include RSL_LITE.make
 include main.make
 
+real_em.o : real_em.F version_decl module_bc.o module_big_step_utilities_em.o \
+              module_date_time.o module_optional_si_input.o module_bc_time_utilities.o \
+              module_dm.o module_utility.o module_timing.o module_configure.o \
+              module_driver_constants.o module_io_domain.o module_initialize_real.o \
+              module_domain.o module_machine.o 
+
 
 depend : arch links registry makedepf90.exe module_state_description.F md_calls.inc \
                       inc/da_generic_boilerplate.inc
 	./makedepf90.exe $(FPPFLAGS) \
-           *.F *.f90 *.F90 > depend.txt 2>/dev/null
+           *.F *.f90 *.F90  2>/dev/null | grep -v 'real_em.o :' > depend.txt
 	
 
 include depend.txt
