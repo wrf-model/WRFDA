@@ -13,28 +13,30 @@ FIXEDFLAGS        = $(FCOPTIM) $(FCBASE) $(FCDEBUG) $(FCTYPE)
 FIXEDFLAGS_BUFR   = $(FCOPTIM) $(FCBASE) $(FCDEBUG) $(FCTYPE)
 FIXEDFLAGS_ENDIAN = $(FCTYPE) $(FCBASE)
 
-WRFVAR_LIBS  = libwrflib.a libwrfio_nf.a libesmf_time.a libio_grib1.a \
+WRFVAR_LIBS  = libwrflib.a libwrfio_nf.a libesmf_time.a $(IO_GRIB_SHARE)/libio_grib_share.a \
+                 $(IO_GRIB1)/libio_grib1.a \
                  libblas.a liblapack.a libblas.a libbufr.a libfftpack5.a \
                  libwrfvar.a $(MPI_LIBS)
 
 GEN_BE_LIBS  = libblas.a liblapack.a libfftpack5.a
 
-WRF_LIBS     = libwrflib.a libwrfio_nf.a libesmf_time.a libio_grib1.a $(MPI_LIBS)
+WRF_LIBS     = libwrflib.a libwrfio_nf.a libesmf_time.a $(IO_GRIB_SHARE)/libio_grib_share.a \
+                 $(IO_GRIB1)/libio_grib1.a $(MPI_LIBS)
 
 WRFPLUS_LIBS = libwrflib.a libwrfplus.a libwrfio_nf.a libesmf_time.a \
-               libio_grib1.a $(MPI_LIBS)
+               $(IO_GRIB_SHARE)/libio_grib_share.a $(IO_GRIB1)/libio_grib1.a $(MPI_LIBS)
 
 WRFVAR_LIB  = -L. -lwrfvar -lwrflib $(NETCDF_LIB)  \
-               -L$(EXTERNAL)/io_grib1 -lio_grib1 $(LOCAL_LIB) \
+               $(GRIB_SHARE_LIB) $(GRIB1_LIB) $(LOCAL_LIB) \
                $(LAPACK_LIB) $(BLAS_LIB) $(BUFR_LIB) $(FFTPACK5_LIB) \
                $(RTTOV_LIB) $(MPI_LIB) $(EXTRA_LIBS)
 
 WRF_LIB     = -L. -lwrflib \
-              -L$(EXTERNAL)/io_grib1 -lio_grib1 $(LOCAL_LIB) \
+              $(GRIB_SHARE_LIB) $(GRIB1_LIB) $(LOCAL_LIB) \
               $(NETCDF_LIB) $(MPI_LIB) $(EXTRA_LIBS)
 
 WRFPLUS_LIB = -L. $(NETCDF_LIB) -lwrflib -lwrfplus \
-              -L$(EXTERNAL)/io_grib1 -lio_grib1 $(LOCAL_LIB) \
+              $(GRIB_SHARE_LIB) $(GRIB1_LIB) $(LOCAL_LIB) \
               $(NETCDF_LIB) $(MPI_LIB) $(EXTRA_LIBS)
 
 GEN_BE_LIB =  $(NETCDF_LIB) -L. $(LAPACK_LIB) $(BLAS_LIB) $(FFTPACK5_LIB) \

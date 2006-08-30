@@ -239,14 +239,14 @@ fi
 
 if [ -n "$HDF" ] ; then
   echo "Will use HDF in dir: $HDF"
-else
+#else
   # No-one cares
   # echo "HDF not set in environment. Will configure WRF for use without."
 fi
 
 if [ -n "$HDFEOS" ] ; then
   echo "Will use HDFEOS in dir: $HDFEOS"
-else
+#else
   # No-one cares
   # echo "HDFEOS not set in environment. Will configure WRF for use without."
 fi

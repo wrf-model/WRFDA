@@ -25,6 +25,7 @@ links :
 	@ $(LN) $(IO_NETCDF)/* .
 	@ $(LN) $(IO_GRIB_SHARE)/* .
 	@ $(LN) $(IO_GRIB1)/* .
+	@ $(LN) $(IO_GRIB2)/* .
 	@ $(LN) $(IOAPI_SHARE)/* .
 	@ $(LN) $(BLAS)/* .
 	@ $(LN) $(LAPACK)/* .
@@ -55,7 +56,7 @@ include tools.make
 include esmf_time_f90.make
 include io_int.make
 include io_netcdf.make
-include io_grib1.make
+include io_grib.make
 include ioapi_share.make
 include bufr_ncep_nco.make
 include lapack.make

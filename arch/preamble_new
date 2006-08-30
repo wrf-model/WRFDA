@@ -22,6 +22,13 @@ CPP     = /lib/cpp
 
 SVNDEF = -DSVN_REV='"$(shell svnversion -n .)"'
 
+#### Single location for defining total number of domains.  You need
+#### at least 1 + 2*(number of total nests).  For example, 1 coarse
+#### grid + three fine grids = 1 + 2(3) = 7, so MAX_DOMAINS=7.
+
+MAX_DOMAINS	=	1
+MAX_PROC	=	1024
+
 # Substituted by Config_new.pl
 
 DEVTOP      = CONFIGURE_DEVTOP
@@ -45,7 +52,8 @@ EXP_CORE    = CONFIGURE_EXP_CORE
 VAR4D_CORE  = CONFIGURE_VAR4D_CORE
 FPPFLAGS1   = CONFIGURE_NETCDF_FLAG CONFIGURE_RTTOV_FLAG $(WORDSIZE_DEF) \
               -DLIMIT_ARGS -DPROMOTE_FLOAT -DINTIO \
-	      -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DONLY_WRFMODEL_IO \
+              -DGRIB1 CONFIGURE_GRIB2_FLAG \
+	      -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
               -DMAX_DOMAINS_F=$(MAX_DOMAINS) \
               -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) \
               $(SVNDEF)
@@ -64,6 +72,7 @@ ESMF_IO_DEFS        = CONFIGURE_ESMF_IO_DEFS
 ESMF_TARGET         = CONFIGURE_ESMF_TARGET
 
 SOLVER=em
+IDEAL_CASE=real
 
 NETCDF_LIB_PATH = ${NETCDF_PATH}/lib
 
@@ -94,6 +103,7 @@ FFTPACK5      = $(EXTERNAL)/fftpack5
 BLAS          = $(EXTERNAL)/blas
 BUFR_NCEP_NCO = $(EXTERNAL)/bufr_ncep_nco
 IO_GRIB1      = $(EXTERNAL)/io_grib1
+IO_GRIB2      = $(EXTERNAL)/io_grib2
 IO_GRIB_SHARE = $(EXTERNAL)/io_grib_share
 IO_INT        = $(EXTERNAL)/io_int
 ESMF_TIME_F90 = $(EXTERNAL)/esmf_time_f90
@@ -109,6 +119,9 @@ LAPACK_LIB    = -llapack
 BLAS_LIB      = -lblas
 BUFR_LIB      = -lbufr
 FFTPACK5_LIB  = -lfftpack5
+GRIB_SHARE_LIB  = -L$(IO_GRIB_SHARE) -lio_grib_share
+GRIB1_LIB       = -L$(IO_GRIB1) -lio_grib1
+GRIB2_LIB       = -L$(IO_GRIB2) -lio_grib2
 
 #### Get core settings from environment (set in compile script)
 #### Note to add a core, this has to be added to.
@@ -127,13 +140,6 @@ RWORDSIZE	=	8
 
 DWORDSIZE	=	8
 WORDSIZE_DEF	=	-DIWORDSIZE=4 -DDWORDSIZE=$(DWORDSIZE) -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4
-
-#### Single location for defining total number of domains.  You need
-#### at least 1 + 2*(number of total nests).  For example, 1 coarse
-#### grid + three fine grids = 1 + 2(3) = 7, so MAX_DOMAINS=7.
-
-MAX_DOMAINS	=	1
-MAX_PROC	=	1024
 
 #### DM buffer length for the configuration flags.
 
