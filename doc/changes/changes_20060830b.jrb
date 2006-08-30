@@ -11,7 +11,9 @@ Reason for changes (explain before making changes)
 Battle with horrid duplicate module_initialise routines to get em_real to
 compile under new compilation system
 
-Fix a typo in configure
+Remove unused -DAIX
+
+Add bin directory where executables are copied. Use in preference to main
 
 Test results
 ------------------------------------------------------
@@ -25,3 +27,7 @@ File changes:
 
 A      doc/changes/changes_20060830b.jrb
 M      build/makefile
+M      build/main.make
+A      bin
+M      compile_new
+M      arch/configure.defaults_new
