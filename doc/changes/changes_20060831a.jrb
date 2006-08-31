@@ -1,0 +1,33 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: John Bray
+Date: 08/31/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Switch order when loading io_grid and io_grib_share libraries for fussy
+loaders
+
+Fix a trace typo
+
+bring share/wrf_restartin.F in line with wrf trunk
+
+compile_wrfvar to copy executables to bin
+
+Test results
+------------------------------------------------------
+
+balsam: Compiles wrfvar, runs con200
+
+--------------------------------------------------------------------------------------
+
+File changes:
+------------
+
+A      doc/changes/changes_20060831a.jrb
+M      arch/postamble_new
+M      da/da_radiance/da_calculate_jo_and_grady_rad.inc 
+M      compile_wrfvar

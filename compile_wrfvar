@@ -23,3 +23,5 @@ if ( $?WRF_SRC_ROOT_DIR ) then
 else
   make wrfvar $argv A2DCASE="$A2DCASE" WRF_SRC_ROOT_DIR="$PWD"
 endif
+
+cp main/*.exe bin
