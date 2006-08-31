@@ -1288,6 +1288,7 @@ mediation_feedback_domain.o : mediation_feedback_domain.F
 convert_nmm.o : convert_nmm.F
 module_configure.o : module_configure.F
 solve_interface.o : solve_interface.F
+solve_em.o : solve_em.F
 
 module_io_mm5.o module_si_io.o module_io_wrf.o module_domain.o \
 module_start.o module_initialize.o module_initialize_b_wave.o  \
@@ -1299,6 +1300,7 @@ mediation_interp_domain.o \
 module_configure.o                                             \
 solve_interface.o                                              \
 shift_domain_em.o                                              \
+solve_em.o							\
 convert_nmm.o :
 	$(RM) $@
 	$(SED_FTN) $*.F > $*.b 
@@ -1318,7 +1320,7 @@ mediation_force_domain.o start_domain.o :
 ###########################################################
 #ARCH   AIX SM          (OpenMP, no nesting)
 #
-OMP             =       -qsmp=noauto
+OMP             =       -qsmp=noauto:noopt
 OMPCPP          =       -D_OPENMP
 FC              =       xlf90_r
 SFC		=	$(FC)
@@ -1408,6 +1410,132 @@ module_domain.o : module_domain.F
 	$(CPP) -I../inc $(CPPFLAGS) $*.b  > $*.f
 	$(RM) $*.b
 	$(FC) -c -g $(PROMOTION) $(FCBASEOPTS) $(MODULE_DIRS) -qnoopt $*.f
+
+###########################################################
+#ARCH	AIX DM-Parallel          (RSL_LITE, IBM-MPI, Allows nesting)
+#
+# Notes: for experimental implementation of moving nests, add -DMOVE_NESTS to ARCHFLAGS
+#        for experimental implementation of vortex tracking nests, add -DMOVE_NESTS -DVORTEX_CENTER to ARCHFLAGS
+#
+DMPARALLEL      =       1
+SFC             =       xlf90_r
+SCC             =       cc_r
+FC              =       mpxlf90_r
+LD              =       mpxlf90_r
+CC              =       mpcc_r
+RWORDSIZE       =       $(NATIVE_RWORDSIZE)
+PROMOTION	=	-qrealsize=$(RWORDSIZE) -qintsize=4
+CFLAGS          =       -DNOUNDERSCORE  -I../external/RSL_LITE -DDM_PARALLEL \
+                        -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) -DNCARIBM_NOC99
+FCOPTIM         =       -O2 -qarch=auto
+FCDEBUG         =       # -qnoopt -qfullpath
+FCBASEOPTS      =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767 #-qflttrap=zerodivide:invalid:enable -qsigtrap
+FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS)
+# machine-specific flags needed to link in ESMF library (C++ run-time-library, etc.)
+ESMF_LIB_FLAGS  =       -lC
+ESMF_IO_LIB     =       ESMFIOLIB
+ESMF_IO_LIB_EXT =       ESMFIOEXTLIB
+INCLUDE_MODULES =       -I../external/io_netcdf -I../external/io_int  -I../external/esmf_time_f90 \
+                        -I../frame -I../share -I../phys -I../chem -I../inc
+ARCHFLAGS       =       -DRSL_LITE -DDM_PARALLEL -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) \
+                        -DLWORDSIZE=4 CONFIGURE_NETCDF_FLAG -DTRIEDNTRUE -DGRIB1 CONFIGURE_GRIB2_FLAG -DINTIO \
+			-DLIMIT_ARGS -DNO_NAMELIST_PRINT -DNATIVE_MASSV -DNMM_NEST=$(WRF_NMM_NEST)
+PERL            =       perl
+REGISTRY        =       Registry
+LIB             =       CONFIGURE_NETCDF_LIB_PATH -L../external/RSL_LITE -lrsl_lite -lmass -lmassv \
+                        -L../external/io_int -lwrfio_int  \
+                        -L../external/io_grib1 -lio_grib1 \
+                        CONFIGURE_GRIB2_LIB \
+                        -L../external/io_grib_share -lio_grib_share \
+			../frame/module_internal_header_util.o ../frame/pack_utils.o -L../external/esmf_time_f90 -lesmf_time 
+LDFLAGS         =	 CONFIGURE_LDFLAGS
+ENVCOMPDEFS	=	CONFIGURE_COMPILEFLAGS
+CPP		=	/lib/cpp
+POUND_DEF	=	-DNONSTANDARD_SYSTEM -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+CPPFLAGS	=	-I$(LIBINCLUDE) -C -P $(ARCHFLAGS) -I../external/RSL_LITE `cat ../inc/dm_comm_cpp_flags` $(COREDEFS) $(ENVCOMPDEFS) $(POUND_DEF)
+MAX_PROC        =       1024
+AR              =       ar ru
+M4              =       m4 -B 14000
+RANLIB          =       ranlib
+NETCDFPATH	=	CONFIGURE_NETCDF_PATH
+CC_TOOLS        =       cc
+
+externals : wrf_ioapi_includes CONFIGURE_WRFIO_NF wrfio_grib_share wrfio_grib1 CONFIGURE_WRFIO_GRIB2 ../external/RSL_LITE/librsl_lite.a wrfio_int gen_comms.c module_dm.F esmf_time
+
+gen_comms.c : ../external/RSL_LITE/gen_comms.c
+	( /bin/cp ../tools/gen_comms_warning ../tools/gen_comms.c ; cat ../external/RSL_LITE/gen_comms.c >> ../tools/gen_comms.c )
+
+module_dm.F : ../external/RSL_LITE/module_dm.F
+	( /bin/cp module_dm_warning module_dm.F ; cat ../external/RSL_LITE/module_dm.F >> module_dm.F )
+
+wrfio_nf : 
+	( cd ../external/io_netcdf ; make NETCDFPATH=CONFIGURE_NETCDF_PATH RANLIB="$(RANLIB)" CPP="$(CPP)" FC="$(SFC) $(PROMOTION) $(FCDEBUG) -qarch=auto -qzerosize" )
+
+wrfio_int : 
+	( cd ../external/io_int ; \
+          make CC="$(CC)" RANLIB="$(RANLIB)" CPP="$(CPP)" SFC="$(SFC) $(PROMOTION) $(FCDEBUG) $(FCBASEOPTS)" FC="$(SFC) $(PROMOTION) $(FCDEBUG) -qarch=auto -qzerosize" all )
+
+wrfio_grib_share :
+	( cd ../external/io_grib_share ; \
+          make CC="$(SCC)" CFLAGS="$(CFLAGS)" RM="$(RM)" RANLIB="$(RANLIB)" CPP="$(CPP)" FC="$(SFC) $(PROMOTION) $(FCDEBUG) -qarch=auto -qzerosize" archive)
+
+wrfio_grib1 :
+	( cd ../external/io_grib1 ; \
+          make CC="$(SCC)" CFLAGS="$(CFLAGS)" RANLIB="$(RANLIB)" CPP="$(CPP)" FC="$(SFC) $(PROMOTION) $(FCDEBUG) -qarch=auto -qzerosize" archive )
+
+wrfio_grib2 :
+	( cd ../external/io_grib2 ; \
+          make CC="$(SCC)" CFLAGS="$(CFLAGS) CONFIGURE_GRIB2_INC -qcpluscmt" RM="$(RM)" RANLIB="$(RANLIB)" CPP="$(CPP)" FC="$(SFC) $(PROMOTION) $(FCDEBUG) -qarch=auto -qzerosize" FREE="" FIXED="-qfixed" archive )
+
+esmf_time : 
+	( cd ../external/esmf_time_f90 ; \
+	  make FC="$(FC) $(PROMOTION) $(FCDEBUG) $(FCBASEOPTS)" RANLIB="$(RANLIB)" CPP="$(CPP) -I../../inc -I. $(POUND_DEF)" )
+
+../external/RSL_LITE/librsl_lite.a :
+	( cd ../external/RSL_LITE ; make CFLAGS="$(CFLAGS)" CC="$(CC)" FC="$(SFC) $(PROMOTION) $(FCFLAGS)" MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) LEARN_BCAST=-DLEARN_BCAST )
+
+# compile these without high optimization
+module_io_mm5.o : module_io_mm5.F
+module_si_io.o : module_si_io.F
+module_io_wrf.o : module_io_wrf.F
+module_domain.o : module_domain.F
+module_start.o : module_start.F
+module_initialize.o : module_initialize.F
+module_initialize_b_wave.o : module_initialize_b_wave.F
+module_initialize_hill2d_x.o : module_initialize_hill2d_x.F
+module_initialize_quarter_ss.o : module_initialize_quarter_ss.F
+module_initialize_squall2d_x.o : module_initialize_squall2d_x.F
+module_initialize_squall2d_y.o : module_initialize_squall2d_y.F
+module_initialize_real.o : module_initialize_real.F
+module_dm.o : module_dm.F
+start_domain.o : start_domain.F
+mediation_integrate.o : mediation_integrate.F
+mediation_interp_domain.o : mediation_interp_domain.F
+mediation_force_domain.o : mediation_force_domain.F
+mediation_feedback_domain.o : mediation_feedback_domain.F
+convert_nmm.o : convert_nmm.F
+solve_interface.o : solve_interface.F
+shift_domain_em.o : shift_domain_em.F
+solve_em.o : solve_em.F
+
+module_io_mm5.o module_si_io.o module_io_wrf.o module_domain.o \
+module_start.o module_initialize.o module_initialize_b_wave.o  \
+module_initialize_hill2d_x.o module_initialize_quarter_ss.o    \
+module_initialize_squall2d_x.o module_initialize_squall2d_y.o  \
+module_initialize_real.o module_dm.o start_domain.o \
+mediation_force_domain.o \
+mediation_integrate.o \
+mediation_interp_domain.o \
+mediation_feedback_domain.o \
+solve_interface.o                                              \
+shift_domain_em.o                                              \
+solve_em.o                                              \
+convert_nmm.o    :
+	$(RM) $@
+	$(SED_FTN) $*.F > $*.b 
+	$(CPP) -I../inc $(CPPFLAGS) $*.b  > $*.f
+	$(RM) $*.b
+	$(FC) -c $(PROMOTION) $(FCBASEOPTS) $(MODULE_DIRS) -qnoopt $*.f
 
 ###########################################################
 #ARCH	AIX DM-Parallel          (RSL, IBM-MPI, allows nesting)
@@ -1515,6 +1643,7 @@ mediation_feedback_domain.o : mediation_feedback_domain.F
 convert_nmm.o : convert_nmm.F
 solve_interface.o : solve_interface.F
 shift_domain_em.o : shift_domain_em.F
+solve_em.o : solve_em.F
 
 module_io_mm5.o module_si_io.o module_io_wrf.o module_domain.o \
 module_start.o module_initialize.o module_initialize_b_wave.o  \
@@ -1527,6 +1656,7 @@ mediation_interp_domain.o \
 mediation_feedback_domain.o \
 solve_interface.o                                              \
 shift_domain_em.o                                              \
+solve_em.o                                              \
 convert_nmm.o    :
 	$(RM) $@
 	$(SED_FTN) $*.F > $*.b 
@@ -1642,6 +1772,7 @@ mediation_feedback_domain.o : mediation_feedback_domain.F
 convert_nmm.o : convert_nmm.F
 solve_interface.o : solve_interface.F
 shift_domain_em.o : shift_domain_em.F
+solve_em.o : solve_em.F
 
 module_io_mm5.o module_si_io.o module_io_wrf.o module_domain.o \
 module_start.o module_initialize.o module_initialize_b_wave.o  \
@@ -1654,6 +1785,136 @@ mediation_interp_domain.o \
 mediation_feedback_domain.o \
 solve_interface.o                                              \
 shift_domain_em.o                                              \
+solve_em.o                                              \
+convert_nmm.o    :
+	$(RM) $@
+	$(SED_FTN) $*.F > $*.b 
+	$(CPP) -I../inc $(CPPFLAGS) $*.b  > $*.f
+	$(RM) $*.b
+	$(FC) -c $(PROMOTION) $(FCBASEOPTS) $(MODULE_DIRS) -qnoopt $*.f
+
+###########################################################
+#ARCH	AIX DM-Parallel          (RSL_LITE, IBM-MPI, Allows nesting )(PARALLEL HDF5)
+#
+# Notes: for experimental implementation of moving nests, add -DMOVE_NESTS to ARCHFLAGS
+#        for experimental implementation of vortex tracking nests, add -DMOVE_NESTS -DVORTEX_CENTER to ARCHFLAGS
+#
+DMPARALLEL      =       1
+SFC             =       xlf90_r
+SCC             =       cc_r
+FC              =       mpxlf90_r
+LD              =       mpxlf90_r
+CC              =       mpcc_r
+RWORDSIZE       =       $(NATIVE_RWORDSIZE)
+PROMOTION	=	-qrealsize=$(RWORDSIZE) -qintsize=4
+CFLAGS          =       -DNOUNDERSCORE  -I../external/RSL_LITE -DDM_PARALLEL  \
+                        -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) -DNCARIBM_NOC99
+FCOPTIM         =       -O2 -qarch=auto 
+FCDEBUG         =       # -qnoopt -qfullpath
+FCBASEOPTS      =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=-1 #-qflttrap=zerodivide:invalid:enable -qsigtrap
+FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS)
+# machine-specific flags needed to link in ESMF library (C++ run-time-library, etc.)
+ESMF_LIB_FLAGS  =       -lC
+ESMF_IO_LIB     =       ESMFIOLIB
+ESMF_IO_LIB_EXT =       ESMFIOEXTLIB
+INCLUDE_MODULES =       -I../external/io_netcdf  -I../external/io_phdf5 -I../external/io_int  -I../external/esmf_time_f90 \
+                        -I../frame -I../share -I../phys -I../inc
+ARCHFLAGS       =       -DRSL_LITE -DDM_PARALLEL -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) \
+                        -DLWORDSIZE=4 CONFIGURE_NETCDF_FLAG CONFIGURE_PHDF5_FLAG -DTRIEDNTRUE   -DGRIB1 CONFIGURE_GRIB2_FLAG -DINTIO \
+			-DLIMIT_ARGS -DNO_NAMELIST_PRINT -DNATIVE_MASSV
+PERL            =       perl
+REGISTRY        =       Registry
+LIB             =       CONFIGURE_NETCDF_LIB_PATH CONFIGURE_PHDF5_LIB_PATH -L../external/RSL_LITE -lrsl_lite -lmass -lmassv \
+                        -L../external/io_int -lwrfio_int  \
+                        -L../external/io_grib1 -lio_grib1 \
+                        CONFIGURE_GRIB2_LIB \
+                        -L../external/io_grib_share -lio_grib_share \
+			../frame/module_internal_header_util.o ../frame/pack_utils.o -L../external/esmf_time_f90 -lesmf_time 
+LDFLAGS         =	 CONFIGURE_LDFLAGS
+ENVCOMPDEFS	=	CONFIGURE_COMPILEFLAGS
+CPP		=	/lib/cpp
+POUND_DEF	=	-DNONSTANDARD_SYSTEM -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+CPPFLAGS	=	-I$(LIBINCLUDE) -C -P $(ARCHFLAGS) -I../external/RSL_LITE `cat ../inc/dm_comm_cpp_flags` $(COREDEFS) $(ENVCOMPDEFS) $(POUND_DEF)
+MAX_PROC        =       1024
+AR              =       ar ru
+M4              =       m4 -B 14000
+RANLIB          =       ranlib
+NETCDFPATH	=	CONFIGURE_NETCDF_PATH
+CC_TOOLS        =       cc
+
+externals : wrf_ioapi_includes CONFIGURE_WRFIO_NF wrfio_grib_share wrfio_grib1 CONFIGURE_WRFIO_GRIB2 CONFIGURE_WRFIO_PHDF5 ../external/RSL_LITE/librsl_lite.a wrfio_int gen_comms.c module_dm.F esmf_time
+
+gen_comms.c : ../external/RSL_LITE/gen_comms.c
+	( /bin/cp ../tools/gen_comms_warning ../tools/gen_comms.c ; cat ../external/RSL_LITE/gen_comms.c >> ../tools/gen_comms.c )
+
+module_dm.F : ../external/RSL_LITE/module_dm.F
+	( /bin/cp module_dm_warning module_dm.F ; cat ../external/RSL_LITE/module_dm.F >> module_dm.F )
+
+wrfio_nf : 
+	( cd ../external/io_netcdf ; make NETCDFPATH=CONFIGURE_NETCDF_PATH RANLIB="$(RANLIB)" CPP="$(CPP)" FC="$(SFC) $(PROMOTION) $(FCDEBUG) -qarch=auto -qzerosize" )
+
+wrfio_phdf5 : 
+	( cd ../external/io_phdf5 ; make PHDF5PATH=CONFIGURE_PHDF5_PATH FC="$(FC) $(PROMOTION) $(FCDEBUG) -qarch=auto -qfree=F90 -qzerosize" ; /bin/cp wrf_io_flags.h wrf_status_codes.h ../../inc )
+
+wrfio_int : 
+	( cd ../external/io_int ; \
+          make CC="$(CC)" RANLIB="$(RANLIB)" CPP="$(CPP)" SFC="$(SFC) $(PROMOTION) $(FCDEBUG) $(FCBASEOPTS)" FC="$(SFC) $(PROMOTION) $(FCDEBUG) -qarch=auto -qzerosize" all )
+
+wrfio_grib_share :
+	( cd ../external/io_grib_share ; \
+          make CC="$(SCC)" CFLAGS="$(CFLAGS)" RM="$(RM)" RANLIB="$(RANLIB)" CPP="$(CPP)" FC="$(SFC) $(PROMOTION) $(FCDEBUG) -qarch=auto -qzerosize" archive)
+
+wrfio_grib1 :
+	( cd ../external/io_grib1 ; \
+          make CC="$(SCC)" CFLAGS="$(CFLAGS)" RANLIB="$(RANLIB)" CPP="$(CPP)" FC="$(SFC) $(PROMOTION) $(FCDEBUG) -qarch=auto -qzerosize" archive )
+
+wrfio_grib2 :
+	( cd ../external/io_grib2 ; \
+          make CC="$(SCC)" CFLAGS="$(CFLAGS) CONFIGURE_GRIB2_INC -qcpluscmt" RM="$(RM)" RANLIB="$(RANLIB)" CPP="$(CPP)" FC="$(SFC) $(PROMOTION) $(FCDEBUG) -qarch=auto -qzerosize" FREE="" FIXED="-qfixed" archive )
+
+esmf_time : 
+	( cd ../external/esmf_time_f90 ; \
+	  make FC="$(FC) $(PROMOTION) $(FCDEBUG) $(FCBASEOPTS)" RANLIB="$(RANLIB)" CPP="$(CPP) -I../../inc -I. $(POUND_DEF)" )
+
+../external/RSL_LITE/librsl_lite.a :
+	( cd ../external/RSL_LITE ; make CC="$(CC)" CFLAGS="$(CFLAGS)" FC="$(SFC) $(PROMOTION) $(FCFLAGS)" MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) LEARN_BCAST=-DLEARN_BCAST )
+
+# compile these without high optimization
+module_io_mm5.o : module_io_mm5.F
+module_si_io.o : module_si_io.F
+module_io_wrf.o : module_io_wrf.F
+module_domain.o : module_domain.F
+module_start.o : module_start.F
+module_initialize.o : module_initialize.F
+module_initialize_b_wave.o : module_initialize_b_wave.F
+module_initialize_hill2d_x.o : module_initialize_hill2d_x.F
+module_initialize_quarter_ss.o : module_initialize_quarter_ss.F
+module_initialize_squall2d_x.o : module_initialize_squall2d_x.F
+module_initialize_squall2d_y.o : module_initialize_squall2d_y.F
+module_initialize_real.o : module_initialize_real.F
+module_dm.o : module_dm.F
+start_domain.o : start_domain.F
+mediation_integrate.o : mediation_integrate.F
+mediation_interp_domain.o : mediation_interp_domain.F
+mediation_force_domain.o : mediation_force_domain.F
+mediation_feedback_domain.o : mediation_feedback_domain.F
+convert_nmm.o : convert_nmm.F
+solve_interface.o : solve_interface.F
+shift_domain_em.o : shift_domain_em.F
+solve_em.o : solve_em.F
+
+module_io_mm5.o module_si_io.o module_io_wrf.o module_domain.o \
+module_start.o module_initialize.o module_initialize_b_wave.o  \
+module_initialize_hill2d_x.o module_initialize_quarter_ss.o    \
+module_initialize_squall2d_x.o module_initialize_squall2d_y.o  \
+module_initialize_real.o module_dm.o start_domain.o \
+mediation_force_domain.o \
+mediation_integrate.o \
+mediation_interp_domain.o \
+mediation_feedback_domain.o \
+solve_interface.o                                              \
+shift_domain_em.o                                              \
+solve_em.o                                              \
 convert_nmm.o    :
 	$(RM) $@
 	$(SED_FTN) $*.F > $*.b 
@@ -1668,7 +1929,7 @@ convert_nmm.o    :
 #        for experimental implementation of vortex tracking nests, add -DMOVE_NESTS -DVORTEX_CENTER to ARCHFLAGS
 #
 DMPARALLEL      =       1
-OMP             =       -qsmp=noauto
+OMP             =       -qsmp=noauto:noopt
 OMPCPP          =       -D_OPENMP
 SFC		=	xlf90_r
 SCC             =       cc_r
@@ -1767,6 +2028,7 @@ mediation_feedback_domain.o : mediation_feedback_domain.F
 convert_nmm.o : convert_nmm.F
 module_configure.o : module_configure.F
 shift_domain_em.o : shift_domain_em.F
+solve_em.o : solve_em.F
 
 module_io_mm5.o module_si_io.o module_io_wrf.o \
 module_start.o module_initialize.o module_initialize_b_wave.o  \
@@ -1777,6 +2039,7 @@ convert_nmm.o \
 module_configure.o                                             \
 solve_interface.o                                              \
 shift_domain_em.o                                              \
+solve_em.o                                              \
 mediation_integrate.o \
 mediation_interp_domain.o :
 	$(RM) $@
@@ -1922,6 +2185,7 @@ mediation_feedback_domain.o : mediation_feedback_domain.F
 convert_nmm.o : convert_nmm.F
 solve_interface.o : solve_interface.F
 shift_domain_em.o : shift_domain_em.F
+solve_em.o : solve_em.F
 
 module_io_mm5.o module_si_io.o module_io_wrf.o module_domain.o \
 module_start.o module_initialize.o module_initialize_b_wave.o  \
@@ -1934,6 +2198,7 @@ mediation_interp_domain.o \
 mediation_feedback_domain.o \
 solve_interface.o                                              \
 shift_domain_em.o                                              \
+solve_em.o                                              \
 convert_nmm.o :
 	$(RM) $@
 	$(SED_FTN) $*.F > $*.b 
@@ -2048,6 +2313,7 @@ mediation_feedback_domain.o : mediation_feedback_domain.F
 convert_nmm.o : convert_nmm.F
 solve_interface.o : solve_interface.F
 shift_domain_em.o : shift_domain_em.F
+solve_em.o : solve_em.F
 
 module_io_mm5.o module_si_io.o module_io_wrf.o module_domain.o \
 module_start.o module_initialize.o module_initialize_b_wave.o  \
@@ -2060,6 +2326,7 @@ mediation_interp_domain.o \
 mediation_feedback_domain.o \
 solve_interface.o                                              \
 shift_domain_em.o                                              \
+solve_em.o                                              \
 convert_nmm.o    :
 	$(RM) $@
 	$(SED_FTN) $*.F > $*.b 
@@ -2073,7 +2340,7 @@ convert_nmm.o    :
 # Notes: for experimental implementation of moving nests, add -DMOVE_NESTS to ARCHFLAGS
 #        for experimental implementation of vortex tracking nests, add -DMOVE_NESTS -DVORTEX_CENTER to ARCHFLAGS
 #
-OMP             =       -qsmp=noauto
+OMP             =       -qsmp=noauto:noopt
 OMPCPP          =       -D_OPENMP
 DMPARALLEL      =       1
 SFC             =       xlf90_r
@@ -2169,6 +2436,7 @@ start_domain.o : start_domain.F
 convert_nmm.o : convert_nmm.F
 solve_interface.o : solve_interface.F
 shift_domain_em.o : shift_domain_em.F
+solve_em.o : solve_em.F
 
 module_io_mm5.o module_si_io.o module_io_wrf.o \
 module_start.o module_initialize.o module_initialize_b_wave.o  \
@@ -2177,6 +2445,7 @@ module_initialize_squall2d_x.o module_initialize_squall2d_y.o  \
 start_domain.o \
 solve_interface.o                                              \
 shift_domain_em.o                                              \
+solve_em.o                                              \
 convert_nmm.o    :
 	$(RM) $@
 	$(SED_FTN) $*.F > $*.b 
@@ -2727,6 +2996,157 @@ nest_init_utils.o : nest_init_utils.F
 module_optional_si_input.o : module_optional_si_input.F
 
 nest_init_utils.o module_optional_si_input.o :
+	$(RM) $@
+	$(SED_FTN) $*.F > $*.b 
+	$(CPP) -I../inc $(CPPFLAGS) $*.b  > $*.f
+	$(RM) $*.b
+	$(FC) -c $(PROMOTION) -w -convert big_endian -automatic -cpp -free -I. -arch host $(MODULE_DIRS) $*.f
+
+# compile these without high optimization to speed compile
+module_io_mm5.o : module_io_mm5.F
+module_si_io.o : module_si_io.F
+module_io_wrf.o : module_io_wrf.F
+module_domain.o : module_domain.F
+module_start.o : module_start.F
+module_initialize.o : module_initialize.F
+module_initialize_b_wave.o : module_initialize_b_wave.F
+module_initialize_hill2d_x.o : module_initialize_hill2d_x.F
+module_initialize_quarter_ss.o : module_initialize_quarter_ss.F
+module_initialize_squall2d_x.o : module_initialize_squall2d_x.F
+module_initialize_squall2d_y.o : module_initialize_squall2d_y.F
+module_initialize_real.o : module_initialize_real.F
+start_domain.o : start_domain.F
+module_configure.o : module_configure.F
+mediation_interp_domain.o : mediation_interp_domain.F
+mediation_force_domain.o : mediation_force_domain.F
+mediation_feedback_domain.o : mediation_feedback_domain.F
+
+module_io_mm5.o module_si_io.o module_io_wrf.o module_domain.o \
+module_start.o module_initialize.o module_initialize_b_wave.o  \
+module_initialize_hill2d_x.o module_initialize_quarter_ss.o    \
+module_initialize_squall2d_x.o module_initialize_squall2d_y.o  \
+module_configure.o                                             \
+mediation_interp_domain.o  \
+mediation_force_domain.o  \
+mediation_feedback_domain.o  \
+module_initialize_real.o start_domain.o :
+	$(RM) $@
+	$(SED_FTN) $*.F > $*.b 
+	$(CPP) -I../inc $(CPPFLAGS) $*.b  > $*.f
+	$(RM) $*.b
+	$(FC) -c $(PROMOTION) $(FCBASEOPTS) $(MODULE_DIRS) -O0 $*.f
+
+mediation_integrate.o : mediation_integrate.F
+module_dm.o : module_dm.F
+mediation_wrfmain.o : mediation_wrfmain.F
+
+mediation_integrate.o module_dm.o mediation_wrfmain.o : 
+	$(RM) $@
+	$(SED_FTN) $*.F > $*.b
+	$(CPP) -I../inc $(CPPFLAGS) $*.b  > $*.f
+	$(RM) $*.b
+	$(FC) -c $(PROMOTION) $(FCBASEOPTS_ESMF) $(MODULE_DIRS) -O0 $*.f
+
+###########################################################
+#ARCH     Compaq OSF1 alpha DM-Parallel       (RSL_LITE, MPICH, allows nesting)
+#
+# Notes: for experimental implementation of moving nests, add -DMOVE_NESTS to ARCHFLAGS
+#        for experimental implementation of vortex tracking nests, add -DMOVE_NESTS -DVORTEX_CENTER to ARCHFLAGS
+#
+DMPARALLEL      =       1
+OMP             =
+OMPCPP          =
+FC              =       mpif90
+SFC		=	f90
+LD              =       mpif90
+CC              =       mpicc
+SCC		=	cc
+RWORDSIZE       =       $(NATIVE_RWORDSIZE)
+RSIZEBITS	=	`expr $(RWORDSIZE) \* 8`
+ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DNETCDF -DGRIB1 CONFIGURE_GRIB2_FLAG -DINTIO \
+                        -DDM_PARALLEL -DRSL_LITE \
+                        -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4 \
+                        -DTRIEDNTRUE   \
+			-DLIMIT_ARGS -DFLOATSAFE \
+			-DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC)
+PROMOTION	=	-real_size $(RSIZEBITS) -integer_size `expr 4 \* 8`
+CFLAGS          =       $(ARCHFLAGS) -I../external/RSL_LITE
+FCOPTIM         =       -fast -O4
+FCDEBUG         =       #-g
+FCDEBUG_ESMF    =       # -O0
+FCBASEOPTS      =       -w -convert big_endian -automatic -cpp -free -I. -arch host $(FCDEBUG)
+FCBASEOPTS_ESMF =       -w -convert big_endian -automatic -cpp -free -I. -arch host $(FCDEBUG_ESMF)
+FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS) $(OMP)
+FCFLAGS_ESMF    =       $(FCOPTIM) $(FCBASEOPTS_ESMF) $(OMP)
+# machine-specific flags needed to link in ESMF library (C++ run-time-library, etc.)
+ESMF_LIB_FLAGS  =       
+ESMF_IO_LIB     =       ESMFIOLIB
+ESMF_IO_LIB_EXT =       ESMFIOEXTLIB
+INCLUDE_MODULES =       -I../external/io_netcdf -I../external/io_int  -I../external/esmf_time_f90 \
+                        -I../frame -I../share -I../phys -I../chem -I../inc
+PERL            =       CONFIGURE_PERL_PATH
+REGISTRY        =       Registry
+LIB             =       CONFIGURE_NETCDF_LIB_PATH -L../external/io_int -lwrfio_int \
+                        -L../external/RSL_LITE -lrsl_lite  \
+			../frame/module_internal_header_util.o ../frame/pack_utils.o -L../external/esmf_time_f90 -lesmf_time \
+                        -L../external/io_grib1 -lio_grib1 \
+                        CONFIGURE_GRIB2_LIB \
+                        -L../external/io_grib_share -lio_grib_share
+LDFLAGS         =       $(FCOPTIM) -automatic -convert big_endian $(OMP) CONFIGURE_LDFLAGS
+ENVCOMPDEFS	=	CONFIGURE_COMPILEFLAGS
+CPP             =       /usr/bin/cpp -C -P
+POUND_DEF	=	-DDEC_ALPHA -DNONSTANDARD_SYSTEM -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+CPPFLAGS        =       -I$(LIBINCLUDE) -C -P $(ARCHFLAGS) -I../external/RSL_LITE -C -P $(OMPCPP) $(COREDEFS) $(ENVCOMPDEFS) $(POUND_DEF)
+MAX_PROC        =       1024
+AR              =       ar ru
+M4              =       m4 -B 14000
+RANLIB          =       ranlib
+NETCDFPATH	=	CONFIGURE_NETCDF_PATH
+CC_TOOLS        =       cc
+
+externals : wrf_ioapi_includes CONFIGURE_WRFIO_NF wrfio_grib_share wrfio_grib1 CONFIGURE_WRFIO_GRIB2 wrfio_int ../external/RSL_LITE/librsl_lite.a gen_comms.c module_dm.F esmf_time
+
+gen_comms.c : ../external/RSL_LITE/gen_comms.c
+	( /bin/cp ../tools/gen_comms_warning ../tools/gen_comms.c ; \
+          cat ../external/RSL_LITE/gen_comms.c >> ../tools/gen_comms.c )
+
+module_dm.F : ../external/RSL_LITE/module_dm.F
+	( /bin/cp module_dm_warning module_dm.F ; \
+          cat ../external/RSL_LITE/module_dm.F >> module_dm.F )
+
+wrfio_nf : 
+	( cd ../external/io_netcdf ; \
+	  make NETCDFPATH=CONFIGURE_NETCDF_PATH RANLIB="$(RANLIB)" CPP="$(CPP)" FC="$(FC) $(PROMOTION) $(FCDEBUG) -convert big_endian -automatic -cpp -free -w" )
+
+wrfio_int : 
+	( cd ../external/io_int ; \
+          make CC="$(CC)" RANLIB="$(RANLIB)" CPP="$(CPP)" SFC="$(SFC) $(PROMOTION) $(FCDEBUG) $(FCBASEOPTS)" FC="$(FC) $(PROMOTION) $(FCDEBUG) -convert big_endian -automatic -cpp -free -w" all )
+
+wrfio_grib_share :
+	( cd ../external/io_grib_share ; \
+          make IO_GRIB_SHARE_DIR="$(WRF_SRC_ROOT_DIR)/external/io_grib_share/" CC="$(SCC)" CFLAGS="$(CFLAGS)" RM="$(RM)" RANLIB="$(RANLIB)" CPP="$(CPP)" FC="$(SFC) $(PROMOTION) $(FCDEBUG) -convert big_endian -automatic -cpp -free -w " archive)
+
+wrfio_grib1 :
+	( cd ../external/io_grib1 ; \
+          make IO_GRIB_SHARE_DIR="$(WRF_SRC_ROOT_DIR)/external/io_grib_share/" CC="$(SCC)" CFLAGS="$(CFLAGS)" RANLIB="$(RANLIB)" CPP="$(CPP)" FC="$(SFC) $(PROMOTION) $(FCDEBUG) -convert big_endian -automatic -cpp -free -w " archive )
+
+wrfio_grib2 :
+	( cd ../external/io_grib2 ; \
+          make IO_GRIB_SHARE_DIR="$(WRF_SRC_ROOT_DIR)/external/io_grib_share/" CC="$(SCC)" CFLAGS="$(CFLAGS) CONFIGURE_GRIB2_INC" RM="$(RM)" RANLIB="$(RANLIB)" CPP="$(CPP)" FC="$(SFC) $(PROMOTION) $(FCDEBUG) -convert big_endian -automatic -cpp -free -w " archive )
+
+esmf_time : 
+	( cd ../external/esmf_time_f90 ; \
+	  make FC="$(FC) $(PROMOTION) $(FCFLAGS_ESMF)" RANLIB="$(RANLIB)" CPP="$(CPP) -I../../inc -I. $(POUND_DEF)" )
+
+../external/RSL_LITE/librsl_lite.a :
+	( cd ../external/RSL_LITE ; \
+          make CC="$(CC)" FC="$(FC) $(PROMOTION) $(FCFLAGS)" MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) )
+
+nest_init_utils.o : nest_init_utils.F
+module_optional_si_input.o : module_optional_si_input.F
+module_IGWAVE_ADJUST.o : module_IGWAVE_ADJUST.F
+
+nest_init_utils.o module_optional_si_input.o module_IGWAVE_ADJUST.o:
 	$(RM) $@
 	$(SED_FTN) $*.F > $*.b 
 	$(CPP) -I../inc $(CPPFLAGS) $*.b  > $*.f
@@ -4604,71 +5024,65 @@ module_initialize_real.o module_dm.o start_domain.o :
 #PGI	fi
 
 ###########################################################
-#ARCH    PC Linux i486 i586 i686, g95 compiler  (DM-Parallel, RSL, MPICH)
+#ARCH     PC Linux i486 i586 i686, PGI compiler  DM-Parallel (RSL_LITE, MPICH, Allows nesting)
 #
 # Notes: for experimental implementation of moving nests, add -DMOVE_NESTS to ARCHFLAGS
 #        for experimental implementation of vortex tracking nests, add -DMOVE_NESTS -DVORTEX_CENTER to ARCHFLAGS
 #
 DMPARALLEL      =       1
 MAX_PROC        =       1024
-FC              =       mpif90
-LD              =       mpif90
-CC              =       mpicc
-SCC		=	$(CC)
-SFC             =       g95
-RWORDSIZE       =       8
-FCOPTIM		=	-O0 # -fast
+FC              =       mpif90 -f90=pgf90
+LD              =       mpif90 -f90=pgf90
+CC              =       mpicc -cc=gcc
+SCC		=	gcc
+SFC             =       pgf90
+RWORDSIZE       =       $(NATIVE_RWORDSIZE)
+PROMOTION	=	-r$(RWORDSIZE) -i4
+CFLAGS          =       -DDM_PARALLEL \
+                        -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) -I../external/RSL_LITE
+#FCOPTIM		=	-fastsse 
+FCOPTIM		=	-O2 # -fast
 FCDEBUG		=	#-g
-FCBASEOPTS      =       -cpp -Wno=101,139,155,158 -fno-second-underscore \
-                           -ftrace=full -finteger=-9999 -freal=nan -C -ffree-form  -ffree-line-length-huge
+#FCBASEOPTS      =       -w -byteswapio -Ktrap=fp -Mfree -tp p6 $(FCDEBUG)
+FCBASEOPTS      =       -w -byteswapio -Mfree -tp p6 $(FCDEBUG) # -Mlfs
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS)
-ARCHFLAGS       =       -DGRIB1 CONFIGURE_GRIB2_FLAG -DINTIO -DWRF_RSL_IO -DRSL -DDM_PARALLEL \
+ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DGRIB1 CONFIGURE_GRIB2_FLAG -DINTIO -DDM_PARALLEL \
                         -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4 CONFIGURE_NETCDF_FLAG \
                         -DTRIEDNTRUE   \
 			-DLIMIT_ARGS
-PROMOTION	=	-r$(RWORDSIZE) -i4
-CFLAGS          =       -DDM_PARALLEL -DWRF_RSL_IO \
-                        -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) -I../external/RSL/RSL $(ARCHFLAGS)
 # machine-specific flags needed to link in ESMF library (C++ run-time-library, etc.)
 ESMF_LIB_FLAGS  =       
 ESMF_IO_LIB     =       ESMFIOLIB
 ESMF_IO_LIB_EXT =       ESMFIOEXTLIB
-INCLUDE_MODULES =       -I../main -I../external/io_netcdf -I../external/io_int -I../external/esmf_time_f90 \
-                        -I../external -I../frame -I../share -I../phys -I../inc
+INCLUDE_MODULES =       -module ../main -I../external/io_netcdf -I../external/io_int -I../external/esmf_time_f90 \
+                        -I../external -I../frame -I../share -I../phys -I../chem -I../inc
 PERL            =       perl
 REGISTRY        =       Registry
-LIB             =       CONFIGURE_NETCDF_LIB_PATH -L../external/RSL/RSL -lrsl \
+LIB             =       CONFIGURE_NETCDF_LIB_PATH -L../external/RSL_LITE -lrsl_lite \
                         -L../external/io_grib1 -lio_grib1 \
                         CONFIGURE_GRIB2_LIB \
                         -L../external/io_grib_share -lio_grib_share \
 			-L../external/io_int -lwrfio_int \
-			../frame/module_internal_header_util.o ../frame/pack_utils.o \
-                        -L../external/esmf_time_f90 -lesmf_time
-LDFLAGS         =       $(FCFLAGS) CONFIGURE_LDFLAGS
+			../frame/module_internal_header_util.o ../frame/pack_utils.o -L../external/esmf_time_f90 -lesmf_time 
+LDFLAGS         =       -byteswapio $(FCFLAGS) CONFIGURE_LDFLAGS
 ENVCOMPDEFS	=	CONFIGURE_COMPILEFLAGS
-CPP             =       /lib/cpp -C -P -traditional -I$(DEVTOP)/external/ioapi_share
-POUND_DEF	=	-DNO_RRTM_PHYSICS  $(COREDEFS) -DNONSTANDARD_SYSTEM -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
-CPPFLAGS        =       -I$(LIBINCLUDE) -C -P $(ARCHFLAGS) -I../external/RSL/RSL -C -P `cat ../inc/dm_comm_cpp_flags` $(ENVCOMPDEFS) $(POUND_DEF)
+CPP             =       /lib/cpp -C -P -traditional
+POUND_DEF	=	-DNO_RRTM_PHYSICS  -traditional $(COREDEFS) -DNONSTANDARD_SYSTEM -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+CPPFLAGS        =       -I$(LIBINCLUDE) -C -P $(ARCHFLAGS) -I../external/RSL_LITE -C -P `cat ../inc/dm_comm_cpp_flags` $(ENVCOMPDEFS) $(POUND_DEF)
 AR              =       ar ru
 M4              =       m4 -B 14000
 RANLIB          =       ranlib
 NETCDFPATH	=	CONFIGURE_NETCDF_PATH
 CC_TOOLS        =       cc
-                    
-FPPFLAGS_BUFR   = -C -P  $(TRADFLAG) -DLINUX -Dlinux
-CCFLAGS_BUFR    = -DUNDERSCORE
-FIXEDFLAGS_BUFR = -fno-second-underscore
-FIXEDFLAGS_WRFVAR = -fno-second-underscore
 
+externals : wrf_ioapi_includes CONFIGURE_WRFIO_NF wrfio_grib_share wrfio_grib1 CONFIGURE_WRFIO_GRIB2 ../external/RSL_LITE/librsl_lite.a wrfio_int gen_comms.c module_dm.F esmf_time
 
-externals : wrf_ioapi_includes CONFIGURE_WRFIO_NF wrfio_grib_share wrfio_grib1 CONFIGURE_WRFIO_GRIB2 ../external/RSL/RSL/librsl.a wrfio_int gen_comms.c module_dm.F esmf_time
-
-gen_comms.c : ../external/RSL/gen_comms.c
+gen_comms.c : ../external/RSL_LITE/gen_comms.c
 	( /bin/cp ../tools/gen_comms_warning ../tools/gen_comms.c ; \
-          cat ../external/RSL/gen_comms.c >> ../tools/gen_comms.c )
+          cat ../external/RSL_LITE/gen_comms.c >> ../tools/gen_comms.c )
 
-module_dm.F : ../external/RSL/module_dm.F
-	( /bin/cp module_dm_warning module_dm.F ; cat ../external/RSL/module_dm.F >> module_dm.F )
+module_dm.F : ../external/RSL_LITE/module_dm.F
+	( /bin/cp module_dm_warning module_dm.F ; cat ../external/RSL_LITE/module_dm.F >> module_dm.F )
 
 wrfio_nf : 
 	( cd ../external/io_netcdf ; \
@@ -4680,11 +5094,11 @@ wrfio_grib_share :
 
 wrfio_grib1 :
 	( cd ../external/io_grib1 ; \
-          make CC="$(SCC)" CFLAGS="$(CFLAGS)" RANLIB="$(RANLIB)" CPP="$(CPP)" FC="$(SFC) $(PROMOTION) -I. $(FCDEBUG) $(FCBASEOPTS) -w" TRADFLAG="-traditional" archive )
+          make CC="$(SCC)" CFLAGS="$(CFLAGS)" RANLIB="$(RANLIB)" CPP="$(CPP)" FC="$(SFC) $(PROMOTION) -I. $(FCDEBUG) $(FCBASEOPTS) -w" TRADFLAG="-traditional" archive)
 
 wrfio_grib2 :
 	( cd ../external/io_grib2 ; \
-          make CC="$(SCC)" CFLAGS="$(CFLAGS) CONFIGURE_GRIB2_INC" RM="$(RM)" RANLIB="$(RANLIB)" CPP="$(CPP)" FC="$(SFC) $(PROMOTION) -I. $(FCDEBUG) $(FCBASEOPTS) -w" TRADFLAG="-traditional" archive )
+          make CC="$(SCC)" CFLAGS="$(CFLAGS) CONFIGURE_GRIB2_INC" RM="$(RM)" RANLIB="$(RANLIB)" CPP="$(CPP)" FC="$(SFC) $(PROMOTION) -I. $(FCDEBUG) $(FCBASEOPTS) -w" TRADFLAG="-traditional" archive)
 
 wrfio_int : 
 	( cd ../external/io_int ; \
@@ -4694,8 +5108,8 @@ esmf_time :
 	( cd ../external/esmf_time_f90 ; \
 	  make FC="$(FC) $(PROMOTION) $(FCDEBUG) $(FCBASEOPTS)" RANLIB="$(RANLIB)" CPP="$(CPP) -I../../inc -I. $(POUND_DEF)" )
 
-../external/RSL/RSL/librsl.a :
-	( cd ../external/RSL/RSL ; make CC="$(CC)" CFLAGS='-DSTUBS' FC="$(FC) $(PROMOTION)" FFLAGS='-fno-second-underscore' MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) LEARN_BCAST=-DLEARN_BCAST stub )
+../external/RSL_LITE/librsl_lite.a :
+	( cd ../external/RSL_LITE ; make CC="$(CC)" FC="$(FC) $(FCFLAGS) $(PROMOTION) -byteswapio" MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) LEARN_BCAST=-DLEARN_BCAST )
 
 # compile these without high optimization to speed compile
 solve_interface.o : solve_interface.F
@@ -4731,7 +5145,15 @@ module_initialize_real.o module_dm.o start_domain.o :
 	$(CPP) -I../inc $(CPPFLAGS) $*.b  > $*.f
 	$(RM) $*.b
 	$(FC) -c $(PROMOTION) $(FCBASEOPTS) $(MODULE_DIRS) $*.f
-
+#PGI	if [ ! -e $@ ] ; then \
+#PGI	sleep 10 ; $(FC) -c $(PROMOTION) $(FCBASEOPTS) $(MODULE_DIRS) $*.f ; \
+#PGI	fi
+#PGI	if [ ! -e $@ ] ; then \
+#PGI	sleep 30 ; $(FC) -c $(PROMOTION) $(FCBASEOPTS) $(MODULE_DIRS) $*.f ; \
+#PGI	fi
+#PGI	if [ ! -e $@ ] ; then \
+#PGI	sleep 300 ; $(FC) -c $(PROMOTION) $(FCBASEOPTS) $(MODULE_DIRS) $*.f ; \
+#PGI	fi
 
 ###########################################################
 #ARCH    Intel Itanium2 ia64 madison Linux DM-Parallel (e.g. mpp2 at PNNL), efc71 compiler (RSL, MPICH, nesting)
@@ -5236,6 +5658,130 @@ module_initialize_real.o module_dm.o start_domain.o :
 	$(FC) -c $(PROMOTION) $(FCBASEOPTS) $(MODULE_DIRS) $*.f
 
 ###########################################################
+#ARCH    PC Linux x86_64 (IA64 and Opteron), PGI 5.2 or higher DM-Parallel   (RSL_LITE, MPICH, Allows nesting, No periodic LBCs)
+#        Note that for 5.1.x comment out -Mpia=fast
+#
+# Notes: for experimental implementation of moving nests, add -DMOVE_NESTS to ARCHFLAGS
+#        for experimental implementation of vortex tracking nests, add -DMOVE_NESTS -DVORTEX_CENTER to ARCHFLAGS
+#
+DMPARALLEL      =       1
+MAX_PROC        =       1024
+FC              =       mpif90
+LD              =       mpif90
+CC              =       mpicc
+SCC		=	gcc
+SFC             =       pgf90
+RWORDSIZE       =       $(NATIVE_RWORDSIZE)
+PROMOTION	=	-r$(RWORDSIZE) -i4
+CFLAGS          =       -DDM_PARALLEL \
+                        -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) -I../external/RSL_LITE \
+                        -DLANDREAD_STUB
+FCOPTIM         =       -fastsse #-Mipa=fast
+FCDEBUG		=	#-g
+#FCBASEOPTS      =       -w -byteswapio -Ktrap=fp -Mfree $(FCDEBUG)
+FCBASEOPTS      =       -w -byteswapio -Mfree $(FCDEBUG)
+FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS)
+ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DGRIB1 CONFIGURE_GRIB2_FLAG -DINTIO -DDM_PARALLEL \
+                        -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4 CONFIGURE_NETCDF_FLAG \
+                        -DTRIEDNTRUE   \
+			-DLIMIT_ARGS -DLANDREAD_STUB
+# machine-specific flags needed to link in ESMF library (C++ run-time-library, etc.)
+ESMF_LIB_FLAGS  =       
+ESMF_IO_LIB     =       ESMFIOLIB
+ESMF_IO_LIB_EXT =       ESMFIOEXTLIB
+INCLUDE_MODULES =       -module ../main -I../external/io_netcdf -I../external/io_int -I../external/esmf_time_f90 \
+                        -I../external -I../frame -I../share -I../phys -I../inc
+PERL            =       perl
+REGISTRY        =       Registry
+LIB             =       CONFIGURE_NETCDF_LIB_PATH -L../external/RSL_LITE -lrsl_lite \
+                        -L../external/io_grib1 -lio_grib1 \
+                        CONFIGURE_GRIB2_LIB \
+                        -L../external/io_grib_share -lio_grib_share \
+			-L../external/io_int -lwrfio_int \
+			../frame/module_internal_header_util.o ../frame/pack_utils.o -L../external/esmf_time_f90 -lesmf_time 
+LDFLAGS         =       -byteswapio CONFIGURE_LDFLAGS
+ENVCOMPDEFS	=	CONFIGURE_COMPILEFLAGS
+CPP             =       /lib/cpp -C -P -traditional
+POUND_DEF	=	-DNO_RRTM_PHYSICS  -traditional $(COREDEFS) -DNONSTANDARD_SYSTEM -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+CPPFLAGS        =       -I$(LIBINCLUDE) -C -P $(ARCHFLAGS) -I../external/RSL_LITE -C -P `cat ../inc/dm_comm_cpp_flags` $(ENVCOMPDEFS) $(POUND_DEF)
+AR              =       ar ru
+M4              =       m4 -B 14000
+RANLIB          =       ranlib
+NETCDFPATH	=	CONFIGURE_NETCDF_PATH
+CC_TOOLS        =       cc
+
+externals : wrf_ioapi_includes CONFIGURE_WRFIO_NF wrfio_grib_share wrfio_grib1 CONFIGURE_WRFIO_GRIB2 ../external/RSL_LITE/librsl_lite.a wrfio_int gen_comms.c module_dm.F esmf_time
+
+gen_comms.c : ../external/RSL_LITE/gen_comms.c
+	( /bin/cp ../tools/gen_comms_warning ../tools/gen_comms.c ; \
+          cat ../external/RSL_LITE/gen_comms.c >> ../tools/gen_comms.c )
+
+module_dm.F : ../external/RSL_LITE/module_dm.F
+	( /bin/cp module_dm_warning module_dm.F ; cat ../external/RSL_LITE/module_dm.F >> module_dm.F )
+
+wrfio_nf :
+	( cd ../external/io_netcdf ; \
+	  make NETCDFPATH=CONFIGURE_NETCDF_PATH RANLIB="$(RANLIB)" CPP="$(CPP)" FC="$(FC) $(PROMOTION) $(FCFLAGS) -w" TRADFLAG="-traditional" )
+
+wrfio_grib_share :
+	( cd ../external/io_grib_share ; \
+          make CC="$(SCC)" CFLAGS="$(CFLAGS)" RM="$(RM)" RANLIB="$(RANLIB)" CPP="$(CPP)" FC="$(SFC) $(PROMOTION) -I. $(FCDEBUG) $(FCBASEOPTS) -w" TRADFLAG="-traditional" archive)
+
+wrfio_grib1 :
+	( cd ../external/io_grib1 ; \
+          make CC="$(SCC)" CFLAGS="$(CFLAGS)" RANLIB="$(RANLIB)" CPP="$(CPP)" FC="$(SFC) $(PROMOTION) -I. $(FCDEBUG) $(FCBASEOPTS) -w" TRADFLAG="-traditional" archive)
+
+wrfio_grib2 :
+	( cd ../external/io_grib2 ; \
+          make CC="$(SCC)" CFLAGS="$(CFLAGS) CONFIGURE_GRIB2_INC" RM="$(RM)" RANLIB="$(RANLIB)" CPP="$(CPP)" FC="$(SFC) $(PROMOTION) -I. $(FCDEBUG) $(FCBASEOPTS) -w" TRADFLAG="-traditional" archive)
+
+wrfio_int :
+	( cd ../external/io_int ; \
+          make CC="$(CC)" RANLIB="$(RANLIB)" CPP="$(CPP)" SFC="$(SFC) $(PROMOTION) $(FCDEBUG) $(FCBASEOPTS)" FC="$(SFC) $(PROMOTION) $(FCDEBUG) $(FCBASEOPTS) -w" TRADFLAG="-traditional" all )
+
+esmf_time : 
+	( cd ../external/esmf_time_f90 ; \
+	  make FC="$(FC) $(PROMOTION) $(FCDEBUG) $(FCBASEOPTS)" RANLIB="$(RANLIB)" CPP="$(CPP) -I../../inc -I. $(POUND_DEF)" )
+
+../external/RSL_LITE/librsl_lite.a :
+	( cd ../external/RSL_LITE ; make CC="$(CC)" FC="$(FC) $(PROMOTION) $(FCFLAGS) -byteswapio" MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) LEARN_BCAST=-DLEARN_BCAST )
+
+# compile these without high optimization to speed compile
+solve_interface.o : solve_interface.F
+shift_domain_em.o : shift_domain_em.F
+module_io_mm5.o : module_io_mm5.F
+module_si_io.o : module_si_io.F
+module_io_wrf.o : module_io_wrf.F
+module_domain.o : module_domain.F
+module_start.o : module_start.F
+module_initialize.o : module_initialize.F
+module_initialize_b_wave.o : module_initialize_b_wave.F
+module_initialize_hill2d_x.o : module_initialize_hill2d_x.F
+module_initialize_quarter_ss.o : module_initialize_quarter_ss.F
+module_initialize_squall2d_x.o : module_initialize_squall2d_x.F
+module_initialize_squall2d_y.o : module_initialize_squall2d_y.F
+module_initialize_real.o : module_initialize_real.F
+module_dm.o : module_dm.F
+start_domain.o : start_domain.F
+mediation_integrate.o : mediation_integrate.F
+module_configure.o : module_configure.F
+
+solve_interface.o                                              \
+shift_domain_em.o                                              \
+module_io_mm5.o module_si_io.o module_io_wrf.o module_domain.o \
+module_start.o module_initialize.o module_initialize_b_wave.o  \
+module_initialize_hill2d_x.o module_initialize_quarter_ss.o    \
+module_initialize_squall2d_x.o module_initialize_squall2d_y.o  \
+mediation_integrate.o \
+module_configure.o                                             \
+module_initialize_real.o module_dm.o start_domain.o :
+	$(RM) $@
+	$(SED_FTN) $*.F > $*.b 
+	$(CPP) -I../inc $(CPPFLAGS) $*.b  > $*.f
+	$(RM) $*.b
+	$(FC) -c $(PROMOTION) $(FCBASEOPTS) $(MODULE_DIRS) $*.f
+
+###########################################################
 
 #ARCH    PC Linux x86_64 (IA64 and Opteron), PGI compiler 5.2 or higher  (Single-threaded, RSL, Allows nesting)
 #        Note that for 5.1.x comment out -Mpia=fast
@@ -5359,6 +5905,134 @@ module_initialize_real.o module_dm.o start_domain.o :
 #	fi
 
 ###########################################################
+#ARCH    Intel Itanium2 ia64 madison Linux  (e.g. mpp2 at PNNL) , efc71 compiler DM-Parallel (RSL_LITE, MPICH, Allows nesting )
+# Notes for running on PNNL cluster:
+# 
+# 1. source /home/oehmen/.mycshrc
+# 2. source /home/mscf/intel7.1/compiler70/ia64/bin/efcvars.csh
+# 
+# Notes: for experimental implementation of moving nests, add -DMOVE_NESTS to ARCHFLAGS
+#        for experimental implementation of vortex tracking nests, add -DMOVE_NESTS -DVORTEX_CENTER to ARCHFLAGS
+#
+DMPARALLEL = 1
+MAX_PROC   = 2000
+FC         = mpif90
+LD         = mpif90
+CC         = mpicc
+SCC        = gcc
+SFC        = efc
+RWORDSIZE       =       $(NATIVE_RWORDSIZE)
+PROMOTION	=	-r$(RWORDSIZE) -i4
+CFLAGS     = -DDM_PARALLEL -w -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) \
+             -I../external/RSL_LITE -size_lp64 -I/usr/lib/mpi/mpi_intel/include
+FCOPTIM = -O2 -ftz
+FCDEBUG = #-g
+FCBASEOPTS = $(FCDEBUG) -w -FR -I$(INCLUDE) -cm 
+FCNOOPTS = -O0 $(FCDEBUG) -FR -I$(INCLUDE) -w -cm 
+FCFLAGS = $(FCOPTIM) $(FCBASEOPTS) $(OMP) -size_lp64 
+ARCHFLAGS = -DDM_PARALLEL \
+            -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4 -DNETCDF \
+            -DGRIB1 CONFIGURE_GRIB2_FLAG -DTRIEDNTRUE -DLIMIT_ARGS 
+# machine-specific flags needed to link in ESMF library (C++ run-time-library, etc.)
+ESMF_LIB_FLAGS  =       
+ESMF_IO_LIB     =       ESMFIOLIB
+ESMF_IO_LIB_EXT =       ESMFIOEXTLIB
+INCLUDE_MODULES = ../main -I../external/io_int -I../external/esmf_time_f90 \
+                  -I../external -I../frame -I../share -I../phys -I../inc   \
+                  -I/usr/lib/mpi/mpi_intel/include
+PERL = perl
+REGISTRY = Registry
+LIB = -L../external/io_netcdf -lwrfio_nf $(OMP) -LCONFIGURE_NETCDF_PATH/lib -lnetcdf -L../external/RSL_LITE -lrsl_lite \
+                        -L../external/io_grib1 -lio_grib1 \
+                        CONFIGURE_GRIB2_LIB \
+                        -L../external/io_grib_share -lio_grib_share \
+      ../frame/module_internal_header_util.o ../frame/pack_utils.o -L../external/esmf_time_f90 -lesmf_time \
+      -lmpifarg -lmpi -lelan -lintrins -lPEPCF90 -limf -lguide -lunwind -lpthread -L/opt/mlib/lib/linux -lveclib8
+LDFLAGS = $(OMP) CONFIGURE_LDFLAGS
+ENVCOMPDEFS	=	CONFIGURE_COMPILEFLAGS
+CPP        = /lib/cpp -traditional -C -P -traditional
+POUND_DEF  = -DNO_RRTM_PHYSICS -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
+             -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+CPPFLAGS   = -I$(LIBINCLUDE) $(ARCHFLAGS) $(COREDEFS) $(OMPCPP) -I$(INCLUDE) \
+             -I../external/RSL_LITE -C -EP `cat ../inc/dm_comm_cpp_flags` $(POUND_DEF)
+AR = ar ru
+M4 = m4 -B 14000
+RANLIB = ranlib
+NETCDFPATH	=	CONFIGURE_NETCDF_PATH
+CC_TOOLS        =       ecc
+
+externals : wrf_ioapi_includes CONFIGURE_WRFIO_NF wrfio_grib_share wrfio_grib1 CONFIGURE_WRFIO_GRIB2 ../external/RSL_LITE/librsl_lite.a wrfio_int gen_comms.c module_dm.F esmf_time
+
+gen_comms.c : ../external/RSL_LITE/gen_comms.c
+	( /bin/cp ../tools/gen_comms_warning ../tools/gen_comms.c ; \
+          cat ../external/RSL_LITE/gen_comms.c >> ../tools/gen_comms.c )
+
+wrfio_nf :
+	( cd ../external/io_netcdf ; \
+	  make NETCDFPATH=CONFIGURE_NETCDF_PATH RANLIB="$(RANLIB)" CPP="$(CPP)" FC="$(FC) $(PROMOTION) $(FCFLAGS) -w" TRADFLAG="-traditional" )
+
+module_dm.F : ../external/RSL_LITE/module_dm.F
+	( /bin/cp module_dm_warning module_dm.F ; \
+          cat ../external/RSL_LITE/module_dm.F >> module_dm.F )
+
+wrfio_grib_share :
+	( cd ../external/io_grib_share ; \
+          make CC="$(SCC)" CFLAGS="$(CFLAGS)" RM="$(RM)" RANLIB="$(RANLIB)" CPP="$(CPP)" FC="$(SFC) $(PROMOTION) -I. $(FCDEBUG) $(FCBASEOPTS) -w" TRADFLAG="-traditional" archive)
+
+wrfio_grib1 :
+	( cd ../external/io_grib1 ; \
+          make CC="$(SCC)" CFLAGS="$(CFLAGS)" RANLIB="$(RANLIB)" CPP="$(CPP)" FC="$(SFC) $(PROMOTION) -I. $(FCDEBUG) $(FCBASEOPTS) -w" TRADFLAG="-traditional" archive)
+
+wrfio_grib2 :
+	( cd ../external/io_grib2 ; \
+          make CC="$(SCC)" CFLAGS="$(CFLAGS) CONFIGURE_GRIB2_INC" RM="$(RM)" RANLIB="$(RANLIB)" CPP="$(CPP)" FC="$(SFC) $(PROMOTION) -I. $(FCDEBUG) $(FCBASEOPTS) -w" TRADFLAG="-traditional" archive)
+
+wrfio_int : 
+	( cd ../external/io_int ; \
+          make CC="$(CC)" RANLIB="$(RANLIB)" CPP="$(CPP)" SFC="$(SFC) $(PROMOTION) $(FCDEBUG) $(FCBASEOPTS)" FC="$(FC) $(PROMOTION) $(FCDEBUG) $(FCFLAGS) -w" all )
+
+esmf_time : 
+	( cd ../external/esmf_time_f90 ; \
+	  make FC="$(FC) $(PROMOTION) $(FCDEBUG) $(FCFLAGS)" RANLIB="$(RANLIB)" CPP="$(CPP) -I../../inc -I. $(POUND_DEF)" )
+
+../external/RSL_LITE/librsl_lite.a :
+	( cd ../external/RSL_LITE ; make CC='mpicc -w -I.' \
+	  FC="$(FC) $(PROMOTION) $(FCFLAGS) -cm -w " MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) )
+
+# compile these without high optimization to speed compile
+solve_interface.o : solve_interface.F
+shift_domain_em.o : shift_domain_em.F
+module_io_mm5.o : module_io_mm5.F
+module_si_io.o : module_si_io.F
+module_io_wrf.o : module_io_wrf.F
+module_domain.o : module_domain.F
+module_start.o : module_start.F
+module_initialize.o : module_initialize.F
+module_initialize_b_wave.o : module_initialize_b_wave.F
+module_initialize_hill2d_x.o : module_initialize_hill2d_x.F
+module_initialize_quarter_ss.o : module_initialize_quarter_ss.F
+module_initialize_squall2d_x.o : module_initialize_squall2d_x.F
+module_initialize_squall2d_y.o : module_initialize_squall2d_y.F
+module_initialize_real.o : module_initialize_real.F
+module_dm.o : module_dm.F
+start_domain.o : start_domain.F
+module_configure.o : module_configure.F
+
+solve_interface.o \
+shift_domain_em.o                                              \
+module_io_mm5.o module_si_io.o module_io_wrf.o module_domain.o \
+module_start.o module_initialize.o module_initialize_b_wave.o \
+module_initialize_hill2d_x.o module_initialize_quarter_ss.o \
+module_initialize_squall2d_x.o module_initialize_squall2d_y.o \
+module_configure.o                                             \
+module_initialize_real.o module_dm.o start_domain.o :
+	$(RM) $@
+	$(SED_FTN) $*.F > $*.b 
+	$(CPP) -I../inc $(CPPFLAGS) $*.b > $*.f
+	$(RM) $*.b
+	$(FC) -c $(PROMOTION) $(FCNOOPTS) $(MODULE_DIRS) $*.f
+
+###########################################################
 #ARCH titan.ncsa.uiuc.edu specific Intel Itanium2 ia64 mckinley Linux, efc compiler DM-Parallel (RSL, VMI, allows nesting) 
 #
 # Consider 'setenv F_UFMTENDIAN big' in your run scripts for big-endian output
@@ -5456,6 +6130,130 @@ esmf_time :
 ../external/RSL/RSL/librsl.a :
 	( cd ../external/RSL/RSL ; make CC='ecc -Vaxlib -I. -cm -w -I/usr/local/vmi/mpich/include '\
 	  FC="$(SFC) $(PROMOTION) -cm -w -Vaxlib -I../../.. " MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) LEARN_BCAST=-DLEARN_BCAST linux )
+
+# compile these without high optimization to speed compile
+solve_interface.o : solve_interface.F
+shift_domain_em.o : shift_domain_em.F
+module_io_mm5.o : module_io_mm5.F
+module_si_io.o : module_si_io.F
+module_io_wrf.o : module_io_wrf.F
+module_domain.o : module_domain.F
+module_start.o : module_start.F
+module_initialize.o : module_initialize.F
+module_initialize_b_wave.o : module_initialize_b_wave.F
+module_initialize_hill2d_x.o : module_initialize_hill2d_x.F
+module_initialize_quarter_ss.o : module_initialize_quarter_ss.F
+module_initialize_squall2d_x.o : module_initialize_squall2d_x.F
+module_initialize_squall2d_y.o : module_initialize_squall2d_y.F
+module_initialize_real.o : module_initialize_real.F
+module_dm.o : module_dm.F
+start_domain.o : start_domain.F
+module_configure.o : module_configure.F
+
+solve_interface.o \
+shift_domain_em.o                                              \
+module_io_mm5.o module_si_io.o module_io_wrf.o module_domain.o \
+module_start.o module_initialize.o module_initialize_b_wave.o \
+module_initialize_hill2d_x.o module_initialize_quarter_ss.o \
+module_initialize_squall2d_x.o module_initialize_squall2d_y.o \
+module_configure.o                                             \
+module_initialize_real.o module_dm.o start_domain.o :
+	$(RM) $@
+	$(SED_FTN) $*.F > $*.b 
+	$(CPP) -I../inc $(CPPFLAGS) $*.b > $*.f
+	$(RM) $*.b
+	$(FC) -c $(PROMOTION) $(FCBASEOPTS) $(MODULE_DIRS) $*.f
+
+###########################################################
+#ARCH titan.ncsa.uiuc.edu specific Intel Itanium2 ia64 mckinley Linux, efc compiler DM-Parallel (RSL_LITE, VMI, allows nesting)
+#
+# Consider 'setenv F_UFMTENDIAN big' in your run scripts for big-endian output
+# Note hard-coded paths to Mark Straka's accounts and ecc6 libs
+#
+# Notes: for experimental implementation of moving nests, add -DMOVE_NESTS to ARCHFLAGS
+#        for experimental implementation of vortex tracking nests, add -DMOVE_NESTS -DVORTEX_CENTER to ARCHFLAGS
+#
+DMPARALLEL = 1
+INCLUDE = ../external/io_netcdf/
+MAX_PROC = 256
+FC = efc -I.. -I/usr/local/vmi/mpich/include
+LD = efc
+CC = ecc -I. -I/usr/local/vmi/mpich/include
+SCC		=	$(CC)
+SFC = efc
+RWORDSIZE       =       $(NATIVE_RWORDSIZE)
+PROMOTION	=	-r$(RWORDSIZE) -i4
+CFLAGS = -DDM_PARALLEL -I../external/RSL_LITE \
+-DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) -size_lp64
+FCOPTIM = -O3 -ftz
+FCDEBUG = #-g
+FCBASEOPTS = $(FCDEBUG) -w -FR -I$(INCLUDE) -I. -cm
+FCFLAGS = $(FCOPTIM) $(FCBASEOPTS) $(OMP) -size_lp64
+ARCHFLAGS = -DRSL_LITE -DDM_PARALLEL \
+-DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4 -DNETCDF \
+-DGRIB1 CONFIGURE_GRIB2_FLAG -DTRIEDNTRUE  
+# machine-specific flags needed to link in ESMF library (C++ run-time-library, etc.)
+ESMF_LIB_FLAGS  =       
+ESMF_IO_LIB     =       ESMFIOLIB
+ESMF_IO_LIB_EXT =       ESMFIOEXTLIB
+INCLUDE_MODULES = ../main -I../external/io_netcdf -I../external/io_int -I../external/esmf_time_f90 \
+-I../external -I../frame -I../share -I../phys -I../chem -I../inc
+PERL = perl
+REGISTRY = Registry
+LIB = -Vaxlib -L../external/io_netcdf -lwrfio_nf $(OMP) -L/u/ncsa/straka/AUGUST.test/WRFV1/netcdfintel7/lib -lnetcdf -L../external/RSL_LITE -lrsl_lite \
+                        -L../external/io_grib1 -lio_grib1 \
+                        CONFIGURE_GRIB2_LIB \
+                        -L../external/io_grib_share -lio_grib_share \
+-L../external/io_int -lwrfio_int \
+../frame/module_internal_header_util.o ../frame/pack_utils.o -L/usr/local/vmi/mpich/lib/ecc6 -lmpich -lfmpich -lvmi -ldl -lpthread -L../external/esmf_time_f90 -lesmf_time 
+LDFLAGS = $(OMP) CONFIGURE_LDFLAGS
+ENVCOMPDEFS	=	CONFIGURE_COMPILEFLAGS
+CPP = /lib/cpp -C -P -traditional
+POUND_DEF = -DNO_RRTM_PHYSICS  -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+CPPFLAGS = -traditional -I$(LIBINCLUDE) -C -P $(COREDEFS) $(ARCHFLAGS) $(OMPCPP) -I$(INCLUDE) -I../external/RSL_LITE -C -P `cat ../inc/dm_comm_cpp_flags` $(ENVCOMPDEFS) $(POUND_DEF) $(COREDEFS)
+AR = ar ru
+M4 = m4 -B 14000
+RANLIB = ranlib
+NETCDFPATH	=	CONFIGURE_NETCDF_PATH
+CC_TOOLS        =       ecc
+
+externals : wrf_ioapi_includes CONFIGURE_WRFIO_NF wrfio_grib_share wrfio_grib1 CONFIGURE_WRFIO_GRIB2 ../external/RSL_LITE/librsl_lite.a wrfio_int gen_comms.c module_dm.F esmf_time
+
+gen_comms.c : ../external/RSL_LITE/gen_comms.c
+	( /bin/cp ../tools/gen_comms_warning ../tools/gen_comms.c ; \
+          cat ../external/RSL_LITE/gen_comms.c >> ../tools/gen_comms.c )
+
+module_dm.F : ../external/RSL_LITE/module_dm.F
+	( /bin/cp module_dm_warning module_dm.F ; \
+          cat ../external/RSL_LITE/module_dm.F >> module_dm.F )
+
+wrfio_nf : 
+	( cd ../external/io_netcdf ; \
+	  make NETCDFPATH=CONFIGURE_NETCDF_PATH RANLIB="$(RANLIB)" CPP="$(CPP)" FC="$(FC) $(PROMOTION) -Vaxlib -I../.. $(FCFLAGS) -w" )
+
+wrfio_int : 
+	( cd ../external/io_int ; \
+          make CC="$(CC)" RANLIB="$(RANLIB)" CPP="$(CPP)" SFC="$(SFC) $(PROMOTION) $(FCDEBUG) $(FCBASEOPTS)" FC="$(SFC) $(PROMOTION) -Vaxlib -I/usr/local/vmi/mpich/include $(FCDEBUG) $(FCFLAGS) -w" all )
+
+wrfio_grib_share :
+	( cd ../external/io_grib_share ; \
+          make CC="$(CC)" CFLAGS="$(CFLAGS)" RM="$(RM)" RANLIB="$(RANLIB)" CPP="$(CPP)" FC="$(SFC) $(PROMOTION) -Vaxlib -I/usr/local/vmi/mpich/include $(FCDEBUG) $(FCFLAGS) -w" archive)
+
+wrfio_grib1 :
+	( cd ../external/io_grib1 ; \
+          make CC="$(CC)" CFLAGS="$(CFLAGS)" CPP="$(CPP)" RANLIB="$(RANLIB)" FC="$(SFC) $(PROMOTION) -Vaxlib -I/usr/local/vmi/mpich/include $(FCDEBUG) $(FCFLAGS) -w" archive)
+
+wrfio_grib2 :
+	( cd ../external/io_grib2 ; \
+          make CC="$(CC)" CFLAGS="$(CFLAGS) CONFIGURE_GRIB2_INC" RM="$(RM)" RANLIB="$(RANLIB)" CPP="$(CPP)" RANLIB="$(RANLIB)" FC="$(SFC) $(PROMOTION) -Vaxlib -I/usr/local/vmi/mpich/include $(FCDEBUG) $(FCFLAGS) -w" archive)
+
+esmf_time : 
+	( cd ../external/esmf_time_f90 ; \
+	  make FC="$(FC) $(PROMOTION) $(FCDEBUG) $(FCFLAGS)" RANLIB="$(RANLIB)" CPP="$(CPP) -I../../inc -I. $(POUND_DEF)" )
+
+../external/RSL_LITE/librsl_lite.a :
+	( cd ../external/RSL_LITE ; make CC='ecc -Vaxlib -I. -cm -w -I/usr/local/vmi/mpich/include' \
+	FC="$(SFC) $(PROMOTION) $(FCFLAGS) -cm -w -Vaxlib -I../../.. " MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) )
 
 # compile these without high optimization to speed compile
 solve_interface.o : solve_interface.F
@@ -6607,6 +7405,163 @@ mediation_force_domain.o:
 	$(FC) -c $(FCBASEOPTS) -O0 $(MODULE_DIRS) $*.f
 
 ###########################################################
+#ARCH   SGI Altix, Intel Itanium2 ia64 Linux, ifort DM-Parallel (RSL_LITE, VMI, SGI MPI, Intel MKL, Allows nesting)
+#
+#  'setenv F_UFMTENDIAN big' in run scripts not necessary
+#  since -convert big_endian is in FCBASEOPTS
+#  Change MPI_HOME if SGI's MPI is not in the default directories
+#  Change MKL_HOME if Intel's MKL is not in the default directories
+#
+#  Process pinning should be used -- set the environment
+#  variable MPI_DSM_DISTRIBUTE on a dedicated system, when
+#  running through the cpuset command, or when using a batch
+#  scheduler that has dynamic cpuset support enabled.  In
+#  other cases, if specific processors are known to be free,
+#  the environment variable MPI_DSM_CPULIST may be used
+#  (details in 'man mpi').
+#
+#  Adding -mP3OPT_ecg_lra_switch=T to the compiler options for
+#  modules/routines that take a long time to compile but do not
+#  significantly contribute to the total runtime performance is 
+#  appropriate.  Temporary suggestion for 2.1.1, Nov 2005.
+#
+# Contributed settings from Gerardo Cisneros, SGI
+#
+# Notes: for experimental implementation of moving nests, add -DMOVE_NESTS to ARCHFLAGS
+#        for experimental implementation of vortex tracking nests, add -DMOVE_NESTS -DVORTEX_CENTER to ARCHFLAGS
+#
+DMPARALLEL        = 1
+INCLUDE           = ../external/io_netcdf/
+MAX_PROC          = 1024
+MPI_HOME          = /usr
+MKL_HOME          = /usr/lib
+# MKL_HOME          = /sw/sdev/mkl/7.2.008/mkl72/lib/64
+FC                = ifort -I..
+LD                = ifort
+CC                = icc -I.
+SCC                = icc -I.
+CC_TOOLS          = cc
+SFC               = ifort
+CFLAGS            = -w -O3 -unroll0 -ip -tpp2 -c -ftz -DDM_PARALLEL -I../external/RSL_LITE \
+                    -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC)
+FCOPTIM           = -O3 -unroll0
+FCDEBUG           = # -g
+FCBASEOPTS        = -w -ip -tpp2 -ftz -FR -convert big_endian $(FCDEBUG) \
+                     -fno-alias -fno-fnalias -align all -IPF_fp_relaxed \
+                     -I$(INCLUDE) -I. 
+FCFLAGS           = $(FCOPTIM) $(FCBASEOPTS) $(OMP)
+ARCHFLAGS         = -DGRIB1 CONFIGURE_GRIB2_FLAG -DINTIO -DRSL_LITE -DDM_PARALLEL \
+                    -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=4 -DLWORDSIZE=4 -DNETCDF \
+                    -DTRIEDNTRUE -DONLY_WRFMODEL_IO -DINTELMKL
+# machine-specific flags needed to link in ESMF library (C++ run-time-library, etc.)
+ESMF_LIB_FLAGS  =       
+ESMF_IO_LIB     =       ESMFIOLIB
+ESMF_IO_LIB_EXT =       ESMFIOEXTLIB
+INCLUDE_MODULES   = -I../main -I../external/io_netcdf -I../external/io_int -I../external/esmf_time_f90 \
+                    -I../external -I../frame -I../share -I../phys -I../inc
+PERL              = perl
+REGISTRY          = Registry
+LIB               = -L../external/io_netcdf -lwrfio_nf $(OMP) \
+                    CONFIGURE_NETCDF_LIB_PATH \
+                    -L../external/RSL_LITE -lrsl_lite \
+                    -L../external/io_grib1 -lio_grib1 \
+                        CONFIGURE_GRIB2_LIB \
+                    -L../external/io_grib_share -lio_grib_share \
+                    -L../external/io_int -lwrfio_int \
+                    ../frame/module_internal_header_util.o ../frame/pack_utils.o \
+                    -L$(MPI_HOME)/lib -lmpi -L../external/esmf_time_f90 -lesmf_time \
+                    -L$(MKL_HOME) -lvml -lmkl_ipf
+LDFLAGS           = -O3 -ip $(OMP) CONFIGURE_LDFLAGS
+CPP               = /lib/cpp -C -P -traditional
+POUND_DEF         = -DNO_RRTM_PHYSICS  -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+CPPFLAGS          = -I$(LIBINCLUDE) -C -P -traditional $(COREDEFS) $(ARCHFLAGS) $(OMPCPP) \
+                    -I$(INCLUDE) -I../external/RSL_LITE -C -P `cat ../inc/dm_comm_cpp_flags` \
+                    $(POUND_DEF) $(COREDEFS)
+AR                = ar ru
+M4                = m4 -B 14000
+RANLIB            = ranlib
+NETCDFPATH	  = CONFIGURE_NETCDF_PATH
+
+externals : CONFIGURE_WRFIO_NF ../external/RSL_LITE/librsl_lite.a wrfio_int gen_comms.c module_dm.F wrfio_grib_share wrfio_grib1 CONFIGURE_WRFIO_GRIB2 esmf_time
+
+gen_comms.c : ../external/RSL_LITE/gen_comms.c
+	( /bin/cp ../tools/gen_comms_warning ../tools/gen_comms.c ; \
+          cat ../external/RSL_LITE/gen_comms.c >> ../tools/gen_comms.c )
+
+module_dm.F : ../external/RSL_LITE/module_dm.F
+	( /bin/cp module_dm_warning module_dm.F ; \
+          cat ../external/RSL_LITE/module_dm.F >> module_dm.F )
+
+wrfio_nf : 
+	( cd ../external/io_netcdf ; \
+          make NETCDFPATH=CONFIGURE_NETCDF_PATH CPP="$(CPP)" FC="$(FC) -I../.. $(FCFLAGS)" \
+          TRADFLAG="-traditional" RANLIB="$(RANLIB)" ; \
+	/bin/cp ../ioapi_share/wrf_io_flags.h ../ioapi_share/wrf_status_codes.h ../../inc ; \
+	/bin/cp ../ioapi_share/wrf_io_flags.h ../ioapi_share/wrf_status_codes.h ../io_phdf5 ; \
+	/bin/cp ../ioapi_share/wrf_io_flags.h ../io_quilt )
+
+wrfio_int : 
+	( cd ../external/io_int ; \
+          make CC="$(CC)" CPP="$(CPP)" TRADFLAG="-traditional" RANLIB="$(RANLIB)" \
+          FC="ifort -I$(MPI_HOME)/include $(FCDEBUG) $(FCFLAGS)" all )
+
+wrfio_grib_share :
+	( cd ../external/io_grib_share ; \
+          make CC="$(CC)" CFLAGS="$(CFLAGS)" RM="$(RM)" TRADFLAG="-traditional" RANLIB="$(RANLIB)" CPP="$(CPP)" \
+          FC="ifort -I$(MPI_HOME)/include $(FCDEBUG) $(FCFLAGS)" archive)
+
+wrfio_grib1 : 
+	( cd ../external/io_grib1 ; \
+          make CC="$(CC)" CPP="$(CPP)" TRADFLAG="-traditional" RANLIB="$(RANLIB)" \
+          FC="ifort -I$(MPI_HOME)/include $(FCDEBUG) $(FCFLAGS)" archive)
+wrfio_grib2 : 
+	( cd ../external/io_grib2 ; \
+          make CC="$(CC)" CPP="$(CPP) CONFIGURE_GRIB2_INC" RM="$(RM)" TRADFLAG="-traditional" RANLIB="$(RANLIB)" \
+          FC="ifort -I$(MPI_HOME)/include $(FCDEBUG) $(FCFLAGS)" archive)
+
+esmf_time : 
+	( cd ../external/esmf_time_f90 ; \
+	  make FC="$(FC) $(FCDEBUG) $(FCFLAGS)" CPP="$(CPP) -I../../inc -I. $(POUND_DEF)" )
+
+../external/RSL_LITE/librsl_lite.a :
+	( cd ../external/RSL_LITE ; make CC='icc -I. -w -O3 -DMPI2_SUPPORT -I$(MPI_HOME)/include '\
+	 FC='ifort -w -O3 -I../../.. ' MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) )
+
+# compile these without high optimization to speed compile
+mediation_integrate.o : mediation_integrate.F
+mediation_interp_domain.o : mediation_interp_domain.F
+mediation_feedback_domain.o : mediation_feedback_domain.F
+wrf_auxinput1out.o : wrf_auxinput1out.F
+wrf_histout.o : wrf_histout.F
+wrf_restartout.o : wrf_restartout.F
+wrf_inputin.o : wrf_inputin.F
+wrf_auxinput1in.o : wrf_auxinput1in.F
+wrf_histin.o : wrf_histin.F
+wrf_restartin.o : wrf_restartin.F
+module_initialize_real.o: module_initialize_real.F
+solve_interface.o : solve_interface.F
+shift_domain_em.o : shift_domain_em.F
+module_dm.o : module_dm.F
+module_io_wrf.o : module_io_wrf.F
+module_domain.o : module_domain.F
+start_domain.o : start_domain.F
+mediation_force_domain.o : mediation_force_domain.F
+module_configure.o : module_configure.F
+
+mediation_integrate.o mediation_interp_domain.o mediation_feedback_domain.o \
+module_configure.o                                              \
+wrf_auxinput1out.o wrf_histout.o wrf_restartout.o wrf_inputin.o \
+wrf_auxinput1in.o wrf_histin.o wrf_restartin.o module_initialize_real.o \
+module_domain.o module_dm.o module_io_wrf.o start_domain.o solve_interface.o \
+shift_domain_em.o                                              \
+mediation_force_domain.o:
+	$(RM) $@
+	$(SED_FTN) $*.F > $*.b
+	$(CPP) -I../inc $(CPPFLAGS) $*.b > $*.f
+	$(RM) $*.b
+	$(FC) -c $(FCBASEOPTS) -O0 $(MODULE_DIRS) $*.f
+
+###########################################################
 #ARCH   SGI Altix, Intel Itanium2 ia64 Linux, ifort DM-Parallel (RSL, SGI MPI, allows nesting)
 #
 #  'setenv F_UFMTENDIAN big' in run scripts not necessary
@@ -6753,6 +7708,159 @@ mediation_force_domain.o : mediation_force_domain.F
 
 module_configure.o \
 mediation_integrate.o mediation_interp_domain.o mediation_feedback_domain.o \
+wrf_auxinput1out.o wrf_histout.o wrf_restartout.o wrf_inputin.o \
+wrf_auxinput1in.o wrf_histin.o wrf_restartin.o module_initialize_real.o \
+module_domain.o module_dm.o module_io_wrf.o start_domain.o solve_interface.o \
+shift_domain_em.o                                              \
+mediation_force_domain.o:
+	$(RM) $@
+	$(SED_FTN) $*.F > $*.b
+	$(CPP) -I../inc $(CPPFLAGS) $*.b > $*.f
+	$(RM) $*.b
+	$(FC) -c $(FCBASEOPTS) -O0 $(MODULE_DIRS) $*.f
+
+###########################################################
+#ARCH   SGI Altix, Intel Itanium2 ia64 Linux, ifort DM-Parallel (RSL_LITE, VMI, SGI MPI, Allows nesting)
+#
+#  'setenv F_UFMTENDIAN big' in run scripts not necessary
+#  since -convert big_endian is in FCBASEOPTS
+#  Change MPI_HOME if SGI's MPI is not in the default directories
+#
+#  Process pinning should be used -- set the environment
+#  variable MPI_DSM_DISTRIBUTE on a dedicated system, when
+#  running through the cpuset command, or when using a batch
+#  scheduler that has dynamic cpuset support enabled.  In
+#  other cases, if specific processors are known to be free,
+#  the environment variable MPI_DSM_CPULIST may be used
+#  (details in 'man mpi').
+#
+#  Adding -mP3OPT_ecg_lra_switch=T to the compiler options for
+#  modules/routines that take a long time to compile but do not
+#  significantly contribute to the total runtime performance is 
+#  appropriate.  Temporary suggestion for 2.1.1, Nov 2005.
+#
+# Contributed settings from Gerardo Cisneros, SGI
+#
+# Notes: for experimental implementation of moving nests, add -DMOVE_NESTS to ARCHFLAGS
+#        for experimental implementation of vortex tracking nests, add -DMOVE_NESTS -DVORTEX_CENTER to ARCHFLAGS
+#
+DMPARALLEL        = 1
+INCLUDE           = ../external/io_netcdf/
+MAX_PROC          = 1024
+MPI_HOME          = /usr
+FC                = ifort -I..
+LD                = ifort
+CC                = icc -I.
+SCC                = icc -I.
+CC_TOOLS          = cc
+SFC               = ifort
+CFLAGS            = -w -O3 -unroll0 -ip -tpp2 -c -ftz -DDM_PARALLEL -I../external/RSL_LITE \
+                    -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC)
+FCOPTIM           = -O3 -unroll0
+FCDEBUG           = # -g
+FCBASEOPTS        = -w -ip -tpp2 -ftz -FR -convert big_endian $(FCDEBUG) \
+                     -fno-alias -fno-fnalias -align all -IPF_fp_relaxed \
+                     -I$(INCLUDE) -I. 
+FCFLAGS           = $(FCOPTIM) $(FCBASEOPTS) $(OMP)
+ARCHFLAGS         = -DGRIB1 CONFIGURE_GRIB2_FLAG -DINTIO -DRSL_LITE -DDM_PARALLEL \
+                    -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=4 -DLWORDSIZE=4 -DNETCDF \
+                    -DTRIEDNTRUE -DONLY_WRFMODEL_IO
+# machine-specific flags needed to link in ESMF library (C++ run-time-library, etc.)
+ESMF_LIB_FLAGS  =       
+ESMF_IO_LIB     =       ESMFIOLIB
+ESMF_IO_LIB_EXT =       ESMFIOEXTLIB
+INCLUDE_MODULES   = -I../main -I../external/io_netcdf -I../external/io_int -I../external/esmf_time_f90 \
+                    -I../external -I../frame -I../share -I../phys -I../inc
+PERL              = perl
+REGISTRY          = Registry
+LIB               = -L../external/io_netcdf -lwrfio_nf $(OMP) \
+                    CONFIGURE_NETCDF_LIB_PATH \
+                    -L../external/RSL_LITE -lrsl_lite \
+                    -L../external/io_grib1 -lio_grib1 \
+                        CONFIGURE_GRIB2_LIB \
+                    -L../external/io_grib_share -lio_grib_share \
+                    -L../external/io_int -lwrfio_int \
+                    ../frame/module_internal_header_util.o ../frame/pack_utils.o \
+                    -L$(MPI_HOME)/lib -lmpi -L../external/esmf_time_f90 -lesmf_time 
+LDFLAGS           = -O3 -ip $(OMP) CONFIGURE_LDFLAGS
+CPP               = /lib/cpp -C -P -traditional
+POUND_DEF         = -DNO_RRTM_PHYSICS  -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+CPPFLAGS          = -I$(LIBINCLUDE) -C -P -traditional $(COREDEFS) $(ARCHFLAGS) $(OMPCPP) \
+                    -I$(INCLUDE) -I../external/RSL_LITE -C -P `cat ../inc/dm_comm_cpp_flags` \
+                    $(POUND_DEF) $(COREDEFS)
+AR                = ar ru
+M4                = m4 -B 14000
+RANLIB            = ranlib
+NETCDFPATH	  = CONFIGURE_NETCDF_PATH
+
+externals : CONFIGURE_WRFIO_NF ../external/RSL_LITE/librsl_lite.a wrfio_int gen_comms.c module_dm.F wrfio_grib_share wrfio_grib1 CONFIGURE_WRFIO_GRIB2 esmf_time
+
+gen_comms.c : ../external/RSL_LITE/gen_comms.c
+	( /bin/cp ../tools/gen_comms_warning ../tools/gen_comms.c ; \
+          cat ../external/RSL_LITE/gen_comms.c >> ../tools/gen_comms.c )
+
+module_dm.F : ../external/RSL_LITE/module_dm.F
+	( /bin/cp module_dm_warning module_dm.F ; \
+          cat ../external/RSL_LITE/module_dm.F >> module_dm.F )
+
+wrfio_nf : 
+	( cd ../external/io_netcdf ; \
+          make NETCDFPATH=CONFIGURE_NETCDF_PATH CPP="$(CPP)" FC="$(FC) -I../.. $(FCFLAGS)" \
+          TRADFLAG="-traditional" RANLIB="$(RANLIB)" ; \
+	/bin/cp ../ioapi_share/wrf_io_flags.h ../ioapi_share/wrf_status_codes.h ../../inc ; \
+	/bin/cp ../ioapi_share/wrf_io_flags.h ../ioapi_share/wrf_status_codes.h ../io_phdf5 ; \
+	/bin/cp ../ioapi_share/wrf_io_flags.h ../io_quilt )
+
+wrfio_int : 
+	( cd ../external/io_int ; \
+          make CC="$(CC)" CPP="$(CPP)" TRADFLAG="-traditional" RANLIB="$(RANLIB)" \
+          FC="ifort -I$(MPI_HOME)/include $(FCDEBUG) $(FCFLAGS)" all )
+
+wrfio_grib_share :
+	( cd ../external/io_grib_share ; \
+          make CC="$(CC)" CFLAGS="$(CFLAGS)" RM="$(RM)" TRADFLAG="-traditional" RANLIB="$(RANLIB)" CPP="$(CPP)" \
+          FC="ifort -I$(MPI_HOME)/include $(FCDEBUG) $(FCFLAGS)" archive)
+
+wrfio_grib1 : 
+	( cd ../external/io_grib1 ; \
+          make CC="$(CC)" CPP="$(CPP)" TRADFLAG="-traditional" RANLIB="$(RANLIB)" \
+          FC="ifort -I$(MPI_HOME)/include $(FCDEBUG) $(FCFLAGS)" archive )
+wrfio_grib2 : 
+	( cd ../external/io_grib2 ; \
+          make CC="$(CC)" CPP="$(CPP) CONFIGURE_GRIB2_INC" RM="$(RM)" TRADFLAG="-traditional" RANLIB="$(RANLIB)" \
+          FC="ifort -I$(MPI_HOME)/include $(FCDEBUG) $(FCFLAGS)" archive )
+
+esmf_time : 
+	( cd ../external/esmf_time_f90 ; \
+	  make FC="$(FC) $(FCDEBUG) $(FCFLAGS)" CPP="$(CPP) -I../../inc -I. $(POUND_DEF)" )
+
+../external/RSL_LITE/librsl_lite.a :
+	( cd ../external/RSL_LITE ; make CC='icc -I. -w -O3 -DMPI2_SUPPORT -I$(MPI_HOME)/include '\
+	 FC='ifort -w -O3 -I../../.. ' MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) )
+
+# compile these without high optimization to speed compile
+mediation_integrate.o : mediation_integrate.F
+mediation_interp_domain.o : mediation_interp_domain.F
+mediation_feedback_domain.o : mediation_feedback_domain.F
+wrf_auxinput1out.o : wrf_auxinput1out.F
+wrf_histout.o : wrf_histout.F
+wrf_restartout.o : wrf_restartout.F
+wrf_inputin.o : wrf_inputin.F
+wrf_auxinput1in.o : wrf_auxinput1in.F
+wrf_histin.o : wrf_histin.F
+wrf_restartin.o : wrf_restartin.F
+module_initialize_real.o: module_initialize_real.F
+solve_interface.o : solve_interface.F
+shift_domain_em.o : shift_domain_em.F
+module_io_wrf.o : module_io_wrf.F
+module_dm.o : module_dm.F
+module_domain.o : module_domain.F
+start_domain.o : start_domain.F
+mediation_force_domain.o : mediation_force_domain.F
+module_configure.o : module_configure.F
+
+mediation_integrate.o mediation_interp_domain.o mediation_feedback_domain.o \
+module_configure.o                                              \
 wrf_auxinput1out.o wrf_histout.o wrf_restartout.o wrf_inputin.o \
 wrf_auxinput1in.o wrf_histin.o wrf_restartin.o module_initialize_real.o \
 module_domain.o module_dm.o module_io_wrf.o start_domain.o solve_interface.o \
@@ -7025,6 +8133,313 @@ mediation_force_domain.o:
 	$(CPP) -I../inc $(CPPFLAGS) $*.b > $*.f
 	$(RM) $*.b
 	$(FC) -c $(FCBASEOPTS) -O0 $(MODULE_DIRS) $*.f
+
+
+###########################################################
+#ARCH   UNICOS/mp  machine crayx1 (RSL_LITE, MPI, MSP mode)
+
+#
+#  Cray X1 (RSL_LITE, MPI, MSP mode)
+#  For CSD mode set numtiles=4 in &domains section
+#  in namelist.input for best MSP efficiency.
+#
+DMPARALLEL      =       1
+FC              =       ftn
+SFC		=	$(FC)
+LD              =       ftn
+CC              =       cc
+SCC		=	$(CC)
+
+#### Override default sed command and script for Fortran source files ####
+#### This sed script converts !$OMP directives to !csd$ directives ####
+SED_FTN = sed -f ../arch/cray_csd.sed
+
+## Use these for X1 cross compiler to build Registry
+##X1_CROSS_COMP = "gcc"
+##X1_CROSS_CFLG = ""
+## Use these for X1 native (trigger) compiler
+X1_CROSS_COMP = "cc"
+X1_CROSS_CFLG = "-hcommand"
+CC_TOOLS        = 	$(X1_CROSS_COMP) $(X1_CROSS_CFLG)
+
+RWORDSIZE         = $(NATIVE_RWORDSIZE)
+FCDEBUG         =       # -g
+FCBASEOPTS      =       -f free -N 255 -I. -Oscalar1 -Ovector0 -Ostream0 -x omp
+FCFLAGS         =       -f free -N 255  -I. -Ofp3 -O3 -x omp -Ogen_private_callee
+FCFLAGS2        =       -f free -N 255  -I. -Ofp2 -O1 -x omp -Ogen_private_callee
+# MSP (non-CSD mode)
+#FCFLAGS2        =       -f free -N 255  -I. -Ofp3 -x omp,csd -Ostream1 -Ovector3 
+PROMOTION	=	-r$(RWORDSIZE) -i4
+CFLAGS          =       -I../external/RSL_LITE -DMAXDOM_MAKE=$(MAX_DOMAINS) \
+                        -DMAXPROC_MAKE=$(MAX_PROC) -DDM_PARALLEL -UCRAY -Dcrayx1 -h gen_private_callee
+
+# machine-specific flags needed to link in ESMF library (C++ run-time-library, etc.)
+ESMF_LIB_FLAGS  =       
+ESMF_IO_LIB     =       ESMFIOLIB
+ESMF_IO_LIB_EXT =       ESMFIOEXTLIB
+INCLUDE_MODULES =       -I../external/io_netcdf -I../external/io_int  -I../external/esmf_time_f90 \
+                        -I../frame -I../share -I../phys -I../inc \
+			-p../external/io_netcdf -p../external/io_int -p../frame \
+                        -p../frame -I ../frame -p../share -p../phys -p../inc \
+                        -p../dyn_em -p../dyn_eh -p../dyn_exp -p ../external/esmf_time_f90
+ARCHFLAGS       =       -DRSL_LITE -DDM_PARALLEL -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) \
+                        -DLWORDSIZE=4 CONFIGURE_NETCDF_FLAG -DGRIB1 CONFIGURE_GRIB2_FLAG -DTRIEDNTRUE  -DINTIO \
+			-DLIMIT_ARGS -DONLY_WRFMODEL_IO -Dcrayx1
+
+PERL            =       perl
+REGISTRY        =       Registry
+
+LIB             =       -L../external/io_netcdf -lwrfio_nf CONFIGURE_NETCDF_LIB_PATH \
+			-L../external/RSL_LITE -lrsl_lite \
+                        -L../external/io_int -lwrfio_int  \
+                        -L../external/io_grib1 -lio_grib1 \
+                        CONFIGURE_GRIB2_LIB \
+                        -L../external/io_grib_share -lio_grib_share \
+			../frame/module_internal_header_util.o ../frame/pack_utils.o \
+			-L../external/esmf_time_f90 -lesmf_time -lmalloc
+
+ENVCOMPDEFS	=	CONFIGURE_COMPILEFLAGS
+LDFLAGS         =       -Ogen_private_callee -p../external/io_netcdf -p../external/io_int -p../frame \
+                        -p../frame -I ../frame -p../share -p../phys -p../inc \
+                        -p../dyn_em -p../dyn_eh -p../dyn_exp  CONFIGURE_LDFLAGS
+
+CPP		=	cpp -C -P 
+POUND_DEF	=	-DNONSTANDARD_SYSTEM -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS) # -DNO_NAMELIST_PRINT
+CPPFLAGS	=	-I$(LIBINCLUDE) -C -P $(ARCHFLAGS) -I../external/RSL_LITE `cat ../inc/dm_comm_cpp_flags` $(COREDEFS) $(ENVCOMPDEFS) $(POUND_DEF)
+
+AR              =       ar ru
+M4              =       m4 -B14000
+RANLIB          =       echo
+NETCDFPATH	=	CONFIGURE_NETCDF_PATH
+
+externals : wrf_ioapi_includes CONFIGURE_WRFIO_NF wrfio_grib_share wrfio_grib1 CONFIGURE_WRFIO_GRIB2 ../external/RSL_LITE/librsl_lite.a wrfio_int gen_comms.c module_dm.F esmf_time
+
+gen_comms.c : ../external/RSL_LITE/gen_comms.c
+	( /bin/cp ../tools/gen_comms_warning ../tools/gen_comms.c ; cat ../external/RSL_LITE/gen_comms.c >> ../tools/gen_comms.c )
+
+module_dm.F : ../external/RSL_LITE/module_dm.F
+	( /bin/cp module_dm_warning module_dm.F ; cat ../external/RSL_LITE/module_dm.F >> module_dm.F )
+
+wrfio_nf : 
+	( cd ../external/io_netcdf ; make NETCDFPATH=CONFIGURE_NETCDF_PATH RANLIB="$(RANLIB)" CPP="$(CPP) -Dcrayx1" FC="$(FC) $(PROMOTION) -f free -N 255 " )
+
+wrfio_int : 
+	( cd ../external/io_int ; \
+          make CC="$(CC)" RANLIB="$(RANLIB)" CPP="$(CPP) -Dcrayx1" SFC="$(SFC) $(PROMOTION) $(FCDEBUG) $(FCBASEOPTS)" FC="$(FC) $(PROMOTION) -f free -N 255" all )
+
+wrfio_grib_share :
+	( cd ../external/io_grib_share ; \
+          make CC="$(CC)" CFLAGS="$(CFLAGS)" RM="$(RM)" RANLIB="$(RANLIB)" CPP="$(CPP) -Dcrayx1" FC="$(FC) $(PROMOTION) -f free -N 255" archive)
+
+wrfio_grib1 : 
+	( cd ../external/io_grib1 ; \
+          make CC="$(CC)" CPP="$(CPP) -Dcrayx1" RANLIB="$(RANLIB)" \
+          FC="$(FC) $(PROMOTION) -f free -N 255" archive )
+wrfio_grib2 : 
+	( cd ../external/io_grib2 ; \
+          make CC="$(CC)" CPP="$(CPP) CONFIGURE_GRIB2_INC -Dcrayx1" RM="$(RM)" RANLIB="$(RANLIB)" \
+          FC="$(SFC) $(PROMOTION) -f free -N 255" archive )
+
+esmf_time : 
+	( cd ../external/esmf_time_f90 ; \
+	  make FC="$(FC) $(PROMOTION) $(FCDEBUG) -f free -N 255" RANLIB="$(RANLIB)" CPP="$(CPP) -I../../inc -I. $(POUND_DEF)" )
+
+../external/RSL_LITE/librsl_lite.a :
+	( cd ../external/RSL_LITE ; make CFLAGS="$(CFLAGS)" CC="$(CC)" FC="$(SFC) $(PROMOTION) $(FCFLAGS)" \
+                                     MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) LEARN_BCAST=-DLEARN_BCAST )
+
+# compile these without high optimization
+module_io_mm5.o : module_io_mm5.F
+module_si_io.o : module_si_io.F
+module_domain.o : module_domain.F
+module_start.o : module_start.F
+module_initialize.o : module_initialize.F
+module_initialize_b_wave.o : module_initialize_b_wave.F
+module_initialize_hill2d_x.o : module_initialize_hill2d_x.F
+module_initialize_quarter_ss.o : module_initialize_quarter_ss.F
+module_initialize_squall2d_x.o : module_initialize_squall2d_x.F
+module_initialize_squall2d_y.o : module_initialize_squall2d_y.F
+module_initialize_real.o : module_initialize_real.F
+module_dm.o : module_dm.F
+start_domain.o : start_domain.F
+mediation_interp_domain.o : mediation_interp_domain.F
+mediation_force_domain.o : mediation_force_domain.F
+convert_nmm.o : convert_nmm.F
+
+module_io_mm5.o module_si_io.o module_domain.o \
+module_start.o module_initialize.o module_initialize_b_wave.o  \
+module_initialize_hill2d_x.o module_initialize_quarter_ss.o    \
+module_initialize_squall2d_x.o module_initialize_squall2d_y.o  \
+module_initialize_real.o module_dm.o start_domain.o \
+mediation_interp_domain.o \
+mediation_force_domain.o \
+convert_nmm.o    :
+	$(RM) $@
+	$(SED_FTN) $*.F > $*.b 
+	$(CPP) -I../inc $(CPPFLAGS) $*.b  > $*.f
+	$(RM) $*.b
+	$(FC) -c $(PROMOTION) $(FCBASEOPTS) $(MODULE_DIRS)  $*.f
+
+# compile at intermediate opt
+# for MSP (non-CSD) mode
+#module_bc.o: module_bc.F
+#module_bc.o:
+# for MSP (CSD) mode
+module_sf_slab.o: module_sf_slab.F
+module_sf_slab.o:
+	$(RM) $@
+	$(SED_FTN) $*.F > $*.b
+	$(CPP) -I../inc $(CPPFLAGS) $*.b  > $*.f
+	$(RM) $*.b
+	$(FC) -c $(FCFLAGS2) $(MODULE_DIRS)  $*.f
+
+###########################################################
+#ARCH   UNICOS/mp  machine crayx1 (RSL_LITE, MPI, OpenMP)
+
+#
+#  Cray X1 (RSL_LITE, MPI, OpenMP)
+#
+DMPARALLEL      =       1
+FC              =       ftn
+SFC		=	$(FC)
+LD              =       ftn
+CC              =       cc
+SCC		=	$(CC)
+
+## Use these for X1 cross compiler to build Registry
+##X1_CROSS_COMP = "gcc"
+##X1_CROSS_CFLG = ""
+## Use these for X1 native (trigger) compiler
+X1_CROSS_COMP = "cc"
+X1_CROSS_CFLG = "-hcommand"
+CC_TOOLS        = 	$(X1_CROSS_COMP) $(X1_CROSS_CFLG)
+
+RWORDSIZE       = $(NATIVE_RWORDSIZE)
+FCDEBUG         =       # -g
+FCBASEOPTS      =       -f free -N 255 -I. -Oscalar1 -Ovector0 -Ostream0 -x csd -Ossp
+FCFLAGS         =       -f free -N 255  -I. -Ofp3 -O3 -x csd -Ossp
+FCFLAGS2        =       -f free -N 255  -I. -Oipa1 -Ofp2 -x csd -O3 -Ossp
+PROMOTION	=	-r$(RWORDSIZE) -i4
+CFLAGS          =       -I../external/RSL_LITE -DMAXDOM_MAKE=$(MAX_DOMAINS) \
+                        -DMAXPROC_MAKE=$(MAX_PROC) -DDM_PARALLEL -UCRAY -Dcrayx1 -h ssp
+
+# machine-specific flags needed to link in ESMF library (C++ run-time-library, etc.)
+ESMF_LIB_FLAGS  =       
+ESMF_IO_LIB     =       ESMFIOLIB
+ESMF_IO_LIB_EXT =       ESMFIOEXTLIB
+INCLUDE_MODULES =       -I../external/io_netcdf -I../external/io_int  -I../external/esmf_time_f90 \
+                        -I../frame -I../share -I../phys -I../inc \
+			-p../external/io_netcdf -p../external/io_int -p../frame \
+                        -p../frame -I ../frame -p../share -p../phys -p../inc \
+                        -p../dyn_em -p../dyn_eh -p../dyn_exp -p ../external/esmf_time_f90
+ARCHFLAGS       =       -D_OPENMP -DRSL_LITE -DDM_PARALLEL -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) \
+                        -DLWORDSIZE=4 CONFIGURE_NETCDF_FLAG -DGRIB1 CONFIGURE_GRIB2_FLAG -DTRIEDNTRUE  -DINTIO \
+			-DLIMIT_ARGS -DONLY_WRFMODEL_IO -Dcrayx1
+
+PERL            =       perl
+REGISTRY        =       Registry
+
+LIB             =       -L../external/io_netcdf -lwrfio_nf CONFIGURE_NETCDF_LIB_PATH \
+			-L../external/RSL_LITE -lrsl_lite \
+                        -L../external/io_int -lwrfio_int  \
+                        -L../external/io_grib1 -lio_grib1 \
+                        CONFIGURE_GRIB2_LIB \
+                        -L../external/io_grib_share -lio_grib_share \
+			../frame/module_internal_header_util.o ../frame/pack_utils.o \
+			-L../external/esmf_time_f90 -lesmf_time -lmalloc
+
+ENVCOMPDEFS	=	CONFIGURE_COMPILEFLAGS
+LDFLAGS         =       -Ossp -p../external/io_netcdf -p../external/io_int -p../frame \
+                        -p../frame -I ../frame -p../share -p../phys -p../inc \
+                        -p../dyn_em -p../dyn_eh -p../dyn_exp  CONFIGURE_LDFLAGS
+
+CPP		=	cpp -C -P 
+POUND_DEF	=	-DNONSTANDARD_SYSTEM -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS) # -DNO_NAMELIST_PRINT
+CPPFLAGS	=	-I$(LIBINCLUDE) -C -P $(ARCHFLAGS) -I../external/RSL_LITE `cat ../inc/dm_comm_cpp_flags` $(COREDEFS) $(ENVCOMPDEFS) $(POUND_DEF)
+
+AR              =       ar ru
+M4              =       m4 -B14000
+RANLIB          =       echo
+NETCDFPATH	=	CONFIGURE_NETCDF_PATH
+
+externals : wrf_ioapi_includes CONFIGURE_WRFIO_NF wrfio_grib_share wrfio_grib1 CONFIGURE_WRFIO_GRIB2 ../external/RSL_LITE/librsl_lite.a wrfio_int gen_comms.c module_dm.F esmf_time
+
+gen_comms.c : ../external/RSL_LITE/gen_comms.c
+	( /bin/cp ../tools/gen_comms_warning ../tools/gen_comms.c ; cat ../external/RSL_LITE/gen_comms.c >> ../tools/gen_comms.c )
+
+module_dm.F : ../external/RSL_LITE/module_dm.F
+	( /bin/cp module_dm_warning module_dm.F ; cat ../external/RSL_LITE/module_dm.F >> module_dm.F )
+
+wrfio_nf : 
+	( cd ../external/io_netcdf ; make NETCDFPATH=CONFIGURE_NETCDF_PATH RANLIB="$(RANLIB)" CPP="$(CPP) -Dcrayx1" FC="$(FC) $(PROMOTION) -f free -N 255 -Ossp" )
+
+wrfio_int : 
+	( cd ../external/io_int ; \
+          make CC="$(CC)" RANLIB="$(RANLIB)" CPP="$(CPP) -Dcrayx1" SFC="$(SFC) $(PROMOTION) $(FCDEBUG) $(FCBASEOPTS)" FC="$(FC) $(PROMOTION) -f free -N 255 -Ossp" all )
+
+wrfio_grib_share :
+	( cd ../external/io_grib_share ; \
+          make CC="$(CC)" CFLAGS="$(CFLAGS)" RM="$(RM)" RANLIB="$(RANLIB)" CPP="$(CPP) -Dcrayx1" FC="$(FC) $(PROMOTION) -f free -N 255 -Ossp" archive)
+
+wrfio_grib1 : 
+	( cd ../external/io_grib1 ; \
+          make CC="$(CC)" CPP="$(CPP) -Dcrayx1" RANLIB="$(RANLIB)" \
+          FC="$(FC) $(PROMOTION) -f free -N 255 -Ossp" archive )
+wrfio_grib2 : 
+	( cd ../external/io_grib2 ; \
+          make CC="$(CC)" CPP="$(CPP) CONFIGURE_GRIB2_INC -Dcrayx1" RM="$(RM)" RANLIB="$(RANLIB)" \
+          FC="$(SFC) $(PROMOTION) -f free -N 255 -Ossp" archive )
+
+esmf_time : 
+	( cd ../external/esmf_time_f90 ; \
+	  make FC="$(FC) $(PROMOTION) $(FCDEBUG) -f free -N 255 -Ossp" RANLIB="$(RANLIB)" CPP="$(CPP) -I../../inc -I. $(POUND_DEF)" )
+
+../external/RSL_LITE/librsl_lite.a :
+	( cd ../external/RSL_LITE ; make CFLAGS="$(CFLAGS)" CC="$(CC)" FC="$(SFC) $(PROMOTION) $(FCFLAGS)" \
+            MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) LEARN_BCAST=-DLEARN_BCAST )
+
+# compile these without high optimization
+module_io_mm5.o : module_io_mm5.F
+module_si_io.o : module_si_io.F
+module_domain.o : module_domain.F
+module_start.o : module_start.F
+module_initialize.o : module_initialize.F
+module_initialize_b_wave.o : module_initialize_b_wave.F
+module_initialize_hill2d_x.o : module_initialize_hill2d_x.F
+module_initialize_quarter_ss.o : module_initialize_quarter_ss.F
+module_initialize_squall2d_x.o : module_initialize_squall2d_x.F
+module_initialize_squall2d_y.o : module_initialize_squall2d_y.F
+module_dm.o : module_dm.F
+start_domain.o : start_domain.F
+mediation_interp_domain.o : mediation_interp_domain.F
+mediation_force_domain.o : mediation_force_domain.F
+convert_nmm.o : convert_nmm.F
+
+module_io_mm5.o module_si_io.o module_domain.o \
+module_start.o module_initialize.o module_initialize_b_wave.o  \
+module_initialize_hill2d_x.o module_initialize_quarter_ss.o    \
+module_initialize_squall2d_x.o module_initialize_squall2d_y.o  \
+module_initialize_real.o module_dm.o start_domain.o \
+mediation_interp_domain.o \
+mediation_force_domain.o \
+convert_nmm.o    :
+	$(RM) $@
+	$(SED_FTN) $*.F > $*.b 
+	$(CPP) -I../inc $(CPPFLAGS) $*.b  > $*.f
+	$(RM) $*.b
+	$(FC) -c $(PROMOTION) $(FCBASEOPTS) $(MODULE_DIRS)  $*.f
+
+# compile at intermediate opt
+module_pbl_driver.o: module_pbl_driver.F
+solve_em.o: solve_em.F
+
+solve_em.o \
+module_pbl_driver.o :
+	$(RM) $@
+	$(SED_FTN) $*.F > $*.b
+	$(CPP) -I../inc $(CPPFLAGS) $*.b  > $*.f
+	$(RM) $*.b
+	$(FC) -c $(FCFLAGS2) $(MODULE_DIRS)  $*.f
 
 ###########################################################
 #ARCH	HP-UX	PA8600	32bit   (single-threaded, no nesting)
@@ -8187,6 +9602,128 @@ module_initialize_real.o module_dm.o start_domain.o :
 	$(FC) -c $(PROMOTION) $(FCBASEOPTS) $(MODULE_DIRS) $*.f
 
 ###########################################################
+#ARCH    PC Linux x86_64 (IA64 and Opteron), PathScale 2.1 or higher DM-Parallel   (RSL_LITE, PathScale MPICH, No periodic LBCs)
+#
+DMPARALLEL      =       1
+MAX_PROC        =       1024
+FC              =       mpif90 -f90=pathf90
+LD              =       mpif90 -f90=pathf90
+CC              =       mpicc  -cc=pathcc
+SCC             =       pathcc
+SFC             =       pathf90
+NATIVE_RWORDSIZE=	4
+RWORDSIZE	=	$(NATIVE_RWORDSIZE)
+CFLAGS          =       -DDM_PARALLEL \
+                        -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) -I../external/RSL_LITE
+FCOPTIM         =       -O3 -OPT:Ofast:Olimit=5000
+FCDEBUG         =       #-g
+FCBASEOPTS      =       -w -byteswapio -freeform -fno-second-underscore $(FCDEBUG)
+FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS)
+ARCHFLAGS       =       -DINTIO -DDM_PARALLEL \
+                        -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=4 -DLWORDSIZE=4 CONFIGURE_NETCDF_FLAG \
+                        -DTRIEDNTRUE   \
+                        -DLIMIT_ARGS
+# machine-specific flags needed to link in ESMF library (C++ run-time-library, etc.)
+ESMF_LIB_FLAGS  =       
+ESMF_IO_LIB     =       ESMFIOLIB
+ESMF_IO_LIB_EXT =       ESMFIOEXTLIB
+INCLUDE_MODULES =       -module ../main -I../external/io_netcdf -I../external/io_int -I../external/esmf_time_f90 \
+                        -I../external -I../frame -I../share -I../phys -I../inc
+EXTRAMODULES    =
+PERL            =       perl
+REGISTRY        =       Registry
+LIB             =       CONFIGURE_NETCDF_LIB_PATH -L../external/RSL_LITE -lrsl_lite \
+                        -L../external/io_grib1 -lio_grib1 \
+                        CONFIGURE_GRIB2_LIB \
+                        -L../external/io_grib_share -lio_grib_share \
+                        -L../external/io_int -lwrfio_int \
+                        ../frame/module_internal_header_util.o ../frame/pack_utils.o -L../external/esmf_time_f90 -lesmf_time
+LDFLAGS         =       -byteswapio
+CPP             =       /lib/cpp -C -P -traditional
+POUND_DEF       =       -DNO_RRTM_PHYSICS  -traditional $(COREDEFS) -DNONSTANDARD_SYSTEM -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+CPPFLAGS        =       -I$(LIBINCLUDE) -C -P $(ARCHFLAGS) -I../external/RSL_LITE -C -P `cat ../inc/dm_comm_cpp_flags` $(POUND_DEF)
+AR              =       ar ru
+M4              =       m4 -B 14000
+RANLIB          =       ranlib
+NETCDFPATH      =       CONFIGURE_NETCDF_PATH
+CC_TOOLS        =       pathcc
+                                                                                
+externals : wrf_ioapi_includes CONFIGURE_WRFIO_NF wrfio_grib_share wrfio_grib1 CONFIGURE_WRFIO_GRIB2 ../external/RSL_LITE/librsl_lite.a wrfio_int gen_comms.c module_dm.F esmf_time
+                                                                                
+gen_comms.c : ../external/RSL_LITE/gen_comms.c
+	( /bin/cp ../tools/gen_comms_warning ../tools/gen_comms.c ; \
+	cat ../external/RSL_LITE/gen_comms.c >> ../tools/gen_comms.c )
+                                                                                
+module_dm.F : ../external/RSL_LITE/module_dm.F
+	( /bin/cp module_dm_warning module_dm.F ; cat ../external/RSL_LITE/module_dm.F >> module_dm.F )
+                                                                                
+#io_flags:
+#	( cd ../external/io_netcdf ; make flags_only ; \
+#	/bin/cp wrf_io_flags.h wrf_status_codes.h ../../inc ; \
+#	/bin/cp wrf_io_flags.h wrf_status_codes.h ../io_phdf5 )
+                                                                                
+wrfio_nf : 
+	( cd ../external/io_netcdf ; \
+	make NETCDFPATH=CONFIGURE_NETCDF_PATH CPP="$(CPP)" FC="$(FC)" TRADFLAG="-traditional" \
+	FFLAGS='$(FCFLAGS) -I../../inc -ICONFIGURE_NETCDF_PATH/include -w -fno-second-underscore' RANLIB=$(RANLIB) )
+                                                                                
+wrfio_grib_share :
+	( cd ../external/io_grib_share ; \
+          make CC="$(SCC)" CFLAGS="$(CFLAGS)" RM="$(RM)" RANLIB="$(RANLIB)" CPP="$(CPP)" TRADFLAG="-traditional" FC="$(SFC) $(PROMOTION) -I. $(FCDEBUG) $(FCBASEOPTS) -w" archive)
+
+wrfio_grib1 :
+	( cd ../external/io_grib1 ; \
+	make CC="$(CC)" CPP="$(CPP)" FC="$(SFC) -I. $(FCDEBUG) $(FCBASEOPTS) -w" TRADFLAG="-traditional" RANLIB=$(RANLIB) )
+                                                                                
+wrfio_grib2 :
+	( cd ../external/io_grib2 ; \
+	make CC="$(CC)" CPP="$(CPP) CONFIGURE_GRIB2_INC" FC="$(SFC) -I. $(FCDEBUG) $(FCBASEOPTS) -w" TRADFLAG="-traditional" RM="$(RM)" RANLIB=$(RANLIB) )
+                                                                                
+wrfio_int : 
+	( cd ../external/io_int ; \
+	make CC="$(CC)" CPP="$(CPP)" FC="$(SFC) $(FCDEBUG) $(FCBASEOPTS) -w" TRADFLAG="-traditional" RANLIB=$(RANLIB) all )
+                                                                                
+esmf_time :
+	( cd ../external/esmf_time_f90 ; \
+	make FC="$(FC) $(FCDEBUG) $(FCBASEOPTS) " CPP="$(CPP) -I../../inc -I. $(POUND_DEF)" )
+                                                                                
+../external/RSL_LITE/librsl_lite.a :
+	( cd ../external/RSL_LITE ; make CC="$(CC)" FC='mpif90 $(FCFLAGS) -byteswapio' MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) LEARN_BCAST=-DLEARN_BCAST )
+                                                                                
+# compile these without high optimization to speed compile
+solve_interface.o : solve_interface.F
+module_io_mm5.o : module_io_mm5.F
+module_si_io.o : module_si_io.F
+module_io_wrf.o : module_io_wrf.F
+module_domain.o : module_domain.F
+module_start.o : module_start.F
+module_initialize.o : module_initialize.F
+module_initialize_b_wave.o : module_initialize_b_wave.F
+module_initialize_hill2d_x.o : module_initialize_hill2d_x.F
+module_initialize_quarter_ss.o : module_initialize_quarter_ss.F
+module_initialize_squall2d_x.o : module_initialize_squall2d_x.F
+module_initialize_squall2d_y.o : module_initialize_squall2d_y.F
+module_initialize_real.o : module_initialize_real.F
+module_dm.o : module_dm.F
+start_domain.o : start_domain.F
+mediation_integrate.o : mediation_integrate.F
+module_configure.o : module_configure.F
+                                                                                
+solve_interface.o                                              \
+module_io_mm5.o module_si_io.o module_io_wrf.o module_domain.o \
+module_start.o module_initialize.o module_initialize_b_wave.o  \
+module_initialize_hill2d_x.o module_initialize_quarter_ss.o    \
+module_initialize_squall2d_x.o module_initialize_squall2d_y.o  \
+mediation_integrate.o \
+module_configure.o                                             \
+module_initialize_real.o module_dm.o start_domain.o :
+	$(RM) $@
+	$(SED_FTN) $*.F > $*.b
+	$(CPP) -I../inc $(CPPFLAGS) $*.b  > $*.f
+	$(RM) $*.b
+	$(FC) -c $(FCBASEOPTS) $(MODULE_DIRS) $*.f
+
+###########################################################
 #ARCH    NEC SX-8, NEC SX cross compiler DM-Parallel (RSL, Allows nesting)
 #
 # Notes: for experimental implementation of moving nests, add -DMOVE_NESTS to ARCHFLAGS
@@ -8268,6 +9805,133 @@ esmf_time :
 
 ../external/RSL/RSL/librsl.a :
 	( cd ../external/RSL/RSL ; make CC="$(CC)" FC="$(FC) $(PROMOTION)" MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) LEARN_BCAST=-DLEARN_BCAST sx )
+
+# compile these without high optimization to speed compile
+solve_interface.o : solve_interface.F
+shift_domain_em.o : shift_domain_em.F
+module_io_mm5.o : module_io_mm5.F
+module_si_io.o : module_si_io.F
+module_io_wrf.o : module_io_wrf.F
+module_domain.o : module_domain.F
+module_start.o : module_start.F
+module_initialize.o : module_initialize.F
+module_initialize_b_wave.o : module_initialize_b_wave.F
+module_initialize_hill2d_x.o : module_initialize_hill2d_x.F
+module_initialize_quarter_ss.o : module_initialize_quarter_ss.F
+module_initialize_squall2d_x.o : module_initialize_squall2d_x.F
+module_initialize_squall2d_y.o : module_initialize_squall2d_y.F
+module_initialize_real.o : module_initialize_real.F
+module_dm.o : module_dm.F
+start_domain.o : start_domain.F
+mediation_integrate.o : mediation_integrate.F
+module_configure.o : module_configure.F
+
+solve_interface.o                                              \
+shift_domain_em.o                                              \
+module_io_mm5.o module_si_io.o module_io_wrf.o module_domain.o \
+module_start.o module_initialize.o module_initialize_b_wave.o  \
+module_initialize_hill2d_x.o module_initialize_quarter_ss.o    \
+module_initialize_squall2d_x.o module_initialize_squall2d_y.o  \
+module_configure.o                                             \
+mediation_integrate.o \
+module_initialize_real.o module_dm.o start_domain.o :
+	$(RM) $@
+	$(SED_FTN) $*.F > $*.b 
+	$(CPP) -I../inc $(CPPFLAGS) $*.b  > $*.f
+	$(RM) $*.b
+	$(FC) -c $(PROMOTION) $(FCBASEOPTS) $(MODULE_DIRS) $*.f
+#	if [ ! -e $@ ] ; then \
+#	sleep 10 ; $(FC) -c $(PROMOTION) $(FCBASEOPTS) $(MODULE_DIRS) $*.f ; \
+#	fi
+#	if [ ! -e $@ ] ; then \
+#	sleep 30 ; $(FC) -c $(PROMOTION) $(FCBASEOPTS) $(MODULE_DIRS) $*.f ; \
+#	fi
+#	if [ ! -e $@ ] ; then \
+#	sleep 300 ; $(FC) -c $(PROMOTION) $(FCBASEOPTS) $(MODULE_DIRS) $*.f ; \
+#	fi
+
+###########################################################
+#ARCH    NEC SX-8, NEC SX cross compiler DM-Parallel (RSL_LITE, Allows nesting)
+#
+# Notes: for experimental implementation of moving nests, add -DMOVE_NESTS to ARCHFLAGS
+#        for experimental implementation of vortex tracking nests, add -DMOVE_NESTS -DVORTEX_CENTER to ARCHFLAGS
+#
+DMPARALLEL      =       1
+MAX_PROC        =       1024
+FC              =       sxmpif90
+LD              =       sxmpif90
+CC              =       sxmpic++
+SCC		=	sxmpic++
+SFC             =       sxmpif90
+RWORDSIZE       =       $(NATIVE_RWORDSIZE)
+PROMOTION	=	
+CFLAGS          =       -DNCARIBM_NOC99 -DDM_PARALLEL \
+                        -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) -I../external/RSL_LITE
+FCOPTIM		=	
+FCDEBUG		=	#-g
+#FCBASEOPTS      =       -w -byteswapio -Ktrap=fp -Mfree -tp p6 $(FCDEBUG)
+FCBASEOPTS      =       -f4 -Wf,-P i $(FCDEBUG)
+FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS)
+ARCHFLAGS       =       -DGRIB1 -DINTIO -DDM_PARALLEL \
+                        -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4 CONFIGURE_NETCDF_FLAG \
+                        -DTRIEDNTRUE   \
+			-DLIMIT_ARGS
+# machine-specific flags needed to link in ESMF library (C++ run-time-library, etc.)
+ESMF_LIB_FLAGS  =       
+ESMF_IO_LIB     =       ESMFIOLIB
+ESMF_IO_LIB_EXT =       ESMFIOEXTLIB
+INCLUDE_MODULES =       -I../main -I../external/io_netcdf -I../external/io_int -I../external/esmf_time_f90 \
+                        -I../external -I../frame -I../share -I../phys -I../chem -I../inc
+PERL            =       perl
+REGISTRY        =       Registry
+LIB             =       CONFIGURE_NETCDF_LIB_PATH -L../external/RSL_LITE -lrsl_lite \
+                        -L../external/io_grib1 -lio_grib1 \
+			-L../external/io_int -lwrfio_int \
+			../frame/module_internal_header_util.o ../frame/pack_utils.o -L../external/esmf_time_f90 -lesmf_time -L$(SX_BASE_CPLUS)/lib -lcpp
+LDFLAGS         =       $(FCFLAGS) -Wl,-h nodefs CONFIGURE_LDFLAGS
+ENVCOMPDEFS	=	CONFIGURE_COMPILEFLAGS
+CPP             =       /lib/cpp -C -P -traditional
+POUND_DEF	=	-DNO_RRTM_PHYSICS  -traditional $(COREDEFS) -DNONSTANDARD_SYSTEM -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+CPPFLAGS        =       -I$(LIBINCLUDE) -C -P $(ARCHFLAGS) -I../external/RSL_LITE -C -P `cat ../inc/dm_comm_cpp_flags` $(ENVCOMPDEFS) $(POUND_DEF) -DNEC
+AR_BASE         =       sxar
+AR              =       $(AR_BASE) ru
+M4              =       m4 -B 14000
+RANLIB          =       sxar rs
+NETCDFPATH	=	CONFIGURE_NETCDF_PATH
+CC_TOOLS        =       cc
+
+#### Override default sed command and script for Fortran source files         ####
+#### This sed script does not pass __FILE__ and __LINE__ to wrf_error_fatal() ####
+#### because the SGI Fortran compiler complains about long source lines.      ####
+SED_FTN = sed -f ../arch/no_file_line.sed
+
+externals : wrf_ioapi_includes CONFIGURE_WRFIO_NF wrfio_grib1 ../external/RSL_LITE/librsl_lite.a wrfio_int gen_comms.c module_dm.F esmf_time
+
+gen_comms.c : ../external/RSL_LITE/gen_comms.c
+	( /bin/cp ../tools/gen_comms_warning ../tools/gen_comms.c ; \
+          cat ../external/RSL_LITE/gen_comms.c >> ../tools/gen_comms.c )
+
+module_dm.F : ../external/RSL_LITE/module_dm.F
+	( /bin/cp module_dm_warning module_dm.F ; cat ../external/RSL_LITE/module_dm.F >> module_dm.F )
+
+wrfio_nf : 
+	( cd ../external/io_netcdf ; \
+	  make NETCDFPATH=CONFIGURE_NETCDF_PATH RANLIB="$(RANLIB)" CPP="$(CPP)" FC="$(FC) $(PROMOTION) $(FCFLAGS) -w" TRADFLAG="-traditional" AR="$(AR_BASE)" )
+
+wrfio_grib1 :
+	( cd ../external/io_grib1 ; \
+          make CC="$(SCC)" CFLAGS="$(CFLAGS)" RANLIB="$(RANLIB)" CPP="$(CPP)" FC="$(SFC) $(PROMOTION) -I. $(FCDEBUG) $(FCBASEOPTS) -w" TRADFLAG="-traditional" AR="$(AR_BASE)" )
+
+wrfio_int : 
+	( cd ../external/io_int ; \
+          make CC="$(CC)" RANLIB="$(RANLIB)" CPP="$(CPP)" SFC="$(SFC) $(PROMOTION) $(FCDEBUG) $(FCBASEOPTS)" FC="$(SFC) $(PROMOTION) $(FCDEBUG) $(FCBASEOPTS) -w" TRADFLAG="-traditional" AR="$(AR_BASE)" all )
+
+esmf_time : 
+	( cd ../external/esmf_time_f90 ; \
+	  make FC="$(FC) $(PROMOTION) $(FCDEBUG) $(FCBASEOPTS)" RANLIB="$(RANLIB)" CPP="$(CPP) -I../../inc -I. $(POUND_DEF)" AR="$(AR_BASE)" )
+
+../external/RSL_LITE/librsl_lite.a :
+	( cd ../external/RSL_LITE ; make CC="$(CC)" FC="$(FC) $(PROMOTION)" MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) LEARN_BCAST=-DLEARN_BCAST AR="$(AR_BASE)" )
 
 # compile these without high optimization to speed compile
 solve_interface.o : solve_interface.F
