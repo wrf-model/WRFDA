@@ -125,7 +125,8 @@ subroutine da_minimise_cg( grid, config_flags,            &
 
       call da_calculate_grady( iv, y , jo_grad_y)
 
-      call da_transform_vtoy_adj( cv_size, be, ep, fhat, iv, vp, vv, xa, xb, xbx, xp, jo_grad_y, &
+      call da_transform_vtoy_adj( iter, cv_size, be, ep, fhat, iv, vp, vv, \
+                                  xa, xb, xbx, xp, jo_grad_y, &
                                   ids, ide, jds, jde, kds, kde,                     &
                                   ims, ime, jms, jme, kms, kme,                     &
                                   its, ite, jts, jte, kts, kte,                     &

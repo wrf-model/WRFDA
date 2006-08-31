@@ -824,6 +824,7 @@ module da_define_structures
    type j_type
       real             :: total
       real             :: jb
+      real             :: jc
       real             :: je
       type (jo_type)   :: jo
    end type j_type

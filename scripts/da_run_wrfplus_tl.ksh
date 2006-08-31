@@ -11,14 +11,36 @@
 
 set -x
 
+
+arg1=$1
+arg2=$2
+
 mkdir tl
 cd tl
 
-cp ../tl00 wrfinput_d$DOMAIN
-cp ../namelist.var4dtl namelist.input
+if test $arg1=pre && test $arg2=monitor; then
+   cp ../namelist.var4dtl namelist.input
+   cp tl00 wrfinput_d${DOMAIN}
+fi
 
-../wrfplus.exe > wrf_tl.out 2>wrf_tl.error
+if test $NUM_PROCS=1; then
+   ../wrfplus.exe > wrf_tl.out 2>wrf_tl.error
+fi
 
-cp tl2000-01-25_01:00:00 ../tl01
-cp tl2000-01-25_02:00:00 ../tl02
-cp tl2000-01-25_03:00:00 ../tl03
+if test $arg1=post && test $arg2=monitor; then
+   for HOUR in 01 02 03 04 05 06; do
+      export CCYY=`echo ${FG_DATE[$HOUR]} | cut -c1-4`
+      export MM=`echo ${FG_DATE[$HOUR]} | cut -c5-6`
+      export DD=`echo ${FG_DATE[$HOUR]} | cut -c7-8`
+      export HH=`echo ${FG_DATE[$HOUR]} | cut -c9-10`
+      cp tl${CCYY}_${MM}_${DD}_${HH}:00.00 tl$HOUR
+   done
+
+   if NL_JCDFI_USE; then
+      export CCYY=`echo $END_DATE | cut -c1-4`
+      export MM=`echo $END_DATE | cut -c5-6`
+      export DD=`echo $END_DATE | cut -c7-8`
+      export HH=`echo $END_DATE | cut -c9-10`
+      cp auxhist3_d${DOMAIN}_${CCYY}_${MM}_${DD}_${HH}:00.00 tldf
+   fi
+fi 

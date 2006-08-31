@@ -58,11 +58,11 @@ if test ! -f $OB_DIR/$DATE/ob.ascii; then
    export TS0=${TS0:-273.0}
    export TLP=${TLP:-50.0}
 
-   if test $MAP_PROJ -eq 'lambert'; then
+   if test $MAP_PROJ = lambert; then
       export PROJ=1
-   elif test $MAP_PROJ -eq 'polar';  then
+   elif test $MAP_PROJ = polar;  then
       export PROJ=2
-   elif test $MAP_PROJ -eq 'mercator'; then
+   elif test $MAP_PROJ = mercator; then
       export PROJ=3
    else
       echo "   Unknown MAP_PROJ = $MAP_PROJ."

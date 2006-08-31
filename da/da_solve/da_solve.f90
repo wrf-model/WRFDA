@@ -54,7 +54,7 @@ SUBROUTINE da_solve ( grid , config_flags , &
 
    integer                      :: cv_size
    real                         :: j_grad_norm_target ! TArget j norm.
-   integer                      :: iost, ierr
+   integer                      :: iost, ierr,comm
 
    IF (trace_use) call da_trace_entry("da_solve")
 
@@ -310,9 +310,30 @@ SUBROUTINE da_solve ( grid , config_flags , &
       ! [8.1] Calculate nonlinear model trajectory 
 
       if (lvar4d) then
-         call da_trace("da_solve","Starting da_run_wrfplus_nl.ksh")
-         call system("da_run_wrfplus_nl.ksh")
-         call da_trace("da_solve","Finished da_run_wrfplus_nl.ksh")
+         call da_trace("da_solve","Starting da_run_wrf_nl.ksh")
+#ifdef DM_PARALLEL
+         call system_4dv("da_run_wrf_nl.ksh pre ")
+!         call system("./wrf.exe -rmpool 1")
+         IF ( wrf_dm_on_monitor() ) THEN
+           call system("rm wrf_done")
+           call system("touch wrf_go_ahead")
+           DO WHILE ( .true. )
+             OPEN(99,file="wrf_done",status="old",err=303)
+             CLOSE(99)
+             EXIT
+303          CONTINUE
+             CALL system("sync")
+             CALL system("sleep 1")
+           ENDDO
+         ENDIF
+         CALL wrf_get_dm_communicator ( comm )
+         CALL mpi_barrier( comm, ierr )
+         
+         call system_4dv("da_run_wrf_nl.ksh post ")
+#else
+         call system("da_run_wrf_nl.ksh")
+#endif
+         call da_trace("da_solve","Finished da_run_wrf_nl.ksh")
       endif
 
       ! [8.2] Calculate innovation vector (O-B):

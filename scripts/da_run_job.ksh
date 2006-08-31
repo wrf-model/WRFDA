@@ -8,6 +8,8 @@ export DAT_DIR=${DAT_DIR:-$HOME/data}
 export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION}
 export EXP_DIR=${EXP_DIR:-$REG_DIR/$EXPT}
 export SCRIPT=${SCRIPT:-$WRFVAR_DIR/scripts/da_run_wrfvar.ksh}
+export POE=false
+export RESET=${RESET:-true}
 
 export PLATFORM=`uname`
 export HOSTNAME=`hostname`
@@ -17,8 +19,11 @@ export MP_SHARED_MEMORY=${MP_SHARED_MEMORY:-yes}
 export HOSTS=${HOSTS:-$PWD/hosts}
 export RUN_CMD=${RUN_CMD:-mpirun -v -np $NUM_PROCS -all-local -machinefile $HOSTS}
 
-rm -rf $EXP_DIR
-mkdir $EXP_DIR
+if $RESET; then
+  rm -rf $EXP_DIR
+fi
+
+mkdir -p $EXP_DIR
 cd $EXP_DIR
 
 if test $HOSTNAME = "bs1101en" -o $HOSTNAME = "bs1201en"; then 
@@ -27,6 +32,7 @@ if test $HOSTNAME = "bs1101en" -o $HOSTNAME = "bs1201en"; then
    # Rather simplistic node calculation 
    let TEMP=$NUM_PROCS-1
    let NODES=$TEMP/8+1
+   export POE=true
 
    cat > job.ksh <<EOF
 #!/bin/ksh
@@ -58,10 +64,8 @@ if test $HOSTNAME = "bs1101en" -o $HOSTNAME = "bs1201en"; then
 #PBS -lnodes=4:comp -lwalltime=1000
 #Uncomment for JET: source /usr/local/bin/setup-mpi.csh
 export RUN_CMD="$DEBUGGER " # Space important
-. $SCRIPT >> $EXP_DIR/index.html 2>&1
+. $SCRIPT > $EXP_DIR/index.html 2>&1
 EOF
-
-   llsubmit job.ksh
 elif test $HOSTNAME = "ln0126en" -o $HOSTNAME = "ln0127en"; then 
    # lightning uses lsf
    cat > job.ksh <<EOF
@@ -79,17 +83,17 @@ elif test $HOSTNAME = "ln0126en" -o $HOSTNAME = "ln0127en"; then
 #BSUB -q regular  
 
 export RUN_CMD=${RUN_CMD:-mpirun.lsf -v -np $NUM_PROCS}
-. $SCRIPT >> $EXP_DIR/index.html 2>&1
+. $SCRIPT > $EXP_DIR/index.html 2>&1
 
 EOF
 elif test $HOSTNAME = ocotillo; then
    cat > job.ksh <<EOF
 export RUN_CMD=${RUN_CMD:-mpirun -v -np $NUM_PROCS -nolocal -machinefile $HOSTS}
-$SCRIPT >> $EXP_DIR/index.html 2>&1
+$SCRIPT > $EXP_DIR/index.html 2>&1
 EOF
 else
    cat > job.ksh <<EOF
-$SCRIPT >> $EXP_DIR/index.html 2>&1
+$SCRIPT > $EXP_DIR/index.html 2>&1
 EOF
 fi
 
@@ -104,7 +108,6 @@ EOF
 
 chmod +x job.ksh
 
-echo "<HTML><HEAD><TITLE>$EXPT</TITLE></HEAD><BODY><H1>$EXPT</H1><PRE>" > $EXP_DIR/index.html
 
 if test $HOSTNAME = "bs1101en" -o $HOSTNAME = "bs1201en"; then 
    llsubmit job.ksh
@@ -115,9 +118,5 @@ elif test $HOSTNAME = ocotillo; then
 else
    ./job.ksh
 fi
-
-echo "</PRE></BODY></HTML>" >> $EXP_DIR/index.html
-
-
 
 exit 0

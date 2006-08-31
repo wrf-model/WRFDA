@@ -1,4 +1,4 @@
-subroutine da_transform_vtoy_adj( cv_size, be, ep, cv, iv, vp, vv, xa, xb, &
+subroutine da_transform_vtoy_adj( iter,cv_size, be, ep, cv, iv, vp, vv, xa, xb, &
                                   xbx, xp, y, &
                                   ids, ide, jds, jde, kds, kde,     &
                                   ims, ime, jms, jme, kms, kme,     &
@@ -11,6 +11,7 @@ subroutine da_transform_vtoy_adj( cv_size, be, ep, cv, iv, vp, vv, xa, xb, &
 
    implicit none
 
+   integer, intent(in)                :: iter
    integer, intent(in)                :: cv_size ! Size of cv array.
    type (be_type), intent(in)         :: be     ! background error structure.
    type (ep_type), intent(in)         :: ep     ! ensemble perturbation structure.
@@ -32,6 +33,7 @@ subroutine da_transform_vtoy_adj( cv_size, be, ep, cv, iv, vp, vv, xa, xb, &
    type(grid_config_rec_type), intent(inout) :: config_flags
 
    integer :: nobwin,ndynopt
+   integer ierr, comm
 
    character(len=4) :: filnam
 
@@ -49,8 +51,52 @@ subroutine da_transform_vtoy_adj( cv_size, be, ep, cv, iv, vp, vv, xa, xb, &
                               )
       enddo
 
+      ndynopt      = grid%dyn_opt
+      grid%dyn_opt = DYN_EM_TL
+      call nl_set_dyn_opt ( 1 , DYN_EM_TL )
+
+      if ( jcdfi_use .AND. iter > 0 ) then
+         filnam ='tldf'
+         call da_med_initialdata_input( grid , config_flags, in_filename=filnam )
+      else
+         grid%em_g_u_2 = 0.0
+         grid%em_g_v_2 = 0.0
+         grid%em_g_w_2 = 0.0
+         grid%em_g_t_2 = 0.0
+         grid%em_g_ph_2 = 0.0
+         grid%em_g_mu_2 = 0.0
+         grid%g_moist = 0.0
+      endif
+
+      filnam ='afdf'
+      call da_med_initialdata_output( grid , config_flags, filnam )
+
+      grid%dyn_opt = ndynopt
+      call nl_set_dyn_opt ( 1 , DYN_EM )
+
       call da_trace("da_transform_vtoy_adj","Starting da_run_wrfplus_ad.ksh")
+
+#ifdef DM_PARALLEL
+      call system_4dv("da_run_wrfplus_ad.ksh pre ")
+
+      IF ( wrf_dm_on_monitor() ) THEN
+        call system("rm wrf_done")
+        call system("touch wrf_go_ahead")
+        DO WHILE ( .true. )
+          OPEN(99,file="wrf_done",status="old",err=303)
+          CLOSE(99)
+          EXIT
+303          CONTINUE
+          CALL system("sleep 1")
+        ENDDO
+      ENDIF
+      CALL wrf_get_dm_communicator ( comm )
+      CALL mpi_barrier( comm, ierr )
+
+      call system_4dv("da_run_wrfplus_ad.ksh post ")
+#else
       call system("da_run_wrfplus_ad.ksh")
+#endif
       call da_trace("da_transform_vtoy_adj","Finished da_run_wrfplus_ad.ksh")
 
       filnam = 'gr00'

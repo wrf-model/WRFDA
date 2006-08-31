@@ -21,6 +21,7 @@ SUBROUTINE wrf_restartin ( fid , grid , config_flags , switch , ierr )
             ims , ime , jms , jme , kms , kme , &
             ips , ipe , jps , jpe , kps , kpe
 
+    INTEGER       itrace
     INTEGER       iname(9)
     INTEGER       iordering(3)
     INTEGER       icurrent_date(24)
@@ -51,10 +52,7 @@ SUBROUTINE wrf_restartin ( fid , grid , config_flags , switch , ierr )
 
     CALL nl_get_dyn_opt ( 1 , dyn_opt )
 
-#include "wrf_restartin.inc"
-    IF ( grid%id .GT. 1 ) THEN
-#include "wrf_bdyin.inc"
-    ENDIF
+#include <wrf_restartin.inc>
 
     RETURN
     END

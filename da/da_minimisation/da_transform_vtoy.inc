@@ -31,6 +31,7 @@ subroutine da_transform_vtoy( cv_size, be, ep, cv, iv, vp, vv, xa, xb, xbx, &
    type(grid_config_rec_type), intent(inout) :: config_flags
 
    integer :: nobwin
+   integer ierr, comm
 
    character(len=4) :: filnam
 
@@ -46,7 +47,27 @@ subroutine da_transform_vtoy( cv_size, be, ep, cv, iv, vp, vv, xa, xb, xbx, &
                                  )
 
       call da_trace("da_transform_vtoy","Starting da_run_wrfplus_tl.ksh")
+#ifdef DM_PARALLEL
+      call system_4dv("da_run_wrfplus_tl.ksh pre")
+
+      IF ( wrf_dm_on_monitor() ) THEN
+        call system("rm wrf_done")
+        call system("touch wrf_go_ahead")
+        DO WHILE ( .true. )
+          OPEN(99,file="wrf_done",status="old",err=303)
+          CLOSE(99)
+          EXIT
+303          CONTINUE
+          CALL system("sleep 1")
+        ENDDO
+      ENDIF
+      CALL wrf_get_dm_communicator ( comm )
+      CALL mpi_barrier( comm, ierr )
+
+      call system_4dv("da_run_wrfplus_tl.ksh post ")
+#else
       call system("da_run_wrfplus_tl.ksh")
+#endif
       call da_trace("da_transform_vtoy","Finished da_run_wrfplus_tl.ksh")
 
       do nobwin=1, num_fgat_time

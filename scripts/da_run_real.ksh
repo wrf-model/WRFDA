@@ -12,7 +12,15 @@ export NL_NUM_METGRID_LEVELS=${NL_NUM_METGRID_LEVELS:-27}
 export LBC_FREQ=${LBC_FREQ:-06}
 
 export RUN_DIR=${RUN_DIR:-$EXP_DIR/real}
-export OUT_DIR=${OUT_DIR:-$RUN_DIR}
+export WORK_DIR=$RUN_DIR/working
+export OUT_DIR=${OUT_DIR:-$RUN_DIR/$DATE}
+
+# Do we remove the WORK_DIR at the end to save space
+export CLEAN=${CLEAN:-false}
+
+rm -rf $WORK_DIR
+mkdir -p $OUT_DIR $WORK_DIR
+cd $WORK_DIR
 
 if $NL_USE_HTML; then
    echo "<HTML><HEAD><TITLE>$EXPT real</TITLE></HEAD><BODY>"
@@ -23,14 +31,21 @@ date
 
 . ${WRFVAR_DIR}/scripts/da_get_date_range.ksh $DATE $CYCLE_PERIOD
 
-cd $RUN_DIR
+echo "Release directory:           $REL_DIR"
+echo "WRF directory:               $WRF_DIR $WRF_REV"
+echo "Working directory:           $WORK_DIR"
+echo "Output directory:            $OUT_DIR"
+echo "Start date:                  $DATE"
+echo "End date:                    $END_DATE"
 
 let NL_INTERVAL_SECONDS=$LBC_FREQ*3600
 
-#if test -f $WRF_DIR/inc/namelist_script.inc; then
+export NL_AUXINPUT1_INNAME="met_em.d<domain>.<date>"
+
+if test -f $WRF_DIR/inc/namelist_script.inc; then
    #Superior solution
-#   . $WRF_DIR/inc/namelist_script.inc
-#else
+   . $WRF_DIR/inc/namelist_script.inc
+else
    cat > namelist.input <<EOF
  &time_control
  run_days                            = 0,
@@ -174,9 +189,7 @@ let NL_INTERVAL_SECONDS=$LBC_FREQ*3600
  nio_groups = 1,
  /
 EOF
-#fi
-
-mkdir -p $RUN_DIR $OUT_DIR
+fi
 
 typeset -l LC_SOLVER
 LC_SOLVER=$SOLVER
@@ -193,6 +206,31 @@ if test ! -f $CS_DIR/$DATE/wrfinput_d${DOMAIN}; then
       ln -fs $CS_DIR/$DATE/met_em.d* .
       $RUN_CMD ${WRF_DIR}/main/real.exe
       RC=$?
+
+      if test -f fort.9; then
+        cp fort.9 $OUT_DIR/namelist.output
+      fi
+
+      mkdir -p $OUT_DIR/rsl
+      mv rsl* $OUT_DIR/rsl
+      if $NL_USE_HTML; then
+         cd $OUT_DIR/rsl
+         for FILE in rsl*; do
+            echo "<HTML><HEAD><TITLE>$FILE</TITLE></HEAD>" > $FILE.html
+            echo "<H1>$FILE</H1><PRE>" >> $FILE.html
+            cat $FILE >> $FILE.html
+            echo "</PRE></BODY></HTML>" >> $FILE.html
+            rm $FILE
+         done
+         cd $OUT_DIR
+
+         echo '<A HREF="namelist.input">Namelist input</a>'
+         echo '<A HREF="namelist.output">Namelist output</a>'
+         echo '<A HREF="rsl/rsl.out.0000.html">rsl.out.0000</a>'
+         echo '<A HREF="rsl/rsl.error.0000.html">rsl.error.0000</a>'
+         echo '<A HREF="rsl">Other RSL output</a>'
+      fi
+
       if test $RC = 0; then
          echo `date` "${OK}Succeeded${END}"
       else

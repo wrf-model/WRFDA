@@ -50,6 +50,9 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
    real             :: xhat_jb(1:cv_size_jb)        ! Jb control variable.
    real             :: cv_je(1:cv_size_je)          ! Je control variable.
    real             :: xhat_je(1:cv_size_je)        ! Je control variable.
+   integer          :: ndynopt
+
+   character(len=4) :: filnam
 
    IF (trace_use) call da_trace_entry("da_calculate_j")
 
@@ -91,6 +94,30 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
       j % jo % total = wrf_dm_sum_real( jo_partial )
    ENDIF
 
+   ! [1.4] calculate jc-dfi:
+
+   j % jc = 0.0
+
+   if (lvar4d .AND. jcdfi_use .AND. iter > 0) then
+
+      ndynopt      = grid%dyn_opt
+      grid%dyn_opt = DYN_EM_TL
+      call nl_set_dyn_opt ( 1 , DYN_EM_TL )
+
+      filnam ='tldf'
+      call da_med_initialdata_input( grid , config_flags, in_filename=filnam )
+
+      grid%dyn_opt = ndynopt
+      call nl_set_dyn_opt ( 1 , DYN_EM )
+
+      j % jc = j % jc + 0.5*da_dot( size(grid%em_g_u_2), grid%em_g_u_2 , grid%em_g_u_2)
+      j % jc = j % jc + 0.5*da_dot( size(grid%em_g_v_2), grid%em_g_v_2 , grid%em_g_v_2)
+      j % jc = j % jc + 0.5*da_dot( size(grid%em_g_t_2), grid%em_g_t_2 , grid%em_g_t_2)
+      j % jc = j % jc + 0.5*da_dot( size(grid%em_g_mu_2),grid%em_g_mu_2, grid%em_g_mu_2)
+      j % jc = j % jc + 0.5*da_dot( size(grid%g_moist),  grid%g_moist,   grid%g_moist)
+
+   endif
+
    !-------------------------------------------------------------------------
    ! [2.0] calculate jb:
    !-------------------------------------------------------------------------
@@ -119,26 +146,48 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
    j % je = je_factor * j % je
 
    !-------------------------------------------------------------------------
-   ! [4.0] calculate total cost function j = jo + jb + je:
+   ! [4.0] calculate total cost function j = jo + jb + jc + je:
    !-------------------------------------------------------------------------
+
+   if( grid%jcdfi_use ) then
+      j % total = j % jb + j % jo % total + j % jc + j % je
+   else
+      j % total = j % jb + j % jo % total + j % je
+   endif
+
+      if(it == 1 .and. iter == 0) then
+      write(81,'(a)')'Outer   EPS   Inner      J          Jb      Jo     Jc'
+      write(81,'(a)')'Iter          Iter                            '
+      write(*,'(a)')'Outer   EPS   Inner  J=      J          Jb      Jo         Jc'
+      write(82,'(a)')'Outer   EPS   Inner      G          Gb      Go'
+      write(82,'(a)')'Iter          Iter                            '
+      endif
+
+      write(81,81) it, EPS(it), iter, j % total, j % jb, j % jo % total, j % jc
+      write(*,89) it, EPS(it), iter, ' J= ',j % total, j % jb, j % jo % total, j % jc
+ 89   format(2x,i2,1x,f6.3,2x,i4,2x,a,2x,4f10.3)
+ 81   format(2x,i2,1x,f6.3,2x,i4,2x,4f10.3)
+
+
+
 
    j % total = j % jb + j % jo % total + j % je
 
    if (it == 1 .and. iter == 0) then
-      write(UNIT=cost_unit,FMT='(a)')'Outer   EPS   Inner      J          Jb      Jo      Je'
+      write(UNIT=cost_unit,FMT='(a)')'Outer   EPS   Inner      J          Jb      Jo      Jc      Je'
       write(UNIT=cost_unit,FMT='(a)')'Iter          Iter                            '
-      write(UNIT=grad_unit,FMT='(a)')'Outer   EPS   Inner      G          Gb      Go      Ge'
+      write(UNIT=grad_unit,FMT='(a)')'Outer   EPS   Inner      G          Gb      Go              Ge'
       write(UNIT=grad_unit,FMT='(a)')'Iter          Iter                            '
    endif
 
-   write(UNIT=cost_unit,FMT='(2x,i2,1x,f6.3,2x,i4,2x,4f10.3)') &
-      it, EPS(it), iter, j % total, j % jb, j % jo % total, j % je
+   write(UNIT=cost_unit,FMT='(2x,i2,1x,f6.3,2x,i4,2x,5f10.3)') &
+      it, EPS(it), iter, j % total, j % jb, j % jo % total, j % jc, j % je
 
    !-------------------------------------------------------------------------
    ! [5.0] calculate grad_v (jo):
    !-------------------------------------------------------------------------
 
-   call da_transform_vtoy_adj( cv_size, be, ep, j_grad, iv, vp, vv, xa, xb, xbx, xp, jo_grad_y, &
+   call da_transform_vtoy_adj( iter, cv_size, be, ep, j_grad, iv, vp, vv, xa, xb, xbx, xp, jo_grad_y, &
                                ids, ide, jds, jde, kds, kde,     &
                                ims, ime, jms, jme, kms, kme,     &
                                its, ite, jts, jte, kts, kte,     &

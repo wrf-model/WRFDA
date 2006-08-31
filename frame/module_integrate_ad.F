@@ -157,7 +157,7 @@ RECURSIVE SUBROUTINE integrate_ad ( grid, nl_date_string, nl_date_index, ad_date
    TYPE (grid_config_rec_type)            :: config_flags
    LOGICAL , EXTERNAL                     :: wrf_dm_on_monitor
    INTEGER                                :: idum1 , idum2 , ierr , open_status
-   INTEGER                                :: rc
+   INTEGER                                :: rc, dfi_counter
 
    CHARACTER (LEN=25)                     :: currTime_str
 
@@ -284,6 +284,10 @@ RECURSIVE SUBROUTINE integrate_ad ( grid, nl_date_string, nl_date_index, ad_date
 !-----end check non-linear input
 
 
+
+!-----Check and read the dfi forcing
+      CALL jcdfi_init_coef ( grid , config_flags )
+      CALL jcdfi_input_forcing ( grid , config_flags )
 !-----start check adjoint input
       if(currTime_str(1:19) .eq. ad_date_string(ad_date_index)(1:19)) then
          print *, 'ad_date_index =', ad_date_index
@@ -299,6 +303,8 @@ RECURSIVE SUBROUTINE integrate_ad ( grid, nl_date_string, nl_date_index, ad_date
 !             'currTime_str(1:19)=', currTime_str(1:19), &
 !             'ad_date_string(ad_date_index)(1:19)=', ad_date_string(ad_date_index)(1:19)
       endif
+      dfi_counter = 0
+      CALL jcdfi_add_forcing ( grid , dfi_counter )
 !-----end check adjoint input
 
       CALL ESMF_TimeIntervalPrint(grid%domain_clock%clockint%TimeStep, 'DEBUG:  integrate_ad.', rc)
@@ -424,7 +430,10 @@ RECURSIVE SUBROUTINE integrate_ad ( grid, nl_date_string, nl_date_index, ad_date
            WRITE ( message , FMT = '("main: time ",A," on domain ",I3)' ) TRIM(message2), grid%id
            CALL end_timing ( TRIM(message) )
          END IF
+         dfi_counter = dfi_counter + 1
+         CALL jcdfi_add_forcing ( grid , dfi_counter )
       END DO
+      CALL jcdfi_finalize
       ! Avoid double writes on nests if this is not really the last time;
       ! Do check for write if the parent domain is ending.
       IF ( grid%id .EQ. 1 ) THEN               ! head_grid

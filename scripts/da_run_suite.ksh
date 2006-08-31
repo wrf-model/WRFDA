@@ -50,6 +50,8 @@
 export INITIAL_DATE=${INITIAL_DATE:-2003010100}            # Start date of test period
 export FINAL_DATE=${FINAL_DATE:-2003012800}              # Final date of test period.
 export CYCLE_PERIOD=${CYCLE_PERIOD:-6}                 # Assimilation frequency.
+export WINDOW_START=${WINDOW_START:-0}
+export WINDOW_END=${WINDOW_END:-6}
 
 # Run LONG_FCST_RANGE hr fcsts at these hours.
 export LONG_FCST_TIME_1=${LONG_FCST_TIME_1:-00}
@@ -81,6 +83,7 @@ export RUN_OBSPROC=${RUN_OBSPROC:-false}            # Run if true.
 export RUN_WRFVAR=${RUN_WRFVAR:-false}              # Run if true.
 export RUN_UPDATE_BC=${RUN_UPDATE_BC:-false}        # Run if true.
 export RUN_WRF=${RUN_WRF:-false}                   # Run if true.
+
 export CYCLING=${CYCLING:-false}                    # Cold start (false), cycle (true).
 export EXPT=${EXPT:-test}                             # Experiment name.
 export HOSTNAME=${HOSTNAME:-`hostname`}
@@ -104,9 +107,13 @@ export WPS_DIR=${WPS_DIR:-$REL_DIR/wps}
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}        
 export OBSPROC_DIR=${OBSPROC_DIR:-$REL_DIR/3DVAR_OBSPROC}   
 
-export OK='<FONT COLOR="green">'
-export ERR='<FONT COLOR="red">'
-export END='</FONT>'
+export NL_USE_HTML=${NL_USE_HTML:-false}
+
+if $NL_USE_HTML; then
+   export OK='<FONT COLOR="green">'
+   export ERR='<FONT COLOR="red">'
+   export END='</FONT>'
+fi
 
 if test ! -d $DAT_DIR; then
    mkdir $DAT_DIR
@@ -173,6 +180,13 @@ if $CHECK_SVNVERSION; then
    WPS_VN=`svnversion -n $WPS_DIR`
 fi
 
+if $NL_USE_HTML; then
+   echo "<HTML><HEAD><TITLE>$EXPT</TITLE></HEAD><BODY><H1>$EXPT</H1><PRE>"
+else
+   echo $EXPT
+   echo
+fi
+
 echo "REL_DIR      $REL_DIR"
 echo "WRF          $WRF_DIR $WRF_VN"
 echo "WRFVAR       $WRFVAR_DIR $WRFVAR_VN"
@@ -184,6 +198,9 @@ echo "OBSPROC      $OBSPROC_DIR"
 echo "NUM_PROCS    $NUM_PROCS"
 echo "INITIAL_DATE $INITIAL_DATE"
 echo "FINAL_DATE   $FINAL_DATE"
+echo "CS_DIR       $CS_DIR"
+echo "OB_DIR       $OB_DIR"
+echo "DA_DIR       $DA_DIR"
 
 while test $DATE != $FINAL_DATE; do  
 
@@ -197,19 +214,19 @@ while test $DATE != $FINAL_DATE; do
    HH=`echo $DATE | cut -c9-10`
 
    # Decide on length of forecast to run
-   if test $HH == $LONG_FCST_TIME_1; then
+   if test $HH = $LONG_FCST_TIME_1; then
       export FCST_RANGE=$LONG_FCST_RANGE_1
    fi
 
-   if test $HH == $LONG_FCST_TIME_2; then
+   if test $HH = $LONG_FCST_TIME_2; then
       export FCST_RANGE=$LONG_FCST_RANGE_2
    fi
 
-   if test $HH == $LONG_FCST_TIME_3; then
+   if test $HH = $LONG_FCST_TIME_3; then
       export FCST_RANGE=$LONG_FCST_RANGE_3
    fi
 
-   if test $HH == $LONG_FCST_TIME_4; then
+   if test $HH = $LONG_FCST_TIME_4; then
       export FCST_RANGE=$LONG_FCST_RANGE_4
    fi
 
@@ -220,8 +237,8 @@ while test $DATE != $FINAL_DATE; do
       export OUT_DIR=$RUN_DIR/$DATE
       mkdir -p $OUT_DIR
 
-      START_DATE=$DATE
-      END_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe ${DATE} ${CYCLE_PERIOD} 2>/dev/null`
+      START_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe ${DATE} $WINDOW_START 2>/dev/null`
+      END_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe ${DATE} $WINDOW_END 2>/dev/null`
 
       $WRFVAR_DIR/scripts/da_trace.ksh da_run_restore_data_ncep $OUT_DIR
       ${WRFVAR_DIR}/scripts/da_restore_data_ncep.ksh > $OUT_DIR/index.html 2>&1
@@ -266,7 +283,7 @@ while test $DATE != $FINAL_DATE; do
       fi
    fi
 
-   # Create WRF namelist.input:
+   # Create WRFVAR namelist.input:
 
    . ${WRFVAR_DIR}/inc/namelist_script.inc
 
@@ -384,6 +401,10 @@ while test $DATE != $FINAL_DATE; do
    export DATE=`$WRFVAR_DIR/main/advance_cymdh.exe $DATE $CYCLE_PERIOD 2>/dev/null`
 
 done
+
+if $NL_USE_HTML; then
+   echo "</PRE></BODY></HTML>"
+fi
 
 exit 0
 
