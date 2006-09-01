@@ -239,9 +239,9 @@ if test ! -f $CS_DIR/$DATE/wrfinput_d${DOMAIN}; then
       fi    
    fi
 
-   mv wrfinput_d${DOMAIN} $CS_DIR/$DATE
-   mv wrfbdy_d${DOMAIN} $CS_DIR/$DATE
-   mv wrflowinp_d${DOMAIN} $CS_DIR/$DATE
+   mv $WORK_DIR/wrfinput_d${DOMAIN} $CS_DIR/$DATE
+   mv $WORK_DIR/wrfbdy_d${DOMAIN} $CS_DIR/$DATE
+   mv $WORK_DIR/wrflowinp_d${DOMAIN} $CS_DIR/$DATE
 else
    echo $CS_DIR/$DATE/wrfinput_d${DOMAIN} exists, skipping
 fi

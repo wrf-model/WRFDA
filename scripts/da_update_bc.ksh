@@ -35,7 +35,7 @@ date
 if test ! -d ${RUN_DIR}; then
    mkdir ${RUN_DIR}
 fi
-set -x
+
 export REL_DIR=${REL_DIR:-$HOME/trunk} # Code directory.
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
 export DA_FIRST_GUESS=${DA_FIRST_GUESS:-$CS_DIR/$DATE/wrfvar_input_d$DOMAIN}
@@ -67,6 +67,11 @@ if $DUMMY; then
    echo Dummy update_bc > wrfbdy_d$DOMAIN
 else
    $WRFVAR_DIR/main/da_update_bc.exe
+   RC=$?
+   if test $RC != 0; then
+      echo "Update_bc failed with error $RC"
+      exit 1
+   fi
 fi
 
 mv wrfbdy_d${DOMAIN} $BDYOUT

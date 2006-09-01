@@ -1,5 +1,3 @@
-#!/bin/ksh
-
 DIR=`dirname $0`
 
 export NUM_PROCS=${NUM_PROCS:-1}               # Number of processors to run on.
@@ -67,6 +65,7 @@ export NL_GLOBAL=${NL_GLOBAL:-false}
 export NL_LVAR4D=${NL_LVAR4D:-false}
 export NL_RUN_HOURS=${NL_RUN_HOURS:-6}
 export NL_USE_HTML=${NL_USE_HTML:-false}
+export NL_JCDFI_USE=${NL_JCDFI_USE:-false}
 
 #=======================================================
 
@@ -85,7 +84,7 @@ echo "WRFPLUS directory:           $WRFPLUS_DIR $WRFPLUS_REV"
 echo "Subversion revision:         $WRFVAR_REV"
 echo "First Guess Input File:      $DA_FIRST_GUESS"
 echo "Background Error Input File: $DA_BACK_ERRORS"
-echo "Observation Input File:      $DA_OBSERVATIONS"
+echo "Observation Directory:       $OB_DIR"
 echo "Analysis:                    $DA_ANALYSIS"
 echo "Working directory:           $WORK_DIR"
 echo "Output directory:            $OUT_DIR"
@@ -103,17 +102,33 @@ if test ! -f $DA_ANALYSIS; then
    END_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe $DATE $WINDOW_END`
 
    typeset -A FG_DATE
+   typeset -A FG_CCYY
+   typeset -A FG_MM
+   typeset -A FG_DD
+   typeset -A FG_HH
 
    for HOUR in 01 02 03 04 05 06 07; do
       let H=$HOUR-1+$WINDOW_START
       FG_DATE[$HOUR]=`$WRFVAR_DIR/main/advance_cymdh.exe $DATE $H`
+      export FG_CCYY[$HOUR]=`echo ${FG_DATE[$HOUR]} | cut -c1-4`
+      export FG_MM[$HOUR]=`echo ${FG_DATE[$HOUR]} | cut -c5-6`
+      export FG_DD[$HOUR]=`echo ${FG_DATE[$HOUR]} | cut -c7-8`
+      export FG_HH[$HOUR]=`echo ${FG_DATE[$HOUR]} | cut -c9-10`
    done
 
    typeset -A OB_DATE
+   typeset -A OB_CCYY
+   typeset -A OB_MM
+   typeset -A OB_DD
+   typeset -A OB_HH
 
    for HOUR in 00 01 02 03 04 05 06; do
       let H=$HOUR+$WINDOW_START
       OB_DATE[$HOUR]=`$WRFVAR_DIR/main/advance_cymdh.exe $DATE $H`
+      export OB_CCYY[$HOUR]=`echo ${OB_DATE[$HOUR]} | cut -c1-4`
+      export OB_MM[$HOUR]=`echo ${OB_DATE[$HOUR]} | cut -c5-6`
+      export OB_DD[$HOUR]=`echo ${OB_DATE[$HOUR]} | cut -c7-8`
+      export OB_HH[$HOUR]=`echo ${OB_DATE[$HOUR]} | cut -c9-10`
    done
 
    export NPROC_X=${NPROC_X:-0} # Regional, always set NPROC_X to 0, Global, always 1
@@ -140,8 +155,8 @@ if test ! -f $DA_ANALYSIS; then
       exit 1
    fi
 
-   if test ! -r $DA_OBSERVATIONS; then
-      echo "${ERR}Observation file >$DA_OBSERVATIONS< does not exist:$END"
+   if test ! -d $OB_DIR; then
+      echo "${ERR}Observation directory >$OB_DIR< does not exist:$END"
       exit 1
    fi
 
@@ -161,12 +176,8 @@ if test ! -f $DA_ANALYSIS; then
    cp $WRFVAR_DIR/run/gribmap.txt .
    cp $WRFVAR_DIR/run/LANDUSE.TBL .
    cp $WRFVAR_DIR/run/gmao_airs_bufr.tbl .
-   cp $WRFVAR_DIR/main/wrfvar.exe  wrfvar.exe
-   if $NL_LVAR4D; then
-      cp $WRFPLUS_DIR/main/wrfplus.exe  wrfplus.exe # For TL and AD
-      cp $WRF_DIR/main/wrf.exe  wrf.exe # for NL
-      export PATH=$WRFVAR_DIR/scripts:$PATH
-   fi
+   ln -s $WRFVAR_DIR/main/wrfvar.exe .
+   export PATH=$WRFVAR_DIR/scripts:$PATH
 
    ln -sf $DA_FIRST_GUESS	 wrfvar_input
    ln -sf $DA_BOUNDARIES 	 wrfbdy_d$DOMAIN
@@ -216,7 +227,6 @@ if test ! -f $DA_ANALYSIS; then
       export NL_USE_SSMIRETRIEVALOBS=true
    fi
 
-   # Create namelist.input files:
    export NL_START_YEAR=`echo $START_DATE | cut -c1-4`
    export NL_START_MONTH=`echo $START_DATE | cut -c5-6`
    export NL_START_DAY=`echo $START_DATE | cut -c7-8`
@@ -227,26 +237,81 @@ if test ! -f $DA_ANALYSIS; then
    export NL_END_HOUR=`echo $END_DATE | cut -c9-10`
 
    if $NL_LVAR4D; then
-      export NL_AUXHIST2_INNAME='auxhist2_d<domain>_<date>'
+      # Create nl, tl, ad links structures
+      mkdir nl tl ad
 
+      # nl
+
+      # Inputs
+      export NL_AUXHIST2_INNAME='auxhist2_d<domain>_<date>'
       export NL_DYN_OPT=2
       export NL_INPUT_OUTNAME='wrfvar_input_d<domain>_<date>'
       . $WRF_DIR/inc/namelist_script.inc
-      mv namelist.input namelist.var4dnl
+      mv namelist.input nl
+      ln -fs $WORK_DIR/LANDUSE.TBL nl
+      ln -fs $WORK_DIR/wrfbdy_d$DOMAIN nl
+      if test -e $WORD_DIR/wrfvar_output; then
+         ln -fs $WORK_DIR/wrfvar_output nl/wrfinput_d$DOMAIN
+      else
+         ln -fs $WORK_DIR/wrfvar_input nl/wrfinput_d$DOMAIN
+      fi
+      ln -s $WRF_DIR/main/wrf.exe nl
 
+      # Outputs
+      for HOUR in 01 02 03 04 05 06; do
+         ln -s nl/wrfvar_input_${FG_CCYY[$HOUR]}_${FG_MM[$HOUR]}_${FG_DD[$HOUR]}_${FG_HH[$HOUR]}:00.00 fgat_fg.$HOUR
+      done
 
+      # ad
+
+      # Inputs
       export NL_DYN_OPT=202
       export NL_INPUT_OUTNAME='wrfvar_input_d<domain>_<date>'
       export NL_AUXINPUT3_INNAME='auxinput3_d<domain>_<date>'
       . $WRFPLUS_DIR/inc/namelist_script.inc
-      mv namelist.input namelist.var4dad
+      mv namelist.input ad
+      ln -fs $WORK_DIR/LANDUSE.TBL ad
+      for HOUR in 01 02 03 04 05 06; do
+         ln -fs $WORK_DIR/af$HOUR ad/auxinput3_d${DOMAIN}_${FG_CCYY[$HOUR]}_${FG_MM[$HOUR]}_${FG_DD[$HOUR]}_${FG_HH[$HOUR]}:00.00
+      done
+      if $NL_JCDFI_USE; then
+         ln -fs $WORK_DIR/afdf ad/auxinput3_d${DOMAIN}_dfi
+      fi   
+      ln -fs $WRFPLUS_DIR/main/wrfplus.exe ad
 
+      # Outputs
+      export CCYY=`echo $DATE | cut -c1-4`
+      export MM=`echo $DATE | cut -c5-6`
+      export DD=`echo $DATE | cut -c7-8`
+      export HH=`echo $DATE | cut -c9-10`
+      ln -fs ad/wrfvar_input_d${DOMAIN}_${CCYY}_${MM}_${DD}_${HH}:00.00 gr00
+
+      # tl
+
+      # Inputs
 
       export NL_DYN_OPT=302
       export NL_INPUT_OUTNAME='tl<date>'
       export NL_AUXHIST3_OUTNAME='auxhist3_d<domain>_<date>'
       . $WRFPLUS_DIR/inc/namelist_script.inc
-      mv namelist.input namelist.var4dtl
+      mv namelist.input tl
+      ln -fs $WORK_DIR/LANDUSE.TBL tl
+      ln -fs $WORK_DIR/tl00 tl/wrfinput_d${DOMAIN}
+      ln -fs $WORK_DIR/wrfvar_input tl/wrfinput_d${DOMAIN}
+      ln -fs $WRFPLUS_DIR/main/wrfplus.exe tl
+
+      # Outputs
+      for HOUR in 01 02 03 04 05 06; do
+         ln -s tl/tl${FG_CCYY[$HOUR]}_${FG_MM[$HOUR]}_${FG_DD[$HOUR]}_${FG_HH[$HOUR]}:00.00 tl$HOUR
+      done
+      if $NL_JCDFI_USE; then
+         export CCYY=`echo $END_DATE | cut -c1-4`
+         export MM=`echo $END_DATE | cut -c5-6`
+         export DD=`echo $END_DATE | cut -c7-8`
+         export HH=`echo $END_DATE | cut -c9-10`
+         ln -s tl/auxhist3_d${DOMAIN}_${CCYY}_${MM}_${DD}_${HH}:00.00 tldf
+      fi
+
       export NL_DYN_OPT=2
    fi
 
@@ -277,37 +342,40 @@ if test ! -f $DA_ANALYSIS; then
          done
          ln -s $OB_DIR/${OB_DATE[06]}/ob.ascii fgat_ob.06-
 
-         if $POE; then
+         if $POE && test $NUM_PROCS -gt 1; then
+            # JRB kludge until we work out what we are doing here
             export MP_PGMMODEL=mpmd
             export MP_CMDFILE=poe.cmdfile
-            if $NUM_PROCS -lt 2; then
-               echo "Need at least 2 processors for 4dvar"
+            if test $NUM_PROCS -lt 3; then
+               echo "Need at least 3 processors for 4dvar"
                exit 1
             fi
             NUM_PROCS_VAR=1
             NUM_PROCS_WRF=1
             let NUM_PROCS_WRFPLUS=$NUM_PROCS-$NUM_PROCS_VAR-$NUM_PROCS_WRF
-            echo "NUM_PROCS_VAR     $NUM_PROCS_VAR"
-            echo "NUM_PROCS_WRF     $NUM_PROCS_WRF"
-            echo "NUM_PROCS_WRFPLUS $NUM_PROCS_WRFPLUS"
+            echo "NUM_PROCS_VAR                $NUM_PROCS_VAR"
+            echo "NUM_PROCS_WRF                $NUM_PROCS_WRF"
+            echo "NUM_PROCS_WRFPLUS            $NUM_PROCS_WRFPLUS"
 
-            rm $MP_CMDFILE
+            rm -f $MP_CMDFILE
             let I=0
-            while $I -lt $NUM_PROCS_VAR; do
-               echo "env BIND_TASKS=no wrfvar.exe" >> $MP_CMDFILE
+            while test $I -lt $NUM_PROCS_VAR; do
+               echo "env BIND_TASKS=no ./wrfvar.exe" >> $MP_CMDFILE
                let I=$I+1
             done
-            while $I -lt $NUM_PROCS_VAR+$NUM_PROCS_WRF; do
-               echo "env BIND_TASKS=no wrfvar.exe" >> $MP_CMDFILE
+            while test $I -lt $NUM_PROCS_VAR+$NUM_PROCS_WRF; do
+               echo "env BIND_TASKS=no ./wrf.exe" >> $MP_CMDFILE
                let I=$I+1
             done
-            while $I -lt $NUM_PROCS; do
-               echo "env BIND_TASKS=no wrfplus.exe" >> $MP_CMDFILE
+            while test $I -lt $NUM_PROCS; do
+               echo "env BIND_TASKS=no ./wrfplus.exe" >> $MP_CMDFILE
                let I=$I+1
             done
+            poe
+            RC=$?
          else
-            echo "Needs POE for 4DVAR"
-            exit 1
+            $RUN_CMD ./wrfvar.exe
+            RC=$?
          fi
       else
          $RUN_CMD ./wrfvar.exe

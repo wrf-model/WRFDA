@@ -1360,7 +1360,7 @@ SUBROUTINE med_auxinputdfi_in ( grid , stream, config_flags )
    CHARACTER (LEN=256)                    :: message
    INTEGER                                :: ierr
    INTEGER                                :: myproc
-   TYPE(ESMF_Time)                        :: CurrTime
+   TYPE(WRFU_Time)                        :: CurrTime
    CHARACTER*80                           :: timestr
 
    IF ( stream .LT. 1 .OR. stream .GT. 5 ) THEN

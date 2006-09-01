@@ -9,7 +9,7 @@ export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION}
 export EXP_DIR=${EXP_DIR:-$REG_DIR/$EXPT}
 export SCRIPT=${SCRIPT:-$WRFVAR_DIR/scripts/da_run_wrfvar.ksh}
 export POE=false
-export RESET=${RESET:-true}
+export RESET=${RESET:-false}
 
 export PLATFORM=`uname`
 export HOSTNAME=`hostname`
@@ -35,7 +35,8 @@ if test $HOSTNAME = "bs1101en" -o $HOSTNAME = "bs1201en"; then
    export POE=true
 
    cat > job.ksh <<EOF
-#!/bin/ksh
+#!/usr/bin/ksh93
+# ksh93 is not as ancient and brain dead as /bin/ksh
 ##@ network.MPI=csss,shared,us
 #IBM:
 # @ job_type   = parallel

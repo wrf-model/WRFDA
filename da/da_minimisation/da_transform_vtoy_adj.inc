@@ -80,10 +80,10 @@ subroutine da_transform_vtoy_adj( iter,cv_size, be, ep, cv, iv, vp, vv, xa, xb, 
       call system_4dv("da_run_wrfplus_ad.ksh pre ")
 
       IF ( wrf_dm_on_monitor() ) THEN
-        call system("rm wrf_done")
-        call system("touch wrf_go_ahead")
+        call system("rm -rf ad/wrf_done")
+        call system("touch ad/wrf_go_ahead")
         DO WHILE ( .true. )
-          OPEN(99,file="wrf_done",status="old",err=303)
+          OPEN(99,file="ad/wrf_done",status="old",err=303)
           CLOSE(99)
           EXIT
 303          CONTINUE

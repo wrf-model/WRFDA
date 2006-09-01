@@ -51,10 +51,10 @@ subroutine da_transform_vtoy( cv_size, be, ep, cv, iv, vp, vv, xa, xb, xbx, &
       call system_4dv("da_run_wrfplus_tl.ksh pre")
 
       IF ( wrf_dm_on_monitor() ) THEN
-        call system("rm wrf_done")
-        call system("touch wrf_go_ahead")
+        call system("rm -rf tl/wrf_done")
+        call system("touch tl/wrf_go_ahead")
         DO WHILE ( .true. )
-          OPEN(99,file="wrf_done",status="old",err=303)
+          OPEN(99,file="tl/wrf_done",status="old",err=303)
           CLOSE(99)
           EXIT
 303          CONTINUE
