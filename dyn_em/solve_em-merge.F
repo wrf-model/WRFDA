@@ -36,7 +36,7 @@ SUBROUTINE solve_em ( grid , config_flags , &
    USE module_input_chem_data
    USE module_chem_utilities
 #endif
-#if (VAR4D_CORE == 1)
+#ifdef WRF_PLUS
    USE module_check
 #endif
 
@@ -389,7 +389,7 @@ BENCH_START(init_zero_tend_tim)
      DO ij = 1 , grid%num_tiles
 
         CALL wrf_debug ( 200 , ' call init_zero_tendency' )
-#if (VAR4D_CORE == 1)
+#ifdef WRF_PLUS
         if(TEST_init_zero_tendency) THEN
         CALL t_init_zero_tendency ( ru_tendf, rv_tendf, rw_tendf,     &
                                   ph_tendf, t_tendf, tke_tend,      &
@@ -443,7 +443,7 @@ BENCH_START(phy_prep_tim)
       DO ij = 1 , grid%num_tiles
 
          CALL wrf_debug ( 200 , ' call phy_prep' )
-#if (VAR4D_CORE == 1)
+#ifdef WRF_PLUS
           if(TEST_phy_prep) THEN
             CALL t_phy_prep ( config_flags,                           &
                          grid%em_mut, grid%em_u_2, grid%em_v_2, grid%em_p, grid%em_pb, grid%em_alt,              &
@@ -877,7 +877,7 @@ BENCH_START(calc_tke_tim)
        DO ij = 1 , grid%num_tiles
 
           CALL wrf_debug ( 200 , ' call calculate_km_kh' )
-#if (VAR4D_CORE == 1)
+#ifdef WRF_PLUS
           if(TEST_calculate_km_kh) THEN
             CALL t_calculate_km_kh( config_flags,grid%dt,grid%dampcoef,grid%zdamp,config_flags%damp_opt,     &
                                 grid%xkmh,grid%xkmhd,grid%xkmv,grid%xkhh,grid%xkhv,grid%bn2,               &
@@ -1118,7 +1118,7 @@ BENCH_START(rk_tend_tim)
    DO ij = 1 , grid%num_tiles
 
       CALL wrf_debug ( 200 , ' call rk_tendency' )
-#if (VAR4D_CORE == 1)
+#ifdef WRF_PLUS
       if(TEST_rk_tendency) THEN
         CALL t_rk_tendency ( config_flags, rk_step,                           &
                          grid%em_ru_tend, grid%em_rv_tend, rw_tend, ph_tend, t_tend,      &
@@ -1171,7 +1171,7 @@ BENCH_START(rk_tend_tim)
                          grid%j_start(ij), grid%j_end(ij),                &
                          k_start, k_end                                  )
 
-#if (VAR4D_CORE == 1)
+#ifdef WRF_PLUS
     if(TEST_advect_scalar) THEN
       CALL t_advect_scalar ( grid%em_t_2, grid%em_t_2, grid%em_t_tend, grid%em_ru, grid%em_rv, grid%em_ww,   &
                          grid%mut, config_flags,            &
@@ -1195,7 +1195,7 @@ BENCH_START(relax_bdy_dry_tim)
 
      IF( (config_flags%specified .or. config_flags%nested) .and. rk_step == 1 ) THEN 
 
-#if (VAR4D_CORE == 1)
+#ifdef WRF_PLUS
        if(TEST_relax_bdy_dry) THEN
        CALL t_relax_bdy_dry ( config_flags,                                &
                             grid%em_u_save, grid%em_v_save, ph_save, grid%em_t_save,             &
@@ -1239,7 +1239,7 @@ BENCH_START(relax_bdy_dry_tim)
 
 
      ENDIF
-#if (VAR4D_CORE == 1)
+#ifdef WRF_PLUS
      if(TEST_rk_addtend_dry) THEN
      CALL t_rk_addtend_dry( grid%em_ru_tend,  grid%em_rv_tend,  rw_tend,  ph_tend,  t_tend,  &
                           ru_tendf, rv_tendf, rw_tendf, ph_tendf, t_tendf, &
@@ -1768,7 +1768,7 @@ BENCH_END(spec_bdy_t_tim)
          ! in the scalar advection (flux divergence).  Using
          ! time averaged values gives us exact scalar conservation.
 
-#if (VAR4D_CORE == 1)
+#ifdef WRF_PLUS
          if(TEST_sumflux) THEN
            CALL t_sumflux ( grid%em_u_2, grid%em_v_2, grid%em_ww,                         &
                         grid%em_u_save, grid%em_v_save, ww1,                  &
@@ -1803,7 +1803,7 @@ BENCH_END(sumflux_tim)
 
 BENCH_START(advance_w_tim)
         IF ( config_flags%non_hydrostatic ) THEN
-#if (VAR4D_CORE == 1)
+#ifdef WRF_PLUS
           if(TEST_advance_w) THEN
             CALL t_advance_w( w_2, rw_tend, ww, u_2, v_2,       &
                           mu_2, mut, muave, muts,           &
@@ -1844,7 +1844,7 @@ BENCH_END(advance_w_tim)
 
 BENCH_START(spec_bdynhyd_tim)
            IF (config_flags%non_hydrostatic)  THEN
-#if (VAR4D_CORE == 1)
+#ifdef WRF_PLUS
              if(TEST_spec_bdyupdate_ph) THEN
                CALL t_spec_bdyupdate_ph( ph_save, ph_2, ph_tend, mu_tend, muts, dts_rk, &
                                      'h'         , config_flags, &
@@ -1999,7 +1999,7 @@ BENCH_END(phys_bc_tim)
       ! full perturbation variables.
       ! first get updated mu at u and v points
 
-#if (VAR4D_CORE == 1)
+#ifdef WRF_PLUS
       if(TEST_calc_mu_uv_1) THEN
         CALL t_calc_mu_uv_1 ( config_flags,                     &
                           grid%em_muts, muus, muvs,                 &
@@ -2021,7 +2021,7 @@ BENCH_START(calc_mu_uv_tim)
                           grid%j_start(ij), grid%j_end(ij), &
                           k_start    , k_end               )
 BENCH_END(calc_mu_uv_tim)
-#if (VAR4D_CORE == 1)
+#ifdef WRF_PLUS
       if(TEST_small_step_finish) THEN
         CALL t_small_step_finish( grid%em_u_2, grid%em_u_1, grid%em_v_2, grid%em_v_1, grid%em_w_2, grid%em_w_1,     &
                               grid%em_t_2, grid%em_t_1, grid%em_ph_2, grid%em_ph_1, grid%em_ww, ww1,    &
@@ -2101,7 +2101,7 @@ BENCH_END(small_step_finish_tim)
 
        CALL wrf_debug ( 200 , ' call rk_scalar_tend' )
 
-#if (VAR4D_CORE == 1)
+#ifdef WRF_PLUS
        if(TEST_rk_scalar_tend) THEN
          CALL t_rk_scalar_tend (  im, im, config_flags,             &
                               rk_step, dt_rk,                   &
@@ -2161,7 +2161,7 @@ BENCH_START(rlx_bdy_scalar_tim)
                                     grid%i_start(ij), grid%i_end(ij),      &
                                     grid%j_start(ij), grid%j_end(ij),      &
                                     k_start, k_end                        )
-#if (VAR4D_CORE == 1)
+#ifdef WRF_PLUS
          if(TEST_spec_bdy_scalar) THEN
            CALL t_spec_bdy_scalar  ( moist_tend(ims,kms,jms,im),                &
                                     moist_b(1,1,1,1,im),                     &
@@ -2204,7 +2204,7 @@ BENCH_END(rlx_bdy_scalar_tim)
 
        CALL wrf_debug ( 200 , ' call rk_update_scalar' )
 
-#if (VAR4D_CORE == 1)
+#ifdef WRF_PLUS
        if(TEST_rk_update_scalar) THEN
          CALL t_rk_update_scalar( im, im,                           &
                               moist_old(ims,kms,jms,im),        &
@@ -2593,7 +2593,7 @@ BENCH_END(chem_adv_tim)
    DO ij = 1 , grid%num_tiles
 
 
-#if (VAR4D_CORE == 1)
+#ifdef WRF_PLUS
      if(TEST_calc_p_rho_phi) THEN
        CALL t_calc_p_rho_phi( moist, num_3d_m,                &
                           grid%em_al, grid%em_alb, grid%em_mu_2, grid%em_muts,              &
@@ -2696,7 +2696,7 @@ BENCH_START(bc_end_tim)
 
 BENCH_START(diag_w_tim)
      IF (.not. config_flags%non_hydrostatic) THEN
-#if (VAR4D_CORE == 1)
+#ifdef WRF_PLUS
      if(TEST_diagnose_w) THEN
        CALL t_diagnose_w( ph_tend, grid%em_ph_2, grid%em_ph_1, grid%em_w_2, grid%em_muts, dt_rk,  &
                       grid%em_u_2, grid%em_v_2, grid%ht,                           &

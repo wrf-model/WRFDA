@@ -298,7 +298,7 @@ CONTAINS
 
    IF ( config_flags%dyn_opt == DYN_EM ) THEN
       CALL integrate ( head_grid )
-#if VAR4D_CORE==1
+#ifdef WRF_PLUS
    ELSE IF ( config_flags%dyn_opt == DYN_EM_SN ) THEN
       CALL integrate ( head_grid )
    ELSE IF ( config_flags%dyn_opt == DYN_EM_TL ) THEN

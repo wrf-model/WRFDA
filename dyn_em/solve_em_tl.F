@@ -80,7 +80,6 @@ SUBROUTINE solve_em_tl ( grid , config_flags , &
 ! time.  Potential problem on stack-limited architectures: increases
 ! amount of data on program stack by making these automatic arrays.
 
-#if (VAR4D_CORE == 1)
    INTEGER :: rc 
    INTEGER :: number_of_small_timesteps, rk_step
    INTEGER :: klevel,ijm,ijp,i,j,k,size1,size2    ! for prints/plots only
@@ -136,7 +135,6 @@ SUBROUTINE solve_em_tl ( grid , config_flags , &
 #ifdef DM_PARALLEL
 #    define REGISTER_I1
 #include "em_data_calls.inc"
-#endif
 
 !<DESCRIPTION>
 !<pre>

@@ -5,9 +5,9 @@ export EM_CORE=0
 export NMM_CORE=0
 export COAMPS_CORE=0
 export EXP_CORE=0
-export VAR4D_CORE=0
 export HDF=${HDF:-}
-export HDFEOS=${HDFEOS:-}
+export HDFEOS=${HDFEOS:-}  
+export compileflags=""
 
 option=$1
 
@@ -29,16 +29,14 @@ elif [ "$option" = "wrfvar" ] ; then
     REGISTRY=Registry.wrfvar
     DA_CORE=1
     EM_CORE=1
-    VAR4D_CORE=1
 elif [ "$option" = "var" ] ; then
     REGISTRY=Registry.wrfvar
     DA_CORE=1
     EM_CORE=1
-    VAR4D_CORE=1
 elif [ "$option" = "wrfplus" ] ; then
     REGISTRY=Registry.EM_4DVAR
     EM_CORE=1
-    VAR4D_CORE=1
+    export compileflags="$compileflags!-DWRF_PLUS"
 elif [ "$option" = "be" ] ; then
     REGISTRY=Registry.wrfvar
     DA_CORE=1
@@ -373,21 +371,19 @@ if [ -n "$WRF_CHEM" ] ; then
   if [ $WRF_CHEM = 1 ] ; then
     echo building WRF with chemistry option
     compileflags="${compileflags}!-DWRF_CHEM"
-  else
-    compileflags=" "
   fi
-else
-  compileflags=" "
 fi
-
+set -x
 # Found perl, so proceed with configuration
 if test -n "$PERL" ; then
   echo option = $option
   $PERL arch/Config_new.pl -perl=$PERL -netcdf=$NETCDF -phdf5=$PHDF5 -hdf=$HDF \
      -hdfeos=$HDFEOS -rttov=$RTTOV -os=$os -mach=$mach -ldflags=$ldflags \
-     -compileflags=$compileflags -registry=$REGISTRY -da_core=$DA_CORE -em_core=$EM_CORE -nmm_core=$NMM_CORE \
-     -coamps_core=$COAMPS_CORE -exp_core=$EXP_CORE -var4d_core=$VAR4D_CORE
+     -compileflags=$compileflags -registry=$REGISTRY -da_core=$DA_CORE \
+     -em_core=$EM_CORE -nmm_core=$NMM_CORE \
+     -coamps_core=$COAMPS_CORE -exp_core=$EXP_CORE
 fi
+set +x
 
 export CONFIG=configure.wrf
 
