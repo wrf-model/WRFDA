@@ -57,8 +57,9 @@ dimspec    g      2     namelist=num_metgrid_levels  z          num_metgrid_leve
 dimspec    m      2     constant=12                  z          months_per_year
 dimspec    a      -     namelist=cam_abs_dim1     c          cam_abs_dim1
 dimspec    c      -     namelist=cam_abs_dim2     z          cam_abs_dim2
-dimspec    o      2     namelist=levsiz           z          levsiz
+dimspec    q      2     namelist=levsiz           z          levsiz
 dimspec    d      2     namelist=paerlev          z          paerlev
+dimspec    v      -     constant=1                z          one
 
 
 ################################################################################
@@ -1473,6 +1474,23 @@ rconfig   integer paerlev                 namelist,physics      1             1 
 rconfig   integer cam_abs_dim1            namelist,physics      1             1       -      "cam_abs_dim1" "dimension for absnxt in CAM radiation"  ""
 rconfig   integer cam_abs_dim2            namelist,physics      1             1       -      "cam_abs_dim2" "dimension for abstot in CAM radiation"  ""
 
+#FDDA namelist parameters
+rconfig   real    FGDT                    namelist,fdda         max_domains    0       h        "FGDT"          ""      ""
+rconfig   integer  grid_fdda              namelist,fdda         max_domains    0       rh       "grid_fdda"            ""      ""
+rconfig   integer  if_no_pbl_nudging_uv   namelist,fdda         max_domains    0       rh       "grid_fdda"            ""      ""
+rconfig   integer  if_no_pbl_nudging_t    namelist,fdda         max_domains    0       rh       "grid_fdda"            ""      ""
+rconfig   integer  if_no_pbl_nudging_q    namelist,fdda         max_domains    0       rh       "grid_fdda"            ""      ""
+rconfig   integer  if_zfac_uv             namelist,fdda         max_domains    0       rh       "grid_fdda"            ""      ""
+rconfig   integer   k_zfac_uv             namelist,fdda         max_domains    0       rh       "grid_fdda"            ""      ""
+rconfig   integer  if_zfac_t              namelist,fdda         max_domains    0       rh       "grid_fdda"            ""      ""
+rconfig   integer   k_zfac_t              namelist,fdda         max_domains    0       rh       "grid_fdda"            ""      ""
+rconfig   integer  if_zfac_q              namelist,fdda         max_domains    0       rh       "grid_fdda"            ""      ""
+rconfig   integer   k_zfac_q              namelist,fdda         max_domains    0       rh       "grid_fdda"            ""      ""
+rconfig   real        guv                 namelist,fdda         max_domains    0       rh       "grid_fdda"            ""      ""
+rconfig   real        gt                  namelist,fdda         max_domains    0       rh       "grid_fdda"            ""      ""
+rconfig   real        gq                  namelist,fdda         max_domains    0       rh       "grid_fdda"            ""      ""
+rconfig   real    dtramp_min              namelist,fdda         1              0       h        "grid_fdda"            ""      ""
+rconfig   integer idynin                  namelist,fdda         1              0       h        "grid_fdda"            ""      ""
 
 # Dynamics
 # dynamics option (see package definitions, below)
@@ -1564,8 +1582,6 @@ rconfig   integer simulation_start_minute derived                  1            
 rconfig   integer simulation_start_second derived                  1              0       -        "simulation_start_second" "start of simulation through restarts" "2-digit second"
 
 #
-#---------------------------------------------------------------------------------------------------------------------------------------
-# Package Declarations
 # Single dummy declaration to define a nodyn dyn option
 state integer nodyn_dummy - dyn_nodyn -  -  -  "" "" ""
 

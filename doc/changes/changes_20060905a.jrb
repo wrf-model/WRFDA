@@ -1,0 +1,24 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: John Bray
+Date: 09/05/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Set VAR4D_CORE=0 for configure_new as we are only using this to compile
+wrfvar (wrfplus complied in Hans' branch), and the VAR4D directive is
+only appropriate for wrfplus
+
+------------------------------------------------------
+
+balsam: Runs con200 
+--------------------------------------------------------------------------------------
+
+File changes:
+------------
+
+A      doc/changes/changes_20060905a.jrb
+M      configure_new

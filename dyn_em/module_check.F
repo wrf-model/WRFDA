@@ -1788,6 +1788,7 @@ END SUBROUTINE t_rk_step_prep
 
 SUBROUTINE t_init_zero_tendency(ru_tendf, rv_tendf, rw_tendf, ph_tendf,  &
                               t_tendf,  tke_tendf,                     &
+                                  mu_tendf,                         &
                               moist_tendf,chem_tendf,scalar_tendf,      &
                               n_moist,n_chem,n_scalar,rk_step,          &
                               ids, ide, jds, jde, kds, kde,            &
@@ -1808,6 +1809,8 @@ SUBROUTINE t_init_zero_tendency(ru_tendf, rv_tendf, rw_tendf, ph_tendf,  &
                                                              ph_tendf, &
                                                               t_tendf, &
                                                             tke_tendf
+
+   REAL , DIMENSION( ims:ime , jms:jme  ) , INTENT(INOUT) ::  mu_tendf
 
    REAL , DIMENSION(ims:ime, kms:kme, jms:jme, n_moist),INTENT(INOUT)::&
                                                           moist_tendf
@@ -1911,6 +1914,7 @@ SUBROUTINE t_init_zero_tendency(ru_tendf, rv_tendf, rw_tendf, ph_tendf,  &
 
    CALL init_zero_tendency(ru_tendf, rv_tendf, rw_tendf, ph_tendf,  &
                               t_tendf,  tke_tendf,                     &
+                              mu_tendf,                                &
                               moist_tendf,chem_tendf,scalar_tendf,     &
                               n_moist,n_chem,n_scalar,rk_step,         &
                               ids, ide, jds, jde, kds, kde,            &
@@ -1994,6 +1998,7 @@ ims, ime, jms, jme, kms, kme, its, ite, jts, jte, kts, kte )
 
    CALL init_zero_tendency(P_ru_tendf, P_rv_tendf, P_rw_tendf, P_ph_tendf,  &
                               P_t_tendf,  tke_tendf,                     &
+                              mu_tendf,                                  &
                               P_moist_tendf,P_chem_tendf,p_scalar_tendf,        &
                               n_moist,n_chem,n_scalar,rk_step,                  &
                               ids, ide, jds, jde, kds, kde,            &
@@ -3788,7 +3793,8 @@ END SUBROUTINE t_relax_bdy_dry
 
 SUBROUTINE t_rk_addtend_dry ( ru_tend, rv_tend, rw_tend, ph_tend, t_tend,      &
                             ru_tendf, rv_tendf, rw_tendf, ph_tendf, t_tendf, &
-                            u_save, v_save, w_save, ph_save, t_save, rk_step,&
+                            u_save, v_save, w_save, ph_save, t_save,         &
+                            mu_tend, mu_tendf, rk_step,                      &
                             h_diabatic, mut, msft, msfu, msfv,               &
                             ids,ide, jds,jde, kds,kde,                       &
                             ims,ime, jms,jme, kms,kme,                       &
@@ -3817,6 +3823,9 @@ SUBROUTINE t_rk_addtend_dry ( ru_tend, rv_tend, rw_tend, ph_tend, t_tend,      &
                                                                       rw_tendf, &
                                                                       ph_tendf, &
                                                                       t_tendf
+
+   REAL , DIMENSION( ims:ime , jms:jme  ) , INTENT(INOUT) :: mu_tend, &
+                                                             mu_tendf
 
    REAL , DIMENSION( ims:ime , kms:kme, jms:jme  )                 ::  u_save,  &
                                                                        v_save,  &
@@ -3878,6 +3887,8 @@ SUBROUTINE t_rk_addtend_dry ( ru_tend, rv_tend, rw_tend, ph_tend, t_tend,      &
                                                                       P_rw_tendf, &
                                                                       P_ph_tendf, &
                                                                       P_t_tendf
+   REAL , DIMENSION( ims:ime ,jms:jme  )                           :: P_mu_tend, &
+                                                                      P_mu_tendf
    REAL , DIMENSION( ims:ime , kms:kme, jms:jme  )                 :: B_ru_tend, &
                                                                       B_rv_tend, &
                                                                       B_rw_tend, &
@@ -3906,6 +3917,8 @@ SUBROUTINE t_rk_addtend_dry ( ru_tend, rv_tend, rw_tend, ph_tend, t_tend,      &
 !  zzma: new definition end
 
 !TGL test
+
+! JRB mu_tend and mu_tendf only partially added. FIX
 
    do i=ims,ime
    do k=kms,kme
@@ -3973,7 +3986,8 @@ SUBROUTINE t_rk_addtend_dry ( ru_tend, rv_tend, rw_tend, ph_tend, t_tend,      &
 
    CALL rk_addtend_dry    ( ru_tend, rv_tend, rw_tend, ph_tend, t_tend,      &
                             ru_tendf, rv_tendf, rw_tendf, ph_tendf, t_tendf, &
-                            u_save, v_save, w_save, ph_save, t_save, rk_step,&
+                            u_save, v_save, w_save, ph_save, t_save,         &
+                            mu_tend, mu_tendf, rk_step,                      &
                             h_diabatic, mut, msft, msfu, msfv,               &
                             ids,ide, jds,jde, kds,kde,                       &
                             ims,ime, jms,jme, kms,kme,                       &
@@ -4064,7 +4078,8 @@ P_t_save, rk_step, h_diabatic, mut, P_mut, msft, msfu, msfv, ide, &
 
    CALL rk_addtend_dry    ( P_ru_tend, P_rv_tend, P_rw_tend, P_ph_tend, P_t_tend,      &
                             P_ru_tendf, P_rv_tendf, P_rw_tendf, P_ph_tendf, P_t_tendf, &
-                            P_u_save, P_v_save, P_w_save, P_ph_save, P_t_save, rk_step,&
+                            P_u_save, P_v_save, P_w_save, P_ph_save, P_t_save, &
+                            P_mu_tend,P_mu_tendf, rk_step,&
                             h_diabatic, P_mut, msft, msfu, msfv,               &
                             ids,ide, jds,jde, kds,kde,                       &
                             ims,ime, jms,jme, kms,kme,                       &

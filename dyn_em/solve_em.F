@@ -32,6 +32,7 @@ SUBROUTINE solve_em ( grid , config_flags , &
    USE module_microphysics_driver
    USE module_microphysics_zero_out
    USE module_pbl_driver
+   USE module_fddagd_driver
 #ifdef WRF_CHEM
    USE module_input_chem_data
    USE module_chem_utilities
@@ -408,7 +409,7 @@ BENCH_START(init_zero_tend_tim)
 #ifdef WRF_PLUS
         if(TEST_init_zero_tendency) THEN
         CALL t_init_zero_tendency ( ru_tendf, rv_tendf, rw_tendf,     &
-                                  ph_tendf, t_tendf, tke_tend,      &
+                                  ph_tendf, t_tendf, tke_tend,mu_tendf,      &
                                   moist_tend,chem_tend,scalar_tend,    &
                                   num_3d_m,num_3d_c,num_3d_s,rk_step,        &
                                   ids, ide, jds, jde, kds, kde,     &
@@ -419,7 +420,7 @@ BENCH_START(init_zero_tend_tim)
         END IF
 #endif
         CALL init_zero_tendency ( ru_tendf, rv_tendf, rw_tendf,     &
-                                  ph_tendf, t_tendf, tke_tend,      &
+                                  ph_tendf, t_tendf, tke_tend,mu_tendf,      &
                                   moist_tend,chem_tend,scalar_tend, &
                                   num_3d_m,num_3d_c,num_3d_s,       &
                                   rk_step,                          &
@@ -766,12 +767,14 @@ BENCH_START(cal_phy_tend)
       DO ij = 1 , grid%num_tiles
 
           CALL wrf_debug ( 200 , ' call calculate_phy_tend' )
-          CALL calculate_phy_tend (config_flags,mut,pi_phy,            &
+          CALL calculate_phy_tend (config_flags,mut,muu,muv,pi_phy,            &
                      RTHRATEN,                                         &
                      RUBLTEN,RVBLTEN,RTHBLTEN,                         &
                      RQVBLTEN,RQCBLTEN,RQIBLTEN,                       &
                      RTHCUTEN,RQVCUTEN,RQCCUTEN,RQRCUTEN,              &
                      RQICUTEN,RQSCUTEN,                                &
+                     RUNDGDTEN,RVNDGDTEN,RTHNDGDTEN,RQVNDGDTEN,        &
+                     RMUNDGDTEN,                                       &
                      ids,ide, jds,jde, kds,kde,                        &
                      ims,ime, jms,jme, kms,kme,                        &
                      grid%i_start(ij), min(grid%i_end(ij),ide-1),      &
@@ -1017,9 +1020,12 @@ BENCH_START(update_phy_ten_tim)
 
           CALL wrf_debug ( 200 , ' call update_phy_ten' )
         CALL update_phy_ten(t_tendf, ru_tendf, rv_tendf,moist_tend,        &
+                          mu_tendf,                                        &
                           RTHRATEN,RTHBLTEN,RTHCUTEN,RUBLTEN,RVBLTEN,      &
                           RQVBLTEN,RQCBLTEN,RQIBLTEN,                      &
                           RQVCUTEN,RQCCUTEN,RQRCUTEN,RQICUTEN,RQSCUTEN,    &
+                          RUNDGDTEN,RVNDGDTEN,RTHNDGDTEN,RQVNDGDTEN,       &
+                          RMUNDGDTEN,                                      &
                           num_3d_m,config_flags,rk_step,                   &
                           ids, ide, jds, jde, kds, kde,                    &
                           ims, ime, jms, jme, kms, kme,                    &
@@ -1259,7 +1265,8 @@ BENCH_START(relax_bdy_dry_tim)
      if(TEST_rk_addtend_dry) THEN
      CALL t_rk_addtend_dry( ru_tend,  rv_tend,  rw_tend,  ph_tend,  t_tend,  &
                           ru_tendf, rv_tendf, rw_tendf, ph_tendf, t_tendf, &
-                          u_save, v_save, w_save, ph_save, t_save, rk_step,&
+                          u_save, v_save, w_save, ph_save, t_save,         &
+                          mu_tend, mu_tendf, rk_step,                      &
                           h_diabatic, mut, msft, msfu, msfv,               &
                           ids,ide, jds,jde, kds,kde,                       &
                           ims,ime, jms,jme, kms,kme,                       &
@@ -1272,7 +1279,8 @@ BENCH_START(relax_bdy_dry_tim)
 
      CALL rk_addtend_dry( ru_tend,  rv_tend,  rw_tend,  ph_tend,  t_tend,  &
                           ru_tendf, rv_tendf, rw_tendf, ph_tendf, t_tendf, &
-                          u_save, v_save, w_save, ph_save, t_save, rk_step,&
+                          u_save, v_save, w_save, ph_save, t_save,         &
+                          mu_tend, mu_tendf, rk_step,                      &
                           h_diabatic, mut, msft, msfu, msfv,               &
                           ids,ide, jds,jde, kds,kde,                       &
                           ims,ime, jms,jme, kms,kme,                       &
