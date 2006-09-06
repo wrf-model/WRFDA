@@ -4,7 +4,8 @@ LN      =       ln -sf
 MAKE    =       make -i -r
 RM      =       rm -f
 
-gen_be : 	gen_be_stage0_wrf	\
+gen_be : 	gen_be_ensrf	\
+		gen_be_stage0_wrf	\
 		gen_be_ep2	\
 		gen_be_stage1	\
 		gen_be_stage1_1dvar	\
@@ -25,6 +26,9 @@ GEN_BE_OBJS = $(DA)/da_gen_be.o $(DA)/da_constants.o $(DA)/da_be_spectral.o \
   ../frame/module_driver_constants.o $(DA)/da_tracing.o $(DA)/da_memory.o
 
 include ../configure.wrf
+
+gen_be_ensrf : gen_be_ensrf.o
+	$(LD) -o gen_be_ensrf.exe $(LDFLAGS) $(GEN_BE_OBJS) gen_be_ensrf.o ${GEN_BE_LIB}
 
 gen_be_stage0_wrf : gen_be_stage0_wrf.o
 	$(LD) -o gen_be_stage0_wrf.exe $(LDFLAGS) $(GEN_BE_OBJS) gen_be_stage0_wrf.o ${GEN_BE_LIB}
@@ -72,6 +76,10 @@ gen_be_read_regcoeffs : gen_be_read_regcoeffs.o
 	$(LD) -o gen_be_read_regcoeffs.exe $(LDFLAGS) $(GEN_BE_OBJS) gen_be_read_regcoeffs.o ${GEN_BE_LIB}
 
 #
+
+gen_be_ensrf.o: 
+	$(RM) $@
+	$(FC) -c ${FCFREE} $(FCBASE) ${FCTYPE} ${MODULE_DIRS} -I${NETCDF}/include gen_be_ensrf.f90
 
 gen_be_stage0_wrf.o: 
 	$(RM) $@

@@ -19,7 +19,8 @@
 #set echo
 #Define job via environment variables:
 
- setenv REL_DIR /smoke/dmbarker/code/latest
+ setenv WRFVAR_DIR /smoke/dmbarker/code/latest/wrfvar.gen_be
+ setenv BE_DIR /smoke/dmbarker/data/con200/xwang/gen_be.2003010112
 
 #-----------------------------------------------------------------------------------
 # Don't change anything below this line.
@@ -46,7 +47,7 @@
  if ( ! $?REGION )        setenv REGION     con200
  if ( ! $?EXPT )          setenv EXPT       xwang  
  if ( ! $?DAT_DIR )       setenv DAT_DIR    ${DATA_DISK}/${USER}/data/${REGION}/${EXPT}
- if ( ! $?BE_FILE )       setenv BE_DIR     ${DAT_DIR}/gen_be
+ if ( ! $?BE_DIR )        setenv BE_DIR     ${DAT_DIR}/gen_be
  if ( ! $?RUN_DIR )       setenv RUN_DIR    ${DAT_DIR}/${DATE}/ep1
 
  if ( ! -d ${DAT_DIR}/$DATE ) mkdir ${DAT_DIR}/$DATE

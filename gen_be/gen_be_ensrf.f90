@@ -14,10 +14,35 @@ program gen_be_ensrf
 #endif
 
    use da_constants
-!   use da_gen_be
+   use da_gen_be
    use da_tracing
 
    implicit none
+
+   type info_type
+       character*40   :: id
+       character*40   :: platform
+       integer        :: plat
+       integer        :: variable
+   end type info_type
+
+   type loc_type
+       real           :: x
+       real           :: y
+       real           :: z
+   end type loc_type
+
+   type ob_type
+      type (info_type):: info
+      type (loc_type) :: loc
+      real            :: yo
+      real            :: omb_mean
+      real            :: oma_mean
+      real            :: omb_rms
+      real            :: oma_rms
+      real            :: sigma_o
+      real            :: sigma_b
+   end type ob_type
 
    integer, parameter    :: nv3d = 4                  ! #3D variables (u, v, T, q).
    integer, parameter    :: nv2d = 1                  ! #2D variables (ps).
@@ -38,16 +63,17 @@ program gen_be_ensrf
    integer               :: nk                        ! 3rd dimension size.
    integer               :: nv                        ! Total number of 2D/3D variables.
    integer               :: nij, nijk, nijkv          ! Dimensions.
-   integer               :: o, member, i, j, v        ! Loop counters.
+   integer               :: o, member, i, j, k, v     ! Loop counters.
    integer               :: imin, imax, jmin, jmax    ! Min/max i,j for localization.
    integer               :: ijkv                      ! 
    integer               :: index                     ! 
+   integer               :: xend 
    real                  :: num_members_inv
    real                  :: num_members_inv1
    real                  :: cov_inf_fac               ! Covariance inflation factor.
-   real                  :: cov_loc_rad_km            ! Covariance localization radius (km).
+   real                  :: cov_loc_rad_m             ! Covariance localization radius (m).
    real                  :: cov_loc_rad               ! Covariance localization radius (gridpts).
-   real                  :: ds                        ! Grid resolution (km).
+   real                  :: ds                        ! Grid resolution (m).
    real                  :: x1, y1                    ! Grid location of ob.
    real                  :: sigma_o2, sigma_b2
    real                  :: sigma_hh_inv
@@ -62,7 +88,7 @@ program gen_be_ensrf
    real                  :: sum_f, sum_a
    real                  :: hf, ha 
 
-   type (ob_type), allocatable     :: ob(:)
+   type (ob_type),pointer:: ob(:)
 
    character(len=10),pointer:: varr(:)                ! Variable name.
    integer, pointer      :: nkk(:)                    ! Vertical dimension of field.
@@ -82,7 +108,7 @@ program gen_be_ensrf
    real, pointer         :: xa_mean(:)                ! Posterior mean.
  
    namelist / gen_be_ensrf_nl / filestub, num_members, &
-                                cov_inf_fac, cov_lov_rad_km
+                                cov_inf_fac, cov_loc_rad_m
 
 !---------------------------------------------------------------------------------------------
    write(6,'(/a)')' [1] Initialize information.'
@@ -94,20 +120,20 @@ program gen_be_ensrf
    filestub = 'test'
    num_members = 56
    cov_inf_fac = 1.0
-   cov_loc_rad_km = 1500.0
+   cov_loc_rad_m = 1500000.0
 
-   open(unit=namelist_unit, file='gen_be_ensrf_nl.nl', &
+   open(unit=unit, file='gen_be_ensrf_nl.nl', &
         form='formatted', status='old', action='read')
-   read(namelist_unit, gen_be_ensrf_nl)
-   close(namelist_unit)
+   read(unit, gen_be_ensrf_nl)
+   close(unit)
 
-   write(6,'(a,i4)')'   Filestub = ', trim(filestub)
+   write(6,'(a,a)')'   Filestub = ', trim(filestub)
    write(6,'(a,i4)')'   Number of ensemble members = ', num_members
    write(6,'(a,f16.8)')'   Covariance Inflation Factor = ', cov_inf_fac
-   write(6,'(a,f16.8)')'   Covariance Localization Radius (km) = ', cov_loc_rad_km
+   write(6,'(a,f16.8)')'   Covariance Localization Radius (m) = ', cov_loc_rad_m
 
    num_members_inv = 1.0 / real(num_members)
-   num_members1_inv = 1.0 / real(num_members-1)
+   num_members_inv1 = 1.0 / real(num_members-1)
 
 !---------------------------------------------------------------------------------------------
    write(6,'(/a)')' [2] Set up data dimensions and allocate arrays:' 
@@ -119,26 +145,26 @@ program gen_be_ensrf
    call da_stage0_initialize( input_file, var, ni, nj, nk, ds )
    niu = ni+1 ! u i dimension is 1 larger.
    njv = nj+1 ! v j dimension is 1 larger.
-   cov_loc_rad = cov_loc_rad_km / ds
-
+   cov_loc_rad = cov_loc_rad_m / ds
    nij = ni * nj
    nijk = nij * nk
    nijkv = nv3d * nijk + nv2d * nij ! #3D + #2D variables.
    nv = nv3d + nv2d
-
+print *, ni, nj, nk, nv, nij, nijk, nv3d, nv2d, nijkv
 !  Allocate arrays:
    allocate ( varr(1:nv) )
    allocate ( nkk(1:nv) )
+   allocate ( xstart(1:nv) )
    allocate( x(1:nijkv,1:num_members) )
    allocate( xf(1:nijkv,1:num_members) )
-   allocate( xf_cif(1:nijkv,1:num_members) )
+!   allocate( xf_cif(1:nijkv,1:num_members) )
    allocate( h(1:num_members) )
    allocate( h_devn(1:num_members) )
    allocate( x_devn(1:num_members) )
    do v = 1, nv3d
       nkk(v) = nk
    end do
-   do v = nk3d + 1, nv
+   do v = nv3d + 1, nv
       nkk(v) = 1 
    end do
    allocate( field(1:ni,1:nj) )
@@ -158,19 +184,25 @@ program gen_be_ensrf
    write(6,'(/a)')' [3] Read observations.'
 !---------------------------------------------------------------------------------------------
 
-   read(unit_ob)num_obs
+   input_file = 'observations'
+   open(unit, file = input_file, status='old')
+!write(56,*)1
+!      write(56,'(2a10,i6,5f16.8)')'test', 'dale', 3, &
+!            20.0, 20.0, 12.0, 250.0, 1.0
+!stop
+   read(unit,*)num_obs
    write(6,'(a,i10)')'   Number of observations = ', num_obs
    allocate( ob(1:num_obs) )
 
    do o = 1, num_obs
-      read(unit_ob,'(2a10,i6,5f16.8)')ob(o) % info % id, ob(o) % info % platform, &
+      read(unit,'(2a10,i6,5f16.8)')ob(o) % info % id, ob(o) % info % platform, &
                 ob(o) % info % variable, &
                 ob(o) % loc % x, ob(o) % loc % y ,ob(o) % loc % z, &
                 ob(o) % yo, ob(o) % sigma_o
    end do
 
 !---------------------------------------------------------------------------------------------
-   write(6,'(/a)')' [3] Extract necessary fields from WRF ensemble forecasts.'
+   write(6,'(/a)')' [4] Extract necessary fields from WRF ensemble forecasts.'
 !---------------------------------------------------------------------------------------------
 
    xstart(1) = 1
@@ -204,7 +236,7 @@ program gen_be_ensrf
                end do
             end if
 
-            if ( varr(v) = "T" ) then
+            if ( varr(v) == "T" ) then
 !              Read theta, and convert to temperature:
                call da_get_trh( input_file, ni, nj, nk, k, field, dummy )
             end if
@@ -237,7 +269,7 @@ program gen_be_ensrf
 
 !  Perform initial covariance inflation (to boost input be):
    call da_cov_inflation( nijkv, num_members, cov_inf_fac, x )
-   xf_cif(1:nijkv,1:num_members) = x(1:nijkv,1:num_members) ! Diagnostic
+!   xf_cif(1:nijkv,1:num_members) = x(1:nijkv,1:num_members) ! Diagnostic
 
    deallocate( uc )
    deallocate( vc )
@@ -245,11 +277,11 @@ program gen_be_ensrf
    deallocate( dummy )
 
 !---------------------------------------------------------------------------------------------
-   write(6,'(/a)')' [4] Perform EnSRF:'
+   write(6,'(/a)')' [5] Perform EnSRF:'
 !---------------------------------------------------------------------------------------------
 
    do o = 1, num_obs 
-      write(6,'(2(a,i8))')' Assimilating observation ', o, ' of ', num_obs
+      write(6,'(2(a,i8))')'     Assimilating observation ', o, ' of ', num_obs
       x1 = ob(o) % loc % x 
       y1 = ob(o) % loc % y 
       sigma_o2 = ob(o) % sigma_o * ob(o) % sigma_o
@@ -265,7 +297,7 @@ program gen_be_ensrf
       h_devn(1:num_members) = h(1:num_members) - h_mean
 
 !     Covariance H Pf H^T:
-      sigma_b2 = sum(h_devn(1:num_members) * h_devn(1:num_members)) * num_members1_inv
+      sigma_b2 = sum(h_devn(1:num_members) * h_devn(1:num_members)) * num_members_inv1
 
       ob(o) % sigma_b = sqrt(sigma_b2)
 
@@ -281,6 +313,8 @@ program gen_be_ensrf
 !      ob(o) % yo = h_mean + 1.0
 !!!DALE
       o_minus_b = ob(o) % yo - h_mean
+      write(6,'(a,2f15.5)')' Observation increment = ', o_minus_b
+      write(6,'(a,2f15.5)')' Observation/forecast error variance = ', sigma_o2, sigma_b2
 
 !-----------------------------------------------------------------------------
 !     Calculate local support:
@@ -291,8 +325,8 @@ program gen_be_ensrf
       jmin = max(nint(ob(o) % loc % y - cov_loc_rad),1)
       jmax = min(nint(ob(o) % loc % y + cov_loc_rad),nj)
 
-      write(6,'(a,2f8.2)')'   Ob location(x/y) = ', ob(o) % loc % x, ob(o) % loc % y
-      write(6,'(a,4i5)')'   Min/max i/j = ', imin, imax, jmin, jmax
+!      write(6,'(a,2f8.2)')'   Ob location(x/y) = ', ob(o) % loc % x, ob(o) % loc % y
+!      write(6,'(a,4i5)')'   Min/max i/j = ', imin, imax, jmin, jmax
 
       do j = jmin, jmax
          do i = imin, imax
@@ -312,7 +346,7 @@ program gen_be_ensrf
 
 !                 Calculate PfHT:
                   sigma_xh = sum( x_devn(1:num_members) * h_devn(1:num_members) ) * &
-                             num_members1_inv
+                             num_members_inv1
 
 !                 Apply covariance localization:
                   sigma_xh = sigma_xh * corr(i,j)
@@ -348,8 +382,8 @@ program gen_be_ensrf
 
 !  Calculate grid-point diagnostics:
 
-   call da_get_grid_stats( num_members, ni, nj, nk, nv, nijkv, nkk, varr, xf_cif, xa )
-!   call da_get_grid_stats( num_members, ni, nj, nk, nv, nijkv, nkk, varr, xf, xa )
+!   call da_get_grid_stats( num_members, ni, nj, nk, nv, nijkv, nkk, varr, xf_cif, x )
+   call da_get_grid_stats( num_members, ni, nj, nk, nv, nijkv, nkk, varr, xf, x )
 
 !  Calculate observation diagnostics:
 
@@ -367,7 +401,8 @@ program gen_be_ensrf
       sum_f = 0.0
       sum_a = 0.0
       do member = 1, num_members
-         call da_obs_operator( nv, ni, nj, nkk, xstart, ob(o), xf_cif(:,member), hf )
+!         call da_obs_operator( nv, ni, nj, nkk, xstart, ob(o), xf_cif(:,member), hf )
+         call da_obs_operator( nv, ni, nj, nkk, xstart, ob(o), xf(:,member), hf )
          call da_obs_operator( nv, ni, nj, nkk, xstart, ob(o), x(:,member), ha )
          sum_f = sum_f + ( ob(o) % yo - hf )**2
          sum_a = sum_a + ( ob(o) % yo - ha )**2
@@ -389,23 +424,45 @@ program gen_be_ensrf
 !---------------------------------------------------------------------------------------------
 
    do member = 1, num_members
-      write(6,'(a,i4)')'   Writing ensemble member increments for member', n
+      write(6,'(a,i4)')'   Writing ensemble member increments for member', member
       write(UNIT=ce,FMT='(i3.3)')member
 
       do v = 1, nv
-         output_file = trim(var(v))//'/'trim(var(v))//'.e'//trim(ce)
+
+!        Output prior ensemble forecasts:
+         output_file = trim(varr(v))//'/'//trim(varr(v))//'.prior.e'//trim(ce)
          open(unit, file = output_file, form='unformatted')
-         write(unit)ni, nj, nk(v)
-         write(unit)x(xstart(v):xend(v)) - xf(xstart(v):xend(v))
+         write(unit)ni, nj, nkk(v)
+         xend = xstart(v) + nij * nkk(v) - 1
+         write(unit)xf(xstart(v):xend,member)
+         close(unit)
+
+!        Output posterior ensemble forecasts:
+         output_file = trim(varr(v))//'/'//trim(varr(v))//'.posterior.e'//trim(ce)
+         open(unit, file = output_file, form='unformatted')
+         write(unit)ni, nj, nkk(v)
+         xend = xstart(v) + nij * nkk(v) - 1
+         write(unit)x(xstart(v):xend,member)
          close(unit)
       end do
    end do
 
    do v = 1, nv
-      output_file = trim(var(v))//'/'trim(var(v))//'.mean'
+
+!     Output prior ensemble forecasts:
+      output_file = trim(varr(v))//'/'//trim(varr(v))//'.prior.mean'
       open(unit, file = output_file, form='unformatted')
-      write(unit)ni, nj, nk(v)
-      write(unit)xa_mean(xstart(v):xend(v)) - xf_mean(xstart(v):xend(v))
+      write(unit)ni, nj, nkk(v)
+      xend = xstart(v) + nij * nkk(v) - 1
+      write(unit)xf_mean(xstart(v):xend)
+      close(unit)
+
+!     Output posterior ensemble forecasts:
+      output_file = trim(varr(v))//'/'//trim(varr(v))//'.posterior.mean'
+      open(unit, file = output_file, form='unformatted')
+      write(unit)ni, nj, nkk(v)
+      xend = xstart(v) + nij * nkk(v) - 1
+      write(unit)xa_mean(xstart(v):xend)
       close(unit)
    end do
 
@@ -553,7 +610,7 @@ subroutine da_get_grid_stats( num_members, ni, nj, nk, nv, nijkv, nkk, varr, xf,
 
    ijkv = 0
    do v = 1, nv
-      name = var(v)
+      name = varr(v)
       do k = 1, nkk(v)
          do j = 1, nj
             do i = 1, ni
@@ -565,9 +622,9 @@ subroutine da_get_grid_stats( num_members, ni, nj, nk, nv, nijkv, nkk, varr, xf,
                stdv_f(i,j) = mnsq_f - mean_f(i,j) * mean_f(i,j)
                stdv_a(i,j) = mnsq_a - mean_a(i,j) * mean_a(i,j)
                stdv_f(i,j) = 0.0
-               if ( stdv_f(i,j) > 0.0 ) stdv_f(i,j) = sqrt(stdv_f)
+               if ( stdv_f(i,j) > 0.0 ) stdv_f(i,j) = sqrt(stdv_f(i,j))
                stdv_a(i,j) = 0.0
-               if ( stdv_a(i,j) > 0.0 ) stdv_a(i,j) = sqrt(stdv_a)
+               if ( stdv_a(i,j) > 0.0 ) stdv_a(i,j) = sqrt(stdv_a(i,j))
             end do
          end do
 
