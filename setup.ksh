@@ -43,6 +43,9 @@ fi
 if test -d /data7/da/bray/rttov/rttov85_${COMPILER}; then
    export RTTOV=/data7/da/bray/rttov/rttov85_${COMPILER}
 fi
+if test -d /data7/da/bray/crtm/crtm_${COMPILER}; then
+   export CRTM=/data7/da/bray/crtm/crtm_${COMPILER}
+fi
 if test -d /data7/da/bray/mpich/mpich-1.2.7p1_${COMPILER}; then
    export MPICH=/data7/da/bray/mpich/mpich-1.2.7p1_${COMPILER}
 fi
@@ -53,6 +56,9 @@ fi
 if test -d ~bray/rttov/rttov85_${COMPILER}; then
    export RTTOV=~bray/rttov/rttov85_${COMPILER}
 fi
+if test -d ~bray/crtm/crtm_${COMPILER}; then
+   export CRTM=~bray/crtm/crtm_${COMPILER}
+fi
 if test -d ~bray/mpich/mpich-1.2.7p1_${COMPILER}; then
    export MPICH=~bray/mpich/mpich-1.2.7p1_${COMPILER}
 fi
@@ -62,6 +68,9 @@ if test -d /Volumes/$MACHINE/bray/tools/netcdf-3.6.1_${COMPILER}; then
 fi
 if test -d /Volumes/$MACHINE/bray/tools/rttov85_${COMPILER}; then
    export RTTOV=/Volumes/$MACHINE/bray/tools/rttov85_${COMPILER}
+fi
+if test -d /Volumes/$MACHINE/bray/tools/crtm_${COMPILER}; then
+   export CRTM=/Volumes/$MACHINE/bray/tools/crtm_${COMPILER}
 fi
 if test -d /Volumes/$MACHINE/bray/tools/mpich-1.2.7p1_${COMPILER}; then
    export MPICH=/Volumes/$MACHINE/bray/tools/mpich-1.2.7p1_${COMPILER}
@@ -102,4 +111,5 @@ fi
 echo
 echo "MPICH       " $MPICH
 echo "RTTOV       " $RTTOV
+echo "CRTM        " $CRTM
 echo "NETCDF      " $NETCDF

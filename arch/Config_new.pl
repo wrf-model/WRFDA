@@ -19,6 +19,7 @@ $sw_jasperinc_path="";
 $sw_esmflib_path="";
 $sw_esmfinc_path="";
 $sw_rttov_path=""; 
+$sw_crtm_path=""; 
 $sw_ldflags=""; 
 $sw_compileflags=""; 
 $WRFCHEM = 0 ;
@@ -63,6 +64,9 @@ while ( substr( $ARGV[0], 0, 1 ) eq "-" ) {
   }
   if ( substr( $ARGV[0], 1, 6 ) eq "rttov=" ) {
     $sw_rttov_path = substr( $ARGV[0], 7 ) ;
+  }
+  if ( substr( $ARGV[0], 1, 5 ) eq "crtm=" ) {
+    $sw_crtm_path = substr( $ARGV[0], 6 ) ;
   }
   if ( substr( $ARGV[0], 1, 3 ) eq "os=" ) {
     $sw_os = substr( $ARGV[0], 4 ) ;
@@ -264,6 +268,18 @@ while ( <CONFIGURE_PREAMBLE> ) {
     $_ =~ s:CONFIGURE_RTTOV_FLAG::g ;
     $_ =~ s:CONFIGURE_RTTOV_LIB::g ;
     $_ =~ s:CONFIGURE_RTTOV_INC::g ;
+  }
+
+  if ( $sw_crtm_path ) {
+    $_ =~ s:CONFIGURE_CRTM_PATH:$sw_crtm_path:g ;
+    $_ =~ s:CONFIGURE_CRTM_FLAG:-DCRTM: ;
+    $_ =~ s:CONFIGURE_CRTM_LIB:-L$sw_crtm_path/lib -lcrtm: ;
+    $_ =~ s:CONFIGURE_CRTM_INC:-I$sw_crtm_path/src: ;
+  } else {
+    $_ =~ s:CONFIGURE_CRTM_PATH::g ;
+    $_ =~ s:CONFIGURE_CRTM_FLAG::g ;
+    $_ =~ s:CONFIGURE_CRTM_LIB::g ;
+    $_ =~ s:CONFIGURE_CRTM_INC::g ;
   }
 
   @machopts1 = ( @machopts1, $_ ) ;

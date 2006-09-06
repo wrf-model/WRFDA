@@ -47,6 +47,9 @@ endif
 if (-d /data7/da/bray/rttov/rttov85_${COMPILER}) then
    setenv RTTOV /data7/da/bray/rttov/rttov85_$COMPILER
 endif
+if (-d /data7/da/bray/crtm/crtm_${COMPILER}) then
+   setenv CRTM /data7/da/bray/crtm/crtm_$COMPILER
+endif
 if (-d /data7/da/bray/mpich/mpich-1.2.7p1_${COMPILER}) then
    setenv MPICH /data7/da/bray/mpich/mpich-1.2.7p1_${COMPILER}
 endif
@@ -58,6 +61,9 @@ endif
 if (-d ~bray/rttov/rttov85_$COMPILER) then
    setenv RTTOV ~bray/rttov/rttov85_$COMPILER
 endif
+if (-d ~bray/crtm/crtm_$COMPILER) then
+   setenv CRTM ~bray/crtm/crtm_$COMPILER
+endif
 if (-d ~bray/mpich/mpich-1.2.7p1_${COMPILER}) then
    setenv MPICH ~bray/mpich/mpich-1.2.7p1_${COMPILER}
 endif
@@ -67,6 +73,9 @@ if (-d /Volumes/$MACHINE/bray/tools/netcdf-3.6.1_${COMPILER}) then
 endif
 if (-d /Volumes/$MACHINE/bray/tools/rttov85_${COMPILER}) then
    setenv RTTOV /Volumes/$MACHINE/bray/tools/rttov85_${COMPILER}
+endif
+if (-d /Volumes/$MACHINE/bray/tools/crtm_${COMPILER}) then
+   setenv CRTM /Volumes/$MACHINE/bray/tools/crtm_${COMPILER}
 endif
 if (-d /Volumes/$MACHINE/bray/tools/mpich-1.2.7p1_${COMPILER}) then
    setenv MPICH /Volumes/$MACHINE/bray/tools/mpich-1.2.7p1_${COMPILER}
@@ -107,4 +116,5 @@ endif
 echo
 echo "MPICH       " $MPICH
 echo "RTTOV       " $RTTOV
+echo "CRTM        " $CRTM
 echo "NETCDF      " $NETCDF

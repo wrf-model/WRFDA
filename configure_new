@@ -157,6 +157,19 @@ if [ "$option" = "var" ] ; then
   fi
 fi
 
+# Look for CRTM for VAR radiances. Only needed for satellite radiances
+
+if [ "$option" = "var" ] ; then
+  if test -z "$CRTM" ; then
+    for p in /usr/local/crtm; do
+      if test -d $p; then
+        CRTM=$p
+        break
+      fi
+    done
+  fi
+fi
+
 # Look for netcdf
 if test -z "$NETCDF" ; then
   for p in /usr/local/netcdf
@@ -318,6 +331,14 @@ if [ "$option" = "var" ] ; then
   fi
 fi
 
+if [ "$option" = "var" ] ; then
+  if [ -n "$CRTM" ] ; then
+    echo "Will use CRTM in dir: $CRTM"
+  else
+    echo "Will configure for use without CRTM"
+  fi
+fi
+
 # Users who are cross-compiling can set environment variable 
 # $WRF_OS to override the value normally obtained from `uname`.  
 # If $WRF_OS is set, then $WRF_MACH can also be set to override 
@@ -378,7 +399,8 @@ fi
 if test -n "$PERL" ; then
   echo option = $option
   $PERL arch/Config_new.pl -perl=$PERL -netcdf=$NETCDF -phdf5=$PHDF5 -hdf=$HDF \
-     -hdfeos=$HDFEOS -rttov=$RTTOV -os=$os -mach=$mach -ldflags=$ldflags \
+     -hdfeos=$HDFEOS -rttov=$RTTOV -crtm=$CRTM -os=$os -mach=$mach \
+     -ldflags=$ldflags \
      -compileflags=$compileflags -registry=$REGISTRY -da_core=$DA_CORE \
      -em_core=$EM_CORE -nmm_core=$NMM_CORE \
      -coamps_core=$COAMPS_CORE -exp_core=$EXP_CORE
