@@ -1,0 +1,22 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: John Bray
+Date: 09/06/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Comment out unnecessary stuff from Registry to slim down code
+
+------------------------------------------------------
+
+bluesky: Runs con200
+--------------------------------------------------------------------------------------
+
+File changes:
+------------
+
+A    doc/changes/changes_20060906f.jrb
+M    Registry/Registry.wrfvar
