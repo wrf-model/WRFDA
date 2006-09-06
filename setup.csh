@@ -87,7 +87,7 @@ endif
 
 # Lightning
 
-if ( $HOSTNAME == "ln0126en" || $HOSTNAME == "ln0127en" ) then 
+if ( $MACHINE == "ln0126en" || $MACHINE == "ln0127en" ) then 
    if ( $COMPILER == pathscale ) then
       setenv MPICH /contrib/2.6/mpich-gm/1.2.6..14a-pathscale-2.4-64
    endif
@@ -98,7 +98,6 @@ endif
 
 setenv MPIHOME $MPICH
 setenv PATH    $MPICH/bin:$PATH
-setenv MANPATH $MPICH/man:$MANPATH
 
 if ($COMPILER == 'g95') then
    setenv G95_ENDIAN         BIG

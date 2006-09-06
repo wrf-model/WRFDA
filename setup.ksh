@@ -82,7 +82,7 @@ fi
 
 # Lightning
 
-if test $HOSTNAME == "ln0126en" -o $HOSTNAME == "ln0127en"; then 
+if test $MACHINE == "ln0126en" -o $MACHINE == "ln0127en"; then 
    if test $COMPILER == pathscale; then
       export MPICH=/contrib/2.6/mpich-gm/1.2.6..14a-pathscale-2.4-64
    fi
