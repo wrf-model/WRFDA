@@ -35,7 +35,6 @@ export RUN_OBSPROC=${RUN_OBSPROC:-true}
 export OB_DIR=$REG_DIR/$EXPT/ob
 
 export RUN_WRFVAR=${RUN_WRFVAR:-true}
-export DA_DIR=$REG_DIR/$EXPT/da
 
 export RUN_UPDATE_BC=${RUN_UPDATE_BC:-true}
 export RUN_WRF=${RUN_WRF:-true}

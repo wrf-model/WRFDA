@@ -9,17 +9,17 @@ export DUMMY=${DUMMY:-false}
 export NL_USE_HTML=${NL_USE_HTML:-false}
 export CYCLE_PERIOD=${CYCLE_PERIOD:-06}
 export NL_NUM_METGRID_LEVELS=${NL_NUM_METGRID_LEVELS:-27}
+export NL_P_TOP_REQUESTED=${NL_P_TOP_REQUESTED:-5000}
 export LBC_FREQ=${LBC_FREQ:-06}
 
-export RUN_DIR=${RUN_DIR:-$EXP_DIR/real}
+export RUN_DIR=${RUN_DIR:-$EXP_DIR/DATE/real}
 export WORK_DIR=$RUN_DIR/working
-export OUT_DIR=${OUT_DIR:-$RUN_DIR/$DATE}
 
 # Do we remove the WORK_DIR at the end to save space
 export CLEAN=${CLEAN:-false}
 
 rm -rf $WORK_DIR
-mkdir -p $OUT_DIR $WORK_DIR
+mkdir -p $RUN_DIR $WORK_DIR
 cd $WORK_DIR
 
 if $NL_USE_HTML; then
@@ -33,8 +33,8 @@ date
 
 echo "Release directory:           $REL_DIR"
 echo "WRF directory:               $WRF_DIR $WRF_REV"
+echo "Run directory:               $RUN_DIR"
 echo "Working directory:           $WORK_DIR"
-echo "Output directory:            $OUT_DIR"
 echo "Start date:                  $DATE"
 echo "End date:                    $END_DATE"
 
@@ -100,12 +100,11 @@ else
  parent_time_step_ratio              = 1,
  feedback                            = 1,
  smooth_option                       = 0
- /
  interp_type                         = 1
  lagrange_order                      = 1
  zap_close_levels                    = 500
  force_sfc_in_vinterp                = 6
- p_top_requested                     = 5000
+ p_top_requested                     = $NL_P_TOP_REQUESTED
  eta_levels                          = 1.000, 0.990, 0.978, 0.964, 0.946, 
                                        0.922, 0.894, 0.860, 0.817, 0.766, 
                                        0.707, 0.644, 0.576, 0.507, 0.444, 
@@ -194,27 +193,27 @@ fi
 typeset -l LC_SOLVER
 LC_SOLVER=$SOLVER
 
-cp namelist.input $OUT_DIR
+cp namelist.input $RUN_DIR
 
-if test ! -f $CS_DIR/$DATE/wrfinput_d${DOMAIN}; then
+if test ! -f $MD_DIR/$DATE/wrfinput_d${DOMAIN}; then
    if $DUMMY; then
       echo "Dummy real"
       echo Dummy real > wrfinput_d${DOMAIN}
       echo Dummy real > wrfbdy_d${DOMAIN}
       echo Dummy real > wrflowinp_d${DOMAIN}
    else
-      ln -fs $CS_DIR/$DATE/met_em.d* .
+      ln -fs $MD_DIR/$DATE/met_em.d* .
       $RUN_CMD ${WRF_DIR}/main/real.exe
       RC=$?
 
       if test -f fort.9; then
-        cp fort.9 $OUT_DIR/namelist.output
+        cp fort.9 $RUN_DIR/namelist.output
       fi
 
-      mkdir -p $OUT_DIR/rsl
-      mv rsl* $OUT_DIR/rsl
+      mkdir -p $RUN_DIR/rsl
+      mv rsl* $RUN_DIR/rsl
       if $NL_USE_HTML; then
-         cd $OUT_DIR/rsl
+         cd $RUN_DIR/rsl
          for FILE in rsl*; do
             echo "<HTML><HEAD><TITLE>$FILE</TITLE></HEAD>" > $FILE.html
             echo "<H1>$FILE</H1><PRE>" >> $FILE.html
@@ -222,7 +221,7 @@ if test ! -f $CS_DIR/$DATE/wrfinput_d${DOMAIN}; then
             echo "</PRE></BODY></HTML>" >> $FILE.html
             rm $FILE
          done
-         cd $OUT_DIR
+         cd $RUN_DIR
 
          echo '<A HREF="namelist.input">Namelist input</a>'
          echo '<A HREF="namelist.output">Namelist output</a>'
@@ -239,11 +238,11 @@ if test ! -f $CS_DIR/$DATE/wrfinput_d${DOMAIN}; then
       fi    
    fi
 
-   mv $WORK_DIR/wrfinput_d${DOMAIN} $CS_DIR/$DATE
-   mv $WORK_DIR/wrfbdy_d${DOMAIN} $CS_DIR/$DATE
-   mv $WORK_DIR/wrflowinp_d${DOMAIN} $CS_DIR/$DATE
+   mv $WORK_DIR/wrfinput_d${DOMAIN} $MD_DIR/$DATE
+   mv $WORK_DIR/wrfbdy_d${DOMAIN} $MD_DIR/$DATE
+   mv $WORK_DIR/wrflowinp_d${DOMAIN} $MD_DIR/$DATE
 else
-   echo $CS_DIR/$DATE/wrfinput_d${DOMAIN} exists, skipping
+   echo $MD_DIR/$DATE/wrfinput_d${DOMAIN} exists, skipping
 fi
 
 #rm -f ${MOAD_DATAROOT}/siprd/wrf_real_input_${LC_SOLVER}*

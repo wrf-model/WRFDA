@@ -34,23 +34,22 @@ export DOMAIN=${DOMAIN:-01}
 export DAT_DIR=${DAT_DIR:-$HOME/data}
 export HOSTS=${HOSTS:-$DAT_DIR/hosts/$HOSTNAME.hosts}
 
-export RUN_DIR=${RUN_DIR:-$REG_DIR/$EXPT}
+export EXP_DIR=${EXP_DIR:-$REG_DIR/$EXPT}
+export RUN_DIR=${RUN_DIR:-$EXP_DIR/$DATE/wrfvar}
 export WORK_DIR=$RUN_DIR/working
-export OUT_DIR=${OUT_DIR:-$RUN_DIR/$DATE}
 
 export OB_DIR=${OB_DIR:-$REG_DIR/ob}
 export BE_DIR=${BE_DIR:-$REG_DIR/be}
-export CS_DIR=${CS_DIR:-$REG_DIR/cs}
-export DA_DIR=${DA_DIR:-$RUN_DIR/da}
+export MD_DIR=${MD_DIR:-$REG_DIR/md}
 
 # Do we remove the WORK_DIR at the end to save space
 export CLEAN=${CLEAN:-false}
 
 export DUMMY=${DUMMY:-false}
 
-export DA_FIRST_GUESS=${DA_FIRST_GUESS:-$CS_DIR/$DATE/wrfinput_d$DOMAIN}    # wrfvar "first guess" input.
-export DA_BOUNDARIES=${DA_BOUNDARIES:-$CS_DIR/$DATE/wrfbdy_d$DOMAIN}    # wrfvar boundaries input.
-export DA_ANALYSIS=${DA_ANALYSIS:-$DA_DIR/$DATE/wrfvar_output}
+export DA_FIRST_GUESS=${DA_FIRST_GUESS:-$MD_DIR/$DATE/wrfinput_d$DOMAIN}    # wrfvar "first guess" input.
+export DA_BOUNDARIES=${DA_BOUNDARIES:-$MD_DIR/$DATE/wrfbdy_d$DOMAIN}    # wrfvar boundaries input.
+export DA_ANALYSIS=${DA_ANALYSIS:-$WORK_DIR/wrfvar_output}
 export DA_OBSERVATIONS=${DA_OBSERVATIONS:-$OB_DIR/$DATE/ob.ascii} # wrfvar observation input.
 export DA_BUFR_DIR=${DA_BUFR_DIR:-$OB_DIR/$DATE} # radiance bufr file directory
 export DA_BACK_ERRORS=${DA_BACK_ERRORS:-$BE_DIR/gen_be.NMC.dat} # wrfvar background errors.
@@ -69,7 +68,7 @@ export NL_JCDFI_USE=${NL_JCDFI_USE:-false}
 
 #=======================================================
 
-mkdir -p $OUT_DIR $DA_DIR/$DATE
+mkdir -p $RUN_DIR $MD_DIR/$DATE
 
 if $NL_USE_HTML; then
    echo "<HTML><HEAD><TITLE>$EXPT wrfvar</TITLE></HEAD><BODY><H1>$EXPT wrfvar</H1><PRE>"
@@ -86,8 +85,8 @@ echo "First Guess Input File:      $DA_FIRST_GUESS"
 echo "Background Error Input File: $DA_BACK_ERRORS"
 echo "Observation Directory:       $OB_DIR"
 echo "Analysis:                    $DA_ANALYSIS"
+echo "Run directory:               $RUN_DIR"
 echo "Working directory:           $WORK_DIR"
-echo "Output directory:            $OUT_DIR"
 echo "Analysis date:               $DATE"
 echo "Time window start:           $WINDOW_START"
 echo "Time window end:             $WINDOW_END"
@@ -97,7 +96,7 @@ if test ! -f $DA_ANALYSIS; then
    rm -rf ${WORK_DIR}
    mkdir -p ${WORK_DIR}
    cd $WORK_DIR
-  
+
    START_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe $DATE $WINDOW_START`
    END_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe $DATE $WINDOW_END`
 
@@ -317,6 +316,15 @@ if test ! -f $DA_ANALYSIS; then
 
    . $WRFVAR_DIR/inc/namelist_script.inc
 
+   if test -f namelist.input; then
+     cp namelist.input $RUN_DIR
+   fi
+
+   if $NL_USE_HTML; then
+      echo '<A HREF="working">Working directory</a>'
+      echo '<A HREF="namelist.input">Namelist input</a>'
+   fi
+
    #-------------------------------------------------------------------
    #Run WRF-Var:
    #-------------------------------------------------------------------
@@ -383,24 +391,20 @@ if test ! -f $DA_ANALYSIS; then
       fi
    fi
 
-   if test -f namelist.input; then
-     cp namelist.input $OUT_DIR
-   fi
-
    if test -f fort.9; then
-     cp fort.9 $OUT_DIR/namelist.output
+     cp fort.9 $RUN_DIR/namelist.output
    fi
 
    if test -f fort.12; then
-      cp fort.12 $OUT_DIR/statistics
+      cp fort.12 $RUN_DIR/statistics
    fi
 
    if test -f fort.81; then 
-      cp fort.81 $OUT_DIR/cost_fn
+      cp fort.81 $RUN_DIR/cost_fn
    fi
 
    if test -f fort.82; then
-      cp fort.82 $OUT_DIR/grad_fn
+      cp fort.82 $RUN_DIR/grad_fn
    fi
 
    if test -f wrfvar_output; then
@@ -408,13 +412,14 @@ if test ! -f $DA_ANALYSIS; then
    fi
 
    if test -d trace; then
-      mv trace $OUT_DIR
+      mkdir -p $RUN_DIR/trace
+      mv trace/* $RUN_DIR/trace
    fi
 
-   mkdir $OUT_DIR/rsl
-   mv rsl* $OUT_DIR/rsl
+   mkdir -p $RUN_DIR/rsl
+   mv rsl* $RUN_DIR/rsl
    if $NL_USE_HTML; then
-      cd $OUT_DIR/rsl
+      cd $RUN_DIR/rsl
       for FILE in rsl*; do
          echo "<HTML><HEAD><TITLE>$FILE</TITLE></HEAD>" > $FILE.html
          echo "<H1>$FILE</H1><PRE>" >> $FILE.html
@@ -422,9 +427,8 @@ if test ! -f $DA_ANALYSIS; then
          echo "</PRE></BODY></HTML>" >> $FILE.html
          rm $FILE
       done
-      cd $OUT_DIR
+      cd $RUN_DIR
 
-      echo '<A HREF="namelist.input">Namelist input</a>'
       echo '<A HREF="namelist.output">Namelist output</a>'
       echo '<A HREF="rsl/rsl.out.0000.html">rsl.out.0000</a>'
       echo '<A HREF="rsl/rsl.error.0000.html">rsl.error.0000</a>'
@@ -436,7 +440,7 @@ if test ! -f $DA_ANALYSIS; then
       echo '<A HREF="statistics">Statistics</a>'
    fi
 
-   ls -l $OUT_DIR/cost_fn
+   ls -l $RUN_DIR/cost_fn
 
    if test $RC = 0; then
      echo `date` "${OK}Succeeded${END}"
@@ -455,10 +459,6 @@ if test ! -f $DA_ANALYSIS; then
 
    if $CLEAN; then
       rm -rf $WORK_DIR
-   fi
-
-   if test $OUT_DIR != $RUN_DIR; then
-      ln -fs ${OUT_DIR##$RUN_DIR/}/* $RUN_DIR
    fi
 else
    echo "$DA_ANALYSIS already exists, skipping"

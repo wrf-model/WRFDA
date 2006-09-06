@@ -28,7 +28,7 @@ export MSS_DIR=${MSS_DIR:-/BRAY/DATA}
 export MSS_RT_DIR=${MSS_RT_DIR:-mss:/BRESCH/RT/DATA}
 export MSS_AVN_DIR=${MSS_AVN_DIR:-mss:/DSS/DS083.2/data}
 export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION} 
-export CS_DIR=${CS_DIR:-$REG_DIR/cs}     
+export MD_DIR=${MD_DIR:-$REG_DIR/md}     
 export OB_DIR=${OB_DIR:-$REG_DIR/ob} 
 
 if $NL_USE_HTML; then
@@ -69,7 +69,7 @@ while test $LOCAL_DATE -le $END_DATE; do
    fi
 
    AVN_FILE=fnl_${YY}${MM}${DD}_${HH}_00
-   DIR=${CS_DIR}/$LOCAL_DATE
+   DIR=${MD_DIR}/$LOCAL_DATE
    mkdir -p ${DIR}
 
    if test ! -f $DIR/$AVN_FILE; then

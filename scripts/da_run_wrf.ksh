@@ -30,8 +30,9 @@ export HOSTNAME=${HOSTNAME:-`hostname`}
 export DAT_DIR=${DAT_DIR:-$HOME/data} # Data directory.
 export HOSTS=${HOSTS:-$DAT_DIR/hosts/$HOSTNAME.hosts}
 export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION} # Data directory for region.
-export RUN_DIR=${RUN_DIR:-$DAT_DIR/$REGION/$EXPT} #Run directory.
-export WORK_DIR=${WORK_DIR:-$RUN_DIR/working}  # Temporary directory.
+export EXP_DIR=${EXP_DIR:-$REG_DIR/$EXPT}
+export RUN_DIR=${RUN_DIR:-$EXP_DIR/$DATE/wrf} #Run directory.
+export WORK_DIR=$RUN_DIR/working  # Temporary directory.
 export REL_DIR=${REL_DIR:-$HOME/trunk} # Code directory.
 export WRF_DIR=${WRF_DIR:-$REL_DIR/wrf}                  # Code subdirectory.
 
@@ -65,8 +66,6 @@ date
 mkdir -p ${WORK_DIR}
 cd ${WORK_DIR}
 
-ln -s $WORK_DIR $OUT_DIR
-
 # Copy necessary info (better than link as not overwritten):
 cp ${WRF_DIR}/main/wrf.exe .
 cp ${WRF_DIR}/run/RRTM_DATA .
@@ -77,8 +76,8 @@ cp ${WRF_DIR}/run/SOILPARM.TBL .
 cp ${WRF_DIR}/run/VEGPARM.TBL .
 cp ${WRF_DIR}/run/gribmap.txt .
 cp ${DA_ANALYSIS} wrfinput_d${DOMAIN}
-cp ${CS_DIR}/$DATE/wrfbdy_d${DOMAIN} wrfbdy_d${DOMAIN}
-#cp ${CS_DIR}/$DATE/wrflowinp_d${DOMAIN} wrflowinp_d${DOMAIN}
+cp ${MD_DIR}/$DATE/wrfbdy_d${DOMAIN} wrfbdy_d${DOMAIN}
+#cp ${MD_DIR}/$DATE/wrflowinp_d${DOMAIN} wrflowinp_d${DOMAIN}
 
 export CCYY=`echo $DATE | cut -c1-4`
 export MM=`echo $DATE | cut -c5-6`
@@ -102,17 +101,9 @@ export NL_END_HOUR=`echo $END_DATE | cut -c9-10`
 export NL_INTERVAL_SECONDS=`expr $LBC_FREQ \* 3600`
 
 . $WRF_DIR/inc/namelist_script.inc
-cp namelist.input $OUT_DIR
+cp namelist.input $RUN_DIR
 
-if $NL_USE_HTML; then
-   echo '<A HREF="namelist.input">Namelist input</a>'
-fi
-
-#mv namelist.input namelist.input1
-#cp $REG_DIR/namelist.input .
-
-
-if test ! -f $CS_DIR/$DATE/wrfout_d${DOMAIN}_${CCYY}-${MM}-${DD}_${HH}:00:00; then
+if test ! -f $MD_DIR/$DATE/wrfout_d${DOMAIN}_${CCYY}-${MM}-${DD}_${HH}:00:00; then
    if $NL_USE_HTML; then
       echo '<A HREF="working">Working directory</a>'
       echo '<A HREF="namelist.input">Namelist input</a>'
@@ -126,13 +117,13 @@ if test ! -f $CS_DIR/$DATE/wrfout_d${DOMAIN}_${CCYY}-${MM}-${DD}_${HH}:00:00; th
    fi
 
    if test -f fort.9; then
-     cp fort.9 $OUT_DIR/namelist.output
+     cp fort.9 $RUN_DIR/namelist.output
    fi
 
-   mkdir $OUT_DIR/rsl
-   mv rsl* $OUT_DIR/rsl
+   mkdir $RUN_DIR/rsl
+   mv rsl* $RUN_DIR/rsl
    if $NL_USE_HTML; then
-      cd $OUT_DIR/rsl
+      cd $RUN_DIR/rsl
       for FILE in rsl*; do
          echo "<HTML><HEAD><TITLE>$FILE</TITLE></HEAD>" > $FILE.html
          echo "<H1>$FILE</H1><PRE>" >> $FILE.html
@@ -147,9 +138,9 @@ if test ! -f $CS_DIR/$DATE/wrfout_d${DOMAIN}_${CCYY}-${MM}-${DD}_${HH}:00:00; th
       echo '<A HREF="rsl/rsl.error.0000.html">rsl.error.0000</a>'
       echo '<A HREF="rsl">Other RSL output</a>'
    fi
-   mv wrfout* $CS_DIR/$DATE
+   mv wrfout* $MD_DIR/$DATE
 else
-   echo "$CS_DIR/$DATE/wrfout_d${DOMAIN}_${CCYY}-${MM}-${DD}_${HH}:00:00 already exists, skipping"
+   echo "$MD_DIR/$DATE/wrfout_d${DOMAIN}_${CCYY}-${MM}-${DD}_${HH}:00:00 already exists, skipping"
 fi
 
 

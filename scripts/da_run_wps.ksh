@@ -39,8 +39,9 @@ export FG_TYPE=${FG_TYPE:-GFS}
 export EXPT=${EXPT:-test}
 export DAT_DIR=${DAT_DIR:-$HOME/data}
 export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION}
-export EXP_DIR=${RUN_DIR:-$REG_DIR/$EXPT}
-export RUN_DIR=${RUN_DIR:-$EXP_DIR/wps}
+export EXP_DIR=${EXP_DIR:-$REG_DIR/$EXPT}
+export RUN_DIR=${RUN_DIR:-$EXP_DIR/$DATE/wps}
+export WORK_DIR=$RUN_DIR/working
 
 if $NL_USE_HTML; then
    echo "<HTML><HEAD><TITLE>$EXPT wps</TITLE></HEAD><BODY><H1>$EXPT wps</H1><PRE>"
@@ -48,11 +49,11 @@ fi
 
 date
 
-if test ! -d $RUN_DIR; then
-   mkdir $RUN_DIR
+if test ! -d $WORK_DIR; then
+   mkdir $WORK_DIR
 fi
 
-cd $RUN_DIR
+cd $WORK_DIR
 
 let LBC_FREQ_SS=$LBC_FREQ*3600
 
@@ -74,7 +75,7 @@ cat >namelist.wps <<EOF
  end_hour = $END_HOUR,
  interval_seconds = $LBC_FREQ_SS,
  io_form_geogrid = 2,
- opt_output_from_geogrid_path = '$RUN_DIR',
+ opt_output_from_geogrid_path = '$WORK_DIR',
  debug_level = 0
 /
 
@@ -107,13 +108,11 @@ cat >namelist.wps <<EOF
 &metgrid
  fg_name = './FILE'
  io_form_metgrid = 2, 
- opt_output_from_metgrid_path = '$RUN_DIR',
+ opt_output_from_metgrid_path = '$WORK_DIR',
  opt_metgrid_tbl_path         = '$WPS_DIR/metgrid',
  opt_ignore_dom_center        = .false.
 /
 EOF
-
-cp namelist.wps $OUT_DIR
 
 #-----------------------------------------------------------------------
 # [3.0] Run WPS:
@@ -124,7 +123,7 @@ export MM=`echo $DATE | cut -c5-6`
 export DD=`echo $DATE | cut -c7-8`
 export HH=`echo $DATE | cut -c9-10`
 
-if test ! -f $CS_DIR/$DATE/met_em.d${DOMAIN}.${CCYY}-${MM}-${DD}_${HH}:00:00.nc; then
+if test ! -f $MD_DIR/$DATE/met_em.d${DOMAIN}.${CCYY}-${MM}-${DD}_${HH}:00:00.nc; then
    if $DUMMY; then
       echo "Dummy wps"
       LOCAL_DATE=$DATE
@@ -138,7 +137,7 @@ if test ! -f $CS_DIR/$DATE/met_em.d${DOMAIN}.${CCYY}-${MM}-${DD}_${HH}:00:00.nc;
       done
    else
       ln -fs $WPS_DIR/ungrib/Variable_Tables/Vtable.$FG_TYPE Vtable
-      $WPS_DIR/link_grib.csh $CS_DIR/$START_DATE/fn* $CS_DIR/$END_DATE/fn*
+      $WPS_DIR/link_grib.csh $MD_DIR/$START_DATE/fn* $MD_DIR/$END_DATE/fn*
       $WPS_DIR/geogrid.exe
       RC=$?
       if test $RC != 0; then
@@ -158,15 +157,17 @@ if test ! -f $CS_DIR/$DATE/met_em.d${DOMAIN}.${CCYY}-${MM}-${DD}_${HH}:00:00.nc;
          exit 1
       fi
    fi
-   mv met_em.d${DOMAIN}* $CS_DIR/$DATE
+   mv met_em.d${DOMAIN}* $MD_DIR/$DATE
 else
-   echo "$CS_DIR/$DATE/met_em.d${DOMAIN}* files exist, skipping"
+   echo "$MD_DIR/$DATE/met_em.d${DOMAIN}* files exist, skipping"
 fi
 
 cd $OLDPWD
 
+cp $WORK_DIR/namelist.input $RUN_DIR
+
 if $CLEAN; then
-   rm -rf $RUN_DIR
+   rm -rf $WORK_DIR
 fi
 
 date

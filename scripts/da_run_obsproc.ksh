@@ -19,12 +19,12 @@ export REGION=${REGION:-amps$DOMAIN}
 export REL_DIR=${REL_DIR:-$HOME/trunk}
 export DAT_DIR=${DAT_DIR:-$HOME/data}
 export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION}
-export RUN_DIR=${RUN_DIR:-$REG_DIR/$EXPT}
-export OUT_DIR=${OUT_DIR:-$RUN_DIR/$DATE}
+export EXP_DIR=${EXP_DIR:-$REG_DIR/$EXPT}
+export RUN_DIR=${RUN_DIR:-$EXP_DIR/$DATE/obsproc}
 export OB_DIR=${OB_DIR:-$REG_DIR/ob}
 export DUMMY=${DUMMY:-false}
 
-mkdir -p $RUN_DIR $OUT_DIR $OB_DIR/$DATE
+mkdir -p $RUN_DIR $OB_DIR/$DATE
 
 export OBSPROC_DIR=${OBSPROC_DIR:-$REL_DIR/3DVAR_OBSPROC} # Observation preprocessing
 
@@ -167,7 +167,7 @@ if test ! -f $OB_DIR/$DATE/ob.ascii; then
 
 EOF
 
-   cp namelist.3dvar_obs $OUT_DIR
+   cp namelist.3dvar_obs $RUN_DIR
 
    echo "Converting $OB_DIR/$DATE/$OB_FILE to"
    echo "$OB_DIR/$DATE/ob.ascii"

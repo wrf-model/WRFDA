@@ -16,11 +16,11 @@ export CYCLING=${CYCLING:-false}
 export DOMAIN=${DOMAIN:-01}
 export DAT_DIR=${DAT_DIR:-$HOME/data}
 export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION}
-export DA_DIR=${DA_DIR:-$REG_DIR/da}
-export CS_DIR=${CS_DIR:-$REG_DIR/cs}
+export MD_DIR=${MD_DIR:-$REG_DIR/md}
 export EXPT=${EXPT:-test}
-export RUN_DIR=${RUN_DIR:-$REG_DIR/$EXPT}
-export WORK_DIR=${WORK_DIR:-$RUN_DIR/working}
+export EXP_DIR=${EXP_DIR:-$REG_DIR/$EXPT}
+export RUN_DIR=${RUN_DIR:-$EXP_DIR/$DATE/update_bc}
+export WORK_DIR=$RUN_DIR/working
 
 export DUMMY=${DUMMY:-false}
 export CLEAN=${CLEAN:-true}
@@ -32,19 +32,17 @@ fi
 
 date
 
-if test ! -d ${RUN_DIR}; then
-   mkdir ${RUN_DIR}
-fi
+mkdir -p ${RUN_DIR}
 
 export REL_DIR=${REL_DIR:-$HOME/trunk} # Code directory.
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
-export DA_FIRST_GUESS=${DA_FIRST_GUESS:-$CS_DIR/$DATE/wrfvar_input_d$DOMAIN}
-export DA_ANALYSIS=${DA_ANALYSIS:-$DA_DIR/$DATE/wrfvar_output}
-export BDYIN=${BDYIN:-$CS_DIR/$DATE/wrfbdy_d$DOMAIN}
-export BDYOUT=${BDYOUT:-$CS_DIR/$DATE/wrfbdy_d$DOMAIN}
+export DA_FIRST_GUESS=${DA_FIRST_GUESS:-$MD_DIR/$DATE/wrfvar_input_d$DOMAIN}
+export DA_ANALYSIS=${DA_ANALYSIS:-$MD_DIR/$DATE/wrfvar_output}
+export BDYIN=${BDYIN:-$MD_DIR/$DATE/wrfbdy_d$DOMAIN}
+export BDYOUT=${BDYOUT:-$MD_DIR/$DATE/wrfbdy_d$DOMAIN}
 
 rm -rf ${WORK_DIR}
-mkdir  ${WORK_DIR}
+mkdir -p ${WORK_DIR}
 cd ${WORK_DIR}
 
 cp $BDYIN wrfbdy_d$DOMAIN

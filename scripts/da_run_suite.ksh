@@ -96,9 +96,8 @@ export HOSTS=${HOSTS:-$DAT_DIR/hosts/$HOSTNAME.hosts}
 export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION} # Data directory for region.
 export EXP_DIR=${EXP_DIR:-$REG_DIR/$EXPT} #Run directory.
 export OB_DIR=${OB_DIR:-$REG_DIR/ob}     # Observation directory.
-export CS_DIR=${CS_DIR:-$REG_DIR/cs}     # Background directory.
+export MD_DIR=${MD_DIR:-$REG_DIR/md}     # Background directory.
 export BE_DIR=${BE_DIR:-$REG_DIR/be}     # Background error covariance directory.
-export DA_DIR=${DA_DIR:-$REG_DIR/da}    
 
 export REL_DIR=${REL_DIR:-$HOME/trunk} 
 export WRF_DIR=${WRF_DIR:-$REL_DIR/wrf} 
@@ -140,7 +139,7 @@ export STAND_LON=${STAND_LON:--98.0}           #
 export NL_DX=${NL_DX:-100000}                # Resolution (m). 
 export NL_DY=${NL_DY:-100000}                # Resolution (m).
 
-# Additional Namelist variable for real (namelist.input):
+# Additional Namelist variable for real:
 
 export NL_HISTORY_INTERVAL=${NL_HISTORY_INTERVAL:-360}          # (minutes)
 export NL_TIME_STEP=${NL_TIME_STEP:-360}                # Timestep (s) (dt=4-6*dx(km) recommended).
@@ -198,9 +197,9 @@ echo "OBSPROC      $OBSPROC_DIR"
 echo "NUM_PROCS    $NUM_PROCS"
 echo "INITIAL_DATE $INITIAL_DATE"
 echo "FINAL_DATE   $FINAL_DATE"
-echo "CS_DIR       $CS_DIR"
+echo "BE_DIR       $BE_DIR"
+echo "MD_DIR       $MD_DIR"
 echo "OB_DIR       $OB_DIR"
-echo "DA_DIR       $DA_DIR"
 
 while test $DATE != $FINAL_DATE; do  
 
@@ -233,91 +232,66 @@ while test $DATE != $FINAL_DATE; do
    . ${WRFVAR_DIR}/scripts/da_get_date_range.ksh $DATE $FCST_RANGE
 
    if $RUN_RESTORE_DATA_NCEP; then
-      export RUN_DIR=$EXP_DIR/restore_data_ncep
-      export OUT_DIR=$RUN_DIR/$DATE
-      mkdir -p $OUT_DIR
+      export RUN_DIR=$EXP_DIR/$DATE/restore_data_ncep
+      mkdir -p $RUN_DIR
 
       START_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe ${DATE} $WINDOW_START 2>/dev/null`
       END_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe ${DATE} $WINDOW_END 2>/dev/null`
 
-      $WRFVAR_DIR/scripts/da_trace.ksh da_run_restore_data_ncep $OUT_DIR
-      ${WRFVAR_DIR}/scripts/da_restore_data_ncep.ksh > $OUT_DIR/index.html 2>&1
+      $WRFVAR_DIR/scripts/da_trace.ksh da_run_restore_data_ncep $RUN_DIR
+      ${WRFVAR_DIR}/scripts/da_restore_data_ncep.ksh > $RUN_DIR/index.html 2>&1
       if test $? != 0; then
          echo `date` "${ERR}Failed with error$?$END"
          exit 1
       fi
-      if $CLEAN; then
-         rm -rf ${RUN_DIR}
-      fi
    fi
 
    if $RUN_WRFSI; then
-      export RUN_DIR=$EXP_DIR/wrfsi
-      export OUT_DIR=$RUN_DIR/$DATE
-      mkdir -p $OUT_DIR
+      export RUN_DIR=$EXP_DIR/$DATE/wrfsi
+      mkdir -p $RUN_DIR
 
-      $WRFVAR_DIR/scripts/da_trace.ksh da_run_wrfsi $OUT_DIR
-      ${WRFVAR_DIR}/scripts/da_run_wrfsi.ksh > $OUT_DIR/index.html 2>&1
+      $WRFVAR_DIR/scripts/da_trace.ksh da_run_wrfsi $RUN_DIR
+      ${WRFVAR_DIR}/scripts/da_run_wrfsi.ksh > $RUN_DIR/index.html 2>&1
       if test $? != 0; then
          echo `date` "${ERR}Failed with error $?$END"
          exit 1
-      fi
-      if $CLEAN; then
-         rm -rf ${RUN_DIR}
       fi
    fi
 
    if $RUN_WPS; then
-      export RUN_DIR=$EXP_DIR/wps
-      export OUT_DIR=$RUN_DIR/$DATE
-      mkdir -p $OUT_DIR
+      export RUN_DIR=$EXP_DIR/$DATE/wps
+      mkdir -p $RUN_DIR
 
-      $WRFVAR_DIR/scripts/da_trace.ksh da_run_wps $OUT_DIR
-      ${WRFVAR_DIR}/scripts/da_run_wps.ksh > $OUT_DIR/index.html 2>&1
+      $WRFVAR_DIR/scripts/da_trace.ksh da_run_wps $RUN_DIR
+      ${WRFVAR_DIR}/scripts/da_run_wps.ksh > $RUN_DIR/index.html 2>&1
       if test $? != 0; then
          echo `date` "${ERR}Failed with error $?$END"
          exit 1
-      fi
-      if $CLEAN; then
-         rm -rf ${RUN_DIR}
       fi
    fi
 
-   # Create WRFVAR namelist.input:
-
-   . ${WRFVAR_DIR}/inc/namelist_script.inc
-
    if $RUN_REAL; then     
-      export RUN_DIR=$EXP_DIR/real
-      export OUT_DIR=$RUN_DIR/$DATE
-      mkdir -p $OUT_DIR
+      export RUN_DIR=$EXP_DIR/$DATE/real
+      mkdir -p $RUN_DIR
 
-      $WRFVAR_DIR/scripts/da_trace.ksh da_run_real $OUT_DIR
-      ${WRFVAR_DIR}/scripts/da_run_real.ksh > $OUT_DIR/index.html 2>&1
+      $WRFVAR_DIR/scripts/da_trace.ksh da_run_real $RUN_DIR
+      ${WRFVAR_DIR}/scripts/da_run_real.ksh > $RUN_DIR/index.html 2>&1
       if test $? != 0; then
          echo `date` "${ERR}Failed with error $?$END"
          exit 1
-      fi
-      if $CLEAN; then
-         rm -rf ${RUN_DIR}
       fi
    fi
 
    if $RUN_OBSPROC; then
-      export RUN_DIR=$EXP_DIR/obsproc
-      export OUT_DIR=$RUN_DIR/$DATE
-      mkdir -p $OUT_DIR
+      export RUN_DIR=$EXP_DIR/$DATE/obsproc
+      mkdir -p $RUN_DIR
 
       export DA_OBSERVATIONS=$OB_DIR/$DATE/ob.ascii
-      $WRFVAR_DIR/scripts/da_trace.ksh da_run_obsproc $OUT_DIR
-      ${WRFVAR_DIR}/scripts/da_run_obsproc.ksh > $OUT_DIR/index.html 2>&1
+      $WRFVAR_DIR/scripts/da_trace.ksh da_run_obsproc $RUN_DIR
+      ${WRFVAR_DIR}/scripts/da_run_obsproc.ksh > $RUN_DIR/index.html 2>&1
       if test $? != 0; then
          echo `date` "${ERR}Failed with error $?$END"
          exit 1
-      fi
-
-      if $CLEAN; then
-         rm -rf ${RUN_DIR}
       fi
    fi
 
@@ -328,72 +302,54 @@ while test $DATE != $FINAL_DATE; do
 
    if $RUN_WRFVAR; then
       if $CYCLING; then
-         export DA_FIRST_GUESS=${CS_DIR}/${PREV_DATE}/wrfvar_input_d${DOMAIN}
+         export DA_FIRST_GUESS=${MD_DIR}/${PREV_DATE}/wrfvar_input_d${DOMAIN}
       fi
 
-      export RUN_DIR=$EXP_DIR/wrfvar
-      export OUT_DIR=$RUN_DIR/$DATE
-      mkdir -p $OUT_DIR $DA_DIR
+      export RUN_DIR=$EXP_DIR/$DATE/wrfvar
+      mkdir -p $RUN_DIR
 
-      export DA_ANALYSIS=$DA_DIR/$DATE/wrfvar_output
-      $WRFVAR_DIR/scripts/da_trace.ksh da_run_wrfvar $OUT_DIR
-      ${WRFVAR_DIR}/scripts/da_run_wrfvar.ksh > $OUT_DIR/index.html 2>&1
+      export DA_ANALYSIS=$MD_DIR/$DATE/wrfvar_output
+      $WRFVAR_DIR/scripts/da_trace.ksh da_run_wrfvar $RUN_DIR
+      ${WRFVAR_DIR}/scripts/da_run_wrfvar.ksh > $RUN_DIR/index.html 2>&1
       if test $? != 0; then
          echo `date` "${ERR}Failed with error $?$END"
          exit 1
-      fi
- 
-      if $CLEAN; then
-         rm -rf ${RUN_DIR}
       fi
    else     
       if $CYCLING; then
          echo "   Running free-forecast."
          echo ""
-         DA_ANALYSIS=${CS_DIR}/${PREV_DATE}/wrfvar_input_d$DOMAIN
+         DA_ANALYSIS=${MD_DIR}/${PREV_DATE}/wrfvar_input_d$DOMAIN
       else
          echo "   Analysis is first guess"
          echo ""
-         DA_ANALYSIS=$CS_DIR/$DATE/wrfinput_d$DOMAIN #ICs
+         DA_ANALYSIS=$MD_DIR/$DATE/wrfinput_d$DOMAIN #ICs
       fi
    fi
 
    if $RUN_UPDATE_BC; then
-      export RUN_DIR=$EXP_DIR/update_bc
-      export OUT_DIR=$RUN_DIR/$DATE
-      mkdir -p $OUT_DIR
+      export RUN_DIR=$EXP_DIR/$DATE/update_bc
+      mkdir -p $RUN_DIR
 
-      $WRFVAR_DIR/scripts/da_trace.ksh da_update_bc $OUT_DIR
-      $WRFVAR_DIR/scripts/da_update_bc.ksh > $OUT_DIR/index.html 2>&1
+      $WRFVAR_DIR/scripts/da_trace.ksh da_update_bc $RUN_DIR
+      $WRFVAR_DIR/scripts/da_update_bc.ksh > $RUN_DIR/index.html 2>&1
       if test $? != 0; then
          echo `date` "${ERR}Failed with error $?$END"
          exit 1
       fi
-
-      if $CLEAN; then
-         rm -rf ${RUN_DIR}
-      fi
-
 #   else
       # Use wrfbdy file as is
    fi
 
    if $RUN_WRF; then
-      export RUN_DIR=$EXP_DIR/wrf
-      export OUT_DIR=$RUN_DIR/$DATE
-      mkdir -p $OUT_DIR
+      export RUN_DIR=$EXP_DIR/$DATE/wrf
+      mkdir -p $RUN_DIR
 
-      $WRFVAR_DIR/scripts/da_trace.ksh da_run_wrf $OUT_DIR
-      $WRFVAR_DIR/scripts/da_run_wrf.ksh > $OUT_DIR/index.html 2>&1
+      $WRFVAR_DIR/scripts/da_trace.ksh da_run_wrf $RUN_DIR
+      $WRFVAR_DIR/scripts/da_run_wrf.ksh > $RUN_DIR/index.html 2>&1
       if test $? != 0; then
          echo `date` "${ERR}Failed with error $?$END"
          exit 1
-      fi
-
-      # What files do we want?
-
-      if $CLEAN; then
-         rm -rf ${RUN_DIR}
       fi
    fi
 
@@ -401,6 +357,8 @@ while test $DATE != $FINAL_DATE; do
    export DATE=`$WRFVAR_DIR/main/advance_cymdh.exe $DATE $CYCLE_PERIOD 2>/dev/null`
 
 done
+
+echo `date` "Suite finished"
 
 if $NL_USE_HTML; then
    echo "</PRE></BODY></HTML>"

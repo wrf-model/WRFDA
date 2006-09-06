@@ -25,8 +25,8 @@ export RUN_ID=${REGION}_${DATE}
 export EXPT=${EXPT:-test}
 export DAT_DIR=${DAT_DIR:-$HOME/data}
 export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION}
-export EXP_DIR=${EXP_DIR:-REG_DIR/$EXPT}
-export RUN_DIR=${RUN_DIR:-$EXP_DIR/wrfsi}
+export EXP_DIR=${EXP_DIR:-$REG_DIR/$EXPT}
+export RUN_DIR=${RUN_DIR:-$EXP_DIR/$DATE/wrfsi}
 
 # Directories:
 export REL_DIR=${REL_DIR:-$HOME/trunk}
@@ -235,7 +235,7 @@ cat > ${STATIC}/grib_prep.nl << EOF
  SRCVTAB = 'ETA', 'GFS', 'AVN', 'RUCH', 'NNRPSFC', 'NNRPSFC', 'SST'
  SRCPATH = '/public/data/grids/eta/40km_eta212_isobaric/grib',
                 '/public/data/grids/avn/global-65160/grib',
-                '${CS_DIR}/$DATE',
+                '${MD_DIR}/$DATE',
                 '/rt0/rucdev/nrelwind/run/maps_fcst',
                 '/path/to/nnrp/grib',
                 '/path/to/nnrp/sfc/grib',
@@ -254,7 +254,7 @@ while test $LOCAL_DATE != $END_DATE; do
 
    AVN_FILE=fnl_${YY}${MM}${DD}_${HH}_00
 
-#   ln -sf ${CS_DIR}/$LOCAL_DATE/${AVN_FILE} ${CS_DIR}/$LOCAL_DATE/${AVN_FILE}
+#   ln -sf ${MD_DIR}/$LOCAL_DATE/${AVN_FILE} ${MD_DIR}/$LOCAL_DATE/${AVN_FILE}
 #   echo "   File ${CSDIR}/$LOCAL_DATE/$AVN_FILE created as link."
 
    LOCAL_DATE=`${WRFVAR_DIR}/main/advance_cymdh.exe ${LOCAL_DATE} ${LBC_FREQ} 2>/dev/null`

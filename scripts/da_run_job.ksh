@@ -7,9 +7,10 @@ export EXPT=${EXPT:-test}
 export DAT_DIR=${DAT_DIR:-$HOME/data}
 export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION}
 export EXP_DIR=${EXP_DIR:-$REG_DIR/$EXPT}
+export RUN_DIR=${RUN_DIR:-$EXP_DIR/run}
+export WORK_DIR=$RUN_DIR/working
 export SCRIPT=${SCRIPT:-$WRFVAR_DIR/scripts/da_run_wrfvar.ksh}
 export POE=false
-export RESET=${RESET:-false}
 
 export PLATFORM=`uname`
 export HOSTNAME=`hostname`
@@ -17,14 +18,9 @@ export NUM_PROCS=${NUM_PROCS:-1}
 
 export MP_SHARED_MEMORY=${MP_SHARED_MEMORY:-yes}
 export HOSTS=${HOSTS:-$PWD/hosts}
-export RUN_CMD=${RUN_CMD:-mpirun -v -np $NUM_PROCS -all-local -machinefile $HOSTS}
 
-if $RESET; then
-  rm -rf $EXP_DIR
-fi
-
-mkdir -p $EXP_DIR
-cd $EXP_DIR
+mkdir -p $RUN_DIR
+cd $RUN_DIR
 
 if test $HOSTNAME = "bs1101en" -o $HOSTNAME = "bs1201en"; then 
    # bluesky used loadleveller
@@ -89,11 +85,16 @@ export RUN_CMD=${RUN_CMD:-mpirun.lsf -v -np $NUM_PROCS}
 EOF
 elif test $HOSTNAME = ocotillo; then
    cat > job.ksh <<EOF
-export RUN_CMD=${RUN_CMD:-mpirun -v -np $NUM_PROCS -nolocal -machinefile $HOSTS}
+# Cannot put - options inside default substitution
+export RUN_CMD_DEFAULT="mpirun -v -np $NUM_PROCS -all-local -machinefile $HOSTS"
+export RUN_CMD=${RUN_CMD:-$RUN_CMD_DEFAULT}
 $SCRIPT > $EXP_DIR/index.html 2>&1
 EOF
 else
    cat > job.ksh <<EOF
+# Cannot put - options inside default substitution
+export RUN_CMD_DEFAULT="mpirun -v -np $NUM_PROCS -nolocal -machinefile $HOSTS"
+export RUN_CMD=${RUN_CMD:-$RUN_CMD_DEFAULT}
 $SCRIPT > $EXP_DIR/index.html 2>&1
 EOF
 fi
