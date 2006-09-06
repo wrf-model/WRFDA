@@ -86,15 +86,15 @@ EOF
 elif test $HOSTNAME = ocotillo; then
    cat > job.ksh <<EOF
 # Cannot put - options inside default substitution
-export RUN_CMD_DEFAULT="mpirun -v -np $NUM_PROCS -all-local -machinefile $HOSTS"
-export RUN_CMD=${RUN_CMD:-$RUN_CMD_DEFAULT}
+export RUN_CMD_DEFAULT="mpirun -v -np $NUM_PROCS -nolocal -machinefile $HOSTS"
+export RUN_CMD=${RUN_CMD:-\$RUN_CMD_DEFAULT}
 $SCRIPT > $EXP_DIR/index.html 2>&1
 EOF
 else
    cat > job.ksh <<EOF
 # Cannot put - options inside default substitution
-export RUN_CMD_DEFAULT="mpirun -v -np $NUM_PROCS -nolocal -machinefile $HOSTS"
-export RUN_CMD=${RUN_CMD:-$RUN_CMD_DEFAULT}
+export RUN_CMD_DEFAULT="mpirun -v -np $NUM_PROCS -alllocal -machinefile $HOSTS"
+export RUN_CMD=${RUN_CMD:-\$RUN_CMD_DEFAULT}
 $SCRIPT > $EXP_DIR/index.html 2>&1
 EOF
 fi

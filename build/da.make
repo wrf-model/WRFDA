@@ -125,7 +125,10 @@ WRFVAR_OBJS        =	da_par_util.o           \
                         wrf_ext_read_field.o \
                         wrf_ext_write_field.o \
                         collect_on_comm.o \
-                        field_routines.o
+                        field_routines.o \
+                        start_domain.o \
+                        interp_fcn.o \
+                        couple_or_uncouple_em.o
 
 inc/da_generic_boilerplate.inc: da_generic_boilerplate.m4
 	@ $(RM) inc/da_generic_boilerplate.inc
