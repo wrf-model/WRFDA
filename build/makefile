@@ -98,8 +98,8 @@ libwrfplus.a : $(WRFPLUS_OBJS) $(WRFPLUS_MODULES)
 	$(AR) libwrfplus.a $(WRFPLUS_OBJS) $(WRFPLUS_MODULES)
 	$(RANLIB) libwrfplus.a
 
-libwrfvar.a : $(DA_OBJS) $(DA_MODULES)
-	$(AR) libwrfvar.a $(DA_OBJS) $(DA_MODULES)
+libwrfvar.a : $(WRFVAR_OBJS)
+	$(AR) libwrfvar.a $(WRFVAR_OBJS)
 	$(RANLIB) libwrfvar.a
 
 clean : arch_clean

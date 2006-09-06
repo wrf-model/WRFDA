@@ -373,7 +373,7 @@ if [ -n "$WRF_CHEM" ] ; then
     compileflags="${compileflags}!-DWRF_CHEM"
   fi
 fi
-set -x
+
 # Found perl, so proceed with configuration
 if test -n "$PERL" ; then
   echo option = $option
@@ -383,7 +383,6 @@ if test -n "$PERL" ; then
      -em_core=$EM_CORE -nmm_core=$NMM_CORE \
      -coamps_core=$COAMPS_CORE -exp_core=$EXP_CORE
 fi
-set +x
 
 export CONFIG=configure.wrf
 

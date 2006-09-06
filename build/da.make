@@ -1,4 +1,4 @@
-DA_MODULES        =	da_par_util.o           \
+WRFVAR_OBJS        =	da_par_util.o           \
 			da_par_util1.o          \
 			da_setup_structures.o	\
 			da_minimisation.o	\
@@ -45,10 +45,87 @@ DA_MODULES        =	da_par_util.o           \
                         da_wrfvar_io.o      \
                         da_airsr.o          \
 	   		da_wrfvar_top.o     \
-                        da_reporting.o
-
-DA_OBJS        =	da_memory.o \
-                        da_solve.o
+                        da_reporting.o \
+                        module_wrf_error.o \
+                        module_configure.o \
+                        module_state_description.o \
+                        module_timing.o \
+                        module_driver_constants.o \
+                        module_domain.o \
+                        module_machine.o \
+                        module_utility.o \
+                        module_symbols_util.o \
+                        module_date_time.o \
+                        module_io_wrf.o \
+                        module_io.o \
+                        module_io_domain.o \
+                        module_io_quilt.o \
+                        module_dm.o \
+                        module_bc.o \
+                        module_model_constants.o \
+                        module_internal_header_util.o \
+                        module_integrate.o \
+                        module_nesting.o \
+                        module_tiles.o \
+                        module_quilt_outbuf_ops.o \
+                        ESMF_Stubs.o \
+                        ESMF_TimeInterval.o \
+                        ESMF_Mod.o \
+                        ESMF_Fraction.o \
+                        ESMF_Time.o \
+                        ESMF_Clock.o \
+                        ESMF_Alarm.o \
+                        ESMF_AlarmClock.o \
+                        ESMF_BaseTime.o \
+                        ESMF_Base.o \
+                        ESMF_Calendar.o \
+                        wrf_io.o \
+                        io_int.o \
+                        da_memory.o \
+                        da_solve.o \
+                        wrf_debug.o \
+                        set_timekeeping.o \
+                        wrf_shutdown.o \
+                        init_modules.o \
+                        mediation_wrfmain.o \
+                        pack_utils.o \
+                        Meat.o \
+                        wrf_num_bytes_between.o \
+                        input_wrf.o \
+                        wrf_auxhist1in.o \
+                        wrf_auxhist2out.o \
+                        wrf_auxhist4in.o \
+                        wrf_auxhist5out.o \
+                        wrf_auxinput2in.o \
+                        wrf_auxinput3out.o \
+                        wrf_auxinput5in.o \
+                        wrf_auxhist1out.o \
+                        wrf_auxhist3in.o \
+                        wrf_auxhist4out.o \
+                        wrf_auxinput1in.o \
+                        wrf_auxinput2out.o \
+                        wrf_auxinput4in.o \
+                        wrf_auxinput5out.o \
+                        wrf_auxhist2in.o \
+                        wrf_auxhist3out.o \
+                        wrf_auxhist5in.o \
+                        wrf_auxinput1out.o \
+                        wrf_auxinput3in.o \
+                        wrf_auxinput4out.o \
+                        wrf_bdyin.o \
+                        wrf_bdyout.o \
+                        wrf_restartin.o \
+                        wrf_restartout.o \
+                        output_wrf.o \
+                        wrf_restartin.o \
+                        wrf_histin.o \
+                        wrf_histout.o \
+                        wrf_inputout.o \
+                        wrf_inputin.o \
+                        wrf_ext_read_field.o \
+                        wrf_ext_write_field.o \
+                        collect_on_comm.o \
+                        field_routines.o
 
 inc/da_generic_boilerplate.inc: da_generic_boilerplate.m4
 	@ $(RM) inc/da_generic_boilerplate.inc
@@ -100,8 +177,9 @@ da_to_be_file: da_to_be_file.o
 da_tune: da_tune.o
 	$(LD) -o $@.exe $@.o
 
-da_update_bc: da_update_bc.o
-	$(LD) -L${NETCDF_PATH}/lib -o $@.exe $@.o da_netcdf_interface.o \
+da_update_bc.exe : da_update_bc.o
+	$(LD) -L${NETCDF_PATH}/lib -o da_update_bc.exe da_update_bc.o \
+           da_netcdf_interface.o \
            da_module_couple_uv.o ${NETCDF_LIB} $(EXTRA_LIBS)
 
 da_write_sl_2_be: da_write_sl_2_be.o
