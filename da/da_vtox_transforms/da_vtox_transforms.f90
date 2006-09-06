@@ -34,6 +34,10 @@ MODULE da_vtox_transforms
 
    CONTAINS
 
+#include "da_add_flow_dependence_vp.inc"
+#include "da_add_flow_dependence_vp_adj.inc"
+#include "da_add_flow_dependence_xa.inc"
+#include "da_add_flow_dependence_xa_adj.inc"
 #include "da_check_eof_decomposition.inc"
 #include "da_transform_vtovv.inc"
 #include "da_transform_vtovv_adj.inc"

@@ -27,7 +27,20 @@ subroutine da_transform_vptox_adj( xb, xbx, xa, vp, be, ep, xp, &
    END IF
 
    IF (trace_use) call da_trace_entry("da_transform_vptox_adj")
-   
+
+   !---------------------------------------------------------------------------
+   !  [4] Add flow-dependent increments in model space (xa):
+   !---------------------------------------------------------------------------
+      
+   if ( be % ne > 0 .and. alphacv_method == 2 ) then
+      call da_add_flow_dependence_xa_adj( be % ne, ep, xa, vp, &
+                                          its,ite, jts,jte, kts,kte )
+   end if
+
+   !--------------------------------------------------------------------------
+   ! [3] Transform to model variable space:
+   !--------------------------------------------------------------------------
+ 
    ! Pseudo RH --> Specific humidity:
    vp%v4(its:ite,jts:jte,kts:kte)  = vp%v4(its:ite,jts:jte,kts:kte) + &
                                      xa%q (its:ite,jts:jte,kts:kte) * &
@@ -42,6 +55,9 @@ subroutine da_transform_vptox_adj( xb, xbx, xa, vp, be, ep, xp, &
                              ims,ime, jms,jme, kms,kme,    &
                              its,ite, jts,jte, kts,kte )
 
+   !--------------------------------------------------------------------------
+   ! [2] Impose statistical balance constraints:
+   !--------------------------------------------------------------------------
 
    ! Surface Pressure
    do k=kts,kte
@@ -72,41 +88,14 @@ subroutine da_transform_vptox_adj( xb, xbx, xa, vp, be, ep, xp, &
       end do
    end do
 
-   !--------------------------------------------------------------------------
-   ! [1] Include alpha control variable:
-   !--------------------------------------------------------------------------
-
-   vp % alpha(:,:,:) = 0.0
-
-   do n = be % ne, 1, -1
-      do k = kte, kts, -1
-         ! ps_u:
-
-         vp % alpha(its:ite,jts:jte,n) = vp % alpha(its:ite,jts:jte,n) + &
-                                        ep % v5(its:ite,jts:jte,k,n) * &
-                                        vp % v5(its:ite,jts:jte,k)
-
-         ! rh:
-         vp % alpha(its:ite,jts:jte,n) = vp % alpha(its:ite,jts:jte,n) + &
-                                         ep % v4(its:ite,jts:jte,k,n) * &
-                                         vp % v4(its:ite,jts:jte,k)
-
-         ! t_u:
-         vp % alpha(its:ite,jts:jte,n) = vp % alpha(its:ite,jts:jte,n) + &
-                                         ep % v3(its:ite,jts:jte,k,n) * &
-                                         vp % v3(its:ite,jts:jte,k)
-
-         ! chi_u:
-         vp % alpha(its:ite,jts:jte,n) = vp % alpha(its:ite,jts:jte,n) + &
-                                         ep % v2(its:ite,jts:jte,k,n) * &
-                                         vp % v2(its:ite,jts:jte,k)
-
-         ! psi:
-         vp % alpha(its:ite,jts:jte,n) = vp % alpha(its:ite,jts:jte,n) + &
-                                         ep % v1(its:ite,jts:jte,k,n) * &
-                                         vp % v1(its:ite,jts:jte,k)
-      end do
-   end do
+   !---------------------------------------------------------------------------
+   !  [1] Add flow-dependent increments in control variable space (vp):
+   !---------------------------------------------------------------------------
+   
+   if ( be % ne > 0 .and. alphacv_method == 1 ) then
+      call da_add_flow_dependence_vp_adj( be % ne, ep, vp, &
+                                          its,ite, jts,jte, kts,kte )
+   end if
 
    IF (trace_use) call da_trace_exit("da_transform_vptox_adj")
 

@@ -22,21 +22,22 @@
  if ( ! $?END_DATE )      setenv END_DATE      2003012812 # Time of last perturbation.
  if ( ! $?FCST_RANGE )    setenv FCST_RANGE    24         # Forecast range of forecast (hours).
  if ( ! $?INTERVAL )      setenv INTERVAL      12         # Period between files (hours).
- if ( ! $?BE_METHOD )     setenv BE_METHOD     NMC        # NMC-method or Ensemble-Method
+ if ( ! $?BE_METHOD )     setenv BE_METHOD     NMC        # NMC-method or ENS-Method.
  if ( ! $?NE )            setenv NE 1                     # Number of ensemble members (for ENS).
 
- if ( ! $?EXPT )          setenv EXPT         noobs
- if ( ! $?ID )            setenv ID           gen_be
- if ( ! $?SRC_DIR )       setenv SRC_DIR      ${HOME}/code_development/WRF_V2.1.2
- if ( ! $?WRFVAR_DIR )    setenv WRFVAR_DIR   ${SRC_DIR}/wrfvar
- if ( ! $?BUILD_DIR )     setenv BUILD_DIR    ${WRFVAR_DIR}/build
- if ( ! $?DATA_DISK )     setenv DATA_DISK    /ocotillo1
- if ( ! $?DOMAIN )        setenv DOMAIN       con200      # Application name.
- if ( ! $?DAT_DIR )       setenv DAT_DIR      ${DATA_DISK}/${USER}/data/${DOMAIN}/${EXPT}
- if ( ! $?RUN_DIR )       setenv RUN_DIR      ${DAT_DIR}/$ID
- if ( ! $?STAGE0_DIR )    setenv STAGE0_DIR   ${DAT_DIR}/stage0
- if ( ! $?LOCAL )         setenv LOCAL false            # True if local machine.
- if ( ! $?NUM_JOBS )      setenv NUM_JOBS    1            # Number of jobs to run.
+ if ( ! $?RELEASE )       setenv RELEASE       WRF_V2.1.2
+ if ( ! $?REL_DIR )       setenv REL_DIR       ${HOME}/code/${RELEASE}
+ if ( ! $?WRFVAR_DIR )    setenv WRFVAR_DIR    ${REL_DIR}/wrfvar
+ if ( ! $?BUILD_DIR )     setenv BUILD_DIR     ${WRFVAR_DIR}/build
+ if ( ! $?DATA_DISK )     setenv DATA_DISK     /smoke
+ if ( ! $?REGION )        setenv REGION        con200
+ if ( ! $?EXPT )          setenv EXPT          noobs
+ if ( ! $?DAT_DIR )       setenv DAT_DIR       ${DATA_DISK}/${USER}/data/${DOMAIN}/${EXPT}
+ if ( ! $?ID )            setenv ID            gen_be
+ if ( ! $?RUN_DIR )       setenv RUN_DIR       ${DAT_DIR}/$ID
+ if ( ! $?STAGE0_DIR )    setenv STAGE0_DIR    ${DAT_DIR}/stage0
+ if ( ! $?LOCAL )         setenv LOCAL         false      # True if local machine.
+ if ( ! $?NUM_JOBS )      setenv NUM_JOBS      1          # Number of jobs to run.
  if ( ! $?MACHINES )      set MACHINES = ( node1 node1 node2 node2 node3 node3 node4 node4 \
                                            node5 node5 node6 node6 node7 node7 node8 node8 )  # For parallel runs.
 

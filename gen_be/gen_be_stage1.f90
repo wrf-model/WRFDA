@@ -22,7 +22,6 @@ program gen_be_stage1
    character*3         :: be_method                  ! Be method (NMC, or ENS)
    character*3         :: ce                         ! Ensemble member index.
    character*80        :: dat_dir                    ! Input data directory.
-   character*80        :: expt                       ! Experiment ID.
    character*80        :: filename                   ! Input filename.
    integer             :: ni, nj, nk                 ! Dimensions read in.
    integer             :: member, b, i, j, k         ! Loop counters.
@@ -62,7 +61,7 @@ program gen_be_stage1
                                  be_method, ne, bin_type, &
                                  lat_min, lat_max, binwidth_lat, &
                                  hgt_min, hgt_max, binwidth_hgt, &
-                                 remove_mean, gaussian_lats, expt, dat_dir
+                                 remove_mean, gaussian_lats, dat_dir
 
 !---------------------------------------------------------------------------------------------
    write(6,'(a)')' [1] Initialize namelist variables and other scalars.'
@@ -85,7 +84,6 @@ program gen_be_stage1
    binwidth_hgt = 1000.0
    remove_mean = .true.
    gaussian_lats = .false.
-   expt = 'gen_be_stage1'
    dat_dir = '/data2/hcshin/youn/DIFF63'
 
    open(unit=namelist_unit, file='gen_be_stage1_nl.nl', &

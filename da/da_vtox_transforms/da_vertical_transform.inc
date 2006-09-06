@@ -15,7 +15,8 @@ subroutine da_vertical_transform( string, be, vertical_wgt, vv, vp, &
    type (vp_type), intent(inout) :: vv          ! CV in gridpt/EOF space.
    type (vp_type), intent(inout) :: vp          ! CV in gridpt/level space.
 
-   integer :: k_end
+   integer                       :: j, m        ! Loop counters.
+   real                          :: alpha_stddev_inv ! 1/ sigma_alpha
 
    IF (trace_use) CALL da_trace_entry("da_vertical_transform")
 
@@ -137,8 +138,11 @@ subroutine da_vertical_transform( string, be, vertical_wgt, vv, vp, &
       END IF
 
       if (be % ne > 0) then
-         ! Uv transform is null:
-         vp % alpha(its:ite,jts:jte,1:be%ne) = vv % alpha(its:ite,jts:jte,1:be%ne)
+         do m = 1, be % ne
+            do j = jts, jte
+               vp % alpha(its:ite,j,m) = vv % alpha(its:ite,j,m) * be % alpha % val(j,m)
+            end do
+         end do
       end if
 
    case ( 'u_inv');
@@ -247,8 +251,12 @@ subroutine da_vertical_transform( string, be, vertical_wgt, vv, vp, &
       END IF
 
       if ( be % ne > 0 ) then
-         ! Uv transform is null:
-         vv % alpha(its:ite,jts:jte,1:be%ne) = vp % alpha(its:ite,jts:jte,1:be%ne)
+         do m = 1, be % ne
+            do j = jts, jte
+               alpha_stddev_inv = 1.0 / be % alpha % val(j,m)
+               vv % alpha(its:ite,j,m) = vp % alpha(its:ite,j,m) * alpha_stddev_inv
+            end do
+         end do
       end if
 
    case ('u_adj');
@@ -362,8 +370,11 @@ subroutine da_vertical_transform( string, be, vertical_wgt, vv, vp, &
       END IF
 
       if ( be % ne > 0 ) then
-         ! Uv transform is null:
-         vv % alpha(its:ite,jts:jte,1:be%ne) = vp % alpha(its:ite,jts:jte,1:be%ne)
+         do m = 1, be % ne
+            do j = jts, jte
+               vv % alpha(its:ite,j,m) = vp % alpha(its:ite,j,m) * be % alpha % val(j,m)
+            end do
+         end do
       end if
 
    case default;

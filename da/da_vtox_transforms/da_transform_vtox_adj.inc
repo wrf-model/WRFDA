@@ -204,9 +204,9 @@ subroutine da_transform_vtox_adj( cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv, 
    call da_zero_vp_type ( vv )
 
    ! Uv for alpha is a null transform:
-   if ( be % ne > 0 ) then
-      vv % alpha(its:ite,jts:jte,1:be%ne) = vp % alpha(its:ite,jts:jte,1:be%ne) 
-   end if
+!   if ( be % ne > 0 ) then
+!      vv % alpha(its:ite,jts:jte,1:be%ne) = vp % alpha(its:ite,jts:jte,1:be%ne) 
+!   end if
 
    if ( vert_corr == 2 ) then      
       call da_vertical_transform( 'u_adj', be, &

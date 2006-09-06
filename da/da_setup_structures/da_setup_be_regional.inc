@@ -512,7 +512,7 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
       ALLOCATE ( be5_evec_loc(1:1,1:1,1:num_bins2d) )
       ALLOCATE ( be5_evec_glo(1:1,1:1) )
 
-!     Transfer the alpha variance to be % alpha:
+!     Transfer the alpha standard deviation to be % alpha:
       allocate( be % alpha % val(1:jy,1:be % ne) )
       allocate( be % alpha % evec(1:jy,1:kz,1:be % ne) )
       allocate( be % alpha % rf_alpha(1:be % ne) )

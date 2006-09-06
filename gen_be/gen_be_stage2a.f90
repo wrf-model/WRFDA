@@ -79,7 +79,7 @@ program gen_be_stage2a
    interval = 24
    be_method = 'NMC'
    ne = 1
-   num_passes = 2
+   num_passes = 0
    rf_scale = 1.0
    testing_eofs = .true.
    expt = 'gen_be_stage2a'

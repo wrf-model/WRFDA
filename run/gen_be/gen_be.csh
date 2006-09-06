@@ -152,7 +152,6 @@ cat >! gen_be_stage1_nl.nl << EOF
     binwidth_hgt = ${BINWIDTH_HGT},
     remove_mean = ${REMOVE_MEAN},
     gaussian_lats = ${GAUSSIAN_LATS},
-    expt = '${EXPT}',
     dat_dir = '${STAGE0_DIR}' /
 EOF
 
@@ -232,7 +231,6 @@ cat >! gen_be_stage2a_nl.nl << EOF
     num_passes = ${NUM_PASSES},
     rf_scale = ${RF_SCALE},
     testing_eofs = ${TESTING_EOFS},
-    expt = '${EXPT}',
     dat_dir = '${RUN_DIR}' /
 EOF
 

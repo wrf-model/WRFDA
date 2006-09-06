@@ -56,9 +56,8 @@ subroutine da_setup_cv( its, ite, jts, jte, &
                                  ( be % alpha % max_wave + 2 )  / 2
          be % cv % size_je  = 2 * be % cv % size_alphac * be % alpha % mz
       else
-         be % cv % size_je = ij * be % alpha % mz
-         call da_error(__FILE__,__LINE__, &
-            (/"flow-dependence not yet coded for regional!"/))
+         be % cv % size_alphac = ij * be % alpha % mz
+         be % cv % size_je = be % cv % size_alphac
       end if
    END IF
 

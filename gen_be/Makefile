@@ -5,6 +5,7 @@ MAKE    =       make -i -r
 RM      =       rm -f
 
 gen_be : 	gen_be_stage0_wrf	\
+		gen_be_ep2	\
 		gen_be_stage1	\
 		gen_be_stage1_1dvar	\
 		gen_be_stage2	\
@@ -16,7 +17,8 @@ gen_be : 	gen_be_stage0_wrf	\
 		gen_be_cov2d		\
 		gen_be_cov3d		\
 		gen_be_diags		\
-		gen_be_diags_read
+		gen_be_diags_read	\
+		gen_be_read_regcoeffs
 
 GEN_BE_OBJS = $(DA)/da_gen_be.o $(DA)/da_constants.o $(DA)/da_be_spectral.o \
   ../frame/module_wrf_error.o \
@@ -26,6 +28,9 @@ include ../configure.wrf
 
 gen_be_stage0_wrf : gen_be_stage0_wrf.o
 	$(LD) -o gen_be_stage0_wrf.exe $(LDFLAGS) $(GEN_BE_OBJS) gen_be_stage0_wrf.o ${GEN_BE_LIB}
+
+gen_be_ep2 : gen_be_ep2.o
+	$(LD) -o gen_be_ep2.exe $(LDFLAGS) $(GEN_BE_OBJS) gen_be_ep2.o ${GEN_BE_LIB}
 
 gen_be_stage1 : gen_be_stage1.o
 	$(LD) -o gen_be_stage1.exe $(LDFLAGS) $(GEN_BE_OBJS) gen_be_stage1.o ${GEN_BE_LIB}
@@ -63,11 +68,18 @@ gen_be_diags : gen_be_diags.o
 gen_be_diags_read : gen_be_diags_read.o
 	$(LD) -o gen_be_diags_read.exe $(LDFLAGS) $(GEN_BE_OBJS) gen_be_diags_read.o ${GEN_BE_LIB}
 
+gen_be_read_regcoeffs : gen_be_read_regcoeffs.o
+	$(LD) -o gen_be_read_regcoeffs.exe $(LDFLAGS) $(GEN_BE_OBJS) gen_be_read_regcoeffs.o ${GEN_BE_LIB}
+
 #
 
 gen_be_stage0_wrf.o: 
 	$(RM) $@
 	$(FC) -c ${FCFREE} $(FCBASE) ${FCTYPE} ${MODULE_DIRS} -I${NETCDF}/include gen_be_stage0_wrf.f90
+
+gen_be_ep2.o: 
+	$(RM) $@
+	$(FC) -c ${FCFREE} $(FCBASE) ${FCTYPE} ${MODULE_DIRS} -I${NETCDF}/include gen_be_ep2.f90
 
 clean: 
 	@ echo 'use the clean script'

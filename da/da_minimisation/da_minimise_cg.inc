@@ -42,6 +42,8 @@ subroutine da_minimise_cg( grid, config_flags,            &
    type(grid_config_rec_type), intent(inout) :: config_flags
 
    integer                           :: iter            
+   integer                           :: je_start, je_end       ! Start/end indices of Je.
+   integer                           :: cv_size_jb             ! end indices of Jb.
    real                              :: j_grad(1:cv_size)      ! grad_v j (local-grid)
    real                              :: fhat(1:cv_size)        ! cv copy.
    real                              :: ghat(1:cv_size)        ! cv copy.
@@ -132,7 +134,12 @@ subroutine da_minimise_cg( grid, config_flags,            &
                                   its, ite, jts, jte, kts, kte,                     &
                                   grid, config_flags                                )
 
-      fhat = - fhat + phat
+      je_start = be % cv % size_jb + 1
+      je_end = be % cv % size_jb + be % cv % size_je
+      cv_size_jb = be % cv % size_jb
+
+      fhat(1:cv_size_jb) = - fhat(1:cv_size_jb) + jb_factor*phat(1:cv_size_jb)
+      fhat(je_start:je_end) = - fhat(je_start:je_end) + je_factor*phat(je_start:je_end)
       apdotp = da_dot_cv( cv_size, cv_size_domain, fhat, phat, xp, & 
                        (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /) )
 

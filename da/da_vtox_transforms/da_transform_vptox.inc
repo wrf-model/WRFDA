@@ -20,42 +20,18 @@ subroutine da_transform_vptox( xb, vp, xp, xa, be, ep, &
    integer, intent(in)  :: ims,ime, jms,jme, kms,kme ! memory dims.
    integer, intent(in)  :: its,ite, jts,jte, kts,kte ! tile   dims.
 
-   integer              :: n, k, j, k1               ! Loop counters.
+   integer              :: k, j, k1            ! Loop counters.
 
    IF (trace_use) call da_trace_entry("da_transform_vptox") 
 
-   !--------------------------------------------------------------------------
-   ! [1] Include alpha control variable:
-   !--------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   !  [1] Add flow-dependent increments in control variable space (vp):
+   !---------------------------------------------------------------------------
 
-   do n = 1, be % ne
-
-      write(6,'(i4,a,f15.5)')n, ' Alpha rms = ', &
-                             sqrt(sum(vp%alpha(:,:,n)**2)/real(ite*jte))
-      do k = kts, kte
-
-         ! psi:
-         vp % v1(its:ite,jts:jte,k) = vp % v1(its:ite,jts:jte,k) + &
-                                      vp % alpha(its:ite,jts:jte,n) * &
-                                      ep % v1(its:ite,jts:jte,k,n)
-         ! chi_u:
-         vp % v2(its:ite,jts:jte,k) = vp % v2(its:ite,jts:jte,k) + &
-                                      vp % alpha(its:ite,jts:jte,n) * &
-                                      ep % v2(its:ite,jts:jte,k,n)
-         ! t_u:
-         vp % v3(its:ite,jts:jte,k) = vp % v3(its:ite,jts:jte,k) + &
-                                      vp % alpha(its:ite,jts:jte,n) * &
-                                      ep % v3(its:ite,jts:jte,k,n)
-         ! rh:
-         vp % v4(its:ite,jts:jte,k) = vp % v4(its:ite,jts:jte,k) + &
-                                      vp % alpha(its:ite,jts:jte,n) * &
-                                      ep % v4(its:ite,jts:jte,k,n)
-        ! ps_u
-        vp % v5(its:ite,jts:jte,k) = vp % v5(its:ite,jts:jte,k) + &
-                                     vp % alpha(its:ite,jts:jte,n) * &
-                                     ep % v5(its:ite,jts:jte,k,n)
-      end do
-   end do
+   if ( be % ne > 0 .and. alphacv_method == 1 ) then
+      call da_add_flow_dependence_vp( be % ne, ep, vp, &
+                                      its,ite, jts,jte, kts,kte )
+   end if
 
    !--------------------------------------------------------------------------
    ! [2] Impose statistical balance constraints:
@@ -107,8 +83,16 @@ subroutine da_transform_vptox( xb, vp, xp, xa, be, ep, &
    xa % q(its:ite,jts:jte,kts:kte) = vp%v4(its:ite,jts:jte,kts:kte) * &
                                      xb%qs(its:ite,jts:jte,kts:kte)
 
-   IF (trace_use) call da_trace_exit("da_transform_vptox") 
+   !---------------------------------------------------------------------------
+   !  [4] Add flow-dependent increments in model space (xa):
+   !---------------------------------------------------------------------------
 
+   if ( be % ne > 0 .and. alphacv_method == 2 ) then
+      call da_add_flow_dependence_xa( be % ne, ep, vp, xa, &
+                                      its,ite, jts,jte, kts,kte )
+   end if
+
+   IF (trace_use) call da_trace_exit("da_transform_vptox") 
  
 end subroutine da_transform_vptox
 

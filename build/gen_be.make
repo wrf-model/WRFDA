@@ -7,6 +7,7 @@ be :		setup                   \
                 $(GEN_BE_LIBS)          \
                 $(GEN_BE_OBJS)          \
                 gen_be_stage0_wrf	\
+                gen_be_ep2	\
 		gen_be_stage1	        \
 		gen_be_stage1_1dvar	\
 		gen_be_stage2	        \
@@ -19,9 +20,12 @@ be :		setup                   \
 		gen_be_cov3d		\
 		gen_be_diags		\
 		gen_be_diags_read       \
+		gen_be_read_regcoeffs    \
                 advance_cymdh
 
 gen_be_stage0_wrf.o      : gen_be_stage0_wrf.f90
+
+gen_be_ep2.o   : gen_be_ep2.f90
 
 gen_be_stage1_wrf.o      : gen_be_stage1_wrf.f90
 
@@ -47,8 +51,13 @@ gen_be_diags.o           : gen_be_diags.f90
 
 gen_be_diags_read.o      : gen_be_diags_read.f90
 
+gen_be_read_regcoeffs.o  : gen_be_read_regcoeffs.f90
+
 gen_be_stage0_wrf : gen_be_stage0_wrf.o
 	$(LD) -o gen_be_stage0_wrf.exe $(LDFLAGS) $(GEN_BE_OBJS)  gen_be_stage0_wrf.o -L$(NETCDF)/lib -lnetcdf $(GEN_BE_LIB)
+
+gen_be_ep2     : gen_be_ep2.o
+	$(LD) -o gen_be_ep2.exe $(LDFLAGS) $(GEN_BE_OBJS)  gen_be_ep2.o -L$(NETCDF)/lib -lnetcdf $(GEN_BE_LIB)
 
 gen_be_stage1 : gen_be_stage1.o
 	$(LD) -o gen_be_stage1.exe $(LDFLAGS) $(GEN_BE_OBJS) gen_be_stage1.o -L$(NETCDF)/lib -lnetcdf $(GEN_BE_LIB)
@@ -85,6 +94,9 @@ gen_be_diags : gen_be_diags.o
 
 gen_be_diags_read : gen_be_diags_read.o
 	$(LD) -o gen_be_diags_read.exe $(LDFLAGS) $(GEN_BE_OBJS) gen_be_diags_read.o -L$(NETCDF)/lib -lnetcdf $(GEN_BE_LIB)
+
+gen_be_read_regcoeffs : gen_be_read_regcoeffs.o
+	$(LD) -o gen_be_read_regcoeffs.exe $(LDFLAGS) $(GEN_BE_OBJS) gen_be_read_regcoeffs.o -L$(NETCDF)/lib -lnetcdf $(GEN_BE_LIB)
 
 # DEPENDENCIES : only dependencies after this line (don't remove the word DEPENDENCIES)
 

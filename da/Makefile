@@ -237,6 +237,10 @@ da_vtox_transforms.o:	da_vtox_transforms.f90 \
 			da_physics.o \
 			da_spectral.o \
 			da_ssmi.o \
+			da_add_flow_dependence_vp.inc \
+			da_add_flow_dependence_vp_adj.inc \
+			da_add_flow_dependence_xa.inc \
+			da_add_flow_dependence_xa_adj.inc \
 			da_transform_vtovv.inc \
 			da_transform_vtovv_adj.inc \
 			da_transform_vtovv_global.inc \

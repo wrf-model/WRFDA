@@ -18,33 +18,49 @@ subroutine da_setup_flow_predictors( ix, jy, kz, ne, ep )
 
    character*10                :: ce                    ! Member index -> character.
    character*200               :: filename              ! Input filename.
-   character*10                :: var                   ! Variable name.
+   character*10                :: var(1:5)              ! Variable name.
    integer                     :: ni, nj, nk            ! Grid dimensions.
    integer                     :: e, i, j               ! Loop counters.
    logical                     :: ldum1, ldum2,nkdum    ! Dummy.
    real                        :: temp3d(1:ix,1:jy,1:kz)! Temporary, real*4 array.
    real                        :: temp2d(1:ix,1:jy)     ! Temporary, real*4 array.
 
+   real                        :: ens_scaling_inv       ! Ensemble scaling of perturbations.
+
    IF (trace_use) call da_trace_entry("da_setup_flow_predictors")
 
-
    call wrf_message("Setup structures for flow-dependent information and read in")
+
+   ep % ne = ne
+
+   ens_scaling_inv = 1.0
+   if (ne > 1) ens_scaling_inv = 1.0 / sqrt(real(ne-1))
+
+!  Decide which space we are introducing flow-dependence:
+   if ( alphacv_method == 2 ) then    ! xa space
+      var(1) = 'u'
+      var(2) = 'v'
+      var(3) = 't'
+      var(4) = 'q'
+      var(5) = 'ps'
+   else                               ! vp space (default)
+      var(1) = 'psi'
+      var(2) = 'chi_u'
+      var(3) = 't_u'
+      var(4) = 'rh'
+      var(5) = 'ps_u'
+   end if
 
 !------------------------------------------------------------------------------
 !  Input ensemble perturbations
 !------------------------------------------------------------------------------
 
-   ep % ne = ne
-
    do e = 1, ne
 
-      write(UNIT=ce,FMT='(i3)')e
-      if ( e < 10 ) ce = '00'//ce(3:3)
-      if ( e >= 10 .and. e  < 100 ) ce = '0'//ce(2:3)
+      write(UNIT=ce,FMT='(i3.3)')e
 
-!     v1 = psi:
-      var = 'psi'
-      filename = 'ep/'//trim(var)//'.e'//trim(ce)
+!     v1:
+      filename = 'ep/'//trim(var(1))//'/'//trim(var(1))//'.e'//trim(ce)
       open(UNIT=ep_unit, file = filename, form = 'unformatted', status = 'old' )
       read(UNIT=ep_unit) ni, nj, nk
 
@@ -56,49 +72,44 @@ subroutine da_setup_flow_predictors( ix, jy, kz, ne, ep )
 
       read(UNIT=ep_unit) temp3d(1:ix,1:jy,1:kz)
       close(UNIT=ep_unit)
-      ep % v1(1:ix,1:jy,1:kz,e) = temp3d(1:ix,1:jy,1:kz)
+      ep % v1(1:ix,1:jy,1:kz,e) = ens_scaling_inv * temp3d(1:ix,1:jy,1:kz)
 
-!     v2 = chi_u:
-      var = 'chi_u'
-      filename = 'ep/'//trim(var)//'.e'//trim(ce)
+!     v2:
+      filename = 'ep/'//trim(var(2))//'/'//trim(var(2))//'.e'//trim(ce)
       open(UNIT=ep_unit, file = filename, form = 'unformatted', status = 'old' )
       read(UNIT=ep_unit) ni, nj, nk
       read(UNIT=ep_unit) temp3d(1:ix,1:jy,1:kz)
-      ep % v2(1:ix,1:jy,1:kz,e) = temp3d(1:ix,1:jy,1:kz)
+      ep % v2(1:ix,1:jy,1:kz,e) = ens_scaling_inv * temp3d(1:ix,1:jy,1:kz)
       close(UNIT=ep_unit)
 
-!     v3 = t_u:
-      var = 't_u'
-      filename = 'ep/'//trim(var)//'.e'//trim(ce)
+!     v3:
+      filename = 'ep/'//trim(var(3))//'/'//trim(var(3))//'.e'//trim(ce)
       open(UNIT=ep_unit, file = filename, form = 'unformatted', status = 'old' )
       read(UNIT=ep_unit) ni, nj, nk
       read(UNIT=ep_unit) temp3d(1:ix,1:jy,1:kz)
-      ep % v3(1:ix,1:jy,1:kz,e) = temp3d(1:ix,1:jy,1:kz)
+      ep % v3(1:ix,1:jy,1:kz,e) = ens_scaling_inv * temp3d(1:ix,1:jy,1:kz)
       close(UNIT=ep_unit)
 
-!     v4 = pseudo rh:
-      var = 'rh'
-      filename = 'ep/'//trim(var)//'.e'//trim(ce)
+!     v4:
+      filename = 'ep/'//trim(var(4))//'/'//trim(var(4))//'.e'//trim(ce)
       open(UNIT=ep_unit, file = filename, form = 'unformatted', status = 'old' )
       read(UNIT=ep_unit) ni, nj, nk
       read(UNIT=ep_unit) temp3d(1:ix,1:jy,1:kz)
-      ep % v4(1:ix,1:jy,1:kz,e) = temp3d(1:ix,1:jy,1:kz)
+      ep % v4(1:ix,1:jy,1:kz,e) = ens_scaling_inv * temp3d(1:ix,1:jy,1:kz)
       close(UNIT=ep_unit)
 
-!     v5 = ps_u:
-      var = 'ps_u'
-      filename = 'ep/'//trim(var)//'.e'//trim(ce)
+!     v5:
+      filename = 'ep/'//trim(var(5))//'/'//trim(var(5))//'.e'//trim(ce)
       open(UNIT=ep_unit, file = filename, form = 'unformatted', status = 'old' )
       read(UNIT=ep_unit) ni, nj, nkdum
       read(UNIT=ep_unit) ldum1, ldum2
       read(UNIT=ep_unit) temp2d(1:ix,1:jy)
-      ep % v5(1:ix,1:jy,1,e) = temp2d(1:ix,1:jy)
+      ep % v5(1:ix,1:jy,1,e) = ens_scaling_inv * temp2d(1:ix,1:jy)
       close(UNIT=ep_unit)
 
    end do 
 
    IF (trace_use) call da_trace_exit("da_setup_flow_predictors")
-
 
 end subroutine da_setup_flow_predictors
 
