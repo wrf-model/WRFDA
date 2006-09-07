@@ -19,7 +19,7 @@ export WRF_DIR=${WRF_DIR:-$REL_DIR/wrf}
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
 export WRFPLUS_DIR=${WRFPLUS_DIR:-$REL_DIR/wrfplus}
 
-export CHECK_SVNVERSION=${CHECK_SVNVERSION:-false}
+export CHECK_SVNVERSION=${CHECK_SVNVERSION:-true}
 
 if $CHECK_SVNVERSION; then
    WRFVAR_REV=`svnversion -n $WRFVAR_DIR`
