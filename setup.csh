@@ -96,6 +96,21 @@ if ( $MACHINE == "ln0126en" || $MACHINE == "ln0127en" ) then
    endif
 endif
 
+# Crayx1
+
+if ( $MACHINE == "gold.us.cray.com" ) then
+   if ( $COMPILER == crayx1 ) then
+      module use /opt/ctl/modulefiles /opt/PE/modulefiles
+      module load PrgEnv.56.newest
+      module list
+      setenv NETCDF /ptmp/pjj/netcdf-3.5.1-x1
+      setenv RTTOV ~n12138/rttov/rttov85_crayx1
+      setenv CRTM ~n12138/crtm/crtm_crayx1
+      setenv MPICH /opt/cpkg/v4/mpich2/1.0
+      setenv WRF_OS crayx1
+   fi
+fi
+
 setenv MPIHOME $MPICH
 setenv PATH    $MPICH/bin:$PATH
 

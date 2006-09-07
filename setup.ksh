@@ -91,6 +91,21 @@ if test $MACHINE == "ln0126en" -o $MACHINE == "ln0127en"; then
    fi
 fi
 
+# Crayx1
+
+if test $MACHINE == "gold.us.cray.com"; then 
+   if test $COMPILER == crayx1; then
+      module use /opt/ctl/modulefiles /opt/PE/modulefiles
+      module load PrgEnv.56.newest
+      module list
+      export NETCDF=/ptmp/pjj/netcdf-3.5.1-x1
+      export RTTOV=~n12138/rttov/rttov85_crayx1
+      export CRTM=~n12138/crtm/crtm_crayx1
+      export MPICH=/opt/cpkg/v4/mpich2/1.0
+      export WRF_OS=crayx1
+   fi
+fi
+
 export MPIHOME=$MPICH
 export PATH=$MPICH/bin:$PATH
 export MANPATH=$MPICH/man:$MANPATH

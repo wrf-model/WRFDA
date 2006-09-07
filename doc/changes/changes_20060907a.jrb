@@ -1,0 +1,24 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: John Bray
+Date: 09/07/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Add crayx1 setup options into setup.*sh scripts
+
+------------------------------------------------------
+Tests:
+
+gold: Environment setup correctly
+--------------------------------------------------------------------------------------
+
+File changes:
+------------
+
+A    doc/changes/changes_20060907a.jrb
+M    setup.ksh
+M    setup.csh
