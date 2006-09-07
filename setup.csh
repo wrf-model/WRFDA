@@ -94,6 +94,10 @@ if ( $MACHINE == "ln0126en" || $MACHINE == "ln0127en" ) then
    if ( $COMPILER == pgi ) then
       setenv MPICH /usr/local/mpich-gm/mpichgm-1.2.6..14a-64
    endif
+   if test $COMPILER == ifort; then
+      source /contrib/2.6/intel/9.1.036-64/bin/ifortvars.csh
+      setenv MPICH /contrib/2.6/mpich-gm/1.2.6..14a-intel-9.1.042-64
+   fi
 endif
 
 # Crayx1

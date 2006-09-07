@@ -89,6 +89,10 @@ if test $MACHINE == "ln0126en" -o $MACHINE == "ln0127en"; then
    if test $COMPILER == pgi; then
       export MPICH=/usr/local/mpich-gm/mpichgm-1.2.6..14a-64
    fi
+   if test $COMPILER == ifort; then
+      . /contrib/2.6/intel/9.1.036-64/bin/ifortvars.sh
+      export MPICH=/contrib/2.6/mpich-gm/1.2.6..14a-intel-9.1.042-64
+   fi
 fi
 
 # Crayx1

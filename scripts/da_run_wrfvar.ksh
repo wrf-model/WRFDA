@@ -100,12 +100,6 @@ if test ! -f $DA_ANALYSIS; then
    START_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe $DATE $WINDOW_START`
    END_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe $DATE $WINDOW_END`
 
-   typeset -A FG_DATE
-   typeset -A FG_CCYY
-   typeset -A FG_MM
-   typeset -A FG_DD
-   typeset -A FG_HH
-
    for HOUR in 01 02 03 04 05 06 07; do
       let H=$HOUR-1+$WINDOW_START
       FG_DATE[$HOUR]=`$WRFVAR_DIR/main/advance_cymdh.exe $DATE $H`
@@ -114,12 +108,6 @@ if test ! -f $DA_ANALYSIS; then
       export FG_DD[$HOUR]=`echo ${FG_DATE[$HOUR]} | cut -c7-8`
       export FG_HH[$HOUR]=`echo ${FG_DATE[$HOUR]} | cut -c9-10`
    done
-
-   typeset -A OB_DATE
-   typeset -A OB_CCYY
-   typeset -A OB_MM
-   typeset -A OB_DD
-   typeset -A OB_HH
 
    for HOUR in 00 01 02 03 04 05 06; do
       let H=$HOUR+$WINDOW_START

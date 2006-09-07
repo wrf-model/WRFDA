@@ -79,7 +79,9 @@ elif test $HOSTNAME = "ln0126en" -o $HOSTNAME = "ln0127en"; then
 #BSUB -e $EXPT.err               
 #BSUB -q regular  
 
-export RUN_CMD=${RUN_CMD:-mpirun.lsf -v -np $NUM_PROCS}
+# Cannot put - options inside default substitution
+export RUN_CMD_DEFAULT="mpirun.lsf -v -np $NUM_PROCS"
+export RUN_CMD=${RUN_CMD:-\$RUN_CMD_DEFAULT}
 . $SCRIPT > $EXP_DIR/index.html 2>&1
 
 EOF
