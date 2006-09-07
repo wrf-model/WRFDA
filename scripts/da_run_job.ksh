@@ -23,7 +23,7 @@ mkdir -p $RUN_DIR
 cd $RUN_DIR
 
 if test $HOSTNAME = "bs1101en" -o $HOSTNAME = "bs1201en"; then 
-   # bluesky used loadleveller
+   # bluesky uses loadleveller
 
    # Rather simplistic node calculation 
    let TEMP=$NUM_PROCS-1
@@ -63,8 +63,9 @@ if test $HOSTNAME = "bs1101en" -o $HOSTNAME = "bs1201en"; then
 export RUN_CMD="$DEBUGGER " # Space important
 . $SCRIPT > $EXP_DIR/index.html 2>&1
 EOF
-elif test $HOSTNAME = "ln0126en" -o $HOSTNAME = "ln0127en"; then 
-   # lightning uses lsf
+elif test $HOSTNAME = "ln0126en" -o $HOSTNAME = "ln0127en" \
+   -o $HOSTNAME = "bv1103en.ucar.edu" ; then 
+   # lightning and bluesky use lsf
    cat > job.ksh <<EOF
 #!/bin/ksh
 #
@@ -78,9 +79,10 @@ elif test $HOSTNAME = "ln0126en" -o $HOSTNAME = "ln0127en"; then
 #BSUB -o $EXPT.out               
 #BSUB -e $EXPT.err               
 #BSUB -q regular  
+#BSUB -W 60
 
 # Cannot put - options inside default substitution
-export RUN_CMD_DEFAULT="mpirun.lsf -v -np $NUM_PROCS"
+export RUN_CMD_DEFAULT="mpirun.lsf"
 export RUN_CMD=${RUN_CMD:-\$RUN_CMD_DEFAULT}
 . $SCRIPT > $EXP_DIR/index.html 2>&1
 
@@ -115,8 +117,9 @@ chmod +x job.ksh
 echo "Running with $NUM_PROCS processors, output to $EXP_DIR"
 if test $HOSTNAME = "bs1101en" -o $HOSTNAME = "bs1201en"; then 
    llsubmit job.ksh
-elif test $HOSTNAME = "ln0126en" -o $HOSTNAME = "ln0127en"; then 
-   bsub -q regular -n $NUM_PROCS $PWD/job.ksh
+elif test $HOSTNAME = "ln0126en" -o $HOSTNAME = "ln0127en" \
+     -o $HOSTNAME = "bv1103en.ucar.edu"; then 
+   bsub -q regular -n $NUM_PROCS < $PWD/job.ksh
 elif test $HOSTNAME = ocotillo; then
    ./job.ksh
 else
