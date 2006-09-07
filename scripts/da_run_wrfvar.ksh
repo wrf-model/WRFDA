@@ -49,7 +49,7 @@ export DUMMY=${DUMMY:-false}
 
 export DA_FIRST_GUESS=${DA_FIRST_GUESS:-$MD_DIR/$DATE/wrfinput_d$DOMAIN}    # wrfvar "first guess" input.
 export DA_BOUNDARIES=${DA_BOUNDARIES:-$MD_DIR/$DATE/wrfbdy_d$DOMAIN}    # wrfvar boundaries input.
-export DA_ANALYSIS=${DA_ANALYSIS:-$WORK_DIR/wrfvar_output}
+export DA_ANALYSIS=${DA_ANALYSIS:-wrfvar_output}
 export DA_OBSERVATIONS=${DA_OBSERVATIONS:-$OB_DIR/$DATE/ob.ascii} # wrfvar observation input.
 export DA_BUFR_DIR=${DA_BUFR_DIR:-$OB_DIR/$DATE} # radiance bufr file directory
 export DA_BACK_ERRORS=${DA_BACK_ERRORS:-$BE_DIR/gen_be.NMC.dat} # wrfvar background errors.
@@ -408,7 +408,9 @@ if test ! -f $DA_ANALYSIS; then
    fi
 
    if test -f wrfvar_output; then
-      mv wrfvar_output $DA_ANALYSIS
+      if test $DA_ANALYSIS != wrfvar_output; then 
+         mv wrfvar_output $DA_ANALYSIS
+      fi
    fi
 
    if test -d trace; then
@@ -440,7 +442,7 @@ if test ! -f $DA_ANALYSIS; then
       echo '<A HREF="statistics">Statistics</a>'
    fi
 
-   ls -l $RUN_DIR/cost_fn
+   cat $RUN_DIR/cost_fn
 
    if test $RC = 0; then
      echo `date` "${OK}Succeeded${END}"

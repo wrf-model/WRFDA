@@ -68,17 +68,14 @@ WRFVAR_OBJS        =	da_par_util.o           \
                         module_nesting.o \
                         module_tiles.o \
                         module_quilt_outbuf_ops.o \
-                        ESMF_Stubs.o \
-                        ESMF_TimeInterval.o \
-                        ESMF_Mod.o \
-                        ESMF_Fraction.o \
-                        ESMF_Time.o \
-                        ESMF_Clock.o \
-                        ESMF_Alarm.o \
-                        ESMF_AlarmClock.o \
-                        ESMF_BaseTime.o \
-                        ESMF_Base.o \
-                        ESMF_Calendar.o \
+                        module_get_file_names.o \
+                        module_bc_time_utilities.o \
+                        solve_interface.o \
+                        mediation_feedback_domain.o \
+                        mediation_force_domain.o \
+                        mediation_interp_domain.o \
+                        nest_init_utils.o \
+                        landread.o \
                         wrf_io.o \
                         io_int.o \
                         da_memory.o \
@@ -88,6 +85,7 @@ WRFVAR_OBJS        =	da_par_util.o           \
                         wrf_shutdown.o \
                         init_modules.o \
                         mediation_wrfmain.o \
+                        mediation_integrate.o \
                         pack_utils.o \
                         Meat.o \
                         wrf_num_bytes_between.o \

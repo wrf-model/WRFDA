@@ -27,7 +27,7 @@ WRFPLUS_LIBS = libwrflib.a libwrfplus.a libwrfio_nf.a libesmf_time.a \
                $(IO_GRIB1)/libio_grib1.a $(IO_GRIB_SHARE)/libio_grib_share.a $(MPI_LIBS)
 
 WRFVAR_LIB  = -L. -lwrfvar $(NETCDF_LIB)  \
-               $(GRIB1_LIB) $(GRIB_SHARE_LIB) $(LOCAL_LIB) \
+               $(GRIB1_LIB) $(GRIB_SHARE_LIB) $(LOCAL_LIB) $(ESMF_TIME_LIB) \
                $(LAPACK_LIB) $(BLAS_LIB) $(BUFR_LIB) $(FFTPACK5_LIB) \
                $(RTTOV_LIB) $(CRTM_LIB) $(MPI_LIB) $(EXTRA_LIBS)
 

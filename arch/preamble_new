@@ -117,6 +117,7 @@ RSL_STUBS     = $(EXTERNAL)/RSL_STUBS
 
 PHDF5_LIB     = -L$(EXTERNAL)/io_phdf5 -lwrfio_phdf5 -L$(PHDF5_PATH)/lib \
   -lhdf5_fortran -lhdf5 -lm -lz -L$(PHDF5PATH)/lib -lsz
+ESMF_TIME_LIB = -lesmf_time
 LAPACK_LIB    = -llapack
 BLAS_LIB      = -lblas
 BUFR_LIB      = -lbufr

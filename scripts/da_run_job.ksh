@@ -110,7 +110,7 @@ EOF
 
 chmod +x job.ksh
 
-
+echo "Running with $NUM_PROCS processors, output to $EXP_DIR"
 if test $HOSTNAME = "bs1101en" -o $HOSTNAME = "bs1201en"; then 
    llsubmit job.ksh
 elif test $HOSTNAME = "ln0126en" -o $HOSTNAME = "ln0127en"; then 
