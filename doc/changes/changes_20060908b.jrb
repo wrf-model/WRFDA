@@ -1,0 +1,24 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: John Bray
+Date: 09/08/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Clarify that the + and i on fgat filenames occurs in the input filenames
+in $OBDIR/$DATE, not in the names presented to wrfvar
+
+------------------------------------------------------
+Tests:
+
+
+--------------------------------------------------------------------------------------
+
+File changes:
+------------
+
+A    doc/changes/changes_20060908b.jrb
+M    scripts/da_run_wrfvar.ksh
