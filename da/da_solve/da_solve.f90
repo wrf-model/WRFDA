@@ -187,6 +187,7 @@ SUBROUTINE da_solve ( grid , config_flags , &
 
    IF (Use_SsmiRetrievalObs .OR. Use_SsmiTbObs) THEN
       OPEN ( UNIT   = ssmi_iunit,     &
+             FILE   = 'ssmi.dat', &
              FORM   = 'FORMATTED',  &
              ACCESS = 'SEQUENTIAL', &
              IOSTAT =  iost,     &

@@ -98,7 +98,7 @@ SUBROUTINE da_setup_obs_structures_bufr( xp, ob, iv )
 
       ! scan MAIN BODY OF Radar OBSERVATION FILE
       ! if(Use_RadarObs) &
-      ! call da_scan_bufr_radar(Radar_iunit-1, iv, xp)
+      ! call da_scan_bufr_radar(Radar_iunit-1, iv, xp,'radar.dat')
    endif
 
    !-----------------------------------------------------------------

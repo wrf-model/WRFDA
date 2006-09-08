@@ -210,8 +210,13 @@ if test ! -f $DA_ANALYSIS; then
    done
 
    if test -r $DA_SSMI; then
-      ln -sf $DA_SSMI	fort.93
+      ln -sf $DA_SSMI ssmi.dat
       export NL_USE_SSMIRETRIEVALOBS=true
+   fi
+
+   if test -r $DA_RADAR; then
+      ln -sf $DA_RADAR radar.dat
+      export NL_USE_RADAROBS=true
    fi
 
    export NL_START_YEAR=`echo $START_DATE | cut -c1-4`
@@ -332,11 +337,23 @@ if test ! -f $DA_ANALYSIS; then
       RC=0
    else
       if $NL_LVAR4D; then
-         ln -s $OB_DIR/${OB_DATE[00]}/ob.ascii fgat_ob.00+
+         ln -s $OB_DIR/${OB_DATE[00]}/ob.ascii ob.00+
          for HOUR in 01 02 03 04 05; do
-            ln -s $OB_DIR/${OB_DATE[$HOUR]}/ob.ascii fgat_ob.$HOUR
+            ln -s $OB_DIR/${OB_DATE[$HOUR]}/ob.ascii ob.$HOUR
          done
-         ln -s $OB_DIR/${OB_DATE[06]}/ob.ascii fgat_ob.06-
+         ln -s $OB_DIR/${OB_DATE[06]}/ob.ascii ob.06-
+
+         ln -s $OB_DIR/${OB_DATE[00]}/ssmi.dat ssmi.00+
+         for HOUR in 01 02 03 04 05; do
+            ln -s $OB_DIR/${OB_DATE[$HOUR]}/ssmi.dat ssmi.$HOUR
+         done
+         ln -s $OB_DIR/${OB_DATE[06]}/ssmi.dat ssmi.06-
+
+         ln -s $OB_DIR/${OB_DATE[00]}/radar.dat radar.00+
+         for HOUR in 01 02 03 04 05; do
+            ln -s $OB_DIR/${OB_DATE[$HOUR]}/radar.dat radar.$HOUR
+         done
+         ln -s $OB_DIR/${OB_DATE[06]}/radar.dat radar.06-
 
          if $POE && test $NUM_PROCS -gt 1; then
             # JRB kludge until we work out what we are doing here

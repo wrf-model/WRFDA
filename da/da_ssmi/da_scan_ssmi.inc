@@ -9,7 +9,7 @@ subroutine da_scan_ssmi (iunit, ob, xp, filename)
    INTEGER,          INTENT(in)    :: iunit
    TYPE(xpose_type), INTENT(IN)    :: xp    ! Domain decomposition vars.
    TYPE(ob_type),    INTENT(inout) :: ob
-   CHARACTER(*), INTENT(in), OPTIONAL :: filename
+   CHARACTER(*), INTENT(in)        :: filename
 
    CHARACTER (LEN =  10)        :: fmt_name
 
@@ -40,35 +40,20 @@ subroutine da_scan_ssmi (iunit, ob, xp, filename)
 
    ! OPEN FILE
 
-   if(present(filename)) then
-      OPEN(UNIT   = iunit,     &
-           FILE   = trim(filename), &
-           FORM   = 'FORMATTED',  &
-           ACCESS = 'SEQUENTIAL', &
-           IOSTAT =  iost,     &
-           STATUS = 'OLD')
+   OPEN(UNIT   = iunit,     &
+        FILE   = trim(filename), &
+        FORM   = 'FORMATTED',  &
+        ACCESS = 'SEQUENTIAL', &
+        IOSTAT =  iost,     &
+        STATUS = 'OLD')
 
-      IF (iost /= 0) THEN
-         write(UNIT=stdout, fmt='(/A,I3,3(2X,A)/)') &
-              'ERROR IN SSMI INPUT FILE UNIT ',iunit, &
-              'SSMI FILENAME:', trim(filename), &
-              'FOR SSMI CANNOT BE FOUND OR CANNOT BE OPENED'
-         RETURN
-      ENDIF
-   else
-      OPEN(UNIT   = iunit,     &
-           FORM   = 'FORMATTED',  &
-           ACCESS = 'SEQUENTIAL', &
-           IOSTAT =  iost,     &
-           STATUS = 'OLD')
-
-      IF (iost /= 0) THEN
-         write(UNIT=stdout, fmt='(/A,I3,2X,A/)') &
-              'ERROR IN INPUT FILE UNIT ',iunit, &
-              'FOR SSMI OBSERVATIONS CANNOT BE FOUND OR CANNOT BE OPENED'
-         RETURN
-      ENDIF
-   endif
+   IF (iost /= 0) THEN
+      write(UNIT=stdout, fmt='(/A,I3,3(2X,A)/)') &
+           'ERROR IN SSMI INPUT FILE UNIT ',iunit, &
+           'SSMI FILENAME:', trim(filename), &
+           'FOR SSMI CANNOT BE FOUND OR CANNOT BE OPENED'
+      RETURN
+   ENDIF
 
    REWIND (UNIT = iunit)
 
