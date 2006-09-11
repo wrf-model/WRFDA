@@ -106,7 +106,7 @@ SUBROUTINE da_solve ( grid , config_flags , &
    ! [2.0] Initialise wrfvar parameters:
    !---------------------------------------------------------------------------
 
-   call da_init_wrfvar( grid, xp, xb, &
+   call da_solve_init( grid, xp, xb, &
                        ids, ide, jds, jde, kds, kde, &
                        ims, ime, jms, jme, kms, kme, &
                        its, ite, jts, jte, kts, kte )
@@ -323,7 +323,7 @@ SUBROUTINE da_solve ( grid , config_flags , &
 
 CONTAINS
 
-#include "da_init_wrfvar.inc"
+#include "da_solve_init.inc"
 
 end subroutine da_solve
 

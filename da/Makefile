@@ -129,7 +129,7 @@ da_solve.o:		da_constants.o			\
 			da_tools.o			\
 			da_minimisation.o		\
 			da_par_util.o			\
-			da_init_wrfvar.inc \
+			da_solve_init.inc \
 			da_solve.f90
 			$(RM) $@
 			$(CPP) $(CPPFLAGS) -I../inc da_solve.f90 > da_solve.f
