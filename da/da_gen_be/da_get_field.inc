@@ -29,8 +29,8 @@ subroutine da_get_field( input_file, var, field_dims, dim1, dim2, dim3, k, field
 !  Check variable is in file:
    rcode = nf_inq_varid ( cdfid, var, id_var )
    if ( rcode /= 0 ) then
-      write(6,'(2a)')var, ' variable is not in input file. Stop'
-      stop
+      write(unit=errmsg(1),FMT='(2a)')var, ' variable is not in input file'
+      call da_error(__FILE__,__LINE__,errmsg(1:1))
    endif
 
    istart = 1

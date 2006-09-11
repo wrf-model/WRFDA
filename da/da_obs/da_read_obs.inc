@@ -1200,12 +1200,12 @@ loop_level: DO i = 1, platform%info%levels
 
 !  if((ob%ob_numb(ob%current_ob_time)%ssmi_tb        /= ob%num_ssmi_tb) .or. &
 !     (ob%ob_numb(ob%current_ob_time)%ssmi_retrieval /= ob%num_ssmi_retrieval)) then
-!     write(unit=stdout, fmt='(a, i6, 2x, a, i6)') &
+!     write(unit=errmsg(1), fmt='(a, i6, 2x, a, i6)') &
 !          'ob%ob_numb(ob%current_ob_time)%ssmi_tb       =', ob%ob_numb(ob%current_ob_time)%ssmi_tb, &
 !          'ob%num_ssmi_tb       =', ob%num_ssmi_tb, &
 !          'ob%ob_numb(ob%current_ob_time)%ssmi_retrieval=', ob%ob_numb(ob%current_ob_time)%ssmi_retrieval, &
 !          'ob%num_ssmi_retrieval=', ob%num_ssmi_retrieval
-!     stop 'Obs mismatch.'
+!     call da_error(__FILE__,__LINE,errmsg(1:1))
 !  endif
 
    IF (trace_use) CALL da_trace_exit("da_read_obs")

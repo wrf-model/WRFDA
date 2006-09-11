@@ -237,9 +237,9 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
    read(be_unit)  evec_loc
    read(be_unit)  eval_loc
    if( variable(1:3) /= 'psi') then
-   print*,' Variable mismatch while transfering eigen values from BE file '
-   print*,' Expected psi but got ',variable
-   stop
+      errmsg(1)=' Variable mismatch while transfering eigen values from BE file '
+      write(unit=errmsg(2),FMT='(A,A)') ' Expected psi but got ',variable
+      call da_error(__FILE__,__LINE__,errmsg(1:2))
    endif
    be % v1 % name = variable
    do j=1,nj
@@ -256,9 +256,9 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
    read(be_unit)  evec_loc
    read(be_unit)  eval_loc
    if( variable(1:5) /= 'chi_u') then
-   print*,' Variable mismatch while transfering eigen values from BE file '
-   print*,' Expected chi_u but got ',variable
-   stop
+      errmsg(1)=' Variable mismatch while transfering eigen values from BE file '
+      write(unit=errmsg(2),FMT='(A,A)') ' Expected chi_u but got ',variable
+      call da_error(__FILE__,__LINE__,errmsg(1:2))
    endif
    be % v2 % name = variable
    do j=1,nj
@@ -275,9 +275,9 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
    read(be_unit)  evec_loc
    read(be_unit)  eval_loc
    if( variable(1:3) /= 't_u') then
-   print*,' Variable mismatch while transfering eigen values from BE file '
-   print*,' Expected t_u but got ',variable
-   stop
+      errmsg(1)=' Variable mismatch while transfering eigen values from BE file '
+      write(unit=errmsg(2),FMT='(A,A)') ' Expected t_u but got ',variable
+      call da_error(__FILE__,__LINE__,errmsg(1:2))
    endif
    be % v3 % name = variable
    do j=1,nj
@@ -296,9 +296,9 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
    read(be_unit)  evec_loc
    read(be_unit)  eval_loc
    if( variable(1:3) /= 'rh') then
-   print*,' Variable mismatch while transfering eigen values from BE file '
-   print*,' Expected rh but got ',variable
-   stop
+      errmsg(1)=' Variable mismatch while transfering eigen values from BE file '
+      write(unit=errmsg(2),FMT='(A,A)') ' Expected rh but got ',variable
+      call da_error(__FILE__,__LINE__,errmsg(1:2))
    endif
    be % v4 % name = variable
    do j=1,nj
@@ -320,9 +320,9 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
    read(be_unit)  evec_loc
    read(be_unit)  eval_loc
    if( variable(1:4) /= 'ps_u') then
-   print*,' Variable mismatch while transfering eigen values from BE file '
-   print*,' Expected ps_u but got ',variable
-   stop
+      errmsg(1)=' Variable mismatch while transfering eigen values from BE file '
+      write(unit=errmsg(2),FMT='(A,A)') ' Expected ps_u but got ',variable
+      call da_error(__FILE__,__LINE__,errmsg(1:2))
    endif
    be % v5 % name = variable
    do j=1,nj

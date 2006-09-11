@@ -38,7 +38,7 @@ subroutine da_max_error_qc_radar (it, info, field, max_error, ix, ixf, iunit, va
                "Err_max < 0 ==> ",err,err_max,max_error, " for ", var, &
                " OBS ID: ", info % platform,     &
                " LA/LON/ELV:", info % lat, info % lon, info % elv
-            ! STOP
+            ! call da_error(__FILE__,__LINE__,(/"Erk"/))
          ENDIF
 
          WRITE (iunit , FMT = '(A,A,A,I5,A,I5,A,F4.1,A,A,A,2F12.1)') &

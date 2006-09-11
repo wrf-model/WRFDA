@@ -111,14 +111,14 @@ subroutine da_obs_sfc_correction(sfc_obs, xb )
 
       return
 
-      ! WRITE(unit=stdout, fmt='(/3(1x,a))') &
+      ! WRITE(unit=errmsg(1), fmt='(/3(1x,a))') &
       !    'MISSING HEIGHT OR PRESSURE OBSERVATION ID ', &
       !    TRIM (sfc_obs%info % id), TRIM (sfc_obs%info % name)
 
-      ! WRITE(unit=stdout, fmt='(2(A,F12.3,/))') &
+      ! WRITE(unit=errmsg(2), fmt='(2(A,F12.3,/))') &
       !                         ' height   = ',ho,&
       !                         ' pressure = ',po
-      ! STOP                ' in da_sfc_correction'
+      ! call da_error(__FILE__,__LINE__,errmsg(1:2))
 
    ENDIF
 

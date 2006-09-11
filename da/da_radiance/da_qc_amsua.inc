@@ -207,8 +207,8 @@ subroutine da_qc_amsua ( inst, nchan, ob, iv )
      endif
      open(unit,file=trim(filename),form='formatted',iostat=ios)
      if( ios /= 0 ) Then
-        Write(*,*) 'error opening the output file ', filename
-        Stop ' in da_qc_amsua '
+        Write(UNIT=errmsg(1),FMT='(A,A)') 'error opening the output file ', filename
+        call da_error(__FILE__,__LINE__,errmsg(1:1))
      Endif
 
      write(unit, fmt='(/a/)') ' Quality Control Statistics for '//iv%instid(inst)%rttovid_string

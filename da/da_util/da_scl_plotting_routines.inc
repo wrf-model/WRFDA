@@ -87,7 +87,7 @@ subroutine point_plot(plt,num,nx,ny,nt,ib,jb,ie,je, &
 
    if (abs(ype - ypb) < 1.0e-5) then 
       call frame
-      stop 'ype - ypb is too small.'
+      call da_error(__FILE__,__LINE,(/'ype - ypb is too small.'/))
    end if
 
    call set(xfb,xfe,yfb,yfe,xpb,xpe,ypb,ype,plot_style)

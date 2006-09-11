@@ -271,32 +271,32 @@ end if
 #endif
 
  if ( any(errorstatus(:) /= 0 )) then
-     !WRITE (UNIT=stdout,FMT=*) 'rttov_direct error code = ', errorstatus(:)
-     !WRITE (UNIT=stdout,FMT=*) 'nfrequencies = ', nfrequencies
-     !WRITE (UNIT=stdout,FMT=*) 'nchannels    = ', nchannels
-     !WRITE (UNIT=stdout,FMT=*) 'nbtout       = ', nbtout
-     !WRITE (UNIT=stdout,FMT=*) 'nprofiles    = ', nprofiles
-     !WRITE (UNIT=stdout,FMT=*) 'channels     = ', channels
-     !WRITE (UNIT=stdout,FMT=*) 'polarisations= ', polarisations
-     !WRITE (UNIT=stdout,FMT=*) 'lprofiles    = ', lprofiles
-     !WRITE (UNIT=stdout,FMT=*) 'profiles%s2m   = ', profiles(1)%s2m
-     !WRITE (UNIT=stdout,FMT=*) 'profiles%skin   = ', profiles(1)%skin
-     write(UNIT=stdout,FMT='(6f12.2)') &
+     !WRITE (UNIT=stderr,FMT=*) 'rttov_direct error code = ', errorstatus(:)
+     !WRITE (UNIT=stderr,FMT=*) 'nfrequencies = ', nfrequencies
+     !WRITE (UNIT=stderr,FMT=*) 'nchannels    = ', nchannels
+     !WRITE (UNIT=stderr,FMT=*) 'nbtout       = ', nbtout
+     !WRITE (UNIT=stderr,FMT=*) 'nprofiles    = ', nprofiles
+     !WRITE (UNIT=stderr,FMT=*) 'channels     = ', channels
+     !WRITE (UNIT=stderr,FMT=*) 'polarisations= ', polarisations
+     !WRITE (UNIT=stderr,FMT=*) 'lprofiles    = ', lprofiles
+     !WRITE (UNIT=stderr,FMT=*) 'profiles%s2m   = ', profiles(1)%s2m
+     !WRITE (UNIT=stderr,FMT=*) 'profiles%skin   = ', profiles(1)%skin
+     write(UNIT=stderr,FMT='(6f12.2)') &
        profiles(1)%s2m%p,profiles(1)%skin%t,profiles(1)%s2m%t, &
        profiles(1)%s2m%q,profiles(1)%s2m%u,profiles(1)%s2m%v
-     !WRITE (UNIT=stdout,FMT=*) 'profiles%zenangle = ', profiles(1)%zenangle
-     !WRITE (UNIT=stdout,FMT=*) 'profiles%azangle = ', profiles(1)%azangle
-     !WRITE (UNIT=stdout,FMT=*) 'profiles%p   = ', profiles(1)%p
-     !WRITE (UNIT=stdout,FMT=*) 'profiles%t   = ', profiles(1)%t
-     !WRITE (UNIT=stdout,FMT=*) 'profiles%q   = ', profiles(1)%q
+     !WRITE (UNIT=stderr,FMT=*) 'profiles%zenangle = ', profiles(1)%zenangle
+     !WRITE (UNIT=stderr,FMT=*) 'profiles%azangle = ', profiles(1)%azangle
+     !WRITE (UNIT=stderr,FMT=*) 'profiles%p   = ', profiles(1)%p
+     !WRITE (UNIT=stderr,FMT=*) 'profiles%t   = ', profiles(1)%t
+     !WRITE (UNIT=stderr,FMT=*) 'profiles%q   = ', profiles(1)%q
      !do i=coef%nlevels,1,-1
-     !  write(UNIT=stdout,FMT='(i4,3f12.2)') i, profiles(1)%p(i),profiles(1)%t(i),profiles(1)%q(i)
+     !  write(UNIT=stderr,FMT='(i4,3f12.2)') i, profiles(1)%p(i),profiles(1)%t(i),profiles(1)%q(i)
      !end do
-     !WRITE (UNIT=stdout,FMT=*) 'addcloud     = ', addcloud
-     !WRITE (UNIT=stdout,FMT=*) 'calcemis     = ', calcemis
-     !WRITE (UNIT=stdout,FMT=*) 'emissivity   = ', emissivity
-     !WRITE (UNIT=stdout,FMT=*) 'radiance = ', radiance%out_clear
-     !stop ' in da_rtm_direct '
+     !WRITE (UNIT=stderr,FMT=*) 'addcloud     = ', addcloud
+     !WRITE (UNIT=stderr,FMT=*) 'calcemis     = ', calcemis
+     !WRITE (UNIT=stderr,FMT=*) 'emissivity   = ', emissivity
+     !WRITE (UNIT=stderr,FMT=*) 'radiance = ', radiance%out_clear
+     !call da_error(__FILE__,__LINE__,(/"Erk"/))
  endif
  
   nc = nbtout / nprofiles

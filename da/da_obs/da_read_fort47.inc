@@ -47,13 +47,14 @@ subroutine da_read_fort47(unit_in,unit_out,num,obs_type_in, nc)
    go to 1
 !--------------------------------------------------------------
 999  continue
-   write(unit=stdout, fmt='(/a,i3/a/)') &
+   write(unit=errmsg(1), fmt='(/a,i3/a/)') &
               'unexpected end of file on unit: ',unit_in, &                       
               'in da_read_fort47'
-      stop
+   call da_error(__FILE__,__LINE__,errmsg(1:1))
+
 1000  continue 
-   write(unit=stdout, fmt='(/a,i3/a/)') &
+   write(unit=errmsg(1), fmt='(/a,i3/a/)') &
               'read error on unit: ',unit_in, &
               'in da_read_fort47'
-      stop
+   call da_error(__FILE__,__LINE__,errmsg(1:1))
 end subroutine da_read_fort47

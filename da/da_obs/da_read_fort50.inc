@@ -68,11 +68,10 @@ subroutine da_read_fort50(unit_in,num,obs_type_in, nc)
 
    if( index( ob_type,'*****') > 0) return   
 
-   write(unit=stdout, fmt='(/a,a20,a,i3/a/)') &
+   write(unit=errmsg(1), fmt='(/a,a20,a,i3/a/)') &
               'Got unknown obs_type string:', trim(ob_type),' on unit ',unit_in, & 
               'in da_read_fort50'
-
-   stop
+   call da_error(__FILE__,__LINE__,errmsg(1:1))
     
 !----------------------------------------------------------------------------   
                 10 continue      !   Synop, Metar, Ships, Buoy , Sonde_sfc
@@ -474,13 +473,13 @@ subroutine da_read_fort50(unit_in,num,obs_type_in, nc)
 
 !--------------------------------------------------------------
 999  continue
-   write(unit=stdout, fmt='(/a,i3/a/)') &
+   write(unit=errmsg(1), fmt='(/a,i3/a/)') &
               'unexpected end of file on unit: ',unit_in, & 
               'in da_read_fort50'
-      stop
+   call da_error(__FILE__,__LINE__,errmsg(1:1))
 1000  continue
-   write(unit=stdout, fmt='(/a,i3/a/)') &
+   write(unit=errmsg(1), fmt='(/a,i3/a/)') &
               'read error on unit: ',unit_in, & 
               'in da_read_fort50'
-      stop
+   call da_error(__FILE__,__LINE__,errmsg(1:1))
 end subroutine da_read_fort50

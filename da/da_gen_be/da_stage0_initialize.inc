@@ -33,15 +33,17 @@ subroutine da_stage0_initialize( input_file, var, dim1, dim2, dim3, ds )
    length = len_trim(input_file)
    rcode = nf_open( input_file(1:length), NF_NOWRITE, cdfid )
    if ( rcode /= 0) then
-     write(6,*) ' Error opening netcdf file ', input_file(1:length)
-     stop
+      write(UNIT=errmsg(1),FMT='(A,A)') &
+         ' Error opening netcdf file ', input_file(1:length)
+      call da_error(__FILE__,__LINE__,errmsg(1:1))
    end if
 
 !  Check variable is in file:
    rcode = nf_inq_varid ( cdfid, var, id_var )
    if ( rcode /= 0 ) then 
-      write(6,'(2a)')var, ' variable is not in input file. Stop'
-      stop
+      write(UNIT=errmsg(1),FMT='(A,A)') &
+         var, ' variable is not in input file'
+      call da_error(__FILE__,__LINE__,errmsg(1:1))
    endif
 
 !  Get metadata (time, dimensions, global attributes):

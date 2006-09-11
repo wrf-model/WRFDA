@@ -151,8 +151,8 @@ subroutine da_make_large(sub_header_small, sub_header_large, &
          end do
 
       else
-         write(unit=*, fmt='(a)') 'Something is wrong.'
-         stop 'check dimensions.'
+         write(unit=errmsg(1), fmt='(a)') 'Something is wrong, check dimensions.'
+         call da_error(__FILE__,__LINE__,errmsg(1:1))
       end if
    else
       data_large = data_small

@@ -586,29 +586,29 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xb, xp, &
          iv%sonde_sfc(i)%info%lon      /= iv%sound(i)%info%lon      .or. &
          iv%sonde_sfc(i)%info%elv      /= iv%sound(i)%info%elv      .or. &
          iv%sonde_sfc(i)%info%id       /= iv%sound(i)%info%id       ) then
-     print*,' Mismatch for Sound surface and upper air report '
-     print*,' Surface Sound Deatils:            '
-      write(unit=*, fmt=fmt_info) &
-            iv%sonde_sfc(i)%info%platform,    &
-            iv%sonde_sfc(i)%info%date_char,   &
-            iv%sonde_sfc(i)%info%name,        &
-            iv%sonde_sfc(i)%info%levels,      &
-            iv%sonde_sfc(i)%info%lat,         &
-            iv%sonde_sfc(i)%info%lon,         &
-            iv%sonde_sfc(i)%info%elv,         &
-            iv%sonde_sfc(i)%info%id
+        write(unit=stderr,FMT='(A)')' Surface Sound Details:            '
+        write(unit=stderr, fmt=fmt_info) &
+           iv%sonde_sfc(i)%info%platform,    &
+           iv%sonde_sfc(i)%info%date_char,   &
+           iv%sonde_sfc(i)%info%name,        &
+           iv%sonde_sfc(i)%info%levels,      &
+           iv%sonde_sfc(i)%info%lat,         &
+           iv%sonde_sfc(i)%info%lon,         &
+           iv%sonde_sfc(i)%info%elv,         &
+           iv%sonde_sfc(i)%info%id
 
-     print*,' Upper level  Deatils: '
-      write(unit=*, fmt=fmt_info) &
-            iv%sound(i)%info%platform,    &
-            iv%sound(i)%info%date_char,   &
-            iv%sound(i)%info%name,        &
-            iv%sound(i)%info%levels,      &
-            iv%sound(i)%info%lat,         &
-            iv%sound(i)%info%lon,         &
-            iv%sound(i)%info%elv,         &
-            iv%sound(i)%info%id
-     stop
+        write(unit=stderr,FMT='(A)') ' Upper level  Details: '
+        write(unit=stderr, fmt=fmt_info) &
+           iv%sound(i)%info%platform,    &
+           iv%sound(i)%info%date_char,   &
+           iv%sound(i)%info%name,        &
+           iv%sound(i)%info%levels,      &
+           iv%sound(i)%info%lat,         &
+           iv%sound(i)%info%lon,         &
+           iv%sound(i)%info%elv,         &
+           iv%sound(i)%info%id
+        call da_error(__FILE__,__LINE__, &
+           (/"Mismatch for Sound surface and upper air report"/))
      end if
 ! Guo....
      nz = 0
