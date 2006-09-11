@@ -40,7 +40,7 @@ subroutine da_transfer_xatoanalysis( it, xbx, grid, config_flags ,&
                            )
 
       if (it < max_ext_its) then
-         if (lvar4d) then
+         if (var4d) then
             call da_med_initialdata_output( grid , config_flags )
          endif
 

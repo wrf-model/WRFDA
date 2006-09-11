@@ -772,7 +772,8 @@ TRADFLAG        =
 FPPFLAGS2       = -DNATIVE_MASSV -DNONSTANDARD_SYSTEM                    
 
 FCOPTIM         = -O0 -qarch=auto
-FCDEBUG         = #-g -qfullpath -C
+FCDEBUG         = #-g -qfullpath -C -qinitauto -qflag=I:I -qtbtable=full \
+                  -qsuppress=1514-008
 
 FCTYPE          = -qrealsize=8
 FCFREE          = -qfree=f90
@@ -813,7 +814,8 @@ DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
 
 FCOPTIM         = -O0 -qarch=auto
-FCDEBUG         = #-g -qfullpath -C
+FCDEBUG         = #-g -qfullpath -C -qinitauto -qflag=I:I -qtbtable=full \
+                  -qsuppress=1514-008
 FCTYPE          = -qrealsize=8
 FCFREE          = -qfree=f90
 FCENDIAN        =

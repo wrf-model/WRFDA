@@ -54,6 +54,7 @@ MODULE da_par_util
 #include "da_free_global_synop.inc"
 #include "da_generic_boilerplate.inc"
 #include "da_y_facade_to_global.inc"
+#include "da_system_4dvar.inc"
 
 #ifdef DM_PARALLEL
 

@@ -98,7 +98,7 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
 
    j % jc = 0.0
 
-   if (lvar4d .AND. jcdfi_use .AND. iter > 0) then
+   if (var4d .AND. jcdfi_use .AND. iter > 0) then
 
       ndynopt      = grid%dyn_opt
       grid%dyn_opt = DYN_EM_TL

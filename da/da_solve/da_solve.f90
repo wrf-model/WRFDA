@@ -188,27 +188,27 @@ SUBROUTINE da_solve ( grid , config_flags , &
 
       ! [8.1] Calculate nonlinear model trajectory 
 
-      if (lvar4d) then
+      if (var4d) then
          call da_trace("da_solve","Starting da_run_wrf_nl.ksh")
 #ifdef DM_PARALLEL
-         call system_4dv("da_run_wrf_nl.ksh pre ")
-!         call system("./wrf.exe -rmpool 1")
+         call da_system_4dvar("da_run_wrf_nl.ksh pre ")
+         ! call system("./wrf.exe -rmpool 1")
          IF ( wrf_dm_on_monitor() ) THEN
-           call system("rm wrf_done")
-           call system("touch wrf_go_ahead")
-           DO WHILE ( .true. )
-             OPEN(99,file="wrf_done",status="old",err=303)
-             CLOSE(99)
-             EXIT
-303          CONTINUE
-             CALL system("sync")
-             CALL system("sleep 1")
-           ENDDO
+            call system("rm wrf_done")
+            call system("touch wrf_go_ahead")
+            DO WHILE ( .true. )
+               OPEN(wrf_done_unit,file="wrf_done",status="old",err=303)
+               CLOSE(wrf_done_unit)
+               EXIT
+303            CONTINUE
+               CALL system("sync")
+               CALL system("sleep 1")
+            ENDDO
          ENDIF
          CALL wrf_get_dm_communicator ( comm )
          CALL mpi_barrier( comm, ierr )
          
-         call system_4dv("da_run_wrf_nl.ksh post ")
+         call da_system_4dvar("da_run_wrf_nl.ksh post ")
 #else
          call system("da_run_wrf_nl.ksh")
 #endif

@@ -61,7 +61,7 @@ export RTTOV=${RTTOV:-$HOME/rttov/rttov85}                            # RTTOV
 export DA_RTTOV_COEFFS=${DA_RTTOV_COEFFS:-$RTTOV/rtcoef_rttov7}
 
 export NL_GLOBAL=${NL_GLOBAL:-false}
-export NL_LVAR4D=${NL_LVAR4D:-false}
+export NL_VAR4D=${NL_VAR4D:-false}
 export NL_RUN_HOURS=${NL_RUN_HOURS:-6}
 export NL_USE_HTML=${NL_USE_HTML:-false}
 export NL_JCDFI_USE=${NL_JCDFI_USE:-false}
@@ -228,7 +228,7 @@ if test ! -f $DA_ANALYSIS; then
    export NL_END_DAY=`echo $END_DATE | cut -c7-8`
    export NL_END_HOUR=`echo $END_DATE | cut -c9-10`
 
-   if $NL_LVAR4D; then
+   if $NL_VAR4D; then
       # Create nl, tl, ad links structures
       mkdir nl tl ad
 
@@ -336,7 +336,7 @@ if test ! -f $DA_ANALYSIS; then
       echo "Dummy wrfvar" > rsl.error.0000
       RC=0
    else
-      if $NL_LVAR4D; then
+      if $NL_VAR4D; then
          ln -s $OB_DIR/${OB_DATE[00]}/ob.ascii+ ob.00
          for HOUR in 01 02 03 04 05; do
             ln -s $OB_DIR/${OB_DATE[$HOUR]}/ob.ascii ob.$HOUR

@@ -199,6 +199,7 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
    INTEGER, PARAMETER :: ssmi_iunit = 93      ! Unit number for SSMI obs input.
    INTEGER, PARAMETER :: Radar_iunit = 94     ! Unit number for Radar input.
    INTEGER, PARAMETER :: airs_table_unit = 95 ! AIRS bufr table input
+   INTEGER, PARAMETER :: wrf_done_unit = 98   ! wrf coupling
    INTEGER, PARAMETER :: rtm_error_unit = 99  ! RTTOV error unit
    ! Tracing to unit 100
    INTEGER, PARAMETER :: rtm_info_unit = 109  ! Radiance info file

@@ -37,7 +37,9 @@ subroutine da_transform_vtoy_adj( iter,cv_size, be, ep, cv, iv, vp, vv, xa, xb, 
 
    character(len=4) :: filnam
 
-   if (lvar4d) then
+   call da_trace_entry("da_transform_vtoy_adj")
+
+   if (var4d) then
       do nobwin=num_fgat_time,1,-1
          iv%current_ob_time = nobwin
          call da_zero_x(xa)
@@ -77,23 +79,23 @@ subroutine da_transform_vtoy_adj( iter,cv_size, be, ep, cv, iv, vp, vv, xa, xb, 
       call da_trace("da_transform_vtoy_adj","Starting da_run_wrfplus_ad.ksh")
 
 #ifdef DM_PARALLEL
-      call system_4dv("da_run_wrfplus_ad.ksh pre ")
+      call da_system_4dvar("da_run_wrfplus_ad.ksh pre ")
 
-      IF ( wrf_dm_on_monitor() ) THEN
-        call system("rm -rf ad/wrf_done")
-        call system("touch ad/wrf_go_ahead")
-        DO WHILE ( .true. )
-          OPEN(99,file="ad/wrf_done",status="old",err=303)
-          CLOSE(99)
-          EXIT
-303          CONTINUE
-          CALL system("sleep 1")
-        ENDDO
+      IF (wrf_dm_on_monitor()) THEN
+         call system("rm -rf ad/wrf_done")
+         call system("touch ad/wrf_go_ahead")
+         DO WHILE ( .true. )
+            OPEN(wrf_done_unit,file="ad/wrf_done",status="old",err=303)
+            CLOSE(wrf_done_unit)
+            EXIT
+303         CONTINUE
+            CALL system("sleep 1")
+         ENDDO
       ENDIF
       CALL wrf_get_dm_communicator ( comm )
       CALL mpi_barrier( comm, ierr )
 
-      call system_4dv("da_run_wrfplus_ad.ksh post ")
+      call da_system_4dvar("da_run_wrfplus_ad.ksh post ")
 #else
       call system("da_run_wrfplus_ad.ksh")
 #endif
@@ -103,18 +105,20 @@ subroutine da_transform_vtoy_adj( iter,cv_size, be, ep, cv, iv, vp, vv, xa, xb, 
       call da_transfer_xatowrftl_adj( grid, config_flags, filnam, &
 #include "em_actual_args.inc"
                               )
-   else  ! lvar4d
+   else  ! var4d
 
       call da_zero_x(xa)
       call da_transform_xtoy_adj( xb, iv, xp, y, xa )
 
-   endif ! lvar4d
+   endif ! var4d
 
    cv = 0.0
    call da_transform_vtox_adj( cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv, &
                                ids, ide, jds, jde, kds, kde,       &
                                ims, ime, jms, jme, kms, kme,       &
                                its, ite, jts, jte, kts, kte )
+
+   call da_trace_exit("da_transform_vtoy_adj")
 
 end subroutine da_transform_vtoy_adj
 
