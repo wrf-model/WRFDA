@@ -15,11 +15,13 @@ registry : $(TOOLS_OBJ)
 advance_cymdh.exe : advance_cymdh.o 
 	$(RM) $@
 	$(SFC) -o advance_cymdh.exe advance_cymdh.o
+	cp advance_cymdh.exe ../main
 
 bufr_little_endian : bufr_little_endian.o
 	$(RM) $@
 	$(FFC) -o bufr_little_endian.exe bufr_little_endian.o bufrlib.o \
           bort_exit.o restd.o wrdesc.o
+	cp bufr_little_endian.exe ../main
 
 bufr_little_endian.o : bort_exit.o restd.o wrdesc.o bufrlib.o
 	$(CPP) $(CPPFLAGS) bufr_little_endian.f90 > bufr_little_endian.f

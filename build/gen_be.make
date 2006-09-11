@@ -22,6 +22,7 @@ be :		setup                   \
 		gen_be_diags_read       \
 		gen_be_read_regcoeffs    \
                 advance_cymdh.exe
+	cp *.exe ../main
 
 gen_be_stage0_wrf.o      : gen_be_stage0_wrf.f90
 
