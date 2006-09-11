@@ -54,7 +54,9 @@ SUBROUTINE da_solve ( grid , config_flags , &
 
    integer                      :: cv_size
    real                         :: j_grad_norm_target ! TArget j norm.
-   integer                      :: iost, ierr,comm
+#ifdef DM_PARALLEL
+   integer                      :: ierr,comm
+#endif
 
    IF (trace_use) call da_trace_entry("da_solve")
 
@@ -73,135 +75,11 @@ SUBROUTINE da_solve ( grid , config_flags , &
       check_max_iv = .false.
    endif
 
-   ! Things that used to be done in da_read_namelist
-
-   IF (Use_SynopObs .OR. Use_ShipsObs .OR. Use_MetarObs .OR. Use_PilotObs .OR. &
-      Use_ProfilerObs .OR. Use_BuoyObs .OR. Use_SoundObs .OR. Use_BogusObs .OR. &
-      Use_RadarObs .OR. Use_Radar_rv .OR. Use_Radar_rf .OR. Use_SatemObs .OR. &
-      Use_GeoAMVObs .OR. Use_PolarAMVObs .OR. Use_AirepObs .OR. &
-      Use_GpspwObs .OR. Use_GpsrefObs .OR. Use_SsmiRetrievalObs .OR. &
-      Use_SsmiTbObs .OR. Use_SSMT1Obs .OR. Use_SSMT2Obs .OR. use_qscatobs) THEN
- 
-      use_obsgts = .TRUE.
-   ELSE
-      use_obsgts = .FALSE.
-   END IF
-
-   IF (use_Hirs2Obs .OR. use_Hirs3Obs .OR. use_MsuObs .OR. use_AmsuaObs .OR. &
-      use_AmsubObs .OR. use_AirsObs .OR. use_Eos_AmsuaObs .OR. &
-      use_Eos_RadObs .OR. use_HsbObs .OR. use_kma1dvar .OR. use_filtered_rad) THEN
-      use_radiance = .TRUE.
-   ELSE
-      use_radiance = .FALSE.
-   END IF
-
-   ! testing_dm_exact can be set to .true. to force DM_PARALLEL runs 
-   ! to produce results that are bitwise-identical regardless of the number of 
-   ! MPI tasks used.  This is useful for validating that multi-processor runs 
-   ! are not a source of bugs.  Runtime will be much longer.  This option is 
-   ! automatically overridden to .false. for serial or 1-MPI-task runs.  
-
-   IF (testing_dm_exact) THEN
-      call wrf_get_nproc(nproc)
-      IF (nproc == 1) THEN
-         testing_dm_exact = .FALSE.
-         WRITE(UNIT=stdout,FMT='(A)') &
-            ' testing_dm_exact overridden to .FALSE. for serial or 1-MPI-task run'
-      ENDIF
-      ! Only implmenented for Sound and Synop, so switch other types off
-      Use_ShipsObs         = .FALSE.
-      Use_MetarObs         = .FALSE.
-      Use_BogusObs         = .FALSE.
-      Use_PilotObs         = .FALSE.
-      Use_AirepObs         = .FALSE.
-      Use_GeoAMVObs        = .FALSE.
-      Use_PolarAMVObs      = .FALSE.
-      Use_BuoyObs          = .FALSE.
-      Use_ProfilerObs      = .FALSE.
-      Use_SatemObs         = .FALSE.
-      Use_GpspwObs         = .FALSE.
-      Use_GpsrefObs        = .FALSE.
-      Use_SsmiRetrievalObs = .FALSE.
-      Use_SsmiTbObs        = .FALSE.
-      use_ssmt1obs         = .FALSE.
-      use_ssmt2obs         = .FALSE.
-      use_qscatobs         = .FALSE.
-      use_Hirs2Obs         = .FALSE.
-      use_Hirs3Obs         = .FALSE.
-      use_MsuObs           = .FALSE.
-      use_AmsuaObs         = .FALSE.
-      use_AmsubObs         = .FALSE.
-      use_AirsObs          = .FALSE.
-      use_Eos_AmsuaObs     = .FALSE.
-      use_Eos_radObs       = .FALSE.
-      use_HsbObs           = .FALSE.
-      Use_Obsgts           = .FALSE.
-      Use_Radiance         = .FALSE.
-   ENDIF
-    
-   if (num_pseudo > 0) then
-      call wrf_message("Single OBS Test:: Turn off all the OBS switches ***")
-      Use_SynopObs         = .FALSE.
-      Use_ShipsObs         = .FALSE.
-      Use_MetarObs         = .FALSE.
-      Use_SoundObs         = .FALSE.
-      Use_BogusObs         = .FALSE.
-      Use_PilotObs         = .FALSE.
-      Use_AirepObs         = .FALSE.
-      Use_GeoAMVObs        = .FALSE.
-      Use_PolarAMVObs      = .FALSE.
-      Use_BuoyObs          = .FALSE.
-      Use_ProfilerObs      = .FALSE.
-      Use_SatemObs         = .FALSE.
-      Use_GpspwObs         = .FALSE.
-      Use_GpsrefObs        = .FALSE.
-      Use_SsmiRetrievalObs = .FALSE.
-      Use_SsmiTbObs        = .FALSE.
-      use_ssmt1obs         = .FALSE.
-      use_ssmt2obs         = .FALSE.
-      use_qscatobs         = .FALSE.
-      use_Hirs2Obs         = .FALSE.
-      use_Hirs3Obs         = .FALSE.
-      use_MsuObs           = .FALSE.
-      use_AmsuaObs         = .FALSE.
-      use_AmsubObs         = .FALSE.
-      use_AirsObs          = .FALSE.
-      use_Eos_AmsuaObs     = .FALSE.
-      use_Eos_radObs       = .FALSE.
-      use_HsbObs           = .FALSE.
-      Use_Obsgts           = .FALSE.
-      Use_Radiance         = .FALSE.
-   endif
-
    IF ( cv_options_hum < 1 .OR. cv_options_hum > 3 ) THEN
       WRITE(UNIT=errmsg(1),FMT='(A,I3)') &
          'Invalid cv_options_hum = ', cv_options_hum
       call wrf_error_fatal(errmsg(1))
    END IF
-
-   IF ( sfc_assi_options < 1 .OR. sfc_assi_options > 2 ) THEN
-      WRITE(UNIT=errmsg(1),FMT='(A,I3)') &
-         'Invalid sfc_assi_option = ', sfc_assi_options
-      call wrf_error_fatal(errmsg(1))
-   END IF
-
-   IF (Use_SsmiRetrievalObs .OR. Use_SsmiTbObs) THEN
-      OPEN ( UNIT   = ssmi_iunit,     &
-             FILE   = 'ssmi.dat', &
-             FORM   = 'FORMATTED',  &
-             ACCESS = 'SEQUENTIAL', &
-             IOSTAT =  iost,     &
-             STATUS = 'OLD')
-      CLOSE(UNIT=ssmi_iunit)
-
-      IF (iost /= 0) THEN
-         WRITE (UNIT=stderr,FMT='(/,A,I3,A,/)') &
-            ' INPUT FILE UNIT ',ssmi_iunit, &
-            ' FOR SSMI OBSERVATIONS CANNOT BE FOUND OR CANNOT BE OPENED'
-         Use_SsmiRetrievalObs=.false.
-         Use_SsmiTbObs=.false.
-      END IF 
-   END IF 
 
    IF ( vert_corr == 2 ) THEN
       IF ( vertical_ip < 0 .OR. vertical_ip > 2 ) THEN
