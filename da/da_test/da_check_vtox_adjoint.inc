@@ -145,7 +145,8 @@ subroutine da_check_vtox_adjoint( cv_size, xb, xbx, be, ep, cv1, vv, vp, xp, &
    else
       adj_sum_rhs = wrf_dm_sum_real( adj_par_rhs )
    end if
-   PRINT *,'TEST_COVERAGE_da_check_vtox_adjoint:  adj_sum_lhs,adj_sum_rhs = ', &
+   write (unit=stdout,FMT='(A,2F10.2)') &
+      'TEST_COVERAGE_da_check_vtox_adjoint:  adj_sum_lhs,adj_sum_rhs = ', &
       adj_sum_lhs,adj_sum_rhs
 
    IF ( wrf_dm_on_monitor() ) THEN

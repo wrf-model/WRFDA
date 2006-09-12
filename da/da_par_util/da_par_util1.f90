@@ -7,6 +7,7 @@
 MODULE da_par_util1
 
    USE module_wrf_error
+   USE da_constants
 
    !---------------------------------------------------------------------------
    ! PURPOSE: Routines for local-to-global and global-to-local grid operations.

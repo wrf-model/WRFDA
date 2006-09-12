@@ -251,7 +251,7 @@ if test ! -f $DA_ANALYSIS; then
 
       # Outputs
       for HOUR in 01 02 03 04 05 06; do
-         ln -s nl/wrfvar_input_${FG_CCYY[$HOUR]}_${FG_MM[$HOUR]}_${FG_DD[$HOUR]}_${FG_HH[$HOUR]}:00.00 fgat_fg.$HOUR
+         ln -fs nl/wrfvar_input_${FG_CCYY[$HOUR]}_${FG_MM[$HOUR]}_${FG_DD[$HOUR]}_${FG_HH[$HOUR]}:00.00 fgat_fg.$HOUR
       done
 
       # ad

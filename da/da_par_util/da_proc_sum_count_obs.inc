@@ -24,7 +24,6 @@ subroutine da_proc_sum_count_obs ( count_obs )
    INTEGER           :: sumval(1:numvals)     ! Sum across processors.
    INTEGER           :: procval(1:numvals)    ! Partial values on processor to sum.
    INTEGER           :: ierr                  ! Error code from MPI routines.
-   INTEGER           :: myrank                ! Id of my processor.
    INTEGER           :: root                  ! Monitor processor.
    INTEGER           :: offset                ! Index into procval and sumval arrays.
 
@@ -32,10 +31,7 @@ subroutine da_proc_sum_count_obs ( count_obs )
 
 #ifdef DM_PARALLEL
 
-   ! Get rank of monitor processor and broadcast to others.
-   call MPI_COMM_RANK( MPI_COMM_WORLD, myrank, ierr )
-
-   IF (wrf_dm_on_monitor()) root = myrank
+   IF (wrf_dm_on_monitor()) root = myproc
    call wrf_dm_bcast_integer ( root, 1 )
 
    offset = 1
@@ -61,7 +57,7 @@ subroutine da_proc_sum_count_obs ( count_obs )
 
    call MPI_REDUCE(procval, sumval, numvals, MPI_INTEGER, MPI_SUM, root, MPI_COMM_WORLD, IERR )
    
-   IF ( myrank .eq. root ) then
+   IF ( myproc .eq. root ) then
       offset = 1
       call da_unpack_count_obs( count_obs % num_synop, offset, sumval )
       call da_unpack_count_obs( count_obs % num_sound, offset, sumval )

@@ -1577,6 +1577,7 @@ rconfig   character model_type            namelist,record1         1            
 rconfig   character documentation_url     namelist,record1         1              "http://box.mmm.ucar.edu/people/bray/wrfvar/html" - "TBD" "TBD" "TBD"
 rconfig   logical write_increments        namelist,record1         1              .false. -       "write_increments" "write_increments" "T/F"
 rconfig   logical var4d                   namelist,record1         1              .false. -       "var4d"            "var4d"            "T/F"
+rconfig   integer var4d_coupling          namelist,record1         1              1       -       "var4d_coupling"   "var4d_coupling"           "1-2"
 rconfig   logical global                  namelist,record1         1              .false. -       "global"           "global"           "T/F"
 rconfig   integer stdout                  namelist,record1         1              6       -       "stdout"           "stdout"           "1-100"
 rconfig   integer stderr                  namelist,record1         1              0       -       "stderr"           "stderr"           "1-100"

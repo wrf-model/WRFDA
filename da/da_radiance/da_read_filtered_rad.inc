@@ -22,14 +22,10 @@
 
    INTEGER            :: ios
    character(len=50)  :: filename
-   integer            :: myproc, ierr, ndomain
+   integer            :: ierr, ndomain
    logical            :: outside,inside_halo
 
  call init_constants_derived
-
-#ifdef DM_PARALLEL
- call MPI_COMM_RANK( MPI_COMM_WORLD, myproc, ierr )
-#endif
 
  do n = 1, iv%num_inst
 

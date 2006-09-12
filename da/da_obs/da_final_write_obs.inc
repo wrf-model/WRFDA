@@ -19,7 +19,6 @@ subroutine da_final_write_obs( ob, iv, re )
    integer                       :: n, k, iunit
    logical, external             :: wrf_dm_on_monitor
    INTEGER                       :: root      ! Monitor processor.
-   INTEGER                       :: myrank    ! Id of my processor.
    INTEGER                       :: ierr      ! Error code from MPI routines.
    INTEGER                       :: num_obs, num_sound_obs
 

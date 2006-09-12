@@ -26,8 +26,6 @@ subroutine da_proc_diagnostics_collect(num_sound, iv, re )
    REAL, POINTER    :: t(:)
    REAL, POINTER    :: q(:)
 
-   INTEGER :: myrank             ! Id of my processor.
-   INTEGER :: nprocs             ! Number of processors.
    INTEGER :: iproc              ! Loop counter.
    INTEGER :: root               ! Monitor processor.
    INTEGER :: ierr               ! Error code from MPI routines.
@@ -57,13 +55,11 @@ subroutine da_proc_diagnostics_collect(num_sound, iv, re )
    q(1:sum_levels) = 0.0
 
    ! Get rank of monitor processor and broadcast to others.
-   call MPI_COMM_RANK( MPI_COMM_WORLD, myrank, ierr ) 
-   call MPI_COMM_SIZE( MPI_COMM_WORLD, nprocs, ierr )
-   IF ( wrf_dm_on_monitor() ) root = myrank
+   IF ( wrf_dm_on_monitor() ) root = myproc
    call wrf_dm_bcast_integer ( root, 1 )
 
    ! Message pass on_proc and iv field arrays.
-   if (myrank .ne. root) then
+   if (myproc .ne. root) then
       !    Assign on_proc and field arrays.
       obs_level = 0
       do n = 1, num_sound
@@ -91,7 +87,7 @@ subroutine da_proc_diagnostics_collect(num_sound, iv, re )
       call MPI_SEND( q, sum_levels, MPI_DOUBLE_PRECISION, root, &
                     34, MPI_COMM_WORLD, IERR )
    else    
-      do iproc = 1, nprocs-1
+      do iproc = 1, num_procs-1
          call MPI_RECV(on_proc, num_sound, MPI_LOGICAL, MPI_ANY_SOURCE, &
                      30, MPI_COMM_WORLD, STATUS, IERR )
          call MPI_RECV(u, sum_levels, MPI_DOUBLE_PRECISION, MPI_ANY_SOURCE, &
@@ -120,7 +116,7 @@ subroutine da_proc_diagnostics_collect(num_sound, iv, re )
    end if
 
    ! Message pass re field arrays.
-   if (myrank .ne. root) then
+   if (myproc .ne. root) then
       ! Assign field arrays.
       obs_level = 0
       do n = 1, num_sound
@@ -144,7 +140,7 @@ subroutine da_proc_diagnostics_collect(num_sound, iv, re )
       call MPI_SEND( q, sum_levels, MPI_DOUBLE_PRECISION, root, &
                     34, MPI_COMM_WORLD, IERR )
    else
-      do iproc = 1, nprocs-1
+      do iproc = 1, num_procs-1
 
          call MPI_RECV(u, sum_levels, MPI_DOUBLE_PRECISION, MPI_ANY_SOURCE, &
                      31, MPI_COMM_WORLD, STATUS, IERR )

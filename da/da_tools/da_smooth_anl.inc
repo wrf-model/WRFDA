@@ -1,8 +1,8 @@
 subroutine da_smooth_anl(SLAB,IMX,JMX,KX,NPASS,ICRSDOT)
  
-!  SECTION  TOOLS
-!  PURPOSE  SPATIALLY SMOOTH (USUALLY SLAB) TO REMOVE HIGH
-!  FREQUENCY WAVES
+   ! SECTION  TOOLS
+   ! PURPOSE  SPATIALLY SMOOTH (USUALLY SLAB) TO REMOVE HIGH
+   ! FREQUENCY WAVES
 
    IMPLICIT NONE
    
@@ -26,7 +26,7 @@ subroutine da_smooth_anl(SLAB,IMX,JMX,KX,NPASS,ICRSDOT)
       DO LOOP=1,NPASS*2
          N=2-MOD(LOOP,2)
  
-!        FIRST SMOOTH IN THE IMX DIRECTION
+         ! FIRST SMOOTH IN THE IMX DIRECTION
  
          DO I=2,IE
             DO J=2,JE
@@ -40,7 +40,7 @@ subroutine da_smooth_anl(SLAB,IMX,JMX,KX,NPASS,ICRSDOT)
             END DO
          END DO
  
-!        NOW SMOOTH IN THE JMX DIRECTION
+         ! NOW SMOOTH IN THE JMX DIRECTION
  
          DO J=2,JE
             DO I=2,IE

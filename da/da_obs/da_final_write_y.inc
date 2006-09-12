@@ -17,7 +17,6 @@ subroutine da_final_write_y( iv, y )
    integer                       :: n, k, ounit, iunit
    logical, external             :: wrf_dm_on_monitor
    integer                       :: root      ! Monitor processor.
-   integer                       :: myrank    ! Id of my processor.
    integer                       :: ierr      ! Error code from MPI routines.
    integer                       :: sound_num_obs, num_obs
 

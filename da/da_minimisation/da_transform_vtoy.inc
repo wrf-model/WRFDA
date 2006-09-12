@@ -50,23 +50,27 @@ subroutine da_transform_vtoy( cv_size, be, ep, cv, iv, vp, vv, xa, xb, xbx, &
 
       call da_trace("da_transform_vtoy","Starting da_run_wrfplus_tl.ksh")
 #ifdef DM_PARALLEL
-      call da_system_4dvar("da_run_wrfplus_tl.ksh pre")
+      if (var4d_coupling == var4d_coupling_disk_simul) then
+         call da_system_4dvar("da_run_wrfplus_tl.ksh pre")
 
-      IF (wrf_dm_on_monitor()) THEN
-         call system("rm -rf tl/wrf_done")
-         call system("touch tl/wrf_go_ahead")
-         DO WHILE ( .true. )
-            OPEN(wrf_done_unit,file="tl/wrf_done",status="old",err=303)
-            CLOSE(wrf_done_unit)
-            EXIT
-303         CONTINUE
-            CALL system("sleep 1")
-         ENDDO
-      ENDIF
-      CALL wrf_get_dm_communicator ( comm )
-      CALL mpi_barrier( comm, ierr )
+         IF (wrf_dm_on_monitor()) THEN
+            call system("rm -rf tl/wrf_done")
+            call system("touch tl/wrf_go_ahead")
+            DO WHILE ( .true. )
+               OPEN(wrf_done_unit,file="tl/wrf_done",status="old",err=303)
+               CLOSE(wrf_done_unit)
+               EXIT
+303            CONTINUE
+               CALL system("sleep 1")
+            ENDDO
+         ENDIF
+         CALL wrf_get_dm_communicator ( comm )
+         CALL mpi_barrier( comm, ierr )
 
-      call da_system_4dvar("da_run_wrfplus_tl.ksh post ")
+         call da_system_4dvar("da_run_wrfplus_tl.ksh post ")
+      else
+         call system("da_run_wrfplus_tl.ksh")
+      end if
 #else
       call system("da_run_wrfplus_tl.ksh")
 #endif

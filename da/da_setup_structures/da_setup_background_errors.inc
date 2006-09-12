@@ -2,19 +2,19 @@ subroutine da_setup_background_errors( xb, xbx, be, xp, &
                                        its, ite, jts, jte, kts, kte, &
                                        ids, ide, jds, jde, kds, kde )
 
-!------------------------------------------------------------------------------
-!  PURPOSE: Define and allocate components of background errors.
-!           Wrapper subroutine.
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! PURPOSE: Define and allocate components of background errors.
+   !          Wrapper subroutine.
+   !---------------------------------------------------------------------------
 
    IMPLICIT NONE
 
-   TYPE (xb_type), INTENT(IN)  :: xb                    ! First guess structure.
-   TYPE (xbx_type),INTENT(IN)  :: xbx                   ! Header & non-gridded vars.
-   TYPE (be_type), INTENT(OUT) :: be                    ! Back. errors structure.
-   type (xpose_type), intent(inout) :: xp               ! Dimensions and xpose buffers.
-   integer, intent(in)         :: its, ite, jts, jte, kts, kte ! Tile dimensions.
-   integer, intent(in)         :: ids, ide, jds, jde, kds, kde ! Tile dimensions.
+   TYPE (xb_type), INTENT(IN)  :: xb       ! First guess structure.
+   TYPE (xbx_type),INTENT(IN)  :: xbx      ! Header & non-gridded vars.
+   TYPE (be_type), INTENT(OUT) :: be       ! Back. errors structure.
+   type (xpose_type), intent(inout) :: xp  ! Dimensions and xpose buffers.
+   integer, intent(in)         :: its, ite, jts, jte, kts, kte ! Tile dimensions
+   integer, intent(in)         :: ids, ide, jds, jde, kds, kde ! Tile dimensions
 
    IF (trace_use) call da_trace_entry("da_setup_background_errors")
 
@@ -32,4 +32,5 @@ subroutine da_setup_background_errors( xb, xbx, be, xp, &
    IF (trace_use) call da_trace_exit("da_setup_background_errors")
 
 end subroutine da_setup_background_errors
+
 

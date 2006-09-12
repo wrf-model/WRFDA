@@ -327,7 +327,7 @@ loop_level: DO i = 1, platform%info%levels
         IF (.NOT. outside) THEN
           WRITE(UNIT=stdout,FMT='(A,I4,A,F8.2,A,F8.2,A,I3,A,2F8.2)') &
              "Report",report," at",platform%info%lon,"E",platform%info%lat, &
-             "N on processor", my_proc_id,", position", platform%loc%x,platform%loc%y
+             "N on processor", myproc,", position", platform%loc%x,platform%loc%y
         END IF
       END IF
 

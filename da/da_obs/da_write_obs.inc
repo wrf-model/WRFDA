@@ -23,8 +23,6 @@ subroutine da_write_obs( ob, iv, re)
    type (y_type), intent(inout)  :: re      ! residual vector.
       
    integer                       :: n, k, num_obs
-   integer                       :: myrank    ! Id of my processor.
-   integer                       :: ierr      ! Error code from MPI routines.
    integer                       :: ounit     ! Output unit           
 
    if (trace_use) call da_trace_entry("da_write_obs")
@@ -37,8 +35,7 @@ subroutine da_write_obs( ob, iv, re)
    if ( numb_procs > 1) then
 #ifdef DM_PARALLEL
       ! Get output unit for MPI run
-      call MPI_COMM_RANK( MPI_COMM_WORLD, myrank, ierr )
-      ounit = omb_unit*10 +  myrank
+      ounit = omb_unit*10 +  myproc
 #endif
    end if
 

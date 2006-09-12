@@ -266,16 +266,9 @@ subroutine da_interpolate_stats( kzs, kz, meanp_stats, meanp_xb, &
       enddo
       e(:,k2) = work(:)
    enddo
-   ! ................................................................
 
    IF (trace_use) call da_trace_exit("da_interpolate_stats")
 
 end subroutine da_interpolate_stats
-
-
-
-
-
-
 
 

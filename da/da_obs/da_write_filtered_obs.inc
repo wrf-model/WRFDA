@@ -71,7 +71,6 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xb, xp, &
    INTEGER                       :: ounit, nz, mnz
    logical, external             :: wrf_dm_on_monitor
    INTEGER                       :: root      ! Monitor processor.
-   INTEGER                       :: myrank    ! Id of my processor.
    INTEGER                       :: ierr      ! Error code from MPI routines.
 
    if (trace_use) CALL da_trace_entry("da_write_filtered_obs")
@@ -79,8 +78,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xb, xp, &
    ounit = filtered_obs_iunit + 1 
 
 #ifdef DM_PARALLEL
-  call MPI_COMM_RANK( MPI_COMM_WORLD, myrank, ierr )
-   ounit = filtered_obs_iunit + myrank  + 1
+   ounit = filtered_obs_iunit + myproc  + 1
 #endif
 
    zero = 0

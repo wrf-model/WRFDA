@@ -20,7 +20,6 @@ SUBROUTINE da_add_noise_to_ob( iv, ob )
 
    real                          :: z1, z2, z3, z4, z5, z6, z7, dum ! Random numbers.
    integer                       :: n, k     ! Loop counters.
-   integer                       :: myrank    ! Id of my processor.
    integer                       :: ierr      ! Error code from MPI routines.
    integer                       :: ounit     ! Output unit
    integer                       :: num_obs                 
@@ -31,8 +30,7 @@ SUBROUTINE da_add_noise_to_ob( iv, ob )
    if( numb_procs > 1) then
 #ifdef DM_PARALLEL
 ! Get output unit for MPI run
-  call MPI_COMM_RANK( MPI_COMM_WORLD, myrank, ierr )
-  ounit = ounit*10 +  myrank
+  ounit = ounit*10 +  myproc
 #endif
    end if
    dum = -999999.9

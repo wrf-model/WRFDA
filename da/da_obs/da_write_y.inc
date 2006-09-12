@@ -24,8 +24,6 @@ SUBROUTINE da_write_y(iv, y)
    integer                       :: ounit ! Output file unit.
    integer                       :: n, k, num_obs
    real                          :: f1, f2, f3, f4, f5, f6, f7, dum
-   integer                       :: myrank    ! Id of my processor.
-   integer                       :: ierr      ! Error code from MPI routines.
 
    if (trace_use) call da_trace_entry("da_write_y")
 
@@ -42,8 +40,7 @@ SUBROUTINE da_write_y(iv, y)
 #ifdef DM_PARALLEL
    if (numb_procs > 1) then
       ! Get output unit for MPI run
-      call MPI_COMM_RANK( MPI_COMM_WORLD, myrank, ierr )
-      ounit = ounit*10 +  myrank
+      ounit = ounit*10 +  myproc
    end if
 #endif
  

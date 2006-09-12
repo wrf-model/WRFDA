@@ -7,38 +7,32 @@ subroutine da_lcl( P0, Z0, T0, Q0, PLCL, ZLCL, TLCL, QLCL )
 
    real   :: DP, QS, EPS
 
-    DP=5.
-    PLCL=300.
+   DP=5.
+   PLCL=300.
 
-  reports: &
-  DO
+   DO
+      TLCL=T0*((PLCL/P0)**0.286)
 
-    TLCL=T0*((PLCL/P0)**0.286)
+      call da_qfrmrh( PLCL, TLCL, 100., QS )
 
-    call da_qfrmrh( PLCL, TLCL, 100., QS )
+      EPS=QS-Q0
 
-    EPS=QS-Q0
+      IF (EPS >= 0.) THEN
+         ZLCL=(1004./9.81)*(T0-TLCL)+Z0
+         QLCL=QS
+         RETURN
+      ELSE
+         PLCL=PLCL+DP
 
-    IF( EPS >= 0. ) THEN
-
-      ZLCL=(1004./9.81)*(T0-TLCL)+Z0
-      QLCL=QS
-      RETURN
-
-    ELSE
-
-      PLCL=PLCL+DP
-
-      IF ( PLCL >= P0 ) THEN
-        ZLCL=Z0
-        QLCL=Q0
-        PLCL=P0
-        RETURN
+         IF ( PLCL >= P0 ) THEN
+            ZLCL=Z0
+            QLCL=Q0
+            PLCL=P0
+            RETURN
+        END IF
       END IF
-
-    END IF
-
-  ENDDO reports
-
+   ENDDO
 
 end subroutine da_lcl
+
+

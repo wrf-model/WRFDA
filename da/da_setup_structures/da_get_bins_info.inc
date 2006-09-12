@@ -25,9 +25,9 @@ subroutine da_get_bins_info(nj, nk, bin2d, evec_g, eval_g,&
 
    !---------------------------------------------------------------------------
 
-   allocate ( e_vec_loc(1:nj,1:nk,1:nk) )
-   allocate ( e_val_loc(1:nj,1:nk) )
-   if( vert_evalue == 1) then              ! Use global eigen vectors
+   allocate (e_vec_loc(1:nj,1:nk,1:nk))
+   allocate (e_val_loc(1:nj,1:nk))
+   if (vert_evalue == 1) then              ! Use global eigen vectors
       do k = 1, nk
          e_val_loc(1:nj,k)     = eval_g(k)
          do i =1,nk
@@ -35,7 +35,7 @@ subroutine da_get_bins_info(nj, nk, bin2d, evec_g, eval_g,&
          end do  
       end do  
   
-   else if(vert_evalue == 2) then          ! Use local  eigen vectors
+   else if (vert_evalue == 2) then          ! Use local  eigen vectors
       do j = 1, nj
          b = bin2d(1,j)         
          do k=1,nk
@@ -54,8 +54,10 @@ subroutine da_get_bins_info(nj, nk, bin2d, evec_g, eval_g,&
    call da_get_vertical_truncation(max_vert_var, eval_g, be_sub)
    call da_allocate_background_errors(nj, nk, eval_g, evec_g, &
       e_val_loc, e_vec_loc, be_sub)
-   if( be_sub%mz > 0 ) be_sub%val(:,:) = var_scaling * be_sub%val(:,:)
+   if (be_sub%mz > 0) be_sub%val(:,:) = var_scaling * be_sub%val(:,:)
    deallocate ( e_vec_loc )
    deallocate ( e_val_loc )
   
 end subroutine da_get_bins_info
+
+

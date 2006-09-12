@@ -29,28 +29,28 @@ subroutine da_setup_firstguess_wrf( xbx, grid, &
    IF (trace_use) call da_trace_entry("da_setup_firstguess_wrf")
 
    !-----------------------------------------------------------------------
-   ! [0.0] check the xb_date
+   ! [0.0] check the xb_date for 3DVAR
    !-----------------------------------------------------------------------
 
-   write(UNIT=xb_date,FMT='(i4.4,2("-",i2.2),"_",i2.2,2(":",i2.2),".0000")')  &
-        grid%start_year, grid%start_month, grid%start_day, &
-        grid%start_hour, grid%start_minute,grid%start_second
+   if (.NOT. var4d) then
+      write(UNIT=xb_date,FMT='(i4.4,2("-",i2.2),"_",i2.2,2(":",i2.2),".0000")')  &
+           grid%start_year, grid%start_month, grid%start_day, &
+           grid%start_hour, grid%start_minute,grid%start_second
 
-   len = len_trim(ANALYSIS_DATE)
+      len = len_trim(ANALYSIS_DATE)
 
-   write(UNIT=an_date(1:len), fmt='(a)') trim(ANALYSIS_DATE)
+      write(UNIT=an_date(1:len), fmt='(a)') trim(ANALYSIS_DATE)
 
-   seconds = da_diff_seconds(an_date, xb_date)
+      seconds = da_diff_seconds(an_date, xb_date)
 
-   if (seconds > ANALYSIS_ACCU) then
-call da_oi(__FILE__,__LINE__)
-      WRITE(UNIT=errmsg(1),FMT='(A,A,A,A)') &
-         "xb_date=",xb_date," an_date=", an_date
-      WRITE(UNIT=errmsg(2),FMT='(A,I6,A,I6)') &
-         "diff=",seconds,"   ANALYSIS_ACCU=",ANALYSIS_ACCU
-      errmsg(3)="=======> Wrong xb time found???"
-call da_oi(__FILE__,__LINE__)
-      call da_warning(__FILE__,__LINE__,errmsg(1:3))
+      if (seconds > ANALYSIS_ACCU) then
+         WRITE(UNIT=errmsg(1),FMT='(A,A,A,A)') &
+            "xb_date=",xb_date," an_date=", an_date
+         WRITE(UNIT=errmsg(2),FMT='(A,I6,A,I6)') &
+            "diff=",seconds,"   ANALYSIS_ACCU=",ANALYSIS_ACCU
+         errmsg(3)="=======> Wrong xb time found???"
+         call da_warning(__FILE__,__LINE__,errmsg(1:3))
+      endif
    endif
 
    !------------------------------------------------------------------------

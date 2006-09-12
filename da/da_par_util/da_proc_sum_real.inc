@@ -18,21 +18,18 @@ subroutine da_proc_sum_real ( n, value )
 
    REAL              :: apsum(n)             ! Sum across processors.
    INTEGER           :: ierr               ! Error code from MPI routines.
-   INTEGER           :: myrank             ! Id of my processor.
    INTEGER           :: root               ! Monitor processor.
 
    LOGICAL, EXTERNAL :: wrf_dm_on_monitor
 
 #ifdef DM_PARALLEL
-   ! Get rank of monitor processor and broadcast to others.
-   call MPI_COMM_RANK( MPI_COMM_WORLD, myrank, ierr )
 
-   IF (wrf_dm_on_monitor()) root = myrank
+   IF (wrf_dm_on_monitor()) root = myproc
    call wrf_dm_bcast_integer ( root, 1 )
    apsum=0
    call MPI_REDUCE(value, apsum, n, TRUE_MPI_REAL, MPI_SUM, root, MPI_COMM_WORLD, IERR )
 
-   IF (myrank .eq. root) value = apsum
+   IF (myproc .eq. root) value = apsum
 #endif
 
 end subroutine da_proc_sum_real

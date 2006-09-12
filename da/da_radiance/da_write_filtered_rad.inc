@@ -22,11 +22,7 @@
 
    INTEGER            :: ios
    character(len=50)  :: filename
-   integer            :: myproc, ierr, ndomain
-
-#ifdef DM_PARALLEL
- call MPI_COMM_RANK( MPI_COMM_WORLD, myproc, ierr )
-#endif
+   integer            :: ndomain
 
  do n = 1, iv%num_inst
   if (iv%instid(n)%num_rad < 1) cycle

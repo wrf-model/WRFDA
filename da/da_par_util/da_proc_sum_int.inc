@@ -15,21 +15,17 @@ subroutine da_proc_sum_int ( value )
 
    INTEGER           :: sum                   ! Sum across processors.
    INTEGER           :: ierr                  ! Error code from MPI routines.
-   INTEGER           :: myrank                ! Id of my processor.
    INTEGER           :: root                  ! Monitor processor.
 
    LOGICAL, EXTERNAL :: wrf_dm_on_monitor
 
 #ifdef DM_PARALLEL
-   ! Get rank of monitor processor and broadcast to others.
-   call MPI_COMM_RANK( MPI_COMM_WORLD, myrank, ierr )
-
-   IF (wrf_dm_on_monitor()) root = myrank
+   IF (wrf_dm_on_monitor()) root = myproc
    call wrf_dm_bcast_integer ( root, 1 )
    sum=0
    call MPI_REDUCE(value, sum, 1, MPI_INTEGER, MPI_SUM, root, MPI_COMM_WORLD, IERR )
 
-   IF (myrank .eq. root) value = sum
+   IF (myproc .eq. root) value = sum
 #endif
 
 end subroutine da_proc_sum_int

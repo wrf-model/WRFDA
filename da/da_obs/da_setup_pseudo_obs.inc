@@ -1,8 +1,8 @@
 subroutine da_setup_pseudo_obs( iv, ob )
 
-!-------------------------------------------------------------------------
-!  Purpose: Sets up pseudo ob part of observation structure.
-!-------------------------------------------------------------------------
+   !-------------------------------------------------------------------------
+   ! Purpose: Sets up pseudo ob part of observation structure.
+   !-------------------------------------------------------------------------
 
    IMPLICIT NONE
 
@@ -11,12 +11,7 @@ subroutine da_setup_pseudo_obs( iv, ob )
 
    integer                       :: n    ! Loop counters.
 
-  IF (trace_use) call da_trace_entry("da_setup_pseudo_obs")
-
-
-
-!   write(UNIT=stdout, fmt='(a, i8)') &
-!        'num_pseudo=', num_pseudo
+   IF (trace_use) call da_trace_entry("da_setup_pseudo_obs")
 
    iv % num_pseudo = num_pseudo
    ob % num_pseudo = num_pseudo
@@ -51,9 +46,9 @@ subroutine da_setup_pseudo_obs( iv, ob )
          ob % pseudo(n) % p = missing_r
          ob % pseudo(n) % q = missing_r
 
-!------------------------------------------------------------------------
-!        [1.0] Initialise components of innovation vector:
-!------------------------------------------------------------------------
+         !---------------------------------------------------------------
+         ! [1.0] Initialise components of innovation vector:
+         !---------------------------------------------------------------
 
          iv % pseudo(n)%loc%x = pseudo_x
          iv % pseudo(n)%loc%y = pseudo_y
