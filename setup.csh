@@ -97,7 +97,7 @@ if ( $MACHINE == "ln0126en" || $MACHINE == "ln0127en" ) then
    if test $COMPILER == ifort; then
       source /contrib/2.6/intel/9.1.036-64/bin/ifortvars.csh
       setenv MPICH /contrib/2.6/mpich-gm/1.2.6..14a-intel-9.1.042-64
-   fi
+   endif
 endif
 
 # Crayx1
@@ -112,8 +112,8 @@ if ( $MACHINE == "gold.us.cray.com" ) then
       setenv CRTM ~n12138/crtm/crtm_crayx1
       setenv MPICH /opt/cpkg/v4/mpich2/1.0
       setenv WRF_OS crayx1
-   fi
-fi
+   endif
+endif
 
 setenv MPIHOME $MPICH
 setenv PATH    $MPICH/bin:$PATH
