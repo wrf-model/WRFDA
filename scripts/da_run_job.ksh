@@ -54,12 +54,16 @@ if test $HOSTNAME = "bs1101en" -o $HOSTNAME = "bs1201en"; then
 # NCAR IBM(blackforest_nighthawk)=com_nh:
 # @ class      =  share
 ## @ class      =  com_rg8
+$SUBMIT_OPTIONS1
+$SUBMIT_OPTIONS2
+$SUBMIT_OPTIONS3
 # @ queue
 #
 #FSL JET (Alpha/Linux):
 #PBS -V -A sfmlidar
 #PBS -lnodes=4:comp -lwalltime=1000
 #Uncomment for JET: source /usr/local/bin/setup-mpi.csh
+
 export RUN_CMD="$DEBUGGER " # Space important
 . $SCRIPT > $EXP_DIR/index.html 2>&1
 EOF
@@ -80,6 +84,10 @@ elif test $HOSTNAME = "ln0126en" -o $HOSTNAME = "ln0127en" \
 #BSUB -e $EXPT.err               
 #BSUB -q regular  
 #BSUB -W 60
+$SUBMIT_OPTIONS1
+$SUBMIT_OPTIONS2
+$SUBMIT_OPTIONS3
+
 
 # Cannot put - options inside default substitution
 export RUN_CMD_DEFAULT="mpirun.lsf"
