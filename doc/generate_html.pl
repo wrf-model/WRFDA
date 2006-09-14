@@ -141,7 +141,7 @@ closedir (SOURCE);
 if ($#files >= 0) {
   foreach $file (@files){
     if (! -e "$SINKDIR/$file"){
-      `ln -s $SOURCEDIR/$file $SINKDIR/$file`;
+      `ln -fs $SOURCEDIR/$file $SINKDIR/$file`;
     }
   }
 }
