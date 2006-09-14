@@ -562,10 +562,10 @@ state    real   DZS             l        misc      -         Z     irh       "DZ
 # lsm State Variables
 
 state    real   SMOIS            ijl     -          1         Z     i02rhd=(interp_mask_land_field:lu_index)u=(copy_fcnm)    "SMOIS"            "SOIL MOISTURE"     "m3 m-3"
-state    real   SH2O             ijl     -          1         Z     i02rhd=(interp_mask_land_field:lu_index)u=(copy_fcnm)    "SH2O"             "SOIL LIQUID WATER" "m3 m-3"
+#state    real   SH2O             ijl     -          1         Z     i02rhd=(interp_mask_land_field:lu_index)u=(copy_fcnm)    "SH2O"             "SOIL LIQUID WATER" "m3 m-3"
 state    real   XICE             ij     misc        1         -     i012rhd=(interp_mask_water_field:lu_index)u=(copy_fcnm)  "XICE"             "SEA ICE FLAG"  ""
-state    real   SMSTAV           ij     misc        1         -      rd=(interp_mask_land_field:lu_index)       "SMSTAV"           "MOISTURE AVAILABILITY" ""
-state    real   SMSTOT           ij     misc        1         -      r                                          "SMSTOT"           "TOTAL SOIL MOISTURE" "m3 m-3"
+#state    real   SMSTAV           ij     misc        1         -      rd=(interp_mask_land_field:lu_index)       "SMSTAV"           "MOISTURE AVAILABILITY" ""
+#state    real   SMSTOT           ij     misc        1         -      r                                          "SMSTOT"           "TOTAL SOIL MOISTURE" "m3 m-3"
 
 state    real   SFCRUNOFF        ij     misc        1         -      rhd=(interp_mask_land_field:lu_index)      "SFROFF"           "SURFACE RUNOFF"     "mm"
 state    real   UDRUNOFF         ij     misc        1         -      rhd=(interp_mask_land_field:lu_index)      "UDROFF"           "UNDERGROUND RUNOFF" "mm"
@@ -573,28 +573,28 @@ state  integer  IVGTYP           ij     misc        1         -     i02rhd=(inte
 state  integer  ISLTYP           ij     misc        1         -     i02rhd=(interp_fcni)u=(copy_fcni)            "ISLTYP"           "DOMINANT SOIL CATEGORY"       ""
 state    real   VEGFRA           ij     misc        1         -     i012rhd=(interp_mask_land_field:lu_index)u=(copy_fcnm)   "VEGFRA"           "VEGETATION FRACTION" ""
 state    real   SFCEVP           ij     misc        1         -      r                                          "SFCEVP"           "SURFACE EVAPORATION" "kg m-2"
-state    real   GRDFLX           ij     misc        1         -      rh                                         "GRDFLX"           "GROUND HEAT FLUX" "W m-2"
-state    real   SFCEXC           ij     misc        1         -      r                                          "SFCEXC "          "SURFACE EXCHANGE COEFFICIENT"   "m s-1"
+#state    real   GRDFLX           ij     misc        1         -      rh                                         "GRDFLX"           "GROUND HEAT FLUX" "W m-2"
+#state    real   SFCEXC           ij     misc        1         -      r                                          "SFCEXC "          "SURFACE EXCHANGE COEFFICIENT"   "m s-1"
 
 state    real   ACSNOW           ij     misc        1         -      rd=(interp_mask_land_field:lu_index)u=(copy_fcnm)       "ACSNOW"           "ACCUMULATED SNOW"         "kg m-2"
 state    real   ACSNOM           ij     misc        1         -      rd=(interp_mask_land_field:lu_index)u=(copy_fcnm)       "ACSNOM"           "ACCUMULATED MELTED SNOW"  "kg m-2"
 state    real   SNOW             ij     misc        1         -     i01rhd=(interp_mask_land_field:lu_index)u=(copy_fcnm)    "SNOW"             "SNOW WATER EQUIVALENT"    "kg m-2"
 state    real   SNOWH            ij     misc        1         -     i01rhd=(interp_mask_land_field:lu_index)u=(copy_fcnm)    "SNOWH"            "PHYSICAL SNOW DEPTH"      "m"
-state    real   CANWAT           ij     misc        1         -     i01rhd=(interp_mask_land_field:lu_index)u=(copy_fcnm)    "CANWAT"           "CANOPY WATER"             "kg m-2"
+#state    real   CANWAT           ij     misc        1         -     i01rhd=(interp_mask_land_field:lu_index)u=(copy_fcnm)    "CANWAT"           "CANOPY WATER"             "kg m-2"
 state    real   SST              ij     misc        1         -     i0125rhd=(interp_mask_water_field:lu_index)   "SST"              "SEA SURFACE TEMPERATURE" "K"
-state  integer  IFNDSNOWH        -      misc        1         -     i         "FNDSNOWH" "SNOWH_LOGICAL"
-state  integer  IFNDSOILW        -      misc        1         -     i         "FNDSOILW" "SOILW_LOGICAL"
+#state  integer  IFNDSNOWH        -      misc        1         -     i         "FNDSNOWH" "SNOWH_LOGICAL"
+#state  integer  IFNDSOILW        -      misc        1         -     i         "FNDSOILW" "SOILW_LOGICAL"
 
 # RUC LSM
-state    real   SMFR3D           ijl    misc        1         Z      r        "SMFR3D"               "SOIL ICE" ""
-state    real   KEEPFR3DFLAG     ijl    misc        1         Z      r        "KEEPFR3DFLAG          "FLAG - 1. FROZEN SOIL YES, 0 - NO"             ""
+#state    real   SMFR3D           ijl    misc        1         Z      r        "SMFR3D"               "SOIL ICE" ""
+#state    real   KEEPFR3DFLAG     ijl    misc        1         Z      r        "KEEPFR3DFLAG          "FLAG - 1. FROZEN SOIL YES, 0 - NO"             ""
 
 # MRF PBL variables***25Aug 2002*****
-i1      real   PSIM           ij     misc        1         -     -         "PSIM"                "SIMILARITY FUNCTION FOR MOMENTUM"     ""
-i1      real   PSIH           ij     misc        1         -     -         "PSIH"                "SIMILARITY FUNCTION FOR HEAT"         ""
-i1      real   WSPD           ij     misc        1         -     -         "WSPD"                "Wind speed"                           "m s-1"
-i1      real   GZ1OZ0         ij     misc        1         -     -         "GZ1OZ0"              "LOG OF Z1 over Z0"                     ""
-i1      real   BR             ij     misc        1         -     -         "BR"                  "Bulk Richardson"                       ""
+#i1      real   PSIM           ij     misc        1         -     -         "PSIM"                "SIMILARITY FUNCTION FOR MOMENTUM"     ""
+#i1      real   PSIH           ij     misc        1         -     -         "PSIH"                "SIMILARITY FUNCTION FOR HEAT"         ""
+#i1      real   WSPD           ij     misc        1         -     -         "WSPD"                "Wind speed"                           "m s-1"
+#i1      real   GZ1OZ0         ij     misc        1         -     -         "GZ1OZ0"              "LOG OF Z1 over Z0"                     ""
+#i1      real   BR             ij     misc        1         -     -         "BR"                  "Bulk Richardson"                       ""
 
 # MYJ PBL variables
 #state    real   tke_myj        ijk     misc        1         -      r        "tke_myj"               "TKE FROM MELLOR-YAMADA-JANJIC      "m2 s-2"
@@ -1605,7 +1605,7 @@ rconfig   logical print_detail_testing    namelist,record1         1            
 rconfig   logical print_detail_parallel   namelist,record1         1              .false. -       "print_detail_parallel" "print_detail_parallel"   "T/F"
 rconfig   logical print_detail_be         namelist,record1         1              .false. -       "print_detail_be"   "print_detail_be"  "T/F"
 rconfig   logical print_detail_timing     namelist,record1         1              .false. -       "print_detail_timing"   "print_detail_timing"  "T/F"
-rconfig   logical use_html                namelist,record1         1              .false. -       "use_html"              "use_html"             "T/F"
+rconfig   logical use_html                namelist,record1         1              .true. -        "use_html"              "use_html"             "T/F"
 rconfig   logical obs_jrb                 namelist,record1         1              .false. -       "obs_jrb"           "obs_jrb"          "T/F"
 
 rconfig   character analysis_type         namelist,record2         1              "3D-VAR" -       "TBD"              "TBD"              "3D-PSAS or 3D-VAR"

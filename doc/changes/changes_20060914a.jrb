@@ -1,0 +1,26 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: John Bray
+Date: 09/14/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Remove more redundant variables from Registry.wrfvar, make use_html=true
+by default
+
+
+------------------------------------------------------
+Tests:
+
+balsam: con200 run
+
+--------------------------------------------------------------------------------------
+
+File changes:
+------------
+
+A    doc/changes/changes_20060914a.jrb
+M    Registry/Registry.wrfvar
