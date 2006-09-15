@@ -7,7 +7,7 @@ set compare_be = 0
 setenv WRF_EM_CORE 1
 setenv WRF_DA_CORE 0
 
-if ( !  -e configure.wrf  ) then
+if ( !  -e configure.wrfvar  ) then
   echo "You need to configure the code first."
   echo "Please do ./configure_new and then ./compile_new."
   exit 1
