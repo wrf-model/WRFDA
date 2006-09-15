@@ -209,7 +209,7 @@ DA_Minimisation.o:	\
 			DA_Minimisation/DA_Minimise_QN.inc
 			$(RM) $@
 			$(CPP) -I./DA_Minimisation $(CPPFLAGS_3DVAR) DA_Minimisation/DA_Minimisation.F > DA_Minimisation.f
-			$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) DA_Minimisation.f
+			$(FC) -c $(FCBASEOPTS) $(MODULE_DIRS) DA_Minimisation.f
 
 DA_Setup_Structures.o:	\
 			DA_Define_Structures.o \
@@ -350,7 +350,7 @@ DA_Obs.o:		\
 			DA_Obs/da_write_y.inc
 			$(RM) $@
 			$(CPP) -I./DA_Obs $(CPPFLAGS_3DVAR) DA_Obs/DA_Obs.F > DA_Obs.f
-			$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) DA_Obs.f
+			$(FC) -c $(FCBASEOPTS) $(MODULE_DIRS) DA_Obs.f
 
 da_pseudo.o:		\
 			DA_Constants.o \
@@ -738,7 +738,7 @@ DA_SSMI.o:		\
 			DA_SSMI/da_transform_xtoy_ssmt2_adj.inc
 			$(RM) $@
 			$(CPP) -I./DA_SSMI $(CPPFLAGS_3DVAR) DA_SSMI/DA_SSMI.F > DA_SSMI.f
-			$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) DA_SSMI.f
+			$(FC) -c $(FCBASEOPTS) $(MODULE_DIRS) DA_SSMI.f
 
 da_qscat.o:		\
 			DA_Constants.o \
@@ -1186,7 +1186,7 @@ DA_Test.o:	\
 			DA_Test/set_tst_trnsf_fld.inc
 			$(RM) $@
 			$(CPP) -I./DA_Test $(CPPFLAGS_3DVAR) DA_Test/DA_Test.F > DA_Test.f
-			$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) DA_Test.f
+			$(FC) -c $(FCBASEOPTS) $(MODULE_DIRS) DA_Test.f
 
 da_gen_be.o:	         \
 			DA_Constants.o			\
