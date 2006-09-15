@@ -2,11 +2,11 @@
 
 var : wrfvar
 
-wrfvar  : advance_cymdh.exe da_update_bc.exe $(WRFVAR_OBJS) $(WRFVAR_LIBS) wrfvar.o
+wrfvar  : advance_cymdh.exe da_update_bc.exe $(WRFVAR_LIBS) $(WRFVAR_OBJS) wrfvar.o
 	$(LD) -o wrfvar.exe $(LDFLAGS) wrfvar.o $(WRFVAR_LIB)
 	cp wrfvar.exe ../main
 
-wrfvar_esmf  : advance_cymdh.exe da_update_bc.exe $(WRFVAR_OBJS) $(WRFVAR_LIBS) wrfvar_esmf.o \
+wrfvar_esmf  : advance_cymdh.exe da_update_bc.exe $(WRFVAR_LIBS) $(WRFVAR_OBJS) wrfvar_esmf.o \
           da_wrfvar_esmf_super.o
 	$(LD) -o wrfvar_esmf.exe $(LDFLAGS) wrfvar_esmf.o $(WRFVAR_LIB) \
           da_wrfvar_esmf_super.o

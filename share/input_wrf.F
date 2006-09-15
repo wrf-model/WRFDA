@@ -462,7 +462,9 @@ print *,'dx_compare,dy_compare = ',dx_compare,dy_compare
                 CALL wrf_message( "**WARNING** Time in input file not equal to time on domain **WARNING**" )
                 WRITE(wrf_err_message,*) "**WARNING** Trying next time in file ",TRIM(fname)," ..."
                 CALL wrf_message( TRIM(wrf_err_message) )
-                GOTO 3003
+                WRITE(wrf_err_message,*) "**JRB** GOTO 3003 nobbled **JRB**"
+                CALL wrf_message( TRIM(wrf_err_message) )
+!                GOTO 3003
             ENDIF
         CASE DEFAULT
       END SELECT

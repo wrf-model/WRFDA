@@ -1,7 +1,5 @@
 #makefile to build a wrf-phdf5 with netCDF
 
-include ../../configure.wrf
-
 OBJSL   = wrf-phdf5.o wrf-phdf5attr.o wrf-phdf5support.o
 OBJS    = $(OBJSL)
 OPTS    = -bmaxdata:0x80000000
@@ -34,7 +32,7 @@ wrf-phdf5.o:             wrf-phdf5.F90 wrf-phdf5attr.o wrf-phdf5support.o
 			$(FC) $(FFLAGS) -c wrf-phdf5.f
 
 clean :
-	@ $(RM) *.f *.o *.mod
+	@ rm -rf *.f *.o *.mod
 
 superclean:
-	@ $(RM) *.a
+	@ rm -rf *.a

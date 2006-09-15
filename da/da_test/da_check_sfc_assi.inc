@@ -144,7 +144,8 @@ subroutine da_check_sfc_assi( xb, xa, iv, xp, y, &
 
    adj_ttl_lhs = wrf_dm_sum_real( partial_lhs )
    adj_ttl_rhs = wrf_dm_sum_real( partial_rhs )
-   PRINT *,'TEST_COVERAGE_check_sfc_assi_A:  adj_ttl_lhs,adj_ttl_rhs = ', &
+   write (unit=stdout,fmt='(A,2F10.2)') &
+      'TEST_COVERAGE_check_sfc_assi_A:  adj_ttl_lhs,adj_ttl_rhs = ', &
       adj_ttl_lhs,adj_ttl_rhs
    IF ( wrf_dm_on_monitor() ) THEN
       write(UNIT=stdout, fmt='(A,1pe22.14)') &
@@ -172,3 +173,6 @@ subroutine da_check_sfc_assi( xb, xa, iv, xp, y, &
    IF (trace_use) call da_trace_exit("da_check_sfc_assi")
    
 END subroutine da_check_sfc_assi
+
+
+

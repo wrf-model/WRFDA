@@ -31,38 +31,26 @@ if test $HOSTNAME = "bs1101en" -o $HOSTNAME = "bs1201en"; then
    export POE=true
 
    cat > job.ksh <<EOF
-#!/usr/bin/ksh93
-# ksh93 is not as ancient and brain dead as /bin/ksh
-##@ network.MPI=csss,shared,us
-#IBM:
-# @ job_type   = parallel
-# @ environment = COPY_ALL
-# @ job_name   = $EXPT
-# @ output     = $EXPT.e\$(jobid)
-# @ error      = $EXPT.o\$(jobid)
-# @ node       = $NODES
-# @ notification = never
-## @ network.MPI    = css0,shared,us
-# @ network.MPI    = css0,shared,ip
-# @ total_tasks = $NUM_PROCS
-# @ node_usage = shared
-# @ checkpoint = no
+#!/bin/ksh
+# @ job_type         = parallel
+# @ environment      = COPY_ALL
+# @ job_name         = $EXPT
+# @ output           = $EXPT.e\$(jobid)
+# @ error            = $EXPT.o\$(jobid)
+# @ node             = $NODES
+# @ notification     = never
+# @ network.MPI      = css0,shared,ip
+# @ total_tasks      = $NUM_PROCS
+# @ node_usage       = shared
+# @ checkpoint       = no
 # @ wall_clock_limit = 01:30:00
 # NCEP IBM=dev
 # NCAR IBM(bluesky)=com_rg8:
-# NCAR IBM(blackforest)=com_reg:
-# NCAR IBM(blackforest_nighthawk)=com_nh:
 # @ class      =  share
-## @ class      =  com_rg8
 $SUBMIT_OPTIONS1
 $SUBMIT_OPTIONS2
 $SUBMIT_OPTIONS3
 # @ queue
-#
-#FSL JET (Alpha/Linux):
-#PBS -V -A sfmlidar
-#PBS -lnodes=4:comp -lwalltime=1000
-#Uncomment for JET: source /usr/local/bin/setup-mpi.csh
 
 export RUN_CMD="$DEBUGGER " # Space important
 . $SCRIPT > $EXP_DIR/index.html 2>&1
@@ -75,7 +63,6 @@ elif test $HOSTNAME = "ln0126en" -o $HOSTNAME = "ln0127en" \
 #
 # LSF batch script to run a serial code
 #
-##BSUB -P 93300070  
 #BSUB -x       
 #BSUB -a mpich_gm      
 #BSUB -n $NUM_PROCS              

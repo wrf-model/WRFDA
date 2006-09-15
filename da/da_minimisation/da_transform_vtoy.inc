@@ -43,8 +43,7 @@ subroutine da_transform_vtoy( cv_size, be, ep, cv, iv, vp, vv, xa, xb, xbx, &
                            its, ite, jts, jte, kts, kte )
 
    if (var4d) then
-      filnam = 'tl00'
-      call da_transfer_xatowrftl( grid, config_flags, filnam, &
+      call da_transfer_xatowrftl( grid, config_flags, 'tl01', &
 #include "em_actual_args.inc"
                                  )
 
@@ -78,7 +77,7 @@ subroutine da_transform_vtoy( cv_size, be, ep, cv, iv, vp, vv, xa, xb, xbx, &
 
       do nobwin=1, num_fgat_time
          iv%current_ob_time = nobwin
-         write(filnam,'(a2,i2.2)') 'tl',nobwin-1
+         write(filnam,'(a2,i2.2)') 'tl',nobwin
          call da_transfer_wrftltoxa( grid, config_flags, filnam, &
 #include "em_actual_args.inc"
                                  )

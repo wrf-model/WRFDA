@@ -167,11 +167,11 @@ subroutine da_wrfvar_init( no_init1 )
    ! 
    !</DESCRIPTION>
 
-   ! call med_initialdata_input( head_grid , config_flags )
+   ! call med_initialdata_input( head_grid , config_flags,'fg01' )
 
    IF ((config_flags%real_data_init_type == 1) .or. &
        (config_flags%real_data_init_type == 3)) THEN
-      call da_med_initialdata_input( head_grid , config_flags)
+      call da_med_initialdata_input( head_grid , config_flags,'fg01')
    END IF
 
    ! JRB

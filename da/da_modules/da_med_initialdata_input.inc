@@ -1,27 +1,26 @@
-subroutine da_med_initialdata_input (grid, config_flags, in_date, in_filename)
+subroutine da_med_initialdata_input (grid, config_flags, filename, in_date)
 
    IMPLICIT NONE
 
-   !--Arguments
+   ! Arguments
 
    TYPE(domain)                               :: grid
    TYPE (grid_config_rec_type), INTENT(INOUT) :: config_flags
 
+   CHARACTER(*),  INTENT (in)                 :: filename
    CHARACTER(*),  INTENT (in),  OPTIONAL      :: in_date
-   CHARACTER(*),  INTENT (in),  OPTIONAL      :: in_filename
 
-   !--Local
+   ! Local
 
    INTEGER                 :: fid , ierr , status, n, nsave
-   CHARACTER (LEN=80)      :: file_name
    CHARACTER (LEN=80)      :: message
 
    INTEGER :: julyr, julday
    REAL    :: gmt
 
-   !------------------------------------------------------------------------------
-
    IF (trace_use) call da_trace_entry("da_med_initialdata_input")
+   IF (trace_use) call da_trace("da_med_initialdata_input", &
+      Message="Reading "//trim(filename))
 
    ! Initialize the mother domain.
 
@@ -31,24 +30,18 @@ subroutine da_med_initialdata_input (grid, config_flags, in_date, in_filename)
 
    grid%input_from_file = .true.
 
-   IF (present(in_filename)) THEN
-      file_name = trim(in_filename)
-   ELSE
-      file_name = 'wrfvar_input'
-   END IF
-
-   call ext_ncd_open_for_read( trim(file_name), 0, 0, "", fid, ierr)
+   call ext_ncd_open_for_read( trim(filename), 0, 0, "", fid, ierr)
 
    IF (ierr /= 0) THEN
       write(unit=errmsg(1), fmt='(2a)') &
-         'Netcdf error opening file:', trim(file_name)
+         'Netcdf error opening file:', trim(filename)
       call da_error(__FILE__,__LINE__,errmsg(1:1))
    endif
 
    call ext_ncd_get_next_time( fid, current_date, Status )
 
    if (present(in_date)) then
-      !-----Set start_date to current_date.
+      ! Set start_date to current_date.
       read(in_date(1:19), fmt='(i4, 5(1x, i2))') &
          grid%start_year,   &
          grid%start_month,  &
@@ -62,18 +55,18 @@ subroutine da_med_initialdata_input (grid, config_flags, in_date, in_filename)
         message = 'current_date='//trim(current_date)// &
            ', in_date='//trim(in_date)
          call wrf_debug ( 100 , trim(message) )
-         if(current_date(1:19) == in_date(1:19)) then
+         if (current_date(1:19) == in_date(1:19)) then
             nsave = n - 1
             exit
          endif
          call ext_ncd_get_next_time( fid, current_date, Status )
       enddo
 
-      if(nsave < 0) then
+      if (nsave < 0) then
          call wrf_error_fatal("Can not find the needed time")
       endif
    else
-      !-----Set start_date to current_date.
+      ! Set start_date to current_date.
       read(current_date(1:19), fmt='(i4, 5(1x, i2))') &
            grid%start_year,  &
            grid%start_month, &
@@ -107,12 +100,12 @@ subroutine da_med_initialdata_input (grid, config_flags, in_date, in_filename)
    call ext_ncd_ioclose(fid, ierr)
 
    call wrf_debug ( 100 , __FILE__//': calling open_r_dataset for wrfvar input' )
-   call open_r_dataset ( fid, TRIM(file_name), grid , config_flags , &
+   call open_r_dataset ( fid, TRIM(filename), grid , config_flags , &
       "DATASET=INPUT", ierr )
 
    IF ( ierr .NE. 0 ) THEN
      WRITE( wrf_err_message , * ) __FILE__//': error opening ', &
-       TRIM(file_name),' for reading ierr=',ierr
+       TRIM(filename),' for reading ierr=',ierr
      call wrf_error_fatal ( wrf_err_message )
    ENDIF
 

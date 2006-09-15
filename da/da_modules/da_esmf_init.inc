@@ -166,7 +166,7 @@ subroutine da_wrfvar_init( gcomp, importState, exportState, clock, rc )
 
    IF ((config_flags%real_data_init_type == 1) .OR. &
        (config_flags%real_data_init_type == 3)) THEN
-      call da_med_initialdata_input( head_grid , config_flags )
+      call da_med_initialdata_input( head_grid , config_flags,'fg01' )
    END IF
 
    !<DESCRIPTION>

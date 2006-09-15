@@ -104,8 +104,7 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
       grid%dyn_opt = DYN_EM_TL
       call nl_set_dyn_opt ( 1 , DYN_EM_TL )
 
-      filnam ='tldf'
-      call da_med_initialdata_input( grid , config_flags, in_filename=filnam )
+      call da_med_initialdata_input( grid , config_flags, 'tldf')
 
       grid%dyn_opt = ndynopt
       call nl_set_dyn_opt ( 1 , DYN_EM )

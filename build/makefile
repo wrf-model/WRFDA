@@ -1,4 +1,4 @@
-include configure.wrf
+include configure.wrfvar
 
 setup : depend
 
@@ -27,11 +27,7 @@ links :
 	@ $(LN) $(IO_GRIB1)/* .
 	@ $(LN) $(IO_GRIB2)/* .
 	@ $(LN) $(IOAPI_SHARE)/* .
-	@ $(LN) $(BLAS)/* .
-	@ $(LN) $(LAPACK)/* .
-	@ $(LN) $(FFTPACK5)/* .
 	@ $(LN) $(ESMF_TIME_F90)/* .
-	@ $(LN) $(BUFR_NCEP_NCO)/* .
 	@ $(LN) $(IO_NETCDF)/*.code .
 	@ $(LN) $(ARCH)/*.sed .
 	@ $(LN) $(CONVERTOR)/convert_tool/* .
@@ -58,11 +54,7 @@ include io_int.make
 include io_netcdf.make
 include io_grib.make
 include ioapi_share.make
-include bufr_ncep_nco.make
-include lapack.make
-include blas.make
-include fftpack5.make
-include RSL_LITE.make
+#include RSL_LITE.make
 include main.make
 
 real_em.o : real_em.F version_decl module_bc.o module_big_step_utilities_em.o \
@@ -102,6 +94,28 @@ libwrfvar.a : $(WRFVAR_OBJS)
 	$(AR) libwrfvar.a $(WRFVAR_OBJS)
 	$(RANLIB) libwrfvar.a
 
+# External libraries
+
+blas : $(BLAS)/libblas.a
+
+lapack : blas $(LAPACK)/liblapack.a
+
+fftpack5 : da_constants.o $(FFTPACK5)/libfftpack5.a
+
+bufr : $(BUFR_NCEP_NCO)/libbufr.a
+
+$(BLAS)/libblas.a :
+	@ ( cd $(BLAS); make all )
+
+$(LAPACK)/liblapack.a :
+	@ ( cd $(LAPACK); make all )
+
+$(FFTPACK5)/libfftpack5.a :
+	( cd $(FFTPACK5); make all )
+
+$(BUFR_NCEP_NCO)/libbufr.a :
+	( cd $(BUFR_NCEP_NCO); make all )
+
 clean : arch_clean
 	@ $(RM) *.exe *.o *.mod *.b *.a *.f inc/*.inc frame/*.f90 registry \
           Registry_tmp* module_state_description.f90 bufrlib.prm \
@@ -115,6 +129,6 @@ superclean : clean arch_superclean
           bufrlib.param *.sed registry \
           convert_tool kma_wave2grid wave2grid_kma *.csh version_decl \
           *.bsh *.csh Utl* macros_utl module_dm_warning rsl_cpp_flags \
-          scl_plotting_routines configure.wrf ../configure.wrf \
+          scl_plotting_routines configure.wrfvar ../configure.wrfvar \
           decode_l2_airs.README time_window.nl \
           da_macros_utl links arch

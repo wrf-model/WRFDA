@@ -62,7 +62,8 @@ FPPFLAGS1   = CONFIGURE_NETCDF_FLAG CONFIGURE_RTTOV_FLAG \
 CCFLAGS1    = -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) \
               -DLANDREAD_STUB
 WRFIO       = CONFIGURE_WRFIO_NF wrfio_int wrfio_grib1
-INCS        = -I. -I./inc CONFIGURE_RTTOV_INC CONFIGURE_CRTM_INC
+INCS        = -I. -I./inc CONFIGURE_RTTOV_INC CONFIGURE_CRTM_INC \
+                -I$(NETCDF_PATH)/include
 LDFLAGS1    = CONFIGURE_LDFLAGS
 
 # switch to use separately installed ESMF library for coupling:  1==true
@@ -81,6 +82,7 @@ NETCDF_LIB_PATH = ${NETCDF_PATH}/lib
 # Short cuts to directories
 
 ARCH      = $(DEVTOP)/arch
+BUILD     = $(DEVTOP)/build
 CHEM      = $(DEVTOP)/chem
 CONVERTOR = $(DEVTOP)/convertor
 DA        = $(DEVTOP)/da
@@ -118,10 +120,10 @@ RSL_STUBS     = $(EXTERNAL)/RSL_STUBS
 PHDF5_LIB     = -L$(EXTERNAL)/io_phdf5 -lwrfio_phdf5 -L$(PHDF5_PATH)/lib \
   -lhdf5_fortran -lhdf5 -lm -lz -L$(PHDF5PATH)/lib -lsz
 ESMF_TIME_LIB = -lesmf_time
-LAPACK_LIB    = -llapack
-BLAS_LIB      = -lblas
-BUFR_LIB      = -lbufr
-FFTPACK5_LIB  = -lfftpack5
+LAPACK_LIB    = -L$(LAPACK) -llapack
+BLAS_LIB      = -L$(BLAS) -lblas
+BUFR_LIB      = -L$(BUFR_NCEP_NCO) -lbufr
+FFTPACK5_LIB  = -L$(FFTPACK5) -lfftpack5
 GRIB_SHARE_LIB  = -L$(IO_GRIB_SHARE) -lio_grib_share
 GRIB1_LIB       = -L$(IO_GRIB1) -lio_grib1
 GRIB2_LIB       = -L$(IO_GRIB2) -lio_grib2

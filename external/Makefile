@@ -3,7 +3,7 @@ clean :
 	@ ( cd io_netcdf ;  make clean )
 	@ ( cd io_int ; make clean )
 	@ ( cd io_mcel ;  make clean )
-	@ ( cd io_phdf5 ; make clean )
+	@ ( cd io_phdf5 ; make -i clean )
 	@ ( cd io_grib1 ; make clean )
 	@ ( cd io_grib_share ; make clean )
 	@ ( cd io_grib2 ; make clean )

@@ -19,6 +19,9 @@ if [ "$option" = "wrf" ] ; then
 elif [ "$option" = "wrf_em" ] ; then
     REGISTRY=Registry.EM
     EM_CORE=1
+elif [ "$option" = "wrf_em_nl" ] ; then
+    REGISTRY=Registry.EM_NL
+    EM_CORE=1
 elif [ "$option" = "wrf_em_chem" ] ; then
     REGISTRY=Registry.NMM
     EM_CORE=1
@@ -42,10 +45,11 @@ elif [ "$option" = "be" ] ; then
     DA_CORE=1
     EM_CORE=1
 else
-   echo "Please type : <configure wrf|wrf_em|wrf_em_chem|wrf_nmm> to compile wrf,"
-   echo "    or type : <configure wrfvar> to compile wrfvar."
-   echo "    or type : <configure wrfplus> to compile wrf for 4dvar."
-   echo "    or type : <configure be> to compile be."
+   echo "Please type : <configure_new wrf|wrf_em|wrf_em_chem|wrf_nmm> to compile wrf,"
+   echo "    or type : <configure_new wrf_em_nl> to compile non-linear wrf for 4DVAR."
+   echo "    or type : <configure_new wrfvar> to compile wrfvar."
+   echo "    or type : <configure_new wrfplus> to compile wrf TL/AD for 4DVAR."
+   echo "    or type : <configure_new be> to compile be."
    exit
 fi
 
@@ -72,7 +76,7 @@ do
     ac_echo_test=`echo foo 1>&1`
     if test -z "$ac_echo_test" ; then
        print_error "Your sh shell does not handle the output redirection"
-       print_error "1>&1 correctly.  Configure will work around this problem,"
+       print_error "1>&1 correctly.  Configure_new will work around this problem,"
        print_error "but you should report the problem to your vendor."
     fi
   fi
@@ -135,10 +139,10 @@ if test -n "$PERL" ; then
 
     # Should do a test first for ch_p4 etc.
     if test "$perlversion" -lt 5 ; then
-        echo "WRF build requires perl version 5, which configure did not find."
+        echo "WRF build requires perl version 5, which configure_new did not find."
         echo "You can set the environment variable PERL to contain the "
         echo "location of perl version 5."
-        echo "Configure believes that $PERL is version $perlversion ."
+        echo "Configure_new believes that $PERL is version $perlversion ."
         PERL=""
     fi
     
@@ -406,32 +410,32 @@ if test -n "$PERL" ; then
      -coamps_core=$COAMPS_CORE -exp_core=$EXP_CORE
 fi
 
-export CONFIG=configure.wrf
+export CONFIG=configure.wrfvar
 
 ln -fs $PWD/$CONFIG build
 
 # new feb 2005.  test whether MPI-2
-if test -e $CONFIG ; then
-  grepresult=`grep DM_PARALLEL $CONFIG`
-  if [ "$grepresult" != "" ] ; then
-    echo testing for MPI_Comm_f2c and MPI_Comm_c2f 
-    /bin/rm -f tools/mpi2_test
-    make mpi2_test
-    if test -x tools/mpi2_test ; then
-      echo "  " MPI_Comm_f2c and MPI_Comm_c2f are supported
-      sed '/^CC .*=/s/$/ -DMPI2_SUPPORT/' $CONFIG > xx$$ ; /bin/mv xx$$ $CONFIG
-    else
-      echo "  " MPI_Comm_f2c and MPI_Comm_c2f are not supported
-    fi 
-    /bin/rm -f tools/mpi2_test
-  fi
-fi
+#if test -e $CONFIG ; then
+#  grepresult=`grep DM_PARALLEL $CONFIG`
+#  if [ "$grepresult" != "" ] ; then
+#    echo testing for MPI_Comm_f2c and MPI_Comm_c2f 
+#    /bin/rm -f tools/mpi2_test
+#    make mpi2_test
+#    if test -x tools/mpi2_test ; then
+#      echo "  " MPI_Comm_f2c and MPI_Comm_c2f are supported
+#      sed '/^CC .*=/s/$/ -DMPI2_SUPPORT/' $CONFIG > xx$$ ; /bin/mv xx$$ $CONFIG
+#    else
+#      echo "  " MPI_Comm_f2c and MPI_Comm_c2f are not supported
+#    fi 
+#    /bin/rm -f tools/mpi2_test
+#  fi
+#fi
 
 if test $NMM_CORE = 1; then
   grep -q DM_PARALLEL $CONFIG
   if test $status = 1; then
     echo NMM_CORE must be configured for DM parallel
-    echo Please rerun the configure script and chose a DM parallel option
+    echo Please rerun the configure_new script and chose a DM parallel option
     exit 3
   fi
   # integrity check for a kludge where a hard coded value in the 

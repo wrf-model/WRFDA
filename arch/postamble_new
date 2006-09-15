@@ -1,13 +1,14 @@
 #
 FPPFLAGS        = $(FPPFLAGS1) $(FPPFLAGS2) $(COREDEFS) \
                      $(ENVCOMPDEFS) $(DM_FPPFLAGS)
-CPPFLAGS        = -C -P $(TRADFLAG) $(INCS) $(DM_CPPFLAGS) -I$(NETCDF_PATH)/include
+CPPFLAGS        = -C -P $(TRADFLAG) $(INCS) $(DM_CPPFLAGS)
 REGFLAGS        = $(FPPFLAGS1) $(FPPFLAGS2) $(DM_FPPFLAGS)
  
 CCFLAGS        = $(CCFLAGS1) $(CCFLAGS2)
 LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN) -L$(NETCDF_LIB_PATH) $(LDFLAGS2)
 
-FCFLAGS         = $(FCBASE) $(FCDEBUG) $(FCTYPE) $(FCFREE) $(FCENDIAN) $(FCOPTIM) 
+FCFLAGS         = $(FCBASE) $(FCDEBUG) $(FCTYPE) $(FCFREE) $(FCENDIAN) $(FCOPTIM) \
+                  -I$(LAPACK) -I$(FFTPACK5) -I$(BLAS)
 FCFLAGS_NOOPT   = $(FCBASE) $(FCDEBUG) $(FCTYPE) $(FCFREE) $(FCENDIAN)
 FIXEDFLAGS        = $(FCOPTIM) $(FCBASE) $(FCDEBUG) $(FCTYPE)
 FIXEDFLAGS_BUFR   = $(FCOPTIM) $(FCBASE) $(FCDEBUG) $(FCTYPE)
@@ -15,10 +16,10 @@ FIXEDFLAGS_ENDIAN = $(FCTYPE) $(FCBASE)
 
 WRFVAR_LIBS  = libwrfio_nf.a libesmf_time.a $(IO_GRIB_SHARE)/libio_grib_share.a \
                  $(IO_GRIB1)/libio_grib1.a \
-                 libblas.a liblapack.a libblas.a libbufr.a libfftpack5.a \
+                 lapack blas bufr fftpack5 \
                  libwrfvar.a $(MPI_LIBS)
 
-GEN_BE_LIBS  = libblas.a liblapack.a libfftpack5.a
+GEN_BE_LIBS  = blas lapack fftpack5
 
 WRF_LIBS     = libwrflib.a libwrfio_nf.a libesmf_time.a $(IO_GRIB_SHARE)/libio_grib_share.a \
                  $(IO_GRIB1)/libio_grib1.a $(MPI_LIBS)

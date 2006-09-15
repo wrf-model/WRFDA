@@ -52,10 +52,14 @@ subroutine da_ao_stats_gpsref( stats_unit, oi, re )
             o_minus_a_0 = wrf_dm_sum_real( o_minus_a )
             sigma_o_0 = wrf_dm_sum_real( sigma_o )
             sigma_b_0 = wrf_dm_sum_real( sigma_b )
-            PRINT *,'TEST_COVERAGE_da_ao_stats_gpsref:  o_minus_b_0 = ', o_minus_b_0 
-            PRINT *,'TEST_COVERAGE_da_ao_stats_gpsref:  o_minus_a_0 = ', o_minus_a_0 
-            PRINT *,'TEST_COVERAGE_da_ao_stats_gpsref:  sigma_o_0 = ', sigma_o_0
-            PRINT *,'TEST_COVERAGE_da_ao_stats_gpsref:  sigma_b_0 = ', sigma_b_0
+            write (unit=stdout,fmt='(A,F10.2)') &
+               'TEST_COVERAGE_da_ao_stats_gpsref:  o_minus_b_0 = ', o_minus_b_0 
+            write (unit=stdout,fmt='(A,F10.2)') &
+               'TEST_COVERAGE_da_ao_stats_gpsref:  o_minus_a_0 = ', o_minus_a_0
+            write (unit=stdout,fmt='(A,F10.2)') & 
+               'TEST_COVERAGE_da_ao_stats_gpsref:  sigma_o_0 = ', sigma_o_0
+            write (unit=stdout,fmt='(A,F10.2)') &
+               'TEST_COVERAGE_da_ao_stats_gpsref:  sigma_b_0 = ', sigma_b_0
             IF (wrf_dm_on_monitor()) THEN 
                write(stats_unit,'(/A,A3,A,f12.3)')  & 
                            ' Pseudo ', pseudo_var, ' O-B: ', o_minus_b_0 
@@ -89,4 +93,5 @@ subroutine da_ao_stats_gpsref( stats_unit, oi, re )
    END IF
 
 end subroutine da_ao_stats_gpsref
+
 

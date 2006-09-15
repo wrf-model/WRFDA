@@ -225,7 +225,7 @@ subroutine da_check_vptox_adjoint( ne, xb, xbx, be, ep, xp, vp, xa, &
 
    adj_sum_lhs = wrf_dm_sum_real( adj_par_lhs )
    adj_sum_rhs = wrf_dm_sum_real( adj_par_rhs )
-   PRINT *, &
+   write (unit=stdout,fmt='(A,2F10.2)') &
       'TEST_COVERAGE_da_check_vptox_adjoint B:  adj_sum_lhs,adj_sum_rhs = ', &
       adj_sum_lhs,adj_sum_rhs
 

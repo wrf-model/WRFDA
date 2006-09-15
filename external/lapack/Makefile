@@ -1,4 +1,4 @@
-include ../../configure.wrf
+include ../../configure.wrfvar
 
 LAPACK_OBJS = lapack.o
 
@@ -19,8 +19,8 @@ lapack.o:		lapack.f90 \
 			dlansy.inc \
 			dlapy2.inc \
 			dsyev.inc
-			$(CPP) $(CPPFLAGS) lapack.f90 > lapack.f
-			$(SFC) -c $(FCFIXED) $(PROMOTION) -I../blas lapack.f
+			$(CPP) $(CPPFLAGS)  $(FPPFLAGS) lapack.f90 > lapack.f
+			$(FFC) -c  $(FIXEDFLAGS) -I../blas lapack.f
 
 clean :
 	@ $(RM) *.o *.f *.mod

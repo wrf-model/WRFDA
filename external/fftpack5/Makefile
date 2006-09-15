@@ -1,4 +1,4 @@
-include ../../configure.wrf
+include ../../configure.wrfvar
 
 FFTPACK5_OBJS =	fftpack5.o
 
@@ -23,9 +23,9 @@ fftpack5.o:	         \
 			rfftf1.inc  \
 			rffti1.inc  \
 			xerfft.inc  \
-			fftpack5.f90
-			$(CPP) $(CPPFLAGS) fftpack5.f90 > fftpack5.f
-			$(SFC) -c $(FCFIXED) $(MODULE_DIRS) $(PROMOTION) fftpack5.f
+			fftpack5.f90 
+			$(CPP) $(CPPFLAGS)  $(FPPFLAGS) fftpack5.f90 > fftpack5.f
+			$(FFC) -c  $(FIXEDFLAGS) -I$(BUILD) fftpack5.f
 
 clean :
 	$(RM) $(FFTPACK_OBJS) *.mod *.f

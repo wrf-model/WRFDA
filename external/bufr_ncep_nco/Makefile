@@ -1,4 +1,4 @@
-include ../../configure.wrf
+include ../../configure.wrfvar
 
 BUFR_OBJS =		bufrlib.o 		\
 	                bort_exit.o 		\
@@ -10,12 +10,12 @@ all : $(BUFR_OBJS)
 
 bufrlib.prm:		bufrlib.param
 			$(RM) $@
-			$(CPP) $(CPPFLAGS_BUFR) bufrlib.param > bufrlib.prm
+			$(CPP) $(CPPFLAGS_BUFR) $(FPPFLAGS_BUFR) bufrlib.param > bufrlib.prm
 
 bufrlib.o:		bufrlib.f90 bufrlib.prm
 			$(RM) $@
-			$(CPP) $(CPPFLAGS) bufrlib.f90 > bufrlib.f
-			$(SFC) -c $(FCFIXED) $(MODULE_DIRS) bufrlib.f
+			$(CPP) $(CPPFLAGS) $(FPPFLAGS) bufrlib.f90 > bufrlib.f
+			$(FFC) -c $(FIXEDFLAGS_BUFR) bufrlib.f
 
 bort_exit.o:		bort_exit.c
 			$(RM) $@

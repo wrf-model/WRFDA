@@ -31,9 +31,9 @@ subroutine da_get_innov_vector( it, ob, iv, &
       iv%current_ob_time = n
 
       if (num_fgat_time > 1) then
-         write(UNIT=filename(1:10), fmt='(a, i2.2)') 'fgat_fg.', n
+         write(UNIT=filename(1:10), fmt='(a, i2.2)') 'fg', n
          call da_med_initialdata_input ( grid , config_flags, &
-            in_filename=filename )
+            filename )
          call da_setup_firstguess( xbx, grid, &
 #include "em_dummy_args.inc"
                            )
@@ -171,9 +171,8 @@ subroutine da_get_innov_vector( it, ob, iv, &
      call da_write_filtered_rad(ob,iv)
    end if
 
-!---------------------------------------------------------------------------
    if (num_fgat_time > 1) then
-      call da_med_initialdata_input ( grid , config_flags )
+      call da_med_initialdata_input ( grid , config_flags, 'fg01')
       call da_setup_firstguess( xbx, grid, &
 #include "em_dummy_args.inc"
                              )

@@ -4,7 +4,7 @@
 
 export REL_DIR=${REL_DIR:-$HOME/trunk}
 export WRF_DIR=${WRF_DIR:-$REL_DIR/wrf}
-export SOLVER=${SOLVER:-EM}
+export SOLVER=${SOLVER:-em}
 export DUMMY=${DUMMY:-false}
 export NL_USE_HTML=${NL_USE_HTML:-false}
 export CYCLE_PERIOD=${CYCLE_PERIOD:-06}
@@ -190,9 +190,6 @@ else
 EOF
 fi
 
-typeset -l LC_SOLVER
-LC_SOLVER=$SOLVER
-
 cp namelist.input $RUN_DIR
 
 if test ! -f $MD_DIR/$DATE/wrfinput_d${DOMAIN}; then
@@ -245,8 +242,8 @@ else
    echo $MD_DIR/$DATE/wrfinput_d${DOMAIN} exists, skipping
 fi
 
-#rm -f ${MOAD_DATAROOT}/siprd/wrf_real_input_${LC_SOLVER}*
-#rm -f ${WRF_DIR}/test/${LC_SOLVER}_real/wrf_real_input_${LC_SOLVER}*
+#rm -f ${MOAD_DATAROOT}/siprd/wrf_real_input_${SOLVER}*
+#rm -f ${WRF_DIR}/test/${SOLVER}_real/wrf_real_input_${SOLVER}*
 
 date
 

@@ -44,7 +44,7 @@ subroutine da_transform_vtoy_adj( iter,cv_size, be, ep, cv, iv, vp, vv, xa, xb, 
          iv%current_ob_time = nobwin
          call da_zero_x(xa)
          call da_transform_xtoy_adj( xb, iv, xp, y, xa )
-         write(UNIT=filnam,FMT='(a2,i2.2)') 'af',nobwin-1
+         write(UNIT=filnam,FMT='(a2,i2.2)') 'af',nobwin
          write(unit=stdout, fmt='(2a,2x,a,i6)') &
             'file:', __FILE__, 'line:', __LINE__
 
@@ -58,8 +58,7 @@ subroutine da_transform_vtoy_adj( iter,cv_size, be, ep, cv, iv, vp, vv, xa, xb, 
       call nl_set_dyn_opt ( 1 , DYN_EM_TL )
 
       if ( jcdfi_use .AND. iter > 0 ) then
-         filnam ='tldf'
-         call da_med_initialdata_input( grid , config_flags, in_filename=filnam )
+         call da_med_initialdata_input( grid , config_flags, 'tldf' )
       else
          grid%em_g_u_2 = 0.0
          grid%em_g_v_2 = 0.0
@@ -70,8 +69,7 @@ subroutine da_transform_vtoy_adj( iter,cv_size, be, ep, cv, iv, vp, vv, xa, xb, 
          grid%g_moist = 0.0
       endif
 
-      filnam ='afdf'
-      call da_med_initialdata_output( grid , config_flags, filnam )
+      call da_med_initialdata_output( grid , config_flags, 'afdf')
 
       grid%dyn_opt = ndynopt
       call nl_set_dyn_opt ( 1 , DYN_EM )
@@ -105,8 +103,7 @@ subroutine da_transform_vtoy_adj( iter,cv_size, be, ep, cv, iv, vp, vv, xa, xb, 
 #endif
       call da_trace("da_transform_vtoy_adj","Finished da_run_wrfplus_ad.ksh")
 
-      filnam = 'gr00'
-      call da_transfer_xatowrftl_adj( grid, config_flags, filnam, &
+      call da_transfer_xatowrftl_adj( grid, config_flags, 'gr01', &
 #include "em_actual_args.inc"
                               )
    else  ! var4d

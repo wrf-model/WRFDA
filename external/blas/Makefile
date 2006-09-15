@@ -1,4 +1,4 @@
-include ../../configure.wrf
+include ../../configure.wrfvar
 
 BLAS_OBJS =	blas.o 
 
@@ -22,8 +22,8 @@ blas.o:	         blas.f90 \
 			dtrmv.inc  \
 			lsame.inc  \
 			xerbla.inc
-			$(CPP) $(CPPFLAGS) blas.f90 > blas.f
-			$(SFC) -c $(FCFIXED) $(MODULE_DIRS) $(PROMOTION) blas.f
+			$(CPP) $(CPPFLAGS) $(FPPFLAGS) blas.f90 > blas.f
+			$(FFC) -c $(FIXEDFLAGS) blas.f
 
 clean :
 	@ $(RM) *.o *.f *.mod

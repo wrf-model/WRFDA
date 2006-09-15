@@ -28,7 +28,9 @@ PROG = makedepf90
 VERSION = 2.8.8
 
 CC = gcc
-CFLAGS = -g -O2
+# JRB
+#CFLAGS = -g -O2
+CFLAGS = -O2
 CPPFLAGS =  -DVERSION=\"$(VERSION)\"
 
 LEX = flex

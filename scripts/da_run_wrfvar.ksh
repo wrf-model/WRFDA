@@ -49,7 +49,7 @@ export DUMMY=${DUMMY:-false}
 
 export DA_FIRST_GUESS=${DA_FIRST_GUESS:-$MD_DIR/$DATE/wrfinput_d$DOMAIN}    # wrfvar "first guess" input.
 export DA_BOUNDARIES=${DA_BOUNDARIES:-$MD_DIR/$DATE/wrfbdy_d$DOMAIN}    # wrfvar boundaries input.
-export DA_ANALYSIS=${DA_ANALYSIS:-wrfvar_output}
+export DA_ANALYSIS=${DA_ANALYSIS:-analysis}
 export DA_OBSERVATIONS=${DA_OBSERVATIONS:-$OB_DIR/$DATE/ob.ascii} # wrfvar observation input.
 export DA_BUFR_DIR=${DA_BUFR_DIR:-$OB_DIR/$DATE} # radiance bufr file directory
 export DA_BACK_ERRORS=${DA_BACK_ERRORS:-$BE_DIR/gen_be.NMC.dat} # wrfvar background errors.
@@ -65,6 +65,7 @@ export NL_VAR4D=${NL_VAR4D:-false}
 export NL_RUN_HOURS=${NL_RUN_HOURS:-6}
 export NL_USE_HTML=${NL_USE_HTML:-false}
 export NL_JCDFI_USE=${NL_JCDFI_USE:-false}
+export NL_JCDFI_ONOFF=$NL_JCDFI_USE
 
 #=======================================================
 
@@ -100,22 +101,13 @@ if test ! -f $DA_ANALYSIS; then
    START_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe $DATE $WINDOW_START`
    END_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe $DATE $WINDOW_END`
 
-   for HOUR in 01 02 03 04 05 06 07; do
-      let H=$HOUR-1+$WINDOW_START
-      FG_DATE[$HOUR]=`$WRFVAR_DIR/main/advance_cymdh.exe $DATE $H`
-      export FG_CCYY[$HOUR]=`echo ${FG_DATE[$HOUR]} | cut -c1-4`
-      export FG_MM[$HOUR]=`echo ${FG_DATE[$HOUR]} | cut -c5-6`
-      export FG_DD[$HOUR]=`echo ${FG_DATE[$HOUR]} | cut -c7-8`
-      export FG_HH[$HOUR]=`echo ${FG_DATE[$HOUR]} | cut -c9-10`
-   done
-
-   for HOUR in 00 01 02 03 04 05 06; do
-      let H=$HOUR+$WINDOW_START
-      OB_DATE[$HOUR]=`$WRFVAR_DIR/main/advance_cymdh.exe $DATE $H`
-      export OB_CCYY[$HOUR]=`echo ${OB_DATE[$HOUR]} | cut -c1-4`
-      export OB_MM[$HOUR]=`echo ${OB_DATE[$HOUR]} | cut -c5-6`
-      export OB_DD[$HOUR]=`echo ${OB_DATE[$HOUR]} | cut -c7-8`
-      export OB_HH[$HOUR]=`echo ${OB_DATE[$HOUR]} | cut -c9-10`
+   for INDEX in 01 02 03 04 05 06 07; do
+      let H=$INDEX-1+$WINDOW_START
+      D_DATE[$INDEX]=`$WRFVAR_DIR/main/advance_cymdh.exe $DATE $H`
+      export D_CCYY[$INDEX]=`echo ${D_DATE[$INDEX]} | cut -c1-4`
+      export D_MM[$INDEX]=`echo ${D_DATE[$INDEX]} | cut -c5-6`
+      export D_DD[$INDEX]=`echo ${D_DATE[$INDEX]} | cut -c7-8`
+      export D_HH[$INDEX]=`echo ${D_DATE[$INDEX]} | cut -c9-10`
    done
 
    export NPROC_X=${NPROC_X:-0} # Regional, always set NPROC_X to 0, Global, always 1
@@ -128,7 +120,19 @@ if test ! -f $DA_ANALYSIS; then
    export DD=`echo $DATE | cut -c7-8`
    export HH=`echo $DATE | cut -c9-10`
 
+   export START_CCYY=`echo $START_DATE | cut -c1-4`
+   export START_MM=`echo $START_DATE | cut -c5-6`
+   export START_DD=`echo $START_DATE | cut -c7-8`
+   export START_HH=`echo $START_DATE | cut -c9-10`
+
+   export END_CCYY=`echo $END_DATE | cut -c1-4`
+   export END_MM=`echo $END_DATE | cut -c5-6`
+   export END_DD=`echo $END_DATE | cut -c7-8`
+   export END_HH=`echo $END_DATE | cut -c9-10`
+
+   export NL_TIME_WINDOW_MIN=${NL_TIME_WINDOW_MIN:-${START_CCYY}-${START_MM}-${START_DD}_${START_HH}:00:00.0000}
    export NL_ANALYSIS_DATE=${CCYY}-${MM}-${DD}_${HH}:00:00.0000
+   export NL_TIME_WINDOW_MAX=${NL_TIME_WINDOW_MAX:-${END_CCYY}-${END_MM}-${END_DD}_${END_HH}:00:00.0000}
 
    # Default WRF namelist variables:
    export NL_OB_FORMAT=${NL_OB_FORMAT:-2}              # Observation format: 1=BUFR, 2=ASCII "little_r"
@@ -166,19 +170,19 @@ if test ! -f $DA_ANALYSIS; then
    ln -s $WRFVAR_DIR/main/wrfvar.exe .
    export PATH=$WRFVAR_DIR/scripts:$PATH
 
-   ln -sf $DA_FIRST_GUESS	 wrfvar_input
    ln -sf $DA_BOUNDARIES 	 wrfbdy_d$DOMAIN
+   ln -sf $DA_FIRST_GUESS	 fg01
    ln -sf $DA_FIRST_GUESS	 wrfinput_d$DOMAIN
    ln -sf $DA_BACK_ERRORS   fort.34
    if test $NL_OB_FORMAT = 1; then
-      ln -sf $DA_OBSERVATIONS ob.bufr
+      ln -fs $DA_OBSERVATIONS ob.bufr
    else
-      ln -sf $DA_OBSERVATIONS ob.ascii
+      ln -fs $DA_OBSERVATIONS ob01.ascii
    fi
 
    for FILE in $DAT_DIR/*.inv; do
       if test -f $FILE; then
-         ln -s $FILE .
+         ln -fs $FILE .
       fi
    done
 
@@ -210,12 +214,12 @@ if test ! -f $DA_ANALYSIS; then
    done
 
    if test -r $DA_SSMI; then
-      ln -sf $DA_SSMI ssmi.dat
+      ln -sf $DA_SSMI ssmi01.dat
       export NL_USE_SSMIRETRIEVALOBS=true
    fi
 
    if test -r $DA_RADAR; then
-      ln -sf $DA_RADAR radar.dat
+      ln -sf $DA_RADAR radar01.dat
       export NL_USE_RADAROBS=true
    fi
 
@@ -237,38 +241,93 @@ if test ! -f $DA_ANALYSIS; then
       # Inputs
       export NL_AUXHIST2_INNAME='auxhist2_d<domain>_<date>'
       export NL_DYN_OPT=2
-      export NL_INPUT_OUTNAME='wrfvar_input_d<domain>_<date>'
+      export NL_INPUT_OUTNAME='nl_d<domain>_<date>'
+      export NL_INPUTOUT_INTERVAL=60
+      export NL_AUXHIST2_INTERVAL=10
+      export NL_FRAMES_PER_AUXHIST2=1
+      export NL_INTERVAL_SECONDS=10800
+      export NL_HISTORY_INTERVAL=180
+      export NL_RESTART=false
+      export NL_FRAMES_PER_OUTFILE=1000
+      export NL_INPUT_FROM_FILE=true
+      export NL_TIME_STEP=600
+      export NL_WRITE_INPUT=true
+      export NL_DEBUG_LEVEL=999
       . $WRF_DIR/inc/namelist_script.inc
+      export NL_DEBUG_LEVEL=0
+      unset NL_AUXHIST2_INNAME
+      unset NL_AUXHIST2_INTERVAL
+      unset NL_FRAMES_PER_AUXHIST2
       mv namelist.input nl
       ln -fs $WORK_DIR/LANDUSE.TBL nl
       ln -fs $WORK_DIR/wrfbdy_d$DOMAIN nl
-      if test -e $WORD_DIR/wrfvar_output; then
-         ln -fs $WORK_DIR/wrfvar_output nl/wrfinput_d$DOMAIN
-      else
-         ln -fs $WORK_DIR/wrfvar_input nl/wrfinput_d$DOMAIN
-      fi
+      ln -fs $WORK_DIR/fg01 nl/wrfinput_d${DOMAIN}
+#      if test -e $WORK_DIR/wrfvar_output; then
+#         ln -fs $WORK_DIR/wrfvar_output nl/wrfinput_d$DOMAIN
+#      else
+         ln -fs $WORK_DIR/fg01 nl/wrfinput_d${DOMAIN}
+#      fi
       ln -s $WRF_DIR/main/wrf.exe nl
 
       # Outputs
-      for HOUR in 01 02 03 04 05 06; do
-         ln -fs nl/wrfvar_input_${FG_CCYY[$HOUR]}_${FG_MM[$HOUR]}_${FG_DD[$HOUR]}_${FG_HH[$HOUR]}:00.00 fgat_fg.$HOUR
+      for I in 02 03 04 05 06 07; do
+         ln -fs nl/nl_d${DOMAIN}_${D_CCYY[$I]}-${D_MM[$I]}-${D_DD[$I]}_${D_HH[$I]}:00:00 fg$I
       done
+
+      # tl
+
+      # Inputs
+
+      export NL_DYN_OPT=202
+      export NL_INPUT_OUTNAME='tl_d<domain>_<date>'
+      export NL_AUXHIST3_OUTNAME='auxhist3_d<domain>_<date>'
+      export NL_AUXHIST3_INTERVAL=60
+      export NL_AUXINPUT2_INNAME='../nl/auxhist2_d<domain>_<date>'
+      export NL_AUXINPUT2_INTERVAL=10
+      . $WRFPLUS_DIR/inc/namelist_script.inc
+      mv namelist.input tl
+      ln -fs $WORK_DIR/LANDUSE.TBL tl
+      ln -fs $WORK_DIR/wrfbdy_d$DOMAIN tl
+      ln -fs $WORK_DIR/tl01 tl/wrfinput_d${DOMAIN}
+      ln -fs $WRFPLUS_DIR/main/wrfplus.exe tl
+
+      # Outputs
+      for I in 02 03 04 05 06 07; do
+         ln -s tl/tl_d${DOMAIN}_${D_CCYY[$I]}-${D_MM[$I]}-${D_DD[$I]}_${D_HH[$I]}:00:00 tl$I
+      done
+      if $NL_JCDFI_USE; then
+         export CCYY=`echo $END_DATE | cut -c1-4`
+         export MM=`echo $END_DATE | cut -c5-6`
+         export DD=`echo $END_DATE | cut -c7-8`
+         export HH=`echo $END_DATE | cut -c9-10`
+         ln -s tl/auxhist3_d${DOMAIN}_${CCYY}-${MM}-${DD}_${HH}:00:00 tldf
+      fi
 
       # ad
 
       # Inputs
-      export NL_DYN_OPT=202
-      export NL_INPUT_OUTNAME='wrfvar_input_d<domain>_<date>'
+      export NL_DYN_OPT=302
+      export NL_INPUT_OUTNAME='ad_d<domain>_<date>'
+      export NL_AUXINPUT2_INNAME='../nl/auxhist2_d<domain>_<date>'
+      export NL_AUXINPUT2_INTERVAL=10
       export NL_AUXINPUT3_INNAME='auxinput3_d<domain>_<date>'
+      export NL_AUXINPUT3_INTERVAL=60
+      export NL_HISTORY_INTERVAL=9999
+      export NL_AUXHIST3_INTERVAL=60
+      export NL_INPUTOUT_INTERVAL=60
+      export NL_INTERVAL_SECONDS=21600
       . $WRFPLUS_DIR/inc/namelist_script.inc
       mv namelist.input ad
       ln -fs $WORK_DIR/LANDUSE.TBL ad
-      for HOUR in 01 02 03 04 05 06; do
-         ln -fs $WORK_DIR/af$HOUR ad/auxinput3_d${DOMAIN}_${FG_CCYY[$HOUR]}_${FG_MM[$HOUR]}_${FG_DD[$HOUR]}_${FG_HH[$HOUR]}:00.00
+      ln -fs $WORK_DIR/wrfbdy_d$DOMAIN ad
+      ln -fs $WORK_DIR/fg01 ad/wrfinput_d${DOMAIN}
+      for I in 01 02 03 04 05 06 07; do
+         ln -fs $WORK_DIR/af$I ad/auxinput3_d${DOMAIN}_${D_CCYY[$I]}-${D_MM[$I]}-${D_DD[$I]}_${D_HH[$I]}:00:00
       done
-      if $NL_JCDFI_USE; then
+# JRB
+#      if $NL_JCDFI_USE; then
          ln -fs $WORK_DIR/afdf ad/auxinput3_d${DOMAIN}_dfi
-      fi   
+#      fi   
       ln -fs $WRFPLUS_DIR/main/wrfplus.exe ad
 
       # Outputs
@@ -276,33 +335,7 @@ if test ! -f $DA_ANALYSIS; then
       export MM=`echo $DATE | cut -c5-6`
       export DD=`echo $DATE | cut -c7-8`
       export HH=`echo $DATE | cut -c9-10`
-      ln -fs ad/wrfvar_input_d${DOMAIN}_${CCYY}_${MM}_${DD}_${HH}:00.00 gr00
-
-      # tl
-
-      # Inputs
-
-      export NL_DYN_OPT=302
-      export NL_INPUT_OUTNAME='tl<date>'
-      export NL_AUXHIST3_OUTNAME='auxhist3_d<domain>_<date>'
-      . $WRFPLUS_DIR/inc/namelist_script.inc
-      mv namelist.input tl
-      ln -fs $WORK_DIR/LANDUSE.TBL tl
-      ln -fs $WORK_DIR/tl00 tl/wrfinput_d${DOMAIN}
-      ln -fs $WORK_DIR/wrfvar_input tl/wrfinput_d${DOMAIN}
-      ln -fs $WRFPLUS_DIR/main/wrfplus.exe tl
-
-      # Outputs
-      for HOUR in 01 02 03 04 05 06; do
-         ln -s tl/tl${FG_CCYY[$HOUR]}_${FG_MM[$HOUR]}_${FG_DD[$HOUR]}_${FG_HH[$HOUR]}:00.00 tl$HOUR
-      done
-      if $NL_JCDFI_USE; then
-         export CCYY=`echo $END_DATE | cut -c1-4`
-         export MM=`echo $END_DATE | cut -c5-6`
-         export DD=`echo $END_DATE | cut -c7-8`
-         export HH=`echo $END_DATE | cut -c9-10`
-         ln -s tl/auxhist3_d${DOMAIN}_${CCYY}_${MM}_${DD}_${HH}:00.00 tldf
-      fi
+      ln -fs ad/ad_d${DOMAIN}_${CCYY}-${MM}-${DD}_${HH}:00:00 gr01
 
       export NL_DYN_OPT=2
    fi
@@ -337,23 +370,23 @@ if test ! -f $DA_ANALYSIS; then
       RC=0
    else
       if $NL_VAR4D; then
-         ln -s $OB_DIR/${OB_DATE[00]}/ob.ascii+ ob.00
-         for HOUR in 01 02 03 04 05; do
-            ln -s $OB_DIR/${OB_DATE[$HOUR]}/ob.ascii ob.$HOUR
+         ln -fs $OB_DIR/${D_DATE[01]}/ob.ascii+ ob01.ascii
+         for I in 02 03 04 05 06; do
+            ln -fs $OB_DIR/${D_DATE[$I]}/ob.ascii ob${I}.ascii
          done
-         ln -s $OB_DIR/${OB_DATE[06]}/ob.ascii- ob.06
+         ln -fs $OB_DIR/${D_DATE[07]}/ob.ascii- ob07.ascii
 
-         ln -s $OB_DIR/${OB_DATE[00]}/ssmi.dat+ ssmi.00
-         for HOUR in 01 02 03 04 05; do
-            ln -s $OB_DIR/${OB_DATE[$HOUR]}/ssmi.dat ssmi.$HOUR
+         ln -fs $OB_DIR/${D_DATE[01]}/ssmi.dat+ ssmi01.dat
+         for I in 02 03 04 05 06; do
+            ln -fs $OB_DIR/${D_DATE[$I]}/ssmi.dat ssmi${I}.dat
          done
-         ln -s $OB_DIR/${OB_DATE[06]}/ssmi.dat- ssmi.06
+         ln -fs $OB_DIR/${D_DATE[07]}/ssmi.dat- ssmi07.dat
 
-         ln -s $OB_DIR/${OB_DATE[00]}/radar.dat+ radar.00
-         for HOUR in 01 02 03 04 05; do
-            ln -s $OB_DIR/${OB_DATE[$HOUR]}/radar.dat radar.$HOUR
+         ln -fs $OB_DIR/${D_DATE[01]}/radar.dat+ radar01.dat
+         for I in 02 03 04 05 06; do
+            ln -fs $OB_DIR/${D_DATE[$I]}/radar.dat radar${I}.dat
          done
-         ln -s $OB_DIR/${OB_DATE[06]}/radar.dat- radar.06
+         ln -fs $OB_DIR/${D_DATE[07]}/radar.dat- radar07.dat
 
          if $POE && test $NUM_PROCS -gt 1; then
             # JRB kludge until we work out what we are doing here

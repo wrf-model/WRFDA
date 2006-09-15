@@ -46,7 +46,7 @@ IF (trace_use) call da_trace_entry("da_transfer_wrftltoxa")
    grid%dyn_opt = DYN_EM_TL
    call nl_set_dyn_opt ( 1 , DYN_EM_TL )
 
-   call da_med_initialdata_input( grid , config_flags, in_filename=filnam )
+   call da_med_initialdata_input( grid , config_flags, filnam )
 
    grid%dyn_opt = ndynopt
    call nl_set_dyn_opt ( 1 , DYN_EM )
