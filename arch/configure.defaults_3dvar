@@ -785,46 +785,6 @@ externals : CONFIGURE_WRFIO_NF wrfio_int wrfio_grib1 esmf_time
 	( /bin/cp module_dm_warning module_dm.F ; cat module_dm_stubs.F >> module_dm.F )
 
 ###########################################################
-#ARCH Darwin		(single-threaded, no nesting, for G4)
-#
-FC              =       xlf90_r
-F77             =       xlf_r
-LD              =       xlf90_r
-CC              =       cc
-CC_TOOLS        =       cc
-CFLAGS          =       -DNOUNDERSCORE -DLANDREAD_STUB
-TRADFLAG        =
-FCOPTIM         =       -O0 -qarch=auto
-FCDEBUG         =       #-g
-FCTYPE          =       -qrealsize=8
-FCFORM          =       -qfree=f90
-FCHOST          =
-FCBASE          =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767 -qinitauto=00 
-#                       -qflttrap=zerodivide:invalid:enable -qsigtrap
-FCBUFR          =       $(FCBASE)
-FC_FFT_RF       =       $(FCBASE)
-EXTRAMODULES    =       
-ARCHFLAGS       =       -DINTIO \
-			$(WORDSIZE_DEF) \
-                        CONFIGURE_NETCDF_FLAG -DTRIEDNTRUE   \
-			-DLIMIT_ARGS -DNO_NAMELIST_PRINT
-PERL            =       CONFIGURE_PERL_PATH
-REGISTRY        =       Registry
-NETCDF_LIB	=       CONFIGURE_NETCDF_LIB_PATH
-LDFLAGS         =	 -Wl,-stack_size,10000000,-stack_addr,0xc0000000
-ENVCOMPDEFS     =       CONFIGURE_COMPILEFLAGS
-CPP             =       /usr/bin/cpp  -C -P -xassembler-with-cpp
-DM_1_CPP_FLAGS	=
-DM_2_CPP_FLAGS	=
-POUND_DEF       =       -DDARWIN -DMAC_OS \
-			-DNONSTANDARD_SYSTEM -DF90_STANDALONE \
-			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
-NETCDFPATH	=	CONFIGURE_NETCDF_PATH
-
-externals : CONFIGURE_WRFIO_NF wrfio_int wrfio_grib1 esmf_time
-	( /bin/cp module_dm_warning module_dm.F ; cat module_dm_stubs.F >> module_dm.F )
-
-###########################################################
 #ARCH Darwin		(single-threaded, no nesting, for g95 compiler)
 #
 FC              =       g95 -ffree-form -ffree-line-length-huge -fendian=big
