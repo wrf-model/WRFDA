@@ -19,17 +19,13 @@ subroutine da_med_initialdata_output ( grid , config_flags, out_filename )
 
    IF (trace_use) call da_trace_entry("da_med_initialdata_output")
 
-   IF (print_detail_timing) THEN
-      call start_timing
-   END IF
-
    if(present(out_filename)) then
       file_name = trim(out_filename)
    else
       file_name = 'wrfvar_output'
    endif
 
-   call wrf_debug ( 100 , __FILE__//': calling open_w_dataset wrfvar output' )
+   call da_trace ("da_med_initialdata_ouput",Message="Writing wrfvar output")
    call open_w_dataset ( fid, TRIM(file_name), grid , config_flags , &
                          output_model_input , "DATASET=INPUT", ierr )
 
@@ -49,11 +45,6 @@ subroutine da_med_initialdata_output ( grid , config_flags, out_filename )
    call output_model_input ( fid, grid , config_flags , ierr )
 
    call close_dataset ( fid , config_flags, "DATASET=INPUT" )
-
-   IF (print_detail_timing) THEN
-      WRITE ( message , FMT = '("writing wrfvar output for domain ",I8)' ) grid%id
-      call end_timing ( TRIM(message) )
-   END IF
 
    IF (trace_use) call da_trace_exit("da_med_initialdata_output")
 

@@ -14,11 +14,11 @@ subroutine da_transfer_wrftltoxa( grid, config_flags, filnam, &
 
    character*4 filnam
 
-!  Definitions of dummy arguments to solve
+   ! Definitions of dummy arguments to solve
 
 #include "em_dummy_decl.inc"
 
-!  Local variables
+   ! Local variables
 
    integer :: i, j, k, n
    integer :: is, ie, js, je, ks, ke
@@ -28,12 +28,11 @@ subroutine da_transfer_wrftltoxa( grid, config_flags, filnam, &
 
    integer ndynopt
 
-IF (trace_use) call da_trace_entry("da_transfer_wrftltoxa")
+   IF (trace_use) call da_trace_entry("da_transfer_wrftltoxa")
 
-
-!------------------------------------------------------------------------------
-!  [0.0] INPUT
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! [0.0] INPUT
+   !---------------------------------------------------------------------------
 
    is=xp%its
    ie=xp%ite
@@ -51,9 +50,9 @@ IF (trace_use) call da_trace_entry("da_transfer_wrftltoxa")
    grid%dyn_opt = ndynopt
    call nl_set_dyn_opt ( 1 , DYN_EM )
 
-!------------------------------------------------------------------------------
-!  [1.0] Get the specific humidity increments from mixing ratio increments
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! [1.0] Get the specific humidity increments from mixing ratio increments
+   !---------------------------------------------------------------------------
 
    do k=ks,ke
    do j=js,je
@@ -63,9 +62,9 @@ IF (trace_use) call da_trace_entry("da_transfer_wrftltoxa")
    enddo
    enddo
 
-!------------------------------------------------------------------------------
-!  [2.0] COMPUTE psfc increments from mu-increments
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! [2.0] COMPUTE psfc increments from mu-increments
+   !---------------------------------------------------------------------------
 
    do j=js,je
    do i=is,ie
@@ -79,9 +78,9 @@ IF (trace_use) call da_trace_entry("da_transfer_wrftltoxa")
    enddo
    enddo
 
-!------------------------------------------------------------------------------
-!  [3.0] COMPUTE pressure increments 
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! [3.0] COMPUTE pressure increments 
+   !---------------------------------------------------------------------------
 
    do j=js,je
    do i=is,ie
@@ -95,9 +94,9 @@ IF (trace_use) call da_trace_entry("da_transfer_wrftltoxa")
    enddo
    enddo
 
-!------------------------------------------------------------------------------
-!  [4.0] CONVERT THETA INCREMENTS TO T INCREMENTS
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! [4.0] CONVERT THETA INCREMENTS TO T INCREMENTS
+   !---------------------------------------------------------------------------
 
    do k=ks,ke
    do j=js,je
@@ -108,13 +107,14 @@ IF (trace_use) call da_trace_entry("da_transfer_wrftltoxa")
    enddo
    enddo
 
-! In the inverse, g_ph information is lost. This should be investigated later!!!
+   ! FIX. In the inverse, g_ph information is lost. This should be investigated 
+   ! later.
 
-! ----------------------------------------------------------------------------
-![5.0] CONVERT FROM C-GRID TO A-GRID
-! ----------------------------------------------------------------------------
+   !-------------------------------------------------------------------------
+   ! [5.0] CONVERT FROM C-GRID TO A-GRID
+   !-------------------------------------------------------------------------
 
-!--Fill the halo region for u and v.
+   ! Fill the halo region for u and v.
    call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id3)
 
    do k=ks,ke
@@ -126,9 +126,9 @@ IF (trace_use) call da_trace_entry("da_transfer_wrftltoxa")
    enddo
    enddo
 
-!------------------------------------------------------------------------------
-!  [6.0] ALL THE SIMPLE ONES
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! [6.0] ALL THE SIMPLE ONES
+   !---------------------------------------------------------------------------
 
    do j=js,je
    do k=ks,ke+1
@@ -151,7 +151,7 @@ IF (trace_use) call da_trace_entry("da_transfer_wrftltoxa")
       enddo
    endif
 
-   if ( size(moist,dim=4) >= 6 ) then
+   if (size(moist,dim=4) >= 6 ) then
       do k=ks,ke
       do j=js,je
       do i=is,ie
@@ -162,7 +162,7 @@ IF (trace_use) call da_trace_entry("da_transfer_wrftltoxa")
       enddo
    endif
 
-   if ( size(moist_2,dim=4) >= 7 ) then
+   if (size(moist_2,dim=4) >= 7 ) then
       do k=ks,ke
       do j=js,je
       do i=is,ie
@@ -173,7 +173,8 @@ IF (trace_use) call da_trace_entry("da_transfer_wrftltoxa")
    endif
 #endif
 
-IF (trace_use) call da_trace_exit("da_transfer_wrftltoxa")
+   IF (trace_use) call da_trace_exit("da_transfer_wrftltoxa")
 
 end subroutine da_transfer_wrftltoxa
+
 

@@ -42,7 +42,7 @@ subroutine da_check_sfc_assi( xb, xa, iv, xp, y, &
       its == 0 ) THEN
    END IF
   
-   call wrf_message("check_sfc_assi: Adjoint Test Results:")
+   call da_messages((/"check_sfc_assi: Adjoint Test Results:"/))
     
    xa2_u(ims:ime, jms:jme, kms:kme) = xa%u(ims:ime, jms:jme, kms:kme)
    xa2_v(ims:ime, jms:jme, kms:kme) = xa%v(ims:ime, jms:jme, kms:kme)

@@ -41,11 +41,17 @@ export DAT_DIR=${DAT_DIR:-$HOME/data}
 export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION}
 export EXP_DIR=${EXP_DIR:-$REG_DIR/$EXPT}
 export RUN_DIR=${RUN_DIR:-$EXP_DIR/$DATE/wps}
+export RC_DIR=${RC_DIR:-$REG_DIR/rc}
+export WPS_INPUT_DIR=${WPS_INPUT_DIR:-$RC_DIR}
 export WORK_DIR=$RUN_DIR/working
 
 if $NL_USE_HTML; then
    echo "<HTML><HEAD><TITLE>$EXPT wps</TITLE></HEAD><BODY><H1>$EXPT wps</H1><PRE>"
-fi
+fi   
+
+echo "WPS_DIR $WPS_DIR"
+echo "RC_DIR $RC_DIR"
+echo "
 
 date
 
@@ -123,7 +129,7 @@ export MM=`echo $DATE | cut -c5-6`
 export DD=`echo $DATE | cut -c7-8`
 export HH=`echo $DATE | cut -c9-10`
 
-if test ! -f $MD_DIR/$DATE/met_em.d${DOMAIN}.${CCYY}-${MM}-${DD}_${HH}:00:00.nc; then
+if test ! -f $RC_DIR/$DATE/met_em.d${DOMAIN}.${CCYY}-${MM}-${DD}_${HH}:00:00.nc; then
    if $DUMMY; then
       echo "Dummy wps"
       LOCAL_DATE=$DATE
@@ -137,7 +143,7 @@ if test ! -f $MD_DIR/$DATE/met_em.d${DOMAIN}.${CCYY}-${MM}-${DD}_${HH}:00:00.nc;
       done
    else
       ln -fs $WPS_DIR/ungrib/Variable_Tables/Vtable.$FG_TYPE Vtable
-      $WPS_DIR/link_grib.csh $MD_DIR/$START_DATE/fn* $MD_DIR/$END_DATE/fn*
+      $WPS_DIR/link_grib.csh $WPS_INPUT_DIR/$START_DATE/* $WPS_INPUT_DIR/$END_DATE/*
       $WPS_DIR/geogrid.exe
       RC=$?
       if test $RC != 0; then
@@ -157,9 +163,9 @@ if test ! -f $MD_DIR/$DATE/met_em.d${DOMAIN}.${CCYY}-${MM}-${DD}_${HH}:00:00.nc;
          exit 1
       fi
    fi
-   mv met_em.d${DOMAIN}* $MD_DIR/$DATE
+   mv met_em.d${DOMAIN}* $RC_DIR/$DATE
 else
-   echo "$MD_DIR/$DATE/met_em.d${DOMAIN}* files exist, skipping"
+   echo "$RC_DIR/$DATE/met_em.d${DOMAIN}* files exist, skipping"
 fi
 
 cd $OLDPWD

@@ -14,15 +14,7 @@ subroutine da_trace_init
 
    IOStatus = 0
 
-#ifdef DM_PARALLEL
-   call wrf_get_nproc(nproc)
-   call wrf_get_myproc(mype)
-#else
-   nproc=1
-   mype=0
-#endif
-
-   IF (trace_all_pes .OR. mype == trace_pe) THEN
+   IF (trace_all_pes .OR. myproc == trace_pe) THEN
      trace_write = .TRUE.  
    END IF
 
@@ -33,7 +25,7 @@ subroutine da_trace_init
    IF (trace_write .AND. trace_unit /= 0) THEN
       if (use_html) then
          WRITE(UNIT=TraceFile,FMT='(A,I0,A)') &
-           "trace/",mype,".html"
+           "trace/",myproc,".html"
          OPEN ( &
             UNIT=trace_unit, &   ! I:
             FILE=TRIM(TraceFile), &   ! I:
@@ -42,7 +34,7 @@ subroutine da_trace_init
             IOSTAT=IOStatus)    ! O:
       else   
          WRITE(UNIT=TraceFile,FMT='(A,I0,A)') &
-           "trace/",mype,".txt"
+           "trace/",myproc,".txt"
          OPEN ( &
             UNIT=trace_unit, &   ! I:
             FILE=TRIM(TraceFile), &   ! I:

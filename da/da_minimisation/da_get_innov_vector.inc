@@ -21,7 +21,7 @@ subroutine da_get_innov_vector( it, ob, iv, &
 
    IF (trace_use) CALL da_trace_entry("da_get_innov_vector") 
 
-   CALL wrf_message("[5.1] Calculate innovation vector (iv)")
+   CALL da_messages((/"[5.1] Calculate innovation vector (iv)"/))
 
    iv%ptop    = xb%ptop
 

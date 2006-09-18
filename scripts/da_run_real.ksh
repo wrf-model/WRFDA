@@ -192,14 +192,14 @@ fi
 
 cp namelist.input $RUN_DIR
 
-if test ! -f $MD_DIR/$DATE/wrfinput_d${DOMAIN}; then
+if test ! -f $RC_DIR/$DATE/wrfinput_d${DOMAIN}; then
    if $DUMMY; then
       echo "Dummy real"
       echo Dummy real > wrfinput_d${DOMAIN}
       echo Dummy real > wrfbdy_d${DOMAIN}
       echo Dummy real > wrflowinp_d${DOMAIN}
    else
-      ln -fs $MD_DIR/$DATE/met_em.d* .
+      ln -fs $RC_DIR/$DATE/met_em.d* .
       $RUN_CMD ${WRF_DIR}/main/real.exe
       RC=$?
 
@@ -235,11 +235,11 @@ if test ! -f $MD_DIR/$DATE/wrfinput_d${DOMAIN}; then
       fi    
    fi
 
-   mv $WORK_DIR/wrfinput_d${DOMAIN} $MD_DIR/$DATE
-   mv $WORK_DIR/wrfbdy_d${DOMAIN} $MD_DIR/$DATE
-   mv $WORK_DIR/wrflowinp_d${DOMAIN} $MD_DIR/$DATE
+   mv $WORK_DIR/wrfinput_d${DOMAIN} $RC_DIR/$DATE
+   mv $WORK_DIR/wrfbdy_d${DOMAIN} $RC_DIR/$DATE
+   mv $WORK_DIR/wrflowinp_d${DOMAIN} $RC_DIR/$DATE
 else
-   echo $MD_DIR/$DATE/wrfinput_d${DOMAIN} exists, skipping
+   echo $RC_DIR/$DATE/wrfinput_d${DOMAIN} exists, skipping
 fi
 
 #rm -f ${MOAD_DATAROOT}/siprd/wrf_real_input_${SOLVER}*

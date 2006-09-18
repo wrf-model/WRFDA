@@ -19,14 +19,6 @@ subroutine da_setup_firstguess( xbx, grid, &
 
    IF (trace_use) call da_trace_entry("da_setup_firstguess")
 
-
-   write(unit=stdout, fmt='(/a)') &
-      '-----------------------------------'
-   write(unit=stdout, fmt='(/a)') &
-      '[2.0] Set up first guess field (xb)'
-   write(unit=stdout, fmt='(a/a)') &
-      '-----------------------------------'
-
    is = xp % its
    ie = xp % ite
    js = xp % jts

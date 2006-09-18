@@ -45,8 +45,6 @@ subroutine da_transform_vtoy_adj( iter,cv_size, be, ep, cv, iv, vp, vv, xa, xb, 
          call da_zero_x(xa)
          call da_transform_xtoy_adj( xb, iv, xp, y, xa )
          write(UNIT=filnam,FMT='(a2,i2.2)') 'af',nobwin
-         write(unit=stdout, fmt='(2a,2x,a,i6)') &
-            'file:', __FILE__, 'line:', __LINE__
 
          call da_transfer_wrftltoxa_adj( grid, config_flags, filnam, &
 #include "em_actual_args.inc"

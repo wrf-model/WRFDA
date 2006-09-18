@@ -465,8 +465,6 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
       grid%start_minute, ':', &
       grid%start_second
 
-   print *, 'current_date=', current_date
-
    xbx % mminlu = 'USGS'
 
    call da_roughness_from_lanu(19, xbx % mminlu, current_date, xp, &

@@ -42,7 +42,7 @@ subroutine da_check( cv_size, xb, xbx, be, ep, iv, &
    ! [2] Perform vtox adjoint tests:
    !----------------------------------------------------------------------------
 
-   call wrf_message("Performing vtox adjoint tests")
+   call da_messages((/"Performing vtox adjoint tests"/))
 
    ! v_to_vv adjoint test:
 
@@ -83,7 +83,7 @@ subroutine da_check( cv_size, xb, xbx, be, ep, iv, &
    ! [2] Perform xtoy adjoint tests:
    !----------------------------------------------------------------------------
 
-   call wrf_message("Performing xtoy adjoint tests")
+   call da_messages((/"Performing xtoy adjoint tests"/))
 
    call da_allocate_y( iv, y )
    call da_zero_x(xa)
@@ -119,7 +119,7 @@ subroutine da_check( cv_size, xb, xbx, be, ep, iv, &
 
    if (global) then
 
-      call wrf_message("Performing spectral tests")
+      call da_messages((/"Performing spectral tests"/))
 
       call random_number(field(:,:) )
       field(:,:) = field(:,:) - 0.5

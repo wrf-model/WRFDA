@@ -24,10 +24,6 @@ subroutine da_med_initialdata_input (grid, config_flags, filename, in_date)
 
    ! Initialize the mother domain.
 
-   IF (print_detail_timing) THEN
-      call start_timing
-   END IF
-
    grid%input_from_file = .true.
 
    call ext_ncd_open_for_read( trim(filename), 0, 0, "", fid, ierr)
@@ -52,9 +48,6 @@ subroutine da_med_initialdata_input (grid, config_flags, filename, in_date)
 
       nsave = -1
       DO n=1, 1000
-        message = 'current_date='//trim(current_date)// &
-           ', in_date='//trim(in_date)
-         call wrf_debug ( 100 , trim(message) )
          if (current_date(1:19) == in_date(1:19)) then
             nsave = n - 1
             exit
@@ -99,37 +92,30 @@ subroutine da_med_initialdata_input (grid, config_flags, filename, in_date)
 
    call ext_ncd_ioclose(fid, ierr)
 
-   call wrf_debug ( 100 , __FILE__//': calling open_r_dataset for wrfvar input' )
+   call da_trace("da_med_initialdata_input",message="open_r_dataset for "//TRIM(filename))
    call open_r_dataset ( fid, TRIM(filename), grid , config_flags , &
       "DATASET=INPUT", ierr )
 
    IF ( ierr .NE. 0 ) THEN
-     WRITE( wrf_err_message , * ) __FILE__//': error opening ', &
+     WRITE(UNIT=errmsg(1),FMT='(A,A,A,I5)') 'Error opening ', &
        TRIM(filename),' for reading ierr=',ierr
-     call wrf_error_fatal ( wrf_err_message )
+     call da_error(__FILE__,__LINE__,errmsg(1:1))
    ENDIF
 
    if (present(in_date)) then
       do n=1, nsave
-         message = 'current_date='//trim(current_date)// &
-            ', in_date='//trim(in_date)
-         call wrf_debug ( 100 , trim(message) )
+         call da_messages((/"current_date="//trim(current_date)// &
+            ', in_date='//trim(in_date)/))
          call ext_ncd_get_next_time( fid, current_date, Status )
       enddo
    endif
 
-   call wrf_debug ( 100 , __FILE__//': calling input_model_input' )
    call input_model_input ( fid ,   grid , config_flags , ierr )
-   call wrf_debug ( 100 , __FILE__//': back from input_model_input' )
 
    call close_dataset ( fid , config_flags , "DATASET=INPUT" )
-
-   if (print_detail_timing) THEN
-      WRITE ( message , FMT = '("reading wrfvar input for domain ",I8)' ) &
-         grid%id
-      call end_timing ( TRIM(message) )
-   END IF
 
    IF (trace_use) call da_trace_exit("da_med_initialdata_input")
 
 end subroutine da_med_initialdata_input
+
+

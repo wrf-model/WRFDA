@@ -19,9 +19,7 @@ subroutine da_wrfvar_run( gcomp, importState, exportState, clock, rc )
 
    !--do wrfvar
 
-   call wrf_debug ( 100 , 'wrfvar: calling wrfvar ' )
    call da_wrfvar_interface ( head_grid, config_flags )
-   call wrf_debug ( 100 , 'wrfvar: back from wrfvar ' )
 
    ! return success status
    rc = ESMF_SUCCESS

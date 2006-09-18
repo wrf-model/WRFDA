@@ -29,7 +29,8 @@ subroutine da_setup_flow_predictors( ix, jy, kz, ne, ep )
 
    IF (trace_use) call da_trace_entry("da_setup_flow_predictors")
 
-   call wrf_message("Setup structures for flow-dependent information and read in")
+   call da_messages( &
+      (/"Setup structures for flow-dependent information and read in"/))
 
    ep % ne = ne
 

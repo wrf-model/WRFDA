@@ -35,7 +35,6 @@ subroutine da_y_facade_to_global( re_slice, template, re_glob_slice )
    INCLUDE 'mpif.h'
    INTEGER                      :: n, k, serial_n, serial_numvals
    INTEGER                      :: communicator
-   INTEGER                      :: nproc
    INTEGER                      :: proc
    INTEGER                      :: num_obs_send
    INTEGER                      :: buf_idx
@@ -76,11 +75,10 @@ subroutine da_y_facade_to_global( re_slice, template, re_glob_slice )
    END DO
    ! exchange num_obs_send and obs_global_index
    call wrf_get_dm_communicator ( communicator )
-   call wrf_get_nproc( nproc )
-   ALLOCATE( num_obs_send_all(0:nproc-1),     &
-              num_send_buf_all(0:nproc-1),     &
-              recv_counts(0:nproc-1),          &
-              recv_displs(0:nproc-1) )
+   ALLOCATE( num_obs_send_all(0:num_procs-1),     &
+              num_send_buf_all(0:num_procs-1),     &
+              recv_counts(0:num_procs-1),          &
+              recv_displs(0:num_procs-1) )
    ! gather num_obs_send
    call MPI_ALLGATHER( num_obs_send, 1, MPI_INTEGER, num_obs_send_all, 1, &
                         MPI_INTEGER, communicator, ierr )
@@ -92,7 +90,7 @@ subroutine da_y_facade_to_global( re_slice, template, re_glob_slice )
    ! set up to gather obs_global_index
    recv_counts = num_obs_send_all
    recv_displs(0) = 0
-   DO proc=1, nproc-1
+   DO proc=1, num_procs-1
       recv_displs(proc) = recv_displs(proc-1) + recv_counts(proc-1)
    ENDDO
    ALLOCATE( num_values_all(num_obs_all),       &
@@ -173,7 +171,7 @@ subroutine da_y_facade_to_global( re_slice, template, re_glob_slice )
       ! gather num_values
       recv_counts = num_obs_send_all
       recv_displs(0) = 0
-      DO proc=1, nproc-1
+      DO proc=1, num_procs-1
          recv_displs(proc) = recv_displs(proc-1) + recv_counts(proc-1)
       ENDDO
       ! num_values
@@ -189,7 +187,7 @@ subroutine da_y_facade_to_global( re_slice, template, re_glob_slice )
       ! finish setting up to gather local arrays
       recv_counts = num_send_buf_all
       recv_displs(0) = 0
-      DO proc=1, nproc-1
+      DO proc=1, num_procs-1
          recv_displs(proc) = recv_displs(proc-1) + recv_counts(proc-1)
       ENDDO
       num_recv_all = SUM( recv_counts )

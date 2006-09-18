@@ -8,14 +8,9 @@ subroutine da_wrfvar_finalize( no_shutdown )
        (config_flags%real_data_init_type == 3)) THEN
       call da_med_initialdata_output( head_grid , config_flags )
       call med_shutdown_io ( head_grid , config_flags )
-      call wrf_debug ( 100 , 'wrf: back from med_shutdown_io' )
    END IF
 
-   call wrf_debug (   0 , 'wrfvar: SUCCESS COMPLETE WRFVAR' )
-
-   IF (print_detail_timing) THEN
-      call end_timing ("wrfvar overall") ! start call in wrfvar_init
-   END IF
+   call da_messages((/"wrfvar: SUCCESS COMPLETE WRFVAR"/))
 
    IF (trace_use) call da_trace_report
 

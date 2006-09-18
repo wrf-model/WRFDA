@@ -70,7 +70,7 @@ subroutine da_transform_xtovp( xb, xbx, xa, xp, vp, be, &
 
    ! [2.3] Transform u, v to velocity potential via divergence:
 
-   call wrf_message('calling UV_To_Divergence')
+   call da_messages((/'calling UV_To_Divergence'/))
 #ifndef DEREF_KLUDGE
    call da_uv_to_divergence(xb, xa % u, xa % v, div, &
 #else
@@ -98,11 +98,11 @@ subroutine da_transform_xtovp( xb, xbx, xa, xp, vp, be, &
 
    ! Calculate chi:
 
-   call wrf_message(' calling Solve_PoissonEquation for Chi')
+   call da_messages((/' calling Solve_PoissonEquation for Chi'/))
    call da_solve_poissoneqn_fct(xbx, div, vp%v2, xp)
 
    ! [2.4] Transform chi to chi_u:
-   call wrf_message(' calculating chi_u')
+   call da_messages((/' calculating chi_u'/))
    do k=kts,kte
       do j=jts,jte
          vp%v2(its:ite,j,k) = vp%v2(its:ite,j,k) - &
@@ -110,7 +110,7 @@ subroutine da_transform_xtovp( xb, xbx, xa, xp, vp, be, &
       enddo
    enddo
 
-   call wrf_message(' calculating t_u')
+   call da_messages((/' calculating t_u'/))
    ! [2.4] Compute t_u:
    do k=kts,kte
       do j=jts,jte
@@ -123,14 +123,14 @@ subroutine da_transform_xtovp( xb, xbx, xa, xp, vp, be, &
 
    ! [2.6] Choice of moisture control variable: 
    
-   call wrf_message(' calculating psudo rh')
+   call da_messages((/' calculating psudo rh'/))
    vp % v4(its:ite,jts:jte,kts:kte) = xa % q  (its:ite,jts:jte,kts:kte) /   &
                                       xb % qs (its:ite,jts:jte,kts:kte) 
 
    ! [2.7] Choice of surface pressure control variable: 
       
    ! [2.7] compute psfc_u:
-   call wrf_message(' calculating psfc_u ')
+   call da_messages((/' calculating psfc_u '/))
    do j=jts,jte
       do i=its,ite
           vp % v5(i,j,1) = xa%psfc(i,j) - &

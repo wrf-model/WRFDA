@@ -168,7 +168,7 @@ subroutine da_setup_firstguess_wrf( xbx, grid, &
          FMT='("Upper-right: lat,lon,x,y,xp%ide,xp%jde:",4f10.3,2i6)') &
          xlat(xp%ide,xp%jde),  xlong(xp%ide,xp%jde), start_x, start_y, &
          xp%ide, xp%jde
-      call wrf_message(errmsg(1:5))
+      call da_messages(errmsg(1:5))
    endif
 
    ! Setup the domain definition for use of the MM5/GRAPH:
@@ -182,8 +182,9 @@ subroutine da_setup_firstguess_wrf( xbx, grid, &
    xxc = real(coarse_ix)/2.0
    yyc = real(coarse_jy)/2.0
 
-   if (grid%cen_lon /= grid%stand_lon .or. &
-       grid%cen_lat /= grid%moad_cen_lat) then
+   ! Warn if grid centres differ by more than .1%
+   if (ABS(grid%cen_lon-grid%stand_lon)/grid%cen_lon > 0.001 .or. &
+       ABS(grid%cen_lat-grid%moad_cen_lat)/grid%cen_lat > 0.001) then
 
       WRITE(UNIT=errmsg(1),FMT='(a,2e20.12)')'grid%cen_lon  , grid%cen_lat     :', &
                            grid%cen_lon, grid%cen_lat
@@ -209,18 +210,13 @@ subroutine da_setup_firstguess_wrf( xbx, grid, &
       WRITE(UNIT=errmsg(4),FMT='(a,2i5,2x,a,2f6.1)') &
             'Dimension of MOAD: ix, jy:',coarse_ix, coarse_jy, &
             'parent_x, parent_y:', start_x, start_y
-      call wrf_message(errmsg(1:4))
+      call da_warning(__FILE__,__LINE__,errmsg(1:4))
    endif
 
    call da_set_map_para ! set up the map background parameters
 
    ! call da_llxy( PHIC,XLONC,X,Y )
    call da_llxy(grid%cen_lat,grid%cen_lon,x,y)
-   WRITE(UNIT=errmsg(1),FMT='(a)') &
-      "Please check if the domain's central point (x,y) is correct:"
-   WRITE(UNIT=errmsg(2),FMT='(a,4f12.3)') 'grid%cen_lat,grid%cen_lon,x,y:', &
-                         grid%cen_lat,grid%cen_lon,x,y
-   call da_warning(__FILE__,__LINE__,errmsg(1:2)) 
 
    !--------------------------------------------------------------------------
    ! [3.0] Interpolate WRF C-grid winds to p points of WRFVAR grid (interpolate 
@@ -240,9 +236,8 @@ subroutine da_setup_firstguess_wrf( xbx, grid, &
    call da_transfer_wrftoxb( xbx, grid, &
 #include "em_dummy_args.inc"
                            )
-
    IF (trace_use) call da_trace_exit("da_setup_firstguess_wrf")
 
-
 end subroutine da_setup_firstguess_wrf
+
 

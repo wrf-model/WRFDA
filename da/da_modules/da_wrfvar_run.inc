@@ -27,9 +27,7 @@ subroutine da_wrfvar_run( )
    !--do wrfvar
    IF (trace_use) call da_trace_entry("da_wrfvar_run")
 
-   call wrf_debug ( 100 , 'wrfvar: calling wrfvar ' )
    call da_wrfvar_interface ( head_grid, config_flags )
-   call wrf_debug ( 100 , 'wrfvar: back from wrfvar ' )
 
    IF (trace_use) call da_trace_exit("da_wrfvar_run")
 

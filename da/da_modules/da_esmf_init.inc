@@ -1,4 +1,4 @@
-subroutine da_wrfvar_init( gcomp, importState, exportState, clock, rc )
+subroutine da_esmf_init( gcomp, importState, exportState, clock, rc )
 
    TYPE(ESMF_GridComp), INTENT(INOUT) :: gcomp
    TYPE(ESMF_State),    INTENT(INOUT) :: importState, exportState
@@ -97,12 +97,6 @@ subroutine da_wrfvar_init( gcomp, importState, exportState, clock, rc )
       call da_error(__FILE__,__LINE__, &
          'nesting requires either an MPI build or use of the -DSTUBMPI option' ) 
 #endif
-#if ( defined ( MOVE_NESTS ) )
-      call wrf_message( '                      W A R N I N G                          ' )
-      call wrf_message( '  MOVING NEST CAPABILITY IS EXPERIMENTAL AND UNSUPPORTED     ' )
-      call wrf_message( '                 IN THIS VERSION OF WRF                      ' )
-      call wrf_message( '          U S E   A T   Y O U R   O W N   R I S K            ' )
-#endif
    END IF
 
    !<DESCRIPTION>
@@ -121,18 +115,21 @@ subroutine da_wrfvar_init( gcomp, importState, exportState, clock, rc )
    ! broadcast of the configuration information.
    ! 
 !</DESCRIPTION>
-   call       wrf_message ( program_name )
-   call       wrf_debug ( 100 , 'wrf: calling alloc_and_configure_domain ' )
+   call       da_messages ((/program_name/))
+
+   call da_trace("da_esmf_init",message="calling alloc_and_configure_domain")
    call alloc_and_configure_domain ( domain_id  = 1 ,                  &
                                     grid       = head_grid ,          &
                                     parent     = null_domain ,        &
                                     kid        = -1                   )
 
-   call       wrf_debug ( 100 , 'wrf: calling model_to_grid_config_rec ' )
+   call da_trace("da_esmf_init",message="callingmodel_to_grid_config_rec")
    call model_to_grid_config_rec ( head_grid%id , model_config_rec , config_flags )
-   call       wrf_debug ( 100 , 'wrf: calling set_scalar_indices_from_config ' )
+
+   call da_trace("da_esmf_init",message="calling set_scalar_indices_from_config")
    call set_scalar_indices_from_config ( head_grid%id , idum1, idum2 )
-   call       wrf_debug ( 100 , 'wrf: calling init_wrfio' )
+
+   call da_trace("da_esmf_init",message="calling init_wrfio")
    call init_wrfio
 
 #ifdef DM_PARALLEL
@@ -198,4 +195,4 @@ subroutine da_wrfvar_init( gcomp, importState, exportState, clock, rc )
    ! return success status
    rc = ESMF_SUCCESS
 
-end subroutine da_wrfvar_init
+end subroutine da_esmf_init

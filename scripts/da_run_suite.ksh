@@ -65,8 +65,6 @@ export LONG_FCST_RANGE_2=${LONG_FCST_RANGE_2:-$CYCLE_PERIOD}
 export LONG_FCST_RANGE_3=${LONG_FCST_RANGE_3:-$CYCLE_PERIOD}
 export LONG_FCST_RANGE_4=${LONG_FCST_RANGE_4:-$CYCLE_PERIOD}
 
-export FCST_RANGE=${FCST_RANGE:-$CYCLE_PERIOD}
-
 export LBC_FREQ=${LBC_FREQ:-06}                        # Boundary condition frequency.
 export DOMAIN=${DOMAIN:-01}                            # Domain name. 
 export REGION=${REGION:-con200}                        # Region name. 
@@ -96,8 +94,11 @@ export HOSTS=${HOSTS:-$DAT_DIR/hosts/$HOSTNAME.hosts}
 export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION} # Data directory for region.
 export EXP_DIR=${EXP_DIR:-$REG_DIR/$EXPT} #Run directory.
 export OB_DIR=${OB_DIR:-$REG_DIR/ob}     # Observation directory.
-export MD_DIR=${MD_DIR:-$REG_DIR/md}     # Background directory.
+export NCEP_DIR=${NCEP_DIR:-$DAT_DIR/ncep}     # NCEP dir
 export BE_DIR=${BE_DIR:-$REG_DIR/be}     # Background error covariance directory.
+export RC_DIR=${RC_DIR:-$REG_DIR/rc}     # Reconfiguration directory
+export FC_DIR=${FC_DIR:-$REG_DIR/fc}     # Forecast directory
+export DA_DIR=${DA_DIR:-$REG_DIR/da}     # Forecast directory
 
 export REL_DIR=${REL_DIR:-$HOME/trunk} 
 export WRF_DIR=${WRF_DIR:-$REL_DIR/wrf} 
@@ -198,10 +199,16 @@ echo "NUM_PROCS    $NUM_PROCS"
 echo "INITIAL_DATE $INITIAL_DATE"
 echo "FINAL_DATE   $FINAL_DATE"
 echo "BE_DIR       $BE_DIR"
-echo "MD_DIR       $MD_DIR"
+echo "NCEP_DIR     $NCEP_DIR"
+echo "RC_DIR       $RC_DIR"
+echo "FC_DIR       $FC_DIR"
 echo "OB_DIR       $OB_DIR"
 
-while test $DATE != $FINAL_DATE; do  
+export FIRST=true
+
+while test $DATE != $FINAL_DATE; do 
+
+   mkdir -p $FC_DIR/$DATE $RC_DIR/$DATE $OB_DIR/$DATE 
 
    echo "=========="
    echo $DATE
@@ -213,6 +220,8 @@ while test $DATE != $FINAL_DATE; do
    HH=`echo $DATE | cut -c9-10`
 
    # Decide on length of forecast to run
+   export FCST_RANGE=$CYCLE_PERIOD
+
    if test $HH = $LONG_FCST_TIME_1; then
       export FCST_RANGE=$LONG_FCST_RANGE_1
    fi
@@ -229,7 +238,7 @@ while test $DATE != $FINAL_DATE; do
       export FCST_RANGE=$LONG_FCST_RANGE_4
    fi
 
-   . ${WRFVAR_DIR}/scripts/da_get_date_range.ksh $DATE $FCST_RANGE
+   . ${WRFVAR_DIR}/scripts/da_get_date_range.ksh $DATE $CYCLE_PERIOD
 
    if $RUN_RESTORE_DATA_NCEP; then
       export RUN_DIR=$EXP_DIR/$DATE/restore_data_ncep
@@ -245,6 +254,8 @@ while test $DATE != $FINAL_DATE; do
          exit 1
       fi
    fi
+  
+   # Restore lost values
 
    if $RUN_WRFSI; then
       export RUN_DIR=$EXP_DIR/$DATE/wrfsi
@@ -302,28 +313,31 @@ while test $DATE != $FINAL_DATE; do
 
    if $RUN_WRFVAR; then
       if $CYCLING; then
-         export DA_FIRST_GUESS=${MD_DIR}/${PREV_DATE}/wrfvar_input_d${DOMAIN}
+         if $FIRST; then
+            export DA_FIRST_GUESS=${RC_DIR}/${DATE}/wrfinput_d${DOMAIN}
+         else
+            export DA_FIRST_GUESS=${FC_DIR}/${DATE}/wrfinput_d${DOMAIN}
+         fi
+      else
+         export DA_FIRST_GUESS=${RC_DIR}/$DATE/wrfinput_d${DOMAIN}
       fi
 
       export RUN_DIR=$EXP_DIR/$DATE/wrfvar
       mkdir -p $RUN_DIR
 
-      export DA_ANALYSIS=$MD_DIR/$DATE/wrfvar_output
+      export DA_ANALYSIS=$FC_DIR/$DATE/analysis
       $WRFVAR_DIR/scripts/da_trace.ksh da_run_wrfvar $RUN_DIR
       ${WRFVAR_DIR}/scripts/da_run_wrfvar.ksh > $RUN_DIR/index.html 2>&1
       if test $? != 0; then
          echo `date` "${ERR}Failed with error $?$END"
          exit 1
       fi
+      export WRF_INPUT=$DA_ANALYSIS
    else     
       if $CYCLING; then
-         echo "   Running free-forecast."
-         echo ""
-         DA_ANALYSIS=${MD_DIR}/${PREV_DATE}/wrfvar_input_d$DOMAIN
-      else
-         echo "   Analysis is first guess"
-         echo ""
-         DA_ANALYSIS=$MD_DIR/$DATE/wrfinput_d$DOMAIN #ICs
+         if ! $FIRST; then
+            WRF_INPUT=${FC_DIR}/${DATE}/wrfinput_d$DOMAIN
+         fi
       fi
    fi
 
@@ -337,10 +351,8 @@ while test $DATE != $FINAL_DATE; do
          echo `date` "${ERR}Failed with error $?$END"
          exit 1
       fi
-#   else
-      # Use wrfbdy file as is
+      WRF_BDY=$FC_DIR/$DATE/wrfbdy_d$DOMAIN}
    fi
-
    if $RUN_WRF; then
       export RUN_DIR=$EXP_DIR/$DATE/wrf
       mkdir -p $RUN_DIR
@@ -351,10 +363,15 @@ while test $DATE != $FINAL_DATE; do
          echo `date` "${ERR}Failed with error $?$END"
          exit 1
       fi
+      mkdir -p $FC_DIR/$END_DATE
+      ln -fs $FC_DIR/$DATE/wrfout_d${DOMAIN}_${END_YEAR}-${END_MONTH}-${END_DAY}_${END_HOUR}:00:00 \
+        $FC_DIR/$END_DATE/wrfinput_d${DOMAIN}
    fi
 
    export PREV_DATE=${DATE}
    export DATE=`$WRFVAR_DIR/main/advance_cymdh.exe $DATE $CYCLE_PERIOD 2>/dev/null`
+
+   export FIRST=false
 
 done
 

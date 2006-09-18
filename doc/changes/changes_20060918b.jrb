@@ -1,0 +1,26 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: John Bray
+Date: 09/18/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Remove wrf timing calls from da routines, as da_trace handles it
+
+Change nproc lookup to use num_procs from da_constants for da routines
+
+
+------------------------------------------------------
+Tests:
+
+bluesky: con200 and kma_t63 run
+
+--------------------------------------------------------------------------------------
+
+File changes:
+------------
+
+A    doc/changes/changes_20060918a.jrb

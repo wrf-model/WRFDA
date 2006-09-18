@@ -59,7 +59,6 @@ subroutine da_solve_init( grid, xp, xb, &
 #include "em_data_calls.inc"
    ! XPOSE_V1
    IF ( grid%comms( XPOSE_V1 ) == invalid_message_value ) THEN
-      call wrf_debug ( 50 , 'setting up xpose XPOSE_V1' )
       call setup_xpose_rsl( grid )
       call reset_msgs_xpose
 #ifndef DEREF_KLUDGE
@@ -74,7 +73,6 @@ subroutine da_solve_init( grid, xp, xb, &
 
    ! XPOSE_V2
    IF ( grid%comms( XPOSE_V2 ) == invalid_message_value ) THEN
-      call wrf_debug ( 50 , 'setting up xpose XPOSE_V2' )
       call setup_xpose_rsl( grid )
       call reset_msgs_xpose
 #ifndef DEREF_KLUDGE

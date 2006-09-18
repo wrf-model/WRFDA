@@ -16,7 +16,8 @@ export CYCLING=${CYCLING:-false}
 export DOMAIN=${DOMAIN:-01}
 export DAT_DIR=${DAT_DIR:-$HOME/data}
 export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION}
-export MD_DIR=${MD_DIR:-$REG_DIR/md}
+export FC_DIR=${FC_DIR:-$REG_DIR/fc}
+export RC_DIR=${RC_DIR:-$REG_DIR/rc}
 export EXPT=${EXPT:-test}
 export EXP_DIR=${EXP_DIR:-$REG_DIR/$EXPT}
 export RUN_DIR=${RUN_DIR:-$EXP_DIR/$DATE/update_bc}
@@ -36,10 +37,14 @@ mkdir -p ${RUN_DIR}
 
 export REL_DIR=${REL_DIR:-$HOME/trunk} # Code directory.
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
-export DA_FIRST_GUESS=${DA_FIRST_GUESS:-$MD_DIR/$DATE/wrfvar_input_d$DOMAIN}
-export DA_ANALYSIS=${DA_ANALYSIS:-$MD_DIR/$DATE/wrfvar_output}
-export BDYIN=${BDYIN:-$MD_DIR/$DATE/wrfbdy_d$DOMAIN}
-export BDYOUT=${BDYOUT:-$MD_DIR/$DATE/wrfbdy_d$DOMAIN}
+export DA_FIRST_GUESS=${DA_FIRST_GUESS:-$FC_DIR/$DATE/wrfvar_input_d$DOMAIN}
+export DA_ANALYSIS=${DA_ANALYSIS:-$FC_DIR/$DATE/analysis}
+if $CYCLING; then
+   export BDYIN=${BDYIN:-$FC_DIR/$DATE/wrfbdy_d$DOMAIN}
+else
+   export BDYIN=${BDYIN:-$RC_DIR/$DATE/wrfbdy_d$DOMAIN}
+fi
+export BDYOUT=${BDYOUT:-$FC_DIR/$DATE/wrfbdy_d$DOMAIN}
 
 rm -rf ${WORK_DIR}
 mkdir -p ${WORK_DIR}

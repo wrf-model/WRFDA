@@ -3,6 +3,7 @@ SUBROUTINE da_messages(strs)
 #ifdef USE_LOGERR
    USE module_utility
 #endif
+   USE da_constants
 
    IMPLICIT NONE
 
@@ -11,8 +12,7 @@ SUBROUTINE da_messages(strs)
 
 #if defined( DM_PARALLEL ) && ! defined( STUBMPI)
    DO I=1,SIZE(strs) 
-      write(6,*) strs(i)
-      write(0,*) strs(i)
+      write(unit=stdout,FMT='(A)') strs(i)
    END DO
 #endif
 !TBH:  work around deficiencies in build-automation

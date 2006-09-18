@@ -40,15 +40,23 @@ export WORK_DIR=$RUN_DIR/working
 
 export OB_DIR=${OB_DIR:-$REG_DIR/ob}
 export BE_DIR=${BE_DIR:-$REG_DIR/be}
-export MD_DIR=${MD_DIR:-$REG_DIR/md}
+export RC_DIR=${RC_DIR:-$REG_DIR/rc}
+export FC_DIR=${FC_DIR:-$REG_DIR/fc}
 
 # Do we remove the WORK_DIR at the end to save space
 export CLEAN=${CLEAN:-false}
 
 export DUMMY=${DUMMY:-false}
+export CYCLING=${CYCLING:-false}
 
-export DA_FIRST_GUESS=${DA_FIRST_GUESS:-$MD_DIR/$DATE/wrfinput_d$DOMAIN}    # wrfvar "first guess" input.
-export DA_BOUNDARIES=${DA_BOUNDARIES:-$MD_DIR/$DATE/wrfbdy_d$DOMAIN}    # wrfvar boundaries input.
+if $CYCLING; then
+  export DA_FIRST_GUESS=${DA_FIRST_GUESS:-$FC_DIR/$DATE/wrfinput_d$DOMAIN}    # wrfvar "first guess" input.
+  export DA_BOUNDARIES=${DA_BOUNDARIES:-$FC_DIR/$DATE/wrfbdy_d$DOMAIN}    # wrfvar boundaries input.
+else
+  export DA_FIRST_GUESS=${DA_FIRST_GUESS:-$RC_DIR/$DATE/wrfinput_d$DOMAIN}    # wrfvar "first guess" input.
+  export DA_BOUNDARIES=${DA_BOUNDARIES:-$RC_DIR/$DATE/wrfbdy_d$DOMAIN}    # wrfvar boundaries input.
+fi
+
 export DA_ANALYSIS=${DA_ANALYSIS:-analysis}
 export DA_OBSERVATIONS=${DA_OBSERVATIONS:-$OB_DIR/$DATE/ob.ascii} # wrfvar observation input.
 export DA_BUFR_DIR=${DA_BUFR_DIR:-$OB_DIR/$DATE} # radiance bufr file directory
@@ -69,7 +77,7 @@ export NL_JCDFI_ONOFF=$NL_JCDFI_USE
 
 #=======================================================
 
-mkdir -p $RUN_DIR $MD_DIR/$DATE
+mkdir -p $RUN_DIR
 
 if $NL_USE_HTML; then
    echo "<HTML><HEAD><TITLE>$EXPT wrfvar</TITLE></HEAD><BODY><H1>$EXPT wrfvar</H1><PRE>"
@@ -358,15 +366,7 @@ if test ! -f $DA_ANALYSIS; then
 
    if $DUMMY; then
       echo Dummy wrfvar
-      echo "Dummy wrfvar" > wrfvar_output
-      echo "Dummy wrfvar" > wrfvar.out
-      echo "Dummy wrfvar" > wrfvar.error
-      echo "Dummy wrfvar" > fort.9
-      echo "Dummy wrfvar" > fort.12
-      echo "Dummy wrfvar" > fort.81
-      echo "Dummy wrfvar" > fort.82
-      echo "Dummy wrfvar" > rsl.out.0000
-      echo "Dummy wrfvar" > rsl.error.0000
+      echo "Dummy wrfvar" > $DA_ANALYSIS
       RC=0
    else
       if $NL_VAR4D; then
@@ -427,66 +427,66 @@ if test ! -f $DA_ANALYSIS; then
          $RUN_CMD ./wrfvar.exe
          RC=$?
       fi
-   fi
 
-   if test -f fort.9; then
-     cp fort.9 $RUN_DIR/namelist.output
-   fi
-
-   if test -f fort.12; then
-      cp fort.12 $RUN_DIR/statistics
-   fi
-
-   if test -f fort.81; then 
-      cp fort.81 $RUN_DIR/cost_fn
-   fi
-
-   if test -f fort.82; then
-      cp fort.82 $RUN_DIR/grad_fn
-   fi
-
-   if test -f wrfvar_output; then
-      if test $DA_ANALYSIS != wrfvar_output; then 
-         mv wrfvar_output $DA_ANALYSIS
+      if test -f fort.9; then
+        cp fort.9 $RUN_DIR/namelist.output
       fi
-   fi
 
-   if test -d trace; then
-      mkdir -p $RUN_DIR/trace
-      mv trace/* $RUN_DIR/trace
-   fi
+      if test -f fort.12; then
+         cp fort.12 $RUN_DIR/statistics
+      fi
 
-   mkdir -p $RUN_DIR/rsl
-   mv rsl* $RUN_DIR/rsl
-   if $NL_USE_HTML; then
-      cd $RUN_DIR/rsl
-      for FILE in rsl*; do
-         echo "<HTML><HEAD><TITLE>$FILE</TITLE></HEAD>" > $FILE.html
-         echo "<H1>$FILE</H1><PRE>" >> $FILE.html
-         cat $FILE >> $FILE.html
-         echo "</PRE></BODY></HTML>" >> $FILE.html
-         rm $FILE
-      done
-      cd $RUN_DIR
+      if test -f fort.81; then 
+         cp fort.81 $RUN_DIR/cost_fn
+      fi
 
-      echo '<A HREF="namelist.output">Namelist output</a>'
-      echo '<A HREF="rsl/rsl.out.0000.html">rsl.out.0000</a>'
-      echo '<A HREF="rsl/rsl.error.0000.html">rsl.error.0000</a>'
-      echo '<A HREF="rsl">Other RSL output</a>'
-      echo '<A HREF="trace/0.html">PE 0 trace</a>'
-      echo '<A HREF="trace">Other tracing</a>'
-      echo '<A HREF="cost_fn">Cost function</a>'
-      echo '<A HREF="grad_fn">Gradient function</a>'
-      echo '<A HREF="statistics">Statistics</a>'
-   fi
+      if test -f fort.82; then
+         cp fort.82 $RUN_DIR/grad_fn
+      fi
 
-   cat $RUN_DIR/cost_fn
+      if test -f wrfvar_output; then
+         if test $DA_ANALYSIS != wrfvar_output; then 
+            mv wrfvar_output $DA_ANALYSIS
+         fi
+      fi
 
-   if test $RC = 0; then
-     echo `date` "${OK}Succeeded${END}"
-   else
-      echo `date` "${ERR}Failed${END} with error $RC"
-      exit 1
+      if test -d trace; then
+         mkdir -p $RUN_DIR/trace
+         mv trace/* $RUN_DIR/trace
+      fi
+
+      mkdir -p $RUN_DIR/rsl
+      mv rsl* $RUN_DIR/rsl
+      if $NL_USE_HTML; then
+         cd $RUN_DIR/rsl
+         for FILE in rsl*; do
+            echo "<HTML><HEAD><TITLE>$FILE</TITLE></HEAD>" > $FILE.html
+            echo "<H1>$FILE</H1><PRE>" >> $FILE.html
+            cat $FILE >> $FILE.html
+            echo "</PRE></BODY></HTML>" >> $FILE.html
+            rm $FILE
+         done
+         cd $RUN_DIR
+
+         echo '<A HREF="namelist.output">Namelist output</a>'
+         echo '<A HREF="rsl/rsl.out.0000.html">rsl.out.0000</a>'
+         echo '<A HREF="rsl/rsl.error.0000.html">rsl.error.0000</a>'
+         echo '<A HREF="rsl">Other RSL output</a>'
+         echo '<A HREF="trace/0.html">PE 0 trace</a>'
+         echo '<A HREF="trace">Other tracing</a>'
+         echo '<A HREF="cost_fn">Cost function</a>'
+         echo '<A HREF="grad_fn">Gradient function</a>'
+         echo '<A HREF="statistics">Statistics</a>'
+      fi
+
+      cat $RUN_DIR/cost_fn
+
+      if test $RC = 0; then
+        echo `date` "${OK}Succeeded${END}"
+      else
+         echo `date` "${ERR}Failed${END} with error $RC"
+         exit 1
+      fi
    fi
 
    # We never look at core files

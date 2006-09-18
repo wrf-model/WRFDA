@@ -31,10 +31,6 @@ subroutine da_wrfvar_init( no_init1 )
    ! Phase 2 resumes after MPI_INIT() (if it is called)
    call init_modules(2)
 
-   IF (print_detail_timing) THEN
-      call start_timing ! end_timing call in wrfvar_finalize
-   END IF
-
    !<DESCRIPTION>
    ! The wrf namelist.input file is read and stored in the USE associated
    ! structure model_config_rec, defined in frame/module_configure.F, by the
@@ -123,19 +119,20 @@ subroutine da_wrfvar_init( no_init1 )
    ! 
    !</DESCRIPTION>
 
-   call wrf_message ( program_name )
-   call wrf_message ( "Subversion "//subversion_version)
-   call wrf_debug ( 100 , 'wrf: calling alloc_and_configure_domain ' )
+   call da_messages ((/program_name//" "//subversion_version/))
+   call da_trace("da_wrfvar_init",message="calling alloc_and_configure_domain")
    call alloc_and_configure_domain ( domain_id  = 1 ,                  &
                                      grid       = head_grid ,          &
                                      parent     = null_domain ,        &
                                      kid        = -1                   )
 
-   call wrf_debug ( 100 , 'wrf: calling model_to_grid_config_rec ' )
+   call da_trace("da_wrfvar_init",message="calling model_to_grid_config_rec")
    call model_to_grid_config_rec ( head_grid%id , model_config_rec , config_flags )
-   call wrf_debug ( 100 , 'wrf: calling set_scalar_indices_from_config ' )
+
+   call da_trace("da_wrfvar_init",message="calling set_scalar_indices_from_config")
    call set_scalar_indices_from_config ( head_grid%id , idum1, idum2 )
-   call wrf_debug ( 100 , 'wrf: calling init_wrfio' )
+
+   call da_trace("da_wrfvar_init",message="calling init_wrfio")
    call init_wrfio
 
 #ifdef DM_PARALLEL

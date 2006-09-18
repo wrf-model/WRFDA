@@ -116,8 +116,11 @@
         CALL nl_set_simulation_start_hour   ( grid%id , simulation_start_hour   )
         CALL nl_set_simulation_start_minute ( grid%id , simulation_start_minute )
         CALL nl_set_simulation_start_second ( grid%id , simulation_start_second )
+! JRB stop this message in WRFVAR, as we don't handle dates well
+#ifndef DA_CORE
         CALL wrf_message('input_wrf: SIMULATION_START_DATE not available in input')
         CALL wrf_message('will use namelist information') 
+#endif
       ENDIF
     ENDIF
 
@@ -452,6 +455,8 @@ print *,'dx_compare,dy_compare = ',dx_compare,dy_compare
             CALL wrf_atotime( current_date(1:19), time )
             CALL domain_clock_get( grid, current_time=currtime, &
                                          current_timestr=currtimestr )
+! JRB don't perform the check  for WRFVAR, as we're not passing the right dates around
+#ifndef DA_CORE
             CALL domain_clockprint(150, grid, &
                    'DEBUG input_wrf():  get CurrTime from clock,')
             IF ( time .NE. currtime ) THEN
@@ -462,10 +467,9 @@ print *,'dx_compare,dy_compare = ',dx_compare,dy_compare
                 CALL wrf_message( "**WARNING** Time in input file not equal to time on domain **WARNING**" )
                 WRITE(wrf_err_message,*) "**WARNING** Trying next time in file ",TRIM(fname)," ..."
                 CALL wrf_message( TRIM(wrf_err_message) )
-                WRITE(wrf_err_message,*) "**JRB** GOTO 3003 nobbled **JRB**"
-                CALL wrf_message( TRIM(wrf_err_message) )
-!                GOTO 3003
+                GOTO 3003
             ENDIF
+#endif
         CASE DEFAULT
       END SELECT
     ENDIF

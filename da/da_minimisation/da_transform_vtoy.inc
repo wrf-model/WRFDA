@@ -83,7 +83,7 @@ subroutine da_transform_vtoy( cv_size, be, ep, cv, iv, vp, vv, xa, xb, xbx, &
                                  )
          call da_transform_xtoy( xb, iv, xa, xp, y )
       enddo
-   else  ! var4d
+   else  ! not var4d
       call da_transform_xtoy( xb, iv, xa, xp, y )
    endif ! var4d
 
