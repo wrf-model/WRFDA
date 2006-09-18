@@ -10,9 +10,11 @@ MODULE module_wrf_esmf_super
    USE module_machine
    USE module_domain
    USE module_integrate
+#ifdef WRF_PLUS
    USE module_integrate_ad
    USE module_integrate_tl
    USE module_integrate_tst
+#endif
    USE module_driver_constants
    USE module_configure
 

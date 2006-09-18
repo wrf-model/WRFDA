@@ -14,6 +14,7 @@ wrfvar_esmf  : advance_cymdh.exe da_update_bc.exe $(WRFVAR_LIBS) $(WRFVAR_OBJS) 
 
 wrf     : $(WRF_LIBS) wrf.o
 	$(LD) -o wrf.exe $(LDFLAGS) wrf.o $(WRF_LIB)
+	cp wrf.exe ../main
 
 wrfplus : $(WRFPLUS_LIBS) wrf.o
 	$(LD) -o wrfplus.exe $(LDFLAGS) wrf.o $(WRFPLUS_LIB)
@@ -67,7 +68,7 @@ convert_emiss : $(WRF_LIBS) convert_emiss.o
 	cp convert_emiss.exe ../main
 
 real_em : $(WRF_LIBS) real_em.o
-	$(FC) -o real_em.exe $(LDFLAGS) real_em.o module_bc.o \
+	$(FC) -o real.exe $(LDFLAGS) real_em.o module_bc.o \
             module_big_step_utilities_em.o \
             module_date_time.o module_optional_si_input.o module_bc_time_utilities.o \
             module_dm.o module_utility.o module_timing.o module_configure.o \
@@ -150,25 +151,6 @@ ndown_em.o: \
 	module_initialize_real.o \
 	module_big_step_utilities_em.o \
 	$(ESMF_MOD_DEPENDENCE) $(EXTRAMODULES)
-
-# this already built above :module_initialize.real.o \
-real_em.o: \
-	module_machine.o \
-	module_domain.o \
-	module_driver_constants.o \
-	module_configure.o \
-	module_timing.o \
-	module_dm.o \
-	module_wrf_esmf_super.o \
-	module_si_io_em.o \
-	module_big_step_utilities_em.o \
-	module_io_domain.o \
-	module_date_time.o \
-	module_optional_si_input.o \
-	module_bc_time_utilities.o \
-	$(ESMF_MOD_DEPENDENCE) $(EXTRAMODULES)
-#	module_input_chem_data.o \
-#	module_input_chem_bioemiss.o \
 
 wrf.o: \
 	module_machine.o \
