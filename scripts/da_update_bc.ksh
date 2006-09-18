@@ -46,6 +46,12 @@ else
 fi
 export BDYOUT=${BDYOUT:-$FC_DIR/$DATE/wrfbdy_d$DOMAIN}
 
+echo 'REL_DIR        <A HREF="'$REL_DIR'">'$REL_DIR'</a>'
+echo 'WRFVAR_DIR     <A HREF="'$WRFVAR_DIR'">'$WRFVAR_DIR'</a>'
+echo "DA_FIRST_GUESS $DA_FIRST_GUESS"
+echo "BDYIN          $BDYIN"
+echo "BDYOUT         $BDYOUT"
+
 rm -rf ${WORK_DIR}
 mkdir -p ${WORK_DIR}
 cd ${WORK_DIR}

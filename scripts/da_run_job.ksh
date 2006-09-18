@@ -84,6 +84,7 @@ export RUN_CMD=${RUN_CMD:-\$RUN_CMD_DEFAULT}
 EOF
 elif test $HOSTNAME = ocotillo; then
    cat > job.ksh <<EOF
+#!/bin/ksh
 # Cannot put - options inside default substitution
 export RUN_CMD_DEFAULT="mpirun -v -np $NUM_PROCS -nolocal -machinefile $HOSTS"
 export RUN_CMD=${RUN_CMD:-\$RUN_CMD_DEFAULT}
@@ -91,6 +92,7 @@ $SCRIPT > $EXP_DIR/index.html 2>&1
 EOF
 else
    cat > job.ksh <<EOF
+#!/bin/ksh
 # Cannot put - options inside default substitution
 export RUN_CMD_DEFAULT="mpirun -v -np $NUM_PROCS -all-local -machinefile $HOSTS"
 export RUN_CMD=${RUN_CMD:-\$RUN_CMD_DEFAULT}
@@ -99,6 +101,7 @@ EOF
 fi
 
 cat >> job.ksh <<EOF
+#!/bin/ksh
 RC=\$?
 if test \$RC = 0; then
    echo Succeeded

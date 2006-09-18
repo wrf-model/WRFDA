@@ -66,6 +66,7 @@ export LONG_FCST_RANGE_3=${LONG_FCST_RANGE_3:-$CYCLE_PERIOD}
 export LONG_FCST_RANGE_4=${LONG_FCST_RANGE_4:-$CYCLE_PERIOD}
 
 export LBC_FREQ=${LBC_FREQ:-06}                        # Boundary condition frequency.
+export OBS_FREQ=${OBS_FREQ:-06}
 export DOMAIN=${DOMAIN:-01}                            # Domain name. 
 export REGION=${REGION:-con200}                        # Region name. 
 export SOLVER=${SOLVER:-em}
@@ -74,6 +75,7 @@ export CLEAN=${CLEAN:-false}
 export DUMMY=${DUMMY:-true}
 
 export RUN_RESTORE_DATA_NCEP=${RUN_RESTORE_DATA_NCEP:-false}  # Run if true.
+export RUN_RESTORE_DATA_RTOBS=${RUN_RESTORE_DATA_RTOBS:-false}  # Run if true.
 export RUN_WPS=${RUN_WPS:-false}                # Run if true.
 export RUN_WRFSI=${RUN_WRFSI:-false}                # Run if true.
 export RUN_REAL=${RUN_REAL:-false}                  # Run if true.
@@ -102,6 +104,7 @@ export DA_DIR=${DA_DIR:-$REG_DIR/da}     # Forecast directory
 
 export REL_DIR=${REL_DIR:-$HOME/trunk} 
 export WRF_DIR=${WRF_DIR:-$REL_DIR/wrf} 
+export WRF_NL_DIR=${WRF_NL_DIR:-$REL_DIR/wrf_nl} 
 export WRFSI_DIR=${WRFSI_DIR:-$REL_DIR/wrfsi}                
 export WPS_DIR=${WPS_DIR:-$REL_DIR/wps}                
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}        
@@ -175,6 +178,7 @@ export PREV_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe $DATE -$CYCLE_PERIOD 2>/dev
 
 if $CHECK_SVNVERSION; then
    WRF_VN=`svnversion -n $WRF_DIR`
+   WRF_NL_VN=`svnversion -n $WRF_NL_DIR`
    WRFVAR_VN=`svnversion -n $WRFVAR_DIR`
    WRFPLUS_VN=`svnversion -n $WRFPLUS_DIR`
    WPS_VN=`svnversion -n $WPS_DIR`
@@ -187,22 +191,25 @@ else
    echo
 fi
 
-echo "REL_DIR      $REL_DIR"
-echo "WRF          $WRF_DIR $WRF_VN"
-echo "WRFVAR       $WRFVAR_DIR $WRFVAR_VN"
-echo "WRFPLUS      $WRFPLUS_DIR $WRFPLUS_VN"
-echo "WPS          $WPS_DIR $WPS_VN"
-echo "WRFSI        $WRFSI_DIR"
-echo "OBSPROC      $OBSPROC_DIR"
+echo 'REL_DIR      <A HREF="file:'$REL_DIR'">'$REL_DIR'</a>'
+echo 'WRF          <A HREF="file:'$WRF_DIR'">'$WRF_DIR'</a>' $WRF_VN
+echo 'WRF_NL       <A HREF="file:'$WRF_NL_DIR'">'$WRF_NL_DIR'</a>' $WRF_VN
+echo 'WRFVAR       <A HREF="file:'$WRFVAR_DIR'">'$BE_DIR'</a>' $WRFVAR_VN
+echo 'WRFPLUS      <A HREF="file:'$WRFPLUS_DIR'">'$WRFPLUS_DIR'</a>' $WRFPLUS_VN
+echo 'WPS          <A HREF="file:'$WPS_DIR'">'$WPS_DIR'</a>' $WPS_VN
+echo 'WRFSI        <A HREF="file:'$WRFSI_DIR'">'$WRFSI_DIR'</a>'
+echo 'OBSPROC      <A HREF="file:'$OBSPROC_DIR'">'$OBSPROC_DIR'</a>'
 
+echo "DUMMY        $DUMMY"
+echo "CLEAN        $CLEAN"
 echo "NUM_PROCS    $NUM_PROCS"
 echo "INITIAL_DATE $INITIAL_DATE"
 echo "FINAL_DATE   $FINAL_DATE"
-echo "BE_DIR       $BE_DIR"
-echo "NCEP_DIR     $NCEP_DIR"
-echo "RC_DIR       $RC_DIR"
-echo "FC_DIR       $FC_DIR"
-echo "OB_DIR       $OB_DIR"
+echo 'BE_DIR       <A HREF="file:'$BE_DIR'">'$BE_DIR'</a>'
+echo 'NCEP_DIR     <A HREF="file:'$NCEP_DIR'">'$NCEP_DIR'</a>'
+echo 'RC_DIR       <A HREF="file:'$RC_DIR'">'$RC_DIR'</a>'
+echo 'FC_DIR       <A HREF="file:'$FC_DIR'">'$FC_DIR'</a>'
+echo 'OB_DIR       <A HREF="file:'$OB_DIR'">'$OB_DIR'</a>'
 
 export FIRST=true
 
@@ -249,6 +256,21 @@ while test $DATE != $FINAL_DATE; do
 
       $WRFVAR_DIR/scripts/da_trace.ksh da_run_restore_data_ncep $RUN_DIR
       ${WRFVAR_DIR}/scripts/da_restore_data_ncep.ksh > $RUN_DIR/index.html 2>&1
+      if test $? != 0; then
+         echo `date` "${ERR}Failed with error$?$END"
+         exit 1
+      fi
+   fi
+
+   if $RUN_RESTORE_DATA_RTOBS; then
+      export RUN_DIR=$EXP_DIR/$DATE/restore_data_rtobs
+      mkdir -p $RUN_DIR
+
+      START_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe ${DATE} $WINDOW_START 2>/dev/null`
+      END_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe ${DATE} $WINDOW_END 2>/dev/null`
+
+      $WRFVAR_DIR/scripts/da_trace.ksh da_run_restore_data_rtobs $RUN_DIR
+      ${WRFVAR_DIR}/scripts/da_restore_data_rtobs.ksh > $RUN_DIR/index.html 2>&1
       if test $? != 0; then
          echo `date` "${ERR}Failed with error$?$END"
          exit 1
@@ -351,8 +373,9 @@ while test $DATE != $FINAL_DATE; do
          echo `date` "${ERR}Failed with error $?$END"
          exit 1
       fi
-      WRF_BDY=$FC_DIR/$DATE/wrfbdy_d$DOMAIN}
+      export WRF_BDY=$FC_DIR/$DATE/wrfbdy_d${DOMAIN}
    fi
+
    if $RUN_WRF; then
       export RUN_DIR=$EXP_DIR/$DATE/wrf
       mkdir -p $RUN_DIR
@@ -375,6 +398,7 @@ while test $DATE != $FINAL_DATE; do
 
 done
 
+echo
 echo `date` "Suite finished"
 
 if $NL_USE_HTML; then

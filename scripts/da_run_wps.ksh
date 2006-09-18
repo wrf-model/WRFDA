@@ -49,9 +49,11 @@ if $NL_USE_HTML; then
    echo "<HTML><HEAD><TITLE>$EXPT wps</TITLE></HEAD><BODY><H1>$EXPT wps</H1><PRE>"
 fi   
 
-echo "WPS_DIR $WPS_DIR"
-echo "RC_DIR $RC_DIR"
-echo "
+echo 'WPS_DIR       <A HREF="'$WPS_DIR'"</a>'$WPS_DIR'</a>'
+echo "DATE          $DATE"
+echo "CYCLE_PERIOD  $CYCLE_PERIOD"
+echo 'RC_DIR        <A HREF="file:'$RC_DIR'"</a>'$RC_DIR'</a>'
+echo 'WPS_INPUT_DIR <A HREF="file:'$WPS_INPUT_DIR'"</a>'$WPS_INPUT_DIR'</a>'
 
 date
 
@@ -170,7 +172,7 @@ fi
 
 cd $OLDPWD
 
-cp $WORK_DIR/namelist.input $RUN_DIR
+cp $WORK_DIR/namelist.wps $RUN_DIR
 
 if $CLEAN; then
    rm -rf $WORK_DIR

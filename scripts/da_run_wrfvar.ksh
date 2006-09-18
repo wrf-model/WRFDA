@@ -15,7 +15,7 @@ export WINDOW_END=${WINDOW_END:-6}
 #Default directories/files:
 
 export REL_DIR=${REL_DIR:-$HOME/trunk}
-export WRF_DIR=${WRF_DIR:-$REL_DIR/wrf}
+export WRF_NL_DIR=${WRF_NL_DIR:-$REL_DIR/wrf_nl}
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
 export WRFPLUS_DIR=${WRFPLUS_DIR:-$REL_DIR/wrfplus}
 
@@ -23,7 +23,7 @@ export CHECK_SVNVERSION=${CHECK_SVNVERSION:-true}
 
 if $CHECK_SVNVERSION; then
    WRFVAR_REV=`svnversion -n $WRFVAR_DIR`
-   WRF_REV=`svnversion -n $WRF_DIR`
+   WRF_NL_REV=`svnversion -n $WRF_NL_DIR`
    WRFPLUS_REV=`svnversion -n $WRFPLUS_DIR`
 fi
 
@@ -85,17 +85,17 @@ fi
 
 date
 
-echo "Release directory:           $REL_DIR"
-echo "WRFVAR directory:            $WRFVAR_DIR $WRFVAR_REV"
-echo "WRF directory:               $WRF_DIR $WRF_REV"
-echo "WRFPLUS directory:           $WRFPLUS_DIR $WRFPLUS_REV"
+echo 'Release directory:           <A HREF="file:'$REL_DIR'">"'$REL_DIR'</a>'
+echo 'WRFVAR directory:            <A HREF="file:'$WRFVAR_DIR'">'$WRFVAR_DIR'</a>' $WRFVAR_REV
+echo 'WRF NL directory:            <A HREF="file:'$WRF_NL_DIR'">'$WRF_NL_DIR'</a>' $WRF_NL_REV
+echo 'WRFPLUS directory:           <A HREF="file:'$WRFPLUS_DIR'">'$WRFPLUS_DIR'</a>' $WRFPLUS_REV
 echo "Subversion revision:         $WRFVAR_REV"
 echo "First Guess Input File:      $DA_FIRST_GUESS"
 echo "Background Error Input File: $DA_BACK_ERRORS"
-echo "Observation Directory:       $OB_DIR"
+echo 'Observation Directory:       <A HREF="file:'$OB_DIR'">'$OB_DIR'</a>'
 echo "Analysis:                    $DA_ANALYSIS"
-echo "Run directory:               $RUN_DIR"
-echo "Working directory:           $WORK_DIR"
+echo 'Run directory:               <A HREF="file:'$RUN_DIR'">'$RUN_DIR'</a>'
+echo 'Working directory:           <A HREF="file:'$WORK_DIR'">'$WORK_DIR'</a>'
 echo "Analysis date:               $DATE"
 echo "Time window start:           $WINDOW_START"
 echo "Time window end:             $WINDOW_END"
@@ -261,7 +261,7 @@ if test ! -f $DA_ANALYSIS; then
       export NL_TIME_STEP=600
       export NL_WRITE_INPUT=true
       export NL_DEBUG_LEVEL=999
-      . $WRF_DIR/inc/namelist_script.inc
+      . $WRF_NL_DIR/inc/namelist_script.inc
       export NL_DEBUG_LEVEL=0
       unset NL_AUXHIST2_INNAME
       unset NL_AUXHIST2_INTERVAL
@@ -275,7 +275,7 @@ if test ! -f $DA_ANALYSIS; then
 #      else
          ln -fs $WORK_DIR/fg01 nl/wrfinput_d${DOMAIN}
 #      fi
-      ln -s $WRF_DIR/main/wrf.exe nl
+      ln -s $WRF_NL_DIR/main/wrf.exe nl
 
       # Outputs
       for I in 02 03 04 05 06 07; do
@@ -355,7 +355,6 @@ if test ! -f $DA_ANALYSIS; then
    fi
 
    if $NL_USE_HTML; then
-      echo '<A HREF="working">Working directory</a>'
       echo '<A HREF="namelist.input">Namelist input</a>'
    fi
 

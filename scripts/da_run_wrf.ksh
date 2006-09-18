@@ -38,7 +38,7 @@ export WRF_DIR=${WRF_DIR:-$REL_DIR/wrf}                  # Code subdirectory.
 
 export RC_DIR=${RC_DIR:-$REG_DIR/rc}
 
-export WRF_INPUT=${WRF_INPUT:-$RC_DIR/wrfinput_d${DOMAIN}}
+export WRF_INPUT=${WRF_INPUT:-$RC_DIR/$DATE/wrfinput_d${DOMAIN}}
 export WRF_BDY=${WRF_BDY:-$RC_DIR/$DATE/wrfbdy_d${DOMAIN}}
 
 
@@ -63,6 +63,8 @@ export NL_TIME_STEP_SOUND=${NL_TIME_STEP_SOUND:-4}    #
 if $NL_USE_HTML; then
    echo "<HTML><HEAD><TITLE>$EXPT wrf</TITLE></HEAD><BODY>"
    echo "<H1>$EXPT wrf</H1><PRE>"
+   echo 'REL_DIR    <A HREF="file:'$REL_DIR'">'$REL_DIR'</a>'
+   echo 'WRF_DIR    <A HREF="file:'$WRF_DIR'">'$WRF_DIR'</a>' $WRF_REV
    echo "WRF_INPUT  $WRF_INPUT"
    echo "WRF_BDY    $WRF_BDY"
    echo "FCST_RANGE $FCST_RANGE"
@@ -76,16 +78,16 @@ mkdir -p ${WORK_DIR}
 cd ${WORK_DIR}
 
 # Copy necessary info (better than link as not overwritten):
-cp ${WRF_DIR}/main/wrf.exe .
-cp ${WRF_DIR}/run/RRTM_DATA .
-cp ${WRF_DIR}/run/GENPARM.TBL .
-cp ${WRF_DIR}/run/LANDUSE.TBL .
+ln -fs ${WRF_DIR}/main/wrf.exe .
+ln -fs ${WRF_DIR}/run/RRTM_DATA .
+ln -fs ${WRF_DIR}/run/GENPARM.TBL .
+ln -fs ${WRF_DIR}/run/LANDUSE.TBL .
 
-cp ${WRF_DIR}/run/SOILPARM.TBL .
-cp ${WRF_DIR}/run/VEGPARM.TBL .
-cp ${WRF_DIR}/run/gribmap.txt .
-cp ${WRF_INPUT} wrfinput_d${DOMAIN}
-cp ${WRF_BDY} wrfbdy_d${DOMAIN}
+ln -fs ${WRF_DIR}/run/SOILPARM.TBL .
+ln -fs ${WRF_DIR}/run/VEGPARM.TBL .
+ln -fs ${WRF_DIR}/run/gribmap.txt .
+ln -fs ${WRF_INPUT} wrfinput_d${DOMAIN}
+ln -fs ${WRF_BDY} wrfbdy_d${DOMAIN}
 #cp ${RC_DIR}/$DATE/wrflowinp_d${DOMAIN} wrflowinp_d${DOMAIN}
 
 export CCYY=`echo $DATE | cut -c1-4`
@@ -109,7 +111,14 @@ export NL_END_HOUR=`echo $END_DATE | cut -c9-10`
 
 export NL_INTERVAL_SECONDS=`expr $LBC_FREQ \* 3600`
 
-. $WRF_DIR/inc/namelist_script.inc
+if test $WRF_NAMELIST'.' != '.'; then
+   ln -fs $WRF_NAMELIST namelist.input
+elif test -f WRF_DIR/inc/namelist_script.inc; then
+   . $WRF_DIR/inc/namelist_script.inc
+else
+   ln -fs $WRF_DIR/test/em_real/namelist.input .
+fi
+
 cp namelist.input $RUN_DIR
 
 if test ! -f $FC_DIR/$DATE/wrfout_d${DOMAIN}_${END_YEAR}-${END_MONTH}-${END_DAY}_${END_HOUR}:00:00; then
