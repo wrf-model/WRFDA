@@ -96,4 +96,3 @@ module_utility.o :  ESMF_Mod.o module_symbols_util.o
 module_symbols_util.o :  ESMF_Mod.o
 Test1.o :  module_utility.o
 
-clean :

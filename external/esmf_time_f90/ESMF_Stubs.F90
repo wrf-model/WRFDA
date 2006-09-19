@@ -93,7 +93,7 @@ CONTAINS
       USE esmf_basemod
       INTEGER, INTENT(  OUT), OPTIONAL :: rc
 #if (defined SPMD) || (defined COUP_CSM)
-      INCLUDE 'mpif.h'
+#include <mpif.h>
 #endif
       INTEGER :: ier
 

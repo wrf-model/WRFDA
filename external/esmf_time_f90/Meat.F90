@@ -1,4 +1,4 @@
-#include "ESMF_TimeMgr.inc"
+#include <ESMF_TimeMgr.inc>
 
 ! Factor so abs(Sn) < Sd and ensure that signs of S and Sn match.  
 ! Also, enforce consistency.  

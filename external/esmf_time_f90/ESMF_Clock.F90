@@ -18,7 +18,7 @@
 !     
 !------------------------------------------------------------------------------
 ! INCLUDES
-#include "ESMF_TimeMgr.inc" 
+#include <ESMF_TimeMgr.inc> 
 
 !==============================================================================
 !BOPI
@@ -98,8 +98,8 @@
 !      public ESMF_ClockGetAdvanceCount
 !      public ESMF_ClockGetTimeStep
 !      public ESMF_ClockSetTimeStep
-      public ESMF_ClockGetCurrTime
-      public ESMF_ClockSetCurrTime
+!      public ESMF_ClockGetCurrTime
+!      public ESMF_ClockSetCurrTime
 !      public ESMF_ClockGetStartTime
 !      public ESMF_ClockGetStopTime
 !      public ESMF_ClockGetRefTime
@@ -113,8 +113,6 @@
 !      public ESMF_ClockSyncToWallClock
       public ESMF_ClockAdvance
       public ESMF_ClockIsStopTime
-      public ESMF_ClockIsStartTime
-      public ESMF_ClockBack
       public ESMF_ClockStopTimeDisable
 
 ! Required inherited and overridden ESMF_Base class methods
@@ -1159,36 +1157,6 @@ use esmf_timemod
       IF ( PRESENT( rc ) ) rc = ESMF_SUCCESS
     
       end function ESMF_ClockIsStopTime
-
-! JRB stubs
-      function ESMF_ClockIsStartTime(clock, rc)
-
-      logical :: ESMF_ClockIsStartTime
-
-      type(ESMF_Clock), intent(in) :: clock
-      integer, intent(out), optional :: rc
-
-      CALL wrf_error_fatal("Stub routine")
-
-      ESMF_ClockIsStartTime = .TRUE.
-    
-      end function ESMF_ClockIsStartTime  
-
-SUBROUTINE ESMF_ClockBack(clock, RingingAlarmList, &
-                                NumRingingAlarms, rc)
-
-
-  TYPE(ESMF_Clock), INTENT(INOUT) :: clock
-  TYPE(ESMF_Alarm), DIMENSION(MAX_ALARMS), intent(out), optional :: &
-                                        RingingAlarmList
-  INTEGER, INTENT(OUT), OPTIONAl :: NumRingingAlarms
-  INTEGER, INTENT(OUT) :: rc
-
-  CALL wrf_error_fatal("Stub routine")
-
-END SUBROUTINE ESMF_ClockBack
-
-! JRB end of stubs
 
 !------------------------------------------------------------------------------
 !

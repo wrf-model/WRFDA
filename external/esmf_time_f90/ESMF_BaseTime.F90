@@ -20,7 +20,7 @@
 !------------------------------------------------------------------------------
 ! INCLUDES
 
-#include "ESMF_TimeMgr.inc"
+#include <ESMF_TimeMgr.inc>
 !
 !===============================================================================
 !BOPI
@@ -37,7 +37,6 @@
 !------------------------------------------------------------------------------
 ! !USES:
       use ESMF_BaseMod    ! ESMF Base class
-
       implicit none
 !
 !------------------------------------------------------------------------------
@@ -131,8 +130,6 @@
         TYPE(ESMF_BaseTime), INTENT(IN) :: basetime2
         ! locals
         INTEGER (ESMF_KIND_I8) :: Sn1, Sd1, Sn2, Sd2, lcd
-
-external normalize_basetime
 !  PRINT *,'DEBUG:  BEGIN ESMF_BaseTimeSum()'
 !  PRINT *,'DEBUG:  ESMF_BaseTimeSum():  basetime1%S = ',basetime1%S
 !  PRINT *,'DEBUG:  ESMF_BaseTimeSum():  basetime1%Sn = ',basetime1%Sn

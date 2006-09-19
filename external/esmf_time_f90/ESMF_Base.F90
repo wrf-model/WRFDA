@@ -436,7 +436,7 @@ end function
       subroutine ESMF_BaseInit(base, rc)
 !
 ! !ARGUMENTS:
-      type(ESMF_Base), INTENT(INOUT) :: base                 
+      type(ESMF_Base) :: base                 
       integer, intent(out), optional :: rc     
 
 !
@@ -483,7 +483,7 @@ end function
       subroutine ESMF_SetName(anytype, name, namespace, rc)
 !
 ! !ARGUMENTS:
-      type(ESMF_Base), INTENT(INOUT) :: anytype                 
+      type(ESMF_Base) :: anytype                 
       character (len = *), intent(in), optional :: name   
       character (len = *), intent(in), optional :: namespace
       integer, intent(out), optional :: rc     
@@ -942,7 +942,7 @@ end function
       subroutine ESMF_SetPointer(ptype, contents, rc)
 !
 ! !ARGUMENTS:
-      type(ESMF_Pointer),INTENT(INOUT) :: ptype 
+      type(ESMF_Pointer) :: ptype 
       integer*8, intent(in) :: contents
       integer, intent(out), optional :: rc  
 
@@ -968,7 +968,7 @@ end function
       subroutine ESMF_SetNullPointer(ptype, rc)
 !
 ! !ARGUMENTS:
-      type(ESMF_Pointer), INTENT(INOUT) :: ptype 
+      type(ESMF_Pointer) :: ptype 
       integer, intent(out), optional :: rc  
 
 !
