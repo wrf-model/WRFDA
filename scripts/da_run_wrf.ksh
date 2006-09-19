@@ -60,16 +60,15 @@ export NL_KM_OPT=${NL_KM_OPT:-1}               #
 export NL_DAMPCOEF=${NL_DAMPCOEF:-0.2}           # 
 export NL_TIME_STEP_SOUND=${NL_TIME_STEP_SOUND:-4}    # 
 
-if $NL_USE_HTML; then
-   echo "<HTML><HEAD><TITLE>$EXPT wrf</TITLE></HEAD><BODY>"
-   echo "<H1>$EXPT wrf</H1><PRE>"
-   echo 'REL_DIR    <A HREF="file:'$REL_DIR'">'$REL_DIR'</a>'
-   echo 'WRF_DIR    <A HREF="file:'$WRF_DIR'">'$WRF_DIR'</a>' $WRF_REV
-   echo "WRF_INPUT  $WRF_INPUT"
-   echo "WRF_BDY    $WRF_BDY"
-   echo "FCST_RANGE $FCST_RANGE"
-   echo "LBC_FREQ   $LBC_FREQ"
-fi
+echo "<HTML><HEAD><TITLE>$EXPT wrf</TITLE></HEAD><BODY>"
+echo "<H1>$EXPT wrf</H1><PRE>"
+
+echo 'REL_DIR    <A HREF="file:'$REL_DIR'">'$REL_DIR'</a>'
+echo 'WRF_DIR    <A HREF="file:'$WRF_DIR'">'$WRF_DIR'</a>' $WRF_REV
+echo "WRF_INPUT  $WRF_INPUT"
+echo "WRF_BDY    $WRF_BDY"
+echo "FCST_RANGE $FCST_RANGE"
+echo "LBC_FREQ   $LBC_FREQ"
 
 date
 
@@ -122,10 +121,8 @@ fi
 cp namelist.input $RUN_DIR
 
 if test ! -f $FC_DIR/$DATE/wrfout_d${DOMAIN}_${END_YEAR}-${END_MONTH}-${END_DAY}_${END_HOUR}:00:00; then
-   if $NL_USE_HTML; then
-      echo '<A HREF="working">Working directory</a>'
-      echo '<A HREF="namelist.input">Namelist input</a>'
-   fi
+   echo '<A HREF="working">Working directory</a>'
+   echo '<A HREF="namelist.input">Namelist input</a>'
 
    if $DUMMY; then
       echo Dummy wrf
@@ -147,22 +144,20 @@ if test ! -f $FC_DIR/$DATE/wrfout_d${DOMAIN}_${END_YEAR}-${END_MONTH}-${END_DAY}
 
       mkdir $RUN_DIR/rsl
       mv rsl* $RUN_DIR/rsl
-      if $NL_USE_HTML; then
-         cd $RUN_DIR/rsl
-         for FILE in rsl*; do
-            echo "<HTML><HEAD><TITLE>$FILE</TITLE></HEAD>" > $FILE.html
-            echo "<H1>$FILE</H1><PRE>" >> $FILE.html
-            cat $FILE >> $FILE.html
-            echo "</PRE></BODY></HTML>" >> $FILE.html
-            rm $FILE
-         done
-         cd $WORK_DIR
+      cd $RUN_DIR/rsl
+      for FILE in rsl*; do
+         echo "<HTML><HEAD><TITLE>$FILE</TITLE></HEAD>" > $FILE.html
+         echo "<H1>$FILE</H1><PRE>" >> $FILE.html
+         cat $FILE >> $FILE.html
+         echo "</PRE></BODY></HTML>" >> $FILE.html
+         rm $FILE
+      done
+      cd $WORK_DIR
 
-         echo '<A HREF="namelist.output">Namelist output</a>'
-         echo '<A HREF="rsl/rsl.out.0000.html">rsl.out.0000</a>'
-         echo '<A HREF="rsl/rsl.error.0000.html">rsl.error.0000</a>'
-         echo '<A HREF="rsl">Other RSL output</a>'
-      fi
+      echo '<A HREF="namelist.output">Namelist output</a>'
+      echo '<A HREF="rsl/rsl.out.0000.html">rsl.out.0000</a>'
+      echo '<A HREF="rsl/rsl.error.0000.html">rsl.error.0000</a>'
+      echo '<A HREF="rsl">Other RSL output</a>'
    fi
    mv wrfout* $FC_DIR/$DATE
 else
@@ -176,9 +171,7 @@ fi
 
 date
 
-if $NL_USE_HTML; then
-   echo "</BODY></HTML>"
-fi
+echo "</BODY></HTML>"
 
 exit 0
 

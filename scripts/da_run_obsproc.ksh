@@ -10,12 +10,11 @@
 #--------------------------------------------
 
 export EXPT=${EXPT:-test}
-export NL_USE_HTML=${NL_USE_HTML:-false}
 export DATE=${DATE:-2004051300}
 export MAX_OB_RANGE=${MAX_OB_RANGE:-2}             # Maximum difference O, B (hours)
 
 export DOMAIN=${DOMAIN:-01}
-export REGION=${REGION:-amps$DOMAIN}
+export REGION=${REGION:-con200}
 export REL_DIR=${REL_DIR:-$HOME/trunk}
 export DAT_DIR=${DAT_DIR:-$HOME/data}
 export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION}
@@ -41,13 +40,15 @@ export STAND_LON=${STAND_LON:-180.0}
 export NL_DX=${NL_DX:-90000}
 export PTOP_PA=${PTOP_PA:-5000.0}
 
-if $NL_USE_HTML; then
-   echo "<HTML><HEAD><TITLE>$EXPT obsproc</TITLE></HEAD><BODY><H1>$EXPT obsproc</H1><PRE>"
-fi
+echo "<HTML><HEAD><TITLE>$EXPT obsproc</TITLE></HEAD><BODY><H1>$EXPT obsproc</H1><PRE>"
 
 date
 
-echo "Release directory $REL_DIR"
+echo 'REL_DIR      <A HREF="'$REL_DIR'">'$REL_DIR'</a>'
+echo 'OBSPROC_DIR  <A HREF="'$OBSPROC_DIR'">'$OBSPROC_DIR'</a>'
+echo 'OB_DIR       <A HREF="'$OB_DIR'">'$OB_DIR'</a>'
+echo 'RUN_DIR      <A HREF="'$RUN_DIR'">'$RUN_DIR'</a>'
+echo 'WORK_DIR     <A HREF="'$WORK_DIR'">'$WORK_DIR'</a>'
 
 if test ! -f $OB_DIR/$DATE/ob.ascii; then
 
@@ -191,9 +192,7 @@ fi
 
 date
 
-if $NL_USE_HTML; then
-   echo '</PRE></BODY></HTML>'
-fi
+echo '</PRE></BODY></HTML>'
 
 exit $RC
 

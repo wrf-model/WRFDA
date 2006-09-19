@@ -25,10 +25,8 @@ export MSS_RT_DIR=${MSS_RT_DIR:-mss:/BRESCH/RT/DATA}
 export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION} 
 export OB_DIR=${OB_DIR:-$REG_DIR/ob} 
 
-if $NL_USE_HTML; then
-   echo "<HTML><HEAD><TITLE>$EXPT restore_data_rtobs</TITLE></HEAD><BODY>"
-   echo "<H1>$EXPT restore_data_rtobs</H1><PRE>"
-fi
+echo "<HTML><HEAD><TITLE>$EXPT restore_data_rtobs</TITLE></HEAD><BODY>"
+echo "<H1>$EXPT restore_data_rtobs</H1><PRE>"
 
 date
 
@@ -69,8 +67,6 @@ done
 
 date
 
-if $NL_USE_HTML; then
-   echo "</BODY></HTML>"
-fi
+echo "</BODY></HTML>"
 
 exit 0

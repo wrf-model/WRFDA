@@ -26,10 +26,8 @@ export WORK_DIR=$RUN_DIR/working
 export DUMMY=${DUMMY:-false}
 export CLEAN=${CLEAN:-true}
 
-if $NL_USE_HTML; then
-   echo "<HTML><HEAD><TITLE>$EXPT update_bc</TITLE></HEAD><BODY>"
-   echo "<H1>$EXPT update_bc</H1><PRE>"
-fi
+echo "<HTML><HEAD><TITLE>$EXPT update_bc</TITLE></HEAD><BODY>"
+echo "<H1>$EXPT update_bc</H1><PRE>"
 
 date
 
@@ -91,8 +89,6 @@ fi
 
 date
 
-if $NL_USE_HTML; then
-   echo "</BODY></HTML>"
-fi
+echo "</BODY></HTML>"
 
 exit 0

@@ -45,9 +45,7 @@ export RC_DIR=${RC_DIR:-$REG_DIR/rc}
 export WPS_INPUT_DIR=${WPS_INPUT_DIR:-$RC_DIR}
 export WORK_DIR=$RUN_DIR/working
 
-if $NL_USE_HTML; then
-   echo "<HTML><HEAD><TITLE>$EXPT wps</TITLE></HEAD><BODY><H1>$EXPT wps</H1><PRE>"
-fi   
+echo "<HTML><HEAD><TITLE>$EXPT wps</TITLE></HEAD><BODY><H1>$EXPT wps</H1><PRE>"
 
 echo 'WPS_DIR       <A HREF="'$WPS_DIR'"</a>'$WPS_DIR'</a>'
 echo "DATE          $DATE"
@@ -180,9 +178,7 @@ fi
 
 date
 
-if $NL_USE_HTML; then
-   echo "</BODY></HTML>"
-fi
+echo "</BODY></HTML>"
 
 exit 0
 

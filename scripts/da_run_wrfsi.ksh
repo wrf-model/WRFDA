@@ -46,7 +46,6 @@ export AVN_DIR=${AVN_DIR:-$RUN_DIR/fnl}
 
 # WRFSI Namelist variables:
 
-export NL_USE_HTML=${NL_USE_HTML:-false}
 export NL_E_WE=${NL_E_WE:-110}
 export NL_E_SN=${NL_E_SN:-145}
 export MAP_PROJ=${MAP_PROJ:-polar}
@@ -94,10 +93,8 @@ export MOAD_STAND_LONS=$STAND_LONS
 export MOAD_DX=$NL_DX
 export MOAD_DY=$NL_DY
 
-if $NL_USE_HTML; then
-   echo "<HTML><HEAD><TITLE>$EXPT wrfsi</TITLE></HEAD><BODY>"
-   echo "<H1>$EXPT wrfsi</H1><PRE>"
-fi
+echo "<HTML><HEAD><TITLE>$EXPT wrfsi</TITLE></HEAD><BODY>"
+echo "<H1>$EXPT wrfsi</H1><PRE>"
 
 date
 
@@ -294,9 +291,7 @@ rm -rf ${EXT_DATAROOT}/extprd/*-* # Remove everything other than README file!
 
 date
 
-if $NL_USE_HTML; then
-   echo "</BODY></HTML>"
-fi
+echo "</BODY></HTML>"
 
 exit 0
 

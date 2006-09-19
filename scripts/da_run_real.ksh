@@ -6,7 +6,6 @@ export REL_DIR=${REL_DIR:-$HOME/trunk}
 export WRF_DIR=${WRF_DIR:-$REL_DIR/wrf}
 export SOLVER=${SOLVER:-em}
 export DUMMY=${DUMMY:-false}
-export NL_USE_HTML=${NL_USE_HTML:-false}
 export CYCLE_PERIOD=${CYCLE_PERIOD:-06}
 export NL_NUM_METGRID_LEVELS=${NL_NUM_METGRID_LEVELS:-27}
 export NL_P_TOP_REQUESTED=${NL_P_TOP_REQUESTED:-5000}
@@ -22,22 +21,20 @@ rm -rf $WORK_DIR
 mkdir -p $RUN_DIR $WORK_DIR
 cd $WORK_DIR
 
-if $NL_USE_HTML; then
-   echo "<HTML><HEAD><TITLE>$EXPT real</TITLE></HEAD><BODY>"
-   echo "<H1>$EXPT real</H1><PRE>"
-fi
+echo "<HTML><HEAD><TITLE>$EXPT real</TITLE></HEAD><BODY>"
+echo "<H1>$EXPT real</H1><PRE>"
 
 date
 
 . ${WRFVAR_DIR}/scripts/da_get_date_range.ksh $DATE $CYCLE_PERIOD
 
-echo 'Release directory:           <A HREF="file:'$REL_DIR'">'$REL_DIR'</a>'
-echo 'WRF directory:               <A HREF="file:'$WRF_DIR'">'$WRF_DIR'</a>' $WRF_REV
-echo 'Run directory:               <A HREF="file:'$RUN_DIR'">'$RUN_DIR'</a>'
-echo 'Working directory:           <A HREF="file:'$WORK_DIR'">'$WORK_DIR'</a>'
-echo 'RC_DIR:                      <A HREF="file:'$RC_DIR'">'$RC_DIR'</a>'
-echo "Start date:                  $DATE"
-echo "End date:                    $END_DATE"
+echo 'REL_DIR    <A HREF="file:'$REL_DIR'">'$REL_DIR'</a>'
+echo 'WRF_DIR    <A HREF="file:'$WRF_DIR'">'$WRF_DIR'</a>' $WRF_REV
+echo 'RUN_DIR    <A HREF="file:'$RUN_DIR'">'$RUN_DIR'</a>'
+echo 'WORK_DIR   <A HREF="file:'$WORK_DIR'">'$WORK_DIR'</a>'
+echo 'RC_DIR     <A HREF="file:'$RC_DIR'">'$RC_DIR'</a>'
+echo "DATE       $DATE"
+echo "END_DATE   $END_DATE"
 
 let NL_INTERVAL_SECONDS=$LBC_FREQ*3600
 
@@ -72,23 +69,21 @@ if test ! -f $RC_DIR/$DATE/wrfinput_d${DOMAIN}; then
 
       mkdir -p $RUN_DIR/rsl
       mv rsl* $RUN_DIR/rsl
-      if $NL_USE_HTML; then
-         cd $RUN_DIR/rsl
-         for FILE in rsl*; do
-            echo "<HTML><HEAD><TITLE>$FILE</TITLE></HEAD>" > $FILE.html
-            echo "<H1>$FILE</H1><PRE>" >> $FILE.html
-            cat $FILE >> $FILE.html
-            echo "</PRE></BODY></HTML>" >> $FILE.html
-            rm $FILE
-         done
-         cd $RUN_DIR
+      cd $RUN_DIR/rsl
+      for FILE in rsl*; do
+         echo "<HTML><HEAD><TITLE>$FILE</TITLE></HEAD>" > $FILE.html
+         echo "<H1>$FILE</H1><PRE>" >> $FILE.html
+         cat $FILE >> $FILE.html
+         echo "</PRE></BODY></HTML>" >> $FILE.html
+         rm $FILE
+      done
+      cd $RUN_DIR
 
-         echo '<A HREF="namelist.input">Namelist input</a>'
-         echo '<A HREF="namelist.output">Namelist output</a>'
-         echo '<A HREF="rsl/rsl.out.0000.html">rsl.out.0000</a>'
-         echo '<A HREF="rsl/rsl.error.0000.html">rsl.error.0000</a>'
-         echo '<A HREF="rsl">Other RSL output</a>'
-      fi
+      echo '<A HREF="namelist.input">Namelist input</a>'
+      echo '<A HREF="namelist.output">Namelist output</a>'
+      echo '<A HREF="rsl/rsl.out.0000.html">rsl.out.0000</a>'
+      echo '<A HREF="rsl/rsl.error.0000.html">rsl.error.0000</a>'
+      echo '<A HREF="rsl">Other RSL output</a>'
 
       if test $RC = 0; then
          echo `date` "${OK}Succeeded${END}"
@@ -110,6 +105,4 @@ fi
 
 date
 
-if $NL_USE_HTML; then
-   echo "</BODY></HTML>"
-fi
+echo "</BODY></HTML>"

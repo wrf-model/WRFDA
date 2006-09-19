@@ -101,7 +101,6 @@ EOF
 fi
 
 cat >> job.ksh <<EOF
-#!/bin/ksh
 RC=\$?
 if test \$RC = 0; then
    echo Succeeded

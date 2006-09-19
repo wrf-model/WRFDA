@@ -22,9 +22,9 @@ export WRFPLUS_DIR=${WRFPLUS_DIR:-$REL_DIR/wrfplus}
 export CHECK_SVNVERSION=${CHECK_SVNVERSION:-true}
 
 if $CHECK_SVNVERSION; then
-   WRFVAR_REV=`svnversion -n $WRFVAR_DIR`
-   WRF_NL_REV=`svnversion -n $WRF_NL_DIR`
-   WRFPLUS_REV=`svnversion -n $WRFPLUS_DIR`
+   WRFVAR_REV=`svnversion -n $WRFVAR_DIR 2>/dev/null`
+   WRF_NL_REV=`svnversion -n $WRF_NL_DIR 2>/dev/null`
+   WRFPLUS_REV=`svnversion -n $WRFPLUS_DIR 2>/dev/null`
 fi
 
 export REGION=${REGION:-con200}
@@ -71,7 +71,6 @@ export DA_RTTOV_COEFFS=${DA_RTTOV_COEFFS:-$RTTOV/rtcoef_rttov7}
 export NL_GLOBAL=${NL_GLOBAL:-false}
 export NL_VAR4D=${NL_VAR4D:-false}
 export NL_RUN_HOURS=${NL_RUN_HOURS:-6}
-export NL_USE_HTML=${NL_USE_HTML:-false}
 export NL_JCDFI_USE=${NL_JCDFI_USE:-false}
 export NL_JCDFI_ONOFF=$NL_JCDFI_USE
 
@@ -79,26 +78,23 @@ export NL_JCDFI_ONOFF=$NL_JCDFI_USE
 
 mkdir -p $RUN_DIR
 
-if $NL_USE_HTML; then
-   echo "<HTML><HEAD><TITLE>$EXPT wrfvar</TITLE></HEAD><BODY><H1>$EXPT wrfvar</H1><PRE>"
-fi
+echo "<HTML><HEAD><TITLE>$EXPT wrfvar</TITLE></HEAD><BODY><H1>$EXPT wrfvar</H1><PRE>"
 
 date
 
-echo 'Release directory:           <A HREF="file:'$REL_DIR'">"'$REL_DIR'</a>'
-echo 'WRFVAR directory:            <A HREF="file:'$WRFVAR_DIR'">'$WRFVAR_DIR'</a>' $WRFVAR_REV
-echo 'WRF NL directory:            <A HREF="file:'$WRF_NL_DIR'">'$WRF_NL_DIR'</a>' $WRF_NL_REV
-echo 'WRFPLUS directory:           <A HREF="file:'$WRFPLUS_DIR'">'$WRFPLUS_DIR'</a>' $WRFPLUS_REV
-echo "Subversion revision:         $WRFVAR_REV"
-echo "First Guess Input File:      $DA_FIRST_GUESS"
-echo "Background Error Input File: $DA_BACK_ERRORS"
-echo 'Observation Directory:       <A HREF="file:'$OB_DIR'">'$OB_DIR'</a>'
-echo "Analysis:                    $DA_ANALYSIS"
-echo 'Run directory:               <A HREF="file:'$RUN_DIR'">'$RUN_DIR'</a>'
-echo 'Working directory:           <A HREF="file:'$WORK_DIR'">'$WORK_DIR'</a>'
-echo "Analysis date:               $DATE"
-echo "Time window start:           $WINDOW_START"
-echo "Time window end:             $WINDOW_END"
+echo 'REL_DIR               <A HREF="file:'$REL_DIR'">'$REL_DIR'</a>'
+echo 'WRFVAR_DIR            <A HREF="file:'$WRFVAR_DIR'">'$WRFVAR_DIR'</a>' $WRFVAR_REV
+echo 'WRF_NL_DIR            <A HREF="file:'$WRF_NL_DIR'">'$WRF_NL_DIR'</a>' $WRF_NL_REV
+echo 'WRFPLUS_DIR           <A HREF="file:'$WRFPLUS_DIR'">'$WRFPLUS_DIR'</a>' $WRFPLUS_REV
+echo "DA_FIRST_GUESS        $DA_FIRST_GUESS"
+echo "DA_BACK_ERRORS        $DA_BACK_ERRORS"
+echo 'OB_DIR                <A HREF="file:'$OB_DIR'">'$OB_DIR'</a>'
+echo "DA_ANALYSIS           $DA_ANALYSIS"
+echo 'RUN_DIR               <A HREF="file:'$RUN_DIR'">'$RUN_DIR'</a>'
+echo 'WORK_DIR              <A HREF="file:'$WORK_DIR'">'$WORK_DIR'</a>'
+echo "DATE                  $DATE"
+echo "WINDOW_START          $WINDOW_START"
+echo "WINDOW_END            $WINDOW_END"
 
 if test ! -f $DA_ANALYSIS; then
 
@@ -354,9 +350,7 @@ if test ! -f $DA_ANALYSIS; then
      cp namelist.input $RUN_DIR
    fi
 
-   if $NL_USE_HTML; then
-      echo '<A HREF="namelist.input">Namelist input</a>'
-   fi
+   echo '<A HREF="namelist.input">Namelist input</a>'
 
    #-------------------------------------------------------------------
    #Run WRF-Var:
@@ -456,27 +450,25 @@ if test ! -f $DA_ANALYSIS; then
 
       mkdir -p $RUN_DIR/rsl
       mv rsl* $RUN_DIR/rsl
-      if $NL_USE_HTML; then
-         cd $RUN_DIR/rsl
-         for FILE in rsl*; do
-            echo "<HTML><HEAD><TITLE>$FILE</TITLE></HEAD>" > $FILE.html
-            echo "<H1>$FILE</H1><PRE>" >> $FILE.html
-            cat $FILE >> $FILE.html
-            echo "</PRE></BODY></HTML>" >> $FILE.html
-            rm $FILE
-         done
-         cd $RUN_DIR
+      cd $RUN_DIR/rsl
+      for FILE in rsl*; do
+         echo "<HTML><HEAD><TITLE>$FILE</TITLE></HEAD>" > $FILE.html
+         echo "<H1>$FILE</H1><PRE>" >> $FILE.html
+         cat $FILE >> $FILE.html
+         echo "</PRE></BODY></HTML>" >> $FILE.html
+         rm $FILE
+      done
+      cd $RUN_DIR
 
-         echo '<A HREF="namelist.output">Namelist output</a>'
-         echo '<A HREF="rsl/rsl.out.0000.html">rsl.out.0000</a>'
-         echo '<A HREF="rsl/rsl.error.0000.html">rsl.error.0000</a>'
-         echo '<A HREF="rsl">Other RSL output</a>'
-         echo '<A HREF="trace/0.html">PE 0 trace</a>'
-         echo '<A HREF="trace">Other tracing</a>'
-         echo '<A HREF="cost_fn">Cost function</a>'
-         echo '<A HREF="grad_fn">Gradient function</a>'
-         echo '<A HREF="statistics">Statistics</a>'
-      fi
+      echo '<A HREF="namelist.output">Namelist output</a>'
+      echo '<A HREF="rsl/rsl.out.0000.html">rsl.out.0000</a>'
+      echo '<A HREF="rsl/rsl.error.0000.html">rsl.error.0000</a>'
+      echo '<A HREF="rsl">Other RSL output</a>'
+      echo '<A HREF="trace/0.html">PE 0 trace</a>'
+      echo '<A HREF="trace">Other tracing</a>'
+      echo '<A HREF="cost_fn">Cost function</a>'
+      echo '<A HREF="grad_fn">Gradient function</a>'
+      echo '<A HREF="statistics">Statistics</a>'
 
       cat $RUN_DIR/cost_fn
 
@@ -503,8 +495,6 @@ else
    echo "$DA_ANALYSIS already exists, skipping"
 fi
 
-if $NL_USE_HTML; then
-   echo '</PRE></BODY></HTML>'
-fi
+echo '</PRE></BODY></HTML>'
 
 exit $RC

@@ -110,13 +110,9 @@ export WPS_DIR=${WPS_DIR:-$REL_DIR/wps}
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}        
 export OBSPROC_DIR=${OBSPROC_DIR:-$REL_DIR/3DVAR_OBSPROC}   
 
-export NL_USE_HTML=${NL_USE_HTML:-false}
-
-if $NL_USE_HTML; then
-   export OK='<FONT COLOR="green">'
-   export ERR='<FONT COLOR="red">'
-   export END='</FONT>'
-fi
+export OK='<FONT COLOR="green">'
+export ERR='<FONT COLOR="red">'
+export END='</FONT>'
 
 if test ! -d $DAT_DIR; then
    mkdir $DAT_DIR
@@ -177,28 +173,23 @@ export DATE=$INITIAL_DATE
 export PREV_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe $DATE -$CYCLE_PERIOD 2>/dev/null`
 
 if $CHECK_SVNVERSION; then
-   WRF_VN=`svnversion -n $WRF_DIR`
-   WRF_NL_VN=`svnversion -n $WRF_NL_DIR`
-   WRFVAR_VN=`svnversion -n $WRFVAR_DIR`
-   WRFPLUS_VN=`svnversion -n $WRFPLUS_DIR`
-   WPS_VN=`svnversion -n $WPS_DIR`
+   WRF_VN=`svnversion -n $WRF_DIR 2>/dev/null`
+   WRF_NL_VN=`svnversion -n $WRF_NL_DIR 2>/dev/null`
+   WRFVAR_VN=`svnversion -n $WRFVAR_DIR 2>/dev/null`
+   WRFPLUS_VN=`svnversion -n $WRFPLUS_DIR 2>/dev/null`
+   WPS_VN=`svnversion -n $WPS_DIR 2>/dev/null`
 fi
 
-if $NL_USE_HTML; then
-   echo "<HTML><HEAD><TITLE>$EXPT</TITLE></HEAD><BODY><H1>$EXPT</H1><PRE>"
-else
-   echo $EXPT
-   echo
-fi
+echo "<HTML><HEAD><TITLE>$EXPT</TITLE></HEAD><BODY><H1>$EXPT</H1><PRE>"
 
 echo 'REL_DIR      <A HREF="file:'$REL_DIR'">'$REL_DIR'</a>'
-echo 'WRF          <A HREF="file:'$WRF_DIR'">'$WRF_DIR'</a>' $WRF_VN
-echo 'WRF_NL       <A HREF="file:'$WRF_NL_DIR'">'$WRF_NL_DIR'</a>' $WRF_VN
-echo 'WRFVAR       <A HREF="file:'$WRFVAR_DIR'">'$BE_DIR'</a>' $WRFVAR_VN
-echo 'WRFPLUS      <A HREF="file:'$WRFPLUS_DIR'">'$WRFPLUS_DIR'</a>' $WRFPLUS_VN
-echo 'WPS          <A HREF="file:'$WPS_DIR'">'$WPS_DIR'</a>' $WPS_VN
-echo 'WRFSI        <A HREF="file:'$WRFSI_DIR'">'$WRFSI_DIR'</a>'
-echo 'OBSPROC      <A HREF="file:'$OBSPROC_DIR'">'$OBSPROC_DIR'</a>'
+echo 'WRF_DIR      <A HREF="file:'$WRF_DIR'">'$WRF_DIR'</a>' $WRF_VN
+echo 'WRF_NL_DIR   <A HREF="file:'$WRF_NL_DIR'">'$WRF_NL_DIR'</a>' $WRF_VN
+echo 'WRFVAR_DIR   <A HREF="file:'$WRFVAR_DIR'">'$BE_DIR'</a>' $WRFVAR_VN
+echo 'WRFPLUS_DIR  <A HREF="file:'$WRFPLUS_DIR'">'$WRFPLUS_DIR'</a>' $WRFPLUS_VN
+echo 'WPS_DIR      <A HREF="file:'$WPS_DIR'">'$WPS_DIR'</a>' $WPS_VN
+echo 'WRFSI_DIR    <A HREF="file:'$WRFSI_DIR'">'$WRFSI_DIR'</a>'
+echo 'OBSPROC_DIR  <A HREF="file:'$OBSPROC_DIR'">'$OBSPROC_DIR'</a>'
 
 echo "DUMMY        $DUMMY"
 echo "CLEAN        $CLEAN"
@@ -251,8 +242,8 @@ while test $DATE != $FINAL_DATE; do
       export RUN_DIR=$EXP_DIR/$DATE/restore_data_ncep
       mkdir -p $RUN_DIR
 
-      START_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe ${DATE} $WINDOW_START 2>/dev/null`
-      END_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe ${DATE} $WINDOW_END 2>/dev/null`
+      export START_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe ${DATE} $WINDOW_START 2>/dev/null`
+      export END_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe ${DATE} $WINDOW_END 2>/dev/null`
 
       $WRFVAR_DIR/scripts/da_trace.ksh da_run_restore_data_ncep $RUN_DIR
       ${WRFVAR_DIR}/scripts/da_restore_data_ncep.ksh > $RUN_DIR/index.html 2>&1
@@ -266,8 +257,8 @@ while test $DATE != $FINAL_DATE; do
       export RUN_DIR=$EXP_DIR/$DATE/restore_data_rtobs
       mkdir -p $RUN_DIR
 
-      START_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe ${DATE} $WINDOW_START 2>/dev/null`
-      END_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe ${DATE} $WINDOW_END 2>/dev/null`
+      export START_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe ${DATE} $WINDOW_START 2>/dev/null`
+      export END_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe ${DATE} $WINDOW_END 2>/dev/null`
 
       $WRFVAR_DIR/scripts/da_trace.ksh da_run_restore_data_rtobs $RUN_DIR
       ${WRFVAR_DIR}/scripts/da_restore_data_rtobs.ksh > $RUN_DIR/index.html 2>&1
@@ -401,9 +392,7 @@ done
 echo
 echo `date` "Suite finished"
 
-if $NL_USE_HTML; then
-   echo "</PRE></BODY></HTML>"
-fi
+echo "</PRE></BODY></HTML>"
 
 exit 0
 

@@ -25,10 +25,8 @@ export MSS_NCEP_DIR=${MSS_NCEP_DIR:-mss:/DSS/DS083.2/data}
 export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION} 
 export NCEP_DIR=${NCEP_DIR:-$DAT_DIR/ncep}     
 
-if $NL_USE_HTML; then
-   echo "<HTML><HEAD><TITLE>$EXPT restore_data_ncep</TITLE></HEAD><BODY>"
-   echo "<H1>$EXPT restore_data_ncep</H1><PRE>"
-fi
+echo "<HTML><HEAD><TITLE>$EXPT restore_data_ncep</TITLE></HEAD><BODY>"
+echo "<H1>$EXPT restore_data_ncep</H1><PRE>"
 
 date
 
@@ -68,8 +66,6 @@ done
 
 date
 
-if $NL_USE_HTML; then
-   echo "</BODY></HTML>"
-fi
+echo "</BODY></HTML>"
 
 exit 0
