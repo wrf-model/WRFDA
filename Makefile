@@ -13,14 +13,6 @@ include ./configure.wrf
 EM_MODULE_DIR = -I../dyn_em
 EM_MODULES =  $(EM_MODULE_DIR)
 
-DA_WRFVAR_MODULES = $(INCLUDE_MODULES)
-DA_WRFVAR_MODULES_2 = $(INC_MOD_WRFVAR)
-
-#JRB -p../convertor is not a valid option on Linux or Aix, I wonder
-# what it was for?
-#DA_CONVERTOR_MOD_DIR = -I../convertor -p../convertor
-DA_CONVERTOR_MOD_DIR = -I../convertor
-DA_CONVERTOR_MODULES = $(DA_CONVERTOR_MOD_DIR) $(INCLUDE_MODULES)
 
 #### 3.d.   add macros to specify the modules for this core
 
@@ -72,81 +64,7 @@ wrf : framework_only
 	  ( cd run ; /bin/rm -f wrf_SST_ESMF.exe ; ln -s ../main/wrf_SST_ESMF.exe . ) ; \
 	fi
 
-blas : 
-	( cd external/blas; make all )
-
-lapack : blas
-	( cd external/lapack; make all )
-
-fftpack5 : 
-	( cd external/fftpack5; make all )
-
-bufr : 
-	( cd external/bufr_ncep_nco; make all )
-
-wrfvar : var
-
-var : blas lapack fftpack5 bufr
-	/bin/rm -f main/libwrflib.a
-	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" ext
-	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" toolsdir
-	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" REGISTRY="Registry" framework
-	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" shared
-	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" physics
-	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" em_core
-	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" wrfvar_io
-	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" wrfvar_src
-	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" wrfvar_interface
-	( cd main ; $(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" wrfvar )
-
-pure_var : 
-	@ echo 'This option assumes that you have already compiled the WRF frame part correctly.'
-	@ echo 'If you have not done so, please use compile var'
-	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" wrfvar_io
-	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" wrfvar_src
-	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" wrfvar_interface
-	( cd main ; $(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" wrfvar )
-
-k2n : 
-	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" ext
-	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" toolsdir
-	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" REGISTRY="Registry" framework
-	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" shared
-	$(MAKE) MODULE_DIRS="$(ALL_MODULES)" physics
-	$(MAKE) MODULE_DIRS="$(ALL_MODULES)" em_core
-	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" wrfvar_io
-	$(MAKE) MODULE_DIRS="$(DA_CONVERTOR_MODULES)" convertor_drivers
-	( cd main ; \
-          /bin/rm -f kma2netcdf.exe ; \
-	  $(MAKE) MODULE_DIRS="$(DA_CONVERTOR_MODULES)" kma2netcdf )
-
-n2k : 
-	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" ext
-	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" toolsdir
-	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" REGISTRY="Registry" framework
-	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" shared
-	$(MAKE) MODULE_DIRS="$(ALL_MODULES)" physics
-	$(MAKE) MODULE_DIRS="$(ALL_MODULES)" em_core
-	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" wrfvar_io
-	$(MAKE) MODULE_DIRS="$(DA_CONVERTOR_MODULES)" convertor_drivers
-	( cd main ; \
-          /bin/rm -f netcdf2kma.exe ; \
-	  $(MAKE) MODULE_DIRS="$(DA_CONVERTOR_MODULES)" netcdf2kma )
-
-BE_OBJS = da_gen_be.o DA_Constants.o be_spectral.o LAPACK.o BLAS.o da_fftpack5.o
-BE_MODULES1 = -I../../frame
-BE_MODULES2 = -I../da -I../frame
-be : 
-	( cd tools; $(MAKE) FC="$(FC)" FCFLAGS="$(FCFLAGS)" advance_cymdh )
-	( cd frame; $(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" externals module_wrf_error.o )
-	( cd da; $(MAKE) MODULE_DIRS="$(BE_MODULES1)" $(BE_OBJS) da_gen_be.o )
-	( cd gen_be ; \
-	/bin/rm -f *.exe ; \
-	$(MAKE) MODULE_DIRS="$(BE_MODULES2)" gen_be )
-
 ### 3.a.  rules to build the framework and then the experimental core
-
-
 
 exp_wrf : configcheck
 	$(MAKE) MODULE_DIRS="$(ALL_MODULES)" ext
@@ -414,22 +332,6 @@ fseek_test :
 	@ cd tools ; /bin/rm -f fseeko_test ; $(SCC) -DTEST_FSEEKO -o fseeko_test fseek_test.c ; cd ..
 	@ cd tools ; /bin/rm -f fseeko64_test ; $(SCC) -DTEST_FSEEKO64 -o fseeko64_test fseek_test.c ; cd ..
 
-wrfvar_src :
-	@ echo '--------------------------------------'
-	( cd da; $(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" wrfvar_src )
-
-wrfvar_io :
-	@ echo '--------------------------------------'
-	( cd da; $(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" wrfvar_io )
-
-wrfvar_interface :
-	@ echo '--------------------------------------'
-	( cd da; $(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" wrfvar_interface )
-
-convertor_drivers :
-	@ echo '--------------------------------------'
-	( cd convertor ; $(MAKE) )
-
 ### 3.b.  sub-rule to build the expimental core
 
 # uncomment the two lines after exp_core for EXP
@@ -451,12 +353,6 @@ toolsdir :
 esmf_time_f90_only :
 	@ echo '--------------------------------------'
 	( cd external/esmf_time_f90 ; $(MAKE) FC="$(FC) $(FCFLAGS)" CPP="$(CPP) -DTIME_F90_ONLY" tests )
-
-
-bufr_little_endian :
-	@ echo '--------------------------------------'
-	( cd tools ; $(MAKE) CC="$(CC_TOOLS)" DA_SRC="$(DA_SRC)" \
-            FC="$(FC)" F77FLAGS_ENDIAN="$(F77FLAGS_ENDIAN)" bufr_little_endian.exe)
 
 clean :
 		@ echo 'Use the clean script'
